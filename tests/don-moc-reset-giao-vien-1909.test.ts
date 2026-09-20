@@ -1,5 +1,8 @@
 // DỌN MÁY THẦY THEO `mocReset` (0.Planer duyệt 19/09/2026, thầy chốt reset 00:01 thứ Hai 21/09).
 //
+// ĐỔI 21/09 (Boss chuyển lệnh thầy): reset GIỮ TOÀN BỘ ca thi ⇒ danh sách DỌN RỖNG, không toast. Test giữ nguyên CƠ CHẾ (kích hoạt
+// theo mốc, nguyên tử, dấu mốc, xếp loại khoá mới) và thêm test "cơ chế còn sống" — thêm một tên vào danh sách dọn là dọn thật.
+//
 // Kiểm ba lớp:
 //   1. LUẬT: khoá nào DỌN, khoá nào GIỮ; mốc hợp lệ; khi nào chạy, khi nào không (thay thế được bằng `pt` để không chạm IndexedDB).
 //   2. GIAO DỊCH nguyên tử trên một IndexedDB GIẢ trong bộ nhớ (repo không có fake-indexeddb): xoá đúng, giữ đúng, ghi dấu cùng
@@ -25,7 +28,10 @@ function taoDbGia() {
         if (nen.hong) throw new Error('IDB hỏng giữa giao dịch')
         m.delete(k)
       },
-      put: async (v: unknown, k: string) => void m.set(k, v),
+      put: async (v: unknown, k: string) => {
+        if (nen.hong) throw new Error('IDB hỏng giữa giao dịch')
+        m.set(k, v)
+      },
     }
   }
   return {
@@ -84,28 +90,27 @@ describe('mốc hợp lệ và câu thông báo', () => {
       expect(MOC.chuanMocReset(xau), String(xau)).toBeNull()
     }
   })
-  it('một dòng cho thầy: mốc ngày thì nói ngày, mốc khác thì nói chung', () => {
-    expect(MOC.chuThongBaoMocReset('2026-09-21')).toBe('Hệ thống đã làm mới ngày 21/09 — dữ liệu ca cũ trong máy đã được dọn')
-    expect(MOC.chuThongBaoMocReset('lan-2')).toBe('Hệ thống đã làm mới — dữ liệu ca cũ trong máy đã được dọn')
+  it('KHÔNG còn câu toast: máy thầy giữ toàn bộ ca thi nên không có gì để báo', () => {
+    expect((MOC as Record<string, unknown>).chuThongBaoMocReset).toBeUndefined()
   })
 })
 
 describe('khoá nào DỌN, khoá nào GIỮ', () => {
-  const DON = ['soCauCa:1', 'khoChuaCa:x', 'deRiengCa:x', 'cheDoDeRieng:x', 'qidRaPhieu:12000', 'buoiChua:-|Lop|1', 'diemCuaEm']
+  // 21/09: reset GIỮ toàn bộ ca thi — các khoá theo ca/em trước đây bị dọn nay nằm cả ở nhóm GIỮ.
   const GIU = [
     'scriptUrl', 'mayChuMoi', 'teacherSecret', 'khoaApp', 'khoaVanTay', 'khoaPhien', 'giuPhien', 'soSuaDang',
     'tokenHocSinh', 'tokenPhuHuynh', 'myStudentSbd', 'myParentPhone', 'mocResetDaDon',
-    // Boss chốt 21/09 (reset GIỮ hồ sơ mạnh yếu): độ khó theo câu và hàng đợi ôn giãn cách CHỈ có ở máy thầy ⇒ giữ
     'khoDoKho', 'lichOnLai',
+    // theo ca / theo em (từng thuộc nhóm DỌN)
+    'soCauCa:1', 'khoChuaCa:x', 'deRiengCa:x', 'cheDoDeRieng:x', 'qidRaPhieu:12000', 'buoiChua:-|Lop|1', 'diemCuaEm',
   ]
-  it('đúng bảng 0.Planer đã duyệt', () => {
-    for (const k of DON) expect(EXAM.khoaSettingsThuocNhomDon(k), k).toBe(true)
+  it('danh sách DỌN RỖNG: mọi khoá (kể cả theo ca/em, buổi chữa dở, điểm của em) đều được GIỮ', () => {
     for (const k of GIU) expect(EXAM.khoaSettingsThuocNhomDon(k), k).toBe(false)
+    expect([...EXAM.STORE_DON_KHI_RESET]).toEqual([])
+    expect([...EXAM.TIEN_TO_SETTINGS_DON_KHI_RESET]).toEqual([])
+    expect([...EXAM.KHOA_SETTINGS_DON_KHI_RESET]).toEqual([])
   })
-  it('store xoá sạch là ba store theo ca/em; KHO ĐỀ `examSources` không nằm trong đó', () => {
-    expect([...EXAM.STORE_DON_KHI_RESET].sort()).toEqual(['attempts', 'sessionBankTeacher', 'sessionCache'])
-  })
-  it('KHOÁ MỚI trong `settings` phải được PHÂN LOẠI: mọi khoá exam-db.ts dùng nằm ở danh sách DỌN hoặc GIỮ của test này (thêm khoá là phải quyết)', () => {
+  it('KHOÁ MỚI trong `settings` phải được PHÂN LOẠI: mọi khoá exam-db.ts dùng nằm ở danh sách GIỮ của test này (thêm khoá là phải quyết: giữ thì thêm vào GIU, dọn thì thêm vào danh sách dọn)', () => {
     const hang = new Map([...EXAM_DB.matchAll(/const (KHOA_[A-Z_]+) = '([^']+)'/g)].map((m) => [m[1], m[2]]))
     const dungDung = new Set<string>()
     for (const dong of EXAM_DB.split('\n')) {
@@ -117,11 +122,11 @@ describe('khoá nào DỌN, khoá nào GIỮ', () => {
     // cả hai tập phải có thật (đề phòng regex hỏng thành xanh suông)
     expect([...dungDung].sort()).toEqual(expect.arrayContaining(['scriptUrl', 'teacherSecret', 'khoDoKho', 'diemCuaEm', 'lichOnLai', 'mocResetDaDon', 'soSuaDang', 'tokenHocSinh']))
     expect(dungDung.size).toBeGreaterThanOrEqual(15)
-    expect([...dungDung].sort()).toEqual(expect.arrayContaining(['khoDoKho', 'lichOnLai']))
     expect([...tienTo].sort()).toEqual(['buoiChua:', 'cheDoDeRieng:', 'deRiengCa:', 'khoChuaCa:', 'qidRaPhieu:', 'soCauCa:'])
-    const chuaPhanLoai = [...dungDung].filter((k) => !DON.includes(k) && !GIU.includes(k))
+    const gocGiu = new Set(GIU.map((k) => (k.includes(':') && !k.startsWith('mocReset') ? k.slice(0, k.indexOf(':') + 1) : k)))
+    const chuaPhanLoai = [...dungDung].filter((k) => !gocGiu.has(k))
     expect(chuaPhanLoai, 'khoá settings mới chưa được xếp DỌN/GIỮ khi reset').toEqual([])
-    for (const t of tienTo) expect((EXAM.TIEN_TO_SETTINGS_DON_KHI_RESET as readonly string[]).includes(t), t).toBe(true)
+    for (const t of tienTo) expect(gocGiu.has(t), `tiền tố ${t} chưa xếp loại`).toBe(true)
   })
 })
 
@@ -130,15 +135,13 @@ describe('donTheoMocReset — khi nào chạy', () => {
     laThay: () => true,
     docDaDon: async () => '',
     don: vi.fn(async () => ({ soBanGhi: 3, soKhoaSettings: 5 })),
-    baoThay: vi.fn(),
     ...o,
   })
 
-  it('không có mốc (máy chủ chưa reset / đường Apps Script cũ) ⇒ KHÔNG dọn, KHÔNG báo', async () => {
+  it('không có mốc (máy chủ chưa reset / đường Apps Script cũ) ⇒ KHÔNG dọn', async () => {
     const p = pt()
     for (const v of [undefined, null, '', 20260921, {}]) expect(await MOC.donTheoMocReset(v, p)).toEqual({ daDon: false, lyDo: 'khong_co_moc' })
     expect(p.don).not.toHaveBeenCalled()
-    expect(p.baoThay).not.toHaveBeenCalled()
   })
 
   it('KHÔNG phải vai giáo viên ⇒ không dọn (cổng học sinh / phụ huynh có bộ dọn riêng)', async () => {
@@ -147,20 +150,17 @@ describe('donTheoMocReset — khi nào chạy', () => {
     expect(p.don).not.toHaveBeenCalled()
   })
 
-  it('mốc MỚI ⇒ dọn đúng một lần, báo thầy một dòng đúng chữ đã duyệt', async () => {
+  it('mốc MỚI ⇒ chạy đúng một lần (không toast — không có gì để báo)', async () => {
     const p = pt()
     const kq = await MOC.donTheoMocReset('2026-09-21', p)
     expect(kq).toEqual({ daDon: true, ket: { soBanGhi: 3, soKhoaSettings: 5 }, moc: '2026-09-21' })
     expect(p.don).toHaveBeenCalledWith('2026-09-21')
-    expect(p.baoThay).toHaveBeenCalledTimes(1)
-    expect(p.baoThay).toHaveBeenCalledWith('Hệ thống đã làm mới ngày 21/09 — dữ liệu ca cũ trong máy đã được dọn')
   })
 
-  it('đã dọn theo ĐÚNG mốc này rồi ⇒ không dọn lại, không báo lại', async () => {
+  it('đã dọn theo ĐÚNG mốc này rồi ⇒ không dọn lại', async () => {
     const p = pt({ docDaDon: async () => '2026-09-21' })
     expect(await MOC.donTheoMocReset('2026-09-21', p)).toEqual({ daDon: false, lyDo: 'da_don_roi' })
     expect(p.don).not.toHaveBeenCalled()
-    expect(p.baoThay).not.toHaveBeenCalled()
   })
 
   it('một mốc reset LẦN SAU (khác mốc đã dọn) ⇒ dọn lại', async () => {
@@ -169,17 +169,10 @@ describe('donTheoMocReset — khi nào chạy', () => {
     expect(p.don).toHaveBeenCalledWith('2026-10-05')
   })
 
-  it('máy mới tinh (không có gì để dọn) ⇒ vẫn ghi dấu nhưng KHÔNG báo thầy', async () => {
-    const p = pt({ don: vi.fn(async () => ({ soBanGhi: 0, soKhoaSettings: 0 })) })
-    expect((await MOC.donTheoMocReset('2026-09-21', p)).daDon).toBe(true)
-    expect(p.baoThay).not.toHaveBeenCalled()
-  })
-
-  it('dọn HỎNG ⇒ không ném lỗi ra ngoài (danh sách ca quan trọng hơn), không báo, lần sau thử lại', async () => {
+  it('dọn HỎNG ⇒ không ném lỗi ra ngoài (danh sách ca quan trọng hơn), lần sau thử lại', async () => {
     const p = pt({ don: vi.fn(async () => { throw new Error('IDB chết') }) })
     const spy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     await expect(MOC.donTheoMocReset('2026-09-21', p)).resolves.toEqual({ daDon: false, lyDo: 'loi' })
-    expect(p.baoThay).not.toHaveBeenCalled()
     spy.mockRestore()
     // lần sau (đã hết lỗi) dọn được
     const p2 = pt()
@@ -196,26 +189,54 @@ describe('donTheoMocReset — khi nào chạy', () => {
     const [ka, kb] = await Promise.all([a, b])
     expect(ka).toEqual(kb)
     expect(p.don).toHaveBeenCalledTimes(1)
-    expect(p.baoThay).toHaveBeenCalledTimes(1)
   })
 })
 
 describe('giao dịch dọn trên IndexedDB giả', () => {
-  it('xoá đúng nhóm DỌN, GIỮ đúng nhóm GIỮ (kể cả KHO ĐỀ), ghi dấu, đếm đúng', async () => {
+  const TAT_CA_KHOA = () => [...nen.kho.get('settings')!.keys()].sort()
+
+  it('GIỮ TOÀN BỘ ca thi (danh sách dọn rỗng): không xoá store nào, không xoá khoá nào, chỉ thêm dấu mốc; đếm 0', async () => {
+    const truoc = TAT_CA_KHOA()
     const kq = await EXAM.donDuLieuTheoMocReset('2026-09-21')
-    expect(kq).toEqual({ soBanGhi: 2 + 2 + 1, soKhoaSettings: 7 })
-    for (const s of ['sessionCache', 'sessionBankTeacher', 'attempts']) expect(nen.kho.get(s)!.size, s).toBe(0)
+    expect(kq).toEqual({ soBanGhi: 0, soKhoaSettings: 0 })
+    expect(nen.kho.get('sessionCache')!.size).toBe(2)
+    expect(nen.kho.get('sessionBankTeacher')!.size).toBe(2)
+    expect(nen.kho.get('attempts')!.size).toBe(1)
     expect([...nen.kho.get('examSources')!.keys()].sort()).toEqual(['D1', 'D2'])
-    const conLai = [...nen.kho.get('settings')!.keys()].sort()
-    expect(conLai).toEqual(
-      ['giuPhien', 'khoDoKho', 'khoaApp', 'khoaPhien', 'khoaVanTay', 'lichOnLai', 'mayChuMoi', 'mocResetDaDon', 'myParentPhone', 'myStudentSbd', 'scriptUrl', 'soSuaDang', 'teacherSecret', 'tokenHocSinh', 'tokenPhuHuynh'].sort(),
-    )
+    expect(TAT_CA_KHOA()).toEqual([...truoc, 'mocResetDaDon'].sort())
+    for (const k of ['soCauCa:111111', 'khoChuaCa:111111', 'deRiengCa:111111', 'cheDoDeRieng:111111', 'qidRaPhieu:12000', 'buoiChua:-|Lop|111111', 'diemCuaEm', 'khoDoKho', 'lichOnLai']) {
+      expect(nen.kho.get('settings')!.has(k), k).toBe(true)
+    }
     expect(nen.kho.get('settings')!.get('mocResetDaDon')).toBe('2026-09-21')
     expect(nen.kho.get('settings')!.get('teacherSecret')).toBe('bi-mat')
     expect(await EXAM.docMocResetDaDon()).toBe('2026-09-21')
   })
 
-  it('HỎNG GIỮA CHỪNG ⇒ không dọn nửa vời và KHÔNG ghi dấu (giao dịch bị huỷ)', async () => {
+  it('CƠ CHẾ CÒN SỐNG: thêm tên vào các danh sách dọn thì dọn đúng nhóm đó, giữ phần còn lại, đếm đúng, ghi dấu', async () => {
+    const st = EXAM.STORE_DON_KHI_RESET as unknown as string[]
+    const tt = EXAM.TIEN_TO_SETTINGS_DON_KHI_RESET as string[]
+    const kk = EXAM.KHOA_SETTINGS_DON_KHI_RESET as string[]
+    st.push('sessionBankTeacher', 'attempts')
+    tt.push('buoiChua:', 'soCauCa:')
+    kk.push('diemCuaEm')
+    try {
+      expect(EXAM.khoaSettingsThuocNhomDon('buoiChua:-|Lop|1')).toBe(true)
+      const kq = await EXAM.donDuLieuTheoMocReset('2026-10-05')
+      expect(kq).toEqual({ soBanGhi: 2 + 1, soKhoaSettings: 3 })
+      expect(nen.kho.get('sessionBankTeacher')!.size).toBe(0)
+      expect(nen.kho.get('attempts')!.size).toBe(0)
+      expect(nen.kho.get('sessionCache')!.size).toBe(2) // không nằm trong danh sách ⇒ giữ
+      for (const k of ['buoiChua:-|Lop|111111', 'soCauCa:111111', 'diemCuaEm']) expect(nen.kho.get('settings')!.has(k), k).toBe(false)
+      for (const k of ['khoChuaCa:111111', 'khoDoKho', 'lichOnLai', 'teacherSecret']) expect(nen.kho.get('settings')!.has(k), k).toBe(true)
+      expect(await EXAM.docMocResetDaDon()).toBe('2026-10-05')
+    } finally {
+      st.length = 0
+      tt.length = 0
+      kk.length = 0
+    }
+  })
+
+  it('HỎNG GIỮA CHỪNG ⇒ giao dịch bị huỷ: KHÔNG ghi dấu (lần sau thử lại), không đổi gì', async () => {
     nen.hong = true
     await expect(EXAM.donDuLieuTheoMocReset('2026-09-21')).rejects.toThrow('IDB hỏng')
     expect(nen.kho.get('sessionBankTeacher')!.size).toBe(2)
@@ -223,19 +244,16 @@ describe('giao dịch dọn trên IndexedDB giả', () => {
     expect(await EXAM.docMocResetDaDon()).toBe('')
   })
 
-  it('dọn hai lần liên tiếp vô hại (idempotent) và đếm 0 lần hai', async () => {
+  it('dọn hai lần liên tiếp vô hại (idempotent) và đếm 0 cả hai lần', async () => {
     await EXAM.donDuLieuTheoMocReset('2026-09-21')
     expect(await EXAM.donDuLieuTheoMocReset('2026-09-21')).toEqual({ soBanGhi: 0, soKhoaSettings: 0 })
   })
 
-  it('toàn tuyến `donTheoMocReset` (không thay phụ thuộc) dọn máy giả và báo thầy', async () => {
-    const baoThay = vi.fn()
-    const kq = await MOC.donTheoMocReset('2026-09-21', { laThay: () => true, baoThay })
+  it('toàn tuyến `donTheoMocReset` (không thay phụ thuộc): ghi dấu mốc, giữ bank ca, lần hai báo "đã dọn rồi"', async () => {
+    const kq = await MOC.donTheoMocReset('2026-09-21', { laThay: () => true })
     expect(kq.daDon).toBe(true)
-    expect(baoThay).toHaveBeenCalledTimes(1)
-    expect(nen.kho.get('sessionBankTeacher')!.size).toBe(0)
-    expect(await MOC.donTheoMocReset('2026-09-21', { laThay: () => true, baoThay })).toEqual({ daDon: false, lyDo: 'da_don_roi' })
-    expect(baoThay).toHaveBeenCalledTimes(1)
+    expect(nen.kho.get('sessionBankTeacher')!.size).toBe(2)
+    expect(await MOC.donTheoMocReset('2026-09-21', { laThay: () => true })).toEqual({ daDon: false, lyDo: 'da_don_roi' })
   })
 })
 

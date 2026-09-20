@@ -1,4 +1,8 @@
-// DỌN BỘ NHỚ MÁY THẦY THEO `mocReset` (thầy chốt 19/09/2026: 00:01 thứ Hai 21/09 máy chủ xoá toàn bộ dữ liệu học sinh).
+// DỌN BỘ NHỚ MÁY THẦY THEO `mocReset` (thầy chốt 19/09/2026: 00:01 thứ Hai 21/09 máy chủ làm mới dữ liệu học sinh).
+//
+// ĐỔI 21/09 (Boss chuyển lệnh thầy): reset GIỮ TOÀN BỘ ca thi ⇒ danh sách DỌN ở `exam-db.ts` nay RỖNG — máy thầy không xoá gì và
+// không báo gì. Tệp này giữ nguyên CƠ CHẾ (kích hoạt theo mốc máy chủ, một giao dịch nguyên tử, dấu "đã dọn theo mốc") để lần sau
+// đổi ý chỉ việc thêm tên vào danh sách, không dựng lại.
 //
 // PHẠM VI — hẹp có chủ ý (0.Planer duyệt 19/09):
 //   · CHỈ IndexedDB `omr-exam` (danh sách nhóm dọn nằm ở `exam-db.ts`). KHÔNG đụng localStorage/sessionStorage: dọn hai thứ
@@ -26,18 +30,10 @@ export function chuanMocReset(v: unknown): string | null {
   return /^[0-9A-Za-z][0-9A-Za-z._:-]{0,39}$/.test(s) ? s : null
 }
 
-/** Một dòng cho thầy. Mốc dạng ngày `yyyy-mm-dd` thì nói rõ ngày; mốc khác thì nói chung. */
-export function chuThongBaoMocReset(moc: string): string {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(moc)
-  const ngay = m ? ` ngày ${m[3]}/${m[2]}` : ''
-  return `Hệ thống đã làm mới${ngay} — dữ liệu ca cũ trong máy đã được dọn`
-}
-
 export interface PhuThuocDonMoc {
   laThay: () => boolean
   docDaDon: () => Promise<string>
   don: (moc: string) => Promise<KetQuaDonKhiReset>
-  baoThay: (chu: string) => void
 }
 
 // Phụ thuộc mặc định tra LÚC DÙNG (không đọc export nào lúc nạp module): `exam-api.ts` nạp tệp này, mà nhiều test thay `exam-db` /
@@ -46,9 +42,6 @@ const MAC_DINH: PhuThuocDonMoc = {
   laThay: () => typeof location !== 'undefined' && laManThayQuanLy(location.search, location.pathname),
   docDaDon: () => docMocResetDaDon(),
   don: (moc) => donDuLieuTheoMocReset(moc),
-  baoThay: (chu) => {
-    void import('../store/appStore').then((m) => m.useAppStore.getState().showToast(chu, 'success'))
-  },
 }
 
 // Nhiều lệnh `danhSachCa` cùng nhận mốc một lúc thì chỉ MỘT lượt dọn chạy.
@@ -66,8 +59,7 @@ export function donTheoMocReset(mocTho: unknown, pt: Partial<PhuThuocDonMoc> = {
     try {
       if ((await p.docDaDon()) === moc) return { daDon: false, lyDo: 'da_don_roi' }
       const ket = await p.don(moc)
-      // Chỉ báo thầy khi thật sự có gì để dọn — máy mới tinh thì im lặng.
-      if (ket.soBanGhi + ket.soKhoaSettings > 0) p.baoThay(chuThongBaoMocReset(moc))
+      // Không báo thầy: từ 21/09 danh sách dọn rỗng (giữ toàn bộ ca thi) nên không có gì để nói.
       return { daDon: true, ket, moc }
     } catch (e) {
       console.warn('[mocReset] không dọn được bộ nhớ máy thầy — lần sau thử lại:', e)

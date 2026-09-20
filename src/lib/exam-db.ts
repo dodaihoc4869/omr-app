@@ -731,39 +731,38 @@ export async function docLichOnLai<T>(): Promise<T | undefined> {
 }
 
 // ---------------------------------------------------------------------------
-// DỌN THEO MỐC RESET (`mocReset`) — thầy chốt 19/09/2026: 00:01 thứ Hai 21/09 máy chủ XOÁ TOÀN BỘ dữ liệu học sinh
-// (ca thi, điểm, bài làm, BTVN, lên bảng, sổ học…), GIỮ tài khoản + kho đề + cấu hình.
+// DỌN THEO MỐC RESET (`mocReset`) — thầy chốt lại 21/09/2026 (Boss chuyển): reset GIỮ TOÀN BỘ ca thi. Máy thầy vì thế KHÔNG dọn
+// gì theo ca/em nữa: giữ bản ca, bank có đáp án, bài làm, số câu / kho chưa / đề riêng / chế độ đề riêng / qid ra phiếu theo ca,
+// điểm của em, buổi chữa dở, độ khó theo câu, lịch ôn lại.
 //
-// Máy thầy giữ một BẢN SAO theo ca/em của những thứ ấy. Không dọn thì sáng thứ Hai hiện "ca ma", hoặc — nguy hiểm hơn —
-// đẩy ngược bank ca cũ lên máy chủ (`capNhatKeyBank`) tái tạo khoá của ca đã xoá. Cách dọn nằm ở
-// `don-moc-reset-giao-vien.ts`; ở đây chỉ có DANH SÁCH cái gì thuộc nhóm DỌN (nằm sát lược đồ để ai thêm khoá theo ca/em
-// mới thì thấy) và một giao dịch NGUYÊN TỬ thực hiện việc dọn.
+// GIỮ NGUYÊN CƠ CHẾ: ba danh sách dưới đây là chỗ DUY NHẤT quyết cái gì bị dọn — nay để RỖNG. Lần sau thầy đổi ý thì chỉ thêm tên vào
+// đây, không phải dựng lại đường kích hoạt (`don-moc-reset-giao-vien.ts`), giao dịch nguyên tử và dấu mốc. Dây chặn "ca ma" ở
+// `exam-sync.ts` (`capNhatKeyBank` chỉ đẩy bank của ca CÒN trên máy chủ) vẫn giữ nguyên.
 //
-// QUY ƯỚC KHI THÊM DỮ LIỆU MỚI VÀO `omr-exam`: khoá/store nào gắn với một CA hoặc một EM thì PHẢI vào các danh sách dưới
-// đây (test `don-moc-reset-giao-vien-1909` soi mọi khoá `settings` có `${…}` trong tệp này). Khoá cấu hình của thầy (địa chỉ
-// máy chủ, mã bí mật, khoá app, sổ sửa mã dạng, KHO ĐỀ `examSources`) tuyệt đối KHÔNG vào đây.
+// QUY ƯỚC KHI THÊM DỮ LIỆU MỚI VÀO `omr-exam`: khoá/store nào gắn với một CA hoặc một EM thì test `don-moc-reset-giao-vien-1909`
+// bắt phải XẾP LOẠI (giữ hay dọn) — thêm khoá là phải quyết. Khoá cấu hình của thầy (địa chỉ máy chủ, mã bí mật, khoá app, sổ sửa
+// mã dạng, KHO ĐỀ `examSources`) tuyệt đối KHÔNG vào danh sách dọn.
 // ---------------------------------------------------------------------------
 
-/** Store xoá SẠCH khi reset: bản ca cache, bank có đáp án theo ca, bài làm của em trên máy này. */
-export const STORE_DON_KHI_RESET = [STORE_SESSION_CACHE, STORE_SESSION_BANK_TEACHER, STORE_ATTEMPTS] as const
-/** Khoá `settings` theo TIỀN TỐ (`soCauCa:<maCa>`, `qidRaPhieu:<sbd>`…) bị xoá khi reset. */
-export const TIEN_TO_SETTINGS_DON_KHI_RESET = ['soCauCa:', 'khoChuaCa:', 'deRiengCa:', 'cheDoDeRieng:', 'qidRaPhieu:', 'buoiChua:'] as const
-/** Khoá `settings` ĐÚNG TÊN bị xoá khi reset: chỉ điểm theo em.
- *
- * GIỮ `khoDoKho` (độ khó theo CÂU — qid → lượt/đúng/số ca — không phải điểm của em; ca đã xoá rồi thì không dựng lại được mà
- * thời gian lên bảng cần nó) và `lichOnLai` (hàng đợi ôn giãn cách em × dạng: hồ sơ mạnh yếu chỉ có ở máy thầy) — Boss chốt 21/09 khi
- * thầy đổi lệnh reset thành "GIỮ hồ sơ mạnh yếu". */
-export const KHOA_SETTINGS_DON_KHI_RESET = [KHOA_DIEM_EM] as const
+/** Store xoá SẠCH khi reset. RỖNG từ 21/09: giữ bản ca cache (`sessionCache`), bank có đáp án theo ca (`sessionBankTeacher`) và bài làm
+ * của em trên máy này (`attempts`). */
+export const STORE_DON_KHI_RESET: readonly (typeof STORE_SESSION_CACHE | typeof STORE_SESSION_BANK_TEACHER | typeof STORE_ATTEMPTS)[] = []
+/** Khoá `settings` theo TIỀN TỐ bị xoá khi reset. RỖNG từ 21/09: giữ `soCauCa:`, `khoChuaCa:`, `deRiengCa:`, `cheDoDeRieng:`,
+ * `qidRaPhieu:` và `buoiChua:` (buổi chữa dở — khoá buổi không còn gắn mốc reset nên nối được qua reset). */
+export const TIEN_TO_SETTINGS_DON_KHI_RESET: readonly string[] = []
+/** Khoá `settings` ĐÚNG TÊN bị xoá khi reset. RỖNG từ 21/09: giữ cả `diemCuaEm`, `khoDoKho` (độ khó theo CÂU) và `lichOnLai`
+ * (hàng đợi ôn giãn cách em × dạng — hồ sơ mạnh yếu chỉ có ở máy thầy). */
+export const KHOA_SETTINGS_DON_KHI_RESET: readonly string[] = []
 
 /** DẤU "đã dọn theo mốc này" — nằm trong `settings` (KHÔNG thuộc nhóm dọn) và được ghi CÙNG giao dịch với việc dọn. */
 const KHOA_MOC_RESET_DA_DON = 'mocResetDaDon'
 
 export function khoaSettingsThuocNhomDon(khoa: string): boolean {
-  return (KHOA_SETTINGS_DON_KHI_RESET as readonly string[]).includes(khoa) || TIEN_TO_SETTINGS_DON_KHI_RESET.some((t) => khoa.startsWith(t))
+  return KHOA_SETTINGS_DON_KHI_RESET.includes(khoa) || TIEN_TO_SETTINGS_DON_KHI_RESET.some((t) => khoa.startsWith(t))
 }
 
 export interface KetQuaDonKhiReset {
-  /** Số bản ghi đã xoá khỏi các store (ca cache + bank + bài làm). */
+  /** Số bản ghi đã xoá khỏi các store dọn (nay luôn 0 vì danh sách dọn rỗng). */
   soBanGhi: number
   /** Số khoá `settings` đã xoá. */
   soKhoaSettings: number

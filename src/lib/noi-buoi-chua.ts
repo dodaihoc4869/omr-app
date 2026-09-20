@@ -4,8 +4,9 @@
 // là mất; ở đây là phần THUẦN của việc nhớ và nối: khoá buổi, bản ghi lưu, hạn 14 ngày, phần CÒN LẠI, và em nào được giữ
 // lại khi nối. Lưu/đọc IndexedDB nằm ở `exam-db.ts` (`luuBuoiChua`…); màn hình ở `GoiLenBangScreen.tsx`.
 //
-// KHOÁ BUỔI = `mocReset | lớp | mã ca`. `mocReset` là mốc reset dữ liệu học sinh đã dọn trên máy này (`docMocResetDaDon`):
-// buổi lưu TRƯỚC reset mang mốc khác (hoặc đã bị dọn hẳn) nên không bao giờ nối sang dữ liệu của lần làm mới.
+// KHOÁ BUỔI = `mốc | lớp | mã ca`. Lúc làm M4 mốc là mốc reset đã dọn trên máy (để buổi cũ không nối sang dữ liệu lần làm mới); từ 21/09
+// thầy chốt reset GIỮ toàn bộ ca thi nên buổi của ca còn nguyên phải nối được qua reset ⇒ màn hình luôn truyền `MOC_KHOA_BUOI` (rỗng,
+// khoá dạng `-|lớp|mã ca` — trùng khoá M4 trước mọi lần reset). Tham số `moc` của hàm giữ lại để khoá vẫn có chỗ gắn mốc khi cần.
 //
 // PHẦN CÒN LẠI = mọi câu từng vào kế hoạch của buổi − câu đã có kết quả. "Đã có kết quả" lấy từ HAI nguồn để không mất khi
 // đổi máy: (1) ô thầy đã bấm Đạt / Chưa đạt trên máy này (`daGhi`), (2) lịch sử lên bảng của MÁY CHỦ — em trong kế hoạch có
@@ -16,6 +17,8 @@ import type { LichSuLenBangEm } from './exam-api'
 
 /** Buổi lưu hết hạn sau bấy nhiêu ngày kể từ lần lưu gần nhất. */
 export const HAN_BUOI_CHUA_NGAY = 14
+/** Đoạn "mốc" trong khoá buổi — RỖNG có chủ ý (xem đầu tệp). */
+export const MOC_KHOA_BUOI = ''
 const MS_NGAY = 86_400_000
 
 export type CachLayCauBuoi = 'san' | 'tu_chon' | 'theo_dang' | 'btvn_gan_nhat'

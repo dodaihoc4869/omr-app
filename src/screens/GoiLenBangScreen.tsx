@@ -19,8 +19,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay, UserCheck } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
-import { docBuoiChua, docKhoChuaCa, docMocResetDaDon, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret, luuBuoiChua, xoaBuoiChua } from '../lib/exam-db'
-import { HAN_BUOI_CHUA_NGAY, chuTheTiepTuc, conHan, emGiuKhiNoi, khoaBuoiChua, laBuoiChuaHopLe, taoBanGhiBuoi, tinhTrangBuoi, type BuoiChuaLuu } from '../lib/noi-buoi-chua'
+import { docBuoiChua, docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret, luuBuoiChua, xoaBuoiChua } from '../lib/exam-db'
+import { HAN_BUOI_CHUA_NGAY, MOC_KHOA_BUOI, chuTheTiepTuc, conHan, emGiuKhiNoi, khoaBuoiChua, laBuoiChuaHopLe, taoBanGhiBuoi, tinhTrangBuoi, type BuoiChuaLuu } from '../lib/noi-buoi-chua'
 import { theoDoiBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { mergeKeepAnswers } from '../data/examContent'
@@ -872,12 +872,12 @@ export default function GoiLenBangScreen() {
     let huy = false
     void (async () => {
       try {
-        const moc = await docMocResetDaDon().catch(() => '')
-        const khoa = khoaBuoiChua(moc, du.lop, du.maCa)
+        // Khoá buổi KHÔNG gắn mốc reset: reset giữ toàn bộ ca thi (21/09) nên buổi dở của ca còn nguyên vẫn nối được qua reset.
+        const khoa = khoaBuoiChua(MOC_KHOA_BUOI, du.lop, du.maCa)
         const raw = await docBuoiChua(khoa)
         if (huy || !raw) return
-        if (!laBuoiChuaHopLe(raw) || raw.khoa !== khoa || raw.moc !== moc || !conHan(raw, new Date())) {
-          await xoaBuoiChua(khoa).catch(() => {}) // hỏng / khác mốc / quá 14 ngày ⇒ bỏ, không nối nhầm
+        if (!laBuoiChuaHopLe(raw) || raw.khoa !== khoa || !conHan(raw, new Date())) {
+          await xoaBuoiChua(khoa).catch(() => {}) // hỏng / quá 14 ngày ⇒ bỏ, không nối nhầm
           return
         }
         setBuoiDo(raw)
@@ -904,8 +904,7 @@ export default function GoiLenBangScreen() {
     const batDauLuc = batDauBuoiMoi.current
     void (async () => {
       try {
-        const moc = await docMocResetDaDon().catch(() => '')
-        const rec = taoBanGhiBuoi(goc, { moc, lop: du.lop, maCa: du.maCa, tenCa: du.ten, nguon, cauTrongBuoi, kehoach, ketQua, nay: new Date(), batDauLuc })
+        const rec = taoBanGhiBuoi(goc, { moc: MOC_KHOA_BUOI, lop: du.lop, maCa: du.maCa, tenCa: du.ten, nguon, cauTrongBuoi, kehoach, ketQua, nay: new Date(), batDauLuc })
         await luuBuoiChua(rec.khoa, rec)
       } catch (e) {
         console.warn('[buổi chữa] không lưu được buổi dở:', e)

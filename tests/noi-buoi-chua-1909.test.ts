@@ -1,8 +1,10 @@
 // M4 — LƯU BUỔI CHỮA + TỰ NỐI BUỔI SAU: phần THUẦN (`noi-buoi-chua.ts`) và việc Engine E GIỮ em đã định (`emDaDinh`).
 // Phần màn hình (tắt app → mở lại) ở `goi-len-bang-noi-buoi-1909.test.tsx`.
 import { describe, it, expect } from 'vitest'
+import { readFileSync } from 'node:fs'
 import {
   HAN_BUOI_CHUA_NGAY,
+  MOC_KHOA_BUOI,
   chuTheTiepTuc,
   conHan,
   emGiuKhiNoi,
@@ -45,11 +47,20 @@ const dauVao = (o: Partial<DauVaoLuuBuoi> = {}): DauVaoLuuBuoi => ({
 })
 
 describe('khoá buổi và hạn 14 ngày', () => {
+  it('21/09 reset GIỮ toàn bộ ca thi ⇒ màn hình dùng khoá KHÔNG gắn mốc reset (nối được qua reset), và không đọc mốc đã dọn nữa', () => {
+    expect(MOC_KHOA_BUOI).toBe('')
+    expect(khoaBuoiChua(MOC_KHOA_BUOI, '12A', '111111')).toBe('-|12A|111111')
+    const man = readFileSync('src/screens/GoiLenBangScreen.tsx', 'utf8')
+    expect(man).toContain('khoaBuoiChua(MOC_KHOA_BUOI, du.lop, du.maCa)')
+    expect(man).toContain('moc: MOC_KHOA_BUOI')
+    expect(man).not.toContain('docMocResetDaDon')
+  })
+
   it('khoá = mốc reset | lớp | mã ca; trống thành "-"; dấu | trong chữ bị đổi để khoá không vỡ đoạn', () => {
     expect(khoaBuoiChua('2026-09-21', '12A', '111111')).toBe('2026-09-21|12A|111111')
     expect(khoaBuoiChua('', '', '111111')).toBe('-|-|111111')
     expect(khoaBuoiChua(' 2026-09-21 ', 'Lớp|12', ' 9 ')).toBe('2026-09-21|Lớp/12|9')
-    // khác mốc reset ⇒ khác khoá: buổi trước reset không bao giờ nối sang
+    // hàm vẫn cho gắn mốc (mốc khác ⇒ khoá khác); màn hình thì luôn truyền MOC_KHOA_BUOI = '' — xem test dưới
     expect(khoaBuoiChua('2026-09-21', '12A', '1')).not.toBe(khoaBuoiChua('2026-10-05', '12A', '1'))
     expect(khoaBuoiChua('2026-09-21', '12A', '1')).not.toBe(khoaBuoiChua('2026-09-21', '12B', '1'))
   })

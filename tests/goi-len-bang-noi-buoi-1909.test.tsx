@@ -87,7 +87,7 @@ vi.mock('../src/store/appStore', () => ({
 const { default: GoiLenBangScreen } = await import('../src/screens/GoiLenBangScreen')
 
 const CHO = { timeout: 20000 }
-const KHOA = '2026-09-21|12A|111111'
+const KHOA = '-|12A|111111' // khoá buổi KHÔNG gắn mốc reset (21/09: reset giữ toàn bộ ca thi)
 const emRong = { chuyenDe: [], qidSai: [], qidDaLam: [], lenBang: { soLan: 0, lanCuoi: '', qids: [] } }
 
 beforeEach(() => {
@@ -141,11 +141,11 @@ async function chuaMotEmRoiTat() {
 }
 
 describe('lưu buổi chữa', () => {
-  it('xếp giờ ⇒ LƯU NGAY (khoá mốc reset | lớp | mã ca) với kế hoạch, câu bắt buộc, nguồn câu; chưa có kết quả nào', async () => {
+  it('xếp giờ ⇒ LƯU NGAY (khoá `-` | lớp | mã ca — không gắn mốc reset) với kế hoạch, câu bắt buộc, nguồn câu; chưa có kết quả nào', async () => {
     await buoiDau()
     const b = luu()!
     expect(b.khoa).toBe(KHOA)
-    expect(b.moc).toBe('2026-09-21')
+    expect(b.moc).toBe('')
     expect(b.lop).toBe('12A')
     expect(b.maCa).toBe('111111')
     expect(b.kehoach.length).toBeGreaterThan(0)
@@ -269,18 +269,17 @@ describe('buổi cũ KHÔNG được nối khi không nên', () => {
     expect(theTiepTuc(r)).toBeNull()
   }, 90000)
 
-  it('SAU RESET (mốc khác) ⇒ khoá khác ⇒ không có buổi để nối', async () => {
+  it('SAU RESET (mốc khác) ⇒ buổi VẪN nối được: reset giữ toàn bộ ca thi nên khoá buổi không gắn mốc (21/09)', async () => {
     await chuaMotEmRoiTat()
     m.moc = '2026-10-05'
     const r = await moCaXong()
-    await waitFor(() => expect(nutXep(r)).toBeTruthy(), CHO)
-    expect(theTiepTuc(r)).toBeNull()
+    await waitFor(() => expect(theTiepTuc(r)).toBeTruthy(), CHO)
     expect(m.kho.get('2026-10-05|12A|111111')).toBeUndefined()
   }, 90000)
 
-  it('bản lưu HỎNG (hình dạng lạ) hoặc khoá/mốc bên trong không khớp ⇒ bỏ, không nối', async () => {
+  it('bản lưu HỎNG (hình dạng lạ) hoặc khoá bên trong không khớp ⇒ bỏ, không nối', async () => {
     await chuaMotEmRoiTat()
-    for (const hong of [{ phienBan: 1, khoa: KHOA }, 'rác', { ...luu()!, moc: '2026-01-01' }, { ...luu()!, khoa: 'khoa|khac|1' }]) {
+    for (const hong of [{ phienBan: 1, khoa: KHOA }, 'rác', { ...luu()!, khoa: 'khoa|khac|1' }]) {
       cleanup()
       m.xoa.mockReset()
       m.kho.set(KHOA, hong)
