@@ -82,6 +82,7 @@ Phân vùng dự kiến theo hai bản thiết kế:
 
 > Chỉ giữ 12 dòng mới nhất ở đây để mỗi phiên đọc nhanh, đỡ tốn ngữ cảnh. Dòng cũ hơn: `docs/nhat-ky-dieu-phoi-cu.md` (các dòng "đã soát <mã>" cũ vẫn có hiệu lực — tra ở đó bằng `grep`).
 
+- 21/09 01:26 (giờ máy) · Boss · Boss đã soát e781e0c (Code 3: job reset BẢN CUỐI — BANG_XOA chỉ còn BTVN/bài Mẹ giao/luyện đề/kế hoạch ngày/len_bang/trao đổi/game+thần thú+EXP+doan_*/vinh danh/bảng tin; 14 bảng ca thi + sổ/hồ sơ mạnh yếu nằm ở GIỮ). Worker 6132b838, CHƯA lên đạn; dryRun thật: XOÁ 15.428 / GIỮ 93.353 dòng (ca 27, luot 265). Đã lên: token PH mềm, lệnh màn Hôm nay, on_thi mang câu. Code 3 chờ lệnh "MỌI VIỆC XONG".
 - 21/09 01:25 (giờ máy) · Boss · Boss đã soát 14e61de (Code 1: reset GIỮ ca thi ⇒ danh sách dọn máy thầy RỖNG, bỏ toast, giữ cơ chế + đai-dây capNhatKeyBank; khoá buổi chữa dở không còn gắn mốc reset — đồng ý). ĐƯỢC ĐẨY.
 - 21/09 01:18 (giờ máy) · Boss · Boss đã soát 34a4a90 (Code 2, C10 bước 4 "Xem lại sau": trạng thái giao diện tại máy, khoá riêng `ddh.xemlai.*`, không vào gói nộp/lưu/chấm — có test khoá nguồn + so gói /nop thật). ĐƯỢC ĐẨY.
 - 21/09 01:17 (giờ máy) · Boss · ĐÃ GỘP 62710ce = Đảo thần thú MỚI nối vào Game.tsx bằng một vỏ `dao/DaoThanThu` (Code 5 + Code 6 XONG TRỌN; bản sạch 262/262 test game+đảo, tsc sạch; mục Đoàn theo `doanMo`). ĐƯỢC ĐẨY — Đảo mới lên cho cả trường ở đợt Pages kế. Cũng đã soát f3a6b05 (Code 4: cổng PH nhận `?ph=`, không chạm luồng thi).
