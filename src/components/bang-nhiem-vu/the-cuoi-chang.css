@@ -1,0 +1,70 @@
+/* THẺ CUỐI CHẶNG (BTVN nâng đỡ). Bản vẽ: docs/ban-ve-btvn-nang-do-2109/hs-3-the-cuoi-chang.jpg.
+ * Chỉ dùng token M3 của m3-theme.css (lớp .m3) và token app; KHÔNG mã màu thô (npm run check:mau). */
+.lop-the-chang {
+  position: fixed;
+  inset: 0;
+  z-index: 100000; /* trên khung xem phiếu (99999) */
+  display: flex;
+  flex-direction: column;
+  background: var(--m3-surface);
+  color: var(--m3-on-surface);
+  font-family: var(--sans);
+}
+.lop-the-chang .tcc-tren { flex: none; height: 56px; display: flex; align-items: center; gap: 16px; padding: 0 12px 0 8px; }
+.lop-the-chang .tcc-tren h1 { margin: 0; font-size: var(--cx-4); font-weight: 700; }
+.lop-the-chang .tcc-dong {
+  width: 48px; height: 48px; border-radius: 50%; border: 0; background: transparent; color: var(--m3-on-surface);
+  display: grid; place-items: center; cursor: pointer;
+}
+.lop-the-chang .tcc-dong:focus-visible, .lop-the-chang .tcc-nut:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+.lop-the-chang .tcc-cuon { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 16px 16px; display: flex; flex-direction: column; gap: 12px; }
+.lop-the-chang .tcc-mini { display: flex; align-items: center; gap: 6px; }
+.lop-the-chang .tcc-mini i { flex: 1; height: 6px; border-radius: var(--m3-bo-tron); background: var(--m3-surface-container-high); }
+.lop-the-chang .tcc-mini i.xong { background: var(--m3-tertiary); }
+.lop-the-chang .tcc-mini i.mai { background: var(--m3-primary-container); }
+.lop-the-chang h2 { margin: 4px 0 0; font-size: var(--cx-5); font-weight: 700; line-height: 1.2; }
+.lop-the-chang .tcc-phu { margin: -6px 0 0; font-size: var(--cx-2); color: var(--m3-on-surface-variant); line-height: 1.4; }
+.lop-the-chang .tcc-o {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--m3-surface-container-lowest); color: var(--m3-primary);
+}
+.lop-the-chang .tcc-the { border-radius: var(--m3-bo-28); background: var(--m3-surface-container); padding: 16px; }
+.lop-the-chang .tcc-nop { background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container); display: flex; flex-direction: column; gap: 4px; font-size: var(--cx-3); }
+.lop-the-chang .tcc-nop span { font-size: var(--cx-2); color: var(--m3-on-tertiary-container-phu); }
+.lop-the-chang .tcc-tienbo { border-radius: var(--m3-bo-28); background: var(--m3-primary-container); color: var(--m3-on-primary-container); padding: 16px; }
+.lop-the-chang .tcc-nhan { display: flex; align-items: center; gap: 10px; font-size: var(--cx-2); font-weight: 700; color: var(--m3-on-primary-container-phu); }
+.lop-the-chang .tcc-bac { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--m3-on-primary-container-phu); }
+.lop-the-chang .tcc-bac-cu { padding: 6px 14px; border-radius: var(--m3-bo-tron); background: var(--m3-hang-mo); font-size: var(--cx-3); font-weight: 600; }
+.lop-the-chang .tcc-bac-moi {
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--m3-bo-tron);
+  background: var(--m3-primary); color: var(--m3-on-primary); font-size: var(--cx-4); font-weight: 700;
+}
+.lop-the-chang .tcc-thang { display: flex; gap: 6px; margin-top: 14px; }
+.lop-the-chang .tcc-thang div { flex: 1; font-size: var(--cx-1); font-weight: 600; color: var(--m3-on-primary-container-phu); }
+.lop-the-chang .tcc-thang div i { display: block; height: 8px; border-radius: var(--m3-bo-tron); background: var(--m3-hang-mo); margin-bottom: 5px; }
+.lop-the-chang .tcc-thang div.on i { background: var(--m3-primary); }
+.lop-the-chang .tcc-thang div.on { color: var(--m3-on-primary-container); }
+.lop-the-chang .tcc-tienbo p { margin: 10px 0 0; font-size: var(--cx-2); line-height: 1.4; color: var(--m3-on-primary-container-phu); }
+.lop-the-chang .tcc-ds { list-style: none; margin: 0; padding: 4px 16px; }
+.lop-the-chang .tcc-ds li { display: flex; align-items: center; gap: 12px; padding: 12px 0; }
+.lop-the-chang .tcc-ds li + li { border-top: 1px solid var(--m3-hang-2); }
+.lop-the-chang .tcc-ds b { font-size: var(--cx-3); font-weight: 700; line-height: 1.3; }
+.lop-the-chang .tcc-exp { display: flex; align-items: center; gap: 12px; }
+.lop-the-chang .tcc-exp .tcc-o { width: 44px; height: 44px; color: var(--m3-tertiary); }
+.lop-the-chang .tcc-exp-so { font-size: var(--cx-5); font-weight: 700; line-height: 1.1; }
+.lop-the-chang .tcc-exp-so small { font-size: var(--cx-2); font-weight: 600; color: var(--m3-on-surface-variant); margin-left: 6px; }
+.lop-the-chang .tcc-exp-phu { margin-top: 6px; font-size: var(--cx-1); color: var(--m3-on-surface-variant); }
+.lop-the-chang .tcc-exp-phu b { color: var(--m3-on-surface); }
+.lop-the-chang .tcc-day {
+  flex: none; display: flex; flex-direction: column; gap: 8px; padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: var(--m3-surface-container); box-shadow: var(--m3-cao-do-1);
+}
+.lop-the-chang .tcc-nut {
+  height: 52px; width: 100%; border: 0; border-radius: var(--m3-bo-tron); cursor: pointer;
+  background: var(--m3-primary); color: var(--m3-on-primary); font-family: inherit; font-size: var(--cx-3); font-weight: 700;
+}
+.lop-the-chang .tcc-nut--dich { background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
+@media (prefers-reduced-motion: no-preference) {
+  .lop-the-chang { animation: tcc-vao 180ms ease-out; }
+  @keyframes tcc-vao { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+}

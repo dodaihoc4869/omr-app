@@ -59,6 +59,7 @@ import {
 } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
+import type { TheChangView } from '../lib/btvn-ca-nhan-em'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
@@ -79,6 +80,7 @@ import type { TuCongHocSinh } from './ExamTakeScreen'
 // Màn làm bài nạp trễ: cổng học sinh không phải kéo theo bộ chấm khi chỉ xem điểm.
 const ManLamBai = lazy(() => import('./ExamTakeScreen'))
 const LamCauOn = lazy(() => import('../components/bang-nhiem-vu/LamCauOn'))
+const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang'))
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
@@ -235,6 +237,10 @@ export default function StudentPortalScreen() {
 
   // Khắc phục câu sai
   const [phieuHtml, setPhieuHtml] = useState('')
+  /** BTVN "nâng đỡ": thẻ "hôm nay em tiến thêm gì" hiện sau khi em xong hẳn MỘT chặng (nội dung do `theChangView` quyết). */
+  const [theChang, setTheChang] = useState<TheChangView | null>(null)
+  /** Mã ca của phiếu BTVN đang mở — cần để tải lại bài sau khi nộp chặng. */
+  const maCaPhieuRef = useRef('')
   /** HTML đề + lời giải của em, dựng TẠI MÁY. Rỗng = không mở lớp phủ.
    *
    * Bản trước mở `/t/<mã ca>` trong khung. Cách ấy phụ thuộc việc máy chủ trả
@@ -642,6 +648,7 @@ export default function StudentPortalScreen() {
       }
       const { dungPhieuBtvn } = await import('../lib/btvn-cho-em')
       const html = await dungPhieuBtvn(r, bt.maCa || 'Riêng', auth.sbd, { lamLai, ...tuyChonPhanTang })
+      maCaPhieuRef.current = bt.maCa || 'Riêng'
       setPhieuHtml(html)
     } catch (e) {
       alert(e instanceof Error ? e.message : 'Không mở được bài tập')
@@ -2248,10 +2255,40 @@ export default function StudentPortalScreen() {
           html={phieuHtml}
           ten="Bài tập & Phiếu làm bài"
           dong={() => {
+            setTheChang(null)
             setPhieuHtml('')
             void napLaiBtvn()
           }}
+          nopChang={async (tin) => {
+            // Bài `ca_nhan`: phiếu KHÔNG có đáp án, gửi đáp án MỘT chặng ra đây. Thành công ⇒ dựng lại phiếu có kết quả
+            // (đổi html), xong hẳn chặng thì bật thẻ tiến bộ. Hỏng ⇒ trả lời báo cho phiếu, bài làm vẫn còn ở máy.
+            const [{ nopChangCaNhan }, { theChangView }] = await Promise.all([import('../lib/btvn-nop-chang-em'), import('../lib/btvn-ca-nhan-em')])
+            const kq = await nopChangCaNhan(tin, maCaPhieuRef.current)
+            if (!kq.ok) return { ok: false, error: kq.error }
+            if (kq.html) setPhieuHtml(kq.html)
+            else {
+              setPhieuHtml('')
+              void napLaiBtvn()
+            }
+            const the = kq.ket ? theChangView(kq.ket, kq.soChang) : null
+            if (the) setTheChang(the)
+            return { ok: true }
+          }}
         />
+      )}
+      {theChang && (
+        <Suspense fallback={null}>
+          <TheCuoiChang
+            view={theChang}
+            dong={() => setTheChang(null)}
+            veBang={() => {
+              setTheChang(null)
+              setPhieuHtml('')
+              setTab(null)
+              void napLaiBtvn()
+            }}
+          />
+        </Suspense>
       )}
 
       {/* Modal Báo cáo ca thi chuẩn Google Material 3 - Mở tức thì & Thúc đẩy sửa sai ngay */}

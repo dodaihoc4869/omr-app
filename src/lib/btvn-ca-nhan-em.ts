@@ -318,3 +318,52 @@ export function ghepKetQuaVaoCau(cauTho: readonly Record<string, unknown>[], ket
 
 const TEN_MUC = ['Biết', 'Hiểu', 'Vận dụng'] as const
 export const tenMucBac = (n: number): string => TEN_MUC[n] ?? ''
+
+// ───────────────────────── thẻ cuối chặng: "hôm nay em tiến thêm gì" ─────────────────────────
+// Bản vẽ đã duyệt: docs/ban-ve-btvn-nang-do-2109/hs-3-the-cuoi-chang.jpg. CHỈ số đếm, so em với chính em; không xếp hạng,
+// không chữ "nắm chắc", không kết luận năng lực. Có gì thì nói, không có thì im — không bịa (`coTienBo:false` ⇒ thẻ im).
+
+export interface TheChangView {
+  tieuDe: string
+  /** Dòng phụ dưới tiêu đề. */
+  phu: string
+  /** true khi có ít nhất một tiến triển để kể (dạng lên bậc / đúng lại / câu mới / dạng mới). */
+  coTienBo: boolean
+  dangLenBac: { ten: string; tu: string; den: string }[]
+  dong: { kieu: 'lai' | 'moi' | 'dang'; chu: string }[]
+  exp: { homNay: number; conLai: number | null } | null
+  /** Chỉ khi chặng CUỐI vừa xong và máy chủ đã tự chốt nộp bài. */
+  nop: { chu: string; ghiThuong: string | null } | null
+  tram: { xong: number; tong: number } | null
+}
+
+/** null khi chặng CHƯA xong hẳn (còn câu bỏ trống): chỉ làm mới phiếu, không bật thẻ. */
+export function theChangView(ket: KetQuaChang, soChang?: number | null): TheChangView | null {
+  if (!ket.ok || !ket.chang?.xong) return null
+  const k = ket.chang.chiSo + 1
+  const tong = soChang && soChang > 0 ? soChang : null
+  const dangLenBac = (ket.tienBo?.dangLenBac ?? [])
+    .map((d) => ({ ten: d.ten, tu: tenMucBac(d.tu), den: tenMucBac(d.den) }))
+    .filter((d) => d.tu !== '' && d.den !== '')
+  const dong: TheChangView['dong'] = []
+  const t = ket.tienBo
+  if (t && t.soCauDungLai > 0) dong.push({ kieu: 'lai', chu: `Đúng lại ${t.soCauDungLai} câu từng sai` })
+  if (t && t.soCauMoiGap > 0) dong.push({ kieu: 'moi', chu: `Gặp ${t.soCauMoiGap} câu mới` })
+  if (t && t.soDangMoi > 0) dong.push({ kieu: 'dang', chu: `Mở thêm ${t.soDangMoi} dạng mới` })
+  const nop = ket.nop
+    ? {
+        chu: `Em đã xong cả bài: đúng ${ket.nop.soDung}/${ket.nop.soCau} câu`,
+        ghiThuong: ket.nop.soCauThuongSai > 0 ? `${ket.nop.soCauThuongSai} câu thưởng chưa đúng không bị tính vào điểm.` : null,
+      }
+    : null
+  return {
+    tieuDe: nop ? 'Xong cả bài' : `Xong chặng ${k}`,
+    phu: `Chặng ${k}${tong ? `/${tong}` : ''} · đúng ${ket.chang.soDung}/${ket.chang.soCau} câu`,
+    coTienBo: dangLenBac.length > 0 || dong.length > 0,
+    dangLenBac,
+    dong,
+    exp: ket.exp && ket.exp.homNay > 0 ? { homNay: ket.exp.homNay, conLai: ket.exp.conLaiLenCap } : null,
+    nop,
+    tram: tong ? { xong: Math.min(ket.loDaXong ?? k, tong), tong } : null,
+  }
+}

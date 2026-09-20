@@ -11,7 +11,9 @@ import {
   luuKetQuaChang,
   tenMucBac,
   themDapAnGiaChoCau,
+  theChangView,
   thongTinNhan,
+  type KetQuaChang,
 } from '../src/lib/btvn-ca-nhan-em'
 
 const phanHoi = (o: Record<string, unknown> = {}) => ({
@@ -289,5 +291,77 @@ describe('câu thô ↔ kết quả', () => {
 describe('tenMucBac', () => {
   it('0/1/2 = Biết/Hiểu/Vận dụng, ngoài ra rỗng', () => {
     expect([0, 1, 2, 3, -1].map(tenMucBac)).toEqual(['Biết', 'Hiểu', 'Vận dụng', '', ''])
+  })
+})
+
+describe('theChangView — thẻ cuối chặng: chỉ nói điều có số đếm thật', () => {
+  const ket = (o: Partial<KetQuaChang> = {}): KetQuaChang => ({
+    ok: true,
+    ketQua: [],
+    chuaLam: [],
+    loDaXong: 3,
+    chang: { chiSo: 2, soCau: 8, soDung: 6, xong: true },
+    exp: { homNay: 46, conLaiLenCap: 30 },
+    tienBo: { dangLenBac: [{ ma: 'tp', ten: 'Thuỷ phân ester', tu: 0, den: 1 }], soCauDungLai: 2, soCauMoiGap: 1, soDangMoi: 1, coTienBo: true },
+    ...o,
+  })
+  it('chặng xong: tiêu đề, dòng phụ, dạng lên bậc, các dòng đếm, EXP, thanh 7 chặng', () => {
+    const v = theChangView(ket(), 7)!
+    expect(v.tieuDe).toBe('Xong chặng 3')
+    expect(v.phu).toBe('Chặng 3/7 · đúng 6/8 câu')
+    expect(v.coTienBo).toBe(true)
+    expect(v.dangLenBac).toEqual([{ ten: 'Thuỷ phân ester', tu: 'Biết', den: 'Hiểu' }])
+    expect(v.dong).toEqual([
+      { kieu: 'lai', chu: 'Đúng lại 2 câu từng sai' },
+      { kieu: 'moi', chu: 'Gặp 1 câu mới' },
+      { kieu: 'dang', chu: 'Mở thêm 1 dạng mới' },
+    ])
+    expect(v.exp).toEqual({ homNay: 46, conLai: 30 })
+    expect(v.tram).toEqual({ xong: 3, tong: 7 })
+    expect(v.nop).toBeNull()
+  })
+  it('chặng CHƯA xong hẳn (còn câu trống) hoặc lỗi ⇒ null (chỉ làm mới phiếu)', () => {
+    expect(theChangView(ket({ chang: { chiSo: 0, soCau: 3, soDung: 1, xong: false } }), 7)).toBeNull()
+    expect(theChangView(ket({ chang: undefined }), 7)).toBeNull()
+    expect(theChangView(ket({ ok: false }), 7)).toBeNull()
+  })
+  it('không có tiến triển: thẻ IM (không bịa), vẫn còn tiêu đề + đếm + EXP', () => {
+    const v = theChangView(ket({ tienBo: { dangLenBac: [], soCauDungLai: 0, soCauMoiGap: 0, soDangMoi: 0, coTienBo: false } }), 7)!
+    expect(v.coTienBo).toBe(false)
+    expect(v.dangLenBac).toEqual([])
+    expect(v.dong).toEqual([])
+    expect(v.exp).not.toBeNull()
+    expect(theChangView(ket({ tienBo: undefined }), 7)!.coTienBo).toBe(false)
+  })
+  it('dòng đếm bằng 0 KHÔNG hiện; bậc lạ bị bỏ', () => {
+    const v = theChangView(ket({ tienBo: { dangLenBac: [{ ma: 'a', ten: 'A', tu: 0, den: 9 }], soCauDungLai: 0, soCauMoiGap: 3, soDangMoi: 0, coTienBo: true } }), 7)!
+    expect(v.dong).toEqual([{ kieu: 'moi', chu: 'Gặp 3 câu mới' }])
+    expect(v.dangLenBac).toEqual([])
+  })
+  it('EXP: 0 hôm nay ⇒ ẩn; em chưa có thú ⇒ conLai null', () => {
+    expect(theChangView(ket({ exp: { homNay: 0, conLaiLenCap: 5 } }), 7)!.exp).toBeNull()
+    expect(theChangView(ket({ exp: undefined }), 7)!.exp).toBeNull()
+    expect(theChangView(ket({ exp: { homNay: 4, conLaiLenCap: null } }), 7)!.exp).toEqual({ homNay: 4, conLai: null })
+  })
+  it('thanh chặng theo loDaXong của máy chủ (không phải chiSo+1); thiếu loDaXong ⇒ lấy chiSo+1; không vượt tổng', () => {
+    expect(theChangView(ket({ loDaXong: 5 }), 7)!.tram).toEqual({ xong: 5, tong: 7 })
+    expect(theChangView(ket({ loDaXong: undefined }), 7)!.tram).toEqual({ xong: 3, tong: 7 })
+    expect(theChangView(ket({ loDaXong: 99 }), 7)!.tram).toEqual({ xong: 7, tong: 7 })
+  })
+  it('chưa biết tổng số chặng ⇒ bỏ "/7" và thanh chặng, không bịa', () => {
+    const v = theChangView(ket(), null)!
+    expect(v.phu).toBe('Chặng 3 · đúng 6/8 câu')
+    expect(v.tram).toBeNull()
+  })
+  it('chặng CUỐI: máy chủ tự chốt nộp ⇒ tiêu đề "Xong cả bài", đúng x/y (mẫu điểm) + ghi chú câu thưởng', () => {
+    const v = theChangView(ket({ nop: { daNop: true, nopLuc: '', soDung: 40, soCau: 45, soCauCuaEm: 48, soCauThuongSai: 3, qidSai: [] } }), 7)!
+    expect(v.tieuDe).toBe('Xong cả bài')
+    expect(v.nop).toEqual({ chu: 'Em đã xong cả bài: đúng 40/45 câu', ghiThuong: '3 câu thưởng chưa đúng không bị tính vào điểm.' })
+    const khong = theChangView(ket({ nop: { daNop: true, nopLuc: '', soDung: 40, soCau: 45, soCauCuaEm: 45, soCauThuongSai: 0, qidSai: [] } }), 7)!
+    expect(khong.nop!.ghiThuong).toBeNull()
+  })
+  it('không xếp hạng, không chữ "nắm chắc"', () => {
+    const v = JSON.stringify(theChangView(ket(), 7))
+    expect(v).not.toMatch(/nắm chắc|xếp hạng|hạng \d|bạn khác/i)
   })
 })

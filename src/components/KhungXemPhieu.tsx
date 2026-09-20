@@ -34,6 +34,7 @@ import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { ThanhTren, dungM3 } from './m3'
 import './m3/khung-xem-phieu.css'
+import type { TinNopChang } from '../lib/btvn-nop-chang-em'
 
 export interface KhungXemPhieuProps {
   /** Nội dung dựng sẵn tại máy. Dùng cho phiếu bài tập và đề ca. */
@@ -44,9 +45,12 @@ export interface KhungXemPhieuProps {
   /** Nhãn cho trình đọc màn hình. Không hiện thành chữ trên màn. */
   ten?: string
   dong: () => void
+  /** Bài BTVN "nâng đỡ": phiếu trong iframe KHÔNG có đáp án nên gửi ĐÁP ÁN MỘT CHẶNG ra đây; nơi gọi nộp lên máy chủ,
+   * dựng lại phiếu (đổi `html`) khi thành công. Trả `ok:false` + lời báo thì phiếu hiện lời báo và cho nộp lại. */
+  nopChang?: (tin: TinNopChang) => Promise<{ ok: boolean; error?: string }>
 }
 
-export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuProps) {
+export default function KhungXemPhieu({ html, src, ten, dong, nopChang }: KhungXemPhieuProps) {
   // ĐO THẲNG mép phải của thanh điều hướng, không trông vào CSS.
   //
   // Bản trước để CSS lo bằng `body:has(.ben-trai)`. Luật đó đúng và chạy được,
@@ -97,6 +101,9 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
   // đang gọi, quên một chỗ là lỗi quay lại.
   const dongRef = useRef(dong)
   dongRef.current = dong
+  const nopChangRef = useRef(nopChang)
+  nopChangRef.current = nopChang
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
   useEffect(() => {
     // ĐẨY MỘT MỤC LỊCH SỬ để vuốt quay lại (và nút back) đóng lớp phủ thay vì
@@ -141,6 +148,25 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
             await xongLoBtvn(ch, { maBtvn: String(e.data.ma), sbd: String(e.data.sbd || ''), chiSo: Number(e.data.chiSo) })
           } catch {}
         })()
+      } else if (e.data?.type === 'ddh-btvn-nop-chang' && e.data.ma) {
+        // NỘP CHẶNG BÀI "NÂNG ĐỠ". CHỈ nhận từ chính iframe của khung này (không tin trang lạ), và luôn trả lời — phiếu
+        // đang chờ ở trạng thái "Đang nộp…", không trả lời là nút treo mãi.
+        if (e.source !== iframeRef.current?.contentWindow) return
+        const traLoi = (kq: { ok: boolean; error?: string }) => {
+          try {
+            iframeRef.current?.contentWindow?.postMessage({ type: 'ddh-btvn-nop-chang-ket', ok: kq.ok, error: kq.error }, '*')
+          } catch {
+            /* phiếu đã đóng thì thôi */
+          }
+        }
+        const dapAn: Record<string, string> = {}
+        if (e.data.dapAn && typeof e.data.dapAn === 'object') for (const [q, v] of Object.entries(e.data.dapAn)) if (typeof v === 'string') dapAn[q] = v
+        const ham = nopChangRef.current
+        if (!ham) return traLoi({ ok: false, error: 'Không nộp được chặng từ chỗ này. Em mở bài trong app nhé.' })
+        void ham({ ma: String(e.data.ma), sbd: String(e.data.sbd || ''), chiSo: Number(e.data.chiSo), dapAn }).then(
+          (kq) => traLoi(kq),
+          () => traLoi({ ok: false, error: 'Chưa nộp được chặng. Bài của em vẫn được giữ, em thử lại nhé.' }),
+        )
       }
     }
     window.addEventListener('popstate', quayLai)
@@ -185,6 +211,7 @@ export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuPro
         </div>
       )}
       <iframe
+        ref={iframeRef}
         title={ten || 'Phiếu bài tập'}
         {...(html ? { srcDoc: html } : { src })}
         // TỜ CHIẾU LÊN BẢNG CÓ NÚT TOÀN MÀN HÌNH. Trang trong iframe chỉ gọi
