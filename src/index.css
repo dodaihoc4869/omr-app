@@ -341,75 +341,7 @@ body {
  * rộng hơn cả màn điện thoại nằm ngang. Dưới nữa thì hai cột chật hơn một cột.
  *
  * Vùng nội dung chặn bề rộng: dòng chữ kéo dài 1800px thì mắt lạc dòng. */
-.ben-trai {
-  display: none;
-}
-
-@media (min-width: 880px) {
-  .khung-app {
-    display: grid;
-    /* Thanh điều hướng Giáo viên đặt ở CẠNH PHẢI */
-    grid-template-columns: minmax(0, 1fr) var(--rong-ben-trai, 232px);
-    min-height: 100vh;
-  }
-  .ben-trai {
-    display: flex;
-    flex-direction: column;
-    /* sticky vừa là mốc định vị cho tay kéo (position:absolute), vừa giữ thanh
-       phải đứng yên khi cuộn. */
-    position: sticky;
-    top: 0;
-    align-self: start;
-    height: 100vh;
-    overflow-y: auto;
-    padding: var(--k5) var(--k3);
-    background: var(--the);
-    border-left: 1px solid var(--vien);
-    border-right: none;
-  }
-  .khung-noi-dung {
-    min-width: 0;
-  }
-  .giua-noi-dung {
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  /* Thanh điều hướng dưới đáy chỉ dành cho màn hẹp. */
-  .khung-app > nav.fixed {
-    display: none;
-  }
-
-  /* TAY KÉO — dải 10px nằm đúng trên đường viền trái của thanh phải. */
-  .tay-keo {
-    position: fixed;
-    top: 0;
-    right: calc(var(--rong-ben-trai, 232px) - 5px);
-    left: auto;
-    width: 10px;
-    height: 100vh;
-    z-index: 25;
-    cursor: col-resize;
-    touch-action: none;
-    background: transparent;
-  }
-  .tay-keo::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 4px;
-    width: 2px;
-    height: 100%;
-    background: transparent;
-    transition: background-color var(--nhanh);
-  }
-  .tay-keo:hover::after,
-  .tay-keo:focus-visible::after {
-    background: var(--tim);
-  }
-  .tay-keo:focus-visible {
-    outline: none;
-  }
-}
+/* Vỏ app giáo viên (thanh điều hướng TRÁI, rail, thanh đáy) đã chuyển sang src/styles/vo-thay.css — Material 3, G1 21/09. */
 
 /* ------------------------------------------------ MÀN LÀM BÀI cũng hai cột
  * Cột trái là LƯỚI SỐ CÂU, KHÔNG phải menu của thầy — em đang thi mà cạnh đó

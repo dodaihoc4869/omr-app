@@ -19,6 +19,7 @@ export type ScreenId =
   | 'giaobtvn'
   | 'goilenbang'
   | 'cauhoi'
+  | 'caidat'
 
 export interface ScannedSheet {
   id: string

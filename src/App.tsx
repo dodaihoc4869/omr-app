@@ -1,9 +1,12 @@
 import './styles/teacher-layout.css'
+import './styles/vo-thay.css'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import BottomNav from './components/BottomNav'
 import ThanhBenTrai from './components/ThanhBenTrai'
 import Toast from './components/Toast'
 import { useAppStore } from './store/appStore'
+import './components/m3'
+import { apDungGiaoDien, docGiaoDien } from './lib/giao-dien-thay'
 import { loadClassList } from './lib/classlist-db'
 import { datMaBiMatPhien, loadKhoaApp, loadTeacherSecret } from './lib/exam-db'
 import { catPhien, donPhien, khoiPhucPhien } from './lib/khoa-phien'
@@ -49,6 +52,7 @@ const HocSinhScreen = lazy(() => import('./screens/HocSinhScreen'))
 const GoiLenBangScreen = lazy(() => import('./screens/GoiLenBangScreen'))
 const GiaoBtvnScreen = lazy(() => import('./screens/PhanCongScreen'))
 const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
+const CaiDatScreen = lazy(() => import('./screens/CaiDatScreen'))
 // CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
 // nó nhập thẳng là em học sinh nào cũng phải tải kèm.
@@ -76,6 +80,7 @@ const TEN_MAN: Record<string, string> = {
   goilenbang: 'Gọi lên bảng',
   giaobtvn: 'Giao bài tập về nhà',
   cauhoi: 'Học sinh hỏi',
+  caidat: 'Cài đặt',
 }
 
 const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
@@ -118,6 +123,11 @@ function App() {
   // Bản ghi vân tay của MÁY NÀY. Đọc cùng lúc với `khoaApp` để màn khoá gọi
   // được vân tay ngay khi dựng, không phải chờ thêm một vòng đọc IndexedDB.
   const screen = useAppStore((s) => s.screen)
+
+  // GIAO DIỆN SÁNG/TỐI của app thầy (Cài đặt → Giao diện): áp dụng thuộc tính `data-giao-dien` ngay khi mở. Chỉ ở vỏ giáo viên.
+  useEffect(() => {
+    if (canHoi) apDungGiaoDien(docGiaoDien())
+  }, [canHoi])
   const setClassList = useAppStore((s) => s.setClassList)
   const setScreen = useAppStore((s) => s.setScreen)
 
@@ -313,8 +323,9 @@ function App() {
   const laManThi = screen === 'examtake'
 
   return (
-    <div className={`min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100${laManThi ? '' : ' khung-app'}`}>
+    <div className={`min-h-screen m3 m3-thay${laManThi ? '' : ' vo-thay'}`}>
       <Toast />
+      {!laManThi && <ThanhBenTrai />}
       <div className="khung-noi-dung">
         <div className="giua-noi-dung" data-teacher-screen={laManThi ? undefined : screen}>
       {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
@@ -332,11 +343,11 @@ function App() {
         {screen === 'giaobtvn' && <GiaoBtvnScreen />}
         {screen === 'goilenbang' && <GoiLenBangScreen />}
         {screen === 'cauhoi' && <CauHoiScreen />}
+        {screen === 'caidat' && <CaiDatScreen />}
         </Suspense>
       </ChanLoi>
         </div>
       </div>
-      {!laManThi && <ThanhBenTrai />}
       {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}
     </div>
   )

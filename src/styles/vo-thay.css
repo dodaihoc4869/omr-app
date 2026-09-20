@@ -1,0 +1,332 @@
+/* VỎ APP GIÁO VIÊN — Material 3 (thầy chốt 21/09, bản vẽ docs/ban-ve-app-giao-vien-2109). Chỉ màu/hình theo token --m3-* (m3-theme.css, MỘT bảng
+ * màu cho cả 3 app); không hex. Gốc `.vo-thay` luôn mang `.m3` (App.tsx) nên mọi token cũ (--nen, --the, --muc…) cũng đổi theo vai trò M3.
+ *
+ * Ba dạng, cùng một danh sách mục (ThanhBenTrai.tsx · MUC_DIEU_HUONG):
+ *   ≥ 1100 px  ngăn kéo 264 px · 880–1099 rail 88 px · < 880 thanh đáy (BottomNav) + nút "Mở ca" nổi.
+ * Nội dung nằm trong một tờ bo 28 px trên nền surface-container; `.giua-noi-dung` giữ bề rộng tối đa. */
+.vo-thay {
+  min-height: 100vh;
+  background: var(--m3-surface-container);
+  color: var(--m3-on-surface);
+}
+.vo-thay .khung-noi-dung {
+  min-width: 0;
+  width: 100%;
+  background: var(--m3-surface);
+  overflow-x: clip;
+}
+.vo-thay .giua-noi-dung {
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+/* ── thanh trái: ẩn ở màn hẹp ─────────────────────────────────────────── */
+.ben-trai {
+  display: none;
+}
+.day-thay {
+  display: none;
+}
+
+@media (min-width: 880px) {
+  .vo-thay {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    min-height: 100vh;
+  }
+  .vo-thay .khung-noi-dung {
+    margin: 12px 12px 12px 0;
+    border-radius: var(--m3-bo-28);
+    min-height: calc(100vh - 24px);
+  }
+  .ben-trai {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 20px 10px;
+    background: transparent;
+    color: var(--m3-on-surface-variant);
+  }
+  .ben-trai-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0 14px;
+    border-radius: var(--m3-bo-16);
+    background: transparent;
+  }
+  /* rail: chỉ hình logo, chữ ĐỖ ĐẠI HỌC ẩn */
+  .ben-trai-logo-goc > div {
+    display: none;
+  }
+  .ben-trai-nut-ca {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 56px;
+    margin: 0 8px 10px;
+    padding: 0;
+    border-radius: 18px;
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgb(0 0 0 / 0.22);
+  }
+  .ben-trai-nut-ca-chu {
+    display: none;
+  }
+  .ben-trai-danh-sach {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ben-trai-cuoi {
+    margin-top: auto;
+  }
+  .ben-trai-muc {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-height: 64px;
+    padding: 6px 4px;
+    border-radius: var(--m3-bo-16);
+    background: transparent;
+    color: var(--m3-on-surface-variant);
+    font-family: var(--sans);
+    text-align: center;
+  }
+  .ben-trai-bieu-tuong {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 32px;
+    border-radius: 16px;
+  }
+  .ben-trai-ten {
+    display: none;
+  }
+  .ben-trai-ngan {
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .ben-trai-muc:hover .ben-trai-bieu-tuong {
+    background: var(--m3-surface-container-high);
+  }
+  .ben-trai-muc.dang {
+    color: var(--m3-on-primary-container);
+  }
+  .ben-trai-muc.dang .ben-trai-bieu-tuong {
+    background: var(--m3-primary-container);
+  }
+  .ben-trai-muc.dang .ben-trai-ngan {
+    font-weight: 800;
+  }
+  .ben-trai-huy-hieu {
+    position: absolute;
+    top: 4px;
+    right: 14px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+  }
+  /* mật độ của màn hình rộng: nút trong nội dung 40 px (bản vẽ), không phải 48 px của điện thoại */
+  .vo-thay .giua-noi-dung button {
+    min-height: 40px;
+  }
+}
+
+/* ── ngăn kéo ≥ 1100 px ───────────────────────────────────────────────── */
+@media (min-width: 1100px) {
+  .vo-thay {
+    grid-template-columns: 264px minmax(0, 1fr);
+  }
+  .ben-trai {
+    padding: 20px 14px;
+  }
+  .ben-trai-logo {
+    justify-content: flex-start;
+    padding: 4px 10px 18px;
+  }
+  .ben-trai-logo-goc > div {
+    display: flex;
+  }
+  .ben-trai-nut-ca {
+    justify-content: flex-start;
+    margin: 0 0 12px;
+    padding: 0 20px;
+  }
+  .ben-trai-nut-ca-chu {
+    display: inline;
+  }
+  .ben-trai-muc {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 14px;
+    min-height: 52px;
+    padding: 0 18px;
+    border-radius: 26px;
+    text-align: left;
+  }
+  .ben-trai-bieu-tuong,
+  .ben-trai-muc:hover .ben-trai-bieu-tuong,
+  .ben-trai-muc.dang .ben-trai-bieu-tuong {
+    width: auto;
+    height: auto;
+    background: transparent;
+  }
+  .ben-trai-ten {
+    display: inline;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .ben-trai-ngan {
+    display: none;
+  }
+  .ben-trai-muc:hover {
+    background: var(--m3-surface-container-high);
+  }
+  .ben-trai-muc.dang {
+    background: var(--m3-primary-container);
+  }
+  .ben-trai-muc.dang .ben-trai-ten {
+    font-weight: 700;
+  }
+  .ben-trai-huy-hieu {
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+  }
+}
+
+/* ── thanh đáy < 880 px ───────────────────────────────────────────────── */
+@media (max-width: 879px) {
+  .day-thay {
+    display: block;
+  }
+  .day-thay-thanh {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 40;
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+    background: var(--m3-surface-container);
+    box-shadow: 0 -1px 0 var(--m3-outline);
+  }
+  .day-thay-muc {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 2px;
+    background: transparent;
+    color: var(--m3-on-surface-variant);
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .day-thay-bieu-tuong {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 32px;
+    border-radius: 16px;
+  }
+  .day-thay-muc.dang {
+    color: var(--m3-on-primary-container);
+    font-weight: 800;
+  }
+  .day-thay-muc.dang .day-thay-bieu-tuong {
+    background: var(--m3-primary-container);
+  }
+  .day-thay-nut-ca {
+    position: fixed;
+    right: 16px;
+    bottom: calc(88px + env(safe-area-inset-bottom));
+    z-index: 41;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 56px;
+    padding: 0 20px;
+    border-radius: 18px;
+    background: var(--m3-primary);
+    color: var(--m3-on-primary);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgb(0 0 0 / 0.25);
+  }
+  .day-thay-them {
+    position: fixed;
+    right: 12px;
+    bottom: calc(88px + env(safe-area-inset-bottom));
+    z-index: 42;
+    display: flex;
+    flex-direction: column;
+    min-width: 240px;
+    padding: 8px;
+    border-radius: var(--m3-bo-28);
+    background: var(--m3-surface-container-high);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.28);
+  }
+  .day-thay-them-muc {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 52px;
+    padding: 0 16px;
+    border-radius: 26px;
+    background: transparent;
+    color: var(--m3-on-surface);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 500;
+    text-align: left;
+  }
+  .day-thay-them-muc.dang {
+    background: var(--m3-primary-container);
+    color: var(--m3-on-primary-container);
+    font-weight: 700;
+  }
+  .day-thay-them-muc .ben-trai-huy-hieu {
+    position: static;
+    margin-left: auto;
+  }
+  .vo-thay .khung-noi-dung {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ben-trai-muc,
+  .day-thay-muc {
+    transition: none;
+  }
+}
