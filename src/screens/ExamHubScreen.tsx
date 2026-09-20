@@ -2,6 +2,7 @@ import {useState} from 'react'
 import {RefreshCw} from 'lucide-react'
 import {daySangBanMoi,type DangKySW} from '../lib/cap-nhat-app'
 import BangTinGiaoVien from '../components/BangTinGiaoVien'
+import HomNayScreen from './HomNayScreen'
 
 function NutCapNhat() {
   const [dang, setDang] = useState(false)
@@ -69,8 +70,10 @@ function NutCapNhat() {
 }
 
 export default function ExamHubScreen(){
- return <div className="gv-page min-h-screen pb-24 px-4 pt-4 flex flex-col" style={{background:'var(--nen)',color:'var(--muc)',gap:'var(--k4)'}}>
-  <BangTinGiaoVien/>
-  <div style={{marginTop:'auto',paddingTop:32,display:'flex',justifyContent:'flex-end'}}><NutCapNhat/></div>
+ // TRANG CHỦ = màn HÔM NAY (G2, 21/09); bảng tin hoạt động cũ (đợt giao bài, ca, truy cập, vinh danh) giữ nguyên bên dưới.
+ return <div className="gv-page min-h-screen pb-24 flex flex-col" style={{color:'var(--muc)',gap:'var(--k4)'}}>
+  <HomNayScreen/>
+  <section aria-label="Hoạt động trong ngày" className="px-4"><BangTinGiaoVien/></section>
+  <div style={{marginTop:'auto',paddingTop:32,paddingInline:16,display:'flex',justifyContent:'flex-end'}}><NutCapNhat/></div>
  </div>
 }

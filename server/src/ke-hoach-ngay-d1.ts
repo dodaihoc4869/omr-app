@@ -51,7 +51,12 @@ function docQid(v: unknown): string[] | undefined {
 /** Ngày nghỉ thầy đặt: `cau_hinh.ngay_nghi` = mảng JSON hoặc chuỗi cách nhau bởi dấu phẩy/xuống dòng. */
 export async function docNgayNghi(env: Env): Promise<Set<string>> {
   const r = await tat(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi'").first<{ gia_tri: string }>(), null)
-  const v = String(r?.gia_tri ?? '').trim()
+  return phanTichNgayNghi(String(r?.gia_tri ?? ''))
+}
+
+/** Phần thuần của `docNgayNghi`: đọc giá trị `cau_hinh.ngay_nghi` (mảng JSON hoặc chuỗi cách nhau bởi dấu phẩy/chấm phẩy/khoảng trắng) thành tập ngày YYYY-MM-DD. */
+export function phanTichNgayNghi(giaTri: string): Set<string> {
+  const v = giaTri.trim()
   let ds: unknown[] = []
   if (v.startsWith('[')) {
     try { ds = JSON.parse(v) as unknown[] } catch { ds = [] }

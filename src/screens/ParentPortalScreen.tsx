@@ -5,7 +5,8 @@ import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import { useGioHocTap } from '../hooks/useGioHocTap'
 import { useBanNho, useKeHoachNgay } from '../components/bang-nhiem-vu/may-chu'
-import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom, parentNewsApi } from '../lib/mom-api'
+import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom, parentNewsApi, datPassPhuHuynh } from '../lib/mom-api'
+import { docPass, nhanPassTuDiaChi, xacDinhPhuHuynh, xoaPass } from '../lib/ph-token'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useMemo, useState } from 'react'
 import DongDemCau from '../components/DongDemCau'
@@ -147,8 +148,22 @@ export default function ParentPortalScreen() {
   const [hienHuongDan, setHienHuongDan] = useState(false)
 
   useEffect(() => {
-    loadScriptUrl().then((u) => {
+    loadScriptUrl().then(async (u) => {
       setScriptUrl(u)
+      // LIÊN KẾT RIÊNG CỦA CON (?ph=<pass>, giai đoạn mềm): nhận + xoá khỏi địa chỉ, xác định con bằng token; lỗi thì hiện câu của máy chủ
+      // và cho nhập SBD như cũ. Không có liên kết mà máy đã nhớ pass thì dùng lại pass đó.
+      const pass = nhanPassTuDiaChi() || docPass()
+      if (pass) {
+        const kq = await xacDinhPhuHuynh(pass)
+        if (kq.ok) {
+          datPassPhuHuynh(pass)
+          void dangNhapPhuHuynh(kq.sbd, u, { hoTen: kq.hoTen, lop: kq.lop })
+          return
+        }
+        xoaPass()
+        datPassPhuHuynh('')
+        setThongBaoLoi(kq.error)
+      }
       const sbdLuu = localStorage.getItem(SBD_STORAGE_KEY)
       if (sbdLuu && sbdLuu.trim()) {
         void dangNhapPhuHuynh(sbdLuu.trim(), u)
@@ -239,7 +254,7 @@ export default function ParentPortalScreen() {
     return () => { clearInterval(timer); window.removeEventListener('focus', refresh); window.removeEventListener('online', refresh) }
   }, [sbdHienTai])
 
-  async function dangNhapPhuHuynh(sbd: string, urlParam?: string) {
+  async function dangNhapPhuHuynh(sbd: string, urlParam?: string, conBiet?: { hoTen: string; lop: string }) {
     const sbdSach = sbd.trim()
     if (!sbdSach) {
       setThongBaoLoi('Vui lòng nhập Số báo danh của con')
@@ -252,9 +267,9 @@ export default function ParentPortalScreen() {
 
     try {
       // 1. Tra cứu thông tin học sinh
-      let ten = ''
-      let lop = ''
-      if (url) {
+      let ten = conBiet?.hoTen ?? ''
+      let lop = conBiet?.lop ?? ''
+      if (url && !conBiet) {
         try {
           const info = await tenTheoSbd(url, '', sbdSach)
           if (info && info.hoTen) {
@@ -322,6 +337,8 @@ export default function ParentPortalScreen() {
 
   const dangXuat = () => {
     localStorage.removeItem(SBD_STORAGE_KEY)
+    xoaPass()
+    datPassPhuHuynh('')
     setSbdHienTai(null)
     setHoTenCon('')
     setLopCon('')

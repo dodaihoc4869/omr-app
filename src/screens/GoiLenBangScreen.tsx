@@ -19,7 +19,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay, UserCheck } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
-import { docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
+import { docBuoiChua, docKhoChuaCa, docMocResetDaDon, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret, luuBuoiChua, xoaBuoiChua } from '../lib/exam-db'
+import { HAN_BUOI_CHUA_NGAY, chuTheTiepTuc, conHan, emGiuKhiNoi, khoaBuoiChua, laBuoiChuaHopLe, taoBanGhiBuoi, tinhTrangBuoi, type BuoiChuaLuu } from '../lib/noi-buoi-chua'
 import { theoDoiBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { mergeKeepAnswers } from '../data/examContent'
@@ -168,6 +169,8 @@ type CauDayDu =
 
 interface DuLieuCa {
   maCa: string
+  /** Lớp của ca — một phần khoá buổi chữa lưu để nối buổi sau (`noi-buoi-chua.ts`). */
+  lop: string
   ten: string
   bank: BanDeCa
   /** KHO CHỮA của ca — bộ câu rộng hơn đề em làm, do màn Mở ca lưu lại khi thầy
@@ -272,6 +275,15 @@ export default function GoiLenBangScreen() {
   /** Kết quả thầy đã bấm trên BẢNG BUỔI CHỮA (Engine E), theo `sbd|qid`. Máy chủ nhận rồi thì
    * khoá nút: bấm lại là ghi đôi vào sổ lên bảng, mà sổ chỉ thêm, không sửa. */
   const [ketQuaBuoi, setKetQuaBuoi] = useState<Record<string, 'dat' | 'khong_dat'>>({})
+  /** NỐI BUỔI (M4): buổi chữa dở đã lưu của ca này (null = không có / hết hạn / thầy đã bỏ). `buoiQuyet`: thầy đã chọn nối hay bắt đầu mới.
+   * `tiepBuoi`: đang NỐI — chỉ xếp các câu còn lại, bắt buộc chưa chữa lên đầu, giữ em còn có mặt. */
+  const [buoiDo, setBuoiDo] = useState<BuoiChuaLuu | null>(null)
+  const [buoiQuyet, setBuoiQuyet] = useState<'tiep' | 'moi' | null>(null)
+  const [tiepBuoi, setTiepBuoi] = useState<{ conLai: Set<string>; batBuoc: Set<string>; emGiu: Record<string, string> } | null>(null)
+  const [tuDongXep, setTuDongXep] = useState(false)
+  /** Bản ghi gốc của buổi đang chạy (lúc NỐI là bản đã lưu; buổi mới là null) và giờ bắt đầu ổn định của buổi mới. */
+  const goiBuoiGoc = useRef<BuoiChuaLuu | null>(null)
+  const batDauBuoiMoi = useRef('')
   /** Hồ sơ lớp đang giữ là của (danh sách em × danh sách câu) nào. Đổi em có mặt hay đổi
    * bài chữa thì phải xin lại: hồ sơ nắm kiến thức chỉ có đúng những câu ĐÃ XIN. */
   const khoaHoSoDaNap = useRef('')
@@ -396,7 +408,7 @@ export default function GoiLenBangScreen() {
       // không phải tick lại đề ở khối bên dưới.
       const kc = await docKhoChuaCa(ca.maCa).catch(() => undefined)
       const khoChua = kc && kc.length ? mergeKeepAnswers(kc) : null
-      setDu({ maCa: ca.maCa, ten: ca.tenCa || `mã ${ca.maCa}`, bank, khoChua, luot, hoSo })
+      setDu({ maCa: ca.maCa, lop: String(ca.lop ?? ''), ten: ca.tenCa || `mã ${ca.maCa}`, bank, khoChua, luot, hoSo })
       // Ca thường (mở bằng Rút bộ câu / Lấy trọn kho) không có bộ rút sẵn — đưa
       // thẳng thầy sang nhánh tự chọn, khỏi phải bấm thêm một chạm.
       setCachLayCau(!dayHoc && khoChua ? 'san' : 'tu_chon')
@@ -749,7 +761,7 @@ export default function GoiLenBangScreen() {
   /** MỘT NÚT CHẠY CẢ HAI, đúng thứ tự: xếp giờ trước để biết em nào lên bảng,
    * phân công sau để biết em ấy chữa câu nào. */
   /** CÂU ĐƯA VÀO THUẬT TOÁN MỚI — gộp độ khó đo được với sao trong kho. */
-  const cauVaoXep = useMemo<CauVaoXep[]>(
+  const cauVaoXepGoc = useMemo<CauVaoXep[]>(
     () =>
       doKhoCau.map((d) => {
         const goc = traCau.get(d.cau.id)
@@ -765,6 +777,16 @@ export default function GoiLenBangScreen() {
         }
       }),
     [doKhoCau, boBatBuoc, traCau],
+  )
+  /** Đang NỐI buổi: chỉ các câu còn lại (câu bắt buộc chưa chữa vẫn bắt buộc, trừ khi thầy bỏ tích), mỗi câu mang em đã định để giữ nếu còn có mặt. */
+  const cauVaoXep = useMemo<CauVaoXep[]>(
+    () =>
+      tiepBuoi
+        ? cauVaoXepGoc
+            .filter((c) => tiepBuoi.conLai.has(c.cau.id))
+            .map((c) => ({ ...c, batBuoc: c.batBuoc || (tiepBuoi.batBuoc.has(c.cau.id) && !boBatBuoc.includes(c.cau.id)), emDaDinh: tiepBuoi.emGiu[c.cau.id] }))
+        : cauVaoXepGoc,
+    [cauVaoXepGoc, tiepBuoi, boBatBuoc],
   )
 
   /** BÀI TẬP VỀ NHÀ CẢ LỚP — cộng dồn từ hồ sơ, KHÔNG ước lượng. Không em nào
@@ -815,7 +837,14 @@ export default function GoiLenBangScreen() {
     if (!kq.datSan && kq.thieu) showToast(`Mới ${kq.soEmLenBang}/${kq.soEmToiThieu} em lên bảng — ${kq.thieu.viSao}`, 'warn')
   }
 
+  /** NỐI BUỔI (M4): tình trạng buổi dở đã lưu — câu còn lại / đã chữa (đối chiếu cả lịch sử lên bảng của máy chủ khi đã đọc được). */
+  const tinhTrangDo = useMemo(() => (buoiDo ? tinhTrangBuoi(buoiDo, lichSu) : null), [buoiDo, lichSu])
+
   const chayCaHai = () => {
+    // Có buổi dở của ca này mà thầy chưa chọn nối hay bắt đầu mới: chặn (im lặng ghi đè bản lưu là mất phần đã làm).
+    if (!dayHoc && buoiDo && tinhTrangDo && tinhTrangDo.conLai.length > 0 && !buoiQuyet) {
+      return showToast('Ca này có buổi chữa dở — bấm "Tiếp tục buổi trước" hoặc "Bắt đầu buổi mới" trước', 'warn')
+    }
     if (dayHoc) {
       if (!lichSu) return showToast('Chưa tải được lịch sử lên bảng. Thầy tải lại lịch sử trước khi phân công.', 'warn')
       try {
@@ -829,6 +858,106 @@ export default function GoiLenBangScreen() {
     chay(1)
     void chayBuoiChua()
   }
+
+  // ── NỐI BUỔI CHỮA (M4) ──────────────────────────────────────────────────────────────────────────────────
+  // Mở ca ⇒ đọc buổi dở đã lưu (khoá = mốc reset | lớp | mã ca; hết hạn 14 ngày; buổi trước reset không có vì đã bị dọn).
+  useEffect(() => {
+    setBuoiDo(null)
+    setBuoiQuyet(null)
+    setTiepBuoi(null)
+    setTuDongXep(false)
+    goiBuoiGoc.current = null
+    batDauBuoiMoi.current = ''
+    if (!du || dayHoc) return
+    let huy = false
+    void (async () => {
+      try {
+        const moc = await docMocResetDaDon().catch(() => '')
+        const khoa = khoaBuoiChua(moc, du.lop, du.maCa)
+        const raw = await docBuoiChua(khoa)
+        if (huy || !raw) return
+        if (!laBuoiChuaHopLe(raw) || raw.khoa !== khoa || raw.moc !== moc || !conHan(raw, new Date())) {
+          await xoaBuoiChua(khoa).catch(() => {}) // hỏng / khác mốc / quá 14 ngày ⇒ bỏ, không nối nhầm
+          return
+        }
+        setBuoiDo(raw)
+      } catch {
+        /* không đọc được buổi dở thì coi như không có — buổi mới vẫn xếp được */
+      }
+    })()
+    return () => {
+      huy = true
+    }
+  }, [du?.maCa, du?.lop, dayHoc])
+
+  /** LƯU BUỔI sau mỗi lần xếp và mỗi lần ghi kết quả. Lỗi lưu không được làm hỏng buổi đang chữa. */
+  useEffect(() => {
+    if (!kqBuoi || !du || dayHoc) return
+    const kehoach = kqBuoi.dong.filter((d) => d.tang === 'len_bang' && d.em).map((d) => ({ qid: d.cau.id, sbd: d.em!.sbd }))
+    const cauTrongBuoi = kqBuoi.dong.map((d) => ({ qid: d.cau.id, batBuoc: cauVaoXep.find((c) => c.cau.id === d.cau.id)?.batBuoc ?? false }))
+    // Kết quả đã ghi của MỌI câu thuộc buổi này (kể cả ô của lần xếp trước trong cùng phiên) — không lấy ô của ca khác.
+    const qidBuoi = new Set([...cauTrongBuoi.map((c) => c.qid), ...(goiBuoiGoc.current?.cauBuoi ?? [])])
+    const ketQua = Object.fromEntries(Object.entries(ketQuaBuoi).filter(([k]) => qidBuoi.has(k.slice(k.indexOf('|') + 1))))
+    if (!goiBuoiGoc.current && !batDauBuoiMoi.current) batDauBuoiMoi.current = new Date().toISOString()
+    const nguon = { cachLayCau, maDeChon: [...maDeChon], soCauChua, locSao, locDang }
+    const goc = goiBuoiGoc.current
+    const batDauLuc = batDauBuoiMoi.current
+    void (async () => {
+      try {
+        const moc = await docMocResetDaDon().catch(() => '')
+        const rec = taoBanGhiBuoi(goc, { moc, lop: du.lop, maCa: du.maCa, tenCa: du.ten, nguon, cauTrongBuoi, kehoach, ketQua, nay: new Date(), batDauLuc })
+        await luuBuoiChua(rec.khoa, rec)
+      } catch (e) {
+        console.warn('[buổi chữa] không lưu được buổi dở:', e)
+      }
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [kqBuoi, ketQuaBuoi])
+
+  /** "Tiếp tục buổi trước": dựng lại nguồn câu của buổi, rồi xếp CHỈ các câu còn lại cho em CÓ MẶT hôm nay (em vắng được thay). */
+  const tiepTucBuoi = () => {
+    if (!buoiDo || !tinhTrangDo) return
+    const tt = tinhTrangDo
+    setCachLayCau(buoiDo.nguon.cachLayCau)
+    setMaDeChon(new Set(buoiDo.nguon.maDeChon))
+    setSoCauChua(buoiDo.nguon.soCauChua)
+    setLocSao(buoiDo.nguon.locSao as LocSao)
+    setLocDang(buoiDo.nguon.locDang as LocDang)
+    const coMat = new Set(dsEmCa.filter((e) => e.coMat).map((e) => e.sbd))
+    setTiepBuoi({ conLai: new Set(tt.conLai), batBuoc: new Set(buoiDo.batBuoc), emGiu: emGiuKhiNoi(buoiDo, tt.conLai, coMat) })
+    // Câu máy chủ đã xác nhận chữa (ở máy khác) được GHI VÀO bản lưu — mất mạng lần sau vẫn không hiện lại như câu còn lại.
+    goiBuoiGoc.current = { ...buoiDo, daChua: tt.daChua }
+    setKetQuaBuoi({})
+    setBuoiQuyet('tiep')
+    setTuDongXep(true)
+  }
+
+  /** "Bắt đầu buổi mới": bỏ phần dở đã lưu (KHÔNG đụng lịch sử lên bảng ở máy chủ). */
+  const batDauBuoiMoiFn = () => {
+    if (buoiDo) void xoaBuoiChua(buoiDo.khoa).catch(() => {})
+    goiBuoiGoc.current = null
+    batDauBuoiMoi.current = ''
+    setBuoiDo(null)
+    setTiepBuoi(null)
+    setBuoiQuyet('moi')
+  }
+
+  // Nối xong dựng lại nguồn câu thì tự xếp; nguồn không dựng lại được thì nói thật thay vì xếp rỗng.
+  useEffect(() => {
+    if (!tuDongXep || !tiepBuoi) return
+    if (cauVaoXep.length === 0) {
+      const hen = setTimeout(() => {
+        setTuDongXep(false)
+        showToast('Không dựng lại được câu của buổi trước — chọn lại nguồn câu ở mục 2 rồi xếp giờ', 'warn')
+      }, 2500)
+      return () => clearTimeout(hen)
+    }
+    setTuDongXep(false)
+    const thieu = [...tiepBuoi.conLai].filter((q) => !cauVaoXep.some((c) => c.cau.id === q)).length
+    if (thieu > 0) showToast(`${thieu} câu của buổi trước không còn trong nguồn câu hiện tại — bỏ qua`, 'warn')
+    chayCaHai()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tuDongXep, tiepBuoi, cauVaoXep])
 
   /** TỜ MÁY CHIẾU — hai em một đợt, chiếu lên bảng để gọi lên chữa.
    *
@@ -1721,6 +1850,28 @@ export default function GoiLenBangScreen() {
               `!dsCau.length`, mà `chayGiaoAn` đã có sẵn lời nhắc cho đúng ca ấy
               — nút mờ chặn trước nên lời nhắc không bao giờ hiện. Nút chết lặng
               là đúng thứ đặc tả cấm: không lặng lẽ sai. */}
+          {!dayHoc && buoiDo && tinhTrangDo && tinhTrangDo.conLai.length > 0 && !buoiQuyet && (
+            <div data-khoi="tiep-tuc-buoi" style={{ marginTop: 'var(--k4)', padding: 'var(--k3)', borderRadius: 'var(--bo-2)', background: 'var(--the-2)' }}>
+              <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>{chuTheTiepTuc(tinhTrangDo)}</div>
+              <div style={{ ...NHAN_NHO, marginTop: 4 }}>
+                Buổi bắt đầu {new Date(buoiDo.batDauLuc).toLocaleDateString('vi-VN')}, lưu tới {HAN_BUOI_CHUA_NGAY} ngày kể từ lần chữa gần nhất.
+                {tinhTrangDo.soTuMayChu > 0 ? ` ${tinhTrangDo.soTuMayChu} câu máy chủ ghi nhận đã chữa ở máy khác.` : ''} Em vắng hôm nay: bỏ tích ở mục 3 rồi
+                bấm Tiếp tục — em còn có mặt giữ nguyên câu cũ, em vắng được thay bằng em hợp nhất.
+              </div>
+              <div className="flex items-center flex-wrap" style={{ gap: 'var(--k3)', marginTop: 'var(--k3)' }}>
+                <NutChinh onClick={tiepTucBuoi} disabled={soCoMat === 0}>Tiếp tục buổi trước</NutChinh>
+                <button
+                  type="button"
+                  onClick={batDauBuoiMoiFn}
+                  className="tap-target inline-flex items-center font-bold"
+                  style={{ minHeight: 40, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'transparent', color: 'var(--muc)', border: '1px solid var(--vien)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+                >
+                  Bắt đầu buổi mới
+                </button>
+              </div>
+            </div>
+          )}
+
           <div style={{ marginTop: 'var(--k4)' }}>
             <NutChinh onClick={chayCaHai} disabled={!du || soCoMat === 0}>
               <span className="inline-flex items-center" style={{ gap: 8 }}>
