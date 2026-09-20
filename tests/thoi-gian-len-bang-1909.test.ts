@@ -256,20 +256,27 @@ const emCo = (i: number, bac?: NamKtCauEm['bac'], qids: string[] = []): HoSoEmDa
 })
 
 describe('Engine E — chi phí lên bảng lấy từ T mới', () => {
-  it('câu CÓ văn bản: `dong.giay` = T (tính theo lớp sai và bậc em); câu thiếu văn bản: vẫn 300/180/120', () => {
+  it('câu CÓ văn bản: `dong.giay` = T (tính theo lớp sai và bậc em, GHÉP ĐÔI THẬT khi hai câu ghép được); câu thiếu văn bản: vẫn 300/180/120', () => {
+    // M5: hai câu bậc 1 CHỌN LIỀN NHAU ghép đôi thật — mỗi em mang T_chữa của mình + ½ phần làm bài dài hơn của cặp (M1 từng chia
+    // ½ cho mọi câu, kể cả câu đứng một mình; nợ đã ghi ở M2). Câu thiếu văn bản không tham gia ghép (300/180/120 giữ nguyên).
     const ds = [vao(1, 2, nd(40, false, 3)), vao(2, 1), vao(3, 0, nd(20, false, 2))]
     const kq = xepBuoiChua(ds, [emCo(1), emCo(2), emCo(3)])
     const g = (id: string) => kq.dong.find((d) => d.tang === 'len_bang' && d.cau.id === id)!.giay
-    expect(g('Q1')).toBe(giayBienGhepDoi(thoiGianCau({ phan: 'I', sao: 2, noiDung: nd(40, false, 3), tiLeLopSai: 0.5 })))
+    const tg = (sao: 0 | 1 | 2, n: NoiDungCau) => thoiGianCau({ phan: 'I', sao, noiDung: n, tiLeLopSai: 0.5 })
+    const t1 = tg(2, nd(40, false, 3))
+    const t3 = tg(0, nd(20, false, 2))
+    const maxL = Math.max(t1.doc + t1.lam, t3.doc + t3.lam)
+    expect(g('Q1')).toBe(t1.chua + maxL / 2)
+    expect(g('Q3')).toBe(t3.chua + maxL / 2)
     expect(g('Q2')).toBe(180)
-    expect(g('Q3')).toBe(giayBienGhepDoi(thoiGianCau({ phan: 'I', sao: 0, noiDung: nd(20, false, 2), tiLeLopSai: 0.5 })))
   })
 
   it('bậc của EM ĐƯỢC CHỌN đổi chi phí: cùng câu, em "biết" tốn hơn em "vận dụng" (×1,25 so với ×0,85)', () => {
     const q = vao(1, 1, nd(40, false, 3))
     const chonBiet = xepBuoiChua([q], [emCo(1, 'biet', ['Q1'])]).dong[0]
     const chonVd = xepBuoiChua([q], [emCo(1, 'van_dung', ['Q1'])]).dong[0]
-    const t = (bacEm: 'biet' | 'van_dung') => giayBienGhepDoi(thoiGianCau({ phan: 'I', sao: 1, noiDung: nd(40, false, 3), tiLeLopSai: 0.5, bacEm }))
+    // M5: một câu bậc 1 đứng MỘT MÌNH (không có bạn ghép đôi) mang TRỌN T, không phải ½.
+    const t = (bacEm: 'biet' | 'van_dung') => thoiGianCau({ phan: 'I', sao: 1, noiDung: nd(40, false, 3), tiLeLopSai: 0.5, bacEm }).tong
     expect(chonBiet.giay).toBe(t('biet'))
     expect(chonVd.giay).toBe(t('van_dung'))
     expect(chonBiet.giay).toBeGreaterThanOrEqual(chonVd.giay)

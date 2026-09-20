@@ -172,6 +172,14 @@ export const SO_CAU_DU_TIN_DANG = 4
 /** Dạng yếu khi (câu đã khắc phục + câu chưa từng sai) / câu đã gặp thấp hơn mức này. */
 export const NGUONG_DANG_YEU = 0.7
 
+/** Em này YẾU dạng của câu ấy không? `true` yếu · `false` không yếu · `null` chưa đủ căn cứ (dưới `SO_CAU_DU_TIN_DANG` câu đã gặp
+ * hoặc máy chủ không có số liệu dạng). Đúng định nghĩa `nam_kt_dang` mà `diemHopCau` dùng — một định nghĩa, hai chỗ gọi. */
+export function emYeuDang(em: HoSoEmDayDu, qid: string): boolean | null {
+  const nk = em.namKt?.get(qid) ?? null
+  const yeu = tiLeYeuDang(nk)
+  return yeu === null ? null : 1 - yeu < NGUONG_DANG_YEU
+}
+
 /** Hồ sơ nắm kiến thức của em ở một câu, hoặc `null` (máy chủ cũ / em chưa có dòng nào). */
 export function namKtCuaCau(em: HoSoEmDayDu, qid: string): NamKtCauEm | null {
   return em.namKt?.get(qid) ?? null

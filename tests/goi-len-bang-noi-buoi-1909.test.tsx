@@ -141,6 +141,14 @@ async function chuaMotEmRoiTat() {
 }
 
 describe('lưu buổi chữa', () => {
+  it('M5: khối buổi chữa hiện "giá trị chữa N" (số đo được); không có hồ sơ dạng thì KHÔNG hiện dòng dạng lớp yếu', async () => {
+    const r = await buoiDau()
+    const gt = r.container.querySelector('[data-khoi="buoi-chua"] [data-mot="gia-tri-buoi"]')
+    expect(gt?.textContent ?? '').toMatch(/^giá trị chữa \d+(,\d)?$/)
+    expect(r.container.querySelector('[data-mot="dang-yeu-phu"]')).toBeNull()
+    expect(r.container.textContent ?? '').not.toMatch(/nắm chắc/i)
+  }, 90000)
+
   it('xếp giờ ⇒ LƯU NGAY (khoá `-` | lớp | mã ca — không gắn mốc reset) với kế hoạch, câu bắt buộc, nguồn câu; chưa có kết quả nào', async () => {
     await buoiDau()
     const b = luu()!

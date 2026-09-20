@@ -45,7 +45,7 @@ import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
 import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
 import { noiDungTuCauGoc } from '../lib/thoi-gian-len-bang'
 import { uocLuongBacCau, uocLuongBacCauGoc } from '../lib/uoc-luong-bo-cuc'
-import { xepBuoiChua, bangChuBuoiChua, type CauVaoXep, type DongChua, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
+import { xepBuoiChua, bangChuBuoiChua, chuSoGiaTri, type CauVaoXep, type DongChua, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
 import { btvnCuaCau, napHoSoLop, type HoSoEmDayDu, type KetQuaBtvn } from '../lib/ho-so-lop'
 import { dungGiaoAn } from '../lib/giao-an-len-bang'
 import { KHO_DO_KHO_RONG, gopCaVaoKho, thongKeKho, type KhoDoKhoLuu } from '../lib/kho-do-kho'
@@ -1898,6 +1898,13 @@ export default function GoiLenBangScreen() {
                   {Math.round(kqBuoi.tongGiay / 60)}/{Math.round(kqBuoi.nganSach / 60)} phút
                 </span>
                 <span style={{ ...NHAN_NHO, ...SO }}>{kqBuoi.cauDocDapAn.length} câu chỉ đọc đáp án</span>
+                {/* M5: con số ĐO ĐƯỢC của buổi — không có chữ "nắm chắc". Dạng lớp yếu chỉ hiện khi lớp có dạng yếu. */}
+                <span style={{ ...NHAN_NHO, ...SO }} data-mot="gia-tri-buoi">giá trị chữa {chuSoGiaTri(kqBuoi.hocNhieu.tongGiaTri)}</span>
+                {kqBuoi.hocNhieu.soDangYeu > 0 && (
+                  <span style={{ ...NHAN_NHO, ...SO }} data-mot="dang-yeu-phu">
+                    phủ {kqBuoi.hocNhieu.soDangYeuDaPhu}/{kqBuoi.hocNhieu.soDangYeu} dạng lớp yếu
+                  </span>
+                )}
               </div>
               {tomBtvnLop && (
                 <div style={{ ...NHAN_NHO, ...SO, marginTop: 6 }}>

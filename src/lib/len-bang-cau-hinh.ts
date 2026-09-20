@@ -180,6 +180,18 @@ export const THOI_GIAN_LEN_BANG = {
   HE_LAM_SONG_SONG: 0.5,
 } as const
 
+/** TỐI ƯU "HỌC NHIỀU NHẤT TRONG BUỔI" (M5, 21/09). Giá trị một câu = `tỉLệLớpSai × (1 + HE_SO_DANG_YEU × [dạng lớp yếu CHƯA có câu nào
+ * được chữa trong buổi])`, chọn theo MẬT ĐỘ giá trị/giây trong từng tầng đã chốt (bắt buộc → 2 sao → 1 sao → 0 sao).
+ *
+ * "DẠNG LỚP YẾU" — định nghĩa của máy chủ (`nam_kt_dang`: ≥ `SO_CAU_DU_TIN_DANG` câu đã gặp, tỉ lệ đã khắc phục/chưa từng sai
+ * < `NGUONG_DANG_YEU`) nâng từ em lên LỚP: ít nhất `TOI_THIEU_EM` em CÓ MẶT có dữ liệu ở dạng ấy và từ `TL_EM_YEU` số em có dữ
+ * liệu trở lên là yếu. HAI SỐ SAU LÀ CHỌN CỦA NGƯỜI VIẾT (đặc tả chỉ nêu định nghĩa mức em) — đổi ở đây, có test khoá. */
+export const HOC_NHIEU = {
+  HE_SO_DANG_YEU: 0.5,
+  DANG_YEU_LOP_TL_EM: 0.5,
+  DANG_YEU_LOP_TOI_THIEU_EM: 3,
+} as const
+
 /** Ngân sách thật cho phần chữa, sau khi trừ hao phí. Giây. */
 export function nganSachGiay(ch: CauHinhLenBang): number {
   return Math.max(0, ch.NGAN_SACH_PHUT * 60 - haoPhiGiay(ch))

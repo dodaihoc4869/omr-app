@@ -32,11 +32,11 @@
 //     lên bốn lượt.
 import type { CauChua } from './phan-cong'
 import { chuanChuyenDe } from './phan-cong'
-import { CAU_HINH_LEN_BANG_MAC_DINH, nganSachGiay, type CauHinhLenBang } from './len-bang-cau-hinh'
+import { CAU_HINH_LEN_BANG_MAC_DINH, HOC_NHIEU, nganSachGiay, type CauHinhLenBang } from './len-bang-cau-hinh'
 import { giayBienGhepDoi, thoiGianCau, type NoiDungCau } from './thoi-gian-len-bang'
 import type { BacBoCuc } from './bo-cuc-to-chieu'
 import type { HoSoEmDayDu } from './ho-so-lop'
-import { btvnCuaCau, canDayLaiCau, CHU_BTVN, diemHopCau, lyDoChanCau, tomTatBtvn } from './ho-so-lop'
+import { btvnCuaCau, canDayLaiCau, CHU_BTVN, diemHopCau, emYeuDang, lyDoChanCau, tomTatBtvn } from './ho-so-lop'
 
 /** Một câu đã có thống kê lớp — phần thuật toán này cần đúng bấy nhiêu. */
 export interface CauVaoXep {
@@ -96,6 +96,19 @@ export interface KetQuaBuoiChua {
   /** Câu ĐƯỢC GỌI EM LÊN BẢNG mà quá dài, tờ chiếu phải dành CẢ bảng cho đề (bậc 5): em làm ở bảng phụ. */
   cauChiemCaBang: CauChua[]
   canhBao: string[]
+  /** CÁC CON SỐ ĐO ĐƯỢC của buổi (M5) — không có chữ nào kiểu "nắm chắc". */
+  hocNhieu: {
+    /** Tổng giá trị các câu được chữa: Σ tỉLệLớpSai × (1 + 0,5 × [dạng lớp yếu chưa phủ lúc chọn]). */
+    tongGiaTri: number
+    /** Số dạng LỚP YẾU (theo hồ sơ nắm kiến thức của em có mặt), số dạng đã có ít nhất một câu được chữa, và tên các dạng chưa phủ. */
+    soDangYeu: number
+    soDangYeuDaPhu: number
+    dangYeuChuaPhu: string[]
+    /** Số câu KHÔNG được gọi em hôm nay (chỉ đọc đáp án) — còn lại cho buổi sau (nối buổi ở màn giáo viên). */
+    soCauDoiBuoiSau: number
+    /** Một dòng cho thầy, ghép từ đúng các số trên. */
+    tomTat: string
+  }
 }
 
 export interface YeuCauBuoiChua {
@@ -151,6 +164,9 @@ function chonEm(
   return tot ? { em: tot.em, hop: tot.hop, viSao: tot.viSao } : null
 }
 
+/** Một chữ số thập phân, dấu phẩy kiểu Việt ("12,4") — dùng chung cho dòng tóm tắt và màn hình để hai nơi không lệch chữ. */
+export const chuSoGiaTri = (n: number): string => (Math.round(n * 10) / 10).toString().replace('.', ',')
+
 /**
  * Xếp cả buổi chữa.
  *
@@ -186,6 +202,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
   const daGoi = new Set<string>()
   const daChua = new Set<string>()
   let dung = 0
+  let tongGiaTri = 0
   const batBuocChuaChua: CauChua[] = []
 
   /** Câu vào buổi vì có em CẦN DẠY LẠI mà em đứng lên không phải em ấy (em ấy bị chặn
@@ -193,25 +210,56 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
   const lyDoGoi = (c: CauVaoXep, viSao: string) =>
     cauDayLai.has(c.cau.id) && !viSao.includes('dạy lại') ? `câu cần dạy lại (có em sai ≥ 3 lần chưa đúng lại) · ${viSao}` : viSao
 
-  /** GIÂY MỘT EM TỐN TRONG NGÂN SÁCH BUỔI khi lên bảng chữa câu này — `T = T_đọc + T_làm + T_chữa`
-   * (`thoi-gian-len-bang.ts`): theo sao, độ dài đề, tỉ lệ lớp sai, và bậc của CHÍNH em đứng lên; hai em lên SONG SONG
-   * nên mỗi em gánh ½ phần làm bài (`giayBienGhepDoi`). Câu thiếu văn bản = 300/180/120 như cũ. */
-  const giayLen = (c: CauVaoXep, e?: HoSoEmDayDu): number =>
-    giayBienGhepDoi(
-      thoiGianCau(
-        {
-          phan: c.cau.phan,
-          sao: c.cau.sao,
-          noiDung: c.noiDung,
-          tiLeLopSai: c.tiLeDung === null ? undefined : 1 - c.tiLeDung,
-          bacEm: e?.namKt?.get(c.cau.id)?.bac ?? null,
-        },
-        ch,
-      ),
+  // ── THỜI GIAN (M1 + M5) ────────────────────────────────────────────────────
+  /** `T = T_đọc + T_làm + T_chữa` của MỘT em ở câu này (`thoi-gian-len-bang.ts`): theo sao, độ dài đề, tỉ lệ lớp sai và bậc của
+   * CHÍNH em đứng lên. Câu thiếu văn bản = 300/180/120 như cũ (`roiVeMacDinh`). */
+  const thoiGianO = (c: CauVaoXep, e?: HoSoEmDayDu) =>
+    thoiGianCau(
+      {
+        phan: c.cau.phan,
+        sao: c.cau.sao,
+        noiDung: c.noiDung,
+        tiLeLopSai: c.tiLeDung === null ? undefined : 1 - c.tiLeDung,
+        bacEm: e?.namKt?.get(c.cau.id)?.bac ?? null,
+      },
+      ch,
     )
+  /** Tờ chiếu CHỈ ghép đôi hai câu cùng bậc bố cục 1 (`bo-cuc-to-chieu.ts`); câu bậc ≥ 2 đứng MỘT MÌNH (2/3 bảng) nên phải tính
+   * ĐỦ T — M1 từng tính ½ cho mọi câu (nợ đã ghi ở M2, sửa ở M5). Chưa biết bậc (test dựng tối giản) ⇒ coi như ghép đôi được. */
+  const ghepDuoc = (c: CauVaoXep) => (c.bacUoc ?? 1) === 1
+  /** Giá ƯỚC nghiêng về phía ghép đôi (½ phần làm bài): CHỈ dùng cho MẬT ĐỘ giá trị/giây và GIỮ CHỖ SÀN, không trừ ngân sách. */
+  const giayUoc = (c: CauVaoXep, e?: HoSoEmDayDu): number => {
+    const t = thoiGianO(c, e)
+    return t.roiVeMacDinh || !ghepDuoc(c) ? t.tong : giayBienGhepDoi(t)
+  }
 
-  /** Giá THÊM của việc nâng một câu từ đọc đáp án lên gọi em lên bảng. Chưa biết em nào thì tính bậc trung tính (giữ chỗ cho SÀN). */
-  const themGiay = (c: CauVaoXep, e?: HoSoEmDayDu) => giayLen(c, e) - giayDoc(c)
+  /** Giá THÊM (ƯỚC) của việc nâng một câu từ đọc đáp án lên gọi em lên bảng. Chưa biết em nào thì tính bậc trung tính (giữ chỗ cho SÀN). */
+  const themGiay = (c: CauVaoXep, e?: HoSoEmDayDu) => giayUoc(c, e) - giayDoc(c)
+
+  // GHÉP SONG SONG THẬT (M5): các câu bậc 1 được chọn ghép đôi THEO THỨ TỰ CHỌN (đúng cách tờ chiếu ghép câu liền kề).
+  // Câu thứ hai của một cặp chỉ tốn thêm giờ chữa của mình + phần giờ làm bài vượt em kia — rẻ hơn ½ khi hai câu dài bằng nhau
+  // không đổi, và ĐẮT hơn ½ khi chỉ còn một câu bậc 1 lẻ (đứng một mình). `dung` cộng đúng theo phép này.
+  let choGhep: { l: number } | null = null
+  /** Giây THẬT thêm vào buổi khi xếp câu này cho em này (trước khi trừ phần đọc đáp án). */
+  const chiPhiBien = (c: CauVaoXep, e: HoSoEmDayDu): number => {
+    const t = thoiGianO(c, e)
+    if (t.roiVeMacDinh || !ghepDuoc(c)) return t.tong
+    const l = t.doc + t.lam
+    return choGhep ? t.chua + Math.max(0, l - choGhep.l) : l + t.chua
+  }
+  /** Như `chiPhiBien` khi chưa biết em nào (bậc trung tính) — để chấm mật độ trước khi chọn em. */
+  const chiPhiBienUoc = (c: CauVaoXep): number => {
+    const t = thoiGianO(c)
+    if (t.roiVeMacDinh || !ghepDuoc(c)) return t.tong
+    const l = t.doc + t.lam
+    return choGhep ? t.chua + Math.max(0, l - choGhep.l) : l + t.chua
+  }
+  const chotGhep = (c: CauVaoXep, e: HoSoEmDayDu) => {
+    const t = thoiGianO(c, e)
+    if (t.roiVeMacDinh || !ghepDuoc(c)) return
+    choGhep = choGhep ? null : { l: t.doc + t.lam }
+  }
+  const themGiayThat = (c: CauVaoXep, e: HoSoEmDayDu) => chiPhiBien(c, e) - giayDoc(c)
 
   /** Giữ chỗ cho SÀN: tổng của đúng `n` giá thêm RẺ NHẤT còn lại, bỏ qua câu
    * đang cân nhắc.
@@ -244,7 +292,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
    * nó rơi xuống tầng đọc đáp án, đúng luật "câu còn lại chỉ cần đọc đáp án".
    */
   const duCho = (c: CauVaoXep, e: HoSoEmDayDu, giuChoSan = false): boolean => {
-    const them = themGiay(c, e)
+    const them = themGiayThat(c, e)
     let giuCho = 0
     if (giuChoSan) {
       const conThieu = Math.max(0, san - daGoi.size - 1)
@@ -253,50 +301,136 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
     return dung + tongGiayDoc + them + giuCho <= nganSach
   }
 
-  // ── VÒNG 1: CÂU BẮT BUỘC — phải chữa hết, không nhường chỗ cho ai ─────────
-  for (const c of thuTu) {
-    if (!c.batBuoc) continue
-    if (daGoi.size >= tran) break
-    const chon = chonEm(c, em, daGoi, c.emDaDinh)
-    if (!chon || !duCho(c, chon.em)) {
-      batBuocChuaChua.push(c.cau)
-      continue
+  // ── DẠNG LỚP YẾU (M5) ─────────────────────────────────────────────────────
+  // Dạng của câu lấy từ hồ sơ nắm kiến thức của em (`namKt.maDang`; máy chủ đời cũ không có ⇒ không có dạng nào ⇒ toàn bộ phần
+  // này im lặng và Engine E chọn như trước, chỉ khác mật độ giá trị/giây trong cùng tầng).
+  const dangCua = new Map<string, string>()
+  for (const c of dsCau) {
+    for (const e of em) {
+      const d = e.namKt?.get(c.cau.id)?.maDang
+      if (d) {
+        dangCua.set(c.cau.id, d)
+        break
+      }
     }
-    daGoi.add(chon.em.sbd)
-    daChua.add(c.cau.id)
-    dung += themGiay(c, chon.em)
-    dong.push({ tang: 'len_bang', cau: c.cau, giay: giayLen(c, chon.em), em: chon.em, viSao: lyDoGoi(c, chon.viSao), hop: chon.hop })
+  }
+  const dangYeuLop = new Set<string>()
+  {
+    const tk = new Map<string, { n: number; yeu: number }>()
+    const daDem = new Set<string>()
+    for (const c of dsCau) {
+      const d = dangCua.get(c.cau.id)
+      if (!d) continue
+      for (const e of em) {
+        const k = `${d}|${e.sbd}`
+        if (daDem.has(k)) continue
+        const y = emYeuDang(e, c.cau.id)
+        if (y === null) continue
+        daDem.add(k)
+        const t = tk.get(d) ?? { n: 0, yeu: 0 }
+        t.n++
+        if (y) t.yeu++
+        tk.set(d, t)
+      }
+    }
+    for (const [d, t] of tk) if (t.n >= HOC_NHIEU.DANG_YEU_LOP_TOI_THIEU_EM && t.yeu / t.n >= HOC_NHIEU.DANG_YEU_LOP_TL_EM) dangYeuLop.add(d)
+  }
+  const dangDaPhu = new Set<string>()
+  const dangYeuCua = (c: CauVaoXep) => {
+    const d = dangCua.get(c.cau.id)
+    return d && dangYeuLop.has(d) ? d : null
+  }
+  const laDangYeuChuaPhu = (c: CauVaoXep) => {
+    const d = dangYeuCua(c)
+    return d !== null && !dangDaPhu.has(d)
+  }
+  const tiLeSai = (c: CauVaoXep) => (c.tiLeDung === null ? 0.5 : 1 - c.tiLeDung)
+  /** GIÁ TRỊ một câu = tỉLệLớpSai × (1 + 0,5 × [dạng lớp yếu CHƯA có câu nào được chữa trong buổi]). Câu bắt buộc không "vô hạn" ở
+   * đây: bắt buộc là TẦNG (luôn chọn trước), giá trị chỉ dùng để sắp trong tầng và để báo con số. */
+  const giaTri = (c: CauVaoXep) => tiLeSai(c) * (1 + HOC_NHIEU.HE_SO_DANG_YEU * (laDangYeuChuaPhu(c) ? 1 : 0))
+
+  /** Chọn câu kế tiếp trong MỘT tầng (`pool`): RÀNG BUỘC — còn câu phủ được dạng lớp yếu chưa có câu nào thì KHÔNG chọn câu thứ hai
+   * của dạng đã phủ; rồi lấy câu có MẬT ĐỘ giá trị/giây cao nhất (bằng nhau: câu đứng trước đề). */
+  const chonCauKe = (pool: CauVaoXep[]): CauVaoXep | null => {
+    if (pool.length === 0) return null
+    const conDangChuaPhu = pool.some(laDangYeuChuaPhu)
+    const ungVien = conDangChuaPhu ? pool.filter((c) => { const d = dangYeuCua(c); return d === null || !dangDaPhu.has(d) }) : pool
+    let tot: { c: CauVaoXep; mat: number } | null = null
+    for (const c of ungVien) {
+      // Mật độ theo giá THÊM THẬT của câu này ở trạng thái ghép hiện tại: còn một câu bậc 1 đang chờ bạn thì câu vừa/ngắn hơn nó gần
+      // như chỉ tốn giờ chữa — nhờ đó các cặp gồm hai câu dài GẦN BẰNG NHAU (ghép lệch là phí giờ làm bài dài hơn của cặp).
+      const mat = giaTri(c) / Math.max(1, chiPhiBienUoc(c))
+      if (!tot || mat > tot.mat + 1e-12 || (Math.abs(mat - tot.mat) <= 1e-12 && c.cau.viTri < tot.c.cau.viTri)) tot = { c, mat }
+    }
+    return tot ? tot.c : null
   }
 
-  // ── VÒNG 2: 2 SAO rồi 1 SAO rồi 0 SAO, cho tới khi ĐẠT SÀN ────────────────
-  //
-  // Dừng ở SÀN chứ không ở TRẦN: gọi thừa em là cắt mất giờ chữa của câu khó.
-  for (const c of thuTu) {
-    if (daGoi.size >= san || daGoi.size >= tran) break
-    if (daChua.has(c.cau.id)) continue
-    // Chọn em TRƯỚC rồi mới kiểm giờ: chi phí phụ thuộc bậc của em đứng lên (`giayLen`).
+  /** Thử xếp MỘT câu: chọn em, kiểm giờ, ghi vào buổi. `false` = không xếp được (không em nào nhận / hết giờ). */
+  const thuXep = (c: CauVaoXep, giuChoSan: boolean): boolean => {
+    // Chọn em TRƯỚC rồi mới kiểm giờ: chi phí phụ thuộc bậc của em đứng lên.
+    // Null = không em còn lại nào NHẬN được câu này (bị chặn bậc "biết"), chứ không hẳn hết em: câu khác vẫn còn em nhận được.
     const chon = chonEm(c, em, daGoi, c.emDaDinh)
-    // Null = không em còn lại nào NHẬN được câu này (bị chặn bậc "biết"), chứ không
-    // hẳn hết em: câu sau (1 sao, 0 sao) vẫn còn em nhận được — không được dừng cả vòng.
-    if (!chon) continue
-    if (!duCho(c, chon.em, true)) continue
+    if (!chon || !duCho(c, chon.em, giuChoSan)) return false
+    dung += themGiayThat(c, chon.em)
+    chotGhep(c, chon.em)
+    tongGiaTri += giaTri(c)
+    const d = dangYeuCua(c)
+    if (d) dangDaPhu.add(d)
     daGoi.add(chon.em.sbd)
     daChua.add(c.cau.id)
-    dung += themGiay(c, chon.em)
-    dong.push({ tang: 'len_bang', cau: c.cau, giay: giayLen(c, chon.em), em: chon.em, viSao: lyDoGoi(c, chon.viSao), hop: chon.hop })
+    dong.push({ tang: 'len_bang', cau: c.cau, giay: 0, em: chon.em, viSao: lyDoGoi(c, chon.viSao), hop: chon.hop })
+    return true
   }
 
+  // Tầng ưu tiên đã chốt: bắt buộc (2→1→0 sao) rồi câu thường (2→1→0 sao). TRONG từng tầng chọn theo mật độ giá trị/giây + phủ dạng.
+  const CAC_TANG: readonly (readonly [boolean, 0 | 1 | 2])[] = [[true, 2], [true, 1], [true, 0], [false, 2], [false, 1], [false, 0]]
+  const chayVong = (vong: 1 | 2 | 3) => {
+    const gioiHan = vong === 2 ? Math.min(san, tran) : tran
+    for (const [batBuoc, sao] of CAC_TANG) {
+      if (vong === 1 && !batBuoc) return
+      const daThu = new Set<string>() // đã thử mà không xếp được trong vòng này — không thử lại
+      for (;;) {
+        if (daGoi.size >= gioiHan) return
+        const c = chonCauKe(thuTu.filter((x) => x.batBuoc === batBuoc && x.cau.sao === sao && !daChua.has(x.cau.id) && !daThu.has(x.cau.id)))
+        if (!c) break
+        if (!thuXep(c, vong === 2)) {
+          daThu.add(c.cau.id)
+          if (vong === 1) batBuocChuaChua.push(c.cau)
+        }
+      }
+    }
+  }
+
+  // ── VÒNG 1: CÂU BẮT BUỘC — phải chữa hết, không nhường chỗ cho ai ─────────
+  chayVong(1)
+  // ── VÒNG 2: cho tới khi ĐẠT SÀN — dừng ở SÀN chứ không ở TRẦN: gọi thừa em là cắt mất giờ chữa của câu khó ──
+  chayVong(2)
   // ── VÒNG 3: CÒN GIỜ THÌ GỌI THÊM, nhưng chỉ tới trần ──────────────────────
-  for (const c of thuTu) {
-    if (daGoi.size >= tran) break
-    if (daChua.has(c.cau.id)) continue
-    const chon = chonEm(c, em, daGoi, c.emDaDinh)
-    if (!chon) continue
-    if (!duCho(c, chon.em)) continue
-    daGoi.add(chon.em.sbd)
-    daChua.add(c.cau.id)
-    dung += themGiay(c, chon.em)
-    dong.push({ tang: 'len_bang', cau: c.cau, giay: giayLen(c, chon.em), em: chon.em, viSao: lyDoGoi(c, chon.viSao), hop: chon.hop })
+  chayVong(3)
+
+  // GIỜ THẬT của từng dòng: cặp câu bậc 1 chia đều phần làm bài dài hơn (`max(T_đọc+T_làm)/2` mỗi em) cộng T_chữa của em ấy; câu đứng
+  // một mình (bậc ≥ 2, hoặc câu bậc 1 lẻ, hoặc thiếu văn bản = 300/180/120) mang trọn T. Tổng các dòng = đúng thứ `dung` đã cộng.
+  {
+    let cho: { d: DongChua; l: number; cc: number } | null = null
+    for (const d of dong) {
+      if (d.tang !== 'len_bang') continue
+      const c = thuTu.find((x) => x.cau.id === d.cau.id)!
+      const t = thoiGianO(c, d.em!)
+      if (t.roiVeMacDinh || !ghepDuoc(c)) {
+        d.giay = t.tong
+        continue
+      }
+      const l = t.doc + t.lam
+      if (cho) {
+        const maxL = Math.max(cho.l, l)
+        cho.d.giay = cho.cc + maxL / 2
+        d.giay = t.chua + maxL / 2
+        cho = null
+      } else {
+        d.giay = l + t.chua
+        cho = { d, l, cc: t.chua }
+      }
+    }
   }
 
   // ── TẦNG 2: mọi câu còn lại chỉ đọc đáp án ────────────────────────────────
@@ -355,7 +489,20 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
     )
   }
 
+  // Dạng lớp yếu mà buổi chưa chạm tới: nói tên để thầy thêm câu hoặc nới giờ — không lặng lẽ bỏ.
+  const dangYeuChuaPhu = [...dangYeuLop].filter((d) => !dangDaPhu.has(d)).sort()
+  if (dangYeuChuaPhu.length > 0) {
+    canhBao.push(`${dangYeuChuaPhu.length} dạng lớp yếu chưa có câu nào được chữa: ${dangYeuChuaPhu.map((d) => d.replace(/^CD:/, '')).join(' · ')} — tích thêm câu ở dạng ấy hoặc nới giờ`)
+  }
+  const tomTatHocNhieu = [
+    `giá trị chữa ${chuSoGiaTri(tongGiaTri)}`,
+    ...(dangYeuLop.size > 0 ? [`phủ ${dangDaPhu.size}/${dangYeuLop.size} dạng lớp yếu`] : []),
+    `${soEmLenBang} em lên bảng`,
+    `${cauDocDapAn.length} câu dời buổi sau`,
+  ].join(' · ')
+
   return {
+    hocNhieu: { tongGiaTri, soDangYeu: dangYeuLop.size, soDangYeuDaPhu: dangDaPhu.size, dangYeuChuaPhu, soCauDoiBuoiSau: cauDocDapAn.length, tomTat: tomTatHocNhieu },
     dong,
     soEmLenBang,
     soEmToiThieu: ch.SO_EM_LEN_BANG_TOI_THIEU,
@@ -372,7 +519,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
 
 /** Bảng chữ để thầy copy sang giáo án hoặc nhóm Zalo. */
 export function bangChuBuoiChua(kq: KetQuaBuoiChua, tenNguon: string): string {
-  const d: string[] = [`Buổi chữa · ${tenNguon}`, `${kq.soEmLenBang} em lên bảng · ${Math.round(kq.tongGiay / 60)}/${Math.round(kq.nganSach / 60)} phút`]
+  const d: string[] = [`Buổi chữa · ${tenNguon}`, `${kq.soEmLenBang} em lên bảng · ${Math.round(kq.tongGiay / 60)}/${Math.round(kq.nganSach / 60)} phút`, kq.hocNhieu.tomTat]
   const lenBang = kq.dong.filter((x) => x.tang === 'len_bang')
   if (lenBang.length > 0) {
     d.push('', 'GỌI LÊN BẢNG')
