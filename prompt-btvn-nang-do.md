@@ -28,3 +28,8 @@ Thích nghi sau mỗi chặng (mục 2G) · thẻ "hôm nay em tiến thêm gì"
 
 ## NGHIỆM THU ĐỢT 1
 1. Giao 80 câu hạn 7 ngày cho lớp thử: 3 em (yếu / trung bình / khá) nhận 3 bộ khác nhau, cùng chứa đủ lõi; em yếu 0 câu vượt bậc đích. 2. Điểm mỗi em trên số câu của em; bài không cá nhân hoá chấm y cũ. 3. Màn xem trước khớp đúng bộ em nhận khi mở bài ngay sau đó. 4. vitest: đỏ mới = [].
+
+## CẬP NHẬT 21/09 — THẦY CHỐT: bài cá nhân hoá KHÔNG tự cho làm lại; thầy có NÚT "Cho làm lại" ở app giáo viên
+- **Code 3**: lệnh thầy `/btvn/cho-lam-lai {maBtvn, sbd}` (mã bí mật), chỉ cho bài `ca_nhan=1` ĐÃ NỘP và CHƯA quá hạn (quá hạn ⇒ từ chối bằng lời, nhắc thầy gia hạn bằng lệnh sẵn có). Làm: chép kết quả hiện tại vào `btvn_em_lich_su` (bảng sẵn có), `so_lan_lam + 1`, xoá `nop_luc`/`dap_an_json`/`so_dung`, `lo_da_xong = 0`; GIỮ NGUYÊN bộ câu đã chốt + hạn nộp. Sự kiện ghi với `lan` mới; EXP không cộng đôi (khoá idempotent sẵn có — test khoá). `/btvn/cua-em` trả `soLanLam` để máy em biết là lượt mới. Ra `{ok, soLanLam}`.
+- **Code 4**: tab theo dõi BTVN, mỗi em ĐÃ NỘP của bài cá nhân hoá có nút "Cho làm lại" — MỘT bước xác nhận nói thật ("Em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi; điểm mới thay điểm cũ, điểm cũ vẫn lưu trong lịch sử"), báo đúng kết quả máy chủ; 404/từ chối ⇒ lời thật.
+- **Code 2**: phiếu thấy `soLanLam` tăng ⇒ xoá nháp + kết quả chặng của lượt cũ ở máy em (khoá nháp gắn `soLanLam`), mở lại từ chặng 1.
