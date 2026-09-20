@@ -7,7 +7,7 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 |---|---|---|---|
 | 1 | Script cắt ảnh nhẹ + ảnh `nho/` | XONG | `f9e7547` · `tests/dao-anh-nho.test.ts` 5/5 · `--kiem` khớp từng byte |
 | 2 | Màn Chọn bạn đồng hành | XONG | commit màn 1 · `tests/dao-chon-ban-dong-hanh.test.tsx` 8/8 · ảnh `docs/anh-dao-than-thu-2109/1-*` |
-| 3 | Hòn đảo của em + vỏ `DaoThanThu` + thanh dưới + Túi đồ | chưa | |
+| 3 | Hòn đảo của em + Túi đồ + lõi `dao-core` (vỏ `DaoThanThu` + thanh dưới: commit nối cuối) | XONG phần màn | commit màn 2 · `tests/dao-cua-em.test.tsx` 13/13 · ảnh `2-*` |
 | 4 | Chuyến thám hiểm 6 ải | chưa | |
 | 5 | Sổ tay dạng bài | chưa | |
 | 6 | Hợp đồng prop cho Code 5 | bản đầu đã gửi | `docs/hop-dong-dao-than-thu-prop-2109.md` |
@@ -28,3 +28,12 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 - QUYẾT ĐỊNH ĐÃ DÙNG (báo Boss): (a) bản vẽ ghi "đổi thần thú sau vẫn giữ cấp" nhưng máy chủ chỉ cho `choose` MỘT lần ⇒ đổi câu thành "tên thì đổi lại lúc nào cũng được", có test chặn chữ "đổi thần thú"; (b) thẻ mở đầu theo SBD (`theMoDau`, 1..6) để cả lớp không dồn vào Viêm Sư vì nút vàng một chạm; (c) giảm chuyển động ⇒ không xoay 3D, đổi tranh tức thì.
 - BẪY CSS: `game.css` có `.spirit-game button:hover:not(:disabled){background;transform;box-shadow}` (0,3,1), hover dính sau chạm ⇒ mọi nút của đảo đặt nền/chữ/bóng/dịch chuyển qua biến `--nut-*`, luật nút viết `.dao button.<lớp>`.
 - Xem thử: `npm run dev` → `/src/game/than-thu-v2/dao/xem-thu.html?man=chon[&dau=2][&doan][&loi=…]` (trang dev, không vào build).
+
+## 21/09 · Màn 2 — Hòn đảo của em (`dao/DaoCuaEm.tsx`, `dao/TuiDo.tsx`, `dao/dao-core.ts`, `dao/kieu.ts`)
+- Thú thật (ảnh nhẹ đúng dạng tiến hoá của cấp) + vòng EXP = `profile.exp / thanhExp(cap)` + "còn N EXP lên cấp". Đo Chromium 390: ảnh nạp lần đầu 51 KB (1 ảnh thú + 3 ảnh bé).
+- MỘT thẻ "Chuyến thám hiểm hôm nay": 4 nhóm ải 2·1·2·1 (`NHOM_AI` = suất của `chooseSession`, test khoá); dòng mô tả in TÊN DẠNG thật từ lệnh `recommendations` (vắng thì nói công thức bằng lời học sinh); hết 200 câu ⇒ khoá nút. MỘT nút LÊN ĐƯỜNG.
+- 3 mục tiêu gần nhất từ hồ sơ thật: lên cấp · dạng nhiều sao nhất dưới 3 · rèn khiên (`exp.manhKhien` → không có thì `profile.khienRen` → vẫn không có thì thay bằng mốc tiến hoá kế, KHÔNG bịa).
+- Đường tiến hoá 6 dạng (ảnh bé 96 px, dạng chưa tới "?"). Chip chuỗi ngày / EXP hôm nay chỉ hiện khi có prop (Code 5 xác nhận cây Game hiện chưa có hai số này).
+- Túi đồ: dùng NGUYÊN `ImmortalShield` (giữ tác dụng + màn 10 giây, cùng lệnh `shield-use`), mặc lại vỏ nền tối; mảnh khiên; "Trang phục · SẮP MỞ" có khoá; lối sang Tiến bộ / Võ đài. GHI CHÚ cho Code 5: `ImmortalShield.tsx` còn 2 emoji trong chữ (ngoài làn em).
+- THÊM so với bản vẽ: nút "Nạp N EXP cho <tên>" trên đảo khi `wallet > 0` (lệnh `invest` cũ — bản vẽ không có chỗ nạp, thiếu thì EXP kẹt trong kho); bút đổi tên cạnh tên thú; thẻ "Gia đình nhắc em ôn".
+- Xem thử: `?man=dao[&thu=5&cap=72&vi=300&khongexp&khongchuoi&khongkhien&nhac&het]`, `?man=tui`.
