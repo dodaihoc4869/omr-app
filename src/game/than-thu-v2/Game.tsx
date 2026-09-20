@@ -7,11 +7,8 @@ import {unlockBattleAudio} from './battle-audio'
 import EscortRoom from './EscortRoom'
 // Lối chơi chính mới (19/09): nạp riêng để không làm nặng đảo thần thú.
 const DoanHoTong=lazy(()=>import('./DoanHoTong'))
-// Màn ĐẦU TIÊN cả trường thấy sau reset (Code 6 dựng, docs/hop-dong-dao-than-thu-prop-2109.md). Phần còn lại của Đảo mới sẽ nối khi vỏ `dao/DaoThanThu` lên main.
-const ChonBanDongHanh=lazy(()=>import('./dao/ChonBanDongHanh'))
-const DaoCuaEm=lazy(()=>import('./dao/DaoCuaEm'))
-/** Thẻ mở đầu khác nhau cho từng em — cùng công thức `theMoDau` của dao/ChonBanDongHanh (chép lại để không kéo cả gói lazy vào gói chính). */
-const theMoDauCua=(sbd:string)=>{let h=2166136261;for(const c of sbd)h=Math.imul(h^c.charCodeAt(0),16777619);return 1+((h>>>0)%6)}
+// Đảo thần thú bản mới: MỘT vỏ của Code 6, nạp lazy.
+const DaoThanThu=lazy(()=>import('./dao/DaoThanThu'))
 /** Võ đài 2 đấu 2 cũ giữ nguyên mã, chỉ đổi cửa vào: sự kiện tuần, mở thứ Bảy (giờ Việt Nam). */
 export const laThuBayVn=(now=Date.now())=>new Date(now+7*3600000).getUTCDay()===6
 /** CỬA VÀO TỪ NGOÀI (Bảng nhiệm vụ…): truyền prop `manDau="doan"`, hoặc đặt sessionStorage `game-v2:man-dau`=`doan` trước khi mở tab thần thú. */
@@ -32,14 +29,12 @@ import {layDiaChiMayChu} from '../../lib/dia-chi-may-chu'
 import {hsDangNhapApi} from '../../lib/exam-api'
 import type {HinhAnh} from '../../data/examContent'
 import './game.css'
-import ImmortalShield from './ImmortalShield'
 import type {ShieldState} from './shields'
 interface Profile {nickname?:string;academic?:{total:number;today:number;lastGain:number;dailyLimit:number};shields?:ShieldState;pet:string;choice:boolean;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null}
 interface Feedback {correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}
 interface Result {ok:boolean;doanMo?:boolean;dailyUsed?:number;suggestions?:{title:string;source:string;part:string}[];history?:{day:string;total:number;correct:number}[];mode?:Mode;answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[];pass?:string;tasks?:{id:string;dang:string}[];error?:string;profile?:Profile;revision?:number;remaining?:number;questions?:Question[];id?:string;message?:string;missing?:number;correct?:boolean;answer?:string;solution?:unknown;reward?:number;stage?:number;solutionImages?:HinhAnh[]}
 interface Props {sbd:string;token?:string;manDau?:'home'|'doan';onDong:()=>void;[key:string]:unknown}
 export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
- const [recommendation,setRecommendation]=useState<Result|null>(null)
  const [doanMo,setDoanMo]=useState(false)
  const [,setExpPending]=useState(0)
  const latestRevision=useRef(0)
@@ -65,14 +60,12 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  const run=async(fn:()=>Promise<unknown>)=>{if(running.current)return;running.current=true;setBusy(true);setError('');try{await fn()}catch(e){setError(e instanceof Error?e.message:'Không kết nối được. Em thử lại.')}finally{running.current=false;if(mounted.current)setBusy(false)}}
  useEffect(()=>{mounted.current=true;if(!token){setBusy(false);return}let cancelled=false;setBusy(true);request('profile').catch(e=>{if(!cancelled)setError(String(e.message))}).finally(()=>{if(!cancelled)setBusy(false)});return()=>{cancelled=true}},[token,request])
  useEffect(()=>{if(!token)return;let pending=false;const refresh=async()=>{if(document.hidden||pending||running.current)return;pending=true;try{await request('profile')}catch{/* The next user action reports authentication errors. */}finally{pending=false}};const timer=setInterval(()=>void refresh(),20000);window.addEventListener('focus',refresh);return()=>{clearInterval(timer);window.removeEventListener('focus',refresh)}},[token,request])
- useEffect(()=>{if(!token||!profile||profile.choice)return;let active=true;const refresh=()=>{if(!document.hidden)void request('recommendations').then(r=>{if(active)setRecommendation(r)}).catch(()=>{})};refresh();const timer=setInterval(refresh,30000);return()=>{active=false;clearInterval(timer)}},[token,request,profile?.earned,profile?.mastery,profile?.choice])
  const login=()=>run(async()=>{const r=await hsDangNhapApi('',sbd,password);if(!r.ok||!r.token)throw new Error(r.error||(r.chuaCoMatKhau?'Em đặt mật khẩu ở app học sinh trước khi mở game.':'Máy chủ chưa cấp được phiên game. Mật khẩu chưa được xác định là sai; em thử lại sau.'));await request('profile',{},r.token);try{sessionStorage.setItem(`game-v2:${sbd}`,r.token)}catch{/* Login still works without local storage. */}setPassword('');setToken(r.token)})
  const start=(next:Mode,dang?:string,guardian?:string)=>run(async()=>{
   setNotice('Đang đối chiếu kho bài tập và phần em đã học.');let result=await request('sync');setSyncLeft(result.remaining??0)
   while((result.remaining??0)>0&&mounted.current){result=await request('sync');setSyncLeft(result.remaining??0)}
   const r=await request('start',{mode:next,dang,guardian});setSyncLeft(null);setBattleAnswers([]);setBattleEvent(0);setMode(next);setSession(r.id??'');setQuestions(r.questions??[]);setPosition(0);setAnswer('');setMediaFailed(false);setFeedback(null);setAssisted(false);setDone(false);setTab('learn');setNotice(r.message||(r.missing?`${r.missing} dòng kết quả chưa nối được với kho, chưa dùng để phân bài.`:''))
  })
- const resume=()=>run(async()=>{const r=await request('resume');if(!r.id||!r.questions?.length){setNotice('Chưa có lượt đang học để tiếp tục.');return}setSession(r.id);setQuestions(r.questions);setMode(r.mode??'adventure');const answered=r.answered??[];setBattleAnswers(answered.map(a=>a.attempt));setBattleEvent(0);const first=r.questions.findIndex(q=>!answered.some(a=>a.attempt.qid===q.qid));setPosition(first<0?r.questions.length-1:first);setAnswer('');setMediaFailed(false);setFeedback(null);setAssisted(false);if(first<0)await request('complete',{session:r.id});setDone(first<0);setTab('learn')})
  const submit=()=>run(async()=>{const q=questions[position];if(!q)return;const r=await request('answer',{session,qid:q.qid,answer,assisted});setBattleAnswers(previous=>previous.some(a=>a.qid===q.qid)?previous:[...previous,{qid:q.qid,correct:!!r.correct}]);setBattleEvent(e=>e+1);setFeedback({correct:!!r.correct,answer:r.answer??'',solution:r.solution,reward:r.reward??0,stage:r.stage??0,solutionImages:r.solutionImages??[]})})
  const next=()=>run(async()=>{if(position+1>=questions.length){await request('complete',{session});setDone(true)}else{setPosition(position+1);setAnswer('');setMediaFailed(false);setFeedback(null);setAssisted(false)}})
  const petIndex=Math.max(0,PETS.findIndex(p=>p.id===profile?.pet))
@@ -84,15 +77,16 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
   return {...base,phan:'III',selected:answer,onChange:v=>{if(!feedback&&!busy)setAnswer(v)}}
  }
  const qp=questionProps()
- return <section className="spirit-game" aria-label="Thần Thú Hoá Học">
+ const voDao=!!profile&&(profile.choice||tab==='home')
+ return <section className={voDao?'spirit-game spirit-game-dao':'spirit-game'} aria-label="Thần Thú Hoá Học">
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi / lời giải" onClose={()=>setZoom('')}/>}
   {/* Đảo bản mới có đầu trang riêng ("BÁT LINH ĐẢO" + tên thú) → ẩn đầu trang cũ ở tab Đảo và ở màn chọn thú; các tab khác giữ nguyên. Thanh mục GIỮ tới khi vỏ Đảo của Code 6 có thanh dưới. */}
-  {!(profile&&(profile.choice||tab==='home'))&&<header className="spirit-header"><div><small>HỌC HOÁ · NUÔI THẦN THÚ</small><h1>Bát Linh Đảo</h1></div><button onClick={onDong}>Về app học sinh</button></header>}
+  {!voDao&&<header className="spirit-header"><div><small>HỌC HOÁ · NUÔI THẦN THÚ</small><h1>Bát Linh Đảo</h1></div><button onClick={onDong}>Về app học sinh</button></header>}
   {error&&<div role="alert" className="spirit-error">{error}<button onClick={()=>void run(()=>request('profile'))}>Tải lại hồ sơ</button></div>}
   {!token||(!profile&&!busy)?<div className="spirit-panel"><h2>Mở hồ sơ game của em</h2><p>Nhập mật khẩu học sinh để giữ tiến độ giữa các thiết bị.</p><input type="password" autoComplete="current-password" aria-label="Mật khẩu học sinh" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')void login()}}/><button disabled={busy||!password} onClick={()=>void login()}>Mở game</button></div>:null}
-  {busy&&<p role="status" className="spirit-status">{syncLeft!==null?`Đang nối kho bài tập, còn ${syncLeft} tờ đề…`:'Đang lưu và kiểm tra…'}</p>}
+  {busy&&!voDao&&<p role="status" className="spirit-status">{syncLeft!==null?`Đang nối kho bài tập, còn ${syncLeft} tờ đề…`:'Đang lưu và kiểm tra…'}</p>}
   {profile&&<>
-   <nav className="spirit-nav" aria-label="Mục game">{cuaGame(doanMo).nav.map(([id,label])=><button key={id} aria-current={tab===id?'page':undefined} onClick={()=>setTab(id)}>{label}</button>)}</nav>
+   {!voDao&&<nav className="spirit-nav" aria-label="Mục game">{cuaGame(doanMo).nav.map(([id,label])=><button key={id} aria-current={tab===id?'page':undefined} onClick={()=>setTab(id)}>{label}</button>)}</nav>}
    {!profile.choice&&<>
    {tab==='learn'&&<div className="spirit-panel">
     <header className="spirit-row"><h2>{mode==='arena'?'Luyện Hoá tiếp sức đội':'Nhiệm vụ của em'}</h2><span>{questions.length?`${Math.min(position+1,questions.length)} / ${questions.length} câu`:''}</span></header>
@@ -106,11 +100,9 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
     </>}
    </div>}
    </>}
-   {/* ĐẢO THẦN THÚ bản mới — màn "Hòn đảo của em" của Code 6 (dao/DaoCuaEm): thú thật + vòng EXP + MỘT thẻ chuyến thám hiểm + MỘT nút LÊN ĐƯỜNG. Thuật toán chọn câu/chấm/thưởng giữ nguyên. */}
-   {!profile.choice&&tab==='home'&&<><Suspense fallback={<p role="status" className="spirit-status">Đang mở đảo…</p>}><div className="dao"><DaoCuaEm profile={profile} goiY={recommendation?.suggestions??null} conLai={recommendation?.remaining??null} tasks={tasks} busy={busy} thongBao={notice} loi={error} onLenDuong={()=>void start('adventure')} onOnTheoNhac={dang=>void start('repair',dang)} onNap={()=>void run(()=>request('invest'))} onDoiTen={ten=>void run(()=>request('rename',{name:ten}))}/></div></Suspense>
-    <div className="spirit-row"><button disabled={busy} onClick={()=>void resume()}>Tiếp tục lượt học gần nhất</button></div>
-    <ImmortalShield level={profile.cap} state={profile.shields} busy={busy} onUse={id=>run(()=>request('shield-use',{useId:id}))}/></>}
-   {profile.choice?<Suspense fallback={<p role="status" className="spirit-status">Đang gọi tám thần thú…</p>}><ChonBanDongHanh batDau={theMoDauCua(sbd)} busy={busy} loi={error} moiDoan={doanMo&&tab==='doan'} onChon={(petId,ten)=>void run(async()=>{await request('choose',{pet:petId});if(ten)await request('rename',{name:ten})})}/></Suspense>:<>
+   {/* ĐẢO THẦN THÚ bản mới (Code 6, docs/hop-dong-dao-than-thu-prop-2109.md): MỘT vỏ lo trọn chọn thú → đảo → thám hiểm → sổ tay → túi đồ + thanh dưới. Vỏ tự gọi choose/rename/recommendations/so-tay/resume/sync/start/answer/complete/shield-use/invest qua `request`. Lượt Võ đài (arena) vẫn ở tab learn cũ. */}
+   {(profile.choice||tab==='home')&&<Suspense fallback={<p role="status" className="spirit-status">Đang mở đảo…</p>}><DaoThanThu sbd={sbd} profile={profile} doanMo={doanMo} call={request} tasks={tasks} moiDoan={doanMo&&tab==='doan'} onMoDoan={()=>setTab('doan')} onMoVoDai={()=>setTab('arena')} onMoTienBo={()=>setTab('progress')} onDong={onDong}/></Suspense>}
+   {!profile.choice&&<>
    {doanMo&&tab==='doan'&&<Suspense fallback={<p role="status" className="spirit-status">Đang mở đường cho Đoàn Hộ Tống…</p>}><DoanHoTong call={request} sbd={sbd} pet={petIndex} cap={profile.cap} onDong={()=>setTab('home')} onVeBangNhiemVu={onDong}/></Suspense>}
    {cuaGame(doanMo).voDaiMo?<div hidden={tab!=='arena'}><EscortRoom storageKey={sbd} call={request} active={tab==='arena'}/></div>:tab==='arena'&&<div className="spirit-panel"><small>SỰ KIỆN TUẦN</small><h2>Võ đài thứ Bảy</h2><p>Đấu đội 2 đấu 2 mở vào <strong>thứ Bảy hằng tuần</strong>. Các ngày còn lại, cả lớp cùng đi <strong>Đoàn Hộ Tống</strong>: mỗi ngày một chặng 5–6 phút, làm đúng câu vừa sức của mình là góp sức cho cả đoàn.</p><button className="spirit-primary" onClick={()=>setTab('doan')}>Vào Đoàn Hộ Tống</button></div>}
    {tab==='coming'&&<div className="spirit-panel mission-coming"><span aria-hidden="true">✦</span><small>CHUẨN BỊ PHÁT HÀNH</small><h2>Một hành trình mới đang đến</h2><p>Game mới đang được chuẩn bị. Em tiếp tục làm nhiệm vụ để nuôi thần thú nhé.</p></div>}
