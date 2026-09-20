@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Mẫu BTVN nâng đỡ — học sinh (390 sáng)</title>
+<meta name="viewport" content="width=390">
+<!-- BẢN VẼ MẪU, không phải mã app. Dùng đúng token thật của app (tokens.css + m3-theme.css), không hex.
+     Ba khung 390×844: #m1 đầu bài của riêng em · #m2 nhịp giữa chặng (nhãn câu) · #m3 thẻ cuối chặng.
+     Chụp: node hs-chup-mau.mjs (xem SO-VIEC-GIAO-DIEN.md, mục BTVN nâng đỡ). Số liệu trong mẫu chỉ để minh hoạ. -->
+<link rel="stylesheet" href="../../src/styles/tokens.css">
+<link rel="stylesheet" href="../../src/components/bang-nhiem-vu/m3-theme.css">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:rgb(120 124 130);font-family:var(--sans);-webkit-font-smoothing:antialiased;display:flex;flex-direction:column;gap:24px;width:390px}
+svg{width:1em;height:1em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.man{position:relative;width:390px;height:844px;overflow:hidden;display:flex;flex-direction:column;background:var(--m3-surface);color:var(--m3-on-surface)}
+
+/* thanh trên + đầu bài (đúng khuôn phiếu M3 đã có: gd-tren) */
+.tren{height:56px;display:flex;align-items:center;gap:16px;padding:0 16px;flex:none}
+.tren h1{margin:0;font-size:var(--cx-4);font-weight:700;letter-spacing:-.1px}
+.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:24px;color:var(--m3-on-surface)}
+.dau{flex:none;padding:6px 16px 14px;background:var(--m3-surface);box-shadow:var(--m3-cao-do-1);position:relative;z-index:2}
+.dau-hang{display:flex;align-items:center;gap:12px}
+.dau-chu{flex:1;min-width:0}
+.dau-tieu{font-size:var(--cx-3);font-weight:700;line-height:1.25}
+.dau-phu{margin-top:2px;font-size:var(--cx-2);color:var(--m3-on-surface-variant)}
+.dau-phu b{color:var(--m3-on-surface)}
+.luoi{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:24px;background:var(--m3-surface-container-high);color:var(--m3-on-primary-container)}
+.tien{margin-top:10px;height:6px;border-radius:var(--m3-bo-tron);background:var(--m3-primary-container);overflow:hidden}
+.tien i{display:block;height:100%;border-radius:inherit;background:var(--m3-primary)}
+.khich{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 12px;border-radius:var(--m3-bo-tron);background:var(--m3-tertiary-container);color:var(--m3-on-tertiary-container-phu);font-size:var(--cx-1);font-weight:700}
+.khich svg{font-size:14px}
+
+.cuon{flex:1;min-height:0;overflow:hidden;padding:12px 16px 0;display:flex;flex-direction:column;gap:12px}
+.day{flex:none;height:84px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;background:var(--m3-surface-container);box-shadow:0 -1px 0 rgb(0 0 0 / .08)}
+.day-con{font-size:var(--cx-3);font-weight:700;line-height:1.25}
+.nut{height:56px;padding:0 32px;border-radius:var(--m3-bo-tron);background:var(--m3-primary);color:var(--m3-on-primary);font-size:var(--cx-3);font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--m3-cao-do-3);white-space:nowrap}
+.nut.nhat{background:transparent;box-shadow:none;color:var(--m3-primary);border:1.5px solid var(--m3-outline)}
+.nut.dich{background:var(--m3-secondary-container);color:var(--m3-on-secondary-container);box-shadow:none}
+
+/* thẻ */
+.the{border-radius:var(--m3-bo-28);background:var(--m3-surface-container);padding:16px}
+.o-bt{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:22px;flex:none;background:var(--m3-o-bieu-tuong)}
+
+/* ===== KHUNG 1: thẻ "Bài của riêng em" ===== */
+.hero{border-radius:var(--m3-bo-28);background:var(--m3-primary-container);color:var(--m3-on-primary-container);padding:16px 16px 14px}
+.hero-nhan{display:flex;align-items:center;gap:10px;font-size:var(--cx-2);font-weight:700;color:var(--m3-on-primary-container-phu)}
+.hero-so{margin-top:10px;font-size:var(--cx-6);font-weight:700;line-height:1.15;letter-spacing:-.3px}
+.hero-so span{font-weight:500;font-size:var(--cx-5);margin:0 10px;color:var(--m3-on-primary-container-phu)}
+.hero-phu{margin-top:4px;font-size:var(--cx-2);color:var(--m3-on-primary-container-phu)}
+.chang{list-style:none;margin:16px 0 0;padding:0;display:flex}
+.chang li{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:var(--cx-1);font-weight:600;color:var(--m3-on-primary-container-phu)}
+.chang li::before{content:"";position:absolute;top:13px;left:-50%;width:100%;height:3px;border-radius:2px;background:rgb(4 30 73 / .16)}
+.chang li:first-child::before{display:none}
+.chang .cham{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--m3-hang-mo);font-size:13px;font-weight:700}
+.chang .nay .cham{background:var(--m3-primary);color:var(--m3-on-primary);box-shadow:0 0 0 4px rgb(11 87 208 / .2)}
+.chang .nay{color:var(--m3-primary);font-weight:700}
+.chang em{font-style:normal;height:16px;line-height:16px;white-space:nowrap}
+.nhan-hang{display:flex;flex-wrap:wrap;gap:6px 6px;margin-top:14px}
+
+/* nhãn từng câu — nhẹ, 4 loại */
+.nh{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px 0 10px;border-radius:var(--m3-bo-tron);font-size:var(--cx-1);font-weight:700;white-space:nowrap}
+.nh svg{font-size:15px}
+.nh.kd{background:var(--m3-tertiary-container);color:var(--m3-on-tertiary-container-phu)}
+.nh.cl{background:var(--m3-surface-container-high);color:var(--m3-on-surface-variant)}
+.nh.rr{background:var(--m3-primary-container);color:var(--m3-on-primary-container-phu)}
+.nh.tt{background:var(--m3-canh-bao-nen);color:var(--m3-canh-bao-chu)}
+.hero .nh.cl{background:var(--m3-hang-mo)}
+.hero .nh.rr{background:var(--m3-surface-container-lowest)}
+
+/* thẻ câu hỏi (đúng khuôn c6 + một hàng nhãn) */
+.cau{border-radius:var(--m3-bo-28);background:var(--m3-surface-container);padding:14px 16px 16px}
+.cau-tren{display:flex;align-items:center;gap:10px}
+.so{width:36px;height:36px;border-radius:50%;border:2px solid var(--m3-outline);display:grid;place-items:center;font-size:var(--cx-2);font-weight:700;flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ch{padding:3px 10px;border-radius:var(--m3-bo-tron);font-size:var(--cx-1);font-weight:600;background:var(--m3-surface-container-high);color:var(--m3-on-surface-variant)}
+.ch.l{background:var(--m3-secondary-container);color:var(--m3-on-secondary-container)}
+.de{margin:12px 0 0;font-size:var(--cx-3);line-height:1.5}
+.dap{margin-top:10px;display:flex;align-items:center;gap:14px;min-height:52px;padding:0 16px;border-radius:var(--m3-bo-28);background:var(--m3-surface-container-lowest);border:1px solid var(--m3-hang-2);font-size:var(--cx-3)}
+.dap b{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--m3-outline);display:grid;place-items:center;font-size:var(--cx-2);font-weight:600;flex:none}
+.dap.chon{background:var(--m3-primary-container);border-color:var(--m3-primary)}
+.dap.chon b{background:var(--m3-primary);border-color:var(--m3-primary);color:var(--m3-on-primary)}
+.tt-ghi{display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding:10px 12px;border-radius:var(--m3-bo-16);background:var(--m3-canh-bao-nen);color:var(--m3-canh-bao-chu);font-size:var(--cx-2);font-weight:600;line-height:1.35}
+.tt-ghi svg{font-size:18px;margin-top:1px}
+
+/* ===== KHUNG 3: thẻ cuối chặng ===== */
+.kq-dau{padding:2px 16px 0;flex:none}
+.mini{display:flex;align-items:center;gap:6px}
+.mini i{flex:1;height:6px;border-radius:var(--m3-bo-tron);background:var(--m3-surface-container-high)}
+.mini i.xong{background:var(--m3-tertiary)}
+.mini i.mai{background:var(--m3-primary-container)}
+.kq-dau h2{margin:12px 0 0;font-size:var(--cx-5);font-weight:700;letter-spacing:-.2px;line-height:1.2}
+.kq-dau p{margin:4px 0 0;font-size:var(--cx-2);color:var(--m3-on-surface-variant);line-height:1.4}
+.kq-dau p b{color:var(--m3-on-surface)}
+.tienbo{border-radius:var(--m3-bo-28);background:var(--m3-primary-container);color:var(--m3-on-primary-container);padding:16px}
+.tienbo-nhan{display:flex;align-items:center;gap:10px;font-size:var(--cx-2);font-weight:700;color:var(--m3-on-primary-container-phu)}
+.bac{display:flex;align-items:center;gap:10px;margin-top:12px}
+.bac .cu{padding:6px 14px;border-radius:var(--m3-bo-tron);background:var(--m3-hang-mo);font-size:var(--cx-3);font-weight:600;color:var(--m3-on-primary-container-phu)}
+.bac .moi{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--m3-bo-tron);background:var(--m3-primary);color:var(--m3-on-primary);font-size:var(--cx-4);font-weight:700}
+.bac .moi svg{font-size:20px}
+.bac>svg{font-size:22px;color:var(--m3-on-primary-container-phu)}
+.thang{display:flex;gap:6px;margin-top:14px}
+.thang div{flex:1;font-size:var(--cx-1);font-weight:600;color:var(--m3-on-primary-container-phu)}
+.thang div i{display:block;height:8px;border-radius:var(--m3-bo-tron);background:rgb(4 30 73 / .14);margin-bottom:5px}
+.thang div.on i{background:var(--m3-primary)}
+.thang div.on{color:var(--m3-on-primary-container)}
+.tienbo p{margin:10px 0 0;font-size:var(--cx-2);line-height:1.4;color:var(--m3-on-primary-container-phu)}
+.ds{padding:4px 16px}
+.ds-hang{display:flex;align-items:center;gap:12px;padding:12px 0}
+.ds-hang+.ds-hang{border-top:1px solid rgb(0 0 0 / .08)}
+.ds-hang .o-bt{background:var(--m3-surface-container-lowest);color:var(--m3-primary)}
+.ds-hang.vang .o-bt{color:var(--m3-canh-bao-chu)}
+.ds-hang.xanh .o-bt{color:var(--m3-tertiary)}
+.ds-chu b{display:block;font-size:var(--cx-3);font-weight:700;line-height:1.3}
+.ds-chu>span{display:block;margin-top:1px;font-size:var(--cx-1);color:var(--m3-on-surface-variant);line-height:1.35}
+.sao{display:inline-flex;gap:2px;vertical-align:-2px;font-size:15px}
+.sao svg{fill:var(--m3-hang-1);stroke:var(--m3-canh-bao-chu);stroke-width:1.5}
+.sao svg.rong{fill:none;stroke:var(--m3-outline)}
+.exp{display:flex;align-items:center;gap:12px}
+.exp .o-bt{background:var(--m3-surface-container-lowest);color:var(--m3-tertiary);width:44px;height:44px}
+.exp-chu{flex:1}
+.exp-so{font-size:var(--cx-5);font-weight:700;line-height:1.1}
+.exp-so small{font-size:var(--cx-2);font-weight:600;color:var(--m3-on-surface-variant);margin-left:4px}
+.exp .tien{margin-top:8px;background:var(--m3-surface-container-high)}
+.exp .tien i{background:var(--m3-tertiary)}
+.exp-phu{margin-top:6px;font-size:var(--cx-1);color:var(--m3-on-surface-variant)}
+.exp-phu b{color:var(--m3-on-surface)}
+.day.doc{flex-direction:column;align-items:stretch;justify-content:center;gap:8px;height:auto;padding:10px 16px 12px}
+.day.doc .nut{width:100%;height:48px}
+.day.doc .ghi{text-align:center;font-size:var(--cx-1);color:var(--m3-on-surface-variant)}
+</style>
+</head>
+<body>
+
+<!-- ICON dùng lại: lucide (đúng thư viện app đang dùng) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-luoi" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></symbol>
+    <symbol id="i-len" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+    <symbol id="i-lai" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-tick" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-sao" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="i-tiep" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-huy" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ KHUNG 1 · ĐẦU BÀI CỦA RIÊNG EM (chặng 1, chưa làm câu nào) ============ -->
+<section class="man m3" id="m1">
+  <header class="tren"><span class="ib"><svg><use href="#i-x"/></svg></span><h1>Bài tập về nhà</h1></header>
+  <div class="dau">
+    <div class="dau-hang">
+      <div class="dau-chu">
+        <div class="dau-tieu">BTVN Este – lipit</div>
+        <div class="dau-phu">Chặng 1/7 · Đã làm <b>0</b>/8 câu</div>
+      </div>
+      <span class="luoi"><svg><use href="#i-luoi"/></svg></span>
+    </div>
+    <div class="tien"><i style="width:0%"></i></div>
+  </div>
+  <div class="cuon">
+    <div class="hero">
+      <div class="hero-nhan"><span class="o-bt"><svg><use href="#i-user"/></svg></span>Bài của riêng em</div>
+      <div class="hero-so">52 câu<span>·</span>7 chặng</div>
+      <div class="hero-phu">Khoảng 12 phút mỗi ngày · hạn 28/09</div>
+      <ol class="chang">
+        <li class="nay"><span class="cham">1</span><em>Hôm nay</em></li>
+        <li><span class="cham">2</span><em>Mai</em></li>
+        <li><span class="cham">3</span><em></em></li>
+        <li><span class="cham">4</span><em></em></li>
+        <li><span class="cham">5</span><em></em></li>
+        <li><span class="cham">6</span><em></em></li>
+        <li><span class="cham">7</span><em></em></li>
+      </ol>
+      <div class="nhan-hang">
+        <span class="nh kd"><svg><use href="#i-zap"/></svg>Khởi động</span>
+        <span class="nh cl"><svg><use href="#i-target"/></svg>Cốt lõi</span>
+        <span class="nh rr"><svg><use href="#i-user"/></svg>Dành riêng cho em</span>
+        <span class="nh tt"><svg><use href="#i-flag"/></svg>Thử thách</span>
+      </div>
+    </div>
+
+    <article class="cau">
+      <div class="cau-tren"><span class="so">1</span><span class="nh kd"><svg><use href="#i-zap"/></svg>Khởi động</span></div>
+      <div class="chips"><span class="ch l">Trắc nghiệm</span><span class="ch">Nhận biết</span><span class="ch">Este – lipit</span></div>
+      <p class="de">Chất nào sau đây là este?</p>
+      <div class="dap"><b>A</b><span>CH<sub>3</sub>COOH</span></div>
+      <div class="dap"><b>B</b><span>CH<sub>3</sub>COOCH<sub>3</sub></span></div>
+      <div class="dap"><b>C</b><span>C<sub>2</sub>H<sub>5</sub>OH</span></div>
+    </article>
+  </div>
+  <footer class="day"><span class="day-con">Còn 8 câu chưa làm</span><span class="nut">Nộp bài</span></footer>
+</section>
+
+<!-- ============ KHUNG 2 · NHỊP GIỮA CHẶNG (đã làm 6/8) — nhãn "dành riêng cho em" + "thử thách" ============ -->
+<section class="man m3" id="m2">
+  <header class="tren"><span class="ib"><svg><use href="#i-x"/></svg></span><h1>Bài tập về nhà</h1></header>
+  <div class="dau">
+    <div class="dau-hang">
+      <div class="dau-chu">
+        <div class="dau-tieu">BTVN Este – lipit</div>
+        <div class="dau-phu">Chặng 3/7 · Đã làm <b>6</b>/8 câu</div>
+      </div>
+      <span class="luoi"><svg><use href="#i-luoi"/></svg></span>
+    </div>
+    <div class="tien"><i style="width:75%"></i></div>
+    <div class="khich"><svg><use href="#i-tick"/></svg>Sắp xong chặng hôm nay</div>
+  </div>
+  <div class="cuon">
+    <article class="cau">
+      <div class="cau-tren"><span class="so">7</span><span class="nh rr"><svg><use href="#i-user"/></svg>Dành riêng cho em</span></div>
+      <div class="chips"><span class="ch l">Trắc nghiệm</span><span class="ch">Thông hiểu</span><span class="ch">Este – lipit</span></div>
+      <p class="de">Thuỷ phân este X (C<sub>4</sub>H<sub>8</sub>O<sub>2</sub>) trong NaOH thu được muối Y. Chất Y là</p>
+      <div class="dap chon"><b>A</b><span>CH<sub>3</sub>COONa</span></div>
+      <div class="dap"><b>B</b><span>HCOONa</span></div>
+      <div class="dap"><b>C</b><span>C<sub>2</sub>H<sub>5</sub>COONa</span></div>
+    </article>
+
+    <article class="cau">
+      <div class="cau-tren"><span class="so">8</span><span class="nh tt"><svg><use href="#i-flag"/></svg>Thử thách</span></div>
+      <div class="tt-ghi"><svg><use href="#i-flag"/></svg>Câu này để em thử sức — sai không sao, không bị trừ gì.</div>
+      <div class="chips"><span class="ch l">Trắc nghiệm</span><span class="ch">Vận dụng</span><span class="ch">Este – lipit</span></div>
+      <p class="de">Đun nóng 0,1 mol este X (C<sub>5</sub>H<sub>10</sub>O<sub>2</sub>) với dung dịch KOH vừa đủ, thu được ancol có phân tử khối là</p>
+    </article>
+  </div>
+  <footer class="day"><span class="day-con">Còn 2 câu chưa làm</span><span class="nut">Nộp bài</span></footer>
+</section>
+
+<!-- ============ KHUNG 3 · THẺ CUỐI CHẶNG — "hôm nay em tiến thêm gì" ============ -->
+<section class="man m3" id="m3">
+  <header class="tren"><span class="ib"><svg><use href="#i-x"/></svg></span><h1>Xong chặng 3</h1></header>
+  <div class="kq-dau">
+    <div class="mini"><i class="xong"></i><i class="xong"></i><i class="xong"></i><i class="mai"></i><i></i><i></i><i></i></div>
+    <h2>Hôm nay em đã tiến thêm</h2>
+    <p>So với chính em hôm qua · <b>24/52</b> câu của em</p>
+  </div>
+  <div class="cuon">
+    <div class="tienbo">
+      <div class="tienbo-nhan"><span class="o-bt"><svg><use href="#i-len"/></svg></span>Dạng “Thuỷ phân este”</div>
+      <div class="bac"><span class="cu">Biết</span><svg><use href="#i-tiep"/></svg><span class="moi">Hiểu<svg><use href="#i-len"/></svg></span></div>
+      <div class="thang"><div class="on"><i></i>Biết</div><div class="on"><i></i>Hiểu</div><div><i></i>Vận dụng</div></div>
+      <p>Em đúng 2 câu liền ở bậc Biết, nên từ chặng sau có câu bậc Hiểu.</p>
+    </div>
+
+    <div class="the ds">
+      <div class="ds-hang"><span class="o-bt"><svg><use href="#i-lai"/></svg></span><div class="ds-chu"><b>Đúng lại 2 câu từng sai</b><span>Hôm trước sai, hôm nay em làm đúng</span></div></div>
+      <div class="ds-hang vang"><span class="o-bt"><svg><use href="#i-flag"/></svg></span><div class="ds-chu"><b>Đã thử 1 câu thử thách</b><span>Sai không sao — em đã dám thử sức</span></div></div>
+      <div class="ds-hang"><span class="o-bt"><svg><use href="#i-sao"/></svg></span><div class="ds-chu"><b>Sổ tay dạng bài sáng thêm 1 sao</b><span>Thuỷ phân este · <span class="sao"><svg><use href="#i-sao"/></svg><svg><use href="#i-sao"/></svg><svg class="rong"><use href="#i-sao"/></svg></span></span></div></div>
+    </div>
+
+    <div class="the exp">
+      <span class="o-bt"><svg><use href="#i-huy"/></svg></span>
+      <div class="exp-chu">
+        <div class="exp-so">+46 EXP<small>hôm nay</small></div>
+        <div class="tien"><i style="width:62%"></i></div>
+        <div class="exp-phu">Thần thú của em còn <b>30 EXP</b> nữa là lên cấp</div>
+      </div>
+    </div>
+  </div>
+  <footer class="day doc">
+    <span class="nut">Về Bảng nhiệm vụ</span>
+    <span class="nut dich">Em muốn làm thêm · +EXP</span>
+    <span class="ghi">Chặng 4 mở sáng mai</span>
+  </footer>
+</section>
+
+</body>
+</html>
