@@ -196,6 +196,9 @@ export interface DieuChinhEm {
    *  · `cho_thu_len_bac`: bậc đích của dạng cao thêm một bậc, KHÔNG quá bậc hồ sơ + 1 và không áp cho dạng YẾU; · `tam_nghi`: phần riêng và thử thách không lấy câu của dạng
    *  (câu lõi của dạng vẫn ở lại). */
   dang?: { ma: string; nut: NutDang }[]
+  /** KHẮC PHỤC LUÔN (bộ não tự hành, ≤ 2 dạng): rút `soCau` (2–4) câu cùng dạng CHƯA giao từ kho của chính bài, đúng bậc đích hoặc thấp hơn một bậc, chèn vào chặng CHƯA mở kế tiếp,
+   *  và BỚT câu phần riêng dễ nhất để tổng tải không tăng. Chưa cài ở commit này (chỉ kiểu). */
+  khacPhuc?: { dang: string; soCau: number; bac: 'dung_bac' | 'thap_hon_mot_bac' }[]
 }
 
 /** THẺ "HÔM NAY EM TIẾN THÊM GÌ" — CHỈ SỐ ĐẾM, so em với chính em lần trước (không xếp hạng, không kết luận năng lực). */

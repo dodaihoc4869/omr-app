@@ -5,6 +5,8 @@ Kiểu dùng chung: `src/lib/bo-nao-khuon.ts` (`DauRaEm`, `DongBanTin`, `kiemKhu
 
 ## Nguyên tắc
 - MỌI lệnh `/ai/*` là **lệnh thầy**: nối SAU cổng `laThay` trong `index.ts` (header `x-ma-bi-mat`). Học sinh / phụ huynh không gọi được.
+- **BỘ NÃO TỰ HÀNH (thầy chốt 21/09, thay cho "thầy duyệt")**: khi chế độ hiệu lực của lớp em là `that`, điều chỉnh qua kiểm khuôn và `doTinCay ≥ 0,6` (`HAN_MUC_BO_NAO.NGUONG_TIN_CAY`) được ÁP NGAY (`ap_dung = 1`); dưới 0,6 chỉ ghi sổ. Hôm sau máy chủ TỰ CHẤM (`danhGiaDieuChinh`): `xau_di` ⇒ TỰ GỠ (`huy = 1`, `tu_go = 1`, ghi sổ). Thầy chỉ đọc bản tin ("Đêm qua đã hỗ trợ N em") và có thể bấm "Xem" / "Bỏ điều chỉnh".
+- **DEADLINE THẮNG MỌI NÚM**: không núm nào đổi hạn nộp; số chặng ≤ số ngày còn lại; mọi câu lõi chưa làm nằm gọn trong các chặng còn lại. Núm nào làm lõi không kịp hạn bị BỎ và ghi lý do (`ly_do_bo` trong nhật ký). Cài ở lõi `btvn-nang-do.ts` (test tính chất khoá).
 - **Chế độ BÓNG là mặc định**: điều chỉnh được nhận, kiểm, LƯU; KHÔNG tầng nào (kế hoạch ngày, BTVN nâng đỡ, `/hs/*`) đọc chúng ⇒ `/hs/ke-hoach-ngay` và BTVN của học sinh không đổi một byte (test khoá). Chỉ khi chế độ `that` của lớp em thì tầng đọc (việc SAU, Code 3).
 - **Ẩn danh ở đầu máy thầy**: tệp AI đọc chỉ có bí danh; máy chủ chỉ biết SBD. Máy chủ ghép TÊN em từ SBD (`hoTen`) khi trả cho app thầy; AI chỉ viết chữ không tên.
 - Máy chủ KIỂM LẦN NỮA bằng `kiemKhuon` (thẻ lưu từ lúc dựng hồ sơ ngày) trước khi lưu. Sai khuôn ⇒ bỏ phần tử ấy, báo lý do; không sửa hộ.
@@ -26,7 +28,9 @@ Thân `{}` (tuỳ chọn `ngay: 'YYYY-MM-DD'`, mặc định đêm gần nhất 
 - `chayLanCuoi`: ISO của lần NỘP gần nhất; chưa chạy lần nào ⇒ `null` và `banTin.cacDong = []`. Quá 36 giờ so với bây giờ ⇒ app cảnh báo (app tự tính).
 - `banTin.cacDong` ≤ 6 dòng. `sbd` / `hoTen` có thể rỗng (dòng nói về cả lớp); `dang` rỗng nếu không gắn dạng. `chu` KHÔNG chứa tên em (máy chủ ghép `hoTen` riêng).
 - `soSoiNhanh` / `soSoiKy` / `soVang`: số em theo luồng đêm ấy (`phanLuong`). `soEm` = tổng em có thẻ đêm ấy.
-- `soDieuChinh`: `nhan` = phần tử qua kiểm khuôn; `chiGhiSo` = trong đó độ tin cậy < 0,5 (không áp dụng); `biLoai` = sai khuôn.
+- `soDieuChinh`: `nhan` = phần tử qua kiểm khuôn; `chiGhiSo` = trong đó độ tin cậy < 0,6 hoặc chế độ bóng (không áp dụng); `biLoai` = sai khuôn.
+- **Tự hành (trường tuỳ chọn — thiếu thì app ẩn phần ấy)**: `soEmHoTro` = số em có điều chỉnh ĐÃ ÁP đêm ấy (bóng ⇒ 0). Mỗi dòng có thể thêm: `apDung: boolean` (false = chỉ ghi sổ / bóng) · `ngayDieuChinh: 'YYYY-MM-DD'` (ngày của điều chỉnh mà nút "Bỏ điều chỉnh" nhắm tới; mặc định = `ngay` gốc) · `ketQua` ('an_thua'|'khong_doi'|'xau_di'|'chua_du_du_lieu'|null) + `ketQuaChu` (câu ngắn do MÁY CHỦ ghép từ số đo, ví dụ "hôm qua đúng 7/9 câu, xong 2/2 chặng") của điều chỉnh HÔM QUA cho em ấy · `tuGo: boolean` (`xau_di` ⇒ bộ não đã tự gỡ). Dòng CHỈ-BÁO (không nút "Bỏ"): `loai='thay_xem_lai'` và `loai='can_thay_y'` có `hanhDong='nhan_phu_huynh'` (em vắng ≥ 5 ngày).
+- Loại/khuôn dòng bản tin do AI viết: `chu` ≤ 160 ký tự; `hanhDong` ∈ khong|xem_ho_so|goi_len_bang|dua_vao_buoi_chua|nhan_phu_huynh|giao_bai_rieng.
 
 ## Nhật ký điều chỉnh của một em — `POST /ai/nhat-ky {sbd}` (chỉ đọc)
 ```json
@@ -36,9 +40,10 @@ Thân `{}` (tuỳ chọn `ngay: 'YYYY-MM-DD'`, mặc định đêm gần nhất 
             "dang": [ { "ma": "ESTE.THUY_PHAN", "hanhDong": "uu_tien", "lyDo": "đúng 7/9 câu" } ],
             "co": "khong|tut_nhip|qua_tai|lam_cho_xong|nghi_chep",
             "loiNhanChoEm": "…", "goiYChoThay": { "chu": "…", "hanhDong": "khong|goi_len_bang|nhan_phu_huynh|giao_bai_rieng", "dang": "…" }, "ghiChuHlv": "…",
-            "ketQua": "an_thua|khong_doi|xau_di|chua_du_du_lieu|null", "ketQuaChu": "xong 2/2 chặng, đúng 78 %", "daBo": false } ] }
+            "khacPhuc": [ { "dang": "ESTE.THUY_PHAN", "kieu": "khac_phuc|on_som", "soCau": 3, "bac": "dung_bac|thap_hon_mot_bac" } ],
+            "apDung": true, "lyDoBo": [], "ketQua": "an_thua|khong_doi|xau_di|chua_du_du_lieu|null", "ketQuaChu": "xong 2/2 chặng, đúng 78 %", "tuGo": false, "daBo": false } ] }
 ```
-Mới nhất trước, ≤ 14 dòng. `ketQua = null` khi CHƯA được đánh giá (điều chỉnh mới, chưa có ≥ 1 chặng dữ liệu sau nó). `ketQuaChu` là câu ngắn do máy chủ ghép từ số đo (không do AI viết).
+`apDung`: đã áp cho em (chế độ thật + tin cậy ≥ 0,6 + chưa gỡ). `lyDoBo`: núm bị lõi BTVN BỎ vì làm lõi không kịp hạn (rỗng nếu không). `tuGo`: bộ não tự gỡ vì `xau_di`; `daBo`: thầy bấm "Bỏ". Mới nhất trước, ≤ 14 dòng. `ketQua = null` khi CHƯA được đánh giá (điều chỉnh mới, chưa có ≥ 1 chặng dữ liệu sau nó). `ketQuaChu` là câu ngắn do máy chủ ghép từ số đo (không do AI viết).
 
 ## Bỏ một điều chỉnh — `POST /ai/dieu-chinh/bo {sbd, ngay}`
 → `{ok, daBo: boolean}`. Đặt `huy = 1`: điều chỉnh không còn được đọc (nếu đang `that`) và nhật ký ghi `daBo: true`. Điều chỉnh không tồn tại ⇒ `ok:true, daBo:false`. Bỏ rồi bỏ lại: vô hại.
@@ -51,9 +56,14 @@ Mới nhất trước, ≤ 14 dòng. `ketQua = null` khi CHƯA được đánh g
 
 ## Bảng D1 (chỉ-thêm; `server/migration-2109-bo-nao.sql`)
 - `ai_ho_so_ngay(sbd, ngay, lop, luong, ly_do_luong, the_json, tao_luc, PRIMARY KEY(sbd, ngay))`
-- `ai_dieu_chinh(sbd, ngay, json, do_tin, che_do, ap_dung, het_han, huy, ket_qua, ket_qua_chu, nop_luc, PRIMARY KEY(sbd, ngay))`
+- `ai_dieu_chinh(sbd, ngay, json, do_tin, che_do, ap_dung, het_han, huy, tu_go, ly_do_bo, ket_qua, ket_qua_chu, nop_luc, PRIMARY KEY(sbd, ngay))`
 - `ai_ban_tin(ngay PRIMARY KEY, json, che_do, nop_luc, so_nhanh, so_sau, so_vang, so_nhan, so_chi_ghi_so, so_bi_loai)`
 - Cờ ở `cau_hinh` khoá `bo_nao`.
 
+## `khacPhuc` (khắc phục luôn) — ai làm gì
+`DauRaEm.khacPhuc[]` ≤ 2: `{dang, kieu:'khac_phuc'|'on_som', soCau 2–4, bac:'dung_bac'|'thap_hon_mot_bac'}` (`on_som` không mang soCau/bac). `kiemKhuon` kiểm: dạng có trong thẻ, không lặp, soCau nguyên 2–4, bậc hợp lệ.
+- `khac_phuc` → cổng `dieuChinh.khacPhuc` của `btvn-nang-do.ts` (`dieuChinhTuDauRa`): rút câu cùng dạng CHƯA giao từ kho của chính bài, chèn vào chặng CHƯA mở kế tiếp, bớt câu riêng dễ nhất để tổng tải không tăng.
+- `on_som` → việc của Code 3 (kế hoạch ngày): kéo `moc_on_ke` của các câu vừa sai thuộc dạng đó về ngày mai — CHỈ SỚM hơn, không bao giờ muộn hơn.
+
 ## Việc SAU (chế độ `that`, Code 3 — không thuộc đợt này)
-Kế hoạch ngày + BTVN nâng đỡ đọc `ai_dieu_chinh` còn hạn, chưa huỷ, `ap_dung = 1` qua cổng `dieuChinh` của `chonBoCuaEm` (`dieuChinhTuDauRa`); `/hs/ke-hoach-ngay` trả `loiNhanHlv`. Cron 03:30 dựng hồ sơ ngày.
+Kế hoạch ngày + BTVN nâng đỡ đọc `ai_dieu_chinh` còn hạn, chưa huỷ (`huy = 0`), `ap_dung = 1` qua cổng `dieuChinh` của `chonBoCuaEm` (`dieuChinhTuDauRa`); `/hs/ke-hoach-ngay` trả `loiNhanHlv`. Cron 03:30 dựng hồ sơ ngày.

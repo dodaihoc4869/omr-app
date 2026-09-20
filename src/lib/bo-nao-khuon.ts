@@ -11,6 +11,18 @@ import type { DieuChinhEm } from './btvn-nang-do'
 
 export type HanhDongDang = 'uu_tien' | 'ha_mot_bac' | 'cho_thu_len_bac' | 'tam_nghi'
 export type CoBoNao = 'khong' | 'tut_nhip' | 'qua_tai' | 'lam_cho_xong' | 'nghi_chep'
+/** KHẮC PHỤC LUÔN (bộ não tự hành, 21/09): `khac_phuc` = cho em gặp lại đúng dạng vừa vấp ngay chặng kế (`soCau` câu, đúng bậc hoặc thấp hơn một bậc; thuật toán bớt câu riêng dễ để tổng tải không tăng);
+ * `on_som` = kéo các câu em vừa sai của dạng ấy về ôn sớm (chỉ SỚM hơn, không bao giờ muộn hơn — máy chủ làm). */
+export type KieuKhacPhuc = 'khac_phuc' | 'on_som'
+export type BacKhacPhuc = 'dung_bac' | 'thap_hon_mot_bac'
+export interface KhacPhucEm {
+  dang: string
+  kieu: KieuKhacPhuc
+  /** 2–4 với `khac_phuc`; vắng với `on_som`. */
+  soCau?: number
+  /** Vắng với `on_som`. */
+  bac?: BacKhacPhuc
+}
 export type HanhDongChoThay = 'khong' | 'goi_len_bang' | 'nhan_phu_huynh' | 'giao_bai_rieng'
 
 /** MỘT PHẦN TỬ ĐẦU RA của bộ não cho MỘT em (`ra/<tệp>.json` là mảng các phần tử này). `biDanh` là bí danh của đêm — nop.mjs đổi về SBD trước khi gửi. */
@@ -20,6 +32,8 @@ export interface DauRaEm {
   doTinCay: number
   nhip: { lech: number; khoiDong: number }
   dang: { ma: string; hanhDong: HanhDongDang; lyDo: string }[]
+  /** ≤ 2 phần tử (mỗi dạng tối đa một). Có thể vắng ở phần tử cũ ⇒ coi như rỗng. */
+  khacPhuc: KhacPhucEm[]
   co: CoBoNao
   loiNhanChoEm: string
   goiYChoThay: { chu: string; hanhDong: HanhDongChoThay; dang: string }
@@ -30,7 +44,7 @@ export interface DauRaEm {
 
 /** Loại dòng bản tin (Boss chốt tên 21/09): em cần thầy để ý · dạng cả lớp · gợi ý gọi lên bảng · điều chỉnh hôm qua có ăn thua không · thầy xem lại một điều chỉnh. */
 export type LoaiDongBanTin = 'can_thay_y' | 'ca_lop' | 'goi_len_bang' | 'dieu_chinh' | 'thay_xem_lai'
-export type HanhDongBanTin = 'khong' | 'goi_len_bang' | 'nhan_phu_huynh' | 'giao_bai_rieng' | 'xem_ho_so'
+export type HanhDongBanTin = 'khong' | 'xem_ho_so' | 'goi_len_bang' | 'dua_vao_buoi_chua' | 'nhan_phu_huynh' | 'giao_bai_rieng'
 
 /** Một dòng bản tin sáng cho thầy (khối "Bộ não đêm qua") do AI viết: CHỈ chữ không tên. `biDanh` (có thể rỗng khi dòng nói về cả lớp) được nop.mjs đổi về SBD; máy chủ ghép TÊN em từ SBD. */
 export interface DongBanTin {
@@ -67,6 +81,9 @@ export const HAN_MUC_BO_NAO = {
   KHOI_DONG_TOI_THIEU: 1,
   KHOI_DONG_TOI_DA: 3,
   SO_DANG_TOI_DA: 3,
+  SO_KHAC_PHUC_TOI_DA: 2,
+  KHAC_PHUC_SO_CAU_TOI_THIEU: 2,
+  KHAC_PHUC_SO_CAU_TOI_DA: 4,
   LY_DO_TOI_DA: 80,
   LOI_NHAN_TOI_DA: 140,
   GOI_Y_TOI_DA: 200,
@@ -74,9 +91,9 @@ export const HAN_MUC_BO_NAO = {
   BI_DANH_TOI_DA: 40,
   MA_DANG_TOI_DA: 80,
   BAN_TIN_SO_DONG_TOI_DA: 6,
-  DONG_BAN_TIN_TOI_DA: 200,
-  /** Dưới ngưỡng này máy chủ chỉ ghi sổ, không áp dụng (`DE-XUAT` mục 4). */
-  NGUONG_TIN_CAY: 0.5,
+  DONG_BAN_TIN_TOI_DA: 160,
+  /** Dưới ngưỡng này máy chủ chỉ ghi sổ, không áp dụng. 0,6 từ 21/09 (bộ não TỰ HÀNH: thầy không duyệt từng điều chỉnh; trước đó 0,5). */
+  NGUONG_TIN_CAY: 0.6,
   /** Điều chỉnh tự hết hạn sau bấy nhiêu ngày. */
   HAN_NGAY: 3,
 } as const
@@ -85,7 +102,7 @@ export const HANH_DONG_DANG: readonly HanhDongDang[] = ['uu_tien', 'ha_mot_bac',
 export const CO_BO_NAO: readonly CoBoNao[] = ['khong', 'tut_nhip', 'qua_tai', 'lam_cho_xong', 'nghi_chep']
 export const HANH_DONG_CHO_THAY: readonly HanhDongChoThay[] = ['khong', 'goi_len_bang', 'nhan_phu_huynh', 'giao_bai_rieng']
 export const LOAI_DONG_BAN_TIN: readonly LoaiDongBanTin[] = ['can_thay_y', 'ca_lop', 'goi_len_bang', 'dieu_chinh', 'thay_xem_lai']
-export const HANH_DONG_BAN_TIN: readonly HanhDongBanTin[] = ['khong', 'goi_len_bang', 'nhan_phu_huynh', 'giao_bai_rieng', 'xem_ho_so']
+export const HANH_DONG_BAN_TIN: readonly HanhDongBanTin[] = ['khong', 'xem_ho_so', 'goi_len_bang', 'dua_vao_buoi_chua', 'nhan_phu_huynh', 'giao_bai_rieng']
 
 /** TỪ CẤM trong lời gửi CHO EM: nhãn năng lực, so với bạn, xếp hạng, doạ / mỉa. So theo TỪ (đã bỏ dấu và hạ chữ thường) hoặc CỤM. */
 export const TU_CAM_CHO_EM: readonly string[] = [
@@ -132,6 +149,9 @@ function chuanSo(x: string): string {
   return Number.isFinite(n) ? String(n) : x
 }
 
+/** Khoá của thẻ mang MÃ / định danh / mốc thời gian, không phải sự thật để nêu cho em: số nằm trong chúng ("D3", "12-C1", "2026-09-22") KHÔNG được coi là số có thật. */
+const KHOA_KHONG_LAY_SO = new Set(['ma', 'maDang', 'qid', 'biDanh', 'sbd', 'ngay', 'luc'])
+
 /** TẬP SỐ CÓ THẬT trong một thẻ (JSON bất kỳ): mọi số, và dạng hiển thị thường gặp — số làm tròn, một chữ số thập phân, phần trăm của số 0–1, và các số nằm TRONG chuỗi chữ của thẻ. */
 export function tapSoCuaThe(the: unknown): Set<string> {
   const tap = new Set<string>()
@@ -148,7 +168,7 @@ export function tapSoCuaThe(the: unknown): Set<string> {
     if (typeof v === 'number') them(v)
     else if (typeof v === 'string') for (const s of timSoTrongChu(v)) them(Number(s))
     else if (Array.isArray(v)) for (const x of v) duyet(x, sau + 1)
-    else if (typeof v === 'object') for (const x of Object.values(v as Record<string, unknown>)) duyet(x, sau + 1)
+    else if (typeof v === 'object') for (const [k, x] of Object.entries(v as Record<string, unknown>)) if (!KHOA_KHONG_LAY_SO.has(k)) duyet(x, sau + 1)
   }
   duyet(the, 0)
   return tap
@@ -215,6 +235,30 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
         if (cam.length) loi.push(`dang[${i}].lyDo có từ cấm: ${cam.join(', ')}`)
       }
     })
+  }
+
+  // khacPhuc: vắng ⇒ rỗng (phần tử cũ); có thì phải là mảng ≤ 2, mỗi dạng một lần, dạng có trong thẻ, `khac_phuc` cần soCau 2–4 + bac, `on_som` không mang soCau/bac
+  if (d.khacPhuc !== undefined) {
+    if (!Array.isArray(d.khacPhuc)) loi.push('khacPhuc phải là mảng')
+    else {
+      if (d.khacPhuc.length > H.SO_KHAC_PHUC_TOI_DA) loi.push(`khacPhuc quá ${H.SO_KHAC_PHUC_TOI_DA} phần tử`)
+      const daKp = new Set<string>()
+      d.khacPhuc.forEach((x, i) => {
+        const o = x as Record<string, unknown> | null
+        if (!o || typeof o !== 'object') return void loi.push(`khacPhuc[${i}] không phải đối tượng`)
+        if (!laChuoi(o.dang) || o.dang.length === 0 || o.dang.length > H.MA_DANG_TOI_DA || KY_TU_LA.test(o.dang)) loi.push(`khacPhuc[${i}].dang không hợp lệ`)
+        else {
+          if (daKp.has(o.dang)) loi.push(`khacPhuc[${i}].dang lặp`)
+          daKp.add(o.dang)
+          if (the.maDang && !the.maDang.includes(o.dang)) loi.push(`khacPhuc[${i}].dang không có trong thẻ của em`)
+        }
+        if (o.kieu !== 'khac_phuc' && o.kieu !== 'on_som') loi.push(`khacPhuc[${i}].kieu phải là khac_phuc hoặc on_som`)
+        else if (o.kieu === 'khac_phuc') {
+          if (!laSoNguyenTrong(o.soCau, H.KHAC_PHUC_SO_CAU_TOI_THIEU, H.KHAC_PHUC_SO_CAU_TOI_DA)) loi.push(`khacPhuc[${i}].soCau phải là số nguyên trong [2, 4]`)
+          if (o.bac !== 'dung_bac' && o.bac !== 'thap_hon_mot_bac') loi.push(`khacPhuc[${i}].bac phải là dung_bac hoặc thap_hon_mot_bac`)
+        } else if (o.soCau !== undefined || o.bac !== undefined) loi.push(`khacPhuc[${i}]: on_som không mang soCau/bac`)
+      })
+    }
   }
 
   if (!CO_BO_NAO.includes(d.co as CoBoNao)) loi.push('co không thuộc năm giá trị')
@@ -292,11 +336,15 @@ export function kiemBanTin(banTin: unknown, soLieuLop: unknown, biDanhHopLe?: Re
 // ══════════════════════════════ ĐỔI SANG NÚM CỦA LÕI BTVN ══════════════════════════════
 
 /** Điều chỉnh của một em dưới dạng cổng `dieuChinh` của `chonBoCuaEm` / `thichNghiChangSau` (`btvn-nang-do.ts`). Chỉ gọi sau khi `kiemKhuon` hợp lệ VÀ `doTinCay ≥ NGUONG_TIN_CAY`. */
-export function dieuChinhTuDauRa(d: Pick<DauRaEm, 'nhip' | 'dang'>): DieuChinhEm {
-  return { nhip: d.nhip.lech, khoiDong: d.nhip.khoiDong, dang: d.dang.map((x) => ({ ma: x.ma, nut: x.hanhDong })) }
+export function dieuChinhTuDauRa(d: Pick<DauRaEm, 'nhip' | 'dang'> & { khacPhuc?: KhacPhucEm[] }): DieuChinhEm {
+  const ra: DieuChinhEm = { nhip: d.nhip.lech, khoiDong: d.nhip.khoiDong, dang: d.dang.map((x) => ({ ma: x.ma, nut: x.hanhDong })) }
+  // `on_som` là việc của kế hoạch ngày (máy chủ), không phải của bộ câu BTVN — chỉ `khac_phuc` đi vào cổng của lõi
+  const kp = (d.khacPhuc ?? []).filter((x): x is KhacPhucEm & { soCau: number; bac: BacKhacPhuc } => x.kieu === 'khac_phuc' && typeof x.soCau === 'number' && !!x.bac)
+  if (kp.length) ra.khacPhuc = kp.map((x) => ({ dang: x.dang, soCau: x.soCau, bac: x.bac }))
+  return ra
 }
 
-/** Số THAY ĐỔI của một phần tử (nguyên tắc 10 "không rung lắc": ≤ 2 mỗi em mỗi đêm): nhịp lệch ≠ 0, khởi động ≠ 2, mỗi dạng bị vặn. Cờ không tính (chỉ là nhãn). */
-export function demThayDoi(d: Pick<DauRaEm, 'nhip' | 'dang'>): number {
-  return (d.nhip.lech !== 0 ? 1 : 0) + (d.nhip.khoiDong !== 2 ? 1 : 0) + d.dang.length
+/** Số THAY ĐỔI của một phần tử (nguyên tắc 10 "không rung lắc": ≤ 2 mỗi em mỗi đêm): nhịp lệch ≠ 0, khởi động ≠ 2, mỗi dạng bị vặn. `khac_phuc` tính một thay đổi, `on_som` không (chỉ là kéo mốc ôn sớm). Cờ không tính (chỉ là nhãn). */
+export function demThayDoi(d: Pick<DauRaEm, 'nhip' | 'dang'> & { khacPhuc?: KhacPhucEm[] }): number {
+  return (d.nhip.lech !== 0 ? 1 : 0) + (d.nhip.khoiDong !== 2 ? 1 : 0) + d.dang.length + (d.khacPhuc ?? []).filter((x) => x.kieu === 'khac_phuc').length
 }

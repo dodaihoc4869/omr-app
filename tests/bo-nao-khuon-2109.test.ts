@@ -34,6 +34,7 @@ const tot = (): DauRaEm => ({
   doTinCay: 0.8,
   nhip: { lech: -2, khoiDong: 3 },
   dang: [{ ma: 'ESTE.THUY_PHAN', hanhDong: 'uu_tien', lyDo: 'đúng 7/9 câu trong 7 ngày' }],
+  khacPhuc: [],
   co: 'tut_nhip',
   loiNhanChoEm: 'Hôm nay em đúng lại 2 câu thuỷ phân ester từng sai. Chuỗi 4 ngày rồi, giữ nhịp nhé.',
   goiYChoThay: { chu: 'Bỏ dở 1 chặng, chuỗi 4 ngày — nên hỏi han', hanhDong: 'goi_len_bang', dang: 'ESTE.THUY_PHAN' },
@@ -57,7 +58,7 @@ describe('phần tử ĐÚNG khuôn', () => {
     expect(ket(tot())).toEqual({ hopLe: true, lyDo: [] })
   })
   it('em ổn: `thayDoi` rỗng + lời nhắn rỗng + không dạng vẫn hợp lệ (không ép bịa việc)', () => {
-    const d = voi((x) => Object.assign(x, { dang: [], co: 'khong', nhip: { lech: 0, khoiDong: 2 }, loiNhanChoEm: '', goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' }, ghiChuHlv: '' }))
+    const d = voi((x) => Object.assign(x, { dang: [], khacPhuc: [], co: 'khong', nhip: { lech: 0, khoiDong: 2 }, loiNhanChoEm: '', goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' }, ghiChuHlv: '' }))
     expect(ket(d).hopLe).toBe(true)
   })
   it('biên: nhịp ±3, khởi động 1 và 3, đúng 3 dạng, đúng 140 / 200 / 80 ký tự đều hợp lệ', () => {
@@ -128,6 +129,36 @@ describe('BIÊN ĐỘ', () => {
   })
 })
 
+describe('KHẮC PHỤC LUÔN (`khacPhuc`) — bộ não tự hành', () => {
+  const kp = (o: Record<string, unknown> = {}) => ({ dang: 'ESTE.THUY_PHAN', kieu: 'khac_phuc', soCau: 3, bac: 'dung_bac', ...o })
+  it('hợp lệ: khac_phuc (2–4 câu, hai loại bậc) và on_som không mang soCau/bac; vắng trường = rỗng (phần tử cũ)', () => {
+    expect(ket(voi((x) => (x.khacPhuc = [kp() as never]))).hopLe).toBe(true)
+    for (const n of [2, 4]) expect(ket(voi((x) => (x.khacPhuc = [kp({ soCau: n }) as never]))).hopLe, String(n)).toBe(true)
+    expect(ket(voi((x) => (x.khacPhuc = [kp({ bac: 'thap_hon_mot_bac' }) as never]))).hopLe).toBe(true)
+    expect(ket(voi((x) => (x.khacPhuc = [{ dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }, kp({ dang: 'CARB.PHAN_LOAI' }) as never]))).hopLe).toBe(true)
+    const cu = tot() as unknown as Record<string, unknown>
+    delete cu.khacPhuc
+    expect(ket(cu).hopLe).toBe(true)
+  })
+  it('loại: quá 2 phần tử, dạng lặp, dạng không có trong thẻ, soCau ngoài [2, 4] / không nguyên, bậc lạ, kiểu lạ, on_som mang soCau/bac, không phải mảng', () => {
+    coLoi(voi((x) => (x.khacPhuc = [kp(), kp({ dang: 'CARB.PHAN_LOAI' }), kp({ dang: 'LIPID.BEO' })] as never)), 'khacPhuc quá 2')
+    coLoi(voi((x) => (x.khacPhuc = [kp(), kp({ kieu: 'on_som', soCau: undefined, bac: undefined })] as never)), 'lặp')
+    coLoi(voi((x) => (x.khacPhuc = [kp({ dang: 'DANG.LA' }) as never])), 'khacPhuc[0].dang không có trong thẻ')
+    for (const n of [1, 5, 2.5, '3', NaN, undefined]) coLoi(voi((x) => (x.khacPhuc = [kp({ soCau: n }) as never])), 'soCau')
+    coLoi(voi((x) => (x.khacPhuc = [kp({ bac: 'cao_hon' }) as never])), 'bac phải là')
+    coLoi(voi((x) => (x.khacPhuc = [kp({ kieu: 'xoa' }) as never])), 'kieu phải là')
+    coLoi(voi((x) => (x.khacPhuc = [{ dang: 'ESTE.THUY_PHAN', kieu: 'on_som', soCau: 3 } as never])), 'on_som không mang')
+    coLoi({ ...tot(), khacPhuc: {} }, 'khacPhuc phải là mảng')
+    coLoi(voi((x) => (x.khacPhuc = [null as never])), 'khacPhuc[0]')
+  })
+  it('`dieuChinhTuDauRa` chỉ đưa `khac_phuc` vào cổng của lõi BTVN (`on_som` là việc của kế hoạch ngày); `demThayDoi` tính khac_phuc, không tính on_som', () => {
+    const d = voi((x) => (x.khacPhuc = [kp() as never, { dang: 'CARB.PHAN_LOAI', kieu: 'on_som' }]))
+    expect(dieuChinhTuDauRa(d).khacPhuc).toEqual([{ dang: 'ESTE.THUY_PHAN', soCau: 3, bac: 'dung_bac' }])
+    expect(dieuChinhTuDauRa(tot()).khacPhuc).toBeUndefined()
+    expect(demThayDoi(d)).toBe(demThayDoi(tot()) + 1)
+  })
+})
+
 describe('BÍ DANH — không đổi được em của phần tử', () => {
   it('bí danh khác thẻ ⇒ loại (AI không được nói về em khác); rỗng ⇒ loại', () => {
     coLoi(voi((x) => (x.biDanh = 'A18')), 'không khớp thẻ')
@@ -157,6 +188,13 @@ describe('MỌI CON SỐ trong lời nhắn / lý do / gợi ý phải có trong
   })
   it('lý do của dạng PHẢI có số ("lý do bằng số")', () => {
     coLoi(voi((x) => (x.dang[0].lyDo = 'em hay sai dạng này')), 'phải có số')
+  })
+  it('số nằm trong MÃ dạng / bí danh / ngày của thẻ KHÔNG được coi là số có thật ("D3", "2026-09-22")', () => {
+    const the: TheDeKiem = { biDanh: 'A17', maDang: ['D3'], ngay: '2026-09-22', dang: [{ ma: 'D3', gap: 9 }] }
+    expect(tapSoCuaThe(the).has('3')).toBe(false)
+    expect(tapSoCuaThe(the).has('2026')).toBe(false)
+    expect(tapSoCuaThe(the).has('9')).toBe(true)
+    expect(ket(voi((x) => { x.biDanh = 'A17'; x.loiNhanChoEm = 'Em làm dạng 3 hôm nay' }), the).hopLe).toBe(false)
   })
   it('`tapSoCuaThe` gom số ở mọi tầng của thẻ, kể cả trong mảng và chuỗi; bỏ giá trị không hữu hạn', () => {
     const tap = tapSoCuaThe({ a: 1, b: [2, { c: 0.5 }], d: 'gồm 9 câu', e: NaN, f: Infinity, g: null, h: undefined })
@@ -226,6 +264,8 @@ describe('BẢN TIN SÁNG (`ra/lop.json`)', () => {
     expect(kiemBanTin({ cacDong: [dong({ chu: '12 em kẹt' })] }, SO_LIEU).lyDo.join()).toContain('số không có trong số liệu lớp: 12')
     expect(kiemBanTin({ cacDong: [dong({ chu: 'em nắm chắc 9' })] }, SO_LIEU).lyDo.join()).toContain('từ cấm')
     expect(kiemBanTin({ cacDong: [dong({ loai: 'khac' })] }, SO_LIEU).hopLe).toBe(false)
+    expect(kiemBanTin({ cacDong: [dong({ hanhDong: 'dua_vao_buoi_chua' })] }, SO_LIEU).hopLe).toBe(true)
+    expect(kiemBanTin({ cacDong: [dong({ chu: 'a'.repeat(161) })] }, SO_LIEU).lyDo.join()).toContain('quá 160')
     expect(kiemBanTin({ cacDong: [dong({ chu: '' })] }, SO_LIEU).hopLe).toBe(false)
     expect(kiemBanTin({ cacDong: [dong({ biDanh: 'Z99' })] }, SO_LIEU, new Set(['A17'])).lyDo.join()).toContain('biDanh không có trong dữ liệu đêm')
     expect(kiemBanTin({ cacDong: [dong({ biDanh: 'A17' })] }, SO_LIEU, new Set(['A17'])).hopLe).toBe(true)
@@ -251,7 +291,7 @@ describe('khoá nguồn', () => {
     expect([...readFileSync('src/lib/bo-nao-khuon.ts', 'utf8').matchAll(/^import (?:type )?.* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./btvn-nang-do'])
     expect(readFileSync('src/lib/bo-nao-khuon.ts', 'utf8')).toMatch(/^import type \{ DieuChinhEm \}/m)
   })
-  it('hằng số khớp cẩm nang: ±3, khởi động 1–3, ≤ 3 dạng, 80/140/200 ký tự, tin cậy 0,5, hết hạn 3 ngày', () => {
-    expect(HAN_MUC_BO_NAO).toMatchObject({ NHIP_LECH_TOI_DA: 3, KHOI_DONG_TOI_THIEU: 1, KHOI_DONG_TOI_DA: 3, SO_DANG_TOI_DA: 3, LY_DO_TOI_DA: 80, LOI_NHAN_TOI_DA: 140, GOI_Y_TOI_DA: 200, NGUONG_TIN_CAY: 0.5, HAN_NGAY: 3, BAN_TIN_SO_DONG_TOI_DA: 6 })
+  it('hằng số khớp cẩm nang: ±3, khởi động 1–3, ≤ 3 dạng, ≤ 2 khắc phục, 80/140/200 ký tự, tin cậy áp dụng 0,6, hết hạn 3 ngày', () => {
+    expect(HAN_MUC_BO_NAO).toMatchObject({ NHIP_LECH_TOI_DA: 3, KHOI_DONG_TOI_THIEU: 1, KHOI_DONG_TOI_DA: 3, SO_DANG_TOI_DA: 3, LY_DO_TOI_DA: 80, LOI_NHAN_TOI_DA: 140, GOI_Y_TOI_DA: 200, NGUONG_TIN_CAY: 0.6, HAN_NGAY: 3, BAN_TIN_SO_DONG_TOI_DA: 6, SO_KHAC_PHUC_TOI_DA: 2 })
   })
 })
