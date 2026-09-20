@@ -29,3 +29,10 @@ CHIA LẠI để Code 3 (đang bận máy chủ BTVN nâng đỡ) không thành 
 - **Code 3**: chỉ NỐI — thêm route sau cổng `laThay` vào `index.ts`, chạy migration `--remote`, đẩy Worker; chỉ cho Code 1 cơ chế đọc mã bí mật AN TOÀN mà em đang dùng khi gọi thật (không in, không commit). Cron 03:30 + việc tầng nào đọc điều chỉnh (chế độ `that`) làm SAU BTVN nâng đỡ Đợt 1.
 - **Code 4**: khối "Bộ não đêm qua" + nhật ký điều chỉnh + công tắc (vẽ mẫu 1 ảnh → build).
 - **Boss**: tác vụ hẹn giờ 04:00 + chạy thử tay lượt đầu khi thầy còn ngồi máy (để thầy bấm cho phép 2 mã lệnh) + đo token từng đêm, ghi `bo-nao/so-tay/do-token.md`.
+
+## CẬP NHẬT 2 (21/09) — THẦY CHỐT "BỘ NÃO TỰ HÀNH" (đề xuất mục 12; cẩm nang đã sửa)
+- **Code 1**: KHUÔN thêm `khacPhuc[] {dang, kieu: khac_phuc|on_som, soCau 2–4, bac}` (≤ 2). Lõi BTVN nâng đỡ: cổng `dieuChinh` nhận thêm `khacPhuc` — rút câu cùng dạng CHƯA giao từ kho của chính bài, chèn vào chặng CHƯA mở kế tiếp, BỚT câu phần riêng dễ nhất để tổng tải không tăng. **DEADLINE THẮNG MỌI NÚM** — test tính chất bắt buộc: với MỌI `dieuChinh` hợp lệ (kể cả nhịp −3), số chặng ≤ số ngày còn lại, mọi câu lõi chưa làm nằm trong các chặng còn lại, hạn nộp không đổi; núm làm lõi không kịp ⇒ bị bỏ + trả lý do. `danhGiaDieuChinh` trả `xau_di` ⇒ `bo-nao.ts` TỰ GỠ điều chỉnh (ghi sổ). Ngưỡng áp dụng `doTinCay ≥ 0,6`.
+- **Code 3**: chế độ `that` thành việc CẦN SỚM (ngay sau máy chủ BTVN nâng đỡ Đợt 1): kế hoạch ngày + BTVN nâng đỡ đọc điều chỉnh còn hạn; `on_som` = kéo `moc_on_ke` của các câu vừa sai thuộc dạng đó về ngày mai (chỉ SỚM hơn, không bao giờ muộn hơn); `/hs/ke-hoach-ngay` trả `loiNhanHlv`. Bảng tin thầy (`teacher-news`) nhận mục "Bộ não đêm qua".
+- **Code 4**: đổi giọng khối "Bộ não đêm qua" sang ĐÃ LÀM ("Đêm qua đã hỗ trợ N em"), mỗi dòng có kết quả hôm sau khi đã có; nút chỉ còn "Xem" / "Bỏ điều chỉnh"; đưa bản tóm tắt vào BẢNG TIN giáo viên. Công tắc tắt giữ nguyên.
+- **Code 2**: dòng lời nhắn HLV + khi chặng có câu `khac_phuc` thì nhãn nhẹ "luyện lại dạng em vừa vấp".
+- **Boss**: 2 đêm bóng kiểm máy móc ⇒ đạt thì tự bật `that` cả trường đêm thứ 3.
