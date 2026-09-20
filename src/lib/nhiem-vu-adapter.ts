@@ -46,8 +46,8 @@ export interface TheNhiemVu {
   hanNop?: string
   conLaiMs?: number
   conLaiChu?: string
-  /** Lô BTVN: `hienTai` đếm từ 1. Chỉ có khi dữ liệu nói rõ "Lô x/y". */
-  tienDoLo?: { hienTai: number; tong: number }
+  /** Lô BTVN: `hienTai` đếm từ 1. Chỉ có khi dữ liệu nói rõ "Lô x/y". `laChang` = bài BTVN "nâng đỡ" (cá nhân hoá): lô ≡ CHẶNG. */
+  tienDoLo?: { hienTai: number; tong: number; laChang?: boolean }
   biCong: boolean
   /** Tên việc phải xong trước — chỉ có khi `biCong`. */
   moSauKhiXong?: string
@@ -467,7 +467,9 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     switch (v.loai) {
       case 'btvn_lo': {
         const bt = btvnTheoMa(ct.ma)
-        return `${bt?.tenBtvn || bt?.tieuDe || 'BTVN'}: Lô ${Number(ct.chiSo) + 1}/${Number(ct.tongLo)}`
+        // Bài cá nhân hoá (hợp đồng BTVN nâng đỡ mục 7): lô ≡ chặng, `chiTiet.caNhan:true`.
+        const nhanLo = ct.caNhan === true ? 'Chặng' : 'Lô'
+        return `${bt?.tenBtvn || bt?.tieuDe || 'BTVN'}: ${nhanLo} ${Number(ct.chiSo) + 1}/${Number(ct.tongLo)}`
       }
       case 'btvn_nop': {
         const bt = btvnTheoMa(ct.ma)
@@ -489,7 +491,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       case 'btvn_lo':
       case 'btvn_nop': {
         const bt = btvnTheoMa(ct.ma)
-        return { loai: 'mo_btvn', payload: bt ? { bt } : undefined, nhanNut: v.loai === 'btvn_nop' ? 'Nộp bài' : `Làm Lô ${Number(ct.chiSo) + 1}` }
+        return { loai: 'mo_btvn', payload: bt ? { bt } : undefined, nhanNut: v.loai === 'btvn_nop' ? 'Nộp bài' : `${ct.caNhan === true ? 'Làm chặng' : 'Làm Lô'} ${Number(ct.chiSo) + 1}` }
       }
       case 'mom': {
         const bai = momTheoId(ct.id)
@@ -523,7 +525,8 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     const biCong = v.hien === false
     const phanMoTa: string[] = []
     if (v.loai === 'btvn_lo') {
-      phanMoTa.push(`${soCau} câu`)
+      // Bài cá nhân hoá: đây là số câu CỦA EM ở chặng này; chưa chốt bộ thì nói thật (số chỉ là ước lượng theo ngân sách ngày).
+      phanMoTa.push(ct.caNhan === true ? (ct.chuaChot === true ? 'Bộ câu của em chốt khi em mở bài' : `${soCau} câu của em`) : `${soCau} câu`)
       if (ct.treNhip === true) phanMoTa.push('đã trễ nhịp — làm trước')
     } else if (v.loai === 'mom') phanMoTa.push(ct.chuaBatDau === true ? `Gồm ${soCau} câu · 120 phút từ khi bắt đầu` : `Gồm ${soCau} câu`)
     else if (v.loai === 'btvn_nop') phanMoTa.push('Đã xong mọi lô — bấm nộp bài trước hạn')
@@ -543,7 +546,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       conLaiMs,
       conLaiChu,
       tienDoLo: v.loai === 'btvn_lo' && Number.isFinite(Number(ct.chiSo)) && Number(ct.tongLo) > Number(ct.chiSo)
-        ? { hienTai: Number(ct.chiSo) + 1, tong: Number(ct.tongLo) }
+        ? { hienTai: Number(ct.chiSo) + 1, tong: Number(ct.tongLo), ...(ct.caNhan === true ? { laChang: true } : {}) }
         : undefined,
       biCong,
       moSauKhiXong: biCong ? (v.cong ? tenTheoId.get(v.cong) : undefined) ?? 'việc trước' : undefined,

@@ -1667,7 +1667,21 @@ export default function StudentPortalScreen() {
                       </h3>
 
                       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1.5">
-                        {bt.soCau > 0 && <span>Số câu: <strong>{bt.soCau}</strong></span>}
+                        {bt.caNhan ? (
+                          // Bài cá nhân hoá: số câu CỦA EM (không phải số câu của bài); chưa mở lần nào thì bộ chưa chốt.
+                          <span>
+                            {typeof bt.soCauCuaEm === 'number' ? (
+                              <>
+                                Câu của em: <strong>{bt.soCauCuaEm}</strong>
+                                {bt.soChang > 0 ? <> · {bt.soChang} chặng</> : null}
+                              </>
+                            ) : (
+                              'Bộ câu của em chốt khi em mở bài'
+                            )}
+                          </span>
+                        ) : (
+                          bt.soCau > 0 && <span>Số câu: <strong>{bt.soCau}</strong></span>
+                        )}
                         {bt.hanNop && (
                           <NhanHanBaiTap han={bt.hanNop} now={nowHocTap} daNop={!!bt.daNop} />
                         )}
@@ -1719,7 +1733,7 @@ export default function StudentPortalScreen() {
                             </button>
                           ) : (
                             <span className="text-[11px] text-slate-400 italic px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full">
-                              {(mocThoiGian(bt.hanNop) ?? Infinity) <= nowHocTap ? 'Cần Thầy gia hạn để làm lại' : 'Đã hết lượt làm lại'}
+                              {(mocThoiGian(bt.hanNop) ?? Infinity) <= nowHocTap ? 'Cần Thầy gia hạn để làm lại' : bt.caNhan ? 'Làm lại khi Thầy cho phép' : 'Đã hết lượt làm lại'}
                             </span>
                           )}
                         </>
