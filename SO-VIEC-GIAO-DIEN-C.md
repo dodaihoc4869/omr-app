@@ -170,6 +170,22 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 
 - [x] 99 đỏ / 44 tệp (nền c6c7: 102/46). Đỏ MỚI 2: (1) **tests/m3-a1-1909 "không có mã màu # ở bất kỳ tệp nào của m3/" — LỖI CỦA EM**: chú thích mới trong bang-tin.css (140af65) có chữ `#fbbc04`; đã bỏ hex khỏi chú thích, m3-a1 xanh lại; (2) tests/ca-dang-mo-1909 "HAI truy vấn…" — chạy riêng xanh (máy tải). 5 test đo giờ đỏ ở nền nay xanh lại. Test của em khác: 0 đỏ mới. Bài học: chú thích trong m3/*.css cũng bị test quét hex
 
+## Huy hiệu thông báo + dòng nhắc icon (0.Planer giao) — 4be32ac
+
+- [x] `logo-huy-hieu-96-v3.png` sinh từ `logo-don-sac.svg` (96 px, nền trong suốt, mọi điểm không trong suốt đều trắng, lề ≥ 8 px, nét chéo/ngang dày lên 24/20 vì 13/11 mảnh quá ở 24 dp); `sw.ts`: `badge` trỏ tới nó, `icon` vẫn logo màu 192. Test giải mã PNG (RGBA 8-bit, tự viết bộ bỏ lọc) kiểm 4 góc alpha 0 · đơn sắc trắng · lề · nguồn; đột biến 5 → đỏ
+- [x] Trang cài app (3 bản y hệt): "Muốn thấy icon mới: gỡ app khỏi màn hình chính rồi thêm lại." — đúng một dòng, không làm gì hơn
+
+## SOÁT APP GIÁO VIÊN Ở DỮ LIỆU TRỐNG (0.Planer giao 19/09) — b6cdaef — 21/09
+
+**Cách soát (đo trên máy chủ THẬT, không giả bằng tay):** dựng Worker thật (`server/src/index.ts`) trên D1 giả bằng sqlite thật (`tests/_d1-that.ts`: lược đồ thật, DỮ LIỆU TRỐNG) qua http :8787; vỏ app giáo viên + MỘT màn trong trang xem thử (Chromium thật, Playwright chuyển hướng `omr.ttadodaihoc.workers.dev` → :8787, mã bí mật phiên đặt như sau khi mở khoá). Tệp tạm (KHÔNG commit, ở `.claude/m3-xem/`): `may-chu-trong.ts` (đóng gói bằng rolldown: `node dong-goi-may-chu.mjs`; đặt `LECH_NGAY=2` để đồng hồ máy chủ qua mốc reset, `mocReset` bật), `gv.html/gv.tsx`; kịch bản `soat-gv.mjs`, `tuong-tac-gv.mjs` ở scratchpad phiên. Gieo thêm: `dong_bo.ca_day_du`, 3 học sinh 2 lớp (giữ lại sau reset), 1 ca mở chưa có lượt.
+
+- [x] 10 màn (Danh sách lớp, Trang chủ/Bảng tin thầy, Mở ca, Ngân hàng đề, Chi tiết ca, Ca thi, Học sinh, Gọi lên bảng, Giao BTVN, Học sinh hỏi) × 6 tình huống: 390 sáng · 390 tối · 1280 sáng · KHÔNG danh sách lớp (cả máy lẫn máy chủ) · máy chủ SAU reset (`mocReset` = 2026-09-21) · ca mở chưa em nào vào: **0 màn trắng, 0 vòng quay vô hạn, 0 lỗi đỏ, 0 tràn ngang, 0 lỗi trang**. Kịch bản bấm 19 nút trên các màn (Báo cáo / Mức độ tiến bộ của em chưa thi, Thêm học sinh, Dán link, Chọn đề, Đồng bộ, mã ca sai, Giao bài mới, Đồng bộ lại phiếu, Cấu hình…): đều ra câu chữ đúng, không lỗi
+- [x] SỬA 2 câu chữ (b6cdaef, luồng thi — CHỜ 0.Planer soát): `HopChonDe` (chung Mở ca / Giao BTVN / Gọi lên bảng) kho rỗng hiện `Không có đề nào khớp "".` → "Kho đề đang trống. Vào Ngân hàng câu hỏi → Đồng bộ ngay để nạp đề."; `ExamMonitorScreen` mã ca không có nhắc "danh sách bên dưới" khi không có → `loiKhongTimThayCa` (src/lib/cau-chu-ca.ts). 7 test, đột biến 4 → đỏ
+- [ ] **CẦN XÁC NHẬN TRÊN D1 THẬT (Code 3):** cột `cau_hoi_em.da_xoa` KHÔNG nằm trong migration nào của repo (chỉ `migration-1209-toan-bo.sql` tạo bảng, không có cột này) nhưng `server/src/goi-cu.ts` (`danhSachCauHoi`, thùng rác) dùng `q.da_xoa`. Trên D1 giả dựng từ repo, màn "Học sinh hỏi" trả HTTP 500 `no such column: q.da_xoa`; sau khi ALTER thêm cột thì ra "Chưa em nào gửi câu hỏi…". Nếu D1 thật CHƯA có cột này thì thầy mở "Học sinh hỏi" là 500 — cùng loại lệch lược đồ mà `tests/_d1-that.ts` đã ghi cho bảng `ca`
+- [x] Không phát hiện lỗi ở tệp Code 1 (GoiLenBang, html-may-chieu, xep-buoi-chua…): màn Gọi lên bảng rỗng ra "Chưa có ca nào khớp." + "Chưa có đề nào trong máy — vào Ngân hàng câu hỏi bấm Đồng bộ trước." (không cần nhắn Code 1)
+- Ghi chú: hai test đỏ lúc chạy vùng liên quan (`man-ca-thi-may-chu-moi-1109 "ghi theo lô"`, `goi-len-bang-to-chieu-cham-1909 "KHÔNG ĐẠT"`) đỏ CẢ KHI HopChonDe là bản HEAD — do WIP tờ chiếu của Code 1 (html-may-chieu/to-chieu-cau-noi đang sửa), không phải của em; `uoc-luong-bo-cuc-1909` (6 test) cũng của Code 1
+- Ảnh: docs/anh-gv-trong-1909 (`gv-trong-<màn>-{390-sang,390-toi,1280-sang}`, `tt-*`, `toan-trang-giaobtvn-giao-moi-390`)
+
 ## Trạng thái cuối phiên — 19/09 15:50
 
 - Việc còn mở: (1) chờ 0.Planer soát 70d3408 (đã soát), e1555a4 (đã soát), 564dc08, 5d0d1c4, b72ca8d; (2) TheCau bật ở màn thi = Code 2 đặt `m3` ở gốc ExamTakeScreen (đã thoả thuận, Code 2 xác nhận cách (a)); (3) KhoiBaiLuyen + TheCauChiTiet để nguyên (đề nghị, chờ đồng ý); (4) nợ cũ ngoài phạm vi: 4 cặp chữ nhỏ --p-do/--p-xanh của TheCauChiTiet dưới 4,5:1 (tokens.css); (5) dọn: thư mục tạm `.claude/m3-xem/` (trang xem thử, KHÔNG commit) — xoá được
