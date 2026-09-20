@@ -243,6 +243,32 @@
 .dao .dao-tham-xong p{font-size:13px;color:var(--dao-chu-mo)}
 .dao .dao-tham-phu{display:flex;justify-content:center;gap:10px}
 
+/* ───── 4. SỔ TAY DẠNG BÀI ───── */
+.dao .dao-so{display:flex;flex-direction:column;gap:14px;padding:max(18px,4vh) 16px 0}
+.dao .dao-so header .dao-nhan{letter-spacing:.24em}
+.dao .dao-so header h2{font-size:26px;font-weight:800;line-height:1.2;margin-top:2px}
+.dao .dao-so header p{font-size:13px;color:var(--dao-chu-mo);margin-top:2px}
+.dao .dao-so-yeu{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:24px;background:linear-gradient(135deg,rgba(255,154,118,.3),rgba(255,154,118,.08));box-shadow:inset 0 0 0 1px rgba(255,154,118,.5)}
+.dao .dao-so-yeu>b{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:rgb(255,154,118);color:rgb(58,18,0);font-size:20px;font-weight:800}
+.dao .dao-so-yeu strong{font-size:15px;font-weight:800}.dao .dao-so-yeu p{font-size:12px;line-height:1.45;color:rgb(255,208,189);margin-top:2px}
+.dao .dao-so-trong{padding:16px;font-size:14px;line-height:1.5;color:var(--dao-chu-mo)}.dao .dao-so-trong b{color:var(--dao-vang)}
+.dao .dao-so-chuong{display:flex;flex-direction:column;gap:12px;padding:16px}
+.dao .dao-so-chuong-dau{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.dao .dao-so-chuong-dau h3{font-size:16px;font-weight:800}.dao .dao-so-chuong-dau span{flex-shrink:0;font-size:12px;font-weight:700;color:var(--dao-vang)}
+.dao .dao-so-chuong ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none}
+.dao .dao-so-chuong li{display:flex;flex-direction:column;gap:6px;min-height:84px;padding:12px;border-radius:18px;background:linear-gradient(160deg,rgba(255,154,118,.3),rgba(255,154,118,.08));box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+.dao .dao-so-chuong li[data-sao="1"],.dao .dao-so-chuong li[data-sao="2"]{background:linear-gradient(160deg,rgba(127,233,255,.28),rgba(127,233,255,.08))}
+.dao .dao-so-chuong li[data-sao="3"]{background:linear-gradient(160deg,rgba(255,209,102,.34),rgba(255,209,102,.1))}
+.dao .dao-so-chuong li>span:first-child{font-size:13px;font-weight:700;line-height:1.25;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.dao .dao-so-chuong li em{font-style:normal;font-size:10px;font-weight:800;color:rgb(127,233,255)}
+.dao .dao-so-chuong li[data-khoa]{background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);color:rgb(128,140,180)}
+.dao .dao-so-chuong li[data-khoa] small{font-size:11px;line-height:1.3}
+.dao .dao-sao{display:flex;gap:2px;margin-top:auto}
+.dao .dao-sao svg{fill:rgba(255,255,255,.2)}.dao .dao-sao svg[data-sang]{fill:var(--dao-vang)}
+.dao .dao-so-thuong{display:flex;align-items:center;gap:12px;padding:14px 16px;opacity:.7}
+.dao .dao-so-thuong>span{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;background:rgba(255,209,102,.2);color:var(--dao-vang)}
+.dao .dao-so-thuong strong{font-size:14px;font-weight:800}.dao .dao-so-thuong p{font-size:12px;color:var(--dao-chu-mo);margin-top:2px}
+
 @media(prefers-reduced-motion:reduce){
  .dao *,.dao *::before,.dao *::after{animation:none!important;transition:none!important}
  /* không xoay 3D: đổi tranh tức thì */

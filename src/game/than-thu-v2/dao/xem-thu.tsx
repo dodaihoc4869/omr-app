@@ -15,6 +15,7 @@ import ChonBanDongHanh,{theMoDau} from './ChonBanDongHanh'
 import DaoCuaEm from './DaoCuaEm'
 import TuiDo from './TuiDo'
 import ThamHiem from './ThamHiem'
+import SoTay from './SoTay'
 import type {CauDao} from './kieu'
 import type {DaoProfile} from './kieu'
 
@@ -39,4 +40,4 @@ function ManTham(){const buoc=q.get('buoc')??'cau',[tl,setTl]=useState(buoc==='c
  return <div className="dao dao-vo dao-vo-tham"><ThamHiem profile={hoSo()} cau={cau} viTri={viTri} ketQua={kq} traLoi={tl} assisted={false} xong={buoc==='xong'} tongKet={{dung:5,tong:6,exp:60,sao:2}}
   phanHoi={buoc==='no'?{correct:true,answer:'B',solution:'CH₃CH₂OH + CuO → CH₃CHO + Cu + H₂O. Ancol bậc I bị oxi hoá thành aldehyde.',solutionImages:[],lyDo:{moc:2,exp:40,chu:'+40 · đúng lại ở một câu khác sau 1 ngày — sao thứ 2 của dạng này'}}:buoc==='sai'?{correct:false,answer:'8,2',solution:'n = 0,1 mol ⇒ m = 0,1 × 82 = 8,2 gam.',solutionImages:[],lyDo:{moc:0,exp:0,chu:'Chưa đúng — dạng này hẹn em ôn lại vào ngày mai'}}:null}
   onTraLoi={setTl} onAssisted={()=>{}} onNop={()=>{}} onTiep={()=>{}} onVeDao={()=>{}} onChuyenMoi={()=>{}} onMoSoTay={()=>{}}/></div>}
-createRoot(document.getElementById('root')!).render(<StrictMode><section className="spirit-game" style={{padding:0,borderRadius:0}}>{man==='chon'&&<ManChon/>}{man==='dao'&&<ManDao/>}{man==='tham'&&<ManTham/>}{man==='tui'&&<div className="dao dao-vo"><TuiDo profile={hoSo()} exp={{homNay:46,manhKhien:{manh:8,moiKhien:12}}} onDungKhien={async()=>{}} onMoVoDai={()=>{}} onMoTienBo={()=>{}}/></div>}</section></StrictMode>)
+createRoot(document.getElementById('root')!).render(<StrictMode><section className="spirit-game" style={{padding:0,borderRadius:0}}>{man==='chon'&&<ManChon/>}{man==='dao'&&<ManDao/>}{man==='tham'&&<ManTham/>}{man==='so-tay'&&<div className="dao dao-vo"><SoTay profile={hoSo()} tenDang={TEN_DANG} danhMuc={q.has('khongdanhmuc')?null:[{key:'ES-TEN',ten:'Tên gọi ester',chuong:'ES'},{key:'ES-TP',ten:'Thuỷ phân ester',chuong:'ES'},{key:'ES-DOT',ten:'Đốt cháy ester',chuong:'ES'},{key:'ES-XP',ten:'Xà phòng hoá',chuong:'ES'},{key:'ES-CB',ten:'Chất béo',chuong:'ES'},{key:'CB-LM',ten:'Lên men',chuong:'CB'},{key:'CB-TB',ten:'Glucose tráng bạc',chuong:'CB'},{key:'CB-TBOT',ten:'Tinh bột',chuong:'CB'}]} tenChuong={{ES:'Ester – Lipid',CB:'Carbohydrate'}}/></div>}{man==='tui'&&<div className="dao dao-vo"><TuiDo profile={hoSo()} exp={{homNay:46,manhKhien:{manh:8,moiKhien:12}}} onDungKhien={async()=>{}} onMoVoDai={()=>{}} onMoTienBo={()=>{}}/></div>}</section></StrictMode>)

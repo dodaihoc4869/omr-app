@@ -9,7 +9,7 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 | 2 | Màn Chọn bạn đồng hành | XONG | commit màn 1 · `tests/dao-chon-ban-dong-hanh.test.tsx` 8/8 · ảnh `docs/anh-dao-than-thu-2109/1-*` |
 | 3 | Hòn đảo của em + Túi đồ + lõi `dao-core` (vỏ `DaoThanThu` + thanh dưới: commit nối cuối) | XONG phần màn | commit màn 2 · `tests/dao-cua-em.test.tsx` 13/13 · ảnh `2-*` |
 | 4 | Chuyến thám hiểm 6 ải | XONG phần màn | commit màn 3 · `tests/dao-tham-hiem.test.tsx` 8/8 · ảnh `3-*` |
-| 5 | Sổ tay dạng bài | chưa | |
+| 5 | Sổ tay dạng bài | XONG phần màn | commit màn 4 · `tests/dao-so-tay.test.tsx` 5/5 · ảnh `4-so-tay-390.jpg` |
 | 6 | Hợp đồng prop cho Code 5 | bản đầu đã gửi | `docs/hop-dong-dao-than-thu-prop-2109.md` |
 | 7 | Nghiệm thu 6 điều (đo ảnh ≤ 400 KB bằng Chromium, 360×740, console sạch, so tên vitest) | chưa | |
 
@@ -49,3 +49,10 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 - 360×740: đáy phần trận + câu trắc nghiệm = 650 px (< 740, không cuộn); thẻ câu dùng chung `TheCau` được nén qua token `--k5/--k3` và ẩn thanh tiêu đề trùng với nhãn ải. Console 0 lỗi ở cả 3 trạng thái.
 - Giữ ô "Em có dùng tài liệu hoặc được trợ giúp" (luật chấm `assisted` của máy chủ) và chặn nộp khi hình của câu lỗi.
 - Xem thử: `?man=tham&buoc=cau|no|sai|xong[&phan=II]`.
+
+## 21/09 · Màn 4 — Sổ tay dạng bài (`dao/SoTay.tsx`, `soTay()` trong `dao-core.ts`)
+- Sao của ô = `mastery[].stage` (20/40/40 = sao 1/2/3); dòng giải thích 3 sao ở đầu trang; nhãn "tới hạn ôn" khi `due ≤ now`.
+- Gom theo `chuong` của lệnh đọc-chỉ `POST /game-v2/so-tay` (Code 5 đã viết, mục 4 hợp đồng máy chủ): dạng em ĐƯỢC PHÉP làm mà chưa có trong `mastery[]` ⇒ ô "???" (test chặn lộ tên). Kho không có TÊN chương ⇒ tiêu đề "Nhóm <mã>" (prop `tenChuong` để sau này ai có bảng tên thì truyền vào). Worker cũ chưa có lệnh ⇒ một nhóm "Dạng em đã gặp", tên lấy từ `tenDang` của các câu em làm trong phiên.
+- Thẻ "N dạng đang yếu" = dạng đã gặp mà 0 sao (chưa lần nào tự làm đúng); hồ sơ trống sau reset ⇒ lời mời LÊN ĐƯỜNG, không màn trắng.
+- Ô "trang phục Hoả Diệm" của bản vẽ ⇒ "Phần thưởng thành thạo trọn chương · SẮP MỞ" có khoá (test chặn chữ trang phục).
+- Xem thử: `?man=so-tay[&khongdanhmuc]`.
