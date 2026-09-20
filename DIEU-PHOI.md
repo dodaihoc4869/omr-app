@@ -82,6 +82,7 @@ Phân vùng dự kiến theo hai bản thiết kế:
 
 > Chỉ giữ 12 dòng mới nhất ở đây để mỗi phiên đọc nhanh, đỡ tốn ngữ cảnh. Dòng cũ hơn: `docs/nhat-ky-dieu-phoi-cu.md` (các dòng "đã soát <mã>" cũ vẫn có hiệu lực — tra ở đó bằng `grep`).
 
+- 21/09 01:32 (giờ máy) · Boss · Boss đã soát a1bf736 (Code 4, G4c: nút nổi Mở ca không đè màn theo dõi, cùng onClick; 8 ảnh G4 — đã xem ảnh 1440 sáng, đúng bản vẽ). ĐƯỢC ĐẨY. "Thêm 5 phút"/"Chiếu mã" = tính năng MỚI, KHÔNG làm đợt này (ghi lại hỏi thầy sau).
 - 21/09 01:32 (giờ máy) · Boss · Boss đã soát 3044dbd + c1090a7 (Code 4, G4a màn theo dõi ca + G4b danh sách ca mặc M3): chỉ thêm tab lọc HIỂN THỊ (state giao diện, đếm từ dữ liệu sẵn có, 0 lệnh mới), hàm/nút/chuỗi giữ nguyên; 36 tệp test liên quan: 32 xanh, 4 đỏ đều thuộc nền cũ (KhoiLuyenKhacPhuc vắng từ trước). ĐƯỢC ĐẨY.
 - 21/09 01:28 (giờ máy) · Boss · Boss đã soát b81281d (Code 2, C10 bước 5: dải cảnh báo rời màn, tấm giữ-để-đọc, thẻ khoá bài mặc M3 — cùng role/z-index/vị trí/câu chữ, nhánh cũ giữ nguyên ngoài dungM3, 0 state/effect/listener mới). ĐƯỢC ĐẨY. ⇒ C10 (màn thi thật theo bản vẽ) XONG.
 - 21/09 01:26 (giờ máy) · Boss · Boss đã soát e781e0c (Code 3: job reset BẢN CUỐI — BANG_XOA chỉ còn BTVN/bài Mẹ giao/luyện đề/kế hoạch ngày/len_bang/trao đổi/game+thần thú+EXP+doan_*/vinh danh/bảng tin; 14 bảng ca thi + sổ/hồ sơ mạnh yếu nằm ở GIỮ). Worker 6132b838, CHƯA lên đạn; dryRun thật: XOÁ 15.428 / GIỮ 93.353 dòng (ca 27, luot 265). Đã lên: token PH mềm, lệnh màn Hôm nay, on_thi mang câu. Code 3 chờ lệnh "MỌI VIỆC XONG".
