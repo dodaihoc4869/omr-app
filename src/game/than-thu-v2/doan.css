@@ -179,6 +179,8 @@
 .dh .dh-don button[aria-pressed=true]{background:linear-gradient(180deg,#ffe9a0,#ffb52e);color:#3a2200;box-shadow:0 8px 18px rgba(255,180,40,.4),inset 0 2px 0 rgba(255,255,255,.6)}
 .dh .dh-don button[aria-pressed=true] small{color:#5a3a00}
 .dh .dh-don button:disabled{opacity:.4}
+.dh .dh-xin{flex-shrink:0;align-self:center;min-height:36px;padding:0 16px;border-radius:18px;background:rgba(255,181,154,.14);box-shadow:inset 0 0 0 1px rgba(255,181,154,.55);font-size:12.5px;font-weight:700;color:#ffd0bd}
+.dh .dh-xin[aria-pressed=true]{background:rgba(255,181,154,.3);color:#fff}
 .dh-cho{flex-shrink:0;text-align:center;font-size:13px;color:#dfe8ff;padding:4px 0}
 .dh-tin-hieu{display:flex;gap:8px;flex-shrink:0}
 .dh .dh-tin-hieu button{flex:1 1 auto;min-height:44px;border-radius:22px;padding:0 6px;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);font-size:12.5px;font-weight:700;white-space:nowrap}

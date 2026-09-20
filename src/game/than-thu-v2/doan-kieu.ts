@@ -21,11 +21,13 @@ export interface KetChangXem {
   thang: boolean; sao: number; linhTam: { hp: number; toiDa: number }; trumVoGiap: boolean[]; quaiHaGuc: number; soLienKich: number
   cuaEm: TomTatGhe; tienBo: TienBoXem; ban: { ghe: number; laMay: boolean; soLanGiupThanhCong: number }[]
 }
+export interface TiepSucXem { conLuotNhan: number; daXin: boolean; theNhan: { tuTen: string; tuLaMay: boolean; loai: string; tieuDe: string; noiDung: string } | null; banCan: number[]; daGiup: boolean; lienKichSanSang: boolean }
+export interface GoiYTiepSuc { den: number; ten: string; pet: number; cap: number; tenDang: string; de: string; the: { loai: string; tieuDe: string; moTa: string }[] }
 export interface DoanXem {
   ma: string; revision: number; laChu: boolean; batDau: boolean; ghe: GheXem[]; gioMayChu: number
-  tran?: TranXem; hiepVuaXong?: KhungNhinHiep; cau?: CauXem; trum?: TrumXem; ketChang?: KetChangXem
+  tran?: TranXem; hiepVuaXong?: KhungNhinHiep; cau?: CauXem; trum?: TrumXem; ketChang?: KetChangXem; tiepSuc?: TiepSucXem
 }
-export interface PhanHoiDoan { ok: boolean; doan?: DoanXem; ketQuaCau?: KetQuaCau; loiGiaiTrum?: { hiep: number; de: Question; answer: string; solution: unknown; solutionImages?: HinhAnh[] } | null; daRoi?: boolean }
+export interface PhanHoiDoan { ok: boolean; doan?: DoanXem; ketQuaCau?: KetQuaCau; goiY?: GoiYTiepSuc; expTiepSuc?: { bat: boolean; exp: number; conLai: number }; loiGiaiTrum?: { hiep: number; de: Question; answer: string; solution: unknown; solutionImages?: HinhAnh[] } | null; daRoi?: boolean }
 
 export const NHAN_CAU: Record<NhanCau, string> = { toi_han_on: 'tới hạn ôn', dang_yeu: 'dạng em đang yếu', cau_moi: 'câu mới', vua_suc: 'vừa sức em' }
 export const CHU_TRANG_THAI: Record<TrangThaiGhe, string> = { cho: 'sẵn sàng', may: 'máy đỡ thay', dang_lam: 'đang làm', da_chot: 'đã chốt', can_tiep_suc: 'cần tiếp sức' }

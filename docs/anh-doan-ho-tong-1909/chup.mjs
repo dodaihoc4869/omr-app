@@ -28,6 +28,8 @@ const MAN = {
   '1-sanh': null,
   '1b-phong-cho': { ma: 'DH7A2C', revision: 1, laChu: true, batDau: false, ghe: ghe3(['cho', 'cho', 'cho']), gioMayChu: 0 },
   '2-trong-tran': { ma: 'DH1', revision: 9, laChu: true, batDau: true, ghe: ghe3(), gioMayChu: 0, tran: tran(), cau: { qid: 'Q1', nhan: 'toi_han_on', de: cauEster } },
+  '3-tiep-suc': { ma: 'DH1', revision: 10, laChu: true, batDau: true, ghe: ghe3(['da_chot', 'can_tiep_suc', 'dang_lam']), gioMayChu: 0, tran: tran({ conMs: 18000 }),
+    cau: { qid: 'Q1', nhan: 'toi_han_on', de: cauEster, daChot: true, hanhDong: 'danh', ketQua: { correct: true, answer: 'B', solution: 'Ester thuỷ phân trong kiềm cho muối và ancol.' } }, tiepSuc: { conLuotNhan: 2, daXin: false, theNhan: null, banCan: [1], daGiup: false, lienKichSanSang: false } },
   '4-tung-chuong': { ma: 'DH1', revision: 12, laChu: true, batDau: true, ghe: ghe3(['cho', 'cho', 'cho']), gioMayChu: 0, tran: tran({ hiep: 4, laTrum: true, moSauMs: 6000, conMs: 60000, giay: 60, quai: [{ ma: 6, loai: 'bun_acid', hp: 18 }] }), hiepVuaXong },
   '5-trum-cau-chung': { ma: 'DH1', revision: 14, laChu: true, batDau: true, gioMayChu: 0, tran: tran({ hiep: 4, laTrum: true, giay: 60, conMs: 52000, quai: [] }),
     ghe: [...ghe3(['dang_lam', 'da_chot', 'dang_lam']), { ghe: 3, ten: 'Lan', pet: 0, cap: 20, laMay: false, roi: false, laEm: false, trangThai: 'da_chot', tinHieu: 'chac_y' }],
@@ -56,6 +58,7 @@ async function moMan(ten, { width = 390, height = 844, giamChuyenDong = false } 
       data = { ok: true, profile, revision: 1, tasks: [], doanMo: true } // cờ mở game BẬT cho em kiểm thử
       if (u.pathname.endsWith('/recommendations')) Object.assign(data, { dailyUsed: 12, remaining: 188, suggestions: [{ title: 'Ester', source: 'D', part: 'I' }, { title: 'Ester', source: 'D', part: 'I' }, { title: 'Ester', source: 'D', part: 'I' }, { title: 'Ancol', source: 'D', part: 'I' }, { title: 'Ancol', source: 'D', part: 'I' }, { title: 'Amin', source: 'D', part: 'I' }] })
       if (/\/doan-/.test(u.pathname)) data = xem ? { ok: true, doan: xem } : { ok: false, error: 'Không tìm thấy chặng này.' }
+      if (u.pathname.endsWith('/doan-the-goi-y')) data.goiY = { den: 1, ten: 'Thu Hà', pet: 1, cap: 30, tenDang: 'Ancol', de: 'Oxi hoá ethanol bằng CuO, đun nóng, thu được chất hữu cơ X. X là…', the: [{ loai: 'nhac_cong_thuc', tieuDe: 'Nhắc công thức', moTa: 'Gửi bạn kiến thức gốc của câu' }, { loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án', moTa: 'Máy gạch một đáp án sai' }, { loai: 'buoc_dau', tieuDe: 'Chỉ bước đầu', moTa: 'Hé bước đầu của lời giải' }] }
     }
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) })
   })
@@ -69,6 +72,7 @@ const ketQua = []
 for (const ten of Object.keys(MAN)) {
   const { page, ctx, loi } = await moMan(ten)
   if (ten === '4-tung-chuong') { await page.locator('.dh-chuong').waitFor(); await page.waitForTimeout(1500) } else await page.waitForTimeout(900)
+  if (ten === '3-tiep-suc') { await page.getByRole('button', { name: /Tiếp sức cho Thu Hà/ }).click(); await page.locator('.dh-tam').waitFor(); await page.waitForTimeout(500) }
   await page.screenshot({ path: `${OUT}/${ten}-390-sang.jpg`, type: 'jpeg', quality: 84 })
   assert.deepEqual(loi, [], `${ten}: có lỗi console: ${loi.join(' | ')}`)
   ketQua.push(`${ten}: chụp xong, 0 lỗi console`)

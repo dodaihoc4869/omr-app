@@ -18,8 +18,8 @@ interface Props {
   yChon: Record<number, 'D' | 'S'>; onYChon: (y: number, v: 'D' | 'S') => void
   onChot: (boTrong: boolean) => void; onChotY: (y: number) => void; onTinHieu: (t: string) => void; onRoi: () => void; onZoom: (src: string) => void
   ban: boolean; loi: string; ketQuaCau?: KetQuaCau | null; cauVuaLam?: CauVuaLam | null; loiGiaiTrum?: LoiGiaiTrum | null
-  /** Bước 4 cắm nút/tấm Tiếp sức và thẻ gợi ý em nhận được vào đây. */
-  khoiTiepSuc?: ReactNode; theNhan?: ReactNode; bieuNgu?: string
+  /** Tiếp sức: xin (khi em chưa chốt) và mở tấm trượt giúp bạn (khi em đã chốt). */
+  onXinTiepSuc: (bat: boolean) => void; onMoTiepSuc: (ghe: number) => void; expTiepSuc?: number
 }
 
 const phut = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
@@ -73,7 +73,7 @@ export default function DoanTran(p: Props) {
   ) : (
     <div className="dh-canh" aria-label={`Linh Tâm còn ${tran.linhTam.hp} máu, ${tran.quai.length} ${tenQuai} trên sân`}>
       <div className="dh-canh-trang" /><div className="dh-canh-dat" />
-      {p.bieuNgu && <div className="dh-canh-bieu-ngu">{p.bieuNgu}</div>}
+      {xem.tiepSuc?.lienKichSanSang && mo && <div className="dh-canh-bieu-ngu">LIÊN KÍCH ×2 SẴN SÀNG</div>}
       <DoiHinh ghe={xem.ghe} />
       <div className="dh-linh-tam-o"><LinhTamCau size={44} /><div className="dh-mau"><i style={{ width: `${phanTramLinhTam}%` }} /></div></div>
       <div className="dh-dich">
@@ -156,7 +156,7 @@ export default function DoanTran(p: Props) {
     )
   }
 
-  const cau = xem.cau, daChot = !!cau?.daChot, chieu = CHIEU[em.pet]!
+  const cau = xem.cau, daChot = !!cau?.daChot, chieu = CHIEU[em.pet]!, ts = xem.tiepSuc
   const tenDon = p.hanhDong === 'danh' ? 'Đánh' : p.hanhDong === 'chan' ? 'Chắn' : chieu.kyNang
   const du = !!p.de && duDapAn(p.de, p.chon), boTrong = !du && p.hanhDong === 'chan'
   const duoi = !mo ? null : tran.laTrum ? (
@@ -166,8 +166,8 @@ export default function DoanTran(p: Props) {
     </>
   ) : cau?.het ? <div className="dh-cho">Hiệp này em cổ vũ đồng đội · còn {phut(p.conGiay)}</div> : daChot ? (
     <>
-      <div className="dh-cho">Em đã chốt · còn {phut(p.conGiay)} · chờ đồng đội ra đòn cùng lúc</div>
-      {p.khoiTiepSuc}
+      <div className="dh-cho">Em đã chốt · còn {phut(p.conGiay)} · {ts?.daGiup ? `em đã tiếp sức${p.expTiepSuc ? ` · +${p.expTiepSuc} EXP tiếp sức` : ''} — bạn làm lại đúng là LIÊN KÍCH ×2` : 'chờ đồng đội ra đòn cùng lúc'}</div>
+      {(ts?.banCan ?? []).map(k => <button key={k} type="button" className="dh-nut-vang" style={{ minHeight: 50, fontSize: 15 }} disabled={p.ban} onClick={() => p.onMoTiepSuc(k)}>Tiếp sức cho {xem.ghe[k]?.ten} · bạn ấy đang cần</button>)}
     </>
   ) : (
     <>
@@ -176,6 +176,9 @@ export default function DoanTran(p: Props) {
         <button type="button" aria-pressed={p.hanhDong === 'chan'} onClick={() => p.onHanhDong('chan')}>{BieuTuong.chan}<b>Chắn</b><small>khiên {CHAN} cho Linh Tâm</small></button>
         <button type="button" aria-pressed={p.hanhDong === 'ky_nang'} disabled={tran.nangLuong < NL_KY_NANG} onClick={() => p.onHanhDong('ky_nang')}>{BieuTuong.ky_nang}<b>{chieu.kyNang}</b><small>kỹ năng · {tran.nangLuong}/{NL_KY_NANG} NL</small></button>
       </div>
+      {ts && !ts.theNhan && !cau?.rut && (ts.conLuotNhan > 0
+        ? <button type="button" className="dh-xin" aria-pressed={ts.daXin} disabled={p.ban} onClick={() => p.onXinTiepSuc(!ts.daXin)}>{ts.daXin ? 'Đang chờ bạn tiếp sức… (chạm để thôi)' : `Cần tiếp sức · còn ${ts.conLuotNhan} lần được tiếp sức`}</button>
+        : <div className="dh-cho" style={{ fontSize: 12 }}>Em đã dùng hết 2 lần được tiếp sức của chặng này — câu này em tự làm nhé.</div>)}
       <button type="button" className="dh-nut-lam" disabled={p.ban || !(du || boTrong) || !!cau?.rut && !boTrong} onClick={() => p.onChot(boTrong)}>
         {p.ban ? 'Đang chốt…' : du ? `Chốt đòn · ${p.de!.phan === 'I' ? p.chon + ' + ' : ''}${tenDon}` : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt đòn'}
       </button>
@@ -187,7 +190,7 @@ export default function DoanTran(p: Props) {
       <ThanhHiep hiep={tran.hiep} soHiep={tran.soHiep} ketThuc={tran.ketThuc} con={p.conGiay} giay={tran.giay} hien={mo} onRoi={p.onRoi} />
       {canh}
       {daiDoi}
-      {p.theNhan}
+      {mo && ts?.theNhan && <div className="dh-the-nhan" role="status"><small>{ts.theNhan.tuLaMay ? 'BẠN ĐỒNG HÀNH' : ts.theNhan.tuTen.toUpperCase()} TIẾP SỨC · {ts.theNhan.tieuDe.toUpperCase()}</small>{ts.theNhan.noiDung}</div>}
       {than}
       {p.loi && <div className="dh-loi" role="alert">{p.loi}</div>}
       {duoi}
