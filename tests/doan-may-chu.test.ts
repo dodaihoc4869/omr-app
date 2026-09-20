@@ -115,8 +115,8 @@ describe('Đoàn Hộ Tống · máy chủ · đi một mình trọn chặng', (
     expect((d.sql.prepare('SELECT trang_thai FROM doan_chang WHERE ma=?').get(ma) as any).trang_thai).toBe('xong')
     const ketLuc = luot[0].ket_luc; await goi(d, 'S1', 'xem', { ma }); await goi(d, 'S1', 'xem', { ma })
     expect((d.sql.prepare("SELECT ket_luc FROM doan_luot WHERE sbd='S1'").get() as any).ket_luc).toBe(ketLuc) // xem lại không chốt sổ lần hai
-    // Chặng đã xong → lần "mở" kế tiếp là CHẶNG MỚI, không kéo lại chặng cũ
-    expect((await goi(d, 'S1', 'mo')).doan.ma).not.toBe(ma)
+    // Chặng đã xong → lần "mở" kế tiếp là CHẶNG MỚI (không kéo lại chặng cũ) — và vì là chặng thứ hai trong ngày nên cần vé (bước 5; test riêng ở doan-mua)
+    await expect(goi(d, 'S1', 'mo')).rejects.toThrow('chưa có vé')
   })
 
   it('"lên bậc ôn" đo từ sổ: câu từng ĐÚNG ở một ngày VN trước, hôm nay tự làm đúng lại → tính 1', async () => {

@@ -23,6 +23,7 @@ import { qidChanHomNay } from './game-v2-ho-so'
 import { ngayVn } from './su-kien-hoc'
 import { soanThe, deRutGon, MO_TA_THE, type LoaiThe, type TheGoiY } from './game-v2-doan-the'
 import { ghiTiepSuc } from './exp-d1'
+import { docSanh, quaCongVe, hoanVe, ketChangChoLop } from './game-v2-doan-mua'
 
 type Row = Record<string, unknown>
 export type GoiGame = (env: Env, action: string, b: Record<string, unknown>) => Promise<Record<string, unknown>>
@@ -326,6 +327,8 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
     doan.ketChang = {
       thang: t.thang, sao: t.sao, linhTam: t.linhTam, trumVoGiap: t.trumVoGiap, quaiHaGuc: t.quaiHaGuc, soLienKich: t.soLienKich,
       cuaEm: t.ghe[i], tienBo: await tienBoHomNay(env, p, i),
+      // Bước 5: trạm của LỚP trước → sau chặng này, em là bạn thứ mấy góp sức hôm nay (đọc từ sổ lượt — bạn máy không có dòng nên không bao giờ được tính).
+      doanLop: p.ketLuc ? await ketChangChoLop(env, sbd, p.nguoi[i]!.lop, ma, t.thang, t.ghe[i]!.satThuong, p.ketLuc) : null,
       // Về bạn: chỉ điều tích cực (đã giúp ai bao nhiêu lần). Không có số câu đúng/sai của bạn.
       ban: t.ghe.filter(g => g.ghe !== i).map(g => ({ ghe: g.ghe, laMay: g.laMay, soLanGiupThanhCong: g.soLanGiupThanhCong })),
     }
@@ -364,11 +367,18 @@ export async function doanAction(env: Env, sbd: string, p: Profile, action: stri
 
 async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row, goiGame: GoiGame): Promise<Record<string, unknown>> {
   const now = Date.now()
-  if (action === 'doan-mo') {
-    const dangDo = await env.DB.prepare(`SELECT l.ma_chang FROM doan_luot l JOIN doan_chang c ON c.ma=l.ma_chang
+  const timDangDo = () => env.DB.prepare(`SELECT l.ma_chang FROM doan_luot l JOIN doan_chang c ON c.ma=l.ma_chang
       WHERE l.sbd=? AND l.ket_luc IS NULL AND c.trang_thai IN ('sanh','dang_di') AND c.tao_luc>? ORDER BY l.vao_luc DESC LIMIT 1`).bind(sbd, iso(now - PHONG_HET_HAN_MS)).first<{ ma_chang: string }>()
+  if (action === 'doan-sanh') {
+    // Sảnh hằng ngày: vé, chuỗi/rương, Đoàn lớp, Trùm lớp. Chưa chạy migration bước 5 → `sanh:null`, giao diện giữ các ô "SẮP MỞ".
+    await env.DB.prepare("DELETE FROM doan_ve_so WHERE sbd=? AND loai='tieu' AND ma_nguon IN (SELECT ma FROM doan_chang WHERE trang_thai IN ('sanh','huy') AND tao_luc<?)").bind(sbd, iso(now - PHONG_HET_HAN_MS)).run().catch(() => { /* chưa có sổ vé */ })
+    return { ok: true, sanh: await docSanh(env, sbd, now), dangDo: (await timDangDo())?.ma_chang ?? null }
+  }
+  if (action === 'doan-mo') {
+    const dangDo = await timDangDo()
     if (dangDo) return chay(env, sbd, hoSo, 'doan-xem', { ...b, ma: dangDo.ma_chang }, goiGame)
     const toi = await taoNguoi(env, sbd, hoSo, b, goiGame, now), ma = 'DH' + hex(4)
+    await quaCongVe(env, sbd, ma, now) // chặng đầu ngày miễn phí; chặng thêm trừ 1 vé; hết vé → lời chỉ cách kiếm vé
     const phong: PhongDoan = { kind: 'doan-phong', chu: sbd, taoLuc: now, nguoi: [toi], chang: null, hiepLuc: 0, nop: {}, nopY: {}, tinHieu: {}, the: {}, daGiup: [], choGhi: [], trum: {}, giaoY: {}, ketLuc: null }
     if (b.cheDo !== 'phong') { Object.assign(phong, await chonCauTrum(env, ma, phong.nguoi, now)); batDau(phong, ma, now) }
     await env.DB.batch([
@@ -392,7 +402,10 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     if (action === 'doan-vao') {
       if (i < 0) {
         if (phong.chang || phong.nguoi.length >= SO_GHE_TOI_DA) throw new Error('Đoàn đã lên đường hoặc đã đủ bốn bạn.')
+        const khac = await timDangDo()
+        if (khac && khac.ma_chang !== ma) throw new Error('Em đang ở một đoàn khác. Em rời đoàn ấy trước rồi vào đoàn này nhé.')
         const toi = toiMoi ??= await taoNguoi(env, sbd, hoSo, b, goiGame, now)
+        await quaCongVe(env, sbd, ma, now)
         phong.nguoi.push(toi); i = phong.nguoi.length - 1; doi = true
         if (!await luuPhong(env, ma, phong, revision)) continue
         await env.DB.prepare('INSERT OR IGNORE INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) VALUES(?,?,?,?,?,?)').bind(ma, sbd, ngayVn(iso(now)), toi.lop, i, iso(now)).run()
@@ -408,6 +421,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
         phong.nguoi.splice(i, 1); if (phong.chu === sbd) phong.chu = phong.nguoi[0]?.sbd ?? sbd
         if (!await luuPhong(env, ma, phong, revision)) continue
         await env.DB.prepare('DELETE FROM doan_luot WHERE ma_chang=? AND sbd=? AND ket_luc IS NULL').bind(ma, sbd).run()
+        await hoanVe(env, sbd, ma) // chưa lên đường mà rời → hoàn vé
         return { ok: true, daRoi: true }
       }
       if (!phong.chang.ketThuc && !phong.chang.ghe[i]!.roi) { phong.chang = roiTran(phong.chang, sbd); delete phong.nop[i]; tienHanh(phong, now); doi = true }
