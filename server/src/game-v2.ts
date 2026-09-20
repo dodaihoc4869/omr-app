@@ -67,6 +67,13 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
       FROM game_v2_attempt WHERE sbd=? AND created_at>=? GROUP BY day ORDER BY day`).bind(sbd,new Date(Math.max(Date.now()-30*86400000,Date.parse(p.cutover)||0)).toISOString()).all()
     return {ok:true,history:rows.results}
   }
+  if(action==='so-tay'){
+    // ĐỌC-CHỈ cho Sổ tay dạng bài của Đảo thần thú: mọi dạng em ĐƯỢC PHÉP làm (đúng phạm vi của `start`: readScope + allowed + đề bảo vệ + phạm vi thầy đặt). `key` = q.dang ?? q.group như `advance` dùng.
+    const scope=await readScope(env,sbd),blocked=await protectedQuestions(env),control=await readGameScope(env,sbd);for(const k of control.blocked)blocked.add(k)
+    const ds=new Map<string,{key:string;ten:string;chuong:string}>()
+    for(const q of scope.pool){if(!q.reviewed||!allowed(q,scope.evidence,blocked)||control.types.length&&(!q.dang||!control.types.includes(q.dang)))continue;const key=q.dang??q.group;if(!ds.has(key))ds.set(key,{key,ten:q.tenDang||'',chuong:q.dang?.split('.')[0]??''})}
+    return {ok:true,dang:[...ds.values()].sort((a,b)=>a.key.localeCompare(b.key))}
+  }
   if(action==='rename'){if(p.choice)throw new Error('Em chọn thần thú trước khi đặt tên.');p.nickname=normalizePetName(b.name);return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}}
   if(action==='share')return {ok:true,pass:await parentPass(env,sbd)}
   if(action==='profile'){const tasks=await env.DB.prepare('SELECT id,dang FROM game_v2_task WHERE sbd=? AND completed_at IS NULL ORDER BY created_at LIMIT 20').bind(sbd).all<{id:string;dang:string}>();return {ok:true,profile:visible(p),revision,tasks:tasks.results,doanMo:await doanMoCho(env,sbd)}}
