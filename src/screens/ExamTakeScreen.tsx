@@ -66,7 +66,9 @@ import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import { docDuongVao } from '../lib/vai-tro'
 import { dungM3 } from '../components/m3'
 import ThanhTrenThiM3 from './ThanhTrenThiM3'
-import { DaiCanhBaoRoiM3, KhungKhoaM3 } from './ThongBaoThiM3'
+import { DaiBaoNheM3, DaiCanhBaoRoiM3, KhungKhoaM3 } from './ThongBaoThiM3'
+import { ngheHanMoi } from '../lib/may-chu-moi'
+import { chuBaoThemGio, hanMoiNeuKeoDai, MS_HIEN_BAO_THEM_GIO } from '../lib/them-phut'
 import DaiCauChuaLamM3, { KhungCauM3 } from './DaiCauChuaLamM3'
 import { docXemLai, doiDauXemLai, luuXemLai } from '../lib/xem-lai-sau'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
@@ -415,6 +417,30 @@ export default function ExamTakeScreen({ tuCong }: { tuCong?: TuCongHocSinh } = 
   useEffect(() => {
     if (maCaXemLai && sbdXemLai) setXemLaiSau(docXemLai(maCaXemLai, sbdXemLai))
   }, [maCaXemLai, sbdXemLai])
+  // "THÊM 5 PHÚT" (thầy duyệt 21/09, docs/hop-dong-them-phut-2109.md mục 2): phản hồi trạng thái của máy chủ có thể mang hạn MỚI của lượt này.
+  // CHỈ nhận khi muộn hơn hạn đang giữ ≥ 30 s (lib/them-phut.ts) — sớm hơn/bằng/thiếu ⇒ bỏ qua, KHÔNG BAO GIỜ rút giờ. Nhận thì đổi `attempt.hetGioLuc`
+  // theo ĐÚNG đường lưu sẵn có (setAttempt + saveAttempt ⇒ IndexedDB, tải lại vẫn đúng) và hiện một dòng báo tự tắt. Không đụng gì khác của màn thi.
+  const [baoThemGio, setBaoThemGio] = useState<string | null>(null)
+  const baoThemGioTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => {
+    const huy = ngheHanMoi((tin) => {
+      const cur = attemptRef.current
+      if (!cur || cur.submitted || cur.loai === 'baitap' || cur.maCa !== tin.maCa || cur.sbd !== tin.sbd) return
+      const keo = hanMoiNeuKeoDai(hetGioCua(cur), tin.hetGioLuc)
+      if (!keo) return
+      const next: ExamAttempt = { ...cur, hetGioLuc: keo.han }
+      attemptRef.current = next
+      setAttempt(next)
+      saveAttempt(next)
+      setBaoThemGio(chuBaoThemGio(keo.themPhut))
+      if (baoThemGioTimerRef.current) clearTimeout(baoThemGioTimerRef.current)
+      baoThemGioTimerRef.current = setTimeout(() => setBaoThemGio(null), MS_HIEN_BAO_THEM_GIO)
+    })
+    return () => {
+      huy()
+      if (baoThemGioTimerRef.current) clearTimeout(baoThemGioTimerRef.current)
+    }
+  }, [])
   const saveFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [online, setOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true))
   const gapVibratedRef = useRef(false)
@@ -3288,6 +3314,21 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="alert" data-canh-bao={canhBaoRoi.muc}>
             <OThongBao tone={canhBaoRoi.muc === 'dam' ? 'do' : 'cam'}>
               <b>{canhBaoRoi.loi}</b>
+            </OThongBao>
+          </div>
+        ))}
+
+      {/* DÒNG BÁO "Thầy cho thêm N phút" — nhẹ, tự tắt; nhường chỗ cho cảnh báo rời màn (cùng vị trí dính) */}
+      {baoThemGio &&
+        !canhBaoRoi &&
+        (dungM3() ? (
+          <div className="sticky z-30" style={{ top: 56 }} role="status" data-bao-them-gio>
+            <DaiBaoNheM3 chu={baoThemGio} />
+          </div>
+        ) : (
+          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="status" data-bao-them-gio>
+            <OThongBao tone="xanh">
+              <b>{baoThemGio}</b>
             </OThongBao>
           </div>
         ))}

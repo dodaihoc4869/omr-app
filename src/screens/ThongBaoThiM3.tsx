@@ -1,6 +1,6 @@
 // CẢNH BÁO RỜI MÀN + THẺ KHOÁ BÀI của màn thi thật, bản Material 3 (bản vẽ ThiCanhBao / ThiVaoVaKhoa). CHỈ đổi dáng: câu chữ, mức (nhe/dam), role="alert",
 // vị trí dính dưới thanh trên và mọi hành động do màn thi giữ nguyên/truyền vào. Chỉ dùng khi dungM3() (đường học sinh/phụ huynh).
-import { TriangleAlert } from 'lucide-react'
+import { Clock, TriangleAlert } from 'lucide-react'
 import type { ReactNode } from 'react'
 import './man-thi-m3.css'
 
@@ -17,4 +17,14 @@ export function DaiCanhBaoRoiM3({ muc, loi }: { muc: 'nhe' | 'dam'; loi: string 
 /** Khung của thẻ "BÀI THI ĐÃ KHOÁ": errorContainer, chữ onErrorContainer (thay TheNoiDung). Nội dung bên trong do màn thi truyền vào, không đổi. */
 export function KhungKhoaM3({ children }: { children: ReactNode }) {
   return <div className="thi-khoa">{children}</div>
+}
+
+/** Dòng báo nhẹ "Thầy cho thêm N phút" (tự tắt): nền tonal, KHÔNG phải cảnh báo. `chu` do màn thi dựng từ lib/them-phut.ts. */
+export function DaiBaoNheM3({ chu }: { chu: string }) {
+  return (
+    <div className="thi-bao-nhe">
+      <Clock size={20} aria-hidden="true" />
+      <div className="thi-bao-nhe-chu">{chu}</div>
+    </div>
+  )
 }

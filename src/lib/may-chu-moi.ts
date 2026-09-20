@@ -351,10 +351,35 @@ export interface TrangThaiEm {
 /** ĐẨY TRẠNG THÁI LÀM BÀI. `null` ⇒ chỗ gọi đi Apps Script.
  *
  * Chỉ thử MỘT lần: nhịp sau tới sau mười giây, cố ở đây chỉ tổ giữ chân em. */
+/** HẠN MỚI DO THẦY THÊM GIỜ ("Thêm 5 phút"): phản hồi `/trang-thai` có thể mang `hetGioLuc` (ISO, hạn hiện hành của ĐÚNG lượt vừa báo). Màn thi đăng ký nghe
+ *  ở đây thay vì đổi chữ ký `trangThaiMoi`/`pushExamStatus` (nhiều chỗ khoá nguyên văn). Chỉ báo khi máy chủ nói ok và trường là chuỗi; việc có nhận hay
+ *  không (chỉ kéo dài ≥ 30 s) do người nghe quyết — xem lib/them-phut.ts. Người nghe lỗi không bao giờ làm hỏng lượt báo trạng thái. */
+export interface TinHanMoi {
+  maCa: string
+  sbd: string
+  hetGioLuc: string
+}
+const nguoiNgheHanMoi = new Set<(tin: TinHanMoi) => void>()
+export function ngheHanMoi(nguoiNghe: (tin: TinHanMoi) => void): () => void {
+  nguoiNgheHanMoi.add(nguoiNghe)
+  return () => {
+    nguoiNgheHanMoi.delete(nguoiNghe)
+  }
+}
+
 export async function trangThaiMoi(ch: CauHinhMayChu, tt: TrangThaiEm): Promise<boolean | null> {
   // Không cần tự kiểm cờ ở đây — `goiWorker` đã chốt `!ch.BAT || !ch.URL` ngay
   // dòng đầu. Thêm một chốt nữa chỉ tạo ra một dòng không phép kiểm nào chạm tới.
-  const r = await goiWorker<{ ok: boolean }>(ch, '/trang-thai', tt, nhipNong(ch))
+  const r = await goiWorker<{ ok: boolean; hetGioLuc?: unknown }>(ch, '/trang-thai', tt, nhipNong(ch))
+  if (r && r.ok && typeof r.hetGioLuc === 'string') {
+    for (const nguoiNghe of [...nguoiNgheHanMoi]) {
+      try {
+        nguoiNghe({ maCa: tt.maCa, sbd: tt.sbd, hetGioLuc: r.hetGioLuc })
+      } catch {
+        /* người nghe hỏng không được làm hỏng lượt báo trạng thái */
+      }
+    }
+  }
   return r ? !!r.ok : null
 }
 
