@@ -8,7 +8,10 @@ export const PHUT_MOI_LAN = 5
 
 export interface KetQuaThemPhut {
   phut: number
+  /** Lượt ĐANG LÀM được cộng giờ. */
   soLuotCong: number
+  /** Lượt đang bị KHOÁ cũng được cộng (mở khoá sau đó không thiệt giờ). Máy chủ cũ chưa trả ⇒ 0. */
+  soLuotKhoaCong: number
   thoiGianPhut: number
   themPhutTong: number
 }
@@ -45,10 +48,15 @@ export async function themPhutCa(maCa: string, phut: number = PHUT_MOI_LAN): Pro
   } catch {
     throw new Error('Máy chủ trả lời không đọc được — chưa chắc đã cộng giờ, hãy bấm Làm mới để xem giờ hiện tại.')
   }
-  if (!res.ok || j.ok !== true) throw new Error(String(j.error || j.loi || 'Máy chủ không cho thêm phút.'))
+  if (!res.ok || j.ok !== true) {
+    const goc = String(j.error || j.loi || 'Máy chủ không cho thêm phút.')
+    // `thuLai`: có lệnh khác chen vào giữa lúc đọc và ghi — máy chủ KHÔNG đổi gì; nói rõ để thầy bấm lại được mà không lo cộng đôi.
+    throw new Error(j.thuLai === true && !/bấm lại|thử lại/i.test(goc) ? `${goc} Chưa cộng gì — bấm Thêm ${phut} phút lần nữa.` : goc)
+  }
   return {
     phut: Number(j.phut) || phut,
     soLuotCong: Number(j.soLuotCong) || 0,
+    soLuotKhoaCong: Number(j.soLuotKhoaCong) || 0,
     thoiGianPhut: Number(j.thoiGianPhut) || 0,
     themPhutTong: Number(j.themPhutTong) || 0,
   }
@@ -56,7 +64,9 @@ export async function themPhutCa(maCa: string, phut: number = PHUT_MOI_LAN): Pro
 
 /** Câu báo kết quả — nói đúng số máy chủ trả. */
 export function cauKetQuaThemPhut(k: KetQuaThemPhut): string {
-  return k.soLuotCong > 0 ? `Đã cộng ${k.phut} phút cho ${k.soLuotCong} em đang làm` : `Đã cộng ${k.phut} phút cho ca — hiện chưa có em nào đang làm`
+  const khoa = k.soLuotKhoaCong > 0 ? `${k.soLuotKhoaCong} em đang bị khoá` : ''
+  if (k.soLuotCong > 0) return `Đã cộng ${k.phut} phút cho ${k.soLuotCong} em đang làm${khoa ? ` và ${khoa}` : ''}`
+  return `Đã cộng ${k.phut} phút cho ca — hiện chưa có em nào đang làm${khoa ? `; ${khoa} cũng được cộng` : ''}`
 }
 
 /** "784817" → "784 817" (tách nhóm 3 số từ trái, cho dễ đọc từ xa). */

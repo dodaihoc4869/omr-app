@@ -65,12 +65,12 @@ describe('themPhutCa — không giả thành công', () => {
   const chay = async () => (await vi.importActual<typeof import('../src/lib/them-phut-api')>('../src/lib/them-phut-api')).themPhutCa('784817', 5)
 
   it('POST /ca/them-phut {maCa, phut} kèm x-ma-bi-mat; trả đúng số máy chủ trả', async () => {
-    stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, phut: 5, soLuotCong: 8, thoiGianPhut: 55, themPhutTong: 5 }) }))
+    stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, phut: 5, soLuotCong: 8, soLuotKhoaCong: 2, thoiGianPhut: 55, themPhutTong: 5 }) }))
     const kq = await chay()
     expect(goi.mock.calls[0][0]).toBe('https://may.test/ca/them-phut')
     expect(JSON.parse(String(goi.mock.calls[0][1].body))).toEqual({ maCa: '784817', phut: 5 })
     expect(goi.mock.calls[0][1].headers['x-ma-bi-mat']).toBe('mat-thu')
-    expect(kq).toEqual({ phut: 5, soLuotCong: 8, thoiGianPhut: 55, themPhutTong: 5 })
+    expect(kq).toEqual({ phut: 5, soLuotCong: 8, soLuotKhoaCong: 2, thoiGianPhut: 55, themPhutTong: 5 })
   })
 
   it('máy chủ CHƯA CÓ lệnh (404) → ném lỗi thật, không thành công giả', async () => {
@@ -97,9 +97,24 @@ describe('themPhutCa — không giả thành công', () => {
     await expect(chay()).rejects.toThrow(/chưa chắc đã cộng giờ/)
   })
 
-  it('câu báo kết quả và định dạng mã', () => {
-    expect(cauKetQuaThemPhut({ phut: 5, soLuotCong: 8, thoiGianPhut: 55, themPhutTong: 5 })).toBe('Đã cộng 5 phút cho 8 em đang làm')
-    expect(cauKetQuaThemPhut({ phut: 5, soLuotCong: 0, thoiGianPhut: 55, themPhutTong: 5 })).toBe('Đã cộng 5 phút cho ca — hiện chưa có em nào đang làm')
+  it('máy chủ cũ chưa trả soLuotKhoaCong → 0 (không vỡ)', async () => {
+    stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, phut: 5, soLuotCong: 3, thoiGianPhut: 55, themPhutTong: 5 }) }))
+    expect((await chay()).soLuotKhoaCong).toBe(0)
+  })
+
+  it('từ chối có thuLai (lệnh khác chen vào): giữ lời máy chủ + nói rõ CHƯA cộng gì, bấm lại được', async () => {
+    stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: false, thuLai: true, error: 'Có lệnh khác vừa đổi giờ ca này.' }) }))
+    await expect(chay()).rejects.toThrow('Có lệnh khác vừa đổi giờ ca này. Chưa cộng gì — bấm Thêm 5 phút lần nữa.')
+    stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: false, thuLai: true, error: 'Vừa có lệnh khác, hãy bấm lại.' }) }))
+    await expect(chay()).rejects.toThrow('Vừa có lệnh khác, hãy bấm lại.') // đã dặn bấm lại thì không thêm câu
+  })
+
+  it('câu báo kết quả và định dạng mã: có em bị khoá thì báo thêm "và N em đang bị khoá"', () => {
+    const k = { phut: 5, soLuotCong: 8, soLuotKhoaCong: 0, thoiGianPhut: 55, themPhutTong: 5 }
+    expect(cauKetQuaThemPhut(k)).toBe('Đã cộng 5 phút cho 8 em đang làm')
+    expect(cauKetQuaThemPhut({ ...k, soLuotKhoaCong: 2 })).toBe('Đã cộng 5 phút cho 8 em đang làm và 2 em đang bị khoá')
+    expect(cauKetQuaThemPhut({ ...k, soLuotCong: 0 })).toBe('Đã cộng 5 phút cho ca — hiện chưa có em nào đang làm')
+    expect(cauKetQuaThemPhut({ ...k, soLuotCong: 0, soLuotKhoaCong: 1 })).toBe('Đã cộng 5 phút cho ca — hiện chưa có em nào đang làm; 1 em đang bị khoá cũng được cộng')
     expect(dinhDangMa('784817')).toBe('784 817')
     expect(dinhDangMa('1234567')).toBe('123 456 7')
     expect(dinhDangMa('12')).toBe('12')
@@ -136,7 +151,7 @@ describe('KhoiThoiGianCa · Thêm 5 phút', () => {
   })
 
   it('Đồng ý → gọi ĐÚNG MỘT lần; báo đúng số máy chủ trả; gọi onXong; hiện "Đã thêm X phút"', async () => {
-    m.them.mockResolvedValue({ phut: 5, soLuotCong: 8, thoiGianPhut: 55, themPhutTong: 5 })
+    m.them.mockResolvedValue({ phut: 5, soLuotCong: 8, soLuotKhoaCong: 0, thoiGianPhut: 55, themPhutTong: 5 })
     const onXong = vi.fn()
     dung({}, { tong: 0, chay: m.them, onXong })
     fireEvent.click(screen.getByRole('button', { name: 'Thêm 5 phút' }))
@@ -220,7 +235,7 @@ describe('ExamMonitorScreen', () => {
   })
 
   it('Thêm 5 phút trên màn: Đồng ý → gọi lệnh với đúng mã ca, báo toast đúng số, TẢI LẠI ca; "Đã thêm 5 phút" từ máy chủ', async () => {
-    m.them.mockResolvedValue({ phut: 5, soLuotCong: 1, thoiGianPhut: 55, themPhutTong: 10 })
+    m.them.mockResolvedValue({ phut: 5, soLuotCong: 1, soLuotKhoaCong: 0, thoiGianPhut: 55, themPhutTong: 10 })
     await mo()
     expect(screen.getByText('Đã thêm 5 phút')).toBeTruthy()
     const truoc = m.detail.mock.calls.length

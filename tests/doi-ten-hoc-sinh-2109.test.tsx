@@ -75,6 +75,11 @@ describe('doiTenHocSinh — không giả thành công', () => {
     expect((await chay('Lê Minh Đức')).khongDoi).toBe(true)
   })
 
+  it('trùng tên theo máy chủ thật: {ok:false, khongDoi:true, error} → trả cờ khongDoi (không ném lỗi, không ghi)', async () => {
+    stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: false, khongDoi: true, error: 'Tên mới trùng tên cũ.' }) }))
+    expect((await chay('Lê Minh Đức')).khongDoi).toBe(true)
+  })
+
   it('mất mạng / quá 15 s bị huỷ / trả lời không đọc được → "chưa chắc đã đổi tên" (không khẳng định chưa đổi)', async () => {
     vi.stubGlobal('fetch', async () => {
       throw new TypeError('Failed to fetch')

@@ -55,6 +55,8 @@ export async function doiTenHocSinh(sbd: string, hoTen: string): Promise<KetQuaD
   } catch {
     throw new Error('Máy chủ trả lời không đọc được — chưa chắc đã đổi tên. Mở lại hồ sơ để xem tên hiện tại.')
   }
+  // Trùng tên cũ: máy chủ trả {ok:false, khongDoi:true, error} và KHÔNG ghi — không phải lỗi, để màn nói "không có gì để đổi".
+  if (j.khongDoi === true) return { sbd: String(j.sbd ?? sbd), tenCu: String(j.tenCu ?? ''), tenMoi: String(j.tenMoi ?? hoTen), khongDoi: true, soDong: {} }
   if (!res.ok || j.ok !== true) throw new Error(String(j.error || j.loi || 'Máy chủ không cho đổi tên.'))
   const soDong: Record<string, number> = {}
   for (const [k, v] of Object.entries((j.soDong ?? {}) as Record<string, unknown>)) soDong[k] = Number(v) || 0
