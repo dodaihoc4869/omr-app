@@ -105,16 +105,22 @@ describe('ho-so-em-thay: gọi máy chủ (chỉ đọc)', () => {
     expect(await lib.layHoSoNamKt('12001')).toBeNull()
   })
 
-  it('/hs/ke-hoach-ngay: POST {sbd}, KHÔNG gửi mã bí mật (lệnh công khai theo SBD)', async () => {
-    const goi: { url: string; init: RequestInit }[] = []
-    vi.stubGlobal('fetch', async (url: string, init: RequestInit) => {
-      goi.push({ url, init })
+  it('layKeHoachEm: TẠM KHÔNG gọi máy chủ (`/hs/ke-hoach-ngay` là lệnh CÓ GHI — nuốt thông báo EXP của em); trả null → màn "đang chờ máy chủ"', async () => {
+    const goi = vi.fn()
+    vi.stubGlobal('fetch', async (...a: unknown[]) => {
+      goi(...a)
       return { ok: true, json: async () => ({ ok: true, ngay: '2026-09-21', viec: [] }) }
     })
     const lib = await nap()
-    expect((await lib.layKeHoachEm('12001'))?.ngay).toBe('2026-09-21')
-    expect(goi[0].url).toBe('https://may.test/hs/ke-hoach-ngay')
-    expect((goi[0].init.headers as Record<string, string>)['x-ma-bi-mat']).toBeUndefined()
+    expect(await lib.layKeHoachEm('12001')).toBeNull()
+    expect(goi).not.toHaveBeenCalled()
+  })
+
+  it('nguồn: không còn đường nào từ hồ sơ thầy tới lệnh `/hs/*` (lệnh của em, có ghi)', () => {
+    for (const f of ['src/lib/ho-so-em-thay.ts', 'src/components/KhoiHoSoHocTap.tsx', 'src/screens/HocSinhScreen.tsx']) {
+      const goc = fs.readFileSync(path.join(process.cwd(), f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '')
+      expect(goc, f).not.toMatch(/['"`]\/hs\//)
+    }
   })
 })
 

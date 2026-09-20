@@ -1,6 +1,6 @@
 /** SỐ LIỆU MỘT EM cho màn Học sinh của thầy (G3) — chỉ ĐỌC, gọi hai lệnh sẵn có của máy chủ, không ghi gì.
  *   · `/ho-so/xem {sbd}` (mã bí mật thầy)  → hồ sơ nắm kiến thức của em: `cau[]` (từng câu: trạng thái, mốc ôn kế) + `dang[]`.
- *   · `/hs/ke-hoach-ngay {sbd}` (không cần mã) → kế hoạch hôm nay của em: ngân sách, các việc, tiến bộ, thần thú, EXP hôm nay.
+ *   · kế hoạch hôm nay của em (ngân sách, việc, tiến bộ, thần thú, EXP) — CHỜ lệnh chỉ đọc `/gv/ke-hoach-em` của Code 3 (xem `layKeHoachEm`).
  *  Mọi con số trên màn truy được về một trường của hai lệnh này; lệnh lỗi / chưa có ⇒ `null` và màn hiện "đang chờ máy chủ", KHÔNG bịa số.
  *  Không kết luận năng lực từ điểm: chỉ đếm câu theo trạng thái hồ sơ. Không in "nắm chắc". */
 import { layCauHinhMayChu } from './may-chu-moi'
@@ -64,9 +64,13 @@ export interface KeHoachEm {
   exp?: { homNay?: number } | null
 }
 
-export async function layKeHoachEm(sbd: string): Promise<KeHoachEm | null> {
-  const j = await goi('/hs/ke-hoach-ngay', { sbd }, false)
-  return j ? (j as unknown as KeHoachEm) : null
+/** TẠM KHÔNG GỌI MÁY CHỦ (Boss chốt 21/09): `/hs/ke-hoach-ngay` là lệnh CÓ GHI — mỗi lần gọi nó dựng kế hoạch ngày và chạy `capNhatExp`, trả
+ *  `expNhan` MỘT LẦN cho em; thầy mở hồ sơ mà gọi nó là NUỐT thông báo EXP của em. Khối "Kế hoạch hôm nay" và "Thần thú · EXP" hiện
+ *  "đang chờ máy chủ" cho tới khi Code 3 có lệnh chỉ đọc `/gv/ke-hoach-em {sbd}` (mã bí mật, cùng dạng trường `KeHoachEm`) — lúc đó chỉ đổi
+ *  thân hàm này. KHÔNG được nối lại vào `/hs/*`. */
+export async function layKeHoachEm(_sbd: string): Promise<KeHoachEm | null> {
+  void _sbd
+  return null
 }
 
 /** Ngày Việt Nam (YYYY-MM-DD) của một thời điểm — cùng mốc "ngày" với `ngay_vn` của máy chủ. */
