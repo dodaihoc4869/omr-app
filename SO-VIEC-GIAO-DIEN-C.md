@@ -186,6 +186,15 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 - Ghi chú: hai test đỏ lúc chạy vùng liên quan (`man-ca-thi-may-chu-moi-1109 "ghi theo lô"`, `goi-len-bang-to-chieu-cham-1909 "KHÔNG ĐẠT"`) đỏ CẢ KHI HopChonDe là bản HEAD — do WIP tờ chiếu của Code 1 (html-may-chieu/to-chieu-cau-noi đang sửa), không phải của em; `uoc-luong-bo-cuc-1909` (6 test) cũng của Code 1
 - Ảnh: docs/anh-gv-trong-1909 (`gv-trong-<màn>-{390-sang,390-toi,1280-sang}`, `tt-*`, `toan-trang-giaobtvn-giao-moi-390`)
 
+## RÀ CUỐI M3 SÁNG + TỐI (Boss giao 21/09) — sau các đợt của phiên khác
+
+- [x] Quét Chromium 390 px, 22 trạng thái × sáng + tối (phòng vào thi, thông báo HS, luyện đề chuẩn, khắc phục 4 chế độ, báo cáo ca HS + PH, ô mã ca, phòng chờ, modal khắc phục, tấm Hỏi bài Thầy, Bảng tin HS/PH/trống, khung xem phiếu, trang phiếu + vỏ lỗi, đăng nhập HS + PH, thanh logo): lỗi trang, tràn ngang, đích chạm < 44 px, chữ dưới ngưỡng tương phản (4,5:1; 3:1 chữ lớn)
+- [x] Tìm ra và SỬA: (1) `.btn-google-primary` nền tối chữ trắng trên xanh nhạt 2,11:1 (nút "Đăng nhập" HS) → d5e5dab, chỉ nút nền xanh mặc định (`:not([class*='!bg-'])`; nút rose/purple/emerald/amber của game + cổng HS giữ chữ trắng); (2) chữ nút "Xem đề … vừa làm" 4,47:1 → chàm đậm ≥ 4,5:1 (ad3917a); (3) huy hiệu "đáp án đúng" 2,54:1 / "em chọn" 3,76:1 của TheCauChiTiet (nợ A2) → token giấy `--p-xanh-dam` / `--p-do-dam` (commit sau ad3917a); (4) form đăng nhập HS 42 px, nút mắt 16 px không aria-label → Code 2 sửa bf36218 (em đo lại: 0 đích < 44, 0 chữ dưới ngưỡng, sáng + tối)
+- [x] Còn lại sau rà: 0 đích chạm < 44 (checkbox 24 px của luyện đề nằm trong nhãn 334×48 → đạt), 0 chữ dưới ngưỡng ở mọi thành phần của em; DUY NHẤT còn: chip "Khá" 4,06:1 (12,5 px) trong báo cáo giấy v2 (css-bao-cao, không phải của em, hiếm gặp: link báo cáo cũ)
+- [x] TheCau commit 2 KHÔNG cần: Code 2 làm C10 (đặt `m3` ở gốc ExamTakeScreen theo cách (a)); em sẽ chụp thẻ câu 3 phần sáng + tối ở màn thi thật sau khi Code 2 commit
+- [x] Toàn vitest 21/09: 132 đỏ / 50 tệp; đỏ MỚI 34 so với lần chạy trước, TẤT CẢ ở tệp máy chủ của Code 3 đang sửa dở (server/src/reset-toan-app.ts, exp-d1.ts, game-v2-auth.ts, game-v2-bank.ts modified; tests reset-toan-app-1909 ×29, kenh4-than-thu ×3, cau-theo-qid, ho-so-len-bang-may-chu, ke-hoach-than-thu, man-ca-thi, nhiem-vu-adapter); 0 test của em đỏ
+- [ ] CHỜ: hợp đồng token phụ huynh của Code 3 → cổng PH nhận `?ph=…` (giai đoạn mềm, SBD trần vẫn vào); Code 3 xác nhận `cau_hoi_em.da_xoa` trên D1 thật
+
 ## Trạng thái cuối phiên — 19/09 15:50
 
 - Việc còn mở: (1) chờ 0.Planer soát 70d3408 (đã soát), e1555a4 (đã soát), 564dc08, 5d0d1c4, b72ca8d; (2) TheCau bật ở màn thi = Code 2 đặt `m3` ở gốc ExamTakeScreen (đã thoả thuận, Code 2 xác nhận cách (a)); (3) KhoiBaiLuyen + TheCauChiTiet để nguyên (đề nghị, chờ đồng ý); (4) nợ cũ ngoài phạm vi: 4 cặp chữ nhỏ --p-do/--p-xanh của TheCauChiTiet dưới 4,5:1 (tokens.css); (5) dọn: thư mục tạm `.claude/m3-xem/` (trang xem thử, KHÔNG commit) — xoá được
