@@ -2355,6 +2355,8 @@ export interface ChiTietCa {
   demSaiTheoEm?: Record<string, Record<string, number>>
   /** Biên bản lúc rút đề riêng, đọc từ máy chủ. */
   bienBanDeRieng?: Record<string, unknown> | null
+  /** Tổng số phút thầy đã "Thêm phút" cho ca (máy chủ có lệnh /ca/them-phut mới trả; vắng = 0 hoặc máy chủ cũ). */
+  themPhutTong?: number
 }
 
 /** Một lượt bị cổng vào thi chặn. `lyDo` do máy chủ đặt:
@@ -2423,6 +2425,7 @@ function doiChiTietCaMoi(j: Record<string, unknown>): ChiTietCa {
     lapTheoEm: ((j.boTheoEmCa as { lap?: Record<string, string[]> } | null)?.lap) ?? undefined,
     demSaiTheoEm: ((j.boTheoEmCa as { dem?: Record<string, Record<string, number>> } | null)?.dem) ?? undefined,
     bienBanDeRieng: ((j.boTheoEmCa as { bb?: Record<string, unknown> } | null)?.bb) ?? undefined,
+    ...(Number.isFinite(Number(j.themPhutTong ?? c.themPhutTong)) && (j.themPhutTong ?? c.themPhutTong) != null ? { themPhutTong: Number(j.themPhutTong ?? c.themPhutTong) } : {}),
   }
 }
 

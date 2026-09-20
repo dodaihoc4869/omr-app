@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { PHUT_MOI_LAN, cauKetQuaThemPhut, type KetQuaThemPhut } from '../lib/them-phut-api'
 import { conLaiCa, dinhDangDongHo } from '../lib/con-lai-ca'
 import { gioMayChu } from '../lib/gio-may-chu'
 
@@ -12,6 +13,15 @@ export interface CaGioHienThi {
   dongBoGio?: boolean
   thoiGianPhut: number
   hetHanVao?: string
+  /** 'baitap' = bài tập về nhà (hạn theo han_nop) — không có "thêm phút". */
+  loai?: string
+}
+
+/** "Thêm 5 phút" (thầy duyệt 21/09, hợp đồng docs/hop-dong-them-phut-2109.md): `chay` gọi lệnh máy chủ, `onXong` để màn tải lại ca + báo. */
+export interface ThemPhutProps {
+  tong?: number
+  chay: () => Promise<KetQuaThemPhut>
+  onXong?: (k: KetQuaThemPhut) => void
 }
 
 function gioPhut(iso: string): string {
@@ -19,8 +29,11 @@ function gioPhut(iso: string): string {
   return Number.isFinite(d.getTime()) ? d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''
 }
 
-export default function KhoiThoiGianCa({ ca }: { ca: CaGioHienThi }) {
+export default function KhoiThoiGianCa({ ca, themPhut }: { ca: CaGioHienThi; themPhut?: ThemPhutProps }) {
   const [now, setNow] = useState(() => gioMayChu())
+  const [buoc, setBuoc] = useState<'nghi' | 'hoi' | 'dang'>('nghi')
+  const [ketQua, setKetQua] = useState<{ ok: boolean; chu: string } | null>(null)
+  const [tongMoi, setTongMoi] = useState<number | null>(null)
   const coChung = conLaiCa(ca, gioMayChu()) !== null
   useEffect(() => {
     if (!coChung) return
@@ -29,6 +42,22 @@ export default function KhoiThoiGianCa({ ca }: { ca: CaGioHienThi }) {
     return () => clearInterval(t)
   }, [coChung])
   const cl = conLaiCa(ca, now)
+  const coThemPhut = !!themPhut && ca.trangThai === 'mo' && ca.loai !== 'baitap'
+  const tong = tongMoi ?? themPhut?.tong ?? 0
+  const chayThemPhut = async () => {
+    if (!themPhut) return
+    setBuoc('dang')
+    try {
+      const k = await themPhut.chay()
+      setTongMoi(k.themPhutTong)
+      setKetQua({ ok: true, chu: cauKetQuaThemPhut(k) })
+      setBuoc('nghi')
+      themPhut.onXong?.(k)
+    } catch (e) {
+      setKetQua({ ok: false, chu: e instanceof Error ? e.message : 'Không thêm được phút.' })
+      setBuoc('nghi')
+    }
+  }
   const daHet = cl !== null && cl.conLaiMs === 0
   let so: string
   let phu: string
@@ -54,6 +83,41 @@ export default function KhoiThoiGianCa({ ca }: { ca: CaGioHienThi }) {
         </span>
         <span className="ca-gio-phu">{phu}</span>
       </div>
+      {coThemPhut && (
+        <div className="ca-them">
+          {tong > 0 && <p className="ca-them-tong">Đã thêm {tong} phút</p>}
+          {buoc === 'nghi' && (
+            <button
+              type="button"
+              className="ca-nut-them"
+              onClick={() => {
+                setKetQua(null)
+                setBuoc('hoi')
+              }}
+            >
+              Thêm {PHUT_MOI_LAN} phút
+            </button>
+          )}
+          {buoc !== 'nghi' && (
+            <div className="ca-xac-nhan" role="group" aria-label={`Xác nhận thêm ${PHUT_MOI_LAN} phút`}>
+              <p>Cả phòng thêm {PHUT_MOI_LAN} phút. Em đang làm nhận giờ mới trong khoảng 10 giây; em mất mạng sẽ không nhận được.</p>
+              <div className="ca-xac-nhan-nut">
+                <button type="button" className="ca-nut-them ca-nut-them--chinh" disabled={buoc === 'dang'} onClick={() => void chayThemPhut()}>
+                  {buoc === 'dang' ? 'Đang cộng…' : `Đồng ý thêm ${PHUT_MOI_LAN} phút`}
+                </button>
+                <button type="button" className="ca-nut-them" disabled={buoc === 'dang'} onClick={() => setBuoc('nghi')}>
+                  Huỷ
+                </button>
+              </div>
+            </div>
+          )}
+          {ketQua && (
+            <p className={`ca-them-ket-qua${ketQua.ok ? '' : ' ca-them-ket-qua--loi'}`} role={ketQua.ok ? 'status' : 'alert'}>
+              {ketQua.chu}
+            </p>
+          )}
+        </div>
+      )}
     </section>
   )
 }

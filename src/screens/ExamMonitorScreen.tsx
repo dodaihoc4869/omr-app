@@ -36,6 +36,8 @@ import { useAppStore } from '../store/appStore'
 import { cuaVaoCa } from '../lib/cua-vao-ca'
 import { trangThaiCa } from './LichSuCaScreen'
 import KhoiThoiGianCa from '../components/KhoiThoiGianCa'
+import TamPhuChieuMa from '../components/TamPhuChieuMa'
+import { themPhutCa, cauKetQuaThemPhut } from '../lib/them-phut-api'
 import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
@@ -225,6 +227,8 @@ export default function ExamMonitorScreen() {
   const [soCauCa, setSoCauCa] = useState<SoCauMoiPhan | undefined>(undefined)
   // TAB LỌC danh sách em (G4): chỉ đổi cái được hiện. Mặc định 'tat_ca' để thầy không bị ẩn em nào lúc mới mở.
   const [tabEm, setTabEm] = useState('tat_ca')
+  // CHIẾU MÃ VÀO THI (thầy duyệt 21/09): tấm phủ toàn màn cho máy chiếu.
+  const [chieuMa, setChieuMa] = useState(false)
   const [daCopy, setDaCopy] = useState(false)
   const [daCopyDiem, setDaCopyDiem] = useState(false)
   const [xacNhanSbd, setXacNhanSbd] = useState<string | null>(null)
@@ -1058,6 +1062,12 @@ export default function ExamMonitorScreen() {
               </h1>
               {chiTiet && <Pencil size={16} className="shrink-0" style={{ color: 'var(--nhat)' }} />}
             </button>
+            <span className="flex items-center shrink-0" style={{ gap: 'var(--k2)' }}>
+            {chiTiet && (
+              <button type="button" className="ca-nut-chieu" onClick={() => setChieuMa(true)}>
+                Chiếu mã vào thi
+              </button>
+            )}
             <button
               type="button"
               onClick={() => setScreen('lichsuca')}
@@ -1067,6 +1077,7 @@ export default function ExamMonitorScreen() {
               <ArrowLeft size={15} className="text-slate-600 dark:text-slate-300" />
               <span>Lịch sử ca</span>
             </button>
+            </span>
           </>
         )}
       </div>
@@ -1141,7 +1152,17 @@ export default function ExamMonitorScreen() {
         <>
           <div className="ca-luoi">
           <div className="ca-cot ca-cot-phai">
-          <KhoiThoiGianCa ca={chiTiet.ca} />
+          <KhoiThoiGianCa
+            ca={chiTiet.ca}
+            themPhut={{
+              tong: chiTiet.themPhutTong,
+              chay: () => themPhutCa(chiTiet.ca.maCa),
+              onXong: (k) => {
+                showToast(cauKetQuaThemPhut(k), 'success')
+                void tai(chiTiet.ca.maCa, true) // tải lại: giờ hết chung mới (thoiGianPhut đã cộng) hiện ngay ở đồng hồ
+              },
+            }}
+          />
           {/* THÔNG TIN CA */}
           <TheNoiDung className="gv-monitor-overview">
             <div className="gv-page-header flex items-start justify-between flex-wrap" style={{ gap: 'var(--k3)' }}>
@@ -1923,6 +1944,16 @@ export default function ExamMonitorScreen() {
       )}
 
       {/* MODAL BÁO CÁO CA THI HỌC SINH CHUẨN GOOGLE MATERIAL 3 */}
+      {chieuMa && chiTiet && (
+        <TamPhuChieuMa
+          maCa={chiTiet.ca.maCa}
+          tenCa={chiTiet.ca.tenCa || ''}
+          diaChi={`${location.host}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`}
+          soEmCho={chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc ? (chiTiet.dsCho ?? []).length : null}
+          onDong={() => setChieuMa(false)}
+        />
+      )}
+
       {sbdHoSo && (
         <BaoCaoCaThiHocSinhModal
           baiThi={goiBaiThi(

@@ -312,7 +312,7 @@ describe('nguồn màn theo dõi ca', () => {
   const css = fs.readFileSync(path.join(process.cwd(), 'src/screens/ca-thi-m3.css'), 'utf8')
   it('màn nhập css riêng và dùng thẻ Thời gian + thanh tab', () => {
     expect(src).toContain("import './ca-thi-m3.css'")
-    expect(src).toContain('<KhoiThoiGianCa ca={chiTiet.ca} />')
+    expect(src).toMatch(/<KhoiThoiGianCa\s+ca=\{chiTiet\.ca\}/) // nay có thêm prop themPhut (thầy duyệt 21/09)
     expect(src).toContain('<ThanhTabCa ')
   })
   it('các câu cảnh báo của luồng thi thật còn nguyên trong nguồn', () => {
