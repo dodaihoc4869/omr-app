@@ -68,7 +68,7 @@ export default function DoanTran(p: Props) {
       <div style={{ position: 'absolute', left: 8, right: 8, bottom: 6, display: 'flex', justifyContent: 'space-between' }}>
         {xem.ghe.map((g, i) => <ThuHinh key={g.ghe} pet={g.pet} cap={g.cap} size={56} quayTrai={i >= xem.ghe.length / 2} className="dh-noi-2" style={{ animationDelay: `${i * .3}s` }} />)}
       </div>
-      <div className="dh-canh-the" style={{ right: 12, top: 56, color: '#c8f6ff' }}>Linh Tâm {tran.linhTam.hp}</div>
+      <div className="dh-canh-the" style={{ right: 12, top: 56, color: 'rgb(200,246,255)' }}>Linh Tâm {tran.linhTam.hp}</div>
     </div>
   ) : (
     <div className="dh-canh" aria-label={`Linh Tâm còn ${tran.linhTam.hp} máu, ${tran.quai.length} ${tenQuai} trên sân`}>
@@ -84,8 +84,8 @@ export default function DoanTran(p: Props) {
           </div>
         ))}
       </div>
-      <div className="dh-canh-the" style={{ left: '20%', bottom: 8, color: '#c8f6ff', boxShadow: 'inset 0 0 0 1px rgba(127,233,255,.5)' }}>Linh Tâm {tran.linhTam.hp}</div>
-      <div className="dh-canh-the" style={{ right: 10, bottom: 8, color: '#e6ff7a', boxShadow: 'inset 0 0 0 1px rgba(230,255,122,.5)' }}>{tran.quai.length ? `${tenQuai} ×${tran.quai.length}` : 'Sân đã sạch'}</div>
+      <div className="dh-canh-the" style={{ left: '20%', bottom: 8, color: 'rgb(200,246,255)', boxShadow: 'inset 0 0 0 1px rgba(127,233,255,.5)' }}>Linh Tâm {tran.linhTam.hp}</div>
+      <div className="dh-canh-the" style={{ right: 10, bottom: 8, color: 'rgb(230,255,122)', boxShadow: 'inset 0 0 0 1px rgba(230,255,122,.5)' }}>{tran.quai.length ? `${tenQuai} ×${tran.quai.length}` : 'Sân đã sạch'}</div>
     </div>
   )
 

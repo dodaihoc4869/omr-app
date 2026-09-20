@@ -4,7 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { DoanXem } from './doan-kieu'
 import { LinhTamCau, SaoHinh, ThuHinh } from './DoanHinh'
 
-const MAU_GIAY = ['#ffd166', '#7fe9ff', '#ff8a5c', '#7dffb0', '#d9c8ff', '#ff9ec7']
+const MAU_GIAY = ['rgb(255,209,102)', 'rgb(127,233,255)', 'rgb(255,138,92)', 'rgb(125,255,176)', 'rgb(217,200,255)', 'rgb(255,158,199)']
 
 export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, khoiThem }: { xem: DoanXem; expNhan: number; ve?: number | null; onVe: () => void; onDiTiep: () => void; ban: boolean; khoiThem?: ReactNode }) {
   const k = xem.ketChang!, em = xem.ghe.find(g => g.laEm)!, banBe = xem.ghe.filter(g => !g.laEm).slice(0, 2), tb = k.tienBo

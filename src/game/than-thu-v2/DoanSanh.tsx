@@ -43,8 +43,8 @@ export default function DoanSanh(p: Props) {
         <svg viewBox="0 0 358 250" preserveAspectRatio="none">
           <path d="M0 150 C60 118 110 160 170 132 S290 100 358 142 L358 250 L0 250Z" fill="rgba(10,30,50,.55)" />
           <path d="M120 214 C170 206 214 196 244 160 S300 96 332 60" stroke="rgba(255,255,255,.35)" strokeWidth="5" strokeDasharray="2 11" strokeLinecap="round" fill="none" />
-          <path d="M120 214 C170 206 214 196 244 160 S300 96 332 60" stroke="#7dffb0" pathLength={100} strokeDasharray={`${lop ? Math.max(4, Math.round(lop.tram * 100 / lop.tongTram)) : 46} 100`} strokeWidth="5" strokeLinecap="round" fill="none" style={{ filter: 'drop-shadow(0 0 6px rgba(125,255,176,.9))' }} />
-          <polygon points="316,22 326,44 322,78 310,78 306,44" fill="#c8e6ff" opacity=".95" /><polygon points="298,38 306,52 306,78 294,78 292,54" fill="#9fd0ff" opacity=".9" /><polygon points="334,36 340,52 338,78 326,78 326,52" fill="#9fd0ff" opacity=".9" />
+          <path d="M120 214 C170 206 214 196 244 160 S300 96 332 60" stroke="rgb(125,255,176)" pathLength={100} strokeDasharray={`${lop ? Math.max(4, Math.round(lop.tram * 100 / lop.tongTram)) : 46} 100`} strokeWidth="5" strokeLinecap="round" fill="none" style={{ filter: 'drop-shadow(0 0 6px rgba(125,255,176,.9))' }} />
+          <polygon points="316,22 326,44 322,78 310,78 306,44" fill="rgb(200,230,255)" opacity=".95" /><polygon points="298,38 306,52 306,78 294,78 292,54" fill="rgb(159,208,255)" opacity=".9" /><polygon points="334,36 340,52 338,78 326,78 326,52" fill="rgb(159,208,255)" opacity=".9" />
         </svg>
         <ThuHinh pet={p.pet} cap={p.cap} size={150} className="dh-thu-chinh dh-noi" />
         <LinhTamCau size={50} />
@@ -86,18 +86,18 @@ export default function DoanSanh(p: Props) {
           {s && (
             <div className="dh-hai-the">
               <section className="dh-kinh dh-muc" aria-label="Rương chuỗi ngày">
-                <div className="dh-nhan" style={{ color: '#ffd9a0' }}>RƯƠNG CHUỖI NGÀY</div>
-                <p>{s.chuoi.mocKe ? <>Còn <b style={{ color: '#ffd166' }}>{s.chuoi.conNgay} ngày</b> mở rương {s.chuoi.mocKe} ngày</> : <>Em đã mở đủ rương của chuỗi này.</>}{!s.chuoi.daDiHomNay && s.chuoi.ngay > 0 ? ' · đi chặng hôm nay để giữ chuỗi' : ''}</p>
+                <div className="dh-nhan" style={{ color: 'rgb(255,217,160)' }}>RƯƠNG CHUỖI NGÀY</div>
+                <p>{s.chuoi.mocKe ? <>Còn <b style={{ color: 'rgb(255,209,102)' }}>{s.chuoi.conNgay} ngày</b> mở rương {s.chuoi.mocKe} ngày</> : <>Em đã mở đủ rương của chuỗi này.</>}{!s.chuoi.daDiHomNay && s.chuoi.ngay > 0 ? ' · đi chặng hôm nay để giữ chuỗi' : ''}</p>
                 <div className="dh-chuoi-vach" role="img" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}>{Array.from({ length: 7 }, (_, i) => <i key={i} className={i < Math.min(7, s.chuoi.ngay) ? 'dh-xong' : ''} />)}</div>
               </section>
               <section className="dh-kinh dh-muc" aria-label="Trùm lớp">
-                <div className="dh-nhan" style={{ color: '#d9c8ff' }}>TRÙM LỚP</div>
+                <div className="dh-nhan" style={{ color: 'rgb(217,200,255)' }}>TRÙM LỚP</div>
                 {s.trumLop.dangMo || s.trumLop.daGop > 0 ? (
                   <>
-                    <p><b style={{ color: '#fff' }}>{s.trumLop.daHa ? 'Lớp em đã hạ trùm!' : s.trumLop.dangMo ? `Đang mở · ${hen(s.trumLop.conMs)}` : 'Tối Chủ nhật vừa rồi'}</b><br />Cả lớp đã góp {s.trumLop.daGop}/{s.trumLop.mucTieu} sát thương</p>
-                    <div className="dh-mau" style={{ height: 8 }}><i style={{ width: `${Math.min(100, Math.round(s.trumLop.daGop * 100 / Math.max(1, s.trumLop.mucTieu)))}%`, background: 'linear-gradient(90deg,#b79cff,#ff8a5c)' }} /></div>
+                    <p><b style={{ color: 'rgb(255,255,255)' }}>{s.trumLop.daHa ? 'Lớp em đã hạ trùm!' : s.trumLop.dangMo ? `Đang mở · ${hen(s.trumLop.conMs)}` : 'Tối Chủ nhật vừa rồi'}</b><br />Cả lớp đã góp {s.trumLop.daGop}/{s.trumLop.mucTieu} sát thương</p>
+                    <div className="dh-mau" style={{ height: 8 }}><i style={{ width: `${Math.min(100, Math.round(s.trumLop.daGop * 100 / Math.max(1, s.trumLop.mucTieu)))}%`, background: 'linear-gradient(90deg,rgb(183,156,255),rgb(255,138,92))' }} /></div>
                   </>
-                ) : <p><b style={{ color: '#fff', fontSize: 16 }}>Chủ nhật 20:00</b><br />Cả lớp cùng đánh 20 phút · {hen(s.trumLop.moSauMs)}</p>}
+                ) : <p><b style={{ color: 'rgb(255,255,255)', fontSize: 16 }}>Chủ nhật 20:00</b><br />Cả lớp cùng đánh 20 phút · {hen(s.trumLop.moSauMs)}</p>}
               </section>
             </div>
           )}
