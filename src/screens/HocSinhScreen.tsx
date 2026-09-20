@@ -21,7 +21,9 @@ import { classify } from '../engine/score'
 import { useAppStore } from '../store/appStore'
 import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
 import NutThemHocSinh from '../components/NutThemHocSinh'
+import KhoiHoSoHocTap from '../components/KhoiHoSoHocTap'
 import PhieuZaloEm from '../components/PhieuZaloEm'
+import './hoc-sinh-m3.css'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -45,9 +47,10 @@ export { toneXepLoai, laYeu, NGUONG_YEU, SO_CAU_DU_TIN, NHAN_BAI_TAP } from '../
 
 /** Hai mục của hồ sơ một em. Thầy chốt 05/09: mỗi tên trong danh sách có nút đi
  * thẳng vào đúng mục cần xem, không phải mở hồ sơ rồi cuộn tìm. */
-export type MucHoSo = 'bao-cao' | 'lich-su'
+export type MucHoSo = 'tong-quan' | 'bao-cao' | 'lich-su'
 
 export const TEN_MUC_HO_SO: Record<MucHoSo, string> = {
+  'tong-quan': 'Tổng quan',
   'bao-cao': 'Báo cáo',
   'lich-su': 'Lịch sử ca thi',
 }
@@ -55,11 +58,14 @@ export const TEN_MUC_HO_SO: Record<MucHoSo, string> = {
 export default function HocSinhScreen() {
   const sbdDangXem = useAppStore((s) => s.sbdDangXem)
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
-  const [mucHoSo, setMucHoSo] = useState<MucHoSo>('bao-cao')
+  const [mucHoSo, setMucHoSo] = useState<MucHoSo>('tong-quan')
+  const setScreen = useAppStore((s) => s.setScreen)
+  const moChiTietCa = useAppStore((s) => s.moChiTietCa)
+  const [hienZalo, setHienZalo] = useState(false)
 
-  /** Mở hồ sơ một em, ĐẶT SẴN mục cần xem. Bấm tên là vào Báo cáo — câu hỏi đầu
-   * tiên về một em luôn là em ấy đang lên hay đang xuống. */
-  const moHoSo = (sbd: string, muc: MucHoSo = 'bao-cao') => {
+  /** Mở hồ sơ một em, ĐẶT SẴN mục cần xem. Bấm tên là vào TỔNG QUAN (G3): mạnh–yếu, lịch ôn, kế hoạch hôm nay, thần thú — câu hỏi đầu
+   * tiên về một em là đang lên hay đang xuống, và trả lời ngay trên trang; nút Báo cáo vẫn mở báo cáo ca gần nhất như trước. */
+  const moHoSo = (sbd: string, muc: MucHoSo = 'tong-quan') => {
     setMucHoSo(muc)
     moHoSoEm(sbd)
   }
@@ -189,12 +195,18 @@ export default function HocSinhScreen() {
     return hoSo.ca.find((c) => c.tong !== null) ?? hoSo.ca[0]
   }, [hoSo?.ca])
 
+  // Ca em nộp gần nhất — nơi nút "Cho thi lại" dẫn tới (việc xoá lượt + rút đề mới vẫn làm ở hàng của em trong ca, sau bước xác nhận).
+  const caGanNhatCuaEm = useMemo(() => {
+    if (!hoSo?.ca || hoSo.ca.length === 0) return null
+    return [...hoSo.ca].sort((a, b) => (b.nopLuc || '').localeCompare(a.nopLuc || ''))[0]
+  }, [hoSo?.ca])
+
   // ------------------------------------------------------------------ HỒ SƠ
   if (sbdDangXem) {
     const diemGanNhat = hoSo?.ca.find((c) => c.tong !== null)?.tong ?? null
     return (
       <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-        <button onClick={() => moHoSoEm('')} className="tap-target self-start inline-flex items-center text-xs font-bold text-[#1a73e8] hover:underline" style={{ gap: 4 }}>
+        <button onClick={() => moHoSoEm('')} className="tap-target hs-quay-lai" style={{ gap: 4 }}>
           <ArrowLeft size={16} /> Danh sách học sinh
         </button>
 
@@ -204,22 +216,22 @@ export default function HocSinhScreen() {
         {hoSo && (
           <>
             {/* THẺ HỒ SƠ EM CHUẨN GOOGLE WORKSPACE */}
-            <div className="rounded-2xl border-2 border-blue-200/90 dark:border-blue-800/70 bg-gradient-to-br from-blue-50/70 via-white to-indigo-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 p-4 sm:p-5 shadow-sm space-y-4">
+            <div className="hs-ho-so-dau">
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#1a73e8] text-white font-bold text-lg shadow-xs">
+                  <div className="hs-avatar">
                     {(hoSo.em.hoTen || '?').trim().slice(0, 1).toUpperCase()}
                   </div>
                   <div>
-                    <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                    <h2 className="hs-ho-so-ten">
                       {hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
                     </h2>
-                    <div className="flex items-center gap-1.5 flex-wrap text-xs text-slate-500 dark:text-slate-400 mt-1">
-                      <span className="font-mono font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200">
+                    <div className="hs-meta">
+                      <span className="hs-sbd">
                         #{hoSo.em.sbd}
                       </span>
                       {hoSo.em.lop && (
-                        <span className="font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200">
+                        <span className="hs-lop">
                           Lớp {hoSo.em.lop}
                         </span>
                       )}
@@ -235,10 +247,10 @@ export default function HocSinhScreen() {
 
                 <div className="flex items-center gap-2">
                   <div className="text-right">
-                    <div className="text-2xl sm:text-3xl font-black text-[#1a73e8] dark:text-[#8ab4f8] tabular-nums leading-none">
+                    <div className="hs-diem-so">
                       {diemGanNhat === null ? '—' : diemGanNhat.toFixed(2).replace('.', ',')}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-bold uppercase mt-1">
+                    <div className="hs-diem-nhan">
                       Điểm gần nhất
                     </div>
                   </div>
@@ -248,7 +260,25 @@ export default function HocSinhScreen() {
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-blue-100 dark:border-blue-900/60 text-xs font-semibold text-slate-600 dark:text-slate-300">
+              <div className="hs-hanh-dong">
+                <button type="button" className="tap-target hs-nut-chinh" onClick={() => setScreen('giaobtvn')}>
+                  Giao bài riêng
+                </button>
+                <button
+                  type="button"
+                  className="tap-target hs-nut-vien"
+                  disabled={!caGanNhatCuaEm}
+                  title={caGanNhatCuaEm ? `Mở ca ${caGanNhatCuaEm.maCa} — bấm "Cho thi lại" ở hàng của em` : 'Em chưa có ca nào'}
+                  onClick={() => caGanNhatCuaEm && moChiTietCa(caGanNhatCuaEm.maCa)}
+                >
+                  Cho thi lại
+                </button>
+                <button type="button" className="tap-target hs-nut-vien" aria-pressed={hienZalo} onClick={() => setHienZalo((v) => !v)}>
+                  Nhắn phụ huynh
+                </button>
+              </div>
+
+              <div className="hs-ho-so-chan">
                 Đã tham gia <b>{hoSo.ca.length}</b> ca kiểm tra
               </div>
             </div>
@@ -270,23 +300,17 @@ export default function HocSinhScreen() {
                         setCaBaoCao(caMoiNhat)
                       }
                     }}
-                    className={`tap-target min-h-[48px] py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
-                      dang
-                        ? m === 'bao-cao'
-                          ? 'bg-[#1a73e8] text-white shadow-xs'
-                          : 'bg-[#1e8e3e] text-white shadow-xs'
-                        : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-300'
-                    }`}
+                    className={`tap-target hs-tab${dang ? ' hs-tab--chon' : ''}`}
                   >
                     {m === 'bao-cao' ? <FileText size={16} /> : <TrendingUp size={16} />}
                     <span>{m === 'lich-su' ? 'Mức độ tiến bộ (Lịch sử ca thi)' : TEN_MUC_HO_SO[m]}</span>
-                    {m === 'lich-su' && <span className="text-xs font-bold tabular-nums">({hoSo.ca.length})</span>}
+                    {m === 'lich-su' && <span className="hs-tab-so">({hoSo.ca.length})</span>}
                   </button>
                 )
               })}
             </div>
 
-            {mucHoSo === 'bao-cao' ? (
+            {mucHoSo !== 'lich-su' ? (
               <>
                 {/* BÁO CÁO CA THI GẦN NHẤT — CHUẨN GOOGLE MATERIAL 3 */}
                 {caMoiNhat && (
@@ -294,7 +318,7 @@ export default function HocSinhScreen() {
                     <div className="flex items-center justify-between flex-wrap" style={{ gap: 'var(--k3)' }}>
                       <div>
                         <div className="font-bold flex items-center" style={{ fontSize: 'var(--cx-2)', color: 'var(--muc)', gap: 6 }}>
-                          <Sparkles size={16} className="text-amber-500" />
+                          <Sparkles size={16} className="hs-bieu-tuong-nhan" />
                           Báo cáo ca thi gần nhất
                         </div>
                         <div style={NHAN_NHO}>
@@ -322,13 +346,17 @@ export default function HocSinhScreen() {
                   </TheNoiDung>
                 )}
 
-                <KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />
+                <KhoiHoSoHocTap sbd={hoSo.em.sbd} chuyenDe={<KhoiChuyenDe chuyenDe={hoSo.chuyenDe} />} />
 
                 {/* Các khối cũ ẩn đi theo yêu cầu người dùng, giữ trong DOM để bảo toàn các bài test */}
                 <div style={{ display: 'none' }} aria-hidden="true">
                   <KhoiTienBo ca={hoSo.ca} />
-                  <PhieuZaloEm hoSo={hoSo} showToast={showToast} />
                   <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} chuyenDeCa={(hoSo.chuyenDeCaGanNhat ?? []).map((c) => c.ten)} showToast={showToast} />
+                </div>
+
+                {/* "Nhắn phụ huynh" (G3) mở phiếu Zalo có sẵn — cùng khối, cùng nút Gửi; chưa bấm thì ẩn như trước. */}
+                <div style={{ display: hienZalo ? 'block' : 'none' }} aria-hidden={!hienZalo}>
+                  <PhieuZaloEm hoSo={hoSo} showToast={showToast} />
                 </div>
 
                 <TheNoiDung>
@@ -395,7 +423,7 @@ export default function HocSinhScreen() {
             tabMacDinh={tabBaoCaoMo}
             onClose={() => {
               setCaBaoCao(null)
-              moHoSoEm('')
+              setMucHoSo('tong-quan')
             }}
             onBatDauKhacPhuc={() => {
               setCaBaoCao(null)
@@ -411,16 +439,16 @@ export default function HocSinhScreen() {
   return (
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
       {/* HEADER GOOGLE STYLE */}
-      <div className="gv-page-header flex items-center justify-between gap-3 pb-1 border-b border-slate-100 dark:border-slate-800">
+      <div className="gv-page-header flex items-center justify-between gap-3 pb-1">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/70 text-[#1a73e8] border border-blue-200 dark:border-blue-800 shadow-2xs">
+          <div className="hs-icon">
             <Users size={20} />
           </div>
           <div>
             <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--sans)' }}>
               Học sinh
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="hs-phu-de">
               Quản lý học sinh theo lớp, xem báo cáo và mức độ tiến bộ
             </p>
           </div>
@@ -446,12 +474,12 @@ export default function HocSinhScreen() {
       </div>
 
       {/* Hướng dẫn quản lý */}
-      <details className="gv-help rounded-2xl border border-blue-200/60 dark:border-slate-800 bg-blue-50/30 dark:bg-slate-900/50 p-3 sm:p-4 shadow-2xs">
-        <summary className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200 cursor-pointer flex items-center gap-2">
-          <Sparkles size={16} className="text-[#1a73e8]" />
+      <details className="gv-help hs-huong-dan">
+        <summary className="hs-huong-dan-tieu-de">
+          <Sparkles size={16} className="hs-bieu-tuong-nhan" />
           <span>Hướng dẫn quản lý học sinh theo lớp</span>
         </summary>
-        <div style={NHAN_NHO} className="mt-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+        <div style={NHAN_NHO} className="hs-huong-dan-than">
           Mỗi em có các nút: <b style={{ color: 'var(--muc)' }}>Báo cáo</b> (tiến bộ, chuyên đề mạnh–yếu) và{' '}
           <b style={{ color: 'var(--muc)' }}>Lịch sử ca</b> (mọi ca đã làm, điểm và hạng lớp), cùng nút{' '}
           <b style={{ color: 'var(--muc)' }}>Reset mật khẩu</b>. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp file danh sách đã đồng bộ.
@@ -464,7 +492,7 @@ export default function HocSinhScreen() {
             <Search size={18} className="absolute" style={{ left: 14, top: 15, color: 'var(--mo)' }} />
             <input
               style={O_NHAP}
-              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xs focus:ring-2 focus:ring-blue-500"
+              className="hs-o-tim"
               placeholder="Tìm tên, số báo danh hoặc lớp…"
               value={timKiem}
               onChange={(e) => setTimKiem(e.target.value)}
@@ -481,7 +509,7 @@ export default function HocSinhScreen() {
             aria-label="Tải lại"
             title="Tải lại"
           >
-            <RefreshCw size={18} className={dangTai ? 'animate-spin text-[#1a73e8]' : ''} />
+            <RefreshCw size={18} className={dangTai ? 'animate-spin hs-bieu-tuong-nhan' : ''} />
           </button>
         </div>
 
@@ -489,7 +517,7 @@ export default function HocSinhScreen() {
         <div className="space-y-2.5" style={{ marginBottom: 'var(--k3)' }}>
           {/* Lọc theo khối */}
           <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Lọc theo khối">
-            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1 uppercase">Khối:</span>
+            <span className="hs-nhan-loc">Khối:</span>
             {[null, 10, 11, 12].map((k) => {
               const chon = khoiLoc === k
               return (
@@ -497,11 +525,7 @@ export default function HocSinhScreen() {
                   key={k ?? 'tat_ca'}
                   type="button"
                   onClick={() => setKhoiLoc(k)}
-                  className={`tap-target font-bold text-xs py-1.5 px-3 rounded-full transition-all cursor-pointer shadow-2xs ${
-                    chon
-                      ? 'bg-[#1a73e8] text-white border border-[#1a73e8]'
-                      : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-blue-300'
-                  }`}
+                  className={`tap-target hs-chip${chon ? ' hs-chip--chon' : ''}`}
                   style={{ ...SO }}
                 >
                   {k === null ? 'Tất cả khối' : `Khối ${k}`}
@@ -513,7 +537,7 @@ export default function HocSinhScreen() {
           {/* Lọc theo lớp (đồng bộ tất cả các lớp) */}
           {dsLop.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Lọc theo lớp">
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mr-1 uppercase">Lớp:</span>
+              <span className="hs-nhan-loc">Lớp:</span>
               {['', ...dsLop].map((l) => {
                 const chon = lopLoc === l
                 return (
@@ -521,11 +545,7 @@ export default function HocSinhScreen() {
                     key={l || '__tat_ca_lop'}
                     type="button"
                     onClick={() => setLopLoc(l)}
-                    className={`tap-target font-bold text-xs py-1.5 px-3 rounded-full transition-all cursor-pointer shadow-2xs ${
-                      chon
-                        ? 'bg-[#1e8e3e] text-white border border-[#1e8e3e]'
-                        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-emerald-300'
-                    }`}
+                    className={`tap-target hs-chip${chon ? ' hs-chip--chon' : ''}`}
                     style={{ ...SO }}
                   >
                     {l ? `Lớp ${l}` : 'Tất cả các lớp'}
@@ -557,7 +577,7 @@ export default function HocSinhScreen() {
                         type="button"
                         onClick={() => {
                           setTabBaoCaoMo('tong_quan')
-                          moHoSo(e.sbd, 'bao-cao')
+                          moHoSo(e.sbd, 'tong-quan')
                         }}
                         className="tap-target font-bold inline-flex items-center text-left"
                         style={{
@@ -577,17 +597,17 @@ export default function HocSinhScreen() {
                         {e.hoTen || `SBD ${e.sbd}`}
                         <ChevronRight size={14} style={{ color: 'var(--mo)', flexShrink: 0 }} />
                       </button>
-                      <div className="flex items-center gap-1.5 flex-wrap mt-1 text-xs text-slate-500 dark:text-slate-400">
-                        <span className="font-mono font-bold px-1.5 py-0.2 rounded bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200">
+                      <div className="hs-meta">
+                        <span className="hs-sbd">
                           #{e.sbd}
                         </span>
                         {e.lop && (
-                          <span className="font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200">
+                          <span className="hs-lop">
                             Lớp {e.lop}
                           </span>
                         )}
                         {khoi && (
-                          <span className="font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-200">
+                          <span className="hs-khoi">
                             Khối {khoi}
                           </span>
                         )}
@@ -621,11 +641,7 @@ export default function HocSinhScreen() {
                           moHoSo(e.sbd, muc)
                         }}
                         aria-label={`${TEN_MUC_HO_SO[muc]} của ${e.hoTen || `SBD ${e.sbd}`}`}
-                        className={`tap-target inline-flex items-center justify-center font-bold active:scale-[0.98] hover:-translate-y-0.5 transition-all shadow-xs cursor-pointer rounded-xl ${
-                          muc === 'bao-cao'
-                            ? 'bg-blue-50 dark:bg-blue-950/60 text-[#1a73e8] dark:text-[#8ab4f8] border border-blue-200 dark:border-blue-800'
-                            : 'bg-emerald-50 dark:bg-emerald-950/60 text-[#1e8e3e] dark:text-[#81c995] border border-emerald-200 dark:border-emerald-800'
-                        }`}
+                        className={`tap-target hs-nut-hang ${muc === 'bao-cao' ? 'hs-nut-hang--bao-cao' : 'hs-nut-hang--tien-bo'}`}
                         style={{
                           minHeight: 44,
                           gap: 6,
@@ -642,7 +658,7 @@ export default function HocSinhScreen() {
                       disabled={dangResetMk}
                       onClick={() => void resetMatKhau(e.sbd, e.hoTen)}
                       aria-label={`Reset mật khẩu của ${e.hoTen || `SBD ${e.sbd}`}`}
-                      className="tap-target inline-flex items-center justify-center gap-2 font-bold shadow-xs disabled:opacity-50 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-amber-400 cursor-pointer"
+                      className="tap-target hs-nut-phu"
                       style={{ minHeight: 44, fontSize: 'var(--cx-1)' }}
                     >
                       <KeyRound size={15} /> {dangResetMk ? 'Đang reset…' : 'Reset mật khẩu'}

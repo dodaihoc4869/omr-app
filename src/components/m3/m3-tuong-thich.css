@@ -264,7 +264,6 @@
 .m3 .hover\:bg-slate-50:hover { background-color: var(--m3-surface-container-low); }
 .m3 .hover\:bg-white:hover { background-color: var(--m3-surface-container-lowest); }
 .m3 .hover\:border-amber-300:hover { border-color: var(--m3-canh-bao); }
-.m3 .hover\:border-amber-400:hover { border-color: var(--m3-tren-canh-bao); }
 .m3 .hover\:border-blue-300:hover { border-color: var(--m3-primary-container); }
 .m3 .hover\:border-blue-500:hover { border-color: var(--m3-primary); }
 .m3 .hover\:border-emerald-300:hover { border-color: var(--m3-tertiary-container); }
