@@ -1,8 +1,9 @@
 // THẺ CUỐI CHẶNG của bài BTVN "nâng đỡ": "hôm nay em tiến thêm gì".
 // Bản vẽ đã duyệt: docs/ban-ve-btvn-nang-do-2109/hs-3-the-cuoi-chang.jpg. Nội dung do `theChangView` (btvn-ca-nhan-em.ts)
 // quyết định — chỉ SỐ ĐẾM của chính em, không xếp hạng, không chữ "nắm chắc", không kết luận năng lực.
+// KHÔNG tự lập cổng (portal): nằm TRONG khung xem phiếu (`KhungXemPhieu` truyền qua `phu`), phủ đúng vùng của phiếu;
+// không kéo thêm thư viện (test bang-nhiem-vu-1909 chỉ cho react + lucide-react).
 import { useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { ArrowRight, Award, Layers, RotateCcw, Sparkles, TrendingUp, X } from 'lucide-react'
 import type { TheChangView } from '../../lib/btvn-ca-nhan-em'
 import './m3-theme.css'
@@ -28,7 +29,7 @@ export default function TheCuoiChang({ view, dong, veBang }: { view: TheChangVie
 
   const tieuDeLon = view.coTienBo ? 'Hôm nay em đã tiến thêm' : 'Em đã làm xong chặng này'
 
-  return createPortal(
+  return (
     <div className="lop-the-chang m3" role="dialog" aria-modal="true" aria-label={view.tieuDe} data-the-cuoi-chang>
       <header className="tcc-tren">
         <button type="button" className="tcc-dong" onClick={dong} aria-label="Đóng thẻ, xem kết quả chặng">
@@ -120,7 +121,6 @@ export default function TheCuoiChang({ view, dong, veBang }: { view: TheChangVie
           Xem kết quả chặng
         </button>
       </footer>
-    </div>,
-    document.body,
+    </div>
   )
 }

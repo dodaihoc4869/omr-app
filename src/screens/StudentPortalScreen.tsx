@@ -2265,30 +2265,34 @@ export default function StudentPortalScreen() {
             const [{ nopChangCaNhan }, { theChangView }] = await Promise.all([import('../lib/btvn-nop-chang-em'), import('../lib/btvn-ca-nhan-em')])
             const kq = await nopChangCaNhan(tin, maCaPhieuRef.current)
             if (!kq.ok) return { ok: false, error: kq.error }
-            if (kq.html) setPhieuHtml(kq.html)
-            else {
+            if (!kq.html) {
+              // Đã nộp và đã lưu kết quả, chỉ không dựng lại được phiếu: đóng, nạp lại danh sách (mở lại bài là thấy).
               setPhieuHtml('')
               void napLaiBtvn()
+              return { ok: true }
             }
+            setPhieuHtml(kq.html)
             const the = kq.ket ? theChangView(kq.ket, kq.soChang) : null
             if (the) setTheChang(the)
             return { ok: true }
           }}
+          phu={
+            theChang ? (
+              <Suspense fallback={null}>
+                <TheCuoiChang
+                  view={theChang}
+                  dong={() => setTheChang(null)}
+                  veBang={() => {
+                    setTheChang(null)
+                    setPhieuHtml('')
+                    setTab(null)
+                    void napLaiBtvn()
+                  }}
+                />
+              </Suspense>
+            ) : null
+          }
         />
-      )}
-      {theChang && (
-        <Suspense fallback={null}>
-          <TheCuoiChang
-            view={theChang}
-            dong={() => setTheChang(null)}
-            veBang={() => {
-              setTheChang(null)
-              setPhieuHtml('')
-              setTab(null)
-              void napLaiBtvn()
-            }}
-          />
-        </Suspense>
       )}
 
       {/* Modal Báo cáo ca thi chuẩn Google Material 3 - Mở tức thì & Thúc đẩy sửa sai ngay */}

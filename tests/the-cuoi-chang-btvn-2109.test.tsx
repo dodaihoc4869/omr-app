@@ -107,6 +107,21 @@ describe('KhungXemPhieu: tin "nộp chặng" từ phiếu', () => {
   }
   const TIN = { type: 'ddh-btvn-nop-chang', ma: 'B1', sbd: '12121212', chiSo: 2, dapAn: { q1: 'B', q2: 'DSDS', bad: 5, nul: null } }
 
+  it('`phu` được vẽ TRONG lớp phủ của khung phiếu (cùng cổng, đóng cùng phiếu) và sau iframe để nằm trên phiếu', () => {
+    render(<KhungXemPhieu html="<p>x</p>" ten="Bài tập" dong={() => {}} phu={<div data-thu>thẻ nổi</div>} />)
+    const lop = document.querySelector('.lop-xem-phieu')!
+    const thu = lop.querySelector('[data-thu]')!
+    expect(thu).not.toBeNull()
+    expect(lop.contains(thu)).toBe(true)
+    const iframe = lop.querySelector('iframe')!
+    expect(iframe.compareDocumentPosition(thu) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('không truyền `phu` ⇒ khung phiếu ra như cũ (không phần tử thừa)', () => {
+    render(<KhungXemPhieu html="<p>x</p>" ten="Bài tập" dong={() => {}} />)
+    expect(document.querySelector('.lop-xem-phieu [data-the-cuoi-chang]')).toBeNull()
+  })
+
   it('tin từ chính iframe ⇒ gọi nopChang với gói sạch (chỉ đáp án dạng chuỗi) và trả lời ok', async () => {
     const nop = vi.fn(async () => ({ ok: true }))
     const { khung, traLoi } = mo(nop)

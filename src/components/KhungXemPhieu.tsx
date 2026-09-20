@@ -29,7 +29,7 @@
 // `.lop-xem-phieu` trong index.css). Phiếu co đúng theo bề rộng nửa phải, nên
 // thầy vẫn đổi được màn khác mà không phải đóng phiếu; kéo hẹp/rộng cột trái
 // là phiếu co theo ngay.
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { ThanhTren, dungM3 } from './m3'
@@ -48,9 +48,11 @@ export interface KhungXemPhieuProps {
   /** Bài BTVN "nâng đỡ": phiếu trong iframe KHÔNG có đáp án nên gửi ĐÁP ÁN MỘT CHẶNG ra đây; nơi gọi nộp lên máy chủ,
    * dựng lại phiếu (đổi `html`) khi thành công. Trả `ok:false` + lời báo thì phiếu hiện lời báo và cho nộp lại. */
   nopChang?: (tin: TinNopChang) => Promise<{ ok: boolean; error?: string }>
+  /** Nội dung PHỦ LÊN phiếu (vd thẻ cuối chặng), nằm trong cùng lớp phủ nên luôn ở trên phiếu và đóng cùng phiếu. */
+  phu?: ReactNode
 }
 
-export default function KhungXemPhieu({ html, src, ten, dong, nopChang }: KhungXemPhieuProps) {
+export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: KhungXemPhieuProps) {
   // ĐO THẲNG mép phải của thanh điều hướng, không trông vào CSS.
   //
   // Bản trước để CSS lo bằng `body:has(.ben-trai)`. Luật đó đúng và chạy được,
@@ -224,6 +226,7 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang }: KhungX
       {/* Nút thoát NHỎ, nổi góc trên phải. Không phải một dải chiếm hết bề
           ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo.
           (Dưới M3 nút Đóng nằm trong thanh trên ở trên.) */}
+      {phu}
       {!m3 && (
         <button className="nut-dong-phieu" type="button" onClick={() => dongRef.current()} aria-label="Đóng" title="Đóng (Esc, hoặc vuốt quay lại)">
           <X size={18} />

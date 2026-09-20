@@ -1,9 +1,9 @@
 /* THẺ CUỐI CHẶNG (BTVN nâng đỡ). Bản vẽ: docs/ban-ve-btvn-nang-do-2109/hs-3-the-cuoi-chang.jpg.
  * Chỉ dùng token M3 của m3-theme.css (lớp .m3) và token app; KHÔNG mã màu thô (npm run check:mau). */
 .lop-the-chang {
-  position: fixed;
+  position: absolute; /* nằm TRONG khung xem phiếu (.lop-xem-phieu là position: fixed) và phủ đúng vùng của nó */
   inset: 0;
-  z-index: 100000; /* trên khung xem phiếu (99999) */
+  z-index: 5;
   display: flex;
   flex-direction: column;
   background: var(--m3-surface);
