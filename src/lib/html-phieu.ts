@@ -29,6 +29,7 @@ import { cauHinhNop, type CauHinhNopKhacPhuc } from './cau-hinh-nop-khac-phuc'
 import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
 import { goKyTuLa } from './chu-la-pdf'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
+import { nhanChipHtml, ghiThuongHtml, heroCaNhanHtml, ghiChoHtml, CSS_PHIEU_CA_NHAN, type DauBaiCaNhanVao } from './html-phieu-ca-nhan'
 
 /** Một ô thông tin ngoài bìa: nhãn nhỏ ở trên, giá trị đậm ở dưới. */
 export interface OBia {
@@ -1194,6 +1195,9 @@ export function theCauHtml(
   // Nhãn CHỮA đứng trước mọi nhãn khác: đọc một dòng là biết câu này có mặt
   // ở đây để sửa lỗi nào, không phải "một câu Ester bất kỳ".
   const n = c.chuaCho
+  // BTVN nâng đỡ (bài ca_nhan): câu không mang `caNhan` thì mọi thứ dưới đây ra ĐÚNG như trước, từng byte.
+  const cn = c.caNhan
+  const coDap = !cn?.chuaCoDapAn
   const laDimmed = Boolean(laBtvn && soCauSang && stt > soCauSang)
   const tagVong = laBtvn
     ? c.mucDo === 'van_dung'
@@ -1206,6 +1210,7 @@ export function theCauHtml(
     ? '<span class="q-tag muc-tieu-hom-nay-tag">✨ Mục tiêu hôm nay</span>'
     : ''
   const tags = [
+    cn?.nhan ? nhanChipHtml(cn.nhan) : '',
     tagMucTieu,
     tagVong,
     n
@@ -1270,7 +1275,7 @@ export function theCauHtml(
           choLam
             ? `<button type="button" class="tf-badge ${ds} lam-o"${laDung ? ' data-dung="1"' : ''} data-chon="${ds === 'd' ? 'D' : 'S'}" role="radio" aria-checked="false" aria-label="${ky === 'Đ' ? 'Đúng' : 'Sai'} — ý ${CHU_Y[i]}"><span class="ky">${ky}</span></button>`
             : `<div class="tf-badge ${ds}"${laDung ? ' data-dung="1"' : ''}><span class="ky">${ky}</span></div>`
-        return `<div class="tf-item"${choLam ? ` data-y="${CHU_Y[i]}"` : ''}><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o">${oDS('d', 'Đ', dung[i])}${oDS('s', 'S', !dung[i])}</div></div>`
+        return `<div class="tf-item"${choLam ? ` data-y="${CHU_Y[i]}"` : ''}><div class="tf-statement">${CHU_Y[i]}. ${noi}${hinhTaiViTri(c, `sau_y_${CHU_Y[i]}`)}</div><div class="tf-o">${oDS('d', 'Đ', coDap && dung[i])}${oDS('s', 'S', coDap && !dung[i])}</div></div>`
       })
       .join('')
     /* KHONG con hang nhan Đ / S o dau hai cot (thay bo 09/09): moi o da mang
@@ -1282,7 +1287,7 @@ export function theCauHtml(
     const oDien = choLam
       ? `<input class="lam-nhap" type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp án của em" placeholder="Đáp án của em">`
       : `<div class="sa-blank">Đáp án: ……………………………</div>`
-    than = anGiai
+    than = anGiai || !coDap
       ? `<div class="sa-vung">${oDien}</div>`
       : `<div class="sa-vung">${oDien}<div class="sa-answer"><span class="ky">${chuHtml(c.dapAn || '—')}</span></div></div>`
   }
@@ -1321,18 +1326,20 @@ export function theCauHtml(
     moSan ? 'mo' : '',
     giai ? '' : 'khong-giai',
     laDimmed ? 'q-card-dimmed' : (laBtvn && soCauSang ? 'q-card-active' : ''),
+    cn?.daCham ? 'da-cham' : '',
+    cn?.daCham ? (cn.daCham.dung ? 'cau-dung' : 'cau-sai') : '',
   ].filter(Boolean).join(' ')
 
   return `<article class="${cacLop}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}"${choLam ? ` data-qid="${thoat(c.id || '')}"` : ''}>
   <div class="q-header"><div class="q-num"><span class="ky">${stt}</span></div><div class="q-tags">${tags}</div></div>
   <div class="q-than">
-    ${bannerDimmed}
+    ${bannerDimmed}${cn?.nhan && ghiThuongHtml(cn.nhan) ? '\n    ' + ghiThuongHtml(cn.nhan) : ''}
     ${oLamLai}
     ${deBai}
     ${bangHtml(c.bang)}
     ${experimentOriginal(c.text,hinhTaiViTri(c, 'sau_de'))}
     ${than}
-    ${hinhTaiViTri(c, 'cuoi_cau')}
+    ${hinhTaiViTri(c, 'cuoi_cau')}${cn?.daCham ? `<div class="lam-ket">${cn.daCham.dung ? 'Đúng' : 'Sai'}</div>` : ''}
   </div>
   ${nut}
 </article>`
@@ -2071,6 +2078,7 @@ export const JS_PHIEU = `
       function chonO(o) {
         var v = o.closest('.q-card[data-qid]');
         if (!v) return;
+        if (v.classList.contains('da-cham')) return;
         var qid = v.getAttribute('data-qid');
         var phan = v.getAttribute('data-phan');
         if (phan === 'II') {
@@ -2169,6 +2177,7 @@ export const JS_PHIEU = `
         if (daNop || !e.target || !e.target.classList || !e.target.classList.contains('lam-nhap')) return;
         var v = e.target.closest('.q-card[data-qid]');
         if (!v) return;
+        if (v.classList.contains('da-cham')) return;
         lam[v.getAttribute('data-qid')] = e.target.value;
         luuLam();
         if (demLam) demLam.textContent = String(soDaLam());
@@ -2248,8 +2257,56 @@ export const JS_PHIEU = `
           });
       }
 
+      /** NỘP CHẶNG (bài ca_nhan): máy em KHÔNG có đáp án nên không chấm tại chỗ. Gửi đáp án của các câu chưa chấm
+       * ra host (app cha) — host gọi máy chủ, lưu kết quả rồi dựng lại phiếu có đáp án + lời giải. */
+      function loiNopChang(chu) {
+        daNop = false;
+        if (nutNop) { nutNop.disabled = false; nutNop.textContent = 'Nộp chặng'; }
+        if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = chu; }
+      }
+      var daHoiThieuC = -1;
+      function nopChangCaNhan() {
+        if (daNop) return;
+        var dc = du.caNhan.daCham || {};
+        var guiDi = {};
+        var lamMoi = 0;
+        var thieuC = 0;
+        for (var ic2 = 0; ic2 < du.cau.length; ic2++) {
+          var qc = du.cau[ic2].id;
+          if (Object.prototype.hasOwnProperty.call(dc, qc)) continue;
+          var vv = String(lam[qc] == null ? '' : lam[qc]).trim();
+          if (vv) { guiDi[qc] = vv; lamMoi++; } else thieuC++;
+        }
+        if (lamMoi === 0) {
+          if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = 'Em chưa làm câu nào trong chặng này.'; }
+          return;
+        }
+        // HỎI NGAY TRÊN TRANG, KHÔNG DÙNG hộp xác nhận: hộp M3 mượn đúng MỘT chỗ gọi hộp ở luồng nộp cũ (có test khoá).
+        if (thieuC > 0 && daHoiThieuC !== thieuC) {
+          daHoiThieuC = thieuC;
+          if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = 'Còn ' + thieuC + ' câu chưa làm. Bấm Nộp chặng lần nữa để nộp phần đã làm. Câu còn lại em làm tiếp sau, câu đã nộp thì không đổi đáp án được.'; }
+          return;
+        }
+        daNop = true;
+        if (nutNop) { nutNop.disabled = true; nutNop.textContent = 'Đang nộp…'; }
+        if (oLoiNop) oLoiNop.hidden = true;
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'ddh-btvn-nop-chang', ma: du.ma, sbd: du.sbd, chiSo: du.caNhan.chiSo, dapAn: guiDi }, '*');
+            return;
+          }
+        } catch (eNc) {}
+        loiNopChang('Không gửi được từ trang này. Em mở bài trong app để nộp chặng.');
+      }
+      window.addEventListener('message', function (e) {
+        var d = e && e.data;
+        if (!du.caNhan || !d || d.type !== 'ddh-btvn-nop-chang-ket' || e.source !== window.parent) return;
+        if (d.ok === false) loiNopChang(String(d.error || 'Chưa nộp được chặng. Bài của em vẫn được giữ, em thử lại nhé.'));
+      });
+
       if (nutNop) nutNop.addEventListener('click', function () {
         if (daNop) return;
+        if (du.caNhan) { nopChangCaNhan(); return; }
         var thieu = du.cau.length - soDaLam();
         if (du.ch && du.ch.CAN_LAM_HET_MOI_NOP && thieu > 0) {
           if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = 'Còn ' + thieu + ' câu chưa làm.'; }
@@ -2299,6 +2356,18 @@ export const JS_PHIEU = `
       try {
         if (localStorage.getItem(KHOA_LUU + '.cho') === '1') gui(false).catch(function () {});
       } catch (e8) {}
+
+      // BÀI ca_nhan: câu ĐÃ CHẤM ở máy chủ — điền lại đáp án em đã nộp và khoá ô nhập. Màu đúng/sai do bước đồng bộ
+      // ở đầu mã lệnh lo (không có chua-nop ⇒ hiện); chỉ thẻ nào mang data-dung mới có màu: thẻ chưa chấm không có đáp án nào.
+      if (du.caNhan && du.caNhan.daCham) {
+        var dcs = du.caNhan.daCham;
+        for (var qdc in dcs) {
+          if (!Object.prototype.hasOwnProperty.call(dcs, qdc)) continue;
+          lam[qdc] = String(dcs[qdc] && dcs[qdc].chon != null ? dcs[qdc].chon : '');
+        }
+        var oDc = document.querySelectorAll('.q-card.da-cham .lam-nhap');
+        for (var idc = 0; idc < oDc.length; idc++) oDc[idc].readOnly = true;
+      }
 
       veLam();
     }
@@ -2976,11 +3045,11 @@ export const JS_PHIEU_M3 = `
 `
 
 /** Thanh trên dính của phiếu M3: tên bài + "Đã làm X/N câu" + tiến độ + nút lưới số câu. Số liệu do JS_PHIEU_M3 cập nhật. */
-export function dauTrangM3Html(tieuDe: string, tong: number, han = ''): string {
+export function dauTrangM3Html(tieuDe: string, tong: number, han = '', tienTo = ''): string {
   return `<header class="gd-tren" id="gd-tren">
   <div class="gd-tren-trong">
     <div class="gd-tren-hang">
-      <div class="gd-tren-chu"><div class="gd-hang-tieu"><div class="gd-tieu-de">${thoat(tieuDe)}</div>${han ? `<div class="gd-han">Hạn ${thoat(han)}</div>` : ''}</div><div class="gd-phu-hang"><span class="gd-phu">Đã làm <b id="gd-dem">0</b>/<span id="gd-tong">${tong}</span> câu</span><span class="gd-khich" id="gd-khich" hidden></span></div></div>
+      <div class="gd-tren-chu"><div class="gd-hang-tieu"><div class="gd-tieu-de">${thoat(tieuDe)}</div>${han ? `<div class="gd-han">Hạn ${thoat(han)}</div>` : ''}</div><div class="gd-phu-hang"><span class="gd-phu">${tienTo ? thoat(tienTo) : ''}Đã làm <b id="gd-dem">0</b>/<span id="gd-tong">${tong}</span> câu</span><span class="gd-khich" id="gd-khich" hidden></span></div></div>
       <button type="button" class="gd-nut-luoi" id="gd-nut-luoi" aria-label="Mở lưới số câu" aria-haspopup="dialog" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></button>
     </div>
     <div class="gd-tien" role="progressbar" aria-label="Tiến độ làm bài" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="gd-tien-day"></div></div>
@@ -2989,7 +3058,7 @@ export function dauTrangM3Html(tieuDe: string, tong: number, han = ''): string {
 }
 
 /** Tài liệu HTML hoàn chỉnh, tự chứa — mở bằng một chạm, không cần mạng. */
-export function taiLieuHtml(than: string, tieuDe: string, lopBody = '', m3 = false): string {
+export function taiLieuHtml(than: string, tieuDe: string, lopBody = '', m3 = false, cssThem = ''): string {
   const isDark =
     typeof document !== 'undefined' &&
     (document.documentElement.classList.contains('dark') ||
@@ -3001,7 +3070,7 @@ export function taiLieuHtml(than: string, tieuDe: string, lopBody = '', m3 = fal
   const htmlClass = [m3 ? 'gd-m3' : '', isDark ? 'dark' : ''].filter(Boolean).join(' ')
   return `<!DOCTYPE html>
 <html lang="vi"${htmlClass ? ` class="${htmlClass}"` : ''}><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${thoat(tieuDe)}</title><style>${CSS_PHIEU}${m3 ? CSS_PHIEU_M3 : ''}</style></head>
+<title>${thoat(tieuDe)}</title><style>${CSS_PHIEU}${m3 ? CSS_PHIEU_M3 : ''}${cssThem}</style></head>
 <body${bodyClass ? ` class="${bodyClass}"` : ''}>${than}
 <script>${JS_PHIEU}</script>${m3 ? `<script>${JS_PHIEU_M3}</script>` : ''}</body></html>`
 }
@@ -3048,13 +3117,29 @@ export interface TuyChonPhieu {
   /** Chỉ số lô (0-based) đang mở — đi kèm `soCauSang` để báo đúng lô nào vừa
    * xong khi em điền đủ đáp án (xem `lich-lo-btvn.ts`). */
   chiSoLoHienTai?: number
+  /** BTVN "NÂNG ĐỠ" (bài ca_nhan) — xem html-phieu-ca-nhan.ts. Thiếu ⇒ phiếu ra ĐÚNG như trước, từng byte.
+   * Có ⇒ phiếu KHÔNG chấm tại chỗ (câu không có đáp án), nộp theo CHẶNG qua host, câu đã chấm hiện kết quả máy chủ. */
+  caNhan?: {
+    /** Chặng đang hiện (0-based) — host gửi kèm khi nộp chặng. */
+    chiSo: number
+    /** Câu ĐÃ CHẤM ở máy chủ: qid → đúng/sai + đáp án em đã nộp. */
+    daCham: Record<string, { dung: boolean; chon: string }>
+    dauBai: DauBaiCaNhanVao
+    /** "Chặng 2 mở ngày mai." — rỗng thì bỏ. */
+    ghiCho: string
+    /** "Chặng 2/7 · " đứng trước "Đã làm x/y câu" ở thanh trên. */
+    tienTo: string
+    nutNop: string
+    nutTat: boolean
+  } | null
 }
 
 export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChonPhieu = {}): string {
   // `thieuChua` đi kèm phiếu để khối đầu phiếu nói được câu sai nào chưa có câu
   // chữa — im lặng bỏ qua là thầy tưởng phiếu đã chữa hết.
   const anGiai = !!tuyChon.anGiai
-  const laBtvn = Boolean(tuyChon.laBtvn || t.nhanBia === 'BÀI TẬP VỀ NHÀ' || t.tenChuyenDe === 'Bài tập về nhà')
+  const caNhan = tuyChon.caNhan ?? null
+  const laBtvn = !caNhan && Boolean(tuyChon.laBtvn || t.nhanBia === 'BÀI TẬP VỀ NHÀ' || t.tenChuyenDe === 'Bài tập về nhà')
   // PHIẾU NỘP ĐƯỢC: chỉ khi chỗ gọi khai `nop`, và không đi cùng `anGiai`
   // (phiếu chỉ có đề thì không có đáp án để chấm).
   const nop = !anGiai && tuyChon.nop ? tuyChon.nop : null
@@ -3072,7 +3157,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const the = cau.map((c, i) => theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn, soCauSang)).join('\n')
   // KHOÁ LỜI GIẢI TỚI KHI NỘP. Chỉ áp cho phiếu nộp được và khi thầy không
   // bật `HIEN_GIAI_TRUOC_NOP`.
-  const khoaGiai = !!nop && !chNop.HIEN_GIAI_TRUOC_NOP
+  const khoaGiai = !caNhan && !!nop && !chNop.HIEN_GIAI_TRUOC_NOP
   const coGiai = anGiai ? 0 : cau.filter((c) => oGiaiHtml(c) !== '').length
   const huongDan = anGiai
     ? 'Em làm vào vở rồi đối chiếu với link lời giải bố mẹ gửi sau. Muốn bản giấy thì bấm "In đề" rồi chọn "Lưu thành PDF".'
@@ -3091,13 +3176,13 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
 
   const soCauLam = typeof soCauSang === 'number' && soCauSang < cau.length ? soCauSang : cau.length
   const hanNop = String((t.oBia ?? []).find((o) => o.nhan === 'Hạn nộp')?.gia ?? '').trim().replace(/^—$/, '')
-  const than = `${m3 && nop ? dauTrangM3Html(t.tenChuyenDe, soCauLam, hanNop) : ''}${biaHtml(t, cau.length)}
+  const than = `${m3 && nop ? dauTrangM3Html(t.tenChuyenDe, soCauLam, hanNop, caNhan?.tienTo ?? '') : ''}${biaHtml(t, cau.length)}
 <div class="khung">
-  ${nhac ? `<div class="nhac-phieu">${thoat(nhac)}</div>` : ''}
+  ${caNhan ? heroCaNhanHtml(caNhan.dauBai) + ghiChoHtml(caNhan.ghiCho) : nhac ? `<div class="nhac-phieu">${thoat(nhac)}</div>` : ''}
   ${khoiChuaGiHtml(cau, tuyChon.thieuChua ?? [])}
-  ${tongQuanHtml(cau, laBtvn)}
+  ${caNhan ? '' : tongQuanHtml(cau, laBtvn)}
   ${thanhHtml(coGiai, anGiai)}
-  ${nop ? thanhNopHtml(cau.length) : ''}
+  ${nop ? thanhNopHtml(cau.length, caNhan?.nutNop, caNhan?.nutTat) : ''}
   ${khoaGiai ? '<div class="giai-khoa" id="giai-khoa">Lời giải mở ra ngay sau khi em bấm Nộp bài.</div>' : ''}
   ${thanhPhanTang}
   ${!anGiai ? '<div class="ds-tieu-de">LỜI GIẢI CHI TIẾT TỪNG CÂU THEO CHUẨN HOÁ HỌC:</div>' : ''}
@@ -3124,20 +3209,21 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
         banNhap: nop.banNhap,
         soCauMocLo: soCauMocLoChoNop,
         chiSoLo: tuyChon.chiSoLoHienTai,
-        cau: cau.map((c) => ({ id: c.id, phan: c.phan, dapAn: c.dapAn })),
+        caNhan: caNhan ? { chiSo: caNhan.chiSo, daCham: caNhan.daCham } : undefined,
+        cau: cau.map((c) => (caNhan ? { id: c.id, phan: c.phan } : { id: c.id, phan: c.phan, dapAn: c.dapAn })),
       }).replace(/</g, '\\u003c')}<\/script>`
     : ''
   // `co-lam` bật khổ ô Đ/S to bằng ngón tay. Tách khỏi `chua-nop` vì thầy có
   // thể bật HIEN_GIAI_TRUOC_NOP — lúc đó vẫn làm bài, chỉ là không khoá giải.
-  const lopBody = [nop ? 'co-lam' : '', khoaGiai ? 'chua-nop' : ''].filter(Boolean).join(' ')
-  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody, m3)
+  const lopBody = [nop ? 'co-lam' : '', khoaGiai ? 'chua-nop' : '', caNhan ? 'ca-nhan' : ''].filter(Boolean).join(' ')
+  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody, m3, caNhan ? CSS_PHIEU_CA_NHAN : '')
 }
 
 /** THANH NỘP — dính dưới thanh điều khiển, NOP-PHIEU-KHAC-PHUC mục 6. */
-export function thanhNopHtml(soCau: number): string {
+export function thanhNopHtml(soCau: number, nutChu = 'Nộp bài', tat = false): string {
   return `<div class="thanh" id="thanh-nop">
   <div class="nop-chu">Đã làm <b id="nop-dem">0</b>/<span id="nop-tong">${soCau}</span> câu<span id="nop-ket" class="nop-ket" hidden></span></div>
   <span id="nop-loi" class="nop-loi" hidden></span>
-  <button class="nut nop" type="button" id="nut-nop">Nộp bài</button>
+  <button class="nut nop" type="button" id="nut-nop"${tat ? ' disabled' : ''}>${nutChu}</button>
 </div>`
 }

@@ -22,6 +22,7 @@ import { dangCua, hopDang, LOC_DANG_MAC_DINH, type DangCau, type LocDang } from 
 import { hopSao, LOC_SAO_MAC_DINH, type LocSao } from './loc-sao'
 import { hopLeDeRut } from './loc-cau-rut'
 import { chuanChuyenDe } from './goi-len-bang'
+import type { NhanCauEm } from './btvn-ca-nhan-em'
 
 export type MucDoCau = 'biet' | 'hieu' | 'van_dung'
 const BAC: MucDoCau[] = ['biet', 'hieu', 'van_dung']
@@ -71,6 +72,10 @@ export interface CauLuyen {
   /** `laDeCuaEm` — đây là CHÍNH TỜ ĐỀ em vừa làm, không phải phiếu khắc phục.
    * Nhãn phải nói "em làm sai câu này", tuyệt đối không nói "khắc phục lỗi sai". */
   chuaCho?: { qid: string; soCau: number; phan: 'I' | 'II' | 'III'; maDang: string; tenDang?: string; bac: 1 | 2; laLamLai?: true; theoChuyenDe?: true; daChon?: string; viSaoSai?: string; laDeCuaEm?: true; dapAnDung?: string }
+  /** BTVN "NÂNG ĐỠ" (bài `ca_nhan`) — chỉ có khi phiếu dựng cho bài cá nhân hoá; câu không mang nó
+   * ra ĐÚNG như trước, từng byte. `nhan` = nhãn nhẹ trên thẻ; `chuaCoDapAn` = máy chủ chưa gửi đáp án/lời giải
+   * (chỉ về sau khi nộp chặng); `daCham` = câu ĐÃ được máy chủ chấm (đáp án em nộp + đúng/sai). */
+  caNhan?: { nhan?: NhanCauEm; chuaCoDapAn?: true; daCham?: { dung: boolean; chon: string } }
 }
 
 /** CÂU NÀY CÓ ẢNH KHÔNG — một chỗ trả lời cho cả app.
