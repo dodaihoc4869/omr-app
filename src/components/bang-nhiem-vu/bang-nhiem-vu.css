@@ -659,6 +659,26 @@ button.bnv-the:active {
 .bnv-dang-lam-moi-ten { margin: 0; font-size: var(--bnv-cx-2); font-weight: 700; line-height: 1.4; }
 .bnv-dang-lam-moi-so { white-space: nowrap; }
 .bnv-dang-lam-moi-phu { margin: 0; font-size: var(--bnv-cx-1); line-height: 1.4; color: var(--m3-on-secondary-container-phu); }
+.bnv-doan {
+  display: flex;
+  align-items: center;
+  gap: var(--k4, 16px);
+  width: 100%;
+  min-height: 80px;
+  padding: var(--k3, 12px) var(--k4, 16px) var(--k3, 12px) var(--k5, 20px);
+  border-radius: var(--m3-bo-28);
+  background: var(--m3-tertiary-container);
+  color: var(--m3-on-tertiary-container);
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--m3-cao-do-1);
+}
+.bnv-doan-bt { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 52px; height: 52px; border-radius: var(--m3-bo-tron); background: var(--m3-o-bieu-tuong); }
+.bnv-doan-chu { display: flex; flex: 1; flex-direction: column; gap: 2px; min-width: 0; }
+.bnv-doan-ten { font-size: var(--bnv-cx-3); font-weight: 700; line-height: 1.3; }
+.bnv-doan-phu { font-size: var(--bnv-cx-1); line-height: 1.4; color: var(--m3-on-tertiary-container-phu); }
+.bnv-doan:active { transform: scale(0.99); }
+.bnv-doan:focus-visible { outline: 3px solid var(--m3-tertiary); outline-offset: 2px; }
 button.bnv-chon-thu { cursor: pointer; box-shadow: var(--m3-cao-do-1); }
 button.bnv-chon-thu:active { transform: scale(0.99); }
 button.bnv-chon-thu:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
