@@ -235,7 +235,10 @@ describe('nhánh máy chủ: tên, payload khi bấm, quá hạn, cảnh báo', 
         v({ id: 'on_lai:A', loai: 'on_lai', soCau: 25, chiTiet: { qid: [...nhieu, '', 7, null] } }),
         v({ id: 'on_lai:B', loai: 'on_lai', soCau: 2, chiTiet: {} }),
         v({ id: 'on_lai:C', loai: 'on_lai', soCau: 2, chiTiet: { qid: [] } }),
-        v({ id: 'on_thi:D', loai: 'on_thi', soCau: 2, chiTiet: { qid: ['x'] } }),
+        v({ id: 'on_thi:D', loai: 'on_thi', soCau: 2, chiTiet: { qid: ['x', 'y'] } }),
+        v({ id: 'on_thi:E', loai: 'on_thi', soCau: 3, chiTiet: {} }),
+        v({ id: 'on_thi:F', loai: 'on_thi', soCau: 1, chiTiet: { qid: ['', 5, null] } }),
+        v({ id: 'on_thi:G', loai: 'on_thi', soCau: 9, chiTiet: { qid: ['a', 'b'] } }),
       ] as any,
     }
     const t = Object.fromEntries(tatCaViec(tuKeHoachNgay(kh, NOW, phu)).map((x) => [x.id, x]))
@@ -244,8 +247,15 @@ describe('nhánh máy chủ: tên, payload khi bấm, quá hạn, cảnh báo', 
     // thiếu / rỗng qid (máy chủ cũ): giữ luồng luyện lại câu sai hiện có, không mở màn rỗng
     expect(t['on_lai:B'].hanhDong).toMatchObject({ loai: 'mo_khac_phuc', nhanNut: 'Ôn ngay' })
     expect(t['on_lai:C'].hanhDong.loai).toBe('mo_khac_phuc')
-    // on_thi chưa có đường lấy/nộp riêng: KHÔNG mượn đường on_lai
-    expect(t['on_thi:D'].hanhDong.loai).toBe('mo_khac_phuc')
+    // on_thi NAY mang chiTiet.qid và dùng CHÍNH đường on_lai (Code 3, Worker f835f0e5): mở LamCauOn với đúng các qid
+    expect(t['on_thi:D'].hanhDong.loai).toBe('lam_cau_on')
+    expect(t['on_thi:D'].hanhDong.payload).toMatchObject({ viecId: 'on_thi:D', qid: ['x', 'y'], soCau: 2 })
+    expect(t['on_thi:D'].hanhDong).toMatchObject({ nhanNut: 'Ôn ngay' })
+    // on_thi thiếu / toàn qid rác (máy chủ cũ): giữ luồng luyện lại câu sai cũ, không mở màn rỗng
+    expect(t['on_thi:E'].hanhDong).toMatchObject({ loai: 'mo_khac_phuc', nhanNut: 'Ôn ngay' })
+    expect(t['on_thi:F'].hanhDong.loai).toBe('mo_khac_phuc')
+    // số câu của thẻ hành động = số qid THẬT (2), không phải `soCau` của việc (9)
+    expect((t['on_thi:G'].hanhDong.payload as any).soCau).toBe(2)
   })
 
   it('trễ nhịp được nói ra; btvn_nop có nút Nộp bài', () => {

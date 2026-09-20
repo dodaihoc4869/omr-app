@@ -497,15 +497,17 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       }
       case 'than_thu':
         return { loai: 'mo_than_thu', nhanNut: 'Luyện với thần thú' }
-      case 'on_lai': {
+      case 'on_lai':
+      case 'on_thi': {
         // Việc ôn câu: máy chủ đã chọn ĐÚNG các qid (chiTiet.qid) và có đường lấy đề + nộp (`/hs/cau-theo-qid`, `/hs/on-lai/nop`)
-        // ⇒ mở màn LamCauOn với chính các câu ấy. Thiếu qid (máy chủ cũ) thì rơi về luồng luyện câu sai cũ.
+        // ⇒ mở màn LamCauOn với chính các câu ấy. `on_thi` (ôn trước ca thi) NAY mang chiTiet.qid ≤ 4 câu và dùng CHÍNH hai đường ấy — không có
+        // lệnh riêng (Code 3, Worker f835f0e5, 21/09). Thiếu qid (máy chủ cũ) thì rơi về luồng luyện câu sai cũ.
         const qid = Array.isArray(ct.qid) ? ct.qid.filter((q: unknown): q is string => typeof q === 'string' && q.trim() !== '') : []
         if (qid.length > 0) return { loai: 'lam_cau_on', payload: { viecId: v.id, qid: qid.slice(0, 20), soCau: qid.length, tieuDe: tenViec(v) }, nhanNut: 'Ôn ngay' }
         return { loai: 'mo_khac_phuc', payload: { cheDo: 1, soCau: v.soCau }, nhanNut: 'Ôn ngay' }
       }
       default:
-        // on_thi: chưa có đường lấy/nộp riêng ⇒ mở luồng luyện lại câu sai hiện có.
+        // loại khác chưa có đường riêng ⇒ mở luồng luyện lại câu sai hiện có.
         return { loai: 'mo_khac_phuc', payload: { cheDo: 1, soCau: v.soCau }, nhanNut: 'Ôn ngay' }
     }
   }
