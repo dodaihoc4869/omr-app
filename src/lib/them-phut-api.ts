@@ -14,6 +14,9 @@ export interface KetQuaThemPhut {
 }
 
 const HAN_GIAY = 15
+/** Quá hạn chờ / đứt mạng giữa chừng: CHƯA CHẮC đã cộng. */
+export const TRA_LOI_CHAM = 'Máy chủ trả lời chậm — CHƯA CHẮC đã cộng, bấm Làm mới để xem giờ rồi hãy quyết định bấm lại.'
+export const MAT_MANG = 'Không nối được máy chủ — CHƯA CHẮC đã cộng, bấm Làm mới để xem giờ rồi hãy quyết định bấm lại.'
 
 export async function themPhutCa(maCa: string, phut: number = PHUT_MOI_LAN): Promise<KetQuaThemPhut> {
   const [ch, secret] = await Promise.all([layCauHinhMayChu(), loadTeacherSecret()])
@@ -28,8 +31,10 @@ export async function themPhutCa(maCa: string, phut: number = PHUT_MOI_LAN): Pro
       body: JSON.stringify({ maCa, phut }),
       signal: dk.signal,
     })
-  } catch {
-    throw new Error('Không nối được máy chủ — chưa cộng giờ cho em nào.')
+  } catch (e) {
+    // Yêu cầu có thể ĐÃ tới máy chủ trước khi bị huỷ/đứt — nói "chưa cộng" mà thầy bấm lại là thành 10 phút. Chỉ 404 (máy chủ không có lệnh) mới chắc là chưa cộng.
+    if ((e as { name?: string })?.name === 'AbortError') throw new Error(TRA_LOI_CHAM)
+    throw new Error(MAT_MANG)
   } finally {
     clearTimeout(hen)
   }

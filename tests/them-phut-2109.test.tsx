@@ -83,11 +83,16 @@ describe('themPhutCa — không giả thành công', () => {
     await expect(chay()).rejects.toThrow('Ca này đã thêm 30 phút, không thêm được nữa.')
   })
 
-  it('mất mạng → lỗi thật; trả lời không đọc được → nói CHƯA CHẮC đã cộng, bảo bấm Làm mới', async () => {
+  it('mất mạng / quá 15 s bị huỷ → CHƯA CHẮC đã cộng (không nói "chưa cộng"); trả lời không đọc được → nói CHƯA CHẮC đã cộng, bảo bấm Làm mới', async () => {
     vi.stubGlobal('fetch', async () => {
       throw new TypeError('Failed to fetch')
     })
-    await expect(chay()).rejects.toThrow('Không nối được máy chủ — chưa cộng giờ cho em nào.')
+    await expect(chay()).rejects.toThrow('Không nối được máy chủ — CHƯA CHẮC đã cộng, bấm Làm mới để xem giờ rồi hãy quyết định bấm lại.')
+    vi.stubGlobal('fetch', async () => {
+      throw Object.assign(new Error('The operation was aborted'), { name: 'AbortError' })
+    })
+    await expect(chay()).rejects.toThrow('Máy chủ trả lời chậm — CHƯA CHẮC đã cộng, bấm Làm mới để xem giờ rồi hãy quyết định bấm lại.')
+    await expect(chay()).rejects.not.toThrow(/chưa cộng giờ cho em nào/) // bị huỷ vì quá 15 s: không được nói chắc "chưa cộng"
     stub(async () => ({ ok: true, status: 200, json: async () => Promise.reject(new SyntaxError('x')) }))
     await expect(chay()).rejects.toThrow(/chưa chắc đã cộng giờ/)
   })
