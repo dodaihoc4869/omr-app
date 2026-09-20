@@ -62,3 +62,15 @@ Tôi KHÔNG chắc bảng giá hiện hành của mô hình cao nhất, nên tí
 
 Nếu T2 phân luồng, chỉ gửi ~40 % số em ⇒ các con số trên nhân 0,4 (≈ 8–45 USD/tháng).
 **Nhận xét**: tuần một lần bằng mô hình cao nhất cho nhận định SÂU (rất hợp để viết nhận xét tuần, chỉnh bậc, chỉnh tham số), nhưng QUÁ CHẬM cho mục tiêu "tiến bộ từng ngày": em tụt nhịp hôm thứ Ba thì tới Chủ nhật mới được đỡ. Cách ghép tốt nhất: **hằng đêm** T2 (thuật toán) + T3 (phiên trên máy thầy, không tốn tiền API) lo việc ngày; **hằng tuần** một lượt quét sâu bằng mô hình cao nhất — chạy ngay trên máy thầy (0 đồng API) hoặc qua API theo bảng trên nếu thầy muốn tách khỏi máy.
+
+## 11 · THẦY HỎI: gọi API Haiku 4.5 hay chạy trên phiên tại máy thầy — cái nào THÔNG MINH và HIỆU QUẢ hơn?
+| Tiêu chí | API Haiku 4.5 (máy chủ tự gọi mỗi đêm) | Phiên Claude trên máy thầy |
+|---|---|---|
+| Độ thông minh | Mô hình NHỎ: làm tốt việc có khuôn trên thẻ số liệu gọn (≈ 70–80 % số em là ca thường). Yếu hơn ở ca khó: đọc nhiều tín hiệu mâu thuẫn, đoán kiểu nhầm từ phương án sai, viết lời nhắn tự nhiên mà không phạm luật. | **Thông minh hơn**: dùng được mô hình lớn nhất cho ca khó + tổng hợp cả lớp, mô hình nhỏ cho ca thường; đọc sổ tay, tự soi lại điều chỉnh của mình, viết bản tin cho thầy hay hơn. |
+| Độ chắc chắn | **Chắc hơn hẳn**: đúng giờ, không phụ thuộc máy thầy/app mở, không bị hỏi quyền, mỗi em một lượt gọi độc lập, ép đúng khuôn JSON, tự thử lại. | Phụ thuộc máy thức + app mở + quyền đã cấp; mỗi đêm chạy có thể khác nhau chút; có chạy bù nhưng vẫn có đêm lỡ. |
+| Token / tiền | Trả tiền API, cỡ 10–20 USD/tháng nếu soi mọi em mỗi đêm (phải kiểm giá). Không tốn gói của thầy. | 0 đồng API, nhưng ăn vào GÓI thầy đang dùng (~300 nghìn token/đêm + phần điều khiển phiên) — ngày thầy cho các phiên làm việc nặng có thể chạm trần. |
+| Sát sao từng em | Soi mọi em mỗi đêm dễ dàng, đều tay. | Soi mọi em (nhanh) + soi kỹ xoay vòng, sâu hơn ở em cần chú ý. |
+| Việc thầy phải làm | Tạo khoá API, nạp tiền, tự nhập khoá vào máy chủ. | Cài một lần ~5 phút, giữ máy thức. |
+
+**Kết luận**: THÔNG MINH hơn = phiên trên máy thầy. CHẮC và ĐỀU hơn = API Haiku. Tốt nhất về lâu dài là GHÉP: Haiku API soi nhanh mọi em đúng giờ mỗi đêm (kể cả khi máy thầy tắt), phiên trên máy thầy soi kỹ ca khó + tổng hợp lớp + học từ sổ tay.
+**Khuyến nghị**: 80 % phần phải build là CHUNG cho cả hai cách (thuật toán phân luồng, khuôn, bảng, lệnh máy chủ, màn của thầy). Tôi thiết kế "người chạy" thành ổ cắm thay được: **bắt đầu bằng phiên trên máy thầy** (đúng lệnh thầy, không cần khoá API), chạy bóng 7 đêm và ĐO: mấy đêm chạy đủ, tốn bao nhiêu token, chất lượng gợi ý. Nếu có đêm lỡ hoặc ăn gói quá nhiều ⇒ cắm thêm Haiku API cho phần soi nhanh, không phải làm lại gì.
