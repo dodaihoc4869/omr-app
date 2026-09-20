@@ -36,6 +36,7 @@ import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } f
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
+import * as ND from './btvn-nang-do-d1'
 import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env } from './kieu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
@@ -1520,6 +1521,20 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
   if (!Number.isFinite(hanMsMoi) || hanMsMoi <= nay.getTime()) return ra({ok:false,error:'Hạn nộp phải là thời điểm trong tương lai.'})
   const hanNop = new Date(hanMsMoi).toISOString()
 
+  // BÀI CÁ NHÂN HOÁ ("nâng đỡ", docs/hop-dong-btvn-nang-do-2109.md): chỉ khi thầy xin VÀ cờ toàn cục còn bật.
+  // Vắng `caNhan`/false ⇒ đường cũ y nguyên từng byte; cờ tắt ⇒ bài thành `ca_nhan = 0` (báo `caNhanBiTat`).
+  let baiCaNhan: Awaited<ReturnType<typeof ND.dungBaiGiao>> & { ok: true } | null = null
+  let caNhanBiTat = false
+  if (b.caNhan === true) {
+    if (!(await ND.coBatCaNhan(env))) caNhanBiTat = true
+    else {
+      if (!(await ND.daCoBangCaNhan(env))) return ra({ ok: false, error: 'Máy chủ chưa cập nhật bảng bài cá nhân hoá (cần chạy migration-2109-btvn-nang-do.sql).' })
+      const dung = await ND.dungBaiGiao(env, dsMaDe, b.cau, b.ghim)
+      if (!dung.ok) return ra(dung)
+      baiCaNhan = dung
+    }
+  }
+  const hatGiong = String(b.hatGiong ?? '').trim().slice(0, 40) || null
 
   const lenh: D1PreparedStatement[] = []
   const emDaCo = new Set<string>()
@@ -1568,12 +1583,23 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
     dsEm = dsEm.filter(e=>!emDaCo.has(String(e.sbd)))
     if (!dsEm.length) continue
     const maBtvn = `${ca}-${nay.getTime().toString(36)}`
-    lenh.push(
-      env.DB.prepare(
-        `INSERT INTO btvn (ma_btvn, ma_ca, ma_de, so_cau, giao_luc, han_nop, da_xoa, cap_nhat_luc)
-         VALUES (?,?,?,?,?,?,0,?)`,
-      ).bind(maBtvn, ca, dsMaDe.join(','), soCau, giaoLuc, hanNop, giaoLuc),
-    )
+    if (baiCaNhan) {
+      // `btvn_cau` TRƯỚC `btvn`: nếu lượt ghi đứt giữa chừng thì chỉ dư dòng mồ côi, không có bài `ca_nhan` thiếu câu.
+      lenh.push(ND.lenhGhiCauBai(env, maBtvn, baiCaNhan.cau, baiCaNhan.loi, baiCaNhan.ghim))
+      lenh.push(
+        env.DB.prepare(
+          `INSERT INTO btvn (ma_btvn, ma_ca, ma_de, so_cau, giao_luc, han_nop, da_xoa, cap_nhat_luc, ca_nhan, hat_giong, so_loi)
+           VALUES (?,?,?,?,?,?,0,?,1,?,?)`,
+        ).bind(maBtvn, ca, dsMaDe.join(','), soCau, giaoLuc, hanNop, giaoLuc, hatGiong, baiCaNhan.loi.length),
+      )
+    } else {
+      lenh.push(
+        env.DB.prepare(
+          `INSERT INTO btvn (ma_btvn, ma_ca, ma_de, so_cau, giao_luc, han_nop, da_xoa, cap_nhat_luc)
+           VALUES (?,?,?,?,?,?,0,?)`,
+        ).bind(maBtvn, ca, dsMaDe.join(','), soCau, giaoLuc, hanNop, giaoLuc),
+      )
+    }
     for (const e of dsEm) {
       lenh.push(
         env.DB.prepare('INSERT INTO btvn_em (khoa, ma_btvn, sbd, ho_ten) VALUES (?,?,?,?)').bind(`${maBtvn}|${e.sbd}`, maBtvn, String(e.sbd), String(e.ten ?? '')),
@@ -1592,7 +1618,12 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
     })
   }
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
-  return ra({ ok: true, soCa: soLuotGiao, caRong, soEm: emDaCo.size, soCau, soDe: dsMaDe.length, hanNop })
+  return ra({
+    ok: true, soCa: soLuotGiao, caRong, soEm: emDaCo.size, soCau, soDe: dsMaDe.length, hanNop,
+    ...(baiCaNhan
+      ? { caNhan: true, soLoi: baiCaNhan.loi.length, hatGiong, boQuaQid: baiCaNhan.boQuaQid, thieuMeta: baiCaNhan.thieuMeta, ...(baiCaNhan.canhBao ? { canhBao: baiCaNhan.canhBao } : {}) }
+      : caNhanBiTat ? { caNhan: false, caNhanBiTat: true } : {}),
+  })
 }
 
 /** EM MỞ BÀI TẬP CỦA MÌNH. Đường CÔNG KHAI — em chỉ có mã ca và số báo danh.
@@ -1617,6 +1648,26 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
   const quaHan = hanMs > 0 && Date.now() > hanMs
   if (quaHan && !em.nop_luc) {
     return ra({ ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN', hanNop: String(bt.han_nop ?? '') })
+  }
+
+  // BÀI CÁ NHÂN HOÁ: bộ câu riêng của em (chốt lần mở đầu), CHỈ chặng đã mở, KHÔNG đáp án/lời giải. Bài cũ đi tiếp đường dưới, không đổi một byte.
+  if (ND.laBaiCaNhan(bt)) {
+    const p = await ND.phanHoiMoBaiCaNhan(env, bt, em, sbd, Date.now())
+    if (p.ok === false) return ra(p)
+    return ra({
+      ok: true,
+      maBtvn: String(bt.ma_btvn ?? ''),
+      hanNop: String(bt.han_nop ?? ''),
+      giaoLuc: String(bt.giao_luc ?? ''),
+      daNop: !!em.nop_luc,
+      nopLuc: String(em.nop_luc ?? ''),
+      soDung: em.so_dung === null || em.so_dung === undefined ? null : Number(em.so_dung),
+      soLanLam: Math.max(1, Number(em.so_lan_lam) || 1),
+      // Bài cá nhân hoá KHÔNG làm lại: đáp án từng chặng đã khoá và đã hiện lời giải.
+      soLanLamLaiConLai: 0,
+      duocLamLai: false,
+      ...p,
+    })
   }
 
   let goi
@@ -1667,6 +1718,19 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>): Promise<Respons
   const sbd = String(b.sbd ?? '').trim()
   const chiSo = Number(b.chiSo)
   if (!maBtvn || !sbd || !Number.isFinite(chiSo) || chiSo < 0) return ra({ ok: false, error: 'Thiếu dữ liệu' })
+
+  // BÀI CÁ NHÂN HOÁ: lệnh này là NỘP CHẶNG — máy chủ chấm, khoá đáp án đầu, ghi sổ rồi mới trả đáp án/lời giải. Tuyệt đối không cho
+  // "báo xong" không kèm đáp án (đường cũ dưới đây tăng tiến độ mà không chấm gì). `SELECT *` để chưa chạy migration vẫn không lỗi.
+  let btLo: Record<string, unknown> | null = null
+  try {
+    btLo = await env.DB.prepare('SELECT * FROM btvn WHERE ma_btvn = ? AND da_xoa = 0').bind(maBtvn).first<Record<string, unknown>>()
+  } catch {
+    /* không đọc được bài: đi tiếp đường cũ, nó tự báo lỗi đúng chỗ */
+  }
+  if (btLo && ND.laBaiCaNhan(btLo)) {
+    const dapAnCn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
+    return ra(await ND.nopChangCaNhan(env, btLo, sbd, chiSo, dapAnCn, Date.now()))
+  }
 
   const loDaXongMoi = Math.floor(chiSo) + 1
   let r: { meta: { changes: number } }
@@ -1740,6 +1804,8 @@ async function hsCaDangMo(env: Env, b: Record<string, unknown>): Promise<Respons
 async function xemBaiBtvn(env:Env,b:Record<string,unknown>):Promise<Response>{
  const em=await env.DB.prepare('SELECT e.*,b.ma_de FROM btvn_em e JOIN btvn b ON b.ma_btvn=e.ma_btvn WHERE e.ma_btvn=? AND e.sbd=?').bind(String(b.maBtvn||''),String(b.sbd||'')).first<Record<string,unknown>>()
  if(!em?.nop_luc)return ra({ok:false,error:'Học sinh chưa có bài nộp.'})
+ // Bài cá nhân hoá: chỉ câu CỦA EM, chấm theo mẫu (cột `chot_luc` chỉ có sau migration nên `em.chot_luc` vắng ở bài cũ).
+ if(em.chot_luc)return ra(await ND.baiLamCaNhan(env,em))
  try{
   const cau=await homeworkQuestions(env,String(em.ma_de))
   const graded=gradeHomework(homeworkKeys(cau),JSON.parse(String(em.dap_an_json||'{}')),String(em.ma_de))
@@ -1785,7 +1851,7 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
     : await env.DB.prepare('SELECT * FROM btvn WHERE da_xoa = 0 ORDER BY giao_luc DESC LIMIT 50').all<Record<string, unknown>>()
 
   // 1. Đọc dữ liệu học sinh của từng bài BTVN
-  const dsBtvnData: { bt: Record<string, unknown>; dsEm: Record<string, unknown>[] }[] = []
+  const dsBtvnData: { bt: Record<string, unknown>; dsEm: Record<string, unknown>[]; cn?: Awaited<ReturnType<typeof ND.thongKeTheoDoiCaNhan>> }[] = []
   const allSubmittedSbd = new Set<string>()
 
   for (const bt of r.results ?? []) {
@@ -1794,7 +1860,9 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
       .bind(maBtvn)
       .all<Record<string, unknown>>()
     const dsEm = em.results ?? []
-    dsBtvnData.push({ bt, dsEm })
+    // Bài cá nhân hoá: thống kê theo câu CỦA EM + tập lõi (chống chép bài chỉ so trên lõi). Bài cũ: không thêm gì.
+    const cn = ND.laBaiCaNhan(bt) ? await ND.thongKeTheoDoiCaNhan(env, bt, dsEm) : undefined
+    dsBtvnData.push({ bt, dsEm, cn })
     for (const x of dsEm) {
       if (x.nop_luc && !x.thu_hoi) {
         allSubmittedSbd.add(String(x.sbd))
@@ -1833,7 +1901,7 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
 
   // 3. Phân tích gian lận cho từng bài BTVN
   const ds = []
-  for (const { bt, dsEm } of dsBtvnData) {
+  for (const { bt, dsEm, cn } of dsBtvnData) {
     const maBtvn = String(bt.ma_btvn ?? '')
     const emInput: ThongTinHocSinhBtvn[] = dsEm.map((x) => ({
       sbd: String(x.sbd),
@@ -1842,7 +1910,7 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
       soDung: x.so_dung !== null && x.so_dung !== undefined ? Number(x.so_dung) : null,
       soCau: x.so_cau !== null && x.so_cau !== undefined ? Number(x.so_cau) : null,
       thuHoi: !!x.thu_hoi,
-      dap_an_json: typeof x.dap_an_json === 'string' ? x.dap_an_json : null,
+      dap_an_json: cn ? ND.chiGiuCauLoi(x.dap_an_json, cn.loi) : typeof x.dap_an_json === 'string' ? x.dap_an_json : null,
     }))
 
     const kqMap = phanTichGianLanBtvn(emInput, mapThiThat)
@@ -1855,6 +1923,7 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
       giaoLuc: String(bt.giao_luc ?? ''),
       hanNop: String(bt.han_nop ?? ''),
       quaHan: mocMs(String(bt.han_nop ?? '')) > 0 && Date.now() > mocMs(String(bt.han_nop ?? '')),
+      ...(cn ? { caNhan: true, soLoi: cn.soLoi } : {}),
       hocSinh: dsEm.map((x) => {
         const sbd = String(x.sbd)
         const gl = kqMap.get(sbd)
@@ -1870,6 +1939,7 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
           lyDoGianLan: gl ? gl.lyDoGianLan : '',
           diemThiDoiChieu: gl ? gl.diemThiDoiChieu : null,
           chiTietDoiChieu: gl ? gl.chiTietDoiChieu : undefined,
+          ...(cn ? cn.theoEm.get(sbd) : {}),
         }
       }),
       tong: dsEm.filter((x) => !x.thu_hoi).length,
@@ -3044,6 +3114,7 @@ export default {
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
       if (p === '/btvn/sua') return suaBtvn(env,b)
       if (p === '/btvn/giao') return giaoBtvn(env, b)
+      if (p === '/btvn/xem-truoc') return ra(await ND.xemTruocBtvn(env, b, Date.now()))
       if (p === '/btvn/bai-lam') return xemBaiBtvn(env,b)
       if (p === '/btvn/theo-doi') return theoDoiBtvn(env, b)
       if (p === '/dong-bo/dau') return ghiDauDongBo(env, b)

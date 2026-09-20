@@ -46,7 +46,7 @@ const HAN_DEM_MS = 3000
 /** XOÁ — theo lệnh thầy. */
 export const BANG_XOA: readonly string[] = [
   // BTVN, bài giao, luyện đề
-  'btvn', 'btvn_em', 'btvn_em_lich_su', 'mom_bai', 'luyen_de_2026', 'yeu_cau_giao_bai', 'study_drafts',
+  'btvn', 'btvn_em', 'btvn_em_lich_su', 'btvn_cau', 'btvn_em_cau', 'mom_bai', 'luyen_de_2026', 'yeu_cau_giao_bai', 'study_drafts',
   // Kế hoạch ngày và lên bảng (SỔ + HỒ SƠ MẠNH YẾU và CA THI được GIỮ, xem BANG_GIU)
   'ke_hoach_ngay', 'len_bang',
   // Trao đổi

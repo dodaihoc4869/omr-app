@@ -2,6 +2,7 @@ import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './bt
 import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
+import {docBoCuaCacEm,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
@@ -859,6 +860,8 @@ export async function nopBtvnQuaPhieu(
   if (Number.isFinite(hanMs) && Date.now() > hanMs) {
     return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' }
   }
+  // BÀI CÁ NHÂN HOÁ ("nâng đỡ"): chấm trên câu CỦA EM, luật điểm riêng (btvn-nang-do-d1.ts). Bài cũ đi tiếp đường dưới, không đổi một byte.
+  if (laBaiCaNhan(bt)) return nopBaiCaNhan(env, bt, sbd, lam, Date.now())
 
   let graded
   try { graded=gradeHomework(homeworkKeys(await homeworkQuestions(env,chuoi(bt.ma_de))),lam,chuoi(bt.ma_de)) }
@@ -987,7 +990,8 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
   // "nộp được chọn đáp án được theo chuẩn của html rút câu hỏi khắc phục"), nên
   // nút Nộp của nó bắn ra đúng lệnh này với `ma` là MÃ LƯỢT GIAO. Viết một cửa
   // nộp thứ hai chỉ để đổi tên trường là hai chỗ phải sửa mỗi lần đổi luật.
-  const bt = await env.DB.prepare('SELECT ma_btvn, ma_ca, ma_de, han_nop FROM btvn WHERE ma_btvn = ? AND da_xoa = 0')
+  // `SELECT *` (không liệt kê cột) để đọc được `ca_nhan` mà chưa chạy migration vẫn không lỗi.
+  const bt = await env.DB.prepare('SELECT * FROM btvn WHERE ma_btvn = ? AND da_xoa = 0')
     .bind(ma)
     .first<Record<string, unknown>>()
   if (bt) return nopBtvnQuaPhieu(env, bt, sbd, lam)
@@ -1706,6 +1710,8 @@ export async function hoSoLopLenBang(env: Env, b: Record<string, unknown>): Prom
   // Đi từ lượt CŨ tới lượt MỚI để lượt mới nhất ghi đè: em làm lại câu ấy ở
   // lượt sau thì kết quả lượt sau mới là kết quả hiện tại của em.
   const thuTuCu = (rBtvn.results ?? []).filter((x) => giu.has(chuoi(x.ma_btvn))).reverse()
+  // BTVN cá nhân hoá: chỉ câu CỦA EM mới tính (câu ngoài bộ không phải "chưa làm/sai"); em chưa chốt bộ thì bỏ lượt ấy; đáp án chặng đã nộp tính dù chưa nộp cuối.
+  const cn = await docBoCuaCacEm(env, maLuotGiu, ds)
   const theoCau = new Map<string, Map<string, 'dung' | 'sai' | 'chuaLam'>>()
   for (const s2 of ds) theoCau.set(s2, new Map())
 
@@ -1715,12 +1721,19 @@ export async function hoSoLopLenBang(env: Env, b: Record<string, unknown>): Prom
     const bang = theoCau.get(sbd2)
     if (!e || !bang) continue
     const maB = chuoi(x.ma_btvn)
-    const dapAn = dapAnLuot.get(maB)
+    let dapAn = dapAnLuot.get(maB)
     if (!dapAn || dapAn.size === 0) continue
+    const laCn = cn.caNhan.has(maB)
+    if (laCn) {
+      const boEm = cn.bo.get(`${maB}|${sbd2}`)
+      if (!boEm) continue
+      dapAn = new Map([...dapAn].filter(([q]) => boEm.has(q)))
+      if (dapAn.size === 0) continue
+    }
 
     const daNop = Boolean(chuoi(x.nop_luc))
     let lam: Record<string, unknown> = {}
-    if (daNop) {
+    if (daNop || laCn) {
       try {
         const o = JSON.parse(chuoi(x.dap_an_json) || '{}')
         if (o && typeof o === 'object') lam = o as Record<string, unknown>
@@ -1733,7 +1746,7 @@ export async function hoSoLopLenBang(env: Env, b: Record<string, unknown>): Prom
     let lSai = 0
     let lChua = 0
     for (const [qid, dung] of dapAn) {
-      const chon = daNop ? chuoi(lam[qid]).trim().toUpperCase() : ''
+      const chon = daNop || laCn ? chuoi(lam[qid]).trim().toUpperCase() : ''
       const kq: 'dung' | 'sai' | 'chuaLam' = !chon ? 'chuaLam' : chon === dung ? 'dung' : 'sai'
       bang.set(qid, kq)
       if (kq === 'dung') lDung++
@@ -3043,6 +3056,20 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
   // mọi em lo_da_xong=0 — phiếu vẫn mở được, chỉ là chưa nhớ tiến độ lô.
   let r: { results?: Record<string, unknown>[] }
   try {
+    // Ba cột BTVN "nâng đỡ" (migration-2109-btvn-nang-do.sql): chưa chạy migration thì lùi về truy vấn cũ ngay dưới.
+    r = await env.DB.prepare(
+      `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau, COALESCE(be.so_lan_lam, 1) AS so_lan_lam,
+              be.lo_da_xong, be.so_cau_em, be.so_chang, b.ca_nhan,
+              b.ma_ca, b.ma_de, b.han_nop, b.so_cau, b.giao_luc
+         FROM btvn_em be
+         JOIN btvn b ON b.ma_btvn = be.ma_btvn
+        WHERE be.sbd = ? AND be.thu_hoi=0 AND b.da_xoa = 0
+        ORDER BY b.giao_luc DESC LIMIT 100`,
+    )
+      .bind(sbd)
+      .all<Record<string, unknown>>()
+  } catch {
+   try {
     r = await env.DB.prepare(
       `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau, COALESCE(be.so_lan_lam, 1) AS so_lan_lam,
               be.lo_da_xong,
@@ -3054,7 +3081,7 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
     )
       .bind(sbd)
       .all<Record<string, unknown>>()
-  } catch {
+   } catch {
     r = await env.DB.prepare(
       `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau, COALESCE(be.so_lan_lam, 1) AS so_lan_lam,
               b.ma_ca, b.ma_de, b.han_nop, b.so_cau, b.giao_luc
@@ -3065,13 +3092,17 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
     )
       .bind(sbd)
       .all<Record<string, unknown>>()
+   }
   }
 
   return {
     ok: true,
     items: (r.results ?? []).map((x) => {
       const soDung = soHoacNull(x.so_dung)
-      const soCau = Number(x.so_cau) || Number(x.em_so_cau) || 0
+      // Bài cá nhân hoá: `soCau` = MẪU điểm của em (đã nộp) hoặc số câu của em (đã chốt); chưa chốt thì số câu của bài. Bài cũ: công thức cũ.
+      const caNhan = Number(x.ca_nhan) === 1
+      const soCauCuaEm = caNhan ? soHoacNull(x.so_cau_em) : null
+      const soCau = caNhan ? (x.nop_luc ? Number(x.em_so_cau) || soCauCuaEm || 0 : soCauCuaEm ?? (Number(x.so_cau) || 0)) : Number(x.so_cau) || Number(x.em_so_cau) || 0
       const soSai = soDung !== null && soCau >= soDung ? soCau - soDung : null
       const diem = soDung !== null && soCau > 0 ? Math.round((soDung / soCau) * 1000) / 100 : null
       const maDe = chuoi(x.ma_de)
@@ -3096,8 +3127,9 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
         soSai,
         soCau,
         soLanLam,
-        soLanLamLaiConLai,
-        duocLamLai: soLanLamLaiConLai > 0,
+        soLanLamLaiConLai: caNhan ? 0 : soLanLamLaiConLai,
+        duocLamLai: caNhan ? false : soLanLamLaiConLai > 0,
+        ...(caNhan ? { caNhan: true, soCauCuaEm, soChang: soHoacNull(x.so_chang) } : {}),
       }
     }),
   }

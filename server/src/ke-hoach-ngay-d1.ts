@@ -16,6 +16,7 @@ import {
 import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
 import { qidPhucVuDuoc } from './cau-theo-qid'
 import { ngayVn } from './su-kien-hoc'
+import { moLucChang } from './btvn-nang-do-chang'
 
 export const TOI_DA_EM_MOI_LO = 50
 const MOT_NGAY_MS = 86_400_000
@@ -102,13 +103,43 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
   const cua = (x: Record<string, unknown>) => map.get(String(x.sbd))
 
   // BTVN chưa nộp (còn hạn hoặc mới quá hạn ≤ 14 ngày). Có phòng vệ khi cột `lo_da_xong` chưa có.
-  const q = (cot: string) => `SELECT be.sbd, be.ma_btvn, ${cot} AS lo, b.so_cau, b.giao_luc, b.han_nop
+  const q = (cot: string, them = '') => `SELECT be.sbd, be.ma_btvn, ${cot} AS lo, b.so_cau, b.giao_luc, b.han_nop${them}
        FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn
       WHERE be.sbd IN (SELECT value FROM json_each(?)) AND be.thu_hoi = 0 AND b.da_xoa = 0 AND be.nop_luc IS NULL AND b.han_nop > ?`
-  let rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)')).bind(arr, cat14).all<Record<string, unknown>>(), null)
+  // Ba cột BTVN "nâng đỡ" (migration-2109-btvn-nang-do.sql): chưa chạy migration thì lùi về truy vấn cũ, bài nào cũng là bài cũ.
+  let rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)', ', b.ca_nhan, be.so_cau_em, be.chot_luc')).bind(arr, cat14).all<Record<string, unknown>>(), null)
+  if (!rb) rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)')).bind(arr, cat14).all<Record<string, unknown>>(), null)
   if (!rb) rb = await tat(() => env.DB.prepare(q('0')).bind(arr, cat14).all<Record<string, unknown>>(), trong())
+  const baiChot = new Map<string, { chotLuc: string; sbd: string }>() // `<ma_btvn>|<sbd>` → bài cá nhân hoá ĐÃ chốt (cần kích cỡ từng chặng)
   for (const x of rb.results ?? []) {
-    cua(x)?.btvn.push({ ma: String(x.ma_btvn), soCau: Number(x.so_cau) || 0, giaoLuc: String(x.giao_luc ?? ''), hanNop: String(x.han_nop ?? ''), loDaXong: Number(x.lo) || 0, daNop: false })
+    const caNhan = Number(x.ca_nhan) === 1
+    const chotLuc = caNhan && x.chot_luc ? String(x.chot_luc) : null
+    if (chotLuc) baiChot.set(`${x.ma_btvn}|${x.sbd}`, { chotLuc, sbd: String(x.sbd) })
+    cua(x)?.btvn.push({
+      ma: String(x.ma_btvn), soCau: chotLuc ? Number(x.so_cau_em) || 0 : Number(x.so_cau) || 0, giaoLuc: String(x.giao_luc ?? ''), hanNop: String(x.han_nop ?? ''), loDaXong: Number(x.lo) || 0, daNop: false,
+      ...(caNhan ? { caNhan: { chotLuc, cacChang: [] } } : {}),
+    })
+  }
+  // Bài cá nhân hoá đã chốt: lô ≡ chặng — một truy vấn cho kích cỡ từng chặng của cả lô em.
+  if (baiChot.size > 0) {
+    const rcg = await tat(() => env.DB.prepare(
+      `SELECT ma_btvn, sbd, chang, COUNT(*) AS n FROM btvn_em_cau WHERE sbd IN (SELECT value FROM json_each(?)) AND ma_btvn IN (SELECT value FROM json_each(?)) GROUP BY ma_btvn, sbd, chang ORDER BY chang`,
+    ).bind(arr, json([...new Set([...baiChot.keys()].map((k) => k.split('|')[0]))])).all<Record<string, unknown>>(), trong())
+    const soCauChang = new Map<string, number[]>()
+    for (const x of rcg.results ?? []) {
+      const k = `${x.ma_btvn}|${x.sbd}`
+      if (baiChot.has(k)) soCauChang.set(k, [...(soCauChang.get(k) ?? []), Number(x.n) || 0])
+    }
+    for (const c of map.values()) {
+      for (const b of c.btvn) {
+        const k = `${b.ma}|${c.sbd}`
+        const ban = baiChot.get(k)
+        const kc = soCauChang.get(k)
+        if (!b.caNhan || !ban || !kc) continue
+        const moLuc = moLucChang(ban.chotLuc, kc.length)
+        b.caNhan = { chotLuc: ban.chotLuc, cacChang: kc.map((n, i) => ({ soCau: n, moLuc: moLuc[i]! })) }
+      }
+    }
   }
 
   // Mom chưa nộp: đã bắt đầu (còn hạn 120 phút hoặc mới quá hạn ≤ 14 ngày, để liệt kê quá hạn) VÀ chưa bắt đầu (không hạn cứng nhưng vẫn là

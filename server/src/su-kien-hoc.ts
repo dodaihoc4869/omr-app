@@ -70,7 +70,7 @@ export function laBoTrong(chon: unknown): boolean {
 }
 
 /** Nhãn "Hoá học" là chữ điền tạm của app Mom khi câu không có chuyên đề — không phải chuyên đề thật. */
-function chuyenDeThat(v: unknown): string {
+export function chuyenDeThat(v: unknown): string {
   const s = String(v ?? '').trim()
   return s === 'Hoá học' || s === 'Hóa học' ? '' : s
 }

@@ -18,7 +18,7 @@
 //   quá tải (tải cứng > B) → nhãn `qua_tai +X`, cắt hết việc mềm, giữ nguyên việc cứng.
 //   cổng hiển thị: việc hiện khi mọi việc BẮT BUỘC đứng trước nó đã xong, hoặc nó mang nhãn `khan`.
 import { hashSeed } from '../../src/lib/exam-shuffle'
-import { loDangCho, tinhLichLoBtvn, tongCauDenLo, type LichLoBtvn } from '../../src/lib/lich-lo-btvn'
+import { loDangCho, SO_CAU_MOI_LO_TOI_THIEU, tinhLichLoBtvn, tongCauDenLo, type LichLoBtvn } from '../../src/lib/lich-lo-btvn'
 import { tinhNganSachNgay } from '../../src/lib/tro-ly-ca-nhan'
 import {
   BOI_THAN_THU, BUOC_DIEU_CHINH, CAU_ON_THI, GIAY_MOT_CAU_TOI_DA, GIAY_MOT_CAU_TOI_THIEU, NGAN_SACH_SAN, NGAN_SACH_TRAN,
@@ -47,6 +47,11 @@ export interface BtvnDauVao {
   loDaXong: number
   /** Em đã nộp — không còn việc. */
   daNop: boolean
+  /**
+   * BÀI CÁ NHÂN HOÁ ("nâng đỡ"): vắng = bài cũ (lịch lô tính như trước). Đã chốt bộ (`chotLuc`) ⇒ `soCau` là số câu CỦA EM và lô ≡ CHẶNG (`cacChang`,
+   * mỗi chặng có mốc mở riêng); chưa chốt ⇒ `cacChang` rỗng, `soCau` là cả bài (kế hoạch ước một chặng bằng ngân sách ngày).
+   */
+  caNhan?: { chotLuc: string | null; cacChang: { soCau: number; moLuc: string }[] }
 }
 
 export interface MomDauVao {
@@ -256,7 +261,7 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
   const seed = hashSeed(`${d.sbd}|${d.homNay}|${PHIEN_BAN_KE_HOACH}`)
 
   // 1. Bài còn phải làm và bài quá hạn.
-  const btvnCon = d.btvn.filter((b) => !b.daNop && (ms(b.hanNop) ?? Infinity) > d.now && b.soCau > 0)
+  const btvnCon0 = d.btvn.filter((b) => !b.daNop && (ms(b.hanNop) ?? Infinity) > d.now && b.soCau > 0)
   const quaHan: KeHoachNgay['quaHan'] = []
   for (const b of d.btvn) {
     const han = ms(b.hanNop)
@@ -289,14 +294,26 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
     ;(ngayVnCua(m.taoLuc) >= ngayGiaoXaNhat && momViec.length < MOM_CHUA_BAT_DAU_TOI_DA ? momViec : tonCu).push(m)
   }
 
-  const nganSach = tinhNganSach(d, btvnCon.length + momCung.length + momViec.length)
+  const nganSach = tinhNganSach(d, btvnCon0.length + momCung.length + momViec.length)
   const B = nganSach.mucTieuCau
+  // Bài cá nhân hoá CHƯA chốt: em chưa có bộ riêng nên ước số câu = tối đa (số ngày còn lại × ngân sách ngày), không phải cả bài 80 câu (kẻo tải ngày bị thổi phồng).
+  const btvnCon = btvnCon0.map((b) => (b.caNhan && !b.caNhan.chotLuc ? { ...b, soCau: Math.max(1, Math.min(b.soCau, ngayConLai(ms(b.hanNop)!, d.now) * B)) } : b))
+  /** Lịch lô của một bài: bài cá nhân hoá ⇒ lô ≡ CHẶNG (đã chốt) hoặc MỘT lô ≈ ngân sách một chặng (chưa chốt); bài cũ ⇒ `tinhLichLoBtvn`. */
+  const lichBai = (b: BtvnDauVao, taiKhac: number): LichLoBtvn => {
+    if (b.caNhan?.chotLuc && b.caNhan.cacChang.length > 0) {
+      return { cacLo: b.caNhan.cacChang.map((c, i) => ({ chiSo: i, soCau: c.soCau, moDuKienLuc: c.moLuc })), donViDan: 'ngay' }
+    }
+    if (b.caNhan) {
+      return { cacLo: [{ chiSo: 0, soCau: Math.max(1, Math.min(b.soCau, Math.max(SO_CAU_MOI_LO_TOI_THIEU, Math.round(B - taiKhac)))), moDuKienLuc: b.giaoLuc }], donViDan: 'ngay' }
+    }
+    return tinhLichLoBtvn({ soCau: b.soCau, giaoLuc: b.giaoLuc, hanNop: b.hanNop, nganSachNgay: B, taiKhac })
+  }
 
   // 2. Còn lại của từng bài (hai lượt: lượt 1 chưa tính tải khác để biết còn lại; lượt 2 tính lịch lô đúng).
   const lich0 = new Map<string, LichLoBtvn>()
   const conLai = new Map<string, number>()
   for (const b of btvnCon) {
-    const l = tinhLichLoBtvn({ soCau: b.soCau, giaoLuc: b.giaoLuc, hanNop: b.hanNop, nganSachNgay: B, taiKhac: 0 })
+    const l = lichBai(b, 0)
     lich0.set(b.ma, l)
     conLai.set(b.ma, Math.max(0, b.soCau - (b.loDaXong > 0 ? tongCauDenLo(l, b.loDaXong - 1) : 0)))
   }
@@ -315,7 +332,7 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
   const chiTietBai: Record<string, { taiKhac: number; taiMoiNgay: number; conLai: number; soLo: number }> = {}
   for (const b of btvnCon) {
     const taiKhac = baiCung.filter((x) => !(x.loai === 'btvn' && x.ma === b.ma)).reduce((t, x) => t + taiNgay(x), 0)
-    const lich = tinhLichLoBtvn({ soCau: b.soCau, giaoLuc: b.giaoLuc, hanNop: b.hanNop, nganSachNgay: B, taiKhac })
+    const lich = lichBai(b, taiKhac)
     const cl = Math.max(0, b.soCau - (b.loDaXong > 0 ? tongCauDenLo(lich, b.loDaXong - 1) : 0))
     const mine = baiCung.find((x) => x.loai === 'btvn' && x.ma === b.ma)
     chiTietBai[b.ma] = { taiKhac, taiMoiNgay: mine ? taiNgay({ ...mine, conLai: cl }) : 0, conLai: cl, soLo: lich.cacLo.length }
@@ -337,7 +354,7 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
       loai: 'btvn_lo', soCau: lo.soCau, hanMs, hanMemMs: loSau ? ms(loSau.moDuKienLuc) ?? hanMs : hanMs,
       khan: lo.treNhip || hanMs - d.now <= MOT_NGAY_MS, nguon: b.ma,
       ghiChu: lo.treNhip ? `Lô ${lo.chiSo + 1}/${lich.cacLo.length} đã trễ nhịp — làm trước.` : `Lô ${lo.chiSo + 1}/${lich.cacLo.length}`,
-      chiTiet: { ma: b.ma, chiSo: lo.chiSo, tongLo: lich.cacLo.length, treNhip: lo.treNhip, ...chiTietBai[b.ma] },
+      chiTiet: { ma: b.ma, chiSo: lo.chiSo, tongLo: lich.cacLo.length, treNhip: lo.treNhip, ...chiTietBai[b.ma], ...(b.caNhan ? { caNhan: true, ...(b.caNhan.chotLuc ? {} : { chuaChot: true }) } : {}) },
     }))
   }
   for (const m of momCung) {
