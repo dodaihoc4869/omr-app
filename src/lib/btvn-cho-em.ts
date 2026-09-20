@@ -7,8 +7,19 @@
 // Phiếu dựng bằng chính bộ `html-phieu.ts` đang dùng cho phiếu khắc phục, để
 // em nhìn thấy đúng một kiểu trang, và để không đẻ thêm một bộ dựng thứ hai.
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
+import type { CauLuyen } from './bai-tap-pdf'
 import { layCauHinhMayChu, xongNapDiaChi } from './may-chu-moi'
 import { loDangCho, tinhLichLoBtvn, tongCauDenLo } from './lich-lo-btvn'
+import {
+  cauCuaChang,
+  chuDauBai,
+  chuNgayMo,
+  docBaiCaNhan,
+  docKetQuaChangDaLuu,
+  ghepKetQuaVaoCau,
+  themDapAnGiaChoCau,
+  type BaiCaNhanEm,
+} from './btvn-ca-nhan-em'
 
 /** Cấu hình máy chủ cho đường BTVN của em. Dùng chung đường máy em vẫn tự tìm
  * địa chỉ (xem `layCauHinhChoEm`), nên máy nào mở link cũng chạy. */
@@ -50,11 +61,17 @@ export async function dungPhieuBtvn(
     soLanLamLaiConLai?: number
     /** Số lô đã xong — máy chủ ghi qua `/btvn/xong-lo` (xem `lich-lo-btvn.ts`). */
     loDaXong?: number
+    /** Bài `ca_nhan` mang thêm caNhan/chang/nhan/changDangMo… — đọc bằng `docBaiCaNhan`. */
+    [khac: string]: unknown
   },
   maCa: string,
   sbd: string,
   tuyChon?: { lamLai?: boolean; soCauSang?: number },
 ): Promise<string> {
+  // BÀI CÁ NHÂN HOÁ ("nâng đỡ"): đường riêng — câu KHÔNG có đáp án, nộp theo chặng. Bài thường đi tiếp như cũ.
+  const baiCaNhan = docBaiCaNhan(r)
+  if (baiCaNhan) return dungPhieuCaNhan(r, baiCaNhan, maCa, sbd)
+
   const [{ dungPhieu }, { parseKhoDeJson, buildTeacherSourceFromKhoDe }, { cauLuyenTuNguon }, { layCauHinhChoEmBtvn: layCh }] = await Promise.all([
     import('./html-phieu'),
     import('./exam-kho-de-import'),
@@ -137,6 +154,127 @@ export async function dungPhieuBtvn(
         : `Bài tập về nhà · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (lô ${(dangCho?.chiSo ?? 0) + 1}/${tongLo})` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`,
     },
   )
+}
+
+/** Chặng phiếu ĐANG HIỆN: chặng em làm bây giờ nếu đã mở; chưa mở (đợi ngày mai) thì chặng đã xong gần nhất, để em xem lại kết quả. */
+export function chonChangHienThi(b: BaiCaNhanEm): number | null {
+  const dangMo = b.changDangMo === null ? undefined : b.chang.find((c) => c.chiSo === b.changDangMo)
+  if (dangMo?.daMo) return dangMo.chiSo
+  const xong = b.chang.filter((c) => c.daXong)
+  if (xong.length > 0) return xong[xong.length - 1].chiSo
+  return b.chang.find((c) => c.daMo)?.chiSo ?? null
+}
+
+/** Nhãn ngắn dưới chấm chặng: chặng đang làm "Hôm nay"; chặng chưa mở đầu tiên "Mai" hoặc "24/09". */
+function nhanChangNgan(b: BaiCaNhanEm, chiSoHienThi: number | null, bayGio: Date): Record<number, string> {
+  const nhan: Record<number, string> = {}
+  const dangMo = b.changDangMo === null ? undefined : b.chang.find((c) => c.chiSo === b.changDangMo)
+  if (dangMo?.daMo && !dangMo.daXong && dangMo.chiSo === chiSoHienThi) nhan[dangMo.chiSo] = 'Hôm nay'
+  const chuaMo = b.chang.find((c) => !c.daMo)
+  if (chuaMo) {
+    const chu = chuNgayMo(chuaMo.moLuc, bayGio)
+    nhan[chuaMo.chiSo] = chu === 'ngày mai' ? 'Mai' : chu === 'hôm nay' ? 'Hôm nay' : chu.replace(/^ngày /, '')
+  }
+  return nhan
+}
+
+/** PHIẾU BÀI `ca_nhan` (hợp đồng docs/hop-dong-btvn-nang-do-2109.md). Máy chủ KHÔNG gửi đáp án/lời giải của câu chưa nộp;
+ * câu đã nộp chặng được mở lại bằng KẾT QUẢ máy chủ đã trả (giữ ở máy em). Chỉ hiện MỘT chặng: chặng đang làm, hoặc
+ * chặng vừa xong khi chặng kế chưa tới ngày mở. Phiếu không chấm tại chỗ — nộp chặng đi qua host (KhungXemPhieu). */
+async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa: string, sbd: string, bayGio = new Date()): Promise<string> {
+  const [{ dungPhieu, boLoiGiai }, { parseKhoDeJson, buildTeacherSourceFromKhoDe }, { cauLuyenTuNguon }] = await Promise.all([
+    import('./html-phieu'),
+    import('./exam-kho-de-import'),
+    import('./bai-tap-pdf'),
+  ])
+  const chiSoHT = chonChangHienThi(b)
+  if (chiSoHT === null) throw new Error('Bài này chưa có chặng nào mở')
+  const maBtvn = String(r.maBtvn ?? '').trim()
+  const de = (r.de ?? {}) as Record<string, unknown>
+  const cauChang = cauCuaChang(b, docCauBtvn(de), chiSoHT)
+  if (cauChang.length === 0) throw new Error('Chặng này chưa có câu nào để làm')
+
+  // Kết quả máy chủ đã trả lúc nộp chặng (giữ ở máy) → câu đã chấm có đáp án đúng + lời giải; còn lại KHÔNG có gì.
+  const daLuu = docKetQuaChangDaLuu(maBtvn, sbd, chiSoHT)
+  const { cau: cauTho, chuaCo } = themDapAnGiaChoCau(ghepKetQuaVaoCau(cauChang, daLuu.ketQua))
+  const doc = parseKhoDeJson({ ...de, cau: cauTho })
+  if (!doc.ok || !doc.json) {
+    const viSao = (doc.errors ?? []).filter((_, i) => i < 2).join('; ')
+    throw new Error(`Gói bài tập không đọc được: ${viSao || 'khuôn lạ'}`)
+  }
+  const dung = buildTeacherSourceFromKhoDe(doc.json)
+  const daCham: Record<string, { dung: boolean; chon: string }> = {}
+  for (const k of daLuu.ketQua) daCham[k.qid] = { dung: k.dung, chon: daLuu.dapAn[k.qid] ?? '' }
+  const cau = cauLuyenTuNguon([dung.source]).map((c): CauLuyen => {
+    const nhan = b.nhan[c.id]
+    if (chuaCo.has(c.id)) return { ...boLoiGiai(c), caNhan: { nhan, chuaCoDapAn: true as const } }
+    return { ...c, caNhan: { nhan, ...(daCham[c.id] ? { daCham: daCham[c.id] } : {}) } }
+  })
+  if (cau.length === 0) throw new Error('Gói bài tập không có câu nào dùng được')
+
+  const chChinh = await layCauHinhChoEmBtvn()
+  const han = String(r.hanNop ?? '')
+  const conCauChuaCham = cau.some((c) => !c.caNhan?.daCham)
+  const dauBai = chuDauBai(b)
+  const dangMo = b.changDangMo === null ? undefined : b.chang.find((c) => c.chiSo === b.changDangMo)
+  const ghiCho = b.changDangMo === null
+    ? 'Em đã xong hết các chặng của bài này.'
+    : dangMo && !dangMo.daMo
+    ? `Chặng ${dangMo.chiSo + 1} mở ${chuNgayMo(dangMo.moLuc, bayGio)}.`
+    : ''
+
+  let banNhap: Record<string, string> | undefined
+  try {
+    const raw = localStorage.getItem(`ddh.btvn.draft.${maBtvn}.${sbd}`)
+    if (raw) banNhap = JSON.parse(raw)
+  } catch {}
+
+  return dungPhieu(
+    {
+      hoTen: '',
+      sbd,
+      ngay: bayGio,
+      tenChuyenDe: 'Bài tập về nhà',
+      ketQua: '',
+      hienDapAn: false,
+      nhanBia: 'BÀI TẬP VỀ NHÀ',
+      oBia: [
+        { nhan: 'Số báo danh', gia: sbd },
+        { nhan: 'Ca', gia: maCa },
+        { nhan: 'Hạn nộp', gia: han ? gioVN(han) : '—' },
+      ],
+    },
+    cau,
+    {
+      nop: maBtvn ? { ma: maBtvn, sbd, banNhap, url: `${String(chChinh.URL ?? '').replace(/\/+$/, '')}/goi` } : null,
+      loiNhac: null,
+      caNhan: {
+        chiSo: chiSoHT,
+        daCham,
+        dauBai: {
+          tong: dauBai.tong,
+          soChang: dauBai.soChang,
+          phutMoiNgay: dauBai.phutMoiNgay,
+          han: ngayNganVN(han),
+          chang: b.chang.map((c) => ({ chiSo: c.chiSo, daXong: c.daXong })),
+          chiSoHienThi: chiSoHT,
+          nhanChang: nhanChangNgan(b, chiSoHT, bayGio),
+        },
+        ghiCho,
+        tienTo: `Chặng ${chiSoHT + 1}/${b.soChang} · `,
+        nutNop: conCauChuaCham ? 'Nộp chặng' : 'Đã xong chặng',
+        nutTat: !conCauChuaCham,
+      },
+    },
+  )
+}
+
+/** "28/09" — hạn nộp ngắn cho đầu bài; hỏng thì rỗng. */
+function ngayNganVN(iso: string): string {
+  const d = new Date(iso)
+  if (!Number.isFinite(d.getTime())) return ''
+  const hai = (n: number) => String(n).padStart(2, '0')
+  return `${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
 }
 
 /** Giờ Việt Nam gọn cho phiếu: 20:30 ngày 13/09. */

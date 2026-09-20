@@ -158,18 +158,40 @@ describe('docKetQuaChang', () => {
     expect(k.ok).toBe(true)
     expect(k.ketQua).toHaveLength(2)
     expect(k.ketQua[0]).toMatchObject({ qid: 'q1', dung: true, dapAnDung: 'B', loiGiai: 'Vì…' })
-    expect(k.ketQua[1]).toMatchObject({ qid: 'q2', dung: false, loiGiai: '', anhLoiGiai: [] })
+    expect(k.ketQua[1]).toMatchObject({ qid: 'q2', dung: false, loiGiai: null, anhLoiGiai: [] })
     expect(k.chuaLam).toEqual(['q3'])
     expect(k.chang).toEqual({ chiSo: 0, soCau: 2, soDung: 1, xong: true })
     expect(k.exp).toEqual({ homNay: 46, conLaiLenCap: 30 })
     expect(k.tienBo?.dangLenBac[0]).toEqual({ ma: 'thuy-phan', ten: 'Thuỷ phân ester', tu: 0, den: 1 })
     expect(k.tienBo?.soCauDungLai).toBe(2)
   })
+  it('đáp án/lời giải giữ NGUYÊN DẠNG kho: chuỗi hoặc đối tượng (không ép String → "[object Object]")', () => {
+    const lg = { chot: 'Nhóm chức ester', buoc: ['Bước 1'], dap_an_tu_giai: 'B' }
+    const k = docKetQuaChang(ket({ ketQua: [
+      { qid: 'a', dung: true, dapAnDung: 'B', loiGiai: lg },
+      { qid: 'b', dung: false, dapAnDung: { a: 'D', b: 'S', c: 'D', d: 'S' }, loiGiai: {} },
+      { qid: 'c', dung: true, dapAnDung: 12.5, loiGiai: '   ' },
+      { qid: 'd', dung: true, dapAnDung: null, loiGiai: [1] },
+    ] }))!
+    expect(k.ketQua[0].loiGiai).toEqual(lg)
+    expect(k.ketQua[1].dapAnDung).toEqual({ a: 'D', b: 'S', c: 'D', d: 'S' })
+    expect(k.ketQua[1].loiGiai).toBeNull() // đối tượng rỗng = không có lời giải
+    expect(k.ketQua[2]).toMatchObject({ dapAnDung: '12.5', loiGiai: null })
+    expect(k.ketQua[3]).toMatchObject({ dapAnDung: '', loiGiai: null }) // mảng/null không hợp lệ
+  })
   it('em chưa có thú ⇒ conLaiLenCap null; không có exp/tienBo ⇒ vắng (không bịa)', () => {
     expect(docKetQuaChang(ket({ exp: { homNay: 5, conLaiLenCap: null } }))!.exp).toEqual({ homNay: 5, conLaiLenCap: null })
     const k = docKetQuaChang(ket({ exp: undefined, tienBo: undefined }))!
     expect(k.exp).toBeUndefined()
     expect(k.tienBo).toBeUndefined()
+  })
+  it('chặng cuối xong: máy chủ tự chốt nộp — đọc nop (soCau là MẪU điểm); chặng thường KHÔNG có nop', () => {
+    expect(docKetQuaChang(ket())!.nop).toBeUndefined()
+    const k = docKetQuaChang(ket({ nop: { daNop: true, nopLuc: '2026-09-28T13:00:00.000Z', soDung: 40, soCau: 45, soCauCuaEm: 48, soCauThuongSai: 3, qidSai: ['q2', 5] } }))!
+    expect(k.nop).toEqual({ daNop: true, nopLuc: '2026-09-28T13:00:00.000Z', soDung: 40, soCau: 45, soCauCuaEm: 48, soCauThuongSai: 3, qidSai: ['q2'] })
+    // chưa nộp (daNop khác đúng true) hoặc thiếu số ⇒ vắng, không bịa
+    expect(docKetQuaChang(ket({ nop: { daNop: false, soDung: 1, soCau: 2 } }))!.nop).toBeUndefined()
+    expect(docKetQuaChang(ket({ nop: { daNop: true, soDung: 'x', soCau: 2 } }))!.nop).toBeUndefined()
   })
   it('dòng kết quả hỏng bị bỏ (dung phải đúng kiểu boolean)', () => {
     const k = docKetQuaChang(ket({ ketQua: [{ qid: 'q1', dung: 'true' }, { qid: '', dung: true }, { dung: true }, { qid: 'q9', dung: false }] }))!
@@ -242,17 +264,25 @@ describe('câu thô ↔ kết quả', () => {
       { qid: 'q3', dung: true, dapAnDung: '12,5', loiGiai: 'Giải q3', anhLoiGiai: [{ tep: 'lg.png', vi_tri: 'sau_loi_giai' }] },
     ])
     expect(ghep[2].dap_an).toBe('12,5')
-    expect(ghep[2].loi_giai).toBe('Giải q3')
+    expect(ghep[2].loi_giai).toEqual({ chot: 'Giải q3' }) // chuỗi trơn ⇒ bọc `chot` (cửa nạp chỉ nhận đối tượng, phiếu chỉ vẽ chot/buoc/tung_*)
     expect(ghep[2].hinh).toEqual([{ tep: 'de.png', vi_tri: 'sau_de' }, { tep: 'lg.png', vi_tri: 'sau_loi_giai' }])
     expect(ghep[0]).toBe(tho[0])
     expect(ghep[0]).not.toHaveProperty('dap_an')
     expect(tho[2]).not.toHaveProperty('loi_giai')
   })
+  it('ghép lời giải dạng ĐỐI TƯỢNG và đáp án Phần II dạng đối tượng nguyên vẹn', () => {
+    const lg = { chot: 'ý chính' }
+    const ghep = ghepKetQuaVaoCau(tho, [{ qid: 'q2', dung: true, dapAnDung: { a: 'D', b: 'D', c: 'S', d: 'S' }, loiGiai: lg, anhLoiGiai: [] }])
+    expect(ghep[1].loi_giai).toBe(lg)
+    expect(ghep[1].dap_an).toEqual({ a: 'D', b: 'D', c: 'S', d: 'S' })
+  })
   it('lời giải rỗng không ghi đè bằng chuỗi rỗng', () => {
-    const ghep = ghepKetQuaVaoCau(tho, [{ qid: 'q1', dung: false, dapAnDung: 'B', loiGiai: '', anhLoiGiai: [] }])
+    const ghep = ghepKetQuaVaoCau(tho, [{ qid: 'q1', dung: false, dapAnDung: 'B', loiGiai: null, anhLoiGiai: [] }, { qid: 'q3', dung: true, dapAnDung: '1', loiGiai: '  ', anhLoiGiai: [] }, { qid: 'q4', dung: true, dapAnDung: 'A', loiGiai: {}, anhLoiGiai: [] }])
     expect(ghep[0].dap_an).toBe('B')
     expect(ghep[0]).not.toHaveProperty('loi_giai')
     expect(ghep[0]).not.toHaveProperty('hinh')
+    expect(ghep[2]).not.toHaveProperty('loi_giai') // chuỗi trắng
+    expect(ghep[3]).not.toHaveProperty('loi_giai') // đối tượng rỗng
   })
 })
 

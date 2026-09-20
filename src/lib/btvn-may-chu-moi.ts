@@ -10,6 +10,7 @@
 //   3. Hạn 48 giờ tính từ lúc thầy bấm Giao, chung cho cả lớp. Quá hạn thì máy
 //      chủ từ chối, vì giờ trên máy em chỉnh được.
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
+import { docKetQuaChang, type KetQuaChang } from './btvn-ca-nhan-em'
 
 export interface KetQuaGiaoBtvn {
   maBtvn: string
@@ -140,8 +141,9 @@ export async function btvnCuaEm(
   maCa: string,
   sbd: string,
   maBtvn?: string,
-): Promise<{ ok: boolean; lyDo?: string; error?: string; maBtvn?: string; hanNop?: string; daNop?: boolean; soCau?: number; de?: unknown }> {
-  const r = await goi<{ ok?: boolean; lyDo?: string; error?: string; maBtvn?: string; hanNop?: string; daNop?: boolean; soCau?: number; de?: unknown }>(
+): Promise<{ ok: boolean; lyDo?: string; error?: string; maBtvn?: string; hanNop?: string; daNop?: boolean; soCau?: number; de?: unknown; [khac: string]: unknown }> {
+  // Bài `ca_nhan` mang thêm caNhan/chang/nhan/tomTat/changDangMo… — đọc bằng `docBaiCaNhan` (btvn-ca-nhan-em.ts).
+  const r = await goi<{ ok?: boolean; lyDo?: string; error?: string; maBtvn?: string; hanNop?: string; daNop?: boolean; soCau?: number; de?: unknown; [khac: string]: unknown }>(
     ch,
     '/btvn/cua-em',
     { maCa, sbd, maBtvn },
@@ -176,4 +178,16 @@ export async function xongLoBtvn(
   const r = await goi<{ ok?: boolean; loDaXong?: number; error?: string }>(ch, '/btvn/xong-lo', d)
   if (!r) return { ok: false, error: 'Không nối được máy chủ' }
   return { ...r, ok: r.ok === true }
+}
+
+/** EM NỘP MỘT CHẶNG của bài `ca_nhan` (hợp đồng docs/hop-dong-btvn-nang-do-2109.md mục 4): gửi đáp án CÁC CÂU MỚI LÀM
+ * của chặng; máy chủ chấm, ghi sổ, khoá đáp án đầu rồi trả kết quả + lời giải. Máy em KHÔNG có đáp án nên không tự chấm.
+ * Gọi lại được khi mạng chập chờn (đáp án đầu thắng). Không bao giờ ném lỗi: hỏng thì `ok:false` kèm lời báo. */
+export async function nopChangBtvn(
+  ch: CauHinhMayChu,
+  d: { maBtvn: string; sbd: string; chiSo: number; dapAn: Record<string, string> },
+): Promise<KetQuaChang> {
+  const r = await goi<unknown>(ch, '/btvn/xong-lo', d)
+  if (!r) return { ok: false, error: 'Không nối được máy chủ', ketQua: [], chuaLam: [] }
+  return docKetQuaChang(r) ?? { ok: false, error: 'Máy chủ trả về dữ liệu lạ', ketQua: [], chuaLam: [] }
 }

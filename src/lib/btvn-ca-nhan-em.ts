@@ -129,13 +129,28 @@ export function chuNgayMo(moLuc: string, bayGio: Date): string {
 
 // ───────────────────────── kết quả nộp chặng ─────────────────────────
 
+/** Giá trị đáp án/lời giải máy chủ trả NGUYÊN DẠNG như kho lưu: chuỗi ("B", "DSDS", "12,5") hoặc đối tượng có cấu trúc
+ * (Phần II `{a,b,c,d}`; `loi_giai` của kho là đối tượng). Đưa thẳng vào cửa nạp kho, KHÔNG ép về chuỗi. */
+export type GiaTriTho = string | Record<string, unknown>
+
 export interface KetQuaCauChang {
   qid: string
   dung: boolean
-  dapAnDung: string
-  loiGiai: string
+  dapAnDung: GiaTriTho
+  /** null = câu này không có lời giải. */
+  loiGiai: GiaTriTho | null
   anhLoiGiai: unknown[]
 }
+
+/** Chuỗi (kể cả số) hoặc đối tượng phẳng; mọi thứ khác ⇒ null. */
+function giaTriTho(v: unknown): GiaTriTho | null {
+  if (typeof v === 'string') return v
+  if (typeof v === 'number' && Number.isFinite(v)) return String(v)
+  if (laDoiTuong(v)) return v
+  return null
+}
+/** Rỗng theo nghĩa "không có gì để hiện": chuỗi trắng hoặc đối tượng không khoá. */
+const laRong = (v: GiaTriTho | null): boolean => v === null || (typeof v === 'string' ? v.trim() === '' : Object.keys(v).length === 0)
 
 export interface TienBoEm {
   dangLenBac: { ma: string; ten: string; tu: number; den: number }[]
@@ -157,6 +172,9 @@ export interface KetQuaChang {
   chuaLam: string[]
   exp?: { homNay: number; conLaiLenCap: number | null }
   tienBo?: TienBoEm
+  /** CHỈ có khi chặng CUỐI vừa xong: máy chủ TỰ chốt nộp bài. `soCau` là MẪU điểm (đã trừ câu thưởng sai),
+   * điểm = soDung / soCau × 10. Máy em không gọi /btvn/nop cho bài ca_nhan. */
+  nop?: { daNop: boolean; nopLuc: string; soDung: number; soCau: number; soCauCuaEm: number; soCauThuongSai: number; qidSai: string[] }
 }
 
 /** Đọc phản hồi `/btvn/xong-lo` của bài cá nhân hoá. null khi không phải một đối tượng. */
@@ -169,8 +187,8 @@ export function docKetQuaChang(r: unknown): KetQuaChang | null {
       ketQua.push({
         qid: k.qid,
         dung: k.dung,
-        dapAnDung: k.dapAnDung == null ? '' : String(k.dapAnDung),
-        loiGiai: typeof k.loiGiai === 'string' ? k.loiGiai : '',
+        dapAnDung: giaTriTho(k.dapAnDung) ?? '',
+        loiGiai: laRong(giaTriTho(k.loiGiai)) ? null : giaTriTho(k.loiGiai),
         anhLoiGiai: Array.isArray(k.anhLoiGiai) ? k.anhLoiGiai : [],
       })
     }
@@ -190,6 +208,17 @@ export function docKetQuaChang(r: unknown): KetQuaChang | null {
   }
   if (laDoiTuong(r.exp) && laSo(r.exp.homNay)) {
     out.exp = { homNay: r.exp.homNay, conLaiLenCap: laSo(r.exp.conLaiLenCap) ? r.exp.conLaiLenCap : null }
+  }
+  if (laDoiTuong(r.nop) && r.nop.daNop === true && laSoNguyenKhongAm(r.nop.soDung) && laSoNguyenKhongAm(r.nop.soCau)) {
+    out.nop = {
+      daNop: true,
+      nopLuc: typeof r.nop.nopLuc === 'string' ? r.nop.nopLuc : '',
+      soDung: r.nop.soDung,
+      soCau: r.nop.soCau,
+      soCauCuaEm: laSoNguyenKhongAm(r.nop.soCauCuaEm) ? r.nop.soCauCuaEm : r.nop.soCau,
+      soCauThuongSai: laSoNguyenKhongAm(r.nop.soCauThuongSai) ? r.nop.soCauThuongSai : 0,
+      qidSai: Array.isArray(r.nop.qidSai) ? r.nop.qidSai.filter((q): q is string => typeof q === 'string') : [],
+    }
   }
   if (laDoiTuong(r.tienBo)) {
     const t = r.tienBo
@@ -279,7 +308,9 @@ export function ghepKetQuaVaoCau(cauTho: readonly Record<string, unknown>[], ket
     return {
       ...c,
       dap_an: k.dapAnDung,
-      ...(k.loiGiai !== '' ? { loi_giai: k.loiGiai } : {}),
+      // Cửa nạp kho chỉ nhận `loi_giai` là ĐỐI TƯỢNG, và phiếu chỉ vẽ `chot`/`buoc`/`tung_*` (không vẽ `noi_dung`):
+      // một chuỗi trơn ⇒ bọc vào `chot` để em thật sự đọc được lời giải.
+      ...(!laRong(k.loiGiai) ? { loi_giai: typeof k.loiGiai === 'string' ? { chot: k.loiGiai } : k.loiGiai } : {}),
       ...(k.anhLoiGiai.length > 0 ? { hinh: [...hinh, ...k.anhLoiGiai] } : {}),
     }
   })
