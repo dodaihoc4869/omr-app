@@ -70,14 +70,22 @@ describe('doiDauXemLai', () => {
   })
 })
 
-describe('dọn khi máy chủ đặt lại mùa', () => {
-  it('tiền tố `ddh.xemlai.` nằm trong danh sách dọn: dấu của ca cũ bị xoá, khoá khác giữ nguyên', () => {
-    expect(TIEN_TO_LOCAL_DON).toContain('ddh.xemlai.')
+describe('reset mùa (chốt 21/09: GIỮ ca thi + hồ sơ)', () => {
+  it('dấu "Xem lại sau" thuộc CA THI nên KHÔNG bị dọn; phần của bài đã xoá (kế hoạch, nháp Mẹ giao) vẫn bị dọn', () => {
+    expect(TIEN_TO_LOCAL_DON).not.toContain('ddh.xemlai.')
+    expect(TIEN_TO_LOCAL_DON).not.toContain('ddh.lam.')
+    expect(TIEN_TO_LOCAL_DON).not.toContain('ddh.khacphuc.history.')
     luuXemLai('abcd1234', '12121212', new Set(['q1']))
-    localStorage.setItem('ddh_id_thiet_bi', 'tb-1')
+    localStorage.setItem('ddh.lam.abcd1234.k7f9z2', '{"bai":"lam"}')
+    localStorage.setItem('ddh.khacphuc.history.12121212', '[]')
+    localStorage.setItem('omr_bnv_ke_hoach:12121212', '{}')
+    localStorage.setItem('omr_mom_draft_M1_12121212', '{}')
     const r = donKhiDoiMocReset('2026-09-22')
     expect(r.don).toBe(true)
-    expect(localStorage.getItem('ddh.xemlai.abcd1234.12121212')).toBeNull()
-    expect(localStorage.getItem('ddh_id_thiet_bi')).toBe('tb-1')
+    expect(localStorage.getItem('ddh.xemlai.abcd1234.12121212')).toBe('["q1"]')
+    expect(localStorage.getItem('ddh.lam.abcd1234.k7f9z2')).toBe('{"bai":"lam"}')
+    expect(localStorage.getItem('ddh.khacphuc.history.12121212')).toBe('[]')
+    expect(localStorage.getItem('omr_bnv_ke_hoach:12121212')).toBeNull()
+    expect(localStorage.getItem('omr_mom_draft_M1_12121212')).toBeNull()
   })
 })

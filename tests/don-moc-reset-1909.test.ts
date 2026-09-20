@@ -25,17 +25,21 @@ const DON_LOCAL = [
   'omr_mom_draft_M1_12121212',
   'omr_mom_btvn_12121212',
   'omr_mom_sent_12121212_M1',
-  'ddh.lam.abcd1234',
-  'ddh.lam.abcd1234.k7f9z2',
-  'ddh.lam.abcd1234.k7f9z2.cho',
   'ddh.btvn.draft.BT1.12121212',
-  'ddh.khacphuc.history.12121212',
   'ddh.luyen2026.12121212.P1',
-  'ddh.xemlai.abcd1234.12121212',
   'omr_than_thu_hoa_hoc_data',
   'omr_than_thu_da_nhan_exp',
   'omr_than_thu_qid_thanh_tay',
   'omr_he_thong_chat_v2',
+]
+// Phần thuộc CA THI: reset (chốt lại 21/09) GIỮ ca thi + hồ sơ nên bản nhớ của chúng cũng GIỮ. Khoá có đuôi theo ca/SBD nên KHÔNG nằm trong
+// danh sách GIỮ chính thức (khoá đơn lẻ) — được bảo vệ vì KHÔNG tiền tố DỌN nào khớp chúng (khoá ở bài kiểm dưới).
+const GIU_CA_THI = [
+  'ddh.lam.abcd1234',
+  'ddh.lam.abcd1234.k7f9z2',
+  'ddh.lam.abcd1234.k7f9z2.cho',
+  'ddh.khacphuc.history.12121212',
+  'ddh.xemlai.abcd1234.12121212',
 ]
 const GIU_LOCAL = [
   'omr_student_portal_auth',
@@ -62,7 +66,7 @@ const GIU_SESSION = ['omr_presence_session', 'khoa-session-la']
 
 function nap() {
   for (const k of DON_LOCAL) localStorage.setItem(k, `du-lieu:${k}`)
-  for (const k of GIU_LOCAL) localStorage.setItem(k, `giu:${k}`)
+  for (const k of [...GIU_LOCAL, ...GIU_CA_THI]) localStorage.setItem(k, `giu:${k}`)
   for (const k of DON_SESSION) sessionStorage.setItem(k, `du-lieu:${k}`)
   for (const k of GIU_SESSION) sessionStorage.setItem(k, `giu:${k}`)
 }
@@ -91,13 +95,13 @@ describe('mốc VẮNG hoặc SAI ⇒ không dọn gì (kẻo xoá nháp học s
 describe('mốc MỚI ⇒ dọn đúng danh sách DỌN, GIỮ nguyên từng khoá trong danh sách GIỮ', () => {
   it('máy chưa từng thấy mốc: dọn mọi khoá DỌN (localStorage + sessionStorage), lưu mốc, GIỮ y nguyên từng khoá GIỮ', () => {
     nap()
-    const giuLocal = Object.fromEntries(GIU_LOCAL.map((k) => [k, localStorage.getItem(k)]))
+    const giuLocal = Object.fromEntries([...GIU_LOCAL, ...GIU_CA_THI].map((k) => [k, localStorage.getItem(k)]))
     const giuSession = Object.fromEntries(GIU_SESSION.map((k) => [k, sessionStorage.getItem(k)]))
     const kq = donKhiDoiMocReset('2026-09-21')
     expect(kq).toEqual({ don: true, soKhoa: DON_LOCAL.length + DON_SESSION.length })
     for (const k of DON_LOCAL) expect(localStorage.getItem(k), k).toBeNull()
     for (const k of DON_SESSION) expect(sessionStorage.getItem(k), k).toBeNull()
-    for (const k of GIU_LOCAL) expect(localStorage.getItem(k), k).toBe(giuLocal[k])
+    for (const k of [...GIU_LOCAL, ...GIU_CA_THI]) expect(localStorage.getItem(k), k).toBe(giuLocal[k])
     for (const k of GIU_SESSION) expect(sessionStorage.getItem(k), k).toBe(giuSession[k])
     expect(localStorage.getItem(KHOA_MOC_RESET)).toBe('2026-09-21')
     // hai khoá QUAN TRỌNG NHẤT nêu đích danh
@@ -177,7 +181,7 @@ describe('storage lỗi ⇒ không ném, màn vẫn chạy', () => {
 
 describe('bảo hiểm: danh sách DỌN không bao giờ chạm danh sách GIỮ', () => {
   it('không khoá GIỮ nào khớp khoá DỌN hoặc tiền tố DỌN (chặn việc thêm tiền tố rộng sau này)', () => {
-    for (const k of GIU_LOCAL) {
+    for (const k of [...GIU_LOCAL, ...GIU_CA_THI]) {
       expect(KHOA_LOCAL_DON.includes(k), k).toBe(false)
       expect(TIEN_TO_LOCAL_DON.some((t) => k.startsWith(t)), k).toBe(false)
     }

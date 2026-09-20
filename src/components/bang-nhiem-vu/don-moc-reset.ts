@@ -1,6 +1,7 @@
-// DỌN BỘ NHỚ TRONG MÁY KHI MÁY CHỦ ĐẶT LẠI MÙA (thầy chốt 19/09: 00:01 thứ Hai 21/09 xoá toàn bộ dữ liệu học sinh trên máy chủ —
-// giữ tài khoản, kho đề, cấu hình). Máy học sinh/phụ huynh còn bản nhớ kế hoạch, nháp bài, kết quả luyện câu sai cũ… của dữ liệu ĐÃ XOÁ:
-// để nguyên thì hiện thần thú/EXP/bài cũ, hoặc gửi bài làm dở của BTVN không còn (bị từ chối).
+// DỌN BỘ NHỚ TRONG MÁY KHI MÁY CHỦ ĐẶT LẠI MÙA. Phạm vi reset THẦY CHỐT LẠI 21/09: máy chủ chỉ xoá BTVN, bài Mẹ giao, luyện đề, kế hoạch ngày,
+// game/thần thú/EXP, vinh danh, bảng tin; GIỮ toàn bộ ca thi + hồ sơ + tài khoản. Máy học sinh/phụ huynh chỉ dọn bản nhớ của phần ĐÃ XOÁ:
+// để nguyên thì hiện thần thú/EXP/bài cũ, hoặc gửi bài làm dở của BTVN không còn (bị từ chối). Phần thuộc CA THI (`ddh.lam.*` bài làm dở/chờ gửi
+// của phiếu, `ddh.khacphuc.history.*` lịch sử khắc phục, `ddh.xemlai.*` dấu "Xem lại sau" của màn thi) KHÔNG dọn — ca còn thì bản nhớ còn có nghĩa.
 //
 // LUẬT (0.Planer duyệt bảng DỌN/GIỮ 19/09):
 //  · Máy chủ báo `mocReset` = chuỗi "YYYY-MM-DD" trong /hs/ke-hoach-ngay và /hs/ca-dang-mo. VẮNG/RỖNG/SAI KIỂU ⇒ KHÔNG LÀM GÌ (máy chủ
@@ -21,11 +22,8 @@ export const TIEN_TO_LOCAL_DON: readonly string[] = [
   'omr_mom_draft_', // nháp bài Mẹ giao
   'omr_mom_btvn_', // bản nhớ BTVN của Mom
   'omr_mom_sent_', // phụ huynh: bài Mom đã gửi
-  'ddh.lam.', // bài làm dở của phiếu (kể cả `.cho` = chờ gửi)
   'ddh.btvn.draft.', // nháp BTVN
-  'ddh.khacphuc.history.', // lịch sử khắc phục
   'ddh.luyen2026.', // luyện đề chuẩn
-  'ddh.xemlai.', // dấu "Xem lại sau" của màn thi (theo ca + SBD; chỉ trạng thái giao diện tại máy)
 ]
 
 /** localStorage — khoá đơn lẻ cần dọn (V1 game cũ lưu thú/EXP cục bộ; lịch sử trò chuyện trợ lý nhắc tới bài đã xoá). */
