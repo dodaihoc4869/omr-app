@@ -135,7 +135,7 @@ describe('Đoàn Hộ Tống · máy chủ · đi một mình trọn chặng', (
     const ma = (await goi(d, 'S1', 'mo', { cheDo: 'phong' })).doan.ma as string
     await goi(d, 'S2', 'vao', { ma }); await goi(d, 'S1', 'bat-dau', { ma }); troi(DEM_NGUOC_MS)
     expect((await goi(d, 'S1', 'mo')).doan.ma).toBe(ma)
-    expect((await goi(d, 'S1', 'xem', { ma, coCau: 'X1' })).doan.cau).toEqual({ qid: 'X1', giuNguyen: true, nhan: 'toi_han_on' })
+    expect((await goi(d, 'S1', 'xem', { ma, coCau: 'X1' })).doan.cau).toEqual({ qid: 'X1', giuNguyen: true, nhan: 'toi_han_on', an: false })
     await lamHiep(d, 'S1', ma) // S2 chưa chốt → hiệp chưa giải
     const lai = await goi(d, 'S1', 'xem', { ma })
     expect(lai.doan.tran.hiep).toBe(1); expect(lai.doan.cau).toMatchObject({ qid: 'X1', daChot: true, hanhDong: 'danh', ketQua: { correct: true, solution: `${BI_MAT}-X1` } })

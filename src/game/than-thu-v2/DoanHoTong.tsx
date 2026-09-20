@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom'
 import type { Question } from './core'
 import type { HanhDong, KhungNhinHiep } from './doan-core'
 import { HIEP_TRUM } from './doan-core'
-import type { DoanXem, GoiDoan, GoiYTiepSuc, KetQuaCau, PhanHoiDoan, SanhXem } from './doan-kieu'
+import type { AnXem, BanDongHanhXem, DoanXem, GoiDoan, GoiYTiepSuc, KetQuaCau, PhanHoiDoan, SanhXem } from './doan-kieu'
 import DoanSanh, { type GoiYHomNay } from './DoanSanh'
 import DoanTran, { type CauVuaLam, type LoiGiaiTrum } from './DoanTran'
 import DoanTungChuong from './DoanTungChuong'
@@ -23,6 +23,7 @@ const loiCua = (e: unknown) => (e instanceof Error ? e.message : 'Chưa kết n�
 export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemVu }: { call: GoiDoan; sbd: string; pet: number; cap: number; onDong: () => void; onVeBangNhiemVu: () => void }) {
   const [xem, setXem] = useState<DoanXem | null>(null)
   const [goiY, setGoiY] = useState<GoiYHomNay | null>(null), [sanh, setSanh] = useState<SanhXem | null>(null)
+  const [anThach, setAnThach] = useState<AnXem | null>(null), [banDongHanh, setBanDongHanh] = useState<BanDongHanhXem | null>(null)
   const [ban, setBan] = useState(false), [loi, setLoi] = useState(''), [zoom, setZoom] = useState('')
   const [chon, setChon] = useState(''), [hanhDong, setHanhDong] = useState<HanhDong>('danh'), [yChon, setYChon] = useState<Record<number, 'D' | 'S'>>({})
   const [ketQuaCau, setKetQuaCau] = useState<KetQuaCau | null>(null), [cauVuaLam, setCauVuaLam] = useState<CauVuaLam | null>(null)
@@ -61,7 +62,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   useEffect(() => {
     let ma = ''; try { ma = sessionStorage.getItem(khoaLuu(sbd)) ?? '' } catch { /* bỏ qua */ }
     // Sảnh: vé, chuỗi/rương, Đoàn lớp, Trùm lớp — và chặng đang dở trên máy KHÁC (máy này chưa có mã lưu) thì mở lại luôn.
-    void call('doan-sanh').then(r => { const x = r as PhanHoiDoan; if (!song.current) return; setSanh(x.sanh ?? null); if (!ma && x.dangDo) void call('doan-xem', { ma: x.dangDo }).then(v => apDung(v as PhanHoiDoan)).catch(() => {}) }).catch(() => { /* máy chủ cũ chưa có lệnh: Sảnh giữ ô SẮP MỞ */ })
+    void call('doan-sanh').then(r => { const x = r as PhanHoiDoan; if (!song.current) return; setSanh(x.sanh ?? null); setAnThach(x.anThach ?? null); setBanDongHanh(x.banDongHanh ?? null); if (!ma && x.dangDo) void call('doan-xem', { ma: x.dangDo }).then(v => apDung(v as PhanHoiDoan)).catch(() => {}) }).catch(() => { /* máy chủ cũ chưa có lệnh: Sảnh giữ ô SẮP MỞ */ })
     if (ma) void call('doan-xem', { ma }).then(r => apDung(r as PhanHoiDoan)).catch(() => { try { sessionStorage.removeItem(khoaLuu(sbd)) } catch { /* bỏ qua */ } })
     void call('recommendations').then(r => {
       const x = r as { suggestions?: { title: string }[]; remaining?: number }
@@ -140,7 +141,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const trongTran = !!xem?.batDau && !!tran && !(tran.ketThuc && !tungChuong)
   const loaiQuaiVuaDanh = tungChuong && !tungChuong.laTrum ? (tungChuong.hiep < HIEP_TRUM[0]! ? 0 : 1) : 0
   const than = !xem || !xem.batDau || !tran ? (
-    <DoanSanh pet={pet} cap={cap} tenDoan="Đoàn Hộ Tống" goiY={goiY} sanh={sanh} phong={xem} ban={ban} loi={loi}
+    <DoanSanh pet={pet} cap={cap} tenDoan="Đoàn Hộ Tống" goiY={goiY} sanh={sanh} anThach={anThach} banDongHanh={banDongHanh} phong={xem} ban={ban} loi={loi}
       onLenDuong={() => { unlockBattleAudio(); void goi('doan-mo') }} onMoPhong={() => { unlockBattleAudio(); void goi('doan-mo', { cheDo: 'phong' }) }}
       onVaoPhong={ma => { unlockBattleAudio(); void goi('doan-vao', { ma }) }} onBatDau={() => xem && void goi('doan-bat-dau', { ma: xem.ma })} onRoi={() => void roi()} onDong={onDong} />
   ) : tran.ketThuc && !tungChuong && xem.ketChang ? (

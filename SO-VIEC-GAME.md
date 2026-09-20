@@ -9,8 +9,9 @@ Nơi làm: worktree riêng, nhánh `claude/zealous-taussig-a50c90` (tách từ m
 | 2 | Máy chủ `server/src/game-v2-doan.ts` (mở/vào/nộp/kết chặng, chọn câu từ hồ sơ, ghi `su_kien_hoc` nguồn `game`) | **XONG 19/09** — 0.Planer đã soát + gộp main e65efbb, duyệt luật Chắn mới và các điểm (3)(4)(5); Code 3 chạy migration + đẩy Worker |
 | 3 | Giao diện 6 màn theo bản vẽ | **XONG 19/09** — Boss (0.Planer) đã soát + gộp main c1cfaac, kèm CỜ MỞ GAME; Worker 6ddc48c7 đã có, cờ bật riêng 12121212 |
 | 4 | Tiếp sức (3 thẻ gợi ý máy chủ soạn) | **XONG 21/09** — Boss đã soát + gộp |
-| 5 | Mồi hằng ngày (vé, Đoàn lớp, rương chuỗi, Trùm lớp) | **XONG 21/09** (Trùm lớp bản GỌN, Boss đã đồng ý) — chờ Boss soát |
-| 6 | Ấn thạch dạng + hợp đồng hiển thị ngoài game | chưa làm |
+| 5 | Mồi hằng ngày (vé, Đoàn lớp, rương chuỗi, Trùm lớp) | **XONG 21/09** — Boss đã soát + gộp 0235a4d; Code 3 đã chạy migration + Worker a5b1db90 |
+| 6 | Ấn thạch dạng + bạn đồng hành bù nhau + bảng cho thầy + hợp đồng hiển thị ngoài game | **XONG 21/09** — chờ Boss soát |
+| + | Đảo thần thú bản mới (Code 6): `start` trả `role`, `answer` trả `lyDoThuong`, lệnh `so-tay` | **XONG 21/09**; NỐI `Game.tsx` chờ vỏ `dao/DaoThanThu` của Code 6 lên main |
 
 ---
 
@@ -215,3 +216,19 @@ Commit: 7a203ac (máy chủ) · commit giao diện + sổ việc.
 
 ### Cách lùi
 `git revert` hai commit bước 5: Sảnh về 4 ô SẮP MỞ, mọi chặng lại miễn phí như bước 4. Hai bảng mới để nguyên (chỉ-thêm) hoặc DROP theo ghi chú đầu tệp migration.
+
+---
+
+## BƯỚC 6 — Ấn thạch dạng · bạn đồng hành bù nhau · bảng cho thầy (21/09/2026)
+
+**Tệp MỚI:** `server/src/game-v2-doan-an.ts` · `server/migration-2109-game-doan-trum-cau.sql` (chỉ-thêm `doan_trum_cau`) · `tests/doan-an-thach.test.ts` · `docs/hop-dong-doan-hien-thi-2109.md` · ảnh `1c-sanh-cuoi-trang`. **SỬA:** `game-v2-doan.ts` · `game-v2-reports.ts` (1 dòng định tuyến `doan-bao-cao` + import) · `DoanSanh/DoanTran/DoanKetChang/DoanHoTong/doan-kieu/doan.css` · test. Commit a841b74 (máy chủ) + commit giao diện.
+- **Ấn thạch** đọc `nam_kt_dang` bằng ĐÚNG MỘT định nghĩa "dạng yếu" của hồ sơ (`dangYeu`): NỨT ⇔ dạng yếu; SÁNG = đủ ≥ 4 câu đã gặp và không yếu; chưa đủ căn cứ → chưa có ấn. "Còn N câu nữa là sáng" = max(1, số câu cần ổn thêm để tỉ lệ ≥ 0,7, số câu mới sai). Sảnh hiện tối đa 6 ấn (nứt trước), kèm tên biến thể kỹ năng của thần thú em.
+- **Trong trận:** lúc vào đoàn chụp MỘT lần tập dạng ấn sáng → câu thuộc dạng ấy mang `an:true`; em dùng Kỹ năng ở hiệp ấy → biến thể ấn ×1,25 đúng công thức (test: 24, 24, 30). Không tăng chỉ số thô; Đánh thường không ăn ấn. Nút kỹ năng đổi tên biến thể + "ấn sáng ×1,25".
+- **Bạn đồng hành bù nhau:** bạn cùng lớp có ấn SÁNG ở dạng em nứt VÀ ngược lại; chỉ nói điều mỗi bên VỮNG; tất định theo (sbd, ngày); bạn chưa chọn thú thì bỏ qua.
+- **Hào quang / danh hiệu** (lệnh `doan-hien-thi`): ≥ 3 ấn sáng bạc, ≥ 6 vàng; "Người tiếp sức" khi giúp THÀNH CÔNG ≥ 3 lần / 7 ngày. Hợp đồng cho Code 2/4/1: `docs/hop-dong-doan-hien-thi-2109.md` (em không sửa tệp của họ).
+- **Bảng cho thầy** `POST /game-v2-admin {action:'doan-bao-cao', lop?, soNgay?}`: ai giúp ai, Người tiếp sức của tuần (bạn máy không bao giờ lọt), lớp yếu dạng nào qua CÂU TRÙM (sổ `doan_trum_cau`, không tên em nào). Màn hiển thị ở app thầy là việc của Code 1.
+- Kết chặng thêm dòng "Ấn Ester: còn 3 câu nữa là sáng → mở <biến thể>".
+- Bằng chứng: `doan-an-thach` 8/8 · `doan-giao-dien` 24 · `doan-may-chu` 28 · `doan-mua` 15 · `doan-core` 52 · `doan-cua-vao` 6 · `doan-the-goi-y` 11 · `doan-dao-hop-dong` 4 = **148/148**; tsc sạch; Playwright 0 lỗi console. Đột biến bước 6 + hợp đồng Đảo: 20 → 19 đỏ, 1 tương đương (`so-tay` bỏ `allowed`: kho câu của `readScope` vốn chỉ chứa dạng có bằng chứng). Toàn bộ vitest sau khi gộp main: 6185 test · 101 đỏ / 44 tệp, **đỏ thuộc game = []**; ngoài nền chỉ có `reset-toan-app-1909` (bảng mới `doan_trum_cau` chưa phân loại — đã nhắn Code 3 thêm vào BANG_XOA) và `dao-chon-ban-dong-hanh` của Code 6 (chạy riêng xanh, đỏ oan khi máy nặng).
+
+## Việc cho ĐẢO THẦN THÚ bản mới (Code 6) — phần máy chủ
+`core.ts`: `chooseSessionWithRoles` (chooseSession giữ NGUYÊN kết quả — có test so từng mode) · `ly-do-thuong.ts` (chữ sẵn in theo mốc 20/40/40) · `game-v2.ts`: `start` trả `role`, `answer` trả `lyDoThuong`, lệnh đọc-chỉ `so-tay`. Hợp đồng: `docs/hop-dong-dao-than-thu-may-chu-2109.md`. Commit 6069d51, 309c969. **Còn lại: nối vỏ `dao/DaoThanThu` vào `Game.tsx`** theo `docs/hop-dong-dao-than-thu-prop-2109.md` khi vỏ lên main.

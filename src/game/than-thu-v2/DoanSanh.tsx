@@ -2,7 +2,7 @@
 // rương chuỗi, Trùm lớp, ấn thạch — bước 5 và 6) thì KHÔNG hiện: không bịa số.
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import type { DoanXem, SanhXem } from './doan-kieu'
+import type { AnXem, BanDongHanhXem, DoanXem, SanhXem } from './doan-kieu'
 import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh } from './DoanHinh'
 
 // Bốn thứ đang tới (bước 5, 6). CỐ Ý không có con số nào: máy chủ chưa có số thì không bịa — chỉ tên, một dòng mô tả, biểu tượng khoá.
@@ -14,7 +14,7 @@ const SAP_MO = [
 ] as const
 export interface GoiYHomNay { tong: number; nhom: { ten: string; so: number }[]; hetLuot: boolean }
 interface Props {
-  pet: number; cap: number; tenDoan: string; goiY: GoiYHomNay | null; sanh: SanhXem | null
+  pet: number; cap: number; tenDoan: string; goiY: GoiYHomNay | null; sanh: SanhXem | null; anThach?: AnXem | null; banDongHanh?: BanDongHanhXem | null
   phong: DoanXem | null; ban: boolean; loi: string
   onLenDuong: () => void; onMoPhong: () => void; onVaoPhong: (ma: string) => void; onBatDau: () => void; onRoi: () => void; onDong: () => void
   khoiThem?: ReactNode
@@ -24,7 +24,7 @@ const hen = (ms: number) => { const gio = Math.floor(ms / 3_600_000), ngay = Mat
 
 export default function DoanSanh(p: Props) {
   const [ma, setMa] = useState('')
-  const s = p.sanh, lop = s?.doanLop, hetVe = !!s && !s.mienPhiHomNay && !s.ve
+  const s = p.sanh, lop = s?.doanLop, hetVe = !!s && !s.mienPhiHomNay && !s.ve, an = p.anThach && p.anThach.ds.length ? p.anThach : null, bdh = p.banDongHanh
   const sao = Array.from({ length: 26 }, (_, i) => <i key={i} style={{ left: `${(i * 53 + 17) % 100}%`, top: `${(i * 29 + 7) % 60}%`, animationDelay: `${(i % 7) * .4}s` }} />)
   return (
     <div className="dh-khung">
@@ -43,8 +43,8 @@ export default function DoanSanh(p: Props) {
         <svg viewBox="0 0 358 250" preserveAspectRatio="none">
           <path d="M0 150 C60 118 110 160 170 132 S290 100 358 142 L358 250 L0 250Z" fill="rgba(10,30,50,.55)" />
           <path d="M120 214 C170 206 214 196 244 160 S300 96 332 60" stroke="rgba(255,255,255,.35)" strokeWidth="5" strokeDasharray="2 11" strokeLinecap="round" fill="none" />
-          <path d="M120 214 C170 206 214 196 244 160 S300 96 332 60" stroke="#7dffb0" pathLength={100} strokeDasharray={`${lop ? Math.max(4, Math.round(lop.tram * 100 / lop.tongTram)) : 46} 100`} strokeWidth="5" strokeLinecap="round" fill="none" style={{ filter: 'drop-shadow(0 0 6px rgba(125,255,176,.9))' }} />
-          <polygon points="316,22 326,44 322,78 310,78 306,44" fill="#c8e6ff" opacity=".95" /><polygon points="298,38 306,52 306,78 294,78 292,54" fill="#9fd0ff" opacity=".9" /><polygon points="334,36 340,52 338,78 326,78 326,52" fill="#9fd0ff" opacity=".9" />
+          <path d="M120 214 C170 206 214 196 244 160 S300 96 332 60" stroke="rgb(125,255,176)" pathLength={100} strokeDasharray={`${lop ? Math.max(4, Math.round(lop.tram * 100 / lop.tongTram)) : 46} 100`} strokeWidth="5" strokeLinecap="round" fill="none" style={{ filter: 'drop-shadow(0 0 6px rgba(125,255,176,.9))' }} />
+          <polygon points="316,22 326,44 322,78 310,78 306,44" fill="rgb(200,230,255)" opacity=".95" /><polygon points="298,38 306,52 306,78 294,78 292,54" fill="rgb(159,208,255)" opacity=".9" /><polygon points="334,36 340,52 338,78 326,78 326,52" fill="rgb(159,208,255)" opacity=".9" />
         </svg>
         <ThuHinh pet={p.pet} cap={p.cap} size={150} className="dh-thu-chinh dh-noi" />
         <LinhTamCau size={50} />
@@ -86,29 +86,48 @@ export default function DoanSanh(p: Props) {
           {s && (
             <div className="dh-hai-the">
               <section className="dh-kinh dh-muc" aria-label="Rương chuỗi ngày">
-                <div className="dh-nhan" style={{ color: '#ffd9a0' }}>RƯƠNG CHUỖI NGÀY</div>
-                <p>{s.chuoi.mocKe ? <>Còn <b style={{ color: '#ffd166' }}>{s.chuoi.conNgay} ngày</b> mở rương {s.chuoi.mocKe} ngày</> : <>Em đã mở đủ rương của chuỗi này.</>}{!s.chuoi.daDiHomNay && s.chuoi.ngay > 0 ? ' · đi chặng hôm nay để giữ chuỗi' : ''}</p>
+                <div className="dh-nhan" style={{ color: 'rgb(255,217,160)' }}>RƯƠNG CHUỖI NGÀY</div>
+                <p>{s.chuoi.mocKe ? <>Còn <b style={{ color: 'rgb(255,209,102)' }}>{s.chuoi.conNgay} ngày</b> mở rương {s.chuoi.mocKe} ngày</> : <>Em đã mở đủ rương của chuỗi này.</>}{!s.chuoi.daDiHomNay && s.chuoi.ngay > 0 ? ' · đi chặng hôm nay để giữ chuỗi' : ''}</p>
                 <div className="dh-chuoi-vach" role="img" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}>{Array.from({ length: 7 }, (_, i) => <i key={i} className={i < Math.min(7, s.chuoi.ngay) ? 'dh-xong' : ''} />)}</div>
               </section>
               <section className="dh-kinh dh-muc" aria-label="Trùm lớp">
-                <div className="dh-nhan" style={{ color: '#d9c8ff' }}>TRÙM LỚP</div>
+                <div className="dh-nhan" style={{ color: 'rgb(217,200,255)' }}>TRÙM LỚP</div>
                 {s.trumLop.dangMo || s.trumLop.daGop > 0 ? (
                   <>
-                    <p><b style={{ color: '#fff' }}>{s.trumLop.daHa ? 'Lớp em đã hạ trùm!' : s.trumLop.dangMo ? `Đang mở · ${hen(s.trumLop.conMs)}` : 'Tối Chủ nhật vừa rồi'}</b><br />Cả lớp đã góp {s.trumLop.daGop}/{s.trumLop.mucTieu} sát thương</p>
-                    <div className="dh-mau" style={{ height: 8 }}><i style={{ width: `${Math.min(100, Math.round(s.trumLop.daGop * 100 / Math.max(1, s.trumLop.mucTieu)))}%`, background: 'linear-gradient(90deg,#b79cff,#ff8a5c)' }} /></div>
+                    <p><b style={{ color: 'rgb(255,255,255)' }}>{s.trumLop.daHa ? 'Lớp em đã hạ trùm!' : s.trumLop.dangMo ? `Đang mở · ${hen(s.trumLop.conMs)}` : 'Tối Chủ nhật vừa rồi'}</b><br />Cả lớp đã góp {s.trumLop.daGop}/{s.trumLop.mucTieu} sát thương</p>
+                    <div className="dh-mau" style={{ height: 8 }}><i style={{ width: `${Math.min(100, Math.round(s.trumLop.daGop * 100 / Math.max(1, s.trumLop.mucTieu)))}%`, background: 'linear-gradient(90deg,rgb(183,156,255),rgb(255,138,92))' }} /></div>
                   </>
-                ) : <p><b style={{ color: '#fff', fontSize: 16 }}>Chủ nhật 20:00</b><br />Cả lớp cùng đánh 20 phút · {hen(s.trumLop.moSauMs)}</p>}
+                ) : <p><b style={{ color: 'rgb(255,255,255)', fontSize: 16 }}>Chủ nhật 20:00</b><br />Cả lớp cùng đánh 20 phút · {hen(s.trumLop.moSauMs)}</p>}
               </section>
             </div>
           )}
-          <section className="dh-sap-mo" aria-label="Sắp mở">
-            {SAP_MO.filter(([ten]) => !s || ten === 'Ấn thạch dạng').map(([ten, moTa]) => (
+          {an && (
+            <section className="dh-kinh dh-muc" aria-label="Ấn thạch dạng của em">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}><div className="dh-nhan">ẤN THẠCH DẠNG CỦA EM</div><small style={{ color: 'rgb(159,178,217)' }}>sáng {an.sang} · nứt {an.nut}</small></div>
+              <div className="dh-an">{an.ds.map(a => <div key={a.dang} className={a.trangThai === 'nut' ? 'dh-an-nut' : ''}><i aria-hidden="true" /><small>{a.ten}</small></div>)}</div>
+              {an.ganSang ? <p>Ấn <b style={{ color: 'rgb(255,181,154)' }}>{an.ganSang.ten}</b> đang nứt: khắc phục thêm <b style={{ color: 'rgb(255,255,255)' }}>{an.ganSang.conCau} câu</b> là sáng → mở kỹ năng <span className="dh-chu-vang">{an.ganSang.kyNang}</span></p>
+                : <p>Mọi ấn của em đều đang sáng. Câu thuộc dạng đã sáng thì Kỹ năng của thần thú mạnh hơn ×1,25.</p>}
+            </section>
+          )}
+          {(!s || !an) && <section className="dh-sap-mo" aria-label="Sắp mở">
+            {SAP_MO.filter(([ten]) => !s || (ten === 'Ấn thạch dạng' && !an)).map(([ten, moTa]) => (
               <div key={ten} className="dh-kinh">
                 <span className="dh-khoa" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>SẮP MỞ</span>
                 <b>{ten}</b><small>{moTa}</small>
               </div>
             ))}
-          </section>
+          </section>}
+          {bdh && (
+            <section className="dh-kinh dh-muc" aria-label="Bạn đồng hành hợp nhất hôm nay">
+              <div className="dh-nhan">BẠN ĐỒNG HÀNH HỢP NHẤT HÔM NAY</div>
+              <div className="dh-bu-nhau">
+                <div><ThuHinh pet={p.pet} cap={p.cap} size={72} /><b>Em</b></div>
+                <div className="dh-bu-nhau-giua"><span>{bdh.ten} vững {bdh.banVung} →</span><span className="dh-vang">← Em vững {bdh.emVung}</span></div>
+                <div><ThuHinh pet={bdh.pet} cap={bdh.cap} size={72} quayTrai /><b>{bdh.ten}</b></div>
+              </div>
+              <p>Hai bạn bù nhau: đi cùng đoàn thì tiếp sức chảy hai chiều. Em mở đoàn rồi đọc mã cho {bdh.ten} nhé.</p>
+            </section>
+          )}
           <section className="dh-kinh dh-muc" aria-label="Đi cùng bạn">
             <div className="dh-nhan">ĐI CÙNG BẠN · 2–4 BẠN MỘT ĐOÀN</div>
             <p>Ngồi cạnh nhau thì càng vui: bạn nào kẹt sẽ bật tín hiệu "cần tiếp sức", trùm thì cả đội cùng bàn một câu.</p>

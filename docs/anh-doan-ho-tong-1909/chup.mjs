@@ -57,7 +57,7 @@ async function moMan(ten, { width = 390, height = 844, giamChuyenDong = false } 
     if (u.pathname.includes('/game-v2/')) {
       data = { ok: true, profile, revision: 1, tasks: [], doanMo: true } // cờ mở game BẬT cho em kiểm thử
       if (u.pathname.endsWith('/recommendations')) Object.assign(data, { dailyUsed: 12, remaining: 188, suggestions: [{ title: 'Ester', source: 'D', part: 'I' }, { title: 'Ester', source: 'D', part: 'I' }, { title: 'Ester', source: 'D', part: 'I' }, { title: 'Ancol', source: 'D', part: 'I' }, { title: 'Ancol', source: 'D', part: 'I' }, { title: 'Amin', source: 'D', part: 'I' }] })
-      if (u.pathname.endsWith('/doan-sanh')) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, dangDo: null, sanh: { lop: '12A1', tenDoan: 'Đoàn Hộ Tống 12A1', mua: { so: 1, conNgay: 19 }, ve: 2, mienPhiHomNay: true, chuoi: { ngay: 5, daDiHomNay: false, mocKe: 7, conNgay: 2 },
+      if (u.pathname.endsWith('/doan-sanh')) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, dangDo: null, banDongHanh: { ten: 'Thu Hà', pet: 1, cap: 30, banVung: 'Ester', emVung: 'Ancol' }, anThach: { sang: 4, nut: 2, ganSang: { ten: 'Ester', conCau: 3, kyNang: 'Liệt Diễm Xuyên Giáp' }, ds: [{ dang: 'a', ten: 'Ester', trangThai: 'nut', conCau: 3 }, { dang: 'b', ten: 'Peptit', trangThai: 'nut', conCau: 5 }, { dang: 'c', ten: 'Ancol', trangThai: 'sang', conCau: 0 }, { dang: 'd', ten: 'Amin', trangThai: 'sang', conCau: 0 }, { dang: 'e', ten: 'Polime', trangThai: 'sang', conCau: 0 }, { dang: 'f', ten: 'Điện li', trangThai: 'sang', conCau: 0 }] }, sanh: { lop: '12A1', tenDoan: 'Đoàn Hộ Tống 12A1', mua: { so: 1, conNgay: 19 }, ve: 2, mienPhiHomNay: true, chuoi: { ngay: 5, daDiHomNay: false, mocKe: 7, conNgay: 2 },
         doanLop: { lop: '12A1', tram: 17, tongTram: 30, changThang: 221, changMoiTram: 13, conChangToiTramKe: 4, mocKe: 20, tenMocKe: 'Hồ Cân Bằng', conTramToiMoc: 3, gopSucHomNay: 9, siSo: 32 },
         trumLop: { dangMo: false, chuNhat: '2026-09-27', moSauMs: 4 * 86400000 + 4 * 3600000, conMs: 0, daGop: 0, mucTieu: 3200, daHa: false }, quaMoi: [] } }) })
       if (/\/doan-/.test(u.pathname)) data = xem ? { ok: true, doan: xem } : { ok: false, error: 'Không tìm thấy chặng này.' }
@@ -77,6 +77,7 @@ for (const ten of Object.keys(MAN)) {
   if (ten === '4-tung-chuong') { await page.locator('.dh-chuong').waitFor(); await page.waitForTimeout(1500) } else await page.waitForTimeout(900)
   if (ten === '3-tiep-suc') { await page.getByRole('button', { name: /Tiếp sức cho Thu Hà/ }).click(); await page.locator('.dh-tam').waitFor(); await page.waitForTimeout(500) }
   await page.screenshot({ path: `${OUT}/${ten}-390-sang.jpg`, type: 'jpeg', quality: 84 })
+  if (ten === '1-sanh') { await page.evaluate(() => document.querySelector('.dh').scrollTo(0, 99999)); await page.waitForTimeout(300); await page.screenshot({ path: `${OUT}/1c-sanh-cuoi-trang-390-sang.jpg`, type: 'jpeg', quality: 84 }) }
   assert.deepEqual(loi, [], `${ten}: có lỗi console: ${loi.join(' | ')}`)
   ketQua.push(`${ten}: chụp xong, 0 lỗi console`)
   await ctx.close()
