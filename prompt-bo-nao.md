@@ -36,3 +36,12 @@ CHIA LẠI để Code 3 (đang bận máy chủ BTVN nâng đỡ) không thành 
 - **Code 4**: đổi giọng khối "Bộ não đêm qua" sang ĐÃ LÀM ("Đêm qua đã hỗ trợ N em"), mỗi dòng có kết quả hôm sau khi đã có; nút chỉ còn "Xem" / "Bỏ điều chỉnh"; đưa bản tóm tắt vào BẢNG TIN giáo viên. Công tắc tắt giữ nguyên.
 - **Code 2**: dòng lời nhắn HLV + khi chặng có câu `khac_phuc` thì nhãn nhẹ "luyện lại dạng em vừa vấp".
 - **Boss**: 2 đêm bóng kiểm máy móc ⇒ đạt thì tự bật `that` cả trường đêm thứ 3.
+
+## CẬP NHẬT 3 (21/09) — THẦY CHỐT: chăm TỪNG em MỖI ngày, lời nhắn cho học sinh VÀ phụ huynh phải rất tâm huyết; đổi tên hiển thị
+- **TÊN HIỂN THỊ**: trên app học sinh và phụ huynh KHÔNG dùng chữ "bộ não"/"huấn luyện viên" trơn — dùng **"Bộ não A.I hỗ trợ riêng em <họ tên>"** (app ghép tên). Mọi chỗ "chạy bóng" trên giao diện ⇒ **"chạy thử"** (mã nội bộ `cheDo:'bong'` giữ nguyên cũng được).
+- **Cẩm nang** đã thêm mục "NGHỀ VIẾT LỜI NHẮN" + KHUÔN thêm `loiNhanChoPhuHuynh` (≤ 280, chỉ khi đáng) và `thuTuan` (≤ 600, ở lượt soi kỹ hằng tuần); `loiNhanChoEm` ≤ 160, MỖI em có hoạt động đều có.
+- **Code 1**: thẻ của em thêm `mocDangKhen[]` (lần đầu lên bậc ở một dạng, đúng lại câu từng sai, chuỗi 3/7/14 ngày, quay lại sau vắng, tự làm thêm — tính bằng thuật toán, có số) và `loiNhanGanDay[3]` (chống lặp). `kiemKhuon` cho HAI trường phụ huynh: cùng luật chữ số + từ cấm MỞ RỘNG (so sánh với bạn/con nhà khác, nhãn năng lực, dự đoán điểm, sức khoẻ/tâm lý, tiền bạc/quảng cáo, "chép bài/gian lận"); trần MỘT lời phụ huynh/em/ngày; ngày không có lý do trong danh sách "khi nào viết" mà vẫn có lời ⇒ loại lời đó (giữ phần núm).
+- **Code 3**: `/ph/*` trả `boNaoAi {loiNhan, thuTuan, ngay}` cho đúng con của phụ huynh đó (qua cổng token phụ huynh sẵn có); lưu lịch sử lời nhắn; chế độ chạy thử ⇒ KHÔNG trả gì cho học sinh/phụ huynh.
+- **Code 2**: app học sinh — thẻ "Bộ não A.I hỗ trợ riêng em <tên>" ở bảng nhiệm vụ (lời hôm nay; bấm xem 7 lời gần nhất); app phụ huynh — thẻ cùng tên, lời cho phụ huynh + thư tuần. Vẽ mẫu 2 ảnh (HS + PH) gửi Boss rồi build. Không có lời ⇒ không hiện thẻ.
+- **Code 4**: nhãn "CHẠY THỬ"; màn thầy xem được NGUYÊN VĂN lời đã gửi cho em và phụ huynh trong nhật ký của từng em.
+- **Boss**: 2 đêm chạy thử ĐỌC MẪU ≥ 30 lời học sinh + mọi lời phụ huynh trước khi bật thật; lời sáo/lệch giọng ⇒ sửa cẩm nang.
