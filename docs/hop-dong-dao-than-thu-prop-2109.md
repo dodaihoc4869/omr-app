@@ -32,6 +32,12 @@ const DaoThanThu = lazy(() => import('./dao/DaoThanThu'))
 3. Chọn thú chỉ MỘT lần (luật máy chủ `choose`) — màn mới không hứa "đổi thần thú"; tên thì đổi được (`rename`).
 4. `start`/`answer`: vỏ đọc `questions[].role` và `lyDoThuong` nếu có; chưa có thì tự suy bằng `ly-do-thuong.ts` (của Code 5) và `stage`.
 
-## Màn đã xong (cập nhật dần)
-- `dao/ChonBanDongHanh.tsx` — props `{batDau?, busy?, loi?, moiDoan?, onChon(petId, ten)}`; dùng độc lập được nếu cần nối sớm: `onChon = (pet, ten) => run(async () => { await request('choose', {pet}); if (ten) await request('rename', {name: ten}) })`, `batDau = theMoDau(sbd)`.
-- Xem thử khi `npm run dev`: `/src/game/than-thu-v2/dao/xem-thu.html?man=chon`.
+## TRẠNG THÁI 21/09: ĐỦ 4 MÀN + VỎ — nối được trọn một lần
+- Vỏ: `dao/DaoThanThu.tsx` (default export). Màn con: `ChonBanDongHanh`, `DaoCuaEm`, `ThamHiem` (`DaiAi`, `SanDau`), `SoTay`, `TuiDo`; lõi thuần `dao-core.ts`; kiểu `kieu.ts`; ảnh `anh.ts`; CSS `dao.css`.
+- Vỏ TỰ bọc `.dao` (màn con đứng riêng thì phải có tổ tiên `.dao`). Khi đang thám hiểm vỏ ẩn thanh dưới; "Về đảo" giữ lượt dở, LÊN ĐƯỜNG lần sau đi tiếp.
+- Thứ tự lệnh vỏ gọi (test `tests/dao-than-thu-vo.test.tsx` khoá): mở đảo → `recommendations` + `so-tay` (đọc-chỉ, hỏng thì bỏ qua) · LÊN ĐƯỜNG → `resume` (có lượt adventure/repair còn ải chưa làm ⇒ đi tiếp, KHÔNG sync/start; lượt đã làm hết ⇒ `complete`) → `sync` lặp tới `remaining=0` → `start {mode, dang}` · mỗi ải `answer {session,qid,answer,assisted}` · ải cuối `complete {session}` → `recommendations` · gia đình nhắc ôn → `start {mode:'repair', dang}` (không resume) · `invest`, `rename {name}`, `shield-use {useId}` y như cũ.
+- `call` KHÔNG cần ổn định danh tính (vỏ giữ qua ref). `call` phải NÉM Error khi `ok:false` (như `request` hiện tại).
+- `questions[].role` vắng (Worker cũ / `resume`) ⇒ ải tính là "Luyện đều". `lyDoThuong` vắng ⇒ vỏ tự suy bằng `lyDoThuongTuKetQua` (cùng câu chữ với `ly-do-thuong.ts`).
+- Lượt của Võ đài (`mode:'arena'`) KHÔNG đi qua vỏ — `Game.tsx` giữ tab `learn` cũ cho arena.
+- Gói thêm (đo esbuild, cận trên vì gộp cả `core.ts`/`ImmortalShield` vốn đã ở gói Game): JS 17,9 KB + CSS 7,2 KB gzip = 25 KB ≤ 40 KB. Nạp `lazy()`.
+- Xem thử khi `npm run dev`: `/src/game/than-thu-v2/dao/xem-thu.html?man=vo[&chuachon][&doan]` (vỏ thật + máy chủ giả), `?man=chon|dao|tham|so-tay|tui`.
