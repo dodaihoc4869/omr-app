@@ -14,13 +14,15 @@ import type { Profile } from './game-v2'
 import { PETS, publicQuestion, type PrivateQuestion, type Question } from '../../src/game/than-thu-v2/core'
 import {
   moChang, giaiHiep, roiTran, datGiaoY, kiemHanhDong, hiepLaTrum, giayCuaHiep, tomTatChang, khungNhinHiep, kichBanChang,
-  SO_GHE_TOI_DA, SO_HIEP, SO_Y_TRUM, type Chang, type HanhDong, type NopHiep, type NopTrum,
+  kiemTiepSuc, NHAN_TIEP_SUC_TOI_DA, SO_GHE_TOI_DA, SO_HIEP, SO_Y_TRUM, type Chang, type HanhDong, type NopHiep, type NopTrum,
 } from '../../src/game/than-thu-v2/doan-core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
 import { protectedQuestions } from './game-v2-bank'
 import { readGameScope } from './game-v2-reports'
 import { qidChanHomNay } from './game-v2-ho-so'
 import { ngayVn } from './su-kien-hoc'
+import { soanThe, deRutGon, MO_TA_THE, type LoaiThe, type TheGoiY } from './game-v2-doan-the'
+import { ghiTiepSuc } from './exp-d1'
 
 type Row = Record<string, unknown>
 export type GoiGame = (env: Env, action: string, b: Record<string, unknown>) => Promise<Record<string, unknown>>
@@ -55,12 +57,18 @@ interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; da
 /** `cap` chỉ để VẼ đúng hình thái thần thú; không bao giờ vào lõi (cấp không cho chỉ số trong trận). */
 interface NguoiDoan { sbd: string; ten: string; pet: number; cap: number; lop: string; phien: string; cau: CauRef[] }
 interface NopLuu { dung: boolean; hanhDong: HanhDong; tuLam: boolean; boTrong: boolean; tiepSucBoi?: number }
+/** Thẻ gợi ý một ghế đã nhận ở hiệp đang chạy: `tu` = ghế tiếp sức (có thể là bạn máy). Nội dung thẻ CHỈ xuống máy người nhận. */
+interface TheLuu extends TheGoiY { tu: number }
 export interface PhongDoan {
   kind: 'doan-phong'; chu: string; taoLuc: number; nguoi: NguoiDoan[]
   chang: Chang | null
   /** Lúc hiệp hiện tại MỞ (câu chỉ xuống máy em từ lúc này); hạn chót = hiepLuc + số giây của hiệp. */
   hiepLuc: number
   nop: Record<string, NopLuu>; nopY: Record<string, boolean>; tinHieu: Record<string, string>
+  /** Tiếp sức của hiệp đang chạy: thẻ theo ghế NHẬN, và các ghế đã GIÚP (mỗi hiệp giúp một bạn). */
+  the: Record<string, TheLuu>; daGiup: number[]
+  /** Kết quả tiếp sức của hiệp vừa giải, chờ ghi vào `doan_tiep_suc` cùng giao dịch với lần lưu phòng. */
+  choGhi: { hiep: number; den: string; thanhCong: boolean }[]
   /** Câu chung của hai hiệp trùm; null = không có câu hợp lệ → giáp vỡ theo phong độ 3 hiệp trước. */
   trum: Record<string, CauRef | null>
   /** Ý trùm giao theo bậc của từng bạn ở dạng của câu chung (ý a dễ nhất → bạn bậc thấp nhất). */
@@ -84,12 +92,15 @@ const hanHiep = (p: PhongDoan) => p.hiepLuc + giayCuaHiep(p.chang!.hiep) * 1000
 async function docPhong(env: Env, ma: string): Promise<{ phong: PhongDoan; revision: number }> {
   const row = await env.DB.prepare('SELECT json,revision FROM doan_chang WHERE ma=?').bind(ma).first<{ json: string; revision: number }>()
   if (!row) throw new Error('Không tìm thấy chặng này. Em kiểm tra lại mã đoàn.')
-  return { phong: JSON.parse(row.json) as PhongDoan, revision: row.revision }
+  const phong = JSON.parse(row.json) as PhongDoan
+  phong.the ??= {}; phong.daGiup ??= []; phong.choGhi ??= [] // phòng mở trước bước 4
+  return { phong, revision: row.revision }
 }
 /** Ghi có khoá lạc quan. Chặng vừa kết thúc → cùng một giao dịch chốt sổ lượt của từng em (khoá chính + `ket_luc IS NULL` chống ghi trùng). */
 async function luuPhong(env: Env, ma: string, p: PhongDoan, revision: number): Promise<boolean> {
   const c = p.chang
   const trangThai = c?.ketThuc ? 'xong' : c ? 'dang_di' : p.nguoi.length ? 'sanh' : 'huy'
+  const choGhi = p.choGhi ?? []; p.choGhi = []
   const lenh: D1PreparedStatement[] = [env.DB.prepare('UPDATE doan_chang SET json=?,revision=revision+1,trang_thai=?,chu=?,ket_luc=? WHERE ma=? AND revision=?')
     .bind(JSON.stringify(p), trangThai, p.chu, p.ketLuc ? iso(p.ketLuc) : null, ma, revision)]
   if (c?.ketThuc && p.ketLuc) {
@@ -101,6 +112,7 @@ async function luuPhong(env: Env, ma: string, p: PhongDoan, revision: number): P
         .bind(t.thang ? 1 : 0, t.sao, g.soCau, g.soDung, g.soTuLamDung, g.soLanGiup, g.soLanGiupThanhCong, g.soLanDuocGiup, iso(p.ketLuc), ma, g.id, ma, revision + 1))
     }
   }
+  for (const g of choGhi) lenh.push(env.DB.prepare('UPDATE doan_tiep_suc SET thanh_cong=? WHERE ma_chang=? AND hiep=? AND den_sbd=? AND EXISTS(SELECT 1 FROM doan_chang WHERE ma=? AND revision=?)').bind(g.thanhCong ? 1 : 0, ma, g.hiep, g.den, ma, revision + 1))
   const r = await env.DB.batch(lenh)
   return !!r[0]?.meta.changes
 }
@@ -197,7 +209,7 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
 const gheNguoi = (p: PhongDoan) => p.chang!.ghe.map((g, i) => ({ g, i })).filter(x => !x.g.laMay && !x.g.roi)
 function batDau(p: PhongDoan, ma: string, now: number) {
   p.chang = moChang({ hatGiong: ma, nguoi: p.nguoi.map(n => ({ id: n.sbd, ten: n.ten, pet: n.pet })) })
-  p.hiepLuc = now + DEM_NGUOC_MS; p.nop = {}; p.nopY = {}; p.tinHieu = {}
+  p.hiepLuc = now + DEM_NGUOC_MS; p.nop = {}; p.nopY = {}; p.tinHieu = {}; p.the = {}; p.daGiup = []; p.choGhi = []
 }
 /** Trùm không có câu chung: ý của ghế nào ĐÚNG khi ghế ấy tự làm đúng ≥ 2 trong 3 hiệp thường vừa rồi — phong độ của đoạn đường quyết định vỡ giáp. */
 function yTheoPhongDo(c: Chang): NopTrum[] {
@@ -212,8 +224,10 @@ function giai(p: PhongDoan, now: number) {
   } else {
     const nop: NopHiep[] = Object.entries(p.nop).map(([ghe, n]) => ({ ghe: Number(ghe), dung: n.dung, hanhDong: n.hanhDong, anThach: false, tiepSucBoi: n.tiepSucBoi }))
     p.chang = giaiHiep(c, { nop })
+    const kq = p.chang.lichSu.at(-1)!
+    for (const ghe of Object.keys(p.the)) if (p.nguoi[Number(ghe)]) p.choGhi.push({ hiep: kq.hiep, den: p.nguoi[Number(ghe)]!.sbd, thanhCong: !!kq.ghe[Number(ghe)]?.dung })
   }
-  p.nop = {}; p.nopY = {}; p.tinHieu = {}; p.hiepLuc = now + NGHI_GIUA_HIEP_MS
+  p.nop = {}; p.nopY = {}; p.tinHieu = {}; p.the = {}; p.daGiup = []; p.hiepLuc = now + NGHI_GIUA_HIEP_MS
   if (p.chang.ketThuc) p.ketLuc = now
   else if (hiepLaTrum(p.chang.hiep) && p.trum[p.chang.hiep] && p.giaoY[p.chang.hiep]) p.chang = datGiaoY(p.chang, p.giaoY[p.chang.hiep]!)
 }
@@ -280,11 +294,22 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
     else if (da) {
       // Em đã chốt → được xem lại kết quả câu CỦA MÌNH (tải lại trang không mất lời giải).
       const a = da.boTrong ? null : await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE id=? AND sbd=?').bind(`${p.nguoi[i]!.phien}|${ref.qid}`, sbd).first<{ json: string }>()
-      doan.cau = { qid: ref.qid, daChot: true, hanhDong: da.hanhDong, boTrong: da.boTrong, ketQua: a ? ketQuaCau(JSON.parse(a.json)) : null }
+      const q = b.coCau === ref.qid ? null : await cauRieng(env, ref) // tải lại trang sau khi chốt: máy em mất đề → gửi lại đề (vẫn là bản công khai)
+      doan.cau = { qid: ref.qid, nhan: ref.nhan, daChot: true, hanhDong: da.hanhDong, boTrong: da.boTrong, ketQua: a ? ketQuaCau(JSON.parse(a.json)) : null, ...(q ? { de: publicQuestion(q) } : {}) }
     } else if (b.coCau === ref.qid) doan.cau = { qid: ref.qid, giuNguyen: true, nhan: ref.nhan }
     else {
       const q = await cauRieng(env, ref)
       doan.cau = q ? { qid: ref.qid, nhan: ref.nhan, de: publicQuestion(q) } : { qid: ref.qid, rut: true, loiNhan: 'Câu này vừa được rút khỏi kho. Em chọn Chắn rồi chốt — hiệp này không bị tính sai.' }
+    }
+  }
+  if (mo && !laTrum) {
+    const the = p.the[i], daGiup = p.daGiup.includes(i)
+    doan.tiepSuc = {
+      conLuotNhan: Math.max(0, NHAN_TIEP_SUC_TOI_DA - c.ghe[i]!.daNhanTiepSuc - (the ? 1 : 0)), daXin: p.tinHieu[i] === 'can_tiep_suc',
+      // Nội dung thẻ CHỈ có trong gói của người NHẬN. Người tiếp sức không bao giờ thấy nội dung (không đọc hộ bạn).
+      theNhan: the ? { tuTen: c.ghe[the.tu]!.ten, tuLaMay: c.ghe[the.tu]!.laMay || c.ghe[the.tu]!.roi, loai: the.loai, tieuDe: the.tieuDe, noiDung: the.noiDung } : null,
+      banCan: p.nop[i] && !daGiup ? c.ghe.flatMap((g, k) => k !== i && !g.laMay && !g.roi && p.tinHieu[k] === 'can_tiep_suc' && !p.the[k] && !p.nop[k] && g.daNhanTiepSuc < NHAN_TIEP_SUC_TOI_DA ? [k] : []) : [],
+      daGiup, lienKichSanSang: !!the || daGiup,
     }
   }
   if (mo && laTrum) {
@@ -310,6 +335,24 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
 /** Phần kết quả của `answer` được phép về máy em SAU KHI em chốt. */
 const ketQuaCau = (r: Row) => ({ correct: r.correct, answer: r.answer, solution: r.solution, solutionImages: r.solutionImages, reward: r.reward, stage: r.stage })
 
+// ───────────────────────── Tiếp sức ─────────────────────────
+/** Ghế `tu` có được tiếp sức ghế `den` ngay lúc này không. Lời báo in thẳng cho em. */
+function kiemGiup(p: PhongDoan, tu: number, den: number, now: number) {
+  const c = p.chang
+  if (!c || c.ketThuc || now < p.hiepLuc) throw new Error('Hiệp chưa mở.')
+  kiemTiepSuc(c, tu, den, p.daGiup)
+  if (!p.nop[tu]) throw new Error('Em chốt câu của mình trước rồi mới tiếp sức bạn được.')
+  if (p.nop[den]) throw new Error('Bạn ấy vừa chốt xong rồi.')
+  if (p.the[den]) throw new Error('Bạn ấy vừa nhận thẻ của một bạn khác rồi.')
+  if (p.tinHieu[den] !== 'can_tiep_suc') throw new Error('Bạn ấy chưa bật tín hiệu "cần tiếp sức".')
+}
+async function theChoGhe(env: Env, p: PhongDoan, ma: string, ghe: number): Promise<{ q: PrivateQuestion | null; the: TheGoiY[] }> {
+  const ref = p.nguoi[ghe]?.cau[chiSoCau(p.chang!.hiep)], q = ref ? await cauRieng(env, ref) : null
+  return { q, the: q ? soanThe(q, ma) : [] }
+}
+const ghiLuotTiepSuc = (env: Env, ma: string, hiep: number, den: string, tu: string, the: string, now: number) =>
+  env.DB.prepare('INSERT OR IGNORE INTO doan_tiep_suc(ma_chang,hiep,den_sbd,tu_sbd,the,luc) VALUES(?,?,?,?,?,?)').bind(ma, hiep, den, tu, the, iso(now)).run().catch(() => { /* sổ phụ: lỗi ghi không làm hỏng trận */ })
+
 // ───────────────────────── Bộ lệnh /game-v2/doan-* ─────────────────────────
 export async function doanAction(env: Env, sbd: string, p: Profile, action: string, b: Row, goiGame: GoiGame): Promise<Record<string, unknown>> {
   if (!await doanMoCho(env, sbd)) throw new Error(LOI_CHUA_MO)
@@ -326,7 +369,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       WHERE l.sbd=? AND l.ket_luc IS NULL AND c.trang_thai IN ('sanh','dang_di') AND c.tao_luc>? ORDER BY l.vao_luc DESC LIMIT 1`).bind(sbd, iso(now - PHONG_HET_HAN_MS)).first<{ ma_chang: string }>()
     if (dangDo) return chay(env, sbd, hoSo, 'doan-xem', { ...b, ma: dangDo.ma_chang }, goiGame)
     const toi = await taoNguoi(env, sbd, hoSo, b, goiGame, now), ma = 'DH' + hex(4)
-    const phong: PhongDoan = { kind: 'doan-phong', chu: sbd, taoLuc: now, nguoi: [toi], chang: null, hiepLuc: 0, nop: {}, nopY: {}, tinHieu: {}, trum: {}, giaoY: {}, ketLuc: null }
+    const phong: PhongDoan = { kind: 'doan-phong', chu: sbd, taoLuc: now, nguoi: [toi], chang: null, hiepLuc: 0, nop: {}, nopY: {}, tinHieu: {}, the: {}, daGiup: [], choGhi: [], trum: {}, giaoY: {}, ketLuc: null }
     if (b.cheDo !== 'phong') { Object.assign(phong, await chonCauTrum(env, ma, phong.nguoi, now)); batDau(phong, ma, now) }
     await env.DB.batch([
       env.DB.prepare('INSERT INTO doan_chang(ma,json,chu,trang_thai,tao_luc) VALUES(?,?,?,?,?)').bind(ma, JSON.stringify(phong), sbd, phong.chang ? 'dang_di' : 'sanh', iso(now)),
@@ -344,6 +387,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     let i = phong.nguoi.findIndex(n => n.sbd === sbd)
     let doi = tienHanh(phong, now)
     let kem: Record<string, unknown> = {}
+    const sauLuu: (() => Promise<unknown>)[] = [] // việc phụ chỉ làm khi phòng đã lưu xong (ghi sổ tiếp sức, EXP tiếp sức)
 
     if (action === 'doan-vao') {
       if (i < 0) {
@@ -375,8 +419,40 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       if (!phong.chang || phong.chang.ketThuc || now < phong.hiepLuc) throw new Error('Hiệp chưa mở.')
       if (t === '') delete phong.tinHieu[i]
       else if (!(TIN_HIEU as readonly string[]).includes(t)) throw new Error('Chỉ dùng các tín hiệu có sẵn.')
-      else phong.tinHieu[i] = t
+      else if (t === 'can_tiep_suc') {
+        const c = phong.chang
+        if (hiepLaTrum(c.hiep)) throw new Error('Hiệp trùm cả đội bàn chung, không dùng thẻ tiếp sức.')
+        if (phong.nop[i]) throw new Error('Em đã chốt đòn của hiệp này.')
+        if (phong.the[i]) throw new Error('Hiệp này em đã nhận một thẻ rồi.')
+        if (c.ghe[i]!.daNhanTiepSuc >= NHAN_TIEP_SUC_TOI_DA) throw new Error(`Em đã dùng hết ${NHAN_TIEP_SUC_TOI_DA} lần được tiếp sức của chặng này. Câu này em tự làm nhé.`)
+        const { the } = await theChoGhe(env, phong, ma, i)
+        if (!the.length) throw new Error('Câu này chưa có thẻ gợi ý nào gửi được. Em tự làm nhé.')
+        phong.tinHieu[i] = t
+        // Không còn bạn THẬT nào khác trong đoàn (đi một mình, hoặc bạn đã rời) → bạn máy tiếp sức ngay, thẻ rút tất định.
+        const may = c.ghe.findIndex(g => g.laMay || g.roi)
+        if (may >= 0 && !phong.daGiup.includes(may) && gheNguoi(phong).every(x => x.i === i)) {
+          const chon = the[hashSeed(`${ma}|${c.hiep}|${i}|may`) % the.length]!
+          phong.the[i] = { tu: may, ...chon }; phong.daGiup.push(may); delete phong.tinHieu[i]
+          sauLuu.push(() => ghiLuotTiepSuc(env, ma, c.hiep, sbd, 'may', chon.loai, now))
+        }
+      } else phong.tinHieu[i] = t
       doi = true
+    } else if (action === 'doan-the-goi-y') {
+      // Người tiếp sức xem: thân câu rút gọn của bạn + TÊN các thẻ phát được. Không có phương án, không có gì bạn đã chọn, không có nội dung thẻ.
+      const den = Number(b.den); kiemGiup(phong, i, den, now)
+      const { q, the } = await theChoGhe(env, phong, ma, den), g = phong.chang!.ghe[den]!
+      kem = { goiY: { den, ten: g.ten, pet: g.pet, cap: phong.nguoi[den]!.cap, tenDang: q?.tenDang ?? '', de: q ? deRutGon(q) : '', the: the.map(t => ({ loai: t.loai, ...MO_TA_THE[t.loai] })) } }
+    } else if (action === 'doan-tiep-suc') {
+      const den = Number(b.den), c = phong.chang
+      if (c && Number(b.hiep) !== c.hiep) throw new Error('Hiệp vừa kết thúc.')
+      kiemGiup(phong, i, den, now)
+      const chon = (await theChoGhe(env, phong, ma, den)).the.find(t => t.loai === (b.the as LoaiThe))
+      if (!chon) throw new Error('Thẻ này không dùng được cho câu của bạn. Em chọn thẻ khác nhé.')
+      phong.the[den] = { tu: i, ...chon }; phong.daGiup.push(i); delete phong.tinHieu[den]; doi = true
+      const hiep = c!.hiep, denSbd = phong.nguoi[den]!.sbd
+      sauLuu.push(() => ghiLuotTiepSuc(env, ma, hiep, denSbd, sbd, chon.loai, now))
+      // EXP tiếp sức do Code 3 giữ sổ (+3, tối đa 5 lần/ngày, khoá theo mã lượt nên bấm lại không cộng đôi). Game chỉ hiển thị theo số trả về.
+      sauLuu.push(async () => { const r = await ghiTiepSuc(env, sbd, now, `${ma}|${hiep}|${den}`); kem = { ...kem, expTiepSuc: { bat: r.bat, exp: r.exp, conLai: r.conLai } } })
     } else if (action === 'doan-nop') {
       const c = phong.chang
       if (!c || c.ketThuc) throw new Error('Chặng chưa bắt đầu hoặc đã kết thúc.')
@@ -392,10 +468,11 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       if (boTrong && hanhDong !== 'chan') throw new Error('Bỏ trống thì em chỉ Chắn được. Muốn Đánh hay dùng Kỹ năng, em trả lời câu hỏi nhé.')
       let dung = false
       if (!boTrong) {
-        const r = await goiGame(env, 'answer', danhDau({ token: b.token, session: phong.nguoi[i]!.phien, qid: ref!.qid, answer: b.answer, assisted: false }))
+        // Đã nhận thẻ tiếp sức → `assisted:true`: máy chủ game KHÔNG ghi bằng chứng, KHÔNG thưởng mastery cho câu này (luật cũ giữ nguyên). Cờ do máy chủ quyết, không do máy em khai.
+        const r = await goiGame(env, 'answer', danhDau({ token: b.token, session: phong.nguoi[i]!.phien, qid: ref!.qid, answer: b.answer, assisted: !!phong.the[i] }))
         dung = r.correct === true; kem = { ketQuaCau: ketQuaCau(r) }
       }
-      phong.nop[i] = { dung, hanhDong, tuLam: true, boTrong }
+      phong.nop[i] = { dung, hanhDong, tuLam: !phong.the[i], boTrong, tiepSucBoi: phong.the[i]?.tu }
       delete phong.tinHieu[i]; tienHanh(phong, now); doi = true
     } else if (action === 'doan-nop-y') {
       const c = phong.chang, y = Number(b.y), chon = String(b.answer ?? '')
@@ -417,6 +494,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     } else throw new Error('Không có lệnh Đoàn Hộ Tống này.')
 
     if (doi && !await luuPhong(env, ma, phong, revision)) continue
+    for (const viec of sauLuu) await viec()
     return { ...await khungNhin(env, ma, phong, doi ? revision + 1 : revision, sbd, now, b), ...kem }
   }
   throw new Error('Đoàn đang rất đông thao tác. Em bấm lại giúp thầy nhé.')

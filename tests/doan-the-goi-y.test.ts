@@ -45,6 +45,14 @@ describe('Thẻ gợi ý · soạn từ dữ liệu có sẵn của câu', () =>
     expect(soanThe(cau({ solution: { chot: '', buoc: ['Ester + NaOH tạo muối và ancol.'] } }), 'DH1').map(t => t.loai)).toEqual(['nhac_cong_thuc', 'loai_phuong_an'])
     expect(soanThe(cau({ solution: 'Ester thuỷ phân trong kiềm cho muối và ancol nên chọn B.', kienThuc: [] }), 'DH1').map(t => t.loai)).toEqual(['loai_phuong_an'])
   })
+  it('bước đầu chiếm gần hết lời giải (> 60% toàn văn) → coi như toàn bộ lời giải, KHÔNG phát; lời giải chỉ MỘT bước thì dù có câu chốt dài cũng không phát "bước đầu"', () => {
+    const dai = 'Tách ester thành gốc acid và gốc ancol, gốc acid gắn với natri thành muối còn gốc ancol nhận hiđro thành ancol tương ứng của nó.'
+    expect(soanThe(cau({ solution: { chot: '', buoc: [dai, 'Đọc kết quả.'] } }), 'DH1').map(t => t.loai)).toEqual(['nhac_cong_thuc', 'loai_phuong_an'])
+    expect(soanThe(cau({ solution: { chot: dai, buoc: ['Viết phương trình phản ứng.'] } }), 'DH1').map(t => t.loai)).toEqual(['nhac_cong_thuc', 'loai_phuong_an'])
+  })
+  it('trường kiến thức mà lỡ chứa nội dung phương án ĐÚNG → không phát thẻ "Nhắc công thức"', () => {
+    expect(soanThe(cau({ kienThuc: ['sản phẩm là CH3COONa và C2H5OH'], solution: null }), 'DH1').map(t => t.loai)).toEqual(['loai_phuong_an'])
+  })
   it('thiếu trường kiến thức → "Nhắc công thức" dùng câu chốt của lời giải, NHƯNG chỉ khi lời giải còn phần khác và câu chốt không lộ đáp án', () => {
     expect(soanThe(cau({ kienThuc: [] }), 'DH1')[0]).toEqual({ loai: 'nhac_cong_thuc', tieuDe: 'Nhắc công thức', noiDung: 'Ester thuỷ phân trong kiềm cho muối của acid và ancol tương ứng.' })
     expect(soanThe(cau({ kienThuc: [], solution: { chot: 'Sản phẩm là CH3COONa và C2H5OH.', buoc: ['Viết phương trình.', 'Đọc sản phẩm.'] } }), 'DH1').map(t => t.loai)).toEqual(['loai_phuong_an', 'buoc_dau'])

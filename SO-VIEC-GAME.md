@@ -7,8 +7,8 @@ Nơi làm: worktree riêng, nhánh `claude/zealous-taussig-a50c90` (tách từ m
 |---|---|---|
 | 1 | Lõi thuần `doan-core.ts` + test bảng giá trị + đột biến | **XONG 19/09** — 0.Planer đã soát + gộp main 243e746, duyệt cả 9 quyết định (ghi chú 9 → đã sửa, xem mục "Sửa sau soát") |
 | 2 | Máy chủ `server/src/game-v2-doan.ts` (mở/vào/nộp/kết chặng, chọn câu từ hồ sơ, ghi `su_kien_hoc` nguồn `game`) | **XONG 19/09** — 0.Planer đã soát + gộp main e65efbb, duyệt luật Chắn mới và các điểm (3)(4)(5); Code 3 chạy migration + đẩy Worker |
-| 3 | Giao diện 6 màn theo bản vẽ | **XONG 19/09** 5/6 màn (màn 3 Tiếp sức đi cùng bước 4) — chờ 0.Planer soát |
-| 4 | Tiếp sức (3 thẻ gợi ý máy chủ soạn) | chưa làm |
+| 3 | Giao diện 6 màn theo bản vẽ | **XONG 19/09** — Boss (0.Planer) đã soát + gộp main c1cfaac, kèm CỜ MỞ GAME; Worker 6ddc48c7 đã có, cờ bật riêng 12121212 |
+| 4 | Tiếp sức (3 thẻ gợi ý máy chủ soạn) | **XONG 21/09** (máy chủ + màn 3) — chờ Boss soát |
 | 5 | Mồi hằng ngày (vé, Đoàn lớp, rương chuỗi, Trùm lớp) | chưa làm |
 | 6 | Ấn thạch dạng + hợp đồng hiển thị ngoài game | chưa làm |
 
@@ -155,3 +155,36 @@ Commit (mỗi màn một commit, theo lệnh 0.Planer): 9023df2 nền · 2bac1ee
 - **Tung chưởng**: hai tia (lửa của em + nước của bạn) nay xuất phát từ ĐẦU từng thần thú và hội vào quái như bản vẽ 4 (cột tia 168 px × 37 vh, nghiêng ±17°); số sát thương đặt dưới dải tên chiêu, cách mép phải 16 px, không đè chữ.
 - Test đo giờ: ca "tự tắt sau 3 giây" từng ĐỎ OAN khi chạy chung cả bộ (đồng hồ giả trôi theo giờ thật, máy nặng thì màn đã tự tắt trước khi test kịp tìm) → viết lại KHÔNG chờ đồng hồ: bắt đúng cái hẹn giờ 3000 ms rồi tự bấm; ca "một chạm là tắt" kiểm NGAY sau cú chạm (không còn được hẹn giờ cứu). Hạn chờ findBy/waitFor của hai tệp giao diện nới lên 8 s.
 - Toàn bộ vitest sau cùng: **5812 test · 97 đỏ / 42 tệp = ĐÚNG NỀN · MỚI ĐỎ = []**; tsc sạch app + server.
+
+---
+
+## BƯỚC 4 — Tiếp sức (21/09/2026)
+
+**Tệp MỚI:** `server/src/game-v2-doan-the.ts` (hàm thuần soạn thẻ) · `tests/doan-the-goi-y.test.ts` · `src/game/than-thu-v2/DoanTiepSuc.tsx` (màn 3) · `docs/anh-doan-ho-tong-1909/3-tiep-suc-390-sang.jpg`.
+**Tệp SỬA:** `server/src/game-v2-doan.ts` (lệnh + cờ assisted + sổ tiếp sức + EXP) · `doan-kieu.ts` · `DoanTran.tsx` · `DoanHoTong.tsx` · `doan.css` · 2 tệp test cũ · `chup.mjs`. KHÔNG đụng `game-v2.ts`, không migration mới (bảng `doan_tiep_suc` đã có từ bước 2).
+
+### Thẻ do MÁY CHỦ soạn từ dữ liệu có sẵn của câu (không sinh nội dung mới)
+| Thẻ | Nguồn | Khi nào KHÔNG phát |
+|---|---|---|
+| Nhắc công thức | trường `kienThuc` của câu ("Kiến thức gốc của câu này: a · b"); thiếu thì câu chốt của lời giải có cấu trúc | không có kiến thức VÀ (lời giải không có phần nào khác ngoài câu chốt, hoặc câu chốt lộ đáp án) |
+| Loại 1 phương án | máy gạch MỘT phương án SAI, rút tất định theo (mã chặng, qid) | không phải Phần I |
+| Chỉ bước đầu | `buoc[0]` của lời giải NHIỀU bước | lời giải < 2 bước, bước đầu lộ đáp án, hoặc dài > 60% toàn văn lời giải |
+Ba chốt (thà thiếu thẻ còn hơn lộ bài): (1) `loDapAn` — Phần I: chữ cái ("chọn B", "B là đúng", "đáp án: b") hoặc NỘI DUNG phương án đúng; Phần II: dãy Đ/S liền hoặc rời ("Đúng, Sai, Đúng, Sai"), "ý a đúng", dấu ✓✗; Phần III: đáp số như một con số trọn vẹn (12,5 = 12.5, nhưng 0,125 / 112,5 / 12,55 KHÔNG bị bắt nhầm); (2) không phải toàn bộ lời giải; (3) câu không lời giải → chỉ còn "Loại 1 phương án" (Phần II, III: không thẻ nào → em được báo "câu này chưa có thẻ gợi ý, em tự làm nhé" ngay lúc xin, không treo tín hiệu).
+
+### Luồng
+B (chưa chốt) bấm **"Cần tiếp sức · còn 2 lần được tiếp sức"** → A (ĐÃ chốt) thấy nút vàng "Tiếp sức cho <tên>" → tấm trượt: thân câu RÚT GỌN của B (không phương án, không ý, "em không thấy … đã chọn gì"), 3 thẻ (thẻ máy chủ không phát thì khoá), dòng "không bao giờ là đáp án" → A chọn LOẠI thẻ → B nhận NỘI DUNG thẻ + biểu ngữ "LIÊN KÍCH ×2 SẴN SÀNG" → B chốt → lõi tính Liên Kích.
+- Người tiếp sức KHÔNG BAO GIỜ thấy nội dung thẻ, phương án, đáp án hay SBD của bạn (test soi gói tin).
+- **Câu đã nhận thẻ chấm với `assisted:true`** (cờ do máy chủ quyết theo phòng, không do máy em khai) → đường `answer` cũ tự lo: không ghi `su_kien_hoc`, không thưởng mastery — đúng hay sai đều vậy. Test đọc thẳng `game_v2_attempt` + đếm sổ.
+- Trần: mỗi chặng NHẬN 2 lần, mỗi hiệp GIÚP 1 bạn, chưa chốt thì chưa giúp được, bạn chưa bật tín hiệu thì không gửi được, hiệp trùm không có thẻ.
+- Đi MỘT MÌNH (hoặc bạn đã rời): bật tín hiệu là **bạn máy gửi thẻ ngay** (rút tất định) → vẫn có Liên Kích; bạn máy không có EXP, không có dòng sổ lượt. Còn bạn THẬT trong đoàn thì máy không chen vào.
+- Sổ `doan_tiep_suc`: ghi lúc gửi thẻ (`INSERT OR IGNORE`), `thanh_cong` cập nhật trong CÙNG giao dịch với lần lưu phòng khi hiệp giải.
+- **EXP tiếp sức: gọi `ghiTiepSuc(env, sbdNgườiGiúp, now, "<mã chặng>|<hiệp>|<ghế được giúp>")` của Code 3** — game không tự ghi sổ EXP; hiển thị đúng số trả về ("+3 EXP tiếp sức"); cờ EXP mới tắt → 0, không hiện gì.
+- Sửa kèm: tải lại trang SAU khi chốt, máy em mất đề → máy chủ gửi lại đề (bản công khai) trừ khi máy em báo đã có (`coCau`).
+
+### Bằng chứng
+- `doan-the-goi-y` 11/11 (gồm quét 300 câu sinh tự động: không thẻ nào lộ đáp án / là toàn bộ lời giải) · `doan-may-chu` 28/28 (5 ca Tiếp sức mới) · `doan-giao-dien` 18/18 (3 ca màn 3) · `doan-core` 52 · `doan-cua-vao` 6. tsc sạch app + server. Playwright: 7 màn 0 lỗi console, các phép đo bố cục như cũ.
+- Đột biến bước 4: **34 → 32 đỏ**, 2 TƯƠNG ĐƯƠNG do hai chốt chồng nhau ("câu chốt là toàn bộ lời giải" bị chốt 2 bắt; "Phần II/III có thẻ loại phương án" bị điều kiện đáp án một chữ cái bắt). Vòng đầu sống thêm 3 → đã thêm test (bước đầu > 60% toàn văn; một bước + câu chốt dài; kiến thức chứa phương án đúng).
+- Toàn bộ vitest (đã gộp main 9d1db2d): 6003 test · 108 đỏ / 50 tệp. **11 đỏ mới KHÔNG phải của game**: chạy riêng 8 tệp ấy trên bản SẠCH của main ad3917a vẫn đỏ đúng 11 (btvn-submit, ca-dang-mo, cau-theo-qid, ho-so-len-bang-may-chu, kenh4 ×3, man-ca-thi-may-chu-moi, reset-toan-app ×2, teacher-news — dấu hiệu: WeakMap trong reset-toan-app.ts + truy vấn cổng reset chen vào + mốc ngày 21/09). Đã nhắn thẳng Code 3 kèm cách tái hiện. Loại 11 test ấy: 97 đỏ / 42 tệp = nền, **MỚI ĐỎ của game = []**.
+
+### Cách lùi
+`git revert` commit bước 4: nút xin/giúp biến mất, `assisted` về `false` cứng như bước 2; bảng `doan_tiep_suc` để nguyên (chỉ-thêm).

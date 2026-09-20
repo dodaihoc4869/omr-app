@@ -6,11 +6,12 @@ import { createPortal } from 'react-dom'
 import type { Question } from './core'
 import type { HanhDong, KhungNhinHiep } from './doan-core'
 import { HIEP_TRUM } from './doan-core'
-import type { DoanXem, GoiDoan, KetQuaCau, PhanHoiDoan } from './doan-kieu'
+import type { DoanXem, GoiDoan, GoiYTiepSuc, KetQuaCau, PhanHoiDoan } from './doan-kieu'
 import DoanSanh, { type GoiYHomNay } from './DoanSanh'
 import DoanTran, { type CauVuaLam, type LoiGiaiTrum } from './DoanTran'
 import DoanTungChuong from './DoanTungChuong'
 import DoanKetChang from './DoanKetChang'
+import DoanTiepSuc from './DoanTiepSuc'
 import { ManHinhAnh } from '../../components/QuestionMedia'
 import { unlockBattleAudio } from './battle-audio'
 import './doan.css'
@@ -26,6 +27,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const [chon, setChon] = useState(''), [hanhDong, setHanhDong] = useState<HanhDong>('danh'), [yChon, setYChon] = useState<Record<number, 'D' | 'S'>>({})
   const [ketQuaCau, setKetQuaCau] = useState<KetQuaCau | null>(null), [cauVuaLam, setCauVuaLam] = useState<CauVuaLam | null>(null)
   const [tungChuong, setTungChuong] = useState<KhungNhinHiep | null>(null), [loiGiaiTrum, setLoiGiaiTrum] = useState<LoiGiaiTrum | null>(null)
+  const [goiYThe, setGoiYTiepSuc] = useState<GoiYTiepSuc | null>(null), [expTiepSuc, setExpTiepSuc] = useState(0)
   const [expNhan, setExpNhan] = useState(0), [, setNhip] = useState(0), [choRoi, setChoRoi] = useState(false)
   const de = useRef(new Map<string, Question>()), moc = useRef({ luc: 0, conMs: 0, moSauMs: 0 }), phienBan = useRef({ ma: '', revision: -1 })
   const hiepDaChieu = useRef(0), hiepDangLam = useRef(0), khoa = useRef(false), song = useRef(true)
@@ -43,7 +45,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (d.trum?.de && d.trum.qid) de.current.set(d.trum.qid, d.trum.de)
     moc.current = { luc: performance.now(), conMs: d.tran?.conMs ?? 0, moSauMs: d.tran?.moSauMs ?? 0 }
     const hiep = d.tran?.hiep ?? 0
-    if (hiep !== hiepDangLam.current) { hiepDangLam.current = hiep; setChon(''); setHanhDong('danh'); setYChon({}); setKetQuaCau(null); setChoRoi(false) }
+    if (hiep !== hiepDangLam.current) { hiepDangLam.current = hiep; setChon(''); setHanhDong('danh'); setYChon({}); setKetQuaCau(null); setChoRoi(false); setGoiYTiepSuc(null); setExpTiepSuc(0) }
     const vua = d.hiepVuaXong
     if (vua && vua.hiep > hiepDaChieu.current) { hiepDaChieu.current = vua.hiep; setTungChuong(vua); setLoiGiaiTrum(null) }
     setXem(d)
@@ -104,6 +106,12 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (kq?.reward) setExpNhan(n => n + (kq.reward ?? 0))
     setCauVuaLam(deHienTai ? { q: deHienTai, chon: boTrong ? '' : chon, ketQua: kq } : null)
   }
+  const moTiepSuc = async (ghe: number) => { if (!xem) return; const r = await goi('doan-the-goi-y', { ma: xem.ma, den: ghe }); if (r?.goiY) setGoiYTiepSuc(r.goiY) }
+  const guiThe = async (loai: string) => {
+    if (!xem || !tran || !goiYThe) return
+    const r = await goi('doan-tiep-suc', { ma: xem.ma, hiep: tran.hiep, den: goiYThe.den, the: loai })
+    if (r) { setGoiYTiepSuc(null); setExpTiepSuc(r.expTiepSuc?.exp ?? 0) }
+  }
   const chotY = (y: number) => { if (xem && tran && yChon[y]) void goi('doan-nop-y', { ma: xem.ma, hiep: tran.hiep, y, answer: yChon[y] }) }
   const roi = async () => {
     if (!xem) return
@@ -133,13 +141,15 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   ) : (
     <DoanTran xem={xem} de={deHienTai} deTrum={deTrum} conGiay={conGiay} moSauGiay={moSauGiay} chon={chon} onChon={setChon} hanhDong={hanhDong} onHanhDong={setHanhDong}
       yChon={yChon} onYChon={(y, v) => setYChon(o => ({ ...o, [y]: v }))} onChot={b => void chot(b)} onChotY={chotY} onTinHieu={t => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: t })}
-      onRoi={() => void roi()} onZoom={setZoom} ban={ban} loi={loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum} />
+      onXinTiepSuc={bat => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: bat ? 'can_tiep_suc' : '' })} onMoTiepSuc={g => void moTiepSuc(g)} expTiepSuc={expTiepSuc}
+      onRoi={() => void roi()} onZoom={setZoom} ban={ban} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum} />
   )
 
   return createPortal(
     <div className={`dh ${tinh ? 'dh-tinh' : ''} ${trongTran ? 'dh-tran' : ''}`} data-man={!xem?.batDau ? 'sanh' : tran?.ketThuc && !tungChuong ? 'ket-chang' : tran?.laTrum ? 'trum' : 'tran'}>
       {than}
       {tungChuong && xem && tran && <DoanTungChuong kq={tungChuong} ghe={xem.ghe} loaiQuai={tran.loaiQuai[loaiQuaiVuaDanh] ?? 'bun_acid'} tenQuai={tran.tenQuai[loaiQuaiVuaDanh] ?? 'Tạp Chất'} tinh={tinh} onXong={xongChuong} />}
+      {goiYThe && trongTran && !tungChuong && <DoanTiepSuc goiY={goiYThe} ban={ban} loi={loi} onChon={l => void guiThe(l)} onDong={() => { setGoiYTiepSuc(null); setLoi('') }} />}
       {zoom && <ManHinhAnh src={zoom} alt="Ảnh của câu" onClose={() => setZoom('')} />}
     </div>,
     document.body,

@@ -94,6 +94,41 @@ describe('Đoàn Hộ Tống · giao diện · Trong trận', () => {
   })
 })
 
+describe('Đoàn Hộ Tống · giao diện · Tiếp sức (màn 3)', () => {
+  const ts = (o: Record<string, unknown> = {}) => ({ conLuotNhan: 2, daXin: false, theNhan: null, banCan: [], daGiup: false, lienKichSanSang: false, ...o })
+  const goiY = { den: 1, ten: 'Thu Hà', pet: 1, cap: 30, tenDang: 'Ancol', de: 'Oxi hoá ethanol bằng CuO, đun nóng, thu được chất hữu cơ X. X là…', the: [{ loai: 'nhac_cong_thuc', tieuDe: 'Nhắc công thức', moTa: 'Gửi bạn kiến thức gốc của câu' }, { loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án', moTa: 'Máy gạch một đáp án sai' }] }
+  it('em CHƯA chốt: nút "Cần tiếp sức · còn 2 lần được tiếp sức" bật tín hiệu; hết lượt thì nói rõ; nhận thẻ thì hiện nội dung thẻ + biểu ngữ Liên Kích', async () => {
+    const { call } = dung(trongTran({ tiepSuc: ts() as never }))
+    fireEvent.click(await screen.findByRole('button', { name: /Cần tiếp sức · còn 2 lần được tiếp sức/ }))
+    await waitFor(() => expect(call).toHaveBeenCalledWith('doan-tin-hieu', { ma: 'DH1', tinHieu: 'can_tiep_suc' }))
+    cleanup(); sessionStorage.clear()
+    dung(trongTran({ tiepSuc: ts({ conLuotNhan: 0 }) as never })); expect(await screen.findByText(/dùng hết 2 lần được tiếp sức/)).toBeTruthy(); expect(screen.queryByRole('button', { name: /Cần tiếp sức/ })).toBeNull()
+    cleanup(); sessionStorage.clear()
+    dung(trongTran({ tiepSuc: ts({ conLuotNhan: 1, lienKichSanSang: true, theNhan: { tuTen: 'Thu Hà', tuLaMay: false, loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án', noiDung: 'Phương án C không đúng — em gạch đi, còn ba phương án.' } }) as never }))
+    expect((await screen.findByRole('status')).textContent).toBe('THU HÀ TIẾP SỨC · LOẠI 1 PHƯƠNG ÁNPhương án C không đúng — em gạch đi, còn ba phương án.')
+    expect(screen.getByText('LIÊN KÍCH ×2 SẴN SÀNG')).toBeTruthy(); expect(screen.queryByRole('button', { name: /Cần tiếp sức/ })).toBeNull()
+  })
+  it('em ĐÃ chốt + bạn đang cần: mở tấm trượt 3 thẻ — thấy thân câu của bạn + dòng "em không thấy … đã chọn gì" + "không bao giờ là đáp án"; thẻ máy chủ không phát thì khoá; chọn thẻ gửi đúng gói', async () => {
+    const daChot = trongTran({ revision: 6, ghe: ghe(['da_chot', 'can_tiep_suc', 'dang_lam']), cau: { qid: 'Q1', daChot: true, hanhDong: 'danh', ketQua: { correct: true, answer: 'B', solution: 'x' } }, tiepSuc: ts({ banCan: [1] }) as never })
+    const { call } = dung(daChot, (lenh) => lenh === 'doan-the-goi-y' ? { ok: true, doan: daChot, goiY } : { ok: true, doan: { ...daChot, revision: 7, tiepSuc: ts({ daGiup: true, lienKichSanSang: true }) }, expTiepSuc: { bat: true, exp: 3, conLai: 4 } })
+    fireEvent.click(await screen.findByRole('button', { name: /Tiếp sức cho Thu Hà/ }))
+    await waitFor(() => expect(call).toHaveBeenCalledWith('doan-the-goi-y', { ma: 'DH1', den: 1 }))
+    const tam = await screen.findByRole('dialog', { name: 'Tiếp sức cho Thu Hà' })
+    expect(tam.textContent).toContain('Oxi hoá ethanol bằng CuO'); expect(tam.textContent).toContain('em không thấy Thu Hà đã chọn gì'); expect(tam.textContent).toContain('không bao giờ là đáp án'); expect(tam.textContent).toContain('LIÊN KÍCH ×2')
+    const the = [...tam.querySelectorAll('.dh-the-goi-y button')] as HTMLButtonElement[]
+    expect(the.map(b => b.querySelector('b')!.textContent)).toEqual(['Nhắc công thức', 'Loại 1 phương án', 'Chỉ bước đầu']); expect(the.map(b => b.disabled)).toEqual([false, false, true])
+    fireEvent.click(the[1]!)
+    await waitFor(() => expect(call).toHaveBeenCalledWith('doan-tiep-suc', { ma: 'DH1', hiep: 3, den: 1, the: 'loai_phuong_an' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull()); expect(await screen.findByText(/em đã tiếp sức · \+3 EXP tiếp sức/)).toBeTruthy()
+  })
+  it('"Để sau" đóng tấm trượt, không gửi gì', async () => {
+    const daChot = trongTran({ revision: 6, cau: { qid: 'Q1', daChot: true, hanhDong: 'danh', ketQua: null }, tiepSuc: ts({ banCan: [1] }) as never })
+    const { call } = dung(daChot, () => ({ ok: true, doan: daChot, goiY }))
+    fireEvent.click(await screen.findByRole('button', { name: /Tiếp sức cho Thu Hà/ })); await screen.findByRole('dialog')
+    fireEvent.click(screen.getByRole('button', { name: 'Để sau' })); expect(screen.queryByRole('dialog')).toBeNull(); expect(call).not.toHaveBeenCalledWith('doan-tiep-suc', expect.anything())
+  })
+})
+
 describe('Đoàn Hộ Tống · giao diện · Trùm câu chung', () => {
   const trum = (o: Record<string, unknown> = {}) => trongTran({ tran: tran({ hiep: 4, laTrum: true, giay: 60, conMs: 52000 }), cau: undefined, trum: { coCau: true, giaoY: [1, 0, 2, 1], yCuaEm: [1], yDaChot: [true, false, false, false], qid: 'T1', tenDang: 'Ester', de: cauTrum, ...o } })
   it('chỉ ý CỦA EM có nút Đúng/Sai; ý của bạn chỉ hiện "đã chốt / đang nghĩ…"; chốt ý gửi đúng gói; 3 tín hiệu có sẵn, không có ô nhập chữ', async () => {
