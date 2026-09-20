@@ -17,6 +17,7 @@ import {phCapMa,phDemTruyCap,phKeHoach,phThoiGianHoc,phXacDinh} from './ph-truy-
 import {homNayThay} from './hom-nay-thay'
 import {gvKeHoachEm} from './gv-ke-hoach-em'
 import {themPhutCa} from './them-phut'
+import {doiTenHocSinh} from './doi-ten-hoc-sinh'
 import { mom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
@@ -3022,6 +3023,8 @@ export default {
       if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
       // THÊM PHÚT cho ca đang chạy (docs/hop-dong-them-phut-2109.md): chỉ cộng, trần 30 phút mỗi ca.
       if (p === '/ca/them-phut') return ra(await themPhutCa(env, b))
+      // ĐỔI TÊN một học sinh (docs/hop-dong-doi-ten-hoc-sinh-2109.md): chỉ cột tên, 5 bảng; giữ phieu/chan_vao.
+      if (p === '/hoc-sinh/doi-ten') return ra(await doiTenHocSinh(env, b))
       if (p === '/diem') return ghiDiemMoi(env, b)
       if (p === '/em/danh-sach') return danhSachEmMoi(env)
       if (p === '/ca/nap-day-du') return napDayDuCa(env, b)
