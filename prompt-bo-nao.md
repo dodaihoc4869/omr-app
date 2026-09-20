@@ -21,3 +21,11 @@ Cẩm nang + sổ tay `bo-nao/so-tay/bai-hoc.md` · tác vụ hẹn giờ 04:00 
 
 ## NGHIỆM THU
 1. Đêm chạy thử: mọi em có hoạt động đều có một phần tử đầu ra; ≥ 95 % qua kiểm khuôn; 0 lời nhắn chứa số không có trong thẻ; bí danh không lộ SBD/tên. 2. Chế độ `bong`: kế hoạch ngày và BTVN của học sinh KHÔNG đổi một byte (test khoá). 3. Tổng token đêm chạy thử ≤ 300 nghìn cho cỡ lớp thật. 4. Tắt máy thầy một đêm ⇒ app học sinh chạy bình thường, màn Hôm nay báo đúng.
+
+## CẬP NHẬT 21/09 — THẦY CHỐT: "build dùng PHIÊN làm não trước và chạy luôn từ hôm nay" (gói Max tới 04/10 ⇒ 13 đêm đo token)
+MỤC TIÊU ĐÊM NAY: lượt CHẠY BÓNG đầu tiên lúc 04:00 sáng 22/09. Đường găng = hồ sơ ngày + lệnh nộp + 2 mã lệnh; màn của thầy làm song song, chưa xong thì Boss chuyển bản tin sáng cho thầy bằng tay.
+CHIA LẠI để Code 3 (đang bận máy chủ BTVN nâng đỡ) không thành nút cổ chai:
+- **Code 1 (đang rảnh) làm TRỌN phần ruột**: `src/lib/bo-nao-dac-trung.ts`, `src/lib/bo-nao-khuon.ts`, và TỆP MỚI `server/src/bo-nao.ts` (các hàm xử lý nhận `env`: dựng hồ sơ ngày THEO YÊU CẦU cho một trang em — chưa cần cron; nhận + kiểm + lưu điều chỉnh ở chế độ `bong`; đọc bản tin/nhật ký), `scripts/bo-nao/lay.mjs`, `scripts/bo-nao/nop.mjs`, migration chỉ-thêm `server/migration-2109-bo-nao.sql`, test. KHÔNG sửa `server/src/index.ts`.
+- **Code 3**: chỉ NỐI — thêm route sau cổng `laThay` vào `index.ts`, chạy migration `--remote`, đẩy Worker; chỉ cho Code 1 cơ chế đọc mã bí mật AN TOÀN mà em đang dùng khi gọi thật (không in, không commit). Cron 03:30 + việc tầng nào đọc điều chỉnh (chế độ `that`) làm SAU BTVN nâng đỡ Đợt 1.
+- **Code 4**: khối "Bộ não đêm qua" + nhật ký điều chỉnh + công tắc (vẽ mẫu 1 ảnh → build).
+- **Boss**: tác vụ hẹn giờ 04:00 + chạy thử tay lượt đầu khi thầy còn ngồi máy (để thầy bấm cho phép 2 mã lệnh) + đo token từng đêm, ghi `bo-nao/so-tay/do-token.md`.
