@@ -96,7 +96,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
   for (const sbd of em) {
     map.set(sbd, {
       sbd, now, homNay, phutNgay: null, mauGiay: [], btvn: [], mom: [], cauToiHan: [], soCauChuaKhacPhuc: 0, dang: [], nhiemVuThanThu: [],
-      caSapToi: [], lichSu: [], daLamHomNay: { soCau: 0, lenBac: 0, tutBac: 0 }, homNayLaNgayNghi: nghi.has(homNay),
+      caSapToi: [], cauOnThi: [], lichSu: [], daLamHomNay: { soCau: 0, lenBac: 0, tutBac: 0 }, homNayLaNgayNghi: nghi.has(homNay),
     })
   }
   const cua = (x: Record<string, unknown>) => map.get(String(x.sbd))
@@ -188,6 +188,20 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
       const lopCa = String(x.lop ?? '').trim()
       if (lopCa && lopCa !== lop.get(c.sbd)) continue
       c.caSapToi.push({ maCa: String(x.ma_ca), tenCa: String(x.ten_ca ?? ''), batDau: String(x.bat_dau) })
+    }
+  }
+
+  // Ứng viên cho việc `on_thi` — CHỈ em có ca sắp tới (không tốn truy vấn nào khi không có ca): câu từng sai còn đang ôn, lệnh lấy đề phục vụ được.
+  const emCoCa = [...map.values()].filter((c) => c.caSapToi.length > 0).map((c) => c.sbd)
+  if (emCoCa.length > 0) {
+    const ro = await tat(() => env.DB.prepare(
+      `SELECT sbd, qid, lan_sai, trang_thai FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai','dang_on') AND can_day_lai = 0`,
+    ).bind(json(emCoCa)).all<Record<string, unknown>>(), trong())
+    const ung = ro.results ?? []
+    const phucVuThi = await tapQidPhucVu(env, [...new Set(ung.map((x) => String(x.qid)))])
+    for (const x of ung) {
+      if (phucVuThi && !phucVuThi.has(String(x.qid))) continue
+      cua(x)?.cauOnThi?.push({ qid: String(x.qid), lanSai: Number(x.lan_sai) || 0, moiSai: String(x.trang_thai) === 'moi_sai' })
     }
   }
   return map

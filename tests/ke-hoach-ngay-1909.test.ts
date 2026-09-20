@@ -202,10 +202,42 @@ describe('bù khi thiếu ("tự phân thêm bài khi ngày thiếu") và việc
     expect(kh.viec).toEqual([])
     expect(kh.canhBao.find((c) => c.loai === 'thieu_nguon_bu')).toMatchObject({ can: kh.nganSach.toiThieuCau })
   })
-  it('ôn thi là việc MỀM: ca trong 3 ngày thì có, xa hơn thì không', () => {
-    const gan = lapKeHoachNgay(dv({ caSapToi: [{ maCa: 'C1', tenCa: 'Ca thử', batDau: iso(30) }] }))
-    expect(gan.viec.find((v) => v.loai === 'on_thi')).toMatchObject({ soCau: 4, batBuoc: false, nguon: 'C1' })
-    expect(lapKeHoachNgay(dv({ caSapToi: [{ maCa: 'C1', tenCa: 'x', batDau: iso(24 * 5) }] })).viec.some((v) => v.loai === 'on_thi')).toBe(false)
+  const ung = (n: number, moiSai = 0) => Array.from({ length: n }, (_, i) => ({ qid: `U${i + 1}`, lanSai: 1 + (i % 3), moiSai: i < moiSai }))
+  it('ôn thi là việc MỀM mang DANH SÁCH CÂU: ca trong 3 ngày và có câu ứng viên thì có; ca xa hơn, hoặc không có câu nào thì KHÔNG (không giao việc rỗng)', () => {
+    const gan = lapKeHoachNgay(dv({ caSapToi: [{ maCa: 'C1', tenCa: 'Ca thử', batDau: iso(30) }], cauOnThi: ung(6) }))
+    const v = gan.viec.find((x) => x.loai === 'on_thi')!
+    expect(v).toMatchObject({ soCau: 4, batBuoc: false, nguon: 'C1' })
+    expect(v.chiTiet).toMatchObject({ maCa: 'C1', tenCa: 'Ca thử' })
+    expect((v.chiTiet.qid as string[]).length).toBe(4) // số câu KHỚP danh sách câu
+    expect(new Set(v.chiTiet.qid as string[]).size).toBe(4)
+    expect(lapKeHoachNgay(dv({ caSapToi: [{ maCa: 'C1', tenCa: 'x', batDau: iso(24 * 5) }], cauOnThi: ung(6) })).viec.some((x) => x.loai === 'on_thi')).toBe(false)
+    expect(lapKeHoachNgay(dv({ caSapToi: [{ maCa: 'C1', tenCa: 'x', batDau: iso(30) }] })).viec.some((x) => x.loai === 'on_thi')).toBe(false)
+    expect(lapKeHoachNgay(dv({ caSapToi: [{ maCa: 'C1', tenCa: 'x', batDau: iso(30) }], cauOnThi: [] })).viec.some((x) => x.loai === 'on_thi')).toBe(false)
+    const it2 = lapKeHoachNgay(dv({ caSapToi: [{ maCa: 'C1', tenCa: 'x', batDau: iso(30) }], cauOnThi: ung(2) })).viec.find((x) => x.loai === 'on_thi')!
+    expect(it2.soCau).toBe(2) // ít hơn 4 câu ứng viên thì giao ít hơn, số câu vẫn khớp danh sách
+    expect(it2.chiTiet.qid).toHaveLength(2)
+  })
+  it('ôn thi chọn câu MỚI SAI trước, rồi sai nhiều lần; tất định; không trùng hàng ôn tới hạn và không trùng bài Mom đang giao', () => {
+    const ca = [{ maCa: 'C1', tenCa: 'x', batDau: iso(30) }]
+    const u = [{ qid: 'A', lanSai: 5, moiSai: false }, { qid: 'B', lanSai: 1, moiSai: true }, { qid: 'C', lanSai: 2, moiSai: true }, { qid: 'D', lanSai: 9, moiSai: false }, { qid: 'E', lanSai: 3, moiSai: false }, { qid: 'F', lanSai: 1, moiSai: false }]
+    const chon = (o: Partial<DauVaoKeHoach> = {}) => (lapKeHoachNgay(dv({ caSapToi: ca, cauOnThi: u, ...o })).viec.find((x) => x.loai === 'on_thi')!.chiTiet.qid as string[])
+    const a = chon()
+    expect(a.slice(0, 2).sort()).toEqual(['B', 'C']) // hai câu mới sai đứng đầu
+    expect(a[2]).toBe('D') // rồi lanSai nhiều nhất (9), rồi A (5)
+    expect(a[3]).toBe('A')
+    expect(chon()).toEqual(a)
+    // Trùng hàng ôn tới hạn (cùng qid): loại khỏi ôn thi.
+    const trung = chon({ cauToiHan: [{ qid: 'B', maDang: null, mocOnKe: '2026-09-19', lanSai: 1 }, { qid: 'D', maDang: null, mocOnKe: '2026-09-19', lanSai: 1 }] })
+    expect(trung).not.toContain('B'); expect(trung).not.toContain('D')
+    // Trùng bài Mom đang giao: loại.
+    const mo = chon({ mom: [{ id: 'M1', soCau: 2, taoLuc: iso(-3), batDauLuc: iso(-0.5), qid: ['C', 'A'] }] })
+    expect(mo).not.toContain('C'); expect(mo).not.toContain('A')
+  })
+  it('ôn thi bị cắt theo phần thiếu của ngày thì danh sách câu cắt theo, số câu luôn khớp danh sách', () => {
+    const kh = lapKeHoachNgay(dv({ caSapToi: [{ maCa: 'C1', tenCa: 'x', batDau: iso(30) }], cauOnThi: ung(6), daLamHomNay: { soCau: 4, lenBac: 0, tutBac: 0 } })) // mức tối thiểu 6 câu, đã làm 4 ⇒ còn thiếu 2
+    const v = kh.viec.find((x) => x.loai === 'on_thi')!
+    expect(v).toMatchObject({ soCau: 2, nhan: 'bu' })
+    expect(v.chiTiet.qid).toHaveLength(2)
   })
 })
 

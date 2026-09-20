@@ -66,6 +66,13 @@ export interface CauToiHan {
   lanSai: number
 }
 
+/** Câu ứng viên cho việc `on_thi` (em ĐÃ từng gặp, còn sai/đang ôn, chưa tới hạn hoặc đã tới hạn nhưng nằm ngoài hàng ôn hôm nay): `moiSai` = trạng thái `moi_sai`. */
+export interface CauOnThi {
+  qid: string
+  lanSai: number
+  moiSai: boolean
+}
+
 export interface CaSapToi {
   maCa: string
   tenCa: string
@@ -91,6 +98,8 @@ export interface DauVaoKeHoach {
   /** Nhiệm vụ thần thú do phụ huynh nhắc (game_v2_task đang mở). */
   nhiemVuThanThu: { id: string; dang: string }[]
   caSapToi: CaSapToi[]
+  /** Ứng viên cho `on_thi` (chỉ nạp khi có ca sắp tới; thiếu = không có). Chỉ câu lệnh lấy đề PHỤC VỤ ĐƯỢC. */
+  cauOnThi?: CauOnThi[]
   /** Kết quả các ngày TRƯỚC hôm nay, mới nhất trước; null = ngày nghỉ/chưa chốt (bị bỏ qua). */
   lichSu: { ngay: string; ketQua: 'dat' | 'mot_phan' | 'khong' | null }[]
   daLamHomNay: { soCau: number; lenBac: number; tutBac: number }
@@ -447,9 +456,9 @@ export function demChuoiDat(lichSu: DauVaoKeHoach['lichSu']): number {
 
 /** Cắt việc mềm xuống `soCau` câu mà chữ hiển thị và danh sách câu vẫn KHỚP số câu (không nói "3 câu" khi chỉ giao 2). */
 function catViec(v: Viec, soCau: number): Viec {
-  if (soCau >= v.soCau || v.loai !== 'on_lai') return { ...v, soCau }
+  if (soCau >= v.soCau || (v.loai !== 'on_lai' && v.loai !== 'on_thi')) return { ...v, soCau }
   const qid = (v.chiTiet.qid as string[]).slice(0, soCau)
-  return { ...v, soCau, ghiChu: `Ôn ${soCau} câu đã tới hạn nhắc lại`, chiTiet: { ...v.chiTiet, qid } }
+  return { ...v, soCau, ghiChu: v.loai === 'on_lai' ? `Ôn ${soCau} câu đã tới hạn nhắc lại` : v.ghiChu, chiTiet: { ...v.chiTiet, qid } }
 }
 
 function viecCung(o: {
@@ -502,7 +511,18 @@ function dungViecMem(d: DauVaoKeHoach, B: number, taiCung: number, seed: number,
     .filter((c) => { const t = ms(c.batDau); return t !== undefined && t > d.now && t - d.now <= NGAY_ON_THI * MOT_NGAY_MS })
     .sort((a, b) => a.batDau.localeCompare(b.batDau) || a.maCa.localeCompare(b.maCa))[0]
   if (ca) {
-    ra.push(mem({ id: `on_thi:${ca.maCa}`, loai: 'on_thi', soCau: CAU_ON_THI, nguon: ca.maCa, ghiChu: `Ôn cho ca "${ca.tenCa}"`, chiTiet: { maCa: ca.maCa, tenCa: ca.tenCa, batDau: ca.batDau } }))
+    // Việc mang DANH SÁCH CÂU (`chiTiet.qid`, cùng luồng lấy/nộp với on_lai: `/hs/cau-theo-qid` + `/hs/on-lai/nop`). Câu lấy từ chính hồ sơ của em: từng sai, còn đang ôn,
+    // lệnh lấy đề phục vụ được; không trùng hàng ôn tới hạn hôm nay, không trùng bài Mom đang giao. Không có câu nào thì KHÔNG có việc (không giao việc rỗng).
+    const daCoTrongOnLai = new Set(toiHan.map((c) => c.qid))
+    const chon = (d.cauOnThi ?? [])
+      .filter((c) => !daCoTrongOnLai.has(c.qid) && !daGiaoTrongMom.has(c.qid))
+      .map((c) => ({ c, h: hashSeed(`${seed}|thi|${c.qid}`) }))
+      .sort((a, b) => Number(b.c.moiSai) - Number(a.c.moiSai) || b.c.lanSai - a.c.lanSai || a.h - b.h || a.c.qid.localeCompare(b.c.qid))
+      .slice(0, CAU_ON_THI)
+      .map((x) => x.c.qid)
+    if (chon.length > 0) {
+      ra.push(mem({ id: `on_thi:${ca.maCa}`, loai: 'on_thi', soCau: chon.length, nguon: ca.maCa, ghiChu: `Ôn cho ca "${ca.tenCa}"`, chiTiet: { maCa: ca.maCa, tenCa: ca.tenCa, batDau: ca.batDau, qid: chon } }))
+    }
   }
   return ra
 }
