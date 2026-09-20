@@ -1,5 +1,8 @@
 import { hanNhapVietNam, hanChoOChon, mocThoiGian, gioHanVietNam } from '../lib/han-bai-tap'
 import KhoiBtvnLo from '../components/KhoiBtvnLo'
+import KhoiCaNhanHoa from '../components/KhoiCaNhanHoa'
+import XemTruocPhanBo from '../components/XemTruocPhanBo'
+import { taoCauGiao, taoHatGiong } from '../lib/btvn-nang-do-thay'
 import { useAppStore } from '../store/appStore'
 import { layHomNay, type HomNay } from '../lib/hom-nay-api'
 import { useGioHocTap } from '../hooks/useGioHocTap'
@@ -8,7 +11,7 @@ import {nhomBtvn, type NhomBtvn} from '../lib/nhom-btvn'
 import NhomCaThuGon from '../components/NhomCaThuGon'
 import HocSinhNhanBai from '../components/HocSinhNhanBai'
 // Giao và theo dõi BTVN. Gọi lên bảng là màn riêng; không thay đổi bộ rút câu.
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckSquare, ClipboardList, RefreshCw, Search, Square, UserCheck, Users, Send, ClipboardCheck, Clock, GraduationCap } from 'lucide-react'
 import { OThongBao } from '../components/DesignSystem'
 import { danhSachCa, danhSachEm, khoiTuNamSinh, type CaTomTat, type EmTomTat } from '../lib/exam-api'
@@ -176,6 +179,13 @@ function TheGiaoBtvn() {
   const [nguonKho, setNguonKho] = useState<TeacherExamSource[]>([])
   const [dangNap, setDangNap] = useState(true)
   const [dangGiao, setDangGiao] = useState(false)
+  // BTVN NÂNG ĐỠ (thầy duyệt 21/09): công tắc mặc định BẬT (khuyên dùng); tắt = như cũ, cả lớp đủ câu. Ghim câu là TUỲ CHỌN (rỗng vẫn giao được).
+  const [caNhan, setCaNhan] = useState(true)
+  const [ghim, setGhim] = useState<string[]>([])
+  const [xemTruoc, setXemTruoc] = useState(false)
+  const [canhBaoNangDo, setCanhBaoNangDo] = useState('')
+  // Hạt giống MỘT lần cho mỗi hộp thoại giao: dùng chung cho Xem trước và Giao để bộ xem trước = bộ thật (hợp đồng docs/hop-dong-btvn-nang-do-2109.md mục 2/5).
+  const hatGiongRef = useRef(taoHatGiong())
   const [bao, setBao] = useState<{ ok: boolean; chu: string } | null>(null)
   const [hanMoi, setHanMoi] = useState('')
   const [suaHan, setSuaHan] = useState<Record<string,string>>({})
@@ -312,6 +322,11 @@ function TheGiaoBtvn() {
     return dsEm.filter(e=>(!khoiThem || khoiTuNamSinh(e.namSinh)===Number(khoiThem)) && norm(`${e.hoTen} ${e.sbd}`).includes(q))
   },[dsEm,khoiThem,timKiemHs])
   const sbdThem=Array.from(sbdChon).filter(sbd=>!dsHsTrongCa.some(e=>e.sbd===sbd))
+  // Người nhận bài (cho Xem trước phân bổ): đúng những em `giao()` sẽ gửi — em có lượt trong các ca đã tick (+ em chọn thêm), cả lớp theo khối, hoặc từng em đã chọn.
+  const dsSbdNhan = useMemo(
+    () => (cheDo === 'hoc_sinh' ? dsTheoLop.map((e) => e.sbd) : cheDo === 'theo_em' ? Array.from(sbdChonTheoEm) : Array.from(new Set([...dsHsTrongCa.map((e) => e.sbd), ...(chonRieng ? Array.from(sbdChon) : [])]))),
+    [cheDo, dsTheoLop, sbdChonTheoEm, dsHsTrongCa, chonRieng, sbdChon],
+  )
 
   const toggleSbd = (sbd: string) => {
     setSbdChon((prev) => {
@@ -387,6 +402,14 @@ function TheGiaoBtvn() {
     [dsDeTach, daChon],
   )
 
+  // Các câu của những tờ đề đã tick (thứ tự thầy tick → thứ tự kho), kèm dạng/mức/sao đọc trên MÁY THẦY.
+  const cauDaChon = useMemo(() => {
+    const theoMa = new Map(dsDeTach.map((d) => [d.maDe, d]))
+    return taoCauGiao([...daChon].map((m) => theoMa.get(m)).filter((d): d is TeacherExamSource => Boolean(d)))
+  }, [dsDeTach, daChon])
+  // Ghim chỉ giữ câu còn thuộc các tờ đề đang tick (đổi đề thì câu ghim không còn trong bài tự rơi ra).
+  const ghimHopLe = useMemo(() => ghim.filter((q) => cauDaChon.some((c) => c.qid === q)).slice(0, 10), [ghim, cauDaChon])
+
   async function capNhatHocSinh(t:DongTheoDoiBtvn,sbd:string,hanhDong:'reset'|'thu-hoi') {
     setDangSua(t.maBtvn)
     try{const ch=await layCauHinhMayChu(),mat=(await loadTeacherSecret())||'';await suaGiaoBtvn(ch,mat,(t as NhomBtvn).maTheoSbd?.[sbd]||t.maBtvn,{sbd,hanhDong});setTheoDoi(await theoDoiBtvn(ch,mat));setBao({ok:true,chu:hanhDong==='reset'?'Đã mở lại bài cho học sinh.':'Đã thu hồi bài của học sinh.'})}
@@ -418,17 +441,31 @@ function TheGiaoBtvn() {
         : undefined
       if (dsSbdGui && dsSbdGui.length === 0) throw new Error('Chưa có học sinh được chọn.')
       const dsCaGui = cheDo === 'hoc_sinh' || cheDo === 'theo_em' ? [] : [...caChon]
-      const kq = await giaoBtvn(ch, mat, dsCaGui, [...daChon], dsSbdGui, hanMoi ? hanNhapVietNam(hanMoi, nowHocTap) : undefined, cheDo === 'ca' && chonRieng ? [...sbdChon] : undefined)
+      setCanhBaoNangDo('')
+      const nangDo = caNhan && cauDaChon.length > 0 ? { cau: cauDaChon, ghim: ghimHopLe, hatGiong: hatGiongRef.current } : undefined
+      const kq = await giaoBtvn(ch, mat, dsCaGui, [...daChon], dsSbdGui, hanMoi ? hanNhapVietNam(hanMoi, nowHocTap) : undefined, cheDo === 'ca' && chonRieng ? [...sbdChon] : undefined, nangDo)
+      // Máy chủ chưa hỗ trợ nâng đỡ thì bỏ qua các trường lạ và giao NHƯ CŨ — nói thật, không để thầy tưởng mỗi em một bộ.
+      const canh: string[] = []
+      if (nangDo && kq.caNhan !== true) canh.push(`Máy chủ chưa hỗ trợ cá nhân hoá — bài này đã giao NHƯ CŨ: cả lớp nhận đủ ${kq.soCau} câu, không phân bổ riêng từng em.`)
+      else if (nangDo) {
+        if (kq.canhBao === 'loi_it_hon_6') canh.push(`Lõi chung chỉ có ${kq.soLoi ?? 0} câu (dưới 6): so chống chép bài không đủ mẫu chung — bài vẫn giao.`)
+        if ((kq.boQuaQid?.length ?? 0) > 0) canh.push(`Máy chủ bỏ ${kq.boQuaQid!.length} câu không có trong tờ đề.`)
+        if ((kq.thieuMeta ?? 0) > 0) canh.push(`${kq.thieuMeta} câu thiếu dạng/mức trên máy thầy — máy chủ điền mặc định (Biết).`)
+      }
+      setCanhBaoNangDo(canh.join(' '))
+      const noiDungNangDo = nangDo && kq.caNhan === true ? ` Mỗi em một bộ riêng, lõi chung ${kq.soLoi ?? 0} câu.` : ''
+      if (nangDo) hatGiongRef.current = taoHatGiong() // hộp thoại giao kế tiếp có hạt giống mới
       const boQua = kq.caRong && kq.caRong.length > 0 ? ` Bỏ qua ${kq.caRong.length} ca chưa em nào vào thi: ${kq.caRong.join(', ')}.` : ''
       const noiDungCa = kq.soCa ? ` ở ${kq.soCa} ca` : ''
       setBao({
         ok: true,
-        chu: `Đã giao ${kq.soCau} câu (${daChon.size} tờ đề) cho ${kq.soEm} em${noiDungCa}. Hạn nộp ${gioVN(kq.hanNop)}.${boQua}`,
+        chu: `Đã giao ${kq.soCau} câu (${daChon.size} tờ đề) cho ${kq.soEm} em${noiDungCa}.${noiDungNangDo} Hạn nộp ${gioVN(kq.hanNop)}.${boQua}`,
       })
       // Kho trên MÁY THẦY — cùng nguồn màn Mở ca đọc.
       setNguonKho(await loadExamSources())
 
       setTheoDoi(await theoDoiBtvn(ch, mat))
+      setXemTruoc(false)
       setTabBtvn('theodoi')
     } catch (e) {
       setBao({ ok: false, chu: e instanceof Error ? e.message : 'Không giao được' })
@@ -918,6 +955,9 @@ function TheGiaoBtvn() {
               </span>
             </div>
 
+            {/* BTVN NÂNG ĐỠ — công tắc Cá nhân hoá + ghim câu + Xem trước phân bổ (bản vẽ docs/ban-ve-btvn-nang-do-2109/) */}
+            <KhoiCaNhanHoa bat={caNhan} doi={setCaNhan} cau={cauDaChon} ghim={ghimHopLe} doiGhim={setGhim} onXemTruoc={() => setXemTruoc(true)} />
+
             {/* TÓM TẮT ĐÃ CHỌN */}
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between flex-wrap gap-2 text-xs">
               <span className="font-bold text-slate-800 dark:text-slate-200">
@@ -934,6 +974,7 @@ function TheGiaoBtvn() {
 
             {/* THÔNG BÁO LỖI/KẾT QUẢ */}
             {bao && <OThongBao tone={bao.ok ? 'xanh' : 'do'}>{bao.chu}</OThongBao>}
+            {canhBaoNangDo && <OThongBao tone="cam">{canhBaoNangDo}</OThongBao>}
 
             {/* HÀNG NÚT BẤM GIAO BÀI & LÀM MỚI */}
             <div className="flex items-center gap-3 pt-1">
@@ -977,6 +1018,23 @@ function TheGiaoBtvn() {
         </div>
       )}
 
+      {xemTruoc && (
+        <XemTruocPhanBo
+          dau={{
+            dsMaDe: [...daChon],
+            cau: cauDaChon,
+            ghim: ghimHopLe,
+            hanNop: hanMoi ? hanNhapVietNam(hanMoi, nowHocTap) : new Date(nowHocTap + 48 * 3600_000).toISOString(),
+            hatGiong: hatGiongRef.current,
+          }}
+          dsSbd={dsSbdNhan}
+          cau={cauDaChon}
+          dangGiao={dangGiao}
+          loiGiao={bao && !bao.ok ? bao.chu : ''}
+          onDong={() => setXemTruoc(false)}
+          onGiao={() => void giao()}
+        />
+      )}
       {tabBtvn === 'theodoi' && !dangNap && <section aria-label="Bài tập cần theo dõi" className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {[['Bài chưa nộp đã quá hạn', theoDoi.filter(b => (mocThoiGian(b.hanNop) ?? Infinity) <= nowHocTap).reduce((n,b) => n + b.chuaNop.length, 0)],
           ['Bài chưa nộp đến hạn trong 24 giờ', theoDoi.filter(b => (mocThoiGian(b.hanNop) ?? Infinity) > nowHocTap && (mocThoiGian(b.hanNop) ?? Infinity) <= nowHocTap + 86400_000).reduce((n,b) => n + b.chuaNop.length, 0)],
@@ -1006,6 +1064,7 @@ function TheGiaoBtvn() {
           </div>
 
           {bao && <OThongBao tone={bao.ok ? 'xanh' : 'do'}>{bao.chu}</OThongBao>}
+          {canhBaoNangDo && <OThongBao tone="cam">{canhBaoNangDo}</OThongBao>}
           {dangSua && <p className="text-xs text-blue-600 font-semibold">Đang cập nhật bài tập…</p>}
 
           {nhomBtvn(theoDoi).length === 0 ? (
@@ -1039,8 +1098,14 @@ function TheGiaoBtvn() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 block mb-0.5">
-                          Ca {t.maCa} · {t.soCau} câu
+                          Ca {t.maCa} · {t.soCau} câu{t.caNhan ? ' trong bài' : ''}
                         </span>
+                        {t.caNhan && (
+                          <p className="bn-theo-doi-nang-do">
+                            <span className="bn-chip bn-chip--tot bn-chip--nho">Cá nhân hoá · lõi {t.soLoi ?? 0} câu</span>
+                            <span>Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên phần lõi.</span>
+                          </p>
+                        )}
                         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">
                           {dinhDangDeCayThuMuc(t.maDe)}
                         </h3>

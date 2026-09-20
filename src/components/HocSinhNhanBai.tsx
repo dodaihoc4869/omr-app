@@ -31,6 +31,13 @@ export default function HocSinhNhanBai({
       soDung: null,
       soCau: null,
       thuHoi: false,
+      soCauCuaEm: null,
+      soChang: null,
+      loDaXong: null,
+      soDungLoi: null,
+      soCauLoi: null,
+      diemLoi: null,
+      soCauThuongSai: null,
       gianLan: false,
       xacSuatGianLan: 0,
       lyDoGianLan: '',
@@ -161,7 +168,26 @@ export default function HocSinhNhanBai({
               {/* Thông tin số câu đúng */}
               {e.nopLuc && (
                 <p style={{ fontSize: 12, color: 'var(--nhat)', marginTop: 8, marginBottom: 4 }}>
-                  {e.soDung}/{e.soCau} câu đúng ({diemBtvn}/10) · {new Date(e.nopLuc).toLocaleString('vi-VN')}
+                  {e.soDung}/{e.soCau} câu đúng{bai.caNhan ? ' (trên câu của em)' : ''} ({diemBtvn}/10) · {new Date(e.nopLuc).toLocaleString('vi-VN')}
+                </p>
+              )}
+              {/* BÀI NÂNG ĐỠ: bộ câu riêng, chặng, so lớp CHỈ trên lõi — toàn SỐ ĐẾM, không xếp hạng em với em. */}
+              {bai.caNhan && (
+                <p className="bn-theo-doi-em" data-khoi="nang-do">
+                  {e.soCauCuaEm == null ? (
+                    <span>Chưa mở bài — bộ câu chưa chốt</span>
+                  ) : (
+                    <span>
+                      Bộ của em: {e.soCauCuaEm} câu{e.soChang != null ? ` · chặng ${e.loDaXong ?? 0}/${e.soChang}` : ''}
+                    </span>
+                  )}
+                  {e.soCauLoi != null && e.soCauLoi > 0 && typeof e.soDungLoi === 'number' && (
+                    <span>
+                      Lõi: {e.soDungLoi}/{e.soCauLoi}
+                      {typeof e.diemLoi === 'number' ? ` (${e.diemLoi.toFixed(1)}/10)` : ''}
+                    </span>
+                  )}
+                  {typeof e.soCauThuongSai === 'number' && e.soCauThuongSai > 0 && <span>Câu thưởng chưa đúng: {e.soCauThuongSai} (không tính vào điểm)</span>}
                 </p>
               )}
 

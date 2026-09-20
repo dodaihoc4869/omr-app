@@ -20,6 +20,16 @@ export interface KetQuaGiaoBtvn {
   soCa?: number
   /** Những ca bị bỏ qua vì chưa em nào vào thi. */
   caRong?: string[]
+  /** Máy chủ xác nhận bài này giao theo kiểu NÂNG ĐỠ (mỗi em một bộ câu). Vắng ⇒ máy chủ chưa hỗ trợ: bài đã giao NHƯ CŨ (cả lớp đủ câu). */
+  caNhan?: boolean
+  /** Số câu LÕI chung máy chủ chọn (bài nâng đỡ). */
+  soLoi?: number
+  /** 'loi_it_hon_6': lõi < 6 câu ⇒ so chống chép bài không đủ mẫu chung (vẫn giao). */
+  canhBao?: string
+  /** qid thầy gửi mà tờ đề không có (bị bỏ). */
+  boQuaQid?: string[]
+  /** Số câu của tờ đề mà `cau[]` gửi thiếu (máy chủ điền dạng/mức mặc định). */
+  thieuMeta?: number
 }
 
 export interface DongTheoDoiBtvn {
@@ -32,6 +42,10 @@ export interface DongTheoDoiBtvn {
   quaHan: boolean
   tong: number
   daNop: number
+  /** BTVN NÂNG ĐỠ (hợp đồng docs/hop-dong-btvn-nang-do-2109.md mục 6): bài giao theo bộ câu riêng từng em; vắng ⇒ bài cũ. */
+  caNhan?: boolean
+  /** Số câu LÕI chung của bài nâng đỡ. */
+  soLoi?: number
   hocSinh?: {
     sbd: string
     hoTen: string
@@ -39,6 +53,14 @@ export interface DongTheoDoiBtvn {
     soDung: number | null
     soCau: number | null
     thuHoi: boolean
+    /** Bài nâng đỡ: số câu CỦA EM (null = em chưa mở bài, bộ chưa chốt) · số chặng · chặng đã xong · đúng/lõi (so lớp CHỈ trên lõi) · câu thưởng em sai (không vào điểm). */
+    soCauCuaEm?: number | null
+    soChang?: number | null
+    loDaXong?: number | null
+    soDungLoi?: number | null
+    soCauLoi?: number | null
+    diemLoi?: number | null
+    soCauThuongSai?: number | null
     gianLan?: boolean
     xacSuatGianLan?: number
     lyDoGianLan?: string
@@ -85,6 +107,8 @@ export async function giaoBtvn(
   dsSbd?: string[],
   hanNop?: string,
   dsSbdThem?: string[],
+  /** BTVN NÂNG ĐỠ (thầy bật công tắc Cá nhân hoá): gửi kèm dạng/mức/sao từng câu + câu ghim. Vắng ⇒ y như cũ, không đổi một byte thân gửi. */
+  nangDo?: { cau: unknown[]; ghim: string[]; hatGiong?: string },
 ): Promise<KetQuaGiaoBtvn> {
   const coSbd = Boolean(dsSbd && dsSbd.length > 0)
   if (dsMaCa.length === 0 && !coSbd && !dsSbdThem?.length) throw new Error('Chưa tick ca nào')
@@ -93,12 +117,12 @@ export async function giaoBtvn(
   const r = await goi<{ ok?: boolean; error?: string } & KetQuaGiaoBtvn>(
     ch,
     '/btvn/giao',
-    { dsMaCa: dsMaCa.length > 0 ? dsMaCa : undefined, dsMaDe, dsSbd: coSbd ? dsSbd : undefined, dsSbdThem, hanNop },
+    { dsMaCa: dsMaCa.length > 0 ? dsMaCa : undefined, dsMaDe, dsSbd: coSbd ? dsSbd : undefined, dsSbdThem, hanNop, ...(nangDo ? { caNhan: true, cau: nangDo.cau, ghim: nangDo.ghim, ...(nangDo.hatGiong ? { hatGiong: nangDo.hatGiong } : {}) } : {}) },
     mat,
   )
   if (!r) throw new Error('Máy chủ không trả lời')
   if (!r.ok) throw new Error(r.error || 'Không giao được bài tập')
-  return { maBtvn: r.maBtvn, soEm: r.soEm, soCau: r.soCau, hanNop: r.hanNop, soCa: r.soCa, caRong: r.caRong }
+  return { maBtvn: r.maBtvn, soEm: r.soEm, soCau: r.soCau, hanNop: r.hanNop, soCa: r.soCa, caRong: r.caRong, ...(nangDo ? { caNhan: r.caNhan === true, soLoi: r.soLoi, canhBao: r.canhBao, boQuaQid: r.boQuaQid, thieuMeta: r.thieuMeta } : {}) }
 }
 
 /** THẦY THEO DÕI đã nộp / chưa nộp. */
