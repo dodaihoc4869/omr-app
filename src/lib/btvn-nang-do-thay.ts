@@ -23,21 +23,50 @@ export function maDangCuaThay(c: Pick<CauGiao, 'dang' | 'chuyenDe'>): string {
   return c.dang ?? `CD:${c.chuyenDe}`
 }
 
-/** MÃ CÂU gửi máy chủ cho một câu trong tờ đề. Điểm nối DUY NHẤT: hợp đồng máy chủ đổi cách gọi mã câu thì sửa đúng hàm này. */
-export function qidCuaCau(_maDe: string, q: { id: string }): string {
-  return q.id
+/** Mã tờ kho GỐC của máy chủ: bỏ hậu tố phần `-TN/-DS/-TLN` (server/src/btvn-grading.ts `homeworkQuestions`, giống `goPhanKhoiMaDe` ở index.ts). */
+export function maDeGocMayChu(maDe: string): string {
+  return maDe.trim().replace(/-(?:TN|DS|TLN)$/, '')
 }
 
-type CauTrongDe = { id: string; chuyenDe?: string; mucDo?: 'biet' | 'hieu' | 'van_dung'; dang?: { ma: string; ten: string } | null; canChua?: { sao?: Sao } }
+/** Máy chủ BỎ HẲN mục dạy học `-VD` / `-DT` khỏi bài tập (homeworkQuestions) — không gửi câu của mục ấy. */
+export function mayChuBoMucDayHoc(maDe: string): boolean {
+  return /(?:-VD|-DT)(?:-|$)/i.test(maDe.trim())
+}
 
-/** Các câu của những tờ đề thầy đã tick, đúng THỨ TỰ kho (phần I → II → III), kèm dạng/mức/sao đọc từ `LoiGiaiMeta` trên MÁY THẦY. Thiếu thì để trống/0, không đoán. */
+/** Máy chủ BỎ câu phần III có đáp án dạng chữ dài / nhiều ý (không chấm tự động được) — chép đúng điều kiện ở `homeworkQuestions`. Câu bị bỏ thì không gửi, để `boQuaQid` không báo oan. */
+export function mayChuBoCauTuLuan(dapAn: string): boolean {
+  const da = String(dapAn ?? '').trim()
+  return (da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da)
+}
+
+/** MÃ CÂU gửi máy chủ = mã máy chủ dùng để chấm: `<mã tờ kho gốc>-<phần>-<số câu>` (server/src/btvn-grading.ts:128, hợp đồng dòng 7; ví dụ `DH-12-C1-B2-I-49`).
+ *  Máy thầy không giữ trường `so`, chỉ có `q.id`. Khi câu KHÔNG mang mã riêng thì `q.id = <ma_de>-<phần>-<so>` (exam-kho-de-import.ts) ⇒ đuôi chính là `so`, còn tiền tố
+ *  có thể là mã gốc hoặc mã đã có hậu tố phần (tờ nạp sẵn theo phần: `X-TN-I-3` ⇒ `X-I-3`). Câu mang mã riêng của tờ KHÁC (tờ ghép) thì đuôi không phải `so` của tờ này
+ *  ⇒ trả `null`, KHÔNG đoán (đoán sai ra mã của câu khác = gắn nhãn nhầm): máy chủ tự điền nhãn câu ấy từ tờ kho và đếm vào `thieuMeta`. */
+export function qidCuaCau(maDe: string, phan: PhanCau, q: { id: string }): string | null {
+  const m = /^(.*)-(III|II|I)-(\d+)$/.exec(String(q.id ?? '').trim())
+  if (!m || m[2] !== phan) return null
+  if (m[1] !== maDeGocMayChu(maDe) && m[1] !== maDe.trim()) return null
+  return `${maDeGocMayChu(maDe)}-${phan}-${Number(m[3])}`
+}
+
+type CauTrongDe = { id: string; chuyenDe?: string; mucDo?: 'biet' | 'hieu' | 'van_dung'; dang?: { ma: string; ten: string } | null; canChua?: { sao?: Sao }; correct?: unknown }
+
+/** Các câu của những tờ đề thầy đã tick, đúng THỨ TỰ kho (phần I → II → III), kèm dạng/mức/sao đọc từ `LoiGiaiMeta` trên MÁY THẦY. Thiếu thì để trống/0, không đoán.
+ *  CHỈ gồm câu máy chủ thật sự nhận (mã dựng được, không thuộc mục dạy học, không phải câu phần III dạng tự luận, không trùng mã) — máy chủ tự lấy nhãn cho phần còn lại. */
 export function taoCauGiao(dsDe: TeacherExamSource[]): CauGiao[] {
   const kq: CauGiao[] = []
+  const daCo = new Set<string>()
   for (const de of dsDe) {
+    if (mayChuBoMucDayHoc(de.maDe)) continue
     for (const [phan, ds] of [['I', de.phanI], ['II', de.phanII], ['III', de.phanIII]] as [PhanCau, CauTrongDe[]][]) {
       for (const q of ds ?? []) {
+        if (phan === 'III' && mayChuBoCauTuLuan(String(q.correct ?? ''))) continue
+        const qid = qidCuaCau(de.maDe, phan, q)
+        if (!qid || daCo.has(qid)) continue
+        daCo.add(qid)
         kq.push({
-          qid: qidCuaCau(de.maDe, q),
+          qid,
           dang: q.dang?.ma ?? null,
           chuyenDe: q.chuyenDe ?? '',
           mucDo: mucSo(q.mucDo),

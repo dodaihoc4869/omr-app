@@ -29,15 +29,15 @@ describe('taoCauGiao — câu của các tờ đề đã tick, kèm dạng/mức
   it('thứ tự tờ đề rồi phần I → II → III; dạng/mức/sao/chuyên đề lấy đúng; thiếu thì null/rỗng/0/Biết — không đoán', () => {
     const c = taoCauGiao([
       de('A', {
-        phanI: [{ id: 'A-1', chuyenDe: 'Ester', mucDo: 'van_dung', dang: { ma: 'ESTE_THUY_PHAN', ten: 'Thuỷ phân ester' }, canChua: { sao: 2 } }, { id: 'A-2' }] as never,
-        phanII: [{ id: 'A-3', mucDo: 'hieu' }] as never,
-        phanIII: [{ id: 'A-4', mucDo: 'lạ' }] as never,
+        phanI: [{ id: 'A-I-1', chuyenDe: 'Ester', mucDo: 'van_dung', dang: { ma: 'ESTE_THUY_PHAN', ten: 'Thuỷ phân ester' }, canChua: { sao: 2 } }, { id: 'A-I-2' }] as never,
+        phanII: [{ id: 'A-II-3', mucDo: 'hieu' }] as never,
+        phanIII: [{ id: 'A-III-4', mucDo: 'lạ', correct: '0,5' }] as never,
       }),
-      de('B', { phanI: [{ id: 'B-1', chuyenDe: 'Lipid', dang: null }] as never }),
+      de('B', { phanI: [{ id: 'B-I-1', chuyenDe: 'Lipid', dang: null }] as never }),
     ])
-    expect(c.map((x) => x.qid)).toEqual(['A-1', 'A-2', 'A-3', 'A-4', 'B-1'])
-    expect(c[0]).toEqual({ qid: 'A-1', dang: 'ESTE_THUY_PHAN', chuyenDe: 'Ester', mucDo: 2, sao: 2, phan: 'I' })
-    expect(c[1]).toEqual({ qid: 'A-2', dang: null, chuyenDe: '', mucDo: 0, sao: 0, phan: 'I' })
+    expect(c.map((x) => x.qid)).toEqual(['A-I-1', 'A-I-2', 'A-II-3', 'A-III-4', 'B-I-1'])
+    expect(c[0]).toEqual({ qid: 'A-I-1', dang: 'ESTE_THUY_PHAN', chuyenDe: 'Ester', mucDo: 2, sao: 2, phan: 'I' })
+    expect(c[1]).toEqual({ qid: 'A-I-2', dang: null, chuyenDe: '', mucDo: 0, sao: 0, phan: 'I' })
     expect(c.map((x) => x.phan)).toEqual(['I', 'I', 'II', 'III', 'I'])
     expect(c[2].mucDo).toBe(1)
     expect(c[3].mucDo).toBe(0)

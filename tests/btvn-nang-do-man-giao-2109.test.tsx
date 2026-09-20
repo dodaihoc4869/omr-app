@@ -16,7 +16,7 @@ vi.mock('../src/components/HopChonDe', () => ({ default: ({ onChon }: { onChon: 
 vi.mock('../src/components/NhomCaThuGon', () => ({ default: ({ ds, render }: { ds: unknown[]; render: (x: unknown) => unknown }) => <div>{ds.map(render as never)}</div> }))
 vi.mock('../src/components/HocSinhNhanBai', () => ({ default: () => null }))
 
-const cau = (i: number) => ({ id: `D-TN-${i}`, text: `Câu ${i}`, options: ['a', 'b', 'c', 'd'], correct: 'A', chuyenDe: 'Ester', mucDo: i % 2 ? 'hieu' : 'biet', dang: i === 1 ? { ma: 'ESTE_KN', ten: 'Este' } : null, canChua: { sao: 2 } })
+const cau = (i: number) => ({ id: `D-TN-I-${i}`, text: `Câu ${i}`, options: ['a', 'b', 'c', 'd'], correct: 'A', chuyenDe: 'Ester', mucDo: i % 2 ? 'hieu' : 'biet', dang: i === 1 ? { ma: 'ESTE_KN', ten: 'Este' } : null, canChua: { sao: 2 } })
 const kho = [{ maDe: 'D-TN', nhom: '12 · C1', nguon: 'Bài 1', phanI: [cau(1), cau(2), cau(3)], phanII: [], phanIII: [] }]
 
 beforeEach(() => {
@@ -51,7 +51,7 @@ describe('màn Giao bài · Cá nhân hoá', () => {
     await waitFor(() => expect(m.giao).toHaveBeenCalledTimes(1))
     const nangDo = m.giao.mock.calls[0][7] as { cau: { qid: string; dang: string | null; mucDo: number; sao: number; phan: string }[]; ghim: string[]; hatGiong: string }
     expect(nangDo.ghim).toEqual([])
-    expect(nangDo.cau.map((c) => c.qid)).toEqual(['D-TN-1', 'D-TN-2', 'D-TN-3'])
+    expect(nangDo.cau.map((c) => c.qid)).toEqual(['D-I-1', 'D-I-2', 'D-I-3'])
     expect(nangDo.cau[0]).toMatchObject({ dang: 'ESTE_KN', mucDo: 1, sao: 2, phan: 'I' })
     expect(nangDo.cau[1]).toMatchObject({ dang: null, mucDo: 0 })
     expect(nangDo.hatGiong.length).toBeGreaterThan(5)
@@ -73,7 +73,7 @@ describe('màn Giao bài · Cá nhân hoá', () => {
     fireEvent.click(within(screen.getByRole('group', { name: 'Chọn câu để ghim' })).getAllByRole('checkbox')[1])
     fireEvent.click(screen.getByRole('button', { name: /Giao bài tập/ }))
     await waitFor(() => expect(m.giao).toHaveBeenCalledTimes(1))
-    expect((m.giao.mock.calls[0][7] as { ghim: string[] }).ghim).toEqual(['D-TN-2'])
+    expect((m.giao.mock.calls[0][7] as { ghim: string[] }).ghim).toEqual(['D-I-2'])
   })
 
   it('máy chủ chưa hỗ trợ (không trả caNhan) → cảnh báo cam "đã giao NHƯ CŨ" + số câu thật', async () => {
@@ -89,8 +89,8 @@ describe('màn Giao bài · Cá nhân hoá', () => {
     await moManGiao()
     fireEvent.click(screen.getByRole('button', { name: /Giao bài tập/ }))
     expect(await screen.findByText(/Lõi chung chỉ có 3 câu \(dưới 6\)/)).toBeTruthy()
-    expect(screen.getByText(/Máy chủ bỏ 2 câu không có trong tờ đề\./)).toBeTruthy()
-    expect(screen.getByText(/1 câu thiếu dạng\/mức trên máy thầy/)).toBeTruthy()
+    expect(screen.getByText(/Máy chủ không nhận 2 mã câu máy thầy gửi \(lệch mã với tờ đề trong kho\)/)).toBeTruthy()
+    expect(screen.getByText(/1 câu máy thầy không gửi được nhãn dạng\/mức — máy chủ lấy từ tờ kho/)).toBeTruthy()
   })
 
   it('Xem trước phân bổ: mở tấm phủ; gọi máy chủ với người nhận = em có lượt trong ca đã tick + CÙNG hạt giống với lúc giao; ghim rỗng hợp lệ', async () => {

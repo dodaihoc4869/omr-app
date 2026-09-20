@@ -449,8 +449,8 @@ function TheGiaoBtvn() {
       if (nangDo && kq.caNhan !== true) canh.push(`Máy chủ chưa hỗ trợ cá nhân hoá — bài này đã giao NHƯ CŨ: cả lớp nhận đủ ${kq.soCau} câu, không phân bổ riêng từng em.`)
       else if (nangDo) {
         if (kq.canhBao === 'loi_it_hon_6') canh.push(`Lõi chung chỉ có ${kq.soLoi ?? 0} câu (dưới 6): so chống chép bài không đủ mẫu chung — bài vẫn giao.`)
-        if ((kq.boQuaQid?.length ?? 0) > 0) canh.push(`Máy chủ bỏ ${kq.boQuaQid!.length} câu không có trong tờ đề.`)
-        if ((kq.thieuMeta ?? 0) > 0) canh.push(`${kq.thieuMeta} câu thiếu dạng/mức trên máy thầy — máy chủ điền mặc định (Biết).`)
+        if ((kq.boQuaQid?.length ?? 0) > 0) canh.push(`Máy chủ không nhận ${kq.boQuaQid!.length} mã câu máy thầy gửi (lệch mã với tờ đề trong kho) nên bỏ qua — nhãn dạng/mức của các câu ấy lấy từ kho, cá nhân hoá có thể kém chính xác.`)
+        if ((kq.thieuMeta ?? 0) > 0) canh.push(`${kq.thieuMeta} câu máy thầy không gửi được nhãn dạng/mức — máy chủ lấy từ tờ kho (thiếu nữa thì tính là mức Biết).`)
       }
       setCanhBaoNangDo(canh.join(' '))
       const noiDungNangDo = nangDo && kq.caNhan === true ? ` Mỗi em một bộ riêng, lõi chung ${kq.soLoi ?? 0} câu.` : ''
