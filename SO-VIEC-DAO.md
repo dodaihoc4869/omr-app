@@ -11,7 +11,7 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 | 4 | Chuyến thám hiểm 6 ải | XONG phần màn | commit màn 3 · `tests/dao-tham-hiem.test.tsx` 8/8 · ảnh `3-*` |
 | 5 | Sổ tay dạng bài | XONG phần màn | commit màn 4 · `tests/dao-so-tay.test.tsx` 5/5 · ảnh `4-so-tay-390.jpg` |
 | 6 | Vỏ `DaoThanThu` + thanh dưới + hợp đồng prop cho Code 5 | XONG (chờ Code 5 nối `Game.tsx`) | commit vỏ · `tests/dao-than-thu-vo.test.tsx` 7/7 · `docs/hop-dong-dao-than-thu-prop-2109.md` |
-| 7 | Nghiệm thu 6 điều (đo ảnh ≤ 400 KB bằng Chromium, 360×740, console sạch, so tên vitest) | chưa | |
+| 7 | Nghiệm thu 6 điều (đo ảnh ≤ 400 KB bằng Chromium, 360×740, console sạch, so tên vitest) | XONG ở trang xem thử (máy chủ giả); chạy lại trên bản nối thật khi Code 5 nối xong | mục NGHIỆM THU cuối tệp · `docs/anh-dao-than-thu-2109/tron-vong.mjs` |
 
 ## 21/09 · Mục 1 — ảnh nhẹ
 - `node scripts/cat-anh-than-thu.mjs` (ghi) · `--kiem` (so byte) · `--xem <tệp.jpg>` (tờ soát mắt). Công cụ: Chromium của Playwright, không thêm phụ thuộc.
@@ -64,3 +64,18 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 - TRỌN VÒNG Playwright 360×740, máy chủ giả trong trang (`?man=vo&chuachon&doan`): chọn thú 1 chạm → đảo; đảo → câu đầu 1 chạm; 6 ải (I, III, II xen kẽ) → tổng kết 6/6, +60 EXP, 2 sao → về đảo có nút "Nạp 60 EXP" → Sổ tay → Túi đồ; **0 lỗi + 0 cảnh báo console**, không cuộn ngang. Đáy phần trận + câu: trắc nghiệm 635–732 px (< 740), trả lời ngắn 540 px; câu Đúng/Sai 4 ý 909 px (dài tự nhiên, phải cuộn — nút trả lời nổi sẵn ở đáy).
 - ĐO ẢNH bằng Chromium: màn chọn lần đầu 139 KB (3 thẻ); màn đảo lần đầu ở ca nặng nhất (cấp 100 = 1 ảnh thú + 6 ảnh bé) **97 KB** ≤ 400 KB; thêm tối đa 71 KB khi cuồng nộ.
 - Gói thêm ≈ 25 KB gzip (JS 17,9 + CSS 7,2; cận trên) ≤ 40 KB.
+
+## 21/09 · NGHIỆM THU (chạy lại: `npx vite --port 5196 --strictPort` rồi `node docs/anh-dao-than-thu-2109/tron-vong.mjs`)
+| # | Điều kiện của đề bài | Kết quả đo | Bằng chứng |
+|---|---|---|---|
+| 1 | Chưa chọn thú → chọn ≤ 2 chạm, vào đảo; đã có thú → đúng thú/cấp/dạng | **1 chạm** → đảo; ảnh thú = `thu-<thú>-<dạng của cấp>.webp` | `tron-vong.mjs` (`chamChonThu`), `tests/dao-cua-em.test.tsx` |
+| 2 | Đảo → câu đầu ≤ 2 chạm; trọn 6 ải không lỗi console ở 360×740 | **1 chạm**; 6 ải (I/III/II xen kẽ) **0 lỗi + 0 cảnh báo** | `tron-vong.mjs` (`chamToiCauDau`, `loi`) |
+| 3 | Lý do thưởng đúng `stage`; sổ tay khớp `mastery[]` | in nguyên `lyDoThuong.chu`; vắng thì suy từ `stage` — test đi qua `advance()` thật cho sao 1/2/3 + ca 0 EXP; sao ô = `stage` | `tests/dao-cua-em.test.tsx`, `tests/dao-than-thu-vo.test.tsx`, `tests/dao-so-tay.test.tsx` |
+| 4 | Ảnh màn đảo nạp lần đầu ≤ 400 KB (đo Chromium) | **97 KB** (ca nặng nhất cấp 100); màn chọn 139 KB | `tron-vong.mjs` (`anhDaoLanDauKB`) |
+| 5 | `doanMo=false` ⇒ không có mục Đoàn | 0 mục Đoàn; `true` ⇒ 1 | `tron-vong.mjs`, `tests/dao-than-thu-vo.test.tsx` |
+| 6 | vitest: tệp mới xanh, MỚI ĐỎ = [] | 6 tệp `tests/dao-*` 46/46 xanh; bộ hợp đồng game (than-thu, learning-battle, evolution-v2, kenh4, escort-*, doan-*) 42 tệp: đỏ 8 tệp `than-thu-*` của game CŨ, cả 8 đều có trong `docs/nen-vitest-do-1909.txt`, không tệp nào nạp mã của đảo | log so tên ngày 21/09 |
+| + | reduce-motion tắt sạch | 0 phần tử còn hoạt ảnh; tia cuồng nộ `display:none` | `tron-vong.mjs` (`reduceMotion`) |
+| + | Không cuộn 360×740 phần trận + câu | trắc nghiệm đáy 635–732 px, trả lời ngắn 540 px (< 740); Đúng/Sai 4 ý 909 px (dài tự nhiên) | `tron-vong.mjs` (`dayTranCau`) |
+| + | Gói thêm ≤ 40 KB gzip, nạp lazy | ≈ 25 KB (JS 17,9 + CSS 7,2; cận trên) | đo esbuild 21/09 |
+
+VIỆC CÒN LẠI (không phải của Code 6 hoặc chờ phiên khác): (a) Code 5 nối `Game.tsx` theo hợp đồng prop rồi chạy Playwright trên bản nối thật; (b) ĐÃ XONG 21/09: `lyDoThuongTuKetQua` nay gọi thẳng `../ly-do-thuong` của Code 5 (hết bản sao câu chữ); (c) cổng HS (Code 2) đưa `exp` + chuỗi ngày xuống `Game` nếu muốn hiện chip — vắng thì đảo tự ẩn; (d) bảng TÊN chương cho Sổ tay (kho chỉ có mã) — có thì truyền `tenChuong`.
