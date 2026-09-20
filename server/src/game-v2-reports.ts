@@ -1,5 +1,6 @@
 import type {Env} from './kieu'
 import {parentIdentity} from './game-v2-auth'
+import {baoCaoDoan} from './game-v2-doan-an'
 import type {Profile} from './game-v2'
 export interface Scope {enabled:boolean;types:string[];blocked:string[]}
 export async function readGameScope(env:Env,sbd:string):Promise<Scope>{const row=await env.DB.prepare('SELECT json FROM game_v2_scope WHERE sbd=?').bind(sbd).first<{json:string}>();return row?JSON.parse(row.json):{enabled:true,types:[],blocked:[]}}
@@ -14,6 +15,7 @@ export async function parentGame(env:Env,b:Record<string,unknown>):Promise<Recor
  return {ok:true,report:r}
 }
 export async function adminGame(env:Env,b:Record<string,unknown>):Promise<Record<string,unknown>>{
+ if(b.action==='doan-bao-cao')return baoCaoDoan(env,b) // Đoàn Hộ Tống: ai giúp ai, Người tiếp sức của tuần, lớp yếu dạng nào qua câu trùm (không cần SBD)
  const sbd=String(b.sbd??'').trim();if(!sbd)throw new Error('Nhập SBD cần xem.')
  if(b.action==='spirit'){
   // Read only: never import legacy progress or reset a profile from a classroom projection.
