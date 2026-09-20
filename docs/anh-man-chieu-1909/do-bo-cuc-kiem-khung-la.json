@@ -1,14 +1,2171 @@
 {
- "taiLuc": "2026-09-20T17:36:33.354Z",
+ "taiLuc": "2026-09-20T17:15:18.573Z",
  "khung": {
-  "1280x720": {
+  "1440x810": {
    "soDot": 35,
-   "bac": "11111224444442222224442222224244422",
+   "bac": "11111223444442222224442222224244422",
    "tach": 0,
    "bac5": 0,
    "khongVua": [],
    "tran": [],
-   "coMin": 17,
+   "coMin": 19.799999999999997,
+   "coSan": 18,
+   "dot": [
+    {
+     "stt": 1,
+     "ten": "Học sinh 01 + Học sinh 02",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 2,
+     "ten": "Học sinh 03 + Học sinh 04",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 3,
+     "ten": "Học sinh 05 + Học sinh 06",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 4,
+     "ten": "Học sinh 07 + Học sinh 08",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 5,
+     "ten": "Học sinh 09 + Học sinh 10",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 6,
+     "ten": "Học sinh 11",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 7,
+     "ten": "Học sinh 12",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 8,
+     "ten": "Học sinh 13",
+     "bac": 3,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 9,
+     "ten": "Học sinh 14",
+     "bac": 4,
+     "co": 30.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 10,
+     "ten": "Học sinh 15",
+     "bac": 4,
+     "co": 31.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 11,
+     "ten": "Học sinh 16",
+     "bac": 4,
+     "co": 31.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 12,
+     "ten": "Học sinh 17",
+     "bac": 4,
+     "co": 27.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 13,
+     "ten": "Học sinh 18",
+     "bac": 4,
+     "co": 27.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 14,
+     "ten": "Học sinh 19",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 15,
+     "ten": "Học sinh 20",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 16,
+     "ten": "Học sinh 21",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 17,
+     "ten": "Học sinh 22",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 18,
+     "ten": "Học sinh 23",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 19,
+     "ten": "Học sinh 24",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 20,
+     "ten": "Học sinh 25",
+     "bac": 4,
+     "co": 28.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 21,
+     "ten": "Học sinh 26",
+     "bac": 4,
+     "co": 25.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 22,
+     "ten": "Học sinh 27",
+     "bac": 4,
+     "co": 23.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 23,
+     "ten": "Học sinh 28",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 24,
+     "ten": "Học sinh 29",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 25,
+     "ten": "Học sinh 30",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 26,
+     "ten": "Học sinh 31",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 27,
+     "ten": "Học sinh 32",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 28,
+     "ten": "Học sinh 33",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 29,
+     "ten": "Học sinh 34",
+     "bac": 4,
+     "co": 25.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 30,
+     "ten": "Học sinh 35",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 31,
+     "ten": "Học sinh 36",
+     "bac": 4,
+     "co": 22.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 32,
+     "ten": "Học sinh 37",
+     "bac": 4,
+     "co": 23.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 33,
+     "ten": "Học sinh 38",
+     "bac": 4,
+     "co": 19.799999999999997,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 34,
+     "ten": "Học sinh 39",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 35,
+     "ten": "Học sinh 40",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    }
+   ],
+   "rieng": [
+    {
+     "ten": "I-ngắn-1",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-2",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-3",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-4",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-5",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-6",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-7",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-8",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-9",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-10",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-đề-dài-45",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-đề-dài-70",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-đề-dài-95",
+     "bac": 3,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-đề-dài-120",
+     "bac": 4,
+     "co": 30.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-1",
+     "bac": 4,
+     "co": 31.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-2",
+     "bac": 4,
+     "co": 31.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-3",
+     "bac": 4,
+     "co": 27.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-4",
+     "bac": 4,
+     "co": 27.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-520x300",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-640x420",
+     "bac": 3,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-420x560",
+     "bac": 3,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-860x520",
+     "bac": 3,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-ngắn",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-vừa",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-ý-dài",
+     "bac": 4,
+     "co": 28.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-dẫn-90",
+     "bac": 4,
+     "co": 25.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-dẫn-120-ý-dài",
+     "bac": 4,
+     "co": 23.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-có-hình",
+     "bac": 3,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-ngắn",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-vừa",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-dài",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-dẫn-120",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-bảng-nhỏ",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-bảng-lớn",
+     "bac": 4,
+     "co": 25.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-hình-đề-dài",
+     "bac": 3,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "cực-II-dẫn-140-hình-ý-dài",
+     "bac": 4,
+     "co": 20.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "cực-I-đề-160",
+     "bac": 4,
+     "co": 23.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "cực-III-bảng-dẫn-110",
+     "bac": 4,
+     "co": 19.799999999999997,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "ảnh-thân-vừa",
+     "bac": 1,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "ảnh-thân-cao",
+     "bac": 2,
+     "co": 33.8,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    }
+   ]
+  },
+  "1536x864": {
+   "soDot": 35,
+   "bac": "11111223444442222224442222224244422",
+   "tach": 0,
+   "bac5": 0,
+   "khongVua": [],
+   "tran": [],
+   "coMin": 22,
+   "coSan": 19,
+   "dot": [
+    {
+     "stt": 1,
+     "ten": "Học sinh 01 + Học sinh 02",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 2,
+     "ten": "Học sinh 03 + Học sinh 04",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 3,
+     "ten": "Học sinh 05 + Học sinh 06",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 4,
+     "ten": "Học sinh 07 + Học sinh 08",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 5,
+     "ten": "Học sinh 09 + Học sinh 10",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 6,
+     "ten": "Học sinh 11",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 7,
+     "ten": "Học sinh 12",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 8,
+     "ten": "Học sinh 13",
+     "bac": 3,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 9,
+     "ten": "Học sinh 14",
+     "bac": 4,
+     "co": 33,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 10,
+     "ten": "Học sinh 15",
+     "bac": 4,
+     "co": 35,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 11,
+     "ten": "Học sinh 16",
+     "bac": 4,
+     "co": 35,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 12,
+     "ten": "Học sinh 17",
+     "bac": 4,
+     "co": 30,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 13,
+     "ten": "Học sinh 18",
+     "bac": 4,
+     "co": 30,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 14,
+     "ten": "Học sinh 19",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 15,
+     "ten": "Học sinh 20",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 16,
+     "ten": "Học sinh 21",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 17,
+     "ten": "Học sinh 22",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 18,
+     "ten": "Học sinh 23",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 19,
+     "ten": "Học sinh 24",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 20,
+     "ten": "Học sinh 25",
+     "bac": 4,
+     "co": 31,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 21,
+     "ten": "Học sinh 26",
+     "bac": 4,
+     "co": 27,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 22,
+     "ten": "Học sinh 27",
+     "bac": 4,
+     "co": 26,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 23,
+     "ten": "Học sinh 28",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 24,
+     "ten": "Học sinh 29",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 25,
+     "ten": "Học sinh 30",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 26,
+     "ten": "Học sinh 31",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 27,
+     "ten": "Học sinh 32",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 28,
+     "ten": "Học sinh 33",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 29,
+     "ten": "Học sinh 34",
+     "bac": 4,
+     "co": 29,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 30,
+     "ten": "Học sinh 35",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 31,
+     "ten": "Học sinh 36",
+     "bac": 4,
+     "co": 25,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 32,
+     "ten": "Học sinh 37",
+     "bac": 4,
+     "co": 26,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 33,
+     "ten": "Học sinh 38",
+     "bac": 4,
+     "co": 22,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 34,
+     "ten": "Học sinh 39",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 35,
+     "ten": "Học sinh 40",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    }
+   ],
+   "rieng": [
+    {
+     "ten": "I-ngắn-1",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-2",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-3",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-4",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-5",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-6",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-7",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-8",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-9",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-10",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-đề-dài-45",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-đề-dài-70",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-đề-dài-95",
+     "bac": 3,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-đề-dài-120",
+     "bac": 4,
+     "co": 33,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-1",
+     "bac": 4,
+     "co": 35,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-2",
+     "bac": 4,
+     "co": 35,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-3",
+     "bac": 4,
+     "co": 30,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-4",
+     "bac": 4,
+     "co": 30,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-520x300",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-640x420",
+     "bac": 3,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-420x560",
+     "bac": 3,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-860x520",
+     "bac": 3,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-ngắn",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-vừa",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-ý-dài",
+     "bac": 4,
+     "co": 31,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-dẫn-90",
+     "bac": 4,
+     "co": 27,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-dẫn-120-ý-dài",
+     "bac": 4,
+     "co": 26,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-có-hình",
+     "bac": 3,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-ngắn",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-vừa",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-dài",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-dẫn-120",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-bảng-nhỏ",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-bảng-lớn",
+     "bac": 4,
+     "co": 29,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-hình-đề-dài",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "cực-II-dẫn-140-hình-ý-dài",
+     "bac": 4,
+     "co": 23,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "cực-I-đề-160",
+     "bac": 4,
+     "co": 26,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "cực-III-bảng-dẫn-110",
+     "bac": 4,
+     "co": 22,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "ảnh-thân-vừa",
+     "bac": 1,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "ảnh-thân-cao",
+     "bac": 2,
+     "co": 36,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    }
+   ]
+  },
+  "1024x768": {
+   "soDot": 35,
+   "bac": "11111222222222222222442222222244422",
+   "tach": 0,
+   "bac5": 0,
+   "khongVua": [],
+   "tran": [],
+   "coMin": 18,
+   "coSan": 13,
+   "dot": [
+    {
+     "stt": 1,
+     "ten": "Học sinh 01 + Học sinh 02",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 2,
+     "ten": "Học sinh 03 + Học sinh 04",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 3,
+     "ten": "Học sinh 05 + Học sinh 06",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 4,
+     "ten": "Học sinh 07 + Học sinh 08",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 5,
+     "ten": "Học sinh 09 + Học sinh 10",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 6,
+     "ten": "Học sinh 11",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 7,
+     "ten": "Học sinh 12",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 8,
+     "ten": "Học sinh 13",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 9,
+     "ten": "Học sinh 14",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 10,
+     "ten": "Học sinh 15",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 11,
+     "ten": "Học sinh 16",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 12,
+     "ten": "Học sinh 17",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 13,
+     "ten": "Học sinh 18",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 14,
+     "ten": "Học sinh 19",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 15,
+     "ten": "Học sinh 20",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 16,
+     "ten": "Học sinh 21",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 17,
+     "ten": "Học sinh 22",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 18,
+     "ten": "Học sinh 23",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 19,
+     "ten": "Học sinh 24",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 20,
+     "ten": "Học sinh 25",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 21,
+     "ten": "Học sinh 26",
+     "bac": 4,
+     "co": 21,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 22,
+     "ten": "Học sinh 27",
+     "bac": 4,
+     "co": 20,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 23,
+     "ten": "Học sinh 28",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 24,
+     "ten": "Học sinh 29",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 25,
+     "ten": "Học sinh 30",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 26,
+     "ten": "Học sinh 31",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 27,
+     "ten": "Học sinh 32",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 28,
+     "ten": "Học sinh 33",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 29,
+     "ten": "Học sinh 34",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 30,
+     "ten": "Học sinh 35",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 31,
+     "ten": "Học sinh 36",
+     "bac": 4,
+     "co": 19,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 32,
+     "ten": "Học sinh 37",
+     "bac": 4,
+     "co": 20,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 33,
+     "ten": "Học sinh 38",
+     "bac": 4,
+     "co": 18,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 34,
+     "ten": "Học sinh 39",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 35,
+     "ten": "Học sinh 40",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    }
+   ],
+   "rieng": [
+    {
+     "ten": "I-ngắn-1",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-2",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-3",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-4",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-5",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-6",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-7",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-8",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-9",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-ngắn-10",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "I-đề-dài-45",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-đề-dài-70",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-đề-dài-95",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-đề-dài-120",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-1",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-2",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-3",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-pa-dài-4",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-520x300",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-640x420",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-420x560",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "I-hình-860x520",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-ngắn",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "II-vừa",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-ý-dài",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-dẫn-90",
+     "bac": 4,
+     "co": 21,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-dẫn-120-ý-dài",
+     "bac": 4,
+     "co": 20,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-có-hình",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-ngắn",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-vừa",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-dài",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-dẫn-120",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-bảng-nhỏ",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-bảng-lớn",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-hình-đề-dài",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "cực-II-dẫn-140-hình-ý-dài",
+     "bac": 4,
+     "co": 18,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "cực-I-đề-160",
+     "bac": 4,
+     "co": 20,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "cực-III-bảng-dẫn-110",
+     "bac": 4,
+     "co": 18,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "ảnh-thân-vừa",
+     "bac": 1,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "ảnh-thân-cao",
+     "bac": 2,
+     "co": 24,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    }
+   ]
+  },
+  "1280x800": {
+   "soDot": 35,
+   "bac": "11111222433442222222442222224244422",
+   "tach": 0,
+   "bac5": 0,
+   "khongVua": [],
+   "tran": [],
+   "coMin": 20,
    "coSan": 16,
    "dot": [
     {
@@ -91,8 +2248,8 @@
     {
      "stt": 8,
      "ten": "Học sinh 13",
-     "bac": 4,
-     "co": 29,
+     "bac": 2,
+     "co": 30,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -103,7 +2260,7 @@
      "stt": 9,
      "ten": "Học sinh 14",
      "bac": 4,
-     "co": 27,
+     "co": 29,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -113,8 +2270,8 @@
     {
      "stt": 10,
      "ten": "Học sinh 15",
-     "bac": 4,
-     "co": 28,
+     "bac": 3,
+     "co": 30,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -124,8 +2281,8 @@
     {
      "stt": 11,
      "ten": "Học sinh 16",
-     "bac": 4,
-     "co": 28,
+     "bac": 3,
+     "co": 30,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -136,7 +2293,7 @@
      "stt": 12,
      "ten": "Học sinh 17",
      "bac": 4,
-     "co": 25,
+     "co": 28,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -147,7 +2304,7 @@
      "stt": 13,
      "ten": "Học sinh 18",
      "bac": 4,
-     "co": 25,
+     "co": 27,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -223,6 +2380,105 @@
     {
      "stt": 20,
      "ten": "Học sinh 25",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 21,
+     "ten": "Học sinh 26",
+     "bac": 4,
+     "co": 23,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 22,
+     "ten": "Học sinh 27",
+     "bac": 4,
+     "co": 23,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 23,
+     "ten": "Học sinh 28",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 24,
+     "ten": "Học sinh 29",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tach": false,
+     "soEm": 2,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 25,
+     "ten": "Học sinh 30",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 26,
+     "ten": "Học sinh 31",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 27,
+     "ten": "Học sinh 32",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 28,
+     "ten": "Học sinh 33",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tach": false,
+     "soEm": 1,
+     "tran": false,
+     "ghiChu": ""
+    },
+    {
+     "stt": 29,
+     "ten": "Học sinh 34",
      "bac": 4,
      "co": 26,
      "vua": "1",
@@ -232,105 +2488,6 @@
      "ghiChu": ""
     },
     {
-     "stt": 21,
-     "ten": "Học sinh 26",
-     "bac": 4,
-     "co": 23,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 22,
-     "ten": "Học sinh 27",
-     "bac": 4,
-     "co": 21,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 23,
-     "ten": "Học sinh 28",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 24,
-     "ten": "Học sinh 29",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 25,
-     "ten": "Học sinh 30",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 26,
-     "ten": "Học sinh 31",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 27,
-     "ten": "Học sinh 32",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 28,
-     "ten": "Học sinh 33",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 29,
-     "ten": "Học sinh 34",
-     "bac": 4,
-     "co": 22,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
      "stt": 30,
      "ten": "Học sinh 35",
      "bac": 2,
@@ -345,7 +2502,7 @@
      "stt": 31,
      "ten": "Học sinh 36",
      "bac": 4,
-     "co": 21,
+     "co": 22,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -356,7 +2513,7 @@
      "stt": 32,
      "ten": "Học sinh 37",
      "bac": 4,
-     "co": 21,
+     "co": 23,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -367,7 +2524,7 @@
      "stt": 33,
      "ten": "Học sinh 38",
      "bac": 4,
-     "co": 17,
+     "co": 20,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -397,20 +2554,6 @@
      "ghiChu": ""
     }
    ],
-   "chuCucLon": {
-    "soDot": 40,
-    "tach": 10,
-    "tran": 0,
-    "bac5": 0
-   },
-   "cauCucDai": {
-    "tu": 668,
-    "bac": 5,
-    "co": 14,
-    "vua": "1",
-    "tran": false,
-    "ghiChu": "Câu rất dài — chữ nhỏ hơn mức khuyến nghị"
-   },
    "rieng": [
     {
      "ten": "I-ngắn-1",
@@ -510,8 +2653,8 @@
     },
     {
      "ten": "I-đề-dài-95",
-     "bac": 4,
-     "co": 29,
+     "bac": 2,
+     "co": 30,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -519,23 +2662,23 @@
     {
      "ten": "I-đề-dài-120",
      "bac": 4,
-     "co": 27,
+     "co": 29,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-pa-dài-1",
-     "bac": 4,
-     "co": 28,
+     "bac": 3,
+     "co": 30,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-pa-dài-2",
-     "bac": 4,
-     "co": 28,
+     "bac": 3,
+     "co": 30,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -543,7 +2686,7 @@
     {
      "ten": "I-pa-dài-3",
      "bac": 4,
-     "co": 25,
+     "co": 28,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -551,7 +2694,7 @@
     {
      "ten": "I-pa-dài-4",
      "bac": 4,
-     "co": 25,
+     "co": 27,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -566,7 +2709,7 @@
     },
     {
      "ten": "I-hình-640x420",
-     "bac": 3,
+     "bac": 2,
      "co": 30,
      "vua": "1",
      "tran": false,
@@ -574,7 +2717,7 @@
     },
     {
      "ten": "I-hình-420x560",
-     "bac": 3,
+     "bac": 2,
      "co": 30,
      "vua": "1",
      "tran": false,
@@ -590,11 +2733,11 @@
     },
     {
      "ten": "II-ngắn",
-     "bac": 2,
+     "bac": 1,
      "co": 30,
      "vua": "1",
      "tran": false,
-     "tach": true
+     "tach": false
     },
     {
      "ten": "II-vừa",
@@ -606,6 +2749,78 @@
     },
     {
      "ten": "II-ý-dài",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-dẫn-90",
+     "bac": 4,
+     "co": 23,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-dẫn-120-ý-dài",
+     "bac": 4,
+     "co": 23,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "II-có-hình",
+     "bac": 3,
+     "co": 30,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-ngắn",
+     "bac": 1,
+     "co": 30,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-vừa",
+     "bac": 1,
+     "co": 30,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-dài",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-dẫn-120",
+     "bac": 2,
+     "co": 30,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
+     "ten": "III-bảng-nhỏ",
+     "bac": 1,
+     "co": 30,
+     "vua": "1",
+     "tran": false,
+     "tach": false
+    },
+    {
+     "ten": "III-bảng-lớn",
      "bac": 4,
      "co": 26,
      "vua": "1",
@@ -613,1519 +2828,9 @@
      "tach": true
     },
     {
-     "ten": "II-dẫn-90",
-     "bac": 4,
-     "co": 23,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-dẫn-120-ý-dài",
-     "bac": 4,
-     "co": 21,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-có-hình",
-     "bac": 3,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-ngắn",
-     "bac": 1,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "III-vừa",
-     "bac": 1,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "III-dài",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-dẫn-120",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-bảng-nhỏ",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-bảng-lớn",
-     "bac": 4,
-     "co": 22,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
      "ten": "III-hình-đề-dài",
      "bac": 3,
      "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "cực-II-dẫn-140-hình-ý-dài",
-     "bac": 4,
-     "co": 18,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "cực-I-đề-160",
-     "bac": 4,
-     "co": 21,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "cực-III-bảng-dẫn-110",
-     "bac": 4,
-     "co": 17,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "ảnh-thân-vừa",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "ảnh-thân-cao",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    }
-   ]
-  },
-  "1920x1080": {
-   "soDot": 35,
-   "bac": "11111222433442222224442222224244422",
-   "tach": 0,
-   "bac5": 0,
-   "khongVua": [],
-   "tran": [],
-   "coMin": 30,
-   "coSan": 24,
-   "dot": [
-    {
-     "stt": 1,
-     "ten": "Học sinh 01 + Học sinh 02",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 2,
-     "ten": "Học sinh 03 + Học sinh 04",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 3,
-     "ten": "Học sinh 05 + Học sinh 06",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 4,
-     "ten": "Học sinh 07 + Học sinh 08",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 5,
-     "ten": "Học sinh 09 + Học sinh 10",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 6,
-     "ten": "Học sinh 11",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 7,
-     "ten": "Học sinh 12",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 8,
-     "ten": "Học sinh 13",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 9,
-     "ten": "Học sinh 14",
-     "bac": 4,
-     "co": 43,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 10,
-     "ten": "Học sinh 15",
-     "bac": 3,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 11,
-     "ten": "Học sinh 16",
-     "bac": 3,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 12,
-     "ten": "Học sinh 17",
-     "bac": 4,
-     "co": 40,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 13,
-     "ten": "Học sinh 18",
-     "bac": 4,
-     "co": 40,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 14,
-     "ten": "Học sinh 19",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 15,
-     "ten": "Học sinh 20",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 16,
-     "ten": "Học sinh 21",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 17,
-     "ten": "Học sinh 22",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 18,
-     "ten": "Học sinh 23",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 19,
-     "ten": "Học sinh 24",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 20,
-     "ten": "Học sinh 25",
-     "bac": 4,
-     "co": 40,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 21,
-     "ten": "Học sinh 26",
-     "bac": 4,
-     "co": 35,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 22,
-     "ten": "Học sinh 27",
-     "bac": 4,
-     "co": 34,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 23,
-     "ten": "Học sinh 28",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 24,
-     "ten": "Học sinh 29",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 25,
-     "ten": "Học sinh 30",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 26,
-     "ten": "Học sinh 31",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 27,
-     "ten": "Học sinh 32",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 28,
-     "ten": "Học sinh 33",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 29,
-     "ten": "Học sinh 34",
-     "bac": 4,
-     "co": 40,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 30,
-     "ten": "Học sinh 35",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 31,
-     "ten": "Học sinh 36",
-     "bac": 4,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 32,
-     "ten": "Học sinh 37",
-     "bac": 4,
-     "co": 34,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 33,
-     "ten": "Học sinh 38",
-     "bac": 4,
-     "co": 30,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 34,
-     "ten": "Học sinh 39",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 35,
-     "ten": "Học sinh 40",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    }
-   ],
-   "rieng": [
-    {
-     "ten": "I-ngắn-1",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-2",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-3",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-4",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-5",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-6",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-7",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-8",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-9",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-10",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-đề-dài-45",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-đề-dài-70",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-đề-dài-95",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-đề-dài-120",
-     "bac": 4,
-     "co": 43,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-pa-dài-1",
-     "bac": 3,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-pa-dài-2",
-     "bac": 3,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-pa-dài-3",
-     "bac": 4,
-     "co": 40,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-pa-dài-4",
-     "bac": 4,
-     "co": 40,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-hình-520x300",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-hình-640x420",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-hình-420x560",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-hình-860x520",
-     "bac": 3,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-ngắn",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-vừa",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-ý-dài",
-     "bac": 4,
-     "co": 40,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-dẫn-90",
-     "bac": 4,
-     "co": 35,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-dẫn-120-ý-dài",
-     "bac": 4,
-     "co": 34,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-có-hình",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-ngắn",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "III-vừa",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "III-dài",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-dẫn-120",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-bảng-nhỏ",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "III-bảng-lớn",
-     "bac": 4,
-     "co": 40,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-hình-đề-dài",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "cực-II-dẫn-140-hình-ý-dài",
-     "bac": 4,
-     "co": 29,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "cực-I-đề-160",
-     "bac": 4,
-     "co": 34,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "cực-III-bảng-dẫn-110",
-     "bac": 4,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "ảnh-thân-vừa",
-     "bac": 1,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "ảnh-thân-cao",
-     "bac": 2,
-     "co": 45,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    }
-   ]
-  },
-  "1366x768": {
-   "soDot": 35,
-   "bac": "11111224444442222224442222224244422",
-   "tach": 0,
-   "bac5": 0,
-   "khongVua": [],
-   "tran": [],
-   "coMin": 18,
-   "coSan": 17,
-   "dot": [
-    {
-     "stt": 1,
-     "ten": "Học sinh 01 + Học sinh 02",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 2,
-     "ten": "Học sinh 03 + Học sinh 04",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 3,
-     "ten": "Học sinh 05 + Học sinh 06",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 4,
-     "ten": "Học sinh 07 + Học sinh 08",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 5,
-     "ten": "Học sinh 09 + Học sinh 10",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 6,
-     "ten": "Học sinh 11",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 7,
-     "ten": "Học sinh 12",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 8,
-     "ten": "Học sinh 13",
-     "bac": 4,
-     "co": 31,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 9,
-     "ten": "Học sinh 14",
-     "bac": 4,
-     "co": 29,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 10,
-     "ten": "Học sinh 15",
-     "bac": 4,
-     "co": 30,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 11,
-     "ten": "Học sinh 16",
-     "bac": 4,
-     "co": 30,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 12,
-     "ten": "Học sinh 17",
-     "bac": 4,
-     "co": 27,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 13,
-     "ten": "Học sinh 18",
-     "bac": 4,
-     "co": 27,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 14,
-     "ten": "Học sinh 19",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 15,
-     "ten": "Học sinh 20",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 16,
-     "ten": "Học sinh 21",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 17,
-     "ten": "Học sinh 22",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 18,
-     "ten": "Học sinh 23",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 19,
-     "ten": "Học sinh 24",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 20,
-     "ten": "Học sinh 25",
-     "bac": 4,
-     "co": 28,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 21,
-     "ten": "Học sinh 26",
-     "bac": 4,
-     "co": 24,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 22,
-     "ten": "Học sinh 27",
-     "bac": 4,
-     "co": 23,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 23,
-     "ten": "Học sinh 28",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 24,
-     "ten": "Học sinh 29",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 25,
-     "ten": "Học sinh 30",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 26,
-     "ten": "Học sinh 31",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 27,
-     "ten": "Học sinh 32",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 28,
-     "ten": "Học sinh 33",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 29,
-     "ten": "Học sinh 34",
-     "bac": 4,
-     "co": 24,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 30,
-     "ten": "Học sinh 35",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 31,
-     "ten": "Học sinh 36",
-     "bac": 4,
-     "co": 22,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 32,
-     "ten": "Học sinh 37",
-     "bac": 4,
-     "co": 23,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 33,
-     "ten": "Học sinh 38",
-     "bac": 4,
-     "co": 18,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 34,
-     "ten": "Học sinh 39",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 2,
-     "tran": false,
-     "ghiChu": ""
-    },
-    {
-     "stt": 35,
-     "ten": "Học sinh 40",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tach": false,
-     "soEm": 1,
-     "tran": false,
-     "ghiChu": ""
-    }
-   ],
-   "rieng": [
-    {
-     "ten": "I-ngắn-1",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-2",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-3",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-4",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-5",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-6",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-7",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-8",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-9",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-ngắn-10",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "I-đề-dài-45",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-đề-dài-70",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-đề-dài-95",
-     "bac": 4,
-     "co": 31,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-đề-dài-120",
-     "bac": 4,
-     "co": 29,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-pa-dài-1",
-     "bac": 4,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-pa-dài-2",
-     "bac": 4,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-pa-dài-3",
-     "bac": 4,
-     "co": 27,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-pa-dài-4",
-     "bac": 4,
-     "co": 27,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-hình-520x300",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-hình-640x420",
-     "bac": 3,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-hình-420x560",
-     "bac": 3,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-hình-860x520",
-     "bac": 3,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-ngắn",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-vừa",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-ý-dài",
-     "bac": 4,
-     "co": 28,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-dẫn-90",
-     "bac": 4,
-     "co": 24,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-dẫn-120-ý-dài",
-     "bac": 4,
-     "co": 23,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "II-có-hình",
-     "bac": 3,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-ngắn",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "III-vừa",
-     "bac": 1,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": false
-    },
-    {
-     "ten": "III-dài",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-dẫn-120",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-bảng-nhỏ",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-bảng-lớn",
-     "bac": 4,
-     "co": 24,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "III-hình-đề-dài",
-     "bac": 3,
-     "co": 32,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2149,7 +2854,7 @@
     {
      "ten": "cực-III-bảng-dẫn-110",
      "bac": 4,
-     "co": 18,
+     "co": 20,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2157,7 +2862,7 @@
     {
      "ten": "ảnh-thân-vừa",
      "bac": 1,
-     "co": 32,
+     "co": 30,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2165,28 +2870,28 @@
     {
      "ten": "ảnh-thân-cao",
      "bac": 2,
-     "co": 32,
+     "co": 30,
      "vua": "1",
      "tran": false,
      "tach": true
     }
    ]
   },
-  "1600x900": {
+  "1680x1050": {
    "soDot": 35,
-   "bac": "11111222444442222224442222224244422",
+   "bac": "11111222222442222222442222224244422",
    "tach": 0,
    "bac5": 0,
    "khongVua": [],
    "tran": [],
-   "coMin": 23.5,
-   "coSan": 20,
+   "coMin": 27.4,
+   "coSan": 21,
    "dot": [
     {
      "stt": 1,
      "ten": "Học sinh 01 + Học sinh 02",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 2,
@@ -2197,7 +2902,7 @@
      "stt": 2,
      "ten": "Học sinh 03 + Học sinh 04",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 2,
@@ -2208,7 +2913,7 @@
      "stt": 3,
      "ten": "Học sinh 05 + Học sinh 06",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 2,
@@ -2219,7 +2924,7 @@
      "stt": 4,
      "ten": "Học sinh 07 + Học sinh 08",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 2,
@@ -2230,7 +2935,7 @@
      "stt": 5,
      "ten": "Học sinh 09 + Học sinh 10",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 2,
@@ -2241,7 +2946,7 @@
      "stt": 6,
      "ten": "Học sinh 11",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2252,7 +2957,7 @@
      "stt": 7,
      "ten": "Học sinh 12",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2263,7 +2968,7 @@
      "stt": 8,
      "ten": "Học sinh 13",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2273,8 +2978,8 @@
     {
      "stt": 9,
      "ten": "Học sinh 14",
-     "bac": 4,
-     "co": 34.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2284,8 +2989,8 @@
     {
      "stt": 10,
      "ten": "Học sinh 15",
-     "bac": 4,
-     "co": 36.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2295,8 +3000,8 @@
     {
      "stt": 11,
      "ten": "Học sinh 16",
-     "bac": 4,
-     "co": 36.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2307,7 +3012,7 @@
      "stt": 12,
      "ten": "Học sinh 17",
      "bac": 4,
-     "co": 31.5,
+     "co": 36.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2318,7 +3023,7 @@
      "stt": 13,
      "ten": "Học sinh 18",
      "bac": 4,
-     "co": 31.5,
+     "co": 36.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2329,7 +3034,7 @@
      "stt": 14,
      "ten": "Học sinh 19",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 2,
@@ -2340,7 +3045,7 @@
      "stt": 15,
      "ten": "Học sinh 20",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2351,7 +3056,7 @@
      "stt": 16,
      "ten": "Học sinh 21",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2362,7 +3067,7 @@
      "stt": 17,
      "ten": "Học sinh 22",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2373,7 +3078,7 @@
      "stt": 18,
      "ten": "Học sinh 23",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 2,
@@ -2384,7 +3089,7 @@
      "stt": 19,
      "ten": "Học sinh 24",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2394,8 +3099,8 @@
     {
      "stt": 20,
      "ten": "Học sinh 25",
-     "bac": 4,
-     "co": 32.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2406,7 +3111,7 @@
      "stt": 21,
      "ten": "Học sinh 26",
      "bac": 4,
-     "co": 28.5,
+     "co": 32.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2417,7 +3122,7 @@
      "stt": 22,
      "ten": "Học sinh 27",
      "bac": 4,
-     "co": 27.5,
+     "co": 30.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2428,7 +3133,7 @@
      "stt": 23,
      "ten": "Học sinh 28",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2439,7 +3144,7 @@
      "stt": 24,
      "ten": "Học sinh 29",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 2,
@@ -2450,7 +3155,7 @@
      "stt": 25,
      "ten": "Học sinh 30",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2461,7 +3166,7 @@
      "stt": 26,
      "ten": "Học sinh 31",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2472,7 +3177,7 @@
      "stt": 27,
      "ten": "Học sinh 32",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2483,7 +3188,7 @@
      "stt": 28,
      "ten": "Học sinh 33",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2494,7 +3199,7 @@
      "stt": 29,
      "ten": "Học sinh 34",
      "bac": 4,
-     "co": 30.5,
+     "co": 37.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2505,7 +3210,7 @@
      "stt": 30,
      "ten": "Học sinh 35",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2516,7 +3221,7 @@
      "stt": 31,
      "ten": "Học sinh 36",
      "bac": 4,
-     "co": 25.5,
+     "co": 29.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2527,7 +3232,7 @@
      "stt": 32,
      "ten": "Học sinh 37",
      "bac": 4,
-     "co": 27.5,
+     "co": 31.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2538,7 +3243,7 @@
      "stt": 33,
      "ten": "Học sinh 38",
      "bac": 4,
-     "co": 23.5,
+     "co": 27.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2549,7 +3254,7 @@
      "stt": 34,
      "ten": "Học sinh 39",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 2,
@@ -2560,7 +3265,7 @@
      "stt": 35,
      "ten": "Học sinh 40",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2572,7 +3277,7 @@
     {
      "ten": "I-ngắn-1",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2580,7 +3285,7 @@
     {
      "ten": "I-ngắn-2",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2588,7 +3293,7 @@
     {
      "ten": "I-ngắn-3",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2596,7 +3301,7 @@
     {
      "ten": "I-ngắn-4",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2604,7 +3309,7 @@
     {
      "ten": "I-ngắn-5",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2612,7 +3317,7 @@
     {
      "ten": "I-ngắn-6",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2620,7 +3325,7 @@
     {
      "ten": "I-ngắn-7",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2628,7 +3333,7 @@
     {
      "ten": "I-ngắn-8",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2636,7 +3341,7 @@
     {
      "ten": "I-ngắn-9",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2644,7 +3349,7 @@
     {
      "ten": "I-ngắn-10",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2652,7 +3357,7 @@
     {
      "ten": "I-đề-dài-45",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2660,7 +3365,7 @@
     {
      "ten": "I-đề-dài-70",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2668,31 +3373,31 @@
     {
      "ten": "I-đề-dài-95",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-đề-dài-120",
-     "bac": 4,
-     "co": 34.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-pa-dài-1",
-     "bac": 4,
-     "co": 36.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-pa-dài-2",
-     "bac": 4,
-     "co": 36.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2700,7 +3405,7 @@
     {
      "ten": "I-pa-dài-3",
      "bac": 4,
-     "co": 31.5,
+     "co": 36.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2708,7 +3413,7 @@
     {
      "ten": "I-pa-dài-4",
      "bac": 4,
-     "co": 31.5,
+     "co": 36.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2716,55 +3421,55 @@
     {
      "ten": "I-hình-520x300",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-hình-640x420",
-     "bac": 3,
-     "co": 37.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-hình-420x560",
-     "bac": 3,
-     "co": 37.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-hình-860x520",
-     "bac": 3,
-     "co": 37.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "II-ngắn",
-     "bac": 2,
-     "co": 37.5,
+     "bac": 1,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
-     "tach": true
+     "tach": false
     },
     {
      "ten": "II-vừa",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "II-ý-dài",
-     "bac": 4,
-     "co": 32.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2772,7 +3477,7 @@
     {
      "ten": "II-dẫn-90",
      "bac": 4,
-     "co": 28.5,
+     "co": 32.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2780,15 +3485,15 @@
     {
      "ten": "II-dẫn-120-ý-dài",
      "bac": 4,
-     "co": 27.5,
+     "co": 30.4,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "II-có-hình",
-     "bac": 3,
-     "co": 37.5,
+     "bac": 2,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2796,7 +3501,7 @@
     {
      "ten": "III-ngắn",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2804,7 +3509,7 @@
     {
      "ten": "III-vừa",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2812,7 +3517,7 @@
     {
      "ten": "III-dài",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2820,7 +3525,7 @@
     {
      "ten": "III-dẫn-120",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2828,7 +3533,7 @@
     {
      "ten": "III-bảng-nhỏ",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2836,7 +3541,7 @@
     {
      "ten": "III-bảng-lớn",
      "bac": 4,
-     "co": 30.5,
+     "co": 37.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2844,7 +3549,7 @@
     {
      "ten": "III-hình-đề-dài",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2852,7 +3557,7 @@
     {
      "ten": "cực-II-dẫn-140-hình-ý-dài",
      "bac": 4,
-     "co": 23.5,
+     "co": 27.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2860,7 +3565,7 @@
     {
      "ten": "cực-I-đề-160",
      "bac": 4,
-     "co": 27.5,
+     "co": 31.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2868,7 +3573,7 @@
     {
      "ten": "cực-III-bảng-dẫn-110",
      "bac": 4,
-     "co": 23.5,
+     "co": 27.4,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2876,7 +3581,7 @@
     {
      "ten": "ảnh-thân-vừa",
      "bac": 1,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": false
@@ -2884,7 +3589,7 @@
     {
      "ten": "ảnh-thân-cao",
      "bac": 2,
-     "co": 37.5,
+     "co": 39.4,
      "vua": "1",
      "tran": false,
      "tach": true

@@ -1,6 +1,6 @@
 // CẦU NỐI TỜ MÁY CHIẾU → MÀN GIÁO VIÊN (GĐ 6 làn giáo viên, mốc d, 19/09/2026) — PHÍA TỜ CHIẾU VÀ GIAO THỨC.
 //
-// Thầy chốt "cho lên máy chiếu luôn": nút Đạt / Không đạt ngay trên tờ máy chiếu. Tờ là một trang HTML độc lập
+// Thầy chốt "cho lên máy chiếu luôn": nút Đạt / Chưa đạt ngay trên tờ máy chiếu. Tờ là một trang HTML độc lập
 // trong `<iframe srcDoc>`; nó KHÔNG có hàm ghi, chỉ gửi tin về khung cha. Tệp này soi:
 //   · bốn lớp kiểm tin của màn giáo viên (`kiemTinToChieu`);
 //   · tờ dựng ra có/không có nút đúng lúc (không cầu nối ⇒ y hệt cũ; mở riêng ⇒ bỏ hẳn nút);
@@ -128,7 +128,7 @@ describe('tờ dựng ra: có nút khi nào', () => {
     const khoa = [...doc.querySelectorAll('.mc-cham')].map((n) => n.getAttribute('data-khoa'))
     expect(khoa).toEqual(['A|Q-A', 'B|Q-B', 'C|Q-C'])
     for (const v of doc.querySelectorAll('.mc-cham')) {
-      expect([...v.querySelectorAll('.mc-cham-nut')].map((b) => b.textContent)).toEqual(['Đạt', 'Không đạt'])
+      expect([...v.querySelectorAll('.mc-cham-nut')].map((b) => b.textContent)).toEqual(['Đạt', 'Chưa đạt'])
     }
   })
 
@@ -204,7 +204,7 @@ function moTo(opt: { dsO?: OBang[]; coCha?: boolean } = {}) {
   }
   const ketNoi = () => tuCha({ type: TIN_TO_CHIEU.KET_NOI, maPhien: MA })
   const o1 = () => doc.querySelectorAll<HTMLElement>('.mc-cham')[0]!
-  const nut = (v: HTMLElement, chu: 'Đạt' | 'Không đạt') => [...v.querySelectorAll<HTMLButtonElement>('.mc-cham-nut')].find((b) => b.textContent === chu)!
+  const nut = (v: HTMLElement, chu: 'Đạt' | 'Chưa đạt') => [...v.querySelectorAll<HTMLButtonElement>('.mc-cham-nut')].find((b) => b.textContent === chu)!
   const hienTai = () => hen.filter((t) => !t.huy)
   const chayHen = (ms: number) => hienTai().filter((t) => !t.iv && t.ms === ms).forEach((t) => (t.huy = true, t.f()))
   const chayNhip = () => hienTai().filter((t) => t.iv).forEach((t) => t.f())
@@ -240,7 +240,7 @@ describe('tờ chiếu chạy thật — bắt tay với màn giáo viên', () =
     t.chayNhip()
     expect(t.gui.filter((x) => x.m.type === TIN_TO_CHIEU.SAN_SANG)).toHaveLength(3)
     t.ketNoi()
-    expect(t.hienTai().filter((x) => x.iv)).toHaveLength(0)
+    expect(t.hienTai().filter((x) => x.iv && x.ms === NHIP_BAT_TAY_MS)).toHaveLength(0) // còn nhịp 250 ms của thanh dưới (đồng hồ pha) — không phải nhịp bắt tay
     t.chayNhip()
     expect(t.gui.filter((x) => x.m.type === TIN_TO_CHIEU.SAN_SANG)).toHaveLength(3)
   })
@@ -269,14 +269,14 @@ describe('tờ chiếu chạy thật — bắt tay với màn giáo viên', () =
 })
 
 describe('tờ chiếu chạy thật — bấm nút', () => {
-  it('bấm Đạt ⇒ gửi ĐÚNG MỘT tin CHAM {khoa, dat:true, maPhien}; bấm Không đạt ⇒ dat:false', () => {
+  it('bấm Đạt ⇒ gửi ĐÚNG MỘT tin CHAM {khoa, dat:true, maPhien}; bấm Chưa đạt ⇒ dat:false', () => {
     const t = moTo()
     t.ketNoi()
     t.nut(t.o1(), 'Đạt').click()
     expect(daBam(t.gui)).toHaveLength(1)
     expect(daBam(t.gui)[0]).toEqual({ m: { type: TIN_TO_CHIEU.CHAM, maPhien: MA, khoa: 'A|Q-A', dat: true }, o: GOC })
     const v2 = t.doc.querySelectorAll<HTMLElement>('.mc-cham')[1]!
-    t.nut(v2, 'Không đạt').click()
+    t.nut(v2, 'Chưa đạt').click()
     expect(daBam(t.gui)[1].m).toMatchObject({ khoa: 'B|Q-B', dat: false })
   })
 
@@ -286,10 +286,10 @@ describe('tờ chiếu chạy thật — bấm nút', () => {
     const v = t.o1()
     t.nut(v, 'Đạt').click()
     t.nut(v, 'Đạt').click()
-    t.nut(v, 'Không đạt').click()
+    t.nut(v, 'Chưa đạt').click()
     expect(daBam(t.gui)).toHaveLength(1)
     expect(t.nut(v, 'Đạt').disabled).toBe(true)
-    expect(t.nut(v, 'Không đạt').disabled).toBe(true)
+    expect(t.nut(v, 'Chưa đạt').disabled).toBe(true)
     expect(v.querySelector('.mc-cham-tin')!.textContent).toBe('Đang ghi…')
   })
 
@@ -317,9 +317,9 @@ describe('tờ chiếu chạy thật — bấm nút', () => {
     t.nut(v, 'Đạt').click()
     t.tuCha({ type: TIN_TO_CHIEU.PHAN_HOI, maPhien: MA, khoa: 'A|Q-A', kq: 'loi' })
     expect(t.nut(v, 'Đạt').disabled).toBe(false)
-    expect(t.nut(v, 'Không đạt').disabled).toBe(false)
+    expect(t.nut(v, 'Chưa đạt').disabled).toBe(false)
     expect(v.querySelector('.mc-cham-tin')!.textContent).toBe('chưa ghi được, bấm lại')
-    t.nut(v, 'Không đạt').click()
+    t.nut(v, 'Chưa đạt').click()
     expect(daBam(t.gui)).toHaveLength(2)
     expect(daBam(t.gui)[1].m).toMatchObject({ dat: false })
   })
@@ -390,16 +390,16 @@ describe('TẾ NHỊ TRƯỚC LỚP — tờ chiếu không bao giờ lộ kết
   function ghiXong(dat: boolean) {
     const t = moTo({ dsO: [o('A')] })
     t.ketNoi()
-    t.nut(t.o1(), dat ? 'Đạt' : 'Không đạt').click()
+    t.nut(t.o1(), dat ? 'Đạt' : 'Chưa đạt').click()
     t.tuCha({ type: TIN_TO_CHIEU.PHAN_HOI, maPhien: MA, khoa: 'A|Q-A', kq: 'da_ghi' })
     return t
   }
 
-  it('ô vừa ghi KHÔNG chứa chữ "Không đạt" (và không "Đạt") — chỉ "Đã ghi" — với CẢ HAI kết quả', () => {
+  it('ô vừa ghi KHÔNG chứa chữ "Chưa đạt" (và không "Đạt") — chỉ "Đã ghi" — với CẢ HAI kết quả', () => {
     for (const dat of [true, false]) {
       const v = ghiXong(dat).o1()
       expect(v.textContent).toBe('Đã ghi')
-      expect(v.textContent).not.toContain('Không đạt')
+      expect(v.textContent).not.toContain('Chưa đạt')
       expect(v.outerHTML).not.toMatch(/không đạt|đạt/i)
     }
   })
@@ -429,11 +429,11 @@ describe('TẾ NHỊ TRƯỚC LỚP — tờ chiếu không bao giờ lộ kết
   it('khi đang ghi hoặc lỗi, tờ chiếu cũng KHÔNG hiện chữ về kết quả (chỉ trạng thái gửi)', () => {
     const t = moTo({ dsO: [o('A')] })
     t.ketNoi()
-    t.nut(t.o1(), 'Không đạt').click()
+    t.nut(t.o1(), 'Chưa đạt').click()
     expect(t.o1().querySelector('.mc-cham-tin')!.textContent).toBe('Đang ghi…')
     t.tuCha({ type: TIN_TO_CHIEU.PHAN_HOI, maPhien: MA, khoa: 'A|Q-A', kq: 'loi' })
     expect(t.o1().querySelector('.mc-cham-tin')!.textContent).toBe('chưa ghi được, bấm lại')
-    // nhãn Đạt/Không đạt chỉ còn ở NÚT bấm được (để thầy bấm lại), không phải ở dòng thông báo.
+    // nhãn Đạt/Chưa đạt chỉ còn ở NÚT bấm được (để thầy bấm lại), không phải ở dòng thông báo.
     expect(t.o1().querySelector('.mc-cham-tin')!.textContent).not.toMatch(/đạt/i)
   })
 })

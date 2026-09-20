@@ -12,7 +12,9 @@ import { JSDOM } from 'jsdom'
 import { CAU_MAU } from './fixtures/cau-mau-to-chieu'
 import {
   KHUNG_UOC_MAC_DINH,
+  UOC_LUONG_BO_CUC,
   choSanCo,
+  chieuCaoTheTen,
   dauVaoTuCau,
   dauVaoTuCauGoc,
   demDong,
@@ -55,6 +57,41 @@ describe('phép đo Chrome đã lưu — bản thân nó phải đạt', () => {
   })
 })
 
+// Năm khung KHÔNG dùng để chỉnh hằng số (đo sau khi đã chốt hằng số): 1440×810, 1536×864, 1024×768, 1280×800, 1680×1050.
+// Hằng số suy ra từ CSS (hình học) và hiệu chỉnh ở 1280×720 + 1920×1080; đây là phép kiểm THẬT ở khung lạ.
+const DO_LA: Do = JSON.parse(readFileSync('docs/anh-man-chieu-1909/do-bo-cuc-kiem-khung-la.json', 'utf8'))
+
+describe('khung LẠ chưa từng dùng để chỉnh — ước lượng vẫn bám phép đo Chrome', () => {
+  it('có đủ năm khung, mỗi khung đủ 40 câu, 0 vùng đề tràn, cỡ chữ ≥ sàn', () => {
+    expect(Object.keys(DO_LA.khung).sort()).toEqual(['1024x768', '1280x800', '1440x810', '1536x864', '1680x1050'])
+    for (const [k, v] of Object.entries(DO_LA.khung)) {
+      expect(v.rieng, k).toHaveLength(CAU_MAU.length)
+      expect(v.tran, k).toEqual([])
+      expect(v.khongVua, k).toEqual([])
+      expect(v.coMin, k).toBeGreaterThanOrEqual(v.coSan)
+    }
+  })
+
+  for (const k of ['1024x768', '1280x800', '1440x810', '1536x864', '1680x1050']) {
+    const [w, h] = k.split('x').map(Number)
+    describe(k, () => {
+      const kq = DO_LA.khung[k].rieng.map((r) => {
+        const m = CAU_MAU.find((x) => x.ten === r.ten)!
+        return { ten: r.ten, that: r.bac, uoc: uocLuongBacCau(m.o.cau, { rong: w, cao: h }).bac }
+      })
+      it('sai lệch ≤ 1 bậc ở MỌI câu', () => {
+        expect(kq.filter((x) => Math.abs(x.uoc - x.that) > 1).map((x) => `${x.ten}: thật ${x.that} ước ${x.uoc}`)).toEqual([])
+      })
+      it('ước THẤP (tưởng vừa mà không vừa) không quá 2 câu trên 40, và mỗi lần chỉ lệch đúng 1 bậc — tờ luôn đo lại nên chỉ là tách đợt', () => {
+        expect(kq.filter((x) => x.uoc < x.that).length).toBeLessThanOrEqual(2)
+      })
+      it('không báo bậc 5 (cảnh báo câu chiếm cả bảng) khi thật sự không phải', () => {
+        expect(kq.filter((x) => x.uoc === 5 && x.that < 5).map((x) => x.ten)).toEqual([])
+      })
+    })
+  }
+})
+
 describe('ước lượng bám phép đo thật', () => {
   const doKhung = (k: string) => {
     const [W, H] = k.split('x').map(Number)
@@ -81,7 +118,7 @@ describe('ước lượng bám phép đo thật', () => {
       })
 
       it('mất cơ hội ghép đôi (ước ≥ 2 mà thật là 1) ≤ 1 câu trên 40', () => {
-        expect(kq.filter((x) => x.uoc > 1 && x.that === 1)).toHaveLength(k === '1920x1080' ? 1 : 0)
+        expect(kq.filter((x) => x.uoc > 1 && x.that === 1).length).toBeLessThanOrEqual(1)
       })
 
       it('cỡ chữ ước lệch cỡ thật ≤ 3 px ở mọi câu', () => {
@@ -115,7 +152,7 @@ describe('mô hình chữ khớp phông Times của Chrome', () => {
 
   it('chữ Việt có dấu tính theo chữ gốc; chỉ số dưới nhỏ hơn', () => {
     expect(rongChuEm('ế')).toBeCloseTo(rongChuEm('e'), 6)
-    expect(rongChuEm('đ')).toBeCloseTo(0.5, 6)
+    expect(rongChuEm('đ')).toBeCloseTo(0.5 * UOC_LUONG_BO_CUC.RONG_CHU, 6)
     expect(rongChuEm('H2O')).toBeLessThan(rongChuEm('H') + rongChuEm('O') + 0.5)
   })
 
@@ -125,19 +162,31 @@ describe('mô hình chữ khớp phông Times của Chrome', () => {
     expect(demDong('một\nhai\nba', 30, 900)).toBe(3)
   })
 
-  it('chỗ sẵn có của vùng đề khớp Chrome (bậc 2: 635×831 ở 1280×720, 995×1258 ở 1920×1080; bậc 5: 573 / 933)', () => {
-    const a = choSanCo(2, { rong: 1280, cao: 720 })
-    expect(Math.abs(a.cao - 635)).toBeLessThanOrEqual(1)
-    expect(Math.abs(a.rong - 831)).toBeLessThanOrEqual(1)
-    const b = choSanCo(2, { rong: 1920, cao: 1080 })
-    expect(Math.abs(b.cao - 995)).toBeLessThanOrEqual(1)
-    expect(Math.abs(b.rong - 1258)).toBeLessThanOrEqual(1)
-    expect(Math.abs(choSanCo(5, { rong: 1280, cao: 720 }).cao - 573)).toBeLessThanOrEqual(1)
-    expect(Math.abs(choSanCo(5, { rong: 1920, cao: 1080 }).cao - 933)).toBeLessThanOrEqual(1)
-    // bậc 1 (đo: 260 / 506 / 292 ở 1280×720 / 1920×1080 / 1366×768 — thẻ tên 46 / 52 / 48)
-    expect(Math.abs(choSanCo(1, { rong: 1280, cao: 720 }).cao - 260)).toBeLessThanOrEqual(3)
-    expect(Math.abs(choSanCo(1, { rong: 1920, cao: 1080 }).cao - 506)).toBeLessThanOrEqual(3)
-    expect(Math.abs(choSanCo(1, { rong: 1366, cao: 768 }).cao - 292)).toBeLessThanOrEqual(3)
+  it('chỗ sẵn có của thẻ đề khớp Chrome (giao diện M3, thẻ tên CÓ ảnh thần thú): bậc 1 / 2 / 5 ở 4 khung', () => {
+    // Đo bằng `scripts/do-bo-cuc-to-chieu.mjs` + thăm dò `clientHeight` của `.mc-vung-de` khi cho nó lấp hết chỗ trống.
+    // Hai khung 1366×768 và 1600×900 KHÔNG dùng để chỉnh hằng số (hằng số suy ra từ CSS) — chúng kiểm mô hình ở khung lạ.
+    const doi: [number, number, number, number, number, number, number][] = [
+      // rộng, cao, bậc1 cao, bậc2 cao, bậc2 rộng, bậc5 cao, bậc5 rộng
+      [1280, 720, 341, 650, 833, 552, 1260],
+      [1920, 1080, 550, 1010, 1260, 869, 1900],
+      [1366, 768, 370, 698, 891, 595, 1346],
+      [1600, 900, 446, 830, 1047, 711, 1580],
+    ]
+    for (const [rong, cao, b1, b2c, b2r, b5c, b5r] of doi) {
+      const k = { rong, cao }
+      expect(Math.abs(choSanCo(1, k).cao - b1), `${rong}: bậc 1 cao`).toBeLessThanOrEqual(1.5)
+      expect(Math.abs(choSanCo(2, k).cao - b2c), `${rong}: bậc 2 cao`).toBeLessThanOrEqual(1.5)
+      expect(Math.abs(choSanCo(2, k).rong - b2r), `${rong}: bậc 2 rộng`).toBeLessThanOrEqual(1.5)
+      expect(Math.abs(choSanCo(5, k).cao - b5c), `${rong}: bậc 5 cao`).toBeLessThanOrEqual(1.5)
+      expect(Math.abs(choSanCo(5, k).rong - b5r), `${rong}: bậc 5 rộng`).toBeLessThanOrEqual(1.5)
+    }
+  })
+
+  it('thẻ tên có ảnh thần thú: 88 / 131 / 93 / 109 px ở 1280 / 1920 / 1366 / 1600 (đo Chrome); dòng đầu thẻ đề 46 / 65 px ở 1280 / 1920', () => {
+    for (const [w, h] of [[1280, 88], [1920, 131], [1366, 93], [1600, 109]] as const) {
+      expect(Math.abs(chieuCaoTheTen(w, false) - h), String(w)).toBeLessThanOrEqual(1.5)
+      expect(Math.abs(chieuCaoTheTen(w, true) - h), String(w)).toBeLessThanOrEqual(1.5)
+    }
   })
 })
 

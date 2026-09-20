@@ -877,6 +877,8 @@ export default function GoiLenBangScreen() {
       ])
 
       const dsO: OBangMayChieu[] = []
+      const hoSoEmTheoSbd = new Map(hoSoLop.map((e) => [e.sbd, e]))
+      const tiLeDungTheoCau = new Map(cauVaoXep.map((c) => [c.cau.id, c.tiLeDung]))
       // Các ô CÓ TRÊN tờ, tra theo `khoa` khi tờ gửi lệnh ghi (không tin sbd/qid trong tin đến).
       const oTrenTo = new Map<string, { sbd: string; hoTen: string; cau: CauChua }>()
       for (const p of dsPc) {
@@ -928,6 +930,11 @@ export default function GoiLenBangScreen() {
           viSao: p.viSao,
           btvnCau: p.btvnCau,
           btvnTom: p.btvnTom,
+          // Thẻ tên + màn gọi tên: "lần lên bảng thứ N" (lần này tính vào). Chưa có hồ sơ lớp (chế độ dạy học) thì không in.
+          lanLenBang: hoSoEmTheoSbd.get(p.sbd) ? hoSoEmTheoSbd.get(p.sbd)!.lenBang.soLan + 1 : undefined,
+          // Cùng đầu vào Engine E dùng để tính T của câu ⇒ giờ hai pha trên tờ khớp giờ đã xếp cho buổi.
+          tiLeLopSai: tiLeDungTheoCau.get(p.cau.id) != null ? 1 - (tiLeDungTheoCau.get(p.cau.id) as number) : undefined,
+          bacEm: hoSoEmTheoSbd.get(p.sbd)?.namKt?.get(p.cau.id)?.bac ?? null,
         })
       }
 
@@ -975,6 +982,7 @@ export default function GoiLenBangScreen() {
         ngay: new Date(),
         dsDapAn,
         cauNoi: { maPhien },
+        nganSachPhut: dayHoc ? undefined : CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT,
       })
 
       phienChieu.current = { ma: maPhien, o: oTrenTo, cuaSo: null, goc: '*' }
@@ -1076,7 +1084,7 @@ export default function GoiLenBangScreen() {
       // Khoá chung + báo cho tờ máy chiếu (nếu đang chiếu) khoá ô ấy — bấm ở bảng thì tờ chiếu cũng khoá.
       const khoa = khoaToChieu(p.sbd, p.cau.id)
       daGhiKhoa.current.add(khoa)
-      guiToChieu({ type: TIN_TO_CHIEU.DA_GHI, khoa })
+      guiToChieu({ type: TIN_TO_CHIEU.DA_GHI, khoa, dat })
       return true
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không ghi được kết quả', 'error')
@@ -1145,7 +1153,7 @@ export default function GoiLenBangScreen() {
       void ghiTheoKhoaRef.current?.(o, tin.dat).then((ok) => {
         if (phienChieu.current !== p) return // tờ đã đóng/đổi phiên trong lúc chờ máy chủ
         try {
-          cuaSo.postMessage({ type: TIN_TO_CHIEU.PHAN_HOI, maPhien: p.ma, khoa: tin.khoa, kq: ok ? 'da_ghi' : 'loi' }, goc)
+          cuaSo.postMessage({ type: TIN_TO_CHIEU.PHAN_HOI, maPhien: p.ma, khoa: tin.khoa, kq: ok ? 'da_ghi' : 'loi', dat: ok ? tin.dat : undefined }, goc)
         } catch {
           /* khung đã đóng */
         }
