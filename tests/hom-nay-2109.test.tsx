@@ -117,6 +117,24 @@ describe('HomNayScreen', () => {
     expect(screen.getByText('1 học sinh', { exact: false })).toBeTruthy() // số em lấy tạm từ danh sách lớp CỦA MÁY, không phải bịa
   })
 
+  it('MÁY CHỦ ĐÃ TRẢ LỜI nhưng khối không tính được: hiện ĐÚNG lý do máy chủ kèm (lyDoThieu), không nói "đang chờ máy chủ"', async () => {
+    nap.hom = {
+      ...MAU,
+      nhiemVu: null,
+      btvn: null,
+      canYTuong: null,
+      dangYeu: null,
+      lyDoThieu: { nhiemVu: 'Chưa có kế hoạch ngày hôm nay (cron 00:01 hoặc lượt mở của em chưa lập)', btvn: 'Chưa có kế hoạch ngày hôm nay', canYTuong: 'Không đọc được hồ sơ dạng', dangYeu: 'Không đọc được hồ sơ dạng' },
+    }
+    nap.cau = { qidToiHan: 1179, qidPhucVuDuoc: 939 } // lệnh câu tới hạn trả lời được — chỉ các khối kế hoạch/hồ sơ thiếu
+    render(<HomNayScreen />)
+    expect(await screen.findByText('BTVN đang chạy: Chưa có kế hoạch ngày hôm nay.')).toBeTruthy()
+    expect(screen.getByText('Danh sách em cần để ý: Không đọc được hồ sơ dạng.')).toBeTruthy()
+    expect(screen.getByText('Dạng yếu theo lớp: Không đọc được hồ sơ dạng.')).toBeTruthy()
+    expect(screen.getByText('Chưa có kế hoạch ngày hôm nay (cron 00:01 hoặc lượt mở của em chưa lập)')).toBeTruthy() // thẻ số nhiệm vụ
+    expect(screen.queryByText(/đang chờ máy chủ/)).toBeNull()
+  })
+
   it('ĐANG TẢI: chữ "Đang tải…", chưa số nào', () => {
     nap.cho = true
     const { container } = render(<HomNayScreen />)

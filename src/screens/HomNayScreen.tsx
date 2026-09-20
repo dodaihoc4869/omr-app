@@ -43,7 +43,9 @@ export default function HomNayScreen() {
   const soEm = hom?.soEm ?? (classList.length || null)
   const soLop = hom?.soLop ?? (classList.length ? new Set(classList.map((h) => h.lop).filter(Boolean)).size : null)
   const tai = hom === undefined
-  const cho = (v: unknown) => (tai ? 'đang tải…' : v == null ? CHO : '')
+  // Máy chủ ĐÃ trả lời nhưng khối đó không tính được thì nó kèm lý do (`lyDoThieu`) — hiện đúng lý do ấy, không nói "đang chờ" như thể chưa có lệnh.
+  const lyDo = (khoi: 'nhiemVu' | 'btvn' | 'canYTuong' | 'dangYeu' | 'doan') => hom?.lyDoThieu?.[khoi] || CHO
+  const cho = (v: unknown, khoi: 'nhiemVu' | 'btvn' | 'canYTuong' | 'dangYeu' | 'doan') => (tai ? 'đang tải…' : v == null ? lyDo(khoi) : '')
 
   const nv = hom?.nhiemVu
   const bt = hom?.btvn
@@ -87,10 +89,10 @@ export default function HomNayScreen() {
       </header>
 
       <section className="hn-hang-so" aria-label="Số liệu hôm nay">
-        <SoLon vai="tertiary" tieu="ĐẠT NHIỆM VỤ HÔM NAY" so={nv ? String(nv.dat) : '—'} mau={nv ? `/${nv.tong}` : undefined} phu={nv ? `${phanTram(nv.dat, nv.tong) ?? 0}%${nv.datHomQua != null && nv.tongHomQua ? ` · hôm qua ${phanTram(nv.datHomQua, nv.tongHomQua)}%` : ''}` : cho(nv)} />
-        <SoLon vai="primary" tieu="BTVN ĐÚNG NHỊP" so={bt && phanTram(bt.soEmDungNhip, bt.soEmCoLo) != null ? `${phanTram(bt.soEmDungNhip, bt.soEmCoLo)}%` : '—'} phu={bt ? `${bt.dangChay.length} bài đang chạy` : cho(bt)} />
+        <SoLon vai="tertiary" tieu="ĐẠT NHIỆM VỤ HÔM NAY" so={nv ? String(nv.dat) : '—'} mau={nv ? `/${nv.tong}` : undefined} phu={nv ? `${phanTram(nv.dat, nv.tong) ?? 0}%${nv.datHomQua != null && nv.tongHomQua ? ` · hôm qua ${phanTram(nv.datHomQua, nv.tongHomQua)}%` : ''}` : cho(nv, 'nhiemVu')} />
+        <SoLon vai="primary" tieu="BTVN ĐÚNG NHỊP" so={bt && phanTram(bt.soEmDungNhip, bt.soEmCoLo) != null ? `${phanTram(bt.soEmDungNhip, bt.soEmCoLo)}%` : '—'} phu={bt ? `${bt.dangChay.length} bài đang chạy` : cho(bt, 'btvn')} />
         <SoLon vai="secondary" tieu="CÂU TỚI HẠN ÔN" so={cau ? cau.toiHan.toLocaleString('vi-VN') : '—'} phu={cau ? `cả trường · ${cau.moDuoc.toLocaleString('vi-VN')} mở được` : cau === undefined ? 'đang tải…' : CHO} />
-        <SoLon vai="error" tieu="EM CẦN THẦY ĐỂ Ý" so={ty ? String(ty.tong) : '—'} phu={ty ? 'trễ nhịp ≥ 3 ngày, tụt bậc hoặc dạng đang yếu' : cho(ty)} />
+        <SoLon vai="error" tieu="EM CẦN THẦY ĐỂ Ý" so={ty ? String(ty.tong) : '—'} phu={ty ? 'trễ nhịp ≥ 3 ngày, tụt bậc hoặc dạng đang yếu' : cho(ty, 'canYTuong')} />
       </section>
 
       <div className="hn-luoi">
@@ -104,7 +106,7 @@ export default function HomNayScreen() {
                 </button>
               )}
             </div>
-            {!ty && <p className="hn-trong">{tai ? 'Đang tải…' : `Danh sách em cần để ý: ${CHO}.`}</p>}
+            {!ty && <p className="hn-trong">{tai ? 'Đang tải…' : `Danh sách em cần để ý: ${lyDo('canYTuong')}${/[.!]$/.test(lyDo('canYTuong')) ? '' : '.'}`}</p>}
             {ty && ty.ds.length === 0 && <p className="hn-trong">Hôm nay không có em nào cần thầy để ý.</p>}
             {ty?.ds.map((e) => (
               <div className="hn-em" key={e.sbd}>
@@ -131,7 +133,7 @@ export default function HomNayScreen() {
                 Giao bài mới
               </button>
             </div>
-            {!bt && <p className="hn-trong">{tai ? 'Đang tải…' : `BTVN đang chạy: ${CHO}.`}</p>}
+            {!bt && <p className="hn-trong">{tai ? 'Đang tải…' : `BTVN đang chạy: ${lyDo('btvn')}${/[.!]$/.test(lyDo('btvn')) ? '' : '.'}`}</p>}
             {bt && bt.dangChay.length === 0 && <p className="hn-trong">Chưa có bài tập về nhà nào đang chạy.</p>}
             {bt?.dangChay.map((b) => {
               const kip = phanTram(b.soEmKip, b.soEm)
@@ -167,7 +169,7 @@ export default function HomNayScreen() {
 
           <section className="hn-the" aria-labelledby="hn-yeu">
             <h2 id="hn-yeu">{dangDuocDung ? `DẠNG CẢ LỚP ${dangDuocDung.lop} ĐANG YẾU` : 'DẠNG CẢ LỚP ĐANG YẾU'}</h2>
-            {!hom?.dangYeu && <p className="hn-trong">{tai ? 'Đang tải…' : `Dạng yếu theo lớp: ${CHO}.`}</p>}
+            {!hom?.dangYeu && <p className="hn-trong">{tai ? 'Đang tải…' : `Dạng yếu theo lớp: ${lyDo('dangYeu')}${/[.!]$/.test(lyDo('dangYeu')) ? '' : '.'}`}</p>}
             {dangDuocDung && dangDuocDung.dang.length === 0 && <p className="hn-trong">Chưa có dạng nào đủ dữ liệu để kết luận cả lớp yếu.</p>}
             {dangDuocDung?.dang.map((d) => (
               <div className="hn-yeu" key={d.ma}>
