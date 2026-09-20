@@ -31,6 +31,7 @@ const DON_LOCAL = [
   'ddh.btvn.draft.BT1.12121212',
   'ddh.khacphuc.history.12121212',
   'ddh.luyen2026.12121212.P1',
+  'ddh.xemlai.abcd1234.12121212',
   'omr_than_thu_hoa_hoc_data',
   'omr_than_thu_da_nhan_exp',
   'omr_than_thu_qid_thanh_tay',

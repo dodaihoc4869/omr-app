@@ -25,6 +25,7 @@ export const TIEN_TO_LOCAL_DON: readonly string[] = [
   'ddh.btvn.draft.', // nháp BTVN
   'ddh.khacphuc.history.', // lịch sử khắc phục
   'ddh.luyen2026.', // luyện đề chuẩn
+  'ddh.xemlai.', // dấu "Xem lại sau" của màn thi (theo ca + SBD; chỉ trạng thái giao diện tại máy)
 ]
 
 /** localStorage — khoá đơn lẻ cần dọn (V1 game cũ lưu thú/EXP cục bộ; lịch sử trò chuyện trợ lý nhắc tới bài đã xoá). */

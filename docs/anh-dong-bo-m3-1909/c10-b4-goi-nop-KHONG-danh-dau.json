@@ -1,0 +1,67 @@
+{
+ "nop": [
+  {
+   "maCa": "123456",
+   "sbd": "12121212",
+   "dapAn": {
+    "phanI": {
+     "T-A5": "B"
+    },
+    "phanII": {
+     "T-B1": [
+      "D",
+      null,
+      null,
+      null
+     ]
+    },
+    "phanIII": {
+     "T-C1": "125",
+     "T-C2": "7"
+    }
+   },
+   "integrity": {
+    "leaveCount": 0,
+    "totalHiddenMs": 0,
+    "events": [
+     {
+      "type": "vao_ngoai_toan_man",
+      "at": "2026-09-20T18:11:54.218Z"
+     }
+    ],
+    "blocked": false
+   },
+   "giayCau": {
+    "T-A5": 1,
+    "T-C1": 2
+   }
+  }
+ ],
+ "luuTam": [
+  {
+   "maCa": "123456",
+   "sbd": "12121212",
+   "dapAn": {
+    "phanI": {
+     "T-A5": "B"
+    },
+    "phanII": {
+     "T-B1": [
+      "D",
+      null,
+      null,
+      null
+     ]
+    },
+    "phanIII": {
+     "T-C1": "125",
+     "T-C2": "7"
+    }
+   },
+   "giayCau": {
+    "T-A5": 1,
+    "T-C1": 2
+   }
+  }
+ ]
+}

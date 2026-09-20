@@ -59,14 +59,15 @@ import LogoHocSinh from '../components/LogoHocSinh'
 import { LogoDoc } from '../components/LogoVai'
 import PhongChoGame from '../components/PhongChoGame'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
-import { TriangleAlert, X, ArrowLeft, LayoutGrid, Clock, Sparkles } from 'lucide-react'
+import { TriangleAlert, X, ArrowLeft, LayoutGrid, Clock, Sparkles, Flag } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { goiBaiThi } from '../lib/goi-bao-cao'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import { docDuongVao } from '../lib/vai-tro'
 import { dungM3 } from '../components/m3'
 import ThanhTrenThiM3 from './ThanhTrenThiM3'
-import DaiCauChuaLamM3, { KhungCauLamDoM3 } from './DaiCauChuaLamM3'
+import DaiCauChuaLamM3, { KhungCauM3 } from './DaiCauChuaLamM3'
+import { docXemLai, doiDauXemLai, luuXemLai } from '../lib/xem-lai-sau'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
   cacheSession,
@@ -405,6 +406,14 @@ export default function ExamTakeScreen({ tuCong }: { tuCong?: TuCongHocSinh } = 
   const canhBaoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const roiLauTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [saveFlash, setSaveFlash] = useState(false)
+  // "XEM LẠI SAU" (Boss duyệt 21/09): tập qid em đánh dấu — trạng thái GIAO DIỆN TẠI MÁY. KHÔNG nằm trong `attempt`, KHÔNG vào gói nộp/chấm/lưu tạm/đẩy trạng
+  // thái; cất ở khoá riêng theo ca + SBD (lib/xem-lai-sau.ts), mất cũng không sao. Chỉ dùng ở đường học sinh (dungM3).
+  const [xemLaiSau, setXemLaiSau] = useState<Set<string>>(() => new Set())
+  const maCaXemLai = attempt?.maCa
+  const sbdXemLai = attempt?.sbd
+  useEffect(() => {
+    if (maCaXemLai && sbdXemLai) setXemLaiSau(docXemLai(maCaXemLai, sbdXemLai))
+  }, [maCaXemLai, sbdXemLai])
   const saveFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [online, setOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true))
   const gapVibratedRef = useRef(false)
@@ -3085,6 +3094,22 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   const total = flat.length
   const daLamCount = flat.filter((f) => daTraLoiEntry(attempt, assignment, f)).length
   const chuaLam = flat.map((f, i) => (daTraLoiEntry(attempt, assignment, f) ? null : i + 1)).filter((x): x is number => x !== null)
+  // Câu em đánh dấu "Xem lại sau" (số câu 1..N theo thứ tự hiển thị) — chỉ để HIỆN DẤU ở dải, lưới, hộp xác nhận.
+  const qidCuaCau = (f: FlatRef) => (f.phan === 'I' ? assignment.phanI[f.i].qid : f.phan === 'II' ? assignment.phanII[f.i].qid : assignment.phanIII[f.i].qid)
+  const sttDanhDau = flat.map((f, i) => (xemLaiSau.has(qidCuaCau(f)) ? i + 1 : 0)).filter((x) => x > 0)
+  const doiDauCau = (qid: string) => {
+    const moi = doiDauXemLai(xemLaiSau, qid)
+    setXemLaiSau(moi)
+    luuXemLai(attempt.maCa, attempt.sbd, moi)
+  }
+  const bocCau = (qid: string, soY: number, the: React.ReactElement) =>
+    dungM3() ? (
+      <KhungCauM3 key={qid} soY={soY} daDanhDau={xemLaiSau.has(qid)} onDoiDau={() => doiDauCau(qid)}>
+        {the}
+      </KhungCauM3>
+    ) : (
+      the
+    )
   const gapNow = remaining !== null && remaining <= 300
   // BÀI TẬP VỀ NHÀ: thay đồng hồ đếm ngược bằng hạn nộp (BA-APP.md mục 6).
   const laBaiTap = attempt?.loai === 'baitap'
@@ -3110,7 +3135,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         {phan === 'I' &&
           assignment.phanI.map((item) => {
             stt += 1
-            return (
+            return bocCau(
+              item.qid,
+              0,
               <TheCau
                 key={item.qid}
                 cheDo="thi"
@@ -3129,7 +3156,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 selected={(attempt.answers.phanI[item.qid] as 'A' | 'B' | 'C' | 'D' | undefined) ?? null}
                 onSelect={(orig) => setPhanI(item.qid, orig)}
                 onZoom={setZoomSrc}
-              />
+              />,
             )
           })}
         {phan === 'II' &&
@@ -3137,7 +3164,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             stt += 1
             // Nhãn "Mới x/4 ý" (bản vẽ ThiDangLam) khi câu làm dở: chỉ đọc đáp án ĐÃ CÓ. Khung bọc có mặt SUỐT (không mọc/biến theo đáp án) để React không dựng lại thẻ giữa lúc em bấm.
             const soYDaChon = (attempt.answers.phanII[item.qid] ?? []).filter((x) => x !== null && x !== undefined).length
-            const theCau = (
+            return bocCau(
+              item.qid,
+              soYDaChon,
               <TheCau
                 key={item.qid}
                 cheDo="thi"
@@ -3158,20 +3187,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 // vẫn theo thứ tự gốc và đường chấm không phải biết gì về xáo.
                 onSelect={(idx, v) => setPhanII(item.qid, idx, v)}
                 onZoom={setZoomSrc}
-              />
-            )
-            return dungM3() ? (
-              <KhungCauLamDoM3 key={item.qid} soY={soYDaChon}>
-                {theCau}
-              </KhungCauLamDoM3>
-            ) : (
-              theCau
+              />,
             )
           })}
         {phan === 'III' &&
           assignment.phanIII.map((item) => {
             stt += 1
-            return (
+            return bocCau(
+              item.qid,
+              0,
               <TheCau
                 key={item.qid}
                 cheDo="thi"
@@ -3187,7 +3211,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                 selected={attempt.answers.phanIII[item.qid] ?? null}
                 onChange={(t) => setPhanIII(item.qid, t)}
                 onZoom={setZoomSrc}
-              />
+              />,
             )
           })}
       </>
@@ -3285,11 +3309,16 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                   <button
                     key={i}
                     onClick={() => cuonToiCau(i + 1)}
-                    className="tap-target aspect-square flex items-center justify-center font-bold"
+                    className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-1)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
-                    title={`Câu ${i + 1}${done ? ' — đã làm' : ' — chưa làm'}`}
+                    title={`Câu ${i + 1}${done ? ' — đã làm' : ' — chưa làm'}${dungM3() && sttDanhDau.includes(i + 1) ? ' — xem lại sau' : ''}`}
                   >
                     {i + 1}
+                    {dungM3() && sttDanhDau.includes(i + 1) && (
+                      <span className="thi-o-cau-co" role="img" aria-label="đã đánh dấu xem lại">
+                        <Flag size={9} aria-hidden="true" fill="currentColor" />
+                      </span>
+                    )}
                   </button>
                 )
               })}
@@ -3307,7 +3336,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
         {/* DANH SÁCH CÂU — cuộn dọc liên tục, đầu phần dính */}
         <div className="px-3 sm:px-4 flex flex-col" style={{ gap: 'var(--k5)', paddingTop: 'var(--k2)', paddingBottom: 'calc(var(--k8) + env(safe-area-inset-bottom))' }}>
-          {dungM3() && <DaiCauChuaLamM3 chuaLam={chuaLam} onToiCau={cuonToiCau} onMoLuoi={() => setShowGrid(true)} />}
+          {dungM3() && <DaiCauChuaLamM3 chuaLam={chuaLam} daDanhDau={sttDanhDau} onToiCau={cuonToiCau} onMoLuoi={() => setShowGrid(true)} />}
           {renderPhan('I')}
           {renderPhan('II')}
           {renderPhan('III')}
@@ -3351,10 +3380,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                       setShowGrid(false)
                       cuonToiCau(i + 1)
                     }}
-                    className="tap-target aspect-square flex items-center justify-center font-bold"
+                    className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
                     style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
                   >
                     {i + 1}
+                    {dungM3() && sttDanhDau.includes(i + 1) && (
+                      <span className="thi-o-cau-co" role="img" aria-label="đã đánh dấu xem lại">
+                        <Flag size={9} aria-hidden="true" fill="currentColor" />
+                      </span>
+                    )}
                   </button>
                 )
               })}
@@ -3393,6 +3427,11 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               Còn {chuaLam.length} câu chưa làm: câu {chuaLam.join(', ')}.
             </OThongBao>
           )}
+          {dungM3() && sttDanhDau.length > 0 && (
+            <OThongBao tone="cam">
+              Em đã đánh dấu xem lại: câu {sttDanhDau.join(', ')}.
+            </OThongBao>
+          )}
           <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Sau khi nộp không sửa được nữa.</div>
           <div className="flex" style={{ gap: 'var(--k2)' }}>
             <NutChinh
@@ -3400,6 +3439,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               onClick={() => {
                 setShowConfirm(false)
                 if (chuaLam.length > 0) cuonToiCau(chuaLam[0])
+                else if (dungM3() && sttDanhDau.length > 0) cuonToiCau(sttDanhDau[0])
               }}
             >
               Xem lại
