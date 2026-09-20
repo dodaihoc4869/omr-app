@@ -5,7 +5,8 @@ import {roomAction} from './game-v2-room'
 import type {Env} from './kieu'
 import {gameIdentity,parentPass} from './game-v2-auth'
 import {hash,readScope,syncIndex,protectedQuestions} from './game-v2-bank'
-import {PETS,ALIASES,OLD_SIX,allowed,chooseSession,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
+import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
+import {PETS,ALIASES,OLD_SIX,allowed,chooseSessionWithRoles,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
 import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
 import {nhanExp,thanhExp} from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import type {ShieldState} from '../../src/game/than-thu-v2/shields'
@@ -107,7 +108,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const dayStart=new Date(academicDay(now())+'T00:00:00+07:00')
     const count=await env.DB.prepare('SELECT COUNT(*) AS n FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,dayStart.toISOString()).first<{n:number}>()
     const remaining=Math.max(0,200-(count?.n??0))
-    const selected=chooseSession(eligible,scope.evidence,history,await masteryTheoHoSo(env,sbd,p.mastery),mode,tNow).slice(0,remaining)
+    const chon=chooseSessionWithRoles(eligible,scope.evidence,history,await masteryTheoHoSo(env,sbd,p.mastery),mode,tNow).slice(0,remaining),selected=chon.map(x=>x.q),vai=new Map(chon.map(x=>[x.q.qid,x.role]))
     if(action==='recommendations')return {ok:true,dailyUsed:count?.n??0,suggestions:selected.map(q=>({title:q.tenDang||'Ôn kiến thức đã học',source:q.maDe,part:q.phan})),remaining}
     if(!remaining)throw new Error('Em đã hoàn thành 200 câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.')
     const qs=mode==='arena'?selected.slice(0,b.guardian?1:2):selected
@@ -116,7 +117,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const session:Session={guardian,guardianRound,mode,created:Date.now(),questions:qs.map(q=>({qid:q.qid,maDe:q.maDe,version:q.version,group:q.group,novel:!groups.has(q.group)}))}
     const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
     if(!inserted.meta.changes)return gameV2(env,'start',b)
-    return {ok:true,id,questions:qs.map(publicQuestion),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3)}
+    return {ok:true,id,questions:qs.map(q=>({...publicQuestion(q),role:vai.get(q.qid)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3)}
   }
   if(action==='resume'){
     const row=await env.DB.prepare("SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>? AND json_extract(json,'$.doan') IS NULL ORDER BY created_at DESC LIMIT 1").bind(sbd,new Date(Date.now()-2*3600000).toISOString()).first<{id:string;json:string}>()
@@ -152,7 +153,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     p.mastery=[...p.mastery.filter(m=>m.key!==step.mastery.key),step.mastery];p.wallet+=step.reward;p.earned+=step.reward
     if(session.mode==='arena'&&p.arena&&!p.arena.finished)p.arena.studied=(p.arena.studied??0)+1
     if(session.mode==='arena'&&p.arena&&!p.arena.finished&&attempt.correct&&!attempt.assisted&&p.arena.learned<2&&!(p.arena.learnedGroups??[]).includes(q.group)){p.arena.gold+=2;p.arena.learned++;p.arena.learnedGroups=[...(p.arena.learnedGroups??[]),q.group]}
-    const result={attempt,correct:attempt.correct,answer:q.correct,solution:q.solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),reward:step.reward,stage:step.mastery.stage}
+    const result={attempt,correct:attempt.correct,answer:q.correct,solution:q.solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),reward:step.reward,stage:step.mastery.stage,lyDoThuong:lyDoThuong({correct:attempt.correct,assisted:attempt.assisted,reward:step.reward,milestone:step.milestone,stage:step.mastery.stage})}
     const queries=[env.DB.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?) AND (SELECT COUNT(*) FROM game_v2_attempt WHERE sbd=? AND created_at>=?)<200').bind(receipt,sbd,id,qid,q.group,JSON.stringify(result),now(),sbd,revision,sbd,dailyStart)]
     if(step.reward)queries.push(env.DB.prepare('INSERT OR IGNORE INTO game_v2_reward(id,sbd,amount,created_at) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(`${sbd}|${step.mastery.key}|${step.milestone}`,sbd,step.reward,now(),receipt))
     queries.push(env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=? AND EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(JSON.stringify(p),sbd,revision,receipt))
