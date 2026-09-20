@@ -14,6 +14,8 @@ import '../game.css'
 import ChonBanDongHanh,{theMoDau} from './ChonBanDongHanh'
 import DaoCuaEm from './DaoCuaEm'
 import TuiDo from './TuiDo'
+import ThamHiem from './ThamHiem'
+import type {CauDao} from './kieu'
 import type {DaoProfile} from './kieu'
 
 const q=new URLSearchParams(location.search),man=q.get('man')??'chon'
@@ -28,4 +30,13 @@ const TEN_DANG={'ES-TP':'Ester thuỷ phân','ES-TEN':'Tên gọi ester','ES-DOT
 function ManDao(){const [bao,setBao]=useState('')
  return <div className="dao dao-vo"><DaoCuaEm profile={hoSo()} exp={q.has('khongexp')?null:{homNay:46,manhKhien:{manh:8,moiKhien:12}}} chuoiNgay={q.has('khongchuoi')?undefined:5} tenDang={TEN_DANG} goiY={q.has('khonggoiy')?null:[{title:'Ester thuỷ phân'},{title:'Glucose tráng bạc'},{title:'Đốt cháy ester'}]} conLai={q.has('het')?0:180}
   tasks={q.has('nhac')?[{id:'t1',dang:'Xà phòng hoá'}]:[]} thongBao={bao} onLenDuong={()=>setBao('Đang lên đường…')} onNap={()=>setBao('Đã nạp')} onDoiTen={t=>setBao(`Tên mới: ${t}`)} onOnTheoNhac={d=>setBao(`Ôn ${d}`)}/></div>}
-createRoot(document.getElementById('root')!).render(<StrictMode><section className="spirit-game" style={{padding:0,borderRadius:0}}>{man==='chon'&&<ManChon/>}{man==='dao'&&<ManDao/>}{man==='tui'&&<div className="dao dao-vo"><TuiDo profile={hoSo()} exp={{homNay:46,manhKhien:{manh:8,moiKhien:12}}} onDungKhien={async()=>{}} onMoVoDai={()=>{}} onMoTienBo={()=>{}}/></div>}</section></StrictMode>)
+const cauGia=(i:number,role:CauDao['role'],phan:'I'|'II'|'III'='I'):CauDao=>({qid:`q${i}`,maDe:'DE01',version:'1',group:`g${i}`,phan,text:['Oxi hoá ethanol bằng CuO, đun nóng, thu được chất hữu cơ X. X là','Thuỷ phân hoàn toàn 8,8 gam ethyl acetate trong dung dịch NaOH dư, thu được m gam muối. Giá trị của m là','Cho các phát biểu về ester, mỗi phát biểu đúng hay sai?'][i%3]!,choices:phan==='I'?['CH₃COOH','CH₃CHO','HCHO','C₂H₄']:[],ideas:phan==='II'?['Ester no đơn chức có công thức CnH2nO2.','Phản ứng xà phòng hoá là thuận nghịch.','Ethyl acetate tan tốt trong nước.','Isoamyl acetate có mùi chuối chín.']:[],hinhAnh:[],dang:'AN-OXH',tenDang:['Ancol · oxi hoá','Ester thuỷ phân','Lý thuyết ester'][i%3]!,mucDo:'hieu',sao:2,kienThuc:[],role})
+const CAU_GIA=[cauGia(0,'yeu'),cauGia(1,'yeu','III'),cauGia(2,'toi_han','II'),cauGia(3,'lap'),cauGia(4,'lap'),cauGia(5,'thu_thach')]
+/** ?man=tham&buoc=cau|no|sai|xong[&phan=II] */
+function ManTham(){const buoc=q.get('buoc')??'cau',[tl,setTl]=useState(buoc==='cau'?'':'B')
+ const kq=buoc==='no'?[0,1,2].map(i=>({qid:`q${i}`,correct:true})):buoc==='sai'?[{qid:'q0',correct:true},{qid:'q1',correct:false}]:buoc==='xong'?CAU_GIA.map((c,i)=>({qid:c.qid,correct:i!==1})):[{qid:'q0',correct:true},{qid:'q1',correct:true},{qid:'q2',correct:false}]
+ const viTri=buoc==='xong'?5:kq.length-(buoc==='cau'?0:1),cau=q.get('phan')==='II'?CAU_GIA.map((c,i)=>i===viTri?{...cauGia(2,c.role,'II'),qid:c.qid}:c):CAU_GIA
+ return <div className="dao dao-vo dao-vo-tham"><ThamHiem profile={hoSo()} cau={cau} viTri={viTri} ketQua={kq} traLoi={tl} assisted={false} xong={buoc==='xong'} tongKet={{dung:5,tong:6,exp:60,sao:2}}
+  phanHoi={buoc==='no'?{correct:true,answer:'B',solution:'CH₃CH₂OH + CuO → CH₃CHO + Cu + H₂O. Ancol bậc I bị oxi hoá thành aldehyde.',solutionImages:[],lyDo:{moc:2,exp:40,chu:'+40 · đúng lại ở một câu khác sau 1 ngày — sao thứ 2 của dạng này'}}:buoc==='sai'?{correct:false,answer:'8,2',solution:'n = 0,1 mol ⇒ m = 0,1 × 82 = 8,2 gam.',solutionImages:[],lyDo:{moc:0,exp:0,chu:'Chưa đúng — dạng này hẹn em ôn lại vào ngày mai'}}:null}
+  onTraLoi={setTl} onAssisted={()=>{}} onNop={()=>{}} onTiep={()=>{}} onVeDao={()=>{}} onChuyenMoi={()=>{}} onMoSoTay={()=>{}}/></div>}
+createRoot(document.getElementById('root')!).render(<StrictMode><section className="spirit-game" style={{padding:0,borderRadius:0}}>{man==='chon'&&<ManChon/>}{man==='dao'&&<ManDao/>}{man==='tham'&&<ManTham/>}{man==='tui'&&<div className="dao dao-vo"><TuiDo profile={hoSo()} exp={{homNay:46,manhKhien:{manh:8,moiKhien:12}}} onDungKhien={async()=>{}} onMoVoDai={()=>{}} onMoTienBo={()=>{}}/></div>}</section></StrictMode>)

@@ -8,7 +8,7 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 | 1 | Script cắt ảnh nhẹ + ảnh `nho/` | XONG | `f9e7547` · `tests/dao-anh-nho.test.ts` 5/5 · `--kiem` khớp từng byte |
 | 2 | Màn Chọn bạn đồng hành | XONG | commit màn 1 · `tests/dao-chon-ban-dong-hanh.test.tsx` 8/8 · ảnh `docs/anh-dao-than-thu-2109/1-*` |
 | 3 | Hòn đảo của em + Túi đồ + lõi `dao-core` (vỏ `DaoThanThu` + thanh dưới: commit nối cuối) | XONG phần màn | commit màn 2 · `tests/dao-cua-em.test.tsx` 13/13 · ảnh `2-*` |
-| 4 | Chuyến thám hiểm 6 ải | chưa | |
+| 4 | Chuyến thám hiểm 6 ải | XONG phần màn | commit màn 3 · `tests/dao-tham-hiem.test.tsx` 8/8 · ảnh `3-*` |
 | 5 | Sổ tay dạng bài | chưa | |
 | 6 | Hợp đồng prop cho Code 5 | bản đầu đã gửi | `docs/hop-dong-dao-than-thu-prop-2109.md` |
 | 7 | Nghiệm thu 6 điều (đo ảnh ≤ 400 KB bằng Chromium, 360×740, console sạch, so tên vitest) | chưa | |
@@ -37,3 +37,15 @@ Worktree `busy-austin-a4ab8b`, nhánh `claude/confident-dhawan-e9fbb6` (Boss g�
 - Túi đồ: dùng NGUYÊN `ImmortalShield` (giữ tác dụng + màn 10 giây, cùng lệnh `shield-use`), mặc lại vỏ nền tối; mảnh khiên; "Trang phục · SẮP MỞ" có khoá; lối sang Tiến bộ / Võ đài. GHI CHÚ cho Code 5: `ImmortalShield.tsx` còn 2 emoji trong chữ (ngoài làn em).
 - THÊM so với bản vẽ: nút "Nạp N EXP cho <tên>" trên đảo khi `wallet > 0` (lệnh `invest` cũ — bản vẽ không có chỗ nạp, thiếu thì EXP kẹt trong kho); bút đổi tên cạnh tên thú; thẻ "Gia đình nhắc em ôn".
 - Xem thử: `?man=dao[&thu=5&cap=72&vi=300&khongexp&khongchuoi&khongkhien&nhac&het]`, `?man=tui`.
+
+## 21/09 · Sửa lỗi test chập chờn (Boss + Code 5 báo) — `0995bd1`
+- Ca "vuốt sang thẻ khác" đợi `requestAnimationFrame` + `waitFor` 1 giây theo giờ thật ⇒ đỏ oan khi máy tải nặng. Nay thay rAF bằng hàm chạy ngay trong sự kiện cuộn, không còn chờ đồng hồ. Chạy 3 lượt liền 26/26.
+
+## 21/09 · Màn 3 — Chuyến thám hiểm (`dao/ThamHiem.tsx`: `DaiAi`, `SanDau`, `ThamHiem`)
+- Dải ải trên cùng theo `role` máy chủ trả (thiếu `role` — Worker cũ / lệnh resume — coi là "Luyện đều"); ô Trùm ải hình trám vàng.
+- Trận: máu hai bên, sát thương, hồi máu, cuồng nộ đều lấy từ `learningBattle()` cũ (test so từng số). 3 đúng liền ⇒ nền đỏ + tia xoay + TRANH cuồng nộ thật (`the-<thú>-cuong-no.webp`, nạp trước khi chuỗi = 2) + "−34" (×2). Thường ngày dùng ảnh thú đúng dạng tiến hoá (36 KB), KHÔNG nạp atlas 3 MB như `Spirit2D`. Giữ tiếng trận (`battle-audio`) + nút tắt tiếng.
+- Lý do thưởng: một dòng ngay DƯỚI sân đấu (trên câu hỏi) — luôn trong tầm mắt nên KHÔNG cần tự cuộn; in nguyên `lyDoThuong.chu` của máy chủ, số EXP tách ra huy hiệu; vắng trường thì `lyDoThuongTuKetQua` (cùng câu chữ với `ly-do-thuong.ts` của Code 5; đổi sang import khi tệp đó lên main).
+- Bỏ `scrollIntoView` (test đếm 0 lần + quét mã nguồn). Nút "Trả lời · tung chưởng" chỉ NỔI ở đáy khi em đã chọn xong ⇒ chưa chọn thì không che phương án. `.dao` đổi `overflow:hidden` → `clip` (kèm hidden dự phòng) để `position:sticky` chạy.
+- 360×740: đáy phần trận + câu trắc nghiệm = 650 px (< 740, không cuộn); thẻ câu dùng chung `TheCau` được nén qua token `--k5/--k3` và ẩn thanh tiêu đề trùng với nhãn ải. Console 0 lỗi ở cả 3 trạng thái.
+- Giữ ô "Em có dùng tài liệu hoặc được trợ giúp" (luật chấm `assisted` của máy chủ) và chặn nộp khi hình của câu lỗi.
+- Xem thử: `?man=tham&buoc=cau|no|sai|xong[&phan=II]`.
