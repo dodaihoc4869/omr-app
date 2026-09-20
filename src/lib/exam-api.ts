@@ -2526,8 +2526,9 @@ export async function chiTietCa(scriptUrl: string, secret: string, maCa: string,
  * Một câu, một lần: đạt = làm đúng, không đạt = làm sai. Máy chủ cộng vào bảng
  * chuyên đề tổng của em nhưng KHÔNG tạo lượt thi giả và KHÔNG đụng điểm số —
  * nên nó không bao giờ bị nhầm thành "ca gần nhất". */
-export async function ghiLenBang(scriptUrl: string, secret: string, d: { sbd: string; chuyenDe: string; dat: boolean; qid?: string }): Promise<void> {
-  const r = await postJson(scriptUrl, { action: 'ghiLenBang', secret, sbd: d.sbd, chuyenDe: d.chuyenDe, dat: d.dat, qid: d.qid || '' })
+export async function ghiLenBang(scriptUrl: string, secret: string, d: { sbd: string; chuyenDe: string; dat: boolean; qid?: string; giayThuc?: number }): Promise<void> {
+  // `giayThuc` (M6): giây thật từ lúc đợt bắt đầu làm bài tới lúc bấm (20..1800). Máy chủ mới lưu vào `len_bang.giay_thuc`; đường Apps Script cũ bỏ qua.
+  const r = await postJson(scriptUrl, { action: 'ghiLenBang', secret, sbd: d.sbd, chuyenDe: d.chuyenDe, dat: d.dat, qid: d.qid || '', ...(d.giayThuc !== undefined ? { giayThuc: d.giayThuc } : {}) })
   if (!r.ok) throw new Error(r.error || 'Không ghi được kết quả lên bảng')
   // Soi sang máy chủ mới. Một câu chữa tại lớp cộng vào bảng mạnh–yếu; không
   // soi thì bảng bên ấy thiếu đúng những câu thầy chữa tận tay.

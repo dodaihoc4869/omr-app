@@ -57,6 +57,8 @@ export interface CauVaoXep {
    * (buổi nối không xáo lại người đã đứng chỗ); vắng/bận/bị chặn thì chọn em hợp nhất như thường (`diemHopCau`). Đặt ở từng câu
    * (không ở `YeuCauBuoiChua`) để màn hình gọi `xepBuoiChua(cauVaoXep, hoSo)` nguyên dạng như test cũ khoá. */
   emDaDinh?: string
+  /** HỆ SỐ HIỆU CHỈNH giờ theo giây thật của (phần, sao) câu này (M6, `hieu-chinh-giay-thuc.ts`) — màn hình đặt khi đã đủ mẫu; thiếu ⇒ 1. */
+  heSoHieuChinh?: number
 }
 
 export type TangChua = 'len_bang' | 'doc_dap_an'
@@ -221,6 +223,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
         noiDung: c.noiDung,
         tiLeLopSai: c.tiLeDung === null ? undefined : 1 - c.tiLeDung,
         bacEm: e?.namKt?.get(c.cau.id)?.bac ?? null,
+        heSo: c.heSoHieuChinh,
       },
       ch,
     )

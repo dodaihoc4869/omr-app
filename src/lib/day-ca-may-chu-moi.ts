@@ -376,7 +376,7 @@ export async function tienDoEmMoi(
 export async function ghiLenBangMoi(
   ch: CauHinhMayChu,
   maBiMat: string,
-  d: { sbd: string; chuyenDe: string; dat: boolean; qid?: string },
+  d: { sbd: string; chuyenDe: string; dat: boolean; qid?: string; giayThuc?: number },
 ): Promise<boolean> {
   if (!ch.BAT || !ch.URL || !d.sbd || !d.chuyenDe) return false
   return guiJson(ch, maBiMat, '/len-bang', d, HAN_DAY_CA_GIAY)

@@ -274,7 +274,11 @@ describe('tờ chiếu chạy thật — bấm nút', () => {
     t.ketNoi()
     t.nut(t.o1(), 'Đạt').click()
     expect(daBam(t.gui)).toHaveLength(1)
-    expect(daBam(t.gui)[0]).toEqual({ m: { type: TIN_TO_CHIEU.CHAM, maPhien: MA, khoa: 'A|Q-A', dat: true }, o: GOC })
+    // M6: tin có thể mang thêm `giay` + `duTinh` (giây thật của đợt, để hiệu chỉnh giờ) — ngoài hai trường ấy KHÔNG có gì khác.
+    const tin = daBam(t.gui)[0]
+    expect(tin.o).toBe(GOC)
+    expect(tin.m).toMatchObject({ type: TIN_TO_CHIEU.CHAM, maPhien: MA, khoa: 'A|Q-A', dat: true })
+    expect(Object.keys(tin.m).filter((k) => k !== 'giay' && k !== 'duTinh').sort()).toEqual(['dat', 'khoa', 'maPhien', 'type'])
     const v2 = t.doc.querySelectorAll<HTMLElement>('.mc-cham')[1]!
     t.nut(v2, 'Chưa đạt').click()
     expect(daBam(t.gui)[1].m).toMatchObject({ khoa: 'B|Q-B', dat: false })

@@ -192,6 +192,19 @@ export const HOC_NHIEU = {
   DANG_YEU_LOP_TOI_THIEU_EM: 3,
 } as const
 
+/** TỰ HIỆU CHỈNH TỪ GIÂY THẬT (M6, 21/09). Mỗi lần thầy bấm Đạt / Chưa đạt, tờ chiếu báo `giayThực` (từ lúc đợt bắt đầu LÀM BÀI tới lúc bấm)
+ * và `T dự tính` tương ứng (LÀM của đợt + Σ CHỮA của các ô đã bấm tới lúc ấy, đều theo mô hình CHƯA hiệu chỉnh). Hệ số của MỘT (phần, sao) =
+ * trung vị(giâyThực / T) khi có từ `SO_MAU_TOI_THIEU` mẫu hợp lệ, kẹp `HE_SO_THAP`..`HE_SO_CAO`; dưới ngưỡng thì KHÔNG hiệu chỉnh (hệ số 1).
+ * Giờ thật ngoài `TOI_THIEU`..`TOI_DA` giây (bỏ quên tờ mở, bấm dồn) bị bỏ. `SO_MAU_GIU_TOI_DA` mẫu mới nhất được giữ trên máy. */
+export const GIAY_THUC = {
+  TOI_THIEU: 20,
+  TOI_DA: 1800,
+  SO_MAU_TOI_THIEU: 8,
+  HE_SO_THAP: 0.6,
+  HE_SO_CAO: 1.4,
+  SO_MAU_GIU_TOI_DA: 400,
+} as const
+
 /** Ngân sách thật cho phần chữa, sau khi trừ hao phí. Giây. */
 export function nganSachGiay(ch: CauHinhLenBang): number {
   return Math.max(0, ch.NGAN_SACH_PHUT * 60 - haoPhiGiay(ch))

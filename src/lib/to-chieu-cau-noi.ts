@@ -17,6 +17,8 @@
 //   3. MÃ PHIÊN: một chuỗi ngẫu nhiên sinh lúc mở tờ chiếu, chỉ nằm trong HTML của tờ ấy — cửa sổ khác không biết;
 //   4. NỘI DUNG: `khoa` phải là một ô (em × câu) CÓ TRÊN tờ đang chiếu; kết quả phải là boolean thật.
 // Màn hình KHÔNG tin `sbd`/`qid`/chuyên đề trong tin: nó tra lại từ bảng của chính nó theo `khoa`.
+// (M6) Tin còn có thể mang `giay` + `duTinh` — số đo giờ thật; chỉ dùng để hiệu chỉnh mô hình giờ, hỏng/ngoài khoảng thì BỎ chứ không chặn lệnh ghi.
+import { chuanDuTinh, chuanGiayThuc } from './hieu-chinh-giay-thuc'
 
 export const TIN_TO_CHIEU = {
   /** Tờ chiếu → app: "em ở đây, có ai nghe không" (gửi lặp cho tới khi có `KET_NOI`, phòng app nghe chậm). */
@@ -55,7 +57,8 @@ export function taoMaPhienChieu(): string {
   return `${Math.random().toString(36).slice(2)}${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`
 }
 
-export type TinDenToChieu = { loai: 'san_sang' } | { loai: 'cham'; khoa: string; dat: boolean }
+/** `giayThuc` (M6) chỉ có khi tờ báo được CẢ HAI số hợp lệ (giây thật 20..1800, T dự tính > 0); ngoài khoảng thì BỎ số ấy — lệnh ghi vẫn nhận. */
+export type TinDenToChieu = { loai: 'san_sang' } | { loai: 'cham'; khoa: string; dat: boolean; giayThuc?: { giay: number; duTinh: number } }
 
 export interface BoiCanhKiemTin {
   /** Mã phiên của tờ chiếu đang mở. */
@@ -82,7 +85,9 @@ export function kiemTinToChieu(e: { data: unknown; origin: string; source: unkno
   if (t.type === TIN_TO_CHIEU.CHAM) {
     if (typeof t.khoa !== 'string' || !ctx.khoaHopLe(t.khoa)) return null
     if (typeof t.dat !== 'boolean') return null
-    return { loai: 'cham', khoa: t.khoa, dat: t.dat }
+    const giay = chuanGiayThuc(t.giay)
+    const duTinh = chuanDuTinh(t.duTinh)
+    return giay !== null && duTinh !== null ? { loai: 'cham', khoa: t.khoa, dat: t.dat, giayThuc: { giay, duTinh } } : { loai: 'cham', khoa: t.khoa, dat: t.dat }
   }
   return null
 }
@@ -213,7 +218,13 @@ export function jsCauNoiToChieu(): string {
     tin(v, 'Đang ghi…');
     // Không có phản hồi trong ${GIAY_CHO_PHAN_HOI} giây = LỖI: mở lại nút để thầy bấm lại.
     cho[khoa] = setTimeout(function () { cho[khoa] = 0; xong(khoa, 'loi'); }, ${GIAY_CHO_PHAN_HOI * 1000});
-    gui({ type: '${TIN_TO_CHIEU.CHAM}', khoa: khoa, dat: nut.getAttribute('data-kq') === '1' });
+    var m = { type: '${TIN_TO_CHIEU.CHAM}', khoa: khoa, dat: nut.getAttribute('data-kq') === '1' };
+    // M6: giây thật của đợt tới lúc bấm + T dự tính (tờ chiếu đo, app lọc lại khoảng hợp lệ). Không đo được thì lệnh ghi đi như cũ.
+    try {
+      var g = window.__mcGiayDot ? window.__mcGiayDot(v) : null;
+      if (g && isFinite(g.giay) && isFinite(g.duTinh)) { m.giay = g.giay; m.duTinh = g.duTinh; }
+    } catch (x) {}
+    gui(m);
   });
   gui({ type: '${TIN_TO_CHIEU.SAN_SANG}' });
   nhip = setInterval(function () {

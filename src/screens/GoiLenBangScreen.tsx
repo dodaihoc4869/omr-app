@@ -19,7 +19,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay, UserCheck } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
-import { docBuoiChua, docKhoChuaCa, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret, luuBuoiChua, xoaBuoiChua } from '../lib/exam-db'
+import { docBuoiChua, docKhoChuaCa, docMauGiayThuc, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret, luuBuoiChua, themMauGiayThuc, xoaBuoiChua } from '../lib/exam-db'
 import { HAN_BUOI_CHUA_NGAY, MOC_KHOA_BUOI, chuTheTiepTuc, conHan, emGiuKhiNoi, khoaBuoiChua, laBuoiChuaHopLe, taoBanGhiBuoi, tinhTrangBuoi, type BuoiChuaLuu } from '../lib/noi-buoi-chua'
 import { theoDoiBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
@@ -45,6 +45,7 @@ import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
 import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
 import { noiDungTuCauGoc } from '../lib/thoi-gian-len-bang'
 import { uocLuongBacCau, uocLuongBacCauGoc } from '../lib/uoc-luong-bo-cuc'
+import { heSoCua, heSoHieuChinh } from '../lib/hieu-chinh-giay-thuc'
 import { xepBuoiChua, bangChuBuoiChua, chuSoGiaTri, type CauVaoXep, type DongChua, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
 import { btvnCuaCau, napHoSoLop, type HoSoEmDayDu, type KetQuaBtvn } from '../lib/ho-so-lop'
 import { dungGiaoAn } from '../lib/giao-an-len-bang'
@@ -264,6 +265,22 @@ export default function GoiLenBangScreen() {
   const [kqBuoi, setKqBuoi] = useState<KetQuaBuoiChua | null>(null)
   const [boBatBuoc, setBoBatBuoc] = useState<string[]>([])
   const [tranEm, setTranEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.SO_EM_LEN_BANG_TOI_DA)
+  // HỆ SỐ HIỆU CHỈNH GIỜ theo giây thật (M6): nạp từ các mẫu đã lưu trên máy; cập nhật sau mỗi lần bấm Đạt / Chưa đạt trên tờ chiếu.
+  const [heSoHC, setHeSoHC] = useState<Record<string, number>>({})
+  useEffect(() => {
+    let huy = false
+    void (async () => {
+      try {
+        const bang = heSoHieuChinh(await docMauGiayThuc())
+        if (!huy) setHeSoHC(bang)
+      } catch {
+        /* không đọc được mẫu thì dùng mô hình gốc */
+      }
+    })()
+    return () => {
+      huy = true
+    }
+  }, [])
   const [giayMoiEm, setGiayMoiEm] = useState(CAU_HINH_LEN_BANG_MAC_DINH.GIAY_LANE.L3)
   const [daCopyGiaoAn, setDaCopyGiaoAn] = useState(false)
   /** Lịch sử lên bảng thật từ máy chủ. `null` = chưa đọc được (máy chủ bản cũ
@@ -301,7 +318,7 @@ export default function GoiLenBangScreen() {
     goc: string
   } | null>(null)
   /** Bản MỚI NHẤT của `ghiTheoKhoa` cho bộ nghe tin của tờ chiếu (bộ nghe gắn một lần, không được giữ hàm cũ). */
-  const ghiTheoKhoaRef = useRef<((o: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean) => Promise<boolean>) | null>(null)
+  const ghiTheoKhoaRef = useRef<((o: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean, giayThuc?: { giay: number; duTinh: number }) => Promise<boolean>) | null>(null)
 
   useEffect(() => {
     void (async () => {
@@ -774,9 +791,11 @@ export default function GoiLenBangScreen() {
           noiDung: goc ? noiDungTuCauGoc(goc.phan, goc.q) : undefined,
           // Bậc bố cục ƯỚC LƯỢNG trên tờ chiếu (1 = ghép đôi được … 5 = chiếm cả bảng) — để cảnh báo câu quá dài ngay lúc xếp buổi.
           bacUoc: goc ? uocLuongBacCauGoc(goc.phan, goc.q).bac : undefined,
+          // Hệ số hiệu chỉnh giờ theo GIÂY THẬT của (phần, sao) này (M6) — chưa đủ mẫu thì không có.
+          heSoHieuChinh: heSoCua(heSoHC, d.cau.phan, d.cau.sao),
         }
       }),
-    [doKhoCau, boBatBuoc, traCau],
+    [doKhoCau, boBatBuoc, traCau, heSoHC],
   )
   /** Đang NỐI buổi: chỉ các câu còn lại (câu bắt buộc chưa chữa vẫn bắt buộc, trừ khi thầy bỏ tích), mỗi câu mang em đã định để giữ nếu còn có mặt. */
   const cauVaoXep = useMemo<CauVaoXep[]>(
@@ -1063,6 +1082,7 @@ export default function GoiLenBangScreen() {
           // Cùng đầu vào Engine E dùng để tính T của câu ⇒ giờ hai pha trên tờ khớp giờ đã xếp cho buổi.
           tiLeLopSai: tiLeDungTheoCau.get(p.cau.id) != null ? 1 - (tiLeDungTheoCau.get(p.cau.id) as number) : undefined,
           bacEm: hoSoEmTheoSbd.get(p.sbd)?.namKt?.get(p.cau.id)?.bac ?? null,
+          heSoHieuChinh: heSoCua(heSoHC, p.cau.phan, p.cau.sao),
         })
       }
 
@@ -1165,12 +1185,22 @@ export default function GoiLenBangScreen() {
     if (await ghiKetQua(p, dat)) boDong(p)
   }
 
+  /** LƯU MỘT MẪU GIÂY THẬT (M6) sau khi máy chủ đã nhận kết quả, rồi tính lại hệ số. Lỗi lưu không được làm hỏng việc ghi kết quả. */
+  const ghiMauGiayThuc = async (cau: CauChua, g: { giay: number; duTinh: number }) => {
+    try {
+      const ds = await themMauGiayThuc({ phan: cau.phan, sao: (cau.sao ?? 0) as 0 | 1 | 2, giay: g.giay, duTinh: g.duTinh, luc: new Date().toISOString() })
+      setHeSoHC(heSoHieuChinh(ds))
+    } catch (e) {
+      console.warn('[giờ thật] không lưu được mẫu:', e)
+    }
+  }
+
   /** GHI MỘT KẾT QUẢ LÊN BẢNG — MỘT đường duy nhất cho MỌI nơi bấm: `cham` (Engine C, bảng
    * "Phân công"), `chamBuoi` (Engine E, bảng buổi chữa) và tờ máy chiếu (qua `ghiTheoKhoa`). Cùng
    * một lệnh `ghiLenBang`, máy chủ ghi `len_bang` + sổ `nguon='len_bang'`, cùng thông báo, cùng cập
    * nhật lịch sử tại chỗ. Trả `true` chỉ khi máy chủ đã nhận: ghi hỏng thì bên gọi GIỮ dòng lại —
    * mất dòng mà máy chủ chưa có gì là thầy tưởng đã ghi rồi. */
-  const ghiKetQua = async (p: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean): Promise<boolean> => {
+  const ghiKetQua = async (p: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean, giayThuc?: { giay: number; duTinh: number }): Promise<boolean> => {
     if (!cauHinh) {
       showToast('Chưa cấu hình máy chủ', 'error')
       return false
@@ -1182,7 +1212,8 @@ export default function GoiLenBangScreen() {
     }
     setDangCham(p.sbd + p.cau.id)
     try {
-      await ghiLenBang(cauHinh.url, cauHinh.mat, { sbd: p.sbd, chuyenDe: cd, dat, qid: p.cau.id })
+      await ghiLenBang(cauHinh.url, cauHinh.mat, { sbd: p.sbd, chuyenDe: cd, dat, qid: p.cau.id, ...(giayThuc ? { giayThuc: giayThuc.giay } : {}) })
+      if (giayThuc) void ghiMauGiayThuc(p.cau, giayThuc)
       showToast(`${p.hoTen || p.sbd}: ${dat ? 'đạt' : 'không đạt'} — đã ghi vào ${cd}`, dat ? 'success' : 'warn')
       setDaGoiCau((cu) => ({ ...cu, [p.sbd]: [...new Set([...(cu[p.sbd] ?? []), p.cau.id])] }))
       // Cộng ngay vào lịch sử đang giữ: máy chủ vừa ghi xong, khỏi tải lại cả bảng.
@@ -1225,12 +1256,12 @@ export default function GoiLenBangScreen() {
   /** GHI THEO KHOÁ `sbd|qid` — cổng chung của bảng buổi chữa và tờ máy chiếu, IDEMPOTENT: ô đã ghi trả `true`
    * ngay (không ghi lại); ô đang chờ máy chủ thì chờ đúng lượt ghi ấy (không mở lượt thứ hai). Nhờ vậy tờ chiếu
    * quá 8 giây coi là lỗi rồi bấm lại cũng không ghi đôi nếu lượt đầu thật ra đã thành công. */
-  const ghiTheoKhoa = async (o: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean): Promise<boolean> => {
+  const ghiTheoKhoa = async (o: { sbd: string; hoTen: string; cau: CauChua }, dat: boolean, giayThuc?: { giay: number; duTinh: number }): Promise<boolean> => {
     const khoa = khoaToChieu(o.sbd, o.cau.id)
     if (daGhiKhoa.current.has(khoa)) return true
     const dang = dangGhiKhoa.current.get(khoa)
     if (dang) return dang
-    const luot = ghiKetQua(o, dat)
+    const luot = ghiKetQua(o, dat, giayThuc)
     dangGhiKhoa.current.set(khoa, luot)
     try {
       const ok = await luot
@@ -1278,7 +1309,7 @@ export default function GoiLenBangScreen() {
       }
       const o = p.o.get(tin.khoa)
       if (!o) return
-      void ghiTheoKhoaRef.current?.(o, tin.dat).then((ok) => {
+      void ghiTheoKhoaRef.current?.(o, tin.dat, tin.giayThuc).then((ok) => {
         if (phienChieu.current !== p) return // tờ đã đóng/đổi phiên trong lúc chờ máy chủ
         try {
           cuaSo.postMessage({ type: TIN_TO_CHIEU.PHAN_HOI, maPhien: p.ma, khoa: tin.khoa, kq: ok ? 'da_ghi' : 'loi', dat: ok ? tin.dat : undefined }, goc)

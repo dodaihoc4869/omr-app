@@ -17,6 +17,7 @@
 import type { CauLuyen } from './bai-tap-pdf'
 import {
   CAU_HINH_LEN_BANG_MAC_DINH,
+  GIAY_THUC,
   THOI_GIAN_LEN_BANG,
   giayLenBang,
   type CauHinhLenBang,
@@ -45,6 +46,9 @@ export interface DauVaoThoiGian {
   tiLeLopSai?: number
   /** Bậc của em đứng lên ở dạng của câu. Thiếu ⇒ hệ số 1,0. */
   bacEm?: BacDangEm | null
+  /** HỆ SỐ HIỆU CHỈNH theo giây thật (M6, `hieu-chinh-giay-thuc.ts`): nhân cả ba thành phần. Thiếu / không hợp lệ ⇒ 1. Câu thiếu văn bản
+   * (300 / 180 / 120 thầy đã chốt) KHÔNG bị hiệu chỉnh. */
+  heSo?: number
 }
 
 export interface ThoiGianCau {
@@ -145,11 +149,13 @@ export function thoiGianCau(d: DauVaoThoiGian, ch: CauHinhLenBang = CAU_HINH_LEN
   const soBuoc = kep(d.noiDung.soBuoc > 0 ? d.noiDung.soBuoc : tg.CHUA_BUOC_TOI_THIEU, tg.CHUA_BUOC_TOI_THIEU, tranBuoc)
   const chua = (tg.CHUA_NEN_GIAY + tg.CHUA_GIAY_MOI_BUOC * soBuoc) * (lopSai >= tg.CHUA_NGUONG_LOP_SAI ? tg.CHUA_HE_SO_KHO : 1)
 
-  const tho = doc + lam + chua
+  // Hiệu chỉnh từ giây thật: nhân ĐỀU ba thành phần (giữ tỉ trọng pha), rồi kẹp/làm tròn như thường. Ngoài khoảng cho phép ⇒ kẹp lại.
+  const heSo = typeof d.heSo === 'number' && Number.isFinite(d.heSo) && d.heSo > 0 ? kep(d.heSo, GIAY_THUC.HE_SO_THAP, GIAY_THUC.HE_SO_CAO) : 1
+  const tho = (doc + lam + chua) * heSo
   const tong = kep(lamTron(tho, tg.LAM_TRON_GIAY), tg.TOI_THIEU_GIAY, tg.TOI_DA_GIAY)
   // Kẹp/làm tròn làm tổng lệch tổng thô: co đều ba thành phần theo đúng tỉ lệ rồi dồn phần dư lẻ vào T_làm,
   // để `doc + lam + chua === tong` (tờ chiếu cộng ba số này) mà pha nào cũng còn đúng tỉ trọng.
-  const k = tong / tho
+  const k = (tong / tho) * heSo
   const d2 = Math.round(doc * k)
   const c2 = Math.round(chua * k)
   return { doc: d2, lam: tong - d2 - c2, chua: c2, tong, roiVeMacDinh: false }

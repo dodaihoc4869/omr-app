@@ -8,6 +8,7 @@ import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/ex
 import type { BanGhiKhoa } from './khoa-app'
 import { chuanHoaMayChu, type CauHinhMayChu } from './cau-hinh-may-chu'
 import type { SoSuaDang } from './sua-dang'
+import { themMau, type MauGiayThuc } from './hieu-chinh-giay-thuc'
 
 export interface AnswerRecord {
   phanI: Record<string, 'A' | 'B' | 'C' | 'D'> // qid -> lựa chọn (đã quy về chữ cái GỐC, chưa xáo)
@@ -753,6 +754,30 @@ export const TIEN_TO_SETTINGS_DON_KHI_RESET: readonly string[] = []
 /** Khoá `settings` ĐÚNG TÊN bị xoá khi reset. RỖNG từ 21/09: giữ cả `diemCuaEm`, `khoDoKho` (độ khó theo CÂU) và `lichOnLai`
  * (hàng đợi ôn giãn cách em × dạng — hồ sơ mạnh yếu chỉ có ở máy thầy). */
 export const KHOA_SETTINGS_DON_KHI_RESET: readonly string[] = []
+
+// ---------------------------------------------------------------------------
+// GIÂY THẬT CỦA LƯỢT LÊN BẢNG (M6, 21/09/2026) — danh sách mẫu `MauGiayThuc` ở `settings` khoá `giayThucLenBang`, MỚI NHẤT CUỐI, tối đa
+// `GIAY_THUC.SO_MAU_GIU_TOI_DA` mẫu. Nguồn của hệ số hiệu chỉnh giờ (`heSoHieuChinh`). Máy chủ nhận thêm cột `len_bang.giay_thuc` theo hợp đồng
+// `docs/hop-dong-giay-thuc-len-bang-1909.md` nhưng chưa trả lại được ⇒ máy thầy giữ bản của mình. GIỮ khi reset (dữ liệu của MÔ HÌNH, không của em).
+// Nằm ở `settings` (không thêm store, không nâng phiên bản) — cùng lập luận với `buoiChua:`.
+// ---------------------------------------------------------------------------
+const KHOA_GIAY_THUC = 'giayThucLenBang'
+
+export async function docMauGiayThuc(): Promise<unknown[]> {
+  const db = await getDb()
+  const v = await db.get(STORE_SETTINGS, KHOA_GIAY_THUC)
+  return Array.isArray(v) ? v : []
+}
+
+/** Thêm MỘT mẫu trong một giao dịch đọc-ghi (hai lần bấm sát nhau không ghi đè nhau); trả danh sách mới. */
+export async function themMauGiayThuc(mau: MauGiayThuc): Promise<MauGiayThuc[]> {
+  const db = await getDb()
+  const tx = db.transaction(STORE_SETTINGS, 'readwrite')
+  const moi = themMau(await tx.store.get(KHOA_GIAY_THUC), mau)
+  await tx.store.put(moi, KHOA_GIAY_THUC)
+  await tx.done
+  return moi
+}
 
 /** DẤU "đã dọn theo mốc này" — nằm trong `settings` (KHÔNG thuộc nhóm dọn) và được ghi CÙNG giao dịch với việc dọn. */
 const KHOA_MOC_RESET_DA_DON = 'mocResetDaDon'

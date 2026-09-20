@@ -101,6 +101,8 @@ describe('khoá nào DỌN, khoá nào GIỮ', () => {
     'scriptUrl', 'mayChuMoi', 'teacherSecret', 'khoaApp', 'khoaVanTay', 'khoaPhien', 'giuPhien', 'soSuaDang',
     'tokenHocSinh', 'tokenPhuHuynh', 'myStudentSbd', 'myParentPhone', 'mocResetDaDon',
     'khoDoKho', 'lichOnLai',
+    // giây thật của lượt lên bảng (M6): dữ liệu của MÔ HÌNH giờ, không của em
+    'giayThucLenBang',
     // theo ca / theo em (từng thuộc nhóm DỌN)
     'soCauCa:1', 'khoChuaCa:x', 'deRiengCa:x', 'cheDoDeRieng:x', 'qidRaPhieu:12000', 'buoiChua:-|Lop|1', 'diemCuaEm',
   ]

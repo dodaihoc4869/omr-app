@@ -11,7 +11,7 @@ import { JSDOM, VirtualConsole } from 'jsdom'
 import type { CaTomTat } from '../src/lib/exam-api'
 import type { TeacherExamSource } from '../src/data/examContent'
 
-const m = vi.hoisted(() => ({ ghi: vi.fn(), hoSo: vi.fn() }))
+const m = vi.hoisted(() => ({ ghi: vi.fn(), hoSo: vi.fn(), mau: [] as unknown[] }))
 
 const ca = (maCa: string): CaTomTat =>
   ({ maCa, tenCa: `Ca ${maCa}`, lop: '12', daVao: 10, daNop: 10, lenBang: false, trangThai: 'dong', batDau: '2026-09-09T00:00:00.000Z', hetHanVao: '2026-09-09T01:00:00.000Z' }) as unknown as CaTomTat
@@ -58,6 +58,9 @@ vi.mock('../src/lib/exam-db', () => ({
   docKhoChuaCa: async () => [DE],
   docKhoDoKho: async () => undefined,
   luuKhoDoKho: async () => {},
+  // "IndexedDB" giả cho mẫu giây thật (M6)
+  docMauGiayThuc: async () => m.mau,
+  themMauGiayThuc: async (x: unknown) => (m.mau.push(x), m.mau),
 }))
 vi.mock('../src/lib/may-chu-moi', async (goc) => ({ ...(await goc<Record<string, unknown>>()), layCauHinhMayChu: async () => ({ BAT: true, URL: 'https://x' }) }))
 const toast = vi.fn()
@@ -75,6 +78,7 @@ beforeEach(() => {
   m.ghi.mockResolvedValue(undefined)
   m.hoSo.mockReset()
   m.hoSo.mockImplementation(async () => ({ em: Object.fromEntries(LUOT.map((l) => [l.sbd, emRong])) }))
+  m.mau.length = 0
   toast.mockReset()
 })
 
@@ -341,5 +345,102 @@ describe('màn giáo viên KHÔNG nhận lệnh ghi từ nguồn lạ', () => {
     await gui({ type: TIN_TO_CHIEU.SAN_SANG, maPhien: 'sai' }, { source: khung.contentWindow })
     await gui({ type: TIN_TO_CHIEU.SAN_SANG, maPhien: '' }, { source: window })
     expect(spy).not.toHaveBeenCalled()
+  }, 60000)
+})
+
+describe('GIÂY THẬT (M6): tờ chiếu báo giây → màn gửi kèm lệnh ghi, lưu mẫu, hiệu chỉnh buổi sau', () => {
+  const gui = async (data: unknown, khung: HTMLIFrameElement) => {
+    await act(async () => {
+      window.dispatchEvent(new MessageEvent('message', { data, origin: window.location.origin, source: khung.contentWindow }))
+    })
+    await new Promise((res) => setTimeout(res, 60))
+  }
+  const phutBuoi = (r: ReturnType<typeof render>) => {
+    const t = r.container.querySelector('[data-khoi="buoi-chua"]')!.textContent ?? ''
+    return Number(/(\d+)\/\d+ phút/.exec(t)![1])
+  }
+
+  it('tin CHAM kèm giây thật hợp lệ ⇒ `ghiLenBang` nhận `giayThuc`, và MẪU (phần, sao, giây, T dự tính) được lưu sau khi máy chủ nhận', async () => {
+    const r = await moBuoiChua()
+    const { khung, ma, khoa } = await chieuLenBang(r)
+    await gui({ type: TIN_TO_CHIEU.CHAM, maPhien: ma, khoa: khoa[0], dat: true, giay: 95.5, duTinh: 120 }, khung)
+    await waitFor(() => expect(m.ghi).toHaveBeenCalledTimes(1), CHO)
+    expect(m.ghi.mock.calls[0][2]).toMatchObject({ dat: true, giayThuc: 95.5 })
+    await waitFor(() => expect(m.mau).toHaveLength(1), CHO)
+    expect(m.mau[0]).toMatchObject({ phan: 'I', giay: 95.5, duTinh: 120 })
+    expect([0, 1, 2]).toContain((m.mau[0] as { sao: number }).sao)
+  }, 60000)
+
+  it('giây ngoài 20..1800, không phải số, hoặc thiếu T dự tính ⇒ BỎ số đo nhưng VẪN ghi kết quả; không lưu mẫu', async () => {
+    const r = await moBuoiChua()
+    const { khung, ma, khoa } = await chieuLenBang(r)
+    const xau = [{ giay: 5, duTinh: 100 }, { giay: 1801, duTinh: 100 }, { giay: '90', duTinh: 100 }, { giay: 90 }, { giay: 90, duTinh: 0 }, { giay: NaN, duTinh: 100 }]
+    for (let i = 0; i < xau.length; i++) await gui({ type: TIN_TO_CHIEU.CHAM, maPhien: ma, khoa: khoa[i], dat: i % 2 === 0, ...xau[i] }, khung)
+    await waitFor(() => expect(m.ghi).toHaveBeenCalledTimes(xau.length), CHO)
+    for (const goi of m.ghi.mock.calls) expect(goi[2]).not.toHaveProperty('giayThuc')
+    await new Promise((res) => setTimeout(res, 100))
+    expect(m.mau).toHaveLength(0)
+  }, 90000)
+
+  it('máy chủ TỪ CHỐI ⇒ không lưu mẫu (giây của lần ghi hỏng không được tính)', async () => {
+    m.ghi.mockRejectedValueOnce(new Error('Máy chủ lỗi'))
+    const r = await moBuoiChua()
+    const { khung, ma, khoa } = await chieuLenBang(r)
+    await gui({ type: TIN_TO_CHIEU.CHAM, maPhien: ma, khoa: khoa[0], dat: true, giay: 80, duTinh: 100 }, khung)
+    await waitFor(() => expect(m.ghi).toHaveBeenCalledTimes(1), CHO)
+    await new Promise((res) => setTimeout(res, 100))
+    expect(m.mau).toHaveLength(0)
+  }, 60000)
+
+  it('bấm ở BẢNG buổi chữa (không có đợt trên tờ) ⇒ không có giây thật, không lưu mẫu', async () => {
+    const r = await moBuoiChua()
+    const d = dongBuoi(r)[0]
+    fireEvent.click(nutBang(d, 'Đạt')!)
+    await waitFor(() => expect(m.ghi).toHaveBeenCalledTimes(1), CHO)
+    expect(m.ghi.mock.calls[0][2]).not.toHaveProperty('giayThuc')
+    expect(m.mau).toHaveLength(0)
+  }, 60000)
+
+  it('ĐỦ MẪU đã lưu (8 mẫu giây thật gấp 1,4 lần dự tính) ⇒ buổi xếp sau đó tốn NHIỀU phút hơn buổi chưa có mẫu; ít hơn 8 mẫu thì không đổi', async () => {
+    const goc = await moBuoiChua()
+    const phutGoc = phutBuoi(goc)
+    cleanup()
+    m.mau.push(...Array.from({ length: 7 }, () => ({ phan: 'I', sao: 2, giay: 140, duTinh: 100, luc: '2026-09-21T01:00:00.000Z' }))) // 7 < 8
+    const bay = await moBuoiChua()
+    expect(phutBuoi(bay)).toBe(phutGoc)
+    cleanup()
+    m.mau.push({ phan: 'I', sao: 2, giay: 140, duTinh: 100, luc: '2026-09-21T01:00:00.000Z' }) // đủ 8
+    const du = await moBuoiChua()
+    expect(phutBuoi(du)).toBeGreaterThan(phutGoc)
+  }, 120000)
+
+  it('mẫu THỨ 8 vừa lưu ⇒ hệ số có hiệu lực NGAY: tờ chiếu mở lại sau đó dùng giờ đã hiệu chỉnh (trước đó 7 mẫu thì `data-lam` = `data-lam0`)', async () => {
+    m.mau.push(...Array.from({ length: 7 }, () => ({ phan: 'I', sao: 2, giay: 140, duTinh: 100, luc: '2026-09-21T01:00:00.000Z' })))
+    const r = await moBuoiChua()
+    const a = await chieuLenBang(r)
+    const docA = new JSDOM(a.html).window.document
+    for (const n of docA.querySelectorAll<HTMLElement>('.mc-nua[data-lam]')) expect(n.getAttribute('data-lam')).toBe(n.getAttribute('data-lam0'))
+    await gui({ type: TIN_TO_CHIEU.CHAM, maPhien: a.ma, khoa: a.khoa[0], dat: true, giay: 140, duTinh: 100 }, a.khung)
+    await waitFor(() => expect(m.mau).toHaveLength(8), CHO)
+    fireEvent.click(document.querySelector('.nut-dong-phieu') as HTMLElement)
+    await waitFor(() => expect(document.querySelector('.lop-xem-phieu')).toBeNull(), CHO)
+    const b = await chieuLenBang(r)
+    const docB = new JSDOM(b.html).window.document
+    const nua = [...docB.querySelectorAll<HTMLElement>('.mc-nua[data-lam]')]
+    expect(nua.length).toBeGreaterThan(0)
+    for (const n of nua) expect(Number(n.getAttribute('data-lam'))).toBeGreaterThan(Number(n.getAttribute('data-lam0')))
+  }, 90000)
+
+  it('tờ chiếu dựng SAU khi có hệ số dùng giờ đã hiệu chỉnh nhưng vẫn giữ giờ gốc (`data-lam0`/`data-chua0`) làm mẫu số cho lần đo tiếp', async () => {
+    m.mau.push(...Array.from({ length: 8 }, () => ({ phan: 'I', sao: 2, giay: 140, duTinh: 100, luc: '2026-09-21T01:00:00.000Z' })))
+    const r = await moBuoiChua()
+    const { html } = await chieuLenBang(r)
+    const doc = new JSDOM(html).window.document
+    const nua = [...doc.querySelectorAll<HTMLElement>('.mc-nua[data-lam]')]
+    expect(nua.length).toBeGreaterThan(0)
+    for (const n of nua) {
+      expect(Number(n.getAttribute('data-lam'))).toBeGreaterThan(Number(n.getAttribute('data-lam0')))
+      expect(Number(n.getAttribute('data-chua'))).toBeGreaterThan(Number(n.getAttribute('data-chua0')))
+    }
   }, 60000)
 })

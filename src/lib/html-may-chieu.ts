@@ -50,6 +50,8 @@ export interface OBang {
    * Thiếu thì tính như Engine E khi thiếu dữ liệu (0 và không bậc). */
   tiLeLopSai?: number
   bacEm?: 'biet' | 'hieu' | 'van_dung' | null
+  /** Hệ số hiệu chỉnh giờ theo giây thật của (phần, sao) ô này (M6) — thiếu ⇒ 1. Tờ chiếu vẫn giữ giờ CHƯA hiệu chỉnh (`data-lam0`/`data-chua0`) để báo lại giây thật. */
+  heSoHieuChinh?: number
   /** BÀI TẬP VỀ NHÀ CỦA ĐÚNG CÂU NÀY: em ở nhà làm đúng, sai, hay chưa làm.
    * Bỏ trống nghĩa là câu này không nằm trong bài giao về nhà — KHÁC "chưa
    * làm", nên tờ chiếu không hiện gì thay vì hiện nhầm. */
@@ -292,10 +294,13 @@ export function thoiGianDayHoc(o: OBang): number {
 /** GIỜ CỦA MỘT Ô cho thanh dưới (pha LÀM BÀI → CHỮA): `lam` = T_đọc + T_làm, `chua` = T_chữa — cùng công thức Engine E
  * (`thoiGianCau`), nhưng CHIA RIÊNG ba thành phần thay vì cộng thành một tổng. Chế độ dạy học: `lam` là giờ đếm ngược đã có
  * (`thoiGianDayHoc`, kẹp 60–180 s) để đồng hồ dạy học không đổi. */
-function gioCuaO(o: OBang, dayHoc: boolean): { lam: number; chua: number } {
+function gioCuaO(o: OBang, dayHoc: boolean): { lam: number; chua: number; lam0: number; chua0: number } {
   const sao = (o.sao === 0 || o.sao === 1 || o.sao === 2 ? o.sao : o.mucDo === 'van_dung' ? 2 : o.mucDo === 'hieu' ? 1 : 0) as 0 | 1 | 2
-  const t = thoiGianCau({ phan: o.cau.phan, sao, noiDung: noiDungTuCauLuyen(o.cau), tiLeLopSai: o.tiLeLopSai, bacEm: o.bacEm ?? null })
-  return { lam: dayHoc ? thoiGianDayHoc(o) : Math.round(t.doc + t.lam), chua: Math.round(t.chua) }
+  const dau = { phan: o.cau.phan, sao, noiDung: noiDungTuCauLuyen(o.cau), tiLeLopSai: o.tiLeLopSai, bacEm: o.bacEm ?? null }
+  const t = thoiGianCau({ ...dau, heSo: o.heSoHieuChinh })
+  // `lam0`/`chua0`: giờ theo mô hình CHƯA hiệu chỉnh — mẫu số khi tờ báo giây thật (M6). Không có hệ số thì trùng `lam`/`chua`.
+  const t0 = o.heSoHieuChinh === undefined ? t : thoiGianCau(dau)
+  return { lam: dayHoc ? thoiGianDayHoc(o) : Math.round(t.doc + t.lam), chua: Math.round(t.chua), lam0: Math.round(t0.doc + t0.lam), chua0: Math.round(t0.chua) }
 }
 
 /** Hai nút Đạt / Không đạt của một ô — chỉ khi tờ được dựng kèm `cauNoi` và ô có `qid`. Mảnh markup, CSS và JS nằm
@@ -312,7 +317,7 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number, ca
   const gio = gioCuaO(o, dayHoc)
   // `data-giay`: giờ ĐỌC + LÀM của chính câu này — để đợt bị TÁCH lúc chiếu (M2) tính lại thời gian từng đợt (chế độ dạy học).
   // `data-lam` / `data-chua`: giờ hai pha của thanh dưới (M3); đợt tính bằng max(lam) và Σ chua của các ô còn trong đợt.
-  return `<section class="mc-nua mc-${viTri}"${dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''} data-lam="${gio.lam}" data-chua="${gio.chua}">
+  return `<section class="mc-nua mc-${viTri}"${dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''} data-lam="${gio.lam}" data-chua="${gio.chua}" data-lam0="${gio.lam0}" data-chua0="${gio.chua0}">
   <button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>
   ${headerEmHtml(o, ma)}
   <div class="mc-vung-de">${dauDeHtml(o)}<div class="mc-than">${thanCauHtml(o.cau)}</div>
@@ -340,7 +345,7 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
   const ma = `giai-${soDot}-don`
   const gio = gioCuaO(o, Boolean(tuyChon.dayHoc))
   return `<div class="mc-dot mc-dot-don" data-dot="${soDot}" ${secondsAttr}>
-  <section class="mc-nua mc-don"${tuyChon.dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''} data-lam="${gio.lam}" data-chua="${gio.chua}">
+  <section class="mc-nua mc-don"${tuyChon.dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''} data-lam="${gio.lam}" data-chua="${gio.chua}" data-lam0="${gio.lam0}" data-chua0="${gio.chua0}">
     <button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>
     ${headerEmHtml(o, ma)}
     <div class="mc-vung-de">${dauDeHtml(o)}<div class="mc-than">${thanCauHtml(o.cau)}</div>
@@ -623,8 +628,10 @@ const JS_MAY_CHIEU = `
   var dayHoc = document.body.classList.contains('mc-day-hoc');
   var intro = null, introTimeout = null;
   // Pha của đợt đang hiện: '' (không có giờ) · goi (màn gọi tên) · lam (ĐANG LÀM BÀI) · chua (ĐANG CHỮA) · het (quá giờ chữa).
-  var gd = { pha: '', han: 0, tong: 0, lam: 0, chua: 0, sau: 'lam' };
+  var gd = { pha: '', han: 0, tong: 0, lam: 0, chua: 0, sau: 'lam', batLam: -1 };
   var dotDangVao = -1, phienBatDau = -1;
+  // Ô đã báo giây thật trong đợt này: vị trí ô -> giờ CHỮA (mô hình chưa hiệu chỉnh). Xoá mỗi khi vào đợt mới.
+  var dotBam = {};
 
   function dinhDang(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
   function giamChuyenDong() { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
@@ -647,6 +654,7 @@ const JS_MAY_CHIEU = `
   }
   function chuyenPha(pha) {
     gd.pha = pha;
+    if (pha === 'lam') gd.batLam = Date.now();
     gd.tong = pha === 'lam' ? gd.lam : pha === 'chua' ? gd.chua : 0;
     gd.han = Date.now() + gd.tong * 1000;
     veThanh();
@@ -769,6 +777,8 @@ const JS_MAY_CHIEU = `
     gd.lam = g.lam;
     gd.chua = g.chua;
     gd.pha = '';
+    gd.batLam = -1;
+    dotBam = {};
     if (!page || (!g.lam && !g.chua)) { veThanh(); return; }
     if (dayHoc) {
       Array.prototype.forEach.call(page.querySelectorAll('.mc-em'), function (e) { e.hidden = true; });
@@ -783,6 +793,24 @@ const JS_MAY_CHIEU = `
     veThanh();
     choAnh(page, function () { if (dots[i] === page && gd.pha === 'goi') goiTen(page, 'lam'); });
   }
+  /** GIÂY THẬT của đợt tới lúc thầy bấm một ô (M6): từ lúc đợt bắt đầu LÀM BÀI tới bây giờ, kèm T dự tính của ĐÚNG khoảng ấy — LÀM của đợt
+   * (max các ô) + Σ CHỮA của các ô đã bấm tới lúc này (kể cả ô này), đều theo giờ CHƯA hiệu chỉnh. Cầu nối gửi hai số này cho app cùng lệnh
+   * ghi. Không có giờ (chế độ dạy học, đợt không có giờ, ô không thuộc đợt đang hiện) thì trả null và lệnh ghi đi như cũ. */
+  function giayDot(vung) {
+    if (dayHoc || gd.batLam < 0) return null;
+    var page = dots[i];
+    var nua = vung && vung.closest ? vung.closest('.mc-nua') : null;
+    if (!page || !nua || !page.contains(nua)) return null;
+    var ds = Array.prototype.slice.call(page.querySelectorAll('.mc-nua[data-lam]'));
+    var vt = ds.indexOf(nua);
+    if (vt < 0) return null;
+    dotBam[vt] = Number(nua.getAttribute('data-chua0') || nua.getAttribute('data-chua')) || 0;
+    var lam0 = 0, chua0 = 0;
+    ds.forEach(function (n) { lam0 = Math.max(lam0, Number(n.getAttribute('data-lam0') || n.getAttribute('data-lam')) || 0); });
+    Object.keys(dotBam).forEach(function (k) { chua0 += dotBam[k]; });
+    return { giay: Math.round((Date.now() - gd.batLam) / 100) / 10, duTinh: lam0 + chua0 };
+  }
+  window.__mcGiayDot = giayDot;
   function tick() {
     var now = Date.now();
     if (phienBatDau < 0) phienBatDau = now;
