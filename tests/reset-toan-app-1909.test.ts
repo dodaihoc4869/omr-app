@@ -34,7 +34,8 @@ const HO_SO_GIU = ['su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'tien_do_hs', 'qi
 
 const bangHienCo = (d: D1That) => (d.sql.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' ORDER BY name").all() as { name: string }[]).map((x) => x.name)
 const bam = (d: D1That, t: string) => JSON.stringify(d.sql.prepare(`SELECT * FROM "${t}" ORDER BY rowid`).all())
-const dem = (d: D1That, t: string) => Number((d.sql.prepare(`SELECT COUNT(*) AS n FROM "${t}"`).get() as { n: number }).n)
+/** Số dòng của bảng; bảng CHƯA TỒN TẠI (danh sách XOÁ có thể nêu trước bảng của migration chưa gộp, job bỏ qua bảng thiếu) tính 0. */
+const dem = (d: D1That, t: string) => (bangHienCo(d).includes(t) ? Number((d.sql.prepare(`SELECT COUNT(*) AS n FROM "${t}"`).get() as { n: number }).n) : 0)
 const bamTatCa = (d: D1That, ds: readonly string[]) => Object.fromEntries(ds.filter((t) => bangHienCo(d).includes(t)).map((t) => [t, bam(d, t)]))
 
 /** Gieo MỖI bảng 2 dòng (điền cột NOT NULL bằng giá trị mẫu theo kiểu) để job có gì mà xoá/giữ. */
@@ -100,7 +101,7 @@ describe('phân loại bảng', () => {
     expect(new Set(BANG_XOA).size).toBe(BANG_XOA.length)
   })
   it('mọi thứ thầy bảo XOÁ đều nằm trong danh sách XOÁ (ca thi, lượt, điểm, BTVN, bài Mẹ giao, luyện đề, kế hoạch ngày, trao đổi, game, thú, EXP, khiên, Đoàn, vinh danh, tin PH)', () => {
-    for (const t of ['ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'tien_do_ca', 'btvn', 'btvn_em', 'mom_bai', 'luyen_de_2026', 'ke_hoach_ngay', 'tin_nhan', 'game_v2_profile', 'game_v2_attempt', 'than_thu', 'exp_so', 'manh_khien_so', 'doan_chang', 'doan_luot', 'doan_tiep_suc', 'doan_ve_so', 'doan_trum_lop', 'daily_honors', 'parent_daily_news']) {
+    for (const t of ['ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'tien_do_ca', 'btvn', 'btvn_em', 'mom_bai', 'luyen_de_2026', 'ke_hoach_ngay', 'tin_nhan', 'game_v2_profile', 'game_v2_attempt', 'than_thu', 'exp_so', 'manh_khien_so', 'doan_chang', 'doan_luot', 'doan_tiep_suc', 'doan_ve_so', 'doan_trum_lop', 'doan_trum_cau', 'daily_honors', 'parent_daily_news']) {
       expect(BANG_XOA, t).toContain(t)
     }
   })

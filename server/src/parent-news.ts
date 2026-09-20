@@ -1,5 +1,6 @@
 import type {Env} from './kieu'
 import {mom} from './mom'
+import {sbdCuaPhuHuynh} from './ph-truy-cap'
 import {lapVaLuuKeHoach, TOI_DA_EM_MOI_LO} from './ke-hoach-ngay-d1'
 import type {KeHoachNgay} from './ke-hoach-ngay'
 import {chonCauBaiHangNgay} from './parent-news-nguon-cau'
@@ -342,10 +343,13 @@ export async function refreshDailyNews(env: Env, sbd?: string, now = Date.now())
   return { reports, details: d.details, keHoachEm }
 }
 
-export async function parentNews(env: Env, action: string, b: Record<string, unknown>) {
-  const sbd = String(b.sbd ?? '').trim()
-  if (!sbd || !(await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd=?').bind(sbd).first())) {
-    throw new Error('Không tìm thấy số báo danh của con.')
+export async function parentNews(env: Env, action: string, b: Record<string, unknown>, nguon: 'ph' | 'hs' = 'ph') {
+  // 'ph' (mặc định): phụ huynh, token `pass` hoặc SBD trần (giai đoạn mềm, có đếm). 'hs': em đã qua `gameIdentity`, `b.sbd` là SBD từ chữ ký, không đếm.
+  let sbd: string
+  if (nguon === 'ph') sbd = (await sbdCuaPhuHuynh(env, b, 'parent-news')).sbd
+  else {
+    sbd = String(b.sbd ?? '').trim()
+    if (!sbd || !(await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd=?').bind(sbd).first())) throw new Error('Không tìm thấy số báo danh của con.')
   }
   const now = Date.now()
   const { reports } = await refreshDailyNews(env, sbd, now)
@@ -382,7 +386,7 @@ export async function parentNews(env: Env, action: string, b: Record<string, unk
     id,
     tieuDe: `Ôn tập cá nhân hoá ngày ${report.day} · ${finalQuestions.length} câu`,
     dsCau: finalQuestions,
-  })
+  }, { noiBo: true }) // lệnh nội bộ: SBD đã được xác thực ở trên, KHÔNG tính là một lượt truy cập của phụ huynh
 
   return { ok: true, id, questionCount: finalQuestions.length }
 }

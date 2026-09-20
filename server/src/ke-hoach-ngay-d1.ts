@@ -388,7 +388,12 @@ export async function hsKeHoachNgay(env: Env, b: Record<string, unknown>): Promi
 /** `POST /hs/thoi-gian-hoc {token, phut}` — em đặt số phút học mỗi ngày (10–45). Chỉ HẠ mục tiêu, không nâng vượt trần 16. */
 export async function hsThoiGianHoc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = await gameIdentity(env, b)
-  const phut = Math.round(Number(b.phut))
+  return datPhutMoiNgay(env, sbd, b.phut)
+}
+
+/** Đặt số phút học mỗi ngày (10–45) của MỘT em: dùng chung cho em (`/hs/thoi-gian-hoc`) và phụ huynh (`/ph/thoi-gian-hoc`). `sbd` đã được xác thực bởi nơi gọi. */
+export async function datPhutMoiNgay(env: Env, sbd: string, phutTho: unknown): Promise<Record<string, unknown>> {
+  const phut = Math.round(Number(phutTho))
   if (!Number.isFinite(phut) || phut < PHUT_NGAY_TOI_THIEU || phut > PHUT_NGAY_TOI_DA) {
     return { ok: false, error: `Số phút mỗi ngày phải từ ${PHUT_NGAY_TOI_THIEU} đến ${PHUT_NGAY_TOI_DA}.` }
   }
