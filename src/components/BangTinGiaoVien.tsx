@@ -13,6 +13,7 @@ import { layCauHinhMayChu } from '../lib/may-chu-moi'
 import { loadTeacherSecret } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 import { dinhDangDeCayThuMuc } from '../screens/PhanCongScreen'
+import './m3/bang-tin.css' // chữ vàng cố định của bảng vinh danh (1,7:1 trên nền sáng) đọc theo cặp cảnh báo M3 — cùng lớp với Bảng tin HS/PH
 import './BangTinPhuHuynh.css'
 
 type Report = {

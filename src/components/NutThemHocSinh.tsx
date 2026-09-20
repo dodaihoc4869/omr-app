@@ -80,8 +80,8 @@ export default function NutThemHocSinh({ onXong }: { onXong?: (soEm: number, tom
         className="tap-target inline-flex items-center justify-center font-bold whitespace-nowrap"
         style={{
           gap: 'var(--k2)',
-          height: 40,
-          minHeight: 40,
+          height: 44,
+          minHeight: 44,
           padding: '0 var(--k4) 0 var(--k3)',
           borderRadius: 'var(--bo-tron)',
           background: 'var(--the-2)',

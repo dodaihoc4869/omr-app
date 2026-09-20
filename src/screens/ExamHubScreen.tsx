@@ -53,7 +53,7 @@ function NutCapNhat() {
       className="tap-target inline-flex items-center font-bold shadow-xs hover:shadow-sm"
       style={{
         gap: 6,
-        minHeight: 30,
+        minHeight: 44,
         padding: '0 var(--k3)',
         borderRadius: 'var(--bo-tron)',
         border: '1px solid var(--gg-xanh)',

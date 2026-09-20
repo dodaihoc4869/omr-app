@@ -1706,7 +1706,7 @@ export default function ExamMonitorScreen() {
                             type="button"
                             onClick={() => setSbdHoSo(e.sbd)}
                             className="tap-target font-bold inline-flex items-center text-left"
-                            style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)', gap: 2, background: 'none', border: 'none', padding: 0, minHeight: 0, textDecoration: 'underline', textDecorationColor: 'var(--vien-dam)', textUnderlineOffset: 3 }}
+                            style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)', gap: 2, background: 'none', border: 'none', padding: 0, minHeight: 44, textDecoration: 'underline', textDecorationColor: 'var(--vien-dam)', textUnderlineOffset: 3 }}
                           >
                             {e.hoTen || '(chưa có tên)'}
                             <ChevronRight size={14} style={{ color: 'var(--mo)' }} />
@@ -1755,22 +1755,22 @@ export default function ExamMonitorScreen() {
                       </span>
                       <span className="ca-hd">
                           {(l.trangThai === 'khoa' || l.soLanRoiMan > 0) && (
-                            <button type="button" onClick={() => moBaoPhuHuynh(e.sbd, l.hoTen, l)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--cam)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--cam)' }}>
+                            <button type="button" onClick={() => moBaoPhuHuynh(e.sbd, l.hoTen, l)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--cam)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--cam)' }}>
                               Báo phụ huynh
                             </button>
                           )}
                           {l.trangThai === 'khoa' &&
                             (xacNhanMoKhoa === e.sbd ? (
                               <span className="inline-flex items-center" style={{ gap: 4 }}>
-                                <button type="button" onClick={() => handleMoKhoa(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
+                                <button type="button" onClick={() => handleMoKhoa(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
                                   {dangDuyet === e.sbd ? '…' : 'Đồng ý mở khoá'}
                                 </button>
-                                <button type="button" onClick={() => setXacNhanMoKhoa(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
+                                <button type="button" onClick={() => setXacNhanMoKhoa(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
                                   Huỷ
                                 </button>
                               </span>
                             ) : (
-                              <button type="button" onClick={() => setXacNhanMoKhoa(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--do)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--do)' }}>
+                              <button type="button" onClick={() => setXacNhanMoKhoa(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--do)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--do)' }}>
                                 Mở khoá
                               </button>
                             ))}
@@ -1783,16 +1783,16 @@ export default function ExamMonitorScreen() {
                                   Em sẽ vào được bằng MÁY KHÁC (không còn buộc vào máy cũ). Đề mới giữ nguyên; máy cũ cũng vẫn vào được.
                                 </span>
                                 <span className="inline-flex items-center" style={{ gap: 4 }}>
-                                  <button type="button" onClick={() => handleChoVaoMayKhac(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
+                                  <button type="button" onClick={() => handleChoVaoMayKhac(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
                                     {dangDuyet === e.sbd ? '…' : 'Đồng ý cho vào bằng máy khác'}
                                   </button>
-                                  <button type="button" onClick={() => setXacNhanMayKhac(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
+                                  <button type="button" onClick={() => setXacNhanMayKhac(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
                                     Huỷ
                                   </button>
                                 </span>
                               </span>
                             ) : (
-                              <button type="button" onClick={() => setXacNhanMayKhac(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>
+                              <button type="button" onClick={() => setXacNhanMayKhac(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>
                                 Cho vào bằng máy khác
                               </button>
                             ))}
@@ -1806,16 +1806,16 @@ export default function ExamMonitorScreen() {
                                   Xoá hẳn điểm và bài làm lượt này của em, rút đề mới, và em chỉ vào lại được ở đúng máy cũ. Không khôi phục được.
                                 </span>
                                 <span className="inline-flex items-center" style={{ gap: 4 }}>
-                                <button type="button" onClick={() => handleChoThiLai(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--do)', color: 'var(--muc-nguoc)' }}>
+                                <button type="button" onClick={() => handleChoThiLai(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--do)', color: 'var(--muc-nguoc)' }}>
                                   {dangDuyet === e.sbd ? '…' : 'Xoá lượt cũ và cho thi lại'}
                                 </button>
-                                <button type="button" onClick={() => setXacNhanSbd(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
+                                <button type="button" onClick={() => setXacNhanSbd(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
                                   Huỷ
                                 </button>
                                 </span>
                               </span>
                             ) : (
-                              <button type="button" onClick={() => setXacNhanSbd(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 32, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>
+                              <button type="button" onClick={() => setXacNhanSbd(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>
                                 Cho thi lại
                               </button>
                             ))}

@@ -330,3 +330,31 @@
     transition: none;
   }
 }
+
+/* G6 · vùng chạm: điện thoại ≥ 44 px (nút, tab, tiêu đề mở/gập, ô nhập); máy tính ≥ 40 px cho ô nhập và tiêu đề mở/gập (nút đã 40 ở trên). Chỉ CHIỀU CAO — bề rộng
+ * để từng màn quyết. Ô tích (checkbox/radio) và thanh trượt giữ nguyên; giá trị nội tuyến `minHeight` của từng màn thắng luật này (đã nâng lên 44 ở đó). */
+.vo-thay .giua-noi-dung summary {
+  padding-block: 10px;
+}
+@media (min-width: 880px) {
+  .vo-thay .giua-noi-dung button {
+    min-width: 40px;
+  }
+}
+.vo-thay .giua-noi-dung input:not([type='checkbox'], [type='radio'], [type='range'], [type='hidden']),
+.vo-thay .giua-noi-dung select {
+  min-height: 40px;
+}
+@media (max-width: 879px) {
+  .vo-thay .giua-noi-dung :is(button, [role='tab'], [role='menuitem']) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .vo-thay .giua-noi-dung summary {
+    min-height: 44px;
+  }
+  .vo-thay .giua-noi-dung input:not([type='checkbox'], [type='radio'], [type='range'], [type='hidden']),
+  .vo-thay .giua-noi-dung select {
+    min-height: 44px;
+  }
+}

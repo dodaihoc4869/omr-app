@@ -67,8 +67,8 @@ export default function NutDongBo({ onXong, className = '' }: { onXong?: (kq: Ke
       className={`tap-target inline-flex items-center justify-center font-bold whitespace-nowrap ${className}`}
       style={{
         gap: 'var(--k2)',
-        height: 40,
-        minHeight: 40,
+        height: 44,
+        minHeight: 44,
         padding: '0 var(--k4) 0 var(--k3)',
         borderRadius: 'var(--bo-tron)',
         background: mau.nen,

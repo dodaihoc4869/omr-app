@@ -44,6 +44,8 @@
 .hn-tim input {
   flex: 1;
   min-width: 0;
+  align-self: stretch;
+  min-height: 44px;
   border: 0;
   outline: 0;
   background: transparent;

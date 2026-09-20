@@ -596,7 +596,7 @@ export default function HocSinhScreen() {
                           background: 'none',
                           border: 'none',
                           padding: 0,
-                          minHeight: 0,
+                          minHeight: 44,
                           textDecoration: 'underline',
                           textDecorationColor: 'var(--vien-dam)',
                           textUnderlineOffset: 3,
