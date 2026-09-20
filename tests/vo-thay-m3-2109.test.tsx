@@ -6,7 +6,7 @@ import path from 'node:path'
 import ThanhBenTrai, { MUC_DIEU_HUONG, mucDangSang } from '../src/components/ThanhBenTrai'
 import BottomNav from '../src/components/BottomNav'
 import { useAppStore } from '../src/store/appStore'
-import { apDungGiaoDien, datGiaoDien, docGiaoDien, KHOA_GIAO_DIEN } from '../src/lib/giao-dien-thay'
+import { apDungGiaoDien, datGiaoDien, docGiaoDien, KHOA_GIAO_DIEN, vietLaiMedia } from '../src/lib/giao-dien-thay'
 
 vi.mock('../src/components/KhoiMayChuMoi', () => ({ default: () => <div>khối máy chủ</div> }))
 vi.mock('../src/components/KhoiMatKhauApp', () => ({ default: () => <div>khối mật khẩu</div> }))
@@ -153,5 +153,57 @@ describe('giao diện sáng / tối / theo máy', () => {
     expect(document.documentElement.getAttribute('data-giao-dien')).toBe('toi')
     fireEvent.click(screen.getByRole('radio', { name: 'Theo máy' }))
     expect(document.documentElement.hasAttribute('data-giao-dien')).toBe(false)
+  })
+})
+
+describe('ép sáng / tối: viết lại điều kiện `prefers-color-scheme` của mọi luật (một nguồn màu, không bản sao)', () => {
+  it('vietLaiMedia: tối → dark đúng, light sai; sáng → ngược lại; theo máy → nguyên văn; giữ điều kiện đi kèm và cả dạng viết liền', () => {
+    const D = '(prefers-color-scheme: dark)'
+    const L = '(prefers-color-scheme:light)'
+    expect(vietLaiMedia(D, 'toi')).toBe('(min-width: 0px)')
+    expect(vietLaiMedia(D, 'sang')).toBe('(min-width: 999999px)')
+    expect(vietLaiMedia(L, 'toi')).toBe('(min-width: 999999px)')
+    expect(vietLaiMedia(L, 'sang')).toBe('(min-width: 0px)')
+    expect(vietLaiMedia(D, 'may')).toBe(D)
+    expect(vietLaiMedia('(min-width: 880px) and (prefers-color-scheme: dark)', 'toi')).toBe('(min-width: 880px) and (min-width: 0px)')
+    expect(vietLaiMedia('print', 'toi')).toBe('print')
+  })
+
+  it('áp dụng lên tờ kiểu THẬT: khối dark bị viết lại khi ép, và trả về nguyên văn khi chọn theo máy', () => {
+    const st = document.createElement('style')
+    st.textContent = '@media (prefers-color-scheme: dark) { .x { color: red } } @media (min-width: 10px) { .y { color: blue } }'
+    document.head.appendChild(st)
+    const goc = () => (Array.from(st.sheet!.cssRules) as CSSMediaRule[]).map((r) => r.media.mediaText)
+    const truoc = goc()
+    apDungGiaoDien('sang')
+    expect(goc()[0]).not.toContain('prefers-color-scheme')
+    expect(goc()[0]).toContain('999999')
+    expect(goc()[1]).toBe(truoc[1]) // khối không liên quan không đụng tới
+    apDungGiaoDien('toi')
+    expect(goc()[0]).toContain('(min-width: 0px)')
+    apDungGiaoDien('may')
+    expect(goc()[0]).toBe(truoc[0])
+    st.remove()
+  })
+})
+
+describe('G1c: token M3 cho lớp CSS của màn thầy', () => {
+  it('exam-setup.css hết mã hex, bốn bước dùng bốn vai trò M3 (không còn Google 4 màu); teacher-layout.css dùng --m3-primary thay --gg-xanh', () => {
+    const es = doc('src/screens/exam-setup.css')
+    expect(es).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+    for (const [id, vai] of [['setup-source', 'primary'], ['setup-info', 'tertiary'], ['setup-people', 'secondary'], ['setup-wait', 'error']]) expect(es).toContain(`#${id}>summary{border-left-color:var(--m3-${vai})}`)
+    const tl = doc('src/styles/teacher-layout.css')
+    expect(tl).not.toContain('--gg-xanh')
+    expect(tl).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+    expect(tl).toContain('var(--m3-primary)')
+  })
+
+  it('bộ sinh lớp tương thích quét các màn giáo viên: m3-tuong-thich.css có luật cho lớp màu của họ và vẫn chỉ dưới `.m3 `', () => {
+    const css = doc('src/components/m3/m3-tuong-thich.css')
+    expect(css).toContain('ExamSetupScreen.tsx')
+    expect(css).toContain('GoiLenBangScreen.tsx')
+    const dong = css.split('\n').map((l) => l.trim()).filter((l) => l.includes('{') && !l.startsWith('/*') && !l.startsWith('*') && !l.startsWith('@'))
+    expect(dong.length).toBeGreaterThan(100)
+    for (const l of dong) for (const sel of l.split('{')[0].split(',')) expect(sel.trim().startsWith('.m3 '), sel).toBe(true)
   })
 })
