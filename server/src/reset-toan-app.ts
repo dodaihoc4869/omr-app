@@ -1,37 +1,33 @@
-// RESET TOÀN APP — 00:01 giờ Việt Nam thứ Hai 21/09/2026, MỘT LẦN (thầy chốt 19/09: "reset toàn app xoá hết ca thi và toàn bộ dữ liệu vào 00:01 thứ 2
-// để app mới hoàn toàn công bằng cho học sinh"; 0.Planer duyệt bảng phân loại 58 bảng).
+// RESET TOÀN APP — MỘT LẦN, CHẠY THEO LỆNH (thầy chốt 19/09 rồi ĐỔI 21/09 00:08: "tiếp tục tới khi xong hết thì tiến hành reset luôn, cho chọn lại thú, xoá hết mọi ca thi
+// và btvn nhưng GIỮ LẠI toàn bộ hồ sơ mạnh yếu của học sinh đã kiểm tra trước đó").
+//
+// XOÁ: mọi ca thi/lượt/điểm, BTVN, bài Mẹ giao, luyện đề, kế hoạch ngày, trao đổi, game + thần thú + EXP + mảnh khiên (chọn lại thú), vinh danh, bảng tin phụ huynh.
+// GIỮ: tài khoản/mật khẩu, lớp, kho đề, cấu hình, VÀ SỔ + HỒ SƠ MẠNH YẾU (`su_kien_hoc`, `nam_kt_cau`, `nam_kt_dang`, `tien_do_hs`, `qid_da_lam`). `su_kien_hoc` là NGUỒN của hồ sơ
+// (hồ sơ được dựng lại từ sổ sau mỗi lần nộp): xoá sổ mà giữ hồ sơ thì lần dựng lại đầu tiên xoá sạch hồ sơ của em.
 //
 // AN TOÀN, theo thứ tự:
 //   · Hai danh sách CỐ ĐỊNH `BANG_XOA` / `BANG_GIU`: job CHỈ xoá bảng trong `BANG_XOA` (tên đi vào SQL chỉ từ hằng này, có kiểm định dạng). Bảng nào có trong D1 mà không
 //     thuộc danh sách nào (`chuaPhanLoai`) thì KHÔNG bị đụng và được báo cáo; test khoá "mọi bảng của lược đồ phải được phân loại" nên thêm bảng mới là buộc phải quyết.
 //   · Bảng trong danh sách mà chưa tồn tại (chưa chạy migration) thì BỎ QUA, không làm chết job. Bảng WITHOUT ROWID xoá bằng `DELETE FROM "t"` (không dùng rowid).
-//   · AN TOÀN MẶC ĐỊNH: job CHỈ chạy (và cổng đóng băng CHỈ bật) khi `cau_hinh.reset_20260921_cho_phep` = true ("cờ lên đạn", do 0.Planer/thầy bật tối Chủ nhật sau khi sao lưu
-//     và chạy thử khớp). Không có cờ ⇒ không xoá gì, không đóng băng gì. CỜ HUỶ `cau_hinh.reset_20260921_huy` THẮNG cờ cho phép.
-//   · MỘT LẦN: khoá `cau_hinh.reset_20260921` giành bằng INSERT OR IGNORE (hai cron 17:01 UTC và mỗi phút không chạy đôi). Khoá `xong` thì không bao giờ chạy lại.
-//   · HẠN TỰ CHẠY: cron chỉ được bắt đầu/tiếp tục trong [00:01, 01:00] giờ VN 21/09. Quá 01:00 mà chưa `xong` ⇒ `qua_gio`, KHÔNG tự chạy nữa, mở băng; chỉ lệnh của thầy
-//     `/reset/chay-tiep` (mã bí mật) chạy tiếp được. (Job tự tiếp tục lúc 08:00 sẽ xoá bài các em vừa làm sáng thứ Hai.)
+//   · AN TOÀN MẶC ĐỊNH — CỜ LÊN ĐẠN `cau_hinh.reset_toan_app_cho_phep` = true: chỉ khi có cờ, job mới chạy và cổng đóng băng mới bật. Không cờ ⇒ không xoá gì, không đóng băng gì.
+//     Lúc lên đạn = `cap_nhat_luc` của dòng cờ. CỜ HUỶ `cau_hinh.reset_toan_app_huy` THẮNG cờ cho phép.
+//   · MỘT LẦN: khoá `cau_hinh.reset_toan_app` giành bằng INSERT OR IGNORE (hai lượt cron không chạy đôi). Khoá `xong` thì không bao giờ chạy lại.
+//   · CỬA SỔ TỰ CHẠY + ĐÓNG BĂNG = 60 phút kể từ lúc lên đạn (mở sớm ngay khi xong). Quá hạn mà chưa `xong` ⇒ `qua_gio`, KHÔNG tự chạy nữa; chỉ lệnh tay `/reset/chay-tiep` (mã bí mật).
 //   · NGÂN SÁCH TRUY VẤN: mỗi lượt gọi Worker ≤ TOI_DA_TRUY_VAN_MOI_LUOT (40, đúng cho cả gói Free 50) truy vấn D1; job CHIA BƯỚC, hết ngân sách thì ghi `cho_tiep` và lượt cron phút sau
 //     tiếp tục NGAY. Mọi truy vấn đi qua bộ đếm; test đo độc lập.
 //   · CHẠY THỬ: `resetDryRun` chỉ đếm, không ghi gì, ≤ 40 truy vấn.
 //   · Sao lưu: trước khi xoá, khoá ghi `batDauLuc` (mốc D1 Time Travel) và `demTruoc` (số dòng từng bảng); tập mã đã dùng nạp vào `ma_da_dung` TRƯỚC khi xoá `ca`.
-//     Ngoài job: bản export .sql tối Chủ nhật và R2 giữ nguyên (docs/reset-2109.md).
-//   · KHÔNG đụng: tài khoản/mật khẩu/token (`hoc_sinh`), danh sách lớp, kho đề/câu hỏi, chỉ mục game, cấu hình thầy, cài đặt em, đăng ký push, thống kê dùng app, R2.
+//     Ngoài job: bản export .sql do Boss ra lệnh và R2 giữ nguyên (docs/reset-2109.md).
+//   · EXP sau reset: `exp_moi.tu` = `batDauLuc` nên sổ cũ KHÔNG sinh EXP; câu cũ từng sai nay làm đúng vẫn "lên bậc" (sổ giữ, `exp-d1.ts` coi sự kiện `thi` của ca đã bị xoá là ĐÃ công bố).
+//   · KHÔNG đụng: tài khoản/mật khẩu/token (`hoc_sinh`), danh sách lớp, kho đề/câu hỏi, chỉ mục game, cấu hình thầy, cài đặt em, đăng ký push, thống kê dùng app, sổ + hồ sơ mạnh yếu, R2.
 import type { D1PreparedStatement, Env } from './kieu'
 
-export const MA_RESET = 'reset_20260921'
-export const KHOA_HUY = 'reset_20260921_huy'
-/** CỜ LÊN ĐẠN: không có cờ này = true thì job không chạy và không đóng băng. */
-export const KHOA_CHO_PHEP = 'reset_20260921_cho_phep'
-/** 00:01 giờ VN thứ Hai 21/09/2026. */
-export const MOC_RESET = '2026-09-20T17:01:00.000Z'
-export const MOC_RESET_MS = Date.parse(MOC_RESET)
-/** Giá trị máy khách nhận (`mocReset`) SAU KHI job xong. */
-export const MOC_RESET_CHUOI = '2026-09-21'
-export const MUA_MOI = { id: '2026-09-21-mua-1', startedAt: MOC_RESET }
-/** Đóng băng ghi từ 00:00 tới khi `xong` HOẶC 01:00 giờ VN (không mở băng giữa chừng khi job đang xoá dở). */
-export const DONG_BANG_TU_MS = Date.parse('2026-09-20T17:00:00.000Z')
-/** HẠN TỰ CHẠY: 01:00 giờ VN. Quá hạn mà chưa xong ⇒ `qua_gio`, không tự chạy nữa. */
-export const HAN_TU_CHAY_MS = Date.parse('2026-09-20T18:00:00.000Z')
+export const MA_RESET = 'reset_toan_app'
+export const KHOA_HUY = 'reset_toan_app_huy'
+/** CỜ LÊN ĐẠN: không có cờ này = true thì job không chạy và không đóng băng. `cap_nhat_luc` của dòng = lúc lên đạn. */
+export const KHOA_CHO_PHEP = 'reset_toan_app_cho_phep'
+/** Cửa sổ tự chạy + đóng băng kể từ lúc lên đạn. */
+export const CUA_SO_MS = 60 * 60_000
 /** Job coi là chết nếu quá ngần này không có nhịp tim (trạng thái `dang_chay`). Trạng thái `cho_tiep` (nhường) được tiếp tục ngay. */
 export const QUA_HAN_DANG_CHAY_MS = 3 * 60_000
 /** Trần truy vấn D1 mỗi lượt gọi Worker: 40 đúng cho cả gói Free (50). */
@@ -40,9 +36,9 @@ const DU_TRU_GHI_KHOA = 1
 const CHI_PHI_NAP_MA = 12
 const CHI_PHI_CHOT = 6
 const XOA_MOI_LENH = 4000
-/** Cron thôi hỏi khoá sau hạn này thêm ngần này (đủ để ghi `qua_gio`). */
-const CRON_HOI_THEM_MS = 2 * 3_600_000
 const COT_MOI_TRUY_VAN_DEM = 60
+/** Bộ nhớ đệm đọc cờ/khoá trong isolate (mở băng sớm: không lâu hơn ngần này). */
+const HAN_DEM_MS = 3000
 
 /** XOÁ — theo lệnh thầy. */
 export const BANG_XOA: readonly string[] = [
@@ -50,14 +46,14 @@ export const BANG_XOA: readonly string[] = [
   'ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'dong_bo', 'nop_khac_phuc',
   // BTVN, bài giao, luyện đề
   'btvn', 'btvn_em', 'btvn_em_lich_su', 'mom_bai', 'luyen_de_2026', 'yeu_cau_giao_bai', 'study_drafts',
-  // Sổ học và hồ sơ
-  'su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'ke_hoach_ngay', 'tien_do_hs', 'tien_do_ca', 'qid_da_lam', 'len_bang',
+  // Kế hoạch ngày và tiến độ theo ca (SỔ + HỒ SƠ MẠNH YẾU được GIỮ, xem BANG_GIU)
+  'ke_hoach_ngay', 'tien_do_ca', 'len_bang',
   // Trao đổi
   'tin_nhan', 'cau_hoi_em', 'student_notice', 'student_push_delivery',
   // Game, thần thú, EXP
   'game_v2_profile', 'game_v2_attempt', 'game_v2_reward', 'game_v2_room', 'game_v2_session', 'game_v2_task', 'than_thu', 'vo_dai_phong', 'vo_dai_moi', 'exp_so', 'manh_khien_so',
-  // Đoàn Hộ Tống (bảng mới của Code 5; mùa 1 tính từ 21/09)
-  'doan_chang', 'doan_luot', 'doan_tiep_suc',
+  // Đoàn Hộ Tống (bảng của Code 5; mùa 1 tính từ ngày reset). `doan_ve_so` = vé sinh từ sổ EXP (exp_so bị xoá thì vé cũng phải xoá); `doan_trum_lop` = đóng góp trùm lớp.
+  'doan_chang', 'doan_luot', 'doan_tiep_suc', 'doan_ve_so', 'doan_trum_lop',
   // Vinh danh, tin phụ huynh
   'daily_honors', 'parent_daily_news',
 ]
@@ -66,6 +62,10 @@ export const BANG_XOA: readonly string[] = [
 export const BANG_GIU: readonly string[] = [
   'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
   'study_preferences', 'student_push', 'app_presence', 'ma_da_dung',
+  // Đếm truy cập cổng phụ huynh (token PH giai đoạn mềm): số liệu vận hành, không thuộc dữ liệu học của em
+  'ph_truy_cap',
+  // SỔ + HỒ SƠ MẠNH YẾU của học sinh (thầy chốt 21/09 00:08: giữ lại toàn bộ hồ sơ mạnh yếu đã kiểm tra)
+  'su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'tien_do_hs', 'qid_da_lam',
 ]
 
 const TEN_HOP_LE = /^[a-z][a-z0-9_]*$/
@@ -82,6 +82,8 @@ export interface TrangThaiReset {
   /** Chỉ số (trong BANG_XOA) bảng sẽ xoá tiếp. */
   bangTiep: number
   batDauLuc: string
+  /** Lúc lên đạn (`cap_nhat_luc` của dòng cờ) khi job bắt đầu. */
+  lenDanLuc?: string
   tiepTucLuc?: string
   soLanChay: number
   demTruoc: Record<string, number | null>
@@ -92,6 +94,10 @@ export interface TrangThaiReset {
   demSau?: Record<string, number | null>
   xoaConDu?: Record<string, number>
   xongLuc?: string
+  /** Ngày VN lúc XONG ("YYYY-MM-DD"): giá trị `mocReset` máy khách nhận. */
+  mocReset?: string
+  /** Mùa game mới đã đặt (`<ngày VN lúc bắt đầu>-mua-1`). */
+  mua?: string
   quaGioLuc?: string
   soEm?: number
   loi?: string
@@ -125,36 +131,74 @@ async function docGiaTri(env: Env, khoa: string): Promise<string | null> {
   }
 }
 
-function laCoBat(v: string | null, truong: string): boolean {
-  if (v === null) return false
-  const s = v.trim().toLowerCase()
-  if (s === 'true' || s === '1') return true
+function laCoBat(v: string | null | undefined, truong: string): boolean {
+  if (v === null || v === undefined) return false
+  const t = String(v).trim().toLowerCase()
+  if (t === 'true' || t === '1') return true
   try {
-    const o = JSON.parse(v) as unknown
+    const o = JSON.parse(String(v)) as unknown
     return o === true || (typeof o === 'object' && o !== null && (o as Record<string, unknown>)[truong] === true)
   } catch {
     return false
   }
 }
 
-/** Cờ HUỶ (thắng cờ cho phép). */
+/** `cap_nhat_luc` của cau_hinh có thể là ISO ("…T…Z") hoặc `datetime('now')` của SQLite ("YYYY-MM-DD HH:MM:SS", UTC không có Z): cả hai đều đọc ra mốc UTC. */
+export function docMocCauHinh(v: unknown): number | null {
+  const t = String(v ?? '').trim()
+  if (!t) return null
+  const chuan = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\.\d+)?$/.test(t) ? `${t.replace(' ', 'T')}Z` : t
+  const ms2 = Date.parse(chuan)
+  return Number.isFinite(ms2) ? ms2 : null
+}
+
+export interface TrangThaiChung {
+  choPhep: boolean
+  huy: boolean
+  /** Lúc lên đạn (ms) = `cap_nhat_luc` của dòng cờ cho phép; null nếu không có cờ. */
+  lenDanMs: number | null
+  khoa: TrangThaiReset | null
+}
+
+/** MỘT truy vấn đọc cả ba dòng (cờ cho phép, cờ huỷ, khoá). Lỗi/thiếu bảng → coi như KHÔNG lên đạn. */
+async function docTrangThaiChung(env: Env): Promise<TrangThaiChung> {
+  const ra: TrangThaiChung = { choPhep: false, huy: false, lenDanMs: null, khoa: null }
+  try {
+    const r = await env.DB.prepare('SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (?, ?, ?)').bind(KHOA_CHO_PHEP, KHOA_HUY, MA_RESET).all<{ khoa: string; gia_tri: string | null; cap_nhat_luc: string | null }>()
+    for (const x of r.results ?? []) {
+      if (x.khoa === KHOA_CHO_PHEP) { ra.choPhep = laCoBat(x.gia_tri, 'choPhep'); ra.lenDanMs = docMocCauHinh(x.cap_nhat_luc) }
+      else if (x.khoa === KHOA_HUY) ra.huy = laCoBat(x.gia_tri, 'huy')
+      else if (x.khoa === MA_RESET && x.gia_tri) {
+        try { const o = JSON.parse(x.gia_tri) as TrangThaiReset; if (o && typeof o === 'object') ra.khoa = o } catch { /* khoá hỏng: coi như chưa có */ }
+      }
+    }
+  } catch { /* chưa có bảng cau_hinh */ }
+  return ra
+}
+
+const boNhoChung = new WeakMap<object, { at: number; v: TrangThaiChung }>()
+
+/** Bản đọc ĐỆM HAN_DEM_MS trong isolate cho cổng đóng băng và `mocReset` (mỗi request một truy vấn quá tốn). */
+async function docTrangThaiChungDem(env: Env, nowMs: number): Promise<TrangThaiChung> {
+  // `env.DB` có thể là đối tượng D1 giả thô trong test (không phải object): chỉ đệm khi làm khoá WeakMap được.
+  const dungDem = !!env.DB && (typeof env.DB === 'object' || typeof env.DB === 'function')
+  const c = dungDem ? boNhoChung.get(env.DB) : undefined
+  if (c && nowMs >= c.at && nowMs - c.at < HAN_DEM_MS) return c.v
+  const v = await docTrangThaiChung(env)
+  if (dungDem) boNhoChung.set(env.DB, { at: nowMs, v })
+  return v
+}
+
 export async function laHuy(env: Env): Promise<boolean> {
-  return laCoBat(await docGiaTri(env, KHOA_HUY), 'huy')
+  return (await docTrangThaiChung(env)).huy
 }
 /** Cờ LÊN ĐẠN: chỉ khi `true` job mới chạy và cổng đóng băng mới bật. */
 export async function laChoPhep(env: Env): Promise<boolean> {
-  return laCoBat(await docGiaTri(env, KHOA_CHO_PHEP), 'choPhep')
+  return (await docTrangThaiChung(env)).choPhep
 }
 
 export async function docTrangThaiReset(env: Env): Promise<TrangThaiReset | null> {
-  const v = await docGiaTri(env, MA_RESET)
-  if (!v) return null
-  try {
-    const o = JSON.parse(v) as TrangThaiReset
-    return o && typeof o === 'object' ? o : null
-  } catch {
-    return null
-  }
+  return (await docTrangThaiChung(env)).khoa
 }
 
 interface ThongTinBang {
@@ -256,8 +300,10 @@ export async function maDaDungTrong(env: Env, loai: 'ca' | 'btvn' | 'mom', dsMa:
 export interface KetQuaDryRun {
   ok: true
   dryRun: true
-  mocLuc: string
-  hanTuChay: string
+  /** Lúc lên đạn (ISO) nếu có cờ; null nếu chưa lên đạn. */
+  lenDanLuc: string | null
+  /** Hạn tự chạy + đóng băng (ISO) = lên đạn + 60 phút; null nếu chưa lên đạn. */
+  hanTuChay: string | null
   /** Job sẵn sàng về KỸ THUẬT (đủ bảng/migration)? false thì `lyDo` nói thiếu gì — biết NGAY ở dryRun, đừng đợi tới 00:01. */
   sanSang: boolean
   lyDo: string[]
@@ -284,7 +330,8 @@ export async function resetDryRun(envGoc: Env): Promise<KetQuaDryRun> {
   const demBang = await demCacBang(env, hienCo)
   const phanLoai = new Set([...BANG_XOA, ...BANG_GIU])
   const ma = await docMaDaDung(env, hienCo)
-  const khoa = await docTrangThaiReset(env)
+  const chung = await docTrangThaiChung(env)
+  const khoa = chung.khoa
   const lyDo: string[] = []
   if (!hienCo.has('ma_da_dung')) lyDo.push('Chưa chạy migration-1909-ma-da-dung.sql (bảng ma_da_dung): job sẽ DỪNG, không xoá gì')
   if (!hienCo.has('cau_hinh')) lyDo.push('Thiếu bảng cau_hinh (khoá, cờ)')
@@ -293,12 +340,12 @@ export async function resetDryRun(envGoc: Env): Promise<KetQuaDryRun> {
   const ra: KetQuaDryRun = {
     ok: true,
     dryRun: true,
-    mocLuc: MOC_RESET,
-    hanTuChay: new Date(HAN_TU_CHAY_MS).toISOString(),
+    lenDanLuc: chung.lenDanMs === null ? null : new Date(chung.lenDanMs).toISOString(),
+    hanTuChay: chung.lenDanMs === null ? null : new Date(chung.lenDanMs + CUA_SO_MS).toISOString(),
     sanSang: lyDo.length === 0,
     lyDo,
-    choPhep: await laChoPhep(env),
-    huy: await laHuy(env),
+    choPhep: chung.choPhep,
+    huy: chung.huy,
     daXong: khoa?.trangThai === 'xong',
     trangThaiKhoa: khoa,
     xoa,
@@ -342,10 +389,9 @@ export interface TuyChonChayReset {
   tay?: boolean
 }
 
-/** Mở băng và bật `mocReset` NGAY trong isolate này (isolate khác trễ tối đa vài giây của bộ nhớ đệm). */
+/** Mở băng và bật `mocReset` NGAY trong isolate này (isolate khác trễ tối đa HAN_DEM_MS). */
 function boNhoLai(envGoc: Env): void {
-  boNhoDong.delete(envGoc.DB)
-  boNhoMoc.delete(envGoc.DB)
+  if (envGoc.DB && (typeof envGoc.DB === 'object' || typeof envGoc.DB === 'function')) boNhoChung.delete(envGoc.DB)
 }
 
 /**
@@ -356,13 +402,15 @@ export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChay
   const { env, dem } = boDemTruyVan(envGoc)
   const kq = (r: Omit<KetQuaChayReset, 'soTruyVan'>): KetQuaChayReset => ({ ...r, soTruyVan: dem() })
   const tay = tuyChon.tay === true
-  if (nowMs < MOC_RESET_MS) return kq({ chay: false, lyDo: 'chua_toi_gio' })
-  if (await laHuy(env)) return kq({ chay: false, lyDo: 'huy' })
-  if (!(await laChoPhep(env))) return kq({ chay: false, lyDo: 'khong_cho_phep' })
-  const cu = await docTrangThaiReset(env)
+  const chung = await docTrangThaiChung(env) // MỘT truy vấn đọc cờ cho phép + cờ huỷ + khoá (bỏ qua bộ nhớ đệm)
+  if (chung.huy) return kq({ chay: false, lyDo: 'huy' })
+  if (!chung.choPhep || chung.lenDanMs === null) return kq({ chay: false, lyDo: 'khong_cho_phep' })
+  const cu = chung.khoa
   if (cu?.trangThai === 'xong') return kq({ chay: false, lyDo: 'da_xong', trangThai: cu })
-  if (!tay && nowMs > HAN_TU_CHAY_MS) {
-    // Quá 01:00 mà chưa xong: KHÔNG tự chạy nữa (chạy lúc 08:00 là xoá bài các em vừa làm). Ghi `qua_gio` một lần, mở băng.
+  if (nowMs < chung.lenDanMs) return kq({ chay: false, lyDo: 'chua_toi_gio' })
+  const hanMs = chung.lenDanMs + CUA_SO_MS
+  if (!tay && nowMs > hanMs) {
+    // Quá 60 phút kể từ lúc lên đạn mà chưa xong: KHÔNG tự chạy nữa (chạy muộn là xoá bài các em vừa làm). Ghi `qua_gio` một lần, mở băng.
     if (cu && cu.trangThai !== 'qua_gio') {
       const st: TrangThaiReset = { ...cu, trangThai: 'qua_gio', quaGioLuc: new Date(nowMs).toISOString() }
       await ghiKhoa(env, st)
@@ -380,7 +428,7 @@ export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChay
     const muaCu = hienCo.has('game_v2_settings') ? await env.DB.prepare("SELECT json FROM game_v2_settings WHERE key = 'season'").first<{ json: string }>().then((r) => r?.json ?? null).catch(() => null) : null
     const expMoiCu = await docGiaTri(env, 'exp_moi')
     const luc = new Date(nowMs).toISOString()
-    st = { trangThai: 'dang_chay', buoc: 'nap_ma', bangTiep: 0, batDauLuc: luc, tiepTucLuc: luc, soLanChay: 1, demTruoc, muaCu, expMoiCu }
+    st = { trangThai: 'dang_chay', buoc: 'nap_ma', bangTiep: 0, batDauLuc: luc, lenDanLuc: new Date(chung.lenDanMs).toISOString(), tiepTucLuc: luc, soLanChay: 1, demTruoc, muaCu, expMoiCu }
     const g = await env.DB.prepare('INSERT OR IGNORE INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?)').bind(MA_RESET, json(st), luc).run()
     if (!g.meta?.changes) return kq({ chay: false, lyDo: 'dang_chay' })
   } else {
@@ -427,17 +475,21 @@ export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChay
       }
       // Chốt: mùa game mới + EXP mới cho MỌI em từ đúng mốc (bỏ cờ riêng dsSbd/tuDsSbd), đếm lại, ghi `xong`.
       if (!conNganSach(CHI_PHI_CHOT)) return await nhuong()
+      const ngayVn = new Date(ms(st.batDauLuc) + 7 * 3_600_000).toISOString().slice(0, 10)
+      st.mua = `${ngayVn}-mua-1`
       if (hienCo.has('game_v2_settings')) {
-        await env.DB.prepare("INSERT INTO game_v2_settings (key, json) VALUES ('season', ?) ON CONFLICT(key) DO UPDATE SET json = excluded.json").bind(json(MUA_MOI)).run()
+        await env.DB.prepare("INSERT INTO game_v2_settings (key, json) VALUES ('season', ?) ON CONFLICT(key) DO UPDATE SET json = excluded.json").bind(json({ id: st.mua, startedAt: st.batDauLuc })).run()
       }
+      // EXP mới cho MỌI em từ đúng lúc bắt đầu (bỏ cờ riêng dsSbd/tuDsSbd): sổ cũ nằm TRƯỚC `tu` nên không sinh EXP; câu cũ từng sai nay làm đúng vẫn lên bậc.
       await env.DB.prepare('INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
-        .bind('exp_moi', json({ tu: MOC_RESET, toanBo: true }), new Date(nowMs).toISOString()).run()
+        .bind('exp_moi', json({ tu: st.batDauLuc, toanBo: true }), new Date(nowMs).toISOString()).run()
       st.demSau = await demCacBang(env, await docBangHienCo(env))
       const conDu: Record<string, number> = {}
       for (const t of BANG_XOA) if ((st.demSau[t] ?? 0) > 0) conDu[t] = st.demSau[t] as number
       if (Object.keys(conDu).length) st.xoaConDu = conDu // bảng XOÁ còn dòng do em/thầy ghi trong lúc chạy; báo, không coi là lỗi
       st.soEm = st.demTruoc.hoc_sinh ?? 0
       st.xongLuc = new Date(nowMs).toISOString()
+      st.mocReset = new Date(nowMs + 7 * 3_600_000).toISOString().slice(0, 10) // ngày VN lúc XONG
       st.trangThai = 'xong'
       await ghiKhoa(env, st)
       boNhoLai(envGoc)
@@ -451,10 +503,8 @@ export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChay
   }
 }
 
-/** Cho cron: bỏ qua rất nhanh (0 truy vấn) khi chưa tới mốc hoặc đã quá lâu sau hạn. Không ném lỗi. */
+/** Cho cron (mỗi phút): MỘT truy vấn đọc cờ khi chưa lên đạn / đã xong, rồi bỏ qua. Không ném lỗi. */
 export async function chayResetNeuDenGio(env: Env, nowMs: number): Promise<KetQuaChayReset> {
-  if (nowMs < MOC_RESET_MS) return { chay: false, lyDo: 'chua_toi_gio', soTruyVan: 0 }
-  if (nowMs > HAN_TU_CHAY_MS + CRON_HOI_THEM_MS) return { chay: false, lyDo: 'qua_gio', soTruyVan: 0 }
   try {
     return await chayReset(env, nowMs)
   } catch (e) {
@@ -474,47 +524,35 @@ export async function chayTiepTay(env: Env, nowMs: number): Promise<KetQuaChayRe
 
 // --- Đóng băng và mốc cho máy khách ---------------------------------------------------------------------------
 
-const boNhoDong = new WeakMap<object, { at: number; dong: boolean }>()
-const boNhoMoc = new WeakMap<object, { at: number; giaTri: string | null }>()
-
 /**
- * Đang ĐÓNG BĂNG GHI? Chỉ trong [00:00, 01:00] giờ VN, và chỉ khi CÓ cờ cho phép, KHÔNG huỷ, job CHƯA `xong`/`qua_gio` (xong sớm thì mở ngay; đang xoá dở thì KHÔNG mở giữa chừng).
- * Ngoài cửa sổ: không truy vấn gì. Lỗi đọc khoá → không đóng băng (đừng làm cả trường kẹt vì một lần D1 chập chờn).
+ * Đang ĐÓNG BĂNG GHI? Khi CÓ cờ lên đạn, KHÔNG huỷ, đã tới lúc lên đạn, trong 60 phút kể từ lúc lên đạn, và job CHƯA `xong` (xong sớm thì mở ngay; đang xoá dở thì KHÔNG mở
+ * giữa chừng). Không có cờ ⇒ không bao giờ đóng băng. Một truy vấn đọc gộp có bộ nhớ đệm 3 giây trong isolate. Lỗi đọc → không đóng băng.
  */
 export async function dangLamMoi(env: Env, nowMs: number): Promise<boolean> {
-  if (nowMs < DONG_BANG_TU_MS || nowMs > HAN_TU_CHAY_MS) return false
-  const c = boNhoDong.get(env.DB)
-  if (c && nowMs - c.at < 2000 && nowMs >= c.at) return c.dong
-  let dong = false
   try {
-    if (await laChoPhep(env) && !(await laHuy(env))) {
-      const t = (await docTrangThaiReset(env))?.trangThai
-      dong = t !== 'xong' && t !== 'qua_gio'
-    }
+    const c = await docTrangThaiChungDem(env, nowMs)
+    if (!c.choPhep || c.huy || c.lenDanMs === null) return false
+    if (nowMs < c.lenDanMs || nowMs > c.lenDanMs + CUA_SO_MS) return false
+    // `qua_gio` chỉ được ghi SAU khi cửa sổ đã hết; lên đạn LẠI (cờ mới) mở cửa sổ mới và cron tiếp tục job, nên trong cửa sổ mới vẫn phải đóng băng. Chỉ `xong` mới mở.
+    return c.khoa?.trangThai !== 'xong'
   } catch {
-    dong = false
+    return false
   }
-  boNhoDong.set(env.DB, { at: nowMs, dong })
-  return dong
 }
 
 export const LOI_DANG_LAM_MOI = { ok: false, error: 'Hệ thống đang làm mới, thử lại sau 1 phút', dangLamMoi: true } as const
 
 /**
- * `mocReset` cho máy khách: "2026-09-21" CHỈ SAU KHI job đã `xong`; trước đó là null (VẮNG trường). Gửi sớm là máy khách dọn nháp bài của học sinh ngay tối Chủ nhật.
- * Đã xong thì nhớ mãi trong isolate; chưa xong thì nhớ 5 giây. Trước mốc: không truy vấn nào.
+ * `mocReset` cho máy khách: ngày VN lúc job XONG ("YYYY-MM-DD") CHỈ SAU KHI job đã `xong`; trước đó là null (VẮNG trường). Gửi sớm là máy khách dọn nháp bài của học sinh.
+ * Dùng chung bản đọc đệm với cổng đóng băng (một truy vấn mỗi 3 giây mỗi isolate).
  */
 export async function docMocReset(env: Env, nowMs: number = Date.now()): Promise<string | null> {
-  if (nowMs < MOC_RESET_MS) return null
-  const c = boNhoMoc.get(env.DB)
-  if (c && (c.giaTri !== null || (nowMs - c.at < 5000 && nowMs >= c.at))) return c.giaTri
-  let giaTri: string | null = null
   try {
-    const st = await docTrangThaiReset(env)
-    if (st?.trangThai === 'xong' && st.xongLuc) giaTri = MOC_RESET_CHUOI
-  } catch { /* không đọc được: coi như chưa xong */ }
-  boNhoMoc.set(env.DB, { at: nowMs, giaTri })
-  return giaTri
+    const st = (await docTrangThaiChungDem(env, nowMs)).khoa
+    return st?.trangThai === 'xong' && st.xongLuc ? st.mocReset ?? null : null
+  } catch {
+    return null
+  }
 }
 
 // --- Đo giới hạn truy vấn D1 mỗi lượt gọi (chẩn đoán, chỉ đọc) -------------------------------------------------

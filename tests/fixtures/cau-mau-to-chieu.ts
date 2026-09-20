@@ -78,6 +78,20 @@ export const CAU_MAU_DEF: Mau[] = [
   { ten: 'ảnh-thân-cao', phan: 'II', text: '', luaChon: Y_NGAN, anhThanCau: svg(900, 720, 'ảnh cả thân câu cao') },
 ]
 
+/** Thần thú mẫu (ảnh SVG nhúng) — MỌI em mẫu đều có thú và "lần lên bảng thứ N" để thẻ tên có kích cỡ như thật (M3: thẻ tên có
+ * ảnh thần thú cao hơn thẻ không ảnh; đo bố cục không được đo trên thẻ "rỗng"). */
+const THU_MAU = {
+  anh: `data:image/svg+xml;utf8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><path d="M48 10 C63 30 72 40 72 58 A24 24 0 0 1 24 58 C24 40 33 30 48 10Z" fill="#f4a261"/><path d="M48 30 C56 41 61 47 61 58 A13 13 0 0 1 35 58 C35 47 40 41 48 30Z" fill="#ffd166"/></svg>')}`,
+  ten: 'Hoả Long',
+  danhHieu: '',
+  he: 'Lửa',
+  capDo: 12,
+  hinhThai: 'Thức Tỉnh',
+  tangThapCaoNhat: 3,
+  soCauDaThanhTay: 0,
+  capToiDa: 120,
+}
+
 /** `OBang` cho tờ chiếu: mỗi câu một em riêng (`E01`…). */
 export const CAU_MAU: { ten: string; o: OBang }[] = CAU_MAU_DEF.map((m, i) => ({
   ten: m.ten,
@@ -85,6 +99,8 @@ export const CAU_MAU: { ten: string; o: OBang }[] = CAU_MAU_DEF.map((m, i) => ({
     sbd: `E${String(i + 1).padStart(2, '0')}`,
     hoTen: `Học sinh ${String(i + 1).padStart(2, '0')}`,
     qid: `Q${String(i + 1).padStart(2, '0')}`,
+    thanThu: THU_MAU,
+    lanLenBang: 3,
     soCau: i + 1,
     sao: (i % 3) as 0 | 1 | 2,
     cau: {

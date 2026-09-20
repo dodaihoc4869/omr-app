@@ -40,6 +40,24 @@ export const TEP = [
   'src/components/BangTinPhuHuynh.tsx',
   // C9 — cổng phụ huynh: phần ngoài Bảng nhiệm vụ (đăng nhập, khung sheet toàn màn)
   'src/screens/ParentPortalScreen.tsx',
+  // APP GIÁO VIÊN (G1 21/09): vỏ `.m3` bao cả app thầy nên các màn + khối dùng chung của thầy cũng đổi lớp màu Tailwind sang vai trò M3.
+  // Màn của Code 1 (GoiLenBangScreen) chỉ được đổi MÀU qua bộ sinh này — không sửa một dòng của tệp ấy.
+  'src/screens/ExamHubScreen.tsx',
+  'src/screens/ExamSetupScreen.tsx',
+  'src/screens/PhanCongScreen.tsx',
+  'src/screens/HocSinhScreen.tsx',
+  'src/screens/LichSuCaScreen.tsx',
+  'src/screens/ExamMonitorScreen.tsx',
+  'src/screens/NganHangDeScreen.tsx',
+  'src/screens/CauHoiScreen.tsx',
+  'src/screens/ClassListScreen.tsx',
+  'src/screens/GoiLenBangScreen.tsx',
+  'src/screens/CaiDatScreen.tsx',
+  'src/components/BangTinGiaoVien.tsx',
+  'src/components/HopChonDe.tsx',
+  'src/components/KhoiMayChuMoi.tsx',
+  'src/components/KhoiMatKhauApp.tsx',
+  'src/components/NutQuayLai.tsx',
 ]
 
 // ── họ màu Tailwind → vai trò M3 ────────────────────────────────────────────

@@ -25,6 +25,11 @@ export function taoD1That() {
   for (const c of ['pham_vi', 'danh_sach_chon_json', 'mat_khau', 'de_rieng', 'pham_vi_hoi_lai']) {
     if (!cotCa.has(c)) sql.exec(`ALTER TABLE ca ADD COLUMN ${c} TEXT`)
   }
+  // Cùng loại lệch, ghi nhận 21/09 (Code 4 báo, Code 3 xác nhận bằng pragma_table_info trên D1 thật): `cau_hoi_em` trên D1 thật có
+  // `da_xoa INTEGER NOT NULL DEFAULT 0` (goi-cu.ts danhSachCauHoi/INSERT/UPDATE dùng nó) nhưng không migration nào trong repo tạo.
+  // KHÔNG viết migration ADD COLUMN cho D1 thật: cột đã có, chạy lại sẽ lỗi "duplicate column name".
+  const cotCauHoi = new Set((sql.prepare("SELECT name FROM pragma_table_info('cau_hoi_em')").all() as { name: string }[]).map((x) => x.name))
+  if (!cotCauHoi.has('da_xoa')) sql.exec('ALTER TABLE cau_hoi_em ADD COLUMN da_xoa INTEGER NOT NULL DEFAULT 0')
   const objects = new Map<string, unknown>()
   const soLenh = { prepare: 0, batch: 0 }
 

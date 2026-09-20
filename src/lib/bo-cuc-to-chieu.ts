@@ -212,6 +212,8 @@ export function jsBoCuc(): string {
         cot.className = 'mc-cot-lam-bai';
         cot.setAttribute('data-tao', '1');
         cot.setAttribute('aria-label', 'Bảng để học sinh lên làm');
+        var trang = dot.querySelector('.mc-trang');
+        if (trang && trang.getAttribute('data-nhan')) cot.setAttribute('data-nhan', trang.getAttribute('data-nhan'));
         dot.appendChild(cot);
       }
     } else if (dot.getAttribute('data-goc-don') !== '1') {
@@ -345,6 +347,8 @@ export function jsBoCuc(): string {
     an.forEach(function (e) { e.hidden = false; });
     var giaiMo = ds(ray, '.mc-giai:not([hidden])');
     giaiMo.forEach(function (g) { g.hidden = true; }); // lời giải đang mở phủ lên vùng đề: gỡ tạm cho đo đúng
+    var nuaGiai = ds(ray, '.mc-nua.mc-giai-mo'); // đợt đôi đang mở lời giải chiếm cả nửa bảng: trả nửa bảng về bố cục đo trước khi đo
+    nuaGiai.forEach(function (n) { n.classList.remove('mc-giai-mo'); });
     var truoc = daTach;
     var doiSo = 0;
     try {
@@ -355,6 +359,7 @@ export function jsBoCuc(): string {
       dsDot.forEach(boCucMotDot);
     } finally {
       giaiMo.forEach(function (g) { g.hidden = false; });
+      nuaGiai.forEach(function (n) { n.classList.add('mc-giai-mo'); });
       an.forEach(function (e) { e.hidden = true; });
       body.classList.remove('mc-do');
       dangDo = false;

@@ -84,8 +84,8 @@ describe('/hs/ke-hoach-ngay trả thêm thanThu (thần thú THẬT từ game_v2
     const r = await goi(d, 'S1')
     const { thanThu: _t, ...con } = r
     const goc = (await lapVaLuuKeHoach(d.env, ['S1'], Date.now(), { luu: false })).get('S1')!
-    // `serverNow` do route `/hs/*` thêm sẵn từ trước, không phải của lệnh này.
-    expect(Object.keys(con).sort()).toEqual(['ok', 'serverNow', ...Object.keys(goc)].sort())
+    // `serverNow` do route `/hs/*` thêm sẵn từ trước; `doanMo` do route thêm từ cb80f0d (cờ mở game Đoàn, không thuộc kế hoạch); đều không phải của lệnh này.
+    expect(Object.keys(con).sort()).toEqual(['doanMo', 'ok', 'serverNow', ...Object.keys(goc)].sort())
     expect(d.chup('ke_hoach_ngay')).not.toMatch(/thanThu|hoa_long|Bé Lửa/)
     // Đổi thần thú rồi gọi lại → thấy ngay (đọc tươi, không cache trong kế hoạch).
     d.sql.prepare("UPDATE game_v2_profile SET json = json_set(json, '$.pet', 'thuy_long', '$.cap', 9) WHERE sbd = 'S1'").run()

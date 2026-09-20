@@ -1,199 +1,79 @@
-// THANH ĐIỀU HƯỚNG BÊN TRÁI — chỉ hiện trên màn hình rộng (≥ 1024px).
+// ĐIỀU HƯỚNG TRÁI CỦA APP GIÁO VIÊN (Material 3, thầy chốt 21/09 — bản vẽ docs/ban-ve-app-giao-vien-2109).
 //
-// Điện thoại giữ nguyên thanh dưới đáy: ngón cái với tới được, và màn hẹp thì
-// một cột là đúng. Màn rộng mà vẫn một cột thì thầy phải quay về màn Kiểm tra
-// mỗi lần đổi việc, trong khi hai phần ba màn hình bỏ trống.
-//
-// Danh sách mục ở đây PHẢI khớp với các thẻ trong màn Kiểm tra; thêm màn mới
-// thì thêm cả hai chỗ, lệch nhau là thầy tìm không ra chức năng.
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { GraduationCap, Timer, Library, ClipboardList, Presentation, FilePlus2, Users, MessageCircleQuestion } from 'lucide-react'
+// Một danh sách mục (`MUC_DIEU_HUONG`) cho CẢ BA dạng, nên ba dạng luôn khớp nhau:
+//   ≥ 1100 px  ngăn kéo 264 px (logo + chữ, nút "Mở ca kiểm tra", mục có nhãn, Cài đặt ở đáy);
+//   880–1100   thanh rail 88 px (chỉ biểu tượng + nhãn ngắn dưới biểu tượng);
+//   < 880      không hiện thanh này — `BottomNav` (thanh đáy) dùng chính danh sách ấy.
+// Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
+import { CalendarDays, ClipboardCheck, Home, Library, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
-import { chan, datRong, docRong, luuRong, RONG_MAC_DINH, RONG_MAX, RONG_MIN } from '../lib/rong-cot'
 import LogoGiaoVien from './LogoGiaoVien'
 
-interface Muc {
+export interface MucDieuHuong {
   id: ScreenId
+  /** Nhãn đầy đủ (ngăn kéo, tiêu đề). */
   ten: string
-  icon: typeof Timer
+  /** Nhãn ngắn (rail, thanh đáy). */
+  ngan: string
+  icon: LucideIcon
   /** Màn con cũng tô sáng mục cha này. */
   con?: ScreenId[]
+  /** Đặt ở đáy ngăn kéo (Cài đặt). */
+  cuoi?: boolean
 }
 
-const NHOM: { ten: string; icon: typeof Timer; muc: Muc[] }[] = [
-  {
-    ten: 'Học sinh',
-    icon: GraduationCap,
-    muc: [
-      // "Danh sách lớp" bỏ khỏi thanh (thầy chốt 04-09 tối): danh sách đã nạp
-      // lên máy chủ và app tự đọc, không còn việc gì để thầy vào màn đó làm.
-      { id: 'hocsinh', ten: 'Hồ sơ học sinh', icon: Users },
-    ],
-  },
-  {
-    ten: 'Kiểm tra',
-    icon: Timer,
-    muc: [
-      { id: 'examsetup', ten: 'Mở ca kiểm tra', icon: FilePlus2 },
-      { id: 'nganhangde', ten: 'Ngân hàng câu hỏi', icon: Library },
-      { id: 'lichsuca', ten: 'Ca thi', icon: ClipboardList, con: ['exammonitor'] },
-      { id: 'giaobtvn', ten: 'Giao bài tập về nhà', icon: ClipboardList },
-      { id: 'goilenbang', ten: 'Gọi lên bảng', icon: Presentation },
-      { id: 'cauhoi', ten: 'Học sinh hỏi', icon: MessageCircleQuestion },
-    ],
-  },
+export const MUC_DIEU_HUONG: MucDieuHuong[] = [
+  { id: 'examhub', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home },
+  // "Danh sách lớp" không có mục riêng (thầy chốt 04-09): danh sách đã nạp lên máy chủ; màn ấy thuộc mục Học sinh.
+  { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist'] },
+  { id: 'lichsuca', ten: 'Ca thi', ngan: 'Ca thi', icon: CalendarDays, con: ['exammonitor', 'examsetup'] },
+  { id: 'nganhangde', ten: 'Ngân hàng đề', ngan: 'Ngân hàng', icon: Library },
+  { id: 'giaobtvn', ten: 'Giao bài tập về nhà', ngan: 'Bài tập', icon: ClipboardCheck },
+  { id: 'goilenbang', ten: 'Gọi lên bảng', ngan: 'Lên bảng', icon: Presentation },
+  { id: 'cauhoi', ten: 'Học sinh hỏi', ngan: 'Hỏi', icon: MessageCircleQuestion },
+  { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
 
-/** TAY KÉO CHỈNH BỀ RỘNG. Nằm đè lên đường viền phải của thanh trái.
- *
- * Kéo bằng Pointer Events chứ không phải mouse: một mã chạy cho cả chuột,
- * bút cảm ứng và ngón tay trên màn cảm ứng. `setPointerCapture` giữ sự kiện
- * dính vào tay kéo, nên kéo nhanh ra ngoài mép cũng không tuột.
- *
- * Bấm đúp để về mặc định; mũi tên trái phải chỉnh từng 16px cho thầy dùng bàn
- * phím. */
-function TayKeo() {
-  const [rong, setRong] = useState(RONG_MAC_DINH)
-  const dangKeo = useRef(false)
-
-  // Đọc bề rộng đã nhớ NGAY lúc dựng, trước khi trình duyệt vẽ khung — chậm
-  // một nhịp là thầy thấy thanh trái nhảy bề rộng.
-  useEffect(() => {
-    const r = docRong()
-    setRong(r)
-    datRong(r)
-  }, [])
-
-  const dat = useCallback((px: number) => {
-    const r = chan(px)
-    setRong(r)
-    datRong(r)
-    return r
-  }, [])
-
-  const batDau = (e: React.PointerEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    dangKeo.current = true
-    e.currentTarget.setPointerCapture(e.pointerId)
-    document.body.style.cursor = 'col-resize'
-    // Cấm bôi đen chữ trong lúc kéo, không thì cả trang bị quét xanh.
-    document.body.style.userSelect = 'none'
-  }
-
-  const keo = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dangKeo.current) return
-    dat(e.clientX)
-  }
-
-  const ketThuc = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dangKeo.current) return
-    dangKeo.current = false
-    e.currentTarget.releasePointerCapture(e.pointerId)
-    document.body.style.cursor = ''
-    document.body.style.userSelect = ''
-    luuRong(rong)
-  }
-
-  const phim = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    const b = e.key === 'ArrowLeft' ? -16 : e.key === 'ArrowRight' ? 16 : 0
-    if (!b) return
-    e.preventDefault()
-    luuRong(dat(rong + b))
-  }
-
-  return (
-    <div
-      className="tay-keo"
-      role="separator"
-      aria-orientation="vertical"
-      aria-label="Kéo để chỉnh bề rộng thanh bên trái"
-      aria-valuenow={rong}
-      aria-valuemin={RONG_MIN}
-      aria-valuemax={RONG_MAX}
-      tabIndex={0}
-      onPointerDown={batDau}
-      onPointerMove={keo}
-      onPointerUp={ketThuc}
-      onPointerCancel={ketThuc}
-      onKeyDown={phim}
-      onDoubleClick={() => luuRong(dat(RONG_MAC_DINH))}
-      title="Kéo để chỉnh bề rộng · bấm đúp để về mặc định"
-    />
-  )
+/** Mục nào đang sáng ở màn `screen` (mục có màn con tô sáng cả khi đứng ở màn con). */
+export function mucDangSang(screen: ScreenId): ScreenId | null {
+  return MUC_DIEU_HUONG.find((m) => m.id === screen || (m.con ?? []).includes(screen))?.id ?? null
 }
 
-export default function ThanhBenTrai() {
+export default function ThanhBenTrai({ soCauHoi = 0 }: { soCauHoi?: number }) {
   const screen = useAppStore((s) => s.screen)
   const setScreen = useAppStore((s) => s.setScreen)
+  const sang = mucDangSang(screen)
+
+  const nut = (m: MucDieuHuong) => {
+    const Icon = m.icon
+    const dang = sang === m.id
+    return (
+      <button key={m.id} type="button" onClick={() => setScreen(m.id)} aria-current={dang ? 'page' : undefined} className={`ben-trai-muc${dang ? ' dang' : ''}`} aria-label={m.ten} title={m.ten}>
+        <span className="ben-trai-bieu-tuong">
+          <Icon size={22} strokeWidth={dang ? 2.3 : 1.9} aria-hidden="true" />
+        </span>
+        <span className="ben-trai-ten">{m.ten}</span>
+        <span className="ben-trai-ngan" aria-hidden="true">
+          {m.ngan}
+        </span>
+        {m.id === 'cauhoi' && soCauHoi > 0 && <span className="ben-trai-huy-hieu">{soCauHoi}</span>}
+      </button>
+    )
+  }
 
   return (
     <nav className="ben-trai" aria-label="Điều hướng chính">
-      {/* Brand Header với Logo Giáo viên phong cách Google */}
-      <div className="pb-4 mb-3 border-b border-slate-100 dark:border-slate-800">
-        <button
-          type="button"
-          onClick={() => setScreen('examhub')}
-          className="tap-target text-left w-full rounded-2xl hover:bg-slate-100/70 dark:hover:bg-slate-800/60 transition p-2 -m-2 flex items-center"
-          title="Trang chủ Kiên trì"
-        >
-          <LogoGiaoVien size={38} hienChu={true} />
-        </button>
-      </div>
+      <button type="button" onClick={() => setScreen('examhub')} className="ben-trai-logo" title="Trang chủ Kiên trì">
+        <LogoGiaoVien size={40} hienChu={true} className="ben-trai-logo-goc" />
+      </button>
 
-      <div className="flex-1 space-y-5 overflow-y-auto pr-1">
-        {NHOM.map((n) => (
-          <div key={n.ten} className="space-y-1">
-            <div
-              className="font-bold px-3 py-1 text-[11px] tracking-wider uppercase text-slate-400 dark:text-slate-500 select-none"
-              style={{ fontFamily: 'var(--sans)' }}
-            >
-              {n.ten}
-            </div>
-            <div className="flex flex-col gap-0.5">
-              {n.muc.map((m) => {
-                const Icon = m.icon
-                const dang = screen === m.id || (m.con ?? []).includes(screen)
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => setScreen(m.id)}
-                    aria-current={dang ? 'page' : undefined}
-                    className={`tap-target flex items-center gap-3 px-3.5 py-2.5 rounded-full font-medium text-left transition-all duration-150 ${
-                      dang
-                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 font-semibold shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                    style={{
-                      fontFamily: 'var(--sans)',
-                      fontSize: 'var(--cx-2)',
-                    }}
-                  >
-                    <Icon
-                      size={19}
-                      strokeWidth={dang ? 2.3 : 1.8}
-                      className={`shrink-0 transition-colors ${
-                        dang ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'
-                      }`}
-                    />
-                    <span className="truncate">{m.ten}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+      <button type="button" onClick={() => setScreen('examsetup')} className="ben-trai-nut-ca" aria-label="Mở ca kiểm tra">
+        <Plus size={22} aria-hidden="true" />
+        <span className="ben-trai-nut-ca-chu">Mở ca kiểm tra</span>
+      </button>
 
-      {/* Footer nhỏ phiên làm việc Google style */}
-      <div className="pt-3 mt-auto border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 px-2">
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-          <span>Sẵn sàng giảng dạy</span>
-        </span>
-      </div>
-
-      <TayKeo />
+      <div className="ben-trai-danh-sach">{MUC_DIEU_HUONG.filter((m) => !m.cuoi).map(nut)}</div>
+      <div className="ben-trai-cuoi">{MUC_DIEU_HUONG.filter((m) => m.cuoi).map(nut)}</div>
     </nav>
   )
 }

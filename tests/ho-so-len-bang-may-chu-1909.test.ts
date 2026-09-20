@@ -103,6 +103,7 @@ describe('hoSoLopLenBang trả namKt theo hợp đồng', () => {
 
   it('(g) chỉ thêm ĐÚNG 3 truy vấn D1 (nam_kt_cau, game_v2_question, nam_kt_dang), bất kể số em và số câu', async () => {
     const d = await dung()
+    await goiWorker(worker, d.env, '/khong-co-duong-nay', {}) // làm nóng đệm cổng đóng băng reset (1 truy vấn cau_hinh / 3 giây / isolate), không tính vào lệnh
     const t0 = d.soLenh.prepare
     await goi(d, { dsSbd: ['S1', 'S2'] })
     const co = d.soLenh.prepare - t0

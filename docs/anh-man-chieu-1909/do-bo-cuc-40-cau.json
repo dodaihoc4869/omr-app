@@ -1,14 +1,14 @@
 {
- "taiLuc": "2026-09-19T09:03:55.235Z",
+ "taiLuc": "2026-09-20T17:36:33.354Z",
  "khung": {
   "1280x720": {
    "soDot": 35,
-   "bac": "11111222433442222224442222224244422",
+   "bac": "11111224444442222224442222224244422",
    "tach": 0,
    "bac5": 0,
    "khongVua": [],
    "tran": [],
-   "coMin": 18,
+   "coMin": 17,
    "coSan": 16,
    "dot": [
     {
@@ -91,8 +91,8 @@
     {
      "stt": 8,
      "ten": "Học sinh 13",
-     "bac": 2,
-     "co": 30,
+     "bac": 4,
+     "co": 29,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -103,7 +103,7 @@
      "stt": 9,
      "ten": "Học sinh 14",
      "bac": 4,
-     "co": 29,
+     "co": 27,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -113,8 +113,8 @@
     {
      "stt": 10,
      "ten": "Học sinh 15",
-     "bac": 3,
-     "co": 30,
+     "bac": 4,
+     "co": 28,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -124,8 +124,8 @@
     {
      "stt": 11,
      "ten": "Học sinh 16",
-     "bac": 3,
-     "co": 30,
+     "bac": 4,
+     "co": 28,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -136,7 +136,7 @@
      "stt": 12,
      "ten": "Học sinh 17",
      "bac": 4,
-     "co": 26,
+     "co": 25,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -147,7 +147,7 @@
      "stt": 13,
      "ten": "Học sinh 18",
      "bac": 4,
-     "co": 26,
+     "co": 25,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -224,7 +224,7 @@
      "stt": 20,
      "ten": "Học sinh 25",
      "bac": 4,
-     "co": 27,
+     "co": 26,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -246,7 +246,7 @@
      "stt": 22,
      "ten": "Học sinh 27",
      "bac": 4,
-     "co": 22,
+     "co": 21,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -323,7 +323,7 @@
      "stt": 29,
      "ten": "Học sinh 34",
      "bac": 4,
-     "co": 24,
+     "co": 22,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -356,7 +356,7 @@
      "stt": 32,
      "ten": "Học sinh 37",
      "bac": 4,
-     "co": 22,
+     "co": 21,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -367,7 +367,7 @@
      "stt": 33,
      "ten": "Học sinh 38",
      "bac": 4,
-     "co": 18,
+     "co": 17,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -406,10 +406,10 @@
    "cauCucDai": {
     "tu": 668,
     "bac": 5,
-    "co": 16,
+    "co": 14,
     "vua": "1",
     "tran": false,
-    "ghiChu": "Câu dài — cả bảng cho đề; em làm ở bảng phụ"
+    "ghiChu": "Câu rất dài — chữ nhỏ hơn mức khuyến nghị"
    },
    "rieng": [
     {
@@ -510,14 +510,6 @@
     },
     {
      "ten": "I-đề-dài-95",
-     "bac": 2,
-     "co": 30,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-đề-dài-120",
      "bac": 4,
      "co": 29,
      "vua": "1",
@@ -525,17 +517,25 @@
      "tach": true
     },
     {
+     "ten": "I-đề-dài-120",
+     "bac": 4,
+     "co": 27,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
      "ten": "I-pa-dài-1",
-     "bac": 3,
-     "co": 30,
+     "bac": 4,
+     "co": 28,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-pa-dài-2",
-     "bac": 3,
-     "co": 30,
+     "bac": 4,
+     "co": 28,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -543,7 +543,7 @@
     {
      "ten": "I-pa-dài-3",
      "bac": 4,
-     "co": 26,
+     "co": 25,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -551,7 +551,7 @@
     {
      "ten": "I-pa-dài-4",
      "bac": 4,
-     "co": 26,
+     "co": 25,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -566,7 +566,7 @@
     },
     {
      "ten": "I-hình-640x420",
-     "bac": 2,
+     "bac": 3,
      "co": 30,
      "vua": "1",
      "tran": false,
@@ -574,7 +574,7 @@
     },
     {
      "ten": "I-hình-420x560",
-     "bac": 2,
+     "bac": 3,
      "co": 30,
      "vua": "1",
      "tran": false,
@@ -607,7 +607,7 @@
     {
      "ten": "II-ý-dài",
      "bac": 4,
-     "co": 27,
+     "co": 26,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -623,7 +623,7 @@
     {
      "ten": "II-dẫn-120-ý-dài",
      "bac": 4,
-     "co": 22,
+     "co": 21,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -646,11 +646,11 @@
     },
     {
      "ten": "III-vừa",
-     "bac": 2,
+     "bac": 1,
      "co": 30,
      "vua": "1",
      "tran": false,
-     "tach": true
+     "tach": false
     },
     {
      "ten": "III-dài",
@@ -679,14 +679,14 @@
     {
      "ten": "III-bảng-lớn",
      "bac": 4,
-     "co": 24,
+     "co": 22,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "III-hình-đề-dài",
-     "bac": 2,
+     "bac": 3,
      "co": 30,
      "vua": "1",
      "tran": false,
@@ -695,7 +695,7 @@
     {
      "ten": "cực-II-dẫn-140-hình-ý-dài",
      "bac": 4,
-     "co": 19,
+     "co": 18,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -703,7 +703,7 @@
     {
      "ten": "cực-I-đề-160",
      "bac": 4,
-     "co": 22,
+     "co": 21,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -711,7 +711,7 @@
     {
      "ten": "cực-III-bảng-dẫn-110",
      "bac": 4,
-     "co": 18,
+     "co": 17,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -736,12 +736,12 @@
   },
   "1920x1080": {
    "soDot": 35,
-   "bac": "11111222222442222222442222224244422",
+   "bac": "11111222433442222224442222224244422",
    "tach": 0,
    "bac5": 0,
    "khongVua": [],
    "tran": [],
-   "coMin": 32,
+   "coMin": 30,
    "coSan": 24,
    "dot": [
     {
@@ -835,8 +835,8 @@
     {
      "stt": 9,
      "ten": "Học sinh 14",
-     "bac": 2,
-     "co": 45,
+     "bac": 4,
+     "co": 43,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -846,7 +846,7 @@
     {
      "stt": 10,
      "ten": "Học sinh 15",
-     "bac": 2,
+     "bac": 3,
      "co": 45,
      "vua": "1",
      "tach": false,
@@ -857,7 +857,7 @@
     {
      "stt": 11,
      "ten": "Học sinh 16",
-     "bac": 2,
+     "bac": 3,
      "co": 45,
      "vua": "1",
      "tach": false,
@@ -869,7 +869,7 @@
      "stt": 12,
      "ten": "Học sinh 17",
      "bac": 4,
-     "co": 43,
+     "co": 40,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -880,7 +880,7 @@
      "stt": 13,
      "ten": "Học sinh 18",
      "bac": 4,
-     "co": 42,
+     "co": 40,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -956,8 +956,8 @@
     {
      "stt": 20,
      "ten": "Học sinh 25",
-     "bac": 2,
-     "co": 45,
+     "bac": 4,
+     "co": 40,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -968,7 +968,7 @@
      "stt": 21,
      "ten": "Học sinh 26",
      "bac": 4,
-     "co": 36,
+     "co": 35,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -979,7 +979,7 @@
      "stt": 22,
      "ten": "Học sinh 27",
      "bac": 4,
-     "co": 35,
+     "co": 34,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1056,7 +1056,7 @@
      "stt": 29,
      "ten": "Học sinh 34",
      "bac": 4,
-     "co": 44,
+     "co": 40,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1078,7 +1078,7 @@
      "stt": 31,
      "ten": "Học sinh 36",
      "bac": 4,
-     "co": 35,
+     "co": 32,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1089,7 +1089,7 @@
      "stt": 32,
      "ten": "Học sinh 37",
      "bac": 4,
-     "co": 35,
+     "co": 34,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1100,7 +1100,7 @@
      "stt": 33,
      "ten": "Học sinh 38",
      "bac": 4,
-     "co": 32,
+     "co": 30,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1237,15 +1237,15 @@
     },
     {
      "ten": "I-đề-dài-120",
-     "bac": 2,
-     "co": 45,
+     "bac": 4,
+     "co": 43,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-pa-dài-1",
-     "bac": 2,
+     "bac": 3,
      "co": 45,
      "vua": "1",
      "tran": false,
@@ -1253,7 +1253,7 @@
     },
     {
      "ten": "I-pa-dài-2",
-     "bac": 2,
+     "bac": 3,
      "co": 45,
      "vua": "1",
      "tran": false,
@@ -1262,7 +1262,7 @@
     {
      "ten": "I-pa-dài-3",
      "bac": 4,
-     "co": 43,
+     "co": 40,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1270,7 +1270,7 @@
     {
      "ten": "I-pa-dài-4",
      "bac": 4,
-     "co": 42,
+     "co": 40,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1301,7 +1301,7 @@
     },
     {
      "ten": "I-hình-860x520",
-     "bac": 2,
+     "bac": 3,
      "co": 45,
      "vua": "1",
      "tran": false,
@@ -1309,11 +1309,11 @@
     },
     {
      "ten": "II-ngắn",
-     "bac": 1,
+     "bac": 2,
      "co": 45,
      "vua": "1",
      "tran": false,
-     "tach": false
+     "tach": true
     },
     {
      "ten": "II-vừa",
@@ -1325,8 +1325,8 @@
     },
     {
      "ten": "II-ý-dài",
-     "bac": 2,
-     "co": 45,
+     "bac": 4,
+     "co": 40,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1334,7 +1334,7 @@
     {
      "ten": "II-dẫn-90",
      "bac": 4,
-     "co": 36,
+     "co": 35,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1342,7 +1342,7 @@
     {
      "ten": "II-dẫn-120-ý-dài",
      "bac": 4,
-     "co": 35,
+     "co": 34,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1398,7 +1398,7 @@
     {
      "ten": "III-bảng-lớn",
      "bac": 4,
-     "co": 44,
+     "co": 40,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1414,7 +1414,7 @@
     {
      "ten": "cực-II-dẫn-140-hình-ý-dài",
      "bac": 4,
-     "co": 31,
+     "co": 29,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1422,7 +1422,7 @@
     {
      "ten": "cực-I-đề-160",
      "bac": 4,
-     "co": 35,
+     "co": 34,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1430,7 +1430,7 @@
     {
      "ten": "cực-III-bảng-dẫn-110",
      "bac": 4,
-     "co": 32,
+     "co": 30,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1455,12 +1455,12 @@
   },
   "1366x768": {
    "soDot": 35,
-   "bac": "11111222433442222224442222224244422",
+   "bac": "11111224444442222224442222224244422",
    "tach": 0,
    "bac5": 0,
    "khongVua": [],
    "tran": [],
-   "coMin": 20,
+   "coMin": 18,
    "coSan": 17,
    "dot": [
     {
@@ -1543,8 +1543,8 @@
     {
      "stt": 8,
      "ten": "Học sinh 13",
-     "bac": 2,
-     "co": 32,
+     "bac": 4,
+     "co": 31,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1555,7 +1555,7 @@
      "stt": 9,
      "ten": "Học sinh 14",
      "bac": 4,
-     "co": 31,
+     "co": 29,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1565,8 +1565,8 @@
     {
      "stt": 10,
      "ten": "Học sinh 15",
-     "bac": 3,
-     "co": 32,
+     "bac": 4,
+     "co": 30,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1576,8 +1576,8 @@
     {
      "stt": 11,
      "ten": "Học sinh 16",
-     "bac": 3,
-     "co": 32,
+     "bac": 4,
+     "co": 30,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1588,7 +1588,7 @@
      "stt": 12,
      "ten": "Học sinh 17",
      "bac": 4,
-     "co": 29,
+     "co": 27,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1599,7 +1599,7 @@
      "stt": 13,
      "ten": "Học sinh 18",
      "bac": 4,
-     "co": 29,
+     "co": 27,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1676,7 +1676,7 @@
      "stt": 20,
      "ten": "Học sinh 25",
      "bac": 4,
-     "co": 29,
+     "co": 28,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1687,7 +1687,7 @@
      "stt": 21,
      "ten": "Học sinh 26",
      "bac": 4,
-     "co": 25,
+     "co": 24,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1698,7 +1698,7 @@
      "stt": 22,
      "ten": "Học sinh 27",
      "bac": 4,
-     "co": 24,
+     "co": 23,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1775,7 +1775,7 @@
      "stt": 29,
      "ten": "Học sinh 34",
      "bac": 4,
-     "co": 27,
+     "co": 24,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1797,7 +1797,7 @@
      "stt": 31,
      "ten": "Học sinh 36",
      "bac": 4,
-     "co": 23,
+     "co": 22,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1808,7 +1808,7 @@
      "stt": 32,
      "ten": "Học sinh 37",
      "bac": 4,
-     "co": 24,
+     "co": 23,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1819,7 +1819,7 @@
      "stt": 33,
      "ten": "Học sinh 38",
      "bac": 4,
-     "co": 20,
+     "co": 18,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -1948,14 +1948,6 @@
     },
     {
      "ten": "I-đề-dài-95",
-     "bac": 2,
-     "co": 32,
-     "vua": "1",
-     "tran": false,
-     "tach": true
-    },
-    {
-     "ten": "I-đề-dài-120",
      "bac": 4,
      "co": 31,
      "vua": "1",
@@ -1963,17 +1955,25 @@
      "tach": true
     },
     {
+     "ten": "I-đề-dài-120",
+     "bac": 4,
+     "co": 29,
+     "vua": "1",
+     "tran": false,
+     "tach": true
+    },
+    {
      "ten": "I-pa-dài-1",
-     "bac": 3,
-     "co": 32,
+     "bac": 4,
+     "co": 30,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-pa-dài-2",
-     "bac": 3,
-     "co": 32,
+     "bac": 4,
+     "co": 30,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1981,7 +1981,7 @@
     {
      "ten": "I-pa-dài-3",
      "bac": 4,
-     "co": 29,
+     "co": 27,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -1989,7 +1989,7 @@
     {
      "ten": "I-pa-dài-4",
      "bac": 4,
-     "co": 29,
+     "co": 27,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2004,7 +2004,7 @@
     },
     {
      "ten": "I-hình-640x420",
-     "bac": 2,
+     "bac": 3,
      "co": 32,
      "vua": "1",
      "tran": false,
@@ -2012,7 +2012,7 @@
     },
     {
      "ten": "I-hình-420x560",
-     "bac": 2,
+     "bac": 3,
      "co": 32,
      "vua": "1",
      "tran": false,
@@ -2045,7 +2045,7 @@
     {
      "ten": "II-ý-dài",
      "bac": 4,
-     "co": 29,
+     "co": 28,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2053,7 +2053,7 @@
     {
      "ten": "II-dẫn-90",
      "bac": 4,
-     "co": 25,
+     "co": 24,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2061,7 +2061,7 @@
     {
      "ten": "II-dẫn-120-ý-dài",
      "bac": 4,
-     "co": 24,
+     "co": 23,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2084,11 +2084,11 @@
     },
     {
      "ten": "III-vừa",
-     "bac": 2,
+     "bac": 1,
      "co": 32,
      "vua": "1",
      "tran": false,
-     "tach": true
+     "tach": false
     },
     {
      "ten": "III-dài",
@@ -2117,14 +2117,14 @@
     {
      "ten": "III-bảng-lớn",
      "bac": 4,
-     "co": 27,
+     "co": 24,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "III-hình-đề-dài",
-     "bac": 2,
+     "bac": 3,
      "co": 32,
      "vua": "1",
      "tran": false,
@@ -2141,7 +2141,7 @@
     {
      "ten": "cực-I-đề-160",
      "bac": 4,
-     "co": 24,
+     "co": 23,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2149,18 +2149,18 @@
     {
      "ten": "cực-III-bảng-dẫn-110",
      "bac": 4,
-     "co": 20,
+     "co": 18,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "ảnh-thân-vừa",
-     "bac": 2,
+     "bac": 1,
      "co": 32,
      "vua": "1",
      "tran": false,
-     "tach": true
+     "tach": false
     },
     {
      "ten": "ảnh-thân-cao",
@@ -2174,12 +2174,12 @@
   },
   "1600x900": {
    "soDot": 35,
-   "bac": "11111222322442222224442222224244422",
+   "bac": "11111222444442222224442222224244422",
    "tach": 0,
    "bac5": 0,
    "khongVua": [],
    "tran": [],
-   "coMin": 25.5,
+   "coMin": 23.5,
    "coSan": 20,
    "dot": [
     {
@@ -2273,8 +2273,8 @@
     {
      "stt": 9,
      "ten": "Học sinh 14",
-     "bac": 3,
-     "co": 37.5,
+     "bac": 4,
+     "co": 34.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2284,8 +2284,8 @@
     {
      "stt": 10,
      "ten": "Học sinh 15",
-     "bac": 2,
-     "co": 37.5,
+     "bac": 4,
+     "co": 36.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2295,8 +2295,8 @@
     {
      "stt": 11,
      "ten": "Học sinh 16",
-     "bac": 2,
-     "co": 37.5,
+     "bac": 4,
+     "co": 36.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2307,7 +2307,7 @@
      "stt": 12,
      "ten": "Học sinh 17",
      "bac": 4,
-     "co": 34.5,
+     "co": 31.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2318,7 +2318,7 @@
      "stt": 13,
      "ten": "Học sinh 18",
      "bac": 4,
-     "co": 34.5,
+     "co": 31.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2395,7 +2395,7 @@
      "stt": 20,
      "ten": "Học sinh 25",
      "bac": 4,
-     "co": 34.5,
+     "co": 32.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2406,7 +2406,7 @@
      "stt": 21,
      "ten": "Học sinh 26",
      "bac": 4,
-     "co": 29.5,
+     "co": 28.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2417,7 +2417,7 @@
      "stt": 22,
      "ten": "Học sinh 27",
      "bac": 4,
-     "co": 28.5,
+     "co": 27.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2494,7 +2494,7 @@
      "stt": 29,
      "ten": "Học sinh 34",
      "bac": 4,
-     "co": 33.5,
+     "co": 30.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2516,7 +2516,7 @@
      "stt": 31,
      "ten": "Học sinh 36",
      "bac": 4,
-     "co": 27.5,
+     "co": 25.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2527,7 +2527,7 @@
      "stt": 32,
      "ten": "Học sinh 37",
      "bac": 4,
-     "co": 29.5,
+     "co": 27.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2538,7 +2538,7 @@
      "stt": 33,
      "ten": "Học sinh 38",
      "bac": 4,
-     "co": 25.5,
+     "co": 23.5,
      "vua": "1",
      "tach": false,
      "soEm": 1,
@@ -2675,24 +2675,24 @@
     },
     {
      "ten": "I-đề-dài-120",
-     "bac": 3,
-     "co": 37.5,
+     "bac": 4,
+     "co": 34.5,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-pa-dài-1",
-     "bac": 2,
-     "co": 37.5,
+     "bac": 4,
+     "co": 36.5,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "I-pa-dài-2",
-     "bac": 2,
-     "co": 37.5,
+     "bac": 4,
+     "co": 36.5,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2700,7 +2700,7 @@
     {
      "ten": "I-pa-dài-3",
      "bac": 4,
-     "co": 34.5,
+     "co": 31.5,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2708,7 +2708,7 @@
     {
      "ten": "I-pa-dài-4",
      "bac": 4,
-     "co": 34.5,
+     "co": 31.5,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2723,7 +2723,7 @@
     },
     {
      "ten": "I-hình-640x420",
-     "bac": 2,
+     "bac": 3,
      "co": 37.5,
      "vua": "1",
      "tran": false,
@@ -2731,7 +2731,7 @@
     },
     {
      "ten": "I-hình-420x560",
-     "bac": 2,
+     "bac": 3,
      "co": 37.5,
      "vua": "1",
      "tran": false,
@@ -2764,7 +2764,7 @@
     {
      "ten": "II-ý-dài",
      "bac": 4,
-     "co": 34.5,
+     "co": 32.5,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2772,7 +2772,7 @@
     {
      "ten": "II-dẫn-90",
      "bac": 4,
-     "co": 29.5,
+     "co": 28.5,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2780,7 +2780,7 @@
     {
      "ten": "II-dẫn-120-ý-dài",
      "bac": 4,
-     "co": 28.5,
+     "co": 27.5,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2803,11 +2803,11 @@
     },
     {
      "ten": "III-vừa",
-     "bac": 2,
+     "bac": 1,
      "co": 37.5,
      "vua": "1",
      "tran": false,
-     "tach": true
+     "tach": false
     },
     {
      "ten": "III-dài",
@@ -2827,16 +2827,16 @@
     },
     {
      "ten": "III-bảng-nhỏ",
-     "bac": 2,
+     "bac": 1,
      "co": 37.5,
      "vua": "1",
      "tran": false,
-     "tach": true
+     "tach": false
     },
     {
      "ten": "III-bảng-lớn",
      "bac": 4,
-     "co": 33.5,
+     "co": 30.5,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2852,7 +2852,7 @@
     {
      "ten": "cực-II-dẫn-140-hình-ý-dài",
      "bac": 4,
-     "co": 25.5,
+     "co": 23.5,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2860,7 +2860,7 @@
     {
      "ten": "cực-I-đề-160",
      "bac": 4,
-     "co": 29.5,
+     "co": 27.5,
      "vua": "1",
      "tran": false,
      "tach": true
@@ -2868,18 +2868,18 @@
     {
      "ten": "cực-III-bảng-dẫn-110",
      "bac": 4,
-     "co": 25.5,
+     "co": 23.5,
      "vua": "1",
      "tran": false,
      "tach": true
     },
     {
      "ten": "ảnh-thân-vừa",
-     "bac": 2,
+     "bac": 1,
      "co": 37.5,
      "vua": "1",
      "tran": false,
-     "tach": true
+     "tach": false
     },
     {
      "ten": "ảnh-thân-cao",

@@ -11,11 +11,19 @@ import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
 
 const URL = process.env.URL_DEV || 'http://localhost:5173/'
-const OUT = 'docs/anh-man-chieu-1909'
-const VIEWS = [[1280, 720], [1920, 1080], [1366, 768], [1600, 900]]
+// VIEWS='[[1440,810]]' (JSON) chạy khung khác để KIỂM ước lượng ở khung chưa từng dùng; DIR_RA=<thư mục> để không đè tệp đã commit.
+const OUT = process.env.DIR_RA || 'docs/anh-man-chieu-1909'
+const VIEWS = process.env.VIEWS ? JSON.parse(process.env.VIEWS) : [[1280, 720], [1920, 1080], [1366, 768], [1600, 900]]
 mkdirSync(OUT, { recursive: true })
 
 const browser = await chromium.launch({ headless: true })
+/** Đợi tờ vừa nạp ĐO XONG: có ít nhất một đợt VÀ dấu `data-bo-cuc="xong"` (đợi riêng dấu có thể thấy dấu của tài liệu cũ đang bị thay). */
+/** Bỏ màn gọi tên (M3) trước khi chụp — ảnh này để xem BỐ CỤC đề, không phải màn gọi tên (ảnh màn gọi tên nằm ở `m3-*`). */
+const boGoiTen = async (page) => {
+  await page.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: ' ' })))
+  await page.waitForTimeout(120)
+}
+const xong = (page) => page.waitForFunction(() => !!document.querySelector('#mc-ray > .mc-dot') && document.body.getAttribute('data-bo-cuc') === 'xong', null, { timeout: 20000 })
 const ket = { taiLuc: new Date().toISOString(), khung: {} }
 let hong = 0
 
@@ -42,7 +50,7 @@ for (const [W, H] of VIEWS) {
     return T.taoHtmlMayChieu(F.CAU_MAU.map((x) => x.o), { tenBuoi: 'Buổi mẫu 40 câu' })
   })
   await page.setContent(html)
-  await page.waitForSelector('body[data-bo-cuc="xong"]')
+  await xong(page)
   await page.waitForTimeout(1500)
   const dot = await page.evaluate(docTo)
   const coSan = Math.round((W * 24) / 1920)
@@ -71,23 +79,24 @@ for (const [W, H] of VIEWS) {
       ray.scrollLeft = (i - 1) * ray.clientWidth
     }, stt)
     await page.waitForTimeout(200)
+    await boGoiTen(page)
     await page.screenshot({ path: `${OUT}/m2-${W}x${H}-${ten}.png` })
   }
-  const bacCan = W === 1920 ? [1, 2, 4] : W === 1280 ? [3] : []
+  const bacCan = W === 1920 && H === 1080 ? [1, 2, 3, 4] : []
   for (const b of bacCan) {
     const k = dot.find((d) => d.bac === b)
     if (k) await chupDot(k.stt, `dot${String(k.stt).padStart(2, '0')}-bac${b}`)
   }
-  if (W === 1280) {
+  if (W === 1280 && H === 720) {
     // (a) chữ cực lớn ×1,4 ⇒ nhiều đợt đôi không còn vừa ⇒ TÁCH đợt (có ghi chú cho thầy)
-    await page.selectOption('#mc-size', '1.4')
+    await page.evaluate(() => { const z = document.getElementById('mc-size'); z.value = '1.4'; z.dispatchEvent(new Event('change')) }) // ô chọn nằm trong hộp Cài đặt (ẩn)
     await page.waitForTimeout(1200)
     const sau = await page.evaluate(docTo)
     const t = sau.find((d) => d.tach)
     ket.khung['1280x720'].chuCucLon = { soDot: sau.length, tach: sau.filter((d) => d.tach).length, tran: sau.filter((d) => d.tran).length, bac5: sau.filter((d) => d.bac === 5).length }
     hong += sau.filter((d) => d.tran).length
     if (t) await chupDot(t.stt, `dot${String(t.stt).padStart(2, '0')}-tach-chu-1.4`)
-    await page.selectOption('#mc-size', '1')
+    await page.evaluate(() => { const z = document.getElementById('mc-size'); z.value = '1'; z.dispatchEvent(new Event('change')) })
     // (b) một câu dài tới mức chiếm CẢ bảng (bậc 5)
     const html5 = await page.evaluate(async () => {
       const T = await import('/src/lib/html-may-chieu.ts')
@@ -98,14 +107,15 @@ for (const [W, H] of VIEWS) {
       return { html: T.taoHtmlMayChieu([dai], { tenBuoi: 'Câu quá dài' }), tu: chuoi.length * 4 }
     })
     await page.setContent(html5.html)
-    await page.waitForSelector('body[data-bo-cuc="xong"]')
+    await xong(page)
     await page.waitForTimeout(800)
     const d5 = (await page.evaluate(docTo))[0]
     ket.khung['1280x720'].cauCucDai = { tu: html5.tu, bac: d5.bac, co: d5.co, vua: d5.vua, tran: d5.tran, ghiChu: d5.ghiChu }
     if (d5.tran) hong++
+    await boGoiTen(page)
     await page.screenshot({ path: `${OUT}/m2-${W}x${H}-dot01-bac${d5.bac}-cau-cuc-dai.png` })
     await page.setContent(html)
-    await page.waitForSelector('body[data-bo-cuc="xong"]')
+    await xong(page)
     await page.waitForTimeout(600)
   }
 
@@ -121,7 +131,7 @@ for (const [W, H] of VIEWS) {
   const rieng = []
   for (const t of tung) {
     await page.setContent(t.html)
-    await page.waitForSelector('body[data-bo-cuc="xong"]')
+    await xong(page)
     await page.waitForTimeout(350)
     const ds = await page.evaluate(docTo)
     const d = ds[0]

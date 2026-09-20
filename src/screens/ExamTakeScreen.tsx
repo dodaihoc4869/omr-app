@@ -64,6 +64,8 @@ import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { goiBaiThi } from '../lib/goi-bao-cao'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import { docDuongVao } from '../lib/vai-tro'
+import { dungM3 } from '../components/m3'
+import ThanhTrenThiM3 from './ThanhTrenThiM3'
 import { gradeFromKeyBank, type GradedSubmission } from '../lib/exam-grade'
 import {
   cacheSession,
@@ -676,6 +678,7 @@ export default function ExamTakeScreen({ tuCong }: { tuCong?: TuCongHocSinh } = 
           tenChuyenDe: cd.length === 1 ? cd[0] : attempt.tenCa || 'Hoá học',
           ketQua: graded ? `Điểm ${graded.score.total.toFixed(2)}/10` : '',
           hienDapAn: true,
+          giaoDienHocSinh: dungM3(),
           nhanBia: 'Đề của em kèm lời giải',
           oBia: [
             { nhan: 'Học sinh', gia: hoTen.trim() || `SBD ${attempt.sbd}` },
@@ -3177,7 +3180,24 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
   return (
     <Trang className="man-lam-bai">
-      {/* THANH TRÊN — 56px, dính, mờ; tiến độ 3px sát mép trên; chấm lưu 6px góc phải */}
+      {/* THANH TRÊN — 56px, dính. Đường học sinh/phụ huynh (dungM3): bản M3 theo bản vẽ ThiDangLam/ThiCanhBao (ThanhTrenThiM3, chỉ trình bày lại
+          các giá trị dưới đây, cao ĐÚNG 56 px như CAO_THANH_TREN). Đường khác: thanh cũ y hệt (mờ; tiến độ 3px sát mép trên; chấm lưu 6px góc phải). */}
+      {dungM3() ? (
+        <div className="sticky top-0 z-30">
+          <ThanhTrenThiM3
+            dongHo={laBaiTap ? null : formatClock(remaining ?? 0)}
+            chuThayDongHo={hanNopNgan ? `Hạn ${hanNopNgan}` : 'Bài tập'}
+            gap={!laBaiTap && gapNow}
+            tenCa={attempt.tenCa || ''}
+            daLam={daLamCount}
+            tong={total}
+            nhanLuu={dotLabel}
+            mayNgoaiMang={!online}
+            dangLuu={!!saveFlash}
+            onMoLuoi={() => setShowGrid(true)}
+          />
+        </div>
+      ) : (
       <div
         className="sticky top-0 z-30"
         style={{ height: 56, background: 'var(--the-mo)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)' }}
@@ -3204,6 +3224,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           </button>
         </div>
       </div>
+      )}
 
 
       {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
@@ -3413,9 +3434,14 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 // NGOÀI component chính để không bị tạo lại mỗi lần render (nếu khai báo bên
 // trong, React sẽ unmount/mount lại cả trang mỗi lần chọn đáp án — mất vị trí
 // cuộn và focus ô nhập).
+//
+// VIỆC C · C10 (Material 3): ở đường HỌC SINH/PHỤ HUYNH (`dungM3()`: /hs, /ph, ?examCode=, /t/, /d/) khung này mang thêm lớp `m3`.
+// Chỉ có thế: `m3.css` (Code 4) đã ánh xạ token cũ (--nen, --the, --muc, --xanh, --serif…) sang vai trò M3 dưới `.m3`, nên mọi
+// thứ đọc token — chính màn này, DesignSystem, TheCau (`.m3 .the-cau`) — tự mặc bảng màu M3 sáng/tối; KHÔNG dòng logic nào đổi.
+// Đường `/` (app giáo viên) và vitest mặc định: `dungM3()` = false ⇒ y hệt trước.
 function Trang({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`min-h-screen ${className}`} style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
+    <div className={`min-h-screen ${dungM3() ? 'm3 ' : ''}${className}`} style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
       {children}
     </div>
   )

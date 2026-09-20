@@ -11,6 +11,8 @@
 //
 // HIỆU CHỈNH (`UOC_LUONG_BO_CUC`): đo bằng Chrome 40 câu mẫu (`tests/fixtures/cau-mau-to-chieu.ts`) ở 1280×720 và
 // 1920×1080 (`scripts/do-bo-cuc-to-chieu.mjs` → `docs/anh-man-chieu-1909/do-bo-cuc-40-cau.json`); test khoá sai lệch ≤ 1 bậc.
+// M3 (giao diện mới) ĐỔI HÌNH HỌC — thanh dưới 50 px thay thanh trên, thẻ tên giấy to hơn, đệm thẻ đề tỉ lệ theo bề ngang,
+// không viền, chip "Câu N" nằm trong thẻ đề ở đợt đơn — nên MỌI hằng số hình học dưới đây được đo lại (cùng phương pháp).
 // Ước luôn nghiêng về PHÍA AN TOÀN: nghi ngờ thì cho bậc cao hơn (không ghép đôi câu có thể không vừa).
 import type { CauLuyen } from './bai-tap-pdf'
 import {
@@ -32,23 +34,41 @@ export interface KhungChieu {
 export const KHUNG_UOC_MAC_DINH: KhungChieu = { rong: 1920, cao: 1080 }
 
 export const UOC_LUONG_BO_CUC = {
-  /** Thanh điều khiển phía trên tờ (đo: 63 px). */
-  THANH_TREN_PX: 63,
-  /** Lề trang + khe giữa các khối (đo: 10 px). */
+  /** Thanh điều khiển ở ĐÁY tờ: cao 42 px + cách đáy 8 px (M3; bản M2 là thanh trên 63 px). */
+  THANH_DUOI_PX: 50,
+  /** Lề trang + khe giữa các khối (10 px). */
   LE_PX: 10,
-  /** Hai bên viền + đệm của vùng đề: 2 viền + 2×18 đệm dọc; 2 viền + 2×22 đệm ngang. */
-  VUNG_DOC_PX: 2 + 36,
-  VUNG_NGANG_PX: 2 + 44,
-  /** Bậc 1: nút "Hiện học sinh…" 40 + hàng giải 40 + phần cố định còn lại của ô (đo: 0,7·rayH − thẻ tên − 154). */
-  BAC1_CO_DINH_PX: 154,
+  /** Đệm thẻ đề theo bề ngang khung `w`: dọc = clamp(12, 1,72%·w, 30), ngang = clamp(14, 1,9%·w, 34) — mỗi bên; không viền. */
+  DEM_DOC_TL: 0.0172,
+  DEM_DOC_MIN: 12,
+  DEM_DOC_MAX: 30,
+  DEM_NGANG_TL: 0.019,
+  DEM_NGANG_MIN: 14,
+  DEM_NGANG_MAX: 34,
+  /** Bậc 1: hai đệm trang (2×10) + hai khe giữa thẻ tên / thẻ đề / vùng làm bài (2×10). Nút giải + nút chấm nằm ĐÈ lên vùng làm bài. */
+  BAC1_CO_DINH_PX: 40,
   /** Vùng làm bài tối thiểu ở bậc 1 (tỉ lệ chiều cao ray) — khớp `LAM_BAI_TOI_THIEU_TL`. */
   BAC1_LAM_BAI_TL: BO_CUC_TO_CHIEU.LAM_BAI_TOI_THIEU_TL,
-  /** Đệm phần dư của thẻ tên: 2 đệm 8 + 2 viền 1. */
-  THE_TEN_DEM_PX: 18,
-  /** Thẻ tên ở đợt ĐƠN / toàn bảng cao 52 px (đo Chrome ở mọi khung) — dùng cho bậc 5. */
-  THE_TEN_DON_PX: 52,
+  /** Thẻ tên (M3): đệm dọc mỗi bên = clamp(4, 0,62%·w, 12); ảnh thần thú vuông = min(cột 5,94%·w kẹp 46..116, 5,6%·w kẹp 44..108);
+   * chữ: tên = clamp(20, 2,34%·w, 46) (đợt đơn: clamp(18, 2,03%·w, 40)) × 1,1, dòng phụ clamp(12, 1,25%·w, 24) × 1,3, khe 2. */
+  THE_DEM_TL: 0.0062,
+  THE_DEM_MIN: 4,
+  THE_DEM_MAX: 12,
+  THE_CAU_ANH_TL: 0.056,
+  THE_CAU_ANH_MIN: 44,
+  THE_CAU_ANH_MAX: 108,
+  THE_CAU_COT_TL: 0.0594,
+  THE_CAU_COT_MIN: 46,
+  THE_CAU_COT_MAX: 116,
+  THE_TEN_TL: 0.0234,
+  THE_TEN_DON_TL: 0.0203,
+  THE_PHU_TL: 0.0125,
+  /** Dòng đầu thẻ đề ở đợt đơn (chip "Câu N" + chip phần): đệm chip 2×clamp(3, 0,47%·w, 9) + chữ clamp(13, 1,4%·w, 26) × 1,2 + cách dưới clamp(6, 1%·w, 16). */
+  DAU_DE_TL_DEM: 0.0047,
+  DAU_DE_CHU_TL: 0.014,
+  DAU_DE_KHE_TL: 0.01,
   /** Hệ số hiệu chỉnh độ rộng chữ so với số liệu AFM Times (1 = đúng số liệu phông). */
-  RONG_CHU: 1.0,
+  RONG_CHU: 1.01,
   /** Chỉ số dưới (H₂O, C₁₇H₃₅) nhỏ hơn chữ thường bấy nhiêu lần. */
   CHI_SO_DUOI: 0.75,
   DONG_DE: 1.45,
@@ -74,7 +94,7 @@ export const UOC_LUONG_BO_CUC = {
   BANG_DONG: 1.5,
   BANG_DEM_PX: 15.5,
   /** Hệ số dư an toàn nhân vào chiều cao cần (công thức xuống dòng tham lam luôn lệch nhẹ so với trình duyệt). */
-  DU_AN_TOAN: 1.02,
+  DU_AN_TOAN: 1.01,
 } as const
 
 /** Chữ hiển thị của một đoạn đề: bỏ thẻ HTML, `<br>` thành xuống dòng, công thức chỉ đếm phần chữ. */
@@ -189,24 +209,47 @@ export function dauVaoTuCau(c: CauLuyen): DauVao {
   }
 }
 
-/** Chỗ sẵn có (padding-box) của vùng đề theo bậc, đo bằng Chrome. */
+const kep = (x: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, x))
+
+/** Chiều cao thẻ tên (border-box) ở khung `w`. `don` = đợt đơn / toàn bảng (tên nhỏ hơn, không chip). */
+export function chieuCaoTheTen(w: number, don: boolean): number {
+  const U = UOC_LUONG_BO_CUC
+  const anh = Math.min(kep(U.THE_CAU_COT_TL * w, U.THE_CAU_COT_MIN, U.THE_CAU_COT_MAX), kep(U.THE_CAU_ANH_TL * w, U.THE_CAU_ANH_MIN, U.THE_CAU_ANH_MAX))
+  const ten = don ? kep(U.THE_TEN_DON_TL * w, 18, 40) : kep(U.THE_TEN_TL * w, 20, 46)
+  const chu = ten * 1.1 + 2 + kep(U.THE_PHU_TL * w, 12, 24) * 1.3
+  return Math.max(anh, chu) + 2 * kep(U.THE_DEM_TL * w, U.THE_DEM_MIN, U.THE_DEM_MAX)
+}
+
+/** Đệm dọc + đệm ngang (cả hai bên) của thẻ đề ở khung `w`. */
+export function demTheDe(w: number): { doc: number; ngang: number } {
+  const U = UOC_LUONG_BO_CUC
+  return { doc: 2 * kep(U.DEM_DOC_TL * w, U.DEM_DOC_MIN, U.DEM_DOC_MAX), ngang: 2 * kep(U.DEM_NGANG_TL * w, U.DEM_NGANG_MIN, U.DEM_NGANG_MAX) }
+}
+
+/** Dòng đầu thẻ đề (chỉ có ở bậc ≥ 2). */
+function chieuCaoDauDe(w: number): number {
+  const U = UOC_LUONG_BO_CUC
+  return 2 * kep(U.DAU_DE_TL_DEM * w, 3, 9) + 1.2 * kep(U.DAU_DE_CHU_TL * w, 13, 26) + kep(U.DAU_DE_KHE_TL * w, 6, 16)
+}
+
+/** Chỗ sẵn có (padding-box) của thẻ đề theo bậc — tính từ hình học của giao diện M3, kiểm bằng Chrome. */
 export function choSanCo(bac: BacBoCuc, k: KhungChieu): { cao: number; rong: number } {
   const U = UOC_LUONG_BO_CUC
-  const rayH = k.cao - U.THANH_TREN_PX
-  const theTen = 1.2 * Math.min(28, Math.max(19, 0.018 * k.rong)) + U.THE_TEN_DEM_PX
-  // bậc 1: hai ô, mỗi ô rộng nửa bảng; chiều cao = phần ray còn lại sau vùng làm bài tối thiểu, thẻ tên và các khối cố định
-  if (bac === 1) return { cao: (1 - U.BAC1_LAM_BAI_TL) * rayH - theTen - U.BAC1_CO_DINH_PX, rong: (k.rong - 3 * U.LE_PX) / 2 - 2 }
+  const rayH = k.cao - U.THANH_DUOI_PX
+  // bậc 1: hai ô, mỗi ô rộng nửa bảng; chiều cao = phần ray còn lại sau vùng làm bài tối thiểu, thẻ tên và các khe
+  if (bac === 1) return { cao: (1 - U.BAC1_LAM_BAI_TL) * rayH - chieuCaoTheTen(k.rong, false) - U.BAC1_CO_DINH_PX, rong: (k.rong - 3 * U.LE_PX) / 2 }
   // bậc 5: cả bảng, trừ thẻ tên nằm trên
-  if (bac === 5) return { cao: rayH - 2 * U.LE_PX - 2 - U.THE_TEN_DON_PX - U.LE_PX, rong: k.rong - 2 * U.LE_PX - 2 }
+  if (bac === 5) return { cao: rayH - 2 * U.LE_PX - chieuCaoTheTen(k.rong, true) - U.LE_PX, rong: k.rong - 2 * U.LE_PX }
   // bậc 2, 3, 4: đề chiếm 2/3 bề ngang, cao suốt bảng
-  return { cao: rayH - 2 * U.LE_PX - 2, rong: ((k.rong - 3 * U.LE_PX) * 2) / 3 - 2 }
+  return { cao: rayH - 2 * U.LE_PX, rong: ((k.rong - 3 * U.LE_PX) * 2) / 3 }
 }
 
 /** Chiều cao NỘI DUNG đề cần (padding-box) ở bố cục `(bac, co, hinh)`. */
 export function chieuCaoCan(d: DauVao, bac: BacBoCuc, co: number, hinh: number, k: KhungChieu): number {
   const U = UOC_LUONG_BO_CUC
   const cho = choSanCo(bac, k)
-  const rongChu = cho.rong - (U.VUNG_NGANG_PX - 2)
+  const dem = demTheDe(k.rong)
+  const rongChu = cho.rong - dem.ngang
   let h = 0
   if (!d.deLaAnh && d.de) h += demDong(d.de, co, rongChu) * co * U.DONG_DE
   // hình: ảnh đề bọc cả thân + hình nhúng — mỗi hình tối đa 30% chiều cao khung × hệ số hình
@@ -250,7 +293,8 @@ export function chieuCaoCan(d: DauVao, bac: BacBoCuc, co: number, hinh: number, 
   } else if (d.phan === 'III') {
     h += U.GHI_CHU_III_PX + Math.ceil((U.GHI_CHU_III_KY_TU * 0.44 * 0.6 * co) / rongChu) * 0.6 * co * 1.5
   }
-  return h * U.DU_AN_TOAN + U.VUNG_DOC_PX
+  // dòng đầu thẻ đề (chip Câu N / phần) chỉ hiện ở đợt đơn (bậc ≥ 2); đệm dọc của thẻ đề
+  return h * U.DU_AN_TOAN + dem.doc + (bac >= 2 ? chieuCaoDauDe(k.rong) : 0)
 }
 
 export interface UocLuongBac extends KetQuaLeoBac {

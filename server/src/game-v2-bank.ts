@@ -95,10 +95,10 @@ export async function readScope(env:Env,sbd:string):Promise<{evidence:Evidence[]
     }
   }
   // GĐ 5 (Kênh 4): bằng chứng từ HỒ SƠ (nam_kt_cau) cho câu em đã gặp ở nguồn KHÁC ca thi và KHÁC game (BTVN, Mom, ôn lại, khắc phục…): câu sai
-  // ở đó thành "weak"; câu làm đúng ở đó thành nền để mở câu cùng dạng. Loại `thi` vì đường ca thi ở trên đã lọc theo công bố (ca chưa công bố KHÔNG được lọt);
+  // ở đó thành "weak"; câu làm đúng ở đó thành nền để mở câu cùng dạng. Loại `thi` vì đường ca thi ở trên đã lọc theo công bố (ca chưa công bố KHÔNG được lọt) — TRỪ sự kiện `thi` của ca KHÔNG CÒN trong bảng `ca` (reset toàn app xoá ca, giữ sổ): coi là đã công bố;
   // loại `game` vì game tự có `attempts`. Câu có ở cả hai nơi: HỒ SƠ quyết `wrong` (sai ở thi rồi sửa đúng ở BTVN thì không còn "weak"). Thiếu bảng thì bỏ qua.
   try{
-    const rh=await env.DB.prepare(`SELECT qid,trang_thai,luc_cuoi,nguon_cuoi FROM nam_kt_cau WHERE sbd=? AND qid IN (SELECT qid FROM su_kien_hoc WHERE sbd=? AND nguon NOT IN ('thi','game'))`).bind(sbd,sbd).all<Row>()
+    const rh=await env.DB.prepare(`SELECT qid,trang_thai,luc_cuoi,nguon_cuoi FROM nam_kt_cau WHERE sbd=? AND qid IN (SELECT qid FROM su_kien_hoc s WHERE s.sbd=? AND (s.nguon NOT IN ('thi','game') OR (s.nguon='thi' AND NOT EXISTS (SELECT 1 FROM ca WHERE ca.ma_ca=s.ma_nguon))))`).bind(sbd,sbd).all<Row>()
     const chuaKhacPhuc=(t:unknown)=>t==='moi_sai'||t==='dang_on'
     const hoSo=new Map(rh.results.map(h=>[str(h.qid),h]))
     for(const r of rows.results){const h=hoSo.get(str(r.qid));if(h){r.dung_sai=chuaKhacPhuc(h.trang_thai)?0:1;hoSo.delete(str(r.qid))}}

@@ -47,8 +47,8 @@
   transition:all 0.15s ease-in-out!important;
 }
 [data-teacher-screen] .gv-student-list>[data-sbd]:hover{
-  border-color:var(--gg-xanh)!important;
-  box-shadow:0 4px 16px rgba(26,115,232,.08)!important;
+  border-color:var(--m3-primary)!important;
+  box-shadow:0 4px 16px color-mix(in srgb,var(--m3-primary) 10%,transparent)!important;
 }
 [data-teacher-screen] .gv-student-actions{display:flex;flex-wrap:wrap;gap:8px!important}
 [data-teacher-screen] .gv-student-actions>button{
@@ -91,5 +91,5 @@
   [data-teacher-screen] .gv-work-step>div{max-width:100%;min-width:0}
 }
 @media(min-width:1024px){[data-teacher-screen] .setup-launch{bottom:16px}}
-[data-teacher-screen] .gv-help summary:focus-visible{outline:2px solid var(--gg-xanh);outline-offset:3px}
+[data-teacher-screen] .gv-help summary:focus-visible{outline:2px solid var(--m3-primary);outline-offset:3px}
 @media print{[data-teacher-screen] .gv-page{padding:0!important}}

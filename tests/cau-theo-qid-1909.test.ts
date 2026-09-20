@@ -170,6 +170,7 @@ describe('chi phí', () => {
     let docR2 = 0
     const get = d.env.DE.get.bind(d.env.DE)
     d.env.DE.get = (async (k: string) => { docR2++; return get(k) }) as never
+    await goiWorker(worker, d.env, '/khong-co-duong-nay', {}) // làm nóng đệm cổng đóng băng reset (1 truy vấn cau_hinh / 3 giây / isolate), không tính vào lệnh
     const truoc = d.soLenh.prepare
     const r = await goi(d, { sbd: 'S1', qid: ['DE1-II-A', 'DE1-II-B', 'DE1-II-C'] })
     expect(r.ok).toBe(true)

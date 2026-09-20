@@ -63,8 +63,9 @@ function napMayCu() {
   dat('settings', [
     // nhóm DỌN
     ['soCauCa:111111', {}], ['khoChuaCa:111111', []], ['deRiengCa:111111', {}], ['cheDoDeRieng:111111', true], ['qidRaPhieu:12000', ['q1']],
-    ['diemCuaEm', {}], ['khoDoKho', {}], ['lichOnLai', {}],
-    // nhóm GIỮ
+    ['buoiChua:-|Lop|111111', { phienBan: 1 }], ['diemCuaEm', {}],
+    // nhóm GIỮ (kể cả độ khó theo câu và hàng đợi ôn giãn cách)
+    ['khoDoKho', {}], ['lichOnLai', {}],
     ['scriptUrl', 'https://x'], ['mayChuMoi', {}], ['teacherSecret', 'bi-mat'], ['khoaApp', {}], ['khoaVanTay', {}], ['khoaPhien', {}], ['giuPhien', true],
     ['soSuaDang', { q1: 'D01' }], ['tokenHocSinh', 't1'], ['tokenPhuHuynh', 't2'], ['myStudentSbd', '12000'], ['myParentPhone', '09'],
   ])
@@ -90,10 +91,12 @@ describe('mốc hợp lệ và câu thông báo', () => {
 })
 
 describe('khoá nào DỌN, khoá nào GIỮ', () => {
-  const DON = ['soCauCa:1', 'khoChuaCa:x', 'deRiengCa:x', 'cheDoDeRieng:x', 'qidRaPhieu:12000', 'diemCuaEm', 'khoDoKho', 'lichOnLai']
+  const DON = ['soCauCa:1', 'khoChuaCa:x', 'deRiengCa:x', 'cheDoDeRieng:x', 'qidRaPhieu:12000', 'buoiChua:-|Lop|1', 'diemCuaEm']
   const GIU = [
     'scriptUrl', 'mayChuMoi', 'teacherSecret', 'khoaApp', 'khoaVanTay', 'khoaPhien', 'giuPhien', 'soSuaDang',
     'tokenHocSinh', 'tokenPhuHuynh', 'myStudentSbd', 'myParentPhone', 'mocResetDaDon',
+    // Boss chốt 21/09 (reset GIỮ hồ sơ mạnh yếu): độ khó theo câu và hàng đợi ôn giãn cách CHỈ có ở máy thầy ⇒ giữ
+    'khoDoKho', 'lichOnLai',
   ]
   it('đúng bảng 0.Planer đã duyệt', () => {
     for (const k of DON) expect(EXAM.khoaSettingsThuocNhomDon(k), k).toBe(true)
@@ -114,7 +117,8 @@ describe('khoá nào DỌN, khoá nào GIỮ', () => {
     // cả hai tập phải có thật (đề phòng regex hỏng thành xanh suông)
     expect([...dungDung].sort()).toEqual(expect.arrayContaining(['scriptUrl', 'teacherSecret', 'khoDoKho', 'diemCuaEm', 'lichOnLai', 'mocResetDaDon', 'soSuaDang', 'tokenHocSinh']))
     expect(dungDung.size).toBeGreaterThanOrEqual(15)
-    expect([...tienTo].sort()).toEqual(['cheDoDeRieng:', 'deRiengCa:', 'khoChuaCa:', 'qidRaPhieu:', 'soCauCa:'])
+    expect([...dungDung].sort()).toEqual(expect.arrayContaining(['khoDoKho', 'lichOnLai']))
+    expect([...tienTo].sort()).toEqual(['buoiChua:', 'cheDoDeRieng:', 'deRiengCa:', 'khoChuaCa:', 'qidRaPhieu:', 'soCauCa:'])
     const chuaPhanLoai = [...dungDung].filter((k) => !DON.includes(k) && !GIU.includes(k))
     expect(chuaPhanLoai, 'khoá settings mới chưa được xếp DỌN/GIỮ khi reset').toEqual([])
     for (const t of tienTo) expect((EXAM.TIEN_TO_SETTINGS_DON_KHI_RESET as readonly string[]).includes(t), t).toBe(true)
@@ -199,12 +203,12 @@ describe('donTheoMocReset — khi nào chạy', () => {
 describe('giao dịch dọn trên IndexedDB giả', () => {
   it('xoá đúng nhóm DỌN, GIỮ đúng nhóm GIỮ (kể cả KHO ĐỀ), ghi dấu, đếm đúng', async () => {
     const kq = await EXAM.donDuLieuTheoMocReset('2026-09-21')
-    expect(kq).toEqual({ soBanGhi: 2 + 2 + 1, soKhoaSettings: 8 })
+    expect(kq).toEqual({ soBanGhi: 2 + 2 + 1, soKhoaSettings: 7 })
     for (const s of ['sessionCache', 'sessionBankTeacher', 'attempts']) expect(nen.kho.get(s)!.size, s).toBe(0)
     expect([...nen.kho.get('examSources')!.keys()].sort()).toEqual(['D1', 'D2'])
     const conLai = [...nen.kho.get('settings')!.keys()].sort()
     expect(conLai).toEqual(
-      ['giuPhien', 'khoaApp', 'khoaPhien', 'khoaVanTay', 'mayChuMoi', 'mocResetDaDon', 'myParentPhone', 'myStudentSbd', 'scriptUrl', 'soSuaDang', 'teacherSecret', 'tokenHocSinh', 'tokenPhuHuynh'].sort(),
+      ['giuPhien', 'khoDoKho', 'khoaApp', 'khoaPhien', 'khoaVanTay', 'lichOnLai', 'mayChuMoi', 'mocResetDaDon', 'myParentPhone', 'myStudentSbd', 'scriptUrl', 'soSuaDang', 'teacherSecret', 'tokenHocSinh', 'tokenPhuHuynh'].sort(),
     )
     expect(nen.kho.get('settings')!.get('mocResetDaDon')).toBe('2026-09-21')
     expect(nen.kho.get('settings')!.get('teacherSecret')).toBe('bi-mat')

@@ -145,9 +145,9 @@ function noiTo(khung: HTMLIFrameElement, html: string) {
   return { dom, doc: dom.window.document, spy, hen, chayNhip: () => hen.filter((t) => !t.huy && t.iv).forEach((t) => t.f()) }
 }
 
-const daBam = (doc: Document, khoa: string, chu: 'Đạt' | 'Không đạt') =>
+const daBam = (doc: Document, khoa: string, chu: 'Đạt' | 'Chưa đạt') =>
   ([...doc.querySelectorAll<HTMLElement>('.mc-cham')].find((v) => v.getAttribute('data-khoa') === khoa)!.querySelectorAll<HTMLButtonElement>('.mc-cham-nut') as NodeListOf<HTMLButtonElement>)
-const nutTo = (doc: Document, khoa: string, chu: 'Đạt' | 'Không đạt') => [...daBam(doc, khoa, chu)].find((b) => b.textContent === chu)!
+const nutTo = (doc: Document, khoa: string, chu: 'Đạt' | 'Chưa đạt') => [...daBam(doc, khoa, chu)].find((b) => b.textContent === chu)!
 const vungTo = (doc: Document, khoa: string) => [...doc.querySelectorAll<HTMLElement>('.mc-cham')].find((v) => v.getAttribute('data-khoa') === khoa)!
 
 describe('tờ chiếu ↔ màn giáo viên: bắt tay và ghi kết quả (giao thức thật hai đầu)', () => {
@@ -185,7 +185,7 @@ describe('tờ chiếu ↔ màn giáo viên: bắt tay và ghi kết quả (giao
     const t = noiTo(khung, html)
     await waitFor(() => expect(t.doc.body.classList.contains('mc-noi')).toBe(true), CHO)
 
-    nutTo(t.doc, khoa[1], 'Không đạt').click()
+    nutTo(t.doc, khoa[1], 'Chưa đạt').click()
     await waitFor(() => expect(m.ghi).toHaveBeenCalledTimes(1), CHO)
     expect(m.ghi.mock.calls[0][2]).toMatchObject({ dat: false })
     await waitFor(() => expect(vungTo(t.doc, khoa[1]).textContent).toBe('Đã ghi'), CHO)
@@ -193,10 +193,10 @@ describe('tờ chiếu ↔ màn giáo viên: bắt tay và ghi kết quả (giao
 
     const dong = dongBuoi(r).find((d) => d.getAttribute('data-dong-buoi') === khoa[1])!
     await waitFor(() => expect(dong.textContent).toContain('Đã ghi: Không đạt'), CHO)
-    // Toàn bộ tờ chiếu sau khi ghi: KHÔNG có "Không đạt" ở ô vừa ghi (các ô chưa ghi vẫn còn nút bấm).
+    // Toàn bộ tờ chiếu sau khi ghi: KHÔNG có "Chưa đạt" ở ô vừa ghi (các ô chưa ghi vẫn còn nút bấm).
     const conTrongO = [...t.doc.querySelectorAll<HTMLElement>('.mc-nua')].filter((n) => n.querySelector(`.mc-cham[data-khoa="${khoa[1]}"]`))
     expect(conTrongO.length).toBe(1)
-    expect(conTrongO[0].querySelector('.mc-cham')!.textContent).not.toContain('Không đạt')
+    expect(conTrongO[0].querySelector('.mc-cham')!.textContent).not.toContain('Chưa đạt')
   }, 60000)
 
   it('BẤM ĐÚP / tin CHAM gửi hai lần ⇒ máy chủ vẫn nhận ĐÚNG MỘT lần (cổng ghi idempotent)', async () => {

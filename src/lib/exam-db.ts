@@ -747,9 +747,13 @@ export async function docLichOnLai<T>(): Promise<T | undefined> {
 /** Store xoá SẠCH khi reset: bản ca cache, bank có đáp án theo ca, bài làm của em trên máy này. */
 export const STORE_DON_KHI_RESET = [STORE_SESSION_CACHE, STORE_SESSION_BANK_TEACHER, STORE_ATTEMPTS] as const
 /** Khoá `settings` theo TIỀN TỐ (`soCauCa:<maCa>`, `qidRaPhieu:<sbd>`…) bị xoá khi reset. */
-export const TIEN_TO_SETTINGS_DON_KHI_RESET = ['soCauCa:', 'khoChuaCa:', 'deRiengCa:', 'cheDoDeRieng:', 'qidRaPhieu:'] as const
-/** Khoá `settings` ĐÚNG TÊN bị xoá khi reset: điểm theo em, kho độ khó (qid → lượt/đúng/số ca), hàng đợi ôn giãn cách. */
-export const KHOA_SETTINGS_DON_KHI_RESET = [KHOA_DIEM_EM, 'khoDoKho', 'lichOnLai'] as const
+export const TIEN_TO_SETTINGS_DON_KHI_RESET = ['soCauCa:', 'khoChuaCa:', 'deRiengCa:', 'cheDoDeRieng:', 'qidRaPhieu:', 'buoiChua:'] as const
+/** Khoá `settings` ĐÚNG TÊN bị xoá khi reset: chỉ điểm theo em.
+ *
+ * GIỮ `khoDoKho` (độ khó theo CÂU — qid → lượt/đúng/số ca — không phải điểm của em; ca đã xoá rồi thì không dựng lại được mà
+ * thời gian lên bảng cần nó) và `lichOnLai` (hàng đợi ôn giãn cách em × dạng: hồ sơ mạnh yếu chỉ có ở máy thầy) — Boss chốt 21/09 khi
+ * thầy đổi lệnh reset thành "GIỮ hồ sơ mạnh yếu". */
+export const KHOA_SETTINGS_DON_KHI_RESET = [KHOA_DIEM_EM] as const
 
 /** DẤU "đã dọn theo mốc này" — nằm trong `settings` (KHÔNG thuộc nhóm dọn) và được ghi CÙNG giao dịch với việc dọn. */
 const KHOA_MOC_RESET_DA_DON = 'mocResetDaDon'
@@ -794,6 +798,29 @@ export async function donDuLieuTheoMocReset(moc: string): Promise<KetQuaDonKhiRe
   await cs.put(moc, KHOA_MOC_RESET_DA_DON)
   await tx.done
   return { soBanGhi, soKhoaSettings }
+}
+
+// ---------------------------------------------------------------------------
+// BUỔI CHỮA ĐANG DỞ (M4, 21/09/2026) — `buoiChua:<mốc reset>|<lớp>|<mã ca>` → `BuoiChuaLuu` (xem `noi-buoi-chua.ts`).
+//
+// Nằm ở `settings` như `soCauCa`, `khoDoKho`… chứ KHÔNG thêm store mới: nâng phiên bản IndexedDB làm `upgrade()` chạy lại trên
+// MỌI máy (kể cả máy học sinh đang thi dở, dùng chung cơ sở này) và bị CHẶN nếu còn tab bản cũ mở. Rủi ro ấy nặng hơn lợi
+// ích của một store riêng — cùng lập luận với `khoDoKho` ở trên. Tiền tố `buoiChua:` nằm trong nhóm DỌN khi reset.
+// Chỉ lưu thứ máy chủ KHÔNG giữ hộ (kế hoạch buổi + ô đã ghi); lịch sử lên bảng thật vẫn ở máy chủ.
+// ---------------------------------------------------------------------------
+export async function luuBuoiChua(khoa: string, buoi: unknown): Promise<void> {
+  const db = await getDb()
+  await db.put(STORE_SETTINGS, buoi, `buoiChua:${khoa}`)
+}
+
+export async function docBuoiChua(khoa: string): Promise<unknown> {
+  const db = await getDb()
+  return db.get(STORE_SETTINGS, `buoiChua:${khoa}`)
+}
+
+export async function xoaBuoiChua(khoa: string): Promise<void> {
+  const db = await getDb()
+  await db.delete(STORE_SETTINGS, `buoiChua:${khoa}`)
 }
 
 /** Xoá bank ca (có đáp án) của MỘT ca khỏi máy — dùng khi máy chủ không còn mã ca ấy. */

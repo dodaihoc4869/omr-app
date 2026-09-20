@@ -1,6 +1,7 @@
 // CẦU NỐI TỜ MÁY CHIẾU ↔ MÀN GIÁO VIÊN (GĐ 6 làn giáo viên, mốc d, 19/09/2026).
 //
-// Thầy chốt: "Cho lên máy chiếu luôn" — nút Đạt / Không đạt ngay trên tờ máy chiếu.
+// Thầy chốt: "Cho lên máy chiếu luôn" — nút Đạt / Chưa đạt ngay trên tờ máy chiếu (M3, 19/09: nhãn nút là "Chưa đạt", không phải
+// "Không đạt" — thầy chốt trên bản vẽ; đường ghi vẫn là `dat: false`).
 //
 // TỜ CHIẾU LÀ MỘT TRANG HTML ĐỘC LẬP (`html-may-chieu.ts`), nằm trong `<iframe srcDoc>` của
 // `KhungXemPhieu` (cùng nguồn với app, KHÔNG sandbox). Nó không có hàm ghi nào cả: bấm nút chỉ gửi một
@@ -22,11 +23,11 @@ export const TIN_TO_CHIEU = {
   SAN_SANG: 'ddh-mc-san-sang',
   /** App → tờ chiếu: "nghe rồi" — từ đây tờ chiếu mới hiện nút. */
   KET_NOI: 'ddh-mc-ket-noi',
-  /** Tờ chiếu → app: thầy bấm Đạt / Không đạt ở một ô. */
+  /** Tờ chiếu → app: thầy bấm Đạt / Chưa đạt ở một ô. */
   CHAM: 'ddh-mc-cham',
-  /** App → tờ chiếu: kết quả ghi của một lệnh `CHAM` — `kq` là 'da_ghi' hoặc 'loi'. */
+  /** App → tờ chiếu: kết quả ghi của một lệnh `CHAM` — `kq` là 'da_ghi' hoặc 'loi'; kèm `dat` (boolean) khi 'da_ghi' để tờ ăn mừng. */
   PHAN_HOI: 'ddh-mc-phan-hoi',
-  /** App → tờ chiếu: ô này đã được ghi từ chỗ khác (bảng buổi chữa) — khoá nút. */
+  /** App → tờ chiếu: ô này đã được ghi từ chỗ khác (bảng buổi chữa) — khoá nút; kèm `dat` khi vừa ghi xong (không kèm khi chỉ nhắc lại ô đã ghi từ trước). */
   DA_GHI: 'ddh-mc-da-ghi',
 } as const
 
@@ -110,14 +111,15 @@ function thoatThuocTinh(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
-/** Mảnh markup hai nút của MỘT ô. Trung tính: nhãn "Đạt" / "Không đạt" chỉ nằm trên NÚT (trước khi bấm);
- * sau khi ghi mảnh này bị thay bằng nhãn "Đã ghi" (cả hai kết quả y hệt), kết quả không được lưu lại ở đâu. */
+/** Mảnh markup hai nút của MỘT ô. Trung tính: nhãn "Đạt" / "Chưa đạt" chỉ nằm trên NÚT (trước khi bấm);
+ * sau khi ghi mảnh này bị thay bằng nhãn "Đã ghi" (cả hai kết quả y hệt), kết quả không được lưu lại ở đâu trong mảnh này.
+ * (Riêng "Đạt" còn kích hoạt ăn mừng trên thẻ tên — việc của tờ chiếu, xem sự kiện `mc-ghi-nhan` ở `jsCauNoiToChieu`.) */
 export function mangNutChamToChieu(khoa: string): string {
-  return `<span class="mc-cham" data-khoa="${thoatThuocTinh(khoa)}" data-cham="cho"><button type="button" class="mc-cham-nut" data-kq="1">Đạt</button><button type="button" class="mc-cham-nut" data-kq="0">Không đạt</button><span class="mc-cham-tin" role="status" aria-live="polite"></span></span>`
+  return `<span class="mc-cham" data-khoa="${thoatThuocTinh(khoa)}" data-cham="cho"><button type="button" class="mc-cham-nut" data-kq="1">Đạt</button><button type="button" class="mc-cham-nut" data-kq="0">Chưa đạt</button><span class="mc-cham-tin" role="status" aria-live="polite"></span></span>`
 }
 
-/** CSS CỦA HAI NÚT — chỉ chèn khi tờ có `cauNoi`. Trung tính: cùng một kiểu viền xám cho cả hai nút, không
- * xanh/đỏ, cỡ vừa, nằm CẠNH nút "Hiện lời giải" (mép ô, dưới đề, không đè lên đề và không vào chỗ em viết). */
+/** CSS CỦA HAI NÚT — chỉ chèn khi tờ có `cauNoi`. Chỉ giữ LUẬT HIỆN/ẨN và một diện mạo trung tính dự phòng (viền xám, cùng kiểu cho
+ * cả hai nút, không xanh/đỏ); tờ chiếu M3 vẽ lại nút bằng luật riêng, đặc hiệu hơn (`giao-dien-to-chieu.ts`). */
 export const CSS_CAU_NOI_TO_CHIEU = `
 .mc-cham{display:none}
 body.mc-noi .mc-cham{display:inline-flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end;font-family:var(--mc-sans)}
@@ -133,8 +135,9 @@ body.mc-noi .mc-giai-vung .mc-giai{flex:0 0 100%;margin-top:0}
 
 /** JS CỦA HAI NÚT — chỉ chèn khi tờ có `cauNoi`. Giao thức và số giây ở đầu tệp này.
  *
- * KHÔNG lưu kết quả Đạt / Không đạt ở đâu trong trang: thầy bấm là gửi đi, phản hồi về thì ô chỉ còn nhãn
- * "Đã ghi" (cả hai kết quả y hệt nhau). Bấm đúp bị chặn bằng trạng thái `data-cham` (cho → dang → xong). */
+ * KHÔNG lưu kết quả Đạt / Chưa đạt trong mảnh này: thầy bấm là gửi đi, phản hồi về thì ô chỉ còn nhãn "Đã ghi" (cả hai kết
+ * quả y hệt nhau). Riêng khi app báo `dat: true` thì phát sự kiện `mc-ghi-nhan` để tờ ăn mừng. Bấm đúp bị chặn bằng trạng
+ * thái `data-cham` (cho → dang → xong). */
 export function jsCauNoiToChieu(): string {
   return `
 (function () {
@@ -159,7 +162,8 @@ export function jsCauNoiToChieu(): string {
   }
   function nutCua(v) { return Array.prototype.slice.call(v.querySelectorAll('.mc-cham-nut')); }
   function tin(v, chu) { var t = v.querySelector('.mc-cham-tin'); if (t) t.textContent = chu; }
-  function xong(khoa, kq) {
+  // dat (true/false/vắng): kết quả app báo về cùng lệnh ghi. Chỉ true mới ăn mừng; false hoặc vắng thì không có hiệu ứng nào.
+  function xong(khoa, kq, dat) {
     var v = tim(khoa);
     if (!v) return;
     var trang = v.getAttribute('data-cham');
@@ -173,6 +177,8 @@ export function jsCauNoiToChieu(): string {
       s.className = 'mc-cham-xong';
       s.textContent = 'Đã ghi';
       v.appendChild(s);
+      // Tờ chiếu (thẻ tên xanh + thần thú nhảy) nghe sự kiện này. KHÔNG lưu kết quả ở đâu: chỉ phát cho lần này.
+      if (dat === true) document.dispatchEvent(new CustomEvent('mc-ghi-nhan', { detail: { khoa: khoa, dat: true, vung: v } }));
       return;
     }
     v.setAttribute('data-cham', 'cho');
@@ -189,9 +195,9 @@ export function jsCauNoiToChieu(): string {
       if (nhip) { clearInterval(nhip); nhip = null; }
       body.classList.add('mc-noi');
     } else if (d.type === '${TIN_TO_CHIEU.PHAN_HOI}') {
-      xong(String(d.khoa), d.kq === 'da_ghi' ? 'da_ghi' : 'loi');
+      xong(String(d.khoa), d.kq === 'da_ghi' ? 'da_ghi' : 'loi', d.dat === true);
     } else if (d.type === '${TIN_TO_CHIEU.DA_GHI}') {
-      xong(String(d.khoa), 'da_ghi');
+      xong(String(d.khoa), 'da_ghi', d.dat === true);
     }
   });
   document.addEventListener('click', function (e) {

@@ -199,3 +199,9 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 
 - Việc còn mở: (1) chờ 0.Planer soát 70d3408 (đã soát), e1555a4 (đã soát), 564dc08, 5d0d1c4, b72ca8d; (2) TheCau bật ở màn thi = Code 2 đặt `m3` ở gốc ExamTakeScreen (đã thoả thuận, Code 2 xác nhận cách (a)); (3) KhoiBaiLuyen + TheCauChiTiet để nguyên (đề nghị, chờ đồng ý); (4) nợ cũ ngoài phạm vi: 4 cặp chữ nhỏ --p-do/--p-xanh của TheCauChiTiet dưới 4,5:1 (tokens.css); (5) dọn: thư mục tạm `.claude/m3-xem/` (trang xem thử, KHÔNG commit) — xoá được
 - Mã chết không đổi áo: CardCaThiGanNhat, KhoiLuyenKhacPhuc, BongBongChatHocSinh, BongBongChatPhuHuynh; KhoiTienBo chỉ app giáo viên
+
+## APP GIÁO VIÊN M3 (đề bài prompt-app-giao-vien-m3.md, Boss 21/09) — G1 vỏ: 4a51718 · 6fef218
+- [x] Điều hướng TRÁI: ThanhBenTrai (ngăn kéo 264 ≥1100 · rail 88 880–1100) + BottomNav (<880: 4 mục + tờ Thêm = đủ 8 mục) cùng `MUC_DIEU_HUONG`; nút Mở ca kiểm tra; màn CaiDatScreen mới (Giao diện · KhoiMayChuMoi · KhoiMatKhauApp; NganHangDe giữ bản cũ vì 7 test soi chuỗi); vỏ `src/styles/vo-thay.css` (không hex/!important); gốc App `m3 m3-thay vo-thay`; gỡ thanh PHẢI + tay kéo khỏi index.css (`rongBenTrai` còn trong danh sách dọn reset)
+- [x] Sáng/tối/theo máy ÉP ĐƯỢC không sao chép bảng màu: `giao-dien-thay.ts` viết lại điều kiện `prefers-color-scheme` của mọi luật (kể cả CSS nạp muộn) — Chromium 6 tổ hợp đạt; lỗi "sáng→tối không đổi lại" bắt bằng test
+- [x] TEP +16 tệp thầy (m3-c-1909 đổi có chủ ý); exam-setup.css hết hex; `dungM3()` KHÔNG đổi (component dùng chung vẫn cổng route; vỏ thầy luôn `.m3`)
+- Còn: `!important` trong teacher-layout.css/exam-setup.css giữ vì thắng style nội tuyến của DesignSystem — gỡ dần ở G5 khi từng màn được viết lại. Đỏ có sẵn ở tệp Code 1 (don-moc-reset-giao-vien: khoá `buoiChua:` mới trong exam-db.ts) — không của em.
