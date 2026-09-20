@@ -1,6 +1,6 @@
 // THANH ĐÁY (< 880 px) CỦA APP GIÁO VIÊN — cùng danh sách mục với `ThanhBenTrai` (MUC_DIEU_HUONG), nên ngăn kéo, rail và thanh đáy luôn khớp.
 // Bốn mục chính nằm trên thanh; các mục còn lại (Ngân hàng đề, Gọi lên bảng, Học sinh hỏi, Cài đặt) ở tờ "Thêm" — ĐỦ mục, không mục nào mất.
-// Nút nổi "Mở ca kiểm tra" nằm trên thanh, góc phải. Ẩn ở màn làm bài (App.tsx: HIDE_BOTTOMNAV_ON).
+// Nút nổi "Mở ca kiểm tra" nằm trên thanh, góc phải. Ẩn ở màn làm bài (App.tsx: HIDE_BOTTOMNAV_ON), ở màn theo dõi ca và ở chính màn Mở ca.
 import { useState } from 'react'
 import { MoreHorizontal, Plus } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
@@ -23,10 +23,13 @@ export default function BottomNav({ soCauHoi = 0 }: { soCauHoi?: number }) {
 
   return (
     <nav className="day-thay" aria-label="Điều hướng chính">
-      <button type="button" className="day-thay-nut-ca" aria-label="Mở ca kiểm tra" onClick={() => di('examsetup')}>
-        <Plus size={22} aria-hidden="true" />
-        <span>Mở ca</span>
-      </button>
+      {/* Không đè lên màn THEO DÕI CA (giữa giờ thi, góc phải dưới là chỗ nút Khoá ca / Mở khoá — bấm nhầm "Mở ca" là văng khỏi ca) và không lặp ở chính màn Mở ca. */}
+      {screen !== 'exammonitor' && screen !== 'examsetup' && (
+        <button type="button" className="day-thay-nut-ca" aria-label="Mở ca kiểm tra" onClick={() => di('examsetup')}>
+          <Plus size={22} aria-hidden="true" />
+          <span>Mở ca</span>
+        </button>
+      )}
 
       {mo && (
         <div className="day-thay-them" role="menu" aria-label="Thêm chức năng">

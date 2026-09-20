@@ -89,6 +89,18 @@ describe('BottomNav (< 880 px) — ĐỦ mục', () => {
   })
 })
 
+describe('BottomNav — nút nổi Mở ca không đè màn theo dõi ca (G4)', () => {
+  it.each(['exammonitor', 'examsetup'] as const)('ở màn %s KHÔNG có nút nổi; ở màn khác vẫn có', (man) => {
+    useAppStore.getState().setScreen(man)
+    render(<BottomNav />)
+    expect(screen.queryByRole('button', { name: 'Mở ca kiểm tra' })).toBeNull()
+    cleanup()
+    useAppStore.getState().setScreen('hocsinh')
+    render(<BottomNav />)
+    expect(screen.getByRole('button', { name: 'Mở ca kiểm tra' })).toBeTruthy()
+  })
+})
+
 describe('vo-thay.css: ba dạng, một nguồn màu, không hex / !important', () => {
   const sach = CSS.replace(/\/\*[\s\S]*?\*\//g, '')
   it('ngưỡng 880 / 1100 px; rail 88 px, ngăn kéo 264 px; thanh đáy chỉ < 880; mặc định thanh trái ẩn', () => {
