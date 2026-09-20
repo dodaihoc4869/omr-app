@@ -105,6 +105,7 @@ describe('Bước 6 · ấn thạch trong game (SQLite thật)', () => {
     expect(r.tiepSuc).toEqual([{ tu: 'S1', tenTu: 'Trần Minh', den: 'S2', tenDen: 'Nguyễn Thu Hà', soLan: 2, thanhCong: 1 }, { tu: 'S3', tenTu: 'Lê Nam', den: 'S1', tenDen: 'Trần Minh', soLan: 1, thanhCong: 1 }]) // bạn máy không có trong bảng
     expect(r.nguoiTiepSucCuaTuan.map((x: any) => [x.sbd, x.soLan, x.thanhCong])).toEqual([['S1', 2, 1], ['S3', 1, 1]])
     expect(r.trum).toEqual([{ maDang: 'ES.A.X', soLan: 2, yDungTB: 1.5, voGiap: 0, ten: 'Ester' }, { maDang: 'AN.B.Y', soLan: 1, yDungTB: 4, voGiap: 1, ten: 'Ancol' }]); expect(JSON.stringify(r.trum)).not.toMatch(/S1|S2|S3/)
+    const caTruong = await adminGame(d.env, { action: 'doan-bao-cao' }) as any; expect(caTruong.tiepSuc.map((x: any) => x.tu)).not.toContain('may'); expect(caTruong.nguoiTiepSucCuaTuan.map((x: any) => x.sbd)).toEqual(['S1', 'S3']) // không lọc lớp thì bạn máy vẫn không lọt
     d.sql.exec('DROP TABLE doan_trum_cau'); expect((await adminGame(d.env, { action: 'doan-bao-cao' }) as any).trum).toEqual([])
     d.sql.exec('DROP TABLE doan_tiep_suc'); expect(await adminGame(d.env, { action: 'doan-bao-cao' })).toMatchObject({ ok: true, tiepSuc: [], nguoiTiepSucCuaTuan: [] })
   })

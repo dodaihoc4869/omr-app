@@ -152,12 +152,14 @@ export default function DoanTran(p: Props) {
       <section className="dh-giay"><div className="dh-giay-dau"><b className="dh-vien-thuoc">CÂU CỦA EM</b></div><div className="dh-de">{cau?.loiNhan ?? 'Đang tải câu của em…'}</div></section>
     ) : (
       <DoanCau q={p.de} chon={p.chon} onChon={p.onChon} khoa={p.ban || !!cau?.daChot} ketQua={cau?.daChot ? p.ketQuaCau ?? cau.ketQua ?? null : null} onZoom={p.onZoom}
-        dau={<><b className="dh-vien-thuoc">CÂU CỦA EM</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}</span></>} />
+        dau={<><b className="dh-vien-thuoc">CÂU CỦA EM</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}{cau?.an ? ' · ấn đã sáng' : ''}</span></>} />
     )
   }
 
   const cau = xem.cau, daChot = !!cau?.daChot, chieu = CHIEU[em.pet]!, ts = xem.tiepSuc
-  const tenDon = p.hanhDong === 'danh' ? 'Đánh' : p.hanhDong === 'chan' ? 'Chắn' : chieu.kyNang
+  // Câu thuộc dạng em ĐÃ KHẮC PHỤC XONG (ấn sáng) → nút kỹ năng mang tên biến thể ấn, mạnh hơn ×1,25.
+  const tenKyNang = cau?.an ? chieu.kyNangAn : chieu.kyNang
+  const tenDon = p.hanhDong === 'danh' ? 'Đánh' : p.hanhDong === 'chan' ? 'Chắn' : tenKyNang
   const du = !!p.de && duDapAn(p.de, p.chon), boTrong = !du && p.hanhDong === 'chan'
   const duoi = !mo ? null : tran.laTrum ? (
     <>
@@ -174,7 +176,7 @@ export default function DoanTran(p: Props) {
       <div className="dh-don" role="group" aria-label="Chọn đòn">
         <button type="button" aria-pressed={p.hanhDong === 'danh'} onClick={() => p.onHanhDong('danh')}>{BieuTuong.danh}<b>Đánh</b><small>đúng → {satThuongDon({ dung: true })} sát thương</small></button>
         <button type="button" aria-pressed={p.hanhDong === 'chan'} onClick={() => p.onHanhDong('chan')}>{BieuTuong.chan}<b>Chắn</b><small>khiên {CHAN} cho Linh Tâm</small></button>
-        <button type="button" aria-pressed={p.hanhDong === 'ky_nang'} disabled={tran.nangLuong < NL_KY_NANG} onClick={() => p.onHanhDong('ky_nang')}>{BieuTuong.ky_nang}<b>{chieu.kyNang}</b><small>kỹ năng · {tran.nangLuong}/{NL_KY_NANG} NL</small></button>
+        <button type="button" aria-pressed={p.hanhDong === 'ky_nang'} disabled={tran.nangLuong < NL_KY_NANG} onClick={() => p.onHanhDong('ky_nang')}>{BieuTuong.ky_nang}<b>{tenKyNang}</b><small>{cau?.an ? `ấn sáng ×1,25 · ${tran.nangLuong}/${NL_KY_NANG} NL` : `kỹ năng · ${tran.nangLuong}/${NL_KY_NANG} NL`}</small></button>
       </div>
       {ts && !ts.theNhan && !cau?.rut && (ts.conLuotNhan > 0
         ? <button type="button" className="dh-xin" aria-pressed={ts.daXin} disabled={p.ban} onClick={() => p.onXinTiepSuc(!ts.daXin)}>{ts.daXin ? 'Đang chờ bạn tiếp sức… (chạm để thôi)' : `Cần tiếp sức · còn ${ts.conLuotNhan} lần được tiếp sức`}</button>

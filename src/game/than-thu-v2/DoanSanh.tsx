@@ -2,7 +2,7 @@
 // rương chuỗi, Trùm lớp, ấn thạch — bước 5 và 6) thì KHÔNG hiện: không bịa số.
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import type { DoanXem, SanhXem } from './doan-kieu'
+import type { AnXem, BanDongHanhXem, DoanXem, SanhXem } from './doan-kieu'
 import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh } from './DoanHinh'
 
 // Bốn thứ đang tới (bước 5, 6). CỐ Ý không có con số nào: máy chủ chưa có số thì không bịa — chỉ tên, một dòng mô tả, biểu tượng khoá.
@@ -14,7 +14,7 @@ const SAP_MO = [
 ] as const
 export interface GoiYHomNay { tong: number; nhom: { ten: string; so: number }[]; hetLuot: boolean }
 interface Props {
-  pet: number; cap: number; tenDoan: string; goiY: GoiYHomNay | null; sanh: SanhXem | null
+  pet: number; cap: number; tenDoan: string; goiY: GoiYHomNay | null; sanh: SanhXem | null; anThach?: AnXem | null; banDongHanh?: BanDongHanhXem | null
   phong: DoanXem | null; ban: boolean; loi: string
   onLenDuong: () => void; onMoPhong: () => void; onVaoPhong: (ma: string) => void; onBatDau: () => void; onRoi: () => void; onDong: () => void
   khoiThem?: ReactNode
@@ -24,7 +24,7 @@ const hen = (ms: number) => { const gio = Math.floor(ms / 3_600_000), ngay = Mat
 
 export default function DoanSanh(p: Props) {
   const [ma, setMa] = useState('')
-  const s = p.sanh, lop = s?.doanLop, hetVe = !!s && !s.mienPhiHomNay && !s.ve
+  const s = p.sanh, lop = s?.doanLop, hetVe = !!s && !s.mienPhiHomNay && !s.ve, an = p.anThach && p.anThach.ds.length ? p.anThach : null, bdh = p.banDongHanh
   const sao = Array.from({ length: 26 }, (_, i) => <i key={i} style={{ left: `${(i * 53 + 17) % 100}%`, top: `${(i * 29 + 7) % 60}%`, animationDelay: `${(i % 7) * .4}s` }} />)
   return (
     <div className="dh-khung">
@@ -101,14 +101,33 @@ export default function DoanSanh(p: Props) {
               </section>
             </div>
           )}
-          <section className="dh-sap-mo" aria-label="Sắp mở">
-            {SAP_MO.filter(([ten]) => !s || ten === 'Ấn thạch dạng').map(([ten, moTa]) => (
+          {an && (
+            <section className="dh-kinh dh-muc" aria-label="Ấn thạch dạng của em">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}><div className="dh-nhan">ẤN THẠCH DẠNG CỦA EM</div><small style={{ color: 'rgb(159,178,217)' }}>sáng {an.sang} · nứt {an.nut}</small></div>
+              <div className="dh-an">{an.ds.map(a => <div key={a.dang} className={a.trangThai === 'nut' ? 'dh-an-nut' : ''}><i aria-hidden="true" /><small>{a.ten}</small></div>)}</div>
+              {an.ganSang ? <p>Ấn <b style={{ color: 'rgb(255,181,154)' }}>{an.ganSang.ten}</b> đang nứt: khắc phục thêm <b style={{ color: 'rgb(255,255,255)' }}>{an.ganSang.conCau} câu</b> là sáng → mở kỹ năng <span className="dh-chu-vang">{an.ganSang.kyNang}</span></p>
+                : <p>Mọi ấn của em đều đang sáng. Câu thuộc dạng đã sáng thì Kỹ năng của thần thú mạnh hơn ×1,25.</p>}
+            </section>
+          )}
+          {(!s || !an) && <section className="dh-sap-mo" aria-label="Sắp mở">
+            {SAP_MO.filter(([ten]) => !s || (ten === 'Ấn thạch dạng' && !an)).map(([ten, moTa]) => (
               <div key={ten} className="dh-kinh">
                 <span className="dh-khoa" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></svg>SẮP MỞ</span>
                 <b>{ten}</b><small>{moTa}</small>
               </div>
             ))}
-          </section>
+          </section>}
+          {bdh && (
+            <section className="dh-kinh dh-muc" aria-label="Bạn đồng hành hợp nhất hôm nay">
+              <div className="dh-nhan">BẠN ĐỒNG HÀNH HỢP NHẤT HÔM NAY</div>
+              <div className="dh-bu-nhau">
+                <div><ThuHinh pet={p.pet} cap={p.cap} size={72} /><b>Em</b></div>
+                <div className="dh-bu-nhau-giua"><span>{bdh.ten} vững {bdh.banVung} →</span><span className="dh-vang">← Em vững {bdh.emVung}</span></div>
+                <div><ThuHinh pet={bdh.pet} cap={bdh.cap} size={72} quayTrai /><b>{bdh.ten}</b></div>
+              </div>
+              <p>Hai bạn bù nhau: đi cùng đoàn thì tiếp sức chảy hai chiều. Em mở đoàn rồi đọc mã cho {bdh.ten} nhé.</p>
+            </section>
+          )}
           <section className="dh-kinh dh-muc" aria-label="Đi cùng bạn">
             <div className="dh-nhan">ĐI CÙNG BẠN · 2–4 BẠN MỘT ĐOÀN</div>
             <p>Ngồi cạnh nhau thì càng vui: bạn nào kẹt sẽ bật tín hiệu "cần tiếp sức", trùm thì cả đội cùng bàn một câu.</p>
