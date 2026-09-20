@@ -16,12 +16,14 @@ import {
   thichNghiChangSau,
   type BoCuaEm,
   type CauGiao,
+  type DieuChinhEm,
   type HoSoEmRut,
   type Muc,
   type NganSachBai,
+  type NhanCau,
 } from '../src/lib/btvn-nang-do'
 import { NGUONG_DANG_YEU, SO_CAU_DU_TIN_DANG } from '../src/lib/ho-so-lop'
-import { mulberry32 } from '../src/lib/exam-shuffle'
+import { hashSeed, mulberry32 } from '../src/lib/exam-shuffle'
 
 // ───────────────────────── dữ liệu mẫu ─────────────────────────
 /** 80 câu, 20 dạng × 4 câu: mức [Biết, Biết, Hiểu, Vận dụng]; phần [I, I, II, III]; sao xoay vòng. */
@@ -459,11 +461,416 @@ describe('theTienBo — chỉ số đếm, so em với chính em', () => {
   })
 })
 
-describe('Đợt 2 (chữ ký) + khoá nguồn', () => {
-  it('`thichNghiChangSau` hiện CHƯA đổi gì: trả đúng bộ đã đưa vào', () => {
-    const bo = chonBoCuaEm(CAU, chonLoi(CAU, []), rong(), NS(), 'B1|x')
-    expect(thichNghiChangSau(bo, CAU, rong(), 0, { dung: {} })).toBe(bo)
+// ───────────────────────── CỔNG ĐIỀU CHỈNH `dieuChinh` ─────────────────────────
+describe('chonBoCuaEm — cổng `dieuChinh` (bộ não đêm)', () => {
+  const LOI = chonLoi(CAU, [])
+  /** Chữ ký vàng của kết quả TRƯỚC khi có cổng (tính bằng đúng bản 569ebfd): 60 em ngẫu nhiên × 6 ngân sách (hạt giống cố định). Đổi số này = đổi hành vi khi vắng cổng — phải có lý do. */
+  const VANG = 1036170693
+  const NS6: [number, number, number][] = [[7, 12, 3], [7, 10, 4], [5, 16, 2], [3, 8, 8], [14, 16, 0], [1, 12, 2]]
+  const chuKy = (dc?: DieuChinhEm | null) => {
+    let x = 0
+    for (let sd = 1; sd <= 60; sd++)
+      for (const [a, b, c] of NS6) x = (Math.imul(x, 31) + hashSeed(JSON.stringify(chonBoCuaEm(CAU, LOI, emNgauNhien(sd, CAU), { soNgay: a, cauMoiNgay: b, onLaiMoiNgay: c }, `B1|ngẫu nhiên ${sd}`, dc as DieuChinhEm)))) >>> 0
+    return x
+  }
+
+  it('VẮNG cổng (hoặc cổng rỗng / vô hại) ⇒ kết quả Y HỆT bản trước khi có cổng — khoá bằng chữ ký vàng trên 360 bộ', () => {
+    expect(chuKy(undefined)).toBe(VANG)
+    for (const dc of [null, {}, { nhip: 0 }, { dang: [] }, { khoiDong: 2 }, { nhip: 0, khoiDong: 2, dang: [] }, { nhip: NaN, khoiDong: NaN }, { dang: [{ ma: 'KHONG-CO-TRONG-BAI', nut: 'tam_nghi' as const }] }]) {
+      expect(chuKy(dc as DieuChinhEm | null), JSON.stringify(dc)).toBe(VANG)
+    }
   })
+
+  it('NHỊP ±3: số câu/ngày đổi đúng, kẹp [6, 16] mà không kéo ngân sách gốc nằm ngoài khoảng; ngoài ±3 thì kẹp ±3', () => {
+    const ns = (moi: number) => ({ soNgay: 2, cauMoiNgay: moi, onLaiMoiNgay: 2 })
+    const budget = (moi: number, nhip?: number) => chonBoCuaEm(CAU, LOI, rong(), ns(moi), 'B1|n', nhip === undefined ? undefined : { nhip }).tomTat.nganSachCau
+    // 14 + 3 = 17 ⇒ kẹp 16 ⇒ (16 − 2) × 2 = 28; +1 ⇒ 15 ⇒ 26; +2 và +3 cùng ra 28
+    expect([budget(14, 1), budget(14, 2), budget(14, 3), budget(14, 9)]).toEqual([26, 28, 28, 28])
+    // 8 − 3 = 5 ⇒ kẹp 6 ⇒ 6 × 7 = 42 (không thấp hơn 6 dù nhịp âm)
+    const b2 = (moi: number, nhip?: number) => chonBoCuaEm(CAU, LOI, rong(), { soNgay: 7, cauMoiNgay: moi, onLaiMoiNgay: 0 }, 'B1|n', nhip === undefined ? undefined : { nhip }).tomTat.nganSachCau
+    expect([b2(8), b2(8, -1), b2(8, -3), b2(8, -9)]).toEqual([56, 49, 42, 42]) // −3 ⇒ 5 ⇒ kẹp 6 ⇒ 42; không thấp hơn
+    // ngân sách gốc DƯỚI 6: nhịp âm không kéo lên 6 (giữ 4), nhịp dương từ 4 lên 7
+    expect([b2(4), b2(4, -3), b2(4, 3)]).toEqual([28, 28, 49]) // 4 × 7 = 28; nhịp âm không kéo lên 6 và không hạ dưới sàn của chính nó; +3 ⇒ 7 × 7
+    // ngân sách gốc TRÊN 16: nhịp dương không kéo lên; nhịp âm hạ đúng
+    expect([b2(20, 3), b2(20, -3)]).toEqual([80, 80]) // đều kẹp ở N = 80
+    // nhịp ngoài ±3 kẹp về ±3 (khi chưa chạm sàn/trần): 8 + 9 ⇒ như +3 = 11; 12 − 9 ⇒ như −3 = 9
+    expect([b2(8, 9), b2(12, -9)]).toEqual([b2(8, 3), b2(12, -3)])
+    expect([b2(8, 3), b2(12, -3)]).toEqual([77, 63])
+    // nhịp 0 tường minh không đổi gì, kể cả khi ngân sách gốc nằm ngoài [6, 16]
+    for (const moi of [4, 8, 20]) expect(chonBoCuaEm(CAU, LOI, rong(), { soNgay: 7, cauMoiNgay: moi, onLaiMoiNgay: 0 }, 'B1|n', { nhip: 0 })).toEqual(chonBoCuaEm(CAU, LOI, rong(), { soNgay: 7, cauMoiNgay: moi, onLaiMoiNgay: 0 }, 'B1|n'))
+    const nho = (moi: number, nhip: number) => chonBoCuaEm(CAU, LOI, rong(), { soNgay: 3, cauMoiNgay: moi, onLaiMoiNgay: 0 }, 'B1|n', { nhip }).tomTat.nganSachCau
+    expect([nho(18, 3), nho(18, -3)]).toEqual([54, 45]) // 18 + 3 = 21 ⇒ giữ 18 (không hạ về 16 khi tăng); 18 − 3 = 15 ⇒ 45
+  })
+
+  it('KHỞI ĐỘNG 1–3 mỗi chặng (mặc định 2); ngoài khoảng kẹp lại', () => {
+    const mo = (kd?: number) => {
+      const bo = chonBoCuaEm(CAU, LOI, emTB(), NS(7, 14, 2), 'B1|kd', kd === undefined ? undefined : { khoiDong: kd })
+      return bo.chang.map((c) => c.filter((q, k) => bo.nhan[q] === 'khoi_dong' && c.slice(0, k).every((x) => bo.nhan[x] === 'khoi_dong')).length)
+    }
+    expect(mo(1).every((x) => x === 1)).toBe(true)
+    expect(mo(2).every((x) => x === 2)).toBe(true)
+    expect(mo(3).every((x) => x === 3)).toBe(true)
+    expect(mo(9)).toEqual(mo(3))
+    expect(mo(0)).toEqual(mo(1))
+    expect(mo(-4)).toEqual(mo(1))
+    expect(mo(undefined)).toEqual(mo(2))
+  })
+
+  it('`tam_nghi`: phần riêng và thử thách KHÔNG lấy câu của dạng; câu LÕI của dạng vẫn ở lại (lõi không bao giờ bị rút)', () => {
+    const bo0 = chonBoCuaEm(CAU, LOI, rong(), NS(), 'B1|nghi')
+    const bo = chonBoCuaEm(CAU, LOI, rong(), NS(), 'B1|nghi', { dang: [{ ma: 'D3', nut: 'tam_nghi' }, { ma: 'D4', nut: 'tam_nghi' }] })
+    for (const q of [...bo.rieng, ...bo.thuThach]) expect(['D3', 'D4']).not.toContain(dangCuaCau(Number(q.slice(1))))
+    expect([...bo0.rieng, ...bo0.thuThach].some((q) => ['D3', 'D4'].includes(dangCuaCau(Number(q.slice(1)))))).toBe(true) // trước đó CÓ lấy
+    expect(bo.loi).toEqual(LOI)
+    expect(LOI.some((q) => dangCuaCau(Number(q.slice(1))) === 'D3')).toBe(true)
+    expect(bo.chang.flat()).toEqual(expect.arrayContaining(LOI))
+  })
+
+  it('`ha_mot_bac`: bậc đích thấp đi một bậc — phần riêng ≤ bậc−1, câu lõi cao hơn bậc−1+1 thành `loi_cao`; không đụng dạng khác', () => {
+    const ho = emKha() // mọi dạng bậc Hiểu
+    const dang = Array.from({ length: 20 }, (_, d) => ({ ma: `D${d}`, nut: 'ha_mot_bac' as const })).slice(0, 3)
+    const bo = chonBoCuaEm(CAU, LOI, ho, NS(7, 16, 2), 'B1|ha', { dang })
+    for (const q of bo.rieng) {
+      const d = dangCuaCau(Number(q.slice(1)))
+      if (['D0', 'D1', 'D2'].includes(d)) expect(mucCua(CAU, q), q).toBe(0)
+    }
+    // mức Vận dụng của D0–D2 ở lõi (nếu có) không thành câu thường: đã cao hơn bậc 0 + 1
+    for (const q of bo.loi) {
+      const d = dangCuaCau(Number(q.slice(1)))
+      if (['D0', 'D1', 'D2'].includes(d) && mucCua(CAU, q) > 1) expect(bo.nhan[q]).toBe('loi_cao')
+    }
+    const goc = chonBoCuaEm(CAU, LOI, ho, NS(7, 16, 2), 'B1|ha')
+    expect(bo.tomTat.tong).toBeLessThanOrEqual(goc.tomTat.tong) // hạ bậc không thêm câu
+  })
+
+  it('`cho_thu_len_bac`: dạng ổn được nhận câu bậc +1 làm PHẦN RIÊNG (không chỉ thử thách); không quá bậc hồ sơ + 1; dạng YẾU bị bỏ qua', () => {
+    const ho = emTB() // D0–D4 yếu (bậc 0), D5–D14 ổn ở Hiểu(1)
+    const ns = NS(7, 16, 2)
+    const goc = chonBoCuaEm(CAU, LOI, ho, ns, 'B1|len')
+    const len = chonBoCuaEm(CAU, LOI, ho, ns, 'B1|len', { dang: [{ ma: 'D5', nut: 'cho_thu_len_bac' }, { ma: 'D1', nut: 'cho_thu_len_bac' }] })
+    const vd = (b: BoCuaEm, ma: number, cho: 'rieng' | 'thuThach') => b[cho].filter((q) => Number(q.slice(1)) % 20 === ma && mucCua(CAU, q) === 2)
+    expect(vd(len, 5, 'rieng')).toEqual(['q65'])
+    expect(vd(len, 5, 'thuThach')).toEqual([]) // đã là phần riêng, không còn ở thử thách
+    expect(vd(goc, 5, 'rieng')).toEqual([])
+    // D1 yếu: nút bị bỏ qua — bộ không có câu mức > 0 của D1 ngoài lõi
+    for (const q of [...len.rieng, ...len.thuThach].filter((x) => Number(x.slice(1)) % 20 === 1)) expect(mucCua(CAU, q)).toBe(0)
+    // bất biến chung: mọi câu ngoài lõi ≤ bậc đích (chưa điều chỉnh) + 1
+    for (const q of [...len.rieng, ...len.thuThach]) {
+      const c = CAU.find((x) => x.qid === q)!
+      expect(c.mucDo).toBeLessThanOrEqual(bacDichTest(ho, CAU, maDangCua(c)).bac + 1)
+    }
+  })
+
+  it('`cho_thu_len_bac` KHÔNG nhảy 2 bậc: dạng đã được mở +1 bậc (đúng ≥ 2 câu) thì nút không nâng thêm — kết quả y hệt không có nút', () => {
+    const dung = { trangThai: 'da_khac_phuc' as const, ngayDungKhacNhau: 1, lanSai: 1 }
+    const ho: HoSoEmRut = { dang: { D0: dangHS(0, 8, 0.9) }, cau: { q0: dung, q20: dung } } // đã mở: bậc đích 1
+    const ns = NS(7, 40, 0)
+    const khong = chonBoCuaEm(CAU, ['q1'], ho, ns, 'B1|2b')
+    const co = chonBoCuaEm(CAU, ['q1'], ho, ns, 'B1|2b', { dang: [{ ma: 'D0', nut: 'cho_thu_len_bac' }] })
+    expect(co).toEqual(khong)
+    expect(co.rieng).not.toContain('q60') // Vận dụng (hồ sơ + 2) chỉ có thể là thử thách, không phải phần riêng
+  })
+
+  it('`uu_tien` ÉP ≥ 2 câu như dạng yếu: dù câu thứ hai đã đúng lại nhiều ngày (điểm âm) vẫn được lấy; và điểm cộng đưa câu của dạng ưu tiên lên trước khi chỗ trống ít', () => {
+    const dung3 = { trangThai: 'da_khac_phuc' as const, ngayDungKhacNhau: 3, lanSai: 1 }
+    const ho: HoSoEmRut = { dang: { D0: dangHS(1, 8, 0.9) }, cau: { q0: dung3, q20: dung3 } } // D0 ỔN (không yếu), bậc Hiểu
+    const bo = chonBoCuaEm(CAU, ['q1'], ho, NS(7, 40, 0), 'B1|utep', { dang: [{ ma: 'D0', nut: 'uu_tien' }] })
+    const goc = chonBoCuaEm(CAU, ['q1'], ho, NS(7, 40, 0), 'B1|utep')
+    const d0 = (b: BoCuaEm) => b.rieng.filter((q) => qidCuaDang(0).includes(q))
+    expect(d0(bo).length).toBeGreaterThanOrEqual(2)
+    expect(d0(goc)).toEqual(['q40']) // không ưu tiên thì hai câu Biết đã đúng lại bị bỏ, chỉ còn câu Hiểu
+    // ĐIỂM CỘNG (ngoài phần ép ≥ 2): D9/D12/D15 ở bậc Vận dụng; chỗ trống chỉ 7 riêng, các dạng khác chưa có hồ sơ (điểm 3). Ép ≥ 2 chỉ lấy câu Vận dụng của mỗi dạng;
+    // câu HIỂU của ba dạng ấy (1,5 điểm khi không ưu tiên, 4,5 khi có) chỉ thắng nhờ điểm cộng của `uu_tien`.
+    const hoVD: HoSoEmRut = { dang: Object.fromEntries([9, 12, 15].map((d) => [`D${d}`, dangHS(2, 8, 0.9)])), cau: {} }
+    const ut = [{ ma: 'D9', nut: 'uu_tien' as const }, { ma: 'D12', nut: 'uu_tien' as const }, { ma: 'D15', nut: 'uu_tien' as const }]
+    const chat = chonBoCuaEm(CAU, LOI, hoVD, NS(1, 36, 0), 'B1|utep', { dang: ut })
+    const khongUt = chonBoCuaEm(CAU, LOI, hoVD, NS(1, 36, 0), 'B1|utep')
+    for (const d of [9, 12, 15]) {
+      expect(chat.rieng, `D${d} Hiểu có ưu tiên`).toContain(`q${d + 40}`)
+      expect(khongUt.rieng, `D${d} Hiểu không ưu tiên`).not.toContain(`q${d + 40}`)
+    }
+  })
+
+  it('`uu_tien`: dạng ổn được đối xử như dạng yếu — ≥ 2 câu, nhãn `dang_yeu`, đứng trước phần củng cố; `soDangYeu` vẫn chỉ đếm dạng yếu THẬT', () => {
+    const ho = emTB()
+    const ns = NS(7, 10, 4) // ngân sách chặt để thấy ưu tiên
+    const goc = chonBoCuaEm(CAU, LOI, ho, ns, 'B1|ut')
+    const ut = chonBoCuaEm(CAU, LOI, ho, ns, 'B1|ut', { dang: [{ ma: 'D9', nut: 'uu_tien' }] })
+    const so = (b: BoCuaEm) => tapCua(b).filter((q) => Number(q.slice(1)) % 20 === 9).length
+    expect(so(ut)).toBeGreaterThanOrEqual(2)
+    expect(so(ut)).toBeGreaterThanOrEqual(so(goc))
+    const rieng9 = ut.rieng.filter((x) => Number(x.slice(1)) % 20 === 9)
+    for (const q of rieng9) expect(['dang_yeu', 'khoi_dong']).toContain(ut.nhan[q]) // câu dễ nhất chặng vẫn làm khởi động
+    expect(rieng9.some((q) => ut.nhan[q] === 'dang_yeu') || rieng9.length === 0 || rieng9.every((q) => ut.nhan[q] === 'khoi_dong')).toBe(true)
+    expect(ut.tomTat.soDangYeu).toBe(goc.tomTat.soDangYeu) // 5 dạng yếu thật, không tính D9
+  })
+
+  it('TỐI ĐA 3 DẠNG (dòng thứ 4 bỏ), dạng LẶP lấy dòng đầu, nút lạ bị bỏ, đầu vào không bị sửa', () => {
+    const dc: DieuChinhEm = { dang: [{ ma: 'D5', nut: 'tam_nghi' }, { ma: 'D6', nut: 'tam_nghi' }, { ma: 'D7', nut: 'tam_nghi' }, { ma: 'D8', nut: 'tam_nghi' }, { ma: 'D5', nut: 'uu_tien' }, { ma: 'D9', nut: 'xoa_cau' as never }] }
+    const truoc = JSON.stringify(dc)
+    const goc = chonBoCuaEm(CAU, LOI, rong(), NS(7, 16, 0), 'B1|3')
+    const bo = chonBoCuaEm(CAU, LOI, rong(), NS(7, 16, 0), 'B1|3', dc)
+    expect(JSON.stringify(dc)).toBe(truoc)
+    const co = (b: BoCuaEm, d: number) => [...b.rieng, ...b.thuThach].filter((q) => Number(q.slice(1)) % 20 === d).length
+    for (const d of [5, 6, 7, 8, 9]) expect(co(goc, d), `D${d} trước điều chỉnh có câu riêng`).toBeGreaterThan(0)
+    for (const d of [5, 6, 7]) expect(co(bo, d), `D${d} nghỉ`).toBe(0)
+    expect(co(bo, 8), 'D8 là dòng thứ 4: KHÔNG được nghỉ').toBeGreaterThan(0)
+    // nút lạ (không thuộc 4 nút) bị bỏ: một mình nó không đổi gì
+    expect(chonBoCuaEm(CAU, LOI, rong(), NS(7, 16, 0), 'B1|3', { dang: [{ ma: 'D9', nut: 'xoa_cau' as never }] })).toEqual(goc)
+  })
+
+  it('BẤT BIẾN dưới MỌI điều chỉnh (60 em × 40 cổng ngẫu nhiên): lõi nguyên · ba tập rời, hợp = chặng · ≤ ngân sách sau nhịp · không câu ngoài lõi vượt bậc đích (chưa điều chỉnh) + 1 · nhãn đủ', () => {
+    const NUT: DieuChinhEm['dang'] = []
+    void NUT
+    for (let sd = 1; sd <= 60; sd++) {
+      const ho = emNgauNhien(sd, CAU)
+      const r = mulberry32(9000 + sd)
+      for (let k = 0; k < 40; k++) {
+        const nut = ['uu_tien', 'ha_mot_bac', 'cho_thu_len_bac', 'tam_nghi'] as const
+        const dc: DieuChinhEm = {
+          nhip: Math.floor(r() * 9) - 4,
+          khoiDong: Math.floor(r() * 5),
+          dang: Array.from({ length: Math.floor(r() * 5) }, () => ({ ma: `D${Math.floor(r() * 20)}`, nut: nut[Math.floor(r() * 4)] })),
+        }
+        const ns = NS6[k % 6]
+        const bo = chonBoCuaEm(CAU, LOI, ho, { soNgay: ns[0], cauMoiNgay: ns[1], onLaiMoiNgay: ns[2] }, `B1|${sd}`, dc)
+        const tap = tapCua(bo)
+        expect(bo.loi, `em ${sd}`).toEqual(LOI)
+        expect(new Set(tap).size).toBe(tap.length)
+        expect([...bo.chang.flat()].sort()).toEqual([...tap].sort())
+        expect(Object.keys(bo.nhan).sort()).toEqual([...tap].sort())
+        expect(tap.length).toBeLessThanOrEqual(Math.max(LOI.length, Math.min(80, bo.tomTat.nganSachCau)))
+        for (const q of [...bo.rieng, ...bo.thuThach]) {
+          const c = CAU.find((x) => x.qid === q)!
+          expect(c.mucDo, `em ${sd} ${q}`).toBeLessThanOrEqual(bacDichTest(ho, CAU, maDangCua(c)).bac + 1)
+        }
+        expect(bo.thuThach.length).toBeLessThanOrEqual(Math.floor(0.2 * tap.length))
+      }
+    }
+  })
+})
+
+// ───────────────────────── THÍCH NGHI SAU CHẶNG (ĐỢT 2) ─────────────────────────
+describe('thichNghiChangSau — bước G', () => {
+  /** Bài nhỏ: ba dạng A / B / C, mỗi dạng 6 câu mức [0,0,0,0,1,2]. */
+  const cauNho: CauGiao[] = ['A', 'B', 'C', 'E'].flatMap((d, di) =>
+    [0, 0, 0, 0, 1, 2].map((m, k) => ({ qid: `${d}${k}`, dang: d, chuyenDe: `c${di}`, mucDo: m as Muc, sao: 1 as const, phan: 'I' as const })),
+  )
+  const hsNho: HoSoEmRut = { dang: { A: dangHS(0, 8, 0.9), B: dangHS(0, 8, 0.4), C: dangHS(1, 8, 0.9), E: dangHS(2, 8, 0.9) }, cau: {} }
+  const tomTat = (loi: string[], rieng: string[], thu: string[], nganSachCau: number) => ({ tong: loi.length + rieng.length + thu.length, soLoi: loi.length, soRieng: rieng.length, soThuThach: thu.length, soLoiCao: 0, soBiet: 0, soHieu: 0, soVanDung: 0, soChang: 0, soDangYeu: 1, soDangYeuDuCau: 1, nganSachCau })
+  /** Dựng tay một bộ: `chang` = [qid, nhãn][] theo chặng. */
+  function boTay(chang: [string, NhanCau][][], loi: string[], nganSachCau = 99): BoCuaEm {
+    const nhan: Record<string, NhanCau> = {}
+    for (const c of chang) for (const [q, n] of c) nhan[q] = n
+    const thu = Object.keys(nhan).filter((q) => nhan[q] === 'thu_thach')
+    const rieng = Object.keys(nhan).filter((q) => !loi.includes(q) && nhan[q] !== 'thu_thach')
+    const b: BoCuaEm = { loi, rieng, thuThach: thu, chang: chang.map((c) => c.map(([q]) => q)), nhan, tomTat: tomTat(loi, rieng, thu, nganSachCau) }
+    b.tomTat.soChang = chang.length
+    return b
+  }
+  const dungTat = (ds: string[], v: boolean | Record<string, boolean>) => ({ dung: Object.fromEntries(ds.map((q) => [q, typeof v === 'boolean' ? v : v[q]])) })
+  const BO_A = () =>
+    boTay(
+      [
+        [['A0', 'loi'], ['A1', 'cung_co'], ['E0', 'khoi_dong']],
+        [['C0', 'khoi_dong'], ['A2', 'cung_co'], ['C1', 'cung_co']],
+        [['C2', 'khoi_dong'], ['A3', 'cung_co']],
+      ],
+      ['A0'],
+    )
+
+  it('ĐÚNG ≥ 80 % (≥ 2 câu thường của dạng): chặng SAU đổi 1 câu bậc thấp của dạng lấy 1 câu đúng bậc đích + 1; lõi và chặng đã mở nguyên', () => {
+    const bo = BO_A()
+    const kq = thichNghiChangSau(bo, cauNho, hsNho, 0, dungTat(['A0', 'A1'], true))
+    expect(kq.doi).toEqual([{ ma: 'A', loai: 'len_bac', chang: 1, vao: 'A4', ra: 'A2' }]) // A4 = Hiểu, đúng bậc đích (Biết) + 1
+    expect(kq.bo.chang[1]).toEqual(['C0', 'A4', 'C1'])
+    expect(kq.bo.chang[0]).toEqual(bo.chang[0])
+    expect(kq.bo.chang[2]).toEqual(bo.chang[2])
+    expect(kq.bo.loi).toEqual(['A0'])
+    expect(kq.bo.nhan.A4).toBe('cung_co')
+    expect(kq.bo.nhan.A2).toBeUndefined()
+    expect(kq.bo.rieng).toContain('A4')
+    expect(kq.bo.rieng).not.toContain('A2')
+    expect(kq.bo.tomTat.tong).toBe(bo.tomTat.tong) // đổi, không thêm
+    expect(kq.henOnLai).toEqual([])
+  })
+
+  it('SAI ≥ 50 %: chặng sau THÊM 1 câu cùng dạng bậc thấp hơn (nhãn dạng yếu, sau phần lõi/khởi động), và câu sai vào lịch ôn', () => {
+    const bo = boTay(
+      [
+        [['B0', 'loi'], ['B1', 'dang_yeu'], ['B2', 'dang_yeu'], ['E0', 'khoi_dong']],
+        [['C0', 'khoi_dong'], ['C1', 'khoi_dong'], ['B4', 'cung_co'], ['C2', 'cung_co']],
+      ],
+      ['B0'],
+    )
+    const kq = thichNghiChangSau(bo, cauNho, hsNho, 0, dungTat(['B0', 'B1', 'B2', 'E0'], { B0: false, B1: false, B2: true, E0: false }))
+    // B yếu: cần ≥ 3 câu mẫu (có B0, B1, B2): sai 2/3 ≥ 50 % ⇒ thêm câu bậc Biết (B3), chưa hết ngân sách nên không phải nhường
+    expect(kq.doi).toEqual([{ ma: 'B', loai: 'them_cau_de', chang: 1, vao: 'B3', ra: null }])
+    expect(kq.bo.chang[1]).toEqual(['C0', 'C1', 'B3', 'B4', 'C2']) // chèn sau khởi động, trước củng cố
+    expect(kq.bo.nhan.B3).toBe('dang_yeu')
+    expect(kq.bo.tomTat.tong).toBe(bo.tomTat.tong + 1)
+    expect(kq.henOnLai).toEqual(['B0', 'B1', 'E0']) // sai ở câu thường (kể cả khởi động); B2 đúng không vào
+  })
+
+  it('HẾT NGÂN SÁCH: thêm câu dễ thì NHƯỜNG CHỖ một câu củng cố của dạng khác (không lõi, không thử thách); không có gì để nhường thì không đổi', () => {
+    const chang: [string, NhanCau][][] = [
+      [['B0', 'loi'], ['B1', 'dang_yeu'], ['B2', 'dang_yeu']],
+      [['C0', 'khoi_dong'], ['C1', 'khoi_dong'], ['B4', 'cung_co'], ['C2', 'cung_co'], ['C4', 'thu_thach']],
+    ]
+    const bo = boTay(chang, ['B0'], 8) // tong = 8 = ngân sách
+    const kq = thichNghiChangSau(bo, cauNho, hsNho, 0, dungTat(['B0', 'B1', 'B2'], false))
+    expect(kq.doi).toEqual([{ ma: 'B', loai: 'them_cau_de', chang: 1, vao: 'B3', ra: 'C2' }])
+    expect(kq.bo.tomTat.tong).toBe(8)
+    expect(kq.bo.chang[1].slice(-1)).toEqual(['C4']) // thử thách vẫn cuối
+    expect(kq.bo.chang[1]).not.toContain('C2')
+    const khongCoGi = boTay([[['B0', 'loi'], ['B1', 'dang_yeu'], ['B2', 'dang_yeu']], [['C0', 'khoi_dong'], ['C1', 'khoi_dong'], ['B4', 'cung_co']]], ['B0'], 6)
+    const k2 = thichNghiChangSau(khongCoGi, cauNho, hsNho, 0, dungTat(['B0', 'B1', 'B2'], false))
+    expect(k2.doi).toEqual([]) // chỉ còn củng cố cùng dạng B ⇒ không nhường được
+    expect(k2.bo).toBe(khongCoGi)
+    expect(k2.henOnLai).toEqual(['B0', 'B1', 'B2'])
+  })
+
+  it('KHOẢNG GIỮA (đúng 2/3, sai 1/3): không lên bậc, không hạ — không đổi gì', () => {
+    const bo = boTay(
+      [
+        [['A0', 'loi'], ['A1', 'cung_co'], ['A2', 'cung_co'], ['E0', 'khoi_dong']],
+        [['C0', 'khoi_dong'], ['A3', 'cung_co'], ['C1', 'cung_co']],
+      ],
+      ['A0'],
+    )
+    const kq = thichNghiChangSau(bo, cauNho, hsNho, 0, dungTat(['A0', 'A1', 'A2'], { A0: true, A1: true, A2: false }))
+    expect(kq.doi).toEqual([])
+    expect(kq.bo).toBe(bo)
+    expect(kq.henOnLai).toEqual(['A2']) // câu sai vẫn được hẹn ôn dù không đổi chặng
+  })
+
+  it('MẪU quá ít (dưới 2 câu thường của dạng; dạng yếu dưới 3): không đổi; khởi động, thử thách, lõi cao KHÔNG vào mẫu và không vào lịch ôn', () => {
+    const bo = boTay(
+      [
+        [['A0', 'loi'], ['A1', 'thu_thach'], ['A2', 'loi_cao'], ['A3', 'khoi_dong'], ['B0', 'loi'], ['B1', 'dang_yeu']],
+        [['C0', 'khoi_dong'], ['A4', 'cung_co'], ['B4', 'cung_co']],
+      ],
+      ['A0', 'A2', 'B0'],
+    )
+    // dạng A còn câu bậc Biết CHƯA có trong bộ (A6) để phép thử có nghĩa: nếu khởi động/thử thách/lõi cao lọt vào mẫu thì A sai 4/4 và SẼ thêm A6
+    const cauLon: CauGiao[] = [...cauNho, { qid: 'A6', dang: 'A', chuyenDe: 'c0', mucDo: 0, sao: 1, phan: 'I' }]
+    const kq = thichNghiChangSau(bo, cauLon, hsNho, 0, dungTat(['A0', 'A1', 'A2', 'A3', 'B0', 'B1'], false))
+    expect(kq.doi).toEqual([]) // A chỉ có 1 câu thường (A0); B là dạng yếu, mẫu 2 < 3
+    expect(kq.henOnLai).toEqual(['A0', 'A3', 'B0', 'B1']) // không có A1 (thử thách) và A2 (lõi cao)
+    // câu CHƯA có kết quả không tính
+    const k2 = thichNghiChangSau(BO_A(), cauNho, hsNho, 0, { dung: { A0: true } })
+    expect(k2.doi).toEqual([])
+  })
+
+  it('câu thay ra phải THẤP HƠN bậc đích + 1: chặng sau chỉ còn câu đã ở bậc đó thì không đổi qua lại vô ích', () => {
+    const cauLon: CauGiao[] = [...cauNho, { qid: 'A7', dang: 'A', chuyenDe: 'c0', mucDo: 1, sao: 1, phan: 'I' }]
+    const bo = boTay(
+      [
+        [['A0', 'loi'], ['A1', 'cung_co'], ['E0', 'khoi_dong']],
+        [['C0', 'khoi_dong'], ['A4', 'cung_co'], ['C1', 'cung_co']], // A4 đã là Hiểu = bậc đích + 1
+      ],
+      ['A0'],
+    )
+    expect(thichNghiChangSau(bo, cauLon, hsNho, 0, dungTat(['A0', 'A1'], true)).doi).toEqual([])
+  })
+
+  it('CHẶNG CUỐI hoặc chỉ số lạ: không đổi gì nhưng vẫn báo câu cần hẹn ôn; `soChangDaMo` đẩy chặng đích ra sau; số chặng đã mở tính cả chặng mở sớm', () => {
+    const bo = BO_A()
+    const cuoi = thichNghiChangSau(bo, cauNho, hsNho, 2, dungTat(['A3'], false))
+    expect(cuoi.doi).toEqual([])
+    expect(cuoi.henOnLai).toEqual(['A3'])
+    for (const k of [-1, 7, NaN, 1.5]) expect(thichNghiChangSau(bo, cauNho, hsNho, k, dungTat(['A0', 'A1'], true)).doi, String(k)).toEqual([])
+    const mo = boTay(
+      [
+        [['A0', 'loi'], ['A1', 'cung_co'], ['E0', 'khoi_dong']],
+        [['C0', 'khoi_dong'], ['C1', 'cung_co']],
+        [['C2', 'khoi_dong'], ['A2', 'cung_co'], ['C3', 'cung_co']],
+      ],
+      ['A0'],
+    )
+    const kq = thichNghiChangSau(mo, cauNho, hsNho, 0, dungTat(['A0', 'A1'], true), { soChangDaMo: 2 })
+    expect(kq.doi.map((x) => x.chang)).toEqual([2])
+    expect(kq.bo.chang[1]).toEqual(mo.chang[1]) // chặng 2 (chỉ số 1) đã mở sớm — không đụng
+  })
+
+  it('`dieuChinh` truyền lại: `tam_nghi` ⇒ không đổi dạng ấy; `ha_mot_bac` ⇒ bậc lên thấp hơn; dạng bậc Vận dụng không lên nữa', () => {
+    const bo = BO_A()
+    const ketQua = dungTat(['A0', 'A1'], true)
+    expect(thichNghiChangSau(bo, cauNho, hsNho, 0, ketQua, { dieuChinh: { dang: [{ ma: 'A', nut: 'tam_nghi' }] } }).doi).toEqual([])
+    // C ở Hiểu: đúng ⇒ lên Vận dụng (C5); hạ một bậc ⇒ đích chỉ là Hiểu (C4)
+    const boC = boTay([[['C0', 'loi'], ['C1', 'cung_co'], ['E0', 'khoi_dong']], [['E1', 'khoi_dong'], ['C2', 'cung_co'], ['E2', 'cung_co']]], ['C0'])
+    expect(thichNghiChangSau(boC, cauNho, hsNho, 0, dungTat(['C0', 'C1'], true)).doi[0]).toMatchObject({ vao: 'C5', ra: 'C2' })
+    expect(thichNghiChangSau(boC, cauNho, hsNho, 0, dungTat(['C0', 'C1'], true), { dieuChinh: { dang: [{ ma: 'C', nut: 'ha_mot_bac' }] } }).doi[0]).toMatchObject({ vao: 'C4', ra: 'C2' })
+    // E đã ở Vận dụng: không có bậc cao hơn
+    const boE = boTay([[['E0', 'loi'], ['E1', 'cung_co'], ['C0', 'khoi_dong']], [['C1', 'khoi_dong'], ['E2', 'cung_co'], ['C2', 'cung_co']]], ['E0'])
+    expect(thichNghiChangSau(boE, cauNho, hsNho, 0, dungTat(['E0', 'E1'], true)).doi).toEqual([])
+  })
+
+  it('TỐI ĐA 3 thay đổi mỗi chặng, theo mã dạng tăng dần', () => {
+    const cau4: CauGiao[] = ['A', 'B', 'C', 'E'].flatMap((d, di) => [0, 0, 0, 1].map((m, k) => ({ qid: `${d}${k}`, dang: d, chuyenDe: `c${di}`, mucDo: m as Muc, sao: 1 as const, phan: 'I' as const })))
+    const hs4: HoSoEmRut = { dang: { A: dangHS(0, 8, 0.9), B: dangHS(0, 8, 0.9), C: dangHS(0, 8, 0.9), E: dangHS(0, 8, 0.9) }, cau: {} }
+    const bo = boTay(
+      [
+        [['A0', 'loi'], ['A1', 'cung_co'], ['B0', 'loi'], ['B1', 'cung_co'], ['C0', 'loi'], ['C1', 'cung_co'], ['E0', 'loi'], ['E1', 'cung_co']],
+        [['A2', 'cung_co'], ['B2', 'cung_co'], ['C2', 'cung_co'], ['E2', 'cung_co']],
+      ],
+      ['A0', 'B0', 'C0', 'E0'],
+    )
+    const kq = thichNghiChangSau(bo, cau4, hs4, 0, dungTat(['A0', 'A1', 'B0', 'B1', 'C0', 'C1', 'E0', 'E1'], true))
+    expect(kq.doi.map((x) => x.ma)).toEqual(['A', 'B', 'C'])
+    expect(kq.bo.chang[1]).toEqual(['A3', 'B3', 'C3', 'E2'])
+  })
+
+  it('TÍNH CHẤT (64 em × 12 kết quả ngẫu nhiên × mọi chặng): lõi + thử thách nguyên · chỉ đổi chặng chưa mở · câu mới không lõi/trùng, ≤ bậc đích + 1 · tổng ≤ ngân sách · ≤ 3 đổi · tất định · không sửa đầu vào', () => {
+    // BÀI ĐẶC: 6 dạng × ~13 câu để mỗi chặng có NHIỀU câu cùng dạng (mẫu ≥ 2) — bài 20 dạng × 4 câu hiếm khi có
+    const CAU_P: CauGiao[] = Array.from({ length: 80 }, (_, i) => ({ qid: `p${i}`, dang: `D${i % 6}`, chuyenDe: `CD${i % 3}`, mucDo: ([0, 0, 0, 0, 1, 1, 2][Math.floor(i / 6) % 7]) as Muc, sao: ((i * 5) % 3) as 0 | 1 | 2, phan: (['I', 'I', 'II', 'III'] as const)[i % 4] }))
+    const LOI = chonLoi(CAU_P, [])
+    const emMau: [string, () => HoSoEmRut][] = [['rỗng', rong], ...Array.from({ length: 63 }, (_, sd) => [`ngẫu nhiên ${sd + 1}`, () => emNgauNhien(sd + 1, CAU_P)] as [string, () => HoSoEmRut])]
+    let soDoi = 0
+    let k0 = 0
+    for (const [ten, tao] of emMau) {
+      k0++
+      const ho = tao()
+      const bo = chonBoCuaEm(CAU_P, LOI, ho, k0 % 2 ? NS(7, 14, 2) : NS(7, 9, 3), `B1|${ten}`)
+      const truoc = JSON.stringify(bo)
+      const r = mulberry32(hashSeed(ten))
+      for (let lan = 0; lan < 12; lan++) {
+        const k = Math.floor(r() * bo.chang.length)
+        const dungMap = Object.fromEntries(bo.chang[k].filter(() => r() < 0.9).map((q) => [q, r() < (lan % 3 === 0 ? 0.95 : lan % 3 === 1 ? 0.2 : 0.55)]))
+        const kq = thichNghiChangSau(bo, CAU_P, ho, k, { dung: dungMap })
+        expect(JSON.stringify(bo), 'đầu vào bị sửa').toBe(truoc)
+        expect(JSON.stringify(thichNghiChangSau(bo, CAU_P, ho, k, { dung: dungMap })), 'tất định').toBe(JSON.stringify(kq))
+        const b2 = kq.bo
+        expect(b2.loi, `${ten}`).toEqual(bo.loi)
+        expect(b2.thuThach, `${ten}`).toEqual(bo.thuThach)
+        for (let c = 0; c < bo.chang.length; c++) if (c !== k + 1) expect(b2.chang[c], `${ten} chặng ${c + 1} (đã mở hoặc không phải chặng sau)`).toEqual(bo.chang[c])
+        const tap = tapCua(b2)
+        expect(new Set(tap).size).toBe(tap.length)
+        expect([...b2.chang.flat()].sort()).toEqual([...tap].sort())
+        expect(Object.keys(b2.nhan).sort()).toEqual([...tap].sort())
+        expect(tap.length, ten).toBeLessThanOrEqual(bo.tomTat.nganSachCau)
+        expect(kq.doi.length).toBeLessThanOrEqual(3)
+        const cu = new Set(tapCua(bo))
+        for (const q of tap.filter((x) => !cu.has(x))) {
+          const c = CAU_P.find((x) => x.qid === q)!
+          expect(b2.loi, `${ten} câu mới ${q} không được là lõi`).not.toContain(q)
+          expect(c.mucDo, `${ten} câu mới ${q}`).toBeLessThanOrEqual(bacDichTest(ho, CAU_P, maDangCua(c)).bac + 1)
+        }
+        for (const q of kq.henOnLai) {
+          expect(bo.chang[k]).toContain(q)
+          expect(dungMap[q]).toBe(false)
+          expect(['thu_thach', 'loi_cao']).not.toContain(bo.nhan[q])
+        }
+        expect(b2.tomTat.tong).toBe(tap.length)
+        expect(b2.tomTat.soBiet + b2.tomTat.soHieu + b2.tomTat.soVanDung).toBe(tap.length)
+        soDoi += kq.doi.length
+      }
+    }
+    expect(soDoi, 'phép thử phải thật sự có đổi để các bất biến ở trên có nghĩa').toBeGreaterThan(50)
+  })
+})
+
+describe('khoá nguồn', () => {
   it('lõi THUẦN: không Math.random, không đồng hồ, không IO, không React; không chữ "nắm chắc"', () => {
     const nguon = readFileSync('src/lib/btvn-nang-do.ts', 'utf8').replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')
     for (const cam of ['Math.random', 'Date.now', 'new Date', 'performance.now', 'fetch(', 'localStorage', 'indexedDB', "from 'react'", 'console.']) expect(nguon, cam).not.toContain(cam)
