@@ -38,9 +38,9 @@ export const PHUT_TOI_HAN_CHOT = 20 * 60
 export const PHUT_HAN_MUON = 20 * 60 + 30
 export const PHUT_SANG_QUA_HAN = 7 * 60
 export const SO_CHANG_CHAM_M3 = 2
-/** M3 theo giờ: nhắc trước `batDauMuonNhat` (giờ bắt đầu muộn nhất của tối nay) ngần này phút; tính kế hoạch cho tối đa ngần này em mỗi lượt (5 truy vấn/em), phần dư dùng mốc 20:00 cũ. */
+/** M3 theo giờ: nhắc trước `batDauMuonNhat` (giờ bắt đầu muộn nhất của tối nay) ngần này phút; tính kế hoạch cho tối đa ngần này em mỗi lượt (6 truy vấn/em ⇒ ≤ 600, dưới ngưỡng truy vấn của một lượt cron), phần dư dùng mốc 20:00 cũ. */
 export const PHUT_NHAC_M3_TRUOC_GIO_BAT_DAU = 30
-export const TOI_DA_EM_TINH_GIO_M3 = 120
+export const TOI_DA_EM_TINH_GIO_M3 = 100
 /** Mỗi lượt chạy ghi tối đa ngần này dòng (bảo vệ giới hạn D1); phần còn lại được xử lý ở lượt 30 phút kế (khoá idempotent). */
 export const TOI_DA_DONG_MOT_LUOT = 240
 
@@ -244,7 +244,7 @@ export function denGioNhacM3(nowMs: number, batDauMs: number, cfg: CauHinhNhac):
 type GioM3 = { phut: number; batDauGio: string }
 /**
  * Với mỗi (bài, em) chậm ≥ 2 chặng: tính kế hoạch về đích của em (đọc-chỉ, `docVeDichCuaEm`) và cho biết ĐÃ TỚI GIỜ nhắc chưa.
- * Trả: có khoá ⇒ nhắc lượt này (`GioM3` = lời theo giờ; `'cu'` = không tính được kế hoạch ⇒ giữ mốc 20:00 + lời cũ); vắng khoá ⇒ chưa tới giờ / tối nay không có việc / đã qua giờ bắt đầu muộn nhất.
+ * Trả: có khoá ⇒ nhắc lượt này (`GioM3` = lời theo giờ; `'cu'` = không tính được kế hoạch ⇒ giữ mốc 20:00 + lời cũ); vắng khoá ⇒ chưa tới giờ / tối nay không có việc / đã qua giờ bắt đầu muộn nhất / bài bị mốc loại khỏi kế hoạch.
  */
 async function docGioNhacM3(env: Env, cho: { ma: string; sbd: string }[], nowMs: number, cfg: CauHinhNhac): Promise<Map<string, GioM3 | 'cu'>> {
   const ra = new Map<string, GioM3 | 'cu'>()
@@ -262,8 +262,10 @@ async function docGioNhacM3(env: Env, cho: { ma: string; sbd: string }[], nowMs:
   }
   for (const c of cho) {
     const khoa = `${c.ma}|${c.sbd}`
-    const b = veDich.get(c.sbd)?.veDich.find((x) => x.maBtvn === c.ma)
-    if (!b) { ra.set(khoa, 'cu'); continue }
+    const v = veDich.get(c.sbd)
+    if (!v) { ra.set(khoa, 'cu'); continue } // không tính được kế hoạch (lỗi / quá trần em mỗi lượt) ⇒ mốc 20:00 + lời cũ
+    const b = v.veDich.find((x) => x.maBtvn === c.ma)
+    if (!b) continue // kế hoạch có nhưng bài này KHÔNG nằm trong đó (bài giao trước ngày mốc bị loại): không nhắc
     const tn = b.toiNay
     if (!tn || !(tn.phut > 0)) continue // tối nay kế hoạch không xếp việc: không có gì để nhắc
     const batDauMs = Date.parse(tn.batDauMuonNhat)

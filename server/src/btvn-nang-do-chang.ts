@@ -2,7 +2,7 @@
 import { themNgay } from './ho-so-nam-kt'
 import { ngayVn } from './su-kien-hoc'
 import { lichDaiSomHon } from '../../src/lib/btvn-nang-do-lich'
-import { baiTuNgayMoc, docMocNo, KHOA_HIEN_THI_TU, KHOA_MOC_BANG_TIN_NO, KHOA_VE_DICH_TU } from './moc-no'
+import { baiTuNgayMoc, docMocNo, KHOA_HIEN_THI_TU, KHOA_MOC_BANG_TIN_NO, KHOA_VE_DICH_TU, NGAY_MOC_NO_MAC_DINH } from './moc-no'
 
 /** Khoảng cách `lan` của sổ `btvn_lo` giữa hai lượt làm của cùng một bài cá nhân hoá (chỉ số chặng luôn < 1000): `lan = chiSo + LAN_MOI_LUOT × (lượt − 1)`. Nơi đọc `lan` làm chỉ số lô phải lấy `lan % LAN_MOI_LUOT`. */
 export const LAN_MOI_LUOT = 1000
@@ -115,16 +115,17 @@ export function moLucGocChangMoSom(lichJson: unknown): Map<number, number> {
 /**
  * NỘP TRỄ có được bật cho bài này không (Điều 4 = B đổi luật hạn nộp): TẮT nếu (a) cờ LÙI NHANH `cau_hinh.btvn_nop_tre = 'tat'` — trở lại luật cũ (qua hạn là khoá `qua_han`, em nhờ thầy gia hạn); hoặc
  * (b) bài được giao TRƯỚC NGÀY MỐC tính nợ (thầy nói rõ 21/09 15:55: bài cũ không được sống lại; mốc = `ve_dich_tu` ⇒ `bang_tin_tu` ⇒ hằng, xem moc-no.ts). Áp ở CẢ BA đường: mở bài (`/btvn/cua-em`),
- * nộp chặng (`/btvn/xong-lo`), nộp cả bài (`/btvn/nop`). Vắng cờ / lỗi đọc ⇒ BẬT; `giaoLuc` vắng / hỏng ⇒ coi là bài hợp lệ. MỘT truy vấn `cau_hinh`, chỉ chạy khi bài ĐÃ qua hạn (đường thường không tốn truy vấn).
+ * nộp chặng (`/btvn/xong-lo`), nộp cả bài (`/btvn/nop`). Vắng cờ / lỗi đọc ⇒ BẬT; `giaoLuc` vắng / hỏng ⇒ coi là bài CŨ (đóng chặt); đọc cấu hình lỗi ⇒ theo mốc hằng số. MỘT truy vấn `cau_hinh`, chỉ chạy khi bài ĐÃ qua hạn (đường thường không tốn truy vấn).
  */
 export async function btvnNopTreBat(env: { DB: { prepare(q: string): { bind(...a: unknown[]): { all<T>(): Promise<{ results?: T[] }> } } } }, giaoLuc?: unknown): Promise<boolean> {
   try {
     const r = await env.DB.prepare('SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?, ?)').bind('btvn_nop_tre', KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO).all<{ khoa?: unknown; gia_tri?: unknown }>()
     const cau = new Map((r.results ?? []).map((x) => [String(x.khoa ?? ''), x.gia_tri]))
     if (String(cau.get('btvn_nop_tre') ?? '').trim().toLowerCase() === 'tat') return false
-    return baiTuNgayMoc(giaoLuc, docMocNo(cau.get(KHOA_HIEN_THI_TU), cau.get(KHOA_VE_DICH_TU), cau.get(KHOA_MOC_BANG_TIN_NO)))
+    return baiTuNgayMoc(giaoLuc, docMocNo(cau.get(KHOA_HIEN_THI_TU), cau.get(KHOA_VE_DICH_TU), cau.get(KHOA_MOC_BANG_TIN_NO)), false)
   } catch {
-    return true
+    // Đọc cấu hình lỗi: KHÔNG mở nộp trễ cho bài cũ — theo mốc HẰNG SỐ (cờ 'tat' không đọc được nên coi như bật, như trước). Bài từ ngày mốc vẫn nộp trễ được.
+    return baiTuNgayMoc(giaoLuc, NGAY_MOC_NO_MAC_DINH, false)
   }
 }
 

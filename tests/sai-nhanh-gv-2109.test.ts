@@ -1,10 +1,10 @@
 // @vitest-environment node
-// SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy (khoá `saiNhanh` của /gv/bang-tin; hàm thuần Code 1 `demSaiNhanhDungLai`): cron tính vào bản đệm `cau_hinh.sai_nhanh_gv` mỗi 10 phút,
-// bảng tin chỉ ĐỌC (0 truy vấn thêm, không ghi). Khoá: định nghĩa (khớp hàm thuần), ngưỡng 8 câu, loại tài khoản thử, bản đệm cũ/khác ngày ⇒ khoá VẮNG, tần suất tính lại, tên/lớp ghép lúc đọc. SQLite thật.
+// SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy (khoá `saiNhanh` của /gv/bang-tin; hàm thuần Code 1 `demSaiNhanhDungLai`): cron tính vào bản đệm `cau_hinh.sai_nhanh_gv` MỖI MỐC 6 GIỜ (00:10 · 06:10 · 12:10 · 18:10 giờ VN, ≤ 4 lần/ngày),
+// bảng tin chỉ ĐỌC (0 truy vấn thêm, không ghi). Khoá: định nghĩa (khớp hàm thuần), ngưỡng 8 câu, loại tài khoản thử, bản đệm cũ hơn 7 giờ ⇒ khoá VẮNG, tần suất tính lại, tên/lớp ghép lúc đọc. SQLite thật.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
-import { capNhatSaiNhanhNeuCu, docSaiNhanhDem, KHOA_SAI_NHANH_GV, PHUT_DEM_CU_NHAT, PHUT_TINH_LAI, tinhSaiNhanhTatCa } from '../server/src/sai-nhanh-gv'
+import { capNhatSaiNhanhNeuCu, docSaiNhanhDem, KHOA_SAI_NHANH_GV, mocSaiNhanhMoiNhat, PHUT_DEM_CU_NHAT, tinhSaiNhanhTatCa } from '../server/src/sai-nhanh-gv'
 import { demSaiNhanhDungLai, type SuKienSaiNhanh } from '../src/lib/tin-hieu-sai-nhanh'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 import { gio } from './_btvn-nang-do-mau'
@@ -60,49 +60,73 @@ describe('tinhSaiNhanhTatCa: định nghĩa khớp hàm thuần của Code 1', (
   })
 })
 
-describe('docSaiNhanhDem: bản đệm hợp lệ / cũ / khác ngày / hỏng', () => {
-  const dem0 = (luc: number, ngay = '2026-09-22', ds: unknown[] = [{ sbd: 'S1', soCau: 9, nguongSoCau: 8, nguongGiay: 5, cuaSoNgay: 7, tuNgay: '2026-09-16', co: true }]) => JSON.stringify({ ngay, luc: new Date(luc).toISOString(), ds })
-  it('còn mới ⇒ đọc được; cũ hơn 60 phút, khác ngày VN, ở TƯƠNG LAI xa, hỏng ⇒ null', () => {
+describe('mocSaiNhanhMoiNhat: bốn mốc 00:10 · 06:10 · 12:10 · 18:10 giờ VN', () => {
+  it('trước/đúng/sau từng mốc; trước 00:10 là mốc 18:10 của ngày hôm trước', () => {
+    const m = (s: string) => mocSaiNhanhMoiNhat(VN(s))
+    expect(m('2026-09-22T00:09:59')).toBe('2026-09-21T18:10')
+    expect(m('2026-09-22T00:10:00')).toBe('2026-09-22T00:10')
+    expect(m('2026-09-22T06:09:59')).toBe('2026-09-22T00:10')
+    expect(m('2026-09-22T06:10:00')).toBe('2026-09-22T06:10')
+    expect(m('2026-09-22T12:10:00')).toBe('2026-09-22T12:10')
+    expect(m('2026-09-22T18:09:59')).toBe('2026-09-22T12:10')
+    expect(m('2026-09-22T23:59:59')).toBe('2026-09-22T18:10')
+    // một ngày đủ 4 mốc khác nhau, không hơn
+    const trongNgay = new Set(Array.from({ length: 24 * 60 }, (_, k) => m(`2026-09-22T${String(Math.floor(k / 60)).padStart(2, '0')}:${String(k % 60).padStart(2, '0')}:00`)))
+    expect([...trongNgay].sort()).toEqual(['2026-09-21T18:10', '2026-09-22T00:10', '2026-09-22T06:10', '2026-09-22T12:10', '2026-09-22T18:10'])
+  })
+})
+
+describe('docSaiNhanhDem: bản đệm hợp lệ / cũ / hỏng', () => {
+  const dem0 = (luc: number, ds: unknown[] = [{ sbd: 'S1', soCau: 9, nguongSoCau: 8, nguongGiay: 5, cuaSoNgay: 7, tuNgay: '2026-09-16', co: true }], them: object = {}) => JSON.stringify({ ngay: '2026-09-22', luc: new Date(luc).toISOString(), moc: '2026-09-22T12:10', ds, ...them })
+  it('còn mới (kể cả 6 giờ trước) ⇒ đọc được; cũ hơn 7 giờ, ở TƯƠNG LAI xa, đánh dấu lỗi, hỏng ⇒ null', () => {
     expect(docSaiNhanhDem(dem0(NOW - 5 * 60_000), NOW)?.ds).toHaveLength(1)
+    expect(docSaiNhanhDem(dem0(NOW - 6 * 3_600_000), NOW)?.ds).toHaveLength(1) // giữa hai mốc vẫn dùng bản đệm
     expect(docSaiNhanhDem(dem0(NOW - (PHUT_DEM_CU_NHAT + 1) * 60_000), NOW)).toBeNull()
-    expect(docSaiNhanhDem(dem0(NOW - 60_000, '2026-09-21'), NOW)).toBeNull()
     expect(docSaiNhanhDem(dem0(NOW + 3_600_000), NOW)).toBeNull()
+    expect(docSaiNhanhDem(dem0(NOW - 60_000, [], { loi: true }), NOW)).toBeNull()
     for (const v of [undefined, null, '', 'rác', '[]', '{}', '{"ds":5}']) expect(docSaiNhanhDem(v, NOW), String(v)).toBeNull()
   })
   it('bỏ dòng hỏng (thiếu sbd / co không true) và giữ dòng đúng', () => {
-    const r = docSaiNhanhDem(dem0(NOW, '2026-09-22', [{ sbd: '', soCau: 9, co: true }, { sbd: 'S2', soCau: 9, co: false }, { sbd: 'S3', soCau: 9, co: true }, null]), NOW)
+    const r = docSaiNhanhDem(dem0(NOW, [{ sbd: '', soCau: 9, co: true }, { sbd: 'S2', soCau: 9, co: false }, { sbd: 'S3', soCau: 9, co: true }, null]), NOW)
     expect(r?.ds.map((x) => x.sbd)).toEqual(['S3'])
   })
 })
 
-describe('capNhatSaiNhanhNeuCu (cron mỗi phút): chỉ tính lại khi bản đệm cũ hơn 10 phút hoặc sang ngày', () => {
-  it('lần đầu tính + ghi; trong 10 phút chỉ đọc (không chạy truy vấn nặng); sau 10 phút tính lại; sang ngày mới tính lại dù chưa đủ 10 phút', async () => {
+describe('capNhatSaiNhanhNeuCu (cron mỗi phút): tính ĐÚNG MỘT LẦN mỗi mốc 6 giờ (≤ 4 lần/ngày)', () => {
+  it('cả một ngày cron mỗi phút ⇒ đúng 4 lần tính nặng (00:10, 06:10, 12:10, 18:10); lỡ mốc thì lần đầu sau đó tính bù', async () => {
     const d = truong(); themHs(d, 'S1', 'Em Một'); await capSai(d, 'S1', 9)
-    const nang = (): number => 0
-    void nang
     const cauLenh: string[] = []
     const goc = d.env.DB.prepare.bind(d.env.DB)
     d.env.DB.prepare = ((q: string) => { cauLenh.push(q); return goc(q) }) as typeof d.env.DB.prepare
     const soNang = () => cauLenh.filter((q) => /FROM su_kien_hoc a\b/.test(q)).length
-    expect(await capNhatSaiNhanhNeuCu(d.env, NOW)).toMatchObject({ chay: true, soEm: 1 })
-    expect(soNang()).toBe(1)
+    await capNhatSaiNhanhNeuCu(d.env, VN('2026-09-21T23:00:00')) // bản đệm của mốc 18:10 hôm trước đã có; đếm từ đây
+    cauLenh.length = 0
+    const gioTinh: string[] = []
+    for (let k = 0; k < 24 * 60; k++) {
+      const t = VN('2026-09-22T00:00:00') + k * 60_000
+      const truoc = soNang()
+      await capNhatSaiNhanhNeuCu(d.env, t)
+      if (soNang() > truoc) gioTinh.push(new Date(t + 7 * 3_600_000).toISOString().slice(11, 16))
+    }
+    expect(gioTinh).toEqual(['00:10', '06:10', '12:10', '18:10'])
+    expect(soNang()).toBe(4)
     const dong = d.sql.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').get(KHOA_SAI_NHANH_GV) as { gia_tri: string }
-    expect(JSON.parse(dong.gia_tri)).toMatchObject({ ngay: '2026-09-22', ds: [{ sbd: 'S1', soCau: 9 }] })
-    expect(await capNhatSaiNhanhNeuCu(d.env, NOW + 5 * 60_000)).toMatchObject({ chay: false, lyDo: 'con_moi' })
-    expect(soNang()).toBe(1) // không tính lại
-    expect(await capNhatSaiNhanhNeuCu(d.env, NOW + PHUT_TINH_LAI * 60_000 + 1000)).toMatchObject({ chay: true })
-    expect(soNang()).toBe(2)
-    const dauNgayMoi = VN('2026-09-23T00:01:00')
-    expect(await capNhatSaiNhanhNeuCu(d.env, dauNgayMoi)).toMatchObject({ chay: true }) // bản đệm của 22/09 không dùng cho 23/09
-    expect(soNang()).toBe(3)
-    // qua nửa đêm CHƯA đủ 10 phút kể từ lần tính trước (23:58 → 00:03): bản đệm khác ngày VN vẫn phải tính lại
-    expect(await capNhatSaiNhanhNeuCu(d.env, VN('2026-09-23T23:58:00'))).toMatchObject({ chay: true })
-    expect(await capNhatSaiNhanhNeuCu(d.env, VN('2026-09-24T00:03:00'))).toMatchObject({ chay: true })
-    expect(soNang()).toBe(5)
+    expect(JSON.parse(dong.gia_tri)).toMatchObject({ moc: '2026-09-22T18:10', ds: [{ sbd: 'S1', soCau: 9 }] })
+    // lỡ mốc 00:10 (Worker không chạy): 03:00 mới gọi ⇒ tính bù đúng một lần, rồi im đến 06:10
+    const e = truong(); themHs(e, 'S1', 'Em Một'); await capSai(e, 'S1', 9)
+    expect(await capNhatSaiNhanhNeuCu(e.env, VN('2026-09-23T03:00:00'))).toMatchObject({ chay: true, soEm: 1 })
+    expect(await capNhatSaiNhanhNeuCu(e.env, VN('2026-09-23T03:01:00'))).toMatchObject({ chay: false, lyDo: 'con_moi' })
+    expect(await capNhatSaiNhanhNeuCu(e.env, VN('2026-09-23T06:10:00'))).toMatchObject({ chay: true })
   })
-  it('lỗi (thiếu bảng) ⇒ không ném, trả loi', async () => {
+  it('tính LỖI (thiếu bảng) ⇒ không ném, trả loi, đánh dấu mốc để KHÔNG thử lại mỗi phút; bảng tin coi như chưa có; mốc kế thử lại', async () => {
     const d = truong(); d.sql.exec('DROP TABLE su_kien_hoc')
     expect(await capNhatSaiNhanhNeuCu(d.env, NOW)).toMatchObject({ chay: false, lyDo: 'loi' })
+    expect(await capNhatSaiNhanhNeuCu(d.env, NOW + 60_000)).toMatchObject({ chay: false, lyDo: 'con_moi' }) // không thử lại phút sau
+    const dong = d.sql.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').get(KHOA_SAI_NHANH_GV) as { gia_tri: string }
+    expect(JSON.parse(dong.gia_tri)).toMatchObject({ loi: true })
+    expect(docSaiNhanhDem(dong.gia_tri, NOW + 60_000)).toBeNull()
+    d.sql.exec('CREATE TABLE su_kien_hoc (sbd TEXT, qid TEXT, ngay_vn TEXT, ket_qua INTEGER, giay INTEGER)')
+    expect(await capNhatSaiNhanhNeuCu(d.env, VN('2026-09-22T18:10:00'))).toMatchObject({ chay: true }) // mốc kế tính lại được
   })
 })
 
@@ -128,10 +152,16 @@ describe('/gv/bang-tin: khoá saiNhanh', () => {
     await capNhatSaiNhanhNeuCu(d.env, NOW)
     expect((await goi(d)).saiNhanh).toEqual({ ds: [] })
   })
-  it('chưa có bản đệm / bản đệm cũ hơn 60 phút ⇒ khoá VẮNG (không bịa 0)', async () => {
+  it('chưa có bản đệm / bản đệm cũ hơn 7 giờ / lần tính lỗi ⇒ khoá VẮNG (không bịa 0); giữa hai mốc (6 giờ) vẫn dùng bản đệm', async () => {
     const d = truong(); themHs(d, 'S1', 'Em Một'); await capSai(d, 'S1', 9)
     expect(await goi(d)).not.toHaveProperty('saiNhanh')
-    await capNhatSaiNhanhNeuCu(d.env, NOW - (PHUT_DEM_CU_NHAT + 5) * 60_000) // tính từ hơn 60 phút trước
+    await capNhatSaiNhanhNeuCu(d.env, NOW - 6 * 3_600_000) // tính 6 giờ trước
+    expect((await goi(d)).saiNhanh.ds).toHaveLength(1)
+    d.sql.prepare('DELETE FROM cau_hinh WHERE khoa = ?').run(KHOA_SAI_NHANH_GV)
+    await capNhatSaiNhanhNeuCu(d.env, NOW - (PHUT_DEM_CU_NHAT + 5) * 60_000) // tính từ hơn 7 giờ trước
+    expect(await goi(d)).not.toHaveProperty('saiNhanh')
+    d.sql.prepare('DELETE FROM cau_hinh WHERE khoa = ?').run(KHOA_SAI_NHANH_GV)
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES(?,?,'x')").run(KHOA_SAI_NHANH_GV, JSON.stringify({ ngay: '2026-09-22', luc: new Date(NOW).toISOString(), moc: '2026-09-22T12:10', loi: true, ds: [] }))
     expect(await goi(d)).not.toHaveProperty('saiNhanh')
   })
 })

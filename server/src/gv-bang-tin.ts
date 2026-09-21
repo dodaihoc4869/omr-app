@@ -8,7 +8,7 @@ import { buoiCua, docCauHinhNhac, KHOA_CAU_HINH, KHOA_LAN_CHAY, lanChayKe, thuCu
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { tenLopCuaEm } from './ten-lop'
 import { docLichDaLuu, moLucChang, moLucGocChangMoSom } from './btvn-nang-do-chang'
-import { baiTuNgayMoc, docMocNo, KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU } from './moc-no'
+import { baiTuNgayMoc, giaiMocHienThi, KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, type MocHienThi } from './moc-no'
 import { tenViec } from './nhat-ky-may'
 import { docCoTuDong, KHOA_TU_DONG } from './tu-dong-cac-viec'
 import { docThuThachTuDieuChinh, NGUON_THU_THACH, thuThachDaApTuHang } from './thu-thach-rieng'
@@ -96,16 +96,17 @@ export function docMocBangTin(giaTri: unknown, homNay: string): { tuMs: number; 
  * Đã nộp ⇒ không chậm. Em đã chốt bộ (có `so_chang` + `chot_luc`): số chặng TỚI HẠN = số chặng có mốc "xong đúng nhịp" (`dungNhipTruoc` của lịch đã lưu; bài chốt trước bản 1.1 ⇒ mốc mở chặng KẾ, chặng cuối ⇒ hạn nộp)
  * đã qua; chậm khi `lo_da_xong` < số đó. Em chưa chốt / bài thường (không chặng): chỉ chậm khi QUÁ HẠN mà chưa nộp (em chưa mở bài thì chưa có lịch nên chưa chặng nào tới hạn).
  */
-export function emChamNhip(x: Dong, hanIso: string, hanMs: number, nowMs: number, tuNgay?: string): boolean {
+export function emChamNhip(x: Dong, hanIso: string, hanMs: number, nowMs: number, moc?: MocHienThi): boolean {
   if (chuoi(x.nop_luc) !== '') return false
   const soChang = so(x.so_chang)
   const chot = chuoi(x.chot_luc)
-  // Có `tuNgay` (MỐC TÍNH NỢ, thầy lệnh 21/09 15:52 — dùng cho `nhip.noTheoLop`): việc của ngày TRƯỚC mốc không phải nợ (quá hạn từ ngày trước mốc; chặng có mốc GỐC trước mốc). Vắng ⇒ luật chậm cũ, không đổi một byte.
-  if (soChang <= 0 || chot === '' || !Number.isFinite(Date.parse(chot))) return hanMs <= nowMs && (tuNgay === undefined || ngayVnCuaMs(hanMs) >= tuNgay)
+  // Có `moc` (MỐC TÍNH NỢ, thầy lệnh 21/09 15:52 — dùng cho `nhip.noTheoLop`): việc TRƯỚC mốc không phải nợ — bài thường/chưa chốt: hạn rơi trước NGÀY mốc; chặng: mốc mở GỐC trước mốc THEO GIỜ (cùng luật `soNo` của thẻ em: `moGoc >= moc.ms`).
+  // Vắng ⇒ luật chậm cũ, không đổi một byte.
+  if (soChang <= 0 || chot === '' || !Number.isFinite(Date.parse(chot))) return hanMs <= nowMs && (moc === undefined || ngayVnCuaMs(hanMs) >= moc.ngayVn)
   const lich = docLichDaLuu(x.chang_mo_json, soChang, { chotLuc: chot, hanNop: hanIso, nowMs })
   const moLuc = lich && lich.moLuc.length === soChang ? lich.moLuc : moLucChang(chot, soChang)
   let toiHan = 0
-  const goc = tuNgay === undefined ? null : moLucGocChangMoSom(x.chang_mo_json) // chặng đã MỞ SỚM: phân loại theo mốc gốc của lịch
+  const goc = moc === undefined ? null : moLucGocChangMoSom(x.chang_mo_json) // chặng đã MỞ SỚM: phân loại theo mốc gốc của lịch
   const daXong = so(x.lo_da_xong)
   let noTuMoc = false
   for (let k = 0; k < soChang; k++) {
@@ -113,13 +114,13 @@ export function emChamNhip(x: Dong, hanIso: string, hanMs: number, nowMs: number
     const t = Number.isFinite(dn) ? dn : k + 1 < soChang ? Date.parse(moLuc[k + 1]!) : hanMs
     if (t <= nowMs) {
       toiHan++
-      if (tuNgay !== undefined && k >= daXong) {
+      if (moc !== undefined && k >= daXong) {
         const moGoc = goc!.get(k) ?? Date.parse(moLuc[k]!)
-        if (!Number.isFinite(moGoc) || ngayVnCuaMs(moGoc) >= tuNgay) noTuMoc = true
+        if (!Number.isFinite(moGoc) || moGoc >= moc.ms) noTuMoc = true
       }
     }
   }
-  return tuNgay === undefined ? daXong < toiHan : noTuMoc
+  return moc === undefined ? daXong < toiHan : noTuMoc
 }
 
 export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.now()): Promise<Dong> {
@@ -264,7 +265,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const emTrongBai = new Set<string>() // nhip.btvnDungNhip: em có ≥ 1 bài đang hiện ở baiTap
   const emCham = new Set<string>() // ...và chậm ≥ 1 chặng ở ≥ 1 bài
   const emNo = new Set<string>() // NỢ: như trên nhưng chỉ tính việc từ NGÀY MỐC tính nợ (moc-no.ts) — cho `nhip.noTheoLop`
-  const tuNgayNo = docMocNo(cfg.get(KHOA_HIEN_THI_TU)?.gia_tri, cfg.get(KHOA_VE_DICH_TU)?.gia_tri, cfg.get(KHOA_MOC_BANG_TIN)?.gia_tri)
+  const mocNo = giaiMocHienThi(cfg.get(KHOA_HIEN_THI_TU)?.gia_tri, cfg.get(KHOA_VE_DICH_TU)?.gia_tri, cfg.get(KHOA_MOC_BANG_TIN)?.gia_tri)
   for (const x of rBe ?? []) {
     const ma = chuoi(x.ma_btvn)
     const sbd = chuoi(x.sbd)
@@ -275,7 +276,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     const nop = chuoi(x.nop_luc) !== ''
     emTrongBai.add(sbd)
     if (emChamNhip(x, b.han, b.hanMs, nowMs)) emCham.add(sbd)
-    if (baiTuNgayMoc(b.giaoLuc, tuNgayNo) && emChamNhip(x, b.han, b.hanMs, nowMs, tuNgayNo)) emNo.add(sbd) // bài giao TRƯỚC ngày mốc: không tính nợ
+    if (baiTuNgayMoc(b.giaoLuc, mocNo.ngayVn) && emChamNhip(x, b.han, b.hanMs, nowMs, mocNo)) emNo.add(sbd) // bài giao TRƯỚC ngày mốc: không tính nợ
     if (nop) d.daNop++
     else if (st.trangThai === 'chua_mo') d.chuaMo++
     else d.dangLam++

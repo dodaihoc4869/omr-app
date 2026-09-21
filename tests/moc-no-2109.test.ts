@@ -141,24 +141,29 @@ describe('chặng theo MỐC GIỜ (tuLuc) — chặng mở trước 12:00 mốc
   })
 })
 
-describe('emChamNhip(tuNgay) — nợ theo mốc cho nhip.noTheoLop', () => {
+describe('emChamNhip(moc) — nợ theo mốc GIỜ cho nhip.noTheoLop (cùng luật soNo của thẻ em)', () => {
   const HAN_ISO = '2026-09-30T05:00:00.000Z'
-  // chốt 20/09 10:00 VN, 5 chặng chưa làm chặng nào; chưa lịch lưu ⇒ chặng k tới hạn khi chặng k+1 mở (00:00 VN ngày chốt + k+1)
-  const em = { nop_luc: null, so_chang: 5, chot_luc: '2026-09-20T03:00:00.000Z', lo_da_xong: 0, chang_mo_json: null }
-  const nowMs = Date.parse('2026-09-21T10:00:00+07:00') // chặng 0 tới hạn (21/09 00:00)
-  it('không tuNgay ⇒ luật chậm cũ; tuNgay = 21/09: chặng 0 (mốc gốc 20/09) không phải nợ ⇒ không nợ; tuNgay = 20/09: nợ', () => {
-    expect(emChamNhip(em, HAN_ISO, Date.parse(HAN_ISO), nowMs)).toBe(true)
-    expect(emChamNhip(em, HAN_ISO, Date.parse(HAN_ISO), nowMs, '2026-09-21')).toBe(false)
-    expect(emChamNhip(em, HAN_ISO, Date.parse(HAN_ISO), nowMs, '2026-09-20')).toBe(true)
-    // sang 22/09: chặng 1 (mốc gốc 21/09 00:00 ≥ tuNgay 21/09) tới hạn mà chưa làm ⇒ nợ
-    expect(emChamNhip(em, HAN_ISO, Date.parse(HAN_ISO), Date.parse('2026-09-22T10:00:00+07:00'), '2026-09-21')).toBe(true)
+  const HAN_MS = Date.parse(HAN_ISO)
+  const moc21 = giaiMocHienThi('2026-09-21T05:00:00.000Z') // 12:00 trưa 21/09 VN
+  // 5 chặng chưa làm chặng nào; chưa lịch lưu ⇒ chặng k tới hạn khi chặng k+1 mở (00:00 VN ngày chốt + k+1)
+  const em = (chot: string) => ({ nop_luc: null, so_chang: 5, chot_luc: chot, lo_da_xong: 0, chang_mo_json: null })
+  it('không moc ⇒ luật chậm cũ; có moc: chặng mở (gốc) TRƯỚC mốc không phải nợ, kể cả mở lúc 11:00 sáng 21/09 (cùng NGÀY mốc nhưng trước 12:00)', () => {
+    const sang = em('2026-09-21T04:00:00.000Z') // mở 11:00 sáng 21/09
+    const nowMs = Date.parse('2026-09-22T10:00:00+07:00') // chặng 0 tới hạn (22/09 00:00)
+    expect(emChamNhip(sang, HAN_ISO, HAN_MS, nowMs)).toBe(true) // luật cũ: chậm
+    expect(emChamNhip(sang, HAN_ISO, HAN_MS, nowMs, moc21)).toBe(false) // 11:00 < 12:00 ⇒ KHÔNG nợ (khớp `no` của thẻ em)
+    expect(emChamNhip(em('2026-09-21T05:30:00.000Z'), HAN_ISO, HAN_MS, nowMs, moc21)).toBe(true) // mở 12:30 ⇒ nợ
+    expect(emChamNhip(em('2026-09-21T05:00:00.000Z'), HAN_ISO, HAN_MS, nowMs, moc21)).toBe(true) // đúng 12:00 ⇒ giữ (≥ mốc)
+    // ngày sau: chặng 1 (mốc gốc 00:00 22/09 ≥ mốc) tới hạn mà chưa làm ⇒ nợ
+    expect(emChamNhip(sang, HAN_ISO, HAN_MS, Date.parse('2026-09-23T10:00:00+07:00'), moc21)).toBe(true)
   })
-  it('chưa chốt / bài thường quá hạn: chỉ nợ khi hạn rơi từ ngày mốc trở đi', () => {
+  it('chưa chốt / bài thường quá hạn: chỉ nợ khi hạn rơi từ NGÀY mốc trở đi', () => {
     const chuaChot = { nop_luc: null, so_chang: 0, chot_luc: null, lo_da_xong: 0, chang_mo_json: null }
     const han = Date.parse('2026-09-20T05:00:00.000Z')
+    const nowMs = Date.parse('2026-09-22T10:00:00+07:00')
     expect(emChamNhip(chuaChot, new Date(han).toISOString(), han, nowMs)).toBe(true)
-    expect(emChamNhip(chuaChot, new Date(han).toISOString(), han, nowMs, '2026-09-21')).toBe(false) // hạn 20/09 < mốc
-    expect(emChamNhip(chuaChot, new Date(han).toISOString(), han, nowMs, '2026-09-20')).toBe(true)
+    expect(emChamNhip(chuaChot, new Date(han).toISOString(), han, nowMs, moc21)).toBe(false) // hạn 20/09 < mốc
+    expect(emChamNhip(chuaChot, new Date(han).toISOString(), han, nowMs, giaiMocHienThi('2026-09-20'))).toBe(true)
   })
 })
 
@@ -179,5 +184,32 @@ describe('/gv/bang-tin: nhip.noTheoLop theo mốc', () => {
     const b = await goi()
     expect(b.nhip.btvnDungNhip).toMatchObject({ tongEm: 1, cham: 1 }) // khối nhịp bài KHÔNG đổi
     expect(b.nhip).not.toHaveProperty('noTheoLop')
+  })
+})
+
+describe('cổng nộp trễ khi ĐỌC CẤU HÌNH LỖI: bài cũ vẫn qua_han, bài từ ngày mốc vẫn nộp trễ được', () => {
+  const SAU_HAN = new Date(Date.parse(HAN) + 4.5 * 3_600_000)
+  const hongCauHinh = (d: D1That) => {
+    const goc = d.env.DB.prepare.bind(d.env.DB)
+    d.env.DB.prepare = ((q: string) => /FROM cau_hinh WHERE khoa IN \(\?, \?, \?, \?\)/.test(q)
+      ? { bind: () => ({ all: async () => { throw new Error('D1 lỗi giả') } }) }
+      : goc(q)) as typeof d.env.DB.prepare
+  }
+  const dungBai = async (giaoLuc: string): Promise<D1That> => {
+    gio(BAY_GIO)
+    const d = dung(); await giao(d); await mo(d)
+    d.sql.prepare('UPDATE btvn SET giao_luc = ?').run(giaoLuc)
+    return d
+  }
+  it('bài giao 20/09 ⇒ qua_han (mở bài + nộp chặng); bài giao 21/09 10:50 ⇒ nộp trễ được; giao_luc hỏng ⇒ coi là bài cũ (qua_han)', async () => {
+    for (const [giao0, duoc] of [['2026-09-20T03:00:00.000Z', false], ['2026-09-21T03:50:00.000Z', true], ['', false]] as const) {
+      const d = await dungBai(giao0)
+      hongCauHinh(d)
+      gio(SAU_HAN)
+      const q0 = boCuaEm(d).filter((x) => x.chang === 0).map((x) => x.qid)
+      const dapAn = Object.fromEntries(q0.map((q) => [q, DAP_AN_DUNG(q)]))
+      expect(await mo(d), `mở bài, giao "${giao0}"`).toMatchObject(duoc ? { ok: true } : { ok: false, lyDo: 'qua_han' })
+      expect(await nopChang(d, 0, dapAn), `nộp chặng, giao "${giao0}"`).toMatchObject(duoc ? { ok: true } : { ok: false, lyDo: 'qua_han' })
+    }
   })
 })

@@ -101,10 +101,10 @@ describe('nhắc M3 chạy thật trên D1', () => {
     expect(dongsM3(d)[0]!.loi_em).toMatch(/^Em đang chậm \d+ chặng so với lịch của Bài tập về nhà «.+»\. Tối nay làm một chặng/)
   })
 
-  it('kế hoạch trả về mà KHÔNG có bài này (rỗng) ⇒ cũng giữ mốc 20:00 + lời cũ', async () => {
+  it('kế hoạch trả về mà KHÔNG có bài này (bài giao trước ngày mốc bị loại) ⇒ KHÔNG nhắc M3 (không phải "không tính được")', async () => {
     const d = await baiCham(); moc.ghiDe = async () => ({ no: { theoNgay: [], tongCau: 0, tongPhut: 0 }, veDich: [] })
-    await chay(d, NGAY, '20:00')
-    expect(dongsM3(d)[0]!.loi_em).toMatch(/^Em đang chậm/)
+    for (const g of ['20:00', '21:00', '21:30']) await chay(d, NGAY, g)
+    expect(dongsM3(d)).toEqual([])
   })
 
   it('chỉ tính kế hoạch cho em CHẬM ≥ 2 chặng: em đúng lịch không bị đọc (0 lần gọi), em chậm bị đọc 1 lần', async () => {
@@ -117,6 +117,7 @@ describe('nhắc M3 chạy thật trên D1', () => {
     expect(dongsM3(d).map((x) => x.sbd)).toEqual(['S1'])
     expect(moc.soLan).toBe(1)
     expect(TOI_DA_EM_TINH_GIO_M3).toBeGreaterThanOrEqual(50)
+    expect(TOI_DA_EM_TINH_GIO_M3 * 6).toBeLessThanOrEqual(600) // 6 truy vấn/em: một lượt cron không quá 600 truy vấn cho việc này
   })
 
   it('"chậm" tính theo mốc GỐC của lịch: chặng MỞ SỚM chưa làm không làm em thành "chậm ≥ 2 chặng" (mở sớm hôm nay, chặng kế gốc là 00:00 mai)', async () => {

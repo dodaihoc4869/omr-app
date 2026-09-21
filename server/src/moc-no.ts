@@ -40,10 +40,13 @@ export function docMocNo(...uuTien: unknown[]): string {
 /** 00:00 giờ VN của ngày mốc, tính bằng ms. */
 export const dauNgayMocMs = (ngayMoc: string): number => Date.parse(`${ngayMoc}T00:00:00+07:00`)
 
-/** Bài giao lúc `giaoLuc` có thuộc diện "từ ngày mốc" không (thầy nói rõ 21/09 15:55: bài giao TRƯỚC ngày mốc không hiện trong thẻ, không nợ, không mở nộp trễ). `giaoLuc` vắng / hỏng ⇒ có (không giấu vì thiếu dữ liệu). */
-export function baiTuNgayMoc(giaoLuc: unknown, ngayMoc: string): boolean {
+/**
+ * Bài giao lúc `giaoLuc` có thuộc diện "từ ngày mốc" không (thầy nói rõ 21/09 15:55: bài giao TRƯỚC ngày mốc không hiện trong thẻ, không nợ, không mở nộp trễ).
+ * `giaoLuc` vắng / hỏng ⇒ `khiHong` (mặc định `true`: không giấu bài vì thiếu dữ liệu; CỔNG NỘP TRỄ truyền `false`: hỏng = coi là bài cũ, đóng chặt hơn).
+ */
+export function baiTuNgayMoc(giaoLuc: unknown, ngayMoc: string, khiHong = true): boolean {
   const g = Date.parse((giaoLuc === null || giaoLuc === undefined ? '' : String(giaoLuc)).trim())
-  return !Number.isFinite(g) || g >= dauNgayMocMs(ngayMoc)
+  return Number.isFinite(g) ? g >= dauNgayMocMs(ngayMoc) : khiHong
 }
 
 /** Mốc HIỂN THỊ đã giải: `iso` (lọc `luc >= mốc`), `ms`, `ngayVn` (lọc `ngay_vn >= ngày mốc`). */
