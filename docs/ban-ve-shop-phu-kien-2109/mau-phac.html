@@ -314,7 +314,7 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
         <div class="san-be"></div>
         <div class="san-vet lop" id="lop-vet"></div>
         <div class="san-thu">
-          <svg viewBox="0 0 200 200" role="img" aria-label="Thần thú của em: Mập Địch">
+          <svg viewBox="0 0 200 200" role="img" aria-label="Thần thú của em: Bé Mây">
             <defs>
               <linearGradient id="thu-than" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgb(156,196,255)"/><stop offset="1" stop-color="rgb(98,112,232)"/></linearGradient>
               <radialGradient id="thu-bung" cx=".5" cy=".35" r=".7"><stop offset="0" stop-color="rgb(255,250,235)"/><stop offset="1" stop-color="rgb(238,220,194)"/></radialGradient>
@@ -451,7 +451,7 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
   }
   function hinhKhung(k, nho) {
     var lop = k ? ' k-' + k : ''
-    return '<span class="khung-ten' + lop + '"' + (nho ? ' style="transform:scale(.82)"' : '') + '><span class="ki-hieu" aria-hidden="true">' + (k === 'gold' ? 'Au' : 'Md') + '</span><span><small>Thần thú của em</small><strong>Mập Địch</strong></span></span>'
+    return '<span class="khung-ten' + lop + '"' + (nho ? ' style="transform:scale(.82)"' : '') + '><span class="ki-hieu" aria-hidden="true">' + (k === 'gold' ? 'Au' : 'Bm') + '</span><span><small>Tên em đặt cho thần thú</small><strong>Bé Mây</strong></span></span>'
   }
   function tranhThe(m) {
     if (m.o === 'hao-quang') return hinhHaoQuang(m.hinh, 't' + m.ma)
