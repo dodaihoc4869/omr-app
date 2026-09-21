@@ -57,6 +57,29 @@ export function docCoCaNhan(giaTri: unknown): boolean {
   return true
 }
 
+/**
+ * Cờ THÍCH NGHI sau mỗi chặng (bước G, thiết kế thầy duyệt; Boss chốt 21/09 BẬT cho MỌI em bài cá nhân hoá): `cau_hinh.btvn_ca_nhan` dạng `{"thichNghi": false}` = TẮT
+ * (công tắc dừng NGAY, kể cả điều chỉnh của Bộ não ở các chặng chưa mở); vắng/hỏng/khác ⇒ BẬT. Không ảnh hưởng việc giao bài mới (đó là `docCoCaNhan`).
+ */
+export function docCoThichNghi(giaTri: unknown): boolean {
+  if (giaTri === null || giaTri === undefined) return true
+  try {
+    const o = JSON.parse(chuoi(giaTri).trim()) as unknown
+    return !(o && typeof o === 'object' && (o as Hang).thichNghi === false)
+  } catch {
+    return true
+  }
+}
+
+export async function coBatThichNghi(env: Env): Promise<boolean> {
+  try {
+    const r = await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'btvn_ca_nhan'").first<{ gia_tri: string }>()
+    return docCoThichNghi(r?.gia_tri)
+  } catch {
+    return true
+  }
+}
+
 export async function coBatCaNhan(env: Env): Promise<boolean> {
   try {
     const r = await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'btvn_ca_nhan'").first<{ gia_tri: string }>()
@@ -659,14 +682,13 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
     const n = await nopBaiCaNhan(env, bt, sbd, {}, now)
     if (n.ok) nop = { daNop: true, nopLuc: n.nopLuc, soDung: n.soDung, soCau: n.soCau, soCauCuaEm: n.soCauCuaEm, soCauThuongSai: n.soCauThuongSai, qidSai: n.qidSai }
   }
-  // BỘ NÃO A.I chế độ THẬT: em có điều chỉnh còn hạn ⇒ sau chặng vừa XONG chạy `thichNghiChangSau` cho các chặng CHƯA MỞ. Chạy thử/tắt/không có điều chỉnh ⇒ KHÔNG gọi (bộ y nguyên).
-  if (xong && !nop && loMoi < soChang) {
+  // THÍCH NGHI sau chặng vừa XONG (bước G): `thichNghiChangSau` của lõi đổi/thêm câu ở chặng CHƯA MỞ theo kết quả chặng này (đúng ≥ 80 % ⇒ lên bậc, sai ≥ 50 % ⇒ thêm câu dễ);
+  // BẬT cho mọi em bài cá nhân hoá, tắt được bằng `cau_hinh.btvn_ca_nhan.thichNghi = false`. Nếu em còn điều chỉnh THẬT của Bộ não thì cùng đi qua cổng `dieuChinh` (Bộ não bóng/tắt ⇒ không có).
+  if (xong && !nop && loMoi < soChang && (await coBatThichNghi(env))) {
     const dc = (await docDieuChinhHieuLuc(env, [sbd], ngayVn(now))).get(sbd)
-    if (dc) {
-      const dung: Record<string, boolean> = {}
-      for (const c of daLam) dung[chuoi(c.qid)] = isAnswerCorrect(gop[chuoi(c.qid)], answerText(c.dap_an ?? c.dapAn), phanTuQid(chuoi(c.qid), phanCua(c)))
-      await thichNghiSauChang(env, bt, em, sbd, chiSo, loMoi, dung, dc, now)
-    }
+    const dung: Record<string, boolean> = {}
+    for (const c of daLam) dung[chuoi(c.qid)] = isAnswerCorrect(gop[chuoi(c.qid)], answerText(c.dap_an ?? c.dapAn), phanTuQid(chuoi(c.qid), phanCua(c)))
+    await thichNghiSauChang(env, bt, em, sbd, chiSo, loMoi, dung, dc, now)
   }
   const moiExp = await capNhatExp(env, sbd, now)
   const ketQua = daLam.map((c) => {
@@ -1055,7 +1077,7 @@ export async function choLamLaiCaNhan(env: Env, b: Hang, now: number): Promise<H
  * BẤT BIẾN kiểm lại ở đây trước khi ghi (lõi cũng khoá bằng test — kiểm thêm để một lỗi lõi không bao giờ chạm tới em): số chặng không đổi (⇒ mốc mở + HẠN NỘP không đổi), chặng ĐÃ MỞ
  * không đổi một câu, lõi và thử thách còn nguyên, mọi chặng còn lõi chưa làm. Vi phạm ⇒ bỏ cả thay đổi (ghi log), em giữ bộ cũ.
  */
-export async function thichNghiSauChang(env: Env, bt: Hang, em: Hang, sbd: string, chiSo: number, loDaXongMoi: number, dung: Record<string, boolean>, dc: DieuChinhHieuLuc, now: number): Promise<number> {
+export async function thichNghiSauChang(env: Env, bt: Hang, em: Hang, sbd: string, chiSo: number, loDaXongMoi: number, dung: Record<string, boolean>, dc: DieuChinhHieuLuc | undefined, now: number): Promise<number> {
   const maBtvn = chuoi(bt.ma_btvn)
   const khoa = `${maBtvn}|${sbd}`
   const [bai, da] = await Promise.all([docBaiNangDo(env, maBtvn), docBoDaChot(env, maBtvn, sbd)])
@@ -1075,7 +1097,7 @@ export async function thichNghiSauChang(env: Env, bt: Hang, em: Hang, sbd: strin
   }
   const soChangDaMo = trangThaiCacChang(da.chang, chuoi(em.chot_luc), loDaXongMoi, false, now, docLichDaLuu(em.chang_mo_json, da.chang.length)).chang.filter((c) => c.daMo).length
   const hoSo = (await docHoSoRut(env, [sbd], bai.cau, now)).get(sbd)!.hoSo
-  const kq = thichNghiChangSau(bo, bai.cau, hoSo, chiSo, { dung }, { soChangDaMo, dieuChinh: dc.dieuChinh })
+  const kq = thichNghiChangSau(bo, bai.cau, hoSo, chiSo, { dung }, { soChangDaMo, dieuChinh: dc?.dieuChinh })
   if (kq.doi.length === 0) return 0
   const moi = kq.bo
   const giuNguyen =

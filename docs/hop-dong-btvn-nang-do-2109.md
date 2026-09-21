@@ -79,3 +79,9 @@ Mở bài lần đầu (chốt) ≤ 12 truy vấn D1 (đo 8); mở lại ≤ 6 (
 - `/btvn/xem-truoc`: `chiTiet.lich: [{chiSo, moLuc, soCau}]` + `chiTiet.theoGio: boolean` (chế độ (a) tính thử theo giờ hiện tại; (b) em đã chốt = ĐÚNG lịch đã lưu); ở GỐC phản hồi khi lõi vượt sức chứa lành mạnh của hạn ngắn: `canhBaoHanNgan: {soCauLoiToiThieu, soPhien, chu}` (chu = "Hạn ngắn: mỗi em tối thiểu N câu lõi trong M phiên — cân nhắc lùi hạn"; số của em CHẶT nhất). Vẫn giao đủ lõi.
 - Kế hoạch ngày (`/hs/ke-hoach-ngay`): lô ≡ chặng dùng mốc mở ĐÃ LƯU (`btvn_lo.chiTiet`, `sapToi[].moLuc`); bài cũ dùng lịch cũ.
 
+## 11 · THÍCH NGHI SAU MỖI CHẶNG (bước G) — BẬT cho MỌI em bài cá nhân hoá (Boss chốt 21/09), cờ tắt
+- Sau chặng vừa XONG (mọi câu đã có đáp án, chưa phải chặng cuối), máy chủ gọi `thichNghiChangSau` của lõi (Code 1): dạng đúng ≥ 80 % ⇒ chặng CHƯA MỞ đổi 1 câu bậc thấp lấy 1 câu đúng bậc đích + 1; sai ≥ 50 % ⇒ thêm 1 câu cùng dạng bậc thấp hơn (hết ngân sách thì nhường chỗ một câu củng cố); câu THƯỜNG sai vào lịch ôn 1·3·7 (hồ sơ tự hẹn từ sổ); thử thách + lõi cao sai "không sao". Bộ mới LƯU đè `btvn_em_cau` (chỉ chặng chưa mở đổi), cập nhật `so_cau_em`, `tom_tat_json`.
+- **BẤT BIẾN kiểm lại ở máy chủ trước khi lưu** (một lỗi lõi không bao giờ chạm tới em): số chặng không đổi (⇒ mốc mở + HẠN NỘP không đổi), chặng đã mở/vừa xong không đổi một câu, lõi + thử thách còn nguyên; vi phạm ⇒ bỏ cả thay đổi, em giữ bộ cũ.
+- **Cờ**: `cau_hinh.btvn_ca_nhan` = `{"thichNghi": false}` ⇒ TẮT ngay (kể cả điều chỉnh của Bộ não ở chặng chưa mở); vắng/khác ⇒ BẬT. Độc lập với cờ giao bài mới (`false`/`0`/`{"tat":true}`).
+- Em có điều chỉnh THẬT còn hạn của Bộ não thì cùng đi qua cổng `dieuChinh` của lõi (xem docs/bo-nao-tang-doc-2109.md). Phản hồi nộp chặng KHÔNG thêm trường: em thấy chặng kế (khi tới lượt) theo bộ mới.
+
