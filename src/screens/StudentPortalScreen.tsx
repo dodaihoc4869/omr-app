@@ -18,6 +18,7 @@ import { tachDongTheoY } from '../lib/tach-dong-cau'
 import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
 import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
+import { useHopThoai } from '../components/HopThoaiCong'
 import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
 import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
 import { MomDanhSachM3, MomLamBaiM3, type BaiMomM3 } from '../components/bang-nhiem-vu/MomM3'
@@ -58,7 +59,7 @@ import {
 } from '../lib/exam-api'
 import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
 import KhungXemPhieu from '../components/KhungXemPhieu'
-import type { TheChangView } from '../lib/btvn-ca-nhan-kieu'
+import { tenBaiTapTrenThe, type TheChangView } from '../lib/btvn-ca-nhan-kieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import { LogoDoc } from '../components/LogoVai'
@@ -187,6 +188,9 @@ function ChoNapGame() {
 
 export default function StudentPortalScreen() {
   const nowHocTap = useGioHocTap()
+  // Hộp thoại riêng thay `confirm`/`alert` của trình duyệt (bảng từ ngữ H38): nói việc sẽ làm bằng động từ, không "OK / Hủy".
+  const { hoi, bao, hop } = useHopThoai()
+  const hoiRoiBaiMom = () => { void hoi({ tieuDe: 'Rời bài đang làm?', noiDung: 'Em quay về danh sách bài. Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.', nutDongY: 'Rời bài', nutHuy: 'Làm tiếp' }).then((dongY) => { if (dongY) setDangLamMom(null) }) }
   const [auth, setAuth] = useState<ThongTinHs | null>(() => {
     try {
       const luu = localStorage.getItem(KHOA_LUU_AUTH)
@@ -266,9 +270,9 @@ export default function StudentPortalScreen() {
       const url = await loadScriptUrlHoacMacDinh().catch(() => '')
       const kq = await deVaLoiGiaiCuaEm(url, maCa, auth.sbd, auth.hoTen || '')
       if (kq.html) setXemDeHtml(kq.html)
-      else alert(kq.loi || 'Không mở được đề của em')
+      else void bao(kq.loi || 'Không mở được đề của em', 'Chưa mở được đề')
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Không mở được đề của em')
+      void bao(e instanceof Error ? e.message : 'Không mở được đề của em', 'Chưa mở được đề')
     } finally {
       setDangMoDe(false)
     }
@@ -620,12 +624,15 @@ export default function StudentPortalScreen() {
     if (lamLai) {
       const con = typeof bt.soLanLamLaiConLai === 'number' ? bt.soLanLamLaiConLai : 3
       if (con <= 0) {
-        alert('Em đã dùng hết 3 lượt làm lại cho bài tập này!')
+        void bao('Em đã dùng hết 3 lượt làm lại bài tập về nhà này.', 'Hết lượt làm lại')
         return
       }
-      const xacNhan = window.confirm(
-        `Em có chắc muốn làm lại bài tập này không?\n(Được làm lại tối đa 3 lần, hiện còn ${con} lượt. Lần nộp mới sẽ cập nhật điểm số và kết quả mới).`
-      )
+      const xacNhan = await hoi({
+        tieuDe: 'Làm lại bài tập về nhà này?',
+        noiDung: `Em được làm lại tối đa 3 lần, hiện còn ${con} lượt. Lần nộp mới sẽ cập nhật điểm và kết quả.`,
+        nutDongY: 'Làm lại bài',
+        nutHuy: 'Để sau',
+      })
       if (!xacNhan) return
 
       // Xoá bài làm dở trong localStorage để câu hỏi sạch trơn cho em làm mới
@@ -646,7 +653,7 @@ export default function StudentPortalScreen() {
       const ch = await layCauHinhChoEmBtvn()
       const r = await btvnCuaEm(ch, bt.maCa || 'Riêng', auth.sbd, bt.maBtvn)
       if (!r.ok) {
-        alert(r.error || 'Không mở được bài tập về nhà')
+        void bao(r.error || 'Không mở được bài tập về nhà', 'Chưa mở được bài')
         return
       }
       const { dungPhieuBtvn } = await import('../lib/btvn-cho-em')
@@ -654,7 +661,7 @@ export default function StudentPortalScreen() {
       maCaPhieuRef.current = bt.maCa || 'Riêng'
       setPhieuHtml(html)
     } catch (e) {
-      alert(e instanceof Error ? e.message : 'Không mở được bài tập')
+      void bao(e instanceof Error ? e.message : 'Không mở được bài tập', 'Chưa mở được bài')
     } finally {
       setDangMoBai(null)
     }
@@ -713,7 +720,7 @@ export default function StudentPortalScreen() {
             )
 
             if (hopLe.length === 0) {
-              alert('Em không có câu sai nào cần khắc phục! Em có thể thử sức với câu hỏi bứt phá 9+.')
+              void bao('Em không có câu sai nào cần khắc phục. Em có thể thử sức với câu hỏi bứt phá 9+.', 'Không có câu cần khắc phục')
               return
             }
 
@@ -762,7 +769,7 @@ export default function StudentPortalScreen() {
 
             setPhieuHtml(html)
           } catch (err) {
-            alert(err instanceof Error ? err.message : 'Chưa mở được bài khắc phục lỗi')
+            void bao(err instanceof Error ? err.message : 'Chưa mở được bài khắc phục lỗi', 'Chưa mở được bài khắc phục')
           } finally {
             setDangMoDe(false)
           }
@@ -785,7 +792,7 @@ export default function StudentPortalScreen() {
             const dsCau = nguon.slice(0, 2)
 
             if (dsCau.length === 0) {
-              alert('Kho đề đang cập nhật thêm câu hỏi thử thách. Em thử lại sau nhé!')
+              void bao('Kho đề đang cập nhật thêm câu hỏi thử thách. Em thử lại sau nhé.', 'Chưa có câu thử thách')
               return
             }
 
@@ -819,7 +826,7 @@ export default function StudentPortalScreen() {
 
             setPhieuHtml(html)
           } catch (err) {
-            alert(err instanceof Error ? err.message : 'Chưa mở được bài thử thách')
+            void bao(err instanceof Error ? err.message : 'Chưa mở được bài thử thách', 'Chưa mở được bài thử thách')
           } finally {
             setDangMoDe(false)
           }
@@ -1295,6 +1302,7 @@ export default function StudentPortalScreen() {
   // KHI ĐÃ ĐĂNG NHẬP THÀNH CÔNG — MỘT màn "Bảng nhiệm vụ"; mọi màn cũ mở dạng sheet toàn màn.
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
+      {hop}
       {auth.token && !(tab === 'mom' && dangLamMom) && !manThi && (
         <BangNhiemVu
           vaiTro="hocsinh"
@@ -1667,7 +1675,7 @@ export default function StudentPortalScreen() {
                       </div>
 
                       <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                        {bt.tenBtvn || `Bài tập ca ${bt.maCa}`}
+                        {tenBaiTapTrenThe(bt)}
                       </h3>
 
                       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-1.5">
@@ -1727,7 +1735,7 @@ export default function StudentPortalScreen() {
                               onClick={() => void moBaiTap(bt, true)}
                               disabled={dangMoBai === (bt.maBtvn || bt.maCa)}
                               className="px-4 py-2 rounded-full btn-google-primary !bg-amber-500 hover:!bg-amber-600 !border-amber-500 text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-xs"
-                              title={`Làm lại bài tập này (còn ${bt.soLanLamLaiConLai ?? 3}/3 lượt)`}
+                              title={`Làm lại bài tập về nhà này (còn ${bt.soLanLamLaiConLai ?? 3}/3 lượt)`}
                             >
                               {dangMoBai === (bt.maBtvn || bt.maCa) ? (
                                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -1785,11 +1793,7 @@ export default function StudentPortalScreen() {
                 traLoi={cauTraLoiMom}
                 datTraLoi={(idCau, giaTri) => setCauTraLoiMom((prev) => ({ ...prev, [idCau]: giaTri }))}
                 loi={loiMom}
-                onQuayLai={() => {
-                  if (confirm('Em có chắc muốn tạm dừng bài làm không? Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.')) {
-                    setDangLamMom(null)
-                  }
-                }}
+                onQuayLai={hoiRoiBaiMom}
                 onTamDung={() => {
                   try {
                     localStorage.setItem(`omr_mom_draft_${dangLamMom.id}_${auth.sbd}`, JSON.stringify({
@@ -1798,7 +1802,7 @@ export default function StudentPortalScreen() {
                       giayConLai: giayConLaiMom,
                     }))
                   } catch {}
-                  alert('Đã lưu nháp an toàn! Em có thể vào làm tiếp bất cứ lúc nào trước khi hết hạn (deadline).')
+                  void bao('Bài của em đã được lưu nháp. Em vào làm tiếp bất cứ lúc nào trước Hạn nộp.', 'Đã lưu nháp')
                   setDangLamMom(null)
                 }}
                 onNop={nopBaiCuaMom}
@@ -1831,11 +1835,7 @@ export default function StudentPortalScreen() {
                 <div className="sticky top-16 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-4 rounded-2xl border border-rose-200 dark:border-rose-900/60 shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <NutQuayLai
-                      onClick={() => {
-                        if (confirm('Em có chắc muốn tạm dừng bài làm không? Đồng hồ 2 tiếng vẫn tiếp tục đếm ngược.')) {
-                          setDangLamMom(null)
-                        }
-                      }}
+                      onClick={hoiRoiBaiMom}
                       label="Danh sách bài"
                     />
                     <div className="font-bold text-sm text-slate-800 dark:text-slate-100 line-clamp-1">
@@ -1868,7 +1868,7 @@ export default function StudentPortalScreen() {
                             giayConLai: giayConLaiMom,
                           }))
                         } catch {}
-                        alert('Đã lưu nháp an toàn! Em có thể vào làm tiếp bất cứ lúc nào trước khi hết hạn (deadline).')
+                        void bao('Bài của em đã được lưu nháp. Em vào làm tiếp bất cứ lúc nào trước Hạn nộp.', 'Đã lưu nháp')
                         setDangLamMom(null)
                       }}
                       className="border border-amber-300 dark:border-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 font-bold text-xs py-2 px-3.5 rounded-full flex items-center gap-1.5 shadow-xs cursor-pointer transition-colors"

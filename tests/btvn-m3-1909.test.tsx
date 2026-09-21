@@ -129,12 +129,17 @@ describe('C3 · tab BTVN ở cổng học sinh (/hs)', () => {
 
   it.each(['moi', 'xem', 'lamlai'])('bấm mở đúng lượt/chế độ như bản cũ: %s → dungPhieuBtvn(lamLai) + btvnCuaEm(đúng mã)', async (mode) => {
     datDuong('/hs')
-    vi.stubGlobal('confirm', () => true)
     mocks.items = [BT({ maBtvn: 'BT1', maCa: 'CA1', daNop: mode !== 'moi', soLanLamLaiConLai: 3 })]
     render(<StudentPortalScreen />)
     await moTab()
     const ten = mode === 'moi' ? /Vào làm bài/ : mode === 'xem' ? /Xem lại/ : /Làm lại/
     fireEvent.click(await screen.findByRole('button', { name: ten }))
+    // Làm lại: hộp riêng (không phải confirm của trình duyệt) nói việc sẽ làm bằng động từ.
+    if (mode === 'lamlai') {
+      const hop = await screen.findByRole('alertdialog', { name: 'Làm lại bài tập về nhà này?' })
+      expect(hop.textContent).toContain('hiện còn 3 lượt')
+      fireEvent.click(within(hop).getByRole('button', { name: 'Làm lại bài' }))
+    }
     expect(await screen.findByRole('dialog', { name: 'Bài tập & Phiếu làm bài' })).toBeTruthy()
     expect(mocks.homework).toHaveBeenCalledWith({ URL: '/test' }, 'CA1', 'test', 'BT1')
     expect(mocks.sheet.mock.calls[0][3].lamLai).toBe(mode === 'lamlai')

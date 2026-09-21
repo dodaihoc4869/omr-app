@@ -37,19 +37,20 @@ it('lỗi mở bài được hiện trong màn bài gia đình, không biến m�
 
 it.each(['chua_lam','dang_lam'])('nút đỏ trong danh sách Mom hoạt động: %s',async(trangThai)=>{
  mocks.momItems[0].trangThai=trangThai
- vi.stubGlobal('confirm',()=>true)
  render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài gia đình giao'}))
  await screen.findByText('Nội dung câu hỏi phải hiện')
  fireEvent.click(screen.getByRole('button',{name:'Danh sách bài'}))
+ fireEvent.click(await screen.findByRole('button',{name:'Rời bài'}))
  fireEvent.click(await screen.findByRole('button',{name:trangThai==='dang_lam'?'Tiếp tục làm bài':'Bắt đầu làm bài (2 tiếng)'}))
  expect(await screen.findByText('Nội dung câu hỏi phải hiện')).toBeTruthy()
 })
 it.each(['moi','xem','lamlai'])('BTVN mở đúng lượt và đúng chế độ: %s',async(mode)=>{
  const bt={maBtvn:'BT1',maCa:'CA1',soCau:1,tenBtvn:'Bài test',hanNop:new Date(Date.now()+86400000).toISOString(),daNop:mode!=='moi',soLanLamLaiConLai:3}
- mocks.items=[bt];vi.stubGlobal('confirm',()=>true)
+ mocks.items=[bt]
  render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Mở menu'}));fireEvent.click(await screen.findByRole('menuitem',{name:'Bài tập về nhà'}))
  const name=mode==='moi'?'Vào làm bài':mode==='xem'?/Xem lại/:/Làm lại/
  fireEvent.click(await screen.findByRole('button',{name}))
+ if(mode==='lamlai')fireEvent.click(await screen.findByRole('button',{name:'Làm lại bài'}))
  expect(await screen.findByRole('dialog',{name:'Bài tập & Phiếu làm bài'})).toBeTruthy()
  expect(mocks.homework).toHaveBeenCalledWith({URL:'/test'},'CA1','test','BT1')
  expect(mocks.sheet.mock.calls[0][3].lamLai).toBe(mode==='lamlai')

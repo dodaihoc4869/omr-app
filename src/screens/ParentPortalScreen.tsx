@@ -39,6 +39,7 @@ import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
 import { guiTinNhan } from '../lib/tro-ly/he-thong-chat'
 import '../components/m3'
+import { useHopThoai } from '../components/HopThoaiCong'
 
 interface BaiThiCuaCon {
   maCa: string
@@ -82,6 +83,7 @@ export interface BaiMomGiao {
 const SBD_STORAGE_KEY = 'omr_ph_sbd'
 
 export default function ParentPortalScreen() {
+  const { bao, hop } = useHopThoai()
   const [tabPh, setTabPh] = useState<'diem' | 'khacphuc' | 'bantin' | null>(null)
   const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
   const [sbdInput, setSbdInput] = useState('')
@@ -659,6 +661,7 @@ export default function ParentPortalScreen() {
   // GIAO DIỆN 2: ĐÃ ĐĂNG NHẬP — MỘT màn "Bảng nhiệm vụ" đọc-chỉ; mọi màn cũ mở dạng sheet toàn màn.
   return (
     <div className="m3">
+    {hop}
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {tabPh === null && (
         <BangNhiemVu
@@ -890,7 +893,7 @@ export default function ParentPortalScreen() {
               nguoiNhan: { vai: 'gv', hoTen: 'Thầy Đỗ Đại Học' },
               noiDung,
             })
-            alert('Đã gửi tin nhắn đến Thầy Đỗ Đại Học! Thầy sẽ phản hồi sớm nhất trên hệ thống.')
+            void bao('Tin nhắn đã gửi tới Thầy Đỗ Đại Học. Thầy sẽ trả lời trong phần tin nhắn.', 'Đã gửi tin nhắn')
           }}
           onXemPhieuGoc={(html) => {
             setXemPhieuHtml(html)
