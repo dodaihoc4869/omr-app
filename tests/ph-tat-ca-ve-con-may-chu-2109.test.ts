@@ -8,7 +8,7 @@ import { parentPass } from '../server/src/game-v2-auth'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { docCauHinhTangDoc } from '../server/src/bo-nao-doc'
 import { docCauBtvnChuaNop } from '../server/src/game-v2-luot'
-import { tuLucEmDaHoc } from '../server/src/thi-dua-hom-nay'
+import { tuLucTuNgay } from '../server/src/cau-da-lam'
 import { chuGameTrong } from '../server/src/chu-game'
 import {
   CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, docCauChanBtvnChuaNop, lyDoCheCuaCau, NGUONG_LAM_LAU_GIAY, lichChangCuaEm, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
@@ -1840,7 +1840,7 @@ describe('ĐỊNH NGHĨA CHUẨN "câu đã làm hôm nay" = số câu KHÁC NHA
   it('soCau = DISTINCT qid đã trả lời hôm nay, từ mốc, GỒM câu che; soDung + soCauCoKetQua chỉ trên câu KHÔNG che; đúng bằng truy vấn của định nghĩa (khớp ô Thi đua)', async () => {
     const d = xay(1, 0)
     const r = await hoi(d)
-    const sql = (d.sql.prepare('SELECT COUNT(DISTINCT qid) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND luc >= ? AND ket_qua IS NOT NULL').get('S1', NGAY, tuLucEmDaHoc(MOC_THAT, NGAY)) as { n: number }).n
+    const sql = (d.sql.prepare('SELECT COUNT(DISTINCT qid) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND luc >= ? AND ket_qua IS NOT NULL').get('S1', NGAY, tuLucTuNgay(MOC_THAT, NGAY)) as { n: number }).n
     expect(sql).toBe(4) // QA (làm lại 3 lần = 1), QC, QD, QE — QB bỏ trống không đếm; QF hôm qua, QG trước mốc không đếm
     expect(r.homNay.tongQuan.soCau).toBe(sql)
     expect(r.homNay.tongQuan).toMatchObject({ soCauCoKetQua: 2, soDung: 1 }) // QA (đúng lần cuối), QC (sai) — QD, QE bị che không vào

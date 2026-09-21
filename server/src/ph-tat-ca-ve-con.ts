@@ -29,7 +29,8 @@ import { ngayVn } from './su-kien-hoc'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { baiTuNgayMoc, giaiMocHienThi } from './moc-no'
 import { TRAN_ON_KHI_KHONG_NO } from '../../src/lib/ve-dich'
-import { hangChamCuaEm, tuLucEmDaHoc } from './thi-dua-hom-nay'
+import { tuLucTuNgay } from './cau-da-lam'
+import { hangChamCuaEm } from './thi-dua-hom-nay'
 import { docVeDichCuaEm } from './ve-dich-d1'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 
@@ -609,8 +610,8 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
     })
   }
 
-  // ĐỊNH NGHĨA CHUẨN (cùng ô Thi đua, `tuLucEmDaHoc`): số câu KHÁC NHAU đã trả lời hôm nay, mọi nguồn, từ MAX(mốc, 00:00 hôm nay), GỒM câu bị che. `rHomNay` = phần KHÔNG che (đúng + mẫu số tỉ lệ đúng).
-  const tuLucHomNay = tuLucEmDaHoc(moc.iso, homNay)
+  // ĐỊNH NGHĨA CHUẨN (cùng ô Thi đua; MỘT nguồn `cau-da-lam.ts` của Code 3, `tuLucTuNgay`): số câu KHÁC NHAU đã trả lời hôm nay, mọi nguồn, từ MAX(mốc, 00:00 hôm nay), GỒM câu bị che. `rHomNay` = phần KHÔNG che (đúng + mẫu số tỉ lệ đúng).
+  const tuLucHomNay = tuLucTuNgay(moc.iso, homNay)
   const laCauHomNay = (e: Sk): boolean => e.ketQua !== null && e.ngayVn === homNay && e.luc >= tuLucHomNay
   const soCauHomNay = new Set(skTho.filter(laCauHomNay).map((e) => e.qid)).size
   const rHomNay = skHt.filter(laCauHomNay)
