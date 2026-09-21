@@ -109,7 +109,7 @@ describe('3. Vào thi — thẳng vào phòng chờ, không qua cửa hỏi lạ
 
   it('màn làm bài nhận tham số và tự bấm vào thi', () => {
     expect(thi).toContain('export interface TuCongHocSinh')
-    expect(thi).toContain('ExamTakeScreen({ tuCong }')
+    expect(thi).toMatch(/ExamTakeScreen\(\{ tuCong(, onVe)?[ }]/) // `onVe` (HS-1, thêm nút "Về bảng nhiệm vụ") là prop thêm, không đổi cửa vào
     expect(thi).toContain('daTuVaoRef')
     expect(thi).toContain('void handleJoin()')
     // Coi như đã xác nhận danh tính — cổng vừa xác thực bằng mật khẩu riêng.

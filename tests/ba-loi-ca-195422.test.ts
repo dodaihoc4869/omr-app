@@ -172,7 +172,8 @@ describe('LỖI 4 — bài BỊ KHOÁ bấm link xem điểm không thấy đi�
 
   it('màn khoá bị bỏ qua, và bảng điểm được hiện, khi đang xem lại', () => {
     expect(MAN).toContain('if (attempt?.integrity.blocked && !xemLai) {')
-    expect(MAN).toContain('{graded && (!attempt?.integrity.blocked || xemLai) && (')
+    // HS-1 (thầy chốt 21/09): nút xem điểm nay là `onXemBaoCao` của KetQuaSauNop — VẪN chỉ hiện khi đã chấm VÀ (không bị khoá HOẶC đang xem lại).
+    expect(MAN).toContain('onXemBaoCao={graded && (!attempt?.integrity.blocked || xemLai) ? () => setXemBaoCaoModal(true) : undefined}')
   })
 
   it('KHÔNG xoá dấu vết: `integrity.blocked` giữ nguyên trong bản ghi', () => {

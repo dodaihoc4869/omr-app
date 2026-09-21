@@ -2279,7 +2279,13 @@ export default function StudentPortalScreen() {
             <X className="w-5 h-5" />
           </button>
           <Suspense fallback={<div className="p-6 text-sm text-slate-500">Đang mở phòng thi…</div>}>
-            <ManLamBai tuCong={boVaoThi ?? undefined} />
+            <ManLamBai
+              tuCong={boVaoThi ?? undefined}
+              onVe={() => {
+                setManThi(false)
+                setBoVaoThi(null)
+              }}
+            />
           </Suspense>
         </div>
       )}

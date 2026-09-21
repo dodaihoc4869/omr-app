@@ -59,10 +59,12 @@ import LogoHocSinh from '../components/LogoHocSinh'
 import { LogoDoc } from '../components/LogoVai'
 import PhongChoGame from '../components/PhongChoGame'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
-import { TriangleAlert, X, ArrowLeft, LayoutGrid, Clock, Sparkles, Flag, Lock } from 'lucide-react'
+import { TriangleAlert, X, ArrowLeft, LayoutGrid, Flag, Lock } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { goiBaiThi } from '../lib/goi-bao-cao'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
+import KetQuaSauNop from '../components/xem-diem/KetQuaSauNop'
+import { chuGioNop, phanTuDiem, soSanhLanTruoc, thoiGianLam, tongDungTong } from '../lib/ket-qua-sau-nop'
 import { docDuongVao } from '../lib/vai-tro'
 import { dungM3 } from '../components/m3'
 import ThanhTrenThiM3 from './ThanhTrenThiM3'
@@ -253,7 +255,7 @@ export interface TuCongHocSinh {
   matKhau?: string
 }
 
-export default function ExamTakeScreen({ tuCong }: { tuCong?: TuCongHocSinh } = {}) {
+export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSinh; onVe?: () => void } = {}) {
   const showToast = useAppStore((s) => s.showToast)
 
   const [phase, setPhase] = useState<'join' | 'loading' | 'cho' | 'exam' | 'submitted' | 'error'>('join')
@@ -2876,9 +2878,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     }
     const soDaLam = attempt && assignment ? flat.filter((f) => daTraLoiEntry(attempt, assignment, f)).length : null
     const gioNop = attempt?.submittedAt ? new Date(attempt.submittedAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''
+    // Số liệu cho màn kết quả sau nộp (lib/ket-qua-sau-nop.ts): chỉ đọc điểm ĐÃ chấm bằng luật chính thức; lịch sử chưa về ⇒ ẩn chip "so với lần trước".
+    const phanKq = graded ? phanTuDiem(graded.score) : []
+    const dungTong = tongDungTong(phanKq)
+    const soSanhTruoc = graded && lichSuEm.length > 0 ? soSanhLanTruoc(lichSuEm, attempt?.maCa ?? '', attempt?.submittedAt, graded.score.total) : null
+    const ssLanTruoc = graded && lichSuEm.length > 0 ? (soSanhTruoc ? soSanhTruoc.hieu : null) : undefined
     return (
       <Trang className="flex items-center justify-center px-4 py-8">
-        <div className="w-full flex flex-col" style={{ maxWidth: 400, gap: 'var(--k4)' }}>
+        <div className="w-full flex flex-col" style={{ maxWidth: 480, gap: 'var(--k4)' }}>
+          {attempt?.pendingSubmit ? (
           <TheNoiDung>
             <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
               <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
@@ -2927,51 +2935,29 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
                     Gửi lại ngay
                   </NutChinh>
                 </div>
-              ) : graded ? (
-                <OThongBao tone="xanh">
-                  Điểm của em: <b style={SANS_SO}>{graded.score.total.toFixed(2)}/10</b> — {classify(graded.score.total)}.
-                </OThongBao>
-              ) : choCaLop ? (
-                <OThongBao tone="cam">
-                  Điểm sẽ tự hiện khi cả lớp nộp xong — đã nộp{' '}
-                  <b style={SANS_SO}>
-                    {choCaLop.daNop}/{choCaLop.daVao}
-                  </b>{' '}
-                  em. Giữ màn hình này, hoặc mở lại link sau.
-                </OThongBao>
-              ) : (
-                <OThongBao tone="xanh">Thầy sẽ công bố kết quả sau.</OThongBao>
-              )}
+              ) : null}
             </div>
           </TheNoiDung>
-
-          {/* NÚT XEM ĐIỂM CHI TIẾT:
-              - Nếu cho xem điểm luôn (graded sẵn sàng) hoặc khi học sinh cuối cùng nộp bài:
-                Nút sáng lên, bấm vào bung luôn ra báo cáo đã đồng bộ full màn hình.
-              - Nếu đang chờ cả lớp nộp xong:
-                Hiện nút nhưng disabled và báo rõ số em đã nộp / đã vào, khi đủ thì tự sáng lên. */}
-          {graded && (!attempt?.integrity.blocked || xemLai) && (
-            <NutChinh
-              onClick={() => setXemBaoCaoModal(true)}
-              className="animate-google-fade"
-            >
-              <div className="flex items-center justify-center gap-2">
-                <Sparkles size={17} />
-                <span>Xem điểm chi tiết</span>
-              </div>
-            </NutChinh>
-          )}
-
-          {!graded && choCaLop && (!attempt?.integrity.blocked || xemLai) && (
-            <button
-              type="button"
-              disabled
-              className="w-full py-3 px-4 rounded-2xl font-bold text-sm bg-slate-200/90 dark:bg-slate-800/90 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2 opacity-80"
-              title="Điểm sẽ tự động hiện và nút xem điểm sẽ sáng lên khi cả lớp nộp xong"
-            >
-              <Clock size={16} className="animate-spin text-amber-500" />
-              <span>Xem điểm (Chờ cả lớp nộp xong: {choCaLop.daNop}/{choCaLop.daVao})</span>
-            </button>
+          ) : (
+            /* HS-1 (thầy chốt 21/09): kết quả sau nộp vẽ lại theo bản vẽ — ba trạng thái theo luật công bố; CHỈ đổi phần nhìn. */
+            <KetQuaSauNop
+              kieu={graded ? 'da_cong_bo' : choCaLop ? 'ca_lop' : 'khong'}
+              tenCa={attempt?.tenCa || ''}
+              gioNop={chuGioNop(attempt?.submittedAt)}
+              lanThu={attempt?.lanThu}
+              diem={graded?.score.total}
+              phan={phanKq}
+              dung={dungTong.dung}
+              tong={dungTong.tong}
+              lam={thoiGianLam(attempt?.startedAt, attempt?.submittedAt)}
+              de={attempt?.durationMinutes ? `${attempt.durationMinutes} phút` : null}
+              ss={ssLanTruoc}
+              truoc={soSanhTruoc ? soSanhTruoc.truoc : undefined}
+              daNop={choCaLop?.daNop}
+              daVao={choCaLop?.daVao}
+              onXemBaoCao={graded && (!attempt?.integrity.blocked || xemLai) ? () => setXemBaoCaoModal(true) : undefined}
+              onVe={onVe}
+            />
           )}
 
           {phieuCuaEm && (
