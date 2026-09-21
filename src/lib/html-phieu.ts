@@ -762,7 +762,7 @@ body.co-lam .thanh:not(#thanh-nop) { position: static; }
   border: 1px solid rgba(37, 99, 235, 0.3);
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-  transition: all 0.2s;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 }
 .thanh-phan-tang-btvn .tpt-nut-mo:hover {
   background: #2563eb;
