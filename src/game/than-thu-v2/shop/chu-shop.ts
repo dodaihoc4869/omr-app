@@ -138,17 +138,16 @@ export const chuVeCuaHang = 'Về Cửa hàng' // CHỜ MỤC 9 (nhãn nút quay
 export const chuLocNhan = 'Lọc theo chỗ đeo trên thần thú' // CHỜ MỤC 9
 export const chuThanhKeoNhan = 'Số EXP thừa em muốn đổi thành vàng' // CHỜ MỤC 9
 export const chuDoiToiDa = (n: number): string => `Đổi được nhiều nhất ${chuExp(n)}` // CHỜ MỤC 9 (nhãn đầu mút thanh kéo)
-export const chuDangTai = 'Đang tải' // CHỜ MỤC 9 (nhãn trợ năng của khung xám giữ chỗ)
 export const chuNhanKhungTen = 'Tên em đặt cho thần thú' // CHỜ MỤC 9 (dòng nhỏ trên khung tên, chữ của mẫu phác 204d27e)
 export const chuThuCuaEm = (ten?: string): string => (ten ? `Thần thú của em: ${ten}` : 'Thần thú của em') // CHỜ MỤC 9 (nhãn trợ năng của sân khấu; danh từ chung đi trước tên riêng — chuẩn A1.2)
 /** Nhãn trợ năng của thẻ món ở Cửa hàng (chạm = thử). */
 export const chuTheMon = (ten: string, bac: Bac, gia: number, trangThai: string): string => `Thử ${ten}. ${TEN_BAC[bac]}. Giá ${chuVangSo(gia)}. ${trangThai}` // CHỜ MỤC 9
 
-// ── Lời chung khi máy chủ không kèm lời (mã lỗi mới: lời tạm theo hợp đồng, chờ Boss viết) — CHỜ MỤC 9 ──
-export const chuLoiTheoMa: Readonly<Record<string, string>> = { // CHỜ MỤC 9 (ba mã lỗi mới: lời tạm theo hợp đồng)
-  khong_co_mon: 'Không tìm thấy món này.',
-  sap_mo: 'Món này chưa mở bán. Em quay lại sau nhé.',
-  sai_dau_vao: 'Yêu cầu chưa đúng. Em thử lại nhé.',
+// ── Lời chung khi máy chủ không kèm lời (ba mã lỗi mới): ĐÚNG CHỮ mục 9.3 [L11] [L12] [L13] (Boss viết, thêm ở c77f130) ──
+export const chuLoiTheoMa: Readonly<Record<string, string>> = {
+  khong_co_mon: 'Cửa hàng không có món này. Em tải lại Cửa hàng rồi chọn lại nhé.', // [L11]
+  sap_mo: 'Món này sắp mở bán. Em ghé lại sau nhé.', // [L12]
+  sai_dau_vao: 'Có gì đó chưa đúng. Em tải lại trang rồi thử lại nhé.', // [L13]
 }
 
 // ── Lời máy chủ MẪU [L1–L8]: CHỈ máy chủ giả (du-lieu-mau.ts) dùng. Máy thật tự trả lời ở trường `loi`; màn không viết lại. ──

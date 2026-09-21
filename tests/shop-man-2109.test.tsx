@@ -391,9 +391,9 @@ describe('(d) mọi lỗi hợp đồng hiện lời máy chủ + "Thử lại"'
     ['gia_doi', /^Giá vừa thay đổi, em xem lại rồi mua nhé\.$/],
     ['tam_dong', /^Cửa hàng đang tạm đóng\. Đồ em đã mua vẫn còn nguyên\.$/],
     ['da_co', /^Em đã có món này rồi\. Vào Tủ đồ để mặc\.$/],
-    ['khong_co_mon', /^Không tìm thấy món này\.$/],
-    ['sap_mo', /^Món này chưa mở bán\. Em quay lại sau nhé\.$/],
-    ['sai_dau_vao', /^Yêu cầu chưa đúng\. Em thử lại nhé\.$/],
+    ['khong_co_mon', /^Cửa hàng không có món này\. Em tải lại Cửa hàng rồi chọn lại nhé\.$/],
+    ['sap_mo', /^Món này sắp mở bán\. Em ghé lại sau nhé\.$/],
+    ['sai_dau_vao', /^Có gì đó chưa đúng\. Em tải lại trang rồi thử lại nhé\.$/],
   ]
   for (const [ma, mau] of MUA)
     it(`shop-mua · ${ma}: lời máy chủ ngay trong hộp xác nhận, nút "Thử lại" gửi lại và thành công (lỗi giả chỉ bắn một lần)`, async () => {

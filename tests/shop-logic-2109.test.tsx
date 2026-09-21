@@ -174,9 +174,9 @@ describe('đang mặc + đang thử', () => {
 describe('đọc lỗi + khoá yêu cầu', () => {
   it('docLoi: lời máy chủ trước; không lời ⇒ lời chung theo mã (mã mới) ⇒ mất mạng ⇒ lỗi không rõ', () => {
     expect(docLoi(new LoiShopApi('thieu_vang', 'Chưa đủ vàng — còn thiếu 260 vàng.'))).toEqual({ ma: 'thieu_vang', loi: 'Chưa đủ vàng — còn thiếu 260 vàng.' })
-    expect(docLoi({ ma: 'sap_mo', message: '' }).loi).toBe('Món này chưa mở bán. Em quay lại sau nhé.')
-    expect(docLoi({ ma: 'khong_co_mon' }).loi).toBe('Không tìm thấy món này.')
-    expect(docLoi({ ma: 'sai_dau_vao' }).loi).toBe('Yêu cầu chưa đúng. Em thử lại nhé.')
+    expect(docLoi({ ma: 'sap_mo', message: '' }).loi).toBe('Món này sắp mở bán. Em ghé lại sau nhé.')
+    expect(docLoi({ ma: 'khong_co_mon' }).loi).toBe('Cửa hàng không có món này. Em tải lại Cửa hàng rồi chọn lại nhé.')
+    expect(docLoi({ ma: 'sai_dau_vao' }).loi).toBe('Có gì đó chưa đúng. Em tải lại trang rồi thử lại nhé.')
     expect(docLoi({ ma: 'mat_mang' }).loi).toBe('Mất mạng rồi. Có mạng lại mới mua được, em vẫn xem được Tủ đồ.')
     expect(docLoi(new Error('boom'))).toEqual({ ma: '', loi: 'boom' })
     expect(docLoi(undefined).loi).toBe('Cửa hàng chưa tải được. Em bấm Thử lại nhé.')
