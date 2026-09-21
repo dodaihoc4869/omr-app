@@ -109,8 +109,8 @@ export function lanChayKe(ms: number, c: CauHinhNhac): string {
   return new Date(t).toISOString()
 }
 
-const THU = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy']
-const thuCua = (ngay: string): string => THU[new Date(`${ngay}T00:00:00Z`).getUTCDay()]!
+export const THU_TRONG_TUAN = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy']
+export const thuCua = (ngay: string): string => THU_TRONG_TUAN[new Date(`${ngay}T00:00:00Z`).getUTCDay()]!
 /** "23:59 Thứ Năm" cho hạn nộp. */
 export const chuHanCoThu = (hanIso: string): string => {
   const v = new Date(Date.parse(hanIso) + GIO_VN_MS).toISOString()
@@ -118,7 +118,7 @@ export const chuHanCoThu = (hanIso: string): string => {
 }
 
 /** Buổi của một giờ hạn ("12:00" ⇒ trưa): trước 11:00 sáng · đến 13:30 trưa · đến 18:00 chiều · sau đó tối. */
-const buoiCua = (gio: string): string => {
+export const buoiCua = (gio: string): string => {
   const p = phutCuaGio(gio)
   return p < 11 * 60 ? 'sáng' : p < 13 * 60 + 30 ? 'trưa' : p < 18 * 60 ? 'chiều' : 'tối'
 }

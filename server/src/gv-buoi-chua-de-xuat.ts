@@ -67,9 +67,9 @@ export async function gvBuoiChuaDeXuat(env: Env, b: Record<string, unknown>, now
   for (const x of [...rEm].sort((a, c) => so(c.uu) - so(a.uu))) {
     const sbd = chuoi(x.sbd)
     if (!sbd) continue
-    const cu = em.get(sbd)
-    const khoi = chuoi(x.lop) || cu?.khoi || ''
-    em.set(sbd, { hoTen: chuoi(x.ho_ten) || cu?.hoTen || '', khoi, lop: tenLopCuaEm(khoi, tenLop?.get(sbd)) })
+    if (em.get(sbd)?.hoTen) continue // hồ sơ (đã xếp trước) thắng danh sách cổng
+    const khoi = chuoi(x.lop)
+    em.set(sbd, { hoTen: chuoi(x.ho_ten), khoi, lop: tenLopCuaEm(khoi, tenLop?.get(sbd)) })
   }
   const trongLop = (e: { khoi: string; lop: string }): boolean => !lopLoc || e.lop === lopLoc || e.khoi === lopLoc
   const dsSbd = [...em].filter(([, e]) => trongLop(e)).map(([s]) => s)
