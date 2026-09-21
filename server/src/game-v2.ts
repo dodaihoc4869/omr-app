@@ -17,6 +17,7 @@ import {laCauTuLuan,jsonLaTuLuan} from './cam-tu-luan'
 import {masteryTheoHoSo,qidChanHomNay} from './game-v2-ho-so'
 import {ghiSuKien} from './su-kien-hoc'
 import {doanAction,laGoiNoiBoDoan,doanMoCho} from './game-v2-doan'
+import {SO_HIEP} from '../../src/game/than-thu-v2/doan-core'
 import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay'
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
 import {TRAN_CAU_GAME_NGAY,docCauBtvnChuaNop,docDangLop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot} from './game-v2-luot'
@@ -119,6 +120,35 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   if(!inserted.meta.changes)return startLuotMoi(env,sbd,p,b,action)
   return {ok:true,id,questions:chon.map(x=>({...publicQuestion(x.q),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
 }
+/** ĐOÀN HỘ TỐNG lấy câu cá nhân từ KHO LỚP (thầy 21/09, Boss/Code 1 W3 — cùng kho lớp với lượt Đảo mới): trước đây Đoàn gọi `start` nội bộ bằng đường CŨ, kho bó theo bằng chứng của CHÍNH em ⇒ em mới / ít dữ liệu báo "Chưa có câu vừa sức".
+ *  Nay: dạng LỚP đã học (`docDangLop`) ∪ dạng em đã gặp; câu PHẦN I hoặc III (hiệp Đoàn trả lời bằng một chữ A–D hoặc một số; Phần II thuộc câu chung của trùm, KHÔNG làm câu cá nhân), đã duyệt, không tự luận, đủ `dang` + `mucDo` — KHÔNG đòi bằng chứng cùng dạng / kiến thức nền của CHÍNH em
+ *  (như Đảo mới). Cách CHỌN giữ NGUYÊN của Đoàn (`chooseSessionWithRoles`: câu tới hạn ôn → dạng đang yếu → còn lại), nên em có hồ sơ vẫn thấy câu ôn của mình trước. Giữ nguyên rào của đường cũ: thầy tạm dừng game, câu bảo vệ / thầy chặn riêng,
+ *  câu em đã/đang làm hôm nay ở chỗ khác, bài tập về nhà CHƯA nộp (Game hiện lời giải ngay), trần 60 câu/ngày. KHÔNG tốn lượt Đảo (Đoàn có trần 4 chặng/ngày riêng). Phiên tạo ra được `taoNguoi` đóng dấu `doan` như trước.
+ *  Lùi nhanh: cờ `cau_hinh.game_luot_moi = 'tat'` (cùng cờ với Đảo) ⇒ đường cũ. */
+async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<string,unknown>>{
+  const tNow=Date.now(),ngay=academicDay(now())
+  const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
+  const dangLop=await docDangLop(env,sbd,tNow)
+  const scope=await readScope(env,sbd,dangLop)
+  const dayStart=new Date(ngay+'T00:00:00+07:00').toISOString()
+  const count=await env.DB.prepare('SELECT COUNT(*) AS n FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,dayStart).first<{n:number}>()
+  const remaining=Math.max(0,TRAN_CAU_GAME_NGAY-(count?.n??0))
+  if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_GAME_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
+  const history=await attempts(env,sbd)
+  const blocked=await protectedQuestions(env)
+  for(const key of control.blocked)blocked.add(key)
+  for(const qid of await qidChanHomNay(env,sbd,tNow))blocked.add(qid)
+  for(const x of await docCauBtvnChuaNop(env,sbd))blocked.add(x)
+  const dangHoc=new Set<string>([...dangLop,...scope.evidence.map(e=>e.dang).filter((d):d is string=>!!d)])
+  const eligible=scope.pool.filter(q=>q.phan!=='II'&&q.reviewed&&!laCauTuLuan(q)&&!!q.dang&&!!q.mucDo&&dangHoc.has(q.dang)&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(control.types.length===0||control.types.includes(q.dang)))
+  const chon=chooseSessionWithRoles(eligible,scope.evidence,history,await masteryTheoHoSo(env,sbd,p.mastery),'adventure',tNow).slice(0,Math.min(SO_HIEP-2,remaining))
+  if(!chon.length)return {ok:true,questions:[],missing:scope.missing,message:'Chưa có câu vừa sức trong kho cho em. Em hoàn thành bài Thầy giao rồi quay lại lên đường nhé.'}
+  const id=crypto.randomUUID(),groups=new Set(scope.evidence.map(e=>e.group))
+  const session:Session={mode:'adventure',created:Date.now(),questions:chon.map(x=>({qid:x.q.qid,maDe:x.q.maDe,version:x.q.version,group:x.q.group,novel:!groups.has(x.q.group)}))}
+  const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
+  if(!inserted.meta.changes)return startDoanKhoLop(env,sbd,p)
+  return {ok:true,id,questions:chon.map(x=>({...publicQuestion(x.q),role:x.role})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3)}
+}
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
   const sbd=await gameIdentity(env,b)
   if(action==='sync')return {ok:true,...await syncIndex(env)}
@@ -174,6 +204,8 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     if(b.guardian){guardian=String(b.guardian).trim().toUpperCase();const {r}=await escortContext(env,guardian,sbd);if(!r.started||r.finished||mode!=='arena'||Date.now()>=Math.min(r.deadline,r.roundAt+60000)||b.guardianRound!==undefined&&Number(b.guardianRound)!==r.round)throw new Error('Lượt Linh Tâm đã đổi. Em chờ câu của lượt mới.');guardianRound=r.round}
     // Đoàn Hộ Tống gọi `start` NỘI BỘ (laGoiNoiBoDoan) để lấy câu bằng đường cũ; Linh Tâm (guardian) và võ đài cũng giữ đường cũ — chỉ lượt Đảo của em mới theo bộ chọn lượt mới.
     if(!guardian&&mode==='adventure'&&!laGoiNoiBoDoan(b)&&await luotMoiBat(env))return startLuotMoi(env,sbd,p,b,action)
+    // ĐOÀN nội bộ (`start` gọi từ `taoNguoi`): kho LỚP như lượt Đảo mới (cùng cờ lùi `game_luot_moi`); Linh Tâm / võ đài / repair / tower vẫn đường cũ.
+    if(!guardian&&mode==='adventure'&&action==='start'&&laGoiNoiBoDoan(b)&&await luotMoiBat(env))return startDoanKhoLop(env,sbd,p)
     const scope=await readScope(env,sbd);const blocked=await protectedQuestions(env)
     const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game cho hồ sơ này.')
     for(const key of control.blocked)blocked.add(key)
