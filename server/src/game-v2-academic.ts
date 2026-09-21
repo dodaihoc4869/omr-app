@@ -3,7 +3,6 @@ import type {Profile} from './game-v2'
 import {dapAnTheoMaDe} from './goi-cu'
 import {hash,readScope,normalizeBank,readJson} from './game-v2-bank'
 import {grade} from '../../src/game/than-thu-v2/core'
-import {nhanExp} from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import {docCauHinhExp,mocExpCuaEm} from './exp-d1'
 type Row=Record<string,unknown>
 export interface Academic {since?:string;seen:string[];sources:Record<string,string>;days:Record<string,number>;total:number;lastGain:number;at:string}
@@ -17,7 +16,7 @@ export function creditAcademic(p:Profile,events:{key:string;at:string;amount:num
   seen.add(e.key);a.days[day]=(a.days[day]??0)+amount;gain+=amount
  }
  a.seen=[...seen];a.total+=gain;a.lastGain=gain;a.at=now;p.academic=a
- if(gain){const next=nhanExp({capDo:p.cap,exp:p.exp},gain);p.cap=next.capDo;p.exp=next.exp;p.earned+=gain}
+ if(gain){p.wallet+=gain;p.earned+=gain} // Đợt 1 thần thú mỗi ngày: MỌI lên cấp qua cổng hấp thụ (invest) ⇒ EXP học tập vào ỐNG NGHIỆM, không nạp thẳng vào cấp
  return gain
 }
 /** Read academic records only. The profile and its receipt ledger are committed together with CAS by the caller. */

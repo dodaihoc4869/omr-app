@@ -20,6 +20,7 @@ import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
 import {gvBangTin} from './gv-bang-tin'
 import {ghiLoiMay} from './nhat-ky-may'
 import {chotNgayRoiTruKhien} from './khien-mat'
+import {chuyenDoiLoCron} from './game-v2-hap-thu'
 import {phGiaoThem} from './ph-giao-them'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {docThanThuSoThat,hsThuThachHomNay,hsThuThachNop} from './thu-thach-rieng'
@@ -2967,6 +2968,8 @@ export default {
     }else{
       // NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09): mỗi phút gọi nhưng chỉ chạy MỘT lần/30 phút, trong khung 07:00–21:30 giờ VN, khoá idempotent. Lỗi chỉ ghi log — không kéo `deliverNotices` đổ theo.
       // CHỐT "ĐẠT NGÀY" còn lại + MẤT KHIÊN KHI VẮNG (khung 00:02–05:00 giờ VN; ngoài khung trả về ngay, không truy vấn). Trừ khiên CHỈ chạy khi chốt ngày đã xong cho mọi em.
+      // ĐỢT 1 thần thú mỗi ngày: chuyển đổi hồ sơ đã chơi sang luật cấp mới, ≤ 40 hồ sơ/phút cho tới hết (rồi cờ chuyen_doi_cap = xong, phút sau không truy vấn). Lỗi chỉ ghi nhật ký máy.
+      await chuyenDoiLoCron(env,Date.now()).then(r=>{if(r.soDoc>0)console.log('[hap-thu] cron chuyển đổi',JSON.stringify(r))}).catch(async e=>{console.error('[hap-thu] cron lỗi:',e);await ghiLoiMay(env,'hap_thu_chuyen_doi')})
       await chotNgayRoiTruKhien(env,Date.now()).then(r=>{if(r.truKhien?.chay)console.log('[khien-mat] cron',JSON.stringify(r))}).catch(async e=>{console.error('[khien-mat] cron lỗi:',e);await ghiLoiMay(env,'khien_mat')})
       await nhacTuDong(env,Date.now()).then(async r=>{if(r.chay)console.log('[nhac-tu-dong] cron',JSON.stringify(r));if(r.lyDo==='loi')await ghiLoiMay(env,'nhac_nop_bai')}).catch(async e=>{console.error('[nhac-tu-dong] cron lỗi:',e);await ghiLoiMay(env,'nhac_nop_bai')})
       await deliverNotices(env).catch(async e=>{console.error('[thong-bao] cron lỗi:',e);await ghiLoiMay(env,'gui_thong_bao')})

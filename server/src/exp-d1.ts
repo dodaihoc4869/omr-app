@@ -21,6 +21,7 @@ import type { SuKienDoc } from './ho-so-nam-kt'
 import { traCuuTheoQid } from './ho-so-nam-kt'
 import { demChuoiDat } from './ke-hoach-ngay'
 import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
+import { docHapThuChoEm } from './game-v2-hap-thu'
 import { tinhDatNhiemVuNgay } from '../../src/lib/dat-nhiem-vu-ngay'
 import type { ThieuDat } from '../../src/lib/dat-nhiem-vu-ngay'
 import { ngayVn } from './su-kien-hoc'
@@ -595,7 +596,8 @@ export async function docThanhTichNgay(env: Env, sbd: string, nowMs: number, nga
     for (const x of r?.results ?? []) {
       const khoa = String(x.khoa).slice(tienTo.length)
       if (x.loai === 'dat_ngay') ra.datNgay = true
-      else if (Number(x.exp) === bangGiaExp(ngay).loDungNhip) ra.loDungNhip.push({ maBtvn: String(x.ma_nguon ?? ''), chiSo: Number(khoa.split('|')[2]), khoa })
+      // ĐÚNG NHỊP = khoản `lo` có EXP CAO HƠN giá trễ nhịp của NGÀY ấy (10 > 4 trước 22/09; 20 > 8 từ 22/09) — không so cứng một con số, để đổi bảng giá không làm lệch vé của game.
+      else if (Number(x.exp) > bangGiaExp(ngay).loTreNhip) ra.loDungNhip.push({ maBtvn: String(x.ma_nguon ?? ''), chiSo: Number(khoa.split('|')[2]), khoa })
     }
     return ra
   } catch (e) {
@@ -684,6 +686,10 @@ const TEN_LOAI: Record<string, string> = {
 }
 
 export interface ExpHomNay {
+  /** Đợt 1 thần thú mỗi ngày (chỉ-thêm; vắng khi em chưa có thú/hồ sơ chưa chuyển): EXP thú còn thiếu để lên cấp (KHÔNG trừ ống), ống nghiệm, hôm nay thú còn ăn được. */
+  expConThieu?: number
+  ongNghiem?: number
+  hapThuConLaiHomNay?: number
   homNay: number
   chiTietHomNay: { loai: string; exp: number; ghiChu: string; soKhoan: number }[]
   manhKhien: { manh: number; moiKhien: number; khienRen: number; khienConLai: number; choCongVaoHoSo: boolean }
@@ -722,6 +728,7 @@ export async function docExpHomNay(env: Env, sbd: string, nowMs: number): Promis
   return {
     homNay: chiTiet.reduce((t, x) => t + x.exp, 0), chiTietHomNay: chiTiet,
     manhKhien: { manh, moiKhien: MANH_MOI_KHIEN, khienRen, khienConLai: p ? khienConLai(p) : 0, choCongVaoHoSo: cho },
+    ...(await docHapThuChoEm(env, sbd, nowMs) ?? {}),
   }
 }
 

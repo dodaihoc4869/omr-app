@@ -162,7 +162,8 @@ describe('idempotent: gọi lại / gọi chồng nhau không cộng trùng', ()
     expect(d.dem('exp_so')).toBe(6)
     expect(p.expMoi.daCong).toBe(12)
     expect(p.earned).toBe(12)
-    expect({ cap: p.cap, exp: p.exp }).toEqual({ cap: nhanExp({ capDo: 1, exp: 0 }, 12).capDo, exp: nhanExp({ capDo: 1, exp: 0 }, 12).exp })
+    // Đợt 1 thần thú mỗi ngày (21/09): EXP học tập vào ỐNG NGHIỆM, không nạp thẳng vào cấp — thần thú chỉ ăn qua cổng hấp thụ `invest` (200/120/0 mỗi ngày). Sửa CÓ CHỦ Ý.
+    expect({ cap: p.cap, exp: p.exp, wallet: p.wallet }).toEqual({ cap: 1, exp: 0, wallet: 12 })
   })
   it('EM CHƯA CÓ HỒ SƠ GAME: khoản nằm chờ trong sổ; có hồ sơ rồi thì cộng đủ, đúng một lần', async () => {
     const d = taoD1That()

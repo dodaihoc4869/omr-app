@@ -8,7 +8,6 @@ import {hash,readScope,syncIndex,protectedQuestions} from './game-v2-bank'
 import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
 import {PETS,ALIASES,OLD_SIX,allowed,chooseSessionWithRoles,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
 import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
-import {nhanExp,thanhExp} from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import type {ShieldState} from '../../src/game/than-thu-v2/shields'
 import {khienConLai,khienRenChuaDung} from './exp-ho-so-game'
 import {CAP_KHIEN_QUA_DAU,MANH_MOI_KHIEN,NGAY_DAT_MO_KHIEN_QUA} from './exp-cau-hinh'
@@ -18,7 +17,9 @@ import {laCauTuLuan,jsonLaTuLuan} from './cam-tu-luan'
 import {masteryTheoHoSo,qidChanHomNay} from './game-v2-ho-so'
 import {ghiSuKien} from './su-kien-hoc'
 import {doanAction,laGoiNoiBoDoan,doanMoCho} from './game-v2-doan'
-export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
+import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay'
+import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
+export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
 type Row={revision:number;json:string}
 type Session={doan?:number;guardian?:string;guardianRound?:number;mode:Mode;questions:{qid:string;maDe:string;version:string;group:string;novel:boolean}[];created:number}
 const now=()=>new Date().toISOString()
@@ -32,22 +33,24 @@ export async function loadProfile(env:Env,sbd:string):Promise<{profile:Profile;r
     const id=String(old.idThanhThuChon??old.thanThuId??'');const pet=ALIASES[id]??id
     const profile:Profile={pet:PETS.some(p=>p.id===pet)?pet:'dat_quy',choice:!id||OLD_SIX.has(id)||!PETS.some(p=>p.id===pet),legacy:legacy?.json??null,
       cap:Math.max(1,Math.min(120,Number(old.capDo)||1)),exp:Math.max(0,Number(old.exp)||0),wallet:Math.max(0,Number(old.khoExp)||0),earned:0,tower:Math.max(1,Math.min(999,Number(old.tangThapCaoNhat)||1)),mastery:[],arena:null,cutover:now()}
-    if(season)Object.assign(profile,{pet:'dat_quy',choice:true,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,season})
+    if(season)Object.assign(profile,{pet:'dat_quy',choice:true,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,season,luatCap:LUAT_CAP_MOI})
     await env.DB.prepare('INSERT OR IGNORE INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').bind(sbd,JSON.stringify(profile),now()).run()
     row=await env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd).first<Row>()
   }
   if(!row)throw new Error('Chưa mở được hồ sơ game.')
   const current=JSON.parse(row.json) as Profile
   if(season&&current.season!==season){
-    const fresh:Profile={pet:'dat_quy',choice:true,legacy:current.legacy,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:now(),season}
+    const fresh:Profile={pet:'dat_quy',choice:true,legacy:current.legacy,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:now(),season,luatCap:LUAT_CAP_MOI}
     const updated=await env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=?').bind(JSON.stringify(fresh),sbd,row.revision).run()
     if(!updated.meta.changes)return loadProfile(env,sbd)
     return {profile:fresh,revision:row.revision+1}
   }
+  // ĐỢT 1 thần thú mỗi ngày: hồ sơ đã chơi theo luật cấp cũ được CHUYỂN ĐỔI LƯỜI khi mở (CAS theo revision; thua CAS/lỗi ⇒ dùng hồ sơ như đã đọc, cron quét nốt).
+  if(current.luatCap!==LUAT_CAP_MOI){const doi=await chuyenDoiKhiMo(env,sbd,current,row.revision);if(doi)return doi}
   return {profile:current,revision:row.revision}
 }
 async function save(env:Env,sbd:string,p:Profile,rev:number){const r=await env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=?').bind(JSON.stringify(p),sbd,rev).run();if(!r.meta.changes)throw new Error('Hồ sơ vừa đổi trên thiết bị khác. Em tải lại hồ sơ.');return rev+1}
-function visible(p:Profile){const {legacy:_,academic,expMoi,...rest}=p;return {...rest,soNgayDat:expMoi?.ngayDat??0,ngayMoKhienQua:NGAY_DAT_MO_KHIEN_QUA,khienRen:p.khienRen?{manh:p.khienRen.manh,daRen:p.khienRen.daRen,chuaDung:khienRenChuaDung(p),conLai:khienConLai(p),moiKhien:MANH_MOI_KHIEN}:undefined,academic:academic?{total:academic.total,today:academic.days[academicDay(now())]??0,lastGain:academic.lastGain,at:academic.at,dailyLimit:100}:undefined}}
+function visible(p:Profile,hapThuInfo?:{tran:number;lyDo?:string|null}){const {legacy:_,academic,expMoi,truocSiet:_ts,...rest}=p;const homNay=academicDay(now());return {...rest,ongNghiem:p.wallet,hapThuHomNay:{da:p.hapThu&&p.hapThu.ngay===homNay?p.hapThu.da:0,tran:hapThuInfo?.tran??null,lyDo:hapThuInfo?.lyDo??null},expGameHomNay:{da:daExpGameHomNay(p,homNay),tran:TRAN_EXP_GAME_NGAY},soNgayDat:expMoi?.ngayDat??0,ngayMoKhienQua:NGAY_DAT_MO_KHIEN_QUA,khienRen:p.khienRen?{manh:p.khienRen.manh,daRen:p.khienRen.daRen,chuaDung:khienRenChuaDung(p),conLai:khienConLai(p),moiKhien:MANH_MOI_KHIEN}:undefined,academic:academic?{total:academic.total,today:academic.days[academicDay(now())]??0,lastGain:academic.lastGain,at:academic.at,dailyLimit:100}:undefined}}
 async function attempts(env:Env,sbd:string){const r=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE sbd=? ORDER BY created_at DESC LIMIT 3000').bind(sbd).all<{json:string}>();return r.results.map(x=>(JSON.parse(x.json) as {attempt:Attempt}).attempt).reverse()}
 async function currentQuestion(env:Env,q:{qid:string;maDe:string;version:string}){
   const row=await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`).bind(q.maDe,q.qid,q.version).first<{json:string}>()
@@ -88,7 +91,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
   }
   if(action==='rename'){if(p.choice)throw new Error('Em chọn thần thú trước khi đặt tên.');p.nickname=normalizePetName(b.name);return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}}
   if(action==='share')return {ok:true,pass:await parentPass(env,sbd)}
-  if(action==='profile'){const tasks=await env.DB.prepare('SELECT id,dang FROM game_v2_task WHERE sbd=? AND completed_at IS NULL ORDER BY created_at LIMIT 20').bind(sbd).all<{id:string;dang:string}>();return {ok:true,profile:visible(p),revision,tasks:tasks.results,doanMo:await doanMoCho(env,sbd)}}
+  if(action==='profile'){const tasks=await env.DB.prepare('SELECT id,dang FROM game_v2_task WHERE sbd=? AND completed_at IS NULL ORDER BY created_at LIMIT 20').bind(sbd).all<{id:string;dang:string}>();const tranHapThu=await docTranHapThu(env,sbd,academicDay(now()));return {ok:true,profile:visible(p,{tran:tranHapThu.tran}),revision,tasks:tasks.results,doanMo:await doanMoCho(env,sbd)}}
   if(action==='shield-use'){
     const id=String(b.useId??'');if(!/^[a-zA-Z0-9-]{16,80}$/.test(id))throw new Error('Lượt dùng khiên không hợp lệ.')
     if(p.shields?.lastUse===id||Number(p.shields?.activeUntil)>Date.now())return {ok:true,profile:visible(p),revision}
@@ -107,10 +110,12 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
   }
   if(action==='invest'){
     if(p.cap>=120)throw new Error('Thần thú đã đạt cấp 120. EXP tiếp tục được giữ trong kho.')
-    let capacity=-p.exp;for(let level=p.cap;level<120;level++)capacity+=thanhExp(level)
-    const portion=Math.max(0,Math.min(50000,p.wallet,capacity));const res=nhanExp({capDo:p.cap,exp:p.exp},portion)
-    p.cap=res.capDo;p.exp=res.exp;p.wallet-=portion
-    return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}
+    // MỘT CỔNG HẤP THỤ (Đợt 1 thần thú mỗi ngày): mỗi ngày VN thần thú ăn tối đa 200 EXP khi em đạt nhiệm vụ ngày, 120 khi có học chưa đạt, 0 khi chưa học; phần dư ở lại ống nghiệm.
+    if(p.luatCap!==LUAT_CAP_MOI)throw new Error('Hồ sơ thần thú đang được cập nhật sang cách lên cấp mới. Em thử lại sau ít phút.')
+    const ngay=academicDay(now());const t=await docTranHapThu(env,sbd,ngay)
+    const r=hapThu(p,Number.POSITIVE_INFINITY,ngay,t.tran)
+    if(!r.daNap)return {ok:true,profile:visible(p,{tran:t.tran,lyDo:r.lyDo}),revision,daNap:0,lyDo:r.lyDo,conTran:r.conTran}
+    return {ok:true,profile:visible(r.hoSo,{tran:t.tran,lyDo:r.lyDo}),revision:await save(env,sbd,r.hoSo,revision),daNap:r.daNap,lyDo:r.lyDo,conTran:r.conTran}
   }
   if(action==='start'||action==='recommendations'){
     const mode:Mode=['adventure','repair','tower','arena'].includes(String(b.mode))?b.mode as Mode:'adventure'
@@ -176,12 +181,14 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     if(q.phan==='I'&&!/^[ABCD]$/.test(submitted)||q.phan==='II'&&!/^[DS]{4}$/.test(submitted)||q.phan==='III'&&(!submitted||submitted.length>40))throw new Error('Em điền đủ đáp án trước khi chấm.')
     const attempt:Attempt={id:receipt,session:id,qid,group:q.group,dang:q.dang,mucDo:q.mucDo,correct:grade(q,String(b.answer??'')),assisted:b.assisted===true,at:Date.now(),novel:ref.novel}
     const step=advance(p.mastery.find(m=>m.key===(q.dang??q.group)),attempt)
-    p.mastery=[...p.mastery.filter(m=>m.key!==step.mastery.key),step.mastery];p.wallet+=step.reward;p.earned+=step.reward
+    // ĐIỀU 9: thưởng nấc dạng (Đảo và Đoàn cùng đường này) đi qua MỘT cửa có trần 120 EXP/ngày VN; quá trần ⇒ thưởng 0 nhưng mastery, sổ sự kiện, vé vẫn ghi đủ.
+    const thuong=step.reward>0?nhanExpGame(p,academicDay(now()),step.reward):0
+    p.mastery=[...p.mastery.filter(m=>m.key!==step.mastery.key),step.mastery];p.wallet+=thuong;p.earned+=thuong
     if(session.mode==='arena'&&p.arena&&!p.arena.finished)p.arena.studied=(p.arena.studied??0)+1
     if(session.mode==='arena'&&p.arena&&!p.arena.finished&&attempt.correct&&!attempt.assisted&&p.arena.learned<2&&!(p.arena.learnedGroups??[]).includes(q.group)){p.arena.gold+=2;p.arena.learned++;p.arena.learnedGroups=[...(p.arena.learnedGroups??[]),q.group]}
-    const result={attempt,correct:attempt.correct,answer:q.correct,solution:q.solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),reward:step.reward,stage:step.mastery.stage,lyDoThuong:lyDoThuong({correct:attempt.correct,assisted:attempt.assisted,reward:step.reward,milestone:step.milestone,stage:step.mastery.stage})}
+    const result={attempt,correct:attempt.correct,answer:q.correct,solution:q.solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),reward:thuong,...(thuong<step.reward?{thuongGoc:step.reward}:{}),stage:step.mastery.stage,lyDoThuong:lyDoThuong({correct:attempt.correct,assisted:attempt.assisted,reward:thuong,milestone:step.milestone,stage:step.mastery.stage})}
     const queries=[env.DB.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?) AND (SELECT COUNT(*) FROM game_v2_attempt WHERE sbd=? AND created_at>=?)<200').bind(receipt,sbd,id,qid,q.group,JSON.stringify(result),now(),sbd,revision,sbd,dailyStart)]
-    if(step.reward)queries.push(env.DB.prepare('INSERT OR IGNORE INTO game_v2_reward(id,sbd,amount,created_at) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(`${sbd}|${step.mastery.key}|${step.milestone}`,sbd,step.reward,now(),receipt))
+    if(step.reward)queries.push(env.DB.prepare('INSERT OR IGNORE INTO game_v2_reward(id,sbd,amount,created_at) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(`${sbd}|${step.mastery.key}|${step.milestone}`,sbd,thuong,now(),receipt))
     queries.push(env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=? AND EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(JSON.stringify(p),sbd,revision,receipt))
     const written=await env.DB.batch(queries)
     if(!written[0]?.meta.changes)throw new Error('Một thiết bị khác vừa cập nhật. Em bấm chấm lại để đồng bộ.')

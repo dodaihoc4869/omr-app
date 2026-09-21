@@ -179,11 +179,11 @@ describe('qua D1 (capNhatExp)', () => {
     expect(dongExp(d).map((x) => x.loai)).toEqual(['dau_ngay'])
   })
 
-  it('docThanhTichNgay nhận ra lô ĐÚNG NHỊP theo giá của NGÀY: 21/09 giá 10, 22/09 giá 20 (giá cũ ở ngày mới KHÔNG phải đúng nhịp)', async () => {
+  it('docThanhTichNgay nhận ra lô ĐÚNG NHỊP = khoản `lo` cao hơn giá TRỄ NHỊP của ngày ấy (21/09: 10 > 4; 22/09: 20 > 8), trễ nhịp thì không', async () => {
     const d = dung()
     const them = (khoa: string, ngay: string, exp: number) => d.sql.prepare("INSERT INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu) VALUES(?, 'S1', ?, 'lo', NULL, 'B1', ?, ?, 'x')").run(khoa, ngay, exp, `${ngay}T05:00:00.000Z`)
     them('S1|lo|B1|0', '2026-09-21', 10); them('S1|lo|B1|1', '2026-09-21', 4)
-    them('S1|lo|B2|0', '2026-09-22', 20); them('S1|lo|B2|1', '2026-09-22', 8); them('S1|lo|B2|2', '2026-09-22', 10)
+    them('S1|lo|B2|0', '2026-09-22', 20); them('S1|lo|B2|1', '2026-09-22', 8)
     const a = await docThanhTichNgay(d.env, 'S1', T('2026-09-21T12:00:00'))
     expect(a.loDungNhip.map((x) => x.khoa)).toEqual(['lo|B1|0'])
     const b = await docThanhTichNgay(d.env, 'S1', T('2026-09-22T12:00:00'))

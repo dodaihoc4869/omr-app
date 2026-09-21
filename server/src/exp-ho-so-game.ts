@@ -2,12 +2,11 @@
 //
 // Hồ sơ giữ TỔNG LUỸ KẾ đã cộng (`expMoi.daCong`, `expMoi.manhDaTinh`), mỗi lần chỉ cộng phần chênh `tổng sổ − đã cộng`. Nơi gọi (`exp-d1.ts`) ghi hồ sơ
 // bằng CAS theo `revision`, nên gọi lại bao nhiêu lần, hai lượt nộp chạy chồng nhau, hay em chưa có hồ sơ lúc khoản phát sinh, đều không cộng trùng
-// và không sót. EXP học tập nạp thẳng vào cấp bằng đúng `nhanExp` như luật cũ (KHÔNG đổi cơ chế hai bể ví/cấp của game).
+// và không sót. EXP học tập vào ỐNG NGHIỆM (`wallet`) — thần thú chỉ lên cấp qua cổng hấp thụ `invest` (Đợt 1 thần thú mỗi ngày, 21/09).
 //
 // Khiên: `shieldRemaining` cũ (`shields.ts`, KHÔNG sửa) = quà tiến hoá − đã dùng. Khiên RÈN cộng thêm: còn lại = quà + đã rèn − đã dùng.
 // Quy ước dùng: khiên quà tiến hoá dùng TRƯỚC, khiên rèn sau — nên "khiên rèn chưa dùng" = min(đã rèn, còn lại). Đó là con số chạm trần
 // `KHIEN_REN_TOI_DA` (5) để ngừng rèn thêm.
-import { nhanExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { shieldEntitlement } from '../../src/game/than-thu-v2/shields'
 import { congManh, type KhienRen } from './exp-hoc-tap'
 import { CAP_KHIEN_QUA_DAU, NGAY_DAT_MO_KHIEN_QUA } from './exp-cau-hinh'
@@ -15,6 +14,8 @@ import { CAP_KHIEN_QUA_DAU, NGAY_DAT_MO_KHIEN_QUA } from './exp-cau-hinh'
 export interface HoSoGameExp {
   cap: number
   exp: number
+  /** Ống nghiệm: EXP đã kiếm, chưa nạp vào thần thú. */
+  wallet?: number
   earned: number
   shields?: { used: number }
   /** Tổng luỹ kế ĐÃ CỘNG vào hồ sơ này (từ sổ `exp_so`/`manh_khien_so`). Thiếu = 0. `ngayDat` = số NGÀY ĐẠT nhiệm vụ ngày tính từ mốc `khien_moc` (mở khiên quà đầu, phương án B). */
@@ -53,9 +54,8 @@ export function congTongSoVaoHoSo(p: HoSoGameExp, tongExp: number, tongManh: num
   const them = Math.max(0, Math.floor(tongExp) - daCong)
   const themManh = Math.max(0, Math.floor(tongManh) - manhDaTinh)
   if (them > 0) {
-    const sau = nhanExp({ capDo: p.cap, exp: p.exp }, them)
-    p.cap = sau.capDo
-    p.exp = sau.exp
+    // Đợt 1 thần thú mỗi ngày: EXP học tập vào ỐNG NGHIỆM (`wallet`); thần thú hấp thụ qua cổng `invest` (200/120/0 mỗi ngày). Không còn nạp thẳng vào cấp.
+    p.wallet = Math.max(0, p.wallet ?? 0) + them
     p.earned = Math.max(0, p.earned) + them
   }
   let khienMoi = 0
