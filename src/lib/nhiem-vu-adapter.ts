@@ -285,7 +285,7 @@ function themBaiMeBiCat(viec: TheNhiemVu[], keHoach: KeHoachNgayTroLy, phu: Nguo
       conLaiChu: r.conLaiChu,
       biCong: false,
       trangThai: bai.trangThai === 'dang_lam' ? 'dang_lam' : 'chua_lam',
-      hanhDong: { loai: 'mo_mom', payload: { id: bai.id, bai }, nhanNut: quaHan ? 'Mở để hoàn tất nộp bài' : 'Làm bài của Mom' },
+      hanhDong: { loai: 'mo_mom', payload: { id: bai.id, bai }, nhanNut: quaHan ? 'Mở để hoàn tất nộp bài' : 'Làm bài gia đình giao' },
     })
   }
 }
@@ -499,7 +499,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
         return `${tenBaiTapVeNha(bt)}: nộp bài`
       }
       case 'mom':
-        return momTheoId(ct.id)?.tieuDe || 'Bài của Mẹ giao'
+        return momTheoId(ct.id)?.tieuDe || 'Bài gia đình giao'
       case 'than_thu':
         return 'Thần thú: luyện dạng còn yếu'
       default:
@@ -518,7 +518,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       }
       case 'mom': {
         const bai = momTheoId(ct.id)
-        return { loai: 'mo_mom', payload: bai ? { id: bai.id, bai } : { id: ct.id }, nhanNut: 'Làm bài của Mom' }
+        return { loai: 'mo_mom', payload: bai ? { id: bai.id, bai } : { id: ct.id }, nhanNut: 'Làm bài gia đình giao' }
       }
       case 'than_thu':
         return { loai: 'mo_than_thu', nhanNut: 'Luyện với thần thú' }
@@ -594,9 +594,9 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     const bai = momTheoId(id)
     return {
       id,
-      tieuDe: bai?.tieuDe || 'Bài Mẹ giao',
+      tieuDe: bai?.tieuDe || 'Bài gia đình giao',
       soCau: Math.max(0, Math.floor(Number(soCauMay ?? bai?.soCau) || 0)),
-      hanhDong: { loai: 'mo_mom', payload: bai ? { id, bai } : { id }, nhanNut: 'Làm bài của Mom' },
+      hanhDong: { loai: 'mo_mom', payload: bai ? { id, bai } : { id }, nhanNut: 'Làm bài gia đình giao' },
     }
   }
   // Máy chủ đã nói gì về bài cũ (`tonCu[]` hoặc `tonCuTong`, kể cả 0) thì CHỈ tin máy chủ; chưa nói gì mới suy từ danh sách bài.
@@ -618,7 +618,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
   const quaHan: TheQuaHan[] = (keHoach.quaHan || []).map((q) => {
     if (q.loai === 'mom') {
       const bai = momTheoId(q.ma)
-      return { id: `qua_han:mom:${q.ma}`, loai: 'mom', tieuDe: bai?.tieuDe || 'Bài của Mẹ giao', chu: 'Đã hết giờ — mở để nộp phần đã lưu', hanhDong: { loai: 'mo_mom', payload: bai ? { id: bai.id, bai } : { id: q.ma }, nhanNut: 'Mở để nộp' } }
+      return { id: `qua_han:mom:${q.ma}`, loai: 'mom', tieuDe: bai?.tieuDe || 'Bài gia đình giao', chu: 'Đã hết giờ — mở để nộp phần đã lưu', hanhDong: { loai: 'mo_mom', payload: bai ? { id: bai.id, bai } : { id: q.ma }, nhanNut: 'Mở để nộp' } }
     }
     const bt = btvnTheoMa(q.ma)
     return { id: `qua_han:btvn:${q.ma}`, loai: 'btvn', tieuDe: tenBaiTapVeNha(bt), chu: 'Đã qua Hạn nộp — nhờ Thầy gia hạn' }

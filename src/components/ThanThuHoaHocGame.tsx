@@ -827,7 +827,7 @@ export default function ThanThuHoaHocGame({
 
     setOngDayKhongNhan(0)
     const TEN_VIEC: Record<NguonKiemExp, string> = {
-      caThi: 'ca kiểm tra', btvn: 'bài tập', mom: 'bài MOM', leoThap: 'tầng tháp', sanBoss: 'quái câu sai',
+      caThi: 'ca kiểm tra', btvn: 'bài tập', mom: 'bài gia đình giao', leoThap: 'tầng tháp', sanBoss: 'quái câu sai',
     }
     for (const g of gom) {
       if (g.exp > 0) themVaoKho(g.exp, g.nguon, `${g.so} ${TEN_VIEC[g.nguon]}`)

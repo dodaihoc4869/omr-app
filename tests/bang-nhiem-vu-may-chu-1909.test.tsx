@@ -204,16 +204,16 @@ describe('StudentPortalScreen thật: nối kế hoạch máy chủ và "ca đan
     expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)
   })
 
-  it('máy chủ lỗi hoặc trả JSON hỏng: rơi về nguồn trợ lý, vẫn mở được bài Mẹ giao (không trắng màn)', async () => {
+  it('máy chủ lỗi hoặc trả JSON hỏng: rơi về nguồn trợ lý, vẫn mở được bài gia đình giao (không trắng màn)', async () => {
     tra['/hs/ke-hoach-ngay'] = { body: { ok: true, items: [] } }
     mocks.momItems = [{ id: 'M1', tieuDe: 'Bài luyện thử', soCau: 1, trangThai: 'chua_lam' }]
     const { container } = render(<StudentPortalScreen />)
-    expect(await screen.findByRole('button', { name: 'Làm bài của Mom' })).toBeTruthy()
+    expect(await screen.findByRole('button', { name: 'Làm bài gia đình giao' })).toBeTruthy()
     expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('tro_ly')
   })
 
-  it('bài Mẹ giao chưa bắt đầu do máy chủ đưa vào viec[]: hiện thành thẻ việc, bấm mở đúng bài', async () => {
-    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, viec: [{ id: 'mom:M1', loai: 'mom', soCau: 4, thuTu: 1, batBuoc: true, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho', ghiChu: 'Bài Mom giao, chưa bắt đầu.', chiTiet: { id: 'M1', chuaBatDau: true }, hanCung: null, hanMem: null, nguon: 'M1' }] } }
+  it('bài gia đình giao chưa bắt đầu do máy chủ đưa vào viec[]: hiện thành thẻ việc, bấm mở đúng bài', async () => {
+    tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, viec: [{ id: 'mom:M1', loai: 'mom', soCau: 4, thuTu: 1, batBuoc: true, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho', ghiChu: 'Bài gia đình giao, chưa bắt đầu.', chiTiet: { id: 'M1', chuaBatDau: true }, hanCung: null, hanMem: null, nguon: 'M1' }] } }
     mocks.momItems = [{ id: 'M1', tieuDe: 'Bài Mẹ mới nhận', soCau: 4, trangThai: 'chua_lam' }]
     const { container } = render(<StudentPortalScreen />)
     await screen.findByRole('region', { name: /^Làm ngay: Bài Mẹ mới nhận/ })

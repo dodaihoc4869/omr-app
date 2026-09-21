@@ -22,23 +22,23 @@ beforeEach(()=>{
 })
 afterEach(()=>{cleanup();localStorage.clear();vi.unstubAllGlobals();vi.clearAllMocks()})
 it('từ bảng tin mở đúng màn đề và đóng về bảng tin không trắng',async()=>{
- render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài của Mom'}))
+ render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài gia đình giao'}))
  expect(await screen.findByText('Nội dung câu hỏi phải hiện')).toBeTruthy()
  fireEvent.click(screen.getByTitle('Đóng toàn màn hình'))
  expect(await screen.findByRole('heading',{name:'Chào thử'})).toBeTruthy()
- fireEvent.click(await screen.findByRole('button',{name:'Làm bài của Mom'}))
+ fireEvent.click(await screen.findByRole('button',{name:'Làm bài gia đình giao'}))
  expect(await screen.findByText('Nội dung câu hỏi phải hiện')).toBeTruthy()
 })
 it('lỗi mở bài được hiện trong màn bài gia đình, không biến mất ở trang chủ',async()=>{
  mocks.start.mockRejectedValueOnce(new Error('Không tải được đề thử'))
- render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài của Mom'}))
+ render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài gia đình giao'}))
  expect(await screen.findByText('Không tải được đề thử')).toBeTruthy()
 })
 
 it.each(['chua_lam','dang_lam'])('nút đỏ trong danh sách Mom hoạt động: %s',async(trangThai)=>{
  mocks.momItems[0].trangThai=trangThai
  vi.stubGlobal('confirm',()=>true)
- render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài của Mom'}))
+ render(<StudentPortalScreen/>);fireEvent.click(await screen.findByRole('button',{name:'Làm bài gia đình giao'}))
  await screen.findByText('Nội dung câu hỏi phải hiện')
  fireEvent.click(screen.getByRole('button',{name:'Danh sách bài'}))
  fireEvent.click(await screen.findByRole('button',{name:trangThai==='dang_lam'?'Tiếp tục làm bài':'Bắt đầu làm bài (2 tiếng)'}))

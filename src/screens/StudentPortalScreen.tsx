@@ -122,7 +122,7 @@ export function chuanHoaBaiMom(b: any): BaiMomGiao {
   }))
 
   const id = String(b?.id || `mom_${Date.now()}`)
-  const tieuDe = String(b?.tieuDe || `Bài của Mom giao (${dsCau.length} câu)`)
+  const tieuDe = String(b?.tieuDe || `Bài gia đình giao (${dsCau.length} câu)`)
   const ngayGiao = String(b?.ngayGiao || b?.taoLuc || new Date().toISOString())
   const taoLuc = String(b?.taoLuc || b?.ngayGiao || new Date().toISOString())
   const soCau = Number(b?.soCau) || dsCau.length
@@ -437,7 +437,7 @@ export default function StudentPortalScreen() {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Báo Cáo Bài Của Mom</title>
+  <title>Báo Cáo Bài Gia Đình Giao</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -458,7 +458,7 @@ export default function StudentPortalScreen() {
         </div>
 
         <div style="text-align: center; border-bottom: 2px solid var(--vien, rgb(226, 232, 240)); padding-bottom: 24px; margin-bottom: 28px;">
-          <div style="font-size: 24px; font-weight: 900; color: rgb(234, 67, 53); margin-bottom: 6px; letter-spacing: -0.01em;">💖 KẾT QUẢ BÀI CỦA MOM GIAO</div>
+          <div style="font-size: 24px; font-weight: 900; color: rgb(234, 67, 53); margin-bottom: 6px; letter-spacing: -0.01em;">💖 KẾT QUẢ BÀI GIA ĐÌNH GIAO</div>
           <div style="font-size: 14.5px; color: var(--nhat, rgb(100, 116, 139));">Học sinh: <strong>${auth.hoTen}</strong> (SBD: <strong>${auth.sbd}</strong>) ${auth.lop ? `· Lớp: ${auth.lop}` : ''}</div>
           <div style="font-size: 13px; color: var(--chim, rgb(148, 163, 184)); margin-top: 4px;">Thời gian nộp: ${new Date().toLocaleString('vi-VN')}</div>
           <div style="display: inline-block; margin-top: 18px; padding: 12px 32px; background: rgba(234, 67, 53, 0.08); border: 2px solid rgba(234, 67, 53, 0.25); border-radius: 9999px;">
@@ -578,7 +578,7 @@ export default function StudentPortalScreen() {
     setDsMomGiao(danhSachMoi)
     if(auth.token)void syncStudentExp(auth.sbd,auth.token)
     setDangLamMom(null)
-    setThongBaoNopMom(`Đã nộp bài thành công. Điểm: ${saved.item.diem}/10. Mom đã có thể xem kết quả trên app.`)
+    setThongBaoNopMom(`Đã nộp bài thành công. Điểm: ${saved.item.diem}/10. Phụ huynh đã có thể xem kết quả trên app.`)
     setLoiMom('')
     } catch (e) { setLoiMom(`Chưa nộp được bài. Đáp án vẫn được giữ trên máy, em bấm nộp lại khi có mạng. ${e instanceof Error ? e.message : ''}`) }
     finally { submittingMom.current = false }
@@ -1842,7 +1842,7 @@ export default function StudentPortalScreen() {
                         : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800'
                     }`}>
                       <Timer className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-                      <span>Hạn 2h: {dinhDangThoiGianMom(giayConLaiMom)}</span>
+                      <span>Thời gian làm còn: {dinhDangThoiGianMom(giayConLaiMom)}</span>
                     </div>
 
                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
@@ -1874,7 +1874,7 @@ export default function StudentPortalScreen() {
                       className="btn-google-primary !bg-rose-600 hover:!bg-rose-700 text-white font-bold text-xs py-2 px-4 rounded-full flex items-center gap-1.5 shadow-sm cursor-pointer"
                     >
                       <Check className="w-4 h-4" />
-                      <span>Nộp bài cho Mom</span>
+                      <span>Nộp bài gia đình giao</span>
                     </button>
                   </div>
                 </div>
@@ -1960,17 +1960,17 @@ export default function StudentPortalScreen() {
                 {/* Nút nộp bài dưới cùng */}
                 <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-900/60 text-center space-y-3">
                   <div className="text-sm font-bold text-slate-900 dark:text-white">
-                    Em đã hoàn thành bài của Mom chưa?
+                    Em đã hoàn thành bài gia đình giao chưa?
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                    Khi nộp bài, hệ thống sẽ tự động chấm điểm, tạo cấu trúc lời giải chi tiết chuẩn HTML và gửi kết quả về cho Mom xem.
+                    Khi nộp bài, hệ thống sẽ tự động chấm điểm, tạo cấu trúc lời giải chi tiết chuẩn HTML và gửi kết quả về cho phụ huynh xem.
                   </p>
                   <button
                     onClick={nopBaiCuaMom}
                     className="btn-google-primary !bg-rose-600 hover:!bg-rose-700 text-white font-bold text-sm py-2.5 px-6 rounded-full inline-flex items-center gap-2 shadow-sm cursor-pointer"
                   >
                     <Check className="w-4 h-4" />
-                    <span>Nộp bài ngay cho Mom</span>
+                    <span>Nộp bài ngay</span>
                   </button>
                 </div>
               </div>
@@ -1981,10 +1981,10 @@ export default function StudentPortalScreen() {
                   <div>
                     <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                       <Heart className="w-5 h-5 text-rose-500 fill-rose-500" />
-                      <span>Bài của Mom giao (Hạn 2 tiếng)</span>
+                      <span>Bài gia đình giao (thời gian làm 2 giờ)</span>
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Mom tạo bài từ Cổng Phụ Huynh dựa trên các câu con sai trước đó để con ôn luyện khắc phục.
+                      Phụ huynh tạo bài từ Cổng Phụ Huynh dựa trên các câu con sai trước đó để con ôn luyện khắc phục.
                     </p>
                   </div>
                   <button
@@ -2015,14 +2015,14 @@ export default function StudentPortalScreen() {
                       <Heart className="w-6 h-6" />
                     </div>
                     <div className="font-bold text-sm text-slate-900 dark:text-white">
-                      {daTaiMom ? 'Chưa có bài tập nào do Mom giao' : loiMom ? 'Chưa tải được danh sách bài' : 'Đang nhận bài từ Mom…'}
+                      {daTaiMom ? 'Chưa có bài gia đình giao nào' : loiMom ? 'Chưa tải được danh sách bài' : 'Đang nhận bài gia đình giao…'}
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
-                      Mom có thể vào <strong>Cổng Phụ Huynh (/phu-huynh)</strong> chỉ bằng Số báo danh của con, kéo thanh chọn câu (tối đa 99 câu) để tự động tạo và gửi bài cho con làm bất kỳ lúc nào.
+                      Phụ huynh có thể vào <strong>Cổng Phụ Huynh (/phu-huynh)</strong> chỉ bằng Số báo danh của con, kéo thanh chọn câu (tối đa 99 câu) để tự động tạo và gửi bài cho con làm bất kỳ lúc nào.
                     </p>
                   </div>
                 ) : (
-                  <div role="region" aria-label="Bài của Mom giao" tabIndex={0} className="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-h-[65vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-3 sm:p-4">
+                  <div role="region" aria-label="Bài gia đình giao" tabIndex={0} className="grid grid-cols-1 md:grid-cols-2 gap-3.5 max-h-[65vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-3 sm:p-4">
                     {dsMomGiao.map((bai) => {
                       const daNop = bai.trangThai === 'da_nop'
                       const dangLam = bai.trangThai === 'dang_lam'
@@ -2060,7 +2060,7 @@ export default function StudentPortalScreen() {
                               <span>·</span>
                               <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400 font-medium">
                                 <Timer className="w-3.5 h-3.5" />
-                                <span>Hạn 2 tiếng (120p)</span>
+                                <span>Thời gian làm: 2 giờ</span>
                               </span>
                             </div>
                           </div>

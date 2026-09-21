@@ -51,9 +51,9 @@ export function MomDanhSachM3({
         <div className="mom-tieu-chu">
           <h2 className="mom-h">
             <Heart size={22} aria-hidden="true" className="mom-tim" />
-            <span>Bài của Mom giao (Hạn 2 tiếng)</span>
+            <span>Bài gia đình giao (thời gian làm 2 giờ)</span>
           </h2>
-          <p className="mom-phu">Mom tạo bài từ Cổng Phụ Huynh dựa trên các câu con sai trước đó để con ôn luyện khắc phục.</p>
+          <p className="mom-phu">Phụ huynh tạo bài từ Cổng Phụ Huynh dựa trên các câu con sai trước đó để con ôn luyện khắc phục.</p>
         </div>
         <button type="button" onClick={onLamMoi} className="m3-nut-vien mom-lam-moi">
           <RefreshCw size={18} aria-hidden="true" />
@@ -80,13 +80,13 @@ export function MomDanhSachM3({
           <span className="mom-trong-bt" aria-hidden="true">
             <Heart size={26} />
           </span>
-          <h3 className="mom-trong-ten">{daTai ? 'Chưa có bài tập nào do Mom giao' : loi ? 'Chưa tải được danh sách bài' : 'Đang nhận bài từ Mom…'}</h3>
+          <h3 className="mom-trong-ten">{daTai ? 'Chưa có bài gia đình giao nào' : loi ? 'Chưa tải được danh sách bài' : 'Đang nhận bài gia đình giao…'}</h3>
           <p className="mom-phu">
-            Mom có thể vào <strong>Cổng Phụ Huynh (/phu-huynh)</strong> chỉ bằng Số báo danh của con, kéo thanh chọn câu (tối đa 99 câu) để tự động tạo và gửi bài cho con làm bất kỳ lúc nào.
+            Phụ huynh có thể vào <strong>Cổng Phụ Huynh (/phu-huynh)</strong> chỉ bằng Số báo danh của con, kéo thanh chọn câu (tối đa 99 câu) để tự động tạo và gửi bài cho con làm bất kỳ lúc nào.
           </p>
         </div>
       ) : (
-        <div role="region" aria-label="Bài của Mom giao" className="mom-ds">
+        <div role="region" aria-label="Bài gia đình giao" className="mom-ds">
           {ds.map((bai) => {
             const daNop = bai.trangThai === 'da_nop'
             const dangLam = bai.trangThai === 'dang_lam'
@@ -110,7 +110,7 @@ export function MomDanhSachM3({
                   <span aria-hidden="true">·</span>
                   <span className="mom-han">
                     <Timer size={16} aria-hidden="true" />
-                    <span>Hạn 2 tiếng (120p)</span>
+                    <span>Thời gian làm: 2 giờ</span>
                   </span>
                 </div>
                 <div className="mom-nut">
@@ -184,13 +184,13 @@ export function MomLamBaiM3({
         <div className="mom-dong-ho-tren">
           <span className="mom-dong-ho-so" role="timer" aria-label="Thời gian còn lại">
             <Timer size={18} aria-hidden="true" />
-            <span>Hạn 2h: {dinhDangThoiGian(giayConLai)}</span>
+            <span>Thời gian làm còn: {dinhDangThoiGian(giayConLai)}</span>
           </span>
           <span className="mom-dong-ho-da">
             Đã làm: <strong>{soDaLam}</strong>/{dsCau.length}
           </span>
         </div>
-        <button type="button" onClick={onNop} className="m3-nut-chinh mom-dong-ho-nop" aria-label="Nộp bài cho Mom">
+        <button type="button" onClick={onNop} className="m3-nut-chinh mom-dong-ho-nop" aria-label="Nộp bài gia đình giao">
           <Check size={18} aria-hidden="true" />
           <span>Nộp bài</span>
         </button>
@@ -282,11 +282,11 @@ export function MomLamBaiM3({
       )}
 
       <div className="mom-nop">
-        <div className="mom-nop-ten">Em đã hoàn thành bài của Mom chưa?</div>
-        <p className="mom-phu">Khi nộp bài, hệ thống sẽ tự động chấm điểm, tạo cấu trúc lời giải chi tiết chuẩn HTML và gửi kết quả về cho Mom xem.</p>
+        <div className="mom-nop-ten">Em đã hoàn thành bài gia đình giao chưa?</div>
+        <p className="mom-phu">Khi nộp bài, hệ thống sẽ tự động chấm điểm, tạo cấu trúc lời giải chi tiết chuẩn HTML và gửi kết quả về cho phụ huynh xem.</p>
         <button type="button" onClick={onNop} className="m3-nut-chinh">
           <Check size={18} aria-hidden="true" />
-          <span>Nộp bài ngay cho Mom</span>
+          <span>Nộp bài ngay</span>
         </button>
       </div>
     </div>

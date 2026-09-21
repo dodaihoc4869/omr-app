@@ -192,8 +192,8 @@ export function HangTonCu({ tonCu, docChi, onChon }: { tonCu: TonCu; docChi: boo
   if (tonCu.soBai <= 0) return null
   if (docChi) {
     return (
-      <div className="bnv-ton-cu bnv-ton-cu--chu" data-vung="ton-cu" role="group" aria-label={`Con còn ${tonCu.soBai} bài Mẹ giao cũ chưa làm`}>
-        Con còn {tonCu.soBai} bài Mẹ giao cũ chưa làm
+      <div className="bnv-ton-cu bnv-ton-cu--chu" data-vung="ton-cu" role="group" aria-label={`Con còn ${tonCu.soBai} bài gia đình giao cũ chưa làm`}>
+        Con còn {tonCu.soBai} bài gia đình giao cũ chưa làm
       </div>
     )
   }

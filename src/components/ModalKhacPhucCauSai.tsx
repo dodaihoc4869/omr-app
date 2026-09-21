@@ -986,7 +986,7 @@ export default function ModalKhacPhucCauSai({
                 ) : onGiaoBaiChoCon ? (
                   <>
                     <Heart className="w-4 h-4 text-white" />
-                    <span>Giao bài cho con (Hạn 2h)</span>
+                    <span>Giao bài cho con (thời gian làm 2 giờ)</span>
                   </>
                 ) : (
                   <>

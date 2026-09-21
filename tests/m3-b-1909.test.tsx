@@ -213,7 +213,7 @@ describe('KhoiKhacPhuc3CheDo', () => {
     render(<KhoiKhacPhuc3CheDo sbd="12001" hoTen="Minh" dsLichSu={LICH_SU} scriptUrl="https://may.test" vaiTro="ph" />)
     expect(screen.getByText('4 CHẾ ĐỘ GIAO BÀI CHO CON')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Giao bài sửa câu sai cho con (2 ca đã chọn)' })).toBeTruthy()
-    expect(screen.getByText('Hạn 2 tiếng')).toBeTruthy()
+    expect(screen.getByText('Thời gian làm 2 giờ')).toBeTruthy()
   })
 
   it('không còn lớp amber (màu nhận diện cũ) trong tệp; emoji ✨ đã bỏ', () => {

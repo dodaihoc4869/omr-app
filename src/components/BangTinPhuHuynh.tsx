@@ -516,7 +516,7 @@ export default function BangTinPhuHuynh({
               </div>
               <div>
                 <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-red-600 transition">
-                  Bài Mom
+                  Bài gia đình giao
                 </div>
                 <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
                   Phụ huynh giao
@@ -692,7 +692,7 @@ export default function BangTinPhuHuynh({
               )}
               {momChuaNop > 0 && (
                 <span className="px-2 py-0.5 rounded-lg font-semibold bg-white/80 dark:bg-slate-800/80 text-rose-700 dark:text-rose-300 border border-rose-200/60 dark:border-rose-900/40">
-                  Bài Mom: <strong>{momChuaNop}</strong>
+                  Bài gia đình giao: <strong>{momChuaNop}</strong>
                 </span>
               )}
               {deXuatChuaNop > 0 && (

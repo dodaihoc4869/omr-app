@@ -24,7 +24,7 @@ const THU_MUC = join(__dirname, '../src/components/bang-nhiem-vu')
 
 const btKhan = { maBtvn: 'B-KHAN', tenBtvn: 'BTVN Ancol', soCau: 12, giaoLuc: gio(-30), hanNop: gio(1.5) }
 const btHomNay = { maBtvn: 'B-HOMNAY', tenBtvn: 'BTVN Este', soCau: 12, giaoLuc: gio(-30), hanNop: gio(40) }
-const mom = { id: 'M1', tieuDe: 'Bài của Mẹ giao', soCau: 8, trangThai: 'chua_lam' }
+const mom = { id: 'M1', tieuDe: 'Bài gia đình giao', soCau: 8, trangThai: 'chua_lam' }
 
 const troLy = (over: object = {}) =>
   tongHopKeHoachTroLy({ sbd: 't', hoTen: 'Minh', dsBtvn: [], dsMomGiao: [], dsLichSu: [], tongCauSai: 0, now: NOW, ...over })
@@ -34,7 +34,7 @@ const dsBtvnMay = [
   { maBtvn: 'BT-ANCOL', maCa: 'CA-ANCOL', tenBtvn: 'BTVN Ancol', soCau: 12 },
   { maBtvn: 'BT-ESTE', maCa: 'CA-ESTE', tenBtvn: 'BTVN Este', soCau: 12 },
 ]
-const momDangLam = { id: 'M9', tieuDe: 'Bài của Mẹ giao', soCau: 8, trangThai: 'dang_lam' }
+const momDangLam = { id: 'M9', tieuDe: 'Bài gia đình giao', soCau: 8, trangThai: 'dang_lam' }
 const phu = { dsBtvn: dsBtvnMay, dsMomGiao: [momDangLam] }
 const vm = (o: object) => ({ thuTu: 1, batBuoc: false, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho', ghiChu: '', chiTiet: {}, hanCung: null, hanMem: null, nguon: 'x', ...o })
 // Hình dạng thật của POST /hs/ke-hoach-ngay: 5 việc phủ đủ 4 bậc; 2 việc cuối bị cổng (hien:false).
@@ -565,7 +565,7 @@ describe('phụ huynh: "Giao bài cho con" đi đường bài hằng ngày cá n
 describe('hàng "Bài cũ chưa làm" và thu gọn nhóm dài', () => {
   const baiCu = (n: number) => ({
     soBai: n, soCau: n * 5,
-    bai: Array.from({ length: n }, (_, i) => ({ id: `C${i + 1}`, tieuDe: `Bài cũ ${i + 1}`, soCau: 5, hanhDong: { loai: 'mo_mom' as const, payload: { id: `C${i + 1}` }, nhanNut: 'Làm bài của Mom' } })),
+    bai: Array.from({ length: n }, (_, i) => ({ id: `C${i + 1}`, tieuDe: `Bài cũ ${i + 1}`, soCau: 5, hanhDong: { loai: 'mo_mom' as const, payload: { id: `C${i + 1}` }, nhanNut: 'Làm bài gia đình giao' } })),
   })
   const voiTonCu = (n: number) => ({ ...duLieuMay(), tonCu: baiCu(n) })
 
@@ -596,11 +596,11 @@ describe('hàng "Bài cũ chưa làm" và thu gọn nhóm dài', () => {
     expect(onHanhDong.mock.calls[0][0]).toMatchObject({ loai: 'mo_mom', payload: { id: 'C3' } })
   })
 
-  it('phụ huynh: chỉ một dòng chữ "Con còn N bài Mẹ giao cũ chưa làm", không nút, không danh sách', async () => {
+  it('phụ huynh: chỉ một dòng chữ "Con còn N bài gia đình giao cũ chưa làm", không nút, không danh sách', async () => {
     const { container } = ve({ vaiTro: 'phuhuynh', duLieu: voiTonCu(7), onGiaoBai: () => {} })
     await screen.findByText('Hoả Long')
     const hang = container.querySelector('[data-vung="ton-cu"]')!
-    expect(hang.textContent).toBe('Con còn 7 bài Mẹ giao cũ chưa làm')
+    expect(hang.textContent).toBe('Con còn 7 bài gia đình giao cũ chưa làm')
     expect(hang.querySelectorAll('button').length).toBe(0)
   })
 

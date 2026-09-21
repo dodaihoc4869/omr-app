@@ -297,7 +297,7 @@ export default function BangTroLyPhuHuynh({
               </h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
                 {thongKe.momChuaLam > 0
-                  ? `Con đang có ${thongKe.momChuaLam} bài cần nộp. Thời hạn 2 tiếng giúp con rèn luyện tốc độ.`
+                  ? `Con đang có ${thongKe.momChuaLam} bài cần nộp. Thời gian làm 2 giờ giúp con rèn luyện tốc độ.`
                   : 'Giao bài luyện đề theo ngân sách thích ứng (8–16 câu) để con nâng cao năng lực.'}
               </p>
             </div>

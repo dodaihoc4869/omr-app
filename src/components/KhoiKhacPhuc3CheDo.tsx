@@ -951,7 +951,7 @@ export default function KhoiKhacPhuc3CheDo({
         </div>
         {vaiTro === 'ph' && (
           <span className="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/60 px-2.5 py-1 rounded-full border border-rose-200 dark:border-rose-900 shrink-0">
-            Hạn 2 tiếng
+            Thời gian làm 2 giờ
           </span>
         )}
       </div>
@@ -1594,7 +1594,7 @@ export default function KhoiKhacPhuc3CheDo({
           <div className="flex items-center gap-2">
             <FileText size={16} className="text-blue-500" />
             <h3 className="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-100">
-              {vaiTro === 'ph' ? 'Các bài Mom đã giao' : 'Bài luyện của em'}
+              {vaiTro === 'ph' ? 'Các bài gia đình giao' : 'Bài luyện của em'}
             </h3>
             <span className="text-[11px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-full">
               {vaiTro === 'ph' ? (dsMomGiao ? dsMomGiao.length : 0) : history.length} bài
@@ -1615,7 +1615,7 @@ export default function KhoiKhacPhuc3CheDo({
             ) : (
               <div
                 role="region"
-                aria-label="Danh sách bài Mom đã giao"
+                aria-label="Danh sách bài gia đình giao"
                 tabIndex={0}
                 className="max-h-48 sm:max-h-52 overflow-y-auto overscroll-contain p-2 space-y-1.5 border-t border-slate-100 dark:border-slate-800"
               >

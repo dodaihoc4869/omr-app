@@ -103,7 +103,7 @@ export const DS_NGUON_EXP: readonly NguonKiemExp[] =
 export const TEN_NGUON_EXP: Record<NguonKiemExp, string> = {
   caThi: 'Thi kiểm tra',
   btvn: 'Bài tập về nhà',
-  mom: 'Nộp bài cho MOM',
+  mom: 'Nộp bài gia đình giao',
   leoThap: 'Leo tháp tri thức',
   sanBoss: 'Săn boss câu sai',
 }
@@ -224,7 +224,7 @@ export const BANG_NGUON_EXP: readonly { viec: string; thuong: string }[] = [
   { viec: 'Thanh tẩy một câu sai', thuong: '100 EXP' },
   { viec: 'Nộp đủ một bài tập về nhà', thuong: '200 EXP' },
   { viec: 'Thi xong một ca', thuong: '60 EXP mỗi điểm' },
-  { viec: 'Nộp một bài cho MOM', thuong: '150 + 25 × điểm' },
+  { viec: 'Nộp một bài gia đình giao', thuong: '150 + 25 × điểm' },
 ]
 
 export interface KetQuaNhanExp {

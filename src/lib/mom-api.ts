@@ -24,7 +24,7 @@ export function momApi(action:string,body:Record<string,unknown>):Promise<any>{
 export function studentNewsApi(action:'list'|'assign',token:string){return requestMom(action,{token},'/student-news')}
 export function parentNewsApi(action:'list'|'assign',sbd:string){return requestMom(action,{sbd},'/parent-news')}
 async function requestMom(action:string,body:Record<string,unknown>,prefix='/mom'):Promise<any>{
-  if (prefix === '/mom' && !action.startsWith('parent-') && action !== 'create' && !body.token) throw new Error('Em đăng xuất rồi đăng nhập lại để nhận bài từ Mom.')
+  if (prefix === '/mom' && !action.startsWith('parent-') && action !== 'create' && !body.token) throw new Error('Em đăng xuất rồi đăng nhập lại để nhận bài gia đình giao.')
   if(goiPhuHuynhCoPass(action,prefix)){const {sbd:_boSbd,...con}=body;void _boSbd;body={...con,pass:passPhuHuynh}}
   const url=await layDiaChiMayChu()
   if(!url)throw new Error('Chưa kết nối được máy chủ. Vui lòng thử lại.')
@@ -69,7 +69,7 @@ export function chuanHoaBaiMom(b: any): any {
   }))
 
   const id = String(b?.id || `mom_${Date.now()}`)
-  const tieuDe = String(b?.tieuDe || `Bài của Mom giao (${dsCau.length} câu)`)
+  const tieuDe = String(b?.tieuDe || `Bài gia đình giao (${dsCau.length} câu)`)
   const ngayGiao = String(b?.ngayGiao || b?.taoLuc || new Date().toISOString())
   const taoLuc = String(b?.taoLuc || b?.ngayGiao || new Date().toISOString())
   const soCau = Number(b?.soCau) || dsCau.length
@@ -139,11 +139,11 @@ export function momReviewHtml(b: any): string {
     hoTen: b.sbd ? `SBD: ${b.sbd}` : '',
     sbd: b.sbd || '',
     ngay: new Date(b.nopLuc || b.taoLuc || Date.now()),
-    tenChuyenDe: b.tieuDe || 'Bài luyện của Mom',
+    tenChuyenDe: b.tieuDe || 'Bài luyện gia đình giao',
     ketQua: `${b.diem ?? 0} điểm · Đúng ${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu`,
     hienDapAn: true,
     giaoDienHocSinh: true,
-    nhanBia: 'BÀI CỦA MOM GIAO',
+    nhanBia: 'BÀI GIA ĐÌNH GIAO',
     oBia: [
       { nhan: 'Điểm số', gia: `${b.diem ?? 0}/10` },
       { nhan: 'Kết quả', gia: `${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu đúng` },
@@ -153,6 +153,6 @@ export function momReviewHtml(b: any): string {
 
   return dungPhieu(thongTin, cauLuyen, {
     moSan: true,
-    loiNhac: `Kết quả bài của Mom giao: Đạt ${b.diem ?? 0}/10 điểm (Đúng ${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu). Bấm vào từng câu để mở hoặc đóng lời giải chi tiết.`,
+    loiNhac: `Kết quả bài gia đình giao: Đạt ${b.diem ?? 0}/10 điểm (Đúng ${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu). Bấm vào từng câu để mở hoặc đóng lời giải chi tiết.`,
   })
 }

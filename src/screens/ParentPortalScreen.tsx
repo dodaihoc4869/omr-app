@@ -381,7 +381,7 @@ export default function ParentPortalScreen() {
   const xuLyGiaoBaiTrucTiep = async (dsCau: any[], tieuDe?: string) => {
     if (!sbdHienTai || !dsCau || dsCau.length === 0) return
     const maMom = `mom_${Date.now()}`
-    const tieuDeThucTe = tieuDe || `Bài của Mom giao (${dsCau.length} câu)`
+    const tieuDeThucTe = tieuDe || `Bài gia đình giao (${dsCau.length} câu)`
     const baiMoi: BaiMomGiao = {
       id: maMom,
       tieuDe: tieuDeThucTe,
@@ -407,7 +407,7 @@ export default function ParentPortalScreen() {
       try { localStorage.setItem(`omr_mom_sent_${sbdHienTai}_${maMom}`, '1') } catch {}
       setDsCauSaiModalMom(null)
       await napDanhSachMomGiao(sbdHienTai)
-      setThongBaoMom({loai:'ok',chu:`Đã gửi “${tieuDeThucTe}”. Con mở mục Bài của Mom giao để nhận bài. Thời gian 2 tiếng tính từ lúc con bắt đầu.`})
+      setThongBaoMom({loai:'ok',chu:`Đã gửi “${tieuDeThucTe}”. Con mở mục Bài gia đình giao để nhận bài. Thời gian 2 tiếng tính từ lúc con bắt đầu.`})
     } catch (e) {
       setThongBaoMom({loai:'loi',chu:`Chưa gửi được bài. Vui lòng giữ app và kết nối lại để gửi tiếp. ${e instanceof Error ? e.message : ''}`})
     } finally { setDangTaoMom(false) }
@@ -460,11 +460,11 @@ export default function ParentPortalScreen() {
         if (dsChon.length < soCauGiao) dsChon.push(c)
       }
 
-      const tieuDe = `Bài khắc phục câu sai Mẹ giao (${dsChon.length} câu trọng tâm)`
+      const tieuDe = `Bài khắc phục câu sai gia đình giao (${dsChon.length} câu trọng tâm)`
       await xuLyGiaoBaiTrucTiep(dsChon, tieuDe)
       setThongBaoMom({
         loai: 'ok',
-        chu: `✨ Đã giao ${dsChon.length} câu khắc phục trực tiếp sang app của con! Trợ lý của con đã nhận và đưa lên đầu danh sách làm bài (Thời hạn 2 tiếng).`,
+        chu: `Đã giao ${dsChon.length} câu khắc phục trực tiếp sang app của con! Trợ lý của con đã nhận và đưa lên đầu danh sách làm bài (thời gian làm 2 giờ).`,
       })
     } catch (e) {
       setThongBaoMom({
@@ -506,11 +506,11 @@ export default function ParentPortalScreen() {
         return
       }
 
-      const tieuDe = `Bài luyện bứt phá Mẹ giao (${dsChon.length} câu)`
+      const tieuDe = `Bài luyện bứt phá gia đình giao (${dsChon.length} câu)`
       await xuLyGiaoBaiTrucTiep(dsChon, tieuDe)
       setThongBaoMom({
         loai: 'ok',
-        chu: `✨ Đã giao ${dsChon.length} câu luyện tập sang app của con! Trợ lý của con đã nhận và mở trực tiếp để con làm ngay (Hạn 2 tiếng).`,
+        chu: `Đã giao ${dsChon.length} câu luyện tập sang app của con! Trợ lý của con đã nhận và mở trực tiếp để con làm ngay (thời gian làm 2 giờ).`,
       })
     } catch (e) {
       setThongBaoMom({

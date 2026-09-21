@@ -289,7 +289,7 @@ export function tongHopKeHoachTroLy(input: {
   // A. Candidate: Bài Mom giao
   for (const mom of momChuaNop) {
     let conLaiMs: number | undefined
-    let conLaiChu = 'Hạn 2 tiếng'
+    let conLaiChu = 'Thời gian làm 2 giờ'
     let isOverdue = false
 
     const hanMom = hanBaiMom(mom)
@@ -313,7 +313,7 @@ export function tongHopKeHoachTroLy(input: {
     candidateTasks.push({
       id: `mom_${mom.id}`,
       loai: 'mom',
-      tieuDe: mom.tieuDe || 'Bài Mom giao',
+      tieuDe: mom.tieuDe || 'Bài gia đình giao',
       moTa: `Gồm ${mom.soCau || 10} câu ôn tập · ${conLaiChu}`,
       soCau: mom.soCau || 10,
       phutUocTinh: Math.ceil(((mom.soCau || 10) * 80) / 60),
@@ -326,7 +326,7 @@ export function tongHopKeHoachTroLy(input: {
       hanhDong: {
         loai: 'mo_mom',
         payload: { id: mom.id, bai: mom },
-        nhanNut: isOverdue ? 'Mở để hoàn tất nộp bài' : 'Làm bài của Mom',
+        nhanNut: isOverdue ? 'Mở để hoàn tất nộp bài' : 'Làm bài gia đình giao',
       },
     })
   }
@@ -481,7 +481,7 @@ export function tongHopKeHoachTroLy(input: {
       countDaXong++
       radarItems.push({
         id: `mom_${m.id}`,
-        tieuDe: m.tieuDe || 'Bài Mom giao',
+        tieuDe: m.tieuDe || 'Bài gia đình giao',
         conLaiChu: 'Đã hoàn thành',
         trangThai: 'da_xong',
       })
@@ -501,7 +501,7 @@ export function tongHopKeHoachTroLy(input: {
 
       radarItems.push({
         id: `mom_${m.id}`,
-        tieuDe: m.tieuDe || 'Bài Mom giao',
+        tieuDe: m.tieuDe || 'Bài gia đình giao',
         hanNop: hanMom,
         conLaiChu,
         trangThai: tt,

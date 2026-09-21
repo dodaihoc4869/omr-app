@@ -278,7 +278,7 @@ export default function BangTroLyHocSinh({
                     onClick={() => {
                       if (item.trangThai === 'da_xong') return
                       if (item.loai === 'mom') {
-                        onAction({ loai: 'mo_mom', nhanNut: 'Làm bài Mom' })
+                        onAction({ loai: 'mo_mom', nhanNut: 'Làm bài gia đình giao' })
                       } else {
                         onAction({ loai: 'mo_btvn', nhanNut: 'Làm BTVN' })
                       }

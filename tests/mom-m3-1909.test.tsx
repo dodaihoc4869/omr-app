@@ -89,19 +89,19 @@ describe('C4 · DANH SÁCH ở cổng học sinh (/hs)', () => {
     expect(within(theo('Bài đang làm')).getByRole('button', { name: 'Tiếp tục làm bài' })).toBeTruthy()
     expect(within(theo('Bài đã nộp')).getByText('✓ Đã nộp (7.5/10đ)')).toBeTruthy()
     expect(within(theo('Bài đã nộp')).getByRole('button', { name: 'Xem kết quả & Lời giải HTML' })).toBeTruthy()
-    expect(within(theo('Bài chưa làm')).getByText('Hạn 2 tiếng (120p)')).toBeTruthy()
-    expect(screen.getByRole('region', { name: 'Bài của Mom giao' })).toBeTruthy()
+    expect(within(theo('Bài chưa làm')).getByText('Thời gian làm: 2 giờ')).toBeTruthy()
+    expect(screen.getByRole('region', { name: 'Bài gia đình giao' })).toBeTruthy()
     expect(document.querySelector('.max-h-\\[65vh\\]')).toBeNull()
   })
 
-  it('trạng thái trống: đã tải → "Chưa có bài tập nào do Mom giao"; đang nhận; lỗi tải; thông báo nộp đóng được; Làm mới gọi lại danh sách', () => {
+  it('trạng thái trống: đã tải → "Chưa có bài gia đình giao nào"; đang nhận; lỗi tải; thông báo nộp đóng được; Làm mới gọi lại danh sách', () => {
     const nap = vi.fn()
     const dong = vi.fn()
     const chung = { onDongThongBao: dong, onLamMoi: nap, ngayGio: () => '', onBatDau: () => {}, onXemKetQua: () => {} }
     const { rerender } = render(<MomDanhSachM3 ds={[]} daTai loi="" thongBaoNop={null} {...chung} />)
-    expect(screen.getByText('Chưa có bài tập nào do Mom giao')).toBeTruthy()
+    expect(screen.getByText('Chưa có bài gia đình giao nào')).toBeTruthy()
     rerender(<MomDanhSachM3 ds={[]} daTai={false} loi="" thongBaoNop={null} {...chung} />)
-    expect(screen.getByText('Đang nhận bài từ Mom…')).toBeTruthy()
+    expect(screen.getByText('Đang nhận bài gia đình giao…')).toBeTruthy()
     rerender(<MomDanhSachM3 ds={[]} daTai={false} loi="Mất mạng" thongBaoNop="Đã nộp bài thành công. Điểm: 8/10." {...chung} />)
     expect(screen.getByText('Chưa tải được danh sách bài')).toBeTruthy()
     expect(screen.getByRole('alert').textContent).toBe('Mất mạng')
@@ -127,12 +127,12 @@ describe('C4 · ĐANG LÀM BÀI ở cổng học sinh (/hs)', () => {
     await vaoLam()
     expect(mocks.momApi).toHaveBeenCalledWith('start', { token: 'test-token', id: 'M1' })
     const dh = document.querySelector('.mom-dong-ho') as HTMLElement
-    expect(dh.textContent).toMatch(/Hạn 2h: 01:5\d:\d\d/)
+    expect(dh.textContent).toMatch(/Thời gian làm còn: 01:5\d:\d\d/)
     expect(dh.textContent).toContain('Đã làm: 0/3')
     expect(dh.getAttribute('data-gap')).toBeNull()
     // thanh dính GỌN: chỉ đồng hồ + đếm + đúng MỘT nút (Nộp); Tạm dừng / Danh sách bài / tên bài nằm ở đầu bài (trôi theo trang)
     expect(dh.querySelectorAll('button').length).toBe(1)
-    expect(within(dh).getByRole('button', { name: 'Nộp bài cho Mom' }).textContent).toBe('Nộp bài')
+    expect(within(dh).getByRole('button', { name: 'Nộp bài gia đình giao' }).textContent).toBe('Nộp bài')
     expect(dh.querySelector('h1,h2,h3')).toBeNull()
     const dau = document.querySelector('.mom-dau-bai') as HTMLElement
     expect(within(dau).getByRole('button', { name: 'Tạm dừng' })).toBeTruthy()
@@ -143,7 +143,7 @@ describe('C4 · ĐANG LÀM BÀI ở cổng học sinh (/hs)', () => {
     expect(within(the(0)).getAllByRole('radio').length).toBe(4)
     expect(the(1).querySelectorAll('.mom-y').length).toBe(4)
     expect(within(the(2)).getByRole('textbox')).toBeTruthy()
-    expect(screen.getByText('Em đã hoàn thành bài của Mom chưa?')).toBeTruthy()
+    expect(screen.getByText('Em đã hoàn thành bài gia đình giao chưa?')).toBeTruthy()
   })
 
   it('chọn đáp án → ĐÚNG định dạng cũ (A–D; DS-- 4 ký tự; chữ tự do), đếm "Đã làm", nháp localStorage, lưu máy chủ sau 600 ms', async () => {
@@ -164,7 +164,7 @@ describe('C4 · ĐANG LÀM BÀI ở cổng học sinh (/hs)', () => {
   it('nộp: gọi momApi submit với mã bài + toàn bộ đáp án, về danh sách với thông báo điểm', async () => {
     await vaoLam()
     fireEvent.click(within(the(0)).getAllByRole('radio')[0])
-    fireEvent.click(within(document.querySelector('.mom-dong-ho') as HTMLElement).getByRole('button', { name: 'Nộp bài cho Mom' }))
+    fireEvent.click(within(document.querySelector('.mom-dong-ho') as HTMLElement).getByRole('button', { name: 'Nộp bài gia đình giao' }))
     await waitFor(() => expect(mocks.momApi).toHaveBeenCalledWith('submit', { token: 'test-token', id: 'M1', answers: { q1: 'A' } }))
     expect(await screen.findByRole('status')).toBeTruthy()
     expect(screen.getByRole('status').textContent).toContain('Đã nộp bài thành công. Điểm: 6.67/10.')
@@ -178,7 +178,7 @@ describe('C4 · ĐANG LÀM BÀI ở cổng học sinh (/hs)', () => {
       if (action === 'submit') throw new Error('mất mạng')
       return { ok: true }
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Nộp bài ngay cho Mom' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nộp bài ngay' }))
     expect((await screen.findByRole('alert')).textContent).toMatch(/Chưa nộp được bài\. Đáp án vẫn được giữ trên máy/)
     expect(document.querySelector('.mom-dong-ho')).toBeTruthy()
     expect((within(the(0)).getAllByRole('radio')[0] as HTMLInputElement).checked).toBe(true)
@@ -208,7 +208,7 @@ describe('C4 · ĐANG LÀM BÀI ở cổng học sinh (/hs)', () => {
     await vaoLam()
     const dh = document.querySelector('.mom-dong-ho') as HTMLElement
     expect(dh.getAttribute('data-gap')).toBe('true')
-    expect(dh.textContent).toMatch(/Hạn 2h: 00:(09|10):\d\d/)
+    expect(dh.textContent).toMatch(/Thời gian làm còn: 00:(09|10):\d\d/)
     const css = fs.readFileSync(path.join(process.cwd(), 'src/components/bang-nhiem-vu/mom-m3.css'), 'utf8')
     expect(css).not.toMatch(/animation|@keyframes|pulse/)
   })
@@ -243,7 +243,7 @@ describe('C4 · thành phần độc lập, cô lập và CSS', () => {
     mocks.items = [{ id: 'A', tieuDe: 'Bài A', soCau: 3, trangThai: 'chua_lam', ngayGiao: iso(-3600_000) }]
     render(<StudentPortalScreen />)
     await moTab()
-    await waitFor(() => expect(screen.getByRole('region', { name: 'Bài của Mom giao' }).className).toContain('max-h-[65vh]'))
+    await waitFor(() => expect(screen.getByRole('region', { name: 'Bài gia đình giao' }).className).toContain('max-h-[65vh]'))
     expect(document.querySelector('.mom')).toBeNull()
   })
 

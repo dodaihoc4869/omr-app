@@ -21,7 +21,7 @@ const gio = (h: number) => new Date(NOW + h * 3600_000).toISOString()
 // Tài khoản nghiệm thu NT1: 1 BTVN khẩn + 1 lô hôm nay + 1 bài mẹ giao.
 const btKhan = { maBtvn: 'B-KHAN', tenBtvn: 'BTVN Ancol', soCau: 12, giaoLuc: gio(-30), hanNop: gio(1.5) }
 const btHomNay = { maBtvn: 'B-HOMNAY', tenBtvn: 'BTVN Este', soCau: 12, giaoLuc: gio(-30), hanNop: gio(40) }
-const momChuaLam = { id: 'M1', tieuDe: 'Bài của Mẹ giao', soCau: 8, trangThai: 'chua_lam' }
+const momChuaLam = { id: 'M1', tieuDe: 'Bài gia đình giao', soCau: 8, trangThai: 'chua_lam' }
 
 function troLy(over: Partial<Parameters<typeof tongHopKeHoachTroLy>[0]> = {}) {
   return tongHopKeHoachTroLy({
@@ -45,7 +45,7 @@ const dsBtvnMay = [
   { maBtvn: 'BT-ANCOL', maCa: 'CA-ANCOL', tenBtvn: 'BTVN Ancol', soCau: 12 },
   { maBtvn: 'BT-ESTE', maCa: 'CA-ESTE', tenBtvn: 'BTVN Este', soCau: 12 },
 ]
-const momDangLam = { id: 'M9', tieuDe: 'Bài của Mẹ giao', soCau: 8, trangThai: 'dang_lam' }
+const momDangLam = { id: 'M9', tieuDe: 'Bài gia đình giao', soCau: 8, trangThai: 'dang_lam' }
 const momMoi = { id: 'M1', tieuDe: 'Bài Mẹ mới nhận', soCau: 6, trangThai: 'chua_lam' }
 const phu = { dsBtvn: dsBtvnMay, dsMomGiao: [momDangLam] }
 const v = (o: object) => ({ thuTu: 1, batBuoc: false, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho', ghiChu: '', chiTiet: {}, hanCung: null, hanMem: null, nguon: 'x', ...o })
@@ -54,7 +54,7 @@ const keHoachMayChu: KeHoachNgayMayChu = {
   ngay: '2026-09-19',
   nganSach: { mucTieuCau: 12, toiThieuCau: 6, vanTocGiay: 78, vanTocNguon: 'do', ghiChuVanToc: '' },
   viec: [
-    v({ id: 'mom:M9', loai: 'mom', soCau: 8, hanCung: gio(0.7), hanMem: gio(0.7), batBuoc: true, khan: true, nhan: 'khan_cap', ghiChu: 'Bài Mom đã bắt đầu — hết giờ sau 120 phút.', chiTiet: { id: 'M9' } }),
+    v({ id: 'mom:M9', loai: 'mom', soCau: 8, hanCung: gio(0.7), hanMem: gio(0.7), batBuoc: true, khan: true, nhan: 'khan_cap', ghiChu: 'Bài gia đình giao đã bắt đầu — hết giờ sau 120 phút.', chiTiet: { id: 'M9' } }),
     v({ id: 'btvn_lo:BT-ANCOL:1', loai: 'btvn_lo', soCau: 6, hanCung: gio(1.5), hanMem: gio(1), batBuoc: true, khan: true, nhan: 'khan_cap', cong: 'mom:M9', ghiChu: 'Lô 2/4', chiTiet: { ma: 'BT-ANCOL', chiSo: 1, tongLo: 4, treNhip: false } }),
     v({ id: 'btvn_lo:BT-ESTE:0', loai: 'btvn_lo', soCau: 6, hanCung: gio(40), hanMem: gio(20), batBuoc: true, cong: 'btvn_lo:BT-ANCOL:1', ghiChu: 'Lô 1/2', chiTiet: { ma: 'BT-ESTE', chiSo: 0, tongLo: 2, treNhip: false } }),
     v({ id: 'on_lai:2026-09-19', loai: 'on_lai', soCau: 3, hien: false, nhan: 'bu', cong: 'btvn_lo:BT-ESTE:0', ghiChu: 'Ôn 3 câu đã tới hạn nhắc lại', chiTiet: { qid: ['a', 'b', 'c'] } }),
@@ -184,7 +184,7 @@ describe('cổng', () => {
     const tuyChon = d.cacBac.find((b) => b.bac === 'tuy_chon')!.viec
     expect(tuyChon.length).toBe(1)
     expect(tuyChon[0].biCong).toBe(true)
-    expect(tuyChon[0].moSauKhiXong).toBe('Bài của Mẹ giao')
+    expect(tuyChon[0].moSauKhiXong).toBe('Bài gia đình giao')
     expect(d.lamNgay?.biCong).toBe(false)
   })
 
@@ -215,7 +215,7 @@ describe('nhánh máy chủ: tên, payload khi bấm, quá hạn, cảnh báo', 
   })
 
   it('mom: tên từ bài thô, payload {id, bai}; on_lai/than_thu: không lộ mã dạng/qid ra chữ', () => {
-    expect(theo['mom:M9'].tieuDe).toBe('Bài của Mẹ giao')
+    expect(theo['mom:M9'].tieuDe).toBe('Bài gia đình giao')
     expect(theo['mom:M9'].hanhDong).toMatchObject({ loai: 'mo_mom', payload: { id: 'M9', bai: momDangLam } })
     expect(theo['on_lai:2026-09-19'].tieuDe).toBe('Ôn 3 câu đã tới hạn nhắc lại')
     // Chữ HIỂN THỊ không lộ mã dạng thô (id là khoá máy, không hiển thị).
@@ -305,14 +305,14 @@ describe('nhánh máy chủ: tên, payload khi bấm, quá hạn, cảnh báo', 
   })
 })
 
-describe('bài Mẹ giao không bao giờ rơi khỏi trang chủ (top3 cắt mất)', () => {
-  // Kịch bản đo được trên bản dựng thật: em có câu sai + 2 BTVN tới mốc + 1 bài Mẹ giao.
+describe('bài gia đình giao không bao giờ rơi khỏi trang chủ (top3 cắt mất)', () => {
+  // Kịch bản đo được trên bản dựng thật: em có câu sai + 2 BTVN tới mốc + 1 bài gia đình giao.
   // `tongHopKeHoachTroLy` chỉ giữ 3 việc và "Luyện sửa lỗi" đẩy bài Mẹ ra ngoài.
   const dsBtvn = [btKhan, btHomNay]
   const dsMomGiao = [momChuaLam]
   const kh = () => troLy({ dsBtvn, dsMomGiao, tongCauSai: 12 })
 
-  it('nguồn trợ lý gốc thật sự làm rơi bài Mẹ giao (điều kiện tái hiện)', () => {
+  it('nguồn trợ lý gốc thật sự làm rơi bài gia đình giao (điều kiện tái hiện)', () => {
     expect(kh().top3.some((t) => t.id === 'mom_M1')).toBe(false)
     expect(kh().radarDeadline.danhSach.some((r) => r.id === 'mom_M1' && r.trangThai !== 'da_xong')).toBe(true)
   })
@@ -323,7 +323,7 @@ describe('bài Mẹ giao không bao giờ rơi khỏi trang chủ (top3 cắt m�
     expect(ids).toContain('mom_M1')
     expect(ids.slice(0, 3)).toEqual(kh().top3.map((t) => t.id))
     const me = tatCaViec(d).find((v) => v.id === 'mom_M1')!
-    expect(me.hanhDong).toMatchObject({ loai: 'mo_mom', nhanNut: 'Làm bài của Mom', payload: { id: 'M1', bai: momChuaLam } })
+    expect(me.hanhDong).toMatchObject({ loai: 'mo_mom', nhanNut: 'Làm bài gia đình giao', payload: { id: 'M1', bai: momChuaLam } })
     expect(me.biCong).toBe(false)
     expect(d.lamNgay?.id).toBe(kh().top3[0].id)
   })
@@ -535,9 +535,9 @@ describe('reset mùa 00:01 thứ Hai 21/09 (thầy chốt): bản nhớ của NG
   })
 })
 
-describe('bài Mẹ giao chưa bắt đầu: máy chủ đưa vào viec[] (chuaBatDau); bài cũ ngoài đó vào tonCu', () => {
+describe('bài gia đình giao chưa bắt đầu: máy chủ đưa vào viec[] (chuaBatDau); bài cũ ngoài đó vào tonCu', () => {
   const moChuaBD = (id: string, over: object = {}) =>
-    v({ id: `mom:${id}`, loai: 'mom', soCau: 6, batBuoc: true, ghiChu: 'Bài Mom giao, chưa bắt đầu. Bấm bắt đầu thì có 120 phút làm.', chiTiet: { id, chuaBatDau: true, taoLuc: gio(-5) }, ...over })
+    v({ id: `mom:${id}`, loai: 'mom', soCau: 6, batBuoc: true, ghiChu: 'Bài gia đình giao, chưa bắt đầu. Bấm bắt đầu thì có 120 phút làm.', chiTiet: { id, chuaBatDau: true, taoLuc: gio(-5) }, ...over })
 
   it('máy chủ đưa bài chưa bắt đầu vào viec[]: thẻ BẮT BUỘC, nói "120 phút từ khi bắt đầu", đúng payload; adapter KHÔNG tự bù thêm', () => {
     const kh = { ...keHoachMayChu, viec: [...keHoachMayChu.viec, moChuaBD('M1')] as any }
@@ -570,7 +570,7 @@ describe('bài Mẹ giao chưa bắt đầu: máy chủ đưa vào viec[] (chuaB
     const kh: KeHoachNgayMayChu = { ...keHoachMayChu, tonCu: [{ id: 'M1', soCau: 6 }, { ma: 'M77', soCau: 4 }, {}, { id: '' }] as any, tonCuTong: { soBai: 42, soCau: 300 } }
     const d = tuKeHoachNgay(kh, NOW, { dsBtvn: dsBtvnMay, dsMomGiao: [momMoi] })
     expect(d.tonCu.bai.map((b) => b.id)).toEqual(['M1', 'M77'])
-    expect(d.tonCu.bai[1]).toMatchObject({ tieuDe: 'Bài Mẹ giao', soCau: 4 })
+    expect(d.tonCu.bai[1]).toMatchObject({ tieuDe: 'Bài gia đình giao', soCau: 4 })
     expect(d.tonCu.bai[1].hanhDong).toMatchObject({ loai: 'mo_mom', payload: { id: 'M77' } })
     expect(d).toMatchObject({ tonCu: { soBai: 42, soCau: 300 } })
     // Máy chủ nói rõ là rỗng (mảng rỗng, hoặc chỉ có tonCuTong 0/0) thì KHÔNG suy thêm từ danh sách bài của màn.

@@ -655,7 +655,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
               className="m3-nut-chinh cursor-pointer"
             >
               <Heart size={16} />
-              <span>Tạo bài luyện khắc phục cho con (Hạn 2h)</span>
+              <span>Tạo bài luyện khắc phục cho con (thời gian làm 2 giờ)</span>
             </button>
           ) : (
             <span className="text-xs text-slate-500 dark:text-slate-400 text-right">

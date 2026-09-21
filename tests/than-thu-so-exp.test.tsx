@@ -44,7 +44,7 @@ describe('Năm nguồn EXP', () => {
     expect(DS_NGUON_EXP).toContain('mom')
   })
 
-  it('nộp bài MOM nặng hơn bài tập về nhà — bài dài hai tiếng có người nhà ngồi cạnh', () => {
+  it('nộp bài gia đình giao nặng hơn bài tập về nhà — bài dài hai tiếng có người nhà ngồi cạnh', () => {
     expect(NGUON_EXP.nopMom(0)).toBeGreaterThan(NGUON_EXP.nopBtvn() * 0.7)
     expect(NGUON_EXP.nopMom(10)).toBe(400)
     expect(NGUON_EXP.nopMom(8)).toBe(350)
@@ -90,14 +90,14 @@ describe('Quy đổi ghi vào ĐÚNG nguồn', () => {
     expect(tongSoExp(so)).toBe(doc().khoExp)
   })
 
-  it('bài MOM chưa nộp thì KHÔNG tính', async () => {
+  it('bài gia đình giao chưa nộp thì KHÔNG tính', async () => {
     gan({ dsMom: [{ id: 'm1', trangThai: 'dang_lam', diem: 9 }] })
     fireEvent.click(screen.getByText('Rót việc học vào ống'))
     await waitFor(() => expect(screen.getByText(/Chưa có việc học nào mới/)).toBeTruthy())
     expect(doc().khoExp ?? 0).toBe(0)
   })
 
-  it('cùng một bài MOM không quy đổi hai lần', async () => {
+  it('cùng một bài gia đình giao không quy đổi hai lần', async () => {
     gan({ dsMom: [{ id: 'm1', trangThai: 'da_nop', diem: 10 }] })
     const nut = () => screen.getByText('Rót việc học vào ống')
     fireEvent.click(nut())
@@ -158,7 +158,7 @@ describe('Popup lấp lánh', () => {
     fireEvent.click(screen.getByText('Rót việc học vào ống'))
     // "+400" hiện ở CẢ popup lẫn bảng tóm tắt — đúng ý đồ, nên khớp nhiều phần tử.
     await waitFor(() => expect(screen.getAllByText('+400').length).toBeGreaterThanOrEqual(1))
-    expect(screen.getAllByText('Nộp bài cho MOM').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Nộp bài gia đình giao').length).toBeGreaterThanOrEqual(1)
   })
 })
 
