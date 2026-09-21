@@ -12,6 +12,7 @@
     "check:mau": "node scripts/check-mau.mjs",
     "soi:giao-dien": "node scripts/soi-giao-dien.mjs",
     "mo-phong:btvn": "node scripts/mo-phong-btvn.mjs",
+    "mo-phong:bang-gia-exp": "node scripts/mo-phong-bang-gia-exp.mjs",
     "preview": "vite preview",
     "kiem:lo-dap-an": "vitest run tests/lo-dap-an-chi-de-1509.test.ts && node scripts/kiem-lo-dap-an.mjs",
     "kiem:hien-thi": "vitest run tests/xuat-dom-hien-thi.test.tsx && vite build && node scripts/kiem-13.mjs",
