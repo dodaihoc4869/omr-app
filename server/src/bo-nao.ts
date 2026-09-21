@@ -173,6 +173,7 @@ interface DuLieuTrang {
   theHomTruoc: Map<string, TheNgan>
   loiGanDay: Map<string, string[]>
   loiPhuHuynh7: Map<string, NonNullable<DauVaoEm['loiPhuHuynh7']>>
+  baiCaNhan: Map<string, NonNullable<DauVaoEm['baiCaNhan']>>
 }
 
 const them = <T>(m: Map<string, T[]>, k: string, v: T) => {
@@ -237,7 +238,7 @@ async function docDuLieuTrang(env: Env, sbds: string[], ngay: string): Promise<D
     kq = await env.DB.batch<Obj>(dsTruyVan(false))
   }
   const R = (i: number): Obj[] => (kq[i]?.results ?? []) as Obj[]
-  const ra: DuLieuTrang = { cuoi: new Map(), dau: new Map(), suKien: new Map(), cau: new Map(), dang: new Map(), noOn: new Map(), keHoach: new Map(), btvn: new Map(), exp: new Map(), ca: new Map(), dcHomQua: new Map(), theHomTruoc: new Map(), loiGanDay: new Map(), loiPhuHuynh7: new Map() }
+  const ra: DuLieuTrang = { cuoi: new Map(), dau: new Map(), suKien: new Map(), cau: new Map(), dang: new Map(), noOn: new Map(), keHoach: new Map(), btvn: new Map(), exp: new Map(), ca: new Map(), dcHomQua: new Map(), theHomTruoc: new Map(), loiGanDay: new Map(), loiPhuHuynh7: new Map(), baiCaNhan: new Map() }
   for (const r of R(0)) {
     ra.cuoi.set(chuoi(r.sbd), r.cuoi ? chuoi(r.cuoi) : null)
     ra.dau.set(chuoi(r.sbd), r.dau ? chuoi(r.dau) : null)
@@ -279,6 +280,56 @@ async function docDuLieuTrang(env: Env, sbds: string[], ngay: string): Promise<D
       const dang = [...(d.dang ?? []).map((x) => chuoi(x?.ma)), ...((d.khacPhuc ?? []) as KhacPhucEm[]).map((x) => chuoi(x?.dang))].filter(Boolean)
       them(ra.loiPhuHuynh7, chuoi(r.sbd), { ngay: chuoi(r.ngay), dang })
     }
+  }
+  ra.baiCaNhan = await docBaiCaNhan(env, sbds, ngay)
+  return ra
+}
+
+/**
+ * Bài tập về nhà CÁ NHÂN HOÁ đang chạy của các em + số câu CHƯA GIAO theo dạng × mức (cho thẻ `coBaiCaNhanDangChay` / `soCauConLaiCungDang`: AI chỉ được hứa `khac_phuc` khi máy chủ làm được).
+ * "Đang chạy" = bộ đã chốt (`chot_luc`, có `so_chang`), chưa nộp, chưa thu hồi/xoá, hạn chưa qua (theo ngày của lượt chạy) và còn ≥ 1 chặng sau chặng đang làm (`so_chang − lo_da_xong ≥ 2`).
+ * "Chưa giao" = câu trong kho của bài (`btvn_cau`) KHÔNG phải lõi và KHÔNG nằm trong bộ của em (`btvn_em_cau`) — đúng nguồn ứng viên của `apKhacPhuc` (lõi nâng đỡ). Nhiều bài đang chạy ⇒ lấy số lớn nhất theo dạng.
+ * Lỗi truy vấn (máy chủ chưa có cột/bảng của BTVN nâng đỡ…) ⇒ bản đồ rỗng (mọi em coi như không có bài cá nhân: AI không được dùng `khac_phuc`, an toàn).
+ */
+export async function docBaiCaNhan(env: Env, sbds: string[], ngay: string): Promise<DuLieuTrang['baiCaNhan']> {
+  const ra: DuLieuTrang['baiCaNhan'] = new Map()
+  try {
+    const j = JSON.stringify(sbds)
+    const denNgay = `${ngay}T00:00:00.000Z`
+    const DANG_CHAY = `e.sbd IN (SELECT value FROM json_each(?)) AND e.chot_luc IS NOT NULL AND e.so_chang IS NOT NULL AND e.nop_luc IS NULL AND COALESCE(e.thu_hoi,0) = 0 AND COALESCE(b.da_xoa,0) = 0 AND b.han_nop >= ?`
+    // MỘT câu lệnh (UNION ALL), không dùng thêm lượt `batch`: ngân sách truy vấn mỗi trang em (≤ 4 lượt batch) đã kín.
+    const kq = await env.DB.prepare(
+      `SELECT 'a' AS k, e.sbd, e.ma_btvn, NULL AS dang, NULL AS muc, NULL AS n, COALESCE(e.lo_da_xong,0) AS xong, e.so_chang AS tong
+         FROM btvn_em e JOIN btvn b ON b.ma_btvn = e.ma_btvn WHERE ${DANG_CHAY}
+       UNION ALL
+       SELECT 'c', e.sbd, e.ma_btvn, COALESCE(NULLIF(k.dang,''), 'CD:' || COALESCE(k.chuyen_de,'')), k.muc_do, COUNT(*), NULL, NULL
+         FROM btvn_em e JOIN btvn b ON b.ma_btvn = e.ma_btvn JOIN btvn_cau k ON k.ma_btvn = e.ma_btvn
+        WHERE ${DANG_CHAY} AND COALESCE(k.loi,0) = 0
+          AND NOT EXISTS (SELECT 1 FROM btvn_em_cau c WHERE c.ma_btvn = e.ma_btvn AND c.sbd = e.sbd AND c.qid = k.qid)
+        GROUP BY e.sbd, e.ma_btvn, 4, k.muc_do`,
+    ).bind(j, denNgay, j, denNgay).all<Obj>()
+    const a = (kq.results ?? []).filter((r) => r.k === 'a')
+    const c = (kq.results ?? []).filter((r) => r.k === 'c')
+    const conChang = new Set<string>() // `sbd|ma_btvn` còn chặng để chèn
+    for (const r of a) {
+      const dangChay = (Number(r.tong) || 0) - (Number(r.xong) || 0) >= 2
+      if (!ra.has(chuoi(r.sbd))) ra.set(chuoi(r.sbd), { dangChay: false, chuaGiao: {} })
+      if (dangChay) {
+        ra.get(chuoi(r.sbd))!.dangChay = true
+        conChang.add(`${chuoi(r.sbd)}|${chuoi(r.ma_btvn)}`)
+      }
+    }
+    for (const r of c) {
+      if (!conChang.has(`${chuoi(r.sbd)}|${chuoi(r.ma_btvn)}`)) continue
+      const m = Math.max(0, Math.min(2, Math.trunc(Number(r.muc) || 0)))
+      const cua = ra.get(chuoi(r.sbd))!.chuaGiao
+      const ma = chuoi(r.dang)
+      const mang = cua[ma] ?? [0, 0, 0]
+      mang[m] = Math.max(mang[m], Number(r.n) || 0)
+      cua[ma] = mang
+    }
+  } catch {
+    return new Map()
   }
   return ra
 }
@@ -342,6 +393,7 @@ export async function boNaoHoSoNgay(env: Env, b: Obj = {}, nowMs: number = Date.
       loiNhanGanDay: dl?.loiGanDay.get(d.sbd) ?? [],
       mocReset,
       loiPhuHuynh7: dl?.loiPhuHuynh7.get(d.sbd) ?? [],
+      baiCaNhan: dl?.baiCaNhan.get(d.sbd) ?? { dangChay: false, chuaGiao: {} },
     }
     if (v.dieuChinhHomQua) v.dieuChinhHomQua.ngay = homQua
     if (!cuoi) {

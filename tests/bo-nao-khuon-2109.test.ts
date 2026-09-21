@@ -446,6 +446,44 @@ describe('đổi sang núm của lõi BTVN + đếm thay đổi', () => {
   })
 })
 
+describe('khắc phục CHỈ HỨA ĐIỀU LÀM ĐƯỢC (thẻ mang coBaiCaNhanDangChay / soCauConLaiCungDang)', () => {
+  const kp = (o: Record<string, unknown>): DauRaEm => ({ ...tot(), khacPhuc: [{ dang: 'ESTE.THUY_PHAN', kieu: 'khac_phuc', soCau: 3, bac: 'dung_bac', ...o }] as DauRaEm['khacPhuc'] })
+  const theCo = (con: Record<string, [number, number]> | undefined, dangChay = true): TheDeKiem => ({ ...THE, coBaiCaNhanDangChay: dangChay, ...(con ? { soCauConLaiCungDang: con } : {}) })
+  it('thẻ CŨ (không có trường) ⇒ không kiểm điều này (giữ hành vi cũ)', () => {
+    expect(ket(kp({}), THE).hopLe).toBe(true)
+  })
+  it('em KHÔNG có bài cá nhân hoá đang chạy ⇒ khac_phuc bị loại (dùng on_som/uu_tien); on_som vẫn hợp lệ', () => {
+    const k = ket(kp({}), theCo(undefined, false))
+    expect(k.hopLe).toBe(false)
+    expect(k.lyDo.join('|')).toMatch(/không có bài tập về nhà cá nhân hoá đang chạy/)
+    const onSom: DauRaEm = { ...tot(), khacPhuc: [{ dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }] as DauRaEm['khacPhuc'] }
+    expect(ket(onSom, theCo(undefined, false)).hopLe).toBe(true)
+  })
+  it('có bài: khac_phuc cần ≥ 2 câu chưa giao ở ĐÚNG ô (dung_bac = ô đầu, thap_hon_mot_bac = ô hai) và soCau ≤ số còn', () => {
+    const the = theCo({ 'ESTE.THUY_PHAN': [3, 1] })
+    expect(ket(kp({ soCau: 3 }), the).hopLe).toBe(true) // 3 ≤ 3
+    expect(ket(kp({ soCau: 2 }), the).hopLe).toBe(true)
+    const qua = ket(kp({ soCau: 4 }), the)
+    expect(qua.hopLe).toBe(false)
+    expect(qua.lyDo.join('|')).toMatch(/vượt số câu còn lại/)
+    const thap = ket(kp({ soCau: 2, bac: 'thap_hon_mot_bac' }), the) // ô hai chỉ có 1 < 2
+    expect(thap.hopLe).toBe(false)
+    expect(thap.lyDo.join('|')).toMatch(/chỉ còn 1 câu chưa giao ở bậc thấp hơn một bậc/)
+    expect(ket(kp({ soCau: 2, bac: 'thap_hon_mot_bac' }), theCo({ 'ESTE.THUY_PHAN': [0, 2] })).hopLe).toBe(true)
+    // dạng không có trong bản đồ ⇒ 0 câu
+    const khong = ket(kp({ dang: 'CARB.PHAN_LOAI' }), the)
+    expect(khong.hopLe).toBe(false)
+    expect(khong.lyDo.join('|')).toMatch(/chỉ còn 0 câu/)
+    // bản đồ hỏng (không phải mảng) ⇒ coi như 0, không ném lỗi
+    expect(ket(kp({}), { ...THE, coBaiCaNhanDangChay: true, soCauConLaiCungDang: { 'ESTE.THUY_PHAN': 'x' } as never }).hopLe).toBe(false)
+  })
+  it('phần tử khac_phuc sai khuôn (soCau/bac lạ) chỉ báo lỗi khuôn, không thêm lỗi "khả thi" trùng lặp', () => {
+    const k = ket(kp({ soCau: 9 }), theCo({ 'ESTE.THUY_PHAN': [3, 1] }))
+    expect(k.lyDo.filter((l) => /khacPhuc\[0\]/.test(l))).toHaveLength(1)
+    expect(k.lyDo.join('|')).toMatch(/soCau phải là số nguyên trong \[2, 4\]/)
+  })
+})
+
 describe('khoá nguồn', () => {
   it('thuần: không Math.random, không đồng hồ, không IO; chỉ import KIỂU từ btvn-nang-do', () => {
     const nguon = readFileSync('src/lib/bo-nao-khuon.ts', 'utf8').replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')

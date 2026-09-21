@@ -131,6 +131,18 @@ describe('chỉ đổi cách viết: KHÔNG đổi số, KHÔNG bịa, không m�
     expect(v.maDang).toBeUndefined()
     expect(v.nguon).toBeUndefined()
   })
+  it('khắc phục: coBaiCaNhanDangChay=false bị bỏ (khoá vắng = không), true và bản đồ [đúng bậc, thấp hơn] được giữ nguyên; thẻ chưa có trường thì không thêm', () => {
+    const goc = theDay()
+    const khong = nenThe({ ...goc, coBaiCaNhanDangChay: false })
+    expect('coBaiCaNhanDangChay' in khong).toBe(false)
+    expect('soCauConLaiCungDang' in khong).toBe(false)
+    const co = nenThe({ ...goc, coBaiCaNhanDangChay: true, soCauConLaiCungDang: { [MA(0)]: [3, 1], [MA(1)]: [2, 0] } })
+    expect(co.coBaiCaNhanDangChay).toBe(true)
+    expect(co.soCauConLaiCungDang).toEqual({ [MA(0)]: [3, 1], [MA(1)]: [2, 0] })
+    expect('coBaiCaNhanDangChay' in nenThe(goc)).toBe(false)
+    // thẻ vắng không mang hai trường (AI không được viết khac_phuc cho em vắng)
+    expect('coBaiCaNhanDangChay' in nenTheVang({ ...goc, coBaiCaNhanDangChay: true })).toBe(false)
+  })
   it('gon: bỏ null/undefined/false/[]/{} ở mọi tầng, giữ số 0, chuỗi rỗng, phần tử mảng; không sửa đầu vào', () => {
     const vao = { a: null, b: undefined, c: false, d: [], e: {}, f: 0, g: '', h: [0, null, {}, { x: null, y: 1 }], i: { j: { k: null }, l: 2 }, m: true }
     const truoc = JSON.stringify(vao)

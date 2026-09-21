@@ -314,6 +314,16 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
         else if (o.kieu === 'khac_phuc') {
           if (!laSoNguyenTrong(o.soCau, H.KHAC_PHUC_SO_CAU_TOI_THIEU, H.KHAC_PHUC_SO_CAU_TOI_DA)) loi.push(`khacPhuc[${i}].soCau phải là số nguyên trong [2, 4]`)
           if (o.bac !== 'dung_bac' && o.bac !== 'thap_hon_mot_bac') loi.push(`khacPhuc[${i}].bac phải là dung_bac hoặc thap_hon_mot_bac`)
+          // CHỈ HỨA ĐIỀU LÀM ĐƯỢC (Boss 21/09): máy chủ chỉ chèn câu cùng dạng CHƯA giao vào chặng chưa mở của bài cá nhân hoá ĐANG CHẠY. Thẻ có `coBaiCaNhanDangChay` ⇒ kiểm; thẻ cũ không có ⇒ bỏ qua.
+          if (laChuoi(o.dang) && typeof the.coBaiCaNhanDangChay === 'boolean' && laSoNguyenTrong(o.soCau, H.KHAC_PHUC_SO_CAU_TOI_THIEU, H.KHAC_PHUC_SO_CAU_TOI_DA) && (o.bac === 'dung_bac' || o.bac === 'thap_hon_mot_bac')) {
+            if (!the.coBaiCaNhanDangChay) loi.push(`khacPhuc[${i}]: em không có bài tập về nhà cá nhân hoá đang chạy còn chặng để chèn — không dùng khac_phuc (dùng on_som hoặc uu_tien)`)
+            else {
+              const cap = (the.soCauConLaiCungDang as Record<string, unknown> | undefined)?.[o.dang]
+              const con = Array.isArray(cap) ? Number(cap[o.bac === 'dung_bac' ? 0 : 1]) || 0 : 0
+              if (con < H.KHAC_PHUC_SO_CAU_TOI_THIEU) loi.push(`khacPhuc[${i}]: dạng ${o.dang} chỉ còn ${con} câu chưa giao ở bậc ${o.bac === 'dung_bac' ? 'đúng bậc' : 'thấp hơn một bậc'} — khac_phuc cần ít nhất ${H.KHAC_PHUC_SO_CAU_TOI_THIEU}`)
+              else if ((o.soCau as number) > con) loi.push(`khacPhuc[${i}].soCau ${o.soCau as number} vượt số câu còn lại (${con})`)
+            }
+          }
         } else if (o.soCau !== undefined || o.bac !== undefined) loi.push(`khacPhuc[${i}]: on_som không mang soCau/bac`)
       })
     }

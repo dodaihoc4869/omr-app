@@ -8,6 +8,7 @@ import {
   danhGiaDieuChinh,
   hieuNgay,
   phanLuong,
+  soCauConLaiCungDang,
   themNgay,
   tinhBucTranhLop,
   tinhDacTrung,
@@ -452,5 +453,38 @@ describe('TRẦN LỜI CHO PHỤ HUYNH: ≤ 2 lời/em/7 ngày; "vấp lặp đ�
     const { HAN_MUC_BO_NAO } = await import('../src/lib/bo-nao-khuon')
     expect(HAN_MUC_BO_NAO.TRAN_LOI_PHU_HUYNH_7_NGAY).toBe(NGUONG_BO_NAO.TRAN_LOI_PHU_HUYNH)
     expect(NGUONG_BO_NAO.CUA_SO_LOI_PHU_HUYNH).toBe(7)
+  })
+})
+
+describe('thẻ: coBaiCaNhanDangChay + soCauConLaiCungDang (để AI biết hứa được `khac_phuc` không)', () => {
+  const hoSoDang = [dang('ESTE.A', 1, 8, 2, 4, 2), dang('AMIN.B', 0, 8, 2, 4, 2), dang('LIPID.C', 2, 8, 1, 6, 1)]
+  const suKien = ngay(1, 6, 4)
+  const cau: CauEmNgan[] = ['ESTE.A', 'AMIN.B', 'LIPID.C'].map((ma, i) => ({ qid: `c${i}`, dang: ma, lanSai: 1, trangThai: 'moi_sai' as const }))
+  const chuaGiao = { 'ESTE.A': [2, 3, 1], 'AMIN.B': [4, 1, 0], 'LIPID.C': [0, 2, 5], 'KHONG.THE': [9, 9, 9] } as Record<string, [number, number, number]>
+  it('vắng `baiCaNhan` (máy chủ chưa tra) ⇒ thẻ KHÔNG có hai trường (thẻ cũ không đổi một byte)', () => {
+    const t = the({ suKien, cau, dang: hoSoDang })
+    expect('coBaiCaNhanDangChay' in t).toBe(false)
+    expect('soCauConLaiCungDang' in t).toBe(false)
+  })
+  it('có bài nhưng chưa đủ chặng (dangChay=false) ⇒ coBaiCaNhanDangChay=false và KHÔNG có bản đồ', () => {
+    const t = the({ suKien, cau, dang: hoSoDang, baiCaNhan: { dangChay: false, chuaGiao: {} } })
+    expect(t.coBaiCaNhanDangChay).toBe(false)
+    expect('soCauConLaiCungDang' in t).toBe(false)
+  })
+  it('đang chạy: bản đồ chỉ gồm dạng của thẻ; [đúng bậc hiện tại, thấp hơn một bậc] theo bậc từng dạng (Hiểu: [ô1, ô0]; Biết: [ô0, 0]; Vận dụng: [ô2, ô1]); dạng hết câu bị bỏ; dạng lạ không lọt', () => {
+    const t = the({ suKien, cau, dang: hoSoDang, baiCaNhan: { dangChay: true, chuaGiao } })
+    expect(t.coBaiCaNhanDangChay).toBe(true)
+    expect(t.soCauConLaiCungDang).toEqual({ 'ESTE.A': [3, 2], 'AMIN.B': [4, 0], 'LIPID.C': [5, 2] })
+    expect(t.maDang).toEqual(expect.arrayContaining(Object.keys(t.soCauConLaiCungDang!)))
+    expect(Object.keys(t.soCauConLaiCungDang!)).not.toContain('KHONG.THE')
+    // dạng không còn câu nào: bỏ
+    const t2 = the({ suKien, cau, dang: hoSoDang, baiCaNhan: { dangChay: true, chuaGiao: { 'ESTE.A': [0, 0, 7] } } })
+    expect(t2.soCauConLaiCungDang).toEqual({})
+  })
+  it('hàm soCauConLaiCungDang: bậc lạ/khuyết ⇒ Hiểu; số âm/lẻ/NaN ⇒ kẹp về số nguyên ≥ 0', () => {
+    expect(soCauConLaiCungDang(['X'], [1], { X: [1, 2.9, 3] })).toEqual({ X: [2, 1] })
+    expect(soCauConLaiCungDang(['X'], [], { X: [1, 2, 3] })).toEqual({ X: [2, 1] }) // bậc khuyết ⇒ 1
+    expect(soCauConLaiCungDang(['X', 'Y'], [0, 2], { X: [-4, 9, 9], Y: [Number.NaN, 3, Number.NaN] })).toEqual({ Y: [0, 3] })
+    expect(soCauConLaiCungDang(['X'], [1], {})).toEqual({})
   })
 })

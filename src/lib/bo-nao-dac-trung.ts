@@ -135,6 +135,9 @@ export interface DauVaoEm {
   keHoach: NgayKeHoachNgan[]
   /** Bài BTVN đang mở của em (chưa nộp, chưa thu hồi). */
   btvn: { changXong: number; tongChang: number | null }[]
+  /** Bài tập về nhà CÁ NHÂN HOÁ đang chạy của em (đã chốt bộ, chưa nộp, chưa quá hạn, còn ≥ 1 chặng sau chặng đang làm) và số câu CHƯA GIAO còn trong kho của bài theo dạng × mức (0 Biết · 1 Hiểu · 2 Vận dụng; không tính câu lõi).
+   *  Để AI biết núm `khac_phuc` có thể hứa được không (máy chủ chỉ chèn câu cùng dạng CHƯA giao vào chặng chưa mở). VẮNG (`undefined`) ⇒ thẻ không mang hai trường tương ứng và bộ kiểm không kiểm điều này. */
+  baiCaNhan?: { dangChay: boolean; chuaGiao: Record<string, [number, number, number]> }
   exp: { tong: number | null; cap: number | null }
   /** Ca thi đã nộp gần nhất (điểm thang 10, có thể null nếu chưa chấm). Không có ⇒ null. */
   caGanNhat: { diem: number | null; ngayNop: string } | null
@@ -191,6 +194,10 @@ export interface TheNgan {
   datNgay7: number
   ngayNghi7: number
   btvn: { baiMo: number; changXong: number; tongChang: number | null }
+  /** Em có bài tập về nhà cá nhân hoá đang chạy còn chặng để chèn (xem `DauVaoEm.baiCaNhan`). Có mặt khi máy chủ đã tra; nén bỏ khi `false`. */
+  coBaiCaNhanDangChay?: boolean
+  /** Mã dạng (thuộc `maDang`) → [số câu CHƯA GIAO đúng bậc hiện tại của em, số câu chưa giao thấp hơn một bậc]; chỉ dạng có ≥ 1 câu. Chỉ có khi `coBaiCaNhanDangChay`. `khac_phuc` chỉ hợp lệ khi đủ câu ở đúng ô. */
+  soCauConLaiCungDang?: Record<string, [number, number]>
   noOn: number
   exp: { tong: number | null; cap: number | null }
   ca: { diem: number | null; ngayTruoc: number } | null
@@ -269,6 +276,19 @@ function trungVi(xs: number[]): number | null {
   const n = a.length
   return n % 2 ? a[(n - 1) / 2] : Math.round((a[n / 2 - 1] + a[n / 2]) / 2)
 }
+/** Số câu chưa giao theo dạng của bài cá nhân → [đúng bậc hiện tại, thấp hơn một bậc] cho các dạng trong `maDang`; bỏ dạng không còn câu nào. */
+export function soCauConLaiCungDang(maDang: string[], bac: (0 | 1 | 2)[], chuaGiao: Record<string, [number, number, number]>): Record<string, [number, number]> {
+  const ra: Record<string, [number, number]> = {}
+  maDang.forEach((ma, i) => {
+    const n = chuaGiao[ma]
+    if (!n) return
+    const b = bac[i] ?? 1
+    const cap: [number, number] = [Math.max(0, Math.trunc(n[b] || 0)), b > 0 ? Math.max(0, Math.trunc(n[b - 1] || 0)) : 0]
+    if (cap[0] + cap[1] > 0) ra[ma] = cap
+  })
+  return ra
+}
+
 const laBtvn = (nguon: string) => nguon === 'btvn' || nguon === 'btvn_lo'
 
 // ══════════════════════════════ ĐẶC TRƯNG ══════════════════════════════
@@ -381,6 +401,12 @@ export function tinhDacTrung(v: DauVaoEm): { the: TheNgan; hoSo: HoSoDayDu } {
     datNgay7: kh7.filter((k) => k.ketQua === 'dat').length,
     ngayNghi7: kh7.filter((k) => k.laNgayNghi).length,
     btvn,
+    ...(v.baiCaNhan
+      ? {
+          coBaiCaNhanDangChay: v.baiCaNhan.dangChay,
+          ...(v.baiCaNhan.dangChay ? { soCauConLaiCungDang: soCauConLaiCungDang(maDang, maDang.map((ma) => (hoSoDang.get(ma)?.bac ?? 1) as 0 | 1 | 2), v.baiCaNhan.chuaGiao) } : {}),
+        }
+      : {}),
     noOn: v.noOn,
     exp: v.exp,
     ca,

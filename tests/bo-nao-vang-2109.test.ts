@@ -166,6 +166,13 @@ describe('PHẦN TỬ soạn ra: đúng khuôn, hợp lệ, một chặng ngắn
     for (const k of KHI_NAO_VIET_PHU_HUYNH) expect(luat, k).toContain(k)
     expect(luat).toContain('khac_phuc|on_som')
     expect(luat).toContain('dung_bac|thap_hon_mot_bac')
+    // khắc phục: tên trường thẻ trong luật = tên trường thật của thẻ (đổi tên mà quên sửa luật ⇒ đỏ) + luật chỉ hứa điều làm được
+    const nguonThe = readFileSync('src/lib/bo-nao-dac-trung.ts', 'utf8')
+    for (const truong of ['coBaiCaNhanDangChay', 'soCauConLaiCungDang']) {
+      expect(luat, truong).toContain(truong)
+      expect(nguonThe, truong).toContain(truong)
+    }
+    expect(luat).toContain('`khac_phuc` CHỈ khi thẻ có `coBaiCaNhanDangChay`')
     // an toàn: không tên lớp, không đường dẫn tuyệt đối, không khoá bí mật, không dặn mở tệp ẩn
     expect(luat).not.toMatch(/\b1[012][A-Z]\d\b/)
     expect(luat).not.toMatch(/\/Users\/|https?:\/\/|x-ma-bi-mat|ma-bi-mat/)
