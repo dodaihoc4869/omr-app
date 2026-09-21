@@ -73,7 +73,7 @@ export default function BangVinhDanh({
       <header className="honors-heading">
         <div>
           <span className="honors-eyebrow">
-            <Sparkles size={13} className="text-[#fbbc04]" /> DẤU ẤN MỖI NGÀY
+            <Sparkles size={13} className="text-[var(--vd-vang)]" /> DẤU ẤN MỖI NGÀY
           </span>
           <h2>Bảng vinh danh</h2>
           <p>

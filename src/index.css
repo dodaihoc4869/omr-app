@@ -728,7 +728,7 @@ html[data-giu-de-an] [data-giu-de-phu] {
   user-select: none;
 }
 
-/* NỀN TỐI: --gg-xanh thành xanh NHẠT (#8ab4f8) mà --giay là trắng CỐ ĐỊNH → chữ trắng trên xanh nhạt chỉ 2,11:1 (đo Chromium: nút
+/* NỀN TỐI: --gg-xanh thành xanh NHẠT (màu xanh nhạt của nền tối) mà --giay là trắng CỐ ĐỊNH → chữ trắng trên xanh nhạt chỉ 2,11:1 (đo Chromium: nút
  * "Đăng nhập" của cổng học sinh). Nền tối dùng chữ xanh đậm của --gg-xanh-nen (≈ 8:1). Nền sáng giữ chữ trắng. Dưới `.m3` đã có
  * luật riêng (m3.css) nên không bị ảnh hưởng. CHỈ nút ở nền xanh mặc định: nút tự đặt nền khác bằng `!bg-*` (rose/purple/emerald/amber ở
  * game và cổng học sinh) vẫn giữ chữ trắng của chúng — chữ xanh đậm trên các nền ấy sẽ tệ hơn. */
@@ -873,17 +873,17 @@ html[data-giu-de-an] [data-giu-de-phu] {
 
 /* Neutral surfaces shared by all three portals; semantic status colors stay distinct. */
 @theme {
-  --color-slate-50: #f5f4ef;
-  --color-slate-100: #eeeee8;
-  --color-slate-200: #dedfd9;
-  --color-slate-300: #c3c8ca;
-  --color-slate-400: #a6b0bc;
-  --color-slate-500: #657180;
-  --color-slate-600: #515e6b;
-  --color-slate-700: #394652;
-  --color-slate-800: #29323d;
-  --color-slate-900: #202730;
-  --color-slate-950: #171c23;
+  --color-slate-50: var(--slate-50);
+  --color-slate-100: var(--slate-100);
+  --color-slate-200: var(--slate-200);
+  --color-slate-300: var(--slate-300);
+  --color-slate-400: var(--slate-400);
+  --color-slate-500: var(--slate-500);
+  --color-slate-600: var(--slate-600);
+  --color-slate-700: var(--slate-700);
+  --color-slate-800: var(--slate-800);
+  --color-slate-900: var(--slate-900);
+  --color-slate-950: var(--slate-950);
 }
 body { background:var(--nen);color:var(--muc) }
 .bg-white { background-color:var(--the) }
@@ -916,15 +916,15 @@ input:is([type="date"], [type="datetime-local"], [type="time"])::-webkit-calenda
 @media (prefers-color-scheme: dark) {
   input:is([type="date"], [type="datetime-local"], [type="time"]) {
     color-scheme: dark;
-    color: #f1f5f9;
-    -webkit-text-fill-color: #f1f5f9;
+    color: var(--chu-o-gio-toi);
+    -webkit-text-fill-color: var(--chu-o-gio-toi);
   }
 }
 .dark input:is([type="date"], [type="datetime-local"], [type="time"]),
 [data-theme="dark"] input:is([type="date"], [type="datetime-local"], [type="time"]) {
   color-scheme: dark;
-  color: #f1f5f9;
-  -webkit-text-fill-color: #f1f5f9;
+  color: var(--chu-o-gio-toi);
+  -webkit-text-fill-color: var(--chu-o-gio-toi);
   background-color: var(--the);
   border-color: var(--vien-dam);
 }

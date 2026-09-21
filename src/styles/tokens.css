@@ -151,6 +151,37 @@
   --p3-nen: #fbfaf7;
 }
 
+/* BẢNG "SLATE ẤM" dùng chung ba cổng (trước 21/09 nằm thẳng trong `@theme` của index.css — mã màu thô làm `npm run check:mau` đỏ).
+ * `@theme` của Tailwind trỏ về các biến này (`--color-slate-N: var(--slate-N)`), nên MỘT nguồn màu, đổi ở đây là đổi cả lớp `slate-*`. */
+:root {
+  --slate-50: #f5f4ef;
+  --slate-100: #eeeee8;
+  --slate-200: #dedfd9;
+  --slate-300: #c3c8ca;
+  --slate-400: #a6b0bc;
+  --slate-500: #657180;
+  --slate-600: #515e6b;
+  --slate-700: #394652;
+  --slate-800: #29323d;
+  --slate-900: #202730;
+  --slate-950: #171c23;
+  /* Chữ ô ngày/giờ trên nền tối (input date/time — index.css). */
+  --chu-o-gio-toi: #f1f5f9;
+}
+
+/* BẢNG VINH DANH (`BangVinhDanh.css`): bốn màu thương hiệu Google + vàng huy hiệu, cố định (không đổi theo nền sáng/tối). */
+:root {
+  --vd-vang: #fbbc04;
+  --vd-vang-dam: #f29900;
+  --vd-vang-nhat: #fef08a;
+  --vd-cam: #d97706;
+  --vd-vang-sang: #fbbf24;
+  --vd-nau: #795548;
+  --vd-xanh: #4285f4;
+  --vd-luc: #34a853;
+  --vd-do: #ea4335;
+}
+
 /* KHUNG LỜI GIẢI ĐỌC ĐƯỢC (`.readable-solution`, src/index.css) — cặp màu riêng để chữ lời giải luôn đủ tương phản dù bị lớp tiện ích
  * Tailwind trộn sáng/tối. Trước 21/09 nằm thẳng trong index.css (mã màu thô, làm `npm run check:mau` đỏ); nay đứng đây, một chỗ.
  * Nền tối theo lớp `.dark` / `[data-theme="dark"]` — đúng bộ chọn cũ của khung này (không theo prefers-color-scheme). */

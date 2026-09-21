@@ -33,14 +33,14 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #fbbc04;
+  color: var(--vd-vang);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
 }
 
 .honors-crown {
-  color: #fbbc04;
+  color: var(--vd-vang);
   flex-shrink: 0;
 }
 
@@ -66,14 +66,14 @@
   grid-column: 2;
   grid-row: 1;
   background: var(--the);
-  border-color: #fbbc04;
+  border-color: var(--vd-vang);
   padding-top: 14px;
   z-index: 2;
 }
 
 .honors-top1-glow {
   background: linear-gradient(180deg, rgba(254, 247, 224, 0.65) 0%, var(--the) 100%);
-  border: 2px solid #fbbc04;
+  border: 2px solid var(--vd-vang);
   box-shadow: 0 4px 20px rgba(251, 188, 4, 0.3), 0 0 30px rgba(251, 188, 4, 0.12);
   animation: top1-card-breath 3.6s ease-in-out infinite alternate;
 }
@@ -81,11 +81,11 @@
 @keyframes top1-card-breath {
   0% {
     box-shadow: 0 4px 16px rgba(251, 188, 4, 0.25), 0 0 20px rgba(251, 188, 4, 0.1);
-    border-color: #fbbc04;
+    border-color: var(--vd-vang);
   }
   100% {
     box-shadow: 0 6px 26px rgba(251, 188, 4, 0.45), 0 0 40px rgba(251, 188, 4, 0.25);
-    border-color: #f29900;
+    border-color: var(--vd-vang-dam);
   }
 }
 
@@ -129,28 +129,28 @@
 .honors-sparkle-1 {
   top: 8px;
   left: 10px;
-  color: #fbbc04; /* Google Gold */
+  color: var(--vd-vang); /* Google Gold */
   animation-delay: 0s;
 }
 
 .honors-sparkle-2 {
   top: 10px;
   right: 12px;
-  color: #4285f4; /* Google Blue */
+  color: var(--vd-xanh); /* Google Blue */
   animation-delay: 0.7s;
 }
 
 .honors-sparkle-3 {
   bottom: 28%;
   left: 8px;
-  color: #34a853; /* Google Green */
+  color: var(--vd-luc); /* Google Green */
   animation-delay: 1.4s;
 }
 
 .honors-sparkle-4 {
   bottom: 30%;
   right: 8px;
-  color: #ea4335; /* Google Red */
+  color: var(--vd-do); /* Google Red */
   animation-delay: 2.1s;
 }
 
@@ -197,7 +197,7 @@
   display: inline-flex;
   gap: 4px;
   align-items: center;
-  color: #fbbc04;
+  color: var(--vd-vang);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -313,32 +313,32 @@
 .honors-rank-1 .honors-name {
   font-size: 14px;
   font-weight: 800;
-  border-color: #fbbc04;
+  border-color: var(--vd-vang);
   background: rgba(254, 247, 224, 0.8);
-  color: #795548;
+  color: var(--vd-nau);
 }
 
 .dark .honors-rank-1 .honors-name {
   background: rgba(251, 188, 4, 0.15);
-  color: #fef08a;
+  color: var(--vd-vang-nhat);
 }
 
 .honors-score {
   font-size: 21px;
   font-weight: 800;
   letter-spacing: -0.04em;
-  color: #fbbc04;
+  color: var(--vd-vang);
   margin-top: 2px;
   line-height: 1.1;
 }
 
 .honors-rank-1 .honors-score {
   font-size: 25px;
-  color: #d97706;
+  color: var(--vd-cam);
 }
 
 .dark .honors-rank-1 .honors-score {
-  color: #fbbf24;
+  color: var(--vd-vang-sang);
 }
 
 .honors-score span {
@@ -393,7 +393,7 @@
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #4285f4 0 25%, #ea4335 25% 50%, #fbbc04 50% 75%, #34a853 75%);
+  background: linear-gradient(90deg, var(--vd-xanh) 0 25%, var(--vd-do) 25% 50%, var(--vd-vang) 50% 75%, var(--vd-luc) 75%);
   border-radius: 4px 4px 0 0;
   z-index: 5;
 }
