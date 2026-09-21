@@ -9,6 +9,7 @@ import KhoiBoNaoDemQua from '../components/KhoiBoNaoDemQua'
 import OTraCuu from '../components/hom-nay/OTraCuu'
 import ViecGap from '../components/hom-nay/ViecGap'
 import EmCanGiup from '../components/hom-nay/EmCanGiup'
+import VinhDanh from '../components/hom-nay/VinhDanh'
 import '../styles/hom-nay.css'
 import '../styles/hom-nay-v2.css'
 
@@ -130,12 +131,7 @@ export default function HomNayScreen() {
         </section>
       </div>
 
-      <section className="hn2-the hn2-vinh-danh" aria-labelledby="hn2-vd" data-khoi="vinh-danh">
-        <h2 id="hn2-vd" className="hn2-tieu-de">
-          Vinh danh hôm nay
-        </h2>
-        <p className="hn2-trong">Vinh danh theo ngày (chăm nhất · tiến bộ nhất · bền bỉ nhất) đang chờ máy chủ — chưa có số nào để hiện.</p>
-      </section>
+      <VinhDanh onMoEm={moHoSoEm} />
 
       <div className="hn2-cuoi">
         <section className="hn2-the" aria-labelledby="hn2-ca" data-khoi="ca-hom-nay">

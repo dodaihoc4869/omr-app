@@ -235,7 +235,7 @@ describe('ExamHubScreen = trang chủ Hôm nay bản 2 (đã bỏ Bảng tin cũ
     const css = doc('src/styles/hom-nay-v2.css').replace(/\/\*[\s\S]*?\*\//g, '')
     expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
     expect(css).not.toContain('!important')
-    expect(css).toMatch(/\.hn2-luoi-a \{[^}]*1\.62fr/)
+    expect(css).toMatch(/\.hn2-luoi-a \{[^}]*1\.25fr/)
     expect(css).toMatch(/\.hn2-luoi-b \{[^}]*repeat\(3, minmax\(0, 1fr\)\)/)
     expect(css).toMatch(/@media \(max-width: 1279px\)/)
     expect(css).toMatch(/@media \(max-width: 719px\)/)

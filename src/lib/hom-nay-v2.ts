@@ -294,7 +294,7 @@ export interface NguoiVinhDanh {
 export interface VinhDanhNgay {
   ngay: string
   chamNhat: (NguoiVinhDanh & { exp: number }) | null
-  tienBoNhat: (NguoiVinhDanh & { soDangLenBac: number; soCauDungLai: number }) | null
+  tienBoNhat: (NguoiVinhDanh & { soDangLenBac: number | null; soCauDungLai: number | null }) | null
   benBiNhat: (NguoiVinhDanh & { chuoiNgay: number }) | null
   diemCao: (NguoiVinhDanh & { diem: number; tenCa: string }) | null
 }
@@ -311,7 +311,8 @@ export function docVinhDanh(j: Record<string, unknown>): VinhDanhNgay {
   return {
     ngay: chu(j.ngay),
     chamNhat: a && so(g('chamNhat')?.exp) != null ? { ...a, exp: so(g('chamNhat')!.exp)! } : null,
-    tienBoNhat: b ? { ...b, soDangLenBac: so(g('tienBoNhat')!.soDangLenBac) ?? 0, soCauDungLai: so(g('tienBoNhat')!.soCauDungLai) ?? 0 } : null,
+    // Bục Tiến bộ cần ÍT NHẤT một con số máy chủ tính; số nào thiếu thì để null (dòng phụ bỏ phần đó), không điền 0.
+    tienBoNhat: b && (so(g('tienBoNhat')!.soDangLenBac) != null || so(g('tienBoNhat')!.soCauDungLai) != null) ? { ...b, soDangLenBac: so(g('tienBoNhat')!.soDangLenBac), soCauDungLai: so(g('tienBoNhat')!.soCauDungLai) } : null,
     benBiNhat: c && so(g('benBiNhat')?.chuoiNgay) != null ? { ...c, chuoiNgay: so(g('benBiNhat')!.chuoiNgay)! } : null,
     diemCao: d && so(g('diemCao')?.diem) != null ? { ...d, diem: so(g('diemCao')!.diem)!, tenCa: chu(g('diemCao')!.tenCa) } : null,
   }
