@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight, Check, Eye, Heart, Hourglass, Pause, RefreshCw, 
 import '../m3'
 import './mom-m3.css'
 import { MomOption, MomQuestionStem } from '../MomQuestionMedia'
+import ONhapDapSo from '../ONhapDapSo'
 
 export interface BaiMomM3 {
   id: string
@@ -264,10 +265,10 @@ export function MomLamBaiM3({
                 </div>
               ) : (
                 <div className="mom-nhom">
-                  <label className="mom-nhap">
-                    <span className="mom-nhap-nhan">Điền câu trả lời ngắn:</span>
-                    <input type="text" value={daChon || ''} onChange={(e) => datTraLoi(cau.id, e.target.value)} placeholder="Nhập đáp án số hoặc chữ..." autoComplete="off" />
-                  </label>
+                  <div className="mom-nhap">
+                    <label className="mom-nhap-nhan" htmlFor={`mom-tl-${cau.id}`}>Điền câu trả lời ngắn:</label>
+                    <ONhapDapSo id={`mom-tl-${cau.id}`} inputMode="text" value={daChon || ''} onChange={(v) => datTraLoi(cau.id, v)} placeholder="Nhập đáp án số hoặc chữ..." />
+                  </div>
                 </div>
               )}
             </li>

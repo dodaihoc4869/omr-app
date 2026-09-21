@@ -1,0 +1,15 @@
+/* Ô TRẢ LỜI NGẮN + hai nút "−" và "," (bàn phím số của điện thoại không có hai dấu này). Nơi dùng đổi màu bằng các biến --ond-* hoặc lớp riêng; mặc định trung tính, có bản tối. */
+.ond{--ond-nen:rgb(255,255,255);--ond-chu:rgb(28,32,40);--ond-vien:rgb(160,168,184);--ond-nut-nen:rgb(238,241,247);--ond-nut-chu:rgb(28,32,40);--ond-tieu-diem:rgb(26,86,219);--ond-bo:12px;--ond-cao:48px;
+  display:flex;align-items:stretch;gap:8px;width:100%;min-width:0;box-sizing:border-box}
+.ond *,.ond *::before,.ond *::after{box-sizing:border-box}
+.ond>input{flex:1 1 auto;min-width:0;min-height:var(--ond-cao);padding:0 14px;border:1.5px solid var(--ond-vien);border-radius:var(--ond-bo);background:var(--ond-nen);color:var(--ond-chu);font:inherit;font-size:16px;font-variant-numeric:tabular-nums}
+.ond>input:focus{outline:none;border-color:var(--ond-tieu-diem);box-shadow:0 0 0 2px var(--ond-tieu-diem)}
+.ond>input:disabled{opacity:.7}
+.ond>.ond-nut{flex:0 0 auto;min-width:var(--ond-cao);min-height:var(--ond-cao);padding:0 10px;border:1.5px solid var(--ond-vien);border-radius:var(--ond-bo);background:var(--ond-nut-nen);color:var(--ond-nut-chu);font:inherit;font-size:22px;font-weight:700;line-height:1;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none}
+.ond>.ond-nut:focus-visible{outline:3px solid var(--ond-tieu-diem);outline-offset:2px}
+.ond>.ond-nut:disabled{opacity:.45;cursor:default}
+.ond>.ond-nut[data-bat]{background:var(--ond-bat-nen,var(--ond-chu));color:var(--ond-bat-chu,var(--ond-nen))}
+@media (prefers-color-scheme:dark){
+  .ond{--ond-nen:rgb(30,35,46);--ond-chu:rgb(232,236,246);--ond-vien:rgb(96,106,128);--ond-nut-nen:rgb(46,54,72);--ond-nut-chu:rgb(232,236,246);--ond-tieu-diem:rgb(150,190,255)}
+}
+@media (prefers-reduced-motion:reduce){.ond>.ond-nut{transition:none}}

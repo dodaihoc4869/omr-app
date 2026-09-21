@@ -9,6 +9,7 @@ import './lam-cau-on.css'
 import { MomOption, MomQuestionStem } from '../MomQuestionMedia'
 import { LoiGiaiCauSai } from '../KhoiCauSai'
 import { HinhTaiViTri } from '../QuestionMedia'
+import ONhapDapSo from '../ONhapDapSo'
 import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
 import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
 
@@ -417,20 +418,11 @@ function TheCauOn({
 
       {c.phan === 'III' && (
         <div className="lco-nhom">
-          <label className="lco-nhap">
-            <span className="lco-nhap-nhan">Đáp án của em (số)</span>
-            <input
-              type="text"
-              inputMode="decimal"
-              autoComplete="off"
-              autoCapitalize="off"
-              spellCheck={false}
-              placeholder="Ví dụ 12,5"
-              value={dapAn}
-              disabled={khoaO}
-              onChange={(e) => onChon(e.target.value)}
-            />
-          </label>
+          {/* Nhãn NGOÀI khối nhập (không bọc nút trong <label>: bấm chữ nhãn sẽ kích nút "−" đầu tiên). Hai nút "−" và "," cho bàn phím số không có hai dấu ấy. */}
+          <div className="lco-nhap">
+            <label className="lco-nhap-nhan" htmlFor="lco-dap-an">Đáp án của em (số)</label>
+            <ONhapDapSo id="lco-dap-an" value={dapAn} onChange={onChon} disabled={khoaO} placeholder="Ví dụ 12,5" />
+          </div>
         </div>
       )}
 

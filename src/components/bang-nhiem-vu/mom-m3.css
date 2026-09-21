@@ -73,6 +73,9 @@
 .mom-nhap input { width: 100%; height: 56px; padding: 0 var(--k4, 16px); border: 0; border-radius: var(--m3-bo-12); background: transparent; color: var(--m3-on-surface); box-shadow: inset 0 0 0 1.5px var(--m3-outline); font: inherit; font-size: var(--bnv-cx-3); font-weight: 600; }
 .mom-nhap input::placeholder { color: var(--m3-on-surface-variant); font-weight: 500; }
 .mom-nhap input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--m3-primary); }
+/* hai nút "−" và "," (ONhapDapSo) theo M3 */
+.mom-nhap .ond { --ond-cao: 56px; --ond-bo: var(--m3-bo-12); --ond-vien: var(--m3-outline); --ond-nut-nen: transparent; --ond-nut-chu: var(--m3-on-surface); --ond-chu: var(--m3-on-surface); --ond-nen: transparent; --ond-tieu-diem: var(--m3-primary); }
+.mom-nhap .ond > input { width: auto; flex: 1 1 auto; min-width: 0; border: 0; padding: 0 var(--k4, 16px); }
 
 .mom-nop { display: flex; flex-direction: column; align-items: center; gap: var(--k2, 8px); padding: var(--k5, 20px) var(--k4, 16px); border-radius: var(--m3-bo-16); background: var(--m3-surface-container-high); text-align: center; }
 .mom-nop-ten { font-size: var(--bnv-cx-3); font-weight: 700; }

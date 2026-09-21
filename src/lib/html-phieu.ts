@@ -550,6 +550,12 @@ body.co-lam .tf-item { padding: 9px 10px; }
   padding: 0 14px; font: inherit; font-size: 14px; color: var(--muc); background: var(--o-nen);
 }
 .lam-nhap:focus { outline: none; border-color: #2f3e46; }
+/* Hai nút "−" và "," cạnh ô trả lời ngắn: bàn phím SỐ của điện thoại không có hai dấu ấy. Không lấy tiêu điểm khỏi ô (bàn phím không đóng). */
+.lam-nhap-khoi { display: flex; align-items: stretch; gap: 8px; width: 100%; max-width: 340px; }
+.lam-nhap-khoi .lam-nhap { flex: 1 1 auto; min-width: 0; max-width: none; }
+.lam-nut { flex: 0 0 auto; min-width: 44px; height: 40px; padding: 0 10px; border-radius: 10px; border: 1px solid #e4e0d7; background: var(--o-nen); color: var(--muc); font: inherit; font-size: 20px; font-weight: 700; line-height: 1; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; }
+.lam-nut:focus-visible { outline: 3px solid rgba(47,62,70,.35); outline-offset: 2px; }
+.q-card.da-cham .lam-nut { pointer-events: none; opacity: .5; }
 /* Sau khi nộp: khoá ô lại và tô đúng/sai. Màu KHÔNG đứng một mình — mỗi thẻ
    mang thêm dòng chữ "Đúng"/"Sai" ngay dưới. */
 .q-card.da-cham .lam-o, .q-card.da-cham .lam-nhap { pointer-events: none; opacity: .95; }
@@ -1289,7 +1295,7 @@ export function theCauHtml(
   } else {
     // Phần III cho làm bài: ô điền ĐỨNG THAY dòng kẻ, không thêm hàng mới.
     const oDien = choLam
-      ? `<input class="lam-nhap" type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp án của em" placeholder="Đáp án của em">`
+      ? `<div class="lam-nhap-khoi"><button type="button" class="lam-nut" data-lam-nut="am" aria-label="Đổi dấu âm">−</button><input class="lam-nhap" type="text" inputmode="decimal" autocomplete="off" aria-label="Đáp án của em" placeholder="Đáp án của em"><button type="button" class="lam-nut" data-lam-nut="phay" aria-label="Thêm dấu phẩy">,</button></div>`
       : `<div class="sa-blank">Đáp án: ……………………………</div>`
     than = anGiai || !coDap
       ? `<div class="sa-vung">${oDien}</div>`
@@ -2188,6 +2194,44 @@ export const JS_PHIEU = `
         if (demLam) demLam.textContent = String(soDaLam());
       });
 
+      // HAI NÚT "−" VÀ "," cạnh ô trả lời ngắn (bàn phím SỐ của điện thoại không có hai dấu ấy; thầy lệnh 21/09). Cùng phép với src/lib/nhap-dap-so.ts (test đối chiếu):
+      // "−" bật/tắt "-" ở ĐẦU số; "," chèn TẠI CON TRỎ, chỉ MỘT dấu thập phân ("," hoặc "."). Em gõ gì gửi nấy: KHÔNG chuẩn hoá ở đây.
+      function phieuSuaDoiDau(s, den) {
+        var dau = 0;
+        while (dau < s.length && (s.charAt(dau) === ' ' || s.charAt(dau) === '\\t' || s.charAt(dau) === '\\n' || s.charAt(dau) === '\\u00a0')) dau++;
+        var d = Math.max(0, Math.min(s.length, den));
+        if (s.charAt(dau) === '-') return { value: s.slice(0, dau) + s.slice(dau + 1), caret: d > dau ? d - 1 : d };
+        return { value: s.slice(0, dau) + '-' + s.slice(dau), caret: d >= dau ? d + 1 : d };
+      }
+      function phieuSuaChenPhay(s, tu, den) {
+        var a = Math.max(0, Math.min(s.length, Math.min(tu, den))), b = Math.max(0, Math.min(s.length, Math.max(tu, den)));
+        var giu = s.slice(0, a) + s.slice(b);
+        if (giu.indexOf(',') >= 0 || giu.indexOf('.') >= 0) return null;
+        return { value: s.slice(0, a) + ',' + s.slice(b), caret: a + 1 };
+      }
+      ['pointerdown', 'mousedown'].forEach(function (ev) {
+        document.addEventListener(ev, function (e) {
+          if (e.target && e.target.closest && e.target.closest('.lam-nut')) e.preventDefault(); // không lấy tiêu điểm khỏi ô: bàn phím không đóng
+        }, true);
+      });
+      document.addEventListener('click', function (e) {
+        var nut = e.target && e.target.closest ? e.target.closest('.lam-nut') : null;
+        if (!nut || daNop) return;
+        var khoi = nut.closest('.lam-nhap-khoi');
+        var o = khoi ? khoi.querySelector('.lam-nhap') : null;
+        if (!o || o.disabled) return;
+        var the = o.closest('.q-card[data-qid]');
+        if (the && the.classList.contains('da-cham')) return;
+        var coTieuDiem = document.activeElement === o;
+        var tu = coTieuDiem && o.selectionStart != null ? o.selectionStart : o.value.length;
+        var den = coTieuDiem && o.selectionEnd != null ? o.selectionEnd : o.value.length;
+        var kq = nut.getAttribute('data-lam-nut') === 'am' ? phieuSuaDoiDau(o.value, den) : phieuSuaChenPhay(o.value, tu, den);
+        if (!kq) return;
+        o.value = kq.value;
+        o.dispatchEvent(new Event('input', { bubbles: true }));
+        if (coTieuDiem) { try { o.setSelectionRange(kq.caret, kq.caret); } catch (x) { /* bỏ qua */ } }
+      });
+
       /** CHẤM TẠI CHỖ để hiện ngay. Máy chủ vẫn chấm LẠI và con số ghi vào
        * Sheet là con số của máy chủ — máy em sửa được. */
       function chamTaiCho() {
@@ -2711,6 +2755,9 @@ html.gd-m3 body .lam-nhap {
   box-shadow: inset 0 0 0 1.5px var(--gm-outline); color: var(--gm-on-surface); font-size: 18px; font-weight: 600;
 }
 html.gd-m3 body .lam-nhap::placeholder { color: var(--gm-on-surface-v); font-weight: 500; }
+html.gd-m3 body .lam-nhap-khoi { max-width: none; }
+html.gd-m3 body .lam-nut { min-width: 48px; height: 56px; border: 0; border-radius: 12px; background: transparent; box-shadow: inset 0 0 0 1.5px var(--gm-outline); color: var(--gm-on-surface); font-size: 22px; }
+html.gd-m3 body .lam-nut:focus-visible { outline: 3px solid var(--gm-primary); }
 html.gd-m3 body .lam-nhap:focus { outline: none; box-shadow: inset 0 0 0 2px var(--gm-primary); }
 html.gd-m3 body .sa-blank { border-radius: 12px; }
 html.gd-m3 body .sa-answer { background: var(--gm-tertiary-c); color: var(--gm-on-tertiary-c); border-radius: 12px; }

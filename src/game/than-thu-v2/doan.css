@@ -207,6 +207,9 @@
 .dh .dh-ds button[aria-pressed=true]{background:rgb(20,83,45);color:rgb(255,255,255);box-shadow:none}
 .dh .dh-ds button.dh-chot-y{background:rgb(26,86,219);color:rgb(255,255,255);box-shadow:none}
 .dh .dh-ds button.dh-chot-y:disabled{background:rgb(217,208,186);color:rgb(107,102,88)} /* giữ chỗ khi chưa chọn (không nở hàng khi chọn) */
+.dh .dh-so-khung{--ond-cao:48px;--ond-bo:16px;--ond-vien:rgb(185,176,154);--ond-nut-nen:rgb(255,253,246);--ond-nut-chu:var(--dh-muc);--ond-chu:var(--dh-muc);--ond-nen:rgb(255,253,246);--ond-tieu-diem:rgb(26,86,219)} /* ô đáp số + hai nút "−" "," (ONhapDapSo) trên thẻ giấy ấm */
+.dh .dh-so-khung>.dh-so{width:auto;flex:1 1 auto;min-width:0}
+.dh .dh-so-khung>.ond-nut{font-size:22px;background:var(--ond-nut-nen);box-shadow:none}
 .dh-so{height:48px;width:100%;border-radius:16px;border:0;padding:0 14px;background:rgb(255,253,246);box-shadow:inset 0 0 0 1.5px rgb(185,176,154);font:inherit;font-size:17px;font-weight:700;color:var(--dh-muc)}
 .dh-ket-qua-cau{flex-shrink:0;padding:10px 12px;border-radius:16px;font-size:13.5px;line-height:1.45}
 .dh-ket-qua-cau.dh-dung{background:rgb(223,246,232);color:rgb(15,79,42)}.dh-ket-qua-cau.dh-sai{background:rgb(253,235,224);color:rgb(107,42,16)}
