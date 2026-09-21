@@ -53,7 +53,6 @@ export const TEP = [
   'src/screens/ClassListScreen.tsx',
   'src/screens/GoiLenBangScreen.tsx',
   'src/screens/CaiDatScreen.tsx',
-  'src/components/BangTinGiaoVien.tsx',
   'src/components/HopChonDe.tsx',
   'src/components/KhoiMayChuMoi.tsx',
   'src/components/KhoiMatKhauApp.tsx',

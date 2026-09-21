@@ -293,33 +293,27 @@ describe('nhãn hạn ở app giáo viên: "HH:mm · Thứ … dd/mm/yyyy"; app 
   })
 })
 
-describe('nguồn: năm chỗ đã thay ô, giá trị gửi y cũ (test khoá)', () => {
-  it('PhanCong (hạn mới + gia hạn) · GiaoBaiTap · ExamSetup · BangTin dùng ONgayGio24; không còn input datetime-local/date', () => {
+describe('nguồn: các chỗ còn sống đã thay ô, giá trị gửi y cũ (test khoá; GiaoBaiTap + BangTinGiaoVien đã xoá 21/09 vì là mã chết)', () => {
+  it('PhanCong (hạn mới + gia hạn) · ExamSetup dùng ONgayGio24; không còn input datetime-local/date', () => {
     const pc = doc('src/screens/PhanCongScreen.tsx')
     expect(pc).toContain('<ONgayGio24 nhan="Hạn nộp bài mới"')
     expect(pc).toContain('nhan={`Hạn nộp ${t.maBtvn}`}')
-    expect(doc('src/components/GiaoBaiTap.tsx')).toContain('<ONgayGio24 nhan="Hạn nộp bài tập"')
     expect(doc('src/screens/ExamSetupScreen.tsx')).toContain('<ONgayGio24 nhan="Thời điểm tự động mở ca" value={batDauLocal} onChange={setBatDauLocal} muiGio="may" />')
-    expect(doc('src/components/BangTinGiaoVien.tsx')).toContain('<ONgayGio24 nhan="Ngày xem bảng tin"')
-    for (const f of ['src/screens/PhanCongScreen.tsx', 'src/components/GiaoBaiTap.tsx', 'src/screens/ExamSetupScreen.tsx', 'src/components/BangTinGiaoVien.tsx']) {
+    for (const f of ['src/screens/PhanCongScreen.tsx', 'src/screens/ExamSetupScreen.tsx']) {
       expect(doc(f)).not.toMatch(/type="(datetime-local|date|time)"/)
     }
   })
-  it('GIÁ TRỊ GỬI Y CŨ: PhanCong vẫn hanNhapVietNam(hanMoi, …) và suaGiaoBtvn {hanNop: hanNhapVietNam(...)}; GiaoBaiTap vẫn hanNopISO(hanNgay); ExamSetup (LUỒNG THI) vẫn new Date(batDauLocal) + ISO + kiểm giờ đã qua', () => {
+  it('GIÁ TRỊ GỬI Y CŨ: PhanCong vẫn hanNhapVietNam(hanMoi, …) và suaGiaoBtvn {hanNop: hanNhapVietNam(...)}; ExamSetup (LUỒNG THI) vẫn new Date(batDauLocal) + ISO + kiểm giờ đã qua', () => {
     const pc = doc('src/screens/PhanCongScreen.tsx')
     expect(pc).toContain('hanMoi ? hanNhapVietNam(hanMoi, nowHocTap) : undefined')
     expect(pc).toContain('{hanNop:hanNhapVietNam(suaHan[t.maBtvn], nowHocTap)}')
-    expect(doc('src/components/GiaoBaiTap.tsx')).toContain('const hanNop = hanNopISO(hanNgay)')
     const es = doc('src/screens/ExamSetupScreen.tsx')
     expect(es).toContain('const t = new Date(batDauLocal).getTime()')
     expect(es).toContain("if (t < Date.now() - 60000) return showToast('Giờ bắt đầu đã qua")
     expect(es).toContain('batDauIso = new Date(t).toISOString()')
     expect(es).toContain('const [batDauLocal, setBatDauLocal] = useState(henGioMacDinh)')
   })
-  it('Bảng tin giáo viên hiện hạn "HH:mm · Thứ … dd/mm/yyyy" (lỗi thật trong ảnh thầy: "12:59:00 24/9/2026" kiểu máy); không còn toLocaleString cho hạn', () => {
-    const bt = doc('src/components/BangTinGiaoVien.tsx')
-    expect(bt).toContain('Hạn: {gioDayDu(b.han_nop)}')
-    expect(bt).not.toContain("toLocaleString('vi-VN')")
+  it('gioDayDu: hạn dạng "HH:mm · Thứ … dd/mm/yyyy" (lỗi thật trong ảnh thầy: "12:59:00 24/9/2026" kiểu máy)', () => {
     expect(gioDayDu('2026-09-24T16:59:00Z')).toBe('23:59 · Thứ Năm 24/09/2026')
   })
   it('CSS mới không hex, không !important', () => {

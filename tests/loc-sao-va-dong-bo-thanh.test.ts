@@ -112,7 +112,6 @@ describe('lọc sao — 2 sao (khó) và 1 sao (bản chất)', () => {
   it('mọi màn rút câu đều có hàng nút Mức sao', () => {
     for (const f of [
       'src/components/NutBaiTapPdf.tsx',
-      'src/components/GiaoBaiTap.tsx',
       'src/components/KhoiRutDe.tsx',
       'src/screens/GoiLenBangScreen.tsx',
       'src/components/KhoiBaiLuyen.tsx',

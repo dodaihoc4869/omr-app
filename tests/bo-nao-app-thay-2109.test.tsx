@@ -503,7 +503,7 @@ describe('nguồn: nối vào màn, đổi chữ "bóng" → "thử", không hex
     expect(doc('src/store/appStore.ts')).toContain("moToanCanh: (sbd) => set({ sbdToanCanh: sbd, screen: 'toancanh' })")
     expect(doc('src/screens/HocSinhScreen.tsx')).toContain('<NhatKyDieuChinh sbd={hoSo.em.sbd} />')
     expect(doc('src/screens/CaiDatScreen.tsx')).toContain('<KhoiBoNaoCaiDat />')
-    expect(doc('src/components/BangTinGiaoVien.tsx')).toContain('<KhoiBoNaoDemQua gon ngay={day || undefined} soDongGon={day ? 3 : 0} />')
+    // (Bảng tin giáo viên — nơi dùng bản `gon` — đã xoá 21/09 vì là mã chết.)
   })
   it('giao diện KHÔNG còn chữ "chạy bóng"/"CHẠY BÓNG" (thầy đổi thành "chạy thử"); mã nội bộ cheDo:"bong" giữ nguyên', () => {
     for (const f of ['src/components/KhoiBoNaoDemQua.tsx', 'src/components/NhatKyDieuChinh.tsx', 'src/components/KhoiBoNaoCaiDat.tsx']) {

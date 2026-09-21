@@ -1,5 +1,5 @@
 /* TỆP SINH TỰ ĐỘNG — sửa scripts/sinh-m3-tuong-thich.mjs, KHÔNG sửa tay tệp này.
- * Phạm vi quét: LuyenDeChuan.tsx, KhoiKhacPhuc3CheDo.tsx, ModalKhacPhucCauSai.tsx, KhoiCauSai.tsx, BaoCaoCaThiHocSinhModal.tsx, BaoCaoCaThiPhuHuynhModal.tsx, BieuDoTienBoGoogle.tsx, KhoiBaPhan.tsx, DongDemCau.tsx, PhongChoGame.tsx, BangTinPhuHuynh.tsx, src/screens/ParentPortalScreen.tsx, src/screens/ExamHubScreen.tsx, src/screens/ExamSetupScreen.tsx, src/screens/PhanCongScreen.tsx, src/screens/HocSinhScreen.tsx, src/screens/LichSuCaScreen.tsx, src/screens/ExamMonitorScreen.tsx, src/screens/NganHangDeScreen.tsx, src/screens/CauHoiScreen.tsx, src/screens/ClassListScreen.tsx, src/screens/GoiLenBangScreen.tsx, src/screens/CaiDatScreen.tsx, BangTinGiaoVien.tsx, HopChonDe.tsx, KhoiMayChuMoi.tsx, KhoiMatKhauApp.tsx, NutQuayLai.tsx.
+ * Phạm vi quét: LuyenDeChuan.tsx, KhoiKhacPhuc3CheDo.tsx, ModalKhacPhucCauSai.tsx, KhoiCauSai.tsx, BaoCaoCaThiHocSinhModal.tsx, BaoCaoCaThiPhuHuynhModal.tsx, BieuDoTienBoGoogle.tsx, KhoiBaPhan.tsx, DongDemCau.tsx, PhongChoGame.tsx, BangTinPhuHuynh.tsx, src/screens/ParentPortalScreen.tsx, src/screens/ExamHubScreen.tsx, src/screens/ExamSetupScreen.tsx, src/screens/PhanCongScreen.tsx, src/screens/HocSinhScreen.tsx, src/screens/LichSuCaScreen.tsx, src/screens/ExamMonitorScreen.tsx, src/screens/NganHangDeScreen.tsx, src/screens/CauHoiScreen.tsx, src/screens/ClassListScreen.tsx, src/screens/GoiLenBangScreen.tsx, src/screens/CaiDatScreen.tsx, HopChonDe.tsx, KhoiMayChuMoi.tsx, KhoiMatKhauApp.tsx, NutQuayLai.tsx.
  * Mọi bộ chọn đều mang tiền tố `.m3 ` (không có luật trần): app giáo viên, game thần thú và Bảng nhiệm vụ (.bnv)
  * không bị chạm. Không phân lớp (@layer) nên thắng lớp tiện ích Tailwind. Màu chỉ là biến --m3-*. */
 
@@ -9,7 +9,6 @@
 .m3 .bg-amber-400 { background-color: var(--m3-tren-canh-bao); }
 .m3 .bg-amber-50 { background-color: var(--m3-canh-bao); }
 .m3 .bg-amber-50\/40 { background-color: var(--m3-canh-bao); }
-.m3 .bg-amber-50\/60 { background-color: var(--m3-canh-bao); }
 .m3 .bg-amber-50\/70 { background-color: var(--m3-canh-bao); }
 .m3 .bg-amber-50\/80 { background-color: var(--m3-canh-bao); }
 .m3 .bg-amber-500 { background-color: var(--m3-tren-canh-bao); }
@@ -30,7 +29,6 @@
 .m3 .bg-emerald-400 { background-color: var(--m3-tertiary); }
 .m3 .bg-emerald-50 { background-color: var(--m3-tertiary-container); }
 .m3 .bg-emerald-50\/50 { background-color: var(--m3-tertiary-container); }
-.m3 .bg-emerald-50\/60 { background-color: var(--m3-tertiary-container); }
 .m3 .bg-emerald-500 { background-color: var(--m3-tertiary); }
 .m3 .bg-green-50 { background-color: var(--m3-tertiary-container); }
 .m3 .bg-green-600 { background-color: var(--m3-tertiary); }
@@ -92,8 +90,6 @@
 .m3 .border-blue-600 { border-color: var(--m3-primary); }
 .m3 .border-emerald-100 { border-color: var(--m3-tertiary-container); }
 .m3 .border-emerald-200 { border-color: var(--m3-tertiary-container); }
-.m3 .border-emerald-200\/80 { border-color: var(--m3-tertiary-container); }
-.m3 .border-emerald-200\/90 { border-color: var(--m3-tertiary-container); }
 .m3 .border-emerald-300 { border-color: var(--m3-tertiary-container); }
 .m3 .border-emerald-600 { border-color: var(--m3-tertiary); }
 .m3 .border-green-300\/60 { border-color: var(--m3-tertiary-container); }
@@ -125,7 +121,6 @@
 .m3 .border-transparent { border-color: transparent; }
 .m3 .border-white\/30 { border-color: transparent; }
 .m3 .divide-slate-100 > :not(:last-child) { border-color: var(--m3-surface-container-high); }
-.m3 .from-amber-50\/40 { --tw-gradient-from: var(--m3-canh-bao); }
 .m3 .from-amber-50\/50 { --tw-gradient-from: var(--m3-canh-bao); }
 .m3 .from-blue-50\/40 { --tw-gradient-from: var(--m3-primary-container); }
 .m3 .from-blue-50\/70 { --tw-gradient-from: var(--m3-primary-container); }
@@ -133,9 +128,7 @@
 .m3 .from-blue-50\/90 { --tw-gradient-from: var(--m3-primary-container); }
 .m3 .from-blue-600 { --tw-gradient-from: var(--m3-primary); }
 .m3 .from-blue-600\/20 { --tw-gradient-from: var(--m3-primary); }
-.m3 .from-emerald-50\/40 { --tw-gradient-from: var(--m3-tertiary-container); }
 .m3 .from-indigo-50\/90 { --tw-gradient-from: var(--m3-primary-container); }
-.m3 .from-rose-50\/40 { --tw-gradient-from: var(--m3-error-container); }
 .m3 .from-rose-600 { --tw-gradient-from: var(--m3-error); }
 .m3 .from-sky-100 { --tw-gradient-from: var(--m3-secondary-container); }
 .m3 .from-slate-50 { --tw-gradient-from: var(--m3-surface-container-low); }
@@ -209,7 +202,6 @@
 .m3 .to-indigo-50\/50 { --tw-gradient-to: var(--m3-primary-container); }
 .m3 .to-indigo-600 { --tw-gradient-to: var(--m3-primary); }
 .m3 .to-orange-50\/20 { --tw-gradient-to: var(--m3-canh-bao); }
-.m3 .to-purple-50\/20 { --tw-gradient-to: var(--m3-primary-container); }
 .m3 .to-slate-50\/20 { --tw-gradient-to: var(--m3-surface-container-low); }
 .m3 .via-blue-50 { --tw-gradient-via: var(--m3-primary-container); }
 .m3 .via-blue-50\/70 { --tw-gradient-via: var(--m3-primary-container); }
@@ -272,9 +264,7 @@
 .m3 .hover\:border-rose-300:hover { border-color: var(--m3-error-container); }
 .m3 .hover\:border-slate-200:hover { border-color: var(--m3-surface-container-high); }
 .m3 .hover\:border-slate-300:hover { border-color: var(--m3-outline); }
-.m3 .hover\:text-amber-800:hover { color: var(--m3-tren-canh-bao); }
 .m3 .hover\:text-blue-600:hover { color: var(--m3-primary); }
-.m3 .hover\:text-blue-700:hover { color: var(--m3-primary); }
 .m3 .hover\:text-rose-500:hover { color: var(--m3-error); }
 .m3 .hover\:text-rose-600:hover { color: var(--m3-error); }
 .m3 .hover\:text-slate-600:hover { color: var(--m3-on-surface); }
@@ -314,7 +304,6 @@
   .m3 .dark\:bg-emerald-950 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950\/20 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950\/30 { background-color: var(--m3-tertiary-container); }
-  .m3 .dark\:bg-emerald-950\/40 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950\/50 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950\/60 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950\/70 { background-color: var(--m3-tertiary-container); }
@@ -383,9 +372,6 @@
   .m3 .dark\:border-emerald-700 { border-color: var(--m3-tertiary-container); }
   .m3 .dark\:border-emerald-800 { border-color: var(--m3-tertiary-container); }
   .m3 .dark\:border-emerald-800\/60 { border-color: var(--m3-tertiary-container); }
-  .m3 .dark\:border-emerald-800\/70 { border-color: var(--m3-tertiary-container); }
-  .m3 .dark\:border-emerald-800\/80 { border-color: var(--m3-tertiary-container); }
-  .m3 .dark\:border-emerald-900\/60 { border-color: var(--m3-tertiary-container); }
   .m3 .dark\:border-indigo-800\/80 { border-color: var(--m3-primary-container); }
   .m3 .dark\:border-purple-800 { border-color: var(--m3-primary-container); }
   .m3 .dark\:border-purple-900\/50 { border-color: var(--m3-primary-container); }
@@ -394,7 +380,6 @@
   .m3 .dark\:border-red-800\/60 { border-color: var(--m3-error-container); }
   .m3 .dark\:border-rose-700 { border-color: var(--m3-error-container); }
   .m3 .dark\:border-rose-800 { border-color: var(--m3-error-container); }
-  .m3 .dark\:border-rose-800\/70 { border-color: var(--m3-error-container); }
   .m3 .dark\:border-rose-900 { border-color: var(--m3-error-container); }
   .m3 .dark\:border-rose-900\/40 { border-color: var(--m3-error-container); }
   .m3 .dark\:border-rose-900\/50 { border-color: var(--m3-error-container); }
@@ -452,20 +437,15 @@
   .m3 .dark\:text-white { color: var(--m3-on-surface); }
   .m3 .dark\:to-amber-950\/30 { --tw-gradient-to: var(--m3-canh-bao); }
   .m3 .dark\:to-blue-950\/30 { --tw-gradient-to: var(--m3-primary-container); }
-  .m3 .dark\:to-blue-950\/40 { --tw-gradient-to: var(--m3-primary-container); }
   .m3 .dark\:to-blue-950\/60 { --tw-gradient-to: var(--m3-primary-container); }
-  .m3 .dark\:to-emerald-950\/30 { --tw-gradient-to: var(--m3-tertiary-container); }
   .m3 .dark\:to-indigo-950\/40 { --tw-gradient-to: var(--m3-primary-container); }
   .m3 .dark\:to-indigo-950\/60 { --tw-gradient-to: var(--m3-primary-container); }
-  .m3 .dark\:to-rose-950\/30 { --tw-gradient-to: var(--m3-error-container); }
   .m3 .dark\:to-slate-900 { --tw-gradient-to: var(--m3-surface-container-lowest); }
   .m3 .dark\:via-blue-950\/40 { --tw-gradient-via: var(--m3-primary-container); }
   .m3 .dark\:via-slate-900 { --tw-gradient-via: var(--m3-surface-container-lowest); }
   .m3 .group:hover .dark\:group-hover\:text-blue-300 { color: var(--m3-primary); }
   .m3 .group:hover .dark\:group-hover\:text-blue-400 { color: var(--m3-primary); }
   .m3 .dark\:hover\:bg-amber-950\/40:hover { background-color: var(--m3-canh-bao); }
-  .m3 .dark\:hover\:bg-blue-900\/60:hover { background-color: var(--m3-primary-container); }
-  .m3 .dark\:hover\:bg-blue-950:hover { background-color: var(--m3-primary-container); }
   .m3 .dark\:hover\:bg-blue-950\/40:hover { background-color: var(--m3-primary-container); }
   .m3 .dark\:hover\:bg-purple-950\/40:hover { background-color: var(--m3-primary-container); }
   .m3 .dark\:hover\:bg-rose-950\/40:hover { background-color: var(--m3-error-container); }

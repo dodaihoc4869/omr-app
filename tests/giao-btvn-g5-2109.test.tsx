@@ -79,8 +79,8 @@ describe('Giao bài riêng → màn Giao BTVN chọn sẵn em', () => {
   })
 })
 
-describe('sáu tệp thầy hết mã hex (G5)', () => {
-  const TEP = ['src/screens/PhanCongScreen.tsx', 'src/components/BangTinGiaoVien.tsx', 'src/screens/ExamSetupScreen.tsx', 'src/screens/ClassListScreen.tsx', 'src/screens/CauHoiScreen.tsx', 'src/screens/NganHangDeScreen.tsx']
+describe('năm tệp thầy hết mã hex (G5; BangTinGiaoVien đã xoá 21/09 vì là mã chết)', () => {
+  const TEP = ['src/screens/PhanCongScreen.tsx', 'src/screens/ExamSetupScreen.tsx', 'src/screens/ClassListScreen.tsx', 'src/screens/CauHoiScreen.tsx', 'src/screens/NganHangDeScreen.tsx']
   it.each(TEP)('%s: không mã hex, không hover:bg-[#…]', (f) => {
     expect(doc(f)).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
   })

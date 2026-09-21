@@ -85,12 +85,11 @@ describe('BangTinPhuHuynh dưới M3', () => {
 })
 
 describe('bang-tin.css và tệp CSS dùng chung với giáo viên', () => {
-  it('bang-tin.css: mọi bộ chọn `.m3 `, không !important, không #hex; BangTinPhuHuynh.css (BangTinGiaoVien còn import) KHÔNG bị đụng tới `.m3`', () => {
+  it('bang-tin.css: mọi bộ chọn `.m3 `, không !important, không #hex; BangTinPhuHuynh.css KHÔNG bị đụng tới `.m3`', () => {
     const css = doc('src/components/m3/bang-tin.css').replace(/\/\*[\s\S]*?\*\//g, '')
     expect(css).not.toContain('!important')
     expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
     for (const m of css.matchAll(/([^{}]+)\{/g)) for (const s of m[1].split(',')) expect(s.trim().startsWith('.m3 '), s).toBe(true)
     expect(doc('src/components/BangTinPhuHuynh.css')).not.toContain('.m3')
-    expect(doc('src/components/BangTinGiaoVien.tsx')).toContain("import './BangTinPhuHuynh.css'")
   })
 })

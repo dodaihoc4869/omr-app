@@ -140,9 +140,8 @@ describe('(2) bảng vinh danh trong Bảng tin: dải 4 màu + chữ vàng ch�
     }
   })
 
-  it('app giáo viên không đổi: BangVinhDanh.css / .tsx còn nguyên dải 4 màu + màu #fbbc04 (chỉ luật `.m3 …` mới ghi đè); BangTinGiaoVien không bọc m3', () => {
+  it('app giáo viên không đổi: BangVinhDanh.css / .tsx còn nguyên dải 4 màu + màu #fbbc04 (chỉ luật `.m3 …` mới ghi đè)', () => {
     expect(doc('src/components/BangVinhDanh.css')).toContain('Google 4-color top stripe')
     expect(doc('src/components/BangVinhDanh.css')).toMatch(/\.honors-eyebrow \{[^}]*color: #fbbc04/)
-    expect(doc('src/components/BangTinGiaoVien.tsx')).not.toMatch(/className="m3"|from '\.\/m3'/)
   })
 })

@@ -47,7 +47,7 @@ describe('phạm vi bộ sinh lớp tương thích (nhóm B + C + A2)', () => {
   it('12 tệp của cổng học sinh/phụ huynh (nhóm B + C + A2 + C8 + C9) + 16 tệp APP GIÁO VIÊN (G1 21/09, đổi có chủ ý so với bản "đúng 12 tệp")', () => {
     const ten = TEP.map((t: string) => path.basename(t)).sort()
     const HS_PH = ['BangTinPhuHuynh.tsx', 'BaoCaoCaThiHocSinhModal.tsx', 'BaoCaoCaThiPhuHuynhModal.tsx', 'BieuDoTienBoGoogle.tsx', 'DongDemCau.tsx', 'KhoiBaPhan.tsx', 'KhoiCauSai.tsx', 'KhoiKhacPhuc3CheDo.tsx', 'LuyenDeChuan.tsx', 'ModalKhacPhucCauSai.tsx', 'ParentPortalScreen.tsx', 'PhongChoGame.tsx']
-    const GIAO_VIEN = ['BangTinGiaoVien.tsx', 'CaiDatScreen.tsx', 'CauHoiScreen.tsx', 'ClassListScreen.tsx', 'ExamHubScreen.tsx', 'ExamMonitorScreen.tsx', 'ExamSetupScreen.tsx', 'GoiLenBangScreen.tsx', 'HocSinhScreen.tsx', 'HopChonDe.tsx', 'KhoiMatKhauApp.tsx', 'KhoiMayChuMoi.tsx', 'LichSuCaScreen.tsx', 'NganHangDeScreen.tsx', 'NutQuayLai.tsx', 'PhanCongScreen.tsx']
+    const GIAO_VIEN = ['CaiDatScreen.tsx', 'CauHoiScreen.tsx', 'ClassListScreen.tsx', 'ExamHubScreen.tsx', 'ExamMonitorScreen.tsx', 'ExamSetupScreen.tsx', 'GoiLenBangScreen.tsx', 'HocSinhScreen.tsx', 'HopChonDe.tsx', 'KhoiMatKhauApp.tsx', 'KhoiMayChuMoi.tsx', 'LichSuCaScreen.tsx', 'NganHangDeScreen.tsx', 'NutQuayLai.tsx', 'PhanCongScreen.tsx']
     expect(ten).toEqual([...HS_PH, ...GIAO_VIEN].sort())
   })
   it('ánh xạ cả màu gradient (from-/via-/to-) → biến điểm dừng --tw-gradient-*, mọi luật vẫn có tiền tố `.m3 `', () => {
