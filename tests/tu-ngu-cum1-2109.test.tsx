@@ -117,6 +117,6 @@ describe('Vinh danh: biệt danh đứng sau "Thần thú"; phiếu không có "
   })
   it('html-phieu.ts không còn chữ "nắm chắc" (nộp ≠ nắm; bộ soi giao diện báo LỖI ở dòng 1566)', () => {
     expect(doc('src/lib/html-phieu.ts')).not.toMatch(/nắm chắc/i)
-    expect(doc('src/lib/html-phieu.ts')).toContain('Bắt buộc 100% học sinh hoàn thành để có nền tảng cho các chặng sau.')
+    expect(doc('src/lib/html-phieu.ts')).toContain('Kiến thức cốt lõi. Bắt buộc, em làm trước.')
   })
 })

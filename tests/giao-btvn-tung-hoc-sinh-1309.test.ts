@@ -60,7 +60,7 @@ describe('GIAO BTVN CHO TỪNG HỌC SINH', () => {
     expect(PORTAL).toContain('Làm lại (còn')
     expect(PORTAL).toContain('Đã hết lượt làm lại')
     expect(PORTAL).toContain('Cần Thầy gia hạn để làm lại')
-    expect(PORTAL).toContain('Em đã dùng hết 3 lượt làm lại cho bài tập này')
+    expect(PORTAL).toContain('Em đã dùng hết 3 lượt làm lại bài tập về nhà này')
     expect(PORTAL).toContain('moBaiTap(bt, true)')
   })
 
