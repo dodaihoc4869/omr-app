@@ -155,7 +155,7 @@ export interface DuLieuExp {
  *  - chua_biet : chưa có dữ liệu (máy chủ cũ/lỗi/nguồn trợ lý) — chỉ giữ chỗ, không vẽ.
  * (`pet` lạ, không có trong danh sách game, được giao diện coi như chua_chon.)
  */
-export type TrangThaiThanThu = { kieu: 'co'; pet: string; cap: number; ten?: string } | { kieu: 'chua_chon' } | { kieu: 'chua_biet' }
+export type TrangThaiThanThu = { kieu: 'co'; pet: string; cap: number; ten?: string; /** Cửa hàng phụ kiện MỞ cho em (máy chủ báo, `thanThu.shopBat`); chỉ có khi true. KHÔNG khôi phục từ bản nhớ (cờ có thể đã đổi). */ shopBat?: true } | { kieu: 'chua_chon' } | { kieu: 'chua_biet' }
 
 export function docThanThu(raw: unknown): TrangThaiThanThu {
   if (raw === undefined) return { kieu: 'chua_biet' }
@@ -165,7 +165,7 @@ export function docThanThu(raw: unknown): TrangThaiThanThu {
   const pet = typeof t.pet === 'string' ? t.pet.trim() : ''
   if (!pet) return { kieu: 'chua_chon' }
   const ten = typeof t.nickname === 'string' && t.nickname.trim() ? t.nickname.trim() : undefined
-  return { kieu: 'co', pet, cap: Math.max(1, Math.floor(Number(t.cap) || 1)), ten }
+  return { kieu: 'co', pet, cap: Math.max(1, Math.floor(Number(t.cap) || 1)), ten, ...(t.shopBat === true ? { shopBat: true as const } : {}) }
 }
 
 /** Bài Mẹ giao CŨ chưa làm — đứng RIÊNG như quá hạn: không tính tải, không phải việc hôm nay, không tham gia cổng. */

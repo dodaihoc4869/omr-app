@@ -22,7 +22,7 @@ export function cuaGame(doanMo:boolean,now=Date.now()):{nav:readonly (readonly [
  return doanMo?{nav:[['home','Đảo thần thú'],['doan','Đoàn Hộ Tống'],['arena','Võ đài thứ Bảy'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:laThuBayVn(now)}
   :{nav:[['home','Đảo thần thú'],['arena','Hộ Tống Linh Tâm'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:true}
 }
-function manDauTu(prop:unknown):Tab{let luu='';try{luu=sessionStorage.getItem(KHOA_MAN_DAU)??'';sessionStorage.removeItem(KHOA_MAN_DAU)}catch{/* Storage may be disabled. */}return prop==='doan'||luu==='doan'?'doan':'home'}
+function docManDau(prop:unknown):{tab:Tab;shop:boolean}{let luu='';try{luu=sessionStorage.getItem(KHOA_MAN_DAU)??'';sessionStorage.removeItem(KHOA_MAN_DAU)}catch{/* Storage may be disabled. */}return {tab:prop==='doan'||luu==='doan'?'doan':'home',shop:prop==='shop'||luu==='shop'}} // 'shop' = mở thẳng Cửa hàng phụ kiện (chỉ khi máy chủ báo shopBat)
 import ProgressChart from './ProgressChart'
 import TheCau from '../../components/TheCau'
 import type {TheCauProps} from '../../components/TheCau'
@@ -36,7 +36,7 @@ import type {ShieldState} from './shields'
 interface Profile {nickname?:string;academic?:{total:number;today:number;lastGain:number;dailyLimit:number};shields?:ShieldState;pet:string;choice:boolean;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null}
 interface Feedback {correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}
 interface Result {ok:boolean;doanMo?:boolean;dailyUsed?:number;suggestions?:{title:string;source:string;part:string}[];history?:{day:string;total:number;correct:number}[];mode?:Mode;answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[];pass?:string;tasks?:{id:string;dang:string}[];error?:string;profile?:Profile;revision?:number;remaining?:number;questions?:Question[];id?:string;message?:string;missing?:number;correct?:boolean;answer?:string;solution?:unknown;reward?:number;stage?:number;solutionImages?:HinhAnh[]}
-interface Props {sbd:string;token?:string;manDau?:'home'|'doan';onDong:()=>void;[key:string]:unknown}
+interface Props {sbd:string;token?:string;manDau?:'home'|'doan'|'shop';onDong:()=>void;[key:string]:unknown}
 export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  const [doanMo,setDoanMo]=useState(false)
  const [,setExpPending]=useState(0)
@@ -45,7 +45,7 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  const [zoom,setZoom]=useState('')
  const [tasks,setTasks]=useState<{id:string;dang:string}[]>([])
  const [token,setToken]=useState(()=>{try{return sessionStorage.getItem(`game-v2:${sbd}`)||initialToken||''}catch{return initialToken||''}});const [password,setPassword]=useState('')
- const [profile,setProfile]=useState<Profile|null>(null);const [,setRevision]=useState(0);const [tab,setTab]=useState<Tab>(()=>manDauTu(manDau))
+ const [profile,setProfile]=useState<Profile|null>(null);const [,setRevision]=useState(0);const [manDauDoc]=useState(()=>docManDau(manDau));const [tab,setTab]=useState<Tab>(manDauDoc.tab)
  const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [maLoi,setMaLoi]=useState('');const [notice,setNotice]=useState('');const [syncLeft,setSyncLeft]=useState<number|null>(null)
  const [mediaFailed,setMediaFailed]=useState(false)
  const [battleAnswers,setBattleAnswers]=useState<BattleAnswer[]>([]);const [battleEvent,setBattleEvent]=useState(0)
@@ -109,7 +109,7 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
    </div>}
    </>}
    {/* ĐẢO THẦN THÚ bản mới (Code 6, docs/hop-dong-dao-than-thu-prop-2109.md): MỘT vỏ lo trọn chọn thú → đảo → thám hiểm → sổ tay → túi đồ + thanh dưới. Vỏ tự gọi choose/rename/recommendations/so-tay/resume/sync/start/answer/complete/shield-use/invest qua `request`. Lượt Võ đài (arena) vẫn ở tab learn cũ. */}
-   {(profile.choice||tab==='home')&&<Suspense fallback={<p role="status" className="spirit-status">Đang mở đảo…</p>}><DaoThanThu sbd={sbd} profile={profile} doanMo={doanMo} call={request} tasks={tasks} moiDoan={doanMo&&tab==='doan'} onMoDoan={()=>setTab('doan')} onMoVoDai={()=>setTab('arena')} onMoTienBo={()=>setTab('progress')} onDong={onDong}/></Suspense>}
+   {(profile.choice||tab==='home')&&<Suspense fallback={<p role="status" className="spirit-status">Đang mở đảo…</p>}><DaoThanThu sbd={sbd} token={token} moShopLucDau={manDauDoc.shop} profile={profile} doanMo={doanMo} call={request} tasks={tasks} moiDoan={doanMo&&tab==='doan'} onMoDoan={()=>setTab('doan')} onMoVoDai={()=>setTab('arena')} onMoTienBo={()=>setTab('progress')} onDong={onDong}/></Suspense>}
    {!profile.choice&&<>
    {doanMo&&tab==='doan'&&<Suspense fallback={<p role="status" className="spirit-status">Đang mở đường cho Đoàn Hộ Tống…</p>}><DoanHoTong call={request} sbd={sbd} pet={petIndex} cap={profile.cap} onDong={()=>setTab('home')} onVeBangNhiemVu={onDong}/></Suspense>}
    {cuaGame(doanMo).voDaiMo?<div hidden={tab!=='arena'}><EscortRoom storageKey={sbd} call={request} active={tab==='arena'}/></div>:tab==='arena'&&<div className="spirit-panel"><small>SỰ KIỆN TUẦN</small><h2>Võ đài thứ Bảy</h2><p>Đấu đội 2 đấu 2 mở vào <strong>thứ Bảy hằng tuần</strong>. Các ngày còn lại, cả lớp cùng đi <strong>Đoàn Hộ Tống</strong>: mỗi ngày một chặng 5–6 phút, làm đúng câu vừa sức của mình là góp sức cho cả đoàn.</p><button className="spirit-primary" onClick={()=>setTab('doan')}>Vào Đoàn Hộ Tống</button></div>}

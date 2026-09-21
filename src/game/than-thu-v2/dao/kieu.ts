@@ -30,9 +30,11 @@ export interface DaoKetQua{ok:boolean;error?:string;message?:string;missing?:num
  luot?:unknown;maiCho?:unknown;het?:boolean
  /** Thưởng ĐÁNG LẼ của câu — chỉ có khi trần 120 EXP/ngày từ game đã CẮT `reward` (máy chủ Đợt 1). */
  thuongGoc?:number
- dang?:{key:string;ten:string;chuong:string}[]}
+ dang?:{key:string;ten:string;chuong:string}[]
+ /** Cửa hàng phụ kiện MỞ cho em này (cờ `shop_phu_kien` bật VÀ em thuộc `chiSbd` nếu có). Vắng / false ⇒ KHÔNG có cửa vào. Máy chủ gửi kèm `recommendations` — không thêm lượt gọi. */
+ shopBat?:boolean}
 /** = `request` của Game.tsx: ném Error khi máy chủ trả `ok:false`, tự cập nhật profile. */
 export type DaoCall=(action:string,data?:Record<string,unknown>)=>Promise<DaoKetQua>
 export type ManDao='dao'|'so-tay'|'tui-do'
-export interface DaoThanThuProps{sbd:string;profile:DaoProfile;doanMo:boolean;call:DaoCall;exp?:DaoExp|null;chuoiNgay?:number;tasks?:{id:string;dang:string}[];moiDoan?:boolean
+export interface DaoThanThuProps{sbd:string;/** Token phiên game (chỉ để nối Cửa hàng phụ kiện thật). */token?:string;/** Cửa vào từ ngoài (Bảng nhiệm vụ): mở thẳng Cửa hàng khi máy chủ báo `shopBat`. */moShopLucDau?:boolean;profile:DaoProfile;doanMo:boolean;call:DaoCall;exp?:DaoExp|null;chuoiNgay?:number;tasks?:{id:string;dang:string}[];moiDoan?:boolean
  onMoDoan:()=>void;onMoVoDai?:()=>void;onMoTienBo?:()=>void;onDong:()=>void}

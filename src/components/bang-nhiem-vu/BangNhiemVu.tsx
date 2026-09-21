@@ -17,8 +17,9 @@ import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, PawPrint, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
+import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, PawPrint, RefreshCw, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react'
 import { chuDangCho } from '../../lib/hang-doi-nop'
+import { chuCuaHang } from '../../game/than-thu-v2/shop/chu-shop'
 import { boGameChoPhuHuynh, sachBoNaoChoPhuHuynh, type DuLieuBangNhiemVu, type HanhDongNhiemVu, type TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
@@ -109,6 +110,8 @@ export interface BangNhiemVuProps {
   dangLamMoi?: boolean
   /** Số bài đã lưu ở máy đang chờ máy chủ nhận (hàng đợi nộp lại tự động). 0/vắng ⇒ không hiện dải. */
   dangChoNop?: number
+  /** Bấm "Cửa hàng" (dưới đầu trang) ⇒ mở thẳng Cửa hàng phụ kiện. Chỉ hiện khi máy chủ báo `thanThu.shopBat` (cờ tắt ⇒ không có nút). App phụ huynh không có. */
+  onMoShop?: () => void
   onHanhDong?: (hanhDong: HanhDongNhiemVu) => void
   onMoThanThu?: () => void
   /** Mở game ở màn Đoàn Hộ Tống. Thẻ mời chỉ hiện khi CÓ hàm này, là học sinh, và máy chủ báo `duLieu.doanMo === true`. */
@@ -148,6 +151,7 @@ export default function BangNhiemVu({
   ghiChuNguon,
   dangLamMoi,
   dangChoNop = 0,
+  onMoShop,
   onHanhDong,
   onMoThanThu,
   onLenDuongDoan,
@@ -271,6 +275,15 @@ export default function BangNhiemVu({
           mucMenu={mucMenu}
           khePhai={khePhai}
         />
+
+        {!laPh && onMoShop && duLieu.thanThu.kieu === 'co' && duLieu.thanThu.shopBat === true && (
+          <div className="bnv-trong-nut" data-vung="cua-hang">
+            <button type="button" className="bnv-nut-vien" data-vung="mo-cua-hang" onClick={onMoShop}>
+              <ShoppingBag size={18} aria-hidden="true" />
+              <span>{chuCuaHang}</span>
+            </button>
+          </div>
+        )}
 
         {dangChoNop > 0 && (
           <div className="bnv-dang-lam-moi" role="status" data-vung="dang-cho-nop">

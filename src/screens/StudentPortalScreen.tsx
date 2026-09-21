@@ -1405,6 +1405,15 @@ export default function StudentPortalScreen() {
           dangTai={!sanSangBang && !dungBanNho}
           dangLamMoi={keHoachNgay.dangLamMoi}
           dangChoNop={hangNop.soCho}
+          onMoShop={() => {
+            // Cửa vào Cửa hàng phụ kiện (chỉ có nút khi máy chủ báo `thanThu.shopBat`): khoá màn đầu = 'shop' rồi mở game; Đảo mở thẳng Cửa hàng khi `recommendations` cũng báo shopBat.
+            try {
+              sessionStorage.setItem(KHOA_MAN_DAU_GAME, 'shop')
+            } catch {
+              /* máy chặn lưu: game vẫn mở ở màn Đảo */
+            }
+            moGame()
+          }}
           mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
           khePhai={
             <ThongBaoHocSinh

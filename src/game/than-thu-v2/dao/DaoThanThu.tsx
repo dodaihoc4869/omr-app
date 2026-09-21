@@ -1,4 +1,4 @@
-import {useCallback,useEffect,useRef,useState} from 'react'
+import {lazy,Suspense,useCallback,useEffect,useRef,useState} from 'react'
 import type {ReactNode} from 'react'
 import type {BattleAnswer} from '../learning-battle'
 import ChonBanDongHanh,{theMoDau} from './ChonBanDongHanh'
@@ -12,11 +12,15 @@ import type {LuotNgay,MaiCho} from './dao-core'
 import type {CauDao,DaoKetQua,DaoThanThuProps,ManDao} from './kieu'
 import {docLuotCauNgay,type LuotCauNgay} from '../chu-het-luot'
 import {laLoiHetTran,maCuaLoi} from '../loi-het-tran'
+import {chuCuaHang,chuDangTai} from '../shop/chu-shop'
 import './dao.css'
+
+const ManShopThat=lazy(()=>import('./ManShopThat')) // nạp lười: chỉ tải khi em bấm Cửa hàng (và chỉ có nút khi máy chủ báo shopBat)
 
 interface Luot{id:string;cau:CauDao[]}
 const THONG_BAO_TRONG='Đảo chưa có câu hợp với phần em đã học. Em làm Bài tập về nhà trước, rồi quay lại lên đường nhé.'
-const ICON:Record<ManDao|'doan',ReactNode>={
+const ICON:Record<ManDao|'doan'|'cua-hang',ReactNode>={
+ 'cua-hang':<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>,
  dao:<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12 3 3 10v11h6v-6h6v6h6V10z"/></svg>,
  doan:<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
  'so-tay':<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>,
@@ -27,11 +31,13 @@ const ICON:Record<ManDao|'doan',ReactNode>={
  * VỎ của Đảo thần thú bản mới — component DUY NHẤT `Game.tsx` cần nạp (docs/hop-dong-dao-than-thu-prop-2109.md).
  * Chỉ đổi cách kể: mọi lệnh máy chủ (choose, rename, sync, start, resume, answer, complete, invest, shield-use) GIỮ NGUYÊN.
  */
-export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNgay,tasks,moiDoan,onMoDoan,onMoVoDai,onMoTienBo,onDong}:DaoThanThuProps){
+export default function DaoThanThu({sbd,token,moShopLucDau,profile,doanMo,call:callProp,exp,chuoiNgay,tasks,moiDoan,onMoDoan,onMoVoDai,onMoTienBo,onDong}:DaoThanThuProps){
  // `call` của nơi nối có thể đổi danh tính mỗi lần vẽ ⇒ giữ qua ref, hiệu ứng nạp dữ liệu KHÔNG phụ thuộc vào nó (tránh vòng lặp vẽ lại)
  const callRef=useRef(callProp);callRef.current=callProp
  const call=useCallback<DaoThanThuProps['call']>((action,data)=>callRef.current(action,data),[])
  const [man,setMan]=useState<ManDao>('dao'),[dangTham,setDangTham]=useState(false)
+ // Cửa hàng phụ kiện: CHỈ khi máy chủ báo `shopBat` (kèm `recommendations`, không thêm lượt gọi). Cờ tắt / Worker cũ ⇒ false ⇒ không nút, không tải mã cửa hàng.
+ const [shopBat,setShopBat]=useState(false),[dangShop,setDangShop]=useState(false),daMoShopLucDau=useRef(false)
  const [busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[maLoi,setMaLoi]=useState(''),[bao,setBao]=useState('')
  const [goiY,setGoiY]=useState<{title:string}[]|null>(null),[conLai,setConLai]=useState<number|null>(null),[luotCau,setLuotCau]=useState<LuotCauNgay|null>(null)
  // Đợt 2: lượt trong ngày (recommendations/start) + "Mai thú chờ em" (start khi hết lượt) — đọc chặt; máy chủ cũ không gửi ⇒ null ⇒ không dải lượt.
@@ -44,9 +50,10 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  const hocTen=(cau:readonly CauDao[])=>setTenDang(cu=>{const moi={...cu};for(const c of cau)if(c.tenDang)moi[c.dang??c.group]=c.tenDang;return moi})
 
  // gợi ý hôm nay + danh mục sổ tay: đọc-chỉ, hỏng thì màn vẫn chạy (Worker cũ chưa có `so-tay`)
- const napGoiY=useCallback(()=>{void call('recommendations').then(r=>{if(conSong.current){setGoiY(r.suggestions??[]);setConLai(typeof r.remaining==='number'?r.remaining:null);setLuotCau(docLuotCauNgay(r));if(r.luot!==undefined)setLuotNgay(docLuotNgay(r.luot))}}).catch(()=>{})},[call])
+ const napGoiY=useCallback(()=>{void call('recommendations').then(r=>{if(conSong.current){setGoiY(r.suggestions??[]);setShopBat(r.shopBat===true);setConLai(typeof r.remaining==='number'?r.remaining:null);setLuotCau(docLuotCauNgay(r));if(r.luot!==undefined)setLuotNgay(docLuotNgay(r.luot))}}).catch(()=>{})},[call])
  // Máy chủ báo HẾT TRẦN câu trong ngày giữa lượt ⇒ nạp lại số lượt để màn Đảo nói đúng (khoá LÊN ĐƯỜNG + "đã đi N/36 câu") khi em bấm VỀ ĐẢO.
  useEffect(()=>{if(laLoiHetTran(loi,maLoi))napGoiY()},[loi,maLoi,napGoiY])
+ useEffect(()=>{if(shopBat&&moShopLucDau&&token&&!daMoShopLucDau.current){daMoShopLucDau.current=true;setDangShop(true)}},[shopBat,moShopLucDau,token])
  const daChon=!profile.choice
  useEffect(()=>{if(!daChon)return;napGoiY();void call('so-tay').then(r=>{if(conSong.current&&Array.isArray(r.dang)){setDanhMuc(r.dang);setTenDang(cu=>({...Object.fromEntries(r.dang!.filter(d=>d.ten).map(d=>[d.key,d.ten])),...cu}))}}).catch(()=>{})},[daChon,call,napGoiY])
 
@@ -84,13 +91,14 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  if(dangTham&&luot)return <div className="dao dao-vo dao-vo-tham" data-thu={chiSoThu(profile.pet)}><ThamHiem profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} xong={xong} tongKet={{dung:ketQua.filter(k=>k.correct).length,tong:luot.cau.length,...thuong}}
   busy={busy} loi={loi} maLoi={maLoi} thongBao={bao} onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onVeDao={veDao} onChuyenMoi={conLai===0?undefined:()=>{setLuot(null);void lenDuong()}} onMoSoTay={()=>{veDao();setMan('so-tay')}}/></div>
 
- const muc:[ManDao|'doan',string][]=[['dao','Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ']]
+ if(dangShop&&token)return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}><Suspense fallback={<p role="status" className="spirit-status">{chuDangTai}</p>}><ManShopThat token={token} pet={chiSoThu(profile.pet)} cap={profile.cap} tenThu={profile.nickname} onDong={()=>setDangShop(false)}/></Suspense></div>
+ const muc:[ManDao|'doan'|'cua-hang',string][]=[['dao','Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ'],...(shopBat&&token?[['cua-hang',chuCuaHang]] as [ManDao|'doan'|'cua-hang',string][]:[])]
  return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}>
   {man==='dao'&&<DaoCuaEm profile={profile} exp={exp} chuoiNgay={chuoiNgay} goiY={goiY} conLai={conLai} luotCau={luotCau} luotNgay={luotNgay} maiCho={maiCho} tenDang={tenDang} tasks={tasks} busy={busy} loi={loi||loiChon} thongBao={bao||(luot&&!xong?'Em đang đi dở một chuyến — bấm LÊN ĐƯỜNG để đi tiếp.':'')}
    onLenDuong={()=>void lenDuong()} onOnTheoNhac={dang=>void lenDuong('repair',dang)} onNap={()=>void chay(async()=>{await call('invest')})} onDoiTen={ten=>void chay(async()=>{await call('rename',{name:ten});setLoiChon('')})}/>}
   {man==='so-tay'&&<SoTay profile={profile} danhMuc={danhMuc} tenDang={tenDang}/>}
   {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onDungKhien={id=>chay(async()=>{await call('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}
   <button type="button" className="dao-ve-app" onClick={onDong}>Về app học sinh</button>
-  <nav className="dao-nav" aria-label="Mục của đảo">{muc.map(([id,nhan])=><button type="button" key={id} aria-current={id===man?'page':undefined} onClick={()=>{if(id==='doan')onMoDoan();else setMan(id)}}><span>{ICON[id]}</span>{nhan}</button>)}</nav>
+  <nav className="dao-nav" aria-label="Mục của đảo">{muc.map(([id,nhan])=><button type="button" key={id} aria-current={id===man?'page':undefined} onClick={()=>{if(id==='doan')onMoDoan();else if(id==='cua-hang')setDangShop(true);else setMan(id)}}><span>{ICON[id]}</span>{nhan}</button>)}</nav>
  </div>
 }
