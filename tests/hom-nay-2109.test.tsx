@@ -45,6 +45,7 @@ beforeEach(() => {
     const ok = (b: unknown) => ({ ok: true, status: 200, json: async () => b })
     if (nap.cho) return new Promise(() => {})
     if (u === '/ke-hoach/hom-nay-thay') return nap.hom ? ok({ ok: true, ...(nap.hom as object) }) : { ok: false, status: 404, json: async () => ({ ok: false }) }
+    if (u === '/gv/can-giup') return { ok: false, status: 404, json: async () => ({ ok: false }) } // bước 3: chưa có lệnh chi tiết ⇒ rơi về danh sách rút gọn (test này khoá danh sách rút gọn)
     if (u === '/ke-hoach/do-phu-phuc-vu') return nap.cau ? ok({ ok: true, ...(nap.cau as object) }) : ok({ ok: false })
     void init
     return ok({ ok: true })

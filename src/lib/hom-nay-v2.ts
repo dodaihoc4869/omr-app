@@ -212,3 +212,113 @@ export async function layBangTinNgay(): Promise<KetQuaLenh<BangTinNgay>> {
     },
   }
 }
+
+// ─────────────────────────────── EM CẦN THẦY GIÚP (chi tiết dạng) ───────────────────────────────
+
+export type BacDang = 'biet' | 'hieu' | 'van_dung' | ''
+export const TEN_BAC_DANG: Record<Exclude<BacDang, ''>, string> = { biet: 'Biết', hieu: 'Hiểu', van_dung: 'Vận dụng' }
+export type XuHuong = 'giam' | 'tang' | 'giu' | ''
+/** Nói SỰ VIỆC (không phán xét em): "đang giảm" / "đang lên" / "giữ nguyên". */
+export const TEN_XU_HUONG: Record<Exclude<XuHuong, ''>, string> = { giam: 'đang giảm', tang: 'đang lên', giu: 'giữ nguyên' }
+
+export interface DangCanGiup {
+  ma: string
+  ten: string
+  sai: number | null
+  gap: number | null
+  bac: BacDang
+  xuHuong: XuHuong
+}
+export interface EmCanGiup {
+  sbd: string
+  hoTen: string
+  lop: string
+  lyDo: 'tre_nhip' | 'tut_bac' | 'dang_yeu' | ''
+  ngayTre: number | null
+  dang: DangCanGiup[]
+}
+export interface CanGiup {
+  tong: number
+  lop: string[]
+  ds: EmCanGiup[]
+}
+
+const so = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null)
+const chu = (v: unknown): string => (typeof v === 'string' ? v : '')
+
+/** Câu "vì sao em cần giúp" bằng SỐ, không kết luận năng lực. */
+export function lyDoCanGiup(e: Pick<EmCanGiup, 'lyDo' | 'ngayTre'>): string {
+  if (e.lyDo === 'tre_nhip') return e.ngayTre != null ? `Trễ nhịp ${e.ngayTre} ngày (chưa làm câu nào trong thời gian ấy)` : 'Trễ nhịp'
+  if (e.lyDo === 'tut_bac') return 'Tụt bậc ở một dạng trong 3 ngày'
+  if (e.lyDo === 'dang_yeu') return 'Sai nhiều ở một dạng trong 7 ngày'
+  return 'Cần thầy để ý'
+}
+
+export function docCanGiup(j: Record<string, unknown>): CanGiup {
+  const ds = Array.isArray(j.ds) ? (j.ds as Record<string, unknown>[]) : []
+  const em: EmCanGiup[] = []
+  for (const x of ds) {
+    if (!x || typeof x !== 'object' || !chu(x.sbd)) continue
+    const lyDo = x.lyDo === 'tre_nhip' || x.lyDo === 'tut_bac' || x.lyDo === 'dang_yeu' ? x.lyDo : ''
+    const dang = (Array.isArray(x.dang) ? (x.dang as Record<string, unknown>[]) : [])
+      .filter((d) => d && (chu(d.ten) || chu(d.ma)))
+      .map((d): DangCanGiup => ({
+        ma: chu(d.ma),
+        ten: chu(d.ten) || chu(d.ma),
+        sai: so(d.sai),
+        gap: so(d.gap),
+        bac: d.bac === 'biet' || d.bac === 'hieu' || d.bac === 'van_dung' ? d.bac : '',
+        xuHuong: d.xuHuong === 'giam' || d.xuHuong === 'tang' || d.xuHuong === 'giu' ? d.xuHuong : '',
+      }))
+    em.push({ sbd: chu(x.sbd), hoTen: chu(x.hoTen), lop: chu(x.lop), lyDo, ngayTre: so(x.ngayTre), dang })
+  }
+  return { tong: so(j.tong) ?? em.length, lop: Array.isArray(j.lop) ? (j.lop as unknown[]).map(String) : [], ds: em }
+}
+
+/** Danh sách em cần thầy giúp, kèm chi tiết dạng (lệnh thầy CHỈ ĐỌC `/gv/can-giup {lop?}`, Code 3). Chưa có lệnh ⇒ lời thật; màn rơi về danh sách rút gọn của `/ke-hoach/hom-nay-thay`. */
+export async function layCanGiup(lop?: string): Promise<KetQuaLenh<CanGiup>> {
+  const r = await goiLenh('/gv/can-giup', lop ? { lop } : {}, 'Máy chủ chưa có lệnh chi tiết "Em cần thầy giúp" — đang hiện danh sách rút gọn.')
+  if (!r.ok) return r
+  // Trả lời thiếu hẳn `ds` ≠ "không có em nào": không được nói "hôm nay không ai cần giúp" khi thật ra chưa đọc được.
+  if (!Array.isArray(r.du.ds)) return { ok: false, loai: 'khong_doc_duoc', chu: 'Máy chủ trả danh sách em cần giúp không đúng dạng — đang hiện danh sách rút gọn.' }
+  return { ok: true, du: docCanGiup(r.du) }
+}
+
+// ─────────────────────────────── VINH DANH HÔM NAY ───────────────────────────────
+
+export interface NguoiVinhDanh {
+  sbd: string
+  hoTen: string
+  lop: string
+}
+export interface VinhDanhNgay {
+  ngay: string
+  chamNhat: (NguoiVinhDanh & { exp: number }) | null
+  tienBoNhat: (NguoiVinhDanh & { soDangLenBac: number; soCauDungLai: number }) | null
+  benBiNhat: (NguoiVinhDanh & { chuoiNgay: number }) | null
+  diemCao: (NguoiVinhDanh & { diem: number; tenCa: string }) | null
+}
+
+function docNguoi(v: unknown): NguoiVinhDanh | null {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Record<string, unknown>
+  return chu(o.hoTen) || chu(o.sbd) ? { sbd: chu(o.sbd), hoTen: chu(o.hoTen) || `SBD ${chu(o.sbd)}`, lop: chu(o.lop) } : null
+}
+
+export function docVinhDanh(j: Record<string, unknown>): VinhDanhNgay {
+  const g = (k: string) => (j[k] && typeof j[k] === 'object' ? (j[k] as Record<string, unknown>) : null)
+  const a = docNguoi(g('chamNhat')), b = docNguoi(g('tienBoNhat')), c = docNguoi(g('benBiNhat')), d = docNguoi(g('diemCao'))
+  return {
+    ngay: chu(j.ngay),
+    chamNhat: a && so(g('chamNhat')?.exp) != null ? { ...a, exp: so(g('chamNhat')!.exp)! } : null,
+    tienBoNhat: b ? { ...b, soDangLenBac: so(g('tienBoNhat')!.soDangLenBac) ?? 0, soCauDungLai: so(g('tienBoNhat')!.soCauDungLai) ?? 0 } : null,
+    benBiNhat: c && so(g('benBiNhat')?.chuoiNgay) != null ? { ...c, chuoiNgay: so(g('benBiNhat')!.chuoiNgay)! } : null,
+    diemCao: d && so(g('diemCao')?.diem) != null ? { ...d, diem: so(g('diemCao')!.diem)!, tenCa: chu(g('diemCao')!.tenCa) } : null,
+  }
+}
+
+/** Vinh danh theo ngày (lệnh thầy CHỈ ĐỌC `/gv/vinh-danh-ngay`, Code 3). Không có số ⇒ ô thu gọn một dòng, KHÔNG bịa. */
+export async function layVinhDanhNgay(): Promise<KetQuaLenh<VinhDanhNgay>> {
+  const r = await goiLenh('/gv/vinh-danh-ngay', {}, 'Máy chủ chưa có lệnh vinh danh theo ngày.')
+  return r.ok ? { ok: true, du: docVinhDanh(r.du) } : r
+}

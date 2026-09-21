@@ -2,12 +2,13 @@
 // Bỏ hẳn: khối "Việc cần theo dõi hôm nay", "Bảng tin của thầy" + ô ngày kiểu máy, "Hoạt động dạy học trong ngày", "Bài đã giao" (gộp vào ô Việc gấp). Chữ theo docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md.
 import { useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '../store/appStore'
-import { cauLyDo, hanhDongCua, layCauToiHan, layHomNay, NHAN_HANH_DONG, ngayDai, phanTram, type CauToiHan, type HomNay, type HomNayEm } from '../lib/hom-nay-api'
+import { layCauToiHan, layHomNay, ngayDai, phanTram, type CauToiHan, type HomNay } from '../lib/hom-nay-api'
 import { layBangTinNgay, type BangTinNgay } from '../lib/hom-nay-v2'
 import type { KetQuaLenh } from '../lib/goi-lenh-thay'
 import KhoiBoNaoDemQua from '../components/KhoiBoNaoDemQua'
 import OTraCuu from '../components/hom-nay/OTraCuu'
 import ViecGap from '../components/hom-nay/ViecGap'
+import EmCanGiup from '../components/hom-nay/EmCanGiup'
 import '../styles/hom-nay.css'
 import '../styles/hom-nay-v2.css'
 
@@ -58,11 +59,6 @@ export default function HomNayScreen() {
   const dangDuocDung = useMemo(() => hom?.dangYeu?.[0] ?? null, [hom])
   const dsTraCuu = useMemo(() => classList.map((h) => ({ sbd: h.sbd, hoTen: h.hoTen, lop: h.lop })), [classList])
 
-  const lamHanhDong = (e: HomNayEm) => {
-    if (hanhDongCua(e) === 'dua_vao_buoi_chua') setScreen('goilenbang')
-    else moHoSoEm(e.sbd)
-  }
-
   return (
     <div className="gv-page hn2" style={{ fontFamily: 'var(--sans)' }}>
       <header className="hn2-dau">
@@ -88,36 +84,7 @@ export default function HomNayScreen() {
       <div className="hn2-luoi-a">
         <ViecGap />
 
-        <section className="hn2-the" aria-labelledby="hn2-giup" data-khoi="em-can-giup">
-          <div className="hn2-em-dau">
-            <h2 id="hn2-giup" className="hn2-tieu-de">
-              Em cần thầy giúp hôm nay
-            </h2>
-            {ty && ty.tong > ty.ds.length && (
-              <button type="button" className="hn2-lien-ket" onClick={() => setScreen('hocsinh')}>
-                Xem cả {ty.tong} em
-              </button>
-            )}
-          </div>
-          {!ty && <p className="hn2-trong">{tai ? 'Đang tải…' : `Danh sách em cần giúp: ${lyDo('canYTuong')}${/[.!]$/.test(lyDo('canYTuong')) ? '' : '.'}`}</p>}
-          {ty && ty.ds.length === 0 && <p className="hn2-trong">Hôm nay không có em nào cần thầy giúp.</p>}
-          {ty?.ds.map((e) => (
-            <div className="hn2-em" key={e.sbd}>
-              <span className="hn2-em-chu hn2-em-chu--chua_mo" aria-hidden="true">
-                {e.hoTen.trim().split(/\s+/).pop()?.[0]?.toUpperCase() ?? '?'}
-              </span>
-              <div className="hn2-em-thong-tin">
-                <span className="hn2-em-ten">
-                  {e.hoTen} <span className="hn2-em-lop">· {e.lop}</span>
-                </span>
-                <span className="hn2-em-tt">{cauLyDo(e)}</span>
-              </div>
-              <button type="button" className="hn2-nut hn2-nut--vien hn2-nut--nho" onClick={() => lamHanhDong(e)}>
-                {NHAN_HANH_DONG[hanhDongCua(e)]}
-              </button>
-            </div>
-          ))}
-        </section>
+        <EmCanGiup rutGon={ty} dangTaiRutGon={tai} lyDoRutGon={lyDo('canYTuong')} onMoEm={moHoSoEm} />
       </div>
 
       <div className="hn2-luoi-b">
