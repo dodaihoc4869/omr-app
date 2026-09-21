@@ -3,6 +3,7 @@
 //   POST /ph/chi-tiet-cau-ve-con {pass|sbd, qid} ⇒ lời giải của MỘT câu con đã làm
 // Nguyên tắc: (1) khối nào sai dạng ⇒ VẮNG (màn ẩn, không bịa 0/mảng rỗng giả); (2) CÂU BỊ CHE (`che`) chỉ giữ {luc, nguon, che, giay?} — mọi trường khác (đề, đáp án, đúng/sai, tên dạng, mã câu) BỊ BỎ
 // dù JSON lỡ có: điện thoại phụ huynh không được thành đường lộ đáp án; (3) không trường nào của game (thần thú, EXP, khiên…) được đi qua đây; (4) không ném lỗi.
+import { chuanHoaLoiGiaiCau } from '../chuan-hoa-loi-giai'
 export type NguonHien = 'on_lai' | 'btvn' | 'thu_thach_rieng' | 'luyen_dang_vap' | 'gia_dinh_giao' | 'ca_kiem_tra' | 'len_bang' | 'khac_phuc' | 'luyen_de'
 export type LyDoChe = 'chua_cong_bo' | 'chua_nop'
 export type TenBac = 'biet' | 'hieu' | 'van_dung'
@@ -24,25 +25,43 @@ export interface CaGanNhat {
 }
 export interface DiemTienBo { ngay: string; diem: number; maCa: string; tenCa: string }
 export interface DangTienBo { ma: string; ten: string; tu: number; den: number }
+/** Mục tiêu ngày để vẽ vòng 1 (câu) và vòng 3 (phút) — CHỈ khi máy chủ trả; thiếu ⇒ vòng đó ẩn, chỉ còn số. */
+export interface MucTieu { soCau: number | null; phutHoc: number | null }
 export interface TongQuan {
   soCau: number | null
   soDung: number | null
   phutHoc: number | null
   datNhiemVu: boolean | null
   chuoiNgayHoc: number | null
-  soVoiHomQua: { soCau: number; tiLeDung: number } | null
+  soVoiHomQua: { soCau: number; tiLeDung: number; phutHoc: number | null } | null
+  mucTieu: MucTieu | null
+  /** Số lần ngồi học hôm nay + lần dài nhất (phút): máy chủ trả sẵn để câu tóm tắt không lệch; thiếu ⇒ màn tự đếm từ dòng thời gian. */
+  soLanHoc: number | null
+  lanDaiNhatPhut: number | null
   /** Việc trong kế hoạch hôm nay: đã xong / tổng. CHỈ khi máy chủ trả ĐỦ cả hai (viecTong > 0, viecXong ≤ viecTong); thiếu ⇒ cả hai null và màn KHÔNG vẽ "N/M việc". */
   viecXong: number | null
   viecTong: number | null
 }
-export interface MocThoiGian { batDau: string; nguon: NguonHien; ten: string; soCau: number | null; soDung: number | null; che: LyDoChe | null; phut: number; ghiChu: string }
-export interface CauChe { kieu: 'che'; luc: string; nguon: NguonHien; che: LyDoChe; giay: number | null }
-export interface CauThuong { kieu: 'thuong'; luc: string; nguon: NguonHien; tenDang: string; de: string; conChon: string; dapAn: string; dung: boolean | null; giay: number | null; coLoiGiai: boolean; qid: string }
+/** `soCauDaLam`: CHỈ ở mốc bị che — "Con đã làm 6 câu · kết quả hiện sau…" (KHÔNG đúng/sai). */
+export interface MocThoiGian { batDau: string; nguon: NguonHien; ten: string; soCau: number | null; soDung: number | null; che: LyDoChe | null; phut: number; ghiChu: string; soCauDaLam: number | null }
+/** `lamLau` (máy chủ tính, không chép ngưỡng sang máy khách) và `lan` (chỉ số lần ngồi học) — cả hai null khi máy chủ chưa trả. */
+export interface CauChe { kieu: 'che'; luc: string; nguon: NguonHien; che: LyDoChe; giay: number | null; lamLau: boolean | null; lan: number | null }
+export interface CauThuong { kieu: 'thuong'; luc: string; nguon: NguonHien; tenDang: string; de: string; conChon: string; dapAn: string; dung: boolean | null; giay: number | null; coLoiGiai: boolean; qid: string; lamLau: boolean | null; lan: number | null }
 export type CauHomNay = CauChe | CauThuong
 export interface DangSo { ma: string; ten: string; dung: number; tong: number; bac: 0 | 1 | 2 | null }
 export interface DangManhYeu { tenDang: string; dung: number; tong: number; bac: TenBac | null }
-export interface BtvnDangChay { maBtvn: string; ten: string; hanNop: string; changXong: number | null; changTong: number | null }
-export interface BtvnGan { maBtvn: string; ten: string; nopLuc: string; dungHan: boolean | null; diem: number | null }
+/** Một chấm chặng của bài tập về nhà: `thu` = thứ của NGÀY MỞ chặng (giờ VN); xong · hôm nay (đã mở, chưa xong) · sắp tới (chưa mở). Máy chủ KHÔNG trả số đúng/tổng câu từng chặng (soDung/soCau/nopLuc luôn null trừ khi sau này có). */
+export interface ChangBtvn { thu: 'CN' | 'T2' | 'T3' | 'T4' | 'T5' | 'T6' | 'T7'; ngay: string; trangThai: 'xong' | 'hom_nay' | 'sap_toi'; soDung: number | null; soCau: number | null; nopLuc: string }
+export interface BtvnDangChay { maBtvn: string; ten: string; hanNop: string; changXong: number | null; changTong: number | null; chang: ChangBtvn[] | null }
+export interface BtvnGan { maBtvn: string; ten: string; nopLuc: string; dungHan: boolean | null; diem: number | null; nopTreGio: number | null }
+/** Điều đáng mừng (≤ 3): CHỈ sự thật đo được; không có gì đáng kể ⇒ vắng. */
+/** `dang`: ≤ 3 tên dạng của dòng `len_bac`; `chiTiet`: chữ phụ nếu máy chủ gửi chữ (mảng tên dạng được ghép bằng dấu phẩy). */
+export interface DieuDangMung { loai: 'dung_lai' | 'len_bac' | 'chuoi'; so: number | null; chiTiet: string; dang: string[] }
+/** Việc THẬT có số mà A.I Đỗ Đại Học đã làm cho con hôm nay (≤ 5). `luc`: ISO hoặc "HH:MM". */
+/** `theoNguon`: chỉ ở `chon_rieng` — số câu theo nguồn của kế hoạch ngày {ma: on_lai | than_thu | on_thi | btvn_lo…, so}. `nhac_han`: `so` = số lần đã nhắc phụ huynh hôm nay, `luc` = lần gần nhất. */
+export interface ViecAi { loai: 'chon_rieng' | 'xep_on' | 'soan_thu_thach' | 'nhac_han' | 'cham'; so: number | null; luc: string; chiTiet: string; theoNguon: { ma: string; so: number }[] }
+/** Dồn về đích: món nợ của con (chỉ khi có nợ). */
+export interface NoPh { theoNgay: { ngay: string; loai: string; ten: string; soCau: number | null; phut: number | null }[]; tongCau: number; tongPhut: number | null }
 export interface PhMoi {
   hoTen: string
   serverNow: number | null
@@ -51,13 +70,18 @@ export interface PhMoi {
   tongQuan: TongQuan | null
   dongThoiGian: MocThoiGian[] | null
   cau: CauHomNay[] | null
-  nhipHoc: { ngay: { ngay: string; soCau: number; soCauDung: number }[]; gioThuongHoc: string } | null
+  nhipHoc: { ngay: { ngay: string; soCau: number; soCauDung: number }[]; gioThuongHoc: string; trungBinhCauMoiNgay: number | null; tongCau: number | null } | null
   bacTheoDang: { ma: string; ten: string; bac: 0 | 1 | 2 }[] | null
   dangVap: DangSo[] | null
   vuaLenBac: { ma: string; ten: string; tu: number; den: number; ngay: string }[] | null
   manhYeu: { lamTot: DangManhYeu[]; conVap: DangManhYeu[]; lenBacHomNay: string[] } | null
   baiTapVeNha: { dangChay: BtvnDangChay[]; gan: BtvnGan[] } | null
-  lichOn: { homNay: number; ngayMai: number; daKhacPhuc14Ngay: number; conSaiChuaKhacPhuc: number } | null
+  lichOn: { homNay: number; ngayMai: number; daKhacPhuc14Ngay: number; conSaiChuaKhacPhuc: number; tongTungSai: number | null; bayNgayToi: { ngay: string; soCau: number }[] | null; phutNgayMai: number | null } | null
+  dieuDangMung: DieuDangMung[] | null
+  aiDaLam: ViecAi[] | null
+  /** Cảnh "con chưa học": việc A.I đã CHUẨN BỊ cho con (cùng khuôn). */
+  aiDaChuanBi: ViecAi[] | null
+  no: NoPh | null
   phuHuynhLamGi: string[]
   loiBoNao: { loi: string; ngay: string; thuTuan: string } | null
   giaoThemConLai: number | null
@@ -119,6 +143,15 @@ function docCaGanNhat(x: unknown): CaGanNhat | null {
   }
 }
 
+/** Mục tiêu chỉ nhận số > 0 (0 hoặc âm = không có mục tiêu ⇒ không vẽ vòng); cả hai vắng ⇒ null. */
+function docMucTieu(x: unknown): MucTieu | null {
+  if (!laDoiTuong(x)) return null
+  const cau = nguyenKhongAm(x.cau) ?? nguyenKhongAm(x.soCau) // máy chủ: {cau, phut}; nhận thêm tên {soCau, phutHoc} của GHI-CHU-BUILD
+  const phut = soKhongAm(x.phut) ?? soKhongAm(x.phutHoc)
+  const m = { soCau: cau !== null && cau > 0 ? cau : null, phutHoc: phut !== null && phut > 0 ? phut : null }
+  return m.soCau !== null || m.phutHoc !== null ? m : null
+}
+
 function docTongQuan(x: unknown): TongQuan | null {
   if (!laDoiTuong(x)) return null
   const v = laDoiTuong(x.soVoiHomQua) ? x.soVoiHomQua : null
@@ -131,11 +164,14 @@ function docTongQuan(x: unknown): TongQuan | null {
     phutHoc: soKhongAm(x.phutHoc),
     datNhiemVu: typeof x.datNhiemVu === 'boolean' ? x.datNhiemVu : null,
     chuoiNgayHoc: nguyenKhongAm(x.chuoiNgayHoc),
-    soVoiHomQua: v && nguyenKhongAm(v.soCau) !== null && soKhongAm(v.tiLeDung) !== null && (v.tiLeDung as number) <= 1 ? { soCau: v.soCau as number, tiLeDung: v.tiLeDung as number } : null,
+    soVoiHomQua: v && nguyenKhongAm(v.soCau) !== null && soKhongAm(v.tiLeDung) !== null && (v.tiLeDung as number) <= 1 ? { soCau: v.soCau as number, tiLeDung: v.tiLeDung as number, phutHoc: soKhongAm(v.phutHoc) } : null,
+    mucTieu: docMucTieu(x.mucTieu),
+    soLanHoc: nguyenKhongAm(x.soLanHoc),
+    lanDaiNhatPhut: soKhongAm(x.lanDaiNhatPhut),
     viecXong: coViec ? vx : null,
     viecTong: coViec ? vt : null,
   }
-  const co = t.soCau !== null || t.soDung !== null || t.phutHoc !== null || t.datNhiemVu !== null || t.chuoiNgayHoc !== null || t.viecTong !== null
+  const co = t.soCau !== null || t.soDung !== null || t.phutHoc !== null || t.datNhiemVu !== null || t.chuoiNgayHoc !== null || t.viecTong !== null || t.mucTieu !== null
   return co ? t : null
 }
 
@@ -150,7 +186,8 @@ function docMoc(x: unknown): MocThoiGian | null {
   const soCau = che ? null : nguyenKhongAm(x.soCau)
   const soDung = che || soCau === null ? null : nguyenKhongAm(x.soDung)
   const ghiChu = x.ghiChu === 'Nộp đúng hạn' || x.ghiChu === 'Nộp sau hạn' ? x.ghiChu : ''
-  return { batDau, nguon: ng, ten: chuoi(x.ten, 140), soCau, soDung: soDung !== null && soCau !== null && soDung <= soCau ? soDung : null, che, phut: Math.max(1, phut), ghiChu }
+  const daLam = che ? nguyenKhongAm(x.soCauDaLam) : null // chỉ SỐ CÂU ĐÃ LÀM (khoá riêng) của mốc bị che — không đúng/sai, không lấy từ soCau
+  return { batDau, nguon: ng, ten: chuoi(x.ten, 140), soCau, soDung: soDung !== null && soCau !== null && soDung <= soCau ? soDung : null, che, phut: Math.max(1, phut), ghiChu, soCauDaLam: daLam }
 }
 
 function docCau(x: unknown): CauHomNay | null {
@@ -161,7 +198,9 @@ function docCau(x: unknown): CauHomNay | null {
   const che = lyDoChe(x.che)
   const giayRaw = soKhongAm(x.giay)
   const giay = giayRaw !== null && giayRaw > 0 ? giayRaw : null
-  if (che) return { kieu: 'che', luc, nguon: ng, che, giay } // CHỈ bốn trường này — mọi thứ khác bị bỏ
+  const lamLau = typeof x.lamLau === 'boolean' ? x.lamLau : null
+  const lan = nguyenKhongAm(x.lan)
+  if (che) return { kieu: 'che', luc, nguon: ng, che, giay, lamLau, lan } // CHỈ các trường này — mọi thứ khác (đề, đáp án, đúng/sai) bị bỏ
   const de = chuoi(x.deRutGon, 200)
   if (!de) return null
   return {
@@ -176,7 +215,57 @@ function docCau(x: unknown): CauHomNay | null {
     giay,
     coLoiGiai: x.coLoiGiai === true,
     qid: chuoi(x.qid, 200),
+    lamLau,
+    lan,
   }
+}
+
+function docChang(x: unknown): ChangBtvn | null {
+  if (!laDoiTuong(x)) return null
+  const thu = typeof x.thu === 'string' && ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].includes(x.thu) ? (x.thu as ChangBtvn['thu']) : null
+  const tt = x.trangThai === 'xong' || x.trangThai === 'hom_nay' || x.trangThai === 'sap_toi' ? x.trangThai : null
+  const ngay = typeof x.ngay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.ngay) ? x.ngay : ''
+  if (thu === null || tt === null || !ngay) return null
+  const soCau = nguyenKhongAm(x.soCau)
+  const soDung = nguyenKhongAm(x.soDung)
+  const daNop = tt !== 'sap_toi' // chặng của hôm nay có thể đã nộp rồi; chặng sắp tới thì chưa có số
+  return { thu, ngay, trangThai: tt, soCau: daNop ? soCau : null, soDung: daNop && soCau !== null && soDung !== null && soDung <= soCau ? soDung : null, nopLuc: daNop ? iso(x.nopLuc) : '' }
+}
+
+function docViecAi(x: unknown): ViecAi | null {
+  if (!laDoiTuong(x)) return null
+  const loai = ['chon_rieng', 'xep_on', 'soan_thu_thach', 'nhac_han', 'cham'].includes(x.loai as string) ? (x.loai as ViecAi['loai']) : null
+  if (!loai) return null
+  const so_ = nguyenKhongAm(x.so)
+  const luc = typeof x.luc === 'string' && (Number.isFinite(Date.parse(x.luc)) || /^\d{1,2}:\d{2}$/.test(x.luc.trim())) ? x.luc.trim() : ''
+  // "Việc nào không có số thật ⇒ không gửi dòng đó": số vắng/0 ⇒ bỏ (không vẽ "0 câu"); riêng nhắc hạn nói được bằng giờ nhắc.
+  if ((so_ === null || so_ === 0) && !(loai === 'nhac_han' && luc)) return null
+  const theoNguon = laDoiTuong(x.chiTiet)
+    ? Object.entries(x.chiTiet)
+        .map(([ma, v]) => ({ ma: chuoi(ma, 40), so: nguyenKhongAm(v) ?? 0 }))
+        .filter((e) => e.ma && e.so > 0)
+        .slice(0, 6)
+    : []
+  return { loai, so: so_, luc, chiTiet: typeof x.chiTiet === 'string' ? chuoi(x.chiTiet, 240) : '', theoNguon }
+}
+
+function docDieuMung(x: unknown): DieuDangMung | null {
+  if (!laDoiTuong(x)) return null
+  const loai = x.loai === 'dung_lai' || x.loai === 'len_bac' || x.loai === 'chuoi' ? x.loai : null
+  const so_ = nguyenKhongAm(x.so)
+  const dang = Array.isArray(x.chiTiet) ? lapDanh(x.chiTiet, (e) => (typeof e === 'string' && e.trim() ? chuoi(e, 140) : null), 3) : []
+  return loai && so_ !== null && so_ > 0 ? { loai, so: so_, chiTiet: typeof x.chiTiet === 'string' ? chuoi(x.chiTiet, 240) : dang.join(', '), dang } : null
+}
+
+function docNo(x: unknown): NoPh | null {
+  if (!laDoiTuong(x)) return null
+  const tongCau = nguyenKhongAm(x.tongCau)
+  const ds = lapDanh(x.theoNgay, (e) => {
+    if (!laDoiTuong(e)) return null
+    const ngay = typeof e.ngay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(e.ngay) ? e.ngay : ''
+    return ngay ? { ngay, loai: chuoi(e.loai, 40), ten: chuoi(e.ten, 140), soCau: nguyenKhongAm(e.soCau), phut: soKhongAm(e.phut) } : null
+  }, 30)
+  return tongCau !== null && tongCau > 0 && ds.length > 0 ? { theoNgay: ds, tongCau, tongPhut: soKhongAm(x.tongPhut) } : null
 }
 
 function docDangSo(x: unknown): DangSo | null {
@@ -235,6 +324,8 @@ export function docTatCaVeCon(raw: unknown): PhMoi | null {
           return sc === null || sd === null || sd > sc ? null : { ngay: e.ngay, soCau: sc, soCauDung: sd }
         }, 14),
         gioThuongHoc: chuoi(nh.gioThuongHoc, 40),
+        trungBinhCauMoiNgay: soKhongAm(nh.trungBinhCauMoiNgay),
+        tongCau: nguyenKhongAm(nh.tongCau),
       }
     : null
   return {
@@ -287,19 +378,46 @@ export function docTatCaVeCon(raw: unknown): PhMoi | null {
             if (!laDoiTuong(e)) return null
             const ma = chuoi(e.maBtvn, 80)
             const han = iso(e.hanNop)
-            return ma && han ? { maBtvn: ma, ten: chuoi(e.ten, 140) || 'Bài tập về nhà', hanNop: han, changXong: nguyenKhongAm(e.changXong), changTong: nguyenKhongAm(e.changTong) } : null
+            const chang = Array.isArray(e.chang) ? lapDanh(e.chang, docChang, 12) : []
+            return ma && han ? { maBtvn: ma, ten: chuoi(e.ten, 140) || 'Bài tập về nhà', hanNop: han, changXong: nguyenKhongAm(e.changXong), changTong: nguyenKhongAm(e.changTong), chang: chang.length > 0 ? chang : null } : null
           }, 5),
           gan: lapDanh(bt.gan, (e) => {
             if (!laDoiTuong(e)) return null
             const ma = chuoi(e.maBtvn, 80)
             const nop = iso(e.nopLuc)
-            return ma && nop ? { maBtvn: ma, ten: chuoi(e.ten, 140) || 'Bài tập về nhà', nopLuc: nop, dungHan: typeof e.dungHan === 'boolean' ? e.dungHan : null, diem: soKhongAm(e.diem) } : null
+            return ma && nop ? { maBtvn: ma, ten: chuoi(e.ten, 140) || 'Bài tập về nhà', nopLuc: nop, dungHan: typeof e.dungHan === 'boolean' ? e.dungHan : null, diem: soKhongAm(e.diem), nopTreGio: soKhongAm(e.nopTreGio) } : null
           }, 5),
         }
       : null,
     lichOn: lo && [lo.homNay, lo.ngayMai, lo.daKhacPhuc14Ngay, lo.conSaiChuaKhacPhuc].every((v) => nguyenKhongAm(v) !== null)
-      ? { homNay: lo.homNay as number, ngayMai: lo.ngayMai as number, daKhacPhuc14Ngay: lo.daKhacPhuc14Ngay as number, conSaiChuaKhacPhuc: lo.conSaiChuaKhacPhuc as number }
+      ? {
+          homNay: lo.homNay as number,
+          ngayMai: lo.ngayMai as number,
+          daKhacPhuc14Ngay: lo.daKhacPhuc14Ngay as number,
+          conSaiChuaKhacPhuc: lo.conSaiChuaKhacPhuc as number,
+          tongTungSai: nguyenKhongAm(lo.tongTungSai),
+          bayNgayToi: Array.isArray(lo.bayNgayToi)
+            ? (() => {
+                const d = lapDanh(lo.bayNgayToi, (e) => (laDoiTuong(e) && typeof e.ngay === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(e.ngay) && nguyenKhongAm(e.soCau) !== null ? { ngay: e.ngay, soCau: e.soCau as number } : null), 7)
+                return d.length > 0 ? d : null
+              })()
+            : null,
+          phutNgayMai: soKhongAm(lo.phutNgayMai),
+        }
       : null,
+    dieuDangMung: (() => {
+      const d = hn && Array.isArray(hn.dieuDangMung) ? lapDanh(hn.dieuDangMung, docDieuMung, 3) : []
+      return d.length > 0 ? d : null
+    })(),
+    aiDaLam: (() => {
+      const d = hn && Array.isArray(hn.aiDaLam) ? lapDanh(hn.aiDaLam, docViecAi, 5) : []
+      return d.length > 0 ? d : null
+    })(),
+    aiDaChuanBi: (() => {
+      const d = hn && Array.isArray(hn.aiDaChuanBi) ? lapDanh(hn.aiDaChuanBi, docViecAi, 5) : []
+      return d.length > 0 ? d : null
+    })(),
+    no: docNo(raw.no),
     phuHuynhLamGi: lapDanh(raw.phuHuynhLamGi, (e) => (typeof e === 'string' && e.trim() ? chuoi(e, 240) : null), 2),
     loiBoNao: lb && (chuoi(lb.loi, 600) || chuoi(lb.thuTuan, 900)) ? { loi: chuoi(lb.loi, 600), ngay: typeof lb.ngay === 'string' ? lb.ngay : '', thuTuan: chuoi(lb.thuTuan, 900) } : null,
     giaoThemConLai: gt ? nguyenKhongAm(gt.conLaiHomNay) : null,
@@ -307,7 +425,39 @@ export function docTatCaVeCon(raw: unknown): PhMoi | null {
   }
 }
 
-export type ChiTietCau = { kieu: 'ok'; de: string; phuongAn: string[]; dapAn: string; tenDang: string; loiGiai: string } | { kieu: 'tu_choi'; chu: string; che: LyDoChe | null }
+/** Lời giải có cấu trúc (chuẩn chung của app, chuan-hoa-loi-giai.ts): dòng Chốt, các bước đánh số, dòng Kết quả (+ lý do từng phương án nếu kho có). */
+export interface LoiGiaiCT {
+  chot: string
+  buoc: string[]
+  ketQua: string
+  lyDo: { khoa: string; dung: boolean; ly: string }[]
+}
+/** `loiGiai` là CHỮ THUẦN đọc được (chuỗi thường giữ nguyên; lời giải có cấu trúc được dựng lại thành các dòng Chốt / Bước / Kết quả) — KHÔNG BAO GIỜ chứa JSON thô. `loiGiaiCT` chỉ có khi máy chủ gửi lời giải có cấu trúc. */
+export type ChiTietCau = { kieu: 'ok'; de: string; phuongAn: string[]; dapAn: string; tenDang: string; loiGiai: string; loiGiaiCT: LoiGiaiCT | null } | { kieu: 'tu_choi'; chu: string; che: LyDoChe | null }
+
+/**
+ * Máy chủ (`ph-tat-ca-ve-con.ts`) gửi `loiGiai` = CHUỖI JSON của lời giải có cấu trúc ({chot, buoc[], ketQua, tung_pa…}); nhiều câu chỉ có chữ thường.
+ * Chuỗi bắt đầu bằng `{` ⇒ đọc bằng bộ chuẩn CHUNG chuanHoaLoiGiaiCau (không tự nghĩ ra nội dung); đọc hỏng ⇒ KHÔNG hiện chuỗi rác (chữ rỗng ⇒ màn nói "chưa có lời giải").
+ */
+export function docLoiGiai(raw: unknown): { loiGiai: string; loiGiaiCT: LoiGiaiCT | null } {
+  const s = typeof raw === 'string' ? raw.trim().slice(0, 8000) : ''
+  if (!s) return { loiGiai: '', loiGiaiCT: null }
+  if (!s.startsWith('{') && !s.startsWith('[')) return { loiGiai: s, loiGiaiCT: null }
+  let obj: unknown
+  try {
+    obj = JSON.parse(s)
+  } catch {
+    return { loiGiai: '', loiGiaiCT: null }
+  }
+  if (!laDoiTuong(obj)) return { loiGiai: '', loiGiaiCT: null }
+  const c = chuanHoaLoiGiaiCau(obj)
+  const ketQua = chuoi(obj.ketQua ?? obj.ket_qua ?? obj.dapAn, 240)
+  if (c.thieu && !ketQua) return { loiGiai: '', loiGiaiCT: null }
+  const sach = (t: string) => !t.includes('[object Object]') // bộ chuẩn chung ép String() mọi phần tử: phần tử là object ⇒ bỏ, không in rác
+  const ct: LoiGiaiCT = { chot: sach(c.chot) ? c.chot : '', buoc: (c.buoc ?? []).filter(sach), ketQua, lyDo: (c.lyDo ?? []).filter((l) => l.ly && sach(l.ly)) }
+  const chu = [ct.chot, ...ct.buoc.map((b, i) => `Bước ${i + 1}: ${b}`), ct.ketQua ? `Kết quả: ${ct.ketQua}` : ''].filter(Boolean).join('\n')
+  return { loiGiai: chu, loiGiaiCT: chu ? ct : null }
+}
 
 /** Thân `/ph/chi-tiet-cau-ve-con`. `ok:false` ⇒ từ chối kèm LỜI THẬT của máy chủ; thân lạ ⇒ null. */
 export function docChiTietCau(raw: unknown): ChiTietCau | null {
@@ -317,5 +467,5 @@ export function docChiTietCau(raw: unknown): ChiTietCau | null {
   const de = chuoi(raw.de, 4000)
   const dapAn = chuoi(raw.dapAn, 80)
   if (!de || !dapAn) return null
-  return { kieu: 'ok', de, phuongAn: lapDanh(raw.phuongAn, (e) => (typeof e === 'string' && e.trim() ? chuoi(e, 600) : null), 8), dapAn, tenDang: chuoi(raw.tenDang, 140), loiGiai: typeof raw.loiGiai === 'string' ? raw.loiGiai.trim().slice(0, 8000) : '' }
+  return { kieu: 'ok', de, phuongAn: lapDanh(raw.phuongAn, (e) => (typeof e === 'string' && e.trim() ? chuoi(e, 600) : null), 8), dapAn, tenDang: chuoi(raw.tenDang, 140), ...docLoiGiai(raw.loiGiai) }
 }

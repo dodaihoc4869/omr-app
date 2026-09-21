@@ -1,6 +1,6 @@
 // APP PHỤ HUYNH — MÀN CHÍNH KIỂU APPLE, PHƯƠNG ÁN B "Widget" (thầy chốt 21/09 15:49; mẫu docs/ban-ve-ph-apple-2109/ph-b-man-chinh.html; đề bài cuối prompt-ph-moi-thu-ve-con-2109.md). Không menu, không tab:
 // tiêu đề lớn "Chào anh/chị" + tên con · lớp + nút tròn chữ cái (mở menu nổi có ĐÚNG MỘT mục "Đổi số báo danh") · dải cảnh báo của thầy (thụ động) · widget lớn "Hôm nay của con" · hai widget vuông
-// "Ca kiểm tra gần nhất" + "Học đều" · thẻ rời "Xem mọi thứ về con ›" (MỘT đích chạm ⇒ bảng) · thanh nền mờ dính đáy với MỘT nút "Giao thêm bài cho con".
+// "Ca kiểm tra gần nhất" (LUÔN hiện, có trạng thái trống) + "Học đều" · thẻ rời "Xem mọi thứ về con ›" (MỘT đích chạm ⇒ bảng) · thanh nền mờ dính đáy với MỘT nút "Giao thêm bài cho con".
 // NÓI THẬT THEO DỮ LIỆU: khối/số máy chủ không trả ⇒ ẨN ô (không bịa số 0); "N/M việc" chỉ vẽ khi máy chủ trả homNay.tongQuan.viecXong/viecTong; con số nào cũng có nhãn.
 import { useEffect, useRef, useState } from 'react'
 import '../m3'
@@ -126,7 +126,22 @@ function WidgetHomNay({ pm, now }: { pm: PhMoi; now: number }) {
 
 function WidgetCa({ pm }: { pm: PhMoi }) {
   const ca = pm.caGanNhat
-  if (!ca) return null
+  // Ô này LUÔN hiện (thầy 21/09: "chưa có điểm gần nhất" không được biến mất). Máy chủ không gửi ca (con chưa có ca nào, hoặc mọi ca đã xoá) ⇒ trạng thái trống nói thật, KHÔNG số bịa.
+  if (!ca)
+    return (
+      <section className="phm-ap-the phm-ap-w phm-ap-w-nho" data-vung="ca-gan-nhat" data-trong="" aria-labelledby="phm-ap-h-ca">
+        <h2 className="phm-ap-w__ten" id="phm-ap-h-ca">
+          Ca kiểm tra gần nhất
+        </h2>
+        <p className="phm-ap-w-nho__so phm-ap-w-nho__so--rong" role="img" aria-label="Chưa có ca kiểm tra nào">
+          —
+        </p>
+        <p className="phm-ap-w-nho__phu">
+          <b>Chưa có ca kiểm tra nào</b>
+          Điểm sẽ hiện ở đây sau khi thầy công bố
+        </p>
+      </section>
+    )
   const ngay = thuNgayVn(ca.nopLuc)
   const tong = ca.congBo.daCongBo ? (ca.ketQua?.tong ?? null) : null
   const doi = ca.truoc?.tong != null ? ca.truoc.doi : null
@@ -254,7 +269,6 @@ export default function ManChinh({ v, tenCon, lop, sbd = '', now, canhBao, onCan
   const pm = v.pm
   const ten = pm?.hoTen || tenCon
   const ok = v.trangThai === 'ok' && pm ? pm : null
-  const coCa = !!ok?.caGanNhat
   const deu = ok ? duLieuHocDeu(ok) : null
   return (
     <div className="m3 phm-ap" data-vung="man-chinh-ph">
@@ -297,12 +311,10 @@ export default function ManChinh({ v, tenCon, lop, sbd = '', now, canhBao, onCan
         {ok && (
           <>
             <WidgetHomNay pm={ok} now={now} />
-            {(coCa || deu) && (
-              <div className="phm-ap-hai" data-mot={coCa && deu ? undefined : ''}>
-                <WidgetCa pm={ok} />
-                {deu && <WidgetHocDeu d={deu} />}
-              </div>
-            )}
+            <div className="phm-ap-hai" data-mot={deu ? undefined : ''}>
+              <WidgetCa pm={ok} />
+              {deu && <WidgetHocDeu d={deu} />}
+            </div>
             <button type="button" className="phm-ap-hang phm-ap-the phm-ap-hang--the" data-vung="xem-tat-ca" onClick={() => onMoBang()}>
               <span>
                 Xem mọi thứ về con<small>Từng câu, điểm mạnh, dạng còn vấp</small>

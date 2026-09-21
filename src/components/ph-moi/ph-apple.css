@@ -25,7 +25,7 @@
   --phm-ap-nhan-nen: var(--m3-primary-container);
   --phm-ap-tren-nhan-nen: var(--m3-on-primary-container);
   --phm-ap-dat: var(--m3-tertiary);                     /* xanh lá: CHỈ cho "đã đạt" */
-  --phm-ap-dat-vong: rgb(52 168 83);                    /* vòng tiến độ khi đã đạt. CẦN THÊM TOKEN: lớp .m3 đè --gg-luc thành xanh đậm; mẫu thầy duyệt dùng đúng xanh lá gốc của tokens.css (--gg-luc ở :root) */
+  --phm-ap-dat-vong: var(--ph-luc-to);                  /* vòng tiến độ khi đã đạt: token riêng (tokens.css) vì lớp .m3 đè --gg-luc thành xanh đậm, mẫu thầy duyệt dùng xanh lá gốc */
   --phm-ap-nut: var(--m3-primary);                      /* nền nút chính */
   --phm-ap-tren-nut: var(--m3-on-primary);
 
@@ -47,8 +47,8 @@
     --phm-ap-dat-vong: var(--m3-tertiary);
     /* CẦN THÊM TOKEN: nền nút chính ở nền tối. m3-primary ở nền tối là xanh NHẠT + chữ xanh đậm (kiểu Material);
        kiểu Apple giữ nút xanh đậm chữ trắng. Giá trị này cho chữ trắng tương phản 5,3:1. */
-    --phm-ap-nut: rgb(20 100 225);
-    --phm-ap-tren-nut: rgb(255 255 255);
+    --phm-ap-nut: var(--ph-nut);
+    --phm-ap-tren-nut: var(--ph-tren-nut);
     --phm-ap-vach: color-mix(in srgb, var(--m3-on-surface) 16%, transparent);
     --phm-ap-bong-the: 0 0 0 0.5px var(--phm-ap-vach);
     --phm-ap-bong-menu: 0 0 0 0.5px var(--phm-ap-vach), 0 16px 48px -8px rgb(0 0 0 / 0.7);

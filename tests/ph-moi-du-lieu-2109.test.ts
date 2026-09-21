@@ -7,7 +7,7 @@ import { docChiTietCau, docTatCaVeCon } from '../src/lib/ph-moi/du-lieu'
 import { chuCaiTen, chuThoiGian, gioVn, ngayChuoiNgan, ngayDayDuVn, soVn, thuNgayVn, thuTuChuoiNgay } from '../src/lib/ph-moi/dinh-dang'
 import { taiChiTietCau, taiTatCaVeCon } from '../src/lib/ph-moi/api'
 import { CHU_CHE, NHAN_NGUON, chuCongBoCa, tenMoc } from '../src/components/ph-moi/nhan'
-import { PH_OK, PH_TRONG, CHI_TIET } from './_ph-moi/du-lieu-mau'
+import { PH_OK, PH_TRONG, CHI_TIET, H } from './_ph-moi/du-lieu-mau'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
@@ -29,7 +29,7 @@ describe('docTatCaVeCon — đọc chặt', () => {
     expect(pm.manhYeu!.lamTot).toHaveLength(3)
     expect(pm.manhYeu!.conVap).toHaveLength(2)
     expect(pm.baiTapVeNha!.dangChay[0]).toMatchObject({ ten: 'Ester – Lipid', changXong: 2, changTong: 5 })
-    expect(pm.lichOn).toEqual({ homNay: 0, ngayMai: 7, daKhacPhuc14Ngay: 12, conSaiChuaKhacPhuc: 19 })
+    expect(pm.lichOn).toEqual({ homNay: 0, ngayMai: 7, daKhacPhuc14Ngay: 12, conSaiChuaKhacPhuc: 19, tongTungSai: null, bayNgayToi: null, phutNgayMai: null }) // ba trường sau: máy chủ chưa trả ⇒ null
     expect(pm.doCham).toEqual({ hang: 9, siSo: 42 })
     expect(pm.giaoThemConLai).toBe(2)
     expect(pm.phuHuynhLamGi).toHaveLength(2)
@@ -50,7 +50,7 @@ describe('docTatCaVeCon — đọc chặt', () => {
     const raw = nhan(PH_OK)
     raw.homNay.cau = [{ luc: PH_OK.homNay.cau[0].luc, nguon: 'btvn', che: 'chua_nop', giay: 44, deRutGon: 'ĐỀ LỘ', dapAn: 'C', conChon: 'A', dung: true, tenDang: 'DẠNG LỘ', qid: 'q-lo', coLoiGiai: true }]
     const c = docTatCaVeCon(raw)!.cau![0]!
-    expect(c).toEqual({ kieu: 'che', luc: PH_OK.homNay.cau[0].luc, nguon: 'btvn', che: 'chua_nop', giay: 44 })
+    expect(c).toEqual({ kieu: 'che', luc: PH_OK.homNay.cau[0].luc, nguon: 'btvn', che: 'chua_nop', giay: 44, lamLau: null, lan: null }) // + hai cờ máy chủ tính (không phải đáp án)
     expect(JSON.stringify(c)).not.toMatch(/ĐỀ LỘ|DẠNG LỘ|q-lo|"dapAn"|"dung"/)
     // che lạ ⇒ KHÔNG coi là câu thường có che (bỏ hẳn vì thiếu đề)
     raw.homNay.cau = [{ luc: PH_OK.homNay.cau[0].luc, nguon: 'btvn', che: 'gi_do', deRutGon: 'Đề', dapAn: 'A' }]
@@ -119,6 +119,80 @@ describe('docTatCaVeCon — đọc chặt', () => {
     const r = nhan(PH_OK)
     r.homNay.tongQuan = { viecXong: 1, viecTong: 3 }
     expect(docTatCaVeCon(r)!.tongQuan).toMatchObject({ viecXong: 1, viecTong: 3, soCau: null })
+  })
+
+  it('trường MỚI cho bảng kiểu Apple (docs/ph-tat-ca-ve-con-truong-apple-2109.md, Code 4): mục tiêu {cau, phut}, lần học, điều đáng mừng, việc A.I đã làm (chiTiet theo nguồn), chặng bài tập (thu = CN/T2…), lịch ôn 7 ngày, nợ — đọc chặt, thiếu/sai ⇒ null (không bịa)', () => {
+    expect(docTatCaVeCon(PH_OK)).toMatchObject({ dieuDangMung: null, aiDaLam: null, aiDaChuanBi: null, no: null })
+    expect(docTatCaVeCon(PH_OK)!.tongQuan).toMatchObject({ mucTieu: null, soLanHoc: null, lanDaiNhatPhut: null })
+    const r = nhan(PH_OK)
+    r.homNay.tongQuan.mucTieu = { cau: 16, phut: 45 }
+    r.homNay.tongQuan.soLanHoc = 5
+    r.homNay.tongQuan.lanDaiNhatPhut = 21
+    r.homNay.tongQuan.soVoiHomQua = { soCau: 33, tiLeDung: 0.76, phutHoc: 40 }
+    r.homNay.dieuDangMung = [{ loai: 'dung_lai', so: 4, chiTiet: 'trong 6 câu ôn lại lúc 06:40' }, { loai: 'len_bac', so: 2, chiTiet: ['Phản ứng ester hoá', 'Lipid', '', 'Dạng 3', 'Dạng 4'] }, { loai: 'chuoi', so: 6 }, { loai: 'chuoi', so: 0 }, { loai: 'la', so: 1 }, { loai: 'len_bac', so: 3 }]
+    r.homNay.aiDaLam = [{ loai: 'chon_rieng', so: 23, chiTiet: { on_lai: 6, than_thu: 9, btvn_lo: 3, on_thi: 0, xau: 'x' } }, { loai: 'xep_on', so: 7 }, { loai: 'soan_thu_thach', so: 5, luc: '2026-09-21T12:30:00Z' }, { loai: 'nhac_han', so: 1, luc: '2026-09-21T10:00:00Z' }, { loai: 'nhac_han', luc: '17:00' }, { loai: 'cham', so: 0 }, { loai: 'cham' }, { loai: 'chon_rieng', so: 2 }, { loai: 'la', so: 3 }]
+    r.homNay.aiDaChuanBi = [{ loai: 'xep_on', so: 2 }]
+    r.homNay.cau = [{ ...r.homNay.cau[0], lamLau: true, lan: 2 }, { luc: H(8, 0), nguon: 'gia_dinh_giao', che: 'chua_nop', lamLau: 'x', lan: -1 }]
+    r.homNay.dongThoiGian = [{ batDau: H(20, 40), nguon: 'gia_dinh_giao', che: 'chua_nop', phut: 7, soCauDaLam: 6, soCau: 6, soDung: 5 }]
+    r.baiTapVeNha.dangChay[0].chang = [{ thu: 'CN', ngay: '2026-09-20', trangThai: 'xong' }, { thu: 'T3', ngay: '2026-09-22', trangThai: 'hom_nay' }, { thu: 'T4', ngay: 'sai', trangThai: 'sap_toi' }, { thu: 'T5', ngay: '2026-09-24', trangThai: 'la' }, { thu: 2, ngay: '2026-09-24', trangThai: 'sap_toi' }, { thu: 'T7', ngay: '2026-09-26', trangThai: 'sap_toi', soCau: 9, soDung: 3 }]
+    r.baiTapVeNha.gan[1].nopTreGio = 1.5
+    r.lichOn = { ...r.lichOn, tongTungSai: 31, phutNgayMai: 10, bayNgayToi: [{ ngay: '2026-09-22', soCau: 7 }, { ngay: '22/09', soCau: 3 }, { ngay: '2026-09-23', soCau: 'x' }, { ngay: '2026-09-24', soCau: 0 }] }
+    r.nhipHoc.trungBinhCauMoiNgay = 20.2
+    r.nhipHoc.tongCau = 283
+    r.no = { theoNgay: [{ ngay: '2026-09-21', loai: 'chang', ten: 'Ester – Lipid', soCau: 12, phut: 15 }, { ngay: 'x', loai: 'chang' }], tongCau: 12, tongPhut: 15 }
+    const pm = docTatCaVeCon(r)!
+    expect(pm.tongQuan).toMatchObject({ mucTieu: { soCau: 16, phutHoc: 45 }, soLanHoc: 5, lanDaiNhatPhut: 21, soVoiHomQua: { soCau: 33, tiLeDung: 0.76, phutHoc: 40 } })
+    expect(pm.dieuDangMung!.map((d) => `${d.loai}:${d.so}`)).toEqual(['dung_lai:4', 'len_bac:2', 'chuoi:6']) // ≤ 3, so > 0, loại lạ bỏ
+    expect(pm.dieuDangMung![0]).toMatchObject({ chiTiet: 'trong 6 câu ôn lại lúc 06:40', dang: [] })
+    expect(pm.dieuDangMung![1]).toMatchObject({ dang: ['Phản ứng ester hoá', 'Lipid', 'Dạng 3'], chiTiet: 'Phản ứng ester hoá, Lipid, Dạng 3' }) // mảng tên dạng ≤ 3, bỏ rỗng
+    expect(pm.aiDaLam!.map((d) => `${d.loai}:${d.so}`)).toEqual(['chon_rieng:23', 'xep_on:7', 'soan_thu_thach:5', 'nhac_han:1', 'nhac_han:null']) // số 0 / vắng bỏ, ≤ 5; nhắc hạn nói được bằng giờ
+    expect(pm.aiDaLam![0]!.theoNguon).toEqual([{ ma: 'on_lai', so: 6 }, { ma: 'than_thu', so: 9 }, { ma: 'btvn_lo', so: 3 }]) // nguồn 0 / không phải số bị bỏ
+    expect(pm.aiDaLam![4]!.luc).toBe('17:00')
+    expect(pm.aiDaChuanBi!).toHaveLength(1)
+    const c1 = pm.cau![0]!
+    expect(c1).toMatchObject({ lamLau: true, lan: 2 })
+    expect(pm.cau!.find((c) => c.kieu === 'che' && c.luc === H(8, 0))).toMatchObject({ lamLau: null, lan: null })
+    expect(pm.dongThoiGian![0]).toMatchObject({ che: 'chua_nop', soCau: null, soDung: null, soCauDaLam: 6 }) // che: chỉ số câu đã làm
+    expect(pm.baiTapVeNha!.dangChay[0]!.chang!.map((c) => `${c.thu}:${c.trangThai}`)).toEqual(['CN:xong', 'T3:hom_nay', 'T7:sap_toi'])
+    expect(pm.baiTapVeNha!.dangChay[0]!.chang!.every((c) => c.soCau === null && c.soDung === null)).toBe(true) // chặng sắp tới không có số; máy chủ hiện không trả số từng chặng
+    expect(pm.baiTapVeNha!.gan[1]!.nopTreGio).toBe(1.5)
+    expect(pm.lichOn).toMatchObject({ tongTungSai: 31, phutNgayMai: 10, bayNgayToi: [{ ngay: '2026-09-22', soCau: 7 }, { ngay: '2026-09-24', soCau: 0 }] })
+    expect(pm.nhipHoc).toMatchObject({ trungBinhCauMoiNgay: 20.2, tongCau: 283 })
+    expect(pm.no).toEqual({ theoNgay: [{ ngay: '2026-09-21', loai: 'chang', ten: 'Ester – Lipid', soCau: 12, phut: 15 }], tongCau: 12, tongPhut: 15 })
+    // nhận cả tên {soCau, phutHoc} của GHI-CHU-BUILD; mục tiêu 0 / âm ⇒ không có mục tiêu; nợ tongCau 0 ⇒ vắng
+    const z = nhan(PH_OK)
+    z.homNay.tongQuan.mucTieu = { soCau: 20, phutHoc: 30 }
+    expect(docTatCaVeCon(z)!.tongQuan!.mucTieu).toEqual({ soCau: 20, phutHoc: 30 })
+    z.homNay.tongQuan.mucTieu = { cau: 0, phut: -3 }
+    z.no = { theoNgay: [{ ngay: '2026-09-21' }], tongCau: 0 }
+    expect(docTatCaVeCon(z)).toMatchObject({ no: null })
+    expect(docTatCaVeCon(z)!.tongQuan!.mucTieu).toBeNull()
+  })
+
+  it('LỜI GIẢI (P0 thầy báo 21/09: màn in nguyên JSON): máy chủ gửi CHUỖI JSON có cấu trúc ⇒ dựng Chốt / Bước đánh số / Kết quả; chuỗi thường giữ nguyên; JSON hỏng / thiếu bước / rỗng ⇒ KHÔNG BAO GIỜ còn ký tự `{"`', () => {
+    const ok = (loiGiai: unknown) => docChiTietCau({ ok: true, de: 'Đề', dapAn: 'B', loiGiai }) as Extract<NonNullable<ReturnType<typeof docChiTietCau>>, { kieu: 'ok' }>
+    const json = JSON.stringify({ chot: 'Acetylene có công thức C2H2, khối lượng mol 26.', buoc: ['Tính số mol C2H2 = 0,3 mol.', 'Tính khối lượng sản phẩm.'], ketQua: '92,3%' })
+    const a = ok(json)
+    expect(a.loiGiaiCT).toEqual({ chot: 'Acetylene có công thức C2H2, khối lượng mol 26.', buoc: ['Tính số mol C2H2 = 0,3 mol.', 'Tính khối lượng sản phẩm.'], ketQua: '92,3%', lyDo: [] })
+    expect(a.loiGiai).toBe('Acetylene có công thức C2H2, khối lượng mol 26.\nBước 1: Tính số mol C2H2 = 0,3 mol.\nBước 2: Tính khối lượng sản phẩm.\nKết quả: 92,3%')
+    // chuỗi thường: giữ nguyên, không cấu trúc
+    expect(ok('Số mol tristearin = 17,8 : 890 = 0,02 mol.')).toMatchObject({ loiGiai: 'Số mol tristearin = 17,8 : 890 = 0,02 mol.', loiGiaiCT: null })
+    // thiếu `buoc`: vẫn có Chốt + Kết quả, không mảng bước
+    const thieu = ok(JSON.stringify({ chot: 'Chốt thôi', ketQua: 'B' }))
+    expect(thieu.loiGiaiCT).toMatchObject({ chot: 'Chốt thôi', buoc: [], ketQua: 'B' })
+    // chỉ có phương án lý do (phần I): giữ lý do từng phương án
+    const pa = ok(JSON.stringify({ chot: 'Este', tung_pa: { a: { vi_sao: 'Sai vì A' }, b: { vi_sao: 'Đúng vì B' } } }))
+    expect(pa.loiGiaiCT!.lyDo.map((l) => l.khoa)).toEqual(['A', 'B'])
+    // rỗng / khoảng trắng / thiếu khoá ⇒ không có lời giải
+    for (const trong of ['', '   ', undefined, null, 5, {}, '{}', '{"buoc":[]}']) expect(ok(trong), String(trong)).toMatchObject({ loiGiai: '', loiGiaiCT: null })
+    // JSON HỎNG (cụt / thiếu ngoặc): KHÔNG hiện chuỗi rác
+    for (const hong of ['{"chot":"Acetylene có', '{chot: 1}', '{"chot":"x","buoc":[', '[1,2', '{"chot"']) expect(ok(hong), hong).toMatchObject({ loiGiai: '', loiGiaiCT: null })
+    // BẤT BIẾN: dù đầu vào thế nào, chữ hiện KHÔNG chứa `{"` và không có `[object Object]`
+    for (const v of [json, '{"chot":"a"}', '{"chot":{"x":1},"buoc":[{"y":2}]}', '{"tung_pa":{"a":{"vi_sao":"x"}}}', '{"chot":"Acetylene có']) {
+      const r = ok(v)
+      const chu = [r.loiGiai, r.loiGiaiCT ? [r.loiGiaiCT.chot, ...r.loiGiaiCT.buoc, r.loiGiaiCT.ketQua].join(' ') : ''].join(' ')
+      expect(chu, v).not.toMatch(/\{"|\[object Object\]/)
+    }
   })
 
   it('trần mảng theo hợp đồng: câu ≤ 120, bậc theo dạng ≤ 5, làm tốt ≤ 3; dạng có dung > tong bị bỏ', () => {
@@ -219,7 +293,11 @@ describe('api — danh tính pass hoặc SBD; đọc thân JSON cả khi HTTP 50
 
 describe('khoá nguồn', () => {
   it('lớp ph-moi không chứa màu thô / emoji / lookbehind / .at( / chữ game; không gọi thần thú', () => {
-    for (const p of ['src/lib/ph-moi/du-lieu.ts', 'src/lib/ph-moi/api.ts', 'src/lib/ph-moi/dinh-dang.ts', 'src/lib/ph-moi/use-tat-ca-ve-con.ts', 'src/components/ph-moi/nhan.ts', 'src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx']) {
+    // MỌI tệp ts/tsx của app phụ huynh mới (bộ đọc, màn chính, bảng và các khối của bảng) — liệt kê từ đĩa để khối mới không lọt.
+    const duyet = (d: string): string[] => fs.readdirSync(path.join(process.cwd(), d), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? duyet(`${d}/${e.name}`) : /\.tsx?$/.test(e.name) ? [`${d}/${e.name}`] : []))
+    const tep = [...duyet('src/lib/ph-moi'), ...duyet('src/components/ph-moi')]
+    expect(tep.length).toBeGreaterThan(25)
+    for (const p of tep) {
       const s = doc(p).replace(/\/\/.*$/gm, '')
       expect(s, p).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\(\?<[=!]|\.at\(|randomUUID/)
       expect(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(s), p).toBe(false)

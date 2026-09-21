@@ -195,6 +195,32 @@
   --bt-may-xanh: #7ee0a6;
 }
 
+/* APP PHỤ HUYNH KIỂU APPLE (thầy chốt 21/09; docs/ban-ve-ph-apple-2109/) — màu CHƯA có vai trò trong bảng M3/gg: mảng xanh lá "đạt" (vòng, cột, chấm), cam "cần luyện", tím "phút học", nút chính ở nền tối.
+ * Mặc định = nền sáng (xanh dương nhấn + nút chính ở nền sáng dùng thẳng --m3-primary); nền tối theo prefers-color-scheme ngay dưới (--ph-xanh-to = mảng xanh vòng/cột, --ph-nut + --ph-tren-nut = nút chính: m3-primary tối là xanh NHẠT nên vòng/nút sẽ bạc màu). Nơi dùng: src/components/ph-moi/ph-apple.css + ph-apple-bang.css (bí danh --phm-ap-* / --phm-*). */
+:root {
+  --ph-luc-to: rgb(52 168 83);
+  --ph-cam: rgb(168 84 0);
+  --ph-cam-to: rgb(240 140 20);
+  --ph-cam-nen: rgb(255 240 219);
+  --ph-tren-cam-nen: rgb(122 60 0);
+  --ph-tim: rgb(98 70 200);
+  --ph-tim-to: rgb(124 96 230);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ph-luc-to: rgb(52 199 89);
+    --ph-xanh-to: rgb(64 142 255);
+    --ph-nut: rgb(20 100 225);
+    --ph-tren-nut: rgb(255 255 255);
+    --ph-cam: rgb(255 179 92);
+    --ph-cam-to: rgb(255 159 10);
+    --ph-cam-nen: rgb(66 40 8);
+    --ph-tren-cam-nen: rgb(255 200 140);
+    --ph-tim: rgb(186 170 255);
+    --ph-tim-to: rgb(150 126 255);
+  }
+}
+
 /* BẢNG TIN KIỂU SÀN GIAO DỊCH của thầy (thầy chốt mẫu 21/09 15:58 — docs/ban-ve-bang-tin-san-2109/): SÁNG + TỐI đều là bản chính thức. Toàn bộ màu của màn nằm ở đây (tiền tố --bts-);
  * canvas / three.js đọc đúng các biến này qua getComputedStyle và vẽ lại khi đổi giao diện. Nền tối viết trong @media (prefers-color-scheme: dark) như mọi token khác (giao-dien-thay.ts tự ép sáng/tối). */
 :root {
