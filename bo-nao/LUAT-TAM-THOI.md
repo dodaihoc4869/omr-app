@@ -6,13 +6,11 @@ Ngày 21/09/2026 app xoá bài tập về nhà, kế hoạch ngày, game… (GI�
 - Cờ/tín hiệu "tụt nhịp", "bỏ dở giữa chặng", "trễ nhịp" suy từ kế hoạch/bài tập về nhà là GIẢ ⇒ KHÔNG đặt `co: tut_nhip|qua_tai` và KHÔNG giảm nhịp (`nhip.lech < 0`) vì các tín hiệu đó. Chỉ giảm nhịp khi thẻ cho thấy em THẬT SỰ làm bài SAU 21/09 mà sai nhiều (dưới 60 % ở hai buổi liền).
 - Em "vắng": chỉ tính vắng theo các ngày TỪ 21/09 trở đi.
 - Lời cho PHỤ HUYNH trong giai đoạn này: CHỈ viết khi có MỐC ĐÁNG KHEN thật (đúng lại câu từng sai, lên bậc, chuỗi ngày) hoặc con vắng ≥ 3 ngày tính từ 21/09. Không viết chỉ vì "con hay vấp một dạng". Mỗi em tối đa 2 lời/tuần (xem `loiNhanGanDay`/`lanCuoiLoiPhuHuynh` nếu thẻ có).
-- Các núm vẫn dùng bình thường vì dựa trên sổ học THẬT: `uu_tien`, `khacPhuc`, `on_som`, `ha_mot_bac`, `cho_thu_len_bac`, `tam_nghi`.
+- Các núm vẫn dùng bình thường vì dựa trên sổ học THẬT: `uu_tien`, `khac_phuc` (khi thẻ cho phép), `on_som`, `ha_mot_bac`, `cho_thu_len_bac`, `tam_nghi`.
 - Trong `lyDo`, `goiYChoThay`, bản tin: viết số cửa sổ thời gian bằng CHỮ ("bảy ngày", "ba ngày"); công thức hoá viết bằng TÊN ("đơn chất nitrogen", không "N2") — bộ kiểm hiện loại các chữ số không có trong thẻ. `khacPhuc`: mỗi DẠNG chỉ MỘT dòng (chọn `khac_phuc` HOẶC `on_som`) cho tới khi bộ kiểm được sửa.
 
-## CHỈ HỨA ĐIỀU CHẮC CHẮN XẢY RA (Boss đặt 21/09 — hiệu lực tới khi Boss gỡ)
-- Núm `khacPhuc` kiểu `khac_phuc` CHƯA được nối vào bộ rút bài ⇒ TẠM KHÔNG dùng `khac_phuc`. Muốn em gặp lại dạng vừa vấp: dùng `on_som` (kéo các câu em vừa sai về phần Ôn lại ngay ngày mai — ĐÃ chạy thật) và `uu_tien` (ưu tiên dạng ấy khi rút bài tập về nhà cá nhân hoá KẾ TIẾP).
-- Lời cho em/phụ huynh chỉ được hứa đúng hai điều đó, nói đúng mức chắc chắn:
-  · với `on_som`: "Mai các câu em vừa sai ở dạng … sẽ quay lại trong phần Ôn lại." (chắc chắn)
-  · với `uu_tien`: "Bài tập về nhà tới, mình sẽ ưu tiên dạng … cho em." (KHÔNG nói "mai mình xếp ba câu…" vì chưa chắc ngày mai em có bài mới)
-  · với `nhip`: chỉ nói "mình bớt/giữ số câu mỗi ngày" khi `nhip.lech ≠ 0`.
+## CHỈ HỨA ĐIỀU CHẮC CHẮN XẢY RA (Boss đặt 21/09, SỬA 21/09 09:50 sau khi máy chủ e268ce35 đã nối `khac_phuc` — hiệu lực tới khi Boss gỡ)
+- `khac_phuc` ĐÃ chạy thật: chỉ dùng khi thẻ có `coBaiCaNhanDangChay` và `soCauConLaiCungDang` của dạng ấy còn câu (đúng `LUAT-RUT-GON.md`). Khi dùng, lời cho em nói đúng mức: "Ở chặng tới của bài đang làm, mình đã xếp thêm vài câu dạng … cho em." KHÔNG nêu con số câu trong lời (máy chủ có thể chỉ chèn được ít hơn), KHÔNG nói "ngày mai".
+- Thẻ không cho phép ⇒ dùng `on_som` (chắc chắn: "Mai các câu em vừa sai ở dạng … sẽ quay lại trong phần Ôn lại.") và/hoặc `uu_tien` ("Bài tập về nhà tới, mình sẽ ưu tiên dạng … cho em." — không hứa ngày cụ thể).
+- Với `nhip`: chỉ nói "mình bớt/giữ số câu mỗi ngày" khi `nhip.lech ≠ 0`.
 - Không có núm nào ⇒ lời nhắn chỉ ghi nhận việc em đã làm + một gợi ý nhỏ do EM tự làm được (vd. "mai em thử làm lại hai câu vừa sai trước nhé"), không nói "mình đã xếp…".
