@@ -18,7 +18,7 @@ const CSS = [doc('src/styles/tokens.css'), doc('src/components/bang-nhiem-vu/m3-
 const so = (n, d = 2) => Number(n).toFixed(d).replace(/\.?0+$/, '').replace('.', ',')
 const D = {
   em: { ten: 'Nguyễn Minh Anh', lop: '12A1' },
-  ca: { ten: 'Kiểm tra 45 phút · Este – lipid', ngay: 'Thứ Bảy 19/09/2026', nop: '09:12', lam: '32 phút 10 giây', de: '45 phút', diem: 7.5, truoc: 6.75, dung: 21, tong: 28, exp: 18 },
+  ca: { ten: 'Kiểm tra 45 phút · Ester – lipid', ngay: 'Thứ Bảy 19/09/2026', nop: '09:12', lam: '32 phút 10 giây', de: '45 phút', diem: 7.5, truoc: 6.75, dung: 21, tong: 28, exp: 18 },
   phan: [
     { ma: 'I', ten: 'Phần I · Trắc nghiệm', dung: 15, tong: 18, diem: 3.75, toiDa: 4.5, o: 'dddsddddsdddddsddd'.split('').map((c, i) => [i + 1, c]) },
     { ma: 'II', ten: 'Phần II · Đúng–sai', dung: 2, tong: 4, diem: 2.75, toiDa: 4, o: [[1, 'd'], [2, 'm'], [3, 'd'], [4, 'm']] },
@@ -35,7 +35,7 @@ const D = {
     { ten: 'Nhận biết ester, axit và ancol', dung: 4, tong: 5, bac: 1, truoc: 1 },
   ],
   ds: [
-    { ten: 'Kiểm tra 45 phút · Este – lipid', ngay: 'Thứ Bảy 19/09/2026', tt: 'ok', diem: 7.5, dung: 21, tong: 28, ss: 0.75 },
+    { ten: 'Kiểm tra 45 phút · Ester – lipid', ngay: 'Thứ Bảy 19/09/2026', tt: 'ok', diem: 7.5, dung: 21, tong: 28, ss: 0.75 },
     { ten: 'Kiểm tra 60 phút · Ancol – phenol', ngay: 'Thứ Bảy 12/09/2026', tt: 'ok', diem: 6.75, dung: 27, tong: 40, ss: 0.5 },
     { ten: 'Kiểm tra 60 phút · Hiđrocacbon', ngay: 'Thứ Bảy 05/09/2026', tt: 'ok', diem: 6.25, dung: 25, tong: 40, ss: 0.75 },
     { ten: 'Kiểm tra 60 phút · Đại cương hữu cơ', ngay: 'Thứ Bảy 29/08/2026', tt: 'ok', diem: 5.5, dung: 22, tong: 40, ss: 0.5 },
@@ -352,6 +352,99 @@ P['ban-in-a4'] = () => {
   <div class="a4-chan"><span>In từ app ngày 19/09/2026 · dữ liệu mẫu</span><span>Trang 2/2</span></div></article>` })
 }
 
+// ───────────────────────────── PH · THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" + TRANG "TẤT CẢ VỀ CON" ─────────────────────────────
+// Thầy lệnh 21/09 ~12:40: "Có một chỗ hiện điểm ca thi gần nhất siêu đẹp siêu xịn, bấm vào là xem được hết mọi thứ của con, trừ game." (prompt-ph-giao-them-bai-2109.md mục D)
+// Ghép từ bộ xd-* đã chốt, giọng phụ huynh (con · anh/chị). KHÔNG thần thú/EXP/khiên/Đoàn, KHÔNG xếp hạng, KHÔNG so con với bạn. Dữ liệu GIẢ theo hợp đồng docs/hop-dong-xem-diem-v2-2109.md mục 6 (`/ph/tat-ca-ve-con`).
+const PHD = {
+  btvnDangChay: [{ ten: 'Bài tập về nhà · Kim loại kiềm', chang: 2, tong: 5, han: 'Hạn nộp 12:00 trưa mai (Thứ Ba 22/09) · còn khoảng 17 giờ' }],
+  btvnGan: [
+    { ten: 'Bài tập về nhà · Ancol – phenol', nop: 'Nộp 20/09 lúc 21:40', chip: 'ok', chipChu: 'Nộp đúng hạn', diem: 8.2 },
+    { ten: 'Bài tập về nhà · Hiđrocacbon', nop: 'Nộp 13/09 lúc 23:05', chip: 'luu-y', chipChu: 'Nộp trễ 1 giờ', diem: 7 },
+    { ten: 'Bài tập về nhà · Đại cương hữu cơ', nop: 'Nộp 06/09 lúc 20:10', chip: 'ok', chipChu: 'Nộp đúng hạn', diem: 6.5 },
+  ],
+  lichOn: { homNay: 4, ngayMai: 3, daKhacPhuc: 12, conSai: 5 },
+  nhip: [['08', 0], ['09', 24], ['10', 0], ['11', 18], ['12', 31], ['13', 0], ['14', 0], ['15', 22], ['16', 0], ['17', 27], ['18', 0], ['19', 20], ['20', 24], ['21', 12]],
+  gio: '19:00–21:00',
+  vuaLen: { ten: 'Danh pháp ester', tu: 'Hiểu', den: 'Vận dụng', ngay: '20/09' },
+}
+/** Thẻ đầu Bảng nhiệm vụ phụ huynh. `kieu`: ok (đã công bố) · dau (ca đầu tiên) · lop (chờ cả lớp) · khong (thầy chưa công bố). Cả thẻ là MỘT liên kết ≥ 48 px. */
+C.theCaGan = ({ kieu = 'ok', luc = '09:12', nop = 27, si = 32 } = {}) => {
+  const ten = D.ca.ten
+  const duoi = `<span class="xd-tcg__duoi"><span>Xem tất cả về con</span>${ic('phai', true)}</span>`
+  if (kieu === 'lop' || kieu === 'khong') {
+    const dong = kieu === 'lop' ? `Con đã nộp bài lúc ${luc}. Điểm hiện khi cả lớp nộp xong (${nop}/${si} em đã nộp).` : `Con đã nộp bài lúc ${luc}. Thầy chưa công bố điểm.`
+    return `<a class="xd-the xd-tcg" href="ph-4-tat-ca-ve-con.html" aria-label="Ca kiểm tra gần nhất của con: ${ten}. ${dong} Xem tất cả về con.">
+    <span class="xd-tcg__tren"><span class="xd-tcg__nhan">Ca kiểm tra gần nhất của con</span>${C.chipCongBo(kieu)}</span>
+    <span class="xd-tcg__giua"><span class="xd-tcg__diem xd-tcg__diem--khoa" aria-hidden="true">${ic(kieu === 'lop' ? 'nguoi' : 'khoa', true)}<small>Chưa có điểm</small></span>
+    <span class="xd-tcg__chu"><h3>${ten}</h3><p>${dong}</p></span></span>${duoi}</a>`
+  }
+  const ss = kieu === 'dau' ? null : D.ca.diem - D.ca.truoc
+  const diem = kieu === 'dau' ? 5 : D.ca.diem
+  const tong = kieu === 'dau' ? 40 : D.ca.tong
+  const dung = kieu === 'dau' ? 20 : D.ca.dung
+  const phan = kieu === 'dau' ? [{ ma: 'I', diem: 2.5, toiDa: 4.5 }, { ma: 'II', diem: 1.5, toiDa: 3 }, { ma: 'III', diem: 1, toiDa: 2.5 }] : D.phan
+  return `<a class="xd-the xd-tcg" href="ph-4-tat-ca-ve-con.html" aria-label="Ca kiểm tra gần nhất của con: ${ten}, ${so(diem)} trên 10 điểm, đúng ${dung} trên ${tong} câu. Xem tất cả về con.">
+    <span class="xd-tcg__tren"><span class="xd-tcg__nhan">Ca kiểm tra gần nhất của con</span>${C.chipCongBo('ok')}</span>
+    <span class="xd-tcg__giua"><span class="xd-tcg__diem" aria-hidden="true"><b>${so(diem)}</b><small>trên 10 điểm</small></span>
+    <span class="xd-tcg__chu"><h3>${ten}</h3><p class="xd-so">Nộp ${luc} · ${D.ca.ngay}</p><p class="xd-so">Con làm đúng ${dung}/${tong} câu</p>${C.soSanh(ss, D.ca.truoc, 'con')}</span></span>
+    <span class="xd-tcg__phan">${phan.map((p) => `<span class="xd-tcg__hang"><span>Phần ${p.ma}</span><span class="thanh" role="img" aria-label="Phần ${p.ma}: ${so(p.diem)} trên ${so(p.toiDa)} điểm"><i style="width:${(p.diem / p.toiDa) * 100}%"></i></span><b class="xd-so">${so(p.diem)}/${so(p.toiDa)}</b></span>`).join('')}</span>${duoi}</a>`
+}
+/** Khung xám minh hoạ chỗ đặt (đầu Bảng nhiệm vụ đã có sẵn ở app — chỉ để thấy VỊ TRÍ của thẻ). */
+const KHUNG_GIA = (t) => `<div class="xd-gia" aria-hidden="true">${t}</div>`
+
+P['ph-3-the-ca-gan-nhat'] = () => trang({ tieuDe: 'PH-3 · Thẻ "Ca kiểm tra gần nhất của con"', body: `${C.thanhTren('Thẻ ở đầu Bảng nhiệm vụ phụ huynh', 'Bản vẽ · 4 trạng thái · chạm cả thẻ để mở "Tất cả về con"')}
+<main class="xd-khung">
+  <div class="xd-ghi-chu-bo">Thẻ nằm ở ĐẦU Bảng nhiệm vụ, trên "Việc hôm nay". Khung nét đứt chỉ minh hoạ vị trí (đầu trang và việc hôm nay đã có ở app). Cả thẻ là MỘT đích chạm; chưa công bố thì thẻ trung tính, KHÔNG điểm, KHÔNG đáp án; con chưa nộp ca nào thì không vẽ thẻ. Không game, không xếp hạng.</div>
+  <section class="xd-muc" aria-label="A · Đã công bố"><div class="xd-muc__dau"><h2>A · Đã công bố, điểm tăng</h2><p>đúng 21/28 · +0,75 so với lần trước của con</p></div>
+    ${KHUNG_GIA('Đầu trang: "Hôm nay của Minh" · Con đã làm 12/30 câu')}${C.theCaGan({ kieu: 'ok' })}${KHUNG_GIA('Việc hôm nay: Bài tập về nhà · Chặng 2 …')}</section>
+  <section class="xd-muc" aria-label="B · Ca đầu tiên"><div class="xd-muc__dau"><h2>B · Ca đầu tiên của con</h2><p>chưa có lần trước để so, nói thẳng</p></div>${C.theCaGan({ kieu: 'dau' })}</section>
+  <section class="xd-muc" aria-label="C · Chờ cả lớp nộp"><div class="xd-muc__dau"><h2>C · Chờ cả lớp nộp</h2><p>27/32 em đã nộp · không lộ điểm</p></div>${C.theCaGan({ kieu: 'lop' })}</section>
+  <section class="xd-muc" aria-label="D · Thầy chưa công bố"><div class="xd-muc__dau"><h2>D · Thầy chưa công bố điểm</h2><p>nói thật · không doạ</p></div>${C.theCaGan({ kieu: 'khong' })}</section>
+</main>` })
+
+P['ph-4-tat-ca-ve-con'] = () => trang({ tieuDe: 'PH-4 · Trang "Tất cả về con"', body: `${C.thanhTren('Tất cả về con', `${D.em.ten} · Lớp ${D.em.lop}`, { quayLai: 'Về bảng nhiệm vụ' })}
+<main class="xd-khung xd-khung--rong"><div class="xd-bao-cao">
+  ${C.mucLuc([['ca-gan', 'Ca gần nhất'], ['tien-bo', 'Tiến bộ'], ['btvn', 'Bài tập về nhà'], ['dang-vap', 'Dạng con còn vấp'], ['lich-on', 'Lịch ôn lại'], ['nhip', 'Nhịp học'], ['loi-ai', 'Lời từ A.I Đỗ Đại Học'], ['lam-gi', 'Anh/chị có thể làm gì']], 0)}
+  <div class="xd-bao-cao__noi-dung">
+    <section class="xd-muc" id="ca-gan" aria-labelledby="h-cg"><div class="xd-muc__dau"><h2 id="h-cg">Ca kiểm tra gần nhất</h2><p>${D.ca.ten}</p></div>
+      ${C.ketQua({ ...D.ca, ss: D.ca.diem - D.ca.truoc, truoc: D.ca.truoc, ai: 'con', giong: 'con', nop: `Nộp lúc ${D.ca.nop} · ${D.ca.ngay}` })}
+      <div class="xd-phan-ds">${D.phan.map((p) => C.phan(p, { chiTiet: false })).join('')}</div>
+      <a class="xd-nut xd-nut--tonal" href="ph-1-bao-cao-phu-huynh.html" style="align-self:flex-start">${ic('tai-lieu')}Xem báo cáo chi tiết của ca này</a></section>
+    ${C.tienBo({ doc: 'con' })}
+    <section class="xd-muc" id="btvn" aria-labelledby="h-bt"><div class="xd-muc__dau"><h2 id="h-bt">Bài tập về nhà</h2><p>1 bài đang chạy · 3 bài gần đây</p></div>
+      <p class="xd-nhom-ten">ĐANG CHẠY</p>
+      ${PHD.btvnDangChay.map((b) => `<div class="xd-btvn"><div class="xd-btvn__dau"><h3>${b.ten}</h3><span class="xd-chip xd-chip--cho xd-so">Chặng ${b.chang}/${b.tong}</span></div>
+        <div class="xd-tien-do__thanh" role="progressbar" aria-label="Số chặng con đã xong" aria-valuemin="0" aria-valuemax="${b.tong}" aria-valuenow="${b.chang}"><i style="width:${(b.chang / b.tong) * 100}%"></i></div>
+        <p class="xd-btvn__han">${ic('dong-ho')}<span>${b.han}</span></p></div>`).join('')}
+      <p class="xd-nhom-ten">GẦN ĐÂY · MỚI NHẤT TRƯỚC</p>
+      <ul class="xd-btvn-ds">${PHD.btvnGan.map((b) => `<li class="xd-btvn-dong"><div><h3>${b.ten}</h3><p>${b.nop}</p></div><div class="xd-btvn-dong__phai"><span class="xd-chip xd-chip--${b.chip}">${b.chip === 'ok' ? ic('dung') : ic('dong-ho')}${b.chipChu}</span><b>${so(b.diem)}<small>điểm</small></b></div></li>`).join('')}</ul></section>
+    <section class="xd-muc" id="dang-vap" aria-labelledby="h-dv"><div class="xd-muc__dau"><h2 id="h-dv">Dạng bài con còn vấp</h2><p>14 ngày gần đây</p></div>
+      <p class="xd-muc__mo-ta">Bậc của con ở mỗi dạng đi từ Biết, đến Hiểu, đến Vận dụng. Dạng con còn vấp được xếp lên trên.</p>
+      <ul class="xd-dang-ds">${D.dang.slice(0, 3).map((d) => C.dang(d, { doc: 'con' })).join('')}</ul>
+      <p class="xd-nhom-ten">CON VỪA LÊN BẬC</p>
+      <ul class="xd-tb-ds"><li class="xd-tb"><span>${PHD.vuaLen.ten}</span><small>${ic('tang')}${PHD.vuaLen.tu} → ${PHD.vuaLen.den} · ${PHD.vuaLen.ngay}</small></li></ul></section>
+    <section class="xd-muc" id="lich-on" aria-labelledby="h-lo"><div class="xd-muc__dau"><h2 id="h-lo">Lịch ôn lại</h2><p>các câu con đã làm sai</p></div>
+      <p class="xd-muc__mo-ta">A.I Đỗ Đại Học nhắc con ôn lại mỗi câu sai vào 1 ngày, 3 ngày và 7 ngày sau khi sai.</p>
+      <div class="xd-on-luoi">
+        <div class="xd-on-o xd-on-o--nhan"><b>${PHD.lichOn.homNay}<small>câu</small></b><span>đến lịch ôn hôm nay</span></div>
+        <div class="xd-on-o xd-on-o--nhan"><b>${PHD.lichOn.ngayMai}<small>câu</small></b><span>đến lịch ôn ngày mai</span></div>
+        <div class="xd-on-o"><b>${PHD.lichOn.daKhacPhuc}<small>câu</small></b><span>con đã khắc phục trong 14 ngày</span></div>
+        <div class="xd-on-o"><b>${PHD.lichOn.conSai}<small>câu</small></b><span>làm sai, chưa khắc phục</span></div>
+      </div></section>
+    <section class="xd-muc" id="nhip" aria-labelledby="h-nh"><div class="xd-muc__dau"><h2 id="h-nh">Nhịp học 14 ngày</h2><p>số câu con làm mỗi ngày</p></div>
+      <div class="xd-the"><div class="xd-nhip" role="img" aria-label="Số câu con làm mỗi ngày trong 14 ngày gần nhất: ${PHD.nhip.filter(([, v]) => v > 0).map(([n, v]) => `ngày ${n} làm ${v} câu`).join(', ')}">${PHD.nhip.map(([n, v]) => `<div>${v > 0 ? `<small class="so">${v}</small><i style="height:${Math.round((v / 31) * 92)}px"></i>` : '<i class="trong"></i>'}<small>${n}</small></div>`).join('')}</div>
+        <div class="xd-nhip-chu"><span>${ic('lich')}Con học ${PHD.nhip.filter(([, v]) => v > 0).length} trong 14 ngày</span><span>${ic('dong-ho')}Thường học vào khoảng ${PHD.gio}</span></div>
+        <p class="xd-muc__mo-ta" style="margin-top:8px;font-size:var(--bnv-cx-1)">Ngày không học để trống, không chấm điểm hay trách. Số ghi trên cột là số câu làm trong ngày; dưới cột là ngày trong tháng 9.</p></div></section>
+    <section class="xd-muc" id="loi-ai" aria-labelledby="h-la"><div class="xd-muc__dau"><h2 id="h-la">Lời từ A.I Đỗ Đại Học</h2><p>gửi anh/chị</p></div>
+      <div class="xd-loi-ai">
+        <div class="xd-loi"><h3>Lời hôm nay · 21/09</h3><p>Hôm qua con ôn đều và đúng 5/6 câu ở dạng Thuỷ phân ester. Tối nay con còn 4 câu đến lịch ôn, khoảng 6 phút.</p></div>
+        <div class="xd-loi"><h3>Thư tuần · 14/09 – 20/09</h3><p>Tuần này con học 6 trong 7 ngày và lên bậc Vận dụng ở dạng Danh pháp ester. Dạng Xà phòng hoá chất béo con vẫn còn vấp, A.I Đỗ Đại Học sẽ ưu tiên dạng này trong bài tập về nhà tới.</p><small>Viết tự động từ số liệu học của con</small></div>
+      </div></section>
+    <section class="xd-muc" id="lam-gi" aria-labelledby="h-lg"><div class="xd-the xd-goi-y"><h2 id="h-lg">Anh/chị có thể làm gì</h2>
+      <ol><li>Hỏi con kể lại cách giải câu 9 (bài toán thuỷ phân ester) — con nói được là con đã hiểu.</li><li>Nhắc con làm 4 câu ôn lại tối nay, khoảng 6 phút.</li></ol>
+      <div class="xd-goi-y__hanh"><button class="xd-nut xd-nut--chinh xd-nut--rong" type="button">Giao thêm bài cho con</button><p class="xd-goi-y__phu xd-so">Hôm nay còn 3 lượt giao · A.I Đỗ Đại Học chọn số câu và dạng bài hợp với con</p></div></div></section>
+  </div></div></main>` })
+
 // TRANG CHỦ của bộ bản vẽ
 P.index = () => trang({ tieuDe: 'Bản vẽ Xem điểm + báo cáo chi tiết · bản 2', body: `${C.thanhTren('Xem điểm + báo cáo chi tiết · bản 2', 'Bản vẽ để thầy duyệt · dữ liệu giả · chưa build')}
 <main class="xd-khung xd-khung--rong" style="gap:20px">
@@ -365,6 +458,8 @@ P.index = () => trang({ tieuDe: 'Bản vẽ Xem điểm + báo cáo chi tiết �
     <a href="hs-3-danh-sach-ca.html"><b>HS-3 · Danh sách ca (tab Xem điểm)</b><span>Điểm 5 ca gần nhất + ca chưa có điểm + ca đã có điểm.</span></a>
     <a href="ph-1-bao-cao-phu-huynh.html"><b>PH-1 · Báo cáo cho phụ huynh</b><span>Tiếng thường, "Anh/chị có thể làm gì".</span></a>
     <a href="ph-2-danh-sach-ca.html"><b>PH-2 · Danh sách ca (phụ huynh)</b><span>Cùng khung với HS-3, giọng "con".</span></a>
+    <a href="ph-3-the-ca-gan-nhat.html"><b>PH-3 · Thẻ "Ca kiểm tra gần nhất của con"</b><span>Đầu Bảng nhiệm vụ phụ huynh · 4 trạng thái · cả thẻ là một đích chạm.</span></a>
+    <a href="ph-4-tat-ca-ve-con.html"><b>PH-4 · Trang "Tất cả về con"</b><span>Một trang cuộn + mục lục dính, 8 mục, không game.</span></a>
     <a href="ban-in-a4.html"><b>Bản in A4</b><span>Hai trang, nền trắng, mực đen (PhieuScreen).</span></a>
   </div></main>` })
 

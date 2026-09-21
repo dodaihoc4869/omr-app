@@ -14,6 +14,8 @@ Mở `index.html` (hoặc từng trang) bằng trình duyệt; dữ liệu và t
 | PH-1 Báo cáo phụ huynh | `ph-1-bao-cao-phu-huynh-…` | tiếng thường + "Anh/chị có thể làm gì" |
 | PH-2 Danh sách ca (phụ huynh) | `ph-2-danh-sach-ca-…` | cùng khung HS-3, giọng "con" |
 | Bản in A4 (PhieuScreen) | `ban-in-a4-a4.jpg` | hai trang, nền trắng, mực đen |
+| PH-3 Thẻ "Ca kiểm tra gần nhất của con" (thầy lệnh 21/09) | `ph-3-the-ca-gan-nhat-{390,1440}-{sang,toi}` | thẻ ở ĐẦU Bảng nhiệm vụ phụ huynh, 4 trạng thái: đã công bố (điểm tăng) · ca đầu tiên · chờ cả lớp (27/32) · thầy chưa công bố (không điểm). Cả thẻ = MỘT đích chạm ≥ 48 px, mũi tên "Xem tất cả về con" |
+| PH-4 Trang "Tất cả về con" (thầy lệnh 21/09) | `ph-4-tat-ca-ve-con-{390,1440}-{sang,toi}[-a/-b]` | MỘT trang cuộn + mục lục dính, 8 mục: Ca gần nhất · Tiến bộ · Bài tập về nhà · Dạng con còn vấp (+ vừa lên bậc) · Lịch ôn lại · Nhịp học 14 ngày · Lời từ A.I Đỗ Đại Học (lời hôm nay + thư tuần) · Anh/chị có thể làm gì + nút "Giao thêm bài cho con". KHÔNG thần thú/EXP/khiên/game, KHÔNG xếp hạng, KHÔNG so con với bạn; ngày không học để trống (không trách) |
 (GV-1/2/3 do Code 4 vẽ sau, dùng đúng bộ thành phần này.)
 
 ## 5 dòng "bản 2 khác bản cũ ở đâu"
@@ -25,3 +27,8 @@ Mở `index.html` (hoặc từng trang) bằng trình duyệt; dữ liệu và t
 
 ## Tự kiểm (Chromium, 8 trang × 390/1440 × sáng/tối = 32 ca)
 0 chữ dưới 4,5:1 · 0 đích chạm dưới 48 px · 0 tràn ngang · 0 lỗi console · 0 emoji · 0 mã nội bộ · màu chỉ đọc biến của app (tokens.css + m3-theme.css) · nút chính đúng MỘT/màn.
+
+## Ghi thêm 21/09 (PH-3/PH-4)
+- Sửa chữ mẫu "Este" → **"Ester"** ở mọi trang (theo Boss); ảnh cũ chụp lại cho khớp.
+- Thẻ và trang chỉ GHÉP bộ `xd-*` đã chốt + vài khối riêng của phụ huynh (`xd-tcg*`, `xd-btvn*`, `xd-on-*`, `xd-nhip*`, `xd-loi*`). Dữ liệu mẫu theo `docs/hop-dong-xem-diem-v2-2109.md` mục 6 (`/ph/tat-ca-ve-con`); khối nào thiếu số thật ⇒ ẨN, không bịa.
+- Tự kiểm Chromium 390/1440 × sáng/tối: 0 chữ dưới 4,5:1 · 0 đích chạm < 48 px · 0 tràn ngang · 0 lỗi console.
