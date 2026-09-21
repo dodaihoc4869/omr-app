@@ -23,6 +23,7 @@ import {chotNgayRoiTruKhien} from './khien-mat'
 import {chuyenDoiLoCron} from './game-v2-hap-thu'
 import {hsThiDuaHomNay,gvChuaHocHomNay} from './thi-dua-hom-nay'
 import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
+import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {docThanThuSoThat,hsThuThachHomNay,hsThuThachNop} from './thu-thach-rieng'
@@ -3092,6 +3093,8 @@ export default {
         const kh = await hsKeHoachNgayCoExp(env, b)
         // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
         if (kh.ok === true && typeof kh.sbd === 'string') kh.doanMo = await doanMoCho(env, kh.sbd)
+        // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` (việc ngày trước chưa xong, theo ngày) + `veDich` (từng bài: chặng xong/nợ/hôm nay/sắp tới, giờ còn lại, tối nay, các buổi sau). Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
+        if (kh.ok === true && typeof kh.sbd === 'string') { try { const vd = await docVeDichCuaEm(env, kh.sbd); kh.no = vd.no; kh.veDich = vd.veDich } catch (e) { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e) } }
         // BỘ NÃO A.I chế độ THẬT: lời nhắn cho ĐÚNG em này (chỉ lời cho em, không lời phụ huynh). Chạy thử/tắt/không có lời ⇒ KHÔNG có khoá `loiNhanHlv` (phản hồi y hệt cũ).
         if (kh.ok === true && typeof kh.sbd === 'string') {
           const loiHlv = await docLoiNhanHlv(env, kh.sbd, typeof kh.ngay === 'string' ? kh.ngay : ngayVn(Date.now()))

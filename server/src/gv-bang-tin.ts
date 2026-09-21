@@ -274,6 +274,13 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   }
   // nhip.btvnDungNhip: tính từ mốc (chỉ các bài đang hiện ở baiTap, tức bài giao từ ngày của mốc); vắng khi không có bài / không đọc được em của bài
   if (rBe && emTrongBai.size > 0) nhip.btvnDungNhip = { dungNhip: emTrongBai.size - emCham.size, tongEm: emTrongBai.size, cham: emCham.size }
+  // DỒN VỀ ĐÍCH: số em ĐANG NỢ (chậm ≥ 1 chặng so với lịch của chính em, hoặc quá hạn chưa nộp) THEO LỚP — dùng đúng tập `emCham` đã tính, KHÔNG thêm truy vấn. Chỉ lớp có ≥ 1 em nợ; xếp giảm dần; vắng ⇒ máy thầy ẩn.
+  if (rBe && emCham.size > 0) {
+    const siSo = new Map<string, number>(), no = new Map<string, number>()
+    for (const [, e] of em) siSo.set(e.tenLop, (siSo.get(e.tenLop) ?? 0) + 1)
+    for (const sbd of emCham) { const e = em.get(sbd); if (e) no.set(e.tenLop, (no.get(e.tenLop) ?? 0) + 1) }
+    nhip.noTheoLop = [...no].map(([lop, soEmNo]) => ({ lop, siSo: siSo.get(lop) ?? soEmNo, soEmNo })).sort((a, c) => c.soEmNo - a.soEmNo || (a.lop < c.lop ? -1 : 1))
+  }
   const luotKe = cfgNhac.bat ? lanChayKe(nowMs, cfgNhac) : undefined
   for (const b of bai) {
     const d = daoBai.get(b.ma)

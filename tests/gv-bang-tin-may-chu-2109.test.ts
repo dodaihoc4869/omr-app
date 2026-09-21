@@ -201,6 +201,22 @@ describe('nhip.btvnDungNhip (em đúng nhịp = đã nộp hoặc xong đủ s�
     expect(r.dungNhip + r.cham).toBe(r.tongEm)
   })
 
+  it('nhip.noTheoLop (Dồn về đích): số em ĐANG NỢ theo lớp = đúng tập em chậm của btvnDungNhip, chia theo lớp; chỉ lớp có ≥ 1 em nợ, xếp giảm dần; không ai chậm ⇒ VẮNG (không 0 giả)', async () => {
+    const d = truong('2026-09-23T13:00:00')
+    themBai(d, 'B1', T('2026-09-21T12:30:00'), T('2026-09-24T12:00:00'))
+    for (const e of EM.slice(0, 6)) themBaiEm(d, 'B1', e!, { soChang: 4, xong: 1, chot: T('2026-09-21T12:40:00') }) // 6 em cùng chậm
+    const r = await goi(d)
+    const tl = (r.nhip as { noTheoLop?: { lop: string; siSo: number; soEmNo: number }[] }).noTheoLop
+    expect(tl).toBeTruthy()
+    expect(tl!.reduce((t, x) => t + x.soEmNo, 0)).toBe(nhipBtvn(r)!.cham)
+    for (const x of tl!) { expect(x.soEmNo).toBeGreaterThanOrEqual(1); expect(x.soEmNo).toBeLessThanOrEqual(x.siSo); expect(typeof x.lop).toBe('string') }
+    expect(tl!.map((x) => x.soEmNo)).toEqual([...tl!.map((x) => x.soEmNo)].sort((p, q) => q - p))
+    const e2 = truong('2026-09-23T13:00:00')
+    themBai(e2, 'B1', T('2026-09-21T12:30:00'), T('2026-09-24T12:00:00'))
+    themBaiEm(e2, 'B1', EM[0]!, { soChang: 4, xong: 4, chot: T('2026-09-21T12:40:00') }) // không ai chậm
+    expect((await goi(e2)).nhip).not.toHaveProperty('noTheoLop')
+  })
+
   it('lịch ĐÃ LƯU (hạn ngắn, chia theo giờ) dùng `dungNhipTruoc` của chính em: chưa tới mốc ⇒ đúng nhịp dù chặng kế đã mở; tới đúng mốc (20:00:00) ⇒ cham', async () => {
     const chay = async (luc: string) => {
       const d = truong(luc)

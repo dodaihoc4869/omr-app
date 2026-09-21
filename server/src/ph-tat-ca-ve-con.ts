@@ -23,6 +23,7 @@ import { sbdCuaPhuHuynh } from './ph-truy-cap'
 import { ngayVn } from './su-kien-hoc'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { hangChamCuaEm } from './thi-dua-hom-nay'
+import { docVeDichCuaEm } from './ve-dich-d1'
 
 type Row = Record<string, unknown>
 
@@ -588,7 +589,13 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   const doCham = await hangChamCuaEm(env, sbd, nowMs)
   if (doCham) ra.doCham = { hang: doCham.hang, siSo: doCham.siSo }
 
-  // ── `no` (Dồn về đích, thầy chốt 21/09): { theoNgay:[{ngay, loai, ten, soCau, phut}], tongCau, tongPhut } — Code 3 cấp hàm tính nợ ở W3; CHỜ NỐI TẠI ĐÂY, KHÔNG tự tính lại ở tệp này.
+  // ── `no` (Dồn về đích, thầy chốt 21/09): { theoNgay:[{ngay, loai, ten, soCau, phut}], tongCau, tongPhut } — nối `docVeDichCuaEm` (ve-dich-d1.ts, Code 4 soạn; Code 3 nối W3). CHỈ khi có nợ; không nợ / lỗi ⇒ vắng khoá (khối thiếu ⇒ vắng, không bịa).
+  try {
+    const vd = await docVeDichCuaEm(env, sbd, nowMs)
+    if (vd.no.tongCau > 0) ra.no = vd.no
+  } catch (e) {
+    console.error('[ph-tat-ca-ve-con] không đọc được nợ (bỏ khối no):', e instanceof Error ? e.message : e)
+  }
   return ra
 }
 
