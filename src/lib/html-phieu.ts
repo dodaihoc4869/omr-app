@@ -29,7 +29,7 @@ import { cauHinhNop, type CauHinhNopKhacPhuc } from './cau-hinh-nop-khac-phuc'
 import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
 import { goKyTuLa } from './chu-la-pdf'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
-import { nhanChipHtml, ghiThuongHtml, heroCaNhanHtml, ghiChoHtml, CSS_PHIEU_CA_NHAN, type DauBaiCaNhanVao } from './html-phieu-ca-nhan'
+import { nhanChipHtml, ghiThuongHtml, heroCaNhanHtml, ghiChoHtml, chipThuSucHtml, ghiThuSucHtml, nhomThuSucHtml, CSS_PHIEU_CA_NHAN, type DauBaiCaNhanVao } from './html-phieu-ca-nhan'
 
 /** Một ô thông tin ngoài bìa: nhãn nhỏ ở trên, giá trị đậm ở dưới. */
 export interface OBia {
@@ -1210,7 +1210,7 @@ export function theCauHtml(
     ? '<span class="q-tag muc-tieu-hom-nay-tag">✨ Mục tiêu hôm nay</span>'
     : ''
   const tags = [
-    cn?.nhan ? nhanChipHtml(cn.nhan) : '',
+    cn?.thuSuc ? chipThuSucHtml() : cn?.nhan ? nhanChipHtml(cn.nhan) : '',
     tagMucTieu,
     tagVong,
     n
@@ -1326,6 +1326,7 @@ export function theCauHtml(
     moSan ? 'mo' : '',
     giai ? '' : 'khong-giai',
     laDimmed ? 'q-card-dimmed' : (laBtvn && soCauSang ? 'q-card-active' : ''),
+    cn?.thuSuc ? 'q-card-thu-suc' : '',
     cn?.daCham ? 'da-cham' : '',
     cn?.daCham ? (cn.daCham.dung ? 'cau-dung' : 'cau-sai') : '',
   ].filter(Boolean).join(' ')
@@ -1333,7 +1334,7 @@ export function theCauHtml(
   return `<article class="${cacLop}" data-so="${stt}" data-phan="${c.phan}" data-muc="${thoat(c.mucDo || '')}"${choLam ? ` data-qid="${thoat(c.id || '')}"` : ''}>
   <div class="q-header"><div class="q-num"><span class="ky">${stt}</span></div><div class="q-tags">${tags}</div></div>
   <div class="q-than">
-    ${bannerDimmed}${cn?.nhan && ghiThuongHtml(cn.nhan) ? '\n    ' + ghiThuongHtml(cn.nhan) : ''}
+    ${bannerDimmed}${cn?.thuSuc ? '\n    ' + ghiThuSucHtml() : cn?.nhan && ghiThuongHtml(cn.nhan) ? '\n    ' + ghiThuongHtml(cn.nhan) : ''}
     ${oLamLai}
     ${deBai}
     ${bangHtml(c.bang)}
@@ -2042,7 +2043,7 @@ export const JS_PHIEU = `
       }
       function soDaLam() {
         var n = 0;
-        for (var i = 0; i < du.cau.length; i++) if (String(lam[du.cau[i].id] || '').trim()) n++;
+        for (var i = 0; i < du.cau.length; i++) if (!du.cau[i].ts && String(lam[du.cau[i].id] || '').trim()) n++;
         return n;
       }
       // Ô CHỌN NẰM NGAY TRÊN PHƯƠNG ÁN, nên mọi thứ tra từ thẻ câu.
@@ -2275,7 +2276,7 @@ export const JS_PHIEU = `
           var qc = du.cau[ic2].id;
           if (Object.prototype.hasOwnProperty.call(dc, qc)) continue;
           var vv = String(lam[qc] == null ? '' : lam[qc]).trim();
-          if (vv) { guiDi[qc] = vv; lamMoi++; } else thieuC++;
+          if (vv) { guiDi[qc] = vv; if (!du.cau[ic2].ts) lamMoi++; } else if (!du.cau[ic2].ts) thieuC++;
         }
         if (lamMoi === 0) {
           if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = 'Em chưa làm câu nào trong chặng này.'; }
@@ -2804,7 +2805,7 @@ export const JS_PHIEU_M3 = `
         for (var i = 0; i < ds.length; i++) {
           var lam = daLam(ds[i]);
           if (ds[i].classList.contains('gd-da-lam') !== lam) ds[i].classList.toggle('gd-da-lam', lam);
-          if (biKhoa(ds[i])) continue;
+          if (biKhoa(ds[i]) || ds[i].classList.contains('q-card-thu-suc')) continue;
           t++;
           if (lam) l++;
         }
@@ -3154,7 +3155,13 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   // GIAO DIỆN M3: phiếu học sinh làm/nộp (`nop`) hoặc phiếu học sinh chỉ đọc do chỗ gọi khai `giaoDienHocSinh`.
   // KHÔNG suy từ `laBtvn`/`anGiai`: hai cờ ấy còn dùng cho phiếu của giáo viên.
   const m3 = Boolean(nop || t.giaoDienHocSinh)
-  const the = cau.map((c, i) => theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn, soCauSang)).join('\n')
+  // BẢN 1.2: nhóm "Thử sức thêm · không bắt buộc" nằm CUỐI danh sách (sau chặng cuối); tiêu đề nhóm đứng trước câu thử sức đầu tiên.
+  // Câu thử sức KHÔNG tính vào "Đã làm x/y" và không chặn nút nộp. Không câu nào mang `thuSuc` ⇒ đúng như trước, từng byte.
+  const soThuSuc = caNhan ? cau.filter((c) => c.caNhan?.thuSuc).length : 0
+  const soBatBuoc = cau.length - soThuSuc
+  const the = cau
+    .map((c, i) => (caNhan && c.caNhan?.thuSuc && !cau.slice(0, i).some((x) => x.caNhan?.thuSuc) ? nhomThuSucHtml(soThuSuc) : '') + theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn, soCauSang))
+    .join('\n')
   // KHOÁ LỜI GIẢI TỚI KHI NỘP. Chỉ áp cho phiếu nộp được và khi thầy không
   // bật `HIEN_GIAI_TRUOC_NOP`.
   const khoaGiai = !caNhan && !!nop && !chNop.HIEN_GIAI_TRUOC_NOP
@@ -3174,7 +3181,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
       </div>`
     : ''
 
-  const soCauLam = typeof soCauSang === 'number' && soCauSang < cau.length ? soCauSang : cau.length
+  const soCauLam = typeof soCauSang === 'number' && soCauSang < cau.length ? soCauSang : soBatBuoc
   const hanNop = String((t.oBia ?? []).find((o) => o.nhan === 'Hạn nộp')?.gia ?? '').trim().replace(/^—$/, '')
   const than = `${m3 && nop ? dauTrangM3Html(t.tenChuyenDe, soCauLam, hanNop, caNhan?.tienTo ?? '') : ''}${biaHtml(t, cau.length)}
 <div class="khung">
@@ -3182,7 +3189,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   ${khoiChuaGiHtml(cau, tuyChon.thieuChua ?? [])}
   ${caNhan ? '' : tongQuanHtml(cau, laBtvn)}
   ${thanhHtml(coGiai, anGiai)}
-  ${nop ? thanhNopHtml(cau.length, caNhan?.nutNop, caNhan?.nutTat) : ''}
+  ${nop ? thanhNopHtml(soBatBuoc, caNhan?.nutNop, caNhan?.nutTat) : ''}
   ${khoaGiai ? '<div class="giai-khoa" id="giai-khoa">Lời giải mở ra ngay sau khi em bấm Nộp bài.</div>' : ''}
   ${thanhPhanTang}
   ${!anGiai ? '<div class="ds-tieu-de">LỜI GIẢI CHI TIẾT TỪNG CÂU THEO CHUẨN HOÁ HỌC:</div>' : ''}
@@ -3210,7 +3217,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
         soCauMocLo: soCauMocLoChoNop,
         chiSoLo: tuyChon.chiSoLoHienTai,
         caNhan: caNhan ? { chiSo: caNhan.chiSo, daCham: caNhan.daCham } : undefined,
-        cau: cau.map((c) => (caNhan ? { id: c.id, phan: c.phan } : { id: c.id, phan: c.phan, dapAn: c.dapAn })),
+        cau: cau.map((c) => (caNhan ? { id: c.id, phan: c.phan, ...(c.caNhan?.thuSuc ? { ts: 1 } : {}) } : { id: c.id, phan: c.phan, dapAn: c.dapAn })),
       }).replace(/</g, '\\u003c')}<\/script>`
     : ''
   // `co-lam` bật khổ ô Đ/S to bằng ngón tay. Tách khỏi `chua-nop` vì thầy có

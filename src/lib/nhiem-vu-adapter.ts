@@ -5,7 +5,7 @@
 // của dữ liệu; ở đây chỉ gán bậc, tính cổng và chọn thẻ "Làm ngay".
 import { docBoNao, docBoNaoHocSinh, type BoNaoView } from './bo-nao-hien-thi'
 import { docCanhBaoThay, type CanhBaoThay } from './canh-bao-thay-hien-thi'
-import { dongPhuChang } from './btvn-ca-nhan-kieu'
+import { chuSoCauCuaEm, dongPhuChang } from './btvn-ca-nhan-kieu'
 import { dinhDangConLai } from './tro-ly-ca-nhan'
 import { ngayVietNam } from './han-bai-tap'
 import type { CapDoUuTien, KeHoachNgayTroLy, NhiemVuTroLy } from './tro-ly-ca-nhan'
@@ -548,7 +548,10 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     const phanMoTa: string[] = []
     if (v.loai === 'btvn_lo') {
       // Bài cá nhân hoá: đây là số câu CỦA EM ở chặng này; chưa chốt bộ thì nói thật (số chỉ là ước lượng theo ngân sách ngày).
-      phanMoTa.push(ct.caNhan === true ? (ct.chuaChot === true ? 'Bộ câu của em chốt khi em mở bài' : `${soCau} câu của em`) : `${soCau} câu`)
+      // Bản 1.2: nhóm "Thử sức thêm" mở cùng CHẶNG CUỐI ⇒ chỉ thẻ chặng cuối nói thêm "(+M câu thử sức thêm, không bắt buộc)"; M không nằm trong N.
+      const btLo = btvnTheoMa(ct.ma)
+      const soTs = ct.caNhan === true && Number(ct.chiSo) + 1 === soChangThat(btLo) ? soThuSucCua(btLo, ct) : 0
+      phanMoTa.push(ct.caNhan === true ? (ct.chuaChot === true ? 'Bộ câu của em chốt khi em mở bài' : chuSoCauCuaEm(soCau, soTs)) : `${soCau} câu`)
       if (ct.treNhip === true) phanMoTa.push('đã trễ nhịp — làm trước')
     } else if (v.loai === 'mom') phanMoTa.push(ct.chuaBatDau === true ? `Gồm ${soCau} câu · 120 phút từ khi bắt đầu` : `Gồm ${soCau} câu`)
     else if (v.loai === 'btvn_nop') phanMoTa.push('Đã xong mọi lô — bấm nộp bài trước hạn')
@@ -683,6 +686,15 @@ const TEN_LOAI: Record<string, string> = {
 function soChangThat(bt: { soChang?: unknown } | undefined): number | undefined {
   const n = Number(bt?.soChang)
   return Number.isInteger(n) && n >= 1 ? n : undefined
+}
+
+/** BẢN 1.2 — số câu "thử sức thêm, không bắt buộc" của bài cá nhân hoá: `soThuSucThem` ở /hs/btvn (ưu tiên) hoặc ở chiTiet của kế hoạch ngày. Không phải số nguyên dương ⇒ 0. */
+export function soThuSucCua(bt: { soThuSucThem?: unknown } | undefined, ct?: { soThuSucThem?: unknown }): number {
+  for (const v of [bt?.soThuSucThem, ct?.soThuSucThem]) {
+    const n = Number(v)
+    if (v !== null && v !== undefined && v !== '' && Number.isInteger(n) && n >= 1) return n
+  }
+  return 0
 }
 
 /** Thanh tiến độ lô/chặng. Bài thường: theo `tongLo` của kế hoạch (như cũ). Bài cá nhân hoá: CHỈ khi biết số chặng thật. */

@@ -18,6 +18,8 @@ import {
   docKetQuaChangDaLuu,
   doiLuotLam,
   ghepKetQuaVaoCau,
+  hienNhomThuSuc,
+  tachThuSucThem,
   themDapAnGiaChoCau,
   type BaiCaNhanEm,
 } from './btvn-ca-nhan-em'
@@ -192,7 +194,12 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
   if (chiSoHT === null) throw new Error('Bài này chưa có chặng nào mở')
   const maBtvn = String(r.maBtvn ?? '').trim()
   const de = (r.de ?? {}) as Record<string, unknown>
-  const cauChang = cauCuaChang(b, docCauBtvn(de), chiSoHT)
+  // BẢN 1.2: câu "thử sức thêm" tách khỏi các chặng; chỉ hiện ở CHẶNG CUỐI (khi đã mở), NGAY SAU câu bắt buộc. Máy chủ chưa gửi ⇒ như cũ.
+  const tach = tachThuSucThem(b, docCauBtvn(de), Array.isArray(de.thuSucThem) ? (de.thuSucThem as Record<string, unknown>[]) : [])
+  const cauBatBuoc = cauCuaChang(b, tach.batBuoc, chiSoHT)
+  const cauThuSuc = hienNhomThuSuc(b, chiSoHT) ? tach.thuSuc : []
+  const maThuSuc = new Set(cauThuSuc.map((c) => String(c.qid ?? c.id ?? '')))
+  const cauChang = [...cauBatBuoc, ...cauThuSuc]
   if (cauChang.length === 0) throw new Error('Chặng này chưa có câu nào để làm')
 
   // THẦY CHO LÀM LẠI: `soLanLam` khác lượt máy em đã thấy ⇒ bỏ nháp + kết quả chặng của lượt cũ TRƯỚC khi đọc chúng.
@@ -208,16 +215,20 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
   const dung = buildTeacherSourceFromKhoDe(doc.json)
   const daCham: Record<string, { dung: boolean; chon: string }> = {}
   for (const k of daLuu.ketQua) daCham[k.qid] = { dung: k.dung, chon: daLuu.dapAn[k.qid] ?? '' }
-  const cau = cauLuyenTuNguon([dung.source]).map((c): CauLuyen => {
+  const cauTheoPhan = cauLuyenTuNguon([dung.source]).map((c): CauLuyen => {
     const nhan = b.nhan[c.id]
-    if (chuaCo.has(c.id)) return { ...boLoiGiai(c), caNhan: { nhan, chuaCoDapAn: true as const } }
-    return { ...c, caNhan: { nhan, ...(daCham[c.id] ? { daCham: daCham[c.id] } : {}) } }
+    const thuSuc = maThuSuc.has(c.id) ? { thuSuc: true as const } : {}
+    if (chuaCo.has(c.id)) return { ...boLoiGiai(c), caNhan: { nhan, chuaCoDapAn: true as const, ...thuSuc } }
+    return { ...c, caNhan: { nhan, ...(daCham[c.id] ? { daCham: daCham[c.id] } : {}), ...thuSuc } }
   })
+  // Đề xếp câu theo phần I→II→III; nhóm thử sức phải nằm CUỐI (sau mọi câu bắt buộc, kể cả câu bắt buộc phần III). Không có thử sức ⇒ giữ nguyên thứ tự.
+  const cau = maThuSuc.size === 0 ? cauTheoPhan : [...cauTheoPhan.filter((c) => !c.caNhan?.thuSuc), ...cauTheoPhan.filter((c) => c.caNhan?.thuSuc)]
   if (cau.length === 0) throw new Error('Gói bài tập không có câu nào dùng được')
 
   const chChinh = await layCauHinhChoEmBtvn()
   const han = String(r.hanNop ?? '')
-  const conCauChuaCham = cau.some((c) => !c.caNhan?.daCham)
+  // Nút chỉ khoá khi mọi câu BẮT BUỘC đã chấm; câu thử sức không bắt buộc không giữ nút mở (và không khoá nó).
+  const conCauChuaCham = cau.some((c) => !c.caNhan?.thuSuc && !c.caNhan?.daCham)
   const dauBai = chuDauBai(b)
   const dangMo = b.changDangMo === null ? undefined : b.chang.find((c) => c.chiSo === b.changDangMo)
   const ghiCho = b.changDangMo === null
@@ -262,6 +273,7 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
           chang: b.chang.map((c) => ({ chiSo: c.chiSo, daXong: c.daXong })),
           chiSoHienThi: chiSoHT,
           nhanChang: nhanChangNgan(b, chiSoHT, bayGio),
+          soThuSuc: b.soThuSucThem,
         },
         ghiCho,
         tienTo: `Chặng ${chiSoHT + 1}/${b.soChang} · `,

@@ -21,6 +21,8 @@ export interface ChangEm {
   moLuc: string
   daMo: boolean
   daXong: boolean
+  /** ISO — mốc "xong ĐÚNG NHỊP" của chặng (bản 1.1: 23:59 giờ VN của ngày mở chặng, không quá hạn). Rỗng nếu máy chủ không gửi (bài chốt trước 1.1). */
+  dungNhipTruoc: string
 }
 
 export interface BaiCaNhanEm {
@@ -31,9 +33,18 @@ export interface BaiCaNhanEm {
   loDaXong: number
   /** Chặng em làm bây giờ (0-based); null khi đã xong hết. */
   changDangMo: number | null
+  /** true = hạn ngắn, chặng chia theo GIỜ trong cửa sổ học tối (bản 1.1); false/vắng = lịch cũ (mỗi ngày một chặng, mở 00:00). */
+  theoGio: boolean
   chang: ChangEm[]
   /** Nhãn của các câu đã mở. Nhãn lạ bị bỏ (câu đó chỉ không có nhãn). */
   nhan: Record<string, NhanCauEm>
+  /**
+   * BẢN 1.2 — mã các câu "THỬ SỨC THÊM · không bắt buộc" (lõi cao hơn bậc của em): KHÔNG nằm trong `chang`, KHÔNG tính vào `soCauCuaEm`,
+   * không chặn xong chặng/xong bài. Máy chủ chưa gửi ⇒ [] (bài như cũ). Chỉ có mã khi chặng cuối đã mở (câu mở cùng lúc chặng cuối).
+   */
+  thuSucThem: string[]
+  /** Số câu thử sức thêm của em (kể cả khi chặng cuối CHƯA mở, để bảng nhiệm vụ nói trước). = `thuSucThem.length` nếu máy chủ không gửi số riêng. */
+  soThuSucThem: number
 }
 
 const laSo = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v)
@@ -53,6 +64,7 @@ export function docBaiCaNhan(r: unknown): BaiCaNhanEm | null {
         moLuc: typeof c.moLuc === 'string' ? c.moLuc : '',
         daMo: c.daMo === true,
         daXong: c.daXong === true,
+        dungNhipTruoc: typeof c.dungNhipTruoc === 'string' && Number.isFinite(new Date(c.dungNhipTruoc).getTime()) ? c.dungNhipTruoc : '',
       })
     }
   }
@@ -61,15 +73,71 @@ export function docBaiCaNhan(r: unknown): BaiCaNhanEm | null {
   if (laDoiTuong(r.nhan)) {
     for (const [qid, n] of Object.entries(r.nhan)) if (typeof n === 'string' && NHAN_HOP_LE.has(n)) nhan[qid] = n as NhanCauEm
   }
+  const thuSucThem = docMaThuSuc(r)
   const soCauCuaEm = laSoNguyenKhongAm(r.soCauCuaEm) ? r.soCauCuaEm : laSoNguyenKhongAm(r.soCau) ? r.soCau : chang.reduce((t, c) => t + c.soCau, 0)
   return {
     soCauCuaEm,
     soChang: laSoNguyenKhongAm(r.soChang) ? r.soChang : chang.length,
     loDaXong: laSoNguyenKhongAm(r.loDaXong) ? r.loDaXong : chang.filter((c) => c.daXong).length,
     changDangMo: laSoNguyenKhongAm(r.changDangMo) ? r.changDangMo : null,
+    theoGio: r.theoGio === true,
     chang,
     nhan,
+    thuSucThem,
+    soThuSucThem: laSoNguyenKhongAm(r.soThuSucThem) ? Math.max(r.soThuSucThem, thuSucThem.length) : thuSucThem.length,
   }
+}
+
+const maCua = (v: unknown): string => (typeof v === 'string' ? v.trim() : laDoiTuong(v) ? maCua(v.qid ?? v.id) : '')
+
+/** Mã các câu thử sức thêm từ phản hồi `/btvn/cua-em`: chịu CẢ hai dạng — `thuSucThem:[qid]` ở gốc, hoặc `de.thuSucThem:[câu]` (mỗi câu có `qid`). Bỏ trùng, giữ thứ tự. */
+function docMaThuSuc(r: Record<string, unknown>): string[] {
+  const nguon: unknown[] = []
+  if (Array.isArray(r.thuSucThem)) nguon.push(...r.thuSucThem)
+  if (laDoiTuong(r.de) && Array.isArray(r.de.thuSucThem)) nguon.push(...r.de.thuSucThem)
+  const ra: string[] = []
+  for (const x of nguon) {
+    const m = maCua(x)
+    if (m && !ra.includes(m)) ra.push(m)
+  }
+  return ra
+}
+
+/**
+ * Tách câu của phản hồi thành BẮT BUỘC (đi vào các chặng) và THỬ SỨC THÊM. Câu thử sức có thể nằm lẫn trong `de.cau` (nhận ra bằng mã) và/hoặc
+ * trong `de.thuSucThem`; mỗi câu chỉ xuất hiện một lần. Không có mã thử sức ⇒ `batBuoc` = đúng `deCau`, `thuSuc` rỗng (bài như cũ).
+ */
+export function tachThuSucThem<T extends Record<string, unknown>>(b: Pick<BaiCaNhanEm, 'thuSucThem'>, deCau: readonly T[], deThuSuc: readonly T[] = []): { batBuoc: T[]; thuSuc: T[] } {
+  const ts = new Set(b.thuSucThem)
+  const batBuoc: T[] = []
+  const thuSuc: T[] = []
+  const thay = new Set<string>()
+  for (const c of [...deCau, ...deThuSuc]) {
+    const m = maCua(c)
+    if (m && ts.has(m)) {
+      if (!thay.has(m)) {
+        thay.add(m)
+        thuSuc.push(c)
+      }
+    } else if (deCau.includes(c)) batBuoc.push(c)
+  }
+  return { batBuoc, thuSuc }
+}
+
+/** Nhóm thử sức chỉ hiện ở CHẶNG CUỐI khi chặng cuối đã mở (mở cùng lúc). */
+export function hienNhomThuSuc(b: BaiCaNhanEm, chiSoHienThi: number): boolean {
+  if (b.thuSucThem.length === 0 || b.chang.length === 0) return false
+  const cuoi = b.chang[b.chang.length - 1]!
+  return cuoi.daMo && cuoi.chiSo === chiSoHienThi
+}
+
+export const TIEU_DE_THU_SUC = 'Thử sức thêm · không bắt buộc'
+export const GHI_CHU_CAU_THU_SUC = 'Câu cao — làm đúng được cộng, bỏ qua không sao'
+export const LOI_DAN_THU_SUC = 'Các câu này cao hơn mức của em lúc này. Không bắt buộc: làm đúng được cộng thêm, bỏ qua không sao.'
+
+/** "12 câu của em" / "12 câu của em (+3 câu thử sức thêm, không bắt buộc)". Số thử sức không dương ⇒ như cũ. */
+export function chuSoCauCuaEm(soCau: number, soThuSuc: number): string {
+  return `${soCau} câu của em${soThuSuc > 0 ? ` (+${soThuSuc} câu thử sức thêm, không bắt buộc)` : ''}`
 }
 
 /** Câu của MỘT chặng, cắt từ `de.cau` (thứ tự: chặng đã mở theo chỉ số → thứ tự trong chặng). */
@@ -138,7 +206,8 @@ const ngayCuaNgay = (d: Date): number => new Date(d.getFullYear(), d.getMonth(),
 export interface MoLucView {
   /** "lúc 21:20" · "lúc 20:00 ngày mai" · "ngày mai" · "ngày 24/09" · "ngay bây giờ". Ghép sau chữ "mở". */
   chu: string
-  /** "còn 25 phút" · "còn 1 giờ 20 phút" — chỉ khi còn < 3 giờ; ngoài ra null (không dọa em bằng đồng hồ xa). */
+  /** "còn 25 phút" · "còn 1 giờ 20 phút" — CHỈ khi mốc có giờ cụ thể và còn < 3 giờ; ngoài ra null (không dọa em bằng đồng hồ xa,
+   * và mốc 00:00 nói theo NGÀY nên không có đếm ngược — chữ không nhảy theo giờ máy). */
   conLai: string | null
   /** Mốc đã tới (hoặc qua): chặng phải mở được — nếu máy chưa cho thì em tải lại bài. */
   daToi: boolean
@@ -156,8 +225,15 @@ export function chuMoLuc(moLuc: string, bayGio: Date): MoLucView | null {
   const ngay = chenh <= 0 ? '' : chenh === 1 ? 'ngày mai' : `ngày ${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
   const chu = nuaDem ? (chenh <= 0 ? 'hôm nay' : ngay) : `lúc ${gio}${ngay ? ' ' + ngay : ''}`
   const phut = Math.max(1, Math.ceil(ms / 60_000))
-  const conLai = ms > 3 * 3_600_000 ? null : phut < 60 ? `còn ${phut} phút` : `còn ${Math.floor(phut / 60)} giờ${phut % 60 ? ` ${phut % 60} phút` : ''}`
+  const conLai = nuaDem || ms > 3 * 3_600_000 ? null : phut < 60 ? `còn ${phut} phút` : `còn ${Math.floor(phut / 60)} giờ${phut % 60 ? ` ${phut % 60} phút` : ''}`
   return { chu, conLai, daToi: false }
+}
+
+/** "23:59" — giờ:phút của một mốc ISO (giờ máy em). Hỏng ⇒ ''. */
+export function gioChu(iso: unknown): string {
+  if (typeof iso !== 'string' || iso.trim() === '') return ''
+  const d = new Date(iso)
+  return Number.isFinite(d.getTime()) ? `${hai(d.getHours())}:${hai(d.getMinutes())}` : ''
 }
 
 /** Nhãn NGẮN dưới chấm chặng (cột chỉ rộng ~46 px): "21:20" (hôm nay có giờ) · "Hôm nay" · "Mai" · "24/09". */

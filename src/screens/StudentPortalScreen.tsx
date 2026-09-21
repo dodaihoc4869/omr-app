@@ -1,7 +1,7 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
 import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
-import { dungBangNhiemVu } from '../lib/nhiem-vu-adapter'
+import { dungBangNhiemVu, soThuSucCua } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import NhanHanBaiTap from '../components/NhanHanBaiTap'
 import { mocThoiGian } from '../lib/han-bai-tap'
@@ -1674,6 +1674,7 @@ export default function StudentPortalScreen() {
                             {typeof bt.soCauCuaEm === 'number' ? (
                               <>
                                 Câu của em: <strong>{bt.soCauCuaEm}</strong>
+                                {soThuSucCua(bt) > 0 ? <> (+{soThuSucCua(bt)} câu thử sức thêm, không bắt buộc)</> : null}
                                 {bt.soChang > 0 ? <> · {bt.soChang} chặng</> : null}
                               </>
                             ) : (

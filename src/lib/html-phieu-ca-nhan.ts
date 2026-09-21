@@ -4,7 +4,7 @@
 // Chỉ được dùng khi chỗ gọi khai `caNhan` cho `dungPhieu`. Phiếu KHÔNG khai `caNhan` không có một byte nào của
 // tệp này. Màu chỉ dùng token của khối M3 trong phiếu (`--gm-*`) hoặc rgb() — không hex (npm run check:mau).
 // (Cấm dấu huyền ngược và ký hiệu đô-la-ngoặc-nhọn trong khối CSS: cả khối nằm trong một chuỗi mẫu.)
-import { thongTinNhan, type NhanCauEm } from './btvn-ca-nhan-kieu'
+import { GHI_CHU_CAU_THU_SUC, LOI_DAN_THU_SUC, TIEU_DE_THU_SUC, thongTinNhan, type NhanCauEm } from './btvn-ca-nhan-kieu'
 
 const esc = (s: unknown): string =>
   String(s ?? '')
@@ -50,6 +50,8 @@ export interface DauBaiCaNhanVao {
   chiSoHienThi: number | null
   /** Chữ dưới chấm chặng: { chiSo: 'Hôm nay' | 'Mai' | '24/09' }. */
   nhanChang: Record<number, string>
+  /** BẢN 1.2 — số câu "thử sức thêm, không bắt buộc" (KHÔNG nằm trong `tong`). > 0 ⇒ hero ghi thêm một dòng. Vắng/0 ⇒ như cũ. */
+  soThuSuc?: number
 }
 
 /** Thẻ đầu bài "Bài của riêng em": chỉ số ĐẾM của chính em — không bao giờ có số của bạn khác. */
@@ -67,9 +69,29 @@ export function heroCaNhanHtml(d: DauBaiCaNhanVao): string {
   return `<section class="gcn-hero" id="gcn-hero" aria-label="Bài của riêng em">
   <div class="gcn-hero-nhan"><span class="gcn-o-bt">${svg(USER_TRONG, 22)}</span>Bài của riêng em</div>
   <div class="gcn-hero-so"><b>${d.tong}</b> câu<span class="gcn-sep" aria-hidden="true">·</span><b>${d.soChang}</b> chặng</div>
+  ${d.soThuSuc && d.soThuSuc > 0 ? `<div class="gcn-hero-ts">(+${d.soThuSuc} câu thử sức thêm, không bắt buộc)</div>` : ''}
   ${dong ? `<div class="gcn-hero-phu">${esc(dong)}</div>` : ''}
   ${cham ? `<ol class="gcn-chang">${cham}</ol>` : ''}
   <div class="gcn-nhan-hang" aria-label="Nhãn từng câu">${chip}</div>
+</section>`
+}
+
+/** Chip trên thẻ câu thuộc nhóm THỬ SỨC THÊM (bản 1.2). */
+export function chipThuSucHtml(): string {
+  return `<span class="gcn-nhan gcn-tt" data-nhan="thu_suc_them">${ICON.flag}${esc('Thử sức thêm')}</span>`
+}
+
+/** Dải ghi trên thẻ câu thử sức: KHÔNG bắt buộc, đúng thì được cộng, bỏ qua không sao. */
+export function ghiThuSucHtml(): string {
+  return `<div class="gcn-ghi" role="note">${ICON.flag}<span>${esc(GHI_CHU_CAU_THU_SUC)}</span></div>`
+}
+
+/** Tiêu đề nhóm "Thử sức thêm · không bắt buộc" đứng trước câu thử sức đầu tiên (sau chặng cuối). */
+export function nhomThuSucHtml(soCau: number): string {
+  return `<section class="gcn-nhom-ts" id="gcn-nhom-ts" aria-label="${esc(TIEU_DE_THU_SUC)}">
+  <h3><span class="gcn-o-bt">${ICON.flag}</span>${esc(TIEU_DE_THU_SUC)}</h3>
+  <p>${esc(LOI_DAN_THU_SUC)}</p>
+  <small>${soCau} câu · không tính vào tiến độ, không chặn nút nộp</small>
 </section>`
 }
 
@@ -96,6 +118,12 @@ html.gd-m3 body .gcn-hero-nhan { display: flex; align-items: center; gap: 10px; 
 html.gd-m3 body .gcn-o-bt { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--gm-lowest); color: var(--gm-primary); }
 html.gd-m3 body .gcn-hero-so { margin-top: 10px; font-size: 30px; font-weight: 700; line-height: 1.15; letter-spacing: -0.3px; }
 html.gd-m3 body .gcn-hero-so b { font-weight: 700; }
+html.gd-m3 body .gcn-hero-ts { margin-top: 4px; font-size: 14px; font-weight: 600; opacity: 0.9; }
+html.gd-m3 body .gcn-nhom-ts { margin: 24px 0 12px; padding: 14px 16px; border-radius: 20px; background: var(--gcn-vang-nen); color: var(--gcn-vang-chu); }
+html.gd-m3 body .gcn-nhom-ts h3 { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; line-height: 1.3; }
+html.gd-m3 body .gcn-nhom-ts p { margin: 6px 0 0; font-size: 15px; line-height: 1.45; }
+html.gd-m3 body .gcn-nhom-ts small { display: block; margin-top: 6px; font-size: 13px; font-weight: 600; opacity: 0.9; }
+html.gd-m3 body .q-card-thu-suc { border-inline-start: 4px solid var(--gcn-vang-chu); }
 html.gd-m3 body .gcn-sep { margin: 0 10px; font-size: 24px; font-weight: 500; opacity: 0.7; }
 html.gd-m3 body .gcn-hero-phu { margin-top: 4px; font-size: 15px; opacity: 0.85; }
 html.gd-m3 body .gcn-chang { list-style: none; margin: 16px 0 0; padding: 0; display: flex; }

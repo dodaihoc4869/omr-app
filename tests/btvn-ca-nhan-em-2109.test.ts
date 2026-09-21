@@ -467,6 +467,10 @@ describe('chuMoLuc — chặng kế mở lúc nào (lịch theo giờ, bản 1.1
     expect(chuMoLuc(at(21, 21, 20), bayGiay)!.conLai).toBe('còn 50 phút')
     expect(chuMoLuc(new Date(2026, 8, 21, 20, 30, 50).toISOString(), bayGiay)!.conLai).toBe('còn 1 phút')
   })
+  it('mốc 00:00 nói theo NGÀY và KHÔNG có đếm ngược (kể cả khi còn < 3 giờ) — chữ không nhảy theo giờ máy', () => {
+    const khuya = new Date(2026, 8, 21, 22, 30)
+    expect(chuMoLuc(new Date(2026, 8, 22, 0, 0).toISOString(), khuya)).toEqual({ chu: 'ngày mai', conLai: null, daToi: false })
+  })
   it('sáng mai có giờ: "lúc 20:00 ngày mai"; mốc 00:00 nói theo NGÀY như cũ', () => {
     expect(chuMoLuc(at(22, 20, 0), bay)!.chu).toBe('lúc 20:00 ngày mai')
     expect(chuMoLuc(at(22, 0, 0), bay)!.chu).toBe('ngày mai')

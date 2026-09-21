@@ -75,7 +75,7 @@ export interface CauLuyen {
   /** BTVN "NÂNG ĐỠ" (bài `ca_nhan`) — chỉ có khi phiếu dựng cho bài cá nhân hoá; câu không mang nó
    * ra ĐÚNG như trước, từng byte. `nhan` = nhãn nhẹ trên thẻ; `chuaCoDapAn` = máy chủ chưa gửi đáp án/lời giải
    * (chỉ về sau khi nộp chặng); `daCham` = câu ĐÃ được máy chủ chấm (đáp án em nộp + đúng/sai). */
-  caNhan?: { nhan?: NhanCauEm; chuaCoDapAn?: true; daCham?: { dung: boolean; chon: string } }
+  caNhan?: { nhan?: NhanCauEm; chuaCoDapAn?: true; daCham?: { dung: boolean; chon: string }; thuSuc?: true }
 }
 
 /** CÂU NÀY CÓ ẢNH KHÔNG — một chỗ trả lời cho cả app.
