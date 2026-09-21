@@ -63,7 +63,9 @@ describe('/btvn/theo-doi — bài cá nhân hoá', () => {
     const r = await theoDoi(d)
     expect(r.ds[0]).not.toHaveProperty('caNhan')
     expect(r.ds[0]).not.toHaveProperty('soLoi')
-    expect(Object.keys(r.ds[0].hocSinh[0]).sort()).toEqual(['chiTietDoiChieu', 'diemThiDoiChieu', 'gianLan', 'hoTen', 'lyDoGianLan', 'nopLuc', 'sbd', 'soCau', 'soDung', 'thuHoi', 'xacSuatGianLan'].sort())
+    // SỬA CÓ CHỦ Ý 21/09 (`/btvn/theo-doi` bản 2, CHỈ-THÊM, docs/hop-dong-btvn-theo-doi-v2-2109.md): thêm nhóm/chặng hiện tại/số câu đã làm/số câu của em/lần học gần nhất. Vẫn KHÔNG có trường cá nhân hoá (soChang, loDaXong, soDungLoi, diemLoi…).
+    expect(Object.keys(r.ds[0].hocSinh[0]).sort()).toEqual(['changHienTai', 'chiTietDoiChieu', 'diemThiDoiChieu', 'gianLan', 'hocGanNhat', 'hoTen', 'lyDoGianLan', 'nhom', 'nopLuc', 'sbd', 'soCau', 'soCauCuaEm', 'soCauDaLam', 'soDung', 'thuHoi', 'xacSuatGianLan'].sort())
+    expect(r.ds[0].hocSinh[0]).not.toHaveProperty('soChang')
   })
 })
 

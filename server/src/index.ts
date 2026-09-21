@@ -55,6 +55,7 @@ import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } f
 import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
+import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
 import { capNhatSaiNhanhNeuCu } from './sai-nhanh-gv'
@@ -1933,6 +1934,9 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
     }
   }
 
+  // 2b. BẢN 2 (CHỈ-THÊM, docs/hop-dong-btvn-theo-doi-v2-2109.md): tên đọc được, tên lớp, chặng có ngày, NHÓM em / bài — MỘT nguồn `btvn-theo-doi-nhom.ts`. Lỗi ⇒ null ⇒ bỏ khoá mới, khoá cũ giữ nguyên.
+  const boSung = await tinhBoSungTheoDoi(env, dsBtvnData, Date.now())
+
   // 3. Phân tích gian lận cho từng bài BTVN
   const ds = []
   for (const { bt, dsEm, cn } of dsBtvnData) {
@@ -1949,6 +1953,7 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
 
     const kqMap = phanTichGianLanBtvn(emInput, mapThiThat)
 
+    const bs = boSung?.get(maBtvn)
     ds.push({
       maBtvn,
       maCa: String(bt.ma_ca ?? ''),
@@ -1958,6 +1963,7 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
       hanNop: String(bt.han_nop ?? ''),
       quaHan: mocMs(String(bt.han_nop ?? '')) > 0 && Date.now() > mocMs(String(bt.han_nop ?? '')),
       ...(cn ? { caNhan: true, soLoi: cn.soLoi } : {}),
+      ...(bs ? { ten: bs.ten, tenLop: bs.tenLop, soCauLoi: bs.soCauLoi, ...(bs.chang ? { chang: bs.chang } : {}), nhom: bs.nhom } : {}),
       hocSinh: dsEm.map((x) => {
         const sbd = String(x.sbd)
         const gl = kqMap.get(sbd)
@@ -1974,6 +1980,7 @@ async function theoDoiBtvn(env: Env, b: Record<string, unknown>): Promise<Respon
           diemThiDoiChieu: gl ? gl.diemThiDoiChieu : null,
           chiTietDoiChieu: gl ? gl.chiTietDoiChieu : undefined,
           ...(cn ? cn.theoEm.get(sbd) : {}),
+          ...(bs?.theoEm.get(sbd) ?? {}),
         }
       }),
       tong: dsEm.filter((x) => !x.thu_hoi).length,

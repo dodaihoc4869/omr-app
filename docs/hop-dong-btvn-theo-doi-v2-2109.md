@@ -32,8 +32,15 @@ Bản nháp của Code 1 (màn `src/screens/PhanCongScreen.tsx` + `src/component
 - Ngăn danh sách em: tab theo `hocSinh[].nhom`; dòng em dùng `changHienTai` · `soCauDaLam / soCauCuaEm` · `hocGanNhat` · `nopTreGio`.
 - Nhiều dòng `btvn` cùng một lần giao (nhiều ca + "Riêng") được màn GỘP như hiện nay (`nhom-btvn.ts`): màn CỘNG các số `nhom` của các dòng, lấy `ten`/`chang`/`soCauLoi` của dòng đầu, `tenLop` gộp không trùng.
 
-## Máy chủ (Code 3 điền)
-- Số truy vấn thêm mỗi lần gọi (≤ 5 term mỗi UNION — giới hạn D1 thật): …
-- rows_read đo trên D1 thật / ước lượng dòng đọc mỗi ngày: …
-- Test đối chiếu: cùng dữ liệu ⇒ `nhom.chamNhip` = số em `emChamNhip` của Bảng tin cho bài đó: …
-- Đã gọi thử D1 thật có mã bí mật (kết quả): …
+## Máy chủ (Code 3 điền, 21/09) — `server/src/btvn-theo-doi-nhom.ts`, nối ở `theoDoiBtvn` (index.ts)
+**Luật nhóm MỘT em** (thứ tự ưu tiên; mỗi em không thu hồi đúng MỘT nhóm nên `chuaMo+dungNhip+chamNhip+xongHomNay+daNop = tong`): (1) đã nộp ⇒ `da_nop` (`nopTre` ⊂ daNop theo cột `nop_tre`; `nopTreGio` = `gio_tre`); (2) `emChamNhip` của Bảng tin ⇒ `cham_nhip` — CHỈ với bài giao TỪ NGÀY MỐC (bài giao trước ngày mốc không bao giờ chậm, cùng luật `noTheoLop`); (3) `trangThaiNopBai` = chưa mở ⇒ `chua_mo`; (4) bài chia chặng và em đã xong chặng lịch của hôm nay (mốc GỐC `truoc` của chặng mở sớm) ⇒ `xong_hom_nay`; (5) còn lại ⇒ `dung_nhip`.
+**Khác/chốt so với bản nháp (Code 1 xem):**
+- Bài KHÔNG chia chặng nhưng ĐÃ QUÁ HẠN: em chưa nộp (dở dang hay chưa mở) ⇒ `cham_nhip` (đúng `emChamNhip` của Bảng tin: "quá hạn chưa nộp") — không phải 0. Chưa quá hạn: `chamNhip = xongHomNay = 0`, `dungNhip` = đang làm. Màn nên đổi nhãn "Chậm nhịp" ⇒ "Quá hạn chưa nộp" khi `chang` vắng.
+- Chưa mở + quá hạn ⇒ `cham_nhip` (Bảng tin cũng không đếm em này vào `chuaMo`); nhờ vậy `nhom.chuaMo` = `baiTap[].chuaMo`, `nhom.chamNhip` = số em `emChamNhip`, `nhom.daNop` = `baiTap[].daNop` cho cùng bài.
+- `ten` = `tenBaiHienThi(chuyên đề trội nhất, tên ca/tờ)` KHÔNG kèm lớp (đã có `tenLop`; bài chỉ có mã kỹ thuật ⇒ "Bài tập về nhà"). `tenLop` = lớp DUY NHẤT của các em không thu hồi trong bài, nhiều lớp / không rõ ⇒ `''`.
+- `chang` chỉ có khi ≥ 1 em đã chốt; số chặng = số phổ biến nhất; `ngay` = ngày VN mở GỐC phổ biến nhất của chặng đó; `laHomNay` = ngày đó là hôm nay.
+- `soCauCuaEm`: bài cá nhân hoá = số câu bộ của em (`null` nếu chưa chốt); bài thường = số câu của bài. `soCauDaLam` = số câu có đáp án không rỗng (`null` khi chưa mở). `hocGanNhat` = mốc lớn nhất trong (lần học gần nhất ở sổ `btvn`/`btvn_lo`, giờ nộp, `xong_vong1_luc`); `null` khi chưa mở. `changHienTai` = min(số chặng đã xong + 1, tổng chặng), `null` khi chưa chốt / không chia chặng.
+- Em thu hồi: không có `nhom` và các khoá mới (giữ nguyên các khoá cũ).
+**Chi phí:** đúng 5 truy vấn thêm (song song, SELECT, không UNION): cột lịch/chặng của em · tên bài + chuyên đề · tên lớp · lần học gần nhất · mốc. D1 thật 21/09 (4 bài, 245 em): 271 + 1.090 + 761 + 1.235 + 1 ≈ **3,4 nghìn dòng đọc/lần** (thầy mở màn vài chục lần/ngày ⇒ ≪ 0,5 triệu dòng/ngày). Lỗi bất kỳ ⇒ bỏ khoá mới, lệnh cũ vẫn ok (máy cũ thiếu khoá ⇒ thẻ không thanh nhóm).
+**Test đối chiếu:** `tests/btvn-theo-doi-v2-2109.test.ts` — cùng dữ liệu ⇒ `nhom.chamNhip` = số em `emChamNhip`, `nhom.chuaMo`/`daNop` = `baiTap[]` của `/gv/bang-tin`; đột biến 18/19 chết (1 tương đương).
+**Đã gọi thử D1 thật:** (điền sau khi đẩy)

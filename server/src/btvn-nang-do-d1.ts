@@ -651,7 +651,7 @@ export async function phanHoiMoBaiCaNhan(env: Env, bt: Hang, em: Hang, sbd: stri
 
 // ================================================================== NỘP CHẶNG (/btvn/xong-lo cho bài ca_nhan) ==================================================================
 
-const docDapAnDaLuu = (v: unknown): Record<string, string> => {
+export const docDapAnDaLuu = (v: unknown): Record<string, string> => {
   try {
     const o = JSON.parse(chuoi(v)) as unknown
     if (!o || typeof o !== 'object' || Array.isArray(o)) return {}
