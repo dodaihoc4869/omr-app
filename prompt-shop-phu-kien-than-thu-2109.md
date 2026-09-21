@@ -31,8 +31,8 @@ NHIỆM VỤ
 Viết BẢN THIẾT KẾ HOÀN CHỈNH + KẾ HOẠCH BUILD cho (a) cơ chế đổi EXP thừa thành VÀNG và (b) SHOP PHỤ KIỆN cho thần thú, đủ chi tiết để ba lập trình viên (máy chủ, giao diện game, mỹ thuật SVG) làm song song không phải hỏi lại.
 
 NGUYÊN TẮC BẮT BUỘC
-- Vàng CHỈ sinh từ EXP thừa; không nguồn nào khác, không tặng, không chuyển cho bạn. Tỉ giá cố định ghi bằng số (đề xuất 10 EXP = 1 vàng) và có bảng mô phỏng 30 ngày cho 3 kiểu em: chăm (dư 80/ngày), trung bình (dư 30/ngày), thất thường (học 3 ngày/tuần).
-- "EXP thừa" = phần ống nghiệm VƯỢT ngưỡng dự trữ (đề xuất 3 ngày ăn = 600 EXP). Dưới ngưỡng không đổi được. Đổi là MỘT CHIỀU, có hộp xác nhận ghi rõ "thú mất X EXP dự trữ, em nhận Y vàng".
+- Vàng CHỈ sinh từ EXP thừa; không nguồn nào khác, không tặng, không chuyển cho bạn. Tỉ giá cố định: 1 EXP thừa = 1 vàng (dễ hiểu, em tự nhẩm được) và có bảng mô phỏng 30 ngày cho 3 kiểu em: chăm (dư 80/ngày), trung bình (dư 30/ngày), thất thường (học 3 ngày/tuần).
+- "EXP thừa" = phần ống nghiệm VƯỢT mức dự trữ tối thiểu 1 ngày ăn = 200 EXP. Em TỰ CHỌN đổi bao nhiêu trong phần vượt (thanh kéo), màn nói rõ "Dự trữ còn N ngày ăn" trước và sau khi đổi. Dưới 200 không đổi được. Đổi là MỘT CHIỀU, có hộp xác nhận ghi rõ "thú mất X EXP dự trữ, em nhận Y vàng".
 - Bảng giá 5 bậc độ hiếm với số cụ thể: Thường 20–60 vàng · Đẹp 120–250 · Hiếm 500–900 · Sử thi 1.800–3.000 · Huyền thoại (siêu VIP) 6.000–12.000; mỗi bậc nêu số món, số ngày một em chăm cần để mua món rẻ nhất và đắt nhất của bậc.
 - Tối thiểu 40 món cho mùa 1 chia 5 ô gắn trên thú: đầu, cổ/lưng, hào quang/nền, dấu chân/vệt di chuyển, khung tên. Mỗi món: tên tiếng Việt gợi Hoá học (vd "Vương miện Bạch kim", "Khăn choàng Ngọn lửa Magie"), bậc, giá, điều kiện mở (nếu có), mô tả hình 1 câu để hoạ sĩ vẽ SVG.
 - Món Huyền thoại phải có ĐIỀU KIỆN HỌC kèm giá (vd chuỗi đạt nhiệm vụ 14 ngày, 5 ấn thạch sáng) và giới hạn số lượng theo mùa; ghi rõ con số.
@@ -41,9 +41,9 @@ NGUYÊN TẮC BẮT BUỘC
 - Giao diện: thử đồ trực tiếp trên thú của chính em trước khi mua; chuyển cảnh 200–300 ms; tôn trọng "giảm chuyển động"; chạy mượt trên điện thoại Android 360 px tầm trung (60 khung/giây, gói shop nạp lười ≤ 60 KB gzip chưa tính hình); sáng + tối; không màu hex thô ngoài tệp token; mọi con số có nhãn.
 
 GIẢ ĐỊNH ĐÃ DÙNG
-- Tỉ giá 10 EXP = 1 vàng; ngưỡng dự trữ không đổi được = 600 EXP (3 ngày ăn). Thầy đổi hai số này là cả bảng giá co giãn theo.
+- BOSS CHỐT 21/09 (thầy uỷ quyền tự chốt 3 câu hỏi): 1 EXP = 1 vàng; dự trữ tối thiểu giữ lại 200 EXP; em chăm (dư 80 EXP/ngày) mua món Thường đầu tiên trong ≤ 3 ngày, món Huyền thoại rẻ nhất (6.000 vàng) sau khoảng 75 ngày ≈ 11 tuần. Trước khi khoá giá, máy chủ ĐO phân bố ống nghiệm thật (p50/p90/cao nhất); em có sẵn số dư lớn không mua được Huyền thoại ngay vì món ấy đòi điều kiện học + giới hạn số lượng.
 - Phụ kiện vẽ bằng SVG lớp phủ, neo theo 5 điểm neo khai báo cho từng loài × từng giai đoạn tiến hoá (8 loài); không vẽ lại sprite thú.
-- Bạn cùng đoàn và Bảng vinh danh NHÌN THẤY phụ kiện em đang mặc; app phụ huynh và app thầy KHÔNG hiện shop (thầy chỉ có một dòng thống kê "số em đã mua đồ" nếu dễ).
+- BOSS CHỐT: bạn cùng đoàn và Bảng vinh danh NHÌN THẤY phụ kiện em đang mặc. Làm HAI ĐỢT để không nghẽn mỹ thuật: ĐỢT 1 = ba ô KHÔNG cần điểm neo theo loài (hào quang/nền · vệt di chuyển · khung tên), 24 món, lên trước; ĐỢT 2 = hai ô cần neo (đầu · cổ/lưng), 16 món, bảng neo 8 loài × giai đoạn tiến hoá. app phụ huynh và app thầy KHÔNG hiện shop (thầy chỉ có một dòng thống kê "số em đã mua đồ" nếu dễ).
 - Không hoàn trả sau khi mua; không bán lại; không quà tặng giữa các em (tránh xin xỏ, bắt nạt).
 - Mùa 1 kéo dài tới hết học kỳ I; hết mùa món giới hạn ngừng bán, đồ đã mua giữ mãi.
 - Shop mở cho mọi em ngay; vào từ Đảo (nút "Cửa hàng" cạnh Túi đồ) và từ thẻ thần thú ở Bảng nhiệm vụ.
