@@ -68,9 +68,13 @@
 .dh-muc{padding:16px;display:flex;flex-direction:column;gap:12px}
 .dh-muc p{margin:0;font-size:13px;line-height:1.5;color:rgb(223,232,255)}
 .dh-ma-doan{display:flex;gap:8px}
-.dh-ma-doan input{flex:1;min-width:0;height:48px;border-radius:24px;border:0;padding:0 18px;background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);color:rgb(255,255,255);font:inherit;font-size:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.dh-ma-doan input{flex:1;min-width:0;height:48px;border-radius:24px;border:0;padding:0 14px;background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2);color:rgb(255,255,255);font:inherit;font-size:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
 .dh-ma-doan input::placeholder{color:rgba(255,255,255,.4);letter-spacing:.02em;text-transform:none;font-weight:500}
 .dh .dh-ma-doan button{width:auto;flex-shrink:0}
+/* Nhãn NGOÀI ô (ô mã hẹp không chứa nổi câu dài — máy thật 360 px cắt placeholder) + dòng lý do dưới nút khoá + trùm lớp không rớt dòng xấu. */
+.dh-nhan-o{display:block;margin:2px 4px -4px;font-size:12px;font-weight:700;color:var(--dh-mo)}
+.dh-muc .dh-ly-do{display:block;text-align:center;font-size:12px;line-height:1.4;color:var(--dh-vang-nhat);overflow-wrap:anywhere}
+.dh-hai-the .dh-muc p{overflow-wrap:break-word;min-width:0}
 .dh-ma-to{font-size:30px;font-weight:800;letter-spacing:.16em;text-align:center;color:var(--dh-vang-nhat);text-shadow:0 0 18px rgba(255,209,102,.5)}
 .dh-ds-ban{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .dh-ds-ban>div{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:18px;background:rgba(255,255,255,.06);font-size:12px;font-weight:700;text-align:center;min-height:96px;justify-content:center}
@@ -88,19 +92,22 @@
 .dh-chuoi-vach{display:flex;gap:4px}
 .dh-chuoi-vach i{flex:1;height:7px;border-radius:4px;background:rgba(255,255,255,.14)}
 .dh-chuoi-vach i.dh-xong{background:linear-gradient(90deg,rgb(255,138,92),rgb(255,181,154))}
-.dh-an{display:flex;justify-content:space-between;gap:4px}
+.dh-an{display:flex;justify-content:space-between;align-items:flex-start;gap:4px}
 .dh-an>div{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px}
 .dh-an i{width:44px;height:50px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(160deg,rgb(200,246,255),rgb(95,208,255) 45%,rgb(42,107,214));filter:drop-shadow(0 0 8px rgba(127,233,255,.7))}
 .dh-an>div:nth-child(2) i{background:linear-gradient(160deg,rgb(214,255,226),rgb(63,208,122) 50%,rgb(20,110,70))}
 .dh-an>div:nth-child(3) i{background:linear-gradient(160deg,rgb(255,243,192),rgb(255,197,61) 50%,rgb(200,120,0))}
 .dh-an>div:nth-child(4) i{background:linear-gradient(160deg,rgb(240,226,255),rgb(154,110,240) 50%,rgb(70,40,160))}
 .dh-an>div.dh-an-nut:nth-child(n) i{background:linear-gradient(160deg,rgb(58,68,104),rgb(26,33,64));box-shadow:inset 0 0 0 2px rgb(255,154,118);animation:dh-shake 2.6s ease-in-out infinite}
-.dh-an small{font-size:10px;font-weight:700;color:rgb(201,214,242);text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dh-an small{font-size:10px;font-weight:700;line-height:1.25;color:rgb(201,214,242);text-align:center;max-width:100%;overflow-wrap:anywhere;white-space:normal} /* tên dạng XUỐNG DÒNG, không cắt "Cấu tạo – c…" (ba ấn cùng đầu chữ không phân biệt được) */
 .dh-an .dh-an-nut small{color:rgb(255,181,154)}
-.dh-bu-nhau{display:flex;align-items:center;justify-content:space-between;gap:6px}
-.dh-bu-nhau>div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12.5px}
-.dh-bu-nhau-giua{flex:1;gap:8px!important}
-.dh-bu-nhau-giua span{padding:4px 10px;border-radius:12px;background:rgba(127,233,255,.12);box-shadow:inset 0 0 0 1px rgba(127,233,255,.45);font-size:11.5px;font-weight:700;white-space:nowrap}
+.dh-bu-nhau{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px 6px}
+.dh-bu-nhau>div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12.5px;min-width:0;max-width:46%}
+.dh-bu-nhau>div>b{max-width:100%;overflow-wrap:anywhere;text-align:center}
+/* Máy hẹp: hai thú ở HAI ĐẦU hàng trên, hai chip "vững …" nằm hàng dưới rộng hết thẻ (xuống dòng, không cắt tên dạng; máy thật 360 px chip nowrap đẩy thú ra ngoài thẻ). */
+.dh-bu-nhau-giua{order:3;flex:1 1 100%;max-width:100%!important;align-items:stretch!important;gap:8px!important}
+.dh-bu-nhau-giua span{padding:4px 10px;border-radius:12px;background:rgba(127,233,255,.12);box-shadow:inset 0 0 0 1px rgba(127,233,255,.45);font-size:11.5px;font-weight:700;white-space:normal;overflow-wrap:anywhere;text-align:center;min-width:0}
+@media(min-width:520px){.dh-bu-nhau-giua{order:0;flex:1 1 0;min-width:0}}
 .dh-bu-nhau-giua .dh-vang{background:rgba(255,209,102,.14);box-shadow:inset 0 0 0 1px rgba(255,209,102,.5);color:var(--dh-vang-nhat)}
 .dh-lop-tien{display:flex;align-items:center;gap:14px;padding:14px 16px}
 .dh-lop-tien>div:last-child{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;font-size:12.5px;line-height:1.4;color:rgb(223,232,255)}

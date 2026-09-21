@@ -79,13 +79,16 @@ describe('Hòn đảo của em', () => {
     fireEvent.click(nut[0]!); expect(onLenDuong).toHaveBeenCalledTimes(1)
     expect([...container.querySelectorAll('img')].every(i => i.getAttribute('src')!.startsWith('/than-thu-v2/nho/'))).toBe(true)
   })
-  it('thẻ chuyến thám hiểm: 4 nhóm ải 2·1·2·1; gợi ý của máy chủ in nguyên tên; hết 200 câu ⇒ khoá nút', () => {
+  it('thẻ chuyến thám hiểm: 4 nhóm ải 2·1·2·1; gợi ý của máy chủ in nguyên tên; hết lượt câu game ⇒ khoá nút (trần do máy chủ nói, không viết cứng 200)', () => {
     const { container, rerender } = dung({ goiY: [{ title: 'Ester thuỷ phân' }, { title: 'Glucose tráng bạc' }] })
     expect([...container.querySelectorAll('.dao-chuyen-ai li')].map(li => li.textContent)).toEqual(['2Sửa lỗi', '1Ký ức', '2Luyện đều', '1Trùm ải'])
     expect(container.querySelector('.dao-chuyen-ta')!.textContent).toContain('Ester thuỷ phân · Glucose tráng bạc')
     rerender(<div className="dao"><DaoCuaEm profile={hoSo()} now={NOW} conLai={0} onLenDuong={() => {}} /></div>)
     expect((screen.getByRole('button', { name: /LÊN ĐƯỜNG/ }) as HTMLButtonElement).disabled).toBe(true)
-    expect(container.textContent).toContain('200 câu hôm nay')
+    expect(container.textContent).toContain('Em đã chơi đủ số câu game của hôm nay') // máy chủ cũ chưa gửi trần ⇒ câu không số
+    expect(container.textContent).not.toMatch(/200 câu/)
+    rerender(<div className="dao"><DaoCuaEm profile={hoSo()} now={NOW} conLai={0} luotCau={{ daDung: 61, tran: 60 }} onLenDuong={() => {}} /></div>)
+    expect(container.querySelector('.dao-chuyen-ta')!.textContent).toBe('Hôm nay em đã chơi 60/60 câu game. Mai đảo có chuyến mới.')
   })
   it('bỏ sạch chữ người lớn của màn cũ và không còn "today/100"', () => {
     const { container } = dung({ exp: { homNay: 46 } })

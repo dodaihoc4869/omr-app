@@ -74,7 +74,7 @@ describe('Đoàn Hộ Tống · giao diện · Sảnh bước 5 (vé, chuỗi, �
     expect(screen.getByText('Trạm 17/30 · còn 3 trạm tới Hồ Cân Bằng')).toBeTruthy(); expect(man().textContent).toContain('9/32 bạn góp sức hôm nay'); expect(man().textContent).toContain('còn 4 chuyến thắng nữa là lớp tiến một trạm')
     expect(screen.getByText('CHUYẾN HÔM NAY · MIỄN PHÍ')).toBeTruthy()
     expect(screen.getByLabelText('Rương chuỗi ngày').textContent).toContain('Còn 2 ngày mở rương 7 ngày'); expect(screen.getByLabelText('Rương chuỗi ngày').textContent).toContain('đi một chuyến hôm nay để giữ chuỗi'); expect(document.querySelectorAll('.dh-chuoi-vach i.dh-xong')).toHaveLength(5)
-    expect(screen.getByLabelText('Trùm lớp').textContent).toContain('20:00 · Chủ nhật'); expect(screen.getByLabelText('Trùm lớp').textContent).toContain('còn 4 ngày 4 giờ')
+    expect(screen.getByLabelText('Trùm lớp').textContent).toContain('20:00 · Chủ nhật'); expect(screen.getByLabelText('Trùm lớp').textContent!.replace(/\u00a0/g, ' ')).toContain('còn 4 ngày 4 giờ') // NBSP giữ số dính đơn vị (P0 sảnh 19:5x)
     expect([...screen.getByLabelText('Sắp mở').querySelectorAll('b')].map(b => b.textContent)).toEqual(['Ấn thạch dạng'])
   })
   it('bước 6: 6 ấn thạch (nứt trước), "khắc phục thêm 3 câu là sáng → mở <biến thể kỹ năng>", thẻ bạn đồng hành BÙ NHAU chỉ nói điều mỗi bên vững; có ấn thật thì hết ô SẮP MỞ', async () => {
@@ -89,11 +89,11 @@ describe('Đoàn Hộ Tống · giao diện · Sảnh bước 5 (vé, chuỗi, �
     voi(sanh({ mienPhiHomNay: false, ve: 1, quaMoi: [{ loai: 'dat', ve: 2, ghiChu: 'Em đạt nhiệm vụ ngày' }] }))
     expect(await screen.findByText('CHUYẾN THÊM · 1 VÉ')).toBeTruthy(); expect(screen.getByText('＋2 vé · Em đạt nhiệm vụ ngày')).toBeTruthy(); expect((screen.getByRole('button', { name: /LÊN ĐƯỜNG/ }) as HTMLButtonElement).disabled).toBe(false)
     cleanup(); voi(sanh({ mienPhiHomNay: false, ve: 0 }))
-    expect(((await screen.findByRole('button', { name: /HẾT VÉ HÔM NAY/ })) as HTMLButtonElement).disabled).toBe(true); expect(screen.getByText(/Làm xong nhiệm vụ hôm nay để nhận 2 vé/)).toBeTruthy()
+    expect(((await screen.findByRole('button', { name: /HẾT VÉ HÔM NAY/ })) as HTMLButtonElement).disabled).toBe(true); expect(screen.getAllByText(/Làm xong nhiệm vụ hôm nay để nhận 2 vé/)).toHaveLength(2) // dưới LÊN ĐƯỜNG + dưới Mở đoàn mới (nút khoá có lý do, P0 sảnh 19:5x)
   })
   it('Trùm lớp đang mở: thanh máu cả lớp đã góp; chặng dở trên máy KHÁC được mở lại từ `dangDo`', async () => {
     voi(sanh({ trumLop: { dangMo: true, chuNhat: '2026-09-27', moSauMs: 0, conMs: 11 * 60_000, daGop: 1280, mucTieu: 3200, daHa: false } }))
-    expect((await screen.findByLabelText('Trùm lớp')).textContent).toContain('Đang mở · còn 11 phút'); expect(screen.getByLabelText('Trùm lớp').textContent).toContain('1280/3200')
+    expect((await screen.findByLabelText('Trùm lớp')).textContent!.replace(/\u00a0/g, ' ')).toContain('Đang mở · còn 11 phút'); expect(screen.getByLabelText('Trùm lớp').textContent).toContain('1280/3200')
     cleanup(); sessionStorage.clear()
     const dangDi = trongTran(); const call = vi.fn(async (lenh: string) => lenh === 'doan-sanh' ? { ok: true, sanh: sanh(), dangDo: 'DH1' } : lenh === 'doan-xem' ? { ok: true, doan: dangDi } : { ok: true })
     render(<DoanHoTong call={call} sbd="S1" pet={2} cap={32} onDong={() => {}} onVeBangNhiemVu={() => {}} />)

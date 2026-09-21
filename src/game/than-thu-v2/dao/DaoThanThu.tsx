@@ -10,6 +10,7 @@ import TuiDo from './TuiDo'
 import {chiSoThu,docLuotNgay,docMaiCho,lyDoThuongTuKetQua,lyDoTranExpGame,tenThu} from './dao-core'
 import type {LuotNgay,MaiCho} from './dao-core'
 import type {CauDao,DaoKetQua,DaoThanThuProps,ManDao} from './kieu'
+import {docLuotCauNgay,type LuotCauNgay} from '../chu-het-luot'
 import './dao.css'
 
 interface Luot{id:string;cau:CauDao[]}
@@ -31,7 +32,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  const call=useCallback<DaoThanThuProps['call']>((action,data)=>callRef.current(action,data),[])
  const [man,setMan]=useState<ManDao>('dao'),[dangTham,setDangTham]=useState(false)
  const [busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[bao,setBao]=useState('')
- const [goiY,setGoiY]=useState<{title:string}[]|null>(null),[conLai,setConLai]=useState<number|null>(null)
+ const [goiY,setGoiY]=useState<{title:string}[]|null>(null),[conLai,setConLai]=useState<number|null>(null),[luotCau,setLuotCau]=useState<LuotCauNgay|null>(null)
  // Đợt 2: lượt trong ngày (recommendations/start) + "Mai thú chờ em" (start khi hết lượt) — đọc chặt; máy chủ cũ không gửi ⇒ null ⇒ không dải lượt.
  const [luotNgay,setLuotNgay]=useState<LuotNgay|null>(null),[maiCho,setMaiCho]=useState<MaiCho|null>(null)
  const [danhMuc,setDanhMuc]=useState<{key:string;ten:string;chuong:string}[]|null>(null),[tenDang,setTenDang]=useState<Record<string,string>>({})
@@ -42,7 +43,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  const hocTen=(cau:readonly CauDao[])=>setTenDang(cu=>{const moi={...cu};for(const c of cau)if(c.tenDang)moi[c.dang??c.group]=c.tenDang;return moi})
 
  // gợi ý hôm nay + danh mục sổ tay: đọc-chỉ, hỏng thì màn vẫn chạy (Worker cũ chưa có `so-tay`)
- const napGoiY=useCallback(()=>{void call('recommendations').then(r=>{if(conSong.current){setGoiY(r.suggestions??[]);setConLai(typeof r.remaining==='number'?r.remaining:null);if(r.luot!==undefined)setLuotNgay(docLuotNgay(r.luot))}}).catch(()=>{})},[call])
+ const napGoiY=useCallback(()=>{void call('recommendations').then(r=>{if(conSong.current){setGoiY(r.suggestions??[]);setConLai(typeof r.remaining==='number'?r.remaining:null);setLuotCau(docLuotCauNgay(r));if(r.luot!==undefined)setLuotNgay(docLuotNgay(r.luot))}}).catch(()=>{})},[call])
  const daChon=!profile.choice
  useEffect(()=>{if(!daChon)return;napGoiY();void call('so-tay').then(r=>{if(conSong.current&&Array.isArray(r.dang)){setDanhMuc(r.dang);setTenDang(cu=>({...Object.fromEntries(r.dang!.filter(d=>d.ten).map(d=>[d.key,d.ten])),...cu}))}}).catch(()=>{})},[daChon,call,napGoiY])
 
@@ -82,7 +83,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
 
  const muc:[ManDao|'doan',string][]=[['dao','Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ']]
  return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}>
-  {man==='dao'&&<DaoCuaEm profile={profile} exp={exp} chuoiNgay={chuoiNgay} goiY={goiY} conLai={conLai} luotNgay={luotNgay} maiCho={maiCho} tenDang={tenDang} tasks={tasks} busy={busy} loi={loi||loiChon} thongBao={bao||(luot&&!xong?'Em đang đi dở một chuyến — bấm LÊN ĐƯỜNG để đi tiếp.':'')}
+  {man==='dao'&&<DaoCuaEm profile={profile} exp={exp} chuoiNgay={chuoiNgay} goiY={goiY} conLai={conLai} luotCau={luotCau} luotNgay={luotNgay} maiCho={maiCho} tenDang={tenDang} tasks={tasks} busy={busy} loi={loi||loiChon} thongBao={bao||(luot&&!xong?'Em đang đi dở một chuyến — bấm LÊN ĐƯỜNG để đi tiếp.':'')}
    onLenDuong={()=>void lenDuong()} onOnTheoNhac={dang=>void lenDuong('repair',dang)} onNap={()=>void chay(async()=>{await call('invest')})} onDoiTen={ten=>void chay(async()=>{await call('rename',{name:ten});setLoiChon('')})}/>}
   {man==='so-tay'&&<SoTay profile={profile} danhMuc={danhMuc} tenDang={tenDang}/>}
   {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onDungKhien={id=>chay(async()=>{await call('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}

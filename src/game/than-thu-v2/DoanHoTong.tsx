@@ -1,6 +1,7 @@
 // ĐOÀN HỘ TỐNG — khung điều khiển phía máy em: Sảnh → Trong trận / Trùm → Tung chưởng → Kết chặng.
 // Đồng bộ bằng hỏi-đáp ngắn 1,5 s với /game-v2/doan-xem (giả định đã chốt, chưa dùng WebSocket). Mọi luật, mọi phép chấm ở MÁY CHỦ;
 // ở đây chỉ vẽ đúng thứ máy chủ trả về. Vẽ vào document.body (cổng) để là lớp phủ toàn màn, không dính kiểu nút của game cũ.
+import { docLuotCauNgay } from './chu-het-luot'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { Question } from './core'
@@ -67,9 +68,9 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     void call('doan-sanh').then(r => { const x = r as PhanHoiDoan; if (!song.current) return; setSanh(x.sanh ?? null); setAnThach(x.anThach ?? null); setBanDongHanh(x.banDongHanh ?? null); if (!ma && x.dangDo) void call('doan-xem', { ma: x.dangDo }).then(v => apDung(v as PhanHoiDoan)).catch(() => {}) }).catch(() => { /* máy chủ cũ chưa có lệnh: Sảnh giữ ô SẮP MỞ */ })
     if (ma) void call('doan-xem', { ma }).then(r => apDung(r as PhanHoiDoan)).catch(() => { try { sessionStorage.removeItem(khoaLuu(sbd)) } catch { /* bỏ qua */ } })
     void call('recommendations').then(r => {
-      const x = r as { suggestions?: { title: string }[]; remaining?: number }
+      const x = r as { suggestions?: { title: string }[]; remaining?: number; dailyUsed?: number; tranNgay?: number }
       const dem = new Map<string, number>(); for (const s of x.suggestions ?? []) dem.set(s.title, (dem.get(s.title) ?? 0) + 1)
-      if (song.current) setGoiY({ tong: x.suggestions?.length ?? 0, nhom: [...dem].map(([ten, so]) => ({ ten, so })).slice(0, 3), hetLuot: x.remaining === 0 })
+      if (song.current) setGoiY({ tong: x.suggestions?.length ?? 0, nhom: [...dem].map(([ten, so]) => ({ ten, so })).slice(0, 3), hetLuot: x.remaining === 0, ...docLuotCauNgay(x) })
     }).catch(() => { /* không có gợi ý: thẻ dùng lời chung */ })
   }, [sbd, call, apDung])
 

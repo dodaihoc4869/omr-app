@@ -21,6 +21,8 @@ export interface CauDao extends Question{role?:VaiAi
  roleV2?:string}
 export interface LyDoThuong{moc:0|1|2|3;exp:number;chu:string}
 export interface DaoKetQua{ok:boolean;error?:string;message?:string;missing?:number;remaining?:number;dailyUsed?:number
+ /** Trần lượt game/ngày do máy chủ nói (chỉ-thêm); máy chủ cũ không gửi ⇒ lời hết lượt không nói số. */
+ tranNgay?:number
  suggestions?:{title:string;source:string;part:string}[]
  id?:string;mode?:Mode;questions?:CauDao[];answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[]
  correct?:boolean;answer?:string;solution?:unknown;reward?:number;stage?:number;solutionImages?:HinhAnh[];lyDoThuong?:LyDoThuong
