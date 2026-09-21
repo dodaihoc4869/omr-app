@@ -51,8 +51,12 @@ export default function NhatKyDieuChinh({ sbd }: { sbd: string }) {
     setDangBo(true)
     const r = await boDieuChinh(sbd, d.ngay)
     setDangBo(false)
-    if (r.ok) {
+    if (r.ok && r.du) {
       showToast(`Đã bỏ điều chỉnh ngày ${ngayNgan(d.ngay)}.`)
+      tai()
+    } else if (r.ok) {
+      setXacNhan(null)
+      showToast(`Không có điều chỉnh ngày ${ngayNgan(d.ngay)} để bỏ (có thể đã được bỏ hoặc bộ não đã tự gỡ).`, 'warn')
       tai()
     } else {
       setXacNhan(null)

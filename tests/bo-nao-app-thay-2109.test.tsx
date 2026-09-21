@@ -88,25 +88,28 @@ describe('lớp nối bo-nao-thay — đọc hợp đồng, không đoán', () =
     expect(x).toMatchObject({ ngay: '2026-09-22', cheDo: 'that', apDung: true, tuGo: false, loiNhanChoEm: 'Chào em', loiNhanChoPhuHuynh: 'Kính gửi phụ huynh', thuTuan: 'Tuần này…', ketQua: 'an_thua' })
     expect(x.khacPhuc).toEqual([{ dang: 'ESTE.THUY_PHAN', kieu: 'khac_phuc', soCau: 3, bac: 'thap_hon_mot_bac' }, { dang: 'X', kieu: 'on_som', soCau: null, bac: '' }])
     expect(moTaNum(x)).toEqual({ chinh: 'Nhịp −2 · khởi động 3', phu: ['Ưu tiên: ESTE.THUY_PHAN', 'Khắc phục: ESTE.THUY_PHAN · 3 câu · thấp hơn một bậc', 'Ôn sớm: X'] })
+    // máy chủ điền nhịp mặc định {lech:0, khoiDong:2} khi bộ não KHÔNG vặn nhịp ⇒ không in "Nhịp ±0"
+    expect(moTaNum({ nhip: { lech: 0, khoiDong: 2 }, dang: [{ ma: 'X', hanhDong: 'uu_tien', lyDo: '' }], co: 'khong' })).toEqual({ chinh: '', phu: ['Ưu tiên: X'] })
+    expect(moTaNum({ nhip: { lech: 0, khoiDong: 2 }, dang: [], co: 'khong' }).chinh).toBe('Giữ nguyên')
+    expect(moTaNum({ nhip: { lech: 0, khoiDong: 3 }, dang: [], co: 'khong' }).chinh).toBe('Nhịp ±0 · khởi động 3') // vặn khởi động thì vẫn in
     expect(docNhatKy({ ds: [{ ngay: '2026-09-22' }] })[0]).toMatchObject({ loiNhanChoEm: '', loiNhanChoPhuHuynh: '', thuTuan: '', apDung: null, ketQua: null, khacPhuc: [] })
   })
 
   it('tiêu đề khối: chạy thật "Bộ não A.I · đêm qua đã hỗ trợ N em"; chạy thử chỉ nói đã soi; thiếu số thì KHÔNG nêu số', () => {
     const dem = { soEm: 120, soEmHoTro: 9, soDieuChinh: { nhan: 30, chiGhiSo: 9, biLoai: 2 } }
     expect(tieuDeKhoi(dem, true)).toBe('Bộ não A.I · đêm qua đã hỗ trợ 9 em')
-    expect(tieuDeKhoi({ ...dem, soEmHoTro: null }, true)).toBe('Bộ não A.I · đêm qua đã hỗ trợ 21 em') // nhan − chiGhiSo
-    expect(tieuDeKhoi({ soEm: 120, soEmHoTro: null, soDieuChinh: null }, true)).toBe('Bộ não A.I · đêm qua')
-    expect(tieuDeKhoi({ ...dem, soEmHoTro: 0 }, true)).toBe('Bộ não A.I · đêm qua chưa cần chỉnh em nào')
+    expect(tieuDeKhoi({ ...dem, soEmHoTro: null }, true)).toBe('Bộ não A.I · đêm qua') // KHÔNG suy từ số điều chỉnh qua kiểm khuôn — chỉ nêu số khi máy chủ nói
+    expect(tieuDeKhoi({ ...dem, soEmHoTro: 0 }, true)).toBe('Bộ não A.I · đêm qua chưa áp điều chỉnh nào cho em')
     expect(tieuDeKhoi(dem, false)).toBe('Bộ não A.I · đêm qua đã soi 120 em')
-    expect(tieuDeKhoi({ soEm: null, soEmHoTro: null, soDieuChinh: null }, false)).toBe('Bộ não A.I · đêm qua đã soi các em')
+    expect(tieuDeKhoi({ soEm: 0, soEmHoTro: 0 }, false)).toBe('Bộ não A.I · đêm qua chưa soi em nào') // chưa có bản tin đêm ấy
+    expect(tieuDeKhoi({ soEm: null, soEmHoTro: null }, false)).toBe('Bộ não A.I · đêm qua đã soi các em')
   })
 
   it('nhãn dòng: điều chỉnh ĐÃ ÁP ⇒ "ĐÃ LÀM"; chạy thử / chưa áp ⇒ "ĐỀ XUẤT" (không nói đã làm khi chưa làm); chỉ-báo và nút', () => {
-    expect(nhanCuaDong(dong({ apDung: true }), false).nhan).toBe('ĐÃ LÀM')
-    expect(nhanCuaDong(dong({ apDung: null }), true).nhan).toBe('ĐÃ LÀM')
-    expect(nhanCuaDong(dong({ apDung: null }), false).nhan).toBe('ĐỀ XUẤT')
-    expect(nhanCuaDong(dong({ apDung: false }), true).nhan).toBe('ĐỀ XUẤT')
-    expect(nhanCuaDong(dong({ loai: 'thay_xem_lai' }), true).nhan).toBe('THẦY XEM LẠI')
+    expect(nhanCuaDong(dong({ apDung: true })).nhan).toBe('ĐÃ LÀM')
+    expect(nhanCuaDong(dong({ apDung: null })).nhan).toBe('ĐỀ XUẤT') // máy chủ không nói ⇒ không khẳng định đã làm
+    expect(nhanCuaDong(dong({ apDung: false })).nhan).toBe('ĐỀ XUẤT')
+    expect(nhanCuaDong(dong({ loai: 'thay_xem_lai' })).nhan).toBe('THẦY XEM LẠI')
     expect(laDongChiBao(dong({ loai: 'thay_xem_lai' }))).toBe(true)
     expect(laDongChiBao(dong({ loai: 'can_thay_y', hanhDong: 'nhan_phu_huynh' }))).toBe(true)
     expect(laDongChiBao(dong({ loai: 'can_thay_y', hanhDong: 'xem_ho_so' }))).toBe(false)
@@ -250,6 +253,15 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
     expect(screen.getByText(/không đổi hạn nộp/)).toBeTruthy()
   })
 
+  it('CHẠY THẬT nhưng máy chủ CHƯA áp điều chỉnh nào (apDung vắng/false, soEmHoTro 0) ⇒ KHÔNG nói "đã hỗ trợ"/"ĐÃ LÀM"; nói thật là chưa áp', async () => {
+    chay({ cheDo: 'that', soEmHoTro: 0, banTin: { cacDong: [{ loai: 'dieu_chinh', chu: 'Giảm 3 câu mỗi ngày.', sbd: '12007', hoTen: 'Trần Thu Hà', hanhDong: 'xem_ho_so' }] } })
+    expect(await screen.findByRole('heading', { name: 'Bộ não A.I · đêm qua chưa áp điều chỉnh nào cho em' })).toBeTruthy()
+    expect(screen.getByText('ĐỀ XUẤT')).toBeTruthy()
+    expect(screen.queryByText('ĐÃ LÀM')).toBeNull()
+    expect(screen.getByText(/chưa có điều chỉnh nào được áp/)).toBeTruthy()
+    expect(document.body.textContent).not.toContain('Thầy không cần làm gì')
+  })
+
   it('Bỏ điều chỉnh: hỏi lại → gọi /ai/dieu-chinh/bo {sbd, ngay của điều chỉnh}; xong thì ghi "Đã bỏ"; Giữ thì thôi', async () => {
     chay({ cheDo: 'that', banTin: { cacDong: [{ loai: 'dieu_chinh', chu: 'Đã giảm 3 câu.', sbd: '12007', hoTen: 'Trần Thu Hà', hanhDong: 'xem_ho_so', apDung: true, ngayDieuChinh: '2026-09-21' }] } })
     await screen.findByText('ĐÃ LÀM')
@@ -263,6 +275,16 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
     const lan = goi.mock.calls.find((c) => c[0] === '/ai/dieu-chinh/bo')!
     expect(lan[1]).toEqual({ sbd: '12007', ngay: '2026-09-21' })
     expect(useAppStore.getState().toast?.text).toContain('Đã bỏ điều chỉnh của Trần Thu Hà')
+  })
+
+  it('máy chủ trả ok nhưng daBo=false (không có gì để bỏ) ⇒ KHÔNG nói "đã bỏ"; nói thật', async () => {
+    dungMayChu({ '/ai/dem-qua': () => ({ json: demQuaJson({ cheDo: 'that', banTin: { cacDong: [{ loai: 'dieu_chinh', chu: 'Đã giảm 3 câu.', sbd: '12007', hoTen: 'Trần Thu Hà', hanhDong: 'xem_ho_so', apDung: true }] } }) }), '/ai/dieu-chinh/bo': () => ({ json: { ok: true, daBo: false } }) })
+    render(<KhoiBoNaoDemQua />)
+    await screen.findByText('ĐÃ LÀM')
+    fireEvent.click(screen.getByRole('button', { name: 'Bỏ điều chỉnh' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Bỏ' }))
+    await waitFor(() => expect(useAppStore.getState().toast?.text ?? '').toContain('Không có điều chỉnh nào của Trần Thu Hà để bỏ'))
+    expect(screen.queryByText('Đã bỏ điều chỉnh')).toBeNull()
   })
 
   it('dòng CHỈ BÁO (thầy xem lại · em vắng lâu) và dòng bộ não đã tự gỡ KHÔNG có nút "Bỏ điều chỉnh"; dòng cả lớp nối Gọi lên bảng', async () => {

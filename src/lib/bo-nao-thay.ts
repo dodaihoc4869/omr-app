@@ -204,10 +204,11 @@ export async function layNhatKy(sbd: string): Promise<KetQuaLenh<DongNhatKy[]>> 
   return r.ok ? { ok: true, du: docNhatKy(r.du) } : r
 }
 
-/** Bỏ MỘT điều chỉnh (thầy không đồng ý). Quá hạn chờ ⇒ nói CHƯA CHẮC đã bỏ (lệnh có thể đã tới máy chủ) — bài học từ "Thêm phút". */
-export async function boDieuChinh(sbd: string, ngay: string): Promise<KetQuaLenh<true>> {
+/** Bỏ MỘT điều chỉnh (thầy không đồng ý). Trả `du` = máy chủ báo `daBo`: `false` = KHÔNG có điều chỉnh nào để bỏ (đã bỏ / đã tự gỡ / không tồn tại) — màn không được nói "đã bỏ".
+ *  Quá hạn chờ ⇒ nói CHƯA CHẮC đã bỏ (lệnh có thể đã tới máy chủ) — bài học từ "Thêm phút". */
+export async function boDieuChinh(sbd: string, ngay: string): Promise<KetQuaLenh<boolean>> {
   const r = await goiLenh('/ai/dieu-chinh/bo', { sbd, ngay }, 'Máy chủ chưa có lệnh Bỏ điều chỉnh — chưa bỏ được.', 'Máy chủ trả lời chậm — CHƯA CHẮC đã bỏ điều chỉnh. Mở lại hồ sơ em để xem tình trạng thật.')
-  return r.ok ? { ok: true, du: true } : r
+  return r.ok ? { ok: true, du: r.du.daBo === true } : r
 }
 
 function docCauHinh(j: Record<string, unknown>): CauHinhBoNao {
@@ -272,9 +273,9 @@ export const NHAN_LOAI: Record<LoaiDongBanTin, { nhan: string; vai: 'loi' | 'thu
   thay_xem_lai: { nhan: 'THẦY XEM LẠI', vai: 'canh' },
 }
 
-/** Nhãn của dòng theo giọng TỰ HÀNH: điều chỉnh ĐÃ ÁP ⇒ "ĐÃ LÀM"; mới chỉ ghi sổ / chạy bóng ⇒ "ĐỀ XUẤT" (không nói đã làm khi chưa làm). */
-export function nhanCuaDong(d: DongBanTin, tatCaThat: boolean): { nhan: string; vai: 'loi' | 'thuong' | 'chinh' | 'tot' | 'canh' } {
-  if (d.loai === 'dieu_chinh' && !(d.apDung ?? tatCaThat)) return { nhan: 'ĐỀ XUẤT', vai: 'thuong' }
+/** Nhãn của dòng theo giọng TỰ HÀNH: CHỈ khi máy chủ nói `apDung:true` mới ghi "ĐÃ LÀM"; mới ghi sổ / chạy thử / máy chủ không nói ⇒ "ĐỀ XUẤT" (không nói đã làm khi chưa chắc đã làm — tầng áp dụng ở máy chủ có thể chưa bật). */
+export function nhanCuaDong(d: DongBanTin): { nhan: string; vai: 'loi' | 'thuong' | 'chinh' | 'tot' | 'canh' } {
+  if (d.loai === 'dieu_chinh' && d.apDung !== true) return { nhan: 'ĐỀ XUẤT', vai: 'thuong' }
   return NHAN_LOAI[d.loai]
 }
 
@@ -289,11 +290,12 @@ export function coTheBoDong(d: DongBanTin): boolean {
 }
 
 /** Tiêu đề khối theo giọng TỰ HÀNH (thầy chốt 21/09). Chạy thật: "Bộ não A.I · đêm qua đã hỗ trợ N em"; chạy thử: chưa hỗ trợ ai nên chỉ nói đã soi bao nhiêu em; thiếu số thì KHÔNG nêu số. */
-export function tieuDeKhoi(dem: Pick<DemQua, 'soEm' | 'soEmHoTro' | 'soDieuChinh'>, tatCaThat: boolean): string {
-  if (!tatCaThat) return dem.soEm != null ? `Bộ não A.I · đêm qua đã soi ${dem.soEm} em` : 'Bộ não A.I · đêm qua đã soi các em'
-  const n = dem.soEmHoTro ?? (dem.soDieuChinh ? Math.max(0, dem.soDieuChinh.nhan - dem.soDieuChinh.chiGhiSo) : null)
+export function tieuDeKhoi(dem: Pick<DemQua, 'soEm' | 'soEmHoTro'>, tatCaThat: boolean): string {
+  if (!tatCaThat) return dem.soEm === 0 ? 'Bộ não A.I · đêm qua chưa soi em nào' : dem.soEm != null ? `Bộ não A.I · đêm qua đã soi ${dem.soEm} em` : 'Bộ não A.I · đêm qua đã soi các em'
+  // CHỈ nêu số em khi MÁY CHỦ nói (`soEmHoTro`): không suy từ số điều chỉnh qua kiểm khuôn, vì "qua kiểm khuôn" chưa có nghĩa là đã áp cho em.
+  const n = dem.soEmHoTro
   if (n === null) return 'Bộ não A.I · đêm qua'
-  return n > 0 ? `Bộ não A.I · đêm qua đã hỗ trợ ${n} em` : 'Bộ não A.I · đêm qua chưa cần chỉnh em nào'
+  return n > 0 ? `Bộ não A.I · đêm qua đã hỗ trợ ${n} em` : 'Bộ não A.I · đêm qua chưa áp điều chỉnh nào cho em'
 }
 
 /** Nút "Xem" của một dòng (thầy chỉ ĐỌC; "Bỏ điều chỉnh" là nút thứ hai, tuỳ thầy): NỐI HÀM SẴN CÓ — mở hồ sơ em, hoặc sang Gọi lên bảng với dòng nói về cả lớp. Không tạo luồng mới. `null` = dòng không có nút. */
@@ -347,7 +349,9 @@ export function ngayNgan(iso: string): string {
 
 /** Chữ mô tả "núm" cho thầy: "Nhịp −2 · khởi động 3" + các dạng ("Ưu tiên: <mã>"). */
 export function moTaNum(d: Pick<DongNhatKy, 'nhip' | 'dang' | 'co'> & Partial<Pick<DongNhatKy, 'khacPhuc'>>): { chinh: string; phu: string[] } {
-  const chinh = d.nhip ? `Nhịp ${d.nhip.lech > 0 ? '+' : d.nhip.lech < 0 ? '−' : '±'}${Math.abs(d.nhip.lech)} · khởi động ${d.nhip.khoiDong}` : d.dang.length > 0 || (d.khacPhuc?.length ?? 0) > 0 ? '' : 'Giữ nguyên'
+  // Máy chủ điền nhịp mặc định {lech:0, khoiDong:2} khi bộ não KHÔNG vặn nhịp ⇒ không in "Nhịp ±0" như một thay đổi.
+  const coVanNhip = d.nhip != null && !(d.nhip.lech === 0 && d.nhip.khoiDong === 2)
+  const chinh = coVanNhip && d.nhip ? `Nhịp ${d.nhip.lech > 0 ? '+' : d.nhip.lech < 0 ? '−' : '±'}${Math.abs(d.nhip.lech)} · khởi động ${d.nhip.khoiDong}` : d.dang.length > 0 || (d.khacPhuc?.length ?? 0) > 0 ? '' : 'Giữ nguyên'
   const phu = d.dang.map((x) => `${TEN_HANH_DONG_DANG[x.hanhDong] ?? x.hanhDong}: ${x.ma}`)
   for (const k of d.khacPhuc ?? []) phu.push(k.kieu === 'on_som' ? `Ôn sớm: ${k.dang}` : `Khắc phục: ${k.dang}${k.soCau ? ` · ${k.soCau} câu` : ''}${k.bac === 'thap_hon_mot_bac' ? ' · thấp hơn một bậc' : ''}`)
   return { chinh, phu }

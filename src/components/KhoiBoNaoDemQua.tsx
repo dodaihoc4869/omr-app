@@ -148,6 +148,8 @@ export default function KhoiBoNaoDemQua({
     </span>
   )
 
+  // Đã ÁP thật cho em chưa? Chỉ tin điều MÁY CHỦ nói (số em hỗ trợ > 0 hoặc có dòng apDung:true).
+  const daApDung = (d.soEmHoTro ?? 0) > 0 || d.banTin.some((x) => x.apDung === true)
   const tt = trangThaiChay(d.chayLanCuoi, nayMs)
   if (tt === 'chua_chay') {
     return (
@@ -179,9 +181,12 @@ export default function KhoiBoNaoDemQua({
     const r = await boDieuChinh(x.sbd, x.ngayDieuChinh || d.ngay)
     setDangBo(false)
     setXacNhan(null)
-    if (r.ok) {
+    if (r.ok && r.du) {
       setDaBo((c) => new Set(c).add(i))
       showToast(`Đã bỏ điều chỉnh của ${tenEm(x)}.`)
+    } else if (r.ok) {
+      // Máy chủ trả ok nhưng KHÔNG có điều chỉnh nào để bỏ (đã bỏ, đã tự gỡ hoặc chưa được lưu) — không nói "đã bỏ".
+      showToast(`Không có điều chỉnh nào của ${tenEm(x)} để bỏ (có thể đã được bỏ hoặc bộ não đã tự gỡ).`, 'warn')
     } else {
       showToast(r.chu, 'warn')
     }
@@ -245,7 +250,7 @@ export default function KhoiBoNaoDemQua({
       ) : (
         <div>
           {dsHien.map((x, i) => {
-            const nh = nhanCuaDong(x, tatCaThat)
+            const nh = nhanCuaDong(x)
             const ten = tenEm(x)
             const lop = x.sbd ? tenLop(x.sbd) : ''
             const kqDong = x.ketQua ? NHAN_KET_QUA[x.ketQua] : null
@@ -292,9 +297,13 @@ export default function KhoiBoNaoDemQua({
           <p className="bnao-ghi-chu">
             <Info size={18} aria-hidden="true" />
             <span>
-              {tatCaThat ? (
+              {tatCaThat && daApDung ? (
                 <>
                   Bộ não tự điều chỉnh trong khung an toàn — <b>không đổi hạn nộp</b>, không đụng câu lõi, tự hết hạn sau 3 ngày. Thầy không cần làm gì; chỉ bấm <b>Bỏ điều chỉnh</b> nếu không đồng ý.
+                </>
+              ) : tatCaThat ? (
+                <>
+                  Đang <b>chạy thật</b> nhưng đêm qua <b>chưa có điều chỉnh nào được áp</b> cho học sinh (máy chủ có thể chưa bật phần áp dụng, hoặc độ tin cậy chưa đủ) — kế hoạch ngày và bài tập của học sinh <b>chưa đổi</b>.
                 </>
               ) : (
                 <>
