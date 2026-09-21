@@ -10,8 +10,9 @@ export interface SuKienSaiNhanh { qid: string; ngayVn: string; ketQua: 0 | 1 | n
 export interface KetQuaSaiNhanh {
   /** Số câu KHÁC NHAU thoả định nghĩa. */
   soCau: number
-  /** Ngưỡng báo và cửa sổ đã dùng (để câu chữ nói đúng số). */
+  /** Ngưỡng báo, ngưỡng giây và cửa sổ đã dùng (để câu chữ nói đúng số, kể cả khi gọi với ngưỡng riêng). */
   nguongSoCau: number
+  nguongGiay: number
   cuaSoNgay: number
   tuNgay: string
   /** `soCau ≥ nguongSoCau`. */
@@ -38,10 +39,10 @@ export function demSaiNhanhDungLai(ds: readonly SuKienSaiNhanh[], homNay: string
     const d = dung.get(qid)
     if (d && [...ngays].some((n) => d.has(ngaySau(n, 1)))) soCau++
   }
-  return { soCau, nguongSoCau, cuaSoNgay, tuNgay, co: soCau >= nguongSoCau }
+  return { soCau, nguongSoCau, nguongGiay, cuaSoNgay, tuNgay, co: soCau >= nguongSoCau }
 }
 
 /** Dòng cho thầy (Bảng tin / Hồ sơ em): chữ thường, có số thật và nhãn, không nhãn năng lực. Không có tín hiệu ⇒ chuỗi rỗng. */
 export function chuTinHieuSaiNhanh(k: KetQuaSaiNhanh): string {
-  return k.co ? `Em có ${k.soCau} câu sai rất nhanh (dưới ${TIN_HIEU_SAI_NHANH.nguongGiay} giây) rồi làm đúng vào hôm sau trong ${k.cuaSoNgay} ngày gần nhất. Thầy có thể xem cách em làm bài.` : ''
+  return k.co ? `Em có ${k.soCau} câu sai rất nhanh (dưới ${k.nguongGiay} giây) rồi làm đúng vào hôm sau trong ${k.cuaSoNgay} ngày gần nhất. Thầy có thể xem cách em làm bài.` : ''
 }

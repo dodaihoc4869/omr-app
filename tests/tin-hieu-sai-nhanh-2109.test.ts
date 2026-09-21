@@ -12,7 +12,7 @@ describe('demSaiNhanhDungLai', () => {
   it('mặc định: cửa sổ 7 ngày, sai < 5 giây, đúng NGÀY LIỀN SAU, ngưỡng 8 câu; 8 câu ⇒ có, 7 câu ⇒ không', () => {
     expect(TIN_HIEU_SAI_NHANH).toEqual({ cuaSoNgay: 7, nguongGiay: 5, nguongSoCau: 8 })
     const tam = demSaiNhanhDungLai(cap(8, '2026-09-23', '2026-09-24'), HOM_NAY)
-    expect(tam).toEqual({ soCau: 8, nguongSoCau: 8, cuaSoNgay: 7, tuNgay: '2026-09-19', co: true })
+    expect(tam).toEqual({ soCau: 8, nguongSoCau: 8, nguongGiay: 5, cuaSoNgay: 7, tuNgay: '2026-09-19', co: true })
     expect(demSaiNhanhDungLai(cap(7, '2026-09-23', '2026-09-24'), HOM_NAY)).toMatchObject({ soCau: 7, co: false })
   })
   it('KHÔNG tính: sai từ 5 giây trở lên, sai không phải ngày liền trước, đúng cùng ngày, đúng cách 2 ngày, thiếu giây, kết quả null, ngoài cửa sổ', () => {
@@ -43,6 +43,8 @@ describe('demSaiNhanhDungLai', () => {
     const co = demSaiNhanhDungLai(cap(9, '2026-09-23', '2026-09-24'), HOM_NAY)
     expect(chuTinHieuSaiNhanh(co)).toBe('Em có 9 câu sai rất nhanh (dưới 5 giây) rồi làm đúng vào hôm sau trong 7 ngày gần nhất. Thầy có thể xem cách em làm bài.')
     expect(chuTinHieuSaiNhanh(demSaiNhanhDungLai([], HOM_NAY))).toBe('')
+    // ngưỡng giây riêng ⇒ chữ nói đúng số đã dùng (không cứng 5)
+    expect(chuTinHieuSaiNhanh(demSaiNhanhDungLai(ds, HOM_NAY, { nguongGiay: 8, nguongSoCau: 3 }))).toBe('Em có 3 câu sai rất nhanh (dưới 8 giây) rồi làm đúng vào hôm sau trong 7 ngày gần nhất. Thầy có thể xem cách em làm bài.')
   })
   it('TÍNH CHẤT 3 000 sổ ngẫu nhiên: soCau ≤ số câu khác nhau; thêm sự kiện đúng KHÔNG làm giảm; co ⇔ soCau ≥ ngưỡng; xáo trộn thứ tự không đổi kết quả', () => {
     const r = mulberry32(8)
