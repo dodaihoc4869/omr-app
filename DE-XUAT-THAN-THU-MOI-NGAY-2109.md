@@ -115,6 +115,37 @@ Code 1 rà thấy: làm 4 câu SAI HẾT vẫn được tính đạt. Đề ngh�
 Một ngày đẹp của em: học thật khoảng 140 EXP + 3 lượt Đảo khoảng 60–80 + một chặng Đoàn 3 sao khoảng 50–70 ⇒ kiếm khoảng 250–290, thú ăn 200, phần dư 50–90 nằm ống nghiệm làm đệm cho ngày bận. Ống nghiệm không còn phình vô nghĩa, con số "+EXP" giữ được giá trị.
 **Tính lại EXP đã kiếm (gộp vào Điều 2, làm MỘT lần):** thưởng nấc dạng em đã nhận được định giá lại theo bảng mới (nấc 1: 20 → 10; tới nấc 2: 60 → 30; tới nấc 3: 100 → 60), phần chênh trừ khỏi ống nghiệm (không âm); EXP học tập giữ nguyên từng điểm. Mọi em cùng một bảng giá từ đầu mùa.
 
+## ĐIỀU 10 · Tính lại MỌI khoản thưởng EXP cho khớp ba mốc: 36 ngày có khiên đầu · 21 ngày lên cấp 10 · 1 200 ngày lên cấp 120 (thầy lệnh 13:47)
+(Thầy viết "cấp 20"; tôi hiểu là cấp 120 như lệnh trước. Nếu thầy muốn đúng cấp 20 thì báo, tôi tính lại đường cấp.)
+**Ba mốc đều treo vào MỘT việc: "đạt nhiệm vụ ngày".** Khiên = 36 ngày đạt. Cấp 10 = 21 ngày thú ăn no, mà thú chỉ ăn no 200 vào ngày em đạt. Vậy bảng thưởng phải bảo đảm: **em nào ĐẠT nhiệm vụ ngày và chơi 3 lượt thú thì kiếm đủ 200 EXP, dù em học yếu.** Bảng cũ không làm được điều đó — thưởng nghiêng về câu đúng nên em giỏi đủ 200 còn em yếu-mà-chăm chỉ được khoảng 165, mất 27 ngày mới tới cấp 10. Tôi giả lập trên bảng cũ và bảng mới:
+| Kiểu học sinh (ngày nào cũng đạt) | Bảng cũ: kiếm mỗi ngày → tới cấp 10 | Bảng mới: kiếm mỗi ngày → tới cấp 10 |
+|---|---|---|
+| Yếu mà chăm (đúng 50 %) | 165 EXP → ngày 27 | 242 EXP → **ngày 21** |
+| Trung bình, chăm (đúng 70 %) | 203 EXP → ngày 22 | 280 EXP → **ngày 21** |
+| Giỏi, chăm (đúng 90 %) | 234 EXP → ngày 21 | 311 EXP → **ngày 21** |
+| Học 5 ngày một tuần, đạt 60 % số ngày | ngày 51 | ngày 42 |
+
+⇒ Với bảng mới, **chăm là đủ**: em yếu đi cùng nhịp với em giỏi; em giỏi hơn thì dư EXP vào ống nghiệm làm dự trữ cho tuần thi cử (màn hiện "Dự trữ đủ N ngày ăn" thay cho con số trần trụi). Bỏ ngày thì không bảng thưởng nào cứu được — đúng ý "vào app mỗi ngày".
+**Bảng thưởng EXP học tập (áp từ 00:00 ngày 22/09; sổ cũ không tính lại, riêng em đã đạt hôm 21/09 được bù 60 EXP khi chuyển đổi hồ sơ):**
+| Khoản | Cũ | Mới | Vì sao |
+|---|---|---|---|
+| Đạt nhiệm vụ ngày | 20 | **80** | xương sống: em nào chăm cũng nhận như nhau |
+| Câu ĐÚNG đầu tiên trong ngày | 0 | **10** | cái móc mở app mỗi ngày |
+| Chuỗi ngày đạt liên tiếp | 2 × số ngày (tối đa 20) | giữ | |
+| Xong chặng bài tập về nhà đúng nhịp | 10 | **20** | |
+| Xong chặng trễ nhịp | 4 | **8** | em chậm vẫn được ghi công |
+| Nộp bài tập về nhà đúng hạn | 15 | **30** | |
+| Mừng em trở lại (ngày đầu có học sau khi vắng từ 3 ngày) | 0 | **30**, nhiều nhất 1 lần trong 14 ngày | kéo em đã bỏ quay lại; không lợi hơn học đều |
+| Mỗi câu đúng (theo phần và số sao), trần mềm | 2–10 | giữ | |
+| Lên bậc (đúng lại câu từng sai ở ngày khác) | 6 | giữ | thưởng TIẾN BỘ, em yếu có nhiều cơ hội hơn |
+| Khắc phục xong một câu | 30 | giữ | như trên |
+| Bài gia đình giao làm xong | 10 | giữ | |
+| Lên bảng đạt / chưa đạt | 15 / 5 | giữ | |
+| Ca kiểm tra | điểm × 3 | giữ | |
+| Trong game (Đảo + Đoàn) | | theo Điều 9, tối đa 120 mỗi ngày | |
+
+**Các mốc theo số ngày đạt, khớp nhau thành một đường:** ngày 1 lên cấp 2 → ngày 21 cấp 10 Thức tỉnh → **ngày 36 khiên đầu tiên** (lúc đó thú vừa qua cấp 12) → ngày 74 cấp 20 → ngày 134 cấp 30 Trưởng thành → ngày 280 cấp 50 → … → ngày 1 200 cấp 120. Khiên rèn tiếp theo: cứ 36 ngày đạt một khiên; vắng 7 ngày liền mất một khiên (đã sống).
+
 ---
 ## THẦY DUYỆT
 Thầy trả lời "chốt hết" hoặc ghi số điều cần sửa (ví dụ "Điều 3: 24 câu", "Điều 6: A"). Thứ tự build sau khi duyệt: Điều 1 + 2 lên trước (máy chủ rồi màn), Điều 7, rồi Điều 3–5 (rút câu), Điều 6. Trước khi Điều 1 sống, lời mời của Bộ não tạm không nêu số EXP còn thiếu và số cấp.
