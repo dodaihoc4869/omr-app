@@ -50,8 +50,16 @@ describe('THẺ GIAO BÀI — nói thẳng khi chưa chuyển kho đề', () => 
     expect(PC).toContain('máy chủ')
     expect(PC).toContain('Để trống: mặc định hạn nộp sau 48 giờ')
     // Sửa CÓ CHỦ Ý 21/09 (Điều 4 = B, thầy chốt 14:13): quá hạn VẪN mở được (nộp trễ); em chưa từng mở bài cá nhân hoá được chốt bộ chỉ phần lõi.
-    expect(doc('server/src/index.ts')).not.toContain('if (quaHan && !em.nop_luc')
-    expect(doc('server/src/index.ts')).toContain('chotBoChoEm` chốt bộ CHỈ PHẦN LÕI')
+    // Luật CŨ ('qua hạn ⇒ qua_han') chỉ được tồn tại SAU cờ lùi `cau_hinh.btvn_nop_tre = 'tat'` (btvnNopTreBat): chặn vô điều kiện bị cấm; mọi chỗ chặn cũ phải đi kèm cờ.
+    const idx = doc('server/src/index.ts')
+    expect(idx).not.toContain('if (quaHan && !em.nop_luc)')
+    expect(idx).toContain('chotBoChoEm` chốt bộ CHỈ PHẦN LÕI')
+    const chanCu = idx.match(/if \(quaHan && !em\.nop_luc[^\n]*/g) ?? []
+    expect(chanCu).toHaveLength(1) // đúng MỘT nhánh chặn cũ…
+    expect(chanCu[0]).toContain('!(await btvnNopTreBat(env))') // …và nó nằm sau cờ lùi
+    // hai đường nộp còn lại cũng vậy
+    expect(doc('server/src/goi-cu.ts')).toMatch(/if \(quaHan && !\(await btvnNopTreBat\(env\)\)\) return \{ ok: false, lyDo: 'qua_han'/)
+    expect(doc('server/src/btvn-nang-do-d1.ts')).toMatch(/!\(await btvnNopTreBat\(env\)\)\) return \{ ok: false, lyDo: 'qua_han'/)
   })
 
   it('kho đề đọc từ máy chủ mới, không đọc Apps Script', () => {
