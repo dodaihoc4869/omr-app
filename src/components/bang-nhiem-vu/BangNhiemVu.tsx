@@ -10,6 +10,7 @@ import GiaoThemChoCon from './GiaoThemChoCon'
 import type { ViewGiaoThem } from '../../lib/use-giao-them'
 import type { ViewThiDua } from '../../lib/use-thi-dua'
 import OThiDua from './OThiDua'
+import TheChoAn, { viewChoAn } from './TheChoAn'
 import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
@@ -238,6 +239,7 @@ export default function BangNhiemVu({
   const { tienDo, tocDo } = duLieu
   const viec = tatCaViec(duLieu)
   // Nút của ô Thi đua dẫn tới việc CHƯA XONG đầu tiên (không bị cổng); hết việc ⇒ Đảo thần thú (Boss 21/09).
+  const viewChoAnHs = laPh ? null : viewChoAn(duLieu)
   const lamViecDau = () => {
     const dau = viec.find((x) => !x.biCong)
     if (dau) chon(dau)
@@ -413,6 +415,9 @@ export default function BangNhiemVu({
 
             {/* THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" (chỉ phụ huynh, thầy lệnh 21/09): ngay dưới thanh tiến độ, TRÊN việc hôm nay. Màn cha truyền vào; không có ca nào ⇒ không thẻ. */}
             {laPh && theCaGanNhat}
+
+            {/* LỜI NHẮC "CHO ĂN" (Đợt 1 thần thú mỗi ngày; chỉ học sinh): ống nghiệm có EXP + hôm nay thú còn ăn được ⇒ một thẻ dẫn vào Đảo (nơi có nút nạp). Thiếu số của máy chủ ⇒ không thẻ. */}
+            {!laPh && onMoThanThu && viewChoAnHs && <TheChoAn v={viewChoAnHs} onMo={onMoThanThu} />}
 
             {/* Ô "THI ĐUA HÔM NAY" (chỉ học sinh; 8A): ngay dưới thanh tiến độ, TRÊN việc hôm nay. */}
             {!laPh && thiDua && <OThiDua v={thiDua} onLam={lamViecDau} />}

@@ -131,6 +131,11 @@ export interface DuLieuBangNhiemVu {
 
 export interface DuLieuExp {
   homNay: number
+  /**
+   * Đợt 1 thần thú mỗi ngày — CHỈ khi máy chủ trả ĐỦ cả ba số (thiếu một ⇒ vắng hết, KHÔNG đoán): `expConThieu` = EXP thú còn thiếu để lên cấp (KHÔNG trừ ống nghiệm),
+   * `ongNghiem` = EXP đã kiếm chưa nạp, `hapThuConLaiHomNay` = hôm nay thú còn ăn được (0 khi chưa học / đã no). Không lưu vào bản nhớ (số ví cũ sẽ nói sai).
+   */
+  thu?: { expConThieu: number; ongNghiem: number; hapThuConLaiHomNay: number }
   /** `ghiChu` là tiếng Việt máy chủ đã viết sẵn — in nguyên văn. */
   chiTiet: { loai: string; exp: number; ghiChu: string }[]
   manhKhien: { manh: number; moiKhien: number; khienConLai: number } | null
@@ -399,7 +404,7 @@ export interface KeHoachNgayMayChu {
   viec: ViecMayChu[]
   canhBao?: { loai: string; noiDung: string }[]
   quaHan?: { loai: 'btvn' | 'mom'; ma: string; hanNop: string; conLai?: number }[]
-  tienBo: { daLamCau: number; lenBac?: number; tutBac?: number; dat?: boolean; toiThieuCau?: number; conThieu?: number }
+  tienBo: { daLamCau: number; lenBac?: number; tutBac?: number; dat?: boolean; toiThieuCau?: number; conThieu?: number; thieuDat?: { soCauDung?: number; chu?: string } }
   chuoiDat?: number
   lanNghi?: boolean
   capNhatLuc?: string
@@ -418,6 +423,10 @@ export interface KeHoachNgayMayChu {
     chiTietHomNay?: { loai?: string; exp?: number; ghiChu?: string; soKhoan?: number }[]
     manhKhien?: { manh?: number; moiKhien?: number; khienRen?: number; khienConLai?: number; choCongVaoHoSo?: boolean } | null
     datNgay?: { dat?: boolean; thieu?: string[]; daLam?: number; toiThieu?: number; daTrao?: boolean; laNghi?: boolean } | null
+    /** Đợt 1 thần thú mỗi ngày (chỉ-thêm; vắng khi em chưa có thú / hồ sơ chưa chuyển). */
+    expConThieu?: number
+    ongNghiem?: number
+    hapThuConLaiHomNay?: number
   } | null
   /** Khoản EXP mới ghi trong CHÍNH lần gọi này. */
   expNhan?: { loai?: string; exp?: number; ghiChu?: string }[]
@@ -432,15 +441,27 @@ export interface KeHoachNgayMayChu {
 
 const soNguyen = (v: unknown) => Math.max(0, Math.floor(Number(v) || 0))
 
+/** `tienBo.thieuDat` (Điều 7, từ 22/09): còn thiếu CÂU ĐÚNG để đạt nhiệm vụ ngày. Chữ của máy chủ (vd "cần đúng thêm 2 câu"); thiếu chữ thì viết từ số; số không dương/hỏng ⇒ null (không nói gì). */
+export function docThieuDat(t: KeHoachNgayMayChu['tienBo'] | undefined): string | null {
+  const x = t?.thieuDat
+  if (!x || typeof x !== 'object') return null
+  const n = Math.floor(Number(x.soCauDung))
+  if (!(n > 0)) return null
+  const chu = typeof x.chu === 'string' ? x.chu.replace(/\s+/g, ' ').trim() : ''
+  return chu || `cần đúng thêm ${n} câu`
+}
+
 /** Đọc phần EXP của máy chủ: thiếu `exp` (chưa bật cho em / máy chủ cũ) ⇒ `null`, giao diện ẩn hết. Bỏ khoản không có chữ `ghiChu`. */
 function docExp(k: KeHoachNgayMayChu): Pick<DuLieuBangNhiemVu, 'exp' | 'expNhan' | 'manhNhan'> {
   const e = k.exp
   const co = !!e && typeof e === 'object' && e.homNay !== undefined && Number.isFinite(Number(e.homNay))
   const mk = co ? e!.manhKhien : null
+  const laSo3 = co && [e!.expConThieu, e!.ongNghiem, e!.hapThuConLaiHomNay].every((x) => typeof x === 'number' && Number.isFinite(x) && x >= 0)
   return {
     exp: co
       ? {
           homNay: soNguyen(e!.homNay),
+          ...(laSo3 ? { thu: { expConThieu: soNguyen(e!.expConThieu), ongNghiem: soNguyen(e!.ongNghiem), hapThuConLaiHomNay: soNguyen(e!.hapThuConLaiHomNay) } } : {}),
           chiTiet: (Array.isArray(e!.chiTietHomNay) ? e!.chiTietHomNay : [])
             .map((c) => ({ loai: String(c?.loai ?? ''), exp: soNguyen(c?.exp), ghiChu: String(c?.ghiChu ?? '').trim() }))
             .filter((c) => c.ghiChu),
@@ -643,6 +664,8 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
   const datNgayExp = keHoach.exp?.datNgay
   const coDatNgay = !!datNgayExp && datNgayExp.laNghi !== true && typeof datNgayExp.dat === 'boolean'
   const expChuaDat = coDatNgay && datNgayExp!.dat === false
+  const thieuDat = docThieuDat(keHoach.tienBo)
+  const chuaDat = expChuaDat || thieuDat !== null
   // Khi máy chủ CÓ nói `datNgay` thì câu trạng thái CHỈ theo `datNgay` (kèm số): hai định nghĩa "đạt" mà nói cùng lúc sẽ tự mâu thuẫn
   // ("đã đủ số câu tối thiểu · Để đạt hôm nay: chưa đủ số câu tối thiểu"). Không có `datNgay` thì giữ câu cũ theo `tienBo`.
   const soConThieu = Math.max(1, Math.floor(Number(datNgayExp?.toiThieu) || 0) - Math.floor(Number(datNgayExp?.daLam) || 0))
@@ -651,10 +674,13 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     tre_nhip: 'làm nốt việc bắt buộc đang trễ nhịp',
     chua_len_bac: 'lên bậc ít nhất một câu đến lịch ôn lại',
   }
-  const thieuChu = expChuaDat ? (datNgayExp!.thieu || []).map((k) => CHU_THIEU[k]).filter(Boolean) : []
+  const thieuChu = [...(expChuaDat ? (datNgayExp!.thieu || []).map((k) => CHU_THIEU[k]).filter(Boolean) : []), ...(thieuDat ? [thieuDat] : [])]
   const dauTienDo = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc` : ''}`
+  // Thiếu CÂU ĐÚNG (Điều 7): nói riêng, kèm số câu làm còn thiếu nếu có — không lẫn với "đã đủ số câu tối thiểu" (hai số khác nhau).
   const ghiChuTienDo = coDatNgay
-    ? `${dauTienDo} · ${expChuaDat ? (thieuChu.length > 0 ? `Để đạt hôm nay: ${thieuChu.join('; ')}` : 'chưa đạt hôm nay') : 'đã đạt hôm nay'}`
+    ? `${dauTienDo} · ${chuaDat ? (thieuChu.length > 0 ? `Để đạt hôm nay: ${thieuChu.join('; ')}` : 'chưa đạt hôm nay') : 'đã đạt hôm nay'}`
+    : thieuDat
+    ? `${dauTienDo} · Để đạt hôm nay: ${[...(conThieu > 0 ? [`làm thêm ${conThieu} câu`] : []), thieuDat].join('; ')}`
     : ghiChuTienDo0
   return dongGoi('ke_hoach_ngay', viec, {
     tienDo: { daLam, mucTieu, phanTram: phanTram(daLam, mucTieu), ghiChu: ghiChuTienDo },
@@ -675,7 +701,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     boNao: (() => { const v = docBoNao(keHoach); return v.hs ? { hs: v.hs, ph: null } : null })(),
     canhBaoThay: docCanhBaoThay(keHoach.canhBaoThay),
     thuThachRieng: null,
-  }, { dat: keHoach.tienBo.dat === true && !expChuaDat, daLamCau: daLam, lenBac })
+  }, { dat: keHoach.tienBo.dat === true && !chuaDat, daLamCau: daLam, lenBac })
 }
 
 const TEN_LOAI: Record<string, string> = {

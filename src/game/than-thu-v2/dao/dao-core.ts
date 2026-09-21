@@ -1,5 +1,6 @@
 /** LÕI THUẦN của Đảo thần thú: chỉ đổi CÁCH KỂ — mọi con số lấy từ hồ sơ máy chủ trả, không tự tính thưởng, không bịa. */
 import {PETS} from '../core'
+import {HAP_THU_DAT,TRAN_EXP_GAME_NGAY} from '../../../lib/hap-thu-ngay'
 import type {Mastery} from '../core'
 import {BATTLE_SKINS} from '../learning-battle'
 import {EVOLUTION_LEVELS,evolutionStage} from '../evolution'
@@ -26,8 +27,8 @@ export function tenThu(p:Pick<DaoProfile,'pet'|'nickname'>){return p.nickname||B
 export function vongExp(cap:number,exp:number){const can=thanhExp(cap);if(cap>=CAP_TOI_DA||can<=0)return {toiDa:true,can:0,con:0,tiLe:1}
  const co=Math.max(0,Math.min(can,Math.floor(exp)));return {toiDa:false,can,con:can-co,tiLe:co/can}}
 
-/** Trần hấp thụ tối đa mỗi ngày (khi đạt nhiệm vụ ngày). = `HAP_THU_DAT` của Code 1 (`src/lib/hap-thu-ngay.ts`); đổi sang import khi tệp ấy có. */
-export const HAP_THU_TOI_DA_NGAY=200
+/** Trần hấp thụ tối đa mỗi ngày (khi đạt nhiệm vụ ngày) = `HAP_THU_DAT` của Code 1. */
+export const HAP_THU_TOI_DA_NGAY=HAP_THU_DAT
 export interface HapThuView{da:number;toiDa:number;tiLe:number;chu:string;bao:string}
 /** THANH "Hôm nay {tên} đã hấp thụ 120 / 200 EXP" + lời báo khi lần nạp bị chặn (giọng trung tính, nói thật). Thiếu/sai dạng ⇒ null (ẩn, KHÔNG bịa số).
  *  `coExpDeNap` = ống nghiệm đang có EXP chờ nạp: chỉ khi đó lời báo mới có nghĩa (không có gì để nạp thì không cần báo bị chặn). */
@@ -39,6 +40,14 @@ export function hapThuHienThi(h:DaoProfile['hapThuHomNay'],ten:string,coExpDeNap
   if(h.lyDo==='chua_hoc')bao='Thần thú chỉ ăn vào ngày em có học. Em làm vài câu rồi quay lại nạp nhé.'
   else if(h.lyDo==='no')bao=tran>=toiDa?`Hôm nay ${ten} đã ăn no. EXP còn lại nằm trong ống nghiệm, mai em nạp tiếp.`:`Đạt nhiệm vụ ngày hôm nay thì ${ten} ăn được thêm ${toiDa-tran} EXP.`}
  return {da,toiDa,tiLe:da/toiDa,chu:`Hôm nay ${ten} đã hấp thụ ${da} / ${toiDa} EXP`,bao}}
+
+/** "Dự trữ đủ N ngày ăn": ống nghiệm chia cho mức ăn tối đa một ngày (200), làm tròn XUỐNG. Không có EXP chờ (N = 0) ⇒ null: ẩn, không nói "0 ngày". */
+export function duTruNgayAn(wallet:number):number|null{const n=Number.isFinite(wallet)?Math.floor(Math.max(0,wallet)/HAP_THU_TOI_DA_NGAY):0;return n>0?n:null}
+/** Câu vừa bị CHẶN bởi trần EXP từ game (Điều 9: 120/ngày): máy chủ trả `reward` (đã cắt) < `thuongGoc` (thưởng đáng lẽ). Trả lý do thay cho câu "sao thứ N…" sai chỗ; không bị cắt ⇒ null (giữ câu của máy chủ). */
+export function lyDoTranExpGame(reward:number|undefined,thuongGoc:number|undefined,tenThuCuaEm:string):LyDoThuong|null{
+ const r=Math.max(0,Math.floor(Number(reward)||0)),g=Math.floor(Number(thuongGoc)||0)
+ if(g<=0||r>=g)return null
+ return {moc:0,exp:r,chu:`+${r} EXP · hôm nay em đã đủ ${TRAN_EXP_GAME_NGAY} EXP từ game. Muốn ${tenThuCuaEm} ăn no thì làm bài tập về nhà hoặc phần ôn lại.`}}
 
 export interface MucTieu{loai:'cap'|'dang'|'khien'|'tien-hoa';tieuDe:string;phu:string;tiLe:number}
 /** Dạng gần thành thạo nhất: nhiều sao nhất trong các dạng chưa đủ 3 sao; hoà thì dạng tới hạn sớm hơn. */

@@ -101,12 +101,18 @@ export default function TheCuoiChang({ view, dong, veBang }: { view: TheChangVie
             <span className="tcc-o"><Award size={24} aria-hidden="true" /></span>
             <div>
               <div className="tcc-exp-so">
-                +{view.exp.homNay} EXP<small>hôm nay</small>
+                +{view.exp.homNay} EXP<small>{view.exp.thu ? 'đã vào ống nghiệm' : 'hôm nay'}</small>
               </div>
-              {view.exp.conLai !== null && (
-                <div className="tcc-exp-phu">
-                  Thần thú của em còn <b>{view.exp.conLai} EXP</b> nữa là lên cấp
+              {view.exp.thu ? (
+                <div className="tcc-exp-phu" data-vung="exp-thu">
+                  Thần thú của em còn <b>{view.exp.thu.expConThieu} EXP</b> nữa lên cấp · ống nghiệm có <b>{view.exp.thu.ongNghiem} EXP</b> · hôm nay thú còn ăn được <b>{view.exp.thu.hapThuConLaiHomNay} EXP</b>
                 </div>
+              ) : (
+                view.exp.conLai !== null && (
+                  <div className="tcc-exp-phu">
+                    Thần thú của em còn <b>{view.exp.conLai} EXP</b> nữa là lên cấp
+                  </div>
+                )
               )}
             </div>
           </div>

@@ -20,6 +20,8 @@ export interface DaoKetQua{ok:boolean;error?:string;message?:string;missing?:num
  suggestions?:{title:string;source:string;part:string}[]
  id?:string;mode?:Mode;questions?:CauDao[];answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[]
  correct?:boolean;answer?:string;solution?:unknown;reward?:number;stage?:number;solutionImages?:HinhAnh[];lyDoThuong?:LyDoThuong
+ /** Thưởng ĐÁNG LẼ của câu — chỉ có khi trần 120 EXP/ngày từ game đã CẮT `reward` (máy chủ Đợt 1). */
+ thuongGoc?:number
  dang?:{key:string;ten:string;chuong:string}[]}
 /** = `request` của Game.tsx: ném Error khi máy chủ trả `ok:false`, tự cập nhật profile. */
 export type DaoCall=(action:string,data?:Record<string,unknown>)=>Promise<DaoKetQua>

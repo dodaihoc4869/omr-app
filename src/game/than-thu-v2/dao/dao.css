@@ -106,6 +106,8 @@
 .dao .dao-hap-thu{display:flex;flex-direction:column;gap:8px;padding:12px 14px}
 .dao .dao-hap-thu-chu{margin:0;font-size:13px;font-weight:600;color:var(--dao-chu-mo)}.dao .dao-hap-thu-chu b{font-size:14px;font-weight:800;color:var(--dao-chu);font-variant-numeric:tabular-nums}
 .dao .dao-hap-thu-bao{margin:0;font-size:13px;line-height:1.45;font-weight:600;color:var(--dao-chu-mo)}
+.dao .dao-hap-thu-du-tru{margin:0;font-size:13px;line-height:1.45;font-weight:600;color:var(--dao-chu-mo)}
+.dao .dao-hap-thu-du-tru b{color:var(--dao-chu);font-weight:800}
 .dao .dao-hon-loi{position:absolute;left:12px;right:12px;bottom:12px;margin:0 auto;width:fit-content;max-width:calc(100% - 24px);padding:6px 14px;border-radius:999px;background:rgba(8,14,40,.66);font-size:13px;font-weight:700;text-align:center}
 @keyframes dao-tho{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.015,1.025)}}
 @keyframes dao-nhun{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}

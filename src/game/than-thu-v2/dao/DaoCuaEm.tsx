@@ -4,7 +4,7 @@ import {PETS} from '../core'
 import {EVOLUTION_NAMES,evolutionStage} from '../evolution'
 import {normalizePetName} from '../pet-name'
 import {anhThu,anhThuTheoDang} from './anh'
-import {CAP_TOI_DA,NHOM_AI,chiSoThu,duongTienHoa,hapThuHienThi,loiThu,mucTieuGanNhat,tenThu,tienHoaKe,vongExp} from './dao-core'
+import {CAP_TOI_DA,NHOM_AI,chiSoThu,duTruNgayAn,duongTienHoa,hapThuHienThi,loiThu,mucTieuGanNhat,tenThu,tienHoaKe,vongExp} from './dao-core'
 import type {MucTieu} from './dao-core'
 import type {DaoExp,DaoProfile} from './kieu'
 import './dao.css'
@@ -34,6 +34,7 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
  const luuTen=(e:FormEvent)=>{e.preventDefault();try{const sach=normalizePetName(tenMoi);setLoiTen('');setSuaTen(false);onDoiTen?.(sach)}catch(x){setLoiTen(x instanceof Error?x.message:'Tên chưa hợp lệ.')}}
  const hetLuot=conLai===0,soAi=NHOM_AI.reduce((s,n)=>s+n.suat,0)
  const hapThu=hapThuHienThi(profile.hapThuHomNay,ten,profile.wallet>0)
+ const duTru=hapThu?duTruNgayAn(profile.wallet):null
  return <div className="dao-nha" data-thu={thu}>
   <header className="dao-nha-dau"><div><small className="dao-nhan">BÁT LINH ĐẢO</small>
    {suaTen?<form className="dao-nha-doi-ten" onSubmit={luuTen}><input aria-label="Tên thần thú" value={tenMoi} maxLength={48} autoComplete="off" autoFocus onChange={e=>{setTenMoi(e.target.value);setLoiTen('')}}/><button type="submit" className="dao-nut-nho" disabled={busy||!tenMoi.trim()}>Lưu</button><button type="button" className="dao-nut-nho dao-nut-nho-mo" onClick={()=>{setSuaTen(false);setLoiTen('')}}>Huỷ</button></form>
@@ -55,7 +56,8 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
   {/* THẦN THÚ MỖI NGÀY (Đợt 1): ngay dưới khối có nút nạp — hôm nay đã hấp thụ bao nhiêu / trần; bị chặn thì nói thật. Máy chủ cũ (thiếu `hapThuHomNay`) ⇒ ẩn. */}
   {hapThu&&<section className="dao-kinh dao-hap-thu" data-vung="hap-thu" aria-label="EXP hấp thụ hôm nay"><p className="dao-hap-thu-chu">Hôm nay {ten} đã hấp thụ <b>{hapThu.da} / {hapThu.toiDa} EXP</b></p>
    <div className="dao-thanh" role="progressbar" aria-label={`EXP ${ten} đã hấp thụ hôm nay`} aria-valuemin={0} aria-valuemax={hapThu.toiDa} aria-valuenow={hapThu.da} aria-valuetext={`${hapThu.da} trên ${hapThu.toiDa} EXP`}><i style={{width:`${Math.round(hapThu.tiLe*100)}%`}}/></div>
-   {hapThu.bao&&<p className="dao-hap-thu-bao" role="status">{hapThu.bao}</p>}</section>}
+   {hapThu.bao&&<p className="dao-hap-thu-bao" role="status">{hapThu.bao}</p>}
+   {duTru!==null&&<p className="dao-hap-thu-du-tru" data-vung="du-tru">Dự trữ đủ <b>{duTru} ngày ăn</b> · ống nghiệm có {profile.wallet.toLocaleString('vi-VN')} EXP</p>}</section>}
 
   {tasks.map(t=><section className="dao-kinh dao-nhac" key={t.id}><p>Gia đình nhắc em ôn: <b>{t.dang}</b></p><button type="button" className="dao-nut-nho" disabled={busy} onClick={()=>onOnTheoNhac?.(t.dang)}>Ôn ngay</button></section>)}
 

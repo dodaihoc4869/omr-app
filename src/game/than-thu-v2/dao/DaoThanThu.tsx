@@ -7,7 +7,7 @@ import ThamHiem from './ThamHiem'
 import type {PhanHoiAi} from './ThamHiem'
 import SoTay from './SoTay'
 import TuiDo from './TuiDo'
-import {chiSoThu,lyDoThuongTuKetQua} from './dao-core'
+import {chiSoThu,lyDoThuongTuKetQua,lyDoTranExpGame,tenThu} from './dao-core'
 import type {CauDao,DaoKetQua,DaoThanThuProps,ManDao} from './kieu'
 import './dao.css'
 
@@ -62,7 +62,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
   setBao(s.message||'');moLuot(s,false)})
  const nop=()=>chay(async()=>{const q=luot?.cau[viTri];if(!luot||!q)return
   const r=await call('answer',{session:luot.id,qid:q.qid,answer:traLoi,assisted}),correct=!!r.correct,reward=r.reward??0
-  const lyDo=r.lyDoThuong??lyDoThuongTuKetQua({correct,assisted,reward,stage:r.stage??0})
+  const lyDo=lyDoTranExpGame(reward,r.thuongGoc,tenThu(profile))??r.lyDoThuong??lyDoThuongTuKetQua({correct,assisted,reward,stage:r.stage??0})
   setKetQua(cu=>cu.some(a=>a.qid===q.qid)?cu:[...cu,{qid:q.qid,correct}]);setThuong(t=>({exp:t.exp+reward,sao:t.sao+(reward>0?1:0)}))
   setPhanHoi({correct,answer:r.answer??'',solution:r.solution,solutionImages:r.solutionImages??[],lyDo})})
  const tiep=()=>chay(async()=>{if(!luot)return

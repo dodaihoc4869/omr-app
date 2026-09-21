@@ -352,7 +352,8 @@ export interface KetQuaChang {
   ketQua: KetQuaCauChang[]
   /** Câu bỏ trống: KHÔNG chấm, chưa có lời giải, em làm tiếp được. */
   chuaLam: string[]
-  exp?: { homNay: number; conLaiLenCap: number | null }
+  /** `expConThieu` / `ongNghiem` / `hapThuConLaiHomNay`: Đợt 1 thần thú mỗi ngày — chỉ có khi máy chủ trả ĐỦ cả ba. */
+  exp?: { homNay: number; conLaiLenCap: number | null; thu?: { expConThieu: number; ongNghiem: number; hapThuConLaiHomNay: number } }
   tienBo?: TienBoEm
   /** CHỈ có khi chặng CUỐI vừa xong: máy chủ TỰ chốt nộp bài. `soCau` là MẪU điểm (đã trừ câu thưởng sai),
    * điểm = soDung / soCau × 10. Máy em không gọi /btvn/nop cho bài ca_nhan. */
@@ -394,6 +395,8 @@ export function docKetQuaChang(r: unknown): KetQuaChang | null {
   }
   if (laDoiTuong(r.exp) && laSo(r.exp.homNay)) {
     out.exp = { homNay: r.exp.homNay, conLaiLenCap: laSo(r.exp.conLaiLenCap) ? r.exp.conLaiLenCap : null }
+    const { expConThieu, ongNghiem, hapThuConLaiHomNay } = r.exp as Record<string, unknown>
+    if (laSoNguyenKhongAm(expConThieu) && laSoNguyenKhongAm(ongNghiem) && laSoNguyenKhongAm(hapThuConLaiHomNay)) out.exp.thu = { expConThieu, ongNghiem, hapThuConLaiHomNay }
   }
   if (laDoiTuong(r.nop) && r.nop.daNop === true && laSoNguyenKhongAm(r.nop.soDung) && laSoNguyenKhongAm(r.nop.soCau)) {
     out.nop = {
@@ -484,7 +487,8 @@ export interface TheChangView {
   coTienBo: boolean
   dangLenBac: { ten: string; tu: string; den: string }[]
   dong: { kieu: 'lai' | 'moi' | 'dang'; chu: string }[]
-  exp: { homNay: number; conLai: number | null } | null
+  /** `thu` (có khi máy chủ trả đủ 3 số Đợt 1): EXP học đã VÀO ỐNG NGHIỆM (chưa lên cấp) — màn nói "còn N EXP nữa lên cấp · ống nghiệm có M · hôm nay thú còn ăn được K". */
+  exp: { homNay: number; conLai: number | null; thu?: { expConThieu: number; ongNghiem: number; hapThuConLaiHomNay: number } } | null
   /** Chỉ khi chặng CUỐI vừa xong và máy chủ đã tự chốt nộp bài. */
   nop: { chu: string; ghiThuong: string | null } | null
   tram: { xong: number; tong: number } | null
@@ -522,7 +526,7 @@ export function theChangView(ket: KetQuaChang, soChang?: number | null): TheChan
     coTienBo: dangLenBac.length > 0 || dong.length > 0,
     dangLenBac,
     dong,
-    exp: ket.exp && ket.exp.homNay > 0 ? { homNay: ket.exp.homNay, conLai: ket.exp.conLaiLenCap } : null,
+    exp: ket.exp && ket.exp.homNay > 0 ? { homNay: ket.exp.homNay, conLai: ket.exp.conLaiLenCap, ...(ket.exp.thu ? { thu: ket.exp.thu } : {}) } : null,
     nop,
     tram: tong && !thuSuc ? { xong: Math.min(ket.loDaXong ?? k, tong), tong } : null,
   }
