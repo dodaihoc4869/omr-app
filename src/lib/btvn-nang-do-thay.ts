@@ -193,3 +193,36 @@ export function nhanCuaCau(n: NhanCau | undefined): { chu: string; ly: string; l
       return { chu: 'Câu', ly: '', loai: 'loi' }
   }
 }
+
+// ─────────────────────────────── CHO LÀM LẠI (từng em, bài cá nhân hoá) ───────────────────────────────
+// Thầy chốt 21/09: bài cá nhân hoá KHÔNG tự cho làm lại; thầy bấm "Cho làm lại" từng em. Lệnh thầy `POST /btvn/cho-lam-lai {maBtvn, sbd}` (mã bí mật) — máy chủ CHỈ nhận bài
+// `ca_nhan=1`, em ĐÃ NỘP, bài CHƯA quá hạn (quá hạn ⇒ từ chối bằng lời). Làm: điểm cũ vào lịch sử, `so_lan_lam + 1`, em làm lại từ chặng 1, GIỮ bộ câu + hạn nộp. Ra `{ok, soLanLam}`.
+
+/** Lời xác nhận NÓI THẬT trước khi cho làm lại (đúng chữ Boss/thầy chốt). */
+export const LOI_XAC_NHAN_LAM_LAI = 'Em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi; điểm mới thay điểm cũ, điểm cũ vẫn lưu trong lịch sử.'
+
+/** Cho MỘT em làm lại. Ném lỗi bằng lời thật: máy chủ chưa có lệnh (404) · quá hạn chờ (CHƯA CHẮC đã làm — lệnh có thể đã tới) · máy chủ từ chối (giữ nguyên câu của máy chủ, gồm "quá hạn"). */
+export async function choLamLaiBtvn(maBtvn: string, sbd: string): Promise<{ soLanLam: number | null }> {
+  const [ch, mat] = await Promise.all([layCauHinhMayChu(), loadTeacherSecret()])
+  if (!ch.URL) throw new Error('Chưa kết nối được máy chủ.')
+  const dk = new AbortController()
+  const hen = setTimeout(() => dk.abort(), HAN_GIAY * 1000)
+  let res: Response
+  try {
+    res = await fetch(`${ch.URL}/btvn/cho-lam-lai`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': mat || '' }, body: JSON.stringify({ maBtvn, sbd }), signal: dk.signal })
+  } catch (e) {
+    if ((e as { name?: string })?.name === 'AbortError') throw new Error('Máy chủ trả lời chậm — CHƯA CHẮC đã cho em làm lại. Mở lại tab theo dõi để xem tình trạng thật.')
+    throw new Error('Không nối được máy chủ — chưa cho em làm lại được. Kết quả của em vẫn giữ nguyên.')
+  } finally {
+    clearTimeout(hen)
+  }
+  if (res.status === 404) throw new Error('Máy chủ chưa có lệnh Cho làm lại — chưa mở lại được bài. Kết quả của em vẫn giữ nguyên.')
+  let j: Record<string, unknown> = {}
+  try {
+    j = (await res.json()) as Record<string, unknown>
+  } catch {
+    throw new Error('Máy chủ trả lời không đọc được — CHƯA CHẮC đã cho em làm lại. Mở lại tab theo dõi để xem tình trạng thật.')
+  }
+  if (!res.ok || j.ok !== true) throw new Error(String(j.error || j.loi || 'Máy chủ không cho em làm lại. Kết quả của em vẫn giữ nguyên.'))
+  return { soLanLam: typeof j.soLanLam === 'number' && Number.isFinite(j.soLanLam) ? j.soLanLam : null }
+}

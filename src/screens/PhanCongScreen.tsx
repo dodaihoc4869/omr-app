@@ -2,7 +2,7 @@ import { hanNhapVietNam, hanChoOChon, mocThoiGian, gioHanVietNam } from '../lib/
 import KhoiBtvnLo from '../components/KhoiBtvnLo'
 import KhoiCaNhanHoa from '../components/KhoiCaNhanHoa'
 import XemTruocPhanBo from '../components/XemTruocPhanBo'
-import { taoCauGiao, taoHatGiong } from '../lib/btvn-nang-do-thay'
+import { LOI_XAC_NHAN_LAM_LAI, choLamLaiBtvn, taoCauGiao, taoHatGiong } from '../lib/btvn-nang-do-thay'
 import { useAppStore } from '../store/appStore'
 import { layHomNay, type HomNay } from '../lib/hom-nay-api'
 import { useGioHocTap } from '../hooks/useGioHocTap'
@@ -414,6 +414,18 @@ function TheGiaoBtvn() {
     setDangSua(t.maBtvn)
     try{const ch=await layCauHinhMayChu(),mat=(await loadTeacherSecret())||'';await suaGiaoBtvn(ch,mat,(t as NhomBtvn).maTheoSbd?.[sbd]||t.maBtvn,{sbd,hanhDong});setTheoDoi(await theoDoiBtvn(ch,mat));setBao({ok:true,chu:hanhDong==='reset'?'Đã mở lại bài cho học sinh.':'Đã thu hồi bài của học sinh.'})}
     catch(e){setBao({ok:false,chu:e instanceof Error?e.message:'Chưa cập nhật được.'})}finally{setDangSua('')}
+  }
+
+  /** CHO LÀM LẠI một em của bài CÁ NHÂN HOÁ (thầy chốt 21/09): lệnh riêng /btvn/cho-lam-lai, báo ĐÚNG kết quả máy chủ (chưa có lệnh / quá hạn / chưa chắc ⇒ lời thật). */
+  async function choLamLai(t:DongTheoDoiBtvn,sbd:string) {
+    setDangSua(t.maBtvn)
+    const ten=t.hocSinh?.find((e)=>e.sbd===sbd)?.hoTen||`SBD ${sbd}`
+    try{
+      const kq=await choLamLaiBtvn((t as NhomBtvn).maTheoSbd?.[sbd]||t.maBtvn,sbd)
+      setBao({ok:true,chu:`Đã cho ${ten} làm lại${kq.soLanLam?` (lượt làm thứ ${kq.soLanLam})`:''}: em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi.`})
+    }catch(e){setBao({ok:false,chu:e instanceof Error?e.message:'Chưa cho em làm lại được.'})}
+    try{const ch=await layCauHinhMayChu(),mat=(await loadTeacherSecret())||'';setTheoDoi(await theoDoiBtvn(ch,mat))}catch{/* danh sách giữ nguyên; thông báo trên đã nói kết quả */}
+    setDangSua('')
   }
 
   async function capNhatBai(t:DongTheoDoiBtvn,thuHoi=false) {
@@ -1168,10 +1180,15 @@ function TheGiaoBtvn() {
                         bai={t}
                         busy={dangSua === t.maBtvn}
                         onAction={(sbd, action) =>
-                          setXacNhan({
-                            text: `${action === 'reset' ? 'Cho làm lại' : 'Thu hồi bài của'} học sinh ${sbd}? Kết quả cũ được lưu lại.`,
-                            run: () => capNhatHocSinh(t, sbd, action),
-                          })
+                          action === 'cho-lam-lai'
+                            ? setXacNhan({
+                                text: `Cho ${t.hocSinh?.find((e) => e.sbd === sbd)?.hoTen || `học sinh ${sbd}`} làm lại? ${LOI_XAC_NHAN_LAM_LAI}`,
+                                run: () => choLamLai(t, sbd),
+                              })
+                            : setXacNhan({
+                                text: `${action === 'reset' ? 'Cho làm lại' : 'Thu hồi bài của'} học sinh ${sbd}? Kết quả cũ được lưu lại.`,
+                                run: () => capNhatHocSinh(t, sbd, action),
+                              })
                         }
                       />
                     </div>

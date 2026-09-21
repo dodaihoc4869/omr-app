@@ -11,7 +11,7 @@ export default function HocSinhNhanBai({
   maTheoSbd?: Record<string, string>
   bai: DongTheoDoiBtvn
   busy: boolean
-  onAction: (sbd: string, action: 'reset' | 'thu-hoi') => void
+  onAction: (sbd: string, action: 'reset' | 'thu-hoi' | 'cho-lam-lai') => void
 }) {
   const [xem, setXem] = useState<string | null>(null)
   const [query, setQuery] = useState('')
@@ -193,14 +193,32 @@ export default function HocSinhNhanBai({
 
               {/* Nút hành động */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
-                <button
-                  disabled={busy}
-                  onClick={() => onAction(e.sbd, 'reset')}
-                  className="btn-google-outlined"
-                  style={{ padding: '8px 12px', fontSize: 13 }}
-                >
-                  Cho làm lại
-                </button>
+                {/* BÀI NÂNG ĐỠ KHÔNG tự cho làm lại (thầy chốt 21/09): chỉ em ĐÃ NỘP mới có nút "Cho làm lại", gọi lệnh riêng /btvn/cho-lam-lai (giữ bộ câu + hạn nộp, điểm cũ vào lịch sử). Quá hạn ⇒ máy chủ từ chối, nên nói trước để thầy gia hạn. Bài cũ: y như trước. */}
+                {!bai.caNhan ? (
+                  <button
+                    disabled={busy}
+                    onClick={() => onAction(e.sbd, 'reset')}
+                    className="btn-google-outlined"
+                    style={{ padding: '8px 12px', fontSize: 13 }}
+                  >
+                    Cho làm lại
+                  </button>
+                ) : e.nopLuc && !e.thuHoi ? (
+                  bai.quaHan ? (
+                    <span data-khoi="cho-lam-lai-qua-han" style={{ fontSize: 12, color: 'var(--nhat)', alignSelf: 'center' }}>
+                      Quá hạn — gia hạn bài rồi mới cho làm lại
+                    </span>
+                  ) : (
+                    <button
+                      disabled={busy}
+                      onClick={() => onAction(e.sbd, 'cho-lam-lai')}
+                      className="btn-google-outlined"
+                      style={{ padding: '8px 12px', fontSize: 13 }}
+                    >
+                      Cho làm lại
+                    </button>
+                  )
+                ) : null}
                 <button
                   disabled={busy || e.thuHoi}
                   onClick={() => onAction(e.sbd, 'thu-hoi')}
