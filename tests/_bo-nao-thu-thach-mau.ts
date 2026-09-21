@@ -1,4 +1,4 @@
-// Mẫu dùng chung cho các test thử thách riêng của Bộ não (Code 1, 21/09/2026): thẻ mẫu + 6 lời mẫu TỐT + 4 lời mẫu CẤM (chép nguyên chữ vào cẩm nang / LUAT-CHIEU.md — test khoá).
+// Mẫu dùng chung cho các test thử thách riêng của Bộ não (Code 1, 21/09/2026): thẻ mẫu + 8 lời mẫu TỐT + 4 lời mẫu CẤM (chép nguyên chữ vào cẩm nang / LUAT-CHIEU.md — test khoá).
 import type { TheDeKiem } from '../src/lib/bo-nao-khuon'
 
 export const THE: TheDeKiem = {
@@ -30,6 +30,8 @@ export const LOI_TOT: { chu: string; the: TheDeKiem; dang?: string[] }[] = [
   { chu: 'Chuỗi 4 ngày của em đang chạy đều. Rồng Lửa còn thiếu 40 EXP lên cấp 6, hôm nay thử vài câu Lipid béo nhé.', the: THE, dang: ['LIPID.BEO'] },
   { chu: 'Hôm qua em đúng lại 4 câu từng sai, làm rất đều. Hôm nay thử mấy câu Thuỷ phân ester để luyện tiếp.', the: THE_KHONG_THU, dang: ['ESTE.THUY_PHAN'] },
   { chu: 'Em đã đạt 4 ngày liền. Hôm nay thử vài câu Carb phân loại, mỗi câu đúng đều được thêm EXP.', the: THE_KHONG_THU, dang: ['CARB.PHAN_LOAI'] },
+  { chu: 'Hôm qua em đúng lại 4 câu từng sai. Hôm nay thử mấy câu Thuỷ phân ester, rồi chọn một bạn đồng hành để EXP của em có chỗ về nhé.', the: THE_KHONG_THU, dang: ['ESTE.THUY_PHAN'] },
+  { chu: 'Hôm qua em làm 8 câu, đúng 7 câu. Hôm nay thử vài câu Lipid béo, rồi chọn một thần thú để EXP của em có chỗ về.', the: THE_KHONG_THU, dang: ['LIPID.BEO'] },
 ]
 /** MẪU CẤM — kèm điều bị chặn (chép vào cẩm nang). */
 export const LOI_CAM: { chu: string; mau: string }[] = [

@@ -298,6 +298,9 @@ function tenRiengLa(chu: string, tenThu: string | undefined): string[] {
   return [...new Set(ra)]
 }
 
+/** Cụm MỜI chọn thú cho em CHƯA có thú (Boss 21/09: "chọn một bạn đồng hành để EXP của em có chỗ về"). Không kèm tên thú nào. */
+const MOI_CHON_THU = /chọn\s+(?:một\s+)?(?:thần\s+thú|bạn\s+đồng\s+hành|thú)/giu
+
 /** Số câu nêu như VIỆC SẼ LÀM ("thử 6 câu", "làm 6 câu" khi 6 = soCau): máy chủ có thể chọn được ÍT hơn ⇒ không hứa. Số câu nói về QUÁ KHỨ trong thẻ ("đúng lại 4 câu") vẫn được. */
 const THU_N_CAU = /thử\s+(?:\p{L}+\s+){0,2}\d+(?:[.,]\d+)?\s*câu/iu
 const VIEC_N_CAU = /(?:thử|làm|luyện|giải|chinh phục|hoàn thành|nhận)\s+(?:\p{L}+\s+){0,2}(\d+)\s*câu/giu
@@ -375,7 +378,9 @@ export function kiemThuThach(d: Record<string, unknown>, the: TheDeKiem, tapSo: 
     // thú / tên riêng: chỉ khi thẻ có thanThu.ten và đúng tên ấy
     const thanThu = the.thanThu as Record<string, unknown> | undefined
     const tenThu = thanThu && typeof thanThu === 'object' && laChuoi(thanThu.ten) && thanThu.ten.trim().length > 0 ? thanThu.ten : undefined
-    if (!tenThu && timTuCam(lm, ['thú', 'thần thú']).length) e.push('loiMoi nhắc thú nhưng thẻ không có thanThu')
+    // Em CHƯA có thú (thẻ không có thanThu): được MỜI chọn thú ("chọn một thần thú / bạn đồng hành") nhưng không nói thú nào cả — bỏ cụm mời rồi mới soi chữ "thú"
+    const conLai = lm.replace(MOI_CHON_THU, ' ')
+    if (!tenThu && timTuCam(conLai, ['thú', 'thần thú']).length) e.push('loiMoi nhắc thú nhưng thẻ không có thanThu (chỉ được MỜI chọn thú: "chọn một thần thú")')
     const laTen = tenRiengLa(lm, tenThu)
     if (laTen.length) e.push(`loiMoi có tên riêng không có trong thẻ: ${laTen.join(', ')}`)
   }

@@ -147,6 +147,16 @@ describe('loiMoi — luật chữ', () => {
     expect(L('Hôm qua em đúng lại 4 câu, hôm nay làm mấy câu nữa nhé.', THE, 4)).toBe('')
     expect(L('Hôm qua em làm 8 câu, đúng 7 câu. Hôm nay thử mấy câu nhé.', THE, 6)).toBe('')
   })
+  it('em CHƯA có thú: được MỜI chọn thú (đúng cụm "chọn một thần thú" / "chọn một bạn đồng hành") nhưng KHÔNG nhắc thú khác, không nêu tên', () => {
+    const KT = THE_KHONG_THU
+    expect(L('Hôm qua em đúng lại 4 câu. Hôm nay thử mấy câu, rồi chọn một thần thú để EXP có chỗ về nhé.', KT)).toBe('')
+    expect(L('Hôm qua em đúng lại 4 câu. Hôm nay thử mấy câu, rồi chọn thần thú nhé.', KT)).toBe('')
+    expect(L('Hôm qua em đúng lại 4 câu. Hôm nay thử mấy câu, rồi chọn một bạn đồng hành nhé.', KT)).toBe('')
+    expect(L('Hôm qua em đúng lại 4 câu. Thần thú của em còn thiếu EXP, thử mấy câu nhé.', KT)).toContain('chỉ được MỜI chọn thú')
+    expect(L('Hôm qua em đúng lại 4 câu. Chọn một thần thú rồi nuôi thú cho lớn nhé.', KT)).toContain('nhắc thú')
+    expect(L('Hôm qua em đúng lại 4 câu. Hôm nay chọn Rồng Lửa nhé.', KT)).toContain('tên riêng không có trong thẻ')
+    expect(L('Hôm qua em đúng lại 4 câu. Hôm nay thử mấy câu, rồi chọn một thần thú nhé.', THE)).toBe('') // thẻ CÓ thanThu: câu mời vẫn vô hại
+  })
   it('thú: nhắc thú / tên riêng CHỈ khi thẻ có thanThu.ten và đúng tên ấy', () => {
     expect(L('Hôm qua em đúng lại 4 câu. Thần thú của em còn thiếu 40 EXP.', THE_KHONG_THU)).toContain('thẻ không có thanThu')
     expect(L('Rồng Lửa còn thiếu 40 EXP, thử mấy câu nhé.', THE_KHONG_THU)).toContain('tên riêng không có trong thẻ: Rồng Lửa')
