@@ -433,7 +433,7 @@ export default function MessagesFab() {
                     )}
                     {!laThay && m.nguoiGui.sbd && (
                       <div className="text-[11px] font-bold text-blue-600 dark:text-blue-400 mt-1">
-                        👉 Bấm vào đây để trả lời {m.nguoiGui.hoTen || m.nguoiGui.sbd}
+                        Bấm vào đây để trả lời {m.nguoiGui.hoTen || m.nguoiGui.sbd}
                       </div>
                     )}
                   </div>
@@ -450,6 +450,7 @@ export default function MessagesFab() {
                 </div>
                 <input
                   type="text"
+                  aria-label="Nội dung trả lời"
                   value={traLoi}
                   onChange={(e) => setTraLoi(e.target.value)}
                   onKeyDown={(e) => {
@@ -465,7 +466,7 @@ export default function MessagesFab() {
                       capNhatTinNoiBo()
                     }
                   }}
-                  placeholder="Nhập tin nhắn của Thầy..."
+                  placeholder="Nhập tin nhắn của Thầy…"
                   className="flex-1 text-xs px-2.5 py-1.5 rounded-lg border outline-none focus-visible:ring-2 focus-visible:ring-blue-500 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
                 />
                 <button

@@ -125,6 +125,7 @@ export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, 
         <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Địa chỉ Worker</div>
         <input
           style={O_NHAP}
+          aria-label="Địa chỉ máy chủ Worker"
           value={ch.URL}
           onChange={(e) => setCh({ ...ch, URL: e.target.value })}
           onBlur={() => luu(ch)}

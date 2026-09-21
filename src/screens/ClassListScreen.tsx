@@ -171,6 +171,7 @@ export default function ClassListScreen() {
           <div className="space-y-3">
             <input
               className="tap-target w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+              aria-label="Liên kết Google Sheet danh sách lớp"
               placeholder="Dán link Google Sheet…"
               value={sheetUrl}
               onChange={(e) => setSheetUrl(e.target.value)}
@@ -188,6 +189,7 @@ export default function ClassListScreen() {
           <div className="space-y-3">
             <textarea
               className="w-full h-32 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-3 text-sm font-mono text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
+              aria-label="Vùng dữ liệu danh sách lớp dán từ Google Sheet"
               placeholder="Dán vùng dữ liệu copy trực tiếp từ Google Sheet (kèm hàng tiêu đề)"
               value={tsvText}
               onChange={(e) => setTsvText(e.target.value)}
@@ -228,6 +230,7 @@ export default function ClassListScreen() {
                   {FIELD_LABEL[field]}
                 </span>
                 <select
+                  aria-label={`Cột ${FIELD_LABEL[field]}`}
                   className="tap-target border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1 text-xs sm:text-sm bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={mapping[field] ?? ''}
                   onChange={(e) => setMapping({ ...mapping, [field]: e.target.value || null })}

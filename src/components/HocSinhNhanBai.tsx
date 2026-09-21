@@ -2,6 +2,7 @@ import BaiNopBtvn from './BaiNopBtvn'
 import { useState } from 'react'
 import type { DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import { chuBoCuaEm } from '../lib/btvn-nang-do-thay'
+import { gioDayDu } from '../lib/ngay-gio-24'
 
 export default function HocSinhNhanBai({
   bai,
@@ -170,7 +171,7 @@ export default function HocSinhNhanBai({
               {/* Thông tin số câu đúng */}
               {e.nopLuc && (
                 <p style={{ fontSize: 12, color: 'var(--nhat)', marginTop: 8, marginBottom: 4 }}>
-                  {e.soDung}/{e.soCau} câu đúng{bai.caNhan ? ' (trên câu của em)' : ''} ({diemBtvn}/10) · {new Date(e.nopLuc).toLocaleString('vi-VN')}
+                  {e.soDung}/{e.soCau} câu đúng{bai.caNhan ? ' (trên câu của em)' : ''} ({diemBtvn}/10) · {gioDayDu(e.nopLuc)}
                 </p>
               )}
               {/* BÀI NÂNG ĐỠ: bộ câu riêng, chặng, so lớp CHỈ trên lõi — toàn SỐ ĐẾM, không xếp hạng em với em. */}

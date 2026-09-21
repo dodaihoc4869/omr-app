@@ -610,11 +610,11 @@ export default function NganHangDeScreen() {
           <div className="flex flex-col" style={{ gap: 'var(--k3)', marginTop: 'var(--k3)' }}>
             <div>
               <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Địa chỉ máy chủ (bỏ trống = dùng máy chủ mới đã cấu hình)</div>
-              <input style={O_NHAP} value={scriptUrl} onChange={(e) => setScriptUrl(e.target.value)} placeholder="https://omr.ttadodaihoc.workers.dev" />
+              <input style={O_NHAP} aria-label="Địa chỉ máy chủ" value={scriptUrl} onChange={(e) => setScriptUrl(e.target.value)} placeholder="https://omr.ttadodaihoc.workers.dev" />
             </div>
             <div>
               <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Mã bí mật kho đề (đúng bằng MA_BI_MAT đã đặt trong Apps Script)</div>
-              <input style={O_NHAP} type="password" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="Mã bí mật" autoComplete="off" />
+              <input style={O_NHAP} type="password" aria-label="Mã bí mật kho đề" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="Mã bí mật" autoComplete="off" />
             </div>
             <NutChinh variant="phu" onClick={luuCauHinh}>
               Lưu & đồng bộ
@@ -805,6 +805,7 @@ function CauNghiCard({ c, onChot }: { c: CauNghi; onChot: (dapAn: string) => voi
           <>
             <input
               style={{ ...O_NHAP, width: 160, height: 44 }}
+              aria-label={c.phan === 'II' ? 'Đáp án đúng–sai (bốn chữ Đ hoặc S)' : 'Đáp án trả lời ngắn'}
               placeholder={c.phan === 'II' ? 'vd DSDS' : 'vd 12,5'}
               value={tuNhap}
               onChange={(e) => setTuNhap(c.phan === 'II' ? e.target.value.toUpperCase().replace(/[^DS]/g, '').slice(0, 4) : e.target.value)}

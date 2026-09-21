@@ -518,12 +518,14 @@ export default function ExamSetupScreen() {
               )
             })}
             <input
+              aria-label="Lớp của ca kiểm tra"
               placeholder="Nhập lớp…"
               value={lop}
               onChange={(e) => setLop(e.target.value)}
               className="h-8 w-28 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white shrink-0 outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
             />
             <input
+              aria-label="Tên ca kiểm tra"
               placeholder="Tên ca (tùy chọn, ví dụ: 15 Phút Số 1)"
               value={tenCa}
               onChange={(e) => setTenCa(e.target.value)}
@@ -563,6 +565,7 @@ export default function ExamSetupScreen() {
                   <input
                     type="number"
                     min={1}
+                    aria-label="Số phút làm bài"
                     value={thoiGianPhut}
                     onChange={(e) => setThoiGianPhut(Number(e.target.value))}
                     className="h-8 w-14 px-1.5 text-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
@@ -940,6 +943,7 @@ export default function ExamSetupScreen() {
 
             <div className="p-3 sm:p-4 flex-1 overflow-y-auto space-y-2.5">
               <input
+                aria-label="Tìm học sinh theo tên hoặc số báo danh"
                 placeholder="Tìm theo tên hoặc SBD…"
                 value={timTen}
                 onChange={(e) => setTimTen(e.target.value)}
@@ -1026,6 +1030,7 @@ export default function ExamSetupScreen() {
                 </label>
                 <input
                   type="text"
+                  aria-label="Mật khẩu ca thi"
                   placeholder="Để trống nếu không đặt mật khẩu"
                   value={matKhauCa}
                   onChange={(e) => setMatKhauCa(e.target.value)}
