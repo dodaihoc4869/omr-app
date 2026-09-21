@@ -287,8 +287,11 @@ describe('đủ khối khi có số thật', () => {
     // 12 truy vấn cho phần dữ liệu + tối đa 3 của `doCham` (hangChamCuaEm dùng chung với lệnh thi đua: danh sách lớp, số câu/ngày, đạt nhiệm vụ ngày)
     const cuaDoCham = log.filter((q) => /UNION ALL SELECT sbd, ho_ten, lop, NULL AS ten_lop/.test(q) || /SELECT sbd, ngay_vn, COUNT\(\*\) AS n, MAX\(luc1\)/.test(q) || /FROM exp_so WHERE ngay_vn = \? AND loai = 'dat_ngay'/.test(q))
     expect(cuaDoCham.length).toBeLessThanOrEqual(3)
-    expect(log.length - cuaDoCham.length, log.join('\n')).toBeLessThanOrEqual(12)
-    expect(log.length, log.join('\n')).toBeLessThanOrEqual(15)
+    // Sửa CÓ CHỦ Ý 21/09 (W3b Dồn về đích): `docVeDichCuaEm` (Code 4, đọc-chỉ) đọc đúng 5 truy vấn để trả `no` của con — ngân sách phần dữ liệu 12 → 17, tổng 15 → 20.
+    const cuaVeDich = log.filter((q) => /^WITH dang AS \(SELECT be\.ma_btvn/.test(q) || /FROM nam_kt_cau WHERE sbd = \? AND trang_thai IN \('moi_sai', 'dang_on', 'da_khac_phuc'\) AND can_day_lai = 0 AND moc_on_ke IS NOT NULL/.test(q) || /FROM mom_bai WHERE sbd = \? AND COALESCE\(submitted_at, ''\) = ''/.test(q) || /^SELECT 'g' AS k, giay AS a/.test(q) || /^SELECT 'em' AS k, lop AS a, nam_sinh AS b/.test(q))
+    expect(cuaVeDich.length, log.join('\n')).toBeLessThanOrEqual(5)
+    expect(log.length - cuaDoCham.length - cuaVeDich.length, log.join('\n')).toBeLessThanOrEqual(12) // phần dữ liệu của hợp đồng: vẫn ≤ 12
+    expect(log.length, log.join('\n')).toBeLessThanOrEqual(20)
     expect(log.length).toBeGreaterThanOrEqual(8) // đo thật: chống test rỗng
     const ghiSql = log.filter((q) => /^\s*(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b/i.test(q) || q === 'BATCH')
     expect(ghiSql.length, ghiSql.join('\n')).toBe(1)

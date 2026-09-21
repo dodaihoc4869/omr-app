@@ -262,6 +262,19 @@ describe('thưởng theo việc: lô, nộp bài, mom, ca thi', () => {
     expect(expCua(d, 'lo|B1|1')).toBe(4)
     expect(expCua(d, 'lo|B1|2')).toBeUndefined()
   })
+  it('CHỐT CỨNG nộp trễ (21/09): chặng xong SAU hạn nộp của bài luôn TRỄ nhịp (4), kể cả khi hạn mềm trong lịch đã lưu còn xa hơn hạn nộp; xong TRƯỚC hạn nộp vẫn đúng nhịp (10)', async () => {
+    const d = await dung()
+    d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc) VALUES('B1','C','D',3,?,?,0,'x')").run(iso(NOW - 3 * D), iso(NOW - 2 * H)) // hạn nộp = 2 giờ TRƯỚC bây giờ
+    luuKeHoach(d, { viec: [{ id: 'btvn_lo:B1:0', hanMem: iso(NOW + 5 * H) }, { id: 'btvn_lo:B1:1', hanMem: iso(NOW + 5 * H) }] }) // hạn mềm ảo còn xa (sau hạn nộp)
+    await ghi(d, [
+      sk('q1', 1, NOW - 4 * H, { nguon: 'btvn_lo', maNguon: 'B1', lan: 0 }), // TRƯỚC hạn nộp
+      sk('q2', 1, NOW - 3000, { nguon: 'btvn_lo', maNguon: 'B1', lan: 1 }), // SAU hạn nộp
+    ])
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,lo_da_xong) VALUES('B1|S1','B1','S1',2)").run()
+    await capNhatExp(d.env, 'S1', NOW)
+    expect(expCua(d, 'lo|B1|0')).toBe(10)
+    expect(expCua(d, 'lo|B1|1')).toBe(4)
+  })
   it('chặng CHƯA XONG (mới làm vài câu, lo_da_xong chưa tăng) ⇒ KHÔNG có khoản lô — không trao EXP xong chặng từ câu đầu tiên', async () => {
     const d = await dung()
     luuKeHoach(d, { viec: [{ id: 'btvn_lo:B1:0', hanMem: iso(NOW + 5 * H) }] })

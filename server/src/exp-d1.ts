@@ -432,8 +432,10 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
     if (!cu || e.luc > cu.luc) loMap.set(k, { maBtvn: e.maNguon, chiSo, luc: e.luc })
   }
   const loXong = [...loMap.values()].map((l) => {
-    const han = luuKh.map((k) => k.hanMemLo.get(`btvn_lo:${l.maBtvn}:${l.chiSo}`)).find((h) => h !== undefined) ?? hanNopBtvn.get(l.maBtvn)
-    return { ...l, dungNhip: han ? ms(l.luc) < ms(han) : true }
+    const hanBai = hanNopBtvn.get(l.maBtvn)
+    const han = luuKh.map((k) => k.hanMemLo.get(`btvn_lo:${l.maBtvn}:${l.chiSo}`)).find((h) => h !== undefined) ?? hanBai
+    // CHỐT CỨNG (nộp trễ, Điều 4 = B): chặng xong SAU hạn nộp của bài không bao giờ "đúng nhịp", kể cả khi mốc lịch ảo của em chưa chốt vượt hạn.
+    return { ...l, dungNhip: (han ? ms(l.luc) < ms(han) : true) && !(hanBai && ms(l.luc) > ms(hanBai)) }
   })
   const baiBtvnNop = (baiNopRaw?.results ?? []).map((x) => ({
     maBtvn: String(x.ma_btvn), luc: String(x.nop_luc), dungHan: !!x.han_nop && ms(String(x.nop_luc)) <= ms(String(x.han_nop)),

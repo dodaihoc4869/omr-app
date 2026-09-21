@@ -1,5 +1,5 @@
 // `POST /ph/tat-ca-ve-con {pass}` — thẻ "Ca kiểm tra gần nhất của con" + trang "Tất cả về con" của phụ huynh (hợp đồng docs/hop-dong-xem-diem-v2-2109.md mục 6 + bổ sung `homNay`, `manhYeu` của điều phối 21/09).
-// ĐỌC-CHỈ, không AI, ≤ 12 truy vấn D1 cho phần dữ liệu + 3 cho `doCham` (hangChamCuaEm dùng chung với lệnh thi đua) = ≤ 15 tổng (kể cả xác thực; đo trong test). KHÔNG trường nào của game (không thần thú, EXP, khiên, chuỗi game, đoàn, đảo, võ đài), không xếp hạng, không so với bạn.
+// ĐỌC-CHỈ, không AI, ≤ 12 truy vấn D1 cho phần dữ liệu + 3 cho `doCham` (hangChamCuaEm dùng chung với lệnh thi đua) + 5 cho `no` của con (`docVeDichCuaEm`, W3b Dồn về đích) = ≤ 20 tổng (kể cả xác thực; đo trong test). KHÔNG trường nào của game (không thần thú, EXP, khiên, chuỗi game, đoàn, đảo, võ đài), không xếp hạng, không so với bạn.
 // Khối nào không có số thật thì VẮNG (không số 0 giả, không mảng bịa).
 //
 // LUẬT CHE (đứng trên mọi khối; luật công bố ở `cong-bo-diem.ts`): sự kiện học của ca CHƯA công bố, của bài tập về nhà CHƯA NỘP, của gói "gia đình giao" CHƯA NỘP bị CHE — nó KHÔNG vào bất kỳ con số nào có đúng/sai

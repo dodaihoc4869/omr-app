@@ -96,6 +96,12 @@ describe('mở bài SAU hạn (cua-em)', () => {
     expect(hang.length).toBeLessThan((d.sql.prepare("SELECT COUNT(*) n FROM btvn_em_cau WHERE sbd='S1'").get() as { n: number }).n) // ít hơn bộ đầy đủ của S1
     const lich = JSON.parse((d.sql.prepare("SELECT chang_mo_json FROM btvn_em WHERE sbd='S2'").get() as { chang_mo_json: string }).chang_mo_json) as { chang: { moLuc: string }[] }
     expect(lich.chang[0]!.moLuc).toBe(SAU_HAN_4G30.toISOString()) // chặng đầu mở NGAY
+    // `tomTat` lưu số của bộ NỘP TRỄ (chỉ lõi), không phải của bộ đầy đủ: tong = số câu thật, không có thử sức thêm, đủ số chặng
+    const e2 = d.sql.prepare("SELECT so_cau_em, so_chang, tom_tat_json FROM btvn_em WHERE sbd='S2'").get() as { so_cau_em: number; so_chang: number; tom_tat_json: string }
+    const t2 = JSON.parse(e2.tom_tat_json) as { tong: number; soBatBuoc: number; soLoi: number; soRieng: number; soThuThach: number; soThuSucThem: number; soLoiCao: number; soChang: number; nganSachCau: number; soBiet: number; soHieu: number; soVanDung: number }
+    expect(t2).toMatchObject({ tong: hang.length, soBatBuoc: hang.length, soLoi: hang.length, soRieng: 0, soThuThach: 0, soThuSucThem: 0, soLoiCao: 0, soChang: e2.so_chang, nganSachCau: hang.length })
+    expect(t2.soBiet + t2.soHieu + t2.soVanDung).toBe(hang.length)
+    expect(e2.so_cau_em).toBe(hang.length)
     // làm hết các chặng (tuần tự) rồi nộp ⇒ nộp trễ
     const soChang = (d.sql.prepare("SELECT so_chang FROM btvn_em WHERE sbd='S2'").get() as { so_chang: number }).so_chang
     let kq: any
@@ -133,5 +139,100 @@ describe('mở bài SAU hạn (cua-em)', () => {
     expect(d.sql.prepare("SELECT nop_tre, gio_tre FROM btvn_em WHERE khoa='BT0|S1'").get()).toEqual({ nop_tre: 1, gio_tre: 5 })
     const lai = await goiWorker(worker, d.env, '/btvn/nop', { maBtvn: 'BT0', sbd: 'S1', dapAn: { 'DE1-I-1': 'B', 'DE1-I-2': 'B' } }) as any
     expect(lai).toMatchObject({ ok: false, lyDo: 'qua_han' })
+  })
+})
+
+// ── Rà chéo Code 1 (ddf5038): bộ NỘP TRỄ chỉ có lõi ⇒ thích nghi / khắc phục / mở sớm KHÔNG được thêm câu hay dồn thêm chặng vào ngày của em trễ ──────────────────────────────
+/** Tờ kho lớn: 100 câu phần I (dạng xoay DA-1..DA-6), ghim 65 câu đầu ⇒ ≥ 65 lõi bắt buộc ⇒ nộp trễ chia ≥ 3 chặng (30 + 30 + 5), còn 35 câu ngoài lõi để thích nghi "thêm câu dễ". */
+function khoLon() {
+  const muc = ['biet', 'hieu'] // chỉ Biết/Hiểu: không câu nào thành "thử sức thêm" (loi_cao) ⇒ cả 65 câu ghim đều BẮT BUỘC
+  const cau = Array.from({ length: 100 }, (_, k) => {
+    const i = k + 1
+    return { phan: 'I', so: i, de: `Câu I.${i}`, pa: { A: 'a', B: 'b', C: 'c', D: 'd' }, dap_an: 'A', chuyen_de: 'Este', muc_do: muc[(i - 1) % 2], dang: { ma: `DA-${1 + ((i - 1) % 6)}`, ten: `Dạng ${1 + ((i - 1) % 6)}` }, can_chua: { sao: (i - 1) % 2, dk: [], ly_do: 'x', bay: null }, loi_giai: { chot: `LG-${i}` }, kienThuc: ['KT'] }
+  })
+  return { cau, thay: cau.map((c) => ({ qid: `DE1-I-${c.so}`, dang: c.dang.ma, chuyenDe: 'Este', mucDo: muc.indexOf(c.muc_do), sao: c.can_chua.sao, phan: 'I' })) }
+}
+async function dungBaiLon(soEm = 3) {
+  const d = dung(soEm)
+  const k = khoLon()
+  d.objects.set('kho/DE1.json', { ma_de: 'DE1', cau: k.cau })
+  d.sql.prepare("UPDATE de_kho SET so_cau = 100 WHERE ma_de = 'DE1'").run()
+  const g = await giao(d, { cau: k.thay, ghim: k.thay.slice(0, 65).map((c) => c.qid) }) as any
+  expect(g.ok, JSON.stringify(g)).toBe(true)
+  return d
+}
+const hangEm = (d: D1That, sbd: string) => d.sql.prepare('SELECT qid, chang FROM btvn_em_cau WHERE sbd = ? AND chang >= 0 ORDER BY chang, thu_tu').all(sbd) as { qid: string; chang: number }[]
+const emRow = (d: D1That, sbd: string) => d.sql.prepare('SELECT so_cau_em, so_chang, tom_tat_json, ngan_sach_json, chang_mo_json FROM btvn_em WHERE sbd = ?').get(sbd) as { so_cau_em: number; so_chang: number; tom_tat_json: string; ngan_sach_json: string; chang_mo_json: string }
+
+describe('bộ NỘP TRỄ chỉ có lõi: không thích nghi, không khắc phục, không mở sớm, số liệu lưu là của bộ lõi', () => {
+  it('bài ≥ 65 lõi (3 chặng): em mở SAU hạn ⇒ cờ nopTre trong ngan_sach_json; tomTat lưu số của BỘ LÕI (tong = số câu thật, không thử sức, đủ số chặng); chặng 0 sai hết ⇒ chặng chưa mở KHÔNG đổi một câu', async () => {
+    gio(BAY_GIO)
+    const d = await dungBaiLon(2); await mo(d, 'S1')
+    gio(SAU_HAN_4G30)
+    expect(await mo(d, 'S2')).toMatchObject({ ok: true, nopTre: true })
+    const r0 = emRow(d, 'S2')
+    expect(JSON.parse(r0.ngan_sach_json).nopTre).toBe(true)
+    expect(JSON.parse(emRow(d, 'S1').ngan_sach_json).nopTre).toBeUndefined() // bộ đúng hạn KHÔNG mang cờ
+    const truoc = hangEm(d, 'S2')
+    expect(r0.so_chang).toBeGreaterThanOrEqual(3)
+    const tt = JSON.parse(r0.tom_tat_json) as Record<string, number>
+    expect(tt).toMatchObject({ tong: truoc.length, soBatBuoc: truoc.length, soLoi: truoc.length, soRieng: 0, soThuThach: 0, soLoiCao: 0, soThuSucThem: 0, soChang: r0.so_chang, nganSachCau: truoc.length })
+    expect(r0.so_cau_em).toBe(truoc.length)
+    // chặng 0 sai HẾT (đường thích nghi "sai ≥ 50 % ⇒ thêm câu dễ" + khắc phục Bộ não chạy sau chặng xong)
+    const q0 = truoc.filter((x) => x.chang === 0).map((x) => x.qid)
+    const kq = await nopChang(d, 0, Object.fromEntries(q0.map((q) => [q, 'B'])), 'S2') as any
+    expect(kq.ok, JSON.stringify(kq)).toBe(true)
+    expect(hangEm(d, 'S2')).toEqual(truoc) // mọi chặng giữ nguyên: không thêm / đổi / bớt câu nào
+    expect(emRow(d, 'S2').so_cau_em).toBe(truoc.length)
+  })
+
+  it('CHỐT RIÊNG của thích nghi: dù tomTat.nganSachCau còn số của bộ ĐẦY ĐỦ (dữ liệu chốt trước bản vá), cờ nopTre vẫn chặn "thêm câu dễ" — đối chứng: bỏ cờ thì câu CÓ được thêm vào chặng chưa mở', async () => {
+    gio(BAY_GIO)
+    const d = await dungBaiLon(3); await mo(d, 'S1')
+    gio(SAU_HAN_4G30)
+    await mo(d, 'S2'); await mo(d, 'S3')
+    const sai = async (sbd: string) => {
+      const q0 = hangEm(d, sbd).filter((x) => x.chang === 0).map((x) => x.qid)
+      const kq = await nopChang(d, 0, Object.fromEntries(q0.map((q) => [q, 'B'])), sbd) as any
+      expect(kq.ok, JSON.stringify(kq)).toBe(true)
+    }
+    for (const sbd of ['S2', 'S3']) d.sql.prepare("UPDATE btvn_em SET tom_tat_json = json_set(tom_tat_json, '$.nganSachCau', 95) WHERE sbd = ?").run(sbd) // ngân sách của bộ đầy đủ: còn chỗ cho 30 câu
+    d.sql.prepare("UPDATE btvn_em SET ngan_sach_json = json_remove(ngan_sach_json, '$.nopTre') WHERE sbd = 'S3'").run() // S3: KHÔNG cờ (như bộ đúng hạn)
+    const truocS2 = hangEm(d, 'S2'); const truocS3 = hangEm(d, 'S3')
+    await sai('S2'); await sai('S3')
+    expect(hangEm(d, 'S2')).toEqual(truocS2) // có cờ nopTre ⇒ chặng chưa mở nguyên vẹn
+    expect(hangEm(d, 'S3').length, 'đối chứng: không cờ thì thích nghi CÓ thêm câu dễ').toBeGreaterThan(truocS3.length)
+  })
+
+  it('bài ≥ 65 lõi: đúng hết hai chặng đầu KHÔNG mở sớm chặng 3 (em trễ tối đa 2 chặng/ngày); chặng 3 vẫn mở 00:00 ngày sau; phản hồi không có moSom', async () => {
+    gio(BAY_GIO)
+    const d = await dungBaiLon(2); await mo(d, 'S1')
+    gio(SAU_HAN_4G30)
+    await mo(d, 'S2')
+    const truoc = hangEm(d, 'S2')
+    const lichTruoc = (JSON.parse(emRow(d, 'S2').chang_mo_json) as { chang: { moLuc: string }[] }).chang
+    expect(Date.parse(lichTruoc[2]!.moLuc)).toBeGreaterThan(SAU_HAN_4G30.getTime()) // chặng 3 CHƯA mở
+    let kq: any
+    for (const k of [0, 1]) {
+      kq = await nopChang(d, k, Object.fromEntries(truoc.filter((x) => x.chang === k).map((x) => [x.qid, DAP_AN_DUNG(x.qid)])), 'S2')
+      expect(kq.ok, JSON.stringify(kq)).toBe(true)
+    }
+    expect(kq.moSom ?? null).toBeNull() // không có khối mở sớm
+    const lichSau = JSON.parse(emRow(d, 'S2').chang_mo_json) as { chang: { moLuc: string }[]; moSom?: unknown[] }
+    expect(lichSau.chang[2]!.moLuc).toBe(lichTruoc[2]!.moLuc) // mốc mở chặng 3 không đổi
+    expect(lichSau.moSom ?? []).toEqual([])
+    expect(await nopChang(d, 2, Object.fromEntries(truoc.filter((x) => x.chang === 2).map((x) => [x.qid, DAP_AN_DUNG(x.qid)])), 'S2')).toMatchObject({ ok: false }) // vẫn khoá tới 00:00
+  })
+
+  it('bài KHÔNG còn câu lõi nào cho em ⇒ lời riêng "không còn câu bắt buộc" (lyDo khong_con_cau_bat_buoc), KHÔNG phải "thử lại sau ít phút"; không chốt bộ', async () => {
+    gio(BAY_GIO)
+    const d = dung(2); await giao(d); await mo(d, 'S1')
+    d.sql.prepare('UPDATE btvn_cau SET loi = 0, ghim = 0').run() // thầy gỡ hết lõi/ghim sau khi giao (dữ liệu hiếm)
+    gio(SAU_HAN_4G30)
+    const r = await mo(d, 'S2') as any
+    expect(r).toMatchObject({ ok: false, lyDo: 'khong_con_cau_bat_buoc' })
+    expect(String(r.error)).toMatch(/không còn câu bắt buộc/)
+    expect(String(r.error)).not.toMatch(/thử lại/)
+    expect((d.sql.prepare("SELECT chot_luc FROM btvn_em WHERE sbd='S2'").get() as { chot_luc: string | null }).chot_luc).toBeNull()
   })
 })
