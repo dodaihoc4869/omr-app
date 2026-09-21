@@ -32,9 +32,10 @@ Mã lỗi: `duoi_nguong` · `thieu_vang` · `chua_mo` · `het_suat` · `da_co` �
 Trường `phuKien: {"<chỗ đeo>":"<mã món>"}` (chỉ các chỗ đang mặc; không mặc gì ⇒ `{}`) cho ba nơi: thẻ thần thú ở Bảng nhiệm vụ, sảnh + trận Đoàn (mỗi bạn), Bảng vinh danh. Đọc cho cả đoàn bằng MỘT truy vấn `WHERE sbd IN (SELECT value FROM json_each(?))`. Tên lệnh cụ thể của ba nơi được ghi vào mục 8 khi làm (S3). Cờ tắt vẫn trả. App thầy: một lệnh `/gv/*` chỉ đọc "số em đã mua phụ kiện" (S3).
 
 ## 6. D1 (migration CHỈ-THÊM, chạy lại được, có tệp lùi)
-- `vang_so(id INTEGER PRIMARY KEY AUTOINCREMENT, sbd, loai CHECK IN('doi','mua','hoan'), so_vang INTEGER, exp_tru INTEGER, ma_mon, khoa_yeu_cau, luc, UNIQUE(sbd, khoa_yeu_cau))` + chỉ mục `(sbd)`. Chỉ INSERT. Số dư = `SUM(so_vang)`. `hoan` chỉ Boss dùng để sửa lỗi máy chủ.
+- `vang_so(id INTEGER PRIMARY KEY AUTOINCREMENT, sbd, loai CHECK IN('doi','mua','hoan'), so_vang INTEGER, exp_tru INTEGER, ma_mon, khoa_yeu_cau, luc, UNIQUE(sbd, khoa_yeu_cau))` (chỉ mục tự sinh của UNIQUE đã phục vụ tra theo `sbd`, không thêm chỉ mục riêng). Chỉ INSERT. Số dư = `SUM(so_vang)`. `hoan` chỉ Boss dùng để sửa lỗi máy chủ.
 - `phu_kien_so_huu(sbd, ma_mon, mua, gia, khoa_yeu_cau, luc, PRIMARY KEY(sbd, ma_mon))` + chỉ mục `(ma_mon, mua)`.
-- `phu_kien_dang_mac(sbd, o_gan, ma_mon, luc, PRIMARY KEY(sbd, o_gan))`.
+- `phu_kien_dang_mac(sbd, o_gan CHECK IN(5 chỗ đeo), ma_mon, luc, PRIMARY KEY(sbd, o_gan))`.
+- Tệp: `server/migration-2109-shop-phu-kien.sql` (chỉ-thêm, chạy lại được) · lùi `server/lui-2109-shop-phu-kien.sql` (MẤT sổ vàng + đồ: chỉ khi Boss VÀ thầy cùng ra lệnh).
 - Cả ba bảng vào `BANG_GIU` của `server/src/reset-toan-app.ts` (vàng và đồ là tài sản em đã kiếm) + test phân loại.
 - `vang-doi` = MỘT `DB.batch`: (a) `UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=? AND NOT EXISTS(khoá đã có trong vang_so)`; (b) `INSERT OR IGNORE INTO vang_so … SELECT … WHERE EXISTS(hồ sơ đang ở revision+1)`. Hai dòng cùng đổi hoặc cùng không; không đổi ⇒ đọc lại, thử tối đa 3 lần. Luôn giữ ≥ 200 EXP.
 - `shop-mua` = MỘT `DB.batch`: (a) `INSERT OR IGNORE INTO phu_kien_so_huu … SELECT … WHERE SUM(vang_so) >= giá AND COUNT(đã bán) < suatTong`; (b) `INSERT OR IGNORE INTO vang_so(−giá) … WHERE EXISTS(dòng sở hữu mang đúng khoá)`; (c) `INSERT OR REPLACE INTO phu_kien_dang_mac … WHERE EXISTS(dòng sở hữu mang đúng khoá)`.
@@ -45,7 +46,7 @@ Trường `phuKien: {"<chỗ đeo>":"<mã món>"}` (chỉ các chỗ đang mặc
 
 ## 8. Tiến độ (cập nhật khi có mốc)
 - [x] Hợp đồng này + danh mục `src/lib/phu-kien-danh-muc.ts` (S2 trước).
-- [ ] S1 migration 3 bảng + `BANG_GIU` + test phân loại.
+- [x] S1 migration 3 bảng + `BANG_GIU` + test (tests/shop-phu-kien-migration-2109.test.ts, đột biến 7/7 diệt). CHƯA chạy `--remote` (chờ Boss soát + lời thầy).
 - [ ] S2 `vang-xem`, `vang-doi`, `shop-danh-sach`, `shop-mua`, `thu-mac-do` + test đua/bấm đúp.
 - [ ] S3 `phuKien` ở ba nơi + dòng thống kê cho thầy.
 - [ ] S4 đẩy Worker (chờ lời thầy), gọi thử mọi lệnh bị chạm trên D1 thật, bật `chiSbd` một em, rồi toàn bộ.

@@ -77,6 +77,8 @@ export const BANG_GIU: readonly string[] = [
   'nhat_ky_may',
   // THỬ THÁCH RIÊNG (migration-2109-thu-thach-rieng.sql): câu đã chốt của ngày — số liệu vận hành, kết quả nằm ở sổ `su_kien_hoc` (đã GIỮ).
   'thu_thach_rieng',
+  // CỬA HÀNG PHỤ KIỆN (migration-2109-shop-phu-kien.sql): sổ vàng, đồ đã mua, đồ đang mặc — tài sản em đã kiếm bằng việc học, GIỮ (EXP đã trừ khỏi ống nghiệm lúc đổi nên hồ sơ game bị xoá không ảnh hưởng số vàng).
+  'vang_so', 'phu_kien_so_huu', 'phu_kien_dang_mac',
 ]
 
 const TEN_HOP_LE = /^[a-z][a-z0-9_]*$/
