@@ -1,3 +1,4 @@
+import {DemTTL} from './dem-chung'
 import type { Env } from './kieu'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../../src/lib/exam-kho-de-import'
 import {grade} from '../../src/game/than-thu-v2/core'
@@ -74,6 +75,7 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
   }
   protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});return blocked
 }
+const demKhoDang=new DemTTL<{k:string;json:string}[]>(60_000,400,16_000_000)
 export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[]):Promise<{evidence:Evidence[];pool:PrivateQuestion[];missing:number}> {
   const rows=await env.DB.prepare(`SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu,l.nop_luc FROM chi_tiet_cau c JOIN luot l ON l.ma_ca=c.ma_ca AND l.sbd=c.sbd AND l.lan_thu=c.lan_thu JOIN ca ON ca.ma_ca=c.ma_ca WHERE c.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND c.dung_sai IN (0,1) AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>()
   // Recover missing detail rows read-only, using only qids explicitly submitted by this learner.
@@ -112,9 +114,26 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
   /* CHI PHÍ D1 (Boss 21/09: truy vấn này ≈ 246 triệu dòng đọc/ngày): bản cũ phân trang bằng `ORDER BY ma_de||'|'||qid` + `LIMIT 300` nên MỖI trang quét lại và sắp xếp lại MỌI câu khớp (bậc hai theo cỡ kho, ~76 dòng đọc/câu).
      Bản này TÁCH HAI PHA, tuyến tính (~5 dòng đọc/câu): (1) một truy vấn chỉ lấy khoá (ma_de, qid) của các câu khớp (không tải json), sắp theo đúng thứ tự cũ `ma_de|qid` trong bộ nhớ; (2) tải json theo từng 300 khoá bằng
      MỘT tham số json_each nối thẳng vào khoá chính (D1 giới hạn 100 tham số/truy vấn). Kết quả (nội dung + thứ tự) đúng như bản cũ — khoá bằng test đối chiếu với thuật toán cũ. */
+  /* HẠ TẢI D1 (Boss 21/09 ~20:50: truy vấn nạp câu theo dạng = 205 s/giờ, 7,6 nghìn lượt, 6,3 triệu dòng — top tải lúc D1 nghẽn): kho câu THEO DẠNG là dữ liệu CHUNG của mọi em (không riêng em nào) ⇒ ĐỆM 60 GIÂY MỨC MÔ-ĐUN theo TỪNG dạng
+     (khoá = mã dạng; chỉ giữ CHUỖI json, phân tích lại mỗi lượt; trần ~16 triệu ký tự, bỏ dạng cũ nhất). Dạng chưa có trong đệm ⇒ nạp MỘT truy vấn cho mọi dạng còn thiếu của lô 60. Kết quả (nội dung + thứ tự `ma_de|qid` trong từng lô 60 dạng) GIỐNG HỆT bản không đệm.
+     PHẦN RIÊNG của em (bằng chứng, câu đã gặp `originals`, câu bị chặn, đã làm hôm nay) KHÔNG đi qua đệm: ở trên và ở nơi gọi, đọc tươi mỗi lượt. Kho đổi (tải đề mới) hiện chậm nhất 60 giây. */
+  // Phiên bản kho = (số tờ đang dùng được, cap_nhat_luc lớn nhất, danh sách mã tờ): thêm / sửa / xoá một tờ đề đổi khoá ⇒ đệm cũ không bao giờ được dùng (không chờ hết 60 giây). Một truy vấn tổng hợp nhẹ trên hai bảng nhỏ.
+  let phienBanKho='?';try{const v=await env.DB.prepare(`SELECT COUNT(*) AS n, COALESCE(MAX(d.cap_nhat_luc),'') AS t, COALESCE(GROUP_CONCAT(d.ma_de),'') AS ids FROM de_kho d JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0`).first<{n:number;t:string;ids:string}>();phienBanKho=`${v?.n}|${v?.t}|${v?.ids}`}catch{phienBanKho='?'+Math.random()}
+  const bayGio=Date.now()
   for(let i=0;i<types.length;i+=60){const ids=types.slice(i,i+60)
-    const khoa=await env.DB.prepare(`SELECT q.ma_de,q.qid FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${ids.map(()=>'?').join(',')})`).bind(...ids).all<{ma_de:string;qid:string}>()
-    const ds=khoa.results.map(k=>[str(k.ma_de),str(k.qid)] as [string,string]).sort((a,b)=>{const x=a[0]+'|'+a[1],y=b[0]+'|'+b[1];return x<y?-1:x>y?1:0})
-    for(let j=0;j<ds.length;j+=300){const r=await env.DB.prepare(`SELECT q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') ORDER BY j.key`).bind(JSON.stringify(ds.slice(j,j+300))).all<{json:string}>();pool.push(...r.results.map(r=>JSON.parse(r.json) as PrivateQuestion))}}
+    const theoDang=new Map<string,{k:string;json:string}[]>();const thieu:string[]=[]
+    for(const d of ids){const c=demKhoDang.doc(phienBanKho+'|'+d,bayGio);if(c)theoDang.set(d,c);else thieu.push(d)}
+    if(thieu.length){
+      const khoa=await env.DB.prepare(`SELECT q.dang,q.ma_de,q.qid FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${thieu.map(()=>'?').join(',')})`).bind(...thieu).all<{dang:string;ma_de:string;qid:string}>()
+      const dangCua=new Map(khoa.results.map(k=>[str(k.ma_de)+'|'+str(k.qid),str(k.dang)] as [string,string]))
+      const ds=khoa.results.map(k=>[str(k.ma_de),str(k.qid)] as [string,string]).sort((a,b)=>{const x=a[0]+'|'+a[1],y=b[0]+'|'+b[1];return x<y?-1:x>y?1:0})
+      const moi=new Map<string,{k:string;json:string}[]>(thieu.map(d=>[d,[]]))
+      for(let j=0;j<ds.length;j+=300){const r=await env.DB.prepare(`SELECT q.ma_de,q.qid,q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') ORDER BY j.key`).bind(JSON.stringify(ds.slice(j,j+300))).all<{ma_de:string;qid:string;json:string}>()
+        for(const x of r.results){const k=str(x.ma_de)+'|'+str(x.qid);moi.get(dangCua.get(k)??'')?.push({k,json:str(x.json)})}}
+      for(const [d,v] of moi){theoDang.set(d,v);demKhoDang.ghi(phienBanKho+'|'+d,bayGio,v,v.reduce((a,x)=>a+x.json.length,0)+64)}
+    }
+    const gop=ids.flatMap(d=>theoDang.get(d)??[]).sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0)
+    pool.push(...gop.map(x=>JSON.parse(x.json) as PrivateQuestion))
+  }
   return {evidence,pool:[...new Map(pool.map(q=>[q.qid,q])).values()],missing}
 }

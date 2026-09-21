@@ -302,9 +302,9 @@ describe('đệm 10 giây (song) / 60 giây (bản 3)', () => {
     dat(NOW + 5_000)
     const b = await goi(d)
     expect(b.dem).toEqual({ bangTin: true, song: true }); expect(b.soTruyVan).toBe(0)
-    // chỉ 2 truy vấn cấu hình của Worker + route (cổng chung, cờ `bang_tin_san`); KHÔNG đọc sổ học / bảng nào khác
+    // chỉ truy vấn cấu hình của route (cờ `bang_tin_san`); cổng đóng băng của reset nay ĐỆM 30 giây (SỬA CÓ CHỦ Ý 21/09 hạ tải D1: 3 s → 30 s) nên lượt thứ hai trong 5 giây không đọc lại; KHÔNG đọc sổ học / bảng nào khác
     const them = cauLenh.slice(soLenhA)
-    expect(them).toHaveLength(2)
+    expect(them).toHaveLength(1)
     expect(them.every((q) => /FROM cau_hinh/.test(q))).toBe(true)
     // câu mới ghi: sau 10 giây phần song đọc lại, số nhip GHI ĐÈ bằng số mới dù bản 3 còn đệm
     sk(d, { sbd: 'S3', luc: NOW + 6_000, kq: 1 })

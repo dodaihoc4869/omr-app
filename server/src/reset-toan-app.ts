@@ -41,7 +41,8 @@ const CHI_PHI_CHOT = 6
 const XOA_MOI_LENH = 4000
 const COT_MOI_TRUY_VAN_DEM = 60
 /** Bộ nhớ đệm đọc cờ/khoá trong isolate (mở băng sớm: không lâu hơn ngần này). */
-const HAN_DEM_MS = 3000
+/** 30 giây (Boss 21/09: truy vấn 3 cờ này 23 nghìn lượt/giờ khi D1 nghẽn; bản cũ 3 giây × nhiều isolate). Hệ quả: lên đạn / huỷ reset có hiệu lực ở cổng đóng băng chậm nhất 30 giây (job reset vẫn đọc TƯƠI). Reset toàn app 21/09 đã chạy xong, không lên đạn lại. */
+const HAN_DEM_MS = 30_000
 
 /** XOÁ — theo lệnh thầy. */
 export const BANG_XOA: readonly string[] = [

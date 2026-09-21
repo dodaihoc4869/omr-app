@@ -399,7 +399,7 @@ describe('CỬA SỔ 60 PHÚT kể từ lúc lên đạn', () => {
     const luc2 = HAN_MS + 2 * H
     expect(await dangLamMoi(d.env, luc2 + 10_000)).toBe(false) // chưa lên đạn lại
     lenDan(d, new Date(luc2).toISOString())
-    expect(await dangLamMoi(d.env, luc2 + 20_000)).toBe(true) // (quá bộ nhớ đệm 3 giây) cửa sổ mới: đóng băng dù khoá đang ghi qua_gio
+    expect(await dangLamMoi(d.env, luc2 + 45_000)).toBe(true) // (quá bộ nhớ đệm 30 giây — SỬA CÓ CHỦ Ý 21/09 hạ tải D1: 3 s → 30 s) cửa sổ mới: đóng băng dù khoá đang ghi qua_gio
     const { cuoi } = await chayHet(d, luc2 + 60_000)
     expect(cuoi.trangThai).toMatchObject({ trangThai: 'xong', lenDanLuc: LEN_DAN }) // khoá giữ lúc lên đạn đầu tiên, batDauLuc giữ từ lượt đầu
     for (const t of BANG_XOA) expect(dem(d, t)).toBe(0)
@@ -702,7 +702,7 @@ describe('đóng băng ghi trong lúc job chạy', () => {
     expect(await dangLamMoi(kCo.env, luc(1))).toBe(false) // không có cờ lên đạn: không đóng băng
   })
 
-  it('bộ nhớ đệm 3 giây: hai lần hỏi trong 3 giây chỉ tốn MỘT truy vấn; hỏi lại sau 3 giây thì đọc lại (thấy cờ mới)', async () => {
+  it('bộ nhớ đệm 30 giây (SỬA CÓ CHỦ Ý 21/09 hạ tải D1: 3 s → 30 s): hai lần hỏi trong 30 giây chỉ tốn MỘT truy vấn; hỏi lại sau 30 giây thì đọc lại (thấy cờ mới)', async () => {
     const d = dung({}, false)
     const t0 = d.soLenh.prepare
     expect(await dangLamMoi(d.env, luc(1))).toBe(false)
@@ -710,7 +710,8 @@ describe('đóng băng ghi trong lúc job chạy', () => {
     expect(d.soLenh.prepare - t0).toBe(1)
     lenDan(d)
     expect(await dangLamMoi(d.env, luc(1) + 2000)).toBe(false) // vẫn trong đệm
-    expect(await dangLamMoi(d.env, luc(1) + 4000)).toBe(true) // hết đệm: thấy cờ
+    expect(await dangLamMoi(d.env, luc(1) + 29_000)).toBe(false) // còn đệm (29 s)
+    expect(await dangLamMoi(d.env, luc(1) + 31_000)).toBe(true) // hết đệm: thấy cờ
   })
 
   it('môi trường tối giản/hỏng (không có D1 dùng được làm khoá đệm) không ném lỗi: không đóng băng, mocReset vắng', async () => {

@@ -1,11 +1,12 @@
 // @vitest-environment node
-import {describe,it,expect} from 'vitest'
+import {describe,it,expect,vi} from 'vitest'
 import {DatabaseSync} from 'node:sqlite'
 import {readFileSync} from 'node:fs'
 import {allowed,advance,THUONG_NAC,chooseSession,grade,newArena,arenaAction,PETS,DAY,targetLevel,publicQuestion} from '../src/game/than-thu-v2/core'
 import type {PrivateQuestion,Attempt,Evidence} from '../src/game/than-thu-v2/core'
 import type {Env,D1PreparedStatement} from '../server/src/kieu'
 import {gameV2,loadProfile} from '../server/src/game-v2'
+import {xoaMoiDem} from '../server/src/dem-chung'
 import {gameToken,gameIdentity,parentPass,parentIdentity} from '../server/src/game-v2-auth'
 import {normalizeBank,readScope,syncIndex,protectedQuestions} from '../server/src/game-v2-bank'
 import {roomAction} from '../server/src/game-v2-room'
@@ -15,6 +16,7 @@ const question=(i=0):PrivateQuestion=>({qid:`D-I-${i}`,maDe:'D',version:'v1',gro
 const evidence=(q=question()):Evidence=>({qid:q.qid,group:q.group,dang:q.dang,mucDo:q.mucDo,kienThuc:q.kienThuc,wrong:true,date:'2026-09-01',ca:'CA'})
 const attempt=(at=1,group='g0'):Attempt=>({id:group,session:group,qid:group,group,dang:'AA.BB.CC',mucDo:'biet',correct:true,assisted:false,at,novel:true})
 function fixture(){
+ xoaMoiDem() // đệm mức mô-đun (kho câu theo dạng, xác thực token) không được lẫn giữa các fixture
  const sql=new DatabaseSync(':memory:');sql.exec("CREATE TABLE game_v2_settings (key TEXT PRIMARY KEY,json TEXT NOT NULL)");sql.exec(`CREATE TABLE hoc_sinh(sbd TEXT PRIMARY KEY,mat_khau TEXT);INSERT INTO hoc_sinh VALUES('1','password'),('2','password'),('3','password'),('4','password'),('5','password'),('6','password'),('7','password');CREATE TABLE than_thu(sbd TEXT PRIMARY KEY,du_lieu_json TEXT);CREATE TABLE ca(ma_ca TEXT PRIMARY KEY,trang_thai TEXT,cong_bo TEXT,bank_r2 TEXT,cap_nhat_luc TEXT,bo_theo_em_json TEXT,het_han_vao TEXT,thoi_gian_phut INTEGER,loai TEXT,han_nop TEXT,bat_dau TEXT);CREATE TABLE luot(ma_ca TEXT,sbd TEXT,lan_thu INTEGER,nop_luc TEXT,trang_thai TEXT,dap_an_json TEXT,het_gio_luc TEXT);CREATE TABLE chi_tiet_cau(ma_ca TEXT,sbd TEXT,lan_thu INTEGER,qid TEXT,dung_sai INTEGER);CREATE TABLE de_kho(ma_de TEXT PRIMARY KEY,r2_khoa TEXT,cap_nhat_luc TEXT,da_xoa INTEGER);`)
  sql.exec(readFileSync('server/migration-1609-than-thu-v2.sql','utf8'))
  const objects=new Map<string,unknown>()
@@ -42,7 +44,7 @@ describe('Võ đài máy chủ',()=>{
  it('trận tất định, không vượt vòng 10',()=>{let a=newArena(1);a.units=[{id:'x',pet:0,star:3,pos:0}];expect(arenaAction(a,{type:'fight'})).toEqual(arenaAction(a,{type:'fight'}));for(let i=0;i<10;i++){a.studied=1;a=arenaAction(a,{type:'fight'})}expect(a.finished).toBe(true);expect(()=>arenaAction(a,{type:'fight'})).toThrow()})
 })
 describe('D1 thực: tách dữ liệu, phân quyền, giao dịch',()=>{
- it('token giả / đổi SBD / đổi mật khẩu không được truy cập',async()=>{const {env,sql}=fixture();const token=await gameToken(env,'1');expect(await gameIdentity(env,{token,sbd:'2'})).toBe('1');await expect(gameIdentity(env,{sbd:'1'})).rejects.toThrow();await expect(gameIdentity(env,{token:token+'a'})).rejects.toThrow();sql.exec("UPDATE hoc_sinh SET mat_khau='changed' WHERE sbd='1'");await expect(gameIdentity(env,{token})).rejects.toThrow()})
+ it('token giả / đổi SBD / đổi mật khẩu không được truy cập',async()=>{const {env,sql}=fixture();const token=await gameToken(env,'1');expect(await gameIdentity(env,{token,sbd:'2'})).toBe('1');await expect(gameIdentity(env,{sbd:'1'})).rejects.toThrow();await expect(gameIdentity(env,{token:token+'a'})).rejects.toThrow();sql.exec("UPDATE hoc_sinh SET mat_khau='changed' WHERE sbd='1'");expect(await gameIdentity(env,{token})).toBe('1') /* SỬA CÓ CHỦ Ý 21/09 (hạ tải D1): xác thực token được ĐỆM 60 giây ⇒ đổi mật khẩu có hiệu lực ≤ 60 giây */;vi.useFakeTimers({toFake:['Date']});vi.setSystemTime(Date.now()+61_000);try{await expect(gameIdentity(env,{token})).rejects.toThrow()}finally{vi.useRealTimers()}})
  it('mã phụ huynh không có quyền chấm bài',async()=>{const {env}=fixture();const pass=await parentPass(env,'1');expect(await parentIdentity(env,pass)).toBe('1');await expect(gameIdentity(env,{token:pass})).rejects.toThrow();const token=await gameToken(env,'1');await expect(parentIdentity(env,token)).rejects.toThrow()})
  it('chuyển hồ sơ bảo toàn dữ liệu cũ và chỉ chọn lại một lần',async()=>{const {env,sql}=fixture();const old={idThanhThuChon:'loi_dieu',capDo:51,exp:88,khoExp:50000,tangThapCaoNhat:999,unknownAsset:'keep'};sql.prepare('INSERT INTO than_thu VALUES(?,?)').run('1',JSON.stringify(old));const token=await gameToken(env,'1');const r=await loadProfile(env,'1');expect(r.profile).toMatchObject({pet:'khi_lang',cap:51,exp:88,wallet:50000,tower:999,choice:true});expect(JSON.parse(String(r.profile.legacy))).toEqual(old);await gameV2(env,'choose',{token,pet:'sangy_cu'});await expect(gameV2(env,'choose',{token,pet:'dat_quy'})).rejects.toThrow();expect(sql.prepare('SELECT du_lieu_json AS json FROM than_thu').get()?.json).toBe(JSON.stringify(old))})
  it('chấm lặp cùng lượt chỉ thưởng một lần, không chạm bảng học tập',async()=>{const f=fixture();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');const tables=['ca','luot','chi_tiet_cau','de_kho'];const before=tables.map(t=>JSON.stringify(f.sql.prepare(`SELECT * FROM ${t}`).all()));const start=await gameV2(f.env,'start',{token,mode:'repair'});expect(JSON.stringify(start)).not.toContain('correct');const id=start.id;const a=await gameV2(f.env,'answer',{token,session:id,qid:'D-I-0',answer:'B'});expect(a.reward).toBe(10);const b=await gameV2(f.env,'answer',{token,session:id,qid:'D-I-0',answer:'A'});expect(b.replayed).toBe(true);expect((await loadProfile(f.env,'1')).profile.wallet).toBe(10);expect(f.sql.prepare('SELECT COUNT(*) n FROM game_v2_reward').get()?.n).toBe(1);expect(tables.map(t=>JSON.stringify(f.sql.prepare(`SELECT * FROM ${t}`).all()))).toEqual(before)})
