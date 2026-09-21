@@ -75,7 +75,7 @@ export default function KhoiThoiGianCa({ ca, themPhut }: { ca: CaGioHienThi; the
     phu = `mỗi em tính giờ riêng · vào phòng đến ${ca.hetHanVao ? gioPhut(ca.hetHanVao) : 'không giới hạn'}`
   }
   return (
-    <section className="ca-gio" aria-label="Thời gian ca thi" data-co-chung={cl ? 'co' : 'khong'}>
+    <section className="ca-gio" aria-label="Thời gian ca kiểm tra" data-co-chung={cl ? 'co' : 'khong'}>
       <h2 className="ca-nhan-nho">THỜI GIAN</h2>
       <div className="ca-gio-hang">
         <span className="ca-gio-so" role="timer" aria-live="off">

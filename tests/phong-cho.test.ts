@@ -159,7 +159,7 @@ describe('màn của thầy', () => {
   it('khối phòng chờ chỉ hiện khi ca đang chờ, và có ĐÚNG hai nút', () => {
     const than = MAN_THAY.slice(MAN_THAY.indexOf('{chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && ('), MAN_THAY.indexOf('{chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && ('))
     expect(than).toContain('Bắt đầu thi')
-    expect(than).toContain('Huỷ ca thi')
+    expect(than).toContain('Huỷ ca kiểm tra')
   })
 
   it('huỷ ca là XOÁ MỀM — bấm nhầm còn khôi phục được, và có bước hỏi lại', () => {

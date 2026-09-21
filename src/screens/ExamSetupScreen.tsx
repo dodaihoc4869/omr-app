@@ -1044,7 +1044,7 @@ export default function ExamSetupScreen() {
               {/* Mật khẩu ca */}
               <div className="space-y-1.5">
                 <label className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                  <KeyRound size={14} /> Mật khẩu ca thi (tùy chọn)
+                  <KeyRound size={14} /> Mật khẩu ca kiểm tra (tuỳ chọn)
                 </label>
                 <input
                   type="text"

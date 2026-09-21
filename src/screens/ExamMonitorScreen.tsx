@@ -1024,7 +1024,7 @@ export default function ExamMonitorScreen() {
               }}
               maxLength={TEN_CA_TOI_DA}
               placeholder={`Ca ${chiTiet.ca.maCa}`}
-              aria-label="Tên ca thi"
+              aria-label="Tên ca kiểm tra"
               style={{ ...O_NHAP, fontFamily: 'var(--serif)', fontWeight: 700 }}
             />
             <button
@@ -1054,10 +1054,10 @@ export default function ExamMonitorScreen() {
               disabled={!chiTiet}
               className="tap-target flex items-center min-w-0"
               style={{ gap: 'var(--k2)', background: 'transparent', border: 'none', padding: 0, textAlign: 'left', color: 'var(--muc)' }}
-              aria-label="Sửa tên ca thi"
+              aria-label="Sửa tên ca kiểm tra"
             >
               <h1 className="font-bold truncate" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-                {chiTiet ? tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa) : 'Chi tiết ca thi'}
+                {chiTiet ? tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa) : 'Chi tiết ca kiểm tra'}
               </h1>
               {chiTiet && <Pencil size={16} className="shrink-0" style={{ color: 'var(--nhat)' }} />}
             </button>
@@ -1107,7 +1107,7 @@ export default function ExamMonitorScreen() {
                   onClick={() => setScreen('lichsuca')}
                   className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
                 >
-                  Xem tất cả ca thi <ChevronRight size={14} />
+                  Xem tất cả ca kiểm tra <ChevronRight size={14} />
                 </button>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -1211,8 +1211,8 @@ export default function ExamMonitorScreen() {
                   onClick={() => tai(chiTiet.ca.maCa)}
                   disabled={dangTai}
                   className="tap-target inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition shadow-2xs text-xs font-bold cursor-pointer active:scale-95 disabled:opacity-50"
-                  aria-label="Làm mới ca thi"
-                  title="Làm mới dữ liệu ca thi"
+                  aria-label="Làm mới ca kiểm tra"
+                  title="Làm mới dữ liệu ca kiểm tra"
                 >
                   <RefreshCw size={13} className={dangTai ? 'animate-spin' : ''} />
                   <span>Làm mới</span>
@@ -1238,7 +1238,7 @@ export default function ExamMonitorScreen() {
             {/* PHÒNG CHỜ (thầy chốt 07/09). Ca bật phòng chờ mà thầy chưa bấm
                 bắt đầu thì em đang đứng ở màn trắng — đây là việc gấp nhất
                 trên màn này, nên nó đứng trên cả cửa vào ca.
-                Hai nút đúng như thầy chốt: Bắt đầu thi và Huỷ ca thi. */}
+                Hai nút đúng như thầy chốt: Bắt đầu thi và Huỷ ca kiểm tra (đổi chữ 21/09). */}
             {chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && (
               <div style={{ marginTop: 'var(--k3)', background: 'var(--tim-nen)', borderRadius: 'var(--bo-2)', padding: 'var(--k4)' }}>
                 <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
@@ -1287,7 +1287,7 @@ export default function ExamMonitorScreen() {
                     className="tap-target font-bold"
                     style={{ minHeight: 52, borderRadius: 'var(--bo-2)', border: '1.5px solid var(--do)', background: 'transparent', color: 'var(--do)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
                   >
-                    Huỷ ca thi
+                    Huỷ ca kiểm tra
                   </button>
                 </div>
                 {hoiHuy && (
