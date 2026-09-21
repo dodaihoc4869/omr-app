@@ -412,3 +412,36 @@ describe('ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (th�
     }
   })
 })
+
+describe('LUẬT KHỐI trong chính hàm chọn (Boss 21/09, P0 khối 11 nhận câu khối 12): `opt.khoiEm` — lớp bảo hiểm thứ hai sau bộ lọc kho ở máy chủ', () => {
+  // Kho giả: CÙNG mã dạng ở cả ba khối (dạng dùng chung nhiều khối) — mã tờ đổi theo khối: DH-10-…, DH-11-…, DH-12-…
+  const KHO_KHOI = POOL.map((q, i) => ({ ...q, maDe: `DH-${10 + (i % 3)}-C1-B1`, qid: `DH-${10 + (i % 3)}-C1-B1-I-${i}` }))
+  const khoiCau = (q: PrivateQuestion) => Number(/^DH-(\d+)-/.exec(q.maDe)![1])
+  it('em khối 10 / 11: 1 200 lượt ngẫu nhiên ở cả ba loại lượt (kể cả câu "yếu"/"tới hạn ôn") KHÔNG BAO GIỜ có câu tờ khối cao hơn', () => {
+    const r = mulberry32(2110)
+    for (let i = 0; i < 1200; i++) {
+      const khoiEm = (i % 2 === 0 ? 11 : 10) as 10 | 11
+      const { evidence, attempts, mastery } = trangThai(r)
+      const ra = chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, opt(LUOT[i % 3]!, { khoiEm, cap: 1 + Math.floor(r() * 60) }))
+      expect(ra.length, `#${i} lượt rỗng khi kho còn câu`).toBeGreaterThan(0)
+      for (const x of ra) expect(khoiCau(x.q), `#${i} em khối ${khoiEm} nhận ${x.q.qid} (${x.role})`).toBeLessThanOrEqual(khoiEm)
+    }
+  })
+  it('em khối 12, khoiEm bỏ trống hoặc null ⇒ KHÔNG lọc: kết quả Y HỆT nhau và Y HỆT trước khi có luật khối (tương thích ngược)', () => {
+    const r = mulberry32(2111)
+    for (let i = 0; i < 300; i++) {
+      const { evidence, attempts, mastery } = trangThai(r)
+      const goc = opt(LUOT[i % 3]!, { cap: 1 + Math.floor(r() * 60) })
+      const a = chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, goc).map((x) => x.q.qid)
+      expect(chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, { ...goc, khoiEm: null }).map((x) => x.q.qid)).toEqual(a)
+      expect(chooseLuotMoi(KHO_KHOI, evidence, attempts, mastery, { ...goc, khoiEm: 12 }).map((x) => x.q.qid)).toEqual(a)
+    }
+  })
+  it('kho CHỈ còn câu khối 12 mà em khối 11 ⇒ trả RỖNG (thà không có lượt còn hơn câu khối cao); em khối 12 cùng kho vẫn đủ 6 câu', () => {
+    const chiKhoi12 = KHO_KHOI.filter((q) => khoiCau(q) === 12)
+    for (const loai of LUOT) {
+      expect(chooseLuotMoi(chiKhoi12, [], [], [], opt(loai, { khoiEm: 11 })), loai).toEqual([])
+      expect(chooseLuotMoi(chiKhoi12, [], [], [], opt(loai, { khoiEm: 12 })).length, loai).toBeGreaterThanOrEqual(1)
+    }
+  })
+})

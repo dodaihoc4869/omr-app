@@ -1,4 +1,5 @@
 import { normalizeNumericAnswer } from '../../engine/score'
+import { cauHopKhoi, type Khoi } from '../../lib/khoi-cau'
 
 export const PETS = [
   { id:'dat_quy', name:'Thạch Quy', element:'Đất', shape:'quy', color:'rgb(180,130,62)', accent:'rgb(86,180,136)', skill:'Chia bài thành từng bước' },
@@ -131,7 +132,7 @@ export const tranCauDaiTheoCap=(cap:number)=>cap>=30?3:cap>=10?2:1
 const GIO_VN=7*3600000
 const ngayVnChi=(ms:number)=>Math.floor((ms+GIO_VN)/DAY)
 const ngayVnChuoi=(ms:number)=>new Date(ms+GIO_VN).toISOString().slice(0,10)
-export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number }
+export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): khối của em — câu của tờ khối CAO hơn KHÔNG BAO GIỜ vào lượt, dù trùng mã dạng. Bỏ trống / không rõ ⇒ không lọc (máy chủ vẫn lọc kho ở `readScope`; đây là lớp bảo hiểm thứ hai, ở chính hàm chọn). */ khoiEm?:Khoi|null; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number }
 export interface CauLuot { q:PrivateQuestion; role:QuestionRoleV2; dai:boolean; moi:boolean }
 interface ThongKeNhom { gap:number; sai:number; lucSaiCuoi:number; lucDungCuoi:number; lucCuoi:number }
 export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempts:Attempt[],mastery:Mastery[],opt:OptLuot):CauLuot[] {
@@ -154,7 +155,7 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
   const level=(q:Question)=>q.mucDo===null?-1:LEVELS.indexOf(q.mucDo)
   const dai=(q:Question)=>q.phan!=='I'
   const rank=(q:Question)=>{let h=2166136261;for(const c of q.group)h=Math.imul(h^c.charCodeAt(0),16777619);return (h^(Math.floor(now/3600000)+attempts.length)*2654435761)>>>0}
-  const kho=pool.filter(q=>q.reviewed&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(q.phan==='I'||q.phan==='II'||q.phan==='III'))
+  const kho=pool.filter(q=>q.reviewed&&!blocked.has(q.qid)&&!blocked.has(q.group)&&cauHopKhoi(opt.khoiEm,q)&&(q.phan==='I'||q.phan==='II'||q.phan==='III'))
   const nhanCoYeu=kho.some(q=>weak.has(key(q))&&level(q)<=target(q.dang)&&!saiHomNay(q)),nhanCoTH=kho.some(q=>due.has(key(q))&&level(q)<=target(q.dang)&&!saiHomNay(q))
   const tranDai=opt.loai==='trum'?N:Math.min(opt.thuong?2:1,tranCauDaiTheoCap(opt.cap))
   const tranDaiToiDa=opt.loai==='trum'?N:tranCauDaiTheoCap(opt.cap)
