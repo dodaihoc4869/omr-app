@@ -212,7 +212,7 @@ describe('BangTinSan — nến trong khung', () => {
   beforeEach(() => { vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} }) })
   afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
-  it('có nến ⇒ hiện khối nến; thiếu nến (null hoặc rỗng) ⇒ ẨN cả hàng chính, các khối khác vẫn hiện', () => {
+  it('có nến ⇒ hiện khối nến; thiếu nến (null hoặc rỗng) ⇒ ẨN khối nến (bản đồ lớp vẫn hiện); thiếu cả nến lẫn lớp ⇒ ẨN cả hàng chính; các khối khác vẫn hiện', () => {
     const d = taoDuLieuGia(NAY)
     const { container } = render(<BangTinSan du={d} nayMs={NAY} />)
     expect(container.querySelector('[data-khoi="nen"]')).toBeTruthy()
@@ -220,8 +220,11 @@ describe('BangTinSan — nến trong khung', () => {
     for (const nen of [null, []] as const) {
       const c = render(<BangTinSan du={{ ...d, nen }} nayMs={NAY} />).container
       expect(c.querySelector('[data-khoi="nen"]')).toBeNull()
-      expect(c.querySelector('[data-khoi="hang-chinh"]')).toBeNull()
-      expect(c.querySelectorAll('.bts-o-so')).toHaveLength(4)
+      expect(c.querySelector('[data-khoi="ban-do-lop"]')).toBeTruthy()
+      cleanup()
+      const trong = render(<BangTinSan du={{ ...d, nen, theoLop: null }} nayMs={NAY} />).container
+      expect(trong.querySelector('[data-khoi="hang-chinh"]')).toBeNull()
+      expect(trong.querySelectorAll('.bts-o-so')).toHaveLength(4)
       cleanup()
     }
   })

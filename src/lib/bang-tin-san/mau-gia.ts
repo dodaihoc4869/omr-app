@@ -35,8 +35,8 @@ const LOP = [
   { ten: '12 - Nhóm 10 điểm', siSo: 27, hoc: 4, cau: 131, dung: 123 },
   { ten: 'Chưa xếp lớp', siSo: 12, hoc: 1, cau: 23, dung: 18 },
 ]
+// TÊN GIẢ RÕ RÀNG: đệm luôn là "Mẫu" (Nguyễn Mẫu An…) ⇒ không bao giờ trùng tên học sinh thật (Boss 21/09: ảnh/tài liệu không được lộ em thật).
 const HO = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Vũ', 'Đặng', 'Bùi', 'Hồ', 'Ngô', 'Dương', 'Lý', 'Phan', 'Trịnh', 'Mai']
-const DEM = ['Khánh', 'Ngọc', 'Tuệ', 'Hải', 'Quốc', 'Nhật', 'Thanh', 'Bảo', 'Phương', 'Đức', 'Hoài', 'Tường', 'Anh', 'Minh', 'Thu', 'Kim']
 const TEN = ['An', 'Lâm', 'Nhi', 'Khôi', 'Vân', 'Đăng', 'Trúc', 'Phúc', 'Quỳnh', 'Sơn', 'Chi', 'Nam', 'Uyên', 'Tùng', 'Hà', 'Long', 'My', 'Kiên', 'Thư', 'Duy']
 
 export function taoDuLieuGia(nowMs: number, hatGiong = 20260921): DuLieuSan {
@@ -60,10 +60,9 @@ export function taoDuLieuGia(nowMs: number, hatGiong = 20260921): DuLieuSan {
       let hoTen = ''
       do {
         const ho = chon(HO)
-        const dem = chon(DEM)
         const ten = chon(TEN)
-        khoa = ho + dem + ten
-        hoTen = `${ho} ${dem} ${ten}`
+        khoa = ho + ten
+        hoTen = `${ho} Mẫu ${ten}`
       } while (daCo.has(khoa))
       daCo.add(khoa)
       nhiet.push({ sbd: `S${String(nhiet.length + 1).padStart(4, '0')}`, hoTen, lop: lop.ten, soCau: 0, soCauDung: 0, dangVap: false })
@@ -146,7 +145,7 @@ export function taoDuLieuGia(nowMs: number, hatGiong = 20260921): DuLieuSan {
   const tileTia = th.map((x, k) => x + (dich * k) / 59)
   const dungNhip = { soEm: 59, soCoLo: 59 }
 
-  const tenEm = (e: EmNhiet): string => `${e.hoTen.split(' ').slice(-2).join(' ')}`
+  const tenEm = (e: EmNhiet): string => e.hoTen
   const dangHoc = nhiet.filter((e) => e.soCau > 0)
   const tin: TinSan[] = [
     { luc: nowMs - 9 * PHUT, loai: 'len', chu: tenEm(dangHoc[0]!), phu: `· ${dangHoc[0]!.lop} · đúng 5 câu liền` },

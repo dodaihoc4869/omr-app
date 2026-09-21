@@ -3,6 +3,7 @@
 import { useMemo, useRef } from 'react'
 import type { DuLieuSan } from '../../lib/bang-tin-san/kieu'
 import { chenhLech, chotSo } from '../../lib/bang-tin-san/trang-thai'
+import { BanDo3D } from './BanDo3D'
 import { BangChay } from './BangChay'
 import { NenHoc } from './NenHoc'
 import { OSo } from './OSo'
@@ -85,9 +86,10 @@ export default function BangTinSan({ du, nayMs }: BangTinSanProps) {
           />
         )}
       </section>
-      {(du.nen?.length ?? 0) > 0 && (
+      {((du.nen?.length ?? 0) > 0 || (du.theoLop?.length ?? 0) > 0) && (
         <section className="bts-hang-chinh" data-khoi="hang-chinh">
-          <NenHoc nen={du.nen!} nowMs={now} mau={mau} phienBanMau={phienBan} itDong={itDong} />
+          {(du.nen?.length ?? 0) > 0 && <NenHoc nen={du.nen!} nowMs={now} mau={mau} phienBanMau={phienBan} itDong={itDong} />}
+          {(du.theoLop?.length ?? 0) > 0 && <BanDo3D lop={du.theoLop!} mau={mau} phienBanMau={phienBan} itDong={itDong} />}
         </section>
       )}
     </main>

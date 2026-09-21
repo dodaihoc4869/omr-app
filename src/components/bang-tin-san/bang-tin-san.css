@@ -512,3 +512,76 @@
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   }
 }
+
+/* ============ 5. BẢN ĐỒ LỚP 3D ============ */
+.bts-the-3d {
+  height: 360px;
+}
+.bts-hop-3d {
+  overflow: hidden;
+  border-radius: 12px;
+  cursor: default;
+}
+.bts-nhan3d {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 7px 3px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 9px;
+  background: var(--bts-nhan-nen);
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  will-change: transform;
+}
+.bts-nhan3d::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1px;
+  height: var(--bts-day, 0px);
+  background: var(--bts-chu-mo);
+}
+.bts-nhan3d b {
+  display: block;
+  font-size: 12px;
+  font-weight: 650;
+}
+.bts-nhan3d span {
+  display: block;
+  color: var(--bts-chu-phu);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.25;
+}
+.bts-goi-y {
+  position: absolute;
+  z-index: 9;
+  padding: 6px 9px;
+  border-radius: 9px;
+  background: var(--bts-chu);
+  color: var(--bts-mat);
+  font-size: 12px;
+  line-height: 1.35;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 10px));
+}
+.bts-goi-y b {
+  font-weight: 650;
+}
+.bts-thang {
+  display: inline-block;
+  width: 64px;
+  height: 7px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--bts-do), var(--bts-vang), var(--bts-la));
+}
+@container bts (min-width: 720px) {
+  .bts-the-3d {
+    height: 380px;
+  }
+}

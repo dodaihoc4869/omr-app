@@ -29,16 +29,17 @@ const lopTsx = (src: string, tienTo: RegExp): string[] => {
   return [...ra]
 }
 
+const tepTrong = (d: string, duoi: string): string[] => fs.readdirSync(path.join(goc, d)).filter((f) => f.endsWith(duoi)).map((f) => `${d}/${f}`)
 const CA = [
   { ten: 'Thi đua hôm nay', tsx: ['src/components/bang-nhiem-vu/OThiDua.tsx'], css: ['src/components/bang-nhiem-vu/bang-nhiem-vu.css'], tienTo: /^bnv-td/ },
   { ten: 'Lời nhắc Cho ăn', tsx: ['src/components/bang-nhiem-vu/TheChoAn.tsx'], css: ['src/components/bang-nhiem-vu/bang-nhiem-vu.css'], tienTo: /^bnv-cho-an/ },
   { ten: 'Thẻ Giao thêm bài cho con', tsx: ['src/components/bang-nhiem-vu/GiaoThemChoCon.tsx'], css: ['src/components/bang-nhiem-vu/bang-nhiem-vu.css'], tienTo: /^bnv-giao-them/ },
   { ten: 'Đường về đích', tsx: ['src/components/bang-nhiem-vu/TheVeDich.tsx'], css: ['src/components/bang-nhiem-vu/ve-dich.css'], tienTo: /^vd(-|$)/ },
   { ten: 'Thanh hấp thụ của Đảo', tsx: ['src/game/than-thu-v2/dao/DaoCuaEm.tsx'], css: ['src/game/than-thu-v2/dao/dao.css'], tienTo: /^dao-hap-thu/ },
-  { ten: 'App phụ huynh mới (bảng "Mọi thứ về con")', tsx: ['src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx'], css: ['src/components/ph-moi/ph-moi.css', 'src/components/ph-moi/ph-moi-them.css'], tienTo: /^phm(-|$)/ },
+  { ten: 'App phụ huynh mới (bảng "Mọi thứ về con" kiểu Apple)', tsx: tepTrong('src/components/ph-moi/bang', '.tsx'), css: ['src/components/ph-moi/ph-apple-bang.css', 'src/components/ph-moi/ph-apple.css', ...tepTrong('src/components/ph-moi/bang', '.css')], tienTo: /^phm(-|$)/ },
   { ten: 'App phụ huynh mới (màn chính kiểu Apple)', tsx: ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/ThanhDayAp.tsx', 'src/components/ph-moi/BieuTuongAp.tsx'], css: ['src/components/ph-moi/ph-apple.css'], tienTo: /^phm-ap(-|$)/ },
-  { ten: 'Bảng tin kiểu sàn giao dịch (thầy)', tsx: ['src/components/bang-tin-san/BangTinSan.tsx', 'src/components/bang-tin-san/ThanhTren.tsx', 'src/components/bang-tin-san/BangChay.tsx', 'src/components/bang-tin-san/OSo.tsx', 'src/components/bang-tin-san/SoLan.tsx', 'src/components/bang-tin-san/NenHoc.tsx'], css: ['src/components/bang-tin-san/bang-tin-san.css'], tienTo: /^bts-/ },
-] as const
+  { ten: 'Bảng tin kiểu sàn giao dịch (thầy)', tsx: ['src/components/bang-tin-san/BangTinSan.tsx', 'src/components/bang-tin-san/ThanhTren.tsx', 'src/components/bang-tin-san/BangChay.tsx', 'src/components/bang-tin-san/OSo.tsx', 'src/components/bang-tin-san/SoLan.tsx', 'src/components/bang-tin-san/NenHoc.tsx', 'src/components/bang-tin-san/BanDo3D.tsx'], css: ['src/components/bang-tin-san/bang-tin-san.css'], tienTo: /^bts-/ },
+]
 
 describe('không va chạm tên lớp CSS', () => {
   for (const c of CA)
@@ -51,7 +52,7 @@ describe('không va chạm tên lớp CSS', () => {
       // Lớp chỉ làm móc chọn (data-…/test) không có CSS: cho phép tối đa 4.
       expect(moCoi.length, `${c.ten}: lớp không có định nghĩa: ${moCoi.join(', ')}`).toBeLessThanOrEqual(4)
       for (const [p, d] of DINH_NGHIA) {
-        if ((c.css as readonly string[]).includes(p)) continue
+        if (c.css.includes(p)) continue
         for (const t of lop) expect(d.has(t), `${p} có bộ chọn .${t} (của ${c.ten})`).toBe(false)
       }
     })
