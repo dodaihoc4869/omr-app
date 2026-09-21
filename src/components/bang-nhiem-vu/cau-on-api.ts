@@ -49,6 +49,8 @@ export interface TienBoOn {
 export interface PhanHoiNopOn {
   ok: boolean
   error?: string
+  /** Máy chủ BẬN / không nối được (hết giờ, rớt mạng, lỗi 5xx): bài còn ở máy, có thể xếp hàng nộp lại (máy chủ idempotent). Vắng ⇒ bị từ chối thật. */
+  ban?: boolean
   ketQua?: KetQuaCauOn[]
   khongCo?: string[]
   /** Câu nhận được nhưng CHƯA TRẢ LỜI: không ghi sổ, không khoá, không đáp án — em làm nốt. */
@@ -118,10 +120,10 @@ export async function nopOnLai(token: string, traLoi: MucTraLoi[], duong = '/hs/
   if (!token) return { ok: false, error: 'Chưa đăng nhập nên chưa nộp được.' }
   // `duong` mặc định là ôn câu thường; "Thử thách riêng hôm nay" nộp qua `/hs/thu-thach-hom-nay/nop` (trả y hệt, máy chủ ghi nguồn `thu_thach_rieng`).
   const r = await goiChiTiet(duong, { token, traLoi: traLoi.slice(0, TOI_DA_CAU_ON) }, 20)
-  if (!r) return { ok: false, error: 'Chưa gửi được lên máy chủ. Bài làm của em vẫn được giữ, em bấm nộp lại khi có mạng.' }
+  if (!r) return { ok: false, ban: true, error: 'Chưa gửi được lên máy chủ. Bài làm của em vẫn được giữ, em bấm nộp lại khi có mạng.' }
   const d = r.du
-  if (!d || typeof d !== 'object') return { ok: false, error: 'Máy chủ trả lời không đọc được. Em thử nộp lại.' }
-  if (d.ok !== true) return { ok: false, error: typeof d.error === 'string' && d.error.trim() ? d.error : 'Máy chủ chưa nhận bài. Em thử nộp lại.' }
+  if (!d || typeof d !== 'object') return { ok: false, ...(r.trangThai >= 500 ? { ban: true } : {}), error: 'Máy chủ trả lời không đọc được. Em thử nộp lại.' }
+  if (d.ok !== true) return { ok: false, ...(r.trangThai >= 500 ? { ban: true } : {}), error: typeof d.error === 'string' && d.error.trim() ? d.error : 'Máy chủ chưa nhận bài. Em thử nộp lại.' }
   return {
     ok: true,
     ketQua: Array.isArray(d.ketQua) ? d.ketQua : [],

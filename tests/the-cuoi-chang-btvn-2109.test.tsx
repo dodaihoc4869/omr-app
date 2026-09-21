@@ -129,7 +129,7 @@ describe('KhungXemPhieu: tin "nộp chặng" từ phiếu', () => {
     await vi.waitFor(() => expect(traLoi).toHaveBeenCalled())
     expect(nop).toHaveBeenCalledTimes(1)
     expect(nop.mock.calls[0][0]).toEqual({ ma: 'B1', sbd: '12121212', chiSo: 2, dapAn: { q1: 'B', q2: 'DSDS' } })
-    expect(traLoi.mock.calls[0][0]).toEqual({ type: 'ddh-btvn-nop-chang-ket', ok: true, error: undefined, ban: false })
+    expect(traLoi.mock.calls[0][0]).toEqual({ type: 'ddh-btvn-nop-chang-ket', ok: true, error: undefined, ban: false, daLuu: false })
   })
 
   it('tin từ trang KHÁC (không phải iframe của khung) bị bỏ: không nộp, không trả lời', async () => {
@@ -148,7 +148,15 @@ describe('KhungXemPhieu: tin "nộp chặng" từ phiếu', () => {
     const { khung, traLoi } = mo(async () => ({ ok: false, error: 'Chặng này chưa mở.' }))
     gui(TIN, khung.contentWindow)
     await vi.waitFor(() => expect(traLoi).toHaveBeenCalled())
-    expect(traLoi.mock.calls[0][0]).toEqual({ type: 'ddh-btvn-nop-chang-ket', ok: false, error: 'Chặng này chưa mở.', ban: false })
+    expect(traLoi.mock.calls[0][0]).toEqual({ type: 'ddh-btvn-nop-chang-ket', ok: false, error: 'Chặng này chưa mở.', ban: false, daLuu: false })
+  })
+
+  it('nopChang báo daLuu (hàng đợi nộp lại tự động đã nhận bài) ⇒ phiếu nhận ban + daLuu để hiện "Đã lưu ở máy" thay vì đếm ngược', async () => {
+    const chu = 'Đã lưu ở máy, đang chờ máy chủ. Em không cần bấm nộp lại — app tự gửi khi máy chủ rảnh.'
+    const { khung, traLoi } = mo(async () => ({ ok: false, ban: true, daLuu: true, error: chu }))
+    gui(TIN, khung.contentWindow)
+    await vi.waitFor(() => expect(traLoi).toHaveBeenCalled())
+    expect(traLoi.mock.calls[0][0]).toEqual({ type: 'ddh-btvn-nop-chang-ket', ok: false, error: chu, ban: true, daLuu: true })
   })
 
   it('nopChang NÉM lỗi ⇒ phiếu vẫn nhận lời báo (không treo nút "Đang nộp…")', async () => {

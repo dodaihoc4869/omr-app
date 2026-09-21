@@ -18,6 +18,7 @@ import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, PawPrint, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
+import { chuDangCho } from '../../lib/hang-doi-nop'
 import { boGameChoPhuHuynh, sachBoNaoChoPhuHuynh, type DuLieuBangNhiemVu, type HanhDongNhiemVu, type TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
@@ -106,6 +107,8 @@ export interface BangNhiemVuProps {
   ghiChuNguon?: string
   /** Máy chủ đang làm mới (reset): vẽ một dải thông báo nhẹ; phần còn lại của màn giữ nguyên. */
   dangLamMoi?: boolean
+  /** Số bài đã lưu ở máy đang chờ máy chủ nhận (hàng đợi nộp lại tự động). 0/vắng ⇒ không hiện dải. */
+  dangChoNop?: number
   onHanhDong?: (hanhDong: HanhDongNhiemVu) => void
   onMoThanThu?: () => void
   /** Mở game ở màn Đoàn Hộ Tống. Thẻ mời chỉ hiện khi CÓ hàm này, là học sinh, và máy chủ báo `duLieu.doanMo === true`. */
@@ -144,6 +147,7 @@ export default function BangNhiemVu({
   caDangMo = false,
   ghiChuNguon,
   dangLamMoi,
+  dangChoNop = 0,
   onHanhDong,
   onMoThanThu,
   onLenDuongDoan,
@@ -267,6 +271,16 @@ export default function BangNhiemVu({
           mucMenu={mucMenu}
           khePhai={khePhai}
         />
+
+        {dangChoNop > 0 && (
+          <div className="bnv-dang-lam-moi" role="status" data-vung="dang-cho-nop">
+            <RefreshCw size={22} aria-hidden="true" />
+            <div className="bnv-dang-lam-moi-chu">
+              <p className="bnv-dang-lam-moi-ten">{chuDangCho(dangChoNop)}</p>
+              <p className="bnv-dang-lam-moi-phu">{laPh ? 'Con' : 'Em'} cứ để app mở, app tự gửi khi máy chủ rảnh.</p>
+            </div>
+          </div>
+        )}
 
         {!dangTai && dangLamMoi && (
           <div className="bnv-dang-lam-moi" role="status" data-vung="dang-lam-moi">

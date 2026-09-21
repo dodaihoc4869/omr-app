@@ -47,7 +47,7 @@ export interface KhungXemPhieuProps {
   dong: () => void
   /** Bài BTVN "nâng đỡ": phiếu trong iframe KHÔNG có đáp án nên gửi ĐÁP ÁN MỘT CHẶNG ra đây; nơi gọi nộp lên máy chủ,
    * dựng lại phiếu (đổi `html`) khi thành công. Trả `ok:false` + lời báo thì phiếu hiện lời báo và cho nộp lại. */
-  nopChang?: (tin: TinNopChang) => Promise<{ ok: boolean; error?: string }>
+  nopChang?: (tin: TinNopChang) => Promise<{ ok: boolean; error?: string; ban?: boolean; daLuu?: boolean }>
   /** Nội dung PHỦ LÊN phiếu (vd thẻ cuối chặng), nằm trong cùng lớp phủ nên luôn ở trên phiếu và đóng cùng phiếu. */
   phu?: ReactNode
 }
@@ -154,9 +154,9 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
         // NỘP CHẶNG BÀI "NÂNG ĐỠ". CHỈ nhận từ chính iframe của khung này (không tin trang lạ), và luôn trả lời — phiếu
         // đang chờ ở trạng thái "Đang nộp…", không trả lời là nút treo mãi.
         if (e.source !== iframeRef.current?.contentWindow) return
-        const traLoi = (kq: { ok: boolean; error?: string; ban?: boolean }) => {
+        const traLoi = (kq: { ok: boolean; error?: string; ban?: boolean; daLuu?: boolean }) => {
           try {
-            iframeRef.current?.contentWindow?.postMessage({ type: 'ddh-btvn-nop-chang-ket', ok: kq.ok, error: kq.error, ban: kq.ban === true }, '*')
+            iframeRef.current?.contentWindow?.postMessage({ type: 'ddh-btvn-nop-chang-ket', ok: kq.ok, error: kq.error, ban: kq.ban === true, daLuu: kq.daLuu === true }, '*')
           } catch {
             /* phiếu đã đóng thì thôi */
           }

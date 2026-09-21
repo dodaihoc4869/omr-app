@@ -569,6 +569,7 @@ body.co-lam .tf-item { padding: 9px 10px; }
 .nut.nop[disabled] { opacity: .5; cursor: default; }
 .nop-ket { font-weight: 700; font-size: 14px; color: var(--muc); }
 .nop-loi { font-size: 12.5px; color: #b42318; }
+.nop-loi.luu { color: #475467; }
 
 /* ================= THANH ĐIỀU KHIỂN ================= */
 .thanh {
@@ -2311,6 +2312,11 @@ export const JS_PHIEU = `
         if (nutNop) { nutNop.disabled = false; nutNop.textContent = 'Nộp chặng'; }
         if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = chu; }
       }
+      /** ĐÃ LƯU Ở MÁY (máy chủ bận, app giữ bài và TỰ nộp lại khi máy chủ rảnh): nút khoá, lời báo trung tính (không đỏ), em không phải bấm lại. */
+      function daLuuMay(nut, oLoi) {
+        if (nut) { nut.disabled = true; nut.textContent = 'Đã lưu ở máy · đang chờ máy chủ'; }
+        if (oLoi) oLoi.classList.add('luu');
+      }
       function khoaNutTam(nut, giay) {
         if (!nut) return;
         var chuGoc = nut.textContent;
@@ -2403,7 +2409,8 @@ export const JS_PHIEU = `
           var laTs = dangNopTs;
           if (laTs) loiNopThuSuc(chuLoi); else loiNopChang(chuLoi);
           // MÁY CHỦ BẬN (hết giờ / không nối được): bài vẫn ở máy; KHOÁ nút nộp 15 giây, đếm ngược trên nút — chống bấm dồn lúc máy chủ nghẽn (sự cố D1 21/09).
-          if (d.ban === true) khoaNutTam(laTs ? nutNopTs : nutNop, 15);
+          if (d.daLuu === true) daLuuMay(laTs ? nutNopTs : nutNop, laTs ? oLoiTs : oLoiNop);
+          else if (d.ban === true) khoaNutTam(laTs ? nutNopTs : nutNop, 15);
         }
       });
 
@@ -2607,6 +2614,7 @@ html.gd-m3 body #thanh-nop .gd-con { flex: 1; min-width: 0; font-size: 14px; fon
 html.gd-m3 body #thanh-nop .gd-con.ket { color: var(--gm-tertiary); }
 html.gd-m3 body #thanh-nop .nop-ket { font-size: 13px; font-weight: 700; color: var(--gm-on-surface-v); }
 html.gd-m3 body #thanh-nop .nop-loi { display: block; font-size: 12px; color: var(--gm-error); }
+html.gd-m3 body #thanh-nop .nop-loi.luu { color: var(--gm-on-surface-v); }
 html.gd-m3 body #thanh-nop .nut.nop {
   flex-shrink: 0; min-height: 52px; height: 52px; padding: 0 24px; border: 0; border-radius: 26px;
   background: var(--gm-primary); color: var(--gm-on-primary); font-size: 15px; font-weight: 700;

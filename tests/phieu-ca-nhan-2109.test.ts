@@ -366,6 +366,33 @@ describe('chạy trong trình duyệt giả: khoá thẻ đã chấm, nộp ch�
     expect(nopChang()).toHaveLength(2)
   })
 
+  it('ĐÃ LƯU Ở MÁY (host báo daLuu:true — hàng đợi nộp lại tự động đã nhận bài): lời trung tính (không đỏ), nút KHOÁ "Đã lưu ở máy · đang chờ máy chủ", KHÔNG đếm ngược, KHÔNG gửi lần hai dù bấm', async () => {
+    moPhieu(phieu(cauHon, { daCham }))
+    chonI('q4', 3)
+    $('#nut-nop').click()
+    $('#nut-nop').click()
+    await cho()
+    expect(nopChang()).toHaveLength(1)
+    vi.useFakeTimers()
+    try {
+      const chu = 'Đã lưu ở máy, đang chờ máy chủ. Em không cần bấm nộp lại — app tự gửi khi máy chủ rảnh.'
+      const ev = new MessageEvent('message', { data: { type: 'ddh-btvn-nop-chang-ket', ok: false, error: chu, ban: true, daLuu: true } })
+      Object.defineProperty(ev, 'source', { value: cha })
+      window.dispatchEvent(ev)
+      expect($('#nop-loi').textContent).toBe(chu)
+      expect($('#nop-loi').classList.contains('luu')).toBe(true) // lời trung tính, không phải lỗi đỏ
+      expect(($('#nut-nop') as HTMLButtonElement).disabled).toBe(true)
+      expect($('#nut-nop').textContent).toBe('Đã lưu ở máy · đang chờ máy chủ')
+      vi.advanceTimersByTime(600_000) // KHÔNG tự mở khoá (không đếm ngược 15 giây): hàng đợi lo việc nộp
+      expect(($('#nut-nop') as HTMLButtonElement).disabled).toBe(true)
+      $('#nut-nop').click()
+      expect(nopChang()).toHaveLength(1)
+      expect($('.q-card[data-qid="q4"] .q-opt.lam-o[aria-checked="true"]').getAttribute('data-chon')).toBe('D') // bài vẫn ở máy
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('lỗi KHÁC (máy chủ từ chối, không phải bận) KHÔNG khoá nút: mở lại ngay như cũ', async () => {
     moPhieu(phieu(cauHon, { daCham }))
     chonI('q4', 3)

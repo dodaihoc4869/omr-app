@@ -88,6 +88,15 @@ describe('nộp chặng hỏng — không nuốt lỗi, không lưu nhầm', () 
     expect(docKetQuaChangDaLuu('B1', '12121212', 0).ketQua).toEqual([])
   })
 
+  it('lỗi CHUNG của Worker khi D1 quá tải (không có lyDo nghiệp vụ) cũng là "bận" ⇒ cờ ban (được xếp hàng nộp lại); có lyDo nghiệp vụ thì KHÔNG', async () => {
+    for (const error of ['D1_ERROR: D1 DB is overloaded. Requests queued for too long.', 'Máy chủ đang quá tải, thử lại sau', 'Hết giờ chờ máy chủ']) {
+      const { d } = dep({ nopChang: vi.fn(async () => ({ ok: false, error, ketQua: [], chuaLam: [] })) as never })
+      expect(await nopChangCaNhan(TIN, 'R', d)).toEqual({ ok: false, error: LOI_MAY_CHU_BAN, ban: true })
+    }
+    const { d } = dep({ nopChang: vi.fn(async () => ({ ok: false, lyDo: 'qua_han', error: 'quá tải hạn nộp', ketQua: [], chuaLam: [] })) as never })
+    expect((await nopChangCaNhan(TIN, 'R', d)).ban).toBeUndefined()
+  })
+
   it('máy chủ TỪ CHỐI có lý do (quá hạn, chưa mở, lời lạ) ⇒ KHÔNG phải "bận": không cờ ban (nút không bị khoá)', async () => {
     for (const ket of [{ ok: false, lyDo: 'qua_han' }, { ok: false, lyDo: 'chang_chua_mo' }, { ok: false, error: 'Bài này đã bị thầy thu hồi.' }]) {
       const { d } = dep({ nopChang: vi.fn(async () => ({ ...ket, ketQua: [], chuaLam: [] })) as never })

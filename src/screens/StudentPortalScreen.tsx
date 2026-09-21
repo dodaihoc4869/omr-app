@@ -1,7 +1,7 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
 import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong, useThuThachHomNay } from '../components/bang-nhiem-vu/may-chu'
-import { DUONG_NOP_THU_THACH, type CauOn } from '../components/bang-nhiem-vu/cau-on-api'
+import { DUONG_NOP_THU_THACH, type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
 import { dangDeSau, docDeSau, luuDeSau, type ThuThachRieng } from '../lib/thu-thach-rieng'
 import { ngayVietNam } from '../lib/han-bai-tap'
 import { dungBangNhiemVu, soThuSucCua } from '../lib/nhiem-vu-adapter'
@@ -94,6 +94,8 @@ import ONhapDapSo from '../components/ONhapDapSo'
 import { batNhipBenVung } from '../lib/nhip-ben-vung'
 import { khoiCuaEm } from '../lib/khoi-cau'
 import { chonCauThuThach } from '../lib/thu-thach-chon-cau'
+import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, TOI_DA_LAN_THU, khoaChang } from '../lib/hang-doi-nop'
+import { useHangDoiNop } from '../lib/use-hang-doi-nop'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
 
@@ -257,6 +259,11 @@ export default function StudentPortalScreen() {
   const [theChang, setTheChang] = useState<TheChangView | null>(null)
   /** Mã ca của phiếu BTVN đang mở — cần để tải lại bài sau khi nộp chặng. */
   const maCaPhieuRef = useRef('')
+  /** Mã bài (maBtvn) của lần nộp chặng gần nhất từ phiếu đang mở — để hàng đợi nộp lại biết có nên vẽ lại đúng phiếu ấy khi nộp được. */
+  const maBtvnPhieuRef = useRef('')
+  const phieuMoRef = useRef(false)
+  /** Tăng 1 khi hàng đợi nộp lại vừa nộp xong một việc ôn câu ⇒ hỏi lại kế hoạch ngày (cộng với lần "vừa đóng màn con"). */
+  const [lamMoiHang, setLamMoiKeHoach] = useState(0)
   /** HTML đề + lời giải của em, dựng TẠI MÁY. Rỗng = không mở lớp phủ.
    *
    * Bản trước mở `/t/<mã ca>` trong khung. Cách ấy phụ thuộc việc máy chủ trả
@@ -628,6 +635,47 @@ export default function StudentPortalScreen() {
     }
   }, [auth])
 
+  // HÀNG ĐỢI NỘP LẠI TỰ ĐỘNG (Boss 21/09, sau sự cố D1): máy chủ bận lúc em nộp một chặng ⇒ bài giữ ở máy, app tự nộp lại có lùi dần (`hang-doi-nop.ts`); máy chủ idempotent
+  // (khoá đáp án đầu) nên nộp lại không nhân đôi. Nộp được: đang mở đúng phiếu ấy thì vẽ lại phiếu có kết quả, không thì nạp lại danh sách bài.
+  phieuMoRef.current = !!phieuHtml
+  const hangNop = useHangDoiNop(auth?.sbd, async (m) => {
+    if (m.lanThu >= TOI_DA_LAN_THU) {
+      if (m.loai === 'on_cau') window.dispatchEvent(new CustomEvent(SU_KIEN_HANG_DOI_XONG, { detail: { id: m.id, phanHoi: { ok: false, error: 'Chưa nộp được sau nhiều lần thử. Bài của em vẫn ở máy — em bấm nộp lại nhé.' } } }))
+      else void bao('Chưa nộp được chặng sau nhiều lần thử. Bài của em vẫn ở máy — em mở lại bài rồi bấm nộp nhé.', 'Chưa nộp được chặng')
+      return 'bo'
+    }
+    if (m.loai === 'on_cau') {
+      // Ôn câu / thử thách riêng: máy chủ khoá sổ (kênh, ngày, sbd, qid) đầu thắng ⇒ nộp lại an toàn. Nộp được: màn ôn đang mở nhận kết quả qua sự kiện; hỏi lại kế hoạch ngày.
+      const g = m.goi as { traLoi?: MucTraLoi[]; duong?: string }
+      if (!auth?.token || !Array.isArray(g.traLoi) || g.traLoi.length === 0) return 'bo'
+      const { nopOnLai } = await import('../components/bang-nhiem-vu/cau-on-api')
+      const r = await nopOnLai(auth.token, g.traLoi, g.duong)
+      if (r.ban) return 'ban'
+      window.dispatchEvent(new CustomEvent(SU_KIEN_HANG_DOI_XONG, { detail: { id: m.id, phanHoi: r } }))
+      if (!r.ok) return 'bo'
+      setLamMoiKeHoach((n) => n + 1)
+      return 'xong'
+    }
+    if (m.loai !== 'btvn_chang') return 'bo'
+    const g = m.goi as { ma?: string; chiSo?: number; dapAn?: Record<string, string>; maCa?: string }
+    if (!g.ma || typeof g.chiSo !== 'number' || !g.dapAn) return 'bo'
+    const [{ nopChangCaNhan }, { theChangView }] = await Promise.all([import('../lib/btvn-nop-chang-em'), import('../lib/btvn-ca-nhan-kieu')])
+    const kq = await nopChangCaNhan({ ma: g.ma, sbd: m.sbd, chiSo: g.chiSo, dapAn: g.dapAn }, g.maCa || 'Riêng')
+    if (kq.ban) return 'ban'
+    if (!kq.ok) {
+      void bao(kq.error || 'Chưa nộp được chặng.', 'Chưa nộp được chặng')
+      return 'bo'
+    }
+    if (kq.html && phieuMoRef.current && maBtvnPhieuRef.current === g.ma) {
+      setPhieuHtml(kq.html)
+      const the = kq.ket ? theChangView(kq.ket, kq.soChang) : null
+      if (the) setTheChang(the)
+    } else {
+      void napLaiBtvn()
+    }
+    return 'xong'
+  })
+
   const moBaiTap = async (bt: any, lamLai = false, tuyChonPhanTang?: { vong?: number; soCauSang?: number }) => {
     if (!auth) return
     const id = bt.maBtvn || bt.maCa
@@ -988,9 +1036,9 @@ export default function StudentPortalScreen() {
   const dangMoManCon =
     tab !== null || dangLamMom !== null || manThi || boVaoThi !== null || !!phieuHtml || !!xemDeHtml || caXemBaoCaoModal !== null || dsCauSaiKhacPhucModal !== null
   const lamMoiSheet = useLamMoiKhiDong(dangMoManCon)
-  const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet)
+  const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
   // "Thử thách riêng hôm nay" của Bộ não A.I (lệnh riêng, hợp đồng docs/hop-dong-thu-thach-rieng-2109.md): co:false/lỗi/404 ⇒ null ⇒ không thẻ. "Để sau" ẩn tới ngày mai.
-  const thuThachMayChu = useThuThachHomNay(auth?.token, lamMoiSheet)
+  const thuThachMayChu = useThuThachHomNay(auth?.token, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
   const thiDua = useThiDua(auth?.token, !!auth?.token && tab === null)
   const [deSauThuThach, setDeSauThuThach] = useState('')
@@ -1344,6 +1392,7 @@ export default function StudentPortalScreen() {
           onCanhBaoDaXem={(cb) => void baoDaXemHocSinh(auth.token!, cb.id)}
           dangTai={!sanSangBang && !dungBanNho}
           dangLamMoi={keHoachNgay.dangLamMoi}
+          dangChoNop={hangNop.soCho}
           mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
           khePhai={
             <ThongBaoHocSinh
@@ -2162,7 +2211,7 @@ export default function StudentPortalScreen() {
         {/* ÔN CÂU HÔM NAY (việc on_lai): lấy đề → làm → nộp → lời giải. Đóng sheet thì màn cổng hỏi lại kế hoạch ngày. */}
         {tab === 'cauon' && cauOn && auth && auth.token && (
           <Suspense fallback={<div className="m3-xuong" style={{ height: 160 }} />}>
-            <LamCauOn token={auth.token} sbd={auth.sbd} viecId={cauOn.viecId} qid={cauOn.qid} tieuDe={cauOn.tieuDe} cauSan={cauOn.cauSan} duongNop={cauOn.duongNop} onXong={() => setTab(null)} />
+            <LamCauOn token={auth.token} sbd={auth.sbd} viecId={cauOn.viecId} qid={cauOn.qid} tieuDe={cauOn.tieuDe} cauSan={cauOn.cauSan} duongNop={cauOn.duongNop} onXong={() => setTab(null)} xepHang={(m) => hangNop.them({ id: m.id, loai: 'on_cau', sbd: auth.sbd, goi: m.goi })} />
           </Suspense>
         )}
 
@@ -2322,8 +2371,16 @@ export default function StudentPortalScreen() {
             // Bài `ca_nhan`: phiếu KHÔNG có đáp án, gửi đáp án MỘT chặng ra đây. Thành công ⇒ dựng lại phiếu có kết quả
             // (đổi html), xong hẳn chặng thì bật thẻ tiến bộ. Hỏng ⇒ trả lời báo cho phiếu, bài làm vẫn còn ở máy.
             const [{ nopChangCaNhan }, { theChangView }] = await Promise.all([import('../lib/btvn-nop-chang-em'), import('../lib/btvn-ca-nhan-kieu')])
+            maBtvnPhieuRef.current = tin.ma
             const kq = await nopChangCaNhan(tin, maCaPhieuRef.current)
+            const idHang = khoaChang(tin.sbd || auth?.sbd || '', tin.ma, tin.chiSo)
+            if (kq.ban && auth) {
+              // Máy chủ bận: GIỮ bài ở máy và để hàng đợi tự nộp lại (không bắt em bấm lại). Phiếu hiện "Đã lưu ở máy, đang chờ máy chủ".
+              hangNop.them({ id: idHang, loai: 'btvn_chang', sbd: auth.sbd, goi: { ma: tin.ma, chiSo: tin.chiSo, dapAn: tin.dapAn, maCa: maCaPhieuRef.current } })
+              return { ok: false, ban: true, daLuu: true, error: CHU_DA_LUU_MAY }
+            }
             if (!kq.ok) return { ok: false, error: kq.error }
+            hangNop.go(idHang) // nộp được bằng đường bấm tay ⇒ gỡ mục cùng việc khỏi hàng đợi (nếu có)
             if (!kq.html) {
               // Đã nộp và đã lưu kết quả, chỉ không dựng lại được phiếu: đóng, nạp lại danh sách (mở lại bài là thấy).
               setPhieuHtml('')

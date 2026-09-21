@@ -40,6 +40,8 @@ const LOI_CHUNG = 'Chưa nộp được chặng. Bài của em vẫn được gi
 /** Máy chủ nghẽn (sự cố D1 21/09 ~20:30): hết giờ / không nối được ⇒ nói rõ bài còn ở máy và hẹn nộp lại sau 1 phút (nút khoá 15 giây để không dồn thêm lượt). */
 export const LOI_MAY_CHU_BAN = 'Máy chủ đang bận, bài của em vẫn ở máy. Bấm nộp lại sau 1 phút.'
 const laLoiKhongNoi = (e: string | undefined) => /Không nối được máy chủ/i.test(e ?? '')
+/** Máy chủ BẬN (không phải bị từ chối về nghiệp vụ): rớt mạng / hết giờ, HOẶC lỗi chung của Worker khi D1 quá tải (không có `lyDo` nghiệp vụ như chang_chua_mo, qua_han…). */
+const laMayChuBan = (k: { lyDo?: string; error?: string }) => laLoiKhongNoi(k.error) || (!k.lyDo && /D1|overload|quá tải|đang bận|hết giờ|timeout|tạm thời|thử lại sau/i.test(k.error ?? ''))
 
 /** Lời báo cho em từ phản hồi lỗi của máy chủ. */
 export function loiChoEm(ket: Pick<KetQuaChang, 'lyDo' | 'error'>): string {
@@ -58,7 +60,7 @@ export async function nopChangCaNhan(tin: TinNopChang, maCa: string, dep: PhuThu
   try {
     const ch = await dep.layCauHinh()
     const ket = await dep.nopChang(ch, { ...tin, maBtvn: tin.ma })
-    if (!ket.ok) return laLoiKhongNoi(ket.error) ? { ok: false, error: LOI_MAY_CHU_BAN, ban: true } : { ok: false, error: loiChoEm(ket) }
+    if (!ket.ok) return laMayChuBan(ket) ? { ok: false, error: LOI_MAY_CHU_BAN, ban: true } : { ok: false, error: loiChoEm(ket) }
     // Không câu nào được chấm (đáp án chưa hợp lệ: Phần II chưa đủ 4 ý, Phần III chưa có số…) ⇒ báo, không dựng lại.
     if (ket.ketQua.length === 0) return { ok: false, error: 'Chưa có câu nào được chấm. Em kiểm tra lại đáp án (Phần II cần đủ 4 ý, Phần III cần có số) rồi nộp lại nhé.', ket }
     // Tải lại bài TRƯỚC khi lưu: nếu thầy vừa "Cho làm lại" (soLanLam đổi) thì bỏ làm dở lượt cũ rồi mới lưu kết quả lượt MỚI —

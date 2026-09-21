@@ -11,7 +11,8 @@ import { LoiGiaiCauSai } from '../KhoiCauSai'
 import { HinhTaiViTri } from '../QuestionMedia'
 import ONhapDapSo from '../ONhapDapSo'
 import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
-import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
+import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type MucTraLoi, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
+import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang-doi-nop'
 
 const KY_TU = ['A', 'B', 'C', 'D', 'E', 'F']
 const NHAN_PHAN: Record<CauOn['phan'], string> = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng / Sai', III: 'Phần III · Trả lời ngắn' }
@@ -30,6 +31,8 @@ export interface LamCauOnProps {
   cauSan?: CauOn[]
   /** Đường nộp; vắng = `/hs/on-lai/nop`. "Thử thách riêng hôm nay" nộp qua `/hs/thu-thach-hom-nay/nop` (trả y hệt). */
   duongNop?: string
+  /** Máy chủ BẬN lúc nộp ⇒ đưa bài vào HÀNG ĐỢI NỘP LẠI TỰ ĐỘNG của cổng (`hang-doi-nop.ts`); vắng ⇒ như cũ (em bấm nộp lại). Kết quả về qua sự kiện `SU_KIEN_HANG_DOI_XONG`. */
+  xepHang?: (m: { id: string; goi: { traLoi: MucTraLoi[]; duong: string } }) => void
 }
 
 type Pha = 'tai' | 'loi' | 'lam'
@@ -57,7 +60,7 @@ export function daTraLoi(c: CauOn, dapAn: string | undefined): boolean {
 
 const chuanDS = (s: string) => s.replace(/[Đđ]/g, 'D').toUpperCase().replace(/[^DS]/g, '')
 
-export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauSan, duongNop }: LamCauOnProps) {
+export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauSan, duongNop, xepHang }: LamCauOnProps) {
   const [pha, setPha] = useState<Pha>('tai')
   const [loiTai, setLoiTai] = useState('')
   const [cau, setCau] = useState<CauOn[]>([])
@@ -70,6 +73,9 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
   const [expNhan, setExpNhan] = useState<{ exp: number; ghiChu: string }[]>([])
   const [manhNhan, setManhNhan] = useState<{ so: number; ghiChu: string }[]>([])
   const [dangNop, setDangNop] = useState(false)
+  /** Bài đã lưu ở máy, hàng đợi đang chờ máy chủ rảnh để nộp (em không cần bấm lại). */
+  const [choMayChu, setChoMayChu] = useState(false)
+  const idHang = useRef('')
   const [loiNop, setLoiNop] = useState('')
   const [daNopLan, setDaNopLan] = useState(0)
   const [lanTai, setLanTai] = useState(0)
@@ -142,9 +148,22 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
     const r: PhanHoiNopOn = await nopOnLai(token, gui, duongNop)
     setDangNop(false)
     if (!r.ok) {
+      if (r.ban && xepHang) {
+        // Máy chủ bận: GIỮ bài ở máy, hàng đợi tự nộp lại có lùi dần — em không phải bấm nộp lại (máy chủ idempotent nên không nhân đôi).
+        const duong = duongNop || '/hs/on-lai/nop'
+        idHang.current = khoaOnCau(sbd || '', duong, gui.map((g) => g.qid))
+        xepHang({ id: idHang.current, goi: { traLoi: gui, duong } })
+        setChoMayChu(true)
+        return
+      }
       setLoiNop(r.error || 'Chưa nộp được. Em thử lại.')
       return
     }
+    apDungNop(r)
+  }
+
+  /** Vẽ kết quả một lần nộp thành công (đường bấm tay HOẶC hàng đợi tự nộp lại xong). */
+  const apDungNop = (r: PhanHoiNopOn) => {
     setKetQua((truoc) => {
       const moi = { ...truoc }
       // Nộp lại giữ kết quả LẦN ĐẦU: câu đã có kết quả thì không ghi đè.
@@ -158,6 +177,22 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
     if (r.manhNhan && r.manhNhan.length > 0) setManhNhan((t) => [...t, ...r.manhNhan!])
     setDaNopLan((n) => n + 1)
   }
+  const apDungRef = useRef(apDungNop)
+  apDungRef.current = apDungNop
+
+  // Hàng đợi của cổng nộp xong (hoặc bị máy chủ từ chối hẳn) việc của MÀN NÀY ⇒ vẽ kết quả / hiện lỗi. Màn đã đóng thì cổng tự lo (nạp lại kế hoạch).
+  useEffect(() => {
+    const khiXong = (e: Event) => {
+      const d = (e as CustomEvent<{ id?: string; phanHoi?: PhanHoiNopOn }>).detail
+      if (!d || !d.phanHoi || d.id !== idHang.current) return
+      idHang.current = ''
+      setChoMayChu(false)
+      if (d.phanHoi.ok) apDungRef.current(d.phanHoi)
+      else setLoiNop(d.phanHoi.error || 'Chưa nộp được. Em thử lại.')
+    }
+    window.addEventListener(SU_KIEN_HANG_DOI_XONG, khiXong)
+    return () => window.removeEventListener(SU_KIEN_HANG_DOI_XONG, khiXong)
+  }, [])
 
   // Sau mỗi lần nộp thành công: kéo về đầu để thấy tổng kết (không cuộn mượt khi giảm chuyển động).
   useEffect(() => {
@@ -263,7 +298,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
               dapAn={traLoi[c.qid] || ''}
               ketQua={ketQua[c.qid]}
               chuaTraLoi={chuaLam.includes(c.qid) || (daNopLan > 0 && !ketQua[c.qid] && !daTraLoi(c, traLoi[c.qid]))}
-              khoa={dangNop}
+              khoa={dangNop || choMayChu}
               onChon={(g) => chon(c.qid, g)}
               onChonY={(y, v) => chonY(c.qid, y, v)}
             />
@@ -282,6 +317,11 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
           {loiNop && (
             <p className="lco-loi-nop" role="alert">
               {loiNop}
+            </p>
+          )}
+          {choMayChu && (
+            <p className="lco-cho-may-chu" role="status">
+              {CHU_DA_LUU_MAY}
             </p>
           )}
           <div className="lco-day-hang">
@@ -304,8 +344,8 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
             ) : (
               <>
                 <p className="lco-day-chu">{soChuaTraLoi > 0 ? `Còn ${soChuaTraLoi} câu chưa trả lời` : 'Em đã trả lời hết các câu'}</p>
-                <button type="button" className="m3-nut-chinh" disabled={soDaTraLoi === 0 || dangNop} onClick={() => void nop()}>
-                  {dangNop ? 'Đang nộp…' : soDaTraLoi === 0 || soDaTraLoi === dsChuaCham.length ? 'Nộp bài' : `Nộp ${soDaTraLoi} câu đã làm`}
+                <button type="button" className="m3-nut-chinh" disabled={soDaTraLoi === 0 || dangNop || choMayChu} onClick={() => void nop()}>
+                  {dangNop ? 'Đang nộp…' : choMayChu ? 'Đã lưu ở máy · đang chờ máy chủ' : soDaTraLoi === 0 || soDaTraLoi === dsChuaCham.length ? 'Nộp bài' : `Nộp ${soDaTraLoi} câu đã làm`}
                 </button>
               </>
             )}

@@ -143,6 +143,10 @@
   max-width: 640px; margin: 0 auto var(--k2, 8px); padding: 8px var(--k3, 12px); border-radius: var(--m3-bo-12);
   background: var(--m3-error-container); color: var(--m3-on-error-container); font-size: var(--bnv-cx-1); line-height: 1.4;
 }
+.lco-cho-may-chu {
+  max-width: 640px; margin: 0 auto var(--k2, 8px); padding: 8px var(--k3, 12px); border-radius: var(--m3-bo-12);
+  background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); font-size: var(--bnv-cx-1); line-height: 1.4;
+}
 .lco-day .m3-nut-chinh { min-width: 132px; }
 
 @media (prefers-reduced-motion: reduce) {
