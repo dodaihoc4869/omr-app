@@ -1,0 +1,1012 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark"><title>App phụ huynh · bảng “Mọi thứ về con” kiểu Apple, đầy đủ (bản vẽ)</title>
+<!-- iPhone / Mac: San Francisco có sẵn. Máy khác (Android, Windows): nạp Inter (giấy phép OFL). Bản thật nên tự chứa Inter qua @fontsource/inter. -->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>/* HỆ THIẾT KẾ TOÀN APP — nguồn sự thật DUY NHẤT cho màu/cỡ chữ/khoảng cách.
+ * Bước 1 trong HETHIETKETOANAPP.md; nền tối theo MANCUAVAOVANENTOI.md mục 1:
+ * cùng TÊN biến, giá trị đổi theo prefers-color-scheme của hệ thống. Ngoài
+ * file này KHÔNG được có mã màu "#" nào khác (kiểm bằng scripts trong
+ * package.json: "check:mau"). */
+:root {
+  /* nền và bề mặt */
+  --nen: #f5f4ef;
+  --the: #fffefb;
+  --the-2: #eeeee8; /* nền chìm: hàng phương án, ô nhập */
+  --the-mo: rgba(255, 255, 255, 0.85); /* thanh trên mờ (backdrop-filter) của màn làm bài */
+  --giay: #ffffff; /* "tờ giấy": nền ảnh cắt từ đề + phiếu in — CỐ ĐỊNH trắng ở cả 2 nền */
+
+  --vang-diu: #91691e;
+  --vang-diu-nen: #f7efd9;
+  /* chữ */
+  --muc: #1a2332;
+  /* HAI BẬC CHỮ MỜ PHẢI ĐỌC ĐƯỢC, không chỉ phải nhạt.
+   * Đo bằng Lighthouse 10/09: `--mo` cũ (#9ca3af) chỉ đạt tương phản 2,54 trên
+   * nền trắng và 2,39 trên nền thẻ — dưới xa mức 4,5 của WCAG AA cho chữ 13px.
+   * Thầy cầm điện thoại đứng lớp, học sinh đọc trên máy cũ; chữ 2,4 là chữ để
+   * trang trí chứ không phải để đọc.
+   * Nay cả hai bậc đều ≥ 4,5 trên CẢ BA nền sáng (--the, --nen, --the-2), và
+   * vẫn cách nhau đủ để phân bậc. Khoá lại bằng `tuong-phan-mau-1009.test.ts`. */
+  --nhat: #505b69;
+  --mo: #626c7b;
+  --muc-nguoc: #ffffff; /* chữ đặt TRÊN nền --muc/--do/--tim đặc (nút chính, cảnh báo) */
+
+  /* lớp phủ sau hộp thoại / ảnh phóng to */
+  --phu: rgba(26, 35, 50, 0.55);
+  --phu-dam: rgba(26, 35, 50, 0.9);
+  /* Nút thoát nổi trên phiếu — đủ tối để thấy trên nền trắng của phiếu, đủ
+     trong để không che chữ bên dưới. Giữ nguyên ở nền tối: phiếu luôn là
+     giấy trắng mực đen. */
+  --phu-dam-mo: rgba(15, 23, 42, 0.55);
+
+  /* đường kẻ */
+  --vien: #e5e7eb;
+  --vien-dam: #d1d5db;
+
+  /* trạng thái */
+  --xanh: #10b981;
+  --xanh-nen: #ecfdf5;
+  --do: #ef4444;
+  --do-nen: #fef2f2;
+  --cam: #f59e0b;
+  --cam-nen: #fffbeb;
+  --tim: #6366f1;
+  --tim-nen: #eef2ff;
+  --gap: #dc2626; /* CHỈ một việc: đồng hồ làm bài còn dưới 5 phút (GIAO-DIEN-LAM-BAI.md) */
+
+  /* màu phong cách Google Material 3 */
+  --gg-xanh: #1a73e8;
+  --gg-do: #ea4335;
+  --gg-vang: #fbbc04;
+  --gg-luc: #34a853;
+  --gg-xanh-nen: #e8f0fe;
+  --gg-luc-nen: #e6f4ea;
+  --gg-vang-nen: #fef7e0;
+  --gg-do-nen: #fce8e6;
+
+  /* gradient đầu thẻ — xoay vòng theo số câu (chỉ số modulo 4) */
+  --g1: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --g2: linear-gradient(135deg, #f59e0b, #fbbf24);
+  --g3: linear-gradient(135deg, #3b82f6, #60a5fa);
+  --g4: linear-gradient(135deg, #10b981, #34d399);
+
+  /* chữ: mọi nội dung học thuật (đề bài, phương án, nhận xét, tiêu đề) dùng
+   * --serif; số liệu/đồng hồ/nhãn nút/bảng biểu dùng --sans kèm
+   * font-variant-numeric: tabular-nums */
+  /* CẤM Charter · Bitstream Charter · Iowan Old Style · Palatino · EB Garamond:
+   * mấy phông này THIẾU DẤU TIẾNG VIỆT, trình duyệt phải nhặt dấu từ phông khác
+   * và dấu rơi ra khỏi chữ ("bằng" hiện thành "bă`ng"). Hai phông đầu dãy có
+   * dấu Việt đầy đủ, nạp từ Google Fonts kèm subset vietnamese (index.html);
+   * chưa tải xong hay ngoại tuyến lần đầu thì Times New Roman đỡ — cũng đủ dấu. */
+  --serif: 'Noto Serif', 'Source Serif 4', Lora, 'Times New Roman', Cambria, serif;
+  --sans: 'Be Vietnam Pro', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --cx-1: 13px;
+  --cx-2: 15px;
+  --cx-3: 17px;
+  --cx-4: 20px;
+  --cx-5: 24px;
+  --cx-6: 30px;
+
+  /* khoảng cách — bội số 4 */
+  --k1: 4px;
+  --k2: 8px;
+  --k3: 12px;
+  --k4: 16px;
+  --k5: 20px;
+  --k6: 24px;
+  --k7: 32px;
+  --k8: 48px;
+
+  /* bo góc */
+  --bo-1: 10px;
+  --bo-2: 14px;
+  --bo-3: 16px;
+  --bo-tron: 999px;
+
+  /* đổ bóng — CHỈ hai mức, không thêm mức khác */
+  --bong-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --bong-2: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  --nhanh: 140ms cubic-bezier(0.2, 0, 0, 1);
+  --motion-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --motion-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --motion-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* MÀU CỦA "TỜ GIẤY" GỬI ĐI — ảnh phiếu kết quả Zalo, phiếu in.
+ * KHÔNG redefine trong khối nền tối bên dưới: ảnh này rời khỏi máy thầy và mở
+ * trên máy phụ huynh, nên phải luôn là giấy trắng mực đen dù thầy đang để máy
+ * nền tối. Giữ ở đây để mã màu vẫn nằm đúng một chỗ (check:mau). */
+:root {
+  --p-giay: #ffffff;
+  --p-nen: #f7f8fa;
+  --p-chim: #f3f4f6;
+  --p-muc: #1a2332;
+  /* CÙNG MỘT LỖI, CHỖ CÒN TỆ HƠN. Bảng màu phiếu này in ra chữ 10,5–11,5px cho
+   * PHỤ HUYNH đọc trên điện thoại; `--p-mo` cũ (#9ca3af) chỉ đạt tương phản
+   * 2,54. Nay dùng đúng cặp đã đo của bảng màu app, đều ≥ 4,5 trên cả ba nền
+   * phiếu. Khoá bằng `tuong-phan-mau-1009.test.ts`. */
+  --p-nhat: #5b6270;
+  --p-mo: #667085;
+  --p-vien: #e5e7eb;
+  --p-xanh: #10b981;
+  --p-do: #ef4444;
+  /* BẢN ĐẬM cho CHỮ TRẮNG nằm trên nền xanh / đỏ (huy hiệu "đáp án đúng" / "em chọn" 10,5 px của thẻ câu): trắng trên --p-xanh chỉ 2,54:1,
+   * trên --p-do 3,76:1. Hai bản đậm này đạt ≥ 4,5:1 (khoá bằng the-cau-chi-tiet-nhan-1909.test.ts). Như cả nhóm --p-*: không redefine ở nền tối. */
+  --p-xanh-dam: #047857;
+  --p-do-dam: #b91c1c;
+  --p-cam: #f59e0b;
+  --p-tim: #6366f1;
+  --p-tim-2: #8b5cf6;
+  --p-trang: #ffffff;
+  /* bóng của thẻ điểm trong phiếu HTML (screens/PhieuScreen.tsx) — đặt ở đây
+   * để mã màu vẫn nằm đúng một chỗ, kể cả màu trong rgba(). */
+  --p-bong: 0 18px 44px -18px rgba(26, 35, 50, 0.34), 0 2px 6px rgba(26, 35, 50, 0.06);
+
+  /* BÁO CÁO PHỤ HUYNH V3 (PHIEU-PHU-HUYNH-V3 mục 3) — bảng màu đã chạy qua bộ
+   * kiểm tương phản, CẤM ĐỔI và CẤM THÊM màu ngoài bốn dòng này.
+   * Chỉ hai màu đầu MANG NGHĨA (đúng / sai); hai màu sau là nền.
+   * Cũng KHÔNG redefine ở khối nền tối, cùng lý do với nhóm --p-* bên trên:
+   * báo cáo mở trên máy phụ huynh, luôn phải là giấy trắng mực đen. */
+  --p3-dung: #2e8b6b;
+  --p3-sai: #b42318;
+  --p3-hero: #16171a;
+  --p3-nen: #fbfaf7;
+}
+
+/* BẢNG "SLATE ẤM" dùng chung ba cổng (trước 21/09 nằm thẳng trong `@theme` của index.css — mã màu thô làm `npm run check:mau` đỏ).
+ * `@theme` của Tailwind trỏ về các biến này (`--color-slate-N: var(--slate-N)`), nên MỘT nguồn màu, đổi ở đây là đổi cả lớp `slate-*`. */
+:root {
+  --slate-50: #f5f4ef;
+  --slate-100: #eeeee8;
+  --slate-200: #dedfd9;
+  --slate-300: #c3c8ca;
+  --slate-400: #a6b0bc;
+  --slate-500: #657180;
+  --slate-600: #515e6b;
+  --slate-700: #394652;
+  --slate-800: #29323d;
+  --slate-900: #202730;
+  --slate-950: #171c23;
+  /* Chữ ô ngày/giờ trên nền tối (input date/time — index.css). */
+  --chu-o-gio-toi: #f1f5f9;
+}
+
+/* BẢNG VINH DANH (`BangVinhDanh.css`): bốn màu thương hiệu Google + vàng huy hiệu, cố định (không đổi theo nền sáng/tối). */
+:root {
+  --vd-vang: #fbbc04;
+  --vd-vang-dam: #f29900;
+  --vd-vang-nhat: #fef08a;
+  --vd-cam: #d97706;
+  --vd-vang-sang: #fbbf24;
+  --vd-nau: #795548;
+  --vd-xanh: #4285f4;
+  --vd-luc: #34a853;
+  --vd-do: #ea4335;
+}
+
+/* BẢNG TIN CỦA THẦY bản 3 (thầy chốt 21/09; bản vẽ docs/ban-ve-bang-tin-v3-2109/) — màu KHÔNG có sẵn trong bảng M3/gg: thanh "đang làm" (hổ phách),
+ * thanh "dạng vấp" (cam đậm), ô "Máy đã tự làm hôm nay" (nền xanh đen ở CẢ sáng và tối). Chữ/nền còn lại dùng token --m3-* sẵn có. Dùng ở src/styles/bang-tin-v3.css. */
+:root {
+  --bt-dang-lam: #f1b44c;
+  --bt-dang-lam-chu: #3a2500;
+  --bt-vap: #c2410c;
+  --bt-may-nen: #10233f;
+  --bt-may-chu: #ffffff;
+  --bt-may-phu: #c9d8f0;
+  --bt-may-vien: #2b4166;
+  --bt-may-xanh: #7ee0a6;
+}
+
+/* KHUNG LỜI GIẢI ĐỌC ĐƯỢC (`.readable-solution`, src/index.css) — cặp màu riêng để chữ lời giải luôn đủ tương phản dù bị lớp tiện ích
+ * Tailwind trộn sáng/tối. Trước 21/09 nằm thẳng trong index.css (mã màu thô, làm `npm run check:mau` đỏ); nay đứng đây, một chỗ.
+ * Nền tối theo lớp `.dark` / `[data-theme="dark"]` — đúng bộ chọn cũ của khung này (không theo prefers-color-scheme). */
+:root {
+  --loi-giai-nen: #fff8e9;
+  --loi-giai-chu: #322c22;
+  --loi-giai-vien: #dbc58e;
+  --loi-giai-cam-chu: #493a20;
+  --loi-giai-nhan: #815512;
+}
+.dark,
+[data-theme="dark"] {
+  --loi-giai-nen: #292f35;
+  --loi-giai-chu: #f2eee3;
+  --loi-giai-vien: #786645;
+  --loi-giai-cam-chu: #f2eee3;
+  --loi-giai-nhan: #e8c477;
+}
+
+/* NỀN TỐI — MANCUAVAOVANENTOI.md mục 1. Giữ nguyên tên biến, chỉ đổi giá trị;
+ * gradient --g1..--g4 giữ nguyên (đủ tương phản ở cả hai nền). Các biến cỡ
+ * chữ/khoảng cách/bo góc không đổi theo nền. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --vang-diu: #e4c47e;
+    --vang-diu-nen: #343126;
+    --nen: #171c23;
+    --the: #202730;
+    --the-2: #29323d;
+    --the-mo: rgba(26, 32, 41, 0.85);
+
+    --muc: #e8eaed;
+    --nhat: #c2c8cf;
+    /* Nền tối cũng vậy: #6b7482 cũ chỉ đạt 3,02 trên --the-2. */
+    --mo: #a6b0bc;
+    --muc-nguoc: #0f1419;
+
+    --phu: rgba(0, 0, 0, 0.6);
+    --phu-dam: rgba(0, 0, 0, 0.9);
+
+    --vien: #2a323d;
+    --vien-dam: #3a434f;
+
+    --xanh: #34d399;
+    --xanh-nen: #0d2f24;
+    --do: #f87171;
+    --do-nen: #2f1516;
+    --cam: #fbbf24;
+    --cam-nen: #2d2411;
+    --tim: #818cf8;
+    --tim-nen: #1e1f3d;
+
+    --gg-xanh: #8ab4f8;
+    --gg-do: #f28b82;
+    --gg-vang: #fdd663;
+    --gg-luc: #81c995;
+    --gg-xanh-nen: #172b4d;
+    --gg-luc-nen: #0f3822;
+    --gg-vang-nen: #3a2e0a;
+    --gg-do-nen: #3c1e1e;
+
+    --bong-1: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --bong-2: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+    /* bảng tin của thầy: ô "Máy đã tự làm" vẫn nền đậm (sáng hơn nền trang một chút để còn nổi khối) */
+    --bt-dang-lam: #e9a93a;
+    --bt-vap: #fb923c;
+    --bt-may-nen: #16305a;
+    --bt-may-vien: #34507d;
+  }
+}
+
+/* Tôn trọng prefers-reduced-motion trên TOÀN APP — tắt hết chuyển động,
+ * không chỉ riêng màn làm bài. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* VAI TRÒ MÀU MATERIAL 3 của màn "Bảng nhiệm vụ" — MỘT nguồn cho cả thư mục.
+ * Giá trị lấy đúng bản vẽ đã duyệt 19/09 (5 khung project/*.dc.html), viết dạng
+ * rgb() để thư mục này không có chuỗi thập lục phân nào (nghiệm thu NT3 và
+ * `npm run check:mau` đều quét theo mẫu ấy). Tệp .tsx KHÔNG được ghi màu: chỉ
+ * dùng lớp `bnv-*` trong bang-nhiem-vu.css, lớp ấy chỉ đọc biến ở đây.
+ *
+ * Thứ gì tokens.css đã có thì ÁNH XẠ, không chép: phông (--sans), bậc chữ
+ * (--cx-1..6), khoảng cách (--k*), đường cong chuyển động, vàng vinh danh
+ * (--gg-vang) và nền cảnh báo (--gg-vang-nen). Sáng/tối theo
+ * prefers-color-scheme như tokens.css — không có nút chuyển. */
+/* `.bnv` = riêng Bảng nhiệm vụ; `.m3` = bí danh cho MỌI màn khác muốn dùng cùng bảng màu (đặt lên phần tử gốc của màn). */
+.bnv,
+.m3 {
+  --m3-primary: rgb(11 87 208);
+  --m3-on-primary: rgb(255 255 255);
+  --m3-primary-container: rgb(211 227 253);
+  --m3-on-primary-container: rgb(4 30 73);
+  --m3-on-primary-container-phu: rgb(8 66 160);
+
+  --m3-secondary: rgb(0 99 155);
+  --m3-secondary-container: rgb(194 231 255);
+  --m3-on-secondary-container: rgb(0 29 53);
+  --m3-on-secondary-container-phu: rgb(0 74 119);
+
+  --m3-tertiary: rgb(20 108 46);
+  --m3-tertiary-container: rgb(196 238 208);
+  --m3-on-tertiary-container: rgb(7 33 0);
+  --m3-on-tertiary-container-phu: rgb(15 82 35);
+
+  --m3-error: rgb(179 38 30);
+  --m3-on-error: rgb(255 255 255);
+  --m3-error-container: rgb(249 222 220);
+  --m3-on-error-container: rgb(65 14 11);
+  --m3-on-error-container-phu: rgb(96 20 16);
+
+  /* bề mặt 5 bậc */
+  --m3-surface: rgb(253 251 255);
+  --m3-surface-container-lowest: rgb(255 255 255);
+  --m3-surface-container-low: rgb(247 249 252);
+  --m3-surface-container: rgb(240 244 249);
+  --m3-surface-container-high: rgb(233 238 246);
+  --m3-on-surface: rgb(31 31 31);
+  --m3-on-surface-variant: rgb(68 71 70);
+  --m3-outline: rgb(116 119 117);
+
+  /* thẻ "Làm ngay" (filled): sáng = primary, tối = primaryContainer (bản vẽ) */
+  --m3-lam-ngay-nen: var(--m3-primary);
+  --m3-lam-ngay-chu: var(--m3-on-primary);
+  --m3-lam-ngay-nut-nen: var(--m3-on-primary);
+  --m3-lam-ngay-nut-chu: var(--m3-primary);
+
+  /* ô biểu tượng trong thẻ tonal, hàng vinh danh hạng 2–3 */
+  --m3-o-bieu-tuong: rgb(255 255 255 / 0.65);
+  --m3-hang-mo: rgb(255 255 255 / 0.6);
+
+  /* vinh danh: vàng lấy token có sẵn; bạc/đồng chỉ dùng cho huy hiệu hạng */
+  --m3-hang-1: var(--gg-vang);
+  --m3-hang-2: rgb(196 199 197);
+  --m3-hang-3: rgb(216 165 119);
+  --m3-on-hang: rgb(31 31 31);
+  --m3-shimmer: rgb(255 255 255 / 0.9);
+
+  /* cảnh báo tải (phụ huynh) */
+  --m3-canh-bao-nen: var(--gg-vang-nen);
+  --m3-canh-bao-chu: rgb(92 68 0);
+
+  /* cao độ M3 mức 1 và mức 3 */
+  --m3-cao-do-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+  --m3-cao-do-3: 0 4px 8px 3px rgb(0 0 0 / 0.15), 0 1px 3px rgb(0 0 0 / 0.3);
+
+  /* bo góc theo thang M3 */
+  --m3-bo-12: 12px;
+  --m3-bo-16: 16px;
+  --m3-bo-28: 28px;
+  --m3-bo-tron: var(--bo-tron, 999px);
+
+  /* bậc chữ: token --cx-* là gốc; vế rem để chữ lớn theo cỡ chữ hệ thống (130%) */
+  --bnv-cx-1: max(var(--cx-1, 13px), 0.8125rem);
+  --bnv-cx-2: max(var(--cx-2, 15px), 0.9375rem);
+  --bnv-cx-3: max(var(--cx-3, 17px), 1.0625rem);
+  --bnv-cx-4: max(var(--cx-4, 20px), 1.25rem);
+  --bnv-cx-5: max(var(--cx-5, 24px), 1.5rem);
+  --bnv-cx-6: max(var(--cx-6, 30px), 1.875rem);
+
+  /* nền động: hai quầng màu vai trò, độ mờ trần 18% */
+  --m3-nen-dong-1: var(--m3-primary);
+  --m3-nen-dong-2: var(--m3-tertiary);
+  --m3-nen-dong-do-mo: 0.18;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bnv,
+  .m3 {
+    --m3-primary: rgb(168 199 250);
+    --m3-on-primary: rgb(6 46 111);
+    --m3-primary-container: rgb(8 66 160);
+    --m3-on-primary-container: rgb(211 227 253);
+    --m3-on-primary-container-phu: rgb(168 199 250);
+
+    --m3-secondary: rgb(127 207 255);
+    --m3-secondary-container: rgb(0 74 119);
+    --m3-on-secondary-container: rgb(194 231 255);
+    --m3-on-secondary-container-phu: rgb(127 207 255);
+
+    --m3-tertiary: rgb(109 213 140);
+    --m3-tertiary-container: rgb(15 82 35);
+    --m3-on-tertiary-container: rgb(196 238 208);
+    --m3-on-tertiary-container-phu: rgb(109 213 140);
+
+    --m3-error: rgb(242 184 181);
+    --m3-on-error: rgb(96 20 16);
+    --m3-error-container: rgb(140 29 24);
+    --m3-on-error-container: rgb(249 222 220);
+    --m3-on-error-container-phu: rgb(242 184 181);
+
+    --m3-surface: rgb(19 19 20);
+    --m3-surface-container-lowest: rgb(58 60 63);
+    --m3-surface-container-low: rgb(25 26 27);
+    --m3-surface-container: rgb(30 31 32);
+    --m3-surface-container-high: rgb(40 42 44);
+    --m3-on-surface: rgb(227 227 227);
+    --m3-on-surface-variant: rgb(196 199 197);
+    --m3-outline: rgb(142 145 143);
+
+    --m3-lam-ngay-nen: var(--m3-primary-container);
+    --m3-lam-ngay-chu: var(--m3-on-primary-container);
+    --m3-lam-ngay-nut-nen: var(--m3-primary);
+    --m3-lam-ngay-nut-chu: var(--m3-on-primary);
+
+    --m3-o-bieu-tuong: rgb(0 0 0 / 0.25);
+    --m3-hang-mo: rgb(255 255 255 / 0.06);
+    --m3-hang-2: rgb(154 160 166);
+    --m3-hang-3: rgb(197 140 92);
+    --m3-shimmer: rgb(255 255 255 / 0.35);
+
+    --m3-canh-bao-chu: var(--gg-vang);
+
+    --m3-cao-do-1: 0 1px 2px rgb(0 0 0 / 0.5), 0 1px 3px 1px rgb(0 0 0 / 0.3);
+    --m3-cao-do-3: 0 4px 8px 3px rgb(0 0 0 / 0.35), 0 1px 3px rgb(0 0 0 / 0.5);
+  }
+}
+
+/* Cầu nối Tailwind v4: khi tệp này được @import từ src/index.css, các vai trò
+ * trên thành tiện ích `bg-m3-primary`, `text-m3-on-surface`… Đứng riêng thì
+ * khối này không sinh gì (Tailwind nuốt), các lớp `bnv-*` vẫn chạy bình thường. */
+
+/* BẢN VẼ bảng "Mọi thứ về con" KIỂU APPLE (thầy lệnh 21/09/2026) — CHỈ LÀ BẢN VẼ, không phải mã chạy thật.
+ * Dùng cho ph-d-bang-day-du / ph-e-bang-thua. Lớp gốc: <body class="m3 phm-goc"> (.m3 = lớp token có sẵn của app).
+ * TIỀN TỐ: MỌI lớp ở đây bắt đầu bằng `phm-` (src/index.css đã có .mt / .mt-tren của mũi tên phản ứng — cấm đụng tên).
+ * MÀU: bí danh --phm-* trỏ về token của app (tokens.css + m3-theme.css). Chỗ app CHƯA có token ghi "CẦN THÊM TOKEN".
+ * PHÔNG: chồng phông hệ thống y như ph-apple.css (iPhone / Mac ra San Francisco; máy khác ra Inter tự nạp). KHÔNG nhúng phông Apple.
+ * CỠ CHỮ (rem, thang iOS): Large Title 34/41 · Title2 22/28 · Title3 20/25 · Headline 17/22 đậm vừa · Body 17/22 · Subhead 15/20 · Footnote 13/18 · Caption 12/16 */
+
+.phm-goc {
+  --phm-phong: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", system-ui, "Helvetica Neue", Arial, sans-serif;
+  --phm-nen: var(--m3-surface-container);
+  --phm-the: var(--m3-surface-container-lowest);
+  --phm-o: var(--m3-surface-container-high);
+  --phm-chu: var(--m3-on-surface);
+  --phm-chu-2: var(--m3-on-surface-variant);
+  --phm-net: var(--m3-outline);
+  --phm-nhan: var(--m3-primary);                       /* MỘT màu nhấn: xanh hành động */
+  --phm-nhan-nen: var(--m3-primary-container);
+  --phm-tren-nhan-nen: var(--m3-on-primary-container);
+  --phm-nhan-to: var(--m3-primary);                    /* mảng màu nhấn: vòng, cột, thanh */
+  --phm-nhan-nhat: color-mix(in srgb, var(--m3-primary) 30%, var(--phm-the));
+  --phm-dat: var(--m3-tertiary);                       /* CHỮ xanh lá: chỉ cho "đạt / đúng" */
+  --phm-dat-to: var(--gg-luc);                         /* MẢNG xanh lá */
+  --phm-dat-nen: var(--m3-tertiary-container);
+  --phm-tren-dat-nen: var(--m3-on-tertiary-container-phu);
+  --phm-do: var(--m3-error);                           /* đỏ: chỉ cho "Sai", rất tiết chế */
+  --phm-do-nen: var(--m3-error-container);
+  --phm-tren-do-nen: var(--m3-on-error-container-phu);
+  --phm-nut: var(--m3-primary);
+  --phm-tren-nut: var(--m3-on-primary);
+  /* CẦN THÊM TOKEN: cam "cần luyện" + tím "phút học" (vòng thứ ba) — app chưa có vai trò màu tương ứng */
+  --phm-cam: rgb(168 84 0);
+  --phm-cam-to: rgb(240 140 20);
+  --phm-cam-nen: rgb(255 240 219);
+  --phm-tren-cam-nen: rgb(122 60 0);
+  --phm-tim: rgb(98 70 200);
+  --phm-tim-to: rgb(124 96 230);
+  /* CẦN THÊM TOKEN: vạch tóc, nền mờ, bóng thẻ */
+  --phm-vach: color-mix(in srgb, var(--m3-on-surface) 11%, transparent);
+  --phm-mo-nen: color-mix(in srgb, var(--phm-nen) 92%, transparent);
+  --phm-bong-the: 0 0 0 0.5px var(--phm-vach), 0 1px 2px rgb(0 0 0 / 0.03), 0 10px 28px -14px rgb(0 0 0 / 0.14);
+  --phm-bo-the: 22px;
+  --phm-bo-nut: 15px;
+  --phm-le: clamp(16px, 5vw, 20px);
+  --phm-rong: 480px;
+  --phm-thanh-cao: max(48px, 3rem);
+}
+@media (prefers-color-scheme: dark) {
+  .phm-goc {
+    --phm-nen: var(--m3-surface);
+    --phm-the: var(--m3-surface-container);
+    --phm-o: var(--m3-surface-container-high);
+    --phm-dat-to: rgb(52 199 89);
+    --phm-nhan-to: rgb(64 142 255);                    /* CẦN THÊM TOKEN: mảng xanh ở nền tối (m3-primary tối là xanh nhạt, vòng sẽ bạc màu) */
+    --phm-nut: rgb(20 100 225);                        /* CẦN THÊM TOKEN: nút chính nền tối, chữ trắng 5,3:1 (như ph-apple.css) */
+    --phm-tren-nut: rgb(255 255 255);
+    --phm-cam: rgb(255 179 92);
+    --phm-cam-to: rgb(255 159 10);
+    --phm-cam-nen: rgb(66 40 8);
+    --phm-tren-cam-nen: rgb(255 200 140);
+    --phm-tim: rgb(186 170 255);
+    --phm-tim-to: rgb(150 126 255);
+    --phm-vach: color-mix(in srgb, var(--m3-on-surface) 16%, transparent);
+    --phm-bong-the: 0 0 0 0.5px var(--phm-vach);
+  }
+}
+@media (min-width: 600px) { .phm-goc { --phm-rong: 640px; --phm-le: 24px; } }
+@media (min-width: 900px) { .phm-goc { --phm-rong: 1000px; --phm-le: 28px; } }
+
+html { font-size: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body.phm-goc {
+  margin: 0; min-height: 100dvh; background: var(--phm-nen); color: var(--phm-chu); color-scheme: light dark;
+  font-family: var(--phm-phong); font-size: 1.0625rem; line-height: 1.294; font-weight: 400;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility;
+  font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
+}
+.phm-goc *, .phm-goc *::before, .phm-goc *::after { box-sizing: border-box; }
+:where(.phm-goc) :where(h1, h2, h3, h4, p, ul, ol, figure) { margin: 0; padding: 0; }
+:where(.phm-goc) :where(ul, ol) { list-style: none; }
+:where(.phm-goc) button { font: inherit; color: inherit; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+:where(.phm-goc) a { color: inherit; text-decoration: none; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.phm-goc :focus-visible { outline: 3px solid var(--phm-nhan); outline-offset: 2px; border-radius: 12px; }
+.phm-goc sub { font-size: 0.72em; line-height: 0; vertical-align: -0.28em; }
+.phm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.phm-lien { white-space: nowrap; }
+.phm-goc:not([data-canh="thua"]) [data-khi-canh="thua"], .phm-goc:not([data-canh="chua-hoc"]) [data-khi-canh="chua-hoc"] { display: none !important; }
+
+/* biểu tượng nét mảnh (tự vẽ, tinh thần SF Symbols) */
+.phm-i { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.phm-i--s { width: 16px; height: 16px; stroke-width: 2; }
+.phm-i--mui { width: 18px; height: 18px; color: var(--phm-net); stroke-width: 2.1; }
+
+/* ── THANH TRÊN + LARGE TITLE + MỤC LỤC ───────────────────────────── */
+.phm-tren, .phm-muc-luc { background: var(--phm-mo-nen); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); }
+.phm-tren { position: sticky; top: 0; z-index: 16; padding-top: env(safe-area-inset-top); }
+.phm-tren__hang { display: grid; grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(0, 1fr); align-items: center; min-height: var(--phm-thanh-cao); max-width: var(--phm-rong); margin: 0 auto; padding: 0 max(calc(var(--phm-le) - 10px), env(safe-area-inset-right)) 0 max(calc(var(--phm-le) - 10px), env(safe-area-inset-left)); }
+.phm-lui { justify-self: start; display: inline-flex; align-items: center; gap: 1px; min-height: 48px; min-width: 48px; padding: 0 10px 0 0; color: var(--phm-nhan); font-size: 1.0625rem; line-height: 1.294; }
+.phm-lui .phm-i { width: 26px; height: 26px; stroke-width: 2.2; }
+.phm-tren__giua { min-width: 0; text-align: center; opacity: 0; transform: translateY(4px); }
+.phm-goc[data-thu] .phm-tren__giua { opacity: 1; transform: none; }
+.phm-tren__ten, .phm-tren__phu { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phm-tren__ten { font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; }
+.phm-tren__phu { font-size: 0.75rem; line-height: 1.333; color: var(--phm-chu-2); }
+.phm-tieu-de { max-width: var(--phm-rong); margin: 0 auto; padding: 2px max(var(--phm-le), env(safe-area-inset-right)) 6px max(var(--phm-le), env(safe-area-inset-left)); }
+.phm-tieu-de h1 { font-size: clamp(1.75rem, 8.7vw, 2.125rem); line-height: 1.206; font-weight: 700; letter-spacing: -0.022em; }
+.phm-tieu-de p { margin-top: 2px; font-size: 0.9375rem; line-height: 1.333; color: var(--phm-chu-2); }
+.phm-tieu-de p b { font-weight: 600; color: var(--phm-chu); }
+.phm-muc-luc { position: sticky; top: calc(var(--phm-thanh-cao) + env(safe-area-inset-top)); z-index: 15; border-bottom: 1px solid transparent; }
+.phm-goc[data-cuon] .phm-muc-luc { border-bottom-color: var(--phm-vach); }
+.phm-muc-luc__khung { max-width: var(--phm-rong); margin: 0 auto; min-width: 0; overflow: hidden; }
+.phm-muc-luc ul { display: flex; gap: 8px; min-width: 0; padding: 0 var(--phm-le); overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent); }
+.phm-muc-luc ul::-webkit-scrollbar { display: none; }
+.phm-muc-luc li { flex: none; }
+.phm-muc-luc li:last-child { padding-right: 28px; }
+.phm-muc-luc a { display: flex; align-items: center; min-height: 48px; min-width: 48px; }
+.phm-muc-luc a span { display: block; padding: 6px 14px; border-radius: 999px; background: var(--phm-the); box-shadow: 0 0 0 0.5px var(--phm-vach); font-size: 0.9375rem; line-height: 1.333; font-weight: 500; white-space: nowrap; }
+.phm-muc-luc a[aria-current] span { background: var(--phm-chu); color: var(--phm-the); box-shadow: none; font-weight: 600; }
+
+/* ── KHUNG MÀN: một cột ở điện thoại, hai cột từ 900 px ───────────── */
+.phm-man { display: flex; flex-direction: column; max-width: var(--phm-rong); margin: 0 auto; padding: 10px max(var(--phm-le), env(safe-area-inset-right)) calc(var(--phm-day-cao, 96px) + 20px) max(var(--phm-le), env(safe-area-inset-left)); }
+.phm-hang, .phm-cot { display: contents; }
+.phm-muc { order: var(--tt, 0); min-width: 0; margin-top: 30px; scroll-margin-top: calc(var(--phm-thanh-cao) + 64px); }
+.phm-muc--dau { margin-top: 0; }
+.phm-muc--sat { margin-top: 14px; }
+@media (min-width: 900px) {
+  .phm-hang { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; align-items: start; margin-top: 30px; }
+  .phm-hang:first-child { margin-top: 0; }
+  .phm-cot { display: flex; flex-direction: column; min-width: 0; }
+  .phm-cot > .phm-muc:first-child { margin-top: 0; }
+}
+.phm-muc__dau { margin: 0 4px 10px; }
+.phm-muc__dau h2 { font-size: 1.375rem; line-height: 1.273; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
+.phm-muc__dau p { margin-top: 1px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+
+.phm-the { background: var(--phm-the); border-radius: var(--phm-bo-the); box-shadow: var(--phm-bong-the); min-width: 0; }
+.phm-the--dem { padding: 18px 18px 16px; }
+.phm-the + .phm-the { margin-top: 12px; }
+.phm-nhan-muc { display: flex; align-items: center; gap: 7px; font-size: 0.8125rem; line-height: 1.385; font-weight: 600; color: var(--phm-nhan); }
+.phm-nhan-muc .phm-i { width: 18px; height: 18px; stroke-width: 1.9; }
+.phm-nhan-muc[data-mau="dat"] { color: var(--phm-dat); }
+.phm-nhan-muc[data-mau="cam"] { color: var(--phm-cam); }
+.phm-nhan-muc[data-mau="xam"] { color: var(--phm-chu-2); }
+.phm-ten-the { margin-top: 3px; font-size: 1.25rem; line-height: 1.25; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
+.phm-phu { font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-phu b { font-weight: 600; color: var(--phm-chu); }
+
+/* chip */
+.phm-chip { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; padding: 4px 11px 4px 8px; border-radius: 999px; background: var(--phm-o); color: var(--phm-chu); font-size: 0.8125rem; line-height: 1.385; font-weight: 600; max-width: 100%; }
+.phm-chip .phm-i { width: 15px; height: 15px; stroke-width: 2.3; }
+.phm-chip--tron { padding-left: 11px; }
+.phm-chip[data-mau="dat"] { background: var(--phm-dat-nen); color: var(--phm-tren-dat-nen); }
+.phm-chip[data-mau="cam"] { background: var(--phm-cam-nen); color: var(--phm-tren-cam-nen); }
+.phm-chip[data-mau="do"] { background: var(--phm-do-nen); color: var(--phm-tren-do-nen); }
+.phm-chips { display: flex; flex-wrap: wrap; gap: 6px 6px; min-width: 0; }
+
+/* thanh mảnh kiểu Health */
+.phm-thanh { display: block; height: 6px; border-radius: 3px; background: var(--phm-o); overflow: hidden; }
+.phm-thanh > i { display: block; height: 100%; border-radius: 3px; background: var(--phm-nhan-to); }
+.phm-thanh--manh { height: 4px; }
+.phm-thanh[data-mau="dat"] > i { background: var(--phm-dat-to); }
+.phm-thanh[data-mau="cam"] > i { background: var(--phm-cam-to); }
+
+/* ── KHỐI ANH HÙNG: ba vòng hoạt động ─────────────────────────────── */
+.phm-ah__ngay { font-size: 0.8125rem; line-height: 1.385; font-weight: 600; color: var(--phm-chu-2); }
+.phm-ah h2 { margin-top: 2px; font-size: clamp(1.5rem, 7.2vw, 1.75rem); line-height: 1.18; font-weight: 700; letter-spacing: -0.024em; text-wrap: balance; }
+.phm-ah__than { display: flex; flex-wrap: wrap; align-items: center; gap: 14px clamp(14px, 5vw, 24px); margin-top: 16px; }
+.phm-vong3 { flex: none; width: clamp(112px, 34vw, 148px); aspect-ratio: 1; }
+.phm-vong3 svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.phm-vong3 circle { fill: none; }
+.phm-vong3 .phm-v-nen { opacity: 0.18; }
+.phm-vong3 [data-mau="1"] { stroke: var(--phm-nhan-to); } .phm-vong3 [data-mau="2"] { stroke: var(--phm-dat-to); } .phm-vong3 [data-mau="3"] { stroke: var(--phm-tim-to); }
+.phm-vong3 circle[data-vuot][data-mau="1"] { stroke: color-mix(in srgb, var(--phm-nhan-to) 74%, white); } .phm-vong3 circle[data-vuot][data-mau="2"] { stroke: color-mix(in srgb, var(--phm-dat-to) 74%, white); } .phm-vong3 circle[data-vuot][data-mau="3"] { stroke: color-mix(in srgb, var(--phm-tim-to) 74%, white); }
+.phm-vong3 [data-to="1"] { fill: var(--phm-nhan-to); stroke: none; } .phm-vong3 [data-to="2"] { fill: var(--phm-dat-to); stroke: none; } .phm-vong3 [data-to="3"] { fill: var(--phm-tim-to); stroke: none; }
+.phm-vong3 [data-to="1"][data-vuot] { fill: color-mix(in srgb, var(--phm-nhan-to) 74%, white); } .phm-vong3 [data-to="2"][data-vuot] { fill: color-mix(in srgb, var(--phm-dat-to) 74%, white); } .phm-vong3 [data-to="3"][data-vuot] { fill: color-mix(in srgb, var(--phm-tim-to) 74%, white); }
+@media (prefers-color-scheme: dark) { .phm-vong3 .phm-v-nen { opacity: 0.26; } }
+.phm-chu-giai { flex: 1 1 128px; min-width: 0; display: grid; gap: 9px; }
+.phm-chu-giai b { display: block; font-size: 1.75rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.03em; white-space: nowrap; }
+.phm-chu-giai b small { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.01em; color: var(--phm-chu-2); margin-left: 2px; }
+.phm-chu-giai span { display: block; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-chu-giai [data-mau="1"] b { color: var(--phm-nhan); } .phm-chu-giai [data-mau="2"] b { color: var(--phm-dat); } .phm-chu-giai [data-mau="3"] b { color: var(--phm-tim); }
+.phm-chu-giai [data-rong] b { color: var(--phm-chu-2); }
+.phm-ah__loi { display: flex; align-items: flex-start; gap: 9px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--phm-vach); font-size: 0.9375rem; line-height: 1.4; }
+.phm-ah__loi .phm-i { color: var(--phm-dat); margin-top: -1px; }
+.phm-ah__loi[data-mau="nhan"] .phm-i { color: var(--phm-nhan); }
+.phm-ah__loi p { min-width: 0; }
+.phm-ah__loi small { display: block; margin-top: 2px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-ah__hq { margin-top: 14px; }
+.phm-ah__hq h3 { margin-bottom: 7px; font-size: 0.8125rem; line-height: 1.385; font-weight: 600; color: var(--phm-chu-2); }
+
+/* ── ĐIỀU ĐÁNG MỪNG ───────────────────────────────────────────────── */
+.phm-mung > li { display: grid; grid-template-columns: 38px minmax(0, 1fr); column-gap: 13px; align-items: start; padding: 14px 0; }
+.phm-mung > li + li { border-top: 1px solid var(--phm-vach); }
+.phm-mung > li:last-child { padding-bottom: 2px; }
+.phm-o-bt { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; background: var(--phm-nhan-nen); color: var(--phm-tren-nhan-nen); }
+.phm-o-bt .phm-i { width: 21px; height: 21px; }
+.phm-o-bt[data-mau="dat"] { background: var(--phm-dat-nen); color: var(--phm-tren-dat-nen); }
+.phm-mung h3 { font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; text-wrap: pretty; }
+.phm-mung h3 b { font-weight: 700; color: var(--phm-dat); }
+.phm-mung p { margin-top: 3px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-len-bac { margin-top: 8px; display: grid; gap: 6px; }
+.phm-len-bac li { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 8px; font-size: 0.9375rem; line-height: 1.333; }
+.phm-len-bac li > span:first-child { min-width: 0; }
+.phm-bac-len { display: inline-flex; align-items: center; gap: 4px; font-size: 0.8125rem; font-weight: 600; color: var(--phm-chu-2); white-space: nowrap; }
+.phm-bac-len b { color: var(--phm-dat); font-weight: 700; }
+.phm-bac-len .phm-i { width: 14px; height: 14px; stroke-width: 2.2; color: var(--phm-dat); }
+.phm-7 { display: flex; gap: 6px; margin-top: 9px; }
+.phm-7 li { display: grid; justify-items: center; gap: 3px; font-size: 0.75rem; line-height: 1.333; color: var(--phm-chu-2); min-width: 22px; }
+.phm-7 i { width: 14px; height: 14px; border-radius: 50%; background: var(--phm-dat-to); }
+.phm-7 [data-nghi] i { background: none; box-shadow: inset 0 0 0 1.5px var(--phm-net); }
+.phm-o4 { display: flex; gap: 5px; margin-top: 9px; align-items: center; }
+.phm-o4 i { width: 18px; height: 18px; border-radius: 50%; background: var(--phm-dat-to); display: grid; place-items: center; color: var(--phm-the); }
+.phm-o4 i svg { width: 12px; height: 12px; stroke-width: 3; }
+
+/* ── A.I ĐÃ LÀM GÌ CHO CON ────────────────────────────────────────── */
+.phm-lam > li { display: grid; grid-template-columns: 26px minmax(0, 1fr); column-gap: 12px; align-items: start; padding: 12px 0; }
+.phm-lam > li + li { border-top: 1px solid var(--phm-vach); }
+.phm-tich { width: 24px; height: 24px; margin-top: -1px; border-radius: 50%; display: grid; place-items: center; background: var(--phm-dat-to); color: var(--phm-the); }
+.phm-tich .phm-i { width: 15px; height: 15px; stroke-width: 2.8; }
+.phm-lam h3 { font-size: 1.0625rem; line-height: 1.294; font-weight: 400; letter-spacing: -0.012em; }
+.phm-lam h3 b { font-weight: 600; }
+.phm-lam p { margin-top: 2px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-lam__cuoi { margin: 6px -18px -16px; padding: 12px 18px 14px; border-top: 1px solid var(--phm-vach); border-radius: 0 0 var(--phm-bo-the) var(--phm-bo-the); background: color-mix(in srgb, var(--phm-o) 45%, transparent); font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+
+/* ── DÒNG THỜI GIAN: kiểu "Thời gian sử dụng" ─────────────────────── */
+.phm-so-to { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; }
+.phm-so-to b { font-size: 2.125rem; line-height: 1.12; font-weight: 700; letter-spacing: -0.03em; white-space: nowrap; }
+.phm-so-to b small { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.01em; color: var(--phm-chu-2); margin-left: 4px; }
+.phm-so-to > span { font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-bieu { position: relative; margin-top: 14px; padding-right: 50px; }
+.phm-bieu__luoi { position: absolute; left: 0; right: 0; top: 0; height: var(--bieu-cao); pointer-events: none; }
+.phm-bieu__luoi span { position: absolute; left: 0; right: 50px; border-top: 1px solid var(--phm-vach); font-size: 0.75rem; line-height: 1; color: var(--phm-chu-2); text-align: right; }
+.phm-bieu__luoi span em { position: absolute; right: -50px; top: -0.45em; width: 46px; font-style: normal; text-align: left; padding-left: 6px; white-space: nowrap; }
+.phm-gio { --bieu-cao: 90px; }
+.phm-gio ol { display: flex; align-items: flex-end; height: var(--bieu-cao); gap: 2px; }
+.phm-gio ol li { position: relative; flex: 1; min-width: 0; height: 100%; display: flex; align-items: flex-end; }
+.phm-gio ol li[data-moc]::before { content: ""; position: absolute; left: -1px; top: 0; bottom: -18px; border-left: 1px solid var(--phm-vach); }
+.phm-gio ol li i { display: block; width: 100%; border-radius: 2.5px 2.5px 0 0; background: var(--phm-nhan-to); height: calc(var(--c) / 30 * 100%); min-height: 3px; }
+.phm-gio ol li span { position: absolute; left: 3px; top: calc(100% + 4px); font-size: 0.75rem; line-height: 1.2; color: var(--phm-chu-2); white-space: nowrap; }
+.phm-gio__loi { margin-top: 30px; font-size: 0.9375rem; line-height: 1.4; }
+.phm-lan > li > a { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; column-gap: 12px; align-items: center; min-height: 64px; margin-left: 18px; padding: 12px 14px 12px 0; }
+.phm-lan > li + li > a { border-top: 1px solid var(--phm-vach); }
+.phm-lan { border-top: 1px solid var(--phm-vach); margin-top: 16px; }
+.phm-lan .phm-o-bt { width: 36px; height: 36px; border-radius: 10px; align-self: start; margin-top: 2px; }
+.phm-lan .phm-o-bt .phm-i { width: 20px; height: 20px; }
+.phm-lan h3 { font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; }
+.phm-lan p { margin-top: 2px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-lan p b { font-weight: 600; color: var(--phm-chu); }
+.phm-lan .phm-thanh { margin-top: 7px; }
+
+/* ── CA KIỂM TRA ──────────────────────────────────────────────────── */
+.phm-diem { display: flex; align-items: baseline; gap: 6px; margin-top: 8px; }
+.phm-diem b { font-size: clamp(3.25rem, 17vw, 4rem); line-height: 1; font-weight: 700; letter-spacing: -0.04em; }
+.phm-diem span { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.01em; color: var(--phm-chu-2); white-space: nowrap; }
+.phm-ca__hon { margin-top: 10px; display: flex; align-items: flex-start; gap: 8px; font-size: 0.9375rem; line-height: 1.333; font-weight: 600; color: var(--phm-dat); }
+.phm-ca__hon i { flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--phm-dat-nen); color: var(--phm-tren-dat-nen); }
+.phm-ca__hon i .phm-i { width: 13px; height: 13px; stroke-width: 2.8; }
+.phm-ca__hon span { min-width: 0; }
+.phm-ca__hon + .phm-phu { margin-top: 8px; }
+.phm-phan { margin-top: 16px; padding-top: 4px; border-top: 1px solid var(--phm-vach); }
+.phm-phan li { padding-top: 12px; }
+.phm-phan__dau { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 10px; margin-bottom: 6px; }
+.phm-phan__dau h3 { font-size: 0.9375rem; line-height: 1.333; font-weight: 600; }
+.phm-phan__dau span { font-size: 0.9375rem; line-height: 1.333; font-weight: 600; white-space: nowrap; }
+.phm-phan__dau span small { font-size: 0.8125rem; font-weight: 400; color: var(--phm-chu-2); }
+.phm-phan p { margin-top: 5px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-bien-the { margin: 16px 4px 8px; display: flex; align-items: center; gap: 8px; font-size: 0.75rem; line-height: 1.333; font-weight: 600; letter-spacing: 0.02em; color: var(--phm-chu-2); }
+.phm-bien-the::after { content: ""; flex: 1; border-top: 1px dashed var(--phm-net); opacity: 0.6; }
+.phm-dong-bt { display: grid; grid-template-columns: 38px minmax(0, 1fr); column-gap: 13px; align-items: start; padding: 15px 18px; }
+.phm-dong-bt .phm-o-bt[data-mau="xam"] { background: var(--phm-o); color: var(--phm-chu-2); }
+.phm-dong-bt .phm-o-bt[data-mau="cam"] { background: var(--phm-cam-nen); color: var(--phm-tren-cam-nen); }
+.phm-dong-bt h3 { font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; }
+.phm-dong-bt p { margin-top: 2px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+
+/* ── ĐIỂM MẠNH · CẦN LUYỆN ────────────────────────────────────────── */
+.phm-hai { display: grid; gap: 12px; }
+.phm-hai > .phm-the + .phm-the { margin-top: 0; }
+@media (min-width: 600px) { .phm-hai { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
+.phm-dang > li { padding: 13px 0 14px; }
+.phm-dang > li + li { border-top: 1px solid var(--phm-vach); }
+.phm-dang { margin-top: 6px; }
+.phm-dang__dau { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 10px; }
+.phm-dang__dau h3 { font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; min-width: 0; }
+.phm-dang__dau span { font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); white-space: nowrap; }
+.phm-dang__dau span b { font-size: 0.9375rem; font-weight: 600; color: var(--phm-chu); }
+.phm-dang .phm-thanh { margin-top: 7px; }
+.phm-bac { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 9px; padding: 2px; border-radius: 9px; background: var(--phm-o); }
+.phm-bac span { min-width: 0; padding: 4px 2px; border-radius: 7px; text-align: center; font-size: 0.75rem; line-height: 1.333; font-weight: 500; color: var(--phm-chu-2); white-space: nowrap; }
+.phm-bac span[data-nay] { background: var(--phm-the); color: var(--phm-chu); font-weight: 600; box-shadow: 0 0 0 0.5px var(--phm-vach), 0 2px 6px -2px rgb(0 0 0 / 0.18); }
+.phm-dang__ghi { display: flex; align-items: center; gap: 5px; margin-top: 7px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-dang__ghi .phm-i { width: 14px; height: 14px; stroke-width: 2.2; }
+.phm-dang__ghi[data-mau="dat"] { color: var(--phm-dat); font-weight: 600; }
+.phm-the__cuoi { margin: 2px -18px -16px; padding: 12px 18px 14px; border-top: 1px solid var(--phm-vach); border-radius: 0 0 var(--phm-bo-the) var(--phm-bo-the); display: flex; align-items: flex-start; gap: 9px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); background: color-mix(in srgb, var(--phm-o) 45%, transparent); }
+.phm-the__cuoi .phm-i { width: 18px; height: 18px; color: var(--phm-cam); margin-top: 0; }
+.phm-the__cuoi b { font-weight: 600; color: var(--phm-chu); }
+.phm-ghi-chu { margin: 10px 6px 0; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+
+/* ── TỪNG CÂU CON ĐÃ LÀM ──────────────────────────────────────────── */
+.phm-seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); min-width: 0; border-radius: 12px; background: var(--phm-o); }
+.phm-seg button { min-width: 0; min-height: 48px; padding: 4px; border: 0; background: none; cursor: pointer; display: grid; }
+.phm-seg button span { display: grid; place-items: center; min-width: 0; border-radius: 9px; padding: 2px 4px; font-size: 0.9375rem; line-height: 1.2; font-weight: 500; color: var(--phm-chu); text-align: center; }
+.phm-seg button span small { font-size: inherit; color: var(--phm-chu-2); font-weight: 500; }
+.phm-seg button[aria-pressed="true"] span { background: var(--phm-the); font-weight: 600; box-shadow: 0 0 0 0.5px var(--phm-vach), 0 3px 8px -2px rgb(0 0 0 / 0.16); }
+@media (prefers-color-scheme: dark) { .phm-seg button[aria-pressed="true"] span { background: color-mix(in srgb, var(--m3-on-surface) 22%, var(--phm-o)); } .phm-bac span[data-nay] { background: color-mix(in srgb, var(--m3-on-surface) 22%, var(--phm-o)); } }
+.phm-chu-thich { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 10px 4px 0; font-size: 0.75rem; line-height: 1.333; color: var(--phm-chu-2); }
+.phm-chu-thich span { display: inline-flex; align-items: center; gap: 5px; }
+.phm-o-cau { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 3.5px; background: var(--phm-dat-to); }
+.phm-o-cau[data-sai] { background: repeating-linear-gradient(135deg, var(--phm-do) 0 2px, var(--phm-do-nen) 2px 4.5px); box-shadow: inset 0 0 0 1px var(--phm-do); }
+.phm-o-cau[data-che] { background: var(--phm-o); box-shadow: inset 0 0 0 1px var(--phm-net); }
+.phm-nhom { margin-top: 20px; scroll-margin-top: calc(var(--phm-thanh-cao) + 64px); }
+.phm-nhom__dau { margin: 0 6px 7px; }
+.phm-nhom__dau h3 { font-size: 0.8125rem; line-height: 1.385; font-weight: 600; color: var(--phm-chu-2); }
+.phm-nhom__dau h3 b { color: var(--phm-chu); font-weight: 600; }
+.phm-nhom__dau p { font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-dai-o { display: flex; flex-wrap: wrap; gap: 4px; padding: 14px 18px 13px; }
+.phm-cau > button, .phm-them { display: grid; width: 100%; border: 0; background: none; text-align: left; cursor: pointer; }
+.phm-cau { border-top: 1px solid var(--phm-vach); margin-left: 18px; }
+.phm-cau > button { grid-template-columns: minmax(0, 1fr) auto; column-gap: 8px; align-items: start; min-height: 64px; padding: 12px 12px 13px 0; }
+.phm-cau__dau { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 8px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-cau__dau b { font-weight: 600; color: var(--phm-chu); font-size: 0.9375rem; line-height: 1.333; min-width: 0; }
+.phm-cau__de { margin-top: 3px; font-size: 0.9375rem; line-height: 1.4; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.phm-cau[data-mo] .phm-cau__de { display: block; overflow: visible; }
+.phm-cau__kq { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; margin-top: 8px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-cau__kq b { font-weight: 600; color: var(--phm-chu); }
+.phm-cau > button > .phm-i { margin-top: 2px; transition: transform 200ms ease; }
+.phm-cau[data-mo] > button > .phm-i { transform: rotate(180deg); }
+.phm-mo { padding: 0 18px 16px 0; }
+.phm-pa { display: grid; gap: 6px; }
+.phm-pa li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; column-gap: 10px; align-items: center; min-height: 44px; padding: 7px 12px 7px 8px; border-radius: 13px; background: var(--phm-o); font-size: 0.9375rem; line-height: 1.333; }
+.phm-pa li > i { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-weight: 600; font-size: 0.8125rem; background: var(--phm-the); box-shadow: 0 0 0 0.5px var(--phm-vach); }
+.phm-pa li[data-dung] { background: var(--phm-dat-nen); color: var(--m3-on-tertiary-container); }
+.phm-pa li[data-dung] > i { background: var(--phm-dat); color: var(--phm-the); box-shadow: none; }
+.phm-pa li[data-chon] { box-shadow: inset 0 0 0 1.5px var(--phm-do); }
+.phm-pa li em { font-style: normal; font-size: 0.75rem; line-height: 1.333; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 3px; }
+.phm-pa li[data-dung] em { color: var(--phm-tren-dat-nen); }
+.phm-pa li[data-chon] em { color: var(--phm-do); }
+.phm-pa em .phm-i { width: 13px; height: 13px; stroke-width: 2.6; }
+.phm-loi-giai { margin-top: 10px; padding: 13px 15px 14px; border-radius: 15px; background: color-mix(in srgb, var(--phm-nhan-nen) 42%, var(--phm-the)); }
+.phm-loi-giai h4 { font-size: 0.8125rem; line-height: 1.385; font-weight: 600; color: var(--phm-nhan); margin-bottom: 4px; }
+.phm-loi-giai p { font-size: 0.9375rem; line-height: 1.47; }
+.phm-them { grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 8px; min-height: 50px; padding: 6px 12px 6px 18px; border-top: 1px solid var(--phm-vach); font-size: 1.0625rem; line-height: 1.294; color: var(--phm-nhan); }
+.phm-them small { display: block; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-dai-o + .phm-them { margin-left: 18px; width: calc(100% - 18px); padding-left: 0; }
+.phm-tu-cau[data-loc="sai"] .phm-cau:not([data-sai]), .phm-tu-cau[data-loc="lau"] .phm-cau:not([data-lau]) { display: none; }
+
+/* ── BÀI TẬP VỀ NHÀ ───────────────────────────────────────────────── */
+.phm-chang { display: grid; grid-template-columns: repeat(var(--so-chang, 5), minmax(0, 1fr)); margin-top: 16px; }
+.phm-chang li { position: relative; display: grid; justify-items: center; gap: 5px; min-width: 0; font-size: 0.75rem; line-height: 1.333; color: var(--phm-chu-2); text-align: center; }
+.phm-chang li::before { content: ""; position: absolute; top: 14px; left: -50%; right: 50%; border-top: 2px solid var(--phm-o); z-index: 0; }
+.phm-chang li:first-child::before { display: none; }
+.phm-chang li[data-tt="xong"]::before, .phm-chang li[data-tt="hom-nay"]::before { border-top-color: var(--phm-dat-to); }
+.phm-chang li > i { position: relative; z-index: 1; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 0.8125rem; font-weight: 600; background: var(--phm-o); color: var(--phm-chu-2); box-shadow: 0 0 0 3px var(--phm-the); }
+.phm-chang li[data-tt="xong"] > i, .phm-chang li[data-tt="hom-nay"] > i { background: var(--phm-dat-to); color: var(--phm-the); }
+.phm-chang li[data-tt="hom-nay"] > i { box-shadow: 0 0 0 3px var(--phm-the), 0 0 0 5px var(--phm-nhan-to); }
+.phm-chang li[data-tt="hom-nay"] { color: var(--phm-chu); font-weight: 600; }
+.phm-chang li > i .phm-i { width: 16px; height: 16px; stroke-width: 2.8; }
+.phm-ds > li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 1px 14px; padding: 12px 0; font-size: 1.0625rem; line-height: 1.294; }
+.phm-ds > li + li, .phm-ds--vach > li:first-child { border-top: 1px solid var(--phm-vach); }
+.phm-ds { margin-top: 14px; }
+.phm-ds > li:last-child { padding-bottom: 0; }
+.phm-ds > li > span { color: var(--phm-chu); min-width: 0; }
+.phm-ds > li > b { font-weight: 600; text-align: right; min-width: 0; margin-left: auto; }
+.phm-ds > li > b small, .phm-ds > li > span small { display: block; font-size: 0.8125rem; line-height: 1.385; font-weight: 400; color: var(--phm-chu-2); }
+.phm-bai > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-items: center; margin-left: 18px; padding: 13px 18px 13px 0; }
+.phm-bai > li + li { border-top: 1px solid var(--phm-vach); }
+.phm-bai h3 { font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; }
+.phm-bai p { margin: 2px 0 7px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-bai .phm-bai__diem { margin: 0; color: var(--phm-chu); text-align: right; white-space: nowrap; font-size: 1.5rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.025em; }
+.phm-bai .phm-bai__diem small { display: block; margin-top: 2px; font-size: 0.75rem; line-height: 1.333; font-weight: 500; letter-spacing: 0; color: var(--phm-chu-2); }
+.phm-dong-cam { display: flex; align-items: flex-start; gap: 10px; padding: 13px 16px; border-radius: 16px; background: var(--phm-cam-nen); color: var(--phm-tren-cam-nen); font-size: 0.9375rem; line-height: 1.4; }
+.phm-dong-cam .phm-i { width: 20px; height: 20px; margin-top: 0; }
+.phm-dong-cam b { font-weight: 600; }
+
+/* ── LỊCH ÔN LẠI ──────────────────────────────────────────────────── */
+.phm-on { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 14px; align-items: center; }
+.phm-on__so b { display: block; font-size: clamp(3rem, 15vw, 3.5rem); line-height: 1; font-weight: 700; letter-spacing: -0.04em; }
+.phm-on__so span { display: block; margin-top: 4px; font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; }
+.phm-on__so small { display: block; margin-top: 2px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-vong1 { position: relative; width: 84px; height: 84px; flex: none; }
+.phm-vong1 svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.phm-vong1 circle { fill: none; stroke: var(--phm-dat-to); stroke-width: 10; }
+.phm-vong1 .phm-v-nen { opacity: 0.2; }
+.phm-vong1 .phm-v-dat { stroke-linecap: round; }
+.phm-vong1 div { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
+.phm-vong1 div small { display: block; font-size: 0.75rem; font-weight: 500; letter-spacing: 0; color: var(--phm-chu-2); }
+.phm-on__kp { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--phm-vach); display: flex; align-items: flex-start; gap: 9px; font-size: 0.9375rem; line-height: 1.4; }
+.phm-on__kp .phm-i { color: var(--phm-dat); margin-top: -1px; }
+.phm-on__kp[data-mau="xam"] .phm-i { color: var(--phm-chu-2); }
+.phm-on__kp small { display: block; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-tuan { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--phm-vach); }
+.phm-tuan h3 { font-size: 0.8125rem; line-height: 1.385; font-weight: 600; color: var(--phm-chu-2); margin-bottom: 10px; }
+.phm-tuan ol { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; align-items: end; }
+.phm-tuan li { display: grid; justify-items: center; gap: 3px; min-width: 0; font-size: 0.75rem; line-height: 1.333; color: var(--phm-chu-2); }
+.phm-tuan li b { font-size: 0.8125rem; font-weight: 600; color: var(--phm-chu); }
+.phm-tuan li i { display: block; width: 100%; max-width: 22px; border-radius: 4px; background: var(--phm-nhan-nhat); height: calc(6px + var(--c) * 6px); }
+.phm-tuan li[data-mai] i { background: var(--phm-nhan-to); }
+.phm-tuan li[data-khong] i { height: 5px; width: 5px; border-radius: 50%; background: var(--phm-net); opacity: 0.55; }
+
+/* ── 14 NGÀY GẦN ĐÂY ──────────────────────────────────────────────── */
+.phm-14 { --bieu-cao: 120px; }
+.phm-14 ol { display: flex; align-items: flex-end; gap: clamp(3px, 1.4vw, 7px); height: var(--bieu-cao); }
+.phm-14 ol li { position: relative; flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.phm-14 ol li i { display: block; width: 100%; max-width: 12px; border-radius: 4px 4px 1.5px 1.5px; background: var(--phm-nhan-nhat); height: calc(var(--c) / 40 * 100%); }
+.phm-14 ol li[data-nay] i { background: var(--phm-nhan-to); }
+.phm-14 ol li[data-nghi] i { width: 5px; height: 5px; border-radius: 50%; background: var(--phm-net); opacity: 0.55; margin-bottom: 1px; }
+.phm-14 ol li em { font-style: normal; font-size: 0.75rem; line-height: 1.2; font-weight: 700; color: var(--phm-nhan); margin-bottom: 3px; white-space: nowrap; }
+.phm-14 ol li span { position: absolute; top: calc(100% + 5px); left: 50%; transform: translateX(-50%); font-size: 0.75rem; line-height: 1.2; color: var(--phm-chu-2); white-space: nowrap; }
+.phm-14 ol li[data-nay] span { color: var(--phm-chu); font-weight: 700; }
+.phm-14__chu { margin-top: 26px; font-size: 0.75rem; line-height: 1.333; color: var(--phm-chu-2); display: flex; flex-wrap: wrap; gap: 3px 14px; }
+.phm-14__chu span { display: inline-flex; align-items: center; gap: 5px; }
+.phm-14__chu i { width: 8px; height: 8px; border-radius: 2.5px; background: var(--phm-nhan-nhat); }
+.phm-14__chu i[data-nay] { background: var(--phm-nhan-to); }
+.phm-14__chu i[data-nghi] { width: 5px; height: 5px; border-radius: 50%; background: var(--phm-net); opacity: 0.55; }
+
+/* ── LỜI A.I ĐỖ ĐẠI HỌC ───────────────────────────────────────────── */
+.phm-thu { padding: 20px 20px 18px; }
+.phm-thu__dau { display: flex; align-items: center; gap: 12px; }
+.phm-thu__dau > i { width: 42px; height: 42px; border-radius: 50%; flex: none; display: grid; place-items: center; font-style: normal; font-size: 0.875rem; font-weight: 700; letter-spacing: -0.01em; background: var(--phm-nhan-nen); color: var(--phm-tren-nhan-nen); }
+.phm-thu__dau h3 { font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; }
+.phm-thu__dau p { font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-thu__than { margin-top: 14px; font-size: 1.0625rem; line-height: 1.5; letter-spacing: -0.011em; text-wrap: pretty; }
+.phm-thu__than p + p { margin-top: 0.7em; }
+.phm-thu__ky { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--phm-vach); font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-goi-y > li { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: 12px; align-items: start; padding: 13px 0; font-size: 0.9375rem; line-height: 1.4; }
+.phm-goi-y > li + li { border-top: 1px solid var(--phm-vach); }
+.phm-goi-y > li > i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 0.8125rem; font-weight: 700; background: var(--phm-nhan-nen); color: var(--phm-tren-nhan-nen); }
+.phm-goi-y { margin-top: 6px; }
+.phm-goi-y > li:last-child { padding-bottom: 2px; }
+.phm-do-cham { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 26px 8px 0; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); text-align: left; order: 99; }
+.phm-do-cham .phm-i { width: 18px; height: 18px; }
+.phm-do-cham b { font-weight: 600; color: var(--phm-chu); }
+
+/* ── "SẮP CÓ THÊM" (dữ liệu thưa) ─────────────────────────────────── */
+.phm-sap > li { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 12px; align-items: start; padding: 11px 0; font-size: 0.9375rem; line-height: 1.4; }
+.phm-sap > li + li { border-top: 1px solid var(--phm-vach); }
+.phm-sap { margin-top: 6px; }
+.phm-sap .phm-i { width: 20px; height: 20px; color: var(--phm-chu-2); margin-top: 1px; }
+.phm-sap small { display: block; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+.phm-sap > li:last-child { padding-bottom: 0; }
+
+/* ── THANH ĐÁY ────────────────────────────────────────────────────── */
+.phm-day { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 10px max(var(--phm-le), env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(var(--phm-le), env(safe-area-inset-left));
+  background: var(--phm-mo-nen); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid var(--phm-vach); }
+.phm-day__trong { max-width: 440px; margin: 0 auto; }
+.phm-nut { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 52px; padding: 6px 16px; border: 0; border-radius: var(--phm-bo-nut); cursor: pointer; background: var(--phm-nut); color: var(--phm-tren-nut); font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; }
+.phm-nut .phm-i { width: 20px; height: 20px; stroke-width: 1.8; }
+.phm-day__phu { margin-top: 6px; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); text-align: center; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .phm-tren__giua { transition: opacity 180ms ease, transform 180ms ease; }
+  .phm-nut, .phm-lan a, .phm-cau > button, .phm-them, .phm-muc-luc a { transition: opacity 140ms ease, transform 140ms ease; }
+  .phm-nut:active { transform: scale(0.98); opacity: 0.86; }
+  .phm-lan a:active, .phm-cau > button:active, .phm-them:active, .phm-muc-luc a:active { opacity: 0.6; }
+}
+</style></head><body class="m3 phm-goc">
+<header class="phm-tren"><div class="phm-tren__hang"><a class="phm-lui" href="ph-a-man-chinh.html" aria-label="Quay lại màn Hôm nay"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg><span>Hôm nay</span></a>
+  <div class="phm-tren__giua" aria-hidden="true"><span class="phm-tren__ten">Mọi thứ về con</span><span class="phm-tren__phu" data-ten>Nguyễn Minh Khôi</span></div><span></span></div></header>
+<div class="phm-tieu-de"><h1>Mọi thứ về con</h1><p><b data-ten>Nguyễn Minh Khôi</b> · Lớp 12 - Tinh Hoa</p></div>
+<nav class="phm-muc-luc" aria-label="Các mục của bảng"><div class="phm-muc-luc__khung"><ul><li><a href="#muc-tong-quan" aria-current="true"><span>Tổng quan</span></a></li><li><a href="#muc-thoi-gian"><span>Dòng thời gian</span></a></li><li><a href="#muc-ca"><span>Ca kiểm tra</span></a></li><li><a href="#muc-dang"><span>Điểm mạnh · cần luyện</span></a></li><li><a href="#muc-cau"><span>Từng câu (38)</span></a></li><li><a href="#muc-btvn"><span>Bài tập về nhà</span></a></li><li><a href="#muc-on"><span>Lịch ôn lại</span></a></li><li><a href="#muc-14"><span>14 ngày</span></a></li><li><a href="#muc-loi"><span>Lời A.I Đỗ Đại Học</span></a></li></ul></div></nav>
+<main class="phm-man">
+<div class="phm-hang"><div class="phm-cot">
+  <section class="phm-muc phm-muc--dau" id="muc-tong-quan" style="--tt:1" aria-label="Tổng quan hôm nay"><div class="phm-the phm-the--dem phm-ah">
+    <p class="phm-ah__ngay">Thứ Hai 21/09/2026 · cập nhật lúc 21:00</p><h2>Hôm nay của <span data-ten-goi>Khôi</span></h2>
+    <div class="phm-ah__than"><div class="phm-vong3" role="img" aria-label="Ba vòng hôm nay: 38 câu đã làm trên mục tiêu 16 câu; câu đúng 79 %; 52 phút học trên mục tiêu 45 phút"><svg viewBox="0 0 120 120" aria-hidden="true"><defs><filter id="phm-v1-mo" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="1.7"/></filter></defs><circle class="phm-v-nen" data-mau="1" cx="60" cy="60" r="50" stroke-width="10.5"/><circle data-mau="1" cx="60" cy="60" r="50" stroke-width="10.5"/><circle data-mau="1" data-vuot cx="60" cy="60" r="50" stroke-width="10.5" stroke-linecap="round" stroke-dasharray="117.81 314.16" transform="rotate(-90 60 60)"/><mask id="phm-v1-1"><circle cx="60" cy="60" r="50" fill="none" stroke="#fff" stroke-width="10.5"/></mask>
+      <g mask="url(#phm-v1-1)"><circle cx="93.09" cy="97.62" r="5.25" fill="#000" stroke="none" opacity="0.42" filter="url(#phm-v1-mo)"/></g><circle data-to="1" data-vuot cx="95.36" cy="95.36" r="5.25"/><circle class="phm-v-nen" data-mau="2" cx="60" cy="60" r="37.5" stroke-width="10.5"/><circle data-mau="2" cx="60" cy="60" r="37.5" stroke-width="10.5" stroke-linecap="round" stroke-dasharray="186.02 235.62" transform="rotate(-90 60 60)"/><circle class="phm-v-nen" data-mau="3" cx="60" cy="60" r="25" stroke-width="10.5"/><circle data-mau="3" cx="60" cy="60" r="25" stroke-width="10.5"/><circle data-mau="3" data-vuot cx="60" cy="60" r="25" stroke-width="10.5" stroke-linecap="round" stroke-dasharray="24.43 157.08" transform="rotate(-90 60 60)"/><mask id="phm-v1-3"><circle cx="60" cy="60" r="25" fill="none" stroke="#fff" stroke-width="10.5"/></mask>
+      <g mask="url(#phm-v1-3)"><circle cx="82.52" cy="48.67" r="5.25" fill="#000" stroke="none" opacity="0.42" filter="url(#phm-v1-mo)"/></g><circle data-to="3" data-vuot cx="80.73" cy="46.02" r="5.25"/></svg></div>
+      <ul class="phm-chu-giai"><li data-mau="1"><b>38<small>/16 câu</small></b><span>đã làm · vượt mục tiêu</span></li>
+        <li data-mau="2"><b>79<small>%</small></b><span>đúng 30 trong 38 câu</span></li>
+        <li data-mau="3"><b>52<small>/45 phút</small></b><span>đã học · vượt mục tiêu</span></li></ul></div>
+    <div class="phm-ah__loi"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.8 2.8 5.2-6"/></svg><p>Hôm nay <span data-ten-goi>Khôi</span> học 5 lần, lần dài nhất 21 phút, và đã đạt nhiệm vụ ngày.</p></div>
+    <div class="phm-ah__hq"><h3>So với hôm qua của chính con</h3><div class="phm-chips">
+    <span class="phm-chip" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>nhiều hơn 5 câu</span><span class="phm-chip" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>đúng hơn 3 %</span><span class="phm-chip" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>lâu hơn 7 phút</span></div></div></div></section>
+  <section class="phm-muc " id="muc-thoi-gian" style="--tt:4" aria-label="Dòng thời gian trong ngày"><header class="phm-muc__dau"><h2>Dòng thời gian trong ngày</h2><p>chạm một lần ngồi học để xem từng câu</p></header><div class="phm-the">
+  <div style="padding:18px 18px 0"><p class="phm-so-to"><b>5<small>lần ngồi học</small></b><span>dài nhất 21 phút · tổng 52 phút</span></p><div class="phm-bieu phm-gio" role="img" aria-label="Số phút con học theo từng giờ trong ngày: 6 giờ 7 phút, 17 giờ 21 phút, 19 giờ 6 phút, 20 giờ 18 phút">
+    <div class="phm-bieu__luoi" aria-hidden="true"><span style="top:0"><em>30 phút</em></span><span style="top:50%"><em>15 phút</em></span><span style="top:100%"><em>0</em></span></div>
+    <ol aria-hidden="true"><li data-moc><span>0 giờ</span></li><li></li><li></li><li></li><li></li><li></li><li data-moc><i style="--c:7"></i><span>6 giờ</span></li><li></li><li></li><li></li><li></li><li></li><li data-moc><span>12 giờ</span></li><li></li><li></li><li></li><li></li><li><i style="--c:21"></i></li><li data-moc><span>18 giờ</span></li><li><i style="--c:6"></i></li><li><i style="--c:18"></i></li><li></li><li></li><li></li></ol></div><p class="phm-gio__loi">1 lần buổi sáng, 1 lần buổi chiều, 3 lần buổi tối.</p></div>
+  <ol class="phm-lan"><li><a href="#nhom-1" aria-label="06:40, Ôn lại 6 câu đến lịch: 6 câu, đúng 5, 7 phút. Xem từng câu của lần này"><span class="phm-o-bt"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/></svg></span>
+    <div><h3>Ôn lại 6 câu đến lịch</h3><p><b>06:40</b> · 6 câu · đúng 5 · 7 phút</p><span class="phm-thanh phm-thanh--manh" data-mau="dat" role="img" aria-label="đúng 5 trong 6 câu"><i style="width:83.3%"></i></span></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></a></li><li><a href="#nhom-2" aria-label="17:12, Bài tập về nhà Ester – Lipid, chặng 2: 12 câu, đúng 9, 21 phút. Xem từng câu của lần này"><span class="phm-o-bt"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 6.5C10.3 5 7.8 4.5 4 4.5v13c3.8 0 6.3.5 8 2 1.7-1.5 4.2-2 8-2v-13c-3.8 0-6.3.5-8 2z"/><path d="M12 6.5v13"/></svg></span>
+    <div><h3>Bài tập về nhà <span class="phm-lien">“Ester – Lipid”</span> · chặng 2</h3><p><b>17:12</b> · 12 câu · đúng 9 · 21 phút · nộp đúng nhịp</p><span class="phm-thanh phm-thanh--manh" data-mau="dat" role="img" aria-label="đúng 9 trong 12 câu"><i style="width:75.0%"></i></span></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></a></li><li><a href="#nhom-3" aria-label="19:35, Thử thách riêng hôm nay: 5 câu, đúng 4, 6 phút. Xem từng câu của lần này"><span class="phm-o-bt"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.8"/></svg></span>
+    <div><h3>Thử thách riêng hôm nay</h3><p><b>19:35</b> · 5 câu · đúng 4 · 6 phút</p><span class="phm-thanh phm-thanh--manh" data-mau="dat" role="img" aria-label="đúng 4 trong 5 câu"><i style="width:80.0%"></i></span></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></a></li><li><a href="#nhom-4" aria-label="20:10, Luyện dạng con còn vấp: 9 câu, đúng 7, 11 phút. Xem từng câu của lần này"><span class="phm-o-bt"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M3.5 19.5H8V15h4.5v-4.5H17V6h3.5"/></svg></span>
+    <div><h3>Luyện dạng con còn vấp</h3><p><b>20:10</b> · 9 câu · đúng 7 · 11 phút</p><span class="phm-thanh phm-thanh--manh" data-mau="dat" role="img" aria-label="đúng 7 trong 9 câu"><i style="width:77.8%"></i></span></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></a></li><li><a href="#nhom-5" aria-label="20:40, Bài gia đình giao lúc 19:58: 6 câu, đúng 5, 7 phút. Xem từng câu của lần này"><span class="phm-o-bt"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5"/><path d="M6 9.5v10h12v-10"/><path d="M10 19.5v-5h4v5"/></svg></span>
+    <div><h3>Bài gia đình giao lúc 19:58</h3><p><b>20:40</b> · 6 câu · đúng 5 · 7 phút</p><span class="phm-thanh phm-thanh--manh" data-mau="dat" role="img" aria-label="đúng 5 trong 6 câu"><i style="width:83.3%"></i></span></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></a></li></ol></div></section>
+</div><div class="phm-cot">
+  <section class="phm-muc phm-muc--sat" id="muc-mung" style="--tt:2" aria-label="Điều đáng mừng hôm nay"><div class="phm-the phm-the--dem"><p class="phm-nhan-muc" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M11 4.5 12.7 10l5.8 1.7-5.8 1.8L11 19l-1.7-5.5-5.8-1.8L9.3 10z"/><path d="M18.5 3.5v3.4M16.8 5.2h3.4"/></svg>Điều đáng mừng hôm nay</p><ul class="phm-mung"><li><span class="phm-o-bt" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/></svg></span><div><h3>Con làm đúng lại <b>4 câu</b> từng sai tuần trước</h3><p>trong 6 câu ôn lại lúc 06:40 sáng nay</p><div class="phm-o4" aria-hidden="true"><i><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i><i><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i><i><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i><i><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i></div></div></li><li><span class="phm-o-bt" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M3.5 19.5H8V15h4.5v-4.5H17V6h3.5"/></svg></span><div><h3>Con lên bậc ở <b>2 dạng</b></h3><ul class="phm-len-bac"><li><span>Phản ứng ester hoá</span><span class="phm-bac-len">Biết <svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg> <b>Hiểu</b></span></li><li><span>Tính chất vật lí của lipid</span><span class="phm-bac-len">Biết <svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg> <b>Hiểu</b></span></li></ul></div></li><li><span class="phm-o-bt" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M3.5 10h17"/><path d="m9 15.2 2.2 2.2 3.8-4.2"/></svg></span><div><h3>Con học đều ngày thứ <b>6</b> liên tiếp</h3><p>từ Thứ Tư 16/09 đến hôm nay</p><ol class="phm-7" aria-hidden="true"><li data-nghi><i></i>T3</li><li><i></i>T4</li><li><i></i>T5</li><li><i></i>T6</li><li><i></i>T7</li><li><i></i>CN</li><li><i></i>T2</li></ol></div></li></ul></div></section>
+  <section class="phm-muc phm-muc--sat" id="muc-ai-lam" style="--tt:3" aria-label="Thầy và A.I Đỗ Đại Học đã làm gì cho con hôm nay"><div class="phm-the phm-the--dem"><p class="phm-nhan-muc"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M10 6.5h10M10 12h10M10 17.5h10"/><path d="m3.5 6.3 1.4 1.4 2.3-2.6M3.5 11.8l1.4 1.4 2.3-2.6M3.5 17.3l1.4 1.4 2.3-2.6"/></svg>A.I Đỗ Đại Học · hôm nay</p><h2 class="phm-ten-the">Thầy và A.I Đỗ Đại Học đã làm gì cho con hôm nay</h2>
+  <ul class="phm-lam" style="margin-top:6px"><li><span class="phm-tich"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><div><h3>Chọn riêng <b>23 câu</b> hợp với sức của con</h3><p>5 câu thử thách, 9 câu luyện dạng còn vấp, 6 câu bài gia đình giao, 3 câu dành riêng trong bài tập về nhà</p></div></li><li><span class="phm-tich"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><div><h3>Xếp <b>7 câu</b> con từng sai vào lịch ôn ngày mai</h3><p>Thứ Ba 22/09/2026 · khoảng 10 phút</p></div></li><li><span class="phm-tich"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><div><h3>Soạn một thử thách riêng <b>5 câu</b> lúc 19:30</h3><p>con làm lúc 19:35, đúng 4 câu</p></div></li><li><span class="phm-tich"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><div><h3>Nhắc con trước hạn nộp bài tập về nhà</h3><p>nhắc lúc 17:00 · con làm chặng 2 lúc 17:12</p></div></li><li><span class="phm-tich"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><div><h3>Chấm và giải thích <b>38 câu</b> ngay khi con làm xong</h3><p>câu nào cũng có đáp án và lời giải ngắn</p></div></li></ul><p class="phm-lam__cuoi">Anh/chị không cần làm gì thêm — chỉ cần động viên con học đều.</p></div></section>
+  <section class="phm-muc " id="muc-ca" style="--tt:5" aria-label="Ca kiểm tra gần nhất"><header class="phm-muc__dau"><h2>Ca kiểm tra gần nhất</h2></header><div class="phm-the phm-the--dem"><p class="phm-nhan-muc" data-mau="xam">Kiểm tra 45 phút · Ester – Lipid</p>
+    <p class="phm-diem" role="img" aria-label="7,5 trên 10 điểm"><b>7,5</b><span>/10 điểm</span></p>
+    <p class="phm-ca__hon"><i><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg></i><span>Hơn 0,75 điểm so với lần trước của chính con</span></p>
+    <p class="phm-phu">Lần trước 6,75 điểm · nộp lúc 09:12 · Thứ Bảy 19/09/2026 · đúng 21/28 câu · làm trong 32 phút 10 giây</p>
+    <ul class="phm-phan"><li><div class="phm-phan__dau"><h3>Phần I · Trắc nghiệm</h3><span>3,75<small>/4,5 điểm</small></span></div><span class="phm-thanh " role="img" aria-label="3,75 trên 4,5 điểm"><i style="width:83.3%"></i></span><p>đúng 15/18 câu</p></li><li><div class="phm-phan__dau"><h3>Phần II · Đúng–sai</h3><span>2,75<small>/4 điểm</small></span></div><span class="phm-thanh " role="img" aria-label="2,75 trên 4 điểm"><i style="width:68.8%"></i></span><p>đúng trọn 2/4 câu</p></li><li><div class="phm-phan__dau"><h3>Phần III · Trả lời ngắn</h3><span>1<small>/1,5 điểm</small></span></div><span class="phm-thanh " role="img" aria-label="1 trên 1,5 điểm"><i style="width:66.7%"></i></span><p>đúng 4/6 câu</p></li></ul></div>
+    <p class="phm-bien-the">Biến thể · khi thầy chưa công bố điểm</p><div class="phm-the phm-dong-bt"><span class="phm-o-bt" data-mau="xam"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9.5" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><h3>Thầy chưa công bố điểm</h3><p>Con đã nộp bài lúc 09:12 · Thứ Bảy 19/09/2026. Điểm và từng câu sẽ hiện khi thầy công bố.</p></div></div></section>
+</div></div>
+<section class="phm-muc " id="muc-dang" style="--tt:6" aria-label="Điểm mạnh và cần luyện"><header class="phm-muc__dau"><h2>Điểm mạnh · cần luyện</h2><p>tính trên 14 ngày gần đây</p></header><div class="phm-hai">
+  <div class="phm-the phm-the--dem"><p class="phm-nhan-muc" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.8 2.8 5.2-6"/></svg>Dạng con làm tốt</p><ul class="phm-dang"><li><div class="phm-dang__dau"><h3>Danh pháp ester</h3><span>đúng <b>11/12</b> câu</span></div><span class="phm-thanh phm-thanh--manh" data-mau="dat"><i style="width:91.7%"></i></span>
+  <div class="phm-bac" role="img" aria-label="Bậc hiện tại của con: Vận dụng. Ba bậc: Biết, Hiểu, Vận dụng"><span>Biết</span><span>Hiểu</span><span data-nay>Vận dụng</span></div>
+  </li><li><div class="phm-dang__dau"><h3>Phản ứng ester hoá</h3><span>đúng <b>9/10</b> câu</span></div><span class="phm-thanh phm-thanh--manh" data-mau="dat"><i style="width:90.0%"></i></span>
+  <div class="phm-bac" role="img" aria-label="Bậc hiện tại của con: Hiểu. Ba bậc: Biết, Hiểu, Vận dụng"><span>Biết</span><span data-nay>Hiểu</span><span>Vận dụng</span></div>
+  <p class="phm-dang__ghi" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>Mới lên bậc Hiểu hôm nay</p></li><li><div class="phm-dang__dau"><h3>Tính chất vật lí của lipid</h3><span>đúng <b>8/9</b> câu</span></div><span class="phm-thanh phm-thanh--manh" data-mau="dat"><i style="width:88.9%"></i></span>
+  <div class="phm-bac" role="img" aria-label="Bậc hiện tại của con: Hiểu. Ba bậc: Biết, Hiểu, Vận dụng"><span>Biết</span><span data-nay>Hiểu</span><span>Vận dụng</span></div>
+  <p class="phm-dang__ghi" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m6 11 6-6 6 6"/></svg>Mới lên bậc Hiểu hôm nay</p></li></ul></div>
+  <div class="phm-the phm-the--dem"><p class="phm-nhan-muc" data-mau="cam"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.8"/></svg>Dạng con còn vấp</p><ul class="phm-dang"><li><div class="phm-dang__dau"><h3>Xà phòng hoá chất béo</h3><span>đúng <b>3/9</b> câu</span></div><span class="phm-thanh phm-thanh--manh" data-mau="cam"><i style="width:33.3%"></i></span>
+  <div class="phm-bac" role="img" aria-label="Bậc hiện tại của con: Biết. Ba bậc: Biết, Hiểu, Vận dụng"><span data-nay>Biết</span><span>Hiểu</span><span>Vận dụng</span></div>
+  <p class="phm-dang__ghi"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/></svg>4 câu vào lịch ôn ngày 22/09</p></li><li><div class="phm-dang__dau"><h3>Bài toán hỗn hợp ester</h3><span>đúng <b>4/10</b> câu</span></div><span class="phm-thanh phm-thanh--manh" data-mau="cam"><i style="width:40.0%"></i></span>
+  <div class="phm-bac" role="img" aria-label="Bậc hiện tại của con: Biết. Ba bậc: Biết, Hiểu, Vận dụng"><span data-nay>Biết</span><span>Hiểu</span><span>Vận dụng</span></div>
+  <p class="phm-dang__ghi"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/></svg>2 câu vào lịch ôn ngày 22/09</p></li><li><div class="phm-dang__dau"><h3>Phản ứng thuỷ phân ester</h3><span>đúng <b>6/11</b> câu</span></div><span class="phm-thanh phm-thanh--manh" data-mau="cam"><i style="width:54.5%"></i></span>
+  <div class="phm-bac" role="img" aria-label="Bậc hiện tại của con: Hiểu. Ba bậc: Biết, Hiểu, Vận dụng"><span>Biết</span><span data-nay>Hiểu</span><span>Vận dụng</span></div>
+  <p class="phm-dang__ghi"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/></svg>1 câu vào lịch ôn ngày 22/09</p></li></ul>
+    <p class="phm-the__cuoi"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M8 3v4"/><path d="M16 3v4"/><path d="M3.5 10h17"/><path d="m9 15.2 2.2 2.2 3.8-4.2"/></svg><span>A.I Đỗ Đại Học đã xếp <b>7 câu</b> của 3 dạng này vào lịch ôn ngày 22/09</span></p></div></div>
+  <p class="phm-ghi-chu">Mỗi dạng bài con đi qua ba bậc: Biết, Hiểu, Vận dụng.</p></section>
+<div class="phm-hang"><div class="phm-cot">
+  <section class="phm-muc " id="muc-cau" style="--tt:7" aria-label="Từng câu con đã làm hôm nay"><header class="phm-muc__dau"><h2>Từng câu con đã làm</h2><p>38 câu hôm nay · xếp theo giờ làm</p></header><div class="phm-seg" role="group" aria-label="Lọc câu"><button type="button" data-loc="" aria-pressed="true"><span>Tất cả <small>38</small></span></button><button type="button" data-loc="sai" aria-pressed="false"><span>Sai <small>8</small></span></button><button type="button" data-loc="lau" aria-pressed="false"><span>Làm lâu <small>5</small></span></button></div>
+  <p class="phm-chu-thich"><span><i class="phm-o-cau"></i>ô đặc: đúng</span><span><i class="phm-o-cau" data-sai></i>ô gạch chéo: sai</span><span>Làm lâu: hơn 3 phút một câu</span></p><div class="phm-tu-cau" data-loc="">
+    <div class="phm-nhom" id="nhom-1"><div class="phm-nhom__dau"><h3><b>06:40</b> · Ôn lại 6 câu đến lịch</h3><p>6 câu · đúng 5 · sai 1 · 7 phút</p></div>
+  <div class="phm-the"><div class="phm-dai-o" role="img" aria-label="6 câu: đúng 5, sai 1"><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau" data-sai></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i></div><button class="phm-them" type="button"><span>Xem 6 câu của lần này</span><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button></div></div>
+    <div class="phm-nhom" id="nhom-2"><div class="phm-nhom__dau"><h3><b>17:12</b> · Bài tập về nhà <span class="phm-lien">“Ester – Lipid”</span> · chặng 2</h3><p>12 câu · đúng 9 · sai 3 · 21 phút</p></div>
+  <div class="phm-the"><div class="phm-dai-o" role="img" aria-label="12 câu: đúng 9, sai 3"><i class="phm-o-cau"></i><i class="phm-o-cau" data-sai></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau" data-sai></i><i class="phm-o-cau"></i><i class="phm-o-cau" data-sai></i><i class="phm-o-cau"></i></div><ul><li class="phm-cau"><button type="button">
+    <div><p class="phm-cau__dau"><b>Phản ứng ester hoá</b><span>17:12</span></p><p class="phm-cau__de">Đun nóng CH<sub>3</sub>COOH với C<sub>2</sub>H<sub>5</sub>OH (xúc tác H<sub>2</sub>SO<sub>4</sub> đặc) thu được ester có công thức là</p>
+      <p class="phm-cau__kq"><span class="phm-chip" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Đúng</span><span>Đáp án <b>B</b></span><span>52 giây</span></p></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
+    </li><li class="phm-cau" data-sai data-lau><button type="button">
+    <div><p class="phm-cau__dau"><b>Phản ứng thuỷ phân ester</b><span>17:15</span></p><p class="phm-cau__de">Thuỷ phân hoàn toàn 8,8 gam ethyl acetate CH<sub>3</sub>COOC<sub>2</sub>H<sub>5</sub> bằng 200 mL dung dịch NaOH 1 M. Cô cạn dung dịch sau phản ứng thu được m gam chất rắn khan. Giá trị của m là</p>
+      <p class="phm-cau__kq"><span class="phm-chip" data-mau="do"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>Sai</span><span>Đáp án <b>C</b></span><span>3 phút 48 giây</span><span class="phm-chip" data-mau="cam"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Làm lâu</span></p></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
+    </li><li class="phm-cau" data-sai data-lau><button type="button">
+    <div><p class="phm-cau__dau"><b>Bài toán hỗn hợp ester</b><span>17:29</span></p><p class="phm-cau__de">Đốt cháy hoàn toàn 0,1 mol hỗn hợp hai ester no, đơn chức, mạch hở thu được 0,35 mol CO<sub>2</sub>. Khối lượng H<sub>2</sub>O thu được là</p>
+      <p class="phm-cau__kq"><span class="phm-chip" data-mau="do"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>Sai</span><span>Đáp án <b>B</b></span><span>4 phút 10 giây</span><span class="phm-chip" data-mau="cam"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Làm lâu</span></p></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
+    </li></ul><button class="phm-them" type="button"><span>Hiện đủ 12 câu<small>còn 9 câu nữa của lần này</small></span><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button></div></div>
+    <div class="phm-nhom" id="nhom-3"><div class="phm-nhom__dau"><h3><b>19:35</b> · Thử thách riêng hôm nay</h3><p>5 câu · đúng 4 · sai 1 · 6 phút</p></div>
+  <div class="phm-the"><div class="phm-dai-o" role="img" aria-label="5 câu: đúng 4, sai 1"><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau" data-sai></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i></div><button class="phm-them" type="button"><span>Xem 5 câu của lần này</span><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button></div></div>
+    <div class="phm-nhom" id="nhom-4"><div class="phm-nhom__dau"><h3><b>20:10</b> · Luyện dạng con còn vấp</h3><p>9 câu · đúng 7 · sai 2 · 11 phút</p></div>
+  <div class="phm-the"><div class="phm-dai-o" role="img" aria-label="9 câu: đúng 7, sai 2"><i class="phm-o-cau"></i><i class="phm-o-cau" data-sai></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau" data-sai></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i></div><ul><li class="phm-cau"><button type="button">
+    <div><p class="phm-cau__dau"><b>Xà phòng hoá chất béo</b><span>20:10</span></p><p class="phm-cau__de">Chất béo là triester của glycerol với</p>
+      <p class="phm-cau__kq"><span class="phm-chip" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Đúng</span><span>Con chọn <b>A</b> · Đáp án <b>A</b></span><span>35 giây</span></p></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
+    </li><li class="phm-cau" data-sai data-lau data-mo><button type="button" aria-expanded="true" aria-controls="phm-mo-1">
+    <div><p class="phm-cau__dau"><b>Xà phòng hoá chất béo</b><span>20:14</span></p><p class="phm-cau__de">Xà phòng hoá hoàn toàn 17,8 gam tristearin (C<sub>17</sub>H<sub>35</sub>COO)<sub>3</sub>C<sub>3</sub>H<sub>5</sub> bằng dung dịch NaOH vừa đủ. Khối lượng glycerol thu được là</p>
+      <p class="phm-cau__kq"><span class="phm-chip" data-mau="do"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>Sai</span><span>Con chọn <b>D</b> · Đáp án <b>B</b></span><span>3 phút 20 giây</span><span class="phm-chip" data-mau="cam"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Làm lâu</span></p></div><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button>
+    <div class="phm-mo" id="phm-mo-1"><ul class="phm-pa"><li><i>A</i><span>0,92 gam</span></li><li data-dung><i>B</i><span>1,84 gam</span><em><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Đáp án đúng</em></li><li><i>C</i><span>2,76 gam</span></li><li data-chon><i>D</i><span>5,52 gam</span><em>Con chọn</em></li></ul>
+      <div class="phm-loi-giai"><h4>Lời giải ngắn</h4><p>Số mol tristearin = 17,8 : 890 = 0,02 mol. Một mol chất béo khi xà phòng hoá chỉ cho một mol glycerol C<sub>3</sub>H<sub>5</sub>(OH)<sub>3</sub>, nên số mol glycerol = 0,02 mol. Khối lượng glycerol = 0,02 × 92 = 1,84 gam. Số 5,52 con chọn là do nhân thêm hệ số 3 của NaOH.</p></div></div></li></ul><button class="phm-them" type="button"><span>Hiện đủ 9 câu<small>còn 7 câu nữa của lần này</small></span><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7"/></svg></button></div></div>
+    <div class="phm-nhom" id="nhom-5"><div class="phm-nhom__dau"><h3><b>20:40</b> · Bài gia đình giao lúc 19:58</h3><p>6 câu · đúng 5 · sai 1 · 7 phút</p></div>
+  <div class="phm-the"><div class="phm-dai-o" role="img" aria-label="6 câu: đúng 5, sai 1"><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau"></i><i class="phm-o-cau" data-sai></i><i class="phm-o-cau"></i></div><button class="phm-them" type="button"><span>Xem 6 câu của lần này</span><svg class="phm-i phm-i--mui" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button></div></div>
+    <p class="phm-bien-the">Biến thể · nhóm câu của bài con chưa nộp</p><div class="phm-the"><div class="phm-dong-bt"><span class="phm-o-bt" data-mau="xam"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9.5" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><div><h3>Bài tập về nhà · chặng 3 · con đang làm</h3><p>Con đã làm 6 câu · kết quả hiện sau khi con nộp bài</p></div></div>
+      <div class="phm-dai-o" style="padding-top:0" role="img" aria-label="6 câu con đã làm, chưa hiện kết quả"><i class="phm-o-cau" data-che></i><i class="phm-o-cau" data-che></i><i class="phm-o-cau" data-che></i><i class="phm-o-cau" data-che></i><i class="phm-o-cau" data-che></i><i class="phm-o-cau" data-che></i></div></div></div></section>
+</div><div class="phm-cot">
+  <section class="phm-muc " id="muc-btvn" style="--tt:8" aria-label="Bài tập về nhà"><header class="phm-muc__dau"><h2>Bài tập về nhà</h2><p>1 bài đang chạy · 2 bài gần đây</p></header><div class="phm-the phm-the--dem"><p class="phm-nhan-muc"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 6.5C10.3 5 7.8 4.5 4 4.5v13c3.8 0 6.3.5 8 2 1.7-1.5 4.2-2 8-2v-13c-3.8 0-6.3.5-8 2z"/><path d="M12 6.5v13"/></svg>Đang chạy</p><h3 class="phm-ten-the">Ester – Lipid</h3><p class="phm-phu">Xong 2 trong 5 chặng</p>
+    <ol class="phm-chang" aria-label="Năm chặng: chặng 1 và 2 đã xong, chặng 2 là của hôm nay, chặng 3 đến 5 sắp tới"><li data-tt="xong"><i><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i>CN 20</li><li data-tt="hom-nay"><i><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i>Hôm nay</li><li data-tt=""><i>3</i>T3 22</li><li data-tt=""><i>4</i>T4 23</li><li data-tt=""><i>5</i>T5 24</li></ol>
+    <p style="margin-top:14px"><span class="phm-chip" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Nộp đúng nhịp: mỗi ngày một chặng</span></p>
+    <ul class="phm-ds phm-ds--vach"><li><span>Chặng 2</span><b>đúng 9/12 câu<small>con nộp hôm nay lúc 17:33</small></b></li>
+      <li><span>Hạn nộp</span><b>12:00 · Thứ Sáu 25/09/2026<small>còn 3 ngày 15 giờ</small></b></li></ul></div>
+    <p class="phm-bien-the">Biến thể · khi con còn chặng của ngày trước</p><p class="phm-dong-cam"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span><b>Con còn 1 chặng của Thứ Hai</b> · tối nay cần khoảng 36 phút</span></p>
+    <div class="phm-nhom__dau" style="margin-top:20px"><h3>Gần đây · mới nhất trước</h3></div><div class="phm-the"><ul class="phm-bai">
+      <li><div><h3>Ôn tập Alcohol – Phenol</h3><p>Nộp 21:40 · Thứ Năm 17/09/2026</p><span class="phm-chip" data-mau="dat"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Nộp đúng hạn</span></div><p class="phm-bai__diem">8,2<small>/10 điểm</small></p></li>
+      <li><div><h3>Ôn tập Carboxylic acid</h3><p>Nộp 23:05 · Thứ Bảy 12/09/2026</p><span class="phm-chip" data-mau="cam"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Nộp trễ 1 giờ</span></div><p class="phm-bai__diem">7,0<small>/10 điểm</small></p></li></ul></div></section>
+  <section class="phm-muc " id="muc-on" style="--tt:9" aria-label="Lịch ôn lại"><header class="phm-muc__dau"><h2>Lịch ôn lại</h2><p>các câu con từng làm sai</p></header><div class="phm-the phm-the--dem"><div class="phm-on"><p class="phm-on__so"><b>7</b><span>câu đến lịch ôn ngày mai</span><small>Thứ Ba 22/09/2026 · khoảng 10 phút</small></p><div class="phm-vong1" role="img" aria-label="Đã khắc phục 12 trong 31 câu từng sai"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="phm-v-nen" cx="50" cy="50" r="43"/><circle class="phm-v-dat" cx="50" cy="50" r="43" stroke-dasharray="104.6 270.2"/></svg><div>12/31<small>câu</small></div></div></div>
+  <p class="phm-on__kp"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12.4 2.8 2.8 5.2-6"/></svg><span>Đã khắc phục 12 trong 31 câu từng sai<small>còn 19 câu đang trong lịch ôn</small></span></p>
+    <div class="phm-tuan"><h3>Số câu đến lịch ôn · 7 ngày tới</h3><ol><li data-mai aria-label="T3 22/09: 7 câu"><b>7</b><i style="--c:7"></i>T3 22</li><li aria-label="T4 23/09: 3 câu"><b>3</b><i style="--c:3"></i>T4 23</li><li aria-label="T5 24/09: 4 câu"><b>4</b><i style="--c:4"></i>T5 24</li><li aria-label="T6 25/09: 2 câu"><b>2</b><i style="--c:2"></i>T6 25</li><li data-khong aria-label="T7 26/09: 0 câu"><b>0</b><i style="--c:0"></i>T7 26</li><li aria-label="CN 27/09: 3 câu"><b>3</b><i style="--c:3"></i>CN 27</li><li data-khong aria-label="T2 28/09: 0 câu"><b>0</b><i style="--c:0"></i>T2 28</li></ol></div></div></section>
+  <section class="phm-muc " id="muc-14" style="--tt:10" aria-label="14 ngày gần đây"><header class="phm-muc__dau"><h2>14 ngày gần đây</h2><p>số câu con làm mỗi ngày · 08/09 đến 21/09</p></header><div class="phm-the phm-the--dem"><p class="phm-so-to"><b>283<small>câu trong 14 ngày</small></b><span>con học 11 trong 14 ngày</span></p><div class="phm-bieu phm-14" role="img" aria-label="Số câu con làm mỗi ngày, 08/09 đến 21/09: T3 08: 22 câu; T4 09: không học; T5 10: 18 câu; T6 11: 31 câu; T7 12: 26 câu; CN 13: không học; T2 14: 24 câu; T3 15: không học; T4 16: 20 câu; T5 17: 27 câu; T6 18: 16 câu; T7 19: 28 câu; CN 20: 33 câu; T2 21: 38 câu">
+  <div class="phm-bieu__luoi" aria-hidden="true"><span style="top:0"><em>40 câu</em></span><span style="top:50%"><em>20 câu</em></span><span style="top:100%"><em>0</em></span></div>
+  <ol aria-hidden="true"><li><i style="--c:22"></i><span>08</span></li><li data-nghi><i style="--c:0"></i><span>09</span></li><li><i style="--c:18"></i><span>10</span></li><li><i style="--c:31"></i><span>11</span></li><li><i style="--c:26"></i><span>12</span></li><li data-nghi><i style="--c:0"></i><span>13</span></li><li><i style="--c:24"></i><span>14</span></li><li data-nghi><i style="--c:0"></i><span>15</span></li><li><i style="--c:20"></i><span>16</span></li><li><i style="--c:27"></i><span>17</span></li><li><i style="--c:16"></i><span>18</span></li><li><i style="--c:28"></i><span>19</span></li><li><i style="--c:33"></i><span>20</span></li><li data-nay><em>38</em><i style="--c:38"></i><span>21</span></li></ol></div>
+  <p class="phm-14__chu" aria-hidden="true"><span><i data-nay></i>hôm nay</span><span><i></i>ngày có học</span><span><i data-nghi></i>ngày con không học</span></p>
+    <ul class="phm-ds phm-ds--vach"><li><span>Trung bình mỗi ngày</span><b>20 câu</b></li><li><span>Giờ con thường học</span><b><span class="phm-lien">19:30 đến 21:00</span></b></li><li><span>Chuỗi học đều</span><b>6 ngày<small>liên tục từ 16/09</small></b></li></ul></div></section>
+  <section class="phm-muc " id="muc-loi" style="--tt:11" aria-label="Lời A.I Đỗ Đại Học gửi anh/chị"><header class="phm-muc__dau"><h2>Lời A.I Đỗ Đại Học gửi anh/chị</h2></header><div class="phm-the phm-thu"><div class="phm-thu__dau"><i aria-hidden="true">A.I</i><div><h3>A.I Đỗ Đại Học</h3><p>Thứ Hai 21/09/2026 · 21:00</p></div></div>
+    <div class="phm-thu__than"><p>Thưa anh/chị, hôm nay <span data-ten-goi>Khôi</span> làm 38 câu trong 52 phút, đúng 30 câu, nhiều hơn hôm qua 5 câu. Con lên bậc Hiểu ở hai dạng: Phản ứng ester hoá và Tính chất vật lí của lipid.</p>
+      <p>Dạng Xà phòng hoá chất béo con mới đúng 3 trong 9 câu, nên ngày mai 22/09 con sẽ ôn lại 4 câu dạng này. Bài 6 câu anh/chị giao lúc 19:58 con đã làm xong lúc 20:47, đúng 5 câu.</p></div>
+    <p class="phm-thu__ky">A.I Đỗ Đại Học viết từ số liệu học của con.</p></div>
+    <div class="phm-the phm-the--dem"><p class="phm-nhan-muc">Anh/chị có thể làm gì</p><ol class="phm-goi-y">
+      <li><i aria-hidden="true">1</i><span>Hỏi con kể lại cách giải câu xà phòng hoá tristearin lúc 20:14 (đáp án 1,84 gam). Con nói được vì sao một mol chất béo chỉ cho một mol glycerol là con đã hiểu.</span></li>
+      <li><i aria-hidden="true">2</i><span>Ngày mai nhắc con làm 7 câu đến lịch ôn, khoảng 10 phút.</span></li></ol></div></section>
+  <p class="phm-do-cham"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><circle cx="9" cy="9" r="3.2"/><path d="M3.5 19c.6-3.2 2.7-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16.5 14c2.3.2 3.7 1.8 4.2 4.5"/></svg><span>Độ chăm hôm nay: con đứng thứ <b>9</b> trong <b>42</b> bạn của lớp</span></p>
+</div></div></main>
+<div class="phm-day"><div class="phm-day__trong"><button class="phm-nut" type="button"><svg class="phm-i " aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M21 3 10.2 13.8"/><path d="m21 3-6.6 18-4.2-7.2L3 9.6z"/></svg>Giao thêm bài cho con</button><p class="phm-day__phu">Hôm nay còn 2 lượt giao</p></div></div><script>(()=>{const b=document.body,h=new URLSearchParams(location.hash.slice(1));
+if(h.get('canh'))b.dataset.canh=h.get('canh');
+if(h.get('co'))document.documentElement.style.fontSize=h.get('co')+'%';
+if(h.get('ten')==='dai'){document.querySelectorAll('[data-ten]').forEach(e=>e.textContent="Nguyễn Hoàng Bảo Khánh An");document.querySelectorAll('[data-ten-goi]').forEach(e=>e.textContent="An")}
+const day=document.querySelector('.phm-day');if(day){const f=()=>b.style.setProperty('--phm-day-cao',day.offsetHeight+'px');new ResizeObserver(f).observe(day);f()}
+const td=document.querySelector('.phm-tieu-de h1'),cuon=()=>{b.toggleAttribute('data-cuon',scrollY>6);if(td)b.toggleAttribute('data-thu',td.getBoundingClientRect().bottom<(document.querySelector('.phm-tren').offsetHeight+4))};addEventListener('scroll',cuon,{passive:true});cuon();
+const ml=document.querySelector('.phm-muc-luc ul'),lk=[...document.querySelectorAll('.phm-muc-luc a')];
+if(ml&&'IntersectionObserver'in window){const io=new IntersectionObserver(es=>{if(scrollY<8)return;for(const e of es)if(e.isIntersecting){const a=lk.find(x=>x.getAttribute('href')==='#'+e.target.id);if(!a)continue;lk.forEach(x=>x.removeAttribute('aria-current'));a.setAttribute('aria-current','true');ml.scrollTo({left:a.parentElement.offsetLeft-ml.offsetLeft-16,behavior:'auto'})}},{rootMargin:'-30% 0px -60% 0px'});lk.forEach(a=>{const m=document.getElementById(a.getAttribute('href').slice(1));if(m)io.observe(m)})}
+document.querySelectorAll('.phm-seg').forEach(s=>s.addEventListener('click',e=>{const n=e.target.closest('button');if(!n)return;s.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===n)));s.closest('.phm-muc').querySelector('.phm-tu-cau').dataset.loc=n.dataset.loc}));
+document.querySelectorAll('.phm-cau > button[aria-controls]').forEach(n=>n.addEventListener('click',()=>{const li=n.parentElement,mo=li.toggleAttribute('data-mo');n.setAttribute('aria-expanded',String(mo));document.getElementById(n.getAttribute('aria-controls')).hidden=!mo}))})()</script></body></html>
