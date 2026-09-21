@@ -278,7 +278,7 @@ describe('M2 · tối hạn chót (20:00 ngày hạn) ⇒ EM + PHỤ HUYNH', () 
   })
 })
 
-describe('M3 · trễ nhịp (20:00, chậm ≥ 2 chặng, bài còn ≥ 1 ngày) ⇒ EM', () => {
+describe('M3 · trễ nhịp (chậm ≥ 2 chặng, bài còn ≥ 1 ngày) ⇒ EM — NHẮC ĐÚNG GIỜ CẦN (W3: 30 phút trước giờ bắt đầu muộn nhất của tối nay; chi tiết tests/nhac-m3-theo-gio-2109.test.ts)', () => {
   it('em chậm ≥ 2 chặng so với lịch nhận M3 với số chặng chậm và số câu chặng kế; em đúng lịch hoặc chỉ chậm 1 chặng thì không', async () => {
     const d = await bai(3, '2026-09-29T16:59:00.000Z') // hạn 23:59 thứ Ba 29/09 — còn nhiều ngày
     await mo(d, 'S1'); await mo(d, 'S2'); await mo(d, 'S3')
@@ -290,14 +290,14 @@ describe('M3 · trễ nhịp (20:00, chậm ≥ 2 chặng, bài còn ≥ 1 ngày
     // tối 25/09: S1 chưa làm chặng nào (chậm toiLich); S2 đúng lịch; S3 chậm ĐÚNG 1 chặng
     d.sql.prepare("UPDATE btvn_em SET lo_da_xong = ? WHERE sbd = 'S2'").run(Math.min(so, toiLich))
     d.sql.prepare("UPDATE btvn_em SET lo_da_xong = ? WHERE sbd = 'S3'").run(Math.min(so, toiLich) - 1)
-    const r = await chay(d, '2026-09-25', '20:00')
+    // Sửa CÓ CHỦ Ý 21/09 (W3, Dồn về đích): M3 không còn cố định 20:00 — gửi 30 phút trước `batDauMuonNhat` của tối nay (fixture này: 22:25 ⇒ ngoài khung 21:30 ⇒ lượt CUỐI 21:30), lời theo giờ.
+    expect((await chay(d, '2026-09-25', '20:00')).theoMoc ?? {}).not.toHaveProperty('M3') // 20:00 chưa tới giờ nhắc
+    const r = await chay(d, '2026-09-25', '21:30')
     expect(r.theoMoc).toMatchObject({ M3: 1 })
     const m3 = emDongs(d, 'M3')
     expect(m3.map((x) => x.sbd)).toEqual(['S1'])
     expect(m3[0]).toMatchObject({ gui_ph: 0, ph_nhom: null })
-    expect(String(m3[0]!.loi_em)).toMatch(new RegExp(`^Em đang chậm ${toiLich} chặng so với lịch của Bài tập về nhà «.+»\\. Tối nay làm một chặng \\(\\d+ câu\\) là bắt kịp\\.$`))
-    const nhieu = boCuaEm(d, 'S1').filter((x) => x.chang === 0).length
-    expect(String(m3[0]!.loi_em)).toContain(`(${nhieu} câu)`)
+    expect(String(m3[0]!.loi_em)).toMatch(/^Tối nay em cần khoảng \d+ phút để về đúng nhịp của Bài tập về nhà «.+»\. Bắt đầu trước \d\d:\d\d nhé\.$/)
   })
   it('bài sắp hết hạn (< 1 ngày) thì KHÔNG M3; trước 20:00 không M3', async () => {
     const d = await bai(1, '2026-09-29T16:59:00.000Z')

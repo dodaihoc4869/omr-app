@@ -4,7 +4,7 @@
 // Bốn mốc cho mỗi em CHƯA nộp của mỗi bài đang chạy (bài thường lẫn cá nhân hoá):
 //   M1 · nhắc sớm     còn ≤ 24 giờ tới hạn, em CHƯA MỞ bài .................. EM
 //   M2 · tối cuối trước hạn 20:00 NGÀY HẠN (hạn từ 20:30 trở đi) HOẶC 20:00 HÔM TRƯỚC (hạn trước 20:30, vd 12:00 trưa), chưa nộp ... EM + PHỤ HUYNH
-//   M3 · trễ nhịp     20:00, chậm ≥ 2 chặng so với lịch (bài còn hạn ≥ 1 ngày) . EM
+//   M3 · trễ nhịp     chậm ≥ 2 chặng so với lịch (bài còn hạn ≥ 1 ngày); ĐÚNG GIỜ CẦN = 30 phút trước `batDauMuonNhat` của tối nay (kế hoạch Dồn về đích, `docVeDichCuaEm`); không tính được ⇒ 20:00 như cũ . EM
 //   M4 · quá hạn      07:00 sáng hôm sau hạn, vẫn chưa nộp .................... EM + PHỤ HUYNH (MỘT lần/bài)
 // TRẦN: em ≤ 1 tin "nhắc thường" (M1/M3, kể cả tin thầy bấm tay) / bài / ngày — M2 và M4 là hai mốc CHỐT HẠN, mỗi mốc đúng một lần/bài, không tính vào trần ấy (ngày hạn có thể có M1 sáng + M2 tối);
 // PHỤ HUYNH ≤ 1 tin tự động / ngày (nhiều bài ⇒ GỘP MỘT tin) và ≤ 3 tin / 7 ngày. Không gửi cho em đã nộp, bài thu hồi/xoá, bài tắt (`baiTat`), mốc tắt (`mocTat`), cờ `bat = false`.
@@ -12,7 +12,8 @@
 import type { Env } from './kieu'
 import { ngayVnCuaMs, chuHan, trangThaiNopBai, TEN_BAI_MAC_DINH, KENH_THONG_BAO, TIEU_DE_THONG_BAO } from './canh-bao-thay'
 import { docChang1ChoEm } from './btvn-nang-do-d1'
-import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
+import { docLichDaLuu, moLucChang, moLucGocChangMoSom } from './btvn-nang-do-chang'
+import { docVeDichCuaEm, type VeDichCuaEm } from './ve-dich-d1'
 
 type Hang = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -37,6 +38,9 @@ export const PHUT_TOI_HAN_CHOT = 20 * 60
 export const PHUT_HAN_MUON = 20 * 60 + 30
 export const PHUT_SANG_QUA_HAN = 7 * 60
 export const SO_CHANG_CHAM_M3 = 2
+/** M3 theo giờ: nhắc trước `batDauMuonNhat` (giờ bắt đầu muộn nhất của tối nay) ngần này phút; tính kế hoạch cho tối đa ngần này em mỗi lượt (5 truy vấn/em), phần dư dùng mốc 20:00 cũ. */
+export const PHUT_NHAC_M3_TRUOC_GIO_BAT_DAU = 30
+export const TOI_DA_EM_TINH_GIO_M3 = 120
 /** Mỗi lượt chạy ghi tối đa ngần này dòng (bảo vệ giới hạn D1); phần còn lại được xử lý ở lượt 30 phút kế (khoá idempotent). */
 export const TOI_DA_DONG_MOT_LUOT = 240
 
@@ -152,6 +156,8 @@ export interface DauVaoLoi {
   /** M3: số chặng chậm và số câu của chặng kế. */
   chamChang?: number
   soCauChangKe?: number
+  /** M3 theo giờ: số phút tối nay em cần và giờ bắt đầu muộn nhất (HH:MM giờ VN) từ kế hoạch về đích; có ⇒ lời theo giờ, vắng ⇒ lời cũ (chậm N chặng). */
+  toiNay?: { phut: number; batDauGio: string }
   /** M4: đã làm x trong y câu. */
   daLam?: number
   tongCau?: number
@@ -171,6 +177,7 @@ export function loiEmTheoMoc(m: Moc, x: DauVaoLoi): string {
     const con = x.tongChang && x.tongChang > 0 ? ` Em còn ${Math.max(0, x.tongChang - (x.daXongChang ?? 0))} trong ${x.tongChang} chặng.` : ' Em chưa nộp bài.'
     return `Hạn nộp ${chuHanM2(x.hanIso, x.nowMs)} của Bài tập về nhà ${bai}.${con}`
   }
+  if (m === 'M3' && x.toiNay) return `Tối nay em cần khoảng ${x.toiNay.phut} phút để về đúng nhịp của Bài tập về nhà ${bai}. Bắt đầu trước ${x.toiNay.batDauGio} nhé.`
   if (m === 'M3') return `Em đang chậm ${x.chamChang ?? SO_CHANG_CHAM_M3} chặng so với lịch của Bài tập về nhà ${bai}. Tối nay làm một chặng${x.soCauChangKe ? ` (${x.soCauChangKe} câu)` : ''} là bắt kịp.`
   return `Bài tập về nhà ${bai} đã quá hạn ${chuHan(x.hanIso, x.nowMs - MOT_NGAY_MS).replace(/ hôm nay$/, ' hôm qua')}. Em đã làm ${x.daLam ?? 0} trong ${x.tongCau ?? 0} câu.`
 }
@@ -220,6 +227,50 @@ async function docBaiDangChay(env: Env, nowMs: number): Promise<BaiDangChay[]> {
   return (r.results ?? []).map((x) => ({
     ma: chuoi(x.ma_btvn), maDe: chuoi(x.ma_de), han: chuoi(x.han_nop), hanMs: Date.parse(chuoi(x.han_nop)), soCau: so(x.so_cau), caNhan: so(x.ca_nhan) === 1, ten: chuoi(x.ten), giaoLuc: chuoi(x.giao_luc), row: x,
   })).filter((b) => b.ma && Number.isFinite(b.hanMs))
+}
+
+// ================================================================== M3 THEO GIỜ ==================================================================
+
+/**
+ * Đã tới giờ nhắc M3 chưa? Nhắc trong 30 phút TRƯỚC `batDauMuonNhat` (chưa tới giờ đó). Nếu lượt chạy kế trong khung (07:00–21:30) đã muộn hơn giờ ấy — giờ bắt đầu muộn nhất nằm sau khung, ví dụ 22:10 —
+ * thì lượt này là lượt CUỐI: nhắc luôn (không bỏ mất nhắc). Đã qua giờ bắt đầu muộn nhất ⇒ không nhắc nữa.
+ */
+export function denGioNhacM3(nowMs: number, batDauMs: number, cfg: CauHinhNhac): boolean {
+  if (!Number.isFinite(batDauMs) || nowMs >= batDauMs) return false
+  if (nowMs >= batDauMs - PHUT_NHAC_M3_TRUOC_GIO_BAT_DAU * 60_000) return true
+  return Date.parse(lanChayKe(nowMs, cfg)) >= batDauMs
+}
+
+type GioM3 = { phut: number; batDauGio: string }
+/**
+ * Với mỗi (bài, em) chậm ≥ 2 chặng: tính kế hoạch về đích của em (đọc-chỉ, `docVeDichCuaEm`) và cho biết ĐÃ TỚI GIỜ nhắc chưa.
+ * Trả: có khoá ⇒ nhắc lượt này (`GioM3` = lời theo giờ; `'cu'` = không tính được kế hoạch ⇒ giữ mốc 20:00 + lời cũ); vắng khoá ⇒ chưa tới giờ / tối nay không có việc / đã qua giờ bắt đầu muộn nhất.
+ */
+async function docGioNhacM3(env: Env, cho: { ma: string; sbd: string }[], nowMs: number, cfg: CauHinhNhac): Promise<Map<string, GioM3 | 'cu'>> {
+  const ra = new Map<string, GioM3 | 'cu'>()
+  if (cho.length === 0) return ra
+  const dsEm = [...new Set(cho.map((x) => x.sbd))]
+  const tinh = dsEm.slice(0, TOI_DA_EM_TINH_GIO_M3)
+  const veDich = new Map<string, VeDichCuaEm | null>()
+  for (let i = 0; i < tinh.length; i += 8) {
+    await Promise.all(tinh.slice(i, i + 8).map(async (sbd) => {
+      try { veDich.set(sbd, await docVeDichCuaEm(env, sbd, nowMs)) } catch (e) {
+        console.error('[nhac-tu-dong] không tính được kế hoạch về đích cho M3 (dùng mốc 20:00):', e instanceof Error ? e.message : e)
+        veDich.set(sbd, null)
+      }
+    }))
+  }
+  for (const c of cho) {
+    const khoa = `${c.ma}|${c.sbd}`
+    const b = veDich.get(c.sbd)?.veDich.find((x) => x.maBtvn === c.ma)
+    if (!b) { ra.set(khoa, 'cu'); continue }
+    const tn = b.toiNay
+    if (!tn || !(tn.phut > 0)) continue // tối nay kế hoạch không xếp việc: không có gì để nhắc
+    const batDauMs = Date.parse(tn.batDauMuonNhat)
+    if (!denGioNhacM3(nowMs, batDauMs, cfg)) continue
+    ra.set(khoa, { phut: Math.max(1, Math.round(tn.phut)), batDauGio: new Date(batDauMs + GIO_VN_MS).toISOString().slice(11, 16) })
+  }
+  return ra
 }
 
 // ================================================================== CHẠY MỘT LƯỢT ==================================================================
@@ -303,6 +354,28 @@ async function chayLuot(env: Env, nowMs: number, cfg: CauHinhNhac): Promise<KetQ
     ph7Ngay.set(chuoi(x.sbd), (ph7Ngay.get(chuoi(x.sbd)) ?? 0) + 1)
   }
 
+  // Số chặng em CHẬM so với lịch (chặng đã tới giờ mở − chặng đã xong); bài không chia chặng ⇒ 0.
+  const chamCuaEm = (e: EmChuaNop, b: BaiDangChay): number => {
+    const tongChang = so(e.row.so_chang)
+    if (!(tongChang > 0 && chuoi(e.row.chot_luc) !== '')) return 0
+    const moLuc = docLichDaLuu(e.row.chang_mo_json, tongChang, { chotLuc: chuoi(e.row.chot_luc), hanNop: b.han, nowMs })?.moLuc ?? moLucChang(chuoi(e.row.chot_luc), tongChang)
+    const goc = moLucGocChangMoSom(e.row.chang_mo_json) // "chậm so với LỊCH": chặng mở sớm tính theo mốc GỐC của lịch
+    return moLuc.filter((m, k) => Math.max(Date.parse(m), goc.get(k) ?? -Infinity) <= nowMs).length - Math.min(tongChang, so(e.row.lo_da_xong))
+  }
+  // M3 THEO GIỜ: gom em chậm ≥ 2 chặng có thể nhận M3 hôm nay, tính kế hoạch về đích của họ một lần rồi mới chọn mốc trong vòng lặp.
+  const m3Cho: { ma: string; sbd: string }[] = []
+  if (!cfg.mocTat.includes('M3')) {
+    for (const b of bai) {
+      if (b.hanMs - nowMs < MOT_NGAY_MS) continue
+      for (const e of emTheoBai.get(b.ma) ?? []) {
+        if (chamCuaEm(e, b) < SO_CHANG_CHAM_M3) continue
+        if (daCo.has(`${b.ma}|${e.sbd}|M3|${homNay}`) || nhacThuongHomNay.has(`${b.ma}|${e.sbd}`)) continue
+        m3Cho.push({ ma: b.ma, sbd: e.sbd })
+      }
+    }
+  }
+  const m3TheoGio = await docGioNhacM3(env, m3Cho, nowMs, cfg)
+
   interface UngVien { b: BaiDangChay; e: EmChuaNop; moc: Moc; x: DauVaoLoi; trangThai: string; guiPhMuon: boolean }
   const ungVien: UngVien[] = []
   let boQuaTran = 0
@@ -318,12 +391,9 @@ async function chayLuot(env: Env, nowMs: number, cfg: CauHinhNhac): Promise<KetQ
       // Thứ tự ƯU TIÊN: M4 > M2 > M3 > M1 (mỗi lượt chọn các mốc ĐẾN HẠN; trần quyết định cái nào được gửi).
       if (!cfg.mocTat.includes('M4') && conHanMs < 0 && ngayHan < homNay && phutNay >= PHUT_SANG_QUA_HAN && !daCoM4.has(`${b.ma}|${e.sbd}`)) chon.push('M4')
       if (!cfg.mocTat.includes('M2') && conHanMs > 0 && ngayGuiM2(b.hanMs) === homNay && phutNay >= PHUT_TOI_HAN_CHOT) chon.push('M2')
-      let cham = 0
-      if (lichChang) {
-        const moLuc = docLichDaLuu(e.row.chang_mo_json, tongChang, { chotLuc: chuoi(e.row.chot_luc), hanNop: b.han, nowMs })?.moLuc ?? moLucChang(chuoi(e.row.chot_luc), tongChang)
-        cham = moLuc.filter((m) => Date.parse(m) <= nowMs).length - daXongChang
-      }
-      if (!cfg.mocTat.includes('M3') && conHanMs >= MOT_NGAY_MS && phutNay >= PHUT_TOI_HAN_CHOT && cham >= SO_CHANG_CHAM_M3) chon.push('M3')
+      const cham = chamCuaEm(e, b)
+      const gio3 = m3TheoGio.get(`${b.ma}|${e.sbd}`)
+      if (!cfg.mocTat.includes('M3') && conHanMs >= MOT_NGAY_MS && cham >= SO_CHANG_CHAM_M3 && gio3 !== undefined && (gio3 !== 'cu' || phutNay >= PHUT_TOI_HAN_CHOT)) chon.push('M3')
       if (!cfg.mocTat.includes('M1') && conHanMs > 0 && conHanMs <= GIO_M1_TRUOC_HAN * 3_600_000 && st.trangThai === 'chua_mo') chon.push('M1')
       for (const moc of chon) {
         if (daCo.has(`${b.ma}|${e.sbd}|${moc}|${homNay}`)) continue // khoá idempotent
@@ -336,6 +406,7 @@ async function chayLuot(env: Env, nowMs: number, cfg: CauHinhNhac): Promise<KetQ
           x: {
             tenBai: b.ten, hanIso: b.han, nowMs, hoTen: e.hoTen, soNgayQuaHan: st.soNgayQuaHan, tongChang: lichChang ? tongChang : undefined, daXongChang: lichChang ? daXongChang : undefined,
             chamChang: cham, daLam, tongCau: so(e.row.so_cau_em) || b.soCau, soCauBai: b.soCau,
+            ...(moc === 'M3' && gio3 && gio3 !== 'cu' ? { toiNay: gio3 } : {}),
           },
         })
         // Một em/bài mỗi lượt chỉ nhận MỘT tin "thường" (M1/M3); M2/M4 đi riêng — nhưng M4 loại M2 (ở trên) và trong cùng lượt M1/M3 nhường nhau theo thứ tự chọn.
