@@ -200,7 +200,7 @@ describe('Cửa hàng: ví, thẻ món, thanh lọc', () => {
     expect(the(c, 'VD-08').textContent).toContain('Đã hết')
     expect(the(c, 'VD-01').textContent).toContain('Đã có')
     expect(the(c, 'KT-03').textContent).toContain('Đang mặc')
-    expect(the(c, 'VD-04').getAttribute('aria-label')).toBe('Thử Đuôi Lửa Tím. Đẹp. Giá 120 vàng. Đủ vàng rồi')
+    expect(the(c, 'VD-04').getAttribute('aria-label')).toBe('Thử Đuôi Lửa Tím. Bậc Đẹp. Giá 120 vàng. Đủ vàng rồi')
   })
 
   it('thanh lọc theo chỗ đeo; Trên đầu / Trên lưng là chip "Sắp mở" (vô hiệu); đợt 2 mở ⇒ chip mở và đủ 40 món', async () => {
@@ -263,7 +263,7 @@ describe('(b) số dư CHỈ đổi theo đáp máy chủ (máy chủ giả tr�
   it('đổi EXP: máy chủ trả 4.321 vàng, ống nghiệm 200 ⇒ màn hiện đúng số ấy', async () => {
     const { container: c } = dung({ tre: 40, congTac: { vangSauGhi: 4321 } })
     await sanSang(c)
-    fireEvent.click(screen.getByRole('button', { name: 'Đổi được nhiều nhất 420 EXP' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Em đổi được tối đa 420 EXP' }))
     fireEvent.click(nut(c, 'doi'))
     fireEvent.click(nut(c, 'doi-that'))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
@@ -500,7 +500,7 @@ describe('(e) đổi EXP: không xuống dưới giữ lại', () => {
     fireEvent.change(o, { target: { value: '-5' } })
     expect(o.value).toBe('0')
     expect(nut(c, 'doi').disabled).toBe(true)
-    fireEvent.click(screen.getByRole('button', { name: 'Đổi được nhiều nhất 420 EXP' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Em đổi được tối đa 420 EXP' }))
     expect(o.value).toBe('420')
   })
 
@@ -518,7 +518,7 @@ describe('(e) đổi EXP: không xuống dưới giữ lại', () => {
     await waitFor(() => expect(c.querySelector<HTMLInputElement>('.ps-truot')!.max).toBe('240')) // doiToiDa máy chủ tính lại
     expect(api.ghi.doi).toBe(1)
     // đổi nốt phần còn lại
-    fireEvent.click(screen.getByRole('button', { name: 'Đổi được nhiều nhất 240 EXP' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Em đổi được tối đa 240 EXP' }))
     fireEvent.click(nut(c, 'doi'))
     fireEvent.click(nut(c, 'doi-that'))
     await waitFor(() => expect(vangHien(c)).toBe('760'))
@@ -626,7 +626,8 @@ describe('(f) cờ tắt · mất mạng · Tủ đồ trống · tấm chào ·
     expect(c.querySelector('.ps-gc-vet')).toBeNull() // bản vẽ mặc định không còn
     const dm = cuoi().dangMac as DangMac
     expect(dm).toMatchObject({ vet: 'VD-04', khung: 'KT-03', 'hao-quang': null, dau: null, 'co-lung': null })
-    expect(cuoi()).toMatchObject({ pet: 3, cap: 12, ten: 'Bé Mây', nhan: 'Tên em đặt cho thần thú' })
+    expect(cuoi()).toMatchObject({ pet: 3, cap: 12, ten: 'Bé Mây' })
+    expect(cuoi().nhan).toBeUndefined() // app thật KHÔNG vẽ dòng nhỏ trên khung tên (Boss 21/09), chỉ hiện tên thú
     expect(cuoi().size).toBeGreaterThanOrEqual(150)
     // bỏ thử ⇒ quay về món đang mặc (không có vệt)
     fireEvent.click(nut(c, 'bo-thu'))

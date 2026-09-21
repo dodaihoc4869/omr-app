@@ -2,7 +2,7 @@
 // Điểm cắm `veThu`: mặc định = `ThuHinh` (thú thật) + lớp CSS giữ chỗ (vòng sáng dưới chân, vệt, khung tên) theo màu bậc của món;
 // sau này Code 4 đưa `ThuMacDo` vào đây (nó vẽ SVG thật, nhận đúng `dangMac` này) — màn không đổi.
 import { ThuHinh } from '../DoanHinh'
-import { chuDangThu, chuDoThanThuDangMac, chuNhanKhungTen, chuThuCuaEm } from './chu-shop'
+import { chuDangThu, chuDoThanThuDangMac, chuThuCuaEm } from './chu-shop'
 import type { DangMac, MonShop, VeThu } from './kieu'
 import { demDangThu } from './logic-shop'
 
@@ -56,7 +56,7 @@ export default function SanKhau({ pet, cap, hienThi, dangThu, tenThu, mon, veThu
       <span className="ps-san-nhan">{n > 0 ? chuDangThu(n) : chuDoThanThuDangMac}</span>
       <span className="ps-san-be" aria-hidden="true" />
       <div className="ps-san-thu" role="img" aria-label={chuThuCuaEm(tenThu)}>
-        {ve({ dangMac: hienThi, pet, cap, size: CO_THU_SAN, ten: tenThu ?? '', nhan: chuNhanKhungTen })}
+        {ve({ dangMac: hienThi, pet, cap, size: CO_THU_SAN, ten: tenThu ?? '' })}
       </div>
     </div>
   )

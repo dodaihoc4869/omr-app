@@ -86,8 +86,8 @@ export const chuMonKe = (ten: string, gia: number): string => `Em vẫn đủ v�
 export const chuDoiXong = (vang: number, ngay: number): string => `Đã đổi xong. Em có ${chuVangSo(vang)}, thần thú vẫn đủ ${chuNgayAn(ngay)}.` // [M3]
 export const chuDaMac = (ten: string): string => `Đã mặc ${ten}.` // [M4]
 export const chuDaCoi = (ten: string): string => `Đã cởi ${ten}.` // [M4]
-/** Không còn món nào vừa số vàng: nói món rẻ nhất chưa có + lời [D1]/[D2]. Mục 9 không có khuôn ghép tên — CHỜ MỤC 9. */
-export const chuMonKeChuaDu = (ten: string, chiDuong: string): string => `${ten}: ${chiDuong}` // CHỜ MỤC 9
+/** Không còn món nào vừa số vàng: nói món rẻ nhất chưa có + lời [D1]/[D2]. */
+export const chuMonKeChuaDu = (ten: string, chiDuong: string): string => `${ten}: ${chiDuong}` // [A8]
 
 // ── Chỉ đường tới món kế [D1–D5] ──
 export const chuChiDuongDuExp = 'Em có đủ EXP thừa. Đổi vàng là mua được.' // [D1]
@@ -113,11 +113,11 @@ export const chuCanCoGiaTri = (chuoi: number | null, an: number | null): string 
 export const chuKhoaChuoiDai = (can: number, dang: number): string => `chuỗi ${so(can)} ngày (em đang chuỗi ${so(dang)} ngày)`
 export const chuKhoaAnDai = (can: number, dang: number): string => `${so(can)} ấn thạch sáng (em đang có ${so(dang)} ấn thạch)`
 export const chuCanDai = (phan: readonly string[]): string => `Cần ${phan.join(' và ')}`
-export const chuKhongCan = 'Không cần' // CHỜ MỤC 9 (dòng "Cần có" của món không có điều kiện)
+export const chuKhongCan = 'Không cần gì thêm' // [A6] (dòng "Cần có" của món không có điều kiện)
 export const chuChiCon = (n: number): string => `Chỉ còn ${so(n)} cái` // [S3]
 export const chuMuaChiCo = (n: number): string => `Mùa 1 chỉ có ${so(n)} cái` // [S3]
 export const chuSoLuongDai = (con: number, tong: number): string => `Chỉ còn ${so(con)} cái · mùa 1 có ${so(tong)} cái` // [S3]
-export const chuKhongGioiHan = 'Không giới hạn' // CHỜ MỤC 9 (dòng "Số lượng" của món không giới hạn)
+export const chuKhongGioiHan = 'Luôn có sẵn' // [A7] (dòng "Số lượng" của món không giới hạn)
 /** [S4] — ghép từ lời `thieu` của máy chủ: "Chưa mua được — cần chuỗi 14 ngày (em đang chuỗi 9 ngày)". */
 export const chuChuaMuaDuoc = (thieu: string): string => `Chưa mua được — ${thieu.charAt(0).toLocaleLowerCase('vi-VN')}${thieu.slice(1)}`
 
@@ -132,16 +132,15 @@ export const chuTamDong = 'Cửa hàng đang tạm đóng. Đồ em đã mua v�
 export const chuMatMang = 'Mất mạng rồi. Có mạng lại mới mua được, em vẫn xem được Tủ đồ.' // [L9]
 export const chuLoiKhongRo = 'Cửa hàng chưa tải được. Em bấm Thử lại nhé.' // [L10]
 
-// ── Nhãn trợ năng + chữ phụ mà mục 9 chưa có — CHỜ MỤC 9 ──
-export const chuVeDao = 'Về Đảo thần thú' // CHỜ MỤC 9 (nhãn nút quay lại của Cửa hàng)
-export const chuVeCuaHang = 'Về Cửa hàng' // CHỜ MỤC 9 (nhãn nút quay lại của Thử đồ, Tủ đồ)
-export const chuLocNhan = 'Lọc theo chỗ đeo trên thần thú' // CHỜ MỤC 9
-export const chuThanhKeoNhan = 'Số EXP thừa em muốn đổi thành vàng' // CHỜ MỤC 9
-export const chuDoiToiDa = (n: number): string => `Đổi được nhiều nhất ${chuExp(n)}` // CHỜ MỤC 9 (nhãn đầu mút thanh kéo)
-export const chuNhanKhungTen = 'Tên em đặt cho thần thú' // CHỜ MỤC 9 (dòng nhỏ trên khung tên, chữ của mẫu phác 204d27e)
-export const chuThuCuaEm = (ten?: string): string => (ten ? `Thần thú của em: ${ten}` : 'Thần thú của em') // CHỜ MỤC 9 (nhãn trợ năng của sân khấu; danh từ chung đi trước tên riêng — chuẩn A1.2)
+// ── Nhãn trợ năng + chữ phụ [A1–A10] (Boss duyệt 21/09 đêm; chép vào mục 9.3 cùng commit). Dòng nhỏ trên khung tên: KHÔNG vẽ — app thật chỉ hiện tên thú. ──
+export const chuVeDao = 'Về Đảo thần thú' // [A1] (nhãn nút quay lại của Cửa hàng)
+export const chuVeCuaHang = 'Về Cửa hàng' // [A2] (nhãn nút quay lại của Thử đồ, Tủ đồ)
+export const chuLocNhan = 'Lọc theo chỗ đeo' // [A3]
+export const chuThanhKeoNhan = chuKeoThanh // [A4] (dùng lại [B9])
+export const chuDoiToiDa = (n: number): string => `Em đổi được tối đa ${chuExp(n)}` // [A5] (nhãn đầu mút thanh kéo)
+export const chuThuCuaEm = (ten?: string): string => (ten ? `Thần thú của em: ${ten}` : 'Thần thú của em') // [A9] (nhãn trợ năng của sân khấu; danh từ chung đi trước tên riêng — chuẩn A1.2)
 /** Nhãn trợ năng của thẻ món ở Cửa hàng (chạm = thử). */
-export const chuTheMon = (ten: string, bac: Bac, gia: number, trangThai: string): string => `Thử ${ten}. ${TEN_BAC[bac]}. Giá ${chuVangSo(gia)}. ${trangThai}` // CHỜ MỤC 9
+export const chuTheMon = (ten: string, bac: Bac, gia: number, trangThai: string): string => `Thử ${ten}. Bậc ${TEN_BAC[bac]}. Giá ${chuVangSo(gia)}. ${trangThai}` // [A10]
 
 // ── Lời chung khi máy chủ không kèm lời (ba mã lỗi mới): ĐÚNG CHỮ mục 9.3 [L11] [L12] [L13] (Boss viết, thêm ở c77f130) ──
 export const chuLoiTheoMa: Readonly<Record<string, string>> = {

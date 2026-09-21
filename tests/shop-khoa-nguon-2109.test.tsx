@@ -179,7 +179,7 @@ describe('chữ chốt mục 9 (DE-XUAT-SHOP-PHU-KIEN-2109.md): từng chuỗi �
       'Vàng chỉ đến từ việc học. Không nạp tiền, không xin bạn được.', 'Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.', 'Em có đủ EXP thừa. Đổi vàng là mua được.', 'Làm nhiệm vụ hôm nay để ống nghiệm đầy thêm.',
       'Tủ đồ còn trống. Ghé Cửa hàng chọn món đầu tiên, có món chỉ 20 vàng.', 'Chưa có món nào cho chỗ này.', 'Em chưa thử món nào. Chạm một phụ kiện ở Cửa hàng, thần thú mặc thử liền.', 'Cửa hàng đang tạm đóng. Đồ em đã mua vẫn còn nguyên.',
       'Mất mạng rồi. Có mạng lại mới mua được, em vẫn xem được Tủ đồ.', 'Cửa hàng không có món này. Em tải lại Cửa hàng rồi chọn lại nhé.', 'Món này sắp mở bán. Em ghé lại sau nhé.', 'Có gì đó chưa đúng. Em tải lại trang rồi thử lại nhé.', 'Cửa hàng chưa tải được. Em bấm Thử lại nhé.', 'Em đã có món này rồi. Vào Tủ đồ để mặc.', 'Giá vừa thay đổi, em xem lại rồi mua nhé.', 'Em chưa có món này nên chưa mặc được.',
-      'Kéo thanh để chọn số EXP', 'Chưa có EXP thừa để đổi', 'Bỏ thử món này', 'Bật mí Hoá học', 'Đắt dần:',
+      'Kéo thanh để chọn số EXP', 'Chưa có EXP thừa để đổi', 'Bỏ thử món này', 'Bật mí Hoá học', 'Đắt dần:', 'Về Đảo thần thú', 'Về Cửa hàng', 'Lọc theo chỗ đeo', 'Không cần gì thêm', 'Luôn có sẵn', 'Em đổi được tối đa', 'Thần thú của em',
     ]
     for (const t of tinh) {
       expect(D.includes(t), `đề xuất không còn câu: ${t}`).toBe(true)
@@ -187,10 +187,14 @@ describe('chữ chốt mục 9 (DE-XUAT-SHOP-PHU-KIEN-2109.md): từng chuỗi �
     }
   })
 
-  it('chuỗi nào mục 9 KHÔNG có đều đánh dấu `// CHỜ MỤC 9` (danh sách khoá để báo Boss); giọng văn: một dấu chấm than, không chữ gợi cờ bạc / quảng cáo', () => {
+  it('KHÔNG còn chuỗi nào đánh dấu `// CHỜ MỤC 9` (Boss duyệt 11 chuỗi thiếu, chép vào mục 9.3 [A1–A10]); mỗi nhãn phụ [A#] có mặt ở CẢ mục 9.3 lẫn chu-shop.ts; dòng nhỏ trên khung tên KHÔNG còn; giọng văn: một dấu chấm than, không chữ gợi cờ bạc / quảng cáo', () => {
     const src = doc(`${DIR}/chu-shop.ts`)
-    const cho = [...src.matchAll(/^export const (\w+)[^\n]*\/\/ CHỜ MỤC 9/gm)].map((m) => m[1]!)
-    expect([...cho].sort()).toEqual(['chuDoiToiDa', 'chuKhongCan', 'chuKhongGioiHan', 'chuLocNhan', 'chuMonKeChuaDu', 'chuNhanKhungTen', 'chuTheMon', 'chuThanhKeoNhan', 'chuThuCuaEm', 'chuVeCuaHang', 'chuVeDao'].sort())
+    expect([...src.matchAll(/^export const (\w+)[^\n]*\/\/ CHỜ MỤC 9/gm)].map((m) => m[1]!)).toEqual([])
+    expect(src).not.toMatch(/chuNhanKhungTen|Tên em đặt cho thần thú/)
+    for (let i = 1; i <= 10; i++) {
+      expect(D.includes(`- [A${i}] `), `mục 9.3 thiếu [A${i}]`).toBe(true)
+      expect(src.includes(`// [A${i}]`), `chu-shop.ts thiếu dấu [A${i}]`).toBe(true)
+    }
     const chu9 = bo(src)
     expect((chu9.match(/!/g) ?? []).length, 'mỗi màn tối đa MỘT dấu chấm than').toBeLessThanOrEqual(1)
     expect(chu9).not.toMatch(/\b(rương|may mắn|trúng|jackpot|gold|coin|shop|skin|item|quay(?! lại))\b/i)

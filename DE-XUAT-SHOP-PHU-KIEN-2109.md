@@ -211,7 +211,7 @@ Thầy duyệt bản thiết kế 21/09 kèm lệnh "đặt lại ngôn ngữ d�
 
 **Bảy trạng thái của một món** (đúng từng chữ): Đang thử · Đủ vàng rồi · Chưa đủ vàng — còn thiếu N vàng · Cần chuỗi N ngày (kèm "+ 5 ấn thạch sáng" nếu có) · Chỉ còn N cái · Đã có · Đang mặc.
 
-### 9.3. Kho câu chữ (58 chuỗi; `{…}` là số hoặc tên do máy chủ trả)
+### 9.3. Kho câu chữ (58 chuỗi + 10 nhãn phụ [A1–A10]; `{…}` là số hoặc tên do máy chủ trả)
 **Tiêu đề màn + nhãn**
 - [N1] Cửa hàng — dòng phụ: Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
 - [N2] Thử đồ — dòng phụ: Thử thoải mái, không mất vàng
@@ -292,3 +292,15 @@ Thầy duyệt bản thiết kế 21/09 kèm lệnh "đặt lại ngôn ngữ d�
 - [L13] `sai_dau_vao`: Có gì đó chưa đúng. Em tải lại trang rồi thử lại nhé.
 - [L9] Mất mạng: Mất mạng rồi. Có mạng lại mới mua được, em vẫn xem được Tủ đồ.
 - [L10] Lỗi không rõ: Cửa hàng chưa tải được. Em bấm Thử lại nhé.
+
+**Nhãn trợ năng + chữ phụ (thêm 21/09 đêm — Boss duyệt 11 chuỗi máy em còn thiếu)**
+- [A1] Về Đảo thần thú — nhãn nút quay lại của Cửa hàng
+- [A2] Về Cửa hàng — nhãn nút quay lại của Thử đồ, Tủ đồ
+- [A3] Lọc theo chỗ đeo — nhãn hàng lọc theo chỗ đeo
+- [A4] Kéo thanh để chọn số EXP — nhãn thanh kéo (dùng lại [B9])
+- [A5] Em đổi được tối đa {420} EXP — nhãn đầu mút thanh kéo
+- [A6] Cần có: Không cần gì thêm — món không có điều kiện học
+- [A7] Số lượng: Luôn có sẵn — món không giới hạn
+- [A8] {Vòng Lửa Vàng}: {Em có đủ EXP thừa. Đổi vàng là mua được.} — khuôn "{tên món}: {lời chỉ đường D1/D2}" khi không còn món nào vừa số vàng
+- [A9] Thần thú của em: {Lửa Nhỏ} — nhãn trợ năng của sân khấu; chưa có tên ⇒ Thần thú của em. Dòng nhỏ trên khung tên: KHÔNG vẽ (app thật chỉ hiện tên thú; dòng ấy chỉ để giải thích trong mẫu phác)
+- [A10] Thử {Vòng Lửa Vàng}. Bậc {Thường}. Giá {150} vàng. {Đủ vàng rồi} — nhãn trợ năng của thẻ món
