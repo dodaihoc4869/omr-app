@@ -261,3 +261,9 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 - [x] `PhanCongScreen`: MỘT bước xác nhận nói thật ("Cho <tên> làm lại? Em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi; điểm mới thay điểm cũ, điểm cũ vẫn lưu trong lịch sử.") → `choLamLaiBtvn(maBtvn theo ca, sbd)` (`POST /btvn/cho-lam-lai`, lệnh của Code 3, commit 2de35c7 chưa lên Worker) → báo "Đã cho <tên> làm lại (lượt làm thứ N)…"; 404 ⇒ "Máy chủ chưa có lệnh Cho làm lại… Kết quả của em vẫn giữ nguyên"; máy chủ từ chối (quá hạn / chưa nộp / đã thay đổi…) ⇒ hiện NGUYÊN câu của máy chủ; quá hạn chờ ⇒ "CHƯA CHẮC đã cho em làm lại"; luôn tải lại danh sách.
 - [x] 11 test + đột biến 8/8; tsc -b + build exit 0; ảnh `cll-giao-{xac-nhan,ket-qua,qua-han}-*.jpg` (1440/390 sáng/tối, 10 tệp ≤ 73 KB), 0 lỗi tương phản/vùng chạm/tràn; test đỏ còn lại (`btvn-ui-1609`) thuộc nền đỏ 19/09.
 - [ ] CHƯA thử với Worker thật (lệnh chưa lên). Khi lên: thử một em đã nộp ở 12121212.
+
+## BTVN NÂNG ĐỠ bản 1.1 — phần app thầy (e6dca3a)
+- [x] Ô "Hạn nộp bài mới" mặc định 23:59 giờ VN của ngày (hôm nay VN + 2) — `hanMacDinhVN` (đúng múi giờ, qua nửa đêm/sang năm); giao gửi ISO 23:59 VN (=16:59Z); thầy vẫn đổi/xoá được (xoá trắng ⇒ máy chủ tự đặt như cũ). Lời chú thích "Mặc định 23:59 — giờ chốt mỗi ngày của học sinh".
+- [x] Xem trước: đọc `canhBao/boQuaQid/thieuMeta` (Code 3 đã thêm cho chế độ "trước khi giao") ⇒ dải cảnh báo cam đầu tấm phủ; dùng CHUNG hàm `canhBaoTuMayChu` với lúc giao (lõi < 6 · mã câu bị bỏ · thiếu nhãn).
+- [ ] CHƯA: lịch chặng theo GIỜ ("Chặng 1 · 20:00 · 8 câu…") + cảnh báo "Hạn ngắn: mỗi em tối thiểu N câu lõi trong M phiên — cân nhắc lùi hạn" — chờ dạng trường (đã gửi Code 3 đề nghị `chiTiet.lich[{chiSo,moLuc,soCau}]` + `canhBaoHanNgan{soCauLoiToiThieu,soPhien}`), Code 1 chưa xong `xepLichChang`.
+- [x] 34 test + đột biến 6/6; tsc -b + build exit 0; m3-b/m3-c xanh; ảnh `han-giao-mac-dinh-*`, `bn-canh-bao-*` (0 lỗi tương phản/chạm/tràn).
