@@ -21,7 +21,7 @@ Không đồng hồ, không ngẫu nhiên, không đọc D1; chạy được c�
 - Không vượt bậc + 1; không đụng hạn nộp / điểm / bài bắt buộc (việc bắt buộc còn ⇒ từ chối).
 
 ## 5 · Phần Code 3 — `POST /ph/giao-them` (máy chủ; Code 3, 21/09)
-**Xác thực:** mã phụ huynh `{pass}` như `/ph/ke-hoach` (chỉ token). **Một lệnh, hai kiểu gọi:** `{pass}` = GIAO; `{pass, chiXem: true}` = chỉ đọc trạng thái nút (không ghi, không chọn câu).
+**Xác thực (sửa 21/09 14:30, Boss):** nhận CẢ `{pass}` (token liên kết riêng) LẪN `{sbd}` trần như `/mom/*` và `/parent-news/*` — phụ huynh thật hiện đều dùng SBD trần, chưa ai có token; có `pass` thì danh tính lấy từ token và `sbd` trong thân bị bỏ. **Một lệnh, hai kiểu gọi:** `{pass}` = GIAO; `{pass, chiXem: true}` = chỉ đọc trạng thái nút (không ghi, không chọn câu).
 ```jsonc
 { "ok": true, "serverNow": 0,
   "conLaiHomNay": 2,                       // 3 − số lượt THÀNH CÔNG hôm nay (ngày VN); lượt bị từ chối KHÔNG tính

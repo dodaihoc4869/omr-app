@@ -273,11 +273,24 @@ describe('loại câu không dùng được', () => {
   })
 })
 
+describe('xác thực: token LẪN SBD trần (như mom / parent-news)', () => {
+  it('SBD trần (phụ huynh chưa có liên kết) giao được, ghi truy cập loại sbd_tran; token vẫn lấy danh tính từ token, `sbd` trong thân bị bỏ', async () => {
+    const { d, pass } = await dung()
+    const a = await phGiaoThem(d.env, { sbd: 'S1' }, H('19:00')) as any
+    expect(a.ok).toBe(true); expect(a.daGiao.luot).toBe(1)
+    expect(d.sql.prepare("SELECT kieu FROM ph_truy_cap WHERE duong = 'ph-giao-them'").all()).toEqual([{ kieu: 'sbd_tran' }])
+    lamXong(d) // con làm xong gói 1 ⇒ được giao gói 2
+    const b = await phGiaoThem(d.env, { pass, sbd: 'EM-KHAC' }, H('19:30')) as any
+    expect(b.ok).toBe(true); expect(b.daGiao.luot).toBe(2) // cùng em S1 theo token; sbd trong thân bị bỏ
+    expect((d.sql.prepare('SELECT DISTINCT sbd FROM ph_giao_them').all() as { sbd: string }[]).map((x) => x.sbd)).toEqual(['S1'])
+  })
+})
+
 describe('xác thực và lỗi hệ thống', () => {
   it('không có mã phụ huynh / mã sai / thiếu bảng ⇒ ok:false, không ghi', async () => {
     const { d, pass } = await dung()
-    await expect(phGiaoThem(d.env, {}, H('19:00'))).rejects.toThrow(/liên kết riêng/)
-    await expect(phGiaoThem(d.env, { sbd: 'S1' }, H('19:00'))).rejects.toThrow(/liên kết riêng/) // chỉ nhận token
+    await expect(phGiaoThem(d.env, {}, H('19:00'))).rejects.toThrow(/số báo danh/) // thiếu cả token lẫn SBD
+    await expect(phGiaoThem(d.env, { sbd: 'KHONG-CO' }, H('19:00'))).rejects.toThrow(/số báo danh/)
     await expect(phGiaoThem(d.env, { pass: pass + 'x' }, H('19:00'))).rejects.toThrow()
     d.sql.exec('DROP TABLE ph_giao_them')
     expect(await chay(d, pass, '19:00')).toMatchObject({ ok: false, error: expect.stringContaining('migration-2109-ph-giao-them.sql') })

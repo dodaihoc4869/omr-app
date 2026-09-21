@@ -249,7 +249,9 @@ async function goiGanNhat(env: Env, sbd: string, hang: HangLuot | undefined): Pr
 const daGiaoTuHang = (h: HangLuot, laLuotCu: boolean): Row => ({ soCau: h.soCau, luot: h.luot, luc: h.luc, phutUocTinh: h.phutUocTinh, lyDo: h.lyDo, thanhPhan: h.thanhPhan, laLuotCu })
 
 export async function phGiaoThem(env: Env, b: Record<string, unknown>, nowMs: number = Date.now()): Promise<Row> {
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-giao-them', { chiToken: true })
+  // Nhận CẢ token liên kết riêng LẪN SBD trần — y như `/mom/*` và `/parent-news/*` (Boss 21/09: 100% phụ huynh thật đang dùng SBD trần, chưa ai có token; chỉ token ⇒ không ai giao được bài).
+  // Không mở thêm rủi ro: cùng SBD trần đó đã đọc tiến bộ và tạo bài Mẹ giao (`mom/create`); ở đây còn kẹp 3 lượt/ngày/em. Có `pass` ⇒ danh tính lấy từ token, `sbd` trong thân bị bỏ.
+  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-giao-them')
   const ngay = ngayVn(nowMs)
   const rHang = await tat(() => env.DB.prepare('SELECT * FROM ph_giao_them WHERE sbd = ? AND ngay_vn = ? ORDER BY luot').bind(sbd, ngay).all<Row>(), null)
   if (rHang === null) return { ok: false, error: 'Máy chủ chưa cập nhật bảng giao thêm (cần chạy migration-2109-ph-giao-them.sql).' }
