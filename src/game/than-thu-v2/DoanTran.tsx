@@ -6,6 +6,7 @@ import { CHIEU, HIEP_TRUM, NL_KY_NANG, CHAN, satThuongDon, type HanhDong } from 
 import { CHU_TRANG_THAI, NHAN_CAU, TIN_HIEU_TRUM, type DoanXem, type GheXem, type KetQuaCau } from './doan-kieu'
 import DoanCau, { DeBai, duDapAn } from './DoanCau'
 import { cacAnhCuaCau, useAnhSanSang } from './anh-san-sang'
+import { CHU_HET_CAU_MOI } from './chu-het-luot'
 import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh, TrumHinh } from './DoanHinh'
 import { ChemText } from '../../lib/chem-format'
 import { LoiGiaiCauSai } from '../../components/KhoiCauSai'
@@ -18,7 +19,7 @@ interface Props {
   chon: string; onChon: (v: string) => void; hanhDong: HanhDong; onHanhDong: (h: HanhDong) => void
   yChon: Record<number, 'D' | 'S'>; onYChon: (y: number, v: 'D' | 'S') => void
   onChot: (boTrong: boolean) => void; onChotY: (y: number) => void; onTinHieu: (t: string) => void; onRoi: () => void; onZoom: (src: string) => void
-  ban: boolean; dangChot?: boolean; loi: string; ketQuaCau?: KetQuaCau | null; cauVuaLam?: CauVuaLam | null; loiGiaiTrum?: LoiGiaiTrum | null
+  ban: boolean; dangChot?: boolean; /** Máy chủ báo hôm nay hết câu MỚI (bộ có câu em từng làm lâu rồi) — máy nói thật ở quãng chuẩn bị hiệp 1. */ hetCauMoi?: boolean; loi: string; ketQuaCau?: KetQuaCau | null; cauVuaLam?: CauVuaLam | null; loiGiaiTrum?: LoiGiaiTrum | null
   /** Tiếp sức: xin (khi em chưa chốt) và mở tấm trượt giúp bạn (khi em đã chốt). */
   onXinTiepSuc: (bat: boolean) => void; onMoTiepSuc: (ghe: number) => void; expTiepSuc?: number
 }
@@ -206,6 +207,7 @@ export default function DoanTran(p: Props) {
       {p.loi && <div className="dh-loi" role="alert">{p.loi}</div>}
       {duoi}
       {!mo && !tran.ketThuc && <div className="dh-cho" role="status">{tran.hiep === 1 && !xem.hiepVuaXong ? 'Chuẩn bị lên đường' : `Hiệp ${tran.hiep}${tran.laTrum ? ' · TRÙM' : ''} mở sau`} {Math.max(1, p.moSauGiay)} giây</div>}
+      {!mo && !tran.ketThuc && p.hetCauMoi && tran.hiep === 1 && <div className="dh-cho" role="status" data-vung="het-cau-moi">{CHU_HET_CAU_MOI}</div>}
     </div>
   )
 }

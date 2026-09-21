@@ -1,11 +1,11 @@
 // ĐOÀN HỘ TỐNG — SẢNH hằng ngày (bản vẽ 1) + phòng chờ khi đi cùng bạn. Khối nào cần số liệu mà máy chủ chưa trả (Đoàn lớp, vé,
 // rương chuỗi, Trùm lớp, ấn thạch — bước 5 và 6) thì KHÔNG hiện: không bịa số.
 import { useEffect, useRef, useState } from 'react'
-import { Flame, Ticket, X } from 'lucide-react'
+import { Flag, Flame, Ticket, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { AnXem, BanDongHanhXem, DoanXem, SanhXem } from './doan-kieu'
 import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh } from './DoanHinh'
-import { chuHetLuotDoan, type LuotCauNgay } from './chu-het-luot'
+import { chuChangHomNay, chuHetChang, chuHetLuotDoan, daHetChang, type ChangHomNay, type LuotCauNgay } from './chu-het-luot'
 
 // Bốn thứ đang tới (bước 5, 6). CỐ Ý không có con số nào: máy chủ chưa có số thì không bịa — chỉ tên, một dòng mô tả, biểu tượng khoá.
 const SAP_MO = [
@@ -17,7 +17,7 @@ const SAP_MO = [
 /** `daDung` + `tran` (lượt game hôm nay / trần) do máy chủ gửi ở `recommendations`; máy chủ cũ không gửi ⇒ vắng ⇒ lời hết lượt KHÔNG nói số. */
 export interface GoiYHomNay extends LuotCauNgay { tong: number; nhom: { ten: string; so: number }[]; hetLuot: boolean }
 interface Props {
-  pet: number; cap: number; tenDoan: string; goiY: GoiYHomNay | null; sanh: SanhXem | null; anThach?: AnXem | null; banDongHanh?: BanDongHanhXem | null
+  pet: number; cap: number; tenDoan: string; goiY: GoiYHomNay | null; /** `changHomNay` của `doan-sanh`: "Đã đi 2/6 chặng hôm nay"; đủ chặng ⇒ khoá + lý do. Vắng ⇒ không hiện, không khoá theo chặng. */ chang?: ChangHomNay | null; sanh: SanhXem | null; anThach?: AnXem | null; banDongHanh?: BanDongHanhXem | null
   phong: DoanXem | null; ban: boolean; loi: string
   onLenDuong: () => void; onMoPhong: () => void; onVaoPhong: (ma: string) => void; onBatDau: () => void; onRoi: () => void; onDong: () => void
   khoiThem?: ReactNode
@@ -43,7 +43,9 @@ export default function DoanSanh(p: Props) {
   const s = p.sanh, lop = s?.doanLop, hetVe = !!s && !s.mienPhiHomNay && !s.ve, an = p.anThach && p.anThach.ds.length ? p.anThach : null, bdh = p.banDongHanh
   // Nút "Mở đoàn mới": khoá thì nói LÝ DO ngay dưới nút. Máy chủ (`doan-mo`, cả cheDo phong) cũng qua cổng vé (`quaCongVe`) nên hết vé thì mở đoàn bị từ chối — khoá cùng luật với nút LÊN ĐƯỜNG, không đổi luật.
   const chuHetLuot = chuHetLuotDoan(p.goiY) // trần do máy chủ nói, không viết cứng số
-  const khoaMo = p.goiY?.hetLuot ? chuHetLuot : hetVe ? CHU_HET_VE : p.ban ? 'Đang xử lý, em đợi một chút…' : null
+  const hetChang = daHetChang(p.chang) // `doan-mo` (cả cheDo phong) ném lỗi khi đủ chặng/ngày — khoá đúng chỗ máy chủ sẽ từ chối, số chặng do máy chủ nói
+  const chuHetChangNay = p.chang ? chuHetChang(p.chang) : ''
+  const khoaMo = p.goiY?.hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : hetVe ? CHU_HET_VE : p.ban ? 'Đang xử lý, em đợi một chút…' : null
   const sao = Array.from({ length: 26 }, (_, i) => <i key={i} style={{ left: `${(i * 53 + 17) % 100}%`, top: `${(i * 29 + 7) % 60}%`, animationDelay: `${(i % 7) * .4}s` }} />)
   return (
     <div className="dh-khung">
@@ -54,10 +56,11 @@ export default function DoanSanh(p: Props) {
           <button type="button" className="dh-nut-dong" aria-label="Về Đảo thần thú" title="Về Đảo thần thú" onClick={p.onDong}><X size={18} aria-hidden="true" /></button>
         </div>
       </header>
-      {s && ((s.ve !== null) || s.chuoi.ngay > 0) && (
+      {((s && ((s.ve !== null) || s.chuoi.ngay > 0)) || p.chang) && (
         <div className="dh-hang-the">
           {s && s.ve !== null && <span className="dh-the-so dh-the-ve" aria-label={`Em có ${s.ve} vé hộ tống`}><Ticket size={16} aria-hidden="true" />Vé hộ tống: {s.ve}</span>}
           {s && s.chuoi.ngay > 0 && <span className="dh-the-so dh-the-chuoi" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}><Flame size={16} aria-hidden="true" />Chuỗi {s.chuoi.ngay} ngày</span>}
+          {p.chang && <span className="dh-the-so dh-the-chang" data-vung="chang-hom-nay"><Flag size={16} aria-hidden="true" />{chuChangHomNay(p.chang)}</span>}
         </div>
       )}
 
@@ -102,8 +105,8 @@ export default function DoanSanh(p: Props) {
             <div className="dh-chang-qua"><span className="dh-vien-thuoc">EXP thần thú</span><span className="dh-vien-thuoc">Liên Kích ×2 khi tiếp sức</span></div>
             {s?.quaMoi.map((q, i) => <div key={i} className="dh-qua-moi" role="status">＋{q.ve} vé · {q.ghiChu}</div>)}
             {loiO('len')}
-            <button type="button" className="dh-nut-vang" disabled={p.ban || !!p.goiY?.hetLuot || hetVe} onClick={() => { setNut('len'); p.onLenDuong() }}>{BieuTuong.choi}<span>{p.ban ? 'ĐANG MỞ ĐƯỜNG…' : hetVe ? 'HẾT VÉ HÔM NAY' : 'LÊN ĐƯỜNG'}</span></button>
-            <small>{p.goiY?.hetLuot ? chuHetLuot : hetVe ? CHU_HET_VE : s ? 'Chuyến thêm tốn 1 vé · vé chỉ kiếm được bằng làm bài tập · thua không mất gì' : 'Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì'}</small>
+            <button type="button" className="dh-nut-vang" disabled={p.ban || !!p.goiY?.hetLuot || hetChang || hetVe} onClick={() => { setNut('len'); p.onLenDuong() }}>{BieuTuong.choi}<span>{p.ban ? 'ĐANG MỞ ĐƯỜNG…' : hetChang ? 'ĐÃ ĐI ĐỦ CHẶNG HÔM NAY' : hetVe ? 'HẾT VÉ HÔM NAY' : 'LÊN ĐƯỜNG'}</span></button>
+            <small>{p.goiY?.hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : hetVe ? CHU_HET_VE : s ? 'Chuyến thêm tốn 1 vé · vé chỉ kiếm được bằng làm bài tập · thua không mất gì' : 'Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì'}</small>
           </section>
           {p.khoiThem}
           {s && (

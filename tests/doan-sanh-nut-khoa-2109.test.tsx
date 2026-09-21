@@ -21,8 +21,8 @@ const goc = (sua: Partial<P> = {}): P => ({ pet: 0, cap: 12, tenDoan: 'Đoàn H�
 
 const CHU_HET_VE = 'Hết vé? Làm xong nhiệm vụ hôm nay để nhận 2 vé · xong một chặng Bài tập về nhà đúng kế hoạch nhận 1 vé.'
 // Máy chủ CŨ chưa gửi trần ⇒ câu KHÔNG số (không viết cứng 200/60: thầy đã đổi trần 200 → 60)
-const CHU_HET_LUOT = 'Em đã chơi đủ số câu game của hôm nay — mai mình đi tiếp nhé.'
-const CHU_HET_LUOT_SO = 'Hôm nay em đã chơi 60/60 câu game — mai mình đi tiếp nhé.'
+const CHU_HET_LUOT = 'Em đã đi đủ số câu Đoàn Hộ Tống của hôm nay — mai mình đi tiếp nhé.'
+const CHU_HET_LUOT_SO = 'Hôm nay em đã đi 60/60 câu Đoàn Hộ Tống — mai mình đi tiếp nhé.'
 const LOI_HET_VE = 'Hôm nay em đã đi chặng miễn phí rồi và em chưa có vé. Vé chỉ kiếm bằng học.'
 
 const nutMo = (c: HTMLElement) => within(c).getByRole('button', { name: /Mở đoàn mới/ }) as HTMLButtonElement
@@ -45,7 +45,7 @@ describe('nút "Mở đoàn mới" khoá ⇒ dòng lý do NGAY DƯỚI nút', ()
     expect(nutMo(container).disabled).toBe(false)
     expect(lyDo(container)).toBeNull()
   })
-  it('hết lượt câu game: khoá + lý do "đã chơi đủ số câu game … mai mình đi tiếp"; dòng lý do đứng SÁT dưới nút; nút LÊN ĐƯỜNG cũng nói đúng lý do (không nói chuyện vé)', () => {
+  it('hết lượt câu Đoàn: khoá + lý do "đã đi đủ số câu Đoàn Hộ Tống … mai mình đi tiếp"; dòng lý do đứng SÁT dưới nút; nút LÊN ĐƯỜNG cũng nói đúng lý do (không nói chuyện vé)', () => {
     const { container } = render(<DoanSanh {...goc({ goiY: goiY(true) })} />)
     expect(nutMo(container).disabled).toBe(true)
     expect(lyDo(container)!.textContent).toBe(CHU_HET_LUOT)
@@ -74,14 +74,14 @@ describe('nút "Mở đoàn mới" khoá ⇒ dòng lý do NGAY DƯỚI nút', ()
     expect(nutMo(container).disabled).toBe(true)
     expect(lyDo(container)!.textContent).toMatch(/^Đang xử lý/)
   })
-  it('thứ tự lý do: hết 200 câu thắng hết vé thắng đang xử lý', () => {
+  it('thứ tự lý do: hết lượt câu thắng hết vé thắng đang xử lý', () => {
     const { container } = render(<DoanSanh {...goc({ goiY: goiY(true), sanh: sanh({ ve: 0 }), ban: true })} />)
     expect(lyDo(container)!.textContent).toBe(CHU_HET_LUOT)
     cleanup()
     const c2 = render(<DoanSanh {...goc({ sanh: sanh({ ve: 0 }), ban: true })} />).container
     expect(lyDo(c2)!.textContent).toBe(CHU_HET_VE)
   })
-  it('máy chủ NÓI trần (tranNgay 60, dailyUsed 60): lý do ghi "60/60 câu game" ở cả hai nút; dailyUsed hơn trần (đếm lượt) vẫn ghi 60/60', () => {
+  it('máy chủ NÓI trần (tranNgay 60, dailyUsed 60): lý do ghi "60/60 câu Đoàn Hộ Tống" ở cả hai nút; dailyUsed hơn trần (đếm lượt) vẫn ghi 60/60', () => {
     for (const daDung of [60, 64]) {
       const { container } = render(<DoanSanh {...goc({ goiY: goiY(true, { daDung, tran: 60 }) })} />)
       expect(lyDo(container)!.textContent).toBe(CHU_HET_LUOT_SO)
@@ -107,6 +107,46 @@ describe('nút "Mở đoàn mới" khoá ⇒ dòng lý do NGAY DƯỚI nút', ()
   it('dòng lý do là ghi chú cho trợ năng (role=note), không phải cảnh báo', () => {
     const { container } = render(<DoanSanh {...goc({ goiY: goiY(true) })} />)
     expect(lyDo(container)!.getAttribute('role')).toBe('note')
+  })
+})
+
+describe('chặng hôm nay (doan-sanh.changHomNay): chip "Đã đi N/6 chặng hôm nay"; đủ chặng ⇒ khoá cả hai nút + lý do', () => {
+  const CHU_HET_CHANG = 'Hôm nay em đã đi đủ 6 chặng — mai mình đi tiếp nhé.'
+  it('có changHomNay ⇒ chip số chặng (số do máy chủ nói); không có ⇒ không chip', () => {
+    const { container } = render(<DoanSanh {...goc({ chang: { daDi: 2, toiDa: 6 } })} />)
+    expect(container.querySelector('[data-vung="chang-hom-nay"]')!.textContent).toBe('Đã đi 2/6 chặng hôm nay')
+    cleanup()
+    expect(render(<DoanSanh {...goc()} />).container.querySelector('[data-vung="chang-hom-nay"]')).toBeNull()
+    cleanup()
+    // chip hiện cả khi sảnh chưa có vé/chuỗi (sanh null): vẫn là số máy chủ nói
+    expect(render(<DoanSanh {...goc({ sanh: null, chang: { daDi: 0, toiDa: 6 } })} />).container.querySelector('[data-vung="chang-hom-nay"]')!.textContent).toBe('Đã đi 0/6 chặng hôm nay')
+  })
+  it('chưa đủ chặng ⇒ KHÔNG khoá (còn 1 chặng): hai nút bấm được', () => {
+    const { container } = render(<DoanSanh {...goc({ chang: { daDi: 5, toiDa: 6 } })} />)
+    expect(nutMo(container).disabled).toBe(false)
+    expect(nutDi(container).disabled).toBe(false)
+    expect(lyDo(container)).toBeNull()
+  })
+  it('ĐỦ chặng (6/6): khoá LÊN ĐƯỜNG + Mở đoàn mới; nhãn "ĐÃ ĐI ĐỦ CHẶNG HÔM NAY"; lý do ngay dưới cả hai nút', () => {
+    const { container } = render(<DoanSanh {...goc({ chang: { daDi: 6, toiDa: 6 } })} />)
+    expect(nutMo(container).disabled).toBe(true)
+    expect(nutDi(container).disabled).toBe(true)
+    expect(nutDi(container).textContent).toContain('ĐÃ ĐI ĐỦ CHẶNG HÔM NAY')
+    expect(lyDo(container)!.textContent).toBe(CHU_HET_CHANG)
+    expect(nutMo(container).nextElementSibling).toBe(lyDo(container))
+    expect(theChang(container).querySelector('small')!.textContent).toBe(CHU_HET_CHANG)
+  })
+  it('trần chặng do máy chủ nói (toiDa 4 ⇒ "đủ 4 chặng", không cứng 6)', () => {
+    const { container } = render(<DoanSanh {...goc({ chang: { daDi: 4, toiDa: 4 } })} />)
+    expect(lyDo(container)!.textContent).toContain('đủ 4 chặng')
+  })
+  it('thứ tự lý do: hết lượt câu > đủ chặng > hết vé > đang xử lý', () => {
+    const p = { chang: { daDi: 6, toiDa: 6 }, sanh: sanh({ ve: 0 }), ban: true }
+    expect(lyDo(render(<DoanSanh {...goc({ ...p, goiY: goiY(true) })} />).container)!.textContent).toBe(CHU_HET_LUOT)
+    cleanup()
+    expect(lyDo(render(<DoanSanh {...goc(p)} />).container)!.textContent).toBe(CHU_HET_CHANG)
+    cleanup()
+    expect(lyDo(render(<DoanSanh {...goc({ sanh: sanh({ ve: 0 }), ban: true })} />).container)!.textContent).toBe(CHU_HET_VE)
   })
 })
 

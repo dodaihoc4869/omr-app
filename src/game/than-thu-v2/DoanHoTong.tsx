@@ -1,7 +1,7 @@
 // ĐOÀN HỘ TỐNG — khung điều khiển phía máy em: Sảnh → Trong trận / Trùm → Tung chưởng → Kết chặng.
 // Đồng bộ bằng hỏi-đáp ngắn 1,5 s với /game-v2/doan-xem (giả định đã chốt, chưa dùng WebSocket). Mọi luật, mọi phép chấm ở MÁY CHỦ;
 // ở đây chỉ vẽ đúng thứ máy chủ trả về. Vẽ vào document.body (cổng) để là lớp phủ toàn màn, không dính kiểu nút của game cũ.
-import { docLuotCauNgay } from './chu-het-luot'
+import { daChamTran, docChangHomNay, docLuotCauNgay, type ChangHomNay, type LuotCauNgay } from './chu-het-luot'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { Question } from './core'
@@ -25,6 +25,9 @@ const loiCua = (e: unknown) => (e instanceof Error ? e.message : 'Chưa kết n�
 export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemVu }: { call: GoiDoan; sbd: string; pet: number; cap: number; onDong: () => void; onVeBangNhiemVu: () => void }) {
   const [xem, setXem] = useState<DoanXem | null>(null)
   const [goiY, setGoiY] = useState<GoiYHomNay | null>(null), [sanh, setSanh] = useState<SanhXem | null>(null)
+  // Trần TÁCH RIÊNG (thầy 19:30): số lượt câu + chặng của ĐOÀN lấy từ `doan-sanh`, KHÔNG từ `recommendations` (đó là số của Đảo). Máy chủ cũ không gửi ⇒ null.
+  const [luotDoan, setLuotDoan] = useState<LuotCauNgay | null>(null), [chang, setChang] = useState<ChangHomNay | null>(null), [hetCauMoi, setHetCauMoi] = useState(false)
+  const apSanh = useCallback((x: PhanHoiDoan) => { setSanh(x.sanh ?? null); const l = docLuotCauNgay(x); setLuotDoan(l.tran !== undefined && l.daDung !== undefined ? l : null); setChang(docChangHomNay(x)) }, [])
   const [anThach, setAnThach] = useState<AnXem | null>(null), [banDongHanh, setBanDongHanh] = useState<BanDongHanhXem | null>(null)
   const [ban, setBan] = useState(false), [loi, setLoi] = useState(''), [zoom, setZoom] = useState('')
   // ĐANG CHỐT câu này (lệnh doan-nop đang bay). Chỉ lúc này lưới đáp án mới khoá (đáp án trên màn = đáp án đã gửi); `ban` là MỌI lệnh (tín hiệu, xin tiếp sức…) và KHÔNG được khoá lưới:
@@ -61,21 +64,22 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const goi = useCallback(async (lenh: string, data: Record<string, unknown> = {}) => {
     if (khoa.current) return null
     khoa.current = true; setBan(true); setLoi('')
-    try { const r = await call(lenh, data) as PhanHoiDoan; apDung(r); return r } catch (e) { if (song.current) setLoi(loiCua(e)); return null } finally { khoa.current = false; if (song.current) setBan(false) }
+    try { const r = await call(lenh, data) as PhanHoiDoan; apDung(r); if (song.current && (r.hetCauMoi === true || lenh === 'doan-mo')) setHetCauMoi(r.hetCauMoi === true); return r } catch (e) { if (song.current) setLoi(loiCua(e)); return null } finally { khoa.current = false; if (song.current) setBan(false) }
   }, [call, apDung])
 
   // Mở lại chặng đang dở (tải lại trang / đổi tab) và đọc "câu của riêng em hôm nay" cho thẻ Chặng hôm nay.
   useEffect(() => {
     let ma = ''; try { ma = sessionStorage.getItem(khoaLuu(sbd)) ?? '' } catch { /* bỏ qua */ }
     // Sảnh: vé, chuỗi/rương, Đoàn lớp, Trùm lớp — và chặng đang dở trên máy KHÁC (máy này chưa có mã lưu) thì mở lại luôn.
-    void call('doan-sanh').then(r => { const x = r as PhanHoiDoan; if (!song.current) return; setSanh(x.sanh ?? null); setAnThach(x.anThach ?? null); setBanDongHanh(x.banDongHanh ?? null); if (!ma && x.dangDo) void call('doan-xem', { ma: x.dangDo }).then(v => apDung(v as PhanHoiDoan)).catch(() => {}) }).catch(() => { /* máy chủ cũ chưa có lệnh: Sảnh giữ ô SẮP MỞ */ })
+    void call('doan-sanh').then(r => { const x = r as PhanHoiDoan; if (!song.current) return; apSanh(x); setAnThach(x.anThach ?? null); setBanDongHanh(x.banDongHanh ?? null); if (!ma && x.dangDo) void call('doan-xem', { ma: x.dangDo }).then(v => apDung(v as PhanHoiDoan)).catch(() => {}) }).catch(() => { /* máy chủ cũ chưa có lệnh: Sảnh giữ ô SẮP MỞ */ })
     if (ma) void call('doan-xem', { ma }).then(r => apDung(r as PhanHoiDoan)).catch(() => { try { sessionStorage.removeItem(khoaLuu(sbd)) } catch { /* bỏ qua */ } })
     void call('recommendations').then(r => {
       const x = r as { suggestions?: { title: string }[]; remaining?: number; dailyUsed?: number; tranNgay?: number }
       const dem = new Map<string, number>(); for (const s of x.suggestions ?? []) dem.set(s.title, (dem.get(s.title) ?? 0) + 1)
-      if (song.current) setGoiY({ tong: x.suggestions?.length ?? 0, nhom: [...dem].map(([ten, so]) => ({ ten, so })).slice(0, 3), hetLuot: x.remaining === 0, ...docLuotCauNgay(x) })
+      // `remaining`/`dailyUsed`/`tranNgay` ở đây là của ĐẢO: KHÔNG dùng cho hết-lượt của Đoàn (chỉ lấy danh sách gợi ý).
+      if (song.current) setGoiY({ tong: x.suggestions?.length ?? 0, nhom: [...dem].map(([ten, so]) => ({ ten, so })).slice(0, 3), hetLuot: false })
     }).catch(() => { /* không có gợi ý: thẻ dùng lời chung */ })
-  }, [sbd, call, apDung])
+  }, [sbd, call, apDung, apSanh])
 
   const dangDi = !!xem && (!xem.batDau || !xem.tran?.ketThuc)
   // Hỏi-đáp ngắn: chỉ khi đang có đoàn, tab đang hiện, không có lệnh khác đang bay.
@@ -100,6 +104,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const daMo = moSauGiay <= 0
   useEffect(() => { if (xem?.batDau && !xem.tran?.ketThuc && !khoa.current) void call('doan-xem', { ma: xem.ma }).then(r => apDung(r as PhanHoiDoan)).catch(() => {}) }, [daMo, conGiay <= 0]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Gợi ý của Đảo (`recommendations`) chỉ cho danh sách "câu của riêng em"; hết lượt + số lượt là của ĐOÀN (doan-sanh). Chưa có số của Đoàn (máy chủ cũ) ⇒ không khoá theo lượt.
+  const goiYSanh: GoiYHomNay | null = goiY || luotDoan ? { tong: goiY?.tong ?? 0, nhom: goiY?.nhom ?? [], hetLuot: daChamTran(luotDoan), ...(luotDoan ?? {}) } : null
   const tran = xem?.tran
   const deHienTai = xem?.cau?.qid ? de.current.get(xem.cau.qid) : undefined
   const deTrum = xem?.trum?.qid ? de.current.get(xem.trum.qid) : undefined
@@ -133,8 +139,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const veSanh = () => {
     try { sessionStorage.removeItem(khoaLuu(sbd)) } catch { /* bỏ qua */ }
     phienBan.current = { ma: '', revision: -1 }; hiepDaChieu.current = 0; hiepDangLam.current = 0
-    setXem(null); setTungChuong(null); setCauVuaLam(null); setLoiGiaiTrum(null); setExpNhan(0); setLoi('')
-    void call('doan-sanh').then(r => { if (song.current) setSanh((r as PhanHoiDoan).sanh ?? null) }).catch(() => {})
+    setXem(null); setTungChuong(null); setCauVuaLam(null); setLoiGiaiTrum(null); setExpNhan(0); setLoi(''); setHetCauMoi(false)
+    void call('doan-sanh').then(r => { if (song.current) apSanh(r as PhanHoiDoan) }).catch(() => {})
   }
   const xongChuong = () => {
     const kq = tungChuong; setTungChuong(null)
@@ -145,11 +151,11 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   // Chặng vừa kết thúc → hỏi lại Sảnh một lần để nút "Đi thêm một chặng · 1 vé" nói đúng số vé em đang có.
   const daKet = !!xem?.tran?.ketThuc
   const [veSauChang, setVeSauChang] = useState<number | null | undefined>(undefined)
-  useEffect(() => { if (!daKet) { setVeSauChang(undefined); return } void call('doan-sanh').then(r => { if (song.current) { const x = (r as PhanHoiDoan).sanh; setSanh(x ?? null); setVeSauChang(x ? x.ve : undefined) } }).catch(() => {}) }, [daKet, call])
+  useEffect(() => { if (!daKet) { setVeSauChang(undefined); return } void call('doan-sanh').then(r => { if (song.current) { const x = (r as PhanHoiDoan).sanh; apSanh(r as PhanHoiDoan); setVeSauChang(x ? x.ve : undefined) } }).catch(() => {}) }, [daKet, call, apSanh])
   const trongTran = !!xem?.batDau && !!tran && !(tran.ketThuc && !tungChuong)
   const loaiQuaiVuaDanh = tungChuong && !tungChuong.laTrum ? (tungChuong.hiep < HIEP_TRUM[0]! ? 0 : 1) : 0
   const than = !xem || !xem.batDau || !tran ? (
-    <DoanSanh pet={pet} cap={cap} tenDoan="Đoàn Hộ Tống" goiY={goiY} sanh={sanh} anThach={anThach} banDongHanh={banDongHanh} phong={xem} ban={ban} loi={loi}
+    <DoanSanh pet={pet} cap={cap} tenDoan="Đoàn Hộ Tống" goiY={goiYSanh} chang={chang} sanh={sanh} anThach={anThach} banDongHanh={banDongHanh} phong={xem} ban={ban} loi={loi}
       onLenDuong={() => { unlockBattleAudio(); void goi('doan-mo') }} onMoPhong={() => { unlockBattleAudio(); void goi('doan-mo', { cheDo: 'phong' }) }}
       onVaoPhong={ma => { unlockBattleAudio(); void goi('doan-vao', { ma }) }} onBatDau={() => xem && void goi('doan-bat-dau', { ma: xem.ma })} onRoi={() => void roi()} onDong={onDong} />
   ) : tran.ketThuc && !tungChuong && xem.ketChang ? (
@@ -158,7 +164,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     <DoanTran xem={xem} de={deHienTai} deTrum={deTrum} conGiay={conGiay} moSauGiay={moSauGiay} chon={chon} onChon={setChon} hanhDong={hanhDong} onHanhDong={setHanhDong}
       yChon={yChon} onYChon={(y, v) => setYChon(o => ({ ...o, [y]: v }))} onChot={b => void chot(b)} onChotY={chotY} onTinHieu={t => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: t })}
       onXinTiepSuc={bat => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: bat ? 'can_tiep_suc' : '' })} onMoTiepSuc={g => void moTiepSuc(g)} expTiepSuc={expTiepSuc}
-      onRoi={() => void roi()} onZoom={setZoom} ban={ban} dangChot={dangChot} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum} />
+      onRoi={() => void roi()} onZoom={setZoom} ban={ban} dangChot={dangChot} hetCauMoi={hetCauMoi} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum} />
   )
 
   return createPortal(
