@@ -7,7 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 DICH="$HOME/.omr-bo-nao/app"
 mkdir -p "$DICH/scripts/bo-nao" "$DICH/src/lib" "$DICH/bo-nao/so-tay"
-cp scripts/bo-nao/lay.mjs scripts/bo-nao/nop.mjs scripts/bo-nao/chung.mjs scripts/bo-nao/chay-tay.sh scripts/bo-nao/chay-dem.sh "$DICH/scripts/bo-nao/"
+cp scripts/bo-nao/lay.mjs scripts/bo-nao/nop.mjs scripts/bo-nao/chung.mjs scripts/bo-nao/cau-hinh.mjs scripts/bo-nao/chay-tay.sh scripts/bo-nao/chay-dem.sh "$DICH/scripts/bo-nao/"
 cp src/lib/bo-nao-khuon.ts src/lib/bo-nao-nen.ts src/lib/btvn-nang-do.ts "$DICH/src/lib/"
 # thư viện mà btvn-nang-do.ts import (nếu có) — chép theo danh sách import tương đối
 grep -hoE "from '\./[^']+'" src/lib/bo-nao-khuon.ts src/lib/bo-nao-nen.ts src/lib/btvn-nang-do.ts | sed -E "s/from '\.\/([^']+)'/\1/" | sort -u | while read -r m; do [ -f "src/lib/$m.ts" ] && cp "src/lib/$m.ts" "$DICH/src/lib/" || true; done
