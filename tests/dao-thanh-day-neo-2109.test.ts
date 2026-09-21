@@ -13,6 +13,12 @@ const INDEX = doc('src/index.css')
 const DAO = doc('src/game/than-thu-v2/dao/dao.css')
 
 describe('khoá nguồn', () => {
+  it('nút "Về app học sinh" (dính góc trên trái, cuộn qua nội dung) có nền ĐẶC — chữ và nút không bị nội dung phía sau lọt qua', () => {
+    const nut = /\.dao button\.dao-ve-app\{([^}]*)\}/.exec(DAO)![1]!
+    expect(nut).toMatch(/position:fixed/)
+    expect(nut).toMatch(/background:rgb\(9,13,40\)/)
+    expect(nut).not.toMatch(/background:rgba/)
+  })
   it('hai lớp animation của vỏ sheet dùng fill `backwards` (KHÔNG `forwards`): không để lại ma trận đơn vị làm khung chứa cho phần tử fixed; trạng thái cuối keyframe = trạng thái tự nhiên', () => {
     expect(INDEX).toMatch(/\.animate-google-fade \{\s*animation: google-fade-in-up [^;]*backwards;/)
     expect(INDEX).toMatch(/\.animate-google-pop \{\s*animation: google-pop [^;]*backwards;/)

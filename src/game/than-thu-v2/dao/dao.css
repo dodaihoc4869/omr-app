@@ -158,7 +158,7 @@
 .dao .dao-nav button[aria-current]>span{background:rgba(255,209,102,.18)}
 /* Nút "Về app học sinh" LUÔN HIỆN (thầy lệnh 21/09, game tự toàn màn hình): dải mỏng dính ở trên cùng, đích chạm ≥ 48 px, chừa tai thỏ/thanh hệ thống
    bằng vùng an toàn; nội dung đảo nằm dưới dải (padding-top của .dao-vo). Không có nút bật/thoát toàn màn hình. */
-.dao button.dao-ve-app{--nut-chu:var(--dao-chu);position:fixed;top:max(8px,env(safe-area-inset-top,0px));left:max(8px,env(safe-area-inset-left,0px));z-index:60;display:inline-flex;align-items:center;justify-content:center;min-height:48px;min-width:48px;margin:0;padding:0 18px;border-radius:999px;font-size:14px;font-weight:700;background:rgba(9,13,40,.78);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 6px 16px rgba(0,0,0,.35);text-decoration:none}
+.dao button.dao-ve-app{--nut-chu:var(--dao-chu);position:fixed;top:max(8px,env(safe-area-inset-top,0px));left:max(8px,env(safe-area-inset-left,0px));z-index:60;display:inline-flex;align-items:center;justify-content:center;min-height:48px;min-width:48px;margin:0;padding:0 18px;border-radius:999px;font-size:14px;font-weight:700;background:rgb(9,13,40);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 6px 16px rgba(0,0,0,.35);text-decoration:none}
 
 /* ───── Túi đồ ───── */
 .dao .dao-tui{display:flex;flex-direction:column;gap:14px;padding:max(18px,4vh) 16px 0}
