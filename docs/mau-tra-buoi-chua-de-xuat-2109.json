@@ -1,0 +1,103 @@
+{
+  "ok": true,
+  "ngay": "2026-09-22",
+  "lop": "12",
+  "soEmCoSo3Ngay": 8,
+  "dangCaLopYeu": [
+    {
+      "lop": "12 - Tinh Hoa",
+      "khoi": "12",
+      "siSo": 3,
+      "dang": [
+        {
+          "ma": "ESTE.THUY_PHAN",
+          "ten": "ESTE.THUY_PHAN",
+          "soEmYeu": 3
+        }
+      ]
+    }
+  ],
+  "dangBoNao": [
+    {
+      "dang": "ESTE.THUY_PHAN",
+      "chu": "Cả lớp còn yếu dạng này: 4 em sai lặp lại trong 3 ngày."
+    }
+  ],
+  "cauSaiNhieu": [
+    {
+      "qid": "DH-12-C1-B2-I-49",
+      "maDe": "DH-12-C1-B2",
+      "phan": "I",
+      "dang": "ESTE.THUY_PHAN",
+      "soEmLam": 8,
+      "soEmSai": 5,
+      "tiLeSai": 0.625,
+      "loi": false,
+      "emSai": [
+        {
+          "sbd": "12001",
+          "hoTen": "Học sinh mẫu 1",
+          "lop": "12 - Tinh Hoa"
+        },
+        {
+          "sbd": "12002",
+          "hoTen": "Học sinh mẫu 2",
+          "lop": "12 - Tinh Hoa"
+        },
+        {
+          "sbd": "12003",
+          "hoTen": "Học sinh mẫu 3",
+          "lop": "12 - Tinh Hoa"
+        },
+        {
+          "sbd": "12004",
+          "hoTen": "Học sinh mẫu 4",
+          "lop": "12 - Lớp Thường"
+        },
+        {
+          "sbd": "12005",
+          "hoTen": "Học sinh mẫu 5",
+          "lop": "12 - Lớp Thường"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B2-II-3",
+      "maDe": "DH-12-C1-B2",
+      "phan": "II",
+      "dang": "ESTE.XA_PHONG",
+      "soEmLam": 6,
+      "soEmSai": 3,
+      "tiLeSai": 0.5,
+      "loi": false,
+      "emSai": [
+        {
+          "sbd": "12001",
+          "hoTen": "Học sinh mẫu 1",
+          "lop": "12 - Tinh Hoa"
+        },
+        {
+          "sbd": "12002",
+          "hoTen": "Học sinh mẫu 2",
+          "lop": "12 - Tinh Hoa"
+        },
+        {
+          "sbd": "12003",
+          "hoTen": "Học sinh mẫu 3",
+          "lop": "12 - Tinh Hoa"
+        }
+      ]
+    }
+  ],
+  "dongBoNao": [
+    {
+      "sbd": "12002",
+      "hoTen": "Học sinh mẫu 2",
+      "lop": "12 - Tinh Hoa",
+      "hanhDong": "goi_len_bang",
+      "dang": "ESTE.THUY_PHAN",
+      "chu": "Em sai lặp lại ở dạng này."
+    }
+  ],
+  "soTruyVan": 11
+}
