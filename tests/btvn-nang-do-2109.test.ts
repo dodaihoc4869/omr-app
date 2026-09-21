@@ -509,10 +509,20 @@ describe('chonBoCuaEm — cổng `dieuChinh` (bộ não đêm)', () => {
    * ⇒ số mới 1419150711; chưa có gì của lõi lên máy chủ nên đổi kết quả không hại. */
   const VANG = 1419150711
   const NS6: [number, number, number][] = [[7, 12, 3], [7, 10, 4], [5, 16, 2], [3, 8, 8], [14, 16, 0], [1, 12, 2]]
+  /** BẢN 1.2 thêm `thuSucThem` / `tomTat.soThuSucThem` / `tomTat.soBatBuoc`: bỏ ba trường MỚI (phải rỗng / bằng số cũ) rồi băm ⇒ vẫn ra ĐÚNG số 1419150711 của bản trước ⇒ với bài
+   * KHÔNG có lõi cao (như bộ mẫu 80 câu) bản 1.2 cho kết quả Y HỆT từng byte. */
+  const gocCu = (bo: BoCuaEm) => {
+    const { thuSucThem, ...con } = bo as BoCuaEm & { thuSucThem: string[] }
+    expect(thuSucThem).toEqual([])
+    const { soThuSucThem, soBatBuoc, ...tt } = con.tomTat
+    expect(soThuSucThem).toBe(0)
+    expect(soBatBuoc).toBe(con.tomTat.tong)
+    return { ...con, tomTat: tt }
+  }
   const chuKy = (dc?: DieuChinhEm | null) => {
     let x = 0
     for (let sd = 1; sd <= 60; sd++)
-      for (const [a, b, c] of NS6) x = (Math.imul(x, 31) + hashSeed(JSON.stringify(chonBoCuaEm(CAU, LOI, emNgauNhien(sd, CAU), { soNgay: a, cauMoiNgay: b, onLaiMoiNgay: c }, `B1|ngẫu nhiên ${sd}`, dc as DieuChinhEm)))) >>> 0
+      for (const [a, b, c] of NS6) x = (Math.imul(x, 31) + hashSeed(JSON.stringify(gocCu(chonBoCuaEm(CAU, LOI, emNgauNhien(sd, CAU), { soNgay: a, cauMoiNgay: b, onLaiMoiNgay: c }, `B1|ngẫu nhiên ${sd}`, dc as DieuChinhEm))))) >>> 0
     return x
   }
 
