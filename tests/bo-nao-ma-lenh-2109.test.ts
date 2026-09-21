@@ -468,18 +468,21 @@ describe('nop.mjs — kiểm khuôn, đổi bí danh, nộp', () => {
     ghiRa('lop.json', { cacDong: [dong(), dong({ chu: 'Có 77 em cần chú ý' }), dong({ loai: 'can_thay_y', biDanh: em, chu: 'Có 5 em vắng lâu', hanhDong: 'xem_ho_so' }), dong({ biDanh: 'E999' }), 'rác'] })
     const kq = await chayNop({ ngay: NGAY, goc, goi, bayGio: NOW })
     expect(kq.loiTep).toEqual([]) // lop.json là bản tin, KHÔNG bị đọc như tệp kết quả từng em
-    expect(kq.banTin.nhan).toBe(2)
-    expect(kq.banTin.loi.join('\n')).toMatch(/bản tin dòng 2: số không có trong số liệu lớp: 77/)
+    expect(kq.banTin.nhan).toBe(3) // dòng 2 chỉ có số lạ ⇒ CẢNH BÁO, vẫn nộp
+    expect(kq.banTin.canhBao.join('\n')).toMatch(/bản tin dòng 2: số không có trong số liệu lớp: 77/)
+    expect(kq.banTin.loi.join('\n')).not.toMatch(/dòng 2/)
+    expect(dongNop(kq).join('\n')).toMatch(/Cảnh báo bản tin dòng 2: số không có trong số liệu lớp: 77/)
     expect(kq.banTin.loi.join('\n')).toMatch(/bản tin dòng 4: biDanh không có trong dữ liệu đêm/)
     expect(kq.banTin.loi.join('\n')).toMatch(/bản tin dòng 5:/)
     const guiNop = nhatKy.find((x) => x.duong === '/ai/dieu-chinh/nop')!
     expect(guiNop.than.banTin.cacDong).toEqual([
       { loai: 'ca_lop', chu: 'Đêm nay có 5 em vắng nhiều ngày', hanhDong: 'khong', dang: '', sbd: '' },
+      { loai: 'ca_lop', chu: 'Có 77 em cần chú ý', hanhDong: 'khong', dang: '', sbd: '' },
       { loai: 'can_thay_y', chu: 'Có 5 em vắng lâu', hanhDong: 'xem_ho_so', dang: '', sbd: bd[em] },
     ])
     const dq = (await boNaoDemQua(d.env, {}, NOW)) as any
-    expect(dq.banTin.cacDong).toHaveLength(2)
-    expect(dq.banTin.cacDong[1].hoTen).toMatch(/^(Học Sinh Thử \d+|Em Nổi Lên)$/) // máy chủ ghép tên từ SBD
+    expect(dq.banTin.cacDong).toHaveLength(3)
+    expect(dq.banTin.cacDong[2].hoTen).toMatch(/^(Học Sinh Thử \d+|Em Nổi Lên)$/) // máy chủ ghép tên từ SBD
     // > 6 dòng
     ghiRa('lop.json', { cacDong: Array.from({ length: 8 }, () => dong()) })
     const kq2 = await chayNop({ ngay: NGAY, goc, goi, bayGio: NOW })

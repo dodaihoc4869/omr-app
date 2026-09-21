@@ -148,7 +148,8 @@ describe('KHẮC PHỤC LUÔN (`khacPhuc`) — bộ não tự hành', () => {
   })
   it('loại: quá 2 phần tử, dạng lặp, dạng không có trong thẻ, soCau ngoài [2, 4] / không nguyên, bậc lạ, kiểu lạ, on_som mang soCau/bac, không phải mảng', () => {
     coLoi(voi((x) => (x.khacPhuc = [kp(), kp({ dang: 'CARB.PHAN_LOAI' }), kp({ dang: 'LIPID.BEO' })] as never)), 'khacPhuc quá 2')
-    coLoi(voi((x) => (x.khacPhuc = [kp(), kp({ kieu: 'on_som', soCau: undefined, bac: undefined })] as never)), 'lặp')
+    coLoi(voi((x) => (x.khacPhuc = [kp(), kp({ soCau: 4 })] as never)), 'lặp (cùng dạng và cùng kiểu)')
+    coLoi(voi((x) => (x.khacPhuc = [{ dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }, { dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }] as never)), 'lặp (cùng dạng và cùng kiểu)')
     coLoi(voi((x) => (x.khacPhuc = [kp({ dang: 'DANG.LA' }) as never])), 'khacPhuc[0].dang không có trong thẻ')
     for (const n of [1, 5, 2.5, '3', NaN, undefined]) coLoi(voi((x) => (x.khacPhuc = [kp({ soCau: n }) as never])), 'soCau')
     coLoi(voi((x) => (x.khacPhuc = [kp({ bac: 'cao_hon' }) as never])), 'bac phải là')
@@ -156,6 +157,12 @@ describe('KHẮC PHỤC LUÔN (`khacPhuc`) — bộ não tự hành', () => {
     coLoi(voi((x) => (x.khacPhuc = [{ dang: 'ESTE.THUY_PHAN', kieu: 'on_som', soCau: 3 } as never])), 'on_som không mang')
     coLoi({ ...tot(), khacPhuc: {} }, 'khacPhuc phải là mảng')
     coLoi(voi((x) => (x.khacPhuc = [null as never])), 'khacPhuc[0]')
+  })
+  it('CẶP `khac_phuc` + `on_som` cùng MỘT dạng là HỢP LỆ (khác kiểu) — Boss 21/09 sau lượt chạy thật; hai dạng khác nhau vẫn hợp lệ; ≤ 2 phần tử vẫn giữ', () => {
+    expect(ket(voi((x) => (x.khacPhuc = [kp(), { dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }] as never))).hopLe).toBe(true)
+    expect(ket(voi((x) => (x.khacPhuc = [{ dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }, kp()] as never))).hopLe).toBe(true) // thứ tự nào cũng được
+    expect(ket(voi((x) => (x.khacPhuc = [kp(), { dang: 'CARB.PHAN_LOAI', kieu: 'on_som' }] as never))).hopLe).toBe(true)
+    coLoi(voi((x) => (x.khacPhuc = [kp(), { dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }, { dang: 'CARB.PHAN_LOAI', kieu: 'on_som' }] as never)), 'khacPhuc quá 2')
   })
   it('`dieuChinhTuDauRa` chỉ đưa `khac_phuc` vào cổng của lõi BTVN (`on_som` là việc của kế hoạch ngày); `demThayDoi` tính khac_phuc, không tính on_som', () => {
     const d = voi((x) => (x.khacPhuc = [kp() as never, { dang: 'CARB.PHAN_LOAI', kieu: 'on_som' }]))
@@ -174,10 +181,31 @@ describe('BÍ DANH — không đổi được em của phần tử', () => {
 })
 
 describe('MỌI CON SỐ trong lời nhắn / lý do / gợi ý phải có trong thẻ', () => {
-  it('số bịa (3 câu khi thẻ chỉ có 2) ⇒ loại, nêu số nào', () => {
+  it('số bịa (3 câu khi thẻ chỉ có 2) ở LỜI TỚI EM ⇒ loại, nêu số nào', () => {
     coLoi(voi((x) => (x.loiNhanChoEm = 'Hôm nay em đúng lại 3 câu thuỷ phân ester.')), 'loiNhanChoEm có số không có trong thẻ: 3')
-    coLoi(voi((x) => (x.goiYChoThay.chu = 'Sai 5 câu liền')), 'goiYChoThay.chu có số không có trong thẻ: 5')
-    coLoi(voi((x) => (x.dang[0].lyDo = 'đúng 6/9 câu')), 'lyDo có số không có trong thẻ: 6')
+  })
+  it('số lạ ở PHẦN THẦY ĐỌC (`lyDo`, `goiYChoThay.chu`) CHỈ CẢNH BÁO — phần tử vẫn hợp lệ, không mất núm (Boss 21/09: kiểm loại oan)', () => {
+    const k1 = ket(voi((x) => (x.goiYChoThay.chu = 'Sai 5 câu liền')))
+    expect(k1.hopLe).toBe(true)
+    expect(k1.canhBao).toEqual(['goiYChoThay.chu có số không có trong thẻ: 5'])
+    expect(k1.boLoi).toBeUndefined() // cảnh báo số KHÔNG làm mất lời phụ huynh / thư tuần
+    const k2 = ket(voi((x) => (x.dang[0].lyDo = 'đúng 6/9 câu')))
+    expect(k2.hopLe).toBe(true)
+    expect(k2.canhBao).toEqual(['dang[0].lyDo có số không có trong thẻ: 6'])
+    // hai cảnh báo cùng lúc
+    const k3 = ket(voi((x) => { x.dang[0].lyDo = 'đúng 6 câu'; x.goiYChoThay.chu = 'Sai 5 câu' }))
+    expect(k3.hopLe).toBe(true)
+    expect(k3.canhBao).toHaveLength(2)
+    // lamSachDauRa không xoá gì vì cảnh báo số
+    const d = voi((x) => (x.goiYChoThay.chu = 'Sai 5 câu liền'))
+    expect(lamSachDauRa(d, k1).goiYChoThay.chu).toBe('Sai 5 câu liền')
+  })
+  it('lời cho phụ huynh / thư tuần vẫn ÁP CỨNG số (chỉ mất lời ấy, giữ núm) — không nới ở đây', () => {
+    const the: TheDeKiem = { ...THE, khiNaoVietPhuHuynh: ['moc_dang_khen'] }
+    const k = ket(voi((x) => (x.loiNhanChoPhuHuynh = 'Anh chị ơi, con đúng 99 câu hôm qua. Bộ não A.I đã xếp thêm câu cho con.')), the)
+    expect(k.hopLe).toBe(true)
+    expect(k.boLoi).toEqual(['loiNhanChoPhuHuynh'])
+    expect(k.canhBao?.join()).toContain('có số không có trong thẻ: 99')
   })
   it('số có trong thẻ ở dạng khác (7 → "7", 0,78 → "78%", 0,78 → "0,78", 42 giây) đều được', () => {
     for (const t of ['Em đúng 7 câu.', 'Tỉ lệ đúng 78% ở dạng này.', 'Đúng 0,78 tổng số.', 'Trung vị của em là 42 giây.', 'Chuỗi 4 ngày, EXP 130.']) {
@@ -189,11 +217,55 @@ describe('MỌI CON SỐ trong lời nhắn / lý do / gợi ý phải có trong
     expect(ket(voi((x) => (x.loiNhanChoEm = 'Em đã tới câu 12 của chặng.')), the).hopLe).toBe(true)
     expect(ket(voi((x) => (x.loiNhanChoEm = 'Em đã tới câu 13 của chặng.')), the).hopLe).toBe(false)
   })
-  it('không lách bằng dấu phẩy, số 0 đầu, hay số dính chữ: "3câu", "003", "3,0"', () => {
+  it('không lách bằng dấu phẩy, số 0 đầu, hay chữ số + chữ THƯỜNG liền nhau: "3câu", "003", "3,0"', () => {
     for (const t of ['đúng 3câu', 'đúng 003 câu', 'đúng 3,0 câu', 'đúng 3.0 câu']) coLoi(voi((x) => (x.loiNhanChoEm = t)), 'không có trong thẻ: 3')
   })
-  it('lý do của dạng PHẢI có số ("lý do bằng số")', () => {
-    coLoi(voi((x) => (x.dang[0].lyDo = 'em hay sai dạng này')), 'phải có số')
+  it('số DÍNH CHỮ CÁI là công thức / mã, KHÔNG phải số liệu: N2, CO2, H2SO4, C6H12O6, 12A1, 2H2O — không bị loại, không cần có trong thẻ', () => {
+    for (const t of ['Dạng đơn chất N2 em làm khá hơn.', 'Phản ứng tạo CO2 và H2O em nhớ rồi.', 'Axit H2SO4 loãng em đã đúng lại.', 'Glucozơ C6H12O6 em còn nhầm một chỗ.', 'Em lớp 12A1 chăm làm bài.', 'Cân bằng 2H2O em làm được.']) {
+      const k = ket(voi((x) => (x.loiNhanChoEm = t)))
+      expect(k.hopLe, `${t} ${JSON.stringify(k.lyDo)}`).toBe(true)
+    }
+    expect(timSoTrongChu('N2 CO2 H2SO4 12A1 C6H12O6 2H2O')).toEqual([])
+    expect(timSoTrongChu('CO2 và 3 câu, 7/9, 70 %, 0,5, 12A1')).toEqual(['3', '7', '9', '70', '0.5'])
+    // số thật đứng cạnh công thức vẫn bị kiểm
+    coLoi(voi((x) => (x.loiNhanChoEm = 'Em đúng lại 5 câu CO2.')), 'không có trong thẻ: 5')
+  })
+  it('SỐ CỬA SỔ THỜI GIAN của luật (7 ngày, 3 ngày, 30 ngày, 1 tuần, 1·3·7) luôn hợp lệ dù thẻ không ghi; số câu vẫn phải có trong thẻ', () => {
+    const the: TheDeKiem = { ...THE, chuoi: 0 }
+    for (const t of ['Trong 7 ngày qua em làm đều.', 'Ba ngày gần đây, 3 ngày liền em có mặt.', 'Cả 30 ngày qua em đều học.', 'Ôn theo nhịp 1·3·7 nhé.', 'Ôn theo nhịp 1-3-7 nhé.', 'Một tuần, 1 tuần vừa rồi em tiến bộ.']) {
+      expect(ket(voi((x) => (x.loiNhanChoEm = t)), the).hopLe, t).toBe(true)
+    }
+    coLoi(voi((x) => (x.loiNhanChoEm = 'Em đúng 8 câu trong 7 ngày qua.')), 'không có trong thẻ: 8')
+    coLoi(voi((x) => (x.loiNhanChoEm = 'Em làm 30 câu hôm qua.')), 'không có trong thẻ: 30') // "30 câu" không phải cửa sổ thời gian (30 KHÔNG có trong thẻ)
+    expect(tapSoCuaThe(THE).has('30')).toBe(false)
+  })
+  it('CỬA SỔ THỜI GIAN trên thẻ KHÔNG có số nào: "1 tuần", "7 ngày", "30 ngày", "1·3·7" đều miễn; "8 ngày", "2 tuần" thì không', () => {
+    const trong: TheDeKiem = { biDanh: 'A17', maDang: ['ESTE.THUY_PHAN'], khiNaoVietPhuHuynh: [], luotSoiKyTuan: false }
+    for (const t of ['Trong 1 tuần qua em làm đều.', 'Cả 7 ngày qua em học đều.', 'Suốt 30 ngày qua em chăm.', 'Nhịp ôn 1·3·7 giúp em nhớ.', 'Nhịp ôn 1/3/7 giúp em nhớ.']) {
+      expect(ket(voi((x) => (x.loiNhanChoEm = t)), trong).hopLe, t).toBe(true)
+    }
+    coLoi(voi((x) => (x.loiNhanChoEm = 'Trong 8 ngày qua em làm đều.')), 'không có trong thẻ: 8', trong)
+    coLoi(voi((x) => (x.loiNhanChoEm = 'Trong 2 tuần qua em làm đều.')), 'không có trong thẻ: 2', trong)
+    coLoi(voi((x) => (x.loiNhanChoEm = 'Trong 14 ngày qua em làm đều.')), 'không có trong thẻ: 14', trong)
+  })
+  it('"vấp lặp đã xử lý" phải xử lý một dạng MỚI so với lời gần nhất cho phụ huynh: chỉ xử lý lại dạng đã báo ⇒ lời phụ huynh bị bỏ (giữ núm); xử lý dạng mới ⇒ được', () => {
+    const the: TheDeKiem = { ...THE, khiNaoVietPhuHuynh: ['vap_lap_da_xu_ly'], dangLoiPhuHuynhTruoc: ['ESTE.THUY_PHAN'], soLoiPhuHuynh7: 1 }
+    const loi = 'Anh chị ơi, con hay nhầm một dạng. Bộ não A.I đã xếp thêm câu cho con. Anh chị chỉ cần hỏi con hôm nay học dạng gì.'
+    const cu = ket(voi((x) => Object.assign(x, { loiNhanChoPhuHuynh: loi, dang: [{ ma: 'ESTE.THUY_PHAN', hanhDong: 'uu_tien', lyDo: 'đúng 7/9 câu trong 7 ngày' }] })), the)
+    expect(cu.hopLe).toBe(true)
+    expect(cu.boLoi).toEqual(['loiNhanChoPhuHuynh'])
+    const moi = ket(voi((x) => Object.assign(x, { loiNhanChoPhuHuynh: loi, dang: [{ ma: 'CARB.PHAN_LOAI', hanhDong: 'uu_tien', lyDo: 'đúng 7/9 câu trong 7 ngày' }] })), the)
+    expect(moi.boLoi).toBeUndefined()
+    // xử lý bằng khắc phục dạng mới cũng được
+    const kp2 = ket(voi((x) => Object.assign(x, { loiNhanChoPhuHuynh: loi, dang: [], khacPhuc: [{ dang: 'LIPID.BEO', kieu: 'khac_phuc', soCau: 3, bac: 'dung_bac' }] })), the)
+    expect(kp2.boLoi).toBeUndefined()
+    // thẻ không ghi dạng đã báo ⇒ chỉ cần có xử lý (như trước)
+    expect(ket(voi((x) => Object.assign(x, { loiNhanChoPhuHuynh: loi, dang: [{ ma: 'ESTE.THUY_PHAN', hanhDong: 'uu_tien', lyDo: 'đúng 7/9 câu trong 7 ngày' }] })), { ...the, dangLoiPhuHuynhTruoc: undefined }).boLoi).toBeUndefined()
+  })
+  it('lý do của dạng NÊN có số: thiếu số chỉ CẢNH BÁO (phần tử vẫn hợp lệ)', () => {
+    const k = ket(voi((x) => (x.dang[0].lyDo = 'em hay sai dạng này')))
+    expect(k.hopLe).toBe(true)
+    expect(k.canhBao).toEqual(['dang[0].lyDo nên có số (lý do bằng số)'])
   })
   it('số nằm trong MÃ dạng / bí danh / ngày của thẻ KHÔNG được coi là số có thật ("D3", "2026-09-22")', () => {
     const the: TheDeKiem = { biDanh: 'A17', maDang: ['D3'], ngay: '2026-09-22', dang: [{ ma: 'D3', gap: 9 }] }
@@ -347,7 +419,11 @@ describe('BẢN TIN SÁNG (`ra/lop.json`)', () => {
   })
   it('quá 6 dòng, số bịa, từ cấm, loại lạ, thiếu chữ, bí danh không có trong đêm', () => {
     expect(kiemBanTin({ cacDong: Array.from({ length: 7 }, () => dong()) }, SO_LIEU).lyDo.join()).toContain('quá 6 dòng')
-    expect(kiemBanTin({ cacDong: [dong({ chu: '12 em kẹt' })] }, SO_LIEU).lyDo.join()).toContain('số không có trong số liệu lớp: 12')
+    // số lạ ở dòng bản tin CHỈ CẢNH BÁO (dòng vẫn hợp lệ) — Boss 21/09; số của cửa sổ thời gian luôn hợp lệ
+    const soLa12 = kiemBanTin({ cacDong: [dong({ chu: '12 em kẹt' })] }, SO_LIEU)
+    expect(soLa12.hopLe).toBe(true)
+    expect(soLa12.canhBao).toEqual(['dòng 1: số không có trong số liệu lớp: 12'])
+    expect(kiemBanTin({ cacDong: [dong({ chu: 'Trong 7 ngày qua cả lớp làm đều' })] }, SO_LIEU).canhBao).toBeUndefined()
     expect(kiemBanTin({ cacDong: [dong({ chu: 'em nắm chắc 9' })] }, SO_LIEU).lyDo.join()).toContain('từ cấm')
     expect(kiemBanTin({ cacDong: [dong({ loai: 'khac' })] }, SO_LIEU).hopLe).toBe(false)
     expect(kiemBanTin({ cacDong: [dong({ hanhDong: 'dua_vao_buoi_chua' })] }, SO_LIEU).hopLe).toBe(true)

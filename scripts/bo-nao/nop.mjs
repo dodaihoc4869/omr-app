@@ -119,17 +119,21 @@ export function kiemBanTinCucBo(tepLop, lop, bang) {
   if (!dongs) return { banTin: null, loi: [], ghiChu: 'ra/lop.json cần dạng {"cacDong":[…]} — không nộp bản tin' }
   const bienDanhHopLe = new Set(Object.keys(bang))
   const loi = []
+  const canhBao = []
   const tot = []
   dongs.forEach((d, i) => {
     const k = kiemBanTin({ cacDong: [d] }, lop, bienDanhHopLe)
     if (k.hopLe) tot.push(d)
     else loi.push(`bản tin dòng ${i + 1}: ${k.lyDo.map((s) => s.replace(/^dòng 1: /, '')).join('; ')}`)
+    // số lạ trong dòng hợp lệ chỉ là CẢNH BÁO (dòng vẫn nộp)
+    for (const c of k.canhBao ?? []) canhBao.push(`bản tin dòng ${i + 1}: ${c.replace(/^dòng 1: /, '')}`)
   })
   if (tot.length > HAN_MUC_BO_NAO.BAN_TIN_SO_DONG_TOI_DA) loi.push(`bản tin có ${tot.length} dòng hợp lệ, chỉ nhận ${HAN_MUC_BO_NAO.BAN_TIN_SO_DONG_TOI_DA} dòng đầu`)
   const nhan = tot.slice(0, HAN_MUC_BO_NAO.BAN_TIN_SO_DONG_TOI_DA)
   return {
     banTin: nhan.length ? { cacDong: nhan.map((d) => ({ loai: d.loai, chu: d.chu, hanhDong: d.hanhDong, dang: d.dang ?? '', sbd: d.biDanh ? (bang[d.biDanh] ?? '') : '' })) } : null,
     loi,
+    canhBao,
     ghiChu: '',
   }
 }
@@ -167,7 +171,7 @@ export async function chayNop({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
   let biLoaiMayChu = 0
   const loaiMayChu = []
   const canhBao = hopLe.filter((h) => h.canhBao.length).map((h) => ({ biDanh: h.biDanh, canhBao: h.canhBao }))
-  let banTinKq = { nhan: 0, loi: [...bt.loi] }
+  let banTinKq = { nhan: 0, loi: [...bt.loi], canhBao: [...(bt.canhBao ?? [])] }
   for (let i = 0; i < lo.length; i++) {
     const cuoi = i === lo.length - 1
     const than = { ngay, cacEm: lo[i].map(({ sbd, dauRa }) => {
@@ -182,7 +186,7 @@ export async function chayNop({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
     soApDung += Number(r.soApDung) || 0
     biLoaiMayChu += Number(r.biLoai) || 0
     for (const l of r.loai ?? []) loaiMayChu.push({ biDanh: dao.get(String(l.sbd)) ?? '?', lyDo: (l.lyDo ?? []).map((s) => giauSbd(s, dao)) })
-    if (cuoi && r.banTin) banTinKq = { nhan: Number(r.banTin.nhan) || 0, loi: [...banTinKq.loi, ...(r.banTin.loi ?? []).map((s) => giauSbd(s, dao))] }
+    if (cuoi && r.banTin) banTinKq = { nhan: Number(r.banTin.nhan) || 0, loi: [...banTinKq.loi, ...(r.banTin.loi ?? []).map((s) => giauSbd(s, dao))], canhBao: [...banTinKq.canhBao, ...(r.banTin.canhBao ?? []).map((s) => giauSbd(s, dao))] }
   }
 
   const tomTat = {
@@ -213,6 +217,7 @@ export function dongTomTat(kq) {
     ...kq.loai.map((l) => `  Loại ${l.biDanh}: ${l.lyDo.join('; ').slice(0, 220)}`),
     ...kq.canhBao.map((c) => `  Cảnh báo ${c.biDanh}: ${c.canhBao.join('; ').slice(0, 220)}`),
     ...kq.banTin.loi.map((l) => `  ${l.slice(0, 220)}`),
+    ...(kq.banTin.canhBao ?? []).map((l) => `  Cảnh báo ${l.slice(0, 210)}`),
     ...kq.loiTep.map((l) => `  Tệp: ${l}`),
   ]
   for (const l of lyDo.slice(0, SO_DONG_LOI_IN_TOI_DA)) d.push(l)

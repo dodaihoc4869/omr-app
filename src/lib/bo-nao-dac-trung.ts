@@ -47,6 +47,15 @@ export const NGUONG_BO_NAO = {
   /** CẢ LỚP CÙNG SAI MỘT DẠNG: ≥ 30 % em có hoạt động (không vắng) cùng sai lặp một dạng (và ≥ 3 em) ⇒ ghi MỘT lần vào bản tin lớp (`dangCaLopYeu`), KHÔNG đẩy từng em vào luồng sâu vì lý do đó. */
   TI_LE_DANG_CA_LOP: 0.3,
   SO_EM_DANG_CA_LOP_TOI_THIEU: 3,
+  /** SAU XOÁ SỔ (Boss 21/09, lượt chạy thật đầu tiên): tín hiệu suy từ kế hoạch ngày / BTVN (`bo_do`, `tut_nhip`) chỉ bật khi đã có ≥ bấy nhiêu ngày dữ liệu SAU `mocReset` — bảng bị xoá ⇒ "tụt nhịp/bỏ dở" giả. */
+  SO_NGAY_SAU_RESET_TOI_THIEU: 3,
+  /** `moi_vao` chỉ khi ngày hoạt động ĐẦU nằm SAU `mocReset` hơn bấy nhiêu ngày (em thật sự mới); em có hoạt động đầu trong 7 ngày sau xoá sổ chỉ là "sổ mới", không phải em mới vào lớp. */
+  MOI_VAO_SAU_RESET_NGAY: 7,
+  /** Cờ `sauXoaSo` trong thẻ khi hôm nay còn cách ngày xoá sổ ≤ bấy nhiêu ngày (`soNgayTuLucDau` chỉ đếm từ sổ mới). */
+  SAU_XOA_SO_NGAY: 14,
+  /** Lời cho PHỤ HUYNH: tối đa bấy nhiêu lời / em / `CUA_SO_LOI_PHU_HUYNH` ngày (không tính thư tuần). Đủ trần ⇒ thẻ không còn lý do được viết. */
+  TRAN_LOI_PHU_HUYNH: 2,
+  CUA_SO_LOI_PHU_HUYNH: 7,
   /** Luồng SÂU ≤ 25 % số em có thẻ mỗi đêm (ít nhất 1 em), chọn theo điểm ưu tiên; phần còn lại về luồng nhanh. */
   TRAN_LUONG_SAU: 0.25,
   /** Điểm ưu tiên luồng sâu (cao vào trước): điều chỉnh hôm qua xấu đi · bỏ dở/tụt nhịp · làm cho xong/đúng nhanh (thầy cần biết) · sai lặp RIÊNG · vừa thi · xoay vòng hằng tuần. */
@@ -134,6 +143,10 @@ export interface DauVaoEm {
   theHomTruoc?: TheNgan | null
   /** ≤ 3 lời nhắn cho em gần nhất (mới nhất trước) — để AI KHÔNG lặp ý / cấu trúc / từ mở đầu. Không phải nguồn số. */
   loiNhanGanDay?: string[]
+  /** Ngày xoá sổ toàn app gần nhất (`YYYY-MM-DD`, giờ VN); vắng / null = chưa từng xoá (hoặc chưa xong). */
+  mocReset?: string | null
+  /** Những ngày trong 7 ngày trước `ngay` mà em ĐÃ có lời cho phụ huynh, mỗi ngày kèm các dạng đã xử lý hôm đó (dạng của núm `dang` + `khacPhuc`). Mới nhất trước. */
+  loiPhuHuynh7?: { ngay: string; dang: string[] }[]
 }
 
 // ══════════════════════════════ KIỂU ĐẦU RA ══════════════════════════════
@@ -169,7 +182,7 @@ export interface TheNgan {
   maDang: string[]
   /** Bậc hiện tại (0 Biết · 1 Hiểu · 2 Vận dụng) của từng dạng trong `maDang`, CÙNG THỨ TỰ — để đêm sau thấy dạng lên bậc. (Mảng song song: không lặp mã dạng cho thẻ gọn.) */
   bacCuaMaDang: (0 | 1 | 2)[]
-  hoatDong: { ngayCoBai7: number; soNgayVang: number; soNgayTuLucDau: number | null }
+  hoatDong: { ngayCoBai7: number; soNgayVang: number; soNgayTuLucDau: number | null; sauXoaSo?: true }
   cau: { lam7: number; dung7: number; sai7: number; tiLe7: number | null; lam3: number; tiLe3: number | null; lam4Truoc: number; lamHomQua: number; dungHomQua: number }
   xuHuong: XuHuong
   giay: { trungVi7: number | null; homQua: number | null }
@@ -186,8 +199,14 @@ export interface TheNgan {
   mocDangKhen: MocDangKhen[]
   /** Hôm nay là lượt soi kỹ hằng tuần của em (được viết thư tuần). */
   luotSoiKyTuan: boolean
-  /** Lý do được phép viết lời cho phụ huynh (`KHI_NAO_VIET_PHU_HUYNH`); rỗng ⇒ ngày thường, để rỗng. */
+  /** Lý do được phép viết lời cho phụ huynh (`KHI_NAO_VIET_PHU_HUYNH`); rỗng ⇒ ngày thường, để rỗng. Đủ trần 2 lời/7 ngày ⇒ rỗng. */
   khiNaoVietPhuHuynh: string[]
+  /** Số lời cho phụ huynh em đã có trong 7 ngày trước (không tính thư tuần). Chỉ ghi khi > 0. */
+  soLoiPhuHuynh7?: number
+  /** Ngày của lời gần nhất cho phụ huynh (chỉ khi có). */
+  lanCuoiLoiPhuHuynh?: string
+  /** Các dạng đã xử lý trong lời gần nhất cho phụ huynh — "vấp lặp đã xử lý" chỉ hợp lệ với dạng KHÔNG nằm trong danh sách này. */
+  dangLoiPhuHuynhTruoc?: string[]
   /** ≤ 3 lời nhắn gần nhất cho em (chống lặp). KHÔNG phải nguồn số. */
   loiNhanGanDay: string[]
   /** Kết quả CHẤM điều chỉnh hôm qua (máy chủ gắn sau khi so thẻ đêm trước với thẻ này); chỉ khi em có điều chỉnh hôm qua. Số đo ở đây là nguồn số cho lời nhắn. */
@@ -348,7 +367,12 @@ export function tinhDacTrung(v: DauVaoEm): { the: TheNgan; hoSo: HoSoDayDu } {
     ngay: v.ngay,
     maDang,
     bacCuaMaDang: maDang.map((ma) => (hoSoDang.get(ma)?.bac ?? 1) as 0 | 1 | 2),
-    hoatDong: { ngayCoBai7: ngayCoBai.size, soNgayVang, soNgayTuLucDau: v.ngayHoatDongDau ? Math.max(0, hieuNgay(v.ngay, v.ngayHoatDongDau)) : null },
+    hoatDong: {
+      ngayCoBai7: ngayCoBai.size,
+      soNgayVang,
+      soNgayTuLucDau: v.ngayHoatDongDau ? Math.max(0, hieuNgay(v.ngay, v.ngayHoatDongDau)) : null,
+      ...(v.mocReset && hieuNgay(v.ngay, v.mocReset) <= N.SAU_XOA_SO_NGAY ? { sauXoaSo: true as const } : {}),
+    },
     cau: { lam7: e7.length, dung7: dung(e7), sai7: e7.length - dung(e7), tiLe7, lam3: e3.length, tiLe3, lam4Truoc: e4.length, lamHomQua: eHQ.length, dungHomQua: dung(eHQ) },
     xuHuong,
     giay: { trungVi7: gTV7, homQua: gHQ },
@@ -367,6 +391,12 @@ export function tinhDacTrung(v: DauVaoEm): { the: TheNgan; hoSo: HoSoDayDu } {
     khiNaoVietPhuHuynh: [],
     loiNhanGanDay: (v.loiNhanGanDay ?? []).slice(0, 3).map((t) => t.slice(0, 160)),
     homQuaDc,
+  }
+  const loiPh = (v.loiPhuHuynh7 ?? []).filter((x) => x.ngay < v.ngay && hieuNgay(v.ngay, x.ngay) <= N.CUA_SO_LOI_PHU_HUYNH).sort((a, b) => (a.ngay < b.ngay ? 1 : -1))
+  if (loiPh.length > 0) {
+    the.soLoiPhuHuynh7 = loiPh.length
+    the.lanCuoiLoiPhuHuynh = loiPh[0].ngay
+    the.dangLoiPhuHuynhTruoc = [...loiPh[0].dang]
   }
   the.co = timCo(the, v)
   the.mocDangKhen = timMocDangKhen(the, v, eHQ, dangCua)
@@ -400,13 +430,17 @@ function timCo(the: TheNgan, v: DauVaoEm): CoThuatToan[] {
   const co: CoThuatToan[] = []
   const c = the.cau
   const trungBinh4 = c.lam4Truoc / (N.SO_NGAY_CUA_SO - N.SO_NGAY_GAN)
-  if (c.lam4Truoc >= N.TUT_NHIP_NEN_TOI_THIEU && c.lam3 / N.SO_NGAY_GAN < N.TUT_NHIP_TI_LE * trungBinh4) co.push('tut_nhip')
-  if (the.btvn.baiMo > 0 && the.nguon.btvn7 > 0 && the.nguon.btvn2 === 0) co.push('bo_do')
+  // SAU XOÁ SỔ: bảng kế hoạch/BTVN bị xoá ⇒ chưa đủ ngày SAU `mocReset` thì KHÔNG bật tụt nhịp / bỏ dở (tín hiệu giả)
+  const duLieuTin = !v.mocReset || hieuNgay(v.ngay, v.mocReset) >= N.SO_NGAY_SAU_RESET_TOI_THIEU
+  if (duLieuTin && c.lam4Truoc >= N.TUT_NHIP_NEN_TOI_THIEU && c.lam3 / N.SO_NGAY_GAN < N.TUT_NHIP_TI_LE * trungBinh4) co.push('tut_nhip')
+  if (duLieuTin && the.btvn.baiMo > 0 && the.nguon.btvn7 > 0 && the.nguon.btvn2 === 0) co.push('bo_do')
   if (the.dangChuY.some((d) => d.sai7 >= N.SAI_LAP_SO_LAN)) co.push('sai_lap')
   if (c.lam3 >= N.DUNG_NHANH_SO_CAU && c.tiLe3 !== null && c.tiLe3 >= N.DUNG_NHANH_TI_LE && the.giay.homQua !== null && the.giay.trungVi7 !== null && the.giay.homQua <= N.NHANH_TI_LE_GIAY * the.giay.trungVi7) co.push('dung_nhanh')
   if (c.lamHomQua >= N.DUNG_NHANH_SO_CAU && c.tiLe3 !== null && c.tiLe3 < N.LAM_CHO_XONG_TI_LE && the.giay.homQua !== null && the.giay.trungVi7 !== null && the.giay.homQua <= N.NHANH_TI_LE_GIAY * the.giay.trungVi7) co.push('lam_cho_xong')
   if (the.ca && the.ca.ngayTruoc >= N.VUA_THI_TU && the.ca.ngayTruoc <= N.VUA_THI_DEN) co.push('vua_thi')
-  if (the.hoatDong.soNgayTuLucDau !== null && the.hoatDong.soNgayTuLucDau <= N.MOI_VAO_NGAY) co.push('moi_vao')
+  // "mới vào": chỉ em có hoạt động ĐẦU sau xoá sổ hơn 7 ngày (em thật sự mới); trong 7 ngày sau xoá sổ MỌI em đều có "hoạt động đầu" gần đây mà không phải em mới
+  const moiThat = !v.mocReset || (v.ngayHoatDongDau !== null && hieuNgay(v.ngayHoatDongDau, v.mocReset) > N.MOI_VAO_SAU_RESET_NGAY)
+  if (moiThat && the.hoatDong.soNgayTuLucDau !== null && the.hoatDong.soNgayTuLucDau <= N.MOI_VAO_NGAY) co.push('moi_vao')
   if (the.hoatDong.soNgayVang >= N.VANG_BAO_THAY) co.push('vang_lau')
   void v
   return co
@@ -440,9 +474,13 @@ function timMocDangKhen(the: TheNgan, v: DauVaoEm, eHomQua: SuKienNgan[], dangCu
 
 /** Lý do được phép viết lời cho phụ huynh, tính từ thẻ (`vap_lap_da_xu_ly` còn phải thoả điều kiện "bộ não ĐÃ xử lý" — do `kiemKhuon` kiểm trên đầu ra). */
 function timKhiNaoVietPhuHuynh(the: TheNgan): string[] {
+  // TRẦN: tối đa 2 lời/em/7 ngày (không tính thư tuần) — đủ trần thì không còn lý do nào
+  if ((the.soLoiPhuHuynh7 ?? 0) >= N.TRAN_LOI_PHU_HUYNH) return []
   const ra: string[] = []
   if (the.mocDangKhen.length > 0) ra.push('moc_dang_khen')
-  if (the.co.includes('sai_lap')) ra.push('vap_lap_da_xu_ly')
+  // "vấp lặp đã xử lý" chỉ khi có dạng sai lặp MỚI so với lời gần nhất cho phụ huynh (không lặp lại chuyện đã báo)
+  const daBao = new Set(the.dangLoiPhuHuynhTruoc ?? [])
+  if (the.co.includes('sai_lap') && the.dangChuY.some((d) => d.sai7 >= N.SAI_LAP_SO_LAN && !daBao.has(d.ma))) ra.push('vap_lap_da_xu_ly')
   if (the.co.includes('bo_do')) ra.push('bo_do_2_ngay')
   if (the.hoatDong.soNgayVang >= 3) ra.push('vang_3_ngay')
   if (the.co.includes('vua_thi')) ra.push('vua_thi')

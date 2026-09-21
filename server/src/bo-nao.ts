@@ -9,6 +9,7 @@
 //   boNaoBoDieuChinh    thầy bỏ một điều chỉnh
 // TỰ HÀNH: hôm sau bộ não TỰ CHẤM điều chỉnh của đêm trước (lúc dựng hồ sơ ngày); `xau_di` ⇒ TỰ GỠ (`huy = 1`, `tu_go = 1`) và cờ `xau_di_hom_qua` đẩy em vào luồng soi kỹ.
 import type { D1PreparedStatement, Env } from './kieu'
+import { docMocReset } from './reset-toan-app'
 import {
   danhGiaDieuChinh,
   chotLuongCaLop,
@@ -43,6 +44,7 @@ const NOP_TOI_DA = 100
 const NGAY_LUI_SU_KIEN = 14
 const NGAY_LUI_CA_THI = 14
 const NGAY_LUI_LOI_NHAN = 10
+const CUA_SO_LOI_PHU_HUYNH = 7 // trần lời cho phụ huynh tính trong cửa sổ này (cùng số với `NGUONG_BO_NAO.CUA_SO_LOI_PHU_HUYNH`)
 const CHUNK_BATCH = 25
 
 // ══════════════════════════════ TIỆN ÍCH ══════════════════════════════
@@ -170,6 +172,7 @@ interface DuLieuTrang {
   dcHomQua: Map<string, Obj>
   theHomTruoc: Map<string, TheNgan>
   loiGanDay: Map<string, string[]>
+  loiPhuHuynh7: Map<string, NonNullable<DauVaoEm['loiPhuHuynh7']>>
 }
 
 const them = <T>(m: Map<string, T[]>, k: string, v: T) => {
@@ -234,7 +237,7 @@ async function docDuLieuTrang(env: Env, sbds: string[], ngay: string): Promise<D
     kq = await env.DB.batch<Obj>(dsTruyVan(false))
   }
   const R = (i: number): Obj[] => (kq[i]?.results ?? []) as Obj[]
-  const ra: DuLieuTrang = { cuoi: new Map(), dau: new Map(), suKien: new Map(), cau: new Map(), dang: new Map(), noOn: new Map(), keHoach: new Map(), btvn: new Map(), exp: new Map(), ca: new Map(), dcHomQua: new Map(), theHomTruoc: new Map(), loiGanDay: new Map() }
+  const ra: DuLieuTrang = { cuoi: new Map(), dau: new Map(), suKien: new Map(), cau: new Map(), dang: new Map(), noOn: new Map(), keHoach: new Map(), btvn: new Map(), exp: new Map(), ca: new Map(), dcHomQua: new Map(), theHomTruoc: new Map(), loiGanDay: new Map(), loiPhuHuynh7: new Map() }
   for (const r of R(0)) {
     ra.cuoi.set(chuoi(r.sbd), r.cuoi ? chuoi(r.cuoi) : null)
     ra.dau.set(chuoi(r.sbd), r.dau ? chuoi(r.dau) : null)
@@ -261,6 +264,7 @@ async function docDuLieuTrang(env: Env, sbds: string[], ngay: string): Promise<D
     const t = parseJson<TheNgan | null>(r.the_json, null)
     if (t) ra.theHomTruoc.set(chuoi(r.sbd), t)
   }
+  const tuPh = themNgay(ngay, -CUA_SO_LOI_PHU_HUYNH)
   for (const r of R(11)) {
     const d = parseJson<Partial<DauRaEm>>(r.json, {})
     if (typeof d.loiNhanChoEm === 'string' && d.loiNhanChoEm) {
@@ -269,6 +273,11 @@ async function docDuLieuTrang(env: Env, sbds: string[], ngay: string): Promise<D
         a.push(d.loiNhanChoEm)
         ra.loiGanDay.set(chuoi(r.sbd), a)
       }
+    }
+    // lời cho PHỤ HUYNH trong 7 ngày trước (đếm trần 2 lời/7 ngày; không tính thư tuần) + các dạng đã xử lý hôm đó
+    if (typeof d.loiNhanChoPhuHuynh === 'string' && d.loiNhanChoPhuHuynh.trim() !== '' && chuoi(r.ngay) >= tuPh) {
+      const dang = [...(d.dang ?? []).map((x) => chuoi(x?.ma)), ...((d.khacPhuc ?? []) as KhacPhucEm[]).map((x) => chuoi(x?.dang))].filter(Boolean)
+      them(ra.loiPhuHuynh7, chuoi(r.sbd), { ngay: chuoi(r.ngay), dang })
     }
   }
   return ra
@@ -305,6 +314,7 @@ export async function boNaoHoSoNgay(env: Env, b: Obj = {}, nowMs: number = Date.
   const { ds, tong } = await docDanhSachEm(env, trang, coTrang)
   const sbds = ds.map((d) => d.sbd)
   const dl = sbds.length ? await docDuLieuTrang(env, sbds, ngay) : null
+  const mocReset = await docMocReset(env, nowMs) // ngày xoá sổ toàn app gần nhất (null nếu chưa từng): tín hiệu suy từ kế hoạch/BTVN chưa đáng tin ngay sau đó
   const tao = new Date(nowMs).toISOString()
   const luu: D1PreparedStatement[] = []
   const capNhatChamDiem: D1PreparedStatement[] = []
@@ -330,6 +340,8 @@ export async function boNaoHoSoNgay(env: Env, b: Obj = {}, nowMs: number = Date.
       dieuChinhHomQua: dieuChinhDaNopTuDong(dl?.dcHomQua.get(d.sbd)),
       theHomTruoc: dl?.theHomTruoc.get(d.sbd) ?? null,
       loiNhanGanDay: dl?.loiGanDay.get(d.sbd) ?? [],
+      mocReset,
+      loiPhuHuynh7: dl?.loiPhuHuynh7.get(d.sbd) ?? [],
     }
     if (v.dieuChinhHomQua) v.dieuChinhHomQua.ngay = homQua
     if (!cuoi) {
@@ -489,10 +501,12 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
   // BẢN TIN SÁNG
   let banTinNhan = 0
   const banTinLoi: string[] = []
+  const banTinCanhBao: string[] = []
   if (b.banTin !== undefined) {
     const soLieuLop = await bucTranhLopTuSo(env, ngay)
     const bt = b.banTin as { cacDong?: (DongBanTin & { sbd?: string })[] }
     const kBt = kiemBanTin({ cacDong: (bt?.cacDong ?? []).map((d) => ({ ...d, biDanh: '' })) }, soLieuLop)
+    banTinCanhBao.push(...(kBt.canhBao ?? []))
     if (!kBt.hopLe) banTinLoi.push(...kBt.lyDo)
     else {
       const cacDong = (bt.cacDong ?? []).map((d) => ({ loai: d.loai, sbd: chuoi(d.sbd), chu: d.chu, hanhDong: d.hanhDong, dang: d.dang }))
@@ -520,7 +534,7 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
     biLoai: loai.length,
     loai,
     canhBao,
-    banTin: { nhan: banTinNhan, loi: banTinLoi },
+    banTin: { nhan: banTinNhan, loi: banTinLoi, canhBao: banTinCanhBao },
   }
 }
 

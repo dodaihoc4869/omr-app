@@ -356,3 +356,101 @@ describe('CÁC TÍNH CHẤT CHUNG', () => {
     expect([...readFileSync('src/lib/bo-nao-dac-trung.ts', 'utf8').matchAll(/^import (?:type )?.* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./exam-shuffle', './bo-nao-khuon'])
   })
 })
+
+// ───────────────────────── SAU XOÁ SỔ + TRẦN LỜI PHỤ HUYNH (Boss 21/09, sau lượt chạy THẬT đầu tiên) ─────────────────────────
+describe('SAU XOÁ SỔ: tín hiệu giả không được bật; "mới vào" chỉ với em thật sự mới', () => {
+  /** Em tụt nhịp thật theo số đếm (4 ngày trước 16 câu, 3 ngày gần 3 câu) + bỏ dở BTVN (có bài mở, làm hôm xa, 2 ngày qua không). */
+  const emTut = (o: Partial<DauVaoEm> = {}): Partial<DauVaoEm> => ({
+    suKien: [...ngay(1, 1, 1), ...ngay(2, 1, 1), ...ngay(3, 1, 1), ...ngay(5, 8, 6), ...ngay(6, 8, 6)].map((e, i) => (e.ngay >= ngayTruoc(3) ? e : { ...e, nguon: i % 2 ? 'btvn' : 'btvn' })),
+    btvn: [{ changXong: 2, tongChang: 5 }],
+    ...o,
+  })
+  it('KHÔNG có mocReset (chưa từng xoá sổ) ⇒ như trước: tụt nhịp bật', () => {
+    expect(the(emTut()).co).toContain('tut_nhip')
+    expect(the(emTut({ mocReset: null })).co).toContain('tut_nhip')
+  })
+  it('mocReset hôm qua (còn 1 ngày dữ liệu sau xoá sổ) ⇒ KHÔNG bật tụt nhịp, KHÔNG bật bỏ dở, dù số đếm nghe như vậy', () => {
+    for (const cachXa of [1, 2]) {
+      const t = the(emTut({ mocReset: ngayTruoc(cachXa) }))
+      expect(t.co, `xoá sổ ${cachXa} ngày trước`).not.toContain('tut_nhip')
+      expect(t.co).not.toContain('bo_do')
+      expect(t.khiNaoVietPhuHuynh).not.toContain('bo_do_2_ngay')
+    }
+  })
+  it('đủ 3 ngày dữ liệu SAU xoá sổ ⇒ bật lại (biên: 2 ngày chưa, 3 ngày rồi)', () => {
+    expect(the(emTut({ mocReset: ngayTruoc(2) })).co).not.toContain('tut_nhip')
+    expect(the(emTut({ mocReset: ngayTruoc(3) })).co).toContain('tut_nhip')
+    expect(the(emTut({ mocReset: ngayTruoc(30) })).co).toContain('tut_nhip')
+  })
+  it('bỏ dở BTVN cũng theo ngưỡng 3 ngày', () => {
+    const o = { btvn: [{ changXong: 1, tongChang: 4 }], suKien: [...ngay(4, 6, 4, { nguon: 'btvn' })] }
+    expect(the({ ...o, mocReset: ngayTruoc(1) }).co).not.toContain('bo_do')
+    expect(the({ ...o, mocReset: ngayTruoc(3) }).co).toContain('bo_do')
+    expect(the(o).co).toContain('bo_do')
+  })
+  it('"mới vào": trong 7 ngày sau xoá sổ MỌI em đều có hoạt động đầu gần đây nhưng KHÔNG phải em mới ⇒ không bật; em có hoạt động đầu > 7 ngày sau xoá sổ và ≤ 7 ngày trước ⇒ bật', () => {
+    // sau xoá sổ 1 ngày, em có hoạt động đầu 1 ngày trước
+    expect(the({ mocReset: ngayTruoc(1), ngayHoatDongDau: ngayTruoc(1), suKien: ngay(1, 5, 4) }).co).not.toContain('moi_vao')
+    // xoá sổ 5 ngày trước, hoạt động đầu 3 ngày trước (cách xoá sổ 2 ngày ≤ 7) ⇒ vẫn là "sổ mới"
+    expect(the({ mocReset: ngayTruoc(5), ngayHoatDongDau: ngayTruoc(3), suKien: ngay(3, 5, 4) }).co).not.toContain('moi_vao')
+    // xoá sổ 20 ngày trước, hoạt động đầu 3 ngày trước (cách xoá sổ 17 ngày > 7) ⇒ em thật sự mới
+    expect(the({ mocReset: ngayTruoc(20), ngayHoatDongDau: ngayTruoc(3), suKien: ngay(3, 5, 4) }).co).toContain('moi_vao')
+    // chưa từng xoá sổ: luật cũ (≤ 7 ngày từ lần đầu)
+    expect(the({ ngayHoatDongDau: ngayTruoc(3), suKien: ngay(3, 5, 4) }).co).toContain('moi_vao')
+    // hoạt động đầu > 7 ngày trước: không bao giờ
+    expect(the({ mocReset: ngayTruoc(30), ngayHoatDongDau: ngayTruoc(9), suKien: ngay(3, 5, 4) }).co).not.toContain('moi_vao')
+  })
+  it('BIÊN "mới vào": hoạt động đầu cách xoá sổ đúng 7 ngày ⇒ chưa (còn là sổ mới); 8 ngày ⇒ có', () => {
+    expect(the({ mocReset: ngayTruoc(12), ngayHoatDongDau: ngayTruoc(5), suKien: ngay(5, 4, 3) }).co).not.toContain('moi_vao') // 12 − 5 = 7
+    expect(the({ mocReset: ngayTruoc(12), ngayHoatDongDau: ngayTruoc(4), suKien: ngay(4, 4, 3) }).co).toContain('moi_vao') // 12 − 4 = 8
+  })
+  it('thẻ báo `hoatDong.sauXoaSo` khi hôm nay còn ≤ 14 ngày sau xoá sổ (để AI biết `soNgayTuLucDau` chỉ đếm từ sổ mới); ngoài ra không có trường', () => {
+    expect(the({ mocReset: ngayTruoc(1), ngayHoatDongDau: ngayTruoc(1), suKien: ngay(1, 3, 2) }).hoatDong.sauXoaSo).toBe(true)
+    expect(the({ mocReset: ngayTruoc(14), suKien: ngay(1, 3, 2) }).hoatDong.sauXoaSo).toBe(true)
+    expect(the({ mocReset: ngayTruoc(15), suKien: ngay(1, 3, 2) }).hoatDong).not.toHaveProperty('sauXoaSo')
+    expect(the({ suKien: ngay(1, 3, 2) }).hoatDong).not.toHaveProperty('sauXoaSo')
+  })
+})
+
+describe('TRẦN LỜI CHO PHỤ HUYNH: ≤ 2 lời/em/7 ngày; "vấp lặp đã xử lý" chỉ với dạng MỚI', () => {
+  const saiLap = (ma: string) => ({ dang: [dang(ma, 0, 10, 4)], cau: [1, 2, 3].map((i) => ({ qid: `s${ma}${i}`, dang: ma, lanSai: 1, trangThai: 'moi_sai' as const })), suKien: [1, 2, 3].map((i) => ({ qid: `s${ma}${i}`, nguon: 'btvn', ketQua: 0 as const, giay: null, ngay: ngayTruoc(i) })) })
+  it('chưa có lời nào ⇒ không có trường soLoiPhuHuynh7; vấp lặp ⇒ có lý do', () => {
+    const t = the({ ...saiLap('DA') })
+    expect(t).not.toHaveProperty('soLoiPhuHuynh7')
+    expect(t.khiNaoVietPhuHuynh).toContain('vap_lap_da_xu_ly')
+  })
+  it('1 lời trong 7 ngày ⇒ vẫn được viết (chưa đủ trần) nếu có lý do; thẻ ghi số lời, ngày lời gần nhất, dạng đã xử lý', () => {
+    const t = the({ ...saiLap('DB'), loiPhuHuynh7: [{ ngay: ngayTruoc(2), dang: ['DA'] }], keHoach: [], ngayHoatDongCuoi: ngayTruoc(1) })
+    expect(t.soLoiPhuHuynh7).toBe(1)
+    expect(t.lanCuoiLoiPhuHuynh).toBe(ngayTruoc(2))
+    expect(t.dangLoiPhuHuynhTruoc).toEqual(['DA'])
+    expect(t.khiNaoVietPhuHuynh).toContain('vap_lap_da_xu_ly') // DB là dạng MỚI so với lời trước (DA)
+  })
+  it('ĐỦ TRẦN (2 lời / 7 ngày) ⇒ mọi lý do bị bỏ, dù có mốc đáng khen, vắng ≥ 3 ngày, vừa thi…', () => {
+    const t = the({ ...saiLap('DC'), caGanNhat: { diem: 7, ngayNop: ngayTruoc(2) }, loiPhuHuynh7: [{ ngay: ngayTruoc(1), dang: ['DX'] }, { ngay: ngayTruoc(5), dang: [] }] })
+    expect(t.soLoiPhuHuynh7).toBe(2)
+    expect(t.khiNaoVietPhuHuynh).toEqual([])
+    const vang = the({ ngayHoatDongCuoi: ngayTruoc(5), loiPhuHuynh7: [{ ngay: ngayTruoc(1), dang: [] }, { ngay: ngayTruoc(2), dang: [] }] })
+    expect(vang.khiNaoVietPhuHuynh).toEqual([])
+  })
+  it('"vấp lặp đã xử lý" chỉ với dạng MỚI so với lời gần nhất: sai lặp chỉ dạng đã báo ⇒ không còn lý do; thêm một dạng mới ⇒ có', () => {
+    const cu = the({ ...saiLap('DA'), loiPhuHuynh7: [{ ngay: ngayTruoc(3), dang: ['DA'] }] })
+    expect(cu.co).toContain('sai_lap')
+    expect(cu.khiNaoVietPhuHuynh).not.toContain('vap_lap_da_xu_ly')
+    const hai = { ...saiLap('DA'), dang: [dang('DA', 0, 10, 4), dang('DN', 0, 10, 4)], cau: [...saiLap('DA').cau, ...saiLap('DN').cau], suKien: [...saiLap('DA').suKien, ...saiLap('DN').suKien] }
+    const moi = the({ ...hai, loiPhuHuynh7: [{ ngay: ngayTruoc(3), dang: ['DA'] }] })
+    expect(moi.khiNaoVietPhuHuynh).toContain('vap_lap_da_xu_ly')
+  })
+  it('lời NGOÀI cửa sổ 7 ngày, hoặc của hôm nay/tương lai, không được đếm; các lý do KHÁC (mốc khen, vắng…) vẫn nguyên khi chưa đủ trần', () => {
+    const t = the({ ...saiLap('DA'), loiPhuHuynh7: [{ ngay: ngayTruoc(8), dang: [] }, { ngay: ngayTruoc(9), dang: [] }, { ngay: NGAY, dang: [] }, { ngay: themNgay(NGAY, 1), dang: [] }] })
+    expect(t).not.toHaveProperty('soLoiPhuHuynh7')
+    expect(t.khiNaoVietPhuHuynh).toContain('vap_lap_da_xu_ly')
+    const vang = the({ ngayHoatDongCuoi: ngayTruoc(5), loiPhuHuynh7: [{ ngay: ngayTruoc(4), dang: [] }] })
+    expect(vang.khiNaoVietPhuHuynh).toContain('vang_3_ngay')
+  })
+  it('hằng số trần khớp giữa khuôn và đặc trưng; cửa sổ 7 ngày', async () => {
+    const { HAN_MUC_BO_NAO } = await import('../src/lib/bo-nao-khuon')
+    expect(HAN_MUC_BO_NAO.TRAN_LOI_PHU_HUYNH_7_NGAY).toBe(NGUONG_BO_NAO.TRAN_LOI_PHU_HUYNH)
+    expect(NGUONG_BO_NAO.CUA_SO_LOI_PHU_HUYNH).toBe(7)
+  })
+})

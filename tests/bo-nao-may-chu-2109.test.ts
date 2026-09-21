@@ -217,6 +217,83 @@ describe('/ai/ho-so-ngay', () => {
   })
 })
 
+// ───────────────────────── SAU XOÁ SỔ + TRẦN LỜI PHỤ HUYNH (Boss 21/09) ─────────────────────────
+describe('máy chủ: `mocReset` và lịch sử lời cho phụ huynh đi vào thẻ', () => {
+  const datMocReset = (ngayXong: string) =>
+    d.sql.exec(`INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('reset_toan_app', '${JSON.stringify({ trangThai: 'xong', xongLuc: `${ngayXong}T05:00:00.000Z`, mocReset: ngayXong })}', 'x')`)
+  /** Em tụt nhịp thật theo số đếm: 16 câu ở "4 ngày trước", 3 câu ở 3 ngày gần. */
+  function emTut(sbd: string) {
+    themEm(sbd, `Em Tụt ${sbd}`)
+    ngayHoc(sbd, 5, 8, 6)
+    ngayHoc(sbd, 6, 8, 6)
+    ngayHoc(sbd, 1, 1, 1)
+    ngayHoc(sbd, 2, 1, 1)
+    ngayHoc(sbd, 3, 1, 1)
+  }
+  const theLuu = (sbd: string) => JSON.parse((d.sql.prepare('SELECT the_json FROM ai_ho_so_ngay WHERE sbd = ?').get(sbd) as { the_json: string }).the_json)
+
+  it('CHƯA từng xoá sổ ⇒ như trước: em tụt nhịp có cờ tut_nhip', async () => {
+    emTut('60001')
+    await hoSo()
+    expect(theLuu('60001').co).toContain('tut_nhip')
+    expect(theLuu('60001').hoatDong).not.toHaveProperty('sauXoaSo')
+  })
+  it('vừa xoá sổ HÔM QUA ⇒ KHÔNG bật tut_nhip / moi_vao (tín hiệu giả); thẻ báo sauXoaSo; đủ 3 ngày sau xoá sổ ⇒ bật lại', async () => {
+    datMocReset(truoc(1))
+    emTut('60002')
+    await hoSo()
+    const t = theLuu('60002')
+    expect(t.co).not.toContain('tut_nhip')
+    expect(t.co).not.toContain('moi_vao')
+    expect(t.hoatDong.sauXoaSo).toBe(true)
+    d = taoD1That()
+    datMocReset(truoc(3))
+    emTut('60003')
+    await hoSo()
+    expect(theLuu('60003').co).toContain('tut_nhip')
+  })
+  it('lịch sử LỜI CHO PHỤ HUYNH trong 7 ngày: 1 lời ⇒ vẫn được viết; 2 lời ⇒ thẻ không còn lý do và nộp lời thứ ba bị bỏ (giữ núm) kèm cảnh báo trần', async () => {
+    dungBaEm() // em 12002 vắng 4 ngày ⇒ có lý do "vang_3_ngay"
+    const luuLoi = (sbd: string, nTruoc: number, dangMa: string) =>
+      d.sql.exec(`INSERT INTO ai_dieu_chinh (sbd, ngay, json, do_tin, che_do, ap_dung, het_han, huy, tu_go, ly_do_bo, nop_luc) VALUES ('${sbd}', '${truoc(nTruoc)}', '${JSON.stringify({ nhip: { lech: 0, khoiDong: 2 }, dang: dangMa ? [{ ma: dangMa, hanhDong: 'uu_tien', lyDo: '7' }] : [], khacPhuc: [], co: 'khong', loiNhanChoEm: '', loiNhanChoPhuHuynh: 'Anh chị ơi, con làm đều.', thuTuan: '' })}', 0.7, 'bong', 0, '${truoc(nTruoc - 3)}', 0, 0, '[]', 'x')`)
+    const nopPh = () => boNaoNop(d.env, { ngay: NGAY, cacEm: [dauRa({ sbd: '12002', dang: [], loiNhanChoEm: 'Em quay lại nhé, chỉ cần một chặng ngắn thôi.', goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' }, loiNhanChoPhuHuynh: 'Anh chị ơi, con vắng 4 ngày. Bộ não A.I đã xếp một chặng ngắn cho con. Anh chị chỉ cần nhắc con mở app.' })] }, NOW)
+    luuLoi('12002', 2, 'ESTE.THUY_PHAN')
+    // dạng do KHẮC PHỤC xử lý hôm đó cũng tính là "đã báo"
+    d.sql.exec(`UPDATE ai_dieu_chinh SET json = json_set(json, '$.khacPhuc', json('[{"dang":"CARB.PHAN_LOAI","kieu":"on_som"}]')) WHERE sbd = '12002' AND ngay = '${truoc(2)}'`)
+    await hoSo()
+    let t = theLuu('12002')
+    expect(t.soLoiPhuHuynh7).toBe(1)
+    expect(t.lanCuoiLoiPhuHuynh).toBe(truoc(2))
+    expect(t.dangLoiPhuHuynhTruoc).toEqual(['ESTE.THUY_PHAN', 'CARB.PHAN_LOAI'])
+    expect(t.khiNaoVietPhuHuynh).toContain('vang_3_ngay') // 1 lời: chưa đủ trần
+    expect((await nopPh()).canhBao).toEqual([]) // lời được nhận
+    const luu1 = JSON.parse((d.sql.prepare("SELECT json FROM ai_dieu_chinh WHERE sbd = '12002' AND ngay = ?").get(NGAY) as { json: string }).json)
+    expect(luu1.loiNhanChoPhuHuynh).toContain('Anh chị ơi')
+    d.sql.exec(`DELETE FROM ai_dieu_chinh WHERE ngay = '${NGAY}'`)
+    luuLoi('12002', 4, '')
+    await hoSo()
+    t = theLuu('12002')
+    expect(t.soLoiPhuHuynh7).toBe(2)
+    expect(t.khiNaoVietPhuHuynh).toEqual([]) // đủ 2 lời/7 ngày
+    const r = await nopPh()
+    expect(r.nhan).toBe(1) // núm vẫn được nhận
+    expect(JSON.stringify(r.canhBao)).toContain('đã có 2 lời cho phụ huynh trong 7 ngày (trần 2)')
+    const luu = JSON.parse((d.sql.prepare("SELECT json FROM ai_dieu_chinh WHERE sbd = '12002' AND ngay = ?").get(NGAY) as { json: string }).json)
+    expect(luu.loiNhanChoPhuHuynh).toBe('') // lời bị bỏ
+  })
+  it('lời NGOÀI 7 ngày hoặc của hôm nay không tính vào trần; thư tuần không tính', async () => {
+    dungBaEm()
+    const luuLoi = (nTruoc: number) =>
+      d.sql.exec(`INSERT INTO ai_dieu_chinh (sbd, ngay, json, do_tin, che_do, ap_dung, het_han, huy, tu_go, ly_do_bo, nop_luc) VALUES ('12001', '${truoc(nTruoc)}', '${JSON.stringify({ nhip: { lech: 0, khoiDong: 2 }, dang: [], khacPhuc: [], co: 'khong', loiNhanChoEm: '', loiNhanChoPhuHuynh: nTruoc === 3 ? '' : 'Anh chị ơi, con làm đều.', thuTuan: 'Thư tuần dài' })}', 0.7, 'bong', 0, '${truoc(nTruoc - 3)}', 0, 0, '[]', 'x')`)
+    luuLoi(8) // ngoài cửa sổ
+    luuLoi(9)
+    luuLoi(3) // trong cửa sổ nhưng KHÔNG có lời phụ huynh (chỉ thư tuần)
+    await hoSo()
+    expect(theLuu('12001')).not.toHaveProperty('soLoiPhuHuynh7')
+    expect(theLuu('12002')).not.toHaveProperty('soLoiPhuHuynh7')
+  })
+})
+
 // ───────────────────────── chốt luồng cả lớp ─────────────────────────
 describe('/ai/ho-so-ngay {phan:"lop"} — CHỐT LUỒNG CẢ LỚP (dạng cả lớp cùng sai, trần luồng sâu 25 %)', () => {
   /** Em học đều + 3 lần sai lặp cùng dạng `ma` trong 7 ngày. */
@@ -287,9 +364,10 @@ describe('/ai/ho-so-ngay {phan:"lop"} — CHỐT LUỒNG CẢ LỚP (dạng cả
     expect(d.sql.prepare("SELECT luong FROM ai_ho_so_ngay WHERE sbd = '44000'").get()).toEqual({ luong: 'vang' })
     const so = lop.lop.dangCaLopYeu[0]
     const nop = await boNaoNop(d.env, { ngay: NGAY, cacEm: [], banTin: { cacDong: [{ loai: 'ca_lop', sbd: '', chu: `Cả lớp cùng sai một dạng: ${so.soEm} em (${so.phanTram} %)`, hanhDong: 'dua_vao_buoi_chua', dang: '' }] } }, NOW)
-    expect(nop.banTin).toEqual({ nhan: 1, loi: [] })
+    expect(nop.banTin).toEqual({ nhan: 1, loi: [], canhBao: [] })
     const nopSai = await boNaoNop(d.env, { ngay: NGAY, cacEm: [], banTin: { cacDong: [{ loai: 'ca_lop', sbd: '', chu: 'Cả lớp cùng sai một dạng: 99 em', hanhDong: 'khong', dang: '' }] } }, NOW)
-    expect((nopSai.banTin as { loi: string[] }).loi.join()).toContain('số không có trong số liệu lớp: 99')
+    // số lạ ở dòng bản tin CHỈ CẢNH BÁO: dòng vẫn được nhận (Boss 21/09)
+    expect(nopSai.banTin).toEqual({ nhan: 1, loi: [], canhBao: ['dòng 1: số không có trong số liệu lớp: 99'] })
   })
 })
 
@@ -371,13 +449,19 @@ describe('/ai/dieu-chinh/nop', () => {
   it('BẢN TIN: hợp lệ được lưu kèm số đếm đêm; số bịa / quá 6 dòng ⇒ báo lỗi, KHÔNG lưu bản tin (điều chỉnh vẫn nhận)', async () => {
     const dong = (o: Record<string, unknown> = {}) => ({ loai: 'ca_lop', sbd: '', chu: 'Có 2 em soi kỹ đêm nay', hanhDong: 'khong', dang: '', ...o })
     const ok = await nop([dauRa()], { cacDong: [dong(), dong({ loai: 'can_thay_y', sbd: '12002', chu: 'Có 1 em vắng liền nhiều ngày', hanhDong: 'nhan_phu_huynh' })] })
-    expect(ok.banTin).toEqual({ nhan: 2, loi: [] })
+    expect(ok.banTin).toEqual({ nhan: 2, loi: [], canhBao: [] })
     expect(d.sql.prepare('SELECT so_em, so_vang, so_nhan, che_do FROM ai_ban_tin').get()).toMatchObject({ so_em: 2, so_vang: 1, so_nhan: 1, che_do: 'bong' })
     d.sql.exec('DELETE FROM ai_ban_tin')
+    d.sql.exec('DELETE FROM ai_ban_tin')
     const xau = await nop([dauRa()], { cacDong: [dong({ chu: 'Có 77 em soi kỹ' })] })
-    expect((xau.banTin as { nhan: number; loi: string[] }).nhan).toBe(0)
-    expect((xau.banTin as { loi: string[] }).loi.join()).toContain('số không có trong số liệu lớp: 77')
+    // số lạ ở bản tin CHỈ CẢNH BÁO: dòng vẫn được lưu
+    expect(xau.banTin).toEqual({ nhan: 1, loi: [], canhBao: ['dòng 1: số không có trong số liệu lớp: 77'] })
     expect(xau.nhan).toBe(1)
+    expect(d.dem('ai_ban_tin')).toBe(1)
+    d.sql.exec('DELETE FROM ai_ban_tin')
+    // dòng SAI KHUÔN thật (loại lạ) vẫn bị loại cả bản tin
+    const hong = await nop([dauRa()], { cacDong: [dong({ loai: 'khac' })] })
+    expect((hong.banTin as { nhan: number }).nhan).toBe(0)
     expect(d.dem('ai_ban_tin')).toBe(0)
     const nhieu = await nop([], { cacDong: Array.from({ length: 7 }, () => dong()) })
     expect((nhieu.banTin as { loi: string[] }).loi.join()).toContain('quá 6 dòng')
@@ -495,7 +579,7 @@ describe('khoá nguồn', () => {
   it('server/src/bo-nao.ts: không tự kiểm mã bí mật, chỉ import lõi thuần + kiểu; không tên em trong thẻ (chỉ ghép tên ở đường đọc)', () => {
     const nguon = readFileSync('server/src/bo-nao.ts', 'utf8')
     expect(nguon.split('\n').filter((l) => !l.trimStart().startsWith('//')).join('\n')).not.toMatch(/MA_BI_MAT|x-ma-bi-mat|laThay/) // chú thích được nhắc tên; MÃ thì không
-    expect([...nguon.matchAll(/^(?:import|\}).* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./kieu', '../../src/lib/bo-nao-dac-trung', '../../src/lib/bo-nao-khuon'])
+    expect([...nguon.matchAll(/^(?:import|\}).* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./kieu', './reset-toan-app', '../../src/lib/bo-nao-dac-trung', '../../src/lib/bo-nao-khuon'])
     expect(nguon).not.toMatch(/console\./)
     expect(readFileSync('server/src/index.ts', 'utf8')).toContain("from './bo-nao'") // Code 3 ĐÃ nối (chỉ sau cổng laThay, khoá ở tests/bo-nao-noi-route-2109.test.ts); tệp này không tự sửa index.ts
   })

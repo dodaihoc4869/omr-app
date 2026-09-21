@@ -83,6 +83,10 @@ export interface TheDeKiem {
   luotSoiKyTuan?: boolean
   /** Các lý do "khi nào viết lời cho phụ huynh" mà thuật toán thấy trong thẻ. Vắng/rỗng ⇒ KHÔNG được có `loiNhanChoPhuHuynh`. */
   khiNaoVietPhuHuynh?: string[]
+  /** Số lời cho phụ huynh em đã có trong 7 ngày trước; đủ `TRAN_LOI_PHU_HUYNH_7_NGAY` ⇒ KHÔNG được viết thêm. */
+  soLoiPhuHuynh7?: number
+  /** Các dạng đã xử lý trong lời gần nhất cho phụ huynh: lý do "vấp lặp đã xử lý" chỉ hợp lệ khi đầu ra xử lý một dạng KHÔNG nằm trong danh sách này. */
+  dangLoiPhuHuynhTruoc?: string[]
   [khac: string]: unknown
 }
 
@@ -99,6 +103,8 @@ export const HAN_MUC_BO_NAO = {
   LY_DO_TOI_DA: 80,
   LOI_NHAN_TOI_DA: 160,
   LOI_PHU_HUYNH_TOI_DA: 280,
+  /** Tối đa bấy nhiêu lời cho phụ huynh / em / 7 ngày (không tính thư tuần) — cùng số với `TRAN_LOI_PHU_HUYNH` của `bo-nao-dac-trung.ts` (test so hai nơi). */
+  TRAN_LOI_PHU_HUYNH_7_NGAY: 2,
   THU_TUAN_TOI_DA: 600,
   GOI_Y_TOI_DA: 200,
   GHI_CHU_HLV_TOI_DA: 200,
@@ -171,11 +177,21 @@ export function timTuCam(chu: string, danhSach: readonly string[]): string[] {
   return danhSach.filter((c) => t.includes(` ${c.normalize('NFC')} `))
 }
 
-/** Mọi con số (chữ số) trong một đoạn chữ, chuẩn hoá dấu phẩy thập phân về dấu chấm; bỏ số 0 thừa đầu ("007" ⇒ "7") nhưng giữ "0.5". */
+/**
+ * Mọi con số (chữ số) trong một đoạn chữ, chuẩn hoá dấu phẩy thập phân về dấu chấm; bỏ số 0 thừa đầu ("007" ⇒ "7") nhưng giữ "0.5".
+ * Chữ số DÍNH CHỮ CÁI là công thức / mã, không phải số liệu (Boss 21/09): chữ số ĐỨNG SAU một chữ cái (N2, CO2, H2SO4, C6H12O6) hoặc đứng trước MỘT CHỮ HOA (12A1, 2H2O) ⇒ không tính.
+ * "3 câu", "7/9", "70 %", "0,5" vẫn tính; "3câu" (chữ số + chữ THƯỜNG liền nhau) VẪN tính — không cho lách luật bằng cách bỏ dấu cách.
+ */
 export function timSoTrongChu(chu: string): string[] {
   const ra: string[] = []
-  for (const m of chu.matchAll(/\d+(?:[.,]\d+)?/g)) ra.push(chuanSo(m[0]))
+  for (const m of chu.matchAll(/(?<![\p{L}\d])\d+(?:[.,]\d+)?(?![\p{Lu}\d])/gu)) ra.push(chuanSo(m[0]))
   return ra
+}
+
+/** Cụm CỬA SỔ THỜI GIAN của luật ("7 ngày", "3 ngày", "30 ngày", "1 tuần", "1·3·7") — số trong đó luôn hợp lệ dù thẻ không ghi (Boss 21/09). */
+const CUM_CUA_SO = /(?<![\p{L}\d])(?:(?:1|3|7|30)\s*ngày|1\s*tuần|1\s*[·•\-–,./]\s*3\s*[·•\-–,./]\s*7)(?![\p{L}\d])/giu
+function boCumCuaSo(chu: string): string {
+  return chu.replace(CUM_CUA_SO, ' ')
 }
 
 function chuanSo(x: string): string {
@@ -212,9 +228,9 @@ export function tapSoCuaThe(the: unknown): Set<string> {
   return tap
 }
 
-/** Số trong `chu` mà `tap` KHÔNG có. */
+/** Số trong `chu` mà `tap` KHÔNG có (không tính số của cụm cửa sổ thời gian và số dính chữ cái). */
 export function soLa(chu: string, tap: Set<string>): string[] {
-  return [...new Set(timSoTrongChu(chu).filter((s) => !tap.has(s)))]
+  return [...new Set(timSoTrongChu(boCumCuaSo(chu)).filter((s) => !tap.has(s)))]
 }
 
 const laChuoi = (v: unknown): v is string => typeof v === 'string'
@@ -231,6 +247,7 @@ const KY_TU_LA = /[\u0000-\u001f\u007f<>`]|https?:|www\./i
  */
 export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
   const loi: string[] = []
+  const canhBaoSo: string[] = [] // số lạ ở phần THẦY đọc (lý do, gợi ý): cảnh báo, không loại
   if (!dauRa || typeof dauRa !== 'object' || Array.isArray(dauRa)) return { hopLe: false, lyDo: ['không phải một đối tượng'] }
   const d = dauRa as Record<string, unknown>
   const tapSo = tapSoCuaThe(the)
@@ -266,16 +283,17 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
       else {
         if (doDai(o.lyDo) > H.LY_DO_TOI_DA) loi.push(`dang[${i}].lyDo quá ${H.LY_DO_TOI_DA} ký tự`)
         if (KY_TU_LA.test(o.lyDo)) loi.push(`dang[${i}].lyDo có ký tự lạ`)
-        if (timSoTrongChu(o.lyDo).length === 0) loi.push(`dang[${i}].lyDo phải có số (lý do bằng số)`)
+        // SỐ trong lý do CHỈ CẢNH BÁO (phần tử vẫn hợp lệ): lời tới em/phụ huynh/thư tuần mới bị áp cứng (Boss 21/09: kiểm loại oan)
+        if (timSoTrongChu(o.lyDo).length === 0) canhBaoSo.push(`dang[${i}].lyDo nên có số (lý do bằng số)`)
         const la = soLa(o.lyDo, tapSo)
-        if (la.length) loi.push(`dang[${i}].lyDo có số không có trong thẻ: ${la.join(', ')}`)
+        if (la.length) canhBaoSo.push(`dang[${i}].lyDo có số không có trong thẻ: ${la.join(', ')}`)
         const cam = timTuCam(o.lyDo, TU_CAM_CHO_THAY)
         if (cam.length) loi.push(`dang[${i}].lyDo có từ cấm: ${cam.join(', ')}`)
       }
     })
   }
 
-  // khacPhuc: vắng ⇒ rỗng (phần tử cũ); có thì phải là mảng ≤ 2, mỗi dạng một lần, dạng có trong thẻ, `khac_phuc` cần soCau 2–4 + bac, `on_som` không mang soCau/bac
+  // khacPhuc: vắng ⇒ rỗng (phần tử cũ); có thì phải là mảng ≤ 2, mỗi (dạng, kiểu) một lần, dạng có trong thẻ, `khac_phuc` cần soCau 2–4 + bac, `on_som` không mang soCau/bac
   if (d.khacPhuc !== undefined) {
     if (!Array.isArray(d.khacPhuc)) loi.push('khacPhuc phải là mảng')
     else {
@@ -286,8 +304,10 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
         if (!o || typeof o !== 'object') return void loi.push(`khacPhuc[${i}] không phải đối tượng`)
         if (!laChuoi(o.dang) || o.dang.length === 0 || o.dang.length > H.MA_DANG_TOI_DA || KY_TU_LA.test(o.dang)) loi.push(`khacPhuc[${i}].dang không hợp lệ`)
         else {
-          if (daKp.has(o.dang)) loi.push(`khacPhuc[${i}].dang lặp`)
-          daKp.add(o.dang)
+          // CẶP `khac_phuc` + `on_som` cùng một dạng là hợp lệ (khác `kieu`); chỉ cấm trùng CẢ dạng lẫn kiểu (Boss 21/09)
+          const khoa = `${o.dang}|${String(o.kieu)}`
+          if (daKp.has(khoa)) loi.push(`khacPhuc[${i}] lặp (cùng dạng và cùng kiểu)`)
+          daKp.add(khoa)
           if (the.maDang && !the.maDang.includes(o.dang)) loi.push(`khacPhuc[${i}].dang không có trong thẻ của em`)
         }
         if (o.kieu !== 'khac_phuc' && o.kieu !== 'on_som') loi.push(`khacPhuc[${i}].kieu phải là khac_phuc hoặc on_som`)
@@ -331,9 +351,24 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
       canhBao.push(`${ten} bị bỏ (giữ núm): ${e.join('; ')}`)
     }
   }
-  const daXuLy = (Array.isArray(d.khacPhuc) && d.khacPhuc.length > 0) || (Array.isArray(d.dang) && d.dang.length > 0)
-  const lyDoPh = (the.khiNaoVietPhuHuynh ?? []).filter((x) => KHI_NAO_VIET_PHU_HUYNH.includes(x as (typeof KHI_NAO_VIET_PHU_HUYNH)[number]) && (x !== 'vap_lap_da_xu_ly' || daXuLy))
-  kiemLoiNgoai('loiNhanChoPhuHuynh', d.loiNhanChoPhuHuynh, H.LOI_PHU_HUYNH_TOI_DA, lyDoPh.length > 0, 'hôm nay không có lý do được phép viết lời cho phụ huynh')
+  const xuLy = [
+    ...(Array.isArray(d.dang) ? (d.dang as { ma?: unknown }[]).map((x) => String(x?.ma ?? '')) : []),
+    ...(Array.isArray(d.khacPhuc) ? (d.khacPhuc as { dang?: unknown }[]).map((x) => String(x?.dang ?? '')) : []),
+  ].filter(Boolean)
+  const daXuLy = xuLy.length > 0
+  // "vấp lặp đã xử lý": phải xử lý (núm) ít nhất một dạng KHÔNG nằm trong các dạng đã báo phụ huynh ở lời gần nhất; thẻ không ghi dạng đã báo ⇒ chỉ cần có xử lý
+  const daBao = new Set(the.dangLoiPhuHuynhTruoc ?? [])
+  const daXuLyDangMoi = daXuLy && (daBao.size === 0 || xuLy.some((m) => !daBao.has(m)))
+  const soLoi7 = Number(the.soLoiPhuHuynh7 ?? 0)
+  const daDuTran = Number.isFinite(soLoi7) && soLoi7 >= H.TRAN_LOI_PHU_HUYNH_7_NGAY
+  const lyDoPh = daDuTran ? [] : (the.khiNaoVietPhuHuynh ?? []).filter((x) => KHI_NAO_VIET_PHU_HUYNH.includes(x as (typeof KHI_NAO_VIET_PHU_HUYNH)[number]) && (x !== 'vap_lap_da_xu_ly' || daXuLyDangMoi))
+  kiemLoiNgoai(
+    'loiNhanChoPhuHuynh',
+    d.loiNhanChoPhuHuynh,
+    H.LOI_PHU_HUYNH_TOI_DA,
+    lyDoPh.length > 0,
+    daDuTran ? `đã có ${soLoi7} lời cho phụ huynh trong 7 ngày (trần ${H.TRAN_LOI_PHU_HUYNH_7_NGAY})` : 'hôm nay không có lý do được phép viết lời cho phụ huynh',
+  )
   kiemLoiNgoai('thuTuan', d.thuTuan, H.THU_TUAN_TOI_DA, the.luotSoiKyTuan === true, 'chưa tới lượt soi kỹ hằng tuần của em')
 
   const g = d.goiYChoThay as Record<string, unknown> | undefined
@@ -346,7 +381,7 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
       const cam = timTuCam(g.chu, TU_CAM_CHO_THAY)
       if (cam.length) loi.push(`goiYChoThay.chu có từ cấm: ${cam.join(', ')}`)
       const la = soLa(g.chu, tapSo)
-      if (la.length) loi.push(`goiYChoThay.chu có số không có trong thẻ: ${la.join(', ')}`)
+      if (la.length) canhBaoSo.push(`goiYChoThay.chu có số không có trong thẻ: ${la.join(', ')}`)
     }
     if (!HANH_DONG_CHO_THAY.includes(g.hanhDong as HanhDongChoThay)) loi.push('goiYChoThay.hanhDong không thuộc bốn giá trị')
     if (!laChuoi(g.dang)) loi.push('goiYChoThay.dang phải là chuỗi (có thể rỗng)')
@@ -365,10 +400,8 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
   if (typeof d.canSau !== 'boolean') loi.push('canSau phải là true/false')
 
   const ra: KetQuaKiem = { hopLe: loi.length === 0, lyDo: loi }
-  if (canhBao.length) {
-    ra.canhBao = canhBao
-    ra.boLoi = boLoi
-  }
+  if (canhBao.length || canhBaoSo.length) ra.canhBao = [...canhBao, ...canhBaoSo]
+  if (boLoi.length) ra.boLoi = boLoi
   return ra
 }
 
@@ -382,6 +415,7 @@ export function lamSachDauRa(d: DauRaEm, kq: KetQuaKiem): DauRaEm {
 /** Kiểm BẢN TIN SÁNG (`ra/lop.json`): ≤ 6 dòng, đúng khuôn từng dòng, số trong chữ phải có trong số liệu lớp (`soLieuLop`), từ cấm của lời cho thầy. */
 export function kiemBanTin(banTin: unknown, soLieuLop: unknown, biDanhHopLe?: ReadonlySet<string>): KetQuaKiem {
   const loi: string[] = []
+  const canhBao: string[] = [] // số lạ trong dòng bản tin (thầy đọc): CẢNH BÁO, dòng vẫn giữ (Boss 21/09)
   const b = banTin as Record<string, unknown> | null
   if (!b || typeof b !== 'object' || !Array.isArray(b.cacDong)) return { hopLe: false, lyDo: ['bản tin phải có mảng cacDong'] }
   if (b.cacDong.length > HAN_MUC_BO_NAO.BAN_TIN_SO_DONG_TOI_DA) loi.push(`bản tin quá ${HAN_MUC_BO_NAO.BAN_TIN_SO_DONG_TOI_DA} dòng`)
@@ -401,10 +435,10 @@ export function kiemBanTin(banTin: unknown, soLieuLop: unknown, biDanhHopLe?: Re
       const cam = timTuCam(o.chu, TU_CAM_CHO_THAY)
       if (cam.length) loi.push(`dòng ${i + 1}: từ cấm ${cam.join(', ')}`)
       const la = soLa(o.chu, tapSo)
-      if (la.length) loi.push(`dòng ${i + 1}: số không có trong số liệu lớp: ${la.join(', ')}`)
+      if (la.length) canhBao.push(`dòng ${i + 1}: số không có trong số liệu lớp: ${la.join(', ')}`)
     }
   })
-  return { hopLe: loi.length === 0, lyDo: loi }
+  return { hopLe: loi.length === 0, lyDo: loi, ...(canhBao.length ? { canhBao } : {}) }
 }
 
 // ══════════════════════════════ ĐỔI SANG NÚM CỦA LÕI BTVN ══════════════════════════════
