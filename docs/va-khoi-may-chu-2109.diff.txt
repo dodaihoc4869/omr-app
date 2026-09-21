@@ -1,0 +1,239 @@
+diff --git a/server/src/game-v2-bank.ts b/server/src/game-v2-bank.ts
+index 025f4c7..b4aa98c 100644
+--- a/server/src/game-v2-bank.ts
++++ b/server/src/game-v2-bank.ts
+@@ -2,6 +2,7 @@ import type { Env } from './kieu'
+ import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../../src/lib/exam-kho-de-import'
+ import {grade} from '../../src/game/than-thu-v2/core'
+ import type { Evidence, PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
++import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
+ type Row=Record<string,unknown>
+ const str=(v:unknown)=>String(v??'')
+ export async function hash(v:unknown):Promise<string>{const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(v)));return [...new Uint8Array(bytes)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+@@ -74,6 +75,21 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
+   }
+   protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});return blocked
+ }
++/** KHỐI CỦA EM (`hoc_sinh.lop` + tên lớp) — luật Boss 21/09 (P0 khối 11 nhận câu khối 12): MỌI kênh rút câu tự động chỉ được đưa câu khối em hoặc THẤP hơn (`src/lib/khoi-cau.ts`). Không đọc được ⇒ null (không lọc, "không biết ⇒ không kết tội"). */
++export async function docKhoiCacEm(env:Env,sbds:readonly string[]):Promise<Map<string,Khoi|null>>{
++  const ra=new Map<string,Khoi|null>();const ds=[...new Set(sbds.filter(Boolean))];if(!ds.length)return ra
++  const doc=async(cot:string)=>(await env.DB.prepare(`SELECT sbd,${cot} FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(ds)).all<Row>()).results??[]
++  let rows:Row[]=[]
++  try{rows=await doc('lop,ten_lop')}catch{try{rows=await doc('lop')}catch{rows=[]}}
++  for(const r of rows)ra.set(str(r.sbd),khoiCuaEm({lop:r.lop,tenLop:r.ten_lop}))
++  return ra
++}
++export async function docKhoiEm(env:Env,sbd:string):Promise<Khoi|null>{return (await docKhoiCacEm(env,[sbd])).get(sbd)??null}
++/** Khối THẤP NHẤT trong nhóm em (đội Đoàn lẫn khối: câu chung phải hợp với MỌI thành viên). Không em nào rõ khối ⇒ null. */
++export async function docKhoiThapNhat(env:Env,sbds:readonly string[]):Promise<Khoi|null>{
++  let ra:Khoi|null=null;for(const k of (await docKhoiCacEm(env,sbds)).values())if(k!==null&&(ra===null||k<ra))ra=k
++  return ra
++}
+ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[]):Promise<{evidence:Evidence[];pool:PrivateQuestion[];missing:number}> {
+   const rows=await env.DB.prepare(`SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu,l.nop_luc FROM chi_tiet_cau c JOIN luot l ON l.ma_ca=c.ma_ca AND l.sbd=c.sbd AND l.lan_thu=c.lan_thu JOIN ca ON ca.ma_ca=c.ma_ca WHERE c.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND c.dung_sai IN (0,1) AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>()
+   // Recover missing detail rows read-only, using only qids explicitly submitted by this learner.
+@@ -116,5 +132,6 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
+     const khoa=await env.DB.prepare(`SELECT q.ma_de,q.qid FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${ids.map(()=>'?').join(',')})`).bind(...ids).all<{ma_de:string;qid:string}>()
+     const ds=khoa.results.map(k=>[str(k.ma_de),str(k.qid)] as [string,string]).sort((a,b)=>{const x=a[0]+'|'+a[1],y=b[0]+'|'+b[1];return x<y?-1:x>y?1:0})
+     for(let j=0;j<ds.length;j+=300){const r=await env.DB.prepare(`SELECT q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') ORDER BY j.key`).bind(JSON.stringify(ds.slice(j,j+300))).all<{json:string}>();pool.push(...r.results.map(r=>JSON.parse(r.json) as PrivateQuestion))}}
+-  return {evidence,pool:[...new Map(pool.map(q=>[q.qid,q])).values()],missing}
++  // LUẬT KHỐI (Boss 21/09): kho ứng viên chỉ gồm câu khối em hoặc thấp hơn — dạng dùng chung nhiều khối nên lọc theo DẠNG không đủ. Bằng chứng (`evidence`) là lịch sử THẬT của em, giữ nguyên.
++  return {evidence,pool:locCauHopKhoi(await docKhoiEm(env,sbd),[...new Map(pool.map(q=>[q.qid,q])).values()]),missing}
+ }
+diff --git a/server/src/game-v2-doan.ts b/server/src/game-v2-doan.ts
+index bb3b48c..b721b0f 100644
+--- a/server/src/game-v2-doan.ts
++++ b/server/src/game-v2-doan.ts
+@@ -17,7 +17,8 @@ import {
+   kiemTiepSuc, NHAN_TIEP_SUC_TOI_DA, SO_GHE_TOI_DA, SO_HIEP, SO_Y_TRUM, type Chang, type HanhDong, type NopHiep, type NopTrum,
+ } from '../../src/game/than-thu-v2/doan-core'
+ import { hashSeed } from '../../src/lib/exam-shuffle'
+-import { protectedQuestions } from './game-v2-bank'
++import { protectedQuestions, docKhoiThapNhat } from './game-v2-bank'
++import { cauHopKhoi } from '../../src/lib/khoi-cau'
+ import { laCauTuLuan } from './cam-tu-luan'
+ import { readGameScope } from './game-v2-reports'
+ import { qidChanHomNay } from './game-v2-ho-so'
+@@ -212,8 +213,9 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
+   } catch { /* chưa có bảng hồ sơ: không xếp theo độ yếu của lớp, ai cũng bậc 0 */ }
+   const r = await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc
+     WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${cho(ds.length)}) AND json_extract(q.json,'$.phan')='II' LIMIT 400`).bind(...ds).all<{ json: string }>()
++  const khoiDoi = await docKhoiThapNhat(env, nguoi.map(n => n.sbd)) // câu chung hiện cho CẢ đội ⇒ hợp khối với em thấp nhất (Boss 21/09)
+   const ungVien = r.results.map(x => JSON.parse(x.json) as PrivateQuestion)
+-    .filter(q => q.reviewed && !laCauTuLuan(q) && /^[DS]{4}$/.test(q.correct) && q.ideas.length === SO_Y_TRUM && !chan.has(q.qid) && !chan.has(q.group)
++    .filter(q => cauHopKhoi(khoiDoi, q) && q.reviewed && !laCauTuLuan(q) && /^[DS]{4}$/.test(q.correct) && q.ideas.length === SO_Y_TRUM && !chan.has(q.qid) && !chan.has(q.group)
+       && q.kienThuc.length > 0 && q.kienThuc.every(k => ktBiet.get(q.dang!)!.has(k)))
+     .sort((a, b) => (yeu.get(b.dang ?? '') ?? 0) - (yeu.get(a.dang ?? '') ?? 0) || hashSeed(`${ma}|${a.qid}`) - hashSeed(`${ma}|${b.qid}`) || a.qid.localeCompare(b.qid))
+   // Trùm nhớ câu đã ra ở chặng trước của các em trong đoàn + câu các em đã làm ở mọi nguồn/mọi ngày: câu CHƯA AI thấy đứng trước (ổn định: giữ thứ tự cũ trong cùng nhóm)
+diff --git a/server/src/game-v2.ts b/server/src/game-v2.ts
+index 41e448f..aa26cd6 100644
+--- a/server/src/game-v2.ts
++++ b/server/src/game-v2.ts
+@@ -4,7 +4,8 @@ import {readGameScope} from './game-v2-reports'
+ import {roomAction} from './game-v2-room'
+ import type {Env} from './kieu'
+ import {gameIdentity,parentPass} from './game-v2-auth'
+-import {hash,readScope,syncIndex,protectedQuestions} from './game-v2-bank'
++import {hash,readScope,syncIndex,protectedQuestions,docKhoiEm} from './game-v2-bank'
++import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
+ import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
+ import {PETS,ALIASES,OLD_SIX,allowed,chooseSessionWithRoles,chooseLuotMoi,luotHomNay,SO_CAU_MOI_LUOT,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
+ import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
+@@ -67,11 +68,13 @@ async function currentQuestion(env:Env,q:{qid:string;maDe:string;version:string}
+   return cau
+ }
+ /** Các qid trong LƯỢT mà hiện là TỰ LUẬN (lượt soạn trước lệnh cấm 21/09). MỘT truy vấn theo (qid, version); không thấy dòng ⇒ không kết tội. */
+-async function qidTuLuanTrongLuot(env:Env,refs:{qid:string;version:string}[]):Promise<Set<string>>{
++/** Câu của lượt cũ KHÔNG được phục vụ nữa: tự luận (21/09) và câu KHỐI CAO hơn khối em (Boss 21/09 — lượt soạn trước luật khối vẫn có thể chứa câu khối 12 cho em khối 11). */
++async function qidTuLuanTrongLuot(env:Env,refs:{qid:string;version:string;maDe?:string}[],khoiEm:Khoi|null=null):Promise<Set<string>>{
+   const ra=new Set<string>();if(!refs.length)return ra
+   const r=await env.DB.prepare('SELECT q.qid,q.version,q.json FROM game_v2_question q WHERE q.qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(refs.map(x=>x.qid))).all<{qid:string;version:string;json:string}>()
+   const can=new Set(refs.map(x=>`${x.qid}|${x.version}`))
+   for(const x of r.results)if(can.has(`${x.qid}|${x.version}`)&&jsonLaTuLuan(x.json))ra.add(x.qid)
++  for(const x of refs)if(!cauHopKhoi(khoiEm,x))ra.add(x.qid)
+   return ra
+ }
+ /** TƯƠNG THÍCH máy em đang sống (Boss 21/09): màn Đảo cũ chỉ biết vai yeu|toi_han|lap|thu_thach ⇒ `role` trả tập cũ (moi → lap, trum → thu_thach); `roleV2` = vai THẬT cho màn mới. */
+@@ -95,9 +98,9 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
+     const dangCho=await docLuotDangCho(env,sbd,tNow)
+     if(dangCho){
+       try{
+-        const old=JSON.parse(dangCho.json) as Session;const tuLuan=await qidTuLuanTrongLuot(env,old.questions);const qs=[]
++        const old=JSON.parse(dangCho.json) as Session;const khoiEm=await docKhoiEm(env,sbd);const tuLuan=await qidTuLuanTrongLuot(env,old.questions,khoiEm);const qs=[]
+         // Thầy có thể giao BTVN SAU khi lượt này đã bốc câu: câu nào nay nằm trong bài em chưa nộp ⇒ bỏ lượt chờ, mở lượt mới (không trả lại câu có thể lộ đáp án).
+-        const chanBtvn=await docCauBtvnChuaNop(env,sbd);if(old.questions.some(ref=>chanBtvn.has(ref.qid)||chanBtvn.has(ref.group))){await env.DB.prepare('DELETE FROM game_v2_session WHERE id=? AND sbd=?').bind(dangCho.id,sbd).run();return startLuotMoi(env,sbd,p,b,action)} // lượt chờ chưa trả lời câu nào: bỏ hẳn rồi tính lại từ đầu (không mất lượt, số lượt đúng)
++        const chanBtvn=await docCauBtvnChuaNop(env,sbd);if(old.questions.some(ref=>chanBtvn.has(ref.qid)||chanBtvn.has(ref.group)||!cauHopKhoi(khoiEm,ref))){await env.DB.prepare('DELETE FROM game_v2_session WHERE id=? AND sbd=?').bind(dangCho.id,sbd).run();return startLuotMoi(env,sbd,p,b,action)} // lượt chờ chưa trả lời câu nào: bỏ hẳn rồi tính lại từ đầu (không mất lượt, số lượt đúng)
+         for(const ref of old.questions){if(tuLuan.has(ref.qid))continue;qs.push({...publicQuestion(await currentQuestion(env,ref)),...vaiChoMay(ref.role)})}
+         if(qs.length)return {ok:true,id:dangCho.id,questions:qs,missing:scope.missing,luot:tom,maiCho:cho}
+       }catch{/* câu đã đổi/rút khỏi kho: mở lượt mới */}
+@@ -260,7 +263,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
+     if(!row)return {ok:true,questions:[]}
+     const session=JSON.parse(row.json) as Session;const blocked=await protectedQuestions(env);const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game.');for(const key of control.blocked)blocked.add(key);const qs=[]
+     // CẤM RÚT TỰ LUẬN (21/09): lượt soạn trước lệnh cấm mà còn câu tự luận ⇒ BỎ câu ấy khỏi lượt trả về (em làm nốt các câu còn lại, `complete` cũng chỉ đòi các câu này).
+-    const tuLuan=await qidTuLuanTrongLuot(env,session.questions)
++    const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await docKhoiEm(env,sbd))
+     for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await currentQuestion(env,ref);if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');qs.push(publicQuestion(q))}
+     if(!qs.length)return {ok:true,questions:[]}
+     const rows=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=? ORDER BY created_at').bind(row.id,sbd).all<{json:string}>()
+@@ -317,7 +320,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
+     const session=JSON.parse(row.json) as Session;const r=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=?').bind(id,sbd).all<{json:string}>()
+     const done=r.results.map(x=>JSON.parse(x.json) as {attempt:Attempt})
+     // CẤM RÚT TỰ LUẬN (21/09): câu tự luận còn sót trong lượt cũ không được đòi em làm; chỉ đếm các câu rút được.
+-    const tuLuan=await qidTuLuanTrongLuot(env,session.questions)
++    const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await docKhoiEm(env,sbd))
+     if(done.filter(x=>!tuLuan.has(x.attempt.qid)).length!==session.questions.filter(x=>!tuLuan.has(x.qid)).length)throw new Error('Em cần hoàn thành các câu trong lượt.')
+     if(session.mode==='tower'&&done.filter(x=>x.attempt.correct&&!x.attempt.assisted).length>=Math.ceil(done.length*.7)){
+       const milestone=`${sbd}|tower|${id}`
+diff --git a/server/src/goi-cu.ts b/server/src/goi-cu.ts
+index 8c2f798..48b9b40 100644
+--- a/server/src/goi-cu.ts
++++ b/server/src/goi-cu.ts
+@@ -1,3 +1,5 @@
++import { docKhoiEm } from './game-v2-bank'
++import { cauHopKhoi } from '../../src/lib/khoi-cau'
+ import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
+ import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
+ import {expNhanSauNop} from './exp-d1'
+@@ -2376,12 +2378,15 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
+   if (dsCd.length === 0) return { ok: true, items: [], soCau: 0, soChon: 0, thuTu: [], catBotViNang: false }
+ 
+   const oCd = dsCd.map(() => '?').join(',')
+-  const rCau = await env.DB.prepare(
++  const rCauTho = await env.DB.prepare(
+     `SELECT c.qid, c.ma_de, c.chuyen_de FROM cau_hoi c JOIN de_kho d ON d.ma_de = c.ma_de
+       WHERE d.da_xoa = 0 AND c.chuyen_de IN (${oCd}) LIMIT 3000`,
+   )
+     .bind(...dsCd)
+     .all<Record<string, unknown>>()
++  // LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): chuyên đề/dạng trùng tên giữa các khối ⇒ chỉ giữ câu của tờ khối em hoặc THẤP hơn (máy em gửi `sbd`; không có `sbd` ⇒ không lọc).
++  const khoiEm = sbd ? await docKhoiEm(env, sbd) : null
++  const rCau = { results: (rCauTho.results ?? []).filter((x) => cauHopKhoi(khoiEm, { qid: x.qid, ma_de: x.ma_de })) }
+ 
+   // ĐƯỜNG RIÊNG CHO MÀN KHẮC PHỤC: LỌC THEO MÃ DẠNG.
+   //
+diff --git a/server/src/ke-hoach-ngay-d1.ts b/server/src/ke-hoach-ngay-d1.ts
+index c1de24d..347aecc 100644
+--- a/server/src/ke-hoach-ngay-d1.ts
++++ b/server/src/ke-hoach-ngay-d1.ts
+@@ -15,6 +15,8 @@ import {
+ } from './ho-so-cau-hinh'
+ import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
+ import { qidPhucVuDuoc } from './cau-theo-qid'
++import { docKhoiCacEm } from './game-v2-bank'
++import { cauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
+ import { ngayVn } from './su-kien-hoc'
+ import { docCauDaLamHomNay } from './cau-da-lam'
+ import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
+@@ -104,6 +106,9 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
+     })
+   }
+   const cua = (x: Record<string, unknown>) => map.get(String(x.sbd))
++  // LUẬT KHỐI (Boss 21/09): hàng ôn chỉ nhận câu khối em hoặc THẤP hơn — kể cả câu khối cao đã lọt vào sổ của em từ trước (mã tờ ở đầu qid). Không đọc được khối ⇒ không lọc.
++  const khoiEm: Map<string, Khoi | null> = await docKhoiCacEm(env, em).catch(() => new Map<string, Khoi | null>())
++  const hopKhoi = (x: Record<string, unknown>) => cauHopKhoi(khoiEm.get(String(x.sbd)), String(x.qid))
+ 
+   // BTVN chưa nộp (còn hạn hoặc mới quá hạn ≤ 14 ngày). Có phòng vệ khi cột `lo_da_xong` chưa có.
+   const q = (cot: string, them = '') => `SELECT be.sbd, be.ma_btvn, ${cot} AS lo, b.so_cau, b.giao_luc, b.han_nop${them}
+@@ -170,6 +175,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
+   const phucVu = await tapQidPhucVu(env, denHan.map((x) => String(x.qid)))
+   for (const x of denHan) {
+     if (phucVu && !phucVu.has(String(x.qid))) continue
++    if (!hopKhoi(x)) continue
+     cua(x)?.cauToiHan.push({ qid: String(x.qid), maDang: x.ma_dang ? String(x.ma_dang) : null, mocOnKe: String(x.moc_on_ke), lanSai: Number(x.lan_sai) || 0 })
+   }
+   const rd = await tat(() => env.DB.prepare(`SELECT * FROM nam_kt_dang WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong())
+@@ -239,6 +245,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
+     const phucVuThi = await tapQidPhucVu(env, [...new Set(ung.map((x) => String(x.qid)))])
+     for (const x of ung) {
+       if (phucVuThi && !phucVuThi.has(String(x.qid))) continue
++      if (!hopKhoi(x)) continue
+       cua(x)?.cauOnThi?.push({ qid: String(x.qid), lanSai: Number(x.lan_sai) || 0, moiSai: String(x.trang_thai) === 'moi_sai' })
+     }
+   }
+@@ -249,7 +256,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
+     const c = map.get(sbd)
+     if (!c) continue
+     if (dc.nhip !== 0) c.boNao = { nhip: dc.nhip }
+-    if (dc.onSom.length > 0) await keoOnSom(env, c, dc.onSom, themNgay(dc.ngay, 1), homNay)
++    if (dc.onSom.length > 0) await keoOnSom(env, c, dc.onSom, themNgay(dc.ngay, 1), homNay, hopKhoi)
+   }
+   return map
+ }
+@@ -258,7 +265,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
+  * `on_som`: câu ĐÃ TỪNG sai, còn đang ôn (`moi_sai`/`dang_on`), thuộc dạng được bộ não chọn, mà mốc ôn kế còn ở tương lai ⇒ mốc HIỆU LỰC = min(mốc, ngày mai của đêm điều chỉnh).
+  * CHỈ SỚM hơn, không bao giờ muộn hơn, không ghi lại `nam_kt_cau` (hồ sơ nguồn không đổi). Vào hàng ôn qua đúng cửa `cauToiHan` (cùng bộ lọc phục vụ được).
+  */
+-async function keoOnSom(env: Env, c: DauVaoKeHoach, dsDang: string[], ngayMai: string, homNay: string): Promise<void> {
++async function keoOnSom(env: Env, c: DauVaoKeHoach, dsDang: string[], ngayMai: string, homNay: string, hopKhoi: (x: Record<string, unknown>) => boolean = () => true): Promise<void> {
+   if (ngayMai > homNay) return // chưa tới "ngày mai" của đêm điều chỉnh
+   const daCo = new Set(c.cauToiHan.map((x) => x.qid))
+   const r = await tat(() => env.DB.prepare(
+@@ -269,6 +276,7 @@ async function keoOnSom(env: Env, c: DauVaoKeHoach, dsDang: string[], ngayMai: s
+   const phucVu = await tapQidPhucVu(env, ung.map((x) => String(x.qid)))
+   for (const x of ung) {
+     if (phucVu && !phucVu.has(String(x.qid))) continue
++    if (!hopKhoi({ sbd: c.sbd, qid: x.qid })) continue
+     c.cauToiHan.push({ qid: String(x.qid), maDang: x.ma_dang ? String(x.ma_dang) : null, mocOnKe: ngayMai < String(x.moc_on_ke) ? ngayMai : String(x.moc_on_ke), lanSai: Number(x.lan_sai) || 0 })
+   }
+ }
+diff --git a/server/src/luyen-de.ts b/server/src/luyen-de.ts
+index 05abc5d..7c6eebd 100644
+--- a/server/src/luyen-de.ts
++++ b/server/src/luyen-de.ts
+@@ -8,6 +8,7 @@ import { mergeAndStrip, type TeacherExamSource } from '../../src/data/examConten
+ import { rutDeChuan2026, SO_CAU_CHUAN_2026, laBoDe12, MA_TRAN_HOA_2026 } from '../../src/lib/ma-tran-hoa-2026'
+ import { normalizeNumericAnswer } from '../../src/engine/score'
+ import { laCauTuLuan } from './cam-tu-luan'
++import { docKhoiEm } from './game-v2-bank'
+ 
+ type Row = { id:string;sbd:string;created_at:number;deadline:number;status:string;bank_key:string;answers:string;result:string|null }
+ const read = async(env:Env,key:string):Promise<TeacherExamSource[]> => {
+@@ -41,6 +42,8 @@ export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):P
+   let row:Row|null=null
+   if(action==='start') {
+     if(b.daHocXong!==true)throw new Error('Mục này chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.')
++    // LUẬT KHỐI (Boss 21/09): Bộ đề là đề khối 12; cờ `daHocXong` do MÁY EM tự gửi nên máy chủ tự kiểm khối — em khối 10/11 không mở được. Không rõ khối ⇒ giữ cổng cũ.
++    const khoiEm=await docKhoiEm(env,sbd);if(khoiEm!==null&&khoiEm<12)throw new Error('Mục này chỉ dành cho học sinh khối 12.')
+     row=await env.DB.prepare("SELECT * FROM luyen_de_2026 WHERE sbd=? AND status='active'").bind(sbd).first<Row>()
+     if(!row){
+       const r=await env.DB.prepare("SELECT ma_de,r2_khoa FROM de_kho WHERE da_xoa=0 AND lop='12' AND (lower(ten_de) LIKE '%bộ đề%' OR ten_de LIKE '%BỘ ĐỀ%' OR ten_de LIKE '%Bộ đề%') ORDER BY ma_de").all<{ma_de:string;r2_khoa:string}>()
