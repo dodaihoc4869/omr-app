@@ -25,7 +25,7 @@ const CONG_THUC_BIA = [
 ]
 
 describe('MÁY CHỦ — số câu chỉ đến từ bảng chấm', () => {
-  const hsLichSu = SRV.slice(SRV.indexOf('export async function hsLichSuCa'), SRV.indexOf('export async function hsLichSuCa') + 4200)
+  const hsLichSu = SRV.slice(SRV.indexOf('export async function hsLichSuCa'), SRV.indexOf('export async function hsLichSuCa') + 4400) // 4200 → 4400 (21/09): WHERE của hsLichSuCa thêm điều kiện bỏ ca đã xoá mềm (+33 ký tự) đẩy `...goiDemCau(demCua)` ra sát mép cửa sổ cũ
 
   it('`hsLichSuCa` KHÔNG còn công thức suy số câu từ điểm', () => {
     for (const ct of CONG_THUC_BIA) expect(hsLichSu, ct).not.toContain(ct)

@@ -3009,7 +3009,7 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
             ${cauConDem('tong_cau', '1 = 1')}
        FROM luot l
        LEFT JOIN ca c ON c.ma_ca = l.ma_ca
-      WHERE l.sbd = ? AND (l.trang_thai = 'da_nop' OR l.trang_thai = 'khoa' OR l.nop_luc IS NOT NULL)
+      WHERE l.sbd = ? AND (l.trang_thai = 'da_nop' OR l.trang_thai = 'khoa' OR l.nop_luc IS NOT NULL) AND c.trang_thai IS NOT 'da_xoa'
       ORDER BY l.nop_luc DESC LIMIT 100`,
   )
     .bind(sbd)
