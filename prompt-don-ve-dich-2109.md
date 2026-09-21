@@ -20,3 +20,6 @@ Hạn nộp KHÔNG BAO GIỜ bị đổi. Không đổi luật chấm, không đ
 
 ## CODE 2 — màn (SAU khi Boss soát mẫu)
 Thẻ "Đường về đích" ở đầu Bảng nhiệm vụ HS đúng mẫu: đường chặng (xong · nợ có nhãn thứ · hôm nay · sắp tới · cờ hạn), đồng hồ đếm ngược theo giờ LUÔN hiện khi có nợ, dòng "Tối nay: … bắt đầu muộn nhất …", MỘT nút, khối "Còn lại từ các ngày trước" theo ngày, cú hích "Còn N việc nữa là hôm nay ĐẠT", hoạt ảnh gạch tên ngày khi trả xong (tắt khi giảm chuyển động); không nợ ⇒ một dòng xanh. Cao ≤ 420 px ở 390. Trạng thái nộp trễ: "Bài đã qua hạn nộp · em vẫn cần làm nốt 2 chặng · sẽ ghi nộp trễ". Ẩn toàn bộ khi máy chủ chưa trả `veDich`.
+
+## THẦY CHỐT MẪU — 21/09 14:25 ("Chốt bảng đường về đích")
+Mẫu `docs/ban-ve-don-ve-dich-2109/` (4 trạng thái) là bản được chốt. Code 2 build ĐÚNG mẫu; hai sửa của Boss khi build: ảnh thần thú thật ở lời chào; thêm trạng thái nộp trễ (phương án B): "Bài đã qua hạn nộp · em vẫn cần làm nốt N chặng · sẽ ghi nộp trễ".
