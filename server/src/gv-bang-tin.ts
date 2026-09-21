@@ -12,6 +12,7 @@ import { tenViec } from './nhat-ky-may'
 import { docCoTuDong, KHOA_TU_DONG } from './tu-dong-cac-viec'
 import { docThuThachTuDieuChinh, NGUON_THU_THACH, thuThachDaApTuHang } from './thu-thach-rieng'
 import { KHIEN_MAT_KHI_VANG_NGAY } from './exp-cau-hinh'
+import { docSaiNhanhDem, KHOA_SAI_NHANH_GV } from './sai-nhanh-gv'
 
 type Dong = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -129,7 +130,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   }
 
   // 2 · cấu hình: mốc, cờ nhắc, lượt cron nhắc gần nhất
-  const rCfg = await Q.hoi("SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (?, ?, ?, ?)", KHOA_MOC_BANG_TIN, KHOA_CAU_HINH, KHOA_LAN_CHAY, KHOA_TU_DONG)
+  const rCfg = await Q.hoi("SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (?, ?, ?, ?, ?)", KHOA_MOC_BANG_TIN, KHOA_CAU_HINH, KHOA_LAN_CHAY, KHOA_TU_DONG, KHOA_SAI_NHANH_GV)
   const cfg = new Map((rCfg ?? []).map((x) => [chuoi(x.khoa), x]))
   const { tuMs, tuDangAp } = docMocBangTin(cfg.get(KHOA_MOC_BANG_TIN)?.gia_tri, ngay)
   const dauHomNay = dauNgayMs(ngay)
@@ -456,9 +457,15 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   }
 
   const tenDangVap = dangVapCat.map((d) => ({ ma: d.ma, ten: tenCua(d.ma), soEmVap: d.soEmVap, soEmGap: d.soEmGap }))
+  // SAI RẤT NHANH RỒI ĐÚNG LẠI (tín hiệu ĐO của Code 1, chỉ thầy thấy): đọc bản đệm do cron tính (sai-nhanh-gv.ts) — 0 truy vấn thêm. Bản đệm vắng / cũ / khác ngày ⇒ khoá VẮNG (không bịa 0); tính rồi mà không em nào `co` ⇒ { ds: [] }.
+  const demSaiNhanh = docSaiNhanhDem(cfg.get(KHOA_SAI_NHANH_GV)?.gia_tri, nowMs)
+  const saiNhanh = demSaiNhanh
+    ? { ds: demSaiNhanh.ds.filter((x) => em.has(x.sbd)).slice(0, 20).map((x) => ({ sbd: x.sbd, hoTen: em.get(x.sbd)!.hoTen, tenLop: em.get(x.sbd)!.tenLop, soCau: x.soCau, nguongSoCau: x.nguongSoCau, nguongGiay: x.nguongGiay, cuaSoNgay: x.cuaSoNgay, tuNgay: x.tuNgay, co: true })) }
+    : null
   return {
     ok: true, ngay, tu: iso(tuMs), tuHomNay, tuDangAp, capNhatLuc: iso(nowMs),
     nhip, baiTap, tienBo: tienBo.slice(0, TOI_DA_TIEN_BO), canDeY, dangVap: tenDangVap, ...(boNao ? { boNao } : {}), mayDaLam, sucKhoe,
+    ...(saiNhanh ? { saiNhanh } : {}),
     ...(Object.keys(lyDoThieu).length > 0 ? { lyDoThieu } : {}),
     soTruyVan: Q.dem(),
   }

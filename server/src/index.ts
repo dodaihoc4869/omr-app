@@ -55,6 +55,7 @@ import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
+import { capNhatSaiNhanhNeuCu } from './sai-nhanh-gv'
 import * as AI from './bo-nao'
 import {themTenDangDemQua,themTenDangNhatKy} from './ten-dang-bo-nao'
 import {docLoiNhanHlv} from './bo-nao-doc'
@@ -2977,6 +2978,8 @@ export default {
       // ĐỢT 1 thần thú mỗi ngày: chuyển đổi hồ sơ đã chơi sang luật cấp mới, ≤ 40 hồ sơ/phút cho tới hết (rồi cờ chuyen_doi_cap = xong, phút sau không truy vấn). Lỗi chỉ ghi nhật ký máy.
       await chuyenDoiLoCron(env,Date.now()).then(r=>{if(r.soDoc>0)console.log('[hap-thu] cron chuyển đổi',JSON.stringify(r))}).catch(async e=>{console.error('[hap-thu] cron lỗi:',e);await ghiLoiMay(env,'hap_thu_chuyen_doi')})
       await chotNgayRoiTruKhien(env,Date.now()).then(r=>{if(r.truKhien?.chay)console.log('[khien-mat] cron',JSON.stringify(r))}).catch(async e=>{console.error('[khien-mat] cron lỗi:',e);await ghiLoiMay(env,'khien_mat')})
+      // SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy: tính lại mỗi 10 phút vào bản đệm `cau_hinh.sai_nhanh_gv` (bản còn mới ⇒ chỉ 1 truy vấn đọc); lỗi chỉ ghi log.
+      await capNhatSaiNhanhNeuCu(env,Date.now())
       await nhacTuDong(env,Date.now()).then(async r=>{if(r.chay)console.log('[nhac-tu-dong] cron',JSON.stringify(r));if(r.lyDo==='loi')await ghiLoiMay(env,'nhac_nop_bai')}).catch(async e=>{console.error('[nhac-tu-dong] cron lỗi:',e);await ghiLoiMay(env,'nhac_nop_bai')})
       await deliverNotices(env).catch(async e=>{console.error('[thong-bao] cron lỗi:',e);await ghiLoiMay(env,'gui_thong_bao')})
     }
