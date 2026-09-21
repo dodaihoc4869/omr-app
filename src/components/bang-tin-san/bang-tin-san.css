@@ -540,7 +540,7 @@
   content: '';
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: calc(50% + var(--bts-day-lech, 0px));
   width: 1px;
   height: var(--bts-day, 0px);
   background: var(--bts-chu-mo);
@@ -1187,6 +1187,10 @@
     gap: 4px;
   }
 }
+/* nhãn 3D bản NGẮN (chỉ tên lớp) khi hết chỗ cho bản đầy đủ; số câu vẫn có ở gợi ý khi rê chuột */
+.bts-hop-3d[data-nhan='ten'] .bts-nhan3d span {
+  display: none;
+}
 /* nhãn 3D một dòng khi khung thấp */
 .bts-hop-3d--gon .bts-nhan3d {
   padding: 1px 6px 2px;
@@ -1223,4 +1227,38 @@
 .bts-nhiet-hop canvas:focus-visible {
   outline: 2px solid var(--bts-duong);
   outline-offset: 2px;
+}
+
+/* ── sửa CHỒNG CHỮ ở 1280×800 / 1366×768 trong vỏ app (Boss 21/09; khoá bằng test Chromium thật) ── */
+.bts-dd-hang {
+  grid-template-columns: 14px 10px minmax(0, 1fr) auto auto;
+}
+.bts-dd-cau,
+.bts-dd-tb {
+  white-space: nowrap;
+}
+.bts-tien-bo {
+  flex-wrap: wrap;
+  row-gap: 2px;
+  margin-top: 11px;
+  white-space: normal;
+}
+.bts-nhiet-chan span {
+  white-space: nowrap;
+}
+@container bts (max-width: 1249px) {
+  .bts-cy-ten span,
+  .bts-vap-hai,
+  .bts-nhiet-chan .bts-hn {
+    display: none;
+  }
+}
+/* thấp (< 860 px): Dẫn đầu chỉ 4 hàng — hàng thứ 5 không còn chỗ, khỏi đè lên "Tiến bộ" */
+@media (max-height: 859px) {
+  .bts-dan-dau {
+    --bts-max-hang: 4;
+  }
+  .bts-dan-dau li:nth-child(n + 5) {
+    display: none;
+  }
 }

@@ -54,12 +54,14 @@ export interface ViTriNhan {
 }
 
 /**
- * Đặt nhãn HTML nổi trên đầu cột: kẹp trong khung, đẩy LÊN khi hai nhãn chồng nhau (cao 33 px mỗi nhãn), không nhãn nào che đầu cột của lớp khác quá mức.
- * Trả `y0` (vị trí gốc, để vẽ dây dẫn từ nhãn xuống đầu cột) và `y` (vị trí sau khi đẩy).
+ * Đặt nhãn HTML nổi trên đầu cột: kẹp trong khung, đẩy LÊN khi hai nhãn chồng nhau (`cao` px mỗi nhãn), không nhãn nào che đầu cột của lớp khác quá mức.
+ * Hết chỗ phía trên (nhãn chạm mép trên) thì DỜI NGANG sang chỗ trống kế bên thay vì dồn đè lên nhau — `x0` là vị trí gốc (đầu cột) để vẽ dây dẫn kéo lệch về đúng cột.
+ * Trả `y0` / `x0` (vị trí gốc) và `x` / `y` (vị trí sau khi đặt). Hết mọi cách (quá nhiều nhãn cho khung) mới để chồng.
  */
-export function datNhanChongLap<T extends ViTriNhan>(vt: readonly T[], w: number, cao = 33): (T & { y0: number })[] {
-  const ra = vt.map((p) => ({ ...p, x: kep(p.x, p.w / 2 + 2, Math.max(p.w / 2 + 2, w - p.w / 2 - 2)), y0: p.y }))
+export function datNhanChongLap<T extends ViTriNhan>(vt: readonly T[], w: number, cao = 33): (T & { y0: number; x0: number })[] {
+  const ra = vt.map((p) => ({ ...p, x: kep(p.x, p.w / 2 + 2, Math.max(p.w / 2 + 2, w - p.w / 2 - 2)), y0: p.y, x0: p.x }))
   const daDat: typeof ra = []
+  const chong = (p: { x: number; y: number; w: number }, q: { x: number; y: number; w: number }) => Math.abs(p.x - q.x) < (p.w + q.w) / 2 + 4 && Math.abs(p.y - q.y) < cao
   ra
     .map((_, i) => i)
     .sort((a, b) => ra[b]!.y - ra[a]!.y)
@@ -70,14 +72,42 @@ export function datNhanChongLap<T extends ViTriNhan>(vt: readonly T[], w: number
       while (lap && vong++ < 8) {
         lap = false
         for (const q of daDat) {
-          if (Math.abs(p.x - q.x) < (p.w + q.w) / 2 + 4 && Math.abs(p.y - q.y) < cao) {
+          if (chong(p, q)) {
             p.y = q.y - cao
             lap = true
           }
         }
       }
+      if (p.y < cao || daDat.some((q) => chong(p, q))) {
+        // hết chỗ phía trên: thử dời ngang (và các tầng cao thấp hơn), chọn cách ít lệch nhất mà không chồng nhãn nào
+        const bienTrai = p.w / 2 + 2
+        const bienPhai = Math.max(bienTrai, w - p.w / 2 - 2)
+        const xs = new Set<number>([p.x])
+        for (const q of daDat) for (const d of [-1, 1]) xs.add(kep(q.x + d * ((p.w + q.w) / 2 + 4.5), bienTrai, bienPhai)) // +0,5 để khỏi dính đúng biên (sai số số thực)
+        let tot: { x: number; y: number; gia: number } | null = null
+        for (let k = 0; k < 6; k++) {
+          const y = Math.max(cao, p.y0 - k * cao)
+          if (k > 0 && y === Math.max(cao, p.y0 - (k - 1) * cao)) break
+          for (const x of xs) {
+            if (daDat.some((q) => chong({ x, y, w: p.w }, q))) continue
+            const gia = Math.abs(x - p.x0) + 0.7 * (p.y0 - y)
+            if (!tot || gia < tot.gia) tot = { x, y, gia }
+          }
+        }
+        if (tot) { p.x = tot.x; p.y = tot.y }
+      }
       p.y = Math.max(cao, p.y)
       daDat.push(p)
     })
   return ra
+}
+
+/** Sau khi đặt nhãn: còn cặp nào CHỒNG nhau không (hết chỗ dù đã đẩy lên + dời ngang)? Dùng để chuyển nhãn sang bản NGẮN (chỉ tên lớp). */
+export function conNhanChong(dat: readonly { x: number; y: number; w: number }[], cao: number): boolean {
+  for (let i = 0; i < dat.length; i++) {
+    for (let j = i + 1; j < dat.length; j++) {
+      if (Math.abs(dat[i]!.x - dat[j]!.x) < (dat[i]!.w + dat[j]!.w) / 2 + 4 && Math.abs(dat[i]!.y - dat[j]!.y) < cao) return true
+    }
+  }
+  return false
 }

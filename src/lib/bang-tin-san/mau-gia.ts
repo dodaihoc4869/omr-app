@@ -34,7 +34,7 @@ const LOP = [
   { ten: '12 - Tinh Hoa', siSo: 38, hoc: 7, cau: 247, dung: 227 },
   { ten: '12 - Lớp Thường', siSo: 54, hoc: 6, cau: 231, dung: 199 },
   { ten: '12 - Nhóm 10 điểm', siSo: 27, hoc: 4, cau: 131, dung: 123 },
-  { ten: 'Chưa xếp lớp', siSo: 12, hoc: 1, cau: 23, dung: 18 },
+  { ten: 'Chưa rõ lớp', siSo: 12, hoc: 1, cau: 23, dung: 18 },
 ]
 // TÊN GIẢ RÕ RÀNG: đệm luôn là "Mẫu" (Nguyễn Mẫu An…) ⇒ không bao giờ trùng tên học sinh thật (Boss 21/09: ảnh/tài liệu không được lộ em thật).
 const HO = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Vũ', 'Đặng', 'Bùi', 'Hồ', 'Ngô', 'Dương', 'Lý', 'Phan', 'Trịnh', 'Mai']

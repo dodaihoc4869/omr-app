@@ -101,6 +101,26 @@ describe('datNhanChongLap — nhãn không đè nhau', () => {
       }
     }
   })
+  it('SÁT MÉP TRÊN (hết chỗ đẩy lên): nhãn DỜI NGANG sang chỗ trống, KHÔNG dồn đè nhau; x0/y0 giữ vị trí gốc để kéo dây về đúng đầu cột (ảnh 1280×800: "Khối 10" đè "Khối 11")', () => {
+    const r = datNhanChongLap([nhan(100, 22, 60), nhan(120, 22, 60), nhan(140, 22, 60)], 600, 22)
+    for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++) expect(Math.abs(r[i]!.x - r[j]!.x) >= (r[i]!.w + r[j]!.w) / 2 + 4 || Math.abs(r[i]!.y - r[j]!.y) >= 22, `${i}/${j}`).toBe(true)
+    expect(r.map((p) => p.x0)).toEqual([100, 120, 140])
+    expect(r.every((p) => p.y0 === 22 && p.y >= 22)).toBe(true)
+    expect(r.every((p) => p.x - p.w / 2 >= 1.99 && p.x + p.w / 2 <= 600 - 1.99)).toBe(true)
+    // ít lệch nhất: nhãn không cần dời thì đứng nguyên
+    const yen = datNhanChongLap([nhan(100, 22, 60), nhan(300, 22, 60)], 600, 22)
+    expect(yen.map((p) => [p.x, p.y])).toEqual([[100, 22], [300, 22]])
+  })
+  it('BẤT BIẾN sát mép: 2–5 nhãn quanh mép trên trong khung đủ rộng ⇒ không cặp nào chồng (nhiều tổ hợp có hạt giống)', () => {
+    let h = 777
+    const rnd = () => ((h = (h * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff)
+    for (let lan = 0; lan < 60; lan++) {
+      const n = 2 + Math.floor(rnd() * 4)
+      const vt = Array.from({ length: n }, () => nhan(150 + rnd() * 300, 22 + rnd() * 30, 50 + rnd() * 50, rnd() * 100))
+      const r = datNhanChongLap(vt, 700, 22)
+      for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) expect(Math.abs(r[i]!.x - r[j]!.x) < (r[i]!.w + r[j]!.w) / 2 + 4 && Math.abs(r[i]!.y - r[j]!.y) < 22, `lần ${lan} ${i}/${j}`).toBe(false)
+    }
+  })
   it('nhãn rộng hơn khung vẫn không ném (kẹp về giữa); danh sách rỗng ⇒ rỗng; không sửa đầu vào', () => {
     expect(() => datNhanChongLap([nhan(5, 50, 900)], 300)).not.toThrow()
     expect(datNhanChongLap([], 300)).toEqual([])

@@ -37,7 +37,7 @@ export function DanDau({ danDau, bt, onMoEm }: { danDau: readonly DanDauSan[] | 
         <span className="bts-the-phu">so với chính em ấy, 7 ngày</span>
       </div>
       {danDau && danDau.length > 0 && (
-        <ol className="bts-dan-dau" style={{ height: `calc(var(--bts-cao-hang) * ${danDau.length})` }}>
+        <ol className="bts-dan-dau" style={{ height: `calc(var(--bts-cao-hang) * min(${danDau.length}, var(--bts-max-hang, ${danDau.length})))` }}>
           {danDau.map((e, i) => (
             <li key={e.sbd}>
               <button type="button" className="bts-dd-hang" style={{ transform: `translateY(calc(var(--bts-cao-hang) * ${i}))` }} data-doi={doi[e.sbd]} onClick={() => onMoEm(e.sbd)} aria-label={`Hạng ${i + 1}: ${e.hoTen}, ${e.tenLop} — ${e.soCau} câu — mở toàn cảnh`}>

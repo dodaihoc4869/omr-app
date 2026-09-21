@@ -9,7 +9,7 @@ const PHONG_CHU = '600 12px system-ui, sans-serif'
 const PHONG_SO = '500 11px ui-monospace, "SF Mono", Menlo, Consolas, monospace'
 const LOE_MS = 900
 /** Chiều cao tối thiểu của một khối lớp (px): đủ một dòng nhãn 12 px để chữ không đè lên lớp kế. */
-export const CAO_NHAN = 14
+export const CAO_NHAN = 16
 
 export interface NhomNhiet {
   ten: string
@@ -42,7 +42,7 @@ export interface BoTri {
 export function boTriNhiet(w: number, nhom: readonly { em: readonly unknown[] }[], hToiDa: number): BoTri {
   const nhanW = w < 270 ? 98 : 106
   const g = 2
-  const gN = 5
+  const gN = 6
   const vungW = w - nhanW
   const tinh = (s: number) => {
     const cot = Math.max(1, Math.floor((vungW + g) / (s + g)))
@@ -283,7 +283,7 @@ export function BanDoNhiet(p: BanDoNhietProps) {
       </div>
       <div className="bts-nhiet-chan">
         <span>
-          Chưa học hôm nay: <b className="bts-so">{p.soLieu.chuaHoc}</b> em
+          Chưa học<span className="bts-hn"> hôm nay</span>: <b className="bts-so">{p.soLieu.chuaHoc}</b> em
         </span>
         <span>
           Đã học: <b className="bts-so">{p.soLieu.soEmHoc}</b> em

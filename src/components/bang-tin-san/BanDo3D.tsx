@@ -3,7 +3,7 @@
 // Nhãn HTML nổi trên đầu cột (tên lớp + số câu), tự đẩy lên khi chồng nhau, có dây dẫn. Rê chuột: dừng xoay + gợi ý chi tiết (chỉ ở bản 3D).
 import { useEffect, useRef, useState } from 'react'
 import type { LopSan } from '../../lib/bang-tin-san/kieu'
-import { datNhanChongLap, docRgb, tiLeLop, tyLeCao } from '../../lib/bang-tin-san/ban-do-chung'
+import { conNhanChong, datNhanChongLap, docRgb, tiLeLop, tyLeCao } from '../../lib/bang-tin-san/ban-do-chung'
 import { veIso } from '../../lib/bang-tin-san/ban-do-iso'
 import { phay } from '../../lib/bang-tin-san/trang-thai'
 import { chuanBiCanvas, useKichThuoc, type MauSan } from './hooks'
@@ -25,6 +25,7 @@ export function BanDo3D({ lop, mau, phienBanMau, itDong }: { lop: readonly LopSa
   const cao = useRef<number[]>([])
   const loe = useRef<number[]>([])
   const truoc = useRef<number[]>([])
+  const banNhan = useRef({ khoa: '', ngan: false })
   const trang = useRef({ lop, mau, itDong, kieu, dung: false, px: 0, py: 0 })
   trang.current = { lop, mau, itDong, kieu, dung: trang.current.dung, px: trang.current.px, py: trang.current.py }
 
@@ -121,16 +122,28 @@ export function BanDo3D({ lop, mau, phienBanMau, itDong }: { lop: readonly LopSa
       // nhãn: đo bề rộng, đẩy lên khi chồng nhau, dây dẫn từ nhãn xuống đầu cột
       const gon = h < 260 // khung thấp: nhãn MỘT dòng (tên · số câu) để không chất đống ở mép trên
       hop.classList.toggle('bts-hop-3d--gon', gon)
-      const dat = datNhanChongLap(
-        vtri.map((p, i) => ({ ...p, w: nhanRef.current[i]?.offsetWidth ?? 80 })),
-        w,
-        gon ? 22 : 33,
-      )
+      // hết chỗ dù đã đẩy lên + dời ngang ⇒ nhãn NGẮN (chỉ tên lớp; số câu vẫn có ở gợi ý khi rê). Chọn bản nhãn theo cỡ khung + danh sách lớp (KHÔNG theo camera) để nhãn không nhấp nháy giữa hai bản.
+      const khoa = `${w}x${h}|${s.lop.map((l) => l.lop).join('|')}`
+      if (banNhan.current.khoa !== khoa) banNhan.current = { khoa, ngan: false }
+      const dat = (() => {
+        for (const ngan of banNhan.current.ngan ? [true] : [false, true]) {
+          hop.dataset.nhan = ngan ? 'ten' : 'day'
+          const cn = gon || ngan ? 22 : 33
+          const r = datNhanChongLap(
+            vtri.map((p, i) => ({ ...p, w: nhanRef.current[i]?.offsetWidth ?? 80 })),
+            w,
+            cn,
+          )
+          if (ngan || !conNhanChong(r, cn)) { banNhan.current.ngan = ngan; return r }
+        }
+        return []
+      })()
       dat.forEach((p, i) => {
         const el = nhanRef.current[i]
         if (!el) return
         el.style.transform = `translate(${p.x.toFixed(1)}px,${p.y.toFixed(1)}px) translate(-50%,-100%)`
         el.style.setProperty('--bts-day', `${Math.max(0, p.y0 - p.y).toFixed(0)}px`)
+        el.style.setProperty('--bts-day-lech', `${(p.x0 - p.x).toFixed(0)}px`) // dời ngang ⇒ dây dẫn kéo lệch về đúng đầu cột
         el.style.zIndex = String(1 + Math.round(p.gan))
       })
       // chọn cột dưới con trỏ (bản 3D)

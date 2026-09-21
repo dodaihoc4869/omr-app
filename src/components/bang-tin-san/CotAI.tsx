@@ -83,7 +83,7 @@ export function CotAI({ bt }: { bt: BangTin }) {
                   <div className="bts-vap-dong">
                     <span>{d.ten}</span>
                     <span className="bts-so">
-                      {d.soEmVap} / {d.soEmGap} em vấp
+                      {d.soEmVap} / {d.soEmGap} em<span className="bts-vap-hai"> vấp</span>
                     </span>
                   </div>
                   <div className="bts-vap-thanh" role="img" aria-label={`${d.soEmVap} trên ${d.soEmGap} em đã gặp dạng này bị vấp`}>
