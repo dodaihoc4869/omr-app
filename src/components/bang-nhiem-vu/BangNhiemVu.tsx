@@ -10,6 +10,8 @@ import GiaoThemChoCon from './GiaoThemChoCon'
 import type { ViewGiaoThem } from '../../lib/use-giao-them'
 import type { ViewThiDua } from '../../lib/use-thi-dua'
 import OThiDua from './OThiDua'
+import TheVeDich from './TheVeDich'
+import { ngayVuaTraXong, type VeDichView } from '../../lib/ve-dich-hien-thi'
 import { chuBanApp } from '../../lib/cap-nhat-app'
 import TheChoAn, { viewChoAn } from './TheChoAn'
 import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
@@ -221,6 +223,18 @@ export default function BangNhiemVu({
   const viec = tatCaViec(duLieu)
   // Nút của ô Thi đua dẫn tới việc CHƯA XONG đầu tiên (không bị cổng); hết việc ⇒ Đảo thần thú (Boss 21/09).
   const viewChoAnHs = laPh ? null : viewChoAn(duLieu)
+  // "Đường về đích": so hai lần nạp liên tiếp ⇒ ngày nợ VỪA TRẢ XONG (gạch tên ngày ~8 giây; tắt hoạt ảnh khi giảm chuyển động ở CSS). Vắng `veDich` ⇒ không thẻ.
+  const veDichTruoc = useRef<VeDichView | null>(null)
+  const [ngayVuaTra, setNgayVuaTra] = useState<string | null>(null)
+  useEffect(() => {
+    if (laPh || !duLieu.veDich) return
+    const n = ngayVuaTraXong(veDichTruoc.current, duLieu.veDich)
+    veDichTruoc.current = duLieu.veDich
+    if (!n) return
+    setNgayVuaTra(n)
+    const t = setTimeout(() => setNgayVuaTra(null), 8000)
+    return () => clearTimeout(t)
+  }, [laPh, duLieu.veDich])
   const lamViecDau = () => {
     const dau = viec.find((x) => !x.biCong)
     if (dau) chon(dau)
@@ -327,6 +341,10 @@ export default function BangNhiemVu({
                   Ẩn
                 </button>
               </section>
+            )}
+            {/* "ĐƯỜNG VỀ ĐÍCH" (chỉ học sinh): ngay dưới lời chào, TRÊN tiến độ. Số nợ/giờ muộn nhất là của máy chủ; nút dẫn tới việc CHƯA XONG đầu tiên. Vắng `veDich` ⇒ không dựng. */}
+            {!laPh && duLieu.veDich && !dangTai && (
+              <TheVeDich v={duLieu.veDich} now={now} onLam={lamViecDau} soViecConLai={duLieu.daXongHomNay ? 0 : viec.filter((x) => x.bac === 'khan' || x.bac === 'bat_buoc').length} ngayVuaTra={ngayVuaTra} />
             )}
             <section className="bnv-tien-do" aria-label="Tiến độ hôm nay" data-vung="tien-do">
               <div className="bnv-tien-do-dau">

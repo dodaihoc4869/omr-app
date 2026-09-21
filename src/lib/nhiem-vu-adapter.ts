@@ -9,6 +9,7 @@ import type { ThuThachRieng } from './thu-thach-rieng'
 import { chuSoCauCuaEm, dongPhuChang, tenBaiTapVeNha } from './btvn-ca-nhan-kieu'
 import { dinhDangConLai } from './tro-ly-ca-nhan'
 import { ngayVietNam } from './han-bai-tap'
+import { docVeDich, type VeDichView } from './ve-dich-hien-thi'
 import type { CapDoUuTien, KeHoachNgayTroLy, NhiemVuTroLy } from './tro-ly-ca-nhan'
 
 export type BacNhiemVu = 'khan' | 'bat_buoc' | 'nen_lam' | 'tuy_chon'
@@ -122,6 +123,10 @@ export interface DuLieuBangNhiemVu {
    * (lời cho phụ huynh, xem bo-nao-lay-loi-ph.ts) chứ không qua đây. KHÔNG lưu vào bản nhớ: cảnh báo cũ có thể đã hết đúng (em vừa nộp).
    */
   canhBaoThay?: CanhBaoThay[]
+  /**
+   * "Đường về đích" (Dồn về đích, thầy chốt mẫu 21/09): `veDich[]` + `no` của `/hs/ke-hoach-ngay` đọc CHẶT (`docVeDich`). Máy chủ chưa trả `veDich` ⇒ null ⇒ KHÔNG thẻ. KHÔNG lưu vào bản nhớ (số nợ cũ sẽ nói sai khi mở lại).
+   */
+  veDich?: VeDichView | null
   /**
    * "Thử thách riêng hôm nay" của Bộ não A.I: lời mời + câu do MÁY CHỦ chọn. Đến từ lệnh RIÊNG `POST /hs/thu-thach-hom-nay` (không nằm trong /hs/ke-hoach-ngay) nên
    * adapter luôn để null; màn cổng học sinh gắn vào SAU (`docThuThachRieng`). null/vắng ⇒ KHÔNG thẻ. Không lưu vào bản nhớ. Phụ huynh chưa nhận gì ở Nấc 1.
@@ -393,6 +398,9 @@ export interface ViecMayChu {
 export interface KeHoachNgayMayChu {
   ok?: boolean
   ngay?: string
+  /** Dồn về đích (chỉ-thêm): xem `docVeDich`. */
+  veDich?: unknown
+  no?: unknown
   nganSach: {
     mucTieuCau: number
     toiThieuCau?: number
@@ -694,6 +702,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     capNhatLuc: keHoach.capNhatLuc,
     ghiChuCu: cu && keHoach.capNhatLuc ? `Kế hoạch lúc ${gioVietNam(keHoach.capNhatLuc)} — chưa cập nhật được, đang hiện bản cuối.` : undefined,
     ngayNghi: keHoach.lanNghi === true,
+    veDich: docVeDich(keHoach),
     thanThu: docThanThu(keHoach.thanThu),
     tonCu,
     ...docExp(keHoach),
@@ -830,7 +839,7 @@ export function dongGoiBanNho(duLieu: DuLieuBangNhiemVu, now: number): BanNhoBan
   if (duLieu.nguon !== 'ke_hoach_ngay' || duLieu.ghiChuCu) return null
   const ngay = ngayVietNam(now)
   // "Vừa nhận EXP" là thông báo MỘT LẦN của đúng lần gọi ấy: lưu vào bản nhớ thì mở lại app sẽ phát lại.
-  return ngay ? { ngay, luuLuc: now, duLieu: { ...duLieu, expNhan: [], manhNhan: [] } } : null
+  return ngay ? { ngay, luuLuc: now, duLieu: { ...duLieu, expNhan: [], manhNhan: [], veDich: null } } : null
 }
 
 function docExpDaLuu(x: any): DuLieuExp | null {
