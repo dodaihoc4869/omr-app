@@ -11,7 +11,8 @@ fi
 LOI_DAN="$HOME/.claude/scheduled-tasks/bo-nao-ai-omr/SKILL.md"
 [ -f "$LOI_DAN" ] || { echo "Không thấy lời dặn của tác vụ: $LOI_DAN"; exit 1; }
 echo "Bộ não A.I bắt đầu chạy… (thường 10–25 phút; xong sẽ in tổng kết ≤ 8 dòng)"
-claude -p "$(cat "$LOI_DAN")" \
+# Bỏ phần đầu tệp (frontmatter giữa hai dòng ---) rồi đưa lời dặn qua ĐƯỜNG NHẬP CHUẨN: lời dặn bắt đầu bằng "---" sẽ bị hiểu nhầm là tuỳ chọn nếu truyền làm tham số.
+awk 'BEGIN{d=0} /^---[[:space:]]*$/ && d<2 {d++; next} d>=2 || d==0 {print}' "$LOI_DAN" | claude -p \
   --allowedTools \
     "Bash(node scripts/bo-nao/lay.mjs:*)" "Bash(node scripts/bo-nao/nop.mjs:*)" \
     "Bash(date:*)" "Bash(TZ=Asia/Ho_Chi_Minh date:*)" "Bash(ls:*)" "Bash(cat bo-nao/CHAY-NGAY.txt)" "Bash(rm bo-nao/CHAY-NGAY.txt)" "Bash(rm -f bo-nao/CHAY-NGAY.txt)" \
