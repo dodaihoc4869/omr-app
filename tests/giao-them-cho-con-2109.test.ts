@@ -33,7 +33,7 @@ const dem = (r: KetQuaGiaoThem, loai: string) => r.thanhPhan.filter((t) => t.loa
 describe('hằng số và hàm nhỏ', () => {
   it('trần từng lượt: 10 · 6 · 4; kẹp lượt 1: 4–10, vượt mục tiêu 4–6; sau 21:30 ≤ 4; tổng 16; tối đa 3 lượt', () => {
     expect([1, 2, 3].map(tranLuot)).toEqual([10, 6, 4])
-    expect(GIAO_THEM).toMatchObject({ SO_LUOT_TOI_DA: 3, TONG_CAU_TOI_DA_NGAY: 16, LUOT_1_TOI_THIEU: 4, LUOT_1_TOI_DA: 10, VUOT_MUC_TIEU_TOI_THIEU: 4, VUOT_MUC_TIEU_TOI_DA: 6, SAU_GIO_TOI_DA: 4, KHOA_SAU_PHUT: 22 * 60 + 30, THU_SUC_TI_LE: 0.8 })
+    expect(GIAO_THEM).toMatchObject({ SO_LUOT_TOI_DA: 3, TONG_CAU_TOI_DA_NGAY: 16, LUOT_1_TOI_THIEU: 4, LUOT_1_TOI_DA: 10, VUOT_MUC_TIEU_TOI_THIEU: 4, VUOT_MUC_TIEU_TOI_DA: 6, SAU_GIO_TOI_DA: 4, KHOA_SAU_PHUT: 22 * 60 + 30, GIO_MO_LAI_PHUT: 5 * 60, THU_SUC_TI_LE: 0.8 })
   })
   it('thử sức: đúng ≥ 80 % trong ≥ 5 câu (4/5 được; 7/10 không; 4/4 chưa đủ mẫu; dung > daLam bị kẹp)', () => {
     expect(duDieuKienThuSuc(5, 4)).toBe(true)
@@ -198,6 +198,26 @@ describe('TỪ CHỐI đúng ca — soCau 0, thanhPhan rỗng, lý do bằng s�
     expect(tinhGiaoThem(vao({ bayGioMs: Date.parse('2026-09-21T15:31:00Z') })).tuChoi?.ma).toBe('qua_muon')
     expect(tinhGiaoThem(vao({ bayGioMs: Date.parse('2026-09-21T15:29:00Z') })).tuChoi).toBeUndefined()
   })
+  it('KHUYA 00:00–05:00 giờ VN cũng từ chối (qua_muon, lời "để con ngủ", không mất lượt): 00:00:00 và 04:59:59.999 từ chối, đúng 05:00:00 giao lại; 23:59:59 vẫn là lời "muộn"', () => {
+    const KHUYA = 'Đã khuya rồi, để con ngủ. Sáng mai anh/chị giao tiếp được.'
+    const MUON = 'Đã muộn rồi, để con nghỉ. Mai anh/chị giao tiếp được.'
+    const luc = (hms: string) => Date.parse(`2026-09-22T${hms}+07:00`)
+    for (const luot of [1, 2, 3]) {
+      for (const g of ['00:00:00', '00:00:01', '01:30:00', '03:00:00', '04:59:59']) expect(chuan(tinhGiaoThem(vao({ bayGioMs: luc(g), luot })), 'qua_muon'), `lượt ${luot} ${g}`).toBe(KHUYA)
+      expect(chuan(tinhGiaoThem(vao({ bayGioMs: luc('04:59:59') + 999, luot })), 'qua_muon'), `lượt ${luot} 04:59:59.999`).toBe(KHUYA)
+      expect(tinhGiaoThem(vao({ bayGioMs: luc('05:00:00'), luot })).tuChoi, `lượt ${luot} 05:00:00`).toBeUndefined()
+    }
+    expect(chuan(tinhGiaoThem(vao({ bayGioMs: luc('23:59:59') })), 'qua_muon')).toBe(MUON)
+    expect(chuan(tinhGiaoThem(vao({ bayGioMs: luc('22:30:01') })), 'qua_muon')).toBe(MUON)
+    // đêm nối đêm: 23:59:59 giờ VN (muộn) rồi 00:00:00 giờ VN của ngày kế (khuya) — hai lời khác nhau, cùng mã
+    expect(tinhGiaoThem(vao({ bayGioMs: luc('23:59:59') - 86_400_000 })).tuChoi?.lyDo).toEqual([MUON])
+    expect(tinhGiaoThem(vao({ bayGioMs: luc('00:00:00') })).tuChoi?.lyDo).toEqual([KHUYA])
+    // 05:00 giờ VN = 22:00 UTC hôm trước: múi giờ đổi đúng
+    expect(tinhGiaoThem(vao({ bayGioMs: Date.parse('2026-09-21T21:59:59Z') })).tuChoi?.ma).toBe('qua_muon')
+    expect(tinhGiaoThem(vao({ bayGioMs: Date.parse('2026-09-21T22:00:00Z') })).tuChoi).toBeUndefined()
+    // sáng 05:00–08:00 giao bình thường, gói lượt 1 không bị kẹp ≤ 4 (luật ≤ 4 chỉ sau 21:30)
+    expect(tinhGiaoThem(vao({ bayGioMs: luc('05:00:00') })).soCau).toBeGreaterThan(4)
+  })
   it('từ chối vì quá muộn KHÔNG tính vào lượt: kết quả không có trường lượt/đếm, chỉ soCau 0 + tuChoi; cùng đầu vào lúc 20:00 vẫn giao được đủ lượt đó', () => {
     const tre = tinhGiaoThem(vao({ bayGioMs: vn('22:45'), luot: 2, tongDaGiaoHomNay: 6 }))
     expect(Object.keys(tre).sort()).toEqual(['lyDo', 'phutUocTinh', 'soCau', 'thanhPhan', 'tuChoi'])
@@ -253,6 +273,10 @@ describe('TÍNH CHẤT trên 6000 đầu vào ngẫu nhiên', () => {
       const r = tinhGiaoThem(v)
       if (r.tuChoi) continue
       const nhan = `#${i}`
+      const gVn = new Date(v.bayGioMs + 7 * 3_600_000)
+      const gs = gVn.getUTCHours() * 3600 + gVn.getUTCMinutes() * 60 + gVn.getUTCSeconds()
+      expect(gs, `${nhan} giờ giao được`).toBeGreaterThanOrEqual(5 * 3600)
+      expect(gs, `${nhan} giờ giao được`).toBeLessThanOrEqual(22.5 * 3600)
       expect(r.soCau, nhan).toBeGreaterThanOrEqual(GIAO_THEM.TOI_THIEU_MOI_GOI)
       expect(r.soCau, nhan).toBeLessThanOrEqual(tranLuot(v.luot))
       expect(r.soCau, nhan).toBeLessThanOrEqual(10)
@@ -286,6 +310,7 @@ describe('TÍNH CHẤT trên 6000 đầu vào ngẫu nhiên', () => {
   })
   it('TỪ CHỐI đúng ca — và chỉ khi có lý do: mỗi tuChoi có lý do bằng số, soCau 0; KHÔNG từ chối khi không thuộc ca nào', () => {
     let soTuChoi = 0
+    let soKhuya = 0
     for (const { v, i } of CAC) {
       const r = tinhGiaoThem(v)
       const bb = v.nganSach.batBuocConLai.some((x) => x.soCau > 0)
@@ -293,7 +318,10 @@ describe('TÍNH CHẤT trên 6000 đầu vào ngẫu nhiên', () => {
       const gioVn = new Date(v.bayGioMs + 7 * 3_600_000)
       const giay = gioVn.getUTCHours() * 3600 + gioVn.getUTCMinutes() * 60 + gioVn.getUTCSeconds() + gioVn.getUTCMilliseconds() / 1000
       if (v.luot > 3) expect(r.tuChoi?.ma, `#${i}`).toBe('het_luot')
-      else if (giay > 22.5 * 3600) expect(r.tuChoi?.ma, `#${i}`).toBe('qua_muon')
+      else if (giay > 22.5 * 3600 || giay < 5 * 3600) {
+        expect(r.tuChoi?.ma, `#${i}`).toBe('qua_muon')
+        if (giay < 5 * 3600) soKhuya++
+      }
       else if (bb) expect(r.tuChoi?.ma, `#${i}`).toBe('con_viec_bat_buoc')
       else if (goiDo) expect(r.tuChoi?.ma, `#${i}`).toBe('goi_truoc_chua_xong')
       else if (16 - v.tongDaGiaoHomNay < 3) expect(r.tuChoi?.ma, `#${i}`).toBe('het_tran_ngay')
@@ -306,6 +334,31 @@ describe('TÍNH CHẤT trên 6000 đầu vào ngẫu nhiên', () => {
       }
     }
     expect(soTuChoi).toBeGreaterThan(500)
+    expect(soKhuya, 'lưới có ca 00:00–05:00').toBeGreaterThan(0)
+  })
+  it('KHOÁ GIỜ trên CẢ NGÀY: 3000 đầu vào × giờ ngẫu nhiên 00:00–24:00 (tới mili-giây, nhiều ngày): từ chối `qua_muon` ĐÚNG KHI giờ VN < 05:00 hoặc > 22:30; nếu không thì không bao giờ là `qua_muon`; ngày nào cũng vậy', () => {
+    const r = mulberry32(22302109)
+    let muon = 0
+    let khuya = 0
+    let giao = 0
+    for (let i = 0; i < 3000; i++) {
+      const v = ngauNhien(50_000 + i)
+      const ngay0 = Date.parse('2026-09-01T00:00:00+07:00') + Math.floor(r() * 60) * 86_400_000
+      const ms = ngay0 + Math.floor(r() * 86_400_000)
+      const t = ms - ngay0 // mili-giây kể từ 00:00 giờ VN
+      const kq = tinhGiaoThem({ ...v, bayGioMs: ms, luot: 1 + (i % 3), nganSach: { ...v.nganSach, batBuocConLai: [] }, goiTruoc: null })
+      const khoa = t > (22 * 60 + 30) * 60_000 || t < 5 * 3600_000
+      expect(kq.tuChoi?.ma === 'qua_muon', `#${i} t=${t}`).toBe(khoa)
+      if (khoa) {
+        expect(kq.tuChoi!.lyDo, `#${i}`).toEqual([t < 5 * 3600_000 ? 'Đã khuya rồi, để con ngủ. Sáng mai anh/chị giao tiếp được.' : 'Đã muộn rồi, để con nghỉ. Mai anh/chị giao tiếp được.'])
+        expect(kq.soCau).toBe(0)
+        if (t < 5 * 3600_000) khuya++
+        else muon++
+      } else giao++
+    }
+    expect(muon).toBeGreaterThan(100)
+    expect(khuya).toBeGreaterThan(300)
+    expect(giao).toBeGreaterThan(1000)
   })
   it('ĐƠN ĐIỆU: cùng đầu vào, lượt 1 → 2 → 3 số câu KHÔNG tăng; giờ muộn hơn KHÔNG tăng; tổng đã giao nhiều hơn KHÔNG tăng', () => {
     for (const { v, i } of CAC.slice(0, 3000)) {

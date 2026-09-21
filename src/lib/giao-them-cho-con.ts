@@ -22,6 +22,8 @@ export const GIAO_THEM = {
   SAU_GIO_TOI_DA: 4,
   /** Sau giờ này (22:30 giờ VN, tới từng mili-giây) TỪ CHỐI HẲN — "để con nghỉ" (Boss chốt 21/09). Đúng 22:30:00 còn giao; 22:30:01 từ chối. */
   KHOA_SAU_PHUT: 22 * 60 + 30,
+  /** Từ 00:00 tới TRƯỚC giờ này (05:00 giờ VN, tới từng mili-giây) cũng TỪ CHỐI — "để con ngủ" (Boss chốt 21/09). Đúng 05:00:00 giao lại được; 04:59:59.999 còn từ chối. */
+  GIO_MO_LAI_PHUT: 5 * 60,
   /** Gói nhỏ hơn chừng này không đáng giao (hết trần ngày hoặc hết câu phù hợp ⇒ từ chối). */
   TOI_THIEU_MOI_GOI: 3,
   /** Câu "thử sức" (bậc + 1) CHỈ khi hôm nay con đúng ≥ tỉ lệ này trong ≥ chừng này câu; tối đa MỘT câu. */
@@ -130,8 +132,17 @@ const soNguyen = (x: unknown): number => (typeof x === 'number' && Number.isFini
 const phutTrongNgayVn = (ms: number): number => Math.floor(((((ms + LECH_VN) % MS_NGAY) + MS_NGAY) % MS_NGAY) / MS_PHUT)
 /** ĐÃ QUA 21:30 giờ Việt Nam (so tới từng mili-giây: 21:30:01 đã là "sau 21:30"). */
 const daQuaGioNghi = (ms: number): boolean => ((((ms + LECH_VN) % MS_NGAY) + MS_NGAY) % MS_NGAY) > GIAO_THEM.SAU_GIO_PHUT * MS_PHUT
-/** ĐÃ QUA 22:30 giờ Việt Nam ⇒ không giao nữa (so tới từng mili-giây). */
-const daQuaGioKhoa = (ms: number): boolean => ((((ms + LECH_VN) % MS_NGAY) + MS_NGAY) % MS_NGAY) > GIAO_THEM.KHOA_SAU_PHUT * MS_PHUT
+/**
+ * Khoá theo giờ (giờ Việt Nam, so tới từng mili-giây): sau 22:30 ⇒ 'muon' (để con nghỉ); từ 00:00 tới trước 05:00 ⇒ 'khuya' (để con ngủ); còn lại ⇒ null.
+ * Cả hai cùng mã từ chối `qua_muon`, chỉ khác lời. Hàm chỉ nhìn giờ trong ngày nên nửa đêm sang ngày mới vẫn bị chặn tới 05:00.
+ */
+const khoaTheoGio = (ms: number): 'muon' | 'khuya' | null => {
+  const t = (((ms + LECH_VN) % MS_NGAY) + MS_NGAY) % MS_NGAY
+  if (t > GIAO_THEM.KHOA_SAU_PHUT * MS_PHUT) return 'muon'
+  if (t < GIAO_THEM.GIO_MO_LAI_PHUT * MS_PHUT) return 'khuya'
+  return null
+}
+const LOI_QUA_MUON = { muon: 'Đã muộn rồi, để con nghỉ. Mai anh/chị giao tiếp được.', khuya: 'Đã khuya rồi, để con ngủ. Sáng mai anh/chị giao tiếp được.' } as const
 const gioPhut = (ms: number): string => {
   const p = phutTrongNgayVn(ms)
   return `${String(Math.floor(p / 60)).padStart(2, '0')}:${String(p % 60).padStart(2, '0')}`
@@ -177,7 +188,7 @@ function tuChoi(ma: MaTuChoi, lyDo: string[]): KetQuaGiaoThem {
 }
 
 /**
- * Tính gói "Giao thêm bài cho con". Thứ tự TỪ CHỐI (dừng ở cái đầu tiên đúng): hết 3 lượt → quá 22:30 (không mất lượt) → còn việc BẮT BUỘC hôm nay → gói trước chưa làm xong → hết trần 16 câu/ngày (còn < 3 câu) → không có câu phù hợp (< 3 câu).
+ * Tính gói "Giao thêm bài cho con". Thứ tự TỪ CHỐI (dừng ở cái đầu tiên đúng): hết 3 lượt → quá 22:30 hoặc trước 05:00 (không mất lượt) → còn việc BẮT BUỘC hôm nay → gói trước chưa làm xong → hết trần 16 câu/ngày (còn < 3 câu) → không có câu phù hợp (< 3 câu).
  * Nếu không từ chối: liều theo `lieuMongMuon`, rồi chia CƠ CẤU theo ưu tiên: câu đến lịch ôn → câu dạng con đang vấp (chia vòng tròn giữa các dạng, dạng yếu / sai nhiều trước) → câu từng sai chưa khắc phục;
  * cộng MỘT câu "thử sức" (bậc + 1) CHỈ khi hôm nay con đúng ≥ 80 % (≥ 5 câu) và có dạng ổn (không yếu, bậc < Vận dụng) còn câu bậc + 1. Không bao giờ đòi nhiều hơn số câu khả dụng.
  */
@@ -190,8 +201,9 @@ export function tinhGiaoThem(vao: DauVaoGiaoThem): KetQuaGiaoThem {
   // 1 · hết lượt
   if (luot > G.SO_LUOT_TOI_DA) return tuChoi('het_luot', [`Hôm nay đã giao đủ ${G.SO_LUOT_TOI_DA} lượt, mai giao tiếp được.`])
 
-  // 2 · quá muộn (sau 22:30): để con nghỉ, không mất lượt
-  if (daQuaGioKhoa(vao.bayGioMs)) return tuChoi('qua_muon', ['Đã muộn rồi, để con nghỉ. Mai anh/chị giao tiếp được.'])
+  // 2 · quá muộn (sau 22:30) hoặc còn khuya (trước 05:00): để con nghỉ, không mất lượt
+  const khoa = khoaTheoGio(vao.bayGioMs)
+  if (khoa) return tuChoi('qua_muon', [LOI_QUA_MUON[khoa]])
 
   // 3 · còn việc BẮT BUỘC hôm nay
   const batBuoc = (nganSach.batBuocConLai ?? []).filter((v) => soNguyen(v.soCau) > 0)
