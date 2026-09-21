@@ -29,9 +29,14 @@ const TRAN_CAU_MOI_LUOT = 400
 /** Rút gọn câu SQL thành "khung": bỏ khoảng trắng thừa, cắt 240 ký tự. Số/chuỗi hằng vẫn nằm trong câu (D1 dùng tham số `?` nên ít khi có). */
 const khungSql = (sql: string): string => sql.replace(/\s+/g, ' ').trim().slice(0, 240)
 
+/** Câu SQL ĐẦY ĐỦ theo khung (mỗi khung một bản, ≤ 6.000 ký tự) — để `explain.mjs` chạy EXPLAIN các truy vấn tốn nhất. */
+const sqlDayDu = new Map<string, string>()
+
 function ghiCau(sql: string, meta: Record<string, unknown> | undefined, msTuong: number, theoBatch: boolean): void {
   const luot = als.getStore()
   if (!luot) return
+  const kh = khungSql(sql)
+  if (!sqlDayDu.has(kh) && sqlDayDu.size < 3000) sqlDayDu.set(kh, sql.slice(0, 6000))
   if (luot.cau.length >= TRAN_CAU_MOI_LUOT) return
   luot.cau.push({
     khung: khungSql(sql),
@@ -151,7 +156,7 @@ const nhanLenh = (v: string | null): string => { if (!v) return ''; try { return
 export default {
   async fetch(req: Request, env: any, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(req.url)
-    if (url.pathname === '/__do/dump') return Response.json({ luot: [...nhatKy.values()] })
+    if (url.pathname === '/__do/dump') return Response.json({ luot: [...nhatKy.values()], sql: Object.fromEntries(sqlDayDu) })
     if (url.pathname === '/__do/reset') { nhatKy.clear(); return Response.json({ ok: true }) }
     const id = req.headers.get('x-tai-gia-id') || `l${++dem}`
     const luot: LuotGoi = { id, lenh: nhanLenh(req.headers.get('x-tai-gia-lenh')) || url.pathname, duong: url.pathname, batDau: Date.now(), traLoiLuc: null, xongLuc: null, ma: 0, loi: null, cau: [] }

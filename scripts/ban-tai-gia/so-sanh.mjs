@@ -12,6 +12,7 @@ const doc = (ma) => JSON.parse(readFileSync(join(REPO, `docs/do-tai-d1/ban-tai-$
 const a = doc(cu), b = doc(moi)
 const phanTram = (x, y) => (x === 0 ? (y === 0 ? '0 %' : '+∞') : `${y >= x ? '+' : ''}${(((y - x) / x) * 100).toFixed(0)} %`)
 const so = (x) => Math.round(x).toLocaleString('vi-VN')
+const thoiGian = (ms) => (ms >= 1000 ? `${(ms / 1000).toFixed(1).replace('.', ',')} s` : `${Math.round(ms)} ms`)
 const mapA = new Map(a.theoLenh.map((x) => [x.lenh, x]))
 const mapB = new Map(b.theoLenh.map((x) => [x.lenh, x]))
 const lenh = [...new Set([...mapA.keys(), ...mapB.keys()])]
@@ -36,7 +37,7 @@ P('|---|---|---:|---|---:|---|---|---|')
 for (const k of lenh.sort((x, y) => ((mapA.get(y)?.docTb ?? 0) * (mapA.get(y)?.n ?? 0)) - ((mapA.get(x)?.docTb ?? 0) * (mapA.get(x)?.n ?? 0)))) {
   const x = mapA.get(k), y = mapB.get(k)
   const vuot = `${x ? (x.vuot ? '❌' : '✅') : '—'} → ${y ? (y.vuot ? '❌' : '✅') : '—'}`
-  P(`| \`${k}\` | ${x ? x.tvTb.toFixed(1) : '—'} → ${y ? y.tvTb.toFixed(1) : '—'} | ${x && y ? phanTram(x.tvTb, y.tvTb) : ''} | ${x ? so(x.docTb) : '—'} → ${y ? so(y.docTb) : '—'} | ${x && y ? phanTram(x.docTb, y.docTb) : ''} | ${x ? (x.ghiTb ?? '—') : '—'} → ${y ? (y.ghiTb ?? '—') : '—'} | ${x ? `${so(x.ms50)}→${so(x.ms95)}` : '—'} / ${y ? `${so(y.ms50)}→${so(y.ms95)}` : '—'} | ${vuot} |`)
+  P(`| \`${k}\` | ${x ? x.tvTb.toFixed(1) : '—'} → ${y ? y.tvTb.toFixed(1) : '—'} | ${x && y ? phanTram(x.tvTb, y.tvTb) : ''} | ${x ? so(x.docTb) : '—'} → ${y ? so(y.docTb) : '—'} | ${x && y ? phanTram(x.docTb, y.docTb) : ''} | ${x ? (x.ghiTb ?? '—') : '—'} → ${y ? (y.ghiTb ?? '—') : '—'} | ${x ? `${thoiGian(x.ms50)}→${thoiGian(x.ms95)}` : '—'} / ${y ? `${thoiGian(y.ms50)}→${thoiGian(y.ms95)}` : '—'} | ${vuot} |`)
 }
 P()
 writeFileSync(join(REPO, `docs/do-tai-d1/so-sanh-${cu}-${moi}.md`), dong.join('\n') + '\n')

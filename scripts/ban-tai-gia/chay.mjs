@@ -9,7 +9,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, symlinkSync,
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { banTai } from './ban.mjs'
-import { lapMarkdown, gomTheoLenh } from './phan-tich.mjs'
+import { lapMarkdown, gomTheoLenh, topTruyVan } from './phan-tich.mjs'
 
 const GOC = dirname(fileURLToPath(import.meta.url))
 const REPO = join(GOC, '../..')
@@ -76,7 +76,8 @@ try {
 } finally {
   await new Promise((ok) => setTimeout(ok, 2500)) // để việc phụ sau khi trả lời (waitUntil) kịp ghi vào sổ đo
 }
-const dump = (await (await fetch(goc + '/__do/dump')).json()).luot
+const dumpTho = await (await fetch(goc + '/__do/dump')).json()
+const dump = dumpTho.luot
 writeFileSync(nhatKy, ghiLog.join(''))
 tat()
 
@@ -88,7 +89,8 @@ mkdirSync(ra, { recursive: true })
 const md = lapMarkdown({ ma: nhan, batDau, cauHinh, khach: kq.khach, dump, ghiChu })
 writeFileSync(join(ra, `ban-tai-${nhan}.md`), md + '\n')
 writeFileSync(join(ra, `ban-tai-${nhan}.json`), JSON.stringify({ ma: nhan, batDau, cauHinh, theoLenh: gomTheoLenh(kq.khach, dump).map(({ lenh, n, loi, ms50, ms95, tvTb, tvMax, docTb, docMax, ghiTb, vuot }) => ({ lenh, n, loi, ms50, ms95, tvTb: +tvTb.toFixed(2), tvMax, docTb: Math.round(docTb), docMax, ghiTb: +ghiTb.toFixed(1), vuot })) }, null, 1) + '\n')
-log(`Đã ghi docs/do-tai-d1/ban-tai-${nhan}.md (+ .json)`)
+writeFileSync(join(ra, `ban-tai-${nhan}-truy-van.json`), JSON.stringify({ ma: nhan, truyVan: topTruyVan(dump, 40).map(({ khung, lan, doc, lenhChinh }) => ({ khung, lan, doc, lenhChinh, sql: (dumpTho.sql ?? {})[khung] ?? khung })) }) + '\n')
+log(`Đã ghi docs/do-tai-d1/ban-tai-${nhan}.md (+ .json, -truy-van.json để EXPLAIN)`)
 const vuot = gomTheoLenh(kq.khach, dump).filter((b) => b.vuot)
 log(`Lệnh VƯỢT ngân sách: ${vuot.length}${vuot.length ? ' — ' + vuot.slice(0, 6).map((b) => b.lenh).join(' · ') : ''}`)
 

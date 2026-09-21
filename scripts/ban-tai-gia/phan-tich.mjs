@@ -13,6 +13,7 @@ export const phanVi = (ds, p) => {
 const tb = (ds) => (ds.length ? ds.reduce((t, x) => t + x, 0) / ds.length : 0)
 const lam = (x, so = 0) => (Number.isFinite(x) ? x.toFixed(so) : '—')
 const dinhDang = (x) => Math.round(x).toLocaleString('vi-VN')
+const thoiGian = (ms) => (ms >= 1000 ? `${(ms / 1000).toFixed(1).replace('.', ',')} s` : `${Math.round(ms)} ms`)
 
 /**
  * @param khach  mảng {id, lenh, ms, ma, loi} — số đo của máy khách cho từng lượt gọi
@@ -87,11 +88,11 @@ export function lapMarkdown({ ma, batDau, cauHinh, khach, dump, ghiChu = [] }) {
   P()
   P('## 1. Bảng theo lệnh (xếp theo tổng dòng đọc giảm dần)')
   P()
-  P('| Lệnh | Lượt | Lỗi | p50 ms | p95 ms | Truy vấn TB / p95 / max | Dòng đọc TB / p95 / max | Dòng ghi TB | Vượt |')
+  P('| Lệnh | Lượt | Lỗi | p50 | p95 | Truy vấn TB / p95 / max | Dòng đọc TB / p95 / max | Dòng ghi TB | Vượt |')
   P('|---|---:|---:|---:|---:|---|---|---:|---|')
   for (const b of bang) {
     const co = `${b.vuotTv ? `${b.vuotTv} lượt > ${b.tran} tv` : ''}${b.vuotTv && b.vuotDong ? '; ' : ''}${b.vuotDong ? `${b.vuotDong} lượt > 2.000 dòng` : ''}` || '—'
-    P(`| \`${b.lenh}\`${b.nop ? ' 🔒' : ''} | ${b.n} | ${b.loi} | ${dinhDang(b.ms50)} | ${dinhDang(b.ms95)} | ${lam(b.tvTb, 1)} / ${b.tv95} / ${b.tvMax} | ${dinhDang(b.docTb)} / ${dinhDang(b.doc95)} / ${dinhDang(b.docMax)} | ${lam(b.ghiTb, 1)} | ${b.vuot ? '❌ ' : ''}${co} |`)
+    P(`| \`${b.lenh}\`${b.nop ? ' 🔒' : ''} | ${b.n} | ${b.loi} | ${thoiGian(b.ms50)} | ${thoiGian(b.ms95)} | ${lam(b.tvTb, 1)} / ${b.tv95} / ${b.tvMax} | ${dinhDang(b.docTb)} / ${dinhDang(b.doc95)} / ${dinhDang(b.docMax)} | ${lam(b.ghiTb, 1)} | ${b.vuot ? '❌ ' : ''}${co} |`)
   }
   P()
   P('🔒 = lệnh nộp (ngân sách truy vấn 15). Thời gian p50/p95 là thời gian máy khách đo (gồm cả xếp hàng ở Worker cục bộ), không phải thời gian D1 thật.')
