@@ -4,7 +4,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
-import { taoD1That, type D1That } from './_d1-that'
+import worker from '../server/src/index'
+import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
 const T0 = Date.parse('2026-09-22T12:00:00+07:00')
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) })
@@ -102,7 +103,7 @@ describe('hai trần độc lập lúc RÚT câu', () => {
   })
 })
 
-describe('hai trần độc lập lúc TRẢ LỜI (answer, cả cổng nguyên tử của INSERT)', () => {
+describe('câu ĐÃ PHÁT trong lượt đang mở LUÔN được trả lời — trần chỉ chặn ở lúc PHÁT (SỬA CÓ CHỦ Ý 21/09, Boss: em không được kẹt giữa ải vì trần đổi / đếm lại)', () => {
   /** Một phiên đang chờ với MỘT câu Phần I chưa trả lời, loại `loai`; trả về thông số để gọi answer. */
   const phienCho = async (d: D1That, loai: Loai) => {
     const q = JSON.parse((d.sql.prepare("SELECT json FROM game_v2_question WHERE qid = 'A-9'").get() as { json: string }).json)
@@ -111,18 +112,34 @@ describe('hai trần độc lập lúc TRẢ LỜI (answer, cả cổng nguyên 
     const b = { token: await gameToken(d.env, 'S1'), session: id, qid: 'A-9', answer: 'B' }
     return loai === 'doan' ? danhDau(b) : b // câu của Đoàn chỉ trả lời qua cửa nội bộ của Đoàn (laGoiNoiBoDoan)
   }
-  it('Đảo đủ 36 ⇒ chặn trả lời trong phiên Đảo (báo 36) nhưng phiên ĐOÀN vẫn ghi được', async () => {
+  it('Đảo đã đủ 36 mà còn câu đã phát trong lượt mở ⇒ VẪN trả lời được (tổng 37, trần chỉ chặn lúc phát)', async () => {
     const d = dung(); lamDay(d, 36, 'dao')
-    await expect(gameV2(d.env, 'answer', await phienCho(d, 'dao'))).rejects.toThrow(/hoàn thành 36 câu hôm nay/)
-    const r = await gameV2(d.env, 'answer', await phienCho(d, 'doan')) as any
-    expect(r.ok).toBe(true)
-    expect((d.sql.prepare("SELECT COUNT(*) AS n FROM game_v2_attempt WHERE session = 'cho-doan'").get() as { n: number }).n).toBe(1)
-  })
-  it('Đoàn đủ 60 ⇒ chặn trả lời trong phiên Đoàn (báo 60) nhưng phiên ĐẢO vẫn ghi được', async () => {
-    const d = dung(); lamDay(d, 60, 'doan')
-    await expect(gameV2(d.env, 'answer', await phienCho(d, 'doan'))).rejects.toThrow(/hoàn thành 60 câu hôm nay/)
     const r = await gameV2(d.env, 'answer', await phienCho(d, 'dao')) as any
-    expect(r.ok).toBe(true)
+    expect(r.ok).toBe(true); expect(r.replayed).toBeUndefined()
+    expect((d.sql.prepare("SELECT COUNT(*) AS n FROM game_v2_attempt WHERE session = 'cho-dao'").get() as { n: number }).n).toBe(1)
+  })
+  it('Đoàn đã đủ 60 mà còn câu đã phát ⇒ vẫn trả lời được; phiên Đảo cũng vậy (hai trần độc lập)', async () => {
+    const d = dung(); lamDay(d, 60, 'doan')
+    expect(((await gameV2(d.env, 'answer', await phienCho(d, 'doan'))) as any).ok).toBe(true)
+    expect(((await gameV2(d.env, 'answer', await phienCho(d, 'dao'))) as any).ok).toBe(true)
+  })
+  it('trần vẫn chặn ở lúc PHÁT: Đảo đủ 36 ⇒ start bị từ chối với lời trần VÀ mã het_tran (lỗi mang ma)', async () => {
+    const d = dung(); lamDay(d, 36, 'dao')
+    const e = await gameV2(d.env, 'start', { token: await gameToken(d.env, 'S1'), mode: 'adventure' }).then(() => null, (x) => x) as (Error & { ma?: string }) | null
+    expect(e).not.toBeNull(); expect(e!.message).toMatch(/hoàn thành 36 câu hôm nay/); expect(e!.ma).toBe('het_tran')
+  })
+  it('QUA ĐƯỜNG THẬT của Worker: start bị từ chối trả JSON {ok:false, error, ma:"het_tran"} (màn hiện lời cạnh nút + nút Về đảo); lỗi thường KHÔNG có ma', async () => {
+    const d = dung(); lamDay(d, 36, 'dao')
+    const r = await goiWorker(worker, d.env, '/game-v2/start', { token: await gameToken(d.env, 'S1'), mode: 'adventure' }) as any
+    expect(r).toMatchObject({ ok: false, ma: 'het_tran' }); expect(r.error).toMatch(/hoàn thành 36 câu hôm nay/)
+    const thuong = await goiWorker(worker, d.env, '/game-v2/answer', { token: await gameToken(d.env, 'S1'), session: 'khong-co', qid: 'x', answer: 'B' }) as any
+    expect(thuong.ok).toBe(false); expect(thuong.ma).toBeUndefined()
+  })
+  it('trả lời cùng câu hai lần (bấm đúp): lần hai là replayed, KHÔNG ghi thêm dòng nào', async () => {
+    const d = dung(); const b = await phienCho(d, 'dao')
+    expect(((await gameV2(d.env, 'answer', b)) as any).ok).toBe(true)
+    const lai = await gameV2(d.env, 'answer', b) as any
+    expect(lai.replayed).toBe(true); expect((d.sql.prepare("SELECT COUNT(*) AS n FROM game_v2_attempt WHERE session = 'cho-dao'").get() as { n: number }).n).toBe(1)
   })
 })
 

@@ -224,7 +224,8 @@ it('nhiệm vụ cá nhân không lộ đáp án, giới hạn 36 câu ĐẢO th
  /* Đợt 2 (21/09): `start` lần hai khi lượt cũ CHƯA trả lời câu nào trả lại CHÍNH lượt ấy (không bốc lại câu, không tốn lượt). Trần 60 vẫn chặn trả lời ở MỘT lượt khác. */
  expect(last.id).toBe(session.id)
  f.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) SELECT ?,sbd,json,created_at FROM game_v2_session WHERE id=?').run('khac',session.id)
- await expect(gameV2(f.env,'answer',{token,session:'khac',qid:session.questions[0].qid,answer:'B'})).rejects.toThrow('36 câu')
+ /* SỬA CÓ CHỦ Ý 21/09 (Boss, P0 "không nộp được bài"): trần chỉ chặn ở lúc PHÁT (start), câu ĐÃ PHÁT trong một lượt đang mở luôn được trả lời — kể cả khi tổng đã chạm 36 */
+ expect(((await gameV2(f.env,'answer',{token,session:'khac',qid:session.questions[0].qid,answer:'B'})) as any).ok).toBe(true)
  const replay:any=await gameV2(f.env,'answer',{token,session:session.id,qid:session.questions[0].qid,answer:'B'});expect(replay.replayed).toBe(true)
  const other=await gameToken(f.env,'2');expect((await gameV2(f.env,'recommendations',{token:other})).remaining).toBe(36)
 })

@@ -3251,7 +3251,8 @@ export default {
 
       return ra({ ok: false, error: 'Không có đường này' }, 404)
     } catch (e) {
-      return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ' }, 500)
+      const ma = (e as { ma?: unknown } | null)?.ma // mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời; lỗi thường không có
+      return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ', ...(typeof ma === 'string' ? { ma } : {}) }, 500)
     }
   },
 }
