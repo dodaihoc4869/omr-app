@@ -44,7 +44,7 @@ describe('/btvn/xem-truoc — TRƯỚC khi giao (a)', () => {
     expect(r.ds.map((x: { sbd: string }) => x.sbd)).toEqual(['S1', 'S2', 'S3'])
     expect(r.ds[0]).toMatchObject({ sbd: 'S1', hoTen: 'Em 1', daChot: false, coHoSo: true })
     expect(r.ds[1]).toMatchObject({ sbd: 'S2', daChot: false, coHoSo: false })
-    expect(r.ds[0].nganSach).toMatchObject({ soNgay: 7 })
+    expect(r.ds[0].nganSach).toMatchObject({ soNgay: 8 }) // bản 1.1: số NGÀY LỊCH VN từ ngày chốt tới ngày hạn (22/09 → 29/09 = 8), theo `soNgayToiHan` của Code 1
     expect(r.ds[0].nganSach.cauMoiNgay).toBeGreaterThanOrEqual(8)
     expect(r.ds[0].tomTat).toMatchObject({ soLoi: r.soLoi })
     expect(r.chiTiet.sbd).toBe('S1')
@@ -75,10 +75,10 @@ describe('/btvn/xem-truoc — TRƯỚC khi giao (a)', () => {
   it('KHỚP BỘ THẬT cả khi ngân sách < số câu (hạt giống phân xử câu nào được chọn): xem trước == thật; hạt giống khác ⇒ bộ khác', async () => {
     gio(BAY_GIO)
     const d = dung(1)
-    // Tờ DE3: 60 câu Phần I, 6 dạng × 10 câu, toàn mức Biết ⇒ rất nhiều câu cùng điểm; hạn 2 ngày ⇒ ngân sách ≈ 2 × 12 câu ≪ 60.
+    // Tờ DE3: 60 câu Phần I, 6 dạng × 10 câu, toàn mức Biết ⇒ rất nhiều câu cùng điểm; hạn 3 ngày (72 giờ ⇒ hạn DÀI) ⇒ ngân sách ≈ 4 × 12 câu < 60.
     d.objects.set('kho/DE3.json', { ma_de: 'DE3', cau: Array.from({ length: 60 }, (_, i) => ({ phan: 'I', so: i + 1, de: 'x', dap_an: 'A', chuyen_de: 'Este', muc_do: 'biet', dang: { ma: `DB-${Math.floor(i / 10)}`, ten: 'x' } })) })
     d.sql.exec("INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DE3','Tờ 3',60,0,'x')")
-    const han2 = '2026-09-24T03:00:00.000Z'
+    const han2 = '2026-09-25T03:00:00.000Z'
     const xemSeed = (hatGiong: string) => xem(d, { maDe: 'DE3', cau: [], ghim: [], hanNop: han2, hatGiong, dsSbd: ['S1'], sbdChiTiet: 'S1' })
     const truoc = await xemSeed('seed-A')
     expect(truoc.ok).toBe(true)
