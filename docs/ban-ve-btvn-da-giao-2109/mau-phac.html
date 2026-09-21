@@ -1,0 +1,33 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mẫu phác — Bài tập về nhà đã giao (dữ liệu mô phỏng)</title>
+<style>
+:root{--nen:rgb(248,250,253);--the:rgb(255,255,255);--the2:rgb(240,244,249);--muc:rgb(31,31,31);--phu:rgb(95,99,104);--vien:rgb(218,220,224);--xanh:rgb(11,87,208);--xanh-nen:rgb(211,227,253);--cam-nen:rgb(254,239,195);--cam-chu:rgb(122,77,0);--xam:rgb(180,178,169);--duong:rgb(133,183,235);--cam:rgb(250,199,117);--la:rgb(151,196,89)}
+@media (prefers-color-scheme:dark){:root{--nen:rgb(19,19,20);--the:rgb(30,31,32);--the2:rgb(40,42,44);--muc:rgb(227,227,227);--phu:rgb(170,174,180);--vien:rgb(68,71,70);--xanh:rgb(168,199,250);--xanh-nen:rgb(0,74,119);--cam-nen:rgb(86,60,0);--cam-chu:rgb(255,223,153)}}
+body{margin:0;background:var(--nen);color:var(--muc);font:16px/1.5 system-ui,sans-serif}
+main{max-width:920px;margin:0 auto;padding:24px 16px}
+.hang{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.chip{font-size:13px;padding:6px 12px;border-radius:999px;border:1px solid var(--vien)}
+.chip.chon{background:var(--xanh-nen);border-color:transparent}
+.o3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.o{border-radius:16px;padding:14px 16px;background:var(--the2)}
+.o.cam{background:var(--cam-nen);color:var(--cam-chu)}
+.o small{display:block;font-size:13px}.o b{font-size:26px;font-weight:600}
+.the{background:var(--the);border:1px solid var(--vien);border-radius:20px;padding:16px 20px;margin-bottom:10px}
+.ten{font-weight:600}.phu{font-size:13px;color:var(--phu)}
+.chang{display:flex;gap:6px;align-items:center;margin:14px 0 8px;font-size:12px;color:var(--phu)}
+.chang i{flex:1;height:8px;border-radius:4px;background:var(--the2);border:1px solid var(--vien)}.chang i.nay{background:var(--xanh);border-color:transparent}
+.thanh{display:flex;height:24px;border-radius:8px;overflow:hidden;font-size:12px;line-height:24px;text-align:center;color:rgb(31,31,31)}
+.g{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--phu);margin-top:6px}.g span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;background:var(--m)}
+.nut{font:inherit;font-size:13px;padding:8px 14px;border-radius:999px;border:1px solid var(--vien);background:transparent;color:var(--xanh)}
+.gon{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+</style></head><body><main>
+<div class="hang"><span class="phu">Dữ liệu mô phỏng · mẫu phác thầy chốt 21/09</span><span style="margin-left:auto" class="hang"><span class="chip chon">Tất cả lớp</span><span class="chip">Lớp 10</span><span class="chip">Lớp 12</span></span></div>
+<div class="o3"><div class="o cam"><small>Em chưa mở bài</small><b>31</b> em · 4 bài</div><div class="o cam"><small>Em chậm nhịp</small><b>12</b> em</div><div class="o"><small>Hạn gần nhất</small><b>2 ngày 17 giờ</b></div></div>
+<section class="the"><div class="hang" style="align-items:flex-start"><div style="flex:1;min-width:0"><div class="ten">Lớp 10 · Chương 2 · Bài 5</div><div class="phu">44 em · 113 câu, 29 câu lõi · giao 10:48 Thứ Hai</div></div><div style="text-align:right"><div class="phu">Hạn nộp 12:00 Thứ Năm 24/09</div><div class="ten">còn 2 ngày 17 giờ</div></div><button class="nut" aria-label="Thêm thao tác">⋯</button></div>
+<div class="chang"><i class="nay"></i>Chặng 1 · hôm nay<i></i>Chặng 2 · Thứ Ba<i></i>Chặng 3 · Thứ Tư</div>
+<div class="thanh"><span style="width:18%;background:var(--xam)">8</span><span style="width:50%;background:var(--duong)">22</span><span style="width:14%;background:var(--cam)">6</span><span style="width:18%;background:var(--la)">8</span></div>
+<div class="g"><span style="--m:var(--xam)">chưa mở 8</span><span style="--m:var(--duong)">đúng nhịp 22</span><span style="--m:var(--cam)">chậm nhịp 6</span><span style="--m:var(--la)">xong chặng hôm nay 8</span></div>
+<div class="hang" style="border-top:1px solid var(--vien);margin-top:12px;padding-top:10px"><span class="phu" style="flex:1">8 em chưa mở · 6 em chậm nhịp</span><button class="nut">Xem 14 em này</button></div></section>
+<section class="the gon"><div style="flex:1;min-width:200px"><div class="ten">Lớp 12 · Chương 2 · Bài 4</div><div class="phu">67 em · chặng 1 trong 4 · hạn 12:00 Thứ Sáu</div></div><div class="thanh" style="width:200px;height:14px"><span style="width:24%;background:var(--xam)"></span><span style="width:58%;background:var(--duong)"></span><span style="width:6%;background:var(--cam)"></span><span style="width:12%;background:var(--la)"></span></div><span class="phu">16 chưa mở · 4 chậm</span></section>
+<section class="the gon"><div style="flex:1;min-width:200px"><div class="ten">Lớp 11 · Chương 1 · Bài 3</div><div class="phu">52 em · chặng 1 trong 5 · hạn 12:00 Thứ Bảy</div></div><div class="thanh" style="width:200px;height:14px"><span style="width:13%;background:var(--xam)"></span><span style="width:72%;background:var(--duong)"></span><span style="width:4%;background:var(--cam)"></span><span style="width:11%;background:var(--la)"></span></div><span class="phu">7 chưa mở · 2 chậm</span></section>
+</main></body></html>
