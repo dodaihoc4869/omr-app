@@ -470,6 +470,10 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
            ON CONFLICT(ngay) DO UPDATE SET json = excluded.json, che_do = excluded.che_do, nop_luc = excluded.nop_luc, so_em = excluded.so_em, so_nhanh = excluded.so_nhanh, so_sau = excluded.so_sau,
              so_vang = excluded.so_vang, so_nhan = excluded.so_nhan, so_chi_ghi_so = excluded.so_chi_ghi_so, so_bi_loai = excluded.so_bi_loai`,
         ).bind(ngay, JSON.stringify({ cacDong }), ch.cheDo, nop, soLieuLop.soEm, soLieuLop.soSoiNhanh, soLieuLop.soSoiKy, soLieuLop.soVang, nhan, chiGhiSo, loai.length),
+        // mã lệnh nộp nhiều lô (≤ 100 em/lô) và gắn bản tin vào lô cuối: số "đã hỗ trợ" tính lại từ bảng để không chỉ đếm lô này
+        env.DB.prepare(
+          `UPDATE ai_ban_tin SET so_nhan = (SELECT COUNT(*) FROM ai_dieu_chinh WHERE ngay = ?), so_chi_ghi_so = (SELECT COUNT(*) FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 0) WHERE ngay = ?`,
+        ).bind(ngay, ngay, ngay),
       )
     }
   }

@@ -306,6 +306,12 @@ describe('/ai/dieu-chinh/nop', () => {
     const nhieu = await nop([], { cacDong: Array.from({ length: 7 }, () => dong()) })
     expect((nhieu.banTin as { loi: string[] }).loi.join()).toContain('quá 6 dòng')
   })
+  it('NHIỀU LÔ: bản tin gắn vào lô CUỐI vẫn đếm đủ số em đã nhận ở mọi lô (tính lại từ bảng)', async () => {
+    await nop([dauRa()]) // lô 1: em 12001, chưa có bản tin
+    const r = await nop([dauRa({ sbd: '12002', dang: [], loiNhanChoEm: 'Em quay lại nhé, chỉ cần một chặng ngắn thôi.', goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' } })], { cacDong: [{ loai: 'ca_lop', sbd: '', chu: 'Đêm nay có 2 em có thẻ', hanhDong: 'khong', dang: '' }] }) // lô 2 + bản tin
+    expect(r).toMatchObject({ nhan: 1, banTin: { nhan: 1, loi: [] } })
+    expect(d.sql.prepare('SELECT so_nhan, so_chi_ghi_so FROM ai_ban_tin').get()).toEqual({ so_nhan: 2, so_chi_ghi_so: 2 })
+  })
   it('giới hạn: > 100 em một lượt ⇒ lỗi; ngày sai ⇒ lỗi; thân rỗng ⇒ ok, không nhận gì', async () => {
     expect((await nop(Array.from({ length: 101 }, () => dauRa()))).ok).toBe(false)
     expect((await boNaoNop(d.env, { ngay: 'x', cacEm: [] }, NOW)).ok).toBe(false)
