@@ -99,6 +99,22 @@ Code 1 rà thấy: làm 4 câu SAI HẾT vẫn được tính đạt. Đề ngh�
 - App phụ huynh: chỉ thấy vị trí của con mình ("Con đang hạng 9 trong 42 bạn về độ chăm hôm nay"), không thấy tên bạn khác.
 - Cách làm: Code 2 VẼ MẪU cả 8A và 8B (điện thoại 390, sáng và tối, chuẩn Material 3 của app) gửi thầy xem trước khi build, như mọi màn mới.
 
+## ĐIỀU 9 · EXP của Đoàn Hộ Tống và của cả game, tính lại cho khớp kế hoạch (thầy lệnh 13:43: "Tính toán lại hết EXP của bên Hộ tống… phù hợp nhất với kế hoạch vừa chốt")
+**Số thật:** Đoàn Hộ Tống không có bảng EXP riêng — câu cá nhân trong Đoàn trả thưởng bằng đúng đường của Đảo (dạng lên nấc 20 / 40 / 40 EXP), cộng tiếp sức 3 EXP. Hôm nay đã có 45 chặng xong; thưởng game của một em có chơi: số giữa 200, một phần tư trên 500 EXP — tức là CHỈ CHƠI GAME đã đủ cho thú ăn no, việc học thật (bài tập về nhà, ôn lại, ca kiểm tra) không còn nghĩa với cấp. Phải cân lại.
+**Nguyên tắc cân:** thú ăn no cần 200 EXP một ngày. Game (Đảo + Đoàn gộp) chỉ được góp **tối đa 120 EXP mỗi ngày** = đúng mức "có học". Muốn thú ăn no 200 thì em phải có ít nhất 80 EXP từ HỌC THẬT. EXP học tập không bị trần.
+| Khoản EXP trong game | Cũ | Mới |
+|---|---|---|
+| Dạng lên nấc 1 · 2 · 3 (Đảo và Đoàn chung một sổ, không trả hai lần) | 20 · 40 · 40 | **10 · 20 · 30** (nhớ được sau 7 ngày mới là nấc quý nhất) |
+| Câu thử thách / Lượt trùm làm đúng lần đầu | 0 | theo bảng giá câu đã chốt (4–10) |
+| Tiếp sức đồng đội trong Đoàn | 3 EXP, 5 lần mỗi ngày | **5 EXP**, 5 lần mỗi ngày |
+| Thắng một chặng Đoàn | 0 | **5 · 10 · 15 EXP** theo 1 · 2 · 3 sao; chặng thắng đầu tiên trong ngày nhận đủ, các chặng sau nhận một nửa; thua không mất gì |
+| Cả đội làm vỡ giáp trùm | 0 | **+3 EXP** mỗi trùm cho từng bạn trong đội |
+| Trần EXP từ game mỗi ngày | không có | **120** (đủ trần thì câu vẫn tính tiến bộ, bản đồ, vé; EXP hiện "+0, hôm nay đã đủ EXP game") |
+| Số chặng Đoàn mỗi ngày | 1 miễn phí + bao nhiêu vé cũng được | 1 miễn phí + tối đa 3 chặng bằng vé (24 câu; cùng 36 câu Đảo = trần 60 câu toàn game) |
+
+Một ngày đẹp của em: học thật khoảng 140 EXP + 3 lượt Đảo khoảng 60–80 + một chặng Đoàn 3 sao khoảng 50–70 ⇒ kiếm khoảng 250–290, thú ăn 200, phần dư 50–90 nằm ống nghiệm làm đệm cho ngày bận. Ống nghiệm không còn phình vô nghĩa, con số "+EXP" giữ được giá trị.
+**Tính lại EXP đã kiếm (gộp vào Điều 2, làm MỘT lần):** thưởng nấc dạng em đã nhận được định giá lại theo bảng mới (nấc 1: 20 → 10; tới nấc 2: 60 → 30; tới nấc 3: 100 → 60), phần chênh trừ khỏi ống nghiệm (không âm); EXP học tập giữ nguyên từng điểm. Mọi em cùng một bảng giá từ đầu mùa.
+
 ---
 ## THẦY DUYỆT
 Thầy trả lời "chốt hết" hoặc ghi số điều cần sửa (ví dụ "Điều 3: 24 câu", "Điều 6: A"). Thứ tự build sau khi duyệt: Điều 1 + 2 lên trước (máy chủ rồi màn), Điều 7, rồi Điều 3–5 (rút câu), Điều 6. Trước khi Điều 1 sống, lời mời của Bộ não tạm không nêu số EXP còn thiếu và số cấp.
