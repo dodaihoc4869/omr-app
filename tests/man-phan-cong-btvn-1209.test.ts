@@ -56,10 +56,10 @@ describe('THẺ GIAO BÀI — nói thẳng khi chưa chuyển kho đề', () => 
     expect(idx).toContain('chotBoChoEm` chốt bộ CHỈ PHẦN LÕI')
     const chanCu = idx.match(/if \(quaHan && !em\.nop_luc[^\n]*/g) ?? []
     expect(chanCu).toHaveLength(1) // đúng MỘT nhánh chặn cũ…
-    expect(chanCu[0]).toContain('!(await btvnNopTreBat(env))') // …và nó nằm sau cờ lùi
+    expect(chanCu[0]).toContain('!(await btvnNopTreBat(env, bt.giao_luc))') // …và nó nằm sau cờ lùi (kèm ngày giao: bài cũ trước mốc cũng giữ luật cũ)
     // hai đường nộp còn lại cũng vậy
-    expect(doc('server/src/goi-cu.ts')).toMatch(/if \(quaHan && !\(await btvnNopTreBat\(env\)\)\) return \{ ok: false, lyDo: 'qua_han'/)
-    expect(doc('server/src/btvn-nang-do-d1.ts')).toMatch(/!\(await btvnNopTreBat\(env\)\)\) return \{ ok: false, lyDo: 'qua_han'/)
+    expect(doc('server/src/goi-cu.ts')).toMatch(/if \(quaHan && !\(await btvnNopTreBat\(env, bt\.giao_luc\)\)\) return \{ ok: false, lyDo: 'qua_han'/)
+    expect(doc('server/src/btvn-nang-do-d1.ts')).toMatch(/!\(await btvnNopTreBat\(env, bt\.giao_luc\)\)\) return \{ ok: false, lyDo: 'qua_han'/)
   })
 
   it('kho đề đọc từ máy chủ mới, không đọc Apps Script', () => {

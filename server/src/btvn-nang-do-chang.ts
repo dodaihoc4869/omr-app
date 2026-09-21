@@ -2,6 +2,7 @@
 import { themNgay } from './ho-so-nam-kt'
 import { ngayVn } from './su-kien-hoc'
 import { lichDaiSomHon } from '../../src/lib/btvn-nang-do-lich'
+import { baiTuNgayMoc, docMocNo, KHOA_HIEN_THI_TU, KHOA_MOC_BANG_TIN_NO, KHOA_VE_DICH_TU } from './moc-no'
 
 /** Khoảng cách `lan` của sổ `btvn_lo` giữa hai lượt làm của cùng một bài cá nhân hoá (chỉ số chặng luôn < 1000): `lan = chiSo + LAN_MOI_LUOT × (lượt − 1)`. Nơi đọc `lan` làm chỉ số lô phải lấy `lan % LAN_MOI_LUOT`. */
 export const LAN_MOI_LUOT = 1000
@@ -112,13 +113,16 @@ export function moLucGocChangMoSom(lichJson: unknown): Map<number, number> {
 }
 
 /**
- * Cờ LÙI NHANH của NỘP TRỄ (Điều 4 = B đổi luật hạn nộp): `cau_hinh.btvn_nop_tre = 'tat'` ⇒ trở lại luật cũ (qua hạn là khoá `qua_han`, em nhờ thầy gia hạn) ở CẢ BA đường: mở bài (`/btvn/cua-em`),
- * nộp chặng (`/btvn/xong-lo`), nộp cả bài (`/btvn/nop`). Vắng / khác / lỗi đọc ⇒ BẬT. Chỉ được đọc khi bài ĐÃ qua hạn (đường thường không tốn truy vấn).
+ * NỘP TRỄ có được bật cho bài này không (Điều 4 = B đổi luật hạn nộp): TẮT nếu (a) cờ LÙI NHANH `cau_hinh.btvn_nop_tre = 'tat'` — trở lại luật cũ (qua hạn là khoá `qua_han`, em nhờ thầy gia hạn); hoặc
+ * (b) bài được giao TRƯỚC NGÀY MỐC tính nợ (thầy nói rõ 21/09 15:55: bài cũ không được sống lại; mốc = `ve_dich_tu` ⇒ `bang_tin_tu` ⇒ hằng, xem moc-no.ts). Áp ở CẢ BA đường: mở bài (`/btvn/cua-em`),
+ * nộp chặng (`/btvn/xong-lo`), nộp cả bài (`/btvn/nop`). Vắng cờ / lỗi đọc ⇒ BẬT; `giaoLuc` vắng / hỏng ⇒ coi là bài hợp lệ. MỘT truy vấn `cau_hinh`, chỉ chạy khi bài ĐÃ qua hạn (đường thường không tốn truy vấn).
  */
-export async function btvnNopTreBat(env: { DB: { prepare(q: string): { bind(...a: unknown[]): { first<T>(): Promise<T | null> } } } }): Promise<boolean> {
+export async function btvnNopTreBat(env: { DB: { prepare(q: string): { bind(...a: unknown[]): { all<T>(): Promise<{ results?: T[] }> } } } }, giaoLuc?: unknown): Promise<boolean> {
   try {
-    const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('btvn_nop_tre').first<{ gia_tri?: unknown }>()
-    return String(r?.gia_tri ?? '').trim().toLowerCase() !== 'tat'
+    const r = await env.DB.prepare('SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?, ?)').bind('btvn_nop_tre', KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO).all<{ khoa?: unknown; gia_tri?: unknown }>()
+    const cau = new Map((r.results ?? []).map((x) => [String(x.khoa ?? ''), x.gia_tri]))
+    if (String(cau.get('btvn_nop_tre') ?? '').trim().toLowerCase() === 'tat') return false
+    return baiTuNgayMoc(giaoLuc, docMocNo(cau.get(KHOA_HIEN_THI_TU), cau.get(KHOA_VE_DICH_TU), cau.get(KHOA_MOC_BANG_TIN_NO)))
   } catch {
     return true
   }

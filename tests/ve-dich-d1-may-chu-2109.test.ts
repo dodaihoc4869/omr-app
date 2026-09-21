@@ -3,7 +3,7 @@
 // Khoá: em đúng nhịp ⇒ nợ 0/0/0, mỗi bài một chặng/buổi · lỡ chặng ⇒ nợ đúng ngày, chặng có 'no' + 'hom_nay', tối nay 2 chặng · lỡ 3 ngày sát hạn ⇒ kip:false + canRutPhanLamThem:true (đủ giờ ⇒ kip:true) ·
 // hạn đã qua ⇒ quaHan, gioConLai 0, vẫn liệt kê chặng nợ (đúng biên 14 ngày) · bài đã nộp/thu hồi/xoá/của em khác không hiện · bài không chia chặng · gói gia đình giao chưa xong (biên nửa đêm VN, bỏ bài hằng ngày, biên 14 ngày) ·
 // câu ôn quá lịch (mốc < hôm nay, trạng thái, ≤ 3 ngày, tổng không mất) · khung giờ học thật vs mặc định (biên 19/20 lượt, biên 14 ngày) · giây/câu thật (biên 4/5 mẫu, biên 30 ngày) · ca kiểm tra chặn khoảng giờ
-// (khối, đã xoá/đóng, loại, phạm vi, biên 7 ngày, ca đang diễn ra) · chỉ đọc đúng sbd · ≤ 6 truy vấn, không ghi, không đổi bảng nào · không chữ/khoá của game · thiếu bảng ⇒ giá trị an toàn, lỗi D1 khác vẫn ném.
+// (khối, đã xoá/đóng, loại, phạm vi, biên 7 ngày, ca đang diễn ra) · chỉ đọc đúng sbd · ≤ 7 truy vấn (5 dữ liệu + 1 mốc tính nợ + 1 lùi), không ghi, không đổi bảng nào · không chữ/khoá của game · thiếu bảng ⇒ giá trị an toàn, lỗi D1 khác vẫn ném.
 import { describe, expect, it } from 'vitest'
 import { hopPhamVi } from '../server/src/index'
 import { chuGameTrong } from '../server/src/chu-game'
@@ -23,6 +23,9 @@ function dung(): D1That {
   const d = taoD1That()
   d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,nam_sinh,lop,mat_khau,cap_nhat_luc) VALUES('S1','Nguyễn Thu Hà','2009','12','mk','x')").run()
   d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,nam_sinh,lop,mat_khau,cap_nhat_luc) VALUES('S2','Trần Bình','2009','12','mk','x')").run()
+  // Sửa CÓ CHỦ Ý 21/09 (W3c, mốc tính nợ 12:00 trưa 21/09): các ca dưới đây kiểm luật nợ THUẦN, dữ liệu dựng từ cả ngày trước 21/09 ⇒ đặt mốc hiển thị về xa (2000-01-01) để chúng không bị mốc lọc;
+  // hành vi theo mốc có test riêng ở tests/moc-no-2109.test.ts.
+  d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('hien_thi_tu','2000-01-01','x')").run()
   return d
 }
 
@@ -603,6 +606,7 @@ describe('chỉ đọc đúng sbd: em khác không lọt vào', () => {
     expect(r2.no.tongCau).toBe(150)
     for (const [t, sbd, khac] of [[t1, 'S1', 'S2'], [t2, 'S2', 'S1']] as const) {
       for (const q of t.log) {
+        if (/FROM cau_hinh WHERE khoa IN \(\?, \?, \?\)/.test(q.sql)) continue // sửa CÓ CHỦ Ý 21/09 (W3c): truy vấn MỐC tính nợ là cấu hình CHUNG, không chứa dữ liệu của em nào
         const cacBind = q.bind.filter((x) => typeof x === 'string')
         expect(cacBind, q.sql).toContain(sbd)
         expect(cacBind, q.sql).not.toContain(khac)
@@ -611,16 +615,16 @@ describe('chỉ đọc đúng sbd: em khác không lọt vào', () => {
   })
 })
 
-describe('chỉ đọc: ≤ 6 truy vấn, không ghi, không đổi bảng nào, không đụng bảng game', () => {
-  it('đường thường: 5 truy vấn; không câu ghi nào; mọi bảng nguyên vẹn; không dùng batch', async () => {
+describe('chỉ đọc: ≤ 7 truy vấn, không ghi, không đổi bảng nào, không đụng bảng game', () => {
+  it('đường thường: 6 truy vấn (5 dữ liệu + 1 mốc tính nợ); không câu ghi nào; mọi bảng nguyên vẹn; không dùng batch', async () => {
     const d = dungDay()
     const truoc = BANG.map((b) => d.chup(b))
     const t = theoDoi(d)
     const r = await docVeDichCuaEm(t.env, 'S1', NOW_DAY)
     expect(r.veDich.length).toBeGreaterThan(0) // chống test rỗng
     expect(t.log.length, t.log.map((q) => q.sql).join('\n')).toBeGreaterThanOrEqual(4)
-    expect(t.log.length, t.log.map((q) => q.sql).join('\n')).toBeLessThanOrEqual(6)
-    expect(t.log).toHaveLength(5)
+    expect(t.log.length, t.log.map((q) => q.sql).join('\n')).toBeLessThanOrEqual(7)
+    expect(t.log).toHaveLength(6)
     for (const q of t.log) {
       expect(q.sql, q.sql).not.toMatch(/\b(INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|CREATE|PRAGMA|VACUUM)\b/i)
       expect(q.sql, q.sql).toMatch(/^\s*(SELECT|WITH)\b/i)
@@ -629,12 +633,12 @@ describe('chỉ đọc: ≤ 6 truy vấn, không ghi, không đổi bảng nào,
     expect(BANG.map((b) => d.chup(b))).toEqual(truoc)
     expect(d.soLenh.batch).toBe(0)
   })
-  it('thiếu bảng "nâng đỡ" (btvn_em_cau): lùi một truy vấn, tổng vẫn ≤ 6; bài đọc như một chặng', async () => {
+  it('thiếu bảng "nâng đỡ" (btvn_em_cau): lùi một truy vấn, tổng vẫn ≤ 7; bài đọc như một chặng', async () => {
     const d = dungDay()
     d.sql.exec('DROP TABLE btvn_em_cau')
     const t = theoDoi(d)
     const r = await docVeDichCuaEm(t.env, 'S1', NOW_DAY)
-    expect(t.log.length).toBeLessThanOrEqual(6)
+    expect(t.log.length).toBeLessThanOrEqual(7)
     expect(r.veDich[0]!.chang).toHaveLength(1) // không còn biết chia chặng ⇒ một chặng
     expect(r.no.theoNgay.some((m) => m.loai === 'goi_gia_dinh')).toBe(true) // các phần khác vẫn đủ
   })

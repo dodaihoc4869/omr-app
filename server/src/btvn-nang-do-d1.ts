@@ -704,7 +704,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
   if (!em.chot_luc) return { ok: false, lyDo: 'chua_chot', error: 'Em mở bài trước rồi mới nộp chặng được.' }
   const soChang = soHoac(em.so_chang)
   // ĐIỀU 4 = B (thầy chốt 21/09 14:13): qua hạn em VẪN làm và nộp các chặng còn lại của bài ĐÃ MỞ (đã chốt bộ — kiểm ở trên); lượt nộp cuối ghi nộp trễ (`ghiNopTre`). Hạn nộp KHÔNG đổi; thầy vẫn gia hạn tay được.
-  if (!em.nop_luc && Number.isFinite(Date.parse(chuoi(bt.han_nop))) && now > Date.parse(chuoi(bt.han_nop)) && !(await btvnNopTreBat(env))) return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' } // cờ lùi `btvn_nop_tre = 'tat'`: luật cũ
+  if (!em.nop_luc && Number.isFinite(Date.parse(chuoi(bt.han_nop))) && now > Date.parse(chuoi(bt.han_nop)) && !(await btvnNopTreBat(env, bt.giao_luc))) return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' } // cờ lùi `btvn_nop_tre = 'tat'`: luật cũ
   const chotLuc = chuoi(em.chot_luc)
   const loDaXong = Math.min(soChang, soHoac(em.lo_da_xong))
   if (chiSo === soChang && soChang > 0) return nopThuSucThem(env, bt, em, sbd, dapAnTho, now) // chặng ẢO "thử sức thêm" (bản 1.2): nộp RIÊNG, tới hạn nộp kể cả khi phần bắt buộc đã nộp

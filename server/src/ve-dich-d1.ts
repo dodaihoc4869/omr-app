@@ -23,7 +23,7 @@
 import type { Env } from './kieu'
 import { phutUocTinhChang } from '../../src/lib/btvn-nang-do-lich'
 import {
-  GIO_MUON_NHAT, KHUNG_GIO_HOC_MAC_DINH, SO_NGAY_RAI_ON_TOI_DA, keHoachVeDich, soNo,
+  GIO_MUON_NHAT, KHUNG_GIO_HOC_MAC_DINH, SO_NGAY_RAI_ON_TOI_DA, keHoachVeDich, soNo, trangThaiChangTheoMoc,
   type BaiDangChay, type BuoiVeDich, type GoiGiaDinhChuaXong, type KhoangGio, type KhungGioHoc, type MonNo, type OnQuaLich, type ViecVeDich,
 } from '../../src/lib/ve-dich'
 import { docLichDaLuu, moLucChang, moLucGocChangMoSom } from './btvn-nang-do-chang'
@@ -32,6 +32,7 @@ import { NGAN_SACH_TRAN, NGAY_LIET_KE_QUA_HAN, SO_NGAY_DO_VAN_TOC } from './ho-s
 import { themNgay } from './ho-so-nam-kt'
 import { tinhVanToc } from './ke-hoach-ngay'
 import { ngayVn } from './su-kien-hoc'
+import { baiTuNgayMoc, giaiMocHienThi, KHOA_HIEN_THI_TU, KHOA_MOC_BANG_TIN_NO, KHOA_VE_DICH_TU } from './moc-no'
 
 type Row = Record<string, unknown>
 
@@ -297,7 +298,7 @@ async function docGoi(hoi: Hoi, sbd: string, nowMs: number): Promise<GoiGiaDinhC
   for (const x of r ?? []) {
     const ngay = ngayVn(chuoi(x.created_at))
     if (!ngay || ngay >= homNay || ngay < tuNgay || so(x.question_count) <= 0) continue
-    ra.push({ ngay, soCau: so(x.question_count), ten: tenSach(x.title, 'Bài gia đình giao') })
+    ra.push({ ngay, soCau: so(x.question_count), ten: tenSach(x.title, 'Bài gia đình giao'), taoLuc: chuoi(x.created_at) }) // taoLuc: soNo bỏ gói tạo TRƯỚC mốc tính nợ theo giờ
   }
   return ra
 }
@@ -359,9 +360,15 @@ export async function docVeDichCuaEm(env: Env, sbd: string, nowMs: number = Date
   const dauHomNay = dauNgayVnMs(homNay)
   const dauMai = dauHomNay + MS_NGAY
 
-  const [bai, emVaCa, onQuaLich, goiGiaDinh, soHoc] = await Promise.all([
+  const [bai, emVaCa, onQuaLich, goiGiaDinh, soHoc, cfgMoc] = await Promise.all([
     docBai(hoi, em, nowMs), docEmVaCa(hoi, em, nowMs), docOn(hoi, em, homNay), docGoi(hoi, em, nowMs), docSoHoc(hoi, em, homNay),
+    hoi('SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?)', KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO),
   ])
+  // MỐC TÍNH NỢ (thầy lệnh 21/09 15:52): món nợ có ngày < mốc KHÔNG phải nợ (xem moc-no.ts). Không đọc được cấu hình ⇒ hằng số mặc định.
+  const cauHinh = new Map((cfgMoc ?? []).map((x) => [chuoi(x.khoa), x.gia_tri]))
+  const moc = giaiMocHienThi(cauHinh.get(KHOA_HIEN_THI_TU), cauHinh.get(KHOA_VE_DICH_TU), cauHinh.get(KHOA_MOC_BANG_TIN_NO))
+  const tuNgay = moc.ngayVn
+  const tuLuc = moc.iso
   const giay = tinhVanToc(soHoc.mauGiay).giay
   const khung: KhungGioHoc = khungGioTuLuotTheoGio(soHoc.theoGio) ?? KHUNG_GIO_HOC_MAC_DINH
   const ca = caCuaEm(emVaCa.ca, emVaCa.em, em, nowMs)
@@ -370,6 +377,7 @@ export async function docVeDichCuaEm(env: Env, sbd: string, nowMs: number = Date
   const baiDangChay: BaiDangChay[] = []
   const veDich: BaiVeDich[] = []
   for (const b of bai) {
+    if (!baiTuNgayMoc(b.giaoLuc, tuNgay)) continue // bài giao TRƯỚC ngày mốc: không hiện trong thẻ, không nợ (thầy nói rõ 21/09 15:55)
     const hanMs = Date.parse(b.hanNop)
     if (!Number.isFinite(hanMs)) continue // hạn hỏng: không lập được kế hoạch, cũng không có "quá hạn" để nói
     const ten = tenSach(b.ten, 'Bài tập về nhà')
@@ -381,9 +389,10 @@ export async function docVeDichCuaEm(env: Env, sbd: string, nowMs: number = Date
     c.moLuc.forEach((mo, k) => {
       const ms = Date.parse(mo)
       const hopLe = Number.isFinite(ms)
-      const ngay = hopLe ? ngayVn(ms) : ''
-      // chỉ số < daXong ⇒ xong; mở trước 00:00 hôm nay mà chưa xong ⇒ nợ; mở hôm nay ⇒ hôm nay; mở sau ⇒ sắp tới (mốc hỏng: coi như đã mở hôm nay, không bịa nợ)
-      const trangThai: TrangThaiChangDich = k < c.daXong ? 'xong' : !hopLe ? 'hom_nay' : ms < dauHomNay ? 'no' : ms < dauMai ? 'hom_nay' : 'sap_toi'
+      // chỉ số < daXong ⇒ xong; mở trước 00:00 hôm nay mà chưa xong ⇒ nợ — TRỪ mốc gốc trước NGÀY MỐC tính nợ (thầy lệnh 15:52): chặng ấy vẫn phải làm nhưng là việc "hôm nay", không gắn nhãn nợ;
+      // mở hôm nay ⇒ hôm nay; mở sau ⇒ sắp tới (mốc hỏng: coi như đã mở hôm nay, không bịa nợ)
+      const trangThai: TrangThaiChangDich = k < c.daXong ? 'xong' : !hopLe ? 'hom_nay' : trangThaiChangTheoMoc(ms, { dauHomNay, dauMai, tuNgay, tuLuc })
+      const ngay = hopLe && trangThai === 'hom_nay' && ms < dauHomNay ? homNay : hopLe ? ngayVn(ms) : ''
       chang.push({ chiSo: k, trangThai, ngay })
       if (trangThai !== 'xong') viecConLai.push({ loai: 'chang_btvn', trangThai, maBtvn: b.ma, ten, chiSo: k, ngay, soCau: c.soCau[k]!, phut: phut(c.soCau[k]!), moLuc: mo })
     })
@@ -405,7 +414,7 @@ export async function docVeDichCuaEm(env: Env, sbd: string, nowMs: number = Date
     })
   }
 
-  const theoNgay = soNo({ now: nowMs, baiDangChay, onQuaLich, goiGiaDinh, giayMoiCau: giay })
+  const theoNgay = soNo({ now: nowMs, baiDangChay, onQuaLich, goiGiaDinh, giayMoiCau: giay, tuNgay, tuLuc }) // món trước NGÀY MỐC không phải nợ (ba loại; món đúng ngày mốc giữ)
   return { no: { theoNgay, tongCau: theoNgay.reduce((s, m) => s + m.soCau, 0), tongPhut: theoNgay.reduce((s, m) => s + m.phut, 0) }, veDich }
 }
 

@@ -7,7 +7,8 @@ import { ngayVnCuaMs, trangThaiNopBai } from './canh-bao-thay'
 import { buoiCua, docCauHinhNhac, KHOA_CAU_HINH, KHOA_LAN_CHAY, lanChayKe, thuCua, trongKhung } from './nhac-tu-dong'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { tenLopCuaEm } from './ten-lop'
-import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
+import { docLichDaLuu, moLucChang, moLucGocChangMoSom } from './btvn-nang-do-chang'
+import { baiTuNgayMoc, docMocNo, KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU } from './moc-no'
 import { tenViec } from './nhat-ky-may'
 import { docCoTuDong, KHOA_TU_DONG } from './tu-dong-cac-viec'
 import { docThuThachTuDieuChinh, NGUON_THU_THACH, thuThachDaApTuHang } from './thu-thach-rieng'
@@ -95,20 +96,30 @@ export function docMocBangTin(giaTri: unknown, homNay: string): { tuMs: number; 
  * Đã nộp ⇒ không chậm. Em đã chốt bộ (có `so_chang` + `chot_luc`): số chặng TỚI HẠN = số chặng có mốc "xong đúng nhịp" (`dungNhipTruoc` của lịch đã lưu; bài chốt trước bản 1.1 ⇒ mốc mở chặng KẾ, chặng cuối ⇒ hạn nộp)
  * đã qua; chậm khi `lo_da_xong` < số đó. Em chưa chốt / bài thường (không chặng): chỉ chậm khi QUÁ HẠN mà chưa nộp (em chưa mở bài thì chưa có lịch nên chưa chặng nào tới hạn).
  */
-export function emChamNhip(x: Dong, hanIso: string, hanMs: number, nowMs: number): boolean {
+export function emChamNhip(x: Dong, hanIso: string, hanMs: number, nowMs: number, tuNgay?: string): boolean {
   if (chuoi(x.nop_luc) !== '') return false
   const soChang = so(x.so_chang)
   const chot = chuoi(x.chot_luc)
-  if (soChang <= 0 || chot === '' || !Number.isFinite(Date.parse(chot))) return hanMs <= nowMs
+  // Có `tuNgay` (MỐC TÍNH NỢ, thầy lệnh 21/09 15:52 — dùng cho `nhip.noTheoLop`): việc của ngày TRƯỚC mốc không phải nợ (quá hạn từ ngày trước mốc; chặng có mốc GỐC trước mốc). Vắng ⇒ luật chậm cũ, không đổi một byte.
+  if (soChang <= 0 || chot === '' || !Number.isFinite(Date.parse(chot))) return hanMs <= nowMs && (tuNgay === undefined || ngayVnCuaMs(hanMs) >= tuNgay)
   const lich = docLichDaLuu(x.chang_mo_json, soChang, { chotLuc: chot, hanNop: hanIso, nowMs })
   const moLuc = lich && lich.moLuc.length === soChang ? lich.moLuc : moLucChang(chot, soChang)
   let toiHan = 0
+  const goc = tuNgay === undefined ? null : moLucGocChangMoSom(x.chang_mo_json) // chặng đã MỞ SỚM: phân loại theo mốc gốc của lịch
+  const daXong = so(x.lo_da_xong)
+  let noTuMoc = false
   for (let k = 0; k < soChang; k++) {
     const dn = lich && lich.moLuc.length === soChang ? Date.parse(lich.dungNhipTruoc[k] ?? '') : NaN
     const t = Number.isFinite(dn) ? dn : k + 1 < soChang ? Date.parse(moLuc[k + 1]!) : hanMs
-    if (t <= nowMs) toiHan++
+    if (t <= nowMs) {
+      toiHan++
+      if (tuNgay !== undefined && k >= daXong) {
+        const moGoc = goc!.get(k) ?? Date.parse(moLuc[k]!)
+        if (!Number.isFinite(moGoc) || ngayVnCuaMs(moGoc) >= tuNgay) noTuMoc = true
+      }
+    }
   }
-  return so(x.lo_da_xong) < toiHan
+  return tuNgay === undefined ? daXong < toiHan : noTuMoc
 }
 
 export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.now()): Promise<Dong> {
@@ -130,7 +141,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   }
 
   // 2 · cấu hình: mốc, cờ nhắc, lượt cron nhắc gần nhất
-  const rCfg = await Q.hoi("SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (?, ?, ?, ?, ?)", KHOA_MOC_BANG_TIN, KHOA_CAU_HINH, KHOA_LAN_CHAY, KHOA_TU_DONG, KHOA_SAI_NHANH_GV)
+  const rCfg = await Q.hoi("SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (?, ?, ?, ?, ?, ?, ?)", KHOA_MOC_BANG_TIN, KHOA_CAU_HINH, KHOA_LAN_CHAY, KHOA_TU_DONG, KHOA_SAI_NHANH_GV, KHOA_VE_DICH_TU, KHOA_HIEN_THI_TU)
   const cfg = new Map((rCfg ?? []).map((x) => [chuoi(x.khoa), x]))
   const { tuMs, tuDangAp } = docMocBangTin(cfg.get(KHOA_MOC_BANG_TIN)?.gia_tri, ngay)
   const dauHomNay = dauNgayMs(ngay)
@@ -252,6 +263,8 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const emDaChot = new Set<string>()
   const emTrongBai = new Set<string>() // nhip.btvnDungNhip: em có ≥ 1 bài đang hiện ở baiTap
   const emCham = new Set<string>() // ...và chậm ≥ 1 chặng ở ≥ 1 bài
+  const emNo = new Set<string>() // NỢ: như trên nhưng chỉ tính việc từ NGÀY MỐC tính nợ (moc-no.ts) — cho `nhip.noTheoLop`
+  const tuNgayNo = docMocNo(cfg.get(KHOA_HIEN_THI_TU)?.gia_tri, cfg.get(KHOA_VE_DICH_TU)?.gia_tri, cfg.get(KHOA_MOC_BANG_TIN)?.gia_tri)
   for (const x of rBe ?? []) {
     const ma = chuoi(x.ma_btvn)
     const sbd = chuoi(x.sbd)
@@ -262,6 +275,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     const nop = chuoi(x.nop_luc) !== ''
     emTrongBai.add(sbd)
     if (emChamNhip(x, b.han, b.hanMs, nowMs)) emCham.add(sbd)
+    if (baiTuNgayMoc(b.giaoLuc, tuNgayNo) && emChamNhip(x, b.han, b.hanMs, nowMs, tuNgayNo)) emNo.add(sbd) // bài giao TRƯỚC ngày mốc: không tính nợ
     if (nop) d.daNop++
     else if (st.trangThai === 'chua_mo') d.chuaMo++
     else d.dangLam++
@@ -275,11 +289,11 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   }
   // nhip.btvnDungNhip: tính từ mốc (chỉ các bài đang hiện ở baiTap, tức bài giao từ ngày của mốc); vắng khi không có bài / không đọc được em của bài
   if (rBe && emTrongBai.size > 0) nhip.btvnDungNhip = { dungNhip: emTrongBai.size - emCham.size, tongEm: emTrongBai.size, cham: emCham.size }
-  // DỒN VỀ ĐÍCH: số em ĐANG NỢ (chậm ≥ 1 chặng so với lịch của chính em, hoặc quá hạn chưa nộp) THEO LỚP — dùng đúng tập `emCham` đã tính, KHÔNG thêm truy vấn. Chỉ lớp có ≥ 1 em nợ; xếp giảm dần; vắng ⇒ máy thầy ẩn.
-  if (rBe && emCham.size > 0) {
+  // DỒN VỀ ĐÍCH: số em ĐANG NỢ (chậm ≥ 1 chặng so với lịch của chính em, hoặc quá hạn chưa nộp) THEO LỚP — dùng tập `emNo` (= `emCham` nhưng chỉ tính việc từ NGÀY MỐC tính nợ), KHÔNG thêm truy vấn. Chỉ lớp có ≥ 1 em nợ; xếp giảm dần; vắng ⇒ máy thầy ẩn.
+  if (rBe && emNo.size > 0) {
     const siSo = new Map<string, number>(), no = new Map<string, number>()
     for (const [, e] of em) siSo.set(e.tenLop, (siSo.get(e.tenLop) ?? 0) + 1)
-    for (const sbd of emCham) { const e = em.get(sbd); if (e) no.set(e.tenLop, (no.get(e.tenLop) ?? 0) + 1) }
+    for (const sbd of emNo) { const e = em.get(sbd); if (e) no.set(e.tenLop, (no.get(e.tenLop) ?? 0) + 1) }
     nhip.noTheoLop = [...no].map(([lop, soEmNo]) => ({ lop, siSo: siSo.get(lop) ?? soEmNo, soEmNo })).sort((a, c) => c.soEmNo - a.soEmNo || (a.lop < c.lop ? -1 : 1))
   }
   const luotKe = cfgNhac.bat ? lanChayKe(nowMs, cfgNhac) : undefined
