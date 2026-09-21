@@ -11,6 +11,26 @@ import type { D1PreparedStatement, Env } from '../server/src/kieu'
 /** Duy nhất tệp này phụ thuộc thứ tự (cần `game_v2_settings` dựng trước) — bỏ qua, không dùng tới. */
 const BO_QUA = new Set(['migration-1609-academic-start.sql'])
 
+/**
+ * GIỚI HẠN CỦA D1 THẬT mà node:sqlite không có: TỐI ĐA 5 term trong MỘT truy vấn UNION (thử trên D1 thật 21/09: 5 term chạy, 6 term ⇒ "too many terms in compound SELECT").
+ * Đếm theo TỪNG nhóm ngoặc (truy vấn con có nhóm riêng); bỏ qua chữ trong chuỗi '…', "…", `…` và chú thích. Lệnh vượt ⇒ ném đúng lỗi của D1 khi chạy (first/all/run), như D1 thật.
+ */
+export const D1_TOI_DA_TERM_UNION = 5
+export function demTermUnionToiDa(query: string): number {
+  const s = query.replace(/--[^\n]*/g, ' ').replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/'(?:[^']|'')*'/g, "''").replace(/"(?:[^"]|"")*"/g, '""').replace(/`[^`]*`/g, '``')
+  const ngan: number[] = [0]
+  let toiDa = 1
+  const chot = (n: number) => { if (n + 1 > toiDa) toiDa = n + 1 }
+  const re = /\(|\)|\bUNION\b/gi
+  for (let m = re.exec(s); m; m = re.exec(s)) {
+    if (m[0] === '(') ngan.push(0)
+    else if (m[0] === ')') { chot(ngan.pop() ?? 0); if (ngan.length === 0) ngan.push(0) }
+    else ngan[ngan.length - 1]!++
+  }
+  for (const n of ngan) chot(n)
+  return toiDa
+}
+
 export function taoD1That() {
   const sql = new DatabaseSync(':memory:')
   const tep = ['schema.sql', ...readdirSync('server').filter((f) => /^migration-.*\.sql$/.test(f)).sort()]
@@ -36,18 +56,22 @@ export function taoD1That() {
   function prepare(query: string): D1PreparedStatement {
     soLenh.prepare++
     let values: unknown[] = []
+    const kiemTerm = () => { if (demTermUnionToiDa(query) > D1_TOI_DA_TERM_UNION) throw new Error('D1_ERROR: too many terms in compound SELECT: SQLITE_ERROR') }
     const st: D1PreparedStatement = {
       bind(...a: unknown[]) {
         values = a
         return st
       },
       async first<T>() {
+        kiemTerm()
         return (sql.prepare(query).get(...(values as never[])) ?? null) as T | null
       },
       async all<T>() {
+        kiemTerm()
         return { results: sql.prepare(query).all(...(values as never[])) as T[], success: true, meta: { changes: 0, last_row_id: 0, rows_read: 0, rows_written: 0 } }
       },
       async run<T>() {
+        kiemTerm()
         const r = sql.prepare(query).run(...(values as never[]))
         return { results: [] as T[], success: true, meta: { changes: Number(r.changes), last_row_id: Number(r.lastInsertRowid), rows_read: 0, rows_written: Number(r.changes) } }
       },

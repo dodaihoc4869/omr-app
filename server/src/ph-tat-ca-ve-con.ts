@@ -215,8 +215,9 @@ export function lichChangCuaEm(chuoiLich: unknown, soChang: number, loDaXong: nu
 interface PhanHoSo { bang: string; batBuoc: boolean; sql: string; bind: (sbd: string, homNay: string) => unknown[] }
 const PHAN_HO_SO: PhanHoSo[] = [
   { bang: 'hoc_sinh', batBuoc: true, sql: "SELECT 'em' AS k, ho_ten AS a, lop AS b, NULL AS c FROM hoc_sinh WHERE sbd = ?", bind: (s) => [s] },
-  { bang: 'cau_hinh', batBuoc: true, sql: "SELECT 'cfg', gia_tri, NULL, NULL FROM cau_hinh WHERE khoa = 'bo_nao'", bind: () => [] },
-  { bang: 'cau_hinh', batBuoc: true, sql: "SELECT 'moc', khoa, gia_tri, NULL FROM cau_hinh WHERE khoa IN ('hien_thi_tu', 've_dich_tu', 'bang_tin_tu')", bind: () => [] }, // mốc hiển thị: chung truy vấn gộp
+  // MỘT term cho cả cấu hình Bộ não ('cfg': a = gia_tri) lẫn ba khoá mốc hiển thị ('moc': a = khoa, b = gia_tri): D1 CHỈ cho tối đa 5 term trong một truy vấn UNION (term thứ 6 ⇒ "too many terms in compound SELECT",
+  // /ph/tat-ca-ve-con trả 500 trên D1 thật lúc 16:19–16:5x 21/09). Hàng trả ra Y HỆT khi tách hai term.
+  { bang: 'cau_hinh', batBuoc: true, sql: "SELECT CASE WHEN khoa = 'bo_nao' THEN 'cfg' ELSE 'moc' END, CASE WHEN khoa = 'bo_nao' THEN gia_tri ELSE khoa END, CASE WHEN khoa = 'bo_nao' THEN NULL ELSE gia_tri END, NULL FROM cau_hinh WHERE khoa IN ('bo_nao', 'hien_thi_tu', 've_dich_tu', 'bang_tin_tu')", bind: () => [] },
   { bang: 'ph_giao_them', batBuoc: false, sql: "SELECT 'gt', COUNT(*), NULL, NULL FROM ph_giao_them WHERE sbd = ? AND ngay_vn = ?", bind: (s, n) => [s, n] },
   { bang: 'ke_hoach_ngay', batBuoc: false, sql: "SELECT 'kh', ngan_sach_json, viec_json, la_ngay_nghi FROM ke_hoach_ngay WHERE sbd = ? AND ngay = ?", bind: (s, n) => [s, n] },
   { bang: 'nam_kt_cau', batBuoc: false, sql: "SELECT 'cau', qid, ma_dang, chuyen_de FROM nam_kt_cau WHERE sbd = ?", bind: (s) => [s] },

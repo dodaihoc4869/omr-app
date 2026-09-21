@@ -372,7 +372,9 @@ const chuThoiGian = (giay: number): string => {
 /** Mức chấm điểm nhịp học 30 ngày: 0 không làm · 1 (1–4 câu) · 2 (5–14) · 3 (≥ 15). */
 export const mucNhip = (soCau: number): 0 | 1 | 2 | 3 => (soCau <= 0 ? 0 : soCau <= 4 ? 1 : soCau <= 14 ? 2 : 3)
 
+// D1 THẬT chỉ cho TỐI ĐA 5 term trong MỘT truy vấn UNION (6 term ⇒ "too many terms in compound SELECT" ⇒ khối dòng thời gian VẮNG khi có nhánh canh_bao_thay): ba term đầu gói trong một truy vấn con (mỗi nhóm ngoặc đếm riêng).
 const DONG_THOI_GIAN = (coCanhBao: boolean) => `
+  SELECT luc, loai, ma, ten, n1, n2, n3, n4, txt FROM (
   SELECT l.nop_luc AS luc, 'ca' AS loai, l.ma_ca AS ma, COALESCE(c.ten_ca, '') AS ten, l.tong AS n1, l.so_lan_roi_man AS n2, l.tong_giay_roi_man AS n3,
          CAST(ROUND((julianday(l.nop_luc) - julianday(l.vao_luc)) * 1440) AS INTEGER) AS n4, '' AS txt
     FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca WHERE l.sbd = ? AND l.nop_luc IS NOT NULL AND l.ma_ca NOT LIKE 'BTVN%'
@@ -381,6 +383,7 @@ const DONG_THOI_GIAN = (coCanhBao: boolean) => `
          s.ma_nguon, s.nguon, COUNT(*), SUM(s.ket_qua), SUM(COALESCE(s.giay, 0)), 0, ''
     FROM su_kien_hoc s WHERE s.sbd = ? AND s.nguon NOT IN ('thi', 'len_bang') GROUP BY s.nguon, s.ma_nguon, s.ngay_vn
   UNION ALL SELECT luc, 'len_bang', qid, COALESCE(chuyen_de, ''), COALESCE(dat, 0), 0, 0, 0, '' FROM len_bang WHERE sbd = ?
+  )
   UNION ALL SELECT MAX(luc), 'exp', ngay_vn, '', SUM(exp), COUNT(*), 0, 0, '' FROM exp_so WHERE sbd = ? GROUP BY ngay_vn
   UNION ALL SELECT COALESCE(nop_luc, ngay || 'T05:00:00.000Z'), 'bo_nao', ngay, COALESCE(che_do, ''), 0, 0, 0, 0, COALESCE(json, '') FROM ai_dieu_chinh WHERE sbd = ? AND COALESCE(huy, 0) = 0 AND COALESCE(json_extract(json, '$.luot'), '') <> 'chieu'
   ${coCanhBao ? "UNION ALL SELECT gui_luc, 'canh_bao', id, ma_btvn, CASE WHEN em_xem_luc IS NULL THEN 0 ELSE 1 END, CASE WHEN ph_xem_luc IS NULL THEN 0 ELSE 1 END, 0, 0, loi_em FROM canh_bao_thay WHERE sbd = ?" : ''}`
