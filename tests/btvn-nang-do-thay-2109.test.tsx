@@ -6,7 +6,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { CauGiao, TomTatBo } from '../src/lib/btvn-nang-do'
 import type { TeacherExamSource } from '../src/data/examContent'
-import { EM_MOI_LUOT, GHIM_TOI_DA, canhBaoTuMayChu, hanMacDinhVN, maDangCuaThay, mucSo, nhanCuaCau, taoCauGiao, taoHatGiong } from '../src/lib/btvn-nang-do-thay'
+import { EM_MOI_LUOT, GHIM_TOI_DA, canhBaoTuMayChu, gioMoChang, hanMacDinhVN, maDangCuaThay, mucSo, nhanCuaCau, taoCauGiao, taoHatGiong } from '../src/lib/btvn-nang-do-thay'
 import KhoiCaNhanHoa from '../src/components/KhoiCaNhanHoa'
 import XemTruocPhanBo from '../src/components/XemTruocPhanBo'
 
@@ -60,6 +60,21 @@ describe('taoCauGiao — câu của các tờ đề đã tick, kèm dạng/mức
     expect(c[2]).toContain('4 câu máy thầy không gửi được nhãn')
     expect(canhBaoTuMayChu({ canhBao: 'la' })).toEqual([]) // cảnh báo lạ ⇒ không đoán
   })
+  it('gioMoChang: giờ VN "20:00"; khác ngày với chặng đầu thì kèm ngày "25/09 20:00"; ISO hỏng ⇒ rỗng', () => {
+    expect(gioMoChang('2026-09-22T13:00:00Z')).toBe('20:00') // 20:00 giờ VN
+    expect(gioMoChang('2026-09-22T14:20:00Z', '2026-09-22T13:00:00Z')).toBe('21:20')
+    expect(gioMoChang('2026-09-22T16:59:00Z', '2026-09-22T13:00:00Z')).toBe('23:59')
+    expect(gioMoChang('2026-09-24T13:00:00Z', '2026-09-22T13:00:00Z')).toBe('24/09 20:00')
+    expect(gioMoChang('2026-09-22T17:30:00Z', '2026-09-22T13:00:00Z')).toBe('23/09 00:30') // qua nửa đêm giờ VN = ngày khác
+    expect(gioMoChang('không phải ngày')).toBe('')
+  })
+  it('hạn NGẮN: cảnh báo "Hạn ngắn: mỗi em tối thiểu N câu lõi trong M phiên — cân nhắc lùi hạn." đứng đầu; thiếu/0 ⇒ không cảnh báo', () => {
+    expect(canhBaoTuMayChu({ canhBaoHanNgan: { soCauLoiToiThieu: 12, soPhien: 3 } })).toEqual(['Hạn ngắn: mỗi em tối thiểu 12 câu lõi trong 3 phiên — cân nhắc lùi hạn.'])
+    const c = canhBaoTuMayChu({ canhBaoHanNgan: { soCauLoiToiThieu: 12, soPhien: 3 }, canhBao: 'loi_it_hon_6', soLoi: 3 })
+    expect(c[0]).toContain('Hạn ngắn:')
+    expect(c[1]).toContain('Lõi chung chỉ có 3 câu')
+    expect(canhBaoTuMayChu({ canhBaoHanNgan: null })).toEqual([])
+  })
   it('mucSo / maDangCuaThay / nhãn câu', () => {
     expect([mucSo('biet'), mucSo('hieu'), mucSo('van_dung'), mucSo(undefined), mucSo('x')]).toEqual([0, 1, 2, 0, 0])
     expect(maDangCuaThay({ dang: 'D1', chuyenDe: 'Ester' })).toBe('D1')
@@ -102,13 +117,24 @@ describe('xemTruocPhanBo + giaoBtvn — hợp đồng máy chủ, không giả s
     expect(kq).toMatchObject({ hatGiong: 'gHAT', soCauBai: 80, soLoi: 26, loi: ['Q1', 'Q2'] })
     expect(kq.ds).toHaveLength(1) // dòng thiếu sbd / tomTat bị bỏ
     expect(kq.ds[0]).toMatchObject({ sbd: '1', coHoSo: false, daChot: false })
-    expect(kq.chiTiet).toEqual({ sbd: '1', chang: [['Q1', 'Q2'], ['Q3']], nhan: { Q1: 'loi' } })
+    expect(kq.chiTiet).toEqual({ sbd: '1', chang: [['Q1', 'Q2'], ['Q3']], nhan: { Q1: 'loi' }, lich: [], theoGio: false }) // máy chủ chưa trả lịch ⇒ rỗng, không theo giờ
   })
   it('xem trước "trước khi giao": đọc canhBao / boQuaQid / thieuMeta; vắng ⇒ rỗng (không bịa)', async () => {
     stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, soLoi: 3, canhBao: 'loi_it_hon_6', boQuaQid: ['Z1', 5], thieuMeta: 2, ds: [] }) }))
     expect(await chay()).toMatchObject({ canhBao: 'loi_it_hon_6', boQuaQid: ['Z1', '5'], thieuMeta: 2 })
     stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, ds: [] }) }))
     expect(await chay()).toMatchObject({ canhBao: null, boQuaQid: [], thieuMeta: 0 })
+  })
+  it('xem trước bản 1.1: đọc chiTiet.lich + theoGio + canhBaoHanNgan (dạng trường Code 3 chốt); bỏ mốc hỏng; vắng ⇒ như cũ', async () => {
+    stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, ds: [], canhBaoHanNgan: { soCauLoiToiThieu: 12, soPhien: 3 }, chiTiet: { sbd: '1', chang: [['Q1'], ['Q2']], nhan: {}, theoGio: true, lich: [{ chiSo: 0, moLuc: '2026-09-22T13:00:00Z', soCau: 8 }, { chiSo: 1, moLuc: 'hỏng', soCau: 7 }, { chiSo: 2, moLuc: '2026-09-22T14:20:00Z', soCau: 7 }] } }) }))
+    const kq = await chay({ sbdChiTiet: '1' })
+    expect(kq.canhBaoHanNgan).toEqual({ soCauLoiToiThieu: 12, soPhien: 3 })
+    expect(kq.chiTiet!.theoGio).toBe(true)
+    expect(kq.chiTiet!.lich).toEqual([{ chiSo: 0, moLuc: '2026-09-22T13:00:00Z', soCau: 8 }, { chiSo: 2, moLuc: '2026-09-22T14:20:00Z', soCau: 7 }])
+    stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, ds: [], canhBaoHanNgan: { soCauLoiToiThieu: 0, soPhien: 0 }, chiTiet: { sbd: '1', chang: [['Q1']], nhan: {} } }) }))
+    const cu = await chay({ sbdChiTiet: '1' })
+    expect(cu.canhBaoHanNgan).toBeNull()
+    expect(cu.chiTiet).toMatchObject({ theoGio: false, lich: [] })
   })
   it('không xin chi tiết thì thân KHÔNG có sbdChiTiet; tối đa 50 em mỗi lượt (cắt ở nguồn)', async () => {
     stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, ds: [] }) }))
@@ -271,6 +297,24 @@ describe('XemTruocPhanBo — bảng từng em + danh sách câu', () => {
     m.xemTruoc.mockResolvedValue({ ...KQ, canhBao: null, boQuaQid: [], thieuMeta: 0 })
     const { container: c2 } = dung()
     await screen.findByRole('button', { name: /Trần Thu Hà/ })
+    expect(c2.querySelector('[data-khoi="canh-bao-may-chu"]')).toBeNull()
+  })
+
+  it('LỊCH CHẶNG THEO GIỜ (hạn ngắn): "Chặng 1 · 20:00 · 2 câu", "Chặng 2 · 21:20 · 3 câu" + cảnh báo Hạn ngắn; hạn dài (theoGio=false) ⇒ KHÔNG hiện giờ, như cũ', async () => {
+    const lich = [{ chiSo: 0, moLuc: '2026-09-22T13:00:00Z', soCau: 2 }, { chiSo: 1, moLuc: '2026-09-22T14:20:00Z', soCau: 3 }]
+    m.xemTruoc.mockResolvedValue({ ...KQ, canhBaoHanNgan: { soCauLoiToiThieu: 12, soPhien: 3 }, chiTiet: { ...CT, theoGio: true, lich } })
+    const { container } = dung()
+    await screen.findByRole('button', { name: /Trần Thu Hà/ })
+    const ten = () => [...container.querySelectorAll('.bn-tp-chang-ten')].map((h) => h.textContent)
+    await waitFor(() => expect(ten()).toEqual(['Chặng 1 · 20:00 · 2 câu', 'Chặng 2 · 21:20 · 3 câu']))
+    expect(container.querySelector('[data-khoi="canh-bao-may-chu"]')!.textContent).toContain('Hạn ngắn: mỗi em tối thiểu 12 câu lõi trong 3 phiên — cân nhắc lùi hạn.')
+    expect(container.querySelector('[data-khoi="lich-theo-gio"]')).toBeTruthy()
+    cleanup()
+    m.xemTruoc.mockResolvedValue({ ...KQ, chiTiet: { ...CT, theoGio: false, lich } })
+    const { container: c2 } = dung()
+    await screen.findByRole('button', { name: /Trần Thu Hà/ })
+    await waitFor(() => expect([...c2.querySelectorAll('.bn-tp-chang-ten')].map((h) => h.textContent)).toEqual(['Chặng 1 · 2 câu', 'Chặng 2 · 3 câu']))
+    expect(c2.querySelector('[data-khoi="lich-theo-gio"]')).toBeNull()
     expect(c2.querySelector('[data-khoi="canh-bao-may-chu"]')).toBeNull()
   })
 

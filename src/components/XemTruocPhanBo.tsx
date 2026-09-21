@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import type { CauGiao } from '../lib/btvn-nang-do'
-import { EM_MOI_LUOT, TEN_MUC, canhBaoTuMayChu, nhanCuaCau, xemTruocPhanBo, type ChiTietEmXemTruoc, type DauVaoXemTruoc, type EmXemTruoc } from '../lib/btvn-nang-do-thay'
+import { EM_MOI_LUOT, TEN_MUC, canhBaoTuMayChu, gioMoChang, nhanCuaCau, xemTruocPhanBo, type ChiTietEmXemTruoc, type DauVaoXemTruoc, type EmXemTruoc } from '../lib/btvn-nang-do-thay'
 import '../screens/btvn-nang-do-m3.css'
 
 /** XEM TRƯỚC PHÂN BỔ (bản vẽ docs/ban-ve-btvn-nang-do-2109/2-xem-truoc-phan-bo.jpg, thầy duyệt 21/09): tấm phủ toàn màn — bảng từng em (tổng · lõi/riêng · bậc Biết/Hiểu/Vận dụng · số
@@ -217,10 +217,17 @@ export default function XemTruocPhanBo({
                 {em.tomTat.tong} câu · {em.tomTat.soChang} chặng · lõi {em.tomTat.soLoi} + riêng {em.tomTat.soRieng} · thử thách {em.tomTat.soThuThach}
               </p>
               {!ct && dangTaiCT && <p className="bn-phu">Đang tải danh sách câu…</p>}
-              {ct?.chang.map((qids, i) => (
+              {ct?.theoGio && (
+                <p className="bn-phu" data-khoi="lich-theo-gio">
+                  Hạn ngắn — các chặng chia theo GIỜ trong cửa sổ học 20:00–23:59 (giờ Việt Nam); em vào muộn vẫn làm được, mốc đã qua thì chặng mở ngay khi chặng trước xong.
+                </p>
+              )}
+              {ct?.chang.map((qids, i) => {
+                const mo = ct.theoGio ? (ct.lich.find((l) => l.chiSo === i) ?? ct.lich[i]) : undefined
+                return (
                 <div key={i} className="bn-tp-chang-khoi">
                   <h4 className="bn-tp-chang-ten">
-                    Chặng {i + 1} <small>· {qids.length} câu</small>
+                    Chặng {i + 1} <small>· {mo ? `${gioMoChang(mo.moLuc, ct.lich[0]?.moLuc)} · ` : ''}{qids.length} câu</small>
                   </h4>
                   {qids.map((qid) => {
                     const nh = nhanCuaCau(ct.nhan[qid])
@@ -235,7 +242,8 @@ export default function XemTruocPhanBo({
                     )
                   })}
                 </div>
-              ))}
+                )
+              })}
             </section>
           )}
         </div>
