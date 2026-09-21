@@ -6,7 +6,7 @@ import './TungCau.css'
 import { ChemText } from '../../../lib/chem-format'
 import { taiChiTietCau } from '../../../lib/ph-moi/api'
 import { chuThoiGian, gioVn } from '../../../lib/ph-moi/dinh-dang'
-import type { CauChe, CauHomNay, CauThuong, ChiTietCau, PhMoi } from '../../../lib/ph-moi/du-lieu'
+import type { CauChe, CauHomNay, CauThuong, ChiTietCau, LyDoChe, PhMoi } from '../../../lib/ph-moi/du-lieu'
 import { CHU_CHE, NHAN_NGUON } from '../nhan'
 import { BtCheo, BtDongHo, BtKhoa, BtMui, BtMuiXuong, BtTich } from './bieu-tuong'
 import { Chip } from './dung-chung'
@@ -61,8 +61,21 @@ export interface TungCauProps {
   lanBay?: string | null
 }
 
-export function TungCau({ pm, nhom, sbd, nhomMo, batMo, dongMo, lanBay }: TungCauProps) {
+/** Câu thường bị máy chủ từ chối chi tiết vì "bài chưa nộp / chưa công bố" ⇒ chuyển sang dạng CHE (không đúng/sai, không đáp án). */
+const cheHoa = (c: CauThuong, lyDo: LyDoChe): CauChe => ({ kieu: 'che', luc: c.luc, nguon: c.nguon, che: lyDo, giay: c.giay, lamLau: c.lamLau, lan: c.lan })
+/** Lời từ chối của chi tiết câu thuộc loại che? (`che` của máy chủ, hoặc lời "chưa nộp / chưa công bố" cho bản máy chủ cũ chưa gửi `che`.) */
+export function lyDoCheCuaTuChoi(ct: Extract<ChiTietCau, { kieu: 'tu_choi' }>): LyDoChe | null {
+  if (ct.che) return ct.che
+  return /chưa công bố/i.test(ct.chu) ? 'chua_cong_bo' : /chưa nộp/i.test(ct.chu) ? 'chua_nop' : null
+}
+
+export function TungCau({ pm, nhom: nhomGoc, sbd, nhomMo, batMo, dongMo, lanBay }: TungCauProps) {
   const [loc, setLoc] = useState<LocCau>('tat-ca')
+  // LƯỚI AN TOÀN (Boss 21/09): chi tiết một câu bị từ chối kiểu "chưa nộp / chưa công bố" ⇒ dòng câu ấy CHUYỂN NGAY sang dạng che trong phiên (ẩn đúng/sai + đáp án đã hiện ở danh sách), kể cả khi máy chủ (bản cũ) đã lỡ gửi câu thường.
+  const [daChe, setDaChe] = useState<ReadonlyMap<string, LyDoChe>>(() => new Map())
+  const cheCau = useCallback((qid: string, lyDo: LyDoChe) => setDaChe((m) => (m.has(qid) ? m : new Map(m).set(qid, lyDo))), [])
+  const daCheHoa = useCallback((c: CauHomNay): CauHomNay => (c.kieu === 'thuong' && daChe.has(c.qid) ? cheHoa(c, daChe.get(c.qid)!) : c), [daChe])
+  const nhom = useMemo(() => (daChe.size === 0 ? nhomGoc : nhomGoc.map((n) => (n.cau.some((c) => c.kieu === 'thuong' && daChe.has(c.qid)) ? { ...n, cau: n.cau.map(daCheHoa) } : n))), [nhomGoc, daChe, daCheHoa])
   const [duNhom, setDuNhom] = useState<ReadonlySet<string>>(() => new Set())
   const kho: Kho = useRef(new Map<string, ChiTietCau>())
 
@@ -77,7 +90,7 @@ export function TungCau({ pm, nhom, sbd, nhomMo, batMo, dongMo, lanBay }: TungCa
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lanBay])
 
-  const tatCa = pm.cau
+  const tatCa = daChe.size === 0 ? pm.cau : pm.cau ? pm.cau.map(daCheHoa) : pm.cau
   if (!tatCa || tatCa.length === 0) return null
   const thuong = tatCa.filter((c): c is CauThuong => c.kieu === 'thuong')
   const dem = { 'tat-ca': tatCa.length, sai: tatCa.filter(laSai).length, 'lam-lau': tatCa.filter(laLamLauThuong).length, che: tatCa.filter(laChe).length }
@@ -139,14 +152,14 @@ export function TungCau({ pm, nhom, sbd, nhomMo, batMo, dongMo, lanBay }: TungCa
         {nhom
           .filter((n) => hienTheoLoc(n, locHieu))
           .map((n) => (
-            <KhoiNhom key={n.id} n={n} loc={locHieu} sbd={sbd} kho={kho} dangMo={nhomMo.has(n.id)} hienDu={duNhom.has(n.id)} bay={lanBay === n.id} batMo={batMo} thuGon={thuGon} moHet={moHet} />
+            <KhoiNhom key={n.id} n={n} loc={locHieu} sbd={sbd} kho={kho} dangMo={nhomMo.has(n.id)} hienDu={duNhom.has(n.id)} bay={lanBay === n.id} batMo={batMo} thuGon={thuGon} moHet={moHet} cheCau={cheCau} />
           ))}
       </div>
     </section>
   )
 }
 
-function KhoiNhom({ n, loc, sbd, kho, dangMo, hienDu, bay, batMo, thuGon, moHet }: { n: NhomCau; loc: LocCau; sbd: string; kho: Kho; dangMo: boolean; hienDu: boolean; bay: boolean; batMo: (id: string) => void; thuGon: (id: string) => void; moHet: (id: string) => void }) {
+function KhoiNhom({ n, loc, sbd, kho, dangMo, hienDu, bay, batMo, thuGon, moHet, cheCau }: { n: NhomCau; loc: LocCau; sbd: string; kho: Kho; dangMo: boolean; hienDu: boolean; bay: boolean; batMo: (id: string) => void; thuGon: (id: string) => void; moHet: (id: string) => void; cheCau: (qid: string, lyDo: LyDoChe) => void }) {
   const idTieuDe = `${n.id}-h`
   // Nhóm bị che: MỘT dòng khoá + dải ô che, không dòng câu, không nút mở.
   if (laNhomChe(n)) {
@@ -205,7 +218,7 @@ function KhoiNhom({ n, loc, sbd, kho, dangMo, hienDu, bay, batMo, thuGon, moHet 
         {dangMo ? (
           <>
             <ul id={idDs}>
-              {hien.map(({ c, i }) => (c.kieu === 'che' ? <DongCauChe key={`${c.luc}|${i}`} c={c} /> : <DongCauThuong key={`${c.luc}|${i}`} c={c} sbd={sbd} kho={kho} />))}
+              {hien.map(({ c, i }) => (c.kieu === 'che' ? <DongCauChe key={`${c.luc}|${i}`} c={c} /> : <DongCauThuong key={`${c.luc}|${i}`} c={c} sbd={sbd} kho={kho} cheCau={cheCau} />))}
             </ul>
             {con > 0 && (
               <button type="button" className="phm-them" data-vung="hien-du" onClick={() => moHet(n.id)}>
@@ -252,7 +265,7 @@ function DongCauChe({ c }: { c: CauChe }) {
   )
 }
 
-function DongCauThuong({ c, sbd, kho }: { c: CauThuong; sbd: string; kho: Kho }) {
+function DongCauThuong({ c, sbd, kho, cheCau }: { c: CauThuong; sbd: string; kho: Kho; cheCau: (qid: string, lyDo: LyDoChe) => void }) {
   const uid = useId()
   const [mo, setMo] = useState(false)
   const [ct, setCt] = useState<ChiTietCau | null>(() => (c.qid ? (kho.current.get(c.qid) ?? null) : null))
@@ -274,6 +287,11 @@ function DongCauThuong({ c, sbd, kho }: { c: CauThuong; sbd: string; kho: Kho })
     setDang(false)
     if (r.kieu === 'ok') {
       if (r.ct.kieu === 'ok') kho.current.set(c.qid, r.ct)
+      else {
+        // Máy chủ nói câu này thuộc bài chưa nộp / chưa công bố ⇒ danh sách KHÔNG được giữ đúng/sai + đáp án của câu ấy (lưới an toàn cho bản máy chủ cũ).
+        const lyDo = lyDoCheCuaTuChoi(r.ct)
+        if (lyDo) cheCau(c.qid, lyDo)
+      }
       setCt(r.ct)
     } else setLoi(r.chu)
   }

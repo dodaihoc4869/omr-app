@@ -570,6 +570,41 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     expect(r2.textContent).not.toMatch(/\{"/)
   })
 
+  it('LƯỚI AN TOÀN (Boss 21/09): chi tiết một câu bị từ chối "chưa nộp / chưa công bố" ⇒ dòng câu ấy CHUYỂN NGAY sang dạng che trong phiên — hết Đúng/Sai + Đáp án + Con chọn, không mở được nữa; đếm bộ lọc và tóm tắt nhóm cập nhật; câu khác giữ nguyên; từ chối kiểu khác (lỗi mạng, không có lời giải) KHÔNG che', async () => {
+    goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: { kieu: 'tu_choi', chu: 'Bài này con chưa nộp nên chưa xem được lời giải.', che: null } })
+    const { container, hang } = moMotCau()
+    const truoc = hang()
+    const n = truoc.length
+    const r1 = truoc[1]! // câu sai (con chọn A, đáp án B)
+    expect(r1.textContent).toMatch(/Sai/)
+    expect(r1.textContent).toMatch(/Đáp án/)
+    const nhomEl = r1.closest('.phm-nhom') as HTMLElement
+    const saiTruoc = container.querySelector('.phm-seg')!.textContent
+    fireEvent.click(r1.querySelector('button')!)
+    await waitFor(() => expect(nhomEl.querySelectorAll('[data-vung="cau-che"]').length).toBeGreaterThan(0))
+    const sau = [...nhomEl.querySelectorAll('li.phm-cau')]
+    expect(sau).toHaveLength(n)
+    const che = nhomEl.querySelector('[data-vung="cau-che"]') as HTMLElement
+    expect(che.textContent).not.toMatch(/Sai|Đúng|Đáp án|Con chọn/)
+    expect(che.querySelector('button, .phm-mo, .phm-pa, .phm-loi-giai')).toBeNull() // không mở được, không phương án/lời giải
+    expect(container.querySelector('.phm-seg')!.textContent).not.toBe(saiTruoc) // đếm "Sai" / "Chưa công bố" đã đổi
+    // từ chối KHÔNG phải kiểu che ⇒ không che
+    cleanup()
+    goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: { kieu: 'tu_choi', chu: 'Chưa xem được lời giải của câu này.', che: null } })
+    const b2 = moMotCau()
+    const q1 = b2.hang()[1]!
+    fireEvent.click(q1.querySelector('button')!)
+    await waitFor(() => expect(q1.textContent).toContain('Chưa xem được lời giải của câu này.'))
+    expect(b2.container.querySelectorAll('[data-vung="cau-che"]').length).toBe(0)
+    expect(q1.textContent).toMatch(/Sai/)
+    // máy chủ mới gửi `che` rõ ràng: nhận luôn
+    cleanup()
+    goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: { kieu: 'tu_choi', chu: 'Chưa xem được.', che: 'chua_cong_bo' } })
+    const b3 = moMotCau()
+    fireEvent.click(b3.hang()[1]!.querySelector('button')!)
+    await waitFor(() => expect(b3.container.querySelectorAll('[data-vung="cau-che"]').length).toBeGreaterThan(0))
+  })
+
   it('phương án: "Đáp án đúng" ở B; "Con chọn" đỏ ở A (con chọn sai); lời giải ngắn từ máy chủ; đề đầy đủ của máy chủ thay đề rút gọn', async () => {
     goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: CT_OK })
     const { hang } = moMotCau()
@@ -645,18 +680,39 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     expect(goiChiTiet).toHaveBeenCalledTimes(2)
   })
 
-  it('máy chủ TỪ CHỐI (chưa công bố điểm) ⇒ hiện đúng câu của máy chủ, KHÔNG phương án, KHÔNG lời giải, KHÔNG đáp án thêm', async () => {
+  it('máy chủ TỪ CHỐI kiểu che (chưa công bố điểm) ⇒ dòng câu chuyển NGAY sang dạng che (lưới an toàn): không phương án, không lời giải, không đúng/sai/đáp án, không mở lại được', async () => {
     goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: { kieu: 'tu_choi', chu: 'Ca này chưa công bố điểm nên chưa xem được lời giải.', che: 'chua_cong_bo' } })
+    const { container, hang } = moMotCau()
+    const r0 = hang()[0]!
+    const nhomEl = r0.closest('.phm-nhom') as HTMLElement
+    const soCheTruoc = nhomEl.querySelectorAll('[data-vung="cau-che"]').length
+    fireEvent.click(r0.querySelector('button')!)
+    await waitFor(() => expect(nhomEl.querySelectorAll('[data-vung="cau-che"]').length).toBe(soCheTruoc + 1))
+    expect(goiChiTiet).toHaveBeenCalledTimes(1)
+    expect(nhomEl.querySelector('.phm-pa, .phm-loi-giai, [role="alert"]')).toBeNull()
+    expect(container.querySelector('[data-vung="cau-che"]')!.querySelector('button')).toBeNull()
+  })
+
+  it('từ chối KHÁC (không phải che): hiện đúng lời của máy chủ, KHÔNG phương án/lời giải; mở lại thì hỏi lại', async () => {
+    goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: { kieu: 'tu_choi', chu: 'Chưa xem được lời giải của câu này.', che: null } })
     const { hang } = moMotCau()
     const r0 = hang()[0]!
     fireEvent.click(r0.querySelector('button')!)
     await waitFor(() => expect(r0.querySelector('[role="alert"]')).toBeTruthy())
-    expect(r0.querySelector('[role="alert"]')!.textContent).toBe('Ca này chưa công bố điểm nên chưa xem được lời giải.')
+    expect(r0.querySelector('[role="alert"]')!.textContent).toBe('Chưa xem được lời giải của câu này.')
     expect(r0.querySelector('.phm-pa, .phm-loi-giai')).toBeNull()
     fireEvent.click(r0.querySelector('button')!)
     fireEvent.click(r0.querySelector('button')!)
     await act(async () => {})
-    expect(goiChiTiet).toHaveBeenCalledTimes(2) // bị từ chối: mở lại thì hỏi lại (điểm có thể vừa được công bố)
+    expect(goiChiTiet).toHaveBeenCalledTimes(2)    // lời có chữ "nộp" nhưng KHÔNG phải "chưa nộp" ⇒ không che nhầm
+    cleanup()
+    goiChiTiet.mockReset()
+    goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: { kieu: 'tu_choi', chu: 'Câu này chưa có lời giải, thầy sẽ bổ sung sau khi con nộp bài kế tiếp.', che: null } })
+    const b2 = moMotCau()
+    const q0 = b2.hang()[0]!
+    fireEvent.click(q0.querySelector('button')!)
+    await waitFor(() => expect(q0.querySelector('[role="alert"]')).toBeTruthy())
+    expect(b2.container.querySelector('[data-vung="cau-che"]')).toBeNull()
   })
 
   it('câu KHÔNG có mã (qid) ⇒ mở được nhưng không hỏi máy chủ, không phương án/lời giải, chỉ ghi chú', () => {
