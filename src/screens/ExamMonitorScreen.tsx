@@ -6,7 +6,8 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BANG_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
+import { BANG_NHIP_THAY, LUI_THEO_DOI_CA_MS, useNhipThay } from '../lib/nhip-may-thay'
+import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
 import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
@@ -310,6 +311,9 @@ export default function ExamMonitorScreen() {
 
   /** Đang có một lượt tải chạy (tay hoặc nền): lượt NỀN không chồng lên (kế hoạch giờ cao điểm 21/09 — không gọi chồng). */
   const dangTaiRef = useRef(false)
+  /** Số lần tải HỤT liền nhau (nền hoặc tay) + giờ của lần tải TỐT cuối: ≥ 2 hụt ⇒ dòng "Mất kết nối · số lúc HH:MM" (số trên màn đã cũ). */
+  const [soHut, setSoHut] = useState(0)
+  const [gioTot, setGioTot] = useState<number | null>(null)
   /** Trả `true` = tải được; `false` = lỗi / thiếu cấu hình (vòng tự làm mới dùng để LÙI DẦN). */
   const tai = async (ma: string, imLang = false): Promise<boolean> => {
     const url = (scriptUrl || (await loadScriptUrl())).trim()
@@ -342,6 +346,8 @@ export default function ExamMonitorScreen() {
       const sc = scLocal ?? (scServer && scServer.I + scServer.II + scServer.III > 0 ? scServer : undefined)
       setSoCauCa(sc)
       if (!scLocal && sc) await luuSoCauCa(ma.trim(), sc)
+      setSoHut(0)
+      setGioTot(Date.now())
       // CA ĐỀ RIÊNG TỪNG EM: bản đồ sbd → câu PHẢI có mặt trước khi chấm. Chấm
       // bằng luật hash trong khi em nhận bộ câu theo bản đồ là ra bộ câu của
       // người khác — sai điểm mà màn hình không báo gì.
@@ -360,6 +366,7 @@ export default function ExamMonitorScreen() {
       } else {
         setLoi(`Không tải được ca: ${msg}`)
       }
+      setSoHut((n) => n + 1)
       return false
     } finally {
       dangTaiRef.current = false
@@ -612,7 +619,7 @@ export default function ExamMonitorScreen() {
   // `setInterval` trần: một lượt chậm 20 s dồn thêm lượt, lỗi cũng cứ 20 s một lần), lỗi ⇒ lùi dần 30 → 60 → 120 s. Vòng chạy MỘT mạch (không dựng lại mỗi lần chiTiet đổi).
   const conDangLam = !!chiTiet && chiTiet.luot.some((l) => l.trangThai === 'dang_lam')
   const maCaTheoDoiNen = chiTiet?.ca.maCa
-  useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), BANG_NHIP_THAY.theoDoiCa, conDangLam)
+  useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), BANG_NHIP_THAY.theoDoiCa, conDangLam, LUI_THEO_DOI_CA_MS)
 
   const handleChoThiLai = async (sbd: string) => {
     if (!chiTiet) return
@@ -1268,6 +1275,7 @@ export default function ExamMonitorScreen() {
                 </button>
               </div>
             </div>
+            <DongMatKetNoiCa soHut={soHut} gioTotMs={gioTot} />
             <div className="grid grid-cols-3" style={{ gap: 'var(--k2)', marginTop: 'var(--k4)' }}>
               {(
                 [

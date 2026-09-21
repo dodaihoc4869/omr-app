@@ -8,10 +8,11 @@ export const CHAN_DOI_MS = 20_000
 export const LUI_DAN_MS: readonly number[] = [30_000, 60_000, 120_000, 300_000]
 
 /** Khoảng chờ trước lần tự gọi kế: nhịp cơ sở ± lệch ngẫu nhiên; sau N lần lỗi liên tiếp ⇒ không ít hơn mức lùi (30 → 60 → 120 → 300 s, giữ ở 300). Không bao giờ dưới 1 giây. */
-export function khoangChoTiepTheo(coSoMs: number, lechMs: number, soLoiLienTiep: number, ngauNhien: () => number = Math.random): number {
+export function khoangChoTiepTheo(coSoMs: number, lechMs: number, soLoiLienTiep: number, ngauNhien: () => number = Math.random, luiDan: readonly number[] = LUI_DAN_MS): number {
   const nen = Math.max(1000, Math.round(coSoMs + (ngauNhien() * 2 - 1) * lechMs))
   if (soLoiLienTiep <= 0) return nen
-  const lui = LUI_DAN_MS[Math.min(Math.floor(soLoiLienTiep), LUI_DAN_MS.length) - 1]!
+  if (luiDan.length === 0) return nen
+  const lui = luiDan[Math.min(Math.floor(soLoiLienTiep), luiDan.length) - 1]!
   return Math.max(nen, lui)
 }
 
@@ -62,6 +63,8 @@ export interface TuyChonNhip {
   chanDoiMs?: number
   /** Gọi ngay khi bật (mặc định true). */
   chayNgay?: boolean
+  /** Bảng lùi riêng khi lỗi liên tiếp (mili-giây, giữ ở mức cuối); mặc định `LUI_DAN_MS`. Vd Theo dõi ca của thầy: [30 s, 40 s] — lùi TỐI ĐA 40 s để số không cũ quá. */
+  luiDanMs?: readonly number[]
   // để test / môi trường lạ:
   ngauNhien?: () => number
   bayGio?: () => number
@@ -93,7 +96,7 @@ export function batNhipBenVung(chay: () => Promise<unknown> | unknown, o: TuyCho
   const xep = () => {
     if (dungRoi) return
     xoa(gio)
-    gio = dat(nhip, khoangChoTiepTheo(coSo, lech, loi, o.ngauNhien))
+    gio = dat(nhip, khoangChoTiepTheo(coSo, lech, loi, o.ngauNhien, o.luiDanMs))
   }
   const chayMot = async () => {
     if (dungRoi || dangChay) return

@@ -23,7 +23,7 @@ export interface BangTinSanProps {
   onMoEm?: (sbd: string) => void
   /** Giờ cố định (ms) cho bản vẽ / kiểm thử; không truyền ⇒ chạy theo giờ máy chủ. */
   nayMs?: number
-  /** Hỏi máy chủ hụt ≥ 3 nhịp liền: chip "TRỰC TIẾP" đổi thành "Mất kết nối · số lúc HH:MM" (giờ máy chủ của số đang hiện); hỏi được lại ⇒ tự mất. */
+  /** Hỏi máy chủ hụt ≥ 2 nhịp liền: chip "TRỰC TIẾP" đổi thành "Mất kết nối · số lúc HH:MM" (giờ máy chủ của số đang hiện); hỏi được lại ⇒ tự mất. */
   matKetNoi?: boolean
 }
 
