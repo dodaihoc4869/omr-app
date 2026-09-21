@@ -29,9 +29,9 @@ const bo = (d: DauRaEm, the: TheDeKiem = THE) => {
 }
 
 describe('thuThach + loiMoi — hợp lệ', () => {
-  it('6 lời mẫu tốt (khung 3 ý) đều qua; phần tử hợp lệ, không có boLoi; lamSachDauRa giữ nguyên hai trường', () => {
-    for (const { chu, the, dang } of LOI_TOT) {
-      const d = ghep(chu, dang)
+  it('8 lời mẫu tốt (khung 3 ý, 8 kiểu mở đầu) đều qua; phần tử hợp lệ, không có boLoi; lamSachDauRa giữ nguyên hai trường', () => {
+    for (const { chu, the, dang, bac } of LOI_TOT) {
+      const d = ghep(chu, dang, 6, bac)
       expect(kt(d as unknown as Record<string, unknown>, the), chu).toEqual([])
       const k = bo(d, the)
       expect(k.boLoi, chu).toBeUndefined()
@@ -39,9 +39,9 @@ describe('thuThach + loiMoi — hợp lệ', () => {
       expect(lamSachDauRa(d, k).thuThach).toEqual(d.thuThach)
     }
   })
-  it('4 lời mẫu cấm đều bị chặn với đúng lý do; CHỈ bỏ phần thử thách (phần tử hợp lệ, boLoi = ["thuThach"], lamSachDauRa xoá cả hai trường)', () => {
-    for (const { chu, mau } of LOI_CAM) {
-      const d = ghep(chu)
+  it('7 lời mẫu cấm đều bị chặn với đúng lý do; CHỈ bỏ phần thử thách (phần tử hợp lệ, boLoi = ["thuThach"], lamSachDauRa xoá cả hai trường)', () => {
+    for (const { chu, mau, bac } of LOI_CAM) {
+      const d = ghep(chu, ['ESTE.THUY_PHAN'], 6, bac ?? 'dung_bac')
       const k = bo(d)
       expect(k.boLoi, chu).toEqual(['thuThach'])
       expect((k.canhBao ?? []).join(' | '), chu).toContain(mau)
@@ -55,6 +55,43 @@ describe('thuThach + loiMoi — hợp lệ', () => {
     expect(k.boLoi).toBeUndefined()
     expect(k.canhBao).toBeUndefined()
     expect(kt({ loiMoi: '' })).toEqual([])
+  })
+})
+
+describe('loiMoi — ý nghĩa, bậc, mở đầu, khiên (Boss 21/09 sau lượt thử chiều)', () => {
+  const tt = (chu: string, bac: string, the: TheDeKiem = THE, dang = ['ESTE.THUY_PHAN']) => kt(ghep(chu, dang, 6, bac) as unknown as Record<string, unknown>, the).join(' | ')
+  it('cao_hon_mot_bac ⇒ lời PHẢI nói "khó hơn một bậc" VÀ "đúng N trong M câu" (số suy ra từ thẻ: đúng = gặp − sai)', () => {
+    expect(tt('Em đúng 8 trong 9 câu, hôm nay thử vài câu Thuỷ phân ester nhé.', 'cao_hon_mot_bac')).toContain('khó hơn một bậc')
+    expect(tt('Hôm nay hãy thử câu khó hơn một bậc ở dạng Thuỷ phân ester nhé, chuỗi 4 ngày rồi.', 'cao_hon_mot_bac')).toContain('đúng N trong M')
+    expect(tt('Hôm nay hãy thử câu khó hơn một bậc ở dạng Thuỷ phân ester, vì em đã đúng 8 trong 9 câu dạng này.', 'cao_hon_mot_bac')).toBe('')
+    expect(tt('Hôm nay hãy thử câu khó hơn một bậc ở dạng Thuỷ phân ester, vì em đã đúng 8 trên 9 câu dạng này.', 'cao_hon_mot_bac')).toBe('')
+    expect(tt('Hôm nay hãy thử câu khó hơn một bậc ở dạng Thuỷ phân ester, vì em đã đúng 7 trong 9 câu dạng này.', 'cao_hon_mot_bac')).toBe('') // 7 có ở dungHomQua ⇒ KHÔNG lạ
+    expect(tt('Hôm nay hãy thử câu khó hơn một bậc ở dạng Thuỷ phân ester, vì em đã đúng 19 trong 9 câu dạng này.', 'cao_hon_mot_bac')).toContain('số không có trong thẻ: 19')
+  })
+  it('thap_hon_mot_bac ⇒ lời PHẢI nói "lùi một bậc"; bậc khác KHÔNG được nói "khó hơn một bậc" / "lùi một bậc"', () => {
+    expect(tt('Hôm nay thử vài câu Carb phân loại, chuỗi 4 ngày rồi nhé.', 'thap_hon_mot_bac')).toContain('lùi một bậc')
+    expect(tt('Hôm nay mình lùi một bậc ở dạng Carb phân loại để em lấy lại nhịp, chuỗi 4 ngày rồi.', 'thap_hon_mot_bac')).toBe('')
+    expect(tt('Hôm nay mình lùi một bậc ở dạng Carb phân loại, chuỗi 4 ngày rồi.', 'dung_bac')).toContain('nhưng bac không phải thap_hon_mot_bac')
+    expect(tt('Hôm nay thử câu khó hơn một bậc ở dạng Thuỷ phân ester, chuỗi 4 ngày rồi.', 'dung_bac')).toContain('nhưng bac không phải cao_hon_mot_bac')
+  })
+  it('KHEN CHUNG CHUNG bị chặn (tuyệt vời, xuất sắc, làm tốt lắm, cố lên…); khen đúng dữ kiện thì được', () => {
+    for (const t of ['tuyệt vời', 'xuất sắc', 'làm tốt lắm', 'rất tốt', 'cố lên', 'tiếp tục phát huy', 'quá giỏi']) expect(tt(`Chuỗi 4 ngày rồi, ${t}, hôm nay thử vài câu nhé.`, 'dung_bac'), t).toContain('hứa điều không chắc')
+    expect(tt('Chuỗi 4 ngày liền, nghĩa là thói quen đang thành hình. Hôm nay hãy thử vài câu nhé.', 'dung_bac')).toBe('')
+  })
+  it('TẠM CẤM khiên / mảnh khiên trong lời mời (thầy đang siết khiên lên 36 ngày, số /12 sắp đổi)', () => {
+    expect(tt('Rồng Lửa đang có 3 mảnh khiên, hôm nay thử vài câu nhé.', 'dung_bac')).toContain('hứa điều không chắc hoặc gọi tên: khiên, mảnh khiên')
+    expect(tt('Rồng Lửa còn thiếu 40 EXP, hôm nay thử vài câu nhé.', 'dung_bac')).toBe('')
+  })
+  it('câu MỜI CHỌN THÚ phải ở CUỐI lời (ba cách nói đều được, ở giữa thì không)', () => {
+    for (const moi of ['chọn một thần thú', 'chọn thần thú', 'chọn một bạn đồng hành', 'chọn cho mình một thần thú']) {
+      expect(tt(`Em đã đạt 4 ngày liền. Hôm nay hãy thử vài câu, rồi ${moi} nhé.`, 'dung_bac', THE_KHONG_THU), moi).toBe('')
+      expect(tt(`Em đã đạt 4 ngày liền, hãy ${moi} nhé. Hôm nay thử vài câu.`, 'dung_bac', THE_KHONG_THU), moi).toContain('câu mời chọn thú phải ở CUỐI')
+    }
+  })
+  it('tapSoCuaThe sinh thêm SỐ SUY RA: đúng = gặp − sai (dạng), đúng 7 ngày = làm − sai, đúng 3 ngày = làm × tỉ lệ', () => {
+    const tap = tapSoCuaThe({ dangChuY: [{ ma: 'A', gap: 20, sai: 3, lam7: 15, sai7: 2 }], cau: { lam3: 12, tiLe3: 0.75 } })
+    for (const n of ['17', '13', '9']) expect(tap.has(n), n).toBe(true)
+    expect(tapSoCuaThe({ dangChuY: [{ ma: 'A', gap: 20, sai: 3 }] }).has('13')).toBe(false)
   })
 })
 
@@ -86,12 +123,12 @@ describe('thuThach — khuôn', () => {
     CO({ dang: ['ESTE.THUY_PHAN'], soCau: 6, bac: 'dung_bac', maCau: ['q1'] }, 'khoá lạ')
     CO('dung_bac', 'không phải đối tượng')
     CO(['a'], 'không phải đối tượng')
-    for (const b of ['dung_bac', 'thap_hon_mot_bac']) expect(T({ dang: ['ESTE.THUY_PHAN'], soCau: 6, bac: b })).toEqual([])
+    for (const b of ['dung_bac', 'thap_hon_mot_bac', 'cao_hon_mot_bac']) expect(kt({ thuThach: { dang: ['ESTE.THUY_PHAN'], soCau: 6, bac: b }, loiMoi: LOI_TOT.find((x) => x.bac === b && x.the === THE)!.chu }), b).toEqual([])
   })
 })
 
 describe('cao_hon_mot_bac — chỉ khi đúng ≥ 80 % theo số trong thẻ', () => {
-  const cao = (dang: string[], the: TheDeKiem = THE) => kt({ thuThach: { dang, soCau: 6, bac: 'cao_hon_mot_bac' }, loiMoi: CHU_OK }, the)
+  const cao = (dang: string[], the: TheDeKiem = THE) => kt({ thuThach: { dang, soCau: 6, bac: 'cao_hon_mot_bac' }, loiMoi: LOI_TOT[1].chu }, the)
   it('dạng đúng 8/9 (lam7 9, sai7 1) + 3 ngày chung 92 % ⇒ được', () => {
     expect(cao(['ESTE.THUY_PHAN'])).toEqual([])
   })
@@ -123,7 +160,7 @@ describe('loiMoi — luật chữ', () => {
   it('phải có ≥ 1 số; MỌI số phải có trong thẻ', () => {
     expect(L('Hôm nay em thử mấy câu Thuỷ phân ester nhé.')).toContain('ít nhất một con số')
     expect(L('Rồng Lửa còn thiếu 41 EXP, thử mấy câu nhé.')).toContain('số không có trong thẻ: 41')
-    expect(L('Rồng Lửa còn thiếu 40 EXP và có 3 mảnh khiên, thử mấy câu nhé.')).toBe('') // 3, 40 đều có trong thẻ
+    expect(L('Rồng Lửa còn thiếu 40 EXP và chuỗi 4 ngày rồi, thử mấy câu nhé.')).toBe('') // 4, 40 đều có trong thẻ
   })
   it('độ dài ≤ 200; một dòng; không ký tự lạ; không emoji; không dấu gạch dài', () => {
     expect(L(`Em đúng lại 4 câu. ${'a'.repeat(200)}`)).toContain('quá 200 ký tự')

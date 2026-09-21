@@ -194,7 +194,13 @@ export const TU_CAM_CHO_EM: readonly string[] = [
   'đáp án', 'ca thi', 'phụ huynh', 'cha mẹ', 'bố mẹ', 'ba mẹ', 'điểm thi', 'dự đoán',
 ]
 /** Lời MỜI thử thách (`loiMoi`), NGOÀI `TU_CAM_CHO_EM`: hứa điều không chắc xảy ra (EXP chỉ có khi trả lời đúng; máy chủ có thể chọn được ít câu hơn) và xưng hô gọi tên (thẻ ẩn danh — Bộ não không biết tên em). */
-export const TU_CAM_RIENG_LOI_MOI: readonly string[] = ['chắc chắn', 'đảm bảo', 'nhất định', 'cam kết', 'xong là', 'là đủ', 'chỉ cần', 'sẽ lên cấp', 'chắc sẽ', 'chắc là', 'ơi']
+export const TU_CAM_RIENG_LOI_MOI: readonly string[] = [
+  'chắc chắn', 'đảm bảo', 'nhất định', 'cam kết', 'xong là', 'là đủ', 'chỉ cần', 'sẽ lên cấp', 'chắc sẽ', 'chắc là', 'ơi',
+  // KHEN CHUNG CHUNG (thầy 21/09: "quan tâm sâu sắc" = khen ĐÚNG việc em làm bằng dữ kiện, không khen suông)
+  'tuyệt vời', 'xuất sắc', 'làm tốt lắm', 'rất tốt', 'cố lên', 'tiếp tục phát huy', 'quá giỏi',
+  // TẠM CẤM (Boss 21/09 15:xx): thầy đang siết khiên lên 36 ngày, con số 12 mảnh sắp đổi — lời mời chỉ dùng EXP còn thiếu + cấp. Bỏ hai dòng này khi luật khiên mới chốt.
+  'khiên', 'mảnh khiên',
+]
 /** Lời mời / lời mục tiêu KHÔNG được nói ra điều Bộ não "biết" về em (nhãn `huongEm` là để CHỈNH lời, không để khoe): cấm những cách nói này. */
 export const TU_LO_HUONG_EM: readonly string[] = ['em thích', 'em hay', 'em thường', 'mình biết em', 'mình để ý', 'mình thấy em', 'mình nhận ra em', 'mình nhớ em']
 /** Lời cho THẦY (gợi ý, lý do, bản tin, ghi chú): "dạng yếu" là chữ thường dùng trong app nên chỉ cấm những từ này. */
@@ -281,6 +287,13 @@ export function tapSoCuaThe(the: unknown): Set<string> {
   }
   const duyet = (v: unknown, sau: number) => {
     if (sau > 12 || v === null || v === undefined) return
+    // SỐ SUY RA cho lời "đúng N trong M câu": đúng = đã gặp − đã sai (dạng), đúng 7 ngày = làm 7 − sai 7, đúng 3 ngày = làm 3 × tỉ lệ 3 ngày (Boss 21/09: lời đẩy bậc phải nêu "đúng N trong M")
+    if (typeof v === 'object' && !Array.isArray(v)) {
+      const o = v as Record<string, unknown>
+      if (typeof o.gap === 'number' && typeof o.sai === 'number') them(o.gap - o.sai)
+      if (typeof o.lam7 === 'number' && typeof o.sai7 === 'number') them(o.lam7 - o.sai7)
+      if (typeof o.lam3 === 'number' && typeof o.tiLe3 === 'number') them(Math.round(o.lam3 * o.tiLe3))
+    }
     if (typeof v === 'number') them(v)
     else if (typeof v === 'string') for (const s of timSoTrongChu(v)) them(Number(s))
     else if (Array.isArray(v)) for (const x of v) duyet(x, sau + 1)
@@ -340,7 +353,7 @@ function tenRiengLa(chu: string, tenThu: string | undefined): string[] {
 }
 
 /** Cụm MỜI chọn thú cho em CHƯA có thú (Boss 21/09: "chọn một bạn đồng hành để EXP của em có chỗ về"). Không kèm tên thú nào. */
-const MOI_CHON_THU = /chọn\s+(?:một\s+)?(?:thần\s+thú|bạn\s+đồng\s+hành|thú)/giu
+const MOI_CHON_THU = /chọn\s+(?:cho\s+mình\s+)?(?:một\s+)?(?:thần\s+thú|bạn\s+đồng\s+hành|thú)/giu
 
 /** Số câu nêu như VIỆC SẼ LÀM ("thử 6 câu", "làm 6 câu" khi 6 = soCau): máy chủ có thể chọn được ÍT hơn ⇒ không hứa. Số câu nói về QUÁ KHỨ trong thẻ ("đúng lại 4 câu") vẫn được. */
 const THU_N_CAU = /thử\s+(?:\p{L}+\s+){0,2}\d+(?:[.,]\d+)?\s*câu/iu
@@ -375,6 +388,10 @@ export function kiemChuLoiMoi(lm: unknown, ten: string, toiDa: number, the: TheD
   const tenThu = thanThu && typeof thanThu === 'object' && laChuoi(thanThu.ten) && thanThu.ten.trim().length > 0 ? thanThu.ten : undefined
   // Em CHƯA có thú (thẻ không có thanThu): được MỜI chọn thú ("chọn một thần thú / bạn đồng hành") nhưng không nói thú nào cả — bỏ cụm mời rồi mới soi chữ "thú"
   const conLai = lm.replace(MOI_CHON_THU, ' ')
+  // câu mời chọn thú đặt ở CUỐI (Boss 21/09): nằm trong CÂU CUỐI của lời, không ở giữa
+  const cacCau = lm.split(/[.!?]+/).map((x) => x.trim()).filter(Boolean)
+  const viTriMoi = cacCau.findIndex((c) => new RegExp(MOI_CHON_THU.source, 'iu').test(c))
+  if (viTriMoi >= 0 && viTriMoi < cacCau.length - 1) e.push(`${ten}: câu mời chọn thú phải ở CUỐI lời, không ở giữa`)
   if (!tenThu && timTuCam(conLai, ['thú', 'thần thú']).length) e.push(`${ten} nhắc thú nhưng thẻ không có thanThu (chỉ được MỜI chọn thú: "chọn một thần thú")`)
   const laTen = tenRiengLa(lm, tenThu)
   if (laTen.length) e.push(`${ten} có tên riêng không có trong thẻ: ${laTen.join(', ')}`)
@@ -512,6 +529,19 @@ export function kiemThuThach(d: Record<string, unknown>, the: TheDeKiem, tapSo: 
 
   const soCauDe = typeof t === 'object' && !Array.isArray(t) && laSoNguyenTrong(t.soCau, 0, 1000) ? t.soCau : undefined
   e.push(...kiemChuLoiMoi(d.loiMoi, 'loiMoi', H.LOI_MOI_TOI_DA, the, tapSo, soCauDe))
+  // Lời PHẢI nói đúng bậc (Boss 21/09): cao_hon_mot_bac ⇒ "câu khó hơn một bậc" + "đúng N trong M câu"; thap_hon_mot_bac ⇒ "lùi một bậc"; bậc khác không được nói những điều ấy
+  if (laChuoi(d.loiMoi) && typeof t === 'object' && !Array.isArray(t) && BAC_THU_THACH.includes(t.bac as BacThuThach)) {
+    const chuLoi = d.loiMoi
+    const noiKhoHon = timTuCam(chuLoi, ['khó hơn một bậc']).length > 0
+    const noiLui = timTuCam(chuLoi, ['lùi một bậc']).length > 0
+    if (t.bac === 'cao_hon_mot_bac') {
+      if (!noiKhoHon) e.push('loiMoi: bậc cao_hon_mot_bac ⇒ lời PHẢI nói rõ đó là câu "khó hơn một bậc"')
+      if (!/đúng\s+\d+(?:[.,]\d+)?\s+(?:trong|trên)\s+\d+/iu.test(chuLoi)) e.push('loiMoi: bậc cao_hon_mot_bac ⇒ lời PHẢI nêu lý do bằng số: "vì em đã đúng N trong M câu dạng này"')
+    } else if (noiKhoHon) e.push('loiMoi nói "khó hơn một bậc" nhưng bac không phải cao_hon_mot_bac')
+    if (t.bac === 'thap_hon_mot_bac') {
+      if (!noiLui) e.push('loiMoi: bậc thap_hon_mot_bac ⇒ lời PHẢI nói "mình lùi một bậc để em lấy lại nhịp"')
+    } else if (noiLui) e.push('loiMoi nói "lùi một bậc" nhưng bac không phải thap_hon_mot_bac')
+  }
   // V4: nhãn kín ĐANG CÓ của em (thẻ) ràng buộc thử thách hôm nay — chỉ làm bộ NHẸ đi, không nặng thêm
   const huong = new Set(Array.isArray(the.huongEm) ? (the.huongEm as { nhan?: unknown }[]).map((x) => String(x?.nhan)) : [])
   if (typeof t === 'object' && !Array.isArray(t)) {

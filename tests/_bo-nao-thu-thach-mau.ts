@@ -22,22 +22,27 @@ export const THE_KHONG_THU: TheDeKiem = (() => {
   return con as TheDeKiem
 })()
 
-/** MẪU TỐT — chép NGUYÊN CHỮ vào `bo-nao/HUONG-DAN-BO-NAO.md` (test khoá bên dưới). Khung 3 ý: điều em vừa làm được bằng số → mời thử mấy câu dạng X → làm xong thần thú/em được gì bằng số thật. */
-export const LOI_TOT: { chu: string; the: TheDeKiem; dang?: string[] }[] = [
-  { chu: 'Hôm qua em đúng lại 4 câu từng sai. Rồng Lửa còn thiếu 40 EXP để lên cấp 6, hôm nay thử mấy câu Thuỷ phân ester nhé.', the: THE, dang: ['ESTE.THUY_PHAN'] },
-  { chu: 'Rồng Lửa đang có 3 mảnh khiên, cần 12 mảnh để rèn. Hôm nay thử vài câu Thuỷ phân ester, mỗi câu đúng đều được thêm EXP.', the: THE, dang: ['ESTE.THUY_PHAN'] },
-  { chu: 'Hôm qua em làm 8 câu, đúng 7 câu. Hôm nay thử mấy câu Thuỷ phân ester để giữ chuỗi 4 ngày.', the: THE, dang: ['ESTE.THUY_PHAN'] },
-  { chu: 'Chuỗi 4 ngày của em đang chạy đều. Rồng Lửa còn thiếu 40 EXP lên cấp 6, hôm nay thử vài câu Lipid béo nhé.', the: THE, dang: ['LIPID.BEO'] },
-  { chu: 'Hôm qua em đúng lại 4 câu từng sai, làm rất đều. Hôm nay thử mấy câu Thuỷ phân ester để luyện tiếp.', the: THE_KHONG_THU, dang: ['ESTE.THUY_PHAN'] },
-  { chu: 'Em đã đạt 4 ngày liền. Hôm nay thử vài câu Carb phân loại, mỗi câu đúng đều được thêm EXP.', the: THE_KHONG_THU, dang: ['CARB.PHAN_LOAI'] },
-  { chu: 'Hôm qua em đúng lại 4 câu từng sai. Hôm nay thử mấy câu Thuỷ phân ester, rồi chọn một bạn đồng hành để EXP của em có chỗ về nhé.', the: THE_KHONG_THU, dang: ['ESTE.THUY_PHAN'] },
-  { chu: 'Hôm qua em làm 8 câu, đúng 7 câu. Hôm nay thử vài câu Lipid béo, rồi chọn một thần thú để EXP của em có chỗ về.', the: THE_KHONG_THU, dang: ['LIPID.BEO'] },
+/** MẪU TỐT — chép NGUYÊN CHỮ vào `bo-nao/HUONG-DAN-BO-NAO.md` và `bo-nao/LUAT-CHIEU.md` (test khoá). Khung 3 ý: ĐIỀU EM ĐÃ LÀM (số thật) → Ý NGHĨA của nó với chính em (mệnh đề ngắn, dữ kiện, không khen suông) → LỜI MỜI mạnh + phần thưởng (số thật).
+ * Tám mẫu, tám kiểu MỞ ĐẦU khác nhau; hai mẫu đẩy bậc (`cao_hon_mot_bac`, `thap_hon_mot_bac`) nói ĐÚNG bậc; thẻ có `thanThu` chỉ dùng EXP còn thiếu + cấp (KHÔNG khiên); em chưa có thú thì mời chọn thú ở CÂU CUỐI (ba cách nói). */
+export const LOI_TOT: { chu: string; the: TheDeKiem; dang: string[]; bac: 'dung_bac' | 'thap_hon_mot_bac' | 'cao_hon_mot_bac' }[] = [
+  { chu: 'Sai rồi sửa lại được 4 câu, đó là cách nhớ lâu nhất. Hôm nay em hãy cùng Rồng Lửa thử mấy câu Thuỷ phân ester nhé.', the: THE, dang: ['ESTE.THUY_PHAN'], bac: 'dung_bac' },
+  { chu: 'Chuỗi 4 ngày liền, hôm nay đến lúc nâng tầm: hãy thử câu khó hơn một bậc ở dạng Thuỷ phân ester, vì em đã đúng 8 trong 9 câu dạng này. Rồng Lửa còn thiếu 40 EXP lên cấp 6.', the: THE, dang: ['ESTE.THUY_PHAN'], bac: 'cao_hon_mot_bac' },
+  { chu: 'Hôm qua em làm 8 câu, đúng 7 câu, nhịp đều như vậy là nền vững cho bài dài. Thử ngay vài câu Lipid béo, Rồng Lửa còn thiếu 40 EXP để lên cấp 6.', the: THE, dang: ['LIPID.BEO'], bac: 'dung_bac' },
+  { chu: 'Rồng Lửa đang chờ em ở cấp 6, còn thiếu 40 EXP. Em vừa đúng lại 4 câu từng sai, nên hôm nay hãy thử mấy câu Thuỷ phân ester để chắc thêm.', the: THE, dang: ['ESTE.THUY_PHAN'], bac: 'dung_bac' },
+  { chu: 'Hôm nay mình lùi một bậc ở dạng Carb phân loại để em lấy lại nhịp: làm chậm, kỹ từng câu. Rồng Lửa vẫn chờ em, còn thiếu 40 EXP.', the: THE, dang: ['CARB.PHAN_LOAI'], bac: 'thap_hon_mot_bac' },
+  { chu: 'Em đã đạt 4 ngày liền, nghĩa là thói quen học đang thành hình. Hôm nay hãy thử mấy câu Carb phân loại, rồi chọn một thần thú để EXP của em có chỗ về.', the: THE_KHONG_THU, dang: ['CARB.PHAN_LOAI'], bac: 'dung_bac' },
+  { chu: 'Thuỷ phân ester em làm đều tay nên thử ngay câu khó hơn một bậc ở dạng này, vì em đã đúng 8 trong 9 câu dạng này. Rồi chọn một bạn đồng hành nhé.', the: THE_KHONG_THU, dang: ['ESTE.THUY_PHAN'], bac: 'cao_hon_mot_bac' },
+  { chu: 'Em đã làm đúng lại 4 câu từng sai, sửa được lỗi là cách nhớ lâu nhất. Thử ngay vài câu Thuỷ phân ester, rồi chọn thần thú của em nhé.', the: THE_KHONG_THU, dang: ['ESTE.THUY_PHAN'], bac: 'dung_bac' },
 ]
-/** MẪU CẤM — kèm điều bị chặn (chép vào cẩm nang). */
-export const LOI_CAM: { chu: string; mau: string }[] = [
+/** Em CHƯA có thú, bậc đúng bậc — dùng cho các test cần một lời hợp lệ của thẻ không có `thanThu`. */
+export const LOI_KHONG_THU = LOI_TOT[5]
+/** MẪU CẤM — kèm điều bị chặn (chép vào cẩm nang / LUAT-CHIEU.md). `bac` mặc định `dung_bac`. */
+export const LOI_CAM: { chu: string; mau: string; bac?: 'dung_bac' | 'thap_hon_mot_bac' | 'cao_hon_mot_bac' }[] = [
   { chu: 'Em đã nắm chắc Thuỷ phân ester sau 4 ngày, thử mấy câu nữa nhé.', mau: 'từ cấm' },
   { chu: 'Rồng Lửa còn thiếu 55 EXP để lên cấp, thử mấy câu nhé.', mau: 'số không có trong thẻ' },
   { chu: 'Hôm nay thử 6 câu Thuỷ phân ester, xong là Rồng Lửa lên cấp 6.', mau: 'số câu' },
   { chu: 'Các bạn khác đã làm 4 câu rồi, em thử mấy câu nhé.', mau: 'từ cấm' },
+  { chu: 'Em làm tuyệt vời lắm, 4 ngày liền rồi, hôm nay thử mấy câu nhé.', mau: 'hứa điều không chắc' },
+  { chu: 'Rồng Lửa đang có 3 mảnh khiên, hôm nay em hãy thử vài câu nhé.', mau: 'hứa điều không chắc' },
+  { chu: 'Em đúng 8 trong 9 câu Thuỷ phân ester, hôm nay thử vài câu dạng này nhé.', mau: 'khó hơn một bậc', bac: 'cao_hon_mot_bac' },
 ]
-
