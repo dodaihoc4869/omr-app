@@ -56,7 +56,7 @@ export type MucHoSo = 'tong-quan' | 'bao-cao' | 'lich-su'
 export const TEN_MUC_HO_SO: Record<MucHoSo, string> = {
   'tong-quan': 'Tổng quan',
   'bao-cao': 'Báo cáo',
-  'lich-su': 'Lịch sử ca thi',
+  'lich-su': 'Lịch sử ca kiểm tra',
 }
 
 export default function HocSinhScreen() {
@@ -137,7 +137,7 @@ export default function HocSinhScreen() {
       if (ca) {
         setCaBaoCao(ca)
       } else {
-        showToast(`Em ${hoSo.em.hoTen || hoSo.em.sbd} chưa tham gia ca thi nào`, 'warn')
+        showToast(`Em ${hoSo.em.hoTen || hoSo.em.sbd} chưa tham gia ca kiểm tra nào`, 'warn')
       }
     }
   }, [hoSo, mucHoSo, showToast])
@@ -343,7 +343,7 @@ export default function HocSinhScreen() {
                     type="button"
                     role="tab"
                     aria-selected={dang}
-                    aria-label={m === 'lich-su' ? 'Lịch sử ca thi' : 'Báo cáo'}
+                    aria-label={m === 'lich-su' ? 'Lịch sử ca kiểm tra' : 'Báo cáo'}
                     onClick={() => {
                       setMucHoSo(m)
                       if (m === 'bao-cao' && caMoiNhat) {
@@ -353,7 +353,7 @@ export default function HocSinhScreen() {
                     className={`tap-target hs-tab${dang ? ' hs-tab--chon' : ''}`}
                   >
                     {m === 'bao-cao' ? <FileText size={16} /> : <TrendingUp size={16} />}
-                    <span>{m === 'lich-su' ? 'Mức độ tiến bộ (Lịch sử ca thi)' : TEN_MUC_HO_SO[m]}</span>
+                    <span>{m === 'lich-su' ? 'Mức độ tiến bộ (Lịch sử ca kiểm tra)' : TEN_MUC_HO_SO[m]}</span>
                     {m === 'lich-su' && <span className="hs-tab-so">({hoSo.ca.length})</span>}
                   </button>
                 )
@@ -369,7 +369,7 @@ export default function HocSinhScreen() {
                       <div>
                         <div className="font-bold flex items-center" style={{ fontSize: 'var(--cx-2)', color: 'var(--muc)', gap: 6 }}>
                           <Sparkles size={16} className="hs-bieu-tuong-nhan" />
-                          Báo cáo ca thi gần nhất
+                          Báo cáo ca kiểm tra gần nhất
                         </div>
                         <div style={NHAN_NHO}>
                           Điểm: <b style={{ ...SO, color: 'var(--muc)' }}>{caMoiNhat.tong !== null ? caMoiNhat.tong.toFixed(2).replace('.', ',') : '—'}</b>

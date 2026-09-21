@@ -288,10 +288,10 @@ describe('HocSinhScreen · hồ sơ tổng quan', () => {
     ;(HO_SO as { ca: unknown }).ca = goc
   })
 
-  it('mục Lịch sử ca thi vẫn tách riêng (không đổ khối tổng quan vào)', async () => {
+  it('mục Lịch sử ca kiểm tra vẫn tách riêng (không đổ khối tổng quan vào)', async () => {
     const { container } = await moHoSo('ten')
     await waitFor(() => expect(container.querySelector('.hs-viec')).toBeTruthy())
-    fireEvent.click(screen.getByRole('tab', { name: /Lịch sử ca thi/ }))
+    fireEvent.click(screen.getByRole('tab', { name: /Lịch sử ca kiểm tra/ }))
     expect(container.textContent).toContain('Ca Ester')
     expect(container.querySelector('.hs-luoi')).toBeNull()
   })

@@ -592,7 +592,7 @@ function TheGiaoBtvn() {
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
                   }`}
                 >
-                  <Users size={15} /> Theo ca thi
+                  <Users size={15} /> Theo ca kiểm tra
                 </button>
                 <button
                   type="button"
@@ -1043,7 +1043,7 @@ function TheGiaoBtvn() {
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-between flex-wrap gap-2 text-xs">
               <span className="font-bold text-slate-800 dark:text-slate-200">
                 {cheDo === 'ca'
-                  ? `Người nhận: ${caChon.size} ca thi ${chonRieng && sbdThem.length > 0 ? `+ ${sbdThem.length} em chọn thêm` : ''}`
+                  ? `Người nhận: ${caChon.size} ca kiểm tra ${chonRieng && sbdThem.length > 0 ? `+ ${sbdThem.length} em chọn thêm` : ''}`
                   : cheDo === 'theo_em'
                   ? `Người nhận: ${sbdChonTheoEm.size} học sinh đã chọn`
                   : `Người nhận: Lớp ${khoiGui} (${dsTheoLop.length} học sinh)`}

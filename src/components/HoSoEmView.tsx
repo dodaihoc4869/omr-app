@@ -149,7 +149,7 @@ export function KhoiLichSuCa({
   return (
     <TheNoiDung>
       <h2 className="font-bold" style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-4)', marginBottom: 'var(--k3)' }}>
-        Lịch sử ca thi
+        Lịch sử ca kiểm tra
       </h2>
       {ca.length === 0 ? (
         <div style={NHAN_NHO}>Em chưa nộp bài ca nào.</div>

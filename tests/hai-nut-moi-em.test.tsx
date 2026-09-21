@@ -55,22 +55,22 @@ describe('danh sách học sinh — hai nút mỗi em', () => {
     const { getByLabelText, container } = render(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Lê Minh Đức'))
     expect(getByLabelText('Báo cáo của Lê Minh Đức')).toBeTruthy()
-    expect(getByLabelText('Lịch sử ca thi của Lê Minh Đức')).toBeTruthy()
+    expect(getByLabelText('Lịch sử ca kiểm tra của Lê Minh Đức')).toBeTruthy()
     expect(getByLabelText('Báo cáo của Trần Thu Hà')).toBeTruthy()
-    expect(getByLabelText('Lịch sử ca thi của Trần Thu Hà')).toBeTruthy()
+    expect(getByLabelText('Lịch sử ca kiểm tra của Trần Thu Hà')).toBeTruthy()
   })
 
   it('nút Lịch sử ca nói luôn em đã làm mấy ca', async () => {
     const { getByLabelText, container } = render(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Lê Minh Đức'))
-    expect(getByLabelText('Lịch sử ca thi của Lê Minh Đức').textContent).toContain('(3)')
-    expect(getByLabelText('Lịch sử ca thi của Trần Thu Hà').textContent).toContain('(0)')
+    expect(getByLabelText('Lịch sử ca kiểm tra của Lê Minh Đức').textContent).toContain('(3)')
+    expect(getByLabelText('Lịch sử ca kiểm tra của Trần Thu Hà').textContent).toContain('(0)')
   })
 
   it('bấm nút nào cũng mở hồ sơ ĐÚNG em đó', async () => {
     const { getByLabelText, container } = render(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Trần Thu Hà'))
-    fireEvent.click(getByLabelText('Lịch sử ca thi của Trần Thu Hà'))
+    fireEvent.click(getByLabelText('Lịch sử ca kiểm tra của Trần Thu Hà'))
     expect(moHoSoEm).toHaveBeenCalledWith('002')
   })
 
@@ -92,7 +92,7 @@ describe('danh sách học sinh — hai nút mỗi em', () => {
   it('vùng chạm của hai nút không dưới 44px', async () => {
     const { getByLabelText, container } = render(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Lê Minh Đức'))
-    for (const ten of ['Báo cáo của Lê Minh Đức', 'Lịch sử ca thi của Lê Minh Đức']) {
+    for (const ten of ['Báo cáo của Lê Minh Đức', 'Lịch sử ca kiểm tra của Lê Minh Đức']) {
       expect((getByLabelText(ten) as HTMLElement).style.minHeight).toBe('44px')
     }
   })
@@ -113,7 +113,7 @@ describe('hồ sơ một em — hai mục tách hẳn', () => {
   it('vào từ nút Lịch sử ca: thấy thẳng danh sách ca, không phải cuộn qua báo cáo', async () => {
     const { getByLabelText, container, rerender } = render(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Lê Minh Đức'))
-    fireEvent.click(getByLabelText('Lịch sử ca thi của Lê Minh Đức'))
+    fireEvent.click(getByLabelText('Lịch sử ca kiểm tra của Lê Minh Đức'))
     sbdDangXem = '001'
     rerender(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Ca Ester'))
@@ -129,7 +129,7 @@ describe('hồ sơ một em — hai mục tách hẳn', () => {
     rerender(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('KHOI TIEN BO'))
 
-    fireEvent.click(getByRole('tab', { name: /Lịch sử ca thi/ }))
+    fireEvent.click(getByRole('tab', { name: /Lịch sử ca kiểm tra/ }))
     expect(container.textContent).toContain('Ca Ester')
     fireEvent.click(getByRole('tab', { name: /Báo cáo/ }))
     expect(container.textContent).toContain('KHOI TIEN BO')
@@ -138,12 +138,12 @@ describe('hồ sơ một em — hai mục tách hẳn', () => {
   it('mục đang xem được đánh dấu aria-selected, không chỉ đổi màu', async () => {
     const { getByLabelText, getAllByRole, container, rerender } = render(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Lê Minh Đức'))
-    fireEvent.click(getByLabelText('Lịch sử ca thi của Lê Minh Đức'))
+    fireEvent.click(getByLabelText('Lịch sử ca kiểm tra của Lê Minh Đức'))
     sbdDangXem = '001'
     rerender(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Ca Ester'))
     const tab = getAllByRole('tab')
     expect(tab.filter((t) => t.getAttribute('aria-selected') === 'true')).toHaveLength(1)
-    expect(tab.find((t) => t.getAttribute('aria-selected') === 'true')!.textContent).toContain('Lịch sử ca thi')
+    expect(tab.find((t) => t.getAttribute('aria-selected') === 'true')!.textContent).toContain('Lịch sử ca kiểm tra')
   })
 })

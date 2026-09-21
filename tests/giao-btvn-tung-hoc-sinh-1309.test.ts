@@ -9,8 +9,8 @@ const BTVN_LIB = doc('src/lib/btvn-may-chu-moi.ts')
 const SERVER = doc('server/src/index.ts')
 
 describe('GIAO BTVN CHO TỪNG HỌC SINH', () => {
-  it('PhanCongScreen có 2 chế độ: Theo ca thi và Cho từng học sinh', () => {
-    expect(PC).toContain('Theo ca thi (cả lớp)')
+  it('PhanCongScreen có 2 chế độ: Theo ca kiểm tra và Cho từng học sinh', () => {
+    expect(PC).toContain('Theo ca kiểm tra')
     expect(PC).toContain('Cho từng học sinh')
     expect(PC).toContain("const [cheDo, setCheDo] = useState<'ca' | 'hoc_sinh'>('ca')")
   })
