@@ -17,7 +17,7 @@ export interface TheGoiY { loai: LoaiThe; tieuDe: string; noiDung: string }
 /** Thứ người tiếp sức thấy khi chọn thẻ: chỉ tên + mô tả, KHÔNG thấy nội dung thẻ (để không đọc hộ bạn). */
 export const MO_TA_THE: Record<LoaiThe, { tieuDe: string; moTa: string }> = {
   nhac_cong_thuc: { tieuDe: 'Nhắc công thức', moTa: 'Gửi bạn kiến thức gốc của câu' },
-  loai_phuong_an: { tieuDe: 'Loại 1 phương án', moTa: 'Máy gạch một đáp án sai' },
+  loai_phuong_an: { tieuDe: 'Loại 1 phương án', moTa: 'A.I Đỗ Đại Học gạch một đáp án sai' },
   buoc_dau: { tieuDe: 'Chỉ bước đầu', moTa: 'Hé bước đầu của lời giải' },
 }
 export const THU_TU_THE: readonly LoaiThe[] = ['nhac_cong_thuc', 'loai_phuong_an', 'buoc_dau']

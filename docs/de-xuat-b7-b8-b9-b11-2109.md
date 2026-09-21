@@ -27,7 +27,7 @@ Chung cả bốn việc (theo mục D của `DE-XUAT-TU-DONG-HOA-2109.md`): **th
 ## B11 · Tự canh sức khoẻ hệ thống
 - **Việc:** mở rộng `sucKhoe` của `/gv/bang-tin` thành danh sách `canhBao[]` (mỗi dòng một câu tiếng Việt + mức xanh/vàng/đỏ): Bộ não A.I không chạy > **36 giờ** (hiện đang 26 giờ ở `sucKhoe`; chốt số nào); cron nhắc nộp bài không chiếm lượt > 45 phút trong khung giờ, hoặc có **lỗi** trong 24 giờ; tỉ lệ lời bị loại tăng (`ai_ban_tin.so_bi_loai/so_em` đêm nay ≥ 2× trung vị 7 đêm và ≥ 5 lời).
 - **Ghi:** để biết "có lỗi", cần lưu lỗi cron — hiện chỉ `console.error`. Bảng mới `nhat_ky_may(id, luc, nguon, muc, chu)` (chỉ-thêm, giữ ≤ 500 dòng, chống trùng 1 dòng/nguồn/30 phút); các `catch` của cron nhắc nộp / mừng mốc / kéo lại ghi vào. Đọc-chỉ ở `/gv/bang-tin`.
-- **Cờ/rào:** chỉ HIỂN THỊ (thầy đọc là biết); không gửi tin, không tự sửa; không lộ chi tiết kỹ thuật (câu chữ đơn giản: "Nhắc nộp bài lỗi lúc 13:30, máy sẽ thử lại").
+- **Cờ/rào:** chỉ HIỂN THỊ (thầy đọc là biết); không gửi tin, không tự sửa; không lộ chi tiết kỹ thuật (câu chữ đơn giản: "Nhắc nộp bài lỗi lúc 13:30, A.I Đỗ Đại Học sẽ thử lại").
 - **Rủi ro:** báo động giả làm thầy nhờn ⇒ ngưỡng vàng trước, đỏ chỉ khi cả hai kênh trễ hoặc lỗi lặp ≥ 3 lượt liên tiếp.
 - **Ước công:** 0,5 ngày máy chủ + test.
 

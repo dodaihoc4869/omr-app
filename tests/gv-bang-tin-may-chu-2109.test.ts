@@ -388,7 +388,7 @@ describe('sucKhoe.canhBao (B11): trễ, lỗi của máy, tỉ lệ lời bị l
     expect(k.canhBao).toEqual([
       { nguon: 'loi_nhac_nop_bai', muc: 'do', chu: 'Nhắc nộp bài lỗi 3 lần trong 24 giờ, lần cuối lúc 13:00' },
       { nguon: 'loi_gui_thong_bao', muc: 'vang', chu: 'Gửi thông báo lỗi 2 lần trong 24 giờ, lần cuối lúc 12:40' },
-      { nguon: 'loi_ke_hoach_ngay', muc: 'vang', chu: 'Lập kế hoạch ngày lỗi lúc 00:01, máy sẽ thử lại' },
+      { nguon: 'loi_ke_hoach_ngay', muc: 'vang', chu: 'Lập kế hoạch ngày lỗi lúc 00:01, A.I Đỗ Đại Học sẽ thử lại' },
     ])
     expect(JSON.stringify(k)).not.toMatch(/stack|Error|exception|SQLITE/i)
     d.sql.exec('DROP TABLE nhat_ky_may')

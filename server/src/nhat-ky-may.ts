@@ -13,7 +13,7 @@ export const TEN_NGUON_NHAT_KY: Readonly<Record<string, string>> = {
   gui_thong_bao: 'Gửi thông báo',
 }
 export const tenViec = (nguon: string): string => TEN_NGUON_NHAT_KY[nguon] ?? 'Một việc của máy'
-export const chuLoiMay = (nguon: string): string => `${tenViec(nguon)} lỗi, máy sẽ thử lại`
+export const chuLoiMay = (nguon: string): string => `${tenViec(nguon)} lỗi, A.I Đỗ Đại Học sẽ thử lại`
 
 /** Ghi MỘT lỗi. Trả `true` khi thật sự ghi thêm dòng (không trùng trong 30 phút, có bảng). */
 export async function ghiLoiMay(env: Env, nguon: string, nowMs: number = Date.now()): Promise<boolean> {

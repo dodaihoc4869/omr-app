@@ -389,7 +389,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     const cuoi = Date.parse(chuoi(x.cuoi))
     canhBao.push({
       nguon: `loi_${chuoi(x.nguon)}`, muc: n >= LOI_MAY_DO_TU_LAN ? 'do' : 'vang',
-      chu: n === 1 ? `${tenViec(chuoi(x.nguon))} lỗi lúc ${Number.isFinite(cuoi) ? tuLuc(cuoi) : 'gần đây'}, máy sẽ thử lại` : `${tenViec(chuoi(x.nguon))} lỗi ${n} lần trong ${LOI_MAY_SO_GIO} giờ, lần cuối lúc ${Number.isFinite(cuoi) ? tuLuc(cuoi) : 'gần đây'}`,
+      chu: n === 1 ? `${tenViec(chuoi(x.nguon))} lỗi lúc ${Number.isFinite(cuoi) ? tuLuc(cuoi) : 'gần đây'}, A.I Đỗ Đại Học sẽ thử lại` : `${tenViec(chuoi(x.nguon))} lỗi ${n} lần trong ${LOI_MAY_SO_GIO} giờ, lần cuối lúc ${Number.isFinite(cuoi) ? tuLuc(cuoi) : 'gần đây'}`,
     })
   }
   // tỉ lệ lời bị loại tăng: đêm mới nhất ≥ 5 lời bị loại và ≥ gấp đôi trung vị các đêm trước (tối đa 7)

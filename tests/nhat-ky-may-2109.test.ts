@@ -15,10 +15,10 @@ describe('ghiLoiMay', () => {
   it('ghi một dòng với câu đơn giản cho thầy; không chứa chi tiết kỹ thuật; mọi nguồn có tên bằng lời', async () => {
     const d = taoD1That()
     expect(await ghiLoiMay(d.env, 'nhac_nop_bai', NAY)).toBe(true)
-    expect(dong(d)).toEqual([{ nguon: 'nhac_nop_bai', luc: new Date(NAY).toISOString(), muc: 'loi', chu: 'Nhắc nộp bài lỗi, máy sẽ thử lại' }])
+    expect(dong(d)).toEqual([{ nguon: 'nhac_nop_bai', luc: new Date(NAY).toISOString(), muc: 'loi', chu: 'Nhắc nộp bài lỗi, A.I Đỗ Đại Học sẽ thử lại' }])
     expect(Object.keys(TEN_NGUON_NHAT_KY).sort()).toEqual(['exp_ngay', 'gui_thong_bao', 'ke_hoach_ngay', 'nhac_nop_bai', 'tin_phu_huynh'])
-    for (const n of Object.keys(TEN_NGUON_NHAT_KY)) expect(chuLoiMay(n)).toMatch(/ lỗi, máy sẽ thử lại$/)
-    expect(chuLoiMay('nguon_la')).toBe('Một việc của máy lỗi, máy sẽ thử lại')
+    for (const n of Object.keys(TEN_NGUON_NHAT_KY)) expect(chuLoiMay(n)).toMatch(/ lỗi, A.I Đỗ Đại Học sẽ thử lại$/)
+    expect(chuLoiMay('nguon_la')).toBe('Một việc của máy lỗi, A.I Đỗ Đại Học sẽ thử lại')
   })
   it('CHỐNG TRÙNG: cùng nguồn trong 30 phút (kể cả đúng 30 phút) không ghi thêm; quá 30 phút ghi; nguồn khác độc lập', async () => {
     const d = taoD1That()
