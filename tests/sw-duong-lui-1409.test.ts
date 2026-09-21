@@ -62,7 +62,9 @@ describe('service worker viết tay', () => {
     expect(SW).toContain('precacheAndRoute(self.__WB_MANIFEST)')
     expect(VITE).toMatch(/globIgnores:\s*\[[^\]]*'\*\*\/404\.html'/)
     expect(VITE).toContain("'**/than-thu-v2/**'")
-    expect(VITE).toContain("globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff,woff2,ttf}']")
+    // SỬA CÓ CHỦ Ý 21/09 (P1 máy kẹt bản cũ — Boss): precache thu nhỏ 245 tệp/5,3 MB → ~123 tệp/2,5 MB, bỏ phông trùng woff/ttf (mọi trình duyệt của em nạp woff2 trước).
+    // Khoá chi tiết ở tests/bao-hiem-ban-moi-2109.test.tsx.
+    expect(VITE).toContain("globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}']")
   })
 })
 

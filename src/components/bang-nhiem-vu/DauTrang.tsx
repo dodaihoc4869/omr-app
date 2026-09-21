@@ -7,6 +7,7 @@ import Spirit2D, { type SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import { PETS } from '../../game/than-thu-v2/core'
 import type { TrangThaiThanThu } from '../../lib/nhiem-vu-adapter'
 import { useSauVeDauTien } from './may-chu'
+import { chuBanApp } from '../../lib/cap-nhat-app'
 
 export interface MucMenu {
   id: string
@@ -146,6 +147,11 @@ export default function DauTrang({
                       </button>
                     </div>
                   ))}
+                  {/* Số bản ở CUỐI menu: thầy hỏi em "máy em bản mấy" là em đọc được ngay (P1 21/09, máy kẹt bản cũ). */}
+                  <div role="none">
+                    <div className="bnv-menu-ke" role="separator" />
+                    <p className="bnv-menu-ban">{chuBanApp()}</p>
+                  </div>
                 </div>
               )}
             </div>

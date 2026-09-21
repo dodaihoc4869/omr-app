@@ -65,7 +65,28 @@ export default defineConfig({
       // ngay, không cần thầy/học sinh xoá cache tay mới thấy sửa lỗi —
       // injectRegister:false để không đăng ký trùng 2 lần.
       injectRegister: false,
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'logo-*-v3.svg', 'logo-*-v3.png', 'manifest.json', 'manifest-hs.json', 'manifest-ph.json', 'cau-hinh.json'],
+      // Chỉ biểu tượng NHỎ của app học sinh/phụ huynh (P1 21/09: precache nhỏ). Bản 512 px + logo app thầy do hệ điều hành đọc lúc CÀI qua mạng / đi kho chạy-lúc (src/sw.ts) —
+      // `includeAssets` cũng KHÔNG bị `globIgnores` lọc nên phải liệt kê đúng ở đây.
+      includeAssets: [
+        'favicon.svg',
+        'apple-touch-icon.png',
+        'icon-192.png',
+        'logo-hs-v3.svg',
+        'logo-hs-nho-v3.svg',
+        'logo-ph-v3.svg',
+        'logo-ph-nho-v3.svg',
+        'logo-hs-64-v3.png',
+        'logo-ph-64-v3.png',
+        'logo-hs-180-v3.png',
+        'logo-ph-180-v3.png',
+        'logo-hs-192-v3.png',
+        'logo-ph-192-v3.png',
+        'logo-huy-hieu-96-v3.png',
+        'manifest.json',
+        'manifest-hs.json',
+        'manifest-ph.json',
+        'cau-hinh.json',
+      ],
       // KHÔNG để plugin sinh và CHÈN thẻ manifest. Thẻ nó chèn nằm cuối <head>
       // và luôn trỏ manifest chung, nên Chrome cài ra app "ĐỖ ĐẠI HỌC" chung dù
       // em đang ở app học sinh — mã JS đổi thẻ sau đó là đã muộn. Ba file
@@ -89,8 +110,26 @@ export default defineConfig({
         // woff2/woff: phông có dấu tiếng Việt và phông công thức của KaTeX.
         // Thiếu hai đuôi này thì mất mạng là dấu tiếng Việt và chỉ số công thức
         // rơi về phông dự phòng — đúng lỗi "bă`ng" đã gặp.
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff,woff2,ttf}'],
-        globIgnores: ['**/404.html', '**/than-thu-v2/**', '**/Spirit3D-*.js', '**/Game-*.js'],
+        //
+        // PRECACHE NHỎ (P1 21/09 — máy học sinh kẹt bản cũ): precache là TẤT-CẢ-HOẶC-KHÔNG, 245 tệp / 5,4 MB thì mạng di động yếu rớt một tệp là cả lượt cài
+        // hỏng, máy ở lại bản cũ mãi. Nay chỉ precache VỎ + phần khởi động của 3 cổng (index, m3, chem-format, các mảnh dùng chung nhỏ, ParentPortalScreen,
+        // phông woff2, biểu tượng nhỏ). Màn của thầy, game, máy chiếu, tệp phông trùng (ttf/woff — mọi trình duyệt của em đều nạp woff2 trước) KHÔNG precache:
+        // vẫn tải được, tải một lần rồi cất ở kho chạy-lúc (`omr-manh-chay-lan`, xem src/sw.ts). `scripts/kiem-sw.mjs` chặn precache phình to lại.
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}'],
+        globIgnores: [
+          '**/404.html',
+          '**/than-thu-v2/**',
+          '**/Spirit3D-*.js',
+          '**/{CaiDatScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,DaoThanThu,DoanHoTong,Game,html-may-chieu}-*.{js,css}',
+          '**/cai-app/**',
+          '**/cai-app.html',
+          '**/cai-dat.html',
+          // Biểu tượng cài app 512 px + logo của app thầy: hệ điều hành đọc lúc CÀI app (qua mạng), máy không cần chúng để chạy.
+          '**/*-512*.png',
+          '**/logo-gv-*',
+          // Phiếu HTML: chỉ mở khi em bấm làm phiếu (đang có mạng), tải một lần rồi cất.
+          '**/html-phieu-*.js',
+        ],
         // ĐƯỜNG LUI CHO MỌI LƯỢT ĐIỀU HƯỚNG — khai TƯỜNG MINH.
         //
         // App đọc vai và mã ca từ đường dẫn (/hs, /ph, /t/<mã ca>, /d/<mã ca>).

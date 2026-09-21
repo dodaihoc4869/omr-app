@@ -118,6 +118,14 @@
   margin: var(--k2, 8px) 0;
   background: var(--m3-surface-container-high);
 }
+.bnv-menu-ban {
+  padding: 0 var(--k4, 16px) var(--k2, 8px);
+  font-size: var(--bnv-cx-1);
+  color: var(--m3-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+  -webkit-user-select: text;
+  user-select: text;
+}
 
 /* ── vùng 1: đầu trang ─────────────────────────────────────────────── */
 .bnv-dau {

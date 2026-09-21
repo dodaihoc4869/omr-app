@@ -37,6 +37,15 @@ export function datDangLamBai(v: boolean): void {
   if (truoc && !v) for (const f of khiXongBai.slice()) f()
 }
 
+/** Đăng ký một việc chạy NGAY khi em rời màn làm bài (lớp bảo hiểm bản mới dùng: bản mới chờ đúng lúc này). Trả hàm gỡ. */
+export function dangKyKhiXongBai(f: () => void): () => void {
+  khiXongBai.push(f)
+  return () => {
+    const i = khiXongBai.indexOf(f)
+    if (i >= 0) khiXongBai.splice(i, 1)
+  }
+}
+
 // ĐANG MỞ KHOÁ THÌ KHÔNG TỰ TẢI LẠI (MATKHAUMOAPP.md mục 4C và mục 9).
 //
 // Lý do gốc: mã bí mật giải ra chỉ sống trong bộ nhớ chương trình; tải lại
@@ -253,3 +262,17 @@ export function batTuTaiLaiKhiDoiBan(
  * mới nghĩa là máy đã nhận bản mới; còn mã cũ nghĩa là chưa nhận. */
 declare const __PHIEN_BAN__: string
 export const PHIEN_BAN_APP: string = typeof __PHIEN_BAN__ === 'string' ? __PHIEN_BAN__ : 'dev'
+
+/** Giờ dựng gói này (GIÂY, cùng giá trị với `builtAt` trong sw-version.json của đúng bản dựng ấy). 0 = chạy thử (dev) — lớp bảo hiểm bản mới tự tắt. */
+declare const __SW_BUILT_AT__: number
+export const BAN_DUNG_LUC_GIAY: number = typeof __SW_BUILT_AT__ === 'number' ? __SW_BUILT_AT__ : 0
+
+/** "Bản app 21/09 12:07 · 8cf7739" (giờ Việt Nam, UTC+7) — chữ cuối menu ba chấm để thầy hỏi em "máy em bản mấy". Chạy thử ⇒ "Bản chạy thử". */
+export function chuBanApp(giay: number = BAN_DUNG_LUC_GIAY, phienBan: string = PHIEN_BAN_APP): string {
+  if (!Number.isFinite(giay) || giay <= 0) return 'Bản chạy thử'
+  const d = new Date((giay + 7 * 3600) * 1000)
+  const hai = (n: number) => String(n).padStart(2, '0')
+  const gio = `${hai(d.getUTCDate())}/${hai(d.getUTCMonth() + 1)} ${hai(d.getUTCHours())}:${hai(d.getUTCMinutes())}`
+  const ma = phienBan.split(' · ')[0].trim()
+  return `Bản app ${gio}${ma && ma !== 'dev' ? ` · ${ma}` : ''}`
+}

@@ -7,7 +7,7 @@
 //
 // Bốn điều dưới đây, thiếu một là cả ba app không mở được trên máy đã cài.
 // Thoát mã 1 để `DAY-TAT-CA.command` dừng, không đẩy bản hỏng lên.
-import { readFileSync, existsSync } from 'node:fs'
+import { readFileSync, existsSync, statSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -54,6 +54,21 @@ function xoaSachKho(ma) {
   }
   return false
 }
+
+/** PRECACHE PHẢI NHỎ (P1 21/09). Precache là TẤT-CẢ-HOẶC-KHÔNG: 245 tệp / 5,4 MB thì mạng di động yếu rớt một tệp là cả lượt cài hỏng, máy em ở lại bản cũ mãi
+ * (thầy chụp iPhone vẫn chữ cũ sau 3 giờ). Đo từ chính `dist/sw.js` + kích thước tệp thật cạnh nó. */
+const TOI_DA_TEP_PRECACHE = 170
+const TOI_DA_KB_PRECACHE = 3000
+function doPrecache(ma, thuMuc) {
+  const url = [...new Set([...ma.matchAll(/"url"\s*:\s*"([^"]+)"/g)].map((m) => m[1]))]
+  let byte = 0
+  for (const u of url) {
+    const p = resolve(thuMuc, u)
+    if (existsSync(p)) byte += statSync(p).size
+  }
+  return { tep: url.length, kb: Math.round(byte / 1024) }
+}
+const pc = doPrecache(s, dirname(SW))
 
 const phep = [
   [
@@ -111,6 +126,21 @@ const phep = [
     'KHÔNG ép tab đang mở điều hướng lại',
     !/\.\s*navigate\s*\(/.test(s),
     'ép điều hướng từ trong SW thì lượt ấy đi qua chính SW đó, gặp kho chưa sẵn sàng là ra trang lỗi',
+  ],
+  [
+    `precache nhỏ (${pc.tep} tệp / ${pc.kb} KB; trần ${TOI_DA_TEP_PRECACHE} tệp / ${TOI_DA_KB_PRECACHE} KB)`,
+    pc.tep > 0 && pc.tep <= TOI_DA_TEP_PRECACHE && pc.kb <= TOI_DA_KB_PRECACHE,
+    'precache phình to lại: lượt cài càng nặng càng dễ rớt một tệp trên mạng yếu ⇒ cả lượt cài hỏng ⇒ máy kẹt bản cũ. Màn thầy/game/ảnh lớn phải đi kho chạy-lúc (vite.config.ts globIgnores)',
+  ],
+  [
+    'có kho chạy-lúc cho mảnh ngoài precache',
+    s.includes('omr-manh-chay-lan') && s.includes('omr-anh-chay-lan'),
+    'bỏ mảnh khỏi precache mà không có kho chạy-lúc thì màn thầy/game tải lại từ mạng mỗi lần (và không chạy được offline)',
+  ],
+  [
+    'kho chạy-lúc KHÔNG cất trang HTML dưới tên mảnh',
+    /text\\\/html/.test(s),
+    'máy chủ trả index.html (200) cho mảnh đã bị xoá khi phát hành; cất nó dưới tên .js là đầu độc kho (lỗi MIME mãi tới khi xoá dữ liệu trang)',
   ],
   [
     'có chốt tự sửa khi app trắng màn',

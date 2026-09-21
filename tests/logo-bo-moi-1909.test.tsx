@@ -165,7 +165,9 @@ describe('service worker + cấu hình PWA', () => {
     const v = doc('vite.config.ts')
     const m = /includeAssets:\s*\[([^\]]*)\]/.exec(v)!
     const muc = [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1])
-    expect(muc).toEqual(expect.arrayContaining(['favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'logo-*-v3.svg', 'logo-*-v3.png']))
+    // SỬA CÓ CHỦ Ý 21/09 (P1 máy kẹt bản cũ — Boss): precache thu nhỏ. Biểu tượng 512 px + logo app thầy không còn precache (hệ điều hành đọc lúc CÀI qua mạng;
+    // đi kho chạy-lúc trong sw.ts), nên `includeAssets` liệt kê ĐÍCH DANH logo nhỏ của học sinh/phụ huynh thay cho mẫu `logo-*-v3.*`. Khoá chi tiết: bao-hiem-ban-moi-2109.test.tsx.
+    expect(muc).toEqual(expect.arrayContaining(['favicon.svg', 'apple-touch-icon.png', 'icon-192.png', 'logo-hs-v3.svg', 'logo-ph-v3.svg', 'logo-hs-192-v3.png', 'logo-ph-192-v3.png']))
     for (const t of muc.filter((x) => !x.includes('*'))) expect(fs.existsSync(path.join(goc, 'public', t)), t).toBe(true)
     expect(v).not.toMatch(/icon-(hs|ph)-/)
   })

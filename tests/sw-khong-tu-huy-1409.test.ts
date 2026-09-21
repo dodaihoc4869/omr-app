@@ -104,6 +104,9 @@ describe('scripts/kiem-sw.mjs — cửa này PHẢI bắt được bản hỏng'
   // trước, xoá sau).
   const LANH = `(function(){
     ${'revision'.repeat(60)}
+    // Thêm 21/09 (P1 máy kẹt bản cũ): cửa nay còn đòi precache NHỎ (đếm theo "url") + kho chạy-lúc + chốt không cất HTML.
+    const manifest = [{"revision":null,"url":"index.html"}];
+    const kho = ["omr-manh-chay-lan", "omr-anh-chay-lan"]; const chot = /text\\/html/i;
     self.skipWaiting();
     const x = "index.html";
     (async()=>{ (await caches.keys()).filter(n=>n.includes("workbox")).map(n=>caches.delete(n)) })();
@@ -114,6 +117,21 @@ describe('scripts/kiem-sw.mjs — cửa này PHẢI bắt được bản hỏng'
 
   it('bản lành thì ĐẠT — cửa không kêu oan', () => {
     expect(chay(LANH, TRANG_LANH)).toBe(0)
+  })
+
+  // P1 21/09 (máy học sinh kẹt bản cũ): ba điều mới cửa phải bắt.
+  it('bắt được: precache phình to lại (200 tệp > trần 170) — tất-cả-hoặc-không nên mạng yếu rớt một tệp là cả lượt cài hỏng', () => {
+    const nhieu = Array.from({ length: 200 }, (_, i) => `{"revision":null,"url":"assets/x${i}.js"}`).join(',')
+    expect(chay(LANH.replace('[{"revision":null,"url":"index.html"}]', `[${nhieu}]`), TRANG_LANH)).toBe(1)
+  })
+
+  it('bắt được: bỏ mảnh khỏi precache mà không có kho chạy-lúc', () => {
+    expect(chay(LANH.replace('omr-manh-chay-lan', 'x'), TRANG_LANH)).toBe(1)
+    expect(chay(LANH.replace('omr-anh-chay-lan', 'x'), TRANG_LANH)).toBe(1)
+  })
+
+  it('bắt được: kho chạy-lúc cất cả trang HTML dưới tên mảnh (đầu độc kho)', () => {
+    expect(chay(LANH.replace('const chot = /text\\/html/i;', 'const chot = 1;'), TRANG_LANH)).toBe(1)
   })
 
   it('bắt được BẢN THẬT đang chạy 14/09: tự gỡ đăng ký', () => {

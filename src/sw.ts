@@ -37,6 +37,8 @@
 //   `scripts/kiem-sw.mjs` nay chặn cả ba việc ấy quay lại.
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
+import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies'
+import { ExpirationPlugin } from 'workbox-expiration'
 import { clientsClaim } from 'workbox-core'
 
 declare const self: ServiceWorkerGlobalScope
@@ -120,6 +122,36 @@ async function traTrangApp(tuyChon: Parameters<typeof TU_PRECACHE>[0]): Promise<
 }
 
 registerRoute(new NavigationRoute(traTrangApp, { denylist: KHONG_DUNG }))
+
+// ─── KHO CHẠY-LÚC: mảnh KHÔNG nằm trong precache (P1 21/09) ───────────────────
+// Precache chỉ giữ VỎ + phần khởi động của 3 cổng (vite.config.ts · globIgnores) để lượt cài nhỏ, khó hỏng. Màn của thầy, game, máy chiếu, ảnh lớn vẫn phải chạy
+// được: tải lần đầu qua mạng rồi cất ở đây, các lần sau lấy từ máy. Route này đăng ký SAU precache nên tệp đã precache không bao giờ rơi vào đây.
+//   · `/assets/*` có BĂM TÊN theo nội dung ⇒ không bao giờ đổi ⇒ CacheFirst (không cần hỏi lại máy chủ).
+//   · Ảnh trong public/ KHÔNG băm tên (thần thú, logo…) ⇒ StaleWhileRevalidate: hiện bản có sẵn, ngầm lấy bản mới; tối đa 60 ảnh vì có ảnh ~3 MB.
+//     KHÔNG bắt âm thanh/video: Safari xin theo Range, mà SW trả cả tệp cho yêu cầu Range là hỏng tiếng — để trình duyệt tự lo như trước.
+// CHỐT: KHÔNG cất phản hồi trang HTML dưới tên tệp mã. Máy chủ trả `index.html` (200) cho mọi đường không có thật — mảnh của bản cũ đã bị xoá khi phát hành sẽ bị đọc
+// thành HTML; cất nó dưới tên `.js` là đầu độc kho (mỗi lần mở app báo lỗi MIME tới khi xoá dữ liệu trang). `nap-manh.ts` tự tải lại khi thiếu mảnh.
+const KHONG_LUU_HTML = {
+  cacheWillUpdate: async ({ response }: { response: Response }) => {
+    const loai = response.headers.get('content-type') || ''
+    return response.status === 200 && !/text\/html/i.test(loai) ? response : null
+  },
+}
+const CUNG_NGUON = (u: URL) => u.origin === self.location.origin
+registerRoute(
+  ({ url }) => CUNG_NGUON(url) && /\/assets\/[^/]+\.(?:js|css|woff2?|ttf|png|jpe?g|svg|webp|gif)$/.test(url.pathname),
+  new CacheFirst({
+    cacheName: 'omr-manh-chay-lan',
+    plugins: [KHONG_LUU_HTML, new ExpirationPlugin({ maxEntries: 150, maxAgeSeconds: 30 * 24 * 3600, purgeOnQuotaError: true })],
+  }),
+)
+registerRoute(
+  ({ url }) => CUNG_NGUON(url) && !url.pathname.includes('/assets/') && /\.(?:png|jpe?g|webp|svg|gif)$/.test(url.pathname),
+  new StaleWhileRevalidate({
+    cacheName: 'omr-anh-chay-lan',
+    plugins: [KHONG_LUU_HTML, new ExpirationPlugin({ maxEntries: 60, maxAgeSeconds: 30 * 24 * 3600, purgeOnQuotaError: true })],
+  }),
+)
 
 // BẢN MỚI CHIẾM QUYỀN NGAY. Bản mới nằm chờ tới khi đóng hết app thì app đã cài
 // vào màn hình chính gần như không bao giờ nhận được bản sửa.

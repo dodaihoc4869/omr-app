@@ -28,6 +28,7 @@ import { chuanHoaDuongDan, docDuongVao, nhoVaiDaDung } from './lib/vai-tro'
 import { khoaVaiVaoUrl } from './lib/khoa-vai'
 import { donPhienCu } from './lib/don-phien-cu'
 import { batTuHoiBanMoi, daySangBanMoi, tuTaiLaiKhiDoiBan } from './lib/cap-nhat-app'
+import { batBaoHiemBanMoi } from './lib/bao-hiem-ban-moi'
 import { batSuKienCaiApp } from './lib/pwa-install'
 import { batLoiThieuManh } from './lib/nap-manh'
 import { napDiaChiMayChuMoiChoEm } from './lib/may-chu-moi'
@@ -118,6 +119,11 @@ registerSW({
     })
   },
 })
+// LỚP BẢO HIỂM 4 (P1 21/09): ba lớp trên đều trông vào service worker cài được bản mới; máy nào cài hỏng (mạng yếu rớt một tệp precache) thì kẹt bản cũ mãi.
+// Lớp này tự hỏi sw-version.json rồi so với giờ dựng đóng trong gói; mới hơn mà 20 giây sau chưa tự lên thì xoá kho SW + nạp lại. Rào: không ép lúc em làm bài;
+// mỗi bản tối đa 2 lần; không đụng IndexedDB/localStorage. Xem bao-hiem-ban-moi.ts.
+batBaoHiemBanMoi()
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
