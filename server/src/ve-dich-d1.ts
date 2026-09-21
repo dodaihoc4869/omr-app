@@ -26,7 +26,7 @@ import {
   GIO_MUON_NHAT, KHUNG_GIO_HOC_MAC_DINH, SO_NGAY_RAI_ON_TOI_DA, keHoachVeDich, soNo,
   type BaiDangChay, type BuoiVeDich, type GoiGiaDinhChuaXong, type KhoangGio, type KhungGioHoc, type MonNo, type OnQuaLich, type ViecVeDich,
 } from '../../src/lib/ve-dich'
-import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
+import { docLichDaLuu, moLucChang, moLucGocChangMoSom } from './btvn-nang-do-chang'
 import { coChuGame } from './chu-game'
 import { NGAN_SACH_TRAN, NGAY_LIET_KE_QUA_HAN, SO_NGAY_DO_VAN_TOC } from './ho-so-cau-hinh'
 import { themNgay } from './ho-so-nam-kt'
@@ -334,7 +334,10 @@ function dungChang(b: BaiTho, hanMs: number, nowMs: number, dauHomNay: number): 
   if (b.caNhan && Number.isFinite(chotMs) && b.cauMoiChang.size > 0) {
     const n = Math.max(...b.cauMoiChang.keys()) + 1
     const soCau = Array.from({ length: n }, (_, i) => b.cauMoiChang.get(i) ?? 0)
-    const moLuc = docLichDaLuu(b.lichJson, n, { chotLuc: b.chotLuc, hanNop: b.hanNop, nowMs })?.moLuc ?? moLucChang(b.chotLuc, n)
+    const moLucThat = docLichDaLuu(b.lichJson, n, { chotLuc: b.chotLuc, hanNop: b.hanNop, nowMs })?.moLuc ?? moLucChang(b.chotLuc, n)
+    // Chặng đã MỞ SỚM (Điều 6) mà mốc mở thật đã rơi vào ngày TRƯỚC: phân loại nợ theo mốc GỐC của lịch (em được mở sớm chưa kịp làm không bị tính nợ sớm một ngày). Mở sớm HÔM NAY giữ mốc thật (hôm nay).
+    const goc = moLucGocChangMoSom(b.lichJson)
+    const moLuc = moLucThat.map((m, k) => { const g = goc.get(k); const t = Date.parse(m); return g !== undefined && Number.isFinite(t) && t < dauHomNay && g > t ? new Date(g).toISOString() : m })
     return { moLuc, soCau, daXong: Math.max(0, Math.min(n, Math.floor(b.loDaXong))) }
   }
   const ngayConLai = Math.max(1, Math.ceil((hanMs - nowMs) / MS_NGAY))

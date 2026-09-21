@@ -510,7 +510,7 @@ async function moSomChangKe(env: Env, khoa: string, soChang: number, chiSoXong: 
     if (laBoNopTre(cu?.ngan_sach_json)) return null // bộ NỘP TRỄ đã có nhịp riêng (≤ 2 chặng/ngày): em trễ không được nhận nhiều chặng/ngày hơn em đúng nhịp
     const raw = chuoi(cu?.chang_mo_json)
     if (!raw) return null
-    const o = JSON.parse(raw) as { chang?: { moLuc?: string }[]; moSom?: { chiSo: number; luc: string }[] }
+    const o = JSON.parse(raw) as { chang?: { moLuc?: string }[]; moSom?: { chiSo: number; luc: string; truoc?: string }[] }
     if (!Array.isArray(o.chang) || o.chang.length !== soChang || !o.chang[chiSoKe]?.moLuc) return null
     const hom = ngayVn(now)
     const soMoSomHomNay = (o.moSom ?? []).filter((x) => Number.isFinite(Date.parse(x.luc)) && ngayVn(Date.parse(x.luc)) === hom).length
@@ -519,9 +519,10 @@ async function moSomChangKe(env: Env, khoa: string, soChang: number, chiSoXong: 
     if (!kq.duoc) return { duoc: false, lyDo: kq.lyDo, chu }
     if (Date.parse(String(o.chang[chiSoKe]!.moLuc)) <= now) return { duoc: false, lyDo: 'da_mo_san', chu } // đã mở sẵn: không cần và không tính hạn mức
     const iso = new Date(now).toISOString()
+    const moLucGoc = String(o.chang[chiSoKe]!.moLuc) // mốc gốc, giữ lại để phân loại nợ (em được mở sớm mà chưa làm KHÔNG bị tính nợ sớm)
     o.chang[chiSoKe]!.moLuc = iso
     for (let k = chiSoKe + 1; k < o.chang.length; k++) if (Date.parse(String(o.chang[k]!.moLuc)) < now) o.chang[k]!.moLuc = iso // giữ mốc không lùi
-    o.moSom = [...(o.moSom ?? []), { chiSo: chiSoKe, luc: iso }]
+    o.moSom = [...(o.moSom ?? []), { chiSo: chiSoKe, luc: iso, truoc: moLucGoc }]
     const w = await env.DB.prepare('UPDATE btvn_em SET chang_mo_json = ? WHERE khoa = ? AND chang_mo_json = ?').bind(JSON.stringify(o), khoa, raw).run()
     return w.meta.changes ? { duoc: true, lyDo: null, chu } : { duoc: false, lyDo: 'thua_cas', chu }
   } catch (e) {

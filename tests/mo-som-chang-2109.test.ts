@@ -23,7 +23,7 @@ describe('mở sớm chặng kế', () => {
     const sau = lichCua(d)
     expect(sau.chang[1]!.moLuc).toBe(BAY_GIO.toISOString())
     expect(sau.chang.map((c) => c.dungNhipTruoc)).toEqual(truoc.chang.map((c) => c.dungNhipTruoc)) // EXP đúng nhịp không đổi
-    expect(sau.moSom).toEqual([{ chiSo: 1, luc: BAY_GIO.toISOString() }])
+    expect(sau.moSom).toEqual([{ chiSo: 1, luc: BAY_GIO.toISOString(), truoc: truoc.chang[1]!.moLuc }]) // sửa CÓ CHỦ Ý 21/09: moSom lưu thêm mốc GỐC `truoc` (phân loại nợ dùng mốc gốc)
     expect((d.sql.prepare('SELECT han_nop FROM btvn').get() as { han_nop: string }).han_nop).toBe(han0)
     // chặng 1 làm được NGAY hôm nay
     expect(await lam(d, 1)).toMatchObject({ ok: true, loDaXong: 2 })
@@ -80,5 +80,43 @@ describe('mở sớm chặng kế', () => {
     d.sql.exec("UPDATE btvn_em SET chang_mo_json = NULL WHERE sbd='S1'") // bài chốt trước bản 1.1: không có lịch lưu
     const r = await lam(d, 0)
     expect(r.ok).toBe(true); expect(r).not.toHaveProperty('moSom')
+  })
+})
+
+// ── Rà chéo Code 1 (21/09): chặng MỞ SỚM mà em chưa làm KHÔNG bị tính là NỢ sớm hơn lịch gốc (moSom lưu mốc gốc `truoc`; ve-dich-d1 phân loại nợ theo mốc gốc) ──────────────────────────────────
+describe('mở sớm không thành nợ oan', () => {
+  const veDich = async (d: D1That, t: Date) => {
+    gio(t)
+    const { docVeDichCuaEm } = await import('../server/src/ve-dich-d1')
+    return docVeDichCuaEm(d.env, 'S1', t.getTime())
+  }
+  const emMoSom = async () => {
+    gio(BAY_GIO)
+    const d = dung()
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,mat_khau,cap_nhat_luc) VALUES('S1','Em Một','mk','x')").run()
+    await giao(d); await mo(d)
+    expect(await lam(d, 0)).toMatchObject({ ok: true, moSom: { duoc: true } }) // chặng 1 mở sớm lúc BAY_GIO; chặng 1 CHƯA làm
+    return d
+  }
+  it('mở sớm hôm nay + không làm ⇒ sáng mai chặng đó là "hôm nay" (mốc gốc 00:00 hôm nay), KHÔNG nợ; sang ngày sau mốc gốc mới thành nợ', async () => {
+    const d = await emMoSom()
+    const goc = lichCua(d).moSom![0] as { truoc?: string }
+    expect(goc.truoc).toBeDefined()
+    const cungNgay = await veDich(d, new Date(BAY_GIO.getTime() + 2 * 3_600_000)) // CÙNG ngày mở sớm: chặng đã mở là việc của HÔM NAY (mốc thật), không bị đẩy về mốc gốc ngày mai
+    expect(cungNgay.veDich[0]!.chang[1]!.trangThai).toBe('hom_nay')
+    const D1 = new Date(BAY_GIO.getTime() + 24 * 3_600_000) // sáng hôm sau
+    const v1 = await veDich(d, D1)
+    expect(v1.veDich[0]!.chang[1]!.trangThai).toBe('hom_nay')
+    expect(v1.no.tongCau).toBe(0)
+    expect(v1.no.theoNgay).toEqual([])
+    const v2 = await veDich(d, new Date(BAY_GIO.getTime() + 2 * 24 * 3_600_000)) // hai ngày sau: mốc gốc (00:00 ngày +1) đã qua ngày
+    expect(v2.veDich[0]!.chang[1]!.trangThai).toBe('no')
+    expect(v2.no.tongCau).toBeGreaterThan(0)
+  })
+  it('mở sớm rồi làm luôn trong ngày ⇒ chặng "xong"; cửa chặng vẫn theo mốc THẬT (làm được ngay hôm nay, không đợi mốc gốc)', async () => {
+    const d = await emMoSom()
+    expect(await lam(d, 1)).toMatchObject({ ok: true, loDaXong: 2 }) // mốc thật = bây giờ ⇒ nộp được
+    const v = await veDich(d, new Date(BAY_GIO.getTime() + 24 * 3_600_000))
+    expect(v.veDich[0]!.chang[1]!.trangThai).toBe('xong')
   })
 })

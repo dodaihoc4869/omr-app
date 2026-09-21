@@ -95,6 +95,23 @@ export function soGioTre(hanNop: unknown, nowMs: number): number {
 }
 
 /**
+ * Mốc GỐC (ms) của các chặng đã MỞ SỚM (Điều 6): `moSom: [{ chiSo, luc, truoc }]` trong `chang_mo_json`, `truoc` = mốc mở theo lịch TRƯỚC khi bị đổi thành lúc mở sớm.
+ * Mọi chỗ phân loại "nợ / hôm nay / sắp tới / chậm lịch" phải dùng mốc GỐC (em được mở sớm mà chưa kịp làm KHÔNG bị tính nợ sớm hơn lịch); cửa chặng / cổng nộp vẫn dùng `moLuc` thật. Hỏng / vắng ⇒ rỗng.
+ */
+export function moLucGocChangMoSom(lichJson: unknown): Map<number, number> {
+  const ra = new Map<number, number>()
+  try {
+    const o = (typeof lichJson === 'string' ? JSON.parse(lichJson) : lichJson) as { moSom?: unknown } | null
+    if (!Array.isArray(o?.moSom)) return ra
+    for (const x of o!.moSom as { chiSo?: unknown; truoc?: unknown }[]) {
+      const t = typeof x?.truoc === 'string' ? Date.parse(x.truoc) : NaN
+      if (Number.isInteger(x?.chiSo) && Number.isFinite(t)) ra.set(x.chiSo as number, t)
+    }
+  } catch { /* JSON hỏng: không có mốc gốc */ }
+  return ra
+}
+
+/**
  * Cờ LÙI NHANH của NỘP TRỄ (Điều 4 = B đổi luật hạn nộp): `cau_hinh.btvn_nop_tre = 'tat'` ⇒ trở lại luật cũ (qua hạn là khoá `qua_han`, em nhờ thầy gia hạn) ở CẢ BA đường: mở bài (`/btvn/cua-em`),
  * nộp chặng (`/btvn/xong-lo`), nộp cả bài (`/btvn/nop`). Vắng / khác / lỗi đọc ⇒ BẬT. Chỉ được đọc khi bài ĐÃ qua hạn (đường thường không tốn truy vấn).
  */
