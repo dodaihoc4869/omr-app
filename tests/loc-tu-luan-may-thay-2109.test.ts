@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import type { TeacherExamSource } from '../src/data/examContent'
 import { chuBaoBoTuLuan, laCauTuLuan } from '../src/lib/cau-tu-luan'
-import { locTuLuanKhiMoCa, SO_CAU_MAC_DINH_MOI_EM } from '../src/lib/loc-tu-luan-mo-ca'
+import { canhBaoThieuSauLoc, chuBoTuLuanChiTiet, demCauTheoPhan, locTuLuanKhiMoCa, SO_CAU_MAC_DINH_MOI_EM } from '../src/lib/loc-tu-luan-mo-ca'
 import { sinhBoTheoEm } from '../src/lib/de-rieng-blueprint'
 import { MA_TRAN_HOA_2026, rutDeChuan2026, SO_CAU_CHUAN_2026 } from '../src/lib/ma-tran-hoa-2026'
 import { chonCauBuKho } from '../src/lib/de-rieng-nguon'
@@ -88,13 +88,43 @@ describe('locTuLuanKhiMoCa (màn Mở ca)', () => {
   it('chữ báo thầy khớp số đếm', () => {
     expect(chuBaoBoTuLuan(locTuLuanKhiMoCa(de(), undefined, 'luon').soBo)).toBe('Đã bỏ 4 câu tự luận (chỉ rút câu trắc nghiệm, đúng sai, trả lời ngắn)')
   })
-  it('ExamSetupScreen chỉ chọn chế độ lọc ĐÚNG: luôn lọc khi mã trận 2026 / đề riêng / đã bấm Rút đề; còn lại chỉ khi có cắt ngẫu nhiên', () => {
+  it('ExamSetupScreen: MỌI ca kiểm tra đều lọc (chế độ luon, kể cả nguyên tờ thầy chọn) TRƯỚC khi dựng gói đề đẩy lên máy chủ; không còn nhánh khi_co_cat ở màn Mở ca', () => {
     const ma = readFileSync('src/screens/ExamSetupScreen.tsx', 'utf8')
-    expect(ma).toContain("locTuLuanKhiMoCa(nguonTruocLoc, soCauCuoi, chuan2026 || deRiengBat || boRut ? 'luon' : 'khi_co_cat')")
+    expect(ma).toContain("locTuLuanKhiMoCa(nguonTruocLoc, soCauCuoi, 'luon')")
+    expect(ma).toContain("locTuLuanKhiMoCa(nguonRaDe, soCauRaDe, 'luon')") // bản dựng sẵn để hiện ở bước chọn đề
+    expect(ma).not.toContain('khi_co_cat')
     expect(ma).toContain('const nguonCuoi = locTuLuan.nguon')
-    // bộ lọc chạy TRƯỚC khi dựng gói đề đẩy lên máy chủ
     expect(ma.indexOf('locTuLuanKhiMoCa(nguonTruocLoc')).toBeLessThan(ma.indexOf('mergeAndStrip(nguonCuoi, soCauCuoi)'))
-    expect(ma).toContain('chuBaoBoTuLuan(locTuLuan.soBo)')
+    expect(ma.indexOf('locTuLuanKhiMoCa(nguonTruocLoc')).toBeLessThan(ma.indexOf('mergeKeepAnswers(nguonCuoi, soCauCuoi)')) // cả gói có đáp án cũng dùng bộ đã lọc
+    // hiện RÕ trước khi mở ca: số câu bỏ theo phần + cảnh báo thiếu bằng lời, ngay ở thẻ đề đã chọn
+    expect(ma).toContain('chuBoTuLuanChiTiet(locMoCa)')
+    expect(ma).toContain('canhBaoThieuSauLoc(locMoCa, soCauRaDe)')
+    expect(ma).toContain('canhBaoThieu.map')
+    expect(ma).toContain('chuBoTuLuanChiTiet(locTuLuan)') // và trong bước "Đang gửi ca…"
+    // số câu hiện trên màn là số SAU lọc
+    expect(ma).toContain('demCauTheoPhan(locMoCa.nguon)')
+  })
+  it('chữ báo RÕ: "Đã bỏ N câu tự luận (phần I: a · phần III: c)" — chỉ liệt kê phần có bỏ; không bỏ ⇒ rỗng', () => {
+    const r = locTuLuanKhiMoCa(de(), undefined, 'luon')
+    expect(chuBoTuLuanChiTiet(r)).toBe('Đã bỏ 4 câu tự luận (phần I: 1 · phần II: 1 · phần III: 2) — chỉ rút câu trắc nghiệm, đúng sai, trả lời ngắn')
+    expect(chuBoTuLuanChiTiet({ soBo: 3, soBoTheoPhan: { I: 0, II: 0, III: 3 } })).toBe('Đã bỏ 3 câu tự luận (phần III: 3) — chỉ rút câu trắc nghiệm, đúng sai, trả lời ngắn')
+    expect(chuBoTuLuanChiTiet({ soBo: 0, soBoTheoPhan: { I: 0, II: 0, III: 0 } })).toBe('')
+  })
+  it('CẢNH BÁO THIẾU: phần bị bỏ câu mà còn ít hơn số câu mỗi em làm ⇒ báo bằng lời (kèm số còn / số cần); phần không bị bỏ thì im; đủ thì im', () => {
+    const vao = [nguon('T', [mcq('T-I-1'), mcq('T-I-2'), mcqThieuPa('T-I-3')], [tf('T-II-1'), tf('T-II-2')], [sa('T-III-1'), saHoiMo('T-III-2'), saHoiMo('T-III-3'), sa('T-III-4')])]
+    const r = locTuLuanKhiMoCa(vao, { I: 2, II: 4, III: 3 }, 'luon')
+    expect(demCauTheoPhan(r.nguon)).toEqual({ I: 2, II: 2, III: 2 })
+    const c = canhBaoThieuSauLoc(r, { I: 2, II: 4, III: 3 })
+    expect(c).toHaveLength(1) // I: còn 2 ≥ 2 đủ; II: không bị bỏ câu nào (thiếu sẵn từ đề) ⇒ im; III: còn 2 < 3 ⇒ cảnh báo
+    expect(c[0]).toBe('Phần III chỉ còn 2 câu sau khi bỏ câu tự luận, ít hơn 3 câu mỗi em phải làm — chọn thêm đề hoặc giảm số câu ở bước Rút câu.')
+    // không ghi số câu ⇒ dùng 18/4/6
+    const r2 = locTuLuanKhiMoCa([nguon('U', [], [], [sa('U-III-1'), saHoiMo('U-III-2')])], undefined, 'luon')
+    expect(canhBaoThieuSauLoc(r2, undefined)).toEqual(['Phần III chỉ còn 1 câu sau khi bỏ câu tự luận, ít hơn 6 câu mỗi em phải làm — chọn thêm đề hoặc giảm số câu ở bước Rút câu.'])
+    expect(canhBaoThieuSauLoc(locTuLuanKhiMoCa(vao, { I: 2, II: 2, III: 2 }, 'luon'), { I: 2, II: 2, III: 2 })).toEqual([])
+  })
+  it('vẫn dùng được chế độ khi_co_cat ở nơi khác (hàm giữ nguyên)', () => {
+    const vao = de()
+    expect(locTuLuanKhiMoCa(vao, { I: 3, II: 2, III: 3 }, 'khi_co_cat').soBo).toBe(0)
   })
 })
 

@@ -55,3 +55,31 @@ export function locTuLuanKhiMoCa(nguon: TeacherExamSource[], can: SoCauMoiPhan |
   if (!coDoi) return { nguon, soBo: 0, soBoTheoPhan }
   return { nguon: moi, soBo: soBoTheoPhan.I + soBoTheoPhan.II + soBoTheoPhan.III, soBoTheoPhan }
 }
+
+/** Số câu từng phần trong các nguồn (đã khử trùng bên ngoài). */
+export function demCauTheoPhan(nguon: TeacherExamSource[]): SoCauMoiPhan {
+  const d: SoCauMoiPhan = { I: 0, II: 0, III: 0 }
+  for (const x of nguon) for (const p of ['I', 'II', 'III'] as PhanCau[]) d[p] += (x[KHOA_PHAN[p]] as unknown[] | undefined)?.length ?? 0
+  return d
+}
+
+/** Câu chữ RÕ cho màn Mở ca khi bộ lọc bỏ câu: "Đã bỏ 4 câu tự luận (phần I: 1 · phần III: 3)". Không bỏ câu nào ⇒ chuỗi rỗng. */
+export function chuBoTuLuanChiTiet(kq: Pick<KetQuaLocMoCa, 'soBo' | 'soBoTheoPhan'>): string {
+  if (kq.soBo <= 0) return ''
+  const chiTiet = (['I', 'II', 'III'] as PhanCau[]).filter((p) => kq.soBoTheoPhan[p] > 0).map((p) => `phần ${p}: ${kq.soBoTheoPhan[p]}`)
+  return `Đã bỏ ${kq.soBo} câu tự luận (${chiTiet.join(' · ')}) — chỉ rút câu trắc nghiệm, đúng sai, trả lời ngắn`
+}
+
+/**
+ * CẢNH BÁO THIẾU SAU LỌC (bằng lời, cho thầy thấy ngay ở bước chọn đề — không âm thầm thiếu câu): phần nào BỊ BỎ câu tự luận mà số câu còn lại ít hơn số câu mỗi em phải làm.
+ * `can` = số câu mỗi em làm (ca đã rút/mã trận 2026), không ghi ⇒ luật 18/4/6. Phần không bị bỏ câu nào thì không cảnh báo (thiếu sẵn từ đề, không do bộ lọc).
+ */
+export function canhBaoThieuSauLoc(kq: KetQuaLocMoCa, can: SoCauMoiPhan | undefined): string[] {
+  const con = demCauTheoPhan(kq.nguon)
+  const ra: string[] = []
+  for (const p of ['I', 'II', 'III'] as PhanCau[]) {
+    const canP = Math.max(0, Math.floor(can?.[p] ?? SO_CAU_MAC_DINH_MOI_EM[p]))
+    if (kq.soBoTheoPhan[p] > 0 && con[p] < canP) ra.push(`Phần ${p} chỉ còn ${con[p]} câu sau khi bỏ câu tự luận, ít hơn ${canP} câu mỗi em phải làm — chọn thêm đề hoặc giảm số câu ở bước Rút câu.`)
+  }
+  return ra
+}

@@ -35,8 +35,7 @@ import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadTeacherSec
 import { AN_HAN_CHON_GIAY, BAT_MAC_DINH_CA_THI, MS_AN_HAN_NHA_TAY } from '../lib/giu-de-doc'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
-import { locTuLuanKhiMoCa } from '../lib/loc-tu-luan-mo-ca'
-import { chuBaoBoTuLuan } from '../lib/cau-tu-luan'
+import { canhBaoThieuSauLoc, chuBoTuLuanChiTiet, demCauTheoPhan, locTuLuanKhiMoCa } from '../lib/loc-tu-luan-mo-ca'
 import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
 
@@ -278,7 +277,14 @@ export default function ExamSetupScreen() {
   const dsNhom = useMemo(() => Array.from(new Set(savedSources.map((c) => (c.nhom || '').trim()).filter(Boolean))).sort(), [savedSources])
 
 
-  const tongCauDaChon = nguonRaDe.reduce((s, c) => s + c.phanI.length + c.phanII.length + c.phanIII.length, 0)
+  // CẤM RÚT CÂU TỰ LUẬN (thầy lệnh 21/09, kể cả ca kiểm tra): MỌI ca đều bỏ câu tự luận khỏi bộ câu — kể cả khi thầy chọn nguyên tờ; hiện RÕ ở bước chọn đề, không âm thầm thiếu câu.
+  const locMoCa = useMemo(() => locTuLuanKhiMoCa(nguonRaDe, soCauRaDe, 'luon'), [nguonRaDe, soCauRaDe])
+  const chuBoTuLuan = chuBoTuLuanChiTiet(locMoCa)
+  const canhBaoThieu = useMemo(() => canhBaoThieuSauLoc(locMoCa, soCauRaDe), [locMoCa, soCauRaDe])
+  const tongCauDaChon = (() => {
+    const d = demCauTheoPhan(locMoCa.nguon)
+    return d.I + d.II + d.III
+  })()
 
 
   const handleOpenSession = async () => {
@@ -303,8 +309,8 @@ export default function ExamSetupScreen() {
       const maCa = randomSessionCode()
       const nguonTruocLoc = chuan2026 ? rutDeChuan2026(selectedSources, maCa) : nguonRaDe
       const soCauCuoi = chuan2026 ? SO_CAU_CHUAN_2026 : soCauRaDe
-      // CẤM RÚT CÂU TỰ LUẬN (thầy lệnh 21/09): mọi chỗ APP TỰ RÚT câu (kho rộng đề riêng / mã trận 2026 / bộ vừa rút) không có câu tự luận; nguyên tờ thầy tự chọn (không bị cắt ngẫu nhiên) giữ nguyên.
-      const locTuLuan = locTuLuanKhiMoCa(nguonTruocLoc, soCauCuoi, chuan2026 || deRiengBat || boRut ? 'luon' : 'khi_co_cat')
+      // CẤM RÚT CÂU TỰ LUẬN (thầy lệnh 21/09, kể cả ca kiểm tra nguyên tờ): luôn bỏ câu tự luận khỏi bộ câu của ca. Chỉ đổi NGUỒN câu đầu vào; chấm điểm, chia đề, seed không đổi.
+      const locTuLuan = locTuLuanKhiMoCa(nguonTruocLoc, soCauCuoi, 'luon')
       const nguonCuoi = locTuLuan.nguon
       if (nguonCuoi.length === 0) return showToast('Bộ câu ra đề đang rỗng — chỉnh lại phần Bộ câu ra đề', 'error')
       // ĐỀ RIÊNG TỪNG EM: KHÔNG gắn bản đồ ở đây. Lúc mở ca chưa biết em nào
@@ -313,7 +319,7 @@ export default function ExamSetupScreen() {
       // RỘNG để lúc đó còn câu mà rút.
       const publicBank = mergeAndStrip(nguonCuoi, soCauCuoi)
       const keyBank = mergeKeepAnswers(nguonCuoi, soCauCuoi)
-      setBuocMoCa(`Đang gửi ca #${maCa} lên máy chủ…${locTuLuan.soBo > 0 ? ` ${chuBaoBoTuLuan(locTuLuan.soBo)}.` : ''}`)
+      setBuocMoCa(`Đang gửi ca #${maCa} lên máy chủ…${locTuLuan.soBo > 0 ? ` ${chuBoTuLuanChiTiet(locTuLuan)}.` : ''}`)
       const moc = await publishSession(diaChi, maCa, lop.trim(), chuan2026 ? 50 : thoiGianPhut, publicBank, congBoDiem, keyBank, {
         batDau: batDauIso,
         hanVaoPhut,
@@ -470,6 +476,16 @@ export default function ExamSetupScreen() {
             </button>
           </div>
         </div>
+        {(chuBoTuLuan || canhBaoThieu.length > 0) && (
+          <div className="mt-3 space-y-1" role="status">
+            {chuBoTuLuan && <div className="text-xs text-amber-700 dark:text-amber-300">{chuBoTuLuan}</div>}
+            {canhBaoThieu.map((c) => (
+              <div key={c} className="text-xs font-semibold text-red-600 dark:text-red-400">
+                {c}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* THẺ 2: LỚP HỌC & THỜI GIAN LÀM BÀI */}
