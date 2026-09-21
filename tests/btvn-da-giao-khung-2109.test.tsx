@@ -227,8 +227,8 @@ describe('bài quá hạn còn em chưa nộp + chi tiết thanh nhóm', () => {
   })
   it('đoạn quá hẹp: số KHÔNG nằm trong đoạn mà ra chú giải; tab "Cần để ý" mang đúng số em', () => {
     const d = canh('binh-thuong')
-    d[0]!.nhom = { chuaMo: 1, dungNhip: 40, chamNhip: 0, xongHomNay: 0, daNop: 0, nopTre: 0 }
-    d[0]!.hocSinh = d[0]!.hocSinh!.map((e, i) => ({ ...e, nhom: i === 0 ? ('chua_mo' as const) : ('dung_nhip' as const) }))
+    d[1]!.nhom = { chuaMo: 1, dungNhip: 40, chamNhip: 30, xongHomNay: 0, daNop: 0, nopTre: 0 } // d[1] = bài Lớp 12; chậm nhịp 30 ⇒ mức cao nhất ⇒ đứng đầu, thẻ MỞ (có số trong đoạn rộng); đoạn 'chưa mở 1' rất hẹp
+    d[1]!.hocSinh = d[1]!.hocSinh!.map((e, i) => ({ ...e, nhom: i === 0 ? ('chua_mo' as const) : ('dung_nhip' as const) }))
     dung('binh-thuong', { ds: nhomBtvn(d) })
     const doanDau = [...document.querySelectorAll('.btg-doan')].find((x) => x.getAttribute('aria-label')?.startsWith('chưa mở: 1 em'))!
     expect(doanDau.textContent).toBe('')
@@ -236,7 +236,9 @@ describe('bài quá hạn còn em chưa nộp + chi tiết thanh nhóm', () => {
     cleanup()
     dung('binh-thuong')
     fireEvent.click(within(the()[0]!).getByRole('button', { name: 'Xem 20 em này' }))
-    expect(within(screen.getByRole('dialog', { name: /Danh sách em của/ })).getByRole('tab', { name: /Cần để ý\s*20/ })).toBeTruthy()
+    const ngan2 = screen.getByRole('dialog', { name: /Danh sách em của/ })
+    expect(within(ngan2).getByRole('tab', { name: /Cần để ý\s*20/ })).toBeTruthy()
+    expect(within(ngan2).queryByRole('tab', { name: /Chưa nộp/ })).toBeNull() // bài chưa quá hạn: không có tab "Chưa nộp"
   })
   it('thông báo kết quả hiện CẢ TRONG hộp đang mở (không nằm sau lớp phủ)', () => {
     dung('binh-thuong', { thongBao: <p data-testid="tb">Đã cho Lê Minh Đức làm lại</p> })

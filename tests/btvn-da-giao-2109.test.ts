@@ -124,6 +124,7 @@ describe('chữ hạn nộp + đếm ngược (giờ VN)', () => {
     const han = vn('2026-09-24T12:00')
     expect(demNguocHan(han, vn('2026-09-22T18:45'))).toEqual({ chu: 'còn 1 ngày 17 giờ', cam: false, qua: false })
     expect(demNguocHan(han, vn('2026-09-21T19:00'))).toEqual({ chu: 'còn 2 ngày 17 giờ', cam: false, qua: false }) // đúng số của mẫu phác (65 giờ)
+    expect(demNguocHan(han, han - (47 * 60 + 30) * 60_000)).toEqual({ chu: 'còn 1 ngày 23 giờ', cam: false, qua: false }) // 2 850 phút: sát biên 2 ngày (bắt nhầm hệ số ngày)
     expect(demNguocHan(han, vn('2026-09-24T06:48'))).toEqual({ chu: 'còn 5 giờ 12 phút', cam: true, qua: false })
     expect(demNguocHan(han, vn('2026-09-24T11:18'))).toEqual({ chu: 'còn 42 phút', cam: true, qua: false })
     expect(demNguocHan(han, han - 1000)).toEqual({ chu: 'còn 1 phút', cam: true, qua: false })
