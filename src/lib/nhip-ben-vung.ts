@@ -2,6 +2,8 @@
 // Luật (Boss): (1) nhịp nền CHẬM (mặc định 180 giây) + LỆCH ngẫu nhiên ±30 giây để hàng trăm máy không đồng pha; (2) KHÔNG gọi khi lần trước chưa xong; (3) vẫn gọi khi quay lại tab / có mạng lại nhưng CHẶN DỘI (≥ 20 giây kể từ lần bắt đầu trước);
 // (4) lỗi / hết giờ ⇒ LÙI DẦN 30 → 60 → 120 → 300 giây (không bao giờ NHANH hơn nhịp thường), thành công thì về nhịp thường; (5) tab ẩn thì không gọi (hẹn lại). Không đổi luật gì của máy chủ. THUẦN (không React) — bọc trong effect ở nơi dùng.
 
+import { nhipSauHeSo } from './nhip-de-nghi'
+
 export const NHIP_NEN_MS = 180_000
 export const LECH_NHIP_MS = 30_000
 export const CHAN_DOI_MS = 20_000
@@ -36,8 +38,9 @@ export interface VongTrucTiep {
 export function batVongTrucTiep(
   chay: () => Promise<unknown> | unknown,
   coSoMs: number,
-  o: { datGio?: (f: () => void, ms: number) => ReturnType<typeof setTimeout>; xoaGio?: (t: ReturnType<typeof setTimeout> | undefined) => void } = {},
+  o: { datGio?: (f: () => void, ms: number) => ReturnType<typeof setTimeout>; xoaGio?: (t: ReturnType<typeof setTimeout> | undefined) => void; /** Hệ số `nhipDeNghi` tối đa áp cho vòng trực tiếp (mặc định 2: trận đang chơi không giãn quá gấp đôi). */ heSoToiDa?: number } = {},
 ): VongTrucTiep {
+  const nhipHienHanh = () => nhipSauHeSo(coSoMs, { heSoToiDa: o.heSoToiDa ?? 2, tranMs: coSoMs * 2 })
   const dat = o.datGio ?? ((f, ms) => setTimeout(f, ms))
   const xoa = o.xoaGio ?? ((t) => clearTimeout(t))
   let dungRoi = false, loi = 0
@@ -51,9 +54,9 @@ export function batVongTrucTiep(
       hong = true
     }
     loi = hong ? loi + 1 : 0
-    if (!dungRoi) gio = dat(() => void buoc(), khoangChoTrucTiep(coSoMs, loi))
+    if (!dungRoi) gio = dat(() => void buoc(), khoangChoTrucTiep(nhipHienHanh(), loi))
   }
-  gio = dat(() => void buoc(), coSoMs)
+  gio = dat(() => void buoc(), nhipHienHanh())
   return { dung: () => { dungRoi = true; xoa(gio); gio = undefined }, soLoi: () => loi }
 }
 
@@ -65,6 +68,10 @@ export interface TuyChonNhip {
   chayNgay?: boolean
   /** Bảng lùi riêng khi lỗi liên tiếp (mili-giây, giữ ở mức cuối); mặc định `LUI_DAN_MS`. Vd Theo dõi ca của thầy: [30 s, 40 s] — lùi TỐI ĐA 40 s để số không cũ quá. */
   luiDanMs?: readonly number[]
+  /** Hệ số `nhipDeNghi` của máy chủ tối đa được nhân vào nhịp gốc (mặc định 4; hiện diện đặt 1 vì máy chủ coi "online" trong 90 s). */
+  heSoToiDa?: number
+  /** Trần nhịp sau khi nhân hệ số (ms); mặc định max(nhịp gốc, 300 s). */
+  tranMs?: number
   // để test / môi trường lạ:
   ngauNhien?: () => number
   bayGio?: () => number
@@ -96,7 +103,7 @@ export function batNhipBenVung(chay: () => Promise<unknown> | unknown, o: TuyCho
   const xep = () => {
     if (dungRoi) return
     xoa(gio)
-    gio = dat(nhip, khoangChoTiepTheo(coSo, lech, loi, o.ngauNhien, o.luiDanMs))
+    gio = dat(nhip, khoangChoTiepTheo(nhipSauHeSo(coSo, { heSoToiDa: o.heSoToiDa, tranMs: o.tranMs }, bay()), lech, loi, o.ngauNhien, o.luiDanMs))
   }
   const chayMot = async () => {
     if (dungRoi || dangChay) return

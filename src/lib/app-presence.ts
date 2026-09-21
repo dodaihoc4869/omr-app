@@ -7,6 +7,6 @@ export function startAppPresence(){
  let busy=false,stopped=false
  const ping=async():Promise<boolean>=>{if(document.hidden||busy||stopped)return true;busy=true;const c=new AbortController(),t=setTimeout(()=>c.abort(),10000);try{const url=await layDiaChiMayChu();if(url&&!stopped)await fetch(`${url}/presence`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({session,role}),signal:c.signal});return true}catch{/* Presence never blocks learning. */return false}finally{clearTimeout(t);busy=false}}
  // Sự cố D1 21/09: 30 giây × mọi máy. Máy chủ tính "đang online" trong 90 giây (teacher-news.ts) nên KHÔNG chậm hơn 60 s ± 10 s được (chờ Code 3 nới cửa sổ rồi mới tăng); vẫn không gọi chồng, lỗi ⇒ lùi 30→60→120 s, quay lại tab dội ≥ 20 s.
- const nhip=batNhipBenVung(ping,{coSoMs:60_000,lechMs:10_000});const focus=()=>nhip.kich();window.addEventListener('focus',focus);document.addEventListener('visibilitychange',focus)
+ const nhip=batNhipBenVung(ping,{coSoMs:60_000,lechMs:10_000,heSoToiDa:1});const focus=()=>nhip.kich();window.addEventListener('focus',focus);document.addEventListener('visibilitychange',focus)
  return()=>{stopped=true;nhip.dung();window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',focus)}
 }

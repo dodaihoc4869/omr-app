@@ -1,4 +1,5 @@
 import {startAppPresence} from './lib/app-presence'
+import { batDocNhipDeNghi } from './lib/nhip-de-nghi'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { registerSW } from 'virtual:pwa-register'
@@ -36,6 +37,9 @@ import { napDiaChiMayChuMoiChoEm } from './lib/may-chu-moi'
 // Dọn thiết lập cũ nếu cấu trúc dữ liệu đã đổi. Chạy trước mọi logic khác;
 // KHÔNG đụng id thiết bị và IndexedDB (xem don-phien-cu.ts).
 donPhienCu()
+
+// `nhipDeNghi` của máy chủ (Code 3, M3): CHỈ ĐỌC header `x-nhip-de-nghi` để các vòng hỏi nền tự giãn nhịp khi máy chủ bận. Không đụng thân phản hồi; chưa có header ⇒ không làm gì.
+batDocNhipDeNghi()
 
 // Đổi /gv và /t/<mã ca> thành tham số truy vấn — việc mà public/404.html vẫn
 // làm, nhưng 404.html không chạy trên máy đã cài app (service worker trả thẳng
