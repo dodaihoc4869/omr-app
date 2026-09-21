@@ -21,6 +21,7 @@ import {gvBangTin} from './gv-bang-tin'
 import {ghiLoiMay} from './nhat-ky-may'
 import {chotNgayRoiTruKhien} from './khien-mat'
 import {chuyenDoiLoCron} from './game-v2-hap-thu'
+import {hsThiDuaHomNay,gvChuaHocHomNay} from './thi-dua-hom-nay'
 import {phGiaoThem} from './ph-giao-them'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {docThanThuSoThat,hsThuThachHomNay,hsThuThachNop} from './thu-thach-rieng'
@@ -3080,6 +3081,8 @@ export default {
       if (p === '/btvn/nop') return nopBtvn(env, b)
       if (p === '/btvn/xong-lo') return xongLoBtvn(env, b)
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
+      // Ô "Thi đua hôm nay" (Điều 8, phương án 8A): ĐỌC-CHỈ, token của em (thi-dua-hom-nay.ts của Code 4).
+      if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(env, b))
       if (p === '/hs/ke-hoach-ngay') {
         const kh = await hsKeHoachNgayCoExp(env, b)
         // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
@@ -3148,7 +3151,8 @@ export default {
       // BUỔI CHỮA TỐI NAY (B6, docs/hop-dong-buoi-chua-de-xuat-2109.md): số liệu thô ĐỌC-CHỈ, ≤ 12 truy vấn.
       if (p === '/gv/buoi-chua-de-xuat') return ra(await gvBuoiChuaDeXuat(env, b))
       // BẢNG TIN CỦA THẦY bản 3 (docs/hop-dong-bang-tin-v3-2109.md): MỘT lệnh đọc-chỉ ≤ 12 truy vấn cho cả màn Hôm nay, số liệu tính từ mốc `cau_hinh.bang_tin_tu`.
-      if (p === '/gv/bang-tin') return ra(await gvBangTin(env, b))
+      // `chuaHocHomNay` (Code 4, Điều 8): chỉ-thêm, khối RIÊNG ngoài bộ đếm truy vấn của bảng tin; lỗi/thiếu ⇒ vắng khoá (máy thầy ẩn khối, không bịa).
+      if (p === '/gv/bang-tin') { const r = await gvBangTin(env, b); if (r.ok !== false) { try { r.chuaHocHomNay = await gvChuaHocHomNay(env) } catch (e) { console.error('[bang-tin] chưa học hôm nay lỗi:', e) } } return ra(r) }
       // CỜ TẮT chung của các việc máy tự làm B7–B11 (thầy chỉ tắt/bật): đọc-ghi khoá `cau_hinh.tu_dong_cac_viec`.
       if (p === '/gv/tu-dong-cac-viec') return ra(await gvTuDongCacViec(env, b))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
