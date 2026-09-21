@@ -28,7 +28,8 @@ describe('POST /len-bang đọc giayThuc', () => {
     expect(d.sql.prepare("SELECT COUNT(*) AS n FROM su_kien_hoc WHERE nguon = 'len_bang' AND sbd = 'S1' AND qid = 'Q1'").get()).toEqual({ n: 1 })
     expect(d.sql.prepare("SELECT so_lan FROM qid_da_lam WHERE sbd = 'S1' AND qid = 'Q1'").get()).toEqual({ so_lan: 1 })
     expect(d.sql.prepare("SELECT da_chua FROM ban_do_sai WHERE sbd = 'S1' AND qid = 'Q1'").get()).toEqual({ da_chua: 1 })
-    expect(JSON.stringify(r)).not.toContain('60')
+    const { serverNow: _dongHo, ...phanHoi } = r // `serverNow` là mili giây đồng hồ (có lúc chứa chuỗi "60"): chỉ kiểm phần phản hồi của lệnh, không kiểm đồng hồ
+    expect(JSON.stringify(phanHoi)).not.toContain('60')
   })
   it('chưa chạy migration (cột giay_thuc chưa có): vẫn ghi như cũ, không ghi đôi, không lỗi', async () => {
     const d = taoD1That()
