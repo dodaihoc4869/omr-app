@@ -14,6 +14,8 @@ import { loadTeacherSecret } from '../lib/exam-db'
 import { useAppStore } from '../store/appStore'
 import { dinhDangDeCayThuMuc } from '../screens/PhanCongScreen'
 import KhoiBoNaoDemQua from './KhoiBoNaoDemQua'
+import ONgayGio24 from './ONgayGio24'
+import { gioDayDu } from '../lib/ngay-gio-24'
 import './m3/bang-tin.css' // chữ vàng cố định của bảng vinh danh (1,7:1 trên nền sáng) đọc theo cặp cảnh báo M3 — cùng lớp với Bảng tin HS/PH
 import './BangTinPhuHuynh.css'
 
@@ -113,13 +115,8 @@ export default function BangTinGiaoVien() {
           </div>
 
           <div className="flex gap-2 items-center">
-            <input
-              aria-label="Ngày xem bảng tin"
-              type="date"
-              value={day || report?.day || ''}
-              onChange={(e) => setDay(e.target.value)}
-              className="text-xs sm:text-sm bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-2xs"
-            />
+            {/* Ô ngày/tháng/năm 24 giờ dùng chung (thầy yêu cầu 21/09). Nhập dở / không có thật thì giữ NGÀY ĐANG XEM (không nhảy về hôm nay giữa chừng). */}
+            <ONgayGio24 nhan="Ngày xem bảng tin" chiNgay value={day || report?.day || ''} onChange={(v) => v && setDay(v)} />
             <button
               className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-50 dark:bg-blue-950/60 text-[color:var(--m3-primary)] border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
               disabled={loading}
@@ -263,7 +260,7 @@ export default function BangTinGiaoVien() {
                           {b.thu_hoi ? `· ${b.thu_hoi} thu hồi riêng` : ''}
                         </p>
                         <p className="text-slate-400 text-[10px]">
-                          Hạn: {new Date(b.han_nop).toLocaleString('vi-VN')}
+                          Hạn: {gioDayDu(b.han_nop)}
                         </p>
                       </article>
                     ))}

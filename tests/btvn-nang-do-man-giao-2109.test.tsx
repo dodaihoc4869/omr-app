@@ -84,16 +84,43 @@ describe('màn Giao bài · Cá nhân hoá', () => {
     expect(screen.queryByText(/Mỗi em một bộ riêng/)).toBeNull()
   })
 
-  it('HẠN NỘP MẶC ĐỊNH 23:59 (giờ chốt mỗi ngày của học sinh): ô đã điền sẵn, giao gửi ISO đúng 23:59 giờ Việt Nam; xoá trắng ⇒ gửi undefined như cũ', async () => {
+  it('HẠN NỘP MẶC ĐỊNH 23:59 (giờ chốt mỗi ngày của học sinh): ô ngày/tháng/năm + giờ:phút 24 giờ điền sẵn, giao gửi ISO đúng 23:59 giờ Việt Nam', async () => {
     await moManGiao()
-    const o = screen.getByLabelText('Hạn nộp bài mới') as HTMLInputElement
-    expect(o.value).toMatch(/^\d{4}-\d{2}-\d{2}T23:59$/)
+    const o = within(screen.getByRole('group', { name: 'Hạn nộp bài mới' }))
+    expect((o.getByLabelText('Giờ') as HTMLInputElement).value).toBe('23')
+    expect((o.getByLabelText('Phút') as HTMLInputElement).value).toBe('59')
     expect(screen.getByText(/Mặc định 23:59 — giờ chốt mỗi ngày của học sinh/)).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /Giao bài tập/ }))
     await waitFor(() => expect(m.giao).toHaveBeenCalled())
     const han = m.giao.mock.calls[0][5] as string
     expect(new Date(han).toISOString().slice(11, 16)).toBe('16:59') // 23:59 giờ VN = 16:59 UTC
     expect(new Date(han).getTime()).toBeGreaterThan(Date.now())
+  })
+
+  it('ô hạn: ngày KHÔNG CÓ THẬT (31/02) báo lỗi và CHẶN Giao (không lặng lẽ rơi về mặc định); xoá trắng hết ⇒ gửi undefined như cũ', async () => {
+    await moManGiao()
+    const o = () => within(screen.getByRole('group', { name: 'Hạn nộp bài mới' }))
+    for (const [ten, v] of [['Ngày', '31'], ['Tháng', '02'], ['Năm', '2030']] as const) fireEvent.change(o().getByLabelText(ten), { target: { value: v } })
+    expect((await screen.findAllByRole('alert')).some((e) => e.textContent === 'Ngày 31/02/2030 không có thật.')).toBe(true)
+    fireEvent.click(screen.getByRole('button', { name: /Giao bài tập/ }))
+    expect(await screen.findByText('Hạn nộp chưa hợp lệ — sửa ô hạn nộp rồi giao lại.')).toBeTruthy()
+    expect(m.giao).not.toHaveBeenCalled()
+    for (const ten of ['Ngày', 'Tháng', 'Năm', 'Giờ', 'Phút']) fireEvent.change(o().getByLabelText(ten), { target: { value: '' } })
+    fireEvent.click(screen.getByRole('button', { name: /Giao bài tập/ }))
+    await waitFor(() => expect(m.giao).toHaveBeenCalledTimes(1))
+    expect(m.giao.mock.calls[0][5]).toBeUndefined()
+  })
+
+  it('nút nhanh "Mai 23:59" đặt đúng hạn: 23:59 giờ VN của ngày mai', async () => {
+    await moManGiao()
+    const o = () => within(screen.getByRole('group', { name: 'Hạn nộp bài mới' }))
+    fireEvent.click(o().getByRole('button', { name: 'Mai 23:59' }))
+    fireEvent.click(screen.getByRole('button', { name: /Giao bài tập/ }))
+    await waitFor(() => expect(m.giao).toHaveBeenCalledTimes(1))
+    const han = new Date(m.giao.mock.calls[0][5] as string)
+    expect(han.toISOString().slice(11, 16)).toBe('16:59')
+    expect(han.getTime() - Date.now()).toBeGreaterThan(0)
+    expect(han.getTime() - Date.now()).toBeLessThanOrEqual(2 * 86_400_000)
   })
 
   it('cảnh báo của máy chủ: lõi dưới 6 câu · qid lạ bị bỏ · câu thiếu dạng/mức — nói thật, bài vẫn giao', async () => {

@@ -1,5 +1,5 @@
 import {afterEach,expect,it,vi} from 'vitest'
-import {render,screen,fireEvent,waitFor,cleanup} from '@testing-library/react'
+import {render,screen,fireEvent,waitFor,cleanup,within} from '@testing-library/react'
 import PhanCongScreen from '../src/screens/PhanCongScreen'
 const mocks=vi.hoisted(()=>({giao:vi.fn(),theoDoi:vi.fn().mockResolvedValue([])}))
 vi.mock('../src/lib/exam-db',()=>({loadScriptUrl:async()=>'/test',loadTeacherSecret:async()=>'test',loadExamSources:async()=>[]}))
@@ -31,7 +31,9 @@ it('giữ màn giao và dữ liệu đã chọn khi máy chủ từ chối giao'
 })
 it('hạn đã qua không gửi yêu cầu giao lên máy chủ',async()=>{
  await open()
- fireEvent.change(screen.getByLabelText('Hạn nộp bài mới'),{target:{value:'2000-01-01T12:00'}})
+ // ô hạn nộp là ô ngày/tháng/năm + giờ:phút 24 giờ (ONgayGio24) — nhập từng ô: 01/01/2000 12:00
+ const o=within(screen.getByRole('group',{name:'Hạn nộp bài mới'}))
+ for(const [ten,v] of [['Ngày','01'],['Tháng','01'],['Năm','2000'],['Giờ','12'],['Phút','00']]) fireEvent.change(o.getByLabelText(ten),{target:{value:v}})
  fireEvent.click(screen.getByRole('button',{name:/Giao bài tập/}))
  await screen.findByText('Hạn nộp phải ở sau thời điểm hiện tại.')
  expect(mocks.giao).not.toHaveBeenCalled()

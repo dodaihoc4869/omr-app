@@ -1,4 +1,6 @@
-import { hanNhapVietNam, hanChoOChon, mocThoiGian, gioHanVietNam } from '../lib/han-bai-tap'
+import { hanNhapVietNam, hanChoOChon, mocThoiGian } from '../lib/han-bai-tap'
+import { gioDayDu } from '../lib/ngay-gio-24'
+import ONgayGio24 from '../components/ONgayGio24'
 import KhoiBtvnLo from '../components/KhoiBtvnLo'
 import KhoiCaNhanHoa from '../components/KhoiCaNhanHoa'
 import XemTruocPhanBo from '../components/XemTruocPhanBo'
@@ -29,7 +31,8 @@ interface DeKho {
   soCau: number
 }
 
-const gioVN = gioHanVietNam
+/** Mọi chỗ HIỆN giờ/hạn ở màn này: "HH:mm · Thứ Sáu 25/09/2026" (giờ Việt Nam, 24 giờ — thầy yêu cầu 21/09). */
+const gioVN = (v: unknown) => gioDayDu(v)
 
 /** Đổi mã đề dạng DH-12-C2-B6-DS,DH-12-C2-B6-TLN thành cây thư mục Dạy học / Lớp 12 / Ch.2 / Bài 6 / Đúng sai · Trả lời ngắn */
 export function dinhDangDeCayThuMuc(maDeStr: string): string {
@@ -189,6 +192,8 @@ function TheGiaoBtvn() {
   const [bao, setBao] = useState<{ ok: boolean; chu: string } | null>(null)
   // Hạn nộp mặc định 23:59 (giờ chốt mỗi ngày của học sinh — thầy chốt 21/09); thầy vẫn đổi được, và xoá trắng thì máy chủ tự đặt như cũ.
   const [hanMoi, setHanMoi] = useState(() => hanMacDinhVN(Date.now()))
+  // Lỗi của ô hạn (ngày không có thật / đã qua / nhập dở) — chặn Giao để hạn không bị lặng lẽ rơi về mặc định.
+  const [loiHan, setLoiHan] = useState('')
   const [suaHan, setSuaHan] = useState<Record<string,string>>({})
   const [dangSua, setDangSua] = useState('')
   const [xacNhan,setXacNhan]=useState<{text:string;run:()=>Promise<void>}|null>(null)
@@ -441,7 +446,21 @@ function TheGiaoBtvn() {
     finally{setDangSua('')}
   }
 
+  /** Hạn dùng cho Xem trước: hạn thầy nhập; nhập dở / đã qua thì tạm lấy sau 48 giờ (ô hạn đang báo lỗi, Giao sẽ bị chặn) — không để màn vỡ. */
+  function hanChoXemTruoc(): string {
+    try {
+      if (hanMoi) return hanNhapVietNam(hanMoi, nowHocTap)
+    } catch {
+      /* rơi xuống mặc định */
+    }
+    return new Date(nowHocTap + 48 * 3600_000).toISOString()
+  }
+
   async function giao() {
+    if (loiHan) {
+      setBao({ ok: false, chu: 'Hạn nộp chưa hợp lệ — sửa ô hạn nộp rồi giao lại.' })
+      return
+    }
     setDangGiao(true)
     setBao(null)
     try {
@@ -948,17 +967,12 @@ function TheGiaoBtvn() {
             </h2>
 
             <div className="flex flex-wrap items-center gap-4 text-xs">
-              <label className="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-300">
-                <Clock size={16} className="text-slate-400" /> Hạn nộp (giờ Việt Nam):
-                <input
-                  aria-label="Hạn nộp bài mới"
-                  type="datetime-local"
-                  value={hanMoi}
-                  onChange={(e) => setHanMoi(e.target.value)}
-                  style={{ colorScheme: 'light dark' }}
-                  className="rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-2 text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                />
-              </label>
+              <div className="flex flex-wrap items-start gap-2 font-bold text-slate-700 dark:text-slate-300">
+                <span className="flex items-center gap-2" style={{ minHeight: 48 }}>
+                  <Clock size={16} className="text-slate-400" /> Hạn nộp (giờ Việt Nam):
+                </span>
+                <ONgayGio24 nhan="Hạn nộp bài mới" value={hanMoi} onChange={setHanMoi} onLoi={setLoiHan} nhanh khongQuaKhu />
+              </div>
               <span className="text-slate-500 dark:text-slate-400">
                 {hanMoi ? (hanMoi.endsWith('T23:59') ? 'Mặc định 23:59 — giờ chốt mỗi ngày của học sinh (giờ Việt Nam). Học sinh cần nộp trước mốc này.' : 'Áp dụng giờ Việt Nam đã chọn. Học sinh cần nộp trước mốc này.') : '(Để trống: mặc định hạn nộp sau 48 giờ)'}
               </span>
@@ -1033,7 +1047,7 @@ function TheGiaoBtvn() {
             dsMaDe: [...daChon],
             cau: cauDaChon,
             ghim: ghimHopLe,
-            hanNop: hanMoi ? hanNhapVietNam(hanMoi, nowHocTap) : new Date(nowHocTap + 48 * 3600_000).toISOString(),
+            hanNop: hanChoXemTruoc(),
             hatGiong: hatGiongRef.current,
           }}
           dsSbd={dsSbdNhan}
@@ -1120,7 +1134,7 @@ function TheGiaoBtvn() {
                         </h3>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                           Giao lúc {gioVN(t.giaoLuc)}
-                          <NhanHanBaiTap han={t.hanNop} now={nowHocTap} daNop={t.chuaNop.length === 0} />
+                          <NhanHanBaiTap han={t.hanNop} now={nowHocTap} daNop={t.chuaNop.length === 0} dayDu />
                         </p>
                       </div>
                       <span
@@ -1138,16 +1152,12 @@ function TheGiaoBtvn() {
 
                     {/* HÀNG THAO TÁC HẠN NỘP & THU HỒI */}
                     <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex flex-wrap items-center gap-2">
-                      <input
-                        aria-label={`Hạn nộp ${t.maBtvn}`}
-                        type="datetime-local"
-                        value={
-                          suaHan[t.maBtvn] ??
-                          hanChoOChon(t.hanNop)
-                        }
-                        onChange={(e) => setSuaHan((v) => ({ ...v, [t.maBtvn]: e.target.value }))}
-                        style={{ colorScheme: 'light dark' }}
-                        className="rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-1.5 text-xs text-slate-900 dark:text-white font-medium flex-1 min-w-[150px]"
+                      <ONgayGio24
+                        nhan={`Hạn nộp ${t.maBtvn}`}
+                        value={suaHan[t.maBtvn] ?? hanChoOChon(t.hanNop)}
+                        onChange={(v) => setSuaHan((c) => ({ ...c, [t.maBtvn]: v }))}
+                        nhanh
+                        khongQuaKhu
                       />
                       <button
                         disabled={dangSua === t.maBtvn}

@@ -4,6 +4,7 @@
 // đủ thì báo rõ số câu có được, không âm thầm giao ít hơn.
 import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, Square, X } from 'lucide-react'
+import ONgayGio24 from './ONgayGio24'
 import { Hang, Nhan, OThongBao, NutChinh } from './DesignSystem'
 import { demCauTheoChuyenDe, rutBaiTap, SO_CAU_BAI_TAP_MAC_DINH, SO_CAU_BAI_TAP_TOI_DA, SO_CAU_BAI_TAP_TOI_THIEU, type MucDoLoc } from '../lib/bai-tap'
 import { LOC_DANG_MAC_DINH, MOI_LOC_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
@@ -377,24 +378,8 @@ export default function GiaoBaiTap({
           <div className="font-bold" style={{ fontSize: 'var(--cx-2)', marginBottom: 'var(--k2)' }}>
             Hạn nộp
           </div>
-          <input
-            type="date"
-            value={hanNgay}
-            onChange={(e) => setHanNgay(e.target.value)}
-            style={{
-              height: 48,
-              borderRadius: 'var(--bo-1)',
-              padding: '0 var(--k4)',
-              background: 'var(--the-2)',
-              border: '1.5px solid transparent',
-              fontFamily: 'var(--sans)',
-              fontSize: 'var(--cx-2)',
-              color: 'var(--muc)',
-              outline: 'none',
-              width: '100%',
-            }}
-            aria-label="Hạn nộp bài tập"
-          />
+          {/* Ô ngày/tháng/năm 24 giờ dùng chung (thầy yêu cầu 21/09). Giá trị ra vẫn 'YYYY-MM-DD' cho `hanNopISO` (hết ngày 23:59, giờ máy) — không đổi payload. */}
+          <ONgayGio24 nhan="Hạn nộp bài tập" value={hanNgay} onChange={setHanNgay} chiNgay nhanh khongQuaKhu muiGio="may" />
           <div style={{ ...NHAN_NHO, marginTop: 4 }}>Hết ngày này. Nộp muộn vẫn nhận, chỉ đánh dấu quá hạn.</div>
         </div>
 

@@ -36,6 +36,7 @@ import { AN_HAN_CHON_GIAY, BAT_MAC_DINH_CA_THI, MS_AN_HAN_NHA_TAY } from '../lib
 import { dongBoNganHang } from '../lib/exam-sync'
 import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
 import { useAppStore } from '../store/appStore'
+import ONgayGio24 from '../components/ONgayGio24'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -585,16 +586,10 @@ export default function ExamSetupScreen() {
 
         {batDauCach === 'hen' && (
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
-            <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
-              Chọn thời điểm tự động mở ca:
-            </label>
-            <input
-              type="datetime-local"
-              value={batDauLocal}
-              onChange={(e) => setBatDauLocal(e.target.value)}
-              style={{ colorScheme: 'light dark' }}
-              className="w-full h-9 px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white shadow-2xs focus:ring-2 focus:ring-blue-500/30"
-            />
+            <div className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
+              Chọn thời điểm tự động mở ca (ngày/tháng/năm, giờ 24 giờ):
+            </div>
+            <ONgayGio24 nhan="Thời điểm tự động mở ca" value={batDauLocal} onChange={setBatDauLocal} muiGio="may" />
           </div>
         )}
       </div>
