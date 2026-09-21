@@ -43,6 +43,9 @@ import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
 import { CAU_HINH_LEN_BANG_MAC_DINH, TEN_LANE, dongHo, nganSachGiay } from '../lib/len-bang-cau-hinh'
 import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
 import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
+import { deXuatBuoiChua, type DauVaoDeXuat } from '../lib/buoi-chua-de-xuat'
+import { khoTuNguon, layDeXuatBuoiChua } from '../lib/buoi-chua-de-xuat-lenh'
+import TheBuoiChuaXepSan from '../components/TheBuoiChuaXepSan'
 import { noiDungTuCauGoc } from '../lib/thoi-gian-len-bang'
 import { uocLuongBacCau, uocLuongBacCauGoc } from '../lib/uoc-luong-bo-cuc'
 import { heSoCua, heSoHieuChinh } from '../lib/hieu-chinh-giay-thuc'
@@ -158,7 +161,6 @@ const O_NHAP: React.CSSProperties = {
   fontFamily: 'var(--sans)',
   fontSize: 'var(--cx-2)',
   color: 'var(--muc)',
-  outline: 'none',
   width: '100%',
 }
 
@@ -244,6 +246,26 @@ export default function GoiLenBangScreen() {
   useEffect(() => {
     void loadExamSources().then((ds) => setKhoDe(khuTrungNguon(ds).nguon))
   }, [])
+  // BUỔI CHỮA XẾP SẴN (B6, Boss duyệt 21/09): máy chủ gom số liệu 3 ngày qua khi thầy mở màn; hàm thuần `deXuatBuoiChua` chọn câu/em trên kho của máy thầy (lọc tự luận).
+  // Lệnh chưa có / lỗi / thiếu kho ⇒ thẻ ẨN, không báo lỗi đỏ. `gioiHanId`: chỉ các câu này (id trong kho) làm nguồn ở cách "tự chọn" — bỏ ngay khi thầy đổi cách chọn.
+  const [deXuatDv, setDeXuatDv] = useState<DauVaoDeXuat | null>(null)
+  const [anDeXuat, setAnDeXuat] = useState(false)
+  const [gioiHanId, setGioiHanId] = useState<Set<string> | null>(null)
+  const [choChonDeXuat, setChoChonDeXuat] = useState(false)
+  const [choChayDeXuat, setChoChayDeXuat] = useState(false)
+  useEffect(() => {
+    let huy = false
+    void layDeXuatBuoiChua()
+      .then((r) => {
+        if (!huy) setDeXuatDv(r.ok ? r.du : null)
+      })
+      .catch(() => {})
+    return () => {
+      huy = true
+    }
+  }, [])
+  const khoCauDeXuat = useMemo(() => khoTuNguon(khoDe), [khoDe])
+  const deXuat = useMemo(() => (deXuatDv && khoCauDeXuat.length > 0 ? deXuatBuoiChua(deXuatDv, khoCauDeXuat) : null), [deXuatDv, khoCauDeXuat])
   const [timEm, setTimEm] = useState('')
 
   const [soLuot, setSoLuot] = useState(1)
@@ -386,6 +408,7 @@ export default function GoiLenBangScreen() {
     if (!cauHinh) return showToast('Chưa cấu hình máy chủ', 'error')
     setDangTaiCa(ca.maCa)
     setLoi('')
+    setGioiHanId(null)
     setKq(null)
     setSoLuot(1)
     setDaGoiCau({})
@@ -470,10 +493,14 @@ export default function GoiLenBangScreen() {
   /** Bản đề của các mã thầy tích thêm, gộp lại thành một kho. */
   // KHỬ TRÙNG Ở ĐÂY, sau khi thầy đã tích — hộp chọn vẫn hiện đủ kho, còn danh
   // sách chữa thì không có hai câu y hệt nhau.
-  const bankTichTay: BanDeCa = useMemo(
-    () => mergeKeepAnswers(dayHoc ? deDaLuu.filter(d => maDeChon.has(d.maDe)) : khuTrungNguon(deDaLuu.filter((d) => maDeChon.has(d.maDe))).nguon),
-    [deDaLuu, maDeChon, dayHoc],
-  )
+  const bankTichTay: BanDeCa = useMemo(() => {
+    // Buổi chữa XẾP SẴN đang dùng: lấy đúng các câu máy đề xuất từ cả kho (không phụ thuộc đề thầy tích).
+    if (gioiHanId && !dayHoc) {
+      const tatCa = mergeKeepAnswers(deDaLuu)
+      return { phanI: tatCa.phanI.filter((q) => gioiHanId.has(q.id)), phanII: tatCa.phanII.filter((q) => gioiHanId.has(q.id)), phanIII: tatCa.phanIII.filter((q) => gioiHanId.has(q.id)) }
+    }
+    return mergeKeepAnswers(dayHoc ? deDaLuu.filter(d => maDeChon.has(d.maDe)) : khuTrungNguon(deDaLuu.filter((d) => maDeChon.has(d.maDe))).nguon)
+  }, [deDaLuu, maDeChon, dayHoc, gioiHanId])
   /** Số câu bị bỏ vì trùng — nói ra để thầy khỏi thắc mắc sao tích 40 ra 36. */
   const soCauTrung = useMemo(() => {
     const bo = khuTrungNguon(deDaLuu.filter((d) => maDeChon.has(d.maDe))).boQua
@@ -937,6 +964,7 @@ export default function GoiLenBangScreen() {
   const tiepTucBuoi = () => {
     if (!buoiDo || !tinhTrangDo) return
     const tt = tinhTrangDo
+    setGioiHanId(null)
     setCachLayCau(buoiDo.nguon.cachLayCau)
     setMaDeChon(new Set(buoiDo.nguon.maDeChon))
     setSoCauChua(buoiDo.nguon.soCauChua)
@@ -977,6 +1005,55 @@ export default function GoiLenBangScreen() {
     chayCaHai()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tuDongXep, tiepBuoi, cauVaoXep])
+
+  // ── BUỔI CHỮA XẾP SẴN (B6) ─────────────────────────────────────────────────────────────────────────────
+  /** "Mở buổi chữa này": chưa mở ca nào thì mở ca gần nhất của lớp (không có ca thì nói thật), rồi điền sẵn câu máy đề xuất và xếp giờ như nút "Xếp giờ & phân công". */
+  const moBuoiDeXuat = async () => {
+    if (!deXuat?.co || dangTaiCa) return
+    if (!du) {
+      const ca = (dsCa ?? [])
+        .filter((c) => c.trangThai !== 'da_xoa' && c.loai !== 'baitap' && (!deXuatDv?.lop || !c.lop || c.lop === deXuatDv.lop))
+        .sort((a, b) => (b.moLuc || '').localeCompare(a.moLuc || ''))[0]
+      if (!ca) return showToast('Chưa có ca nào — chọn một ca ở mục 1 rồi bấm Mở buổi chữa này', 'warn')
+      setChoChonDeXuat(true)
+      await moCa(ca)
+      return
+    }
+    setChoChonDeXuat(true)
+  }
+  // Ca đã mở xong (và các bộ nạp theo ca đã chạy): điền sẵn câu đề xuất vào mục 2 (cách "tự chọn", giới hạn đúng các câu ấy).
+  useEffect(() => {
+    if (!choChonDeXuat || !deXuat?.co || !du || dangTaiCa || dangTaiBtvnCa) return
+    const ids = new Set<string>()
+    for (const c of deXuat.cau) {
+      const id = (khoCauDeXuat.find((k) => k.qid === c.qid)?.q as { id?: string } | undefined)?.id
+      if (id) ids.add(id)
+    }
+    setChoChonDeXuat(false)
+    if (ids.size === 0) return showToast('Không tìm thấy câu của buổi xếp sẵn trên máy này — chọn tay ở mục 2', 'warn')
+    setGioiHanId(ids)
+    setCachLayCau('tu_chon')
+    setKq(null)
+    setKqXep(null)
+    setKqBuoi(null)
+    setHtmlMayChieu('')
+    setChoChayDeXuat(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [choChonDeXuat, deXuat, du, dangTaiCa, dangTaiBtvnCa, khoCauDeXuat])
+  // Nguồn câu đã dựng lại ⇒ tự xếp; không dựng được thì nói thật thay vì xếp rỗng.
+  useEffect(() => {
+    if (!choChayDeXuat || !gioiHanId) return
+    if (cachLayCau !== 'tu_chon' || cauVaoXep.length === 0) {
+      const hen = setTimeout(() => {
+        setChoChayDeXuat(false)
+        showToast('Không dựng được danh sách câu của buổi xếp sẵn — chọn tay ở mục 2 rồi xếp giờ', 'warn')
+      }, 2500)
+      return () => clearTimeout(hen)
+    }
+    setChoChayDeXuat(false)
+    chayCaHai()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [choChayDeXuat, gioiHanId, cachLayCau, cauVaoXep])
 
   /** TỜ MÁY CHIẾU — hai em một đợt, chiếu lên bảng để gọi lên chữa.
    *
@@ -1436,7 +1513,7 @@ export default function GoiLenBangScreen() {
         <button
           type="button"
           onClick={() => { setDayHoc(false); setCachLayCau('tu_chon'); setKq(null); setKqXep(null); setKqBuoi(null); setHtmlMayChieu('') }}
-          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
             !dayHoc
               ? 'bg-white dark:bg-slate-700 text-[color:var(--m3-primary)] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -1447,7 +1524,7 @@ export default function GoiLenBangScreen() {
         <button
           type="button"
           onClick={() => { setDayHoc(true); setCachLayCau('tu_chon'); setKq(null); setKqXep(null); setKqBuoi(null); setHtmlMayChieu('') }}
-          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
             dayHoc
               ? 'bg-white dark:bg-slate-700 text-[color:var(--m3-primary)] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -1541,6 +1618,17 @@ export default function GoiLenBangScreen() {
 
       {/* 2 — THÊM CÂU NGOÀI CA */}
       <TheNoiDung className="h-full">
+        {!dayHoc && !anDeXuat && (
+          <TheBuoiChuaXepSan
+            deXuat={deXuat}
+            dangMo={!!dangTaiCa || choChonDeXuat || choChayDeXuat}
+            onMo={() => void moBuoiDeXuat()}
+            onTuChon={() => {
+              setAnDeXuat(true)
+              setGioiHanId(null)
+            }}
+          />
+        )}
         <div style={TIEU_DE_MUC}>2. Câu để chữa lấy ở đâu</div>
         <div style={{ ...NHAN_NHO, marginTop: 4, marginBottom: 'var(--k3)' }}>
           Bài làm của em ở mục 1 luôn được dùng để tính câu nào cả lớp cùng sai. Mục này chỉ quyết định LẤY CÂU NÀO RA CHỮA.
@@ -1557,8 +1645,11 @@ export default function GoiLenBangScreen() {
                 role="radio"
                 aria-checked={chon}
                 disabled={tat}
-                onClick={() => setCachLayCau(c)}
-                className={`text-xs font-bold px-3.5 py-2 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+                onClick={() => {
+                  setGioiHanId(null)
+                  setCachLayCau(c)
+                }}
+                className={`text-xs font-bold px-3.5 py-2 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 ${
                   chon
                     ? 'bg-blue-50 dark:bg-blue-950/60 text-[color:var(--m3-primary)] dark:text-blue-300 border border-blue-300 dark:border-blue-700 shadow-2xs ring-2 ring-blue-400/20'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
@@ -1592,7 +1683,7 @@ export default function GoiLenBangScreen() {
                     role="radio"
                     aria-checked={chon}
                     onClick={() => setLocDang(v)}
-                    className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer ${
+                    className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
                       chon
                         ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs ring-2 ring-blue-400/20'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
@@ -1614,7 +1705,7 @@ export default function GoiLenBangScreen() {
                     role="radio"
                     aria-checked={chon}
                     onClick={() => setLocSao(v)}
-                    className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer ${
+                    className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
                       chon
                         ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs ring-2 ring-blue-400/20'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
@@ -1667,13 +1758,22 @@ export default function GoiLenBangScreen() {
                   return (
                     <div
                       key={bt.maBtvn}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={daChon}
+                      onKeyDown={(e) => {
+                        if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+                          e.preventDefault()
+                          e.currentTarget.click()
+                        }
+                      }}
                       onClick={() => {
                         setBtvnChon(bt.maBtvn)
                         if (bt.maDe) {
                           setMaDeChon(new Set([bt.maDe]))
                         }
                       }}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                      className={`p-3 rounded-xl border transition-colors cursor-pointer flex items-center justify-between gap-3 ${
                         daChon
                           ? 'bg-blue-50 dark:bg-blue-950/70 border-blue-400 dark:border-blue-600 shadow-2xs ring-2 ring-blue-400/20'
                           : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-blue-300'
@@ -1721,6 +1821,11 @@ export default function GoiLenBangScreen() {
           </div>
         )}
 
+        {cachLayCau === 'tu_chon' && gioiHanId && (
+          <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }} data-dang-dung-xep-san>
+            Đang dùng <span style={SO}>{gioiHanId.size}</span> câu của buổi chữa xếp sẵn. Tích bài ở hộp dưới để quay về cách chọn cũ.
+          </div>
+        )}
         {cachLayCau === 'tu_chon' &&
           (deDaLuu.length === 0 ? (
           <OThongBao tone="cam">Chưa có đề nào trong máy — vào Ngân hàng câu hỏi bấm Đồng bộ trước.</OThongBao>
@@ -1729,15 +1834,19 @@ export default function GoiLenBangScreen() {
             ds={deDaLuu}
             daChon={maDeChon}
             chonNhieu
-            onChon={(ma) =>
+            onChon={(ma) => {
+              setGioiHanId(null)
               setMaDeChon((cu) => {
                 const m = new Set(cu)
                 if (m.has(ma)) m.delete(ma)
                 else m.add(ma)
                 return m
               })
-            }
-            onChonTatCa={(ma) => setMaDeChon(new Set(ma))}
+            }}
+            onChonTatCa={(ma) => {
+              setGioiHanId(null)
+              setMaDeChon(new Set(ma))
+            }}
             cao={264}
           />
           ))}
@@ -1995,7 +2104,7 @@ export default function GoiLenBangScreen() {
                   type="button"
                   onClick={() => void moMayChieu()}
                   disabled={dangMoMayChieu}
-                  className="tap-target inline-flex items-center font-bold px-4 py-2 rounded-full cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all"
+                  className="tap-target inline-flex items-center font-bold px-4 py-2 rounded-full cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors"
                   style={{ gap: 6, minHeight: 40, fontSize: 'var(--cx-1)' }}
                 >
                   <MonitorPlay size={16} />
@@ -2128,7 +2237,7 @@ export default function GoiLenBangScreen() {
           type="button"
           onClick={() => void moMayChieu()}
           disabled={dangMoMayChieu}
-          className="tap-target w-full font-bold flex items-center justify-center gap-2 select-none active:scale-[0.98] hover:-translate-y-0.5 transition-all duration-150"
+          className="tap-target w-full font-bold flex items-center justify-center gap-2 select-none active:scale-[0.98] hover:-translate-y-0.5 transition-[transform,background-color,box-shadow,opacity] duration-150"
           style={{
             height: 52,
             marginTop: 'var(--k3)',
