@@ -261,3 +261,33 @@
 .xd-tot li + li, .xd-them li + li { border-top: 1px solid color-mix(in srgb, currentColor 18%, transparent); }
 .xd-tot li span, .xd-them li span { display: block; font-size: var(--bnv-cx-1); font-weight: 500; opacity: 0.85; }
 .xd-nut-hang { display: grid; gap: 8px; justify-items: stretch; }
+
+/* ── PH · THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" + TRANG "TẤT CẢ VỀ CON" (bản vẽ 21/09, thầy lệnh; prompt-ph-giao-them-bai-2109.md mục D) ──
+ * Ghép từ bộ xd-* đã chốt; chỉ thêm các khối riêng của phụ huynh. Không game, không xếp hạng, không so con với bạn. */
+a.xd-tcg, button.xd-tcg { display: grid; gap: 14px; width: 100%; padding: 18px 18px 0; color: inherit; cursor: pointer; text-align: left; }
+a.xd-tcg:hover, button.xd-tcg:hover { background: var(--m3-surface-container); }
+.xd-tcg__tren { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.xd-tcg__nhan { font-size: var(--bnv-cx-1); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--xd-nhat); }
+.xd-tcg__giua { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; }
+.xd-tcg__diem { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 96px; height: 96px; border-radius: 28px; background: var(--m3-primary-container); color: var(--m3-on-primary-container); line-height: 1; }
+.xd-tcg__diem b { font-size: 40px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.xd-tcg__diem small { margin-top: 6px; font-size: var(--bnv-cx-1); font-weight: 600; color: var(--m3-on-primary-container-phu); text-align: center; }
+.xd-tcg__diem--khoa { background: var(--m3-surface-container-high); color: var(--m3-on-surface-variant); gap: 6px; }
+.xd-tcg__diem--khoa small { margin-top: 0; color: var(--m3-on-surface-variant); }
+.xd-tcg__chu { min-width: 0; display: grid; gap: 6px; justify-items: start; }
+.xd-tcg__chu h3 { font-size: var(--bnv-cx-3); font-weight: 700; line-height: 1.25; }
+.xd-tcg__chu p { font-size: var(--bnv-cx-2); color: var(--xd-nhat); }
+.xd-tcg__phan { display: grid; gap: 10px; padding-top: 2px; }
+.xd-tcg__hang { display: grid; grid-template-columns: 56px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: var(--bnv-cx-1); font-weight: 600; }
+.xd-tcg__hang .thanh { display: block; height: 8px; border-radius: 999px; background: var(--m3-surface-container-high); overflow: hidden; }
+.xd-tcg__hang .thanh i { display: block; height: 100%; border-radius: 999px; background: var(--m3-primary); }
+.xd-tcg__hang b { text-align: right; }
+.xd-tcg__duoi { display: flex; align-items: center; justify-content: space-between; min-height: 52px; margin: 0 -18px; padding: 0 18px; border-top: 1px solid var(--xd-vien); color: var(--m3-primary); font-size: var(--bnv-cx-2); font-weight: 700; }
+/* ba phần: SỐ ĐIỂM từng phần (chưa có trần điểm từng phần từ máy chủ ⇒ chưa vẽ thanh) */
+.xd-tcg__phan--so { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.xd-tcg__o { display: grid; justify-items: center; align-content: center; gap: 2px; min-height: 60px; padding: 8px 6px; border-radius: 14px; background: var(--m3-surface-container-high); }
+.xd-tcg__o small { font-size: var(--bnv-cx-1); font-weight: 600; color: var(--xd-nhat); }
+.xd-tcg__o b { font-size: var(--bnv-cx-3); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.xd-tcg__o b i { font-style: normal; font-size: var(--bnv-cx-1); font-weight: 600; color: var(--xd-nhat); margin-left: 3px; }
+/* thẻ nằm TRONG Bảng nhiệm vụ (nền gradient của bảng): gốc `.xd` không tô nền riêng */
+.xd.xd--trong { background: transparent; }

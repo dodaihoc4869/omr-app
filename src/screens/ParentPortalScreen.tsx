@@ -34,6 +34,8 @@ import BaoCaoCaThiPhuHuynhModal from '../components/BaoCaoCaThiPhuHuynhModal'
 import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import { hopLeDeRut } from '../lib/loc-cau-rut'
 import { hsBtvnApi, hsCauSaiApi, hsLichSuCaApi, tenTheoSbd } from '../lib/exam-api'
+import TheCaGanNhatCua from '../components/xem-diem/TheCaGanNhat'
+import { chonTheCaGanNhat, type CaChuaCongBo } from '../lib/the-ca-gan-nhat'
 import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
@@ -97,6 +99,8 @@ export default function ParentPortalScreen() {
 
   // Dữ liệu con
   const [dsBaiThi, setDsBaiThi] = useState<BaiThiCuaCon[]>([])
+  // Ca đã nộp mà thầy CHƯA công bố (`chuaCongBo[]` của /hs/lich-su): chỉ để vẽ thẻ trung tính "Thầy chưa công bố / chờ cả lớp" — không điểm.
+  const [dsChuaCongBo, setDsChuaCongBo] = useState<CaChuaCongBo[]>([])
   const [caDangXem, setCaDangXem] = useState<BaiThiCuaCon | null>(null)
   const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
   // Bảng nhiệm vụ: skeleton tới khi lượt nạp bài gia đình giao đầu tiên xong (kể cả lỗi).
@@ -139,6 +143,15 @@ export default function ParentPortalScreen() {
     })[0]
   }, [dsBaiThi])
 
+  // THẺ "Ca kiểm tra gần nhất của con" (thầy lệnh 21/09): ghép từ ca ĐÃ công bố + ca CHƯA công bố; bấm ⇒ tạm mở tab Xem điểm hiện có (trang "Tất cả về con" chờ thầy chốt).
+  const theCaGanNhat = useMemo(
+    () =>
+      chonTheCaGanNhat(
+        dsBaiThi.map((b) => ({ maCa: b.maCa, tenCa: b.tenCa, nopLuc: b.ngayNop, tong: b.tong ?? b.diem, diemI: b.diemI, diemII: b.diemII, diemIII: b.diemIII, soCauDung: b.soCauDung, tongCau: b.tongSoCau })),
+        dsChuaCongBo,
+      ),
+    [dsBaiThi, dsChuaCongBo],
+  )
   const keHoachNgay = useKeHoachNgay({ sbd: sbdHienTai ?? undefined }, !!sbdHienTai, 0)
   const duLieuNhiemVu = useMemo(
     () =>
@@ -341,6 +354,7 @@ export default function ParentPortalScreen() {
                 linkBaoCao: '',
               })),
             )
+            setDsChuaCongBo(Array.isArray(ls.chuaCongBo) ? ls.chuaCongBo : [])
           }
         } catch {
           // fallback
@@ -371,6 +385,7 @@ export default function ParentPortalScreen() {
     setHoTenCon('')
     setLopCon('')
     setDsBaiThi([])
+    setDsChuaCongBo([])
     setDsMomGiao([])
     setDaNapMomLanDau(false)
     setDsBtvnCon([])
@@ -672,6 +687,7 @@ export default function ParentPortalScreen() {
           dangTai={!sanSangBang && !dungBanNho}
           dangLamMoi={keHoachNgay.dangLamMoi}
           boNaoPh={boNaoPh}
+          theCaGanNhat={<TheCaGanNhatCua the={theCaGanNhat} onMo={() => setTabPh('diem')} />}
           canhBaoPh={canhBaoPh}
           onCanhBaoDaXem={(cb) => void baoDaXemPhuHuynh(cb.id)}
           mucMenu={mucMenuPhuHuynh(setTabPh, dangXuat, {

@@ -3212,6 +3212,8 @@ export async function hsLichSuCaApi(scriptUrl: string, sbd: string): Promise<{
     soYDungII?: number | null
     soYTongII?: number | null
   }>
+  /** Ca đã nộp mà THẦY CHƯA CÔNG BỐ (luật `cong-bo-diem.ts`, Worker c616b986): KHÔNG điểm, KHÔNG số câu. Máy chủ cũ không có trường này. */
+  chuaCongBo?: Array<{ maCa: string; tenCa: string; nopLuc: string; congBo: string; soEmDaNop: number; soEmDaVao: number }>
   error?: string
 }> {
   // MỘT NGUỒN ĐỊA CHỈ. Chỗ gọi truyền rỗng cũng phải chạy: xem `dia-chi-may-chu.ts`.

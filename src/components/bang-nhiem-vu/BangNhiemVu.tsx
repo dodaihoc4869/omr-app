@@ -127,6 +127,8 @@ export interface BangNhiemVuProps {
   taiVinhDanh?: () => Promise<DuLieuVinhDanh | null>
   /** Lời cho phụ huynh + thư tuần của "Bộ não A.I" (lệnh riêng /ph/ke-hoach). Học sinh KHÔNG nhận qua đây (lời của em đi theo `duLieu.boNao`). */
   boNaoPh?: BoNaoPhuHuynh | null
+  /** Chỗ đặt thẻ "Ca kiểm tra gần nhất của con" (chỉ phụ huynh): ngay dưới khối tiến độ, trên việc hôm nay. */
+  theCaGanNhat?: ReactNode
   /** "Cảnh báo của thầy" của PHỤ HUYNH (lời cho phụ huynh, lệnh /ph/ke-hoach). Học sinh nhận qua `duLieu.canhBaoThay`. */
   canhBaoPh?: CanhBaoThay[]
   /** Em/phụ huynh bấm "Đã xem" (hoặc "Làm ngay") ở một cảnh báo ⇒ màn cha báo máy chủ. */
@@ -159,6 +161,7 @@ export default function BangNhiemVu({
   onNhanThay,
   taiVinhDanh,
   boNaoPh: boNaoPhGoc,
+  theCaGanNhat,
   canhBaoPh,
   onCanhBaoDaXem,
   onLamThuThach,
@@ -391,6 +394,9 @@ export default function BangNhiemVu({
                 </span>
               )}
             </section>
+
+            {/* THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" (chỉ phụ huynh, thầy lệnh 21/09): ngay dưới thanh tiến độ, TRÊN việc hôm nay. Màn cha truyền vào; không có ca nào ⇒ không thẻ. */}
+            {laPh && theCaGanNhat}
 
             {/* THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I, thầy chốt 21/09): ngay dưới thanh tiến độ, TRÊN việc hôm nay. Chỉ học sinh; không thử thách hợp lệ ⇒ không dựng. */}
             {!laPh && duLieu.thuThachRieng && (duLieu.thuThachRieng.trangThai === 'xong' || (onLamThuThach && onDeSauThuThach)) && (
