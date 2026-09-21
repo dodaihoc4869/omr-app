@@ -167,7 +167,7 @@ export function taoDuLieuGia(nowMs: number, hatGiong = 20260921): DuLieuSan {
   const danDau: DanDauSan[] = top.map((e, i) => ({ sbd: e.sbd, hoTen: e.hoTen, tenLop: e.lop, soCau: e.soCau, tienBo: [9, 4, 3, 13, 0][i]! }))
   const bt: BangTin = {
     ngay: '2026-09-21', tu: new Date(mocMs).toISOString(), tuHomNay: new Date(mocMs).toISOString(), tuDangAp: true, capNhatLuc: new Date(nowMs).toISOString(),
-    nhip: { soEmHoc, tongEm, soCau, soCauDung, tiLeDung: soCauDung / soCau, homQua: null, noTheoLop: null },
+    nhip: { soEmHoc, tongEm, soCau, soCauDung, tiLeDung: soCauDung / soCau, homQua: null, noTheoLop: null, btvnDungNhip: null },
     baiTap: [
       { ma: 'B1', ten: 'Este – Lipid', tenLop: '12 - Lớp Thường', nhieuLop: false, hanNop: dh(2 * 24 + 5), quaHan: false, tong: 54, chuaMo: 21, dangLam: 19, daNop: 14, chang: null, nhac: { soEm: 12, soPhuHuynh: 9, luotKe: dh(0.03) } },
       { ma: 'B2', ten: 'Cân bằng hoá học', tenLop: 'Khối 11', nhieuLop: false, hanNop: dh(29), quaHan: false, tong: 71, chuaMo: 30, dangLam: 26, daNop: 15, chang: null, nhac: { soEm: 3, soPhuHuynh: 2, luotKe: dh(0.3) } },

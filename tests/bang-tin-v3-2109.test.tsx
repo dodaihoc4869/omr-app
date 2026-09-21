@@ -5,7 +5,7 @@ import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MAU_DAY, MAU_RONG, MAU_THAT_SANG_21 } from './fixtures/bang-tin-mau'
-import { buoiCuaGio, chuHanNop, chuMocDau, chuTinhTu, chuTuMoc, docBangTin, phanTramTiLe } from '../src/lib/bang-tin-thay'
+import { buoiCuaGio, chuHanNop, chuMocDau, chuTinhTu, chuTuMoc, docBangTin, docBtvnDungNhip, phanTramTiLe } from '../src/lib/bang-tin-thay'
 import BangTinV3, { BangTinLoi, BangTinXuong } from '../src/components/bang-tin/BangTin'
 import { boSoDau, chuDamSo, chuMayBaiTap, chuVietTat } from '../src/components/bang-tin/cac-khoi'
 import { chiaHang } from '../src/components/bang-tin/hooks'
@@ -376,6 +376,15 @@ describe('điện thoại: 6 trang lướt ngang', () => {
 })
 
 // ─────────────────────────────── MÀN: bản 3 hay bản dự phòng ───────────────────────────────
+describe('docBtvnDungNhip — nhip.btvnDungNhip chống số vô lý', () => {
+  it('đủ ⇒ đọc; thiếu cham ⇒ tongEm − dungNhip; dungNhip > tongEm / tongEm < 1 / không nguyên / âm / sai kiểu ⇒ null', () => {
+    expect(docBtvnDungNhip({ dungNhip: 41, tongEm: 57, cham: 16 })).toEqual({ dungNhip: 41, tongEm: 57, cham: 16 })
+    expect(docBtvnDungNhip({ dungNhip: 41, tongEm: 57 })).toEqual({ dungNhip: 41, tongEm: 57, cham: 16 })
+    for (const x of [{ dungNhip: 60, tongEm: 57 }, { dungNhip: 0, tongEm: 0 }, { dungNhip: 1.5, tongEm: 3 }, { dungNhip: -1, tongEm: 3 }, { dungNhip: '3', tongEm: 5 }, null, 'x', [], {}]) expect(docBtvnDungNhip(x), JSON.stringify(x)).toBeNull()
+    expect(docBtvnDungNhip({ dungNhip: 0, tongEm: 5, cham: 5 })).toEqual({ dungNhip: 0, tongEm: 5, cham: 5 }) // 0 em đúng nhịp là số thật
+  })
+})
+
 describe('HomNayScreen — /gv/bang-tin có ⇒ Bảng tin; chưa có ⇒ bản 2 dự phòng; chờ ⇒ khung xương', () => {
   const nap: { bangTin: unknown; hom: unknown; cho: boolean } = { bangTin: MAU_DAY, hom: { ok: true, btvn: { soEmCoLo: 148, soEmDungNhip: 97, dangChay: [] } }, cho: false }
   const goi: string[] = []
@@ -408,7 +417,7 @@ describe('HomNayScreen — /gv/bang-tin có ⇒ Bảng tin; chưa có ⇒ bản 
     expect(container.querySelectorAll('button')).toHaveLength(0)
   })
 
-  it('có /gv/bang-tin ⇒ dựng BẢNG TIN (không dựng "Chào thầy Học" của bản 2); số "đúng nhịp" lấy từ lệnh cũ; KHÔNG có nút Lấy bản mới trên trang', async () => {
+  it('có /gv/bang-tin ⇒ dựng BẢNG TIN (không dựng "Chào thầy Học" của bản 2); số "đúng nhịp" lấy từ nhip.btvnDungNhip CỦA CHÍNH /gv/bang-tin, KHÔNG gọi lệnh cũ /ke-hoach/hom-nay-thay; KHÔNG có nút Lấy bản mới trên trang', async () => {
     const { container } = render(<HomNayScreen />)
     await screen.findByText('Từ 12:00 · Thứ Hai 21/09/2026', { exact: false }).catch(() => undefined)
     await waitFor(() => expect(container.querySelector('[data-khung="bang-tin-v3"]')).toBeTruthy())
@@ -416,6 +425,19 @@ describe('HomNayScreen — /gv/bang-tin có ⇒ Bảng tin; chưa có ⇒ bản 
     expect(screen.queryByRole('button', { name: /Lấy bản mới/ })).toBeNull()
     await waitFor(() => expect(container.querySelectorAll('.bt3-so')[3].querySelector('.bt3-so-gia-tri')?.textContent).toBe('97/ 148 em'))
     expect(goi).toContain('/gv/bang-tin')
+    expect(goi).not.toContain('/ke-hoach/hom-nay-thay')
+  })
+
+  it('nhip.btvnDungNhip VẮNG (không em nào có bài) hoặc sai dạng ⇒ ô "đúng nhịp" nói thật "—", không gọi lệnh cũ để bù', async () => {
+    for (const nhip of [{ ...MAU_DAY.nhip, btvnDungNhip: undefined }, { ...MAU_DAY.nhip, btvnDungNhip: { dungNhip: 9, tongEm: 3, cham: 0 } }]) {
+      nap.bangTin = { ...MAU_DAY, nhip }
+      goi.length = 0
+      const { container, unmount } = render(<HomNayScreen />)
+      await waitFor(() => expect(container.querySelector('[data-khung="bang-tin-v3"]')).toBeTruthy())
+      expect(container.querySelectorAll('.bt3-so')[3].querySelector('.bt3-so-gia-tri')?.textContent).toBe('—')
+      expect(goi).not.toContain('/ke-hoach/hom-nay-thay')
+      unmount()
+    }
   })
 
   it('lệnh /gv/bang-tin CHƯA CÓ (404) ⇒ rơi về bản 2 qua các lệnh cũ, không lỗi đỏ; bản dự phòng còn nút Lấy bản mới', async () => {

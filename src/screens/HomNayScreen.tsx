@@ -4,7 +4,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '../store/appStore'
 import { layBangTin, type BangTin, type EmCanDeY } from '../lib/bang-tin-thay'
-import { layHomNay } from '../lib/hom-nay-api'
 import { layCanGiup, lyDoCanGiup } from '../lib/hom-nay-v2'
 import BangTinV3, { BangTinXuong } from '../components/bang-tin/BangTin'
 import type { DungNhip } from '../components/bang-tin/cac-khoi'
@@ -31,7 +30,6 @@ function HomNayBan3() {
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   /** `bt` = bản đọc thành công GẦN NHẤT (lần sau lỗi thì giữ bản cũ, không nhảy về bản dự phòng); `xong` = đã có câu trả lời đầu tiên. */
   const [tt, setTt] = useState<{ bt: BangTin | null; xong: boolean }>({ bt: null, xong: false })
-  const [dungNhip, setDungNhip] = useState<DungNhip | null>(null)
   const [nayMs, setNayMs] = useState(() => Date.now())
 
   const lam = useCallback(() => {
@@ -39,8 +37,6 @@ function HomNayBan3() {
       setNayMs(Date.now())
       setTt((t) => ({ bt: r.ok ? r.du : t.bt, xong: true }))
     })
-    // "Bài tập về nhà đúng nhịp" chưa có trong /gv/bang-tin ⇒ lấy từ lệnh cũ; không có thì ô ấy nói thật "chưa có số liệu".
-    void layHomNay().then((h) => setDungNhip(h?.btvn ? { soEm: h.btvn.soEmDungNhip, soCoLo: h.btvn.soEmCoLo } : null))
   }, [])
   useEffect(() => lam(), [lam])
   useTuLamMoi(lam, 60000)
@@ -51,6 +47,9 @@ function HomNayBan3() {
     if (!r.ok) return null
     return r.du.ds.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, tenLop: e.lop, lyDo: [{ loai: e.lyDo, chu: lyDoCanGiup(e), so: null, tong: null }] }))
   }, [])
+
+  /** Ô "Bài tập về nhà đúng nhịp": nay có ngay trong `/gv/bang-tin` (`nhip.btvnDungNhip`) — không gọi lệnh cũ `/ke-hoach/hom-nay-thay`; vắng ⇒ ô nói thật "chưa có số liệu". */
+  const dungNhip = useMemo<DungNhip | null>(() => (tt.bt?.nhip.btvnDungNhip ? { soEm: tt.bt.nhip.btvnDungNhip.dungNhip, soCoLo: tt.bt.nhip.btvnDungNhip.tongEm } : null), [tt.bt])
 
   const dsTraCuu = useMemo(() => classList.map((h) => ({ sbd: h.sbd, hoTen: h.hoTen, lop: h.lop })), [classList])
 

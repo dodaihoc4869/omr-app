@@ -58,7 +58,7 @@ const MAY_DA_LAM = [
 
 export const MAU_DAY = {
   ok: true, ngay: '2026-09-21', tu: '2026-09-21T05:00:00.000Z', tuHomNay: '2026-09-21T05:00:00.000Z', tuDangAp: true, capNhatLuc: '2026-09-21T06:12:00.000Z',
-  nhip: { soEmHoc: 57, tongEm: 263, soCau: 1234, soCauDung: 900, tiLeDung: 0.729, homQua: { soEmHoc: 61, soCau: 1100, tiLeDung: 0.7 } },
+  nhip: { soEmHoc: 57, tongEm: 263, soCau: 1234, soCauDung: 900, tiLeDung: 0.729, homQua: { soEmHoc: 61, soCau: 1100, tiLeDung: 0.7 }, btvnDungNhip: { dungNhip: 97, tongEm: 148, cham: 51 } },
   baiTap: BAI_TAP,
   tienBo: [
     { loai: 'cham_nhat', sbd: '12012', hoTen: 'Trần Minh Anh', tenLop: '12 - Tinh Hoa', so: 42, chu: '42 câu đã làm hôm nay' },

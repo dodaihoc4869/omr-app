@@ -17,6 +17,8 @@ export interface NhipBangTin {
   homQua: { soEmHoc?: number; soCau?: number; tiLeDung?: number } | null
   /** Dồn về đích (Code 3, khoá `nhip.noTheoLop`): theo lớp, số em đang NỢ chặng bài tập về nhà / sĩ số. Vắng ⇒ null (ẩn, không vẽ 0 giả). */
   noTheoLop: NoTheoLop[] | null
+  /** Ô "Bài tập về nhà đúng nhịp" (khoá `nhip.btvnDungNhip`, Code 3): em KHÔNG chậm chặng nào / em có bài đang hiện. Vắng (không em nào có bài) ⇒ null ⇒ ô nói thật "chưa có số liệu". */
+  btvnDungNhip: { dungNhip: number; tongEm: number; cham: number } | null
 }
 
 export interface NoTheoLop {
@@ -178,6 +180,16 @@ export function docSaiNhanh(v: unknown): EmSaiNhanh[] | null {
   return ra.length > 0 ? ra.slice(0, 20) : null
 }
 
+/** `nhip.btvnDungNhip = {dungNhip, tongEm, cham}`: số nguyên không âm, tongEm ≥ 1, dungNhip ≤ tongEm — sai dạng ⇒ null (không dựng ô từ số vô lý). */
+export function docBtvnDungNhip(v: unknown): NhipBangTin['btvnDungNhip'] {
+  const o = doiTuong(v)
+  if (!o) return null
+  const d = so(o.dungNhip), t = so(o.tongEm)
+  if (d === null || t === null || !Number.isInteger(d) || !Number.isInteger(t) || d < 0 || t < 1 || d > t) return null
+  const c = so(o.cham)
+  return { dungNhip: d, tongEm: t, cham: c !== null && Number.isInteger(c) && c >= 0 ? c : t - d }
+}
+
 function docNhip(v: unknown): NhipBangTin | null {
   const o = doiTuong(v)
   if (!o) return null
@@ -197,6 +209,7 @@ function docNhip(v: unknown): NhipBangTin | null {
     tiLeDung: so(o.tiLeDung),
     homQua: homQua && Object.keys(homQua).length > 0 ? homQua : null,
     noTheoLop: docNoTheoLop(o.noTheoLop),
+    btvnDungNhip: docBtvnDungNhip(o.btvnDungNhip),
   }
 }
 
