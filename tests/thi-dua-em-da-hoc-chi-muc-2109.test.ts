@@ -4,7 +4,8 @@
 // không UNION (chốt 5 term của D1), thứ tự tham số (mốc ISO trước, ngày VN sau). SQLite thật.
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { SQL_EM_DA_HOC_HOM_NAY } from '../server/src/thi-dua-hom-nay'
+import { gvChuaHocHomNay, SQL_EM_DA_HOC_HOM_NAY, tuLucEmDaHoc } from '../server/src/thi-dua-hom-nay'
+import { giaiMocHienThi } from '../server/src/moc-no'
 import { taoD1That, type D1That } from './_d1-that'
 
 const SQL_CU = 'SELECT DISTINCT sbd FROM su_kien_hoc WHERE ngay_vn = ? AND luc >= ? AND ket_qua IS NOT NULL'
@@ -62,11 +63,44 @@ describe('em đã học hôm nay: bản chỉ mục = bản cũ', () => {
     expect(SQL_EM_DA_HOC_HOM_NAY.indexOf('luc >= ?')).toBeLessThan(SQL_EM_DA_HOC_HOM_NAY.indexOf('ngay_vn = ?'))
   })
 
-  it('cả hai chỗ dùng ở thi-dua-hom-nay.ts đều gọi hằng số này (không còn DISTINCT trần) với thứ tự (mốc, ngày)', () => {
+  it('cả hai chỗ dùng ở thi-dua-hom-nay.ts đều gọi hằng số này (không còn DISTINCT trần) với thứ tự (mốc chặn theo hôm nay, ngày)', () => {
     const ma = readFileSync('server/src/thi-dua-hom-nay.ts', 'utf8')
     expect(ma).not.toMatch(/SELECT DISTINCT sbd FROM su_kien_hoc WHERE ngay_vn/)
     expect(ma.match(/prepare\(SQL_EM_DA_HOC_HOM_NAY\)\.bind\(/g)).toHaveLength(2)
-    expect(ma).toMatch(/prepare\(SQL_EM_DA_HOC_HOM_NAY\)\.bind\(moc\.iso, ngayVn\(nowMs\)\)/)
-    expect(ma).toMatch(/prepare\(SQL_EM_DA_HOC_HOM_NAY\)\.bind\(mocHt\.iso, ngay\)/)
+    expect(ma).toMatch(/prepare\(SQL_EM_DA_HOC_HOM_NAY\)\.bind\(tuLucEmDaHoc\(moc\.iso, ngayVn\(nowMs\)\), ngayVn\(nowMs\)\)/)
+    expect(ma).toMatch(/prepare\(SQL_EM_DA_HOC_HOM_NAY\)\.bind\(tuLucEmDaHoc\(mocHt\.iso, ngay\), ngay\)/)
+  })
+})
+
+describe('tham số đầu = MAX(mốc, 00:00 hôm nay giờ VN): mốc đứng yên nhiều ngày không làm truy vấn đọc lớn dần', () => {
+  it('hàm thuần: mốc cũ ⇒ 00:00 hôm nay (17:00Z hôm trước); mốc trong ngày ⇒ giữ mốc; mốc tương lai ⇒ giữ mốc', () => {
+    expect(tuLucEmDaHoc('2026-09-12T05:00:00.000Z', '2026-09-22')).toBe('2026-09-21T17:00:00.000Z')
+    expect(tuLucEmDaHoc('2026-09-22T05:00:00.000Z', '2026-09-22')).toBe('2026-09-22T05:00:00.000Z')
+    expect(tuLucEmDaHoc('2026-09-23T05:00:00.000Z', '2026-09-22')).toBe('2026-09-23T05:00:00.000Z')
+    expect(tuLucEmDaHoc('2026-09-21T17:00:00.000Z', '2026-09-22')).toBe('2026-09-21T17:00:00.000Z') // đúng biên
+  })
+
+  it('mốc CŨ 10 ngày + sự kiện rải 10 ngày: cùng tập em với truy vấn cũ (bind mốc cũ), và tham số bind thật là 00:00 hôm nay', async () => {
+    const d = taoD1That()
+    const NOW = Date.parse('2026-09-22T10:00:00+07:00')
+    for (let i = 0; i < 12; i++) d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES(?,?,'12','mk','x')").run(`E${i}`, `Em ${String.fromCharCode(65 + i)}`)
+    for (let ng = 12; ng <= 22; ng++) ghi(d, { sbd: `E${ng - 12}`, luc: `2026-09-${ng}T03:00:00.000Z`, ngay: `2026-09-${ng}`, kq: 1 }) // E10 học hôm nay 22/09; E0…E9 các ngày trước
+    ghi(d, { sbd: 'E11', luc: '2026-09-22T04:00:00.000Z', ngay: '2026-09-22', kq: null }) // chưa chấm hôm nay ⇒ vẫn "chưa học"
+    const mocCu = '2026-09-12T05:00:00.000Z'
+    const cu = await tap(d, SQL_CU, '2026-09-22', mocCu)
+    expect(cu).toEqual(['E10'])
+    expect(await tap(d, SQL_EM_DA_HOC_HOM_NAY, tuLucEmDaHoc(mocCu, '2026-09-22'), '2026-09-22')).toEqual(cu)
+    const binds: unknown[][] = []
+    const goc = d.env.DB.prepare.bind(d.env.DB)
+    d.env.DB.prepare = ((q: string) => {
+      const st = goc(q)
+      if (q !== SQL_EM_DA_HOC_HOM_NAY) return st
+      const b0 = st.bind.bind(st)
+      st.bind = ((...a: unknown[]) => { binds.push(a); return b0(...a) }) as typeof st.bind
+      return st
+    }) as typeof d.env.DB.prepare
+    const r = await gvChuaHocHomNay(d.env, NOW, giaiMocHienThi(mocCu))
+    expect(r.theoLop.reduce((t, l) => t + l.chuaHoc, 0)).toBe(11) // 12 em − E10
+    expect(binds).toEqual([['2026-09-21T17:00:00.000Z', '2026-09-22']])
   })
 })

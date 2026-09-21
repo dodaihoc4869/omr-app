@@ -37,6 +37,14 @@ const json = (v: unknown): string => JSON.stringify(v)
  * thay vì quét cả sổ theo `idx_skh_em_ngay` (DISTINCT ưa chỉ mục đứng đầu bằng sbd): đo 21/09 trên D1 thật 29.156 → ~1,8 nghìn dòng/lần. Thiếu chỉ mục vẫn chạy đúng (chậm hơn).
  */
 export const SQL_EM_DA_HOC_HOM_NAY = 'SELECT DISTINCT sbd FROM (SELECT sbd, ngay_vn FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL LIMIT -1) WHERE ngay_vn = ?'
+/**
+ * Tham số đầu (`luc >= ?`) của `SQL_EM_DA_HOC_HOM_NAY`: MAX(mốc hiển thị, 00:00 hôm nay giờ VN). Mốc đứng yên nhiều ngày; bind thẳng mốc thì truy vấn con đọc MỌI sự kiện từ mốc rồi mới lọc `ngay_vn`
+ * (số dòng đọc lớn dần theo ngày). Cùng tập em: `ngay_vn = hôm nay` ⇒ `luc ≥ 00:00 hôm nay`; chi phí luôn chỉ là sự kiện của hôm nay. (ISO cùng định dạng `.000Z` ⇒ so chuỗi = so thời điểm.)
+ */
+export function tuLucEmDaHoc(mocIso: string, ngay: string): string {
+  const dau = new Date(Date.parse(`${ngay}T00:00:00+07:00`)).toISOString()
+  return mocIso > dau ? mocIso : dau
+}
 /** Tài khoản thử của hệ thống — không tính vào lớp (khớp `SBD_THU` của gv-bang-tin.ts; test giữ hai chỗ khớp nhau, không nhập chéo để tránh vòng nhập). */
 export const SBD_THU_NGHIEM = '12121212'
 export const TOP_TOI_DA = 3
@@ -284,7 +292,7 @@ async function docLopXemThu(env: Env, nowMs: number, moc: MocHienThi): Promise<{
   const cfg = await tat(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'thi_dua_lop_xem_thu'").first<Dong>(), null)
   let lop = chuoi(cfg?.gia_tri)
   if (!lop || !soEmCuaLop.has(lop)) {
-    const rHoc = await tat(() => env.DB.prepare(SQL_EM_DA_HOC_HOM_NAY).bind(moc.iso, ngayVn(nowMs)).all<Dong>(), rong)
+    const rHoc = await tat(() => env.DB.prepare(SQL_EM_DA_HOC_HOM_NAY).bind(tuLucEmDaHoc(moc.iso, ngayVn(nowMs)), ngayVn(nowMs)).all<Dong>(), rong)
     const daHocCuaLop = new Map<string, number>()
     for (const x of rHoc.results ?? []) {
       const e = tatCa.get(chuoi(x.sbd))
@@ -418,7 +426,7 @@ export async function gvChuaHocHomNay(
   const ngay = ngayVn(nowMs)
   const tatCa = await docTatCaEm(env)
   const mocHt = moc ?? (await docMocHienThi(env))
-  const rHoc = await tat(() => env.DB.prepare(SQL_EM_DA_HOC_HOM_NAY).bind(mocHt.iso, ngay).all<Dong>(), rong)
+  const rHoc = await tat(() => env.DB.prepare(SQL_EM_DA_HOC_HOM_NAY).bind(tuLucEmDaHoc(mocHt.iso, ngay), ngay).all<Dong>(), rong)
   const daHoc = new Set((rHoc.results ?? []).map((x) => chuoi(x.sbd)))
   const nhom = new Map<string, { siSo: number; em: { sbd: string; hoTen: string }[] }>()
   for (const [sbd, e] of tatCa) {
