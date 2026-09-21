@@ -255,6 +255,19 @@ describe('Đoàn Hộ Tống · máy chủ · trùm câu chung', () => {
     for (let h = 1; h <= 3; h++) { await lamHiep(d, 'S1', ma); await lamHiep(d, 'S2', ma); troi(NGHI_GIUA_HIEP_MS) }
     return { d, ma }
   }
+  it('RÒ ĐÁP ÁN (Code 1 rà chéo W2c): câu CHUNG của trùm KHÔNG nằm trong bài tập về nhà CHƯA nộp của BẤT KỲ bạn nào trong đội — mọi câu trùm hợp lệ đang nằm trong bài chưa nộp của S2 ⇒ trùm không có câu chung (giáp vỡ theo phong độ)', async () => {
+    const d = dungTruong(); await bangChung(d, 'S1', 'X1'); await bangChung(d, 'S2', 'Y1')
+    d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BTX','CA1','DE1',3,'2026-09-20T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run()
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BTX|S2','BTX','S2','x')").run()
+    for (const [i, qid] of ['TX1', 'TX2', 'TY1'].entries()) d.sql.prepare("INSERT INTO btvn_em_cau(khoa,ma_btvn,sbd,qid,chang,nhan,thu_tu) VALUES(?,?,?,?,0,'loi',?)").run(`BTX|S2|${qid}`, 'BTX', 'S2', qid, i + 1)
+    const ma = (await goi(d, 'S1', 'mo', { cheDo: 'phong' })).doan.ma as string
+    await goi(d, 'S2', 'vao', { ma }); await goi(d, 'S1', 'bat-dau', { ma }); troi(DEM_NGUOC_MS)
+    for (let h = 1; h <= 3; h++) { await lamHiep(d, 'S1', ma); await lamHiep(d, 'S2', ma); troi(NGHI_GIUA_HIEP_MS) }
+    const a = await goi(d, 'S1', 'xem', { ma })
+    // Không có câu chung hợp lệ ⇒ hiệp trùm bị bỏ qua (giáp vỡ theo phong độ 3 hiệp vừa rồi): đã sang hiệp 5, không có câu trùm nào được phát.
+    expect(a.doan.tran).toMatchObject({ hiep: 5, laTrum: false, trumVoGiap: [true] })
+    expect(a.doan.trum?.qid).toBeUndefined()
+  })
   it('một câu Phần II chung, 60 giây; mỗi bạn giữ 2 ý; chỉ người giữ mới chốt được; ý của bạn chỉ hiện đã chốt / chưa', async () => {
     const { d, ma } = await toiTrum()
     const a = await goi(d, 'S1', 'xem', { ma }), b = await goi(d, 'S2', 'xem', { ma })

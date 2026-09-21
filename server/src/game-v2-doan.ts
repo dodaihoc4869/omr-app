@@ -25,6 +25,7 @@ import { ngayVn } from './su-kien-hoc'
 import { soanThe, deRutGon, MO_TA_THE, type LoaiThe, type TheGoiY } from './game-v2-doan-the'
 import { ghiTiepSuc } from './exp-d1'
 import { docExpKetChang, traoExpKetChang } from './game-v2-doan-exp'
+import { docCauBtvnChuaNop } from './game-v2-luot'
 import { docSanh, quaCongVe, hoanVe, ketChangChoLop } from './game-v2-doan-mua'
 import { docAnThach, anChoSanh, goiYBanDongHanh, docHienThi } from './game-v2-doan-an'
 
@@ -187,6 +188,8 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
     for (const k of control.blocked) chan.add(k)
     if (control.types.length) loaiDuocPhep = new Set(control.types.filter(t => !loaiDuocPhep || loaiDuocPhep.has(t)))
     for (const q of await qidChanHomNay(env, n.sbd, now)) chan.add(q)
+    // Game hiện lời giải ngay ⇒ câu CHUNG của trùm cũng KHÔNG được nằm trong bài tập về nhà CHƯA nộp của BẤT KỲ bạn nào trong đội (Code 1 rà chéo W2c).
+    for (const x of await docCauBtvnChuaNop(env, n.sbd)) chan.add(x)
     for (const c of n.cau) { chan.add(c.qid); chan.add(c.nhom) }
   }
   const ktBiet = new Map<string, Set<string>>()

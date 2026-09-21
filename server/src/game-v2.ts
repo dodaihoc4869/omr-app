@@ -93,6 +93,8 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
     if(dangCho){
       try{
         const old=JSON.parse(dangCho.json) as Session;const tuLuan=await qidTuLuanTrongLuot(env,old.questions);const qs=[]
+        // Thầy có thể giao BTVN SAU khi lượt này đã bốc câu: câu nào nay nằm trong bài em chưa nộp ⇒ bỏ lượt chờ, mở lượt mới (không trả lại câu có thể lộ đáp án).
+        const chanBtvn=await docCauBtvnChuaNop(env,sbd);if(old.questions.some(ref=>chanBtvn.has(ref.qid)||chanBtvn.has(ref.group))){await env.DB.prepare('DELETE FROM game_v2_session WHERE id=? AND sbd=?').bind(dangCho.id,sbd).run();return startLuotMoi(env,sbd,p,b,action)} // lượt chờ chưa trả lời câu nào: bỏ hẳn rồi tính lại từ đầu (không mất lượt, số lượt đúng)
         for(const ref of old.questions){if(tuLuan.has(ref.qid))continue;qs.push({...publicQuestion(await currentQuestion(env,ref)),...vaiChoMay(ref.role)})}
         if(qs.length)return {ok:true,id:dangCho.id,questions:qs,missing:scope.missing,luot:tom,maiCho:cho}
       }catch{/* câu đã đổi/rút khỏi kho: mở lượt mới */}

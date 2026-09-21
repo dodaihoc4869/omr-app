@@ -346,6 +346,21 @@ describe('sửa theo rà chéo W2b của Code 1', () => {
     for (const mode of ['repair', 'tower']) { const m = await start(d, { mode }); expect(qids(m).filter((q) => /^A-([1-9]|[1-3][0-9])$/.test(q))).toEqual([]) }
   })
 
+  it('lượt CHỜ (chưa trả lời câu nào) mà sau đó thầy giao BTVN chứa câu của lượt ⇒ bỏ lượt chờ (xoá, không mất lượt), mở lượt mới không chứa câu dính bài chưa nộp', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung()
+    const a = await start(d)
+    expect(d.dem('game_v2_session')).toBe(1)
+    d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT7','CA1','DE1',6,'2026-09-22T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run()
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BT7|S1','BT7','S1','Em Một')").run()
+    qids(a).forEach((q, i) => d.sql.prepare("INSERT INTO btvn_em_cau(khoa,ma_btvn,sbd,qid,chang,nhan,thu_tu) VALUES(?,?,?,?,0,'loi',?)").run(`BT7|S1|${q}`, 'BT7', 'S1', q, i + 1))
+    const b = await start(d)
+    expect(b.id).not.toBe(a.id)
+    expect(qids(b).filter((q) => qids(a).includes(q))).toEqual([])
+    expect(d.dem('game_v2_session')).toBe(1) // phiên chờ cũ đã xoá; chỉ còn phiên mới
+    expect(b.luot).toMatchObject({ daLam: 1, conLai: 2 })
+  })
+
   const suKien = (d: D1That, qid: string, nguon: string, chiSo = 0, ngay = NGAY, ketQua: number | null = 1) => d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES (?, 'S1', ?, ?, ?, ?, ?, 40, ?, ?)")
     .run(`${qid}|${nguon}|${chiSo}`, qid, nguon, nguon === 'btvn_lo' ? 'BT5' : 'x', chiSo, ketQua, `${ngay}T03:00:00.000Z`, ngay)
   const dauVao = (d: D1That) => docDauVaoLuot(d.env, 'S1', NGAY, Date.parse(`${NGAY}T10:00:00+07:00`), false)
