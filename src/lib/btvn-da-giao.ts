@@ -83,11 +83,12 @@ export function baiChoThe(t: NhomBtvn, tenCu: (t: NhomBtvn) => string): TheBai {
   const chang = dong.map((d) => docChang(d.chang)).find((c) => c.length > 0) ?? []
   const soCauLoi = dong.map((d) => (soKhongAm(d.soCauLoi) ? d.soCauLoi : soKhongAm(d.soLoi) ? d.soLoi : null)).find((x) => x !== null) ?? null
   const hanMs = Date.parse(t.hanNop)
+  const tenLop = khongTrung(dong.map((d) => (typeof d.tenLop === 'string' ? d.tenLop : ''))).join(' · ')
   return {
     khoa: t.maBtvn,
-    ten: tenMoi || tenCu(t),
+    ten: tenMoi && tenLop && !tenLop.includes(' · ') && !tenMoi.includes(tenLop) ? `${tenLop} · ${tenMoi}` : tenMoi || tenCu(t), // máy chủ trả `ten` KHÔNG kèm lớp (đã có tenLop): thẻ đọc "Lớp 10 · Chương 2 · Bài 5"
     coTenMoi: tenMoi !== '',
-    tenLop: khongTrung(dong.map((d) => (typeof d.tenLop === 'string' ? d.tenLop : ''))).join(' · '),
+    tenLop,
     tong: t.tong,
     daNop: t.daNop,
     soCau: t.soCau,
@@ -213,7 +214,8 @@ export const NGUONG_DOAN_HEP = 9
 
 const SAC: Record<NhomEm, SacNhom> = { chua_mo: 'xam', dung_nhip: 'duong', cham_nhip: 'cam', xong_hom_nay: 'la', da_nop: 'la_dam' }
 const NHAN_CO_CHANG: Record<NhomEm, string> = { chua_mo: 'chưa mở', dung_nhip: 'đúng nhịp', cham_nhip: 'chậm nhịp', xong_hom_nay: 'xong chặng hôm nay', da_nop: 'đã nộp cả bài' }
-const NHAN_KHONG_CHANG: Record<NhomEm, string> = { chua_mo: 'chưa mở', dung_nhip: 'đang làm', cham_nhip: 'chậm nhịp', xong_hom_nay: 'xong chặng hôm nay', da_nop: 'đã nộp' }
+// Bài KHÔNG chia chặng: máy chủ đặt em chưa nộp của bài QUÁ HẠN vào cham_nhip (đúng emChamNhip của Bảng tin) ⇒ nhãn "quá hạn chưa nộp".
+const NHAN_KHONG_CHANG: Record<NhomEm, string> = { chua_mo: 'chưa mở', dung_nhip: 'đang làm', cham_nhip: 'quá hạn chưa nộp', xong_hom_nay: 'xong chặng hôm nay', da_nop: 'đã nộp' }
 export const nhanNhomEm = (khoa: NhomEm, chiaChang: boolean): string => (chiaChang ? NHAN_CO_CHANG : NHAN_KHONG_CHANG)[khoa]
 
 const soCuaNhom = (n: NhomBai, k: NhomEm): number => (k === 'chua_mo' ? n.chuaMo : k === 'dung_nhip' ? n.dungNhip : k === 'cham_nhip' ? n.chamNhip : k === 'xong_hom_nay' ? n.xongHomNay : n.daNop)
@@ -223,7 +225,7 @@ const soCuaNhom = (n: NhomBai, k: NhomEm): number => (k === 'chua_mo' ? n.chuaMo
  * `doan` = các đoạn có số > 0 (độ rộng % theo số / tổng các đoạn); `chuGiai` = mọi nhóm của bài (kể cả 0, trừ "đã nộp" khi 0).
  */
 export function thanhNhom(nhom: NhomBai, chiaChang: boolean): { doan: DoanNhom[]; chuGiai: { khoa: NhomEm; nhan: string; so: number; sac: SacNhom }[]; tong: number } {
-  const khoa = (chiaChang ? NHOM_EM : (['chua_mo', 'dung_nhip', 'da_nop'] as NhomEm[])).filter((k) => k !== 'da_nop' || nhom.daNop > 0)
+  const khoa = (chiaChang ? NHOM_EM : (['chua_mo', 'dung_nhip', 'cham_nhip', 'da_nop'] as NhomEm[])).filter((k) => (k !== 'da_nop' || nhom.daNop > 0) && (chiaChang || k !== 'cham_nhip' || nhom.chamNhip > 0))
   const tong = khoa.reduce((s, k) => s + soCuaNhom(nhom, k), 0)
   const doan: DoanNhom[] = khoa
     .filter((k) => soCuaNhom(nhom, k) > 0)

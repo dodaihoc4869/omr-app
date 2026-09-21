@@ -53,6 +53,17 @@ describe('baiChoThe — gộp một lần giao', () => {
   })
 })
 
+describe('tên bài: máy chủ trả ten KHÔNG kèm lớp', () => {
+  it('một lớp ⇒ thẻ đọc "Lớp 10 · Chương 2 · Bài 5"; đã có lớp trong tên ⇒ không lặp; nhiều lớp / không lớp ⇒ giữ nguyên tên', () => {
+    expect(the({ ten: 'Chương 2 · Bài 5', tenLop: 'Lớp 10' }).ten).toBe('Lớp 10 · Chương 2 · Bài 5')
+    expect(the({ ten: 'Lớp 10 · Chương 2 · Bài 5', tenLop: 'Lớp 10' }).ten).toBe('Lớp 10 · Chương 2 · Bài 5')
+    expect(the({ ten: 'Chương 2 · Bài 5', tenLop: '' }).ten).toBe('Chương 2 · Bài 5')
+    const chung = { giaoLuc: '2026-09-21T03:48:00.000Z', maDe: 'DE-Y' }
+    const g = nhomBtvn([dong({ ...chung, ten: 'Bài 5', tenLop: 'Lớp 10' }), dong({ ...chung, ten: 'Bài 5', tenLop: 'Lớp 11' })])
+    expect(baiChoThe(g[0]!, () => 'x').ten).toBe('Bài 5') // hai lớp: không đoán
+  })
+})
+
 describe('sắp thẻ + dải "cần thầy để ý"', () => {
   it('sắp: mức cần để ý (chậm × 2 + chưa mở) giảm dần, rồi hạn gần trước, rồi giao muộn trước; ổn định; máy cũ (0) xuống cuối', () => {
     const a = the({ nhom: N({ chuaMo: 4 }), hanNop: '2026-09-25T05:00:00.000Z' }) // 4
@@ -155,6 +166,13 @@ describe('thanh nhóm', () => {
     const co = thanhNhom(N({ chuaMo: 0, dungNhip: 5, daNop: 3, nopTre: 1 }), true)
     expect(co.doan.map((d) => d.khoa)).toEqual(['dung_nhip', 'da_nop'])
     expect(co.chuGiai.map((d) => `${d.nhan} ${d.so}`)).toEqual(['chưa mở 0', 'đúng nhịp 5', 'chậm nhịp 0', 'xong chặng hôm nay 0', 'đã nộp cả bài 3'])
+  })
+  it('bài KHÔNG chia chặng nhưng QUÁ HẠN (máy chủ đặt em chưa nộp vào chậm nhịp): thêm đoạn "quá hạn chưa nộp"; chamNhip = 0 thì không có đoạn/mục ấy', () => {
+    const t = thanhNhom(N({ chuaMo: 2, dungNhip: 3, chamNhip: 4, daNop: 1 }), false)
+    expect(t.chuGiai.map((d) => `${d.nhan} ${d.so}`)).toEqual(['chưa mở 2', 'đang làm 3', 'quá hạn chưa nộp 4', 'đã nộp 1'])
+    expect(t.doan.map((d) => d.sac)).toEqual(['xam', 'duong', 'cam', 'la_dam'])
+    expect(t.tong).toBe(10)
+    expect(thanhNhom(N({ chuaMo: 2, dungNhip: 3 }), false).chuGiai.map((d) => d.nhan)).toEqual(['chưa mở', 'đang làm'])
   })
   it('bài KHÔNG chia chặng: chưa mở · đang làm · đã nộp', () => {
     const t = thanhNhom(N({ chuaMo: 3, dungNhip: 5, daNop: 2 }), false)
