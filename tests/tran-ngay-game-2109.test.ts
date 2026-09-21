@@ -71,6 +71,12 @@ describe('tranNgay / dailyUsed cho màn: recommendations = ĐẢO, doan-sanh = �
     const s = await goi(d, 'S1', 'sanh') as any
     expect(s).toMatchObject({ ok: true, tranNgay: 60, dailyUsed: 7 })
   })
+  it('doan-sanh trả changHomNay {daDi, toiDa}: trần 6 chặng/ngày (Boss chốt 4 ⇒ 6), daDi đếm chặng đã LÊN ĐƯỜNG hôm nay (sảnh bỏ dở không tính)', async () => {
+    const d = dung()
+    const chang = (ma: string, tt: string) => { d.sql.prepare("INSERT INTO doan_chang(ma,json,chu,trang_thai,tao_luc) VALUES(?,?,'S1',?,?)").run(ma, '{}', tt, new Date(T0 - 3_600_000).toISOString()); d.sql.prepare('INSERT INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) VALUES(?,?,?,?,0,?)').run(ma, 'S1', '2026-09-22', '12', new Date(T0 - 3_600_000).toISOString()) }
+    chang('DH1', 'xong'); chang('DH2', 'dang_di'); chang('DH3', 'sanh') // sảnh chưa đi ⇒ không tính
+    expect((await goi(d, 'S1', 'sanh') as any).changHomNay).toEqual({ daDi: 2, toiDa: 6 })
+  })
   it('đường cũ (cờ game_luot_moi = tat) cũng trả tranNgay 36 theo Đảo', async () => {
     const d = dung()
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_luot_moi','tat','x')").run()

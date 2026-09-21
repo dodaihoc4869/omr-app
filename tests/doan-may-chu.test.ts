@@ -83,10 +83,13 @@ describe('Đoàn Hộ Tống · máy chủ · đi một mình trọn chặng', (
     expect(mo.doan.cau).toBeUndefined(); khongLo(mo) // đang đếm ngược: chưa có câu
     troi(DEM_NGUOC_MS)
     const xem = await goi(d, 'S1', 'xem', { ma: mo.doan.ma })
-    expect(xem.doan.cau).toMatchObject({ qid: 'X1', nhan: 'toi_han_on', de: { qid: 'X1', text: 'Đề X1' } }); khongLo(xem) // câu sai 3 ngày trước → tới hạn ôn → ra ĐẦU TIÊN
+    // SỬA CÓ CHỦ Ý 21/09 (thầy lệnh ~19:35, Đoàn rút bằng luật Đảo Đợt 2, KHÔNG lặp câu em đã làm ở BẤT KỲ nguồn/ngày nào): câu em ĐÃ LÀM (X1, sai 3 ngày trước) không còn ra đầu tiên — câu MỚI cùng dạng ra trước.
+    const q1 = xem.doan.cau.qid as string
+    expect(q1).toMatch(/^X[2-9]$/); expect(q1).not.toBe('X1') // dạng Ester (mở bởi câu sai), câu MỚI — không phải X1 đã làm
+    expect(xem.doan.cau).toMatchObject({ qid: q1, de: { qid: q1, text: `Đề ${q1}` } }); khongLo(xem)
     expect(xem.doan.tran.conMs).toBe(40_000)
-    const nop = await goi(d, 'S1', 'nop', { ma: mo.doan.ma, hiep: 1, answer: dapAn.get('X1'), hanhDong: 'danh' })
-    expect(nop.ketQuaCau).toMatchObject({ correct: true, answer: dapAn.get('X1'), solution: `${BI_MAT}-X1` })
+    const nop = await goi(d, 'S1', 'nop', { ma: mo.doan.ma, hiep: 1, answer: dapAn.get(q1), hanhDong: 'danh' })
+    expect(nop.ketQuaCau).toMatchObject({ correct: true, answer: dapAn.get(q1), solution: `${BI_MAT}-${q1}` })
     // Đi một mình: em chốt là đủ bài → hiệp giải ngay, sang hiệp 2 sau quãng nghỉ
     expect(nop.doan.tran).toMatchObject({ hiep: 2, moSauMs: NGHI_GIUA_HIEP_MS }); expect(nop.doan.hiepVuaXong.cuaEm).toMatchObject({ dung: true, satThuong: 24, tuLam: true })
   })
@@ -122,6 +125,11 @@ describe('Đoàn Hộ Tống · máy chủ · đi một mình trọn chặng', (
   it('"lên bậc ôn" đo từ sổ: câu từng ĐÚNG ở một ngày VN trước, hôm nay tự làm đúng lại → tính 1', async () => {
     const d = dungTruong(); await bangChung(d, 'S1', 'X1')
     await ghiSuKien(d.env, [{ nguon: 'btvn', maNguon: 'BT2', sbd: 'S1', qid: 'X1', lan: 2, ketQua: 1, luc: new Date(T0 - 48 * 3_600_000).toISOString(), maDang: 'ES.A.X' }])
+    // SỬA CÓ CHỦ Ý 21/09 (thầy lệnh ~19:35, Đoàn rút bằng luật Đảo Đợt 2, KHÔNG lặp câu em đã làm ở BẤT KỲ nguồn/ngày nào): câu em ĐÃ LÀM (X1) không ra trước câu MỚI. Muốn X1 vào chặng thì kho hết câu mới:
+    // em đã chơi X2…X6 ở game hôm qua (lượt CÓ TRỢ GIÚP — không vào sổ học ⇒ không tính "lên bậc"), thầy chặn X7…X9 ⇒ chặng lấy đúng 6 câu CŨ (lâu nhất chưa gặp), gồm X1.
+    const hqua = T0 - 48 * 3_600_000, insA = d.sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
+    for (const qid of ['X2', 'X3', 'X4', 'X5', 'X6']) insA.run(`h-${qid}`, 'S1', 'hqua', qid, `g-${qid}`, JSON.stringify({ attempt: { id: `h-${qid}`, session: 'hqua', qid, group: `g-${qid}`, dang: 'ES.A.X', mucDo: 'biet', correct: false, assisted: true, at: hqua, novel: true } }), new Date(hqua).toISOString())
+    d.sql.prepare("INSERT INTO game_v2_scope(sbd,json,updated_at) VALUES('S1',?,'x')").run(JSON.stringify({ enabled: true, types: [], blocked: ['X7', 'X8', 'X9'] }))
     await dungLaiHoSo(d.env, ['S1'], new Date(T0).toISOString())
     const ma = (await goi(d, 'S1', 'mo')).doan.ma as string
     troi(DEM_NGUOC_MS); let xem = await goi(d, 'S1', 'xem', { ma })
@@ -135,12 +143,16 @@ describe('Đoàn Hộ Tống · máy chủ · đi một mình trọn chặng', (
     const ma = (await goi(d, 'S1', 'mo', { cheDo: 'phong' })).doan.ma as string
     await goi(d, 'S2', 'vao', { ma }); await goi(d, 'S1', 'bat-dau', { ma }); troi(DEM_NGUOC_MS)
     expect((await goi(d, 'S1', 'mo')).doan.ma).toBe(ma)
-    expect((await goi(d, 'S1', 'xem', { ma, coCau: 'X1' })).doan.cau).toEqual({ qid: 'X1', giuNguyen: true, nhan: 'toi_han_on', an: false })
+    // SỬA CÓ CHỦ Ý 21/09 (thầy lệnh ~19:35, Đoàn rút bằng luật Đảo Đợt 2, KHÔNG lặp câu em đã làm ở BẤT KỲ nguồn/ngày nào): câu em ĐÃ LÀM (X1, sai 3 ngày trước) không còn ra đầu tiên — câu MỚI cùng dạng ra trước.
+    const q1 = (await goi(d, 'S1', 'xem', { ma })).doan.cau.qid as string
+    expect(q1).toMatch(/^X[2-9]$/)
+    const giu = (await goi(d, 'S1', 'xem', { ma, coCau: q1 })).doan.cau
+    expect(giu).toMatchObject({ qid: q1, giuNguyen: true, an: false }); expect(typeof giu.nhan).toBe('string')
     await lamHiep(d, 'S1', ma) // S2 chưa chốt → hiệp chưa giải
     const lai = await goi(d, 'S1', 'xem', { ma })
-    expect(lai.doan.tran.hiep).toBe(1); expect(lai.doan.cau).toMatchObject({ qid: 'X1', daChot: true, hanhDong: 'danh', ketQua: { correct: true, solution: `${BI_MAT}-X1` } })
-    expect(lai.doan.cau.de).toMatchObject({ qid: 'X1', text: 'Đề X1' }); expect(JSON.stringify(lai.doan.cau.de)).not.toMatch(/"(correct|solution|reviewed)"/) // máy em mất đề sau khi tải lại → gửi lại BẢN CÔNG KHAI
-    expect((await goi(d, 'S1', 'xem', { ma, coCau: 'X1' })).doan.cau.de).toBeUndefined()
+    expect(lai.doan.tran.hiep).toBe(1); expect(lai.doan.cau).toMatchObject({ qid: q1, daChot: true, hanhDong: 'danh', ketQua: { correct: true, solution: `${BI_MAT}-${q1}` } })
+    expect(lai.doan.cau.de).toMatchObject({ qid: q1, text: `Đề ${q1}` }); expect(JSON.stringify(lai.doan.cau.de)).not.toMatch(/"(correct|solution|reviewed)"/) // máy em mất đề sau khi tải lại → gửi lại BẢN CÔNG KHAI
+    expect((await goi(d, 'S1', 'xem', { ma, coCau: q1 })).doan.cau.de).toBeUndefined()
   })
 })
 
@@ -178,8 +190,9 @@ describe('Đoàn Hộ Tống · máy chủ · hai tài khoản cùng chặng', (
   it('mỗi em nhận câu KHÁC nhau từ hồ sơ của chính mình; không gói tin nào của em này chứa câu, đáp án hay SBD của em kia', async () => {
     const { d, ma } = await haiBan()
     const a = await goi(d, 'S1', 'xem', { ma }), b = await goi(d, 'S2', 'xem', { ma })
-    expect(a.doan.cau.qid).toBe('X1'); expect(b.doan.cau.qid).toBe('Y1'); expect(a.doan.cau.de.tenDang).toBe('Ester'); expect(b.doan.cau.de.tenDang).toBe('Ancol')
-    khongLo(a, ['S2']); khongLo(b, ['S1']); expect(JSON.stringify(a)).not.toContain('Y1'); expect(JSON.stringify(b)).not.toContain('X1')
+    // SỬA CÓ CHỦ Ý 21/09 (thầy lệnh ~19:35, Đoàn rút bằng luật Đảo Đợt 2, KHÔNG lặp câu em đã làm ở BẤT KỲ nguồn/ngày nào): câu em ĐÃ LÀM (X1, sai 3 ngày trước) không còn ra đầu tiên — câu MỚI cùng dạng ra trước.
+    expect(a.doan.cau.qid).toMatch(/^X[2-9]$/); expect(b.doan.cau.qid).toMatch(/^Y[2-9]$/); expect(a.doan.cau.de.tenDang).toBe('Ester'); expect(b.doan.cau.de.tenDang).toBe('Ancol')
+    khongLo(a, ['S2']); khongLo(b, ['S1']); expect(JSON.stringify(a)).not.toMatch(/"Y\d/); expect(JSON.stringify(b)).not.toMatch(/"X\d/)
     const moi = (s: string) => (d.sql.prepare('SELECT json FROM doan_chang WHERE ma=?').get(ma) as any).json as string
     const cau = JSON.parse(moi('')).nguoi.map((n: any) => n.cau.map((c: any) => c.qid))
     expect(cau[0].every((q: string) => q.startsWith('X'))).toBe(true); expect(cau[1].every((q: string) => q.startsWith('Y'))).toBe(true)
@@ -326,27 +339,29 @@ describe('Đoàn Hộ Tống · máy chủ · Tiếp sức', () => {
   it('trọn luồng: bạn bật "cần tiếp sức" → em (đã chốt) chọn THẺ → bạn nhận nội dung thẻ, làm lại đúng → Liên Kích ×2 cho cả hai; câu được giúp KHÔNG thành bằng chứng', async () => {
     const { d, ma } = await haiBan()
     await goi(d, 'S2', 'tin-hieu', { ma, tinHieu: 'can_tiep_suc' })
+    const yq = (await goi(d, 'S2', 'xem', { ma })).doan.cau.qid as string // SỬA CÓ CHỦ Ý 21/09 (Đoàn rút bằng luật Đảo Đợt 2, không lặp câu đã làm): câu hiệp 1 của S2 là câu MỚI cùng dạng Ancol (không còn cố định Y1)
+    expect(yq).toMatch(/^Y[2-9]$/)
     // S1 chưa chốt thì chưa giúp được
     await expect(goi(d, 'S1', 'the-goi-y', { ma, den: 1 })).rejects.toThrow('chốt câu của mình trước')
     const s1 = await lamHiep(d, 'S1', ma)
     expect(s1.doan.tiepSuc).toMatchObject({ banCan: [1], daGiup: false }); expect(s1.doan.tran.hiep).toBe(1)
     const xemThe = await goi(d, 'S1', 'the-goi-y', { ma, den: 1 }) as any
-    expect(xemThe.goiY).toMatchObject({ den: 1, ten: 'Văn Nam', tenDang: 'Ancol', de: 'Đề Y1' }); expect(xemThe.goiY.the.map((t: any) => t.loai)).toEqual(['nhac_cong_thuc', 'loai_phuong_an'])
+    expect(xemThe.goiY).toMatchObject({ den: 1, ten: 'Văn Nam', tenDang: 'Ancol', de: `Đề ${yq}` }); expect(xemThe.goiY.the.map((t: any) => t.loai)).toEqual(['nhac_cong_thuc', 'loai_phuong_an'])
     // Người tiếp sức KHÔNG thấy: phương án của bạn, đáp án, nội dung thẻ, SBD bạn
-    khongLo(xemThe.goiY, ['S2']); expect(JSON.stringify(xemThe)).not.toContain(`${BI_MAT}-Y1`); expect(JSON.stringify(xemThe.goiY)).not.toMatch(/noiDung|choices|Kiến thức gốc|Phương án [ABCD] không/)
+    khongLo(xemThe.goiY, ['S2']); expect(JSON.stringify(xemThe)).not.toContain(`${BI_MAT}-${yq}`); expect(JSON.stringify(xemThe.goiY)).not.toMatch(/noiDung|choices|Kiến thức gốc|Phương án [ABCD] không/)
     await expect(goi(d, 'S1', 'tiep-suc', { ma, hiep: 1, den: 1, the: 'buoc_dau' })).rejects.toThrow('không dùng được')
     const gui = await goi(d, 'S1', 'tiep-suc', { ma, hiep: 1, den: 1, the: 'loai_phuong_an' }) as any
-    expect(gui.expTiepSuc).toEqual({ bat: true, exp: 5, conLai: 4 }); expect(gui.doan.tiepSuc).toMatchObject({ banCan: [], daGiup: true, lienKichSanSang: true }); expect(JSON.stringify(gui)).not.toContain(`${BI_MAT}-Y1`); expect(JSON.stringify(gui)).not.toContain('"S2"')
+    expect(gui.expTiepSuc).toEqual({ bat: true, exp: 5, conLai: 4 }); expect(gui.doan.tiepSuc).toMatchObject({ banCan: [], daGiup: true, lienKichSanSang: true }); expect(JSON.stringify(gui)).not.toContain(`${BI_MAT}-${yq}`); expect(JSON.stringify(gui)).not.toContain('"S2"')
     expect(JSON.stringify(gui)).not.toContain('không đúng — em gạch') // nội dung thẻ không về máy người giúp
     const b = await goi(d, 'S2', 'xem', { ma })
     expect(b.doan.tiepSuc).toMatchObject({ conLuotNhan: 1, daXin: false, lienKichSanSang: true, theNhan: { tuTen: 'Thu Hà', tuLaMay: false, loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án' } })
-    const gach = (b.doan.tiepSuc.theNhan.noiDung as string).match(/^Phương án ([ABCD]) không đúng/)![1]; expect(gach).not.toBe(dapAn.get('Y1')); khongLo(b, ['S1'])
+    const gach = (b.doan.tiepSuc.theNhan.noiDung as string).match(/^Phương án ([ABCD]) không đúng/)![1]; expect(gach).not.toBe(dapAn.get(yq)); khongLo(b, ['S1'])
     const xong = await lamHiep(d, 'S2', ma, true)
     expect(xong.doan.hiepVuaXong).toMatchObject({ hiep: 1, tongSatThuong: 96 }); expect(xong.doan.hiepVuaXong.cuaEm).toMatchObject({ satThuong: 48, lienKich: true, tuLam: false, duocGiupBoi: 0 })
     expect((await goi(d, 'S1', 'xem', { ma })).doan.hiepVuaXong.cuaEm).toMatchObject({ satThuong: 48, lienKich: true, giup: 1, giupThanhCong: true })
     // LUẬT CŨ GIỮ NGUYÊN: có trợ giúp = không ghi bằng chứng, không thưởng mastery
     const lan = JSON.parse((d.sql.prepare("SELECT json FROM game_v2_attempt WHERE sbd='S2'").get() as any).json)
-    expect(lan.attempt).toMatchObject({ qid: 'Y1', correct: true, assisted: true }); expect(lan.reward).toBe(0)
+    expect(lan.attempt).toMatchObject({ qid: yq, correct: true, assisted: true }); expect(lan.reward).toBe(0)
     expect(dem(d, "SELECT COUNT(*) n FROM su_kien_hoc WHERE sbd='S2' AND nguon='game'")).toBe(0); expect(dem(d, "SELECT COUNT(*) n FROM su_kien_hoc WHERE sbd='S1' AND nguon='game'")).toBe(1)
     expect(d.sql.prepare('SELECT hiep,den_sbd,tu_sbd,the,thanh_cong FROM doan_tiep_suc WHERE ma_chang=?').all(ma)).toEqual([{ hiep: 1, den_sbd: 'S2', tu_sbd: 'S1', the: 'loai_phuong_an', thanh_cong: 1 }])
     expect(d.sql.prepare("SELECT loai,exp,ma_nguon FROM exp_so WHERE sbd='S1' AND loai='tiepsuc'").all()).toEqual([{ loai: 'tiepsuc', exp: 5, ma_nguon: `${ma}|1|1` }])
@@ -390,11 +405,12 @@ describe('Đoàn Hộ Tống · máy chủ · Tiếp sức', () => {
   })
   it('câu không có thẻ nào gửi được (Phần I hỏng đáp án / không kiến thức, không lời giải nhiều bước ở Phần II, III) → từ chối ngay từ lúc xin, không treo tín hiệu', async () => {
     const d = dungTruong(); await bangChung(d, 'S1', 'X1')
-    d.sql.prepare("UPDATE game_v2_question SET json=json_set(json,'$.kienThuc',json('[\"K1\"]'),'$.phan','III','$.correct','12,5','$.choices',json('[]')) WHERE qid='X1'").run()
-    d.sql.prepare("UPDATE game_v2_question SET json=json_remove(json_set(json,'$.solution',json('null')),'$.x') WHERE qid='X1'").run()
+    // SỬA CÓ CHỦ Ý 21/09 (Đoàn rút bằng luật Đảo Đợt 2, không lặp câu đã làm): X1 (đã làm) không còn ra đầu ⇒ biến MỌI câu dạng X thành Phần III không lời giải (câu nào ra trước cũng đúng kịch bản)
+    d.sql.prepare("UPDATE game_v2_question SET json=json_set(json,'$.kienThuc',json('[\"K1\"]'),'$.phan','III','$.correct','12,5','$.choices',json('[]')) WHERE qid LIKE 'X%'").run()
+    d.sql.prepare("UPDATE game_v2_question SET json=json_remove(json_set(json,'$.solution',json('null')),'$.x') WHERE qid LIKE 'X%'").run()
     const ma = (await goi(d, 'S1', 'mo')).doan.ma as string; troi(DEM_NGUOC_MS)
     const xem = await goi(d, 'S1', 'xem', { ma })
-    expect(xem.doan.cau.qid).toBe('X1') // X1 giờ là Phần III, không lời giải, nhưng có kiến thức K1 → vẫn có đúng MỘT thẻ "Nhắc công thức"
+    expect(xem.doan.cau.qid).toMatch(/^X/) // câu ra là Phần III, không lời giải, nhưng có kiến thức K1 → vẫn có đúng MỘT thẻ "Nhắc công thức"
     expect((await goi(d, 'S1', 'tin-hieu', { ma, tinHieu: 'can_tiep_suc' })).doan.tiepSuc.theNhan.loai).toBe('nhac_cong_thuc')
     d.sql.prepare("UPDATE game_v2_question SET json=json_set(json,'$.kienThuc',json('[]'),'$.phan','III','$.correct','7','$.choices',json('[]'),'$.solution',json('null'))").run()
     troi(40_000 + AN_HAN_MS); await goi(d, 'S1', 'xem', { ma }); troi(NGHI_GIUA_HIEP_MS); await goi(d, 'S1', 'xem', { ma })

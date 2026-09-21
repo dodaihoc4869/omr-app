@@ -17,6 +17,7 @@ import {laCauTuLuan,jsonLaTuLuan} from './cam-tu-luan'
 import {masteryTheoHoSo,qidChanHomNay} from './game-v2-ho-so'
 import {ghiSuKien} from './su-kien-hoc'
 import {doanAction,laGoiNoiBoDoan,doanMoCho} from './game-v2-doan'
+import {chonLauNhat,docCauDaLamMoiNguon,docCauLamHomNay,tachMoiCu} from './game-v2-cau-moi'
 import {SO_HIEP} from '../../src/game/than-thu-v2/doan-core'
 import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay'
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
@@ -133,20 +134,40 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
   const dayStart=new Date(ngay+'T00:00:00+07:00').toISOString()
   const remaining=Math.max(0,TRAN_CAU_DOAN_NGAY-await demCauTrongNgay(env,sbd,dayStart,'doan')) // trần ĐOÀN riêng (60), không tính lượt của Đảo
   if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_DOAN_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
-  const history=await attempts(env,sbd)
+  const history=await attempts(env,sbd),mastery=await masteryTheoHoSo(env,sbd,p.mastery)
   const blocked=await protectedQuestions(env)
   for(const key of control.blocked)blocked.add(key)
-  for(const qid of await qidChanHomNay(env,sbd,tNow))blocked.add(qid)
+  const chanHomNay=await qidChanHomNay(env,sbd,tNow) // câu làm HÔM NAY ở nguồn khác (+ gói gia đình chưa nộp): loại ở `eligible` nhưng tách riêng để báo THẬT "hết câu mới hôm nay"
   for(const x of await docCauBtvnChuaNop(env,sbd))blocked.add(x)
   const dangHoc=new Set<string>([...dangLop,...scope.evidence.map(e=>e.dang).filter((d):d is string=>!!d)])
-  const eligible=scope.pool.filter(q=>q.phan!=='II'&&q.reviewed&&!laCauTuLuan(q)&&!!q.dang&&!!q.mucDo&&dangHoc.has(q.dang)&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(control.types.length===0||control.types.includes(q.dang)))
-  const chon=chooseSessionWithRoles(eligible,scope.evidence,history,await masteryTheoHoSo(env,sbd,p.mastery),'adventure',tNow).slice(0,Math.min(SO_HIEP-2,remaining))
-  if(!chon.length)return {ok:true,questions:[],missing:scope.missing,message:'Chưa có câu vừa sức trong kho cho em. Em hoàn thành bài Thầy giao rồi quay lại lên đường nhé.'}
+  const poolHopLe=scope.pool.filter(q=>q.phan!=='II'&&q.reviewed&&!laCauTuLuan(q)&&!!q.dang&&!!q.mucDo&&dangHoc.has(q.dang)&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(control.types.length===0||control.types.includes(q.dang)))
+  const eligible=poolHopLe.filter(q=>!chanHomNay.has(q.qid))
+  for(const qid of chanHomNay)blocked.add(qid)
+  // RÚT CÂU KHÔNG LẶP (thầy lệnh 21/09 ~19:35, game-v2-cau-moi.ts): CÙNG luật cá nhân hoá với Đảo Đợt 2 (chooseLuotMoi 'kham_pha'); KHÔNG lặp câu em đã làm HÔM NAY (mọi nguồn); ưu tiên câu CHƯA TỪNG làm ở đâu (mọi nguồn, mọi ngày);
+  // hết câu mới ⇒ câu LÂU NHẤT chưa gặp + báo thật `hetCauMoi`; không còn gì ⇒ báo thật.
+  const homNay=await docCauLamHomNay(env,sbd,dayStart,ngay),daLam=await docCauDaLamMoiNguon(env,sbd)
+  const lucGame=new Map<string,number>();for(const a of history)lucGame.set(a.group,Math.max(lucGame.get(a.group)??-1,a.at))
+  const {moi,cu}=tachMoiCu(eligible,homNay,daLam,new Set(lucGame.keys()))
+  const soCau=Math.min(SO_HIEP-2,remaining),opt={loai:'kham_pha' as const,cap:p.cap,now:tNow,blocked,soCau}
+  let chon=chooseLuotMoi(moi,scope.evidence,history,mastery,opt),hetCauMoi=false
+  if(chon.length<soCau){
+    // Bù bằng câu LÂU NHẤT chưa gặp: thử `k` câu cũ nhất trước (k = số câu còn thiếu), chỉ nới `k` khi luật bậc/đổi câu của chooseLuotMoi loại bớt.
+    const daChon=new Set(chon.map(x=>x.q.group)),thieu=soCau-chon.length,cuCon=cu.filter(q=>!daChon.has(q.group))
+    for(let k=thieu;k<cuCon.length+thieu;k+=thieu){
+      const bu=chooseLuotMoi(chonLauNhat(cuCon,daLam,lucGame,k),scope.evidence,history,mastery,{...opt,soCau:thieu})
+      if(bu.length>=thieu||k+thieu>=cuCon.length+thieu){if(bu.length){hetCauMoi=true;chon=[...chon,...bu]};break}
+    }
+  }
+  if(!chon.length){
+    const lyDo=!poolHopLe.length?'kho_trong':(!moi.length&&!cu.length)?'het_cau_moi_hom_nay':'chi_con_cau_qua_bac'
+    const message=lyDo==='het_cau_moi_hom_nay'?'Hôm nay em đã làm hết câu mới hợp sức em trong kho. Mai có câu mới nhé.':lyDo==='chi_con_cau_qua_bac'?'Các câu còn lại của lớp đều cao hơn một bậc so với sức em ở dạng đó. Em làm thêm bài tập về nhà và phần ôn lại nhé.':'Chưa có câu vừa sức trong kho cho em. Em hoàn thành bài Thầy giao rồi quay lại lên đường nhé.'
+    return {ok:true,questions:[],lyDo,missing:scope.missing,message}
+  }
   const id=crypto.randomUUID(),groups=new Set(scope.evidence.map(e=>e.group))
   const session:Session={mode:'adventure',created:Date.now(),questions:chon.map(x=>({qid:x.q.qid,maDe:x.q.maDe,version:x.q.version,group:x.q.group,novel:!groups.has(x.q.group)}))}
   const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
   if(!inserted.meta.changes)return startDoanKhoLop(env,sbd,p)
-  return {ok:true,id,questions:chon.map(x=>({...publicQuestion(x.q),role:x.role})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3)}
+  return {ok:true,id,questions:chon.map(x=>({...publicQuestion(x.q),role:x.role})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(hetCauMoi?{hetCauMoi:true}:{})}
 }
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
   const sbd=await gameIdentity(env,b)

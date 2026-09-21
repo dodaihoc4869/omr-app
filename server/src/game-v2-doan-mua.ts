@@ -100,9 +100,16 @@ async function soChangDaDiHomNay(env: Env, sbd: string, homNay: string, truMa: s
 async function daDiHomNay(env: Env, sbd: string, homNay: string, truMa: string): Promise<boolean> {
   return (await soChangDaDiHomNay(env, sbd, homNay, truMa)) > 0
 }
-/** Trần chặng Đoàn mỗi ngày VN (Điều 9): 1 chặng miễn phí + tối đa 3 chặng bằng vé (24 câu; cùng 36 câu Đảo = trần 60 câu toàn game). */
-export const TOI_DA_CHANG_NGAY = 4
-export const LOI_DU_CHANG_NGAY = 'Hôm nay em đã đi đủ 4 chặng. Mai đoàn lại lên đường.'
+/**
+ * Trần chặng Đoàn mỗi ngày VN (Điều 9; Boss chốt 21/09 ~19:40 theo uỷ quyền của thầy: "đủ vui với nhau nhưng không quá lâu, phải cuốn"): 1 chặng miễn phí + tối đa 5 chặng bằng vé = 6 chặng (36 câu cá nhân ≈ 45–60 phút, trước là 4).
+ * Trần câu Đoàn RIÊNG 60/ngày (game-v2-luot.ts) giữ làm lưới an toàn. Luật kiếm vé, giá vé, thưởng kết chặng KHÔNG đổi.
+ */
+export const TOI_DA_CHANG_NGAY = 6
+export const LOI_DU_CHANG_NGAY = `Hôm nay em đã đi đủ ${TOI_DA_CHANG_NGAY} chặng. Mai đoàn lại lên đường.`
+/** Số chặng em ĐÃ LÊN ĐƯỜNG hôm nay (sảnh bỏ dở không tính) — cho màn "Chặng n/6 hôm nay". Thiếu bảng ⇒ null. */
+export async function changDaDiHomNay(env: Env, sbd: string, homNay: string): Promise<number | null> {
+  try { return await soChangDaDiHomNay(env, sbd, homNay, '') } catch (e) { if (thieuBang(e)) return null; throw e }
+}
 /**
  * CỔNG VÉ lúc em mở / vào một đoàn: chặng đầu ngày (giờ VN) miễn phí; chặng thêm tốn 1 vé, trừ NGAY (khoá `tieu|<mã chặng>` nên bấm lại không trừ đôi).
  * Hết vé → ném lời tiếng Việt chỉ cách kiếm vé. Thiếu bảng vé (chưa chạy migration bước 5) → chỉ cho chặng miễn phí.
@@ -111,7 +118,7 @@ export async function quaCongVe(env: Env, sbd: string, maChang: string, now: num
   const homNay = ngayVn(iso(now))
   const daDi = await soChangDaDiHomNay(env, sbd, homNay, maChang)
   if (daDi === 0) return { mienPhi: true }
-  if (daDi >= TOI_DA_CHANG_NGAY) throw new Error(LOI_DU_CHANG_NGAY) // 1 miễn phí + 3 vé là hết — vé còn dư cũng không đi thêm
+  if (daDi >= TOI_DA_CHANG_NGAY) throw new Error(LOI_DU_CHANG_NGAY) // 1 miễn phí + 5 vé là hết — vé còn dư cũng không đi thêm
   await dongBoVe(env, sbd, now)
   const ve = await soVe(env, sbd)
   const daTru = ve === null ? null : await env.DB.prepare('SELECT 1 x FROM doan_ve_so WHERE khoa=?').bind(`${sbd}|tieu|${maChang}`).first()

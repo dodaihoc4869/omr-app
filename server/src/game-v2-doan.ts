@@ -26,8 +26,9 @@ import { soanThe, deRutGon, MO_TA_THE, type LoaiThe, type TheGoiY } from './game
 import { ghiTiepSuc } from './exp-d1'
 import { docExpKetChang, traoExpKetChang } from './game-v2-doan-exp'
 import { docCauBtvnChuaNop } from './game-v2-luot'
-import { docSanh, quaCongVe, hoanVe, ketChangChoLop } from './game-v2-doan-mua'
+import { docSanh, quaCongVe, hoanVe, ketChangChoLop, changDaDiHomNay, TOI_DA_CHANG_NGAY } from './game-v2-doan-mua'
 import { TRAN_CAU_DOAN_NGAY, demCauTrongNgay } from './game-v2-luot'
+import { demEmDaThayTrum, docCauLamHomNay } from './game-v2-cau-moi'
 import { docAnThach, anChoSanh, goiYBanDongHanh, docHienThi } from './game-v2-doan-an'
 
 type Row = Record<string, unknown>
@@ -62,7 +63,7 @@ export type NhanCau = 'toi_han_on' | 'dang_yeu' | 'cau_moi' | 'vua_suc'
 /** `an` = dạng của câu này em ĐÃ KHẮC PHỤC XONG (ấn thạch sáng) → kỹ năng ở hiệp này là biến thể ấn (×1,25). */
 interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; dang: string | null; tenDang: string; nhom: string; kt: string[]; an?: boolean }
 /** `cap` chỉ để VẼ đúng hình thái thần thú; không bao giờ vào lõi (cấp không cho chỉ số trong trận). */
-interface NguoiDoan { sbd: string; ten: string; pet: number; cap: number; lop: string; phien: string; cau: CauRef[] }
+interface NguoiDoan { sbd: string; ten: string; pet: number; cap: number; lop: string; phien: string; cau: CauRef[]; /** Kho hết câu MỚI hôm nay ⇒ có câu lâu nhất chưa gặp trong bộ (báo thật cho em). */ hetCauMoi?: boolean }
 interface NopLuu { dung: boolean; hanhDong: HanhDong; tuLam: boolean; boTrong: boolean; tiepSucBoi?: number }
 /** Thẻ gợi ý một ghế đã nhận ở hiệp đang chạy: `tu` = ghế tiếp sức (có thể là bạn máy). Nội dung thẻ CHỈ xuống máy người nhận. */
 interface TheLuu extends TheGoiY { tu: number }
@@ -170,7 +171,7 @@ async function taoNguoi(env: Env, sbd: string, p: Profile, b: Row, goiGame: GoiG
   // Ấn thạch SÁNG của em (dạng đã khắc phục xong theo hồ sơ thật) → đánh dấu câu thuộc dạng ấy; chụp MỘT lần lúc vào đoàn để cả chặng tất định.
   const anSang = new Set((await docAnThach(env, sbd, ngayVn(iso(now)))).filter(a => a.trangThai === 'sang').map(a => a.dang))
   const cau = (await ganNhan(env, sbd, qs.slice(0, SO_HIEP - 2), now)).map(c => ({ ...c, an: !!c.dang && anSang.has(c.dang) }))
-  return { sbd, ten: tenGoi(String(hs?.ho_ten ?? ''), p.nickname || PETS[pet]!.name), pet, cap: Math.max(1, Math.min(120, Number(p.cap) || 1)), lop: String(hs?.lop ?? ''), phien, cau }
+  return { sbd, ten: tenGoi(String(hs?.ho_ten ?? ''), p.nickname || PETS[pet]!.name), pet, cap: Math.max(1, Math.min(120, Number(p.cap) || 1)), lop: String(hs?.lop ?? ''), phien, cau, ...(start.hetCauMoi === true ? { hetCauMoi: true } : {}) }
 }
 
 /**
@@ -189,6 +190,7 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
     for (const k of control.blocked) chan.add(k)
     if (control.types.length) loaiDuocPhep = new Set(control.types.filter(t => !loaiDuocPhep || loaiDuocPhep.has(t)))
     for (const q of await qidChanHomNay(env, n.sbd, now)) chan.add(q)
+    for (const q of await docCauLamHomNay(env, n.sbd, new Date(ngayVn(iso(now)) + 'T00:00:00+07:00').toISOString(), ngayVn(iso(now)))) chan.add(q) // không lặp câu đã làm HÔM NAY (mọi nguồn, kể cả game)
     // Game hiện lời giải ngay ⇒ câu CHUNG của trùm cũng KHÔNG được nằm trong bài tập về nhà CHƯA nộp của BẤT KỲ bạn nào trong đội (Code 1 rà chéo W2c).
     for (const x of await docCauBtvnChuaNop(env, n.sbd)) chan.add(x)
     for (const c of n.cau) { chan.add(c.qid); chan.add(c.nhom) }
@@ -214,6 +216,9 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
     .filter(q => q.reviewed && !laCauTuLuan(q) && /^[DS]{4}$/.test(q.correct) && q.ideas.length === SO_Y_TRUM && !chan.has(q.qid) && !chan.has(q.group)
       && q.kienThuc.length > 0 && q.kienThuc.every(k => ktBiet.get(q.dang!)!.has(k)))
     .sort((a, b) => (yeu.get(b.dang ?? '') ?? 0) - (yeu.get(a.dang ?? '') ?? 0) || hashSeed(`${ma}|${a.qid}`) - hashSeed(`${ma}|${b.qid}`) || a.qid.localeCompare(b.qid))
+  // Trùm nhớ câu đã ra ở chặng trước của các em trong đoàn + câu các em đã làm ở mọi nguồn/mọi ngày: câu CHƯA AI thấy đứng trước (ổn định: giữ thứ tự cũ trong cùng nhóm)
+  const daThay = await demEmDaThayTrum(env, nguoi.map(n => n.sbd), ungVien.map(q => q.qid))
+  ungVien.sort((a, b) => (daThay.get(a.qid) ?? 0) - (daThay.get(b.qid) ?? 0))
   const mot = ungVien[0]; if (!mot) return { trum, giaoY }
   const hai = ungVien.find(q => q.group !== mot.group && q.dang !== mot.dang) ?? ungVien.find(q => q.group !== mot.group)
   const soGhe = Math.max(2, nguoi.length)
@@ -382,6 +387,12 @@ async function theChoGhe(env: Env, p: PhongDoan, ma: string, ghe: number): Promi
 const ghiLuotTiepSuc = (env: Env, ma: string, hiep: number, den: string, tu: string, the: string, now: number) =>
   env.DB.prepare('INSERT OR IGNORE INTO doan_tiep_suc(ma_chang,hiep,den_sbd,tu_sbd,the,luc) VALUES(?,?,?,?,?,?)').bind(ma, hiep, den, tu, the, iso(now)).run().catch(() => { /* sổ phụ: lỗi ghi không làm hỏng trận */ })
 
+/** `changHomNay: {daDi, toiDa}` cho sảnh (chỉ-thêm): màn hiện "Chặng n/toiDa hôm nay". Thiếu bảng ⇒ vắng khoá. */
+const changHomNay = async (env: Env, sbd: string, homNay: string): Promise<Record<string, unknown>> => {
+  const daDi = await changDaDiHomNay(env, sbd, homNay)
+  return daDi === null ? {} : { changHomNay: { daDi, toiDa: TOI_DA_CHANG_NGAY } }
+}
+
 // ───────────────────────── Bộ lệnh /game-v2/doan-* ─────────────────────────
 export async function doanAction(env: Env, sbd: string, p: Profile, action: string, b: Row, goiGame: GoiGame): Promise<Record<string, unknown>> {
   if (!await doanMoCho(env, sbd)) throw new Error(LOI_CHUA_MO)
@@ -399,7 +410,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     // Sảnh hằng ngày: vé, chuỗi/rương, Đoàn lớp, Trùm lớp. Chưa chạy migration bước 5 → `sanh:null`, giao diện giữ các ô "SẮP MỞ".
     await env.DB.prepare("DELETE FROM doan_ve_so WHERE sbd=? AND loai='tieu' AND ma_nguon IN (SELECT ma FROM doan_chang WHERE trang_thai IN ('sanh','huy') AND tao_luc<?)").bind(sbd, iso(now - PHONG_HET_HAN_MS)).run().catch(() => { /* chưa có sổ vé */ })
     const homNay = ngayVn(iso(now)), pet = Math.max(0, PETS.findIndex(x => x.id === hoSo.pet)), sanh = await docSanh(env, sbd, now)
-    return { ok: true, tranNgay: TRAN_CAU_DOAN_NGAY, dailyUsed: await demCauTrongNgay(env, sbd, new Date(homNay + 'T00:00:00+07:00').toISOString(), 'doan'), sanh, anThach: anChoSanh(await docAnThach(env, sbd, homNay), pet), banDongHanh: await goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi), dangDo: (await timDangDo())?.ma_chang ?? null }
+    return { ok: true, tranNgay: TRAN_CAU_DOAN_NGAY, dailyUsed: await demCauTrongNgay(env, sbd, new Date(homNay + 'T00:00:00+07:00').toISOString(), 'doan'), ...await changHomNay(env, sbd, homNay), sanh, anThach: anChoSanh(await docAnThach(env, sbd, homNay), pet), banDongHanh: await goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi), dangDo: (await timDangDo())?.ma_chang ?? null }
   }
   if (action === 'doan-hien-thi') {
     // Hợp đồng hiển thị NGOÀI game (docs/hop-dong-doan-hien-thi-2109.md): hào quang + danh hiệu của chính em.
@@ -416,7 +427,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       env.DB.prepare('INSERT INTO doan_chang(ma,json,chu,trang_thai,tao_luc) VALUES(?,?,?,?,?)').bind(ma, JSON.stringify(phong), sbd, phong.chang ? 'dang_di' : 'sanh', iso(now)),
       env.DB.prepare('INSERT INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) VALUES(?,?,?,?,0,?)').bind(ma, sbd, ngayVn(iso(now)), toi.lop, iso(now)),
     ])
-    return khungNhin(env, ma, phong, 0, sbd, now, b)
+    return { ...(await khungNhin(env, ma, phong, 0, sbd, now, b)), ...(toi.hetCauMoi ? { hetCauMoi: true } : {}) } // hetCauMoi (chỉ-thêm): hôm nay hết câu MỚI, bộ có câu lâu nhất chưa gặp — máy nói thật với em
   }
 
   const ma = String(b.ma ?? '').trim().toUpperCase()

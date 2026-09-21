@@ -1,6 +1,6 @@
 // @vitest-environment node
 // ĐỢT 2 · ĐOÀN HỘ TỐNG (Điều 9): EXP kết chặng (`doan_chang` 5/10/15, các chặng thắng sau trong ngày một nửa; `doan_giap` +3 mỗi trùm vỡ giáp, kể cả chặng thua) qua cửa trần 120 EXP game/ngày, khoá sổ theo mã chặng;
-// và trần 4 chặng/ngày (1 miễn phí + tối đa 3 bằng vé). SQLite thật; số viết thẳng (không import hằng luật).
+// và trần 6 chặng/ngày (1 miễn phí + tối đa 5 bằng vé; Boss chốt 21/09 ~19:40, trước là 4). SQLite thật; số viết thẳng (không import hằng luật).
 import { describe, expect, it } from 'vitest'
 import { docExpKetChang, traoExpKetChang } from '../server/src/game-v2-doan-exp'
 import { LOI_DU_CHANG_NGAY, LOI_HET_VE, TOI_DA_CHANG_NGAY, quaCongVe } from '../server/src/game-v2-doan-mua'
@@ -94,18 +94,18 @@ describe('EXP kết chặng Đoàn', () => {
   })
 })
 
-describe('trần 4 chặng Đoàn mỗi ngày (1 miễn phí + tối đa 3 bằng vé)', () => {
-  it('chặng đầu miễn phí; đã đi 4 chặng ⇒ chặng thứ 5 bị chặn bằng lời (dù còn vé); đã đi 3 chặng mà hết vé ⇒ lời hết vé cũ (không phải lời đủ 4 chặng)', async () => {
-    expect(TOI_DA_CHANG_NGAY).toBe(4); expect(LOI_DU_CHANG_NGAY).toBe('Hôm nay em đã đi đủ 4 chặng. Mai đoàn lại lên đường.')
+describe('trần 6 chặng Đoàn mỗi ngày (1 miễn phí + tối đa 5 bằng vé; SỬA CÓ CHỦ Ý 21/09 Boss chốt: 4 ⇒ 6)', () => {
+  it('chặng đầu miễn phí; đã đi 6 chặng ⇒ chặng thứ 7 bị chặn bằng lời (dù còn vé); đã đi 5 chặng mà hết vé ⇒ lời hết vé cũ (không phải lời đủ 6 chặng)', async () => {
+    expect(TOI_DA_CHANG_NGAY).toBe(6); expect(LOI_DU_CHANG_NGAY).toBe('Hôm nay em đã đi đủ 6 chặng. Mai đoàn lại lên đường.')
     const now = Date.parse(`${NGAY}T21:00:00+07:00`)
     const a = dung()
     expect(await quaCongVe(a.env, 'S1', 'MOI', now)).toEqual({ mienPhi: true })
     const d = dung()
-    for (let i = 1; i <= 4; i++) luot(d, `C${i}`, 'S1', 1)
+    for (let i = 1; i <= 6; i++) luot(d, `C${i}`, 'S1', 1)
     d.sql.prepare("INSERT INTO doan_ve_so(khoa,sbd,ngay_vn,loai,so,ma_nguon,luc) VALUES('S1|ruong|x','S1',?,'ruong',5,'x',?)").run(NGAY, `${NGAY}T01:00:00.000Z`)
-    await expect(quaCongVe(d.env, 'S1', 'MOI', now)).rejects.toThrow('đủ 4 chặng')
+    await expect(quaCongVe(d.env, 'S1', 'MOI', now)).rejects.toThrow('đủ 6 chặng')
     const e = dung()
-    for (let i = 1; i <= 3; i++) luot(e, `C${i}`, 'S1', 1)
+    for (let i = 1; i <= 5; i++) luot(e, `C${i}`, 'S1', 1)
     await expect(quaCongVe(e.env, 'S1', 'MOI', now)).rejects.toThrow(LOI_HET_VE)
   })
 })
