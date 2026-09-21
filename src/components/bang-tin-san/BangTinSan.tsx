@@ -23,9 +23,11 @@ export interface BangTinSanProps {
   onMoEm?: (sbd: string) => void
   /** Giờ cố định (ms) cho bản vẽ / kiểm thử; không truyền ⇒ chạy theo giờ máy chủ. */
   nayMs?: number
+  /** Hỏi máy chủ hụt ≥ 3 nhịp liền: chip "TRỰC TIẾP" đổi thành "Mất kết nối · số lúc HH:MM" (giờ máy chủ của số đang hiện); hỏi được lại ⇒ tự mất. */
+  matKetNoi?: boolean
 }
 
-export default function BangTinSan({ du, nayMs, onMoEm = () => {} }: BangTinSanProps) {
+export default function BangTinSan({ du, nayMs, onMoEm = () => {}, matKetNoi = false }: BangTinSanProps) {
   const goc = useRef<HTMLElement>(null)
   const { mau, phienBan } = useMauSan(goc)
   const itDong = useItDong()
@@ -40,7 +42,7 @@ export default function BangTinSan({ du, nayMs, onMoEm = () => {} }: BangTinSanP
   const nhip = du.dungNhip
   return (
     <main className="bts-san" ref={goc} data-khoi="bang-tin-san" data-it-dong={itDong ? '1' : '0'} data-mot-man={motMan ? '1' : '0'}>
-      <ThanhTren mocMs={du.mocMs} nowMs={now} moPhong={du.moPhong} />
+      <ThanhTren mocMs={du.mocMs} nowMs={now} moPhong={du.moPhong} matKetNoiLuc={matKetNoi ? du.serverNow : null} />
       {du.tin.length > 0 && <BangChay tin={du.tin} itDong={itDong} />}
       <section className="bts-hang-so" aria-label="Bốn con số hôm nay" data-so-o={nhip ? '4' : '3'}>
         <OSo

@@ -1262,3 +1262,15 @@
     display: none;
   }
 }
+
+/* mất kết nối (hỏi máy chủ hụt ≥ 3 nhịp): chấm vàng đứng yên, chữ thường — số đang hiện là số của lúc ghi */
+.bts-mat-ket-noi {
+  color: var(--bts-vang-chu);
+  letter-spacing: 0;
+}
+.bts-mat-ket-noi i {
+  background: var(--bts-vang);
+}
+.bts-mat-ket-noi i::after {
+  display: none;
+}

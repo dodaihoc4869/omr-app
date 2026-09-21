@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import type { DanDauSan } from '../../lib/bang-tin-san/kieu'
 import type { BangTin, EmCanDeY, TienBoBangTin } from '../../lib/bang-tin-thay'
+import { tenGoiKhongTrung } from '../../lib/bang-tin-san/ten-goi'
 
 const TOI_DA_CAN_DE_Y = 3
-const goiTen = (hoTen: string): string => hoTen.trim().split(/\s+/).slice(-2).join(' ')
 
 /** Mức của một em cần để ý: quá hạn / sai nhiều ⇒ "Cần để ý" (đỏ); còn lại (chưa mở bài, tín hiệu khác) ⇒ "Theo dõi" (vàng). */
 export function mucCanDeY(e: EmCanDeY): 'do' | 'vang' {
@@ -29,6 +29,8 @@ export function DanDau({ danDau, bt, onMoEm }: { danDau: readonly DanDauSan[] | 
     return () => clearTimeout(id)
   }, [danDau])
   const tienBo: TienBoBangTin | undefined = bt?.tienBo.find((t) => t.loai === 'tien_bo_nhat')
+  const tenGoi = tenGoiKhongTrung([...(danDau ?? []), ...(tienBo ? [tienBo] : [])])
+  const goiTen = (sbd: string, hoTen: string): string => tenGoi.get(sbd) || hoTen // tên gọi hai chữ cuối, trùng thì thêm chữ trước (không "…")
   const canDeY = bt?.canDeY.ds.slice(0, TOI_DA_CAN_DE_Y) ?? []
   return (
     <article className="bts-the" data-khoi="dan-dau">
@@ -44,7 +46,7 @@ export function DanDau({ danDau, bt, onMoEm }: { danDau: readonly DanDauSan[] | 
                 <span className="bts-dd-thu bts-so">{i + 1}</span>
                 <span className="bts-dd-mt" aria-hidden="true" />
                 <span className="bts-dd-ten" title={e.hoTen}>
-                  {goiTen(e.hoTen)} <span>· {e.tenLop}</span>
+                  {goiTen(e.sbd, e.hoTen)} <span>· {e.tenLop}</span>
                 </span>
                 <span className="bts-dd-cau bts-so">
                   {e.soCau} <small>câu</small>
@@ -62,7 +64,7 @@ export function DanDau({ danDau, bt, onMoEm }: { danDau: readonly DanDauSan[] | 
         <p className="bts-tien-bo">
           <span className="bts-nhan"><span className="bts-nhan-dai">Tiến bộ nhất</span><span className="bts-nhan-gon">Tiến bộ</span></span>
           <span>
-            <b title={`${tienBo.hoTen} · ${tienBo.tenLop}`}>{goiTen(tienBo.hoTen)}</b> · <b className="bts-so">{tienBo.chu}</b>
+            <b title={`${tienBo.hoTen} · ${tienBo.tenLop}`}>{goiTen(tienBo.sbd, tienBo.hoTen)}</b> · <b className="bts-so">{tienBo.chu}</b>
           </span>
         </p>
       )}

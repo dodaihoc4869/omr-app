@@ -1,7 +1,7 @@
 // BẢNG TIN KIỂU SÀN GIAO DỊCH · BỘ ĐỌC HỢP ĐỒNG `POST /gv/bang-tin-song` (docs/hop-dong-bang-tin-song-2109.md, Code 4 ⇄ Code 3).
 // Đọc CÓ CHỐNG SAI KIỂU: khoá nào sai dạng thì bỏ khoá ấy (khối ẩn, KHÔNG bịa 0); thiếu `song` hoặc thiếu `nhip` ⇒ null ⇒ màn dùng Bảng tin bản 3 (`/gv/bang-tin`).
 // Mọi khoá của `/gv/bang-tin` nằm cùng thân ⇒ `bt` đọc bằng CHÍNH `docBangTin` (không chép luật đọc).
-import { docBangTin, type BangTin } from '../bang-tin-thay'
+import { docBangTin } from '../bang-tin-thay'
 import { goiLenh, type KetQuaLenh } from '../goi-lenh-thay'
 import type { DanDauSan, DuLieuSan, DungNhipSan, EmNhiet, LoaiTin, LopSan, NenSan, TinSan, Tia60 } from './kieu'
 

@@ -2,7 +2,7 @@
 // Nút Sáng/Tối dùng cơ chế giao diện SẴN CÓ của app (src/lib/giao-dien-thay.ts), không tự chế.
 import { useEffect, useState } from 'react'
 import { useGiaoDien } from '../../lib/giao-dien-thay'
-import { chuMoc, gioGiayVN } from '../../lib/bang-tin-san/trang-thai'
+import { chuMoc, gioGiayVN, gioPhutMs } from '../../lib/bang-tin-san/trang-thai'
 
 /** Giao diện ĐANG HIỆU LỰC: người dùng ép sáng/tối thì theo đó; "theo máy" thì theo prefers-color-scheme. */
 function useToiMay(): boolean {
@@ -17,7 +17,7 @@ function useToiMay(): boolean {
   return toiMay
 }
 
-export function ThanhTren({ mocMs, nowMs, moPhong }: { mocMs: number; nowMs: number; moPhong?: boolean }) {
+export function ThanhTren({ mocMs, nowMs, moPhong, matKetNoiLuc = null }: { mocMs: number; nowMs: number; moPhong?: boolean; matKetNoiLuc?: number | null }) {
   const [chon, datGiaoDien] = useGiaoDien()
   const toiMay = useToiMay()
   const toi = chon === 'toi' || (chon === 'may' && toiMay)
@@ -30,10 +30,17 @@ export function ThanhTren({ mocMs, nowMs, moPhong }: { mocMs: number; nowMs: num
         <span className="bts-dong-ho bts-so" aria-label="Giờ hiện tại">
           {gioGiayVN(nowMs)}
         </span>
-        <span className="bts-truc-tiep">
-          <i />
-          TRỰC TIẾP
-        </span>
+        {matKetNoiLuc !== null ? (
+          <span className="bts-truc-tiep bts-mat-ket-noi" role="status">
+            <i />
+            Mất kết nối · số lúc {gioPhutMs(matKetNoiLuc)}
+          </span>
+        ) : (
+          <span className="bts-truc-tiep">
+            <i />
+            TRỰC TIẾP
+          </span>
+        )}
         <div className="bts-doi-mau" role="group" aria-label="Giao diện màu">
           <button type="button" aria-pressed={!toi} onClick={() => datGiaoDien('sang')}>
             Sáng

@@ -11,7 +11,9 @@ import { TEN_LOP_CHUA_XEP } from '../server/src/ten-lop'
 import { datKhungGia } from './_khung-gia-2109'
 import { useAppStore } from '../src/store/appStore'
 import HomNayScreen from '../src/screens/HomNayScreen'
-import { NHIP_HOI_SAN_MS, THU_LAI_SAU_KHI_TU_CHOI_MS } from '../src/components/bang-tin-san/use-san-song'
+import { NHIP_HOI_SAN_MS, NHIP_HUT_MAT_KET_NOI, THU_LAI_SAU_KHI_TU_CHOI_MS } from '../src/components/bang-tin-san/use-san-song'
+import { tenGoiKhongTrung } from '../src/lib/bang-tin-san/ten-goi'
+import { DanDau } from '../src/components/bang-tin-san/DanDau'
 
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }) }))
 vi.mock('../src/lib/exam-db', () => ({ loadTeacherSecret: async () => 'mat-thu' }))
@@ -273,6 +275,56 @@ describe('HomNayScreen — Bảng tin sàn khi máy chủ có lệnh sống; rơ
     await yen(NHIP_HOI_SAN_MS * 3) // câu trả lời chưa về ⇒ ba nhịp trôi qua không thêm lệnh
     expect(dem('/gv/bang-tin-song')).toBe(truoc)
     await act(async () => mo(ok(thanSong())))
+  })
+  it('MẤT KẾT NỐI: hỏi hụt ≥ 3 nhịp liền ⇒ chip "Mất kết nối · số lúc HH:MM" (giờ của số đang hiện) thay "TRỰC TIẾP"; hỏi được lại ⇒ tự mất; 2 nhịp hụt chưa đủ', async () => {
+    expect(NHIP_HUT_MAT_KET_NOI).toBe(3)
+    dongHoGia()
+    const { container } = render(<HomNayScreen />)
+    await yen()
+    expect(laSan(container)).toBeTruthy()
+    const chip = () => container.querySelector('.bts-mat-ket-noi')?.textContent ?? null
+    expect(chip()).toBeNull()
+    expect(container.textContent).toContain('TRỰC TIẾP')
+    nap.song = () => { throw new TypeError('mất mạng') }
+    await yen(NHIP_HOI_SAN_MS * 2 + 200)
+    expect(chip()).toBeNull() // mới hụt 2 nhịp
+    expect(container.textContent).toContain('TRỰC TIẾP')
+    await yen(NHIP_HOI_SAN_MS)
+    expect(chip()).toBe('Mất kết nối · số lúc 15:28') // serverNow của số cuối = 08:28:36Z = 15:28 giờ VN
+    expect(container.textContent).not.toContain('TRỰC TIẾP')
+    expect(laSan(container)).toBeTruthy() // vẫn giữ số
+    nap.song = () => ok(thanSong())
+    await yen(NHIP_HOI_SAN_MS + 200)
+    expect(chip()).toBeNull()
+    expect(container.textContent).toContain('TRỰC TIẾP')
+    // hụt rải rác (không liền nhau) không đủ 3
+    nap.song = () => { throw new TypeError('mất mạng') }
+    await yen(NHIP_HOI_SAN_MS * 2)
+    nap.song = () => ok(thanSong())
+    await yen(NHIP_HOI_SAN_MS)
+    nap.song = () => { throw new TypeError('mất mạng') }
+    await yen(NHIP_HOI_SAN_MS * 2)
+    expect(chip()).toBeNull()
+  })
+  it('tên gọi ngắn: HAI CHỮ CUỐI, không "…"; hai em trùng tên gọi ⇒ thêm chữ đứng trước; cùng một em hai lần không tính trùng; một chữ / rỗng không vỡ', () => {
+    const t = (...ds: [string, string][]) => tenGoiKhongTrung(ds.map(([sbd, hoTen]) => ({ sbd, hoTen })))
+    expect(t(['1', 'Nguyễn Thị Thanh Thảo']).get('1')).toBe('Thanh Thảo')
+    const trung = t(['1', 'Nguyễn Thanh Thảo'], ['2', 'Trần Thanh Thảo'], ['3', 'Lê Minh Anh'])
+    expect(trung.get('1')).toBe('Nguyễn Thanh Thảo')
+    expect(trung.get('2')).toBe('Trần Thanh Thảo')
+    expect(trung.get('3')).toBe('Minh Anh') // em không trùng giữ hai chữ
+    expect(t(['1', 'Nguyễn Thanh Thảo'], ['1', 'Nguyễn Thanh Thảo']).get('1')).toBe('Thanh Thảo') // cùng em (Dẫn đầu + Tiến bộ nhất)
+    expect(t(['1', 'Thảo']).get('1')).toBe('Thảo')
+    expect(t(['1', '   ']).get('1')).toBe('')
+    expect(t(['1', 'Lê Văn An'], ['2', 'Lê Văn An']).get('1')).toBe('Lê Văn An') // trùng cả họ tên: hết chữ để thêm, không lặp vô hạn
+    expect(t(['1', 'Nguyễn Văn An'], ['2', 'văn an']).get('2')).toBe('văn an') // trùng không phân biệt hoa thường ⇒ hết chữ thêm
+  })
+  it('Dẫn đầu: tên dài hiện HAI CHỮ CUỐI, không có "…"; hai em trùng tên gọi ⇒ ba chữ', () => {
+    const e = (sbd: string, hoTen: string, soCau: number) => ({ sbd, hoTen, tenLop: 'Lớp A', soCau, tienBo: 3 })
+    const { container } = render(<DanDau danDau={[e('1', 'Nguyễn Thị Thanh Thảo', 60), e('2', 'Trần Minh Khôi', 50), e('3', 'Lê Thanh Thảo', 40)]} bt={null} onMoEm={() => {}} />)
+    const ten = [...container.querySelectorAll('.bts-dd-ten')].map((x) => x.textContent!.replace(/·.*$/, '').trim())
+    expect(ten).toEqual(['Thị Thanh Thảo', 'Minh Khôi', 'Lê Thanh Thảo']) // #1 và #3 cùng "Thanh Thảo" ⇒ mỗi em thêm một chữ đứng trước
+    expect(container.textContent).not.toContain('…')
   })
   it('THREE nạp LƯỜI và KHÔNG precache: chỉ ban-do-3d-three.ts import "three"; BanDo3D nạp động; vite.config.ts bỏ **/ban-do-3d-three-*.js khỏi precache (máy học sinh không cất 536 KB)', () => {
     const importThree: string[] = []

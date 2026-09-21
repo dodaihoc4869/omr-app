@@ -21,7 +21,7 @@ export default function HomNayScreen() {
   const san = useSanSong()
   const moToanCanh = useAppStore((s) => s.moToanCanh)
   if (san.kieu === 'cho') return <BangTinXuong />
-  if (san.kieu === 'san') return <BangTinSan du={san.du} onMoEm={moToanCanh} />
+  if (san.kieu === 'san') return <BangTinSan du={san.du} onMoEm={moToanCanh} matKetNoi={san.matKetNoi} />
   return <HomNayBan3 />
 }
 

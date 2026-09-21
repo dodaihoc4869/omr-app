@@ -6,16 +6,19 @@ import { laySan } from '../../lib/bang-tin-san/doc-san'
 import type { DuLieuSan } from '../../lib/bang-tin-san/kieu'
 import { useTuLamMoi } from '../bang-tin/hooks'
 
-export type TrangThaiSan = { kieu: 'cho' } | { kieu: 'san'; du: DuLieuSan } | { kieu: 'v3' }
+export type TrangThaiSan = { kieu: 'cho' } | { kieu: 'san'; du: DuLieuSan; matKetNoi: boolean } | { kieu: 'v3' }
 
 export const NHIP_HOI_SAN_MS = 10_000
 export const THU_LAI_SAU_KHI_TU_CHOI_MS = 5 * 60_000
+/** Số nhịp hỏi HỤT liên tiếp (mất mạng / chậm) thì màn ghi "Mất kết nối · số lúc HH:MM"; hỏi được lại ⇒ tự mất. */
+export const NHIP_HUT_MAT_KET_NOI = 3
 
 export function useSanSong(): TrangThaiSan {
   const [tt, setTt] = useState<TrangThaiSan>({ kieu: 'cho' })
   const dangHoi = useRef(false)
   const chiHoiTu = useRef(0)
   const conSong = useRef(true)
+  const hut = useRef(0)
   const lam = useCallback(() => {
     if (dangHoi.current || Date.now() < chiHoiTu.current) return // lần trước chưa xong / máy chủ vừa từ chối ⇒ không chồng lệnh
     dangHoi.current = true
@@ -23,7 +26,8 @@ export function useSanSong(): TrangThaiSan {
       .then((r) => {
         if (!conSong.current) return
         if (r.ok) {
-          setTt({ kieu: 'san', du: r.du })
+          hut.current = 0
+          setTt({ kieu: 'san', du: r.du, matKetNoi: false })
           return
         }
         if (r.loai === 'chua_co_lenh' || r.loai === 'tu_choi' || r.loai === 'khong_doc_duoc') {
@@ -31,10 +35,16 @@ export function useSanSong(): TrangThaiSan {
           setTt({ kieu: 'v3' })
           return
         }
-        setTt((t) => (t.kieu === 'san' ? t : { kieu: 'v3' })) // mất mạng / chậm: đang có số sống thì giữ, chưa có thì bản 3 (không màn trắng)
+        hut.current++
+        const matHan = hut.current >= NHIP_HUT_MAT_KET_NOI
+        // mất mạng / chậm: đang có số sống thì GIỮ (hụt ≥ 3 nhịp ⇒ ghi "Mất kết nối"), chưa có thì bản 3 (không màn trắng)
+        setTt((t) => (t.kieu === 'san' ? (matHan && !t.matKetNoi ? { ...t, matKetNoi: true } : t) : { kieu: 'v3' }))
       })
       .catch(() => {
-        if (conSong.current) setTt((t) => (t.kieu === 'san' ? t : { kieu: 'v3' }))
+        if (!conSong.current) return
+        hut.current++
+        const matHan = hut.current >= NHIP_HUT_MAT_KET_NOI
+        setTt((t) => (t.kieu === 'san' ? (matHan && !t.matKetNoi ? { ...t, matKetNoi: true } : t) : { kieu: 'v3' }))
       })
       .finally(() => {
         dangHoi.current = false
