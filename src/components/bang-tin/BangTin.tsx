@@ -10,7 +10,7 @@ import type { EmTraCuu } from '../../lib/hom-nay-v2'
 import OTraCuu from '../hom-nay/OTraCuu'
 import TamBen from './TamBen'
 import { useMedia, useTrangLuot } from './hooks'
-import { BonSoLon, ChuGiaiBaiTap, HangBaiTap, HangDang, HangEm, HangViec, KhoiBaiTap, dongThuThach, KhoiBoNao, KhoiCanDeY, KhoiDangVap, KhoiMayDaLam, KhoiTienBo, TEN_O_MAY, viecCuaMay, type DungNhip } from './cac-khoi'
+import { BonSoLon, ChuGiaiBaiTap, HangBaiTap, HangChuaHoc, HangDang, HangEm, HangViec, KhoiBaiTap, dongThuThach, KhoiBoNao, KhoiCanDeY, KhoiDangVap, KhoiMayDaLam, KhoiTienBo, TEN_O_MAY, viecCuaMay, type DungNhip } from './cac-khoi'
 import '../../styles/hom-nay-v2.css'
 import '../../styles/bang-tin-v3.css'
 
@@ -26,7 +26,7 @@ export interface BangTinProps {
   taiTatCaCanDeY?: () => Promise<EmCanDeY[] | null>
 }
 
-type Tam = null | 'bai' | 'em' | 'dang' | 'may' | 'tim'
+type Tam = null | 'bai' | 'em' | 'dang' | 'may' | 'tim' | 'chua-hoc'
 
 function ChuCapNhat({ bt, ngan }: { bt: BangTin; ngan?: boolean }) {
   const gio = bt.capNhatLuc ? gioPhutVN(bt.capNhatLuc) : ''
@@ -70,6 +70,35 @@ function TamEmCanDeY({ bt, onMoEm, onDong, taiTatCa }: { bt: BangTin; onMoEm: (s
   )
 }
 
+function TamChuaHoc({ bt, onMoEm, onDong }: { bt: BangTin; onMoEm: (sbd: string) => void; onDong: () => void }) {
+  const ds = bt.chuaHoc ?? []
+  const luc = bt.capNhatLuc ? gioPhutVN(bt.capNhatLuc) : ''
+  return (
+    <TamBen tieuDe="Chưa học hôm nay" phu={`Theo lớp: số em chưa học / sĩ số${luc ? ` · tính đến ${luc}` : ''}. Bấm vào một em để xem toàn cảnh.`} onDong={onDong}>
+      {ds.map((l) => (
+        <section key={l.lop} className="bt3-chua-lop" aria-label={`${l.lop}: ${l.chuaHoc} trên ${l.siSo} em chưa học`}>
+          <h3>
+            {l.lop} · {l.chuaHoc}/{l.siSo} em chưa học
+          </h3>
+          <ul className="bt3-ds bt3-ds--tam">
+            {l.em.map((e) => (
+              <HangChuaHoc
+                key={e.sbd}
+                e={e}
+                lop={l.lop}
+                onMoEm={(s) => {
+                  onDong()
+                  onMoEm(s)
+                }}
+              />
+            ))}
+          </ul>
+        </section>
+      ))}
+    </TamBen>
+  )
+}
+
 function TamKhac({ tam, bt, onDong }: { tam: 'bai' | 'dang' | 'may'; bt: BangTin; onDong: () => void }) {
   if (tam === 'bai')
     return (
@@ -103,7 +132,7 @@ export default function BangTinV3(p: BangTinProps) {
     so: <BonSoLon bt={bt} nayMs={nayMs} dungNhip={p.dungNhip} />,
     bai: <KhoiBaiTap bt={bt} nayMs={nayMs} onMoTatCa={moTam('bai')} />,
     tien: <KhoiTienBo bt={bt} nayMs={nayMs} onMoEm={onMoEm} />,
-    em: <KhoiCanDeY bt={bt} nayMs={nayMs} onMoEm={onMoEm} onMoTatCa={moTam('em')} />,
+    em: <KhoiCanDeY bt={bt} nayMs={nayMs} onMoEm={onMoEm} onMoTatCa={moTam('em')} onMoChuaHoc={moTam('chua-hoc')} />,
     dang: <KhoiDangVap bt={bt} nayMs={nayMs} onMoTatCa={moTam('dang')} />,
     bn: <KhoiBoNao bn={bt.boNao} lyDo={bt.lyDoThieu.boNao} thuThach={dongThuThach(bt)} />,
     may: <KhoiMayDaLam bt={bt} nayMs={nayMs} onMoTatCa={moTam('may')} />,
@@ -177,6 +206,7 @@ export default function BangTinV3(p: BangTinProps) {
           </>
         )}
       </div>
+      {tam === 'chua-hoc' && <TamChuaHoc bt={bt} onMoEm={onMoEm} onDong={dong} />}
       {tam === 'em' && <TamEmCanDeY bt={bt} onMoEm={onMoEm} onDong={dong} taiTatCa={p.taiTatCaCanDeY} />}
       {(tam === 'bai' || tam === 'dang' || tam === 'may') && <TamKhac tam={tam} bt={bt} onDong={dong} />}
       {tam === 'tim' && (

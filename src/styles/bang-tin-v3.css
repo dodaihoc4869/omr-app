@@ -730,6 +730,58 @@
   background: var(--m3-error);
 }
 
+/* ── "Chưa học hôm nay": một dòng 48 px dưới danh sách em cần để ý; tên từng lớp ở tấm bên ── */
+.bt3-chua-hoc {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+  min-height: 48px;
+  margin-top: 8px;
+  padding: 6px 4px;
+  border: 0;
+  border-top: 1px solid var(--bt3-vien);
+  background: transparent;
+  color: var(--m3-on-surface);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bt3-chua-hoc:hover {
+  background: color-mix(in srgb, var(--m3-primary) 6%, transparent);
+}
+.bt3-chua-hoc:focus-visible {
+  outline: 3px solid var(--m3-primary);
+  outline-offset: 2px;
+}
+.bt3-chua-hoc-chu {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.3;
+}
+.bt3-chua-hoc-chu > span {
+  color: var(--m3-on-surface-variant);
+  font-size: 13px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+.bt3-chua-lop h3 {
+  margin: 16px 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--m3-on-surface-variant);
+}
+.bt3-chua-lop:first-child h3 {
+  margin-top: 4px;
+}
+
 /* ── tấm bên (nơi duy nhất được cuộn) ─────────────────────────────── */
 .bt3-tam-nen {
   position: fixed;

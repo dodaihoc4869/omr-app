@@ -51,6 +51,14 @@ export interface LyDoBangTin {
   so: number | null
   tong: number | null
 }
+/** Một lớp có em chưa học hôm nay: số em chưa học / sĩ số + tên (chạm tên ⇒ Toàn cảnh một em). */
+export interface LopChuaHoc {
+  lop: string
+  siSo: number
+  chuaHoc: number
+  em: { sbd: string; hoTen: string }[]
+}
+
 export interface EmCanDeY {
   sbd: string
   hoTen: string
@@ -96,6 +104,8 @@ export interface BangTin {
   baiTap: BaiTapBangTin[]
   tienBo: TienBoBangTin[]
   canDeY: { ds: EmCanDeY[]; conLai: number }
+  /** Em CHƯA HỌC hôm nay theo lớp (khối `chuaHocHomNay`, Code 3). null = máy chủ chưa trả / không có em nào chưa học ⇒ ẩn (không bịa "cả lớp đã học"). Chỉ thầy thấy tên. */
+  chuaHoc: LopChuaHoc[] | null
   dangVap: DangVapBangTin[]
   boNao: BoNaoBangTin | null
   mayDaLam: ViecMayLam[]
@@ -221,6 +231,26 @@ function docSucKhoe(v: unknown): SucKhoeBangTin | null {
   return o && MUC.includes(muc) && chu(o.chu) ? { muc, chu: chu(o.chu) } : null
 }
 
+/** Khối `chuaHocHomNay` = `{ ngay, theoLop:[{ lop, siSo, chuaHoc, em:[{sbd, hoTen}] }] }` (hoặc thẳng mảng lớp). Lớp không có em nào chưa học hoặc sai dạng bị bỏ; rỗng ⇒ null. */
+export function docChuaHoc(v: unknown): LopChuaHoc[] | null {
+  const o = doiTuong(v)
+  const ds = Array.isArray(v) ? v : o ? mang(o.theoLop) : []
+  const ra: LopChuaHoc[] = []
+  for (const x of ds) {
+    const l = doiTuong(x)
+    if (!l) continue
+    const ten = chu(l.lop)
+    const em = mang(l.em).flatMap((e) => {
+      const d = doiTuong(e)
+      return d && chu(d.sbd) && chu(d.hoTen) ? [{ sbd: chu(d.sbd), hoTen: chu(d.hoTen) }] : []
+    })
+    if (!ten || em.length === 0) continue
+    const chuaHoc = Math.max(em.length, Math.round(soKhong(l.chuaHoc)))
+    ra.push({ lop: ten, siSo: Math.max(chuaHoc, Math.round(soKhong(l.siSo))), chuaHoc, em })
+  }
+  return ra.length > 0 ? ra : null
+}
+
 /** Không đọc được phần `nhip` (luôn phải có) ⇒ null: màn rơi về lệnh cũ, không vẽ bảng tin rỗng như thể "hôm nay không ai học". */
 export function docBangTin(j: Record<string, unknown>): BangTin | null {
   const nhip = docNhip(j.nhip)
@@ -244,6 +274,7 @@ export function docBangTin(j: Record<string, unknown>): BangTin | null {
       ds: dsCanDeY.map(docEmCanDeY).filter((e): e is EmCanDeY => e != null),
       conLai: Math.max(0, Math.round(soKhong(cd ? cd.conLai : j.canDeYConLai))),
     },
+    chuaHoc: docChuaHoc(j.chuaHocHomNay),
     dangVap: mang(j.dangVap).map(docDangVap).filter((d): d is DangVapBangTin => d != null),
     boNao: docBoNao(j.boNao),
     mayDaLam: mang(j.mayDaLam).map(docViec).filter((v): v is ViecMayLam => v != null),

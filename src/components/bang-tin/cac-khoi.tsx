@@ -13,6 +13,7 @@ import {
   type BoNaoBangTin,
   type DangVapBangTin,
   type EmCanDeY,
+  type LopChuaHoc,
   type SucKhoeBangTin,
   type TienBoBangTin,
   type ViecMayLam,
@@ -282,7 +283,7 @@ export function HangEm({ e, onMoEm }: { e: EmCanDeY; onMoEm: (sbd: string) => vo
   )
 }
 
-export function KhoiCanDeY({ bt, nayMs, onMoEm, onMoTatCa }: { bt: BangTin; nayMs: number; onMoEm: (sbd: string) => void; onMoTatCa: () => void }) {
+export function KhoiCanDeY({ bt, nayMs, onMoEm, onMoTatCa, onMoChuaHoc }: { bt: BangTin; nayMs: number; onMoEm: (sbd: string) => void; onMoTatCa: () => void; onMoChuaHoc?: () => void }) {
   const [ref, cao, hang] = useChieuCao<HTMLDivElement>(56)
   const { ds, conLai } = bt.canDeY
   const n = chiaHang(ds.length, cao, hang, CAO_NUT_NUA, conLai)
@@ -293,7 +294,43 @@ export function KhoiCanDeY({ bt, nayMs, onMoEm, onMoTatCa }: { bt: BangTin; nayM
         {ds.length === 0 ? <Trong>{bt.lyDoThieu.canDeY ?? `${chuTuMoc(bt, nayMs)} chưa có em nào cần thầy để ý.`}</Trong> : <ul className="bt3-ds">{ds.slice(0, n).map((e) => <HangEm key={e.sbd} e={e} onMoEm={onMoEm} />)}</ul>}
         {con > 0 && <NutNua conLai={con} don="em" onMo={onMoTatCa} />}
       </div>
+      {bt.chuaHoc && onMoChuaHoc && <DongChuaHoc ds={bt.chuaHoc} onMo={onMoChuaHoc} />}
     </O>
+  )
+}
+
+/** "Chưa học hôm nay" — MỘT dòng 48 px dưới danh sách em cần để ý: tổng số em + hai lớp đầu (số chưa học / sĩ số); chạm ⇒ tấm bên có tên từng lớp.
+ *  Chỉ ĐỌC (không nút việc); tên và chạm-tên-mở-toàn-cảnh nằm ở tấm bên (nơi duy nhất được cuộn). */
+export function DongChuaHoc({ ds, onMo }: { ds: LopChuaHoc[]; onMo: () => void }) {
+  const tong = ds.reduce((s, l) => s + l.chuaHoc, 0)
+  const lop = ds.slice(0, 2).map((l) => `${l.lop} ${l.chuaHoc}/${l.siSo}`)
+  const them = ds.length - lop.length
+  return (
+    <button type="button" className="bt3-chua-hoc" onClick={onMo} data-khoi="chua-hoc-hom-nay">
+      <span className="bt3-chua-hoc-chu">
+        <b>Chưa học hôm nay: {tong.toLocaleString('vi-VN')} em</b>
+        <span>
+          {lop.join(' · ')}
+          {them > 0 ? ` · +${them} lớp` : ''}
+        </span>
+      </span>
+      <ChevronRight size={18} aria-hidden="true" />
+    </button>
+  )
+}
+
+/** Một em chưa học trong tấm bên: tên + lớp; chạm ⇒ Toàn cảnh một em. */
+export function HangChuaHoc({ e, lop, onMoEm }: { e: { sbd: string; hoTen: string }; lop: string; onMoEm: (sbd: string) => void }) {
+  return (
+    <li>
+      <button type="button" className="bt3-em" onClick={() => onMoEm(e.sbd)} aria-label={`${e.hoTen} · ${lop} — chưa học hôm nay, mở toàn cảnh`}>
+        <span className="bt3-em-tt">
+          <span className="bt3-em-ten">
+            <b title={e.hoTen}>{e.hoTen}</b>
+          </span>
+        </span>
+      </button>
+    </li>
   )
 }
 
