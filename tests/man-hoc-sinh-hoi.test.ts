@@ -85,13 +85,14 @@ describe('Màn dựng đúng cách', () => {
     expect(man).toContain('loadSessionTeacherBank(mo.maCa)')
   })
 
-  it('có ô Học sinh hỏi ở màn chính và ở thanh bên', async () => {
+  // Màn chính nay là Bảng tin "Hôm nay" chỉ đọc (thầy chốt bản 3) — không còn ô lối tắt ở màn chính; đường vào Học sinh hỏi là THANH BÊN (và tờ "Thêm" ở điện thoại).
+  it('đường vào Học sinh hỏi nằm ở thanh bên; màn chính không còn ô lối tắt', async () => {
     const { readFileSync } = await import('node:fs')
     const { resolve } = await import('node:path')
     const hub = readFileSync(resolve(__dirname, '../src/screens/ExamHubScreen.tsx'), 'utf8')
-    expect(hub).toContain('Học sinh hỏi')
-    expect(hub).toContain("setScreen('cauhoi')")
+    expect(hub).not.toContain("setScreen('cauhoi')")
     const ben = readFileSync(resolve(__dirname, '../src/components/ThanhBenTrai.tsx'), 'utf8')
     expect(ben).toContain("id: 'cauhoi'")
+    expect(ben).toContain('Học sinh hỏi')
   })
 })

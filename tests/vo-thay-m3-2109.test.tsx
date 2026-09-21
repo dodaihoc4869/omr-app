@@ -52,13 +52,11 @@ describe('ThanhBenTrai (ngăn kéo / rail)', () => {
     expect(useAppStore.getState().screen).toBe('caidat')
   })
 
-  it('nút "Mở ca kiểm tra" → examsetup; huy hiệu Học sinh hỏi chỉ hiện khi có số', () => {
+  it('nút "Mở ca kiểm tra" → examsetup; KHÔNG có huy hiệu số ở mục Học sinh hỏi (chưa có lệnh đếm nhẹ ở máy chủ — huy hiệu chết đã gỡ)', () => {
     const a = render(<ThanhBenTrai />)
     fireEvent.click(screen.getByRole('button', { name: 'Mở ca kiểm tra' }))
     expect(useAppStore.getState().screen).toBe('examsetup')
     expect(a.container.querySelector('.ben-trai-huy-hieu')).toBeNull()
-    a.unmount()
-    expect(render(<ThanhBenTrai soCauHoi={4} />).container.querySelector('.ben-trai-huy-hieu')!.textContent).toBe('4')
   })
 })
 

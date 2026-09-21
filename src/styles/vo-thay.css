@@ -135,21 +135,6 @@
   .ben-trai-muc.dang .ben-trai-ngan {
     font-weight: 800;
   }
-  .ben-trai-huy-hieu {
-    position: absolute;
-    top: 4px;
-    right: 14px;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    border-radius: 10px;
-    background: var(--m3-primary);
-    color: var(--m3-on-primary);
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 20px;
-    text-align: center;
-  }
   /* mật độ của màn hình rộng: nút trong nội dung 40 px (bản vẽ), không phải 48 px của điện thoại */
   .vo-thay .giua-noi-dung button {
     min-height: 40px;
@@ -211,11 +196,6 @@
   }
   .ben-trai-muc.dang .ben-trai-ten {
     font-weight: 700;
-  }
-  .ben-trai-huy-hieu {
-    top: 50%;
-    right: 14px;
-    transform: translateY(-50%);
   }
 }
 
@@ -315,10 +295,6 @@
     background: var(--m3-primary-container);
     color: var(--m3-on-primary-container);
     font-weight: 700;
-  }
-  .day-thay-them-muc .ben-trai-huy-hieu {
-    position: static;
-    margin-left: auto;
   }
   .vo-thay .khung-noi-dung {
     padding-bottom: calc(88px + env(safe-area-inset-bottom));

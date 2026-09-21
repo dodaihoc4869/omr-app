@@ -8,7 +8,7 @@ import { MUC_DIEU_HUONG, mucDangSang } from './ThanhBenTrai'
 
 const CHINH = ['examhub', 'hocsinh', 'lichsuca', 'giaobtvn']
 
-export default function BottomNav({ soCauHoi = 0 }: { soCauHoi?: number }) {
+export default function BottomNav() {
   const screen = useAppStore((s) => s.screen)
   const setScreen = useAppStore((s) => s.setScreen)
   const [mo, setMo] = useState(false)
@@ -39,7 +39,6 @@ export default function BottomNav({ soCauHoi = 0 }: { soCauHoi?: number }) {
               <button key={m.id} type="button" role="menuitem" className={`day-thay-them-muc${sang === m.id ? ' dang' : ''}`} onClick={() => di(m.id)}>
                 <Icon size={22} aria-hidden="true" />
                 <span>{m.ten}</span>
-                {m.id === 'cauhoi' && soCauHoi > 0 && <span className="ben-trai-huy-hieu">{soCauHoi}</span>}
               </button>
             )
           })}

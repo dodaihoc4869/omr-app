@@ -39,7 +39,7 @@ export function mucDangSang(screen: ScreenId): ScreenId | null {
   return MUC_DIEU_HUONG.find((m) => m.id === screen || (m.con ?? []).includes(screen))?.id ?? null
 }
 
-export default function ThanhBenTrai({ soCauHoi = 0 }: { soCauHoi?: number }) {
+export default function ThanhBenTrai() {
   const screen = useAppStore((s) => s.screen)
   const setScreen = useAppStore((s) => s.setScreen)
   const sang = mucDangSang(screen)
@@ -56,7 +56,6 @@ export default function ThanhBenTrai({ soCauHoi = 0 }: { soCauHoi?: number }) {
         <span className="ben-trai-ngan" aria-hidden="true">
           {m.ngan}
         </span>
-        {m.id === 'cauhoi' && soCauHoi > 0 && <span className="ben-trai-huy-hieu">{soCauHoi}</span>}
       </button>
     )
   }
