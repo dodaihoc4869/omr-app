@@ -1,6 +1,6 @@
 # ĐỀ XUẤT — THẦN THÚ: lên cấp theo NGÀY HỌC ĐỀU, mỗi ngày một lượng câu vừa đủ, kho câu rộng hết phần đã học, khó và dài dần
 
-Boss soạn · 21/09/2026 · CHỜ THẦY DUYỆT, chưa phiên nào build.
+Boss soạn · 21/09/2026 · **THẦY ĐÃ CHỐT HẾT 21/09 13:36 ("CHỐT HẾT BUILD ĐI")** ⇒ build theo `prompt-than-thu-moi-ngay-2109.md`. Thầy không sửa điều nào nên Điều 6 theo phương án B, Điều 8 theo phương án 8A (đề nghị của Boss).
 Gộp 5 lệnh của thầy trưa nay: (1) rút câu thần thú rộng hết phần đã học, (2) ít nhất **21 ngày chăm chỉ** mới tới cấp 10, (3) ít nhất **1 200 ngày** mới tới cấp 120, (4) tính lại EXP cho em đã chơi, (5) có **số câu tối đa mỗi ngày**, đủ mà không chán, kéo em vào app mỗi ngày, câu khó và dài dần.
 
 ## 0 · SỐ THẬT HÔM NAY (đọc dữ liệu thật khoảng 13:25, chỉ đọc)
