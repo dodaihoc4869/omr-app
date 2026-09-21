@@ -162,6 +162,10 @@ describe('loiMoi — luật chữ', () => {
     expect(L('Rồng Lửa còn thiếu 40 EXP, thử mấy câu nhé.', THE_KHONG_THU)).toContain('tên riêng không có trong thẻ: Rồng Lửa')
     expect(L('Long Hoả còn thiếu 40 EXP, thử mấy câu nhé.', THE)).toContain('tên riêng không có trong thẻ: Long Hoả')
     expect(L('Rồng Lửa còn thiếu 40 EXP, thử mấy câu nhé.', THE)).toBe('')
+    // từ mở đầu câu quen thuộc viết hoa chỉ vì đứng đầu câu KHÔNG phải tên riêng
+    expect(L('Dạng Thuỷ phân ester em đã làm 4 câu, hôm nay thử mấy câu nhé.', THE)).toBe('')
+    expect(L('Chuỗi 4 ngày rồi. Bài Thuỷ phân ester hôm nay thử mấy câu nhé.', THE)).toBe('')
+    expect(L('Long Hoả còn thiếu 40 EXP, thử mấy câu nhé.', THE)).toContain('tên riêng không có trong thẻ: Long Hoả')
     expect(L('Thần thú Rồng Lửa còn thiếu 40 EXP, thử mấy câu nhé.', THE)).toBe('') // nhắc thú khi thẻ có thanThu ⇒ được
     expect(L('Hôm nay em thử mấy câu, chuỗi 4 ngày rồi, thêm EXP nữa.', THE_KHONG_THU)).toBe('') // từ toàn hoa (EXP) và chữ đầu câu không phải tên riêng
   })

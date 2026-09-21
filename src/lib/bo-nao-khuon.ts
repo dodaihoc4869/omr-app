@@ -34,6 +34,22 @@ export interface ThuThachEm {
   bac: BacThuThach
 }
 
+/**
+ * V4 "VÒNG KHÉP KÍN" (thầy chốt 21/09; đề xuất `docs/de-xuat-bo-nao-v3-v4-2109.md`): Bộ não ĐỀ XUẤT ≤ 2 NHÃN KÍN về cách em hợp với lời mời/thử thách, mỗi nhãn kèm SỐ BẰNG CHỨNG trong thẻ. KHÔNG chữ tự do
+ * (không nhãn năng lực, không lộ đời tư). Em KHÔNG thấy; thầy xem chỉ-đọc ở Hồ sơ em; hết hạn 14 ngày. Ba cặp đối nghịch: thích thử thách / cần trấn an · thích ngắn / cần giải thích · học sớm / học muộn.
+ */
+export type NhanHuongEm = 'thu_thach' | 'tran_an' | 'ngan' | 'giai_thich' | 'som' | 'muon'
+export interface HuongEmDeXuat {
+  nhan: NhanHuongEm
+  /** 1–4 con số THẬT trong thẻ làm bằng chứng (không rỗng, mọi số phải có trong thẻ). */
+  so: number[]
+}
+/** V3 "MỤC TIÊU TUẦN": MỘT dạng + bậc đích (= bậc hiện tại + 1), chỉ ở ngày soi kỹ hằng tuần của em. Đi cùng `loiMucTieu`. */
+export interface MucTieuTuanEm {
+  dang: string
+  den: 1 | 2
+}
+
 /** MỘT PHẦN TỬ ĐẦU RA của bộ não cho MỘT em (`ra/<tệp>.json` là mảng các phần tử này). `biDanh` là bí danh của đêm — nop.mjs đổi về SBD trước khi gửi. */
 export interface DauRaEm {
   biDanh: string
@@ -57,6 +73,11 @@ export interface DauRaEm {
   thuThach?: ThuThachEm
   /** ≤ 200 ký tự: lời mời hôm nay. Phải có ≥ 1 số THẬT trong thẻ, không nêu số câu sẽ làm, tên thú chỉ lấy từ `thanThu.ten` của thẻ. */
   loiMoi?: string
+  /** V4 (CHƯA bật — xem cẩm nang): ≤ 2 nhãn kín kèm số bằng chứng. Sai khuôn CHỈ bỏ phần này (`boLoi: ['huongEm']`). */
+  huongEm?: HuongEmDeXuat[]
+  /** V3 (CHƯA bật): mục tiêu tuần — hai trường ĐI CÙNG NHAU với `loiMucTieu`. Sai khuôn CHỈ bỏ phần này (`boLoi: ['mucTieuTuan']`). */
+  mucTieuTuan?: MucTieuTuanEm
+  loiMucTieu?: string
 }
 
 /** Loại dòng bản tin (Boss chốt tên 21/09): em cần thầy để ý · dạng cả lớp · gợi ý gọi lên bảng · điều chỉnh hôm qua có ăn thua không · thầy xem lại một điều chỉnh. */
@@ -84,7 +105,7 @@ export interface KetQuaKiem {
   lyDo: string[]
   /** Lỗi chỉ làm mất MỘT LỜI (phụ huynh / thư tuần): phần tử vẫn hợp lệ, phần núm được giữ, lời đó bị làm rỗng (`lamSachDauRa`). */
   canhBao?: string[]
-  boLoi?: ('loiNhanChoPhuHuynh' | 'thuTuan' | 'thuThach')[]
+  boLoi?: ('loiNhanChoPhuHuynh' | 'thuTuan' | 'thuThach' | 'huongEm' | 'mucTieuTuan')[]
 }
 
 /** Phần thẻ CỦA EM mà kiểm khuôn cần: bí danh, mã dạng có trong thẻ, và TOÀN BỘ thẻ (để gom mọi con số có thật). Thẻ đầy đủ ở `bo-nao-dac-trung.ts`. */
@@ -128,6 +149,18 @@ export const HAN_MUC_BO_NAO = {
   LOI_MOI_TOI_DA: 200,
   THU_THACH_LEN_BAC_DUNG_TOI_THIEU: 0.8,
   THU_THACH_LEN_BAC_MAU_TOI_THIEU: 5,
+  /** V4: ≤ 2 nhãn kín, mỗi nhãn ≥ 3 ngày có bài trong 7 ngày (`hoatDong.ngayCoBai7`), 1–4 số bằng chứng; `som` khi giờ học trung vị ≤ 19, `muon` khi ≥ 21; hết hạn 14 ngày (máy chủ). */
+  HUONG_EM_SO_NHAN_TOI_DA: 2,
+  HUONG_EM_SO_NGAY_TOI_THIEU: 3,
+  HUONG_EM_SO_BANG_CHUNG_TOI_DA: 4,
+  HUONG_EM_GIO_SOM_TOI_DA: 19,
+  HUONG_EM_GIO_MUON_TOI_THIEU: 21,
+  HUONG_EM_TUOI_THO_NGAY: 14,
+  /** Khi thẻ có `huongEm` `ngan` ⇒ thử thách hôm nay ≤ chừng này câu. */
+  HUONG_EM_NGAN_SO_CAU_TOI_DA: 5,
+  /** V3: lời mục tiêu ≤ 160 ký tự; dạng phải đủ tin (≥ bấy nhiêu câu đã gặp). */
+  LOI_MUC_TIEU_TOI_DA: 160,
+  MUC_TIEU_SO_CAU_DU_TIN: 4,
   BI_DANH_TOI_DA: 40,
   MA_DANG_TOI_DA: 80,
   BAN_TIN_SO_DONG_TOI_DA: 6,
@@ -142,6 +175,9 @@ export const HANH_DONG_DANG: readonly HanhDongDang[] = ['uu_tien', 'ha_mot_bac',
 export const CO_BO_NAO: readonly CoBoNao[] = ['khong', 'tut_nhip', 'qua_tai', 'lam_cho_xong', 'nghi_chep']
 export const HANH_DONG_CHO_THAY: readonly HanhDongChoThay[] = ['khong', 'goi_len_bang', 'nhan_phu_huynh', 'giao_bai_rieng']
 export const BAC_THU_THACH: readonly BacThuThach[] = ['dung_bac', 'thap_hon_mot_bac', 'cao_hon_mot_bac']
+export const NHAN_HUONG_EM: readonly NhanHuongEm[] = ['thu_thach', 'tran_an', 'ngan', 'giai_thich', 'som', 'muon']
+/** Ba TRỤC đối nghịch: một em không được mang cả hai nhãn của cùng một trục. */
+export const TRUC_HUONG_EM: readonly (readonly [NhanHuongEm, NhanHuongEm])[] = [['thu_thach', 'tran_an'], ['ngan', 'giai_thich'], ['som', 'muon']]
 export const LOAI_DONG_BAN_TIN: readonly LoaiDongBanTin[] = ['can_thay_y', 'ca_lop', 'goi_len_bang', 'dieu_chinh', 'thay_xem_lai']
 export const HANH_DONG_BAN_TIN: readonly HanhDongBanTin[] = ['khong', 'xem_ho_so', 'goi_len_bang', 'dua_vao_buoi_chua', 'nhan_phu_huynh', 'giao_bai_rieng']
 
@@ -159,6 +195,8 @@ export const TU_CAM_CHO_EM: readonly string[] = [
 ]
 /** Lời MỜI thử thách (`loiMoi`), NGOÀI `TU_CAM_CHO_EM`: hứa điều không chắc xảy ra (EXP chỉ có khi trả lời đúng; máy chủ có thể chọn được ít câu hơn) và xưng hô gọi tên (thẻ ẩn danh — Bộ não không biết tên em). */
 export const TU_CAM_RIENG_LOI_MOI: readonly string[] = ['chắc chắn', 'đảm bảo', 'nhất định', 'cam kết', 'xong là', 'là đủ', 'chỉ cần', 'sẽ lên cấp', 'chắc sẽ', 'chắc là', 'ơi']
+/** Lời mời / lời mục tiêu KHÔNG được nói ra điều Bộ não "biết" về em (nhãn `huongEm` là để CHỈNH lời, không để khoe): cấm những cách nói này. */
+export const TU_LO_HUONG_EM: readonly string[] = ['em thích', 'em hay', 'em thường', 'mình biết em', 'mình để ý', 'mình thấy em', 'mình nhận ra em', 'mình nhớ em']
 /** Lời cho THẦY (gợi ý, lý do, bản tin, ghi chú): "dạng yếu" là chữ thường dùng trong app nên chỉ cấm những từ này. */
 export const TU_CAM_CHO_THAY: readonly string[] = ['nắm chắc', 'dốt', 'ngu', 'lười', 'ngốc', 'vô dụng']
 /** Lời cho PHỤ HUYNH (`loiNhanChoPhuHuynh`, `thuTuan`): MỞ RỘNG — so với con nhà khác, nhãn năng lực, dự đoán điểm, sức khoẻ / tâm lý, tiền bạc / quảng cáo, chép bài / gian lận, báo động. */
@@ -224,7 +262,7 @@ function chuanSo(x: string): string {
 }
 
 /** Khoá của thẻ mang MÃ / định danh / mốc thời gian / bậc 0-1-2 (nói bằng TÊN bậc: Biết, Hiểu, Vận dụng — không nói bằng số), không phải sự thật để nêu cho em: số nằm trong chúng ("D3", "12-C1", "2026-09-22") KHÔNG được coi là số có thật. */
-const KHOA_KHONG_LAY_SO = new Set(['ma', 'maDang', 'qid', 'biDanh', 'sbd', 'ngay', 'luc', 'loiNhanGanDay', 'khiNaoVietPhuHuynh', 'bac', 'tu', 'den', 'bacCuaMaDang', 'emNoiLen'])
+const KHOA_KHONG_LAY_SO = new Set(['ma', 'maDang', 'qid', 'biDanh', 'sbd', 'ngay', 'luc', 'loiNhanGanDay', 'khiNaoVietPhuHuynh', 'bac', 'tu', 'den', 'bacCuaMaDang', 'bacNay', 'emNoiLen'])
 /** Khoá mà GIÁ TRỊ CHUỖI là mã (mã dạng, tên núm…) — bỏ khi là chuỗi, nhưng vẫn đi vào khi là mảng/đối tượng (`dang: [{gap: 9}]` là số thật). */
 const KHOA_CHUOI_LA_MA = new Set(['dang', 'hanhDong', 'kieu', 'co', 'trangThai', 'xuHuong'])
 
@@ -273,6 +311,8 @@ function coEmoji(chu: string): boolean {
   return false
 }
 
+/** Từ mở đầu câu quen thuộc (viết hoa chỉ vì đứng đầu câu): không tính là phần của tên riêng ("Dạng Thuỷ phân ester" không phải tên thú). */
+const TU_DAU_CAU_THUONG = new Set(['Dạng', 'Bài', 'Câu', 'Hôm', 'Em', 'Mình', 'Chuỗi', 'Tuần', 'Ngày', 'Thử', 'Chặng', 'Còn', 'Mỗi', 'Đã', 'Vừa', 'Rồi', 'Nếu', 'Khi', 'Nhờ', 'Sau', 'Trong'])
 /** Cụm TÊN RIÊNG lạ: chuỗi ≥ 2 từ liền nhau viết hoa chữ đầu (không tính từ toàn hoa như "EXP") mà KHÔNG nằm trong `tenThu` — Bộ não chỉ được nêu tên thú có trong thẻ. */
 function tenRiengLa(chu: string, tenThu: string | undefined): string[] {
   const ra: string[] = []
@@ -286,9 +326,10 @@ function tenRiengLa(chu: string, tenThu: string | undefined): string[] {
       }
       chay = []
     }
-    for (const tu of cau.split(/[^\p{L}\p{N}]+/u).filter(Boolean)) {
+    const cacTu = cau.split(/[^\p{L}\p{N}]+/u).filter(Boolean)
+    for (const [vt, tu] of cacTu.entries()) {
       const dau = tu.charAt(0)
-      const hoaDau = dau !== dau.toLowerCase() && dau === dau.toUpperCase()
+      const hoaDau = dau !== dau.toLowerCase() && dau === dau.toUpperCase() && !(vt === 0 && TU_DAU_CAU_THUONG.has(tu))
       const toanHoa = tu.length >= 2 && tu === tu.toUpperCase() && tu !== tu.toLowerCase()
       if (hoaDau && !toanHoa) chay.push(tu)
       else chot()
@@ -304,6 +345,120 @@ const MOI_CHON_THU = /chọn\s+(?:một\s+)?(?:thần\s+thú|bạn\s+đồng\s+h
 /** Số câu nêu như VIỆC SẼ LÀM ("thử 6 câu", "làm 6 câu" khi 6 = soCau): máy chủ có thể chọn được ÍT hơn ⇒ không hứa. Số câu nói về QUÁ KHỨ trong thẻ ("đúng lại 4 câu") vẫn được. */
 const THU_N_CAU = /thử\s+(?:\p{L}+\s+){0,2}\d+(?:[.,]\d+)?\s*câu/iu
 const VIEC_N_CAU = /(?:thử|làm|luyện|giải|chinh phục|hoàn thành|nhận)\s+(?:\p{L}+\s+){0,2}(\d+)\s*câu/giu
+
+/**
+ * LUẬT CHỮ chung của lời MỜI thử thách (`loiMoi`) và lời MỤC TIÊU TUẦN (`loiMucTieu`): `ten` = tên trường để báo lỗi; `soCau` = số câu Bộ não muốn (nếu có) để chặn nêu số câu sẽ làm.
+ * Một dòng, ≤ `toiDa` ký tự, không emoji / gạch dài, không từ cấm lời cho em, không hứa / gọi tên, không nói điều Bộ não "biết" về em, có ≥ 1 số và MỌI số có trong thẻ, nhắc thú / tên riêng chỉ khi thẻ có `thanThu.ten`.
+ */
+export function kiemChuLoiMoi(lm: unknown, ten: string, toiDa: number, the: TheDeKiem, tapSo: Set<string>, soCau?: number): string[] {
+  const e: string[] = []
+  if (!laChuoi(lm) || lm.trim().length === 0) return [`${ten} phải là chuỗi không rỗng`]
+  if (doDai(lm) > toiDa) e.push(`${ten} quá ${toiDa} ký tự`)
+  if (KY_TU_LA.test(lm)) e.push(`${ten} có ký tự lạ hoặc xuống dòng`)
+  if (coEmoji(lm)) e.push(`${ten} có emoji`)
+  if (/[—–]/.test(lm)) e.push(`${ten} có dấu gạch dài`)
+  const cam = timTuCam(lm, TU_CAM_CHO_EM)
+  if (cam.length) e.push(`${ten} có từ cấm: ${cam.join(', ')}`)
+  const hua = timTuCam(lm, TU_CAM_RIENG_LOI_MOI)
+  if (hua.length) e.push(`${ten} hứa điều không chắc hoặc gọi tên: ${hua.join(', ')}`)
+  const lo = timTuCam(lm, TU_LO_HUONG_EM)
+  if (lo.length) e.push(`${ten} nói ra điều Bộ não "biết" về em: ${lo.join(', ')}`)
+  const so = timSoTrongChu(boCumCuaSo(lm))
+  if (so.length === 0) e.push(`${ten} phải có ít nhất một con số thật có trong thẻ`)
+  const soLa = soLaTrongChu(lm, tapSo)
+  if (soLa.length) e.push(`${ten} có số không có trong thẻ: ${soLa.join(', ')}`)
+  // không hứa số câu
+  if (THU_N_CAU.test(lm)) e.push(`${ten} nêu số câu sẽ làm sau chữ "thử" — viết "mấy câu này" hoặc "vài câu"`)
+  else if (soCau !== undefined) for (const m of lm.matchAll(VIEC_N_CAU)) if (Number(m[1]) === soCau) e.push(`${ten} nêu số câu sẽ làm (${soCau} câu) — máy chủ có thể chọn được ít hơn; viết "mấy câu này"`)
+  // thú / tên riêng: chỉ khi thẻ có thanThu.ten và đúng tên ấy
+  const thanThu = the.thanThu as Record<string, unknown> | undefined
+  const tenThu = thanThu && typeof thanThu === 'object' && laChuoi(thanThu.ten) && thanThu.ten.trim().length > 0 ? thanThu.ten : undefined
+  // Em CHƯA có thú (thẻ không có thanThu): được MỜI chọn thú ("chọn một thần thú / bạn đồng hành") nhưng không nói thú nào cả — bỏ cụm mời rồi mới soi chữ "thú"
+  const conLai = lm.replace(MOI_CHON_THU, ' ')
+  if (!tenThu && timTuCam(conLai, ['thú', 'thần thú']).length) e.push(`${ten} nhắc thú nhưng thẻ không có thanThu (chỉ được MỜI chọn thú: "chọn một thần thú")`)
+  const laTen = tenRiengLa(lm, tenThu)
+  if (laTen.length) e.push(`${ten} có tên riêng không có trong thẻ: ${laTen.join(', ')}`)
+  return e
+}
+
+/**
+ * KIỂM V4 `huongEm` — trả lý do BỎ CẢ phần này (rỗng ⇒ hợp lệ hoặc vắng). ≤ 2 nhãn trong danh sách kín, không lặp, mỗi trục tối đa MỘT nhãn; mỗi nhãn 1–4 số bằng chứng, MỌI số có trong thẻ; thẻ phải có ≥ 3 ngày có bài
+ * trong 7 ngày; `som` chỉ khi `gioHoc` ≤ 19, `muon` chỉ khi `gioHoc` ≥ 21 (thẻ phải có `gioHoc`); `thu_thach` chỉ khi hôm qua em ĐÃ MỞ thẻ thử thách (`homQuaThuThach.mo`) và làm ≥ 3 câu.
+ */
+export function kiemHuongEm(d: Record<string, unknown>, the: TheDeKiem, tapSo: Set<string>): string[] {
+  if (d.huongEm === undefined || d.huongEm === null) return []
+  const H = HAN_MUC_BO_NAO
+  const e: string[] = []
+  const h = d.huongEm
+  if (!Array.isArray(h)) return ['huongEm phải là mảng']
+  if (h.length === 0) return []
+  if (h.length > H.HUONG_EM_SO_NHAN_TOI_DA) e.push(`huongEm quá ${H.HUONG_EM_SO_NHAN_TOI_DA} nhãn`)
+  const hoatDong = the.hoatDong as Record<string, unknown> | undefined
+  if (!(Number(hoatDong?.ngayCoBai7) >= H.HUONG_EM_SO_NGAY_TOI_THIEU)) e.push(`huongEm cần thẻ có ≥ ${H.HUONG_EM_SO_NGAY_TOI_THIEU} ngày có bài trong 7 ngày`)
+  const daCo = new Set<string>()
+  const gio = Number(the.gioHoc)
+  h.forEach((x, i) => {
+    const o = x as Record<string, unknown> | null
+    if (!o || typeof o !== 'object' || Array.isArray(o)) return void e.push(`huongEm[${i}] không phải đối tượng`)
+    const la = Object.keys(o).filter((k) => k !== 'nhan' && k !== 'so')
+    if (la.length) e.push(`huongEm[${i}] có khoá lạ: ${la.join(', ')}`)
+    if (!NHAN_HUONG_EM.includes(o.nhan as NhanHuongEm)) return void e.push(`huongEm[${i}].nhan không thuộc danh sách kín`)
+    const nhan = o.nhan as NhanHuongEm
+    if (daCo.has(nhan)) e.push(`huongEm[${i}].nhan lặp`)
+    daCo.add(nhan)
+    if (!Array.isArray(o.so) || o.so.length < 1 || o.so.length > H.HUONG_EM_SO_BANG_CHUNG_TOI_DA || o.so.some((n) => typeof n !== 'number' || !Number.isFinite(n))) e.push(`huongEm[${i}].so phải là 1–${H.HUONG_EM_SO_BANG_CHUNG_TOI_DA} con số`)
+    else {
+      const la2 = (o.so as number[]).filter((n) => !tapSo.has(String(n)))
+      if (la2.length) e.push(`huongEm[${i}].so có số không có trong thẻ: ${la2.join(', ')}`)
+    }
+    if (nhan === 'som' && !(Number.isFinite(gio) && gio <= H.HUONG_EM_GIO_SOM_TOI_DA)) e.push(`huongEm[${i}]: som cần thẻ có gioHoc ≤ ${H.HUONG_EM_GIO_SOM_TOI_DA}`)
+    if (nhan === 'muon' && !(Number.isFinite(gio) && gio >= H.HUONG_EM_GIO_MUON_TOI_THIEU)) e.push(`huongEm[${i}]: muon cần thẻ có gioHoc ≥ ${H.HUONG_EM_GIO_MUON_TOI_THIEU}`)
+    if (nhan === 'thu_thach') {
+      const q = the.homQuaThuThach as Record<string, unknown> | undefined
+      if (!(q && q.mo === true && Number(q.soDaLam) >= 3)) e.push(`huongEm[${i}]: thu_thach cần thẻ có homQuaThuThach (em đã mở thẻ và làm ≥ 3 câu)`)
+    }
+  })
+  for (const [a, b] of TRUC_HUONG_EM) if (daCo.has(a) && daCo.has(b)) e.push(`huongEm mang cả hai nhãn đối nghịch ${a} và ${b}`)
+  return [...new Set(e)]
+}
+
+/**
+ * KIỂM V3 `mucTieuTuan` + `loiMucTieu` — trả lý do BỎ CẢ HAI (rỗng ⇒ hợp lệ hoặc vắng). Đi cùng nhau; CHỈ ở ngày soi kỹ hằng tuần của em (`luotSoiKyTuan`); em CHƯA có mục tiêu đang chạy (thẻ `mucTieuTuan.ngayCon > 0`);
+ * `dang` có trong thẻ, đủ tin (≥ 4 câu đã gặp), không yếu; `den` = bậc hiện tại + 1 và ≤ Vận dụng; lời ≤ 160 ký tự theo LUẬT CHỮ chung (nói bậc bằng chữ Biết/Hiểu/Vận dụng, số lấy từ thẻ).
+ */
+export function kiemMucTieuTuan(d: Record<string, unknown>, the: TheDeKiem, tapSo: Set<string>): string[] {
+  const coMt = d.mucTieuTuan !== undefined && d.mucTieuTuan !== null
+  const coLoi = d.loiMucTieu !== undefined && d.loiMucTieu !== null && d.loiMucTieu !== ''
+  if (!coMt && !coLoi) return []
+  if (coMt !== coLoi) return ['mucTieuTuan và loiMucTieu phải đi cùng nhau (thiếu một trong hai)']
+  const H = HAN_MUC_BO_NAO
+  const e: string[] = []
+  if (the.luotSoiKyTuan !== true) e.push('mục tiêu tuần chỉ được đặt ở ngày soi kỹ hằng tuần của em')
+  const dangChay = the.mucTieuTuan as Record<string, unknown> | undefined
+  if (dangChay && typeof dangChay === 'object' && Number(dangChay.ngayCon) > 0) e.push('em đang có mục tiêu tuần chưa hết hạn')
+  const m = d.mucTieuTuan as Record<string, unknown>
+  if (typeof m !== 'object' || Array.isArray(m)) e.push('mucTieuTuan không phải đối tượng')
+  else {
+    const la = Object.keys(m).filter((k) => k !== 'dang' && k !== 'den')
+    if (la.length) e.push(`mucTieuTuan có khoá lạ: ${la.join(', ')}`)
+    if (!laChuoi(m.dang) || m.dang.length === 0 || m.dang.length > H.MA_DANG_TOI_DA || KY_TU_LA.test(m.dang)) e.push('mucTieuTuan.dang không hợp lệ')
+    else if (the.maDang && !the.maDang.includes(m.dang)) e.push('mucTieuTuan.dang không có trong thẻ của em')
+    else {
+      const ds = Array.isArray(the.dangChuY) ? (the.dangChuY as Record<string, unknown>[]) : []
+      const x = ds.find((y) => y && y.ma === m.dang)
+      if (!x) e.push('mucTieuTuan.dang không có số liệu trong thẻ (dangChuY)')
+      else {
+        if (!(Number(x.gap) >= H.MUC_TIEU_SO_CAU_DU_TIN)) e.push(`mucTieuTuan.dang chưa đủ tin (cần ≥ ${H.MUC_TIEU_SO_CAU_DU_TIN} câu đã gặp)`)
+        if (typeof x.tiLeKhacPhuc === 'number' && x.tiLeKhacPhuc < 0.7) e.push('mucTieuTuan.dang đang yếu — chưa đặt mục tiêu lên bậc')
+        const bac = Number(x.bac)
+        if (m.den !== 1 && m.den !== 2) e.push('mucTieuTuan.den phải là 1 (Hiểu) hoặc 2 (Vận dụng)')
+        else if (!(bac >= 0 && bac <= 1 && m.den === bac + 1)) e.push('mucTieuTuan.den phải đúng bậc hiện tại + 1 (không quá Vận dụng)')
+      }
+    }
+  }
+  e.push(...kiemChuLoiMoi(d.loiMucTieu, 'loiMucTieu', H.LOI_MUC_TIEU_TOI_DA, the, tapSo))
+  return [...new Set(e)]
+}
 
 /**
  * KIỂM PHẦN THỬ THÁCH (`thuThach` + `loiMoi`) — trả các lý do BỎ CẢ HAI trường (rỗng ⇒ hợp lệ hoặc vắng). Luật (thầy chốt 21/09; hợp đồng Code 3):
@@ -355,34 +510,13 @@ export function kiemThuThach(d: Record<string, unknown>, the: TheDeKiem, tapSo: 
     }
   }
 
-  const lm = d.loiMoi
-  if (!laChuoi(lm) || lm.trim().length === 0) e.push('loiMoi phải là chuỗi không rỗng')
-  else {
-    if (doDai(lm) > H.LOI_MOI_TOI_DA) e.push(`loiMoi quá ${H.LOI_MOI_TOI_DA} ký tự`)
-    if (KY_TU_LA.test(lm)) e.push('loiMoi có ký tự lạ hoặc xuống dòng')
-    if (coEmoji(lm)) e.push('loiMoi có emoji')
-    if (/[—–]/.test(lm)) e.push('loiMoi có dấu gạch dài')
-    const cam = timTuCam(lm, TU_CAM_CHO_EM)
-    if (cam.length) e.push(`loiMoi có từ cấm: ${cam.join(', ')}`)
-    const hua = timTuCam(lm, TU_CAM_RIENG_LOI_MOI)
-    if (hua.length) e.push(`loiMoi hứa điều không chắc hoặc gọi tên: ${hua.join(', ')}`)
-    const so = timSoTrongChu(boCumCuaSo(lm))
-    if (so.length === 0) e.push('loiMoi phải có ít nhất một con số thật có trong thẻ')
-    const soLa = soLaTrongChu(lm, tapSo)
-    if (soLa.length) e.push(`loiMoi có số không có trong thẻ: ${soLa.join(', ')}`)
-    // không hứa số câu
-    if (THU_N_CAU.test(lm)) e.push('loiMoi nêu số câu sẽ làm sau chữ "thử" — viết "mấy câu này" hoặc "vài câu"')
-    else if (typeof t === 'object' && !Array.isArray(t) && laSoNguyenTrong(t.soCau, 0, 1000)) {
-      for (const m of lm.matchAll(VIEC_N_CAU)) if (Number(m[1]) === t.soCau) e.push(`loiMoi nêu số câu sẽ làm (${t.soCau} câu) — máy chủ có thể chọn được ít hơn; viết "mấy câu này"`)
-    }
-    // thú / tên riêng: chỉ khi thẻ có thanThu.ten và đúng tên ấy
-    const thanThu = the.thanThu as Record<string, unknown> | undefined
-    const tenThu = thanThu && typeof thanThu === 'object' && laChuoi(thanThu.ten) && thanThu.ten.trim().length > 0 ? thanThu.ten : undefined
-    // Em CHƯA có thú (thẻ không có thanThu): được MỜI chọn thú ("chọn một thần thú / bạn đồng hành") nhưng không nói thú nào cả — bỏ cụm mời rồi mới soi chữ "thú"
-    const conLai = lm.replace(MOI_CHON_THU, ' ')
-    if (!tenThu && timTuCam(conLai, ['thú', 'thần thú']).length) e.push('loiMoi nhắc thú nhưng thẻ không có thanThu (chỉ được MỜI chọn thú: "chọn một thần thú")')
-    const laTen = tenRiengLa(lm, tenThu)
-    if (laTen.length) e.push(`loiMoi có tên riêng không có trong thẻ: ${laTen.join(', ')}`)
+  const soCauDe = typeof t === 'object' && !Array.isArray(t) && laSoNguyenTrong(t.soCau, 0, 1000) ? t.soCau : undefined
+  e.push(...kiemChuLoiMoi(d.loiMoi, 'loiMoi', H.LOI_MOI_TOI_DA, the, tapSo, soCauDe))
+  // V4: nhãn kín ĐANG CÓ của em (thẻ) ràng buộc thử thách hôm nay — chỉ làm bộ NHẸ đi, không nặng thêm
+  const huong = new Set(Array.isArray(the.huongEm) ? (the.huongEm as { nhan?: unknown }[]).map((x) => String(x?.nhan)) : [])
+  if (typeof t === 'object' && !Array.isArray(t)) {
+    if (huong.has('tran_an') && t.bac === 'cao_hon_mot_bac') e.push('em đang có nhãn tran_an (cần trấn an) — không được cao_hon_mot_bac')
+    if (huong.has('ngan') && typeof t.soCau === 'number' && t.soCau > H.HUONG_EM_NGAN_SO_CAU_TOI_DA) e.push(`em đang có nhãn ngan (thích ngắn) — soCau tối đa ${H.HUONG_EM_NGAN_SO_CAU_TOI_DA}`)
   }
   return [...new Set(e)]
 }
@@ -494,7 +628,7 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
 
   // ── LỜI CHO PHỤ HUYNH + THƯ TUẦN: lỗi ở đây CHỈ làm mất lời ấy (phần núm được giữ) ──
   const canhBao: string[] = []
-  const boLoi: ('loiNhanChoPhuHuynh' | 'thuTuan' | 'thuThach')[] = []
+  const boLoi: ('loiNhanChoPhuHuynh' | 'thuTuan' | 'thuThach' | 'huongEm' | 'mucTieuTuan')[] = []
   const kiemLoiNgoai = (ten: 'loiNhanChoPhuHuynh' | 'thuTuan', v: unknown, toiDa: number, duocViet: boolean, lyDoKhong: string) => {
     if (v === undefined || v === '') return
     if (!laChuoi(v)) return void loi.push(`${ten} phải là chuỗi (có thể rỗng)`)
@@ -556,6 +690,18 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
     canhBao.push(`thuThach bị bỏ (giữ núm): ${loiTt.join('; ')}`)
   }
 
+  // ── V4 huongEm + V3 mucTieuTuan: sai khuôn CHỈ bỏ phần ấy (phần tử vẫn hợp lệ) ──
+  const loiHuong = kiemHuongEm(d, the, tapSo)
+  if (loiHuong.length) {
+    boLoi.push('huongEm')
+    canhBao.push(`huongEm bị bỏ (giữ núm): ${loiHuong.join('; ')}`)
+  }
+  const loiMt = kiemMucTieuTuan(d, the, tapSo)
+  if (loiMt.length) {
+    boLoi.push('mucTieuTuan')
+    canhBao.push(`mucTieuTuan bị bỏ (giữ núm): ${loiMt.join('; ')}`)
+  }
+
   if (!laChuoi(d.ghiChuHlv)) loi.push('ghiChuHlv phải là chuỗi (có thể rỗng)')
   else {
     if (doDai(d.ghiChuHlv) > H.GHI_CHU_HLV_TOI_DA) loi.push(`ghiChuHlv quá ${H.GHI_CHU_HLV_TOI_DA} ký tự`)
@@ -579,6 +725,10 @@ export function lamSachDauRa(d: DauRaEm, kq: KetQuaKiem): DauRaEm {
     if (t === 'thuThach') {
       delete ra.thuThach
       delete ra.loiMoi
+    } else if (t === 'huongEm') delete ra.huongEm
+    else if (t === 'mucTieuTuan') {
+      delete ra.mucTieuTuan
+      delete ra.loiMucTieu
     } else ra[t] = ''
   }
   return ra

@@ -217,6 +217,16 @@ export interface TheNgan {
   /** SỐ THẬT thần thú của em (V2, thầy chốt 21/09; máy chủ dựng ở `/ai/ho-so-ngay`, hợp đồng `docs/hop-dong-thu-thach-rieng-2109.md`). ẨN DANH: chỉ tên loài thú, không tên em/biệt danh.
    * Khoá nào không có số thật thì VẮNG; vắng cả khối = em chưa chọn thú ⇒ Bộ não KHÔNG được nhắc thú. Là nguồn số của `loiMoi` (`tapSoCuaThe` gom mọi số ở đây). */
   thanThu?: { ten?: string; cap?: number; expConThieu?: number; manhKhien?: number; manhKhienTong?: number; chuoiNgay?: number }
+  /** V4 (CHƯA bật; hợp đồng `docs/hop-dong-bo-nao-v3-v4-2109.md`): kết quả THỬ THÁCH RIÊNG hôm qua do MÁY CHỦ đo — `mo` = em đã mở thẻ (có hàng `thu_thach_rieng`), `soDaLam`/`soDung` từ sổ, `bac`/`dang` như Bộ não đã chọn. Vắng = hôm qua em không có thử thách. */
+  homQuaThuThach?: { mo: boolean; soDaLam: number; soDung: number; bac: string; dang: string[] }
+  /** V4: giờ (0–23, giờ Việt Nam) trung vị của các lượt làm 7 ngày; vắng khi chưa đủ mẫu (< 10 lượt). */
+  gioHoc?: number
+  /** V4: nhãn kín ĐANG CÓ của em (đã lưu ≤ 14 ngày): thẻ mang để lời nhắn / thử thách hôm nay nhất quán (`tran_an` ⇒ không cao_hon_mot_bac; `ngan` ⇒ ≤ 5 câu). Em không thấy. */
+  huongEm?: { nhan: string; so?: number[] }[]
+  /** V3: mục tiêu tuần ĐANG CHẠY (7 ngày) do máy chủ đo `tienDo` 0–1; `tu`/`den` là bậc (nói bằng chữ Biết/Hiểu/Vận dụng). */
+  mucTieuTuan?: { dang: string; tu: 0 | 1 | 2; den: 0 | 1 | 2; ngayCon: number; tienDo: number }
+  /** V3: mục tiêu tuần VỪA HẾT (tuần trước) và kết quả — nguồn số cho `thuTuan` báo phụ huynh. */
+  mucTieuTuanTruoc?: { dang: string; tu: 0 | 1 | 2; den: 0 | 1 | 2; dat: boolean; bacNay: 0 | 1 | 2; tienDoCuoi: number; soCauDung: number }
   /** ≤ 3 lời nhắn gần nhất cho em (chống lặp). KHÔNG phải nguồn số. */
   loiNhanGanDay: string[]
   /** Kết quả CHẤM điều chỉnh hôm qua (máy chủ gắn sau khi so thẻ đêm trước với thẻ này); chỉ khi em có điều chỉnh hôm qua. Số đo ở đây là nguồn số cho lời nhắn. */
