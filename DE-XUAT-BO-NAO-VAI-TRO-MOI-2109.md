@@ -34,3 +34,9 @@ Số em nhận thử thách · số em làm · tỉ lệ đúng · số em LÊN 
 3. Em nhận tối đa **2 lời của Bộ não mỗi ngày** (hiện 1) — khuyên: CÓ.
 4. **Lõi đúng bậc**: mỗi dạng vẫn ≥ 1 câu nhưng đúng bậc của em, câu lõi không còn giống hệt mọi em — khuyên: CÓ.
 5. **Lượt chạy chiều 17:30** cho lời mở màn buổi tối, đo token 3 ngày — khuyên: THỬ.
+
+---
+## THẦY ĐÃ CHỐT CẢ 5 ĐIỀU — 21/09/2026 11:31 ("Chốt hết bộ não a.i. triển luôn nhé để tối nay chạy thật luôn")
+KẾ HOẠCH TỐI NAY (Boss): **Nấc 1 = V1 Thử thách riêng + V2 số thật thần thú + LÕI ĐÚNG BẬC + một LƯỢT CHẠY CHIỀU bằng tay (~18:30)** để lời mời đầu tiên tới các em trước giờ học 20:00. V3 mục tiêu tuần + V4 vòng khép kín: ngày mai. Lượt chiều tự động (launchd 17:30): cài sau khi đo token lượt tay hôm nay.
+Mốc giờ: 12:30 hợp đồng `docs/hop-dong-thu-thach-rieng-2109.md` (Code 3 viết, Code 1 + Code 2 góp) · 15:30 xong mã ba phía · 16:30 Boss soát · 17:00 Worker + Pages lên · 17:30–18:30 Boss chạy lượt chiều, ĐỌC 20 lời mời mẫu trước khi nộp · 19:30 kiểm sống · 20:00 các em thấy thẻ. Trượt mốc nào ⇒ tối nay chỉ lên phần đã soát xong (ưu tiên: lõi đúng bậc), phần còn lại sáng mai — KHÔNG đẩy thứ chưa soát.
+Khuôn mới của Bộ não: `thuThach { dang[≤2], soCau 3–8, bac: dung_bac|thap_hon_mot_bac|cao_hon_mot_bac }` + `loiMoi` (≤ 200 ký tự, phải chứa ít nhất MỘT số thật có trong thẻ; tên thần thú lấy từ thẻ). Bộ não KHÔNG chọn mã câu — máy chủ chọn (không tự luận, chưa làm trong 14 ngày, không vượt bậc + 1). Thử thách KHÔNG bắt buộc, không hạn, không tính vào bài tập về nhà; câu sai vẫn vào lịch ôn; EXP như làm câu thường. Trần: em ≤ 2 lời Bộ não/ngày. Cờ tắt: `cau_hinh.bo_nao.thuThach`.
