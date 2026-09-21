@@ -66,10 +66,15 @@ describe('HẠN NGẮN (≤ 48 giờ): chia theo giờ trong cửa sổ học', 
       expect(p >= 20 * 60 && p <= 23 * 60 + 59, `chặng ${k} mở ${mocs[k]} (giờ VN ${(p / 60).toFixed(2)}) ngoài cửa sổ`).toBe(true)
     }
     for (const t of mocs) expect(Date.parse(t)).toBeLessThan(Date.parse(han))
-    // Ngân sách đưa cho lõi ở hạn ngắn = SỨC CHỨA theo phiên (soNgay = số phiên, câu/ngày = câu/phiên, ôn lại 0), không phải ngân sách/ngày.
+    // Ngân sách đưa cho lõi ở hạn ngắn = SỨC CHỨA theo phiên (câu/ngày = câu/phiên, ôn lại 0), không phải ngân sách/ngày. BẢN 1.4 (Boss duyệt): thêm TRẦN TỔNG `tongToiDa` (≤ sức chứa tối đa) và số ngày chỉ đủ phiên cho max(trần, lõi) nên ≤ số phiên.
     const sc = sucChua({ chotLuc: BAY_GIO.toISOString(), hanNop: han, cauMoiNgay: 12, onLaiMoiNgay: 0, giayMoiCau: 90 })
     expect(sc.cheDo).toBe('ngan')
-    expect(JSON.parse((d.sql.prepare("SELECT ngan_sach_json FROM btvn_em WHERE sbd='S1'").get() as { ngan_sach_json: string }).ngan_sach_json)).toEqual({ soNgay: sc.soPhien, cauMoiNgay: sc.cauMoiPhien, onLaiMoiNgay: 0 })
+    const ns = JSON.parse((d.sql.prepare("SELECT ngan_sach_json FROM btvn_em WHERE sbd='S1'").get() as { ngan_sach_json: string }).ngan_sach_json) as { soNgay: number; cauMoiNgay: number; onLaiMoiNgay: number; tongToiDa: number }
+    expect(ns).toMatchObject({ cauMoiNgay: sc.cauMoiPhien, onLaiMoiNgay: 0 })
+    expect(ns.soNgay).toBeGreaterThanOrEqual(1)
+    expect(ns.soNgay).toBeLessThanOrEqual(sc.soPhien)
+    expect(ns.tongToiDa).toBeGreaterThan(0)
+    expect(ns.tongToiDa).toBeLessThanOrEqual(sc.soCauToiDa)
     for (const t of mocs.slice(1)) expect(phutVn(t) >= 6 * 60).toBe(true) // không 00:00–05:59
     expect(m.chang.every((c: { dungNhipTruoc: string }) => Date.parse(c.dungNhipTruoc) <= Date.parse(han))).toBe(true)
   })

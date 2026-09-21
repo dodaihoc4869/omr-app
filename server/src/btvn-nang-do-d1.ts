@@ -23,7 +23,7 @@ import { chuyenDeThat, ghiSuKien, ngayVn, phanTuQid, suKienChamBai, suKienTuKetQ
 import { daTraLoi } from './on-lai-nop'
 import { docDieuChinhHieuLuc, type DieuChinhHieuLuc } from './bo-nao-doc'
 import { docLichDaLuu, LAN_MOI_LUOT, moLucChang, trangThaiCacChang, type LichDaLuu } from './btvn-nang-do-chang'
-import { canhBaoHanNgan, cheDoLich, sucChua, xepLichChang, type SucChua } from '../../src/lib/btvn-nang-do-lich'
+import { canhBaoHanNgan, cheDoLich, nganSachHanNgan, sucChua, xepLichChang, type SucChua } from '../../src/lib/btvn-nang-do-lich'
 
 type Hang = Record<string, unknown>
 
@@ -342,7 +342,7 @@ export interface NganSachVaSucChua {
  * Ngân sách của MỘT em cho bài này (bản 1.1): `cauMoiNgay` theo tốc độ thật (8–16, luật `tinhNganSach` của kế hoạch ngày); phần ôn lại = ≤ 40 % và ≤ số câu tới hạn;
  * số ngày/phiên và tổng bộ theo SỨC CHỨA (`sucChua` của Code 1). Hạn dài cho đúng số cũ (test khoá); hạn ngắn ⇒ bộ nhỏ hơn cho vừa các phiên còn lại (lõi vẫn giữ đủ).
  */
-export function nganSachVaSucChua(sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: Pick<HoSoRutCuaEm, 'chuaKhacPhuc' | 'toiHan'>): NganSachVaSucChua {
+export function nganSachVaSucChua(sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: Pick<HoSoRutCuaEm, 'chuaKhacPhuc' | 'toiHan'>, soLoi?: number): NganSachVaSucChua {
   const d: DauVaoKeHoach = {
     sbd, now, homNay: ngayVn(now), phutNgay: dv.phutNgay, mauGiay: dv.mauGiay, btvn: [], mom: [], cauToiHan: [], soCauChuaKhacPhuc: hs.chuaKhacPhuc, dang: [],
     nhiemVuThanThu: [], caSapToi: [], lichSu: dv.lichSu, daLamHomNay: { soCau: 0, lenBac: 0, tutBac: 0 }, homNayLaNgayNghi: false,
@@ -357,7 +357,8 @@ export function nganSachVaSucChua(sbd: string, now: number, hanMs: number, dv: D
   } catch {
     sc = { cheDo: 'dai', soNgay: soNgayCu, soPhien: soNgayCu, cauMoiPhien: Math.max(1, cauMoiNgay - onLaiMoiNgay), soCauToiDa: soNgayCu * Math.max(1, cauMoiNgay - onLaiMoiNgay) }
   }
-  const nganSach: NganSachBai = sc.cheDo === 'ngan' ? { soNgay: sc.soPhien, cauMoiNgay: sc.cauMoiPhien, onLaiMoiNgay: 0 } : { soNgay: sc.soNgay, cauMoiNgay, onLaiMoiNgay }
+  // Bản 1.4 (Boss duyệt hệ số 1,0): hạn ngắn có TRẦN TỔNG (em mở muộn không nhận nhiều câu hơn em mở sớm); hạn dài Y HỆT cũ; `soLoi` ⇒ chặng vừa đủ, không vụn.
+  const nganSach: NganSachBai = nganSachHanNgan(sc, { chotLuc: new Date(now).toISOString(), hanNop: new Date(hanMs).toISOString(), cauMoiNgay, onLaiMoiNgay }, soLoi)
   return { nganSach, goc: { cauMoiNgay, onLaiMoiNgay }, giay, sc }
 }
 
@@ -418,7 +419,7 @@ export async function docBoDaChot(env: Env, maBtvn: string, sbd: string): Promis
 
 /** Dựng bộ cho một em từ hồ sơ + ngân sách đã đọc (thuần — dùng chung với xem trước, nên bộ xem trước = bộ thật khi hồ sơ không đổi). */
 export function dungBoChoEm(bai: BaiNangDo, hatGiongBai: string, sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: HoSoRutCuaEm, dieuChinh?: DieuChinhEm): { bo: BoCuaEm; nganSach: NganSachBai; goc: NganSachVaSucChua['goc']; giay: number; sc: SucChua } {
-  const { nganSach, goc, giay, sc } = nganSachVaSucChua(sbd, now, hanMs, dv, hs)
+  const { nganSach, goc, giay, sc } = nganSachVaSucChua(sbd, now, hanMs, dv, hs, bai.loi.length)
   // `dieuChinh` (Bộ não A.I chế độ THẬT) là cổng TUỲ CHỌN của lõi: vắng ⇒ Y HỆT không có cổng (test của Code 1 + test bóng ở `tests/bo-nao-doc-2109.test.ts`).
   return { bo: chonBoCuaEm(bai.cau, bai.loi, hs.hoSo, nganSach, `${hatGiongBai}|${sbd}`, dieuChinh), nganSach, goc, giay, sc }
 }
