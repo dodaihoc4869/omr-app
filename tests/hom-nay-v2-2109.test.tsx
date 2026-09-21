@@ -135,7 +135,7 @@ describe('OTraCuu — ô tra cứu lớn', () => {
     expect(o.value).toBe('')
   })
 
-  it('bấm vào gợi ý mở em; Esc đóng + xoá; 6 số ⇒ "Mở ca kiểm tra mã …"; không có ⇒ nói thật ngay trong ô; danh sách lớp trống ⇒ hướng dẫn nạp', () => {
+  it('bấm vào gợi ý mở em; Esc đóng + xoá; 6 số ⇒ "Mở ca kiểm tra mã …"; không có ⇒ nói thật ngay trong ô; danh sách lớp trống ⇒ hướng dẫn nạp', async () => {
     const { onMoEm, onMoCa, o } = dung()
     fireEvent.change(o, { target: { value: '12121002' } })
     fireEvent.mouseDown(screen.getAllByRole('option')[0])
@@ -149,10 +149,13 @@ describe('OTraCuu — ô tra cứu lớn', () => {
     fireEvent.keyDown(o, { key: 'Enter' })
     expect(onMoCa).toHaveBeenCalledWith('123456')
     fireEvent.change(o, { target: { value: 'không ai' } })
-    expect(screen.getByText('Không tìm thấy “không ai” trong danh sách lớp trên máy này.')).toBeTruthy()
+    // Sửa có chủ ý 21/09: ô tra cứu hỏi cả MÁY CHỦ (trễ ~200 ms) rồi mới kết luận; ở đây máy chủ không dùng được ⇒ rơi về câu "trên máy này".
+    expect(await screen.findByText('Không tìm thấy “không ai” trong danh sách lớp trên máy này.')).toBeTruthy()
     cleanup()
-    dung([])
-    expect(screen.getByText(/Chưa có danh sách lớp trên máy này/)).toBeTruthy()
+    const { o: o2 } = dung([])
+    fireEvent.change(o2, { target: { value: 'ba' } })
+    // Hướng dẫn nạp danh sách chỉ hiện khi CẢ máy chủ lẫn máy đều không có gì (đã bỏ câu này khi máy chủ dùng được).
+    expect(await screen.findByText(/Chưa hỏi được máy chủ và chưa có danh sách lớp trên máy này/)).toBeTruthy()
   })
 })
 

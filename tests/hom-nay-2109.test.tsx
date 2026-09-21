@@ -210,7 +210,8 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
     fireEvent.change(o, { target: { value: 'không có ai' } })
     fireEvent.keyDown(o, { key: 'Enter' })
     expect(useAppStore.getState().screen).toBe('examhub')
-    expect(screen.getByText('Không tìm thấy “không có ai” trong danh sách lớp trên máy này.')).toBeTruthy()
+    // Sửa có chủ ý 21/09: ô tra cứu nay hỏi cả MÁY CHỦ (trễ ~200 ms) rồi mới kết luận ⇒ dòng báo hiện sau khi máy chủ trả lời/lỗi, không còn đồng bộ.
+    expect(await screen.findByText('Không tìm thấy “không có ai” trong danh sách lớp trên máy này.')).toBeTruthy()
   })
 })
 

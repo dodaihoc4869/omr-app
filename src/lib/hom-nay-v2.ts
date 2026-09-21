@@ -25,6 +25,8 @@ export interface EmTraCuu {
   sbd: string
   hoTen: string
   lop: string
+  /** Tên lớp máy chủ trả (vd "12 - Tinh Hoa"); có thì hiện thay cho `lop`. */
+  tenLop?: string
 }
 export interface KetQuaTim extends EmTraCuu {
   diem: number
@@ -55,6 +57,38 @@ export function timEm(ds: EmTraCuu[], q: string, toiDa = 6): KetQuaTim[] {
     kq.push({ sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, diem })
   }
   return kq.sort((a, b) => b.diem - a.diem || a.hoTen.localeCompare(b.hoTen, 'vi')).slice(0, toiDa)
+}
+
+/** Gõ toàn chữ số, từ 4 số trở lên ⇒ coi là SỐ BÁO DANH (mã ca 6 số vẫn được ô tra cứu mở như ca). */
+export const laSbdGo = (q: string): boolean => /^\d{4,}$/.test(q.trim())
+
+/** Gợi ý từ MÁY CHỦ (lệnh thầy chỉ đọc `/gv/tim-em {q}`, Code 3): ≤ 10 {sbd, hoTen, lop, tenLop?}, khớp SBD trước rồi tên không dấu. Chưa có lệnh / lỗi ⇒ `ok:false` (ô tra cứu rơi về danh sách trên máy, không báo đỏ). */
+export async function timEmMayChu(q: string): Promise<KetQuaLenh<EmTraCuu[]>> {
+  const k = q.trim()
+  const r = await goiLenh('/gv/tim-em', { q: k }, 'Máy chủ chưa có lệnh tìm em — đang tìm trong danh sách lớp trên máy này.')
+  if (!r.ok) return r
+  const ds = (r.du as { ds?: unknown }).ds
+  if (!Array.isArray(ds)) return { ok: false, loai: 'khong_doc_duoc', chu: 'Máy chủ trả danh sách tìm em không đúng dạng.' }
+  const ra: EmTraCuu[] = []
+  for (const x of ds) {
+    const o = x && typeof x === 'object' ? (x as Record<string, unknown>) : null
+    const sbd = o ? chu(o.sbd) : ''
+    if (!o || !sbd) continue
+    ra.push({ sbd, hoTen: chu(o.hoTen), lop: chu(o.lop), ...(chu(o.tenLop) ? { tenLop: chu(o.tenLop) } : {}) })
+  }
+  return { ok: true, du: ra.slice(0, 10) }
+}
+
+/** Gộp kết quả máy chủ (ƯU TIÊN, giữ thứ tự) với kết quả trên máy thầy; trùng SBD lấy bản máy chủ (có tên lớp mới). */
+export function gopKetQuaTim(mayChu: EmTraCuu[], tren: EmTraCuu[], toiDa = 8): EmTraCuu[] {
+  const thay = new Set<string>()
+  const ra: EmTraCuu[] = []
+  for (const e of [...mayChu, ...tren]) {
+    if (thay.has(e.sbd)) continue
+    thay.add(e.sbd)
+    ra.push({ sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, ...(e.tenLop ? { tenLop: e.tenLop } : {}) })
+  }
+  return ra.slice(0, toiDa)
 }
 
 // ─────────────────────────────── THỜI GIAN ───────────────────────────────
