@@ -180,7 +180,7 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
   const hopLe=(q:PrivateQuestion,s:Suat,noi:number)=>{
     if(dung.has(q.group))return false
     const L=level(q),T=target(q.dang),T1=Math.min(2,T+1)
-    if(s.mucCao){if(noi<=1?L!==T1:noi===2?!(L>=T&&L<=T1):L>T1)return false}
+    if(s.mucCao){if(noi<=1?L!==T1:noi===2?!(L>=T&&L<=T1):(L>T1||L<0))return false}   // câu chưa rõ bậc (mucDo null) KHÔNG BAO GIỜ vào suất thử thách / Lượt trùm
     else if(!(L<=T||(noi>=2&&L===T+1)))return false
     if(opt.loai==='khoi_dong'&&noi<4&&dai(q))return false
     if(opt.loai!=='trum'&&dai(q)&&soDai>=Math.min(tranDai,tranDaiToiDa)&&noi<4)return false   // MỘT lượt thường: câu dài ≤ 1 (thưởng ≤ 2) VÀ ≤ trần theo cấp thú

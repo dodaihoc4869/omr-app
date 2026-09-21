@@ -224,6 +224,23 @@ describe('MỐC 4 — KHÔNG LƯỢT RỖNG khi kho còn câu; thang nới', () 
   })
 })
 
+describe('câu chưa rõ bậc (mucDo null)', () => {
+  it('KHÔNG BAO GIỜ vào suất thử thách hay Lượt trùm (kể cả khi kho hết câu khác); lượt trùm ngắn còn hơn lượt có câu chưa rõ bậc', () => {
+    const khongBac = POOL.slice(0, 60).map((q, i) => ({ ...q, qid: `N${i}`, group: `NG${i}`, mucDo: null }))
+    const r = mulberry32(404)
+    for (let i = 0; i < 300; i++) {
+      const { evidence, attempts, mastery } = trangThai(r)
+      const kho = r() < 0.5 ? khongBac : [...khongBac, ...POOL.filter((_, k) => k % 7 === 0)]
+      for (const loai of LUOT) {
+        const ra = chooseLuotMoi(kho, evidence, attempts, mastery, opt(loai))
+        for (const x of ra) if (x.role === 'thu_thach' || x.role === 'trum') expect(x.q.mucDo, `#${i} ${loai} ${x.role} ${x.q.qid}`).not.toBeNull()
+      }
+    }
+    // kho CHỈ có câu mucDo null: trùm ngắn/rỗng (không lấy câu chưa rõ bậc làm câu khó hơn một bậc)
+    expect(chooseLuotMoi(khongBac, [], [], [], opt('trum'))).toEqual([])
+  })
+})
+
 describe('luotHomNay — số lượt mỗi ngày', () => {
   const v = (o: Partial<Parameters<typeof luotHomNay>[0]> = {}) => ({ soLuotDaLam: 0, xongChangHomNay: false, xongOnToiHan: false, datHomNay: false, dungHomNay: 0, tongHomNay: 0, ...o })
   it('3 lượt sẵn (khởi động, khám phá, khám phá); +1 xong chặng; +1 đạt; +1 trùm (đúng ≥ 80 % trong ≥ 12 câu); trần 6 lượt = 36 câu', () => {
