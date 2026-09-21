@@ -1,7 +1,6 @@
 tests/btvn-ui-1609.test.tsx
 tests/btvn-va-khong-apps-script-1209.test.ts
 tests/danh-dau-cau-hoi-lai.test.ts
-tests/dau-tru-phan-ba-1009.test.ts
 tests/dau-truong-chan-ly.test.ts
 tests/dong-bo-kho-sang-may-em-1409.test.ts
 tests/duyet-hang-loat.test.tsx

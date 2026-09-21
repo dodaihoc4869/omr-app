@@ -2191,9 +2191,12 @@ export const JS_PHIEU = `
       /** CHẤM TẠI CHỖ để hiện ngay. Máy chủ vẫn chấm LẠI và con số ghi vào
        * Sheet là con số của máy chủ — máy em sửa được. */
       function chamTaiCho() {
+        // PHẦN III chấm Y HỆT luật chính thức `normalizeNumericAnswer` (src/engine/score.ts): tám kiểu dấu trừ → "-", bỏ MỌI khoảng trắng (kể cả
+        // no-break), "," → ".", rồi so CHUỖI. KHÔNG bỏ dấu "+", KHÔNG bỏ đơn vị (mol, g, %…), KHÔNG so theo số học: chữ số có nghĩa là có
+        // tính điểm ("0,80" ≠ "0,8", "+5" ≠ "5", "5 mol" ≠ "5"). Máy chủ chấm lại bằng đúng luật này nên chỗ này không được "nới hơn" —
+        // nới thì em thấy "đúng" rồi bị chấm sai. Test dau-tru-phan-ba-1009 + cham-tai-cho-dung-luat-2109 khoá cả hai bên.
         var chuanIII = function (v) {
-          var s = String(v == null ? '' : v).replace(/[‐‑‒–—―−－]/g, '-').replace(/[\s ]+/g, '').replace(',', '.').replace(/^[+]/, '');
-          return s.replace(/(gam|lit|lít|mol|cm3|dm3|kcal|kj|cal|amu|giay|phut|kg|ml|g|l|m|%|j|h|s)$/i, '').trim();
+          return String(v == null ? '' : v).replace(/[‐‑‒–—―−－]/g, '-').replace(/[\\s\u00a0\u202f\u2007]+/g, '').replace(',', '.');
         };
         var normII = function (v) {
           return String(v == null ? '' : v).toUpperCase().replace(/Đ/g, 'D').replace(/[^DS]/g, '');
@@ -2207,12 +2210,7 @@ export const JS_PHIEU = `
           var khop = false;
           if (!chon) khop = false;
           else if (c.phan === 'III') {
-            var cChon = chuanIII(chon), cDap = chuanIII(dapAn);
-            if (cChon === cDap) khop = true;
-            else {
-              var nC = Number(cChon), nD = Number(cDap);
-              khop = !isNaN(nC) && !isNaN(nD) && Math.abs(nC - nD) < 1e-4;
-            }
+            khop = chuanIII(chon) === chuanIII(dapAn);
           } else if (c.phan === 'II') {
             var nChon = normII(chon), nDap = normII(dapAn);
             khop = nChon.length === 4 && nDap.length === 4 && nChon === nDap;
