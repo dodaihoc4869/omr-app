@@ -206,3 +206,39 @@ describe('migration', () => {
     expect(cot).toMatchObject({ name: 'ten_lop', notnull: 0 })
   })
 })
+
+describe('tệp gán "12 - Nhóm 10 điểm" (thầy lệnh 21/09 ~10:50: 15 em tách khỏi Lớp Thường)', () => {
+  const lay = (tep: string): string[] => [...(/IN \(([^)]*)\)/.exec(readFileSync(tep, 'utf-8').replace(/^--.*$/gm, ''))?.[1] ?? '').matchAll(/'(\d+)'/g)].map((m) => m[1]!)
+  const tinhHoa = lay('server/gan-2109-ten-lop-tinh-hoa.sql')
+  const nhom = lay('server/gan-2109-ten-lop-nhom-10-diem.sql')
+  const sqlNhom = readFileSync('server/gan-2109-ten-lop-nhom-10-diem.sql', 'utf-8')
+  it('đúng 15 SBD khác nhau (đúng danh sách Boss chuyển), không em nào thuộc Tinh Hoa; không phải tệp migration-*.sql', () => {
+    expect(nhom).toEqual(['12053', '12067', '12073', '12078', '12079', '12100', '12104', '12106', '12108', '12114', '12116', '12117', '12120', '12122', '12123'])
+    expect(new Set(nhom).size).toBe(15)
+    expect(nhom.filter((s) => tinhHoa.includes(s))).toEqual([])
+    expect(sqlNhom).toContain("lop = '12'")
+    expect('gan-2109-ten-lop-nhom-10-diem.sql').not.toMatch(/^migration-/)
+  })
+  it('chạy sau tệp Tinh Hoa: Tinh Hoa vẫn 42, Nhóm 10 điểm 15, Lớp Thường = phần còn lại; /gv/lop trả 3 lớp khối 12; lùi trả 15 em về Lớp Thường', async () => {
+    const d = taoD1That()
+    for (const s of [...tinhHoa, ...nhom, '12001', '12002', '12003']) themHs(d, s, `Em ${s}`, '12')
+    themHs(d, '11053', 'Khối 11', '11')
+    d.sql.exec(readFileSync('server/gan-2109-ten-lop-tinh-hoa.sql', 'utf-8'))
+    d.sql.exec(sqlNhom)
+    const dem = (t: string) => (d.sql.prepare('SELECT COUNT(*) AS n FROM hoc_sinh WHERE ten_lop = ?').get(t) as { n: number }).n
+    expect([dem('12 - Tinh Hoa'), dem('12 - Nhóm 10 điểm')]).toEqual([42, 15])
+    const lop = (await goi(d, '/gv/lop')).lop as { tenLop: string; khoi: string; soEm: number }[]
+    expect(lop.filter((l) => l.khoi === '12').map((l) => [l.tenLop, l.soEm])).toEqual([['12 - Lớp Thường', 3], ['12 - Nhóm 10 điểm', 15], ['12 - Tinh Hoa', 42]])
+    d.sql.exec("UPDATE hoc_sinh SET ten_lop = NULL WHERE ten_lop = '12 - Nhóm 10 điểm'") // lệnh lùi ghi trong tệp
+    const sau = (await goi(d, '/gv/lop')).lop as { tenLop: string; soEm: number }[]
+    expect(sau.filter((l) => l.tenLop.startsWith('12')).map((l) => [l.tenLop, l.soEm])).toEqual([['12 - Lớp Thường', 18], ['12 - Tinh Hoa', 42]])
+    expect(sqlNhom).toContain("UPDATE hoc_sinh SET ten_lop = NULL WHERE ten_lop = '12 - Nhóm 10 điểm'")
+  })
+  it('BẢO VỆ: em đã là Tinh Hoa không bị ghi đè; em khối khác cùng SBD trong danh sách không bị đụng', () => {
+    const d = taoD1That()
+    themHs(d, '12053', 'Đã Tinh Hoa', '12', '12 - Tinh Hoa'); themHs(d, '12067', 'Khối 11', '11'); themHs(d, '12073', 'Thường', '12')
+    d.sql.exec(sqlNhom)
+    const tl = (s: string) => (d.sql.prepare('SELECT ten_lop FROM hoc_sinh WHERE sbd = ?').get(s) as { ten_lop: string | null }).ten_lop
+    expect([tl('12053'), tl('12067'), tl('12073')]).toEqual(['12 - Tinh Hoa', null, '12 - Nhóm 10 điểm'])
+  })
+})
