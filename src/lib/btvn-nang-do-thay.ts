@@ -108,6 +108,8 @@ export interface ChiTietEmXemTruoc {
   sbd: string
   chang: string[][]
   nhan: Record<string, NhanCau>
+  /** BẢN 1.2: mã các câu "THỬ SỨC THÊM · không bắt buộc" của em (lõi cao hơn bậc của em). KHÔNG nằm trong `chang`; máy học sinh xếp thành một nhóm riêng SAU chặng cuối. Vắng / em khá ⇒ []. */
+  thuSucThem: string[]
   /** LỊCH MỞ từng chặng (bản 1.1, Code 3): `moLuc` ISO UTC. Có luôn (hạn dài: mỗi ngày một chặng mở 00:00). Vắng ⇒ []. */
   lich: { chiSo: number; moLuc: string; soCau: number }[]
   /** `true` = hạn NGẮN, chia chặng theo GIỜ trong cửa sổ học 20:00–23:59 ⇒ chỉ khi ấy màn hiện giờ từng chặng. */
@@ -201,12 +203,36 @@ export async function xemTruocPhanBo(v: DauVaoXemTruoc): Promise<KetQuaXemTruoc>
     ds: ds.map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.hoTen ?? ''), daChot: x.daChot === true, coHoSo: x.coHoSo !== false, tomTat: x.tomTat as TomTatBo })).filter((x) => x.sbd && x.tomTat),
     chiTiet:
       ct && Array.isArray(ct.chang)
-        ? { sbd: String(ct.sbd ?? ''), chang: (ct.chang as unknown[][]).map((c) => (Array.isArray(c) ? c.map(String) : [])), nhan: (ct.nhan ?? {}) as Record<string, NhanCau>, lich: docLich(ct.lich), theoGio: ct.theoGio === true }
+        ? { sbd: String(ct.sbd ?? ''), chang: (ct.chang as unknown[][]).map((c) => (Array.isArray(c) ? c.map(String) : [])), nhan: (ct.nhan ?? {}) as Record<string, NhanCau>, thuSucThem: Array.isArray(ct.thuSucThem) ? (ct.thuSucThem as unknown[]).map(String) : [], lich: docLich(ct.lich), theoGio: ct.theoGio === true }
         : null,
   }
 }
 
 // ─────────────────────────────── NHÃN CHO THẦY ───────────────────────────────
+
+/** Nhãn của câu THỬ SỨC THÊM (bản 1.2, Boss chốt 21/09): câu lõi cao hơn bậc của em — không bắt buộc, sai không tính, không hẹn ôn. */
+export const NHAN_THU_SUC_THEM = 'Câu cốt lõi · thử sức thêm (sai không sao)'
+
+/** BẢN 1.2 — "bắt buộc N câu · thử sức thêm M câu (không bắt buộc)" của MỘT em. Đọc CÓ CHỐNG THIẾU: máy chủ chưa trả `soThuSucThem` ⇒ `thuSucThem = null` (màn giữ cách hiện cũ, không bịa 0).
+ *  `batBuoc` = `soBatBuoc` nếu có, không thì `tong` (Code 1: `tong` chính là số câu bắt buộc, không gồm thử sức thêm). */
+export function batBuocVaThuSucThem(t: { tong: number; soBatBuoc?: number | null; soThuSucThem?: number | null }): { batBuoc: number; thuSucThem: number | null } {
+  return {
+    batBuoc: typeof t.soBatBuoc === 'number' ? t.soBatBuoc : t.tong,
+    thuSucThem: typeof t.soThuSucThem === 'number' && t.soThuSucThem >= 0 ? t.soThuSucThem : null,
+  }
+}
+/** Câu chữ đúng như Boss chốt. Em không có câu thử sức thêm (em khá, hoặc máy chủ chưa trả) ⇒ '' (không thêm chữ thừa). */
+export function chuBatBuoc(batBuoc: number, thuSucThem: number | null): string {
+  return thuSucThem != null && thuSucThem > 0 ? `bắt buộc ${batBuoc} câu · thử sức thêm ${thuSucThem} câu (không bắt buộc)` : ''
+}
+
+/** Dòng "bộ của em" ở tab theo dõi bài. null ⇒ em chưa mở bài (caller nói "Chưa mở bài — bộ câu chưa chốt"). Bản 1.2: có câu thử sức thêm ⇒ "bắt buộc N câu · thử sức thêm M câu (không bắt buộc)"; không có ⇒ chữ cũ. */
+export function chuBoCuaEm(e: { soCauCuaEm?: number | null; soChang?: number | null; loDaXong?: number | null; soThuSucThem?: number | null }): string | null {
+  if (e.soCauCuaEm == null) return null
+  const chang = e.soChang != null ? ` · chặng ${e.loDaXong ?? 0}/${e.soChang}` : ''
+  const bb = chuBatBuoc(e.soCauCuaEm, typeof e.soThuSucThem === 'number' ? e.soThuSucThem : null)
+  return bb ? `Bộ của em: ${bb}${chang}` : `Bộ của em: ${e.soCauCuaEm} câu${chang}`
+}
 
 /** Nhãn + lý do của một câu trong bộ của em, đúng chữ bản vẽ (Code 2 dùng cùng bộ chữ cho em). Chỉ mô tả CÂU, không đánh giá em. */
 export function nhanCuaCau(n: NhanCau | undefined): { chu: string; ly: string; loai: 'khoi_dong' | 'loi' | 'rieng' | 'thu_thach' } {
@@ -222,7 +248,7 @@ export function nhanCuaCau(n: NhanCau | undefined): { chu: string; ly: string; l
     case 'thu_thach':
       return { chu: 'Thử thách · sai không sao', ly: '+1 bậc, chỉ ở dạng em đang ổn', loai: 'thu_thach' }
     case 'loi_cao':
-      return { chu: 'Cốt lõi · câu thưởng', ly: 'câu cả lớp cùng làm, cao hơn bậc của em — sai không tính điểm', loai: 'thu_thach' }
+      return { chu: NHAN_THU_SUC_THEM, ly: 'câu cả lớp cùng làm, cao hơn bậc của em — không bắt buộc, sai không sao', loai: 'thu_thach' }
     default:
       return { chu: 'Câu', ly: '', loai: 'loi' }
   }

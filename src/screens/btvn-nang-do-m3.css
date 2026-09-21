@@ -463,6 +463,12 @@
   opacity: 0.85;
   white-space: nowrap;
 }
+.bn-tp-bb {
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: normal;
+  opacity: 1;
+}
 .bn-tp-tong {
   font-size: 19px;
   font-weight: 800;

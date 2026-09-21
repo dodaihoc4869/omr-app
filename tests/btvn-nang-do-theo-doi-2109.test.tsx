@@ -26,6 +26,14 @@ describe('theo dõi bài NÂNG ĐỠ', () => {
     expect(container.textContent).not.toMatch(/xếp hạng|thứ hạng|top \d/i)
   })
 
+  it('BẢN 1.2: em có câu thử sức thêm ⇒ "Bộ của em: bắt buộc N câu · thử sức thêm M câu (không bắt buộc) · chặng a/b"; máy chủ chưa trả / bằng 0 ⇒ chữ cũ', () => {
+    const { container } = dung(bai({ caNhan: true, soLoi: 26 }, [em({ soCauCuaEm: 20, soChang: 4, loDaXong: 2, soThuSucThem: 9 })]))
+    expect((container.querySelector('[data-khoi="nang-do"]') as HTMLElement).textContent).toBe('Bộ của em: bắt buộc 20 câu · thử sức thêm 9 câu (không bắt buộc) · chặng 2/4')
+    cleanup()
+    const c2 = dung(bai({ caNhan: true, soLoi: 26 }, [em({ soCauCuaEm: 20, soChang: 4, loDaXong: 2, soThuSucThem: 0 })])).container
+    expect((c2.querySelector('[data-khoi="nang-do"]') as HTMLElement).textContent).toBe('Bộ của em: 20 câu · chặng 2/4')
+  })
+
   it('em CHƯA mở bài: nói bộ câu chưa chốt — không bịa số câu/chặng', () => {
     const { container } = dung(bai({ caNhan: true, soLoi: 26 }, [em({ soCauCuaEm: null, soChang: null })]))
     const dong = container.querySelector('[data-khoi="nang-do"]') as HTMLElement

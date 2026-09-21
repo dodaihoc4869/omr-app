@@ -6,7 +6,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { CauGiao, TomTatBo } from '../src/lib/btvn-nang-do'
 import type { TeacherExamSource } from '../src/data/examContent'
-import { EM_MOI_LUOT, GHIM_TOI_DA, canhBaoTuMayChu, gioMoChang, hanMacDinhVN, maDangCuaThay, mucSo, nhanCuaCau, taoCauGiao, taoHatGiong } from '../src/lib/btvn-nang-do-thay'
+import { EM_MOI_LUOT, GHIM_TOI_DA, batBuocVaThuSucThem, canhBaoTuMayChu, chuBatBuoc, chuBoCuaEm, gioMoChang, hanMacDinhVN, maDangCuaThay, mucSo, nhanCuaCau, taoCauGiao, taoHatGiong } from '../src/lib/btvn-nang-do-thay'
 import KhoiCaNhanHoa from '../src/components/KhoiCaNhanHoa'
 import XemTruocPhanBo from '../src/components/XemTruocPhanBo'
 
@@ -84,7 +84,7 @@ describe('taoCauGiao — câu của các tờ đề đã tick, kèm dạng/mức
     expect(nhanCuaCau('dang_yeu').chu).toBe('Dành riêng cho em')
     expect(nhanCuaCau('cung_co').chu).toBe('Dành riêng cho em')
     expect(nhanCuaCau('thu_thach').chu).toBe('Thử thách · sai không sao')
-    expect(nhanCuaCau('loi_cao').chu).toBe('Cốt lõi · câu thưởng') // câu lõi cao hơn bậc em (Boss thêm 21/09)
+    expect(nhanCuaCau('loi_cao').chu).toBe('Câu cốt lõi · thử sức thêm (sai không sao)') // bản 1.2 (Boss 21/09): trước là "Cốt lõi · câu thưởng"
     expect(taoHatGiong().length).toBeLessThanOrEqual(40)
     expect(taoHatGiong()).not.toBe(taoHatGiong())
   })
@@ -117,7 +117,7 @@ describe('xemTruocPhanBo + giaoBtvn — hợp đồng máy chủ, không giả s
     expect(kq).toMatchObject({ hatGiong: 'gHAT', soCauBai: 80, soLoi: 26, loi: ['Q1', 'Q2'] })
     expect(kq.ds).toHaveLength(1) // dòng thiếu sbd / tomTat bị bỏ
     expect(kq.ds[0]).toMatchObject({ sbd: '1', coHoSo: false, daChot: false })
-    expect(kq.chiTiet).toEqual({ sbd: '1', chang: [['Q1', 'Q2'], ['Q3']], nhan: { Q1: 'loi' }, lich: [], theoGio: false }) // máy chủ chưa trả lịch ⇒ rỗng, không theo giờ
+    expect(kq.chiTiet).toEqual({ sbd: '1', chang: [['Q1', 'Q2'], ['Q3']], nhan: { Q1: 'loi' }, thuSucThem: [], lich: [], theoGio: false }) // máy chủ chưa trả lịch ⇒ rỗng, không theo giờ
   })
   it('xem trước "trước khi giao": đọc canhBao / boQuaQid / thieuMeta; vắng ⇒ rỗng (không bịa)', async () => {
     stub(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, soLoi: 3, canhBao: 'loi_it_hon_6', boQuaQid: ['Z1', 5], thieuMeta: 2, ds: [] }) }))
@@ -337,13 +337,13 @@ describe('XemTruocPhanBo — bảng từng em + danh sách câu', () => {
     expect(container.textContent).not.toMatch(/xếp hạng|top \d|thứ nhất/i)
   })
 
-  it('em đầu có sẵn danh sách câu theo chặng + nhãn lý do (Khởi động / Cốt lõi / Dành riêng / Thử thách / Cốt lõi · câu thưởng); em khác → gọi lại xin chi tiết đúng em ấy', async () => {
+  it('em đầu có sẵn danh sách câu theo chặng + nhãn lý do (Khởi động / Cốt lõi / Dành riêng / Thử thách / Câu cốt lõi · thử sức thêm); em khác → gọi lại xin chi tiết đúng em ấy', async () => {
     m.xemTruoc.mockResolvedValueOnce(KQ).mockResolvedValueOnce({ ...KQ, ds: [KQ.ds[1]], chiTiet: { sbd: '034', chang: [['Q1']], nhan: { Q1: 'khoi_dong' } } })
     const { container } = dung()
     await screen.findByRole('button', { name: /Trần Thu Hà/ })
     const ct = () => container.querySelector('.bn-tp-chi-tiet') as HTMLElement
     expect([...ct().querySelectorAll('.bn-tp-chang-ten')].map((x) => x.textContent)).toEqual(['Chặng 1 · 2 câu', 'Chặng 2 · 3 câu'])
-    expect([...ct().querySelectorAll('.bn-tp-cau .bn-chip')].map((x) => x.textContent)).toEqual(['Khởi động', 'Dành riêng cho em', 'Cốt lõi', 'Thử thách · sai không sao', 'Cốt lõi · câu thưởng'])
+    expect([...ct().querySelectorAll('.bn-tp-cau .bn-chip')].map((x) => x.textContent)).toEqual(['Khởi động', 'Dành riêng cho em', 'Cốt lõi', 'Thử thách · sai không sao', 'Câu cốt lõi · thử sức thêm (sai không sao)'])
     expect(ct().textContent).toContain('dạng em đang yếu · đúng bậc của em')
     expect(ct().textContent).toContain('Câu 1 ·') // số thứ tự trong đề, không lộ qid
     fireEvent.click(screen.getByRole('button', { name: /Nguyễn Minh Khôi/ }))
@@ -417,5 +417,102 @@ describe('nguồn: PhanCongScreen', () => {
       expect(t, f).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
       if (f.endsWith('.css')) expect(t).not.toContain('!important')
     }
+  })
+})
+
+
+// ---------------------------------------------------------------- BẢN 1.2: bắt buộc / thử sức thêm
+describe('BẢN 1.2 — "bắt buộc N câu · thử sức thêm M câu (không bắt buộc)"', () => {
+  it('batBuocVaThuSucThem / chuBatBuoc: chỉ nói phần máy chủ CÓ; thử sức thêm 0 hoặc vắng ⇒ không thêm chữ thừa', () => {
+    expect(batBuocVaThuSucThem({ tong: 20, soBatBuoc: 20, soThuSucThem: 9 })).toEqual({ batBuoc: 20, thuSucThem: 9 })
+    expect(batBuocVaThuSucThem({ tong: 20 })).toEqual({ batBuoc: 20, thuSucThem: null }) // máy chủ chưa trả ⇒ null, KHÔNG bịa 0
+    expect(batBuocVaThuSucThem({ tong: 20, soThuSucThem: -1 })).toEqual({ batBuoc: 20, thuSucThem: null })
+    expect(batBuocVaThuSucThem({ tong: 20, soBatBuoc: 18 })).toEqual({ batBuoc: 18, thuSucThem: null })
+    expect(chuBatBuoc(20, 9)).toBe('bắt buộc 20 câu · thử sức thêm 9 câu (không bắt buộc)')
+    expect(chuBatBuoc(20, 0)).toBe('')
+    expect(chuBatBuoc(20, null)).toBe('')
+  })
+
+  it('chuBoCuaEm (tab theo dõi): chưa mở ⇒ null; có thử sức thêm ⇒ "Bộ của em: bắt buộc … · chặng a/b"; không ⇒ chữ cũ', () => {
+    expect(chuBoCuaEm({ soCauCuaEm: null })).toBeNull()
+    expect(chuBoCuaEm({ soCauCuaEm: 40, soChang: 6, loDaXong: 0 })).toBe('Bộ của em: 40 câu · chặng 0/6')
+    expect(chuBoCuaEm({ soCauCuaEm: 20, soChang: 4, loDaXong: 2, soThuSucThem: 9 })).toBe('Bộ của em: bắt buộc 20 câu · thử sức thêm 9 câu (không bắt buộc) · chặng 2/4')
+    expect(chuBoCuaEm({ soCauCuaEm: 20, soChang: 4, soThuSucThem: 0 })).toBe('Bộ của em: 20 câu · chặng 0/4')
+    expect(chuBoCuaEm({ soCauCuaEm: 20, soThuSucThem: 3 })).toBe('Bộ của em: bắt buộc 20 câu · thử sức thêm 3 câu (không bắt buộc)')
+  })
+
+  describe('lệnh xem trước', () => {
+    beforeEach(() => {
+      vi.resetModules()
+      vi.doMock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }) }))
+      vi.doMock('../src/lib/exam-db', () => ({ loadTeacherSecret: async () => 'mat-thu' }))
+    })
+    const chay = async () => (await vi.importActual<typeof import('../src/lib/btvn-nang-do-thay')>('../src/lib/btvn-nang-do-thay')).xemTruocPhanBo({ dsSbd: ['1'], dsMaDe: ['D1'], cau: cauMau(3), ghim: [], hanNop: '2026-09-27T15:00:00Z', hatGiong: 'gHAT', sbdChiTiet: '1' })
+    it('đọc chiTiet.thuSucThem (qid) và giữ tomTat.soThuSucThem/soBatBuoc; vắng ⇒ []', async () => {
+      const tomTat = { tong: 20, soLoi: 14, soRieng: 6, soThuThach: 0, soLoiCao: 9, soThuSucThem: 9, soBatBuoc: 20, soBiet: 10, soHieu: 8, soVanDung: 2, soChang: 4, soDangYeu: 2, soDangYeuDuCau: 2, nganSachCau: 20 }
+      vi.stubGlobal('fetch', async () => ({ ok: true, status: 200, json: async () => ({ ok: true, ds: [{ sbd: '1', hoTen: 'A', tomTat }], chiTiet: { sbd: '1', chang: [['Q1'], ['Q2']], nhan: {}, thuSucThem: ['Q9', 7, 'Q8'] } }) }))
+      const kq = await chay()
+      expect(kq.chiTiet!.thuSucThem).toEqual(['Q9', '7', 'Q8'])
+      expect(kq.ds[0].tomTat.soThuSucThem).toBe(9)
+      expect(kq.ds[0].tomTat.soBatBuoc).toBe(20)
+      vi.stubGlobal('fetch', async () => ({ ok: true, status: 200, json: async () => ({ ok: true, ds: [], chiTiet: { sbd: '1', chang: [['Q1']], nhan: {} } }) }))
+      expect((await chay()).chiTiet!.thuSucThem).toEqual([])
+    })
+  })
+
+  describe('màn Xem trước', () => {
+    const dau = { dsMaDe: ['D1'], cau: cauMau(6), ghim: [] as string[], hanNop: '2026-09-27T15:00:00Z', hatGiong: 'gHAT' }
+    const dung = () => render(<XemTruocPhanBo dau={dau} dsSbd={['007', '034', '015']} cau={cauMau(6)} dangGiao={false} onDong={vi.fn()} onGiao={vi.fn()} />)
+    const kq12 = () => ({
+      ...KQ,
+      ds: [
+        em('007', 'Trần Thu Hà', tt(20, { soLoi: 14, soRieng: 6, soThuThach: 0, soChang: 4, soBatBuoc: 20, soThuSucThem: 9, soLoiCao: 9 })),
+        em('034', 'Nguyễn Minh Khôi', tt(29, { soBatBuoc: 29, soThuSucThem: 0 })),
+        em('015', 'Đỗ Khánh Linh', tt(40, { soDangYeu: 0 }), false), // máy chủ chưa trả hai số này
+      ],
+      chiTiet: { sbd: '007', chang: [['Q1', 'Q3'], ['Q2', 'Q4']], nhan: { Q1: 'khoi_dong', Q3: 'dang_yeu', Q2: 'loi', Q4: 'thu_thach', Q5: 'loi_cao', Q6: 'loi_cao' }, thuSucThem: ['Q5', 'Q6'], lich: [], theoGio: false },
+    })
+
+    it('mỗi em có thử sức thêm: "bắt buộc N câu · thử sức thêm M câu (không bắt buộc)"; cột đầu đổi thành BẮT BUỘC; em không có (0 / máy chủ chưa trả) ⇒ KHÔNG thêm chữ', async () => {
+      m.xemTruoc.mockResolvedValue(kq12())
+      const { container } = dung()
+      await screen.findByRole('button', { name: /Trần Thu Hà/ })
+      expect(container.querySelector('.bn-tp-hang--dau')!.textContent).toContain('BẮT BUỘC')
+      expect(container.querySelector('.bn-tp-hang--dau')!.textContent).not.toContain('TỔNG')
+      const hang = [...container.querySelectorAll('.bn-tp-hang:not(.bn-tp-hang--dau)')]
+      expect(hang[0].querySelector('[data-khoi="bat-buoc-thu-suc"]')!.textContent).toBe('bắt buộc 20 câu · thử sức thêm 9 câu (không bắt buộc)')
+      expect(hang[0].querySelector('.bn-tp-tong')!.textContent).toBe('20')
+      expect(hang[1].querySelector('[data-khoi="bat-buoc-thu-suc"]')).toBeNull()
+      expect(hang[2].querySelector('[data-khoi="bat-buoc-thu-suc"]')).toBeNull()
+    })
+
+    it('chi tiết em: dòng tóm tắt có "thử sức thêm"; nhóm THỬ SỨC THÊM đứng SAU chặng cuối, tách riêng, nhãn "Câu cốt lõi · thử sức thêm (sai không sao)"; câu thử sức thêm KHÔNG nằm trong chặng nào', async () => {
+      m.xemTruoc.mockResolvedValue(kq12())
+      const { container } = dung()
+      await screen.findByRole('button', { name: /Trần Thu Hà/ })
+      const ct = container.querySelector('.bn-tp-chi-tiet') as HTMLElement
+      expect(ct.querySelector('.bn-phu')!.textContent).toBe('20 câu bắt buộc · 4 chặng · lõi 14 + riêng 6 · thử thách 0 · thử sức thêm 9 câu (không bắt buộc)')
+      const khoi = [...ct.querySelectorAll('.bn-tp-chang-khoi')]
+      expect(khoi.map((k) => k.querySelector('h4')!.textContent)).toEqual(['Chặng 1 · 2 câu', 'Chặng 2 · 2 câu', 'Thử sức thêm · 2 câu · không bắt buộc · mở cùng chặng cuối'])
+      const nhom = ct.querySelector('[data-khoi="thu-suc-them"]') as HTMLElement
+      expect(khoi[khoi.length - 1]).toBe(nhom) // đứng cuối, sau chặng cuối
+      expect([...nhom.querySelectorAll('.bn-tp-cau .bn-chip')].map((x) => x.textContent)).toEqual(['Câu cốt lõi · thử sức thêm (sai không sao)', 'Câu cốt lõi · thử sức thêm (sai không sao)'])
+      expect(nhom.textContent).toContain('Không tính vào điều kiện xong chặng hay xong bài')
+      expect(nhom.textContent).toContain('sai hay bỏ qua đều không sao và không hẹn ôn lại')
+      // hai chặng chỉ chứa câu bắt buộc: Q5/Q6 (thử sức thêm) không lọt vào
+      expect(khoi[0].querySelectorAll('.bn-tp-cau')).toHaveLength(2)
+      expect(khoi[1].querySelectorAll('.bn-tp-cau')).toHaveLength(2)
+    })
+
+    it('MÁY CHỦ CHƯA CÓ TRƯỜNG MỚI ⇒ như cũ: cột "TỔNG", không chữ "bắt buộc/thử sức thêm", không nhóm riêng', async () => {
+      m.xemTruoc.mockResolvedValue(KQ)
+      const { container } = dung()
+      await screen.findByRole('button', { name: /Trần Thu Hà/ })
+      expect(container.querySelector('.bn-tp-hang--dau')!.textContent).toContain('TỔNG')
+      expect(container.querySelector('.bn-tp-bang')!.textContent).not.toMatch(/bắt buộc/) // bảng từng em (lý do của câu loi_cao ở chi tiết có chữ "không bắt buộc" — đó là lý do CỦA CÂU)
+      expect(container.querySelector('[data-khoi="bat-buoc-thu-suc"]')).toBeNull() // (nhãn của câu loi_cao trong chặng — máy chủ cũ — vẫn có chữ "thử sức thêm": đó là NHÃN CÂU, không phải số của em)
+      expect(container.querySelector('[data-khoi="thu-suc-them"]')).toBeNull()
+      expect(container.querySelector('.bn-tp-chi-tiet .bn-phu')!.textContent).toBe('46 câu · 7 chặng · lõi 26 + riêng 15 · thử thách 5')
+    })
   })
 })

@@ -56,6 +56,8 @@ export interface DongTheoDoiBtvn {
     thuHoi: boolean
     /** Bài nâng đỡ: số câu CỦA EM (null = em chưa mở bài, bộ chưa chốt) · số chặng · chặng đã xong · đúng/lõi (so lớp CHỈ trên lõi) · câu thưởng em sai (không vào điểm). */
     soCauCuaEm?: number | null
+    /** BẢN 1.2: số câu "thử sức thêm — không bắt buộc" của em (KHÔNG nằm trong `soCauCuaEm` / chặng). Vắng ⇒ bài chưa có luật 1.2 (màn giữ cách hiện cũ). */
+    soThuSucThem?: number | null
     soChang?: number | null
     loDaXong?: number | null
     soDungLoi?: number | null

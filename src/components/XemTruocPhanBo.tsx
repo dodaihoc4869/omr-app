@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import type { CauGiao } from '../lib/btvn-nang-do'
-import { EM_MOI_LUOT, TEN_MUC, canhBaoTuMayChu, gioMoChang, nhanCuaCau, xemTruocPhanBo, type ChiTietEmXemTruoc, type DauVaoXemTruoc, type EmXemTruoc } from '../lib/btvn-nang-do-thay'
+import { EM_MOI_LUOT, NHAN_THU_SUC_THEM, TEN_MUC, batBuocVaThuSucThem, canhBaoTuMayChu, chuBatBuoc, gioMoChang, nhanCuaCau, xemTruocPhanBo, type ChiTietEmXemTruoc, type DauVaoXemTruoc, type EmXemTruoc } from '../lib/btvn-nang-do-thay'
 import '../screens/btvn-nang-do-m3.css'
 
 /** XEM TRƯỚC PHÂN BỔ (bản vẽ docs/ban-ve-btvn-nang-do-2109/2-xem-truoc-phan-bo.jpg, thầy duyệt 21/09): tấm phủ toàn màn — bảng từng em (tổng · lõi/riêng · bậc Biết/Hiểu/Vận dụng · số
@@ -96,6 +96,9 @@ export default function XemTruocPhanBo({
 
   const em = ds.find((x) => x.sbd === chon)
   const ct = chiTiet[chon]
+  const thuSucThem = ct?.thuSucThem ?? [] // adapter luôn trả mảng; `?? []` chỉ để chịu được dữ liệu dựng tay/cũ
+  // BẢN 1.2: máy chủ trả `soThuSucThem` ⇒ cột đầu là "BẮT BUỘC"; chưa trả ⇒ như cũ ("TỔNG").
+  const coBanMoi = ds.some((x) => batBuocVaThuSucThem(x.tomTat).thuSucThem != null)
   const moTaCau = (qid: string) => {
     const v = viTri.get(qid)
     return v ? `Câu ${v.so} · ${v.c.chuyenDe || (v.c.dang ?? 'chưa gắn dạng')} · ${TEN_MUC[v.c.mucDo]} · phần ${v.c.phan}` : qid
@@ -151,13 +154,15 @@ export default function XemTruocPhanBo({
           <section className="bn-tp-bang" aria-label="Bảng phân bổ từng em">
             <div className="bn-tp-hang bn-tp-hang--dau" aria-hidden="true">
               <span>HỌC SINH</span>
-              <span>TỔNG</span>
+              <span>{coBanMoi ? 'BẮT BUỘC' : 'TỔNG'}</span>
               <span>LÕI / RIÊNG</span>
               <span>BẬC</span>
               <span>CHẶNG</span>
             </div>
             {ds.map((x) => {
               const t = x.tomTat
+              const bb = batBuocVaThuSucThem(t)
+              const chuBB = chuBatBuoc(bb.batBuoc, bb.thuSucThem)
               return (
                 <button key={x.sbd} type="button" className={`bn-tp-hang${x.sbd === chon ? ' bn-tp-hang--chon' : ''}`} aria-pressed={x.sbd === chon} onClick={() => void chonEm(x.sbd)}>
                   <span className="bn-tp-ten">
@@ -166,8 +171,13 @@ export default function XemTruocPhanBo({
                     {!x.coHoSo && <em className="bn-chip bn-chip--trung bn-chip--nho">chưa có hồ sơ</em>}
                     {x.coHoSo && t.soDangYeu > 0 && <em className="bn-chip bn-chip--loi bn-chip--nho">đang yếu {t.soDangYeu} dạng</em>}
                     {x.daChot && <em className="bn-chip bn-chip--tot bn-chip--nho">đã chốt</em>}
+                    {chuBB && (
+                      <small className="bn-tp-bb" data-khoi="bat-buoc-thu-suc">
+                        {chuBB}
+                      </small>
+                    )}
                   </span>
-                  <span className="bn-tp-tong">{t.tong}</span>
+                  <span className="bn-tp-tong">{bb.batBuoc}</span>
                   <span className="bn-tp-thanh">
                     <i className="bn-tp-thanh-nen" aria-hidden="true">
                       <i style={{ width: `${(t.soLoi / Math.max(1, t.tong)) * 100}%` }} className="bn-tp-doan bn-tp-doan--loi" />
@@ -214,7 +224,8 @@ export default function XemTruocPhanBo({
                 {em.hoTen || `SBD ${em.sbd}`} <small>· {em.sbd}</small>
               </h3>
               <p className="bn-phu">
-                {em.tomTat.tong} câu · {em.tomTat.soChang} chặng · lõi {em.tomTat.soLoi} + riêng {em.tomTat.soRieng} · thử thách {em.tomTat.soThuThach}
+                {batBuocVaThuSucThem(em.tomTat).thuSucThem != null ? `${batBuocVaThuSucThem(em.tomTat).batBuoc} câu bắt buộc` : `${em.tomTat.tong} câu`} · {em.tomTat.soChang} chặng · lõi {em.tomTat.soLoi} + riêng {em.tomTat.soRieng} · thử thách {em.tomTat.soThuThach}
+                {chuBatBuoc(batBuocVaThuSucThem(em.tomTat).batBuoc, batBuocVaThuSucThem(em.tomTat).thuSucThem) && ` · thử sức thêm ${batBuocVaThuSucThem(em.tomTat).thuSucThem} câu (không bắt buộc)`}
               </p>
               {!ct && dangTaiCT && <p className="bn-phu">Đang tải danh sách câu…</p>}
               {ct?.theoGio && (
@@ -244,6 +255,23 @@ export default function XemTruocPhanBo({
                 </div>
                 )
               })}
+              {thuSucThem.length > 0 && (
+                <div className="bn-tp-chang-khoi" data-khoi="thu-suc-them">
+                  <h4 className="bn-tp-chang-ten">
+                    Thử sức thêm <small>· {thuSucThem.length} câu · không bắt buộc · mở cùng chặng cuối</small>
+                  </h4>
+                  <p className="bn-phu">Không tính vào điều kiện xong chặng hay xong bài. Em làm đúng thì được cộng; sai hay bỏ qua đều không sao và không hẹn ôn lại.</p>
+                  {thuSucThem.map((qid) => (
+                    <div key={qid} className="bn-tp-cau">
+                      <div className="bn-tp-cau-chu">
+                        <span>{moTaCau(qid)}</span>
+                        <small>{nhanCuaCau('loi_cao').ly}</small>
+                      </div>
+                      <span className="bn-chip bn-chip--nhan-thu_thach bn-chip--nho">{NHAN_THU_SUC_THEM}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </section>
           )}
         </div>

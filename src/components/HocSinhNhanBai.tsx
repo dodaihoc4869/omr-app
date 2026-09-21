@@ -1,6 +1,7 @@
 import BaiNopBtvn from './BaiNopBtvn'
 import { useState } from 'react'
 import type { DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
+import { chuBoCuaEm } from '../lib/btvn-nang-do-thay'
 
 export default function HocSinhNhanBai({
   bai,
@@ -32,6 +33,7 @@ export default function HocSinhNhanBai({
       soCau: null,
       thuHoi: false,
       soCauCuaEm: null,
+      soThuSucThem: null,
       soChang: null,
       loDaXong: null,
       soDungLoi: null,
@@ -174,13 +176,7 @@ export default function HocSinhNhanBai({
               {/* BÀI NÂNG ĐỠ: bộ câu riêng, chặng, so lớp CHỈ trên lõi — toàn SỐ ĐẾM, không xếp hạng em với em. */}
               {bai.caNhan && (
                 <p className="bn-theo-doi-em" data-khoi="nang-do">
-                  {e.soCauCuaEm == null ? (
-                    <span>Chưa mở bài — bộ câu chưa chốt</span>
-                  ) : (
-                    <span>
-                      Bộ của em: {e.soCauCuaEm} câu{e.soChang != null ? ` · chặng ${e.loDaXong ?? 0}/${e.soChang}` : ''}
-                    </span>
-                  )}
+                  {e.soCauCuaEm == null ? <span>Chưa mở bài — bộ câu chưa chốt</span> : <span>{chuBoCuaEm(e)}</span>}
                   {e.soCauLoi != null && e.soCauLoi > 0 && typeof e.soDungLoi === 'number' && (
                     <span>
                       Lõi: {e.soDungLoi}/{e.soCauLoi}
