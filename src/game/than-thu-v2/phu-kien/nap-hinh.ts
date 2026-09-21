@@ -25,6 +25,22 @@ const NAP: Record<string, Nap> = {
   'VD-06': () => import('./hinh/pk-vd-06'),
   'VD-07': () => import('./hinh/pk-vd-07'),
   'VD-08': () => import('./hinh/pk-vd-08'),
+  'DA-01': () => import('./hinh/pk-da-01'),
+  'DA-02': () => import('./hinh/pk-da-02'),
+  'DA-03': () => import('./hinh/pk-da-03'),
+  'DA-04': () => import('./hinh/pk-da-04'),
+  'DA-05': () => import('./hinh/pk-da-05'),
+  'DA-06': () => import('./hinh/pk-da-06'),
+  'DA-07': () => import('./hinh/pk-da-07'),
+  'DA-08': () => import('./hinh/pk-da-08'),
+  'CL-01': () => import('./hinh/pk-cl-01'),
+  'CL-02': () => import('./hinh/pk-cl-02'),
+  'CL-03': () => import('./hinh/pk-cl-03'),
+  'CL-04': () => import('./hinh/pk-cl-04'),
+  'CL-05': () => import('./hinh/pk-cl-05'),
+  'CL-06': () => import('./hinh/pk-cl-06'),
+  'CL-07': () => import('./hinh/pk-cl-07'),
+  'CL-08': () => import('./hinh/pk-cl-08'),
 }
 
 /** Món này đã có tệp hình SVG chưa (khung tên KT-* không cần). */

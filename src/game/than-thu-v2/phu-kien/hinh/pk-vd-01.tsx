@@ -16,8 +16,8 @@ export default function Hinh({ id: _id }: HinhProps) {
     <svg viewBox="0 0 256 96" aria-hidden="true" focusable="false">
       {B.map(([x, y, r]) => (
         <g key={x}>
-          <circle cx={x} cy={y} r={r} className="pk-f2" opacity=".2" />
-          <circle cx={x} cy={y} r={r} fill="none" className="pk-s1" strokeWidth={Math.max(1.2, r * 0.13)} opacity=".9" />
+          <circle cx={x} cy={y} r={r} className="pk-f2" opacity=".34" />
+          <circle cx={x} cy={y} r={r} fill="none" className="pk-s1" strokeWidth={Math.max(1.8, r * 0.17)} opacity="1" />
           <circle cx={x - r * 0.36} cy={y - r * 0.36} r={r * 0.22} className="pk-f3" />
         </g>
       ))}

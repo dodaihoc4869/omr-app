@@ -10,10 +10,10 @@ export default function Hinh({ id: _id }: HinhProps) {
   return (
     <svg viewBox="0 0 256 96" aria-hidden="true" focusable="false">
       {VONG.map(([x, y, r], i) => (
-        <g key={x} opacity={1 - i * 0.22}>
-          <ellipse cx={x} cy={y} rx={r} ry={r * 0.32} className="pk-f1" opacity=".16" />
-          <ellipse cx={x} cy={y} rx={r} ry={r * 0.32} fill="none" className="pk-s1" strokeWidth="2" opacity=".7" />
-          <ellipse cx={x} cy={y} rx={r * 0.55} ry={r * 0.17} fill="none" className="pk-s2" strokeWidth="1.4" opacity=".55" />
+        <g key={x} opacity={1 - i * 0.16}>
+          <ellipse cx={x} cy={y} rx={r} ry={r * 0.32} className="pk-f1" opacity=".3" />
+          <ellipse cx={x} cy={y} rx={r} ry={r * 0.32} fill="none" className="pk-s1" strokeWidth="2.6" opacity=".95" />
+          <ellipse cx={x} cy={y} rx={r * 0.55} ry={r * 0.17} fill="none" className="pk-s2" strokeWidth="1.8" opacity=".85" />
         </g>
       ))}
       <g transform="translate(224 34)">
