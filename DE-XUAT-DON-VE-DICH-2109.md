@@ -1,6 +1,6 @@
 # ĐỀ XUẤT — "DỒN VỀ ĐÍCH": việc ngày nào chưa xong thì hôm sau hiện đủ, tính lại theo GIỜ, bắt buộc xong trước hạn nộp
 
-Boss soạn · 21/09/2026 · CHỜ THẦY CHỐT (có mẫu màn hình đi kèm). Thầy lệnh: "Nếu học sinh không hoàn thành deadline ngày thì ngày hôm sau hiện tính toán theo giờ để gộp dồn về cuối, phải hoàn thành hết; các ngày sau phải hiện đủ ngày trước chưa làm; thiết kế hiển thị lại đẹp mắt, xịn xò, kích thích làm. Tính toán thông minh, chu đáo nhất."
+Boss soạn · 21/09/2026 · **THẦY ĐÃ CHỐT HẾT 14:13 ("Chốt B và chốt hết build") — Điều 4 = phương án B (nộp trễ, vẫn phải làm nốt).** Build theo `prompt-don-ve-dich-2109.md`. Thầy lệnh: "Nếu học sinh không hoàn thành deadline ngày thì ngày hôm sau hiện tính toán theo giờ để gộp dồn về cuối, phải hoàn thành hết; các ngày sau phải hiện đủ ngày trước chưa làm; thiết kế hiển thị lại đẹp mắt, xịn xò, kích thích làm. Tính toán thông minh, chu đáo nhất."
 
 ## 0 · HIỆN TRẠNG (đã dò mã, có tệp:dòng trong sổ của Boss)
 | Chỗ | Hiện nay | Hệ quả |
