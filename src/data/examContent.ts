@@ -245,7 +245,7 @@ export function validateTeacherSource(c: TeacherExamSource): string[] {
     q.ideas.forEach((idea, j) => {
       if (!idea.trim()) errors.push(`Phần II câu ${i + 1} ý ${'abcd'[j]}: thiếu nội dung`)
     })
-    if (q.correct.some((v) => !v)) errors.push(`Phần II câu ${i + 1}: chưa đánh dấu đủ Đ/S cho cả 4 ý`)
+    if (q.correct.some((v) => !v)) errors.push(`Phần II câu ${i + 1}: chưa đánh dấu đủ Đúng/Sai cho cả 4 ý`)
   })
   c.phanIII.forEach((q, i) => {
     if (!q.text.trim()) errors.push(`Phần III câu ${i + 1}: thiếu đề bài`)

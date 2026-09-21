@@ -20,6 +20,7 @@ import {
   laDongChiBao,
   lopDangThat,
   moTaNum,
+  tenDangHienThi,
   ngayNgan,
   nhanCuaDong,
   nutCuaDong,
@@ -86,10 +87,15 @@ describe('lớp nối bo-nao-thay — đọc hợp đồng, không đoán', () =
   it('docNhatKy: núm khắc phục, áp dụng, tự gỡ, lời nhắn em + phụ huynh + thư tuần nguyên văn', () => {
     const [x] = docNhatKy({ ds: [{ ngay: '2026-09-22', hetHan: '2026-09-25', cheDo: 'that', doTin: 0.8, nhip: { lech: -2, khoiDong: 3 }, dang: [{ ma: 'ESTE.THUY_PHAN', hanhDong: 'uu_tien', lyDo: 'đúng 7/9 câu' }], khacPhuc: [{ dang: 'ESTE.THUY_PHAN', kieu: 'khac_phuc', soCau: 3, bac: 'thap_hon_mot_bac' }, { dang: 'X', kieu: 'on_som' }], apDung: true, lyDoBo: ['làm lõi không kịp hạn'], tuGo: false, co: 'tut_nhip', loiNhanChoEm: 'Chào em', loiNhanChoPhuHuynh: 'Kính gửi phụ huynh', thuTuan: 'Tuần này…', goiYChoThay: { chu: 'Gọi lên bảng', hanhDong: 'goi_len_bang', dang: 'X' }, ghiChuHlv: 'đang thử', ketQua: 'an_thua', ketQuaChu: 'xong 2/2 chặng', daBo: false }, { chu: 'thiếu ngày' }] })
     expect(x).toMatchObject({ ngay: '2026-09-22', cheDo: 'that', apDung: true, tuGo: false, loiNhanChoEm: 'Chào em', loiNhanChoPhuHuynh: 'Kính gửi phụ huynh', thuTuan: 'Tuần này…', ketQua: 'an_thua' })
-    expect(x.khacPhuc).toEqual([{ dang: 'ESTE.THUY_PHAN', kieu: 'khac_phuc', soCau: 3, bac: 'thap_hon_mot_bac' }, { dang: 'X', kieu: 'on_som', soCau: null, bac: '' }])
-    expect(moTaNum(x)).toEqual({ chinh: 'Nhịp −2 · khởi động 3', phu: ['Ưu tiên: ESTE.THUY_PHAN', 'Khắc phục: ESTE.THUY_PHAN · 3 câu · thấp hơn một bậc', 'Ôn sớm: X'] })
+    expect(x.khacPhuc).toEqual([{ dang: 'ESTE.THUY_PHAN', tenDang: '', kieu: 'khac_phuc', soCau: 3, bac: 'thap_hon_mot_bac' }, { dang: 'X', tenDang: '', kieu: 'on_som', soCau: null, bac: '' }])
+    // 21/09 (từ ngữ hàng 8 + 10): "Khắc phục" → "Ôn lại"; chưa có tên dạng ⇒ "dạng chưa đặt tên (mã …)", KHÔNG mã trơ trọi
+    expect(moTaNum(x)).toEqual({ chinh: 'Nhịp −2 · khởi động 3', phu: ['Ưu tiên: dạng chưa đặt tên (mã ESTE.THUY_PHAN)', 'Ôn lại: dạng chưa đặt tên (mã ESTE.THUY_PHAN) · 3 câu · thấp hơn một bậc', 'Ôn sớm: dạng chưa đặt tên (mã X)'] })
+    // máy chủ có trả tên dạng (`ten` / `tenDang`) ⇒ hiện tên
+    const [y] = docNhatKy({ ds: [{ ngay: '2026-09-22', hetHan: '2026-09-25', cheDo: 'that', doTin: 0.8, nhip: null, dang: [{ ma: 'ESTE.THUY_PHAN', ten: 'Thuỷ phân ester', hanhDong: 'uu_tien', lyDo: '' }], khacPhuc: [{ dang: 'ESTE.THUY_PHAN', tenDang: 'Thuỷ phân ester', kieu: 'khac_phuc', soCau: 3, bac: '' }], co: 'khong' }] })
+    expect(moTaNum(y).phu).toEqual(['Ưu tiên: Thuỷ phân ester', 'Ôn lại: Thuỷ phân ester · 3 câu'])
+    expect(tenDangHienThi('A', '  ')).toBe('dạng chưa đặt tên (mã A)')
     // máy chủ điền nhịp mặc định {lech:0, khoiDong:2} khi bộ não KHÔNG vặn nhịp ⇒ không in "Nhịp ±0"
-    expect(moTaNum({ nhip: { lech: 0, khoiDong: 2 }, dang: [{ ma: 'X', hanhDong: 'uu_tien', lyDo: '' }], co: 'khong' })).toEqual({ chinh: '', phu: ['Ưu tiên: X'] })
+    expect(moTaNum({ nhip: { lech: 0, khoiDong: 2 }, dang: [{ ma: 'X', ten: '', hanhDong: 'uu_tien', lyDo: '' }], co: 'khong' })).toEqual({ chinh: '', phu: ['Ưu tiên: dạng chưa đặt tên (mã X)'] })
     expect(moTaNum({ nhip: { lech: 0, khoiDong: 2 }, dang: [], co: 'khong' }).chinh).toBe('Giữ nguyên')
     expect(moTaNum({ nhip: { lech: 0, khoiDong: 3 }, dang: [], co: 'khong' }).chinh).toBe('Nhịp ±0 · khởi động 3') // vặn khởi động thì vẫn in
     expect(docNhatKy({ ds: [{ ngay: '2026-09-22' }] })[0]).toMatchObject({ loiNhanChoEm: '', loiNhanChoPhuHuynh: '', thuTuan: '', apDung: null, ketQua: null, khacPhuc: [] })

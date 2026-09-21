@@ -62,3 +62,22 @@ describe('CỤM 1 · Giao bài tập về nhà + Xem trước + theo dõi (hàng
     expect(pc).not.toMatch(/>Hủy<\/button>|>Xác nhận<\/button>/)
   })
 })
+
+describe('CỤM 2 · Hồ sơ em / Bộ não / Ngân hàng đề (hàng 8, 10, 15)', () => {
+  it('hàng 8 + 10: hoạt động gọi "Ôn lại" (không "Khắc phục:"); không mã dạng trơ trọi trong nhật ký điều chỉnh', () => {
+    const bn = chuHienRa('src/lib/bo-nao-thay.ts')
+    expect(bn).toContain('`Ôn lại: ${tenDangHienThi(k.dang, k.tenDang)}')
+    expect(bn).not.toContain('`Khắc phục: ')
+    expect(bn).not.toMatch(/: \$\{x\.ma\}`|: \$\{k\.dang\}`/) // mã dạng đi qua tenDangHienThi, không nối thẳng
+    // "đã khắc phục" (trạng thái) và "Khắc phục sau ca" (phiếu quen) GIỮ — không khoá ở đây
+  })
+
+  it('hàng 15: Ngân hàng đề viết đầy đủ "Trắc nghiệm · Đúng–sai · Trả lời ngắn" (không TN / Đ/S / TLN); lỗi soạn đề nói "Đúng/Sai"', () => {
+    const nh = chuHienRa('src/screens/NganHangDeScreen.tsx')
+    expect(nh).toContain('· Trắc nghiệm {s.phanI.length}')
+    expect(nh).toContain('· Đúng–sai {s.phanII.length}')
+    expect(nh).toContain('· Trả lời ngắn {s.phanIII.length}')
+    expect(nh).not.toMatch(/· TN \{|· Đ\/S \{|· TLN \{/)
+    expect(chuHienRa('src/data/examContent.ts')).toContain('chưa đánh dấu đủ Đúng/Sai cho cả 4 ý')
+  })
+})

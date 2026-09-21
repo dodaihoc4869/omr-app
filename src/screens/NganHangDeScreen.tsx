@@ -513,7 +513,7 @@ export default function NganHangDeScreen() {
                     tích riêng. Kho vẫn giữ MỘT bản đề: id từng câu không đổi,
                     chấm bài và lịch sử ca cũ không đụng gì. */}
                 <div className="flex flex-wrap gap-2 text-xs text-slate-600 dark:text-slate-300">
-                  <span>{s.phanI.length + s.phanII.length + s.phanIII.length} câu</span><span>· TN {s.phanI.length}</span><span>· Đ/S {s.phanII.length}</span><span>· TLN {s.phanIII.length}</span>
+                  <span>{s.phanI.length + s.phanII.length + s.phanIII.length} câu</span><span>· Trắc nghiệm {s.phanI.length}</span><span>· Đúng–sai {s.phanII.length}</span><span>· Trả lời ngắn {s.phanIII.length}</span>
                 </div>
                 <details><summary className="cursor-pointer text-xs font-semibold text-blue-600">Chi tiết đề</summary>
                 <div className="grid" style={{ gap: 'var(--k2)', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>

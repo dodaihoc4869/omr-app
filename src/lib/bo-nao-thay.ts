@@ -56,7 +56,8 @@ export interface DongNhatKy {
   cheDo: CheDoBoNao
   doTin: number
   nhip: { lech: number; khoiDong: number } | null
-  dang: { ma: string; hanhDong: string; lyDo: string }[]
+  /** `ten` = tên dạng do máy chủ trả cạnh mã (Code 3, đề nghị 21/09); vắng ⇒ màn nói "dạng chưa đặt tên (mã …)". */
+  dang: { ma: string; ten: string; hanhDong: string; lyDo: string }[]
   co: string
   loiNhanChoEm: string
   /** NGUYÊN VĂN lời cho phụ huynh (chỉ khi đáng) và thư tuần — thầy xem lại được cả hai; chạy thử thì CHƯA gửi. Vắng ⇒ rỗng. */
@@ -65,7 +66,7 @@ export interface DongNhatKy {
   goiYChoThay: { chu: string; hanhDong: string; dang: string } | null
   ghiChuHlv: string
   /** Núm KHẮC PHỤC LUÔN (rút câu cùng dạng chưa giao / kéo ôn về sớm) — thuật toán thực hiện, AI chỉ chọn dạng. */
-  khacPhuc: { dang: string; kieu: 'khac_phuc' | 'on_som'; soCau: number | null; bac: string }[]
+  khacPhuc: { dang: string; tenDang: string; kieu: 'khac_phuc' | 'on_som'; soCau: number | null; bac: string }[]
   /** Đã ÁP cho em (chế độ thật + tin cậy đủ + chưa gỡ). `null` = máy chủ chưa nói. */
   apDung: boolean | null
   /** Núm bị lõi BTVN bỏ vì làm lõi không kịp hạn (deadline thắng mọi núm). */
@@ -137,14 +138,14 @@ export function docNhatKy(j: Record<string, unknown>): DongNhatKy[] {
         cheDo: cheDo(x.cheDo),
         doTin: so(x.doTin) ?? 0,
         nhip: nhip && so(nhip.lech) !== null && so(nhip.khoiDong) !== null ? { lech: so(nhip.lech)!, khoiDong: so(nhip.khoiDong)! } : null,
-        dang: Array.isArray(x.dang) ? (x.dang as Record<string, unknown>[]).map((d) => ({ ma: chu(d.ma), hanhDong: chu(d.hanhDong), lyDo: chu(d.lyDo) })) : [],
+        dang: Array.isArray(x.dang) ? (x.dang as Record<string, unknown>[]).map((d) => ({ ma: chu(d.ma), ten: chu(d.ten) || chu(d.tenDang), hanhDong: chu(d.hanhDong), lyDo: chu(d.lyDo) })) : [],
         co: chu(x.co),
         loiNhanChoEm: chu(x.loiNhanChoEm),
         loiNhanChoPhuHuynh: chu(x.loiNhanChoPhuHuynh),
         thuTuan: chu(x.thuTuan),
         goiYChoThay: gy && chu(gy.chu) ? { chu: chu(gy.chu), hanhDong: chu(gy.hanhDong), dang: chu(gy.dang) } : null,
         ghiChuHlv: chu(x.ghiChuHlv),
-        khacPhuc: Array.isArray(x.khacPhuc) ? (x.khacPhuc as Record<string, unknown>[]).map((k) => ({ dang: chu(k.dang), kieu: k.kieu === 'on_som' ? ('on_som' as const) : ('khac_phuc' as const), soCau: so(k.soCau), bac: chu(k.bac) })) : [],
+        khacPhuc: Array.isArray(x.khacPhuc) ? (x.khacPhuc as Record<string, unknown>[]).map((k) => ({ dang: chu(k.dang), tenDang: chu(k.tenDang) || chu(k.ten), kieu: k.kieu === 'on_som' ? ('on_som' as const) : ('khac_phuc' as const), soCau: so(k.soCau), bac: chu(k.bac) })) : [],
         apDung: typeof x.apDung === 'boolean' ? x.apDung : null,
         lyDoBo: Array.isArray(x.lyDoBo) ? (x.lyDoBo as unknown[]).map(String) : [],
         tuGo: x.tuGo === true,
@@ -309,13 +310,18 @@ export function ngayNgan(iso: string): string {
   return m ? `${m[3]}/${m[2]}` : iso
 }
 
-/** Chữ mô tả "núm" cho thầy: "Nhịp −2 · khởi động 3" + các dạng ("Ưu tiên: <mã>"). */
+/** Tên dạng cho thầy: có tên máy chủ trả thì dùng; CHƯA có ⇒ "dạng chưa đặt tên (mã …)" (không để mã trơ trọi — chuẩn từ ngữ luật 4). */
+export function tenDangHienThi(ma: string, ten?: string): string {
+  return ten && ten.trim() ? ten.trim() : `dạng chưa đặt tên (mã ${ma})`
+}
+
+/** Chữ mô tả "núm" cho thầy: "Nhịp −2 · khởi động 3" + các dạng ("Ưu tiên: <tên dạng>", "Ôn lại: <tên dạng>"). */
 export function moTaNum(d: Pick<DongNhatKy, 'nhip' | 'dang' | 'co'> & Partial<Pick<DongNhatKy, 'khacPhuc'>>): { chinh: string; phu: string[] } {
   // Máy chủ điền nhịp mặc định {lech:0, khoiDong:2} khi bộ não KHÔNG vặn nhịp ⇒ không in "Nhịp ±0" như một thay đổi.
   const coVanNhip = d.nhip != null && !(d.nhip.lech === 0 && d.nhip.khoiDong === 2)
   const chinh = coVanNhip && d.nhip ? `Nhịp ${d.nhip.lech > 0 ? '+' : d.nhip.lech < 0 ? '−' : '±'}${Math.abs(d.nhip.lech)} · khởi động ${d.nhip.khoiDong}` : d.dang.length > 0 || (d.khacPhuc?.length ?? 0) > 0 ? '' : 'Giữ nguyên'
-  const phu = d.dang.map((x) => `${TEN_HANH_DONG_DANG[x.hanhDong] ?? x.hanhDong}: ${x.ma}`)
-  for (const k of d.khacPhuc ?? []) phu.push(k.kieu === 'on_som' ? `Ôn sớm: ${k.dang}` : `Khắc phục: ${k.dang}${k.soCau ? ` · ${k.soCau} câu` : ''}${k.bac === 'thap_hon_mot_bac' ? ' · thấp hơn một bậc' : ''}`)
+  const phu = d.dang.map((x) => `${TEN_HANH_DONG_DANG[x.hanhDong] ?? x.hanhDong}: ${tenDangHienThi(x.ma, x.ten)}`)
+  for (const k of d.khacPhuc ?? []) phu.push(k.kieu === 'on_som' ? `Ôn sớm: ${tenDangHienThi(k.dang, k.tenDang)}` : `Ôn lại: ${tenDangHienThi(k.dang, k.tenDang)}${k.soCau ? ` · ${k.soCau} câu` : ''}${k.bac === 'thap_hon_mot_bac' ? ' · thấp hơn một bậc' : ''}`)
   return { chinh, phu }
 }
 
