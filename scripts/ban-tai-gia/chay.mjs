@@ -48,6 +48,27 @@ rmSync(chay, { recursive: true, force: true })
 const thuMucD1 = join(chay, 'v3/d1/miniflare-D1DatabaseObject')
 mkdirSync(thuMucD1, { recursive: true })
 copyFileSync(join(TT, 'mau.sqlite'), join(thuMucD1, mau.tenTep))
+// Migration CHỈ-THÊM của CÂY MÃ này (chỉ mục / bảng / cột mới — ví dụ migration-2109-chi-muc-luot.sql của Code 3) áp lên bản sao D1 cục bộ, như khi thầy chạy migration trên D1 thật. Chỉ CREATE INDEX/TABLE và ALTER … ADD COLUMN; câu khác (UPDATE/INSERT/DELETE) bỏ qua; lỗi "đã có" bỏ qua.
+import { DatabaseSync } from 'node:sqlite'
+import { readdirSync } from 'node:fs'
+const migMoi = []
+{
+  const db = new DatabaseSync(join(thuMucD1, mau.tenTep))
+  const thuMucSv = join(cay, 'server')
+  for (const f of readdirSync(thuMucSv).filter((x) => /^migration-.*\.sql$/.test(x)).sort()) {
+    const chuKy = () => Number(db.prepare("SELECT (SELECT COUNT(*) FROM sqlite_master) + (SELECT COALESCE(SUM((SELECT COUNT(*) FROM pragma_table_info(m.name))), 0) FROM sqlite_master m WHERE m.type = 'table') AS n").get().n)
+    const truoc = chuKy()
+    for (const cau of readFileSync(join(thuMucSv, f), 'utf8').replace(/^\s*--.*$/gm, '').split(/;\s*(?:\n|$)/).map((x) => x.trim()).filter(Boolean)) {
+      if (!/^(CREATE\s+(UNIQUE\s+)?INDEX|CREATE\s+TABLE|ALTER\s+TABLE\s+\S+\s+ADD\s+COLUMN)/i.test(cau)) continue
+      try { db.exec(cau) } catch { /* đã có */ }
+    }
+    const them = chuKy() - truoc
+    if (them > 0) migMoi.push(`${f} (+${them} đối tượng: bảng/chỉ mục/cột)`)
+  }
+  db.exec('PRAGMA journal_mode=DELETE')
+  db.close()
+}
+if (migMoi.length) log(`Migration chỉ-thêm áp thêm: ${migMoi.join(', ')}`)
 
 // (3) Worker cục bộ
 const nhatKy = join(TT, `dev-${sha}.log`)
@@ -83,7 +104,7 @@ tat()
 
 // (6) viết bản đo
 const cauHinh = { soEm: kq.soEm, phut, nhanh, nhipNenGiay: 180, thoiGianThatGiay: kq.thoiGianThatGiay, saoLuu: mau.saoLuu, treD1Ms: treD1 }
-const ghiChu = [...kq.ghiChu, ...(treD1 > 0 ? [`ĐỘ TRỄ GIẢ D1: mỗi truy vấn chờ thêm ${treD1} ms (mỗi batch một lần); KHÔNG mô hình hàng đợi một luồng của D1 ⇒ p50/p95 chỉ để SO SÁNH tương đối giữa các commit.`] : []), `Cây mã: ${laWorktree ? `commit ${sha} (worktree sạch)` : 'cây hiện tại của máy (không tái lập được)'}; bộ đệm mô-đun của Worker bắt đầu TRỐNG (như vừa đẩy bản mới).`]
+const ghiChu = [...kq.ghiChu, ...(migMoi.length ? [`Migration chỉ-thêm của cây mã đã áp lên bản sao D1 cục bộ (câu MỚI so với mẫu; lỗi 'đã có' bỏ qua): ${migMoi.join(', ')}`] : []), ...(treD1 > 0 ? [`ĐỘ TRỄ GIẢ D1: mỗi truy vấn chờ thêm ${treD1} ms (mỗi batch một lần); KHÔNG mô hình hàng đợi một luồng của D1 ⇒ p50/p95 chỉ để SO SÁNH tương đối giữa các commit.`] : []), `Cây mã: ${laWorktree ? `commit ${sha} (worktree sạch)` : 'cây hiện tại của máy (không tái lập được)'}; bộ đệm mô-đun của Worker bắt đầu TRỐNG (như vừa đẩy bản mới).`]
 const ra = join(REPO, 'docs/do-tai-d1')
 mkdirSync(ra, { recursive: true })
 const md = lapMarkdown({ ma: nhan, batDau, cauHinh, khach: kq.khach, dump, ghiChu })
