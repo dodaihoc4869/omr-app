@@ -27,11 +27,11 @@ describe('Bảng tin: kế hoạch hôm nay không còn nhãn V1/V2/V3', () => {
         return { ok: true, status: 200, json: async () => b, text: async () => JSON.stringify(b) }
       }))
       const { container } = render(<BangTinPhuHuynh sbd="12001" studentToken={vai === 'học sinh' ? 't' : undefined} onSent={() => {}} />)
-      await screen.findByText(/Sửa lỗi/)
+      await screen.findByText(/câu sửa lỗi/)
       const chu = container.textContent || ''
-      expect(chu).toMatch(/4c\s*Sửa lỗi/)
-      expect(chu).toMatch(/2c\s*Ôn bài cũ/)
-      expect(chu).toMatch(/2c\s*Câu tiến bộ/)
+      expect(chu).toMatch(/4\s*câu sửa lỗi/)
+      expect(chu).toMatch(/2\s*câu ôn lại/)
+      expect(chu).toMatch(/2\s*câu tiến bộ/)
       expect(chu).not.toMatch(/\bV[123]\b|Lõi|Chống quên|Thử thách/)
     })
   }

@@ -162,7 +162,7 @@ describe('bốn bậc, bốn vai trò màu, cổng', () => {
 
   it('việc KHẨN có đồng hồ đếm lùi', async () => {
     ve({ duLieu: duLieuMay() })
-    expect(screen.getByRole('timer').textContent).toMatch(/^(\d+:)?\d{2}:\d{2}$/)
+    expect(screen.getByRole('timer').textContent).toMatch(/^Còn (\d+:)?\d{2}:\d{2}$/)
     await screen.findByText('Hoả Long')
   })
 
@@ -397,7 +397,7 @@ describe('dòng nói thật từ kế hoạch máy chủ', () => {
     const { container } = ve({ duLieu: duLieuMay() })
     await screen.findByText('Hoả Long')
     const tien = container.querySelector('[data-vung="tien-do"]')!.textContent!
-    expect(tien).toContain('Đã làm 6 câu, 2 câu lên bậc ôn')
+    expect(tien).toContain('Đã làm 6 câu, 2 câu lên bậc')
     expect(container.querySelector('[data-vung="canh-bao"]')!.textContent).toBe('Hôm nay dồn 26 câu, vượt mức 12 câu (+14).')
     expect(container.querySelector('[data-vung="ngay-nghi"]')!.textContent).toContain('ngày nghỉ')
     expect(container.textContent).not.toMatch(/nắm chắc/i)
@@ -417,7 +417,7 @@ describe('dòng nói thật từ kế hoạch máy chủ', () => {
     const { container } = ve({ duLieu: duLieuMay() })
     await screen.findByText('Hoả Long')
     const qh = container.querySelector('[data-bac="qua_han"]')!
-    expect(qh.textContent).toContain('ĐÃ QUA HẠN NỘP · 1')
+    expect(qh.textContent).toContain('Đã qua Hạn nộp · 1 việc')
     expect(qh.textContent).toContain('nhờ Thầy gia hạn')
     expect(qh.querySelectorAll('button').length).toBe(0)
   })
@@ -646,14 +646,14 @@ describe('xong việc hôm nay: chỉ còn việc tuỳ chọn', () => {
     const { container } = ve({ duLieu: d(true), onHanhDong, taiVinhDanh: vinhDanhRong })
     const mung = container.querySelector('[data-vung="xong-hom-nay"]') as HTMLElement
     expect(mung.querySelector('h2')!.textContent).toBe('Em đã xong việc hôm nay')
-    expect(mung.textContent).toContain('Đã làm 9 câu, 3 câu lên bậc ôn')
+    expect(mung.textContent).toContain('Đã làm 9 câu, 3 câu lên bậc')
     expect(mung.textContent).not.toMatch(/nắm chắc/i)
     expect(container.querySelectorAll('[data-vung="lam-ngay"]').length).toBe(0)
     expect(container.querySelectorAll('[data-vung="trong"]').length).toBe(0)
     expect(screen.queryByText(/Hôm nay chưa có việc/)).toBeNull()
     const bac = container.querySelector('[data-bac="tuy_chon"]') as HTMLElement
-    expect(bac.getAttribute('aria-label')).toBe('LÀM THÊM · TUỲ CHỌN: 2 việc')
-    expect(bac.textContent).toContain('LÀM THÊM · TUỲ CHỌN · 2')
+    expect(bac.getAttribute('aria-label')).toBe('Làm thêm (không bắt buộc): 2 việc')
+    expect(bac.textContent).toContain('Làm thêm (không bắt buộc) · 2 việc')
     const the = bac.querySelectorAll<HTMLElement>('button.bnv-the')
     expect(the.length).toBe(2)
     fireEvent.click(the[0])
@@ -669,13 +669,13 @@ describe('xong việc hôm nay: chỉ còn việc tuỳ chọn', () => {
     expect(container.querySelectorAll('[data-vung="lam-ngay"]').length).toBe(1)
     expect(container.querySelector('[data-vung="lam-ngay"]')!.textContent).toContain('Ôn 3 câu đã tới hạn nhắc lại')
     expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)
-    expect(container.querySelector('[data-bac="tuy_chon"]')!.getAttribute('aria-label')).toBe('TUỲ CHỌN: 1 việc')
+    expect(container.querySelector('[data-bac="tuy_chon"]')!.getAttribute('aria-label')).toBe('Làm thêm (không bắt buộc): 1 việc')
   })
 
   it('phụ huynh (đọc-chỉ), ĐÃ ĐẠT: "Con đã xong việc hôm nay", danh sách làm thêm KHÔNG có nút bấm', () => {
     const { container } = render(<BangNhiemVu vaiTro="phuhuynh" hoTen="Phụ huynh" now={NOW} duLieu={d(true)} onHanhDong={() => {}} taiVinhDanh={vinhDanhRong} />)
     expect(container.querySelector('[data-vung="xong-hom-nay"] h2')!.textContent).toBe('Con đã xong việc hôm nay')
-    expect(container.querySelector('[data-bac="tuy_chon"]')!.textContent).toContain('LÀM THÊM · TUỲ CHỌN')
+    expect(container.querySelector('[data-bac="tuy_chon"]')!.textContent).toContain('Làm thêm (không bắt buộc)')
     expect(container.querySelectorAll('[data-bac="tuy_chon"] button.bnv-the').length).toBe(0)
     expect(container.querySelectorAll('[data-vung="trong"]').length).toBe(0)
   })

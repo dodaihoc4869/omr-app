@@ -65,7 +65,7 @@ describe('C2 · tab điểm ở cổng học sinh (/hs)', () => {
     expect(a.querySelector('.lsc-diem')!.getAttribute('data-muc')).toBe('cao')
     expect(a.querySelector('.lsc-diem')!.textContent).toBe('8.00/10')
     expect(b.querySelector('.lsc-diem')!.getAttribute('data-muc')).toBe('kha')
-    expect(within(a).getByText('Phần I (TN)').nextElementSibling!.textContent).toBe('3.00')
+    expect(within(a).getByText('Phần I · Trắc nghiệm').nextElementSibling!.textContent).toBe('3.00')
     expect(a.querySelector('.lsc-dem')!.textContent).toMatch(/Đúng 23\/28 câu/)
     expect(screen.getByRole('region', { name: 'Lịch sử ca kiểm tra và báo cáo' })).toBeTruthy()
     expect(document.querySelector('.max-h-\\[65vh\\]')).toBeNull()

@@ -164,6 +164,12 @@ export function tenBaiTapVeNha(bt: { tenBtvn?: unknown; tieuDe?: unknown } | und
   return 'Bài tập về nhà'
 }
 
+/** Tên bài trên THẺ (danh sách): có tên thật thì dùng; thiếu/giống mã thì "Bài tập về nhà (chưa đặt tên)" — không bao giờ là "Bài tập ca <mã>". */
+export function tenBaiTapTrenThe(bt: { tenBtvn?: unknown; tieuDe?: unknown } | undefined): string {
+  const t = tenBaiTapVeNha(bt)
+  return t === 'Bài tập về nhà' ? 'Bài tập về nhà (chưa đặt tên)' : t
+}
+
 export const TIEU_DE_THU_SUC = 'Thử sức thêm · không bắt buộc'
 export const GHI_CHU_CAU_THU_SUC = 'Câu cao — làm đúng được cộng, bỏ qua không sao'
 export const LOI_DAN_THU_SUC = 'Các câu này cao hơn mức của em lúc này. Không bắt buộc: làm đúng được cộng thêm, bỏ qua không sao.'
@@ -206,14 +212,14 @@ export function thongTinNhan(n: NhanCauEm): ThongTinNhan {
     case 'khoi_dong':
       return { kieu: 'kd', chu: 'Khởi động', bieuTuong: 'zap', thuong: false, ghi: null }
     case 'loi':
-      return { kieu: 'cl', chu: 'Cốt lõi', bieuTuong: 'target', thuong: false, ghi: null }
+      return { kieu: 'cl', chu: 'Câu cốt lõi', bieuTuong: 'target', thuong: false, ghi: null }
     case 'dang_yeu':
     case 'cung_co':
-      return { kieu: 'rr', chu: 'Dành riêng cho em', bieuTuong: 'user', thuong: false, ghi: null }
+      return { kieu: 'rr', chu: 'Câu dành riêng cho em', bieuTuong: 'user', thuong: false, ghi: null }
     case 'thu_thach':
-      return { kieu: 'tt', chu: 'Thử thách', bieuTuong: 'flag', thuong: true, ghi: 'Câu này để em thử sức — sai không sao, không bị trừ gì.' }
+      return { kieu: 'tt', chu: 'Câu thử thách (sai không sao)', bieuTuong: 'flag', thuong: true, ghi: 'Câu này để em thử sức — sai không sao, không bị trừ gì.' }
     case 'loi_cao':
-      return { kieu: 'tt', chu: 'Cốt lõi · câu cao', bieuTuong: 'flag', thuong: true, ghi: 'Câu cốt lõi hơi cao hơn — sai không sao, không bị trừ gì.' }
+      return { kieu: 'tt', chu: 'Câu cốt lõi hơi cao (sai không sao)', bieuTuong: 'flag', thuong: true, ghi: 'Câu cốt lõi hơi cao hơn — sai không sao, không bị trừ gì.' }
   }
 }
 

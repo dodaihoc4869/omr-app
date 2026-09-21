@@ -1205,10 +1205,10 @@ export function theCauHtml(
   const laDimmed = Boolean(laBtvn && soCauSang && stt > soCauSang)
   const tagVong = laBtvn
     ? c.mucDo === 'van_dung'
-      ? '<span class="q-tag vong-btvn vong-3">Vòng 3: Thử Thách (x2 EXP)</span>'
+      ? '<span class="q-tag vong-btvn vong-3">Câu thử thách (sai không sao)</span>'
       : c.mucDo === 'hieu'
-      ? '<span class="q-tag vong-btvn vong-2">Vòng 2: Trọng Tâm</span>'
-      : '<span class="q-tag vong-btvn vong-1">Vòng 1: Lõi Căn Bản</span>'
+      ? '<span class="q-tag vong-btvn vong-2">Câu dành riêng cho em</span>'
+      : '<span class="q-tag vong-btvn vong-1">Câu cốt lõi</span>'
     : ''
   const tagMucTieu = Boolean(laBtvn && soCauSang && stt <= soCauSang)
     ? `<span class="q-tag muc-tieu-hom-nay-tag">${ICO_SAO}Mục tiêu hôm nay</span>`
@@ -1546,10 +1546,10 @@ export function tongQuanHtml(cau: CauLuyen[], laBtvn = false): string {
       const cd = [...new Set(ds.map((x) => x.c.chuyenDe).filter(Boolean))].join(', ')
       const tagVong = laBtvn
         ? k === 'biet'
-          ? '<span class="vong-pill p1">Vòng 1: Lõi Căn Bản (Bắt buộc)</span>'
+          ? '<span class="vong-pill p1">Câu cốt lõi (bắt buộc)</span>'
           : k === 'hieu'
-          ? '<span class="vong-pill p2">Vòng 2: Trọng Tâm Cá Nhân (Bắt buộc)</span>'
-          : '<span class="vong-pill p3">Vòng 3: Thử Thách Bứt Phá (x2 EXP)</span>'
+          ? '<span class="vong-pill p2">Câu dành riêng cho em (bắt buộc)</span>'
+          : '<span class="vong-pill p3">Câu thử thách (sai không sao)</span>'
         : ''
       return `<button type="button" class="topic-item" data-loc="muc:${k}" aria-pressed="false"><span class="topic-cham"><span class="topic-dot" style="background:${mau};"></span></span><span class="topic-ten"><strong>${ten}</strong>${cd ? `<span class="topic-cd">${thoat(cd)}</span>` : ''}${tagVong}</span><span class="topic-cau">${nhan} · ${ds.length} câu</span></button>`
     })
@@ -1562,21 +1562,21 @@ export function tongQuanHtml(cau: CauLuyen[], laBtvn = false): string {
   const bannerBtvn = laBtvn
     ? `<div class="btvn-3vong-banner">
   <div class="btvn-3vong-tieu-de">
-    <strong>THUẬT TOÁN 3 VÒNG PHÂN TẦNG BÀI TẬP VỀ NHÀ:</strong>
-    <span class="btvn-chi-tieu">Hoàn thành Vòng 1 + Vòng 2 là đạt 100% chỉ tiêu BTVN</span>
+    <strong>CÁC NHÓM CÂU TRONG BÀI TẬP VỀ NHÀ:</strong>
+    <span class="btvn-chi-tieu">Làm xong câu cốt lõi và câu dành riêng cho em là đạt chỉ tiêu</span>
   </div>
   <div class="btvn-3vong-grid">
     <div class="vong-col col-1">
-      <div class="vong-head">VÒNG 1: LÕI CĂN BẢN · ${v1Count} câu</div>
-      <div class="vong-body">Kiến thức cốt lõi nhận biết & thông hiểu. Bắt buộc 100% học sinh hoàn thành để có nền tảng cho các chặng sau.</div>
+      <div class="vong-head">CÂU CỐT LÕI · ${v1Count} câu</div>
+      <div class="vong-body">Kiến thức cốt lõi. Bắt buộc, em làm trước.</div>
     </div>
     <div class="vong-col col-2">
-      <div class="vong-head">VÒNG 2: TRỌNG TÂM CÁ NHÂN · ${v2Count} câu</div>
-      <div class="vong-body">Rèn luyện kỹ năng & lấp lỗ hổng chuyên đề. Bắt buộc hoàn thành để đạt chuẩn bài tập.</div>
+      <div class="vong-head">CÂU DÀNH RIÊNG CHO EM · ${v2Count} câu</div>
+      <div class="vong-body">Rèn kỹ năng và lấp lỗ hổng theo chuyên đề. Bắt buộc.</div>
     </div>
     <div class="vong-col col-3">
-      <div class="vong-head">VÒNG 3: THỬ THÁCH BỨT PHÁ · ${v3Count} câu</div>
-      <div class="vong-body">Vận dụng cao 2 sao. Không ép buộc học sinh; thử sức để bứt phá điểm 9–10 và nhận x2 EXP Thần Thú.</div>
+      <div class="vong-head">CÂU THỬ THÁCH (SAI KHÔNG SAO) · ${v3Count} câu</div>
+      <div class="vong-body">Câu vận dụng cao. Không bắt buộc; sai không sao, không bị trừ gì.</div>
     </div>
   </div>
 </div>`
@@ -1596,7 +1596,7 @@ export function tongQuanHtml(cau: CauLuyen[], laBtvn = false): string {
     ${oThongKe(dem('II'), 'Đúng / Sai', 'phan:II')}
     ${oThongKe(dem('III'), 'Trả lời ngắn', 'phan:III')}
   </div>
-  ${dong ? `<div class="topics-list"><h3>${laBtvn ? 'Phân loại mức độ & Vòng phân tầng' : 'Phân loại mức độ'}</h3>${dong}</div>` : ''}
+  ${dong ? `<div class="topics-list"><h3>${laBtvn ? 'Phân loại mức độ & nhóm câu' : 'Phân loại mức độ'}</h3>${dong}</div>` : ''}
 </section>`
 }
 

@@ -174,7 +174,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: La
             </span>
             {soCham > 0 && (
               <span className="m3-chip" data-vai-tro="tertiary">
-                Đã chấm {soCham} · đúng {soChamDung}
+                Đã chấm {soCham} câu · đúng {soChamDung} câu
               </span>
             )}
           </div>
@@ -210,7 +210,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: La
           </p>
           {tienBo && (
             <p className="lco-phu">
-              Hôm nay em đã ôn {tienBo.daLamCau} câu · lên bậc {tienBo.lenBac} · tụt bậc {tienBo.tutBac}
+              Hôm nay em đã ôn {tienBo.daLamCau} câu · {tienBo.lenBac} câu lên bậc
             </p>
           )}
           {exp > 0 && <p className="lco-exp">+{exp} EXP học tập</p>}

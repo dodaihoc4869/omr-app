@@ -34,7 +34,7 @@ function DemLui({ conLaiMs }: { conLaiMs: number }) {
   const chu = gio > 0 ? `${gio}:${haiSo(Math.floor((giay % 3600) / 60))}:${haiSo(giay % 60)}` : `${haiSo(Math.floor(giay / 60))}:${haiSo(giay % 60)}`
   return (
     <span className="bnv-dem-lui" role="timer" aria-label={`Còn ${chu}`}>
-      {chu}
+      Còn {chu}
     </span>
   )
 }
@@ -126,7 +126,7 @@ export default function DanhSachNhiemVu({
               <h2 className="bnv-bac-dau">
                 <span className="bnv-bac-cham" aria-hidden="true" />
                 <span>
-                  {b.nhan} · {b.viec.length}
+                  {b.nhan} · {b.viec.length} việc
                 </span>
               </h2>
               {hien.map((v) => (
@@ -151,7 +151,7 @@ export function DanhSachQuaHan({ viec, docChi, onChon }: { viec: TheQuaHan[]; do
     <section className="bnv-bac" data-bac="qua_han" aria-label={`Đã qua Hạn nộp: ${viec.length} việc`}>
       <h2 className="bnv-bac-dau">
         <span className="bnv-bac-cham" aria-hidden="true" />
-        <span>ĐÃ QUA HẠN NỘP · {viec.length}</span>
+        <span>Đã qua Hạn nộp · {viec.length} việc</span>
       </h2>
       {viec.map((v) => {
         const Icon = v.loai === 'mom' ? Heart : BookOpen

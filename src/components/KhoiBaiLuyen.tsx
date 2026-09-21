@@ -205,7 +205,7 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
       // HTML tải về.
       const nhacTrongPhieu = chiDeChoEm
         ? lyDoKhongNop === 'thieu_ma'
-          ? 'Phiếu này chưa xin được mã bài tập từ máy chủ nên chỉ đọc được, chưa bấm chọn và chưa nộp được. Em làm ra giấy, hoặc mở lại khi mạng ổn định. Thầy vào Lịch sử ca, bấm "Đồng bộ lại phiếu mọi ca" rồi mở lại link này.'
+          ? 'Phiếu này chưa lấy được từ máy chủ nên chỉ đọc được, chưa bấm chọn và chưa nộp được. Em làm ra giấy, hoặc mở lại khi mạng ổn định. Thầy vào Lịch sử ca, bấm "Đồng bộ lại phiếu mọi ca" rồi mở lại link này.'
           : lyDoKhongNop === 'thieu_sbd'
             ? 'Phiếu này thiếu số báo danh nên chỉ đọc được, chưa bấm chọn và chưa nộp được. Báo Thầy để dựng lại phiếu.'
             : 'Máy chưa có địa chỉ máy chủ nên phiếu chỉ đọc được, chưa bấm chọn và chưa nộp được. Mở lại link khi có mạng.'
@@ -368,7 +368,7 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
       {khongNop !== '' && html !== '' && (
         <div style={{ fontSize: 12.5, color: 'var(--p-cam)', marginTop: 6, lineHeight: 1.6 }}>
           {khongNop === 'thieu_ma'
-            ? 'Phiếu này chưa có mã bài tập nên chưa nộp được — Thầy vào Lịch sử ca, bấm "Đồng bộ lại phiếu mọi ca", rồi mở lại link này.'
+            ? 'Phiếu này chưa lấy được từ máy chủ nên chưa nộp được — Thầy vào Lịch sử ca, bấm "Đồng bộ lại phiếu mọi ca", rồi mở lại link này.'
             : khongNop === 'thieu_sbd'
               ? 'Phiếu này thiếu số báo danh nên chưa nộp được. Báo Thầy để dựng lại phiếu.'
               : 'Máy chưa có địa chỉ máy chủ nên chưa nộp được. Mở lại link khi có mạng.'}

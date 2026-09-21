@@ -191,7 +191,7 @@ describe('nộp', () => {
     expect((within(the(2)).getByRole('textbox') as HTMLInputElement).disabled).toBe(false)
     expect(screen.getByText(/Còn 2 câu chưa trả lời/, { selector: '.lco-nhac' })).toBeTruthy()
     // tiến bộ + EXP
-    expect(screen.getByText('Hôm nay em đã ôn 2 câu · lên bậc 1 · tụt bậc 1')).toBeTruthy()
+    expect(screen.getByText('Hôm nay em đã ôn 2 câu · 1 câu lên bậc')).toBeTruthy()
     expect(screen.getByText('+2 EXP học tập')).toBeTruthy()
   })
 

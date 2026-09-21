@@ -60,11 +60,11 @@ describe('BÀI TẬP VỀ NHÀ THÔNG MINH — 3 VÒNG PHÂN TẦNG', () => {
       ],
       { laBtvn: true },
     )
-    expect(html).toContain('THUẬT TOÁN 3 VÒNG PHÂN TẦNG BÀI TẬP VỀ NHÀ:')
-    expect(html).toContain('Hoàn thành Vòng 1 + Vòng 2 là đạt 100% chỉ tiêu BTVN')
-    expect(html).toContain('Vòng 1: Lõi Căn Bản')
-    expect(html).toContain('Vòng 2: Trọng Tâm Cá Nhân')
-    expect(html).toContain('Vòng 3: Thử Thách Bứt Phá')
+    expect(html).toContain('CÁC NHÓM CÂU TRONG BÀI TẬP VỀ NHÀ:')
+    expect(html).toContain('Làm xong câu cốt lõi và câu dành riêng cho em là đạt chỉ tiêu')
+    expect(html).toContain('Câu cốt lõi')
+    expect(html).toContain('Câu dành riêng cho em')
+    expect(html).toContain('Câu thử thách (sai không sao)')
     expect(html).toContain('vong-btvn vong-1')
     expect(html).toContain('vong-btvn vong-2')
     expect(html).toContain('vong-btvn vong-3')

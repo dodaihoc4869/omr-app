@@ -117,9 +117,9 @@ describe('chuDauBai — chỉ số đếm của chính em', () => {
 describe('thongTinNhan — nhãn nhẹ, không lẫn màu đúng/sai', () => {
   it('bảng ánh xạ đúng với lõi của Code 1', () => {
     expect(thongTinNhan('khoi_dong')).toMatchObject({ kieu: 'kd', chu: 'Khởi động', thuong: false })
-    expect(thongTinNhan('loi')).toMatchObject({ kieu: 'cl', chu: 'Cốt lõi', thuong: false })
-    expect(thongTinNhan('dang_yeu')).toMatchObject({ kieu: 'rr', chu: 'Dành riêng cho em' })
-    expect(thongTinNhan('cung_co')).toMatchObject({ kieu: 'rr', chu: 'Dành riêng cho em' })
+    expect(thongTinNhan('loi')).toMatchObject({ kieu: 'cl', chu: 'Câu cốt lõi', thuong: false })
+    expect(thongTinNhan('dang_yeu')).toMatchObject({ kieu: 'rr', chu: 'Câu dành riêng cho em' })
+    expect(thongTinNhan('cung_co')).toMatchObject({ kieu: 'rr', chu: 'Câu dành riêng cho em' })
   })
   it('thử thách và lõi-cao là câu THƯỞNG, cùng kiểu vàng, đều ghi "sai không sao"', () => {
     for (const n of ['thu_thach', 'loi_cao'] as const) {
@@ -128,8 +128,8 @@ describe('thongTinNhan — nhãn nhẹ, không lẫn màu đúng/sai', () => {
       expect(t.thuong).toBe(true)
       expect(t.ghi).toContain('sai không sao')
     }
-    expect(thongTinNhan('loi_cao').chu).toBe('Cốt lõi · câu cao')
-    expect(thongTinNhan('thu_thach').chu).toBe('Thử thách')
+    expect(thongTinNhan('loi_cao').chu).toBe('Câu cốt lõi hơi cao (sai không sao)')
+    expect(thongTinNhan('thu_thach').chu).toBe('Câu thử thách (sai không sao)')
   })
   it('câu thường KHÔNG có dòng ghi', () => {
     for (const n of ['khoi_dong', 'loi', 'dang_yeu', 'cung_co'] as const) expect(thongTinNhan(n).ghi).toBeNull()

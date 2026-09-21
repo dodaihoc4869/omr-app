@@ -107,7 +107,7 @@ describe('đầu bài "Bài của riêng em" và nhãn từng câu', () => {
     expect(hero).toContain('aria-current="step"')
     expect(hero).toContain('Hôm nay')
     expect(hero).toContain('Mai')
-    for (const chu of ['Khởi động', 'Cốt lõi', 'Dành riêng cho em', 'Thử thách']) expect(hero).toContain(chu)
+    for (const chu of ['Khởi động', 'Câu cốt lõi', 'Câu dành riêng cho em', 'Câu thử thách (sai không sao)']) expect(hero).toContain(chu)
     expect(thanTrang).toContain('Chặng 1/7 · Đã làm <b id="gd-dem">0</b>/<span id="gd-tong">5</span> câu')
   })
 
@@ -117,7 +117,7 @@ describe('đầu bài "Bài của riêng em" và nhãn từng câu', () => {
     expect(the('q2')).toContain('data-nhan="loi"')
     expect(the('q3')).toContain('data-nhan="dang_yeu"')
     expect(the('q4')).toContain('data-nhan="thu_thach"')
-    expect(the('q5')).toContain('Cốt lõi · câu cao')
+    expect(the('q5')).toContain('Câu cốt lõi hơi cao (sai không sao)')
     for (const q of ['q4', 'q5']) expect(the(q)).toContain('sai không sao')
     for (const q of ['q1', 'q2', 'q3']) expect(the(q)).not.toContain('gcn-ghi')
   })

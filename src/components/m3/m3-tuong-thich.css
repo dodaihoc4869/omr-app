@@ -34,7 +34,6 @@
 .m3 .bg-green-600 { background-color: var(--m3-tertiary); }
 .m3 .bg-indigo-100 { background-color: var(--m3-primary-container); }
 .m3 .bg-indigo-600 { background-color: var(--m3-primary); }
-.m3 .bg-orange-100 { background-color: var(--m3-canh-bao); }
 .m3 .bg-orange-50 { background-color: var(--m3-canh-bao); }
 .m3 .bg-orange-600 { background-color: var(--m3-tren-canh-bao); }
 .m3 .bg-purple-100 { background-color: var(--m3-primary-container); }
@@ -172,7 +171,6 @@
 .m3 .text-indigo-700 { color: var(--m3-primary); }
 .m3 .text-indigo-900 { color: var(--m3-on-primary-container); }
 .m3 .text-orange-600 { color: var(--m3-tren-canh-bao); }
-.m3 .text-orange-800 { color: var(--m3-tren-canh-bao); }
 .m3 .text-purple-600 { color: var(--m3-primary); }
 .m3 .text-purple-700 { color: var(--m3-primary); }
 .m3 .text-purple-800 { color: var(--m3-on-primary-container); }
@@ -299,7 +297,6 @@
   .m3 .dark\:bg-blue-950\/70 { background-color: var(--m3-primary-container); }
   .m3 .dark\:bg-blue-950\/80 { background-color: var(--m3-primary-container); }
   .m3 .dark\:bg-emerald-900\/40 { background-color: var(--m3-tertiary-container); }
-  .m3 .dark\:bg-emerald-900\/60 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-900\/80 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-emerald-950\/20 { background-color: var(--m3-tertiary-container); }
@@ -310,7 +307,6 @@
   .m3 .dark\:bg-emerald-950\/80 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-green-950\/70 { background-color: var(--m3-tertiary-container); }
   .m3 .dark\:bg-indigo-900\/40 { background-color: var(--m3-primary-container); }
-  .m3 .dark\:bg-orange-900\/80 { background-color: var(--m3-canh-bao); }
   .m3 .dark\:bg-orange-950\/60 { background-color: var(--m3-canh-bao); }
   .m3 .dark\:bg-orange-950\/80 { background-color: var(--m3-canh-bao); }
   .m3 .dark\:bg-purple-900\/60 { background-color: var(--m3-primary-container); }
@@ -415,7 +411,6 @@
   .m3 .dark\:text-indigo-200 { color: var(--m3-primary); }
   .m3 .dark\:text-indigo-300 { color: var(--m3-primary); }
   .m3 .dark\:text-indigo-400 { color: var(--m3-primary); }
-  .m3 .dark\:text-orange-200 { color: var(--m3-tren-canh-bao); }
   .m3 .dark\:text-purple-200 { color: var(--m3-primary); }
   .m3 .dark\:text-purple-300 { color: var(--m3-primary); }
   .m3 .dark\:text-purple-400 { color: var(--m3-primary); }

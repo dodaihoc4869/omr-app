@@ -199,7 +199,7 @@ describe('StudentPortalScreen thật: nối kế hoạch máy chủ và "ca đan
     expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay')
     const biCong = container.querySelector('[data-bi-cong="true"]')!
     expect(biCong.textContent).toContain('Mở sau khi xong: Ôn 3 câu đã tới hạn nhắc lại')
-    expect(container.querySelector('[data-vung="tien-do"]')!.textContent).toContain('Đã làm 2 câu, 1 câu lên bậc ôn')
+    expect(container.querySelector('[data-vung="tien-do"]')!.textContent).toContain('Đã làm 2 câu, 1 câu lên bậc')
     expect(goiTheo('/hs/ke-hoach-ngay')[0].body).toEqual({ token: 'test-token' })
     expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)
   })

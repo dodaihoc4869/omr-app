@@ -113,6 +113,6 @@ export function daKhacPhuc(m: MucOnLai, ch: CauHinhChanDoan = CAU_HINH_CHAN_DOAN
 /** Dòng chữ cho thầy đọc — luôn kèm SỐ, không nói chung chung. */
 export function chuTienDo(m: MucOnLai, ch: CauHinhChanDoan = CAU_HINH_CHAN_DOAN_MAC_DINH): string {
   if (daKhacPhuc(m, ch)) return `${m.maDang}: đúng ${m.lanDung}/${ch.MOC_ON.length} mốc — đã khắc phục`
-  const con = m.conMayBuoi <= 0 ? 'tới hạn ôn' : `còn ${m.conMayBuoi} buổi`
+  const con = m.conMayBuoi <= 0 ? 'đến lịch ôn lại' : `còn ${m.conMayBuoi} buổi`
   return `${m.maDang}: sai ${m.lanSai} lần, đúng ${m.lanDung}/${ch.MOC_ON.length} mốc, ${con}`
 }

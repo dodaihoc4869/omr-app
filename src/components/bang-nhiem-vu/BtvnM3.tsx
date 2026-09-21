@@ -6,6 +6,7 @@ import '../m3'
 import './btvn-m3.css'
 import { mocThoiGian } from '../../lib/han-bai-tap'
 import { gioDayDu } from '../../lib/ngay-gio-24'
+import { tenBaiTapTrenThe } from '../../lib/btvn-ca-nhan-kieu'
 
 export interface MucBtvn {
   maBtvn?: string
@@ -116,7 +117,7 @@ export default function BtvnM3({
             const han = bt.hanNop ? nhanHan(bt.hanNop, now, !!bt.daNop) : null
             const conLuot = (bt.soLanLamLaiConLai ?? 3) > 0
             return (
-              <article key={id} className="btm-the" data-da-nop={bt.daNop ? true : undefined} aria-label={bt.tenBtvn || `Bài tập ca ${bt.maCa}`}>
+              <article key={id} className="btm-the" data-da-nop={bt.daNop ? true : undefined} aria-label={tenBaiTapTrenThe(bt)}>
                 <div className="btm-chips">
                   <span className="btm-ma">#{bt.maCa}</span>
                   <span className="m3-chip btm-chip-secondary">Chia chặng theo ngày/giờ</span>
@@ -131,7 +132,7 @@ export default function BtvnM3({
                   )}
                 </div>
 
-                <h3 className="btm-ten">{bt.tenBtvn || `Bài tập ca ${bt.maCa}`}</h3>
+                <h3 className="btm-ten">{tenBaiTapTrenThe(bt)}</h3>
 
                 <div className="btm-meta">
                   {(bt.soCau ?? 0) > 0 && (
@@ -169,7 +170,7 @@ export default function BtvnM3({
                           onClick={() => onMo(bt, true)}
                           disabled={dangMo}
                           className="m3-nut-tonal"
-                          title={`Làm lại bài tập này (còn ${bt.soLanLamLaiConLai ?? 3}/3 lượt)`}
+                          title={`Làm lại bài tập về nhà này (còn ${bt.soLanLamLaiConLai ?? 3}/3 lượt)`}
                         >
                           {dangMo ? <RefreshCw size={18} className="btm-quay" aria-hidden="true" /> : <RotateCcw size={18} aria-hidden="true" />}
                           <span>Làm lại (còn {bt.soLanLamLaiConLai ?? 3}/3 lần)</span>

@@ -168,7 +168,7 @@ describe('chặng 1 đã mở: chỉ hiện câu của chặng 1', () => {
     expect(duNop(html).cau.map((c: { id: string }) => c.id)).toEqual(['M-I-4', 'M-I-5'])
     expect(duNop(html).caNhan.chiSo).toBe(1)
     expect(than(html)).toContain('Chặng 2/2 · ')
-    expect(the(html, 'M-I-5')).toContain('Cốt lõi · câu cao')
+    expect(the(html, 'M-I-5')).toContain('Câu cốt lõi hơi cao (sai không sao)')
     expect(the(html, 'M-I-5')).toContain('sai không sao')
     expect(html).not.toContain('Đề câu 1<')
   })

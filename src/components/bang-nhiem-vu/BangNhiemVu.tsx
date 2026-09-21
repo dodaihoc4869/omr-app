@@ -348,8 +348,8 @@ export default function BangNhiemVu({
                     <span className="bnv-chu-phu">câu tới mức gợi ý</span>
                   </div>
                   <div>
-                    <span className="bnv-o-so-gia">{tocDo.giayMoiCau ? `${tocDo.giayMoiCau} s` : '—'}</span>
-                    <span className="bnv-chu-phu">{tocDo.giayMoiCau ? 'mỗi câu · đo 30 ngày' : tocDo.chu}</span>
+                    <span className="bnv-o-so-gia">{tocDo.giayMoiCau ? `${tocDo.giayMoiCau} giây` : '—'}</span>
+                    <span className="bnv-chu-phu">{tocDo.giayMoiCau ? 'mỗi câu, trung bình 30 ngày gần đây' : tocDo.chu}</span>
                   </div>
                 </div>
               ) : (
@@ -456,7 +456,7 @@ export default function BangNhiemVu({
                       <h2>{laPh ? 'Con đã xong việc hôm nay' : 'Em đã xong việc hôm nay'}</h2>
                       {/* Chỉ nói số đo thật; KHÔNG nói "nắm chắc" (nộp ≠ nắm). */}
                       <p>
-                        Đã làm {duLieu.daXongHomNay.daLamCau} câu{duLieu.daXongHomNay.lenBac > 0 ? `, ${duLieu.daXongHomNay.lenBac} câu lên bậc ôn` : ''}
+                        Đã làm {duLieu.daXongHomNay.daLamCau} câu{duLieu.daXongHomNay.lenBac > 0 ? `, ${duLieu.daXongHomNay.lenBac} câu lên bậc` : ''}
                       </p>
                       <p className="bnv-mung-phu">{laPh ? 'Còn vài việc làm thêm, không bắt buộc.' : 'Muốn làm thêm thì chọn một việc bên dưới — không bắt buộc.'}</p>
                     </div>

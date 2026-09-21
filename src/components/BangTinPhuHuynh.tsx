@@ -258,12 +258,9 @@ export default function BangTinPhuHuynh({
               <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white">
                 Khắc phục luyện đề
               </span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 shrink-0">
-                Thuật toán mới
-              </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Cá nhân hóa theo Cặp đôi Song sinh & tiến trình sư phạm 3 nấc giúp con lấp lỗ hổng nhanh nhất:
+              Bài luyện chọn riêng theo câu {studentToken ? 'em' : 'con'} từng sai:
             </p>
           </div>
         </div>
@@ -600,16 +597,13 @@ export default function BangTinPhuHuynh({
                 }`}>
                   <Sparkles size={17} />
                 </div>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/80 text-orange-800 dark:text-orange-200">
-                  8 hệ
-                </span>
               </div>
               <div>
                 <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-orange-600 transition">
-                  Thần thú
+                  Thần thú của {studentToken ? 'em' : 'con'}
                 </div>
                 <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
-                  Leo tháp 8 hệ
+                  {studentToken ? 'Em' : 'Con'} luyện để lên cấp
                 </div>
               </div>
             </button>
@@ -657,11 +651,11 @@ export default function BangTinPhuHuynh({
                   <TrendingUp size={15} />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-indigo-900 dark:text-indigo-200">
-                  Dự đoán đề thi tốt nghiệp ({report.duDoanDiem.thang})
+                  Điểm ước tính, chỉ để tham khảo ({report.duDoanDiem.thang})
                 </span>
               </div>
               <div className="text-sm sm:text-base font-black text-indigo-700 dark:text-indigo-300 tabular-nums">
-                {report.duDoanDiem.khoangDiem} đ
+                {report.duDoanDiem.khoangDiem} điểm
               </div>
             </div>
             <p className="text-[11px] sm:text-xs text-slate-600 dark:text-slate-300 leading-snug">
@@ -678,7 +672,7 @@ export default function BangTinPhuHuynh({
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-xs font-bold text-rose-800 dark:text-rose-200">
                 <AlertTriangle size={16} className="text-red-500 shrink-0" />
-                <span>Cảnh báo: {tongChuaNop} bài đang chờ làm</span>
+                <span>{tongChuaNop} bài đang chờ {studentToken ? 'em' : 'con'} làm</span>
               </div>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-200/80 dark:bg-rose-900/80 text-rose-900 dark:text-rose-100">
                 Chưa nộp
@@ -746,15 +740,15 @@ export default function BangTinPhuHuynh({
         {report.keHoach && (
           <div className="flex items-center justify-between gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100/90 dark:bg-slate-800/80 p-2.5 rounded-xl border border-slate-200/70 dark:border-slate-700/60 shadow-2xs">
             <span className="flex items-center gap-1">
-              <span><strong>{report.keHoach.soCauSuaLoi}c</strong> Sửa lỗi</span>
+              <span><strong>{report.keHoach.soCauSuaLoi}</strong> câu sửa lỗi</span>
             </span>
             <span className="text-slate-300 dark:text-slate-600">·</span>
             <span className="flex items-center gap-1">
-              <span><strong>{report.keHoach.soCauOnBaiCu}c</strong> Ôn bài cũ</span>
+              <span><strong>{report.keHoach.soCauOnBaiCu}</strong> câu ôn lại</span>
             </span>
             <span className="text-slate-300 dark:text-slate-600">·</span>
             <span className="flex items-center gap-1">
-              <span><strong>{report.keHoach.soCauTienBo}c</strong> Câu tiến bộ</span>
+              <span><strong>{report.keHoach.soCauTienBo}</strong> câu tiến bộ</span>
             </span>
           </div>
         )}

@@ -285,7 +285,7 @@ describe('nhánh máy chủ: tên, payload khi bấm, quá hạn, cảnh báo', 
 
   it('tiến bộ nói "đã làm N câu, M câu lên bậc", không "nắm chắc"', () => {
     expect(d.tienDo).toMatchObject({ daLam: 6, mucTieu: 12, phanTram: 50 })
-    expect(d.tienDo.ghiChu).toBe('Đã làm 6 câu, 2 câu lên bậc ôn · đã đủ số câu tối thiểu hôm nay')
+    expect(d.tienDo.ghiChu).toBe('Đã làm 6 câu, 2 câu lên bậc · đã đủ số câu tối thiểu hôm nay')
     const thieu = tuKeHoachNgay({ ...keHoachMayChu, tienBo: { daLamCau: 2, lenBac: 0, conThieu: 4 } }, NOW, phu)
     expect(thieu.tienDo.ghiChu).toBe('Đã làm 2 câu · còn 4 câu là đạt hôm nay')
     expect(JSON.stringify(d)).not.toMatch(/nắm chắc/i)
@@ -378,12 +378,12 @@ describe('chỉ còn việc TUỲ CHỌN (0.Planer đổi luật 19/09)', () => 
     expect(d.lamNgay).toBeNull()
     expect(d.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
     const tc = d.cacBac.find((b) => b.bac === 'tuy_chon')!
-    expect(tc.nhan).toBe('LÀM THÊM · TUỲ CHỌN')
+    expect(tc.nhan).toBe('Làm thêm (không bắt buộc)')
     expect(tc.viec.map((x) => x.id)).toEqual(['on_lai:2026-09-19', 'than_thu:X'])
     expect(tc.viec[0].hanhDong.loai).toBe('lam_cau_on')
     expect(tc.viec[0].biCong).toBe(false)
     // ba bậc kia vẫn giữ tên cũ
-    expect(d.cacBac.filter((b) => b.bac !== 'tuy_chon').map((b) => b.nhan)).toEqual(['KHẨN', 'BẮT BUỘC HÔM NAY', 'NÊN LÀM'])
+    expect(d.cacBac.filter((b) => b.bac !== 'tuy_chon').map((b) => b.nhan)).toEqual(['Sắp đến hạn nộp', 'Bắt buộc hôm nay', 'Nên làm'])
   })
 
   it('CHƯA ĐẠT (dat=false hoặc thiếu): KHÔNG trống; việc tuỳ chọn mở đầu tiên là "Làm ngay"; không thẻ mừng; bậc vẫn tên "TUỲ CHỌN"', () => {
@@ -392,7 +392,7 @@ describe('chỉ còn việc TUỲ CHỌN (0.Planer đổi luật 19/09)', () => 
       expect(d.trong).toBe(false)
       expect(d.daXongHomNay).toBeNull()
       expect(d.lamNgay?.id).toBe('on_lai:2026-09-19')
-      expect(d.cacBac.find((b) => b.bac === 'tuy_chon')!.nhan).toBe('TUỲ CHỌN')
+      expect(d.cacBac.find((b) => b.bac === 'tuy_chon')!.nhan).toBe('Làm thêm (không bắt buộc)')
       expect(d.cacBac.find((b) => b.bac === 'tuy_chon')!.viec.map((x) => x.id)).toEqual(['than_thu:X'])
     }
   })
@@ -403,7 +403,7 @@ describe('chỉ còn việc TUỲ CHỌN (0.Planer đổi luật 19/09)', () => 
     expect(d.daXongHomNay).toBeNull()
     expect(d.trong).toBe(false)
     expect(d.lamNgay?.id).toBe('on_lai:2026-09-19')
-    expect(d.tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc ôn · Để đạt hôm nay: lên bậc ít nhất một câu tới hạn ôn')
+    expect(d.tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc · Để đạt hôm nay: lên bậc ít nhất một câu đến lịch ôn lại')
     // có datNgay ⇒ KHÔNG còn câu theo tienBo ("đã đủ số câu tối thiểu…") đứng cạnh câu "chưa đủ" (mâu thuẫn thầy 0.Planer bắt trên bản sống)
     expect(d.tienDo.ghiChu).not.toMatch(/đã đủ số câu tối thiểu|còn \d+ câu là đạt/)
     // thiếu câu: nói SỐ câu (toiThieu − daLam, tối thiểu 1); nhiều lý do ghép bằng "; "; mã lạ bị bỏ
@@ -413,15 +413,15 @@ describe('chỉ còn việc TUỲ CHỌN (0.Planer đổi luật 19/09)', () => 
     const min1 = tuKeHoachNgay({ ...khCoDat(true), exp: { datNgay: { dat: false, thieu: ['cau_toi_thieu'], daLam: 6, toiThieu: 6 } } }, NOW)
     expect(min1.tienDo.ghiChu).toContain('làm thêm 1 câu')
     // chưa đạt mà máy chủ không nói lý do: nói thật là chưa đạt
-    expect(tuKeHoachNgay({ ...khCoDat(true), exp: { datNgay: { dat: false, thieu: [] } } }, NOW).tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc ôn · chưa đạt hôm nay')
+    expect(tuKeHoachNgay({ ...khCoDat(true), exp: { datNgay: { dat: false, thieu: [] } } }, NOW).tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc · chưa đạt hôm nay')
   })
 
   it('`exp.datNgay.dat=true` ⇒ "đã đạt hôm nay" (mừng); thiếu `exp`, `datNgay:null` hoặc ngày NGHỈ ⇒ theo tienBo như cũ (câu ghi chú cũ nguyên văn)', () => {
     const bt = tuKeHoachNgay(khCoDat(true), NOW)
-    expect(bt.tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc ôn · đã đủ số câu tối thiểu hôm nay')
+    expect(bt.tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc · đã đủ số câu tối thiểu hôm nay')
     const dat = tuKeHoachNgay({ ...khCoDat(true), exp: { datNgay: { dat: true, thieu: [] } } }, NOW)
     expect(dat.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
-    expect(dat.tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc ôn · đã đạt hôm nay')
+    expect(dat.tienDo.ghiChu).toBe('Đã làm 9 câu, 3 câu lên bậc · đã đạt hôm nay')
     for (const exp of [{ datNgay: null }, null, { datNgay: { dat: false, thieu: [], laNghi: true } }] as any[]) {
       const d = tuKeHoachNgay({ ...khCoDat(true), exp }, NOW)
       expect(d.daXongHomNay).toEqual({ daLamCau: 9, lenBac: 3 })
@@ -640,12 +640,12 @@ describe('nói thật', () => {
     const macDinh: KeHoachNgayMayChu = { ...keHoachMayChu, nganSach: { mucTieuCau: 8, vanTocGiay: 90, vanTocNguon: 'mac_dinh', ghiChuVanToc: 'chưa đo được tốc độ (2/5 mẫu), tạm tính 90 giây/câu' } }
     // In NGUYÊN VĂN câu của máy chủ, không tự viết lại.
     expect(tuKeHoachNgay(macDinh, NOW).tocDo).toEqual({ chu: 'chưa đo được tốc độ (2/5 mẫu), tạm tính 90 giây/câu' })
-    expect(tuKeHoachNgay(keHoachMayChu, NOW, phu).tocDo).toEqual({ giayMoiCau: 78, chu: 'tốc độ 78 s/câu · đo 30 ngày' })
+    expect(tuKeHoachNgay(keHoachMayChu, NOW, phu).tocDo).toEqual({ giayMoiCau: 78, chu: '78 giây mỗi câu, trung bình 30 ngày gần đây' })
   })
 
   it('chuỗi ngày: trợ lý đếm ngày HỌC, máy chủ đếm ngày ĐẠT — adapter ghi đúng tên', () => {
-    expect(tuKeHoachTroLy(troLy()).chuoiNgay.chu).toMatch(/ngày học liên tiếp$/)
-    expect(tuKeHoachNgay(keHoachMayChu, NOW, phu).chuoiNgay).toEqual({ soNgay: 5, chu: '5 ngày đạt liên tiếp' })
+    expect(tuKeHoachTroLy(troLy()).chuoiNgay.chu).toMatch(/^Chuỗi \d+ ngày$/)
+    expect(tuKeHoachNgay(keHoachMayChu, NOW, phu).chuoiNgay).toEqual({ soNgay: 5, chu: 'Chuỗi 5 ngày' })
   })
 
   it('không có chữ "nắm chắc" ở bất kỳ thẻ nào', () => {

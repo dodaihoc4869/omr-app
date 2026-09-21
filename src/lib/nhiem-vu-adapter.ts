@@ -31,10 +31,10 @@ export const VAI_TRO_MAU: Record<BacNhiemVu, VaiTroMau> = {
   tuy_chon: 'tertiary',
 }
 export const NHAN_BAC: Record<BacNhiemVu, string> = {
-  khan: 'KHẨN',
-  bat_buoc: 'BẮT BUỘC HÔM NAY',
-  nen_lam: 'NÊN LÀM',
-  tuy_chon: 'TUỲ CHỌN',
+  khan: 'Sắp đến hạn nộp',
+  bat_buoc: 'Bắt buộc hôm nay',
+  nen_lam: 'Nên làm',
+  tuy_chon: 'Làm thêm (không bắt buộc)',
 }
 
 export interface TheNhiemVu {
@@ -213,7 +213,7 @@ function gomBac(viec: TheNhiemVu[]): NhomBac[] {
 }
 
 /** Nhãn bậc TUỲ CHỌN khi em đã xong việc hôm nay: việc còn lại là LÀM THÊM, không phải nợ. */
-export const NHAN_LAM_THEM = 'LÀM THÊM · TUỲ CHỌN'
+export const NHAN_LAM_THEM = 'Làm thêm (không bắt buộc)'
 
 function dongGoi(
   nguon: DuLieuBangNhiemVu['nguon'],
@@ -333,7 +333,7 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     },
     tocDo: { chu: 'tốc độ: chưa đo' },
     // `chuoiNgayHoc` đếm ngày CÓ NỘP BÀI, chưa phải ngày "đạt" — nói đúng tên.
-    chuoiNgay: { soNgay: streak.soNgayLienTiep, chu: `${streak.soNgayLienTiep} ngày học liên tiếp` },
+    chuoiNgay: { soNgay: streak.soNgayLienTiep, chu: `Chuỗi ${streak.soNgayLienTiep} ngày` },
     canhBao: [],
     quaHan: [],
     capNhatLuc: undefined,
@@ -629,7 +629,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
   const lenBac = Math.max(0, Number(keHoach.tienBo.lenBac) || 0)
   const conThieu = Math.max(0, Number(keHoach.tienBo.conThieu) || 0)
   // Nộp ≠ nắm: chỉ nói "đã làm N câu, M câu lên bậc", không nói "nắm chắc".
-  const ghiChuTienDo0 = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc ôn` : ''} · ${conThieu > 0 ? `còn ${conThieu} câu là đạt hôm nay` : 'đã đủ số câu tối thiểu hôm nay'}`
+  const ghiChuTienDo0 = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc` : ''} · ${conThieu > 0 ? `còn ${conThieu} câu là đạt hôm nay` : 'đã đủ số câu tối thiểu hôm nay'}`
   const chuoi = Math.max(0, Number(keHoach.chuoiDat) || 0)
   const daDo = keHoach.nganSach.vanTocNguon === 'do' && Number(keHoach.nganSach.vanTocGiay) > 0
   // "Đã xong việc hôm nay" chỉ khi CẢ HAI cùng đạt: `tienBo.dat` và (nếu máy chủ có nói) `exp.datNgay.dat`. Ngày nghỉ: chỉ `tienBo.dat`.
@@ -642,19 +642,19 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
   const CHU_THIEU: Record<string, string> = {
     cau_toi_thieu: `làm thêm ${soConThieu} câu`,
     tre_nhip: 'làm nốt việc bắt buộc đang trễ nhịp',
-    chua_len_bac: 'lên bậc ít nhất một câu tới hạn ôn',
+    chua_len_bac: 'lên bậc ít nhất một câu đến lịch ôn lại',
   }
   const thieuChu = expChuaDat ? (datNgayExp!.thieu || []).map((k) => CHU_THIEU[k]).filter(Boolean) : []
-  const dauTienDo = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc ôn` : ''}`
+  const dauTienDo = `Đã làm ${daLam} câu${lenBac > 0 ? `, ${lenBac} câu lên bậc` : ''}`
   const ghiChuTienDo = coDatNgay
     ? `${dauTienDo} · ${expChuaDat ? (thieuChu.length > 0 ? `Để đạt hôm nay: ${thieuChu.join('; ')}` : 'chưa đạt hôm nay') : 'đã đạt hôm nay'}`
     : ghiChuTienDo0
   return dongGoi('ke_hoach_ngay', viec, {
     tienDo: { daLam, mucTieu, phanTram: phanTram(daLam, mucTieu), ghiChu: ghiChuTienDo },
     tocDo: daDo
-      ? { giayMoiCau: Math.round(Number(keHoach.nganSach.vanTocGiay)), chu: `tốc độ ${Math.round(Number(keHoach.nganSach.vanTocGiay))} s/câu · đo 30 ngày` }
+      ? { giayMoiCau: Math.round(Number(keHoach.nganSach.vanTocGiay)), chu: `${Math.round(Number(keHoach.nganSach.vanTocGiay))} giây mỗi câu, trung bình 30 ngày gần đây` }
       : { chu: keHoach.nganSach.ghiChuVanToc || 'tốc độ: chưa đo' },
-    chuoiNgay: { soNgay: chuoi, chu: `${chuoi} ngày đạt liên tiếp` },
+    chuoiNgay: { soNgay: chuoi, chu: `Chuỗi ${chuoi} ngày` },
     // `chua_do_toc_do` đã in ở dòng tốc độ (nguyên văn ghiChuVanToc) — không in hai lần.
     canhBao: (keHoach.canhBao || []).filter((c) => c.loai !== 'chua_do_toc_do' && c.noiDung).map((c) => ({ loai: c.loai, noiDung: c.noiDung })),
     quaHan,

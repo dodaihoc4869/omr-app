@@ -94,15 +94,15 @@ export default function LichSuCaM3({
 
                 <dl className="lsc-phan">
                   <div>
-                    <dt>Phần I (TN)</dt>
+                    <dt>Phần I · Trắc nghiệm</dt>
                     <dd>{fmt(item.diemI)}</dd>
                   </div>
                   <div>
-                    <dt>Phần II (Đ/S)</dt>
+                    <dt>Phần II · Đúng–sai</dt>
                     <dd>{fmt(item.diemII)}</dd>
                   </div>
                   <div>
-                    <dt>Phần III (Trả lời)</dt>
+                    <dt>Phần III · Trả lời ngắn</dt>
                     <dd>{fmt(item.diemIII)}</dd>
                   </div>
                 </dl>
