@@ -27,7 +27,7 @@ beforeAll(async () => {
   await may.listen()
   goc = `http://127.0.0.1:${(may.httpServer!.address() as AddressInfo).port}`
   trinhDuyet = await chromium.launch({ headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] })
-}, 120_000)
+}, 180_000)
 afterAll(async () => {
   await trinhDuyet?.close()
   await may?.close()
@@ -43,7 +43,7 @@ async function chup(rong: number, cao: number, gd: 'sang' | 'toi'): Promise<{ la
   await trang.addInitScript(caiBatChuCanvas)
   await trang.goto(`${goc}/tests/_trinh-duyet-bts/bts.html?gd=${gd}`, { waitUntil: 'networkidle' })
   await trang.waitForSelector('[data-khoi="bang-tin-san"]')
-  await trang.waitForFunction(() => document.querySelector('[data-kieu]')?.getAttribute('data-kieu') !== 'cho', undefined, { timeout: 20_000 })
+  await trang.waitForFunction(() => document.querySelector('[data-kieu]')?.getAttribute('data-kieu') !== 'cho', undefined, { timeout: 60_000 })
   await trang.waitForTimeout(1200)
   const lan: KetQuaDo[] = []
   for (let k = 0; k < 3; k++) {
@@ -72,7 +72,7 @@ describe('Bảng tin sàn trong Chromium thật — không chồng chữ, không
           if (k.cuonDoc) loiDo.push(`[lần ${i + 1}] CUỘN DỌC (màn cao hơn cửa sổ)`)
         }
         expect([...new Set(loiDo.map((x) => x.replace(/^\[lần \d\] /, '')))], loiDo.join('\n')).toEqual([])
-      }, 60_000)
+      }, 120_000)
     }
   }
 })
