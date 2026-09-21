@@ -40,6 +40,7 @@ import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import * as ND from './btvn-nang-do-d1'
 import * as AI from './bo-nao'
+import {themTenDangDemQua,themTenDangNhatKy} from './ten-dang-bo-nao'
 import {docLoiNhanHlv} from './bo-nao-doc'
 import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env } from './kieu'
@@ -3146,8 +3147,9 @@ export default {
       if (p === '/ai/cau-hinh') return ra(await AI.boNaoCauHinh(env, b))
       if (p === '/ai/ho-so-ngay') return ra(await AI.boNaoHoSoNgay(env, b))
       if (p === '/ai/dieu-chinh/nop') return ra(await AI.boNaoNop(env, b))
-      if (p === '/ai/dem-qua') return ra(await AI.boNaoDemQua(env, b))
-      if (p === '/ai/nhat-ky') return ra(await AI.boNaoNhatKy(env, b))
+      // TÊN DẠNG cạnh mã dạng (chuẩn từ ngữ luật 4: mã nội bộ không hiện cho thầy) — lớp mỏng `ten-dang-bo-nao.ts`, không sửa lõi Bộ não.
+      if (p === '/ai/dem-qua') return ra(await themTenDangDemQua(env, await AI.boNaoDemQua(env, b)))
+      if (p === '/ai/nhat-ky') return ra(await themTenDangNhatKy(env, await AI.boNaoNhatKy(env, b)))
       if (p === '/ai/dieu-chinh/bo') return ra(await AI.boNaoBoDieuChinh(env, b))
       if (p === '/btvn/giao') return giaoBtvn(env, b)
       if (p === '/btvn/xem-truoc') return ra(await ND.xemTruocBtvn(env, b, Date.now()))
