@@ -20,6 +20,8 @@ import {
   dangKyNhanTinNhan,
   type TinNhanChat,
 } from '../lib/tro-ly/he-thong-chat'
+import { gioDayDu } from '../lib/ngay-gio-24'
+import { gioPhutVN } from '../lib/em-toan-canh'
 
 /** Tên thầy đặt cho trợ lý (thầy chốt 06/09). Một chỗ duy nhất — đổi tên thì
  * đổi ở đây, không đi sửa từng chỗ. */
@@ -372,7 +374,7 @@ export default function MessagesFab() {
                         {m.lop ? ` — lớp ${m.lop}` : ''} {m.sbd ? ` — SBD ${m.sbd}` : ''}
                       </span>
                     </span>
-                    <span className="shrink-0">{new Date(m.thoiGian).toLocaleString('vi-VN')}</span>
+                    <span className="shrink-0">{gioDayDu(m.thoiGian, '')}</span>
                   </div>
                   <div className="text-sm whitespace-pre-wrap">{m.noiDung}</div>
                 </div>
@@ -423,7 +425,7 @@ export default function MessagesFab() {
                           {m.nguoiGui.hoTen || (laThay ? `Gửi tới: ${m.nguoiNhan.hoTen || m.nguoiNhan.sbd}` : `SBD ${m.nguoiGui.sbd}`)}
                         </span>
                       </span>
-                      <span className="shrink-0">{new Date(m.thoiGian).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="shrink-0">{gioPhutVN(m.thoiGian)}</span>
                     </div>
                     <div className="text-sm whitespace-pre-wrap">{m.noiDung}</div>
                     {m.html && (

@@ -26,6 +26,7 @@ import TheCau from '../components/TheCau'
 import NutQuayLai from '../components/NutQuayLai'
 import { useAppStore } from '../store/appStore'
 import { apDungSoSua, type SoSuaDang } from '../lib/sua-dang'
+import { ngayDayDu } from '../lib/ngay-gio-24'
 
 type CauNghi = {
   phan: 'I' | 'II' | 'III'
@@ -284,7 +285,7 @@ export default function NganHangDeScreen() {
       else if (c.phan === 'II') (q as TeacherTrueFalseQuestion).correct = dapAnMoi.split('') as ['D' | 'S', 'D' | 'S', 'D' | 'S', 'D' | 'S']
       else (q as TeacherShortAnswerQuestion).correct = dapAnMoi
       q.loiGiaiTrangThai = 'khop'
-      q.ghiChuLoiGiai = `Thầy chốt đáp án ${dapAnMoi} ngày ${new Date().toLocaleDateString('vi-VN')}`
+      q.ghiChuLoiGiai = `Thầy chốt đáp án ${dapAnMoi} ngày ${ngayDayDu(Date.now())}`
     }
     const list = c.phan === 'I' ? next.phanI : c.phan === 'II' ? next.phanII : next.phanIII
     apDung(list[c.idx])
@@ -348,7 +349,7 @@ export default function NganHangDeScreen() {
   const duyetHangLoat = async (ds: TeacherExamSource[]) => {
     setDangDuyet(true)
     try {
-      const ghi = `Thầy duyệt hàng loạt ngày ${new Date().toLocaleDateString('vi-VN')}, giữ nguyên đáp án đang chấm`
+      const ghi = `Thầy duyệt hàng loạt ngày ${ngayDayDu(Date.now())}, giữ nguyên đáp án đang chấm`
       let n = 0
       for (const s of ds) {
         const { next, n: k } = duyetDe(s, ghi)
@@ -496,7 +497,7 @@ export default function NganHangDeScreen() {
                       </div>
                       <div className="truncate" style={{ ...NHAN_NHO, marginTop: 3 }}>
                         {s.maDe}
-                        {s.ngayNap ? ` · nạp ${new Date(s.ngayNap).toLocaleDateString('vi-VN')}` : ''}
+                        {s.ngayNap ? ` · nạp ${ngayDayDu(s.ngayNap)}` : ''}
                       </div>
                     </div>
                   </div>

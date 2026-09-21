@@ -12,6 +12,7 @@ import {
   Send,
   TrendingUp,
 } from 'lucide-react'
+import { ngayDayDu } from '../lib/ngay-gio-24'
 
 export interface BangTroLyPhuHuynhProps {
   sbd: string
@@ -234,7 +235,7 @@ export default function BangTroLyPhuHuynh({
                 </h4>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                   Điểm số: <b className="text-blue-600 dark:text-blue-400 text-sm">{typeof thongKe.diemGanNhat === 'number' ? thongKe.diemGanNhat.toFixed(1) : 'Đã nộp'}</b>
-                  {caGanNhat.ngayNop ? ` · Ngày ${new Date(caGanNhat.ngayNop).toLocaleDateString('vi-VN')}` : ''}
+                  {caGanNhat.ngayNop ? ` · Ngày ${ngayDayDu(caGanNhat.ngayNop)}` : ''}
                 </p>
               </div>
 

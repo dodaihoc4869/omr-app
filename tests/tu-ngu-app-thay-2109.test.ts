@@ -104,3 +104,31 @@ describe('CỤM 3 · Bộ não A.I · ngày giờ · Gọi lên bảng (hàng 9,
     expect(chuHienRa('src/lib/em-toan-canh.ts')).toContain("len_bang: 'Gọi lên bảng'")
   })
 })
+
+describe('CỤM 4 · Ngày giờ một kiểu (hàng 14) — giờ VN, 24 giờ, đủ số 0; danh sách gọn giữ "dd/mm HH:mm"', () => {
+  it('ngayDayDu: "dd/mm/yyyy" đủ số 0 theo GIỜ VIỆT NAM (17:30Z đã sang ngày sau); mốc hỏng ⇒ chuỗi rỗng', async () => {
+    const { ngayDayDu } = await import('../src/lib/ngay-gio-24')
+    expect(ngayDayDu('2026-09-24T16:59:00Z')).toBe('24/09/2026')
+    expect(ngayDayDu('2026-09-04T17:30:00Z')).toBe('05/09/2026')
+    expect(ngayDayDu(Date.parse('2026-01-02T01:00:00Z'))).toBe('02/01/2026')
+    expect(ngayDayDu('hỏng')).toBe('')
+    expect(ngayDayDu(undefined, '—')).toBe('—')
+  })
+
+  it('HoSoEmView.ngayGio + gioPhutVN nhận số: "21/09 20:14" giờ VN, không lệ thuộc máy; 17:30Z ⇒ ngày kế', async () => {
+    const { ngayGio } = await import('../src/components/HoSoEmView')
+    const { gioPhutVN } = await import('../src/lib/em-toan-canh')
+    expect(ngayGio('2026-09-21T13:14:00Z')).toBe('21/09 20:14')
+    expect(ngayGio('2026-09-20T17:30:00Z')).toBe('21/09 00:30')
+    expect(ngayGio('hỏng')).toBe('')
+    expect(gioPhutVN(Date.parse('2026-09-21T13:14:00Z'))).toBe('20:14')
+  })
+
+  it('không còn toLocaleDateString/toLocaleString(vi-VN) trơ ở các chỗ đã sửa (ngày kiểu máy: "25/9/2026", "12:59:00")', () => {
+    for (const f of ['src/screens/NganHangDeScreen.tsx', 'src/components/BangTroLyPhuHuynh.tsx', 'src/components/MessagesFab.tsx', 'src/components/HoSoEmView.tsx', 'src/components/KhoiThoiGianCa.tsx', 'src/screens/CauHoiScreen.tsx', 'src/screens/LichSuCaScreen.tsx']) {
+      expect(chuHienRa(f), f).not.toMatch(/toLocaleTimeString\('vi-VN'|toLocaleString\('vi-VN'|toLocaleDateString\('vi-VN'\)/)
+    }
+    expect(chuHienRa('src/components/MessagesFab.tsx')).toContain('gioDayDu(m.thoiGian')
+    expect(chuHienRa('src/screens/NganHangDeScreen.tsx')).toContain('ngayDayDu(s.ngayNap)')
+  })
+})

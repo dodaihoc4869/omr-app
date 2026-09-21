@@ -7,6 +7,7 @@
 // Nội dung y hệt nhau; chỉ khác cách xưng hô và các nút hành động của thầy —
 // những nút đó do màn cha vẽ thêm, không nằm ở đây.
 import { TrendingDown, TrendingUp, Minus, FileText } from 'lucide-react'
+import { gioPhutVN, ngayVN } from '../lib/em-toan-canh'
 import { Hang, Nhan, OThongBao, TheNoiDung } from './DesignSystem'
 import type { BaiTapCuaEm, ChuyenDeEm, HoSoEm, TrangThaiBaiTap, XuHuong } from '../lib/exam-api'
 import { classify } from '../engine/score'
@@ -68,7 +69,8 @@ function phanTram(x: number): string {
 export function ngayGio(iso: string): string {
   const d = new Date(iso)
   if (!Number.isFinite(d.getTime())) return ''
-  return d.toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+  const [, m, ng] = /^\d{4}-(\d{2})-(\d{2})$/.exec(ngayVN(iso)) ?? []
+  return `${ng}/${m} ${gioPhutVN(iso)}` // dd/mm HH:mm giờ VN (24 giờ); danh sách gọn nên không kèm thứ/năm
 }
 
 function MuiTen({ xuHuong }: { xuHuong: XuHuong }) {

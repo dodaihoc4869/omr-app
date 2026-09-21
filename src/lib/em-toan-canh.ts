@@ -163,8 +163,8 @@ export const ngayVN = (iso: string | number): string => {
   const ms = typeof iso === 'number' ? iso : Date.parse(iso)
   return Number.isFinite(ms) ? NGAY_VN.format(ms) : ''
 }
-export const gioPhutVN = (iso: string): string => {
-  const ms = Date.parse(iso)
+export const gioPhutVN = (moc: string | number): string => {
+  const ms = typeof moc === 'number' ? moc : Date.parse(moc)
   return Number.isFinite(ms) ? GIO_VN.format(ms) : ''
 }
 /** 'YYYY-MM-DD' → "Thứ Hai 21/09/2026" (thứ tính theo lịch, không lệ thuộc múi giờ máy). */

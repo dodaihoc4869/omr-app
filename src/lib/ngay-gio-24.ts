@@ -134,3 +134,11 @@ export function gioDayDu(moc: unknown, khiSai = 'Chưa có hạn hợp lệ'): s
   if (!Number.isFinite(ms)) return khiSai
   return hienGiaTri(bayGio(ms, 'vn'))
 }
+
+/** "25/09/2026" (đủ số 0, GIỜ VIỆT NAM) của một mốc — chỗ nào chỉ cần NGÀY (không giờ). Sai ⇒ `khiSai`. Thay `toLocaleDateString('vi-VN')` vốn ra "25/9/2026" thiếu số 0. */
+export function ngayDayDu(moc: unknown, khiSai = ''): string {
+  const ms = typeof moc === 'number' ? moc : typeof moc === 'string' && moc.trim() ? Date.parse(moc) : NaN
+  if (!Number.isFinite(ms)) return khiSai
+  const f = tachGiaTri(bayGio(ms, 'vn'))
+  return `${f.d}/${f.m}/${f.y}`
+}

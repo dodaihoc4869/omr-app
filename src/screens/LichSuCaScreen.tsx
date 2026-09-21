@@ -14,6 +14,7 @@ import { useAppStore } from '../store/appStore'
 import NutQuayLai from '../components/NutQuayLai'
 import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
 import './lich-su-ca-m3.css'
+import { gioPhutVN } from '../lib/em-toan-canh'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -47,7 +48,7 @@ export function caConEmDangLam(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetH
 function ngayGio(iso: string): string {
   const d = new Date(iso)
   if (!Number.isFinite(d.getTime())) return ''
-  return `${d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })} ${d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`
+  return `${d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })} ${gioPhutVN(iso)}`
 }
 
 export default function LichSuCaScreen() {

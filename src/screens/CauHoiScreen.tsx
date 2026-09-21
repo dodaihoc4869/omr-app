@@ -21,6 +21,7 @@ import { danhSachCauHoi, xoaCauHoi } from '../lib/exam-api'
 import { loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret } from '../lib/exam-db'
 import { gomTheoCa, type CaCoCauHoi } from '../lib/hoi-bai'
 import { useAppStore } from '../store/appStore'
+import { gioPhutVN } from '../lib/em-toan-canh'
 
 const NHAN: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', lineHeight: 1.6 }
 
@@ -28,7 +29,7 @@ function ngayGio(iso: string): string {
   if (!iso) return ''
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return ''
-  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} ${gioPhutVN(iso)}`
 }
 
 /** Ô tích của một thẻ. Tách hẳn thành nút riêng cạnh thẻ chứ không lồng trong

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { gioPhutVN } from '../lib/em-toan-canh'
 import { PHUT_MOI_LAN, cauKetQuaThemPhut, type KetQuaThemPhut } from '../lib/them-phut-api'
 import { conLaiCa, dinhDangDongHo } from '../lib/con-lai-ca'
 import { gioMayChu } from '../lib/gio-may-chu'
@@ -25,8 +26,7 @@ export interface ThemPhutProps {
 }
 
 function gioPhut(iso: string): string {
-  const d = new Date(iso)
-  return Number.isFinite(d.getTime()) ? d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''
+  return gioPhutVN(iso) // HH:mm 24 giờ GIỜ VIỆT NAM — không lệ thuộc máy đặt 12 giờ
 }
 
 export default function KhoiThoiGianCa({ ca, themPhut }: { ca: CaGioHienThi; themPhut?: ThemPhutProps }) {
