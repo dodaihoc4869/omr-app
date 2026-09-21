@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Bảng tin — điện thoại, trang Bài tập về nhà</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0;font-family:'Be Vietnam Pro',system-ui,sans-serif;background:#F3F6FB;color:#1A1F27}
+a{color:#1849A9;text-decoration:none}a:hover{color:#123A87}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 14px; background: #F3F6FB; color: #1A1F27;">
+<header style="display: flex; flex-direction: column; gap: 8px;">
+<div style="display: flex; align-items: center; gap: 10px;">
+<h1 style="margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.3px; flex-grow: 1;">Bảng tin</h1>
+<button type="button" aria-label="Tìm học sinh" style="width: 48px; height: 48px; border-radius: 50%; border: 1px solid #DDE4EF; background: #FFFFFF; color: #1A1F27; display: flex; align-items: center; justify-content: center;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+</button>
+</div>
+<div style="display: flex; align-items: center; gap: 8px;">
+<span style="padding: 6px 12px; border-radius: 999px; background: #DCE7FB; color: #123A87; font-size: 13px; font-weight: 600;">Từ 12:00 · Thứ Hai 21/09/2026</span>
+<span style="font-size: 13px; color: #4A5565;">Cập nhật 14:32</span>
+</div>
+</header>
+<div style="font-size: 13px; font-weight: 700; color: #4A5565; text-transform: uppercase; letter-spacing: 0.5px;">Trang 2 trong 6 · Bài tập về nhà đang chạy</div>
+<div style="display: flex; gap: 14px; font-size: 13px; color: #4A5565;">
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border-radius: 3px; background: #C9D3E3;"></span>Chưa mở</span>
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border-radius: 3px; background: #F1B44C;"></span>Đang làm</span>
+<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 12px; height: 12px; border-radius: 3px; background: #157A3C;"></span>Đã nộp</span>
+</div>
+<section style="flex-grow: 1; display: flex; flex-direction: column; gap: 12px; min-height: 0;">
+<sc-for list="{{bai}}" as="b" hint-placeholder-count="3">
+<div style="flex-grow: 1; box-sizing: border-box; padding: 16px 18px; border-radius: 20px; background: #FFFFFF; border: 1px solid #DDE4EF; display: flex; flex-direction: column; justify-content: space-between; gap: 8px;">
+<div style="display: flex; flex-direction: column; gap: 4px;">
+<span style="font-size: 17px; font-weight: 700;">{{b.ten}}</span>
+<span style="font-size: 13px; color: #4A5565;">{{b.lop}} · hạn nộp {{b.han}}</span>
+</div>
+<div style="display: flex; height: 30px; border-radius: 9px; overflow: hidden; font-size: 14px; font-weight: 700;">
+<span style="width: {{b.w1}}; background: #C9D3E3; color: #1A1F27; display: flex; align-items: center; justify-content: center;">{{b.n1}}</span>
+<span style="width: {{b.w2}}; background: #F1B44C; color: #3A2500; display: flex; align-items: center; justify-content: center;">{{b.n2}}</span>
+<span style="width: {{b.w3}}; background: #157A3C; color: #FFFFFF; display: flex; align-items: center; justify-content: center;">{{b.n3}}</span>
+</div>
+<div style="font-size: 13px; color: #4A5565; line-height: 18px;">{{b.nhac}}</div>
+</div>
+</sc-for>
+</section>
+<nav aria-label="Các trang của bảng tin" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 28px;">
+<a href="DienThoai1.dc.html" aria-label="Về trang Nhịp hôm nay" style="width: 8px; height: 8px; border-radius: 50%; background: #B8C4D6;"></a>
+<span style="width: 22px; height: 8px; border-radius: 4px; background: #1849A9;"></span>
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #B8C4D6;"></span>
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #B8C4D6;"></span>
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #B8C4D6;"></span>
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #B8C4D6;"></span>
+<span style="margin-left: 10px; font-size: 14px; font-weight: 600; color: #1849A9;">Lướt sang: Tiến bộ hôm nay</span>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {
+bai: [
+{ ten: 'Ester – Lipid', lop: '12 - Tinh Hoa · 42 em', han: '12:00 Thứ Sáu 25/09', w1: '21.4%', w2: '64.3%', w3: '14.3%', n1: '9', n2: '27', n3: '6', nhac: 'Máy đã tự nhắc 9 em chưa mở · lượt nhắc kế 20:00' },
+{ ten: 'Carbohydrate', lop: '12 - Nhóm 10 điểm · 15 em', han: '23:59 Thứ Năm 24/09', w1: '13.4%', w2: '53.3%', w3: '33.3%', n1: '2', n2: '8', n3: '5', nhac: 'Máy đã tự nhắc 2 em chưa mở · lượt nhắc kế 20:00' },
+{ ten: 'Alkane – Alkene', lop: 'Khối 11 · 91 em', han: '12:00 Thứ Bảy 26/09', w1: '38.4%', w2: '48.4%', w3: '13.2%', n1: '35', n2: '44', n3: '12', nhac: 'Máy đã tự nhắc 35 em chưa mở · lượt nhắc kế 20:00' }
+]
+};
+}
+}
+</script>
+</body>
+</html>
