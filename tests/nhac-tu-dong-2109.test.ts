@@ -65,6 +65,12 @@ describe('hàm thuần: cờ, khung giờ, lượt 30 phút, giờ dự kiến',
     expect(co([], VN('2026-09-23', '10:00'), true, { ...c, bat: false })).toBeUndefined()
     expect(co([], VN('2026-09-23', '10:00'), true, { ...c, mocTat: ['M1'] })?.moc).toBe('M2')
   })
+  it('nhacKeCuaEm M1: hạn ĐÚNG đầu lượt 30 phút (12:00) ⇒ M1 hiện 12:00 ngày trước hạn (lượt đó đã đủ điều kiện), không nhảy sang 12:30; hạn 12:10 ⇒ lượt 12:30 (12:10 không phải đầu lượt); mốc là bây giờ ⇒ lượt kế', () => {
+    const co = (hhmm: string, nowMs: number) => nhacKeCuaEm({ hanIso: new Date(VN('2026-09-24', hhmm)).toISOString(), nowMs, chuaMo: true, daCoMoc: new Set(), cfg: CAU_HINH_MAC_DINH })
+    expect(co('12:00', VN('2026-09-21', '11:00'))).toEqual({ moc: 'M1', luc: new Date(VN('2026-09-23', '12:00')).toISOString() })
+    expect(co('12:10', VN('2026-09-21', '11:00'))).toEqual({ moc: 'M1', luc: new Date(VN('2026-09-23', '12:30')).toISOString() })
+    expect(co('12:00', VN('2026-09-23', '12:00'))).toEqual({ moc: 'M1', luc: new Date(VN('2026-09-23', '12:30')).toISOString() }) // đã tới mốc: lượt kế
+  })
   it('ngayGuiM2: hạn từ 20:30 trở đi ⇒ M2 gửi chính ngày hạn; hạn trước 20:30 (00:00, 12:00 trưa, 20:29) ⇒ tối HÔM TRƯỚC', () => {
     const h = (hhmm: string) => VN('2026-09-26', hhmm)
     expect(['00:00', '07:00', '12:00', '20:29'].map((g) => ngayGuiM2(h(g)))).toEqual(['2026-09-25', '2026-09-25', '2026-09-25', '2026-09-25'])

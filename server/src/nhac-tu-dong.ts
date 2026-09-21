@@ -415,7 +415,8 @@ export function nhacKeCuaEm(x: { hanIso: string; nowMs: number; chuaMo: boolean;
   const trongCuaSo = (ms: number): string => lanChayKe(ms, cfg)
   if (!cfg.mocTat.includes('M1') && chuaMo && han > nowMs && !daCoMoc.has('M1')) {
     const tu = Math.max(nowMs, han - GIO_M1_TRUOC_HAN * 3_600_000)
-    const luc = trongCuaSo(tu)
+    // Mốc tính ra ở TƯƠNG LAI (24 giờ trước hạn): lượt đúng đầu 30 phút đó đã đủ điều kiện (còn ≤ 24 giờ) nên KHÔNG nhảy sang lượt sau; mốc là BÂY GIỜ thì lượt KẾ.
+    const luc = trongCuaSo(tu > nowMs ? tu - 1 : tu)
     if (Date.parse(luc) < han) ds.push({ moc: 'M1', luc })
   }
   if (!cfg.mocTat.includes('M2') && !daCoMoc.has('M2')) {
