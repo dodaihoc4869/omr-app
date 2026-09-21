@@ -1,0 +1,13 @@
+# Lõi đúng bậc — chỗ Code 3 / Code 4 / Code 2 phải đọc "lõi CỦA EM" (Code 1, 21/09/2026 · lõi: `531f372` + `e2fa5f5`)
+**Đổi gì:** `BoCuaEm.loi` nay là lõi CỦA EM (cùng số câu, cùng độ phủ dạng với lõi của bài; ở dạng em ổn định ≥ Hiểu, câu lõi mức thấp được thay bằng câu cùng dạng đúng bậc). Khi lõi của em KHÁC lõi của bài, `bo.tomTat.loiCuaEm` (qid theo thứ tự đề) có mặt và được máy chủ lưu sẵn ở `btvn_em.tom_tat_json` — KHÔNG đổi lược đồ. Vắng ⇒ lõi của em = `bai.loi`. Bộ đã chốt trước bản này: không có `loiCuaEm` ⇒ đọc như cũ (đúng). Em đã chốt không bị đổi.
+
+## Máy chủ (Code 3) — `server/src/btvn-nang-do-d1.ts`
+1. **`thichNghiSauChang` (~1255–1281) — PHẢI SỬA:** dựng lại `bo.loi` bằng `bai.loi ∩ bộ` ⇒ câu lõi THAY (không thuộc `bai.loi`) bị coi là "riêng" và có thể bị thích nghi đổi mất (phạm bất biến "lõi không đổi"). Sửa: `const loiEm = tomTat.loiCuaEm ?? bai.loi; const loiSet = new Set(loiEm)` (`tomTat` đã đọc ở dòng 1258); phần `giuNguyen` giữ nguyên (nó dùng `bo.loi`).
+2. **`thongKeTheoDoiCaNhan` (~1121–1167) — NÊN SỬA:** `loiEm = btvn_cau.loi=1 ∩ nhan của em` ⇒ em có thay: `soCauLoi` thiếu và `diemLoi` tính trên câu khác. Thêm `tom_tat_json` vào SELECT `btvn_em` rồi `loiEm = docTomTat(...).loiCuaEm ?? [...loi].filter(q => nhan.has(q))`. `soLoi: loi.size` giữ (= số câu lõi mỗi em, vì thay 1–1).
+3. Không đổi: giao bài `:181–189` (`btvn_cau.loi` = lõi GỐC của bài), `dungBoChoEm :422`, Xem trước `:1013–1023` (`soLoi`, `canhBaoHanNgan` chỉ đếm), `server/src/index.ts:1613,1645,1947` (chỉ `soLoi`). `/gv/buoi-chua-de-xuat`: `loi` = `btvn_cau.loi` — câu thay có `loi=0`, câu gốc bị thay vẫn `loi=1`: chấp nhận, chỉ lệch dòng "câu cốt lõi nhiều em sai".
+4. **Ý nghĩa cần Boss biết:** `diemLoi` ("so lớp": đúng lõi / số câu lõi × 10) và cảnh báo `loi_it_hon_6` xây trên "lõi chung"; với lõi đúng bậc em ổn định làm câu KHÁC nên `diemLoi` giữa hai em không còn cùng thước (em bậc cao nhận câu khó hơn). Thầy đã chốt đổi luật này (11:31); nếu cần thước chung cho so lớp thì tính `diemLoi` trên `bai.loi ∩ câu em đã làm`.
+
+## App thầy (Code 4)
+5. Chữ "câu cốt lõi **chung**": `XemTruocPhanBo.tsx:129,187`, `PhanCongScreen.tsx:508,1186` (`noiDungNangDo`, chip), `lib/btvn-nang-do-thay.ts:320` — số câu lõi vẫn bằng nhau ở mọi em nhưng câu cụ thể có thể khác ⇒ bỏ "chung" hoặc ghi "mỗi dạng ≥ 1 câu". Xem trước từng em có thể hiện `em.tomTat.loiCuaEm` (nếu có) làm "lõi của em".
+## Máy em (Code 2)
+6. Không có chỗ nào đọc `bai.loi`; nhãn `nhan === 'loi'` chỉ là nhãn hiển thị (lõi ở vị trí khởi động vẫn mang nhãn `khoi_dong`). Chỉ cần soát chữ hiển thị nào nói "cả lớp cùng làm câu này" cho câu lõi.
