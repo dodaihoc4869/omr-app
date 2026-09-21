@@ -105,6 +105,9 @@ if (chup) {
   for (const sang of ['light', 'dark']) { const { p, ngu } = await mo(sang, 1280, 800, 'binh-thuong'); await luu(p, `1280-${sang === 'light' ? 'sang' : 'toi'}`); await ngu.close() }
   { const { p, ngu } = await mo('light', 390, 844, 'binh-thuong'); await luu(p, '390-sang'); await ngu.close() }
   { const { p, ngu } = await mo('light', 1280, 800, 'binh-thuong'); await p.getByRole('button', { name: /Xem \d+ em này/ }).first().click(); await luu(p, 'ngan-danh-sach-em-1280'); await ngu.close() }
+  // Điện thoại 412 tối, dữ liệu bản 2 THẬT (che tên) và bản "máy chủ cũ": thấy thẻ cuối cách nút nổi 'Mở ca kiểm tra'.
+  { const { p, ngu } = await mo('dark', 412, 915, 'that'); await luu(p, '412-toi-du-lieu-that'); await ngu.close() }
+  { const { p, ngu } = await mo('dark', 412, 915, 'may-cu-that'); await p.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await luu(p, '412-toi-may-cu-cuoi-danh-sach'); await ngu.close() }
   { const { p, ngu } = await mo('light', 1280, 800, 'binh-thuong'); await p.getByRole('button', { name: /Thêm thao tác/ }).first().click(); await p.getByRole('menuitem', { name: 'Đổi hạn nộp' }).click(); await luu(p, 'hop-doi-han-nop-1280'); await ngu.close() }
   { const { p, ngu } = await mo('light', 1280, 800, 'binh-thuong'); await p.getByRole('button', { name: /Thêm thao tác/ }).first().click(); await p.getByRole('menuitem', { name: 'Thu hồi' }).click(); await luu(p, 'hop-xac-nhan-thu-hoi-1280'); await ngu.close() }
 }
