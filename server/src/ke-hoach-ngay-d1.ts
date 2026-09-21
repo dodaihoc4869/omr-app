@@ -97,7 +97,51 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
   const cat14 = new Date(now - NGAY_LIET_KE_QUA_HAN * MOT_NGAY_MS).toISOString()
   const ngay30 = themNgay(homNay, -SO_NGAY_DO_VAN_TOC)
   const ngayLs = themNgay(homNay, -SO_NGAY_LICH_SU)
-  const nghi = await docNgayNghi(env)
+  // HẠ TẢI (Boss 21/09, D1 nghẽn): các truy vấn ĐỘC LẬP chỉ-đọc dưới đây chạy SONG SONG (trước đây tuần tự ~30 lượt chờ hàng đợi D1, mỗi lượt trả phí chờ; song song trả một lần). Kết quả dùng đúng chỗ cũ, đầu ra không đổi.
+  // Mỗi lời hứa dưới đây KHÔNG ném lỗi (đã bọc `tat`) trừ khi ghi chú khác; ai ném thì được chặn cảnh báo chưa xử lý và vẫn ném đúng chỗ `await` cũ.
+  const chan = <T,>(p: Promise<T>): Promise<T> => { p.catch(() => undefined); return p }
+  const pNghi = chan(docNgayNghi(env))
+  const pKhoi = chan(docKhoiCacEm(env, em).catch(() => new Map<string, Khoi | null>()))
+  const pRc = chan(tat(() => env.DB.prepare(
+    `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai FROM nam_kt_cau
+      WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?`,
+  ).bind(arr, homNay).all<Record<string, unknown>>(), trong()))
+  const pPhucVu = chan(pRc.then((rc) => tapQidPhucVu(env, (rc.results ?? []).map((x) => String(x.qid)))))
+  const pRd = chan(tat(() => env.DB.prepare(`SELECT * FROM nam_kt_dang WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong()))
+  const pRn = chan(tat(() => env.DB.prepare(`SELECT sbd, COUNT(*) AS n FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd`).bind(arr).all<Record<string, unknown>>(), trong()))
+  const pRg = chan(tat(() => env.DB.prepare(`SELECT sbd, giay FROM su_kien_hoc WHERE ${IN_EM} AND giay IS NOT NULL AND ngay_vn >= ?`).bind(arr, ngay30).all<Record<string, unknown>>(), trong()))
+  const pRt = chan(tat(() => env.DB.prepare(TIEN_BO_NGAY).bind(arr, homNay).all<Record<string, unknown>>(), trong()))
+  const pHienThi = chan(docCauDaLamHomNay(env, em, now))
+  const pRh = chan(tat(() => env.DB.prepare(`SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE ${IN_EM} AND ngay < ? AND ngay >= ? ORDER BY ngay DESC`).bind(arr, homNay, ngayLs).all<Record<string, unknown>>(), trong()))
+  const pRp = chan(tat(() => env.DB.prepare(`SELECT sbd, minutes FROM study_preferences WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong()))
+  const pRk = chan(tat(() => env.DB.prepare(`SELECT sbd, id, dang FROM game_v2_task WHERE ${IN_EM} AND completed_at IS NULL`).bind(arr).all<Record<string, unknown>>(), trong()))
+  const pRl = chan(tat(() => env.DB.prepare(`SELECT sbd, lop FROM hoc_sinh WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong()))
+  const denCa = new Date(now + NGAY_ON_THI * MOT_NGAY_MS).toISOString()
+  const pRca = chan(tat(() => env.DB.prepare("SELECT ma_ca, ten_ca, bat_dau, lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau > ? AND bat_dau <= ?").bind(nowIso, denCa).all<Record<string, unknown>>(), trong()))
+  const pDieuChinh = chan(docDieuChinhHieuLuc(env, em, homNay)) // có thể ném lỗi: ném ở chỗ await cuối như cũ
+  const pRb = chan((async () => {
+    // BTVN chưa nộp (còn hạn hoặc mới quá hạn ≤ 14 ngày). Có phòng vệ khi cột `lo_da_xong` chưa có.
+    const q = (cot: string, them = '') => `SELECT be.sbd, be.ma_btvn, ${cot} AS lo, b.so_cau, b.giao_luc, b.han_nop${them}
+         FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn
+        WHERE be.sbd IN (SELECT value FROM json_each(?)) AND be.thu_hoi = 0 AND b.da_xoa = 0 AND be.nop_luc IS NULL AND b.han_nop > ?`
+    // Ba cột BTVN "nâng đỡ" (migration-2109-btvn-nang-do.sql): chưa chạy migration thì lùi về truy vấn cũ, bài nào cũng là bài cũ.
+    let rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)', ', b.ca_nhan, be.so_cau_em, be.chot_luc, be.chang_mo_json')).bind(arr, cat14).all<Record<string, unknown>>(), null)
+    if (!rb) rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)')).bind(arr, cat14).all<Record<string, unknown>>(), null)
+    if (!rb) rb = await tat(() => env.DB.prepare(q('0')).bind(arr, cat14).all<Record<string, unknown>>(), trong())
+    return rb
+  })())
+  const pRm = chan((async () => {
+    // Mom chưa nộp: đã bắt đầu (còn hạn 120 phút hoặc mới quá hạn ≤ 14 ngày, để liệt kê quá hạn) VÀ chưa bắt đầu (không hạn cứng nhưng vẫn là
+    // việc em nợ). Bài hằng ngày `daily_<ngày>` của ngày cũ mà chưa bắt đầu thì bỏ ngay ở SQL — mỗi ngày một bài, không để dồn lại.
+    // `qid_json` (mã câu của bài) có từ migration-1909-mom-qid.sql; chưa có cột thì đọc như cũ, không chống trùng được.
+    const qm = (cot: string) => `SELECT sbd, id, question_count, created_at, started_at, ${cot} AS qid_json FROM mom_bai
+        WHERE ${IN_EM} AND submitted_at IS NULL AND ((started_at IS NOT NULL AND started_at > ?) OR (started_at IS NULL AND (id NOT LIKE 'daily_%' OR id = ?)))`
+    const tamMom = [arr, cat14, `daily_${ngayHocMom(now)}`] as const
+    let rm = await tat(() => env.DB.prepare(qm('qid_json')).bind(...tamMom).all<Record<string, unknown>>(), null)
+    if (!rm) rm = await tat(() => env.DB.prepare(qm('NULL')).bind(...tamMom).all<Record<string, unknown>>(), trong())
+    return rm
+  })())
+  const nghi = await pNghi
 
   const map = new Map<string, DauVaoKeHoach>()
   for (const sbd of em) {
@@ -108,17 +152,10 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
   }
   const cua = (x: Record<string, unknown>) => map.get(String(x.sbd))
   // LUẬT KHỐI (Boss 21/09): hàng ôn chỉ nhận câu khối em hoặc THẤP hơn — kể cả câu khối cao đã lọt vào sổ của em từ trước (mã tờ ở đầu qid). Không đọc được khối ⇒ không lọc.
-  const khoiEm: Map<string, Khoi | null> = await docKhoiCacEm(env, em).catch(() => new Map<string, Khoi | null>())
+  const khoiEm: Map<string, Khoi | null> = await pKhoi
   const hopKhoi = (x: Record<string, unknown>) => cauHopKhoi(khoiEm.get(String(x.sbd)), String(x.qid))
 
-  // BTVN chưa nộp (còn hạn hoặc mới quá hạn ≤ 14 ngày). Có phòng vệ khi cột `lo_da_xong` chưa có.
-  const q = (cot: string, them = '') => `SELECT be.sbd, be.ma_btvn, ${cot} AS lo, b.so_cau, b.giao_luc, b.han_nop${them}
-       FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn
-      WHERE be.sbd IN (SELECT value FROM json_each(?)) AND be.thu_hoi = 0 AND b.da_xoa = 0 AND be.nop_luc IS NULL AND b.han_nop > ?`
-  // Ba cột BTVN "nâng đỡ" (migration-2109-btvn-nang-do.sql): chưa chạy migration thì lùi về truy vấn cũ, bài nào cũng là bài cũ.
-  let rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)', ', b.ca_nhan, be.so_cau_em, be.chot_luc, be.chang_mo_json')).bind(arr, cat14).all<Record<string, unknown>>(), null)
-  if (!rb) rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)')).bind(arr, cat14).all<Record<string, unknown>>(), null)
-  if (!rb) rb = await tat(() => env.DB.prepare(q('0')).bind(arr, cat14).all<Record<string, unknown>>(), trong())
+  const rb = await pRb
   const baiChot = new Map<string, { chotLuc: string; sbd: string; lich: string | null }>() // `<ma_btvn>|<sbd>` → bài cá nhân hoá ĐÃ chốt (cần kích cỡ từng chặng)
   for (const x of rb.results ?? []) {
     const caNhan = Number(x.ca_nhan) === 1
@@ -152,34 +189,21 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
     }
   }
 
-  // Mom chưa nộp: đã bắt đầu (còn hạn 120 phút hoặc mới quá hạn ≤ 14 ngày, để liệt kê quá hạn) VÀ chưa bắt đầu (không hạn cứng nhưng vẫn là
-  // việc em nợ). Bài hằng ngày `daily_<ngày>` của ngày cũ mà chưa bắt đầu thì bỏ ngay ở SQL — mỗi ngày một bài, không để dồn lại.
-  // `qid_json` (mã câu của bài) có từ migration-1909-mom-qid.sql; chưa có cột thì đọc như cũ, không chống trùng được.
-  const qm = (cot: string) => `SELECT sbd, id, question_count, created_at, started_at, ${cot} AS qid_json FROM mom_bai
-      WHERE ${IN_EM} AND submitted_at IS NULL AND ((started_at IS NOT NULL AND started_at > ?) OR (started_at IS NULL AND (id NOT LIKE 'daily_%' OR id = ?)))`
-  const tamMom = [arr, cat14, `daily_${ngayHocMom(now)}`] as const
-  let rm = await tat(() => env.DB.prepare(qm('qid_json')).bind(...tamMom).all<Record<string, unknown>>(), null)
-  if (!rm) rm = await tat(() => env.DB.prepare(qm('NULL')).bind(...tamMom).all<Record<string, unknown>>(), trong())
+  const rm = await pRm
   for (const x of rm.results ?? []) {
     cua(x)?.mom.push({ id: String(x.id), soCau: Number(x.question_count) || 0, taoLuc: String(x.created_at ?? ''), batDauLuc: x.started_at ? String(x.started_at) : null, qid: docQid(x.qid_json) })
   }
 
   // Hồ sơ: câu tới hạn ôn (chỉ câu TỪNG SAI; chua_thay_sai không vào hàng ôn), dạng, và số câu sai chưa khắc phục.
-  const rc = await tat(() => env.DB.prepare(
-    `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai FROM nam_kt_cau
-      WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?`,
-  ).bind(arr, homNay).all<Record<string, unknown>>(), trong())
-  // CHỈ câu mà lệnh lấy đề (`/hs/cau-theo-qid`) PHỤC VỤ ĐƯỢC mới vào hàng ôn: cùng MỘT định nghĩa `qidPhucVuDuoc` (có trong chỉ mục game của tờ kho còn,
-  // không nằm trong đề thi đang bảo vệ). Câu chưa phục vụ được (đề đang bảo vệ, kho chưa lập chỉ mục) vẫn nằm trong hồ sơ, sẽ vào hàng ôn khi phục vụ
-  // được — chứ không được giao rồi để việc "Ôn N câu" không bao giờ xong.
+  const rc = await pRc
   const denHan = rc.results ?? []
-  const phucVu = await tapQidPhucVu(env, denHan.map((x) => String(x.qid)))
+  const phucVu = await pPhucVu
   for (const x of denHan) {
     if (phucVu && !phucVu.has(String(x.qid))) continue
     if (!hopKhoi(x)) continue
     cua(x)?.cauToiHan.push({ qid: String(x.qid), maDang: x.ma_dang ? String(x.ma_dang) : null, mocOnKe: String(x.moc_on_ke), lanSai: Number(x.lan_sai) || 0 })
   }
-  const rd = await tat(() => env.DB.prepare(`SELECT * FROM nam_kt_dang WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong())
+  const rd = await pRd
   for (const x of rd.results ?? []) {
     cua(x)?.dang.push({
       sbd: String(x.sbd), maDang: String(x.ma_dang), soGap: Number(x.so_gap), soSai: Number(x.so_sai), soDaKhacPhuc: Number(x.so_da_khac_phuc),
@@ -187,22 +211,22 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
       mocOnKe: x.moc_on_ke ? String(x.moc_on_ke) : null, mocMoiSai: x.moc_moi_sai ? String(x.moc_moi_sai) : null,
     } satisfies NamKtDang)
   }
-  const rn = await tat(() => env.DB.prepare(`SELECT sbd, COUNT(*) AS n FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd`).bind(arr).all<Record<string, unknown>>(), trong())
+  const rn = await pRn
   for (const x of rn.results ?? []) { const c = cua(x); if (c) c.soCauChuaKhacPhuc = Number(x.n) || 0 }
 
   // Tốc độ đo thật từ sổ (chỉ những nguồn có đo giây — hiện là ca thi).
-  const rg = await tat(() => env.DB.prepare(`SELECT sbd, giay FROM su_kien_hoc WHERE ${IN_EM} AND giay IS NOT NULL AND ngay_vn >= ?`).bind(arr, ngay30).all<Record<string, unknown>>(), trong())
+  const rg = await pRg
   for (const x of rg.results ?? []) cua(x)?.mauGiay.push(Number(x.giay))
 
   // Đã làm hôm nay (mọi nguồn), khử trùng theo câu; "lên bậc" = đúng lại câu từng sai/trống, "tụt bậc" = sai lại câu từng đúng.
-  const rt = await tat(() => env.DB.prepare(TIEN_BO_NGAY).bind(arr, homNay).all<Record<string, unknown>>(), trong())
+  const rt = await pRt
   for (const x of rt.results ?? []) { const c = cua(x); if (c) c.daLamHomNay = { soCau: Number(x.da_lam) || 0, lenBac: Number(x.len_bac) || 0, tutBac: Number(x.tut_bac) || 0, dung: Number(x.dung) || 0 } }
   // SỐ CÂU HIỂN THỊ (một định nghĩa, `cau-da-lam.ts`): KHÔNG thay `soCau` ở trên (nuôi luật đạt ngày/EXP/khiên) — chỉ thêm khoá; đọc lỗi ⇒ vắng khoá (không bịa 0). Em chưa làm câu nào ⇒ 0.
-  const hienThi = await docCauDaLamHomNay(env, em, now)
+  const hienThi = await pHienThi
   if (hienThi) for (const sbd of em) { const c = map.get(sbd); if (c) c.daLamHomNay.soCauHienThi = hienThi.get(sbd)?.soCau ?? 0 }
 
   // Lịch sử kết quả các ngày trước.
-  const rh = await tat(() => env.DB.prepare(`SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE ${IN_EM} AND ngay < ? AND ngay >= ? ORDER BY ngay DESC`).bind(arr, homNay, ngayLs).all<Record<string, unknown>>(), trong())
+  const rh = await pRh
   for (const x of rh.results ?? []) {
     const k = x.ket_qua === 'dat' || x.ket_qua === 'mot_phan' || x.ket_qua === 'khong' ? x.ket_qua : null
     cua(x)?.lichSu.push({ ngay: String(x.ngay), ketQua: k })
@@ -215,19 +239,18 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
   }
 
   // Phút học/ngày em đã đặt, nhiệm vụ thần thú phụ huynh nhắc.
-  const rp = await tat(() => env.DB.prepare(`SELECT sbd, minutes FROM study_preferences WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong())
+  const rp = await pRp
   for (const x of rp.results ?? []) {
     const c = cua(x)
     if (c) c.phutNgay = Math.max(PHUT_NGAY_TOI_THIEU, Math.min(PHUT_NGAY_TOI_DA, Number(x.minutes) || 0)) || null
   }
-  const rk = await tat(() => env.DB.prepare(`SELECT sbd, id, dang FROM game_v2_task WHERE ${IN_EM} AND completed_at IS NULL`).bind(arr).all<Record<string, unknown>>(), trong())
+  const rk = await pRk
   for (const x of rk.results ?? []) cua(x)?.nhiemVuThanThu.push({ id: String(x.id), dang: String(x.dang) })
 
   // Ca thi sắp tới của lớp em (một truy vấn cho cả lô).
-  const rl = await tat(() => env.DB.prepare(`SELECT sbd, lop FROM hoc_sinh WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong())
+  const rl = await pRl
   const lop = new Map((rl.results ?? []).map((x) => [String(x.sbd), String(x.lop ?? '').trim()]))
-  const den = new Date(now + NGAY_ON_THI * MOT_NGAY_MS).toISOString()
-  const rca = await tat(() => env.DB.prepare("SELECT ma_ca, ten_ca, bat_dau, lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau > ? AND bat_dau <= ?").bind(nowIso, den).all<Record<string, unknown>>(), trong())
+  const rca = await pRca
   for (const c of map.values()) {
     for (const x of rca.results ?? []) {
       const lopCa = String(x.lop ?? '').trim()
@@ -252,7 +275,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
   }
   // BỘ NÃO A.I (chế độ THẬT): điều chỉnh còn hạn của các em — nhịp vào ngân sách ngày; `on_som` kéo `moc_on_ke` của câu vừa sai thuộc dạng đó VỀ NGÀY MAI (chỉ SỚM hơn).
   // Chạy thử / tắt ⇒ `docDieuChinhHieuLuc` trả rỗng, kế hoạch Y HỆT (một truy vấn cấu hình). Không đụng hạn nộp bài nào.
-  const dieuChinh = await docDieuChinhHieuLuc(env, em, homNay)
+  const dieuChinh = await pDieuChinh
   for (const [sbd, dc] of dieuChinh) {
     const c = map.get(sbd)
     if (!c) continue

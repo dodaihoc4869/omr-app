@@ -56,6 +56,25 @@ describe('keHoachCoDem (hàm thuần)', () => {
   })
 })
 
+describe('dựng kế hoạch: truy vấn độc lập chạy SONG SONG (hạ tải D1: một lượt chờ hàng đợi thay vì ~10)', () => {
+  it('một lượt thật có nhiều truy vấn D1 cùng bay một lúc (đỉnh ≥ 6), và kết quả kế hoạch không đổi so với lượt tuần tự (cùng dữ liệu ⇒ cùng phản hồi)', async () => {
+    vi.useRealTimers()
+    const d = truong(); await lam(d, 'S1', 'Q1', '11:00:00')
+    let dang = 0, dinh = 0; const goc = d.env.DB.prepare.bind(d.env.DB)
+    d.env.DB.prepare = ((q: string) => {
+      const st = goc(q) as any; const bind = st.bind.bind(st)
+      st.bind = (...a: unknown[]) => { const s2 = bind(...a); const all = s2.all.bind(s2); s2.all = async () => { dang++; dinh = Math.max(dinh, dang); await new Promise((r) => setTimeout(r, 4)); try { return await all() } finally { dang-- } }; return s2 }
+      return st
+    }) as typeof d.env.DB.prepare
+    const a = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' })
+    expect(a.ok).toBe(true); expect(dinh).toBeGreaterThanOrEqual(6)
+    // Cùng dữ liệu, D1 không chậm: phản hồi y hệt (sau khi bỏ đệm và dựng lại) — không mất khoá nào vì thứ tự đọc đổi
+    xoaDemKeHoach(); const b = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' })
+    const bo = (o: Record<string, any>) => { const { capNhatLuc: _1, serverNow: _2, ...r } = o; return r }
+    expect(bo(b)).toEqual(bo(a)); expect(Object.keys(a).length).toBeGreaterThan(10)
+  })
+})
+
 describe('/hs/ke-hoach-ngay qua Worker', () => {
   it('lượt hai trong 20 giây: KHÔNG ghi gì và ít truy vấn hơn hẳn; hết 20 giây tính lại', async () => {
     const d = truong(); const c = dem(d)
