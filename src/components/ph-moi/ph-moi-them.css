@@ -1,0 +1,37 @@
+/* Phần BỔ SUNG cho bản vẽ app phụ huynh mới (mẫu chưa vẽ): thẻ là <button>, khung xương khi tải, lỗi tải + Thử lại, chân màn, thẻ kết quả giao bài trên nút dính đáy. Chỉ đọc biến m3/tokens; không màu thô. */
+button.phm-hn { width: 100%; text-align: left; border: 0; cursor: pointer; display: grid; gap: 14px; padding: 20px 20px 6px; border-radius: 32px; background: var(--m3-primary-container); color: var(--m3-on-primary-container); box-shadow: var(--m3-cao-do-1); }
+button.phm-hn:active, button.phm-ca-nho:active { transform: scale(0.99); }
+button.phm-ca-nho { width: 100%; text-align: left; cursor: pointer; border: 0; display: grid; gap: 6px; padding: 18px 20px; color: inherit; }
+.phm-xuong { display: grid; gap: 14px; }
+.phm-xuong i { display: block; height: 168px; border-radius: 32px; background: var(--m3-surface-container-high); animation: phm-nhap 1.6s ease-in-out infinite; }
+.phm-xuong i + i { height: 120px; border-radius: var(--m3-bo-28); animation-delay: 0.2s; }
+@keyframes phm-nhap { 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) { .phm-xuong i { animation: none; } }
+.phm-loi { display: grid; gap: 4px; justify-items: start; padding: 16px 20px; border-radius: var(--m3-bo-28); background: var(--m3-error-container); color: var(--m3-on-error-container); }
+.phm-loi p { font-size: var(--bnv-cx-2); font-weight: 600; }
+.phm-chan { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; margin-top: 8px; padding-top: 4px; border-top: 1px solid var(--phm-vien); }
+.phm-chan__nut { display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; color: var(--phm-nhat); font-size: var(--bnv-cx-1); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.phm-chan span { font-size: var(--bnv-cx-1); color: var(--phm-nhat); }
+.phm-day__the { width: 100%; max-width: 520px; max-height: 40vh; overflow-y: auto; padding: 12px 16px; border-radius: var(--m3-bo-16); background: var(--m3-surface-container-high); color: var(--m3-on-surface); }
+.phm-day__the[data-kieu="loi"], .phm-day__the[data-kieu="tu_choi"] { background: var(--m3-canh-bao-nen); color: var(--m3-canh-bao-chu); }
+.phm-day__the h3 { font-size: var(--bnv-cx-2); font-weight: 800; }
+.phm-day__the ul { margin-top: 4px; display: grid; gap: 2px; font-size: var(--bnv-cx-1); font-weight: 600; }
+.phm-day__the p, .phm-day__goi { font-size: var(--bnv-cx-1); font-weight: 600; }
+.phm-day .phm-nut:disabled { opacity: 0.55; cursor: default; }
+/* Mốc trên dòng thời gian là <button> (mẫu dùng <a href>): cùng kiểu. Dòng câu bị che / hàng con của nhóm mốc. */
+.phm-tl button.phm-tl__moc { position: relative; display: grid; grid-template-columns: 48px 36px minmax(0, 1fr) 20px; gap: 0 8px; align-items: start; width: 100%; min-height: 72px; padding: 8px 4px 10px 0; border-radius: 16px; text-align: left; cursor: pointer; }
+.phm-tl button.phm-tl__moc:hover { background: var(--m3-surface-container); }
+.phm-cau .phm-cau__hang { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "gio kq" "de de" "chan chan"; gap: 6px 12px; align-items: center; min-height: 48px; padding: 12px 16px; }
+.phm-cau__hang .phm-cau__gio { grid-area: gio; }
+.phm-cau__hang .phm-cau__kq { grid-area: kq; }
+.phm-cau__hang .phm-cau__de { grid-area: de; }
+.phm-cau__hang .phm-cau__chan { grid-area: chan; }
+.phm-cau__mo .phm-nut { justify-self: start; }
+
+/* CHỐNG TRÀN NGANG (hotfix P0 21/09, ảnh của thầy trên Samsung Internet): gốc `.phm` là khối thường, KHÔNG co giãn theo nội dung; mọi khung con `min-width: 0` để dải chip cuộn ngang / chuỗi dài không nở trang. */
+.phm { display: block; min-width: 0; max-width: 100%; }
+@supports (overflow: clip) { .phm { overflow-x: clip; } }
+.phm-nha, .phm-khung, .phm-canh, .phm-noi-dung, .phm-muc, .phm-tren, .phm-tren-ten, .phm-the, .phm-hero, .phm-muc-luc { min-width: 0; }
+.phm-muc-luc ul { max-width: 100%; }
+.phm-hero__loi, .phm-so-o, .phm-tl__chu, .phm-cau__de, .phm-dang, .phm-dang__ten, .phm-moc__ten { min-width: 0; overflow-wrap: anywhere; }
+
