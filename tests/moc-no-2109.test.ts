@@ -177,7 +177,7 @@ describe('emChamNhip(moc) — nợ theo mốc GIỜ cho nhip.noTheoLop (cùng lu
 })
 
 describe('/gv/bang-tin: nhip.noTheoLop theo mốc', () => {
-  it('em chậm chặng của bài giao từ ngày mốc ⇒ có noTheoLop; đẩy mốc qua ngày giao (hien_thi_tu) ⇒ bài cũ không tính nợ ⇒ khoá vắng; btvnDungNhip.cham (chậm cũ) không đổi', async () => {
+  it('em chậm chặng của bài giao từ ngày mốc ⇒ có noTheoLop; đẩy mốc qua ngày giao (hien_thi_tu) ⇒ Bảng tin theo mốc chung: bài cũ rời cả khối nhịp bài lẫn nợ ⇒ hai khoá vắng', async () => {
     gio(new Date('2026-09-24T13:00:00+07:00'))
     const d = taoD1That()
     d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em Một','12','mk','x')").run()
@@ -191,7 +191,8 @@ describe('/gv/bang-tin: nhip.noTheoLop theo mốc', () => {
     expect(a.nhip.noTheoLop).toEqual([{ lop: expect.any(String), siSo: 1, soEmNo: 1 }])
     datCauHinh(d, 'hien_thi_tu', '2026-09-22') // bài giao 21/09 nay là bài TRƯỚC ngày mốc
     const b = await goi()
-    expect(b.nhip.btvnDungNhip).toMatchObject({ tongEm: 1, cham: 1 }) // khối nhịp bài KHÔNG đổi
+    // SỬA CÓ CHỦ Ý 21/09 (MỘT định nghĩa "câu đã làm" lượt 2, Boss): Bảng tin theo mốc CHUNG (hien_thi_tu thắng bang_tin_tu) ⇒ đẩy mốc qua ngày giao thì bài cũ rời cả khối nhịp bài (trước đây khối nhịp còn theo bang_tin_tu riêng).
+    expect(b.nhip).not.toHaveProperty('btvnDungNhip')
     expect(b.nhip).not.toHaveProperty('noTheoLop')
   })
 })
