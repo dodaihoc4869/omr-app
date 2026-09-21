@@ -19,6 +19,7 @@ import { OThongBao } from '../components/DesignSystem'
 import { danhSachCa, danhSachEm, khoiTuNamSinh, type CaTomTat, type EmTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret, loadExamSources } from '../lib/exam-db'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
+import { chuChipLop, useLopThay, type LopThay } from '../lib/ten-lop-thay'
 import { luotCuaCaMoi } from '../lib/day-ca-may-chu-moi'
 import { giaoBtvn, theoDoiBtvn, suaGiaoBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import HopChonDe from '../components/HopChonDe'
@@ -158,6 +159,8 @@ function TheGiaoBtvn() {
   // hiển thị ô danh sách học sinh và có ô tick để giao bài tập).
   const [sbdChon, setSbdChon] = useState<Set<string>>(new Set())
   const [sbdChonTheoEm, setSbdChonTheoEm] = useState<Set<string>>(new Set())
+  // CHỌN THEO LỚP (thầy lệnh 21/09: "12 - Tinh Hoa" / "12 - Lớp Thường"): danh sách lớp từ `/gv/lop`; chưa có lệnh ⇒ mục ẨN, không lỗi.
+  const lopThay = useLopThay()
   useEffect(() => {
     if (!sbdGiaoRieng) return
     setTabBtvn('giao')
@@ -387,6 +390,27 @@ function TheGiaoBtvn() {
     })
   }
 
+  /** Em của lớp `l` mà máy chủ danh sách em CÓ (nếu đã tải) — không tick SBD ma. */
+  const sbdCuaLop = (l: LopThay) => {
+    const co = new Set(dsEm.map((e) => e.sbd))
+    return co.size > 0 ? l.sbd.filter((x) => co.has(x)) : l.sbd
+  }
+  const lopDaChonHet = (l: LopThay) => {
+    const ds = sbdCuaLop(l)
+    return ds.length > 0 && ds.every((x) => sbdChonTheoEm.has(x))
+  }
+  /** Bấm chip lớp: chọn sẵn MỌI em của lớp vào đường "Theo em" có sẵn (đã chọn hết thì bỏ hết em của lớp); bỏ/tick từng em vẫn được. Không đổi luật giao. */
+  const batLop = (l: LopThay) => {
+    const ds = sbdCuaLop(l)
+    setCheDo('theo_em')
+    setSbdChonTheoEm((prev) => {
+      const m = new Set(prev)
+      if (ds.length > 0 && ds.every((x) => m.has(x))) for (const x of ds) m.delete(x)
+      else for (const x of ds) m.add(x)
+      return m
+    })
+  }
+
   const boChonTheoEm = () => {
     setSbdChonTheoEm((prev) => {
       const m = new Set(prev)
@@ -519,7 +543,7 @@ function TheGiaoBtvn() {
         <button
           type="button"
           onClick={() => setTabBtvn('giao')}
-          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
             tabBtvn === 'giao'
               ? 'bg-white dark:bg-slate-700 text-[color:var(--m3-primary)] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -530,7 +554,7 @@ function TheGiaoBtvn() {
         <button
           type="button"
           onClick={() => setTabBtvn('theodoi')}
-          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`flex-1 py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
             tabBtvn === 'theodoi'
               ? 'bg-white dark:bg-slate-700 text-[color:var(--m3-primary)] dark:text-blue-400 shadow-xs ring-1 ring-black/5 dark:ring-white/10'
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -562,7 +586,7 @@ function TheGiaoBtvn() {
                 <button
                   type="button"
                   onClick={() => setCheDo('ca')}
-                  className={`text-xs font-bold inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`text-xs font-bold inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                     cheDo === 'ca'
                       ? 'bg-white dark:bg-slate-700 text-[color:var(--m3-primary)] dark:text-blue-400 shadow-xs ring-1 ring-black/5'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -573,7 +597,7 @@ function TheGiaoBtvn() {
                 <button
                   type="button"
                   onClick={chuyenSangHocSinh}
-                  className={`text-xs font-bold inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`text-xs font-bold inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                     cheDo === 'hoc_sinh'
                       ? 'bg-white dark:bg-slate-700 text-[color:var(--m3-primary)] dark:text-blue-400 shadow-xs ring-1 ring-black/5'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -584,7 +608,7 @@ function TheGiaoBtvn() {
                 <button
                   type="button"
                   onClick={() => setCheDo('theo_em')}
-                  className={`text-xs font-bold inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`text-xs font-bold inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                     cheDo === 'theo_em'
                       ? 'bg-white dark:bg-slate-700 text-[color:var(--m3-primary)] dark:text-blue-400 shadow-xs ring-1 ring-black/5'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -594,6 +618,33 @@ function TheGiaoBtvn() {
                 </button>
               </div>
             </div>
+
+            {lopThay.ds && (
+              <div data-khoi="chon-theo-lop" className="space-y-1.5">
+                <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Chọn theo lớp</div>
+                <div role="group" aria-label="Chọn theo lớp" className="flex flex-wrap items-center gap-2">
+                  {lopThay.ds.map((l) => {
+                    const chon = lopDaChonHet(l)
+                    return (
+                      <button
+                        key={l.tenLop}
+                        type="button"
+                        aria-pressed={chon}
+                        onClick={() => batLop(l)}
+                        className={`min-h-[44px] text-xs font-bold px-4 rounded-full transition-colors cursor-pointer ${
+                          chon
+                            ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs'
+                            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
+                        }`}
+                      >
+                        {chuChipLop({ tenLop: l.tenLop, soEm: sbdCuaLop(l).length })}
+                      </button>
+                    )
+                  })}
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Bấm một lớp để chọn sẵn mọi em của lớp ấy; bỏ chọn từng em ở danh sách “Theo em” bên dưới.</p>
+              </div>
+            )}
 
             {cheDo === 'ca' && (
               <div className="space-y-2.5">
@@ -625,7 +676,7 @@ function TheGiaoBtvn() {
                           key={c.maCa}
                           type="button"
                           onClick={() => batCa(c.maCa)}
-                          className={`p-3 rounded-xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
+                          className={`p-3 rounded-xl border text-left flex items-center gap-3 transition-colors cursor-pointer ${
                             chon
                               ? 'bg-blue-50/70 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 shadow-2xs'
                               : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-100/80 dark:hover:bg-slate-800'
@@ -710,7 +761,7 @@ function TheGiaoBtvn() {
                               key={k}
                               type="button"
                               onClick={() => setKhoiThem(k)}
-                              className={`text-xs font-bold px-3 py-1 rounded-full transition-all cursor-pointer ${
+                              className={`text-xs font-bold px-3 py-1 rounded-full transition-colors cursor-pointer ${
                                 chon
                                   ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs'
                                   : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
@@ -726,6 +777,7 @@ function TheGiaoBtvn() {
                           type="text"
                           value={timKiemHs}
                           onChange={(e) => setTimKiemHs(e.target.value)}
+                          aria-label="Tìm học sinh theo tên hoặc số báo danh"
                           placeholder="Tìm tên hoặc số báo danh…"
                           className="w-full h-8 pl-8 pr-3 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         />
@@ -734,7 +786,7 @@ function TheGiaoBtvn() {
                     </div>
 
                     {/* DANH SÁCH CUỘN HỌC SINH */}
-                    {dangTaiLuot && <div className="text-xs text-slate-400 py-1 text-center">Đang tải danh sách lượt...</div>}
+                    {dangTaiLuot && <div className="text-xs text-slate-400 py-1 text-center">Đang tải danh sách lượt…</div>}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-48 overflow-y-auto pr-1">
                       {dsHsHienThi.map((e) => {
                         const trongCa = dsHsTrongCa.some((h) => h.sbd === e.sbd)
@@ -747,7 +799,7 @@ function TheGiaoBtvn() {
                             aria-checked={tich}
                             disabled={trongCa}
                             onClick={() => toggleSbd(e.sbd)}
-                            className={`p-2 rounded-lg border text-left flex items-center gap-2.5 transition-all text-xs cursor-pointer ${
+                            className={`p-2 rounded-lg border text-left flex items-center gap-2.5 transition-colors text-xs cursor-pointer ${
                               tich
                                 ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100'
                                 : 'bg-white dark:bg-slate-800 border-slate-200/80 dark:border-slate-700 hover:bg-slate-50'
@@ -787,7 +839,7 @@ function TheGiaoBtvn() {
                           key={k}
                           type="button"
                           onClick={() => setKhoiGui(k)}
-                          className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all cursor-pointer ${
+                          className={`text-xs font-bold px-4 py-1.5 rounded-full transition-colors cursor-pointer ${
                             chon
                               ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs ring-2 ring-blue-400/30'
                               : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
@@ -846,7 +898,7 @@ function TheGiaoBtvn() {
                           key={k}
                           type="button"
                           onClick={() => setKhoiTheoEm(k)}
-                          className={`text-xs font-bold px-3 py-1 rounded-full transition-all cursor-pointer ${
+                          className={`text-xs font-bold px-3 py-1 rounded-full transition-colors cursor-pointer ${
                             chon
                               ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs'
                               : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
@@ -862,6 +914,7 @@ function TheGiaoBtvn() {
                       type="text"
                       value={timKiemTheoEm}
                       onChange={(e) => setTimKiemTheoEm(e.target.value)}
+                      aria-label="Tìm học sinh theo tên hoặc số báo danh"
                       placeholder="Tìm tên hoặc số báo danh…"
                       className="w-full h-8 pl-8 pr-3 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
@@ -886,7 +939,7 @@ function TheGiaoBtvn() {
                           role="checkbox"
                           aria-checked={tich}
                           onClick={() => toggleSbdTheoEm(e.sbd)}
-                          className={`p-2 rounded-lg border text-left flex items-center gap-2.5 transition-all text-xs cursor-pointer ${
+                          className={`p-2 rounded-lg border text-left flex items-center gap-2.5 transition-colors text-xs cursor-pointer ${
                             tich
                               ? 'bg-blue-50/80 dark:bg-blue-950/40 border-blue-300 dark:border-blue-700 text-blue-900 dark:text-blue-100 font-medium shadow-2xs'
                               : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700/80 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -1011,7 +1064,7 @@ function TheGiaoBtvn() {
                   (cheDo === 'theo_em' && sbdChonTheoEm.size === 0) ||
                   daChon.size === 0
                 }
-                className="flex-1 sm:flex-initial min-h-[46px] px-6 rounded-xl bg-[color:var(--m3-primary)] hover:opacity-90 text-[color:var(--m3-on-primary)] font-bold text-sm inline-flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="flex-1 sm:flex-initial min-h-[46px] px-6 rounded-xl bg-[color:var(--m3-primary)] hover:opacity-90 text-[color:var(--m3-on-primary)] font-bold text-sm inline-flex items-center justify-center gap-2 transition-[transform,background-color,box-shadow,opacity] shadow-xs active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 <Send size={18} />
                 {dangGiao
@@ -1031,7 +1084,7 @@ function TheGiaoBtvn() {
                 type="button"
                 onClick={() => void nap()}
                 disabled={dangNap}
-                className="min-h-[46px] px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 text-slate-700 dark:text-slate-200 font-semibold text-xs inline-flex items-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                className="min-h-[46px] px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 text-slate-700 dark:text-slate-200 font-semibold text-xs inline-flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50"
               >
                 <RefreshCw size={15} className={dangNap ? 'animate-spin' : ''} />
                 Làm mới
@@ -1080,7 +1133,7 @@ function TheGiaoBtvn() {
               type="button"
               onClick={() => void nap()}
               disabled={dangNap}
-              className="text-xs font-bold text-[color:var(--m3-primary)] dark:text-blue-400 inline-flex items-center gap-1.5 p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-all cursor-pointer"
+              className="text-xs font-bold text-[color:var(--m3-primary)] dark:text-blue-400 inline-flex items-center gap-1.5 p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors cursor-pointer"
             >
               <RefreshCw size={14} className={dangNap ? 'animate-spin' : ''} /> Cập nhật dữ liệu
             </button>
@@ -1115,7 +1168,7 @@ function TheGiaoBtvn() {
                 return (
                   <div
                     key={t.maBtvn}
-                    className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:border-blue-300 dark:hover:border-blue-700 transition-all space-y-3.5"
+                    className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:border-blue-300 dark:hover:border-blue-700 transition-colors space-y-3.5"
                   >
                     {/* TIÊU ĐỀ & TRẠNG THÁI */}
                     <div className="flex items-start justify-between gap-2">
@@ -1162,7 +1215,7 @@ function TheGiaoBtvn() {
                       <button
                         disabled={dangSua === t.maBtvn}
                         onClick={() => capNhatBai(t)}
-                        className="rounded-lg bg-[color:var(--m3-primary)] hover:bg-blue-700 px-3 py-1.5 text-xs font-bold text-[color:var(--m3-on-primary)] disabled:opacity-50 transition-all cursor-pointer"
+                        className="rounded-lg bg-[color:var(--m3-primary)] hover:bg-blue-700 px-3 py-1.5 text-xs font-bold text-[color:var(--m3-on-primary)] disabled:opacity-50 transition-colors cursor-pointer"
                       >
                         Lưu hạn
                       </button>
@@ -1175,7 +1228,7 @@ function TheGiaoBtvn() {
                             run: () => capNhatBai(t, true),
                           })
                         }
-                        className="rounded-lg border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/50 px-3 py-1.5 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 disabled:opacity-50 transition-all cursor-pointer"
+                        className="rounded-lg border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/50 px-3 py-1.5 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 disabled:opacity-50 transition-colors cursor-pointer"
                       >
                         Thu hồi
                       </button>

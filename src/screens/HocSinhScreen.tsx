@@ -15,6 +15,8 @@ import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import KhoiTienBo from '../components/KhoiTienBo'
 import BieuDoTienBoGoogle from '../components/BieuDoTienBoGoogle'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
+import { chuChipLop, useLopThay } from '../lib/ten-lop-thay'
+import DoiLopMotEm from '../components/DoiLopMotEm'
 import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, resetMatKhauHsApi, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { classify } from '../engine/score'
@@ -40,7 +42,6 @@ const O_NHAP: React.CSSProperties = {
   fontFamily: 'var(--sans)',
   fontSize: 'var(--cx-2)',
   color: 'var(--muc)',
-  outline: 'none',
   width: '100%',
 }
 
@@ -81,6 +82,9 @@ export default function HocSinhScreen() {
   const [loi, setLoi] = useState('')
   const [timKiem, setTimKiem] = useState('')
   const [khoiLoc, setKhoiLoc] = useState<number | null>(null)
+  // TÊN LỚP (thầy lệnh 21/09): `/gv/lop` — chưa có lệnh ⇒ `ds === null` ⇒ giữ nguyên cách hiện cũ (mục Đổi lớp ẩn, không lỗi đỏ).
+  const lopThay = useLopThay()
+  const [doiLop, setDoiLop] = useState(false)
   const [lopLoc, setLopLoc] = useState('')
 
   const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
@@ -178,9 +182,12 @@ export default function HocSinhScreen() {
     }
   }
 
+  /** Tên lớp hiển thị của một em: tên lớp thật (`/gv/lop`) nếu có, không thì `lop` cũ. */
+  const tenLopEm = (sbd: string, lopCu: string) => lopThay.tenLopCua(sbd) || lopCu?.trim() || ''
   const dsLop = useMemo(() => {
+    if (lopThay.ds) return lopThay.ds.map((l) => l.tenLop)
     return Array.from(new Set((ds ?? []).map((e) => e.lop?.trim()).filter(Boolean) as string[])).sort()
-  }, [ds])
+  }, [ds, lopThay.ds])
 
   const dsLoc = useMemo(() => {
     const q = timKiem.trim().toLowerCase()
@@ -188,11 +195,12 @@ export default function HocSinhScreen() {
       const khoi = khoiTuNamSinh(e.namSinh)
       return (
         (khoiLoc === null || khoi === khoiLoc) &&
-        (!lopLoc || e.lop?.trim() === lopLoc) &&
-        (!q || e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || e.lop.toLowerCase().includes(q))
+        (!lopLoc || tenLopEm(e.sbd, e.lop) === lopLoc) &&
+        (!q || e.sbd.includes(q) || e.hoTen.toLowerCase().includes(q) || tenLopEm(e.sbd, e.lop).toLowerCase().includes(q))
       )
     })
-  }, [ds, timKiem, khoiLoc, lopLoc])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ds, timKiem, khoiLoc, lopLoc, lopThay.ds])
 
   const caMoiNhat = useMemo(() => {
     if (!hoSo?.ca || hoSo.ca.length === 0) return null
@@ -249,10 +257,29 @@ export default function HocSinhScreen() {
                       <span className="hs-sbd">
                         #{hoSo.em.sbd}
                       </span>
-                      {hoSo.em.lop && (
+                      {tenLopEm(hoSo.em.sbd, hoSo.em.lop) && (
                         <span className="hs-lop">
-                          Lớp {hoSo.em.lop}
+                          Lớp {tenLopEm(hoSo.em.sbd, hoSo.em.lop)}
                         </span>
+                      )}
+                      {lopThay.ds && (
+                        <button type="button" className="tap-target hs-nut-vien" onClick={() => setDoiLop(true)}>
+                          Đổi lớp
+                        </button>
+                      )}
+                      {doiLop && lopThay.ds && (
+                        <DoiLopMotEm
+                          sbd={hoSo.em.sbd}
+                          hoTen={hoSo.em.hoTen}
+                          lopHienTai={tenLopEm(hoSo.em.sbd, hoSo.em.lop)}
+                          dsLop={lopThay.ds}
+                          onDong={() => setDoiLop(false)}
+                          onXong={(ten) => {
+                            setDoiLop(false)
+                            lopThay.lamMoi()
+                            showToast(`Đã chuyển ${hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`} sang lớp ${ten}.`, 'success')
+                          }}
+                        />
                       )}
                       {hoSo.em.namSinh && (
                         <span>
@@ -351,7 +378,7 @@ export default function HocSinhScreen() {
                       <button
                         type="button"
                         onClick={() => setCaBaoCao(caMoiNhat)}
-                        className="tap-target font-bold inline-flex items-center justify-center shrink-0 cursor-pointer shadow-xs transition-all active:scale-95 hover:opacity-90"
+                        className="tap-target font-bold inline-flex items-center justify-center shrink-0 cursor-pointer shadow-xs transition-[transform,background-color,box-shadow,opacity] active:scale-95 hover:opacity-90"
                         style={{
                           minHeight: 40,
                           padding: '0 var(--k4)',
@@ -524,7 +551,7 @@ export default function HocSinhScreen() {
             type="button"
             onClick={tai}
             disabled={dangTai}
-            className="tap-target shrink-0 flex items-center justify-center shadow-2xs transition-all active:scale-95 hover:scale-105 cursor-pointer disabled:cursor-not-allowed rounded-xl"
+            className="tap-target shrink-0 flex items-center justify-center shadow-2xs transition-[transform,background-color,box-shadow,opacity] active:scale-95 hover:scale-105 cursor-pointer disabled:cursor-not-allowed rounded-xl"
             style={{ width: 48, height: 48, border: '1px solid var(--vien)', background: 'var(--the)', color: 'var(--muc)' }}
             aria-label="Tải lại"
             title="Tải lại"
@@ -568,7 +595,7 @@ export default function HocSinhScreen() {
                     className={`tap-target hs-chip${chon ? ' hs-chip--chon' : ''}`}
                     style={{ ...SO }}
                   >
-                    {l ? `Lớp ${l}` : 'Tất cả các lớp'}
+                    {l ? (lopThay.ds ? chuChipLop(lopThay.ds.find((x) => x.tenLop === l) ?? { tenLop: l, soEm: 0 }) : `Lớp ${l}`) : 'Tất cả các lớp'}
                   </button>
                 )
               })}
@@ -621,9 +648,9 @@ export default function HocSinhScreen() {
                         <span className="hs-sbd">
                           #{e.sbd}
                         </span>
-                        {e.lop && (
+                        {tenLopEm(e.sbd, e.lop) && (
                           <span className="hs-lop">
-                            Lớp {e.lop}
+                            Lớp {tenLopEm(e.sbd, e.lop)}
                           </span>
                         )}
                         {khoi && (
