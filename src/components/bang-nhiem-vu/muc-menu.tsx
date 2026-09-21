@@ -22,16 +22,25 @@ export function mucMenuHocSinh(moMan: (man: ManCuHocSinh) => void, dangXuat: () 
 }
 
 /** `giaoNhanh`: hai lối 1 chạm cũ của màn phụ huynh (khắc phục câu sai / luyện bứt phá). */
+/**
+ * `giaoThemSan` (máy chủ có `/ph/giao-them`): phụ huynh chỉ còn MỘT đường giao bài — nút "Giao thêm bài cho con" trên Bảng nhiệm vụ (thầy lệnh 21/09, H13).
+ * Bỏ khỏi menu "Giao bài khắc phục cho con", "Giao nhanh: …" và "Bảng tin của con" (sheet chủ yếu là các cách giao). Máy chủ chưa có lệnh ⇒ menu cũ nguyên.
+ */
 export function mucMenuPhuHuynh(
   moMan: (man: ManCuPhuHuynh) => void,
   doiSbd: () => void,
   giaoNhanh?: { khacPhuc: () => void; luyen: () => void },
+  giaoThemSan = false,
 ): MucMenu[] {
   return [
     { id: 'diem', nhan: 'Báo cáo điểm các ca kiểm tra', bieuTuong: <BarChart3 size={CO} aria-hidden="true" />, onChon: () => moMan('diem') },
-    { id: 'khacphuc', nhan: 'Giao bài khắc phục cho con', bieuTuong: <BookOpen size={CO} aria-hidden="true" />, onChon: () => moMan('khacphuc') },
-    { id: 'bantin', nhan: 'Bảng tin của con', bieuTuong: <Newspaper size={CO} aria-hidden="true" />, onChon: () => moMan('bantin') },
-    ...(giaoNhanh
+    ...(giaoThemSan
+      ? []
+      : [
+          { id: 'khacphuc', nhan: 'Giao bài khắc phục cho con', bieuTuong: <BookOpen size={CO} aria-hidden="true" />, onChon: () => moMan('khacphuc') },
+          { id: 'bantin', nhan: 'Bảng tin của con', bieuTuong: <Newspaper size={CO} aria-hidden="true" />, onChon: () => moMan('bantin') },
+        ]),
+    ...(giaoNhanh && !giaoThemSan
       ? [
           { id: 'giao-khac-phuc', nhan: 'Giao nhanh: bài khắc phục câu sai', bieuTuong: <Zap size={CO} aria-hidden="true" />, onChon: giaoNhanh.khacPhuc },
           { id: 'giao-luyen', nhan: 'Giao nhanh: bài luyện bứt phá', bieuTuong: <Zap size={CO} aria-hidden="true" />, onChon: giaoNhanh.luyen },

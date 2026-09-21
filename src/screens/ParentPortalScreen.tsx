@@ -36,6 +36,7 @@ import { hopLeDeRut } from '../lib/loc-cau-rut'
 import { hsBtvnApi, hsCauSaiApi, hsLichSuCaApi, tenTheoSbd } from '../lib/exam-api'
 import TheCaGanNhatCua from '../components/xem-diem/TheCaGanNhat'
 import { chonTheCaGanNhat, type CaChuaCongBo } from '../lib/the-ca-gan-nhat'
+import { useGiaoThem } from '../lib/use-giao-them'
 import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
@@ -144,6 +145,8 @@ export default function ParentPortalScreen() {
   }, [dsBaiThi])
 
   // THẺ "Ca kiểm tra gần nhất của con" (thầy lệnh 21/09): ghép từ ca ĐÃ công bố + ca CHƯA công bố; bấm ⇒ tạm mở tab Xem điểm hiện có (trang "Tất cả về con" chờ thầy chốt).
+  // MỘT nút "Giao thêm bài cho con" (thầy lệnh 21/09): máy chủ có `/ph/giao-them` ⇒ thay hẳn ô giao bài cũ và bỏ các mục giao trong menu; chưa có ⇒ giữ đường cũ.
+  const giaoThem = useGiaoThem(!!sbdHienTai)
   const theCaGanNhat = useMemo(
     () =>
       chonTheCaGanNhat(
@@ -690,6 +693,7 @@ export default function ParentPortalScreen() {
           theCaGanNhat={<TheCaGanNhatCua the={theCaGanNhat} onMo={() => setTabPh('diem')} />}
           canhBaoPh={canhBaoPh}
           onCanhBaoDaXem={(cb) => void baoDaXemPhuHuynh(cb.id)}
+          giaoThem={giaoThem}
           mucMenu={mucMenuPhuHuynh(setTabPh, dangXuat, {
             // Kết quả giao nhanh hiện ở khung thông báo của sheet "khắc phục", nên mở sheet ngay.
             khacPhuc: () => {
@@ -700,7 +704,7 @@ export default function ParentPortalScreen() {
               setTabPh('khacphuc')
               void xuLyGiaoBaiLuyen1Click()
             },
-          })}
+          }, giaoThem.san)}
           onGiaoBai={() => setTabPh('khacphuc')}
           onGiaoHangNgay={() => void giaoHangNgay()}
           giaoBai={{

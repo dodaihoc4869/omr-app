@@ -6,6 +6,8 @@
 import TheBoNao from './TheBoNao'
 import TheCanhBaoThay from './TheCanhBaoThay'
 import TheThuThachRieng from './TheThuThachRieng'
+import GiaoThemChoCon from './GiaoThemChoCon'
+import type { ViewGiaoThem } from '../../lib/use-giao-them'
 import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
@@ -129,6 +131,8 @@ export interface BangNhiemVuProps {
   boNaoPh?: BoNaoPhuHuynh | null
   /** Chỗ đặt thẻ "Ca kiểm tra gần nhất của con" (chỉ phụ huynh): ngay dưới khối tiến độ, trên việc hôm nay. */
   theCaGanNhat?: ReactNode
+  /** MỘT nút "Giao thêm bài cho con" (phụ huynh; máy chủ có `/ph/giao-them`). `san` ⇒ thay HẲN ô giao bài cũ. Vắng/`san = false` ⇒ giữ ô cũ. */
+  giaoThem?: ViewGiaoThem
   /** "Cảnh báo của thầy" của PHỤ HUYNH (lời cho phụ huynh, lệnh /ph/ke-hoach). Học sinh nhận qua `duLieu.canhBaoThay`. */
   canhBaoPh?: CanhBaoThay[]
   /** Em/phụ huynh bấm "Đã xem" (hoặc "Làm ngay") ở một cảnh báo ⇒ màn cha báo máy chủ. */
@@ -162,6 +166,7 @@ export default function BangNhiemVu({
   taiVinhDanh,
   boNaoPh: boNaoPhGoc,
   theCaGanNhat,
+  giaoThem,
   canhBaoPh,
   onCanhBaoDaXem,
   onLamThuThach,
@@ -494,7 +499,9 @@ export default function BangNhiemVu({
             <HangTonCu tonCu={duLieu.tonCu} docChi={laPh} onChon={(b) => onHanhDong?.(b.hanhDong)} />
             <DanhSachQuaHan viec={duLieu.quaHan} docChi={laPh} onChon={(q) => q.hanhDong && onHanhDong?.(q.hanhDong)} />
 
-            {laPh && onGiaoBai && (
+            {laPh && giaoThem?.san && <GiaoThemChoCon v={giaoThem} />}
+
+            {laPh && onGiaoBai && !giaoThem?.san && (
               <section className="bnv-giao-bai" data-trang-thai={trangThaiGiao} aria-label="Giao bài cho con" data-vung="giao-bai">
                 {gb.reason && <p data-vung="ly-do-giao-bai">{gb.reason}</p>}
                 {gb.daGiao && (
