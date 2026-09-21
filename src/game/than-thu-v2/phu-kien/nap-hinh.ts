@@ -9,9 +9,22 @@ export interface HinhProps {
 type Nap = () => Promise<{ default: ComponentType<HinhProps> }>
 
 const NAP: Record<string, Nap> = {
+  'HQ-01': () => import('./hinh/pk-hq-01'),
+  'HQ-02': () => import('./hinh/pk-hq-02'),
   'HQ-03': () => import('./hinh/pk-hq-03'),
+  'HQ-04': () => import('./hinh/pk-hq-04'),
   'HQ-05': () => import('./hinh/pk-hq-05'),
+  'HQ-06': () => import('./hinh/pk-hq-06'),
+  'HQ-07': () => import('./hinh/pk-hq-07'),
+  'HQ-08': () => import('./hinh/pk-hq-08'),
+  'VD-01': () => import('./hinh/pk-vd-01'),
+  'VD-02': () => import('./hinh/pk-vd-02'),
+  'VD-03': () => import('./hinh/pk-vd-03'),
   'VD-04': () => import('./hinh/pk-vd-04'),
+  'VD-05': () => import('./hinh/pk-vd-05'),
+  'VD-06': () => import('./hinh/pk-vd-06'),
+  'VD-07': () => import('./hinh/pk-vd-07'),
+  'VD-08': () => import('./hinh/pk-vd-08'),
 }
 
 /** Món này đã có tệp hình SVG chưa (khung tên KT-* không cần). */

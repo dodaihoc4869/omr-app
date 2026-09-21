@@ -118,6 +118,31 @@ describe('ThuMacDo — ba lớp đúng chỗ, thú luôn hiện', () => {
   })
 })
 
+describe('M2 — đủ 24 món có hình / kiểu', () => {
+  it('mỗi món hào quang / vệt có tệp hình VÀ bảng màu .pk-m-<mã> trong CSS; mỗi khung có kiểu .pk-k-<kiểu>; hình chỉ dùng lớp tô pk-f1/2/3, pk-s1/2/3', () => {
+    const css = doc(`${THU_MUC}/phu-kien.css`)
+    for (const m of MON_DOT_1) {
+      if (m.o === 'khung') {
+        expect(css, m.ma).toContain(`.pk-k-${m.kieu}`)
+        continue
+      }
+      expect(css, m.ma).toMatch(new RegExp(`\\.pk-m-${m.ma.toLowerCase()} \\{ --pk-1: rgb\\([^)]+\\); --pk-2: rgb\\([^)]+\\); --pk-3: rgb\\([^)]+\\); \\}`))
+      const s = doc(`${THU_MUC}/hinh/pk-${m.ma.toLowerCase()}.tsx`)
+      expect(s, m.ma).toMatch(/pk-[fs][123]|var\(--pk-[123]\)/) // màu chỉ qua bảng màu của món
+      expect(s, m.ma).toMatch(/viewBox="0 0 256 (256|96)"/)
+      expect(s, m.ma).toContain(m.o === 'hao-quang' ? 'viewBox="0 0 256 256"' : 'viewBox="0 0 256 96"')
+    }
+  })
+  it('Thường (bậc 1) không toả và không chuyển động; Sử thi / Huyền thoại có chuyển động riêng của bậc (nhịp thở / xoay / ánh chạy)', () => {
+    for (const m of MON_DOT_1.filter((x) => x.o !== 'khung')) {
+      const s = doc(`${THU_MUC}/hinh/pk-${m.ma.toLowerCase()}.tsx`)
+      const dong = /className="pk-(lay|nhap|nhap-cham|quay|tho)"/.test(s)
+      if (m.bac === 1) expect(dong, m.ma).toBe(false)
+      if (m.bac >= 4) expect(dong, m.ma).toBe(true)
+    }
+  })
+})
+
 describe('nạp lười theo món', () => {
   it('mỗi món SVG có tệp riêng trong hinh/ (chunk riêng), khung tên (KT-*) không có tệp hình; hinhCuaMon trả CÙNG thành phần cho cùng mã và null khi chưa có hình', () => {
     const co = MON_DOT_1.filter((m) => coHinhSvg(m.ma)).map((m) => m.ma)
@@ -128,7 +153,8 @@ describe('nạp lười theo món', () => {
       expect(monCuaO('hao-quang', ma) ?? monCuaO('vet', ma), ma).toBeTruthy() // chỉ hào quang / vệt có SVG
     }
     expect(hinhCuaMon('KT-08')).toBeNull()
-    expect(hinhCuaMon('HQ-01')).toBeNull() // chưa vẽ (M2)
+    expect(MON_DOT_1.filter((m) => m.o !== 'khung').every((m) => coHinhSvg(m.ma))).toBe(true) // M2: đủ 16 hình hào quang + vệt
+    expect(MON_DOT_1.filter((m) => m.o === 'khung').some((m) => coHinhSvg(m.ma))).toBe(false)
     expect(doc(`${THU_MUC}/ThuMacDo.tsx`)).not.toMatch(/from '\.\/hinh\//) // KHÔNG nhập tĩnh: chỉ qua nap-hinh (import động)
   })
 })
@@ -168,7 +194,7 @@ describe('LUẬT VẼ — quy cách mục 6', () => {
   })
   it('mỗi lớp ≤ MỘT chuyển động (thú ≤ 3): mỗi tệp hình có tối đa MỘT phần tử mang lớp chuyển động pk-lay / pk-nhap / pk-nhap-cham / pk-quay', () => {
     for (const f of tepHinh) {
-      const n = (doc(`${THU_MUC}/hinh/${f}`).match(/className="pk-(lay|nhap|nhap-cham|quay)"/g) ?? []).length
+      const n = (doc(`${THU_MUC}/hinh/${f}`).match(/className="pk-(lay|nhap|nhap-cham|quay|tho)"/g) ?? []).length
       expect(n, f).toBeLessThanOrEqual(1)
     }
   })

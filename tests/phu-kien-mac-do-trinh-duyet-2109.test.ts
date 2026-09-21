@@ -104,21 +104,21 @@ describe('phụ kiện thần thú trong Chromium thật', () => {
     expect(r.every(Boolean)).toBe(true)
     await ctx.close()
   }, 90_000)
-  it('chuyển động: bản động ≤ 3 chuyển động trên MỖI thú; bản tĩnh (?tinh=1) = 0; giảm chuyển động của máy = 0', async () => {
-    const dong = await mo(1280, 'toi', '&mon=HQ-05', false, 8)
-    const moiThu = await dong.p.evaluate(() => Array.from(document.querySelectorAll('.pk-thu')).map((t) => t.getAnimations({ subtree: true }).length))
-    expect(moiThu).toHaveLength(8)
-    expect(Math.max(...moiThu)).toBeGreaterThan(0) // món có chuyển động thật
-    expect(Math.max(...moiThu)).toBeLessThanOrEqual(3)
+  it('chuyển động: MỖI thú ≤ 1 chuyển động khi mặc MỘT món (vậy ba lớp ≤ 3); bậc Thường = 0; Sử thi / Huyền thoại ≥ 1; bản tĩnh và giảm chuyển động của máy = 0', async () => {
+    const dong = await mo(1280, 'toi', '')
+    const theoMon = await dong.p.evaluate(() => Object.fromEntries(Array.from(document.querySelectorAll('[data-mon]')).filter((s) => s.tagName === 'SECTION').map((s) => [s.getAttribute('data-mon')!, Math.max(...Array.from(s.querySelectorAll('.pk-thu')).map((t) => t.getAnimations({ subtree: true }).length))])))
+    expect(Object.keys(theoMon)).toHaveLength(24)
+    for (const m of MON_DOT_1) {
+      expect(theoMon[m.ma]!, m.ma).toBeLessThanOrEqual(1)
+      if (m.bac === 1) expect(theoMon[m.ma], `${m.ma} bậc Thường không chuyển động`).toBe(0)
+      if (m.bac >= 4) expect(theoMon[m.ma]!, `${m.ma} bậc ${m.bac} có chuyển động riêng`).toBeGreaterThanOrEqual(1)
+    }
     await dong.ctx.close()
-    const kep = await mo(1280, 'toi', '&mon=KT-08,HQ-03,VD-04', false, 16) // ba ô cùng lúc trên các thú khác nhau; mỗi thú chỉ mặc MỘT món ở trang này ⇒ ≤ 1
-    expect(Math.max(...(await kep.p.evaluate(() => Array.from(document.querySelectorAll('.pk-thu')).map((t) => t.getAnimations({ subtree: true }).length))))).toBeLessThanOrEqual(3)
-    await kep.ctx.close()
     const tinh = await mo(1280, 'toi', '&tinh=1')
     expect(await dem(tinh.p)).toBe(0)
     await tinh.ctx.close()
     const giam = await mo(1280, 'toi', '', true)
     expect(await dem(giam.p)).toBe(0)
     await giam.ctx.close()
-  }, 120_000)
+  }, 180_000)
 })

@@ -1,12 +1,12 @@
-# Phụ kiện thần thú — quy cách vẽ ĐỢT 1 (Code 4, làn mỹ thuật; M1 21/09)
+# Phụ kiện thần thú — quy cách vẽ ĐỢT 1 (Code 4, làn mỹ thuật; M1 + M2 21/09 — ĐỦ 24 món có hình / kiểu)
 
-Đề xuất gốc: `DE-XUAT-SHOP-PHU-KIEN-2109.md` mục 3 (bảng món) + 6 (mỹ thuật). Thành phần: `src/game/than-thu-v2/phu-kien/ThuMacDo.tsx` (bọc `ThuHinh`). Xem thử (dev): `npm run dev` ⇒ `/src/components/xem-thu/phu-kien.html?gd=toi&mon=HQ-03,KT-08&tinh=1&cap=100`.
+Đề xuất gốc: `DE-XUAT-SHOP-PHU-KIEN-2109.md` mục 3 (bảng món) + 6 (mỹ thuật). Thành phần: `src/game/than-thu-v2/phu-kien/ThuMacDo.tsx` (bọc `ThuHinh`). Xem thử (dev): `npm run dev` ⇒ `/src/components/xem-thu/phu-kien.html?gd=toi&mon=HQ-03,KT-08&tinh=1&cap=100` (mỗi món × 8 loài) hoặc `?tong=1&thu=5` (BẢNG TỔNG 24 món trên một loài) · `?thu=N` (một loài, to) · `?trai=1` (thú nhìn trái).
 
 ## Ba lớp, không cần neo theo loài
 | Ô (khoá `dangMac`) | Mã | Lớp | Vị trí | Hình |
 |---|---|---|---|---|
 | `hao-quang` | HQ-01…08 | SAU thú (z 0) | hộp = 1,7 × hộp thú, tâm trùng tâm thú | SVG `viewBox 0 0 256 256`; thú chiếm ô giữa **53–203**, tâm **(128,128)**, chân ≈ y 203 |
-| `vet` | VD-01…08 | SAU-DƯỚI (z 1) | rộng 1,2 × hộp thú, sát chân, đuôi kéo về phía NGƯỢC hướng nhìn (thú nhìn trái ⇒ lật) | SVG `viewBox 0 0 256 96`; bên **phải** = chỗ thú, đường đi dọc y ≈ 68 |
+| `vet` | VD-01…08 | SAU-DƯỚI (z 1) | rộng 1,5 × hộp thú, sát chân, đuôi kéo về phía NGƯỢC hướng nhìn (thú nhìn trái ⇒ lật) | SVG `viewBox 0 0 256 96`; bên **phải** = chỗ thú, đường đi dọc y ≈ 68 |
 | `khung` | KT-01…08 | DƯỚI chân (z 3) | ngay dưới hộp thú (chừa `CAO_KHUNG_TEN` = 52 px) | CSS + token `--pk-*`, KHÔNG tệp hình; cần `ten` (tên thú) mới vẽ |
 
 Thú giữ z 2. Mã lạ / sai ô / ô đợt 2 (`dau`, `co-lung`) bị bỏ qua — thú luôn hiện.

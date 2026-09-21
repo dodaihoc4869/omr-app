@@ -52,14 +52,14 @@
 }
 .pk-vet {
   z-index: 1;
-  right: 45%;
-  bottom: 0;
-  width: 120%;
+  right: 42%;
+  bottom: -4%;
+  width: 150%;
   aspect-ratio: 256 / 96;
 }
 .pk-thu[data-huong='trai'] .pk-vet {
   right: auto;
-  left: 45%;
+  left: 42%;
   transform: scaleX(-1);
 }
 .pk-khung-cho {
@@ -206,3 +206,142 @@
 .pk-m-hq-03 { --pk-1: rgb(255 220 110); --pk-2: rgb(255 190 60); --pk-3: rgb(255 244 190); }
 .pk-m-hq-05 { --pk-1: rgb(255 112 72); --pk-2: rgb(255 200 170); --pk-3: rgb(255 236 220); }
 .pk-m-vd-04 { --pk-1: rgb(186 128 255); --pk-2: rgb(220 190 255); --pk-3: rgb(244 226 255); }
+
+/* ======================= M2: các món còn lại của đợt 1 ======================= */
+/* ---- chuyển động thêm: nhịp thở 4 giây (Sử thi), quỹ đạo xoay chậm (Huyền thoại) ---- */
+.pk-tho { transform-origin: 128px 128px; animation: pk-tho 4s ease-in-out infinite; will-change: transform, opacity; }
+.pk-quay { transform-origin: 128px 128px; animation: pk-quay 40s linear infinite; will-change: transform; }
+@keyframes pk-tho { 0%, 100% { opacity: 0.72; transform: scale(0.97); } 50% { opacity: 1; transform: scale(1.03); } }
+@keyframes pk-quay { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+/* ---- bảng màu riêng từng món ---- */
+.pk-m-hq-01 { --pk-1: rgb(230 244 255); --pk-2: rgb(150 205 255); --pk-3: rgb(255 255 255); }
+.pk-m-hq-02 { --pk-1: rgb(255 96 96); --pk-2: rgb(96 140 255); --pk-3: rgb(255 240 240); }
+.pk-m-hq-04 { --pk-1: rgb(70 150 255); --pk-2: rgb(140 200 255); --pk-3: rgb(224 242 255); }
+.pk-m-hq-06 { --pk-1: rgb(150 226 255); --pk-2: rgb(196 240 255); --pk-3: rgb(255 255 255); }
+.pk-m-hq-07 { --pk-1: rgb(90 255 170); --pk-2: rgb(180 120 255); --pk-3: rgb(214 255 236); }
+.pk-m-hq-08 { --pk-1: rgb(255 214 120); --pk-2: rgb(255 190 60); --pk-3: rgb(255 246 200); }
+.pk-m-vd-01 { --pk-1: rgb(222 246 255); --pk-2: rgb(180 226 255); --pk-3: rgb(255 255 255); }
+.pk-m-vd-02 { --pk-1: rgb(250 252 255); --pk-2: rgb(210 220 236); --pk-3: rgb(255 255 255); }
+.pk-m-vd-03 { --pk-1: rgb(255 122 178); --pk-2: rgb(255 176 210); --pk-3: rgb(255 226 240); }
+.pk-m-vd-05 { --pk-1: rgb(60 220 130); --pk-2: rgb(140 255 190); --pk-3: rgb(240 255 246); }
+.pk-m-vd-06 { --pk-1: rgb(255 255 255); --pk-2: rgb(220 236 255); --pk-3: rgb(255 255 255); }
+.pk-m-vd-07 { --pk-1: rgb(255 60 70); --pk-2: rgb(255 130 110); --pk-3: rgb(255 236 220); }
+.pk-m-vd-08 { --pk-1: rgb(120 190 255); --pk-2: rgb(255 214 120); --pk-3: rgb(255 246 210); }
+
+/* ---- khung tên còn lại (CSS thuần) ---- */
+/* KT-01 · thuỷ tinh: viền trong suốt bo tròn, hai đầu là miệng ống */
+.pk-k-ong-nghiem {
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgb(190 226 255 / 0.22), rgb(20 40 80 / 0.7) 46%, rgb(10 24 56 / 0.78));
+  box-shadow: inset 0 0 0 1.5px rgb(200 232 255 / 0.62), inset 0 3px 0 rgb(255 255 255 / 0.22);
+}
+.pk-k-ong-nghiem::before,
+.pk-k-ong-nghiem::after {
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  width: 7px;
+  border-radius: 4px;
+  background: rgb(210 236 255 / 0.5);
+  content: '';
+}
+.pk-k-ong-nghiem::before { left: 5px; }
+.pk-k-ong-nghiem::after { right: 5px; }
+/* KT-02 · nhãn giấy kem, góc có hình thoi cảnh báo */
+.pk-k-nhan-lo {
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgb(250 243 222), rgb(238 226 194));
+  box-shadow: inset 0 0 0 1.5px rgb(150 120 70 / 0.6), 0 1px 0 rgb(0 0 0 / 0.25);
+  color: rgb(46 34 16);
+}
+.pk-k-nhan-lo small { color: rgb(120 92 50); }
+.pk-k-nhan-lo::before {
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  width: 20px;
+  height: 20px;
+  background: rgb(240 96 40);
+  content: '';
+  transform: rotate(45deg);
+  box-shadow: inset 0 0 0 2px rgb(255 226 120);
+}
+/* KT-04 · bạc chải xước, hai đinh tán */
+.pk-k-silver {
+  border: 3px solid transparent;
+  border-radius: 12px;
+  background: linear-gradient(rgb(16 22 34), rgb(12 17 28)) padding-box, repeating-linear-gradient(100deg, rgb(226 232 240) 0 3px, rgb(158 170 186) 3px 5px, rgb(240 244 250) 5px 8px, rgb(140 152 170) 8px 10px) border-box;
+  box-shadow: 0 0 0 1px rgb(var(--pk-b2) / 0.55);
+}
+.pk-k-silver::before,
+.pk-k-silver::after {
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, rgb(255 255 255), rgb(150 162 180));
+  content: '';
+}
+.pk-k-silver::before { left: 5px; }
+.pk-k-silver::after { right: 5px; }
+/* KT-05 · hai đầu là lục giác benzene, nối bằng nét đôi */
+.pk-k-benzene {
+  border: 3px double rgb(var(--pk-b2) / 0.85);
+  border-radius: 6px;
+  background: rgb(6 30 24 / 0.82);
+  box-shadow: none;
+}
+.pk-k-benzene::before,
+.pk-k-benzene::after {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 20px;
+  margin-top: -10px;
+  background: rgb(var(--pk-b2) / 0.9);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  content: '';
+}
+.pk-k-benzene::before { left: -3px; }
+.pk-k-benzene::after { right: -3px; }
+/* KT-06 · viền thạch anh tím cắt giác, ánh sáng trượt trên cạnh (MỘT chuyển động) */
+.pk-k-thach-anh-tim {
+  border: 3px solid transparent;
+  border-radius: 0;
+  background: linear-gradient(rgb(28 14 52), rgb(20 10 40)) padding-box, linear-gradient(135deg, rgb(226 200 255), rgb(150 96 236) 32%, rgb(90 50 176) 58%, rgb(214 178 255)) border-box;
+  clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+  box-shadow: none;
+}
+.pk-k-thach-anh-tim::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, rgb(240 224 255 / 0.4), transparent);
+  content: '';
+  animation: pk-anh-chay 5s ease-in-out infinite;
+  pointer-events: none;
+  transform: translateX(-140%) skewX(-18deg);
+  will-change: transform;
+}
+/* KT-07 · kim loại đổi màu lam – tím – vàng theo góc; nhịp thở 4 giây (::after) */
+.pk-k-titanium {
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: linear-gradient(rgb(14 18 48), rgb(14 18 48)) padding-box, linear-gradient(100deg, rgb(90 170 255), rgb(176 120 255) 45%, rgb(255 206 110) 75%, rgb(90 220 220)) border-box;
+  box-shadow: 0 0 16px rgb(var(--pk-b4) / 0.4);
+}
+.pk-k-titanium::after {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(90% 120% at 50% 0%, rgb(176 120 255 / 0.28), transparent 70%);
+  content: '';
+  animation: pk-tho-khung 4s ease-in-out infinite;
+  pointer-events: none;
+  will-change: opacity;
+}
+@keyframes pk-tho-khung { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
