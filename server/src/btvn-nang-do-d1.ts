@@ -18,11 +18,12 @@ import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { capNhatExp, docExpHomNay, expNhanCuaKetQua, manhNhanCuaKetQua } from './exp-d1'
 import { PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU, TY_LE_ON_TOI_DA } from './ho-so-cau-hinh'
 import { dungLaiHoSo, themNgay } from './ho-so-nam-kt'
-import { tinhNganSach, type DauVaoKeHoach } from './ke-hoach-ngay'
+import { tinhNganSach, tinhVanToc, type DauVaoKeHoach } from './ke-hoach-ngay'
 import { chuyenDeThat, ghiSuKien, ngayVn, phanTuQid, suKienChamBai, suKienTuKetQuaCham, cauTuKho } from './su-kien-hoc'
 import { daTraLoi } from './on-lai-nop'
 import { docDieuChinhHieuLuc, type DieuChinhHieuLuc } from './bo-nao-doc'
-import { LAN_MOI_LUOT, moLucChang, trangThaiCacChang } from './btvn-nang-do-chang'
+import { docLichDaLuu, LAN_MOI_LUOT, moLucChang, trangThaiCacChang, type LichDaLuu } from './btvn-nang-do-chang'
+import { canhBaoHanNgan, cheDoLich, sucChua, xepLichChang, type SucChua } from '../../src/lib/btvn-nang-do-lich'
 
 type Hang = Record<string, unknown>
 
@@ -304,17 +305,53 @@ export async function docDauVaoNganSach(env: Env, dsSbd: string[], now: number):
   return ra
 }
 
-/** Ngân sách của MỘT em cho bài này: `soNgay` tới hạn; `cauMoiNgay` theo tốc độ thật (8–16, luật `tinhNganSach` của kế hoạch ngày); phần ôn lại = ≤ 40 % và ≤ số câu tới hạn. */
-export function nganSachChoEm(sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: Pick<HoSoRutCuaEm, 'chuaKhacPhuc' | 'toiHan'>): NganSachBai {
+export interface NganSachVaSucChua {
+  /** Ngân sách đưa cho LÕI (`chonBoCuaEm`): hạn dài = số ngày × câu/ngày (Y HỆT trước); hạn NGẮN = số PHIÊN × câu/phiên (`soNgay: soPhien`, ôn lại 0). */
+  nganSach: NganSachBai
+  /** Ngân sách GỐC mỗi ngày của em (đưa cho `xepLichChang`). */
+  goc: { cauMoiNgay: number; onLaiMoiNgay: number }
+  giay: number
+  /** Sức chứa các phiên học tới hạn (bản 1.1): hạn dài = một chặng/ngày; hạn ngắn ≤ 48 giờ = chia theo giờ trong cửa sổ 20:00–23:59. */
+  sc: SucChua
+}
+
+/**
+ * Ngân sách của MỘT em cho bài này (bản 1.1): `cauMoiNgay` theo tốc độ thật (8–16, luật `tinhNganSach` của kế hoạch ngày); phần ôn lại = ≤ 40 % và ≤ số câu tới hạn;
+ * số ngày/phiên và tổng bộ theo SỨC CHỨA (`sucChua` của Code 1). Hạn dài cho đúng số cũ (test khoá); hạn ngắn ⇒ bộ nhỏ hơn cho vừa các phiên còn lại (lõi vẫn giữ đủ).
+ */
+export function nganSachVaSucChua(sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: Pick<HoSoRutCuaEm, 'chuaKhacPhuc' | 'toiHan'>): NganSachVaSucChua {
   const d: DauVaoKeHoach = {
     sbd, now, homNay: ngayVn(now), phutNgay: dv.phutNgay, mauGiay: dv.mauGiay, btvn: [], mom: [], cauToiHan: [], soCauChuaKhacPhuc: hs.chuaKhacPhuc, dang: [],
     nhiemVuThanThu: [], caSapToi: [], lichSu: dv.lichSu, daLamHomNay: { soCau: 0, lenBac: 0, tutBac: 0 }, homNayLaNgayNghi: false,
   }
   const cauMoiNgay = tinhNganSach(d, Math.max(1, dv.soBaiChuaNop)).mucTieuCau
-  return {
-    soNgay: Math.max(1, Math.ceil((hanMs - now) / MOT_NGAY_MS)),
-    cauMoiNgay,
-    onLaiMoiNgay: Math.max(0, Math.min(hs.toiHan, Math.floor(TY_LE_ON_TOI_DA * cauMoiNgay))),
+  const onLaiMoiNgay = Math.max(0, Math.min(hs.toiHan, Math.floor(TY_LE_ON_TOI_DA * cauMoiNgay)))
+  const giay = tinhVanToc(dv.mauGiay).giay
+  const soNgayCu = Math.max(1, Math.ceil((hanMs - now) / MOT_NGAY_MS))
+  let sc: SucChua
+  try {
+    sc = sucChua({ chotLuc: new Date(now).toISOString(), hanNop: new Date(hanMs).toISOString(), cauMoiNgay, onLaiMoiNgay, giayMoiCau: giay })
+  } catch {
+    sc = { cheDo: 'dai', soNgay: soNgayCu, soPhien: soNgayCu, cauMoiPhien: Math.max(1, cauMoiNgay - onLaiMoiNgay), soCauToiDa: soNgayCu * Math.max(1, cauMoiNgay - onLaiMoiNgay) }
+  }
+  const nganSach: NganSachBai = sc.cheDo === 'ngan' ? { soNgay: sc.soPhien, cauMoiNgay: sc.cauMoiPhien, onLaiMoiNgay: 0 } : { soNgay: sc.soNgay, cauMoiNgay, onLaiMoiNgay }
+  return { nganSach, goc: { cauMoiNgay, onLaiMoiNgay }, giay, sc }
+}
+
+/** Tương thích: chỉ phần ngân sách đưa cho lõi. */
+export const nganSachChoEm = (sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: Pick<HoSoRutCuaEm, 'chuaKhacPhuc' | 'toiHan'>): NganSachBai => nganSachVaSucChua(sbd, now, hanMs, dv, hs).nganSach
+
+/** Lịch mở từng chặng (MỘT lần, lúc chốt) bằng `xepLichChang`; lỗi thời gian ⇒ `null` (dùng `moLucChang` cũ). Trả cả chuỗi JSON để lưu ở `chang_mo_json`. */
+export function xepLichChoBo(chotLuc: string, hanNop: string, chang: string[][], goc: { cauMoiNgay: number; onLaiMoiNgay: number }, giay: number): { json: string; lich: LichDaLuu } | null {
+  try {
+    const p = { chotLuc, hanNop, soCauTungChang: chang.map((c) => c.length), cauMoiNgay: goc.cauMoiNgay, onLaiMoiNgay: goc.onLaiMoiNgay, giayMoiCau: giay }
+    const l = xepLichChang(p)
+    if (l.length !== chang.length) return null
+    const j = JSON.stringify({ cheDo: cheDoLich(p), chang: l.map(({ chiSo, moLuc, dungNhipTruoc }) => ({ chiSo, moLuc, dungNhipTruoc })) })
+    const lich = docLichDaLuu(j, chang.length)
+    return lich ? { json: j, lich } : null
+  } catch {
+    return null
   }
 }
 
@@ -327,6 +364,8 @@ export interface BoDaChot {
   tomTat: TomTatBo | null
   soCauEm: number
   soChang: number
+  /** Lịch đã lưu (bản 1.1); `null` ⇒ bài chốt trước bản 1.1 hoặc lỗi thời gian: dùng `moLucChang`. */
+  lich: LichDaLuu | null
 }
 
 /** Bộ đã chốt của em (từ `btvn_em_cau`), theo chặng rồi thứ tự trong chặng. Không có dòng ⇒ `null`. */
@@ -345,10 +384,10 @@ export async function docBoDaChot(env: Env, maBtvn: string, sbd: string): Promis
 }
 
 /** Dựng bộ cho một em từ hồ sơ + ngân sách đã đọc (thuần — dùng chung với xem trước, nên bộ xem trước = bộ thật khi hồ sơ không đổi). */
-export function dungBoChoEm(bai: BaiNangDo, hatGiongBai: string, sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: HoSoRutCuaEm, dieuChinh?: DieuChinhEm): { bo: BoCuaEm; nganSach: NganSachBai } {
-  const nganSach = nganSachChoEm(sbd, now, hanMs, dv, hs)
+export function dungBoChoEm(bai: BaiNangDo, hatGiongBai: string, sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: HoSoRutCuaEm, dieuChinh?: DieuChinhEm): { bo: BoCuaEm; nganSach: NganSachBai; goc: NganSachVaSucChua['goc']; giay: number; sc: SucChua } {
+  const { nganSach, goc, giay, sc } = nganSachVaSucChua(sbd, now, hanMs, dv, hs)
   // `dieuChinh` (Bộ não A.I chế độ THẬT) là cổng TUỲ CHỌN của lõi: vắng ⇒ Y HỆT không có cổng (test của Code 1 + test bóng ở `tests/bo-nao-doc-2109.test.ts`).
-  return { bo: chonBoCuaEm(bai.cau, bai.loi, hs.hoSo, nganSach, `${hatGiongBai}|${sbd}`, dieuChinh), nganSach }
+  return { bo: chonBoCuaEm(bai.cau, bai.loi, hs.hoSo, nganSach, `${hatGiongBai}|${sbd}`, dieuChinh), nganSach, goc, giay, sc }
 }
 
 /**
@@ -363,15 +402,17 @@ export async function chotBoChoEm(env: Env, bt: Hang, sbd: string, now: number):
   if (!bai || !hs) return null
   const dv = dvAll.get(sbd)!
   const dc = dcAll.get(sbd)
-  const { bo, nganSach } = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) ? hanMs : now + MOT_NGAY_MS, dv, hs.get(sbd)!, dc?.dieuChinh)
+  const { bo, nganSach, goc, giay } = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) ? hanMs : now + MOT_NGAY_MS, dv, hs.get(sbd)!, dc?.dieuChinh)
   const chotLuc = new Date(now).toISOString()
+  // LỊCH CHẶNG (bản 1.1): tính MỘT lần cùng bộ, lưu ở `chang_mo_json`. Hạn dài Y HỆT `moLucChang` cũ; hạn ngắn chia theo giờ trong cửa sổ học.
+  const xep = Number.isFinite(hanMs) ? xepLichChoBo(chotLuc, new Date(hanMs).toISOString(), bo.chang, goc, giay) : null
   let thuTu = 0
   const hang = bo.chang.flatMap((qs, c) => qs.map((q) => ({ q, c, n: bo.nhan[q], t: thuTu++ })))
   const soChang = bo.chang.length
   const kq = await env.DB.batch([
     env.DB.prepare(
-      `UPDATE btvn_em SET chot_luc = ?, so_cau_em = ?, so_chang = ?, tom_tat_json = ?, ngan_sach_json = ? WHERE khoa = ? AND chot_luc IS NULL AND thu_hoi = 0`,
-    ).bind(chotLuc, hang.length, soChang, json(bo.tomTat), json({ ...nganSach, ...(dc ? { dieuChinh: dc.dieuChinh, dieuChinhNgay: dc.ngay } : {}) }), khoa),
+      `UPDATE btvn_em SET chot_luc = ?, so_cau_em = ?, so_chang = ?, tom_tat_json = ?, ngan_sach_json = ?, chang_mo_json = ? WHERE khoa = ? AND chot_luc IS NULL AND thu_hoi = 0`,
+    ).bind(chotLuc, hang.length, soChang, json(bo.tomTat), json({ ...nganSach, ...(dc ? { dieuChinh: dc.dieuChinh, dieuChinhNgay: dc.ngay } : {}) }), xep?.json ?? null, khoa),
     env.DB.prepare(
       `INSERT OR IGNORE INTO btvn_em_cau (khoa, ma_btvn, sbd, qid, chang, nhan, thu_tu)
        SELECT ? || '|' || json_extract(j.value,'$.q'), ?, ?, json_extract(j.value,'$.q'), json_extract(j.value,'$.c'), json_extract(j.value,'$.n'), json_extract(j.value,'$.t')
@@ -380,14 +421,14 @@ export async function chotBoChoEm(env: Env, bt: Hang, sbd: string, now: number):
     ).bind(khoa, maBtvn, sbd, json(hang), khoa, chotLuc),
   ])
   if (Number((kq[0] as { meta?: { changes?: number } })?.meta?.changes ?? 0) > 0) {
-    return { chotLuc, chang: bo.chang, nhan: bo.nhan, tomTat: bo.tomTat, soCauEm: hang.length, soChang }
+    return { chotLuc, chang: bo.chang, nhan: bo.nhan, tomTat: bo.tomTat, soCauEm: hang.length, soChang, lich: xep?.lich ?? null }
   }
   // Thua cuộc đua hoặc đã chốt từ trước: đọc lại đúng bộ đã ghi.
-  const em = await env.DB.prepare('SELECT chot_luc, tom_tat_json, so_cau_em, so_chang FROM btvn_em WHERE khoa = ? AND thu_hoi = 0').bind(khoa).first<Hang>()
+  const em = await env.DB.prepare('SELECT chot_luc, tom_tat_json, so_cau_em, so_chang, chang_mo_json FROM btvn_em WHERE khoa = ? AND thu_hoi = 0').bind(khoa).first<Hang>()
   if (!em?.chot_luc) return null
   const da = await docBoDaChot(env, maBtvn, sbd)
   if (!da) return null
-  return { chotLuc: chuoi(em.chot_luc), chang: da.chang, nhan: da.nhan, tomTat: docTomTat(em.tom_tat_json), soCauEm: da.chang.flat().length, soChang: da.chang.length }
+  return { chotLuc: chuoi(em.chot_luc), chang: da.chang, nhan: da.nhan, tomTat: docTomTat(em.tom_tat_json), soCauEm: da.chang.flat().length, soChang: da.chang.length, lich: docLichDaLuu(em.chang_mo_json, da.chang.length) }
 }
 
 /** `docHoSoRut` cần danh sách câu của bài; ở đường chốt đã có `bai` nên chỉ cần một lượt đọc — bọc lại để chạy song song với `docBaiNangDo`. */
