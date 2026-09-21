@@ -214,9 +214,8 @@
   flex: 1 1 100%;
   min-width: 0;
   margin: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* tên ca xuống dòng, KHÔNG cắt "…" (luật B của Boss 21/09) */
+  overflow-wrap: anywhere;
   font-size: 15px;
   font-weight: 800;
   color: var(--m3-on-surface);

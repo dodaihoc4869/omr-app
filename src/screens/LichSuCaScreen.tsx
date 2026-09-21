@@ -18,6 +18,9 @@ import { gioPhutVN } from '../lib/em-toan-canh'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
+/** Luật công bố điểm của ca, nói bằng lời cho từng dòng ca (bản vẽ GV-3). Ca cũ không có `congBo` ⇒ không vẽ chip, không đoán. */
+const CONG_BO_NGAN: Record<string, string> = { khong: 'Điểm chưa công bố cho học sinh', ngay: 'Điểm hiện ngay khi học sinh nộp', ca_lop_xong: 'Điểm hiện khi cả lớp nộp xong' }
+
 /** Trạng thái hiển thị của ca theo mốc thời gian máy chủ + số đã nộp. */
 export function trangThaiCa(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetHanVao' | 'daVao' | 'daNop'>, nowMs: number): { ten: string; tone: 'xanh' | 'cam' | 'do' | 'tim' | 'xam' } {
   if (ca.trangThai === 'dong') return { ten: 'Đã đóng', tone: 'xam' }
@@ -61,6 +64,8 @@ export default function LichSuCaScreen() {
   const [loi, setLoi] = useState('')
   const [timKiem, setTimKiem] = useState('')
   const [lopLoc, setLopLoc] = useState('')
+  /** Lọc theo trạng thái ca (Xem điểm bản 2 · GV-3): '' = tất cả · 'mo' = đang mở · 'dong' = đã đóng. */
+  const [ttLoc, setTtLoc] = useState<'' | 'mo' | 'dong'>('')
   // Chế độ tích chọn để xoá nhiều ca
   const [chonMode, setChonMode] = useState(false)
   const [daChon, setDaChon] = useState<string[]>([])
@@ -98,8 +103,10 @@ export default function LichSuCaScreen() {
   const dsLop = useMemo(() => Array.from(new Set((dsCa ?? []).map((c) => c.lop.trim()).filter(Boolean))).sort(), [dsCa])
   const dsLoc = useMemo(() => {
     const q = timKiem.trim().toLowerCase()
-    return (dsCa ?? []).filter((c) => (!lopLoc || c.lop.trim() === lopLoc) && (!q || c.maCa.includes(q) || c.tenCa.toLowerCase().includes(q) || c.lop.toLowerCase().includes(q)))
-  }, [dsCa, timKiem, lopLoc])
+    return (dsCa ?? []).filter((c) => (!lopLoc || c.lop.trim() === lopLoc) && (!ttLoc || c.trangThai === ttLoc) && (!q || c.maCa.includes(q) || c.tenCa.toLowerCase().includes(q) || c.lop.toLowerCase().includes(q)))
+  }, [dsCa, timKiem, lopLoc, ttLoc])
+  const demMo = useMemo(() => (dsCa ?? []).filter((c) => c.trangThai === 'mo').length, [dsCa])
+  const demDong = useMemo(() => (dsCa ?? []).filter((c) => c.trangThai === 'dong').length, [dsCa])
 
   // Chỉ tính trên danh sách ĐANG hiện — tích "Tất cả" không bao giờ chạm ca bị bộ lọc giấu đi.
   const chonTrongLoc = useMemo(() => dsLoc.filter((c) => daChon.includes(c.maCa)), [dsLoc, daChon])
@@ -233,6 +240,7 @@ export default function LichSuCaScreen() {
             type="button"
             onClick={() => {
               thoatChon()
+              setTtLoc('') // thùng rác chỉ có ca đã xoá — không mang bộ lọc trạng thái sang
               setXemDaXoa((v) => !v)
             }}
             className={`tap-target ls-nut-tron${xemDaXoa ? ' ls-nut-tron--do' : ''}`}
@@ -253,6 +261,22 @@ export default function LichSuCaScreen() {
             <RefreshCw size={18} className={dangTai ? 'animate-spin' : ''} />
           </button>
         </div>
+
+        {!xemDaXoa && dsCa !== null && dsCa.length > 0 && (
+          <div className="ls-chips" role="group" aria-label="Lọc theo trạng thái ca">
+            {(
+              [
+                ['', `Tất cả ${dsCa.length}`],
+                ['mo', `Đang mở ${demMo}`],
+                ['dong', `Đã đóng ${demDong}`],
+              ] as const
+            ).map(([k, ten]) => (
+              <button key={k || '__tat_ca_tt'} type="button" onClick={() => setTtLoc(k)} aria-pressed={ttLoc === k} className={`tap-target ls-chip${ttLoc === k ? ' ls-chip--chon' : ''}`} style={SO}>
+                {ten}
+              </button>
+            ))}
+          </div>
+        )}
 
         {dsLop.length > 1 && (
           <div className="ls-chips" role="group" aria-label="Lọc theo lớp">
@@ -477,9 +501,10 @@ export default function LichSuCaScreen() {
                     <span>{c.thoiGianPhut} phút</span>
                   </div>
 
-                  {c.canhBao > 0 && (
+                  {(CONG_BO_NGAN[c.congBo] || c.canhBao > 0) && (
                     <div className="ls-ca-chan">
-                      <Nhan tone="cam">{c.canhBao} cảnh báo rời màn</Nhan>
+                      {CONG_BO_NGAN[c.congBo] && <Nhan tone="xam">{CONG_BO_NGAN[c.congBo]}</Nhan>}
+                      {c.canhBao > 0 && <Nhan tone="cam">{c.canhBao} cảnh báo rời màn</Nhan>}
                     </div>
                   )}
 
