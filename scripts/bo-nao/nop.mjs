@@ -51,6 +51,12 @@ export function docThuMucRa(thuMucRa) {
   return { phanTu, loiTep }
 }
 
+/** Phần tử do THUẬT TOÁN soạn cho em vắng 2–4 ngày (`lay.mjs` ghi `tu-dong/vang.json`; AI không đọc) ⇒ `[{tep, x}]`. */
+export function docTuDong(thuMucNgay) {
+  const mang = docJsonNeuCo(join(thuMucNgay, 'tu-dong', 'vang.json'), [])
+  return Array.isArray(mang) ? mang.filter(laDoiTuong).map((x) => ({ tep: 'tu-dong/vang.json', x })) : []
+}
+
 /**
  * Thẻ ĐẦY ĐỦ đã lấy ⇒ Map(biDanh → {the}). Nguồn chính: `.the-day-du.json` (thẻ đầy đủ mã lệnh giữ riêng — tệp AI đọc `vao/*.json` đã NÉN, thiếu trường). Không có (lượt lấy cũ) thì dùng `vao/*.json`.
  */
@@ -101,7 +107,7 @@ export function kiemCacEm(phanTu, bang, the) {
       loai.push({ biDanh: b, tep, lyDo: k.lyDo })
       continue
     }
-    hopLe.push({ biDanh: b, sbd: bang[b], dauRa: x, canhBao: k.canhBao ?? [] })
+    hopLe.push({ biDanh: b, sbd: bang[b], dauRa: x, canhBao: k.canhBao ?? [], tep })
   }
   return { hopLe, loai }
 }
@@ -140,7 +146,7 @@ export function kiemBanTinCucBo(tepLop, lop, bang) {
 
 /**
  * Lõi của mã lệnh (tách ra để test). Trả bản tóm tắt KHÔNG có SBD:
- * `{ ngay, soPhanTu, nhan, chiGhiSo, soApDung, biLoaiCucBo, biLoaiMayChu, loai:[{biDanh, lyDo}], canhBao:[{biDanh, canhBao}], banTin:{nhan, loi}, loiTep }`.
+ * `{ ngay, soPhanTu, tuDong, nhan, chiGhiSo, soApDung, biLoaiCucBo, biLoaiMayChu, loai:[{biDanh, lyDo}], canhBao:[{biDanh, canhBao}], banTin:{nhan, loi}, loiTep }`.
  */
 export async function chayNop({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now() }) {
   const thuMuc = join(goc, ngay)
@@ -150,7 +156,10 @@ export async function chayNop({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
   const bang = bd.bang
   const dao = new Map(Object.entries(bang).map(([b, s]) => [String(s), b]))
   const the = docTheDaLay(thuMuc)
-  const { phanTu, loiTep } = docThuMucRa(join(thuMuc, 'ra'))
+  const { phanTu: phanTuAi, loiTep } = docThuMucRa(join(thuMuc, 'ra'))
+  // lời mời quay lại do THUẬT TOÁN soạn (em vắng 2–4 ngày): nộp cùng kết quả của AI; AI có phần tử cho em nào thì phần tử AI thắng
+  const coAi = new Set(phanTuAi.map((p) => (laDoiTuong(p.x) && typeof p.x.biDanh === 'string' ? p.x.biDanh : null)))
+  const phanTu = [...phanTuAi, ...docTuDong(thuMuc).filter((p) => !coAi.has(typeof p.x.biDanh === 'string' ? p.x.biDanh : null))]
   const lopTep = docJsonNeuCo(join(thuMuc, 'lop.json'), null)
   const lop = lopTep && laDoiTuong(lopTep.lop) ? lopTep.lop : {}
 
@@ -193,6 +202,7 @@ export async function chayNop({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
     ngay,
     nopLuc: new Date(bayGio).toISOString(),
     soPhanTu: phanTu.length,
+    tuDong: hopLe.filter((h) => h.tep === 'tu-dong/vang.json').length,
     nhan,
     chiGhiSo,
     soApDung,
@@ -211,7 +221,7 @@ export async function chayNop({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
 
 export function dongTomTat(kq) {
   const d = [
-    `Nộp xong ngày ${kq.ngay}: nhận ${kq.nhan}/${kq.soPhanTu} phần tử (áp dụng ngay ${kq.soApDung} · chỉ ghi sổ ${kq.chiGhiSo}) · loại ${kq.biLoaiCucBo + kq.biLoaiMayChu} · cảnh báo ${kq.canhBao.length} · bản tin ${kq.banTin.nhan} dòng.`,
+    `Nộp xong ngày ${kq.ngay}: nhận ${kq.nhan}/${kq.soPhanTu} phần tử (áp dụng ngay ${kq.soApDung} · chỉ ghi sổ ${kq.chiGhiSo}; ${kq.tuDong ?? 0} lời mời vắng do thuật toán soạn) · loại ${kq.biLoaiCucBo + kq.biLoaiMayChu} · cảnh báo ${kq.canhBao.length} · bản tin ${kq.banTin.nhan} dòng.`,
   ]
   const lyDo = [
     ...kq.loai.map((l) => `  Loại ${l.biDanh}: ${l.lyDo.join('; ').slice(0, 220)}`),

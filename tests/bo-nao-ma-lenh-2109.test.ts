@@ -14,6 +14,7 @@ import { themNgay } from '../src/lib/bo-nao-dac-trung'
 import { LoiBoNao, capBiDanh, chiaTep, docMaBiMat, giauSbd, homNayVn, laNgay, maBiDanh, ngayChayBu, taoGoiMayChu } from '../scripts/bo-nao/chung.mjs'
 // @ts-expect-error
 import { chayLay, dongTomTat as dongLay } from '../scripts/bo-nao/lay.mjs'
+import { kiemKhuon } from '../src/lib/bo-nao-khuon'
 // @ts-expect-error
 import { chayNop, dongTomTat as dongNop, docTheDaLay, docThuMucRa, kiemBanTinCucBo, kiemCacEm } from '../scripts/bo-nao/nop.mjs'
 
@@ -66,7 +67,7 @@ function ngayHoc(sbd: string, nTruoc: number, k: number, dung: number) {
   const ngay = truoc(nTruoc)
   for (let i = 0; i < k; i++) d.sql.exec(`INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES ('k${++dem}', '${sbd}', 'q${sbd}-${nTruoc}-${i}', 'btvn', 'm', 1, ${i < dung ? 1 : 0}, NULL, '${ngay}T02:00:00.000Z', '${ngay}')`)
 }
-/** `n` em học đều (thẻ nhanh, một phần thành sâu do xoay vòng), 5 em vắng 4 ngày, 3 em chưa từng học. SBD dạng 20xxx, tên "Học Sinh Thử <số>". */
+/** `n` em học đều (thẻ nhanh, một phần thành sâu do xoay vòng), 3 em vắng 4 ngày + 2 em vắng 6 ngày, 3 em chưa từng học. SBD dạng 20xxx, tên "Học Sinh Thử <số>". */
 function dungLop(n = 20) {
   const sbds: string[] = []
   for (let i = 0; i < n; i++) {
@@ -81,7 +82,7 @@ function dungLop(n = 20) {
     const sbd = `21${String(i).padStart(3, '0')}`
     sbds.push(sbd)
     themEm(sbd, `Vắng Bốn Ngày ${i}`)
-    ngayHoc(sbd, 5, 6, 4)
+    ngayHoc(sbd, i < 3 ? 5 : 7, 6, 4) // 3 em vắng 4 ngày (thuật toán soạn lời mời) + 2 em vắng 6 ngày (AI xem)
   }
   for (let i = 0; i < 3; i++) themEm(`22${String(i).padStart(3, '0')}`, `Chưa Học ${i}`)
   // một em đang LÊN rõ (≥ 15 câu/7 ngày, ≥ 85 % đúng, xu hướng lên) ⇒ SBD xuất hiện trong `lop.emNoiLen` của máy chủ (mã lệnh phải đổi sang bí danh)
@@ -265,11 +266,60 @@ describe('lay.mjs — lấy dữ liệu đêm', () => {
     expect(mot).toHaveProperty('luotSoiKyTuan')
     expect(mot).toHaveProperty('khiNaoVietPhuHuynh')
   })
+  it('VẮNG 2–4 NGÀY do THUẬT TOÁN soạn: `tu-dong/vang.json` (3 phần tử đúng khuôn, bí danh), KHÔNG có trong `vao/` (AI không đọc ⇒ tiết kiệm token); vắng ≥ 5 ngày vẫn vào `vao/vang.json`; đếm và dòng in đúng', async () => {
+    dungLop(20)
+    const { goi } = mayChuGia()
+    const kq = await chayLay({ ngay: NGAY, goc, goi, bayGio: NOW })
+    const t = join(goc, NGAY)
+    const tuDong = JSON.parse(readFileSync(join(t, 'tu-dong', 'vang.json'), 'utf8')) as Record<string, any>[]
+    expect(tuDong).toHaveLength(3)
+    expect(tuDong.map((p) => p.biDanh)).toEqual(tuDong.map((p) => p.biDanh).sort()) // thứ tự cố định theo bí danh (chạy lại ra đúng tệp cũ)
+    const bd = JSON.parse(readFileSync(join(t, '.bi-danh.json'), 'utf8')).bang as Record<string, string>
+    const dayDu = JSON.parse(readFileSync(join(t, '.the-day-du.json'), 'utf8')).the as Record<string, any>
+    for (const p of tuDong) {
+      expect(p.biDanh).toMatch(/^E\d{3}$/)
+      expect(bd[p.biDanh]).toMatch(/^21\d{3}$/) // đúng 3 em vắng 4 ngày (21000–21002)
+      expect(Number(bd[p.biDanh].slice(2))).toBeLessThan(3)
+      expect(p).toMatchObject({ doTinCay: 0.7, nhip: { lech: -2, khoiDong: 3 }, dang: [], khacPhuc: [], co: 'khong', loiNhanChoPhuHuynh: '', thuTuan: '' })
+      expect(kiemKhuon(p, { ...dayDu[p.biDanh], biDanh: p.biDanh }).hopLe, p.biDanh).toBe(true) // qua ĐÚNG bộ kiểm khuôn của máy chủ
+      expect(p.loiNhanChoEm).toMatch(/\d/) // mọi mẫu đều mang số THẬT của thẻ (ngày vắng hoặc câu 7 ngày)
+    }
+    // AI không thấy: các em ấy KHÔNG nằm trong vao/
+    const trongVao = new Set(docTatCaVao().map((e) => e.biDanh as string))
+    for (const p of tuDong) expect(trongVao.has(p.biDanh)).toBe(false)
+    // vắng ≥ 5 ngày vẫn cho AI
+    const vang = JSON.parse(readFileSync(join(t, 'vao', 'vang.json'), 'utf8')) as Record<string, any>[]
+    expect(vang).toHaveLength(2)
+    expect(vang.every((e) => e.the.hoatDong.soNgayVang === 6)).toBe(true)
+    expect(kq.dem).toMatchObject({ vang: 2, vangTuDong: 3 })
+    expect(dongLay(kq).join('\n')).toContain('vắng ≥ 5 ngày 2')
+    expect(dongLay(kq).join('\n')).toContain('vắng 2–4 ngày 3 (thuật toán soạn, không cần AI)')
+    // tu-dong không chứa SBD/tên
+    const chu = readFileSync(join(t, 'tu-dong', 'vang.json'), 'utf8')
+    expect(chu).not.toMatch(/2100\d|Vắng Bốn Ngày/)
+    // chạy lại: ghi lại đúng, không nhân đôi
+    await chayLay({ ngay: NGAY, goc, goi, bayGio: NOW })
+    expect(JSON.parse(readFileSync(join(t, 'tu-dong', 'vang.json'), 'utf8'))).toEqual(tuDong)
+    // không còn em vắng 2–4 ngày ⇒ tệp tu-dong bị dọn (không để sót từ lượt trước)
+    d.sql.exec("DELETE FROM su_kien_hoc WHERE sbd IN ('21000','21001','21002')")
+    await chayLay({ ngay: NGAY, goc, goi, bayGio: NOW })
+    expect(existsSync(join(t, 'tu-dong', 'vang.json'))).toBe(false)
+  })
+  it('LUAT-RUT-GON.md được chép vào thư mục ngày (≤ 1.200 chữ, khớp hằng số của khuôn); thiếu tệp nguồn thì bỏ qua, không lỗi', async () => {
+    dungLop(20)
+    const { goi } = mayChuGia()
+    const kq = await chayLay({ ngay: NGAY, goc, goi, bayGio: NOW })
+    const luat = readFileSync(join(goc, NGAY, 'LUAT-RUT-GON.md'), 'utf8')
+    expect(luat).toBe(readFileSync('bo-nao/LUAT-RUT-GON.md', 'utf8'))
+    expect(luat.split(/\s+/).filter(Boolean).length).toBeLessThanOrEqual(1200)
+    expect(kq.dem.coLuatRutGon).toBe(true)
+    expect(dongLay(kq).join('\n')).toContain('LUAT-RUT-GON.md')
+  })
   it('ghi đúng bố cục: lop.json, vao/{nhanh,sau,vang}, ra/, .bi-danh.json (600), tom-tat.json; đếm khớp máy chủ', async () => {
     const sbds = dungLop(20)
     const { goi, nhatKy } = mayChuGia()
     const kq = await chayLay({ ngay: NGAY, goc, goi, bayGio: NOW })
-    expect(kq.dem).toMatchObject({ soEmCoThe: 26, vang: 5, boQua: 3 })
+    expect(kq.dem).toMatchObject({ soEmCoThe: 26, vang: 2, vangTuDong: 3, boQua: 3 })
     expect(kq.dem.nhanh + kq.dem.sau).toBe(21)
     const t = join(goc, NGAY)
     for (const f of ['lop.json', 'tom-tat.json', '.bi-danh.json', 'vao', 'ra']) expect(existsSync(join(t, f)), f).toBe(true)
@@ -277,8 +327,8 @@ describe('lay.mjs — lấy dữ liệu đêm', () => {
     expect(readdirSync(join(t, 'ra'))).toEqual([]) // để trống cho AI
     expect(readdirSync(join(t, 'vao')).sort()).toEqual(expect.arrayContaining(['vang.json']))
     const vao = docTatCaVao()
-    expect(vao).toHaveLength(26)
-    expect(vao.filter((e) => e.luong === 'vang')).toHaveLength(5)
+    expect(vao).toHaveLength(23) // 26 em có thẻ − 3 em vắng 4 ngày do thuật toán soạn
+    expect(vao.filter((e) => e.luong === 'vang')).toHaveLength(2)
     expect(vao.filter((e) => e.luong === 'sau').every((e) => e.hoSo && Array.isArray(e.lyDoLuong))).toBe(true)
     expect(vao.filter((e) => e.luong === 'nhanh').every((e) => !('hoSo' in e))).toBe(true)
     // bảng bí danh phủ đúng 26 SBD có thẻ, không có em bỏ qua
@@ -307,7 +357,7 @@ describe('lay.mjs — lấy dữ liệu đêm', () => {
   })
   it('CHIA TỆP: ≤ 40 thẻ nhanh/tệp, ≤ 12 hồ sơ sâu/tệp, vắng > 40 tách nhiều tệp; nhiều trang máy chủ được gộp đủ', async () => {
     const sbds = dungLop(95)
-    for (let i = 5; i < 50; i++) { const sbd = `21${String(i).padStart(3, '0')}`; sbds.push(sbd); themEm(sbd, `Vắng ${i}`); ngayHoc(sbd, 5, 6, 4) } // tổng 50 em vắng (5 + 45)
+    for (let i = 5; i < 50; i++) { const sbd = `21${String(i).padStart(3, '0')}`; sbds.push(sbd); themEm(sbd, `Vắng ${i}`); ngayHoc(sbd, 7, 6, 4) } // 45 em vắng 6 ngày (AI) + 2 từ dungLop = 47; 3 em vắng 4 ngày do thuật toán
     const { goi, nhatKy } = mayChuGia()
     const kq = await chayLay({ ngay: NGAY, goc, goi, bayGio: NOW })
     expect(nhatKy.filter((x) => x.duong === '/ai/ho-so-ngay' && x.than.trang).length).toBeGreaterThanOrEqual(3)
@@ -318,10 +368,10 @@ describe('lay.mjs — lấy dữ liệu đêm', () => {
       if (f.startsWith('sau-')) expect(n, f).toBeLessThanOrEqual(12)
       if (f.startsWith('vang')) expect(n, f).toBeLessThanOrEqual(40)
     }
-    expect(readdirSync(vao).filter((f) => f.startsWith('vang-')).length).toBe(2) // 50 em vắng ⇒ 2 tệp (40 + 10)
+    expect(readdirSync(vao).filter((f) => f.startsWith('vang-')).length).toBe(2) // 47 em vắng ≥ 5 ngày ⇒ 2 tệp (40 + 7)
     expect(readdirSync(vao)).not.toContain('vang.json')
     expect(kq.dem.soEmCoThe).toBe(96 + 50)
-    expect(docTatCaVao()).toHaveLength(146)
+    expect(docTatCaVao()).toHaveLength(143) // 146 có thẻ − 3 vắng 4 ngày do thuật toán
     expect(kq.dem.tep.sau).toBe(Math.ceil(kq.dem.sau / 12))
     expect(kq.dem.sau).toBeGreaterThan(0)
   })
@@ -372,6 +422,7 @@ describe('nop.mjs — kiểm khuôn, đổi bí danh, nộp', () => {
     const sbds = dungLop(soEm)
     const may = mayChuGia()
     await chayLay({ ngay: NGAY, goc, goi: may.goi, bayGio: NOW })
+    rmSync(join(goc, NGAY, 'tu-dong'), { recursive: true, force: true }) // các test nộp dưới đây xét phần tử CỦA AI; lời mời vắng tự động có khối test riêng
     const vao = docTatCaVao()
     return { ...may, sbds, vao, biDanhCoHoatDong: vao.filter((e) => e.luong !== 'vang').map((e) => e.biDanh as string), bd: JSON.parse(readFileSync(join(goc, NGAY, '.bi-danh.json'), 'utf8')).bang as Record<string, string> }
   }
@@ -578,6 +629,35 @@ describe('nop.mjs — kiểm khuôn, đổi bí danh, nộp', () => {
     ghiRa('nhanh-01.json', [raHopLe(biDanhCoHoatDong[0])])
     expect((await chayNop({ ngay: NGAY, goc, goi, bayGio: NOW })).nhan).toBe(1)
   })
+  it('NỘP KÈM LỜI MỜI VẮNG TỰ ĐỘNG: em vắng 2–4 ngày được nộp cùng kết quả của AI; AI có phần tử cho em nào thì phần tử AI thắng; chỉ có tu-dong (AI chưa ghi gì) cũng nộp được', async () => {
+    dungLop(20)
+    const may = mayChuGia()
+    await chayLay({ ngay: NGAY, goc, goi: may.goi, bayGio: NOW })
+    const t = join(goc, NGAY)
+    const bd = JSON.parse(readFileSync(join(t, '.bi-danh.json'), 'utf8')).bang as Record<string, string>
+    const tuDong = JSON.parse(readFileSync(join(t, 'tu-dong', 'vang.json'), 'utf8')) as Record<string, any>[]
+    // (a) chỉ có tu-dong ⇒ vẫn nộp (không ném mã 6)
+    const a = await chayNop({ ngay: NGAY, goc, goi: may.goi, bayGio: NOW })
+    expect(a).toMatchObject({ soPhanTu: 3, tuDong: 3, nhan: 3, biLoaiCucBo: 0 })
+    expect(d.dem('ai_dieu_chinh')).toBe(3)
+    const luu = d.sql.prepare("SELECT sbd, json FROM ai_dieu_chinh ORDER BY sbd").all() as { sbd: string; json: string }[]
+    expect(luu.map((x) => x.sbd)).toEqual(tuDong.map((p) => bd[p.biDanh]).sort()) // máy chủ nhận SBD, không phải bí danh
+    expect(JSON.parse(luu[0].json).nhip).toEqual({ lech: -2, khoiDong: 3 })
+    // (b) AI ghi phần tử cho MỘT trong ba em ấy ⇒ phần tử AI thắng; hai em còn lại vẫn do thuật toán
+    const em = tuDong[0].biDanh as string
+    ghiRa('vang-01.json', [raHopLe(em, { loiNhanChoEm: 'Em quay lại nhé, mình chờ em.', nhip: { lech: -1, khoiDong: 2 } })])
+    const b = await chayNop({ ngay: NGAY, goc, goi: may.goi, bayGio: NOW })
+    expect(b).toMatchObject({ soPhanTu: 3, tuDong: 2, nhan: 3 }) // 1 của AI + 2 tự động
+    const cua = JSON.parse((d.sql.prepare('SELECT json FROM ai_dieu_chinh WHERE sbd = ?').get(bd[em]) as { json: string }).json)
+    expect(cua.loiNhanChoEm).toBe('Em quay lại nhé, mình chờ em.')
+    expect(cua.nhip).toEqual({ lech: -1, khoiDong: 2 })
+    expect(dongNop(b).join('\n')).toContain('2 lời mời vắng do thuật toán soạn')
+    // (c) tu-dong hỏng/xấu không làm hỏng lượt nộp: phần tử sai khuôn bị loại như phần tử AI
+    writeFileSync(join(t, 'tu-dong', 'vang.json'), JSON.stringify([{ ...tuDong[1], loiNhanChoEm: 'Em còn yếu, đúng 99 câu.' }, 'rác', null]))
+    const c = await chayNop({ ngay: NGAY, goc, goi: may.goi, bayGio: NOW })
+    expect(c.biLoaiCucBo).toBe(1)
+    expect(c.tuDong).toBe(0)
+  })
   it('kiemCacEm / kiemBanTinCucBo thuần: thứ tự giữ nguyên; khuôn chạy y hệt máy chủ (thẻ + bí danh)', async () => {
     await layXong()
     const the = docTheDaLay(join(goc, NGAY)) as Map<string, any>
@@ -639,8 +719,9 @@ describe('CLI thật (node scripts/bo-nao/lay.mjs · nop.mjs) qua http tới má
     const nop = await chay(NOP, [NGAY])
     expect(nop.loi).toBe('')
     expect(nop.ma).toBe(0)
-    expect(nop.ra).toContain('nhận 21/21')
-    expect(d.dem('ai_dieu_chinh')).toBe(21)
+    expect(nop.ra).toContain('nhận 24/24') // 21 phần tử của AI + 3 lời mời vắng do thuật toán
+    expect(nop.ra).toContain('3 lời mời vắng do thuật toán soạn')
+    expect(d.dem('ai_dieu_chinh')).toBe(24)
     for (const s of sbds) { expect(lay.ra + nop.ra, s).not.toContain(s) }
     expect(lay.ra + nop.ra + lay.loi + nop.loi).not.toContain(MA)
     expect(nhatKyHeader.every((h) => h === MA)).toBe(true)

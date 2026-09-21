@@ -5,21 +5,24 @@
 //   lop.json               bức tranh cả lớp + kết quả các điều chỉnh hôm qua (emNoiLen đã đổi sang bí danh)
 //   vao/nhanh-01.json …    mỗi tệp ≤ 40 thẻ NGẮN (nén: ≤ ~1,2 KB/thẻ)
 //   vao/sau-01.json …      mỗi tệp ≤ 12 hồ sơ ĐẦY ĐỦ (thẻ nén + phần thêm, ≤ ~3 KB/em): luồng sâu ≤ 25 % số em có thẻ, chọn theo điểm ưu tiên
-//   vao/vang.json          em vắng ≥ 2 ngày (thẻ vắng ≤ ~0,4 KB; quá 40 em thì vang-01.json, vang-02.json …)
+//   vao/vang.json          em vắng ≥ 5 ngày (thẻ vắng ≤ ~0,4 KB; quá 40 em thì vang-01.json, vang-02.json …). Em vắng 2–4 ngày: lời mời quay lại do THUẬT TOÁN soạn (`tu-dong/vang.json`, AI không đọc)
+//   LUAT-RUT-GON.md        luật rút gọn (≤ 1.200 chữ) cho trợ lý con đọc THAY cẩm nang dài
 //   ra/                    thư mục trống cho phiên AI ghi kết quả
 //   .bi-danh.json          bảng bí danh → SBD (quyền 600; AI KHÔNG được mở)
 //   .the-day-du.json       thẻ ĐẦY ĐỦ theo bí danh, để `nop.mjs` kiểm khuôn (quyền 600; AI KHÔNG được mở)
 // Luồng: các trang chỉ dựng THẺ TẠM; `phan:'lop'` (gọi SAU CÙNG) CHỐT luồng cả lớp — dạng cả lớp cùng sai ghi MỘT lần vào `lop.json` (`dangCaLopYeu`), không đẩy từng em vào sâu — rồi trả `doiLuong`.
 // In ra CHỈ đường dẫn và số đếm. Chạy lại cùng ngày: em cũ giữ nguyên bí danh. Lỡ đêm: gọi `lay.mjs <ngày>` cho ngày bị lỡ (máy chủ dựng hồ sơ THEO YÊU CẦU cho bất kỳ ngày nào).
-import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { nenHoSo, nenThe, nenTheVang } from '../../src/lib/bo-nao-nen.ts'
+import { laVangTuDong, soanLoiMoiVang } from '../../src/lib/bo-nao-vang.ts'
+import { copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs'
 import {
   CO_TRANG,
   GOC_DU_LIEU,
   LoiBoNao,
   SO_TRANG_TOI_DA,
+  THU_MUC_CAM_NANG,
   TOI_DA_HO_SO_MOI_TEP,
   TOI_DA_THE_MOI_TEP,
   capBiDanh,
@@ -72,16 +75,23 @@ export async function chayLay({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
 
   const nhom = { nhanh: [], sau: [], vang: [] }
   const the = {} // bí danh → thẻ ĐẦY ĐỦ (tệp riêng cho nop.mjs)
+  const tuDongVang = [] // phần tử đầu ra do thuật toán soạn cho em vắng 2–4 ngày
   for (const e of coThe) {
     const b = dao.get(String(e.sbd))
     the[b] = e.the
     if (e.luong === 'sau') {
       const them = nenHoSo(e.the, e.hoSo)
       nhom.sau.push({ biDanh: b, luong: 'sau', lyDoLuong: e.lyDoLuong ?? [], the: nenThe(e.the), ...(them ? { hoSo: them } : {}) })
-    } else if (e.luong === 'vang') nhom.vang.push({ biDanh: b, luong: 'vang', the: nenTheVang(e.the) })
+    } else if (e.luong === 'vang') {
+      // vắng 2–4 ngày: thuật toán soạn lời mời (không đưa vào tệp cho AI ⇒ tiết kiệm token); vắng ≥ 5 ngày AI xem (có gợi ý nhắn phụ huynh)
+      const tuDong = laVangTuDong(e.the) ? soanLoiMoiVang(e.the, b, ngay) : null
+      if (tuDong) tuDongVang.push(tuDong)
+      else nhom.vang.push({ biDanh: b, luong: 'vang', the: nenTheVang(e.the) })
+    }
     else nhom.nhanh.push({ biDanh: b, luong: 'nhanh', the: nenThe(e.the) })
   }
   for (const k of Object.keys(nhom)) nhom[k].sort((a, b) => (a.biDanh < b.biDanh ? -1 : 1))
+  tuDongVang.sort((a, b) => (a.biDanh < b.biDanh ? -1 : 1))
 
   mkdirSync(join(thuMuc, 'vao'), { recursive: true })
   mkdirSync(join(thuMuc, 'ra'), { recursive: true })
@@ -98,11 +108,22 @@ export async function chayLay({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
   ghiJson(tepBiDanh, { ngay, bang }, { rieng: true })
   ghiJson(join(thuMuc, '.the-day-du.json'), { ngay, the }, { rieng: true })
 
+  // tu-dong/: dọn rồi ghi lại (lượt lấy mới); ra/ KHÔNG bị đụng
+  const thuMucTuDong = join(thuMuc, 'tu-dong')
+  rmSync(join(thuMucTuDong, 'vang.json'), { force: true })
+  if (tuDongVang.length) ghiJson(join(thuMucTuDong, 'vang.json'), tuDongVang)
+  // luật rút gọn cho trợ lý con (bản chép của cẩm nang gọn, cùng phiên bản với mã lệnh)
+  const nguonLuat = join(THU_MUC_CAM_NANG, 'LUAT-RUT-GON.md')
+  const coLuat = existsSync(nguonLuat)
+  if (coLuat) copyFileSync(nguonLuat, join(thuMuc, 'LUAT-RUT-GON.md'))
+
   const dem = {
     soEmCoThe: coThe.length,
     nhanh: nhom.nhanh.length,
     sau: nhom.sau.length,
     vang: nhom.vang.length,
+    vangTuDong: tuDongVang.length,
+    coLuatRutGon: coLuat,
     boQua: cacEm.length - coThe.length,
     tep,
   }
@@ -118,8 +139,8 @@ export function dongTomTat(kq) {
   const { dem } = kq
   const d = [
     `Đã lấy dữ liệu ngày ${kq.ngay} → bo-nao/${kq.ngay}/   (chế độ: ${kq.cheDo === 'that' ? 'thật' : 'chạy thử'})`,
-    `  Có thẻ ${dem.soEmCoThe} em: nhanh ${dem.nhanh} (${dem.tep.nhanh} tệp) · sâu ${dem.sau} (${dem.tep.sau} tệp) · vắng ${dem.vang} (${dem.tep.vang} tệp) · bỏ qua ${dem.boQua} em (không lưu).`,
-    '  Đọc: lop.json và vao/*.json. Ghi kết quả vào ra/ (mỗi tệp vào một tệp ra cùng tên; lop.json là bản tin). Xong chạy: node scripts/bo-nao/nop.mjs ' + kq.ngay,
+    `  Có thẻ ${dem.soEmCoThe} em: nhanh ${dem.nhanh} (${dem.tep.nhanh} tệp) · sâu ${dem.sau} (${dem.tep.sau} tệp) · vắng ≥ 5 ngày ${dem.vang} (${dem.tep.vang} tệp) · vắng 2–4 ngày ${dem.vangTuDong} (thuật toán soạn, không cần AI) · bỏ qua ${dem.boQua} em (không lưu).`,
+    '  Đọc: lop.json và vao/*.json (trợ lý con đọc LUAT-RUT-GON.md thay cẩm nang dài). Ghi kết quả vào ra/ (mỗi tệp vào một tệp ra cùng tên; lop.json là bản tin). Xong chạy: node scripts/bo-nao/nop.mjs ' + kq.ngay,
   ]
   if (dem.soEmCoThe === 0) d.push('  Không có em nào có hoạt động → ghi bao-cao.md một dòng rồi dừng.')
   if (kq.chayBu.length) d.push(`  Lưu ý: chưa nộp các ngày ${kq.chayBu.join(', ')} — muốn chạy bù: node scripts/bo-nao/lay.mjs <ngày> rồi nop.mjs <ngày> tương ứng.`)

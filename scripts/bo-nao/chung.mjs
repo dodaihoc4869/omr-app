@@ -5,7 +5,7 @@
 //   • MÃ BÍ MẬT chỉ đọc từ tệp `~/.omr-bo-nao/ma-bi-mat` (thầy tự đặt một lần), gửi bằng header `x-ma-bi-mat` tới địa chỉ https; KHÔNG bao giờ in, ghi tệp, hay đưa vào thông báo lỗi.
 //   • AI chỉ thấy BÍ DANH (E001…). Bảng bí danh → SBD nằm ở `bo-nao/<ngày>/.bi-danh.json` (quyền 600); mã lệnh không in SBD, không in dữ liệu thẻ — chỉ in ĐƯỜNG DẪN và SỐ ĐẾM.
 //   • Mọi thông báo lỗi bằng lời tiếng Việt, ngắn.
-import { chmodSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { randomInt } from 'node:crypto'
 import { homedir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -14,6 +14,8 @@ import { fileURLToPath } from 'node:url'
 export const DIA_CHI_MAC_DINH = 'https://omr.ttadodaihoc.workers.dev'
 /** `bo-nao/` ở gốc kho mã (tính từ vị trí tệp này, chạy ở thư mục nào cũng được). `OMR_BO_NAO_GOC` chỉ để test trỏ sang thư mục tạm. */
 export const GOC_DU_LIEU = process.env.OMR_BO_NAO_GOC || resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', 'bo-nao')
+/** Nơi có `HUONG-DAN-BO-NAO.md` / `LUAT-RUT-GON.md` (tính từ vị trí tệp này, KHÔNG đổi theo `OMR_BO_NAO_GOC`: cả kho mã lẫn gói ở ổ trong đều có `bo-nao/` cạnh `scripts/`). */
+export const THU_MUC_CAM_NANG = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', 'bo-nao')
 export const CO_TRANG = 40
 export const TOI_DA_THE_MOI_TEP = 40
 export const TOI_DA_HO_SO_MOI_TEP = 12
