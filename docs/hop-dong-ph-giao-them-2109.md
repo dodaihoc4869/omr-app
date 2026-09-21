@@ -20,8 +20,29 @@ Không đồng hồ, không ngẫu nhiên, không đọc D1; chạy được c�
 - **Cơ cấu (theo ưu tiên):** (1) câu đến lịch ôn → (2) câu dạng con ĐANG VẤP (chia vòng tròn từng câu giữa các dạng; dạng yếu và sai nhiều trước) → (3) câu con từng sai chưa khắc phục → (4) MỘT câu "thử sức" bậc + 1 CHỈ khi hôm nay con đúng ≥ 80 % trong ≥ 5 câu, ở dạng ổn (không yếu, không vấp, bậc < Vận dụng, còn câu bậc + 1); câu thử sức được giữ chỗ TRƯỚC (tổng vẫn bằng liều).
 - Không vượt bậc + 1; không đụng hạn nộp / điểm / bài bắt buộc (việc bắt buộc còn ⇒ từ chối).
 
-## 5 · Phần Code 3 (nối tiếp — chưa viết)
-`POST /ph/giao-them`: xác thực phụ huynh như `/ph/*`; dựng `DauVaoGiaoThem` (mục 2); gọi `tinhGiaoThem`; nếu `tuChoi` ⇒ `{ ok:true, tuChoi:{lyDo}, conLaiHomNay }` KHÔNG ghi lượt; nếu giao ⇒ chọn qid theo `thanhPhan` (ưu tiên `bac` gợi ý, không tự luận, không câu BTVN chưa nộp…), tạo bài qua đường "Bài gia đình giao" (`mom_bai`), tăng bộ đếm lượt (trần 3/ngày/con theo ngày VN, idempotent khi bấm đúp), trả `{ ok, daGiao:{soCau, thanhPhan, phutUocTinh, lyDo}, conLaiHomNay }`; thông báo cho con; `mayDaLam` bảng tin thầy. Nếu chọn được ÍT câu hơn `soCau` thì giao số chọn được (≥ 3) và báo đúng số.
+## 5 · Phần Code 3 — `POST /ph/giao-them` (máy chủ; Code 3, 21/09)
+**Xác thực:** mã phụ huynh `{pass}` như `/ph/ke-hoach` (chỉ token). **Một lệnh, hai kiểu gọi:** `{pass}` = GIAO; `{pass, chiXem: true}` = chỉ đọc trạng thái nút (không ghi, không chọn câu).
+```jsonc
+{ "ok": true, "serverNow": 0,
+  "conLaiHomNay": 2,                       // 3 − số lượt THÀNH CÔNG hôm nay (ngày VN); lượt bị từ chối KHÔNG tính
+  "goiGanNhat": { "luc": "ISO", "soCau": 6, "soDaLam": 6, "soDung": 5, "phutUocTinh": 8 },   // gói THÀNH CÔNG gần nhất hôm nay; vắng nếu chưa giao gói nào. soDaLam/soDung đếm từ sổ theo mã bài của gói ("Con đã làm xong gói 19:40 · đúng 5 trong 6 câu")
+  // ── chỉ khi GIAO thành công ──
+  "daGiao": { "soCau": 6, "luot": 1, "luc": "ISO", "phutUocTinh": 8, "lyDo": ["…câu tiếng thường có số thật…"],
+              "thanhPhan": [ { "loai": "on_lai|dang_vap|cau_sai|thu_suc", "dang": "MÃ", "tenDang": "Thuỷ phân ester", "soCau": 3 } ],
+              "laLuotCu": false },            // true khi bấm đúp CÙNG PHÚT: trả lại gói vừa giao, KHÔNG tạo gói mới, KHÔNG mất thêm lượt
+  // ── chỉ khi bị TỪ CHỐI (vẫn ok:true, KHÔNG mất lượt) ──
+  "tuChoi": { "ma": "het_luot|qua_muon|con_viec_bat_buoc|goi_truoc_chua_xong|het_tran_ngay|khong_co_cau", "lyDo": ["…"] } }
+```
+- Lỗi xác thực / hệ thống: `{ok:false, error}` (không tính lượt).
+- **Máy chủ dựng `DauVaoGiaoThem`** (mục 2) từ nguồn có sẵn: `nam_kt_dang` (bậc, yếu, tỉ lệ khắc phục, vấp = yếu HOẶC có câu `moi_sai` trong 3 ngày), `nam_kt_cau` (câu đến lịch: `moc_on_ke ≤ hôm nay`; câu sai chưa khắc phục: `moi_sai`/`dang_on`), kho câu `game_v2_question` (khả dụng = duyệt + 3 dạng chuẩn + KHÔNG tự luận + không đề thi đang bảo vệ + không câu của bài tập về nhà CHƯA nộp + không câu làm trong 14 ngày trừ câu đến lịch ôn + mức ≤ bậc + 1), kế hoạch ngày (mục tiêu câu/ngày, đã làm/đã đúng hôm nay, việc BẮT BUỘC còn lại: chặng BTVN chưa xong, ôn lại bắt buộc), `ph_giao_them` (lượt thành công, gói trước), `su_kien_hoc` (đã làm/đã đúng của gói trước; giây/câu thật 14 ngày).
+- **Máy chủ chọn qid** đúng `thanhPhan` theo thứ tự ưu tiên (câu đến lịch → dạng vấp theo `bac` gợi ý → câu từng sai chưa khắc phục → MỘT câu thử sức bậc + 1), các nhóm KHÔNG trùng nhau; chọn được ÍT hơn `soCau` thì giao số chọn được (≥ 3) và `daGiao.soCau`/`thanhPhan` báo ĐÚNG số giao thật; < 3 câu ⇒ `tuChoi.khong_co_cau` (không mất lượt).
+- **Tạo bài** qua đường "Bài gia đình giao" sẵn có (`mom_bai`, id `giao_them:<ngày VN>:<lượt>`, tiêu đề "Gia đình giao thêm · N câu"): con làm ở đúng chỗ Mẹ giao hiện có; chấm + ghi sổ + lịch ôn + EXP như thường (nguồn `mom`). Không đụng hạn nộp, điểm, bài bắt buộc.
+- **Đếm lượt ở MÁY CHỦ** bảng `ph_giao_them` (khoá duy nhất `(sbd, ngày VN, lượt)` + khoá theo phút `(sbd|ngày|phút)` ⇒ bấm đúp không tạo hai gói, hai máy bấm cùng lúc không vượt 3). Ngày VN đổi lúc 00:00 giờ VN.
+- **Con nhận MỘT tin trong app** (danh sách thông báo hiện có): "Gia đình vừa giao cho em 6 câu, khoảng 8 phút. A.I Đỗ Đại Học đã chọn các câu hợp với em hôm nay." — không nhắc thần thú/EXP/khiên/game.
+- **Bảng tin của thầy** `mayDaLam`: `{loai:'giao_them', so:N, chu:"A.I Đỗ Đại Học soạn N gói bài gia đình giao hôm nay"}` (N = số gói thành công hôm nay của cả trường), vẫn ≤ 12 truy vấn.
+- `/ph/tat-ca-ve-con.giaoThem.conLaiHomNay` cùng nguồn với `conLaiHomNay` ở đây. Cả ba nút "Giao bài" cũ của cổng phụ huynh (giao khắc phục / giao nhanh / bài hằng ngày) do Code 2 gỡ; các lệnh máy chủ cũ (`/parent-news/assign`, `/mom/create`) giữ nguyên chạy (không phá máy cũ), dọn sau.
+- Test (`tests/ph-giao-them-may-chu-2109.test.ts`): không đáp án/tự luận/câu bài tập chưa nộp/câu 14 ngày; đúng cơ cấu + bậc; trần 3 lượt thành công; từ chối không mất lượt; bấm đúp cùng phút; hai lượt song song; ngày VN đổi; con nhận tin; mayDaLam; đột biến.
+
 ## 6 · Phần Code 2 (màn) — xem đề bài mục A4. Chủ ngữ do màn ghi: "A.I Đỗ Đại Học đã chọn N câu hợp với con hôm nay".
 
 **Đã chốt (Boss 21/09):** sau 22:30 từ chối hẳn (`qua_muon`, thẻ trung tính "Anh/chị chưa mất lượt nào", `conLaiHomNay` giữ nguyên). **Đã chốt thêm (Boss 21/09, chiều):** 00:00–04:59 cũng từ chối (cùng mã `qua_muon`, lời "để con ngủ") — ngày VN đã sang ngày mới và đủ 3 lượt mới thì hàm vẫn chặn tới 05:00.
