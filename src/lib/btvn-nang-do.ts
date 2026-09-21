@@ -158,6 +158,9 @@ export interface TomTatBo {
   soDangYeuDuCau: number
   /** Ngân sách (soNgay × (cauMoiNgay − onLaiMoiNgay)) đã kẹp trong [|lõi bắt buộc|, N − |thử sức thêm|] — `tong` không bao giờ vượt số này trừ khi lõi bắt buộc đã vượt sẵn. */
   nganSachCau: number
+  /** LÕI ĐÚNG BẬC (thầy chốt 21/09): lõi CỦA EM (qid, theo thứ tự đề) — CHỈ có khi khác lõi của bài (em có dạng ổn định được đổi câu lõi mức thấp lấy câu đúng bậc); vắng ⇒ lõi của em = lõi của bài.
+   * Máy chủ lưu nguyên `tomTat` ở `btvn_em.tom_tat_json` nên trường này đi theo em mà KHÔNG cần đổi lược đồ; `thichNghiSauChang` / thống kê lõi phải đọc `tomTat.loiCuaEm ?? bai.loi`. */
+  loiCuaEm?: string[]
 }
 
 /** BỘ CÂU CỦA MỘT EM. `loi`, `rieng`, `thuThach` ĐÔI MỘT RỜI NHAU; hợp của ba = mọi câu của em = hợp của `chang` VÀ `thuSucThem` (rời nhau). */
@@ -743,6 +746,7 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
       soDangYeu: dangYeuTrongBai,
       soDangYeuDuCau: dangYeuDu,
       nganSachCau,
+      ...(daThay.size > 0 ? { loiCuaEm: loiIdx.map((i) => ds[i].qid) } : {}), // chỉ khi lõi của em KHÁC lõi của bài (bộ cũ / em không có dạng ổn định: Y HỆT từng byte)
     },
   }
   // KHẮC PHỤC LUÔN (bộ não): vắng/rỗng ⇒ trả đúng `boXong` (không thêm trường); có ⇒ chèn vào chặng đầu (lúc chọn bộ chưa chặng nào mở)

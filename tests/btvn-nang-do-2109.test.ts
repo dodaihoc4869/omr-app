@@ -531,9 +531,9 @@ describe('chonBoCuaEm — cổng `dieuChinh` (bộ não đêm)', () => {
   /** Chữ ký vàng của kết quả khi VẮNG cổng: 60 em ngẫu nhiên × 6 ngân sách (hạt giống cố định). Đổi số này = đổi hành vi khi vắng cổng — phải có lý do.
    * Lịch sử: 1036170693 = bản 569ebfd (đã kiểm: bản có cổng cho đúng số ấy). 21/09 Boss QUYẾT sửa cách chia chỗ trống (thử thách tính trên phần NGOÀI lõi, ≤ 20 % làm tròn xuống)
    * ⇒ số mới 1419150711; chưa có gì của lõi lên máy chủ nên đổi kết quả không hại.
-   * 21/09 thầy chốt LÕI ĐÚNG BẬC ⇒ em có dạng ổn định ở bậc ≥ Hiểu nay nhận lõi khác ⇒ số mới 3229971911 (60 em ngẫu nhiên). Số cũ 1419150711 vẫn ĐÚNG cho mọi em KHÔNG có dạng ổn định — khoá ở
+   * 21/09 thầy chốt LÕI ĐÚNG BẬC ⇒ em có dạng ổn định ở bậc ≥ Hiểu nay nhận lõi khác ⇒ số mới 3229971911 (60 em ngẫu nhiên), rồi 29438757 sau khi thêm `tomTat.loiCuaEm`. Số cũ 1419150711 vẫn ĐÚNG cho mọi em KHÔNG có dạng ổn định — khoá ở
    * `VANG_KHONG_ON_DINH` bên dưới ("vắng hồ sơ ⇒ y hệt bản trước"). */
-  const VANG = 3229971911
+  const VANG = 29438757 // 3229971911 khi chưa có `tomTat.loiCuaEm`; thêm trường này (chỉ ở bộ có thay lõi) đổi số cho các em có dạng ổn định
   const NS6: [number, number, number][] = [[7, 12, 3], [7, 10, 4], [5, 16, 2], [3, 8, 8], [14, 16, 0], [1, 12, 2]]
   /** BẢN 1.2 thêm `thuSucThem` / `tomTat.soThuSucThem` / `tomTat.soBatBuoc`: bỏ ba trường MỚI (phải rỗng / bằng số cũ) rồi băm ⇒ vẫn ra ĐÚNG số 1419150711 của bản trước ⇒ với bài
    * KHÔNG có lõi cao (như bộ mẫu 80 câu) bản 1.2 cho kết quả Y HỆT từng byte. */

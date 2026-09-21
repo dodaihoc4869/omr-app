@@ -73,6 +73,21 @@ describe('LÕI ĐÚNG BẬC — em ổn định', () => {
   })
 })
 
+describe('LÕI ĐÚNG BẬC — `tomTat.loiCuaEm` (đi theo em qua `tom_tat_json`, không đổi lược đồ)', () => {
+  it('CÓ (đúng bằng `loi`, theo thứ tự đề) khi lõi của em khác lõi bài; VẮNG khi không thay ⇒ tomTat Y HỆT bản trước', () => {
+    const b = chon(OnDinh(1))
+    expect(b.tomTat.loiCuaEm).toEqual(b.loi)
+    expect(JSON.parse(JSON.stringify(b.tomTat)).loiCuaEm).toEqual(b.loi) // qua JSON (nơi máy chủ lưu) vẫn còn
+    for (const h of [ho({}), OnDinh(0), ho({ A0: dang(1, 8, 0.4), A1: dang(1, 8, 0.4), A2: dang(1, 8, 0.4) })]) expect('loiCuaEm' in chon(h).tomTat).toBe(false)
+  })
+  it('thích nghi sau chặng giữ `loiCuaEm` (tomTat được trải ra, không mất trường)', () => {
+    const h = OnDinh(1)
+    const b = chon(h, NS(3, 8))
+    const k = thichNghiChangSau(b, CAU, h, 0, { dung: Object.fromEntries(b.chang[0].map((q) => [q, false])) }, { soChangDaMo: 1 })
+    expect(k.bo.tomTat.loiCuaEm).toEqual(b.tomTat.loiCuaEm)
+  })
+})
+
 describe('LÕI ĐÚNG BẬC — khi KHÔNG thay (giữ câu gốc, Y HỆT bản trước)', () => {
   it('vắng hồ sơ / hồ sơ rỗng ⇒ lõi = lõi của bài', () => {
     expect(chon(ho({})).loi).toEqual(LOI)
