@@ -15,6 +15,7 @@ import { demLanSai, docHoSoOnEm, dungDeRieng, dungDeRiengLuotHai, type CaTruocDa
 import { dungUngVien } from './rut-de'
 import { chuanChuyenDe } from './goi-len-bang'
 import { hashSeed } from './exam-shuffle'
+import { laCauRutDuoc } from './cau-tu-luan'
 
 export interface CaBoQua {
   maCa: string
@@ -468,6 +469,20 @@ export function locKhoToanBoTheoChuyenDeCa(khoToanBo: TeacherExamSource[], bankG
   return khoToanBo.map((s) => ({ ...s, phanI: s.phanI.filter(hop), phanII: s.phanII.filter(hop), phanIII: s.phanIII.filter(hop) }))
 }
 
+/** CÂU BÙ KHO cho đề riêng: câu CHƯA có trong bộ và KHÔNG phải câu tự luận (thầy lệnh 21/09: tuyệt đối không rút tự luận), đúng số thiếu từng phần, theo thứ tự kho. */
+export function chonCauBuKho(
+  kho: TeacherExamSource[],
+  daCo: ReadonlySet<string>,
+  thieu: { I: number; II: number; III: number },
+): Pick<TeacherExamSource, 'phanI' | 'phanII' | 'phanIII'> {
+  return {
+    phanI: kho.flatMap((s) => s.phanI.filter((q) => !daCo.has(q.id) && laCauRutDuoc(q, 'I'))).slice(0, thieu.I),
+    phanII: kho.flatMap((s) => s.phanII.filter((q) => !daCo.has(q.id) && laCauRutDuoc(q, 'II'))).slice(0, thieu.II),
+    phanIII: kho.flatMap((s) => s.phanIII.filter((q) => !daCo.has(q.id) && laCauRutDuoc(q, 'III'))).slice(0, thieu.III),
+  }
+}
+
+
 export async function dungDeRiengChoCa(
   url: string,
   mat: string,
@@ -604,12 +619,7 @@ export async function dungDeRiengChoCa(
     // nối câu khắc phục), đúng những chuyên đề thầy đã chọn lúc mở ca.
     const khoToanBo = locKhoToanBoTheoChuyenDeCa(khoToanBoGoc, bank)
     const daCo = new Set([...bankDung.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII].map((q) => q.id))])
-    const bu: TeacherExamSource = {
-      maDe: `${maCa}-bu-kho`,
-      phanI: khoToanBo.flatMap((s) => s.phanI.filter((q) => !daCo.has(q.id))).slice(0, thieuI),
-      phanII: khoToanBo.flatMap((s) => s.phanII.filter((q) => !daCo.has(q.id))).slice(0, thieuII),
-      phanIII: khoToanBo.flatMap((s) => s.phanIII.filter((q) => !daCo.has(q.id))).slice(0, thieuIII),
-    }
+    const bu: TeacherExamSource = { maDe: `${maCa}-bu-kho`, ...chonCauBuKho(khoToanBo, daCo, { I: thieuI, II: thieuII, III: thieuIII }) }
     if (bu.phanI.length > 0 || bu.phanII.length > 0 || bu.phanIII.length > 0) {
       bankDung = [...bankDung, bu]
       await noiKhoCa(url, mat, maCa, mergeAndStrip([bu]), { phanI: bu.phanI, phanII: bu.phanII, phanIII: bu.phanIII })

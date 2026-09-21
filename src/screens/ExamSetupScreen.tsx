@@ -35,6 +35,8 @@ import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadTeacherSec
 import { AN_HAN_CHON_GIAY, BAT_MAC_DINH_CA_THI, MS_AN_HAN_NHA_TAY } from '../lib/giu-de-doc'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
+import { locTuLuanKhiMoCa } from '../lib/loc-tu-luan-mo-ca'
+import { chuBaoBoTuLuan } from '../lib/cau-tu-luan'
 import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
 
@@ -299,8 +301,11 @@ export default function ExamSetupScreen() {
       const diaChi = await voiHanCho(layDiaChiMayChu(scriptUrl), 10000, 'Chưa đọc được kết nối máy chủ. Thầy đóng các tab app khác rồi thử lại.')
       if (!diaChi) throw new Error('Chưa có kết nối máy chủ. Thầy mở lại app khi có mạng.')
       const maCa = randomSessionCode()
-      const nguonCuoi = chuan2026 ? rutDeChuan2026(selectedSources, maCa) : nguonRaDe
+      const nguonTruocLoc = chuan2026 ? rutDeChuan2026(selectedSources, maCa) : nguonRaDe
       const soCauCuoi = chuan2026 ? SO_CAU_CHUAN_2026 : soCauRaDe
+      // CẤM RÚT CÂU TỰ LUẬN (thầy lệnh 21/09): mọi chỗ APP TỰ RÚT câu (kho rộng đề riêng / mã trận 2026 / bộ vừa rút) không có câu tự luận; nguyên tờ thầy tự chọn (không bị cắt ngẫu nhiên) giữ nguyên.
+      const locTuLuan = locTuLuanKhiMoCa(nguonTruocLoc, soCauCuoi, chuan2026 || deRiengBat || boRut ? 'luon' : 'khi_co_cat')
+      const nguonCuoi = locTuLuan.nguon
       if (nguonCuoi.length === 0) return showToast('Bộ câu ra đề đang rỗng — chỉnh lại phần Bộ câu ra đề', 'error')
       // ĐỀ RIÊNG TỪNG EM: KHÔNG gắn bản đồ ở đây. Lúc mở ca chưa biết em nào
       // tới, nên bộ câu của từng em rút lúc thầy bấm Bắt đầu, từ đúng danh
@@ -308,7 +313,7 @@ export default function ExamSetupScreen() {
       // RỘNG để lúc đó còn câu mà rút.
       const publicBank = mergeAndStrip(nguonCuoi, soCauCuoi)
       const keyBank = mergeKeepAnswers(nguonCuoi, soCauCuoi)
-      setBuocMoCa(`Đang gửi ca #${maCa} lên máy chủ…`)
+      setBuocMoCa(`Đang gửi ca #${maCa} lên máy chủ…${locTuLuan.soBo > 0 ? ` ${chuBaoBoTuLuan(locTuLuan.soBo)}.` : ''}`)
       const moc = await publishSession(diaChi, maCa, lop.trim(), chuan2026 ? 50 : thoiGianPhut, publicBank, congBoDiem, keyBank, {
         batDau: batDauIso,
         hanVaoPhut,

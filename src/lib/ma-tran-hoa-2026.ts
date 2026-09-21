@@ -1,6 +1,7 @@
 import type { TeacherExamSource, LoiGiaiMeta } from '../data/examContent'
 import { khuTrungNguon } from './khu-trung-cau'
 import { hashSeed, seededPermutation } from './exam-shuffle'
+import { laCauRutDuoc } from './cau-tu-luan'
 
 // Phân tích 16 trang đề 0305, 0330, 0332, 0344, ngày 16/09/2026.
 // Đây là phân loại chuyên môn của ứng dụng, KHÔNG phải ma trận Bộ công bố.
@@ -26,7 +27,7 @@ export function rutDeChuan2026(nguon: TeacherExamSource[], seed: string): Teache
   const ids = new Set<string>()
   const thieu: string[] = []
   for (const phan of ['I', 'II', 'III'] as const) {
-    const qs = ds.flatMap(s => s[`phan${phan}`] as (LoiGiaiMeta & {id:string;canXem?:boolean})[]).filter(cauDuDieuKien)
+    const qs = ds.flatMap(s => s[`phan${phan}`] as (LoiGiaiMeta & {id:string;canXem?:boolean})[]).filter(cauDuDieuKien).filter((q) => laCauRutDuoc(q, phan)) // cấm rút câu tự luận (thầy lệnh 21/09)
     for (const muc of MUC) {
       const need = MA_TRAN_HOA_2026[phan][muc]
       const pool = qs.filter(q => q.mucDo === muc)

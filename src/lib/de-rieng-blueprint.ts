@@ -12,6 +12,7 @@
 // ra đúng con số cũ.
 import type { SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import { hashSeed } from './exam-shuffle'
+import { chuBaoBoTuLuan, laCauRutDuoc } from './cau-tu-luan'
 import { CAU_HINH_TRAN_TRUNG_MAC_DINH, sanTrungTrungBinh, thieuBaoNhieuCauDeKhongTrung, type CauHinhDeRiengTranTrung } from './de-rieng-cau-hinh'
 import { doTrung, lechTanSuat, sinhBoMotO } from './de-rieng-tran-trung'
 
@@ -170,13 +171,19 @@ function sinhBoMotMuc(
     return { boTheoEm, dinhTrung: 0, trungBinhTrung: 0, lechTanSuat: 0, thieuDeVeKhong: 0, san: 0, msChay: 0, canhBao, mucPhanTang: muc, daThu: [] }
   }
 
-  const gop = <T extends CoNhan>(lay: (s: TeacherExamSource) => T[]): T[] => {
+  // CẤM RÚT CÂU TỰ LUẬN (thầy lệnh 21/09): kho rộng của đề riêng có câu tự luận thì bỏ trước khi rút cho từng em.
+  let soTuLuanBo = 0
+  const gop = <T extends CoNhan>(lay: (s: TeacherExamSource) => T[], phan: TenPhan): T[] => {
     const ra: T[] = []
     const daCo = new Set<string>()
     for (const s of nguon) {
       for (const q of lay(s)) {
         if (!q?.id || daCo.has(q.id)) continue
         daCo.add(q.id)
+        if (!laCauRutDuoc(q, phan)) {
+          soTuLuanBo++
+          continue
+        }
         ra.push(q)
       }
     }
@@ -184,10 +191,11 @@ function sinhBoMotMuc(
   }
 
   const phanIds: { phan: TenPhan; cau: CoNhan[]; k: number }[] = [
-    { phan: 'I', cau: gop((s) => s.phanI), k: soCau.I },
-    { phan: 'II', cau: gop((s) => s.phanII), k: soCau.II },
-    { phan: 'III', cau: gop((s) => s.phanIII), k: soCau.III },
+    { phan: 'I', cau: gop((s) => s.phanI, 'I'), k: soCau.I },
+    { phan: 'II', cau: gop((s) => s.phanII, 'II'), k: soCau.II },
+    { phan: 'III', cau: gop((s) => s.phanIII, 'III'), k: soCau.III },
   ]
+  if (soTuLuanBo > 0) canhBao.push(chuBaoBoTuLuan(soTuLuanBo))
 
   // ĐẾM Ô TRƯỚC để chia ngân sách vòng lặp — tất định, không nhìn đồng hồ.
   let soO = 0

@@ -7,6 +7,7 @@ import type { CauGiao, Muc, NhanCau, PhanCau, Sao, TomTatBo } from './btvn-nang-
 import type { TeacherExamSource } from '../data/examContent'
 import { layCauHinhMayChu } from './may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
+import { laCauRutDuoc } from './cau-tu-luan'
 
 /** Ghim câu "cả lớp bắt buộc": tối đa bấy nhiêu câu (thầy chốt qua bản vẽ 21/09). */
 export const GHIM_TOI_DA = 10
@@ -62,6 +63,7 @@ export function taoCauGiao(dsDe: TeacherExamSource[]): CauGiao[] {
     for (const [phan, ds] of [['I', de.phanI], ['II', de.phanII], ['III', de.phanIII]] as [PhanCau, CauTrongDe[]][]) {
       for (const q of ds ?? []) {
         if (phan === 'III' && mayChuBoCauTuLuan(String(q.correct ?? ''))) continue
+        if (!laCauRutDuoc(q as Record<string, unknown>, phan)) continue // CẤM RÚT CÂU TỰ LUẬN (thầy lệnh 21/09): định nghĩa chung `cau-tu-luan.ts` (máy chủ dùng cùng hàm)
         const qid = qidCuaCau(de.maDe, phan, q)
         if (!qid || daCo.has(qid)) continue
         daCo.add(qid)
