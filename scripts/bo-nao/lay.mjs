@@ -3,15 +3,18 @@
 //
 // Gọi máy chủ `/ai/*` (mã bí mật đọc từ ~/.omr-bo-nao/ma-bi-mat — KHÔNG in), lấy thẻ + hồ sơ MỌI em có hoạt động theo từng trang, ẩn danh (bí danh E001…) và ghi vào `bo-nao/<ngày>/`:
 //   lop.json               bức tranh cả lớp + kết quả các điều chỉnh hôm qua (emNoiLen đã đổi sang bí danh)
-//   vao/nhanh-01.json …    mỗi tệp ≤ 40 thẻ NGẮN
-//   vao/sau-01.json …      mỗi tệp ≤ 12 hồ sơ ĐẦY ĐỦ (em bị gắn cờ + em tới lượt soi kỹ hằng tuần)
-//   vao/vang.json          em vắng ≥ 2 ngày (quá 40 em thì vang-01.json, vang-02.json …)
+//   vao/nhanh-01.json …    mỗi tệp ≤ 40 thẻ NGẮN (nén: ≤ ~1,2 KB/thẻ)
+//   vao/sau-01.json …      mỗi tệp ≤ 12 hồ sơ ĐẦY ĐỦ (thẻ nén + phần thêm, ≤ ~3 KB/em): luồng sâu ≤ 25 % số em có thẻ, chọn theo điểm ưu tiên
+//   vao/vang.json          em vắng ≥ 2 ngày (thẻ vắng ≤ ~0,4 KB; quá 40 em thì vang-01.json, vang-02.json …)
 //   ra/                    thư mục trống cho phiên AI ghi kết quả
 //   .bi-danh.json          bảng bí danh → SBD (quyền 600; AI KHÔNG được mở)
+//   .the-day-du.json       thẻ ĐẦY ĐỦ theo bí danh, để `nop.mjs` kiểm khuôn (quyền 600; AI KHÔNG được mở)
+// Luồng: các trang chỉ dựng THẺ TẠM; `phan:'lop'` (gọi SAU CÙNG) CHỐT luồng cả lớp — dạng cả lớp cùng sai ghi MỘT lần vào `lop.json` (`dangCaLopYeu`), không đẩy từng em vào sâu — rồi trả `doiLuong`.
 // In ra CHỈ đường dẫn và số đếm. Chạy lại cùng ngày: em cũ giữ nguyên bí danh. Lỡ đêm: gọi `lay.mjs <ngày>` cho ngày bị lỡ (máy chủ dựng hồ sơ THEO YÊU CẦU cho bất kỳ ngày nào).
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { nenHoSo, nenThe, nenTheVang } from '../../src/lib/bo-nao-nen.ts'
 import {
   CO_TRANG,
   GOC_DU_LIEU,
@@ -51,6 +54,16 @@ export async function chayLay({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
   const lopR = await goi('/ai/ho-so-ngay', { ngay, phan: 'lop' })
   if (!lopR.lop || typeof lopR.lop !== 'object') throw new LoiBoNao('Máy chủ trả bức tranh lớp sai dạng.', 3)
 
+  // CHỐT LUỒNG CẢ LỚP: máy chủ trả các em đổi luồng / lý do so với lúc dựng từng trang (sâu → nhanh vì trần 25 %, hoặc bỏ lý do "cả lớp cùng sai")
+  const doi = new Map((Array.isArray(lopR.doiLuong) ? lopR.doiLuong : []).map((x) => [String(x.sbd), x]))
+  for (const e of cacEm) {
+    const d = e && doi.get(String(e.sbd))
+    if (d && (d.luong === 'nhanh' || d.luong === 'sau')) {
+      e.luong = d.luong
+      e.lyDoLuong = Array.isArray(d.lyDoLuong) ? d.lyDoLuong : []
+    }
+  }
+
   const thuMuc = join(goc, ngay)
   const tepBiDanh = join(thuMuc, '.bi-danh.json')
   const cu = docJsonNeuCo(tepBiDanh, null)
@@ -58,11 +71,15 @@ export async function chayLay({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
   const { bang, dao } = capBiDanh(coThe.map((e) => String(e.sbd)), cu && cu.ngay === ngay && cu.bang && typeof cu.bang === 'object' ? cu.bang : {}, rng)
 
   const nhom = { nhanh: [], sau: [], vang: [] }
+  const the = {} // bí danh → thẻ ĐẦY ĐỦ (tệp riêng cho nop.mjs)
   for (const e of coThe) {
     const b = dao.get(String(e.sbd))
-    if (e.luong === 'sau') nhom.sau.push({ biDanh: b, luong: 'sau', lyDoLuong: e.lyDoLuong ?? [], the: e.the, hoSo: e.hoSo ?? null })
-    else if (e.luong === 'vang') nhom.vang.push({ biDanh: b, luong: 'vang', lyDoLuong: e.lyDoLuong ?? [], the: e.the })
-    else nhom.nhanh.push({ biDanh: b, luong: 'nhanh', the: e.the })
+    the[b] = e.the
+    if (e.luong === 'sau') {
+      const them = nenHoSo(e.the, e.hoSo)
+      nhom.sau.push({ biDanh: b, luong: 'sau', lyDoLuong: e.lyDoLuong ?? [], the: nenThe(e.the), ...(them ? { hoSo: them } : {}) })
+    } else if (e.luong === 'vang') nhom.vang.push({ biDanh: b, luong: 'vang', the: nenTheVang(e.the) })
+    else nhom.nhanh.push({ biDanh: b, luong: 'nhanh', the: nenThe(e.the) })
   }
   for (const k of Object.keys(nhom)) nhom[k].sort((a, b) => (a.biDanh < b.biDanh ? -1 : 1))
 
@@ -79,6 +96,7 @@ export async function chayLay({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
   const lop = { ...lopR.lop, emNoiLen: (lopR.lop.emNoiLen ?? []).map((s) => dao.get(String(s))).filter(Boolean) }
   ghiJson(join(thuMuc, 'lop.json'), { ngay, lop }, { dep: true })
   ghiJson(tepBiDanh, { ngay, bang }, { rieng: true })
+  ghiJson(join(thuMuc, '.the-day-du.json'), { ngay, the }, { rieng: true })
 
   const dem = {
     soEmCoThe: coThe.length,

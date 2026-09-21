@@ -217,6 +217,82 @@ describe('/ai/ho-so-ngay', () => {
   })
 })
 
+// ───────────────────────── chốt luồng cả lớp ─────────────────────────
+describe('/ai/ho-so-ngay {phan:"lop"} — CHỐT LUỒNG CẢ LỚP (dạng cả lớp cùng sai, trần luồng sâu 25 %)', () => {
+  /** Em học đều + 3 lần sai lặp cùng dạng `ma` trong 7 ngày. */
+  function emSaiLap(sbd: string, ma: string) {
+    themEm(sbd, `Em ${sbd}`)
+    ngayHoc(sbd, 1, 6, 5)
+    for (let i = 0; i < 3; i++) {
+      const qid = `s${sbd}-${i}`
+      nkCau(sbd, qid, ma, 1, 'moi_sai')
+      suKien(sbd, 2 + i, qid, 0)
+    }
+  }
+  function dungLop30() {
+    for (let i = 0; i < 20; i++) emSaiLap(`40${String(i).padStart(3, '0')}`, 'DON.CHAT.NITROGEN')
+    for (let i = 0; i < 10; i++) {
+      themEm(`41${String(i).padStart(3, '0')}`, `Em thường ${i}`)
+      ngayHoc(`41${String(i).padStart(3, '0')}`, 1, 6, 5)
+    }
+  }
+  const soSauLuu = () => d.dem('ai_ho_so_ngay', "luong = 'sau'")
+
+  it('20/30 em cùng sai lặp một dạng: các trang dựng TẠM (nhiều em sâu); phan:"lop" ghi dangCaLopYeu MỘT lần, đổi luồng, sâu ≤ 25 % (7/30), lưu lại', async () => {
+    dungLop30()
+    await hoSo({ coTrang: 60 })
+    const tam = soSauLuu()
+    expect(tam).toBeGreaterThan(7) // 20 em sai lặp ⇒ tạm thời đều là ứng viên sâu
+    const r = (await hoSo({ phan: 'lop' })) as any
+    expect(r.ok).toBe(true)
+    expect(r.lop.dangCaLopYeu).toEqual([{ ma: 'DON.CHAT.NITROGEN', soEm: 20, phanTram: 67, tongSai: 60 }]) // 20/30 em có hoạt động
+    expect(r.lop.soEmHoatDong).toBe(30)
+    expect(r.tran.toiDaSau).toBe(7)
+    expect(soSauLuu()).toBeLessThanOrEqual(7)
+    expect(r.lop.soSoiKy).toBe(soSauLuu())
+    expect(r.lop.soSoiNhanh + r.lop.soSoiKy + r.lop.soVang).toBe(30)
+    expect(r.doiLuong.length).toBeGreaterThan(0)
+    // em còn ở sâu KHÔNG còn vì dạng cả lớp: lý do chỉ là xoay vòng (không ai có dạng riêng)
+    const sau = d.sql.prepare("SELECT ly_do_luong FROM ai_ho_so_ngay WHERE luong = 'sau'").all() as { ly_do_luong: string }[]
+    for (const x of sau) expect(JSON.parse(x.ly_do_luong)).toEqual(['tới lượt soi kỹ xoay vòng hằng tuần'])
+  })
+  it('IDEMPOTENT: gọi lại phan:"lop" không đổi gì (doiLuong rỗng); dựng lại các trang rồi chốt lại ra CÙNG kết quả', async () => {
+    dungLop30()
+    await hoSo({ coTrang: 60 })
+    const a = (await hoSo({ phan: 'lop' })) as any
+    const luongA = d.chup('ai_ho_so_ngay').replace(/"tao_luc":"[^"]*"/g, '')
+    const b = (await hoSo({ phan: 'lop' })) as any
+    expect(b.doiLuong).toEqual([])
+    expect(b.lop).toEqual(a.lop)
+    await hoSo({ coTrang: 60 }) // dựng lại từng trang ⇒ luồng tạm ghi đè
+    await hoSo({ phan: 'lop' })
+    expect(d.chup('ai_ho_so_ngay').replace(/"tao_luc":"[^"]*"/g, '')).toBe(luongA)
+  })
+  it('dạng cả lớp chỉ áp khi ≥ 30 % em: 3 em sai lặp trong 30 em (10 %) ⇒ không ghi dangCaLopYeu, các em ấy vẫn được xét sâu theo điểm', async () => {
+    for (let i = 0; i < 3; i++) emSaiLap(`42${String(i).padStart(3, '0')}`, 'DANG.HIEM')
+    for (let i = 0; i < 27; i++) {
+      themEm(`43${String(i).padStart(3, '0')}`, `Em ${i}`)
+      ngayHoc(`43${String(i).padStart(3, '0')}`, 1, 6, 5)
+    }
+    await hoSo({ coTrang: 60 })
+    const r = (await hoSo({ phan: 'lop' })) as any
+    expect(r.lop.dangCaLopYeu).toEqual([])
+    expect(d.dem('ai_ho_so_ngay', "luong = 'sau' AND ly_do_luong LIKE '%sai lặp%'")).toBe(3)
+  })
+  it('bản tin nhắc dạng cả lớp bằng số của lớp được nhận (số nằm trong lop.dangCaLopYeu); em vắng và bo_qua giữ nguyên luồng', async () => {
+    dungLop30()
+    themEm('44000', 'Vắng'); ngayHoc('44000', 6, 6, 4)
+    await hoSo({ coTrang: 60 })
+    const lop = (await hoSo({ phan: 'lop' })) as any
+    expect(d.sql.prepare("SELECT luong FROM ai_ho_so_ngay WHERE sbd = '44000'").get()).toEqual({ luong: 'vang' })
+    const so = lop.lop.dangCaLopYeu[0]
+    const nop = await boNaoNop(d.env, { ngay: NGAY, cacEm: [], banTin: { cacDong: [{ loai: 'ca_lop', sbd: '', chu: `Cả lớp cùng sai một dạng: ${so.soEm} em (${so.phanTram} %)`, hanhDong: 'dua_vao_buoi_chua', dang: '' }] } }, NOW)
+    expect(nop.banTin).toEqual({ nhan: 1, loi: [] })
+    const nopSai = await boNaoNop(d.env, { ngay: NGAY, cacEm: [], banTin: { cacDong: [{ loai: 'ca_lop', sbd: '', chu: 'Cả lớp cùng sai một dạng: 99 em', hanhDong: 'khong', dang: '' }] } }, NOW)
+    expect((nopSai.banTin as { loi: string[] }).loi.join()).toContain('số không có trong số liệu lớp: 99')
+  })
+})
+
 // ───────────────────────── nộp ─────────────────────────
 describe('/ai/dieu-chinh/nop', () => {
   const nop = (cacEm: unknown[], banTin?: unknown) => boNaoNop(d.env, { ngay: NGAY, cacEm, ...(banTin ? { banTin } : {}) }, NOW)

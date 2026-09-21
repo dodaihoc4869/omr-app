@@ -11,6 +11,7 @@
 import type { D1PreparedStatement, Env } from './kieu'
 import {
   danhGiaDieuChinh,
+  chotLuongCaLop,
   phanLuong,
   themNgay,
   tinhBucTranhLop,
@@ -294,7 +295,10 @@ export async function boNaoHoSoNgay(env: Env, b: Obj = {}, nowMs: number = Date.
   if (!ch.bat) return { ok: false, error: 'Bộ não đang tắt (Cài đặt → Bộ não)' }
   const ngay = b.ngay === undefined || b.ngay === '' ? ngayVnTuMs(nowMs) : b.ngay
   if (!laNgay(ngay)) return { ok: false, error: 'ngay phải có dạng YYYY-MM-DD' }
-  if (b.phan === 'lop') return { ok: true, ngay, lop: await bucTranhLopTuSo(env, ngay) }
+  if (b.phan === 'lop') {
+    const kq = await chotLuongVaBucTranhLop(env, ngay)
+    return { ok: true, ngay, lop: kq.lop, doiLuong: kq.doiLuong, tran: kq.tran }
+  }
 
   const trang = Math.max(1, Math.floor(Number(b.trang) || 1))
   const coTrang = Math.min(CO_TRANG_TOI_DA, Math.max(1, Math.floor(Number(b.coTrang) || CO_TRANG_MAC_DINH)))
@@ -365,21 +369,50 @@ export async function boNaoHoSoNgay(env: Env, b: Obj = {}, nowMs: number = Date.
   return { ok: true, ngay, trang, soTrang: Math.max(1, Math.ceil(tong / coTrang)), soEm: tong, cacEm }
 }
 
-/** Bức tranh cả lớp của một đêm, dựng từ thẻ đã lưu. */
-async function bucTranhLopTuSo(env: Env, ngay: string): Promise<BucTranhLop> {
+/** Thẻ đã lưu của cả lớp trong một đêm (bỏ em `bo_qua`), kèm kết quả chấm điều chỉnh hôm qua và cột luồng/lý do đang lưu. */
+async function docTheCaLop(env: Env, ngay: string): Promise<(TheCuaEmLop & { lyDoCu: string })[]> {
   const r = await env.DB.prepare(
-    `SELECT a.sbd, a.lop, a.luong, a.the_json, d.ket_qua AS kq FROM ai_ho_so_ngay a LEFT JOIN ai_dieu_chinh d ON d.sbd = a.sbd AND d.ngay = ? WHERE a.ngay = ? AND a.luong <> 'bo_qua'`,
+    `SELECT a.sbd, a.lop, a.luong, a.ly_do_luong, a.the_json, d.ket_qua AS kq FROM ai_ho_so_ngay a LEFT JOIN ai_dieu_chinh d ON d.sbd = a.sbd AND d.ngay = ? WHERE a.ngay = ? AND a.luong <> 'bo_qua' ORDER BY a.sbd`,
   )
     .bind(themNgay(ngay, -1), ngay)
     .all<Obj>()
-  const cacEm: TheCuaEmLop[] = []
+  const cacEm: (TheCuaEmLop & { lyDoCu: string })[] = []
   for (const x of r.results ?? []) {
     const the = parseJson<TheNgan | null>(x.the_json, null)
     if (!the) continue
     const kq = x.kq === 'an_thua' || x.kq === 'khong_doi' || x.kq === 'xau_di' || x.kq === 'chua_du_du_lieu' ? (x.kq as KetQuaDieuChinh) : null
-    cacEm.push({ sbd: chuoi(x.sbd), lop: chuoi(x.lop), the, luong: chuoi(x.luong) as Luong, ketQuaHomQua: kq })
+    cacEm.push({ sbd: chuoi(x.sbd), lop: chuoi(x.lop), the, luong: chuoi(x.luong) as Luong, ketQuaHomQua: kq, lyDoCu: chuoi(x.ly_do_luong) || '[]' })
   }
-  return tinhBucTranhLop(ngay, cacEm)
+  return cacEm
+}
+
+/** Bức tranh cả lớp của một đêm, dựng từ thẻ đã lưu (luồng như đang lưu — đã chốt nếu mã lệnh đã gọi `phan:'lop'`). */
+async function bucTranhLopTuSo(env: Env, ngay: string): Promise<BucTranhLop> {
+  return tinhBucTranhLop(ngay, await docTheCaLop(env, ngay))
+}
+
+/**
+ * `phan:'lop'`: CHỐT LUỒNG CẢ LỚP (`chotLuongCaLop`) rồi trả bức tranh lớp. Dạng cả lớp cùng sai ⇒ `lop.dangCaLopYeu`, không đẩy từng em vào sâu vì lý do đó; luồng sâu ≤ 25 % số em có thẻ.
+ * Ghi luồng/lý do đã chốt vào `ai_ho_so_ngay` (bản tin sáng, `/ai/dem-qua` và kiểm bản tin đọc đúng số đã chốt) và trả `doiLuong` = các em đổi luồng hoặc lý do so với lúc dựng từng trang,
+ * để `lay.mjs` (đã cầm sẵn thẻ) xếp lại tệp. Chạy lại nhiều lần ra cùng kết quả (chỉ đọc thẻ).
+ */
+async function chotLuongVaBucTranhLop(env: Env, ngay: string): Promise<{ lop: BucTranhLop; doiLuong: { sbd: string; luong: Luong; lyDoLuong: string[] }[]; tran: Obj }> {
+  const cacEm = await docTheCaLop(env, ngay)
+  const kq = chotLuongCaLop(ngay, cacEm)
+  const doiLuong: { sbd: string; luong: Luong; lyDoLuong: string[] }[] = []
+  const luu: D1PreparedStatement[] = []
+  for (const e of cacEm) {
+    const cuoi = kq.luong.get(e.sbd)
+    if (!cuoi) continue
+    const lyDoMoi = JSON.stringify(cuoi.lyDo)
+    if (cuoi.luong !== e.luong || lyDoMoi !== e.lyDoCu) {
+      doiLuong.push({ sbd: e.sbd, luong: cuoi.luong, lyDoLuong: cuoi.lyDo })
+      luu.push(env.DB.prepare('UPDATE ai_ho_so_ngay SET luong = ?, ly_do_luong = ? WHERE sbd = ? AND ngay = ?').bind(cuoi.luong, lyDoMoi, e.sbd, ngay))
+      e.luong = cuoi.luong
+    }
+  }
+  if (luu.length) await chayBatch(env, luu)
+  return { lop: tinhBucTranhLop(ngay, cacEm), doiLuong, tran: kq.tran }
 }
 
 // ══════════════════════════════ NỘP ĐIỀU CHỈNH ══════════════════════════════

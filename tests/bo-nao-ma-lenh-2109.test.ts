@@ -15,7 +15,7 @@ import { LoiBoNao, capBiDanh, chiaTep, docMaBiMat, giauSbd, homNayVn, laNgay, ma
 // @ts-expect-error
 import { chayLay, dongTomTat as dongLay } from '../scripts/bo-nao/lay.mjs'
 // @ts-expect-error
-import { chayNop, dongTomTat as dongNop, docThuMucRa, kiemBanTinCucBo, kiemCacEm } from '../scripts/bo-nao/nop.mjs'
+import { chayNop, dongTomTat as dongNop, docTheDaLay, docThuMucRa, kiemBanTinCucBo, kiemCacEm } from '../scripts/bo-nao/nop.mjs'
 
 const NGAY = '2026-09-22'
 const NOW = Date.parse('2026-09-21T21:00:00.000Z') // 04:00 sáng 22/09 giờ Việt Nam
@@ -88,6 +88,22 @@ function dungLop(n = 20) {
   themEm('24000', 'Em Nổi Lên'); ngayHoc('24000', 5, 8, 5); ngayHoc('24000', 3, 8, 8); ngayHoc('24000', 1, 8, 8)
   sbds.push('24000')
   return sbds
+}
+const nkCau = (sbd: string, qid: string, dang: string, lanSai: number, trangThai: string, nTruoc = 1) =>
+  d.sql.exec(
+    `INSERT INTO nam_kt_cau (khoa, sbd, qid, ma_dang, chuyen_de, lan_gap, lan_sai, lan_trong, dung_lien_tiep, ngay_dung_khac_nhau, ket_qua_cuoi, nguon_cuoi, luc_cuoi, moc_on_ke, trang_thai, can_day_lai, giay_tb, cap_nhat_luc)
+     VALUES ('${sbd}|${qid}', '${sbd}', '${qid}', '${dang}', 'CĐ', 2, ${lanSai}, 0, 0, 0, 0, 'btvn', '${truoc(nTruoc)}T02:00:00.000Z', '${truoc(0)}', '${trangThai}', 0, NULL, '${truoc(nTruoc)}T02:00:00.000Z')`,
+  )
+const suKienSai = (sbd: string, nTruoc: number, qid: string) =>
+  d.sql.exec(`INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES ('k${++dem}', '${sbd}', '${qid}', 'btvn', 'm', 1, 0, NULL, '${truoc(nTruoc)}T02:00:00.000Z', '${truoc(nTruoc)}')`)
+/** Em học đều + 3 lần sai lặp cùng dạng `ma` (cả lớp cùng sai). */
+function emSaiLapCaLop(sbd: string, ma: string) {
+  themEm(sbd, `Em Sai ${sbd}`)
+  ngayHoc(sbd, 1, 6, 5)
+  for (let i = 0; i < 3; i++) {
+    nkCau(sbd, `s${sbd}-${i}`, ma, 1, 'moi_sai')
+    suKienSai(sbd, 2 + i, `s${sbd}-${i}`)
+  }
 }
 const tatCaTep = (thuMuc: string, kq: string[] = []): string[] => {
   for (const f of readdirSync(thuMuc)) {
@@ -208,6 +224,47 @@ describe('bí danh', () => {
 
 // ───────────────────────── lay.mjs ─────────────────────────
 describe('lay.mjs — lấy dữ liệu đêm', () => {
+  it('CHỐT LUỒNG CẢ LỚP: 20/30 em cùng sai lặp một dạng ⇒ lop.json có dangCaLopYeu MỘT lần, sâu ≤ 25 % (7/30), em bị nhường chỗ nằm ở tệp nhanh (không còn hoSo)', async () => {
+    for (let i = 0; i < 20; i++) emSaiLapCaLop(`50${String(i).padStart(3, '0')}`, 'DON.CHAT.NITROGEN')
+    for (let i = 0; i < 10; i++) { themEm(`51${String(i).padStart(3, '0')}`, `Em thường ${i}`); ngayHoc(`51${String(i).padStart(3, '0')}`, 1, 6, 5) }
+    const { goi } = mayChuGia()
+    const kq = await chayLay({ ngay: NGAY, goc, goi, bayGio: NOW })
+    expect(kq.dem.soEmCoThe).toBe(30)
+    expect(kq.dem.sau).toBeLessThanOrEqual(7)
+    expect(kq.dem.sau + kq.dem.nhanh).toBe(30)
+    const lop = JSON.parse(readFileSync(join(goc, NGAY, 'lop.json'), 'utf8')).lop
+    expect(lop.dangCaLopYeu).toEqual([{ ma: 'DON.CHAT.NITROGEN', soEm: 20, phanTram: 67, tongSai: 60 }])
+    const vao = docTatCaVao()
+    expect(vao.filter((e) => e.luong === 'sau')).toHaveLength(kq.dem.sau)
+    expect(vao.filter((e) => e.luong === 'nhanh').every((e) => !('hoSo' in e))).toBe(true)
+    // các em còn ở sâu KHÔNG vì dạng cả lớp
+    for (const e of vao.filter((x) => x.luong === 'sau')) expect(e.lyDoLuong).toEqual(['tới lượt soi kỹ xoay vòng hằng tuần'])
+    expect(dongLay(kq).join('\n')).toContain('sâu ' + kq.dem.sau)
+  })
+  it('NÉN: thẻ nhanh ≤ 1,2 KB, hồ sơ sâu ≤ 3 KB, thẻ vắng ≤ 0,4 KB (byte); vao/ không có null / mảng rỗng / ngay; `.the-day-du.json` giữ thẻ ĐẦY ĐỦ (quyền 600)', async () => {
+    dungLop(20)
+    const { goi } = mayChuGia()
+    await chayLay({ ngay: NGAY, goc, goi, bayGio: NOW })
+    const vao = docTatCaVao()
+    const kich = (x: unknown) => Buffer.byteLength(JSON.stringify(x), 'utf8')
+    for (const e of vao) {
+      if (e.luong === 'nhanh') expect(kich(e), e.biDanh).toBeLessThanOrEqual(1300) // thẻ 1,2 KB + biDanh/luong
+      if (e.luong === 'sau') expect(kich(e), e.biDanh).toBeLessThanOrEqual(3100)
+      if (e.luong === 'vang') expect(kich(e), e.biDanh).toBeLessThanOrEqual(450)
+      expect(JSON.stringify(e)).not.toMatch(/:null|:\[\]|:\{\}|:false/)
+      expect(e.the.ngay).toBeUndefined()
+      if (e.luong === 'vang') expect(e.lyDoLuong).toBeUndefined()
+    }
+    const t = join(goc, NGAY, '.the-day-du.json')
+    expect(statSync(t).mode & 0o777).toBe(0o600)
+    const dayDu = JSON.parse(readFileSync(t, 'utf8'))
+    const bd = JSON.parse(readFileSync(join(goc, NGAY, '.bi-danh.json'), 'utf8')).bang as Record<string, string>
+    expect(Object.keys(dayDu.the).sort()).toEqual(Object.keys(bd).sort()) // đủ mọi em có thẻ
+    const mot = Object.values(dayDu.the)[0] as Record<string, unknown>
+    expect(mot.ngay).toBe(NGAY) // thẻ đầy đủ còn `ngay`, `luotSoiKyTuan`… mà kiểm khuôn cần
+    expect(mot).toHaveProperty('luotSoiKyTuan')
+    expect(mot).toHaveProperty('khiNaoVietPhuHuynh')
+  })
   it('ghi đúng bố cục: lop.json, vao/{nhanh,sau,vang}, ra/, .bi-danh.json (600), tom-tat.json; đếm khớp máy chủ', async () => {
     const sbds = dungLop(20)
     const { goi, nhatKy } = mayChuGia()
@@ -503,9 +560,24 @@ describe('nop.mjs — kiểm khuôn, đổi bí danh, nộp', () => {
     expect(readFileSync(join(goc, NGAY, 'lop.json'), 'utf8')).not.toContain('3100')
     expect(readFileSync(join(goc, NGAY, 'vao', 'ghi-chu.txt'), 'utf8')).toBe('giữ')
   })
+  it('THẺ ĐẦY ĐỦ từ `.the-day-du.json` (không phải vao/ đã nén); không có tệp ấy (lượt lấy cũ) thì rơi về vao/', async () => {
+    const { goi, biDanhCoHoatDong } = await layXong()
+    const dayDu = JSON.parse(readFileSync(join(goc, NGAY, '.the-day-du.json'), 'utf8'))
+    const the = docTheDaLay(join(goc, NGAY))
+    expect(the.get(biDanhCoHoatDong[0]).the).toEqual(dayDu.the[biDanhCoHoatDong[0]])
+    expect(the.get(biDanhCoHoatDong[0]).the).toHaveProperty('ngay')
+    // lượt lấy CŨ: xoá tệp đầy đủ, vao/ ghi thẻ đầy đủ theo khuôn cũ
+    rmSync(join(goc, NGAY, '.the-day-du.json'))
+    writeFileSync(join(goc, NGAY, 'vao', 'nhanh-01.json'), JSON.stringify(Object.entries(dayDu.the).map(([b, t]) => ({ biDanh: b, luong: 'nhanh', the: t }))))
+    for (const f of readdirSync(join(goc, NGAY, 'vao'))) if (f !== 'nhanh-01.json') rmSync(join(goc, NGAY, 'vao', f))
+    const cu = docTheDaLay(join(goc, NGAY))
+    expect(cu.size).toBe(Object.keys(dayDu.the).length)
+    ghiRa('nhanh-01.json', [raHopLe(biDanhCoHoatDong[0])])
+    expect((await chayNop({ ngay: NGAY, goc, goi, bayGio: NOW })).nhan).toBe(1)
+  })
   it('kiemCacEm / kiemBanTinCucBo thuần: thứ tự giữ nguyên; khuôn chạy y hệt máy chủ (thẻ + bí danh)', async () => {
-    const { vao } = await layXong()
-    const the = new Map<string, any>(vao.map((e) => [e.biDanh, e]))
+    await layXong()
+    const the = docTheDaLay(join(goc, NGAY)) as Map<string, any>
     const [a, b] = [...the.keys()]
     const bang = { [a]: '1', [b]: '2' }
     const r = kiemCacEm([{ tep: 'x', x: raHopLe(b) }, { tep: 'x', x: raHopLe(a, { doTinCay: 2 }) }], bang, the)

@@ -51,9 +51,17 @@ export function docThuMucRa(thuMucRa) {
   return { phanTu, loiTep }
 }
 
-/** Đọc thẻ đã lấy (`vao/*.json`) ⇒ Map(biDanh → phần tử vào). */
-export function docTheDaLay(thuMucVao) {
+/**
+ * Thẻ ĐẦY ĐỦ đã lấy ⇒ Map(biDanh → {the}). Nguồn chính: `.the-day-du.json` (thẻ đầy đủ mã lệnh giữ riêng — tệp AI đọc `vao/*.json` đã NÉN, thiếu trường). Không có (lượt lấy cũ) thì dùng `vao/*.json`.
+ */
+export function docTheDaLay(thuMucNgay) {
   const the = new Map()
+  const dayDu = docJsonNeuCo(join(thuMucNgay, '.the-day-du.json'), null)
+  if (dayDu && laDoiTuong(dayDu.the)) {
+    for (const [b, t] of Object.entries(dayDu.the)) the.set(b, { biDanh: b, the: t })
+    return the
+  }
+  const thuMucVao = join(thuMucNgay, 'vao')
   if (!existsSync(thuMucVao)) return the
   for (const f of readdirSync(thuMucVao)) {
     if (!f.endsWith('.json')) continue
@@ -137,7 +145,7 @@ export async function chayNop({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
   if (!bd || bd.ngay !== ngay || !laDoiTuong(bd.bang)) throw new LoiBoNao(`Chưa có dữ liệu ngày ${ngay} (thiếu bảng bí danh) — chạy trước: node scripts/bo-nao/lay.mjs ${ngay}`, 5)
   const bang = bd.bang
   const dao = new Map(Object.entries(bang).map(([b, s]) => [String(s), b]))
-  const the = docTheDaLay(join(thuMuc, 'vao'))
+  const the = docTheDaLay(thuMuc)
   const { phanTu, loiTep } = docThuMucRa(join(thuMuc, 'ra'))
   const lopTep = docJsonNeuCo(join(thuMuc, 'lop.json'), null)
   const lop = lopTep && laDoiTuong(lopTep.lop) ? lopTep.lop : {}
