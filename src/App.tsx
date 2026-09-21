@@ -76,7 +76,7 @@ const TEN_MAN: Record<string, string> = {
   nganhangde: 'Ngân hàng câu hỏi',
   examtake: 'Làm bài',
   exammonitor: 'Theo dõi ca',
-  lichsuca: 'Ca thi',
+  lichsuca: 'Ca kiểm tra',
   hocsinh: 'Học sinh',
   toancanh: 'Toàn cảnh một em',
   goilenbang: 'Gọi lên bảng',

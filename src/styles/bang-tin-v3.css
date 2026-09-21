@@ -208,7 +208,7 @@
   --bt3-hang: 56px;
 }
 .bt3-o-dang {
-  --bt3-hang: 46px;
+  --bt3-hang: 48px;
 }
 .bt3-o-may {
   --bt3-hang: 44px;
@@ -530,15 +530,20 @@
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: auto 8px;
   align-content: center;
-  gap: 5px 8px;
+  gap: 4px 8px;
 }
 .bt3-dv-ten {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
   font-size: 14px;
   line-height: 18px;
   font-weight: 500;
+}
+/* tên dạng xuống tối đa 2 dòng, không cắt "…" như một dòng (luật B) */
+.bt3-dv-ten > span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 .bt3-dv-so {
   font-size: 13px;
@@ -930,7 +935,7 @@
     --bt3-hang: 54px;
   }
   .bt3-o-dang {
-    --bt3-hang: 44px;
+    --bt3-hang: 48px;
   }
   .bt3-o-may {
     --bt3-hang: 42px;

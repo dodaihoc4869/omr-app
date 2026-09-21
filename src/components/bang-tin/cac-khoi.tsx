@@ -305,7 +305,7 @@ export function HangDang({ d }: { d: DangVapBangTin }) {
   return (
     <li className="bt3-dv">
       <span className="bt3-dv-ten" title={d.ten}>
-        {d.ten}
+        <span>{d.ten}</span>
       </span>
       <span className="bt3-dv-so">
         {d.soEmVap} / {d.soEmGap} em vấp
@@ -318,7 +318,8 @@ export function HangDang({ d }: { d: DangVapBangTin }) {
 }
 
 export function KhoiDangVap({ bt, nayMs, onMoTatCa }: { bt: BangTin; nayMs: number; onMoTatCa: () => void }) {
-  const [ref, cao, hang] = useChieuCao<HTMLDivElement>(46)
+  // Tên dạng được xuống 2 dòng (luật B: không cắt "…") ⇒ hàng cao 48 px (2 dòng 36 + 4 + thanh 8).
+  const [ref, cao, hang] = useChieuCao<HTMLDivElement>(48)
   const ds = bt.dangVap
   const n = chiaHang(ds.length, cao, hang, CAO_NUT_NUA)
   return (

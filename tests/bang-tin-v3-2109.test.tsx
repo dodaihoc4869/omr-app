@@ -310,6 +310,9 @@ describe('top-N + tấm bên (trang chính không cuộn)', () => {
     // ô Em cần để ý: 1 em hiện + 4 em cắt bớt + 7 em máy chủ báo còn lại = "+11 em nữa"
     expect(container.querySelectorAll('[data-khoi="can-de-y"] .bt3-em')).toHaveLength(1)
     expect(screen.getByRole('button', { name: '+11 em nữa' })).toBeTruthy()
+    // ô Dạng vấp: hàng 48 px (tên xuống 2 dòng) ⇒ 150 px chứa 2 dạng + nút "+3 dạng nữa"
+    expect(container.querySelectorAll('[data-khoi="dang-vap"] .bt3-dv')).toHaveLength(2)
+    expect(screen.getByRole('button', { name: '+3 dạng nữa' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: '+3 bài nữa' }))
     const tam = screen.getByRole('dialog', { name: 'Bài tập về nhà đang chạy' })
     expect(within(tam).getAllByRole('img').filter((x) => x.getAttribute('aria-label')?.includes('chưa mở'))).toHaveLength(4)
@@ -468,6 +471,12 @@ describe('khoá nguồn: một khung nhìn, token, cỡ chữ, chuyển động,
     expect(css).toMatch(/\.bt3-o \{[^}]*border-radius: 20px/)
     expect(css).toMatch(/\.bt3-giua \{[^}]*1\.55fr[^}]*1fr/)
     expect(css).toMatch(/\.bt3-duoi \{[^}]*1\.25fr[^}]*1\.15fr[^}]*1fr[^}]*1\.1fr/)
+  })
+
+  it('tên dạng được xuống 2 dòng, KHÔNG cắt một dòng "…" (luật B của Boss 21/09): span bên trong clamp 2 dòng, ô tên không nowrap', () => {
+    expect(css).toMatch(/\.bt3-dv-ten > span \{[^}]*-webkit-line-clamp: 2/)
+    expect(css).not.toMatch(/\.bt3-dv-ten \{[^}]*(white-space: nowrap|text-overflow)/)
+    expect(css).toMatch(/\.bt3-o-dang \{\s*--bt3-hang: 48px/)
   })
 
   it('màn thấp (≤ 800 px) có bản siết riêng; điện thoại: trang lướt ngang scroll-snap, nút chạm 48 px', () => {

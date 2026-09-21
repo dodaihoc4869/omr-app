@@ -27,7 +27,7 @@ describe('Màn chính của thầy', () => {
     render(<ExamHubScreen />)
     expect(screen.getByText('Mở ca kiểm tra')).toBeTruthy()
     expect(screen.getByText('Ngân hàng câu hỏi')).toBeTruthy()
-    expect(screen.getByText('Ca thi')).toBeTruthy()
+    expect(screen.getByText('Ca kiểm tra')).toBeTruthy()
   })
 })
 

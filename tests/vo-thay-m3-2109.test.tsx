@@ -65,7 +65,7 @@ describe('ThanhBenTrai (ngăn kéo / rail)', () => {
 describe('BottomNav (< 880 px) — ĐỦ mục', () => {
   it('bốn mục chính + Thêm; tờ Thêm chứa đúng bốn mục còn lại → hợp lại đủ cả 8', () => {
     render(<BottomNav />)
-    for (const t of ['Hôm nay', 'Học sinh', 'Ca thi', 'Bài tập', 'Thêm']) expect(screen.getByText(t)).toBeTruthy()
+    for (const t of ['Hôm nay', 'Học sinh', 'Ca kiểm tra', 'Bài tập', 'Thêm']) expect(screen.getByText(t)).toBeTruthy()
     expect(screen.queryByRole('menu')).toBeNull()
     fireEvent.click(screen.getByText('Thêm'))
     const items = screen.getAllByRole('menuitem').map((e) => e.textContent)

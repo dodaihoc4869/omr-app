@@ -196,7 +196,7 @@ export default function LichSuCaScreen() {
           </div>
           <div>
             <h1 className="ls-tieu-de">
-              {xemDaXoa ? 'Ca đã xoá' : 'Ca thi'}
+              {xemDaXoa ? 'Ca đã xoá' : 'Ca kiểm tra'}
             </h1>
             <p className="ls-phu-de">
               {xemDaXoa ? 'Thùng rác và phục hồi dữ liệu ca' : 'Quản lý, tìm kiếm và chi tiết các ca kiểm tra'}
