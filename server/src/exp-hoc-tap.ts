@@ -155,12 +155,12 @@ export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] }
     them({ khoa: `chuoi|${v.ngay}`, loai: 'chuoi', exp: EXP_CHUOI_HE_SO * nhan, ngay: v.ngay, luc, ghiChu: `Chuỗi ${chuoi} ngày đạt: +${EXP_CHUOI_HE_SO * nhan}` })
     if (!v.daCoKhoa.has(`manh|dat|${v.ngay}`)) manh.push({ khoa: `manh|dat|${v.ngay}`, loai: 'dat', so: MANH_DAT_NGAY, ngay: v.ngay, luc, ghiChu: `Đạt nhiệm vụ ngày: +${MANH_DAT_NGAY} mảnh khiên` })
     if (chuoi > 0 && chuoi % MANH_CHUOI_BOI_SO === 0 && !v.daCoKhoa.has(`manh|chuoi7|${v.ngay}`)) {
-      manh.push({ khoa: `manh|chuoi7|${v.ngay}`, loai: 'chuoi7', so: MANH_CHUOI_BOI_SO_THUONG, ngay: v.ngay, luc, ghiChu: `Chuỗi ${chuoi} ngày (bội ${MANH_CHUOI_BOI_SO}): +${MANH_CHUOI_BOI_SO_THUONG} mảnh khiên` })
+      manh.push({ khoa: `manh|chuoi7|${v.ngay}`, loai: 'chuoi7', so: MANH_CHUOI_BOI_SO_THUONG, ngay: v.ngay, luc, ghiChu: `Chuỗi ${chuoi} ngày (bội ${MANH_CHUOI_BOI_SO}): +${MANH_CHUOI_BOI_SO_THUONG} mảnh khiên (luật 21/09: mảnh chỉ đến từ ngày đạt)` })
     }
   }
   for (const d of v.dangRoiYeu) {
     const khoa = `manh|dang|${d.maDang}|${d.lan}`
-    if (!v.daCoKhoa.has(khoa)) manh.push({ khoa, loai: 'dang', so: MANH_DANG_ROI_YEU, ngay: v.ngay, luc: d.luc, ghiChu: `Một dạng không còn yếu: +${MANH_DANG_ROI_YEU} mảnh khiên` })
+    if (!v.daCoKhoa.has(khoa)) manh.push({ khoa, loai: 'dang', so: MANH_DANG_ROI_YEU, ngay: v.ngay, luc: d.luc, ghiChu: `Một dạng không còn yếu: +${MANH_DANG_ROI_YEU} mảnh khiên (luật 21/09: mảnh chỉ đến từ ngày đạt)` })
   }
 
   return { khoan: sapXep(khoan), manh: sapXep(manh) }
@@ -176,7 +176,7 @@ export interface KhienRen {
 }
 
 /**
- * Cộng mảnh rồi TỰ RÈN: đủ `MANH_MOI_KHIEN` mảnh → rèn 1 khiên, trừ 12 mảnh, lặp. Khiên rèn CHƯA dùng (`khienRenChuaDung`, do nơi gọi tính từ
+ * Cộng mảnh rồi TỰ RÈN: đủ `MANH_MOI_KHIEN` (36) mảnh → rèn 1 khiên, trừ 36 mảnh, lặp. Khiên rèn CHƯA dùng (`khienRenChuaDung`, do nơi gọi tính từ
  * `shieldRemaining`) đã chạm `KHIEN_REN_TOI_DA` thì KHÔNG rèn thêm; mảnh vẫn cộng nhưng kẹp ở `MANH_TOI_DA`. Mảnh không âm, không mua được bằng EXP.
  */
 export function congManh(k: KhienRen, them: number, khienRenChuaDung: number): KhienRen {

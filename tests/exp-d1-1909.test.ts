@@ -219,7 +219,7 @@ describe('chuyển trạng thái hồ sơ: lên bậc, khắc phục, mọi ngu�
     const kp = dongExp(d).filter((x) => x.loai === 'khac_phuc')
     expect(kp.map((x) => [x.khoa.slice(3), x.exp])).toEqual([['kp|A|1', 30], ['kp|A|2', 30]])
   })
-  it('DẠNG RỜI danh sách yếu → +2 mảnh khiên, một lần cho mỗi số câu từng sai', async () => {
+  it('DẠNG RỜI danh sách yếu → khoá sổ MỘT lần cho mỗi số câu từng sai, 0 mảnh khiên (thầy lệnh 21/09: mảnh chỉ đến từ ngày đạt)', async () => {
     const d = await dung()
     // 4 câu cùng dạng: 3 sai ở ngày cũ (dạng yếu: 1/4 chưa sai... < 0,7), rồi hôm nay em đúng lại cả 3 → đúng ≥ 0,7 sau khi khắc phục đủ mốc.
     const dang = (q: string) => ({ ...sk(q, 1, NOW), maDang: 'ZZ.YY' })
@@ -235,7 +235,7 @@ describe('chuyển trạng thái hồ sơ: lên bậc, khắc phục, mọi ngu�
     for (const n of [-10, -9, -8, 0]) await capNhatExp(d.env, 'S1', NOW + n * D)
     const m = dongManh(d).filter((x) => x.loai === 'dang')
     expect(m.length).toBe(1)
-    expect(m[0].so).toBe(2)
+    expect(m[0].so).toBe(0)
   })
 })
 
@@ -359,14 +359,14 @@ describe('đạt nhiệm vụ ngày + chuỗi + mảnh khiên', () => {
     expect(dongManh(d).map((x) => [x.khoa.slice(3), x.so])).toEqual([[`manh|dat|${HOM_NAY}`, 1]])
     expect(docHoSoGame(d).khienRen).toEqual({ manh: 1, daRen: 0 })
   })
-  it('chuỗi 6 ngày trước đều đạt → hôm nay là ngày thứ 7: +14 EXP và +3 mảnh (bội của 7)', async () => {
+  it('chuỗi 6 ngày trước đều đạt → hôm nay là ngày thứ 7: +14 EXP; khoá `chuoi7` giữ sổ với 0 mảnh (thầy lệnh 21/09), mảnh chỉ +1 của ngày đạt', async () => {
     const d = await dung()
     luuKeHoach(d, { toiThieu: 4 })
     for (let i = 1; i <= 6; i++) luuKeHoach(d, { ngay: ngayVn(NOW - i * D), ketQua: 'dat' })
     await lamBonCau(d)
     await capNhatExp(d.env, 'S1', NOW)
     expect(expCua(d, `chuoi|${HOM_NAY}`)).toBe(14)
-    expect(dongManh(d).map((x) => [x.khoa.slice(3), x.so]).sort()).toEqual([[`manh|chuoi7|${HOM_NAY}`, 3], [`manh|dat|${HOM_NAY}`, 1]])
+    expect(dongManh(d).map((x) => [x.khoa.slice(3), x.so]).sort()).toEqual([[`manh|chuoi7|${HOM_NAY}`, 0], [`manh|dat|${HOM_NAY}`, 1]])
   })
   it('KHÔNG đạt khi còn việc bắt buộc trễ nhịp, hoặc có câu tới hạn mà không lên bậc câu nào, hoặc chưa đủ số câu, hoặc chưa có kế hoạch ngày', async () => {
     const d = await dung()
@@ -389,20 +389,23 @@ describe('đạt nhiệm vụ ngày + chuỗi + mảnh khiên', () => {
 })
 
 describe('mảnh khiên → khiên rèn (nối vào hồ sơ game)', () => {
-  it('đủ 12 mảnh tự rèn 1 khiên, trừ 12; khiên còn dùng được tăng 1', () => {
+  it('đủ 36 mảnh tự rèn 1 khiên, trừ 36; khiên còn dùng được tăng 1; 35 mảnh thì CHƯA', () => {
     const p: any = hoSoGame({ cap: 10 })
     const truoc = khienConLai(p)
-    const r = congTongSoVaoHoSo(p, 0, 13)
-    expect(r).toEqual({ exp: 0, manh: 13, khienMoi: 1 })
+    const r = congTongSoVaoHoSo(p, 0, 37)
+    expect(r).toEqual({ exp: 0, manh: 37, khienMoi: 1 })
     expect(p.khienRen).toEqual({ manh: 1, daRen: 1 })
     expect(khienConLai(p)).toBe(truoc + 1)
-    expect(congTongSoVaoHoSo(p, 0, 13)).toEqual({ exp: 0, manh: 0, khienMoi: 0 })
+    expect(congTongSoVaoHoSo(p, 0, 37)).toEqual({ exp: 0, manh: 0, khienMoi: 0 })
+    const q: any = hoSoGame({ cap: 10 })
+    expect(congTongSoVaoHoSo(q, 0, 35)).toEqual({ exp: 0, manh: 35, khienMoi: 0 })
+    expect(q.khienRen).toEqual({ manh: 35, daRen: 0 })
   })
-  it('đang giữ 5 khiên rèn CHƯA dùng thì không rèn thêm, mảnh kẹp ở 24', () => {
+  it('đang giữ 5 khiên rèn CHƯA dùng thì không rèn thêm, mảnh kẹp ở 72', () => {
     const p: any = hoSoGame({ cap: 1, khienRen: { manh: 0, daRen: 5 } })
     expect(khienRenChuaDung(p)).toBe(5)
-    congTongSoVaoHoSo(p, 0, 40)
-    expect(p.khienRen).toEqual({ manh: 24, daRen: 5 })
+    congTongSoVaoHoSo(p, 0, 90)
+    expect(p.khienRen).toEqual({ manh: 72, daRen: 5 })
     p.shields = { used: 2, activeUntil: 0 }
     expect(khienRenChuaDung(p)).toBeLessThanOrEqual(5)
   })
@@ -501,7 +504,7 @@ describe('đường nộp và màn hình', () => {
     expect(r.ok).toBe(true)
     expect(r.exp.homNay).toBe(4)
     expect(r.exp.chiTietHomNay).toEqual([{ loai: 'cau', exp: 4, soKhoan: 2, ghiChu: '2 câu đúng: +4' }])
-    expect(r.exp.manhKhien).toMatchObject({ manh: 0, moiKhien: 12, khienRen: 0 })
+    expect(r.exp.manhKhien).toMatchObject({ manh: 0, moiKhien: 36, khienRen: 0 })
     expect(r.expNhan).toHaveLength(2)
     const r2 = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' })
     expect(r2.expNhan).toEqual([])

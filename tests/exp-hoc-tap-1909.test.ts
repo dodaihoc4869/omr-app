@@ -123,7 +123,7 @@ describe('thưởng theo việc + khoá idempotent', () => {
 })
 
 describe('khoản theo CHUYỂN TRẠNG THÁI HỒ SƠ áp cho MỌI nguồn, kể cả game (0.Planer chốt 19/09)', () => {
-  it('em làm đúng câu ôn trong GAME: không có EXP câu (tránh thưởng đôi với 20/40/40) nhưng CÓ +6 lên bậc, +30 khắc phục và +2 mảnh khi dạng rời yếu', () => {
+  it('em làm đúng câu ôn trong GAME: không có EXP câu (tránh thưởng đôi với 20/40/40) nhưng CÓ +6 lên bậc, +30 khắc phục; dạng rời yếu giữ khoá sổ với 0 mảnh (thầy lệnh 21/09)', () => {
     const r = tinhExp(vao({
       suKien: [sk('G1', 1, { nguon: 'game' }), sk('G2', 1, { nguon: 'game' })],
       lenBac: ['G1'], khacPhuc: [{ qid: 'G2', lan: 2, luc: luc(5) }], dangRoiYeu: [{ maDang: 'ES-01', lan: 1, luc: luc(6) }],
@@ -131,7 +131,7 @@ describe('khoản theo CHUYỂN TRẠNG THÁI HỒ SƠ áp cho MỌI nguồn, k�
     expect(theoLoai(r.khoan, 'cau')).toEqual([]) // câu theo bảng 9 ô: loại game
     expect(theoLoai(r.khoan, 'len_bac').map((k) => [k.khoa, k.exp])).toEqual([[`bac|G1|${NGAY}`, 6]])
     expect(theoLoai(r.khoan, 'khac_phuc').map((k) => [k.khoa, k.exp])).toEqual([['kp|G2|2', 30]])
-    expect(r.manh.map((m) => [m.khoa, m.so])).toEqual([['manh|dang|ES-01|1', 2]])
+    expect(r.manh.map((m) => [m.khoa, m.so])).toEqual([['manh|dang|ES-01|1', 0]]) // giữ khoá sổ, KHÔNG cộng mảnh
     expect(tong(r.khoan)).toBe(36)
   })
   it('câu game có trợ giúp không ghi sổ nên không có sự kiện, không có chuyển trạng thái ⇒ không có khoản nào', () => {
@@ -147,19 +147,20 @@ describe('đạt nhiệm vụ ngày, chuỗi và mảnh khiên', () => {
       expect(r.manh.filter((m) => m.loai === 'dat')).toEqual([expect.objectContaining({ khoa: `manh|dat|${NGAY}`, so: 1 })])
     }
   })
-  it('chuỗi chạm BỘI SỐ 7 (gồm hôm nay) ⇒ thêm +3 mảnh; chuỗi khác thì không', () => {
+  it('chuỗi chạm BỘI SỐ 7 (gồm hôm nay) ⇒ khoá sổ `chuoi7` với 0 mảnh (thầy lệnh 21/09: mảnh chỉ đến từ ngày đạt); chuỗi khác thì không có khoá', () => {
     for (const [chuoi, co] of [[6, false], [7, true], [8, false], [14, true], [21, true]] as const) {
       const r = tinhExp(vao({ datNgay: { chuoi, luc: luc(1) } }))
       expect(r.manh.some((m) => m.loai === 'chuoi7'), `chuỗi ${chuoi}`).toBe(co)
-      if (co) expect(r.manh.find((m) => m.loai === 'chuoi7')).toMatchObject({ khoa: `manh|chuoi7|${NGAY}`, so: 3 })
+      if (co) expect(r.manh.find((m) => m.loai === 'chuoi7')).toMatchObject({ khoa: `manh|chuoi7|${NGAY}`, so: 0 })
+      expect(r.manh.reduce((t, m) => t + m.so, 0), `chuỗi ${chuoi}`).toBe(1) // mỗi ngày đạt chỉ +1 mảnh, kể cả bội 7
     }
   })
   it('không đạt ngày ⇒ không đạt/chuỗi/mảnh đạt', () => {
     expect(tinhExp(vao({ datNgay: null }))).toEqual({ khoan: [], manh: [] })
   })
-  it('một DẠNG rời danh sách dạng yếu: +2 mảnh, khoá theo (dạng, lần); lần mới khi tái phát rồi rời lại', () => {
+  it('một DẠNG rời danh sách dạng yếu: 0 mảnh (thầy lệnh 21/09), khoá sổ theo (dạng, lần); lần mới khi tái phát rồi rời lại', () => {
     const r = tinhExp(vao({ dangRoiYeu: [{ maDang: 'ES-01', lan: 1, luc: luc(1) }, { maDang: 'ES-01', lan: 2, luc: luc(2) }] }))
-    expect(r.manh.map((m) => [m.khoa, m.so])).toEqual([['manh|dang|ES-01|1', 2], ['manh|dang|ES-01|2', 2]])
+    expect(r.manh.map((m) => [m.khoa, m.so])).toEqual([['manh|dang|ES-01|1', 0], ['manh|dang|ES-01|2', 0]])
   })
   it('mảnh KHÔNG mua được bằng EXP: hàm tính EXP không nhận cũng không trả mảnh từ EXP', () => {
     const r = tinhExp(vao({ suKien: Array.from({ length: 30 }, (_, i) => sk(`Q${i}`, 1)) }))
@@ -167,15 +168,17 @@ describe('đạt nhiệm vụ ngày, chuỗi và mảnh khiên', () => {
   })
 })
 
-describe('khiên RÈN: 12 mảnh → 1 khiên; tối đa 5 khiên rèn chưa dùng; mảnh kẹp 24', () => {
-  it('12 mảnh ⇒ tự rèn, trừ 12; 25 mảnh ⇒ rèn 2 dư 1; chưa đủ thì giữ', () => {
-    expect(congManh({ manh: 11, daRen: 0 }, 1, 0)).toEqual({ manh: 0, daRen: 1 })
-    expect(congManh({ manh: 0, daRen: 3 }, 25, 0)).toEqual({ manh: 1, daRen: 5 })
+describe('khiên RÈN: 36 mảnh → 1 khiên (thầy lệnh 21/09); tối đa 5 khiên rèn chưa dùng; mảnh kẹp 72', () => {
+  it('36 mảnh ⇒ tự rèn, trừ 36; 73 mảnh ⇒ rèn 2 dư 1; chưa đủ thì giữ; mảnh cũ 7/12 giữ nguyên thành 7/36', () => {
+    expect(congManh({ manh: 35, daRen: 0 }, 1, 0)).toEqual({ manh: 0, daRen: 1 })
+    expect(congManh({ manh: 0, daRen: 3 }, 73, 0)).toEqual({ manh: 1, daRen: 5 })
     expect(congManh({ manh: 5, daRen: 2 }, 3, 0)).toEqual({ manh: 8, daRen: 2 })
+    expect(congManh({ manh: 7, daRen: 1 }, 0, 0)).toEqual({ manh: 7, daRen: 1 }) // mảnh em đang có: không mất, không tự rèn
+    expect(congManh({ manh: 12, daRen: 1 }, 0, 0)).toEqual({ manh: 12, daRen: 1 }) // 12 mảnh KHÔNG còn đủ một khiên
   })
-  it('đã có 5 khiên rèn chưa dùng ⇒ KHÔNG rèn thêm, mảnh vẫn cộng nhưng kẹp ở 24; còn 4 thì rèn đúng 1 rồi dừng', () => {
-    expect(congManh({ manh: 10, daRen: 5 }, 30, 5)).toEqual({ manh: 24, daRen: 5 })
-    expect(congManh({ manh: 20, daRen: 7 }, 30, 4)).toEqual({ manh: 24, daRen: 8 }) // 50 → rèn 1 (38) rồi chạm 5 chưa dùng → giữ, kẹp 24
+  it('đã có 5 khiên rèn chưa dùng ⇒ KHÔNG rèn thêm, mảnh vẫn cộng nhưng kẹp ở 72; còn 4 thì rèn đúng 1 rồi dừng', () => {
+    expect(congManh({ manh: 10, daRen: 5 }, 90, 5)).toEqual({ manh: 72, daRen: 5 })
+    expect(congManh({ manh: 20, daRen: 7 }, 90, 4)).toEqual({ manh: 72, daRen: 8 }) // 110 → rèn 1 (74) rồi chạm 5 chưa dùng → giữ, kẹp 72
     expect(congManh({ manh: 0, daRen: 0 }, 0, 0)).toEqual({ manh: 0, daRen: 0 })
   })
   it('đầu vào lạ (âm, phân số, NaN) không làm mảnh âm hay sinh khiên ảo', () => {
@@ -183,7 +186,8 @@ describe('khiên RÈN: 12 mảnh → 1 khiên; tối đa 5 khiên rèn chưa dù
     expect(congManh({ manh: 3, daRen: 0 }, 2.9, 0)).toEqual({ manh: 5, daRen: 0 })
   })
   it('hằng số đúng như đặc tả', () => {
-    expect(CH.MANH_MOI_KHIEN).toBe(12); expect(CH.KHIEN_REN_TOI_DA).toBe(5); expect(CH.MANH_TOI_DA).toBe(24)
+    expect(CH.MANH_MOI_KHIEN).toBe(36); expect(CH.KHIEN_REN_TOI_DA).toBe(5); expect(CH.MANH_TOI_DA).toBe(72)
+    expect(CH.MANH_DAT_NGAY).toBe(1); expect(CH.MANH_CHUOI_BOI_SO_THUONG).toBe(0); expect(CH.MANH_DANG_ROI_YEU).toBe(0) // nguồn mảnh DUY NHẤT là ngày đạt
     expect(CH.EXP_MOI_TU).toBeNull() // chưa phát hành ⇒ không mốc
   })
 })

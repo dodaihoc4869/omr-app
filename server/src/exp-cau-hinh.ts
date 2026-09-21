@@ -34,12 +34,16 @@ export const EXP_CHUOI_TOI_DA = 10
 export const TRAN_MEM_HE_SO = 2
 export const TRAN_MEM_TY_LE = 0.25
 
-/** Mảnh khiên (khiên RÈN, thêm vào khiên quà tiến hoá). Núm độ khó: 8 dễ / 12 vừa / 16 khó. */
+/**
+ * Mảnh khiên (khiên RÈN, thêm vào khiên quà tiến hoá). THẦY LỆNH 21/09/2026: "ít nhất học đều 36 ngày mới lấy được khiên đầu tiên" ⇒ NGUỒN MẢNH DUY NHẤT là "đạt nhiệm vụ ngày" +1/ngày,
+ * `MANH_MOI_KHIEN = 36`. Thưởng mảnh ở chuỗi 7 và ở dạng rời danh sách yếu = 0 (giữ khoá sổ + ghi chú, KHÔNG cộng mảnh, KHÔNG đổi EXP). Mảnh em đang có giữ nguyên (7/12 ⇒ 7/36);
+ * khiên rèn đã có giữ nguyên. Núm cũ: 8 dễ / 12 vừa / 16 khó.
+ */
 export const MANH_DAT_NGAY = 1
 export const MANH_CHUOI_BOI_SO = 7
-export const MANH_CHUOI_BOI_SO_THUONG = 3
-export const MANH_DANG_ROI_YEU = 2
-export const MANH_MOI_KHIEN = 12
+export const MANH_CHUOI_BOI_SO_THUONG = 0
+export const MANH_DANG_ROI_YEU = 0
+export const MANH_MOI_KHIEN = 36
 /** Khiên rèn CHƯA dùng tối đa; đang đủ thì mảnh vẫn cộng nhưng kẹp ở MANH_TOI_DA. */
 export const KHIEN_REN_TOI_DA = 5
 export const MANH_TOI_DA = 2 * MANH_MOI_KHIEN

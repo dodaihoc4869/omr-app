@@ -250,14 +250,14 @@ describe('/hs/thu-thach-hom-nay — chọn câu', () => {
 })
 
 describe('/hs/thu-thach-hom-nay — số thật thần thú', () => {
-  it('thanThu: tên LOÀI (không nickname), cấp, EXP còn thiếu = thanhExp(cấp) − exp, mảnh khiên = manh mod 12 / 12, chuỗi ngày đạt; loài lạ / chưa chọn ⇒ vắng', async () => {
+  it('thanThu: tên LOÀI (không nickname), cấp, EXP còn thiếu = thanhExp(cấp) − exp, mảnh khiên = manh mod 36 / 36 (thầy lệnh 21/09; fixture 15 mảnh), chuỗi ngày đạt; loài lạ / chưa chọn ⇒ vắng', async () => {
     const d = truong()
     const kh = (ngay: string, kq: string | null, nghi = 0) => d.sql.prepare("INSERT INTO ke_hoach_ngay(khoa,sbd,ngay,phien_ban,seed,ngan_sach_json,viec_json,canh_bao_json,ket_qua,so_cau_da_lam,so_cau_len_bac,so_cau_tut_bac,la_ngay_nghi,so_su_kien,cap_nhat_luc) VALUES(?,'S1',?,1,'s','{}','{}','[]',?,0,0,0,?,0,'x')").run(`S1|${ngay}`, ngay, kq, nghi)
     const homNay = HOM_NAY()
     const lui = (n: number) => new Date(Date.parse(`${homNay}T00:00:00Z`) - n * D).toISOString().slice(0, 10)
     kh(homNay, null); kh(lui(1), 'dat'); kh(lui(2), 'dat'); kh(lui(3), null, 1); kh(lui(4), 'dat'); kh(lui(5), 'mot_phan'); kh(lui(6), 'dat') // hôm nay chưa xong (bỏ qua), 1+2 đạt, nghỉ bỏ qua, 4 đạt ⇒ 3, đứt ở "mot_phan"
     const r = (await thu(d)) as { thanThu?: Record<string, unknown> }
-    expect(r.thanThu).toEqual({ ten: 'Viêm Sư', cap: 6, expConThieu: thanhExp(6) - 50, manhKhien: 3, manhKhienTong: 12, chuoiNgay: 3 })
+    expect(r.thanThu).toEqual({ ten: 'Viêm Sư', cap: 6, expConThieu: thanhExp(6) - 50, manhKhien: 15, manhKhienTong: 36, chuoiNgay: 3 })
     expect(JSON.stringify(r.thanThu)).not.toContain('Biệt danh')
     const chuaChon = truong(); hoSoGame(chuaChon, 'S1', { choice: true })
     expect((await thu(chuaChon)) as never).not.toHaveProperty('thanThu')
@@ -267,13 +267,14 @@ describe('/hs/thu-thach-hom-nay — số thật thần thú', () => {
     expect(((await thu(khongHoSo)) as never as { co: boolean }).co).toBe(true) // vẫn có thẻ, chỉ không có số thú
     expect((await thu(khongHoSo)) as never).not.toHaveProperty('thanThu')
   })
-  it('docThanThuSoThat theo lô: đúng từng em; em lớn cấp / EXP vượt ⇒ expConThieu ≥ 0; mảnh 12 ⇒ 0/12', async () => {
+  it('docThanThuSoThat theo lô: đúng từng em; em lớn cấp / EXP vượt ⇒ expConThieu ≥ 0; mảnh 36 ⇒ 0/36 (đủ một khiên), mảnh 12 ⇒ 12/36', async () => {
     const d = truong()
-    hoSoGame(d, 'S2', { pet: 'nuoc_long', cap: 120, exp: 5, manh: 12 })
+    hoSoGame(d, 'S2', { pet: 'nuoc_long', cap: 120, exp: 5, manh: 36 })
     const m = await docThanThuSoThat(d.env, ['S1', 'S2', 'S3'])
     expect([...m.keys()].sort()).toEqual(['S1', 'S2'])
-    expect(m.get('S2')).toMatchObject({ ten: 'Thuỷ Long', cap: 120, expConThieu: 0, manhKhien: 0, manhKhienTong: 12 })
-    hoSoGame(d, 'S2', { pet: 'nuoc_long', cap: 6, exp: 99999 })
+    expect(m.get('S2')).toMatchObject({ ten: 'Thuỷ Long', cap: 120, expConThieu: 0, manhKhien: 0, manhKhienTong: 36 })
+    hoSoGame(d, 'S2', { pet: 'nuoc_long', cap: 6, exp: 99999, manh: 12 })
+    expect((await docThanThuSoThat(d.env, ['S2'])).get('S2')).toMatchObject({ manhKhien: 12, manhKhienTong: 36 }) // mảnh cũ 12 không còn đủ một khiên
     expect((await docThanThuSoThat(d.env, ['S2'])).get('S2')!.expConThieu).toBe(0)
     expect((await docThanThuSoThat(d.env, [])).size).toBe(0)
   })
@@ -349,7 +350,7 @@ describe('thẻ /ai/ho-so-ngay có SỐ THẬT thần thú (ẩn danh)', () => {
     expect(r.ok).toBe(true)
     const s1 = r.cacEm.find((x) => x.sbd === 'S1')!
     const s2 = r.cacEm.find((x) => x.sbd === 'S2')!
-    expect(s1.the!.thanThu).toEqual({ ten: 'Viêm Sư', cap: 6, expConThieu: thanhExp(6) - 50, manhKhien: 3, manhKhienTong: 12, chuoiNgay: 0 })
+    expect(s1.the!.thanThu).toEqual({ ten: 'Viêm Sư', cap: 6, expConThieu: thanhExp(6) - 50, manhKhien: 15, manhKhienTong: 36, chuoiNgay: 0 })
     expect(s2.the).not.toHaveProperty('thanThu')
     expect(JSON.stringify(r)).not.toMatch(/Biệt danh|Em Một|Em Hai/)
     const luu = JSON.parse((d.sql.prepare("SELECT the_json FROM ai_ho_so_ngay WHERE sbd = 'S1'").get() as { the_json: string }).the_json)
