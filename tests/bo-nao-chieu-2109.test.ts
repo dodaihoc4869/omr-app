@@ -11,7 +11,7 @@ import { LoiBoNao } from '../scripts/bo-nao/chung.mjs'
 // @ts-expect-error
 import { chayLayChieu, diemTinHieuChieu } from '../scripts/bo-nao/lay.mjs'
 // @ts-expect-error
-import { chayNopChieu, moRongPhanTuChieu, soanXemTruoc } from '../scripts/bo-nao/nop.mjs'
+import { chayNopChieu, moRongPhanTuChieu, nhomLyDo, soanBaoCaoChieu, soanXemTruoc } from '../scripts/bo-nao/nop.mjs'
 import { LOI_CAM, LOI_TOT, THE, THE_KHONG_THU } from './_bo-nao-thu-thach-mau'
 
 const NGAY = '2026-09-21'
@@ -199,6 +199,50 @@ describe('nop.mjs --chieu — xem trước rồi nộp', () => {
     await expect(chayNopChieu({ ngay: NGAY, goc, goi: mayChuGia().goi, xemTruoc: true })).rejects.toMatchObject({ maThoat: 5 })
     await lay()
     await expect(chayNopChieu({ ngay: NGAY, goc, goi: mayChuGia().goi, xemTruoc: true })).rejects.toMatchObject({ maThoat: 6 })
+  })
+  it('BÁO CÁO 6 DÒNG cho thầy: ghi cùng xem trước (DỰ KIẾN) và sau nộp (thật); số em, lý do loại gộp, bậc, 3 lời mẫu; không SBD / tên / bí danh', async () => {
+    const { a, d, bang } = await chuanBi()
+    const e = biDanhCua(bang, '20007')
+    ghiRa([pt(a, LOI_CAM[0].chu), pt(d, LOI_TOT[4].chu, ['LIPID.BEO']), pt(e, LOI_TOT[4].chu), pt('E999', LOI_TOT[0].chu)]) // hợp lệ = d, e (cả hai CHƯA có thú); a (có thú) bị loại vì từ cấm
+    const mc = mayChuGia()
+    const xem = await chayNopChieu({ ngay: NGAY, goc, goi: mc.goi, xemTruoc: true })
+    expect(xem.tepBaoCao).toBe(`bo-nao/${NGAY}/chieu/bao-cao.md`)
+    const bc1 = readFileSync(join(thuMucChieu(), 'bao-cao.md'), 'utf8')
+    const dong1 = bc1.trim().split('\n')
+    expect(dong1).toHaveLength(6)
+    expect(dong1[0]).toBe('Lượt chiều 21/09 (DỰ KIẾN, chưa nộp): 2 em sẽ nhận lời mời thử thách riêng, trong đó 2 em chưa chọn thú được mời chọn.')
+    expect(dong1[1]).toContain('2 lời bị loại')
+    expect(dong1[1]).toContain('1 vì từ cấm')
+    expect(dong1[1]).toContain('1 vì phần tử lạ / trùng')
+    expect(dong1[2]).toBe('Bậc: đúng bậc 2 · thấp hơn 0 · cao hơn 0; máy chủ chọn câu, mỗi em khoảng 5 câu.')
+    expect(dong1[3]).toMatch(/^Mẫu 1: "/)
+    expect(dong1[4]).toMatch(/^Mẫu 2: "/)
+    expect(dong1[5]).toBe('Mẫu 3: (chưa có)') // chỉ 2 em hợp lệ ⇒ 2 mẫu
+    for (const cam of ['20001', '20004', '20007', 'Trần Thu Hà', a, d, e, 'E999']) expect(bc1, cam).not.toContain(cam)
+    await chayNopChieu({ ngay: NGAY, goc, goi: mc.goi })
+    const bc2 = readFileSync(join(thuMucChieu(), 'bao-cao.md'), 'utf8').trim().split('\n')
+    expect(bc2).toHaveLength(6)
+    expect(bc2[0]).toBe('Lượt chiều 21/09: 2 em nhận lời mời thử thách riêng (2 áp dụng ngay), trong đó 2 em chưa chọn thú được mời chọn.')
+  })
+  it('soanBaoCaoChieu: không em nào / không lời nào bị loại / chỉ 1–2 em vẫn đủ 6 dòng; 3 mẫu chọn rải đều và khác nhau', () => {
+    const hl = (chu: string, bac = 'dung_bac', soCau = 4) => ({ biDanh: 'E001', dauRa: { loiMoi: chu, thuThach: { dang: ['A'], soCau, bac } } })
+    expect(soanBaoCaoChieu({ ngay: NGAY, hopLe: [], loai: [] }).trim().split('\n')).toHaveLength(6)
+    const mot = soanBaoCaoChieu({ ngay: NGAY, hopLe: [hl('x 4')], loai: [] }).trim().split('\n')
+    expect(mot).toHaveLength(6)
+    expect(mot[1]).toBe('Không có lời nào bị loại.')
+    expect(mot[4]).toContain('(chưa có)')
+    const nhieu = soanBaoCaoChieu({ ngay: NGAY, hopLe: ['a 1', 'b 2', 'c 3', 'd 4', 'e 5'].map((c, i) => hl(c, i % 2 ? 'cao_hon_mot_bac' : 'dung_bac', 3 + i)), loai: [] }).trim().split('\n')
+    expect(nhieu.slice(3)).toEqual(['Mẫu 1: "a 1"', 'Mẫu 2: "c 3"', 'Mẫu 3: "e 5"'])
+    expect(nhieu[2]).toContain('đúng bậc 3 · thấp hơn 0 · cao hơn 2')
+  })
+  it('nhomLyDo: gom lý do theo nhóm ngắn, thứ tự ưu tiên', () => {
+    expect(nhomLyDo(['loiMoi có số không có trong thẻ: 55'])).toBe('số không có trong thẻ')
+    expect(nhomLyDo(['loiMoi có từ cấm: nắm chắc'])).toBe('từ cấm (nhãn năng lực, so với bạn…)')
+    expect(nhomLyDo(['loiMoi nêu số câu sẽ làm sau chữ "thử"'])).toBe('nêu số câu sẽ làm')
+    expect(nhomLyDo(['thiếu thuThach hoặc loiMoi — lượt chiều chỉ có việc này'])).toBe('thiếu thuThach hoặc loiMoi')
+    expect(nhomLyDo(['thuThach.dang[0] không có trong thẻ của em'])).toBe('sai khuôn thử thách')
+    expect(nhomLyDo(['bí danh không có trong dữ liệu đêm này'])).toBe('phần tử lạ / trùng')
+    expect(nhomLyDo(['gì đó khác hẳn'])).toBe('lý do khác')
   })
   it('soanXemTruoc không chứa SBD; ghi rõ lệnh nộp', () => {
     const md = soanXemTruoc({ ngay: NGAY, tao: 'x', loai: [], hopLe: [{ biDanh: 'E001', dauRa: { doTinCay: 0.8, loiMoi: 'Em đúng 4 câu.', thuThach: { dang: ['A'], soCau: 4, bac: 'cao_hon_mot_bac' } } }] })

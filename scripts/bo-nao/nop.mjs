@@ -268,6 +268,54 @@ export function soanXemTruoc({ ngay, hopLe, loai, tao }) {
   return d.join('\n') + '\n'
 }
 
+/** Nhóm LÝ DO bị loại (mỗi em tính MỘT lần theo lý do đầu tiên khớp) — để báo cáo gọn cho thầy. */
+const NHOM_LY_DO = [
+  [/số không có trong thẻ/, 'số không có trong thẻ'],
+  [/ít nhất một con số/, 'thiếu số thật'],
+  [/nêu số câu/, 'nêu số câu sẽ làm'],
+  [/từ cấm/, 'từ cấm (nhãn năng lực, so với bạn…)'],
+  [/hứa điều|gọi tên/, 'hứa điều không chắc / gọi tên'],
+  [/nói ra điều/, 'nói điều "biết" về em'],
+  [/tên riêng|nhắc thú/, 'tên thú / tên riêng lạ'],
+  [/thiếu thuThach|đi cùng nhau/, 'thiếu thuThach hoặc loiMoi'],
+  [/cao_hon_mot_bac|tran_an|nhãn ngan/, 'bậc / số câu không hợp nhãn'],
+  [/thuThach|soCau|dạng|khoá lạ/, 'sai khuôn thử thách'],
+  [/bí danh|trùng em|thẻ của em/, 'phần tử lạ / trùng'],
+]
+export const nhomLyDo = (lyDo) => {
+  const chu = (Array.isArray(lyDo) ? lyDo : [String(lyDo)]).join(' | ')
+  for (const [re, ten] of NHOM_LY_DO) if (re.test(chu)) return ten
+  return 'lý do khác'
+}
+
+/**
+ * BÁO CÁO LƯỢT CHIỀU cho thầy đọc trên bảng tin — ĐÚNG 6 DÒNG, ẩn danh: (1) số em được mời · (2) số lời bị loại và vì sao · (3) bậc / số câu · (4–6) ba lời mẫu (chọn rải đều, không có bí danh).
+ * `daNop` false ⇒ bản DỰ KIẾN (xem trước). `soChuaChonThu` = số em được mời mà chưa có thần thú. Không SBD, không tên, không bí danh.
+ */
+export function soanBaoCaoChieu({ ngay, hopLe, loai, daNop = false, nhan = 0, soApDung = 0, soChuaChonThu = 0 }) {
+  const n = hopLe.length
+  const bac = { dung_bac: 0, thap_hon_mot_bac: 0, cao_hon_mot_bac: 0 }
+  let tongCau = 0
+  for (const h of hopLe) {
+    const t = h.dauRa.thuThach
+    bac[t.bac] = (bac[t.bac] ?? 0) + 1
+    tongCau += t.soCau
+  }
+  const dem = new Map()
+  for (const l of loai) dem.set(nhomLyDo(l.lyDo), (dem.get(nhomLyDo(l.lyDo)) ?? 0) + 1)
+  const lyDo = [...dem.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1)).map(([k, v]) => `${v} vì ${k}`).join(' · ')
+  const chi = n === 0 ? [] : [...new Set([0, Math.floor(n / 2), n - 1])]
+  const mau = chi.map((i) => hopLe[i].dauRa.loiMoi)
+  const ngayHt = `${ngay.slice(8, 10)}/${ngay.slice(5, 7)}`
+  const d = [
+    `${daNop ? `Lượt chiều ${ngayHt}: ${nhan} em nhận lời mời thử thách riêng (${soApDung} áp dụng ngay)` : `Lượt chiều ${ngayHt} (DỰ KIẾN, chưa nộp): ${n} em sẽ nhận lời mời thử thách riêng`}${soChuaChonThu ? `, trong đó ${soChuaChonThu} em chưa chọn thú được mời chọn` : ''}.`,
+    loai.length ? `${loai.length} lời bị loại: ${lyDo}.` : 'Không có lời nào bị loại.',
+    n ? `Bậc: đúng bậc ${bac.dung_bac} · thấp hơn ${bac.thap_hon_mot_bac} · cao hơn ${bac.cao_hon_mot_bac}; máy chủ chọn câu, mỗi em khoảng ${Math.round(tongCau / n)} câu.` : 'Chưa có em nào được mời.',
+  ]
+  for (let k = 0; k < 3; k++) d.push(k < mau.length ? `Mẫu ${k + 1}: "${mau[k]}"` : `Mẫu ${k + 1}: (chưa có)`)
+  return d.join('\n') + '\n'
+}
+
 /**
  * LƯỢT CHIỀU — kiểm khuôn + XEM TRƯỚC hoặc NỘP. `xemTruoc: true` ⇒ chỉ GHI `chieu/xem-truoc.md` + `xem-truoc.json`, KHÔNG gọi máy chủ. Nộp thật chỉ khi đã có bản xem trước và `ra/` không đổi sau nó.
  * Phần tử phải có ĐỦ `thuThach` + `loiMoi` và qua `kiemKhuon` (sai thử thách ⇒ loại, vì lượt chiều chỉ có việc này). Trả bản tóm tắt KHÔNG có SBD.
@@ -289,13 +337,15 @@ export async function chayNopChieu({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date
     else if (!h.dauRa.thuThach || !h.dauRa.loiMoi) loai.push({ biDanh: h.biDanh, tep: h.tep, lyDo: ['thiếu thuThach hoặc loiMoi — lượt chiều chỉ có việc này'] })
     else hopLe.push(h)
   }
+  const soChuaChonThu = hopLe.filter((h) => !(the.get(h.biDanh)?.the?.thanThu && typeof the.get(h.biDanh).the.thanThu === 'object')).length
   const tao = new Date(bayGio).toISOString()
   const tomTat = { ngay, luc: tao, soPhanTu: phanTuAi.length, hopLe: hopLe.length, biLoai: loai.length, loai: loai.map((l) => ({ biDanh: l.biDanh, lyDo: l.lyDo })), loiTep }
   if (xemTruoc) {
     const tepMd = join(thuMuc, 'xem-truoc.md')
     ghiChu(tepMd, soanXemTruoc({ ngay, hopLe, loai, tao }))
     ghiJson(join(thuMuc, 'xem-truoc.json'), { ...tomTat, cacEm: hopLe.map((h) => ({ biDanh: h.biDanh, doTinCay: h.dauRa.doTinCay, thuThach: h.dauRa.thuThach, loiMoi: h.dauRa.loiMoi })) }, { dep: true })
-    return { ...tomTat, daNop: false, tepXemTruoc: `bo-nao/${ngay}/chieu/xem-truoc.md` }
+    ghiChu(join(thuMuc, 'bao-cao.md'), soanBaoCaoChieu({ ngay, hopLe, loai, daNop: false, soChuaChonThu }))
+    return { ...tomTat, daNop: false, tepXemTruoc: `bo-nao/${ngay}/chieu/xem-truoc.md`, tepBaoCao: `bo-nao/${ngay}/chieu/bao-cao.md` }
   }
   const tepXem = join(thuMuc, 'xem-truoc.json')
   if (!existsSync(tepXem)) throw new LoiBoNao('Chưa có bản xem trước: chạy trước `node scripts/bo-nao/nop.mjs --chieu --xem-truoc` rồi ĐỌC xem-truoc.md trước khi nộp.', 7)
@@ -318,7 +368,8 @@ export async function chayNopChieu({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date
   }
   const ketQua = { ...tomTat, luc: tao, nhan, chiGhiSo, soApDung, biLoaiMayChu, loai: [...tomTat.loai, ...loaiMayChu] }
   ghiJson(join(thuMuc, 'nop-ket-qua.json'), ketQua, { dep: true })
-  return { ...ketQua, daNop: true }
+  ghiChu(join(thuMuc, 'bao-cao.md'), soanBaoCaoChieu({ ngay, hopLe, loai: ketQua.loai.map((l) => ({ lyDo: l.lyDo })), daNop: true, nhan, soApDung, soChuaChonThu }))
+  return { ...ketQua, daNop: true, tepBaoCao: `bo-nao/${ngay}/chieu/bao-cao.md` }
 }
 
 export function dongTomTatChieu(kq) {
@@ -328,6 +379,7 @@ export function dongTomTatChieu(kq) {
   for (const l of kq.loai.slice(0, SO_DONG_LOI_IN_TOI_DA)) d.push(`  Loại ${l.biDanh}: ${l.lyDo.join('; ').slice(0, 220)}`)
   if (kq.loai.length > SO_DONG_LOI_IN_TOI_DA) d.push(`  … và ${kq.loai.length - SO_DONG_LOI_IN_TOI_DA} em nữa (xem xem-truoc.md).`)
   for (const l of kq.loiTep) d.push(`  Tệp: ${l}`)
+  if (kq.tepBaoCao) d.push(`  Báo cáo 6 dòng cho thầy (bảng tin): ${kq.tepBaoCao}`)
   return d
 }
 
