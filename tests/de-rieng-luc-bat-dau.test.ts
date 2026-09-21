@@ -62,7 +62,7 @@ describe('bản đồ ghi lúc bấm Bắt đầu', () => {
 describe('màn Mở ca', () => {
   it('CHẾ ĐỘ NÀY TỰ BẬT PHÒNG CHỜ, và không tắt được', () => {
     expect(MO_CA).toContain('phongCho: phongCho || deRiengBat')
-    expect(MO_CA).toContain('disabled={deRiengBat}')
+    expect(MO_CA).toContain('disabled={deRiengBat || dongBoGio}') // từ khi có "Đồng bộ giờ cả phòng" (cũng bật sẵn phòng chờ) nút khoá thêm theo cờ ấy
     expect(MO_CA).toContain('Bật sẵn và không tắt được')
   })
 

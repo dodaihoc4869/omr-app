@@ -40,8 +40,16 @@ describe('MỞ CA CHỈ CÒN MỘT ĐÍCH', () => {
     expect(HAM).not.toMatch(/catch \{\s*\n\s*daLenMayChuMoi = false\s*\n\s*\}/)
   })
 
-  it('cờ TẮT trả về false chứ không ném — tắt là thầy chủ ý tắt', () => {
-    expect(HAM).toContain('if (!chMoi.BAT || !chMoi.URL) return false')
+  // 12/09 không còn đường lùi: máy chủ mới là đích DUY NHẤT nên "cờ tắt / thiếu địa chỉ" không còn là chuyện thầy chủ ý — trả lời "đã mở" khi ca không nằm ở đâu là thứ tệ nhất.
+  // Trước đây `publishSession` có `if (!chMoi.BAT || !chMoi.URL) return false` rồi chỗ gọi báo đỏ; nay lượt đẩy (`taoCaDaXacNhan`) tự NÉM lỗi nói rõ và lỗi nổi lên thẳng khỏi hàm mở ca: cùng kết quả (báo đỏ), bớt một nhánh im lặng.
+  it('cờ TẮT hoặc thiếu địa chỉ máy chủ ⇒ NÉM LỖI nói rõ (báo đỏ), không âm thầm trả false', async () => {
+    const { taoCaDaXacNhan } = await import('../src/lib/day-ca-may-chu-moi')
+    await expect(taoCaDaXacNhan({ BAT: false, URL: 'https://may-chu.test' } as never, 'mat', {} as never, {})).rejects.toThrow('Chưa có kết nối máy chủ')
+    await expect(taoCaDaXacNhan({ BAT: true, URL: '' } as never, 'mat', {} as never, {})).rejects.toThrow('Chưa có kết nối máy chủ')
+    // hàm mở ca truyền cờ theo địa chỉ THẬT (không có địa chỉ ⇒ cờ tắt ⇒ lượt đẩy ném) và để lỗi nổi lên
+    expect(HAM).toContain('BAT: !!diaChi')
+    expect(HAM).toContain('await taoCaDaXacNhan(')
+    expect(HAM).toMatch(/catch \(e\) \{\s*\n\s*throw e instanceof Error/)
   })
 
   it('BỐN CỜ TỪNG CHỈ SỐNG BÊN SHEET nay đi cùng ca', () => {

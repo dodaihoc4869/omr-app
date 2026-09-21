@@ -48,8 +48,16 @@ const { default: ExamSetupScreen } = await import('../src/screens/ExamSetupScree
 
 /** MỘT MÀN MỞ CA DUY NHẤT (thầy chốt 05/09 chiều) — không còn bước chọn loại
  * ca, vào là soạn luôn. */
-function moCaKiemTra() {
-  return render(<ExamSetupScreen />)
+async function moCaKiemTra() {
+  const r = render(<ExamSetupScreen />)
+  // MÀN MỞ CA THIẾT KẾ LẠI (M3): cây chọn đề nằm trong tấm "Chọn đề kiểm tra", mở bằng nút cùng tên (hoặc "Đổi đề khác" khi đã có đề). Cây bên trong không đổi.
+  const nut = await waitFor(() => {
+    const b = r.getAllByRole('button').find((e) => /^(Chọn đề kiểm tra|Đổi đề khác)$/.test((e.textContent ?? '').trim()))
+    expect(b).toBeTruthy()
+    return b as HTMLElement
+  })
+  fireEvent.click(nut)
+  return r
 }
 
 /** Cây MẶC ĐỊNH GẬP HẾT — mở lần lượt khối, chương, bài để thấy tầng dạng. */
@@ -63,7 +71,7 @@ async function moHetCay(container: HTMLElement) {
 
 describe('danh sách đề khi mở ca', () => {
   it('cây nằm trong HỘP CUỘN cao cố định, không kéo dài cả trang', async () => {
-    const { container } = moCaKiemTra()
+    const { container } = await moCaKiemTra()
     await waitFor(() => expect(container.textContent).toContain('Khối 12'))
     const hop = container.querySelector('[role="tree"]') as HTMLElement
     expect(hop).toBeTruthy()
@@ -72,7 +80,7 @@ describe('danh sách đề khi mở ca', () => {
   })
 
   it('mặc định GẬP HẾT: chỉ thấy khối, chưa thấy chương và mã đề', async () => {
-    const { container } = moCaKiemTra()
+    const { container } = await moCaKiemTra()
     await waitFor(() => expect(container.textContent).toContain('Khối 12'))
     const cay = (container.querySelector('[role="tree"]') as HTMLElement).textContent ?? ''
     expect(cay).toContain('Khối 12')
@@ -81,7 +89,7 @@ describe('danh sách đề khi mở ca', () => {
   })
 
   it('mở hết cây thì mỗi mã ra ba dòng, đặt tên rõ phần nào', async () => {
-    const { container } = moCaKiemTra()
+    const { container } = await moCaKiemTra()
     await waitFor(() => expect(container.textContent).toContain('Khối 12'))
     await moHetCay(container)
     const chu = (container.querySelector('[role="tree"]') as HTMLElement).textContent ?? ''
@@ -90,7 +98,7 @@ describe('danh sách đề khi mở ca', () => {
   })
 
   it('phần rỗng KHÔNG sinh dòng — đề không có trả lời ngắn thì chỉ ra hai mã', async () => {
-    const { container } = moCaKiemTra()
+    const { container } = await moCaKiemTra()
     await waitFor(() => expect(container.textContent).toContain('Khối 11'))
     await moHetCay(container)
     const chu = (container.querySelector('[role="tree"]') as HTMLElement).textContent ?? ''
@@ -100,7 +108,7 @@ describe('danh sách đề khi mở ca', () => {
   })
 
   it('số câu mỗi dòng đúng bằng số câu của phần đó, và tầng bài cộng đủ', async () => {
-    const { container } = moCaKiemTra()
+    const { container } = await moCaKiemTra()
     await waitFor(() => expect(container.textContent).toContain('Khối 12'))
     await moHetCay(container)
     const dong = [...(container.querySelector('[role="tree"]') as HTMLElement).children].map((e) => e.textContent ?? '')

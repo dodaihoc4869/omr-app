@@ -160,8 +160,11 @@ describe('③ MỞ CA — mốc giờ tính MỘT nơi, và chỉ còn MỘT đ�
     expect(layDe).not.toContain('key/')
   })
 
-  it('cờ máy chủ mới TẮT thì trả false, không ném — và chỗ gọi BÁO ĐỎ', () => {
-    expect(HAM).toContain('if (!chMoi.BAT || !chMoi.URL) return false')
+  it('cờ máy chủ mới TẮT thì BÁO ĐỎ (ném lỗi nói rõ) — từ 12/09 lượt đẩy tự ném thay vì trả false rồi chỗ gọi mới ném', () => {
+    // Đổi cơ chế, giữ kết quả: trước `if (!chMoi.BAT || !chMoi.URL) return false` trong `publishSession`; nay `taoCaDaXacNhan` ném 'Chưa có kết nối máy chủ…' và lỗi nổi lên khỏi `publishSession`.
+    expect(HAM).toContain('BAT: !!diaChi')
+    expect(HAM).toContain('await taoCaDaXacNhan(')
+    expect(fs.readFileSync(path.join(process.cwd(), 'src/lib/day-ca-may-chu-moi.ts'), 'utf8')).toContain("if (!ch.BAT || !ch.URL) throw new Error('Chưa có kết nối máy chủ")
     const i = HAM.indexOf('if (!daLenMayChuMoi)')
     expect(i).toBeGreaterThan(0)
     expect(HAM.slice(i, i + 200)).toContain('throw new Error')

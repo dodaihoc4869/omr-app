@@ -165,7 +165,7 @@ describe('MỌI LỆNH ĐI WORKER ĐỀU ĐỌC CẤU HÌNH TRƯỚC', () => {
     ['pushExamStatus', 'trangThaiMoi(chMoi, status)'],
     ['layPhieu', 'layPhieuMoi(chMoi, ma)'],
     ['dayMocBatDauMoi', 'dayMocBatDauMoi('],
-    ['dayCaMoi (mở ca)', 'await dayCaMoi('],
+    ['taoCaDaXacNhan (mở ca; trước đây dayCaMoi)', 'await taoCaDaXacNhan('],
     ['dayDanhSachMoi', 'dayDanhSachMoi(chMoi, secret, items)'],
     ['dayPhieuMoi', 'dayPhieuMoi(chMoi, secret,'],
   ]
