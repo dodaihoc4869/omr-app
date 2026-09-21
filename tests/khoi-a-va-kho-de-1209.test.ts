@@ -124,8 +124,9 @@ describe('KHỐI C — KHO ĐỀ, thứ duy nhất mang sang nguyên vẹn', () 
 
   it('rút câu nói rõ kho CÒN BAO NHIÊU câu dùng được', () => {
     // Hứa 40 câu mà kho chỉ có 12 thì phải nói ra, không im lặng trả 12.
-    const HAM = WK.slice(WK.indexOf('async function rutCau('), WK.indexOf('async function rutCau(') + 1600)
-    expect(HAM).toContain('coSan: con.length')
+    // 21/09 (cấm rút tự luận): rutCau nay duyệt gói từng tờ để bỏ câu tự luận nên hàm dài hơn và `coSan` = số câu còn lại trừ số câu tự luận đã bỏ. Ý của test giữ nguyên: PHẢI nói kho còn bao nhiêu câu dùng được.
+    const HAM = WK.slice(WK.indexOf('async function rutCau('), WK.indexOf('async function rutCau(') + 3600)
+    expect(HAM).toContain('coSan: con0.length - soBoTuLuan')
   })
 })
 

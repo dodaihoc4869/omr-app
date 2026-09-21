@@ -1,4 +1,6 @@
 import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
+import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
+import {qidTuLuanCuaTo} from './cam-tu-luan'
 import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
@@ -1493,6 +1495,8 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
   // (tổng cả tờ) làm số câu của một phần, vì đó là bịa số cho thầy nhìn.
   const demGoi = new Map<string, Record<string, unknown>[]>()
   let soCau = 0
+  // CẤM RÚT TỰ LUẬN (21/09): đếm ĐÚNG số câu em sẽ được giao — cùng luật với `homeworkQuestions` (tờ -VD/-DT/-TL bỏ hẳn, câu tự luận bỏ), không đếm cả tờ.
+  let soBoTuLuan = 0
   for (const m of dsMaDe) {
     const { goc: g, phan } = goPhanKhoiMaDe(m)
     if (!demGoi.has(g) && env.DE) {
@@ -1508,7 +1512,10 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
       }
     }
     const cau = demGoi.get(g) ?? []
-    soCau += phan ? cau.filter((c) => String(c.phan ?? '') === phan).length : cau.length
+    if (laMaDeTuLuan(g)) continue
+    const giu = locCauRutDuoc(phan ? cau.filter((c) => String(c.phan ?? '') === phan) : cau)
+    soCau += giu.giu.length
+    soBoTuLuan += giu.bo.length
   }
   if (soCau === 0) return ra({ ok: false, error: 'Những tờ đã tick không có câu nào — kiểm tra lại kho đề' })
 
@@ -1622,6 +1629,7 @@ async function giaoBtvn(env: Env, b: Record<string, unknown>): Promise<Response>
   for (let i = 0; i < lenh.length; i += 150) await env.DB.batch(lenh.slice(i, i + 150))
   return ra({
     ok: true, soCa: soLuotGiao, caRong, soEm: emDaCo.size, soCau, soDe: dsMaDe.length, hanNop,
+    ...(soBoTuLuan > 0 ? { soBoTuLuan, chuBoTuLuan: chuBaoBoTuLuan(soBoTuLuan) } : {}),
     ...(baiCaNhan
       ? { caNhan: true, soLoi: baiCaNhan.loi.length, hatGiong, boQuaQid: baiCaNhan.boQuaQid, thieuMeta: baiCaNhan.thieuMeta, ...(baiCaNhan.canhBao ? { canhBao: baiCaNhan.canhBao } : {}) }
       : caNhanBiTat ? { caNhan: false, caNhanBiTat: true } : {}),
@@ -2205,7 +2213,7 @@ async function rutCau(env: Env, b: Record<string, unknown>): Promise<Response> {
 
   const oCd = ds.map(() => '?').join(',')
   const r = await env.DB.prepare(
-    `SELECT c.qid, c.ma_de, c.chuyen_de, c.muc_do, c.phan
+    `SELECT c.qid, c.ma_de, c.chuyen_de, c.muc_do, c.phan, d.cap_nhat_luc AS phien_ban
        FROM cau_hoi c JOIN de_kho d ON d.ma_de = c.ma_de
       WHERE d.da_xoa = 0 AND c.chuyen_de IN (${oCd})
       LIMIT 2000`,
@@ -2213,13 +2221,26 @@ async function rutCau(env: Env, b: Record<string, unknown>): Promise<Response> {
     .bind(...ds)
     .all<Record<string, unknown>>()
 
-  const con = (r.results ?? []).filter((x) => !boQua.has(String(x.qid ?? '')))
+  const con0 = (r.results ?? []).filter((x) => !boQua.has(String(x.qid ?? '')))
+  // CẤM RÚT TỰ LUẬN (21/09): chỉ mục `cau_hoi` không có đáp án nên phải nhìn gói của tờ (đệm theo phiên bản tờ). Duyệt theo thứ tự cũ, chỉ mở những tờ cần cho đủ `soCau`;
+  // không đọc được gói ⇒ không biết ⇒ giữ câu (không kết tội). Các dòng chưa duyệt tính là còn dùng được (số `coSan` chỉ có thể lệch cao vài câu, không bao giờ trả tự luận).
+  const chon: Record<string, unknown>[] = []
+  const tuLuanTheoTo = new Map<string, Set<string> | null>()
+  let soBoTuLuan = 0
+  for (const x of con0) {
+    if (chon.length >= soCau) break
+    const maDe = String(x.ma_de ?? '')
+    if (!tuLuanTheoTo.has(maDe)) tuLuanTheoTo.set(maDe, await qidTuLuanCuaTo(env, maDe, String(x.phien_ban ?? '')))
+    if (tuLuanTheoTo.get(maDe)?.has(String(x.qid ?? ''))) { soBoTuLuan++; continue }
+    chon.push(x)
+  }
   return ra({
     ok: true,
     // Nói rõ kho còn bao nhiêu câu dùng được: hứa 40 câu mà kho chỉ có 12 thì
     // phải nói ra, không im lặng trả 12.
-    coSan: con.length,
-    ds: con.slice(0, soCau).map((x) => ({
+    coSan: con0.length - soBoTuLuan,
+    ...(soBoTuLuan > 0 ? { soBoTuLuan } : {}),
+    ds: chon.map((x) => ({
       qid: String(x.qid ?? ''),
       maDe: String(x.ma_de ?? ''),
       chuyenDe: String(x.chuyen_de ?? ''),

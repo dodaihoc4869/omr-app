@@ -4,6 +4,7 @@ import {ghiSuKien,suKienChamBai,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
 import {sbdCuaPhuHuynh} from './ph-truy-cap'
+import {chiGiuCauRutDuoc} from './cam-tu-luan'
 
 type Question = Record<string, unknown>
 type Row = {sbd:string;id:string;title:string;created_at:string;question_count:number;bank_key:string;started_at:string|null;submitted_at:string|null;answers:string;result:string|null}
@@ -36,8 +37,11 @@ export async function mom(env:Env,action:string,b:Record<string,unknown>,opts:{n
   if(action==='create'){
     if(r)return {ok:true,item:item(r)} // Gửi lại sau mất mạng không tạo trùng hoặc ghi đè bài đã làm.
     if(await maDaDung(env,'mom',id))throw new Error('Mã bài đã từng dùng. Tạo lại bài với mã khác.') // tập mã nạp lúc reset 21/09: nháp trong máy em khoá theo mã bài
-    const q=(Array.isArray(b.dsCau)?b.dsCau:[]) as Question[]
-    if(!q.length||q.length>2000||q.some(c=>!c||typeof c!=='object'))throw new Error('Nội dung bài không hợp lệ.')
+    const tho=(Array.isArray(b.dsCau)?b.dsCau:[]) as Question[]
+    if(!tho.length||tho.length>2000||tho.some(c=>!c||typeof c!=='object'))throw new Error('Nội dung bài không hợp lệ.')
+    // CẤM RÚT TỰ LUẬN (21/09): máy phụ huynh tự chọn câu rồi gửi lên — máy chủ là lớp chặn cuối. Chỉ giữ câu trắc nghiệm / đúng sai / trả lời ngắn.
+    const {giu:q,soBo:soBoTuLuan}=chiGiuCauRutDuoc(tho)
+    if(!q.length)throw new Error('Bài này chỉ có câu tự luận nên chưa tạo được. Thầy chỉ giao câu trắc nghiệm, đúng sai và trả lời ngắn.')
     const json=JSON.stringify(q);if(json.length>8_000_000)throw new Error('Bài quá lớn. Vui lòng chia thành các bài nhỏ hơn.')
     const key=`mom/${encodeURIComponent(sbd)}/${id}/${crypto.randomUUID()}.json`
     await env.DE.put(key,json)
@@ -49,7 +53,7 @@ export async function mom(env:Env,action:string,b:Record<string,unknown>,opts:{n
       await env.DB.prepare('INSERT OR IGNORE INTO mom_bai(sbd,id,title,created_at,question_count,bank_key) VALUES(?,?,?,?,?,?)').bind(sbd,id,tieuDe,created,q.length,key).run()}
     r=await env.DB.prepare('SELECT * FROM mom_bai WHERE sbd=? AND id=?').bind(sbd,id).first<Row>()
     if(!r)throw new Error('Chưa lưu được bài. Vui lòng thử lại.')
-    return {ok:true,item:item(r)}
+    return {ok:true,item:item(r),...(soBoTuLuan?{soBoTuLuan}:{})}
   }
   if(!r)throw new Error('Bài chưa được gửi lên máy chủ. Phụ huynh vui lòng mở lại app để đồng bộ bài cũ.')
   if(action==='start'){

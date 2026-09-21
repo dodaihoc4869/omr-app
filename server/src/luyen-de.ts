@@ -7,6 +7,7 @@ import { parseKhoDeJson, buildTeacherSourceFromKhoDe } from '../../src/lib/exam-
 import { mergeAndStrip, type TeacherExamSource } from '../../src/data/examContent'
 import { rutDeChuan2026, SO_CAU_CHUAN_2026, laBoDe12, MA_TRAN_HOA_2026 } from '../../src/lib/ma-tran-hoa-2026'
 import { normalizeNumericAnswer } from '../../src/engine/score'
+import { laCauTuLuan } from './cam-tu-luan'
 
 type Row = { id:string;sbd:string;created_at:number;deadline:number;status:string;bank_key:string;answers:string;result:string|null }
 const read = async(env:Env,key:string):Promise<TeacherExamSource[]> => {
@@ -55,7 +56,8 @@ export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):P
           const kept=[]
           for(const q of s[`phan${phan}`]){
             const group=await contentGroup({phan,text:q.text,choices:'choices' in q?q.choices:[],ideas:'ideas' in q?q.ideas:[],table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,choiceImgs:'choiceImgs' in q?q.choiceImgs:undefined,ideaImgs:'ideaImgs' in q?q.ideaImgs:undefined,hinhAnh:q.hinhAnh||[]} as unknown as Parameters<typeof contentGroup>[0])
-            if(!blocked.has(group)&&!blocked.has(q.id))kept.push(q)
+            // CẤM RÚT TỰ LUẬN (21/09): đề luyện chỉ ghép câu trắc nghiệm / đúng sai / trả lời ngắn.
+            if(!blocked.has(group)&&!blocked.has(q.id)&&!laCauTuLuan(q,phan))kept.push(q)
           }
           ;(s[`phan${phan}`] as unknown[])=kept
         }

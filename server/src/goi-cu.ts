@@ -4,6 +4,7 @@ import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
 import {docBoCuaCacEm,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
 import { hopLe3DangChuan } from './loc-cau-chuan'
+import { goTuLuanKhoiGoi, laCauTuLuan, locPhieuBaiTap, type PhanCau } from './cam-tu-luan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
 // Thầy chốt 12/09 rạng sáng: "gỡ sạch google, toàn bộ app phải được chạy trên
@@ -496,13 +497,16 @@ export async function luuPhieu(env: Env, b: Record<string, unknown>): Promise<Re
   if (!ma) return { ok: false, error: 'Thiếu mã phiếu' }
   if (!env.DE) return { ok: false, error: 'Chưa nối R2 — chưa lưu phiếu được' }
   const nay = NAY()
+  const loai = chuoi(b.loai) || 'ketqua'
+  // CẤM RÚT TỰ LUẬN (21/09): PHIẾU BÀI TẬP chỉ chứa câu trắc nghiệm / đúng sai / trả lời ngắn. Phiếu kết quả (báo cáo bài đã thi) không phải rút đề ⇒ không đụng.
+  const phieu = loai === 'baitap' ? locPhieuBaiTap(b.phieu ?? null).phieu : (b.phieu ?? null)
   const goi = {
     ma,
     maCa: chuoi(b.maCa),
     sbd: chuoi(b.sbd),
     hoTen: chuoi(b.hoTen),
-    loai: chuoi(b.loai) || 'ketqua',
-    phieu: b.phieu ?? null,
+    loai,
+    phieu,
     ghiLuc: nay,
   }
   await env.DE.put(`phieu/${ma}.json`, JSON.stringify(goi))
@@ -545,7 +549,8 @@ export async function layPhieu(env: Env, b: Record<string, unknown>): Promise<Re
   }
   if (!goi || goi.thuHoi === true || goi.phieu === null) return { ok: false, error: 'Không tìm thấy phiếu' }
   await env.DB.prepare('UPDATE phieu SET so_lan_xem = so_lan_xem + 1 WHERE ma = ?').bind(ma).run().catch(() => {})
-  return { ok: true, phieu: goi.phieu }
+  // CẤM RÚT TỰ LUẬN (21/09): phiếu bài tập ĐÃ LƯU từ trước lệnh cấm vẫn có thể còn câu tự luận — lọc lúc phục vụ (lớp cuối).
+  return { ok: true, phieu: goi.loai === 'baitap' ? locPhieuBaiTap(goi.phieu).phieu : goi.phieu }
 }
 
 export async function xoaPhieu(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
@@ -2268,9 +2273,15 @@ async function goiTheoDang(
     }
     if (!goi) continue
     const gom: any[] = Array.isArray(goi.cau) ? goi.cau : []
-    for (const k of ['phanI', 'phanII', 'phanIII']) if (Array.isArray(goi[k])) gom.push(...goi[k])
+    const phanMacDinh = new Map<unknown, PhanCau>() // nguồn thầy (phanI/II/III) không mang `phan` trong từng câu
+    for (const [k, p] of [['phanI', 'I'], ['phanII', 'II'], ['phanIII', 'III']] as const) {
+      if (!Array.isArray(goi[k])) continue
+      gom.push(...goi[k])
+      for (const it of goi[k]) phanMacDinh.set(it, p)
+    }
     for (const c of gom) {
       if (!c || typeof c !== 'object') continue
+      if (laCauTuLuan(c, phanMacDinh.get(c))) continue // CẤM RÚT TỰ LUẬN (21/09): khắc phục theo dạng chỉ ra câu trắc nghiệm / đúng sai / trả lời ngắn
       const ma = maDang(c.dang)
       if (!ma || !x.dsDang.has(ma)) continue
       const qid = chuoi(c.qid ?? c.id) || `${maDe}-${chuoi(c.phan).toUpperCase()}-${chuoi(c.so)}`
@@ -2398,27 +2409,30 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
   }
   const xepDe = [...theoDe.entries()].sort((a, c) => c[1].length - a[1].length).slice(0, 8)
 
+  // CẤM RÚT TỰ LUẬN (21/09): `cau_hoi` không có cột đáp án nên không lọc được bằng SQL — đọc gói của từng tờ TRƯỚC khi chốt thứ tự, gỡ câu tự luận khỏi gói
+  // (và khỏi `thuTu`). Vẫn chỉ đọc những tờ cần cho đủ `soCau`, theo đúng thứ tự cũ.
   const thuTu: string[] = []
-  for (const [, qids] of xepDe) {
-    for (const q of qids) {
-      if (thuTu.length >= soCau) break
-      thuTu.push(q)
-    }
-    if (thuTu.length >= soCau) break
-  }
-
   const items: unknown[] = []
-  if (env.DE) {
-    for (const [maDe] of xepDe) {
-      if (!thuTu.some((q) => (theoDe.get(maDe) ?? []).includes(q))) continue
-      const o = await env.DE.get(`kho/${maDe}.json`)
-      if (!o?.body) continue
+  for (const [maDe, qids] of xepDe) {
+    if (thuTu.length >= soCau) break
+    let goi: unknown = null
+    if (env.DE) {
       try {
-        items.push(await new Response(o.body).json())
+        const o = await env.DE.get(`kho/${maDe}.json`)
+        if (o?.body) goi = await new Response(o.body).json()
       } catch {
         // Gói hỏng thì BỎ QUA gói ấy, không làm chết cả lượt rút.
       }
     }
+    const bo = goi ? goTuLuanKhoiGoi(goi, maDe).qidBo : new Set<string>()
+    let lay = 0
+    for (const q of qids) {
+      if (thuTu.length >= soCau) break
+      if (bo.has(q)) continue
+      thuTu.push(q)
+      lay++
+    }
+    if (goi && lay > 0) items.push(goi)
   }
 
   return {
@@ -2435,8 +2449,11 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
 export async function ghiPhieuKhacPhuc(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const sbd = chuoi(b.sbd).trim()
   if (!sbd) return { ok: false, error: 'Thiếu số báo danh' }
-  const cau = Array.isArray(b.cau) ? (b.cau as unknown[]) : []
-  if (cau.length === 0) return { ok: false, error: 'Phiếu không có câu nào' }
+  const cauTho = Array.isArray(b.cau) ? (b.cau as unknown[]) : []
+  if (cauTho.length === 0) return { ok: false, error: 'Phiếu không có câu nào' }
+  // CẤM RÚT TỰ LUẬN (21/09): máy em gửi câu lên để lập phiếu — chỉ giữ câu trắc nghiệm / đúng sai / trả lời ngắn.
+  const cau = locPhieuBaiTap({ cau: cauTho }).phieu.cau
+  if (cau.length === 0) return { ok: false, error: 'Phiếu chỉ có câu tự luận nên chưa lập được' }
   const ma = maNgauNhien()
   const r = await luuPhieu(env, {
     ma,
@@ -3318,7 +3335,9 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
   })
 
   // KHÓA VĨNH VIỄN CÂU TỰ LUẬN — CHỈ RÚT 3 DẠNG CHUẨN (I, II, III)
+  // Thêm 21/09: cùng MỘT định nghĩa của thầy (`cam-tu-luan.ts`) đứng cạnh luật 3 dạng chuẩn (chặt hơn ở phần III, giữ nguyên).
   const itemsHopLe = items.filter((q) =>
+    !laCauTuLuan(q) &&
     hopLe3DangChuan({
       phan: q.phan,
       text: q.text,
@@ -3607,7 +3626,9 @@ export async function deTheoDangBai(env: Env, b: Record<string, unknown>): Promi
   const o = await env.DE.get(`kho/${ma}.json`)
   if (!o?.body) return { ok: false, error: 'Gói đề của dạng bài này không còn trên máy chủ.' }
   try {
-    return { ok: true, de: await new Response(o.body).json() }
+    const de = await new Response(o.body).json()
+    goTuLuanKhoiGoi(de, ma) // CẤM RÚT TỰ LUẬN (21/09): tờ dạng bài trả cho máy em chỉ còn câu trắc nghiệm / đúng sai / trả lời ngắn
+    return { ok: true, de }
   } catch {
     return { ok: false, error: 'Gói đề của dạng bài này hỏng, không đọc được.' }
   }

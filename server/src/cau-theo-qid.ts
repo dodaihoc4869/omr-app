@@ -12,6 +12,7 @@ import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
+import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 
 export const TOI_DA_QID_MOT_LUOT = 20
 export const DAI_QID_TOI_DA = 120
@@ -38,20 +39,28 @@ export interface PhucVuDuoc {
   /** Lý do loại, để đo: qid không có trong chỉ mục / qid bị đề bảo vệ. */
   khongCoChiMuc: string[]
   biBaoVe: string[]
+  /** qid là câu TỰ LUẬN (cấm rút, 21/09): không bao giờ vào `duoc`. */
+  tuLuan: string[]
 }
 
 /** Trong các `qids`, những qid PHỤC VỤ ĐƯỢC (không đọc nội dung, không cần R2 ngoài phạm vi bảo vệ đã có đệm). Không ném lỗi. */
 export async function qidPhucVuDuoc(env: Env, qids: string[]): Promise<PhucVuDuoc> {
   const xin = [...new Set(qids.filter((q) => q !== ''))]
-  const ra: PhucVuDuoc = { duoc: new Set(), kiemDuocBaoVe: true, khongCoChiMuc: [], biBaoVe: [] }
+  const ra: PhucVuDuoc = { duoc: new Set(), kiemDuocBaoVe: true, khongCoChiMuc: [], biBaoVe: [], tuLuan: [] }
   if (xin.length === 0) return ra
   const nhom = new Map<string, string>()
+  const tuLuan = new Set<string>()
   // Chia mỗi 800 qid một truy vấn: một tham số JSON nhưng không để chuỗi phình vô hạn khi cả lô 50 em có hàng nghìn câu tới hạn.
   for (let i = 0; i < xin.length; i += 800) {
-    const rc = await env.DB.prepare(`SELECT q.qid, q.content_group ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(xin.slice(i, i + 800))).all<{ qid: string; content_group: string }>()
-    for (const x of rc.results ?? []) if (!nhom.has(String(x.qid))) nhom.set(String(x.qid), String(x.content_group))
+    const rc = await env.DB.prepare(`SELECT q.qid, q.content_group, q.json ${TU_CHI_MUC_GAME}`).bind(JSON.stringify(xin.slice(i, i + 800))).all<{ qid: string; content_group: string; json: string }>()
+    for (const x of rc.results ?? []) {
+      // CẤM RÚT TỰ LUẬN (21/09): câu tự luận em từng sai vẫn ở hồ sơ, nhưng KHÔNG phục vụ lại — không vào kế hoạch ôn, không lấy được đề.
+      if (jsonLaTuLuan(x.json)) { tuLuan.add(String(x.qid)); continue }
+      if (!nhom.has(String(x.qid))) nhom.set(String(x.qid), String(x.content_group))
+    }
   }
-  ra.khongCoChiMuc = xin.filter((q) => !nhom.has(q))
+  ra.tuLuan = xin.filter((q) => tuLuan.has(q) && !nhom.has(q))
+  ra.khongCoChiMuc = xin.filter((q) => !nhom.has(q) && !tuLuan.has(q))
   let baoVe: Set<string> | null = null
   try {
     baoVe = await protectedQuestions(env)
@@ -117,6 +126,7 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[]): Promise
   for (const x of rc.results ?? []) {
     try {
       const q = JSON.parse(x.json) as PrivateQuestion
+      if (laCauTuLuan(q)) continue // CẤM RÚT TỰ LUẬN (21/09): em từng gặp cũng không lấy lại đề (chung một cửa với `/hs/on-lai/nop`)
       if (q?.qid && !theoQid.has(q.qid)) theoQid.set(q.qid, q)
     } catch { /* dòng hỏng: bỏ */ }
   }
@@ -188,6 +198,7 @@ export async function docDoPhuPhucVu(env: Env, homNay: string): Promise<Record<s
     qidPhucVuDuoc: pv.duoc.size,
     qidKhongCoChiMuc: chetChiMuc.size,
     qidBiDeBaoVe: chetBaoVe.size,
+    qidTuLuan: pv.tuLuan.length, // cấm rút tự luận: câu tự luận tới hạn ôn nhưng KHÔNG phục vụ (vẫn ở hồ sơ)
     tiLeQidKhongPhucVuPhanTram: pt(tongQid - pv.duoc.size, tongQid),
     capEmQid: cap.length,
     capEmQidKhongPhucVu: capChet,

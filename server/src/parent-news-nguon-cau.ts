@@ -11,6 +11,7 @@ import { chuoiLoiGiai } from './goi-cu'
 import { protectedQuestions } from './game-v2-bank'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { hopLe3DangChuan } from './loc-cau-chuan'
+import { laCauTuLuan } from './cam-tu-luan'
 import {
   chonCauChoPhuHuynh, chuyenDeCuaDang, SO_NGAY_KHONG_GIAO_LAI, type CauChon, type CauToiHan, type NguonCau, type UngVien,
 } from './parent-news-chon-cau'
@@ -57,6 +58,7 @@ const CHON_CAU_KHO = `SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.m
 /** Câu dùng được cho bài hằng ngày: đã duyệt, đúng 3 dạng chuẩn, không thuộc đề thi đang bảo vệ, không có hình rời (Mom chưa vẽ). */
 export function dungDuoc(q: PrivateQuestion, baoVe: ReadonlySet<string>): boolean {
   if (!q.reviewed || baoVe.has(q.qid) || baoVe.has(q.group)) return false
+  if (laCauTuLuan(q)) return false // CẤM RÚT TỰ LUẬN (21/09): luật chung của thầy, đứng TRƯỚC luật 3 dạng chuẩn (chặt hơn, giữ nguyên) bên dưới
   if ((q.hinhAnh ?? []).some((h) => h.viTri !== 'sau_loi_giai')) return false
   return hopLe3DangChuan({ phan: q.phan, text: q.text, dapAnDung: q.correct, choices: q.choices, ideas: q.ideas, maDe: q.maDe })
 }

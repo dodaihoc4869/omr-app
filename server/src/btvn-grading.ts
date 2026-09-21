@@ -1,4 +1,5 @@
 import type { Env } from './kieu'
+import { laCauTuLuan, laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 
 export function answerText(v: unknown): string {
   if (v === null || v === undefined) return ''
@@ -113,7 +114,7 @@ export function gradeHomework(keys: Map<string, string>, raw: Record<string, unk
 export async function homeworkQuestions(env: Env, maDe: string) {
   const out: Record<string, unknown>[] = []; const seen = new Set<string>(); const cache = new Map<string, Record<string, unknown>[]>()
   for (const ma of maDe.split(',').map(x => x.trim()).filter(Boolean)) {
-    if (/(?:-VD|-DT)(?:-|$)/i.test(ma)) continue
+    if (laMaDeTuLuan(ma)) continue // -VD / -DT (mục dạy học) và -TL (tự luận): một định nghĩa dùng chung (src/lib/cau-tu-luan.ts)
     const match = ma.match(/-(TN|DS|TLN)$/), goc = match ? ma.slice(0, -match[0].length) : ma
     const phan = match ? ({ TN: 'I', DS: 'II', TLN: 'III' } as Record<string, string>)[match[1]] : null
     if (!cache.has(goc)) {
@@ -123,8 +124,9 @@ export async function homeworkQuestions(env: Env, maDe: string) {
     }
     for (const c of cache.get(goc) || []) {
       if (phan && c.phan !== phan) continue
-      const da = String(c.dap_an ?? c.dapAn ?? '').trim()
-      if (c.phan === 'III' && ((da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da))) continue
+      // CẤM RÚT TỰ LUẬN (21/09): luật cũ (phần III đáp án dài / nhiều dòng) nay là MỘT phần của định nghĩa dùng chung — thêm: phần III không đáp án hoặc hỏi mở,
+      // phần I thiếu phương án, phần II thiếu ý. Trên 4 tờ kho thật (299 câu) hai luật bỏ đúng cùng những câu (test khoá).
+      if (laCauTuLuan(c)) continue
       const qid = `${goc}-${c.phan}-${c.so}`; if (seen.has(qid)) continue; seen.add(qid); out.push({ ...c, qid })
     }
   }

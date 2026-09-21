@@ -197,7 +197,9 @@ describe('CHỌN ĐỀ Y NHƯ MÀN MỞ CA', () => {
 
   it('giao bài ĐẾM CÂU THẬT theo phần, không lấy tổng cả tờ làm số câu một phần', () => {
     const han = WK.slice(WK.indexOf('async function giaoBtvn('), WK.indexOf('/** EM MỞ BÀI TẬP CỦA MÌNH.'))
-    expect(han).toContain("cau.filter((c) => String(c.phan ?? '') === phan).length")
+    // 21/09 (cấm rút tự luận): đếm theo phần vẫn là `cau.filter(phan)`, nhưng đếm SAU khi bỏ câu tự luận (`locCauRutDuoc`) để số câu = số câu em thật sự được giao.
+    expect(han).toContain("cau.filter((c) => String(c.phan ?? '') === phan)")
+    expect(han).toContain('locCauRutDuoc(')
     expect(han).toContain('Những tờ đã tick không có câu nào')
   })
 

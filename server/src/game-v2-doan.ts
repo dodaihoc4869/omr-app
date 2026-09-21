@@ -18,6 +18,7 @@ import {
 } from '../../src/game/than-thu-v2/doan-core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
 import { protectedQuestions } from './game-v2-bank'
+import { laCauTuLuan } from './cam-tu-luan'
 import { readGameScope } from './game-v2-reports'
 import { qidChanHomNay } from './game-v2-ho-so'
 import { ngayVn } from './su-kien-hoc'
@@ -128,7 +129,10 @@ async function luuPhong(env: Env, ma: string, p: PhongDoan, revision: number): P
 async function cauRieng(env: Env, ref: Pick<CauRef, 'qid' | 'maDe' | 'version'>): Promise<PrivateQuestion | null> {
   const row = await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc
     WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`).bind(ref.maDe, ref.qid, ref.version).first<{ json: string }>()
-  return row ? JSON.parse(row.json) as PrivateQuestion : null
+  // CẤM RÚT TỰ LUẬN (21/09): phòng tạo trước lệnh cấm còn ghim câu tự luận ⇒ coi như câu đã rút khỏi kho (đường `rut: true` sẵn có, hiệp không bị tính sai).
+  if (!row) return null
+  const q = JSON.parse(row.json) as PrivateQuestion
+  return laCauTuLuan(q) ? null : q
 }
 
 /** Xếp 6 câu máy chủ đã chọn: tới hạn ôn → dạng đang yếu → còn lại (giữ thứ tự của chooseSession trong từng nhóm). Thiếu bảng hồ sơ → nhãn trung tính. */
@@ -200,7 +204,7 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
   const r = await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc
     WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${cho(ds.length)}) AND json_extract(q.json,'$.phan')='II' LIMIT 400`).bind(...ds).all<{ json: string }>()
   const ungVien = r.results.map(x => JSON.parse(x.json) as PrivateQuestion)
-    .filter(q => q.reviewed && /^[DS]{4}$/.test(q.correct) && q.ideas.length === SO_Y_TRUM && !chan.has(q.qid) && !chan.has(q.group)
+    .filter(q => q.reviewed && !laCauTuLuan(q) && /^[DS]{4}$/.test(q.correct) && q.ideas.length === SO_Y_TRUM && !chan.has(q.qid) && !chan.has(q.group)
       && q.kienThuc.length > 0 && q.kienThuc.every(k => ktBiet.get(q.dang!)!.has(k)))
     .sort((a, b) => (yeu.get(b.dang ?? '') ?? 0) - (yeu.get(a.dang ?? '') ?? 0) || hashSeed(`${ma}|${a.qid}`) - hashSeed(`${ma}|${b.qid}`) || a.qid.localeCompare(b.qid))
   const mot = ungVien[0]; if (!mot) return { trum, giaoY }

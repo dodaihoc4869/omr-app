@@ -14,6 +14,7 @@ import {khienConLai,khienRenChuaDung} from './exp-ho-so-game'
 import {MANH_MOI_KHIEN} from './exp-cau-hinh'
 import type {KhienRen} from './exp-hoc-tap'
 import {syncAcademic,type Academic,academicDay} from './game-v2-academic'
+import {laCauTuLuan,jsonLaTuLuan} from './cam-tu-luan'
 import {masteryTheoHoSo,qidChanHomNay} from './game-v2-ho-so'
 import {ghiSuKien} from './su-kien-hoc'
 import {doanAction,laGoiNoiBoDoan,doanMoCho} from './game-v2-doan'
@@ -51,7 +52,18 @@ async function attempts(env:Env,sbd:string){const r=await env.DB.prepare('SELECT
 async function currentQuestion(env:Env,q:{qid:string;maDe:string;version:string}){
   const row=await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`).bind(q.maDe,q.qid,q.version).first<{json:string}>()
   if(!row)throw new Error('Câu đã được sửa hoặc rút khỏi kho. Em mở lượt mới; lượt này không bị tính sai.')
-  return JSON.parse(row.json) as PrivateQuestion
+  const cau=JSON.parse(row.json) as PrivateQuestion
+  // CẤM RÚT TỰ LUẬN (21/09): lượt đã tạo trước lệnh cấm mà còn câu tự luận thì đóng như câu rút khỏi kho — không phục vụ, không chấm.
+  if(laCauTuLuan(cau))throw new Error('Câu đã được sửa hoặc rút khỏi kho. Em mở lượt mới; lượt này không bị tính sai.')
+  return cau
+}
+/** Các qid trong LƯỢT mà hiện là TỰ LUẬN (lượt soạn trước lệnh cấm 21/09). MỘT truy vấn theo (qid, version); không thấy dòng ⇒ không kết tội. */
+async function qidTuLuanTrongLuot(env:Env,refs:{qid:string;version:string}[]):Promise<Set<string>>{
+  const ra=new Set<string>();if(!refs.length)return ra
+  const r=await env.DB.prepare('SELECT q.qid,q.version,q.json FROM game_v2_question q WHERE q.qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(refs.map(x=>x.qid))).all<{qid:string;version:string;json:string}>()
+  const can=new Set(refs.map(x=>`${x.qid}|${x.version}`))
+  for(const x of r.results)if(can.has(`${x.qid}|${x.version}`)&&jsonLaTuLuan(x.json))ra.add(x.qid)
+  return ra
 }
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
   const sbd=await gameIdentity(env,b)
@@ -71,7 +83,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     // ĐỌC-CHỈ cho Sổ tay dạng bài của Đảo thần thú: mọi dạng em ĐƯỢC PHÉP làm (đúng phạm vi của `start`: readScope + allowed + đề bảo vệ + phạm vi thầy đặt). `key` = q.dang ?? q.group như `advance` dùng.
     const scope=await readScope(env,sbd),blocked=await protectedQuestions(env),control=await readGameScope(env,sbd);for(const k of control.blocked)blocked.add(k)
     const ds=new Map<string,{key:string;ten:string;chuong:string}>()
-    for(const q of scope.pool){if(!q.reviewed||!allowed(q,scope.evidence,blocked)||control.types.length&&(!q.dang||!control.types.includes(q.dang)))continue;const key=q.dang??q.group;if(!ds.has(key))ds.set(key,{key,ten:q.tenDang||'',chuong:q.dang?.split('.')[0]??''})}
+    for(const q of scope.pool){if(!q.reviewed||laCauTuLuan(q)||!allowed(q,scope.evidence,blocked)||control.types.length&&(!q.dang||!control.types.includes(q.dang)))continue;const key=q.dang??q.group;if(!ds.has(key))ds.set(key,{key,ten:q.tenDang||'',chuong:q.dang?.split('.')[0]??''})}
     return {ok:true,dang:[...ds.values()].sort((a,b)=>a.key.localeCompare(b.key))}
   }
   if(action==='rename'){if(p.choice)throw new Error('Em chọn thần thú trước khi đặt tên.');p.nickname=normalizePetName(b.name);return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}}
@@ -107,7 +119,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const tNow=Date.now()
     for(const qid of await qidChanHomNay(env,sbd,tNow))blocked.add(qid)
     const history=await attempts(env,sbd)
-    const eligible=scope.pool.filter(q=>allowed(q,scope.evidence,blocked)&&(control.types.length===0||q.dang!==null&&control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
+    const eligible=scope.pool.filter(q=>!laCauTuLuan(q)&&allowed(q,scope.evidence,blocked)&&(control.types.length===0||q.dang!==null&&control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
     if(guardian){
       const saved=await env.DB.prepare("SELECT id,json FROM game_v2_session WHERE sbd=? AND json_extract(json,'$.guardian')=? AND json_extract(json,'$.guardianRound')=? ORDER BY created_at DESC LIMIT 1").bind(sbd,guardian,guardianRound).first<{id:string;json:string}>()
       if(saved){const old=JSON.parse(saved.json) as Session;const qs=old.questions.map(ref=>eligible.find(q=>q.qid===ref.qid&&q.version===ref.version));if(qs.every(Boolean)){const answered=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=?').bind(saved.id,sbd).all<{json:string}>();return {ok:true,id:saved.id,questions:qs.map(q=>publicQuestion(q!)),answered:answered.results.map(x=>JSON.parse(x.json))}}throw new Error('Câu của lượt này đã thay đổi phạm vi. Em chờ lượt mới.')}
@@ -130,7 +142,10 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const row=await env.DB.prepare("SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>? AND json_extract(json,'$.doan') IS NULL ORDER BY created_at DESC LIMIT 1").bind(sbd,new Date(Date.now()-2*3600000).toISOString()).first<{id:string;json:string}>()
     if(!row)return {ok:true,questions:[]}
     const session=JSON.parse(row.json) as Session;const blocked=await protectedQuestions(env);const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game.');for(const key of control.blocked)blocked.add(key);const qs=[]
-    for(const ref of session.questions){const q=await currentQuestion(env,ref);if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');qs.push(publicQuestion(q))}
+    // CẤM RÚT TỰ LUẬN (21/09): lượt soạn trước lệnh cấm mà còn câu tự luận ⇒ BỎ câu ấy khỏi lượt trả về (em làm nốt các câu còn lại, `complete` cũng chỉ đòi các câu này).
+    const tuLuan=await qidTuLuanTrongLuot(env,session.questions)
+    for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await currentQuestion(env,ref);if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');qs.push(publicQuestion(q))}
+    if(!qs.length)return {ok:true,questions:[]}
     const rows=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=? ORDER BY created_at').bind(row.id,sbd).all<{json:string}>()
     return {ok:true,id:row.id,questions:qs,mode:session.mode,answered:rows.results.map(x=>JSON.parse(x.json))}
   }
@@ -174,7 +189,9 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const id=String(b.session??'');const row=await env.DB.prepare('SELECT json FROM game_v2_session WHERE id=? AND sbd=?').bind(id,sbd).first<{json:string}>();if(!row)throw new Error('Không có lượt này.')
     const session=JSON.parse(row.json) as Session;const r=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=?').bind(id,sbd).all<{json:string}>()
     const done=r.results.map(x=>JSON.parse(x.json) as {attempt:Attempt})
-    if(done.length!==session.questions.length)throw new Error('Em cần hoàn thành các câu trong lượt.')
+    // CẤM RÚT TỰ LUẬN (21/09): câu tự luận còn sót trong lượt cũ không được đòi em làm; chỉ đếm các câu rút được.
+    const tuLuan=await qidTuLuanTrongLuot(env,session.questions)
+    if(done.filter(x=>!tuLuan.has(x.attempt.qid)).length!==session.questions.filter(x=>!tuLuan.has(x.qid)).length)throw new Error('Em cần hoàn thành các câu trong lượt.')
     if(session.mode==='tower'&&done.filter(x=>x.attempt.correct&&!x.attempt.assisted).length>=Math.ceil(done.length*.7)){
       const milestone=`${sbd}|tower|${id}`
       const res=await env.DB.batch([env.DB.prepare('INSERT OR IGNORE INTO game_v2_reward(id,sbd,amount,created_at) SELECT ?,?,0,? WHERE EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?)').bind(milestone,sbd,now(),sbd,revision),env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=? AND changes()=1').bind(JSON.stringify({...p,tower:Math.min(999,p.tower+1)}),sbd,revision)])

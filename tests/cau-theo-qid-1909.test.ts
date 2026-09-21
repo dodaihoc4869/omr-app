@@ -71,7 +71,8 @@ describe('không bao giờ lộ đáp án, lời giải hay trường lạ', () 
   it('giữ nội dung em cần để làm: thân câu, ý, bảng, ảnh thân câu, dạng, mức độ', async () => {
     const d = taoD1That()
     themHs(d, 'S1')
-    themCau(d, 'DE1', [cauKho('DE1-I-1', { phan: 'I', choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], table: [['x', 'y']], thanCauImg: 'than.png', imageDataUrl: 'data:x' })])
+    // 21/09 (cấm rút tự luận): câu phần I phải có đáp án A–D thì mới là trắc nghiệm rút được — fixture trước để đáp án bí mật dạng chuỗi (không phải A–D) nên nay bị coi tự luận. Chỉ đổi đáp án; mọi ràng buộc "không lộ" của tệp này giữ nguyên.
+    themCau(d, 'DE1', [cauKho('DE1-I-1', { phan: 'I', choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], table: [['x', 'y']], thanCauImg: 'than.png', imageDataUrl: 'data:x', correct: 'B' })])
     await daGap(d, 'S1', ['DE1-I-1'])
     const c = ((await goi(d, { sbd: 'S1', qid: ['DE1-I-1'] })).cau as Record<string, unknown>[])[0]!
     expect(c).toMatchObject({ qid: 'DE1-I-1', phan: 'I', choices: ['A. a', 'B. b', 'C. c', 'D. d'], table: [['x', 'y']], thanCauImg: 'than.png', dang: 'ES.A.X', mucDo: 'hieu' })
