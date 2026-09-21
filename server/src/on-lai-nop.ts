@@ -102,6 +102,14 @@ export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<
   return chamVaGhiTraLoi(env, b, TUY_CHON_ON_LAI)
 }
 
+/** Chấm một câu và, nếu Phần III bị chấm SAI, GHI LẠI chuỗi em gõ + đáp án lưu (chỉ nhật ký máy, không có mã em) để tìm ra kiểu gõ mà bộ chuẩn hoá còn bỏ sót (P0 "0,54" 21/09). */
+export function chamMotCau(x: { qid: string; dapAn: string }, q: { correct: string; phan: string }): boolean {
+  const phan = phanTuQid(x.qid, q.phan)
+  const dung = isAnswerCorrect(x.dapAn, q.correct, phan)
+  if (!dung && phan === 'III') console.warn('[cham-III-sai]', JSON.stringify({ qid: x.qid, em: x.dapAn, dung: q.correct, maEm: [...x.dapAn].map((c) => c.codePointAt(0)!.toString(16)).join(' ') }))
+  return dung
+}
+
 export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt: TuyChonNop): Promise<Record<string, unknown>> {
   // Không token / token sai / SBD trần đều bị từ chối. Lời báo đúng việc của đường này (em đang ÔN CÂU), không mượn lời của game.
   let sbd: string
@@ -136,7 +144,7 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
     const q = cauTheoQid.get(x.qid)!
     return {
       nguon: opt.nguon, maNguon, sbd, qid: x.qid, lan: 1, luc, giay: x.giay, maDang: q.dang, chuyenDe: '', mucDo: q.mucDo ?? '',
-      ketQua: isAnswerCorrect(x.dapAn, q.correct, phanTuQid(x.qid, q.phan)) ? 1 : 0, // đã qua `daTraLoi` nên không còn bỏ trống
+      ketQua: chamMotCau(x, q) ? 1 : 0, // đã qua `daTraLoi` nên không còn bỏ trống
     }
   })
   const ghi = await ghiSuKien(env, suKien)

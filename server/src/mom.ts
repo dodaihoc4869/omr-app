@@ -1,3 +1,4 @@
+import {soKhopSo} from '../../src/lib/cham-so'
 import {emCoGhi} from './dem-ke-hoach'
 import type {Env} from './kieu'
 import {gameIdentity} from './game-v2-auth'
@@ -12,7 +13,8 @@ type Row = {sbd:string;id:string;title:string;created_at:string;question_count:n
 export function gradeMom(q:Question[], answers:Record<string,string>) {
   // Giữ quy tắc bài khắc phục cũ: mỗi câu đúng trọn vẹn có cùng trọng số.
   const norm=(v:unknown)=>String(v??'').trim().toUpperCase()
-  const soCauDung=q.filter((c,i)=>norm(answers[String(c.id||`cau_${i+1}`)])===norm(c.dapAn||c.dapAnDung||'A')).length
+  // Phần III (đáp án số): MỘT bộ chuẩn hoá số dùng chung (src/lib/cham-so.ts, chính sách số học như bài về nhà) — trước đây chỉ so chuỗi in hoa nên "0,54" ≠ "0.54"; Phần I/II giữ nguyên.
+  const soCauDung=q.filter((c,i)=>{const e=answers[String(c.id||`cau_${i+1}`)],d=c.dapAn||c.dapAnDung||'A';return c.phan==='III'?soKhopSo(e,d,'so_hoc'):norm(e)===norm(d)}).length
   return {soCauDung,diem:Math.round(soCauDung/Math.max(1,q.length)*1000)/100}
 }
 /** Mã câu THẬT của một bài: `id`/`qid` không rỗng, bỏ `cau_N` (app tự đánh số, không định danh câu nào), khử trùng, giữ thứ tự. */

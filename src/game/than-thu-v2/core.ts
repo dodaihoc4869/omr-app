@@ -1,4 +1,4 @@
-import { normalizeNumericAnswer } from '../../engine/score'
+import { soKhopSo } from '../../lib/cham-so'
 import { cauHopKhoi, type Khoi } from '../../lib/khoi-cau'
 
 export const PETS = [
@@ -31,7 +31,7 @@ export function publicQuestion(q:PrivateQuestion):Question {
 }
 export function grade(q:Pick<PrivateQuestion,'phan'|'correct'>, answer:string):boolean {
   if(!answer.trim()) return false
-  return q.phan==='III' ? normalizeNumericAnswer(answer)===normalizeNumericAnswer(q.correct) : answer.trim().toUpperCase()===q.correct
+  return q.phan==='III' ? soKhopSo(answer,q.correct,'chat') : answer.trim().toUpperCase()===q.correct
 }
 export function allowed(q:Question, evidence:Evidence[], blocked:Set<string>):boolean {
   if(blocked.has(q.qid)||blocked.has(q.group)) return false

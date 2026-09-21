@@ -1,5 +1,6 @@
 import type { Env } from './kieu'
 import { laCauTuLuan, laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
+import { soKhopSo } from '../../src/lib/cham-so'
 
 export function answerText(v: unknown): string {
   if (v === null || v === undefined) return ''
@@ -46,27 +47,7 @@ export function isAnswerCorrect(v: string, d: string, phan: 'I' | 'II' | 'III' |
     return cleanV === cleanD
   }
 
-  if (phan === 'III') {
-    const sV = cleanShortAnswer(cleanV)
-    const sD = cleanShortAnswer(cleanD)
-    if (sV === sD) return true
-
-    const stripUnit = (str: string) => {
-      let r = str.replace(/^[+]/, '')
-      r = r.replace(/(gam|lit|lít|mol|cm3|dm3|kcal|kj|cal|amu|giay|phut|kg|ml|g|l|m|%|j|h|s)$/i, '')
-      return r.trim()
-    }
-    const uV = stripUnit(sV)
-    const uD = stripUnit(sD)
-    if (uV === uD) return true
-
-    const numV = Number(uV)
-    const numD = Number(uD)
-    if (!Number.isNaN(numV) && !Number.isNaN(numD)) {
-      return Math.abs(numV - numD) < 1e-4
-    }
-    return false
-  }
+  if (phan === 'III') return soKhopSo(v, d, 'so_hoc') // MỘT bộ chuẩn hoá số dùng chung (src/lib/cham-so.ts); chính sách số học 1e-4 của bài về nhà / ôn lại giữ nguyên
 
   return cleanV === cleanD
 }
