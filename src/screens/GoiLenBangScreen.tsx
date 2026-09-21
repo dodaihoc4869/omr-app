@@ -28,7 +28,6 @@ import { khuTrungNguon } from '../lib/khu-trung-cau'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import HopChonDe from '../components/HopChonDe'
-import NutQuayLai from '../components/NutQuayLai'
 import { baiLamTuCa, cauTuBanDe, daCoBaiLam, emTuCa, luotMoiNhat, rowsLopSai, type BanDeCa, type HoSoRutGon, type LuotCa } from '../lib/du-lieu-len-bang'
 import { rutDeChua } from '../lib/rut-de-chua'
 import { LOC_SAO_MAC_DINH, MOI_LOC_SAO, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
@@ -202,7 +201,6 @@ async function songSong<T, R>(ds: T[], soLuong: number, viec: (x: T) => Promise<
 }
 
 export default function GoiLenBangScreen() {
-  const setScreen = useAppStore((s) => s.setScreen)
   const showToast = useAppStore((s) => s.showToast)
 
   const [cauHinh, setCauHinh] = useState<{ url: string; mat: string } | null>(null)
@@ -359,7 +357,7 @@ export default function GoiLenBangScreen() {
       // CÂY. Nay hộp nhận kho đầy đủ; `bankTichTay` mới là chỗ khử trùng.
       setDeDaLuu(tachNhieuTheoPhan(kho))
       if (!url.trim() || !mat.trim()) {
-        setLoi('Chưa cấu hình địa chỉ máy chủ hoặc mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
+        setLoi('Chưa cấu hình địa chỉ máy chủ hoặc mã bí mật — vào Ngân hàng đề → Cấu hình (1 lần)')
         setDsCa([])
         return
       }
@@ -1507,7 +1505,6 @@ export default function GoiLenBangScreen() {
             </p>
           </div>
         </div>
-        <NutQuayLai onClick={() => setScreen('examhub')} label="Kiểm tra" />
       </div>
 
       {/* SEGMENTED SWITCHER CHUẨN GOOGLE MATERIAL 3 */}
