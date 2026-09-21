@@ -24,3 +24,12 @@ Trước: phụ huynh có 4 đường giao bài khác nhau, tự chọn → Sau:
 Số thật: tổng giao thêm tối đa 16 câu mỗi ngày, lượt đầu 4–10 câu; kiểm 6.000 tình huống, 0 lần vượt.
 
 *Việc nào đã lên máy chủ thật thì Boss hoặc Code 3 báo riêng; tệp này chỉ nói thuật toán đổi gì. "Em giả" là mô phỏng, con số tuyệt đối chỉ để so trước và sau.*
+
+## Tình trạng trên bản sống (Boss ghi, 21/09 13:13)
+| Việc | Đã sống chưa |
+|---|---|
+| 1.3 · Lịch chặng khi hạn rơi buổi trưa | ĐÃ SỐNG từ trưa 21/09 (máy chủ); em đã mở bài trước đó được dời lịch sớm hơn cho các chặng chưa mở |
+| 1.4 · Trần số câu khi hạn ngắn | ĐÃ SỐNG từ trưa 21/09 |
+| Lõi đúng bậc | ĐÃ SỐNG cho em mở bài từ 12:07 ngày 21/09; em mở trước đó giữ bộ cũ |
+| Thử thách riêng hôm nay | Máy chủ + thẻ ở app học sinh ĐÃ SỐNG; lời mời đầu tiên được nộp tối 21/09 sau khi Boss đọc bản xem trước |
+| Giao thêm bài cho con (phụ huynh) | CHƯA — thuật toán đã xong và soát; chờ lệnh máy chủ (Code 3) và nút ở app phụ huynh (Code 2) |
