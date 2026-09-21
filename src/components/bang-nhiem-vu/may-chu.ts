@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { donKhiDoiMocReset } from './don-moc-reset'
+import { taiThuThachHomNay } from './cau-on-api'
+import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import { dongGoiBanNho, laKeHoachNgayHopLe, phucHoiBanNho, type DuLieuBangNhiemVu, type KeHoachNgayMayChu } from '../../lib/nhiem-vu-adapter'
 
 export interface DinhDanh {
@@ -196,4 +198,26 @@ export function useBanNho(sbd: string | undefined, moi: DuLieuBangNhiemVu | null
     if (sbd && moi) luuBanNho(sbd, moi, Date.now())
   }, [sbd, moi])
   return nho
+}
+
+/**
+ * "Thử thách riêng hôm nay" của Bộ não (`POST /hs/thu-thach-hom-nay`): gọi khi có token và MỖI lần `lamMoi` đổi (đóng sheet làm bài ⇒ máy chủ trả trạng thái mới).
+ * `co:false` / lỗi / 404 (Worker chưa lên) / mất mạng ⇒ null ⇒ không thẻ, im lặng. Lần đầu trong ngày máy chủ CHỌN VÀ CHỐT câu; gọi lại trả đúng câu đã chốt.
+ */
+export function useThuThachHomNay(token: string | undefined, lamMoi: number): ThuThachRieng | null {
+  const [thuThach, setThuThach] = useState<ThuThachRieng | null>(null)
+  useEffect(() => {
+    if (!token) {
+      setThuThach(null)
+      return
+    }
+    let huy = false
+    void taiThuThachHomNay(token).then((t) => {
+      if (!huy) setThuThach(t)
+    })
+    return () => {
+      huy = true
+    }
+  }, [token, lamMoi])
+  return thuThach
 }

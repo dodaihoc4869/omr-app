@@ -5,6 +5,8 @@
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
 import TheBoNao from './TheBoNao'
 import TheCanhBaoThay from './TheCanhBaoThay'
+import TheThuThachRieng from './TheThuThachRieng'
+import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
@@ -129,6 +131,10 @@ export interface BangNhiemVuProps {
   canhBaoPh?: CanhBaoThay[]
   /** Em/phụ huynh bấm "Đã xem" (hoặc "Làm ngay") ở một cảnh báo ⇒ màn cha báo máy chủ. */
   onCanhBaoDaXem?: (cb: CanhBaoThay) => void
+  /** "Làm mấy câu này": mở màn ôn câu với đúng câu máy chủ chọn cho thử thách (nguồn `thu_thach_rieng`). Vắng ⇒ không dựng thẻ mời. */
+  onLamThuThach?: (t: ThuThachRieng) => void
+  /** "Để sau": màn cha nhớ ẩn thẻ tới ngày mai (thẻ biến mất khỏi `duLieu.thuThachRieng`). */
+  onDeSauThuThach?: (t: ThuThachRieng) => void
 }
 
 export default function BangNhiemVu({
@@ -155,6 +161,8 @@ export default function BangNhiemVu({
   boNaoPh,
   canhBaoPh,
   onCanhBaoDaXem,
+  onLamThuThach,
+  onDeSauThuThach,
 }: BangNhiemVuProps) {
   const laPh = vaiTro === 'phuhuynh'
   const choDong = useChoPhepChuyenDong()
@@ -380,38 +388,9 @@ export default function BangNhiemVu({
               )}
             </section>
 
-            {/* TheBoNao tự chọn phần theo vai: học sinh chỉ thấy lời của em, phụ huynh chỉ thấy lời + thư tuần (test bo-nao-the/bo-nao-bang khoá). */}
-            <TheBoNao vaiTro={vaiTro} hoTen={hoTen} now={now} hs={duLieu.boNao?.hs ?? null} ph={boNaoPh ?? null} />
-
-            {duLieu.exp && (
-              <section className="bnv-exp" aria-label={laPh ? 'EXP học tập hôm nay của con' : 'EXP học tập hôm nay'} data-vung="exp">
-                <div className="bnv-exp-hang">
-                  <span className="bnv-exp-so">
-                    <Zap size={18} aria-hidden="true" />
-                    <span>{laPh ? 'EXP hôm nay của con' : 'EXP hôm nay'}</span>
-                    <b>{duLieu.exp.homNay}</b>
-                  </span>
-                  {duLieu.exp.manhKhien && (
-                    <span className="bnv-exp-khien">
-                      <Shield size={18} aria-hidden="true" />
-                      <span>
-                        Mảnh khiên {duLieu.exp.manhKhien.manh}/{duLieu.exp.manhKhien.moiKhien}
-                        {duLieu.exp.manhKhien.khienConLai > 0 ? ` · ${duLieu.exp.manhKhien.khienConLai} khiên` : ''}
-                      </span>
-                    </span>
-                  )}
-                </div>
-                {duLieu.exp.chiTiet.length > 0 && (
-                  <details className="bnv-exp-ct">
-                    <summary>Chi tiết EXP hôm nay</summary>
-                    <ul>
-                      {duLieu.exp.chiTiet.map((c, i) => (
-                        <li key={`${c.loai}:${i}`}>{c.ghiChu}</li>
-                      ))}
-                    </ul>
-                  </details>
-                )}
-              </section>
+            {/* THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I, thầy chốt 21/09): ngay dưới thanh tiến độ, TRÊN việc hôm nay. Chỉ học sinh; không thử thách hợp lệ ⇒ không dựng. */}
+            {!laPh && duLieu.thuThachRieng && (duLieu.thuThachRieng.trangThai === 'xong' || (onLamThuThach && onDeSauThuThach)) && (
+              <TheThuThachRieng thuThach={duLieu.thuThachRieng} hoTen={hoTen} onLam={(t) => onLamThuThach?.(t)} onDeSau={(t) => onDeSauThuThach?.(t)} />
             )}
 
             {duLieu.trong ? (
@@ -467,6 +446,41 @@ export default function BangNhiemVu({
                 <DanhSachNhiemVu cacBac={duLieu.cacBac} docChi={laPh} onChon={chon} />
               </>
             )}
+            {/* H1 (rà soát dư thừa, Boss duyệt): việc hôm nay đứng NGAY dưới tiến độ; lời Bộ não + EXP hôm nay xuống dưới việc. */}
+            {/* TheBoNao tự chọn phần theo vai: học sinh chỉ thấy lời của em, phụ huynh chỉ thấy lời + thư tuần (test bo-nao-the/bo-nao-bang khoá). */}
+            <TheBoNao vaiTro={vaiTro} hoTen={hoTen} now={now} hs={duLieu.boNao?.hs ?? null} ph={boNaoPh ?? null} />
+
+            {duLieu.exp && (
+              <section className="bnv-exp" aria-label={laPh ? 'EXP học tập hôm nay của con' : 'EXP học tập hôm nay'} data-vung="exp">
+                <div className="bnv-exp-hang">
+                  <span className="bnv-exp-so">
+                    <Zap size={18} aria-hidden="true" />
+                    <span>{laPh ? 'EXP hôm nay của con' : 'EXP hôm nay'}</span>
+                    <b>{duLieu.exp.homNay}</b>
+                  </span>
+                  {duLieu.exp.manhKhien && (
+                    <span className="bnv-exp-khien">
+                      <Shield size={18} aria-hidden="true" />
+                      <span>
+                        Mảnh khiên {duLieu.exp.manhKhien.manh}/{duLieu.exp.manhKhien.moiKhien}
+                        {duLieu.exp.manhKhien.khienConLai > 0 ? ` · ${duLieu.exp.manhKhien.khienConLai} khiên` : ''}
+                      </span>
+                    </span>
+                  )}
+                </div>
+                {duLieu.exp.chiTiet.length > 0 && (
+                  <details className="bnv-exp-ct">
+                    <summary>Chi tiết EXP hôm nay</summary>
+                    <ul>
+                      {duLieu.exp.chiTiet.map((c, i) => (
+                        <li key={`${c.loai}:${i}`}>{c.ghiChu}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
+              </section>
+            )}
+
             <HangTonCu tonCu={duLieu.tonCu} docChi={laPh} onChon={(b) => onHanhDong?.(b.hanhDong)} />
             <DanhSachQuaHan viec={duLieu.quaHan} docChi={laPh} onChon={(q) => q.hanhDong && onHanhDong?.(q.hanhDong)} />
 

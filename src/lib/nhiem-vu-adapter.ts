@@ -5,6 +5,7 @@
 // của dữ liệu; ở đây chỉ gán bậc, tính cổng và chọn thẻ "Làm ngay".
 import { docBoNao, docBoNaoHocSinh, type BoNaoView } from './bo-nao-hien-thi'
 import { docCanhBaoThay, type CanhBaoThay } from './canh-bao-thay-hien-thi'
+import type { ThuThachRieng } from './thu-thach-rieng'
 import { chuSoCauCuaEm, dongPhuChang, tenBaiTapVeNha } from './btvn-ca-nhan-kieu'
 import { dinhDangConLai } from './tro-ly-ca-nhan'
 import { ngayVietNam } from './han-bai-tap'
@@ -121,6 +122,11 @@ export interface DuLieuBangNhiemVu {
    * (lời cho phụ huynh, xem bo-nao-lay-loi-ph.ts) chứ không qua đây. KHÔNG lưu vào bản nhớ: cảnh báo cũ có thể đã hết đúng (em vừa nộp).
    */
   canhBaoThay?: CanhBaoThay[]
+  /**
+   * "Thử thách riêng hôm nay" của Bộ não A.I: lời mời + câu do MÁY CHỦ chọn. Đến từ lệnh RIÊNG `POST /hs/thu-thach-hom-nay` (không nằm trong /hs/ke-hoach-ngay) nên
+   * adapter luôn để null; màn cổng học sinh gắn vào SAU (`docThuThachRieng`). null/vắng ⇒ KHÔNG thẻ. Không lưu vào bản nhớ. Phụ huynh chưa nhận gì ở Nấc 1.
+   */
+  thuThachRieng?: ThuThachRieng | null
 }
 
 export interface DuLieuExp {
@@ -349,6 +355,7 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     doanMo: false,
     boNao: null,
     canhBaoThay: [],
+    thuThachRieng: null,
   }, {
     // Nguồn trợ lý không có `tienBo.dat`: coi là đạt khi đã làm đủ mức gợi ý.
     dat: nganSach.mucTieuCau > 0 && nganSach.daLamCau >= nganSach.mucTieuCau,
@@ -667,6 +674,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     doanMo: keHoach.doanMo === true,
     boNao: (() => { const v = docBoNao(keHoach); return v.hs ? { hs: v.hs, ph: null } : null })(),
     canhBaoThay: docCanhBaoThay(keHoach.canhBaoThay),
+    thuThachRieng: null,
   }, { dat: keHoach.tienBo.dat === true && !expChuaDat, daLamCau: daLam, lenBac })
 }
 
@@ -805,6 +813,7 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
     doanMo: (d as any).doanMo === true,
     boNao: (() => { const hs = docBoNaoHocSinh((d as any).boNao?.hs); return hs ? { hs, ph: null } : null })(),
     canhBaoThay: [],
+    thuThachRieng: null,
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
     ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',

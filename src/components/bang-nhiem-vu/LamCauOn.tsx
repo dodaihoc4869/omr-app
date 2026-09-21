@@ -24,6 +24,10 @@ export interface LamCauOnProps {
   tieuDe?: string
   /** Bấm "Xong": đóng sheet về Bảng nhiệm vụ (màn cổng tự hỏi lại kế hoạch khi sheet đóng). */
   onXong: () => void
+  /** Câu ĐÃ CÓ (máy chủ đã trả công khai, không đáp án — vd "Thử thách riêng hôm nay"): bỏ bước lấy đề theo qid. Vắng = tải theo `qid` như ôn câu thường. */
+  cauSan?: CauOn[]
+  /** Đường nộp; vắng = `/hs/on-lai/nop`. "Thử thách riêng hôm nay" nộp qua `/hs/thu-thach-hom-nay/nop` (trả y hệt). */
+  duongNop?: string
 }
 
 type Pha = 'tai' | 'loi' | 'lam'
@@ -51,7 +55,7 @@ export function daTraLoi(c: CauOn, dapAn: string | undefined): boolean {
 
 const chuanDS = (s: string) => s.replace(/[Đđ]/g, 'D').toUpperCase().replace(/[^DS]/g, '')
 
-export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: LamCauOnProps) {
+export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauSan, duongNop }: LamCauOnProps) {
   const [pha, setPha] = useState<Pha>('tai')
   const [loiTai, setLoiTai] = useState('')
   const [cau, setCau] = useState<CauOn[]>([])
@@ -74,6 +78,13 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: La
   // ─── (1) lấy đề ───
   useEffect(() => {
     let huy = false
+    if (cauSan && cauSan.length > 0) {
+      setCau(cauSan)
+      setKhongCo([])
+      setTraLoi(docNhap(khoa, new Set(cauSan.map((c) => c.qid))))
+      setPha('lam')
+      return
+    }
     setPha('tai')
     void taiCauTheoQid(token, qid).then((r) => {
       if (huy) return
@@ -126,7 +137,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong }: La
     if (gui.length === 0) return
     setDangNop(true)
     setLoiNop('')
-    const r: PhanHoiNopOn = await nopOnLai(token, gui)
+    const r: PhanHoiNopOn = await nopOnLai(token, gui, duongNop)
     setDangNop(false)
     if (!r.ok) {
       setLoiNop(r.error || 'Chưa nộp được. Em thử lại.')

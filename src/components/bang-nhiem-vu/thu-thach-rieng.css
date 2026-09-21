@@ -1,0 +1,37 @@
+/* THẺ "THỬ THÁCH RIÊNG HÔM NAY" — ngôn ngữ M3 của Bảng nhiệm vụ: chỉ token m3-theme.css (.bnv/.m3) + tokens.css, KHÔNG mã màu thô
+ * (npm run check:mau). Nền thẻ như "Bộ não A.I" (bo-nao.css) + dải nhấn tertiary bên trái; nút tonal tertiary (không tranh với nút chính "Làm ngay"). */
+.bnv-tt {
+  margin: 0; padding: 16px 16px 8px; border-radius: var(--m3-bo-28);
+  background: var(--m3-surface-container-lowest);
+  box-shadow: inset 4px 0 0 var(--m3-tertiary), var(--m3-cao-do-1);
+  color: var(--m3-on-surface); font-family: var(--sans);
+}
+.bnv-tt-dau { display: flex; align-items: flex-start; gap: 12px; }
+.bnv-tt-o {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container);
+}
+.bnv-tt-tieu { min-width: 0; }
+.bnv-tt-nhan { display: block; font-size: var(--cx-1); color: var(--m3-on-surface-variant); line-height: 1.35; }
+.bnv-tt-tieu h2 { margin: 2px 0 0; font-size: var(--cx-3); font-weight: 700; line-height: 1.3; }
+.bnv-tt-loi { margin: 12px 0 0; font-size: var(--cx-3); line-height: 1.55; overflow-wrap: anywhere; }
+.bnv-tt-phu { margin: 8px 0 8px; font-size: var(--cx-2); color: var(--m3-on-surface-variant); line-height: 1.5; }
+.bnv-tt[data-trang-thai='xong'] { padding-bottom: 16px; }
+.bnv-tt-chip { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.bnv-tt-chip li {
+  display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; border-radius: 16px;
+  background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container);
+  font-size: var(--cx-1); font-weight: 700; line-height: 1.3;
+}
+.bnv-tt-chan { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.bnv-tt-de-sau {
+  min-height: 48px; min-width: 48px; padding: 0 16px; border: 0; background: transparent; cursor: pointer;
+  font: inherit; font-size: var(--cx-2); font-weight: 600; color: var(--m3-on-surface-variant); border-radius: 999px;
+}
+.bnv-tt-de-sau:hover { background: var(--m3-surface-container); }
+.bnv-tt-de-sau:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+.bnv-tt-so { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; font-size: var(--cx-2); color: var(--m3-on-surface-variant); }
+.bnv-tt-so li { line-height: 1.45; }
+.bnv-tt-thanh { display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--m3-on-surface-variant); }
+.bnv-tt-thanh-nen { flex: 1 1 auto; height: 8px; border-radius: 999px; background: var(--m3-surface-container-high); overflow: hidden; }
+.bnv-tt-thanh-nen i { display: block; height: 100%; border-radius: 999px; background: var(--m3-tertiary); }

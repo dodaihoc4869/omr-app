@@ -65,14 +65,17 @@ describe('bảng nhiệm vụ: vị trí và vai', () => {
     render(<BangNhiemVu vaiTro={vaiTro} hoTen="Đỗ Minh" now={NOW} duLieu={duLieu} boNaoPh={boNaoPh} />)
   const dsVung = () => [...document.querySelectorAll('[data-vung]')].map((e) => e.getAttribute('data-vung'))
 
-  it('học sinh: thẻ nằm NGAY SAU thẻ tiến độ và TRƯỚC thẻ LÀM NGAY (không đẩy nút chính ra khỏi màn)', () => {
+  it('học sinh (H1, Boss duyệt 21/09): việc hôm nay đứng NGAY dưới tiến độ; thẻ Bộ não đứng SAU thẻ LÀM NGAY (không đẩy nút chính ra khỏi màn đầu)', () => {
     const d = { ...conThu(tuKeHoachNgay(keHoach({ loiNhanHlv: HS_THO }), NOW)) }
     ve('hocsinh', d)
     const vung = dsVung()
     expect(vung).toContain('bo-nao')
     expect(vung.indexOf('tien-do')).toBeGreaterThanOrEqual(0)
-    expect(vung.indexOf('bo-nao')).toBe(vung.indexOf('tien-do') + 1)
-    if (vung.includes('lam-ngay')) expect(vung.indexOf('bo-nao')).toBeLessThan(vung.indexOf('lam-ngay'))
+    expect(vung.indexOf('bo-nao')).toBeGreaterThan(vung.indexOf('tien-do'))
+    if (vung.includes('lam-ngay')) {
+      expect(vung.indexOf('lam-ngay')).toBeGreaterThan(vung.indexOf('tien-do'))
+      expect(vung.indexOf('bo-nao')).toBeGreaterThan(vung.indexOf('lam-ngay'))
+    }
     expect(document.querySelector('[data-vung="bo-nao"]')!.textContent).toContain(LOI)
   })
 

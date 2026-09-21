@@ -1,6 +1,9 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
-import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
+import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong, useThuThachHomNay } from '../components/bang-nhiem-vu/may-chu'
+import { DUONG_NOP_THU_THACH, type CauOn } from '../components/bang-nhiem-vu/cau-on-api'
+import { dangDeSau, docDeSau, luuDeSau, type ThuThachRieng } from '../lib/thu-thach-rieng'
+import { ngayVietNam } from '../lib/han-bai-tap'
 import { dungBangNhiemVu, soThuSucCua } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import NhanHanBaiTap from '../components/NhanHanBaiTap'
@@ -292,7 +295,7 @@ export default function StudentPortalScreen() {
   const [dsMomGiao, setDsMomGiao] = useState<BaiMomGiao[]>([])
   const [dangLamMom, setDangLamMom] = useState<BaiMomGiao | null>(null)
   // Việc ÔN CÂU (on_lai) đang làm trong sheet 'cauon': đúng các qid máy chủ chọn, nộp về /hs/on-lai/nop.
-  const [cauOn, setCauOn] = useState<{ viecId: string; qid: string[]; tieuDe: string } | null>(null)
+  const [cauOn, setCauOn] = useState<{ viecId: string; qid: string[]; tieuDe: string; cauSan?: CauOn[]; duongNop?: string } | null>(null)
   const [giayConLaiMom, setGiayConLaiMom] = useState<number>(7200)
   const [cauTraLoiMom, setCauTraLoiMom] = useState<Record<string, string>>({})
   const [thongBaoNopMom, setThongBaoNopMom] = useState<string | null>(null)
@@ -978,7 +981,17 @@ export default function StudentPortalScreen() {
   // Bảng nhiệm vụ: kế hoạch ngày của máy chủ (/hs/ke-hoach-ngay); lỗi/mất mạng → bản cuối hoặc nguồn trợ lý.
   const dangMoManCon =
     tab !== null || dangLamMom !== null || manThi || boVaoThi !== null || !!phieuHtml || !!xemDeHtml || caXemBaoCaoModal !== null || dsCauSaiKhacPhucModal !== null
-  const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, useLamMoiKhiDong(dangMoManCon))
+  const lamMoiSheet = useLamMoiKhiDong(dangMoManCon)
+  const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet)
+  // "Thử thách riêng hôm nay" của Bộ não A.I (lệnh riêng, hợp đồng docs/hop-dong-thu-thach-rieng-2109.md): co:false/lỗi/404 ⇒ null ⇒ không thẻ. "Để sau" ẩn tới ngày mai.
+  const thuThachMayChu = useThuThachHomNay(auth?.token, lamMoiSheet)
+  const [deSauThuThach, setDeSauThuThach] = useState('')
+  const homNayVn = ngayVietNam(nowHocTap) ?? ''
+  const thuThachRieng = useMemo(() => {
+    if (!thuThachMayChu) return null
+    if (thuThachMayChu.trangThai !== 'xong' && dangDeSau(deSauThuThach || docDeSau(auth?.sbd ?? ''), thuThachMayChu.ngay, homNayVn)) return null
+    return thuThachMayChu
+  }, [thuThachMayChu, deSauThuThach, homNayVn, auth?.sbd])
   const caDangMo = useCaDangMo({ token: auth?.token, sbd: auth?.sbd }, !!auth)
   const duLieuNhiemVu = useMemo(
     () =>
@@ -1004,6 +1017,7 @@ export default function StudentPortalScreen() {
   const sanSangBang = daNapLanDau && (daTaiMom || !!loiMom) && keHoachNgay.daXong
   const banNho = useBanNho(auth?.sbd, sanSangBang && !keHoachNgay.cu && duLieuNhiemVu.nguon === 'ke_hoach_ngay' ? duLieuNhiemVu : null)
   const dungBanNho = !!banNho && !sanSangBang
+  const duLieuBang = useMemo(() => ({ ...(dungBanNho ? banNho! : duLieuNhiemVu), thuThachRieng }), [dungBanNho, banNho, duLieuNhiemVu, thuThachRieng])
 
   // Rút đề khắc phục câu sai
   /**
@@ -1309,7 +1323,15 @@ export default function StudentPortalScreen() {
           vaiTro="hocsinh"
           hoTen={auth.hoTen}
           now={nowHocTap}
-          duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
+          duLieu={duLieuBang}
+          onLamThuThach={(t: ThuThachRieng) => {
+            setCauOn({ viecId: `thu_thach_rieng:${t.ngay || homNayVn}`, qid: t.cau.map((c) => c.qid), tieuDe: 'Thử thách riêng hôm nay', cauSan: t.cau as unknown as CauOn[], duongNop: DUONG_NOP_THU_THACH })
+            setTab('cauon')
+          }}
+          onDeSauThuThach={(t: ThuThachRieng) => {
+            luuDeSau(auth.sbd, t.ngay || homNayVn)
+            setDeSauThuThach(t.ngay || homNayVn)
+          }}
           onCanhBaoDaXem={(cb) => void baoDaXemHocSinh(auth.token!, cb.id)}
           dangTai={!sanSangBang && !dungBanNho}
           dangLamMoi={keHoachNgay.dangLamMoi}
@@ -2130,7 +2152,7 @@ export default function StudentPortalScreen() {
         {/* ÔN CÂU HÔM NAY (việc on_lai): lấy đề → làm → nộp → lời giải. Đóng sheet thì màn cổng hỏi lại kế hoạch ngày. */}
         {tab === 'cauon' && cauOn && auth && auth.token && (
           <Suspense fallback={<div className="m3-xuong" style={{ height: 160 }} />}>
-            <LamCauOn token={auth.token} sbd={auth.sbd} viecId={cauOn.viecId} qid={cauOn.qid} tieuDe={cauOn.tieuDe} onXong={() => setTab(null)} />
+            <LamCauOn token={auth.token} sbd={auth.sbd} viecId={cauOn.viecId} qid={cauOn.qid} tieuDe={cauOn.tieuDe} cauSan={cauOn.cauSan} duongNop={cauOn.duongNop} onXong={() => setTab(null)} />
           </Suspense>
         )}
 

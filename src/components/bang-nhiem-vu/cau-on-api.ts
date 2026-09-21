@@ -6,6 +6,7 @@
 // máy chủ (`ok:false, error`) nên trả kèm mã HTTP và thân JSON.
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { chanCauTuLuan } from '../../lib/cau-tu-luan-may-hs'
+import { docThuThachRieng, type ThuThachRieng } from '../../lib/thu-thach-rieng'
 
 /** Một câu ôn — hình dạng `publicQuestion` của game v2: KHÔNG có đáp án, lời giải. */
 export interface CauOn {
@@ -111,9 +112,10 @@ export interface MucTraLoi {
 }
 
 /** `POST /hs/on-lai/nop` — BẮT BUỘC token học sinh. Đáp án/lời giải chỉ có trong phản hồi `ok:true`. */
-export async function nopOnLai(token: string, traLoi: MucTraLoi[]): Promise<PhanHoiNopOn> {
+export async function nopOnLai(token: string, traLoi: MucTraLoi[], duong = '/hs/on-lai/nop'): Promise<PhanHoiNopOn> {
   if (!token) return { ok: false, error: 'Chưa đăng nhập nên chưa nộp được.' }
-  const r = await goiChiTiet('/hs/on-lai/nop', { token, traLoi: traLoi.slice(0, TOI_DA_CAU_ON) }, 20)
+  // `duong` mặc định là ôn câu thường; "Thử thách riêng hôm nay" nộp qua `/hs/thu-thach-hom-nay/nop` (trả y hệt, máy chủ ghi nguồn `thu_thach_rieng`).
+  const r = await goiChiTiet(duong, { token, traLoi: traLoi.slice(0, TOI_DA_CAU_ON) }, 20)
   if (!r) return { ok: false, error: 'Chưa gửi được lên máy chủ. Bài làm của em vẫn được giữ, em bấm nộp lại khi có mạng.' }
   const d = r.du
   if (!d || typeof d !== 'object') return { ok: false, error: 'Máy chủ trả lời không đọc được. Em thử nộp lại.' }
@@ -128,4 +130,17 @@ export async function nopOnLai(token: string, traLoi: MucTraLoi[]): Promise<Phan
     expNhan: (Array.isArray(d.expNhan) ? d.expNhan : []).map((x: any) => ({ exp: Math.max(0, Math.floor(Number(x?.exp) || 0)), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x: { ghiChu: string }) => x.ghiChu),
     manhNhan: (Array.isArray(d.manhNhan) ? d.manhNhan : []).map((x: any) => ({ so: Math.max(0, Math.floor(Number(x?.so) || 0)), ghiChu: String(x?.ghiChu ?? '').trim() })).filter((x: { ghiChu: string }) => x.ghiChu),
   }
+}
+
+export const DUONG_NOP_THU_THACH = '/hs/thu-thach-hom-nay/nop'
+
+/**
+ * `POST /hs/thu-thach-hom-nay {}` — "Thử thách riêng hôm nay" của Bộ não (hợp đồng docs/hop-dong-thu-thach-rieng-2109.md mục 3). Máy chủ lần đầu trong ngày CHỌN VÀ CHỐT câu,
+ * các lần sau trả đúng các câu đã chốt. `co:false`, lỗi, 404 (Worker chưa lên), mất mạng ⇒ null ⇒ KHÔNG thẻ (im lặng, không lỗi đỏ).
+ */
+export async function taiThuThachHomNay(token: string): Promise<ThuThachRieng | null> {
+  if (!token) return null
+  const r = await goiChiTiet('/hs/thu-thach-hom-nay', { token }, 15)
+  if (!r || r.trangThai >= 400) return null
+  return docThuThachRieng(r.du)
 }
