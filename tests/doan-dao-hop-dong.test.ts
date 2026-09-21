@@ -49,7 +49,7 @@ describe('Đảo thần thú · lệnh đọc-chỉ so-tay + role/lyDoThuong qua
     expect(await gameV2(d.env, 'so-tay', { token })).toEqual({ ok: true, dang: [{ key: 'ES.A.X', ten: 'Ester', chuong: 'ES' }] }) // Ancol chưa có bằng chứng → không lộ
     expect((d.sql.prepare('SELECT COUNT(*) n FROM game_v2_session').get() as any).n).toBe(truoc)
     const st = await gameV2(d.env, 'start', { token, mode: 'adventure' }) as any
-    expect(st.questions.length).toBeGreaterThan(0); for (const x of st.questions) { expect(['yeu', 'toi_han', 'lap', 'thu_thach', 'moi', 'trum']).toContain(x.role) /* Đợt 2 (21/09): bộ chọn lượt mới thêm vai 'moi' (câu chưa từng gặp) và 'trum' */; expect(x.correct).toBeUndefined() }
+    expect(st.questions.length).toBeGreaterThan(0); for (const x of st.questions) { expect(['yeu', 'toi_han', 'lap', 'thu_thach']).toContain(x.role) /* máy em cũ chỉ biết 4 vai: `role` giữ tập cũ; Đợt 2 thêm `roleV2` (vai thật: + moi, trum) */; expect(['yeu', 'toi_han', 'lap', 'thu_thach', 'moi', 'trum']).toContain(x.roleV2); expect(x.correct).toBeUndefined() }
     const dau = st.questions[0], tl = await gameV2(d.env, 'answer', { token, session: st.id, qid: dau.qid, answer: 'A' }) as any
     expect(tl.lyDoThuong).toEqual({ moc: 1, exp: 10, chu: '+10 EXP · lần đầu em tự làm đúng dạng này — sao thứ 1' }) // sửa có chủ ý 21/09: nấc 1 thưởng 20 → 10
   })

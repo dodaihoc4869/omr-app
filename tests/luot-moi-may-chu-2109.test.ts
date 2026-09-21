@@ -50,7 +50,7 @@ describe('kho rút = phần LỚP đã học', () => {
     expect(r.ok).toBe(true); expect(r.questions).toHaveLength(6)
     expect(qids(r).every((q) => q.startsWith('A-'))).toBe(true)
     expect(new Set(qids(r)).size).toBe(6)
-    for (const c of r.questions) { expect(c.correct).toBeUndefined(); expect(['yeu', 'toi_han', 'moi', 'thu_thach', 'trum', 'lap']).toContain(c.role) }
+    for (const c of r.questions) { expect(c.correct).toBeUndefined(); expect(['yeu', 'toi_han', 'lap', 'thu_thach']).toContain(c.role); expect(['yeu', 'toi_han', 'moi', 'thu_thach', 'trum', 'lap']).toContain(c.roleV2) } // `role` = tập cũ cho máy em đang sống; `roleV2` = vai thật
     expect(r.luot).toMatchObject({ tran: 6, tongLuotMo: 3, daLam: 1, conLai: 2, luotDangMo: { so: 1, loai: 'khoi_dong', thuong: false } })
     expect(bangLop(d)).toEqual([{ ten_lop: TEN_LOP, dang: 'A.1' }])
   })
@@ -78,6 +78,18 @@ describe('kho rút = phần LỚP đã học', () => {
     gio(`${NGAY}T10:00:00`)
     const d = dung(); d.sql.exec('DROP TABLE lop_da_hoc')
     expect(await docDangLop(d.env, 'S1', Date.now())).toEqual([])
+  })
+})
+
+describe('vai tương thích với máy em đang sống', () => {
+  it('`role` chỉ có yeu|toi_han|lap|thu_thach (moi → lap, trum → thu_thach), `roleV2` giữ vai thật; lượt chờ trả lại cũng thế; EXP thử thách dựa VAI THẬT đã lưu', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung()
+    const iso = new Date().toISOString()
+    d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('SV', 'S1', JSON.stringify({ mode: 'adventure', created: Date.now(), questions: ['moi', 'trum', 'yeu', 'lap', 'thu_thach', 'toi_han'].map((role, i) => ({ qid: `A-${i + 1}`, maDe: 'DE1', version: 'v1', group: `g-A-${i + 1}`, novel: true, role })) }), iso)
+    const r = await start(d) // lượt chờ (chưa trả lời câu nào) ⇒ trả lại chính nó
+    expect(r.id).toBe('SV')
+    expect(r.questions.map((c: any) => [c.role, c.roleV2])).toEqual([['lap', 'moi'], ['thu_thach', 'trum'], ['yeu', 'yeu'], ['lap', 'lap'], ['thu_thach', 'thu_thach'], ['toi_han', 'toi_han']])
   })
 })
 

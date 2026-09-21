@@ -69,6 +69,17 @@ describe('cổng hấp thụ `invest`', () => {
     expect(docHoSo(d)).toMatchObject({ cap: 1, exp: 30, wallet: 0 })
   })
 
+  it('đếm câu LỖI (thiếu bảng sổ) không kéo theo mất trần của em ĐÃ ĐẠT: đạt vẫn 200; chưa đạt thì trần 0 (an toàn)', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = taoD1That(); themHoSo(d)
+    themExp(d, 'dat_ngay')
+    d.sql.exec('DROP TABLE su_kien_hoc')
+    const a = await invest(d)
+    expect(a).toMatchObject({ daNap: 200 }); expect((a.profile as any).hapThuHomNay).toMatchObject({ tran: 200, soCauHomNay: 0 })
+    const e = taoD1That(); themHoSo(e); e.sql.exec('DROP TABLE su_kien_hoc')
+    expect(await invest(e)).toMatchObject({ daNap: 0, lyDo: 'chua_hoc' })
+  })
+
   it('SIẾT "CÓ HỌC" (Boss 21/09): 1–3 câu ⇒ CHƯA học (0, nói rõ đã làm mấy/cần mấy); câu chưa có kết quả và câu lặp không tính; đủ 4 câu KHÁC NHAU ⇒ 120; một dòng exp_so lẻ không còn đủ', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That(); themHoSo(d)

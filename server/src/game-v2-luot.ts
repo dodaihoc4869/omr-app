@@ -76,7 +76,8 @@ export async function docDangLop(env: Env, sbd: string, nowMs: number): Promise<
     const tuoi = nowMs - Date.parse(String(moc?.gia_tri ?? ''))
     if (Number.isFinite(tuoi) && tuoi >= 0 && tuoi < SAU_GIO_MS) {
       const r = await env.DB.prepare('SELECT dang FROM lop_da_hoc WHERE ten_lop = ? ORDER BY dang').bind(ten).all<{ dang: string }>()
-      return (r.results ?? []).map((x) => String(x.dang))
+      // Bảng đệm rỗng dù mốc còn mới (vừa reset toàn app xoá bảng, hoặc lớp thật sự chưa học gì) ⇒ tính lại — rẻ với lớp rỗng, và không để em kẹt "kho trống" tới 6 giờ.
+      if ((r.results ?? []).length > 0) return (r.results ?? []).map((x) => String(x.dang))
     }
     const dang = await tinhDangLop(env, ten)
     const iso = new Date(nowMs).toISOString()

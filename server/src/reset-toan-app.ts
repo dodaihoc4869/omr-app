@@ -52,7 +52,7 @@ export const BANG_XOA: readonly string[] = [
   // Trao đổi
   'tin_nhan', 'cau_hoi_em', 'student_notice', 'student_push_delivery', 'canh_bao_thay',
   // Game, thần thú, EXP
-  'game_v2_profile', 'game_v2_attempt', 'game_v2_reward', 'game_v2_room', 'game_v2_session', 'game_v2_task', 'than_thu', 'vo_dai_phong', 'vo_dai_moi', 'exp_so', 'manh_khien_so', 'khien_mat_so', 'ph_giao_them',
+  'game_v2_profile', 'game_v2_attempt', 'game_v2_reward', 'game_v2_room', 'game_v2_session', 'game_v2_task', 'than_thu', 'vo_dai_phong', 'vo_dai_moi', 'exp_so', 'manh_khien_so', 'khien_mat_so', 'ph_giao_them', 'lop_da_hoc',
   // Đoàn Hộ Tống (bảng của Code 5; mùa 1 tính từ ngày reset). `doan_ve_so` = vé sinh từ sổ EXP (exp_so bị xoá thì vé cũng phải xoá); `doan_trum_lop` = đóng góp trùm lớp; `doan_trum_cau` = sổ kết quả câu chung của trùm theo lớp (bước 6, migration 2109-game-doan-trum-cau; bảng chưa tồn tại thì bỏ qua).
   'doan_chang', 'doan_luot', 'doan_tiep_suc', 'doan_ve_so', 'doan_trum_lop', 'doan_trum_cau',
   // Vinh danh, tin phụ huynh

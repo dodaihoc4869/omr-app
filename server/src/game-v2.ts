@@ -71,6 +71,8 @@ async function qidTuLuanTrongLuot(env:Env,refs:{qid:string;version:string}[]):Pr
   for(const x of r.results)if(can.has(`${x.qid}|${x.version}`)&&jsonLaTuLuan(x.json))ra.add(x.qid)
   return ra
 }
+/** TƯƠNG THÍCH máy em đang sống (Boss 21/09): màn Đảo cũ chỉ biết vai yeu|toi_han|lap|thu_thach ⇒ `role` trả tập cũ (moi → lap, trum → thu_thach); `roleV2` = vai THẬT cho màn mới. */
+const vaiChoMay=(v?:string)=>({role:v==='moi'?'lap':v==='trum'?'thu_thach':v,roleV2:v})
 /** ĐỢT 2 — lượt Đảo theo bộ chọn mới của Code 1 (`chooseLuotMoi`) trên kho LỚP đã học; quota lượt/ngày (`luotHomNay`) và trần 60 câu ở máy chủ. Lùi nhanh: `cau_hinh.game_luot_moi = 'tat'` (đường cũ ở `start`). */
 async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown>,action:string):Promise<Record<string,unknown>>{
   const tNow=Date.now(),ngay=academicDay(now())
@@ -91,7 +93,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
     if(dangCho){
       try{
         const old=JSON.parse(dangCho.json) as Session;const tuLuan=await qidTuLuanTrongLuot(env,old.questions);const qs=[]
-        for(const ref of old.questions){if(tuLuan.has(ref.qid))continue;qs.push({...publicQuestion(await currentQuestion(env,ref)),role:ref.role})}
+        for(const ref of old.questions){if(tuLuan.has(ref.qid))continue;qs.push({...publicQuestion(await currentQuestion(env,ref)),...vaiChoMay(ref.role)})}
         if(qs.length)return {ok:true,id:dangCho.id,questions:qs,missing:scope.missing,luot:tom,maiCho:cho}
       }catch{/* câu đã đổi/rút khỏi kho: mở lượt mới */}
     }
@@ -113,7 +115,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   const session:Session={mode:'adventure',created:Date.now(),questions:chon.map(x=>({qid:x.q.qid,maDe:x.q.maDe,version:x.q.version,group:x.q.group,novel:!groups.has(x.q.group),role:x.role}))}
   const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
   if(!inserted.meta.changes)return startLuotMoi(env,sbd,p,b,action)
-  return {ok:true,id,questions:chon.map(x=>({...publicQuestion(x.q),role:x.role})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
+  return {ok:true,id,questions:chon.map(x=>({...publicQuestion(x.q),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
 }
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
   const sbd=await gameIdentity(env,b)

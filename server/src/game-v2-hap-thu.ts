@@ -24,19 +24,23 @@ export interface TranHapThu { tran: number; dat: boolean; coHoc: boolean; /** S�
  * (Boss siết 21/09: một câu sai mỗi ngày không còn ăn 120 từ ống). Lỗi đọc ⇒ coi như chưa học (trần 0: không nạp nhầm).
  */
 export async function docTranHapThu(env: Env, sbd: string, ngay: string): Promise<TranHapThu> {
+  // HAI lần đọc, mỗi lần bọc RIÊNG (Boss soát 83c4826): đếm câu lỗi KHÔNG được kéo theo mất trần của em ĐÃ ĐẠT (200); đọc "đạt" lỗi ⇒ coi như chưa đạt.
+  let dat = false
   try {
-    const r = await env.DB.prepare(
-      `SELECT (SELECT COUNT(*) FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'dat_ngay') AS dat,
-              (SELECT COUNT(DISTINCT qid) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND ket_qua IS NOT NULL) AS so_cau`,
-    ).bind(sbd, ngay, sbd, ngay).first<{ dat: number; so_cau: number }>()
-    const dat = (Number(r?.dat) || 0) > 0
-    const soCauHomNay = Math.max(0, Math.floor(Number(r?.so_cau) || 0))
-    const tran = tranHapThu({ datHomNay: dat, soCauHomNay })
-    return { tran, dat, coHoc: dat || tran > 0, soCauHomNay, canCau: CO_HOC_TOI_THIEU_CAU }
+    const r = await env.DB.prepare("SELECT COUNT(*) AS n FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'dat_ngay'").bind(sbd, ngay).first<{ n: number }>()
+    dat = (Number(r?.n) || 0) > 0
   } catch (e) {
-    console.error('[hap-thu] đọc trần lỗi (coi như chưa học):', e instanceof Error ? e.message : e)
-    return { tran: 0, dat: false, coHoc: false, soCauHomNay: 0, canCau: CO_HOC_TOI_THIEU_CAU }
+    console.error('[hap-thu] đọc "đạt ngày" lỗi (coi như chưa đạt):', e instanceof Error ? e.message : e)
   }
+  let soCauHomNay = 0
+  try {
+    const r = await env.DB.prepare('SELECT COUNT(DISTINCT qid) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND ket_qua IS NOT NULL').bind(sbd, ngay).first<{ n: number }>()
+    soCauHomNay = Math.max(0, Math.floor(Number(r?.n) || 0))
+  } catch (e) {
+    console.error('[hap-thu] đếm câu hôm nay lỗi (coi như 0 câu; em đã đạt vẫn được 200):', e instanceof Error ? e.message : e)
+  }
+  const tran = tranHapThu({ datHomNay: dat, soCauHomNay })
+  return { tran, dat, coHoc: dat || tran > 0, soCauHomNay, canCau: CO_HOC_TOI_THIEU_CAU }
 }
 
 /** EXP game em đã nhận hôm nay (Điều 9). Sang ngày mới = 0. */
