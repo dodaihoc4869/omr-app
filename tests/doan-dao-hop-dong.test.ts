@@ -28,7 +28,7 @@ describe('Đảo thần thú · vai của từng câu', () => {
 })
 describe('Đảo thần thú · lý do thưởng (chữ sẵn in, khớp mốc 20/40/40 của advance)', () => {
   it('bảng', () => {
-    expect(lyDoThuong({ correct: true, assisted: false, reward: 20, milestone: 1, stage: 1 })).toEqual({ moc: 1, exp: 20, chu: '+20 · lần đầu em tự làm đúng dạng này — sao thứ 1' })
+    expect(lyDoThuong({ correct: true, assisted: false, reward: 20, milestone: 1, stage: 1 })).toEqual({ moc: 1, exp: 20, chu: '+20 EXP · lần đầu em tự làm đúng dạng này — sao thứ 1' })
     expect(lyDoThuong({ correct: true, assisted: false, reward: 40, milestone: 2, stage: 2 })).toMatchObject({ moc: 2, exp: 40 }); expect(lyDoThuong({ correct: true, assisted: false, reward: 40, milestone: 2, stage: 2 }).chu).toContain('sao thứ 2'); expect(lyDoThuong({ correct: true, assisted: false, reward: 40, milestone: 3, stage: 3 }).chu).toContain('sao thứ 3')
     expect(lyDoThuong({ correct: true, assisted: true, reward: 0, milestone: 0, stage: 1 })).toMatchObject({ moc: 0, exp: 0 }); expect(lyDoThuong({ correct: true, assisted: true, reward: 0, milestone: 0, stage: 1 }).chu).toContain('trợ giúp')
     expect(lyDoThuong({ correct: false, assisted: false, reward: 0, milestone: 0, stage: 1 }).chu).toContain('Chưa đúng')
@@ -51,6 +51,6 @@ describe('Đảo thần thú · lệnh đọc-chỉ so-tay + role/lyDoThuong qua
     const st = await gameV2(d.env, 'start', { token, mode: 'adventure' }) as any
     expect(st.questions.length).toBeGreaterThan(0); for (const x of st.questions) { expect(['yeu', 'toi_han', 'lap', 'thu_thach']).toContain(x.role); expect(x.correct).toBeUndefined() }
     const dau = st.questions[0], tl = await gameV2(d.env, 'answer', { token, session: st.id, qid: dau.qid, answer: 'A' }) as any
-    expect(tl.lyDoThuong).toEqual({ moc: 1, exp: 20, chu: '+20 · lần đầu em tự làm đúng dạng này — sao thứ 1' })
+    expect(tl.lyDoThuong).toEqual({ moc: 1, exp: 20, chu: '+20 EXP · lần đầu em tự làm đúng dạng này — sao thứ 1' })
   })
 })

@@ -27,7 +27,7 @@ describe('Vỏ Đảo thần thú', () => {
     const mc = mayChu({})
     dung({ call: mc.call, profile: hoSo({ choice: true, nickname: undefined }) })
     expect(mc.ten()).toEqual([])
-    fireEvent.change(screen.getByLabelText('Đặt tên cho bạn ấy'), { target: { value: 'Tia Nắng' } })
+    fireEvent.change(screen.getByLabelText('Đặt tên cho thần thú'), { target: { value: 'Tia Nắng' } })
     fireEvent.click(screen.getByRole('button', { name: /^CHỌN / }))
     await waitFor(() => expect(mc.ten()).toEqual(['choose', 'rename']))
     expect(mc.nhat[1]![1]).toEqual({ name: 'Tia Nắng' })
@@ -37,7 +37,7 @@ describe('Vỏ Đảo thần thú', () => {
     await waitFor(() => expect(mc.ten()).toContain('so-tay'))
     expect([...v.container.querySelectorAll('.dao-nav button')].map(b => b.textContent)).toEqual(['Đảo', 'Sổ tay', 'Túi đồ'])
     v.rerender(<DaoThanThu sbd="1" profile={hoSo()} doanMo call={mc.call} onMoDoan={onMoDoan} onDong={() => {}} />)
-    fireEvent.click(screen.getByRole('button', { name: 'Đoàn' })); expect(onMoDoan).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'Đoàn Hộ Tống' })); expect(onMoDoan).toHaveBeenCalledTimes(1)
   })
   it('LÊN ĐƯỜNG: resume (không có lượt dở) → sync tới khi remaining=0 → start; làm đủ các ải → complete; lý do thưởng: có thì in nguyên, vắng thì suy từ stage', async () => {
     let lanSync = 0

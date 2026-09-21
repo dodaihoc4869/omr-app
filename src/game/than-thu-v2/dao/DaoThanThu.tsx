@@ -76,7 +76,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  if(dangTham&&luot)return <div className="dao dao-vo dao-vo-tham" data-thu={chiSoThu(profile.pet)}><ThamHiem profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} xong={xong} tongKet={{dung:ketQua.filter(k=>k.correct).length,tong:luot.cau.length,...thuong}}
   busy={busy} loi={loi} thongBao={bao} onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onVeDao={veDao} onChuyenMoi={conLai===0?undefined:()=>{setLuot(null);void lenDuong()}} onMoSoTay={()=>{veDao();setMan('so-tay')}}/></div>
 
- const muc:[ManDao|'doan',string][]=[['dao','Đảo'],...(doanMo?[['doan','Đoàn']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ']]
+ const muc:[ManDao|'doan',string][]=[['dao','Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ']]
  return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}>
   {man==='dao'&&<DaoCuaEm profile={profile} exp={exp} chuoiNgay={chuoiNgay} goiY={goiY} conLai={conLai} tenDang={tenDang} tasks={tasks} busy={busy} loi={loi||loiChon} thongBao={bao||(luot&&!xong?'Em đang đi dở một chuyến — bấm LÊN ĐƯỜNG để đi tiếp.':'')}
    onLenDuong={()=>void lenDuong()} onOnTheoNhac={dang=>void lenDuong('repair',dang)} onNap={()=>void chay(async()=>{await call('invest')})} onDoiTen={ten=>void chay(async()=>{await call('rename',{name:ten});setLoiChon('')})}/>}

@@ -36,11 +36,11 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
       ['', `×${so(toi.heSo.dung)}`, <>Em <b>{toi.tuLam ? 'tự làm đúng' : 'làm lại đúng'}</b> câu vừa sức của chính em</>],
       ...(toi.lienKich ? [['lam', '×2', toi.giupThanhCong ? <>Bạn <b>làm lại đúng</b> sau khi em tiếp sức → hai bạn Liên Kích</> : <>Em <b>làm lại đúng</b> sau khi được tiếp sức → hai bạn Liên Kích</>]] : []),
       ...(toi.heSo.anThach > 1 ? [['cam', 'ẤN', <>Chiêu này mở ra khi em <b>khắc phục xong dạng</b> của câu</>]] : []),
-      ...(toi.chan > 0 ? [['luc', `+${toi.chan}`, <>Kỹ năng dựng thêm <b>khiên {toi.chan}</b> cho Linh Tâm</>]] : []),
+      ...(toi.chan > 0 ? [['luc', `+${toi.chan}`, <>Kỹ năng dựng thêm <b>+{toi.chan} giáp</b> cho Linh Tâm</>]] : []),
       ...(toi.hoi > 0 ? [['luc', `+${toi.hoi}`, <>Kỹ năng <b>hồi {toi.hoi} máu</b> cho Linh Tâm</>]] : []),
       ...(toi.lan > 0 ? [['cam', `−${toi.lan}`, <>Đòn lan trúng thêm các Tạp Chất còn lại</>]] : []),
     ] : [
-      ['luc', `+${toi.chan || CHAN}`, <>Thần thú của em <b>chắn cho Linh Tâm</b> · khiên {toi.chan || CHAN}</>],
+      ['luc', `+${toi.chan || CHAN}`, <>Thần thú của em <b>chắn cho Linh Tâm</b> · +{toi.chan || CHAN} giáp</>],
       ...(toi.dung ? [['lam', '+2', <>Em làm đúng rồi mới chắn → <b>+2 năng lượng</b> cho kỹ năng</>]] : [['', '↻', <>Câu này sẽ quay lại để em <b>tự làm</b> vào ngày mai</>]]),
     ]
 
@@ -74,7 +74,7 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
       )}
       <div className="dh-chuong-san">
         {!kq.laTrum && <span>{tenQuai} · hạ {kq.quaiHaGuc} · còn {kq.quaiConLai}</span>}
-        <span style={{ color: 'rgb(200,246,255)' }}>Linh Tâm {kq.linhTamMat > 0 ? `−${kq.linhTamMat}` : 'an toàn'}{kq.linhTamHoi > 0 ? ` · +${kq.linhTamHoi}` : ''} → {kq.linhTamSau}</span>
+        <span style={{ color: 'rgb(200,246,255)' }}>Linh Tâm {kq.linhTamMat > 0 ? `mất ${kq.linhTamMat} máu` : 'không mất máu'}{kq.linhTamHoi > 0 ? `, hồi ${kq.linhTamHoi} máu` : ''}, còn {kq.linhTamSau} máu</span>
       </div>
       {viSao && (
         <div className="dh-chuong-vi-sao">

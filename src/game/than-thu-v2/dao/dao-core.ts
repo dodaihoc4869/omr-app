@@ -11,7 +11,7 @@ export const CAP_TOI_DA=120
 /** Bốn nhóm ải, theo đúng thứ tự và suất của `chooseSession` (core.ts): 2 yếu · 1 tới hạn · 2 lấp · 1 thử thách. */
 export const NHOM_AI:readonly {vai:VaiAi;ten:string;suat:number;ta:string}[]=[
  {vai:'yeu',ten:'Sửa lỗi',suat:2,ta:'dạng em hay sai'},
- {vai:'toi_han',ten:'Ký ức',suat:1,ta:'câu tới hạn ôn lại'},
+ {vai:'toi_han',ten:'Ký ức',suat:1,ta:'câu đến lịch ôn lại'},
  {vai:'lap',ten:'Luyện đều',suat:2,ta:'câu vừa sức để giữ nhịp'},
  {vai:'thu_thach',ten:'Trùm ải',suat:1,ta:'câu khó hơn sức em một bậc'},
 ]
@@ -54,7 +54,7 @@ export function tinhHinhDang(mastery:readonly Mastery[],now:number){return {toiH
 export function loiThu(profile:DaoProfile,now:number,chuoiNgay?:number){const ten=tenThu(profile),t=tinhHinhDang(profile.mastery,now)
  if(profile.wallet>0&&profile.cap<CAP_TOI_DA)return `${ten} đang chờ em nạp ${profile.wallet.toLocaleString('vi-VN')} EXP`
  if(chuoiNgay&&chuoiNgay>=2)return `${ten} đang rất vui — em giữ chuỗi ${chuoiNgay} ngày rồi`
- if(t.toiHan>0)return `${ten} nhắc em: ${t.toiHan} dạng tới hạn ôn hôm nay`
+ if(t.toiHan>0)return `${ten} nhắc em: ${t.toiHan} dạng đến lịch ôn lại hôm nay`
  if(!t.daGap)return `${ten} háo hức đi chuyến đầu tiên cùng em`
  return `${ten} sẵn sàng lên đường cùng em`}
 

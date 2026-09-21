@@ -120,7 +120,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const chotY = (y: number) => { if (xem && tran && yChon[y]) void goi('doan-nop-y', { ma: xem.ma, hiep: tran.hiep, y, answer: yChon[y] }) }
   const roi = async () => {
     if (!xem) return
-    if (xem.batDau && !xem.tran?.ketThuc && !choRoi) { setChoRoi(true); setLoi('Chạm "Rời chặng" lần nữa để rời. Máy sẽ đỡ thay em, đội không bị phạt.'); return }
+    if (xem.batDau && !xem.tran?.ketThuc && !choRoi) { setChoRoi(true); setLoi('Chạm "Rời chuyến" lần nữa để rời. Máy sẽ đỡ thay em, đội không bị phạt.'); return }
     const r = await goi('doan-roi', { ma: xem.ma })
     if (r?.daRoi) veSanh()
   }

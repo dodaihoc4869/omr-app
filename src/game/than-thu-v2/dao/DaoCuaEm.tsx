@@ -58,7 +58,7 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
    <div className="dao-chuyen-dau"><h3 id="dao-chuyen-ten">CHUYẾN THÁM HIỂM HÔM NAY</h3><span>{soAi} ải · {soAi}–{soAi+2} phút</span></div>
    <ol className="dao-chuyen-ai">{NHOM_AI.map(n=><li key={n.vai} data-vai={n.vai}><b>{n.suat}</b><span>{n.ten}</span></li>)}</ol>
    <p className="dao-chuyen-ta">{hetLuot?'Em đã làm đủ 200 câu hôm nay. Mai đảo có chuyến mới.':goiY?.length?<>Hôm nay em sẽ gặp: {goiY.slice(0,3).map((g,i)=><span key={i}>{i>0&&' · '}<b>{g.title}</b></span>)}.</>
-    :<>Mỗi chuyến: <b>2 câu dạng em hay sai</b> · <b>1 câu tới hạn ôn</b> · 2 câu vừa sức · 1 câu khó hơn sức em một bậc để đánh Trùm ải.</>}</p>
+    :<>Mỗi chuyến: <b>2 câu dạng em hay sai</b> · <b>1 câu đến lịch ôn lại</b> · 2 câu vừa sức · 1 câu khó hơn sức em một bậc để đánh Trùm ải.</>}</p>
    {(thongBao||loi)&&<p className={loi?'dao-loi':'dao-chuyen-bao'} role={loi?'alert':'status'}>{loi||thongBao}</p>}
    <button type="button" className="dao-nut-vang" disabled={busy||hetLuot} onClick={onLenDuong}><span className="dao-nut-tam-giac" aria-hidden="true"/><span>{busy?'ĐANG SOẠN HÀNH TRANG…':'LÊN ĐƯỜNG'}</span></button>
   </section>

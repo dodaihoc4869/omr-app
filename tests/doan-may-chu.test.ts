@@ -369,7 +369,7 @@ describe('Đoàn Hộ Tống · máy chủ · Tiếp sức', () => {
     const d = dungTruong(); await bangChung(d, 'S1', 'X1')
     const ma = (await goi(d, 'S1', 'mo')).doan.ma as string; troi(DEM_NGUOC_MS)
     const xin = await goi(d, 'S1', 'tin-hieu', { ma, tinHieu: 'can_tiep_suc' })
-    expect(xin.doan.tiepSuc).toMatchObject({ daXin: false, conLuotNhan: 1, lienKichSanSang: true, theNhan: { tuTen: 'Bạn đồng hành', tuLaMay: true } }); khongLo(xin)
+    expect(xin.doan.tiepSuc).toMatchObject({ daXin: false, conLuotNhan: 1, lienKichSanSang: true, theNhan: { tuTen: 'Bạn máy', tuLaMay: true } }); khongLo(xin)
     const xong = await lamHiep(d, 'S1', ma, true)
     expect(xong.doan.hiepVuaXong.cuaEm).toMatchObject({ satThuong: 48, lienKich: true, tuLam: false })
     expect(JSON.parse((d.sql.prepare("SELECT json FROM game_v2_attempt WHERE sbd='S1'").get() as any).json).attempt.assisted).toBe(true)

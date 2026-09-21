@@ -41,7 +41,7 @@ export default function ChonBanDongHanh({batDau=2,busy=false,loi='',moiDoan=fals
  const goiY=()=>{const ds=TEN_GOI_Y[giua]!;setTen(ds[luotGoiY%ds.length]!);setLuotGoiY(n=>n+1);setLoiTen('')}
  const chon=()=>{let sach='';if(ten.trim()){try{sach=normalizePetName(ten)}catch(e){setLoiTen(e instanceof Error?e.message:'Tên chưa hợp lệ.');return}}setLoiTen('');onChon(thu.id,sach)}
  return <div className="dao dao-chon" data-thu={giua}>
-  <header className="dao-chon-dau"><small className="dao-nhan">BÁT LINH ĐẢO</small><h2>Chọn bạn đồng hành</h2><p>Tám thần thú — con nào cũng học được mọi phần Hoá</p>{moiDoan&&<p className="dao-chon-moi">Đoàn Hộ Tống đang chờ em — chọn xong là lên đường được ngay.</p>}</header>
+  <header className="dao-chon-dau"><small className="dao-nhan">BÁT LINH ĐẢO</small><h2>Chọn thần thú</h2><p>Tám thần thú — con nào cũng học được mọi phần Hoá</p>{moiDoan&&<p className="dao-chon-moi">Đoàn Hộ Tống đang chờ em — chọn xong là lên đường được ngay.</p>}</header>
   <div className="dao-chon-bang" ref={bang} onScroll={khiCuon} role="group" aria-label="Tám thần thú, vuốt ngang để xem">
    {PETS.map((p,i)=>{const lech=i-giua,dangLat=i===giua&&lat
     return <div className="dao-chon-o" key={p.id} data-lech={lech===0?'0':lech<0?'truoc':'sau'} data-xa={Math.abs(lech)>1?'':undefined}>
@@ -56,7 +56,7 @@ export default function ChonBanDongHanh({batDau=2,busy=false,loi='',moiDoan=fals
      </button></div>})}
   </div>
   <div className="dao-chon-cham" role="group" aria-label="Chọn nhanh thần thú">{PETS.map((p,i)=><button type="button" key={p.id} aria-label={p.name} aria-current={i===giua?'true':undefined} onClick={()=>toi(i)}><i/></button>)}</div>
-  <div className="dao-chon-ten-o"><input aria-label="Đặt tên cho bạn ấy" placeholder="Đặt tên cho bạn ấy…" value={ten} maxLength={48} autoComplete="off" enterKeyHint="done" onChange={e=>{setTen(e.target.value);setLoiTen('')}}/>
+  <div className="dao-chon-ten-o"><input aria-label="Đặt tên cho thần thú" placeholder="Đặt tên cho thần thú…" value={ten} maxLength={48} autoComplete="off" enterKeyHint="done" onChange={e=>{setTen(e.target.value);setLoiTen('')}}/>
    <button type="button" className="dao-chon-goi-y" aria-label="Gợi ý một cái tên" onClick={goiY}><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.5 2.7L21 8"/><path d="M21 3v5h-5"/></svg></button></div>
   {(loiTen||loi)&&<p role="alert" className="dao-loi">{loiTen||loi}</p>}
   <button type="button" className="dao-nut-vang" disabled={busy} onClick={chon}><span>{busy?'ĐANG ĐÓN BẠN ẤY…':`CHỌN ${thu.name.toLocaleUpperCase('vi')}`}</span></button>

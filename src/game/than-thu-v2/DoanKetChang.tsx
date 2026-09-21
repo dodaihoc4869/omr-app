@@ -19,7 +19,7 @@ export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, kh
         <ThuHinh pet={em.pet} cap={em.cap} size={190} className="dh-noi" />
       </div>
       <div className="dh-ket-sao" role="img" aria-label={`${k.sao} trên 3 sao`}>{[1, 2, 3].map(i => <SaoHinh key={i} size={i === 2 ? 46 : 38} sang={k.sao >= i} />)}</div>
-      <h1 className="dh-ket-tieu-de">{k.thang ? <span className="dh-chu-vang">VƯỢT CHẶNG!</span> : 'Linh Tâm cần nghỉ'}</h1>
+      <h1 className="dh-ket-tieu-de">{k.thang ? <span className="dh-chu-vang">HOÀN THÀNH CHUYẾN!</span> : 'Linh Tâm cần nghỉ'}</h1>
       <p className="dh-ket-phu">
         {k.thang ? `Linh Tâm về đích với ${k.linhTam.hp}/${k.linhTam.toiDa} máu · cả đội hạ ${k.quaiHaGuc} Tạp Chất${k.trumVoGiap.filter(Boolean).length ? ` · vỡ giáp ${k.trumVoGiap.filter(Boolean).length} trùm` : ''}`
           : 'Thua không mất gì cả: mọi câu em tự làm đúng hôm nay vẫn được ghi nhận. Mai mình hộ tống lại nhé.'}
@@ -30,7 +30,7 @@ export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, kh
           <div>
             <b>Linh Tâm của lớp: trạm {k.doanLop.tramTruoc}{k.doanLop.tramSau > k.doanLop.tramTruoc ? <> → <span>{k.doanLop.tramSau}</span></> : null}/{k.doanLop.tongTram}</b>
             <div className="dh-mau"><i style={{ width: `${Math.round(k.doanLop.tramSau * 100 / k.doanLop.tongTram)}%` }} /></div>
-            <span>{k.doanLop.banThu > 0 ? `Em là bạn thứ ${k.doanLop.banThu} góp sức hôm nay` : 'Chặng thắng mới đẩy Linh Tâm của lớp'}{k.doanLop.conTramToiMoc ? ` · còn ${k.doanLop.conTramToiMoc} trạm tới ${k.doanLop.tenMocKe}` : ''}{k.doanLop.trumLop ? ` · em góp ${k.doanLop.trumLop} sát thương vào Trùm lớp` : ''}</span>
+            <span>{k.doanLop.banThu > 0 ? `Em là bạn thứ ${k.doanLop.banThu} góp sức hôm nay` : 'Chuyến thắng mới đẩy Linh Tâm của lớp'}{k.doanLop.conTramToiMoc ? ` · còn ${k.doanLop.conTramToiMoc} trạm tới ${k.doanLop.tenMocKe}` : ''}{k.doanLop.trumLop ? ` · em góp ${k.doanLop.trumLop} sát thương vào Trùm lớp` : ''}</span>
           </div>
         </section>
       )}
@@ -39,12 +39,12 @@ export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, kh
       <section className="dh-tien-bo" aria-label="Hôm nay em tiến bộ gì">
         <div className="dh-nhan">HÔM NAY EM TIẾN BỘ GÌ</div>
         <div><i>✓</i><span>Em <b>tự làm đúng {tb.tuLamDung}/{tb.soCau} câu</b> của riêng mình</span></div>
-        {tb.lenBac !== null && tb.lenBac > 0 && <div><i>↑</i><span><b>{tb.lenBac} câu lên bậc ôn</b> · em làm đúng lại ở một ngày khác</span></div>}
+        {tb.lenBac !== null && tb.lenBac > 0 && <div><i>↑</i><span><b>{tb.lenBac} câu sang ngày ôn kế</b> · em làm đúng lại ở một ngày khác</span></div>}
         {k.anThach && <div><i className="dh-cam">◆</i><span>Ấn <b>{k.anThach.ten}</b>: còn <b>{k.anThach.conCau} câu</b> nữa là sáng → mở {k.anThach.kyNang}</span></div>}
         {k.cuaEm.soLanGiup > 0 && <div><i className="dh-lam">⇄</i><span>Em <b>tiếp sức {k.cuaEm.soLanGiup} lần</b>{k.cuaEm.soLanGiupThanhCong > 0 ? ` · ${k.cuaEm.soLanGiupThanhCong} lần bạn làm lại đúng` : ''}</span></div>}
         {tb.duocGiup > 0 && <div><i className="dh-cam">↻</i><span>Em được tiếp sức <b>{tb.duocGiup} câu</b></span></div>}
         {(tb.duocGiup > 0 || banDuocGiup) && <small>Câu được giúp hôm nay sẽ quay lại để {tb.duocGiup > 0 ? 'em' : 'bạn'} tự làm vào ngày mai.</small>}
-        {tb.soCau > tb.tuLamDung && <small>Câu em chưa đúng hôm nay sẽ được hồ sơ đưa lại đúng hạn ôn.</small>}
+        {tb.soCau > tb.tuLamDung && <small>Câu em chưa đúng hôm nay sẽ được đưa lại đúng lịch ôn lại.</small>}
       </section>
 
       {(expNhan > 0 || k.soLienKich > 0) && (
@@ -58,7 +58,7 @@ export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, kh
       )}
 
       <button type="button" className="dh-nut-vang" onClick={onVe}>VỀ BẢNG NHIỆM VỤ</button>
-      <button type="button" className="dh-nut-mo" disabled={ban} onClick={onDiTiep}>Đi thêm một chặng{ve !== undefined && ve !== null ? ' · 1 vé' : ''}</button>
+      <button type="button" className="dh-nut-mo" disabled={ban} onClick={onDiTiep}>Đi thêm một chuyến{ve !== undefined && ve !== null ? ' · 1 vé' : ''}</button>
       {ve === 0 && <p className="dh-ket-phu">Hết vé? Làm xong nhiệm vụ hôm nay để nhận 2 vé.</p>}
     </div>
   )

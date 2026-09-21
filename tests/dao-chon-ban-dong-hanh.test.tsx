@@ -20,7 +20,7 @@ describe('Chọn bạn đồng hành', () => {
   it('tên được chuẩn hoá như máy chủ; tên sai luật ⇒ báo lỗi, KHÔNG gọi chọn', () => {
     const onChon = vi.fn()
     render(<ChonBanDongHanh batDau={1} onChon={onChon} />)
-    const o = screen.getByLabelText('Đặt tên cho bạn ấy')
+    const o = screen.getByLabelText('Đặt tên cho thần thú')
     fireEvent.change(o, { target: { value: '  Sóng   Nhỏ ' } })
     fireEvent.click(screen.getByRole('button', { name: 'CHỌN THUỶ LONG' }))
     expect(onChon).toHaveBeenLastCalledWith('nuoc_long', 'Sóng Nhỏ')
@@ -33,7 +33,7 @@ describe('Chọn bạn đồng hành', () => {
     expect(TEN_GOI_Y.length).toBe(PETS.length)
     for (const ds of TEN_GOI_Y) for (const t of ds) expect(normalizePetName(t)).toBe(t)
     render(<ChonBanDongHanh batDau={2} onChon={() => {}} />)
-    const o = screen.getByLabelText('Đặt tên cho bạn ấy') as HTMLInputElement
+    const o = screen.getByLabelText('Đặt tên cho thần thú') as HTMLInputElement
     fireEvent.click(screen.getByRole('button', { name: 'Gợi ý một cái tên' }))
     expect(o.value).toBe(TEN_GOI_Y[2]![0])
     fireEvent.click(screen.getByRole('button', { name: 'Gợi ý một cái tên' }))

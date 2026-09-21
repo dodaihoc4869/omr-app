@@ -41,6 +41,6 @@ export interface DoanXem {
 }
 export interface PhanHoiDoan { ok: boolean; doan?: DoanXem; sanh?: SanhXem | null; anThach?: AnXem; banDongHanh?: BanDongHanhXem | null; dangDo?: string | null; ketQuaCau?: KetQuaCau; goiY?: GoiYTiepSuc; expTiepSuc?: { bat: boolean; exp: number; conLai: number }; loiGiaiTrum?: { hiep: number; de: Question; answer: string; solution: unknown; solutionImages?: HinhAnh[] } | null; daRoi?: boolean }
 
-export const NHAN_CAU: Record<NhanCau, string> = { toi_han_on: 'tới hạn ôn', dang_yeu: 'dạng em đang yếu', cau_moi: 'câu mới', vua_suc: 'vừa sức em' }
+export const NHAN_CAU: Record<NhanCau, string> = { toi_han_on: 'đến lịch ôn lại', dang_yeu: 'dạng em đang yếu', cau_moi: 'câu mới', vua_suc: 'vừa sức em' }
 export const CHU_TRANG_THAI: Record<TrangThaiGhe, string> = { cho: 'sẵn sàng', may: 'máy đỡ thay', dang_lam: 'đang làm', da_chot: 'đã chốt', can_tiep_suc: 'cần tiếp sức' }
 export const TIN_HIEU_TRUM = [['chac_y', 'Mình chắc ý này'], ['ban_them', 'Cần bàn thêm'], ['doi_ti', 'Đợi tí']] as const

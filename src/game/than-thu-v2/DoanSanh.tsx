@@ -8,7 +8,7 @@ import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh } from './DoanHinh'
 
 // Bốn thứ đang tới (bước 5, 6). CỐ Ý không có con số nào: máy chủ chưa có số thì không bịa — chỉ tên, một dòng mô tả, biểu tượng khoá.
 const SAP_MO = [
-  ['Đoàn lớp', 'Mỗi chặng thắng đẩy Linh Tâm của cả lớp tiến một trạm trên bản đồ mùa.'],
+  ['Đoàn lớp', 'Mỗi chuyến thắng đẩy Linh Tâm của cả lớp tiến một trạm trên bản đồ mùa.'],
   ['Rương chuỗi ngày', 'Đi đều mỗi ngày để mở rương — đứt chuỗi thì đếm lại.'],
   ['Trùm lớp', '20:00 · Chủ nhật, cả lớp cùng online đánh trùm mùa.'],
   ['Ấn thạch dạng', 'Khắc phục xong một dạng bài thì ấn sáng, mở biến thể kỹ năng.'],
@@ -54,7 +54,7 @@ export default function DoanSanh(p: Props) {
         <ThuHinh pet={p.pet} cap={p.cap} size={150} className="dh-thu-chinh dh-noi" />
         <LinhTamCau size={50} />
         <div className="dh-ban-do-nhan">{lop ? `Trạm ${lop.tram}/${lop.tongTram}${lop.conTramToiMoc ? ` · còn ${lop.conTramToiMoc} trạm tới ${lop.tenMocKe}` : ' · đã về đích mùa này'}` : 'Linh Tâm đang chờ đoàn của em'}</div>
-        {lop && <div className="dh-ban-do-gop"><b>{lop.gopSucHomNay}/{lop.siSo} bạn</b> góp sức hôm nay · còn {lop.conChangToiTramKe} chặng thắng nữa là lớp tiến một trạm</div>}
+        {lop && <div className="dh-ban-do-gop"><b>{lop.gopSucHomNay}/{lop.siSo} bạn</b> góp sức hôm nay · còn {lop.conChangToiTramKe} chuyến thắng nữa là lớp tiến một trạm</div>}
       </div>
 
       {p.phong && !p.phong.batDau ? (
@@ -72,8 +72,8 @@ export default function DoanSanh(p: Props) {
         </section>
       ) : (
         <>
-          <section className="dh-chang" aria-label="Chặng hôm nay">
-            <span className="dh-chang-nhan">{!s ? 'CHẶNG HÔM NAY' : s.mienPhiHomNay ? 'CHẶNG HÔM NAY · MIỄN PHÍ' : 'CHẶNG THÊM · 1 VÉ'}</span>
+          <section className="dh-chang" aria-label="Chuyến hôm nay">
+            <span className="dh-chang-nhan">{!s ? 'CHUYẾN HÔM NAY' : s.mienPhiHomNay ? 'CHUYẾN HÔM NAY · MIỄN PHÍ' : 'CHUYẾN THÊM · 1 VÉ'}</span>
             <h2>Hộ tống Linh Tâm qua 8 hiệp</h2>
             <div className="dh-quai-goc" aria-hidden="true"><QuaiHinh loai="bun_acid" size={76} /></div>
             <p>
@@ -85,14 +85,14 @@ export default function DoanSanh(p: Props) {
             {s?.quaMoi.map((q, i) => <div key={i} className="dh-qua-moi" role="status">＋{q.ve} vé · {q.ghiChu}</div>)}
             {p.loi && <div className="dh-loi" role="alert">{p.loi}</div>}
             <button type="button" className="dh-nut-vang" disabled={p.ban || !!p.goiY?.hetLuot || hetVe} onClick={p.onLenDuong}>{BieuTuong.choi}<span>{p.ban ? 'ĐANG MỞ ĐƯỜNG…' : hetVe ? 'HẾT VÉ HÔM NAY' : 'LÊN ĐƯỜNG'}</span></button>
-            <small>{hetVe ? 'Hết vé? Làm xong nhiệm vụ hôm nay để nhận 2 vé · xong một chặng Bài tập về nhà đúng kế hoạch nhận 1 vé.' : s ? 'Chặng thêm tốn 1 vé · vé chỉ kiếm được bằng làm bài tập · thua không mất gì' : 'Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì'}</small>
+            <small>{hetVe ? 'Hết vé? Làm xong nhiệm vụ hôm nay để nhận 2 vé · xong một chặng Bài tập về nhà đúng kế hoạch nhận 1 vé.' : s ? 'Chuyến thêm tốn 1 vé · vé chỉ kiếm được bằng làm bài tập · thua không mất gì' : 'Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì'}</small>
           </section>
           {p.khoiThem}
           {s && (
             <div className="dh-hai-the">
               <section className="dh-kinh dh-muc" aria-label="Rương chuỗi ngày">
                 <div className="dh-nhan" style={{ color: 'rgb(255,217,160)' }}>RƯƠNG CHUỖI NGÀY</div>
-                <p>{s.chuoi.mocKe ? <>Còn <b style={{ color: 'rgb(255,209,102)' }}>{s.chuoi.conNgay} ngày</b> mở rương {s.chuoi.mocKe} ngày</> : <>Em đã mở đủ rương của chuỗi này.</>}{!s.chuoi.daDiHomNay && s.chuoi.ngay > 0 ? ' · đi chặng hôm nay để giữ chuỗi' : ''}</p>
+                <p>{s.chuoi.mocKe ? <>Còn <b style={{ color: 'rgb(255,209,102)' }}>{s.chuoi.conNgay} ngày</b> mở rương {s.chuoi.mocKe} ngày</> : <>Em đã mở đủ rương của chuỗi này.</>}{!s.chuoi.daDiHomNay && s.chuoi.ngay > 0 ? ' · đi một chuyến hôm nay để giữ chuỗi' : ''}</p>
                 <div className="dh-chuoi-vach" role="img" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}>{Array.from({ length: 7 }, (_, i) => <i key={i} className={i < Math.min(7, s.chuoi.ngay) ? 'dh-xong' : ''} />)}</div>
               </section>
               <section className="dh-kinh dh-muc" aria-label="Trùm lớp">

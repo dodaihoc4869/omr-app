@@ -158,8 +158,8 @@ function vaoHiep(c: Chang) {
 /** 1–4 em thật. Đi một mình → thêm MỘT bạn đồng hành do máy điều khiển (tất định), để luôn có "đội". */
 export function moChang(cfg: { hatGiong: string; nguoi: NguoiVaoChang[] }): Chang {
   const { hatGiong, nguoi } = cfg
-  if (!hatGiong) throw new Error('Thiếu hạt giống của chặng.')
-  if (nguoi.length < 1 || nguoi.length > SO_GHE_TOI_DA) throw new Error('Một chặng có từ 1 đến 4 bạn.')
+  if (!hatGiong) throw new Error('Thiếu hạt giống của chuyến.')
+  if (nguoi.length < 1 || nguoi.length > SO_GHE_TOI_DA) throw new Error('Một chuyến có từ 1 đến 4 bạn.')
   if (new Set(nguoi.map(n => n.id)).size !== nguoi.length) throw new Error('Một bạn không thể ngồi hai ghế.')
   const petHopLe = (p: number) => Number.isInteger(p) && p >= 0 && p < CHIEU.length
   if (!nguoi.every(n => petHopLe(n.pet))) throw new Error('Thần thú không hợp lệ.')
@@ -167,7 +167,7 @@ export function moChang(cfg: { hatGiong: string; nguoi: NguoiVaoChang[] }): Chan
   for (let k = 1; ghe.length < SO_GHE_TOI_THIEU; k++) {
     // Bạn máy dắt một thần thú KHÁC của em để hai tia chiêu thức không trùng màu.
     const pet = (nguoi[0]!.pet + 1 + Math.floor(rut(hatGiong, `pet-may|${k}`) * (CHIEU.length - 1))) % CHIEU.length
-    ghe.push({ id: `may:${k}`, ten: 'Bạn đồng hành', pet, laMay: true, roi: false, nangLuong: 0, daNhanTiepSuc: 0 })
+    ghe.push({ id: `may:${k}`, ten: 'Bạn máy', pet, laMay: true, roi: false, nangLuong: 0, daNhanTiepSuc: 0 })
   }
   const toiDa = hpLinhTamToiDa(ghe.length)
   const c: Chang = { kind: 'doan', hatGiong, tenChang: kichBanChang(hatGiong).quai[0]!.chang, hiep: 1, ketThuc: false, thang: null, ghe, linhTam: { hp: toiDa, toiDa }, quai: [], maQuaiKe: 1, giaoY: [], trumVoGiap: [], lichSu: [] }
@@ -190,8 +190,8 @@ export function datGiaoY(chang: Chang, giaoY: number[]): Chang {
 // ───────────────────────── Kiểm lệnh (máy chủ gọi lúc em bấm; lời báo in thẳng cho em) ─────────────────────────
 export function kiemHanhDong(c: Chang, ghe: number, hanhDong: HanhDong) {
   const g = c.ghe[ghe]
-  if (c.ketThuc) throw new Error('Chặng đã kết thúc.')
-  if (!g) throw new Error('Em không có ghế trong chặng này.')
+  if (c.ketThuc) throw new Error('Chuyến đã kết thúc.')
+  if (!g) throw new Error('Em không có ghế trong chuyến này.')
   if (hiepLaTrum(c.hiep)) throw new Error('Hiệp trùm không chọn đòn — cả đội cùng giải câu chung.')
   if (!['danh', 'chan', 'ky_nang'].includes(hanhDong)) throw new Error('Chọn Đánh, Chắn hoặc Kỹ năng.')
   if (hanhDong === 'ky_nang' && g.nangLuong < NL_KY_NANG) throw new Error(`Kỹ năng cần ${NL_KY_NANG} năng lượng — mỗi câu đúng cho em 1 năng lượng.`)
@@ -199,12 +199,12 @@ export function kiemHanhDong(c: Chang, ghe: number, hanhDong: HanhDong) {
 /** `daGiup` = các ghế đã tiếp sức ai đó trong hiệp này (máy chủ giữ). */
 export function kiemTiepSuc(c: Chang, tu: number, den: number, daGiup: number[] = []) {
   const a = c.ghe[tu], b = c.ghe[den]
-  if (c.ketThuc) throw new Error('Chặng đã kết thúc.')
+  if (c.ketThuc) throw new Error('Chuyến đã kết thúc.')
   if (hiepLaTrum(c.hiep)) throw new Error('Hiệp trùm cả đội bàn chung, không dùng thẻ tiếp sức.')
   if (!a || !b || tu === den) throw new Error('Chọn một bạn khác trong đội để tiếp sức.')
   if (gheDoMay(b)) throw new Error('Bạn này đang được máy đỡ thay, không cần tiếp sức.')
   if (daGiup.includes(tu)) throw new Error('Mỗi hiệp em tiếp sức được một bạn.')
-  if (b.daNhanTiepSuc >= NHAN_TIEP_SUC_TOI_DA) throw new Error(`Mỗi chặng một bạn nhận tối đa ${NHAN_TIEP_SUC_TOI_DA} lần tiếp sức — bạn ấy sẽ tự làm câu này.`)
+  if (b.daNhanTiepSuc >= NHAN_TIEP_SUC_TOI_DA) throw new Error(`Mỗi chuyến một bạn nhận tối đa ${NHAN_TIEP_SUC_TOI_DA} lần tiếp sức — bạn ấy sẽ tự làm câu này.`)
 }
 
 // ───────────────────────── Bạn máy (tất định; không bao giờ tạo bằng chứng học) ─────────────────────────
@@ -302,7 +302,7 @@ function giaiHiepTrum(c: Chang, nopVao: NopTrum[]): KetQuaHiep {
 
 /** Giải hiệp hiện tại rồi sang hiệp kế. Trả về trạng thái MỚI (không sửa đầu vào); kết quả hiệp nằm ở cuối `lichSu`. */
 export function giaiHiep(chang: Chang, dauVao: DauVaoHiep = {}): Chang {
-  if (chang.ketThuc) throw new Error('Chặng đã kết thúc.')
+  if (chang.ketThuc) throw new Error('Chuyến đã kết thúc.')
   const c = saoChep(chang)
   const kq = hiepLaTrum(c.hiep) ? giaiHiepTrum(c, dauVao.trum ?? []) : giaiHiepThuong(c, dauVao.nop ?? [])
   // Hồi và mất tính GỘP: Linh Tâm chỉ vỡ khi máu sau cả hai vẫn ≤ 0.

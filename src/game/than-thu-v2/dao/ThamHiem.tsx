@@ -24,7 +24,7 @@ export interface ThamHiemProps{
  onTraLoi:(v:string)=>void;onAssisted:(v:boolean)=>void;onNop:()=>void;onTiep:()=>void;onVeDao:()=>void;onChuyenMoi?:()=>void;onMoSoTay?:()=>void
 }
 export const TEN_QUAI='Quái Sương Mù'
-const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
+const MUC_DO:Record<string,string>={biet:'Biết',hieu:'Hiểu',van_dung:'Vận dụng'}
 
 /** Dải ải trên cùng: xong-đúng · xong-sai · đang làm · chưa tới; ải thử thách là ô trám vàng (Trùm ải). */
 export function DaiAi({cau,viTri,ketQua,xong}:{cau:readonly CauDao[];viTri:number;ketQua:readonly BattleAnswer[];xong:boolean}){
@@ -72,7 +72,7 @@ export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanH
  const pc=propCau(),thieu=!traLoi||(q?.phan==='II'&&(traLoi.length<4||traLoi.includes('-'))),cuoi=viTri+1>=cau.length
  return <div className="dao-tham" data-thu={chiSoThu(profile.pet)}>
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi / lời giải" onClose={()=>setZoom('')}/>}
-  <div className="dao-tham-dau"><button type="button" className="dao-tham-ve" onClick={onVeDao} aria-label="Về đảo (lượt đang làm được giữ lại)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><DaiAi cau={cau} viTri={viTri} ketQua={ketQua} xong={xong}/></div>
+  <div className="dao-tham-dau"><button type="button" className="dao-tham-ve" onClick={onVeDao} aria-label="Về đảo (chuyến đang làm được giữ lại)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><DaiAi cau={cau} viTri={viTri} ketQua={ketQua} xong={xong}/></div>
   <SanDau profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length} xong={xong}/>
   {thongBao&&<p className="dao-chuyen-bao" role="status">{thongBao}</p>}
   {loi&&<p className="dao-loi" role="alert">{loi}</p>}

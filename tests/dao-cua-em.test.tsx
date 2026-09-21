@@ -51,7 +51,7 @@ describe('dao-core', () => {
     expect(tinhHinhDang(hoSo().mastery, NOW)).toEqual({ toiHan: 1, yeu: 1, thanhThao: 1, daGap: 4 })
     expect(loiThu(hoSo({ wallet: 120 }), NOW)).toBe('Lửa Nhỏ đang chờ em nạp 120 EXP')
     expect(loiThu(hoSo(), NOW, 5)).toMatch(/chuỗi 5 ngày/)
-    expect(loiThu(hoSo(), NOW)).toBe('Lửa Nhỏ nhắc em: 1 dạng tới hạn ôn hôm nay')
+    expect(loiThu(hoSo(), NOW)).toBe('Lửa Nhỏ nhắc em: 1 dạng đến lịch ôn lại hôm nay')
     expect(loiThu(hoSo({ mastery: [], nickname: undefined }), NOW)).toBe('Viêm Sư háo hức đi chuyến đầu tiên cùng em')
   })
   it('lý do thưởng khớp `advance`: 20/40/40 = sao 1/2/3; sai, có trợ giúp, đúng mà chưa tới hạn đều 0 EXP và nói rõ vì sao', () => {

@@ -37,7 +37,7 @@ describe('Sổ tay dạng bài', () => {
     const es = screen.getByLabelText('Ester – Lipid')
     expect(within(es).getByText('1/4 dạng thành thạo')).toBeTruthy()
     expect(within(within(es).getByText('Thuỷ phân ester').closest('li')!).getByRole('img').getAttribute('aria-label')).toBe('2 trên 3 sao')
-    expect(within(es).getByText('Thuỷ phân ester').closest('li')!.textContent).toContain('tới hạn ôn')
+    expect(within(es).getByText('Thuỷ phân ester').closest('li')!.textContent).toContain('đến lịch ôn lại')
     expect(container.textContent).not.toContain('Xà phòng hoá'); expect(container.textContent).not.toContain('Glucose tráng bạc')
     expect(container.querySelectorAll('li[data-khoa]').length).toBe(2)
   })

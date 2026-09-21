@@ -28,7 +28,7 @@ const C = 2 * Math.PI * 17
 function ThanhHiep({ hiep, soHiep, ketThuc, con, giay, hien, onRoi }: { hiep: number; soHiep: number; ketThuc: boolean; con: number; giay: number; hien: boolean; onRoi: () => void }) {
   return (
     <header className="dh-hiep">
-      <div className="dh-hiep-dong"><b>HIỆP {hiep}/{soHiep}</b><span>◆ = hiệp trùm{!ketThuc && <> · <button type="button" className="dh-roi" onClick={onRoi} title="Máy sẽ đỡ thay, đội không bị phạt">Rời chặng</button></>}</span></div>
+      <div className="dh-hiep-dong"><b>HIỆP {hiep}/{soHiep}</b><span>◆ = hiệp trùm{!ketThuc && <> · <button type="button" className="dh-roi" onClick={onRoi} title="Máy sẽ đỡ thay, đội không bị phạt">Rời chuyến</button></>}</span></div>
       <div className="dh-vach" role="img" aria-label={`Đang ở hiệp ${hiep} trên ${soHiep}`}>
         {Array.from({ length: soHiep }, (_, i) => i + 1).map(h => <i key={h} className={`${HIEP_TRUM.includes(h) ? 'dh-trum' : ''} ${ketThuc || h < hiep ? 'dh-xong' : h === hiep ? 'dh-dang' : ''}`} />)}
       </div>
@@ -175,12 +175,12 @@ export default function DoanTran(p: Props) {
     <>
       <div className="dh-don" role="group" aria-label="Chọn đòn">
         <button type="button" aria-pressed={p.hanhDong === 'danh'} onClick={() => p.onHanhDong('danh')}>{BieuTuong.danh}<b>Đánh</b><small>đúng → {satThuongDon({ dung: true })} sát thương</small></button>
-        <button type="button" aria-pressed={p.hanhDong === 'chan'} onClick={() => p.onHanhDong('chan')}>{BieuTuong.chan}<b>Chắn</b><small>khiên {CHAN} cho Linh Tâm</small></button>
-        <button type="button" aria-pressed={p.hanhDong === 'ky_nang'} disabled={tran.nangLuong < NL_KY_NANG} onClick={() => p.onHanhDong('ky_nang')}>{BieuTuong.ky_nang}<b>{tenKyNang}</b><small>{cau?.an ? `ấn sáng ×1,25 · ${tran.nangLuong}/${NL_KY_NANG} NL` : `kỹ năng · ${tran.nangLuong}/${NL_KY_NANG} NL`}</small></button>
+        <button type="button" aria-pressed={p.hanhDong === 'chan'} onClick={() => p.onHanhDong('chan')}>{BieuTuong.chan}<b>Chắn</b><small>+{CHAN} giáp cho Linh Tâm</small></button>
+        <button type="button" aria-pressed={p.hanhDong === 'ky_nang'} disabled={tran.nangLuong < NL_KY_NANG} onClick={() => p.onHanhDong('ky_nang')}>{BieuTuong.ky_nang}<b>{tenKyNang}</b><small>{cau?.an ? `ấn sáng ×1,25 · Năng lượng ${tran.nangLuong}/${NL_KY_NANG}` : `Năng lượng ${tran.nangLuong}/${NL_KY_NANG}`}</small></button>
       </div>
       {ts && !ts.theNhan && !cau?.rut && (ts.conLuotNhan > 0
         ? <button type="button" className="dh-xin" aria-pressed={ts.daXin} disabled={p.ban} onClick={() => p.onXinTiepSuc(!ts.daXin)}>{ts.daXin ? 'Đang chờ bạn tiếp sức… (chạm để thôi)' : `Cần tiếp sức · còn ${ts.conLuotNhan} lần được tiếp sức`}</button>
-        : <div className="dh-cho" style={{ fontSize: 12 }}>Em đã dùng hết 2 lần được tiếp sức của chặng này — câu này em tự làm nhé.</div>)}
+        : <div className="dh-cho" style={{ fontSize: 12 }}>Em đã dùng hết 2 lần được tiếp sức của chuyến này — câu này em tự làm nhé.</div>)}
       <button type="button" className="dh-nut-lam" disabled={p.ban || !(du || boTrong) || !!cau?.rut && !boTrong} onClick={() => p.onChot(boTrong)}>
         {p.ban ? 'Đang chốt…' : du ? `Chốt đòn · ${p.de!.phan === 'I' ? p.chon + ' + ' : ''}${tenDon}` : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt đòn'}
       </button>
