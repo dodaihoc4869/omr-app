@@ -4,6 +4,8 @@
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
 import TheBoNao from './TheBoNao'
+import TheCanhBaoThay from './TheCanhBaoThay'
+import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, MessageSquare, PawPrint, Plus, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
@@ -83,6 +85,16 @@ function tatCaViec(d: DuLieuBangNhiemVu): TheNhiemVu[] {
   return [...(d.lamNgay ? [d.lamNgay] : []), ...d.cacBac.flatMap((b) => b.viec)]
 }
 
+/** Việc "mở Bài tập về nhà" đúng bài của một cảnh báo (khớp mã bài hoặc mã ca). Không có ⇒ undefined (thẻ không dựng nút Làm ngay). */
+function viecCuaCanhBao(ds: TheNhiemVu[], cb: CanhBaoThay): TheNhiemVu | undefined {
+  if (!cb.maBtvn) return undefined
+  return ds.find((v) => {
+    if (v.hanhDong.loai !== 'mo_btvn') return false
+    const bt = (v.hanhDong.payload as { bt?: { maBtvn?: unknown; maCa?: unknown } } | undefined)?.bt
+    return !!bt && (bt.maBtvn === cb.maBtvn || bt.maCa === cb.maBtvn)
+  })
+}
+
 export interface BangNhiemVuProps {
   vaiTro: 'hocsinh' | 'phuhuynh'
   hoTen: string
@@ -113,6 +125,10 @@ export interface BangNhiemVuProps {
   taiVinhDanh?: () => Promise<DuLieuVinhDanh | null>
   /** Lời cho phụ huynh + thư tuần của "Bộ não A.I" (lệnh riêng /ph/ke-hoach). Học sinh KHÔNG nhận qua đây (lời của em đi theo `duLieu.boNao`). */
   boNaoPh?: BoNaoPhuHuynh | null
+  /** "Cảnh báo của thầy" của PHỤ HUYNH (lời cho phụ huynh, lệnh /ph/ke-hoach). Học sinh nhận qua `duLieu.canhBaoThay`. */
+  canhBaoPh?: CanhBaoThay[]
+  /** Em/phụ huynh bấm "Đã xem" (hoặc "Làm ngay") ở một cảnh báo ⇒ màn cha báo máy chủ. */
+  onCanhBaoDaXem?: (cb: CanhBaoThay) => void
 }
 
 export default function BangNhiemVu({
@@ -137,6 +153,8 @@ export default function BangNhiemVu({
   onNhanThay,
   taiVinhDanh,
   boNaoPh,
+  canhBaoPh,
+  onCanhBaoDaXem,
 }: BangNhiemVuProps) {
   const laPh = vaiTro === 'phuhuynh'
   const choDong = useChoPhepChuyenDong()
@@ -250,6 +268,18 @@ export default function BangNhiemVu({
           </div>
         ) : (
           <>
+            {/* Cảnh báo của thầy: nổi bật ở ĐẦU bảng; không có ⇒ không dựng gì. Học sinh: lời cho em (`duLieu.canhBao`); phụ huynh: lời cho phụ huynh (`canhBaoPh`). */}
+            <TheCanhBaoThay
+              vaiTro={vaiTro}
+              now={now}
+              canhBao={(laPh ? canhBaoPh : duLieu.canhBaoThay) ?? []}
+              coTheLam={(cb) => !!viecCuaCanhBao(viec, cb)}
+              onLam={(cb) => {
+                const v = viecCuaCanhBao(viec, cb)
+                if (v) chon(v)
+              }}
+              onDaXem={onCanhBaoDaXem}
+            />
             {chuaChonThu &&
               (laPh || !onMoThanThu ? (
                 <section className="bnv-chon-thu bnv-chon-thu--doc" data-vung="chon-than-thu" aria-label={laPh ? 'Con chưa chọn thần thú' : 'Em chưa chọn thần thú'}>

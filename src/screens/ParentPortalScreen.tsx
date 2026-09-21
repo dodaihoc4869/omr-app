@@ -9,7 +9,9 @@ import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom, parentNewsApi, datPa
 import { docPass, nhanPassTuDiaChi, xacDinhPhuHuynh, xoaPass } from '../lib/ph-token'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useMemo, useState } from 'react'
-import { taiBoNaoPhuHuynh } from '../lib/bo-nao-lay-loi-ph'
+import { taiThongTinPhuHuynh } from '../lib/bo-nao-lay-loi-ph'
+import { baoDaXemPhuHuynh } from '../lib/canh-bao-thay-may-chu'
+import type { CanhBaoThay } from '../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../lib/bo-nao-hien-thi'
 import DongDemCau from '../components/DongDemCau'
 import {
@@ -106,14 +108,19 @@ export default function ParentPortalScreen() {
   // "Bộ não A.I hỗ trợ riêng em <tên>": lời cho phụ huynh + thư tuần (lệnh riêng /ph/ke-hoach bằng token phụ huynh của app).
   // Không có lời / chạy thử / mất mạng / phụ huynh vào bằng SBD trần ⇒ null ⇒ không thẻ.
   const [boNaoPh, setBoNaoPh] = useState<BoNaoPhuHuynh | null>(null)
+  // "Cảnh báo của thầy" cho phụ huynh đi cùng MỘT lệnh /ph/ke-hoach với lời Bộ não (lời cho phụ huynh, cửa sổ 72 giờ, chỉ đúng con).
+  const [canhBaoPh, setCanhBaoPh] = useState<CanhBaoThay[]>([])
   useEffect(() => {
     if (!sbdHienTai) {
       setBoNaoPh(null)
+      setCanhBaoPh([])
       return
     }
     let huy = false
-    void taiBoNaoPhuHuynh().then((v) => {
-      if (!huy) setBoNaoPh(v)
+    void taiThongTinPhuHuynh().then((v) => {
+      if (huy) return
+      setBoNaoPh(v.boNao)
+      setCanhBaoPh(v.canhBao)
     })
     return () => {
       huy = true
@@ -661,6 +668,8 @@ export default function ParentPortalScreen() {
           dangTai={!sanSangBang && !dungBanNho}
           dangLamMoi={keHoachNgay.dangLamMoi}
           boNaoPh={boNaoPh}
+          canhBaoPh={canhBaoPh}
+          onCanhBaoDaXem={(cb) => void baoDaXemPhuHuynh(cb.id)}
           mucMenu={mucMenuPhuHuynh(setTabPh, dangXuat, {
             // Kết quả giao nhanh hiện ở khung thông báo của sheet "khắc phục", nên mở sheet ngay.
             khacPhuc: () => {

@@ -4,6 +4,7 @@
 // Hàm thuần: không đọc giờ, không gọi mạng, KHÔNG xếp lại thứ tự — thứ tự là
 // của dữ liệu; ở đây chỉ gán bậc, tính cổng và chọn thẻ "Làm ngay".
 import { docBoNao, docBoNaoHocSinh, type BoNaoView } from './bo-nao-hien-thi'
+import { docCanhBaoThay, type CanhBaoThay } from './canh-bao-thay-hien-thi'
 import { dongPhuChang } from './btvn-ca-nhan-kieu'
 import { dinhDangConLai } from './tro-ly-ca-nhan'
 import { ngayVietNam } from './han-bai-tap'
@@ -115,6 +116,11 @@ export interface DuLieuBangNhiemVu {
    * không đi qua đây (lệnh riêng `/ph/ke-hoach`, xem bo-nao-lay-loi-ph.ts). null/vắng ⇒ KHÔNG thẻ. Nguồn trợ lý không có ⇒ null.
    */
   boNao?: BoNaoView | null
+  /**
+   * "Cảnh báo của thầy" (khoá `canhBaoThay` ở gốc /hs/ke-hoach-ngay, lời cho EM): ≤ 3, chỉ bài chưa nộp; [] ⇒ KHÔNG thẻ. Phụ huynh nhận qua /ph/ke-hoach
+   * (lời cho phụ huynh, xem bo-nao-lay-loi-ph.ts) chứ không qua đây. KHÔNG lưu vào bản nhớ: cảnh báo cũ có thể đã hết đúng (em vừa nộp).
+   */
+  canhBaoThay?: CanhBaoThay[]
 }
 
 export interface DuLieuExp {
@@ -341,6 +347,7 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     // Nguồn trợ lý không biết cờ mở game: KHÔNG mời (cùng bộ khoá ở gốc với nguồn máy chủ — test khoá).
     doanMo: false,
     boNao: null,
+    canhBaoThay: [],
   }, {
     // Nguồn trợ lý không có `tienBo.dat`: coi là đạt khi đã làm đủ mức gợi ý.
     dat: nganSach.mucTieuCau > 0 && nganSach.daLamCau >= nganSach.mucTieuCau,
@@ -411,6 +418,8 @@ export interface KeHoachNgayMayChu {
   doanMo?: unknown
   /** Lời nhắn Bộ não cho học sinh — đọc chặt bằng `docBoNao` (bo-nao-hien-thi.ts). */
   loiNhanHlv?: unknown
+  /** "Cảnh báo của thầy" cho em — đọc chặt bằng `docCanhBaoThay` (canh-bao-thay-hien-thi.ts). */
+  canhBaoThay?: unknown
 }
 
 const soNguyen = (v: unknown) => Math.max(0, Math.floor(Number(v) || 0))
@@ -653,6 +662,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     ...docExp(keHoach),
     doanMo: keHoach.doanMo === true,
     boNao: (() => { const v = docBoNao(keHoach); return v.hs ? { hs: v.hs, ph: null } : null })(),
+    canhBaoThay: docCanhBaoThay(keHoach.canhBaoThay),
   }, { dat: keHoach.tienBo.dat === true && !expChuaDat, daLamCau: daLam, lenBac })
 }
 
@@ -781,6 +791,7 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
     manhNhan: [],
     doanMo: (d as any).doanMo === true,
     boNao: (() => { const hs = docBoNaoHocSinh((d as any).boNao?.hs); return hs ? { hs, ph: null } : null })(),
+    canhBaoThay: [],
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
     ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',

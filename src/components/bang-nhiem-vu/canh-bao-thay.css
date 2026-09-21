@@ -1,0 +1,40 @@
+/* THẺ "CẢNH BÁO CỦA THẦY" (học sinh + phụ huynh) — ngôn ngữ M3 của Bảng nhiệm vụ. Chỉ token m3-theme.css / tokens.css, KHÔNG mã màu thô
+ * (npm run check:mau), không emoji. Màu vàng nhạt = "chú ý" chứ không đỏ (không doạ). Màu không phải kênh duy nhất: luôn kèm chữ + biểu tượng. */
+.bnv-cb-nhom { display: flex; flex-direction: column; gap: 8px; }
+.bnv-cb {
+  margin: 0; padding: 16px; border-radius: var(--m3-bo-28);
+  background: var(--m3-canh-bao-nen); color: var(--m3-canh-bao-chu); box-shadow: var(--m3-cao-do-1);
+  font-family: var(--sans);
+}
+.bnv-cb-dau { display: flex; align-items: flex-start; gap: 12px; }
+.bnv-cb-o {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--m3-canh-bao-chu); color: var(--m3-canh-bao-nen);
+}
+.bnv-cb-tieu { min-width: 0; }
+.bnv-cb-nhan { display: block; font-size: var(--cx-1); font-weight: 600; letter-spacing: 0.02em; }
+.bnv-cb-tieu h2 { margin: 2px 0 0; font-size: var(--cx-3); font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+.bnv-cb-loi { margin: 12px 0 0; font-size: var(--cx-3); line-height: 1.55; white-space: pre-line; overflow-wrap: anywhere; }
+.bnv-cb-that { margin: 12px 0 0; display: flex; flex-direction: column; gap: 2px; font-size: var(--cx-2); font-weight: 600; line-height: 1.45; font-variant-numeric: tabular-nums; }
+.bnv-cb-luc { display: block; margin-top: 8px; font-size: var(--cx-1); opacity: 0.85; font-variant-numeric: tabular-nums; }
+.bnv-cb-chan { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.bnv-cb-nut {
+  min-height: 48px; padding: 0 16px; border: 0; border-radius: var(--m3-bo-tron); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; font: inherit; font-size: var(--cx-2); font-weight: 700;
+  background: var(--m3-canh-bao-chu); color: var(--m3-canh-bao-nen);
+}
+.bnv-cb-nut--phu { background: transparent; color: var(--m3-canh-bao-chu); box-shadow: inset 0 0 0 1px var(--m3-canh-bao-chu); }
+.bnv-cb-nut:active { transform: scale(0.98); }
+.bnv-cb-nut:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
+
+/* Đã xem: thu thành MỘT dòng (bài vẫn chưa nộp nên vẫn nhắc, nhưng không chiếm chỗ). */
+.bnv-cb--gon {
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 16px; border-radius: var(--m3-bo-16); box-shadow: none;
+}
+.bnv-cb--gon > svg { flex: none; }
+.bnv-cb-gon-chu { display: flex; flex-direction: column; min-width: 0; flex: 1; font-size: var(--cx-2); line-height: 1.35; }
+.bnv-cb-gon-chu b { font-weight: 700; overflow-wrap: anywhere; }
+.bnv-cb-gon-chu span { font-size: var(--cx-1); font-variant-numeric: tabular-nums; }
+.bnv-cb-nut--gon { min-height: 48px; padding: 0 12px; flex: none; }
+
+@media (prefers-reduced-motion: reduce) { .bnv-cb-nut:active { transform: none; } }

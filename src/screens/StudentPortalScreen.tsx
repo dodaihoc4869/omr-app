@@ -82,6 +82,7 @@ const ManLamBai = lazy(() => import('./ExamTakeScreen'))
 const LamCauOn = lazy(() => import('../components/bang-nhiem-vu/LamCauOn'))
 const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang'))
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
+import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
 
@@ -1298,6 +1299,7 @@ export default function StudentPortalScreen() {
           hoTen={auth.hoTen}
           now={nowHocTap}
           duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
+          onCanhBaoDaXem={(cb) => void baoDaXemHocSinh(auth.token!, cb.id)}
           dangTai={!sanSangBang && !dungBanNho}
           dangLamMoi={keHoachNgay.dangLamMoi}
           mucMenu={mucMenuHocSinh(moManCu, dangXuat)}
