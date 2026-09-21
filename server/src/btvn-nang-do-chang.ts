@@ -88,3 +88,19 @@ export function trangThaiCacChang(chang: string[][], chotLuc: string, loDaXong: 
   return { chang: ds, changDangMo: daXong < chang.length && ds[daXong].daMo ? daXong : null }
 }
 
+/** Số giờ TRỄ so với hạn nộp (làm tròn LÊN, tối thiểu 1); 0 = chưa quá hạn / hạn không đọc được. */
+export function soGioTre(hanNop: unknown, nowMs: number): number {
+  const h = Date.parse(String(hanNop ?? ''))
+  return Number.isFinite(h) && nowMs > h ? Math.max(1, Math.ceil((nowMs - h) / 3_600_000)) : 0
+}
+
+/** NỘP TRỄ (Điều 4 = B): sau khi lượt nộp ĐẦU đã ghi `nop_luc`, đánh dấu `nop_tre = 1` + `gio_tre`. Best-effort: thiếu cột (chưa chạy migration-2109-nop-tre.sql) hoặc lỗi ⇒ bỏ qua, KHÔNG làm hỏng việc nộp. */
+export async function ghiNopTre(env: { DB: { prepare(q: string): { bind(...a: unknown[]): { run(): Promise<unknown> } } } }, khoa: string, nopLuc: string, hanNop: unknown, nowMs: number): Promise<void> {
+  const gio = soGioTre(hanNop, nowMs)
+  if (gio <= 0) return
+  try {
+    await env.DB.prepare('UPDATE btvn_em SET nop_tre = 1, gio_tre = ? WHERE khoa = ? AND nop_luc = ?').bind(gio, khoa, nopLuc).run()
+  } catch (e) {
+    console.error('[nop-tre] không ghi được nộp trễ (bỏ qua):', e instanceof Error ? e.message : e)
+  }
+}

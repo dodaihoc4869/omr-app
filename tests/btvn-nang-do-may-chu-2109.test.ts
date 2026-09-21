@@ -212,12 +212,12 @@ describe('MỞ BÀI của bài cá nhân hoá', () => {
     expect(r).toMatchObject({ ok: false, lyDo: 'bai_chua_san_sang' })
     expect(JSON.stringify(r)).not.toContain('dap_an')
   })
-  it('quá hạn chưa nộp ⇒ qua_han như cũ', async () => {
+  it('quá hạn chưa nộp: em CHƯA từng mở VẪN mở được (sửa CÓ CHỦ Ý 21/09, Điều 4 = B nộp trễ) — bộ chỉ phần lõi, cờ quaHan/nopTre; chi tiết ở tests/nop-tre-2109', async () => {
     gio(BAY_GIO)
     const d = dung()
     await giao(d)
     gio('2026-09-30T00:00:00.000Z')
-    expect(await mo(d)).toMatchObject({ ok: false, lyDo: 'qua_han' })
+    expect(await mo(d)).toMatchObject({ ok: true, quaHan: true, nopTre: true, daNop: false })
   })
 })
 
@@ -332,7 +332,7 @@ describe('NỘP CHẶNG (/btvn/xong-lo của bài cá nhân hoá)', () => {
     const c1 = boCuaEm(d).filter((x) => x.chang === 1).map((x) => x.qid)
     expect(await nopChang(d, 1, Object.fromEntries(c1.map((q) => [q, DAP_AN_DUNG(q)])))).toMatchObject({ ok: true, loDaXong: 2 })
   })
-  it('đáp án cho câu NGOÀI chặng bị bỏ; quá hạn ⇒ qua_han', async () => {
+  it('đáp án cho câu NGOÀI chặng bị bỏ; qua hạn vẫn nộp được (sửa CÓ CHỦ Ý 21/09: Điều 4 = B nộp trễ)', async () => {
     gio(BAY_GIO)
     const d = dung()
     await giao(d)
@@ -343,8 +343,8 @@ describe('NỘP CHẶNG (/btvn/xong-lo của bài cá nhân hoá)', () => {
     expect(r.ok).toBe(true)
     expect(r.ketQua.map((k: { qid: string }) => k.qid)).not.toContain(ngoai)
     expect(JSON.parse((d.sql.prepare("SELECT dap_an_json FROM btvn_em WHERE sbd='S1'").get() as { dap_an_json: string }).dap_an_json)).not.toHaveProperty(ngoai)
-    gio('2026-09-30T00:00:00.000Z')
-    expect(await nopChang(d, 1, { x: 'A' })).toMatchObject({ ok: false })
+    gio('2026-09-30T00:00:00.000Z') // qua hạn: KHÔNG còn qua_han (nộp trễ); đáp án không thuộc chặng chỉ bị bỏ, chặng chưa xong
+    expect(await nopChang(d, 1, { x: 'A' })).toMatchObject({ ok: true, chuaLam: expect.any(Array) })
   })
   it('CHƯA GHI ĐƯỢC SỔ ⇒ ok:false và KHÔNG có đáp án/lời giải nào trong phản hồi (đáp án chỉ ra sau khi ghi sổ)', async () => {
     gio(BAY_GIO)
@@ -358,16 +358,16 @@ describe('NỘP CHẶNG (/btvn/xong-lo của bài cá nhân hoá)', () => {
     const chuoi = JSON.stringify(r)
     for (const bi of ['dapAnDung', 'loiGiai', 'LG-BI-MAT', 'ketQua', 'tienBo']) expect(chuoi).not.toContain(bi)
   })
-  it('QUÁ HẠN chưa nộp ⇒ nộp chặng bị chặn ở máy chủ (lyDo qua_han), không ghi gì thêm', async () => {
+  it('QUÁ HẠN (sửa CÓ CHỦ Ý 21/09, Điều 4 = B — thầy chốt 14:13): em ĐÃ MỞ bài vẫn nộp được chặng sau hạn (nộp trễ); thử-sức-thêm sau hạn vẫn qua_han (chi tiết: tests/nop-tre-2109)', async () => {
     gio(BAY_GIO)
     const d = dung()
     await giao(d)
     await mo(d)
     gio('2026-09-30T00:00:00.000Z')
     const qs = chang0(d)
-    expect(await nopChang(d, 0, Object.fromEntries(qs.map((q) => [q, DAP_AN_DUNG(q)])))).toMatchObject({ ok: false, lyDo: 'qua_han' })
-    expect(d.dem('su_kien_hoc')).toBe(0)
-    expect(d.sql.prepare("SELECT dap_an_json, lo_da_xong FROM btvn_em WHERE sbd='S1'").get()).toMatchObject({ dap_an_json: null, lo_da_xong: 0 })
+    expect(await nopChang(d, 0, Object.fromEntries(qs.map((q) => [q, DAP_AN_DUNG(q)])))).toMatchObject({ ok: true, loDaXong: 1 })
+    expect(d.dem('su_kien_hoc')).toBe(qs.length)
+    expect(d.sql.prepare("SELECT lo_da_xong FROM btvn_em WHERE sbd='S1'").get()).toMatchObject({ lo_da_xong: 1 })
   })
   it('EM KHÁC không nộp hộ được chặng của em này (khoá theo maBtvn|sbd)', async () => {
     gio(BAY_GIO)

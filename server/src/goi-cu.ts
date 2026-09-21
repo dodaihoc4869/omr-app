@@ -3,6 +3,7 @@ import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
 import {docBoCuaCacEm,docTomTat,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
+import {ghiNopTre} from './btvn-nang-do-chang'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 import { goTuLuanKhoiGoi, laCauTuLuan, locPhieuBaiTap, type PhanCau } from './cam-tu-luan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
@@ -881,9 +882,8 @@ export async function nopBtvnQuaPhieu(
   const maBtvn = chuoi(bt.ma_btvn)
   const han = chuoi(bt.han_nop)
   const hanMs = han ? Date.parse(han) : NaN
-  if (Number.isFinite(hanMs) && Date.now() > hanMs) {
-    return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' }
-  }
+  // ĐIỀU 4 = B (thầy chốt 21/09 14:13): qua hạn em VẪN nộp được LẦN ĐẦU (ghi nộp trễ); nộp LẠI / làm lại sau hạn vẫn khoá (chờ thầy gia hạn) — kiểm ở nhánh `cu.nop_luc` bên dưới.
+  const quaHan = Number.isFinite(hanMs) && Date.now() > hanMs
   // BÀI CÁ NHÂN HOÁ ("nâng đỡ"): chấm trên câu CỦA EM, luật điểm riêng (btvn-nang-do-d1.ts). Bài cũ đi tiếp đường dưới, không đổi một byte.
   if (laBaiCaNhan(bt)) return nopBaiCaNhan(env, bt, sbd, lam, Date.now())
 
@@ -903,6 +903,7 @@ export async function nopBtvnQuaPhieu(
   }
 
   if(cu.nop_luc&&String(cu.dap_an_json)===JSON.stringify(lam))return {ok:true,lanThu:Number(cu.so_lan_lam),soCau,soDung,qidSai,nopLuc:cu.nop_luc,daNhan:true}
+  if (quaHan && cu.nop_luc) return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' }
   let lanMoi = 1
   if (cu.nop_luc) {
     const daLam = Math.max(1, Number(cu.so_lan_lam) || 1)
@@ -919,6 +920,7 @@ export async function nopBtvnQuaPhieu(
     .run()
 
   if(!saved.meta.changes)return {ok:false,error:'Bài vừa được cập nhật từ một lần nộp khác. Em tải lại để xem kết quả.'}
+  if (lanMoi === 1) await ghiNopTre(env, khoa, nay, han, Date.now()) // nộp lần đầu SAU hạn ⇒ nộp trễ
   // SỔ SỰ KIỆN HỌC (GĐ 0): mỗi câu của tờ là một sự kiện `btvn`, lan = lượt làm, dựng từ CHÍNH kết quả
   // `gradeHomework` vừa chấm (không đọc lại R2). Lượt 1 bỏ qua câu đã ghi qua lô (`btvn_lo`) để nộp cả
   // bài không đếm đôi. Lỗi sổ không làm hỏng lượt nộp.

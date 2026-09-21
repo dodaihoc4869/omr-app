@@ -23,7 +23,8 @@ import { tinhNganSach, tinhVanToc, type DauVaoKeHoach } from './ke-hoach-ngay'
 import { chuyenDeThat, ghiSuKien, ngayVn, phanTuQid, suKienChamBai, suKienTuKetQuaCham, cauTuKho } from './su-kien-hoc'
 import { daTraLoi } from './on-lai-nop'
 import { docDieuChinhHieuLuc, type DieuChinhHieuLuc } from './bo-nao-doc'
-import { docLichDaLuu, LAN_MOI_LUOT, moLucChang, trangThaiCacChang, type LichDaLuu } from './btvn-nang-do-chang'
+import { docLichDaLuu, ghiNopTre, LAN_MOI_LUOT, moLucChang, trangThaiCacChang, type LichDaLuu } from './btvn-nang-do-chang'
+import { chiaChangNopTre } from '../../src/lib/ve-dich'
 import { canhBaoHanNgan, cheDoLich, nganSachHanNgan, sucChua, xepLichChang, type SucChua } from '../../src/lib/btvn-nang-do-lich'
 
 type Hang = Record<string, unknown>
@@ -437,10 +438,27 @@ export async function chotBoChoEm(env: Env, bt: Hang, sbd: string, now: number):
   if (!bai || !hs) return null
   const dv = dvAll.get(sbd)!
   const dc = dcAll.get(sbd)
-  const { bo, nganSach, goc, giay } = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) ? hanMs : now + MOT_NGAY_MS, dv, hs.get(sbd)!, dc?.dieuChinh)
+  // NỘP TRỄ (Điều 4 = B, Boss chốt 21/09): em CHƯA TỪNG MỞ bài mà hạn đã qua VẪN phải làm — bộ CHỈ PHẦN LÕI (kể cả lõi đúng bậc), KHÔNG làm thêm/thử sức; chia chặng theo trần buổi (≤ 30 câu / 60 phút, ≤ 2 chặng/ngày;
+  // hai chặng đầu mở NGAY, các chặng sau 00:00 những ngày kế) bằng `chiaChangNopTre` (Code 1). Dựng bộ như thường (hạn giả = mai) rồi tước phần làm thêm.
+  const nopTre = Number.isFinite(hanMs) && now > hanMs
+  const dung = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) && !nopTre ? hanMs : now + MOT_NGAY_MS, dv, hs.get(sbd)!, dc?.dieuChinh)
+  const { nganSach, goc, giay } = dung
+  let bo = dung.bo
   const chotLuc = new Date(now).toISOString()
-  // LỊCH CHẶNG (bản 1.1): tính MỘT lần cùng bộ, lưu ở `chang_mo_json`. Hạn dài Y HỆT `moLucChang` cũ; hạn ngắn chia theo giờ trong cửa sổ học.
-  const xep = Number.isFinite(hanMs) ? xepLichChoBo(chotLuc, new Date(hanMs).toISOString(), bo.chang, goc, giay) : null
+  let xep: { json: string; lich: LichDaLuu } | null
+  if (nopTre) {
+    const loi = new Set([...loiCuaEm(bo.tomTat, bai.loi), ...bai.ghim]) // lõi của EM (kể cả lõi đúng bậc) + câu thầy ghim (luôn bắt buộc)
+    const cauLoi = bo.chang.flat().filter((q) => loi.has(q)).map((qid) => ({ qid, giay }))
+    const chia = chiaChangNopTre({ now, cauLoi, giayMoiCau: giay })
+    if (chia.chang.length === 0) return null // bài không còn câu lõi nào: không chốt được (người gọi báo bằng lời)
+    bo = { ...bo, chang: chia.chang, thuSucThem: [], nhan: Object.fromEntries(chia.chang.flat().map((q) => [q, bo.nhan[q] ?? 'loi'])) }
+    const j = JSON.stringify({ cheDo: 'dai', chang: chia.moLuc.map((moLuc, chiSo) => ({ chiSo, moLuc })) })
+    const lich = docLichDaLuu(j, chia.chang.length)
+    xep = lich ? { json: j, lich } : null
+  } else {
+    // LỊCH CHẶNG (bản 1.1): tính MỘT lần cùng bộ, lưu ở `chang_mo_json`. Hạn dài Y HỆT `moLucChang` cũ; hạn ngắn chia theo giờ trong cửa sổ học.
+    xep = Number.isFinite(hanMs) ? xepLichChoBo(chotLuc, new Date(hanMs).toISOString(), bo.chang, goc, giay) : null
+  }
   let thuTu = 0
   const hangBatBuoc = bo.chang.flatMap((qs, c) => qs.map((q) => ({ q, c, n: bo.nhan[q], t: thuTu++ })))
   // THỬ SỨC THÊM (bản 1.2): ngoài mọi chặng ⇒ `chang = -1`, nhãn `loi_cao`, thứ tự nối sau các câu bắt buộc. `so_cau_em`/`so_chang` CHỈ đếm câu bắt buộc.
@@ -630,8 +648,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
   if (!em || em.thu_hoi) return { ok: false, error: 'Em không có bài tập này.' }
   if (!em.chot_luc) return { ok: false, lyDo: 'chua_chot', error: 'Em mở bài trước rồi mới nộp chặng được.' }
   const soChang = soHoac(em.so_chang)
-  const hanMs = Date.parse(chuoi(bt.han_nop))
-  if (Number.isFinite(hanMs) && now > hanMs && !em.nop_luc) return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' }
+  // ĐIỀU 4 = B (thầy chốt 21/09 14:13): qua hạn em VẪN làm và nộp các chặng còn lại của bài ĐÃ MỞ (đã chốt bộ — kiểm ở trên); lượt nộp cuối ghi nộp trễ (`ghiNopTre`). Hạn nộp KHÔNG đổi; thầy vẫn gia hạn tay được.
   const chotLuc = chuoi(em.chot_luc)
   const loDaXong = Math.min(soChang, soHoac(em.lo_da_xong))
   if (chiSo === soChang && soChang > 0) return nopThuSucThem(env, bt, em, sbd, dapAnTho, now) // chặng ẢO "thử sức thêm" (bản 1.2): nộp RIÊNG, tới hạn nộp kể cả khi phần bắt buộc đã nộp
@@ -927,6 +944,7 @@ export async function nopBaiCaNhan(env: Env, bt: Hang, sbd: string, lam: Hang, n
   const saved = await env.DB.prepare('UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ? WHERE khoa = ? AND thu_hoi = 0 AND nop_luc IS NULL')
     .bind(nay, soDungCuoi, mauCuoi, luuLam, khoa).run()
   if (!saved.meta.changes) return { ok: false, error: 'Bài vừa được cập nhật từ một lần nộp khác. Em tải lại để xem kết quả.' }
+  await ghiNopTre(env, khoa, nay, bt.han_nop, now) // nộp SAU hạn ⇒ ghi nop_tre + số giờ trễ
   // Sổ: mọi câu của em (kể cả thưởng sai — hồ sơ cần biết). Câu đã ghi qua chặng (`btvn_lo`) không ghi đôi.
   await ghiSuKien(env, suKienTuKetQuaCham('btvn', maBtvn, sbd, luot, nay, graded), { tranhTrungLo: true })
   return { ok: true, lanThu: luot, soCau: mauCuoi, soDung: soDungCuoi, qidSai: graded.qidSai, nopLuc: nay, soLanLamLaiConLai: 0, ...chung }

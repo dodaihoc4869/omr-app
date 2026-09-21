@@ -1673,9 +1673,8 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
 
   const hanMs = mocMs(String(bt.han_nop ?? ''))
   const quaHan = hanMs > 0 && Date.now() > hanMs
-  if (quaHan && !em.nop_luc) {
-    return ra({ ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN', hanNop: String(bt.han_nop ?? '') })
-  }
+  // ĐIỀU 4 = B (thầy chốt 21/09 14:13): qua hạn em VẪN mở và làm nốt (nộp trễ) — bài THƯỜNG, hoặc bài cá nhân hoá em ĐÃ chốt bộ. Em CHƯA từng mở bài cá nhân hoá mà hạn đã qua: chờ luật chốt bộ nộp trễ (chỉ lõi) ⇒ tạm vẫn 'qua_han'.
+  // Em CHƯA từng mở bài cá nhân hoá mà hạn đã qua: `chotBoChoEm` chốt bộ CHỈ PHẦN LÕI, chia chặng theo trần buổi (nộp trễ). Không còn chặn 'qua_han' ở đây.
 
   // BÀI CÁ NHÂN HOÁ: bộ câu riêng của em (chốt lần mở đầu), CHỈ chặng đã mở, KHÔNG đáp án/lời giải. Bài cũ đi tiếp đường dưới, không đổi một byte.
   if (ND.laBaiCaNhan(bt)) {
@@ -1685,6 +1684,7 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
       ok: true,
       maBtvn: String(bt.ma_btvn ?? ''),
       hanNop: String(bt.han_nop ?? ''),
+      ...(quaHan && !em.nop_luc ? { quaHan: true, nopTre: true } : {}), // chỉ-thêm: bài đã qua hạn nộp — em vẫn làm nốt, sẽ ghi nộp trễ
       giaoLuc: String(bt.giao_luc ?? ''),
       daNop: !!em.nop_luc,
       nopLuc: String(em.nop_luc ?? ''),
@@ -1708,6 +1708,7 @@ async function btvnCuaEm(env: Env, b: Record<string, unknown>): Promise<Response
     ok: true,
     maBtvn: String(bt.ma_btvn ?? ''),
     hanNop: String(bt.han_nop ?? ''),
+    ...(quaHan && !em.nop_luc ? { quaHan: true, nopTre: true } : {}),
     giaoLuc: String(bt.giao_luc ?? ''),
     daNop: !!em.nop_luc,
     nopLuc: String(em.nop_luc ?? ''),

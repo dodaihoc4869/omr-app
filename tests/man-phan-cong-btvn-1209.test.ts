@@ -49,7 +49,9 @@ describe('THẺ GIAO BÀI — nói thẳng khi chưa chuyển kho đề', () => 
   it('nói rõ hạn 48 giờ chặn ở MÁY CHỦ, không phải ẩn nút', () => {
     expect(PC).toContain('máy chủ')
     expect(PC).toContain('Để trống: mặc định hạn nộp sau 48 giờ')
-    expect(doc('server/src/index.ts')).toContain('if (quaHan && !em.nop_luc)')
+    // Sửa CÓ CHỦ Ý 21/09 (Điều 4 = B, thầy chốt 14:13): quá hạn VẪN mở được (nộp trễ); em chưa từng mở bài cá nhân hoá được chốt bộ chỉ phần lõi.
+    expect(doc('server/src/index.ts')).not.toContain('if (quaHan && !em.nop_luc')
+    expect(doc('server/src/index.ts')).toContain('chotBoChoEm` chốt bộ CHỈ PHẦN LÕI')
   })
 
   it('kho đề đọc từ máy chủ mới, không đọc Apps Script', () => {
