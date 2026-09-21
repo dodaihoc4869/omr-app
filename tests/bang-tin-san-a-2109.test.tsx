@@ -330,7 +330,7 @@ describe('nguồn: lớp CSS, token, chữ', () => {
     const khoiToi = tok.slice(tok.indexOf('--bts-nen: #0e1116'))
     const dungBien = new Set([...css.matchAll(/var\(--(bts-[\w-]+)\)/g)].map((m) => m[1]!))
     expect(dungBien.size).toBeGreaterThan(15)
-    for (const b of dungBien) if (b !== 'bts-fm' && b !== 'bts-em') expect(khoiSang.includes(`--${b}:`), `thiếu ${b} ở nền sáng`).toBe(true)
+    for (const b of dungBien) if (!['bts-fm', 'bts-em', 'bts-cao-hang'].includes(b)) expect(khoiSang.includes(`--${b}:`), `thiếu ${b} ở nền sáng`).toBe(true)
     for (const b of ['bts-nen', 'bts-mat', 'bts-mat-2', 'bts-vien', 'bts-chu', 'bts-chu-phu', 'bts-duong', 'bts-la', 'bts-do', 'bts-la-nhat', 'bts-do-nhat', 'bts-xam-o', 'bts-luoi']) expect(khoiToi.includes(`--${b}:`), `thiếu ${b} ở nền tối`).toBe(true)
   })
 

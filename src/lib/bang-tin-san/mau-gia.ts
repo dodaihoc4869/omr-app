@@ -1,6 +1,7 @@
 // DỮ LIỆU GIẢ có hạt giống cố định cho bản vẽ, kiểm thử và chụp ảnh (KHÔNG dùng ở màn thật: màn thật chỉ nhận `/gv/bang-tin-song`).
 // Sinh ra ĐÚNG hợp đồng `DuLieuSan` và các số KHỚP nhau (tổng lớp = câu đã làm; ô nhiệt = em đã học) — cùng luật với `chotSo`.
-import type { DuLieuSan, EmNhiet, LopSan, NenSan, TinSan } from './kieu'
+import type { BangTin } from '../bang-tin-thay'
+import type { DanDauSan, DuLieuSan, EmNhiet, LopSan, NenSan, TinSan } from './kieu'
 
 const PHUT = 60_000
 const NEN_MS = 5 * PHUT
@@ -159,6 +160,45 @@ export function taoDuLieuGia(nowMs: number, hatGiong = 20260921): DuLieuSan {
     { luc: nowMs - 1 * PHUT, loai: 'cham', chu: tenEm(dangHoc[7]!), phu: `· ${dangHoc[7]!.lop} · vừa vào học, mở bài Ester – Lipid` },
   ]
 
+  // các khối sẵn có của /gv/bang-tin (tên bài là TÊN CHUYÊN ĐỀ, không mã)
+  const dh = (h: number): string => new Date(nowMs + h * 3_600_000).toISOString()
+  const emVap = nhiet.filter((e) => e.dangVap)
+  const top = nhiet.filter((e) => e.soCau > 0).sort((a, b) => b.soCau - a.soCau || (a.sbd < b.sbd ? -1 : 1)).slice(0, 5)
+  const danDau: DanDauSan[] = top.map((e, i) => ({ sbd: e.sbd, hoTen: e.hoTen, tenLop: e.lop, soCau: e.soCau, tienBo: [9, 4, 3, 13, 0][i]! }))
+  const bt: BangTin = {
+    ngay: '2026-09-21', tu: new Date(mocMs).toISOString(), tuHomNay: new Date(mocMs).toISOString(), tuDangAp: true, capNhatLuc: new Date(nowMs).toISOString(),
+    nhip: { soEmHoc, tongEm, soCau, soCauDung, tiLeDung: soCauDung / soCau, homQua: null, noTheoLop: null },
+    baiTap: [
+      { ma: 'B1', ten: 'Este – Lipid', tenLop: '12 - Lớp Thường', nhieuLop: false, hanNop: dh(2 * 24 + 5), quaHan: false, tong: 54, chuaMo: 21, dangLam: 19, daNop: 14, chang: null, nhac: { soEm: 12, soPhuHuynh: 9, luotKe: dh(0.03) } },
+      { ma: 'B2', ten: 'Cân bằng hoá học', tenLop: 'Khối 11', nhieuLop: false, hanNop: dh(29), quaHan: false, tong: 71, chuaMo: 30, dangLam: 26, daNop: 15, chang: null, nhac: { soEm: 3, soPhuHuynh: 2, luotKe: dh(0.3) } },
+      { ma: 'B3', ten: 'Cấu tạo nguyên tử', tenLop: 'Khối 10', nhieuLop: false, hanNop: dh(3 * 24 + 8), quaHan: false, tong: 62, chuaMo: 28, dangLam: 22, daNop: 12, chang: null, nhac: null },
+      { ma: 'B4', ten: 'Amine – Amino acid', tenLop: '12 - Tinh Hoa', nhieuLop: false, hanNop: dh(6.5), quaHan: false, tong: 38, chuaMo: 9, dangLam: 14, daNop: 15, chang: null, nhac: { soEm: 5, soPhuHuynh: 4, luotKe: dh(1.4) } },
+    ],
+    tienBo: [{ loai: 'tien_bo_nhat', sbd: top[3]!.sbd, hoTen: top[3]!.hoTen, tenLop: top[3]!.lop, so: 23, chu: 'đúng 54 → 77 %', anh: '' }],
+    canDeY: {
+      ds: [
+        { sbd: emVap[1]!.sbd, hoTen: emVap[1]!.hoTen, tenLop: emVap[1]!.lop, lyDo: [{ loai: 'sai_nhieu', chu: 'Sai 4/5 câu dạng Chuyển dịch cân bằng', so: 4, tong: 5 }] },
+        { sbd: emVap[3]!.sbd, hoTen: emVap[3]!.hoTen, tenLop: emVap[3]!.lop, lyDo: [{ loai: 'chua_mo_bai', chu: 'Chưa mở bài «Cân bằng hoá học», hạn còn 1 ngày', so: null, tong: null }] },
+        { sbd: emVap[0]!.sbd, hoTen: emVap[0]!.hoTen, tenLop: emVap[0]!.lop, lyDo: [{ loai: 'qua_han', chu: 'Chưa nộp bài «Este – Lipid», đã quá hạn 2 giờ', so: null, tong: null }] },
+      ],
+      conLai: 8,
+    },
+    chuaHoc: null,
+    saiNhanh: null,
+    dangVap: [
+      { ma: 'D1', ten: 'Chuyển dịch cân bằng', soEmVap: 14, soEmGap: 36 },
+      { ma: 'D2', ten: 'Phản ứng tráng bạc', soEmVap: 9, soEmGap: 30 },
+    ],
+    boNao: { chayLuc: new Date(nowMs - 12 * 3_600_000).toISOString(), soEmSoi: 220, soEmDieuChinh: 0, soLoiNhan: 47, goiY: [] },
+    mayDaLam: [
+      { loai: 'on_lai', so: 128, soPhuHuynh: null, chu: 'Đưa 128 câu sai về lịch ôn lại' },
+      { loai: 'bo_cau_rieng', so: 23, soPhuHuynh: null, chu: 'Rút bộ câu riêng cho 23 em' },
+      { loai: 'nhac_nop_bai', so: 44, soPhuHuynh: 30, chu: 'Nhắc 44 em chưa mở bài' },
+    ],
+    sucKhoe: { muc: 'xanh', chu: 'Hệ thống bình thường · thầy không cần làm gì' },
+    lyDoThieu: {},
+  }
+
   return {
     mocMs,
     serverNow: nowMs,
@@ -173,6 +213,8 @@ export function taoDuLieuGia(nowMs: number, hatGiong = 20260921): DuLieuSan {
     nen,
     theoLop,
     nhiet,
+    danDau,
+    bt,
     moPhong: true,
   }
 }

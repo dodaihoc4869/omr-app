@@ -4,34 +4,42 @@ import { useMemo, useRef } from 'react'
 import type { DuLieuSan } from '../../lib/bang-tin-san/kieu'
 import { chenhLech, chotSo } from '../../lib/bang-tin-san/trang-thai'
 import { BanDo3D } from './BanDo3D'
+import { BanDoNhiet } from './BanDoNhiet'
+import { CotAI } from './CotAI'
+import { DanDau } from './DanDau'
+import { SoLenhBai } from './SoLenhBai'
 import { BangChay } from './BangChay'
 import { NenHoc } from './NenHoc'
 import { OSo } from './OSo'
 import { ThanhTren } from './ThanhTren'
-import { useGioMayChu, useItDong, useMauSan } from './hooks'
+import { useGioMayChu, useItDong, useKichThuoc, useMauSan, useMotMan } from './hooks'
 import './bang-tin-san.css'
 
 const nghin = (n: number): string => Math.round(n).toLocaleString('vi-VN')
 
 export interface BangTinSanProps {
   du: DuLieuSan
+  /** Chạm tên em ⇒ Toàn cảnh một em. */
+  onMoEm?: (sbd: string) => void
   /** Giờ cố định (ms) cho bản vẽ / kiểm thử; không truyền ⇒ chạy theo giờ máy chủ. */
   nayMs?: number
 }
 
-export default function BangTinSan({ du, nayMs }: BangTinSanProps) {
+export default function BangTinSan({ du, nayMs, onMoEm = () => {} }: BangTinSanProps) {
   const goc = useRef<HTMLElement>(null)
   const { mau, phienBan } = useMauSan(goc)
   const itDong = useItDong()
   const now = useGioMayChu(du.serverNow, du.nhanLucMs, nayMs)
   const so = useMemo(() => chotSo(du), [du])
+  const ktGoc = useKichThuoc(goc)
+  const motMan = useMotMan() && ktGoc.w >= 980 // MỘT MÀN không cuộn: cửa sổ đủ cao và khung đủ rộng (khớp `data-mot-man` ở CSS)
   const tia = du.tia
 
   const tiLe = so.tiLeDung
   const tiaTile = tia && tia.tile.length >= 2 ? tia.tile.map((v, i, a) => (i === a.length - 1 && tiLe !== null ? tiLe : v)) : null
   const nhip = du.dungNhip
   return (
-    <main className="bts-san" ref={goc} data-khoi="bang-tin-san" data-it-dong={itDong ? '1' : '0'}>
+    <main className="bts-san" ref={goc} data-khoi="bang-tin-san" data-it-dong={itDong ? '1' : '0'} data-mot-man={motMan ? '1' : '0'}>
       <ThanhTren mocMs={du.mocMs} nowMs={now} moPhong={du.moPhong} />
       {du.tin.length > 0 && <BangChay tin={du.tin} itDong={itDong} />}
       <section className="bts-hang-so" aria-label="Bốn con số hôm nay" data-so-o={nhip ? '4' : '3'}>
@@ -92,6 +100,16 @@ export default function BangTinSan({ du, nayMs }: BangTinSanProps) {
           {(du.theoLop?.length ?? 0) > 0 && <BanDo3D lop={du.theoLop!} mau={mau} phienBanMau={phienBan} itDong={itDong} />}
         </section>
       )}
+      {(du.bt?.baiTap.length ?? 0) > 0 || (du.nhiet?.length ?? 0) > 0 || (du.danDau?.length ?? 0) > 0 || du.bt ? (
+        <section className="bts-hang-duoi" data-khoi="hang-duoi">
+          {du.bt && du.bt.baiTap.length > 0 && <SoLenhBai baiTap={du.bt.baiTap} nowMs={now} />}
+          {du.nhiet && du.nhiet.length > 0 && (
+            <BanDoNhiet nhiet={du.nhiet} theoLop={du.theoLop} soLieu={so} mau={mau} phienBanMau={phienBan} itDong={itDong} nowMs={now} motMan={motMan} onMoEm={onMoEm} />
+          )}
+          {((du.danDau?.length ?? 0) > 0 || (du.bt && (du.bt.canDeY.ds.length > 0 || du.bt.tienBo.length > 0))) && <DanDau danDau={du.danDau} bt={du.bt} onMoEm={onMoEm} />}
+          {du.bt && <CotAI bt={du.bt} />}
+        </section>
+      ) : null}
     </main>
   )
 }

@@ -13,6 +13,19 @@ export function useItDong(): boolean {
   return it
 }
 
+/** Chế độ MỘT MÀN không cuộn: cửa sổ đủ cao (≥ 700 px) VÀ khung đủ rộng (≥ 980 px). Khớp điều kiện CSS `data-mot-man` (bang-tin-san.css). */
+export function useMotMan(): boolean {
+  const [v, setV] = useState(() => typeof matchMedia === 'function' && matchMedia('(min-height: 700px)').matches)
+  useEffect(() => {
+    if (typeof matchMedia !== 'function') return
+    const mq = matchMedia('(min-height: 700px)')
+    const doi = () => setV(mq.matches)
+    mq.addEventListener?.('change', doi)
+    return () => mq.removeEventListener?.('change', doi)
+  }, [])
+  return v
+}
+
 /** Tên các token màu (sau tiền tố `--bts-`) mà canvas / three.js cần đọc. */
 export const TEN_MAU = ['nen', 'mat', 'mat-2', 'vien', 'chu', 'chu-phu', 'chu-mo', 'duong', 'la', 'do', 'vang', 'xam-o', 'luoi', 'tren-gia'] as const
 export type MauSan = Record<(typeof TEN_MAU)[number], string>
