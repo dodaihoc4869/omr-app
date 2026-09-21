@@ -5,6 +5,7 @@
  *  Không kết luận năng lực từ điểm: chỉ đếm câu theo trạng thái hồ sơ. Không in "nắm chắc". */
 import { layCauHinhMayChu } from './may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
+import { soCauDaLamHienThi } from './so-cau-hien-thi'
 
 export interface CauNamKt {
   qid: string
@@ -60,7 +61,8 @@ export interface KeHoachEm {
   lanNghi?: boolean
   nganSach?: { mucTieuCau?: number; phutNgay?: number }
   viec?: ViecEm[]
-  tienBo?: { daLamCau?: number; lenBac?: number; dat?: boolean }
+  /** `soCauHienThi` = MỘT định nghĩa "câu đã làm hôm nay" (khớp Thi đua / thẻ Hôm nay của em); `daLamCau` cũ nuôi luật đạt nhiệm vụ — máy chủ cũ chưa có `soCauHienThi` ⇒ rơi về `daLamCau`. */
+  tienBo?: { daLamCau?: number; soCauHienThi?: number; lenBac?: number; dat?: boolean }
   chuoiDat?: number
   thanThu?: { pet?: string | null; cap?: number; nickname?: string | null } | null
   exp?: { homNay?: number } | null
@@ -144,7 +146,8 @@ export function tomTatKeHoach(kh: KeHoachEm): TomTatKeHoach {
   const chip = [ns.mucTieuCau ? `${ns.mucTieuCau} câu` : '', ns.phutNgay ? `${ns.phutNgay} phút/ngày` : ''].filter(Boolean).join(' · ')
   const dong = (kh.viec ?? []).slice(0, 4).map((v, i) => ({ thuTu: v.thuTu ?? i + 1, chu: nhanViec(v), xong: v.trangThai === 'xong', mo: v.hien === false }))
   const tb = kh.tienBo
-  const tienDo = tb && typeof tb.daLamCau === 'number' ? `Đã làm ${tb.daLamCau} câu hôm nay${typeof tb.lenBac === 'number' && tb.lenBac > 0 ? ` · ${tb.lenBac} câu lên bậc` : ''}` : ''
+  const coSoCau = !!tb && (typeof tb.soCauHienThi === 'number' || typeof tb.daLamCau === 'number')
+  const tienDo = tb && coSoCau ? `Đã làm ${soCauDaLamHienThi(tb)} câu hôm nay${typeof tb.lenBac === 'number' && tb.lenBac > 0 ? ` · ${tb.lenBac} câu lên bậc` : ''}` : ''
   const tt = kh.thanThu
   return {
     chip,
