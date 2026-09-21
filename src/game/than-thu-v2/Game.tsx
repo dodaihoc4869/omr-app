@@ -6,6 +6,8 @@ import type {BattleAnswer} from './learning-battle'
 import {unlockBattleAudio} from './battle-audio'
 import EscortRoom from './EscortRoom'
 import {chanPhanHoiCau} from '../../lib/cau-tu-luan-may-hs'
+import {CHU_HET_TRAN_GAME,laLoiHetTran,maCuaLoi} from './loi-het-tran'
+import {batNhipBenVung} from '../../lib/nhip-ben-vung'
 // Lối chơi chính mới (19/09): nạp riêng để không làm nặng đảo thần thú.
 const DoanHoTong=lazy(()=>import('./DoanHoTong'))
 // Đảo thần thú bản mới: MỘT vỏ của Code 6, nạp lazy.
@@ -44,7 +46,7 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  const [tasks,setTasks]=useState<{id:string;dang:string}[]>([])
  const [token,setToken]=useState(()=>{try{return sessionStorage.getItem(`game-v2:${sbd}`)||initialToken||''}catch{return initialToken||''}});const [password,setPassword]=useState('')
  const [profile,setProfile]=useState<Profile|null>(null);const [,setRevision]=useState(0);const [tab,setTab]=useState<Tab>(()=>manDauTu(manDau))
- const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [notice,setNotice]=useState('');const [syncLeft,setSyncLeft]=useState<number|null>(null)
+ const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [maLoi,setMaLoi]=useState('');const [notice,setNotice]=useState('');const [syncLeft,setSyncLeft]=useState<number|null>(null)
  const [mediaFailed,setMediaFailed]=useState(false)
  const [battleAnswers,setBattleAnswers]=useState<BattleAnswer[]>([]);const [battleEvent,setBattleEvent]=useState(0)
  const [session,setSession]=useState('');const [questions,setQuestions]=useState<Question[]>([]);const [position,setPosition]=useState(0);const [mode,setMode]=useState<Mode>('adventure');const [answer,setAnswer]=useState('');const [assisted,setAssisted]=useState(false);const [feedback,setFeedback]=useState<Feedback|null>(null);const [done,setDone]=useState(false)
@@ -54,13 +56,15 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  useEffect(()=>()=>{mounted.current=false},[])
  const request=useCallback(async(action:string,data:Record<string,unknown>={},sessionToken=token):Promise<Result>=>{
   const base=await layDiaChiMayChu('');const response=await fetch(`${base}/game-v2/${action}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...data,token:sessionToken})});const r=chanPhanHoiCau(await response.json() as Result,`game-v2/${action}`) // chốt chặn cuối: bỏ câu tự luận (thầy lệnh 21/09)
-  if(!r.ok){if(/Phiên game|Mật khẩu đã đổi|nhập lại mật khẩu/.test(r.error??'')){setToken('');setProfile(null);try{sessionStorage.removeItem(`game-v2:${sbd}`)}catch{/* Storage may be disabled. */}}throw new Error(r.error||'Chưa kết nối được game. Em thử lại.')}
+  if(!r.ok){if(/Phiên game|Mật khẩu đã đổi|nhập lại mật khẩu/.test(r.error??'')){setToken('');setProfile(null);try{sessionStorage.removeItem(`game-v2:${sbd}`)}catch{/* Storage may be disabled. */}}throw Object.assign(new Error(r.error||'Chưa kết nối được game. Em thử lại.'),{ma:String((r as {ma?:unknown}).ma??'')})}
   if(mounted.current){if(typeof r.doanMo==='boolean')setDoanMo(r.doanMo);if(r.tasks)setTasks(r.tasks);if(r.profile&&(r.revision??0)>=latestRevision.current){setProfile(r.profile);latestRevision.current=r.revision??0;if(r.revision!==undefined)setRevision(r.revision)}}return r
  },[token,sbd])
  useEffect(()=>{const update=(event:Event)=>{const d=(event as CustomEvent).detail;if(d.sbd===sbd&&d.profile&&d.revision>=latestRevision.current){latestRevision.current=d.revision;setExpPending(d.pending??0);setProfile(d.profile);setRevision(d.revision)}};window.addEventListener('spirit-academic-synced',update);return()=>window.removeEventListener('spirit-academic-synced',update)},[sbd])
- const run=async(fn:()=>Promise<unknown>)=>{if(running.current)return;running.current=true;setBusy(true);setError('');try{await fn()}catch(e){setError(e instanceof Error?e.message:'Không kết nối được. Em thử lại.')}finally{running.current=false;if(mounted.current)setBusy(false)}}
+ const run=async(fn:()=>Promise<unknown>)=>{if(running.current)return;running.current=true;setBusy(true);setError('');setMaLoi('');try{await fn()}catch(e){setError(e instanceof Error?e.message:'Không kết nối được. Em thử lại.');setMaLoi(maCuaLoi(e))}finally{running.current=false;if(mounted.current)setBusy(false)}}
  useEffect(()=>{mounted.current=true;if(!token){setBusy(false);return}let cancelled=false;setBusy(true);request('profile').catch(e=>{if(!cancelled)setError(String(e.message))}).finally(()=>{if(!cancelled)setBusy(false)});return()=>{cancelled=true}},[token,request])
- useEffect(()=>{if(!token)return;let pending=false;const refresh=async()=>{if(document.hidden||pending||running.current)return;pending=true;try{await request('profile')}catch{/* The next user action reports authentication errors. */}finally{pending=false}};const timer=setInterval(()=>void refresh(),20000);window.addEventListener('focus',refresh);return()=>{clearInterval(timer);window.removeEventListener('focus',refresh)}},[token,request])
+ useEffect(()=>{if(!token)return;let pending=false;const refresh=async():Promise<boolean>=>{if(document.hidden||pending||running.current)return true;pending=true;try{await request('profile');return true}catch{/* The next user action reports authentication errors. */return false}finally{pending=false}};
+ // Nhịp nền CHẬM (180 s ± 30 s, không chồng, lỗi ⇒ lùi 30→60→120 s; sự cố D1 21/09: 20 giây × mọi máy em); vào game đã nạp hồ sơ nên KHÔNG gọi ngay; quay lại tab vẫn nạp nhưng dội ≥ 20 giây.
+ const nhip=batNhipBenVung(refresh,{chayNgay:false});const kich=()=>nhip.kich();window.addEventListener('focus',kich);return()=>{nhip.dung();window.removeEventListener('focus',kich)}},[token,request])
  const login=()=>run(async()=>{const r=await hsDangNhapApi('',sbd,password);if(!r.ok||!r.token)throw new Error(r.error||(r.chuaCoMatKhau?'Em đặt mật khẩu ở app học sinh trước khi mở game.':'Máy chủ chưa cấp được phiên game. Mật khẩu chưa được xác định là sai; em thử lại sau.'));await request('profile',{},r.token);try{sessionStorage.setItem(`game-v2:${sbd}`,r.token)}catch{/* Login still works without local storage. */}setPassword('');setToken(r.token)})
  const start=(next:Mode,dang?:string,guardian?:string)=>run(async()=>{
   setNotice('Đang đối chiếu kho bài tập và phần em đã học.');let result=await request('sync');setSyncLeft(result.remaining??0)
@@ -78,12 +82,15 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
   return {...base,phan:'III',selected:answer,onChange:v=>{if(!feedback&&!busy)setAnswer(v)}}
  }
  const qp=questionProps()
+ // Lỗi của lệnh nộp hiện NGAY TRÊN nút nộp (em đang ở cuối màn); hết trần câu trong ngày ⇒ thẻ rõ ràng thay nút nộp (thầy 20:28 "không nộp được bài").
+ const loiOCuoi=!!error&&tab==='learn'&&!!qp&&!feedback,hetTran=loiOCuoi&&laLoiHetTran(error,maLoi),loiNutRef=useRef<HTMLDivElement>(null)
+ useEffect(()=>{if(loiOCuoi)loiNutRef.current?.scrollIntoView?.({block:'nearest'})},[loiOCuoi,error])
  const voDao=!!profile&&(profile.choice||tab==='home')
  return <section className={voDao?'spirit-game spirit-game-dao':'spirit-game'} aria-label="Thần Thú Hoá Học">
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi / lời giải" onClose={()=>setZoom('')}/>}
   {/* Đảo bản mới có đầu trang riêng ("BÁT LINH ĐẢO" + tên thú) → ẩn đầu trang cũ ở tab Đảo và ở màn chọn thú; các tab khác giữ nguyên. Thanh mục GIỮ tới khi vỏ Đảo của Code 6 có thanh dưới. */}
   {!voDao&&<header className="spirit-header"><div><small>HỌC HOÁ · NUÔI THẦN THÚ</small><h1>Bát Linh Đảo</h1></div><button onClick={onDong}>Về app học sinh</button></header>}
-  {error&&<div role="alert" className="spirit-error">{error}<button onClick={()=>void run(()=>request('profile'))}>Tải lại hồ sơ</button></div>}
+  {error&&!loiOCuoi&&<div role="alert" className="spirit-error">{error}<button onClick={()=>void run(()=>request('profile'))}>Tải lại hồ sơ</button></div>}
   {!token||(!profile&&!busy)?<div className="spirit-panel"><h2>Mở hồ sơ game của em</h2><p>Nhập mật khẩu học sinh để giữ tiến độ giữa các thiết bị.</p><input type="password" autoComplete="current-password" aria-label="Mật khẩu học sinh" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')void login()}}/><button disabled={busy||!password} onClick={()=>void login()}>Mở game</button></div>:null}
   {busy&&!voDao&&<p role="status" className="spirit-status">{syncLeft!==null?`Đang nối kho bài tập, còn ${syncLeft} tờ đề…`:'Đang lưu và kiểm tra…'}</p>}
   {profile&&<>
@@ -97,7 +104,7 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
      <div className="spirit-nodes" aria-label="Các câu trong lượt">{questions.map((x,i)=><span key={x.qid} className={i===position?'current':i<position?'completed':''}>{i+1}</span>)}</div>
      {q&&<p className="spirit-source">Nguồn: {q.maDe} · {q.qid} · {q.mucDo==='biet'?'Nhận biết':q.mucDo==='hieu'?'Thông hiểu':q.mucDo==='van_dung'?'Vận dụng':'Chưa gắn mức độ'} · {q.sao===null?'Chưa gắn sao':`${q.sao} sao`}</p>}
      {qp&&<div onErrorCapture={e=>{if((e.target as HTMLElement).tagName==='IMG')setMediaFailed(true)}}><TheCau {...qp}/></div>}{mediaFailed&&<p role="alert">Hình của câu chưa tải được. Em mở lại lượt học; câu này chưa bị tính sai.</p>}
-     {!feedback?<><label className="spirit-help"><input type="checkbox" checked={assisted} onChange={e=>setAssisted(e.target.checked)}/> Em có dùng tài liệu hoặc được trợ giúp ở câu này</label><button className="spirit-primary" disabled={busy||mediaFailed||!answer||answer.includes('-')&&q?.phan==='II'} onClick={()=>{unlockBattleAudio();void submit()}}>Trả lời · tung chưởng</button></>:<div className="spirit-feedback" aria-live="polite"><h3>{feedback.correct?'Em đã trả lời đúng':'Em xem lại bước làm ở dưới'}</h3>{feedback.reward>0&&<p className="spirit-reward">+{feedback.reward} EXP</p>}<div className="spirit-bank-solution"><LoiGiaiCauSai hoaHoc c={{text:q?.text,phan:q?.phan,dapAnDung:feedback.answer,loiGiai:feedback.solution}}/><HinhTaiViTri hinhAnh={feedback.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={setZoom}/></div>{mode==='arena'&&<button onClick={()=>setTab('arena')}>Về Linh Tâm · chốt hành động</button>}<button className="spirit-primary" disabled={busy} onClick={()=>void next()}>{position+1===questions.length?'Hoàn thành lượt':'Đã đọc, sang câu tiếp'}</button></div>}
+     {!feedback?<><label className="spirit-help"><input type="checkbox" checked={assisted} onChange={e=>setAssisted(e.target.checked)}/> Em có dùng tài liệu hoặc được trợ giúp ở câu này</label>{loiOCuoi&&<div role="alert" className="spirit-error spirit-error-nut" ref={loiNutRef}>{hetTran?CHU_HET_TRAN_GAME:error}</div>}{!hetTran&&<button className="spirit-primary" disabled={busy||mediaFailed||!answer||answer.includes('-')&&q?.phan==='II'} onClick={()=>{unlockBattleAudio();void submit()}}>Trả lời · tung chưởng</button>}</>:<div className="spirit-feedback" aria-live="polite"><h3>{feedback.correct?'Em đã trả lời đúng':'Em xem lại bước làm ở dưới'}</h3>{feedback.reward>0&&<p className="spirit-reward">+{feedback.reward} EXP</p>}<div className="spirit-bank-solution"><LoiGiaiCauSai hoaHoc c={{text:q?.text,phan:q?.phan,dapAnDung:feedback.answer,loiGiai:feedback.solution}}/><HinhTaiViTri hinhAnh={feedback.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={setZoom}/></div>{mode==='arena'&&<button onClick={()=>setTab('arena')}>Về Linh Tâm · chốt hành động</button>}<button className="spirit-primary" disabled={busy} onClick={()=>void next()}>{position+1===questions.length?'Hoàn thành lượt':'Đã đọc, sang câu tiếp'}</button></div>}
     </>}
    </div>}
    </>}

@@ -91,7 +91,12 @@ describe('Chuyến thám hiểm', () => {
     ve({ viTri: 2, ketQua: dung(3), traLoi: 'B', phanHoi: { correct: true, answer: 'B', solution: '', solutionImages: [], lyDo: { moc: 1, exp: 20, chu: '+20 · lần đầu em tự làm đúng dạng này — sao thứ 1' } } })
     expect(cuon).not.toHaveBeenCalled()
     const goc = resolve(__dirname, '../src/game/than-thu-v2/dao')
-    for (const tep of ['ThamHiem.tsx', 'DaoCuaEm.tsx', 'ChonBanDongHanh.tsx']) expect(readFileSync(resolve(goc, tep), 'utf8')).not.toMatch(/scrollIntoView|window\.scrollTo/)
+    for (const tep of ['DaoCuaEm.tsx', 'ChonBanDongHanh.tsx']) expect(readFileSync(resolve(goc, tep), 'utf8')).not.toMatch(/scrollIntoView|window\.scrollTo/)
+    // SỬA CÓ CHỦ Ý (Boss 21/09 20:28, P0 "không nộp được bài"): ThamHiem có ĐÚNG MỘT chỗ cuộn — đưa lời báo lỗi nộp vào tầm mắt, chỉ chạy khi có lỗi (điều kiện `if(loi)`); vẫn cấm cuộn ở mọi chỗ khác.
+    const tham = readFileSync(resolve(goc, 'ThamHiem.tsx'), 'utf8')
+    expect(tham).not.toMatch(/window\.scrollTo/)
+    expect(tham.match(/scrollIntoView/g)).toHaveLength(1)
+    expect(tham).toMatch(/if\(loi\)loiNutRef\.current\?\.scrollIntoView/)
     const css = readFileSync(resolve(goc, 'dao.css'), 'utf8')
     expect(css).toMatch(/@media\(prefers-reduced-motion:reduce\)\{\s*\.dao \*,\.dao \*::before,\.dao \*::after\{animation:none!important;transition:none!important\}/)
   })

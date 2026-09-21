@@ -9,6 +9,7 @@ import {LoiGiaiCauSai} from '../../../components/KhoiCauSai'
 import {HinhTaiViTri,ManHinhAnh} from '../../../components/QuestionMedia'
 import type {HinhAnh} from '../../../data/examContent'
 import {anhThe,anhThu} from './anh'
+import {CHU_HET_TRAN_DAO,laLoiHetTran} from '../loi-het-tran'
 import {chiSoThu,tenNhomAi,tenThu} from './dao-core'
 import type {CauDao,DaoProfile,LyDoThuong} from './kieu'
 import './dao.css'
@@ -20,7 +21,7 @@ export interface ThamHiemProps{
  /** Kết quả các ải đã nộp (máy chủ chấm) — trận chỉ là CÁCH KỂ, tính bằng `learningBattle` như cũ. */
  ketQua:readonly BattleAnswer[]
  traLoi:string;assisted:boolean;phanHoi:PhanHoiAi|null;xong:boolean;tongKet?:TongKetChuyen
- busy?:boolean;loi?:string;thongBao?:string
+ busy?:boolean;loi?:string;/** Mã lỗi của máy chủ (vd `het_tran`) nếu có; không có ⇒ nhận diện theo lời. */maLoi?:string;thongBao?:string
  onTraLoi:(v:string)=>void;onAssisted:(v:boolean)=>void;onNop:()=>void;onTiep:()=>void;onVeDao:()=>void;onChuyenMoi?:()=>void;onMoSoTay?:()=>void
 }
 export const TEN_QUAI='Quái Sương Mù'
@@ -73,8 +74,11 @@ export function SanDau({profile,ketQua,tong,suKien,xong}:{profile:DaoProfile;ket
  </section>
 }
 
-export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi,xong,tongKet,busy=false,loi='',thongBao='',onTraLoi,onAssisted,onNop,onTiep,onVeDao,onChuyenMoi,onMoSoTay}:ThamHiemProps){
+export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi,xong,tongKet,busy=false,loi='',thongBao='',onTraLoi,onAssisted,onNop,onTiep,onVeDao,onChuyenMoi,onMoSoTay,maLoi=''}:ThamHiemProps){
  const [zoom,setZoom]=useState(''),[hinhLoi,setHinhLoi]=useState(false),q=cau[viTri]
+ // Lỗi của lệnh nộp hiện NGAY TRÊN nút nộp (em đang ở cuối màn — thầy 20:28 "không nộp được bài"); hết trần câu trong ngày ⇒ thẻ rõ ràng + VỀ ĐẢO thay nút nộp.
+ const loiNutRef=useRef<HTMLDivElement>(null),hetTran=!!loi&&laLoiHetTran(loi,maLoi)
+ useEffect(()=>{if(loi)loiNutRef.current?.scrollIntoView?.({block:'nearest'})},[loi])
  useEffect(()=>{setHinhLoi(false)},[viTri])
  const khoa=!!phanHoi||busy
  const propCau=():TheCauProps|null=>{
@@ -89,7 +93,7 @@ export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanH
   <div className="dao-tham-dau"><button type="button" className="dao-tham-ve" onClick={onVeDao} aria-label="Về đảo (chuyến đang làm được giữ lại)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><DaiAi cau={cau} viTri={viTri} ketQua={ketQua} xong={xong}/></div>
   <SanDau profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length} xong={xong}/>
   {thongBao&&<p className="dao-chuyen-bao" role="status">{thongBao}</p>}
-  {loi&&<p className="dao-loi" role="alert">{loi}</p>}
+  {loi&&(xong||!q)&&<p className="dao-loi" role="alert">{loi}</p>}
   {xong?<section className="dao-kinh dao-tham-xong" aria-live="polite"><h3>Xong chuyến thám hiểm</h3>
     {tongKet&&<ul><li><b>{tongKet.dung}/{tongKet.tong}</b><span>ải đúng</span></li><li><b>+{tongKet.exp}</b><span>EXP thành thạo</span></li><li><b>{tongKet.sao}</b><span>sao mới</span></li></ul>}
     <p>Đã lưu. Dạng cần ôn và ngày ôn lại nằm trong Sổ tay.</p>
@@ -105,8 +109,11 @@ export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanH
    </section>
    {!phanHoi&&<label className="dao-tham-tro"><input type="checkbox" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/> Em có dùng tài liệu hoặc được trợ giúp ở câu này</label>}
    {/* Nút nổi ở đáy màn hình CHỈ khi em đã chọn xong (chưa chọn thì nằm cuối trang, không che phương án); không tự cuộn trang. */}
-   <div className="dao-tham-chan" data-noi={phanHoi||!thieu?'':undefined}>{!phanHoi?<button type="button" className="dao-nut-xanh" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?'Chọn đáp án để tung chưởng':'Trả lời · tung chưởng'}</button>
-    :<button type="button" className="dao-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'Đã đọc lời giải · hoàn thành chuyến':`Đã đọc lời giải · sang ải ${viTri+2}`}</button>}</div>
+   <div className="dao-tham-chan" data-noi={phanHoi||!thieu||hetTran||loi?'':undefined}>
+    {hetTran&&!phanHoi?<div className="dao-kinh dao-het-tran" role="alert" ref={loiNutRef}><p>{CHU_HET_TRAN_DAO}</p><button type="button" className="dao-nut-vang" onClick={onVeDao}><span>VỀ ĐẢO</span></button></div>
+    :<>{loi&&<p className="dao-loi dao-loi-nut" role="alert" ref={loiNutRef}>{loi}</p>}
+    {!phanHoi?<button type="button" className="dao-nut-xanh" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?'Chọn đáp án để tung chưởng':'Trả lời · tung chưởng'}</button>
+    :<button type="button" className="dao-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'Đã đọc lời giải · hoàn thành chuyến':`Đã đọc lời giải · sang ải ${viTri+2}`}</button>}</>}</div>
   </>}
  </div>
 }

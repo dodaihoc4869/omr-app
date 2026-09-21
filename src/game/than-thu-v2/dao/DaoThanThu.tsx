@@ -11,6 +11,7 @@ import {chiSoThu,docLuotNgay,docMaiCho,lyDoThuongTuKetQua,lyDoTranExpGame,tenThu
 import type {LuotNgay,MaiCho} from './dao-core'
 import type {CauDao,DaoKetQua,DaoThanThuProps,ManDao} from './kieu'
 import {docLuotCauNgay,type LuotCauNgay} from '../chu-het-luot'
+import {laLoiHetTran,maCuaLoi} from '../loi-het-tran'
 import './dao.css'
 
 interface Luot{id:string;cau:CauDao[]}
@@ -31,7 +32,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  const callRef=useRef(callProp);callRef.current=callProp
  const call=useCallback<DaoThanThuProps['call']>((action,data)=>callRef.current(action,data),[])
  const [man,setMan]=useState<ManDao>('dao'),[dangTham,setDangTham]=useState(false)
- const [busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[bao,setBao]=useState('')
+ const [busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[maLoi,setMaLoi]=useState(''),[bao,setBao]=useState('')
  const [goiY,setGoiY]=useState<{title:string}[]|null>(null),[conLai,setConLai]=useState<number|null>(null),[luotCau,setLuotCau]=useState<LuotCauNgay|null>(null)
  // Đợt 2: lượt trong ngày (recommendations/start) + "Mai thú chờ em" (start khi hết lượt) — đọc chặt; máy chủ cũ không gửi ⇒ null ⇒ không dải lượt.
  const [luotNgay,setLuotNgay]=useState<LuotNgay|null>(null),[maiCho,setMaiCho]=useState<MaiCho|null>(null)
@@ -39,11 +40,13 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  const [luot,setLuot]=useState<Luot|null>(null),[viTri,setViTri]=useState(0),[ketQua,setKetQua]=useState<BattleAnswer[]>([]),[traLoi,setTraLoi]=useState(''),[assisted,setAssisted]=useState(false),[phanHoi,setPhanHoi]=useState<PhanHoiAi|null>(null),[xong,setXong]=useState(false),[thuong,setThuong]=useState({exp:0,sao:0})
  const dangChay=useRef(false),conSong=useRef(true)
  useEffect(()=>{conSong.current=true;return()=>{conSong.current=false}},[])
- const chay=useCallback(async(viec:()=>Promise<void>)=>{if(dangChay.current)return;dangChay.current=true;setBusy(true);setLoi('');try{await viec()}catch(e){if(conSong.current)setLoi(e instanceof Error?e.message:'Không kết nối được. Em thử lại.')}finally{dangChay.current=false;if(conSong.current)setBusy(false)}},[])
+ const chay=useCallback(async(viec:()=>Promise<void>)=>{if(dangChay.current)return;dangChay.current=true;setBusy(true);setLoi('');setMaLoi('');try{await viec()}catch(e){if(conSong.current){setLoi(e instanceof Error?e.message:'Không kết nối được. Em thử lại.');setMaLoi(maCuaLoi(e))}}finally{dangChay.current=false;if(conSong.current)setBusy(false)}},[])
  const hocTen=(cau:readonly CauDao[])=>setTenDang(cu=>{const moi={...cu};for(const c of cau)if(c.tenDang)moi[c.dang??c.group]=c.tenDang;return moi})
 
  // gợi ý hôm nay + danh mục sổ tay: đọc-chỉ, hỏng thì màn vẫn chạy (Worker cũ chưa có `so-tay`)
  const napGoiY=useCallback(()=>{void call('recommendations').then(r=>{if(conSong.current){setGoiY(r.suggestions??[]);setConLai(typeof r.remaining==='number'?r.remaining:null);setLuotCau(docLuotCauNgay(r));if(r.luot!==undefined)setLuotNgay(docLuotNgay(r.luot))}}).catch(()=>{})},[call])
+ // Máy chủ báo HẾT TRẦN câu trong ngày giữa lượt ⇒ nạp lại số lượt để màn Đảo nói đúng (khoá LÊN ĐƯỜNG + "đã đi N/36 câu") khi em bấm VỀ ĐẢO.
+ useEffect(()=>{if(laLoiHetTran(loi,maLoi))napGoiY()},[loi,maLoi,napGoiY])
  const daChon=!profile.choice
  useEffect(()=>{if(!daChon)return;napGoiY();void call('so-tay').then(r=>{if(conSong.current&&Array.isArray(r.dang)){setDanhMuc(r.dang);setTenDang(cu=>({...Object.fromEntries(r.dang!.filter(d=>d.ten).map(d=>[d.key,d.ten])),...cu}))}}).catch(()=>{})},[daChon,call,napGoiY])
 
@@ -79,7 +82,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  if(profile.choice)return <ChonBanDongHanh batDau={theMoDau(sbd)} busy={busy} loi={loi||loiChon} moiDoan={moiDoan} onChon={(pet,ten)=>void chay(async()=>{setLoiChon('');await call('choose',{pet});if(ten)await call('rename',{name:ten}).catch(e=>{if(conSong.current)setLoiChon(`Đã chọn xong. Tên chưa lưu được (${e instanceof Error?e.message:'lỗi mạng'}) — em đặt lại bằng cây bút cạnh tên trên đảo.`)})})}/>
 
  if(dangTham&&luot)return <div className="dao dao-vo dao-vo-tham" data-thu={chiSoThu(profile.pet)}><ThamHiem profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} xong={xong} tongKet={{dung:ketQua.filter(k=>k.correct).length,tong:luot.cau.length,...thuong}}
-  busy={busy} loi={loi} thongBao={bao} onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onVeDao={veDao} onChuyenMoi={conLai===0?undefined:()=>{setLuot(null);void lenDuong()}} onMoSoTay={()=>{veDao();setMan('so-tay')}}/></div>
+  busy={busy} loi={loi} maLoi={maLoi} thongBao={bao} onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onVeDao={veDao} onChuyenMoi={conLai===0?undefined:()=>{setLuot(null);void lenDuong()}} onMoSoTay={()=>{veDao();setMan('so-tay')}}/></div>
 
  const muc:[ManDao|'doan',string][]=[['dao','Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ']]
  return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}>
