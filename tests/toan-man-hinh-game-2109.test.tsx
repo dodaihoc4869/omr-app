@@ -284,8 +284,8 @@ describe('khoá nguồn StudentPortalScreen', () => {
     expect(nguon).toMatch(/const moGame = \(\) => \{\s*xinToanManHinh\('cu-cham-vao'\)\s*setTab\('thanthu'\)\s*\}/)
     expect((nguon.match(/moGame\(\)|onMoThanThu=\{moGame\}/g) ?? []).length).toBeGreaterThanOrEqual(3)
   })
-  it('thông báo mở tab game cũng xin trong cú chạm; Về app học sinh gọi ketThucLuot; hook gắn theo tab game', () => {
-    expect(nguon).toContain("if (t === 'thanthu') xinToanManHinh('cu-cham-vao')")
+  it('Về app học sinh gọi ketThucLuot; hook gắn theo tab game; thông báo chỉ mở bài Gia đình/BTVN (không phải cửa vào game)', () => {
+    expect(nguon).not.toMatch(/onOpen=\{\(t, noticeId\) => \{[^}]*thanthu/)
     expect(nguon).toMatch(/onDong=\{\(\) => \{\s*ketThucLuotToanManHinh\(\)/)
     expect(nguon).toContain("useToanManHinhGame(tab === 'thanthu')")
   })

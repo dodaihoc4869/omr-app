@@ -204,7 +204,7 @@ describe('StudentPortalScreen thật: bấm thẻ ⇒ mở game ở màn Đoàn;
     const cong = fs.readFileSync(path.join(process.cwd(), 'src/screens/StudentPortalScreen.tsx'), 'utf8')
     expect(cong).toMatch(/const KHOA_MAN_DAU_GAME = 'game-v2:man-dau'/)
     expect(cong).not.toMatch(/import[^\n]*KHOA_MAN_DAU[^\n]*from '\.\.\/game\/than-thu-v2\/Game'/)
-    expect(cong).toMatch(/onDong=\{\(\) => setTab\(null\)\}/)
+    expect(cong).toMatch(/onDong=\{\(\) => \{\s*ketThucLuotToanManHinh\(\)[^\n]*\n\s*setTab\(null\)\s*\}\}/) // Về app học sinh: thoát toàn màn hình (thầy lệnh 21/09) rồi về app
   })
 })
 

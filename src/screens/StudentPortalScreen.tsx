@@ -1309,7 +1309,6 @@ export default function StudentPortalScreen() {
             <ThongBaoHocSinh
               token={auth.token}
               onOpen={(t, noticeId) => {
-                if (t === 'thanthu') xinToanManHinh('cu-cham-vao')
                 setTab(t)
                 if (t === 'mom') {
                   void napDsMom()
