@@ -245,7 +245,6 @@
 .m3 .hover\:bg-blue-600:hover { background-color: var(--m3-primary); }
 .m3 .hover\:bg-blue-700:hover { background-color: var(--m3-primary); }
 .m3 .hover\:bg-purple-50:hover { background-color: var(--m3-primary-container); }
-.m3 .hover\:bg-rose-100:hover { background-color: var(--m3-error-container); }
 .m3 .hover\:bg-rose-50:hover { background-color: var(--m3-error-container); }
 .m3 .hover\:bg-rose-700:hover { background-color: var(--m3-error); }
 .m3 .hover\:bg-slate-100:hover { background-color: var(--m3-surface-container); }
@@ -323,7 +322,6 @@
   .m3 .dark\:bg-rose-950\/20 { background-color: var(--m3-error-container); }
   .m3 .dark\:bg-rose-950\/30 { background-color: var(--m3-error-container); }
   .m3 .dark\:bg-rose-950\/40 { background-color: var(--m3-error-container); }
-  .m3 .dark\:bg-rose-950\/50 { background-color: var(--m3-error-container); }
   .m3 .dark\:bg-rose-950\/60 { background-color: var(--m3-error-container); }
   .m3 .dark\:bg-rose-950\/70 { background-color: var(--m3-error-container); }
   .m3 .dark\:bg-rose-950\/80 { background-color: var(--m3-error-container); }
