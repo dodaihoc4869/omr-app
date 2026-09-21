@@ -92,6 +92,8 @@ import { useToanManHinhGame } from '../components/useToanManHinhGame'
 import { ketThucLuotToanManHinh, xinToanManHinh } from '../lib/toan-man-hinh-game'
 import ONhapDapSo from '../components/ONhapDapSo'
 import { batNhipBenVung } from '../lib/nhip-ben-vung'
+import { khoiCuaEm } from '../lib/khoi-cau'
+import { chonCauThuThach } from '../lib/thu-thach-chon-cau'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
 
@@ -795,10 +797,8 @@ export default function StudentPortalScreen() {
             const { dungPhieu } = await import('../lib/html-phieu')
 
             const kho = await loadExamSources()
-            const tatCa = cauLuyenTuNguon(kho)
-            const vdc = tatCa.filter((c) => (c.sao === 2 || c.mucDo === 'van_dung') && c.dapAn)
-            const nguon = vdc.length >= 2 ? vdc : tatCa.filter((c) => c.dapAn)
-            const dsCau = nguon.slice(0, 2)
+            // Chỉ câu HỢP KHỐI của em (Code 1 21/09: em lớp 11 không được "thử thách" bằng câu lớp 12) — luật ở `thu-thach-chon-cau.ts`.
+            const dsCau = chonCauThuThach(cauLuyenTuNguon(kho), khoiCuaEm({ lop: auth.lop }))
 
             if (dsCau.length === 0) {
               void bao('Kho đề đang cập nhật thêm câu hỏi thử thách. Em thử lại sau nhé.', 'Chưa có câu thử thách')
