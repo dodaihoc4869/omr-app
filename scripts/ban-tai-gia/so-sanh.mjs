@@ -21,7 +21,7 @@ const P = (s = '') => dong.push(s)
 P(`# So sánh bản đo tải giả: ${cu} → ${moi}`)
 P()
 const khac = []
-for (const k of ['soEm', 'phut', 'nhanh', 'saoLuu']) if (String(a.cauHinh[k]) !== String(b.cauHinh[k])) khac.push(`${k}: ${a.cauHinh[k]} ≠ ${b.cauHinh[k]}`)
+for (const k of ['soEm', 'phut', 'nhanh', 'saoLuu', 'treD1Ms']) if (String(a.cauHinh[k] ?? 0) !== String(b.cauHinh[k] ?? 0)) khac.push(`${k}: ${a.cauHinh[k] ?? 0} ≠ ${b.cauHinh[k] ?? 0}`)
 if (khac.length) P(`⚠️ Cấu hình KHÁC nhau (so sánh chỉ mang tính tham khảo): ${khac.join(' · ')}`)
 else P(`Cùng kịch bản: ${a.cauHinh.soEm} em × ${a.cauHinh.phut} phút, cùng bản sao lưu \`${a.cauHinh.saoLuu}\`.`)
 P()
@@ -31,12 +31,12 @@ P(`- **Tổng dòng đọc:** ${so(dA)} → ${so(dB)} (${phanTram(dA, dB)})`)
 const vA = a.theoLenh.filter((x) => x.vuot).length, vB = b.theoLenh.filter((x) => x.vuot).length
 P(`- **Lệnh vượt ngân sách:** ${vA} → ${vB}`)
 P()
-P('| Lệnh | Truy vấn TB | Δ | Dòng đọc TB | Δ | Vượt |')
-P('|---|---|---:|---|---:|---|')
+P('| Lệnh | Truy vấn TB | Δ | Dòng đọc TB | Δ | Dòng ghi TB | p50→p95 ms (cũ / mới) | Vượt |')
+P('|---|---|---:|---|---:|---|---|---|')
 for (const k of lenh.sort((x, y) => ((mapA.get(y)?.docTb ?? 0) * (mapA.get(y)?.n ?? 0)) - ((mapA.get(x)?.docTb ?? 0) * (mapA.get(x)?.n ?? 0)))) {
   const x = mapA.get(k), y = mapB.get(k)
   const vuot = `${x ? (x.vuot ? '❌' : '✅') : '—'} → ${y ? (y.vuot ? '❌' : '✅') : '—'}`
-  P(`| \`${k}\` | ${x ? x.tvTb.toFixed(1) : '—'} → ${y ? y.tvTb.toFixed(1) : '—'} | ${x && y ? phanTram(x.tvTb, y.tvTb) : ''} | ${x ? so(x.docTb) : '—'} → ${y ? so(y.docTb) : '—'} | ${x && y ? phanTram(x.docTb, y.docTb) : ''} | ${vuot} |`)
+  P(`| \`${k}\` | ${x ? x.tvTb.toFixed(1) : '—'} → ${y ? y.tvTb.toFixed(1) : '—'} | ${x && y ? phanTram(x.tvTb, y.tvTb) : ''} | ${x ? so(x.docTb) : '—'} → ${y ? so(y.docTb) : '—'} | ${x && y ? phanTram(x.docTb, y.docTb) : ''} | ${x ? (x.ghiTb ?? '—') : '—'} → ${y ? (y.ghiTb ?? '—') : '—'} | ${x ? `${so(x.ms50)}→${so(x.ms95)}` : '—'} / ${y ? `${so(y.ms50)}→${so(y.ms95)}` : '—'} | ${vuot} |`)
 }
 P()
 writeFileSync(join(REPO, `docs/do-tai-d1/so-sanh-${cu}-${moi}.md`), dong.join('\n') + '\n')

@@ -55,22 +55,27 @@ interface CauBoc {
   __sql: string
 }
 
+/** ĐỘ TRỄ GIẢ D1 (`--tre-d1=<ms>` ở chay.mjs ⇒ biến TRE_D1_MS): mỗi truy vấn (và mỗi `batch` MỘT lần) chờ thêm chừng ấy ms như đường mạng tới D1 thật. KHÔNG mô hình hàng đợi một luồng của D1. Để so Promise.all với truy vấn tuần tự. */
+let treD1Ms = 0
+const treGia = (): Promise<void> | void => (treD1Ms > 0 ? new Promise<void>((ok) => setTimeout(ok, treD1Ms)) : undefined)
+
 function bocCau(goc: CauGoc, sql: string): CauBoc {
   let cur = goc
   const p: CauBoc = {
     __sql: sql,
     __goc: () => cur,
     bind(...a) { cur = cur.bind(...a); return p },
-    async all() { const t = Date.now(); const r = await cur.all(); ghiCau(sql, r.meta, Date.now() - t, false); return r },
-    async run() { const t = Date.now(); const r = await cur.run(); ghiCau(sql, r.meta, Date.now() - t, false); return r },
+    async all() { const t = Date.now(); await treGia(); const r = await cur.all(); ghiCau(sql, r.meta, Date.now() - t, false); return r },
+    async run() { const t = Date.now(); await treGia(); const r = await cur.run(); ghiCau(sql, r.meta, Date.now() - t, false); return r },
     async first(col?: string) {
       const t = Date.now()
+      await treGia()
       const r = await cur.all()
       ghiCau(sql, r.meta, Date.now() - t, false)
       const dong = ((r.results ?? [])[0] ?? null) as Record<string, unknown> | null
       return col ? (dong ? (dong[col] ?? null) : null) : dong
     },
-    async raw(o?: unknown) { const t = Date.now(); const r = await cur.raw(o); ghiCau(sql, undefined, Date.now() - t, false); return r },
+    async raw(o?: unknown) { const t = Date.now(); await treGia(); const r = await cur.raw(o); ghiCau(sql, undefined, Date.now() - t, false); return r },
   }
   return p
 }
@@ -83,12 +88,13 @@ function bocD1(db: any): any {
     prepare(sql: string) { return bocCau(db.prepare(sql), sql) },
     async batch(ds: CauBoc[]) {
       const t = Date.now()
+      await treGia()
       const r = (await db.batch(ds.map((s) => (s.__goc ? s.__goc() : s)))) as { meta?: Record<string, unknown> }[]
       const ms = Date.now() - t
       r.forEach((x, i) => ghiCau(ds[i]?.__sql ?? '(batch)', x?.meta, i === 0 ? ms : 0, true))
       return r
     },
-    async exec(sql: string) { const t = Date.now(); const r = await db.exec(sql); ghiCau(sql, undefined, Date.now() - t, false); return r },
+    async exec(sql: string) { const t = Date.now(); await treGia(); const r = await db.exec(sql); ghiCau(sql, undefined, Date.now() - t, false); return r },
     dump: (...a: unknown[]) => db.dump(...a),
     withSession: (...a: unknown[]) => db.withSession(...a),
   }
@@ -133,6 +139,7 @@ const envBoc = new WeakMap<object, object>()
 const bocEnv = (env: any): any => {
   const da = envBoc.get(env)
   if (da) return da
+  treD1Ms = Number(env.TRE_D1_MS) || 0
   const moi = { ...env, DB: bocD1(env.DB), DE: bocR2(env.DE, env.DB) }
   envBoc.set(env, moi)
   return moi

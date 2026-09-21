@@ -81,6 +81,7 @@ export function lapMarkdown({ ma, batDau, cauHinh, khach, dump, ghiChu = [] }) {
   P()
   P(`- **Mô phỏng:** ${cauHinh.soEm} em × ${cauHinh.phut} phút giờ cao điểm (${cauHinh.nhanh > 1 ? `tua nhanh ×${cauHinh.nhanh}, ` : ''}chạy thật ${lam(cauHinh.thoiGianThatGiay)} giây): mở app (kế hoạch ngày, bài về nhà, Thi đua, thông báo…), hỏi nền mỗi ${cauHinh.nhipNenGiay} giây, làm + nộp 1 chặng, ôn 3 câu, 1 lượt Đảo.`)
   P(`- **Tổng:** ${dinhDang(tongLuot)} lượt gọi · ${dinhDang(tongTv)} truy vấn D1 · ${dinhDang(tongDoc)} dòng đọc · trung bình ${lam(tongTv / Math.max(1, tongLuot), 1)} truy vấn và ${dinhDang(tongDoc / Math.max(1, tongLuot))} dòng đọc mỗi lượt.`)
+  if (cauHinh.treD1Ms > 0) P(`- **Độ trễ giả D1:** +${cauHinh.treD1Ms} ms mỗi truy vấn (mỗi batch một lần) — p50/p95 dưới đây phản ánh số TRUY VẤN TUẦN TỰ; không mô hình hàng đợi một luồng của D1.`)
   P(`- **Ngân sách (Boss):** ≤ ${NGAN_SACH.truyVan} truy vấn và ≤ ${dinhDang(NGAN_SACH.dongDoc)} dòng đọc mỗi lượt; lệnh nộp ≤ ${NGAN_SACH.truyVanNop} truy vấn.`)
   P(`- **Kết luận:** ${vuot.length === 0 ? '✅ không lệnh nào vượt ngân sách.' : `❌ **${vuot.length}/${bang.length} lệnh VƯỢT ngân sách** (xem mục 2).`}`)
   P()
