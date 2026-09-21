@@ -2,7 +2,7 @@
 // (1) BangTinPhuHuynh: máy chủ trả ok mà KHÔNG có `report` (vừa reset, chưa dựng bản tin) → `report` mãi null → vòng quay
 //     "Đang tổng hợp…" quay VÔ HẠN (Code 2 đo: còn quay sau 3,5 s, cả HS lẫn PH, sáng lẫn tối). Nay: tải xong mà chưa có bản tin → nói
 //     thật, không quay; tải xong mà lỗi mạng → chỉ dải cảnh báo; đang tải lần đầu → vòng quay, xưng đúng người (HS "em", PH "con").
-// (2) Bảng vinh danh trong Bảng tin: dải 4 màu Google + chữ "DẤU ẤN MỖI NGÀY" (#fbbc04 trên nền sáng 1,71:1) — chỉ ở bản M3.
+// (2) Bảng vinh danh trong Bảng tin: dải 4 màu Google + chữ "DẤU ẤN MỖI NGÀY" (--vd-vang = #fbbc04 trên nền sáng 1,71:1) — chỉ ở bản M3.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import fs from 'node:fs'
@@ -140,8 +140,13 @@ describe('(2) bảng vinh danh trong Bảng tin: dải 4 màu + chữ vàng ch�
     }
   })
 
-  it('app giáo viên không đổi: BangVinhDanh.css / .tsx còn nguyên dải 4 màu + màu #fbbc04 (chỉ luật `.m3 …` mới ghi đè)', () => {
-    expect(doc('src/components/BangVinhDanh.css')).toContain('Google 4-color top stripe')
-    expect(doc('src/components/BangVinhDanh.css')).toMatch(/\.honors-eyebrow \{[^}]*color: #fbbc04/)
+  it('app giáo viên không đổi màu: BangVinhDanh.css còn dải 4 màu + chữ vàng, nay qua token `--vd-*` (tokens.css giữ ĐÚNG giá trị cũ; chỉ luật `.m3 …` mới ghi đè)', () => {
+    const css = doc('src/components/BangVinhDanh.css'), tk = doc('src/styles/tokens.css')
+    expect(css).toContain('Google 4-color top stripe')
+    expect(css).toMatch(/\.honors-eyebrow \{[^}]*color: var\(--vd-vang\)/)
+    expect(css).toContain('linear-gradient(90deg, var(--vd-xanh) 0 25%, var(--vd-do) 25% 50%, var(--vd-vang) 50% 75%, var(--vd-luc) 75%)')
+    // Giá trị của token = đúng mã màu cũ của app thầy (không đổi màu, chỉ đổi chỗ đứng).
+    for (const [ten, mau] of [['vang', '#fbbc04'], ['xanh', '#4285f4'], ['do', '#ea4335'], ['luc', '#34a853']]) expect(tk).toContain(`--vd-${ten}: ${mau};`)
+    expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
   })
 })
