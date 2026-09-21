@@ -683,6 +683,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
           dsCauSai={dsCauSai}
           hoTen={hoTenCon}
           sbd={sbd}
+          lop={lop}
           tieuDeCa={baiThi.tenCa || `Ca #${baiThi.maCa}`}
           onGiaoBaiChoCon={(dsCau, tieuDe) => {
             setHienModalKhacPhuc(false)

@@ -40,6 +40,7 @@ import { hopLeDeRut } from '../lib/loc-cau-rut'
 import { normalizeNumericAnswer } from '../engine/score'
 import { loadScriptUrlHoacMacDinh, loadExamSources } from '../lib/exam-db'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
+import { cacLopHienThi, duocChonLop, khoiEmTuLop, lopEmDuocChon, lopMacDinhCuaEm, nguonHopKhoi } from '../lib/khac-phuc-khoi'
 import { napKhoChoMayEm } from '../lib/kho-cho-may-em'
 import type { TeacherExamSource } from '../data/examContent'
 import ModalXacNhanNop from './ModalXacNhanNop'
@@ -74,6 +75,9 @@ export interface KhoiKhacPhuc3CheDoProps {
   onGiaoBaiChoCon?: (dsCau: any[], tieuDe: string) => Promise<void> | void
   onXemKetQuaMom?: (bai: any) => void
   initialCheDo?: 1 | 2 | 3 | 4
+  /** Lớp / khối em đang học ("11", "12 - Tinh Hoa"). LUẬT BOSS 21/09: kênh rút tự động chỉ đưa câu khối em HOẶC THẤP hơn — lớp cao hơn không được chọn, mặc định = khối em.
+   * Không truyền / không rõ ⇒ như cũ (không lọc). */
+  lop?: string
 }
 
 function chamBai(
@@ -141,8 +145,10 @@ export default function KhoiKhacPhuc3CheDo({
   onGiaoBaiChoCon,
   onXemKetQuaMom,
   initialCheDo,
+  lop,
 }: KhoiKhacPhuc3CheDoProps) {
   const [cheDo, setCheDo] = useState<1 | 2 | 3 | 4>(initialCheDo || 1)
+  const khoiEm = useMemo(() => khoiEmTuLop(lop), [lop])
   const [dangXuLy, setDangXuLy] = useState(false)
   const [loi, setLoi] = useState('')
 
@@ -167,15 +173,17 @@ export default function KhoiKhacPhuc3CheDo({
   })
 
   // Chế độ 2: Dạng câu sai — xin kho máy chủ, phân tích tỷ lệ, thanh kéo
-  const [khoDe2, setKhoDe2] = useState<TeacherExamSource[]>([])
+  const [khoDe2Tho, setKhoDe2] = useState<TeacherExamSource[]>([])
+  const khoDe2 = useMemo(() => nguonHopKhoi(khoiEm, khoDe2Tho), [khoiEm, khoDe2Tho])
   const [dangTaiKho2, setDangTaiKho2] = useState(false)
   const [loiKho2, setLoiKho2] = useState('')
   const [soCauCheDo2, setSoCauCheDo2] = useState<number>(20)
 
   // Chế độ 3: Dạng bài, Chế độ 4: Tự do
-  const [dmDangBai, setDmDangBai] = useState<LopDangBai[]>([])
+  const [dmDangBaiTho, setDmDangBai] = useState<LopDangBai[]>([])
+  const dmDangBai = useMemo(() => lopEmDuocChon(khoiEm, dmDangBaiTho), [khoiEm, dmDangBaiTho])
   const [dangTaiDm, setDangTaiDm] = useState(false)
-  const [lopChon, setLopChon] = useState('12')
+  const [lopChon, setLopChon] = useState(() => String(khoiEm ?? 12))
   const [baiChon, setBaiChon] = useState('')
   const [cacDangChon, setCacDangChon] = useState<Set<string>>(new Set())
   const cacheDeRef = useRef<Map<string, TeacherExamSource>>(new Map())
@@ -201,7 +209,8 @@ export default function KhoiKhacPhuc3CheDo({
   }
   const [soCauCheDo3, setSoCauCheDo3] = useState<number>(20)
   const [soCauCheDo4, setSoCauCheDo4] = useState<number>(20)
-  const [khoDangBai, setKhoDangBai] = useState<TeacherExamSource[]>([])
+  const [khoDangBaiTho, setKhoDangBai] = useState<TeacherExamSource[]>([])
+  const khoDangBai = useMemo(() => nguonHopKhoi(khoiEm, khoDangBaiTho), [khoiEm, khoDangBaiTho])
   const [dangTaiDang, setDangTaiDang] = useState(false)
 
   // Lịch sử và bài luyện hiện tại
@@ -352,12 +361,16 @@ export default function KhoiKhacPhuc3CheDo({
         if (!alive) return
         if (kq.lops && kq.lops.length > 0) {
           setDmDangBai(kq.lops)
-          const l12 = kq.lops.find((l) => l.lop === '12') || kq.lops[0]
-          setLopChon(l12.lop)
-          if (l12.bais && l12.bais.length > 0) {
-            setBaiChon(l12.bais[0].tenBai)
-            if (l12.bais[0].dangs && l12.bais[0].dangs.length > 0) {
-              setCacDangChon(new Set([l12.bais[0].dangs[0].ma]))
+          // MẶC ĐỊNH = khối em (không còn cố định lớp 12); lớp cao hơn khối em không nằm trong lựa chọn
+          const duocChon = lopEmDuocChon(khoiEm, kq.lops)
+          const lopMd = duocChon.find((l) => l.lop === lopMacDinhCuaEm(khoiEm, duocChon))
+          if (lopMd) {
+            setLopChon(lopMd.lop)
+            if (lopMd.bais && lopMd.bais.length > 0) {
+              setBaiChon(lopMd.bais[0].tenBai)
+              if (lopMd.bais[0].dangs && lopMd.bais[0].dangs.length > 0) {
+                setCacDangChon(new Set([lopMd.bais[0].dangs[0].ma]))
+              }
             }
           }
         }
@@ -369,7 +382,7 @@ export default function KhoiKhacPhuc3CheDo({
     return () => {
       alive = false
     }
-  }, [scriptUrlProp])
+  }, [scriptUrlProp, khoiEm])
 
   // Lọc bài theo lớp
   const lopHienTai = useMemo(() => dmDangBai.find((l) => l.lop === lopChon), [dmDangBai, lopChon])
@@ -379,6 +392,7 @@ export default function KhoiKhacPhuc3CheDo({
 
   // Khi đổi lớp
   const handleChonLop = (lop: string) => {
+    if (!duocChonLop(khoiEm, lop)) return // lớp CAO hơn khối em: không cho chọn (luật Boss 21/09)
     setLopChon(lop)
     const l = dmDangBai.find((x) => x.lop === lop)
     if (l && l.bais.length > 0) {
@@ -1340,7 +1354,7 @@ export default function KhoiKhacPhuc3CheDo({
                   1. Chọn Lớp:
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {['10', '11', '12'].map((lop) => (
+                  {cacLopHienThi(khoiEm).map((lop) => (
                     <button
                       key={lop}
                       type="button"

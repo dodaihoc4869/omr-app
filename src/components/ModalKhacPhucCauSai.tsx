@@ -39,6 +39,7 @@ import KhungXemPhieu from './KhungXemPhieu'
 import { napKhoChoMayEm } from '../lib/kho-cho-may-em'
 import { loadScriptUrl } from '../lib/exam-db'
 import { danhMucDangBai, deTheoDangBai, type LopDangBai, type DangBaiMuc } from '../lib/exam-api'
+import { khoiEmTuLop, lopEmDuocChon, lopMacDinhCuaEm, nguonHopKhoi } from '../lib/khac-phuc-khoi'
 import { parseKhoDeJson, buildTeacherSourceFromKhoDe } from '../lib/exam-kho-de-import'
 import { hopLeDeRut } from '../lib/loc-cau-rut'
 import { dungM3 } from './m3'
@@ -65,6 +66,9 @@ export interface ModalKhacPhucCauSaiProps {
   onGiaoBaiChoCon?: (dsCau: any[], tieuDe: string) => void | Promise<void>
   onBatDauLamBaiLuyen?: (dsCau: any[], tieuDe: string) => void
   cheDoMacDinh?: 1 | 2 | 3 | 4
+  /** Lớp / khối em đang học ("11", "12 - Tinh Hoa"). LUẬT BOSS 21/09: kênh rút tự động chỉ đưa câu khối em HOẶC THẤP hơn — "Luyện dạng bài" không hiện lớp cao hơn, mặc định = khối em.
+   * Không truyền / không rõ ⇒ như cũ (không lọc). */
+  lop?: string
 }
 
 export default function ModalKhacPhucCauSai({
@@ -78,7 +82,9 @@ export default function ModalKhacPhucCauSai({
   onGiaoBaiChoCon,
   onBatDauLamBaiLuyen,
   cheDoMacDinh,
+  lop,
 }: ModalKhacPhucCauSaiProps) {
+  const khoiEm = useMemo(() => khoiEmTuLop(lop), [lop])
   const dsCauSai = useMemo(() => {
     return (rawDsCauSai || []).filter((c) =>
       hopLeDeRut({
@@ -96,7 +102,8 @@ export default function ModalKhacPhucCauSai({
   useEffect(() => {
     if (cheDoMacDinh) setCheDo(cheDoMacDinh)
   }, [cheDoMacDinh])
-  const [khoDe, setKhoDe] = useState<TeacherExamSource[]>([])
+  const [khoDeTho, setKhoDe] = useState<TeacherExamSource[]>([])
+  const khoDe = useMemo(() => nguonHopKhoi(khoiEm, khoDeTho), [khoiEm, khoDeTho])
   const [dangTaiKho, setDangTaiKho] = useState(false)
   const [dangTao, setDangTao] = useState(false)
 
@@ -112,14 +119,16 @@ export default function ModalKhacPhucCauSai({
   // Menu (lớp → bài → dạng) tải MỘT LẦN khi mở modal; tờ đề của một dạng chỉ
   // tải khi em bấm đúng dạng ấy — tờ nặng nhất 426 câu, tải sẵn cả 55 tờ là
   // hàng chục MB trên máy em.
-  const [dmDangBai, setDmDangBai] = useState<LopDangBai[]>([])
+  const [dmDangBaiTho, setDmDangBai] = useState<LopDangBai[]>([])
+  const dmDangBai = useMemo(() => lopEmDuocChon(khoiEm, dmDangBaiTho), [khoiEm, dmDangBaiTho])
   const [dangTaiDm, setDangTaiDm] = useState(false)
   const [loiDm, setLoiDm] = useState('')
   const [lanTaiDm, setLanTaiDm] = useState(0)
   const [lopChon, setLopChon] = useState<string>('')
   const [baiChon, setBaiChon] = useState<string>('')
   const [dangChon, setDangChon] = useState<DangBaiMuc | null>(null)
-  const [khoDangBai, setKhoDangBai] = useState<TeacherExamSource[]>([])
+  const [khoDangBaiTho, setKhoDangBai] = useState<TeacherExamSource[]>([])
+  const khoDangBai = useMemo(() => nguonHopKhoi(khoiEm, khoDangBaiTho), [khoiEm, khoDangBaiTho])
   const [dangTaiDang, setDangTaiDang] = useState(false)
   const [loiDang, setLoiDang] = useState('')
   const [soCauCheDo4, setSoCauCheDo4] = useState<number>(20)
@@ -318,11 +327,21 @@ export default function ModalKhacPhucCauSai({
   const baiHienTai = useMemo(() => baisCuaLop.find((b) => b.tenBai === baiChon), [baisCuaLop, baiChon])
   const dangsCuaBai = useMemo(() => baiHienTai?.dangs ?? [], [baiHienTai])
 
-  // Tự động chọn mặc định Lớp 12 -> Bài 1 -> Dạng 1 để học sinh luôn thấy đầy đủ box bài & bộ lọc mức độ
+  // Tự động chọn mặc định KHỐI CỦA EM -> Bài 1 -> Dạng 1 để học sinh luôn thấy đầy đủ box bài & bộ lọc mức độ.
+  // (Trước đây cố định lớp 12 cho mọi em — P0 thầy 21/09: em lớp 11 nhận câu lớp 12. `dmDangBai` đã bỏ các lớp cao hơn khối em; khối em không rõ ⇒ như cũ.)
   useEffect(() => {
     if (dmDangBai.length > 0 && !lopChon) {
-      const l12 = dmDangBai.find((l) => l.lop === '12') || dmDangBai[dmDangBai.length - 1]
-      if (l12) setLopChon(l12.lop)
+      const lopMd = lopMacDinhCuaEm(khoiEm, dmDangBai)
+      if (lopMd) setLopChon(lopMd)
+    }
+  }, [dmDangBai, lopChon, khoiEm])
+
+  // Lớp đang chọn không còn trong danh mục em được chọn (khối em đổi / nạp lại) ⇒ bỏ chọn để mặc định chọn lại theo khối em.
+  useEffect(() => {
+    if (lopChon && dmDangBai.length > 0 && !dmDangBai.some((l) => l.lop === lopChon)) {
+      setLopChon('')
+      setBaiChon('')
+      setDangChon(null)
     }
   }, [dmDangBai, lopChon])
 

@@ -606,6 +606,7 @@ export default function BaoCaoCaThiHocSinhModal({
           dsCauSai={dsCauSai}
           hoTen={hoTen}
           sbd={sbd}
+          lop={lop}
           tieuDeCa={baiThi.tenCa || baiThi.maCa}
           onTaoPhieuXong={(html) => {
             setHienModalKhacPhuc(false)
