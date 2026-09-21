@@ -123,17 +123,29 @@ const chuoi = (x: unknown): string => (typeof x === 'string' ? x : '')
 const soKhongAm = (x: unknown): number => (typeof x === 'number' && Number.isFinite(x) && x >= 0 ? Math.floor(x) : 0)
 
 /**
- * Đọc thân trả về của `/gv/buoi-chua-de-xuat`. Thiếu `ok: true` hoặc không đúng dạng ⇒ `null` (màn ẨN thẻ, không báo lỗi đỏ). Phần tử hỏng bị bỏ, không sửa hộ;
- * số âm/không phải số ⇒ 0. `soEmSai > soEmLam` (vô lý) ⇒ bỏ câu ấy.
+ * Đọc thân trả về của `/gv/buoi-chua-de-xuat` (Code 3, hợp đồng `docs/hop-dong-buoi-chua-de-xuat-2109.md`):
+ * `{ ok, ngay, lop?, soEmCoSo3Ngay, dangCaLopYeu:[{lop, siSo, dang:[{ma, ten, soEmYeu}]}], dangBoNao:[{dang, tenDang?, chu}],
+ *    cauSaiNhieu:[{qid, maDe, phan, dang, tenDang?, soEmLam, soEmSai, tiLeSai, loi?, emSai:[{sbd, hoTen, lop}]}], dongBoNao:[{sbd, hoTen, lop, hanhDong, dang?, tenDang?, chu}] }`.
+ * Thiếu `ok: true` hoặc không phải đối tượng ⇒ `null` (màn ẨN thẻ, không báo lỗi đỏ). Phần tử hỏng bị bỏ, không sửa hộ; số âm/không phải số ⇒ 0; `soEmSai > soEmLam` (vô lý) ⇒ bỏ câu ấy.
+ * Ghép: dạng yếu của MỌI lớp cùng mã cộng dồn số em; dạng có trong `dangBoNao` (dòng `ca_lop` của bản tin đêm qua) thêm nguồn `bo_nao`; `dongBoNao` chỉ giữ hành động gọi lên bảng / đưa vào buổi chữa.
  */
 export function docDauVao(j: unknown): DauVaoDeXuat | null {
   if (!laDoiTuong(j) || j.ok !== true) return null
   const mang = (x: unknown): unknown[] => (Array.isArray(x) ? x : [])
-  const dangYeu: DangYeuLop[] = []
-  for (const x of mang(j.dangYeu)) {
-    if (!laDoiTuong(x) || !chuoi(x.ma)) continue
-    const nguon = mang(x.nguon).filter((n): n is 'ho_so' | 'bo_nao' => n === 'ho_so' || n === 'bo_nao')
-    dangYeu.push({ ma: chuoi(x.ma), ten: chuoi(x.ten) || chuoi(x.ma), soEmYeu: soKhongAm(x.soEmYeu), nguon: [...new Set(nguon)] })
+  const dangBoNao = new Set<string>()
+  for (const x of mang(j.dangBoNao)) if (laDoiTuong(x) && chuoi(x.dang)) dangBoNao.add(chuoi(x.dang))
+  const gop = new Map<string, DangYeuLop>()
+  for (const lop of mang(j.dangCaLopYeu)) {
+    if (!laDoiTuong(lop)) continue
+    for (const x of mang(lop.dang)) {
+      if (!laDoiTuong(x) || !chuoi(x.ma)) continue
+      const ma = chuoi(x.ma)
+      const cu = gop.get(ma)
+      if (cu) {
+        cu.soEmYeu += soKhongAm(x.soEmYeu)
+        if (!cu.ten || cu.ten === cu.ma) cu.ten = chuoi(x.ten) || cu.ten
+      } else gop.set(ma, { ma, ten: chuoi(x.ten) || ma, soEmYeu: soKhongAm(x.soEmYeu), nguon: dangBoNao.has(ma) ? ['ho_so', 'bo_nao'] : ['ho_so'] })
+    }
   }
   const cauSaiNhieu: CauSaiNhieu[] = []
   for (const x of mang(j.cauSaiNhieu)) {
@@ -148,11 +160,11 @@ export function docDauVao(j: unknown): DauVaoDeXuat | null {
     cauSaiNhieu.push({ qid: chuoi(x.qid), dang: chuoi(x.dang), loi: x.loi === true, soEmLam, soEmSai, emSai })
   }
   const goiY: GoiYBoNao[] = []
-  for (const x of mang(j.goiY)) {
-    if (!laDoiTuong(x) || !chuoi(x.sbd)) continue
+  for (const x of mang(j.dongBoNao)) {
+    if (!laDoiTuong(x) || !chuoi(x.sbd) || !(HANH_DONG_GOI_LEN_BANG as readonly string[]).includes(chuoi(x.hanhDong))) continue
     goiY.push({ sbd: chuoi(x.sbd), hoTen: chuoi(x.hoTen), hanhDong: chuoi(x.hanhDong), dang: chuoi(x.dang) })
   }
-  return { ngay: chuoi(j.ngay), lop: chuoi(j.lop), soEmCoSo: soKhongAm(j.soEmCoSo), dangYeu, cauSaiNhieu, goiY }
+  return { ngay: chuoi(j.ngay), lop: chuoi(j.lop), soEmCoSo: soKhongAm(j.soEmCoSo3Ngay), dangYeu: [...gop.values()], cauSaiNhieu, goiY }
 }
 
 // ══════════════════════════════ HÀM CHÍNH ══════════════════════════════

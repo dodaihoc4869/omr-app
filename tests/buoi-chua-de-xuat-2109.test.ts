@@ -268,36 +268,58 @@ describe('lý do hiển thị = số thật, từ chuẩn', () => {
   })
 })
 
-describe('docDauVao — không tin dữ liệu từ máy chủ', () => {
+describe('docDauVao — đọc thân trả về của /gv/buoi-chua-de-xuat (Code 3), không tin dữ liệu ngoài', () => {
   const tot = () => ({
     ok: true,
     ngay: '2026-09-22',
     lop: '12A1',
-    soEmCoSo: 24,
-    dangYeu: [{ ma: 'D0', ten: 'Thuỷ phân ester', soEmYeu: 9, nguon: ['ho_so', 'bo_nao', 'la'] }],
-    cauSaiNhieu: [{ qid: 'T-I-1', dang: 'D0', loi: true, soEmLam: 20, soEmSai: 9, emSai: [{ sbd: 'a1', hoTen: 'Em a1' }, { sbd: '' }, 5] }],
-    goiY: [{ sbd: 'g1', hoTen: 'Em g1', hanhDong: 'goi_len_bang', dang: 'D0' }],
+    soEmCoSo3Ngay: 24,
+    dangCaLopYeu: [
+      { lop: '12A1', siSo: 24, dang: [{ ma: 'D0', ten: 'Thuỷ phân ester', soEmYeu: 5 }, { ma: 'D1', ten: 'Xà phòng hoá', soEmYeu: 7 }] },
+      { lop: '12A2', siSo: 20, dang: [{ ma: 'D0', ten: '', soEmYeu: 4 }] },
+    ],
+    dangBoNao: [{ dang: 'D0', tenDang: 'Thuỷ phân ester', chu: 'cả lớp vấp dạng này' }, { chu: 'thiếu mã dạng' }],
+    cauSaiNhieu: [{ qid: 'T-I-1', maDe: 'T', phan: 'I', dang: 'D0', tenDang: 'x', soEmLam: 20, soEmSai: 9, tiLeSai: 0.45, loi: true, emSai: [{ sbd: 'a1', hoTen: 'Em a1', lop: '12A1' }, { sbd: '' }, 5] }],
+    dongBoNao: [
+      { sbd: 'g1', hoTen: 'Em g1', lop: '12A1', hanhDong: 'goi_len_bang', dang: 'D0', chu: 'x' },
+      { sbd: 'g2', hoTen: 'Em g2', lop: '12A1', hanhDong: 'dua_vao_buoi_chua', chu: 'x' },
+      { sbd: 'g3', hoTen: 'Em g3', lop: '12A1', hanhDong: 'nhan_phu_huynh', chu: 'x' },
+    ],
+    soTruyVan: 9,
   })
-  it('nguồn lặp bị khử trùng', () => {
-    const j = tot()
-    j.dangYeu[0].nguon = ['ho_so', 'ho_so', 'bo_nao', 'bo_nao']
-    expect(docDauVao(j)!.dangYeu[0].nguon).toEqual(['ho_so', 'bo_nao'])
-  })
-  it('đúng dạng ⇒ đọc đủ, nguồn lạ bị bỏ, em không có SBD bị bỏ', () => {
+  it('ghép: dạng yếu của MỌI lớp cùng mã cộng dồn số em (5 + 4 = 9); dạng có trong dangBoNao có thêm nguồn bo_nao; tên lấy lớp đầu có tên', () => {
     const d = docDauVao(tot())!
-    expect(d.dangYeu[0].nguon).toEqual(['ho_so', 'bo_nao'])
-    expect(d.cauSaiNhieu[0].emSai).toEqual([{ sbd: 'a1', hoTen: 'Em a1' }])
     expect(d.soEmCoSo).toBe(24)
-    expect(d.goiY).toHaveLength(1)
+    expect(d.dangYeu).toEqual([
+      { ma: 'D0', ten: 'Thuỷ phân ester', soEmYeu: 9, nguon: ['ho_so', 'bo_nao'] },
+      { ma: 'D1', ten: 'Xà phòng hoá', soEmYeu: 7, nguon: ['ho_so'] },
+    ])
+    expect(d.ngay).toBe('2026-09-22')
+    expect(d.lop).toBe('12A1')
+  })
+  it('tên dạng: lớp đầu không có tên, lớp sau có ⇒ lấy tên của lớp sau', () => {
+    const j = tot()
+    j.dangCaLopYeu = [{ lop: 'A', siSo: 1, dang: [{ ma: 'D5', ten: '', soEmYeu: 3 }] }, { lop: 'B', siSo: 1, dang: [{ ma: 'D5', ten: 'Este', soEmYeu: 2 }] }]
+    expect(docDauVao(j)!.dangYeu).toEqual([{ ma: 'D5', ten: 'Este', soEmYeu: 5, nguon: ['ho_so'] }])
+  })
+  it('câu nhiều em sai: đọc đủ (cờ loi nếu có), em không SBD bị bỏ; không có `loi` ⇒ false', () => {
+    const d = docDauVao(tot())!
+    expect(d.cauSaiNhieu).toEqual([{ qid: 'T-I-1', dang: 'D0', loi: true, soEmLam: 20, soEmSai: 9, emSai: [{ sbd: 'a1', hoTen: 'Em a1' }] }])
+    const j = tot()
+    delete (j.cauSaiNhieu[0] as Record<string, unknown>).loi
+    expect(docDauVao(j)!.cauSaiNhieu[0].loi).toBe(false)
+  })
+  it('dongBoNao: chỉ giữ goi_len_bang / dua_vao_buoi_chua (nhan_phu_huynh KHÔNG vào gợi ý gọi lên bảng)', () => {
+    expect(docDauVao(tot())!.goiY.map((g) => g.sbd)).toEqual(['g1', 'g2'])
   })
   it('không phải {ok:true} / không phải đối tượng ⇒ null (thẻ ẩn, không báo lỗi)', () => {
     for (const x of [null, undefined, 'x', 5, [], { ok: false }, { ok: 'true' }, { error: 'x' }]) expect(docDauVao(x)).toBeNull()
   })
   it('phần tử hỏng bị bỏ, số xấu ⇒ 0, soEmSai > soEmLam ⇒ bỏ câu; thiếu mảng ⇒ rỗng', () => {
-    const j = { ...tot(), soEmCoSo: -5, dangYeu: [{ ma: '' }, null, { ma: 'D1', soEmYeu: 'x' }], cauSaiNhieu: [{ qid: 'Q', soEmLam: 5, soEmSai: 9 }, { soEmLam: 5, soEmSai: 1 }], goiY: [{ hoTen: 'thiếu sbd' }] }
+    const j = { ...tot(), soEmCoSo3Ngay: -5, dangCaLopYeu: [null, { dang: [{ ma: '' }, null, { ma: 'D1', soEmYeu: 'x' }] }], cauSaiNhieu: [{ qid: 'Q', soEmLam: 5, soEmSai: 9 }, { soEmLam: 5, soEmSai: 1 }], dongBoNao: [{ hoTen: 'thiếu sbd', hanhDong: 'goi_len_bang' }] }
     const d = docDauVao(j)!
     expect(d.soEmCoSo).toBe(0)
-    expect(d.dangYeu).toEqual([{ ma: 'D1', ten: 'D1', soEmYeu: 0, nguon: [] }])
+    expect(d.dangYeu).toEqual([{ ma: 'D1', ten: 'D1', soEmYeu: 0, nguon: ['ho_so'] }])
     expect(d.cauSaiNhieu).toEqual([])
     expect(d.goiY).toEqual([])
     expect(docDauVao({ ok: true })).toMatchObject({ dangYeu: [], cauSaiNhieu: [], goiY: [], soEmCoSo: 0 })
@@ -305,6 +327,18 @@ describe('docDauVao — không tin dữ liệu từ máy chủ', () => {
   it('đầu vào đọc xong đưa vào hàm chính không làm sập (kể cả tất cả rỗng)', () => {
     expect(deXuatBuoiChua(docDauVao({ ok: true })!, KHO).co).toBe(false)
     expect(() => deXuatBuoiChua(docDauVao(tot())!, [])).not.toThrow()
+  })
+  it('một thân trả điển hình đi hết đường ống: đọc → đề xuất (có câu, có em, có phút)', () => {
+    const j = tot() as Record<string, unknown>
+    ;(j.cauSaiNhieu as unknown[]).push({ qid: qidCua(0, 1), dang: 'D0', soEmLam: 20, soEmSai: 8, emSai: [{ sbd: 'a2', hoTen: 'Em a2' }] })
+    ;(j.cauSaiNhieu as { qid: string }[])[0].qid = qidCua(0, 0)
+    const r = deXuatBuoiChua(docDauVao(j)!, KHO)
+    expect(r.co).toBe(true)
+    expect(r.cau.slice(0, 2).map((c) => c.qid)).toEqual([qidCua(0, 0), qidCua(0, 1)])
+    expect(r.cau[2]).toMatchObject({ dang: 'D1', nguon: 'dang_yeu' }) // dạng cả lớp yếu D1 (7 em) chưa có câu nhiều em sai ⇒ bổ sung một câu từ kho
+    expect(r.em[0]).toEqual({ sbd: 'g1', hoTen: 'Em g1', lyDo: 'Bộ não A.I gợi ý' })
+    expect(r.cacLyDo[0]).toBe('Dạng em đang yếu: Thuỷ phân ester — 9/24 em')
+    expect(r.phut).toBeGreaterThan(0)
   })
 })
 
