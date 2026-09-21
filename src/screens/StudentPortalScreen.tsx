@@ -91,6 +91,7 @@ import { gioDayDu } from '../lib/ngay-gio-24'
 import { useToanManHinhGame } from '../components/useToanManHinhGame'
 import { ketThucLuotToanManHinh, xinToanManHinh } from '../lib/toan-man-hinh-game'
 import ONhapDapSo from '../components/ONhapDapSo'
+import { batNhipBenVung } from '../lib/nhip-ben-vung'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
 
@@ -207,10 +208,11 @@ export default function StudentPortalScreen() {
 
   useEffect(()=>{
     if(!auth?.sbd||!auth.token)return
-    const sync=()=>{if(document.visibilityState==='visible')void syncStudentExp(auth.sbd,auth.token!)}
-    sync();const timer=setInterval(sync,30000)
-    window.addEventListener('focus',sync);document.addEventListener('visibilitychange',sync)
-    return()=>{clearInterval(timer);window.removeEventListener('focus',sync);document.removeEventListener('visibilitychange',sync)}
+    // Nhịp nền CHẬM + lệch ngẫu nhiên + lùi dần khi lỗi (sự cố D1 21/09 ~20:30: 30 giây × mọi máy em ≈ 38 nghìn lượt/giờ). Quay lại tab / có mạng vẫn cập nhật nhưng chặn dội ≥ 20 giây.
+    const nhip=batNhipBenVung(()=>syncStudentExp(auth.sbd,auth.token!))
+    const kich=()=>nhip.kich()
+    window.addEventListener('focus',kich);window.addEventListener('online',kich);document.addEventListener('visibilitychange',kich)
+    return()=>{nhip.dung();window.removeEventListener('focus',kich);window.removeEventListener('online',kich);document.removeEventListener('visibilitychange',kich)}
   },[auth?.sbd,auth?.token])
 
   // Đăng nhập state
@@ -319,17 +321,19 @@ export default function StudentPortalScreen() {
       setDsMomGiao([...data.items, ...legacy].map(chuanHoaBaiMom))
       setDaTaiMom(true)
       setLoiMom('')
-    } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được bài. Em thử lại.') }
+      return true
+    } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được bài. Em thử lại.'); return false }
   }, [auth])
 
   useEffect(() => {
-    void napDsMom()
-    const refresh = () => { if (!document.hidden) void napDsMom() }
-    const timer = setInterval(refresh, 15000)
-    window.addEventListener('focus', refresh)
-    window.addEventListener('online', refresh)
-    return () => { clearInterval(timer); window.removeEventListener('focus', refresh); window.removeEventListener('online', refresh) }
-  }, [napDsMom, tab])
+    // Danh sách bài Mẹ giao: nhịp nền CHẬM (180 s ± 30 s, không gọi chồng, lỗi ⇒ lùi 30 → 60 → 120 s); đổi tab / quay lại / có mạng vẫn nạp nhưng chặn dội ≥ 20 giây (sự cố D1 21/09: vòng 15 giây × mọi máy em).
+    const nhip = batNhipBenVung(napDsMom)
+    const kich = () => nhip.kich()
+    window.addEventListener('focus', kich)
+    window.addEventListener('online', kich)
+    document.addEventListener('visibilitychange', kich)
+    return () => { nhip.dung(); window.removeEventListener('focus', kich); window.removeEventListener('online', kich); document.removeEventListener('visibilitychange', kich) }
+  }, [napDsMom])
   useEffect(() => {
     if (!dangLamMom || !auth) return
     try { localStorage.setItem(`omr_mom_draft_${auth.sbd}_${dangLamMom.id}`, JSON.stringify(cauTraLoiMom)) } catch {}
@@ -2149,6 +2153,7 @@ export default function StudentPortalScreen() {
                 dsLichSu={dsLichSu}
                 scriptUrl={scriptUrl}
                 initialCheDo={cheDoKhacPhuc}
+                lop={auth.lop}
               />
             </div>
           </div>
@@ -2386,6 +2391,7 @@ export default function StudentPortalScreen() {
           sbd={auth.sbd}
           tieuDeCa={tieuDeKhacPhucModal}
           cheDoMacDinh={cheDoKhacPhucMacDinh}
+          lop={auth.lop}
           onTaoPhieuXong={(html) => {
             setDsCauSaiKhacPhucModal(null)
             setPhieuHtml(html)

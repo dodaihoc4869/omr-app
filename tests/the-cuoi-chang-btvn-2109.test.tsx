@@ -129,7 +129,7 @@ describe('KhungXemPhieu: tin "nộp chặng" từ phiếu', () => {
     await vi.waitFor(() => expect(traLoi).toHaveBeenCalled())
     expect(nop).toHaveBeenCalledTimes(1)
     expect(nop.mock.calls[0][0]).toEqual({ ma: 'B1', sbd: '12121212', chiSo: 2, dapAn: { q1: 'B', q2: 'DSDS' } })
-    expect(traLoi.mock.calls[0][0]).toEqual({ type: 'ddh-btvn-nop-chang-ket', ok: true, error: undefined })
+    expect(traLoi.mock.calls[0][0]).toEqual({ type: 'ddh-btvn-nop-chang-ket', ok: true, error: undefined, ban: false })
   })
 
   it('tin từ trang KHÁC (không phải iframe của khung) bị bỏ: không nộp, không trả lời', async () => {
@@ -148,7 +148,7 @@ describe('KhungXemPhieu: tin "nộp chặng" từ phiếu', () => {
     const { khung, traLoi } = mo(async () => ({ ok: false, error: 'Chặng này chưa mở.' }))
     gui(TIN, khung.contentWindow)
     await vi.waitFor(() => expect(traLoi).toHaveBeenCalled())
-    expect(traLoi.mock.calls[0][0]).toEqual({ type: 'ddh-btvn-nop-chang-ket', ok: false, error: 'Chặng này chưa mở.' })
+    expect(traLoi.mock.calls[0][0]).toEqual({ type: 'ddh-btvn-nop-chang-ket', ok: false, error: 'Chặng này chưa mở.', ban: false })
   })
 
   it('nopChang NÉM lỗi ⇒ phiếu vẫn nhận lời báo (không treo nút "Đang nộp…")', async () => {
@@ -157,8 +157,8 @@ describe('KhungXemPhieu: tin "nộp chặng" từ phiếu', () => {
     })
     gui(TIN, khung.contentWindow)
     await vi.waitFor(() => expect(traLoi).toHaveBeenCalled())
-    expect(traLoi.mock.calls[0][0]).toMatchObject({ type: 'ddh-btvn-nop-chang-ket', ok: false })
-    expect((traLoi.mock.calls[0][0] as { error: string }).error).toContain('thử lại nhé')
+    expect(traLoi.mock.calls[0][0]).toMatchObject({ type: 'ddh-btvn-nop-chang-ket', ok: false, ban: true }) // hết giờ / ném lỗi = máy chủ BẬN: phiếu khoá nút 15 giây
+    expect((traLoi.mock.calls[0][0] as { error: string }).error).toBe('Máy chủ đang bận, bài của em vẫn ở máy. Bấm nộp lại sau 1 phút.')
   })
 
   it('nơi mở phiếu không hỗ trợ nộp chặng (không truyền nopChang) ⇒ báo lỗi rõ ràng', async () => {

@@ -334,6 +334,51 @@ describe('chạy trong trình duyệt giả: khoá thẻ đã chấm, nộp ch�
     expect(nopChang()).toHaveLength(2)
   })
 
+  it('MÁY CHỦ BẬN (host báo ban:true — hết giờ / không nối được): lời "Máy chủ đang bận, bài của em vẫn ở máy…", nút KHOÁ 15 giây có đếm ngược, bấm trong lúc khoá KHÔNG gửi lần hai; hết 15 giây nút mở lại "Nộp chặng", bài làm vẫn giữ (sự cố D1 21/09)', async () => {
+    moPhieu(phieu(cauHon, { daCham }))
+    chonI('q4', 3)
+    $('#nut-nop').click()
+    $('#nut-nop').click()
+    await cho()
+    expect(nopChang()).toHaveLength(1)
+    vi.useFakeTimers()
+    try {
+      const ev = new MessageEvent('message', { data: { type: 'ddh-btvn-nop-chang-ket', ok: false, error: 'Máy chủ đang bận, bài của em vẫn ở máy. Bấm nộp lại sau 1 phút.', ban: true } })
+      Object.defineProperty(ev, 'source', { value: cha })
+      window.dispatchEvent(ev)
+      expect($('#nop-loi').textContent).toBe('Máy chủ đang bận, bài của em vẫn ở máy. Bấm nộp lại sau 1 phút.')
+      expect(($('#nut-nop') as HTMLButtonElement).disabled).toBe(true)
+      expect($('#nut-nop').textContent).toBe('Nộp lại sau 15 giây')
+      $('#nut-nop').click() // đang khoá: không gửi
+      expect(nopChang()).toHaveLength(1)
+      vi.advanceTimersByTime(5_000)
+      expect($('#nut-nop').textContent).toBe('Nộp lại sau 10 giây')
+      expect(($('#nut-nop') as HTMLButtonElement).disabled).toBe(true)
+      vi.advanceTimersByTime(10_000)
+      expect($('#nut-nop').textContent).toBe('Nộp chặng')
+      expect(($('#nut-nop') as HTMLButtonElement).disabled).toBe(false)
+      expect($('.q-card[data-qid="q4"] .q-opt.lam-o[aria-checked="true"]').getAttribute('data-chon')).toBe('D')
+    } finally {
+      vi.useRealTimers()
+    }
+    $('#nut-nop').click()
+    await cho()
+    expect(nopChang()).toHaveLength(2)
+  })
+
+  it('lỗi KHÁC (máy chủ từ chối, không phải bận) KHÔNG khoá nút: mở lại ngay như cũ', async () => {
+    moPhieu(phieu(cauHon, { daCham }))
+    chonI('q4', 3)
+    $('#nut-nop').click()
+    $('#nut-nop').click()
+    await cho()
+    const ev = new MessageEvent('message', { data: { type: 'ddh-btvn-nop-chang-ket', ok: false, error: 'Bài đã quá hạn nộp.' } })
+    Object.defineProperty(ev, 'source', { value: cha })
+    window.dispatchEvent(ev)
+    expect(($('#nut-nop') as HTMLButtonElement).disabled).toBe(false)
+    expect($('#nut-nop').textContent).toBe('Nộp chặng')
+  })
+
   it('tin nhắn "kết quả" từ trang KHÁC (không phải trang cha) bị bỏ qua', async () => {
     moPhieu(phieu(cauHon, { daCham }))
     chonI('q4', 0)

@@ -1,7 +1,7 @@
 // NỘP CHẶNG — bộ điều phối phía host. Không mạng thật: phụ thuộc được tiêm.
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { docKetQuaChangDaLuu, doiLuotLam, khoaLuotLam, type KetQuaChang } from '../src/lib/btvn-ca-nhan-em'
-import { loiChoEm, nopChangCaNhan, type PhuThuocNopChang, type TinNopChang } from '../src/lib/btvn-nop-chang-em'
+import { LOI_MAY_CHU_BAN, loiChoEm, nopChangCaNhan, type PhuThuocNopChang, type TinNopChang } from '../src/lib/btvn-nop-chang-em'
 
 const TIN: TinNopChang = { ma: 'B1', sbd: '12121212', chiSo: 0, dapAn: { q1: 'B', q3: '12,5' } }
 const KET_OK: KetQuaChang = {
@@ -81,10 +81,20 @@ describe('nộp chặng hỏng — không nuốt lỗi, không lưu nhầm', () 
     expect(docKetQuaChangDaLuu('B1', '12121212', 0).ketQua).toEqual([])
   })
 
-  it('mất mạng ⇒ giữ nguyên lời của máy chủ/mạng, không lưu', async () => {
+  it('mất mạng / hết giờ (máy chủ nghẽn — sự cố D1 21/09) ⇒ lời rõ "Máy chủ đang bận, bài của em vẫn ở máy. Bấm nộp lại sau 1 phút." + cờ ban (phiếu khoá nút 15 giây), không lưu', async () => {
     const { d } = dep({ nopChang: vi.fn(async () => ({ ok: false, error: 'Không nối được máy chủ', ketQua: [], chuaLam: [] })) })
-    expect(await nopChangCaNhan(TIN, 'R', d)).toEqual({ ok: false, error: 'Không nối được máy chủ' })
+    expect(await nopChangCaNhan(TIN, 'R', d)).toEqual({ ok: false, error: LOI_MAY_CHU_BAN, ban: true })
+    expect(LOI_MAY_CHU_BAN).toBe('Máy chủ đang bận, bài của em vẫn ở máy. Bấm nộp lại sau 1 phút.')
     expect(docKetQuaChangDaLuu('B1', '12121212', 0).ketQua).toEqual([])
+  })
+
+  it('máy chủ TỪ CHỐI có lý do (quá hạn, chưa mở, lời lạ) ⇒ KHÔNG phải "bận": không cờ ban (nút không bị khoá)', async () => {
+    for (const ket of [{ ok: false, lyDo: 'qua_han' }, { ok: false, lyDo: 'chang_chua_mo' }, { ok: false, error: 'Bài này đã bị thầy thu hồi.' }]) {
+      const { d } = dep({ nopChang: vi.fn(async () => ({ ...ket, ketQua: [], chuaLam: [] })) as never })
+      const kq = await nopChangCaNhan(TIN, 'R', d)
+      expect(kq.ok).toBe(false)
+      expect(kq.ban).toBeUndefined()
+    }
   })
 
   it('máy chủ nhận nhưng KHÔNG chấm câu nào (đáp án chưa hợp lệ) ⇒ báo rõ, không lưu, không dựng lại', async () => {
@@ -97,7 +107,7 @@ describe('nộp chặng hỏng — không nuốt lỗi, không lưu nhầm', () 
   })
 
   it('bất kỳ phụ thuộc nào ném lỗi ⇒ trả lỗi có lời, KHÔNG ném ra ngoài', async () => {
-    expect(await nopChangCaNhan(TIN, 'R', dep({ layCauHinh: vi.fn(async () => { throw new Error('x') }) }).d)).toMatchObject({ ok: false, error: expect.stringContaining('Bài của em vẫn được giữ') })
+    expect(await nopChangCaNhan(TIN, 'R', dep({ layCauHinh: vi.fn(async () => { throw new Error('x') }) }).d)).toMatchObject({ ok: false, ban: true, error: expect.stringContaining('bài của em vẫn ở máy') })
     expect(await nopChangCaNhan(TIN, 'R', dep({ nopChang: vi.fn(async () => { throw new Error('x') }) }).d)).toMatchObject({ ok: false })
   })
 })

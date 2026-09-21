@@ -2311,6 +2311,18 @@ export const JS_PHIEU = `
         if (nutNop) { nutNop.disabled = false; nutNop.textContent = 'Nộp chặng'; }
         if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = chu; }
       }
+      function khoaNutTam(nut, giay) {
+        if (!nut) return;
+        var chuGoc = nut.textContent;
+        var con = giay;
+        nut.disabled = true;
+        nut.textContent = 'Nộp lại sau ' + con + ' giây';
+        var h = setInterval(function () {
+          con -= 1;
+          if (con <= 0) { clearInterval(h); nut.disabled = false; nut.textContent = chuGoc; }
+          else nut.textContent = 'Nộp lại sau ' + con + ' giây';
+        }, 1000);
+      }
       var nutNopTs = document.getElementById('nut-nop-ts');
       var oLoiTs = document.getElementById('nop-loi-ts');
       var dangNopTs = false;
@@ -2388,7 +2400,10 @@ export const JS_PHIEU = `
         if (!du.caNhan || !d || d.type !== 'ddh-btvn-nop-chang-ket' || e.source !== window.parent) return;
         if (d.ok === false) {
           var chuLoi = String(d.error || 'Chưa nộp được chặng. Bài của em vẫn được giữ, em thử lại nhé.');
-          if (dangNopTs) loiNopThuSuc(chuLoi); else loiNopChang(chuLoi);
+          var laTs = dangNopTs;
+          if (laTs) loiNopThuSuc(chuLoi); else loiNopChang(chuLoi);
+          // MÁY CHỦ BẬN (hết giờ / không nối được): bài vẫn ở máy; KHOÁ nút nộp 15 giây, đếm ngược trên nút — chống bấm dồn lúc máy chủ nghẽn (sự cố D1 21/09).
+          if (d.ban === true) khoaNutTam(laTs ? nutNopTs : nutNop, 15);
         }
       });
 

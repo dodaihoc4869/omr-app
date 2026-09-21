@@ -154,9 +154,9 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
         // NỘP CHẶNG BÀI "NÂNG ĐỠ". CHỈ nhận từ chính iframe của khung này (không tin trang lạ), và luôn trả lời — phiếu
         // đang chờ ở trạng thái "Đang nộp…", không trả lời là nút treo mãi.
         if (e.source !== iframeRef.current?.contentWindow) return
-        const traLoi = (kq: { ok: boolean; error?: string }) => {
+        const traLoi = (kq: { ok: boolean; error?: string; ban?: boolean }) => {
           try {
-            iframeRef.current?.contentWindow?.postMessage({ type: 'ddh-btvn-nop-chang-ket', ok: kq.ok, error: kq.error }, '*')
+            iframeRef.current?.contentWindow?.postMessage({ type: 'ddh-btvn-nop-chang-ket', ok: kq.ok, error: kq.error, ban: kq.ban === true }, '*')
           } catch {
             /* phiếu đã đóng thì thôi */
           }
@@ -167,7 +167,7 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
         if (!ham) return traLoi({ ok: false, error: 'Không nộp được chặng từ chỗ này. Em mở bài trong app nhé.' })
         void ham({ ma: String(e.data.ma), sbd: String(e.data.sbd || ''), chiSo: Number(e.data.chiSo), dapAn }).then(
           (kq) => traLoi(kq),
-          () => traLoi({ ok: false, error: 'Chưa nộp được chặng. Bài của em vẫn được giữ, em thử lại nhé.' }),
+          () => traLoi({ ok: false, error: 'Máy chủ đang bận, bài của em vẫn ở máy. Bấm nộp lại sau 1 phút.', ban: true }),
         )
       }
     }
