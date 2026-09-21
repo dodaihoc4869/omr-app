@@ -8,12 +8,15 @@ import { CAC_KHOI, cauHopKhoi, demCauKhongRoKhoi, khoiCaoHon, khoiCuaCau, khoiCu
 describe('khoiCuaMaDe — đọc khối từ mã tờ / mã câu (đoạn thứ 2)', () => {
   it.each([
     ['DH-12-C2-B6-TN', 12], ['DB-12-B8-D1', 12], ['DH-11-III-1', 11], ['DH-10-C1-B1', 10], ['DH-12-C1-B2-I-49', 12], ['dh-11-c2', 11], ['ESTE-11-A', 11], ['DH-12', 12],
+    // dạng SỐ-ĐẦU (38 % kho thật): khối ở đoạn đầu
+    ['12-C1-B2-D1', 12], ['10-C1-B1', 10], ['12-KT-C1-D1', 12], ['11-BD1-2', 11], ['10-C1-B1-I-1', 10], ['12-C1-B2-D1-III-7', 12],
   ])('%s ⇒ %s', (ma, khoi) => expect(khoiCuaMaDe(ma)).toBe(khoi))
-  it.each([['D1'], ['DE1'], ['BTVN240921'], ['DH-120-A'], ['DH-9-A'], ['DH-13-A'], ['12-DH-A'], [''], [null], [undefined], [12], [{}]])('KHÔNG đọc ra khối: %s', (ma) => expect(khoiCuaMaDe(ma)).toBeNull())
+  it.each([['D1'], ['DE1'], ['BTVN240921'], ['DH-120-A'], ['DH-9-A'], ['DH-13-A'], ['120-C1-B1'], ['9-C1-B1'], ['13-C1'], ['1-12-C1'], [''], [null], [undefined], [12], [{}]])('KHÔNG đọc ra khối: %s', (ma) => expect(khoiCuaMaDe(ma)).toBeNull())
   it('danh sách mã (phẩy / chấm phẩy / khoảng trắng) ⇒ khối CAO NHẤT; một mã lạ trong danh sách không làm mất khối của mã còn lại', () => {
     expect(khoiCuaMaDe('DH-11-C2-B4-TN,DH-12-C2-B4-DS')).toBe(12)
     expect(khoiCuaMaDe('DH-11-C2-B4-TN; DH-10-C2-B4-DS')).toBe(11)
     expect(khoiCuaMaDe('X1,DH-11-C2')).toBe(11)
+    expect(khoiCuaMaDe('11-C2-B4,12-C2-B4')).toBe(12) // danh sách dạng số-đầu
   })
 })
 

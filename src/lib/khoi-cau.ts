@@ -26,11 +26,12 @@ export function khoiCuaLop(v: unknown): Khoi | null {
   return m ? (Number(m[1]) as Khoi) : null
 }
 
-/** Khối từ MÃ TỜ / MÃ CÂU: `DH-12-C2-B6-TN`, `DB-12-B8-D1`, `DH-11-III-1`, `DH-12-C1-B2-I-49` ⇒ đoạn thứ 2 (10/11/12). Danh sách mã ngăn bằng phẩy/chấm phẩy/khoảng trắng ⇒ khối CAO NHẤT. Không nhận ra ⇒ null. */
+/** Khối từ MÃ TỜ / MÃ CÂU: `DH-12-C2-B6-TN`, `DB-12-B8-D1`, `DH-11-III-1`, `DH-12-C1-B2-I-49` ⇒ đoạn thứ 2 (10/11/12); và dạng số-đầu `12-C1-B2-D1`, `10-C1-B1-I-1` ⇒ đoạn đầu. Danh sách mã ngăn bằng phẩy/chấm phẩy/khoảng trắng ⇒ khối CAO NHẤT. Không nhận ra ⇒ null. */
 export function khoiCuaMaDe(ma: unknown): Khoi | null {
   let cao: Khoi | null = null
   for (const p of chuoi(ma).split(/[\s,;|]+/)) {
-    const m = /^[A-Za-zĐđ]{1,6}-(10|11|12)(?![0-9])(?:-|$)/.exec(p)
+    // Hai dạng mã tờ THẬT trong kho (đo trên bản sao lưu 21/09: 9 564 câu dạng chữ-đầu, 5 795 câu dạng số-đầu = 38 % kho): `DH-12-C2-B6`, `DB-12-B8-D1` (khối ở đoạn 2) và `12-C1-B2-D1`, `10-C1-B1`, `12-KT-C1-D1` (khối ở đoạn ĐẦU).
+    const m = /^[A-Za-zĐđ]{1,6}-(10|11|12)(?![0-9])(?:-|$)/.exec(p) ?? /^(10|11|12)-/.exec(p)
     if (m) { const k = Number(m[1]) as Khoi; if (cao === null || k > cao) cao = k }
   }
   return cao
