@@ -94,6 +94,19 @@ export function soGioTre(hanNop: unknown, nowMs: number): number {
   return Number.isFinite(h) && nowMs > h ? Math.max(1, Math.ceil((nowMs - h) / 3_600_000)) : 0
 }
 
+/**
+ * Cờ LÙI NHANH của NỘP TRỄ (Điều 4 = B đổi luật hạn nộp): `cau_hinh.btvn_nop_tre = 'tat'` ⇒ trở lại luật cũ (qua hạn là khoá `qua_han`, em nhờ thầy gia hạn) ở CẢ BA đường: mở bài (`/btvn/cua-em`),
+ * nộp chặng (`/btvn/xong-lo`), nộp cả bài (`/btvn/nop`). Vắng / khác / lỗi đọc ⇒ BẬT. Chỉ được đọc khi bài ĐÃ qua hạn (đường thường không tốn truy vấn).
+ */
+export async function btvnNopTreBat(env: { DB: { prepare(q: string): { bind(...a: unknown[]): { first<T>(): Promise<T | null> } } } }): Promise<boolean> {
+  try {
+    const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('btvn_nop_tre').first<{ gia_tri?: unknown }>()
+    return String(r?.gia_tri ?? '').trim().toLowerCase() !== 'tat'
+  } catch {
+    return true
+  }
+}
+
 /** NỘP TRỄ (Điều 4 = B): sau khi lượt nộp ĐẦU đã ghi `nop_luc`, đánh dấu `nop_tre = 1` + `gio_tre`. Best-effort: thiếu cột (chưa chạy migration-2109-nop-tre.sql) hoặc lỗi ⇒ bỏ qua, KHÔNG làm hỏng việc nộp. */
 export async function ghiNopTre(env: { DB: { prepare(q: string): { bind(...a: unknown[]): { run(): Promise<unknown> } } } }, khoa: string, nopLuc: string, hanNop: unknown, nowMs: number): Promise<void> {
   const gio = soGioTre(hanNop, nowMs)

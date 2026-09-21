@@ -3,7 +3,7 @@ import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
 import {docBoCuaCacEm,docTomTat,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
-import {ghiNopTre} from './btvn-nang-do-chang'
+import {btvnNopTreBat,ghiNopTre} from './btvn-nang-do-chang'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 import { goTuLuanKhoiGoi, laCauTuLuan, locPhieuBaiTap, type PhanCau } from './cam-tu-luan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
@@ -884,6 +884,7 @@ export async function nopBtvnQuaPhieu(
   const hanMs = han ? Date.parse(han) : NaN
   // ĐIỀU 4 = B (thầy chốt 21/09 14:13): qua hạn em VẪN nộp được LẦN ĐẦU (ghi nộp trễ); nộp LẠI / làm lại sau hạn vẫn khoá (chờ thầy gia hạn) — kiểm ở nhánh `cu.nop_luc` bên dưới.
   const quaHan = Number.isFinite(hanMs) && Date.now() > hanMs
+  if (quaHan && !(await btvnNopTreBat(env))) return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' } // cờ lùi `btvn_nop_tre = 'tat'`: luật cũ (qua hạn là khoá)
   // BÀI CÁ NHÂN HOÁ ("nâng đỡ"): chấm trên câu CỦA EM, luật điểm riêng (btvn-nang-do-d1.ts). Bài cũ đi tiếp đường dưới, không đổi một byte.
   if (laBaiCaNhan(bt)) return nopBaiCaNhan(env, bt, sbd, lam, Date.now())
 

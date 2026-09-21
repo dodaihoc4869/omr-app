@@ -236,3 +236,59 @@ describe('bộ NỘP TRỄ chỉ có lõi: không thích nghi, không khắc ph�
     expect((d.sql.prepare("SELECT chot_luc FROM btvn_em WHERE sbd='S2'").get() as { chot_luc: string | null }).chot_luc).toBeNull()
   })
 })
+
+// ── Cờ LÙI NHANH `cau_hinh.btvn_nop_tre = 'tat'` (Boss 21/09: nộp trễ đổi luật hạn nộp): trở lại luật cũ ở CẢ BA đường; vắng cờ ⇒ nộp trễ như thường ─────────────────────────────────────────
+describe("cờ lùi nộp trễ: cau_hinh.btvn_nop_tre = 'tat' ⇒ luật cũ (qua hạn là khoá qua_han) ở mở bài · nộp chặng · nộp cả bài", () => {
+  const tat = (d: D1That) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('btvn_nop_tre','tat','x')").run()
+
+  it('MỞ BÀI: cờ tắt ⇒ em đã mở lẫn em chưa từng mở đều nhận qua_han và KHÔNG chốt bộ; bỏ cờ ⇒ mở được', async () => {
+    gio(BAY_GIO)
+    const d = dung(2); await giao(d); await mo(d, 'S1')
+    tat(d)
+    gio(SAU_HAN_4G30)
+    expect(await mo(d, 'S1')).toMatchObject({ ok: false, lyDo: 'qua_han' })
+    expect(await mo(d, 'S2')).toMatchObject({ ok: false, lyDo: 'qua_han' })
+    expect((d.sql.prepare("SELECT chot_luc FROM btvn_em WHERE sbd='S2'").get() as { chot_luc: string | null }).chot_luc).toBeNull()
+    d.sql.prepare("DELETE FROM cau_hinh WHERE khoa='btvn_nop_tre'").run()
+    expect(await mo(d, 'S1')).toMatchObject({ ok: true })
+    expect(await mo(d, 'S2')).toMatchObject({ ok: true, nopTre: true })
+  })
+
+  it('NỘP CHẶNG: cờ tắt ⇒ chặng sau hạn bị qua_han (không ghi đáp án); bỏ cờ ⇒ nộp được', async () => {
+    gio(BAY_GIO)
+    const d = dung(); await giao(d); await mo(d)
+    tat(d)
+    gio(SAU_HAN_4G30)
+    const q0 = boCuaEm(d).filter((x) => x.chang === 0).map((x) => x.qid)
+    const dapAn = Object.fromEntries(q0.map((q) => [q, DAP_AN_DUNG(q)]))
+    expect(await nopChang(d, 0, dapAn)).toMatchObject({ ok: false, lyDo: 'qua_han' })
+    expect((d.sql.prepare("SELECT lo_da_xong FROM btvn_em WHERE sbd='S1'").get() as { lo_da_xong: number }).lo_da_xong).toBe(0)
+    d.sql.prepare("DELETE FROM cau_hinh WHERE khoa='btvn_nop_tre'").run()
+    expect(await nopChang(d, 0, dapAn)).toMatchObject({ ok: true })
+  })
+
+  it('NỘP CẢ BÀI (/btvn/nop): cờ tắt ⇒ bài thường nộp LẦN ĐẦU sau hạn bị qua_han, không ghi nop_luc; bỏ cờ ⇒ nộp trễ', async () => {
+    gio(BAY_GIO)
+    const d = dung()
+    d.objects.set('kho/DE1.json', { cau: [{ phan: 'I', so: 1, dap_an: 'A', chuyen_de: 'ES', muc_do: '1 sao' }, { phan: 'I', so: 2, dap_an: 'B', chuyen_de: 'ES', muc_do: '2 sao' }] })
+    d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT0','CA1','DE1',2,?,?,0,'x',0)").run(BAY_GIO.toISOString(), HAN)
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BT0|S1','BT0','S1','Em Một')").run()
+    tat(d)
+    gio(SAU_HAN_4G30)
+    const nop = () => goiWorker(worker, d.env, '/btvn/nop', { maBtvn: 'BT0', sbd: 'S1', dapAn: { 'DE1-I-1': 'A', 'DE1-I-2': 'B' } }) as Promise<any>
+    expect(await nop()).toMatchObject({ ok: false, lyDo: 'qua_han' })
+    expect((d.sql.prepare("SELECT nop_luc FROM btvn_em WHERE khoa='BT0|S1'").get() as { nop_luc: string | null }).nop_luc).toBeNull()
+    d.sql.prepare("DELETE FROM cau_hinh WHERE khoa='btvn_nop_tre'").run()
+    const ok = await nop()
+    expect(ok.ok, JSON.stringify(ok)).toBe(true)
+    expect(d.sql.prepare("SELECT nop_tre FROM btvn_em WHERE khoa='BT0|S1'").get()).toEqual({ nop_tre: 1 })
+  })
+
+  it('TRƯỚC hạn cờ tắt không đổi gì (đường thường không bị chạm)', async () => {
+    gio(BAY_GIO)
+    const d = dung(); await giao(d); tat(d)
+    expect(await mo(d)).toMatchObject({ ok: true })
+    const q0 = boCuaEm(d).filter((x) => x.chang === 0).map((x) => x.qid)
+    expect(await nopChang(d, 0, Object.fromEntries(q0.map((q) => [q, DAP_AN_DUNG(q)])))).toMatchObject({ ok: true })
+  })
+})
