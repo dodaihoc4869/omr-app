@@ -248,11 +248,13 @@ const soTrongLoi = (chu) => [...new Set(String(chu).match(/\d+(?:[.,]\d+)?/g) ??
 
 /** Bản XEM TRƯỚC dạng chữ để người chạy đọc (KHÔNG có SBD, KHÔNG có tên — chỉ bí danh). */
 export function soanXemTruoc({ ngay, hopLe, loai, tao }) {
+  const canhBao = canhBaoLoLoiMoi(hopLe.map((h) => h.dauRa.loiMoi))
   const d = [
     `# XEM TRƯỚC — LƯỢT CHIỀU ${ngay} (CHƯA NỘP)`,
     '',
     `Tạo lúc ${tao} · ${hopLe.length} em hợp lệ · ${loai.length} em bị loại. Đọc từng lời; ưng thì nộp bằng: \`bash scripts/bo-nao/chay-chieu.sh --nop ${ngay}\`. Chưa ưng: sửa/xoá phần tử trong \`bo-nao/${ngay}/chieu/ra/\` rồi chạy lại \`--xem-truoc\`.`,
     '',
+    ...(canhBao.length ? ['**CẢNH BÁO CẢ LÔ (không loại lời nào — siết LUAT-CHIEU rồi chạy lại nếu cần):**', ...canhBao.map((c) => `- ${c}`), ''] : []),
     '## Hợp lệ',
   ]
   hopLe.forEach((h, i) => {
@@ -266,6 +268,29 @@ export function soanXemTruoc({ ngay, hopLe, loai, tao }) {
   for (const l of loai) d.push(`- **${l.biDanh}**: ${l.lyDo.join('; ').slice(0, 300)}`)
   if (!loai.length) d.push('(không có)')
   return d.join('\n') + '\n'
+}
+
+/**
+ * CẢNH BÁO CẢ LÔ (Boss 21/09 sau lượt thử chiều: 47/52 lời mở bằng "Hôm qua", một đuôi lặp 17 lần): KHÔNG loại lời nào, chỉ báo để người chạy đọc và siết luật. Chỉ xét khi có ≥ 6 lời hợp lệ.
+ * (1) quá nửa lời mở bằng cùng cụm "Hôm qua" · (2) < 4 kiểu mở đầu (hai chữ đầu) khi ≥ 8 lời · (3) một đuôi (5 chữ cuối) lặp ≥ max(3, 20 % số lời).
+ */
+export function canhBaoLoLoiMoi(loi) {
+  const ra = []
+  const n = loi.length
+  if (n < 6) return ra
+  const chuan = (x) => String(x).toLowerCase().normalize('NFC').split(/[^\p{L}\p{N}]+/u).filter(Boolean)
+  const homQua = loi.filter((x) => chuan(x).slice(0, 2).join(' ') === 'hôm qua').length
+  if (homQua * 2 > n) ra.push(`${homQua}/${n} lời mở bằng "Hôm qua" (quá nửa — đơn điệu; cần mở đầu đa dạng)`)
+  const kieu = new Set(loi.map((x) => chuan(x).slice(0, 2).join(' ')))
+  if (n >= 8 && kieu.size < 4) ra.push(`chỉ có ${kieu.size} kiểu mở đầu trong ${n} lời (cần ≥ 4)`)
+  const duoi = new Map()
+  for (const x of loi) {
+    const t = chuan(x).slice(-5).join(' ')
+    duoi.set(t, (duoi.get(t) ?? 0) + 1)
+  }
+  const [tDuoi, soDuoi] = [...duoi.entries()].sort((a, b) => b[1] - a[1])[0] ?? ['', 0]
+  if (soDuoi >= Math.max(3, Math.ceil(n * 0.2))) ra.push(`${soDuoi}/${n} lời kết bằng gần y hệt "… ${tDuoi}" (lặp đuôi)`)
+  return ra
 }
 
 /** Nhóm LÝ DO bị loại (mỗi em tính MỘT lần theo lý do đầu tiên khớp) — để báo cáo gọn cho thầy. */
@@ -345,7 +370,7 @@ export async function chayNopChieu({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date
     ghiChu(tepMd, soanXemTruoc({ ngay, hopLe, loai, tao }))
     ghiJson(join(thuMuc, 'xem-truoc.json'), { ...tomTat, cacEm: hopLe.map((h) => ({ biDanh: h.biDanh, doTinCay: h.dauRa.doTinCay, thuThach: h.dauRa.thuThach, loiMoi: h.dauRa.loiMoi })) }, { dep: true })
     ghiChu(join(thuMuc, 'bao-cao.md'), soanBaoCaoChieu({ ngay, hopLe, loai, daNop: false, soChuaChonThu }))
-    return { ...tomTat, daNop: false, tepXemTruoc: `bo-nao/${ngay}/chieu/xem-truoc.md`, tepBaoCao: `bo-nao/${ngay}/chieu/bao-cao.md` }
+    return { ...tomTat, daNop: false, tepXemTruoc: `bo-nao/${ngay}/chieu/xem-truoc.md`, tepBaoCao: `bo-nao/${ngay}/chieu/bao-cao.md`, canhBaoLo: canhBaoLoLoiMoi(hopLe.map((h) => h.dauRa.loiMoi)) }
   }
   const tepXem = join(thuMuc, 'xem-truoc.json')
   if (!existsSync(tepXem)) throw new LoiBoNao('Chưa có bản xem trước: chạy trước `node scripts/bo-nao/nop.mjs --chieu --xem-truoc` rồi ĐỌC xem-truoc.md trước khi nộp.', 7)
@@ -379,6 +404,7 @@ export function dongTomTatChieu(kq) {
   for (const l of kq.loai.slice(0, SO_DONG_LOI_IN_TOI_DA)) d.push(`  Loại ${l.biDanh}: ${l.lyDo.join('; ').slice(0, 220)}`)
   if (kq.loai.length > SO_DONG_LOI_IN_TOI_DA) d.push(`  … và ${kq.loai.length - SO_DONG_LOI_IN_TOI_DA} em nữa (xem xem-truoc.md).`)
   for (const l of kq.loiTep) d.push(`  Tệp: ${l}`)
+  for (const c of kq.canhBaoLo ?? []) d.push(`  CẢNH BÁO CẢ LÔ: ${c}`)
   if (kq.tepBaoCao) d.push(`  Báo cáo 6 dòng cho thầy (bảng tin): ${kq.tepBaoCao}`)
   return d
 }

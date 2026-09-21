@@ -11,8 +11,8 @@ import { LoiBoNao } from '../scripts/bo-nao/chung.mjs'
 // @ts-expect-error
 import { chayLayChieu, diemTinHieuChieu } from '../scripts/bo-nao/lay.mjs'
 // @ts-expect-error
-import { chayNopChieu, moRongPhanTuChieu, nhomLyDo, soanBaoCaoChieu, soanXemTruoc } from '../scripts/bo-nao/nop.mjs'
-import { LOI_CAM, LOI_TOT, THE, THE_KHONG_THU } from './_bo-nao-thu-thach-mau'
+import { canhBaoLoLoiMoi, chayNopChieu, moRongPhanTuChieu, nhomLyDo, soanBaoCaoChieu, soanXemTruoc } from '../scripts/bo-nao/nop.mjs'
+import { LOI_CAM, LOI_KHONG_THU, LOI_TOT, THE, THE_KHONG_THU } from './_bo-nao-thu-thach-mau'
 
 const NGAY = '2026-09-21'
 let tam: string
@@ -125,7 +125,7 @@ describe('nop.mjs --chieu — xem trước rồi nộp', () => {
     const l = await lay()
     const a = biDanhCua(l.bang, '20001')
     const d = biDanhCua(l.bang, '20004')
-    ghiRa([pt(a, LOI_TOT[0].chu), pt(d, LOI_TOT[4].chu, ['LIPID.BEO'])])
+    ghiRa([pt(a, LOI_TOT[0].chu), pt(d, LOI_KHONG_THU.chu, ['LIPID.BEO'])])
     return { ...l, a, d }
   }
   it('moRongPhanTuChieu: núm RỖNG, không lời nhắn, chỉ mang thuThach + loiMoi; khoá thừa của AI bị bỏ', () => {
@@ -137,7 +137,7 @@ describe('nop.mjs --chieu — xem trước rồi nộp', () => {
   it('--xem-truoc: ghi xem-truoc.md + .json, KHÔNG gọi máy chủ, không SBD/tên; lời hợp lệ có mặt, em bị loại có lý do', async () => {
     const { a, d, bang } = await chuanBi()
     const e = biDanhCua(bang, '20007')
-    ghiRa([pt(a, LOI_TOT[0].chu), pt(d, LOI_TOT[4].chu, ['LIPID.BEO']), pt(e, LOI_CAM[0].chu), pt('E999', LOI_TOT[0].chu)])
+    ghiRa([pt(a, LOI_TOT[0].chu), pt(d, LOI_KHONG_THU.chu, ['LIPID.BEO']), pt(e, LOI_CAM[0].chu), pt('E999', LOI_TOT[0].chu)])
     const mc = mayChuGia()
     const kq = await chayNopChieu({ ngay: NGAY, goc, goi: mc.goi, xemTruoc: true })
     expect(mc.nhatKy).toHaveLength(0)
@@ -152,7 +152,7 @@ describe('nop.mjs --chieu — xem trước rồi nộp', () => {
   it('phần tử thiếu thuThach/loiMoi, hoặc thuThach sai khuôn (dạng ngoài thẻ, soCau ngoài 3–8) ⇒ LOẠI (không nộp phần rỗng)', async () => {
     const { a, d, bang } = await chuanBi()
     const e = biDanhCua(bang, '20007')
-    ghiRa([{ biDanh: a, doTinCay: 0.8 }, pt(d, LOI_TOT[4].chu, ['KHONG.CO']), pt(e, LOI_TOT[0].chu, ['ESTE.THUY_PHAN'], { thuThach: { dang: ['ESTE.THUY_PHAN'], soCau: 12, bac: 'dung_bac' } })])
+    ghiRa([{ biDanh: a, doTinCay: 0.8 }, pt(d, LOI_KHONG_THU.chu, ['KHONG.CO']), pt(e, LOI_TOT[0].chu, ['ESTE.THUY_PHAN'], { thuThach: { dang: ['ESTE.THUY_PHAN'], soCau: 12, bac: 'dung_bac' } })])
     const kq = await chayNopChieu({ ngay: NGAY, goc, goi: mayChuGia().goi, xemTruoc: true })
     expect(kq.hopLe).toBe(0)
     expect(kq.biLoai).toBe(3)
@@ -203,7 +203,7 @@ describe('nop.mjs --chieu — xem trước rồi nộp', () => {
   it('BÁO CÁO 6 DÒNG cho thầy: ghi cùng xem trước (DỰ KIẾN) và sau nộp (thật); số em, lý do loại gộp, bậc, 3 lời mẫu; không SBD / tên / bí danh', async () => {
     const { a, d, bang } = await chuanBi()
     const e = biDanhCua(bang, '20007')
-    ghiRa([pt(a, LOI_CAM[0].chu), pt(d, LOI_TOT[4].chu, ['LIPID.BEO']), pt(e, LOI_TOT[4].chu), pt('E999', LOI_TOT[0].chu)]) // hợp lệ = d, e (cả hai CHƯA có thú); a (có thú) bị loại vì từ cấm
+    ghiRa([pt(a, LOI_CAM[0].chu), pt(d, LOI_KHONG_THU.chu, ['LIPID.BEO']), pt(e, LOI_KHONG_THU.chu), pt('E999', LOI_TOT[0].chu)]) // hợp lệ = d, e (cả hai CHƯA có thú); a (có thú) bị loại vì từ cấm
     const mc = mayChuGia()
     const xem = await chayNopChieu({ ngay: NGAY, goc, goi: mc.goi, xemTruoc: true })
     expect(xem.tepBaoCao).toBe(`bo-nao/${NGAY}/chieu/bao-cao.md`)
@@ -234,6 +234,16 @@ describe('nop.mjs --chieu — xem trước rồi nộp', () => {
     const nhieu = soanBaoCaoChieu({ ngay: NGAY, hopLe: ['a 1', 'b 2', 'c 3', 'd 4', 'e 5'].map((c, i) => hl(c, i % 2 ? 'cao_hon_mot_bac' : 'dung_bac', 3 + i)), loai: [] }).trim().split('\n')
     expect(nhieu.slice(3)).toEqual(['Mẫu 1: "a 1"', 'Mẫu 2: "c 3"', 'Mẫu 3: "e 5"'])
     expect(nhieu[2]).toContain('đúng bậc 3 · thấp hơn 0 · cao hơn 2')
+  })
+  it('CẢNH BÁO CẢ LÔ (không loại): quá nửa lời mở "Hôm qua", < 4 kiểu mở đầu, đuôi lặp; lô đa dạng thì im; < 6 lời không xét', () => {
+    const dongDieu = Array.from({ length: 10 }, (_, i) => `Hôm qua em làm ${i} câu. Hôm nay thử vài câu nhé, rồi chọn một thần thú để EXP có chỗ về.`)
+    const kq = canhBaoLoLoiMoi(dongDieu)
+    expect(kq.join(' | ')).toContain('10/10 lời mở bằng "Hôm qua"')
+    expect(kq.join(' | ')).toContain('chỉ có 1 kiểu mở đầu trong 10 lời')
+    expect(kq.join(' | ')).toContain('10/10 lời kết bằng gần y hệt')
+    const daDang = ['Sai rồi sửa được 4 câu. Thử ngay vài câu A nhé.', 'Chuỗi 4 ngày liền. Hãy thử vài câu B để chắc thêm.', 'Hôm qua em làm 8 câu. Thử vài câu C cùng Rồng Lửa.', 'Rồng Lửa còn thiếu 40 EXP. Thử mấy câu D đi.', 'Em đã đạt 4 ngày. Hôm nay hãy thử câu E.', 'Ba ngày liền em tự làm thêm. Thử ngay mấy câu F.', 'Lipid em làm đều. Thử ngay câu G, rồi chọn một thần thú.', 'Sửa được lỗi là cách nhớ lâu. Thử mấy câu H nhé.']
+    expect(canhBaoLoLoiMoi(daDang)).toEqual([])
+    expect(canhBaoLoLoiMoi(dongDieu.slice(0, 5))).toEqual([])
   })
   it('nhomLyDo: gom lý do theo nhóm ngắn, thứ tự ưu tiên', () => {
     expect(nhomLyDo(['loiMoi có số không có trong thẻ: 55'])).toBe('số không có trong thẻ')
@@ -285,15 +295,15 @@ describe('chay-chieu.sh + gói + lời dặn — phiên AI KHÔNG nộp được
     const g = doc('scripts/bo-nao/dong-goi.sh')
     for (const t of ['chay-chieu.sh', 'LUAT-CHIEU.md', 'LOI-DAN-CHIEU.md']) expect(g, t).toContain(t)
   })
-  it('LOI-DAN-CHIEU.md cấm nộp thật và cấm mở tệp bí danh; LUAT-CHIEU.md ≤ 950 chữ, LUAT-RUT-GON ≤ 1200 chữ', () => {
+  it('LOI-DAN-CHIEU.md cấm nộp thật và cấm mở tệp bí danh; LUAT-CHIEU.md ≤ 1400 chữ, LUAT-RUT-GON ≤ 1200 chữ', () => {
     const ld = doc('bo-nao/LOI-DAN-CHIEU.md')
     expect(ld).toContain('KHÔNG chạy `nop.mjs` mà không có `--xem-truoc`')
     expect(ld).toContain('KHÔNG mở `.bi-danh.json`, `.the-day-du.json`')
     const dem = (t: string) => t.split(/\s+/).filter(Boolean).length
-    expect(dem(doc('bo-nao/LUAT-CHIEU.md'))).toBeLessThanOrEqual(950)
+    expect(dem(doc('bo-nao/LUAT-CHIEU.md'))).toBeLessThanOrEqual(1400)
     expect(dem(doc('bo-nao/LUAT-RUT-GON.md'))).toBeLessThanOrEqual(1200)
   })
-  it('8 lời mẫu TỐT + 4 lời mẫu CẤM có nguyên chữ ở cẩm nang VÀ ở LUAT-CHIEU.md; LUAT-RUT-GON dặn lượt đêm không ghi thuThach', () => {
+  it('8 lời mẫu TỐT + 7 lời mẫu CẤM có nguyên chữ ở cẩm nang VÀ ở LUAT-CHIEU.md; LUAT-RUT-GON dặn lượt đêm không ghi thuThach', () => {
     const camNang = doc('bo-nao/HUONG-DAN-BO-NAO.md')
     const luatChieu = doc('bo-nao/LUAT-CHIEU.md')
     for (const { chu } of [...LOI_TOT, ...LOI_CAM]) {
@@ -305,6 +315,12 @@ describe('chay-chieu.sh + gói + lời dặn — phiên AI KHÔNG nộp được
   it('cẩm nang nói ĐÚNG luật đã cài: hai trường đi cùng nhau, không nêu số câu, tên thú chỉ từ thanThu, cao_hon_mot_bac ≥ 80 %, Boss đọc xem trước trước khi nộp', () => {
     const c = doc('bo-nao/HUONG-DAN-BO-NAO.md')
     for (const t of ['ĐI CÙNG NHAU', 'KHÔNG nêu số câu', '`thanThu.ten`', 'đúng ≥ 80 % trong ≥ 5 câu 7 ngày', 'xem-truoc.md', 'chay-chieu.sh --nop', 'thuThach', 'loiMoi']) expect(c, t).toContain(t)
+  })
+  it('LUAT-CHIEU + cẩm nang nói ĐÚNG các điều Boss chốt sau lượt thử: ba ý bắt buộc, theo bậc, đa dạng, mời chọn thú ở cuối, tạm cấm khiên', () => {
+    const l = doc('bo-nao/LUAT-CHIEU.md')
+    const c = doc('bo-nao/HUONG-DAN-BO-NAO.md')
+    for (const t of ['BA Ý BẮT BUỘC', 'khó hơn một bậc ở dạng X, vì em đã đúng N trong M câu', 'mình lùi một bậc để em lấy lại nhịp', 'không chữ "yếu"', '≥ 4 kiểu MỞ ĐẦU', 'KHÔNG mở bằng "Hôm qua" quá 1/3', 'CÂU CUỐI', 'KHÔNG nhắc khiên', 'CẤM khen chung chung']) expect(l, t).toContain(t)
+    for (const t of ['BA Ý BẮT BUỘC', 'khó hơn một bậc', 'lùi một bậc', 'TẠM KHÔNG dùng', 'CÂU CUỐI', '47/52']) expect(c, t).toContain(t)
   })
   it('THE_KHONG_THU không có thanThu (mẫu 5–6 dành cho em chưa chọn thú)', () => {
     expect('thanThu' in (THE_KHONG_THU as object)).toBe(false)
