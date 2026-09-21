@@ -12,11 +12,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { RefreshCw, Trash2, ChevronDown, ChevronUp, Upload, CheckCheck, Library } from 'lucide-react'
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { TheNoiDung, Hang, Nhan, OThongBao, NutChinh } from '../components/DesignSystem'
-import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
-import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
 import KhoiMaDang from '../components/KhoiMaDang'
 import { ChemText } from '../lib/chem-format'
-import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveScriptUrl, saveSessionTeacherBank, saveTeacherSecret, loadSoSuaDang, saveSoSuaDang, xoaSessionTeacherBank } from '../lib/exam-db'
+import { deleteExamSource, loadAllSessionTeacherBanks, loadExamSources, loadScriptUrl, loadTeacherSecret, saveExamSource, saveSessionTeacherBank, loadSoSuaDang, saveSoSuaDang, xoaSessionTeacherBank } from '../lib/exam-db'
 import { caDungDe, capNhatCaDaMo, chiaBankTheoCaMayChu, dongBoNganHang, maCaConTrenMayChu, type KetQuaDongBo } from '../lib/exam-sync'
 import { capNhatKeyBank, dungChiMuc, luuDe, xoaDe as xoaDeTrenKho } from '../lib/exam-api'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho-de-import'
@@ -105,13 +103,15 @@ const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'va
 
 export default function NganHangDeScreen() {
   const showToast = useAppStore((s) => s.showToast)
+  const setScreen = useAppStore((s) => s.setScreen)
 
   const [scriptUrl, setScriptUrl] = useState('')
   const [secret, setSecret] = useState('')
   const [sources, setSources] = useState<TeacherExamSource[]>([])
   const [dangDongBo, setDangDongBo] = useState(false)
   const [ketQua, setKetQua] = useState<KetQuaDongBo | null>(null)
-  const [moCauHinh, setMoCauHinh] = useState(false)
+  /** Đã đọc xong địa chỉ + mã từ máy (để không báo "chưa kết nối" trong lúc còn đang đọc). Nhập/sửa hai giá trị này nay ở CÀI ĐẶT → Kết nối máy chủ. */
+  const [daDocKetNoi, setDaDocKetNoi] = useState(false)
   const [moDe, setMoDe] = useState<Set<string>>(new Set())
   const [hoiChamLai, setHoiChamLai] = useState<{ maDe: string; soCa: number; capNhat: () => Promise<void> } | null>(null)
   const [dangDay, setDangDay] = useState(false)
@@ -128,8 +128,7 @@ export default function NganHangDeScreen() {
    * luôn vào ngân hàng máy này. Cùng khuôn JSON, cùng kiểm tra. */
   const dayFileJson = async (file: File) => {
     if (!scriptUrl.trim() || !secret.trim()) {
-      showToast('Cần địa chỉ máy chủ + mã bí mật trước (mục Cấu hình)', 'error')
-      setMoCauHinh(true)
+      showToast('Cần địa chỉ máy chủ + mã bí mật trước — vào Cài đặt → Kết nối máy chủ', 'error')
       return
     }
     setDangDay(true)
@@ -187,8 +186,7 @@ export default function NganHangDeScreen() {
 
   const dongBo = async (url: string, mat: string, imLang = false, epTaiLai = false) => {
     if (!url.trim() || !mat.trim()) {
-      if (!imLang) showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật — mở mục Cấu hình bên dưới', 'error')
-      setMoCauHinh(true)
+      if (!imLang) showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật — vào Cài đặt → Kết nối máy chủ', 'error')
       return
     }
     setDangDongBo(true)
@@ -217,19 +215,12 @@ export default function NganHangDeScreen() {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
       setScriptUrl(url)
       setSecret(mat)
+      setDaDocKetNoi(true)
       await taiLocal()
       if (url && mat) dongBo(url, mat, true)
-      else setMoCauHinh(true)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const luuCauHinh = async () => {
-    await saveScriptUrl(scriptUrl.trim())
-    await saveTeacherSecret(secret.trim())
-    showToast('Đã lưu trên máy này', 'success')
-    dongBo(scriptUrl, secret)
-  }
 
   /** Mở hộp hỏi xoá. Đếm trước số ca đã mở dùng đề này để nói thẳng cho thầy,
    * thay vì để thầy đoán xoá đề có làm mất bài đã nộp không (không hề). */
@@ -256,7 +247,7 @@ export default function NganHangDeScreen() {
    * để thầy thử lại, không để rơi vào cảnh máy mất đề mà kho vẫn còn. */
   const xoaHanKhoiKho = async (maDe: string) => {
     if (!scriptUrl.trim() || !secret.trim()) {
-      showToast('Cần địa chỉ máy chủ + mã bí mật mới xoá được ở kho (mục Cấu hình)', 'error')
+      showToast('Cần địa chỉ máy chủ + mã bí mật mới xoá được ở kho — vào Cài đặt → Kết nối máy chủ', 'error')
       return
     }
     setDangXoa(true)
@@ -386,6 +377,17 @@ export default function NganHangDeScreen() {
           </div>
         </div>
       </div>
+
+      {daDocKetNoi && (!scriptUrl.trim() || !secret.trim()) && (
+        <OThongBao tone="cam">
+          <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+            <span>Chưa có địa chỉ máy chủ hoặc mã bí mật nên chưa đồng bộ được đề. Vào Cài đặt → Kết nối máy chủ để nhập.</span>
+            <NutChinh variant="phu" onClick={() => setScreen('caidat')}>
+              Mở Cài đặt
+            </NutChinh>
+          </div>
+        </OThongBao>
+      )}
 
       <TheNoiDung className="gv-bank-overview">
         <div className="gv-page-header flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
@@ -597,35 +599,6 @@ export default function NganHangDeScreen() {
       {sources.length === 0 && !dangDongBo && (
         <OThongBao>Chưa có đề nào. Thả file .pdf vào <code>kho-de/moi/</code> trên máy rồi gõ "Nạp đề mới" trong Cowork (hoặc đợi 22:00), sau đó bấm Đồng bộ ngay.</OThongBao>
       )}
-
-      <TheNoiDung>
-        <button onClick={() => setMoCauHinh((v) => !v)} className="tap-target w-full flex items-center justify-between font-bold" style={{ fontSize: 'var(--cx-3)', fontFamily: 'var(--serif)' }}>
-          <span>Cấu hình (1 lần)</span>
-          {moCauHinh ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </button>
-        {moCauHinh && (
-          <div className="flex flex-col" style={{ gap: 'var(--k3)', marginTop: 'var(--k3)' }}>
-            <div>
-              <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Địa chỉ máy chủ (bỏ trống = dùng máy chủ mới đã cấu hình)</div>
-              <input style={O_NHAP} aria-label="Địa chỉ máy chủ" value={scriptUrl} onChange={(e) => setScriptUrl(e.target.value)} placeholder="https://omr.ttadodaihoc.workers.dev" />
-            </div>
-            <div>
-              <div style={{ ...NHAN_NHO, marginBottom: 'var(--k1)' }}>Mã bí mật kho đề (đúng bằng MA_BI_MAT đã đặt trong Apps Script)</div>
-              <input style={O_NHAP} type="password" aria-label="Mã bí mật kho đề" value={secret} onChange={(e) => setSecret(e.target.value)} placeholder="Mã bí mật" autoComplete="off" />
-            </div>
-            <NutChinh variant="phu" onClick={luuCauHinh}>
-              Lưu & đồng bộ
-            </NutChinh>
-            <div style={NHAN_NHO}>
-              Mã chỉ lưu trên máy này (IndexedDB), không nằm trong code app, không gửi cho học sinh. Cách đặt MA_BI_MAT: xem đầu file <code>docs/apps-script-kiem-tra.gs</code>.
-            </div>
-            <div style={{ height: 1, background: 'var(--vien)' }} />
-            <KhoiMayChuMoi showToast={showToast} />
-            <div style={{ height: 1, background: 'var(--vien)' }} />
-            <KhoiMatKhauApp showToast={showToast} />
-          </div>
-        )}
-      </TheNoiDung>
 
       {/* XÁC NHẬN DUYỆT HÀNG LOẠT. Nói rõ hai loại câu ra hai hệ quả khác nhau
           — thầy bấm xong phải biết mình vừa công nhận cái gì. */}

@@ -1,8 +1,9 @@
 // CÀI ĐẶT của app giáo viên (màn MỚI, G1 — thầy chốt 21/09): gom những thứ trước đây nằm cuối "Ngân hàng đề → Cấu hình (1 lần)":
-// kết nối máy chủ mới, mật khẩu mở app; thêm phần GIAO DIỆN (sáng / tối / theo máy). Không đổi hàm nào của hai khối cũ — chỉ đặt chúng ở đây.
+// địa chỉ máy chủ + mã bí mật kho đề (G4, dời nguyên từ Ngân hàng đề), kết nối máy chủ mới, mật khẩu mở app; thêm phần GIAO DIỆN (sáng / tối / theo máy). Không đổi hàm nào của hai khối cũ — chỉ đặt chúng ở đây.
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { TheNoiDung } from '../components/DesignSystem'
 import KhoiBoNaoCaiDat from '../components/KhoiBoNaoCaiDat'
+import KhoiKetNoiKhoDe from '../components/KhoiKetNoiKhoDe'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
 import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
 import NutCapNhatApp from '../components/NutCapNhatApp'
@@ -52,7 +53,12 @@ export default function CaiDatScreen() {
       <KhoiBoNaoCaiDat />
 
       <TheNoiDung>
-        <KhoiMayChuMoi showToast={showToast} />
+        <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k3)' }}>Kết nối máy chủ</h2>
+        <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
+          <KhoiKetNoiKhoDe showToast={showToast} />
+          <div style={{ height: 1, background: 'var(--vien)' }} />
+          <KhoiMayChuMoi showToast={showToast} />
+        </div>
       </TheNoiDung>
 
       <TheNoiDung>

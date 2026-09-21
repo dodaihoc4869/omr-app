@@ -116,8 +116,8 @@ describe('màn Ngân hàng đề — nút duyệt hàng loạt', () => {
     const sach = deMau('C')
     for (const q of [...sach.phanI, ...sach.phanII, ...sach.phanIII]) q.loiGiaiTrangThai = 'khop'
     KHO = [sach]
-    const { queryByRole, findByText } = render(<NganHangDeScreen />)
-    await findByText(/1 đề/)
+    const { queryByRole, findAllByText } = render(<NganHangDeScreen />)
+    await findAllByText(/1 đề/) // chữ "1 đề" nay có ở đầu trang và ở một chip khác
     expect(queryByRole('button', { name: /Duyệt hết/ })).toBeNull()
   })
 
