@@ -174,6 +174,70 @@ describe('baiTap', () => {
   })
 })
 
+describe('nhip.btvnDungNhip (em đúng nhịp = đã nộp hoặc xong đủ số chặng tới hạn theo lịch CỦA CHÍNH EM; chậm ≥ 1 chặng = cham)', () => {
+  const nhipBtvn = (r: Record<string, unknown>) => (r.nhip as Record<string, unknown>).btvnDungNhip as { dungNhip: number; tongEm: number; cham: number } | undefined
+  const lichNgan = (mo: string[], han: string) => JSON.stringify({ cheDo: 'ngan', chang: mo.map((m, i) => ({ chiSo: i, moLuc: T(m), dungNhipTruoc: T(han), soCau: 3 })) })
+
+  it('bài dài chốt 21/09 12:40, xem 23/09 13:00 (chặng 0 tới hạn 22/09 00:00, chặng 1 tới hạn 23/09 00:00): xong 2 / xong 3 / đã nộp / chưa chốt ⇒ đúng nhịp; xong 1 ⇒ cham; em thu hồi không tính', async () => {
+    const d = truong('2026-09-23T13:00:00')
+    themBai(d, 'B1', T('2026-09-21T12:30:00'), T('2026-09-24T12:00:00'))
+    themBaiEm(d, 'B1', EM[0]!, { nop: T('2026-09-23T09:00:00'), soChang: 4, xong: 4, chot: T('2026-09-21T12:40:00') })
+    themBaiEm(d, 'B1', EM[1]!, { soChang: 4, xong: 2, chot: T('2026-09-21T12:40:00') })
+    themBaiEm(d, 'B1', EM[2]!, { soChang: 4, xong: 1, chot: T('2026-09-21T12:40:00') })
+    themBaiEm(d, 'B1', EM[3]!, { soChang: 4, xong: 3, chot: T('2026-09-21T12:40:00') })
+    themBaiEm(d, 'B1', EM[4]!, { soChang: 4 }) // chưa mở: chưa có lịch, bài chưa quá hạn
+    themBaiEm(d, 'B1', EM[5]!, { soChang: 4, xong: 0, chot: T('2026-09-21T12:40:00') })
+    d.sql.prepare('UPDATE btvn_em SET thu_hoi = 1 WHERE sbd = ?').run(EM[5])
+    expect(nhipBtvn(await goi(d))).toEqual({ dungNhip: 4, tongEm: 5, cham: 1 })
+  })
+
+  it('nhiều bài: em chậm ở MỘT bài là chậm (đếm một lần); dungNhip + cham = tongEm', async () => {
+    const d = truong('2026-09-23T13:00:00')
+    themBai(d, 'B1', T('2026-09-21T12:30:00'), T('2026-09-24T12:00:00'))
+    themBai(d, 'B2', T('2026-09-21T12:35:00'), T('2026-09-24T12:00:00'))
+    for (const m of ['B1', 'B2']) for (const e of [EM[0]!, EM[1]!]) themBaiEm(d, m, e, { soChang: 4, xong: m === 'B2' && e === EM[1] ? 0 : 3, chot: T('2026-09-21T12:40:00') })
+    const r = nhipBtvn(await goi(d))!
+    expect(r).toEqual({ dungNhip: 1, tongEm: 2, cham: 1 })
+    expect(r.dungNhip + r.cham).toBe(r.tongEm)
+  })
+
+  it('lịch ĐÃ LƯU (hạn ngắn, chia theo giờ) dùng `dungNhipTruoc` của chính em: chưa tới mốc ⇒ đúng nhịp dù chặng kế đã mở; tới đúng mốc (20:00:00) ⇒ cham', async () => {
+    const chay = async (luc: string) => {
+      const d = truong(luc)
+      themBai(d, 'B3', T('2026-09-23T08:00:00'), T('2026-09-23T20:00:00'))
+      themBaiEm(d, 'B3', EM[6]!, { soChang: 3, xong: 0, chot: T('2026-09-23T09:00:00') })
+      d.sql.prepare('UPDATE btvn_em SET chang_mo_json = ? WHERE sbd = ?').run(lichNgan(['2026-09-23T09:00:00', '2026-09-23T11:00:00', '2026-09-23T13:00:00'], '2026-09-23T20:00:00'), EM[6])
+      return nhipBtvn(await goi(d))
+    }
+    expect(await chay('2026-09-23T13:00:00')).toEqual({ dungNhip: 1, tongEm: 1, cham: 0 }) // chặng 1 đã mở từ 11:00 nhưng "đúng nhịp trước" còn tới 20:00
+    expect(await chay('2026-09-23T19:59:59')).toEqual({ dungNhip: 1, tongEm: 1, cham: 0 })
+    expect(await chay('2026-09-23T20:00:00')).toEqual({ dungNhip: 0, tongEm: 1, cham: 1 })
+  })
+
+  it('chưa chốt / bài thường: chỉ chậm khi QUÁ HẠN mà chưa nộp; đã nộp quá hạn vẫn đúng nhịp', async () => {
+    const d = truong('2026-09-23T13:00:00')
+    themBai(d, 'B4', T('2026-09-21T12:10:00'), T('2026-09-23T12:00:00'))
+    themBaiEm(d, 'B4', EM[8]!, { soChang: 4 }) // chưa chốt, quá hạn 1 giờ ⇒ cham
+    themBaiEm(d, 'B4', EM[9]!, { nop: T('2026-09-23T11:00:00'), soChang: 4, xong: 4, chot: T('2026-09-21T12:40:00') }) // đã nộp ⇒ đúng nhịp
+    themBai(d, 'B5', T('2026-09-21T12:10:00'), T('2026-09-23T12:30:00'), { caNhan: 0 })
+    themBaiEm(d, 'B5', EM[10]!, { soChang: 0 }) // bài thường quá hạn chưa nộp ⇒ cham
+    themBaiEm(d, 'B5', EM[11]!, { soChang: 0, nop: T('2026-09-22T09:00:00') })
+    expect(nhipBtvn(await goi(d))).toEqual({ dungNhip: 2, tongEm: 4, cham: 2 })
+  })
+
+  it('không có bài nào đang hiện ⇒ VẮNG (không số 0 giả); `nhip.tongEm` vẫn là tổng em của trường; chỉ-thêm (khoá cũ không đổi)', async () => {
+    const d = truong('2026-09-23T13:00:00')
+    const r = await goi(d)
+    expect(r.nhip).not.toHaveProperty('btvnDungNhip')
+    expect((r.nhip as { tongEm: number }).tongEm).toBe(12)
+    themBai(d, 'B1', T('2026-09-21T12:30:00'), T('2026-09-24T12:00:00'))
+    themBaiEm(d, 'B1', EM[0]!, { soChang: 4, xong: 0, chot: T('2026-09-21T12:40:00') })
+    const r2 = await goi(d)
+    expect((r2.nhip as { tongEm: number }).tongEm).toBe(12)
+    expect(nhipBtvn(r2)).toEqual({ dungNhip: 0, tongEm: 1, cham: 1 }) // em chốt 21/09 12:40, xong 0/4 khi đã tới hạn chặng 0 và 1
+  })
+})
+
 describe('tienBo (mỗi bục một em, chỉ khi có số)', () => {
   it('cham_nhat cần ≥ 5 lượt (4 thì vắng); ben_bi cần ≥ 2 ngày liên tiếp mỗi ngày ≥ 5 lượt; tiến bộ nhất = nhiều câu làm đúng lại', async () => {
     const d = truong('2026-09-23T10:00:00')

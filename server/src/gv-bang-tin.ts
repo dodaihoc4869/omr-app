@@ -7,6 +7,7 @@ import { ngayVnCuaMs, trangThaiNopBai } from './canh-bao-thay'
 import { buoiCua, docCauHinhNhac, KHOA_CAU_HINH, KHOA_LAN_CHAY, lanChayKe, thuCua, trongKhung } from './nhac-tu-dong'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { tenLopCuaEm } from './ten-lop'
+import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
 import { tenViec } from './nhat-ky-may'
 import { docCoTuDong, KHOA_TU_DONG } from './tu-dong-cac-viec'
 import { docThuThachTuDieuChinh, NGUON_THU_THACH } from './thu-thach-rieng'
@@ -85,6 +86,27 @@ export function chuHanBangTin(hanIso: string, nowMs: number): string {
 export function docMocBangTin(giaTri: unknown, homNay: string): { tuMs: number; tuDangAp: boolean } {
   const t = typeof giaTri === 'string' && DANG_ISO.test(giaTri.trim()) ? Date.parse(giaTri.trim()) : NaN
   return Number.isFinite(t) ? { tuMs: t, tuDangAp: true } : { tuMs: dauNgayMs(homNay), tuDangAp: false }
+}
+
+/**
+ * `nhip.btvnDungNhip` — em có CHẬM ≥ 1 chặng so với lịch CỦA CHÍNH EM không (Boss 21/09; chỉ dùng cột đã đọc sẵn của `btvn_em`, không thêm truy vấn).
+ * Đã nộp ⇒ không chậm. Em đã chốt bộ (có `so_chang` + `chot_luc`): số chặng TỚI HẠN = số chặng có mốc "xong đúng nhịp" (`dungNhipTruoc` của lịch đã lưu; bài chốt trước bản 1.1 ⇒ mốc mở chặng KẾ, chặng cuối ⇒ hạn nộp)
+ * đã qua; chậm khi `lo_da_xong` < số đó. Em chưa chốt / bài thường (không chặng): chỉ chậm khi QUÁ HẠN mà chưa nộp (em chưa mở bài thì chưa có lịch nên chưa chặng nào tới hạn).
+ */
+export function emChamNhip(x: Dong, hanIso: string, hanMs: number, nowMs: number): boolean {
+  if (chuoi(x.nop_luc) !== '') return false
+  const soChang = so(x.so_chang)
+  const chot = chuoi(x.chot_luc)
+  if (soChang <= 0 || chot === '' || !Number.isFinite(Date.parse(chot))) return hanMs <= nowMs
+  const lich = docLichDaLuu(x.chang_mo_json, soChang, { chotLuc: chot, hanNop: hanIso, nowMs })
+  const moLuc = lich && lich.moLuc.length === soChang ? lich.moLuc : moLucChang(chot, soChang)
+  let toiHan = 0
+  for (let k = 0; k < soChang; k++) {
+    const dn = lich && lich.moLuc.length === soChang ? Date.parse(lich.dungNhipTruoc[k] ?? '') : NaN
+    const t = Number.isFinite(dn) ? dn : k + 1 < soChang ? Date.parse(moLuc[k + 1]!) : hanMs
+    if (t <= nowMs) toiHan++
+  }
+  return so(x.lo_da_xong) < toiHan
 }
 
 export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.now()): Promise<Dong> {
@@ -192,7 +214,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
 
   // 6 · em của các bài đó
   const sqlEm = (day: boolean) =>
-    `SELECT ma_btvn, sbd, nop_luc, ${day ? 'COALESCE(so_chang, 0) AS so_chang, COALESCE(lo_da_xong, 0) AS lo_da_xong, chot_luc' : '0 AS so_chang, 0 AS lo_da_xong, NULL AS chot_luc'},
+    `SELECT ma_btvn, sbd, nop_luc, ${day ? 'COALESCE(so_chang, 0) AS so_chang, COALESCE(lo_da_xong, 0) AS lo_da_xong, chot_luc, chang_mo_json' : '0 AS so_chang, 0 AS lo_da_xong, NULL AS chot_luc, NULL AS chang_mo_json'},
             (COALESCE(dap_an_json, '') NOT IN ('', '{}')) AS co_da, xong_vong1_luc
        FROM btvn_em WHERE ma_btvn IN (SELECT value FROM json_each(?)) AND thu_hoi = 0`
   let rBe = bai.length > 0 ? await Q.hoi(sqlEm(true), json(bai.map((b) => b.ma))) : []
@@ -221,6 +243,8 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const emChuaMoSatHan = new Map<string, { ten: string; han: string; hanMs: number }[]>()
   const emQuaHan = new Map<string, { ten: string; han: string }[]>()
   const emDaChot = new Set<string>()
+  const emTrongBai = new Set<string>() // nhip.btvnDungNhip: em có ≥ 1 bài đang hiện ở baiTap
+  const emCham = new Set<string>() // ...và chậm ≥ 1 chặng ở ≥ 1 bài
   for (const x of rBe ?? []) {
     const ma = chuoi(x.ma_btvn)
     const sbd = chuoi(x.sbd)
@@ -229,6 +253,8 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     const d = daoBai.get(ma) ?? { chuaMo: 0, dangLam: 0, daNop: 0, chotSo: 0, chotXong: 0, chotTong: 0, tenLop: new Map<string, number>() }
     const st = trangThaiNopBai({ ...x, dap_an_json: so(x.co_da) === 1 ? '{"x":1}' : '' }, b.han, nowMs) // `co_da` = đã có ít nhất một đáp án (không tải cả JSON đáp án)
     const nop = chuoi(x.nop_luc) !== ''
+    emTrongBai.add(sbd)
+    if (emChamNhip(x, b.han, b.hanMs, nowMs)) emCham.add(sbd)
     if (nop) d.daNop++
     else if (st.trangThai === 'chua_mo') d.chuaMo++
     else d.dangLam++
@@ -240,6 +266,8 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     if (!nop && st.trangThai === 'chua_mo' && b.hanMs > nowMs && b.hanMs - nowMs <= MOT_NGAY_MS) emChuaMoSatHan.set(sbd, [...(emChuaMoSatHan.get(sbd) ?? []), { ten: b.ten, han: b.han, hanMs: b.hanMs }])
     if (!nop && b.hanMs <= nowMs) emQuaHan.set(sbd, [...(emQuaHan.get(sbd) ?? []), { ten: b.ten, han: b.han }])
   }
+  // nhip.btvnDungNhip: tính từ mốc (chỉ các bài đang hiện ở baiTap, tức bài giao từ ngày của mốc); vắng khi không có bài / không đọc được em của bài
+  if (rBe && emTrongBai.size > 0) nhip.btvnDungNhip = { dungNhip: emTrongBai.size - emCham.size, tongEm: emTrongBai.size, cham: emCham.size }
   const luotKe = cfgNhac.bat ? lanChayKe(nowMs, cfgNhac) : undefined
   for (const b of bai) {
     const d = daoBai.get(b.ma)
