@@ -197,7 +197,7 @@ export function KhoiLichSuCa({
                   <button
                     type="button"
                     onClick={() => onXemBaoCao(c)}
-                    className="tap-target font-bold inline-flex items-center justify-center shrink-0 cursor-pointer shadow-xs transition-all active:scale-95 hover:opacity-90"
+                    className="tap-target font-bold inline-flex items-center justify-center shrink-0 cursor-pointer shadow-xs transition-[transform,background-color,box-shadow,opacity] active:scale-95 hover:opacity-90"
                     style={{
                       minHeight: 32,
                       padding: '0 var(--k3)',

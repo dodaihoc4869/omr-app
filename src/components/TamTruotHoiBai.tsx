@@ -116,7 +116,7 @@ export default function TamTruotHoiBai({ cau, daCongBo, daHoi = [], ghiChuCu = '
               maxLength={TOI_DA_GHI_CHU}
               rows={3}
               aria-label="Em chưa hiểu chỗ nào"
-              style={{ width: '100%', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', background: 'var(--the-2)', border: '1.5px solid transparent', fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)', outline: 'none', resize: 'vertical' }}
+              style={{ width: '100%', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', background: 'var(--the-2)', border: '1.5px solid transparent', fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', color: 'var(--muc)', resize: 'vertical' }}
             />
             <div style={{ ...NHAN, textAlign: 'right' }}>
               {ghiChu.length}/{TOI_DA_GHI_CHU}

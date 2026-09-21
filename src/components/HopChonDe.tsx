@@ -220,7 +220,7 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
           onChange={(e) => setTim(e.target.value)}
           placeholder="Tìm chương, bài, mã đề…"
           aria-label="Tìm đề"
-          style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}
+          style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}
         />
         <span style={{ ...NHAN_NHO, ...SO, flex: '0 0 auto' }}>{tongTrongLoc} đề</span>
       </div>

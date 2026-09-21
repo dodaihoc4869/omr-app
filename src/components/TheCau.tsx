@@ -462,7 +462,6 @@ export default function TheCau(props: TheCauProps) {
             fontFamily: 'var(--serif)',
             fontSize: 'var(--cx-3)',
             color: 'var(--muc)',
-            outline: 'none',
           }}
           placeholder="Nhập đáp án"
           inputMode="decimal"

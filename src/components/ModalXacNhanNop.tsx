@@ -82,7 +82,7 @@ export default function ModalXacNhanNop({
           {/* Progress bar */}
           <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-300 ${
+              className={`h-full rounded-full transition-colors duration-300 ${
                 daXongHet
                   ? 'bg-emerald-500'
                   : primaryColor === 'blue'

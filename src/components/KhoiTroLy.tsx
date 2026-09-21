@@ -183,7 +183,7 @@ export default function KhoiTroLy({ scriptUrl, secret }: KhoiTroLyProps) {
           }}
           placeholder="Thầy muốn biết gì?"
           aria-label="Câu hỏi cho trợ lý"
-          style={{ flex: '1 1 auto', minWidth: 0, height: 44, borderRadius: 12, padding: '0 12px', border: '1px solid var(--vien-dam)', background: 'var(--the)', color: 'var(--muc)', fontSize: 14, outline: 'none' }}
+          style={{ flex: '1 1 auto', minWidth: 0, height: 44, borderRadius: 12, padding: '0 12px', border: '1px solid var(--vien-dam)', background: 'var(--the)', color: 'var(--muc)', fontSize: 14, }}
         />
         <button
           type="button"
