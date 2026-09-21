@@ -2,6 +2,7 @@ import {MoveUpRight,Shield,Zap,Sparkles,X,Check,BookOpen,Swords,ChevronUp,Chevro
 import EscortQuestion from './EscortQuestion'
 import LinhTam from './LinhTam'
 import {useCallback,useEffect,useRef,useState} from 'react'
+import {ganDauTrangCao} from './dau-trang-cao'
 import SpiritArt from './SpiritArt'
 import EscortGuide from './EscortGuide'
 import Spirit2D from './Spirit2D'
@@ -12,6 +13,8 @@ import {unlockBattleAudio,playBattleSound,battleMuted,setBattleMuted} from './ba
 import {evolutionStage} from './evolution'
 type View=Omit<Escort,'owner'|'players'>&{id:string;revision:number;owner:boolean;players:(Escort['players'][number]&{self:boolean;ready:boolean;alias:string})[]}
 export default function EscortRoom({call,active,storageKey}:{call:(action:string,data:Record<string,unknown>)=>Promise<unknown>;active:boolean;storageKey:string}){
+ const vo=useRef<HTMLDivElement>(null)
+ useEffect(()=>ganDauTrangCao(vo.current),[active]) // dòng lượt dính NGAY DƯỚI đầu trang game cũ (đo thật)
  const [pvpMode,setPvpMode]=useState<'duel'|'pvp'>('pvp')
  const [actionInfo,setActionInfo]=useState<Command['type']>()
  const [answerState,setAnswerState]=useState<{round:number;room:string;energy:number}>()
@@ -49,7 +52,7 @@ export default function EscortRoom({call,active,storageKey}:{call:(action:string
  const actionItems=[{type:'move' as const,Icon:MoveUpRight,label:'Di chuyển',description:'Đi tới ô trống liền kề đã chọn. Không tốn năng lượng.'},{type:'guard' as const,Icon:Shield,label:'Dựng khiên',description:'Đứng tại chỗ: đúng tự làm nhận 20 giáp; sai hoặc có trợ giúp nhận 5 giáp.'},{type:'blast' as const,Icon:Zap,label:'Tung chưởng',description:'Tấn công đối thủ được chọn trong phạm vi 3 ô.'},{type:'skill' as const,Icon:Sparkles,label:SKILLS[me?.pet??0],description:'Thi triển kỹ năng riêng của thần thú tại mục tiêu phù hợp.'}]
  const act=(type:Command['type'])=>{if(valid(type))void go('escort-act',{command:{type,...selected,target}})}
  const remaining=room?Math.max(0,Math.ceil((Math.min(room.roundAt+60000,room.deadline)-now)/1000)):0
- return <div className={`escort-shell ${!room?'escort-lobby':''}`}><header className="escort-title"><div><small>{room?.mode==='solo'?'TỰ LUYỆN · ĐẤU VỚI QUÁI TRÙM':'TỰ LUYỆN VÀ ĐỒNG ĐỘI'}</small><h2>Hộ Tống Linh Tâm</h2><p>Hiểu bài để tiếp sức. Phối hợp để đưa Linh Tâm về nhà.</p></div><LinhTam className="escort-heart"/></header>
+ return <div ref={vo} className={`escort-shell ${!room?'escort-lobby':''}`}><header className="escort-title"><div><small>{room?.mode==='solo'?'TỰ LUYỆN · ĐẤU VỚI QUÁI TRÙM':'TỰ LUYỆN VÀ ĐỒNG ĐỘI'}</small><h2>Hộ Tống Linh Tâm</h2><p>Hiểu bài để tiếp sức. Phối hợp để đưa Linh Tâm về nhà.</p></div><LinhTam className="escort-heart"/></header>
  <div style={{display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',margin:'8px 0 12px 0'}}>
    <button aria-pressed={!muted} onClick={()=>{setBattleMuted(!muted);setMuted(!muted)}}>{muted?'Bật âm thanh võ đài':'Tắt âm thanh võ đài'}</button>
    {!room&&<button type="button" onClick={()=>setShowGuide(v=>!v)} style={{padding:'7px 14px',borderRadius:12,border:'1px solid var(--vien)',background:showGuide?'var(--xanh-nen)':'var(--the)',color:showGuide?'var(--xanh)':'var(--muc)',fontWeight:700,fontSize:13,cursor:'pointer',display:'inline-flex',alignItems:'center',gap:6}}><BookOpen size={16} aria-hidden="true"/> Hướng dẫn chơi {showGuide?<ChevronUp size={14} aria-hidden="true"/>:<ChevronDown size={14} aria-hidden="true"/>}</button>}
