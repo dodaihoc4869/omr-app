@@ -101,7 +101,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
       }catch{/* câu đã đổi/rút khỏi kho: mở lượt mới */}
     }
   }
-  if(action==='recommendations'&&(!remaining||!info.luotTiepTheo))return {ok:true,dailyUsed:count?.n??0,suggestions:[],remaining,luot:tom}
+  if(action==='recommendations'&&(!remaining||!info.luotTiepTheo))return {ok:true,dailyUsed:count?.n??0,tranNgay:TRAN_CAU_GAME_NGAY,suggestions:[],remaining,luot:tom}
   if(!info.luotTiepTheo)return {ok:true,questions:[],het:true,luot:tom,maiCho:cho,message:'Hôm nay em đã dùng hết lượt thần thú. Mai thú chờ em.'}
   if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_GAME_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
   const blocked=await protectedQuestions(env)
@@ -112,7 +112,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   const eligible=scope.pool.filter(q=>q.reviewed&&!laCauTuLuan(q)&&!!q.dang&&!!q.mucDo&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(control.types.length===0||control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
   const lt=info.luotTiepTheo
   const chon=chooseLuotMoi(eligible,scope.evidence,history,mastery,{loai:lt.loai,cap:p.cap,now:tNow,thuong:lt.thuong,blocked,soCau:Math.min(SO_CAU_MOI_LUOT,remaining)})
-  if(action==='recommendations')return {ok:true,dailyUsed:count?.n??0,suggestions:chon.map(x=>({title:x.q.tenDang||'Ôn kiến thức đã học',source:x.q.maDe,part:x.q.phan})),remaining,luot:tom}
+  if(action==='recommendations')return {ok:true,dailyUsed:count?.n??0,tranNgay:TRAN_CAU_GAME_NGAY,suggestions:chon.map(x=>({title:x.q.tenDang||'Ôn kiến thức đã học',source:x.q.maDe,part:x.q.phan})),remaining,luot:tom}
   if(!chon.length)return {ok:true,questions:[],lyDo:eligible.length?'chi_con_cau_qua_bac':'kho_trong',luot:tom,maiCho:cho,missing:scope.missing,message:eligible.length?'Các câu còn lại của lớp đều cao hơn một bậc so với sức em ở dạng đó. Em làm thêm bài tập về nhà và phần ôn lại, mai thú mở câu mới cho em.':'Lớp em chưa học dạng nào có câu phù hợp cho thần thú. Khi Thầy giao bài mới, câu sẽ mở ra.'}
   const id=crypto.randomUUID(),groups=new Set(scope.evidence.map(e=>e.group))
   const session:Session={mode:'adventure',created:Date.now(),questions:chon.map(x=>({qid:x.q.qid,maDe:x.q.maDe,version:x.q.version,group:x.q.group,novel:!groups.has(x.q.group),role:x.role}))}
@@ -224,7 +224,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const count=await env.DB.prepare('SELECT COUNT(*) AS n FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,dayStart.toISOString()).first<{n:number}>()
     const remaining=Math.max(0,TRAN_CAU_GAME_NGAY-(count?.n??0))
     const chon=chooseSessionWithRoles(eligible,scope.evidence,history,await masteryTheoHoSo(env,sbd,p.mastery),mode,tNow).slice(0,remaining),selected=chon.map(x=>x.q),vai=new Map(chon.map(x=>[x.q.qid,x.role]))
-    if(action==='recommendations')return {ok:true,dailyUsed:count?.n??0,suggestions:selected.map(q=>({title:q.tenDang||'Ôn kiến thức đã học',source:q.maDe,part:q.phan})),remaining}
+    if(action==='recommendations')return {ok:true,dailyUsed:count?.n??0,tranNgay:TRAN_CAU_GAME_NGAY,suggestions:selected.map(q=>({title:q.tenDang||'Ôn kiến thức đã học',source:q.maDe,part:q.phan})),remaining}
     if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_GAME_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
     const qs=mode==='arena'?selected.slice(0,b.guardian?1:2):selected
     if(!qs.length)return {ok:true,questions:[],missing:scope.missing,message:'Chưa có câu đã chấm, đã công bố và phù hợp trong kho. Em hoàn thành bài Thầy giao rồi quay lại.'}

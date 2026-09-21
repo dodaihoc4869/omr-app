@@ -27,6 +27,7 @@ import { ghiTiepSuc } from './exp-d1'
 import { docExpKetChang, traoExpKetChang } from './game-v2-doan-exp'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 import { docSanh, quaCongVe, hoanVe, ketChangChoLop } from './game-v2-doan-mua'
+import { TRAN_CAU_GAME_NGAY } from './game-v2-luot'
 import { docAnThach, anChoSanh, goiYBanDongHanh, docHienThi } from './game-v2-doan-an'
 
 type Row = Record<string, unknown>
@@ -398,7 +399,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     // Sảnh hằng ngày: vé, chuỗi/rương, Đoàn lớp, Trùm lớp. Chưa chạy migration bước 5 → `sanh:null`, giao diện giữ các ô "SẮP MỞ".
     await env.DB.prepare("DELETE FROM doan_ve_so WHERE sbd=? AND loai='tieu' AND ma_nguon IN (SELECT ma FROM doan_chang WHERE trang_thai IN ('sanh','huy') AND tao_luc<?)").bind(sbd, iso(now - PHONG_HET_HAN_MS)).run().catch(() => { /* chưa có sổ vé */ })
     const homNay = ngayVn(iso(now)), pet = Math.max(0, PETS.findIndex(x => x.id === hoSo.pet)), sanh = await docSanh(env, sbd, now)
-    return { ok: true, sanh, anThach: anChoSanh(await docAnThach(env, sbd, homNay), pet), banDongHanh: await goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi), dangDo: (await timDangDo())?.ma_chang ?? null }
+    return { ok: true, tranNgay: TRAN_CAU_GAME_NGAY, sanh, anThach: anChoSanh(await docAnThach(env, sbd, homNay), pet), banDongHanh: await goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi), dangDo: (await timDangDo())?.ma_chang ?? null }
   }
   if (action === 'doan-hien-thi') {
     // Hợp đồng hiển thị NGOÀI game (docs/hop-dong-doan-hien-thi-2109.md): hào quang + danh hiệu của chính em.
