@@ -23,6 +23,7 @@ import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, dapAnChu, hinhTaiViTri, oGiaiHtm
 import { noiDungTuCauLuyen, thoiGianCau } from './thoi-gian-len-bang'
 import { CSS_BO_CUC, jsBoCuc } from './bo-cuc-to-chieu'
 import { CSS_GIAO_DIEN_NUT_CHAM, CSS_GIAO_DIEN_TO_CHIEU, GIAO_DIEN_TO_CHIEU, mauHaoQuang } from './giao-dien-to-chieu'
+import type { NhanLichSuCau } from './lich-su-cau-len-bang'
 import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu } from './to-chieu-cau-noi'
 
 /** Một ô bảng: một em, một câu. */
@@ -44,6 +45,8 @@ export interface OBang {
   /** Vì sao gọi đúng em này lên câu này. CHỈ ĐỂ màn giáo viên đọc — tờ chiếu KHÔNG in nó (M3, 19/09: tế nhị trước lớp,
    * thầy chốt "KHÔNG chiếu lý do gọi em lên tờ chiếu"). Trường giữ lại để nơi gọi không phải đổi. */
   viSao?: string
+  /** "EM ĐÃ LÀM CÂU NÀY CHƯA" (thầy lệnh 21/09 16:4x): nhãn dựng sẵn từ lịch sử MỌI ngày của em ở câu này (`lich-su-cau-len-bang.ts`). In TRONG thẻ tên nên CHỈ thấy SAU KHI thẻ hiện. Thiếu (chưa gọi được máy chủ) thì không in gì — không bịa. */
+  lichSuCau?: NhanLichSuCau
   /** Lần lên bảng THỨ MẤY của em (đã tính lần này) — dòng "… · lần lên bảng thứ N" ở thẻ tên và màn gọi tên. Thiếu thì không in. */
   lanLenBang?: number
   /** Cho công thức thời gian (`thoi-gian-len-bang.ts`): tỉ lệ lớp sai câu này (0..1) và bậc kiến thức của em ở câu này.
@@ -276,6 +279,14 @@ function thuocTinhNhan(o: OBang, dayHoc: boolean): string {
 /** THẺ TÊN (M3): giấy ấm; thần thú có hào quang theo hệ (`--mc-he`); tên; "thú · cấp · lần lên bảng thứ N"; chip số câu.
  * KHÔNG in `viSao` (lý do gọi em). Nhãn bài tập về nhà (`btvnHtml`, thầy chốt 14/09) vẫn nằm trong mã cho các test cũ nhưng
  * CSS không vẽ nó — bản vẽ 19/09 không có, và "Ở NHÀ LÀM SAI" cạnh tên em trước cả lớp là điều thầy cấm. */
+/** Dòng "em đã làm câu này chưa" dưới tên em (nhãn + tối đa hai dòng phụ). Không có nhãn ⇒ không in gì. Nằm TRONG thẻ tên nên ẩn cùng thẻ. */
+function lichSuHtml(o: OBang): string {
+  const n = o.lichSuCau
+  if (!n) return ''
+  const phu = [n.phu, n.lenBang].filter((x): x is string => Boolean(x)).map((x) => `<span class="mc-ls-phu">${thoat(x)}</span>`).join('')
+  return `<div class="mc-ls mc-ls-${thoat(n.kieu)}"><span class="mc-ls-chu">${thoat(n.chu)}</span>${phu}</div>`
+}
+
 function headerEmHtml(o: OBang, ma: string): string {
   const lanRieng = o.thanThu ? '' : lanHtml(o, 'mc-em-phu')
   return `<header class="mc-em" id="em-${ma}" style="--mc-he:${mauHaoQuang(o.thanThu?.he)}">
@@ -289,7 +300,7 @@ function headerEmHtml(o: OBang, ma: string): string {
         ${btvnHtml(o)}
       </div>
     </div>
-    ${thuHtml(o)}${lanRieng}
+    ${thuHtml(o)}${lanRieng}${lichSuHtml(o)}
   </header>`
 }
 
@@ -516,6 +527,11 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-nut-giai[aria-expanded="true"] { background: var(--mc-xanh-nen); color: var(--mc-xanh); border-color: var(--mc-xanh-nen); }
 .mc-giai { margin-top: 10px; }
 .mc-em[hidden] { display: none !important; }
+.mc-ls { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; flex: 0 0 100%; margin-top: 6px; }
+.mc-ls-chu { font-weight: 700; font-size: 15px; padding: 2px 10px; border-radius: 999px; background: rgb(226,232,240); color: rgb(30,41,59); }
+.mc-ls-phu { font-size: 13px; color: rgb(71,85,105); }
+.mc-ls-dung .mc-ls-chu { background: rgb(196,238,208); color: rgb(7,33,0); }
+.mc-ls-sai .mc-ls-chu { background: rgb(253,214,99); color: rgb(59,47,0); }
 /* Chế độ dạy học: thẻ tên (tên, số báo danh, thần thú) KHÔNG được thấy dù một khung hình trước khi script chạy và ẩn thẻ — mở tờ xong script gắn lớp mc-san-sang. Dùng visibility để không đổi bố cục. */
 body.mc-day-hoc:not(.mc-san-sang) .mc-em { visibility: hidden; }
 @keyframes mc-ten-reveal {
@@ -650,6 +666,7 @@ const JS_MAY_CHIEU = `
   /** NHÃN vùng làm bài (góc dưới phải bảng): thẻ tên còn ẩn ⇒ nhãn KHÔNG tên (data-nhan gốc); thẻ đã hiện ⇒ tên thật lấy từ data-nhan-em. Gọi mỗi khi thẻ hiện / ẩn; chỉ đụng ô có data-nhan-em (chế độ dạy học). */
   var NHAN_KHONG_TEN = ${JSON.stringify(NHAN_LAM_BAI_KHONG_TEN)};
   function dongBoNhan() {
+    if (!document || !document.querySelectorAll) return; // cửa sổ đã đóng (bộ quan sát chạy muộn) ⇒ thôi
     Array.prototype.forEach.call(document.querySelectorAll('.mc-dot'), function (dot) {
       Array.prototype.forEach.call(dot.querySelectorAll('.mc-nua'), function (nua) {
         var trang = nua.querySelector('.mc-trang');

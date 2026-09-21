@@ -14,7 +14,7 @@ const HUY_DAI = em('Nguyễn Văn Huy', 'HS12345', DAI)
 const CAC_CHUOI_LO = ['Nguyễn Văn Huy', 'Huy', 'HS12345', 'Trần Thị Lan', 'Lan', 'HS67890']
 
 function dung(dsO: OBang[], tuyChon: Parameters<typeof taoHtmlMayChieu>[1] = { dayHoc: true }) {
-  const dom = new JSDOM(taoHtmlMayChieu(dsO, tuyChon), { runScripts: 'dangerously', pretendToBeVisual: true, beforeParse(w) { w.setInterval = (() => 1) as never; w.clearInterval = () => {}; w.HTMLElement.prototype.scrollTo = () => {} } })
+  const dom = new JSDOM(taoHtmlMayChieu(dsO, tuyChon), { runScripts: 'dangerously', beforeParse(w) { w.setInterval = (() => 1) as never; w.clearInterval = () => {}; w.HTMLElement.prototype.scrollTo = () => {} } })
   return { dom, doc: dom.window.document }
 }
 

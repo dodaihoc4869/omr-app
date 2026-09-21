@@ -102,6 +102,13 @@ body.mc .mc-em .mc-thu-ten:after{content:"·";margin-left:.45em}
 body.mc .mc-em .mc-thu-cap:has(+ .mc-lan):after{content:"·";margin-left:.45em}
 body.mc .mc-em .mc-thu-cap b{font-weight:500}
 body.mc .mc-em .mc-thu-hinh{display:none}
+/* "Em đã làm câu này chưa": hàng thứ ba của thẻ tên (chỉ thấy khi thẻ đã hiện). Nhãn viên thuốc; đúng = xanh lá, sai = cam (không đỏ), còn lại = xám. Cỡ chữ đọc được từ cuối lớp. */
+body.mc .mc-em .mc-ls{grid-column:2 / -1;grid-row:3;display:flex;flex-wrap:wrap;align-items:center;gap:2px clamp(8px,.9vw,18px);margin-top:clamp(2px,.35vw,8px);min-width:0}
+body.mc .mc-em:not(:has(.mc-thu)) .mc-ls{grid-column:1 / -1}
+body.mc .mc-em .mc-ls-chu{font:700 clamp(13px,1.5vw,29px)/1.25 var(--mc-sans);padding:.08em .62em;border-radius:999px;background:var(--mc-the);color:var(--mc-chu);white-space:nowrap}
+body.mc .mc-em .mc-ls-dung .mc-ls-chu{background:var(--mc-lam-nen);color:var(--mc-lam-chu)}
+body.mc .mc-em .mc-ls-sai .mc-ls-chu{background:var(--mc-qua-nen);color:var(--mc-qua-chu)}
+body.mc .mc-em .mc-ls-phu{font:500 clamp(12px,1.22vw,24px)/1.3 var(--mc-sans);color:var(--mc-phu)}
 body.mc .mc-em .mc-thu-so,body.mc .mc-em .mc-sbd,body.mc .mc-em .mc-btvn{display:none}
 body.mc .mc-em .mc-lan{color:inherit;font:inherit}
 body.mc .mc-em .mc-em-phu{grid-column:2;grid-row:2;font:500 clamp(12px,1.25vw,24px)/1.3 var(--mc-sans);color:var(--mc-phu)}
