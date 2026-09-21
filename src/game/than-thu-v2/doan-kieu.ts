@@ -31,6 +31,8 @@ export interface BanDongHanhXem { ten: string; pet: number; cap: number; banVung
 export interface KetChangLopXem { tramTruoc: number; tramSau: number; tongTram: number; banThu: number; siSo: number; conTramToiMoc: number | null; tenMocKe: string | null; trumLop: number | null }
 export interface KetChangXem {
   thang: boolean; sao: number; linhTam: { hp: number; toiDa: number }; trumVoGiap: boolean[]; quaiHaGuc: number; soLienKich: number
+  /** Các khoản EXP của chuyến này của em (chỉ-thêm, Đợt 2): {loai: doan_chang | doan_giap | tiepsuc, exp đã qua trần 120/ngày, ghiChu}. Máy chủ cũ không gửi ⇒ vắng. */
+  expChang?: { loai: string; exp: number; ghiChu: string }[]
   cuaEm: TomTatGhe; tienBo: TienBoXem; doanLop?: KetChangLopXem | null; anThach?: AnXem['ganSang']; ban: { ghe: number; laMay: boolean; soLanGiupThanhCong: number }[]
 }
 export interface TiepSucXem { conLuotNhan: number; daXin: boolean; theNhan: { tuTen: string; tuLaMay: boolean; loai: string; tieuDe: string; noiDung: string } | null; banCan: number[]; daGiup: boolean; lienKichSanSang: boolean }

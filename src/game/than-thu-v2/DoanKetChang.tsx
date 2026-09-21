@@ -2,13 +2,19 @@
 // máy chủ không trả số nào thì dòng ấy không hiện (không bịa số, không có chữ kết luận năng lực).
 import type { CSSProperties, ReactNode } from 'react'
 import type { DoanXem } from './doan-kieu'
+import { PETS } from './core'
 import { LinhTamCau, SaoHinh, ThuHinh } from './DoanHinh'
+import { chuDuTran, coKhoanBiCat, dongKhoanExp, tongKhoanExp } from './doan-khoan-exp'
 
 const MAU_GIAY = ['rgb(255,209,102)', 'rgb(127,233,255)', 'rgb(255,138,92)', 'rgb(125,255,176)', 'rgb(217,200,255)', 'rgb(255,158,199)']
 
 export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, khoiThem }: { xem: DoanXem; expNhan: number; ve?: number | null; onVe: () => void; onDiTiep: () => void; ban: boolean; khoiThem?: ReactNode }) {
   const k = xem.ketChang!, em = xem.ghe.find(g => g.laEm)!, banBe = xem.ghe.filter(g => !g.laEm).slice(0, 2), tb = k.tienBo
   const banDuocGiup = k.cuaEm.soLanGiup > 0
+  // Từng khoản EXP của chuyến (Điều 9): thắng chuyến / vỡ giáp / tiếp sức; không có ⇒ ô "EXP vào ví" cũ.
+  const khoan = dongKhoanExp(k.expChang, k.sao, k.trumVoGiap.filter(Boolean).length)
+  const tongKhoan = tongKhoanExp(khoan)
+  const tenThu = PETS[em.pet]?.name ?? 'thần thú'
   return (
     <div className="dh-khung">
       <div className="dh-ket-canh">
@@ -47,11 +53,20 @@ export default function DoanKetChang({ xem, expNhan, ve, onVe, onDiTiep, ban, kh
         {tb.soCau > tb.tuLamDung && <small>Câu em chưa đúng hôm nay sẽ được đưa lại đúng lịch ôn lại.</small>}
       </section>
 
-      {(expNhan > 0 || k.soLienKich > 0) && (
+      {(expNhan > 0 || k.soLienKich > 0 || khoan.length > 0) && (
         <section className="dh-kinh dh-muc" aria-label="Phần thưởng">
           <div className="dh-nhan">PHẦN THƯỞNG</div>
+          {khoan.length > 0 && (
+            <div className="dh-khoan" data-vung="khoan-exp">
+              <ul aria-label="Từng khoản EXP của chuyến này">
+                {khoan.map(d => <li key={d.ma} data-ma={d.ma}><span>{d.nhan}</span><b>+{d.exp} EXP</b></li>)}
+              </ul>
+              <div className="dh-khoan-tong"><span>Tổng cộng</span><b>+{tongKhoan} EXP</b></div>
+              {coKhoanBiCat(khoan) && <small data-vung="khoan-du-tran">+{tongKhoan} EXP · {chuDuTran(tenThu)}</small>}
+            </div>
+          )}
           <div className="dh-thuong">
-            {expNhan > 0 && <div><b>+{expNhan}</b><small>EXP vào ví thần thú</small></div>}
+            {khoan.length === 0 && expNhan > 0 && <div><b>+{expNhan}</b><small>EXP vào ví thần thú</small></div>}
             {k.soLienKich > 0 && <div><b>{k.soLienKich}</b><small>lần Liên Kích của cả đội</small></div>}
           </div>
         </section>
