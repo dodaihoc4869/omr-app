@@ -199,7 +199,7 @@ describe('CHỐT CHẶN — chữ hiển thị của MÀN PHỤ HUYNH không cò
     expect(container.querySelector('.bnv-thu, .bnv-thu-vong, .bnv-thu-danh, .bnv-exp, .bnv-doan, .bnv-vd-thu')).toBeNull()
   })
 
-  it('app phụ huynh một màn một nút (21/09): KHÔNG menu ba chấm; chân màn có "Đổi số báo danh" + số bản, không chữ game', async () => {
+  it('app phụ huynh một màn một nút (21/09): KHÔNG menu ba chấm; chân màn có "Đổi số báo danh", KHÔNG dòng số bản app (thầy lệnh 21/09 "Bỏ bản app"), không chữ game', async () => {
     const { container } = veBangPh()
     await screen.findByText('Bài tập về nhà · Chặng 2')
     expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
@@ -207,7 +207,9 @@ describe('CHỐT CHẶN — chữ hiển thị của MÀN PHỤ HUYNH không cò
     const chan = container.querySelector('[data-vung="chan-ph"]') as HTMLElement
     expect(chan).toBeTruthy()
     expect(chuHienThi(chan)).not.toMatch(CAM)
-    expect(chan.querySelector('.bnv-chan-ph-ban')).toBeTruthy()
+    expect(chan.querySelector('.bnv-chan-ph-ban')).toBeNull()
+    expect(chan.textContent).not.toMatch(/Bản app|Bản chạy thử/)
+    expect(chan.textContent).toContain('Đổi số báo danh')
   })
 
   it('việc `than_thu` hiện là "Luyện dạng con còn vấp" kèm số câu; việc bài tập về nhà và hạn nộp GIỮ nguyên', async () => {

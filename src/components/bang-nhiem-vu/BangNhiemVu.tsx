@@ -12,7 +12,6 @@ import type { ViewThiDua } from '../../lib/use-thi-dua'
 import OThiDua from './OThiDua'
 import TheVeDich from './TheVeDich'
 import { ngayVuaTraXong, type VeDichView } from '../../lib/ve-dich-hien-thi'
-import { chuBanApp } from '../../lib/cap-nhat-app'
 import TheChoAn, { viewChoAn } from './TheChoAn'
 import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
@@ -516,13 +515,12 @@ export default function BangNhiemVu({
         {/* MỘT nút duy nhất của app phụ huynh (thầy lệnh 21/09): "Giao thêm bài cho con". Luôn hiện — kể cả khi con chưa có việc; lỗi/thiếu lệnh ⇒ lời thật của máy chủ ngay dưới nút. */}
         {laPh && giaoThem && <GiaoThemChoCon v={giaoThem} />}
 
-        {/* CHÂN MÀN phụ huynh: đường ra/vào tài khoản (phụ huynh hai con) + số bản app, chữ nhỏ; đích chạm ≥ 48 px. Không phải tính năng. */}
+        {/* CHÂN MÀN phụ huynh (màn dự phòng): đường ra/vào tài khoản (phụ huynh hai con), đích chạm ≥ 48 px. Không phải tính năng. Thầy lệnh 21/09: BỎ dòng số bản app khỏi màn (số bản chỉ còn trong menu nút tròn của màn chính). */}
         {laPh && onDoiSbd && (
           <footer className="bnv-chan-ph" data-vung="chan-ph">
             <button type="button" className="bnv-chan-ph-nut" onClick={onDoiSbd}>
               Đổi số báo danh
             </button>
-            <span className="bnv-chan-ph-ban">{chuBanApp()}</span>
           </footer>
         )}
 

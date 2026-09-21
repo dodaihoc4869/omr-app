@@ -145,11 +145,13 @@
 .dao .dao-tien-hoa li small{font-size:10px;font-weight:700;color:var(--dao-chu-nhat)}
 .dao .dao-tien-hoa li[data-hien-tai] small{color:var(--dao-vang)}
 
-/* ───── vỏ + thanh điều hướng dưới ───── */
-.dao-vo{min-height:min(100dvh,1240px);padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+/* ───── vỏ + thanh điều hướng dưới ─────
+   Thanh ĐÁY NEO (thầy báo 21/09 16:3x: viên thuốc nổi đè thẻ, nội dung lộ quanh/dưới thanh): dính mép dưới, NỀN ĐẶC phủ từ mép trên thanh xuống hết đáy màn (kể cả vùng an toàn), có vạch trên.
+   Vùng cuộn chừa ≥ chiều cao thanh (64) + 24 + vùng an toàn để nút LÊN ĐƯỜNG / dải lượt luôn cuộn ra khỏi thanh. GỐC lỗi bám sai khung: `.animate-google-fade` của vỏ sheet (fill `forwards`) để lại ma trận đơn vị sau khi chạy xong ⇒ mọi phần tử `fixed` con bám vào vỏ cuộn, không bám màn (đã sửa ở index.css: fill `backwards`). */
+.dao-vo{min-height:min(100dvh,1240px);padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 .dao-vo:has(>.dao-ve-app){padding-top:calc(60px + max(8px,env(safe-area-inset-top,0px)))}
 .dao-vo.dao-vo-tham{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
-.dao .dao-nav{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;transform:translateX(-50%);width:min(calc(100vw - 24px),420px);height:68px;border-radius:34px;display:flex;align-items:center;justify-content:space-around;background:rgba(14,20,52,.94);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 -6px 22px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.dao .dao-nav{position:fixed;left:0;right:0;bottom:0;z-index:20;box-sizing:border-box;width:auto;height:calc(64px + env(safe-area-inset-bottom,0px));padding:0 max(8px,calc((100vw - 420px) / 2)) env(safe-area-inset-bottom,0px);display:flex;align-items:center;justify-content:space-around;background:rgb(14,20,52);box-shadow:0 -1px 0 rgba(255,255,255,.16),0 -8px 20px rgba(0,0,0,.35)}
 .dao .dao-nav button{--nut-chu:var(--dao-chu-nhat);flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:center;font-size:11px;font-weight:600}
 .dao .dao-nav button>span{display:flex;align-items:center;justify-content:center;width:52px;height:30px;border-radius:15px}
 .dao .dao-nav button[aria-current]{--nut-chu:var(--dao-vang);font-weight:800}

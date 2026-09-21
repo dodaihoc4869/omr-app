@@ -681,7 +681,7 @@ html[data-giu-de-an] [data-giu-de-phu] {
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
@@ -694,17 +694,20 @@ html[data-giu-de-an] [data-giu-de-phu] {
     transform: scale(1.02);
   }
   100% {
-    transform: scale(1);
+    transform: none;
     opacity: 1;
   }
 }
 
+/* `backwards`, KHÔNG `forwards` (P0 thầy báo 21/09: thanh đáy game Đảo "cố định che mất nội dung"): `forwards` giữ giá trị cuối của animation MÃI MÃI, Chromium giữ nó thành ma trận đơn vị (computed
+ * `transform: matrix(1,0,0,1,0,0)`, KHÔNG phải `none`) ⇒ vỏ sheet thành khung chứa của mọi con `position: fixed`, mà vỏ lại là hộp cuộn ⇒ phần tử fixed trôi theo nội dung thay vì bám màn.
+ * Trạng thái cuối của cả hai animation đúng bằng trạng thái tự nhiên (opacity 1, không transform) nên bỏ `forwards` không đổi hình; `backwards` chỉ giữ khung đầu trong lúc chờ. */
 .animate-google-fade {
-  animation: google-fade-in-up 240ms cubic-bezier(0.05, 0.7, 0.1, 1) forwards;
+  animation: google-fade-in-up 240ms cubic-bezier(0.05, 0.7, 0.1, 1) backwards;
 }
 
 .animate-google-pop {
-  animation: google-pop 200ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: google-pop 200ms cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 /* Nút bấm chuẩn Google Material 3: Filled / Primary Button */
