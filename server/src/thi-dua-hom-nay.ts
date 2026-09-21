@@ -16,6 +16,7 @@
 // XEM THỬ: tài khoản thử SBD_THU_NGHIEM (không thuộc lớp nào) được xem bảng của một lớp thật với tư cách NGƯỜI XEM (xem `docLopXemThu`, `xemThu`); không bao giờ lọt vào sĩ số/top/xếp hạng của lớp.
 // MỐC HIỂN THỊ (thầy chốt 21/09 15:56, `moc-no.ts`): số câu hôm nay, chuỗi ngày học, "đã học hôm nay" chỉ đếm sự kiện `luc ≥ mốc` (12:00 trưa 21/09) — sự kiện trước mốc KHÔNG vào số hiển thị (chuỗi bắt đầu đếm từ ngày mốc).
 // Truy vấn D1 (chỉ đọc, không ghi): xếp hạng 3 (danh sách em + số câu/ngày + đạt nhiệm vụ ngày); thêm 1 truy vấn thần thú của top 3; lệnh thầy 2 truy vấn. Thiếu bảng/cột (chưa migration) ⇒ giá trị an toàn.
+import { tuLucTuNgay } from './cau-da-lam'
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { CAN_DANG_NHAP } from './on-lai-nop'
@@ -37,13 +38,9 @@ const json = (v: unknown): string => JSON.stringify(v)
  * thay vì quét cả sổ theo `idx_skh_em_ngay` (DISTINCT ưa chỉ mục đứng đầu bằng sbd): đo 21/09 trên D1 thật 29.156 → ~1,8 nghìn dòng/lần. Thiếu chỉ mục vẫn chạy đúng (chậm hơn).
  */
 export const SQL_EM_DA_HOC_HOM_NAY = 'SELECT DISTINCT sbd FROM (SELECT sbd, ngay_vn FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL LIMIT -1) WHERE ngay_vn = ?'
-/**
- * Tham số đầu (`luc >= ?`) của `SQL_EM_DA_HOC_HOM_NAY`: MAX(mốc hiển thị, 00:00 hôm nay giờ VN). Mốc đứng yên nhiều ngày; bind thẳng mốc thì truy vấn con đọc MỌI sự kiện từ mốc rồi mới lọc `ngay_vn`
- * (số dòng đọc lớn dần theo ngày). Cùng tập em: `ngay_vn = hôm nay` ⇒ `luc ≥ 00:00 hôm nay`; chi phí luôn chỉ là sự kiện của hôm nay. (ISO cùng định dạng `.000Z` ⇒ so chuỗi = so thời điểm.)
- */
+/** Tham số đầu (`luc >= ?`) của `SQL_EM_DA_HOC_HOM_NAY` = MAX(mốc hiển thị, 00:00 hôm nay giờ VN) — MỘT nguồn ở `cau-da-lam.ts` (`tuLucTuNgay`); giữ tên cũ cho nơi đã import. */
 export function tuLucEmDaHoc(mocIso: string, ngay: string): string {
-  const dau = new Date(Date.parse(`${ngay}T00:00:00+07:00`)).toISOString()
-  return mocIso > dau ? mocIso : dau
+  return tuLucTuNgay(mocIso, ngay)
 }
 /** Tài khoản thử của hệ thống — không tính vào lớp (khớp `SBD_THU` của gv-bang-tin.ts; test giữ hai chỗ khớp nhau, không nhập chéo để tránh vòng nhập). */
 export const SBD_THU_NGHIEM = '12121212'

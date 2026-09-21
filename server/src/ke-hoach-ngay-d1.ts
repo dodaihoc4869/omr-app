@@ -16,6 +16,7 @@ import {
 import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
 import { qidPhucVuDuoc } from './cau-theo-qid'
 import { ngayVn } from './su-kien-hoc'
+import { docCauDaLamHomNay } from './cau-da-lam'
 import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
 import { ketQuaChotNgay } from '../../src/lib/dat-nhiem-vu-ngay'
 import { docDieuChinhHieuLuc } from './bo-nao-doc'
@@ -189,6 +190,9 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
   // Đã làm hôm nay (mọi nguồn), khử trùng theo câu; "lên bậc" = đúng lại câu từng sai/trống, "tụt bậc" = sai lại câu từng đúng.
   const rt = await tat(() => env.DB.prepare(TIEN_BO_NGAY).bind(arr, homNay).all<Record<string, unknown>>(), trong())
   for (const x of rt.results ?? []) { const c = cua(x); if (c) c.daLamHomNay = { soCau: Number(x.da_lam) || 0, lenBac: Number(x.len_bac) || 0, tutBac: Number(x.tut_bac) || 0, dung: Number(x.dung) || 0 } }
+  // SỐ CÂU HIỂN THỊ (một định nghĩa, `cau-da-lam.ts`): KHÔNG thay `soCau` ở trên (nuôi luật đạt ngày/EXP/khiên) — chỉ thêm khoá; đọc lỗi ⇒ vắng khoá (không bịa 0). Em chưa làm câu nào ⇒ 0.
+  const hienThi = await docCauDaLamHomNay(env, em, now)
+  if (hienThi) for (const sbd of em) { const c = map.get(sbd); if (c) c.daLamHomNay.soCauHienThi = hienThi.get(sbd)?.soCau ?? 0 }
 
   // Lịch sử kết quả các ngày trước.
   const rh = await tat(() => env.DB.prepare(`SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE ${IN_EM} AND ngay < ? AND ngay >= ? ORDER BY ngay DESC`).bind(arr, homNay, ngayLs).all<Record<string, unknown>>(), trong())

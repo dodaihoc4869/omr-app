@@ -108,7 +108,7 @@ export interface DauVaoKeHoach {
   cauOnThi?: CauOnThi[]
   /** Kết quả các ngày TRƯỚC hôm nay, mới nhất trước; null = ngày nghỉ/chưa chốt (bị bỏ qua). */
   lichSu: { ngay: string; ketQua: 'dat' | 'mot_phan' | 'khong' | null }[]
-  daLamHomNay: { soCau: number; lenBac: number; tutBac: number; /** Số câu KHÁC NHAU đúng hôm nay, mọi nguồn (Điều 7). Vắng = 0. */ dung?: number }
+  daLamHomNay: { soCau: number; lenBac: number; tutBac: number; /** Số câu KHÁC NHAU đúng hôm nay, mọi nguồn (Điều 7). Vắng = 0. */ dung?: number; /** Số câu HIỂN THỊ (định nghĩa chuẩn `cau-da-lam.ts`); vắng ⇒ không hiện khoá. */ soCauHienThi?: number }
   homNayLaNgayNghi: boolean
   /**
    * BỘ NÃO A.I (chế độ THẬT, `bo-nao-doc.ts`): điều chỉnh CÒN HẠN của em. Vắng ⇒ kế hoạch Y HỆT không có tầng này (chạy thử/tắt không bao giờ đặt trường này — test khoá).
@@ -177,6 +177,8 @@ export interface KeHoachNgay {
     daLamCau: number; lenBac: number; tutBac: number; dat: boolean; toiThieuCau: number; conThieu: number; soCauToiHan: number; treNhip: boolean
     /** Điều 7 (từ 22/09): CHỈ có khi "đạt nhiệm vụ ngày" còn thiếu vì chưa đủ câu ĐÚNG — `soCauDung` = số câu đúng còn thiếu, `chu` = câu chữ tiếng thường cho em (từ `moTaThieuDat` của src/lib/dat-nhiem-vu-ngay.ts). */
     thieuDat?: { soCauDung: number; chu: string }
+    /** SỐ CÂU ĐÃ LÀM để HIỂN THỊ (Boss 21/09, MỘT định nghĩa ở `cau-da-lam.ts`: qid khác nhau, đã trả lời, từ MAX(mốc, 00:00 hôm nay)). CHỈ-THÊM; `daLamCau` cũ GIỮ NGUYÊN vì nuôi luật đạt nhiệm vụ ngày / EXP / khiên. Vắng ⇒ máy dùng `daLamCau`. */
+    soCauHienThi?: number
   }
   /** Cấp lịch sử ngày đạt liên tiếp (ngày nghỉ không đứt) — nơi gọi truyền vào `lichSu`. */
   chuoiDat: number
@@ -467,6 +469,7 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
   const daLam = d.daLamHomNay.soCau
   const tienBo = {
     daLamCau: daLam, lenBac: d.daLamHomNay.lenBac, tutBac: d.daLamHomNay.tutBac,
+    ...(d.daLamHomNay.soCauHienThi !== undefined ? { soCauHienThi: d.daLamHomNay.soCauHienThi } : {}),
     dat: daLam >= nganSach.toiThieuCau, toiThieuCau: nganSach.toiThieuCau, conThieu: Math.max(0, nganSach.toiThieuCau - daLam),
     soCauToiHan: d.cauToiHan.filter((c) => c.mocOnKe <= d.homNay).length,
     treNhip: viec.some((v) => v.batBuoc && v.chiTiet.treNhip === true),

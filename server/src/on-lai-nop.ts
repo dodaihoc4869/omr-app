@@ -25,6 +25,7 @@ import { gameIdentity } from './game-v2-auth'
 import { capNhatExp, expNhanCuaKetQua, manhNhanCuaKetQua, tongExpCuaKetQua } from './exp-d1'
 import { dungLaiHoSo } from './ho-so-nam-kt'
 import { TIEN_BO_NGAY } from './ke-hoach-ngay-d1'
+import { docCauDaLamHomNay } from './cau-da-lam'
 import { DAI_QID_TOI_DA, donQid, layCauChoEm, TOI_DA_QID_MOT_LUOT } from './cau-theo-qid'
 import { ghiSuKien, ngayVn, phanTuQid, type SuKien } from './su-kien-hoc'
 
@@ -153,10 +154,13 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
   } catch (e) {
     console.error('[on-lai] dựng lại hồ sơ lỗi (sổ đã ghi, kế hoạch sau sẽ tự dựng lại):', e instanceof Error ? e.message : e)
   }
-  let tienBo: { daLamCau: number; lenBac: number; tutBac: number } | null = null
+  let tienBo: { daLamCau: number; lenBac: number; tutBac: number; soCauHienThi?: number } | null = null
   try {
     const t = await env.DB.prepare(TIEN_BO_NGAY).bind(JSON.stringify([sbd]), ngayVn(now)).first<Record<string, unknown>>()
     tienBo = { daLamCau: Number(t?.da_lam) || 0, lenBac: Number(t?.len_bac) || 0, tutBac: Number(t?.tut_bac) || 0 }
+    // Số câu HIỂN THỊ (một định nghĩa, `cau-da-lam.ts`), CHỈ-THÊM; `daLamCau` cũ giữ nguyên. Lỗi đọc ⇒ vắng khoá.
+    const hienThi = await docCauDaLamHomNay(env, [sbd], now)
+    if (hienThi) tienBo.soCauHienThi = hienThi.get(sbd)?.soCau ?? 0
   } catch { /* không có tiến bộ ngày thì vẫn trả kết quả từng câu */ }
 
   // EXP: EXP HỌC TẬP MỚI (exp-d1.ts) khi đã bật cho em này; chưa bật thì luật cũ (2 EXP/câu, khoá `practice:<qid>`).
