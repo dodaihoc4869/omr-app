@@ -1,0 +1,18 @@
+# BỘ BẮN TẢI GIẢ — cấu hình CHỈ CỤC BỘ (Code 1, 21/09/2026; Boss: KHÔNG bắn vào omr.ttadodaihoc.workers.dev).
+# `database_id` là số 0 giả: KHÔNG trỏ vào D1 thật; `wrangler dev --local` chỉ dùng tệp SQLite trong `.trang-thai/`. R2 cũng cục bộ, trống.
+# Không có [triggers] ⇒ không chạy cron; không có secret thật ⇒ `.dev.vars` do `chuan-bi.mjs` sinh (giả).
+name = "omr-tai-gia"
+main = "vo-do.ts"
+compatibility_date = "2026-09-11"
+workers_dev = true
+# Chỉ để vỏ đo gán truy vấn cho đúng lượt gọi (AsyncLocalStorage); Worker thật không dùng cờ này.
+compatibility_flags = ["nodejs_als"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "omr-tai-gia"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[[r2_buckets]]
+binding = "DE"
+bucket_name = "omr-de-tai-gia"
