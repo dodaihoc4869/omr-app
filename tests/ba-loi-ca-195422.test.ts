@@ -26,7 +26,7 @@ describe('LỖI 1 — link xem điểm báo "Máy chủ chưa gửi đề của 
     const SRV = doc('server/src/goi-cu.ts')
     const than = SRV.slice(SRV.indexOf('export async function phieuCuaEm'), SRV.indexOf('export async function lichSuEm'))
     expect(than).toContain('const daNop =')
-    expect(than).toContain('if (daNop && env.DE)')
+    expect(than).toContain('if (daNop && daCongBo && env.DE)') // 21/09: thêm luật công bố (cong-bo-diem.ts) — vẫn chỉ lượt ĐÃ NỘP, nay còn phải ĐÃ CÔNG BỐ
   })
 
   it('vẫn kín: đường công khai `/de/:maCa` không bao giờ đọc khoá `key/`', () => {
@@ -48,7 +48,7 @@ describe('LỖI 1 — link xem điểm báo "Máy chủ chưa gửi đề của 
 
     it('thiếu khoá `key/` thì mới dựng, và chỉ cho lượt ĐÃ NỘP', () => {
       const pc = SRV.slice(SRV.indexOf('export async function phieuCuaEm'), SRV.indexOf('export async function lichSuEm'))
-      expect(pc).toContain('if (daNop && env.DE)')
+      expect(pc).toContain('if (daNop && daCongBo && env.DE)') // 21/09: thêm luật công bố
       expect(pc).toContain('if (!bank) bank = await keyBankTuBangCham(env, maCa, sbd)')
     })
 

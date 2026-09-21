@@ -371,7 +371,7 @@ describe('F · khắc phục sau ca, dạng bài, phiếu, /kho/rut-cau', () => 
   })
   it('hsCauSai (khắc phục câu sai theo ca đã thi): câu sai ở ca cũ là tự luận (phần I thiếu phương án) KHÔNG được trả lại; câu rút được vẫn trả', async () => {
     const d = dungKho()
-    d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,cap_nhat_luc) VALUES('CA-T','Ca thử','dong','x')").run()
+    d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,cong_bo,cap_nhat_luc) VALUES('CA-T','Ca thử','dong','ngay','x')").run()
     d.objects.set('key/CA-T.json', { cau: KHO_THO.map((t) => ({ ...t })) })
     for (const t of KHO_THO) {
       d.sql.prepare("INSERT INTO chi_tiet_cau(khoa,ma_ca,sbd,lan_thu,phan,so_cau,qid,chuyen_de,muc_do,dap_an_chon,dap_an_dung,dung_sai,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?,?,0,'x')")

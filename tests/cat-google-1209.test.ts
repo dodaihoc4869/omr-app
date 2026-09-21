@@ -141,7 +141,7 @@ describe('TRẢ ĐỦ TRƯỜNG MÀN HÌNH ĐANG ĐỌC', () => {
   it('CHƯA NỘP thì KHÔNG trả ngân hàng có đáp án — đường này công khai', () => {
     const t = than('phieuCuaEm')
     expect(t).toContain('const daNop =')
-    expect(t).toContain('if (daNop && env.DE)')
+    expect(t).toContain('if (daNop && daCongBo && env.DE)') // 21/09: thêm luật công bố (cong-bo-diem.ts)
   })
 
   it('ketQua trả đúng dáng KetQuaCongBo, không phải dáng tự nghĩ ra', () => {

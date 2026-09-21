@@ -88,7 +88,7 @@ describe('SỬA TRIỆT ĐỂ LỖI LẪN LỘN BÁO CÁO VÀ SAI CÂU LÀM SAI 
     const code = fs.readFileSync(path.resolve(__dirname, '../server/src/goi-cu.ts'), 'utf-8')
     const i = code.indexOf('export async function phieuCuaEm(')
     expect(i).toBeGreaterThan(0)
-    const than = code.slice(i, i + 3500)
+    const than = code.slice(i, i + 5200) // 21/09: cửa sổ nới vì thêm luật công bố (cong-bo-diem.ts) vào thân hàm
 
     // Truy vấn D1 phải lấy đủ trường của ca
     expect(than).toContain('c.bo_theo_em_json')

@@ -10,6 +10,7 @@
 // TỰ HÀNH: hôm sau bộ não TỰ CHẤM điều chỉnh của đêm trước (lúc dựng hồ sơ ngày); `xau_di` ⇒ TỰ GỠ (`huy = 1`, `tu_go = 1`) và cờ `xau_di_hom_qua` đẩy em vào luồng soi kỹ.
 import type { D1PreparedStatement, Env } from './kieu'
 import { docMocReset } from './reset-toan-app'
+import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import {
   danhGiaDieuChinh,
   chotLuongCaLop,
@@ -239,7 +240,7 @@ async function docDuLieuTrang(env: Env, sbds: string[], ngay: string): Promise<D
     // 8 — ca thi đã nộp trong 14 ngày (mới nhất trước)
     P(
       `SELECT l.sbd, l.nop_luc, l.tong, l.diem_i, l.diem_ii, l.diem_iii FROM luot l JOIN ca c ON c.ma_ca = l.ma_ca
-        WHERE l.${IN} AND l.trang_thai = 'da_nop' AND l.nop_luc >= ? AND COALESCE(c.trang_thai,'') <> 'da_xoa' ORDER BY l.nop_luc DESC`,
+        WHERE l.${IN} AND l.trang_thai = 'da_nop' AND l.nop_luc >= ? AND COALESCE(c.trang_thai,'') <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')} ORDER BY l.nop_luc DESC`,
       j,
       tuCa,
     ),

@@ -23,6 +23,7 @@ import { goTuLuanKhoiGoi, laCauTuLuan, locPhieuBaiTap, type PhanCau } from './ca
 import type { D1PreparedStatement, Env } from './kieu'
 import { docDsQid, docNamKtChoLop, type NamKtCauMayChu } from './ho-so-len-bang'
 import { tenLopCuaEm } from './ten-lop'
+import { docTrangThaiCongBo, dongChuaCongBo, laSanSangCongBo } from './cong-bo-diem'
 
 export const NAY = (): string => new Date().toISOString()
 
@@ -661,7 +662,10 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
   if (!l) return { ok: false, error: 'Em chưa nộp bài ca này' }
 
   const lanThu = Number(l.lan_thu) || 1
-  const dsCtc = await layChiTietCauD1(env, maCa, sbd, lanThu)
+  // LUẬT CÔNG BỐ (cong-bo-diem.ts): ca CHƯA công bố ⇒ KHÔNG điểm, KHÔNG chi tiết từng câu (đáp án đúng), KHÔNG phiếu kết quả, KHÔNG ngân hàng đáp án; bài làm của chính em giữ nguyên.
+  const cbCa = (await docTrangThaiCongBo(env, [maCa])).get(maCa)
+  const daCongBo = cbCa?.daCongBo === true
+  const dsCtc = daCongBo ? await layChiTietCauD1(env, maCa, sbd, lanThu) : []
 
   const rPhieu = await env.DB.prepare('SELECT ma, loai FROM phieu WHERE ma_ca = ? AND sbd = ? AND thu_hoi = 0 ORDER BY luu_luc DESC')
     .bind(maCa, sbd)
@@ -671,7 +675,7 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
   const maBaiTap = chuoi(ds.find((x) => chuoi(x.loai) === 'baitap')?.ma)
 
   let phieuSan: unknown = null
-  if (maKetQua && env.DE) {
+  if (daCongBo && maKetQua && env.DE) {
     try {
       const oP = await env.DE.get(`phieu/${maKetQua}.json`)
       if (oP?.body) {
@@ -703,7 +707,7 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
   // NGÂN HÀNG CÓ ĐÁP ÁN — chỉ trả khi em ĐÃ NỘP.
   let bank: unknown = null
   const daNop = chuoi(l.trang_thai) === 'da_nop' || chuoi(l.trang_thai) === 'khoa' || chuoi(l.nop_luc) !== ''
-  if (daNop && env.DE) {
+  if (daNop && daCongBo && env.DE) {
     const o = await env.DE.get(`key/${maCa}.json`)
     if (o?.body) {
       try {
@@ -729,17 +733,22 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
 
   return {
     ok: true,
-    ma: maKetQua,
+    // chỉ-thêm: trạng thái công bố của ca (máy mới vẽ "chưa công bố" / "đã nộp a/b em")
+    congBo: cbCa?.congBo ?? 'khong',
+    daCongBo,
+    soEmDaNop: cbCa?.soEmDaNop ?? 0,
+    soEmDaVao: cbCa?.soEmDaVao ?? 0,
+    ma: daCongBo ? maKetQua : '',
     maBaiTap: maBaiTap,
     phieu: phieuSan,
     boTheoEm: goiRieng,
     boCuaEm,
     soCau: soCauCa,
     chiTietCau: dsCtc,
-    diemI: soHoacNull(l.diem_i),
-    diemII: soHoacNull(l.diem_ii),
-    diemIII: soHoacNull(l.diem_iii),
-    tong: soHoacNull(l.tong),
+    diemI: daCongBo ? soHoacNull(l.diem_i) : null,
+    diemII: daCongBo ? soHoacNull(l.diem_ii) : null,
+    diemIII: daCongBo ? soHoacNull(l.diem_iii) : null,
+    tong: daCongBo ? soHoacNull(l.tong) : null,
     hoTen: chuoi(l.ten_hien),
     lop: chuoi(l.lop_hien),
     tenCa: chuoi(l.ten_ca),
@@ -780,7 +789,15 @@ export async function lichSuEm(env: Env, b: Record<string, unknown>): Promise<Re
   )
     .bind(sbd)
     .all<Record<string, unknown>>()
-  const dong = r.results ?? []
+  // LUẬT CÔNG BỐ (cong-bo-diem.ts): ca chưa công bố bị BỚT khỏi `items` (máy cũ không thấy ca ấy) và liệt kê ở `chuaCongBo` cho máy mới.
+  const congBoCa = await docTrangThaiCongBo(env, (r.results ?? []).map((x) => chuoi(x.ma_ca)))
+  const chuaCongBo = new Map<string, ReturnType<typeof dongChuaCongBo>>()
+  const dong = (r.results ?? []).filter((x) => {
+    const cb = congBoCa.get(chuoi(x.ma_ca))
+    if (cb?.daCongBo) return true
+    if (!chuaCongBo.has(chuoi(x.ma_ca))) chuaCongBo.set(chuoi(x.ma_ca), dongChuaCongBo(chuoi(x.ma_ca), chuoi(x.ten_ca), chuoi(x.nop_luc), cb))
+    return false
+  })
 
   // SỐ CÂU LẤY TỪ BẢNG CHẤM của chính em — đúng tờ đề em nhận, kể cả ca đề
   // riêng (ca 561169 phát 12 câu cho mỗi em trong khi gói đề chứa 545 câu, nên
@@ -818,6 +835,7 @@ export async function lichSuEm(env: Env, b: Record<string, unknown>): Promise<Re
         ...goiDemCau(d),
       }
     }),
+    chuaCongBo: [...chuaCongBo.values()],
   }
 }
 
@@ -1977,8 +1995,7 @@ export async function ketQuaCuaEm(env: Env, b: Record<string, unknown>): Promise
 
   // CẢ LỚP XONG nghĩa là không còn ai đang làm, HOẶC thầy đã khoá ca. Ca chưa
   // ai vào thì KHÔNG tính là xong — nếu không, em mở link sớm là thấy đáp án.
-  const caXong = chuoi(ca.trang_thai) === 'dong' || (daVao > 0 && daNop >= daVao)
-  const sanSang = congBo === 'ngay' || (congBo === 'ca_lop_xong' && caXong)
+  const sanSang = laSanSangCongBo(congBo, chuoi(ca.trang_thai), daVao, daNop) // MỘT nguồn luật công bố (cong-bo-diem.ts): ca đóng / cả lớp nộp / `ngay`
 
   let keyBank: unknown = null
   if (sanSang && env.DE) {
@@ -2996,9 +3013,17 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
     .all<Record<string, unknown>>()
 
   const bankCache = new Map<string, Record<string, unknown> | null>()
+  // LUẬT CÔNG BỐ (cong-bo-diem.ts): ca chưa công bố ⇒ KHÔNG điểm, KHÔNG số câu đúng/sai — máy cũ chỉ không thấy ca ấy; máy mới đọc `chuaCongBo`.
+  const congBoCa = await docTrangThaiCongBo(env, (r.results ?? []).map((x) => chuoi(x.ma_ca)))
+  const chuaCongBo = new Map<string, ReturnType<typeof dongChuaCongBo>>()
 
   const items: Array<Record<string, unknown>> = []
   for (const x of r.results ?? []) {
+    const cb = congBoCa.get(chuoi(x.ma_ca))
+    if (!cb?.daCongBo) {
+      if (!chuaCongBo.has(chuoi(x.ma_ca))) chuaCongBo.set(chuoi(x.ma_ca), dongChuaCongBo(chuoi(x.ma_ca), chuoi(x.ten_ca), chuoi(x.nop_luc), cb))
+      continue
+    }
     let rawTongCau = Number(x.tong_cau) || 0
     let rawSoDung = Number(x.so_cau_dung) || 0
     let rawSoSai = Number(x.so_cau_sai) || 0
@@ -3056,6 +3081,7 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
       diemII: dII,
       diemIII: dIII,
       thoiGianPhut: Number(x.thoi_gian_phut) || 0,
+      congBo: cb.congBo,
       ...goiDemCau(demCua),
     })
   }
@@ -3063,6 +3089,7 @@ export async function hsLichSuCa(env: Env, b: Record<string, unknown>): Promise<
   return {
     ok: true,
     items,
+    chuaCongBo: [...chuaCongBo.values()],
   }
 }
 
@@ -3189,6 +3216,7 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
     .all<Record<string, unknown>>()
 
   let rows = r.results ?? []
+  const chuaCongBoTuLuot = new Set<string>()
 
   // Nếu chi_tiet_cau chưa có dữ liệu cho em này (vd học sinh thi nộp trực tiếp chưa qua chấm lại),
   // tự động phân tích bài làm từ luot và keyBank để trích xuất đầy đủ câu sai chuẩn xác theo bộ câu của em.
@@ -3205,9 +3233,15 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
     }
     const rLuot = await env.DB.prepare(luotQuery).bind(...lParams).all<Record<string, unknown>>()
     const luotList = rLuot.results ?? []
+    // LUẬT CÔNG BỐ (cong-bo-diem.ts): ca CHƯA công bố không được chấm lại / trả câu.
+    const congBoLuot = await docTrangThaiCongBo(env, luotList.map((x) => chuoi(x.ma_ca)))
 
     for (const lItem of luotList) {
       const maCa = chuoi(lItem.ma_ca)
+      if (!congBoLuot.get(maCa)?.daCongBo) {
+        chuaCongBoTuLuot.add(maCa)
+        continue
+      }
       const tenCa = chuoi(lItem.ten_ca) || `Ca ${maCa}`
       let dapAnObj: any = null
       try {
@@ -3223,6 +3257,10 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
       void luuChiTietCauNeuChuaCo(env, maCa, sbd, Number(lItem.lan_thu) || 1, dg.dsChiTiet, dg.dsCauSai)
     }
   }
+  // LUẬT CÔNG BỐ (cong-bo-diem.ts): câu của ca CHƯA công bố (đề kèm đáp án đúng + lời giải) KHÔNG rời máy chủ; ca ấy liệt kê ở `caChuaCongBo` cho máy mới.
+  const congBoCa = await docTrangThaiCongBo(env, rows.map((x) => chuoi(x.ma_ca)))
+  const chuaCongBoMa = new Set<string>([...chuaCongBoTuLuot, ...rows.map((x) => chuoi(x.ma_ca)).filter((m) => !congBoCa.get(m)?.daCongBo)])
+  rows = rows.filter((x) => congBoCa.get(chuoi(x.ma_ca))?.daCongBo === true)
   const banksCache = new Map<string, Record<string, unknown>>()
   const qMap = new Map<string, Record<string, unknown>>()
 
@@ -3351,7 +3389,7 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
     })
   )
 
-  return { ok: true, items: itemsHopLe }
+  return { ok: true, items: itemsHopLe, caChuaCongBo: [...chuaCongBoMa] }
 }
 
 
