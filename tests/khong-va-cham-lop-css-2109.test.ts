@@ -37,6 +37,7 @@ const CA = [
   { ten: 'Thanh hấp thụ của Đảo', tsx: ['src/game/than-thu-v2/dao/DaoCuaEm.tsx'], css: ['src/game/than-thu-v2/dao/dao.css'], tienTo: /^dao-hap-thu/ },
   { ten: 'App phụ huynh mới (bảng "Mọi thứ về con")', tsx: ['src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx'], css: ['src/components/ph-moi/ph-moi.css', 'src/components/ph-moi/ph-moi-them.css'], tienTo: /^phm(-|$)/ },
   { ten: 'App phụ huynh mới (màn chính kiểu Apple)', tsx: ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/ThanhDayAp.tsx', 'src/components/ph-moi/BieuTuongAp.tsx'], css: ['src/components/ph-moi/ph-apple.css'], tienTo: /^phm-ap(-|$)/ },
+  { ten: 'Bảng tin kiểu sàn giao dịch (thầy)', tsx: ['src/components/bang-tin-san/BangTinSan.tsx', 'src/components/bang-tin-san/ThanhTren.tsx', 'src/components/bang-tin-san/BangChay.tsx', 'src/components/bang-tin-san/OSo.tsx', 'src/components/bang-tin-san/SoLan.tsx'], css: ['src/components/bang-tin-san/bang-tin-san.css'], tienTo: /^bts-/ },
 ] as const
 
 describe('không va chạm tên lớp CSS', () => {

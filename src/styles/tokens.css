@@ -195,6 +195,74 @@
   --bt-may-xanh: #7ee0a6;
 }
 
+/* BẢNG TIN KIỂU SÀN GIAO DỊCH của thầy (thầy chốt mẫu 21/09 15:58 — docs/ban-ve-bang-tin-san-2109/): SÁNG + TỐI đều là bản chính thức. Toàn bộ màu của màn nằm ở đây (tiền tố --bts-);
+ * canvas / three.js đọc đúng các biến này qua getComputedStyle và vẽ lại khi đổi giao diện. Nền tối viết trong @media (prefers-color-scheme: dark) như mọi token khác (giao-dien-thay.ts tự ép sáng/tối). */
+:root {
+  --bts-nen: #f8fafd;
+  --bts-mat: #ffffff;
+  --bts-mat-2: #f0f4f9;
+  --bts-vien: #dde3ea;
+  --bts-chu: #1f1f1f;
+  --bts-chu-phu: #444746;
+  --bts-chu-mo: #656b73;
+  --bts-duong: #1a73e8;
+  --bts-duong-nhat: #e8f0fe;
+  --bts-la: #188038;
+  --bts-la-nhat: #e6f4ea;
+  --bts-do: #d93025;
+  --bts-do-nhat: #fce8e6;
+  --bts-vang: #f9ab00;
+  --bts-vang-nhat: #fef7e0;
+  --bts-vang-chu: #8a5a00;
+  --bts-xam-o: #e3e8ef;
+  --bts-xam-thanh: #cbd3dd;
+  --bts-luoi: #eaeef3;
+  --bts-tren-la: #ffffff;
+  --bts-tren-vang: #1f1f1f;
+  --bts-tren-xam: #1f1f1f;
+  --bts-tren-gia: #ffffff;
+  --bts-nhan-nen: rgb(255 255 255 / 0.9);
+  --bts-ai-nen: #172130;
+  --bts-ai-mat: #212e42;
+  --bts-ai-vien: #30405a;
+  --bts-ai-chu: #e9eef5;
+  --bts-ai-phu: #a9b6c7;
+  --bts-ai-la: #5bd07f;
+  --bts-ai-do: #f28b82;
+  --bts-ai-duong: #8ab4f8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bts-nen: #0e1116;
+    --bts-mat: #161b22;
+    --bts-mat-2: #1c222b;
+    --bts-vien: #2a313c;
+    --bts-chu: #e3e3e3;
+    --bts-chu-phu: #a8b0ba;
+    --bts-chu-mo: #8b94a0;
+    --bts-duong: #7cacf8;
+    --bts-duong-nhat: #1a2a44;
+    --bts-la: #34a853;
+    --bts-la-nhat: #14301e;
+    --bts-do: #f28b82;
+    --bts-do-nhat: #3b201e;
+    --bts-vang: #f9ab00;
+    --bts-vang-nhat: #382c0e;
+    --bts-vang-chu: #fdd663;
+    --bts-xam-o: #222933;
+    --bts-xam-thanh: #3a4350;
+    --bts-luoi: #202732;
+    --bts-tren-la: #0e1116;
+    --bts-tren-vang: #1f1f1f;
+    --bts-tren-xam: #e3e3e3;
+    --bts-tren-gia: #0e1116;
+    --bts-nhan-nen: rgb(22 27 34 / 0.88);
+    --bts-ai-nen: #1a2639;
+    --bts-ai-mat: #24334a;
+    --bts-ai-vien: #35475f;
+  }
+}
+
 /* KHUNG LỜI GIẢI ĐỌC ĐƯỢC (`.readable-solution`, src/index.css) — cặp màu riêng để chữ lời giải luôn đủ tương phản dù bị lớp tiện ích
  * Tailwind trộn sáng/tối. Trước 21/09 nằm thẳng trong index.css (mã màu thô, làm `npm run check:mau` đỏ); nay đứng đây, một chỗ.
  * Nền tối theo lớp `.dark` / `[data-theme="dark"]` — đúng bộ chọn cũ của khung này (không theo prefers-color-scheme). */

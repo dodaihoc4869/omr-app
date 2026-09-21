@@ -1,0 +1,413 @@
+/* BẢNG TIN KIỂU SÀN GIAO DỊCH (thầy chốt mẫu 21/09/2026) — MỌI lớp bắt đầu bằng `bts-`; màu ở `--bts-*` (src/styles/tokens.css), sáng + tối đều là bản chính thức.
+ * Bố cục theo bề rộng CỦA KHUNG (container query `bts`), không theo bề rộng cửa sổ: trong app còn thanh bên trái. Một màn KHÔNG cuộn khi khung đủ rộng và cửa sổ đủ cao. */
+.bts-san {
+  --bts-fm: ui-monospace, 'SF Mono', Menlo, Consolas, 'Roboto Mono', monospace;
+  --bts-em: cubic-bezier(0.16, 0.84, 0.3, 1);
+  container: bts / inline-size;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  align-content: start;
+  min-width: 0;
+  padding: 12px 16px;
+  background: var(--bts-nen);
+  color: var(--bts-chu);
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+}
+.bts-san *,
+.bts-san *::before,
+.bts-san *::after {
+  box-sizing: border-box;
+}
+.bts-san h1,
+.bts-san h2,
+.bts-san h3,
+.bts-san p,
+.bts-san ul,
+.bts-san ol {
+  margin: 0;
+  padding: 0;
+}
+.bts-san ul,
+.bts-san ol {
+  list-style: none;
+}
+.bts-so {
+  font-family: var(--bts-fm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- thẻ dùng chung ---- */
+.bts-the {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 20px;
+  background: var(--bts-mat);
+}
+
+/* ============ 1. THANH TRÊN ============ */
+.bts-dau {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  min-height: 56px;
+}
+.bts-dau h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.bts-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 14px;
+  background: var(--bts-mat);
+  color: var(--bts-chu-phu);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.bts-chip-mp {
+  border-color: transparent;
+  background: var(--bts-vang-nhat);
+  color: var(--bts-vang-chu);
+  font-weight: 600;
+}
+.bts-chip-mp::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--bts-vang);
+}
+.bts-dau-phai {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-left: auto;
+}
+.bts-dong-ho {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.bts-truc-tiep {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--bts-la);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+.bts-truc-tiep i {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bts-la);
+}
+.bts-truc-tiep i::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1.5px solid var(--bts-la);
+  border-radius: 50%;
+  opacity: 0;
+  animation: bts-song 2s ease-out infinite;
+}
+@keyframes bts-song {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+.bts-doi-mau {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 16px;
+  background: var(--bts-mat-2);
+}
+.bts-doi-mau button {
+  height: 32px;
+  min-width: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--bts-chu-phu);
+  font: 600 13px var(--sans);
+  cursor: pointer;
+}
+.bts-doi-mau button[aria-pressed='true'] {
+  background: var(--bts-mat);
+  color: var(--bts-duong);
+  box-shadow: 0 0 0 1px var(--bts-vien);
+}
+.bts-doi-mau button:focus-visible {
+  outline: 2px solid var(--bts-duong);
+  outline-offset: 2px;
+}
+
+/* ============ 2. BĂNG CHẠY ============ */
+.bts-bang {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 32px;
+  overflow: hidden;
+  border: 1px solid var(--bts-vien);
+  border-radius: 16px;
+  background: var(--bts-mat);
+}
+.bts-bang-nhan {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 100%;
+  padding: 0 12px 0 14px;
+  border-right: 1px solid var(--bts-vien);
+  background: var(--bts-mat-2);
+  color: var(--bts-chu-phu);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.bts-bang-khung {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, rgb(0 0 0) 20px, rgb(0 0 0) calc(100% - 28px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, rgb(0 0 0) 20px, rgb(0 0 0) calc(100% - 28px), transparent 100%);
+}
+.bts-bang-day {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  height: 100%;
+  padding-left: 20px;
+  white-space: nowrap;
+  will-change: transform;
+}
+.bts-tin {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-right: 32px;
+  color: var(--bts-chu);
+  font: 500 12px/1 var(--bts-fm);
+}
+.bts-tin .bts-phu {
+  color: var(--bts-chu-phu);
+  font-weight: 400;
+}
+.bts-mt {
+  display: inline-block;
+  flex: none;
+  width: 9px;
+  height: 9px;
+}
+.bts-tin-len .bts-mt {
+  color: var(--bts-la);
+}
+.bts-tin-xuong .bts-mt {
+  color: var(--bts-do);
+}
+.bts-tin-cham .bts-mt {
+  color: var(--bts-duong);
+}
+
+/* ============ 3. BỐN Ô SỐ ============ */
+.bts-hang-so {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.bts-o-so {
+  flex-direction: row;
+  align-items: stretch;
+  gap: 12px;
+  min-height: 96px;
+  padding: 11px 14px;
+}
+.bts-o-trai {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+}
+.bts-o-nhan {
+  color: var(--bts-chu-phu);
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.bts-o-gia {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  margin: 3px 0;
+}
+.bts-so-lan {
+  display: inline-flex;
+  align-items: flex-end;
+  font-size: 34px;
+  font-weight: 620;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.bts-cs {
+  display: block;
+  height: 1em;
+  overflow: hidden;
+}
+.bts-dai {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+.bts-so-lan--chay .bts-dai {
+  transition: transform 0.42s var(--bts-em);
+}
+.bts-dai span,
+.bts-kt {
+  display: block;
+  height: 1em;
+  text-align: center;
+  line-height: 1;
+}
+.bts-o-duoi {
+  padding-bottom: 3px;
+  color: var(--bts-chu-phu);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.bts-o-lech {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 19px;
+  color: var(--bts-chu-mo);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.bts-lech {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 10px;
+  background: var(--bts-mat-2);
+  color: var(--bts-chu-phu);
+  font: 600 12px/1 var(--bts-fm);
+  font-variant-numeric: tabular-nums;
+}
+.bts-lech[data-h='len'] {
+  background: var(--bts-la-nhat);
+  color: var(--bts-la);
+}
+.bts-lech[data-h='xuong'] {
+  background: var(--bts-do-nhat);
+  color: var(--bts-do);
+}
+.bts-lech .bts-mt {
+  width: 8px;
+  height: 8px;
+}
+.bts-o-tia {
+  position: relative;
+  flex: 1 1 56px;
+  min-width: 56px;
+}
+.bts-o-tia canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.bts-o-tia-ghi {
+  position: absolute;
+  top: -2px;
+  right: 0;
+  color: var(--bts-chu-mo);
+  font-size: 12px;
+}
+
+/* ============ ĐÁP ỨNG theo bề rộng CỦA KHUNG ============ */
+@container bts (min-width: 620px) {
+  .bts-hang-so {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container bts (min-width: 980px) {
+  .bts-hang-so[data-so-o='4'] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .bts-hang-so[data-so-o='3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@container bts (min-width: 620px) and (max-width: 1229px) {
+  .bts-o-lech-chu {
+    display: none; /* khung hẹp: chip chênh đủ nói "so với 10 phút trước" (title), nhường chỗ cho đường tia */
+  }
+}
+@container bts (max-width: 619px) {
+  .bts-dau h1 {
+    font-size: 23px;
+  }
+  .bts-dau-phai {
+    justify-content: space-between;
+    width: 100%;
+    margin-left: 0;
+  }
+  .bts-bang-nhan {
+    display: none;
+  }
+  .bts-o-trai {
+    width: 150px;
+  }
+  .bts-o-tia {
+    flex-basis: 96px;
+  }
+}
+.bts-san[data-it-dong='1'] *,
+.bts-san[data-it-dong='1'] *::before,
+.bts-san[data-it-dong='1'] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bts-san *,
+  .bts-san *::before,
+  .bts-san *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
