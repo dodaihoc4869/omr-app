@@ -36,6 +36,8 @@ import { SO_CAU_MAC_DINH } from '../lib/cau-hinh-chua'
 import ThanhSoCauChua from '../components/ThanhSoCauChua'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import type { OBang as OBangMayChieu } from '../lib/html-may-chieu'
+import { khoaEmCau, nhanLichSuCau, qidMayChuCuaIdCau, type CapEmCau, type LichSuCauEm, type NhanLichSuCau } from '../lib/lich-su-cau-len-bang'
+import { layLichSuCau } from '../lib/lich-su-cau-len-bang-lenh'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
 import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChua, type DongPhanCong, type KetQuaPhanCong } from '../lib/phan-cong'
 import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
@@ -60,6 +62,19 @@ import { gioDayDu } from '../lib/ngay-gio-24'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
+
+/** "EM ĐÃ LÀM CÂU NÀY CHƯA" (thầy lệnh 21/09 16:4x) — nhãn cùng nội dung với thẻ tên trên tờ chiếu, để thầy biết TRƯỚC khi chiếu. Xanh = đúng, cam = sai (không đỏ), xám = còn lại. Không có dữ liệu ⇒ không hiện. */
+function NhanLichSuCauEm({ nhan }: { nhan: NhanLichSuCau | null }) {
+  if (!nhan) return null
+  const tone = nhan.kieu === 'dung' ? 'xanh' : nhan.kieu === 'sai' ? 'cam' : 'xam'
+  return (
+    <span className="flex items-center flex-wrap" data-lich-su-cau={nhan.kieu} style={{ gap: 4, marginTop: 4 }}>
+      <Nhan tone={tone}>{nhan.chu}</Nhan>
+      {nhan.phu && <span style={NHAN_NHO}>{nhan.phu}</span>}
+      {nhan.lenBang && <span style={NHAN_NHO}>{nhan.lenBang}</span>}
+    </span>
+  )
+}
 const TIEU_DE_MUC: React.CSSProperties = { fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', fontWeight: 700, color: 'var(--muc)' }
 
 /** THẺ BÀI TẬP VỀ NHÀ của ĐÚNG câu em được phân lên bảng (thầy chốt 14/09).
@@ -308,6 +323,8 @@ export default function GoiLenBangScreen() {
   /** Lịch sử lên bảng thật từ máy chủ. `null` = chưa đọc được (máy chủ bản cũ
    * chưa có lệnh, hoặc mất mạng) ⇒ màn phải nói thật là chưa có. */
   const [lichSu, setLichSu] = useState<{ soNgay: number; theoEm: Record<string, LichSuLenBangEm> } | null>(null)
+  /** "Em đã làm câu này chưa": lịch sử MỌI ngày của từng cặp (em, câu) trên bảng phân công (`/gv/lich-su-cau-cua-em`). `null` = chưa có / không đọc được ⇒ không nhãn, không bịa. */
+  const [lichSuCauEm, setLichSuCauEm] = useState<Map<string, LichSuCauEm> | null>(null)
   const [daCopy, setDaCopy] = useState(false)
   const [xemCau, setXemCau] = useState('')
   const [dangCham, setDangCham] = useState('')
@@ -1014,6 +1031,37 @@ export default function GoiLenBangScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tuDongXep, tiepBuoi, cauVaoXep])
 
+  // ── "EM ĐÃ LÀM CÂU NÀY CHƯA" (thầy lệnh 21/09 16:4x) ─────────────────────────────────────────────────────────────
+  // Mọi cặp (em, câu) đang có trên bảng (buổi chữa xếp sẵn + bảng phân công); mã câu theo quy ước máy chủ. Quét HẾT lịch sử (lệnh chỉ-đọc `/gv/lich-su-cau-cua-em`, không áp mốc hiển thị 12:00).
+  const capLichSuCau = useMemo(() => {
+    const cap: CapEmCau[] = []
+    const them = (sbd: string, idCau: string) => {
+      const qid = qidMayChuCuaIdCau(idCau)
+      if (qid) cap.push({ sbd, qid })
+    }
+    for (const d of kqBuoi?.dong ?? []) if (d.tang === 'len_bang' && d.em) them(d.em.sbd, d.cau.id)
+    for (const p of kq?.phanCong ?? []) them(p.sbd, p.cau.id)
+    return cap
+  }, [kqBuoi, kq])
+  const khoaCapLichSuCau = useMemo(() => [...new Set(capLichSuCau.map((c) => khoaEmCau(c.sbd, c.qid)))].sort().join(','), [capLichSuCau])
+  useEffect(() => {
+    if (!khoaCapLichSuCau) {
+      setLichSuCauEm(null)
+      return
+    }
+    let huy = false
+    void layLichSuCau(capLichSuCau)
+      .then((m) => { if (!huy) setLichSuCauEm(m) })
+      .catch(() => { if (!huy) setLichSuCauEm(null) })
+    return () => { huy = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [khoaCapLichSuCau])
+  /** Nhãn của một cặp (em, câu) trên màn thầy; chưa có dữ liệu ⇒ null. */
+  const nhanLichSuCua = (sbd: string, idCau: string): NhanLichSuCau | null => {
+    const qid = qidMayChuCuaIdCau(idCau)
+    return qid && lichSuCauEm ? nhanLichSuCau(lichSuCauEm.get(khoaEmCau(sbd, qid))) : null
+  }
+
   // ── BUỔI CHỮA XẾP SẴN (B6) ─────────────────────────────────────────────────────────────────────────────
   /** "Mở buổi chữa này": chưa mở ca nào thì mở ca gần nhất của lớp (không có ca thì nói thật), rồi điền sẵn câu máy đề xuất và xếp giờ như nút "Xếp giờ & phân công". */
   const moBuoiDeXuat = async () => {
@@ -1169,6 +1217,9 @@ export default function GoiLenBangScreen() {
         return
       }
 
+      // "EM ĐÃ LÀM CÂU NÀY CHƯA": quét HẾT lịch sử của từng cặp (em, câu) MỘT lần, chạy song song với thần thú. Không gọi được ⇒ tờ không có nhãn (không bịa).
+      const lichSuTheoCap = layLichSuCau(dsO.flatMap((o) => (o.qid && qidMayChuCuaIdCau(o.qid) ? [{ sbd: o.sbd, qid: qidMayChuCuaIdCau(o.qid)! }] : []))).catch(() => null)
+
       // THẦN THÚ CỦA TỪNG EM (có timeout an toàn)
       try {
         const { thanThuV2ChoToChieu } = await import('../lib/anh-than-thu-v2')
@@ -1181,6 +1232,15 @@ export default function GoiLenBangScreen() {
         }
       } catch {
         /* không lấy được thú thì thôi — tờ chiếu vẫn phải mở */
+      }
+
+      const mapLichSu = await lichSuTheoCap
+      if (mapLichSu) {
+        for (const o of dsO) {
+          const qid = o.qid ? qidMayChuCuaIdCau(o.qid) : null
+          const nhan = qid ? nhanLichSuCau(mapLichSu.get(khoaEmCau(o.sbd, qid))) : null
+          if (nhan) o.lichSuCau = nhan
+        }
       }
 
       // CÂU CHỈ ĐỌC ĐÁP ÁN đi thành trang đáp án nối sau các đợt
@@ -2082,6 +2142,7 @@ export default function GoiLenBangScreen() {
                           {d.em.btvn.soDaLam}/{d.em.btvn.soCauGiao} · Đ {d.em.btvn.soDung} · S {d.em.btvn.soSai} · ? {d.em.btvn.soChuaLam}
                         </span>
                       )}
+                      {d.em && <NhanLichSuCauEm nhan={nhanLichSuCua(d.em.sbd, d.cau.id)} />}
                       <span style={{ ...NHAN_NHO, ...SO, marginLeft: 'auto' }}>{Math.round(d.giay / 60)}′</span>
                       <span className="truncate" style={{ ...NHAN_NHO, flex: '0 1 auto' }}>{d.viSao}</span>
                       {/* ĐẠT / KHÔNG ĐẠT ngay trên bảng thầy đang cầm — ghi ĐÚNG lệnh `ghiLenBang`
@@ -2359,6 +2420,7 @@ export default function GoiLenBangScreen() {
                             {p.muc === 3 && <Nhan tone="cam">chưa làm câu này</Nhan>}
                             {p.cau.mucDo && <Nhan tone="xam">{TEN_MUC_NHAM[p.cau.mucDo]}</Nhan>}
                           </span>
+                          <NhanLichSuCauEm nhan={nhanLichSuCua(p.sbd, p.cau.id)} />
                         </button>
                         <button
                           type="button"
