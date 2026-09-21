@@ -132,3 +132,22 @@ describe('CỤM 4 · Ngày giờ một kiểu (hàng 14) — giờ VN, 24 giờ,
     expect(chuHienRa('src/screens/NganHangDeScreen.tsx')).toContain('ngayDayDu(s.ngayNap)')
   })
 })
+
+describe('Bộ soi G04 · thanh tiến độ giữ hoạt ảnh BỀ RỘNG (Boss dặn 21/09)', () => {
+  it('ModalXacNhanNop: thanh có style width dùng transition-[width,background-color], KHÔNG transition-colors (mất hoạt ảnh bề rộng)', () => {
+    const c = chuHienRa('src/components/ModalXacNhanNop.tsx')
+    expect(c).toContain('transition-[width,background-color] duration-300')
+    expect(c).not.toContain('transition-colors duration-300')
+  })
+
+  it('mọi tệp làn thầy đã đổi transition-all: không có dòng transition-colors nào đứng ngay trên một style width (thanh bề rộng)', () => {
+    for (const f of ['src/components/DesignSystem.tsx', 'src/components/NhomCaThuGon.tsx', 'src/components/NutQuayLai.tsx', 'src/screens/CauHoiScreen.tsx', 'src/screens/ClassListScreen.tsx', 'src/screens/LichSuCaScreen.tsx', 'src/screens/ExamSetupScreen.tsx', 'src/screens/GoiLenBangScreen.tsx', 'src/components/HoSoEmView.tsx', 'src/components/ModalXacNhanNop.tsx', 'src/screens/PhanCongScreen.tsx', 'src/screens/HocSinhScreen.tsx']) {
+      const dong = doc(f).split('\n')
+      dong.forEach((l, i) => {
+        if (!/transition-colors/.test(l)) return
+        const gan = dong.slice(i, i + 8).join('\n')
+        expect(/style=\{\{\s*width\s*:/.test(gan), `${f}:${i + 1} có transition-colors ngay trên thanh style width`).toBe(false)
+      })
+    }
+  })
+})
