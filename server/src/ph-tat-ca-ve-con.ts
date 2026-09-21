@@ -6,7 +6,7 @@
 // (tổng quan, nhịp học, dạng vấp, bậc dạng, lịch ôn, tiến bộ), và ở `homNay.cau[]` chỉ còn `{luc, nguon, che, giay?}` (không đề, không đáp án, không đúng/sai, không tên dạng). Điện thoại phụ huynh không được thành đường lộ đáp án cho con.
 // Ca chưa công bố ở `caGanNhat`: chỉ `congBo` + `soEmDaNop/soEmDaVao` (không điểm, số câu, phần, so với lần trước); `tienBo.diem` chỉ gồm ca ĐÃ công bố.
 // Hồ sơ nắm kiến thức (bậc, lịch ôn) ở đây được PHÁT LẠI từ sổ học ĐÃ BỎ sự kiện bị che (bằng chính `phatLaiSuKien` của hồ sơ) — bảng `nam_kt_*` dựng từ toàn bộ sổ nên đếm câu sai của ca chưa công bố; đọc thẳng chúng là lộ điểm.
-// Xác thực: `sbdCuaPhuHuynh` chỉ nhận token (như `/ph/giao-them`). Việc DUY NHẤT có ghi D1 là dòng đếm truy cập `ph_truy_cap` của chính hàm xác thực đó (không phải của tệp này).
+// Xác thực: `sbdCuaPhuHuynh` nhận token HOẶC SBD trần (hằng `CHI_NHAN_TOKEN`; như `/ph/giao-them` sau da5b5b5). Việc DUY NHẤT có ghi D1 là dòng đếm truy cập `ph_truy_cap` của chính hàm xác thực đó (không phải của tệp này).
 import type { Env } from './kieu'
 import { laDatNgay } from '../../src/lib/dat-nhiem-vu-ngay'
 import { GIAO_THEM } from '../../src/lib/giao-them-cho-con'
@@ -27,6 +27,9 @@ import { hangChamCuaEm } from './thi-dua-hom-nay'
 type Row = Record<string, unknown>
 
 // ------------------------------------------------------------------ hằng số (test khoá từng con số) ------------------------------------------------------------------
+/** Chỉ nhận TOKEN liên kết riêng? `false` (hiện nay): có `pass` ⇒ danh tính từ token và BỎ `sbd` trong thân; không có ⇒ nhận SBD trần như `/parent-news`, `/mom`, `/ph/giao-them` (sổ `ph_truy_cap` thật 21/09: 100 % phụ huynh vào bằng SBD trần, chưa ai có token — chỉ-token thì không ai mở được bảng).
+ *  Siết lại khi thầy phát liên kết riêng: đổi thành `true` (test khoá cả hai hướng cách nối `chiToken`). Token sai/hết hạn KHÔNG bao giờ rơi xuống SBD trần. */
+export const CHI_NHAN_TOKEN = false
 export const SO_NGAY_NHIP = 14
 export const TOI_DA_DIEM_TIEN_BO = 8
 export const TOI_DA_DANG_TIEN_BO_NHAT = 3
@@ -221,7 +224,7 @@ async function docBtvnVaMom(hoi: ReturnType<typeof boHoi>['hoi'], sbd: string, d
 // ------------------------------------------------------------------ LỆNH ------------------------------------------------------------------
 export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: number = Date.now()): Promise<Row> {
   // Code 3 thêm 'ph-tat-ca-ve-con' vào DuongPh khi định tuyến (ph-truy-cap.ts không sửa ở đây): tạm dùng 'ph-ke-hoach'.
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-ke-hoach', { chiToken: true })
+  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-ke-hoach', { chiToken: CHI_NHAN_TOKEN })
   const { hoi } = boHoi(env)
   const homNay = ngayVn(nowMs)
   const homQua = themNgay(homNay, -1)
@@ -597,7 +600,7 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
  */
 export async function phChiTietCauVeCon(env: Env, b: Record<string, unknown>, nowMs: number = Date.now()): Promise<Row> {
   // Code 3 thêm 'ph-chi-tiet-cau-ve-con' vào DuongPh khi định tuyến: tạm dùng 'ph-ke-hoach'.
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-ke-hoach', { chiToken: true })
+  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-ke-hoach', { chiToken: CHI_NHAN_TOKEN })
   const qid = chuoi(b.qid)
   if (!qid || qid.length > 200) return { ok: false, error: 'Thiếu mã câu.' }
   const { hoi } = boHoi(env)

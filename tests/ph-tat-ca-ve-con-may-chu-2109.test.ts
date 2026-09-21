@@ -9,7 +9,7 @@ import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { docCauHinhTangDoc } from '../server/src/bo-nao-doc'
 import { chuGameTrong } from '../server/src/chu-game'
 import {
-  cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
+  CHI_NHAN_TOKEN, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
   DANG_VAP_TI_LE_DUNG_TOI_DA, DANG_VAP_TOI_THIEU_LUOT, PHIEN_CACH_TOI_DA_PHUT, TOI_DA_CAU_HOM_NAY, TOI_THIEU_LUOT_GIO_THUONG_HOC,
 } from '../server/src/ph-tat-ca-ve-con'
 import type { Env } from '../server/src/kieu'
@@ -83,15 +83,34 @@ const moiKhoa = (v: unknown, ra: string[] = []): string[] => {
 const BANG_DOI_CHIEU = ['su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'luot', 'chi_tiet_cau', 'ph_giao_them', 'mom_bai', 'btvn_em', 'student_notice', 'ai_dieu_chinh', 'ke_hoach_ngay']
 
 // ================================================================== XÁC THỰC ==================================================================
-describe('xác thực', () => {
-  it('token sai / hết hạn / không token (SBD trần) / token rỗng ⇒ lỗi, không đọc gì', async () => {
+describe('xác thực — token HOẶC SBD trần (sổ ph_truy_cap thật: 100 % phụ huynh vào bằng SBD trần)', () => {
+  it('hằng CHI_NHAN_TOKEN là false (để MỘT chỗ siết lại khi thầy phát liên kết riêng)', () => {
+    expect(CHI_NHAN_TOKEN).toBe(false)
+  })
+  it('token sai / hết hạn ⇒ lỗi và KHÔNG rơi xuống SBD trần (kể cả khi thân có sbd hợp lệ)', async () => {
     const { d } = dung()
     const pass = await capPass(d)
-    await expect(phTatCaVeCon(d.env, { pass: `${pass}x` }, NOW)).rejects.toThrow(/không hợp lệ/)
-    await expect(phTatCaVeCon(d.env, { pass: 'abc.def' }, NOW)).rejects.toThrow(/không hợp lệ/)
-    await expect(phTatCaVeCon(d.env, { sbd: 'S1' }, NOW)).rejects.toThrow(/liên kết riêng/)
-    await expect(phTatCaVeCon(d.env, { pass: '   ', sbd: 'S1' }, NOW)).rejects.toThrow(/liên kết riêng/)
-    await expect(phTatCaVeCon(d.env, {}, NOW)).rejects.toThrow(/liên kết riêng/)
+    await expect(phTatCaVeCon(d.env, { pass: `${pass}x`, sbd: 'S1' }, NOW)).rejects.toThrow(/không hợp lệ/)
+    await expect(phTatCaVeCon(d.env, { pass: 'abc.def', sbd: 'S1' }, NOW)).rejects.toThrow(/không hợp lệ/)
+  })
+  it('SBD trần của con thật ⇒ MỞ ĐƯỢC (hoTen của đúng em); token rỗng/khoảng trắng coi như không token', async () => {
+    const { d } = dung()
+    themCa(d, 'CA-S1', 'ngay'); themLuot(d, 'CA-S1', 'S1', { tong: 8.25 })
+    const r = (await phTatCaVeCon(d.env, { sbd: 'S1' }, NOW)) as Record<string, any>
+    expect(r).toMatchObject({ ok: true, hoTen: 'Nguyễn Thu Hà' })
+    expect(r.caGanNhat.ketQua.tong).toBe(8.25)
+    expect(((await phTatCaVeCon(d.env, { pass: '   ', sbd: 'S2' }, NOW)) as Record<string, any>).hoTen).toBe('Trần Bình')
+  })
+  it('SBD lạ / rỗng / quá dài / không có gì ⇒ từ chối, không đọc dữ liệu', async () => {
+    const { d } = dung()
+    for (const b of [{ sbd: 'KHONG-CO' }, { sbd: '' }, { sbd: 'X'.repeat(41) }, {}]) await expect(phTatCaVeCon(d.env, b, NOW)).rejects.toThrow(/Không tìm thấy số báo danh/)
+  })
+  it('SBD trần: dòng đếm truy cập ghi kiểu sbd_tran; token ghi kiểu token', async () => {
+    const { d } = dung()
+    await phTatCaVeCon(d.env, { sbd: 'S1' }, NOW)
+    await phTatCaVeCon(d.env, { pass: await capPass(d) }, NOW)
+    const kieu = (d.sql.prepare('SELECT kieu FROM ph_truy_cap WHERE sbd = ? ORDER BY kieu').all('S1') as { kieu: string }[]).map((x) => x.kieu)
+    expect(kieu).toEqual(['sbd_tran', 'token'])
   })
   it('DANH TÍNH lấy từ token: `sbd` trong thân bị bỏ qua (token của S1 không đọc được S2)', async () => {
     const { d } = dung()
@@ -836,7 +855,9 @@ describe('phChiTietCauVeCon — lời giải một câu, CÙNG luật che', () =
   it('xác thực: token sai / không token ⇒ lỗi; thiếu qid ⇒ ok:false', async () => {
     const { d } = dung()
     await expect(phChiTietCauVeCon(d.env, { pass: 'x.y', qid: 'Q' }, NOW)).rejects.toThrow(/không hợp lệ/)
-    await expect(phChiTietCauVeCon(d.env, { sbd: 'S1', qid: 'Q' }, NOW)).rejects.toThrow(/liên kết riêng/)
+    await expect(phChiTietCauVeCon(d.env, { pass: 'x.y', sbd: 'S1', qid: 'Q' }, NOW)).rejects.toThrow(/không hợp lệ/) // token sai không rơi xuống SBD trần
+    await expect(phChiTietCauVeCon(d.env, { sbd: 'KHONG-CO', qid: 'Q' }, NOW)).rejects.toThrow(/Không tìm thấy số báo danh/)
+    expect((await phChiTietCauVeCon(d.env, { sbd: 'S1', qid: 'Q' }, NOW)).ok).toBe(false) // SBD trần được nhận; câu con chưa làm thì từ chối vì lý do khác
     expect((await goi(d, '')).ok).toBe(false)
   })
   it('câu con CHƯA làm ⇒ từ chối (không thành đường đọc kho tuỳ ý)', async () => {
