@@ -240,7 +240,8 @@ describe('THẬT: BTVN nâng đỡ — chốt bộ + thích nghi chặng CHƯA M
     const goc = dung()
     HOSO_MANH(goc)
     const m0 = await moChot(goc)
-    const c0 = boCuaEm(goc).filter((x) => x.chang === 0).map((x) => x.qid)
+    const bo0 = boCuaEm(goc) // bộ NGAY SAU KHI CHỐT (trước khi nộp chặng): lượt mở bài của bảng có điều chỉnh phải ra đúng bộ này
+    const c0 = bo0.filter((x) => x.chang === 0).map((x) => x.qid)
     // Làm SAI hết chặng 0: nếu thích nghi chạy ngầm (dù bóng) thì chặng kế sẽ đổi — phép thử nhạy hơn làm đúng.
     const SAI = (q: string) => (/-II-/.test(q) ? 'SDSD' : /-III-/.test(q) ? '1.5' : 'B')
     const n0 = await nopChang(goc, 0, Object.fromEntries(c0.map((q) => [q, SAI(q)])))
@@ -251,7 +252,7 @@ describe('THẬT: BTVN nâng đỡ — chốt bộ + thích nghi chặng CHƯA M
       ai(d, 'S1', HOM_NAY, { nhip: { lech: 3, khoiDong: 3 }, dang: [{ ma: 'DA-1', hanhDong: 'tam_nghi', lyDo: 'x' }] })
       const m = await moChot(d)
       expect(bo(m)).toBe(bo(m0))
-      expect(boCuaEm(d)).toEqual(boCuaEm(goc))
+      expect(boCuaEm(d)).toEqual(bo0)
       const n = await nopChang(d, 0, Object.fromEntries(c0.map((q) => [q, SAI(q)])))
       expect(bo(n)).toBe(bo(n0))
       expect(boCuaEm(d)).toEqual(boCuaEm(goc)) // không thích nghi khi bóng

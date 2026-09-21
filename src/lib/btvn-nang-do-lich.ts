@@ -1,7 +1,8 @@
 // BTVN "NÂNG ĐỠ" — LỊCH CHẶNG THEO GIỜ + SỨC CHỨA (hàm THUẦN, Code 1, 21/09/2026). Đặc tả: `prompt-btvn-nang-do.md` CẬP NHẬT 2.
 //
 // Chặng xếp theo PHIÊN HỌC chứ không cứng theo ngày. Mọi giờ tính theo giờ Việt Nam (UTC+7, không có giờ mùa hè) BẰNG SỐ HỌC: không Intl, không đồng hồ, không ngẫu nhiên ⇒ cùng đầu vào, cùng lịch.
-//   • HẠN DÀI (tải mỗi ngày ≤ ngân sách × 1,3 và hạn > 48 giờ): một chặng/ngày; chặng 0 mở lúc chốt, chặng k mở 00:00 giờ VN của ngày thứ k (Y HỆT `moLucChang` cũ); "đúng nhịp" = xong trước 23:59 của ngày đó.
+//   • HẠN DÀI (tải mỗi ngày ≤ ngân sách × 1,3 và hạn > 48 giờ): một chặng mỗi BUỔI TỐI; chặng 0 mở lúc chốt, chặng k mở 00:00 giờ VN của ngày thứ k (Y HỆT `moLucChang` cũ khi hạn 23:59); "đúng nhịp" = xong trước 23:59 của ngày đó.
+//     BẢN 1.3 (hạn rơi buổi trưa/sáng — bài thật 12:00): số buổi = số BUỔI TỐI (cửa sổ học 20:00–23:59) còn TRỌN trước hạn; ngày hạn mà cửa sổ học nằm sau giờ hạn thì KHÔNG tính ⇒ chặng cuối mở chậm nhất tối hôm trước.
 //   • HẠN NGẮN (tải mỗi ngày > ngân sách × 1,3 HOẶC hạn ≤ 48 giờ): chia THEO GIỜ trong cửa sổ học (mặc định 20:00–23:59): chặng ≤ ~10 câu, hai chặng cách nhau ≥ 40 phút, dàn ĐỀU trên thời gian còn lại
 //     (ví dụ 20:00 · 21:20 · 22:40). Chặng 0 luôn mở NGAY lúc chốt. Chặng cuối phải mở sớm hơn hạn ≥ 1,5 × thời gian làm; thiếu giờ ⇒ BỎ giãn cách (DEADLINE THẮNG). Không chặng nào mở 00:00–05:59; còn cửa sổ sau thì không mở khuya (23:15–23:59) mà dời sang đầu cửa sổ kế.
 // Lịch chỉ nói "sớm nhất chặng mở lúc nào"; ai vào muộn vẫn làm được (chặng k mở khi chặng k−1 xong VÀ tới giờ — `trangThaiCacChang`), không bao giờ nhốt em.
@@ -74,7 +75,7 @@ export interface ChangLich {
 
 export interface SucChua {
   cheDo: CheDoLich
-  /** Số ngày (lịch VN) từ ngày chốt tới ngày hạn, ≥ 1. */
+  /** Số BUỔI TỐI còn trọn trước hạn tính từ ngày chốt (hạn 23:59 = số ngày lịch từ chốt tới hạn), ≥ 1 — `soNgayToiHan`. */
   soNgay: number
   /** Số chặng tối đa xếp được tới hạn (≥ 1): hạn dài = số ngày; hạn ngắn = số phiên trong các cửa sổ học. */
   soPhien: number
@@ -139,11 +140,17 @@ function giayHopLe(g: number): number {
   return Number.isFinite(g) && g >= 5 && g <= 900 ? g : LICH_CHANG.GIAY_MAC_DINH
 }
 
-/** Số ngày lịch VN từ ngày chốt tới ngày hạn (hạn đúng 00:00 thì ngày hạn là ngày liền trước). ≥ 1. */
-export function soNgayToiHan(chotLuc: string, hanNop: string): number {
+/**
+ * Số BUỔI TỐI còn TRỌN trước hạn, tính từ ngày chốt (BẢN 1.3): mỗi ngày lịch VN có một buổi tối (cửa sổ học `cuaSo`, mặc định 20:00–23:59); buổi ấy tính khi cửa sổ KẾT THÚC không muộn hơn hạn.
+ * Hạn 23:59 (mặc định của ô hạn) hoặc 00:00 ngày sau ⇒ ngày hạn tính (Y HỆT bản cũ = số ngày lịch từ ngày chốt tới ngày hạn); hạn 12:00 ngày D ⇒ ngày D KHÔNG tính (cửa sổ D nằm sau hạn),
+ * buổi tối cuối cùng là D−1 nên chặng cuối mở chậm nhất tối hôm trước. Ngày chốt luôn tính (chặng 0 mở ngay lúc chốt). ≥ 1.
+ */
+export function soNgayToiHan(chotLuc: string, hanNop: string, cuaSo?: CuaSoHoc): number {
   const c = docThoiDiem(chotLuc, 'chotLuc')
   const h = docThoiDiem(hanNop, 'hanNop')
-  return Math.max(1, chiSoNgayVn(h - 1) - chiSoNgayVn(c) + 1)
+  const { den } = cuaSoHieuLuc(cuaSo)
+  const ngayCuoi = Math.floor((h + LECH_VN - den * MS_PHUT) / MS_NGAY) // ngày lớn nhất mà cửa sổ học kết thúc ≤ hạn
+  return Math.max(1, ngayCuoi - chiSoNgayVn(c) + 1)
 }
 
 // ══════════════════════════════ CHẾ ĐỘ ══════════════════════════════
@@ -153,12 +160,12 @@ const nganSachRong = (cauMoiNgay: number, onLai?: number): number => Math.max(1,
 /**
  * HẠN NGẮN hay DÀI. Ngắn khi hạn ≤ 48 giờ kể từ lúc chốt, hoặc tải mỗi ngày (tổng câu / số ngày) > ngân sách × 1,3. Không biết tổng câu ⇒ chỉ xét theo giờ.
  */
-export function cheDoLich(p: Pick<DauVaoLich, 'chotLuc' | 'hanNop' | 'cauMoiNgay' | 'onLaiMoiNgay' | 'soCauTungChang' | 'tongCau'>): CheDoLich {
+export function cheDoLich(p: Pick<DauVaoLich, 'chotLuc' | 'hanNop' | 'cauMoiNgay' | 'onLaiMoiNgay' | 'soCauTungChang' | 'tongCau'> & { cuaSo?: CuaSoHoc }): CheDoLich {
   const c = docThoiDiem(p.chotLuc, 'chotLuc')
   const h = docThoiDiem(p.hanNop, 'hanNop')
   if (h - c <= LICH_CHANG.NGUONG_HAN_NGAN_GIO * MS_GIO) return 'ngan'
   const tong = p.soCauTungChang ? p.soCauTungChang.reduce((a, b) => a + Math.max(0, b), 0) : (p.tongCau ?? 0)
-  if (tong > 0 && tong / soNgayToiHan(p.chotLuc, p.hanNop) > nganSachRong(p.cauMoiNgay, p.onLaiMoiNgay) * LICH_CHANG.HE_SO_TAI_NGAN) return 'ngan'
+  if (tong > 0 && tong / soNgayToiHan(p.chotLuc, p.hanNop, p.cuaSo) > nganSachRong(p.cauMoiNgay, p.onLaiMoiNgay) * LICH_CHANG.HE_SO_TAI_NGAN) return 'ngan'
   return 'dai'
 }
 
@@ -197,7 +204,7 @@ function duTruCuoiCuaSo(thoiGianLam: number): number {
 export function sucChua(p: Pick<DauVaoLich, 'chotLuc' | 'hanNop' | 'cauMoiNgay' | 'onLaiMoiNgay' | 'giayMoiCau' | 'cuaSo'>, cheDo?: CheDoLich): SucChua {
   const m0 = docThoiDiem(p.chotLuc, 'chotLuc')
   const han = docThoiDiem(p.hanNop, 'hanNop')
-  const soNgay = soNgayToiHan(p.chotLuc, p.hanNop)
+  const soNgay = soNgayToiHan(p.chotLuc, p.hanNop, p.cuaSo)
   const cd = cheDo ?? (han - m0 <= LICH_CHANG.NGUONG_HAN_NGAN_GIO * MS_GIO ? 'ngan' : 'dai')
   const rong = nganSachRong(p.cauMoiNgay, p.onLaiMoiNgay)
   if (cd === 'dai') return { cheDo: 'dai', soNgay, soPhien: soNgay, cauMoiPhien: rong, soCauToiDa: soNgay * rong }
@@ -256,6 +263,40 @@ export function mocMoMuonNhat(han: number, thoiGianConLai: number): number {
   return p >= LICH_CHANG.GIO_CAM_MO_TU * 60 && p < LICH_CHANG.GIO_CAM_MO_DEN * 60 ? dauNgayVn(chiSoNgayVn(t)) - MS_PHUT : t
 }
 
+// ══════════════════════════════ LỊCH HẠN DÀI ══════════════════════════════
+
+/** Mốc mở (ms) của các chặng 1…n−1 ở HẠN DÀI (chỉ số 0 = chặng 0 để trống, `m0` lúc chốt): chặng k mở 00:00 giờ VN của ngày (chốt + min(k, số buổi tối − 1)). Trả đủ `SO_CHANG_TOI_DA` phần tử để dùng cho mọi n. */
+const SO_CHANG_TOI_DA = 400
+function moLucDai(m0: number, chotLuc: string, hanNop: string, cuaSo?: CuaSoHoc): number[] {
+  const soNgay = soNgayToiHan(chotLuc, hanNop, cuaSo)
+  const ngayChot = chiSoNgayVn(m0)
+  const ra: number[] = [m0]
+  for (let k = 1; k < SO_CHANG_TOI_DA; k++) ra.push(dauNgayVn(ngayChot + Math.min(k, soNgay - 1)))
+  return ra
+}
+
+/**
+ * LỊCH ĐÃ LƯU của em chốt TRƯỚC bản 1.3 (hạn dài): chặng CHƯA MỞ được mở SỚM HƠN theo luật buổi tối, KHÔNG BAO GIỜ muộn hơn (không nhốt em). Tính lại khi ĐỌC, không cần migration.
+ *   · chặng đã mở (mốc đã lưu ≤ `nayMs`) giữ nguyên; chặng chưa mở: min(mốc đã lưu, mốc tính lại theo bản 1.3); mốc không giảm; không quá hạn − 1 phút;
+ *   · CHỈ dùng cho lịch hạn dài (`cheDo` đã lưu = 'dai') — lịch theo giờ (hạn ngắn) của bản 1.2 vốn đã cắt cửa sổ học theo hạn nên không đổi.
+ * Hạn 23:59 ⇒ mốc tính lại = mốc đã lưu ⇒ trả y hệt. Không đổi số chặng, hạn nộp, lõi, điểm; áp lại nhiều lần cho cùng kết quả.
+ */
+export function lichDaiSomHon(moLucCu: readonly string[], p: { chotLuc: string; hanNop: string; cuaSo?: CuaSoHoc }, nayMs: number): string[] {
+  const n = moLucCu.length
+  if (n === 0) return []
+  const cu = moLucCu.map((s, k) => docThoiDiem(s, `moLucCu[${k}]`))
+  const m0 = docThoiDiem(p.chotLuc, 'chotLuc')
+  const han = docThoiDiem(p.hanNop, 'hanNop')
+  if (n === 1 || han <= m0) return [...moLucCu]
+  const moi = moLucDai(m0, p.chotLuc, p.hanNop, p.cuaSo)
+  const ra: number[] = []
+  for (let k = 0; k < n; k++) {
+    if (cu[k] <= nayMs) ra.push(cu[k]) // đã mở: giữ nguyên
+    else ra.push(Math.max(k > 0 ? ra[k - 1] : m0, Math.min(cu[k], moi[k])))
+  }
+  return ra.map((t, k) => (t === cu[k] ? moLucCu[k] : iso(t)))
+}
+
 // ══════════════════════════════ XẾP LỊCH ══════════════════════════════
 
 /** "Đúng nhịp trước": 23:59 giờ VN của ngày có `t`; nếu `t` đã quá 23:59 thì 23:59 ngày kế; không quá hạn nộp. */
@@ -286,9 +327,8 @@ export function xepLichChang(p: DauVaoLich): ChangLich[] {
   const mo: number[] = new Array(n).fill(m0)
   if (han > m0 && n > 1) {
     if (cheDo === 'dai') {
-      const soNgay = soNgayToiHan(p.chotLuc, p.hanNop)
-      const ngayChot = chiSoNgayVn(m0)
-      for (let k = 1; k < n; k++) mo[k] = dauNgayVn(ngayChot + Math.min(k, soNgay - 1))
+      const dai = moLucDai(m0, p.chotLuc, p.hanNop, p.cuaSo)
+      for (let k = 1; k < n; k++) mo[k] = dai[Math.min(k, dai.length - 1)]
     } else {
       const giay = giayHopLe(p.giayMoiCau)
       const con: number[] = new Array(n + 1).fill(0) // con[k] = thời gian làm các chặng k..n−1 (ms)

@@ -44,7 +44,7 @@ describe('/btvn/xem-truoc — TRƯỚC khi giao (a)', () => {
     expect(r.ds.map((x: { sbd: string }) => x.sbd)).toEqual(['S1', 'S2', 'S3'])
     expect(r.ds[0]).toMatchObject({ sbd: 'S1', hoTen: 'Em 1', daChot: false, coHoSo: true })
     expect(r.ds[1]).toMatchObject({ sbd: 'S2', daChot: false, coHoSo: false })
-    expect(r.ds[0].nganSach).toMatchObject({ soNgay: 8 }) // bản 1.1: số NGÀY LỊCH VN từ ngày chốt tới ngày hạn (22/09 → 29/09 = 8), theo `soNgayToiHan` của Code 1
+    expect(r.ds[0].nganSach).toMatchObject({ soNgay: 7 }) // bản 1.3: số BUỔI TỐI còn trọn trước hạn (`soNgayToiHan` của Code 1): chốt 22/09 10:00, hạn 29/09 10:00 ⇒ 22…28/09 = 7 (tối 29/09 nằm sau hạn nên không tính)
     expect(r.ds[0].nganSach.cauMoiNgay).toBeGreaterThanOrEqual(8)
     expect(r.ds[0].tomTat).toMatchObject({ soLoi: r.soLoi })
     expect(r.chiTiet.sbd).toBe('S1')

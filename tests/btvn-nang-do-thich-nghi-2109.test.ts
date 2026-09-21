@@ -34,7 +34,7 @@ function datCo(d: D1That, giaTri: string | null) {
   if (giaTri !== null) d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('btvn_ca_nhan',?,'x')").run(giaTri)
 }
 async function chayChang0(d: D1That, dapAn: (q: string) => string, lon = false) {
-  await giao(d, lon ? { maDe: 'DE3', cau: [], hanNop: new Date(BAY_GIO.getTime() + 3 * 24 * 3_600_000).toISOString() } : {})
+  await giao(d, lon ? { maDe: 'DE3', cau: [], hanNop: `${new Date(BAY_GIO.getTime() + 3 * 24 * 3_600_000).toISOString().slice(0, 10)}T16:59:00.000Z` } : {}) // hạn 23:59 giờ VN (bản 1.3: hạn 10:00 thì tối ngày hạn không tính ⇒ ít chặng hơn; bài toán của test là hạn dài 4 chặng)
   await mo(d)
   const truoc = boCuaEm(d)
   const c0 = truoc.filter((x) => x.chang === 0).map((x) => x.qid)
