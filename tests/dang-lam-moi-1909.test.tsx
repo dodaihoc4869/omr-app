@@ -215,14 +215,5 @@ describe('StudentPortalScreen thật khi máy chủ đang làm mới', () => {
   })
 })
 
-describe('ParentPortalScreen thật khi máy chủ đang làm mới', () => {
-  it('nối đúng cờ vào Bảng nhiệm vụ của phụ huynh: "Con cứ để app mở…", giữ SBD đã đăng nhập', async () => {
-    window.history.replaceState(null, '', '/?vai=phuhuynh')
-    localStorage.setItem('omr_ph_sbd', '12121212')
-    phanHoi = () => ({ body: DONG_BANG })
-    render(<ParentPortalScreen />)
-    await waitFor(() => expect(DAI()).toBeTruthy())
-    expect(DAI()!.textContent).toContain('Con cứ để app mở, app tự vào lại.')
-    expect(localStorage.getItem('omr_ph_sbd')).toBe('12121212')
-  })
-})
+// ĐÃ GỠ 21/09 (app phụ huynh MỚI — màn chính + bảng "Mọi thứ về con", không còn Bảng nhiệm vụ / kế hoạch ngày): test "ParentPortalScreen thật khi máy chủ đang làm mới" — màn PH không còn gọi /hs/ke-hoach-ngay.
+// Cờ `dangLamMoi` vẫn được khoá ở hook + BangNhiemVu của học sinh (các test trên).

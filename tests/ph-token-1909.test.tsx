@@ -102,13 +102,13 @@ describe('ParentPortalScreen với liên kết ?ph=', () => {
   it('mở /ph?ph=P: xoá ?ph= khỏi địa chỉ, tên con lấy từ /ph/xac-dinh (không tra SBD trần), lệnh PH sau đó gửi pass', async () => {
     window.history.replaceState(null, '', '/?vai=phuhuynh&ph=PASS-B')
     const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
+    await waitFor(() => expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeTruthy())
     expect(location.search).toBe('?vai=phuhuynh')
     expect(goi[0]).toEqual({ url: 'https://may.test/ph/xac-dinh', body: { pass: 'PASS-B' } })
-    expect(container.textContent).toContain('Hôm nay của Minh') // tên thật từ /ph/xac-dinh (màn chỉ hiện tên gọi)
+    expect(container.textContent).toContain('Con: Nguyễn Văn Minh') // tên thật từ /ph/xac-dinh (màn chỉ hiện tên gọi)
     expect(container.textContent).not.toContain('TRẦN') // không phải tên tra bằng SBD trần
-    await waitFor(() => expect(goi.some((g) => g.url.endsWith('/parent-list'))).toBe(true))
-    for (const g of goi.filter((x) => /parent-news|parent-list|giao-them/.test(x.url))) expect(g.body.pass).toBe('PASS-B')
+    await waitFor(() => expect(goi.some((g) => g.url.endsWith('/ph/tat-ca-ve-con'))).toBe(true))
+    for (const g of goi.filter((x) => /tat-ca-ve-con|giao-them/.test(x.url))) expect(g.body.pass).toBe('PASS-B')
     expect(localStorage.getItem(KHOA_PH_PASS)).toBe('PASS-B')
   })
 

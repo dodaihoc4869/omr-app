@@ -156,56 +156,8 @@ describe('TheCaGanNhatCua — vẽ thẻ', () => {
   })
 })
 
-describe('Bảng nhiệm vụ phụ huynh — thẻ ở ĐẦU, bấm mở báo cáo của ĐÚNG ca đó', () => {
-  it('ca đã công bố: thẻ nằm NGAY DƯỚI khối tiến độ và TRÊN việc/lời Bộ não; bấm thẻ ⇒ mở hộp báo cáo của đúng ca (không còn tab Xem điểm)', async () => {
-    mocks.ls = { ok: true, items: [CA_CU, CA_MOI], chuaCongBo: [] } as any
-    localStorage.setItem('omr_ph_sbd', '12121212')
-    const { container } = render(<ParentPortalScreen />)
-    const the = await waitFor(() => {
-      const e = container.querySelector('[data-vung="the-ca-gan-nhat"]')
-      expect(e).toBeTruthy()
-      return e as HTMLElement
-    })
-    const tienDo = container.querySelector('[data-vung="tien-do"]')!
-    expect(tienDo.compareDocumentPosition(the) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy() // thẻ SAU tiến độ
-    const sauThe = container.querySelector('[data-vung="the-ca-gan-nhat"] ~ *')
-    expect(sauThe).toBeTruthy()
-    expect(the.textContent).toMatch(/7,5/)
-    expect(the.textContent).not.toMatch(CAM)
-    fireEvent.click(the.querySelector('button')!)
-    // Hộp báo cáo của CHÍNH ca ở thẻ (CA_MOI), chỉ để xem: không tab Xem điểm, không nút "Tạo bài luyện khắc phục"
-    await waitFor(() => expect(document.body.textContent).toContain(CA_MOI.tenCa))
-    expect(screen.queryByText('Báo Cáo Điểm Tất Cả Các Ca Kiểm Tra')).toBeNull()
-    expect(screen.queryByText(/Tạo bài luyện khắc phục cho con/)).toBeNull()
-  })
-
-  it('ca mới nhất CHƯA công bố (chuaCongBo[] của máy chủ) ⇒ thẻ trung tính, không điểm ở thẻ', async () => {
-    mocks.ls = { ok: true, items: [CA_CU, CA_MOI], chuaCongBo: [CHUA_LOP] } as any
-    localStorage.setItem('omr_ph_sbd', '12121212')
-    const { container } = render(<ParentPortalScreen />)
-    const the = await waitFor(() => {
-      const e = container.querySelector('[data-vung="the-ca-gan-nhat"]')
-      expect(e).toBeTruthy()
-      return e as HTMLElement
-    })
-    expect(the.getAttribute('data-kieu')).toBe('ca_lop')
-    expect(the.textContent).toMatch(/27\/32 em đã nộp/)
-    expect(the.textContent).not.toMatch(/7,5|6,75|Con làm đúng/)
-    expect(the.querySelector('button')).toBeNull() // không có gì để mở
-  })
-
-  it('con chưa nộp ca nào ⇒ KHÔNG thẻ; máy chủ cũ (không có chuaCongBo) vẫn chạy', async () => {
-    mocks.ls = { ok: true, items: [], chuaCongBo: undefined } as any
-    localStorage.setItem('omr_ph_sbd', '12121212')
-    const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
-    expect(container.querySelector('[data-vung="the-ca-gan-nhat"]')).toBeNull()
-    cleanup()
-    mocks.ls = { ok: true, items: [CA_MOI], chuaCongBo: undefined } as any
-    const b = render(<ParentPortalScreen />)
-    await waitFor(() => expect(b.container.querySelector('[data-vung="the-ca-gan-nhat"]')).toBeTruthy())
-  })
-})
+// ĐÃ GỠ 21/09 (app phụ huynh MỚI): describe "Bảng nhiệm vụ phụ huynh — thẻ ở ĐẦU…" (3 test trên ParentPortalScreen). Thẻ ca gần nhất của màn chính mới + bảng khoá ở tests/ph-moi-man-2109.test.tsx.
+// `TheCaGanNhatCua` / `chonTheCaGanNhat` còn ở đây như hàm/khối riêng (chưa xoá — lô dọn).
 
 describe('khoá nguồn', () => {
   it('CardCaThiGanNhat.tsx mồ côi ĐÃ XOÁ; thẻ mới chỉ nằm ở vai phụ huynh (`laPh && theCaGanNhat`) và đứng sau khối tiến độ', () => {
@@ -222,12 +174,5 @@ describe('khoá nguồn', () => {
     expect(t).not.toMatch(/<a\s/)
     expect(doc('src/components/xem-diem/xem-diem.css')).toMatch(/\.xd-tcg__duoi \{[^}]*min-height: 52px/)
     expect(t).toContain("import { ChipCongBo, SoSanh } from './thanh-phan'")
-  })
-  it('màn phụ huynh nạp `chuaCongBo` từ lịch sử; thẻ ĐÃ công bố mở hộp báo cáo của đúng ca (`moBaoCaoCa`), thẻ chưa công bố không bấm được; không còn tab Xem điểm', () => {
-    const p = doc('src/screens/ParentPortalScreen.tsx')
-    expect(p).toContain('setDsChuaCongBo(Array.isArray(ls.chuaCongBo) ? ls.chuaCongBo : [])')
-    expect(p).toContain("onMo={theCaGanNhat?.kieu === 'da_cong_bo' ? moBaoCaoCa : undefined}")
-    expect(p).not.toContain('setTabPh')
-    expect(p).toContain('khongGiaoBai')
   })
 })

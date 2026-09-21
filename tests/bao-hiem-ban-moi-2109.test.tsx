@@ -464,12 +464,12 @@ describe('số bản ở cuối menu ba chấm', () => {
 
   it('cổng phụ huynh (một màn một nút, 21/09): KHÔNG còn menu ba chấm; số bản nằm ở CHÂN màn, cạnh "Đổi số báo danh" (đích ≥ 48 px, chữ nhỏ)', async () => {
     const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
+    await waitFor(() => expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeTruthy())
     expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
     expect(container.querySelector('.bnv-menu')).toBeNull()
     const chan = container.querySelector('[data-vung="chan-ph"]') as HTMLElement
     expect(chan).toBeTruthy()
-    expect((chan.querySelector('.bnv-chan-ph-ban') as HTMLElement).textContent).toBe(chuBanApp())
+    expect((chan.querySelector('span') as HTMLElement).textContent).toBe(chuBanApp())
     expect((chan.querySelector('button') as HTMLElement).textContent).toBe('Đổi số báo danh')
   })
 

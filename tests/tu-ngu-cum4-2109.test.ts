@@ -52,7 +52,7 @@ describe('chữ mới đúng chuẩn', () => {
     expect(doc('src/screens/StudentPortalScreen.tsx')).toContain("tab === 'diem' ? 'Xem điểm & lịch sử ca kiểm tra'")
   })
   it('mã ca KHÔNG làm tên: "Ca kiểm tra mã …" (HS lịch sử, PH danh sách, khắc phục, thẻ gần nhất, báo cáo)', () => {
-    for (const t of ['src/components/bang-nhiem-vu/LichSuCaM3.tsx', 'src/lib/the-ca-gan-nhat.ts', 'src/screens/ParentPortalScreen.tsx', 'src/screens/StudentPortalScreen.tsx'])
+    for (const t of ['src/components/bang-nhiem-vu/LichSuCaM3.tsx', 'src/lib/the-ca-gan-nhat.ts', 'src/screens/StudentPortalScreen.tsx'])
       expect(doc(t), t).toMatch(/Ca kiểm tra mã /)
     for (const t of TEP_HS_PH) expect(dongChu(t).join('\n'), t).not.toMatch(/Ca (thi|kiểm tra) #/)
     expect(doc('src/components/BaoCaoCaThiHocSinhModal.tsx')).toContain('ca kiểm tra (mã {baiThi.maCa})')

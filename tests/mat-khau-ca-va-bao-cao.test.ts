@@ -86,10 +86,11 @@ describe('5. Modal báo cáo học tập ca thi của con cho phụ huynh chuẩ
     expect(file).not.toMatch(/#[0-9a-fA-F]{3,8}/)
   })
 
-  it('ParentPortalScreen đã tích hợp BaoCaoCaThiPhuHuynhModal', () => {
+  // App PH mới (21/09): màn PH KHÔNG còn mở hộp báo cáo cũ (bảng "Mọi thứ về con" thay) ⇒ khoá đổi: hộp còn tồn tại nhưng không được nối vào màn PH.
+  it('ParentPortalScreen KHÔNG còn tích hợp BaoCaoCaThiPhuHuynhModal (bảng Mọi thứ về con thay thế)', () => {
     const file = fs.readFileSync(path.join(__dirname, '../src/screens/ParentPortalScreen.tsx'), 'utf-8')
-    expect(file).toContain('<BaoCaoCaThiPhuHuynhModal')
-    expect(file).toContain('setCaDangXem(b)')
+    expect(file).not.toContain('<BaoCaoCaThiPhuHuynhModal')
+    expect(file).toContain('BangMoiThu')
   })
 })
 

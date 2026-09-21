@@ -1,5 +1,7 @@
 # App phụ huynh — MỘT MÀN, MỘT NÚT (thầy lệnh 21/09; Nhật ký 97f3abe) — danh sách ĐÃ GỠ
 
+> **CẬP NHẬT (thầy chốt mẫu 14:37, đề prompt-ph-moi-thu-ve-con-2109.md):** màn PH nay là APP PHỤ HUYNH MỚI — màn chính (`components/ph-moi/ManChinh.tsx`) + bảng "Mọi thứ về con" (`BangMoiThu.tsx`, gói tải lười) đọc `/ph/tat-ca-ve-con` + `/ph/chi-tiet-cau-ve-con` (`lib/ph-moi/`). Bảng nhiệm vụ / thẻ ca gần nhất cũ / kế hoạch ngày / danh sách mom-BTVN KHÔNG còn ở màn PH (ParentPortalScreen 443 → 263 dòng): không còn gọi `/hs/lich-su`, `/hs/ke-hoach-ngay`, `/hs/btvn`, `/hs/cau-sai`, `/mom/*`. Mã chết mới → lô dọn: `TheCaGanNhat.tsx` + `the-ca-gan-nhat.ts`, `BaoCaoCaThiPhuHuynhModal.tsx` (còn prop khongGiaoBai), nhánh `laPh` của BangNhiemVu (`boNaoPh`, `canhBaoPh`, `theCaGanNhat`, `giaoThem`, `onDoiSbd`, chân màn `.bnv-chan-ph`), `GiaoThemChoCon.tsx` (màn mới dùng `ThanhDay.tsx`).
+
 Còn lại trên màn (theo Boss): lời chào + tiến độ hôm nay của con · dải **cảnh báo của thầy** (thụ động, chỉ đọc + "Đã xem") · thẻ **"Ca kiểm tra gần nhất của con"** (ca đã công bố ⇒ bấm mở hộp báo cáo CHỈ XEM của đúng ca; ca chưa công bố ⇒ không bấm được) · **việc hôm nay của con** (chỉ xem) · MỘT nút **"Giao thêm bài cho con"** (lượt/gói + lời lỗi thật của máy chủ ngay dưới nút) · chân màn **"Đổi số báo danh"** + số bản app (đích ≥ 48 px).
 Đăng nhập: SBD của con HOẶC liên kết riêng `?ph=`. Nút giao gửi `{pass}` nếu có mã, không thì `{sbd}` (máy chủ nhận cả hai — Code 3, W2a).
 

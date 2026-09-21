@@ -1,5 +1,5 @@
 // Việc C · C9 (Code 4): cổng phụ huynh — phần CŨ ngoài Bảng nhiệm vụ: màn đăng nhập bằng SBD + khung sheet toàn màn (thanh trên, nút Đóng).
-// ParentPortalScreen chỉ phụ huynh dùng nên mặc M3 vô điều kiện; Bảng nhiệm vụ (.bnv, của Code 2) nằm TRONG gốc `m3` nhưng không đổi.
+// ParentPortalScreen chỉ phụ huynh dùng nên mặc M3 vô điều kiện; màn chính app PH mới (.mt, Code 2) nằm TRONG gốc `m3`.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import fs from 'node:fs'
@@ -40,31 +40,22 @@ describe('ParentPortalScreen — màn đăng nhập (chưa có SBD)', () => {
     fireEvent.change(screen.getByPlaceholderText(/Ví dụ: 12001/), { target: { value: '12121212' } })
     expect((vao as HTMLButtonElement).disabled).toBe(false)
     fireEvent.click(vao)
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
+    await waitFor(() => expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeTruthy())
     expect(localStorage.getItem('omr_ph_sbd')).toBe('12121212')
     expect(container.firstElementChild!.classList.contains('m3')).toBe(true)
   })
 })
 
 describe('ParentPortalScreen — đã đăng nhập: khung sheet toàn màn', () => {
-  it('Bảng nhiệm vụ nằm trong gốc `m3`; app phụ huynh MỘT màn (21/09): không menu, không sheet toàn màn "Báo cáo điểm"; hộp báo cáo của ca gần nhất mở/đóng được', async () => {
+  it('màn chính nằm trong gốc `m3`; app phụ huynh MỘT màn (21/09): không menu, không sheet toàn màn "Báo cáo điểm"', async () => {
     localStorage.setItem('omr_ph_sbd', '12121212')
     const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
+    await waitFor(() => expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeTruthy())
     expect(container.firstElementChild!.classList.contains('m3')).toBe(true)
-    expect(container.querySelector('.bnv')!.closest('.m3')).toBeTruthy()
+    expect(container.querySelector('[data-vung="man-chinh-ph"]')!.closest('.m3')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
     expect(screen.queryByTitle('Đóng toàn màn hình')).toBeNull()
-    // Thẻ ca gần nhất (ca đã công bố) mở hộp báo cáo của ĐÚNG ca đó; đóng lại thì về Bảng nhiệm vụ
-    const the = await waitFor(() => {
-      const e = container.querySelector('[data-vung="the-ca-gan-nhat"] button')
-      expect(e).toBeTruthy()
-      return e as HTMLElement
-    })
-    fireEvent.click(the)
-    await waitFor(() => expect(document.body.textContent).toContain('Ca Ancol 15/09'))
-    fireEvent.click(screen.getAllByRole('button', { name: 'Đóng' })[0]!)
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
+    // (Màn chính → bảng "Mọi thứ về con": khoá ở tests/ph-moi-man-2109.test.tsx.)
   })
 })
 
