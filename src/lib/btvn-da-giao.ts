@@ -270,12 +270,12 @@ export function emTheoNhom(hs: readonly EmCuaBai[] | undefined, nhom: NhomChon, 
     .sort((a, b) => tenGoiEm(a.hoTen).localeCompare(tenGoiEm(b.hoTen), 'vi') || a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd))
 }
 
-/** Đếm em theo nhóm cho các tab của ngăn: ĐỌC `nhom` của từng em (máy chủ tính). `coNhom` = mọi em đều có nhóm. */
+/** Đếm em theo nhóm cho các tab của ngăn: ĐỌC `nhom` của từng em (máy chủ tính). `coNhom` = CÓ ÍT NHẤT MỘT em có nhóm (em nào thiếu nhóm vẫn nằm ở tab "Tất cả"; không vì một em thiếu mà mất cả tab). */
 export function demEmTheoNhom(hs: readonly EmCuaBai[] | undefined, q = ''): { tatCa: number; canY: number; chuaNop: number; theo: Record<NhomEm, number>; coNhom: boolean } {
   const ds = (hs ?? []).filter((e) => !e.thuHoi && emKhopTim(e, q))
   const theo: Record<NhomEm, number> = { chua_mo: 0, dung_nhip: 0, cham_nhip: 0, xong_hom_nay: 0, da_nop: 0 }
   for (const e of ds) if (e.nhom) theo[e.nhom]++
-  return { tatCa: ds.length, canY: theo.chua_mo + theo.cham_nhip, chuaNop: ds.filter(laChuaNop).length, theo, coNhom: ds.length > 0 && ds.every((e) => !!e.nhom) }
+  return { tatCa: ds.length, canY: theo.chua_mo + theo.cham_nhip, chuaNop: ds.filter(laChuaNop).length, theo, coNhom: ds.some((e) => !!e.nhom) }
 }
 
 /** "hôm nay 20:41" · "hôm qua 20:41" · "3 ngày trước" · null ⇒ "chưa mở". */

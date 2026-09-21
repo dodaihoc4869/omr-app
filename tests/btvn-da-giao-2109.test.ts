@@ -228,9 +228,10 @@ describe('ngăn danh sách em', () => {
     expect(emKhopTim({ sbd: 'S9', hoTen: 'Đặng Văn Đô' }, 'dang van do')).toBe(true)
     expect(emTheoNhom(undefined, 'tat_ca')).toEqual([])
   })
-  it('đếm tab theo nhóm của từng em (máy chủ tính); thiếu nhóm ở một em ⇒ coNhom = false', () => {
+  it('đếm tab theo nhóm của từng em (máy chủ tính); coNhom = CÓ ÍT NHẤT MỘT em có nhóm', () => {
     expect(demEmTheoNhom(ds)).toEqual({ tatCa: 4, canY: 2, chuaNop: 3, theo: { chua_mo: 1, dung_nhip: 1, cham_nhip: 1, xong_hom_nay: 0, da_nop: 1 }, coNhom: true })
-    expect(demEmTheoNhom([...ds, em('S6', 'Cũ Không Nhóm', undefined)]).coNhom).toBe(false)
+    expect(demEmTheoNhom([...ds, em('S6', 'Cũ Không Nhóm', undefined)]).coNhom).toBe(true) // một em thiếu nhóm không làm mất tab của em khác
+    expect(demEmTheoNhom([em('S6', 'Cũ Không Nhóm', undefined), em('S7', 'Cũ Hai', undefined)]).coNhom).toBe(false) // không em nào có nhóm
     expect(demEmTheoNhom(ds, 'thi').tatCa).toBe(1) // chỉ Nguyễn Thị An (em thu hồi không đếm)
   })
   it('học gần nhất, tiến độ, nộp trễ', () => {

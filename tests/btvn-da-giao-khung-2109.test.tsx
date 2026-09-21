@@ -294,13 +294,45 @@ describe('hành động: Đổi hạn nộp, Xem bài làm, Thu hồi', () => {
 })
 
 describe('máy chủ cũ (thiếu khoá mới)', () => {
-  it('thẻ KHÔNG thanh nhóm, có dòng "Cập nhật máy chủ để xem theo nhóm.", tên cũ do nơi gọi đưa; không vỡ; vẫn Xem bài làm', () => {
+  const CHU = 'Chưa có số theo nhóm — bấm “Cập nhật dữ liệu” để tải lại.'
+  it('thẻ KHÔNG thanh nhóm; lời nói THẬT (không "Cập nhật máy chủ" — thầy không làm được) và nói MỘT lần ở đầu khi CẢ danh sách thiếu, không lặp ở mọi thẻ; tên cũ do nơi gọi đưa; không vỡ; vẫn Xem bài làm', () => {
     dung('may-cu')
     expect(document.querySelector('.btg-thanh')).toBeNull()
-    expect(screen.getAllByText('Cập nhật máy chủ để xem theo nhóm.').length).toBeGreaterThan(0)
+    expect(screen.queryByText(/Cập nhật máy chủ/)).toBeNull()
+    expect(screen.getAllByText(CHU).length).toBe(1)
+    expect(document.querySelector('.btg-thieu-nhom')).toBeTruthy()
+    expect(document.querySelectorAll('article .btg-ghi-chu').length).toBe(0)
     expect(the()[0]!.querySelector('.btg-ten')!.textContent).toMatch(/^Dạy học \/ Lớp/)
+    expect(the()[0]!.textContent).toContain('đã nộp 6') // máy cũ vẫn nói được số đã nộp (tổng / đã nộp cũ)
     fireEvent.click(within(the()[0]!).getByRole('button', { name: 'Xem bài làm' }))
     expect(screen.getByTestId('bai-lam')).toBeTruthy()
+  })
+  it('MỘT bài thiếu nhóm KHÔNG làm mất dải và thanh nhóm của bài khác: bài có nhóm vẫn hiện thanh + số ở dải; bài thiếu nói riêng ở thẻ của nó; không dòng đầu trang', () => {
+    const d = canh('binh-thuong')
+    delete d[0]!.nhom // Lớp 10 thiếu nhóm; Lớp 12 và Lớp 11 còn
+    dung('binh-thuong', { ds: nhomBtvn(d) })
+    expect(screen.getByRole('group', { name: 'Cần thầy để ý' })).toBeTruthy()
+    expect(screen.getByText('Em chưa mở bài')).toBeTruthy()
+    expect(the()[0]!.querySelector('.btg-thanh')).toBeTruthy() // bài đầu (Lớp 12) còn thanh nhóm
+    const lop10 = the().find((a) => a.textContent!.includes('Lớp 10'))!
+    fireEvent.click(lop10.querySelector('.btg-the-bam')!) // mở thẻ Lớp 10
+    expect(lop10.textContent).toContain(CHU)
+    expect(lop10.querySelector('.btg-thanh')).toBeNull()
+    expect(document.querySelector('.btg-thieu-nhom')).toBeNull()
+    expect(screen.queryByText('Mọi bài đang đúng nhịp.')).toBeNull()
+  })
+  it('ngăn em: MỘT em thiếu nhóm không làm mất các tab (em ấy chỉ nằm ở "Tất cả"); không em nào có nhóm ⇒ nói thật', () => {
+    const d = canh('binh-thuong')
+    delete d[1]!.hocSinh![0]!.nhom
+    dung('binh-thuong', { ds: nhomBtvn(d) })
+    fireEvent.click(within(the()[0]!).getByRole('button', { name: /Xem \d+ em này/ }))
+    const ngan = screen.getByRole('dialog', { name: /Danh sách em của/ })
+    expect(within(ngan).getByRole('tab', { name: /Cần để ý/ })).toBeTruthy()
+    expect(ngan.textContent).not.toContain(CHU)
+    cleanup()
+    dung('may-cu')
+    fireEvent.click(within(the()[0]!).getByRole('button', { name: 'Xem bài làm' }))
+    fireEvent.keyDown(document, { key: 'Escape' })
   })
 })
 

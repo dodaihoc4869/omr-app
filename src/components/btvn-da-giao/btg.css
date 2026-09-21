@@ -50,6 +50,8 @@
 .btg-ket-qua-muc { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; width: 100%; padding: 0 8px; border: 0; border-radius: 10px; background: transparent; color: var(--muc); font-size: 14px; text-align: left; cursor: pointer; }
 .btg-ket-qua-muc:hover { background: var(--the); }
 
+.btg-thieu-nhom { padding: 10px 14px; border-radius: 14px; background: var(--the-2); }
+
 /* dải "cần thầy để ý" */
 .btg-dai { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
 .btg-o { border-radius: 16px; padding: 14px 16px; background: var(--the-2); font-size: 14px; color: var(--muc); }
@@ -165,6 +167,10 @@
 
 @media (max-width: 1099px) {
   .btg-luoi--ngan { display: block; }
+}
+/* điện thoại / máy nhỏ (< 880 px, có thanh đáy + nút nổi "Mở ca kiểm tra" của vỏ): chừa ≥ 96 px dưới danh sách để thẻ cuối KHÔNG bị nút nổi che */
+@media (max-width: 879px) {
+  .btg { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (max-width: 640px) {
   .btg-the--mo { padding: 14px 14px; }

@@ -110,6 +110,7 @@ export default function KhungBtvnDaGiao(p: KhungBtvnDaGiaoProps) {
   const moDoiHan = (b: TheBai) => { const t = bai1(b.khoa); if (!t) return; setHanNhap(p.hanChoOChon(t.hanNop)); setHop({ kieu: 'doi_han', khoa: b.khoa }) }
 
   const rongNgan = rong && ngan && baiNgan
+  const tatCaThieuNhom = bai.length > 0 && bai.every((b) => b.nhom === null) // máy chủ chưa trả số nhóm cho bài nào: nói MỘT lần ở đầu, không lặp ở mọi thẻ
   const coBai = ds.length > 0
 
   return (
@@ -177,6 +178,7 @@ export default function KhungBtvnDaGiao(p: KhungBtvnDaGiaoProps) {
             </div>
           )}
 
+          {tatCaThieuNhom && <p className="btg-phu btg-thieu-nhom" role="status">Chưa có số theo nhóm — bấm “Cập nhật dữ liệu” để tải lại.</p>}
           {(dai.chuaMo || dai.chamNhip || dai.chuaNopQuaHan || dai.hanGanNhat) && (
             <div className="btg-dai" role="group" aria-label="Cần thầy để ý">
               {dai.chuaMo && <div className="btg-o btg-o--cam"><small>Em chưa mở bài</small><b>{dai.chuaMo.em}</b> em · {dai.chuaMo.bai} bài</div>}
@@ -201,6 +203,7 @@ export default function KhungBtvnDaGiao(p: KhungBtvnDaGiaoProps) {
                       nowMs={nowMs}
                       mo={laMo(b, i)}
                       doiMo={() => doiMo(b, i)}
+                      ghiChuThieuNhom={!tatCaThieuNhom}
                       dangSua={p.dangSua === b.khoa}
                       moNgan={(n) => moNgan(b, n)}
                       hd={{ doiHan: () => moDoiHan(b), xemBaiLam: () => setHop({ kieu: 'bai_lam', khoa: b.khoa }), chiTiet: () => setHop({ kieu: 'chi_tiet', khoa: b.khoa }), thuHoi: () => { const t = bai1(b.khoa); if (t) p.onThuHoi(t) } }}

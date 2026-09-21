@@ -6,8 +6,8 @@ import { execFileSync } from 'node:child_process'
 
 const GOC = process.env.GOC_XEM_THU || 'http://localhost:5173'
 const TRANG = (canh, extra = '') => `${GOC}/src/components/xem-thu/btvn-da-giao.html?canh=${canh}&vo=1${extra}`
-const CANH = ['binh-thuong', 'cham', 'khong-chang', 'qua-han', 'may-cu']
-const MAN = [{ ten: '1280', w: 1280, h: 800 }, { ten: '1440', w: 1440, h: 900 }, { ten: '390', w: 390, h: 844 }]
+const CANH = ['binh-thuong', 'cham', 'khong-chang', 'qua-han', 'may-cu', 'that', 'may-cu-that']
+const MAN = [{ ten: '1280', w: 1280, h: 800 }, { ten: '1440', w: 1440, h: 900 }, { ten: '412', w: 412, h: 915 }, { ten: '390', w: 390, h: 844 }]
 const chup = process.argv.includes('--anh')
 const RA = 'docs/anh-btvn-da-giao-2109'
 if (chup) mkdirSync(RA, { recursive: true })
@@ -64,6 +64,18 @@ for (const sang of ['light', 'dark']) {
       await p.waitForSelector('.btg article', { timeout: 15000 })
       await p.addStyleTag({ content: '*{animation:none!important;transition:none!important}' })
       const r = await p.evaluate(kiemTra)
+      // màn nhỏ: cuộn xuống tận đáy — thẻ cuối phải nằm TRÊN nút nổi "Mở ca kiểm tra" của vỏ (chừa ≥ 96 px)
+      if (m.w < 880) {
+        await p.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+        const che = await p.evaluate(() => {
+          const a = [...document.querySelectorAll('.btg article')].pop()
+          const nut = document.querySelector('.day-thay-nut-ca')
+          if (!a || !nut) return ''
+          const d = a.getBoundingClientRect().bottom, t = nut.getBoundingClientRect().top
+          return d > t - 4 ? `thẻ cuối đáy ${Math.round(d)} > nút nổi ${Math.round(t)}` : ''
+        })
+        if (che) r.tran.push(che)
+      }
       const dong = (k, ds) => ds.length ? (loi++, console.log(`✗ ${sang} ${m.ten} ${canh} ${k}: ${ds.slice(0, 4).join(' | ')}`)) : 0
       dong('TRÀN', r.tran); dong('CHỒNG CHỮ', r.chong); dong('ĐÍCH < 44', r.nho)
     }
@@ -97,5 +109,5 @@ if (chup) {
   { const { p, ngu } = await mo('light', 1280, 800, 'binh-thuong'); await p.getByRole('button', { name: /Thêm thao tác/ }).first().click(); await p.getByRole('menuitem', { name: 'Thu hồi' }).click(); await luu(p, 'hop-xac-nhan-thu-hoi-1280'); await ngu.close() }
 }
 await trinhDuyet.close()
-console.log(loi === 0 ? 'ĐẠT: 0 tràn ngang, 0 chồng chữ, đích ≥ 44 px ở 3 cỡ × sáng/tối × 5 cảnh' : `CÓ ${loi} lỗi`)
+console.log(loi === 0 ? 'ĐẠT: 0 tràn ngang, 0 chồng chữ, đích ≥ 44 px ở 1280 · 1440 · 412 · 390 × sáng/tối × 7 cảnh (5 giả + 2 từ thân thật bản sống)' : `CÓ ${loi} lỗi`)
 process.exit(loi === 0 ? 0 : 1)

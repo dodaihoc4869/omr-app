@@ -1,11 +1,12 @@
 // DỮ LIỆU GIẢ cho trang xem thử "Bài tập về nhà đã giao" (Code 1, 21/09/2026) — năm cảnh của đề §6.1. CHỈ dùng ở trang xem thử và test; không vào gói sản phẩm.
 import type { DongTheoDoiBtvn } from '../../lib/btvn-may-chu-moi'
+import thatJson from './mau-btvn-theo-doi-that-2109.json' // THÂN THẬT của /btvn/theo-doi bản sống (Worker bae74f10, 21/09 19:3x), đã che họ tên em (Code 3)
 
 /** Thứ Hai 21/09/2026 19:00 giờ VN — mọi mốc trong cảnh tính quanh giờ này để ảnh chụp ổn định. */
 export const NOW_MAU = Date.parse('2026-09-21T19:00:00+07:00')
 const vn = (s: string) => new Date(Date.parse(`${s}:00+07:00`)).toISOString()
 
-export const CAC_CANH = ['binh-thuong', 'cham', 'khong-chang', 'qua-han', 'may-cu'] as const
+export const CAC_CANH = ['binh-thuong', 'cham', 'khong-chang', 'qua-han', 'may-cu', 'that', 'may-cu-that'] as const
 export type TenCanh = (typeof CAC_CANH)[number]
 export const CHU_CANH: Record<TenCanh, string> = {
   'binh-thuong': 'Bình thường',
@@ -13,6 +14,8 @@ export const CHU_CANH: Record<TenCanh, string> = {
   'khong-chang': 'Bài không chia chặng',
   'qua-han': 'Bài qua hạn có nộp trễ',
   'may-cu': 'Máy chủ cũ (thiếu khoá mới)',
+  that: 'Dữ liệu THẬT bản sống (đã che tên)',
+  'may-cu-that': 'Dữ liệu thật, bỏ khoá bản 2 (máy cũ thật)',
 }
 
 const HO = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Huỳnh', 'Phan', 'Vũ', 'Võ', 'Đặng', 'Bùi', 'Đỗ']
@@ -55,7 +58,21 @@ function dong(id: string, o: Partial<DongTheoDoiBtvn> & { hs: Em[] }): DongTheoD
 const chang = (soChang: number, homNay: number) => Array.from({ length: soChang }, (_, i) => ({ so: i + 1, ngay: new Date(Date.parse('2026-09-21T00:00:00Z') + (i - (homNay - 1)) * 86_400_000 + (homNay - 1) * 86_400_000).toISOString().slice(0, 10), laHomNay: i + 1 === homNay }))
 const nhomTu = (hs: Em[], nopTre = 0) => ({ chuaMo: hs.filter((e) => e.nhom === 'chua_mo').length, dungNhip: hs.filter((e) => e.nhom === 'dung_nhip').length, chamNhip: hs.filter((e) => e.nhom === 'cham_nhip').length, xongHomNay: hs.filter((e) => e.nhom === 'xong_hom_nay').length, daNop: hs.filter((e) => e.nhom === 'da_nop').length, nopTre })
 
+/** Giờ "bây giờ" của cảnh: cảnh giả cố định; cảnh THẬT theo `serverNow` của thân mẫu. */
+export const nowCua = (ten: TenCanh): number => (ten === 'that' || ten === 'may-cu-that' ? Number((thatJson as unknown as { serverNow?: number }).serverNow) || NOW_MAU : NOW_MAU)
+
+/** Bỏ mọi khoá BẢN 2 khỏi thân thật ⇒ đúng dáng máy chủ cũ (trước 19:07): không ten / tenLop / soCauLoi / chang / nhom, em không nhom / changHienTai / soCauDaLam / hocGanNhat / nopTreGio. */
+function boKhoaBan2(ds: DongTheoDoiBtvn[]): DongTheoDoiBtvn[] {
+  return ds.map((b) => {
+    const { ten: _t, tenLop: _l, soCauLoi: _c, chang: _g, nhom: _n, ...r } = b
+    void _t; void _l; void _c; void _g; void _n
+    return { ...r, hocSinh: b.hocSinh?.map((e) => { const { nhom: _a, changHienTai: _b, soCauDaLam: _d, hocGanNhat: _e, nopTreGio: _f, ...x } = e; void _a; void _b; void _d; void _e; void _f; return x }) }
+  })
+}
+
 export function canh(ten: TenCanh): DongTheoDoiBtvn[] {
+  if (ten === 'that') return (thatJson as unknown as { ds: DongTheoDoiBtvn[] }).ds
+  if (ten === 'may-cu-that') return boKhoaBan2((thatJson as unknown as { ds: DongTheoDoiBtvn[] }).ds)
   if (ten === 'binh-thuong' || ten === 'cham') {
     const cham = ten === 'cham'
     const a = taoEm('A', cham ? { chua_mo: 10, dung_nhip: 6, cham_nhip: 24, xong_hom_nay: 4 } : { chua_mo: 8, dung_nhip: 22, cham_nhip: 6, xong_hom_nay: 8 }, { soChang: 3 })

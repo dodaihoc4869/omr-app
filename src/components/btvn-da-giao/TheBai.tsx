@@ -47,7 +47,7 @@ function MenuBai({ ten, dangSua, hd }: { ten: string; dangSua: boolean; hd: Hanh
 }
 
 export default function TheBaiBtg({
-  bai, nowMs, mo, doiMo, dangSua, hd, moNgan,
+  bai, nowMs, mo, doiMo, dangSua, hd, moNgan, ghiChuThieuNhom = true,
 }: {
   bai: TheBai
   nowMs: number
@@ -57,6 +57,8 @@ export default function TheBaiBtg({
   hd: HanhDongThe
   /** Mở ngăn danh sách em của bài ở nhóm này. */
   moNgan: (nhom: NhomChon) => void
+  /** Bài này thiếu số theo nhóm: có nói thật ở thẻ không (khi CẢ danh sách thiếu, khung nói MỘT lần ở đầu thay vì lặp ở mọi thẻ). */
+  ghiChuThieuNhom?: boolean
 }) {
   const han = demNguocHan(bai.hanMs, nowMs)
   const canY = soEmCanY(bai.nhom)
@@ -69,7 +71,7 @@ export default function TheBaiBtg({
   const homNay = bai.chang.find((c) => c.laHomNay)
   const chuChang = bai.chiaChang ? (homNay ? `chặng ${homNay.so} trong ${bai.chang.length}` : `${bai.chang.length} chặng`) : ''
   const hanChu = han.qua ? `Đã qua hạn${nhom && nhom.nopTre > 0 ? ` · ${nhom.nopTre} em nộp trễ` : ''}` : han.chu
-  const phu = [`${bai.tong} em`, bai.soCau > 0 ? `${bai.soCau} câu${bai.soCauLoi !== null && bai.soCauLoi > 0 ? `, ${bai.soCauLoi} câu lõi` : ''}` : '', chuGiaoLuc(bai.giaoLuc)].filter(Boolean).join(' · ')
+  const phu = [`${bai.tong} em`, !nhom && bai.tong > 0 ? `đã nộp ${bai.daNop}` : '', bai.soCau > 0 ? `${bai.soCau} câu${bai.soCauLoi !== null && bai.soCauLoi > 0 ? `, ${bai.soCauLoi} câu lõi` : ''}` : '', chuGiaoLuc(bai.giaoLuc)].filter(Boolean).join(' · ')
   const idThan = `btg-the-${bai.khoa}`
   return (
     <article className={`btg-the${mo ? ' btg-the--mo' : ' btg-the--gon'}`} data-khoa={bai.khoa} data-mo={mo ? '1' : '0'}>
@@ -100,7 +102,7 @@ export default function TheBaiBtg({
           {nhom ? (
             <ThanhNhom nhom={nhom} chiaChang={bai.chiaChang} onChonNhom={(k) => moNgan(k)} />
           ) : (
-            <p className="btg-phu btg-ghi-chu">Cập nhật máy chủ để xem theo nhóm.</p>
+            ghiChuThieuNhom && <p className="btg-phu btg-ghi-chu">Chưa có số theo nhóm — bấm “Cập nhật dữ liệu” để tải lại.</p>
           )}
           <div className="btg-hanh-dong">
             <span className="btg-phu btg-hanh-dong-chu">{tomTat || (nhom ? 'Mọi em đang đúng nhịp' : '')}</span>

@@ -1,4 +1,4 @@
-// TRANG XEM THỬ (chỉ `npm run dev`, KHÔNG vào bản build): /src/components/xem-thu/btvn-da-giao.html?canh=binh-thuong|cham|khong-chang|qua-han|may-cu[&vo=1][&toi=1]
+// TRANG XEM THỬ (chỉ `npm run dev`, KHÔNG vào bản build): /src/components/xem-thu/btvn-da-giao.html?canh=binh-thuong|cham|khong-chang|qua-han|may-cu|that|may-cu-that[&vo=1][&toi=1]
 // Dựng mục "Bài tập về nhà đã giao" thiết kế lại với dữ liệu GIẢ (không chờ máy chủ). `vo=1` đặt mục trong vỏ app (thanh bên trái thật); `toi=1` ép nền tối.
 import { StrictMode, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -15,10 +15,11 @@ import '../../styles/vo-thay.css'
 import '../m3'
 import KhungBtvnDaGiao from '../btvn-da-giao/KhungBtvnDaGiao'
 import ThanhBenTrai from '../ThanhBenTrai'
+import BottomNav from '../BottomNav'
 import HocSinhNhanBai from '../HocSinhNhanBai'
 import { nhomBtvn } from '../../lib/nhom-btvn'
 import { useAppStore } from '../../store/appStore'
-import { CAC_CANH, CHU_CANH, NOW_MAU, canh, type TenCanh } from './btvn-da-giao-canh'
+import { CAC_CANH, CHU_CANH, canh, nowCua, type TenCanh } from './btvn-da-giao-canh'
 
 const tham = new URLSearchParams(location.search)
 const tenCanh = (CAC_CANH as readonly string[]).includes(tham.get('canh') ?? '') ? (tham.get('canh') as TenCanh) : 'binh-thuong'
@@ -41,7 +42,7 @@ function Canh() {
       {nhat && <p role="status" style={{ margin: 0, fontFamily: 'var(--sans)', fontSize: 13 }}>{nhat}</p>}
       <KhungBtvnDaGiao
         ds={g}
-        nowMs={NOW_MAU}
+        nowMs={nowCua(tenCanh)}
         dangNap={false}
         onNap={() => setNhat('Cập nhật dữ liệu (xem thử — không gọi máy chủ)')}
         tenCu={(t) => t.maDe}
@@ -72,6 +73,7 @@ function Canh() {
     <div className="min-h-screen m3 m3-thay vo-thay">
       <ThanhBenTrai />
       <div className="khung-noi-dung"><div className="giua-noi-dung">{hop}{khung}</div></div>
+      <BottomNav />
     </div>
   ) : (
     <div className="m3">{hop}{khung}</div>
