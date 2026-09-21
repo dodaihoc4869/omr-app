@@ -85,18 +85,22 @@ const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS
 
 async function dungKeHoachEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const kh = await hsKeHoachNgayCoExp(env, b)
-  // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
-  if (kh.ok === true && typeof kh.sbd === 'string') kh.doanMo = await doanMoCho(env, kh.sbd)
-  // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` (việc ngày trước chưa xong, theo ngày) + `veDich` (từng bài: chặng xong/nợ/hôm nay/sắp tới, giờ còn lại, tối nay, các buổi sau). Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
-  if (kh.ok === true && typeof kh.sbd === 'string') { try { const vd = await docVeDichCuaEm(env, kh.sbd); kh.no = vd.no; kh.veDich = vd.veDich } catch (e) { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e) } }
-  // BỘ NÃO A.I chế độ THẬT: lời nhắn cho ĐÚNG em này (chỉ lời cho em, không lời phụ huynh). Chạy thử/tắt/không có lời ⇒ KHÔNG có khoá `loiNhanHlv` (phản hồi y hệt cũ).
   if (kh.ok === true && typeof kh.sbd === 'string') {
-    const loiHlv = await docLoiNhanHlv(env, kh.sbd, typeof kh.ngay === 'string' ? kh.ngay : ngayVn(Date.now()))
+    const sbd = kh.sbd
+    // HẠ TẢI D1 (Boss 21/09): bốn khối phụ ĐỘC LẬP chạy SONG SONG (trước đây tuần tự); khoá gán đúng thứ tự cũ để phản hồi y hệt.
+    const [doanMo, vd, loiHlv, canhBao] = await Promise.all([
+      // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
+      doanMoCho(env, sbd),
+      // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` + `veDich`. Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
+      docVeDichCuaEm(env, sbd).then((v) => v, (e) => { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e); return null }),
+      // BỘ NÃO A.I chế độ THẬT: lời nhắn cho ĐÚNG em này (chỉ lời cho em, không lời phụ huynh). Chạy thử/tắt/không có lời ⇒ KHÔNG có khoá `loiNhanHlv`.
+      docLoiNhanHlv(env, sbd, typeof kh.ngay === 'string' ? kh.ngay : ngayVn(Date.now())),
+      // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): ≤ 3, bài chưa nộp, gửi trong 48 giờ. Không có ⇒ KHÔNG có khoá `canhBaoThay`.
+      canhBaoChoEm(env, sbd),
+    ])
+    kh.doanMo = doanMo
+    if (vd) { kh.no = vd.no; kh.veDich = vd.veDich }
     if (loiHlv) kh.loiNhanHlv = loiHlv
-  }
-  // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): ≤ 3, bài chưa nộp, gửi trong 48 giờ. Không có ⇒ KHÔNG có khoá `canhBaoThay` (phản hồi y hệt cũ).
-  if (kh.ok === true && typeof kh.sbd === 'string') {
-    const canhBao = await canhBaoChoEm(env, kh.sbd)
     if (canhBao.length > 0) kh.canhBaoThay = canhBao
   }
   return kh

@@ -357,11 +357,14 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
   const arr = json(em)
 
   // Sổ đổi so với lần lập trước ⇒ hồ sơ cũ. So số dòng sổ với `so_su_kien` của dòng kế hoạch gần nhất.
-  const rs = await tat(() => env.DB.prepare(`SELECT sbd, COUNT(*) AS n FROM su_kien_hoc WHERE ${IN_EM} GROUP BY sbd`).bind(arr).all<Record<string, unknown>>(), trong())
+  // Hai truy vấn độc lập chạy SONG SONG (hạ tải D1: một lượt chờ hàng đợi thay vì hai).
+  const [rs, rk] = await Promise.all([
+    tat(() => env.DB.prepare(`SELECT sbd, COUNT(*) AS n FROM su_kien_hoc WHERE ${IN_EM} GROUP BY sbd`).bind(arr).all<Record<string, unknown>>(), trong()),
+    tat(() => env.DB.prepare(
+      `SELECT k.sbd, k.so_su_kien FROM ke_hoach_ngay k WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHERE z.sbd = k.sbd)`,
+    ).bind(arr).all<Record<string, unknown>>(), trong()),
+  ])
   const soSk = new Map((rs.results ?? []).map((x) => [String(x.sbd), Number(x.n) || 0]))
-  const rk = await tat(() => env.DB.prepare(
-    `SELECT k.sbd, k.so_su_kien FROM ke_hoach_ngay k WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHERE z.sbd = k.sbd)`,
-  ).bind(arr).all<Record<string, unknown>>(), trong())
   const daLap = new Map((rk.results ?? []).map((x) => [String(x.sbd), Number(x.so_su_kien)]))
   const cuHo = em.filter((s) => !daLap.has(s) || daLap.get(s) !== (soSk.get(s) ?? 0))
   if (cuHo.length > 0) await tat(() => dungLaiHoSo(env, cuHo, nowIso), null)
