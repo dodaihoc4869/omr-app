@@ -8,6 +8,7 @@ import OTraCuu from '../components/hom-nay/OTraCuu'
 import { BanDoDang, DongThoiGian, NhipHoc30, TheHuynh } from '../components/toan-canh/CacKhoi'
 import { layToanCanh, moiXemChu, type LoaiSuKien, type SuKienEm, type ToanCanh } from '../lib/em-toan-canh'
 import type { KetQuaLenh } from '../lib/goi-lenh-thay'
+import '../styles/hom-nay.css' // thẻ số `.hn-so` dùng chung với màn Hôm nay
 import '../styles/hom-nay-v2.css'
 import '../styles/toan-canh-em.css'
 

@@ -493,7 +493,10 @@ describe('nguồn: nối vào màn, đổi chữ "bóng" → "thử", không hex
   const doc = (f: string) => fs.readFileSync(path.join(__dirname, '..', f), 'utf8')
   it('Hôm nay · hồ sơ em · Cài đặt · Bảng tin đều gắn khối Bộ não; nút nối hàm SẴN CÓ', () => {
     const hn = doc('src/screens/HomNayScreen.tsx')
-    expect(hn).toContain("<KhoiBoNaoDemQua onMoHoSo={moHoSoEm} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />")
+    // Bước 5 (Hôm nay v2, 21/09): bấm em ở khối Bộ não mở TOÀN CẢNH (moToanCanh) thay vì hồ sơ; khoá Ý cũ: khối vẫn được dựng và cả ba lối nối đều là HÀM SẴN CÓ của store / setScreen.
+    expect(hn).toContain("<KhoiBoNaoDemQua onMoHoSo={moToanCanh} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />")
+    expect(hn).toContain('const moToanCanh = useAppStore((s) => s.moToanCanh)')
+    expect(doc('src/store/appStore.ts')).toContain("moToanCanh: (sbd) => set({ sbdToanCanh: sbd, screen: 'toancanh' })")
     expect(doc('src/screens/HocSinhScreen.tsx')).toContain('<NhatKyDieuChinh sbd={hoSo.em.sbd} />')
     expect(doc('src/screens/CaiDatScreen.tsx')).toContain('<KhoiBoNaoCaiDat />')
     expect(doc('src/components/BangTinGiaoVien.tsx')).toContain('<KhoiBoNaoDemQua gon ngay={day || undefined} soDongGon={day ? 3 : 0} />')

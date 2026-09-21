@@ -267,7 +267,8 @@
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
-  margin-top: 12px;
+  max-width: 340px;
+  margin: 12px auto 0;
 }
 .tc-nhip-thu {
   text-align: center;
