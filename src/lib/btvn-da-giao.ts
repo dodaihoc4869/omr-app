@@ -173,7 +173,9 @@ export function daiCanYNhu(ds: readonly TheBai[], nowMs: number): DaiCanY {
   const coDuNhom = ds.length > 0 && ds.every((b) => b.nhom !== null)
   for (const b of ds) {
     const qua = chuaNopQuaHan(b, nowMs)
-    if (qua > 0) { emQua += qua; baiQua++ }
+    // MỖI EM CHỈ ĐẾM MỘT Ô (Boss soát 21/09): em chưa nộp của bài ĐÃ QUÁ HẠN chỉ nằm ở ô "chưa nộp quá hạn" (ưu tiên), không đếm lại ở "chưa mở" / "chậm nhịp" — cả bài chia chặng lẫn không chia chặng
+    // (máy chủ bản 2 đặt em chưa nộp của bài không chia chặng quá hạn vào chậm nhịp). Bài chưa quá hạn: giữ nguyên hai ô ấy.
+    if (qua > 0) { emQua += qua; baiQua++; continue }
     if (!b.nhom) continue
     if (b.nhom.chuaMo > 0) { emChua += b.nhom.chuaMo; baiChua++ }
     if (b.nhom.chamNhip > 0) { emCham += b.nhom.chamNhip; baiCham++ }

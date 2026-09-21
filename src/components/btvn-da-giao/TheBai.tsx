@@ -62,11 +62,10 @@ export default function TheBaiBtg({
   const canY = soEmCanY(bai.nhom)
   const quaN = chuaNopQuaHan(bai, nowMs) // bài QUÁ HẠN còn em chưa nộp: việc thầy cần thấy kể cả khi bài không chia chặng
   const nhom = bai.nhom
-  const tomTat = [
-    nhom && nhom.chuaMo > 0 ? `${nhom.chuaMo} em chưa mở` : '',
-    nhom && nhom.chamNhip > 0 ? `${nhom.chamNhip} em chậm nhịp` : '',
-    quaN > 0 ? `${quaN} em chưa nộp quá hạn` : '',
-  ].filter(Boolean).join(' · ')
+  // Bài quá hạn: MỘT con số "chưa nộp quá hạn" (khớp dải cần để ý — mỗi em chỉ đếm một chỗ); bài còn hạn: chưa mở · chậm nhịp.
+  const tomTat = quaN > 0
+    ? `${quaN} em chưa nộp quá hạn`
+    : [nhom && nhom.chuaMo > 0 ? `${nhom.chuaMo} em chưa mở` : '', nhom && nhom.chamNhip > 0 ? `${nhom.chamNhip} em chậm nhịp` : ''].filter(Boolean).join(' · ')
   const homNay = bai.chang.find((c) => c.laHomNay)
   const chuChang = bai.chiaChang ? (homNay ? `chặng ${homNay.so} trong ${bai.chang.length}` : `${bai.chang.length} chặng`) : ''
   const hanChu = han.qua ? `Đã qua hạn${nhom && nhom.nopTre > 0 ? ` · ${nhom.nopTre} em nộp trễ` : ''}` : han.chu

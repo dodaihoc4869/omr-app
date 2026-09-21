@@ -112,6 +112,18 @@ describe('bài QUÁ HẠN còn em chưa nộp (Boss soát 21/09: không được
     expect(d.chamNhip).toBeNull()
     expect(d.moiBaiDungNhip).toBe(false)
   })
+  it('MỖI EM CHỈ MỘT Ô: bài quá hạn — chưa mở / chậm nhịp của nó KHÔNG đếm lại ở hai ô ấy (chỉ ở "chưa nộp quá hạn"); bài còn hạn giữ nguyên hai ô; cả bài không chia chặng máy chủ bản 2 (chưa nộp ở chamNhip)', () => {
+    const conHan = new Date(vn('2026-09-24T12:00')).toISOString()
+    const quaChia = the({ nhom: N({ chuaMo: 3, dungNhip: 2, chamNhip: 4, daNop: 1 }), tong: 10, daNop: 1, hanNop: qua, chang: [{ so: 1, ngay: '2026-09-21', laHomNay: false }] })
+    const quaKhongChia = the({ nhom: N({ chuaMo: 1, chamNhip: 5, daNop: 4 }), tong: 10, daNop: 4, hanNop: qua }) // không chia chặng, quá hạn: chưa nộp nằm ở chamNhip
+    const coHan = the({ nhom: N({ chuaMo: 6, dungNhip: 10, chamNhip: 2, daNop: 2 }), tong: 20, daNop: 2, hanNop: conHan })
+    const d = daiCanYNhu([quaChia, quaKhongChia, coHan], now)
+    expect(d.chuaNopQuaHan).toEqual({ em: 9 + 6, bai: 2 }) // 10−1 và 10−4
+    expect(d.chuaMo).toEqual({ em: 6, bai: 1 }) // chỉ bài còn hạn
+    expect(d.chamNhip).toEqual({ em: 2, bai: 1 })
+    // tổng ba ô ≤ số em chưa nộp thật (mỗi em một ô): 15 + 6 + 2 = 23 = (10−1) + (10−4) + (20−2 trừ 10 đúng nhịp) — không đếm đôi
+    expect(d.chuaNopQuaHan!.em + d.chuaMo!.em + d.chamNhip!.em).toBe(9 + 6 + 8)
+  })
   it('máy chủ cũ (không nhóm) quá hạn còn em chưa nộp: vẫn hiện ô (chỉ cần tổng / đã nộp); cộng qua bài', () => {
     const d = daiCanYNhu([the({ tong: 10, daNop: 6, hanNop: qua }), the({ tong: 8, daNop: 8, hanNop: qua }), the({ nhom: N({ chuaMo: 2, dungNhip: 3, daNop: 5 }), tong: 10, daNop: 5, hanNop: qua })], now)
     expect(d.chuaNopQuaHan).toEqual({ em: 9, bai: 2 })

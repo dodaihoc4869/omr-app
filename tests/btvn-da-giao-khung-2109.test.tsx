@@ -213,6 +213,10 @@ describe('bài quá hạn còn em chưa nộp + chi tiết thanh nhóm', () => {
     dung('qua-han')
     const dai = screen.getByRole('group', { name: 'Cần thầy để ý' })
     expect(within(dai).getByText('Em chưa nộp quá hạn').parentElement!.textContent).toContain('7') // 45 − 38 ở bài Lớp 10
+    // mỗi em một ô: bài Lớp 10 quá hạn nên chưa mở / chậm nhịp của nó không đếm lại — ô "chưa mở" biến mất, "chậm nhịp" chỉ còn của bài Lớp 12 còn hạn
+    expect(screen.queryByText('Em chưa mở bài')).toBeNull()
+    expect(within(dai).getByText('Em chậm nhịp').parentElement!.textContent).toContain('2 em · 1 bài')
+    expect(the()[0]!.textContent).not.toContain('em chậm nhịp')
     expect(the()[0]!.textContent).toContain('7 em chưa nộp quá hạn')
     fireEvent.click(within(the()[0]!).getByRole('button', { name: 'Xem 7 em chưa nộp' }))
     const ngan = screen.getByRole('dialog', { name: /Danh sách em của/ })
