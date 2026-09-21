@@ -332,6 +332,26 @@ export function tomTatChang(c: Chang): TomTatChang {
   return { thang, sao, soHiepDaChoi: c.lichSu.length, linhTam: { ...c.linhTam }, trumVoGiap: [...c.trumVoGiap], quaiHaGuc: c.lichSu.reduce((s, h) => s + h.quaiHaGuc, 0), soLienKich: ghe.reduce((s, g) => s + g.soLanGiupThanhCong, 0), ghe }
 }
 
+// ───────────────────────── EXP thưởng kết chặng (thầy chốt 21/09 · Điều 9, Đợt 2) ─────────────────────────
+/** Thắng chặng: 1 · 2 · 3 sao ⇒ 5 · 10 · 15 EXP. Chặng thắng ĐẦU TIÊN trong ngày VN nhận đủ; các chặng sau nhận MỘT NỬA (làm tròn lên: 3 · 5 · 8). Thua = 0 sao = 0 EXP, không mất gì. */
+export const THUONG_KET_CHANG = [5, 10, 15] as const
+/** Cả đội làm vỡ giáp một trùm: +3 EXP cho TỪNG bạn trong đội, mỗi trùm một lần (tính cả khi chặng sau đó thua — vỡ giáp là việc đã làm được). */
+export const THUONG_VO_GIAP = 3
+export function thuongKetChang(sao: number, laChangThangDauNgay: boolean): number {
+  const s = Number.isFinite(sao) ? Math.min(3, Math.floor(sao)) : 0
+  if (s < 1) return 0
+  const goc = THUONG_KET_CHANG[s - 1]!
+  return laChangThangDauNgay ? goc : Math.ceil(goc / 2)
+}
+export const thuongVoGiap = (trumVoGiap: readonly boolean[]): number => THUONG_VO_GIAP * trumVoGiap.filter(Boolean).length
+export interface KhoanKetChang { chang: number; voGiap: number; tong: number }
+/** Các khoản EXP của MỘT em trong đội sau chặng (chưa qua trần 120/ngày của game — Code 3 kẹp bằng `tranExpGameNgay`). `sao` chỉ tính khi thắng. */
+export function khoanKetChang(tt: Pick<TomTatChang, 'thang' | 'sao' | 'trumVoGiap'>, laChangThangDauNgay: boolean): KhoanKetChang {
+  const chang = tt.thang ? thuongKetChang(tt.sao, laChangThangDauNgay) : 0
+  const voGiap = thuongVoGiap(tt.trumVoGiap)
+  return { chang, voGiap, tong: chang + voGiap }
+}
+
 // ───────────────────────── Khung nhìn gửi xuống máy từng em ─────────────────────────
 /** Điều một em được thấy về BẠN sau hiệp: bạn ra đòn / chắn / giữ vị trí (= không chốt). Không có "sai", không có hệ số, không có ý trùm. */
 export interface GheBanThay { ghe: number; ra: 'don' | 'chan' | 'giu'; tenChieu: string; satThuong: number; haGuc: number; lienKich: boolean }
