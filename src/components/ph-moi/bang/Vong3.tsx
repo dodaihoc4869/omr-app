@@ -2,6 +2,7 @@
 // NÓI THẬT THEO DỮ LIỆU: vòng nào thiếu số hoặc thiếu mục tiêu ⇒ KHÔNG vẽ; các vòng còn lại nhận bán kính theo thứ tự có mặt. Vượt mục tiêu ⇒ vòng đầy + cung thứ hai màu nhạt + chấm đầu vòng có bóng. Chạy đầy từ 0 bằng CSS (TongQuan.css).
 import { useId, type CSSProperties } from "react";
 import "./TongQuan.css";
+import { mauSoTiLeDung } from "../../../lib/ph-moi/du-lieu";
 
 const TAM = 60;
 const NET = 10.5;
@@ -36,6 +37,8 @@ export function tinhVong(giaTri: number | null | undefined, mucTieu: number | nu
 export interface Vong3Props {
   soCau: number | null;
   soDung: number | null;
+  /** Mẫu số của vòng 2 = số câu đã có kết quả (không che); vắng / null ⇒ dùng soCau như trước. */
+  soCauCoKetQua?: number | null;
   phutHoc: number | null;
   mucTieu: { soCau: number | null; phutHoc: number | null } | null;
   /** Chữ đọc cho người dùng màn hình; bỏ trống ⇒ tự ghép từ các vòng đang vẽ. */
@@ -49,12 +52,13 @@ interface VongVe {
 }
 
 /** Các vòng SẼ vẽ, theo thứ tự 1 → 2 → 3. Vòng 2 (tỉ lệ đúng) không cần mục tiêu, không bao giờ vượt; con chưa làm câu nào (0) ⇒ vòng 2 trống nhưng CHỈ khi còn vòng khác để đi cùng. */
-export function cacVongVe({ soCau, soDung, phutHoc, mucTieu }: Omit<Vong3Props, "nhan">): VongVe[] {
+export function cacVongVe({ soCau, soDung, soCauCoKetQua, phutHoc, mucTieu }: Omit<Vong3Props, "nhan">): VongVe[] {
   const v1 = tinhVong(soCau, mucTieu?.soCau);
   const v3 = tinhVong(phutHoc, mucTieu?.phutHoc);
   let v2: KetQuaVong | null = null;
-  if (soCau !== null && soCau > 0 && soDung !== null) v2 = tinhVong(Math.min(soDung, soCau), soCau);
-  else if (soCau === 0 && (soDung === null || soDung === 0) && (v1 || v3)) v2 = tinhVong(0, 1);
+  const mau = mauSoTiLeDung({ soCau, soCauCoKetQua });
+  if (mau !== null && mau > 0 && soDung !== null) v2 = tinhVong(Math.min(soDung, mau), mau);
+  else if (mau === 0 && (soDung === null || soDung === 0) && (v1 || v3)) v2 = tinhVong(0, 1); // chưa làm câu nào, hoặc toàn câu che (chưa có câu nào có kết quả)
   const ra: VongVe[] = [];
   if (v1) ra.push({ mau: 1, kq: v1 });
   if (v2) ra.push({ mau: 2, kq: v2 });
@@ -65,11 +69,12 @@ export function cacVongVe({ soCau, soDung, phutHoc, mucTieu }: Omit<Vong3Props, 
 const f2 = (n: number): string => n.toFixed(2);
 const bien = (o: Record<string, string | number>) => o as CSSProperties; // biến CSS tự đặt (--tq-…)
 
-function nhanTuDong({ soCau, soDung, phutHoc, mucTieu }: Omit<Vong3Props, "nhan">, ve: VongVe[]): string {
+function nhanTuDong({ soCau, soDung, soCauCoKetQua, phutHoc, mucTieu }: Omit<Vong3Props, "nhan">, ve: VongVe[]): string {
+  const mau = mauSoTiLeDung({ soCau, soCauCoKetQua });
   const p: string[] = [];
   for (const v of ve) {
     if (v.mau === 1 && soCau !== null && mucTieu?.soCau) p.push(`${soCau} câu đã làm trên mục tiêu ${mucTieu.soCau} câu`);
-    if (v.mau === 2 && soCau && soDung !== null) p.push(`câu đúng ${Math.round((Math.min(soDung, soCau) / soCau) * 100)} %`);
+    if (v.mau === 2 && mau && soDung !== null) p.push(`câu đúng ${Math.round((Math.min(soDung, mau) / mau) * 100)} %`);
     if (v.mau === 3 && phutHoc !== null && mucTieu?.phutHoc) p.push(`${Math.round(phutHoc)} phút học trên mục tiêu ${Math.round(mucTieu.phutHoc)} phút`);
   }
   const dau = ve.length >= 3 ? "Ba vòng hôm nay" : ve.length === 2 ? "Hai vòng hôm nay" : "Vòng hôm nay";

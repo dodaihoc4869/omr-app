@@ -28,12 +28,17 @@ export interface DangTienBo { ma: string; ten: string; tu: number; den: number }
 /** Mục tiêu ngày để vẽ vòng 1 (câu) và vòng 3 (phút) — CHỈ khi máy chủ trả; thiếu ⇒ vòng đó ẩn, chỉ còn số. */
 export interface MucTieu { soCau: number | null; phutHoc: number | null }
 export interface TongQuan {
+  /** "Câu đã làm hôm nay" (định nghĩa chuẩn, GỒM cả câu bị che: chỉ đếm, không lộ đúng/sai). */
   soCau: number | null
+  /** Số câu ĐÚNG — chỉ trên câu KHÔNG che. Vắng khi cả ngày chỉ có câu che. */
   soDung: number | null
+  /** MẪU SỐ của tỉ lệ đúng = số câu KHÔNG che đã có kết quả (≤ soCau). Máy chủ cũ chưa gửi ⇒ null ⇒ màn rơi về soCau như trước. */
+  soCauCoKetQua: number | null
   phutHoc: number | null
   datNhiemVu: boolean | null
   chuoiNgayHoc: number | null
-  soVoiHomQua: { soCau: number; tiLeDung: number; phutHoc: number | null } | null
+  /** Hôm qua: ngày toàn câu che ⇒ chỉ có `soCau` (tiLeDung, soCauCoKetQua = null) — không có tỉ lệ đúng để so. */
+  soVoiHomQua: { soCau: number; tiLeDung: number | null; soCauCoKetQua: number | null; phutHoc: number | null } | null
   mucTieu: MucTieu | null
   /** Số lần ngồi học hôm nay + lần dài nhất (phút): máy chủ trả sẵn để câu tóm tắt không lệch; thiếu ⇒ màn tự đếm từ dòng thời gian. */
   soLanHoc: number | null
@@ -70,7 +75,7 @@ export interface PhMoi {
   tongQuan: TongQuan | null
   dongThoiGian: MocThoiGian[] | null
   cau: CauHomNay[] | null
-  nhipHoc: { ngay: { ngay: string; soCau: number; soCauDung: number }[]; gioThuongHoc: string; trungBinhCauMoiNgay: number | null; tongCau: number | null } | null
+  nhipHoc: { ngay: { ngay: string; soCau: number; soCauDung: number | null }[]; gioThuongHoc: string; trungBinhCauMoiNgay: number | null; tongCau: number | null } | null
   bacTheoDang: { ma: string; ten: string; bac: 0 | 1 | 2 }[] | null
   dangVap: DangSo[] | null
   vuaLenBac: { ma: string; ten: string; tu: number; den: number; ngay: string }[] | null
@@ -152,19 +157,42 @@ function docMucTieu(x: unknown): MucTieu | null {
   return m.soCau !== null || m.phutHoc !== null ? m : null
 }
 
+/** "So với hôm qua": tiLeDung có thể VẮNG (hôm qua toàn câu che) ⇒ giữ dòng, tiLeDung = null. Có gửi mà hỏng (âm, > 1) ⇒ bỏ cả khối như cũ. */
+function docSoVoiHomQua(v: Record<string, unknown> | null): TongQuan['soVoiHomQua'] {
+  if (!v) return null
+  const soCau = nguyenKhongAm(v.soCau)
+  if (soCau === null) return null
+  const ti = v.tiLeDung === undefined ? null : soKhongAm(v.tiLeDung)
+  if (v.tiLeDung !== undefined && (ti === null || ti > 1)) return null
+  const kq = nguyenKhongAm(v.soCauCoKetQua)
+  return { soCau, tiLeDung: ti, soCauCoKetQua: kq !== null && kq <= soCau ? kq : null, phutHoc: soKhongAm(v.phutHoc) }
+}
+
+/**
+ * MẪU SỐ của "câu đúng / tỉ lệ đúng" (Boss 21/09, một định nghĩa câu đã làm): số câu ĐÃ CÓ KẾT QUẢ (không che) do máy chủ gửi; chưa gửi (máy chủ cũ) ⇒ rơi về `soCau` như trước. Không có soCau ⇒ null.
+ */
+export function mauSoTiLeDung(t: { soCau: number | null; soCauCoKetQua?: number | null }): number | null {
+  if (t.soCau === null) return null
+  const kq = t.soCauCoKetQua
+  return typeof kq === 'number' && Number.isInteger(kq) && kq >= 0 && kq <= t.soCau ? kq : t.soCau
+}
+
 function docTongQuan(x: unknown): TongQuan | null {
   if (!laDoiTuong(x)) return null
   const v = laDoiTuong(x.soVoiHomQua) ? x.soVoiHomQua : null
   const vx = nguyenKhongAm(x.viecXong)
   const vt = nguyenKhongAm(x.viecTong)
   const coViec = vx !== null && vt !== null && vt > 0 && vx <= vt
+  const soCau = nguyenKhongAm(x.soCau)
+  const soKq = nguyenKhongAm(x.soCauCoKetQua)
   const t: TongQuan = {
-    soCau: nguyenKhongAm(x.soCau),
+    soCau,
     soDung: nguyenKhongAm(x.soDung),
+    soCauCoKetQua: soCau !== null && soKq !== null && soKq <= soCau ? soKq : null,
     phutHoc: soKhongAm(x.phutHoc),
     datNhiemVu: typeof x.datNhiemVu === 'boolean' ? x.datNhiemVu : null,
     chuoiNgayHoc: nguyenKhongAm(x.chuoiNgayHoc),
-    soVoiHomQua: v && nguyenKhongAm(v.soCau) !== null && soKhongAm(v.tiLeDung) !== null && (v.tiLeDung as number) <= 1 ? { soCau: v.soCau as number, tiLeDung: v.tiLeDung as number, phutHoc: soKhongAm(v.phutHoc) } : null,
+    soVoiHomQua: docSoVoiHomQua(v),
     mucTieu: docMucTieu(x.mucTieu),
     soLanHoc: nguyenKhongAm(x.soLanHoc),
     lanDaiNhatPhut: soKhongAm(x.lanDaiNhatPhut),
@@ -320,8 +348,9 @@ export function docTatCaVeCon(raw: unknown): PhMoi | null {
         ngay: lapDanh(nh.ngay, (e) => {
           if (!laDoiTuong(e) || typeof e.ngay !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(e.ngay)) return null
           const sc = nguyenKhongAm(e.soCau)
-          const sd = nguyenKhongAm(e.soCauDung)
-          return sc === null || sd === null || sd > sc ? null : { ngay: e.ngay, soCau: sc, soCauDung: sd }
+          // Ngày chỉ có câu bị che: máy chủ gửi soCau mà KHÔNG gửi soCauDung ⇒ giữ ngày (số câu vẫn thật), soCauDung = null (không "0 đúng" giả). Có gửi mà hỏng / lớn hơn soCau ⇒ bỏ cả ngày như cũ.
+          const sd = e.soCauDung === undefined ? null : nguyenKhongAm(e.soCauDung)
+          return sc === null || (e.soCauDung !== undefined && (sd === null || sd > sc)) ? null : { ngay: e.ngay, soCau: sc, soCauDung: sd }
         }, 14),
         gioThuongHoc: chuoi(nh.gioThuongHoc, 40),
         trungBinhCauMoiNgay: soKhongAm(nh.trungBinhCauMoiNgay),

@@ -10,7 +10,7 @@ import { chuBanApp } from '../../lib/cap-nhat-app'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { ViewGiaoThem } from '../../lib/use-giao-them'
 import { chuCaiTen, gioVn, ngayChuoiNgan, soVn, thuNgayVn } from '../../lib/ph-moi/dinh-dang'
-import type { PhMoi } from '../../lib/ph-moi/du-lieu'
+import { mauSoTiLeDung, type PhMoi } from '../../lib/ph-moi/du-lieu'
 import { ChuoiMuoiBonNgay } from '../../lib/ph-moi/nhip-ngay'
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import { chuCongBoCa } from './nhan'
@@ -71,7 +71,9 @@ function WidgetHomNay({ pm, now }: { pm: PhMoi; now: number }) {
   const dat = t?.datNhiemVu ?? null
   const coHoc = (t?.soCau ?? 0) > 0 || dat === true
   const gan = gioHocGanNhat(pm)
-  const pct = t && t.soCau && t.soCau > 0 && t.soDung !== null ? Math.round((t.soDung / t.soCau) * 100) : null
+  // Tỉ lệ đúng trên câu ĐÃ CÓ KẾT QUẢ (không che) — Boss 21/09; máy chủ cũ chưa gửi mẫu số ⇒ soCau như trước.
+  const mau = t ? mauSoTiLeDung(t) : null
+  const pct = t && mau !== null && mau > 0 && t.soDung !== null ? Math.round((Math.min(t.soDung, mau) / mau) * 100) : null
   const viec = t && t.viecTong !== null && t.viecXong !== null ? { xong: t.viecXong, tong: t.viecTong } : null
   const ba = [
     t?.soCau != null ? { b: String(t.soCau), n: 'câu đã làm' } : null,

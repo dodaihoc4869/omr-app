@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import { SoDem } from "./so-dem";
 import { gioVn, ngayChuoiNgan, ngayDayDuVn, thuTuChuoiNgay } from "../../../lib/ph-moi/dinh-dang";
-import type { PhMoi, TongQuan as TongQuanPh } from "../../../lib/ph-moi/du-lieu";
+import { mauSoTiLeDung, type PhMoi, type TongQuan as TongQuanPh } from "../../../lib/ph-moi/du-lieu";
 import { ChuoiMuoiBonNgay } from "../../../lib/ph-moi/nhip-ngay";
 import { BtBang, BtDongHo, BtMucTieu, BtMuiLen, BtMuiXuong, BtTichVong } from "./bieu-tuong";
 import { Chip, conChuaHoc, tenGoi } from "./dung-chung";
@@ -24,18 +24,23 @@ export interface DongChuGiai {
 
 const nguyen = (n: number): number => Math.round(n);
 
-/** THUẦN. Ba dòng "số + nhãn"; dòng nào thiếu số thì KHÔNG có. Có mục tiêu ⇒ "38/16 câu · đã làm · vượt mục tiêu"; thiếu mục tiêu ⇒ "38 câu · đã làm". */
-export function chuGiaiVong(t: Pick<TongQuanPh, "soCau" | "soDung" | "phutHoc" | "mucTieu">): DongChuGiai[] {
+/** THUẦN. Ba dòng "số + nhãn"; dòng nào thiếu số thì KHÔNG có. Có mục tiêu ⇒ "38/16 câu · đã làm · vượt mục tiêu"; thiếu mục tiêu ⇒ "38 câu · đã làm".
+ * Vòng 2 (Boss 21/09, một định nghĩa câu đã làm): "câu đã làm" GỒM câu bị che, còn tỉ lệ đúng chỉ tính trên câu ĐÃ CÓ KẾT QUẢ (không che) ⇒ máy chủ gửi `soCauCoKetQua`, màn ghi "đúng 30 trong 38 câu đã có kết quả"; máy chủ cũ chưa gửi ⇒ mẫu số = soCau, chữ như trước. */
+export function chuGiaiVong(t: Pick<TongQuanPh, "soCau" | "soDung" | "phutHoc" | "mucTieu"> & { soCauCoKetQua?: number | null }): DongChuGiai[] {
   const ra: DongChuGiai[] = [];
   const mucCau = t.mucTieu?.soCau ?? null;
   const mucPhut = t.mucTieu?.phutHoc != null ? nguyen(t.mucTieu.phutHoc) : null;
   if (t.soCau !== null) {
     const nhan = mucCau === null ? "đã làm" : t.soCau > mucCau ? "đã làm · vượt mục tiêu" : t.soCau === mucCau ? "đã làm · đạt mục tiêu" : `đã làm · mục tiêu ${mucCau} câu`;
     ra.push({ mau: "1", so: String(t.soCau), don: mucCau === null ? "câu" : `/${mucCau} câu`, nhan });
+    const mau = mauSoTiLeDung(t)!; // soCau !== null ở đây
+    const kq = t.soCauCoKetQua;
+    const coMauMoi = typeof kq === "number" && Number.isInteger(kq) && kq >= 0 && kq <= t.soCau; // máy chủ đã nói mẫu số ⇒ nói rõ "câu đã có kết quả"
     if (t.soCau === 0) ra.push({ mau: "2", so: "—", don: "", nhan: "câu đúng · chưa có câu nào" });
+    else if (mau === 0) ra.push({ mau: "2", so: "—", don: "", nhan: "câu đúng · chưa có câu nào có kết quả" }); // toàn câu bị che: không có gì để nói đúng/sai
     else if (t.soDung !== null) {
-      const dung = Math.min(t.soDung, t.soCau); // dữ liệu lệch (đúng > làm) không được ra quá 100 %
-      ra.push({ mau: "2", so: String(nguyen((dung / t.soCau) * 100)), don: "%", nhan: `đúng ${dung} trong ${t.soCau} câu` });
+      const dung = Math.min(t.soDung, mau); // dữ liệu lệch (đúng > mẫu số) không được ra quá 100 %
+      ra.push({ mau: "2", so: String(nguyen((dung / mau) * 100)), don: "%", nhan: coMauMoi ? `đúng ${dung} trong ${mau} câu đã có kết quả` : `đúng ${dung} trong ${mau} câu` });
     }
   }
   if (t.phutHoc !== null) {
@@ -57,7 +62,7 @@ export interface ChipHomQua {
 const GAN_BANG_DIEM = 2; // chênh ≤ 2 điểm phần trăm ⇒ "gần bằng hôm qua"
 
 /** THUẦN. Chip nào thiếu số thì KHÔNG có (phút chỉ khi hôm qua có `phutHoc`; tỉ lệ đúng chỉ khi hôm qua có làm câu). */
-export function soSanhHomQua(t: Pick<TongQuanPh, "soCau" | "soDung" | "phutHoc" | "soVoiHomQua">): ChipHomQua[] {
+export function soSanhHomQua(t: Pick<TongQuanPh, "soCau" | "soDung" | "phutHoc" | "soVoiHomQua"> & { soCauCoKetQua?: number | null }): ChipHomQua[] {
   const hq = t.soVoiHomQua;
   if (!hq) return [];
   const ra: ChipHomQua[] = [];
@@ -65,8 +70,10 @@ export function soSanhHomQua(t: Pick<TongQuanPh, "soCau" | "soDung" | "phutHoc" 
     const d = t.soCau - hq.soCau;
     ra.push(d > 0 ? { chu: `nhiều hơn ${d} câu`, huong: "len", mau: "dat" } : d < 0 ? { chu: `ít hơn ${-d} câu`, huong: "xuong" } : { chu: "số câu bằng hôm qua", huong: "bang" });
   }
-  if (t.soCau !== null && t.soCau > 0 && t.soDung !== null && hq.soCau > 0) {
-    const d = nguyen((Math.min(t.soDung, t.soCau) / t.soCau) * 100) - nguyen(hq.tiLeDung * 100);
+  const mau = mauSoTiLeDung(t);
+  // Tỉ lệ đúng so trên câu ĐÃ CÓ KẾT QUẢ ở cả hai ngày; hôm qua toàn câu che (tiLeDung vắng) ⇒ không so tỉ lệ.
+  if (mau !== null && mau > 0 && t.soDung !== null && hq.soCau > 0 && hq.tiLeDung !== null) {
+    const d = nguyen((Math.min(t.soDung, mau) / mau) * 100) - nguyen(hq.tiLeDung * 100);
     ra.push(
       d > GAN_BANG_DIEM
         ? { chu: `đúng hơn ${d} %`, huong: "len", mau: "dat" }
@@ -132,7 +139,7 @@ export function TongQuan({ pm, now }: { pm: PhMoi; now?: number }) {
   const soCau = t ? (t.soCau ?? (chua ? 0 : null)) : null;
   const phutHoc = t && t.phutHoc !== null ? nguyen(t.phutHoc) : t && chua ? 0 : null;
   const muc = t?.mucTieu ? { soCau: t.mucTieu.soCau, phutHoc: t.mucTieu.phutHoc !== null ? nguyen(t.mucTieu.phutHoc) : null } : null;
-  const so = { soCau, soDung: t?.soDung ?? null, phutHoc };
+  const so = { soCau, soDung: t?.soDung ?? null, soCauCoKetQua: t?.soCauCoKetQua ?? null, phutHoc };
   const dong = t ? chuGiaiVong({ ...so, mucTieu: muc }) : [];
   const moc = pm.serverNow ?? now ?? Date.now();
   const tomTat = chua ? null : tomTatHomNay(pm);
@@ -144,6 +151,7 @@ export function TongQuan({ pm, now }: { pm: PhMoi; now?: number }) {
     <Vong3
       soCau={so.soCau}
       soDung={so.soDung}
+      soCauCoKetQua={so.soCauCoKetQua}
       phutHoc={so.phutHoc}
       mucTieu={muc}
       nhan={chua ? "Các vòng hôm nay còn trống: con chưa học" : undefined}

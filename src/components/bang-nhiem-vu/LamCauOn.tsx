@@ -9,6 +9,7 @@ import './lam-cau-on.css'
 import { MomOption, MomQuestionStem } from '../MomQuestionMedia'
 import { LoiGiaiCauSai } from '../KhoiCauSai'
 import { HinhTaiViTri } from '../QuestionMedia'
+import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
 import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
 
 const KY_TU = ['A', 'B', 'C', 'D', 'E', 'F']
@@ -221,7 +222,7 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
           </p>
           {tienBo && (
             <p className="lco-phu">
-              Hôm nay em đã ôn {tienBo.daLamCau} câu · {tienBo.lenBac} câu lên bậc
+              Hôm nay em đã ôn {soCauDaLamHienThi(tienBo)} câu · {tienBo.lenBac} câu lên bậc
             </p>
           )}
           {exp > 0 && <p className="lco-exp">+{exp} EXP học tập</p>}

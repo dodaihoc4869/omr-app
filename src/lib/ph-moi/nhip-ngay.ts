@@ -4,13 +4,13 @@ import type { PhMoi } from './du-lieu'
 
 const hai = (n: number) => String(n).padStart(2, '0')
 
-export function ChuoiMuoiBonNgay(pm: Pick<PhMoi, 'nhipHoc' | 'serverNow'>): { ngay: string; soCau: number | null; soDung: number }[] {
+export function ChuoiMuoiBonNgay(pm: Pick<PhMoi, 'nhipHoc' | 'serverNow'>): { ngay: string; soCau: number | null; soDung: number | null }[] {
   const nh = pm.nhipHoc
   if (!nh) return []
   const homNay = tachVn(pm.serverNow ?? Date.now())
   if (!homNay) return []
   const map = new Map(nh.ngay.map((n) => [n.ngay, n]))
-  const ra: { ngay: string; soCau: number | null; soDung: number }[] = []
+  const ra: { ngay: string; soCau: number | null; soDung: number | null }[] = []
   for (let i = 13; i >= 0; i--) {
     const t = new Date(Date.UTC(homNay.y, homNay.m - 1, homNay.d) - i * 86_400_000)
     const k = `${t.getUTCFullYear()}-${hai(t.getUTCMonth() + 1)}-${hai(t.getUTCDate())}`

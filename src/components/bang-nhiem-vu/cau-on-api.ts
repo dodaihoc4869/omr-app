@@ -40,6 +40,8 @@ export interface KetQuaCauOn {
 
 export interface TienBoOn {
   daLamCau: number
+  /** Số câu HIỂN THỊ hôm nay (định nghĩa chuẩn, cùng ô Thi đua); máy chủ cũ không gửi ⇒ dùng `daLamCau`. */
+  soCauHienThi?: number
   lenBac: number
   tutBac: number
 }

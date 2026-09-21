@@ -9,6 +9,7 @@ import type { ThuThachRieng } from './thu-thach-rieng'
 import { chuSoCauCuaEm, dongPhuChang, tenBaiTapVeNha } from './btvn-ca-nhan-kieu'
 import { dinhDangConLai } from './tro-ly-ca-nhan'
 import { ngayVietNam } from './han-bai-tap'
+import { soCauDaLamHienThi } from './so-cau-hien-thi'
 import { docVeDich, type VeDichView } from './ve-dich-hien-thi'
 import type { CapDoUuTien, KeHoachNgayTroLy, NhiemVuTroLy } from './tro-ly-ca-nhan'
 
@@ -413,7 +414,7 @@ export interface KeHoachNgayMayChu {
   viec: ViecMayChu[]
   canhBao?: { loai: string; noiDung: string }[]
   quaHan?: { loai: 'btvn' | 'mom'; ma: string; hanNop: string; conLai?: number }[]
-  tienBo: { daLamCau: number; lenBac?: number; tutBac?: number; dat?: boolean; toiThieuCau?: number; conThieu?: number; thieuDat?: { soCauDung?: number; chu?: string } }
+  tienBo: { daLamCau: number; /** Số câu HIỂN THỊ (định nghĩa chuẩn, cùng ô Thi đua); vắng ⇒ màn dùng `daLamCau`. */ soCauHienThi?: number; lenBac?: number; tutBac?: number; dat?: boolean; toiThieuCau?: number; conThieu?: number; thieuDat?: { soCauDung?: number; chu?: string } }
   chuoiDat?: number
   lanNghi?: boolean
   capNhatLuc?: string
@@ -676,7 +677,8 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
   })
 
   const mucTieu = Math.max(0, Number(keHoach.nganSach.mucTieuCau) || 0)
-  const daLam = Math.max(0, Number(keHoach.tienBo.daLamCau) || 0)
+  // MỘT định nghĩa "câu đã làm hôm nay" (Boss 21/09): số HIỂN THỊ do máy chủ tính (`tienBo.soCauHienThi`, cùng ô Thi đua); máy chủ cũ chưa có ⇒ rơi về `daLamCau`. KHÔNG đụng luật đạt/chưa đạt (`tienBo.dat`, `conThieu`, `exp.datNgay` vẫn của máy chủ).
+  const daLam = soCauDaLamHienThi(keHoach.tienBo)
   const lenBac = Math.max(0, Number(keHoach.tienBo.lenBac) || 0)
   const conThieu = Math.max(0, Number(keHoach.tienBo.conThieu) || 0)
   // Nộp ≠ nắm: chỉ nói "đã làm N câu, M câu lên bậc", không nói "nắm chắc".
