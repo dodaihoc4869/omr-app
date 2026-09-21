@@ -119,7 +119,7 @@ describe('một nút nổi bật', () => {
     const onHanhDong = vi.fn()
     ve({ onHanhDong })
     const lamNgay = screen.getByRole('region', { name: /^Làm ngay: BTVN Ancol/ })
-    fireEvent.click(within(lamNgay).getByRole('button', { name: 'Làm Lô 1' }))
+    fireEvent.click(within(lamNgay).getByRole('button', { name: 'Làm chặng 1' }))
     expect(onHanhDong).toHaveBeenCalledTimes(1)
     expect(onHanhDong.mock.calls[0][0].loai).toBe('mo_btvn')
     expect(onHanhDong.mock.calls[0][0].payload).toEqual({ bt: btKhan })
@@ -177,7 +177,7 @@ describe('bốn bậc, bốn vai trò màu, cổng', () => {
       expect(the.textContent).toContain('Mở sau khi xong: ')
       fireEvent.click(the)
     }
-    expect(biCong[0].textContent).toContain('Mở sau khi xong: BTVN Este: Lô 1/2')
+    expect(biCong[0].textContent).toContain('Mở sau khi xong: BTVN Este: Chặng 1 trong 2 chặng')
     expect(onHanhDong).not.toHaveBeenCalled()
     const css = readFileSync(join(THU_MUC, 'bang-nhiem-vu.css'), 'utf8')
     expect(css).toMatch(/\.bnv-the\[aria-disabled='true'\]\s*\{[^}]*opacity:\s*0?\.38/)

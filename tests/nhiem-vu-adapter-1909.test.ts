@@ -167,7 +167,7 @@ describe('cổng', () => {
     expect(theo['mom:M9'].biCong).toBe(false)
     expect(theo['btvn_lo:BT-ANCOL:1'].biCong).toBe(false)
     expect(theo['on_lai:2026-09-19'].biCong).toBe(true)
-    expect(theo['on_lai:2026-09-19'].moSauKhiXong).toBe('BTVN Este: Lô 1/2')
+    expect(theo['on_lai:2026-09-19'].moSauKhiXong).toBe('BTVN Este: Chặng 1 trong 2 chặng')
     expect(theo['than_thu:CARBOHYDRATE.UNG_DUNG'].biCong).toBe(true)
     expect(theo['than_thu:CARBOHYDRATE.UNG_DUNG'].moSauKhiXong).toBe('Ôn 3 câu đã tới hạn nhắc lại')
     // Chỉ việc bị cổng mới có nhãn.
@@ -202,15 +202,15 @@ describe('nhánh máy chủ: tên, payload khi bấm, quá hạn, cảnh báo', 
 
   it('btvn_lo: tên "<BTVN>: Lô i/n", vạch lô, payload {bt} đúng bài (giữ nguyên đối tượng thô)', () => {
     const lo = theo['btvn_lo:BT-ANCOL:1']
-    expect(lo.tieuDe).toBe('BTVN Ancol: Lô 2/4')
+    expect(lo.tieuDe).toBe('BTVN Ancol: Chặng 2 trong 4 chặng')
     expect(lo.tienDoLo).toEqual({ hienTai: 2, tong: 4 })
-    expect(lo.hanhDong).toEqual({ loai: 'mo_btvn', payload: { bt: dsBtvnMay[0] }, nhanNut: 'Làm Lô 2' })
+    expect(lo.hanhDong).toEqual({ loai: 'mo_btvn', payload: { bt: dsBtvnMay[0] }, nhanNut: 'Làm chặng 2' })
     expect(theo['btvn_lo:BT-ESTE:0'].hanhDong.payload).toEqual({ bt: dsBtvnMay[1] })
   })
 
   it('btvn_lo mà màn chưa có bài thô: vẫn hiện, không payload (màn cổng rơi về mở danh sách BTVN), không bịa tên', () => {
     const x = tatCaViec(tuKeHoachNgay(keHoachMayChu, NOW)).find((t) => t.id === 'btvn_lo:BT-ANCOL:1')!
-    expect(x.tieuDe).toBe('BTVN: Lô 2/4')
+    expect(x.tieuDe).toBe('Bài tập về nhà: Chặng 2 trong 4 chặng') // không bịa tên; mã tờ đề/tên trống ⇒ "Bài tập về nhà"
     expect(x.hanhDong.payload).toBeUndefined()
   })
 

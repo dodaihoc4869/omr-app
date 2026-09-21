@@ -53,16 +53,16 @@ describe('thẻ việc BTVN cá nhân hoá: chặng, không phải lô', () => {
   it('caNhan phải đúng `true` (chuỗi/1 không tính)', () => {
     for (const caNhan of ['true', 1, 'yes']) {
       const t = viecDau(keHoach([ca({ caNhan })]))
-      expect(t.tieuDe).toContain('Lô 2/7')
-      expect(t.hanhDong.nhanNut).toBe('Làm Lô 2')
+      expect(t.tieuDe).toContain('Chặng 2 trong 7 chặng')
+      expect(t.hanhDong.nhanNut).toBe('Làm chặng 2')
       expect(t.tienDoLo).toEqual({ hienTai: 2, tong: 7 })
     }
   })
 
-  it('bài THƯỜNG không đổi một chữ: Lô, Làm Lô N, "N câu", tienDoLo không có laChang', () => {
+  it('bài THƯỜNG: tên "Chặng k trong n chặng", nút "Làm chặng N", "N câu", tienDoLo không có laChang', () => {
     const t = viecDau(keHoach([v({ id: 'btvn_lo:B-THUONG:0', loai: 'btvn_lo', soCau: 6, hanCung: gio(40), hanMem: gio(20), chiTiet: { ma: 'B-THUONG', chiSo: 0, tongLo: 2, treNhip: false } })]))
-    expect(t.tieuDe).toBe('BTVN Amin: Lô 1/2')
-    expect(t.hanhDong.nhanNut).toBe('Làm Lô 1')
+    expect(t.tieuDe).toBe('BTVN Amin: Chặng 1 trong 2 chặng')
+    expect(t.hanhDong.nhanNut).toBe('Làm chặng 1')
     expect(t.moTa).toContain('6 câu')
     expect(t.moTa).not.toContain('của em')
     expect(t.tienDoLo).toEqual({ hienTai: 1, tong: 2 })
@@ -70,12 +70,12 @@ describe('thẻ việc BTVN cá nhân hoá: chặng, không phải lô', () => {
 })
 
 describe('VachLo (thanh tiến độ)', () => {
-  it('bài cá nhân hoá đọc "Chặng x trên y"; bài thường vẫn "Lô x trên y"', () => {
+  it('chuẩn từ ngữ: cả bài cá nhân hoá lẫn bài thường đọc "Chặng x trong y chặng" (không còn "Lô")', () => {
     const { unmount } = render(<VachLo tienDo={{ hienTai: 2, tong: 7, laChang: true }} />)
-    expect(screen.getByRole('img', { name: 'Chặng 2 trên 7' })).toBeTruthy()
+    expect(screen.getByRole('img', { name: 'Chặng 2 trong 7 chặng' })).toBeTruthy()
     unmount()
     render(<VachLo tienDo={{ hienTai: 1, tong: 3 }} />)
-    expect(screen.getByRole('img', { name: 'Lô 1 trên 3' })).toBeTruthy()
+    expect(screen.getByRole('img', { name: 'Chặng 1 trong 3 chặng' })).toBeTruthy()
   })
 })
 
@@ -136,10 +136,10 @@ describe('thẻ bài cá nhân hoá — tên "Bài tập về nhà · Chặng k"
     expect(d).toEqual(['Chặng 1 trong 7 chặng', `Tờ đề: ${TEN_TO}`])
   })
 
-  it('bài THƯỜNG không có dòng phụ, tên giữ nguyên "Lô"', () => {
+  it('bài THƯỜNG không có dòng phụ, tên "<BTVN>: Chặng k trong n chặng"', () => {
     const t = viecDau(keHoach([v({ id: 'btvn_lo:B-THUONG:0', loai: 'btvn_lo', soCau: 6, hanCung: gio(40), hanMem: gio(20), chiTiet: { ma: 'B-THUONG', chiSo: 0, tongLo: 2, treNhip: false } })]))
     expect(t.dongPhu).toBeUndefined()
-    expect(t.tieuDe).toBe('BTVN Amin: Lô 1/2')
+    expect(t.tieuDe).toBe('BTVN Amin: Chặng 1 trong 2 chặng')
   })
 
   it('thẻ "LÀM NGAY" của học sinh VÀ thẻ của phụ huynh đều vẽ đủ các dòng, tên truy cập không chứa mã tờ', () => {
@@ -209,6 +209,6 @@ describe('K = số chặng THẬT của bài (soChang), không phải số chặ
     const d = tuKeHoachNgay(kh, NOW, { dsBtvn: [{ maBtvn: 'B-THUONG', maCa: 'CA-T', tenBtvn: 'BTVN Amin', soCau: 12, soChang: 99 }], dsMomGiao: [] })
     const t = [...(d.lamNgay ? [d.lamNgay] : []), ...d.cacBac.flatMap((b) => b.viec)][0]
     expect(t.tienDoLo).toEqual({ hienTai: 1, tong: 3 })
-    expect(t.tieuDe).toBe('BTVN Amin: Lô 1/3')
+    expect(t.tieuDe).toBe('BTVN Amin: Chặng 1 trong 3 chặng')
   })
 })

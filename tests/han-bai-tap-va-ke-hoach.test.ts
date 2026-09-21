@@ -32,7 +32,7 @@ describe('Hạn bài và ngày học Việt Nam', () => {
     // số câu của LÔ đang chờ nay là trường `soCau` cấp cao nhất của nhiệm vụ,
     // và phiếu tự tính lại lịch lô từ `bt` gốc trong payload.
     expect(p.top3[0].soCau).toBeGreaterThan(0)
-    expect(p.top3[0].hanhDong.nhanNut).toMatch(/^Làm Lô \d+$/)
+    expect(p.top3[0].hanhDong.nhanNut).toMatch(/^Làm chặng \d+$/)
   })
   it('hạn sai định dạng không bị coi là sát hạn', () => {
     expect(mocThoiGian('khong-hop-le')).toBeUndefined()

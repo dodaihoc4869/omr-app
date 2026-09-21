@@ -79,14 +79,14 @@ describe('sắp xếp và nhãn hạn: đúng như bản cũ', () => {
 })
 
 describe('C3 · tab BTVN ở cổng học sinh (/hs)', () => {
-  it('giữ nguyên chữ bản cũ (banner cách làm theo lô, không "3 Vòng"); không còn khung cuộn lồng nhau', async () => {
+  it('giữ nguyên chữ bản cũ (banner cách làm theo chặng, không "3 Vòng"); không còn khung cuộn lồng nhau', async () => {
     datDuong('/hs')
     mocks.items = [BT({})]
     const { container } = render(<StudentPortalScreen />)
     await moTab()
-    expect(await screen.findByText('Cách làm bài tập về nhà: chia lô theo ngày/giờ')).toBeTruthy()
+    expect(await screen.findByText('Cách làm bài tập về nhà: chia chặng theo ngày/giờ')).toBeTruthy()
     const chu = container.ownerDocument.body.textContent!
-    for (const t of ['LÔ ĐANG MỞ', 'LÔ SAU', 'NỘP BÀI', 'Xong lô đang mở, lô sau mở đúng nhịp']) expect(chu).toContain(t)
+    for (const t of ['CHẶNG ĐANG MỞ', 'CHẶNG SAU', 'NỘP BÀI', 'Xong chặng đang mở, chặng sau mở đúng nhịp']) expect(chu).toContain(t)
     expect(chu).not.toMatch(/3 Vòng|Phân Tầng|VÒNG [123]|nắm chắc/i)
     expect(document.querySelector('.max-h-\\[65vh\\]')).toBeNull()
     expect(screen.getByRole('region', { name: 'Bài tập về nhà' })).toBeTruthy()

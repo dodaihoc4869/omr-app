@@ -6,7 +6,7 @@ import type { TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 
 export function VachLo({ tienDo }: { tienDo: NonNullable<TheNhiemVu['tienDoLo']> }) {
   return (
-    <div className="bnv-lo" role="img" aria-label={`${tienDo.laChang ? 'Chặng' : 'Lô'} ${tienDo.hienTai} trên ${tienDo.tong}`}>
+    <div className="bnv-lo" role="img" aria-label={`Chặng ${tienDo.hienTai} trong ${tienDo.tong} chặng`}>
       {Array.from({ length: tienDo.tong }, (_, i) => (
         <i key={i} data-lo={i + 1 < tienDo.hienTai ? 'xong' : i + 1 === tienDo.hienTai ? 'dang' : 'cho'} />
       ))}

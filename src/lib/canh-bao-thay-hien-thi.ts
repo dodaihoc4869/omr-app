@@ -5,6 +5,7 @@
 // THUẦN: không mạng, không đồng hồ (giờ hiện tại truyền vào), không trường lạ ra ngoài. Nói ĐÚNG SỰ THẬT (chưa mở / dở chặng mấy / hạn lúc nào),
 // không doạ, không so với bạn, không nhãn năng lực. Mã tờ đề không bao giờ làm tên.
 import { lamSachLoi } from './bo-nao-hien-thi'
+import { trongNhuMa } from './btvn-ca-nhan-kieu'
 import { gioDayDu } from './ngay-gio-24'
 
 export type TrangThaiEm = 'chua_mo' | 'do_chang' | 'qua_han'
@@ -31,8 +32,7 @@ const laDoiTuong = (x: unknown): x is Record<string, unknown> => x !== null && t
 const chuoi = (x: unknown, tran: number): string => (typeof x === 'string' || typeof x === 'number' ? lamSachLoi(String(x), tran).replace(/\s*\n+\s*/g, ' ') : '')
 const soNguyenDuong = (x: unknown): number => (typeof x === 'number' && Number.isInteger(x) && x >= 1 ? x : 0)
 
-/** Chuỗi trông như MÃ (không khoảng trắng, có chữ số, ≥ 6 ký tự: "DH-12-C2-B6-TN", "BTVN240921") ⇒ không phải tên để hiện cho em/phụ huynh. */
-export const trongNhuMa = (s: string): boolean => /^[A-Za-z0-9][A-Za-z0-9._#/-]{5,}$/.test(s) && /\d/.test(s)
+export { trongNhuMa }
 
 /** Đọc `canhBaoThay` từ gốc phản hồi. Không phải mảng / dòng hỏng (thiếu id) ⇒ bỏ dòng; trùng id ⇒ giữ dòng đầu; tối đa 3. */
 export function docCanhBaoThay(x: unknown): CanhBaoThay[] {

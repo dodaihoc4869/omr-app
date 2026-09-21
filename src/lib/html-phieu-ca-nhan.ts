@@ -91,8 +91,13 @@ export function nhomThuSucHtml(soCau: number): string {
   return `<section class="gcn-nhom-ts" id="gcn-nhom-ts" aria-label="${esc(TIEU_DE_THU_SUC)}">
   <h3><span class="gcn-o-bt">${ICON.flag}</span>${esc(TIEU_DE_THU_SUC)}</h3>
   <p>${esc(LOI_DAN_THU_SUC)}</p>
-  <small>${soCau} câu · không tính vào tiến độ, không chặn nút nộp</small>
+  <small>${soCau} câu · không tính vào tiến độ · nộp riêng bằng nút ở cuối nhóm</small>
 </section>`
+}
+
+/** Nút NỘP RIÊNG phần thử sức thêm (chặng ảo) — đứng SAU câu thử sức cuối. `tat` = máy chủ đã nhận phần này. */
+export function nopThuSucHtml(nut: string, tat: boolean): string {
+  return `<div class="gcn-nop-ts"><button class="nut nop" type="button" id="nut-nop-ts"${tat ? ' disabled' : ''}>${esc(nut)}</button><span id="nop-loi-ts" class="nop-loi" role="alert" hidden></span></div>`
 }
 
 /** Dòng "Chặng 2 mở ngày mai" khi chưa có câu nào để làm. */
@@ -124,6 +129,8 @@ html.gd-m3 body .gcn-nhom-ts h3 { margin: 0; display: flex; align-items: center;
 html.gd-m3 body .gcn-nhom-ts p { margin: 6px 0 0; font-size: 15px; line-height: 1.45; }
 html.gd-m3 body .gcn-nhom-ts small { display: block; margin-top: 6px; font-size: 13px; font-weight: 600; opacity: 0.9; }
 html.gd-m3 body .q-card-thu-suc { border-inline-start: 4px solid var(--gcn-vang-chu); }
+html.gd-m3 body .gcn-nop-ts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 12px 0 8px; }
+html.gd-m3 body .gcn-nop-ts .nop-loi { flex: 1 1 100%; }
 html.gd-m3 body .gcn-sep { margin: 0 10px; font-size: 24px; font-weight: 500; opacity: 0.7; }
 html.gd-m3 body .gcn-hero-phu { margin-top: 4px; font-size: 15px; opacity: 0.85; }
 html.gd-m3 body .gcn-chang { list-style: none; margin: 16px 0 0; padding: 0; display: flex; }

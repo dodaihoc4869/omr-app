@@ -5,7 +5,7 @@
 // của dữ liệu; ở đây chỉ gán bậc, tính cổng và chọn thẻ "Làm ngay".
 import { docBoNao, docBoNaoHocSinh, type BoNaoView } from './bo-nao-hien-thi'
 import { docCanhBaoThay, type CanhBaoThay } from './canh-bao-thay-hien-thi'
-import { chuSoCauCuaEm, dongPhuChang } from './btvn-ca-nhan-kieu'
+import { chuSoCauCuaEm, dongPhuChang, tenBaiTapVeNha } from './btvn-ca-nhan-kieu'
 import { dinhDangConLai } from './tro-ly-ca-nhan'
 import { ngayVietNam } from './han-bai-tap'
 import type { CapDoUuTien, KeHoachNgayTroLy, NhiemVuTroLy } from './tro-ly-ca-nhan'
@@ -189,7 +189,8 @@ function bieuTuongTuLoai(loai: string): BieuTuongViec {
 }
 
 function docTienDoLo(tieuDe: string): TheNhiemVu['tienDoLo'] {
-  const m = /Lô\s+(\d+)\s*\/\s*(\d+)/.exec(tieuDe)
+  // Chuẩn từ ngữ (Boss 21/09): "Chặng k trong n chặng". Bản nhớ cũ còn "Lô k/n" ⇒ vẫn đọc được.
+  const m = /Chặng\s+(\d+)\s+trong\s+(\d+)\s+chặng/.exec(tieuDe) ?? /Lô\s+(\d+)\s*\/\s*(\d+)/.exec(tieuDe)
   if (!m) return undefined
   const hienTai = Number(m[1])
   const tong = Number(m[2])
@@ -491,11 +492,11 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
         // Bài cá nhân hoá (hợp đồng BTVN nâng đỡ mục 7): lô ≡ chặng, `chiTiet.caNhan:true`.
         // Thầy 21/09: thẻ bài cá nhân hoá KHÔNG lấy mã tờ đề làm tên — "Bài tập về nhà · Chặng k"; mã tờ xuống dòng phụ (`dongPhu`).
         if (ct.caNhan === true) return `Bài tập về nhà · Chặng ${Number(ct.chiSo) + 1}`
-        return `${bt?.tenBtvn || bt?.tieuDe || 'BTVN'}: Lô ${Number(ct.chiSo) + 1}/${Number(ct.tongLo)}`
+        return `${tenBaiTapVeNha(bt)}: Chặng ${Number(ct.chiSo) + 1} trong ${Number(ct.tongLo)} chặng`
       }
       case 'btvn_nop': {
         const bt = btvnTheoMa(ct.ma)
-        return `${bt?.tenBtvn || bt?.tieuDe || 'BTVN'}: nộp bài`
+        return `${tenBaiTapVeNha(bt)}: nộp bài`
       }
       case 'mom':
         return momTheoId(ct.id)?.tieuDe || 'Bài của Mẹ giao'
@@ -513,7 +514,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       case 'btvn_lo':
       case 'btvn_nop': {
         const bt = btvnTheoMa(ct.ma)
-        return { loai: 'mo_btvn', payload: bt ? { bt } : undefined, nhanNut: v.loai === 'btvn_nop' ? 'Nộp bài' : `${ct.caNhan === true ? 'Làm chặng' : 'Làm Lô'} ${Number(ct.chiSo) + 1}` }
+        return { loai: 'mo_btvn', payload: bt ? { bt } : undefined, nhanNut: v.loai === 'btvn_nop' ? 'Nộp bài' : `Làm chặng ${Number(ct.chiSo) + 1}` }
       }
       case 'mom': {
         const bai = momTheoId(ct.id)
@@ -554,7 +555,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       phanMoTa.push(ct.caNhan === true ? (ct.chuaChot === true ? 'Bộ câu của em chốt khi em mở bài' : chuSoCauCuaEm(soCau, soTs)) : `${soCau} câu`)
       if (ct.treNhip === true) phanMoTa.push('đã trễ nhịp — làm trước')
     } else if (v.loai === 'mom') phanMoTa.push(ct.chuaBatDau === true ? `Gồm ${soCau} câu · 120 phút từ khi bắt đầu` : `Gồm ${soCau} câu`)
-    else if (v.loai === 'btvn_nop') phanMoTa.push('Đã xong mọi lô — bấm nộp bài trước hạn')
+    else if (v.loai === 'btvn_nop') phanMoTa.push('Đã xong mọi chặng — bấm Nộp bài trước Hạn nộp')
     else if (soCau > 0) phanMoTa.push(`${soCau} câu`)
     if (conLaiChu) phanMoTa.push(conLaiChu)
     const tieuDe = tenTheoId.get(v.id)!
@@ -620,7 +621,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       return { id: `qua_han:mom:${q.ma}`, loai: 'mom', tieuDe: bai?.tieuDe || 'Bài của Mẹ giao', chu: 'Đã hết giờ — mở để nộp phần đã lưu', hanhDong: { loai: 'mo_mom', payload: bai ? { id: bai.id, bai } : { id: q.ma }, nhanNut: 'Mở để nộp' } }
     }
     const bt = btvnTheoMa(q.ma)
-    return { id: `qua_han:btvn:${q.ma}`, loai: 'btvn', tieuDe: bt?.tenBtvn || bt?.tieuDe || 'BTVN', chu: 'Đã quá hạn — cần Thầy gia hạn' }
+    return { id: `qua_han:btvn:${q.ma}`, loai: 'btvn', tieuDe: tenBaiTapVeNha(bt), chu: 'Đã quá hạn — cần Thầy gia hạn' }
   })
 
   const mucTieu = Math.max(0, Number(keHoach.nganSach.mucTieuCau) || 0)
@@ -670,7 +671,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
 }
 
 const TEN_LOAI: Record<string, string> = {
-  btvn_lo: 'Lô BTVN',
+  btvn_lo: 'Chặng bài tập về nhà',
   mom: 'Bài gia đình giao',
   on_lai: 'Ôn câu tới hạn nhắc lại',
   on_thi: 'Ôn trước ca thi',

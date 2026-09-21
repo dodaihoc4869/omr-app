@@ -58,7 +58,7 @@ describe('BTVN Phân Tầng: Hiện Sáng / Ẩn Mờ (Paced Highlighting & Dimm
     // 3. Các câu từ 9 trở đi phải có class q-card-dimmed và banner khóa nhẹ trong thẻ
     expect(html).toContain('q-card-dimmed')
     expect(html).toContain('<div class="dimmed-pacing-banner">')
-    expect(html).toContain('Câu thuộc lô tiếp theo · Hoàn thành 8 câu sáng hôm nay trước')
+    expect(html).toContain('Câu thuộc chặng tiếp theo · Hoàn thành 8 câu sáng hôm nay trước')
   })
 
   it('Khi đã nộp bài hoặc mở xem lại thì không còn câu nào bị ẩn mờ', () => {
@@ -117,7 +117,7 @@ describe('Thuật toán Trợ Lý Cá Nhân: Tự động rút câu và gán hà
       expect(taskLo.hanhDong.loai).toBe('mo_btvn')
       expect(taskLo.hanhDong.payload?.bt?.maBtvn).toBe('BTVN_01')
       expect(taskLo.soCau).toBeGreaterThan(0)
-      expect(taskLo.hanhDong.nhanNut).toMatch(/^Làm Lô \d+$/)
+      expect(taskLo.hanhDong.nhanNut).toMatch(/^Làm chặng \d+$/)
     }
 
     const taskSai = topTasks.find((t) => t.loai === 'sua_loi_vong1')

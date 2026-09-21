@@ -25,6 +25,19 @@ export interface ChangEm {
   dungNhipTruoc: string
 }
 
+/** Khoá `thuSucThem {chiSo, moLuc, cau[], daNop}` của phản hồi mở bài. */
+export interface ThuSucThemEm {
+  /** Chỉ số CHẶNG ẢO của nhóm (= `soChang`): gửi kèm khi nộp phần thử sức. */
+  chiSo: number
+  moLuc: string
+  /** Máy chủ đã nhận phần thử sức của em (nộp rồi thì khoá). */
+  daNop: boolean
+  /** Mã các câu của nhóm, theo thứ tự (từ `cau[]`: câu đầy đủ hoặc chỉ mã). */
+  maCau: string[]
+  /** Câu ĐẦY ĐỦ (không đáp án) máy chủ gửi kèm trong `thuSucThem.cau`; câu chỉ có mã thì nằm trong `de.cau`. */
+  cau: Record<string, unknown>[]
+}
+
 export interface BaiCaNhanEm {
   /** Số câu CỦA EM (không phải số câu của cả bài). */
   soCauCuaEm: number
@@ -39,11 +52,12 @@ export interface BaiCaNhanEm {
   /** Nhãn của các câu đã mở. Nhãn lạ bị bỏ (câu đó chỉ không có nhãn). */
   nhan: Record<string, NhanCauEm>
   /**
-   * BẢN 1.2 — mã các câu "THỬ SỨC THÊM · không bắt buộc" (lõi cao hơn bậc của em): KHÔNG nằm trong `chang`, KHÔNG tính vào `soCauCuaEm`,
-   * không chặn xong chặng/xong bài. Máy chủ chưa gửi ⇒ [] (bài như cũ). Chỉ có mã khi chặng cuối đã mở (câu mở cùng lúc chặng cuối).
+   * BẢN 1.2 (Boss chốt 21/09) — "THỬ SỨC THÊM · không bắt buộc" là một CHẶNG ẢO `chiSo = soChang`, KHÔNG nằm trong `chang`, KHÔNG tính vào
+   * `soCauCuaEm`, không chặn xong chặng/xong bài. Nộp RIÊNG bằng lệnh nộp chặng với `chiSo` ấy, nộp được tới hạn nộp kể cả khi phần bắt buộc
+   * đã xong. Máy chủ chưa gửi khoá ⇒ null (bài như cũ).
    */
-  thuSucThem: string[]
-  /** Số câu thử sức thêm của em (kể cả khi chặng cuối CHƯA mở, để bảng nhiệm vụ nói trước). = `thuSucThem.length` nếu máy chủ không gửi số riêng. */
+  thuSucThem: ThuSucThemEm | null
+  /** Số câu thử sức thêm của em (kể cả khi chưa mở, để bảng nhiệm vụ nói trước): `soThuSucThem` máy chủ gửi, hoặc số mã trong `thuSucThem`. */
   soThuSucThem: number
 }
 
@@ -73,7 +87,8 @@ export function docBaiCaNhan(r: unknown): BaiCaNhanEm | null {
   if (laDoiTuong(r.nhan)) {
     for (const [qid, n] of Object.entries(r.nhan)) if (typeof n === 'string' && NHAN_HOP_LE.has(n)) nhan[qid] = n as NhanCauEm
   }
-  const thuSucThem = docMaThuSuc(r)
+  const soChangDoc = laSoNguyenKhongAm(r.soChang) ? r.soChang : chang.length
+  const thuSucThem = docThuSucThem(r.thuSucThem, soChangDoc)
   const soCauCuaEm = laSoNguyenKhongAm(r.soCauCuaEm) ? r.soCauCuaEm : laSoNguyenKhongAm(r.soCau) ? r.soCau : chang.reduce((t, c) => t + c.soCau, 0)
   return {
     soCauCuaEm,
@@ -84,51 +99,67 @@ export function docBaiCaNhan(r: unknown): BaiCaNhanEm | null {
     chang,
     nhan,
     thuSucThem,
-    soThuSucThem: laSoNguyenKhongAm(r.soThuSucThem) ? Math.max(r.soThuSucThem, thuSucThem.length) : thuSucThem.length,
+    soThuSucThem: laSoNguyenKhongAm(r.soThuSucThem) ? Math.max(r.soThuSucThem, thuSucThem?.maCau.length ?? 0) : thuSucThem?.maCau.length ?? 0,
   }
 }
 
 const maCua = (v: unknown): string => (typeof v === 'string' ? v.trim() : laDoiTuong(v) ? maCua(v.qid ?? v.id) : '')
 
-/** Mã các câu thử sức thêm từ phản hồi `/btvn/cua-em`: chịu CẢ hai dạng — `thuSucThem:[qid]` ở gốc, hoặc `de.thuSucThem:[câu]` (mỗi câu có `qid`). Bỏ trùng, giữ thứ tự. */
-function docMaThuSuc(r: Record<string, unknown>): string[] {
-  const nguon: unknown[] = []
-  if (Array.isArray(r.thuSucThem)) nguon.push(...r.thuSucThem)
-  if (laDoiTuong(r.de) && Array.isArray(r.de.thuSucThem)) nguon.push(...r.de.thuSucThem)
-  const ra: string[] = []
-  for (const x of nguon) {
-    const m = maCua(x)
-    if (m && !ra.includes(m)) ra.push(m)
+/** Đọc khoá `thuSucThem` (đối tượng). Không phải đối tượng (vắng, mảng, chuỗi…) ⇒ null. `cau[]`: mục là đối tượng ⇒ câu đầy đủ; mục là chuỗi ⇒ chỉ mã. */
+function docThuSucThem(v: unknown, soChang: number): ThuSucThemEm | null {
+  if (!laDoiTuong(v)) return null
+  const maCau: string[] = []
+  const cau: Record<string, unknown>[] = []
+  if (Array.isArray(v.cau)) {
+    for (const x of v.cau) {
+      const m = maCua(x)
+      if (!m || maCau.includes(m)) continue
+      maCau.push(m)
+      if (laDoiTuong(x)) cau.push(x)
+    }
   }
-  return ra
+  return {
+    chiSo: laSoNguyenKhongAm(v.chiSo) ? v.chiSo : soChang,
+    moLuc: typeof v.moLuc === 'string' ? v.moLuc : '',
+    daNop: v.daNop === true,
+    maCau,
+    cau,
+  }
 }
 
 /**
- * Tách câu của phản hồi thành BẮT BUỘC (đi vào các chặng) và THỬ SỨC THÊM. Câu thử sức có thể nằm lẫn trong `de.cau` (nhận ra bằng mã) và/hoặc
- * trong `de.thuSucThem`; mỗi câu chỉ xuất hiện một lần. Không có mã thử sức ⇒ `batBuoc` = đúng `deCau`, `thuSuc` rỗng (bài như cũ).
+ * Tách câu của phản hồi thành BẮT BUỘC (đi vào các chặng) và THỬ SỨC THÊM. Câu thử sức = `thuSucThem.cau` (đầy đủ) + câu trong `de.cau` mang mã có trong nhóm;
+ * mỗi câu một lần, theo thứ tự mã của nhóm. Không có nhóm ⇒ `batBuoc` = đúng `deCau`, `thuSuc` rỗng (bài như cũ).
  */
-export function tachThuSucThem<T extends Record<string, unknown>>(b: Pick<BaiCaNhanEm, 'thuSucThem'>, deCau: readonly T[], deThuSuc: readonly T[] = []): { batBuoc: T[]; thuSuc: T[] } {
-  const ts = new Set(b.thuSucThem)
-  const batBuoc: T[] = []
-  const thuSuc: T[] = []
-  const thay = new Set<string>()
-  for (const c of [...deCau, ...deThuSuc]) {
-    const m = maCua(c)
-    if (m && ts.has(m)) {
-      if (!thay.has(m)) {
-        thay.add(m)
-        thuSuc.push(c)
-      }
-    } else if (deCau.includes(c)) batBuoc.push(c)
-  }
-  return { batBuoc, thuSuc }
+export function tachThuSucThem<T extends Record<string, unknown>>(b: Pick<BaiCaNhanEm, 'thuSucThem'>, deCau: readonly T[]): { batBuoc: T[]; thuSuc: (T | Record<string, unknown>)[] } {
+  const nhom = b.thuSucThem
+  if (!nhom) return { batBuoc: [...deCau], thuSuc: [] }
+  const ma = new Set(nhom.maCau)
+  const trongDe = new Map<string, T>()
+  for (const c of deCau) if (ma.has(maCua(c))) trongDe.set(maCua(c), c)
+  const daGui = new Map<string, Record<string, unknown>>()
+  for (const c of nhom.cau) daGui.set(maCua(c), c)
+  const thuSuc = nhom.maCau.map((m) => trongDe.get(m) ?? daGui.get(m)).filter((c): c is T | Record<string, unknown> => c !== undefined)
+  return { batBuoc: deCau.filter((c) => !ma.has(maCua(c))), thuSuc }
 }
 
-/** Nhóm thử sức chỉ hiện ở CHẶNG CUỐI khi chặng cuối đã mở (mở cùng lúc). */
+/** Nhóm thử sức chỉ hiện ở CHẶNG CUỐI khi chặng cuối đã mở (mở cùng lúc) — kể cả khi phần bắt buộc đã xong (còn nộp được tới hạn). */
 export function hienNhomThuSuc(b: BaiCaNhanEm, chiSoHienThi: number): boolean {
-  if (b.thuSucThem.length === 0 || b.chang.length === 0) return false
+  if (!b.thuSucThem || b.thuSucThem.maCau.length === 0 || b.chang.length === 0) return false
   const cuoi = b.chang[b.chang.length - 1]!
   return cuoi.daMo && cuoi.chiSo === chiSoHienThi
+}
+
+/** Chuỗi trông như MÃ (không khoảng trắng, có chữ số, ≥ 6 ký tự: "DH-12-C2-B6-TN", "BTVN240921") ⇒ không phải tên để hiện cho em/phụ huynh. */
+export const trongNhuMa = (s: string): boolean => /^[A-Za-z0-9][A-Za-z0-9._#/-]{5,}$/.test(s) && /\d/.test(s)
+
+/** Tên bài để HIỆN: tên thầy đặt; thiếu hoặc trông như MÃ tờ đề ⇒ "Bài tập về nhà" (luật 4 CHUAN-TU-NGU: không mã nội bộ làm tên). */
+export function tenBaiTapVeNha(bt: { tenBtvn?: unknown; tieuDe?: unknown } | undefined): string {
+  for (const v of [bt?.tenBtvn, bt?.tieuDe]) {
+    const t = typeof v === 'string' ? v.trim() : ''
+    if (t && !trongNhuMa(t)) return t
+  }
+  return 'Bài tập về nhà'
 }
 
 export const TIEU_DE_THU_SUC = 'Thử sức thêm · không bắt buộc'
@@ -321,6 +352,10 @@ export interface KetQuaChang {
   /** CHỈ có khi chặng CUỐI vừa xong: máy chủ TỰ chốt nộp bài. `soCau` là MẪU điểm (đã trừ câu thưởng sai),
    * điểm = soDung / soCau × 10. Máy em không gọi /btvn/nop cho bài ca_nhan. */
   nop?: { daNop: boolean; nopLuc: string; soDung: number; soCau: number; soCauCuaEm: number; soCauThuongSai: number; qidSai: string[] }
+  /** BẢN 1.2 — chỉ khi vừa nộp phần THỬ SỨC THÊM (chặng ảo): số câu của nhóm, số đã làm, số đúng, máy chủ đã nhận phần này chưa. */
+  thuSucThem?: { chiSo: number; soCau: number; soDaLam: number; soDung: number; daNop: boolean }
+  /** BẢN 1.2 — chỉ khi BÀI ĐÃ NỘP: điểm hiện tại SAU KHI cộng thử sức đúng (điểm = soDung / soCau × 10). */
+  baiDaNop?: { soDung: number; soCau: number }
 }
 
 /** Đọc phản hồi `/btvn/xong-lo` của bài cá nhân hoá. null khi không phải một đối tượng. */
@@ -366,6 +401,17 @@ export function docKetQuaChang(r: unknown): KetQuaChang | null {
       qidSai: Array.isArray(r.nop.qidSai) ? r.nop.qidSai.filter((q): q is string => typeof q === 'string') : [],
     }
   }
+  if (laDoiTuong(r.thuSucThem) && laSoNguyenKhongAm(r.thuSucThem.chiSo) && laSoNguyenKhongAm(r.thuSucThem.soCau)) {
+    const t = r.thuSucThem
+    out.thuSucThem = {
+      chiSo: t.chiSo as number,
+      soCau: t.soCau as number,
+      soDaLam: laSoNguyenKhongAm(t.soDaLam) ? t.soDaLam : 0,
+      soDung: laSoNguyenKhongAm(t.soDung) ? t.soDung : 0,
+      daNop: t.daNop === true,
+    }
+  }
+  if (laDoiTuong(r.baiDaNop) && laSoNguyenKhongAm(r.baiDaNop.soDung) && laSoNguyenKhongAm(r.baiDaNop.soCau)) out.baiDaNop = { soDung: r.baiDaNop.soDung, soCau: r.baiDaNop.soCau }
   if (laDoiTuong(r.tienBo)) {
     const t = r.tienBo
     out.tienBo = {
@@ -441,9 +487,12 @@ export interface TheChangView {
 
 /** null khi chặng CHƯA xong hẳn (còn câu bỏ trống): chỉ làm mới phiếu, không bật thẻ. */
 export function theChangView(ket: KetQuaChang, soChang?: number | null): TheChangView | null {
-  if (!ket.ok || !ket.chang?.xong) return null
-  const k = ket.chang.chiSo + 1
+  if (!ket.ok || !ket.chang) return null
   const tong = soChang && soChang > 0 ? soChang : null
+  // Chặng ẢO "Thử sức thêm" (chiSo = soChang, nộp riêng): thẻ nói riêng, không đếm vào "chặng k/K". Nộp một phần (bỏ trống câu) vẫn kể: câu bỏ trống không tính gì.
+  const thuSuc = (tong !== null && ket.chang.chiSo >= tong) || (ket.thuSucThem !== undefined && ket.thuSucThem.chiSo === ket.chang.chiSo)
+  if (!ket.chang.xong && !(thuSuc && (ket.thuSucThem?.soDaLam ?? ket.ketQua.length) > 0)) return null
+  const k = ket.chang.chiSo + 1
   const dangLenBac = (ket.tienBo?.dangLenBac ?? [])
     .map((d) => ({ ten: d.ten, tu: tenMucBac(d.tu), den: tenMucBac(d.den) }))
     .filter((d) => d.tu !== '' && d.den !== '')
@@ -452,20 +501,24 @@ export function theChangView(ket: KetQuaChang, soChang?: number | null): TheChan
   if (t && t.soCauDungLai > 0) dong.push({ kieu: 'lai', chu: `Đúng lại ${t.soCauDungLai} câu từng sai` })
   if (t && t.soCauMoiGap > 0) dong.push({ kieu: 'moi', chu: `Gặp ${t.soCauMoiGap} câu mới` })
   if (t && t.soDangMoi > 0) dong.push({ kieu: 'dang', chu: `Mở thêm ${t.soDangMoi} dạng mới` })
-  const nop = ket.nop
+  const nop = thuSuc
+    ? ket.baiDaNop
+      ? { chu: `Điểm bài đã cộng phần thử sức: đúng ${ket.baiDaNop.soDung}/${ket.baiDaNop.soCau} câu`, ghiThuong: null }
+      : null
+    : ket.nop
     ? {
         chu: `Em đã xong cả bài: đúng ${ket.nop.soDung}/${ket.nop.soCau} câu`,
         ghiThuong: ket.nop.soCauThuongSai > 0 ? `${ket.nop.soCauThuongSai} câu thưởng chưa đúng không bị tính vào điểm.` : null,
       }
     : null
   return {
-    tieuDe: nop ? 'Xong cả bài' : `Xong chặng ${k}`,
-    phu: `Chặng ${k}${tong ? `/${tong}` : ''} · đúng ${ket.chang.soDung}/${ket.chang.soCau} câu`,
+    tieuDe: thuSuc ? 'Đã nộp phần thử sức thêm' : nop ? 'Xong cả bài' : `Xong chặng ${k}`,
+    phu: thuSuc ? `Thử sức thêm · đúng ${ket.thuSucThem?.soDung ?? ket.chang.soDung}/${ket.thuSucThem?.soDaLam ?? ket.chang.soCau} câu đã làm` : `Chặng ${k}${tong ? `/${tong}` : ''} · đúng ${ket.chang.soDung}/${ket.chang.soCau} câu`,
     coTienBo: dangLenBac.length > 0 || dong.length > 0,
     dangLenBac,
     dong,
     exp: ket.exp && ket.exp.homNay > 0 ? { homNay: ket.exp.homNay, conLai: ket.exp.conLaiLenCap } : null,
     nop,
-    tram: tong ? { xong: Math.min(ket.loDaXong ?? k, tong), tong } : null,
+    tram: tong && !thuSuc ? { xong: Math.min(ket.loDaXong ?? k, tong), tong } : null,
   }
 }

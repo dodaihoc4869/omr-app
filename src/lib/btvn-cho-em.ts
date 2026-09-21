@@ -153,8 +153,8 @@ export async function dungPhieuBtvn(
       loiNhac: r.daNop
         ? `Em đã nộp bài này rồi — đây là bản xem lại, bấm vào từng câu để mở lời giải.${conLai > 0 ? ` Thầy cho phép làm lại tối đa 3 lần (còn ${conLai} lượt).` : ' (Đã hết 3 lượt làm lại)'}`
         : laLamLai
-        ? `Bài tập về nhà (Làm lại lần ${lanLamHienTai - 1} · còn ${conLai} lượt) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (lô ${(dangCho?.chiSo ?? 0) + 1}/${tongLo})` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`
-        : `Bài tập về nhà · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (lô ${(dangCho?.chiSo ?? 0) + 1}/${tongLo})` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`,
+        ? `Bài tập về nhà (Làm lại lần ${lanLamHienTai - 1} · còn ${conLai} lượt) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (chặng ${(dangCho?.chiSo ?? 0) + 1} trong ${tongLo} chặng)` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`
+        : `Bài tập về nhà · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (chặng ${(dangCho?.chiSo ?? 0) + 1} trong ${tongLo} chặng)` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`,
     },
   )
 }
@@ -194,10 +194,12 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
   if (chiSoHT === null) throw new Error('Bài này chưa có chặng nào mở')
   const maBtvn = String(r.maBtvn ?? '').trim()
   const de = (r.de ?? {}) as Record<string, unknown>
-  // BẢN 1.2: câu "thử sức thêm" tách khỏi các chặng; chỉ hiện ở CHẶNG CUỐI (khi đã mở), NGAY SAU câu bắt buộc. Máy chủ chưa gửi ⇒ như cũ.
-  const tach = tachThuSucThem(b, docCauBtvn(de), Array.isArray(de.thuSucThem) ? (de.thuSucThem as Record<string, unknown>[]) : [])
+  // BẢN 1.2 (Boss chốt): "thử sức thêm" là CHẶNG ẢO `chiSo = soChang`, tách khỏi các chặng; chỉ hiện ở CHẶNG CUỐI (khi đã mở, kể cả khi phần bắt buộc đã
+  // xong), NGAY SAU câu bắt buộc, NỘP RIÊNG bằng nút riêng. Máy chủ chưa gửi khoá ⇒ như cũ.
+  const tach = tachThuSucThem(b, docCauBtvn(de))
   const cauBatBuoc = cauCuaChang(b, tach.batBuoc, chiSoHT)
-  const cauThuSuc = hienNhomThuSuc(b, chiSoHT) ? tach.thuSuc : []
+  const nhomTs = b.thuSucThem
+  const cauThuSuc: Record<string, unknown>[] = nhomTs && hienNhomThuSuc(b, chiSoHT) ? (tach.thuSuc as Record<string, unknown>[]) : []
   const maThuSuc = new Set(cauThuSuc.map((c) => String(c.qid ?? c.id ?? '')))
   const cauChang = [...cauBatBuoc, ...cauThuSuc]
   if (cauChang.length === 0) throw new Error('Chặng này chưa có câu nào để làm')
@@ -205,7 +207,10 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
   // THẦY CHO LÀM LẠI: `soLanLam` khác lượt máy em đã thấy ⇒ bỏ nháp + kết quả chặng của lượt cũ TRƯỚC khi đọc chúng.
   doiLuotLam(maBtvn, sbd, r.soLanLam)
   // Kết quả máy chủ đã trả lúc nộp chặng (giữ ở máy) → câu đã chấm có đáp án đúng + lời giải; còn lại KHÔNG có gì.
-  const daLuu = docKetQuaChangDaLuu(maBtvn, sbd, chiSoHT)
+  const daLuuBb = docKetQuaChangDaLuu(maBtvn, sbd, chiSoHT)
+  // Kết quả phần thử sức lưu ở chặng ẢO (chiSo = soChang), gộp vào để câu thử sức đã nộp hiện lời giải.
+  const daLuuTs = cauThuSuc.length > 0 && nhomTs ? docKetQuaChangDaLuu(maBtvn, sbd, nhomTs.chiSo) : { ketQua: [], dapAn: {} }
+  const daLuu = { ketQua: [...daLuuBb.ketQua, ...daLuuTs.ketQua], dapAn: { ...daLuuBb.dapAn, ...daLuuTs.dapAn } }
   const { cau: cauTho, chuaCo } = themDapAnGiaChoCau(ghepKetQuaVaoCau(cauChang, daLuu.ketQua))
   const doc = parseKhoDeJson({ ...de, cau: cauTho })
   if (!doc.ok || !doc.json) {
@@ -232,7 +237,9 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
   const dauBai = chuDauBai(b)
   const dangMo = b.changDangMo === null ? undefined : b.chang.find((c) => c.chiSo === b.changDangMo)
   const ghiCho = b.changDangMo === null
-    ? 'Em đã xong hết các chặng của bài này.'
+    ? cauThuSuc.length > 0 && !nhomTs?.daNop
+      ? 'Em đã xong hết các chặng của bài này. Phần thử sức thêm không bắt buộc — làm rồi nộp riêng ở cuối phiếu.'
+      : 'Em đã xong hết các chặng của bài này.'
     : dangMo && !dangMo.daMo
     ? `Chặng ${dangMo.chiSo + 1} mở ${chuNgayMo(dangMo.moLuc, bayGio)}.`
     : ''
@@ -279,6 +286,9 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
         tienTo: `Chặng ${chiSoHT + 1}/${b.soChang} · `,
         nutNop: conCauChuaCham ? 'Nộp chặng' : 'Đã xong chặng',
         nutTat: !conCauChuaCham,
+        ...(cauThuSuc.length > 0 && nhomTs
+          ? { thuSuc: { chiSo: nhomTs.chiSo, nut: nhomTs.daNop ? 'Đã nộp phần thử sức thêm' : 'Nộp phần thử sức thêm', tat: nhomTs.daNop } }
+          : {}),
       },
     },
   )

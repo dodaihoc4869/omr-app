@@ -29,7 +29,7 @@ import { cauHinhNop, type CauHinhNopKhacPhuc } from './cau-hinh-nop-khac-phuc'
 import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
 import { goKyTuLa } from './chu-la-pdf'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
-import { nhanChipHtml, ghiThuongHtml, heroCaNhanHtml, ghiChoHtml, chipThuSucHtml, ghiThuSucHtml, nhomThuSucHtml, CSS_PHIEU_CA_NHAN, type DauBaiCaNhanVao } from './html-phieu-ca-nhan'
+import { nhanChipHtml, ghiThuongHtml, heroCaNhanHtml, ghiChoHtml, chipThuSucHtml, ghiThuSucHtml, nhomThuSucHtml, nopThuSucHtml, CSS_PHIEU_CA_NHAN, type DauBaiCaNhanVao } from './html-phieu-ca-nhan'
 
 /** Một ô thông tin ngoài bìa: nhãn nhỏ ở trên, giá trị đậm ở dưới. */
 export interface OBia {
@@ -1317,7 +1317,7 @@ export function theCauHtml(
       : ''
 
   const bannerDimmed = laDimmed
-    ? `<div class="dimmed-pacing-banner"><span class="dimmed-lock-icon">🔒</span><span>Câu thuộc lô tiếp theo · Hoàn thành ${soCauSang} câu sáng hôm nay trước để đạt chỉ tiêu</span></div>`
+    ? `<div class="dimmed-pacing-banner"><span class="dimmed-lock-icon">🔒</span><span>Câu thuộc chặng tiếp theo · Hoàn thành ${soCauSang} câu sáng hôm nay trước để đạt chỉ tiêu</span></div>`
     : ''
 
   const cacLop = [
@@ -2265,6 +2265,43 @@ export const JS_PHIEU = `
         if (nutNop) { nutNop.disabled = false; nutNop.textContent = 'Nộp chặng'; }
         if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = chu; }
       }
+      var nutNopTs = document.getElementById('nut-nop-ts');
+      var oLoiTs = document.getElementById('nop-loi-ts');
+      var dangNopTs = false;
+      function loiNopThuSuc(chu) {
+        dangNopTs = false;
+        if (nutNopTs) { nutNopTs.disabled = false; nutNopTs.textContent = 'Nộp phần thử sức thêm'; }
+        if (oLoiTs) { oLoiTs.hidden = false; oLoiTs.textContent = chu; }
+      }
+      // NỘP PHẦN THỬ SỨC THÊM: chặng ẢO chiSoThuSuc, CHỈ các câu thử sức đã làm; không bắt buộc nên không hỏi "còn N câu chưa làm".
+      function nopThuSuc() {
+        if (dangNopTs || !du.caNhan || typeof du.caNhan.chiSoThuSuc !== 'number') return;
+        var dcT = du.caNhan.daCham || {};
+        var guiTs = {};
+        var nTs = 0;
+        for (var it = 0; it < du.cau.length; it++) {
+          if (!du.cau[it].ts) continue;
+          var qt = du.cau[it].id;
+          if (Object.prototype.hasOwnProperty.call(dcT, qt)) continue;
+          var vt = String(lam[qt] == null ? '' : lam[qt]).trim();
+          if (vt) { guiTs[qt] = vt; nTs++; }
+        }
+        if (nTs === 0) {
+          if (oLoiTs) { oLoiTs.hidden = false; oLoiTs.textContent = 'Em chưa làm câu nào ở phần thử sức thêm.'; }
+          return;
+        }
+        dangNopTs = true;
+        if (nutNopTs) { nutNopTs.disabled = true; nutNopTs.textContent = 'Đang nộp…'; }
+        if (oLoiTs) oLoiTs.hidden = true;
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'ddh-btvn-nop-chang', ma: du.ma, sbd: du.sbd, chiSo: du.caNhan.chiSoThuSuc, dapAn: guiTs }, '*');
+            return;
+          }
+        } catch (eTs) {}
+        loiNopThuSuc('Không gửi được từ trang này. Em mở bài trong app để nộp.');
+      }
+      if (nutNopTs) nutNopTs.addEventListener('click', nopThuSuc);
       var daHoiThieuC = -1;
       function nopChangCaNhan() {
         if (daNop) return;
@@ -2275,8 +2312,9 @@ export const JS_PHIEU = `
         for (var ic2 = 0; ic2 < du.cau.length; ic2++) {
           var qc = du.cau[ic2].id;
           if (Object.prototype.hasOwnProperty.call(dc, qc)) continue;
+          if (du.cau[ic2].ts) continue; // câu thử sức thêm nộp RIÊNG (nút riêng), không nằm trong gói nộp chặng
           var vv = String(lam[qc] == null ? '' : lam[qc]).trim();
-          if (vv) { guiDi[qc] = vv; if (!du.cau[ic2].ts) lamMoi++; } else if (!du.cau[ic2].ts) thieuC++;
+          if (vv) { guiDi[qc] = vv; lamMoi++; } else thieuC++;
         }
         if (lamMoi === 0) {
           if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = 'Em chưa làm câu nào trong chặng này.'; }
@@ -2302,7 +2340,10 @@ export const JS_PHIEU = `
       window.addEventListener('message', function (e) {
         var d = e && e.data;
         if (!du.caNhan || !d || d.type !== 'ddh-btvn-nop-chang-ket' || e.source !== window.parent) return;
-        if (d.ok === false) loiNopChang(String(d.error || 'Chưa nộp được chặng. Bài của em vẫn được giữ, em thử lại nhé.'));
+        if (d.ok === false) {
+          var chuLoi = String(d.error || 'Chưa nộp được chặng. Bài của em vẫn được giữ, em thử lại nhé.');
+          if (dangNopTs) loiNopThuSuc(chuLoi); else loiNopChang(chuLoi);
+        }
       });
 
       if (nutNop) nutNop.addEventListener('click', function () {
@@ -2816,7 +2857,7 @@ export const JS_PHIEU_M3 = `
         if (thanh) thanh.setAttribute('aria-valuenow', String(pct));
         var xong = t > 0 && l >= t;
         var chu = '';
-        if (xong) chu = coLo ? 'Xong lô hôm nay' : 'Đã làm hết các câu';
+        if (xong) chu = coLo ? 'Xong chặng hôm nay' : 'Đã làm hết các câu';
         else if (pct >= 50) chu = 'Được nửa đường rồi';
         if (khich) {
           if (chu) { khich.textContent = chu; khich.hidden = false; } else { khich.hidden = true; }
@@ -2920,7 +2961,7 @@ export const JS_PHIEU_M3 = `
           var lam = ds[k].classList.contains('gd-da-lam');
           b.className = 'gd-o' + (k === dang ? ' dang' : lam ? ' da' : '');
           b.textContent = String(k + 1);
-          b.setAttribute('aria-label', 'Câu ' + (k + 1) + (khoa ? ', thuộc lô sau, chưa mở' : lam ? ', đã làm' : ', chưa làm'));
+          b.setAttribute('aria-label', 'Câu ' + (k + 1) + (khoa ? ', thuộc chặng sau, chưa mở' : lam ? ', đã làm' : ', chưa làm'));
           if (khoa) b.disabled = true;
           b.addEventListener('click', function () {
             dongLuoi();
@@ -2935,7 +2976,7 @@ export const JS_PHIEU_M3 = `
       }
       luoiHop.appendChild(luoi);
       var ct = document.createElement('div'); ct.className = 'gd-chu-thich';
-      ct.innerHTML = '<span><i class="da"></i>Đã làm</span><span><i class="dang"></i>Đang xem</span><span><i></i>Chưa làm / lô sau</span>';
+      ct.innerHTML = '<span><i class="da"></i>Đã làm</span><span><i class="dang"></i>Đang xem</span><span><i></i>Chưa làm / chặng sau</span>';
       luoiHop.appendChild(ct);
       document.body.appendChild(luoiNen);
       document.body.appendChild(luoiHop);
@@ -3132,6 +3173,8 @@ export interface TuyChonPhieu {
     tienTo: string
     nutNop: string
     nutTat: boolean
+    /** BẢN 1.2 — nhóm "Thử sức thêm" là chặng ẢO `chiSo = soChang`, NỘP RIÊNG bằng nút riêng ở cuối nhóm. Thiếu ⇒ không nút. */
+    thuSuc?: { chiSo: number; nut: string; tat: boolean }
   } | null
 }
 
@@ -3161,7 +3204,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const soBatBuoc = cau.length - soThuSuc
   const the = cau
     .map((c, i) => (caNhan && c.caNhan?.thuSuc && !cau.slice(0, i).some((x) => x.caNhan?.thuSuc) ? nhomThuSucHtml(soThuSuc) : '') + theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn, soCauSang))
-    .join('\n')
+    .join('\n') + (soThuSuc > 0 && caNhan?.thuSuc ? '\n' + nopThuSucHtml(caNhan.thuSuc.nut, caNhan.thuSuc.tat) : '')
   // KHOÁ LỜI GIẢI TỚI KHI NỘP. Chỉ áp cho phiếu nộp được và khi thầy không
   // bật `HIEN_GIAI_TRUOC_NOP`.
   const khoaGiai = !caNhan && !!nop && !chNop.HIEN_GIAI_TRUOC_NOP
@@ -3216,7 +3259,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
         banNhap: nop.banNhap,
         soCauMocLo: soCauMocLoChoNop,
         chiSoLo: tuyChon.chiSoLoHienTai,
-        caNhan: caNhan ? { chiSo: caNhan.chiSo, daCham: caNhan.daCham } : undefined,
+        caNhan: caNhan ? { chiSo: caNhan.chiSo, daCham: caNhan.daCham, ...(caNhan.thuSuc && soThuSuc > 0 ? { chiSoThuSuc: caNhan.thuSuc.chiSo } : {}) } : undefined,
         cau: cau.map((c) => (caNhan ? { id: c.id, phan: c.phan, ...(c.caNhan?.thuSuc ? { ts: 1 } : {}) } : { id: c.id, phan: c.phan, dapAn: c.dapAn })),
       }).replace(/</g, '\\u003c')}<\/script>`
     : ''

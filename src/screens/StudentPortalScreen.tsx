@@ -1568,11 +1568,11 @@ export default function StudentPortalScreen() {
                     Bài tập về nhà
                   </h2>
                   <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                    Chia lô theo ngày/giờ
+                    Chia chặng theo ngày/giờ
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Mỗi bài chia thành các lô mở dần theo ngày/giờ · làm lô đang mở rồi nộp trước hạn
+                  Mỗi bài chia thành các chặng mở dần theo ngày/giờ · làm chặng đang mở rồi nộp trước Hạn nộp
                 </p>
               </div>
 
@@ -1591,24 +1591,24 @@ export default function StudentPortalScreen() {
             <div className="bg-gradient-to-r from-emerald-50/80 via-amber-50/60 to-rose-50/80 dark:from-emerald-950/20 dark:via-amber-950/20 dark:to-rose-950/20 border border-emerald-200/80 dark:border-emerald-800/60 rounded-2xl p-4">
               <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide">
-                  Cách làm bài tập về nhà: chia lô theo ngày/giờ
+                  Cách làm bài tập về nhà: chia chặng theo ngày/giờ
                 </span>
                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700">
-                  Xong lô đang mở, lô sau mở đúng nhịp
+                  Xong chặng đang mở, chặng sau mở đúng nhịp
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
                 <div className="bg-white/80 dark:bg-slate-900/80 rounded-xl p-2.5 border border-emerald-200/60 dark:border-emerald-800/40">
-                  <div className="font-bold text-emerald-700 dark:text-emerald-400 mb-0.5">LÔ ĐANG MỞ</div>
-                  <div className="text-[11px] text-slate-600 dark:text-slate-300">Em làm lô tới nhịp hôm nay. Xong sớm thì lô sau vẫn mở đúng nhịp, không mở sớm hơn.</div>
+                  <div className="font-bold text-emerald-700 dark:text-emerald-400 mb-0.5">CHẶNG ĐANG MỞ</div>
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300">Em làm chặng tới nhịp hôm nay. Xong sớm thì chặng sau vẫn mở đúng nhịp, không mở sớm hơn.</div>
                 </div>
                 <div className="bg-white/80 dark:bg-slate-900/80 rounded-xl p-2.5 border border-amber-200/60 dark:border-amber-800/40">
-                  <div className="font-bold text-amber-700 dark:text-amber-400 mb-0.5">LÔ SAU</div>
-                  <div className="text-[11px] text-slate-600 dark:text-slate-300">Mở dần theo ngày/giờ tính từ hạn nộp, để không dồn bài vào phút chót.</div>
+                  <div className="font-bold text-amber-700 dark:text-amber-400 mb-0.5">CHẶNG SAU</div>
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300">Mở dần theo ngày/giờ tính từ Hạn nộp, để không dồn bài vào phút chót.</div>
                 </div>
                 <div className="bg-white/80 dark:bg-slate-900/80 rounded-xl p-2.5 border border-rose-200/60 dark:border-rose-800/40">
                   <div className="font-bold text-rose-700 dark:text-rose-400 mb-0.5">NỘP BÀI</div>
-                  <div className="text-[11px] text-slate-600 dark:text-slate-300">Xong các lô thì nộp trước hạn chung. Quá hạn là máy chủ chặn nộp — cần Thầy gia hạn.</div>
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300">Xong các chặng thì nộp trước Hạn nộp chung. Quá Hạn nộp là máy chủ chặn nộp — cần Thầy gia hạn.</div>
                 </div>
               </div>
             </div>
@@ -1650,7 +1650,7 @@ export default function StudentPortalScreen() {
                           #{bt.maCa}
                         </span>
                         <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-                          Chia lô theo ngày/giờ
+                          Chia chặng theo ngày/giờ
                         </span>
                         {bt.daNop ? (
                           <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">

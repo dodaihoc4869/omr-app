@@ -93,7 +93,7 @@ describe('tongHopKeHoachTroLy (src/lib/tro-ly-ca-nhan.ts) — một ô ĐÚNG l�
     const kq = plan([{ maBtvn: 'B1', soCau: 20, giaoLuc, hanNop, daNop: false, loDaXong: 0 }])
     const lo = kq.top3.filter((t) => t.loai === 'btvn_lo')
     expect(lo.length).toBe(1)
-    expect(lo[0].tieuDe).toMatch(/^BTVN: Lô 1\/\d+$/)
+    expect(lo[0].tieuDe).toMatch(/^Bài tập về nhà: Chặng 1 trong \d+ chặng$/)
     expect(lo[0].hanNop).toBe(hanNop)
   })
 

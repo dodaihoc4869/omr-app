@@ -347,7 +347,7 @@ describe('mã lệnh trang trí: tiến độ, khích lệ, lưới số câu (c
     expect($('#gd-con').textContent).toBe('Còn 1 câu chưa làm')
     chonI('q1', 0)
     await cho()
-    expect($('#gd-khich').textContent).toBe('Xong lô hôm nay')
+    expect($('#gd-khich').textContent).toBe('Xong chặng hôm nay')
     expect($('#gd-con').textContent).toBe('Đã làm hết các câu')
     // đếm của mã lệnh cũ vẫn theo TỔNG số câu, nằm trong DOM, không bị đụng tới
     expect($('#nop-tong').textContent).toBe('3')

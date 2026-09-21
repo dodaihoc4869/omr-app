@@ -2,6 +2,7 @@
 import { chuoiNgayHoc, hanBaiMom, mocThoiGian, ngayVietNam } from './han-bai-tap'
 import { gioMayChu } from './gio-may-chu'
 import { loDangCho, tinhLichLoBtvn } from './lich-lo-btvn'
+import { tenBaiTapVeNha } from './btvn-ca-nhan-kieu'
 
 export type LoaiNhiemVu =
   | 'btvn_lo'
@@ -375,9 +376,9 @@ export function tongHopKeHoachTroLy(input: {
     candidateTasks.push({
       id: `btvn_lo_${id}_${dangCho.chiSo}`,
       loai: 'btvn_lo',
-      tieuDe: `${bt.tenBtvn || bt.tieuDe || 'BTVN'}: Lô ${dangCho.chiSo + 1}/${tongLo}`,
+      tieuDe: `${tenBaiTapVeNha(bt)}: Chặng ${dangCho.chiSo + 1} trong ${tongLo} chặng`,
       moTa: dangCho.treNhip
-        ? `Đã trễ nhịp dự kiến (${lich.donViDan === 'ngay' ? 'theo ngày' : 'theo giờ'}) — làm ngay để không dồn tiếp qua lô sau · ${dangCho.soCau} câu · ${conLaiChu}`
+        ? `Đã trễ nhịp dự kiến (${lich.donViDan === 'ngay' ? 'theo ngày' : 'theo giờ'}) — làm ngay để không dồn tiếp qua chặng sau · ${dangCho.soCau} câu · ${conLaiChu}`
         : `${dangCho.soCau} câu · ${conLaiChu}`,
       soCau: dangCho.soCau,
       phutUocTinh: Math.ceil((dangCho.soCau * 80) / 60),
@@ -390,7 +391,7 @@ export function tongHopKeHoachTroLy(input: {
       hanhDong: {
         loai: 'mo_btvn',
         payload: { bt },
-        nhanNut: `Làm Lô ${dangCho.chiSo + 1}`,
+        nhanNut: `Làm chặng ${dangCho.chiSo + 1}`,
       },
     })
   }
@@ -532,7 +533,7 @@ export function tongHopKeHoachTroLy(input: {
       }
       const quaHanChung = conLaiMsHanChung !== undefined && conLaiMsHanChung <= 0
 
-      const conLaiChu = dangChoRadar?.treNhip && !quaHanChung ? 'Đã trễ nhịp lô' : dinhDangConLai(conLaiMsHanChung)
+      const conLaiChu = dangChoRadar?.treNhip && !quaHanChung ? 'Đã trễ nhịp chặng' : dinhDangConLai(conLaiMsHanChung)
       let tt: DongRadarDeadline['trangThai'] = 'binh_thuong'
       if (quaHanChung) {
         tt = 'qua_han'
