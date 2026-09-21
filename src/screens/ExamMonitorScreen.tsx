@@ -54,7 +54,6 @@ const O_NHAP: React.CSSProperties = {
   fontFamily: 'var(--sans)',
   fontSize: 'var(--cx-2)',
   color: 'var(--muc)',
-  outline: 'none',
   width: '100%',
 }
 
@@ -1897,7 +1896,7 @@ export default function ExamMonitorScreen() {
                 <textarea
                   value={tinBao.noiDung}
                   onChange={(ev) => setTinBao({ ...tinBao, noiDung: ev.target.value })}
-                  style={{ width: '100%', minHeight: 140, borderRadius: 'var(--bo-1)', padding: 'var(--k3)', background: 'var(--the-2)', border: '1.5px solid transparent', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)', outline: 'none', lineHeight: 1.6 }}
+                  style={{ width: '100%', minHeight: 140, borderRadius: 'var(--bo-1)', padding: 'var(--k3)', background: 'var(--the-2)', border: '1.5px solid transparent', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)', lineHeight: 1.6 }}
                   aria-label="Nội dung tin báo phụ huynh"
                 />
                 <div className="flex" style={{ gap: 'var(--k2)' }}>

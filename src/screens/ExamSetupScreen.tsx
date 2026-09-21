@@ -76,7 +76,7 @@ function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => v
       role="radio"
       aria-checked={chon}
       onClick={onClick}
-      className={`tap-target text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full transition-all cursor-pointer active:scale-95 shadow-2xs ${
+      className={`tap-target text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full transition-[transform,background-color,box-shadow,opacity] cursor-pointer active:scale-95 shadow-2xs ${
         chon
           ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] ring-2 ring-blue-400/30 shadow-xs'
           : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700'
@@ -507,7 +507,7 @@ export default function ExamSetupScreen() {
                   key={l}
                   type="button"
                   onClick={() => setLop(l)}
-                  className={`tap-target text-xs font-semibold px-3.5 py-1.5 rounded-xl shrink-0 transition-all cursor-pointer active:scale-95 ${
+                  className={`tap-target text-xs font-semibold px-3.5 py-1.5 rounded-xl shrink-0 transition-[transform,background-color,box-shadow,opacity] cursor-pointer active:scale-95 ${
                     chon
                       ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
                       : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
@@ -548,7 +548,7 @@ export default function ExamSetupScreen() {
                     type="button"
                     disabled={chuan2026}
                     onClick={() => setThoiGianPhut(ph)}
-                    className={`tap-target text-xs font-semibold px-3 py-1.5 rounded-xl transition-all cursor-pointer active:scale-95 ${
+                    className={`tap-target text-xs font-semibold px-3 py-1.5 rounded-xl transition-[transform,background-color,box-shadow,opacity] cursor-pointer active:scale-95 ${
                       chon
                         ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
                         : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
@@ -582,7 +582,7 @@ export default function ExamSetupScreen() {
               <button
                 type="button"
                 onClick={() => setBatDauCach('ngay')}
-                className={`tap-target flex-1 text-xs font-semibold py-1.5 px-3 rounded-xl transition-all cursor-pointer active:scale-95 text-center ${
+                className={`tap-target flex-1 text-xs font-semibold py-1.5 px-3 rounded-xl transition-[transform,background-color,box-shadow,opacity] cursor-pointer active:scale-95 text-center ${
                   batDauCach === 'ngay'
                     ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
                     : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
@@ -593,7 +593,7 @@ export default function ExamSetupScreen() {
               <button
                 type="button"
                 onClick={() => setBatDauCach('hen')}
-                className={`tap-target flex-1 text-xs font-semibold py-1.5 px-3 rounded-xl transition-all cursor-pointer active:scale-95 text-center ${
+                className={`tap-target flex-1 text-xs font-semibold py-1.5 px-3 rounded-xl transition-[transform,background-color,box-shadow,opacity] cursor-pointer active:scale-95 text-center ${
                   batDauCach === 'hen'
                     ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
                     : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
@@ -641,7 +641,7 @@ export default function ExamSetupScreen() {
                     setPhamVi(p.id as PhamViCa)
                     if (p.id === 'chon') setHienChonEm(true)
                   }}
-                  className={`tap-target text-xs font-semibold py-2 px-2.5 rounded-xl transition-all text-center cursor-pointer truncate active:scale-95 ${
+                  className={`tap-target text-xs font-semibold py-2 px-2.5 rounded-xl transition-[transform,background-color,box-shadow,opacity] text-center cursor-pointer truncate active:scale-95 ${
                     chon
                       ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
                       : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
@@ -672,7 +672,7 @@ export default function ExamSetupScreen() {
               type="button"
               disabled={deRiengBat || dongBoGio}
               onClick={() => !deRiengBat && setPhongCho((v) => !v)}
-              className={`tap-target p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
+              className={`tap-target p-3 rounded-xl border text-left transition-[transform,background-color,box-shadow,opacity] cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
                 phongCho || deRiengBat || dongBoGio
                   ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 shadow-2xs'
                   : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
@@ -708,7 +708,7 @@ export default function ExamSetupScreen() {
                   return moi
                 })
               }}
-              className={`tap-target p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
+              className={`tap-target p-3 rounded-xl border text-left transition-[transform,background-color,box-shadow,opacity] cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
                 giuDeDoc
                   ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 shadow-2xs'
                   : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
@@ -753,7 +753,7 @@ export default function ExamSetupScreen() {
                     key={c.id}
                     type="button"
                     onClick={() => setCongBoDiem(c.id as CongBoDiem)}
-                    className={`tap-target text-xs font-semibold py-1.5 px-2 rounded-xl transition-all text-center cursor-pointer truncate active:scale-95 ${
+                    className={`tap-target text-xs font-semibold py-1.5 px-2 rounded-xl transition-[transform,background-color,box-shadow,opacity] text-center cursor-pointer truncate active:scale-95 ${
                       chon
                         ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
                         : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
@@ -808,7 +808,7 @@ export default function ExamSetupScreen() {
           type="button"
           disabled={opening || selectedSources.length === 0}
           onClick={handleOpenSession}
-          className="w-full py-4 px-6 rounded-2xl bg-[color:var(--m3-primary)] hover:opacity-90 text-[color:var(--m3-on-primary)] font-bold text-sm sm:text-base shadow-md hover:shadow-lg transition-all active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2.5"
+          className="w-full py-4 px-6 rounded-2xl bg-[color:var(--m3-primary)] hover:opacity-90 text-[color:var(--m3-on-primary)] font-bold text-sm sm:text-base shadow-md hover:shadow-lg transition-[transform,background-color,box-shadow,opacity] active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2.5"
         >
           {opening ? (
             <>
@@ -840,6 +840,7 @@ export default function ExamSetupScreen() {
               </div>
               <button
                 type="button"
+                aria-label="Đóng danh sách chọn đề"
                 onClick={() => setHienChonDe(false)}
                 className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 cursor-pointer"
               >
@@ -885,6 +886,7 @@ export default function ExamSetupScreen() {
               </h3>
               <button
                 type="button"
+                aria-label="Đóng rút đề"
                 onClick={() => setHienRutDe(false)}
                 className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 cursor-pointer"
               >
@@ -928,6 +930,7 @@ export default function ExamSetupScreen() {
               </div>
               <button
                 type="button"
+                aria-label="Đóng danh sách chọn học sinh"
                 onClick={() => setHienChonEm(false)}
                 className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 cursor-pointer"
               >
@@ -940,7 +943,7 @@ export default function ExamSetupScreen() {
                 placeholder="Tìm theo tên hoặc SBD…"
                 value={timTen}
                 onChange={(e) => setTimTen(e.target.value)}
-                className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white outline-none"
+                className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               />
 
               <div className="flex items-center justify-between text-xs text-slate-500">
@@ -1007,6 +1010,7 @@ export default function ExamSetupScreen() {
               </div>
               <button
                 type="button"
+                aria-label="Đóng tùy chọn nâng cao"
                 onClick={() => setHienNangCao(false)}
                 className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 cursor-pointer"
               >
@@ -1025,7 +1029,7 @@ export default function ExamSetupScreen() {
                   placeholder="Để trống nếu không đặt mật khẩu"
                   value={matKhauCa}
                   onChange={(e) => setMatKhauCa(e.target.value)}
-                  className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none"
+                  className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 />
               </div>
 
