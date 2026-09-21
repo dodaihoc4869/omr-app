@@ -8,6 +8,7 @@ import { phutUocTinhChang } from '../../src/lib/btvn-nang-do-lich'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { chuHan } from './canh-bao-thay'
 import { protectedQuestions } from './game-v2-bank'
+import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
 import { mom } from './mom'
@@ -116,12 +117,14 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
     else if (chuoi(x.trang_thai) === 'moi_sai' || chuoi(x.trang_thai) === 'dang_on') saiQid.push(q)
   }
   const kho = new Map<string, PrivateQuestion>()
-  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (!kho.has(q.qid)) kho.set(q.qid, q) }
+  // LUẬT KHỐI (Boss 21/09): câu đến lịch / sai chưa khắc phục nạp theo qid nằm ngoài bộ lọc `d.lop` — câu khối CAO đã lọt vào sổ con từ trước vẫn không được giao lại. Khối con không rõ ⇒ không lọc.
+  const khoiEm = khoiCuaEm({ lop: lopEm })
+  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && !kho.has(q.qid)) kho.set(q.qid, q) }
   const cacQid = [...new Set([...denLichQid, ...saiQid])].slice(0, 600)
   if (cacQid.length > 0) nap(await docCauKho(env, 'AND q.qid IN (SELECT value FROM json_each(?))', [json(cacQid)], baoVe, 600))
   const maDangLay = [...dangEm].sort((a, b) => Number(dangYeu(b, homNay)) - Number(dangYeu(a, homNay)) || b.soMoiSai - a.soMoiSai || a.maDang.localeCompare(b.maDang)).slice(0, 12).map((d) => d.maDang)
   const khoDang = new Map<string, PrivateQuestion>()
-  if (maDangLay.length > 0) for (const q of await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [json(maDangLay), ...themLop], baoVe, 600)) khoDang.set(q.qid, q)
+  if (maDangLay.length > 0) for (const q of await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [json(maDangLay), ...themLop], baoVe, 600)) if (cauHopKhoi(khoiEm, q)) khoDang.set(q.qid, q)
 
   const khaDungCu = (qid: string) => kho.get(qid) ?? khoDang.get(qid)
   const denLichOn = denLichQid.map(khaDungCu).filter((q): q is PrivateQuestion => !!q && !btvnChuaNop.has(q.qid) && !khongGiaoLai.has(q.qid))

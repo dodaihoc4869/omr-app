@@ -6,6 +6,8 @@
 //   · `chonCauThuThach`   hàm THUẦN xếp câu (tất định theo sbd|ngày, không Math.random).
 //   · `hsThuThachHomNay` / `hsThuThachNop`  hai lệnh của máy em.
 import type { Env } from './kieu'
+import { docKhoiEm } from './game-v2-bank'
+import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 import { jsonLaTuLuan } from './cam-tu-luan'
@@ -253,13 +255,15 @@ export async function chotThuThach(env: Env, sbd: string, ngay: string, nowMs: n
     // ứng viên: cùng chỉ mục "phục vụ được" như /hs/cau-theo-qid (câu còn ở kho, chỉ mục khớp), không tự luận
     const ungVien: UngVien[] = []
     const nhomCua = new Map<string, string>()
+    const khoiEm = await docKhoiEm(env, sbd) // LUẬT KHỐI (Boss 21/09): thử thách chỉ lấy câu khối em hoặc THẤP hơn — dạng dùng chung nhiều khối
     for (const d of tt.dang) {
       const rc = await env.DB.prepare(
-        `SELECT q.qid, q.content_group, q.json FROM game_v2_question q JOIN de_kho k ON k.ma_de = q.ma_de JOIN game_v2_index g ON g.ma_de = k.ma_de AND g.source_version = k.cap_nhat_luc
+        `SELECT q.qid, q.ma_de, k.lop AS lop_to, q.content_group, q.json FROM game_v2_question q JOIN de_kho k ON k.ma_de = q.ma_de JOIN game_v2_index g ON g.ma_de = k.ma_de AND g.source_version = k.cap_nhat_luc
           WHERE COALESCE(k.da_xoa, 0) = 0 AND q.dang = ? LIMIT 600`,
       ).bind(d).all<Dong>()
       for (const x of rc.results ?? []) {
         if (jsonLaTuLuan(x.json)) continue
+        if (!cauHopKhoi(khoiEm, { qid: x.qid, ma_de: x.ma_de, lop: x.lop_to })) continue
         let muc: 0 | 1 | 2 = 0
         try { muc = mucTuChu((JSON.parse(chuoi(x.json)) as Dong).mucDo as string) } catch { continue }
         if (!nhomCua.has(chuoi(x.qid))) { nhomCua.set(chuoi(x.qid), chuoi(x.content_group)); ungVien.push({ qid: chuoi(x.qid), dang: d, muc }) }

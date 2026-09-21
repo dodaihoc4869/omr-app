@@ -1,4 +1,5 @@
 import {DemTTL} from './dem-chung'
+import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
 import type { Env } from './kieu'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../../src/lib/exam-kho-de-import'
 import {grade} from '../../src/game/than-thu-v2/core'
@@ -76,6 +77,21 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
   protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});return blocked
 }
 const demKhoDang=new DemTTL<{k:string;json:string}[]>(60_000,400,16_000_000)
+/** KHỐI CỦA EM (`hoc_sinh.lop` + tên lớp) — luật Boss 21/09 (P0 khối 11 nhận câu khối 12): MỌI kênh rút câu tự động chỉ được đưa câu khối em hoặc THẤP hơn (`src/lib/khoi-cau.ts`). Không đọc được ⇒ null (không lọc, "không biết ⇒ không kết tội"). */
+export async function docKhoiCacEm(env:Env,sbds:readonly string[]):Promise<Map<string,Khoi|null>>{
+  const ra=new Map<string,Khoi|null>();const ds=[...new Set(sbds.filter(Boolean))];if(!ds.length)return ra
+  const doc=async(cot:string)=>(await env.DB.prepare(`SELECT sbd,${cot} FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(ds)).all<Row>()).results??[]
+  let rows:Row[]=[]
+  try{rows=await doc('lop,ten_lop')}catch{try{rows=await doc('lop')}catch{rows=[]}}
+  for(const r of rows)ra.set(str(r.sbd),khoiCuaEm({lop:r.lop,tenLop:r.ten_lop}))
+  return ra
+}
+export async function docKhoiEm(env:Env,sbd:string):Promise<Khoi|null>{return (await docKhoiCacEm(env,[sbd])).get(sbd)??null}
+/** Khối THẤP NHẤT trong nhóm em (đội Đoàn lẫn khối: câu chung phải hợp với MỌI thành viên). Không em nào rõ khối ⇒ null. */
+export async function docKhoiThapNhat(env:Env,sbds:readonly string[]):Promise<Khoi|null>{
+  let ra:Khoi|null=null;for(const k of (await docKhoiCacEm(env,sbds)).values())if(k!==null&&(ra===null||k<ra))ra=k
+  return ra
+}
 export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[]):Promise<{evidence:Evidence[];pool:PrivateQuestion[];missing:number}> {
   const rows=await env.DB.prepare(`SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu,l.nop_luc FROM chi_tiet_cau c JOIN luot l ON l.ma_ca=c.ma_ca AND l.sbd=c.sbd AND l.lan_thu=c.lan_thu JOIN ca ON ca.ma_ca=c.ma_ca WHERE c.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND c.dung_sai IN (0,1) AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>()
   // Recover missing detail rows read-only, using only qids explicitly submitted by this learner.
@@ -135,5 +151,6 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
     const gop=ids.flatMap(d=>theoDang.get(d)??[]).sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0)
     pool.push(...gop.map(x=>JSON.parse(x.json) as PrivateQuestion))
   }
-  return {evidence,pool:[...new Map(pool.map(q=>[q.qid,q])).values()],missing}
+  // LUẬT KHỐI (Boss 21/09): kho ứng viên chỉ gồm câu khối em hoặc thấp hơn — dạng dùng chung nhiều khối nên lọc theo DẠNG không đủ. Bằng chứng (`evidence`) là lịch sử THẬT của em, giữ nguyên. Lọc đứng SAU đệm kho theo dạng (đệm chung mọi em), riêng từng em.
+  return {evidence,pool:locCauHopKhoi(await docKhoiEm(env,sbd),[...new Map(pool.map(q=>[q.qid,q])).values()]),missing}
 }

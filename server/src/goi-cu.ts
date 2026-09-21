@@ -1,3 +1,5 @@
+import { docKhoiEm } from './game-v2-bank'
+import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
 import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
@@ -2376,12 +2378,15 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
   if (dsCd.length === 0) return { ok: true, items: [], soCau: 0, soChon: 0, thuTu: [], catBotViNang: false }
 
   const oCd = dsCd.map(() => '?').join(',')
-  const rCau = await env.DB.prepare(
+  const rCauTho = await env.DB.prepare(
     `SELECT c.qid, c.ma_de, c.chuyen_de FROM cau_hoi c JOIN de_kho d ON d.ma_de = c.ma_de
       WHERE d.da_xoa = 0 AND c.chuyen_de IN (${oCd}) LIMIT 3000`,
   )
     .bind(...dsCd)
     .all<Record<string, unknown>>()
+  // LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): chuyên đề/dạng trùng tên giữa các khối ⇒ chỉ giữ câu của tờ khối em hoặc THẤP hơn (máy em gửi `sbd`; không có `sbd` ⇒ không lọc).
+  const khoiEm = sbd ? await docKhoiEm(env, sbd) : null
+  const rCau = { results: (rCauTho.results ?? []).filter((x) => cauHopKhoi(khoiEm, { qid: x.qid, ma_de: x.ma_de })) }
 
   // ĐƯỜNG RIÊNG CHO MÀN KHẮC PHỤC: LỌC THEO MÃ DẠNG.
   //

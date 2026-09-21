@@ -17,7 +17,8 @@ import {
   kiemTiepSuc, NHAN_TIEP_SUC_TOI_DA, SO_GHE_TOI_DA, SO_HIEP, SO_Y_TRUM, type Chang, type HanhDong, type NopHiep, type NopTrum,
 } from '../../src/game/than-thu-v2/doan-core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
-import { protectedQuestions } from './game-v2-bank'
+import { protectedQuestions, docKhoiThapNhat } from './game-v2-bank'
+import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import { laCauTuLuan } from './cam-tu-luan'
 import { readGameScope } from './game-v2-reports'
 import { qidChanHomNay } from './game-v2-ho-so'
@@ -212,8 +213,9 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
   } catch { /* chưa có bảng hồ sơ: không xếp theo độ yếu của lớp, ai cũng bậc 0 */ }
   const r = await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc
     WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${cho(ds.length)}) AND json_extract(q.json,'$.phan')='II' LIMIT 400`).bind(...ds).all<{ json: string }>()
+  const khoiDoi = await docKhoiThapNhat(env, nguoi.map(n => n.sbd)) // câu chung hiện cho CẢ đội ⇒ hợp khối với em thấp nhất (Boss 21/09)
   const ungVien = r.results.map(x => JSON.parse(x.json) as PrivateQuestion)
-    .filter(q => q.reviewed && !laCauTuLuan(q) && /^[DS]{4}$/.test(q.correct) && q.ideas.length === SO_Y_TRUM && !chan.has(q.qid) && !chan.has(q.group)
+    .filter(q => cauHopKhoi(khoiDoi, q) && q.reviewed && !laCauTuLuan(q) && /^[DS]{4}$/.test(q.correct) && q.ideas.length === SO_Y_TRUM && !chan.has(q.qid) && !chan.has(q.group)
       && q.kienThuc.length > 0 && q.kienThuc.every(k => ktBiet.get(q.dang!)!.has(k)))
     .sort((a, b) => (yeu.get(b.dang ?? '') ?? 0) - (yeu.get(a.dang ?? '') ?? 0) || hashSeed(`${ma}|${a.qid}`) - hashSeed(`${ma}|${b.qid}`) || a.qid.localeCompare(b.qid))
   // Trùm nhớ câu đã ra ở chặng trước của các em trong đoàn + câu các em đã làm ở mọi nguồn/mọi ngày: câu CHƯA AI thấy đứng trước (ổn định: giữ thứ tự cũ trong cùng nhóm)

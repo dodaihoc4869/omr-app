@@ -4,7 +4,8 @@ import {readGameScope} from './game-v2-reports'
 import {roomAction} from './game-v2-room'
 import type {Env} from './kieu'
 import {gameIdentity,parentPass} from './game-v2-auth'
-import {hash,readScope,syncIndex,protectedQuestions} from './game-v2-bank'
+import {hash,readScope,syncIndex,protectedQuestions,docKhoiEm} from './game-v2-bank'
+import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
 import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
 import {PETS,ALIASES,OLD_SIX,allowed,chooseSessionWithRoles,chooseLuotMoi,luotHomNay,SO_CAU_MOI_LUOT,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
 import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
@@ -67,11 +68,13 @@ async function currentQuestion(env:Env,q:{qid:string;maDe:string;version:string}
   return cau
 }
 /** Các qid trong LƯỢT mà hiện là TỰ LUẬN (lượt soạn trước lệnh cấm 21/09). MỘT truy vấn theo (qid, version); không thấy dòng ⇒ không kết tội. */
-async function qidTuLuanTrongLuot(env:Env,refs:{qid:string;version:string}[]):Promise<Set<string>>{
+/** Câu của lượt cũ KHÔNG được phục vụ nữa: tự luận (21/09) và câu KHỐI CAO hơn khối em (Boss 21/09 — lượt soạn trước luật khối vẫn có thể chứa câu khối 12 cho em khối 11). */
+async function qidTuLuanTrongLuot(env:Env,refs:{qid:string;version:string;maDe?:string}[],khoiEm:Khoi|null=null):Promise<Set<string>>{
   const ra=new Set<string>();if(!refs.length)return ra
   const r=await env.DB.prepare('SELECT q.qid,q.version,q.json FROM game_v2_question q WHERE q.qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(refs.map(x=>x.qid))).all<{qid:string;version:string;json:string}>()
   const can=new Set(refs.map(x=>`${x.qid}|${x.version}`))
   for(const x of r.results)if(can.has(`${x.qid}|${x.version}`)&&jsonLaTuLuan(x.json))ra.add(x.qid)
+  for(const x of refs)if(!cauHopKhoi(khoiEm,x))ra.add(x.qid)
   return ra
 }
 /** TƯƠNG THÍCH máy em đang sống (Boss 21/09): màn Đảo cũ chỉ biết vai yeu|toi_han|lap|thu_thach ⇒ `role` trả tập cũ (moi → lap, trum → thu_thach); `roleV2` = vai THẬT cho màn mới. */
@@ -95,9 +98,9 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
     const dangCho=await docLuotDangCho(env,sbd,tNow)
     if(dangCho){
       try{
-        const old=JSON.parse(dangCho.json) as Session;const tuLuan=await qidTuLuanTrongLuot(env,old.questions);const qs=[]
+        const old=JSON.parse(dangCho.json) as Session;const khoiEm=await docKhoiEm(env,sbd);const tuLuan=await qidTuLuanTrongLuot(env,old.questions,khoiEm);const qs=[]
         // Thầy có thể giao BTVN SAU khi lượt này đã bốc câu: câu nào nay nằm trong bài em chưa nộp ⇒ bỏ lượt chờ, mở lượt mới (không trả lại câu có thể lộ đáp án).
-        const chanBtvn=await docCauBtvnChuaNop(env,sbd);if(old.questions.some(ref=>chanBtvn.has(ref.qid)||chanBtvn.has(ref.group))){await env.DB.prepare('DELETE FROM game_v2_session WHERE id=? AND sbd=?').bind(dangCho.id,sbd).run();return startLuotMoi(env,sbd,p,b,action)} // lượt chờ chưa trả lời câu nào: bỏ hẳn rồi tính lại từ đầu (không mất lượt, số lượt đúng)
+        const chanBtvn=await docCauBtvnChuaNop(env,sbd);if(old.questions.some(ref=>chanBtvn.has(ref.qid)||chanBtvn.has(ref.group)||!cauHopKhoi(khoiEm,ref))){await env.DB.prepare('DELETE FROM game_v2_session WHERE id=? AND sbd=?').bind(dangCho.id,sbd).run();return startLuotMoi(env,sbd,p,b,action)} // lượt chờ chưa trả lời câu nào: bỏ hẳn rồi tính lại từ đầu (không mất lượt, số lượt đúng)
         for(const ref of old.questions){if(tuLuan.has(ref.qid))continue;qs.push({...publicQuestion(await currentQuestion(env,ref)),...vaiChoMay(ref.role)})}
         if(qs.length)return {ok:true,id:dangCho.id,questions:qs,missing:scope.missing,luot:tom,maiCho:cho}
       }catch{/* câu đã đổi/rút khỏi kho: mở lượt mới */}
@@ -113,7 +116,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   // Chỉ nhận câu ĐỦ `dang` và `mucDo` (hàm chọn coi câu thiếu mức là dễ nhất), đã duyệt, không tự luận, không bị chặn, trong phạm vi thầy đặt.
   const eligible=scope.pool.filter(q=>q.reviewed&&!laCauTuLuan(q)&&!!q.dang&&!!q.mucDo&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(control.types.length===0||control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
   const lt=info.luotTiepTheo
-  const chon=chooseLuotMoi(eligible,scope.evidence,history,mastery,{loai:lt.loai,cap:p.cap,now:tNow,thuong:lt.thuong,blocked,soCau:Math.min(SO_CAU_MOI_LUOT,remaining)})
+  const chon=chooseLuotMoi(eligible,scope.evidence,history,mastery,{loai:lt.loai,cap:p.cap,now:tNow,thuong:lt.thuong,blocked,soCau:Math.min(SO_CAU_MOI_LUOT,remaining),khoiEm:await docKhoiEm(env,sbd)})
   if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:TRAN_CAU_DAO_NGAY,suggestions:chon.map(x=>({title:x.q.tenDang||'Ôn kiến thức đã học',source:x.q.maDe,part:x.q.phan})),remaining,luot:tom}
   if(!chon.length)return {ok:true,questions:[],lyDo:eligible.length?'chi_con_cau_qua_bac':'kho_trong',luot:tom,maiCho:cho,missing:scope.missing,message:eligible.length?'Các câu còn lại của lớp đều cao hơn một bậc so với sức em ở dạng đó. Em làm thêm bài tập về nhà và phần ôn lại, mai thú mở câu mới cho em.':'Lớp em chưa học dạng nào có câu phù hợp cho thần thú. Khi Thầy giao bài mới, câu sẽ mở ra.'}
   const id=crypto.randomUUID(),groups=new Set(scope.evidence.map(e=>e.group))
@@ -149,7 +152,7 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
   const homNay=await docCauLamHomNay(env,sbd,dayStart,ngay),daLam=await docCauDaLamMoiNguon(env,sbd)
   const lucGame=new Map<string,number>();for(const a of history)lucGame.set(a.group,Math.max(lucGame.get(a.group)??-1,a.at))
   const {moi,cu}=tachMoiCu(eligible,homNay,daLam,new Set(lucGame.keys()))
-  const soCau=Math.min(SO_HIEP-2,remaining),opt={loai:'kham_pha' as const,cap:p.cap,now:tNow,blocked,soCau}
+  const soCau=Math.min(SO_HIEP-2,remaining),opt={loai:'kham_pha' as const,cap:p.cap,now:tNow,blocked,soCau,khoiEm:await docKhoiEm(env,sbd)}
   let chon=chooseLuotMoi(moi,scope.evidence,history,mastery,opt),hetCauMoi=false
   if(chon.length<soCau){
     // Bù bằng câu LÂU NHẤT chưa gặp (buCauLauNhat: nới `k` theo luật bậc/đổi câu của chooseLuotMoi, TỐI ĐA TOI_DA_VONG_BU vòng — không lặp theo cỡ kho lớp).
@@ -260,7 +263,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     if(!row)return {ok:true,questions:[]}
     const session=JSON.parse(row.json) as Session;const blocked=await protectedQuestions(env);const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game.');for(const key of control.blocked)blocked.add(key);const qs=[]
     // CẤM RÚT TỰ LUẬN (21/09): lượt soạn trước lệnh cấm mà còn câu tự luận ⇒ BỎ câu ấy khỏi lượt trả về (em làm nốt các câu còn lại, `complete` cũng chỉ đòi các câu này).
-    const tuLuan=await qidTuLuanTrongLuot(env,session.questions)
+    const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await docKhoiEm(env,sbd))
     for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await currentQuestion(env,ref);if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');qs.push(publicQuestion(q))}
     if(!qs.length)return {ok:true,questions:[]}
     const rows=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=? ORDER BY created_at').bind(row.id,sbd).all<{json:string}>()
@@ -317,7 +320,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     const session=JSON.parse(row.json) as Session;const r=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=?').bind(id,sbd).all<{json:string}>()
     const done=r.results.map(x=>JSON.parse(x.json) as {attempt:Attempt})
     // CẤM RÚT TỰ LUẬN (21/09): câu tự luận còn sót trong lượt cũ không được đòi em làm; chỉ đếm các câu rút được.
-    const tuLuan=await qidTuLuanTrongLuot(env,session.questions)
+    const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await docKhoiEm(env,sbd))
     if(done.filter(x=>!tuLuan.has(x.attempt.qid)).length!==session.questions.filter(x=>!tuLuan.has(x.qid)).length)throw new Error('Em cần hoàn thành các câu trong lượt.')
     if(session.mode==='tower'&&done.filter(x=>x.attempt.correct&&!x.attempt.assisted).length>=Math.ceil(done.length*.7)){
       const milestone=`${sbd}|tower|${id}`

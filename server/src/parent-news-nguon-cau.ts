@@ -9,6 +9,7 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
 import { chuoiLoiGiai } from './goi-cu'
 import { protectedQuestions } from './game-v2-bank'
+import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 import { laCauTuLuan } from './cam-tu-luan'
@@ -139,7 +140,9 @@ export async function chonCauBaiHangNgay(env: Env, sbd: string, soCan: number, n
   const loLop = lop ? ' AND d.lop = ?' : ''
   const themLop = lop ? [lop] : []
   const kho = new Map<string, PrivateQuestion>()
-  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (!kho.has(q.qid)) kho.set(q.qid, q) }
+  // LUẬT KHỐI (Boss 21/09): câu nạp theo qid (tới hạn) nằm ngoài bộ lọc `d.lop` — câu khối CAO đã lọt vào sổ em từ trước vẫn không được phát lại. Khối em không rõ ⇒ không lọc.
+  const khoiEm = khoiCuaEm({ lop: lopEm })
+  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && !kho.has(q.qid)) kho.set(q.qid, q) }
   if (toiHan.length > 0) nap(await docCauKho(env, 'AND q.qid IN (SELECT value FROM json_each(?))', [JSON.stringify(toiHan.map((c) => c.qid))], baoVe, TRAN_DOC_TOI_HAN))
   if (dangYeuEm.length > 0) nap(await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [JSON.stringify(dangYeuEm.map((d) => d.maDang)), ...themLop], baoVe, TRAN_DOC_MOI_NHOM))
   const chuyenDe = [...new Set([...dangYeuEm.map((d) => d.maDang), ...toiHanDong.map((x) => (x.ma_dang ? String(x.ma_dang) : ''))].map(chuyenDeCuaDang).filter(Boolean))]

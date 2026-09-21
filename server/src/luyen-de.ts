@@ -8,6 +8,7 @@ import { mergeAndStrip, type TeacherExamSource } from '../../src/data/examConten
 import { rutDeChuan2026, SO_CAU_CHUAN_2026, laBoDe12, MA_TRAN_HOA_2026 } from '../../src/lib/ma-tran-hoa-2026'
 import { normalizeNumericAnswer } from '../../src/engine/score'
 import { laCauTuLuan } from './cam-tu-luan'
+import { docKhoiEm } from './game-v2-bank'
 
 type Row = { id:string;sbd:string;created_at:number;deadline:number;status:string;bank_key:string;answers:string;result:string|null }
 const read = async(env:Env,key:string):Promise<TeacherExamSource[]> => {
@@ -41,6 +42,8 @@ export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):P
   let row:Row|null=null
   if(action==='start') {
     if(b.daHocXong!==true)throw new Error('Mục này chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.')
+    // LUẬT KHỐI (Boss 21/09): Bộ đề là đề khối 12; cờ `daHocXong` do MÁY EM tự gửi nên máy chủ tự kiểm khối — em khối 10/11 không mở được. Không rõ khối ⇒ giữ cổng cũ.
+    const khoiEm=await docKhoiEm(env,sbd);if(khoiEm!==null&&khoiEm<12)throw new Error('Mục này chỉ dành cho học sinh khối 12.')
     row=await env.DB.prepare("SELECT * FROM luyen_de_2026 WHERE sbd=? AND status='active'").bind(sbd).first<Row>()
     if(!row){
       const r=await env.DB.prepare("SELECT ma_de,r2_khoa FROM de_kho WHERE da_xoa=0 AND lop='12' AND (lower(ten_de) LIKE '%bộ đề%' OR ten_de LIKE '%BỘ ĐỀ%' OR ten_de LIKE '%Bộ đề%') ORDER BY ma_de").all<{ma_de:string;r2_khoa:string}>()
