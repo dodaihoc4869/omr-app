@@ -1,4 +1,4 @@
-// TRANG XEM THỬ (chỉ `npm run dev`, KHÔNG vào bản build): /src/components/bang-nhiem-vu/xem-thu-the-cuoi-chang.html?som=duoc|chua|khong
+// TRANG XEM THỬ (chỉ `npm run dev`, KHÔNG vào bản build; nằm NGOÀI thư mục bang-nhiem-vu vì test bang-nhiem-vu-1909 khoá thư viện của thư mục ấy): /src/components/xem-thu/the-cuoi-chang.html?som=duoc|chua|khong
 // Dựng THẺ CUỐI CHẶNG với dữ liệu giả để nhìn dòng "mở sớm chặng" của Điều 6: duoc = được mở sớm · chua = mở 00:00 ngày mai · khong = không có gì đáng nói.
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -11,7 +11,7 @@ import '@fontsource/be-vietnam-pro/latin-700.css'
 import '../../styles/tokens.css'
 import '../../index.css'
 import '../m3'
-import TheCuoiChang from './TheCuoiChang'
+import TheCuoiChang from '../bang-nhiem-vu/TheCuoiChang'
 import { docKetQuaChang, theChangView } from '../../lib/btvn-ca-nhan-kieu'
 
 const q = new URLSearchParams(location.search).get('som') ?? 'duoc'
