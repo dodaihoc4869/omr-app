@@ -13,7 +13,7 @@ afterEach(() => cleanup())
 const NOW = Date.parse('2026-09-21T09:00:00+07:00')
 const gio = (h: number) => new Date(NOW + h * 3600_000).toISOString()
 const v = (o: object) => ({ thuTu: 1, batBuoc: true, khan: false, cong: null, hien: true, nhan: null, trangThai: 'cho', ghiChu: '', chiTiet: {}, hanCung: null, hanMem: null, nguon: 'x', ...o })
-const phu = { dsBtvn: [{ maBtvn: 'B-CN', maCa: 'CA-CN', tenBtvn: 'BTVN Ester – lipid', soCau: 52 }, { maBtvn: 'B-THUONG', maCa: 'CA-T', tenBtvn: 'BTVN Amin', soCau: 12 }], dsMomGiao: [] }
+const phu = { dsBtvn: [{ maBtvn: 'B-CN', maCa: 'CA-CN', tenBtvn: 'BTVN Ester – lipid', soCau: 52, soChang: 7 }, { maBtvn: 'B-THUONG', maCa: 'CA-T', tenBtvn: 'BTVN Amin', soCau: 12 }], dsMomGiao: [] }
 const keHoach = (viec: object[]): KeHoachNgayMayChu => ({
   ok: true,
   ngay: '2026-09-21',
@@ -97,9 +97,9 @@ describe('thẻ bài cá nhân hoá — tên "Bài tập về nhà · Chặng k"
   const HAN_CHANG = new Date(2026, 8, 21, 23, 59).toISOString() // Thứ Hai 21/09 23:59
   const HAN_BAI = new Date(2026, 8, 24, 23, 59).toISOString() // Thứ Năm 24/09 23:59
   const TEN_TO = 'Bài tập: DH-12-C2-B6-TN'
-  const cn = (chiSo: number, hanCung: string | null, hanBai?: string) => {
-    const kh = keHoach([v({ id: `btvn_lo:B-CN:${chiSo}`, loai: 'btvn_lo', soCau: 8, hanCung, hanMem: null, chiTiet: { ma: 'B-CN', chiSo, tongLo: 7, treNhip: false, caNhan: true } })])
-    const p = { dsBtvn: [{ maBtvn: 'B-CN', maCa: 'CA-CN', tenBtvn: TEN_TO, soCau: 52, ...(hanBai ? { hanNop: hanBai } : {}) }], dsMomGiao: [] }
+  const cn = (chiSo: number, hanCung: string | null, hanBai?: string, soChang: unknown = 7, tongLoKeHoach: unknown = 7) => {
+    const kh = keHoach([v({ id: `btvn_lo:B-CN:${chiSo}`, loai: 'btvn_lo', soCau: 8, hanCung, hanMem: null, chiTiet: { ma: 'B-CN', chiSo, tongLo: tongLoKeHoach, treNhip: false, caNhan: true } })])
+    const p = { dsBtvn: [{ maBtvn: 'B-CN', maCa: 'CA-CN', tenBtvn: TEN_TO, soCau: 52, soChang, ...(hanBai ? { hanNop: hanBai } : {}) }], dsMomGiao: [] }
     const d = tuKeHoachNgay(kh, NOW, p)
     return [...(d.lamNgay ? [d.lamNgay] : []), ...d.cacBac.flatMap((b) => b.viec)][0]
   }
@@ -162,5 +162,53 @@ describe('thẻ bài cá nhân hoá — tên "Bài tập về nhà · Chặng k"
     expect(document.body.textContent).toContain('Bài tập về nhà · Chặng 2')
     expect(document.body.textContent).toContain('Chặng 2 trong 7 chặng')
     expect(document.body.textContent).toContain('Hạn chặng này: 23:59 Thứ Hai 21/09')
+  })
+})
+
+// ───────── lỗi thầy thấy trên BÀI THẬT (21/09): thẻ ghi "Chặng 1/1" trong khi bài có 4 chặng ─────────
+describe('K = số chặng THẬT của bài (soChang), không phải số chặng đã mở / tongLo của kế hoạch', () => {
+  const HAN = new Date(2026, 8, 24, 23, 59).toISOString()
+  const cn = (chiSo: number, soChang: unknown, tongLo: unknown) => {
+    const kh = keHoach([v({ id: `btvn_lo:B-CN:${chiSo}`, loai: 'btvn_lo', soCau: 8, hanCung: HAN, hanMem: null, chiTiet: { ma: 'B-CN', chiSo, tongLo, treNhip: false, caNhan: true } })])
+    const d = tuKeHoachNgay(kh, NOW, { dsBtvn: [{ maBtvn: 'B-CN', maCa: 'CA-CN', tenBtvn: 'DH-12-C2-B6-TN', soCau: 29, soChang }], dsMomGiao: [] })
+    return [...(d.lamNgay ? [d.lamNgay] : []), ...d.cacBac.flatMap((b) => b.viec)][0]
+  }
+
+  it('ĐÚNG CA THẬT: bài 4 chặng, mới mở 1, kế hoạch ngày báo tongLo = 1 ⇒ "Chặng 1 trong 4 chặng", thanh tiến độ 1/4', () => {
+    const t = cn(0, 4, 1)
+    expect(t.dongPhu![0]).toBe('Chặng 1 trong 4 chặng')
+    expect(t.tienDoLo).toEqual({ hienTai: 1, tong: 4, laChang: true })
+    expect(t.dongPhu!.join('|')).not.toContain('trong 1 chặng')
+  })
+
+  it('chặng kế (chiSo 1) vẫn "trong 4 chặng"; chặng cuối 4/4', () => {
+    expect(cn(1, 4, 2).dongPhu![0]).toBe('Chặng 2 trong 4 chặng')
+    expect(cn(3, 4, 4).dongPhu![0]).toBe('Chặng 4 trong 4 chặng')
+    expect(cn(3, 4, 4).tienDoLo).toEqual({ hienTai: 4, tong: 4, laChang: true })
+  })
+
+  it('kế hoạch báo tongLo LỚN HƠN thật cũng không được tin: K vẫn là soChang', () => {
+    expect(cn(0, 4, 9).dongPhu![0]).toBe('Chặng 1 trong 4 chặng')
+    expect(cn(0, 4, 9).tienDoLo!.tong).toBe(4)
+  })
+
+  it('chưa biết số chặng thật (bộ chưa chốt: soChang null; danh sách chưa về: vắng; giá trị hỏng) ⇒ chỉ nói "Chặng k", KHÔNG bịa K, KHÔNG vẽ thanh tiến độ', () => {
+    for (const soChang of [null, undefined, 0, -1, 2.5, 'x', NaN]) {
+      const t = cn(0, soChang, 7)
+      expect(t.dongPhu![0], String(soChang)).toBe('Chặng 1')
+      expect(t.tienDoLo, String(soChang)).toBeUndefined()
+    }
+  })
+
+  it('chiSo vượt tổng thật (dữ liệu lệch) ⇒ không vẽ thanh tiến độ sai', () => {
+    expect(cn(4, 4, 5).tienDoLo).toBeUndefined()
+  })
+
+  it('bài THƯỜNG vẫn dùng tongLo của kế hoạch như cũ (không đổi hành vi)', () => {
+    const kh = keHoach([v({ id: 'btvn_lo:B-THUONG:0', loai: 'btvn_lo', soCau: 6, hanCung: gio(40), hanMem: gio(20), chiTiet: { ma: 'B-THUONG', chiSo: 0, tongLo: 3, treNhip: false } })])
+    const d = tuKeHoachNgay(kh, NOW, { dsBtvn: [{ maBtvn: 'B-THUONG', maCa: 'CA-T', tenBtvn: 'BTVN Amin', soCau: 12, soChang: 99 }], dsMomGiao: [] })
+    const t = [...(d.lamNgay ? [d.lamNgay] : []), ...d.cacBac.flatMap((b) => b.viec)][0]
+    expect(t.tienDoLo).toEqual({ hienTai: 1, tong: 3 })
+    expect(t.tieuDe).toBe('BTVN Amin: Lô 1/3')
   })
 })

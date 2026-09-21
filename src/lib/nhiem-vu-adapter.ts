@@ -552,12 +552,10 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       dongPhu: v.loai === 'btvn_lo' && ct.caNhan === true
         ? (() => {
             const bt = btvnTheoMa(ct.ma)
-            return dongPhuChang({ chiSo: Number(ct.chiSo), tongChang: Number(ct.tongLo), hanChang: han, hanBai: bt?.hanNop, tenTo: bt?.tenBtvn || bt?.tieuDe })
+            return dongPhuChang({ chiSo: Number(ct.chiSo), tongChang: soChangThat(bt) ?? NaN, hanChang: han, hanBai: bt?.hanNop, tenTo: bt?.tenBtvn || bt?.tieuDe })
           })()
         : undefined,
-      tienDoLo: v.loai === 'btvn_lo' && Number.isFinite(Number(ct.chiSo)) && Number(ct.tongLo) > Number(ct.chiSo)
-        ? { hienTai: Number(ct.chiSo) + 1, tong: Number(ct.tongLo), ...(ct.caNhan === true ? { laChang: true } : {}) }
-        : undefined,
+      tienDoLo: tienDoLoCua(v.loai, ct, btvnTheoMa),
       biCong,
       moSauKhiXong: biCong ? (v.cong ? tenTheoId.get(v.cong) : undefined) ?? 'việc trước' : undefined,
       trangThai: 'chua_lam',
@@ -660,6 +658,27 @@ const TEN_LOAI: Record<string, string> = {
  * Cửa vào duy nhất cho giao diện: có kế hoạch máy chủ HỢP LỆ thì dùng (`cu` = đang hiện bản cuối
  * vì lần gọi mới lỗi), không thì rơi về trợ lý. `dsBtvn`/`dsMomGiao` là dữ liệu thô của màn.
  */
+/** Số chặng THẬT của bài cá nhân hoá: `soChang` của /hs/btvn (= btvn_em.so_chang, chốt cùng bộ câu). KHÔNG lấy `chiTiet.tongLo` của
+ * kế hoạch ngày và KHÔNG đếm chặng đã mở (thầy 21/09: thẻ ghi "Chặng 1/1" trên bài 4 chặng). Chưa chốt / chưa biết ⇒ undefined. */
+function soChangThat(bt: { soChang?: unknown } | undefined): number | undefined {
+  const n = Number(bt?.soChang)
+  return Number.isInteger(n) && n >= 1 ? n : undefined
+}
+
+/** Thanh tiến độ lô/chặng. Bài thường: theo `tongLo` của kế hoạch (như cũ). Bài cá nhân hoá: CHỈ khi biết số chặng thật. */
+function tienDoLoCua(
+  loai: string,
+  ct: Record<string, any>,
+  btvnTheoMa: (ma: unknown) => { soChang?: unknown } | undefined,
+): TheNhiemVu['tienDoLo'] {
+  if (loai !== 'btvn_lo' || !Number.isFinite(Number(ct.chiSo))) return undefined
+  if (ct.caNhan === true) {
+    const tong = soChangThat(btvnTheoMa(ct.ma))
+    return tong !== undefined && tong > Number(ct.chiSo) ? { hienTai: Number(ct.chiSo) + 1, tong, laChang: true } : undefined
+  }
+  return Number(ct.tongLo) > Number(ct.chiSo) ? { hienTai: Number(ct.chiSo) + 1, tong: Number(ct.tongLo) } : undefined
+}
+
 export function dungBangNhiemVu(input: {
   keHoachNgay?: KeHoachNgayMayChu | null
   keHoachTroLy: KeHoachNgayTroLy
