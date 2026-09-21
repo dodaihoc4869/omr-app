@@ -16,6 +16,7 @@ import {canhBaoChoEm,emXemCanhBao,guiCanhBao} from './canh-bao-thay'
 import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
 import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-nay-v2'
 import {gvLichSuCauCuaEm} from './gv-lich-su-cau'
+import {gvBaoCaoCa,gvBaoCaoCaEm} from './bao-cao-ca'
 import {gvBangTinSong} from './gv-bang-tin-song'
 import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
 import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
@@ -3171,6 +3172,9 @@ export default {
       if (p === '/gv/lich-su-cau-cua-em') return ra(await gvLichSuCauCuaEm(env, b))
       // BẢNG TIN KIỂU SÀN GIAO DỊCH (thầy chốt mẫu 21/09; hợp đồng docs/hop-dong-bang-tin-song-2109.md): mọi khoá của /gv/bang-tin (gồm `chuaHocHomNay`, đệm chung 60 giây) + `song` (nến 5 phút, tia 60 phút, theo lớp, ô nhiệt, băng tin, dẫn đầu; đệm 10 giây).
       // Cờ lùi `cau_hinh.bang_tin_san = 'tat'` ⇒ trả `{ok:false, lyDo:'tat'}` (máy thầy dùng Bảng tin bản 3). ĐỌC-CHỈ.
+      // BÁO CÁO CA cho THẦY (docs/hop-dong-xem-diem-v2-2109.md mục 2 + 4): ĐỌC-CHỈ, không bị chặn công bố (trả `congBo`); `phan[].toiDa` / `phanTb[].toiDa` = trần điểm từng phần từ `quotaPhan` (một nguồn với chấm điểm). Lỗi đọc ⇒ {ok:false, lyDo:'loi_doc'}.
+      if (p === '/gv/bao-cao-ca') return ra(await gvBaoCaoCa(env, b))
+      if (p === '/gv/bao-cao-ca-em') return ra(await gvBaoCaoCaEm(env, b))
       if (p === '/gv/bang-tin-song') {
         const co = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('bang_tin_san').first<{ gia_tri: unknown }>().catch(() => null)
         if (String(co?.gia_tri ?? '').trim().toLowerCase() === 'tat') return ra({ ok: false, lyDo: 'tat', error: 'Bảng tin kiểu sàn đang tắt.' })
