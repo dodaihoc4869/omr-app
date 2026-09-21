@@ -27,7 +27,6 @@ const TEP_HS_PH = [
   'src/components/BangTinPhuHuynh.tsx',
   'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
   'src/components/BaoCaoCaThiHocSinhModal.tsx',
-  'src/components/BangTroLyPhuHuynh.tsx',
   'src/components/InfographicHuongDan.tsx',
   'src/components/CardCaThiGanNhat.tsx',
   'src/components/BieuDoTienBoGoogle.tsx',

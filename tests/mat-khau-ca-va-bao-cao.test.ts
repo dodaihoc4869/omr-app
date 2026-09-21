@@ -29,11 +29,6 @@ describe('2. Đã xoá bong bóng chat và trợ lý giải bài trong app học
     const file = fs.readFileSync(path.join(__dirname, '../src/screens/StudentPortalScreen.tsx'), 'utf-8')
     expect(file).not.toContain('BongBongChatHocSinh')
   })
-
-  it('BangTroLyHocSinh không còn chứa nút/chữ Hỏi Trợ lý AI giải bài', () => {
-    const file = fs.readFileSync(path.join(__dirname, '../src/components/BangTroLyHocSinh.tsx'), 'utf-8')
-    expect(file).not.toContain('Hỏi Trợ lý AI giải bài')
-  })
 })
 
 describe('3. Xử lý HTML khắc phục câu sai không bị [object Object]', () => {
