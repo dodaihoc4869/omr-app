@@ -1138,7 +1138,7 @@ export default function StudentPortalScreen() {
   if (!auth) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-50 to-blue-50/20 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 flex flex-col justify-center items-center p-4">
-        <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/80 dark:border-slate-800 p-8 transition-all">
+        <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none border border-slate-200/80 dark:border-slate-800 p-8 transition">
           <div className="mb-6">
             <LogoDoc vai="hs" size={64} />
           </div>
@@ -1168,7 +1168,7 @@ export default function StudentPortalScreen() {
                   type="password"
                   value={matKhauMoi}
                   onChange={(e) => setMatKhauMoi(e.target.value)}
-                  placeholder="Nhập mật khẩu mới..."
+                  placeholder="Nhập mật khẩu mới…"
                   className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
                   required
                 />
@@ -1183,7 +1183,7 @@ export default function StudentPortalScreen() {
                   type="password"
                   value={xacNhanMatKhau}
                   onChange={(e) => setXacNhanMatKhau(e.target.value)}
-                  placeholder="Nhập lại mật khẩu..."
+                  placeholder="Nhập lại mật khẩu…"
                   className="w-full min-h-[48px] px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
                   required
                 />
@@ -1223,6 +1223,7 @@ export default function StudentPortalScreen() {
                 <input
                   id="hs-dn-sbd"
                   type="text"
+                  inputMode="numeric"
                   value={sbdInput}
                   onChange={(e) => setSbdInput(e.target.value)}
                   placeholder="Ví dụ: 110234 hoặc 12026"
@@ -1247,7 +1248,7 @@ export default function StudentPortalScreen() {
                     type={hienMatKhau ? 'text' : 'password'}
                     value={matKhauInput}
                     onChange={(e) => setMatKhauInput(e.target.value)}
-                    placeholder="Nhập mật khẩu của em..."
+                    placeholder="Nhập mật khẩu của em…"
                     className="w-full min-h-[48px] px-4 py-2.5 pr-12 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition"
                   />
                   <button
@@ -1272,7 +1273,7 @@ export default function StudentPortalScreen() {
 
               <div className="text-center pt-2">
                 <p className="text-[11px] text-slate-400">
-                  Nếu quên mật khẩu, em hãy liên hệ Thầy để được reset về <code>12121212</code>
+                  Quên mật khẩu: nhắn thầy để đặt lại.
                 </p>
               </div>
             </form>
@@ -1924,7 +1925,7 @@ export default function StudentPortalScreen() {
                                   onClick={() =>
                                     setCauTraLoiMom((prev) => ({ ...prev, [cau.id]: kyTu }))
                                   }
-                                  className={`p-3 rounded-2xl border text-left text-xs transition-all flex items-start gap-2.5 cursor-pointer ${
+                                  className={`p-3 rounded-2xl border text-left text-xs transition flex items-start gap-2.5 cursor-pointer ${
                                     duocChon
                                       ? 'bg-rose-50 text-rose-900 border-rose-300 dark:bg-rose-950/60 dark:text-rose-200 dark:border-rose-700 font-semibold shadow-xs'
                                       : 'bg-slate-50/70 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-700/80'

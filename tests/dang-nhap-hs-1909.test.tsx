@@ -49,7 +49,11 @@ describe('form đăng nhập học sinh', () => {
     expect(cao48(screen.getByRole('button', { name: 'Đăng nhập' }))).toBe(true)
     // chữ, gợi ý giữ nguyên
     expect(sbd.placeholder).toBe('Ví dụ: 110234 hoặc 12026')
-    expect(mk.placeholder).toBe('Nhập mật khẩu của em...')
+    expect(mk.placeholder).toBe('Nhập mật khẩu của em…')
+    // Thầy chốt 21/09 (H5): màn đăng nhập KHÔNG in mật khẩu mặc định; bàn phím số cho ô SBD; "…" thay "...".
+    expect(sbd.getAttribute('inputmode')).toBe('numeric')
+    expect(document.body.textContent).not.toContain('12121212')
+    expect(screen.getByText('Quên mật khẩu: nhắn thầy để đặt lại.')).toBeTruthy()
   })
 
   it('nút mắt: 48×48, có tên "Hiện mật khẩu" ↔ "Ẩn mật khẩu" đổi theo trạng thái, đổi kiểu ô mật khẩu; là button type=button (không nộp form)', async () => {
