@@ -119,9 +119,12 @@ export function BanDo3D({ lop, mau, phienBanMau, itDong }: { lop: readonly LopSa
         vtri = veIso(k.ctx, k.w, k.h, s.lop, cao.current, loe.current, { nen: c(s.mau.nen), matNen: c(s.mau['mat-2']), vien: c(s.mau.vien), do: s.mau.do, vang: s.mau.vang, la: s.mau.la, xam: s.mau['xam-o'] })
       }
       // nhãn: đo bề rộng, đẩy lên khi chồng nhau, dây dẫn từ nhãn xuống đầu cột
+      const gon = h < 260 // khung thấp: nhãn MỘT dòng (tên · số câu) để không chất đống ở mép trên
+      hop.classList.toggle('bts-hop-3d--gon', gon)
       const dat = datNhanChongLap(
         vtri.map((p, i) => ({ ...p, w: nhanRef.current[i]?.offsetWidth ?? 80 })),
         w,
+        gon ? 22 : 33,
       )
       dat.forEach((p, i) => {
         const el = nhanRef.current[i]
