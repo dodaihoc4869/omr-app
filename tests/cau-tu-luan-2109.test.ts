@@ -11,7 +11,19 @@ const SACCHAROSE = 'Theo em, có thể dùng phương pháp nào để tách sac
 
 // ───────────────────────── các khuôn câu ─────────────────────────
 const kho = (o: Record<string, unknown>) => ({ so: 1, ...o }) // tờ kho thô R2
+// Khuôn THÔ THẬT của kho (Code 3 đối chiếu 4 tờ thật, 21/09): `pa` là ĐỐI TƯỢNG {A,B,C,D}, `y` là ĐỐI TƯỢNG {a,b,c,d}; kèm hinh[], loi_giai{}, dang{ma,ten}, can_chua{}, kieu 'bai_tap'|'ly_thuyet'.
+const PA_OBJ = { A: 'Etyl axetat', B: 'Metyl axetat', C: 'Etyl fomat', D: 'Metyl fomat' }
+const Y_OBJ = { a: Y[0], b: Y[1], c: Y[2], d: Y[3] }
+const thoKho = (o: Record<string, unknown>) => ({ so: 4, hinh: [], loi_giai: {}, dang: { ma: 'ESTE.CT', ten: 'Công thức este' }, can_chua: {}, kieu: 'bai_tap', chuyen_de: 'Este – Lipid', muc_do: 'biet', ...o })
 const CAU_RUT_DUOC: [string, unknown, PhanCau?][] = [
+  ['KHO THÔ THẬT · phần I, pa là ĐỐI TƯỢNG {A,B,C,D}', thoKho({ phan: 'I', de: 'Este nào sau đây có công thức CH3COOC2H5?', pa: PA_OBJ, dap_an: 'A' })],
+  ['KHO THÔ THẬT · phần I kieu ly_thuyet', thoKho({ phan: 'I', kieu: 'ly_thuyet', de: 'Chất nào là este?', pa: PA_OBJ, dap_an: 'C' })],
+  ['KHO THÔ THẬT · phần II, y là ĐỐI TƯỢNG {a,b,c,d}, dap_an chuỗi', thoKho({ phan: 'II', de: 'Cho este X.', y: Y_OBJ, dap_an: 'DSSD' })],
+  ['KHO THÔ THẬT · phần II, y đối tượng, dap_an đối tượng {a,b,c,d}', thoKho({ phan: 'II', de: 'Cho este X.', y: Y_OBJ, dap_an: { a: 'D', b: 'S', c: 'S', d: 'D' } })],
+  ['KHO THÔ THẬT · phần III', thoKho({ phan: 'III', de: 'Tính khối lượng (gam).', dap_an: '12,5' })],
+  ['KHO THÔ THẬT · phần I, một phương án chỉ có ẢNH (hinh sau_pa_C), chữ rỗng', thoKho({ phan: 'I', de: 'Hình nào đúng?', pa: { A: 'Hình 1', B: 'Hình 2', C: '', D: 'Hình 4' }, hinh: [{ src: 'c.png', viTri: 'sau_pa_C' }], dap_an: 'B' })],
+  ['KHO THÔ THẬT · phần II, một ý chỉ có ảnh (hinh sau_y_b)', thoKho({ phan: 'II', de: 'Xét đồ thị.', y: { a: 'Ý a', b: '', c: 'Ý c', d: 'Ý d' }, hinh: [{ src: 'b.png', viTri: 'sau_y_b' }], dap_an: 'DSDS' })],
+  ['đề thầy · phần I có ảnh phương án trong hinhAnh', { id: 'x-I-1', text: 'Hình nào?', choices: ['', 'B', 'C', 'D'], hinhAnh: [{ src: 'a.png', viTri: 'sau_pa_A' }], correct: 'A' }, 'I'],
   ['kho thô · phần I đủ 4 phương án, đáp án A', kho({ phan: 'I', de: 'Este nào sau đây có công thức CH3COOC2H5?', pa: PA, dap_an: 'A' })],
   ['kho thô · phần I đáp án "C." có dấu chấm', kho({ phan: 'I', de: 'Chất nào là este?', pa: PA, dap_an: 'C.' })],
   ['kho thô · phần II đủ 4 ý, đáp án DSSD', kho({ phan: 'II', de: 'Cho este X. Phát biểu nào đúng?', y: Y, dap_an: 'DSSD' })],
@@ -68,6 +80,12 @@ const CAU_TU_LUAN: [string, unknown, PhanCau?, RegExp?][] = [
   ['phần III "như thế nào"', { phan: 'III', text: 'Tốc độ phản ứng thay đổi như thế nào khi tăng nhiệt độ?', choices: [], ideas: [] }, undefined, /hỏi mở/],
   ['phần I thiếu phương án (2/4)', kho({ phan: 'I', de: 'Chất nào là este?', pa: ['A', 'B'], dap_an: 'A' }), undefined, /thiếu phương án/],
   ['phần I không có phương án (luaChon null)', { phan: 'I', id: 'x-I-1', text: 'Nêu khái niệm este.', luaChon: null, dapAn: 'A' }, undefined, /thiếu phương án/],
+  ['KHO THÔ THẬT · phần I, pa đối tượng thiếu phương án D', thoKho({ phan: 'I', de: 'Chất nào là este?', pa: { A: 'a', B: 'b', C: 'c' }, dap_an: 'A' }), undefined, /thiếu phương án/],
+  ['KHO THÔ THẬT · phần I, pa đối tượng có ô D rỗng và không ảnh', thoKho({ phan: 'I', de: 'Chất nào là este?', pa: { A: 'a', B: 'b', C: 'c', D: '' }, dap_an: 'A' }), undefined, /thiếu phương án/],
+  ['KHO THÔ THẬT · phần I, ô D rỗng và ảnh hinh KHÔNG có src (ảnh hỏng) ⇒ vẫn thiếu phương án', thoKho({ phan: 'I', de: 'Chất nào?', pa: { A: 'a', B: 'b', C: 'c', D: '' }, hinh: [{ viTri: 'sau_pa_D' }], dap_an: 'A' }), undefined, /thiếu phương án/],
+  ['KHO THÔ THẬT · phần I, pa đối tượng rỗng {}', thoKho({ phan: 'I', de: 'Nêu khái niệm.', pa: {}, dap_an: 'A' }), undefined, /thiếu phương án/],
+  ['KHO THÔ THẬT · phần II, y đối tượng chỉ 3 ý', thoKho({ phan: 'II', de: 'Cho este X.', y: { a: 'a', b: 'b', c: 'c' }, dap_an: 'DSS' }), undefined, /thiếu ý/],
+  ['KHO THÔ THẬT · phần III hỏi mở (saccharose) khuôn thô đủ trường', thoKho({ phan: 'III', de: SACCHAROSE, dap_an: '3' }), undefined, /hỏi mở/],
   ['phần I có 4 ô nhưng một ô trống, không ảnh', kho({ phan: 'I', de: 'Chất nào?', pa: ['A', 'B', '', 'D'], dap_an: 'A' }), undefined, /thiếu phương án/],
   ['phần I đáp án không phải A–D', kho({ phan: 'I', de: 'Chất nào?', pa: PA, dap_an: 'AB' }), undefined, /A–D/],
   ['phần I đáp án rỗng (có trường)', kho({ phan: 'I', de: 'Chất nào?', pa: PA, dap_an: '' }), undefined, /A–D/],

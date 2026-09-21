@@ -78,15 +78,28 @@ const hoiMo = (text: string): boolean => {
 /** Đáp án phần III là CHỮ NHIỀU TỪ (≥ 2 từ toàn chữ, không chứa chữ số): "kết tinh lại", "chưng cất phân đoạn". Số, công thức (C2H5OH), số kèm một đơn vị (1,5 mol) không dính. */
 const laChuNhieuTu = (da: string): boolean => da.split(/\s+/).filter((t) => t.length > 0 && !/\d/.test(t) && /^\p{L}{2,}[.,;:!?]*$/u.test(t)).length >= 2
 
-/** Số phương án/ý CÓ NỘI DUNG (chữ hoặc ảnh). */
-function demCoNoiDung(ds: unknown, anh: unknown): number {
-  if (!Array.isArray(ds)) return 0
+/** Chữ của MỘT phương án/ý: chuỗi, hoặc đối tượng có text/noiDung/de. */
+const chuPhuongAn = (x: unknown): string => (typeof x === 'string' ? x.trim() : laDoiTuong(x) ? chuoi(lay(x, 'text', 'noiDung', 'noi_dung', 'de')) : typeof x === 'number' ? String(x) : '')
+
+/**
+ * Số phương án/ý CÓ NỘI DUNG (chữ HOẶC ảnh). Nhận cả MẢNG (đề thầy, phiếu, game: 4 phần tử theo thứ tự A–D / a–d) lẫn ĐỐI TƯỢNG (tờ kho thô R2: `pa {A,B,C,D}`, `y {a,b,c,d}` — đếm khoá A–D/a–d).
+ * Ảnh của phương án: mảng song song (`choiceImgs`/`ideaImgs`) hoặc hình có `viTri` = `sau_pa_A` / `sau_y_a` (kho thô: `hinh[]`; đề thầy: `hinhAnh[]`).
+ */
+function demCoNoiDung(ds: unknown, anh: unknown, hinh: unknown, tienTo: 'sau_pa_' | 'sau_y_'): number {
+  const khoa = ['A', 'B', 'C', 'D']
+  const coHinh = (k: string): boolean =>
+    Array.isArray(hinh) && hinh.some((h) => laDoiTuong(h) && chuoi(h.viTri ?? h.vi_tri).toLowerCase() === `${tienTo}${k}`.toLowerCase() && Boolean(h.src ?? h.url ?? h.data))
   const imgs = Array.isArray(anh) ? anh : []
   let n = 0
-  for (let i = 0; i < ds.length; i++) {
-    const x = ds[i]
-    const chu = typeof x === 'string' ? x.trim() : laDoiTuong(x) ? chuoi(lay(x, 'text', 'noiDung', 'de')) : String(x ?? '').trim()
-    if (chu || CO_ANH(imgs[i])) n++
+  if (Array.isArray(ds)) {
+    for (let i = 0; i < ds.length; i++) if (chuPhuongAn(ds[i]) || CO_ANH(imgs[i]) || (i < 4 && coHinh(khoa[i]))) n++
+    return n
+  }
+  if (laDoiTuong(ds)) {
+    khoa.forEach((k, i) => {
+      const v = ds[k] ?? ds[k.toLowerCase()]
+      if (chuPhuongAn(v) || CO_ANH(imgs[i]) || coHinh(k)) n++
+    })
   }
   return n
 }
@@ -113,12 +126,12 @@ export function lyDoTuLuan(c: unknown, phanMacDinh?: PhanCau): string | null {
   if (phan === 'I') {
     const pa = lay(c, 'choices', 'pa', 'luaChon', 'phuongAn', 'options')
     const coPa = c.choices !== undefined || c.pa !== undefined || c.luaChon !== undefined || c.phuongAn !== undefined || c.options !== undefined
-    if (coPa && demCoNoiDung(pa, lay(c, 'choiceImgs', 'anhLuaChon')) < 4) return 'phần I thiếu phương án (không đủ 4)'
+    if (coPa && demCoNoiDung(pa, lay(c, 'choiceImgs', 'anhLuaChon'), lay(c, 'hinh', 'hinhAnh'), 'sau_pa_') < 4) return 'phần I thiếu phương án (không đủ 4)'
     if (coDapAn && !/^[A-D]$/i.test(da.replace(/[.)\s]+$/, '').trim())) return 'phần I không có đáp án A–D'
   } else if (phan === 'II') {
     const y = lay(c, 'ideas', 'y', 'cacY', 'statements')
     const coY = c.ideas !== undefined || c.y !== undefined || c.cacY !== undefined || c.statements !== undefined
-    if (coY && demCoNoiDung(y, lay(c, 'ideaImgs', 'anhY')) < 4) return 'phần II thiếu ý (không đủ 4)'
+    if (coY && demCoNoiDung(y, lay(c, 'ideaImgs', 'anhY'), lay(c, 'hinh', 'hinhAnh'), 'sau_y_') < 4) return 'phần II thiếu ý (không đủ 4)'
     if (coDapAn && da.replace(/[^DSĐdsđ]/g, '').length !== 4) return 'phần II không có đáp án đúng/sai đủ 4 ý'
   } else if (phan === 'III') {
     if (coDapAn) {
