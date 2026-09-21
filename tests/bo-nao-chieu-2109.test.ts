@@ -324,11 +324,11 @@ describe('chay-chieu.sh + gói + lời dặn — phiên AI KHÔNG nộp được
     const c = doc('bo-nao/HUONG-DAN-BO-NAO.md')
     for (const t of ['ĐI CÙNG NHAU', 'KHÔNG nêu số câu', '`thanThu.ten`', 'đúng ≥ 80 % trong ≥ 5 câu 7 ngày', 'xem-truoc.md', 'chay-chieu.sh --nop', 'thuThach', 'loiMoi']) expect(c, t).toContain(t)
   })
-  it('LUAT-CHIEU + cẩm nang nói ĐÚNG các điều Boss chốt sau lượt thử: ba ý bắt buộc, theo bậc, đa dạng, mời chọn thú ở cuối, tạm cấm khiên', () => {
+  it('LUAT-CHIEU + cẩm nang nói ĐÚNG các điều Boss chốt sau lượt thử: ba ý bắt buộc, theo bậc, đa dạng, mời chọn thú ở cuối, luật khiên 36 ngày', () => {
     const l = doc('bo-nao/LUAT-CHIEU.md')
     const c = doc('bo-nao/HUONG-DAN-BO-NAO.md')
-    for (const t of ['BA Ý BẮT BUỘC', 'khó hơn một bậc ở dạng X, vì em đã đúng N trong M câu', 'mình lùi một bậc để em lấy lại nhịp', 'không chữ "yếu"', '≥ 4 kiểu MỞ ĐẦU', 'KHÔNG mở bằng "Hôm qua" quá 1/3', 'CÂU CUỐI', 'KHÔNG nhắc khiên', 'CẤM khen chung chung']) expect(l, t).toContain(t)
-    for (const t of ['BA Ý BẮT BUỘC', 'khó hơn một bậc', 'lùi một bậc', 'TẠM KHÔNG dùng', 'CÂU CUỐI', '47/52']) expect(c, t).toContain(t)
+    for (const t of ['BA Ý BẮT BUỘC', 'khó hơn một bậc ở dạng X, vì em đã đúng N trong M câu', 'mình lùi một bậc để em lấy lại nhịp', 'không chữ "yếu"', '≥ 4 kiểu MỞ ĐẦU', 'KHÔNG mở bằng "Hôm qua" quá 1/3', 'CÂU CUỐI', 'nhắc khiên CHỈ kèm', 'CẤM khen chung chung']) expect(l, t).toContain(t)
+    for (const t of ['BA Ý BẮT BUỘC', 'khó hơn một bậc', 'lùi một bậc', 'LUẬT CẤP MỚI', 'CÂU CUỐI', '47/52']) expect(c, t).toContain(t)
   })
   it('THE_KHONG_THU không có thanThu (mẫu 5–6 dành cho em chưa chọn thú)', () => {
     expect('thanThu' in (THE_KHONG_THU as object)).toBe(false)

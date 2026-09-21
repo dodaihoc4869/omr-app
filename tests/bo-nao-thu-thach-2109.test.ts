@@ -2,7 +2,7 @@
 // Luật cứng: hai trường đi cùng nhau; sai khuôn ⇒ CHỈ bỏ phần thử thách (phần tử vẫn hợp lệ, núm giữ); lời mời phải có ≥ 1 số THẬT trong thẻ, mọi số phải có trong thẻ, không nêu số câu sẽ làm,
 // không hứa điều không chắc, không nhãn năng lực / so với bạn / gọi tên, tên thú chỉ lấy từ thẻ; `cao_hon_mot_bac` chỉ khi đúng ≥ 80 % theo số trong thẻ.
 import { describe, it, expect } from 'vitest'
-import { anSoGameTam, HAN_MUC_BO_NAO, kiemKhuon, kiemThuThach, lamSachDauRa, tapSoCuaThe, type DauRaEm, type TheDeKiem } from '../src/lib/bo-nao-khuon'
+import { anSoGameTam, HAN_MUC_BO_NAO, HANG_SO_LUAT_LOI_MOI, kiemChuLoiMoi, kiemKhuon, kiemThuThach, lamSachDauRa, tapSoCuaThe, type DauRaEm, type TheDeKiem } from '../src/lib/bo-nao-khuon'
 import { LOI_CAM, LOI_TOT, THE, THE_KHONG_THU } from './_bo-nao-thu-thach-mau'
 
 const nen = (): DauRaEm => ({
@@ -39,7 +39,7 @@ describe('thuThach + loiMoi — hợp lệ', () => {
       expect(lamSachDauRa(d, k).thuThach).toEqual(d.thuThach)
     }
   })
-  it('8 lời mẫu cấm đều bị chặn với đúng lý do; CHỈ bỏ phần thử thách (phần tử hợp lệ, boLoi = ["thuThach"], lamSachDauRa xoá cả hai trường)', () => {
+  it('7 lời mẫu cấm đều bị chặn với đúng lý do; CHỈ bỏ phần thử thách (phần tử hợp lệ, boLoi = ["thuThach"], lamSachDauRa xoá cả hai trường)', () => {
     for (const { chu, mau, bac } of LOI_CAM) {
       const d = ghep(chu, ['ESTE.THUY_PHAN'], 6, bac ?? 'dung_bac')
       const k = bo(d)
@@ -82,15 +82,46 @@ describe('loiMoi — ý nghĩa, bậc, mở đầu, khiên (Boss 21/09 sau lư�
     for (const t of ['hiếm có', 'Hiếm Có', 'hiếm ai', 'ít ai']) expect(tt(`Chuỗi 4 ngày liền, nhịp đều như vậy là ${t}. Hôm nay hãy thử vài câu nhé.`, 'dung_bac'), t).toContain('hứa điều không chắc hoặc gọi tên')
     expect(tt('Chuỗi 4 ngày liền, có những hôm hiếm hoi em nghỉ, nghĩa là thói quen đang thành hình. Hôm nay hãy thử vài câu nhé.', 'dung_bac')).toBe('')
   })
-  it('TẠM CẤM khiên / mảnh khiên trong lời mời (thầy đang siết khiên lên 36 ngày, số /12 sắp đổi)', () => {
-    expect(tt('Rồng Lửa đang có 3 mảnh khiên, hôm nay thử vài câu nhé.', 'dung_bac')).toContain('hứa điều không chắc hoặc gọi tên: khiên, mảnh khiên')
+  it('KHIÊN theo luật mới: chữ "khiên" CHỈ được nói kèm "36 ngày đạt nhiệm vụ ngày"; số mảnh khiên luôn bị cấm (Boss 22/09: luật khiên mới đã sống)', () => {
+    expect(tt('Rồng Lửa đang có 3 mảnh khiên, hôm nay thử vài câu nhé.', 'dung_bac')).toContain('hứa điều không chắc hoặc gọi tên: mảnh khiên')
+    expect(tt('Rồng Lửa sắp có khiên đầu tiên, em chăm 4 ngày liền rồi, hôm nay thử vài câu nhé.', 'dung_bac')).toContain('nhắc khiên mà không nói luật')
+    expect(tt('Em đã chăm 4 ngày liền. Khiên đầu tiên của Rồng Lửa chỉ mở sau 36 ngày đạt nhiệm vụ ngày, hôm nay thử vài câu nhé.', 'dung_bac')).toBe('')
+    expect(tt('Em đã chăm 4 ngày liền. Khiên đầu tiên của Rồng Lửa chỉ mở sau 36 NGÀY ĐẠT NHIỆM VỤ NGÀY, hôm nay thử vài câu nhé.', 'dung_bac')).toBe('')
+    expect(tt('Em đã chăm 4 ngày liền. Khiên đầu tiên chỉ mở sau 35 ngày đạt nhiệm vụ ngày, hôm nay thử vài câu nhé.', 'dung_bac')).toContain('nhắc khiên mà không nói luật') // sai số ngày
     expect(tt('Rồng Lửa đang chờ em, chuỗi 4 ngày rồi, hôm nay thử vài câu nhé.', 'dung_bac')).toBe('')
   })
-  it('TẠM CẤM nêu SỐ EXP / SỐ CẤP của thú (Boss 21/09 chiều: thầy đang tính lại đường cấp): số ấy CÓ trong thẻ vẫn bị loại; chữ "EXP" / "lên cấp" không kèm số vẫn được; tên thú được nhắc', () => {
-    const BAN = ['Rồng Lửa còn thiếu 40 EXP', 'Rồng Lửa còn thiếu EXP 40', 'Rồng Lửa đang ở cấp 6', 'Rồng Lửa lên cấp 6', 'Rồng Lửa đạt 6 cấp', 'Rồng Lửa level 6', 'Rồng Lửa còn thiếu 40 điểm kinh nghiệm', 'Rồng Lửa còn thiếu 40 exp', 'RỒNG LỬA còn thiếu 40EXP']
-    for (const b of BAN) expect(tt(`${b}, chuỗi 4 ngày rồi, hôm nay thử vài câu nhé.`, 'dung_bac'), b).toContain('nêu số EXP hoặc số cấp')
-    const OK = ['Rồng Lửa đang chờ em, chuỗi 4 ngày rồi, hôm nay thử vài câu nhé.', 'Chuỗi 4 ngày rồi, thử vài câu để Rồng Lửa lên cấp nhé.', 'Chuỗi 4 ngày rồi, thử vài câu để EXP của Rồng Lửa có chỗ về nhé.', 'Em đã đúng 8 trong 9 câu, thử vài câu cùng Rồng Lửa nhé.']
+  it('số của luật (200 · 120 · 36 · 4) được nêu dù thẻ KHÔNG có số ấy; số thật của thẻ vẫn bắt buộc', () => {
+    const tapThe = new Set(['8', '7'])
+    for (const so of ['200', '120', '36', '4']) expect(HANG_SO_LUAT_LOI_MOI.has(so), so).toBe(true)
+    expect([...HANG_SO_LUAT_LOI_MOI].sort()).toEqual(['120', '200', '36', '4'])
+    const k = (lm: string) => kiemChuLoiMoi(lm, 'loiMoi', 200, THE, tapThe, 6, HANG_SO_LUAT_LOI_MOI)
+    expect(k('Hôm qua em làm 8 câu, đúng 7 câu. Làm đủ 4 câu hôm nay để Rồng Lửa được ăn nhé.')).toEqual([])
+    expect(k('Hôm qua em làm 8 câu, đúng 7 câu. Làm đủ 3 câu hôm nay để Rồng Lửa được ăn nhé.').join(' ')).toContain('số không có trong thẻ: 3')
+    expect(k('Đạt nhiệm vụ ngày thì Rồng Lửa ăn no 200 EXP, làm đủ 4 câu nhé.').join(' ')).toContain('ít nhất một con số thật có trong thẻ')
+  })
+  it('hai mẫu cấm cũ (đã bớt khỏi LUAT-CHIEU cho vừa 1 400 chữ) VẪN bị chặn: số không có trong thẻ; so với bạn', () => {
+    expect(tt('Rồng Lửa còn thiếu 55 nữa, chuỗi 4 ngày rồi, thử mấy câu nhé.', 'dung_bac')).toContain('số không có trong thẻ: 55')
+    expect(tt('Các bạn khác đã làm 4 câu rồi, em thử mấy câu nhé.', 'dung_bac')).toContain('từ cấm')
+    expect(tt('Em đều tay thế này là hiếm có, chuỗi 4 ngày rồi, hôm nay thử mấy câu nhé.', 'dung_bac')).toContain('hứa điều không chắc')
+  })
+  it('LUẬT CẤP MỚI: được nêu số của luật (200 · 120 · 36 · 4) và nói "cho thú ăn"; vẫn CẤM số cấp, "N EXP" ngoài luật, "EXP còn thiếu để lên cấp"; lời phải có ≥ 1 số THẬT của thẻ (số của luật không đủ)', () => {
+    const BAN = ['Rồng Lửa còn thiếu 40 EXP', 'Rồng Lửa còn thiếu EXP 40', 'Rồng Lửa đang ở cấp 6', 'Rồng Lửa lên cấp 6', 'Rồng Lửa đạt 6 cấp', 'Rồng Lửa level 6', 'Rồng Lửa còn thiếu 40 điểm kinh nghiệm', 'Rồng Lửa còn thiếu 40 exp', 'RỒNG LỬA còn thiếu 40EXP', 'Rồng Lửa còn thiếu 300 EXP', 'Đạt nhiệm vụ ngày thì Rồng Lửa ăn no 199 EXP', 'Rồng Lửa còn thiếu 200 EXP để lên cấp', 'Rồng Lửa cần thêm EXP để lên cấp']
+    for (const b of BAN) expect(tt(`${b}, chuỗi 4 ngày rồi, hôm nay thử vài câu nhé.`, 'dung_bac'), b).toMatch(/nêu số cấp|nêu số EXP ngoài luật|nói EXP còn thiếu để lên cấp|số không có trong thẻ/)
+    const OK = [
+      'Rồng Lửa đang chờ em, chuỗi 4 ngày rồi, hôm nay thử vài câu nhé.',
+      'Chuỗi 4 ngày rồi, thử vài câu để Rồng Lửa lên cấp nhé.',
+      'Chuỗi 4 ngày rồi, thử vài câu để EXP của Rồng Lửa có chỗ về nhé.',
+      'Em đã đúng 8 trong 9 câu, thử vài câu cùng Rồng Lửa nhé.',
+      'Em đúng 8 trong 9 câu. Đạt nhiệm vụ ngày hôm nay thì Rồng Lửa ăn no 200 EXP, thử vài câu nhé.',
+      'Em đúng 8 trong 9 câu. Làm đủ 4 câu hôm nay thì Rồng Lửa được ăn 120 EXP, thử vài câu nhé.',
+      'Em đúng 8 trong 9 câu. EXP 200 là mức Rồng Lửa ăn no mỗi ngày em đạt nhiệm vụ, thử vài câu nhé.',
+    ]
     for (const o of OK) expect(tt(o, 'dung_bac'), o).toBe('')
+    // chỉ có số của luật, không có số thật của thẻ ⇒ loại
+    expect(tt('Đạt nhiệm vụ ngày hôm nay thì Rồng Lửa ăn no 200 EXP, thử vài câu nhé.', 'dung_bac')).toContain('ít nhất một con số thật có trong thẻ')
+    // số của luật KHÔNG được dùng làm số câu sẽ làm khi trùng số câu Bộ não muốn (4) ngoài cụm "làm đủ 4 câu"
+    expect(kt(ghep('Em đúng 8 trong 9 câu. Hôm nay làm 4 câu Thuỷ phân ester nhé.', ['ESTE.THUY_PHAN'], 4) as unknown as Record<string, unknown>).join(' | ')).toContain('số câu sẽ làm')
+    expect(kt(ghep('Em đúng 8 trong 9 câu. Làm đủ 4 câu hôm nay để Rồng Lửa được ăn nhé.', ['ESTE.THUY_PHAN'], 4) as unknown as Record<string, unknown>)).toEqual([])
     // AI không thấy số: kiemKhuon coi số EXP / cấp của thẻ là "không có trong thẻ" ngay cả khi không đi kèm chữ EXP
     const qua = bo(ghep('Rồng Lửa còn thiếu 40 nữa, chuỗi 4 ngày rồi, thử vài câu nhé.'))
     expect((qua.canhBao ?? []).join(' | ')).toContain('số không có trong thẻ: 40')

@@ -200,9 +200,11 @@ export const TU_CAM_RIENG_LOI_MOI: readonly string[] = [
   'tuyệt vời', 'xuất sắc', 'làm tốt lắm', 'rất tốt', 'cố lên', 'tiếp tục phát huy', 'quá giỏi',
   // SO SÁNH NGẦM VỚI BẠN KHÁC (Boss 21/09: lời E046 "hiếm có" hàm ý hơn bạn khác): khen chỉ so với CHÍNH em, không nói em "hiếm" so với ai.
   'hiếm có', 'hiếm ai', 'ít ai',
-  // TẠM CẤM (Boss 21/09 15:xx): thầy đang siết khiên lên 36 ngày, con số 12 mảnh sắp đổi — lời mời chỉ dùng EXP còn thiếu + cấp. Bỏ hai dòng này khi luật khiên mới chốt.
-  'khiên', 'mảnh khiên',
+  // KHIÊN (Boss 22/09, luật khiên mới đã sống): chữ "khiên" CHỈ được nói kèm luật "36 ngày đạt nhiệm vụ ngày" (kiểm riêng ở `kiemChuLoiMoi`); số mảnh khiên thì vẫn cấm.
+  'mảnh khiên',
 ]
+/** SỐ CỦA LUẬT (không phải số của thẻ) mà lời mời được nêu: thú ăn no 200 EXP khi đạt nhiệm vụ ngày (120 khi làm đủ 4 câu chưa đạt), khiên đầu sau 36 ngày đạt. Không tính là "số thật có trong thẻ". */
+export const HANG_SO_LUAT_LOI_MOI: ReadonlySet<string> = new Set(['200', '120', '36', '4'])
 /**
  * TẠM ẨN SỐ CỦA GAME khỏi Bộ não (lệnh tạm của Boss 21/09 chiều, cho lượt chiều): thầy đang siết đường cấp (21 ngày tới cấp 10, 1 200 ngày tới cấp 120) và tính lại cấp của em đã chơi
  * ⇒ "thiếu 27 EXP lên cấp 8" sẽ sai. Bỏ `exp` (tổng EXP, cấp) và `thanThu.{cap, expConThieu, manhKhien, manhKhienTong}`; GIỮ tên thú (`thanThu.ten`) và `thanThu.chuoiNgay`.
@@ -219,10 +221,21 @@ export function anSoGameTam<T>(the: T): T {
 }
 
 /**
- * TẠM CẤM nêu SỐ EXP / SỐ CẤP của thú trong lời mời (lệnh tạm của Boss 21/09 chiều: thầy đang siết đường cấp và tính lại cấp của em đã chơi, số cũ sẽ sai). Bắt: "40 EXP", "EXP 40", "cấp 6",
- * "6 cấp", "level 6", "40 điểm kinh nghiệm". KHÔNG bắt chữ "EXP" / "lên cấp" đứng riêng không kèm số ("chọn thần thú để EXP của em có chỗ về", "để lên cấp"). Gỡ khi Boss báo luật cấp mới đã sống.
+ * LUẬT CẤP MỚI (Boss duyệt 21/09 chiều, áp từ lượt 04:00 22/09): lời mời nói về "cho {tên thú} ăn hôm nay"; được nêu SỐ CỦA LUẬT (`HANG_SO_LUAT_LOI_MOI`: 200 · 120 · 36 · 4) nhưng KHÔNG nêu số cấp, KHÔNG nêu số EXP
+ * còn thiếu để lên cấp (số ấy đổi theo giờ / theo hồ sơ nên lời soạn lúc 04:00 có thể sai lúc em đọc). Bắt: "cấp 6", "6 cấp", "level 6"; "N EXP" / "EXP N" với N ngoài số của luật; câu vừa có "EXP" vừa có "lên cấp".
+ * Không truyền `hangSo` (lời mục tiêu tuần) ⇒ MỌI số đi kèm EXP đều bị cấm như bản tạm.
  */
-const SO_EXP_CAP_TAM_CAM = /\d\s*(?:exp|điểm kinh nghiệm|kinh nghiệm)|(?:exp|kinh nghiệm)\s*[:=]?\s*\d|(?:cấp|level|lv)\s*(?:độ\s*)?\d|\d\s*cấp/iu
+const SO_CAP_CAM = /(?:cấp|level|lv)\s*(?:độ\s*)?\d|\d\s*cấp/iu
+const SO_TRUOC_EXP = /(\d[\d.,]*)\s*(?:exp|điểm kinh nghiệm|kinh nghiệm)/giu
+const SO_SAU_EXP = /(?:exp|kinh nghiệm)\s*[:=]?\s*(\d[\d.,]*)/giu
+function viPhamExpCap(lm: string, hangSo?: ReadonlySet<string>): string | null {
+  const t = lm.normalize('NFC')
+  if (SO_CAP_CAM.test(t)) return 'nêu số cấp của thú'
+  for (const re of [SO_TRUOC_EXP, SO_SAU_EXP]) for (const m of t.matchAll(re)) if (!hangSo || !hangSo.has(chuanSo(m[1]!))) return `nêu số EXP ngoài luật (${m[1]})`
+  if (t.split(/[.!?]+/u).some((c) => /exp/iu.test(c) && /lên cấp/iu.test(c))) return 'nói EXP còn thiếu để lên cấp'
+  return null
+}
+const CO_LUAT_KHIEN = /36\s+ngày\s+đạt\s+nhiệm\s+vụ\s+ngày/iu
 /** Lời mời / lời mục tiêu KHÔNG được nói ra điều Bộ não "biết" về em (nhãn `huongEm` là để CHỈNH lời, không để khoe): cấm những cách nói này. */
 export const TU_LO_HUONG_EM: readonly string[] = ['em thích', 'em hay', 'em thường', 'mình biết em', 'mình để ý', 'mình thấy em', 'mình nhận ra em', 'mình nhớ em']
 /** Lời cho THẦY (gợi ý, lý do, bản tin, ghi chú): "dạng yếu" là chữ thường dùng trong app nên chỉ cấm những từ này. */
@@ -387,7 +400,7 @@ const VIEC_N_CAU = /(?:thử|làm|luyện|giải|chinh phục|hoàn thành|nhậ
  * LUẬT CHỮ chung của lời MỜI thử thách (`loiMoi`) và lời MỤC TIÊU TUẦN (`loiMucTieu`): `ten` = tên trường để báo lỗi; `soCau` = số câu Bộ não muốn (nếu có) để chặn nêu số câu sẽ làm.
  * Một dòng, ≤ `toiDa` ký tự, không emoji / gạch dài, không từ cấm lời cho em, không hứa / gọi tên, không nói điều Bộ não "biết" về em, có ≥ 1 số và MỌI số có trong thẻ, nhắc thú / tên riêng chỉ khi thẻ có `thanThu.ten`.
  */
-export function kiemChuLoiMoi(lm: unknown, ten: string, toiDa: number, the: TheDeKiem, tapSo: Set<string>, soCau?: number): string[] {
+export function kiemChuLoiMoi(lm: unknown, ten: string, toiDa: number, the: TheDeKiem, tapSo: Set<string>, soCau?: number, hangSo?: ReadonlySet<string>): string[] {
   const e: string[] = []
   if (!laChuoi(lm) || lm.trim().length === 0) return [`${ten} phải là chuỗi không rỗng`]
   if (doDai(lm) > toiDa) e.push(`${ten} quá ${toiDa} ký tự`)
@@ -398,16 +411,18 @@ export function kiemChuLoiMoi(lm: unknown, ten: string, toiDa: number, the: TheD
   if (cam.length) e.push(`${ten} có từ cấm: ${cam.join(', ')}`)
   const hua = timTuCam(lm, TU_CAM_RIENG_LOI_MOI)
   if (hua.length) e.push(`${ten} hứa điều không chắc hoặc gọi tên: ${hua.join(', ')}`)
-  if (SO_EXP_CAP_TAM_CAM.test(lm.normalize('NFC'))) e.push(`${ten} nêu số EXP hoặc số cấp của thú (tạm cấm: thầy đang tính lại đường cấp) — chỉ nhắc TÊN thú`)
+  const viPham = viPhamExpCap(lm, hangSo)
+  if (viPham) e.push(`${ten} ${viPham} — chỉ nói "cho {tên thú} ăn hôm nay" và số của luật (200 · 120 · 36 · 4)`)
+  if (timTuCam(lm, ['khiên']).length > 0 && !CO_LUAT_KHIEN.test(lm.normalize('NFC'))) e.push(`${ten} nhắc khiên mà không nói luật "36 ngày đạt nhiệm vụ ngày"`)
   const lo = timTuCam(lm, TU_LO_HUONG_EM)
   if (lo.length) e.push(`${ten} nói ra điều Bộ não "biết" về em: ${lo.join(', ')}`)
   const so = timSoTrongChu(boCumCuaSo(lm))
-  if (so.length === 0) e.push(`${ten} phải có ít nhất một con số thật có trong thẻ`)
-  const soLa = soLaTrongChu(lm, tapSo)
+  if (hangSo ? !so.some((n) => tapSo.has(n)) : so.length === 0) e.push(`${ten} phải có ít nhất một con số thật có trong thẻ`)
+  const soLa = soLaTrongChu(lm, hangSo ? new Set([...tapSo, ...hangSo]) : tapSo)
   if (soLa.length) e.push(`${ten} có số không có trong thẻ: ${soLa.join(', ')}`)
   // không hứa số câu
   if (THU_N_CAU.test(lm)) e.push(`${ten} nêu số câu sẽ làm sau chữ "thử" — viết "mấy câu này" hoặc "vài câu"`)
-  else if (soCau !== undefined) for (const m of lm.matchAll(VIEC_N_CAU)) if (Number(m[1]) === soCau) e.push(`${ten} nêu số câu sẽ làm (${soCau} câu) — máy chủ có thể chọn được ít hơn; viết "mấy câu này"`)
+  else if (soCau !== undefined) for (const m of lm.matchAll(VIEC_N_CAU)) if (Number(m[1]) === soCau && !/đủ\s+4\s*câu/iu.test(m[0])) e.push(`${ten} nêu số câu sẽ làm (${soCau} câu) — máy chủ có thể chọn được ít hơn; viết "mấy câu này"`)
   // thú / tên riêng: chỉ khi thẻ có thanThu.ten và đúng tên ấy
   const thanThu = the.thanThu as Record<string, unknown> | undefined
   const tenThu = thanThu && typeof thanThu === 'object' && laChuoi(thanThu.ten) && thanThu.ten.trim().length > 0 ? thanThu.ten : undefined
@@ -553,7 +568,7 @@ export function kiemThuThach(d: Record<string, unknown>, the: TheDeKiem, tapSo: 
   }
 
   const soCauDe = typeof t === 'object' && !Array.isArray(t) && laSoNguyenTrong(t.soCau, 0, 1000) ? t.soCau : undefined
-  e.push(...kiemChuLoiMoi(d.loiMoi, 'loiMoi', H.LOI_MOI_TOI_DA, the, tapSo, soCauDe))
+  e.push(...kiemChuLoiMoi(d.loiMoi, 'loiMoi', H.LOI_MOI_TOI_DA, the, tapSo, soCauDe, HANG_SO_LUAT_LOI_MOI))
   // Lời PHẢI nói đúng bậc (Boss 21/09): cao_hon_mot_bac ⇒ "câu khó hơn một bậc" + "đúng N trong M câu"; thap_hon_mot_bac ⇒ "lùi một bậc"; bậc khác không được nói những điều ấy
   if (laChuoi(d.loiMoi) && typeof t === 'object' && !Array.isArray(t) && BAC_THU_THACH.includes(t.bac as BacThuThach)) {
     const chuLoi = d.loiMoi
