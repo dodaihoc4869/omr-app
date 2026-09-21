@@ -357,7 +357,7 @@ export default function GoiLenBangScreen() {
       // CÂY. Nay hộp nhận kho đầy đủ; `bankTichTay` mới là chỗ khử trùng.
       setDeDaLuu(tachNhieuTheoPhan(kho))
       if (!url.trim() || !mat.trim()) {
-        setLoi('Chưa cấu hình địa chỉ máy chủ hoặc mã bí mật — vào Ngân hàng đề → Cấu hình (1 lần)')
+        setLoi('Chưa cấu hình địa chỉ máy chủ hoặc mã bí mật — vào Cài đặt → Kết nối máy chủ (1 lần)')
         setDsCa([])
         return
       }
