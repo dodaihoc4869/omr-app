@@ -1,12 +1,15 @@
-// MÀN HÔM NAY của thầy (G2, thầy chốt 21/09 — bản vẽ docs/ban-ve-app-giao-vien-2109/1-hom-nay.jpg). Chỉ hiện số do máy chủ trả
-// (docs/hop-dong-gv-hom-nay-2109.md); khối nào chưa có ⇒ "đang chờ máy chủ", KHÔNG bịa số. Không kết luận năng lực từ điểm.
+// MÀN HÔM NAY của thầy — BẢN 2 (thầy lệnh 21/09; đề bài prompt-hom-nay-gv-v2.md; bản vẽ docs/ban-ve-hom-nay-v2-2109/). Chỉ hiện số do máy chủ trả; khối nào chưa có ⇒ nói thật "đang chờ máy chủ", KHÔNG bịa số.
+// Bỏ hẳn: khối "Việc cần theo dõi hôm nay", "Bảng tin của thầy" + ô ngày kiểu máy, "Hoạt động dạy học trong ngày", "Bài đã giao" (gộp vào ô Việc gấp). Chữ theo docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md.
 import { useEffect, useMemo, useState } from 'react'
-import { Search } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
 import { cauLyDo, hanhDongCua, layCauToiHan, layHomNay, NHAN_HANH_DONG, ngayDai, phanTram, type CauToiHan, type HomNay, type HomNayEm } from '../lib/hom-nay-api'
-import KhoiBtvnLo from '../components/KhoiBtvnLo'
+import { layBangTinNgay, type BangTinNgay } from '../lib/hom-nay-v2'
+import type { KetQuaLenh } from '../lib/goi-lenh-thay'
 import KhoiBoNaoDemQua from '../components/KhoiBoNaoDemQua'
+import OTraCuu from '../components/hom-nay/OTraCuu'
+import ViecGap from '../components/hom-nay/ViecGap'
 import '../styles/hom-nay.css'
+import '../styles/hom-nay-v2.css'
 
 const CHO = 'đang chờ máy chủ'
 
@@ -28,15 +31,15 @@ export default function HomNayScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
-  const showToast = useAppStore((s) => s.showToast)
   const [hom, setHom] = useState<HomNay | null | undefined>(undefined) // undefined = đang tải
   const [cau, setCau] = useState<CauToiHan | null | undefined>(undefined)
-  const [tim, setTim] = useState('')
+  const [tin, setTin] = useState<KetQuaLenh<BangTinNgay> | undefined>(undefined)
 
   useEffect(() => {
     let con = true
     void layHomNay().then((h) => con && setHom(h))
     void layCauToiHan().then((c) => con && setCau(c))
+    void layBangTinNgay().then((t) => con && setTin(t))
     return () => {
       con = false
     }
@@ -53,17 +56,7 @@ export default function HomNayScreen() {
   const bt = hom?.btvn
   const ty = hom?.canYTuong
   const dangDuocDung = useMemo(() => hom?.dangYeu?.[0] ?? null, [hom])
-
-  const timKiem = () => {
-    const q = tim.trim()
-    if (!q) return
-    if (/^\d{6}$/.test(q)) return moChiTietCa(q)
-    const theoSbd = classList.find((h) => h.sbd === q)
-    const theoTen = classList.find((h) => h.hoTen.toLowerCase().includes(q.toLowerCase()))
-    const em = theoSbd ?? theoTen
-    if (em) return moHoSoEm(em.sbd)
-    showToast(`Không tìm thấy "${q}" trong danh sách lớp`, 'warn')
-  }
+  const dsTraCuu = useMemo(() => classList.map((h) => ({ sbd: h.sbd, hoTen: h.hoTen, lop: h.lop })), [classList])
 
   const lamHanhDong = (e: HomNayEm) => {
     if (hanhDongCua(e) === 'dua_vao_buoi_chua') setScreen('goilenbang')
@@ -71,116 +64,161 @@ export default function HomNayScreen() {
   }
 
   return (
-    <div className="gv-page hn" style={{ fontFamily: 'var(--sans)' }}>
-      <header className="hn-dau">
+    <div className="gv-page hn2" style={{ fontFamily: 'var(--sans)' }}>
+      <header className="hn2-dau">
         <div>
-          <h1 className="hn-chao">Chào thầy Học</h1>
-          <p className="hn-ngay">
-            {ngayDai(new Date())}
+          <h1 className="hn2-chao">Chào thầy Học</h1>
+          <p className="hn2-ngay">
+            {ngayDai(new Date())}/{new Date().getFullYear()}
             {soEm != null && ` · ${soEm} học sinh`}
             {soLop != null && ` · ${soLop} lớp`}
+            {hom?.caDangMo != null && ` · ${hom.caDangMo > 0 ? `${hom.caDangMo} ca kiểm tra đang mở` : 'không có ca kiểm tra nào đang mở'}`}
           </p>
         </div>
-        <div className="hn-dau-phai">
-          <label className="hn-tim">
-            <Search size={20} aria-hidden="true" />
-            <input value={tim} onChange={(e) => setTim(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && timKiem()} placeholder="Tìm học sinh, ca thi, mã đề…" aria-label="Tìm học sinh hoặc mã ca" />
-          </label>
-          <span className={`hn-chip${hom?.caDangMo ? ' hn-chip--dang-mo' : ''}`}>{hom?.caDangMo == null ? CHO : hom.caDangMo > 0 ? `${hom.caDangMo} ca đang mở` : 'Không có ca nào đang mở'}</span>
-        </div>
+        <OTraCuu ds={dsTraCuu} onMoEm={moHoSoEm} onMoCa={moChiTietCa} />
       </header>
 
       <section className="hn-hang-so" aria-label="Số liệu hôm nay">
-        <SoLon vai="tertiary" tieu="ĐẠT NHIỆM VỤ HÔM NAY" so={nv ? String(nv.dat) : '—'} mau={nv ? `/${nv.tong}` : undefined} phu={nv ? `${phanTram(nv.dat, nv.tong) ?? 0}%${nv.datHomQua != null && nv.tongHomQua ? ` · hôm qua ${phanTram(nv.datHomQua, nv.tongHomQua)}%` : ''}` : cho(nv, 'nhiemVu')} />
-        <SoLon vai="primary" tieu="BTVN ĐÚNG NHỊP" so={bt && phanTram(bt.soEmDungNhip, bt.soEmCoLo) != null ? `${phanTram(bt.soEmDungNhip, bt.soEmCoLo)}%` : '—'} phu={bt ? `${bt.dangChay.length} bài đang chạy` : cho(bt, 'btvn')} />
-        <SoLon vai="secondary" tieu="CÂU TỚI HẠN ÔN" so={cau ? cau.toiHan.toLocaleString('vi-VN') : '—'} phu={cau ? `cả trường · ${cau.moDuoc.toLocaleString('vi-VN')} mở được` : cau === undefined ? 'đang tải…' : CHO} />
-        <SoLon vai="error" tieu="EM CẦN THẦY ĐỂ Ý" so={ty ? String(ty.tong) : '—'} phu={ty ? 'trễ nhịp ≥ 3 ngày, tụt bậc hoặc dạng đang yếu' : cho(ty, 'canYTuong')} />
+        <SoLon vai="tertiary" tieu="ĐẠT NHIỆM VỤ HÔM NAY" so={nv ? String(nv.dat) : '—'} mau={nv ? `/${nv.tong}` : undefined} phu={nv ? `${phanTram(nv.dat, nv.tong) ?? 0}%${nv.datHomQua != null && nv.tongHomQua ? ` · hôm qua ${phanTram(nv.datHomQua, nv.tongHomQua) ?? 0}%` : ''}` : cho(nv, 'nhiemVu')} />
+        <SoLon vai="primary" tieu="BTVN ĐÚNG NHỊP" so={bt && phanTram(bt.soEmDungNhip, bt.soEmCoLo) != null ? `${phanTram(bt.soEmDungNhip, bt.soEmCoLo)}%` : '—'} phu={bt ? `Bài tập về nhà · ${bt.dangChay.length} bài đang chạy` : cho(bt, 'btvn')} />
+        <SoLon vai="secondary" tieu="CÂU CẦN ÔN LẠI" so={cau ? cau.toiHan.toLocaleString('vi-VN') : '—'} phu={cau ? `cả trường · ${cau.moDuoc.toLocaleString('vi-VN')} câu mở được` : cau === undefined ? 'đang tải…' : CHO} />
+        <SoLon vai="error" tieu="EM CẦN THẦY GIÚP" so={ty ? String(ty.tong) : '—'} phu={ty ? 'trễ nhịp · tụt bậc · dạng đang yếu' : cho(ty, 'canYTuong')} />
       </section>
 
-      <KhoiBoNaoDemQua onMoHoSo={moHoSoEm} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />
+      <div className="hn2-luoi-a">
+        <ViecGap />
 
-      <div className="hn-luoi">
-        <div className="hn-cot">
-          <section className="hn-the" aria-labelledby="hn-can-y">
-            <div className="hn-the-dau">
-              <h2 id="hn-can-y">CẦN THẦY ĐỂ Ý HÔM NAY</h2>
-              {ty && ty.tong > ty.ds.length && (
-                <button type="button" className="hn-lien-ket" onClick={() => setScreen('hocsinh')}>
-                  Xem cả {ty.tong} em
-                </button>
-              )}
-            </div>
-            {!ty && <p className="hn-trong">{tai ? 'Đang tải…' : `Danh sách em cần để ý: ${lyDo('canYTuong')}${/[.!]$/.test(lyDo('canYTuong')) ? '' : '.'}`}</p>}
-            {ty && ty.ds.length === 0 && <p className="hn-trong">Hôm nay không có em nào cần thầy để ý.</p>}
-            {ty?.ds.map((e) => (
-              <div className="hn-em" key={e.sbd}>
-                <span className="hn-em-chu" aria-hidden="true">
-                  {e.hoTen.trim().split(/\s+/).pop()?.[0]?.toUpperCase() ?? '?'}
-                </span>
-                <div className="hn-em-thong-tin">
-                  <span className="hn-em-ten">
-                    {e.hoTen} <span className="hn-em-lop">· {e.lop}</span>
-                  </span>
-                  <span className="hn-em-ly-do">{cauLyDo(e)}</span>
-                </div>
-                <button type="button" className="hn-nut hn-nut--vien" onClick={() => lamHanhDong(e)}>
-                  {NHAN_HANH_DONG[hanhDongCua(e)]}
-                </button>
-              </div>
-            ))}
-          </section>
-
-          <KhoiBtvnLo bt={bt} tai={tai} lyDo={lyDo('btvn')} onGiaoMoi={() => setScreen('giaobtvn')} />
-        </div>
-
-        <div className="hn-cot">
-          <section className="hn-the hn-the--chua" aria-labelledby="hn-chua">
-            <h2 id="hn-chua">BUỔI CHỮA TỐI NAY</h2>
-            <p className="hn-chua-noi-dung">Kế hoạch buổi chữa nằm ở màn Gọi lên bảng — chọn ca, xếp em và câu rồi mở buổi.</p>
-            <button type="button" className="hn-nut hn-nut--chinh" onClick={() => setScreen('goilenbang')}>
-              Mở Gọi lên bảng
-            </button>
-          </section>
-
-          <section className="hn-the" aria-labelledby="hn-yeu">
-            <h2 id="hn-yeu">{dangDuocDung ? `DẠNG CẢ LỚP ${dangDuocDung.lop} ĐANG YẾU` : 'DẠNG CẢ LỚP ĐANG YẾU'}</h2>
-            {!hom?.dangYeu && <p className="hn-trong">{tai ? 'Đang tải…' : `Dạng yếu theo lớp: ${lyDo('dangYeu')}${/[.!]$/.test(lyDo('dangYeu')) ? '' : '.'}`}</p>}
-            {dangDuocDung && dangDuocDung.dang.length === 0 && <p className="hn-trong">Chưa có dạng nào đủ dữ liệu để kết luận cả lớp yếu.</p>}
-            {dangDuocDung?.dang.map((d) => (
-              <div className="hn-yeu" key={d.ma}>
-                <span className="hn-yeu-ten">{d.ten}</span>
-                <span className="hn-yeu-thanh" role="img" aria-label={`${d.soEmYeu} trên ${dangDuocDung.siSo} em`}>
-                  <i style={{ width: `${Math.min(100, Math.round((d.soEmYeu / Math.max(1, dangDuocDung.siSo)) * 100))}%` }} />
-                </span>
-                <span className="hn-yeu-so">
-                  {d.soEmYeu}/{dangDuocDung.siSo} em
-                </span>
-              </div>
-            ))}
-            {dangDuocDung && dangDuocDung.dang.length > 0 && (
-              <div className="hn-hang-nut">
-                <button type="button" className="hn-nut hn-nut--chinh" onClick={() => setScreen('giaobtvn')}>
-                  Giao BTVN theo {dangDuocDung.dang.length} dạng này
-                </button>
-                <button type="button" className="hn-nut hn-nut--vien" onClick={() => setScreen('examsetup')}>
-                  Rút đề kiểm tra
-                </button>
-              </div>
+        <section className="hn2-the" aria-labelledby="hn2-giup" data-khoi="em-can-giup">
+          <div className="hn2-em-dau">
+            <h2 id="hn2-giup" className="hn2-tieu-de">
+              Em cần thầy giúp hôm nay
+            </h2>
+            {ty && ty.tong > ty.ds.length && (
+              <button type="button" className="hn2-lien-ket" onClick={() => setScreen('hocsinh')}>
+                Xem cả {ty.tong} em
+              </button>
             )}
-          </section>
-
-          {hom?.doan && (
-            <section className="hn-the" aria-labelledby="hn-doan">
-              <h2 id="hn-doan">ĐOÀN HỘ TỐNG · {hom.doan.lop}</h2>
-              <p className="hn-doan-dong">
-                Trạm {hom.doan.tram}/{hom.doan.tongTram} · hôm nay {hom.doan.gopSucHomNay}/{hom.doan.siSo} bạn góp sức
-              </p>
-              <span className="hn-yeu-thanh hn-yeu-thanh--doan" role="img" aria-label={`Trạm ${hom.doan.tram} trên ${hom.doan.tongTram}`}>
-                <i style={{ width: `${Math.round((hom.doan.tram / Math.max(1, hom.doan.tongTram)) * 100)}%` }} />
+          </div>
+          {!ty && <p className="hn2-trong">{tai ? 'Đang tải…' : `Danh sách em cần giúp: ${lyDo('canYTuong')}${/[.!]$/.test(lyDo('canYTuong')) ? '' : '.'}`}</p>}
+          {ty && ty.ds.length === 0 && <p className="hn2-trong">Hôm nay không có em nào cần thầy giúp.</p>}
+          {ty?.ds.map((e) => (
+            <div className="hn2-em" key={e.sbd}>
+              <span className="hn2-em-chu hn2-em-chu--chua_mo" aria-hidden="true">
+                {e.hoTen.trim().split(/\s+/).pop()?.[0]?.toUpperCase() ?? '?'}
               </span>
-            </section>
+              <div className="hn2-em-thong-tin">
+                <span className="hn2-em-ten">
+                  {e.hoTen} <span className="hn2-em-lop">· {e.lop}</span>
+                </span>
+                <span className="hn2-em-tt">{cauLyDo(e)}</span>
+              </div>
+              <button type="button" className="hn2-nut hn2-nut--vien hn2-nut--nho" onClick={() => lamHanhDong(e)}>
+                {NHAN_HANH_DONG[hanhDongCua(e)]}
+              </button>
+            </div>
+          ))}
+        </section>
+      </div>
+
+      <div className="hn2-luoi-b">
+        <KhoiBoNaoDemQua onMoHoSo={moHoSoEm} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />
+
+        <section className="hn2-the" aria-labelledby="hn2-yeu">
+          <h2 id="hn2-yeu" className="hn2-tieu-de">
+            {dangDuocDung ? `Dạng cả lớp ${dangDuocDung.lop} đang yếu` : 'Dạng cả lớp đang yếu'}
+          </h2>
+          {!hom?.dangYeu && <p className="hn2-trong">{tai ? 'Đang tải…' : `Dạng yếu theo lớp: ${lyDo('dangYeu')}${/[.!]$/.test(lyDo('dangYeu')) ? '' : '.'}`}</p>}
+          {dangDuocDung && dangDuocDung.dang.length === 0 && <p className="hn2-trong">Chưa có dạng nào đủ dữ liệu để kết luận cả lớp yếu.</p>}
+          {dangDuocDung?.dang.map((d) => (
+            <div className="hn-yeu" key={d.ma}>
+              <span className="hn-yeu-ten">{d.ten}</span>
+              <span className="hn-yeu-thanh" role="img" aria-label={`${d.soEmYeu} trên ${dangDuocDung.siSo} em`}>
+                <i style={{ width: `${Math.min(100, Math.round((d.soEmYeu / Math.max(1, dangDuocDung.siSo)) * 100))}%` }} />
+              </span>
+              <span className="hn-yeu-so">
+                {d.soEmYeu}/{dangDuocDung.siSo} em
+              </span>
+            </div>
+          ))}
+          {dangDuocDung && dangDuocDung.dang.length > 0 && (
+            <div className="hn-hang-nut">
+              <button type="button" className="hn-nut hn-nut--chinh" onClick={() => setScreen('giaobtvn')}>
+                Giao bài tập về nhà theo {dangDuocDung.dang.length} dạng này
+              </button>
+              <button type="button" className="hn-nut hn-nut--vien" onClick={() => setScreen('examsetup')}>
+                Rút đề kiểm tra
+              </button>
+            </div>
           )}
-        </div>
+        </section>
+
+        <section className="hn2-the hn2-the--chua" aria-labelledby="hn2-chua">
+          <h2 id="hn2-chua" className="hn2-tieu-de">
+            Buổi chữa tối nay
+          </h2>
+          <p className="hn2-chua-noi-dung">Kế hoạch buổi chữa nằm ở màn Gọi lên bảng — chọn ca, xếp em và câu rồi mở buổi.</p>
+          <button type="button" className="hn2-nut hn2-nut--chinh" onClick={() => setScreen('goilenbang')}>
+            Mở buổi chữa
+          </button>
+        </section>
+      </div>
+
+      <section className="hn2-the hn2-vinh-danh" aria-labelledby="hn2-vd" data-khoi="vinh-danh">
+        <h2 id="hn2-vd" className="hn2-tieu-de">
+          Vinh danh hôm nay
+        </h2>
+        <p className="hn2-trong">Vinh danh theo ngày (chăm nhất · tiến bộ nhất · bền bỉ nhất) đang chờ máy chủ — chưa có số nào để hiện.</p>
+      </section>
+
+      <div className="hn2-cuoi">
+        <section className="hn2-the" aria-labelledby="hn2-ca" data-khoi="ca-hom-nay">
+          <h2 id="hn2-ca" className="hn2-tieu-de">
+            Ca kiểm tra hôm nay
+          </h2>
+          {tin === undefined && <p className="hn2-trong">Đang tải…</p>}
+          {tin && !tin.ok && <p className="hn2-trong">{tin.chu}</p>}
+          {tin?.ok && tin.du.caHomNay.length === 0 && <p className="hn2-trong">Hôm nay chưa có ca kiểm tra nào bắt đầu hoặc mở.</p>}
+          {tin?.ok &&
+            tin.du.caHomNay.slice(0, 3).map((c) => (
+              <p className="hn2-cuoi-dong" key={c.ma}>
+                <b>{c.ten}</b> · {c.trangThai === 'dong' ? 'đã đóng' : c.trangThai === 'da_xoa' ? 'đã xoá' : 'đang mở'} · {c.daNop}/{c.luot} lượt đã nộp
+              </p>
+            ))}
+          <button type="button" className="hn2-lien-ket" onClick={() => setScreen('lichsuca')}>
+            Xem ca kiểm tra
+          </button>
+        </section>
+
+        <section className="hn2-the" aria-labelledby="hn2-tc" data-khoi="truy-cap">
+          <h2 id="hn2-tc" className="hn2-tieu-de">
+            Truy cập trực tuyến
+          </h2>
+          {tin === undefined && <p className="hn2-trong">Đang tải…</p>}
+          {tin && !tin.ok && <p className="hn2-trong">{tin.chu}</p>}
+          {tin?.ok && !tin.du.truyCap && <p className="hn2-trong">Máy chủ chưa trả số truy cập hôm nay.</p>}
+          {tin?.ok && tin.du.truyCap && (
+            <>
+              <p className="hn2-cuoi-so">{tin.du.truyCap.dangOnline} đang trực tuyến</p>
+              <p className="hn2-phu">
+                học sinh {tin.du.truyCap.hocSinhOnline} · phụ huynh {tin.du.truyCap.phuHuynhOnline} · hôm nay {tin.du.truyCap.luotHomNay} lượt
+              </p>
+            </>
+          )}
+        </section>
+
+        {hom?.doan && (
+          <section className="hn2-the" aria-labelledby="hn2-doan" data-khoi="doan">
+            <h2 id="hn2-doan" className="hn2-tieu-de">
+              Đoàn Hộ Tống · {hom.doan.lop}
+            </h2>
+            <p className="hn2-cuoi-so">
+              Trạm {hom.doan.tram}/{hom.doan.tongTram} · {hom.doan.gopSucHomNay}/{hom.doan.siSo} bạn góp sức
+            </p>
+            <span className="hn-yeu-thanh hn-yeu-thanh--doan" role="img" aria-label={`Trạm ${hom.doan.tram} trên ${hom.doan.tongTram}`}>
+              <i style={{ width: `${Math.round((hom.doan.tram / Math.max(1, hom.doan.tongTram)) * 100)}%` }} />
+            </span>
+          </section>
+        )}
       </div>
     </div>
   )

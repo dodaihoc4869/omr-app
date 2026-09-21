@@ -1,7 +1,6 @@
 import {useState} from 'react'
 import {RefreshCw} from 'lucide-react'
 import {daySangBanMoi,type DangKySW} from '../lib/cap-nhat-app'
-import BangTinGiaoVien from '../components/BangTinGiaoVien'
 import HomNayScreen from './HomNayScreen'
 
 function NutCapNhat() {
@@ -70,10 +69,9 @@ function NutCapNhat() {
 }
 
 export default function ExamHubScreen(){
- // TRANG CHỦ = màn HÔM NAY (G2, 21/09); bảng tin hoạt động cũ (đợt giao bài, ca, truy cập, vinh danh) giữ nguyên bên dưới.
+ // TRANG CHỦ = màn HÔM NAY BẢN 2 (thầy lệnh 21/09): đã bỏ hẳn "Bảng tin của thầy" (khối Việc cần theo dõi, ô ngày kiểu máy, Hoạt động dạy học, Bài đã giao) — gộp vào các ô của Hôm nay.
  return <div className="gv-page min-h-screen pb-24 flex flex-col" style={{color:'var(--muc)',gap:'var(--k4)'}}>
   <HomNayScreen/>
-  <section aria-label="Hoạt động trong ngày" className="px-4"><BangTinGiaoVien/></section>
   <div style={{marginTop:'auto',paddingTop:32,paddingInline:16,display:'flex',justifyContent:'flex-end'}}><NutCapNhat/></div>
  </div>
 }

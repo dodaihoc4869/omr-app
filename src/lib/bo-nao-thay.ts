@@ -4,8 +4,9 @@
  *  `docs/hop-dong-bo-nao-2109.md` (Code 1, 21/09) — đổi hợp đồng thì sửa tại đây, màn không vỡ.
  *  Lệnh thầy CHỈ ĐỌC trừ `boDieuChinh` và `datCauHinhBoNao`. Máy chủ chưa có lệnh ⇒ trả lời bằng LỜI THẬT ("bộ não chưa chạy"), KHÔNG giả số, KHÔNG dựng bản tin.
  *  Bộ não chỉ VẶN NÚM trong khung (nhịp, dạng, cờ, lời nhắn); nó không bao giờ chọn câu, sửa điểm hay gửi gì cho phụ huynh. */
-import { layCauHinhMayChu } from './may-chu-moi'
-import { loadTeacherSecret } from './exam-db'
+
+import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
+export type { KetQuaLenh } from './goi-lenh-thay'
 
 export type LoaiDongBanTin = 'can_thay_y' | 'ca_lop' | 'goi_len_bang' | 'dieu_chinh' | 'thay_xem_lai'
 export type HanhDongDong = 'khong' | 'goi_len_bang' | 'dua_vao_buoi_chua' | 'nhan_phu_huynh' | 'giao_bai_rieng' | 'xem_ho_so'
@@ -82,47 +83,8 @@ export interface CauHinhBoNao {
   lopThat: string[]
 }
 
-/** Kết quả một lệnh: hoặc có số thật, hoặc MỘT câu nói thật vì sao không có (màn hiện đúng câu ấy). */
-export type KetQuaLenh<T> = { ok: true; du: T } | { ok: false; loai: 'chua_co_lenh' | 'mang' | 'cham' | 'tu_choi' | 'khong_doc_duoc'; chu: string }
-
 /** Quá bấy nhiêu giờ kể từ lần chạy cuối thì cảnh báo (đề bài: 36 giờ). */
 export const QUA_HAN_GIO = 36
-const HAN_GIAY = 20
-
-type Thoat = { ok: false; loai: 'chua_co_lenh' | 'mang' | 'cham' | 'tu_choi' | 'khong_doc_duoc'; chu: string }
-const thoat = (loai: Thoat['loai'], chu: string): Thoat => ({ ok: false, loai, chu })
-
-/** Gọi một lệnh thầy `/ai/...` (POST + mã bí mật). Không ném lỗi: trả `KetQuaLenh`. `chuKhongCoLenh` là câu nói thật khi máy chủ chưa có lệnh (404). */
-async function goiLenh(duong: string, body: unknown, chuKhongCoLenh: string, chuCham = 'Máy chủ trả lời chậm — thử lại sau ít phút.'): Promise<KetQuaLenh<Record<string, unknown>>> {
-  let ch: { URL?: string }
-  let mat: string | null
-  try {
-    ;[ch, mat] = await Promise.all([layCauHinhMayChu(), loadTeacherSecret()])
-  } catch {
-    return thoat('mang', 'Chưa đọc được cấu hình máy chủ.')
-  }
-  if (!ch.URL) return thoat('mang', 'Chưa kết nối được máy chủ.')
-  const dk = new AbortController()
-  const hen = setTimeout(() => dk.abort(), HAN_GIAY * 1000)
-  let res: Response
-  try {
-    res = await fetch(`${ch.URL}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': mat || '' }, body: JSON.stringify(body ?? {}), signal: dk.signal })
-  } catch (e) {
-    if ((e as { name?: string })?.name === 'AbortError') return thoat('cham', chuCham)
-    return thoat('mang', 'Không nối được máy chủ.')
-  } finally {
-    clearTimeout(hen)
-  }
-  if (res.status === 404) return thoat('chua_co_lenh', chuKhongCoLenh)
-  let j: Record<string, unknown>
-  try {
-    j = (await res.json()) as Record<string, unknown>
-  } catch {
-    return thoat('khong_doc_duoc', 'Máy chủ trả lời không đọc được.')
-  }
-  if (!res.ok || j.ok !== true) return thoat('tu_choi', String(j.error || j.loi || 'Máy chủ không đồng ý lệnh này.'))
-  return { ok: true, du: j }
-}
 
 const so = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null)
 const chu = (v: unknown): string => (typeof v === 'string' ? v : '')

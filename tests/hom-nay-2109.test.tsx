@@ -18,7 +18,6 @@ import {
 const nap = vi.hoisted(() => ({ hom: null as unknown, cau: null as unknown, cho: false }))
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }) }))
 vi.mock('../src/lib/exam-db', () => ({ loadTeacherSecret: async () => 'bi-mat-thu' }))
-vi.mock('../src/components/BangTinGiaoVien', () => ({ default: () => <div>bảng tin hoạt động</div> }))
 vi.mock('../src/lib/cap-nhat-app', () => ({ daySangBanMoi: () => {} }))
 import HomNayScreen from '../src/screens/HomNayScreen'
 import ExamHubScreen from '../src/screens/ExamHubScreen'
@@ -104,17 +103,18 @@ describe('hom-nay-api: gọi máy chủ', () => {
   })
 })
 
-describe('HomNayScreen', () => {
-  it('ĐANG CHỜ MÁY CHỦ (lệnh chưa có): bốn thẻ số hiện "—" và "đang chờ máy chủ", KHÔNG số nào bịa; vẫn có ô tìm và các nút điều hướng', async () => {
+describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các chuỗi của bản 1)', () => {
+  it('ĐANG CHỜ MÁY CHỦ (lệnh chưa có): bốn thẻ số hiện "—" và "đang chờ máy chủ", KHÔNG số nào bịa; vẫn có ô tra cứu lớn và các ô', async () => {
     const { container } = render(<HomNayScreen />)
-    await screen.findByText(/BTVN đang chạy: đang chờ máy chủ/)
+    await screen.findByText('Danh sách em cần giúp: đang chờ máy chủ.')
     const so = [...container.querySelectorAll('.hn-so-gia-tri')].map((e) => e.textContent)
     expect(so).toEqual(['—', '—', '—', '—'])
-    expect(container.querySelectorAll('.hn-em')).toHaveLength(0)
-    expect(screen.getByText('Danh sách em cần để ý: đang chờ máy chủ.')).toBeTruthy()
+    expect(container.querySelectorAll('[data-khoi="em-can-giup"] .hn2-em')).toHaveLength(0)
     expect(screen.getByText('Dạng yếu theo lớp: đang chờ máy chủ.')).toBeTruthy()
-    expect(screen.queryByText(/ĐOÀN HỘ TỐNG/)).toBeNull() // thẻ game chỉ khi game mở
+    expect(container.querySelector('[data-khoi="doan"]')).toBeNull() // ô game chỉ khi game mở
     expect(screen.getByText('1 học sinh', { exact: false })).toBeTruthy() // số em lấy tạm từ danh sách lớp CỦA MÁY, không phải bịa
+    expect(screen.getByRole('combobox', { name: 'Tìm học sinh theo tên hoặc số báo danh' })).toBeTruthy()
+    expect(container.querySelector('[data-khoi="viec-gap"]')).toBeTruthy()
   })
 
   it('MÁY CHỦ ĐÃ TRẢ LỜI nhưng khối không tính được: hiện ĐÚNG lý do máy chủ kèm (lyDoThieu), không nói "đang chờ máy chủ"', async () => {
@@ -126,13 +126,15 @@ describe('HomNayScreen', () => {
       dangYeu: null,
       lyDoThieu: { nhiemVu: 'Chưa có kế hoạch ngày hôm nay (cron 00:01 hoặc lượt mở của em chưa lập)', btvn: 'Chưa có kế hoạch ngày hôm nay', canYTuong: 'Không đọc được hồ sơ dạng', dangYeu: 'Không đọc được hồ sơ dạng' },
     }
-    nap.cau = { qidToiHan: 1179, qidPhucVuDuoc: 939 } // lệnh câu tới hạn trả lời được — chỉ các khối kế hoạch/hồ sơ thiếu
-    render(<HomNayScreen />)
-    expect(await screen.findByText('BTVN đang chạy: Chưa có kế hoạch ngày hôm nay.')).toBeTruthy()
-    expect(screen.getByText('Danh sách em cần để ý: Không đọc được hồ sơ dạng.')).toBeTruthy()
+    nap.cau = { qidToiHan: 1179, qidPhucVuDuoc: 939 } // lệnh câu cần ôn lại trả lời được — chỉ các khối kế hoạch/hồ sơ thiếu
+    const { container } = render(<HomNayScreen />)
+    expect(await screen.findByText('Danh sách em cần giúp: Không đọc được hồ sơ dạng.')).toBeTruthy()
     expect(screen.getByText('Dạng yếu theo lớp: Không đọc được hồ sơ dạng.')).toBeTruthy()
     expect(screen.getByText('Chưa có kế hoạch ngày hôm nay (cron 00:01 hoặc lượt mở của em chưa lập)')).toBeTruthy() // thẻ số nhiệm vụ
-    expect(screen.queryByText(/đang chờ máy chủ/)).toBeNull()
+    expect(screen.getAllByText('Chưa có kế hoạch ngày hôm nay').length).toBeGreaterThan(0) // thẻ số BTVN
+    // các khối lấy từ kế hoạch/hồ sơ KHÔNG nói "đang chờ" (máy chủ đã trả lời, kèm lý do); riêng ô Vinh danh vẫn chờ lệnh riêng của nó
+    expect(container.querySelector('.hn-hang-so')!.textContent).not.toContain('đang chờ máy chủ')
+    expect(container.querySelector('[data-khoi="em-can-giup"]')!.textContent).not.toContain('đang chờ máy chủ')
   })
 
   it('ĐANG TẢI: chữ "Đang tải…", chưa số nào', () => {
@@ -142,7 +144,7 @@ describe('HomNayScreen', () => {
     expect([...container.querySelectorAll('.hn-so-gia-tri')].map((e) => e.textContent)).toEqual(['—', '—', '—', '—'])
   })
 
-  it('CÓ DỮ LIỆU: mỗi số trên thẻ truy được về một trường của lệnh; danh sách em, lô BTVN, dạng yếu, Đoàn Hộ Tống', async () => {
+  it('CÓ DỮ LIỆU: mỗi số trên thẻ truy được về một trường của lệnh; danh sách em, dạng yếu, Đoàn Hộ Tống; chữ theo CHUẨN TỪ NGỮ', async () => {
     nap.hom = MAU
     nap.cau = { qidToiHan: 1179, qidPhucVuDuoc: 939 }
     const { container } = render(<HomNayScreen />)
@@ -150,31 +152,30 @@ describe('HomNayScreen', () => {
     await waitFor(() => expect(container.querySelectorAll('.hn-so-gia-tri')[2].textContent).toBe('1.179'))
     const so = [...container.querySelectorAll('.hn-so-gia-tri')].map((e) => e.textContent)
     expect(so).toEqual(['142/261', '86%', '1.179', '17'])
+    expect(container.textContent).toContain('CÂU CẦN ÔN LẠI') // "Ôn lại" là từ chuẩn (không "câu tới hạn ôn")
+    expect(container.textContent).toContain('EM CẦN THẦY GIÚP')
     expect(screen.getByText('54% · hôm qua 49%')).toBeTruthy() // 142/261 ; 128/261
-    expect(screen.getByText('cả trường · 939 mở được')).toBeTruthy()
-    expect(screen.getByText('1 bài đang chạy')).toBeTruthy()
-    expect(screen.getByText('Thứ Hai, 21/09', { exact: false })).toBeTruthy()
-    expect(screen.getByText('Không có ca nào đang mở')).toBeTruthy()
-    // em cần để ý: MỘT lý do + MỘT nút mỗi em
-    const dong = container.querySelectorAll('.hn-em')
+    expect(screen.getByText('cả trường · 939 câu mở được')).toBeTruthy()
+    expect(screen.getByText('Bài tập về nhà · 1 bài đang chạy')).toBeTruthy()
+    expect(screen.getByText('Thứ Hai, 21/09/2026', { exact: false })).toBeTruthy()
+    expect(screen.getByText('không có ca kiểm tra nào đang mở', { exact: false })).toBeTruthy()
+    // em cần giúp: MỘT lý do + MỘT nút mỗi em
+    const dong = container.querySelectorAll('[data-khoi="em-can-giup"] .hn2-em')
     expect(dong).toHaveLength(3)
     expect(within(dong[0] as HTMLElement).getByRole('button', { name: 'Nhắn phụ huynh' })).toBeTruthy()
     expect(within(dong[1] as HTMLElement).getByRole('button', { name: 'Đưa vào buổi chữa' })).toBeTruthy()
     expect(within(dong[2] as HTMLElement).getByRole('button', { name: 'Xem hồ sơ' })).toBeTruthy()
     for (const d of dong) expect(d.querySelectorAll('button')).toHaveLength(1)
     expect(screen.getByRole('button', { name: 'Xem cả 17 em' })).toBeTruthy() // 17 > 3 em đang hiện
-    // BTVN theo lô
-    expect(screen.getByText('lô 3/5')).toBeTruthy()
-    expect(screen.getByText('88% kịp')).toBeTruthy() // 30/34 em
-    expect(container.querySelectorAll('.hn-lo i')).toHaveLength(5)
-    expect(container.querySelectorAll('.hn-lo i.da')).toHaveLength(3)
     // dạng yếu + Đoàn Hộ Tống
-    expect(screen.getByText('DẠNG CẢ LỚP 12A1 ĐANG YẾU')).toBeTruthy()
+    expect(screen.getByText('Dạng cả lớp 12A1 đang yếu')).toBeTruthy()
     expect(screen.getByText('21/34 em')).toBeTruthy()
-    expect(screen.getByText('Trạm 17/30 · hôm nay 9/34 bạn góp sức')).toBeTruthy()
+    expect(screen.getByText('Trạm 17/30 · 9/34 bạn góp sức')).toBeTruthy()
+    // đã BỎ các khối cũ
+    expect(container.textContent).not.toMatch(/Việc cần theo dõi hôm nay|Bảng tin của thầy|Hoạt động dạy học|Bài đã giao|CẦN THẦY ĐỂ Ý|lô \d/)
   })
 
-  it('nút hành động: Xem hồ sơ / Nhắn phụ huynh → hồ sơ em; Đưa vào buổi chữa → Gọi lên bảng; Giao BTVN theo dạng → giaobtvn; Rút đề → examsetup', async () => {
+  it('nút hành động: Xem hồ sơ / Nhắn phụ huynh → hồ sơ em; Đưa vào buổi chữa → Gọi lên bảng; Giao bài tập về nhà theo dạng → giaobtvn; Rút đề → examsetup', async () => {
     nap.hom = MAU
     render(<HomNayScreen />)
     fireEvent.click(await screen.findByRole('button', { name: 'Xem hồ sơ' }))
@@ -183,37 +184,40 @@ describe('HomNayScreen', () => {
     expect(useAppStore.getState().sbdDangXem).toBe('12001')
     fireEvent.click(screen.getByRole('button', { name: 'Đưa vào buổi chữa' }))
     expect(useAppStore.getState().screen).toBe('goilenbang')
-    fireEvent.click(screen.getByRole('button', { name: 'Giao BTVN theo 2 dạng này' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Giao bài tập về nhà theo 2 dạng này' }))
     expect(useAppStore.getState().screen).toBe('giaobtvn')
     fireEvent.click(screen.getByRole('button', { name: 'Rút đề kiểm tra' }))
     expect(useAppStore.getState().screen).toBe('examsetup')
+    fireEvent.click(screen.getByRole('button', { name: 'Mở buổi chữa' }))
+    expect(useAppStore.getState().screen).toBe('goilenbang')
   })
 
-  it('ô tìm: 6 số → Chi tiết ca; SBD hoặc tên có trong danh sách lớp → hồ sơ em; không có → báo, không đổi màn', async () => {
+  it('ô tra cứu: 6 số → Chi tiết ca; tên KHÔNG DẤU hoặc SBD có trong danh sách lớp → hồ sơ em; không có → báo ngay trong ô, không đổi màn', async () => {
     render(<HomNayScreen />)
-    const o = screen.getByLabelText('Tìm học sinh hoặc mã ca')
+    const o = screen.getByRole('combobox', { name: 'Tìm học sinh theo tên hoặc số báo danh' })
     fireEvent.change(o, { target: { value: '111222' } })
     fireEvent.keyDown(o, { key: 'Enter' })
     expect([useAppStore.getState().screen, useAppStore.getState().maCaTheoDoi]).toEqual(['exammonitor', '111222'])
     useAppStore.getState().setScreen('examhub')
-    fireEvent.change(o, { target: { value: 'minh khôi' } })
+    fireEvent.change(o, { target: { value: 'minh khoi' } }) // không dấu
     fireEvent.keyDown(o, { key: 'Enter' })
     expect([useAppStore.getState().screen, useAppStore.getState().sbdDangXem]).toEqual(['hocsinh', '12001'])
     useAppStore.getState().setScreen('examhub')
     fireEvent.change(o, { target: { value: 'không có ai' } })
     fireEvent.keyDown(o, { key: 'Enter' })
     expect(useAppStore.getState().screen).toBe('examhub')
-    expect(useAppStore.getState().toast?.text).toContain('Không tìm thấy')
+    expect(screen.getByText('Không tìm thấy “không có ai” trong danh sách lớp trên máy này.')).toBeTruthy()
   })
 })
 
-describe('ExamHubScreen = trang chủ Hôm nay + bảng tin hoạt động cũ; CSS', () => {
-  it('ExamHubScreen dựng HomNayScreen rồi bảng tin hoạt động (không mất tính năng cũ)', async () => {
+describe('ExamHubScreen = trang chủ Hôm nay bản 2 (đã bỏ Bảng tin cũ); CSS', () => {
+  it('ExamHubScreen dựng HomNayScreen + nút Lấy bản mới; KHÔNG còn bảng tin hoạt động cũ (thầy lệnh bỏ)', async () => {
     render(<ExamHubScreen />)
     expect(screen.getByText('Chào thầy Học')).toBeTruthy()
-    expect(screen.getByText('bảng tin hoạt động')).toBeTruthy()
+    expect(screen.queryByText('bảng tin hoạt động')).toBeNull()
     expect(screen.getByRole('button', { name: /Lấy bản mới/ })).toBeTruthy()
-    await screen.findByText(/BTVN đang chạy/)
+    expect(doc('src/screens/ExamHubScreen.tsx')).not.toContain('BangTinGiaoVien')
+    await screen.findByText(/Danh sách em cần giúp/)
   })
 
   it('hom-nay.css: token --m3-*, không hex, không !important; 4 cột → 2 cột (<1100) → 1 cột (<880)', () => {
@@ -226,11 +230,21 @@ describe('ExamHubScreen = trang chủ Hôm nay + bảng tin hoạt động cũ; 
     expect(css).toContain('var(--m3-error-container)')
   })
 
+  it('hom-nay-v2.css: token --m3-*, không hex, không !important; hàng A hai cột → một cột (<1280), hàng B ba cột → hai → một (<720)', () => {
+    const css = doc('src/styles/hom-nay-v2.css').replace(/\/\*[\s\S]*?\*\//g, '')
+    expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+    expect(css).not.toContain('!important')
+    expect(css).toMatch(/\.hn2-luoi-a \{[^}]*1\.62fr/)
+    expect(css).toMatch(/\.hn2-luoi-b \{[^}]*repeat\(3, minmax\(0, 1fr\)\)/)
+    expect(css).toMatch(/@media \(max-width: 1279px\)/)
+    expect(css).toMatch(/@media \(max-width: 719px\)/)
+  })
+
   it('hợp đồng: màn (đủ dữ liệu) không có chữ "nắm chắc" hay kết luận năng lực; nguồn không dùng chữ "nắm chắc"', async () => {
     nap.hom = MAU
     const { container } = render(<HomNayScreen />)
     await screen.findByText('Nguyễn Minh Khôi')
     expect(container.textContent).not.toMatch(/nắm chắc|năng lực|giỏi|kém/i)
-    for (const t of ['src/screens/HomNayScreen.tsx', 'src/lib/hom-nay-api.ts']) expect(doc(t)).not.toContain('nắm chắc')
+    for (const t of ['src/screens/HomNayScreen.tsx', 'src/lib/hom-nay-api.ts', 'src/lib/hom-nay-v2.ts', 'src/components/hom-nay/ViecGap.tsx', 'src/components/hom-nay/OTraCuu.tsx']) expect(doc(t)).not.toContain('nắm chắc')
   })
 })
