@@ -3,12 +3,13 @@
 // CHƯA nộp, EXP câu thử thách/Lượt trùm, `maiCho`, cờ lùi `cau_hinh.game_luot_moi = 'tat'`. SQLite thật (tests/_d1-that.ts); số viết thẳng.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
-import { docCauBtvnChuaNop, docDangLop, luotMoiBat, maiCho } from '../server/src/game-v2-luot'
+import { demLuotHomNay, docCauBtvnChuaNop, docChuoiKeThua, docDangLop, docDauVaoLuot, luotMoiBat, maiCho } from '../server/src/game-v2-luot'
 import { taoD1That, type D1That } from './_d1-that'
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({
   ...(await orig<typeof import('../server/src/game-v2-auth')>()),
   gameIdentity: async (_e: unknown, b: Record<string, unknown>) => {
+    if (b.token === 'token-S3') return 'S3'
     if (b.token !== 'token-S1') throw new Error('Phiên đăng nhập không hợp lệ.')
     return 'S1'
   },
@@ -78,6 +79,69 @@ describe('kho rút = phần LỚP đã học', () => {
     gio(`${NGAY}T10:00:00`)
     const d = dung(); d.sql.exec('DROP TABLE lop_da_hoc')
     expect(await docDangLop(d.env, 'S1', Date.now())).toEqual([])
+  })
+})
+
+const LOP_MOI = '12 - Nhóm 10 điểm'
+/** Thêm em S3 vào lớp mới tách (ten_lop = LOP_MOI, chưa có bài/ca riêng) — lớp gốc mặc định là "12 - Lớp Thường" (có S1, S2; bài của S2 dạy A.1). */
+const themEmLopMoi = (d: D1That) => {
+  d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,mat_khau,lop,ten_lop,cap_nhat_luc) VALUES('S3','Em Ba','mk3','12',?,'x')").run(LOP_MOI)
+  d.sql.prepare('INSERT INTO game_v2_profile(sbd,revision,json,created_at) VALUES(?,0,?,?)').run('S3', JSON.stringify({ pet: 'dat_quy', choice: false, legacy: null, cap: 1, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2026-09-21T05:00:00.000Z', luatCap: 2 }), 'x')
+}
+const datKeThua = (d: D1That, v: unknown) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('lop_da_hoc_ke_thua',?,'x')").run(typeof v === 'string' ? v : JSON.stringify(v))
+
+describe('KẾ THỪA kho lớp (Boss 21/09: lớp mới tách không được có kho nhỏ nhất)', () => {
+  it('lớp mới tách, chưa có bài/ca riêng: KHÔNG kế thừa ⇒ kho rỗng; có `lop_da_hoc_ke_thua` ⇒ nhận đủ dạng lớp gốc; `start` của em rút được câu lớp gốc', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung(); themEmLopMoi(d)
+    expect(await docDangLop(d.env, 'S3', Date.now())).toEqual([])
+    datKeThua(d, { [LOP_MOI]: '12 - Lớp Thường' })
+    expect(await docDangLop(d.env, 'S3', Date.now())).toEqual(['A.1']) // đổi cấu hình ⇒ nạp lại NGAY (mốc gắn chuỗi kế thừa), không chờ 6 giờ
+    expect(bangLop(d)).toEqual([{ ten_lop: LOP_MOI, dang: 'A.1' }])
+    const r = await gameV2(d.env, 'start', { token: 'token-S3', mode: 'adventure' }) as any
+    expect(r.ok).toBe(true); expect(r.questions.length).toBeGreaterThan(0); expect(qids(r).every((q) => q.startsWith('A-'))).toBe(true)
+  })
+
+  it('dạng từ bài/ca CHÍNH em được giao vẫn có dù lớp hiện tại và lớp gốc không có; gỡ kế thừa ⇒ trở về chỉ phần của em', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung(); themEmLopMoi(d)
+    d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT9','CA1','DE1',8,'2026-09-20T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run()
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BT9|S3','BT9','S3','Em Ba')").run()
+    d.sql.prepare("INSERT INTO btvn_cau(ma_btvn,qid,thu_tu,dang,muc_do,sao,phan,loi,ghim) VALUES('BT9','C-0',1,'C.3',0,0,'I',0,0)").run()
+    expect(await docDangLop(d.env, 'S3', Date.now())).toEqual(['C.3'])
+    // bài MỚI giao cho chính em SAU khi bảng đệm của lớp đã nạp (còn mới): phần của em thấy NGAY, không chờ 6 giờ
+    d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT8','CA1','DE1',8,'2026-09-22T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run()
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BT8|S3','BT8','S3','Em Ba')").run()
+    d.sql.prepare("INSERT INTO btvn_cau(ma_btvn,qid,thu_tu,dang,muc_do,sao,phan,loi,ghim) VALUES('BT8','B-0',1,'B.2',0,0,'I',0,0)").run()
+    expect(await docDangLop(d.env, 'S3', Date.now())).toEqual(['B.2', 'C.3'])
+    datKeThua(d, { [LOP_MOI]: '12 - Lớp Thường' })
+    expect(await docDangLop(d.env, 'S3', Date.now())).toEqual(['A.1', 'B.2', 'C.3'])
+    d.sql.exec("DELETE FROM cau_hinh WHERE khoa = 'lop_da_hoc_ke_thua'")
+    expect(await docDangLop(d.env, 'S3', Date.now())).toEqual(['B.2', 'C.3'])
+  })
+
+  it('vòng A→B→A không treo; cấu hình hỏng / không phải đối tượng / giá trị không phải chuỗi ⇒ bỏ qua, không ném lỗi; chuỗi tối đa 3 tầng', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung(); themEmLopMoi(d)
+    datKeThua(d, { [LOP_MOI]: '12 - Lớp Thường', '12 - Lớp Thường': LOP_MOI })
+    expect(await docChuoiKeThua(d.env, LOP_MOI)).toEqual([LOP_MOI, '12 - Lớp Thường'])
+    expect(await docDangLop(d.env, 'S3', Date.now())).toEqual(['A.1'])
+    for (const hong of ['{khong phai json', '[1,2]', '"chuoi"', '{"12 - Nhóm 10 điểm": 5}', 'null']) {
+      datKeThua(d, hong)
+      expect(await docChuoiKeThua(d.env, LOP_MOI)).toEqual([LOP_MOI])
+    }
+    datKeThua(d, { a: 'b', b: 'c', c: 'd', d: 'e' })
+    expect(await docChuoiKeThua(d.env, 'a')).toEqual(['a', 'b', 'c', 'd']) // tối đa 3 tầng
+  })
+
+  it('lớp KHÔNG khai kế thừa không đổi: em S1 vẫn nhận đúng dạng lớp mình; nạp lại chỉ khi cũ hơn 6 giờ hoặc đổi chuỗi', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung()
+    expect(await docDangLop(d.env, 'S1', Date.now())).toEqual(['A.1'])
+    d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,cong_bo,cap_nhat_luc) VALUES('CA9','Ca 9','dong','khong','x')").run()
+    d.sql.prepare("INSERT INTO chi_tiet_cau(khoa,ma_ca,sbd,lan_thu,phan,so_cau,qid,dung_sai,cap_nhat_luc) VALUES('CA9|S2|1|I|1','CA9','S2',1,'I',1,'C-0',1,'x')").run()
+    expect(await docDangLop(d.env, 'S1', Date.now() + 60_000)).toEqual(['A.1']) // còn mới, chuỗi không đổi ⇒ dùng bảng đệm
+    expect(await docDangLop(d.env, 'S1', Date.now() + 7 * 3_600_000)).toEqual(['A.1', 'C.3'])
   })
 })
 
@@ -253,5 +317,71 @@ describe('EXP câu THỬ THÁCH / LƯỢT TRÙM làm đúng lần đầu (qua c�
     expect(a).toMatchObject({ correct: true, reward: 0, thuongGoc: 10 }); expect(a).not.toHaveProperty('expThuThach')
     expect(khoan(d)).toEqual([{ khoa: 'S1|thuthach|A-1', loai: 'thu_thach', exp: 0, qid: 'A-1' }])
     expect(hoSo(d)).toMatchObject({ wallet: 0, earned: 0 })
+  })
+})
+
+describe('sửa theo rà chéo W2b của Code 1', () => {
+  const themBaiChuaNop = (d: D1That) => {
+    d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT2','CA1','DE1',39,'2026-09-21T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run()
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BT2|S1','BT2','S1','Em Một')").run()
+    for (let i = 1; i <= 39; i++) d.sql.prepare("INSERT INTO btvn_em_cau(khoa,ma_btvn,sbd,qid,chang,nhan,thu_tu) VALUES(?,?,?,?,0,'loi',?)").run(`BT2|S1|A-${i}`, 'BT2', 'S1', `A-${i}`, i)
+  }
+  const cungCoBangChung = (d: D1That) => { // em có bằng chứng dạng A.1 (đường CŨ chỉ rút dạng em đã có bằng chứng)
+    d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,cong_bo,cap_nhat_luc) VALUES('CAE','Ca E','dong','ngay','x')").run()
+    d.sql.prepare("INSERT INTO luot(khoa,ma_ca,sbd,lan_thu,vao_luc,trang_thai,nop_luc,cap_nhat_luc) VALUES('CAE|S1|1','CAE','S1',1,'2026-09-20T00:30:00.000Z','da_nop','2026-09-20T01:00:00.000Z','x')").run()
+    d.sql.prepare("INSERT INTO chi_tiet_cau(khoa,ma_ca,sbd,lan_thu,phan,so_cau,qid,dung_sai,cap_nhat_luc) VALUES('CAE|S1|1|I|1','CAE','S1',1,'I',1,'A-0',0,'x')").run()
+  }
+
+  it('(1) đường CŨ của `start` (cờ lùi tắt, repair/tower, Đoàn nội bộ) KHÔNG rút câu nằm trong bài tập về nhà em CHƯA nộp', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung(); cungCoBangChung(d)
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_luot_moi','tat','x')").run()
+    const truoc = await start(d)
+    expect(truoc.questions.length).toBeGreaterThan(0) // đường cũ có câu khi chưa có bài chưa nộp
+    d.sql.exec('DELETE FROM game_v2_session')
+    themBaiChuaNop(d)
+    const r = await start(d)
+    expect(qids(r).filter((q) => /^A-([1-9]|[1-3][0-9])$/.test(q))).toEqual([]) // A-1…A-39 nằm trong bài chưa nộp
+    d.sql.exec('DELETE FROM game_v2_session')
+    for (const mode of ['repair', 'tower']) { const m = await start(d, { mode }); expect(qids(m).filter((q) => /^A-([1-9]|[1-3][0-9])$/.test(q))).toEqual([]) }
+  })
+
+  const suKien = (d: D1That, qid: string, nguon: string, chiSo = 0, ngay = NGAY, ketQua: number | null = 1) => d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES (?, 'S1', ?, ?, ?, ?, ?, 40, ?, ?)")
+    .run(`${qid}|${nguon}|${chiSo}`, qid, nguon, nguon === 'btvn_lo' ? 'BT5' : 'x', chiSo, ketQua, `${ngay}T03:00:00.000Z`, ngay)
+  const dauVao = (d: D1That) => docDauVaoLuot(d.env, 'S1', NGAY, Date.parse(`${NGAY}T10:00:00+07:00`), false)
+
+  it('(2)(3) xong chặng = chặng ĐÃ XONG (lo_da_xong tăng), không phải mới làm 1 câu; bài đã xong hết chặng chưa bấm nộp ⇒ không tính "đang chạy" (null)', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung()
+    d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT5','CA1','DE1',9,'2026-09-21T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run()
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten,so_chang,lo_da_xong) VALUES('BT5|S1','BT5','S1','Em Một',3,0)").run()
+    suKien(d, 'A-1', 'btvn_lo', 0) // mới làm 1 câu của chặng 0
+    expect((await dauVao(d)).xongChangHomNay).toBe(false)
+    d.sql.exec("UPDATE btvn_em SET lo_da_xong = 1 WHERE ma_btvn = 'BT5'") // xong chặng 0
+    expect((await dauVao(d)).xongChangHomNay).toBe(true)
+    d.sql.exec("UPDATE btvn_em SET lo_da_xong = 3 WHERE ma_btvn = 'BT5'") // xong HẾT chặng nhưng chưa nộp
+    expect((await dauVao(d)).xongChangHomNay).toBeNull()
+    d.sql.exec("UPDATE btvn_em SET lo_da_xong = 1, thu_hoi = 1 WHERE ma_btvn = 'BT5'") // bài bị thu hồi ⇒ không có bài đang chạy
+    expect((await dauVao(d)).xongChangHomNay).toBeNull()
+  })
+
+  it('(2) xong ôn tới hạn = hôm nay có ≥ 1 câu ôn lại VÀ không còn câu tới hạn; câu KHẮC PHỤC không tính là ôn; còn câu tới hạn ⇒ chưa xong', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung()
+    suKien(d, 'K-1', 'khac_phuc'); expect((await dauVao(d)).xongOnToiHan).toBe(false)
+    suKien(d, 'O-1', 'on_lai')
+    d.sql.prepare("INSERT INTO nam_kt_cau(khoa,sbd,qid,ma_dang,lan_gap,lan_sai,lan_trong,dung_lien_tiep,ngay_dung_khac_nhau,ket_qua_cuoi,nguon_cuoi,luc_cuoi,moc_on_ke,trang_thai,can_day_lai,cap_nhat_luc) VALUES('S1|O-2','S1','O-2','A.1',1,1,0,0,0,0,'btvn','x',?,'moi_sai',0,'x')").run(NGAY)
+    expect((await dauVao(d)).xongOnToiHan).toBe(false) // còn 1 câu tới hạn
+    d.sql.exec("UPDATE nam_kt_cau SET moc_on_ke = '2026-09-25'") // hẹn ngày sau ⇒ hết câu tới hạn
+    expect((await dauVao(d)).xongOnToiHan).toBe(true)
+  })
+
+  it('(4) lượt đã MỞ rồi BỎ quá 2 giờ mà chưa trả lời câu nào không mất lượt; có ≥ 1 câu trả lời hoặc còn trong 2 giờ thì tính', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = dung()
+    const phien = (id: string, truocGio: number) => d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run(id, 'S1', JSON.stringify({ mode: 'adventure', created: Date.now(), questions: [] }), new Date(Date.now() - truocGio * 3_600_000).toISOString())
+    phien('bo', 3); phien('moi', 1); phien('lamdo', 3)
+    d.sql.prepare("INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES('a1','S1','lamdo','q','g','{}',?)").run(new Date(Date.now() - 3 * 3_600_000).toISOString())
+    expect(await demLuotHomNay(d.env, 'S1', NGAY, Date.now())).toBe(2) // 'moi' (1 giờ) + 'lamdo' (có câu trả lời); 'bo' (3 giờ, 0 câu) không tính
   })
 })

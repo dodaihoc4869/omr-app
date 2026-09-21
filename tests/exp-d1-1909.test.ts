@@ -255,10 +255,23 @@ describe('thưởng theo việc: lô, nộp bài, mom, ca thi', () => {
       sk('q2', 0, NOW - 3000, { nguon: 'btvn_lo', maNguon: 'B1', lan: 1 }),
       sk('q3', null, NOW - 2000, { nguon: 'btvn_lo', maNguon: 'B1', lan: 2 }),
     ])
+    // Sửa CÓ CHỦ Ý 21/09 (Boss/Code 1 rà chéo W2b): "xong lô" CHỈ khi chặng ĐÃ XONG (chỉ số < btvn_em.lo_da_xong): chặng 0 và 1 xong, chặng 2 chưa.
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,lo_da_xong) VALUES('B1|S1','B1','S1',2)").run()
     await capNhatExp(d.env, 'S1', NOW)
     expect(expCua(d, 'lo|B1|0')).toBe(10)
     expect(expCua(d, 'lo|B1|1')).toBe(4)
     expect(expCua(d, 'lo|B1|2')).toBeUndefined()
+  })
+  it('chặng CHƯA XONG (mới làm vài câu, lo_da_xong chưa tăng) ⇒ KHÔNG có khoản lô — không trao EXP xong chặng từ câu đầu tiên', async () => {
+    const d = await dung()
+    luuKeHoach(d, { viec: [{ id: 'btvn_lo:B1:0', hanMem: iso(NOW + 5 * H) }] })
+    await ghi(d, [sk('q1', 1, NOW - 4000, { nguon: 'btvn_lo', maNguon: 'B1', lan: 0 })])
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,lo_da_xong) VALUES('B1|S1','B1','S1',0)").run()
+    await capNhatExp(d.env, 'S1', NOW)
+    expect(expCua(d, 'lo|B1|0')).toBeUndefined()
+    d.sql.prepare("UPDATE btvn_em SET lo_da_xong = 1 WHERE khoa='B1|S1'").run() // làm xong chặng ⇒ bây giờ mới có
+    await capNhatExp(d.env, 'S1', NOW)
+    expect(expCua(d, 'lo|B1|0')).toBe(10)
   })
   it('nộp cả bài BTVN: đúng hạn +15, quá hạn 0', async () => {
     const d = await dung()
@@ -656,6 +669,7 @@ describe('hàm đọc-chỉ cho game phát vé (docThanhTichNgay)', () => {
       sk('q1', 1, NOW - 4000, { nguon: 'btvn_lo', maNguon: 'B1', lan: 0 }), sk('q2', 1, NOW - 3000, { nguon: 'btvn_lo', maNguon: 'B1', lan: 1 }),
       sk('q3', 1, NOW - 2000), sk('q4', 1, NOW - 1000),
     ])
+    d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,lo_da_xong) VALUES('B1|S1','B1','S1',2)").run() // chặng 0, 1 đã xong (sửa CÓ CHỦ Ý 21/09)
     await capNhatExp(d.env, 'S1', NOW)
     const truoc = d.chup('exp_so')
     const r = await docThanhTichNgay(d.env, 'S1', NOW)

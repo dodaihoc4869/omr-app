@@ -413,9 +413,18 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
 
   // Lô BTVN xong: một lô = các dòng sổ `btvn_lo` cùng (mã bài, chỉ số lô = lan) có ≥ 1 câu ĐÃ TRẢ LỜI. "Đúng nhịp" = xong trước hạn mềm của lô
   // trong bản kế hoạch đã lưu (hạn mềm = mốc lô kế); chưa từng có trong bản lưu nào thì so với hạn nộp cả bài (không bịa nhịp).
+  // "Xong lô" CHỈ khi chặng ĐÃ XONG (chỉ số < `btvn_em.lo_da_xong`) — trước đây một câu đã trả lời là đủ ⇒ chặng đúng nhịp (nay 20 EXP + 1 vé Đoàn) bị trao từ câu ĐẦU TIÊN (Boss/Code 1 rà chéo W2b).
+  // Không đọc được `lo_da_xong` (thiếu cột) ⇒ giữ hành vi cũ.
+  const loDaXongCua = new Map<string, number>()
+  let docDuocLoDaXong = false
+  if (maBtvnLo.length > 0) {
+    const rl = await an(() => env.DB.prepare('SELECT ma_btvn, COALESCE(lo_da_xong, 0) AS n FROM btvn_em WHERE sbd = ? AND ma_btvn IN (SELECT value FROM json_each(?))').bind(sbd, json(maBtvnLo)).all<Record<string, unknown>>(), null)
+    if (rl) { docDuocLoDaXong = true; for (const x of rl.results ?? []) loDaXongCua.set(String(x.ma_btvn), Number(x.n) || 0) }
+  }
   const loMap = new Map<string, { maBtvn: string; chiSo: number; luc: string }>()
   for (const e of so) {
     if (e.nguon !== 'btvn_lo' || e.ketQua === null || e.luc < tu) continue
+    if (docDuocLoDaXong && (e.lan % LAN_MOI_LUOT) >= (loDaXongCua.get(e.maNguon) ?? 0)) continue // chặng CHƯA xong: chưa có khoản `lo`
     // Bài cá nhân hoá làm lại: `lan = chiSo + LAN_MOI_LUOT × (lượt − 1)` ⇒ cùng lô ở mọi lượt về CÙNG khoá EXP `lo|<bài>|<chỉ số>` (không cộng đôi). Bài cũ: lan < 1000, không đổi.
     const chiSo = e.lan % LAN_MOI_LUOT
     const k = `${e.maNguon}|${chiSo}`

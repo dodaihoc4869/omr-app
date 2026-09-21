@@ -3,8 +3,10 @@
 import type { Env } from './kieu'
 import type { Mastery } from '../../src/game/than-thu-v2/core'
 import type { DauVaoLuot, KetQuaLuot } from '../../src/game/than-thu-v2/core'
+import { dauVaoLuotTuSo } from '../../src/game/than-thu-v2/core'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { tenLopCuaEm } from './ten-lop'
+import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 
 /** Cờ LÙI NHANH: `cau_hinh.game_luot_moi = 'tat'` ⇒ game rút câu bằng đường CŨ (chooseSessionWithRoles). Vắng / khác ⇒ BẬT. */
 export const KHOA_GAME_LUOT_MOI = 'game_luot_moi'
@@ -42,13 +44,32 @@ async function tenLopEm(env: Env, sbd: string): Promise<string> {
   }
 }
 
-/** Các dạng LỚP đã học, tính lại từ D1 (bài tập về nhà giao cho lớp: cá nhân hoá qua `btvn_cau`, bài thường qua tờ đề; ca lớp đã làm và ĐÃ ĐÓNG hoặc ĐÃ CÔNG BỐ). Mỗi nguồn bọc riêng: thiếu nguồn nào bỏ nguồn ấy. */
-async function tinhDangLop(env: Env, tenLop: string): Promise<string[]> {
-  const rHs = await env.DB.prepare("SELECT sbd, lop, ten_lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'").all<{ sbd: string; lop: string | null; ten_lop?: string | null }>().catch(async () => env.DB.prepare("SELECT sbd, lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'").all<{ sbd: string; lop: string | null; ten_lop?: string | null }>())
-  const ds = (rHs.results ?? []).filter((h) => tenLopCuaEm(h.lop, h.ten_lop ?? null) === tenLop).map((h) => String(h.sbd))
-  if (ds.length === 0) return []
-  const arr = JSON.stringify(ds)
+/** Cấu hình KẾ THỪA kho lớp: `cau_hinh.lop_da_hoc_ke_thua` = JSON `{"<lớp mới>": "<lớp gốc>"}` (Boss 21/09: lớp mới tách chưa có bài/ca riêng vẫn phải thừa kho của lớp gốc; em giỏi nhất không được có kho nhỏ nhất). */
+export const KHOA_LOP_KE_THUA = 'lop_da_hoc_ke_thua'
+
+/** Chuỗi lớp cho `tenLop`: [chính nó, lớp gốc, lớp gốc của lớp gốc…] theo cấu hình; chống vòng; cấu hình hỏng/vắng ⇒ chỉ chính nó. */
+export async function docChuoiKeThua(env: Env, tenLop: string): Promise<string[]> {
+  const ra = [tenLop]
+  try {
+    const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_LOP_KE_THUA).first<{ gia_tri: string }>()
+    if (!r?.gia_tri) return ra
+    const map = JSON.parse(String(r.gia_tri)) as Record<string, unknown>
+    if (!map || typeof map !== 'object' || Array.isArray(map)) return ra
+    let cur = tenLop
+    for (let i = 0; i < 3; i++) { // tối đa 3 tầng kế thừa
+      const cha = typeof map[cur] === 'string' ? String(map[cur]).trim() : ''
+      if (!cha || ra.includes(cha)) break
+      ra.push(cha); cur = cha
+    }
+  } catch { /* cấu hình hỏng: không kế thừa */ }
+  return ra
+}
+
+/** Các dạng đã học của một TẬP em (`dsSbd`), tính từ D1: bài tập về nhà được giao (cá nhân hoá qua `btvn_cau`, bài thường qua tờ đề) + ca đã làm mà ĐÃ ĐÓNG hoặc ĐÃ CÔNG BỐ. Mỗi nguồn bọc riêng: thiếu nguồn nào bỏ nguồn ấy. */
+async function tinhDang(env: Env, dsSbd: string[]): Promise<Set<string>> {
   const ra = new Set<string>()
+  if (dsSbd.length === 0) return ra
+  const arr = JSON.stringify(dsSbd)
   const lay = async (q: string, ...tham: unknown[]): Promise<void> => {
     try {
       const r = await env.DB.prepare(q).bind(...tham).all<{ dang: string | null }>()
@@ -62,34 +83,46 @@ async function tinhDangLop(env: Env, tenLop: string): Promise<string[]> {
       WHERE cc.sbd IN (SELECT value FROM json_each(?)) AND c.trang_thai <> 'da_xoa' AND (c.trang_thai = 'dong' OR ${SQL_DA_CONG_BO('c')}) AND q.dang IS NOT NULL`,
     arr,
   )
-  return [...ra].sort()
+  return ra
+}
+
+/** Các dạng LỚP đã học: dạng của mọi em thuộc lớp `tenLop` VÀ các lớp gốc trong `chuoi` (kế thừa). */
+async function tinhDangLop(env: Env, chuoi: readonly string[]): Promise<string[]> {
+  const rHs = await env.DB.prepare("SELECT sbd, lop, ten_lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'").all<{ sbd: string; lop: string | null; ten_lop?: string | null }>().catch(async () => env.DB.prepare("SELECT sbd, lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'").all<{ sbd: string; lop: string | null; ten_lop?: string | null }>())
+  const ds = (rHs.results ?? []).filter((h) => chuoi.includes(tenLopCuaEm(h.lop, h.ten_lop ?? null))).map((h) => String(h.sbd))
+  return [...(await tinhDang(env, ds))].sort()
 }
 
 /**
- * Dạng LỚP của em đã học — đọc bảng đệm `lop_da_hoc`, nạp lại lười khi cũ hơn 6 giờ (mốc `cau_hinh.lop_da_hoc|<tên lớp>`). Thiếu bảng đệm hoặc lỗi ⇒ [] (game rút theo bằng chứng của em như cũ).
+ * Dạng em ĐƯỢC PHÉP rút = dạng LỚP đã học (lớp hiện tại + lớp gốc kế thừa; bảng đệm `lop_da_hoc`, nạp lại lười khi cũ hơn 6 giờ HOẶC khi chuỗi kế thừa đổi; mốc `cau_hinh.lop_da_hoc|<tên lớp>` = `<ISO>|<chuỗi>`)
+ * ∪ dạng từ bài/ca CHÍNH EM được giao hoặc đã làm (bất kể lúc đó em thuộc lớp nào). Thiếu bảng đệm hoặc lỗi ⇒ chỉ phần của chính em / [] (game rút theo bằng chứng của em như cũ).
  */
 export async function docDangLop(env: Env, sbd: string, nowMs: number): Promise<string[]> {
+  const rieng = await tinhDang(env, [sbd]).catch(() => new Set<string>())
   try {
     const ten = await tenLopEm(env, sbd)
-    if (!ten) return []
+    if (!ten) return [...rieng].sort()
+    const chuoi = await docChuoiKeThua(env, ten)
+    const khoaChuoi = chuoi.join('>')
     const moc = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_MOC_LOP(ten)).first<{ gia_tri: string }>()
-    const tuoi = nowMs - Date.parse(String(moc?.gia_tri ?? ''))
-    if (Number.isFinite(tuoi) && tuoi >= 0 && tuoi < SAU_GIO_MS) {
+    const [tMoc, ...conLai] = String(moc?.gia_tri ?? '').split('|')
+    const tuoi = nowMs - Date.parse(String(tMoc))
+    if (Number.isFinite(tuoi) && tuoi >= 0 && tuoi < SAU_GIO_MS && conLai.join('|') === khoaChuoi) {
       const r = await env.DB.prepare('SELECT dang FROM lop_da_hoc WHERE ten_lop = ? ORDER BY dang').bind(ten).all<{ dang: string }>()
       // Bảng đệm rỗng dù mốc còn mới (vừa reset toàn app xoá bảng, hoặc lớp thật sự chưa học gì) ⇒ tính lại — rẻ với lớp rỗng, và không để em kẹt "kho trống" tới 6 giờ.
-      if ((r.results ?? []).length > 0) return (r.results ?? []).map((x) => String(x.dang))
+      if ((r.results ?? []).length > 0) return [...new Set([...(r.results ?? []).map((x) => String(x.dang)), ...rieng])].sort()
     }
-    const dang = await tinhDangLop(env, ten)
+    const dang = await tinhDangLop(env, chuoi)
     const iso = new Date(nowMs).toISOString()
     await env.DB.batch([
       env.DB.prepare('DELETE FROM lop_da_hoc WHERE ten_lop = ?').bind(ten),
       ...(dang.length ? [env.DB.prepare('INSERT OR REPLACE INTO lop_da_hoc (ten_lop, dang, cap_nhat_luc) SELECT ?, value, ? FROM json_each(?)').bind(ten, iso, JSON.stringify(dang))] : []),
-      env.DB.prepare('INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc').bind(KHOA_MOC_LOP(ten), iso, iso),
+      env.DB.prepare('INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc').bind(KHOA_MOC_LOP(ten), `${iso}|${khoaChuoi}`, iso),
     ])
-    return dang
+    return [...new Set([...dang, ...rieng])].sort()
   } catch (e) {
     console.error('[game-luot] đọc dạng lớp lỗi (rút theo bằng chứng của em):', e instanceof Error ? e.message : e)
-    return []
+    return [...rieng].sort()
   }
 }
 
@@ -113,13 +146,14 @@ export async function docCauBtvnChuaNop(env: Env, sbd: string): Promise<Set<stri
   return ra
 }
 
-/** Số lượt Đảo (mode adventure, KHÔNG phải Đoàn/Linh Tâm) em đã MỞ hôm nay (ngày VN). */
-export async function demLuotHomNay(env: Env, sbd: string, ngay: string): Promise<number> {
+/** Số lượt Đảo (mode adventure, KHÔNG phải Đoàn/Linh Tâm) em đã DÙNG hôm nay (ngày VN): phiên có ≥ 1 câu trả lời HOẶC còn trong 2 giờ (mở rồi bỏ quá 2 giờ chưa trả lời câu nào không mất lượt). */
+export async function demLuotHomNay(env: Env, sbd: string, ngay: string, nowMs: number = Date.now()): Promise<number> {
   try {
     const r = await env.DB.prepare(
-      `SELECT COUNT(*) AS n FROM game_v2_session WHERE sbd = ? AND created_at >= ? AND created_at < ? AND json_extract(json, '$.mode') = 'adventure'
-          AND json_extract(json, '$.doan') IS NULL AND json_extract(json, '$.guardian') IS NULL`,
-    ).bind(sbd, batDauNgay(ngay), hetNgay(ngay)).first<{ n: number }>()
+      `SELECT COUNT(*) AS n FROM game_v2_session s WHERE s.sbd = ? AND s.created_at >= ? AND s.created_at < ? AND json_extract(s.json, '$.mode') = 'adventure'
+          AND json_extract(s.json, '$.doan') IS NULL AND json_extract(s.json, '$.guardian') IS NULL
+          AND (s.created_at > ? OR EXISTS (SELECT 1 FROM game_v2_attempt a WHERE a.session = s.id AND a.sbd = s.sbd))`,
+    ).bind(sbd, batDauNgay(ngay), hetNgay(ngay), new Date(nowMs - 2 * 3_600_000).toISOString()).first<{ n: number }>()
     return so(r?.n)
   } catch {
     return 0
@@ -142,17 +176,23 @@ export async function docLuotDangCho(env: Env, sbd: string, nowMs: number): Prom
 
 /** Dữ liệu cho `luotHomNay` (Code 1): số lượt đã mở, xong chặng BTVN hôm nay (null = không có bài đang chạy), xong ôn tới hạn, đạt ngày, số câu thú đúng/tổng hôm nay (Đoàn/Linh Tâm không tính). */
 export async function docDauVaoLuot(env: Env, sbd: string, ngay: string, nowMs: number, datHomNay: boolean): Promise<DauVaoLuot> {
-  const soLuotDaLam = await demLuotHomNay(env, sbd, ngay)
+  const soLuotDaLam = await demLuotHomNay(env, sbd, ngay, nowMs)
   let xongChangHomNay: boolean | null = null
   let xongOnToiHan = false
   try {
     const r = await env.DB.prepare(
-      `SELECT (SELECT COUNT(*) FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn WHERE be.sbd = ? AND be.nop_luc IS NULL AND b.da_xoa = 0 AND COALESCE(be.thu_hoi, 0) = 0 AND b.han_nop > ?) AS dang_chay,
-              (SELECT COUNT(*) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'btvn_lo') AS lo_hom_nay,
-              (SELECT COUNT(*) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon IN ('on_lai', 'khac_phuc')) AS on_hom_nay`,
-    ).bind(sbd, new Date(nowMs).toISOString(), sbd, ngay, sbd, ngay).first<{ dang_chay: number; lo_hom_nay: number; on_hom_nay: number }>()
-    xongChangHomNay = so(r?.dang_chay) > 0 ? so(r?.lo_hom_nay) > 0 : null
-    xongOnToiHan = so(r?.on_hom_nay) > 0
+      // Bài "đang chạy" = CÒN chặng chưa xong (đã xong hết chặng mà chưa bấm nộp KHÔNG tính). Chặng "xong hôm nay" = có câu btvn_lo hôm nay của chặng ĐÃ XONG (chỉ số < lo_da_xong), không phải mới làm 1 câu.
+      `SELECT (SELECT COUNT(*) FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn WHERE be.sbd = ? AND be.nop_luc IS NULL AND b.da_xoa = 0 AND COALESCE(be.thu_hoi, 0) = 0 AND b.han_nop > ?
+                 AND (be.so_chang IS NULL OR COALESCE(be.lo_da_xong, 0) < be.so_chang)) AS dang_chay,
+              (SELECT COUNT(*) FROM (SELECT DISTINCT s.ma_nguon AS ma, (s.lan % ${LAN_MOI_LUOT}) AS chi FROM su_kien_hoc s WHERE s.sbd = ? AND s.ngay_vn = ? AND s.nguon = 'btvn_lo' AND s.ket_qua IS NOT NULL) x
+                 JOIN btvn_em be2 ON be2.ma_btvn = x.ma AND be2.sbd = ? WHERE x.chi < COALESCE(be2.lo_da_xong, 0)) AS chang_xong_hom_nay,
+              (SELECT COUNT(*) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'on_lai') AS on_hom_nay,
+              (SELECT COUNT(*) FROM nam_kt_cau WHERE sbd = ? AND moc_on_ke IS NOT NULL AND substr(moc_on_ke, 1, 10) <= ? AND trang_thai IN ('moi_sai', 'dang_on') AND COALESCE(can_day_lai, 0) = 0) AS con_toi_han`,
+    ).bind(sbd, new Date(nowMs).toISOString(), sbd, ngay, sbd, sbd, ngay, sbd, ngay).first<{ dang_chay: number; chang_xong_hom_nay: number; on_hom_nay: number; con_toi_han: number }>()
+    // Luật "xong chặng / xong ôn tới hạn" là hàm thuần của Code 1 (`dauVaoLuotTuSo`): ôn tới hạn xong = hôm nay có ≥ 1 câu ôn lại VÀ không còn câu tới hạn; khắc phục không tính; số lạ ⇒ chưa xong.
+    const t = dauVaoLuotTuSo({ changXongHomNay: so(r?.chang_xong_hom_nay) > 0, soCauOnHomNay: so(r?.on_hom_nay), conCauToiHan: so(r?.con_toi_han), coBaiConChang: so(r?.dang_chay) > 0 })
+    xongChangHomNay = t.xongChangHomNay
+    xongOnToiHan = t.xongOnToiHan
   } catch { /* chưa có bảng BTVN nâng đỡ: coi như không có bài đang chạy */ }
   let dungHomNay = 0
   let tongHomNay = 0

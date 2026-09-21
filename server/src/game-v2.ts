@@ -178,6 +178,8 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     // GĐ 5 (Kênh 4): một đồng hồ giờ máy chủ cho cả lượt chọn; câu em đang/đã làm hôm nay ở chỗ khác không ra ở game; mốc ôn theo hồ sơ.
     const tNow=Date.now()
     for(const qid of await qidChanHomNay(env,sbd,tNow))blocked.add(qid)
+    // Game hiện lời giải ngay ⇒ đường CŨ (Đoàn nội bộ, Linh Tâm, võ đài, repair/tower) cũng KHÔNG được rút câu nằm trong bài tập về nhà em CHƯA nộp (Code 1 rà chéo W2b).
+    for(const x of await docCauBtvnChuaNop(env,sbd))blocked.add(x)
     const history=await attempts(env,sbd)
     const eligible=scope.pool.filter(q=>!laCauTuLuan(q)&&allowed(q,scope.evidence,blocked)&&(control.types.length===0||q.dang!==null&&control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
     if(guardian){
