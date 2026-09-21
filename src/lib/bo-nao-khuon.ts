@@ -203,6 +203,26 @@ export const TU_CAM_RIENG_LOI_MOI: readonly string[] = [
   // TẠM CẤM (Boss 21/09 15:xx): thầy đang siết khiên lên 36 ngày, con số 12 mảnh sắp đổi — lời mời chỉ dùng EXP còn thiếu + cấp. Bỏ hai dòng này khi luật khiên mới chốt.
   'khiên', 'mảnh khiên',
 ]
+/**
+ * TẠM ẨN SỐ CỦA GAME khỏi Bộ não (lệnh tạm của Boss 21/09 chiều, cho lượt chiều): thầy đang siết đường cấp (21 ngày tới cấp 10, 1 200 ngày tới cấp 120) và tính lại cấp của em đã chơi
+ * ⇒ "thiếu 27 EXP lên cấp 8" sẽ sai. Bỏ `exp` (tổng EXP, cấp) và `thanThu.{cap, expConThieu, manhKhien, manhKhienTong}`; GIỮ tên thú (`thanThu.ten`) và `thanThu.chuoiNgay`.
+ * GỠ khi Boss báo luật cấp mới đã sống: đặt `SO_GAME_AN_TAM` về `{ goc: [], thanThu: [] }` (không cần sửa chỗ khác).
+ */
+export const SO_GAME_AN_TAM: { goc: readonly string[]; thanThu: readonly string[] } = { goc: ['exp'], thanThu: ['cap', 'expConThieu', 'manhKhien', 'manhKhienTong'] }
+export function anSoGameTam<T>(the: T): T {
+  if (the === null || typeof the !== 'object' || Array.isArray(the)) return the
+  const ra: Record<string, unknown> = {}
+  for (const [k, v] of Object.entries(the)) if (!SO_GAME_AN_TAM.goc.includes(k)) ra[k] = v
+  const tt = ra.thanThu
+  if (tt !== null && typeof tt === 'object' && !Array.isArray(tt)) ra.thanThu = Object.fromEntries(Object.entries(tt as Record<string, unknown>).filter(([k]) => !SO_GAME_AN_TAM.thanThu.includes(k)))
+  return ra as T
+}
+
+/**
+ * TẠM CẤM nêu SỐ EXP / SỐ CẤP của thú trong lời mời (lệnh tạm của Boss 21/09 chiều: thầy đang siết đường cấp và tính lại cấp của em đã chơi, số cũ sẽ sai). Bắt: "40 EXP", "EXP 40", "cấp 6",
+ * "6 cấp", "level 6", "40 điểm kinh nghiệm". KHÔNG bắt chữ "EXP" / "lên cấp" đứng riêng không kèm số ("chọn thần thú để EXP của em có chỗ về", "để lên cấp"). Gỡ khi Boss báo luật cấp mới đã sống.
+ */
+const SO_EXP_CAP_TAM_CAM = /\d\s*(?:exp|điểm kinh nghiệm|kinh nghiệm)|(?:exp|kinh nghiệm)\s*[:=]?\s*\d|(?:cấp|level|lv)\s*(?:độ\s*)?\d|\d\s*cấp/iu
 /** Lời mời / lời mục tiêu KHÔNG được nói ra điều Bộ não "biết" về em (nhãn `huongEm` là để CHỈNH lời, không để khoe): cấm những cách nói này. */
 export const TU_LO_HUONG_EM: readonly string[] = ['em thích', 'em hay', 'em thường', 'mình biết em', 'mình để ý', 'mình thấy em', 'mình nhận ra em', 'mình nhớ em']
 /** Lời cho THẦY (gợi ý, lý do, bản tin, ghi chú): "dạng yếu" là chữ thường dùng trong app nên chỉ cấm những từ này. */
@@ -378,6 +398,7 @@ export function kiemChuLoiMoi(lm: unknown, ten: string, toiDa: number, the: TheD
   if (cam.length) e.push(`${ten} có từ cấm: ${cam.join(', ')}`)
   const hua = timTuCam(lm, TU_CAM_RIENG_LOI_MOI)
   if (hua.length) e.push(`${ten} hứa điều không chắc hoặc gọi tên: ${hua.join(', ')}`)
+  if (SO_EXP_CAP_TAM_CAM.test(lm.normalize('NFC'))) e.push(`${ten} nêu số EXP hoặc số cấp của thú (tạm cấm: thầy đang tính lại đường cấp) — chỉ nhắc TÊN thú`)
   const lo = timTuCam(lm, TU_LO_HUONG_EM)
   if (lo.length) e.push(`${ten} nói ra điều Bộ não "biết" về em: ${lo.join(', ')}`)
   const so = timSoTrongChu(boCumCuaSo(lm))
@@ -718,7 +739,8 @@ export function kiemKhuon(dauRa: unknown, the: TheDeKiem): KetQuaKiem {
   }
 
   // ── THỬ THÁCH RIÊNG: sai khuôn CHỈ bỏ phần này (cả `thuThach` lẫn `loiMoi`), phần tử vẫn hợp lệ ──
-  const loiTt = kiemThuThach(d, the, tapSo)
+  // Lệnh tạm: số EXP / cấp / khiên của game bị ẩn khỏi tập số hợp lệ của thử thách (số ấy có trong thẻ nhưng không được nêu); `anSoGameTam` rỗng lại khi Boss gỡ.
+  const loiTt = kiemThuThach(d, the, tapSoCuaThe(anSoGameTam(the)))
   if (loiTt.length) {
     boLoi.push('thuThach')
     canhBao.push(`thuThach bị bỏ (giữ núm): ${loiTt.join('; ')}`)

@@ -15,6 +15,7 @@
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { nenHoSo, nenThe, nenTheVang } from '../../src/lib/bo-nao-nen.ts'
+import { anSoGameTam } from '../../src/lib/bo-nao-khuon.ts'
 import { laVangTuDong, soanLoiMoiVang } from '../../src/lib/bo-nao-vang.ts'
 import { copyFileSync, existsSync, mkdirSync, rmSync } from 'node:fs'
 import {
@@ -178,7 +179,7 @@ export async function chayLayChieu({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date
   for (const e of chon) {
     const b = dao.get(String(e.sbd))
     the[b] = e.the
-    nhom.push({ biDanh: b, the: nenThe(e.the) })
+    nhom.push({ biDanh: b, the: anSoGameTam(nenThe(e.the)) }) // lệnh tạm: AI không thấy số EXP / cấp / khiên của game (xem `SO_GAME_AN_TAM`)
   }
   nhom.sort((a, b) => (a.biDanh < b.biDanh ? -1 : 1))
   mkdirSync(join(thuMuc, 'vao'), { recursive: true })

@@ -76,7 +76,15 @@ describe('lay.mjs --chieu', () => {
     for (const cam of ['20001', '20004', '20007', 'Trần Thu Hà', 'hoTen', 'sbd']) expect(vao, cam).not.toContain(cam)
     const mang = JSON.parse(vao)
     expect(mang.map((x: { biDanh: string }) => x.biDanh).sort()).toEqual(Object.keys(bang).sort())
-    expect(mang.find((x: { biDanh: string }) => x.biDanh === biDanhCua(bang, '20001')).the.thanThu.ten).toBe('Rồng Lửa') // số thật thần thú tới được AI
+    expect(mang.find((x: { biDanh: string }) => x.biDanh === biDanhCua(bang, '20001')).the.thanThu.ten).toBe('Rồng Lửa') // tên thú tới được AI
+    // LỆNH TẠM (Boss 21/09 chiều): AI KHÔNG thấy số EXP / cấp / khiên của game — chỉ còn tên thú + chuỗi ngày; thẻ đầy đủ mã lệnh giữ riêng vẫn CÓ đủ (đối chiếu)
+    for (const e of mang as { the: Record<string, unknown> }[]) {
+      expect('exp' in e.the, 'exp bị ẩn').toBe(false)
+      for (const k of ['cap', 'expConThieu', 'manhKhien', 'manhKhienTong']) expect(e.the.thanThu && k in (e.the.thanThu as object), `thanThu.${k}`).toBeFalsy()
+    }
+    expect(mang.find((x: { biDanh: string }) => x.biDanh === biDanhCua(bang, '20001')).the.thanThu).toEqual({ ten: 'Rồng Lửa', chuoiNgay: 4 })
+    const dayDu = JSON.parse(readFileSync(join(thuMucChieu(), '.the-day-du.json'), 'utf8')).the as Record<string, { thanThu?: Record<string, unknown>; exp?: unknown }>
+    expect(dayDu[biDanhCua(bang, '20001')]!.thanThu).toMatchObject({ ten: 'Rồng Lửa', cap: 6, expConThieu: 40 })
   })
   it('KHÔNG đụng lượt đêm: không có vao/ra của đêm, không ghi lan-cuoi.json; bí danh + thẻ đầy đủ quyền 600; có LUAT-CHIEU.md; ra/ trống', async () => {
     await lay()
