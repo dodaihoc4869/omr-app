@@ -10,6 +10,7 @@ import OTraCuu from '../components/hom-nay/OTraCuu'
 import ViecGap from '../components/hom-nay/ViecGap'
 import EmCanGiup from '../components/hom-nay/EmCanGiup'
 import VinhDanh from '../components/hom-nay/VinhDanh'
+import KhungCuon from '../components/hom-nay/KhungCuon'
 import '../styles/hom-nay.css'
 import '../styles/hom-nay-v2.css'
 
@@ -92,25 +93,31 @@ export default function HomNayScreen() {
       <div className="hn2-luoi-b">
         <KhoiBoNaoDemQua onMoHoSo={moToanCanh} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />
 
-        <section className="hn2-the" aria-labelledby="hn2-yeu">
-          <h2 id="hn2-yeu" className="hn2-tieu-de">
-            {dangDuocDung ? `Dạng cả lớp ${dangDuocDung.lop} đang yếu` : 'Dạng cả lớp đang yếu'}
-          </h2>
-          {!hom?.dangYeu && <p className="hn2-trong">{tai ? 'Đang tải…' : `Dạng yếu theo lớp: ${lyDo('dangYeu')}${/[.!]$/.test(lyDo('dangYeu')) ? '' : '.'}`}</p>}
-          {dangDuocDung && dangDuocDung.dang.length === 0 && <p className="hn2-trong">Chưa có dạng nào đủ dữ liệu để kết luận cả lớp yếu.</p>}
-          {dangDuocDung?.dang.map((d) => (
-            <div className="hn-yeu" key={d.ma}>
-              <span className="hn-yeu-ten">{d.ten}</span>
-              <span className="hn-yeu-thanh" role="img" aria-label={`${d.soEmYeu} trên ${dangDuocDung.siSo} em`}>
-                <i style={{ width: `${Math.min(100, Math.round((d.soEmYeu / Math.max(1, dangDuocDung.siSo)) * 100))}%` }} />
-              </span>
-              <span className="hn-yeu-so">
-                {d.soEmYeu}/{dangDuocDung.siSo} em
-              </span>
-            </div>
-          ))}
+        <section className="hn2-the hn2-khung" aria-labelledby="hn2-yeu" data-khoi="dang-yeu">
+          <div className="hn2-khung-dau">
+            <h2 id="hn2-yeu" className="hn2-tieu-de hn2-tieu-de--1dong" title={dangDuocDung ? `Dạng cả lớp ${dangDuocDung.lop} đang yếu` : 'Dạng cả lớp đang yếu'}>
+              {dangDuocDung ? `Dạng cả lớp ${dangDuocDung.lop} đang yếu` : 'Dạng cả lớp đang yếu'}
+            </h2>
+          </div>
+          <KhungCuon nhan="Các dạng cả lớp đang yếu">
+            {!hom?.dangYeu && <p className="hn2-trong">{tai ? 'Đang tải…' : `Dạng yếu theo lớp: ${lyDo('dangYeu')}${/[.!]$/.test(lyDo('dangYeu')) ? '' : '.'}`}</p>}
+            {dangDuocDung && dangDuocDung.dang.length === 0 && <p className="hn2-trong">Chưa có dạng nào đủ dữ liệu để kết luận cả lớp yếu.</p>}
+            {dangDuocDung?.dang.map((d) => (
+              <div className="hn-yeu" key={d.ma}>
+                <span className="hn-yeu-ten" title={d.ten}>
+                  {d.ten}
+                </span>
+                <span className="hn-yeu-thanh" role="img" aria-label={`${d.soEmYeu} trên ${dangDuocDung.siSo} em`}>
+                  <i style={{ width: `${Math.min(100, Math.round((d.soEmYeu / Math.max(1, dangDuocDung.siSo)) * 100))}%` }} />
+                </span>
+                <span className="hn-yeu-so">
+                  {d.soEmYeu}/{dangDuocDung.siSo} em
+                </span>
+              </div>
+            ))}
+          </KhungCuon>
           {dangDuocDung && dangDuocDung.dang.length > 0 && (
-            <div className="hn-hang-nut">
+            <div className="hn2-khung-chan hn2-khung-chan--nut">
               <button type="button" className="hn-nut hn-nut--chinh" onClick={() => setScreen('giaobtvn')}>
                 Giao bài tập về nhà theo {dangDuocDung.dang.length} dạng này
               </button>
@@ -122,7 +129,7 @@ export default function HomNayScreen() {
         </section>
 
         <section className="hn2-the hn2-the--chua" aria-labelledby="hn2-chua">
-          <h2 id="hn2-chua" className="hn2-tieu-de">
+          <h2 id="hn2-chua" className="hn2-tieu-de hn2-tieu-de--1dong">
             Buổi chữa tối nay
           </h2>
           <p className="hn2-chua-noi-dung">Kế hoạch buổi chữa nằm ở màn Gọi lên bảng — chọn ca, xếp em và câu rồi mở buổi.</p>

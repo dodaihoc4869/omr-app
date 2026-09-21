@@ -30,29 +30,6 @@
   align-items: center;
   gap: 10px;
 }
-.hn-tim {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 280px;
-  height: 48px;
-  padding: 0 18px;
-  border-radius: 24px;
-  background: var(--m3-surface-container);
-  color: var(--m3-on-surface-variant);
-}
-.hn-tim input {
-  flex: 1;
-  min-width: 0;
-  align-self: stretch;
-  min-height: 44px;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--m3-on-surface);
-  font: inherit;
-  font-size: 14px;
-}
 .hn-chip {
   display: inline-flex;
   align-items: center;
@@ -277,11 +254,21 @@
 
 .hn-yeu {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 110px auto;
+  grid-template-columns: minmax(0, 1fr) 120px 72px;
   align-items: center;
   gap: 12px;
   padding: 8px 0;
   font-size: 14px;
+}
+.hn-yeu-ten {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  line-height: 1.3;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
 }
 .hn-yeu-thanh {
   display: block;
@@ -301,6 +288,9 @@
 }
 .hn-yeu-so {
   font-size: 13px;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
   color: var(--m3-on-surface-variant);
 }
 .hn-doan-dong {
@@ -320,10 +310,6 @@
 @media (max-width: 879px) {
   .hn {
     padding: 16px 14px 24px;
-  }
-  .hn-tim {
-    min-width: 0;
-    width: 100%;
   }
   .hn-btvn {
     grid-template-columns: minmax(0, 1fr) auto;

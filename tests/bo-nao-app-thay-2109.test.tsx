@@ -237,7 +237,9 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
   it('CHẠY THỬ: nhãn "CHẠY THỬ — chưa tác động tới học sinh", tiêu đề chỉ nói đã soi, dòng điều chỉnh ghi "ĐỀ XUẤT" (không "ĐÃ LÀM")', async () => {
     chay({ banTin: { cacDong: [{ loai: 'dieu_chinh', chu: 'Giảm 3 câu mỗi ngày vì bỏ dở 2 ngày liền.', sbd: '12007', hoTen: 'Trần Thu Hà', hanhDong: 'xem_ho_so' }] } })
     expect(await screen.findByText('CHẠY THỬ — chưa tác động tới học sinh')).toBeTruthy()
-    expect(screen.getByRole('heading', { name: 'Bộ não A.I · đêm qua đã soi 120 em' })).toBeTruthy()
+    // 21/09 (thầy lệnh: chữ dài bị ngắt): tiêu đề chỉ còn MỘT dòng cố định, phần trạng thái xuống dòng phụ
+    expect(screen.getByRole('heading', { name: 'Bộ não A.I · đêm qua' })).toBeTruthy()
+    expect(screen.getByText(/^Đã soi 120 em · Chạy lần cuối/)).toBeTruthy()
     expect(screen.getByText('ĐỀ XUẤT')).toBeTruthy()
     expect(screen.queryByText('ĐÃ LÀM')).toBeNull()
     expect(screen.getByText(/chỉ được lưu để kiểm máy móc/)).toBeTruthy()
@@ -247,7 +249,8 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
 
   it('CHẠY THẬT: không có nhãn thử; "đã hỗ trợ N em"; dòng "ĐÃ LÀM" kèm kết quả hôm sau; nút Xem mở hồ sơ đúng em', async () => {
     const { onMoHoSo } = chay({ cheDo: 'that', soEmHoTro: 9, banTin: { cacDong: [{ loai: 'dieu_chinh', chu: 'Đã giảm 3 câu mỗi ngày cho em vì bỏ dở 2 ngày liền.', sbd: '12007', hoTen: 'Trần Thu Hà', hanhDong: 'xem_ho_so', apDung: true, ketQua: 'an_thua', ketQuaChu: 'hôm nay em xong chặng', ngayDieuChinh: '2026-09-21' }] } })
-    expect(await screen.findByRole('heading', { name: 'Bộ não A.I · đêm qua đã hỗ trợ 9 em' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Bộ não A.I · đêm qua' })).toBeTruthy()
+    expect(screen.getByText(/^Đã hỗ trợ 9 em · Chạy lần cuối/)).toBeTruthy()
     expect(screen.queryByText(/CHẠY THỬ/)).toBeNull()
     expect(screen.getByText('ĐÃ LÀM')).toBeTruthy()
     expect(screen.getByText('Có hiệu quả')).toBeTruthy()
@@ -259,7 +262,8 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
 
   it('CHẠY THẬT nhưng máy chủ CHƯA áp điều chỉnh nào (apDung vắng/false, soEmHoTro 0) ⇒ KHÔNG nói "đã hỗ trợ"/"ĐÃ LÀM"; nói thật là chưa áp', async () => {
     chay({ cheDo: 'that', soEmHoTro: 0, banTin: { cacDong: [{ loai: 'dieu_chinh', chu: 'Giảm 3 câu mỗi ngày.', sbd: '12007', hoTen: 'Trần Thu Hà', hanhDong: 'xem_ho_so' }] } })
-    expect(await screen.findByRole('heading', { name: 'Bộ não A.I · đêm qua chưa áp điều chỉnh nào cho em' })).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Bộ não A.I · đêm qua' })).toBeTruthy()
+    expect(screen.getByText(/^Chưa áp điều chỉnh nào cho em · Chạy lần cuối/)).toBeTruthy()
     expect(screen.getByText('ĐỀ XUẤT')).toBeTruthy()
     expect(screen.queryByText('ĐÃ LÀM')).toBeNull()
     expect(screen.getByText(/chưa có điều chỉnh nào được áp/)).toBeTruthy()

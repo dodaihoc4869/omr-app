@@ -27,6 +27,12 @@ import '../styles/bo-nao-m3.css'
  *  Dòng CHỈ BÁO (thầy xem lại · em vắng lâu) không có nút Bỏ. Nhãn "CHẠY THỬ" (mã nội bộ `cheDo:'bong'`) chỉ hiện khi chế độ thử — thử thì KHÔNG nói "đã làm" (dòng ghi "ĐỀ XUẤT").
  *  NÓI THẬT: máy chủ chưa có lệnh / chưa chạy lần nào / quá 36 giờ ⇒ hiện đúng lý do, không dựng bản tin. Hợp đồng `docs/hop-dong-bo-nao-2109.md`; dạng trường `src/lib/bo-nao-thay.ts`.
  *  `gon` = bản tóm tắt cho BẢNG TIN giáo viên: tiêu đề + tối đa `soDongGon` dòng, không nút. */
+/** Phần TRẠNG THÁI của tiêu đề cũ ("… đã hỗ trợ 9 em") chuyển xuống DÒNG PHỤ để tiêu đề chỉ còn một dòng "Bộ não A.I · đêm qua" (thầy lệnh 21/09, chữ dài bị ngắt). Rỗng ⇒ ''. */
+function trangThaiKhoi(d: Parameters<typeof tieuDeKhoi>[0], tatCaThat: boolean): string {
+  const t = tieuDeKhoi(d, tatCaThat).replace(/^Bộ não A\.I · đêm qua\s*/, '')
+  return t ? `${t.charAt(0).toUpperCase()}${t.slice(1)} · ` : ''
+}
+
 export default function KhoiBoNaoDemQua({
   onMoHoSo,
   onGoiLenBang,
@@ -229,8 +235,8 @@ export default function KhoiBoNaoDemQua({
   return (
     <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não đêm qua">
       {dauKhoi(
-        tieuDeKhoi(d, tatCaThat),
-        `Chạy lần cuối ${gioChayCuoi(d.chayLanCuoi!, nayMs)} (${truocDay(d.chayLanCuoi!, nayMs)})${dem ? ` · ${dem}` : ''}`,
+        'Bộ não A.I · đêm qua',
+        `${trangThaiKhoi(d, tatCaThat)}Chạy lần cuối ${gioChayCuoi(d.chayLanCuoi!, nayMs)} (${truocDay(d.chayLanCuoi!, nayMs)})${dem ? ` · ${dem}` : ''}`,
         chip,
       )}
 

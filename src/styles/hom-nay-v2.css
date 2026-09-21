@@ -29,7 +29,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   gap: 16px;
-  align-items: start;
+  align-items: stretch;
 }
 .hn2-luoi-b {
   display: grid;
@@ -201,6 +201,52 @@
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
 }
+.hn2-so-dong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 10px;
+  margin: 2px 0 0;
+}
+.hn2-so-dong .hn2-so-to {
+  margin: 0;
+  font-size: 28px;
+}
+.hn2-tu-dong {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--m3-surface-container-low);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--m3-on-surface);
+}
+.hn2-tu-dong svg {
+  flex: none;
+  margin-top: 3px;
+}
+.hn2-tu-dong--chua {
+  color: var(--m3-on-surface-variant);
+}
+.hn2-em-dai {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.hn2-em-dai--da {
+  color: var(--m3-on-tertiary-container);
+}
+.hn2-em-dai--ke {
+  color: var(--m3-on-surface-variant);
+}
 .hn2-trong {
   margin: 12px 0 0;
   font-size: 14px;
@@ -322,7 +368,6 @@
 /* VIỆC GẤP — ô lớn nhất */
 .hn2-viec-gap {
   box-shadow: inset 0 0 0 2px var(--m3-error);
-  padding: 22px 24px;
 }
 .hn2-viec-dau {
   display: flex;
@@ -335,9 +380,9 @@
   align-items: center;
   justify-content: center;
   flex: none;
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
 }
 .hn2-huy-hieu--canh {
   background: var(--m3-error-container);
@@ -399,11 +444,28 @@
   background: var(--m3-primary);
 }
 .hn2-em {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) 148px;
+  align-items: start;
+  gap: 4px 12px;
   padding: 10px 0;
   border-top: 1px solid var(--m3-outline);
+}
+.hn2-em > .hn2-em-chu {
+  grid-column: 1;
+}
+.hn2-em > .hn2-em-thong-tin {
+  grid-column: 2;
+}
+.hn2-em > .hn2-nut,
+.hn2-em > .hn2-chip,
+.hn2-em > .hn2-em-hanh-dong {
+  grid-column: 3;
+}
+.hn2-em > .hn2-nut,
+.hn2-em > .hn2-chip {
+  width: 148px;
+  justify-content: center;
 }
 .hn2-em-chu {
   display: flex;
@@ -434,8 +496,12 @@
   min-width: 0;
 }
 .hn2-em-ten {
+  display: block;
+  overflow: hidden;
   font-size: 15px;
   font-weight: 800;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 .hn2-em-lop {
   font-size: 13px;
@@ -443,8 +509,18 @@
   color: var(--m3-on-surface-variant);
 }
 .hn2-em-tt {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   font-size: 13.5px;
+  line-height: 1.4;
   color: var(--m3-on-surface-variant);
+  overflow-wrap: anywhere;
+}
+.hn2-nw {
+  white-space: nowrap;
 }
 .hn2-em-tt--chua_mo {
   color: var(--m3-on-error-container);
@@ -598,8 +674,6 @@
   outline-offset: 2px;
 }
 .hn2-em--dang {
-  flex-wrap: wrap;
-  align-items: flex-start;
   padding: 14px 0;
 }
 .hn2-em-chu--xanh {
@@ -608,9 +682,13 @@
 }
 .hn2-em-ten--nut {
   display: block;
+  max-width: 100%;
   min-height: 44px;
   margin: -12px 0 -10px;
   padding: 12px 0 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   border: 0;
   background: transparent;
   color: inherit;
@@ -622,20 +700,32 @@
 }
 .hn2-dang-ds {
   display: flex;
-  flex: 1 1 100%;
   flex-direction: column;
   gap: 8px;
-  padding-left: 52px;
+  margin-top: 6px;
 }
 .hn2-dang {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 8px;
+  gap: 4px 8px;
 }
 .hn2-dang-ten {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  flex: 1 1 100%;
+  min-width: 0;
   font-size: 14px;
   font-weight: 800;
+  line-height: 1.3;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.hn2-dang .hn2-chip {
+  white-space: nowrap;
 }
 .hn2-chip--trung {
   background: var(--m3-surface-container-high);
@@ -648,12 +738,13 @@
 }
 .hn2-em-hanh-dong {
   display: flex;
-  flex: 1 1 100%;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 6px;
+  width: 148px;
 }
 .hn2-em-hanh-dong .hn2-nut {
-  padding: 0 11px;
+  width: 100%;
+  padding: 0 10px;
 }
 
 /* VINH DANH — nhỏ mà sang */
@@ -799,36 +890,145 @@
   font-size: 20px;
 }
 
-/* Điện thoại: đặt SAU các luật gốc (luật cùng độ ưu tiên thì cái viết sau thắng) */
-@media (max-width: 719px) {
-  /* điện thoại: tên + trạng thái chiếm cả dòng, nút xuống dưới (không bóp chữ vào cột hẹp) */
-  .hn2-em {
-    flex-wrap: wrap;
+/* KHUNG CUỘN (thầy lệnh 21/09 "cho vào box cuộn cho đẹp và gọn"): ô cùng cao, ĐẦU dính, THÂN là khung cuộn riêng, mép mờ báo còn nội dung.
+   Thẻ hẹp (< 420 px) ⇒ nút của dòng em xuống DƯỚI, canh phải (container query theo bề rộng CỦA Ô, không theo màn). */
+.hn2-khung {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  container-type: inline-size;
+  container-name: hn2khung;
+}
+.hn2-khung-dau {
+  flex: none;
+  padding: 20px 22px 12px;
+}
+.hn2-khung-than {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 22px 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.hn2-khung-than[data-con='1'] {
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 36px), transparent);
+  mask-image: linear-gradient(to bottom, black calc(100% - 36px), transparent);
+}
+.hn2-khung-than:focus-visible {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: -2px;
+}
+.hn2-khung-chan {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 2px 22px 8px;
+}
+.hn2-khung-chan .hn2-lien-ket {
+  flex: none;
+  white-space: nowrap;
+}
+.hn2-khung-chan .hn2-phu {
+  min-width: 0;
+}
+.hn2-tieu-de--1dong {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+@media (min-width: 1100px) {
+  .hn2-luoi-a > .hn2-khung {
+    height: 560px;
   }
-  .hn2-em-thong-tin {
-    flex: 1 1 calc(100% - 56px);
+  .hn2-luoi-b > * {
+    height: 340px;
+  }
+}
+@media (max-width: 1099px) {
+  .hn2-khung {
+    max-height: 70vh;
+  }
+  .hn2-luoi-b > * {
+    max-height: 70vh;
+  }
+}
+@container hn2khung (max-width: 419px) {
+  /* thẻ hẹp: bỏ huy hiệu chuông (chỉ để trang trí) + siết chữ tiêu đề để "Việc gấp · chưa nộp bài tập về nhà" vẫn đủ MỘT dòng */
+  .hn2-huy-hieu {
+    display: none;
+  }
+  .hn2-khung-dau .hn2-tieu-de {
+    letter-spacing: 0.04em;
+  }
+  .hn2-em {
+    grid-template-columns: 40px minmax(0, 1fr);
   }
   .hn2-em > .hn2-nut,
-  .hn2-em > .hn2-chip {
-    margin-left: 52px;
+  .hn2-em > .hn2-chip,
+  .hn2-em > .hn2-em-hanh-dong {
+    grid-column: 2;
+    justify-self: end;
   }
-  .hn2-viec-dau .hn2-nut--canh-dam {
-    width: 100%;
+  .hn2-em-hanh-dong {
+    flex-direction: row;
+    width: auto;
   }
+  .hn2-em-hanh-dong .hn2-nut {
+    width: auto;
+  }
+}
+
+.hn2-khung-chan--nut {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: 8px 22px 16px;
+}
+.hn2-luoi-b > .hn2-the--chua {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.hn2-luoi-b > .hn2-the--chua .hn2-nut {
+  align-self: flex-start;
+}
+/* Bộ não A.I · đêm qua (component dùng chung .bnao): trong hàng B thành khung cuộn, đầu dính, tiêu đề MỘT dòng, trạng thái ở dòng phụ */
+.hn2-luoi-b > .bnao {
+  gap: 12px;
+  padding-top: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.hn2-luoi-b > .bnao > .bnao-dau {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  flex-wrap: nowrap;
+  padding: 18px 0 8px;
+  background: var(--m3-surface-container-lowest);
+}
+.hn2-luoi-b > .bnao .bnao-tieu-de {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.hn2-luoi-b > .bnao .bnao-dau-chu {
+  min-width: 0;
+}
+
+/* Điện thoại: đặt SAU các luật gốc (luật cùng độ ưu tiên thì cái viết sau thắng) */
+@media (max-width: 719px) {
   .hn2-bai {
     padding: 12px 14px;
   }
-  .hn2-viec-gap {
-    padding: 18px 16px;
-  }
   .hn2-chao {
     font-size: 26px;
-  }
-  .hn2-dang-ds {
-    padding-left: 0;
-  }
-  .hn2-em-hanh-dong .hn2-nut {
-    flex: 1 1 auto;
   }
   .hn2-chieu {
     padding: 20px 16px;

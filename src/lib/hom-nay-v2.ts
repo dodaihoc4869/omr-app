@@ -2,6 +2,7 @@
  *
  *  Nói thật: mọi con số hiện trên màn đến từ dữ liệu thật của máy chủ; chưa có lệnh ⇒ MỘT câu nói thật, KHÔNG giả số, KHÔNG giả "đã gửi". Không kết luận năng lực từ điểm. */
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
+import { gioPhutVN, ngayVN } from './em-toan-canh'
 import { gioDayDu } from './ngay-gio-24'
 import type { DongTheoDoiBtvn } from './btvn-may-chu-moi'
 import { nhomBtvn, type NhomBtvn } from './nhom-btvn'
@@ -173,8 +174,8 @@ export async function guiCanhBaoNopBai(maBtvn: string, dsSbd: string[], loiNhan:
   const r = await goiLenh(
     '/gv/canh-bao-nop-bai',
     { maBtvn, dsSbd, loiNhan },
-    'Máy chủ chưa có lệnh Gửi cảnh báo — chưa gửi gì cho em và phụ huynh.',
-    'Máy chủ trả lời chậm — CHƯA CHẮC đã gửi cảnh báo. Mở lại màn Hôm nay để xem trạng thái thật (đừng bấm gửi lại ngay).',
+    'Máy chủ chưa có lệnh Nhắc ngay — chưa nhắc gì cho em và phụ huynh.',
+    'Máy chủ trả lời chậm — CHƯA CHẮC đã nhắc. Mở lại màn Hôm nay để xem trạng thái thật (đừng bấm Nhắc ngay lần nữa).',
   )
   if (!r.ok) return r
   const g = r.du.daGui
@@ -322,4 +323,104 @@ export function docVinhDanh(j: Record<string, unknown>): VinhDanhNgay {
 export async function layVinhDanhNgay(): Promise<KetQuaLenh<VinhDanhNgay>> {
   const r = await goiLenh('/gv/vinh-danh-ngay', {}, 'Máy chủ chưa có lệnh vinh danh theo ngày.')
   return r.ok ? { ok: true, du: docVinhDanh(r.du) } : r
+}
+
+
+// ─────────────────────────────── TỰ ĐỘNG NHẮC (thầy lệnh 21/09: máy chủ tự gửi, thầy chỉ xem) ───────────────────────────────
+// Nguồn: `/gv/chua-nop` (hợp đồng Code 3; dạng trường ĐỀ NGHỊ, chờ chốt): top-level `tuDong {bat, lanKe?}` · `homNay {soEm, soPhuHuynh}` · mỗi em `daNhac[{moc, luc, emDaXem, phDaXem|null}]` + `nhacKe {moc, luc}`.
+// Trường nào thiếu ⇒ ẩn phần đó, KHÔNG bịa; lệnh chưa có ⇒ ô Việc gấp nói thật "chưa có thông tin tự động nhắc" và vẫn hiện danh sách từ `/btvn/theo-doi`.
+
+export interface DaNhac {
+  moc: string
+  luc: string
+  emDaXem: boolean
+  /** null = mốc ấy không gửi phụ huynh. */
+  phDaXem: boolean | null
+}
+export interface NhacCuaEm {
+  daNhac: DaNhac[]
+  nhacKe: { moc: string; luc: string } | null
+}
+export interface TuDongNhac {
+  bat: boolean | null
+  lanKe: string
+  homNay: { soEm: number; soPhuHuynh: number } | null
+  /** Khoá `maBtvn|sbd`. */
+  theoEm: Record<string, NhacCuaEm>
+}
+
+export const khoaNhac = (maBtvn: string, sbd: string) => `${maBtvn}|${sbd}`
+
+export function docTuDongNhac(j: Record<string, unknown>): TuDongNhac {
+  const td = j.tuDong && typeof j.tuDong === 'object' ? (j.tuDong as Record<string, unknown>) : null
+  const hn = j.homNay && typeof j.homNay === 'object' ? (j.homNay as Record<string, unknown>) : null
+  const theoEm: Record<string, NhacCuaEm> = {}
+  for (const b of Array.isArray(j.bai) ? (j.bai as Record<string, unknown>[]) : []) {
+    for (const e of Array.isArray(b?.em) ? (b.em as Record<string, unknown>[]) : []) {
+      if (!chu(b.maBtvn) || !chu(e?.sbd)) continue
+      const daNhac: DaNhac[] = (Array.isArray(e.daNhac) ? (e.daNhac as Record<string, unknown>[]) : [])
+        .filter((d) => d && chu(d.luc))
+        .map((d) => ({ moc: chu(d.moc), luc: chu(d.luc), emDaXem: d.emDaXem === true, phDaXem: typeof d.phDaXem === 'boolean' ? d.phDaXem : null }))
+        .sort((a, c) => Date.parse(a.luc) - Date.parse(c.luc))
+      const nk = e.nhacKe && typeof e.nhacKe === 'object' ? (e.nhacKe as Record<string, unknown>) : null
+      theoEm[khoaNhac(chu(b.maBtvn), chu(e.sbd))] = { daNhac, nhacKe: nk && chu(nk.luc) ? { moc: chu(nk.moc), luc: chu(nk.luc) } : null }
+    }
+  }
+  return {
+    bat: td && typeof td.bat === 'boolean' ? td.bat : null,
+    lanKe: td ? chu(td.lanKe) : '',
+    homNay: hn && so(hn.soEm) != null && so(hn.soPhuHuynh) != null ? { soEm: so(hn.soEm)!, soPhuHuynh: so(hn.soPhuHuynh)! } : null,
+    theoEm,
+  }
+}
+
+/** Trạng thái tự động nhắc + dải từng em (lệnh thầy CHỈ ĐỌC `/gv/chua-nop`). 404 ⇒ lời thật. */
+export async function layTuDongNhac(): Promise<KetQuaLenh<TuDongNhac>> {
+  const r = await goiLenh('/gv/chua-nop', {}, 'Máy chủ chưa báo trạng thái tự động nhắc.')
+  return r.ok ? { ok: true, du: docTuDongNhac(r.du) } : r
+}
+
+/** Dải trạng thái MỘT em: "Đã tự nhắc 20:00 · em đã xem · phụ huynh chưa xem" / "Sẽ nhắc 20:00". Không có gì ⇒ null. */
+export function daiNhacCuaEm(n: NhacCuaEm | undefined, nayMs: number): { chu: string; vai: 'da' | 'ke' } | null {
+  if (!n) return null
+  const cuoi = n.daNhac[n.daNhac.length - 1]
+  if (cuoi) {
+    const ph = cuoi.phDaXem === null ? '' : ` · phụ huynh ${cuoi.phDaXem ? 'đã xem' : 'chưa xem'}`
+    return { chu: `Đã tự nhắc ${gioPhutVN(cuoi.luc)} · em ${cuoi.emDaXem ? 'đã xem' : 'chưa xem'}${ph}`, vai: 'da' }
+  }
+  if (n.nhacKe && Date.parse(n.nhacKe.luc) > nayMs - 60000) return { chu: `Sẽ nhắc ${gioPhutVN(n.nhacKe.luc)}`, vai: 'ke' }
+  return null
+}
+
+/** Mốc tự động kế tiếp: `lanKe` của máy chủ, không có thì mốc `nhacKe` sớm nhất chưa qua trong các em đang hiện. */
+export function lanKeTuDong(td: TuDongNhac, nayMs: number): string {
+  if (td.lanKe && Date.parse(td.lanKe) > nayMs - 60000) return td.lanKe
+  const ms = Object.values(td.theoEm)
+    .map((n) => (n.nhacKe ? Date.parse(n.nhacKe.luc) : NaN))
+    .filter((m) => Number.isFinite(m) && m > nayMs - 60000)
+  return ms.length ? new Date(Math.min(...ms)).toISOString() : ''
+}
+
+/** "Tự động nhắc: ĐANG BẬT · lượt kế 20:00" (bật) · "ĐANG TẮT" · máy chủ chưa báo cờ ⇒ nói thật. */
+export function chuTuDongNhac(td: TuDongNhac, nayMs: number): string {
+  if (td.bat === true) {
+    const ke = lanKeTuDong(td, nayMs)
+    return `Tự động nhắc: ĐANG BẬT${ke ? ` · lượt kế ${gioPhutVN(ke)}` : ''}`
+  }
+  if (td.bat === false) return 'Tự động nhắc: ĐANG TẮT'
+  return 'Tự động nhắc: máy chủ chưa báo đang bật hay tắt'
+}
+
+/** "Hôm nay đã tự nhắc 12 em · 5 phụ huynh": số máy chủ trả (`homNay`); thiếu ⇒ đếm từ các em đang hiện (ghi rõ là số trong danh sách). null nếu không có gì để nói. */
+export function demTuNhacHomNay(td: TuDongNhac, nayMs: number): { soEm: number; soPhuHuynh: number; tuDanhSach: boolean } | null {
+  if (td.homNay) return { ...td.homNay, tuDanhSach: false }
+  const hn = ngayVN(nayMs)
+  let em = 0
+  let ph = 0
+  for (const n of Object.values(td.theoEm)) {
+    const homNay = n.daNhac.filter((d) => ngayVN(d.luc) === hn)
+    if (homNay.length) em++
+    if (homNay.some((d) => d.phDaXem !== null)) ph++
+  }
+  return em > 0 ? { soEm: em, soPhuHuynh: ph, tuDanhSach: true } : null
 }

@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Info, Minus, TrendingDown, TrendingUp } from 'lucide-react'
+import { ChevronRight, Info, Minus, TrendingDown, TrendingUp } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import { cauLyDo, hanhDongCua, NHAN_HANH_DONG, type HomNay, type HomNayEm } from '../../lib/hom-nay-api'
 import { layCanGiup, lyDoCanGiup, TEN_BAC_DANG, TEN_XU_HUONG, type CanGiup, type DangCanGiup, type EmCanGiup as EmCG } from '../../lib/hom-nay-v2'
 import type { KetQuaLenh } from '../../lib/goi-lenh-thay'
+import KhungCuon from './KhungCuon'
 import '../../styles/hom-nay-v2.css'
-
-const SO_EM_GON = 4
 
 const chuCai = (hoTen: string) => hoTen.trim().split(/\s+/).pop()?.[0]?.toUpperCase() ?? '?'
 const mauChu = (lyDo: EmCG['lyDo']) => (lyDo === 'tre_nhip' ? 'chua_mo' : lyDo === 'tut_bac' ? 'do' : 'xanh')
@@ -63,7 +62,6 @@ export default function EmCanGiup({
   const [kq, setKq] = useState<KetQuaLenh<CanGiup> | undefined>(undefined)
   /** Bản KHÔNG lọc lớp: lấy tên lớp + số em từng lớp cho thanh chọn lớp (lọc rồi vẫn giữ đủ nút lớp). */
   const [goc, setGoc] = useState<CanGiup | null>(null)
-  const [xemHet, setXemHet] = useState(false)
 
   useEffect(() => {
     let con = true
@@ -92,83 +90,84 @@ export default function EmCanGiup({
   }
 
   const chiTiet = kq?.ok ? kq.du : null
-  const hienThi = chiTiet ? (xemHet ? chiTiet.ds : chiTiet.ds.slice(0, SO_EM_GON)) : []
   const soTong = chiTiet?.tong ?? rutGon?.tong
+  const dangHien = chiTiet?.ds.length ?? rutGon?.ds.length ?? 0
+  const conNhieu = soTong != null && soTong > dangHien
 
   return (
-    <section className="hn2-the" aria-labelledby="hn2-giup" data-khoi="em-can-giup">
-      <div className="hn2-em-dau">
-        <h2 id="hn2-giup" className="hn2-tieu-de">
-          Em cần thầy giúp hôm nay
-        </h2>
-        {soTong != null && <span className="hn2-em-tong">{soTong} em</span>}
+    <section className="hn2-the hn2-khung" aria-labelledby="hn2-giup" data-khoi="em-can-giup">
+      <div className="hn2-khung-dau">
+        <div className="hn2-em-dau">
+          <h2 id="hn2-giup" className="hn2-tieu-de hn2-tieu-de--1dong" title="Em cần thầy giúp hôm nay">
+            Em cần thầy giúp hôm nay
+          </h2>
+          {soTong != null && <span className="hn2-em-tong">{soTong} em</span>}
+        </div>
+        {goc && goc.lop.length > 1 && (
+          <div className="hn2-loc-lop" role="group" aria-label="Lọc theo lớp">
+            {['', ...goc.lop].map((l) => (
+              <button key={l || 'tat-ca'} type="button" className="hn2-loc" aria-pressed={lop === l} onClick={() => setLop(l)}>
+                {l || 'Tất cả'}
+                {l && dem ? ` · ${dem[l] ?? 0}` : ''}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {goc && goc.lop.length > 1 && (
-        <div className="hn2-loc-lop" role="group" aria-label="Lọc theo lớp">
-          {['', ...goc.lop].map((l) => (
-            <button key={l || 'tat-ca'} type="button" className="hn2-loc" aria-pressed={lop === l} onClick={() => (setLop(l), setXemHet(false))}>
-              {l || 'Tất cả'}
-              {l && dem ? ` · ${dem[l] ?? 0}` : ''}
-            </button>
-          ))}
-        </div>
-      )}
+      <KhungCuon nhan="Danh sách em cần thầy giúp">
+        {kq === undefined && <p className="hn2-trong">Đang tải…</p>}
 
-      {kq === undefined && <p className="hn2-trong">Đang tải…</p>}
+        {kq && !kq.ok && (
+          <>
+            <p className={`hn2-ghi-chu${kq.loai === 'chua_co_lenh' ? '' : ' hn2-ghi-chu--canh'}`} role={kq.loai === 'chua_co_lenh' ? 'status' : 'alert'}>
+              <Info size={16} aria-hidden="true" />
+              <span>{kq.chu}</span>
+            </p>
+            <DanhSachRutGon rutGon={rutGon} dangTai={dangTaiRutGon} lyDo={lyDoRutGon} onMoHoSo={onMoHoSo} />
+          </>
+        )}
 
-      {kq && !kq.ok && (
-        <>
-          <p className={`hn2-ghi-chu${kq.loai === 'chua_co_lenh' ? '' : ' hn2-ghi-chu--canh'}`} role={kq.loai === 'chua_co_lenh' ? 'status' : 'alert'}>
-            <Info size={16} aria-hidden="true" />
-            <span>{kq.chu}</span>
-          </p>
-          <DanhSachRutGon rutGon={rutGon} dangTai={dangTaiRutGon} lyDo={lyDoRutGon} onMoHoSo={onMoHoSo} />
-        </>
-      )}
+        {chiTiet && chiTiet.ds.length === 0 && <p className="hn2-trong">{lop ? `Lớp ${lop} hôm nay không có em nào cần thầy giúp.` : 'Hôm nay không có em nào cần thầy giúp.'}</p>}
 
-      {chiTiet && chiTiet.ds.length === 0 && <p className="hn2-trong">{lop ? `Lớp ${lop} hôm nay không có em nào cần thầy giúp.` : 'Hôm nay không có em nào cần thầy giúp.'}</p>}
-
-      {hienThi.map((e) => (
-        <div className="hn2-em hn2-em--dang" key={e.sbd} data-sbd={e.sbd}>
-          <span className={`hn2-em-chu hn2-em-chu--${mauChu(e.lyDo)}`} aria-hidden="true">
-            {chuCai(e.hoTen)}
-          </span>
-          <div className="hn2-em-thong-tin">
-            <button type="button" className="hn2-em-ten hn2-em-ten--nut" onClick={() => onMoEm(e.sbd)} aria-label={`${e.hoTen} · ${e.lop} — mở toàn cảnh`}>
-              {e.hoTen} <span className="hn2-em-lop">· {e.lop}</span>
-            </button>
-            <span className="hn2-em-tt">{lyDoCanGiup(e)}</span>
-          </div>
-          {e.dang.length > 0 && (
-            <div className="hn2-dang-ds">
-              {e.dang.map((d) => (
-                <DongDang key={d.ma || d.ten} d={d} />
-              ))}
-              {e.ngayTre != null && e.lyDo !== 'tre_nhip' && <span className="hn2-em-tre">trễ nhịp {e.ngayTre} ngày</span>}
+        {chiTiet?.ds.map((e) => (
+          <div className="hn2-em hn2-em--dang" key={e.sbd} data-sbd={e.sbd}>
+            <span className={`hn2-em-chu hn2-em-chu--${mauChu(e.lyDo)}`} aria-hidden="true">
+              {chuCai(e.hoTen)}
+            </span>
+            <div className="hn2-em-thong-tin">
+              <button type="button" className="hn2-em-ten hn2-em-ten--nut" title={e.hoTen} onClick={() => onMoEm(e.sbd)} aria-label={`${e.hoTen} · ${e.lop} — mở toàn cảnh`}>
+                {e.hoTen} <span className="hn2-em-lop">· {e.lop}</span>
+              </button>
+              <span className="hn2-em-tt">{lyDoCanGiup(e)}</span>
+              {e.dang.length > 0 && (
+                <div className="hn2-dang-ds">
+                  {e.dang.map((d) => (
+                    <DongDang key={d.ma || d.ten} d={d} />
+                  ))}
+                  {e.ngayTre != null && e.lyDo !== 'tre_nhip' && <span className="hn2-em-tre hn2-nw">trễ nhịp {e.ngayTre} ngày</span>}
+                </div>
+              )}
             </div>
-          )}
-          <div className="hn2-em-hanh-dong">
-            <button type="button" className="hn2-nut hn2-nut--vien hn2-nut--nho" onClick={() => setScreen('goilenbang')}>
-              Đưa vào buổi chữa
-            </button>
-            <button type="button" className="hn2-nut hn2-nut--vien hn2-nut--nho" onClick={() => giaoRieng(e.sbd)}>
-              Giao bài riêng
-            </button>
+            <div className="hn2-em-hanh-dong">
+              <button type="button" className="hn2-nut hn2-nut--vien hn2-nut--nho" onClick={() => setScreen('goilenbang')}>
+                Đưa vào buổi chữa
+              </button>
+              <button type="button" className="hn2-nut hn2-nut--vien hn2-nut--nho" onClick={() => giaoRieng(e.sbd)}>
+                Giao bài riêng
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </KhungCuon>
 
-      {chiTiet && chiTiet.ds.length > SO_EM_GON && (
-        <button type="button" className="hn2-lien-ket" aria-expanded={xemHet} onClick={() => setXemHet((v) => !v)}>
-          {xemHet ? 'Thu gọn' : chiTiet.tong === chiTiet.ds.length ? `Xem cả ${chiTiet.tong} em` : `Xem thêm ${chiTiet.ds.length - SO_EM_GON} em`}
-        </button>
-      )}
-      {chiTiet && chiTiet.tong > chiTiet.ds.length && (
+      <div className="hn2-khung-chan">
+        <span className="hn2-phu">{conNhieu ? `Đang hiện ${dangHien} em đầu` : ''}</span>
         <button type="button" className="hn2-lien-ket" onClick={() => setScreen('hocsinh')}>
-          Xem cả {chiTiet.tong} em ở màn Học sinh
+          {conNhieu ? `Xem cả ${soTong} em` : 'Xem tất cả'}
+          <ChevronRight size={16} aria-hidden="true" />
         </button>
-      )}
+      </div>
     </section>
   )
 }
@@ -207,11 +206,6 @@ function DanhSachRutGon({
           </button>
         </div>
       ))}
-      {rutGon.tong > rutGon.ds.length && (
-        <button type="button" className="hn2-lien-ket" onClick={() => setScreen('hocsinh')}>
-          Xem cả {rutGon.tong} em
-        </button>
-      )}
     </>
   )
 }

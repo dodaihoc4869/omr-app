@@ -95,7 +95,7 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
     useAppStore.setState({ screen: 'classlist', sbdGiaoRieng: '' } as never)
   })
 
-  it('CÓ DỮ LIỆU: tổng em · từng em một lý do bằng số · từng dạng "sai x/y câu" + "bậc …" + "đang giảm/đang lên/giữ nguyên 7 ngày" · chỉ 4 em đầu', async () => {
+  it('CÓ DỮ LIỆU: tổng em · từng em một lý do bằng số · từng dạng "sai x/y câu" + "bậc …" + "đang giảm/đang lên/giữ nguyên 7 ngày" · MỌI em nằm trong khung cuộn (không cắt 4 em nữa)', async () => {
     const { container } = dung({ canGiup: luoc })
     await screen.findByText('Trần Thu Hà')
     expect(container.querySelector('.hn2-em-tong')!.textContent).toBe('5 em')
@@ -113,12 +113,15 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
     expect(within(bao).getByText('đang lên 7 ngày')).toBeTruthy()
     // em không có dạng nào ⇒ không dựng khối dạng rỗng
     expect(container.querySelector('[data-sbd="3"] .hn2-dang-ds')).toBeNull()
-    // 4 em đầu; em thứ 5 ẩn tới khi bấm "Xem cả 5 em"
-    expect(container.querySelector('[data-sbd="5"]')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Xem cả 5 em' }))
+    // 21/09 (thầy lệnh khung cuộn): không còn cắt 4 em + nút mở rộng — cả 5 em nằm trong khung cuộn có tên, chân ô có "Xem tất cả" ⇒ màn Học sinh
     expect(container.querySelector('[data-sbd="5"]')).not.toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Thu gọn' }))
-    expect(container.querySelector('[data-sbd="5"]')).toBeNull()
+    const khung = container.querySelector('.hn2-khung-than') as HTMLElement
+    expect(khung.getAttribute('role')).toBe('region')
+    expect(khung.getAttribute('aria-label')).toBe('Danh sách em cần thầy giúp')
+    expect(khung.getAttribute('tabindex')).toBe('0') // cuộn được bằng bàn phím
+    expect(container.querySelector('.hn2-khung-dau')!.contains(khung)).toBe(false) // đầu ô NGOÀI khung cuộn ⇒ dính
+    fireEvent.click(screen.getByRole('button', { name: 'Xem tất cả' }))
+    expect(useAppStore.getState().screen).toBe('hocsinh')
   })
 
   it('CHỮ theo chuẩn: không "xấu đi", "khá lên", "yếu kém", "tệ", "lười"', async () => {
@@ -161,14 +164,14 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
     await screen.findByText('Lớp 11B1 hôm nay không có em nào cần thầy giúp.')
   })
 
-  it('MÁY CHỦ CẮT BỚT (tổng > số em trả về): không đếm số em từng lớp (sẽ sai) · nút "Xem thêm" + liên kết sang màn Học sinh', async () => {
+  it('MÁY CHỦ CẮT BỚT (tổng > số em trả về): không đếm số em từng lớp (sẽ sai) · chân ô nói "Đang hiện 5 em đầu" + "Xem cả 17 em" ⇒ màn Học sinh', async () => {
     dungMayChu({ '/gv/can-giup': () => ({ json: { ok: true, tong: 17, lop: ['12A1', '12A2'], ds: NGUOI } }) })
     const { container } = render(<EmCanGiup rutGon={null} dangTaiRutGon={false} lyDoRutGon="" onMoEm={() => {}} onMoHoSo={() => {}} />)
     await screen.findByText('Trần Thu Hà')
     expect(container.querySelector('.hn2-em-tong')!.textContent).toBe('17 em')
     expect(within(screen.getByRole('group', { name: 'Lọc theo lớp' })).getAllByRole('button').map((b) => b.textContent)).toEqual(['Tất cả', '12A1', '12A2'])
-    expect(screen.getByRole('button', { name: 'Xem thêm 1 em' })).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Xem cả 17 em ở màn Học sinh' }))
+    expect(container.querySelector('.hn2-khung-chan .hn2-phu')!.textContent).toBe('Đang hiện 5 em đầu')
+    fireEvent.click(screen.getByRole('button', { name: 'Xem cả 17 em' }))
     expect(useAppStore.getState().screen).toBe('hocsinh')
   })
 
@@ -181,7 +184,7 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
     expect(container.querySelector('.hn2-em-tong')!.textContent).toBe('2 em')
     fireEvent.click(screen.getByRole('button', { name: 'Xem hồ sơ' }))
     expect(moHoSo).toHaveBeenCalledWith('9') // danh sách rút gọn cũ: "Xem hồ sơ" ⇒ hồ sơ ở màn Học sinh (KHÔNG phải Toàn cảnh)
-    fireEvent.click(screen.getByRole('button', { name: 'Xem cả 2 em' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Xem cả 2 em' })) // rút gọn cũ: máy chủ cắt bớt (tổng 2 > 1 em hiện) ⇒ chân ô nói "Xem cả 2 em"
     expect(useAppStore.getState().screen).toBe('hocsinh')
   })
 

@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import ViecGap from '../src/components/hom-nay/ViecGap'
 import OTraCuu from '../src/components/hom-nay/OTraCuu'
 import { useAppStore } from '../src/store/appStore'
-import { baiViecGap, boDau, conLaiChu, hanNopChu, layBtvnDangChay, loiCanhBaoMacDinh, timEm, tongChuaNop, trangThaiChuaNop } from '../src/lib/hom-nay-v2'
+import { baiViecGap, boDau, chuTuDongNhac, conLaiChu, daiNhacCuaEm, demTuNhacHomNay, docTuDongNhac, hanNopChu, lanKeTuDong, layBtvnDangChay, layTuDongNhac, loiCanhBaoMacDinh, timEm, tongChuaNop, trangThaiChuaNop } from '../src/lib/hom-nay-v2'
 import type { DongTheoDoiBtvn } from '../src/lib/btvn-may-chu-moi'
 
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }) }))
@@ -175,7 +175,7 @@ describe('ViecGap — ô VIỆC GẤP (chưa nộp bài tập về nhà)', () =>
     return container
   }
 
-  it('CÓ DỮ LIỆU: "3 em" chưa nộp · hạn nộp "HH:mm · Thứ … dd/mm/yyyy (còn …)" · đã nộp 3/6 · thanh tiến độ · mỗi em MỘT trạng thái thật + nút Gửi cảnh báo · nút gộp', async () => {
+  it('CÓ DỮ LIỆU: "3 em" chưa nộp · hạn nộp "HH:mm · Thứ … dd/mm/yyyy (còn …)" · đã nộp 3/6 · thanh tiến độ · mỗi em MỘT trạng thái thật + nút nhỏ "Nhắc ngay" · KHÔNG còn nút đỏ lớn (thầy lệnh 21/09: máy chủ tự nhắc)', async () => {
     const c = await chay(() => ({ json: { ok: true, ds: ds() } }))
     expect(c.querySelector('.hn2-so-to')!.textContent).toBe('3 em')
     expect(c.textContent).toContain('chưa nộp · 1 bài đang chạy')
@@ -184,9 +184,10 @@ describe('ViecGap — ô VIỆC GẤP (chưa nộp bài tập về nhà)', () =>
     expect((c.querySelector('.hn2-thanh i') as HTMLElement).style.width).toBe('50%')
     const dong = [...c.querySelectorAll('.hn2-em')].map((d) => d.querySelector('.hn2-em-tt')!.textContent)
     expect(dong).toEqual(['Chưa mở bài', 'Dở chặng 2 trong 7 chặng · đã xong 1 chặng', 'Dở chặng 6 trong 7 chặng · đã xong 5 chặng'])
-    expect(screen.getAllByRole('button', { name: /^Gửi cảnh báo cho / })).toHaveLength(3)
-    expect(screen.getByRole('button', { name: 'Gửi cảnh báo cả 3 em' })).toBeTruthy()
-    expect(c.textContent).toContain('Chỉ thầy bấm mới gửi')
+    expect(screen.getAllByRole('button', { name: /^Nhắc ngay cho / })).toHaveLength(3)
+    expect(screen.getByRole('button', { name: 'Nhắc ngay cả 3' })).toBeTruthy() // liên kết nhỏ ở chân bài
+    expect(c.querySelector('.hn2-nut--canh-dam')).toBeNull() // bỏ nút đỏ lớn
+    expect(c.textContent).not.toMatch(/Gửi cảnh báo|Chỉ thầy bấm mới gửi/)
     expect(c.textContent).not.toMatch(/nắm chắc|lười|yếu kém/i)
   })
 
@@ -204,66 +205,205 @@ describe('ViecGap — ô VIỆC GẤP (chưa nộp bài tập về nhà)', () =>
     expect(document.body.textContent).toContain('—') // số to là "—", không bịa 0
   })
 
-  it('GỬI CẢNH BÁO một em: hộp hỏi với lời mặc định (sửa được); "Không gửi" ⇒ không gọi máy chủ; máy chủ chưa có lệnh ⇒ lời thật, KHÔNG "đã gửi"', async () => {
+  it('NHẮC NGAY một em: hộp hỏi với lời mặc định (sửa được); "Không nhắc" ⇒ không gọi máy chủ; máy chủ chưa có lệnh ⇒ lời thật, KHÔNG "đã nhắc"', async () => {
     await chay(() => ({ json: { ok: true, ds: ds() } })) // chưa có /gv/canh-bao-nop-bai ⇒ 404
-    fireEvent.click(screen.getByRole('button', { name: 'Gửi cảnh báo cho Nguyễn Minh Khôi' }))
-    const hop = screen.getByRole('dialog', { name: 'Gửi cảnh báo nộp bài tập về nhà' })
+    fireEvent.click(screen.getByRole('button', { name: 'Nhắc ngay cho Nguyễn Minh Khôi' }))
+    const hop = screen.getByRole('dialog', { name: 'Nhắc ngay em chưa nộp bài tập về nhà' })
     const o = within(hop).getByLabelText('Lời nhắn (thầy sửa được)') as HTMLTextAreaElement
     expect(o.value).toContain('Thầy nhắc: em chưa nộp bài tập về nhà')
     expect(o.value).toContain('hạn nộp 23:59 · Thứ Hai 21/09/2026')
-    expect(within(hop).getByText('Gửi cảnh báo cho Nguyễn Minh Khôi?')).toBeTruthy()
-    fireEvent.click(within(hop).getByRole('button', { name: 'Không gửi' }))
+    expect(within(hop).getByText('Nhắc ngay Nguyễn Minh Khôi?')).toBeTruthy()
+    fireEvent.click(within(hop).getByRole('button', { name: 'Không nhắc' }))
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(goi.mock.calls.some((x) => x[0] === '/gv/canh-bao-nop-bai')).toBe(false)
-    fireEvent.click(screen.getByRole('button', { name: 'Gửi cảnh báo cho Nguyễn Minh Khôi' }))
-    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Gửi cảnh báo cho 1 em' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nhắc ngay cho Nguyễn Minh Khôi' }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Nhắc ngay 1 em' }))
     const loi = await screen.findByRole('alert')
-    expect(loi.textContent).toBe('Máy chủ chưa có lệnh Gửi cảnh báo — chưa gửi gì cho em và phụ huynh.')
-    expect(document.body.textContent).not.toMatch(/Đã gửi cảnh báo/)
+    expect(loi.textContent).toBe('Máy chủ chưa có lệnh Nhắc ngay — chưa nhắc gì cho em và phụ huynh.')
+    expect(document.body.textContent).not.toMatch(/Đã nhắc/)
     expect(useAppStore.getState().toast).toBeNull()
   })
 
-  it('GỬI THÀNH CÔNG: gọi /gv/canh-bao-nop-bai {maBtvn, dsSbd, loiNhan(đã sửa)}; báo số em máy chủ nói; dòng đổi thành "Đã gửi cảnh báo HH:mm"; nút biến thành chip "Đã gửi"', async () => {
+  it('NHẮC NGAY THÀNH CÔNG: gọi /gv/canh-bao-nop-bai {maBtvn, dsSbd, loiNhan(đã sửa)}; báo số em máy chủ nói; dòng đổi thành "Đã nhắc HH:mm"; nút biến thành chip "Đã nhắc"', async () => {
     const c = await chay(
       () => ({ json: { ok: true, ds: ds() } }),
       () => ({ json: { ok: true, daGui: 1, boQua: [], luc: '2026-09-21T13:15:00Z' } }),
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Gửi cảnh báo cho Lê Hoàng Nam' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nhắc ngay cho Lê Hoàng Nam' }))
     const hop = screen.getByRole('dialog')
     fireEvent.change(within(hop).getByLabelText('Lời nhắn (thầy sửa được)'), { target: { value: 'Em ơi, tối nay nộp giúp thầy nhé.' } })
-    fireEvent.click(within(hop).getByRole('button', { name: 'Gửi cảnh báo cho 1 em' }))
-    await within(hop).findByText(/Đã gửi cảnh báo cho 1 em/)
+    fireEvent.click(within(hop).getByRole('button', { name: 'Nhắc ngay 1 em' }))
+    await within(hop).findByText(/Đã nhắc 1 em/)
     const lan = goi.mock.calls.find((x) => x[0] === '/gv/canh-bao-nop-bai')!
     expect(lan[1]).toEqual({ maBtvn: 'B1', dsSbd: ['2'], loiNhan: 'Em ơi, tối nay nộp giúp thầy nhé.' })
     expect((lan[2] as Record<string, string>)['x-ma-bi-mat']).toBe('mat-thu')
     fireEvent.click(within(hop).getByRole('button', { name: 'Đóng' }))
     const dong = c.querySelector('[data-sbd="2"]')!
-    expect(dong.textContent).toContain('Đã gửi cảnh báo 20:15') // giờ máy chủ trả (13:15Z = 20:15 VN)
-    expect(within(dong as HTMLElement).queryByRole('button', { name: /Gửi cảnh báo cho/ })).toBeNull()
-    expect(useAppStore.getState().toast?.text).toBe('Đã gửi cảnh báo cho 1 em.')
+    expect(dong.textContent).toContain('Đã nhắc 20:15') // giờ máy chủ trả (13:15Z = 20:15 VN)
+    expect(within(dong as HTMLElement).queryByRole('button', { name: /Nhắc ngay cho/ })).toBeNull()
+    expect(useAppStore.getState().toast?.text).toBe('Đã nhắc 1 em.')
   })
 
-  it('GỬI CẢ 3 EM: một lệnh cho mỗi dòng bài; em bị bỏ qua (trần 1 lần/ngày) hiện lý do máy chủ và KHÔNG bị đánh dấu "đã gửi"; quá hạn chờ ⇒ "CHƯA CHẮC"', async () => {
+  it('NHẮC NGAY CẢ 3 EM: một lệnh cho mỗi dòng bài; em bị bỏ qua (trần 1 lần/ngày) hiện lý do máy chủ và KHÔNG bị đánh dấu "đã nhắc"; quá hạn chờ ⇒ "CHƯA CHẮC"', async () => {
     const c = await chay(
       () => ({ json: { ok: true, ds: ds() } }),
       (b) => ({ json: { ok: true, daGui: (b.dsSbd as string[]).length - 1, boQua: [{ sbd: '1', lyDo: 'đã cảnh báo hôm nay' }], luc: '' } }),
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Gửi cảnh báo cả 3 em' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Nhắc ngay cả 3' }))
     const hop = screen.getByRole('dialog')
-    fireEvent.click(within(hop).getByRole('button', { name: 'Gửi cảnh báo cho 3 em' }))
+    fireEvent.click(within(hop).getByRole('button', { name: 'Nhắc ngay 3 em' }))
     await within(hop).findByText(/Bỏ qua 1 em: 1: đã cảnh báo hôm nay/)
     expect(goi.mock.calls.filter((x) => x[0] === '/gv/canh-bao-nop-bai')).toHaveLength(1)
     fireEvent.click(within(hop).getByRole('button', { name: 'Đóng' }))
-    expect(c.querySelector('[data-sbd="1"]')!.textContent).not.toContain('Đã gửi cảnh báo')
-    expect(c.querySelector('[data-sbd="2"]')!.textContent).toContain('Đã gửi cảnh báo')
+    expect(c.querySelector('[data-sbd="1"]')!.textContent).not.toContain('Đã nhắc')
+    expect(c.querySelector('[data-sbd="2"]')!.textContent).toContain('Đã nhắc')
     cleanup()
     await chay(
       () => ({ json: { ok: true, ds: ds() } }),
       () => ({ cham: true }),
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Gửi cảnh báo cho Vũ Đức An' }))
-    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Gửi cảnh báo cho 1 em' }))
-    expect((await screen.findByRole('alert')).textContent).toContain('CHƯA CHẮC đã gửi cảnh báo')
+    fireEvent.click(screen.getByRole('button', { name: 'Nhắc ngay cho Vũ Đức An' }))
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Nhắc ngay 1 em' }))
+    expect((await screen.findByRole('alert')).textContent).toContain('CHƯA CHẮC đã nhắc')
+  })
+})
+
+describe('ViecGap — bản B: khung cuộn + trạng thái TỰ ĐỘNG NHẮC', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(NAY)
+    useAppStore.setState({ classList: [], toast: null } as never)
+  })
+  const ds = () => [
+    bai({ maBtvn: 'B1', caNhan: true, tong: 3, daNop: 0 }, [em({ sbd: '1', hoTen: 'Nguyễn Minh Khôi', soCauCuaEm: null }), em({ sbd: '2', hoTen: 'Lê Hoàng Nam', soCauCuaEm: 46, soChang: 7, loDaXong: 1 }), em({ sbd: '3', hoTen: 'Vũ Đức An', soCauCuaEm: 46, soChang: 7, loDaXong: 5 })]),
+  ]
+  const CHUA_NOP = {
+    ok: true,
+    tuDong: { bat: true, lanKe: '2026-09-21T14:00:00Z' },
+    homNay: { soEm: 12, soPhuHuynh: 5 },
+    bai: [{ maBtvn: 'B1', em: [
+      { sbd: '1', daNhac: [{ moc: 'M2', luc: '2026-09-21T13:00:00Z', emDaXem: true, phDaXem: false }] },
+      { sbd: '2', nhacKe: { moc: 'M3', luc: '2026-09-21T14:00:00Z' } },
+    ] }],
+  }
+  const chay = async (tuDong?: () => Tra) => {
+    dungMayChu({ '/btvn/theo-doi': () => ({ json: { ok: true, ds: ds() } }), ...(tuDong ? { '/gv/chua-nop': tuDong } : {}) })
+    const r = render(<ViecGap />)
+    await waitFor(() => expect(r.container.querySelector('[data-khoi="viec-gap"] .hn2-so-to')!.textContent).toBe('3 em'))
+    return r.container
+  }
+
+  it('CÓ TRẠNG THÁI: "Tự động nhắc: ĐANG BẬT · lượt kế 21:00" + "Hôm nay đã tự nhắc 12 em · 5 phụ huynh"; mỗi em một dải ("Đã tự nhắc 20:00 · em đã xem · phụ huynh chưa xem" / "Sẽ nhắc 21:00"); em không có gì ⇒ không dải', async () => {
+    const c = await chay(() => ({ json: CHUA_NOP }))
+    const dong = await waitFor(() => {
+      const el = c.querySelector('[data-khoi="tu-dong"]')
+      expect(el).toBeTruthy()
+      return el as HTMLElement
+    })
+    expect(dong.textContent).toBe('Tự động nhắc: ĐANG BẬT · lượt kế 21:00 · Hôm nay đã tự nhắc 12 em · 5 phụ huynh')
+    expect(c.querySelector('[data-sbd="1"] .hn2-em-dai')!.textContent).toBe('Đã tự nhắc 20:00 · em đã xem · phụ huynh chưa xem')
+    expect(c.querySelector('[data-sbd="2"] .hn2-em-dai')!.textContent).toBe('Sẽ nhắc 21:00')
+    expect(c.querySelector('[data-sbd="3"] .hn2-em-dai')).toBeNull()
+    // nút tay chỉ là "Nhắc ngay" nhỏ; không còn nút đỏ lớn / chữ "Chỉ thầy bấm mới gửi"
+    expect(c.querySelector('.hn2-nut--canh-dam')).toBeNull()
+    expect(c.textContent).not.toMatch(/Gửi cảnh báo|Chỉ thầy bấm mới gửi/)
+  })
+
+  it('MÁY CHỦ CHƯA CÓ TRẠNG THÁI (404): nói thật "Máy chủ chưa báo trạng thái tự động nhắc." — danh sách em vẫn hiện, không dải, không nói "đang bật"', async () => {
+    const c = await chay()
+    const dong = await waitFor(() => {
+      const el = c.querySelector('[data-khoi="tu-dong"]')
+      expect(el).toBeTruthy()
+      return el as HTMLElement
+    })
+    expect(dong.textContent).toBe('Máy chủ chưa báo trạng thái tự động nhắc.')
+    expect(c.textContent).not.toContain('ĐANG BẬT')
+    expect(c.querySelectorAll('.hn2-em')).toHaveLength(3)
+    expect(c.querySelector('.hn2-em-dai')).toBeNull()
+  })
+
+  it('CỜ TẮT: "ĐANG TẮT" (không giả bật); thiếu số hôm nay ⇒ đếm trong danh sách và ghi rõ', async () => {
+    const c = await chay(() => ({ json: { ...CHUA_NOP, tuDong: { bat: false }, homNay: undefined } }))
+    const dong = await waitFor(() => {
+      const el = c.querySelector('[data-khoi="tu-dong"]')
+      expect(el).toBeTruthy()
+      return el as HTMLElement
+    })
+    expect(dong.textContent).toContain('Tự động nhắc: ĐANG TẮT')
+    expect(dong.textContent).toContain('Hôm nay đã tự nhắc 1 em · 1 phụ huynh (trong danh sách này)')
+  })
+
+  it('KHUNG CUỘN: đầu ô (tiêu đề một dòng + số + trạng thái) NẰM NGOÀI khung cuộn; thân là region có tên, focus được; chân ô "Xem tất cả" ⇒ màn Bài tập về nhà; tên em bấm ⇒ Toàn cảnh, cắt "…" có title', async () => {
+    const c = await chay(() => ({ json: CHUA_NOP }))
+    const khung = c.querySelector('.hn2-khung-than') as HTMLElement
+    expect(khung.getAttribute('role')).toBe('region')
+    expect(khung.getAttribute('aria-label')).toBe('Danh sách em chưa nộp bài tập về nhà')
+    expect(khung.getAttribute('tabindex')).toBe('0')
+    const dau = c.querySelector('.hn2-khung-dau') as HTMLElement
+    expect(dau.contains(khung)).toBe(false)
+    expect(dau.querySelector('h2')!.className).toContain('hn2-tieu-de--1dong')
+    expect(dau.querySelector('h2')!.textContent).toBe('Việc gấp · chưa nộp bài tập về nhà')
+    expect(khung.querySelector('.hn2-tieu-de')).toBeNull()
+    expect(c.querySelector('[data-sbd="1"] .hn2-em-ten')!.getAttribute('title')).toBe('Nguyễn Minh Khôi')
+    fireEvent.click(screen.getByRole('button', { name: /Nguyễn Minh Khôi.*mở toàn cảnh/ }))
+    expect([useAppStore.getState().screen, useAppStore.getState().sbdToanCanh]).toEqual(['toancanh', '1'])
+    useAppStore.setState({ screen: 'examhub' } as never)
+    fireEvent.click(screen.getByRole('button', { name: 'Xem tất cả' }))
+    expect(useAppStore.getState().screen).toBe('giaobtvn')
+  })
+})
+
+describe('TỰ ĐỘNG NHẮC (thầy lệnh 21/09: máy chủ tự gửi, thầy chỉ xem) — phần THUẦN', () => {
+  const CHUA_NOP = {
+    ok: true,
+    tuDong: { bat: true, gioTu: '07:00', gioDen: '21:30', lanKe: '2026-09-21T14:00:00Z' }, // 21:00 giờ VN
+    homNay: { soEm: 12, soPhuHuynh: 5 },
+    bai: [{ maBtvn: 'B1', em: [
+      { sbd: '1', daNhac: [{ moc: 'M2', luc: '2026-09-21T13:00:00Z', emDaXem: true, phDaXem: false }, { moc: 'M1', luc: '2026-09-21T02:00:00Z', emDaXem: true, phDaXem: null }] }, // máy chủ trả LỘN THỨ TỰ: app tự xếp theo giờ
+      { sbd: '2', nhacKe: { moc: 'M3', luc: '2026-09-21T14:00:00Z' } },
+      { sbd: '3', daNhac: [{ moc: 'M1', luc: '2026-09-21T02:00:00Z', emDaXem: false, phDaXem: null }] },
+    ] }],
+  }
+  it('docTuDongNhac: cờ, giờ kế, số hôm nay, dải từng em theo (maBtvn, sbd); trường thiếu/sai kiểu ⇒ null/rỗng (không bịa)', () => {
+    const t = docTuDongNhac(CHUA_NOP)
+    expect(t.bat).toBe(true)
+    expect(t.homNay).toEqual({ soEm: 12, soPhuHuynh: 5 })
+    expect(Object.keys(t.theoEm)).toEqual(['B1|1', 'B1|2', 'B1|3'])
+    expect(t.theoEm['B1|1'].daNhac.map((d) => d.moc)).toEqual(['M1', 'M2']) // xếp theo giờ
+    expect(t.theoEm['B1|1'].daNhac[0].phDaXem).toBeNull() // mốc không gửi phụ huynh
+    const rong = docTuDongNhac({ ok: true, tuDong: { bat: 'bật' }, homNay: { soEm: 'nhiều' }, bai: [{ em: [{ sbd: '1' }] }, { maBtvn: 'X', em: [{}] }] })
+    expect(rong).toEqual({ bat: null, lanKe: '', homNay: null, theoEm: {} })
+  })
+
+  it('daiNhacCuaEm: "Đã tự nhắc HH:mm · em đã/chưa xem · phụ huynh đã/chưa xem" (mốc mới nhất; mốc không gửi phụ huynh ⇒ bỏ đoạn phụ huynh) · "Sẽ nhắc HH:mm" (chưa qua) · không có gì ⇒ null', () => {
+    const t = docTuDongNhac(CHUA_NOP)
+    expect(daiNhacCuaEm(t.theoEm['B1|1'], NAY)).toEqual({ chu: 'Đã tự nhắc 20:00 · em đã xem · phụ huynh chưa xem', vai: 'da' })
+    expect(daiNhacCuaEm(t.theoEm['B1|3'], NAY)).toEqual({ chu: 'Đã tự nhắc 09:00 · em chưa xem', vai: 'da' })
+    expect(daiNhacCuaEm(t.theoEm['B1|2'], NAY)).toEqual({ chu: 'Sẽ nhắc 21:00', vai: 'ke' })
+    expect(daiNhacCuaEm(t.theoEm['B1|2'], NAY + 3 * 3600000)).toBeNull() // mốc kế đã qua ⇒ không nói "sẽ nhắc" nữa
+    expect(daiNhacCuaEm(undefined, NAY)).toBeNull()
+  })
+
+  it('chuTuDongNhac / lanKeTuDong / demTuNhacHomNay: ĐANG BẬT + lượt kế · ĐANG TẮT · chưa báo cờ; lượt kế lấy nhacKe sớm nhất khi máy chủ không trả lanKe; đếm hôm nay ưu tiên số máy chủ, thiếu thì đếm trong danh sách và nói rõ', () => {
+    const t = docTuDongNhac(CHUA_NOP)
+    expect(chuTuDongNhac(t, NAY)).toBe('Tự động nhắc: ĐANG BẬT · lượt kế 21:00')
+    expect(chuTuDongNhac({ ...t, bat: false }, NAY)).toBe('Tự động nhắc: ĐANG TẮT')
+    expect(chuTuDongNhac({ ...t, bat: null }, NAY)).toBe('Tự động nhắc: máy chủ chưa báo đang bật hay tắt')
+    expect(chuTuDongNhac({ ...t, lanKe: '' }, NAY)).toBe('Tự động nhắc: ĐANG BẬT · lượt kế 21:00') // suy từ nhacKe
+    expect(lanKeTuDong({ ...t, lanKe: '', theoEm: {} }, NAY)).toBe('')
+    expect(chuTuDongNhac({ ...t, lanKe: '', theoEm: {} }, NAY)).toBe('Tự động nhắc: ĐANG BẬT') // không có mốc kế ⇒ không bịa giờ
+    expect(demTuNhacHomNay(t, NAY)).toEqual({ soEm: 12, soPhuHuynh: 5, tuDanhSach: false })
+    expect(demTuNhacHomNay({ ...t, homNay: null }, NAY)).toEqual({ soEm: 2, soPhuHuynh: 1, tuDanhSach: true }) // em 1 và 3 có nhắc hôm nay; chỉ em 1 có phụ huynh
+    expect(demTuNhacHomNay({ ...t, homNay: null, theoEm: {} }, NAY)).toBeNull()
+  })
+
+  it('layTuDongNhac: POST /gv/chua-nop; 404 ⇒ lời thật', async () => {
+    dungMayChu({ '/gv/chua-nop': () => ({ json: CHUA_NOP }) })
+    const a = await layTuDongNhac()
+    expect(a.ok && a.du.bat).toBe(true)
+    expect(goi.mock.calls.at(-1)![0]).toBe('/gv/chua-nop')
+    dungMayChu({})
+    expect(await layTuDongNhac()).toMatchObject({ ok: false, loai: 'chua_co_lenh', chu: 'Máy chủ chưa báo trạng thái tự động nhắc.' })
   })
 })
 
