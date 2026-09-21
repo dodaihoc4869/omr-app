@@ -16,6 +16,7 @@ import DoanKetChang from './DoanKetChang'
 import DoanTiepSuc from './DoanTiepSuc'
 import { ManHinhAnh } from '../../components/QuestionMedia'
 import { unlockBattleAudio } from './battle-audio'
+import { batVongTrucTiep } from '../../lib/nhip-ben-vung'
 import './doan.css'
 
 export const NHIP_HOI_MS = 1500
@@ -86,13 +87,18 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   useEffect(() => {
     if (!dangDi || !xem) return
     const ma = xem.ma
-    const hoi = async () => {
-      if (document.hidden || khoa.current) return
+    // KHÔNG GỌI CHỒNG + THƯA DẦN khi lỗi (sự cố D1 21/09: lệnh 8–23 giây mà setInterval 1,5 s vẫn bắn thêm ⇒ hàng chục lượt treo cùng lúc). Bình thường 1,5 s; lỗi ⇒ 5 → 10 → 20 → 30 s (trận đang chơi nên không lùi tới phút như nền); thành công ⇒ về 1,5 s.
+    const vong = batVongTrucTiep(async () => {
+      if (document.hidden || khoa.current) return true // bỏ lượt, không tính là lỗi
       const qid = xem.cau?.qid ?? xem.trum?.qid
-      try { apDung(await call('doan-xem', { ma, coCau: qid && de.current.has(qid) ? qid : undefined }) as PhanHoiDoan) } catch { /* mạng chập chờn: lần hỏi sau thử lại */ }
-    }
-    const t = setInterval(() => void hoi(), NHIP_HOI_MS)
-    return () => clearInterval(t)
+      try {
+        apDung(await call('doan-xem', { ma, coCau: qid && de.current.has(qid) ? qid : undefined }) as PhanHoiDoan)
+        return true
+      } catch {
+        return false // mạng chập chờn: lần hỏi sau thử lại, thưa dần
+      }
+    }, NHIP_HOI_MS)
+    return () => vong.dung()
   }, [dangDi, xem?.ma, xem?.cau?.qid, xem?.trum?.qid, call, apDung]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Đồng hồ vẽ lại 4 lần/giây từ mốc máy chủ trả (không tin đồng hồ máy em cho việc chấm — chỉ để vẽ).

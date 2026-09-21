@@ -2,6 +2,7 @@
 // danh, cấp (`/daily-honors`, server/src/honors.ts) — ở đây CHỈ hiển thị, không
 // tính lại. Không viền: tách lớp bằng tonal surface + cao độ. Shimmer chạy 1
 // lần lúc tải rồi nhịp 8 s, tắt khi máy xin giảm chuyển động.
+import { batNhipBenVung } from '../../lib/nhip-ben-vung'
 import { useEffect, useState } from 'react'
 import { Star, Trophy } from 'lucide-react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
@@ -98,25 +99,26 @@ export default function TheVinhDanh({
   useEffect(() => {
     let song = true
     let ban = false
-    const nap = async () => {
-      if (ban || document.hidden) return
+    const nap = async (): Promise<boolean> => {
+      if (ban || document.hidden) return true
       ban = true
       try {
         const d = await taiDuLieu()
-        if (!song) return
+        if (!song) return true
         if (d) setData(d)
         setDaTai(true)
+        return !!d // không có dữ liệu = lượt lỗi ⇒ nhịp lùi dần
       } finally {
         ban = false
       }
     }
-    void nap()
-    const t = setInterval(() => void nap(), 60000)
-    const focus = () => void nap()
+    // Nhịp nền CHẬM (180 s ± 30 s, không gọi chồng; sự cố D1 21/09): quay lại tab vẫn nạp nhưng chặn dội ≥ 20 giây.
+    const nhip = batNhipBenVung(nap)
+    const focus = () => nhip.kich()
     window.addEventListener('focus', focus)
     return () => {
       song = false
-      clearInterval(t)
+      nhip.dung()
       window.removeEventListener('focus', focus)
     }
   }, [taiDuLieu])

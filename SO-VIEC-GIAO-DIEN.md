@@ -479,3 +479,26 @@ BẢNG QUÉT (grep `inputMode|type="number"|Nhập đáp|Đáp án của em|plac
 | Tự luận | — | KHÔNG ÁP DỤNG (thầy cấm rút tự luận; không có ô số) |
 TEST (đều có đột biến): `o-nhap-dap-so-2109` (17: phép thuần + jsdom), `o-nhap-dap-so-trinh-duyet-2109` (16: Chromium THẬT + React thật đóng gói bằng rolldown — chuột + CHẠM, tiêu điểm giữ, con trỏ giữa, "-1,5" bằng nút, một dấu thập phân, dán "0.54", maxLength, Enter vẫn gửi form, 6 cỡ × sáng/tối không nhảy), `o-nhap-dap-so-phieu-2109` (9: markup, đối chiếu ~60 + ~240 ca với phép thuần, chạy tờ THẬT trong DOM giả) — LỖI BẮT ĐƯỢC LÚC VIẾT: `'\n'` trong chuỗi mẫu của html-phieu.ts thành xuống dòng THẬT làm cả JS tờ phiếu hỏng cú pháp (đã thoát `\\n`); `o-nhap-dap-so-the-cau-2109` (8: bố cục + nhãn cũ, GÓI GỬI LÊN không đổi: onChange nhận đúng chuỗi của hai hàm cũ trên 14 giá trị), `o-nhap-dap-so-cac-noi-2109` (25: Chromium 320/360/390 × sáng/tối tại TheCau/Đoàn/LamCauOn/MomM3 với CSS thật của từng nơi), `o-nhap-dap-so-quet-2109` (6: khoá toàn src — `inputMode="decimal"` chỉ ở ONhapDapSo, không nơi nào tự chế nút, ô đáp án trần bị cấm quay lại).
 KHÔNG ĐỔI: `ExamTakeScreen.tsx` (0 dòng), state, gói nộp; chỉ thay ô nhập bên trong `TheCau`.
+
+## BẢNG NHỊP TỰ GỌI (21/09 tối · lệnh KHẨN của Boss sau sự cố D1 ~20:30 · P15 + P16)
+Luật: vòng nền của app HS/PH ≥ 180 giây ± 30 giây lệch ngẫu nhiên (`src/lib/nhip-ben-vung.ts`), KHÔNG gọi chồng khi lượt trước chưa xong, tab ẩn thì không gọi, lỗi ⇒ lùi dần 30 → 60 → 120 → 300 giây (không bao giờ nhanh hơn nhịp thường), quay lại tab / có mạng lại vẫn nạp nhưng cách nhau ≥ 20 giây. Vòng TRỰC TIẾP (đang trong một trận / phòng mở, em đang nhìn màn): giữ nhịp nhanh nhưng KHÔNG gọi chồng, lỗi ⇒ thưa dần 5 → 10 → 20 → 30 giây (`khoangChoTrucTiep`). Khoá bằng `tests/nhip-bang-2109.test.ts` (mọi tệp còn `setInterval(` phải có trong bảng này — thêm vòng mới mà quên xếp loại là test đỏ).
+| Nơi | Lệnh gọi | Nhịp cũ → mới | Trạng thái |
+|---|---|---|---|
+| `StudentPortalScreen` đồng bộ EXP (`academic-sync.ts`) | `exp/dong-bo` | 30 s → 180 s ± 30 | ĐÃ LÊN (P15) |
+| `StudentPortalScreen` nạp danh sách Mầm (`napDsMom`) | `mom/ds` | 15 s → 180 s ± 30 | ĐÃ LÊN (P15) |
+| Bảng nhiệm vụ: kế hoạch ngày + "có ca mở" (`bang-nhiem-vu/may-chu.ts`) | `ke-hoach-ngay`, ca đang mở | 60 s → 180 s ± 30; lỗi/đang làm mới ⇒ lùi | P16 |
+| Thi đua hôm nay (`use-thi-dua.ts`) | `thi-dua` | 60 s → 180 s ± 30 | P16 |
+| Thẻ Vinh danh (`TheVinhDanh.tsx`), Bảng vinh danh (`BangVinhDanh.tsx`) | bảng vinh danh | 60 s / 30 s → 180 s ± 30 | P16 |
+| Thông báo học sinh (`ThongBaoHocSinh.tsx`) | thông báo | 15 s → 180 s ± 30 | P16 |
+| Phụ huynh: bảng tin (`BangTinPhuHuynh.tsx`), tất cả con (`use-tat-ca-ve-con.ts`) | bảng tin / tổng quan | 15 s / 60 s → 180 s ± 30 | P16 |
+| Game cũ: làm mới hồ sơ (`Game.tsx`), biểu đồ tiến bộ (`ProgressChart.tsx`) | `profile`, `progress-history` | 15 s → 180 s ± 30 | P16 |
+| Hiện diện (`app-presence.ts`) | `presence` | 30 s → 60 s ± 10 | P16 — CHỈ chậm được tới đây: máy chủ coi "đang online" nếu thấy trong 90 s (`server/src/teacher-news.ts:26`); muốn ≥ 120 s cần Code 3 nới cửa sổ |
+| Đoàn Hộ Tống — hỏi trận (`DoanHoTong.tsx`) | `doan-xem` | 1,5 s (setInterval, gọi chồng được) → 1,5 s hẹn giờ NỐI TIẾP, không chồng, lỗi ⇒ 5→10→20→30 s | P16 — vòng trực tiếp, chỉ chạy khi đang trong trận |
+| Escort cũ — hỏi phòng (`EscortRoom.tsx`) | `escort-view` | 2,5 s (setInterval) → 2,5 s nối tiếp, không chồng, lỗi ⇒ thưa dần | P16 — vòng trực tiếp |
+| Đồng hồ vẽ lại, KHÔNG gọi máy chủ | — | (giữ) | `DoanHoTong:113` 250 ms · `EscortRoom:27` 1 s · `ImmortalShield` 100 ms · `StudentPortalScreen:373` 1 s · `KhoiThoiGianCa` 1 s · `LuyenDeChuan` 1 s · `DanhSachNhiemVu` 1 s · `bang-tin-san/hooks` 1 s · `useGioHocTap` 15 s (cục bộ) · `NutNopBtvn` 60 s (chỉ vẽ lại) · `KhoaAppScreen` 1 s · `KhoiKhacPhuc3CheDo` 1 s · `PhongChoGame` 100 ms · `html-may-chieu` 250 ms (tờ chiếu) · `to-chieu-cau-noi` (bắt tay tờ chiếu, cục bộ) · `html-phieu` (đếm ngược nút nộp) |
+| Máy chủ Pages (tệp tĩnh), không chạm D1 | `sw-version.json`, `sw.update()` | (giữ) | `cap-nhat-app.ts` 30 phút · `bao-hiem-ban-moi.ts` 10 phút |
+| Chống gian lận cục bộ | — | (giữ) | `thu-tin-hieu.ts` 1 s (chỉ đo cửa sổ, không gọi máy chủ) |
+| App thầy (làn Code 4, không đụng) | — | — | `ExamMonitorScreen` (đã dùng `useNhipThay` lùi dần), `bang-tin/hooks.ts` `useTuLamMoi` 60 s (HomNayScreen, sàn) |
+| LUỒNG THI THẬT (`ExamTakeScreen.tsx`, `doi-chieu-phong-cho.ts`, `exam-api.ts`) | trạng thái/báo sống (60 s do máy chủ trả), lưu tạm, hỏi phòng chờ 3–15 s | (giữ) | KHÔNG ĐỔI — luật vào thi / chống gian lận cần Boss soát; đã lệch pha bằng `chuKyLechPhaMs` từ trước. Đề xuất cho Boss: nếu muốn hạ nhịp phòng chờ 4–15 s ⇒ giao riêng |
+| Mã chết (không được nhập ở đâu) | — | — | `ThanThuHoaHocGame.tsx` (45 s) + `DauTruongChanLy.tsx` (2,5 s / 6 s): KHÔNG chạy trên app thật; không sửa, nên xoá ở đợt dọn |
+Đã thêm test: `nhip-ben-vung-2109` (bậc lùi 300 s), `nhip-bang-2109` (khoá bảng + vòng trực tiếp), `thi-dua-2109` / `ph-moi-man-2109` (nhịp 180 s), `dang-lam-moi-1909` (quay lại tab sau ≥ 20 s).

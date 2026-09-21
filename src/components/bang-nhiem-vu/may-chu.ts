@@ -1,5 +1,6 @@
 // Gọi máy chủ cho Bảng nhiệm vụ: kế hoạch ngày + "có ca đang mở". Mọi lỗi → null/false, KHÔNG ném:
 // màn phải sống được khi mất mạng (rơi về nguồn trợ lý, hoặc hiện bản cuối kèm "kế hoạch lúc …").
+import { batNhipBenVung } from '../../lib/nhip-ben-vung'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { donKhiDoiMocReset } from './don-moc-reset'
@@ -67,21 +68,20 @@ export async function taiCaDangMo(d: DinhDanh): Promise<boolean> {
 
 const nguoiCua = (d: DinhDanh) => d.token || d.sbd || ''
 
-/** Nhịp gọi lại: mở màn, mỗi 60 s khi tab đang hiện, khi quay lại tab, và khi `khoa` đổi. */
-function useNhipGoi(chay: () => void, bat: boolean, khoa: string) {
+/** Nhịp gọi lại: mở màn, mỗi ~180 s (±30 s) khi tab đang hiện, khi quay lại tab (dội ≥ 20 s), và khi `khoa` đổi. */
+/** `chay` trả (Promise của) `false` = lượt lỗi ⇒ nhịp lùi dần; giá trị khác / không trả gì = thành công. */
+function useNhipGoi(chay: () => Promise<boolean> | boolean | void, bat: boolean, khoa: string) {
   const ref = useRef(chay)
   ref.current = chay
   useEffect(() => {
     if (!bat) return
-    const goi = () => {
-      if (typeof document === 'undefined' || !document.hidden) ref.current()
-    }
-    goi()
-    const t = setInterval(goi, 60_000)
+    // Nhịp nền CHẬM (180 s ± 30 s, không gọi chồng; sự cố D1 21/09: 60 giây × mọi máy × nhiều hook): mở màn gọi ngay; quay lại tab / đổi khoá vẫn nạp nhưng chặn dội ≥ 20 giây.
+    const nhip = batNhipBenVung(async () => (await ref.current()) !== false)
+    const goi = () => nhip.kich()
     window.addEventListener('focus', goi)
     document.addEventListener('visibilitychange', goi)
     return () => {
-      clearInterval(t)
+      nhip.dung()
       window.removeEventListener('focus', goi)
       document.removeEventListener('visibilitychange', goi)
     }
@@ -105,15 +105,16 @@ export function useKeHoachNgay(d: DinhDanh, bat: boolean, lamMoi: number): Trang
   const dangGoi = useRef(false)
   useNhipGoi(
     () => {
-      if (dangGoi.current) return
+      if (dangGoi.current) return true
       dangGoi.current = true
-      void taiKeHoachNgayChiTiet(d).then(({ keHoach: kq, dangLamMoi }) => {
+      return taiKeHoachNgayChiTiet(d).then(({ keHoach: kq, dangLamMoi }) => {
         dangGoi.current = false
         setT((truoc) => {
           const cung = truoc.nguoi === nguoi
           const cuBan = cung ? truoc.keHoach : null
           return kq ? { keHoach: kq, daXong: true, cu: false, dangLamMoi: false, nguoi } : { keHoach: cuBan, daXong: true, cu: cuBan !== null, dangLamMoi, nguoi }
         })
+        return !!kq // lỗi / máy chủ đang làm mới ⇒ lùi dần
       })
     },
     bat && !!nguoi,
@@ -126,9 +127,10 @@ export function useCaDangMo(d: DinhDanh, bat: boolean): boolean {
   const nguoi = nguoiCua(d)
   const [co, setCo] = useState(false)
   useNhipGoi(
-    () => {
-      void taiCaDangMo(d).then(setCo)
-    },
+    () => taiCaDangMo(d).then((co) => {
+      setCo(co)
+      return true // false = "không có ca mở" (đáp hợp lệ), lỗi đã bị nuốt thành false ⇒ không tính là lỗi nhịp
+    }),
     bat && !!nguoi,
     nguoi,
   )

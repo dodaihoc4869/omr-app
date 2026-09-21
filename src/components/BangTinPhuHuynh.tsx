@@ -1,4 +1,5 @@
 import BangVinhDanh from './BangVinhDanh'
+import {batNhipBenVung} from '../lib/nhip-ben-vung'
 import {useCallback,useEffect,useState} from 'react'
 import {parentNewsApi,studentNewsApi} from '../lib/mom-api'
 import './BangTinPhuHuynh.css'
@@ -78,8 +79,10 @@ export default function BangTinPhuHuynh({
  // ĐÃ TẢI XONG LẦN ĐẦU (thành công hay lỗi). Máy chủ trả ok mà KHÔNG có `report` (vừa reset dữ liệu, chưa dựng bản tin) thì trước
  // đây `report` mãi là null → vòng quay "Đang tổng hợp…" quay vô hạn. Phân biệt "đang tải lần đầu" với "đã tải mà chưa có bản tin".
  const [daTai,setDaTai]=useState(false)
- const refresh=useCallback(async()=>{try{const r=await api('list');setReport(r.report);setDaily(r.daily||null);setError('');if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){navigator.serviceWorker.ready.then(reg=>reg.update().catch(()=>{})).catch(()=>{})}}catch(e){setError(e instanceof Error?e.message:'Chưa cập nhật được dữ liệu.')}finally{setDaTai(true)}},[api])
- useEffect(()=>{setReport(null);setDaTai(false);setSent('');void refresh();const poll=()=>{if(!document.hidden)void refresh()};const t=setInterval(poll,15000);window.addEventListener('focus',poll);window.addEventListener('online',poll);return()=>{clearInterval(t);window.removeEventListener('focus',poll);window.removeEventListener('online',poll)}},[refresh])
+ const refresh=useCallback(async()=>{try{const r=await api('list');setReport(r.report);setDaily(r.daily||null);setError('');if(typeof navigator!=='undefined'&&'serviceWorker' in navigator){navigator.serviceWorker.ready.then(reg=>reg.update().catch(()=>{})).catch(()=>{})};return true}catch(e){setError(e instanceof Error?e.message:'Chưa cập nhật được dữ liệu.');return false}finally{setDaTai(true)}},[api])
+ useEffect(()=>{setReport(null);setDaTai(false);setSent('')
+  // Nhịp nền CHẬM (180 s ± 30 s, không gọi chồng, lỗi ⇒ lùi 30→60→120 s; sự cố D1 21/09: vòng 15 giây × mọi máy). Quay lại tab / có mạng vẫn nạp nhưng chặn dội ≥ 20 giây.
+  const nhip=batNhipBenVung(refresh);const poll=()=>nhip.kich();window.addEventListener('focus',poll);window.addEventListener('online',poll);document.addEventListener('visibilitychange',poll);return()=>{nhip.dung();window.removeEventListener('focus',poll);window.removeEventListener('online',poll);document.removeEventListener('visibilitychange',poll)}},[refresh])
  async function assign(){setSending(true);setError('');try{const r=await api('assign');setSent(r.alreadySent?'Bài theo đề xuất hôm nay đã được gửi. Không tạo thêm bài trùng.':`Đã gửi 1 bài gồm ${r.questionCount} câu sang app của con.`);onSent(r.id);await refresh()}catch(e){setError(e instanceof Error?e.message:'Chưa gửi được bài.')}finally{setSending(false)}}
 
  const btvnChuaNop = report?.pendingDetails?.btvn ?? 0

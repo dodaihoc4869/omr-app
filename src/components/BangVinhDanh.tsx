@@ -1,3 +1,4 @@
+import { batNhipBenVung } from '../lib/nhip-ben-vung'
 import { useEffect, useState } from 'react'
 import { Crown, Medal, Sparkles } from 'lucide-react'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
@@ -36,8 +37,8 @@ export default function BangVinhDanh({
   useEffect(() => {
     let alive = true
     let busy = false
-    const load = async () => {
-      if (busy || document.hidden) return
+    const load = async (): Promise<boolean> => {
+      if (busy || document.hidden) return true
       busy = true
       const c = new AbortController()
       const t = setTimeout(() => c.abort(), 15000)
@@ -51,19 +52,21 @@ export default function BangVinhDanh({
         })
         const d = await r.json()
         if (alive && d.ok) setData(d)
+        return !!d.ok // máy chủ trả không ổn = lượt lỗi ⇒ nhịp lùi dần
       } catch {
+        return false
       } finally {
         busy = false
         clearTimeout(t)
       }
     }
-    void load()
-    const t = setInterval(() => void load(), 30000)
-    const focus = () => void load()
+    // Nhịp nền CHẬM (180 s ± 30 s, không gọi chồng; sự cố D1 21/09: 30 giây × mọi máy): quay lại tab vẫn nạp nhưng chặn dội ≥ 20 giây.
+    const nhip = batNhipBenVung(load)
+    const focus = () => nhip.kich()
     window.addEventListener('focus', focus)
     return () => {
       alive = false
-      clearInterval(t)
+      nhip.dung()
       window.removeEventListener('focus', focus)
     }
   }, [])

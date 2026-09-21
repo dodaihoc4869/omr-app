@@ -1,10 +1,11 @@
 import {useEffect,useId,useState} from 'react'
 import './progress-chart.css'
+import {batNhipBenVung} from '../../lib/nhip-ben-vung'
 type Day={day:string;total:number;correct:number}
 export default function ProgressChart({request}:{request:(action:string)=>Promise<{history?:Day[]}>}){
  const [days,setDays]=useState<Day[]>([]),[selected,setSelected]=useState<string>(''),[error,setError]=useState(''),[loaded,setLoaded]=useState(false)
  const id=useId().replace(/:/g,'')
- useEffect(()=>{let active=true;let pending=false;const load=async()=>{if(pending||document.hidden)return;pending=true;try{const r=await request('progress-history');if(active){setDays(r.history??[]);setLoaded(true);setError('')}}catch{if(active)setError('Chưa tải được lịch sử. Đang thử kết nối lại.')}finally{pending=false}};void load();const timer=setInterval(()=>void load(),15000);window.addEventListener('focus',load);return()=>{active=false;clearInterval(timer);window.removeEventListener('focus',load)}},[request])
+ useEffect(()=>{let active=true;const load=async()=>{try{const r=await request('progress-history');if(active){setDays(r.history??[]);setLoaded(true);setError('')}return true}catch{if(active)setError('Chưa tải được lịch sử. Đang thử kết nối lại.');return false}};const nhip=batNhipBenVung(load);const kich=()=>nhip.kich();window.addEventListener('focus',kich);return()=>{active=false;nhip.dung();window.removeEventListener('focus',kich)}},[request]) // nhịp bền vững 180 s ± 30 s, lùi dần khi lỗi (sự cố D1 21/09)
  const points=days.map((d,i)=>({...d,x:48+(days.length===1?.5:i/(days.length-1))*604,y:202-176*d.correct/Math.max(1,d.total)}))
  const current=points.find(p=>p.day===selected)??points[points.length-1]
  const path=points.map((p,i)=>`${i?'L':'M'}${p.x},${p.y}`).join(' ')

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { Bell, BellOff, X, BookOpen, Sparkles, CheckCheck, ChevronRight, Check } from 'lucide-react'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
 import { NutTron } from './m3'
+import { batNhipBenVung } from '../lib/nhip-ben-vung'
 import './m3/thong-bao-hoc-sinh.css'
 
 type Notice = {
@@ -89,9 +90,10 @@ export default function ThongBaoHocSinh({
     setLoaded(false)
     setEnabled(false)
 
-    const refresh = async () => {
-      if (document.hidden || pending) return
+    const refresh = async (): Promise<boolean> => {
+      if (document.hidden || pending) return true
       pending = true
+      let ok = true
       try {
         const d = await noticeApi(token, 'list')
         if (alive) {
@@ -101,19 +103,20 @@ export default function ThongBaoHocSinh({
           setLoadError('')
         }
       } catch {
+        ok = false
         if (alive) setLoadError('Chưa tải được thông báo. App sẽ tự thử lại khi có mạng.')
       } finally {
         pending = false
       }
+      return ok
     }
 
-    void refresh()
-    const timer = setInterval(() => void refresh(), 15000)
-
-    const focus = () => void refresh()
+    // Nhịp nền CHẬM (180 s ± 30 s, không gọi chồng, lỗi ⇒ lùi 30 → 60 → 120 s; sự cố D1 21/09: vòng 15 giây × mọi máy em). Quay lại tab / có mạng / tin từ dịch vụ nền vẫn nạp nhưng chặn dội ≥ 20 giây.
+    const nhip = batNhipBenVung(refresh)
+    const focus = () => nhip.kich()
     const received = (event: MessageEvent) => {
       if (event.data?.type === 'open-student-notices') setOpen(true)
-      void refresh()
+      nhip.kich()
     }
 
     window.addEventListener('focus', focus)
@@ -131,7 +134,7 @@ export default function ThongBaoHocSinh({
 
     return () => {
       alive = false
-      clearInterval(timer)
+      nhip.dung()
       window.removeEventListener('focus', focus)
       window.removeEventListener('online', focus)
       navigator.serviceWorker?.removeEventListener('message', received)

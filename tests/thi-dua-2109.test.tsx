@@ -332,16 +332,19 @@ describe('taiThiDua — không có lệnh / lỗi ⇒ null, không ném', () => 
   })
 })
 
-describe('useThiDua — nhịp 60 giây, giữ bản cũ khi lỗi, "vừa vượt lên" 2 phút', () => {
+describe('useThiDua — nhịp 180 giây ± 30 giây, giữ bản cũ khi lỗi, "vừa vượt lên" 2 phút', () => {
+  let ngauNhien: ReturnType<typeof vi.spyOn>
   beforeEach(() => {
     vi.useFakeTimers()
+    ngauNhien = vi.spyOn(Math, 'random').mockReturnValue(0.5) // độ lệch đúng 0 ⇒ nhịp chính xác 180 giây (độ lệch có bộ thử riêng ở nhip-ben-vung-2109)
   })
+  afterEach(() => ngauNhien.mockRestore())
   const chay = async (ms: number) => {
     await act(async () => {
       await vi.advanceTimersByTimeAsync(ms)
     })
   }
-  it('nạp ngay; sau mỗi 60 giây nạp lại; tắt (bat=false) ⇒ xoá ô và dừng nhịp', async () => {
+  it('nạp ngay; sau mỗi 180 giây nạp lại; tắt (bat=false) ⇒ xoá ô và dừng nhịp', async () => {
     const api = vi.fn().mockResolvedValue(T())
     const { result, rerender } = renderHook(({ bat }) => useThiDua('tok', bat, api), { initialProps: { bat: true } })
     await chay(0)

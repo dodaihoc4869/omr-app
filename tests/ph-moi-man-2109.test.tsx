@@ -341,9 +341,16 @@ describe('ManChinh — màn chính kiểu Apple, phương án B "Widget"', () =>
   })
 })
 
-describe('useTatCaVeCon — nhịp 60 giây, giữ bản cũ khi lỗi', () => {
-  beforeEach(() => vi.useFakeTimers())
-  afterEach(() => vi.useRealTimers())
+describe('useTatCaVeCon — nhịp 180 giây ± 30 giây, giữ bản cũ khi lỗi', () => {
+  let ngauNhien: ReturnType<typeof vi.spyOn>
+  beforeEach(() => {
+    vi.useFakeTimers()
+    ngauNhien = vi.spyOn(Math, 'random').mockReturnValue(0.5) // độ lệch đúng 0 ⇒ nhịp chính xác 180 giây
+  })
+  afterEach(() => {
+    ngauNhien.mockRestore()
+    vi.useRealTimers()
+  })
   const { renderHook } = require('@testing-library/react')
   const chay = async (ms: number) => act(async () => void (await vi.advanceTimersByTimeAsync(ms)))
   it('nạp ngay; lỗi lần đầu ⇒ trạng thái loi + chữ thật; thuLai nạp lại; thành công ⇒ ok; lỗi sau đó GIỮ bản cũ; sbd null ⇒ không gọi', async () => {

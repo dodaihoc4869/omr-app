@@ -11,6 +11,7 @@ import {SKILLS,escortCapacity,checkCommand,distance,type Escort,type Command} fr
 import './escort.css'
 import {unlockBattleAudio,playBattleSound,battleMuted,setBattleMuted} from './battle-audio'
 import {evolutionStage} from './evolution'
+import {batVongTrucTiep} from '../../lib/nhip-ben-vung'
 type View=Omit<Escort,'owner'|'players'>&{id:string;revision:number;owner:boolean;players:(Escort['players'][number]&{self:boolean;ready:boolean;alias:string})[]}
 export default function EscortRoom({call,active,storageKey}:{call:(action:string,data:Record<string,unknown>)=>Promise<unknown>;active:boolean;storageKey:string}){
  const vo=useRef<HTMLDivElement>(null)
@@ -25,7 +26,7 @@ export default function EscortRoom({call,active,storageKey}:{call:(action:string
  const go=async(action:string,data:Record<string,unknown>={})=>{if(lock.current)return;unlockBattleAudio();lock.current=true;setBusy(true);setError('');try{const v=await call(action,{room:room?.id||code,revision:room?.revision,...data}) as {escort:View};if(action==='escort-leave'){setRoom(null);sessionStorage.removeItem(`escort:${storageKey}`);version.current=-1}else{apply(v.escort);sessionStorage.setItem(`escort:${storageKey}`,v.escort.id)}}catch(e){setError(e instanceof Error?e.message:'Chưa nối được phòng.');if(room)try{const v=await call('escort-view',{room:room.id}) as {escort:View};apply(v.escort)}catch{/* Explicit retry remains available. */}}finally{lock.current=false;setBusy(false)}}
  useEffect(()=>{let active=true;const saved=sessionStorage.getItem(`escort:${storageKey}`);if(saved)void call('escort-view',{room:saved}).then(v=>{if(active){const r=(v as {escort:View}).escort;version.current=r.revision;setRoom(r)}}).catch(()=>sessionStorage.removeItem(`escort:${storageKey}`));return()=>{active=false}},[call,storageKey])
  useEffect(()=>{const t=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(t)},[])
- useEffect(()=>{if(!room||room.finished)return;let active=true;const id=room.id;const tick=async()=>{if(document.hidden||lock.current)return;try{const v=await call('escort-view',{room:id}) as {escort:View};if(active&&v.escort.revision>=version.current){version.current=v.escort.revision;setRoom(v.escort)}}catch{/* A dropped poll does not erase the board. */}};const t=setInterval(()=>void tick(),2500);return()=>{active=false;clearInterval(t)}},[room?.id,room?.finished,call])
+ useEffect(()=>{if(!room||room.finished)return;let active=true;const id=room.id;const vong=batVongTrucTiep(async()=>{if(document.hidden||lock.current)return true;try{const v=await call('escort-view',{room:id}) as {escort:View};if(active&&v.escort.revision>=version.current){version.current=v.escort.revision;setRoom(v.escort)};return true}catch{return false/* A dropped poll does not erase the board. */}},2500);return()=>{active=false;vong.dung()}},[room?.id,room?.finished,call]) // không gọi chồng + thưa dần khi lỗi (sự cố D1 21/09)
  useEffect(()=>{const e=room?.effects[0];if(e){const p=room.players[e.from];if(p)playBattleSound(p.pet,evolutionStage(p.level),true,e.kind==='skill')}},[room?.revision])
  const me=room?.players.find(p=>p.self),target=room?.players.findIndex(p=>!p.left&&p.x===selected?.x&&p.y===selected?.y)
  const answered=answerState?.room===room?.id&&answerState?.round===room?.round

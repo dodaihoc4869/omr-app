@@ -195,11 +195,15 @@ describe('StudentPortalScreen thật khi máy chủ đang làm mới', () => {
 
     phanHoi = () => ({ body: KE_HOACH })
     const truoc = soLanGoi
+    // Quay lại tab chỉ nạp khi đã qua ≥ 20 giây kể từ lần gọi trước (chặn dội — sự cố D1 21/09); ở đây em "quay lại sau 1 phút".
+    const gio = Date.now()
+    const dongHo = vi.spyOn(Date, 'now').mockReturnValue(gio + 60_000)
     act(() => {
       window.dispatchEvent(new Event('focus'))
     })
     await waitFor(() => expect(soLanGoi).toBeGreaterThan(truoc))
     await waitFor(() => expect(DAI()).toBeNull())
+    dongHo.mockRestore()
     expect(container.querySelector('.bnv')!.getAttribute('data-nguon')).toBe('ke_hoach_ngay')
   })
 

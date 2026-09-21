@@ -11,14 +11,16 @@ describe('khoangChoTiepTheo — thuần', () => {
     expect(khoangChoTiepTheo(180_000, 30_000, 0, () => 1)).toBe(210_000)
   })
   it('lùi dần khi lỗi: 30 → 60 → 120 s, giữ ở 120; KHÔNG BAO GIỜ nhanh hơn nhịp thường (nhịp 180 s thì lỗi vẫn ≥ 150 s)', () => {
-    expect(LUI_DAN_MS).toEqual([30_000, 60_000, 120_000])
+    expect(LUI_DAN_MS).toEqual([30_000, 60_000, 120_000, 300_000])
     // nhịp ngắn 10 s (nơi cần nhanh) ⇒ lỗi ép lên mức lùi
     expect(khoangChoTiepTheo(10_000, 0, 1)).toBe(30_000)
     expect(khoangChoTiepTheo(10_000, 0, 2)).toBe(60_000)
     expect(khoangChoTiepTheo(10_000, 0, 3)).toBe(120_000)
-    expect(khoangChoTiepTheo(10_000, 0, 9)).toBe(120_000)
+    expect(khoangChoTiepTheo(10_000, 0, 4)).toBe(300_000)
+    expect(khoangChoTiepTheo(10_000, 0, 9)).toBe(300_000)
     // nhịp 180 s: lỗi không làm gọi NHANH hơn
-    for (const n of [1, 2, 3, 9]) expect(khoangChoTiepTheo(180_000, 0, n)).toBe(180_000)
+    for (const n of [1, 2, 3]) expect(khoangChoTiepTheo(180_000, 0, n)).toBe(180_000)
+    expect(khoangChoTiepTheo(180_000, 0, 4)).toBe(300_000)
     expect(khoangChoTiepTheo(180_000, 30_000, 2, () => 0)).toBe(150_000)
   })
   it('sàn 1 giây; số lỗi lẻ/âm không làm hỏng', () => {
