@@ -23,3 +23,9 @@ Thẻ "Đường về đích" ở đầu Bảng nhiệm vụ HS đúng mẫu: đ
 
 ## THẦY CHỐT MẪU — 21/09 14:25 ("Chốt bảng đường về đích")
 Mẫu `docs/ban-ve-don-ve-dich-2109/` (4 trạng thái) là bản được chốt. Code 2 build ĐÚNG mẫu; hai sửa của Boss khi build: ảnh thần thú thật ở lời chào; thêm trạng thái nộp trễ (phương án B): "Bài đã qua hạn nộp · em vẫn cần làm nốt N chặng · sẽ ghi nộp trễ".
+
+## THẦY LỆNH THÊM — 21/09 15:52: "Còn lại những ngày trước trong thẻ về đích chỉ cho tính từ 12h trưa hôm nay thôi, những ngày trước đó không tính"
+- MỐC TÍNH NỢ = mốc của Bảng tin (`cau_hinh.bang_tin_tu` = 2026-09-21T05:00:00.000Z = 12:00 trưa 21/09 giờ VN); khoá riêng `cau_hinh.ve_dich_tu` nếu có thì thắng; vắng cả hai ⇒ hằng số `2026-09-21`. Lọc theo NGÀY VN của mốc (như Bảng tin đã làm ở 7f739f3): món nợ có `ngay` < 2026-09-21 ⇒ KHÔNG hiện, KHÔNG cộng vào `tongCau`/`tongPhut`, KHÔNG tính vào "N việc nữa là đạt" của thẻ, KHÔNG tính vào `nhip.noTheoLop` của Bảng tin và dòng nợ ở bảng phụ huynh.
+- Áp cho cả ba loại nợ: chặng bài tập về nhà (theo mốc GỐC `truoc`/`moLuc`), câu ôn quá lịch (`moc_on_ke`), gói gia đình giao. Việc của ngày 21/09 (kể cả mở trước 12:00) VẪN tính — từ 22/09 nó là "Thứ Hai 21/09".
+- Chặng bài tập về nhà có mốc gốc trước ngày mốc mà chưa làm: trạng thái `hom_nay` (vẫn phải làm, không gắn nhãn nợ). Câu ôn cũ vẫn nằm trong hàng ôn của kế hoạch ngày như trước — chỉ không bị gọi là "nợ".
+- Code 1: `soNo` nhận thêm `tuNgay` (YYYY-MM-DD) + test (món trước mốc bị bỏ; món đúng ngày mốc được giữ; tổng khớp). Code 3: đọc mốc (1 truy vấn `cau_hinh`, gộp với truy vấn sẵn có nếu được) và truyền xuống ở `docVeDichCuaEm` + khối Bảng tin + `phTatCaVeCon.no`. Đi gói W3c.
