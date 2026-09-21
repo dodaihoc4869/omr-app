@@ -4,7 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
 import BaoCaoCaLopKhoi from '../src/components/xem-diem-gv/BaoCaoCaLop'
 import { KHOANG_DIEM, type BaoCaoCaLop } from '../src/lib/bao-cao-ca-lop'
-import { docBaoCaoCaLopMayChu, GIAM_DIEM_NEU, layBaoCaoCaLopMayChu, type EmRoiMan } from '../src/lib/bao-cao-may-chu'
+import { docBaoCaoCaLopMayChu, docBaoCaoEmMayChu, GIAM_DIEM_NEU, layBaoCaoCaLopMayChu, layBaoCaoEmMayChu, type EmRoiMan } from '../src/lib/bao-cao-may-chu'
+import { readFileSync } from 'node:fs'
 
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }) }))
 vi.mock('../src/lib/exam-db', () => ({ loadTeacherSecret: async () => 'mat-thu' }))
@@ -205,5 +206,56 @@ describe('BaoCaoCaLopKhoi có layMayChu', () => {
     render(<BaoCaoCaLopKhoi tomTat={{ nop: 2, tb: 4 }} tinh={tinh} khoa="k" phutDe={45} moSan onMoEm={() => {}} />)
     expect(tinh).toHaveBeenCalledTimes(1)
     expect(screen.queryByText(/Đang lấy báo cáo/)).toBeNull()
+  })
+})
+
+// ────────────── GV-2: báo cáo MỘT em ──────────────
+const THAN_EM = (): Record<string, unknown> => ({
+  ok: true,
+  ketQua: { tong: 7.5, diemI: 3, diemII: 2.5, diemIII: 2, soCau: 28, soCauDung: 21, soCauSai: 5, soCauMotPhan: 1, soCauBoTrong: 1 },
+  phan: [{ ma: 'I', dung: 10, tong: 12, motPhan: 0, diem: 3, toiDa: 4.5 }, { ma: 'II', dung: 2, tong: 4, motPhan: 1, diem: 2.5 }, { ma: 'III', dung: 4, tong: 6, motPhan: 0, diem: 2, toiDa: 1.5 }],
+  dang: [{ ma: 'D.A', ten: 'Tính chất amin', dung: 4, tong: 4 }, { ma: 'D.B', ten: 'Thuỷ phân ester', dung: 1, tong: 5 }],
+  cauCanXemLai: [
+    { qid: 'Q7', phan: 'I', soCau: 7, de: 'Đề rút gọn', dapAnChon: 'A', dapAnDung: 'C', loiGiai: 'Vì…', giay: 84, tbGiay: 61, laDungNhungLau: false },
+    { qid: 'Q9', phan: 'II', soCau: 2, de: '', dapAnChon: 'DDSS', dapAnDung: 'DSDS', giay: 20, laDungNhungLau: true },
+  ],
+})
+describe('docBaoCaoEmMayChu — thân máy chủ ⇒ phần ghép được', () => {
+  it('đủ: điểm + đúng/tổng, ba phần (phần II thiếu trần ⇒ 4), dạng vấp trước, câu cần xem lại (loại sai / đúng-nhưng-lâu, tbGiay ⇒ tbGiayLop)', () => {
+    const e = docBaoCaoEmMayChu(THAN_EM())!
+    expect([e.tong, e.dung, e.tongCau, e.motPhan]).toEqual([7.5, 21, 28, 1])
+    expect(e.phan.map((p) => [p.ma, p.dung, p.tong, p.diem, p.toiDa, p.cau.length])).toEqual([['I', 10, 12, 3, 4.5, 0], ['II', 2, 4, 2.5, 4, 0], ['III', 4, 6, 2, 1.5, 0]])
+    expect(e.dang.map((d) => [d.ten, d.canOn])).toEqual([['Thuỷ phân ester', true], ['Tính chất amin', false]])
+    expect(e.cauXemLai.map((c) => [c.qid, c.loai, c.de, c.giay, c.tbGiayLop])).toEqual([['Q7', 'sai', 'Đề rút gọn', 84, 61], ['Q9', 'dung_lau', null, 20, null]])
+  })
+  it('thiếu ketQua ⇒ null; khối sai dạng bị bỏ riêng; câu xem lại ≤ 8', () => {
+    expect(docBaoCaoEmMayChu({ ok: true })).toBeNull()
+    expect(docBaoCaoEmMayChu({ ok: true, ketQua: { tong: 'x' } })).toBeNull()
+    const t = THAN_EM()
+    ;(t as { phan: unknown }).phan = [{ ma: 'IV', dung: 1, tong: 2, diem: 1 }, { ma: 'I', dung: 'x' }]
+    ;(t as { dang: unknown }).dang = [{ ten: 'X', dung: 5, tong: 2 }, { ten: '', dung: 1, tong: 2 }, { ten: 'Y', dung: 1, tong: 0 }]
+    ;(t as { cauCanXemLai: unknown }).cauCanXemLai = Array.from({ length: 12 }, (_, i) => ({ qid: `Q${i}`, phan: 'I', soCau: i + 1, dapAnChon: 'A', dapAnDung: 'B' }))
+    const e = docBaoCaoEmMayChu(t)!
+    expect(e.phan).toEqual([])
+    expect(e.dang).toEqual([])
+    expect(e.cauXemLai).toHaveLength(8)
+    expect(e.tong).toBe(7.5)
+  })
+  it('layBaoCaoEmMayChu: đúng đường + maCa + sbd; 404 / từ chối / mất mạng ⇒ null', async () => {
+    const goi: { url: string; body: unknown }[] = []
+    vi.stubGlobal('fetch', vi.fn(async (url: string, init: { body?: string }) => { goi.push({ url: String(url), body: JSON.parse(init.body ?? '{}') }); return { ok: true, status: 200, json: async () => THAN_EM() } }))
+    expect((await layBaoCaoEmMayChu('C1', 'A'))!.tong).toBe(7.5)
+    expect(goi).toEqual([{ url: 'https://may.test/gv/bao-cao-ca-em', body: { maCa: 'C1', sbd: 'A' } }])
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 404, json: async () => ({ ok: false }) })))
+    expect(await layBaoCaoEmMayChu('C1', 'A')).toBeNull()
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new TypeError('mất mạng') }))
+    expect(await layBaoCaoEmMayChu('C1', 'A')).toBeNull()
+  })
+  it('nguồn màn Theo dõi ca: chỉ hỏi /gv/bao-cao-ca-em khi máy thầy KHÔNG có bảng chấm và em đã nộp; ghép qua ghepBaoCaoMotEm; hiện bản ghép', () => {
+    const man = readFileSync('src/screens/ExamMonitorScreen.tsx', 'utf8')
+    expect(man).toMatch(/const canHoiMayChu = !!baoCaoMotEm && !baoCaoMotEm\.coBangCham && baoCaoMotEm\.daNop/)
+    expect(man).toMatch(/layBaoCaoEmMayChu\(chiTiet\.ca\.maCa, sbdHoSo\)/)
+    expect(man).toMatch(/ghepBaoCaoMotEm\(baoCaoMotEm, baoCaoEmMay\.may\)/)
+    expect(man).toMatch(/<BaoCaoMotEmTrang\s+bc=\{baoCaoMotEmHienThi\}/)
   })
 })

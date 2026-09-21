@@ -2,9 +2,10 @@
 // XEM ĐIỂM BẢN 2 · GV-1 — HỢP ĐỒNG HAI PHÍA: THÂN THẬT của `gvBaoCaoCa` (server/src/bao-cao-ca.ts, D1 giả bằng SQLite thật) đi qua bộ đọc của màn (`docBaoCaoCaLopMayChu`) —
 // máy chủ đổi tên khoá / kiểu số thì test này đỏ trước khi khối "Báo cáo cả lớp" trắng. Đọc được ⇒ số khớp bảng điểm; dạng vấp / câu sai nhiều / điểm giảm có mặt.
 import { describe, expect, it } from 'vitest'
-import { gvBaoCaoCa } from '../server/src/bao-cao-ca'
+import { gvBaoCaoCa, gvBaoCaoCaEm } from '../server/src/bao-cao-ca'
 import { taoD1That, type D1That } from './_d1-that'
-import { docBaoCaoCaLopMayChu } from '../src/lib/bao-cao-may-chu'
+import { docBaoCaoCaLopMayChu, docBaoCaoEmMayChu, ghepBaoCaoMotEm } from '../src/lib/bao-cao-may-chu'
+import type { BaoCaoMotEm } from '../src/lib/bao-cao-mot-em'
 import { KHOANG_DIEM } from '../src/lib/bao-cao-ca-lop'
 
 const NOW = Date.parse('2026-09-22T05:00:00.000Z')
@@ -74,5 +75,54 @@ describe('thân thật của /gv/bao-cao-ca ⇒ docBaoCaoCaLopMayChu', () => {
       expect((than as { ok?: boolean }).ok).toBe(false)
       expect(docBaoCaoCaLopMayChu(than as Record<string, unknown>)).toBeNull()
     }
+  })
+})
+
+describe('thân thật của /gv/bao-cao-ca-em ⇒ docBaoCaoEmMayChu ⇒ ghepBaoCaoMotEm', () => {
+  const TRONG: BaoCaoMotEm = { daNop: true, tong: null, dung: null, tongCau: null, motPhan: 0, chuThoiGian: '30 phút', phan: [], dang: [], cauXemLai: [], soVoiLop: null, coBangCham: false }
+  it('đọc được: điểm, đúng/tổng, phần (trần điểm), dạng (tên, không mã, vấp trước), câu cần xem lại (kèm đề + lời giải)', async () => {
+    const d = truong()
+    const than = (await gvBaoCaoCaEm(d.env, { maCa: 'C1', sbd: 'C' }, NOW)) as Record<string, unknown>
+    expect(than.ok).toBe(true)
+    const em = docBaoCaoEmMayChu(than)
+    expect(em, 'bộ đọc từ chối thân thật của máy chủ').not.toBeNull()
+    expect([em!.tong, em!.dung, em!.tongCau, em!.motPhan]).toEqual([2.5, 1, 6, 0])
+    expect(em!.phan).toHaveLength(1)
+    expect(em!.phan[0]).toMatchObject({ ma: 'I', dung: 1, tong: 6, toiDa: 10, cau: [] })
+    expect(em!.dang.map((x) => x.ten)).toEqual(['Thuỷ phân ester', 'Tính chất amin'])
+    expect(em!.dang[0]).toMatchObject({ dung: 0, tong: 3, canOn: true })
+    expect(em!.dang.every((x) => !/^D\./.test(x.ten))).toBe(true)
+    expect(em!.cauXemLai.length).toBeGreaterThan(0)
+    expect(em!.cauXemLai.length).toBeLessThanOrEqual(8)
+    expect(em!.cauXemLai[0]).toMatchObject({ loai: 'sai', dapAnChon: 'A', dapAnDung: 'B', de: 'Câu 1', dang: '' })
+    expect(em!.cauXemLai[0]!.loiGiai).toBeTruthy()
+  })
+  it('máy thầy KHÔNG có bảng chấm ⇒ ghép điền các khối trống; CÓ bảng chấm ⇒ giữ nguyên bản ở máy', async () => {
+    const d = truong()
+    const em = docBaoCaoEmMayChu((await gvBaoCaoCaEm(d.env, { maCa: 'C1', sbd: 'C' }, NOW)) as Record<string, unknown>)!
+    const g = ghepBaoCaoMotEm(TRONG, em)
+    expect([g.tong, g.dung, g.tongCau]).toEqual([2.5, 1, 6])
+    expect(g.phan).toHaveLength(1)
+    expect(g.dang.length).toBe(2)
+    expect(g.cauXemLai.length).toBe(em.cauXemLai.length)
+    expect(g.daNop).toBe(true)
+    expect(g.chuThoiGian).toBe('30 phút') // của máy thầy
+    expect(g.coBangCham).toBe(false) // vẫn không có ô từng câu
+    const coBang: BaoCaoMotEm = { ...TRONG, coBangCham: true, tong: 2.5, dang: [{ ten: 'Riêng máy', dung: 1, tong: 2, canOn: true }] }
+    expect(ghepBaoCaoMotEm(coBang, em)).toBe(coBang) // nguyên vẹn
+    const mot: BaoCaoMotEm = { ...TRONG, dang: [{ ten: 'Riêng máy', dung: 1, tong: 2, canOn: true }] }
+    expect(ghepBaoCaoMotEm(mot, em).dang).toEqual(mot.dang) // khối máy thầy đã có thì không ghi đè
+    expect(ghepBaoCaoMotEm(mot, em).cauXemLai.length).toBe(em.cauXemLai.length)
+    // mỗi khối máy thầy ĐÃ có (điểm, câu xem lại) đều được giữ, chỉ khối trống mới điền
+    const rieng = { qid: 'R', phan: 'I' as const, soCau: 1, dang: '', loai: 'sai' as const, de: 'Riêng', dapAnChon: 'A', dapAnDung: 'B', giay: 5, tbGiayLop: null, loiGiai: null }
+    const co: BaoCaoMotEm = { ...TRONG, tong: 9, dung: 20, tongCau: 30, cauXemLai: [rieng] }
+    const g2 = ghepBaoCaoMotEm(co, em)
+    expect([g2.tong, g2.dung, g2.tongCau]).toEqual([9, 20, 30])
+    expect(g2.cauXemLai).toEqual([rieng])
+    expect(g2.phan).toHaveLength(1) // khối trống thì điền
+  })
+  it('em chưa nộp / mã sai ⇒ thân không có ketQua ⇒ bộ đọc trả null', async () => {
+    const d = truong()
+    for (const than of [await gvBaoCaoCaEm(d.env, { maCa: 'C1', sbd: 'KHONG-CO' }, NOW), await gvBaoCaoCaEm(d.env, { maCa: 'KHONG-CO', sbd: 'C' }, NOW)]) expect(docBaoCaoEmMayChu(than as Record<string, unknown>)).toBeNull()
   })
 })

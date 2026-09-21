@@ -8,6 +8,7 @@ import {
   type BaoCaoCaLop, type CauSaiNhieu, type DangCaLop, type EmCanYY, type PhanTrungBinh,
 } from './bao-cao-ca-lop'
 import { soVn } from './ket-qua-sau-nop'
+import { NGUONG_CAN_ON, type BaoCaoMotEm, type CauXemLai, type DangCuaEm, type PhanChiTiet } from './bao-cao-mot-em'
 
 /** Dữ kiện rời màn của từng em (chỉ máy thầy có): dùng để gộp lý do "rời màn ≥ 3 lần" vào danh sách em cần để ý. */
 export interface EmRoiMan {
@@ -164,4 +165,78 @@ export function docBaoCaoCaLopMayChu(j: Record<string, unknown>, roiMan: readonl
 export async function layBaoCaoCaLopMayChu(maCa: string, roiMan: readonly EmRoiMan[] = []): Promise<BaoCaoCaLop | null> {
   const r = await goiLenh('/gv/bao-cao-ca', { maCa }, 'Máy chủ chưa có lệnh Báo cáo ca — tính từ số ở máy này.')
   return r.ok ? docBaoCaoCaLopMayChu(r.du as Record<string, unknown>, roiMan) : null
+}
+
+// ───────────────────────────── MỘT EM (GV-2): `POST /gv/bao-cao-ca-em {maCa, sbd}` ─────────────────────────────
+// Máy chủ có kho câu + bảng chấm nên có dạng của em, câu cần xem lại (kèm lời giải, KHÔNG câu tự luận) dù máy thầy chưa có đáp án của ca. Máy thầy CÓ bảng chấm thì vẫn dùng bản tính ở máy
+// (đủ ô từng câu); chỉ khi máy thầy KHÔNG có bảng chấm mới ghép phần của máy chủ vào các khối còn trống. Không có ô "từng câu" từ máy chủ ⇒ `phan[].cau` rỗng (màn ẩn dải ô).
+
+export interface BaoCaoEmMayChu {
+  tong: number | null
+  dung: number | null
+  tongCau: number | null
+  motPhan: number
+  phan: PhanChiTiet[]
+  dang: DangCuaEm[]
+  cauXemLai: CauXemLai[]
+}
+const TEN_PHAN_DAY_DU = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng–sai', III: 'Phần III · Trả lời ngắn' } as const
+const DIEM_TOI_DA_MAC_DINH = { I: 4.5, II: 4, III: 1.5 } as const
+
+/** Thân `/gv/bao-cao-ca-em` ⇒ phần ghép được. Thiếu `ketQua` (không có điểm) ⇒ null. Khối sai dạng ⇒ bỏ khối. */
+export function docBaoCaoEmMayChu(j: Record<string, unknown>): BaoCaoEmMayChu | null {
+  const kq = doiTuong(j.ketQua)
+  const tong = kq ? so(kq.tong) : null
+  if (!kq || tong === null) return null
+  const phan: PhanChiTiet[] = []
+  for (const x of mang(j.phan)) {
+    const o = doiTuong(x)
+    const ma = PHAN.find((m) => m === o?.ma)
+    const dung = khongAm(o?.dung), tongCau = khongAm(o?.tong), motPhan = khongAm(o?.motPhan), diem = so(o?.diem)
+    if (!o || !ma || dung === null || tongCau === null || diem === null) continue
+    phan.push({ ma, ten: TEN_PHAN_DAY_DU[ma], dung, tong: tongCau, motPhan: motPhan ?? 0, diem, toiDa: khongAm(o.toiDa) ?? DIEM_TOI_DA_MAC_DINH[ma], cau: [] })
+  }
+  const dang: DangCuaEm[] = []
+  for (const x of mang(j.dang)) {
+    const o = doiTuong(x)
+    const ten = chu(o?.ten)
+    const dung = khongAm(o?.dung), tongCau = khongAm(o?.tong)
+    if (!ten || dung === null || tongCau === null || tongCau < 1 || dung > tongCau) continue
+    dang.push({ ten, dung, tong: tongCau, canOn: dung / tongCau < NGUONG_CAN_ON })
+  }
+  dang.sort((a, b) => a.dung / a.tong - b.dung / b.tong || b.tong - a.tong || a.ten.localeCompare(b.ten, 'vi'))
+  const cauXemLai: CauXemLai[] = []
+  for (const x of mang(j.cauCanXemLai)) {
+    const o = doiTuong(x)
+    const p = PHAN.find((m) => m === o?.phan)
+    const qid = chu(o?.qid), soCau = khongAm(o?.soCau)
+    if (!o || !p || !qid || soCau === null) continue
+    const de = chu(o.de)
+    cauXemLai.push({
+      qid, phan: p, soCau, dang: '', loai: o.laDungNhungLau === true ? 'dung_lau' : 'sai', de: de || null, dapAnChon: chu(o.dapAnChon), dapAnDung: chu(o.dapAnDung),
+      giay: khongAm(o.giay), tbGiayLop: khongAm(o.tbGiay), loiGiai: o.loiGiai ?? null,
+    })
+  }
+  return { tong, dung: khongAm(kq.soCauDung), tongCau: khongAm(kq.soCau), motPhan: khongAm(kq.soCauMotPhan) ?? 0, phan, dang, cauXemLai: cauXemLai.slice(0, 8) }
+}
+
+/** Ghép phần của máy chủ vào báo cáo tính ở máy: máy thầy CÓ bảng chấm ⇒ giữ nguyên (đủ ô từng câu); KHÔNG có ⇒ chỉ điền các khối còn trống. Không đổi `daNop`, thời gian, so với lớp (chỉ máy thầy có). */
+export function ghepBaoCaoMotEm(local: BaoCaoMotEm, may: BaoCaoEmMayChu): BaoCaoMotEm {
+  if (local.coBangCham) return local
+  const coPhan = local.phan.length > 0
+  return {
+    ...local,
+    tong: local.tong ?? may.tong,
+    dung: local.dung ?? may.dung,
+    tongCau: local.tongCau ?? may.tongCau,
+    motPhan: coPhan ? local.motPhan : may.motPhan,
+    phan: coPhan ? local.phan : may.phan,
+    dang: local.dang.length > 0 ? local.dang : may.dang,
+    cauXemLai: local.cauXemLai.length > 0 ? local.cauXemLai : may.cauXemLai,
+  }
+}
+
+export async function layBaoCaoEmMayChu(maCa: string, sbd: string): Promise<BaoCaoEmMayChu | null> {
+  const r = await goiLenh('/gv/bao-cao-ca-em', { maCa, sbd }, 'Máy chủ chưa có lệnh Báo cáo một em — dùng số ở máy này.')
+  return r.ok ? docBaoCaoEmMayChu(r.du as Record<string, unknown>) : null
 }

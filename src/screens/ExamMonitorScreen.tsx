@@ -41,7 +41,7 @@ import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 import BaoCaoCaLopKhoi from '../components/xem-diem-gv/BaoCaoCaLop'
 import { tinhBaoCaoCaLop, tomTatCaLop, type EmChoBaoCao } from '../lib/bao-cao-ca-lop'
-import { layBaoCaoCaLopMayChu } from '../lib/bao-cao-may-chu'
+import { ghepBaoCaoMotEm, layBaoCaoCaLopMayChu, layBaoCaoEmMayChu, type BaoCaoEmMayChu } from '../lib/bao-cao-may-chu'
 import BaoCaoMotEmTrang from '../components/xem-diem-gv/BaoCaoMotEm'
 import { nguonCauTuNganHang, tinhBaoCaoMotEm } from '../lib/bao-cao-mot-em'
 
@@ -514,6 +514,26 @@ export default function ExamMonitorScreen() {
     const em = lop.find((e) => e.sbd === sbdHoSo)
     return em ? tinhBaoCaoMotEm(em, lop, nguonCauTuNganHang(bank)) : null
   }, [sbdHoSo, khoaBaoCaoLop])
+  // Máy thầy KHÔNG có bảng chấm của em (chưa có đáp án của ca) ⇒ hỏi máy chủ `/gv/bao-cao-ca-em` (có kho câu) để điền các khối còn trống (dạng, câu cần xem lại). Có bảng chấm ⇒ không hỏi.
+  // Không có lệnh / lỗi ⇒ giữ nguyên số ở máy.
+  const [baoCaoEmMay, setBaoCaoEmMay] = useState<{ khoa: string; may: BaoCaoEmMayChu } | null>(null)
+  const khoaEmMay = chiTiet && sbdHoSo ? `${chiTiet.ca.maCa}|${sbdHoSo}` : ''
+  const canHoiMayChu = !!baoCaoMotEm && !baoCaoMotEm.coBangCham && baoCaoMotEm.daNop
+  useEffect(() => {
+    if (!khoaEmMay || !canHoiMayChu || !chiTiet) return
+    let huy = false
+    void layBaoCaoEmMayChu(chiTiet.ca.maCa, sbdHoSo).then((may) => {
+      if (!huy && may) setBaoCaoEmMay({ khoa: khoaEmMay, may })
+    })
+    return () => {
+      huy = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ đổi em / ca / việc "cần hỏi" mới hỏi lại
+  }, [khoaEmMay, canHoiMayChu])
+  const baoCaoMotEmHienThi = useMemo(
+    () => (baoCaoMotEm && baoCaoEmMay && baoCaoEmMay.khoa === khoaEmMay && !baoCaoMotEm.coBangCham ? ghepBaoCaoMotEm(baoCaoMotEm, baoCaoEmMay.may) : baoCaoMotEm),
+    [baoCaoMotEm, baoCaoEmMay, khoaEmMay],
+  )
 
   // VÁ NGƯỢC KHOÁ `key/<maCa>.json` CHO CA CŨ — TỰ LÀNH KHI THẦY MỞ MÀN.
   //
@@ -1980,9 +2000,9 @@ export default function ExamMonitorScreen() {
         />
       )}
 
-      {sbdHoSo && emTrongCa && baoCaoMotEm && chiTiet && (
+      {sbdHoSo && emTrongCa && baoCaoMotEmHienThi && chiTiet && (
         <BaoCaoMotEmTrang
-          bc={baoCaoMotEm}
+          bc={baoCaoMotEmHienThi}
           hoTen={emTrongCa.hoTen || hoSo?.em.hoTen || ''}
           sbd={sbdHoSo}
           maCa={chiTiet.ca.maCa}
