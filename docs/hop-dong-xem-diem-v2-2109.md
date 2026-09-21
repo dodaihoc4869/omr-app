@@ -53,14 +53,15 @@ Một lệnh báo cáo ≤ 8 truy vấn D1 (`chi_tiet_cau` của em+ca, `luot` c
 ```jsonc
 { "ok": true, "ca": { "maCa": "…", "tenCa": "…", "loai": "thi", "trangThai": "mo|dong", "lop": "…" },
   "congBo": { "congBo": "…", "daCongBo": false, "soEmDaNop": 27, "soEmDaVao": 32 },
-  "tongQuan": { "soEm": 27, "tb": 6.9, "cao": 9.5, "thap": 2.5, "phoDiem": [ { "tu": 0, "den": 1, "so": 0 } ], "phanTb": { "I": 2.6, "II": 2.1, "III": 2.2 } },
-  "dangCaLopVap": [ { "ma": "…", "ten": "…", "soEmSai": 14, "soEm": 27 } ],
-  "cauSaiNhieu": [ { "qid": "…", "phan": "I", "soCau": 7, "de": "…", "soEmSai": 15, "soEm": 27, "dapAnDung": "C", "dapAnSaiNhieu": { "dapAn": "A", "soEm": 9 } } ],
+  "tongQuan": { "soEm": 27, "tb": 6.9, "cao": 9.5, "thap": 2.5, "phoDiem": [ { "tu": 0, "den": 1, "so": 0 } ],
+                 "phanTb": [ { "ma": "I", "diemTb": 2.6, "dungTb": 8.4, "tong": 12, "toiDa": 3 } ] },      // như HS `phan` (Code 4 xin): trung bình đúng x/y câu + điểm/trần điểm
+  "dangCaLopVap": [ { "ma": "…", "ten": "…", "tiLeDung": 0.46, "soEmSai": 10, "soEm": 12 } ],   // tiLeDung = tỉ lệ CÂU đúng của cả lớp ở dạng ấy trong ca; soEmSai = số em sai ÍT NHẤT MỘT câu của dạng; soEm = số em có câu dạng ấy
+  "cauSaiNhieu": [ { "qid": "…", "phan": "I", "soCau": 7, "de": "…", "dang": "Thuỷ phân ester", "soEmSai": 15, "soEm": 27, "dapAnDung": "C", "dapAnSaiNhieu": { "dapAn": "A", "soEm": 9 } } ],
   "emCanYY": [ { "sbd": "…", "hoTen": "…", "tong": 2.5, "diemTruoc": 5, "doi": -2.5 } ],
   "hocSinh": [ { "sbd": "…", "hoTen": "…", "tong": 7.5, "diemTruoc": 6.75, "doi": 0.75, "thoiGianLamGiay": 1930, "soCauDung": 21, "soCau": 28 } ],
   "aiDaLo": { "soCauSaiVaoLichOn": 96, "soEmCoLichOn": 24, "dangBuoiChuaXepSan": [ { "ma": "…", "ten": "…" } ], "dangBaiTapKe": [ { "ma": "…", "ten": "…", "soEm": 12 } ] } }
 ```
-- `phoDiem`: 10 khoảng [0,1)…[9,10]; `dapAnSaiNhieu` = đáp án SAI được chọn nhiều nhất + số em (chỉ đáp án và số em, không lý do); `emCanYY` = tối đa 5 em (điểm giảm ≥ 1,5 so với lần trước của CHÍNH em hoặc dưới 3) — chỉ số liệu, không nhãn năng lực; `dangBuoiChuaXepSan` = dạng cả lớp vấp mà `/gv/buoi-chua-de-xuat` đã có; `dangBaiTapKe` = dạng nhiều em yếu nhất sau ca. Khối nào thiếu số thật thì vắng.
+- `phoDiem`: 10 khoảng [0,1)…[9,10]; `dapAnSaiNhieu` = đáp án SAI được chọn nhiều nhất + số em (chỉ đáp án và số em, không lý do); `dang` = tên dạng (không mã, vắng nếu không rõ), `de` không bao giờ là câu tự luận; `emCanYY` = tối đa 5 em (điểm giảm ≥ 1,5 so với lần trước của CHÍNH em hoặc điểm DƯỚI 5 — nửa thang, khớp chữ trên màn; máy thầy tự gộp lý do "rời màn ≥ 3 lần"/"chưa nộp" từ dữ liệu lượt) — chỉ số liệu, không nhãn năng lực; `dangBuoiChuaXepSan` = dạng cả lớp vấp mà `/gv/buoi-chua-de-xuat` đã có; `dangBaiTapKe` = dạng nhiều em yếu nhất sau ca. Khối nào thiếu số thật thì vắng.
 `/gv/bao-cao-ca-em {maCa, sbd}` — thân MỤC 2 (không chặn công bố; `congBo` vẫn có) **+** `hangTrongLop: { "hang": 5, "siSo": 27 }` (chỉ ở lệnh thầy; hạng trong lớp của ca này) + `aiDaLo` mở rộng: `dangUuTien`, `ngayOnLai` + số câu, `expDaCong`.
 
 ## 5 · Mốc và test
