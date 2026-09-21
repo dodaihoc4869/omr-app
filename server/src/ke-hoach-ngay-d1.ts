@@ -124,7 +124,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
   // Bài cá nhân hoá đã chốt: lô ≡ chặng — một truy vấn cho kích cỡ từng chặng của cả lô em.
   if (baiChot.size > 0) {
     const rcg = await tat(() => env.DB.prepare(
-      `SELECT ma_btvn, sbd, chang, COUNT(*) AS n FROM btvn_em_cau WHERE sbd IN (SELECT value FROM json_each(?)) AND ma_btvn IN (SELECT value FROM json_each(?)) GROUP BY ma_btvn, sbd, chang ORDER BY chang`,
+      `SELECT ma_btvn, sbd, chang, COUNT(*) AS n FROM btvn_em_cau WHERE chang >= 0 AND sbd IN (SELECT value FROM json_each(?)) AND ma_btvn IN (SELECT value FROM json_each(?)) GROUP BY ma_btvn, sbd, chang ORDER BY chang`,
     ).bind(arr, json([...new Set([...baiChot.keys()].map((k) => k.split('|')[0]))])).all<Record<string, unknown>>(), trong())
     const soCauChang = new Map<string, number[]>()
     for (const x of rcg.results ?? []) {

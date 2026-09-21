@@ -2,7 +2,7 @@ import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './bt
 import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
-import {docBoCuaCacEm,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
+import {docBoCuaCacEm,docTomTat,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 import { goTuLuanKhoiGoi, laCauTuLuan, locPhieuBaiTap, type PhanCau } from './cam-tu-luan'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
@@ -3076,7 +3076,7 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
     // Ba cột BTVN "nâng đỡ" (migration-2109-btvn-nang-do.sql): chưa chạy migration thì lùi về truy vấn cũ ngay dưới.
     r = await env.DB.prepare(
       `SELECT be.ma_btvn, be.sbd, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau, COALESCE(be.so_lan_lam, 1) AS so_lan_lam,
-              be.lo_da_xong, be.so_cau_em, be.so_chang, b.ca_nhan,
+              be.lo_da_xong, be.so_cau_em, be.so_chang, be.tom_tat_json, b.ca_nhan,
               b.ma_ca, b.ma_de, b.han_nop, b.so_cau, b.giao_luc
          FROM btvn_em be
          JOIN btvn b ON b.ma_btvn = be.ma_btvn
@@ -3146,7 +3146,7 @@ export async function hsBtvn(env: Env, b: Record<string, unknown>): Promise<Reco
         soLanLam,
         soLanLamLaiConLai: caNhan ? 0 : soLanLamLaiConLai,
         duocLamLai: caNhan ? false : soLanLamLaiConLai > 0,
-        ...(caNhan ? { caNhan: true, soCauCuaEm, soChang: soHoacNull(x.so_chang) } : {}),
+        ...(caNhan ? { caNhan: true, soCauCuaEm, soChang: soHoacNull(x.so_chang), soThuSucThem: docTomTat(x.tom_tat_json)?.soThuSucThem ?? 0 } : {}),
       }
     }),
   }
