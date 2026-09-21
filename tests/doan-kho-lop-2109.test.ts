@@ -87,10 +87,12 @@ describe('kho LỚP cho câu cá nhân của Đoàn', () => {
     for (const q of qs) expect(Number(q.slice(2)), q).toBeGreaterThanOrEqual(24)
   })
 
-  it('trần 60 câu/ngày: đã làm đủ 60 câu game hôm nay ⇒ từ chối bằng lời cũ', async () => {
+  it('trần ĐOÀN 60 câu/ngày (tính riêng): đã làm đủ 60 câu CỦA ĐOÀN hôm nay ⇒ từ chối bằng lời cũ', async () => {
     const d = dung()
+    // SỬA CÓ CHỦ Ý 21/09 (thầy lệnh 19:30): trần Đoàn 60 chỉ đếm lượt của PHIÊN ĐOÀN ($.doan = 1); attempt phải có json thật ({attempt:{group,…}}) để hàm chọn câu đọc được
+    d.sql.prepare("INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES('sd','S1',?,'x')").run(JSON.stringify({ doan: 1, mode: 'adventure', questions: [], created: 1 }))
     const ins = d.sql.prepare("INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)")
-    for (let i = 0; i < 60; i++) ins.run(`a${i}`, 'S1', 's', `Q${i}`, `g${i}`, '{}', '2026-09-22T01:00:00.000Z')
+    for (let i = 0; i < 60; i++) ins.run(`a${i}`, 'S1', 'sd', `Q${i}`, `g${i}`, JSON.stringify({ attempt: { qid: `Q${i}`, group: `g${i}`, correct: true, at: T0 - 3_600_000 + i, assisted: false } }), '2026-09-22T01:00:00.000Z')
     await expect(goi(d, 'S1', 'mo')).rejects.toThrow(/60 câu hôm nay/)
   })
 

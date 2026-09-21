@@ -20,7 +20,7 @@ import {doanAction,laGoiNoiBoDoan,doanMoCho} from './game-v2-doan'
 import {SO_HIEP} from '../../src/game/than-thu-v2/doan-core'
 import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay'
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
-import {TRAN_CAU_GAME_NGAY,docCauBtvnChuaNop,docDangLop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot} from './game-v2-luot'
+import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,dieuKienLoaiPhien,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDangLop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot} from './game-v2-luot'
 import {ghiKhoanExpGame} from './exp-d1'
 import {expMotCau} from './exp-hoc-tap'
 export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
@@ -84,8 +84,8 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   const dauVao=await docDauVaoLuot(env,sbd,ngay,tNow,t.dat)
   const info=luotHomNay(dauVao)
   const dayStart=new Date(ngay+'T00:00:00+07:00').toISOString()
-  const count=await env.DB.prepare('SELECT COUNT(*) AS n FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,dayStart).first<{n:number}>()
-  const remaining=Math.max(0,TRAN_CAU_GAME_NGAY-(count?.n??0))
+  const count={n:await demCauTrongNgay(env,sbd,dayStart,'dao')} // trần ĐẢO riêng (36), không tính lượt của Đoàn
+  const remaining=Math.max(0,TRAN_CAU_DAO_NGAY-count.n)
   const history=await attempts(env,sbd),mastery=await masteryTheoHoSo(env,sbd,p.mastery)
   const cho=maiCho(dangLop,mastery,tNow),tom=tomTatLuot(info,dauVao.soLuotDaLam)
   if(action==='start'){
@@ -101,9 +101,9 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
       }catch{/* câu đã đổi/rút khỏi kho: mở lượt mới */}
     }
   }
-  if(action==='recommendations'&&(!remaining||!info.luotTiepTheo))return {ok:true,dailyUsed:count?.n??0,tranNgay:TRAN_CAU_GAME_NGAY,suggestions:[],remaining,luot:tom}
+  if(action==='recommendations'&&(!remaining||!info.luotTiepTheo))return {ok:true,dailyUsed:count.n,tranNgay:TRAN_CAU_DAO_NGAY,suggestions:[],remaining,luot:tom}
   if(!info.luotTiepTheo)return {ok:true,questions:[],het:true,luot:tom,maiCho:cho,message:'Hôm nay em đã dùng hết lượt thần thú. Mai thú chờ em.'}
-  if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_GAME_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
+  if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_DAO_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
   const blocked=await protectedQuestions(env)
   for(const key of control.blocked)blocked.add(key)
   for(const qid of await qidChanHomNay(env,sbd,tNow))blocked.add(qid)
@@ -112,7 +112,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   const eligible=scope.pool.filter(q=>q.reviewed&&!laCauTuLuan(q)&&!!q.dang&&!!q.mucDo&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(control.types.length===0||control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
   const lt=info.luotTiepTheo
   const chon=chooseLuotMoi(eligible,scope.evidence,history,mastery,{loai:lt.loai,cap:p.cap,now:tNow,thuong:lt.thuong,blocked,soCau:Math.min(SO_CAU_MOI_LUOT,remaining)})
-  if(action==='recommendations')return {ok:true,dailyUsed:count?.n??0,tranNgay:TRAN_CAU_GAME_NGAY,suggestions:chon.map(x=>({title:x.q.tenDang||'Ôn kiến thức đã học',source:x.q.maDe,part:x.q.phan})),remaining,luot:tom}
+  if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:TRAN_CAU_DAO_NGAY,suggestions:chon.map(x=>({title:x.q.tenDang||'Ôn kiến thức đã học',source:x.q.maDe,part:x.q.phan})),remaining,luot:tom}
   if(!chon.length)return {ok:true,questions:[],lyDo:eligible.length?'chi_con_cau_qua_bac':'kho_trong',luot:tom,maiCho:cho,missing:scope.missing,message:eligible.length?'Các câu còn lại của lớp đều cao hơn một bậc so với sức em ở dạng đó. Em làm thêm bài tập về nhà và phần ôn lại, mai thú mở câu mới cho em.':'Lớp em chưa học dạng nào có câu phù hợp cho thần thú. Khi Thầy giao bài mới, câu sẽ mở ra.'}
   const id=crypto.randomUUID(),groups=new Set(scope.evidence.map(e=>e.group))
   const session:Session={mode:'adventure',created:Date.now(),questions:chon.map(x=>({qid:x.q.qid,maDe:x.q.maDe,version:x.q.version,group:x.q.group,novel:!groups.has(x.q.group),role:x.role}))}
@@ -131,9 +131,8 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
   const dangLop=await docDangLop(env,sbd,tNow)
   const scope=await readScope(env,sbd,dangLop)
   const dayStart=new Date(ngay+'T00:00:00+07:00').toISOString()
-  const count=await env.DB.prepare('SELECT COUNT(*) AS n FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,dayStart).first<{n:number}>()
-  const remaining=Math.max(0,TRAN_CAU_GAME_NGAY-(count?.n??0))
-  if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_GAME_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
+  const remaining=Math.max(0,TRAN_CAU_DOAN_NGAY-await demCauTrongNgay(env,sbd,dayStart,'doan')) // trần ĐOÀN riêng (60), không tính lượt của Đảo
+  if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_DOAN_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
   const history=await attempts(env,sbd)
   const blocked=await protectedQuestions(env)
   for(const key of control.blocked)blocked.add(key)
@@ -221,11 +220,12 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
       if(saved){const old=JSON.parse(saved.json) as Session;const qs=old.questions.map(ref=>eligible.find(q=>q.qid===ref.qid&&q.version===ref.version));if(qs.every(Boolean)){const answered=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=?').bind(saved.id,sbd).all<{json:string}>();return {ok:true,id:saved.id,questions:qs.map(q=>publicQuestion(q!)),answered:answered.results.map(x=>JSON.parse(x.json))}}throw new Error('Câu của lượt này đã thay đổi phạm vi. Em chờ lượt mới.')}
     }
     const dayStart=new Date(academicDay(now())+'T00:00:00+07:00')
-    const count=await env.DB.prepare('SELECT COUNT(*) AS n FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,dayStart.toISOString()).first<{n:number}>()
-    const remaining=Math.max(0,TRAN_CAU_GAME_NGAY-(count?.n??0))
+    const loaiTran:LoaiTran=laGoiNoiBoDoan(b)?'doan':'dao' // Đoàn gọi `start` nội bộ ⇒ trần Đoàn; Linh Tâm/võ đài/đường cũ ⇒ trần Đảo (36)
+    const count={n:await demCauTrongNgay(env,sbd,dayStart.toISOString(),loaiTran)}
+    const remaining=Math.max(0,tranCuaLoai(loaiTran)-count.n)
     const chon=chooseSessionWithRoles(eligible,scope.evidence,history,await masteryTheoHoSo(env,sbd,p.mastery),mode,tNow).slice(0,remaining),selected=chon.map(x=>x.q),vai=new Map(chon.map(x=>[x.q.qid,x.role]))
-    if(action==='recommendations')return {ok:true,dailyUsed:count?.n??0,tranNgay:TRAN_CAU_GAME_NGAY,suggestions:selected.map(q=>({title:q.tenDang||'Ôn kiến thức đã học',source:q.maDe,part:q.phan})),remaining}
-    if(!remaining)throw new Error(`Em đã hoàn thành ${TRAN_CAU_GAME_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
+    if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:tranCuaLoai(loaiTran),suggestions:selected.map(q=>({title:q.tenDang||'Ôn kiến thức đã học',source:q.maDe,part:q.phan})),remaining}
+    if(!remaining)throw new Error(`Em đã hoàn thành ${tranCuaLoai(loaiTran)} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
     const qs=mode==='arena'?selected.slice(0,b.guardian?1:2):selected
     if(!qs.length)return {ok:true,questions:[],missing:scope.missing,message:'Chưa có câu đã chấm, đã công bố và phù hợp trong kho. Em hoàn thành bài Thầy giao rồi quay lại.'}
     const id=guardian?await hash(`${guardian}|${guardianRound}|${sbd}`):crypto.randomUUID();const groups=new Set(scope.evidence.map(e=>e.group))
@@ -262,8 +262,9 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     if(previous)return {ok:true,...JSON.parse(previous.json),profile:visible(p),revision,replayed:true}
     if(session.guardian){const {r}=await escortContext(env,session.guardian,sbd);if(r.finished||r.round!==session.guardianRound||Date.now()>=Math.min(r.deadline,r.roundAt+60000))throw new Error('Lượt vừa kết thúc. Em làm câu của lượt mới.')}
     const dailyStart=new Date(academicDay(now())+'T00:00:00+07:00').toISOString()
-    const daily=await env.DB.prepare('SELECT COUNT(*) AS n FROM game_v2_attempt WHERE sbd=? AND created_at>=?').bind(sbd,dailyStart).first<{n:number}>()
-    if((daily?.n??0)>=TRAN_CAU_GAME_NGAY)throw new Error(`Em đã hoàn thành ${TRAN_CAU_GAME_NGAY} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
+    const loaiTran:LoaiTran=session.doan===1?'doan':'dao' // lượt thuộc phiên Đoàn ⇒ trần Đoàn (60); phiên khác ⇒ trần Đảo (36) — hai trần TÍNH RIÊNG
+    const tran=tranCuaLoai(loaiTran)
+    if(await demCauTrongNgay(env,sbd,dailyStart,loaiTran)>=tran)throw new Error(`Em đã hoàn thành ${tran} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`)
     const submitted=String(b.answer??'').trim()
     if(q.phan==='I'&&!/^[ABCD]$/.test(submitted)||q.phan==='II'&&!/^[DS]{4}$/.test(submitted)||q.phan==='III'&&(!submitted||submitted.length>40))throw new Error('Em điền đủ đáp án trước khi chấm.')
     const attempt:Attempt={id:receipt,session:id,qid,group:q.group,dang:q.dang,mucDo:q.mucDo,correct:grade(q,String(b.answer??'')),assisted:b.assisted===true,at:Date.now(),novel:ref.novel}
@@ -274,7 +275,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
     if(session.mode==='arena'&&p.arena&&!p.arena.finished)p.arena.studied=(p.arena.studied??0)+1
     if(session.mode==='arena'&&p.arena&&!p.arena.finished&&attempt.correct&&!attempt.assisted&&p.arena.learned<2&&!(p.arena.learnedGroups??[]).includes(q.group)){p.arena.gold+=2;p.arena.learned++;p.arena.learnedGroups=[...(p.arena.learnedGroups??[]),q.group]}
     const result={attempt,correct:attempt.correct,answer:q.correct,solution:q.solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),reward:thuong,...(thuong<step.reward?{thuongGoc:step.reward}:{}),stage:step.mastery.stage,lyDoThuong:lyDoThuong({correct:attempt.correct,assisted:attempt.assisted,reward:thuong,milestone:step.milestone,stage:step.mastery.stage})}
-    const queries=[env.DB.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?) AND (SELECT COUNT(*) FROM game_v2_attempt WHERE sbd=? AND created_at>=?)<60').bind(receipt,sbd,id,qid,q.group,JSON.stringify(result),now(),sbd,revision,sbd,dailyStart)]
+    const queries=[env.DB.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) SELECT ?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?) AND (SELECT COUNT(*) FROM game_v2_attempt a WHERE a.sbd=? AND a.created_at>=? AND '+dieuKienLoaiPhien(loaiTran)+')<?').bind(receipt,sbd,id,qid,q.group,JSON.stringify(result),now(),sbd,revision,sbd,dailyStart,tran)]
     if(step.reward)queries.push(env.DB.prepare('INSERT OR IGNORE INTO game_v2_reward(id,sbd,amount,created_at) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(`${sbd}|${step.mastery.key}|${step.milestone}`,sbd,thuong,now(),receipt))
     queries.push(env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=? AND EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(JSON.stringify(p),sbd,revision,receipt))
     const written=await env.DB.batch(queries)

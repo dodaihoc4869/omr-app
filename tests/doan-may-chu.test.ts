@@ -418,12 +418,14 @@ describe('Đoàn Hộ Tống · máy chủ · luật cũ vẫn khoá', () => {
     const q = thuong.questions[0].qid as string
     expect(await gameV2(d.env, 'answer', { token, session: thuong.id, qid: q, answer: dapAn.get(q) })).toMatchObject({ ok: true, correct: true })
   })
-  it('trần 60 câu game/ngày (sửa CÓ CHỦ Ý 21/09: 200 ⇒ 60): đã đủ 60 thì không lên đường được; em chưa có bằng chứng học thì được báo bằng lời, không mở chặng rỗng', async () => {
+  it('trần ĐOÀN 60 câu/ngày (tính RIÊNG, sửa CÓ CHỦ Ý 21/09: 200 ⇒ 60 gộp ⇒ Đoàn 60 riêng): đã đủ 60 lượt của Đoàn thì không lên đường được; em chưa có bằng chứng học thì được báo bằng lời, không mở chặng rỗng', async () => {
     const d = dungTruong(); await bangChung(d, 'S1', 'X1')
     await expect(goi(d, 'S2', 'mo')).rejects.toThrow('Chưa có câu')
     expect(dem(d, 'SELECT COUNT(*) n FROM doan_chang')).toBe(0)
-    const ins = d.sql.prepare("INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,'S1','s',?,?,?,?)")
-    for (let i = 0; i < 60; i++) ins.run(`a${i}`, `cu${i}`, `g-cu${i}`, JSON.stringify({ attempt: { id: `a${i}`, session: 's', qid: `cu${i}`, group: `g-cu${i}`, dang: 'ES.A.X', mucDo: 'biet', correct: true, assisted: false, at: T0 - 60_000, novel: true } }), new Date(T0 - 60_000).toISOString())
+    // SỬA CÓ CHỦ Ý 21/09 (thầy lệnh 19:30 "trần hộ tống đoàn là 60 câu, tính riêng hẳn"): 60 lượt phải thuộc PHIÊN CỦA ĐOÀN (json $.doan = 1) mới chạm trần Đoàn
+    d.sql.prepare("INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES('sd','S1',?,'x')").run(JSON.stringify({ doan: 1, mode: 'adventure', questions: [], created: 1 }))
+    const ins = d.sql.prepare("INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,'S1','sd',?,?,?,?)")
+    for (let i = 0; i < 60; i++) ins.run(`a${i}`, `cu${i}`, `g-cu${i}`, JSON.stringify({ attempt: { id: `a${i}`, session: 'sd', qid: `cu${i}`, group: `g-cu${i}`, dang: 'ES.A.X', mucDo: 'biet', correct: true, assisted: false, at: T0 - 60_000, novel: true } }), new Date(T0 - 60_000).toISOString())
     await expect(goi(d, 'S1', 'mo')).rejects.toThrow('60 câu')
   })
   it('chưa chọn thần thú thì chưa lên đường; thầy tạm dừng game của em thì Đoàn cũng dừng', async () => {

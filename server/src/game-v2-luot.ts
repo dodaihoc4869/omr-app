@@ -10,8 +10,23 @@ import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 
 /** Cờ LÙI NHANH: `cau_hinh.game_luot_moi = 'tat'` ⇒ game rút câu bằng đường CŨ (chooseSessionWithRoles). Vắng / khác ⇒ BẬT. */
 export const KHOA_GAME_LUOT_MOI = 'game_luot_moi'
-/** Trần cứng toàn game mỗi ngày VN (hạ từ 200): 36 câu Đảo + 24 câu Đoàn. */
-export const TRAN_CAU_GAME_NGAY = 60
+/**
+ * TRẦN CÂU MỖI NGÀY VN — HAI TRẦN RIÊNG (thầy lệnh 21/09 ~19:30: "cho riêng trần hộ tống đoàn là 60 câu nhé, tính riêng hẳn"; trước đó một trần gộp 60, và trước nữa 200):
+ *   • ĐOÀN HỘ TỐNG: 60 lượt trả lời/ngày, CHỈ đếm lượt thuộc phiên của Đoàn (phiên có `json $.doan = 1`, `taoNguoi` đánh dấu);
+ *   • ĐẢO và mọi chế độ game khác (Linh Tâm, võ đài…): 36 lượt/ngày (thiết kế DE-XUAT-THAN-THU-MOI-NGAY), KHÔNG bị Đoàn ăn vào — và ngược lại.
+ * Vé, lượt Đảo, EXP KHÔNG đổi. Một nguồn hằng số ở đây; máy đọc `tranNgay`/`dailyUsed` (recommendations = Đảo, doan-sanh = Đoàn), không viết cứng.
+ */
+export const TRAN_CAU_DOAN_NGAY = 60
+export const TRAN_CAU_DAO_NGAY = 36
+export type LoaiTran = 'doan' | 'dao'
+export const tranCuaLoai = (loai: LoaiTran): number => (loai === 'doan' ? TRAN_CAU_DOAN_NGAY : TRAN_CAU_DAO_NGAY)
+/** Điều kiện SQL "lượt `a` thuộc loại này" (bảng `game_v2_attempt` bí danh `a`): phiên Đoàn = `game_v2_session.json $.doan = 1`; phiên khác / phiên đã xoá = Đảo. Chỉ đọc. */
+export const dieuKienLoaiPhien = (loai: LoaiTran): string => `${loai === 'doan' ? '' : 'NOT '}EXISTS (SELECT 1 FROM game_v2_session s WHERE s.id = a.session AND s.sbd = a.sbd AND json_extract(s.json, '$.doan') = 1)`
+/** Số lượt trả lời hôm nay (từ `tuIso`, đầu ngày VN) của một em theo LOẠI. */
+export async function demCauTrongNgay(env: Env, sbd: string, tuIso: string, loai: LoaiTran): Promise<number> {
+  const r = await env.DB.prepare(`SELECT COUNT(*) AS n FROM game_v2_attempt a WHERE a.sbd = ? AND a.created_at >= ? AND ${dieuKienLoaiPhien(loai)}`).bind(sbd, tuIso).first<{ n: number }>()
+  return Number(r?.n) || 0
+}
 export const MOT_NGAY_MS = 86_400_000
 const SAU_GIO_MS = 6 * 3_600_000
 const KHOA_MOC_LOP = (ten: string): string => `lop_da_hoc|${ten}`

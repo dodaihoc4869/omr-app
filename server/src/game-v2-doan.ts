@@ -8,7 +8,7 @@
 //   3. GIỮ PHÒNG trong bảng `doan_chang` (JSON + revision, khoá lạc quan như phòng Linh Tâm cũ), đồng bộ bằng hỏi-đáp ngắn.
 //   4. DỰNG KHUNG NHÌN cho từng em: đáp án không bao giờ xuống máy em trước khi em chốt; không ai thấy bạn sai gì / chọn gì.
 //
-// Câu chung của TRÙM không tạo bằng chứng cá nhân: không ghi attempt, không ghi sổ, không tính vào trần 200.
+// Câu chung của TRÙM không tạo bằng chứng cá nhân: không ghi attempt, không ghi sổ, không tính vào trần câu của Đoàn (60).
 import type { Env, D1PreparedStatement } from './kieu'
 import type { Profile } from './game-v2'
 import { PETS, publicQuestion, type PrivateQuestion, type Question } from '../../src/game/than-thu-v2/core'
@@ -27,7 +27,7 @@ import { ghiTiepSuc } from './exp-d1'
 import { docExpKetChang, traoExpKetChang } from './game-v2-doan-exp'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 import { docSanh, quaCongVe, hoanVe, ketChangChoLop } from './game-v2-doan-mua'
-import { TRAN_CAU_GAME_NGAY } from './game-v2-luot'
+import { TRAN_CAU_DOAN_NGAY, demCauTrongNgay } from './game-v2-luot'
 import { docAnThach, anChoSanh, goiYBanDongHanh, docHienThi } from './game-v2-doan-an'
 
 type Row = Record<string, unknown>
@@ -56,7 +56,7 @@ export async function doanMoCho(env: Env, sbd: string): Promise<boolean> {
 // WeakSet theo đối tượng: gói tin từ máy em không cách nào tự đánh dấu mình là "nội bộ".
 const noiBo = new WeakSet<object>()
 export const laGoiNoiBoDoan = (b: object) => noiBo.has(b)
-const danhDau = <T extends object>(b: T): T => { noiBo.add(b); return b }
+export const danhDau = <T extends object>(b: T): T => { noiBo.add(b); return b }
 
 export type NhanCau = 'toi_han_on' | 'dang_yeu' | 'cau_moi' | 'vua_suc'
 /** `an` = dạng của câu này em ĐÃ KHẮC PHỤC XONG (ấn thạch sáng) → kỹ năng ở hiệp này là biến thể ấn (×1,25). */
@@ -399,7 +399,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     // Sảnh hằng ngày: vé, chuỗi/rương, Đoàn lớp, Trùm lớp. Chưa chạy migration bước 5 → `sanh:null`, giao diện giữ các ô "SẮP MỞ".
     await env.DB.prepare("DELETE FROM doan_ve_so WHERE sbd=? AND loai='tieu' AND ma_nguon IN (SELECT ma FROM doan_chang WHERE trang_thai IN ('sanh','huy') AND tao_luc<?)").bind(sbd, iso(now - PHONG_HET_HAN_MS)).run().catch(() => { /* chưa có sổ vé */ })
     const homNay = ngayVn(iso(now)), pet = Math.max(0, PETS.findIndex(x => x.id === hoSo.pet)), sanh = await docSanh(env, sbd, now)
-    return { ok: true, tranNgay: TRAN_CAU_GAME_NGAY, sanh, anThach: anChoSanh(await docAnThach(env, sbd, homNay), pet), banDongHanh: await goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi), dangDo: (await timDangDo())?.ma_chang ?? null }
+    return { ok: true, tranNgay: TRAN_CAU_DOAN_NGAY, dailyUsed: await demCauTrongNgay(env, sbd, new Date(homNay + 'T00:00:00+07:00').toISOString(), 'doan'), sanh, anThach: anChoSanh(await docAnThach(env, sbd, homNay), pet), banDongHanh: await goiYBanDongHanh(env, sbd, sanh?.lop ?? '', homNay, tenGoi), dangDo: (await timDangDo())?.ma_chang ?? null }
   }
   if (action === 'doan-hien-thi') {
     // Hợp đồng hiển thị NGOÀI game (docs/hop-dong-doan-hien-thi-2109.md): hào quang + danh hiệu của chính em.

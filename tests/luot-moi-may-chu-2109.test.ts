@@ -184,13 +184,13 @@ describe('quota lượt và trần câu', () => {
     expect(thuong.questions.length).toBeGreaterThan(0); expect(thuong.luot.luotDangMo).toMatchObject({ so: 4, thuong: true })
   })
 
-  it('trần 60 câu/ngày: đã đủ 60 lượt trả lời thì `start` báo bằng lời; `recommendations` trả remaining 0', async () => {
+  it('trần ĐẢO 36 câu/ngày (sửa CÓ CHỦ Ý 21/09: trần gộp 60 ⇒ Đảo 36 riêng, thầy lệnh 19:30): đã đủ 36 lượt trả lời thì `start` báo bằng lời; `recommendations` trả remaining 0, tranNgay 36', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = dung()
     const ins = d.sql.prepare("INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,'S1','cu',?,?,?,?)")
-    for (let i = 0; i < 60; i++) ins.run(`x${i}`, `q${i}`, `g${i}`, JSON.stringify({ attempt: { correct: true } }), new Date().toISOString())
-    await expect(start(d)).rejects.toThrow('60 câu')
-    expect((await gameV2(d.env, 'recommendations', { token: 'token-S1' }) as any).remaining).toBe(0)
+    for (let i = 0; i < 36; i++) ins.run(`x${i}`, `q${i}`, `g${i}`, JSON.stringify({ attempt: { correct: true } }), new Date().toISOString())
+    await expect(start(d)).rejects.toThrow('36 câu')
+    expect(await gameV2(d.env, 'recommendations', { token: 'token-S1' }) as any).toMatchObject({ remaining: 0, tranNgay: 36, dailyUsed: 36 })
   })
 
   it('Đoàn/Linh Tâm KHÔNG tính vào 6 lượt: phiên có `doan` hoặc `guardian` bị bỏ khi đếm', async () => {

@@ -1,6 +1,6 @@
 // @vitest-environment node
-// TRẦN CÂU GAME/NGÀY để MÀN đọc, không viết cứng (Boss 21/09 P0: trần hạ 200 → 60 nhưng màn còn ghi "200 câu"): `tranNgay = TRAN_CAU_GAME_NGAY` CHỈ-THÊM ở `recommendations` (cả ba nhánh) và `doan-sanh`;
-// và luật thật ở quanh trần: 58/59 lượt làm vẫn mở được Đoàn, đúng 60 thì từ chối bằng lời có số 60 (đo bằng mô phỏng — Boss hỏi vì sao thầy thấy 58 mà không mở được). SQLite thật.
+// HAI TRẦN CÂU/NGÀY TÍNH RIÊNG (thầy lệnh 21/09 ~19:30: "cho riêng trần hộ tống đoàn là 60 câu nhé, tính riêng hẳn"): ĐOÀN 60 (chỉ lượt của PHIÊN ĐOÀN, json $.doan = 1) · ĐẢO + chế độ khác 36; KHÔNG ăn vào nhau; bỏ trần gộp.
+// Máy đọc `tranNgay`/`dailyUsed`: recommendations = ĐẢO, doan-sanh = ĐOÀN (CHỈ-THÊM). Khoá: đếm theo loại, hai chiều độc lập ở lúc RÚT (start/mo) và lúc TRẢ LỜI (answer, gồm cả cổng nguyên tử của INSERT), lời báo có đúng số của trần. SQLite thật.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
@@ -43,37 +43,112 @@ async function caNhanCua(d: D1That, sbd = 'S1'): Promise<string[]> {
 }
 
 
-import { TRAN_CAU_GAME_NGAY } from '../server/src/game-v2-luot'
-const lamDay = (d: D1That, n: number) => {
+import { TRAN_CAU_DAO_NGAY, TRAN_CAU_DOAN_NGAY } from '../server/src/game-v2-luot'
+import { danhDau } from '../server/src/game-v2-doan'
+type Loai = 'doan' | 'dao'
+/** `n` lượt trả lời hôm nay của S1 trong MỘT phiên thuộc loại `loai` (phiên Đoàn có json $.doan = 1). */
+const lamDay = (d: D1That, n: number, loai: Loai) => {
+  const id = loai === 'doan' ? 'p-doan' : 'p-dao'
+  d.sql.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run(id, 'S1', JSON.stringify({ ...(loai === 'doan' ? { doan: 1 } : {}), mode: 'adventure', questions: [], created: 1 }), 'x')
   const ins = d.sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
-  for (let i = 0; i < n; i++) ins.run(`a${i}`, 'S1', 's', `Z${i}`, `gz${i}`, JSON.stringify({ attempt: { qid: `Z${i}`, group: `gz${i}`, correct: true, at: T0 - 3_600_000 + i, assisted: false } }), '2026-09-22T01:00:00.000Z')
+  for (let i = 0; i < n; i++) ins.run(`${id}-${i}`, 'S1', id, `Z${loai}${i}`, `gz${loai}${i}`, JSON.stringify({ attempt: { qid: `Z${loai}${i}`, group: `gz${loai}${i}`, correct: true, at: T0 - 3_600_000 + i, assisted: false } }), '2026-09-22T01:00:00.000Z')
 }
-describe('tranNgay cho màn', () => {
-  it('hằng là 60 và có mặt ở recommendations (nhánh lượt mới: có câu · hết lượt/hết trần) và doan-sanh', async () => {
-    expect(TRAN_CAU_GAME_NGAY).toBe(60)
-    const d = dung()
-    const token = await gameToken(d.env, 'S1')
-    const r1 = await gameV2(d.env, 'recommendations', { token }) as any
-    expect(r1.ok).toBe(true); expect(r1.tranNgay).toBe(TRAN_CAU_GAME_NGAY)
-    const e = dung(); lamDay(e, 60)
-    const r2 = await gameV2(e.env, 'recommendations', { token: await gameToken(e.env, 'S1') }) as any
-    expect(r2).toMatchObject({ ok: true, remaining: 0, tranNgay: TRAN_CAU_GAME_NGAY, dailyUsed: 60 })
-    const s = await goi(d, 'S1', 'sanh') as any
-    expect(s.ok).toBe(true); expect(s.tranNgay).toBe(TRAN_CAU_GAME_NGAY)
-  })
+const moDoan = (d: D1That) => goi(d, 'S1', 'mo', { cheDo: 'phong' })
+const recs = async (d: D1That) => gameV2(d.env, 'recommendations', { token: await gameToken(d.env, 'S1') }) as Promise<any>
 
-  it('đường cũ (cờ game_luot_moi = tat) cũng trả tranNgay', async () => {
+describe('hằng số và điều kiện đếm', () => {
+  it('Đoàn 60, Đảo 36 (không còn trần gộp)', () => { expect([TRAN_CAU_DOAN_NGAY, TRAN_CAU_DAO_NGAY]).toEqual([60, 36]) })
+})
+
+describe('tranNgay / dailyUsed cho màn: recommendations = ĐẢO, doan-sanh = ĐOÀN', () => {
+  it('recommendations trả tranNgay 36 và dailyUsed CHỈ của Đảo (60 lượt Đoàn không hiện ở đây)', async () => {
+    const d = dung(); lamDay(d, 60, 'doan'); lamDay(d, 5, 'dao')
+    const r = await recs(d)
+    expect(r).toMatchObject({ ok: true, tranNgay: 36, dailyUsed: 5, remaining: 31 })
+  })
+  it('doan-sanh trả tranNgay 60 và dailyUsed CHỈ của Đoàn (36 lượt Đảo không hiện ở đây)', async () => {
+    const d = dung(); lamDay(d, 36, 'dao'); lamDay(d, 7, 'doan')
+    const s = await goi(d, 'S1', 'sanh') as any
+    expect(s).toMatchObject({ ok: true, tranNgay: 60, dailyUsed: 7 })
+  })
+  it('đường cũ (cờ game_luot_moi = tat) cũng trả tranNgay 36 theo Đảo', async () => {
     const d = dung()
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_luot_moi','tat','x')").run()
-    const r = await gameV2(d.env, 'recommendations', { token: await gameToken(d.env, 'S1') }) as any
-    expect(r.ok).toBe(true); expect(r.tranNgay).toBe(60)
+    expect(await recs(d)).toMatchObject({ ok: true, tranNgay: 36 })
   })
 })
 
-describe('quanh trần 60: Đoàn mở ở 58/59, từ chối ở 60 bằng lời có số 60', () => {
-  for (const [n, mo] of [[58, true], [59, true], [60, false]] as const) it(`${n} lượt làm hôm nay ⇒ ${mo ? 'MỞ được' : 'từ chối'}`, async () => {
-    const d = dung(); lamDay(d, n)
-    if (mo) { const r = await goi(d, 'S1', 'mo', { cheDo: 'phong' }); expect(r.ok).toBe(true) }
-    else await expect(goi(d, 'S1', 'mo', { cheDo: 'phong' })).rejects.toThrow(new RegExp(`hoàn thành ${TRAN_CAU_GAME_NGAY} câu hôm nay`))
+describe('hai trần độc lập lúc RÚT câu', () => {
+  it('đủ 36 lượt ĐẢO ⇒ Đảo hết (báo 36) nhưng Đoàn VẪN mở được', async () => {
+    const d = dung(); lamDay(d, 36, 'dao')
+    expect(await recs(d)).toMatchObject({ remaining: 0, tranNgay: 36 })
+    expect((await moDoan(d)).ok).toBe(true)
+  })
+  it('đủ 60 lượt ĐOÀN ⇒ Đoàn hết (báo 60) nhưng Đảo VẪN còn nguyên 36', async () => {
+    const d = dung(); lamDay(d, 60, 'doan')
+    await expect(moDoan(d)).rejects.toThrow(/hoàn thành 60 câu hôm nay/)
+    expect(await recs(d)).toMatchObject({ remaining: 36, dailyUsed: 0 })
+  })
+  it('35/36 Đảo còn 1 câu; 59/60 Đoàn vẫn mở', async () => {
+    const d = dung(); lamDay(d, 35, 'dao'); lamDay(d, 59, 'doan')
+    expect(await recs(d)).toMatchObject({ remaining: 1 })
+    expect((await moDoan(d)).ok).toBe(true)
+  })
+})
+
+describe('hai trần độc lập lúc TRẢ LỜI (answer, cả cổng nguyên tử của INSERT)', () => {
+  /** Một phiên đang chờ với MỘT câu Phần I chưa trả lời, loại `loai`; trả về thông số để gọi answer. */
+  const phienCho = async (d: D1That, loai: Loai) => {
+    const q = JSON.parse((d.sql.prepare("SELECT json FROM game_v2_question WHERE qid = 'A-9'").get() as { json: string }).json)
+    const id = `cho-${loai}`
+    d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run(id, 'S1', JSON.stringify({ ...(loai === 'doan' ? { doan: 1 } : {}), mode: 'adventure', created: T0, questions: [{ qid: 'A-9', maDe: 'DE1', version: 'v1', group: q.group, novel: true }] }), new Date(T0).toISOString())
+    const b = { token: await gameToken(d.env, 'S1'), session: id, qid: 'A-9', answer: 'B' }
+    return loai === 'doan' ? danhDau(b) : b // câu của Đoàn chỉ trả lời qua cửa nội bộ của Đoàn (laGoiNoiBoDoan)
+  }
+  it('Đảo đủ 36 ⇒ chặn trả lời trong phiên Đảo (báo 36) nhưng phiên ĐOÀN vẫn ghi được', async () => {
+    const d = dung(); lamDay(d, 36, 'dao')
+    await expect(gameV2(d.env, 'answer', await phienCho(d, 'dao'))).rejects.toThrow(/hoàn thành 36 câu hôm nay/)
+    const r = await gameV2(d.env, 'answer', await phienCho(d, 'doan')) as any
+    expect(r.ok).toBe(true)
+    expect((d.sql.prepare("SELECT COUNT(*) AS n FROM game_v2_attempt WHERE session = 'cho-doan'").get() as { n: number }).n).toBe(1)
+  })
+  it('Đoàn đủ 60 ⇒ chặn trả lời trong phiên Đoàn (báo 60) nhưng phiên ĐẢO vẫn ghi được', async () => {
+    const d = dung(); lamDay(d, 60, 'doan')
+    await expect(gameV2(d.env, 'answer', await phienCho(d, 'doan'))).rejects.toThrow(/hoàn thành 60 câu hôm nay/)
+    const r = await gameV2(d.env, 'answer', await phienCho(d, 'dao')) as any
+    expect(r.ok).toBe(true)
+  })
+})
+
+describe('đường cũ (cờ game_luot_moi = tat): Đoàn vẫn theo trần ĐOÀN, không theo trần Đảo', () => {
+  it('36 lượt Đảo ⇒ Đoàn KHÔNG bị chặn bởi trần; 60 lượt Đoàn ⇒ Đoàn từ chối (báo 60)', async () => {
+    const d = dung()
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_luot_moi','tat','x')").run()
+    lamDay(d, 36, 'dao')
+    // đường cũ đòi bằng chứng học của em (em này chưa có) ⇒ báo lời KHÁC — miễn KHÔNG phải lời chạm trần: 36 lượt Đảo không chặn Đoàn
+    const loi = await moDoan(d).then(() => '', (x: Error) => x.message)
+    expect(loi).not.toMatch(/hoàn thành \d+ câu hôm nay/)
+    const e = dung()
+    e.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_luot_moi','tat','x')").run()
+    lamDay(e, 60, 'doan')
+    await expect(moDoan(e)).rejects.toThrow(/hoàn thành 60 câu hôm nay/)
+  })
+})
+
+describe('cổng NGUYÊN TỬ của INSERT tính đúng loại: hai câu trả lời song song khi Đảo còn đúng 1 suất', () => {
+  it('35/36 Đảo + hai câu song song ⇒ chỉ MỘT được ghi (lượt thứ hai bị cổng chặn), tổng Đảo = 36', async () => {
+    const d = dung(); lamDay(d, 35, 'dao')
+    const cho = (id: string, qid: string) => {
+      const q = JSON.parse((d.sql.prepare('SELECT json FROM game_v2_question WHERE qid = ?').get(qid) as { json: string }).json)
+      d.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run(id, 'S1', JSON.stringify({ mode: 'adventure', created: T0, questions: [{ qid, maDe: 'DE1', version: 'v1', group: q.group, novel: true }] }), new Date(T0).toISOString())
+    }
+    cho('song-1', 'A-8'); cho('song-2', 'A-9')
+    const token = await gameToken(d.env, 'S1')
+    const kq = await Promise.allSettled([
+      gameV2(d.env, 'answer', { token, session: 'song-1', qid: 'A-8', answer: 'B' }),
+      gameV2(d.env, 'answer', { token, session: 'song-2', qid: 'A-9', answer: 'B' }),
+    ])
+    expect(kq.filter((x) => x.status === 'fulfilled')).toHaveLength(1)
+    expect((d.sql.prepare("SELECT COUNT(*) AS n FROM game_v2_attempt WHERE sbd = 'S1' AND session NOT IN ('p-doan')").get() as { n: number }).n).toBe(36)
   })
 })
