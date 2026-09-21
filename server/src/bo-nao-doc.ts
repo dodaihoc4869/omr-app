@@ -11,6 +11,7 @@ import type { DauRaEm, KhacPhucEm } from '../../src/lib/bo-nao-khuon'
 import type { DieuChinhEm } from '../../src/lib/btvn-nang-do'
 import { cheDoHieuLuc, docCauHinhBoNao, khongPhaiHangChieu, type CauHinhBoNao } from './bo-nao'
 import { themNgay } from './ho-so-nam-kt'
+import { coChuGame } from './chu-game'
 
 type Hang = Record<string, unknown>
 
@@ -120,7 +121,10 @@ async function docLoiNhanCuaEm(env: Env, sbd: string, homNay: string, soNgay: nu
   for (const x of r.results ?? []) {
     if (cheDoHieuLuc(cauHinh, chuoi(x.lop)) !== 'that') continue
     const d = doc<Partial<DauRaEm>>(x.json, {})
-    ra.push({ ngay: chuoi(x.ngay), loiEm: chuoi(d.loiNhanChoEm).trim(), loiPh: chuoi(d.loiNhanChoPhuHuynh).trim(), thuTuan: chuoi(d.thuTuan).trim() })
+    // Lời cho PHỤ HUYNH và thư tuần KHÔNG được nhắc thần thú / EXP / khiên / game (thầy lệnh 21/09): lớp phòng thủ ở máy chủ, lời vi phạm coi như vắng (lời cho EM giữ nguyên).
+    const loiPh = chuoi(d.loiNhanChoPhuHuynh).trim()
+    const thuTuan = chuoi(d.thuTuan).trim()
+    ra.push({ ngay: chuoi(x.ngay), loiEm: chuoi(d.loiNhanChoEm).trim(), loiPh: coChuGame(loiPh) ? '' : loiPh, thuTuan: coChuGame(thuTuan) ? '' : thuTuan })
   }
   return ra
 }
