@@ -12,7 +12,9 @@ afterEach(cleanup)
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const hoSo = (them: Partial<DaoProfile> = {}): DaoProfile => ({ nickname: 'Lửa Nhỏ', pet: 'lua_phuong', choice: false, cap: 34, exp: 640, wallet: 0, mastery: [], ...them })
 const CHU_ANH_NO = 'Hôm nay Lửa Nhỏ đã ăn no. EXP còn lại nằm trong ống nghiệm, mai em nạp tiếp.'
-const CHU_CHUA_HOC = 'Thần thú chỉ ăn vào ngày em có học. Em làm vài câu rồi quay lại nạp nhé.'
+// CHỮ MỘT NGUỒN của Code 1 (lib/hap-thu-ngay.ts, luật "có học" = ≥ 4 câu khác nhau): máy chủ cũ không gửi soCauHomNay ⇒ bỏ vế đếm (không nói "em đã làm 0 câu" khi chưa biết).
+const CHU_CHUA_HOC = 'Em làm đủ 4 câu hôm nay rồi cho Lửa Nhỏ ăn nhé.'
+const CHU_CHUA_HOC_DEM = 'Em làm đủ 4 câu hôm nay rồi cho Lửa Nhỏ ăn nhé · em đã làm 2 câu.'
 const CHU_CHUA_DAT = 'Đạt nhiệm vụ ngày hôm nay thì Lửa Nhỏ ăn được thêm 80 EXP.'
 
 describe('hapThuHienThi — lõi thuần', () => {
@@ -27,12 +29,18 @@ describe('hapThuHienThi — lõi thuần', () => {
     expect(hapThuHienThi({ da: 200, tran: 200, lyDo: 'no' }, 'Lửa Nhỏ', true)!.bao).toBe(CHU_ANH_NO)
     expect(hapThuHienThi({ da: 0, tran: 0, lyDo: 'chua_hoc' }, 'Lửa Nhỏ', true)!.bao).toBe(CHU_CHUA_HOC)
     expect(hapThuHienThi({ da: 120, tran: 120, lyDo: 'no' }, 'Lửa Nhỏ', true)!.bao).toBe(CHU_CHUA_DAT)
-    expect(hapThuHienThi({ da: 150, tran: 150, lyDo: 'no' }, 'Bông', true)!.bao).toBe('Đạt nhiệm vụ ngày hôm nay thì Bông ăn được thêm 50 EXP.') // số thêm tính từ trần, không cứng 80
+    expect(hapThuHienThi({ da: 0, tran: 0, lyDo: 'chua_hoc', soCauHomNay: 2, canCau: 4 }, 'Lửa Nhỏ', true)!.bao).toBe(CHU_CHUA_HOC_DEM) // máy chủ mới: có số câu đã làm
+    expect(hapThuHienThi({ da: 150, tran: 150, lyDo: 'no' }, 'Bông', true)!.bao).toBe('Đạt nhiệm vụ ngày hôm nay thì Bông ăn được thêm 80 EXP.') // câu của Code 1 (200 − 120 = 80 cố định theo luật)
   })
 
-  it('không có EXP chờ nạp ⇒ KHÔNG lời báo (không có gì bị chặn); lý do khác (het_ong, cap_toi_da, null, lạ) ⇒ không lời', () => {
+  it('không có EXP chờ nạp ⇒ KHÔNG lời báo "no/chưa học/chưa đạt" (không có gì bị chặn); hết ống / cấp tối đa: câu của Code 1 (không cần ví); null, vắng, lạ ⇒ không lời', () => {
     expect(hapThuHienThi({ da: 200, tran: 200, lyDo: 'no' }, 'Lửa Nhỏ', false)!.bao).toBe('')
-    for (const lyDo of ['het_ong', 'cap_toi_da', null, undefined, 'gi_do_la']) expect(hapThuHienThi({ da: 60, tran: 120, lyDo }, 'Lửa Nhỏ', true)!.bao, String(lyDo)).toBe('')
+    expect(hapThuHienThi({ da: 0, tran: 0, lyDo: 'chua_hoc' }, 'Lửa Nhỏ', false)!.bao).toBe('')
+    for (const cw of [false, true]) {
+      expect(hapThuHienThi({ da: 60, tran: 120, lyDo: 'het_ong' }, 'Lửa Nhỏ', cw)!.bao).toBe('Ống nghiệm của em đang hết EXP. Em làm bài tập về nhà hoặc phần ôn lại để có thêm EXP.')
+      expect(hapThuHienThi({ da: 60, tran: 120, lyDo: 'cap_toi_da' }, 'Lửa Nhỏ', cw)!.bao).toBe('Lửa Nhỏ đã đạt cấp tối đa 120.')
+    }
+    for (const lyDo of [null, undefined, 'gi_do_la']) expect(hapThuHienThi({ da: 60, tran: 120, lyDo }, 'Lửa Nhỏ', true)!.bao, String(lyDo)).toBe('')
   })
 
   it('thiếu / sai dạng ⇒ null (ẩn): undefined, không phải số, âm; số quá trần bị kẹp về 200 (không hiện "230 / 200")', () => {
@@ -97,8 +105,17 @@ describe('DaoCuaEm — thanh hấp thụ trên màn', () => {
 
 describe('khoá nguồn', () => {
   it('kiểu DaoProfile có hapThuHomNay chỉ-thêm (tùy chọn); CSS có khối; tệp logic của Code 1 KHÔNG bị sửa ở đây', () => {
-    expect(doc('src/game/than-thu-v2/dao/kieu.ts')).toContain('hapThuHomNay?:{da:number;tran:number;lyDo?:string|null}')
+    expect(doc('src/game/than-thu-v2/dao/kieu.ts')).toContain('hapThuHomNay?:{da:number;tran:number;lyDo?:string|null;')
+    expect(doc('src/game/than-thu-v2/dao/kieu.ts')).toContain('soCauHomNay?:number;canCau?:number}')
     const css = doc('src/game/than-thu-v2/dao/dao.css')
     for (const l of ['.dao .dao-hap-thu{', '.dao .dao-hap-thu-chu{', '.dao .dao-hap-thu-bao{']) expect(css).toContain(l)
+  })
+})
+
+describe('chữ hấp thụ MỘT NGUỒN (Code 1)', () => {
+  it('dao-core dùng chuHapThu / chuChuaDatNhiemVu / chuThanhHapThu của lib/hap-thu-ngay, không còn câu tự viết', () => {
+    const c = doc('src/game/than-thu-v2/dao/dao-core.ts')
+    for (const h of ['chuHapThu', 'chuChuaDatNhiemVu', 'chuThanhHapThu']) expect(c).toContain(h)
+    for (const cu of ['Thần thú chỉ ăn vào ngày em có học', 'Em làm vài câu rồi quay lại nạp nhé', 'ăn được thêm ${toiDa-tran}']) expect(c).not.toContain(cu)
   })
 })

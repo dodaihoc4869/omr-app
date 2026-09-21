@@ -9,7 +9,9 @@ export interface DaoProfile{nickname?:string;pet:string;choice:boolean;cap:numbe
  khienRen?:{manh:number;daRen?:number;chuaDung?:number;conLai?:number;moiKhien:number}
  /** THẦN THÚ MỖI NGÀY (Điều 1, Đợt 1): hôm nay thú đã hấp thụ `da` EXP; hôm nay được ăn tối đa `tran` (200 khi đạt nhiệm vụ ngày · 120 khi có học · 0 khi chưa học). `lyDo` = vì sao lần nạp gần nhất bị chặn:
   *  'no' (đủ trần) · 'chua_hoc' · 'het_ong' · 'cap_toi_da' · null. Máy chủ cũ KHÔNG có trường này ⇒ màn ẩn thanh. */
- hapThuHomNay?:{da:number;tran:number;lyDo?:string|null}}
+ hapThuHomNay?:{da:number;tran:number;lyDo?:string|null;
+  /** Luật "có học" (Code 1): số câu KHÁC NHAU hôm nay + số câu cần (4) — máy chủ mới; vắng ⇒ màn bỏ vế đếm. */
+  soCauHomNay?:number;canCau?:number}}
 /** EXP MỚI (nguồn /hs/ke-hoach-ngay, cổng HS đưa xuống). Vắng ⇒ ẩn, không bịa số. */
 export interface DaoExp{homNay:number;manhKhien?:{manh:number;moiKhien:number;khienConLai?:number}|null}
 /** Vai của một ải = đúng suất của `chooseSession`: 2 yếu · 1 tới hạn · lấp · 1 thử thách. */

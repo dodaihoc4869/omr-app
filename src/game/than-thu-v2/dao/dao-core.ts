@@ -1,6 +1,6 @@
 /** LÕI THUẦN của Đảo thần thú: chỉ đổi CÁCH KỂ — mọi con số lấy từ hồ sơ máy chủ trả, không tự tính thưởng, không bịa. */
 import {PETS} from '../core'
-import {HAP_THU_DAT,TRAN_EXP_GAME_NGAY} from '../../../lib/hap-thu-ngay'
+import {HAP_THU_DAT,TRAN_EXP_GAME_NGAY,chuChuaDatNhiemVu,chuHapThu,chuThanhHapThu} from '../../../lib/hap-thu-ngay'
 import type {Mastery} from '../core'
 import {BATTLE_SKINS} from '../learning-battle'
 import {EVOLUTION_LEVELS,evolutionStage} from '../evolution'
@@ -35,11 +35,17 @@ export interface HapThuView{da:number;toiDa:number;tiLe:number;chu:string;bao:st
 export function hapThuHienThi(h:DaoProfile['hapThuHomNay'],ten:string,coExpDeNap:boolean):HapThuView|null{
  if(!h||typeof h!=='object'||!Number.isFinite(h.da)||!Number.isFinite(h.tran)||h.da<0||h.tran<0)return null
  const toiDa=HAP_THU_TOI_DA_NGAY,da=Math.min(toiDa,Math.floor(h.da)),tran=Math.min(toiDa,Math.floor(h.tran))
+ // CHỮ MỘT NGUỒN (Code 1, `lib/hap-thu-ngay.ts`: chuHapThu · chuChuaDatNhiemVu · chuThanhHapThu) — màn không tự viết câu.
  let bao=''
- if(coExpDeNap){
-  if(h.lyDo==='chua_hoc')bao='Thần thú chỉ ăn vào ngày em có học. Em làm vài câu rồi quay lại nạp nhé.'
-  else if(h.lyDo==='no')bao=tran>=toiDa?`Hôm nay ${ten} đã ăn no. EXP còn lại nằm trong ống nghiệm, mai em nạp tiếp.`:`Đạt nhiệm vụ ngày hôm nay thì ${ten} ăn được thêm ${toiDa-tran} EXP.`}
- return {da,toiDa,tiLe:da/toiDa,chu:`Hôm nay ${ten} đã hấp thụ ${da} / ${toiDa} EXP`,bao}}
+ if(h.lyDo==='het_ong')bao=chuHapThu('het_ong',{tenThu:ten})
+ else if(h.lyDo==='cap_toi_da')bao=chuHapThu('cap_toi_da',{tenThu:ten})
+ else if(coExpDeNap){
+  if(h.lyDo==='chua_hoc'){
+   // Máy chủ cũ không gửi `soCauHomNay` ⇒ KHÔNG nói "em đã làm 0 câu" (có thể sai): bỏ vế đếm.
+   const c=chuHapThu('chua_hoc',{tenThu:ten,soCauHomNay:typeof h.soCauHomNay==='number'?h.soCauHomNay:0})
+   bao=typeof h.soCauHomNay==='number'?c:c.replace(/ · em đã làm \d+ câu\.$/,'.')}
+  else if(h.lyDo==='no')bao=tran>=toiDa?chuHapThu('no',{tenThu:ten}):chuChuaDatNhiemVu(ten)}
+ return {da,toiDa,tiLe:da/toiDa,chu:chuThanhHapThu(ten,da,toiDa),bao}}
 
 /** "Dự trữ đủ N ngày ăn": ống nghiệm chia cho mức ăn tối đa một ngày (200), làm tròn XUỐNG. Không có EXP chờ (N = 0) ⇒ null: ẩn, không nói "0 ngày". */
 export function duTruNgayAn(wallet:number):number|null{const n=Number.isFinite(wallet)?Math.floor(Math.max(0,wallet)/HAP_THU_TOI_DA_NGAY):0;return n>0?n:null}
