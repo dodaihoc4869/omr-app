@@ -96,13 +96,18 @@ export function chooseSessionWithRoles(pool:PrivateQuestion[],evidence:Evidence[
   add(base,6-out.length)
   return withRoles()
 }
+/**
+ * Thưởng EXP khi một dạng lên NẤC 1 · 2 · 3 (một nguồn duy nhất). Đổi 21/09/2026 (thầy chốt Điều 9): 20/40/40 ⇒ 10/20/30 để game không đủ một mình làm thú ăn no
+ * (nấc quý nhất là nấc 3 — nhớ được sau 7 ngày). Tổng đã trả cho một dạng ở nấc cao nhất: 10 · 30 · 60 (cũ 20 · 60 · 100) — `CHENH_THUONG_NAC` của `hap-thu-ngay.ts` lấy đúng phần chênh.
+ */
+export const THUONG_NAC = [10, 20, 30] as const
 export function advance(old:Mastery|undefined,a:Attempt):{mastery:Mastery;reward:number;milestone:number} {
   const m:Mastery=old?{...old,groups:[...old.groups]}:{key:a.dang??a.group,stage:0,first:0,due:0,groups:[],repaired:false}
   if(!a.correct||a.assisted) {m.due=a.at+DAY;return {mastery:m,reward:0,milestone:0}}
   let reward=0
-  if(m.stage===0){m.stage=1;m.first=a.at;m.due=a.at+DAY;m.groups=[a.group];reward=20}
-  else if(m.stage===1&&a.novel&&!m.groups.includes(a.group)&&a.at>=m.due){m.stage=2;m.groups.push(a.group);m.due=Math.max(a.at+3*DAY,m.first+7*DAY);reward=40}
-  else if(m.stage===2&&a.novel&&!m.groups.includes(a.group)&&a.at>=m.due&&a.at>=m.first+7*DAY){m.stage=3;m.groups.push(a.group);m.repaired=true;m.due=a.at+7*DAY;reward=40}
+  if(m.stage===0){m.stage=1;m.first=a.at;m.due=a.at+DAY;m.groups=[a.group];reward=THUONG_NAC[0]}
+  else if(m.stage===1&&a.novel&&!m.groups.includes(a.group)&&a.at>=m.due){m.stage=2;m.groups.push(a.group);m.due=Math.max(a.at+3*DAY,m.first+7*DAY);reward=THUONG_NAC[1]}
+  else if(m.stage===2&&a.novel&&!m.groups.includes(a.group)&&a.at>=m.due&&a.at>=m.first+7*DAY){m.stage=3;m.groups.push(a.group);m.repaired=true;m.due=a.at+7*DAY;reward=THUONG_NAC[2]}
   if(m.stage===3&&reward===0)m.due=a.at+7*DAY
   return {mastery:m,reward,milestone:reward?m.stage:0}
 }

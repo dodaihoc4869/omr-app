@@ -9,7 +9,7 @@ import { CAP_TOI_DA, type CapTienHoa } from './hinh-thai'
 import { heSoTienHoa } from './can-bang-thap'
 import { vaLichSu, type DongLichSuThap } from './rut-cau-thap'
 import {
-  EXP_BAN_DAU, thanhExp, SUC_CHUA_ONG,
+  thanhExp, SUC_CHUA_ONG,
   soExpRong, vaSoExp, type SoExpTheoNguon,
 } from './kinh-nghiem'
 import { type HeNguyenTo } from './tuong-khac'
@@ -275,7 +275,7 @@ export function layHoSoThanThuMacDinh(idChon = ''): HoSoThanThuLuu {
     exp: 0,
     khoExp: 0,
     soExp: soExpRong(),
-    expToiDa: EXP_BAN_DAU,
+    expToiDa: thanhExp(1), // thanh đầu của đường cấp MỚI (160), không còn EXP_BAN_DAU của đường cũ
     capTienHoa: 1,
     tangThapCaoNhat: 1,
     lichSuThap: [],

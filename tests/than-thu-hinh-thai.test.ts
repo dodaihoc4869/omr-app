@@ -11,8 +11,9 @@ import {
   CAP_TOI_DA, layHinhThai, demTinhNang,
 } from '../src/game/than-thu-hoa-hoc/hinh-thai'
 import {
-  EXP_BAN_DAU, thanhExp, nhanExp, tongExpToiDinh, NGUON_EXP, BANG_NGUON_EXP,
+  EXP_BAN_DAU, thanhExp, thanhExpCu, nhanExp, tongExpToiDinh, NGUON_EXP, BANG_NGUON_EXP,
 } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
+import { TRAN_EXP_GAME_NGAY } from '../src/lib/hap-thu-ngay'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import {
@@ -113,10 +114,13 @@ describe('mười hai hình thái', () => {
 })
 
 describe('kinh nghiệm', () => {
-  it('THANH ĐẦU TIÊN LÀ 120 — em thi một ca 5 điểm là lên hai cấp rưỡi', () => {
+  // SỬA CÓ CHỦ Ý 21/09 (thầy chốt đường cấp theo ngày học đều): thanh đầu 120 → 160; `EXP_BAN_DAU` (120) chỉ còn là gốc của đường CŨ `thanhExpCu`.
+  it('THANH ĐẦU TIÊN LÀ 160 — em thi một ca 5 điểm (300 EXP) lên cấp 2 và còn 140/200', () => {
     expect(EXP_BAN_DAU).toBe(120)
-    expect(thanhExp(1)).toBe(120)
+    expect(thanhExpCu(1)).toBe(120)
+    expect(thanhExp(1)).toBe(160)
     expect(NGUON_EXP.caThi(5)).toBe(300)
+    expect(nhanExp({ capDo: 1, exp: 0 }, 300)).toMatchObject({ capDo: 2, exp: 140, expToiDa: 200 })
   })
 
   it('thanh dài dần, và cấp 120 là hết đường lên', () => {
@@ -127,17 +131,15 @@ describe('kinh nghiệm', () => {
     expect(thanhExp(121)).toBe(0)
   })
 
-  /** Hai mốc thầy chốt 15-09 — đây là chỗ khoá chúng lại. */
-  it('DỐC HẲN TỪ CẤP 10, và TỪ CẤP 13 mỗi cấp một lâu', () => {
-    // Cấp 10 phải đắt hơn cấp 9 ít nhất một nửa — em cảm được cú dốc.
-    expect(thanhExp(10) / thanhExp(9)).toBeGreaterThan(1.5)
-    // Chín cấp đầu cộng lại vẫn rẻ hơn ba cấp 10–12 cộng lại.
+  /** SỬA CÓ CHỦ Ý 21/09: hai mốc cũ của 15-09 ("dốc hẳn từ cấp 10 ×1,5", "cấp 13 đắt hơn nửa chín cấp đầu") thuộc đường CŨ; đường mới: chín cấp đầu = 21 ngày, từ cấp 10 mỗi cấp ~5 ngày, cuối đường ~20 ngày. */
+  it('CHÍN CẤP ĐẦU = 4 200 EXP (21 ngày × 200); TỪ CẤP 10 mỗi cấp ~5 ngày; cuối đường ~20 ngày một cấp', () => {
     let chinDau = 0
     for (let c = 1; c <= 9; c++) chinDau += thanhExp(c)
-    expect(chinDau).toBeLessThan(thanhExp(10) + thanhExp(11) + thanhExp(12))
-    // Từ cấp 13 trở đi: mỗi cấp đều đắt hơn CẢ CHÍN CẤP ĐẦU cộng lại.
-    expect(thanhExp(13)).toBeGreaterThan(chinDau * 0.5)
-    expect(thanhExp(60)).toBeGreaterThan(thanhExp(13) * 4)
+    expect(chinDau).toBe(4200)
+    expect(thanhExp(10)).toBe(1000) // 5 ngày × 200
+    expect(thanhExp(9)).toBe(970)
+    expect(thanhExp(119)).toBe(3950) // ~20 ngày × 200
+    expect(thanhExp(60)).toBeGreaterThan(thanhExp(13) * 1.5)
   })
 
   it('cộng EXP thì lên cấp THẬT — kể cả nhảy nhiều cấp một lúc', () => {
@@ -175,14 +177,16 @@ describe('kinh nghiệm', () => {
     const t = tongExpToiDinh()
     // Con số CHỐT, không phải khoảng ước lượng: đổi nhịp game thì phải sửa ở đây,
     // để không ai lỡ tay đổi `EXP_BAN_DAU` mà không thấy hệ quả.
-    expect(t).toBe(1_286_590)
-    expect(thanhExp(1)).toBe(120)
-    expect(thanhExp(10)).toBe(400)
-    expect(thanhExp(119)).toBe(46_740)
-    // VÀO NHANH VỀ CHẬM: mười hai cấp đầu chưa tới 1% cả đường.
+    // SỬA CÓ CHỦ Ý 21/09: 1 286 590 → 240 000 (= 1 200 ngày × 200); 120 → 160; 400 → 1 000; 46 740 → 3 950.
+    expect(t).toBe(240_000)
+    expect(thanhExp(1)).toBe(160)
+    expect(thanhExp(10)).toBe(1000)
+    expect(thanhExp(119)).toBe(3950)
+    // VÀO NHANH VỀ CHẬM: mười hai cấp đầu chưa tới 4% cả đường (7 240 / 240 000).
     let muoiHaiDau = 0
     for (let c = 1; c <= 12; c++) muoiHaiDau += thanhExp(c)
-    expect(muoiHaiDau / t).toBeLessThan(0.01)
+    expect(muoiHaiDau).toBe(7240)
+    expect(muoiHaiDau / t).toBeLessThan(0.04)
     // MỘT CHỦ Ý: sau reset, leo lại tới cấp 12 RẺ HƠN đường 12 cấp cũ (15 120).
     expect(muoiHaiDau).toBeLessThan(15_120)
     // eslint-disable-next-line no-console
@@ -245,14 +249,15 @@ describe('kinh nghiệm', () => {
    * lần cả đường 12 cấp cũ, tức ngồi leo tháp là khỏi cần thi khỏi cần nộp bài.
    * Phép kiểm này khoá lại: leo hết 999 tầng phải DƯỚI MỘT NỬA cả đường 120 cấp.
    */
-  it('leo hết 999 tầng vẫn chưa được nửa đường lên đỉnh', () => {
+  // SỬA CÓ CHỦ Ý 21/09: đường mới chỉ 240 000 EXP nên 999 tầng (474 575 EXP) là ~2 lần cả đường. KHÔNG còn là máy in vì thú hấp thụ tối đa 200 EXP/ngày (Điều 1) và game góp tối đa
+  // 120 EXP/ngày (Điều 9): thu hết tháp cũng phải mất > 1 200 ngày game. Phép kiểm cũ ("dưới nửa đường") thuộc đường 1 286 590.
+  it('leo hết 999 tầng cho ~2 lần cả đường mới, nhưng trần 120 EXP game/ngày bắt phải mất hơn 1 200 ngày', () => {
     let tongThap = 0
     for (let t = 1; t <= 999; t++) tongThap += NGUON_EXP.leoThap(t)
     const duong = tongExpToiDinh()
-    expect(tongThap).toBeLessThan(duong * 0.5)
-    expect(tongThap / duong).toBeGreaterThan(0.2)
-    // eslint-disable-next-line no-console
-    console.log(`  leo hết 999 tầng: ${tongThap.toLocaleString()} EXP = ${Math.round(tongThap / duong * 100)}% cả đường`)
+    expect(tongThap).toBe(474_575)
+    expect(tongThap / duong).toBeGreaterThan(1.9)
+    expect(tongThap / TRAN_EXP_GAME_NGAY).toBeGreaterThan(1200)
   })
 })
 
@@ -319,8 +324,8 @@ describe('hồ sơ lưu', () => {
     expect(h.expToiDa).toBe(thanhExp(4))
   })
 
-  it('hồ sơ mặc định bắt đầu bằng thanh 120', () => {
-    expect(layHoSoThanThuMacDinh().expToiDa).toBe(120)
+  it('hồ sơ mặc định bắt đầu bằng thanh 160 (đường cấp mới)', () => {
+    expect(layHoSoThanThuMacDinh().expToiDa).toBe(160)
     expect(layHoSoThanThuMacDinh().capDo).toBe(1)
   })
 })

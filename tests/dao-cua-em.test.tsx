@@ -54,14 +54,14 @@ describe('dao-core', () => {
     expect(loiThu(hoSo(), NOW)).toBe('Lửa Nhỏ nhắc em: 1 dạng đến lịch ôn lại hôm nay')
     expect(loiThu(hoSo({ mastery: [], nickname: undefined }), NOW)).toBe('Viêm Sư háo hức đi chuyến đầu tiên cùng em')
   })
-  it('lý do thưởng khớp `advance`: 20/40/40 = sao 1/2/3; sai, có trợ giúp, đúng mà chưa tới hạn đều 0 EXP và nói rõ vì sao', () => {
+  it('lý do thưởng khớp `advance`: 10/20/30 (sửa có chủ ý 21/09, cũ 20/40/40) = sao 1/2/3; sai, có trợ giúp, đúng mà chưa tới hạn đều 0 EXP và nói rõ vì sao', () => {
     const a = (them: Partial<Attempt>): Attempt => ({ id: 'a', session: 's', group: 'g1', qid: 'q', dang: 'D', mucDo: 'biet', correct: true, assisted: false, at: NOW, novel: true, ...them })
     const b1 = advance(undefined, a({}))
-    expect(lyDoThuongTuKetQua({ correct: true, assisted: false, reward: b1.reward, stage: b1.mastery.stage })).toMatchObject({ moc: 1, exp: 20 })
+    expect(lyDoThuongTuKetQua({ correct: true, assisted: false, reward: b1.reward, stage: b1.mastery.stage })).toMatchObject({ moc: 1, exp: 10 })
     const b2 = advance(b1.mastery, a({ group: 'g2', at: NOW + NGAY }))
-    expect(lyDoThuongTuKetQua({ correct: true, assisted: false, reward: b2.reward, stage: b2.mastery.stage })).toMatchObject({ moc: 2, exp: 40, chu: expect.stringContaining('sao thứ 2') })
+    expect(lyDoThuongTuKetQua({ correct: true, assisted: false, reward: b2.reward, stage: b2.mastery.stage })).toMatchObject({ moc: 2, exp: 20, chu: expect.stringContaining('sao thứ 2') })
     const b3 = advance(b2.mastery, a({ group: 'g3', at: NOW + 8 * NGAY }))
-    expect(lyDoThuongTuKetQua({ correct: true, assisted: false, reward: b3.reward, stage: b3.mastery.stage })).toMatchObject({ moc: 3, exp: 40, chu: expect.stringContaining('sao thứ 3') })
+    expect(lyDoThuongTuKetQua({ correct: true, assisted: false, reward: b3.reward, stage: b3.mastery.stage })).toMatchObject({ moc: 3, exp: 30, chu: expect.stringContaining('sao thứ 3') })
     const som = advance(b1.mastery, a({ group: 'g2', at: NOW + 1000 }))
     expect(lyDoThuongTuKetQua({ correct: true, assisted: false, reward: som.reward, stage: som.mastery.stage })).toMatchObject({ moc: 0, exp: 0, chu: expect.stringContaining('sao thứ 2 mở khi') })
     expect(lyDoThuongTuKetQua({ correct: false, assisted: false, reward: 0, stage: 1 }).chu).toMatch(/Chưa đúng/)

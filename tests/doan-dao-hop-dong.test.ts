@@ -51,6 +51,6 @@ describe('Đảo thần thú · lệnh đọc-chỉ so-tay + role/lyDoThuong qua
     const st = await gameV2(d.env, 'start', { token, mode: 'adventure' }) as any
     expect(st.questions.length).toBeGreaterThan(0); for (const x of st.questions) { expect(['yeu', 'toi_han', 'lap', 'thu_thach']).toContain(x.role); expect(x.correct).toBeUndefined() }
     const dau = st.questions[0], tl = await gameV2(d.env, 'answer', { token, session: st.id, qid: dau.qid, answer: 'A' }) as any
-    expect(tl.lyDoThuong).toEqual({ moc: 1, exp: 20, chu: '+20 EXP · lần đầu em tự làm đúng dạng này — sao thứ 1' })
+    expect(tl.lyDoThuong).toEqual({ moc: 1, exp: 10, chu: '+10 EXP · lần đầu em tự làm đúng dạng này — sao thứ 1' }) // sửa có chủ ý 21/09: nấc 1 thưởng 20 → 10
   })
 })
