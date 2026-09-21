@@ -128,6 +128,48 @@ export function chuNgayMo(moLuc: string, bayGio: Date): string {
   return `ngày ${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
 }
 
+// ───────────────────────── lịch chặng THEO GIỜ (bản 1.1) ─────────────────────────
+// Hạn ngắn ⇒ chặng chia theo giờ trong cửa sổ học (vd 20:00 · 21:20 · 22:40); hạn dài ⇒ mỗi chặng mở 00:00 của ngày nó.
+// Máy chủ trả `moLuc` (ISO) từng chặng; máy em chỉ ĐỌC và nói cho em biết chặng kế mở lúc nào, còn bao lâu.
+
+const hai = (n: number): string => String(n).padStart(2, '0')
+const ngayCuaNgay = (d: Date): number => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime()
+
+export interface MoLucView {
+  /** "lúc 21:20" · "lúc 20:00 ngày mai" · "ngày mai" · "ngày 24/09" · "ngay bây giờ". Ghép sau chữ "mở". */
+  chu: string
+  /** "còn 25 phút" · "còn 1 giờ 20 phút" — chỉ khi còn < 3 giờ; ngoài ra null (không dọa em bằng đồng hồ xa). */
+  conLai: string | null
+  /** Mốc đã tới (hoặc qua): chặng phải mở được — nếu máy chưa cho thì em tải lại bài. */
+  daToi: boolean
+}
+
+/** Chữ "chặng kế mở …". null khi `moLuc` hỏng. Mốc đúng 00:00 nói theo NGÀY (như cũ); mốc có giờ nói cả giờ. */
+export function chuMoLuc(moLuc: string, bayGio: Date): MoLucView | null {
+  const d = new Date(moLuc)
+  if (!Number.isFinite(d.getTime())) return null
+  const ms = d.getTime() - bayGio.getTime()
+  if (ms <= 0) return { chu: 'ngay bây giờ', conLai: null, daToi: true }
+  const nuaDem = d.getHours() === 0 && d.getMinutes() === 0
+  const chenh = Math.round((ngayCuaNgay(d) - ngayCuaNgay(bayGio)) / 86_400_000)
+  const gio = `${hai(d.getHours())}:${hai(d.getMinutes())}`
+  const ngay = chenh <= 0 ? '' : chenh === 1 ? 'ngày mai' : `ngày ${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
+  const chu = nuaDem ? (chenh <= 0 ? 'hôm nay' : ngay) : `lúc ${gio}${ngay ? ' ' + ngay : ''}`
+  const phut = Math.max(1, Math.ceil(ms / 60_000))
+  const conLai = ms > 3 * 3_600_000 ? null : phut < 60 ? `còn ${phut} phút` : `còn ${Math.floor(phut / 60)} giờ${phut % 60 ? ` ${phut % 60} phút` : ''}`
+  return { chu, conLai, daToi: false }
+}
+
+/** Nhãn NGẮN dưới chấm chặng (cột chỉ rộng ~46 px): "21:20" (hôm nay có giờ) · "Hôm nay" · "Mai" · "24/09". */
+export function nhanMoLucNgan(moLuc: string, bayGio: Date): string {
+  const d = new Date(moLuc)
+  if (!Number.isFinite(d.getTime())) return ''
+  const chenh = Math.round((ngayCuaNgay(d) - ngayCuaNgay(bayGio)) / 86_400_000)
+  if (chenh <= 0) return d.getHours() === 0 && d.getMinutes() === 0 ? 'Hôm nay' : `${hai(d.getHours())}:${hai(d.getMinutes())}`
+  if (chenh === 1) return 'Mai'
+  return `${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
+}
+
 // ───────────────────────── kết quả nộp chặng ─────────────────────────
 
 /** Giá trị đáp án/lời giải máy chủ trả NGUYÊN DẠNG như kho lưu: chuỗi ("B", "DSDS", "12,5") hoặc đối tượng có cấu trúc

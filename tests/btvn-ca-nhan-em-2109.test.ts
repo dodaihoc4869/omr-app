@@ -2,7 +2,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import {
   cauCuaChang,
   chuDauBai,
+  chuMoLuc,
   chuNgayMo,
+  nhanMoLucNgan,
   docBaiCaNhan,
   docKetQuaChang,
   docKetQuaChangDaLuu,
@@ -442,5 +444,46 @@ describe('doiLuotLam — thầy "Cho làm lại": bỏ làm dở của lượt c
     })
     expect(() => doiLuotLam('B1', 'S1', 2)).not.toThrow()
     spy.mockRestore()
+  })
+})
+
+describe('chuMoLuc — chặng kế mở lúc nào (lịch theo giờ, bản 1.1)', () => {
+  const bay = new Date(2026, 8, 21, 20, 30, 0) // 21/09 20:30
+  const at = (ngay: number, g: number, p: number) => new Date(2026, 8, ngay, g, p).toISOString()
+  it('mốc có giờ trong hôm nay: "lúc 21:20" + còn bao lâu', () => {
+    expect(chuMoLuc(at(21, 21, 20), bay)).toEqual({ chu: 'lúc 21:20', conLai: 'còn 50 phút', daToi: false })
+    expect(chuMoLuc(at(21, 23, 45), bay)).toEqual({ chu: 'lúc 23:45', conLai: null, daToi: false }) // còn 3 giờ 15 phút > 3 giờ
+  })
+  it('còn < 3 giờ mới có đếm ngược; xa hơn thì KHÔNG dọa em bằng đồng hồ', () => {
+    expect(chuMoLuc(at(21, 22, 30), bay)!.conLai).toBe('còn 2 giờ')
+    expect(chuMoLuc(at(21, 23, 20), bay)!.conLai).toBe('còn 2 giờ 50 phút')
+    expect(chuMoLuc(at(21, 23, 59), bay)!.conLai).toBeNull()
+    expect(chuMoLuc(at(21, 20, 31), bay)!.conLai).toBe('còn 1 phút')
+  })
+  it('làm tròn LÊN phút: còn 49 phút 30 giây ⇒ "còn 50 phút"; còn 20 giây ⇒ "còn 1 phút" (không bao giờ "còn 0 phút")', () => {
+    const bayGiay = new Date(2026, 8, 21, 20, 30, 30)
+    expect(chuMoLuc(at(21, 21, 20), bayGiay)!.conLai).toBe('còn 50 phút')
+    expect(chuMoLuc(new Date(2026, 8, 21, 20, 30, 50).toISOString(), bayGiay)!.conLai).toBe('còn 1 phút')
+  })
+  it('sáng mai có giờ: "lúc 20:00 ngày mai"; mốc 00:00 nói theo NGÀY như cũ', () => {
+    expect(chuMoLuc(at(22, 20, 0), bay)!.chu).toBe('lúc 20:00 ngày mai')
+    expect(chuMoLuc(at(22, 0, 0), bay)!.chu).toBe('ngày mai')
+    expect(chuMoLuc(at(24, 0, 0), bay)!.chu).toBe('ngày 24/09')
+    expect(chuMoLuc(at(24, 21, 20), bay)!.chu).toBe('lúc 21:20 ngày 24/09')
+  })
+  it('mốc đã tới/qua ⇒ daToi (chặng phải mở được)', () => {
+    expect(chuMoLuc(at(21, 20, 30), bay)).toEqual({ chu: 'ngay bây giờ', conLai: null, daToi: true })
+    expect(chuMoLuc(at(21, 19, 0), bay)!.daToi).toBe(true)
+  })
+  it('hỏng ⇒ null', () => {
+    expect(chuMoLuc('không phải ngày', bay)).toBeNull()
+    expect(chuMoLuc('', bay)).toBeNull()
+  })
+  it('nhãn ngắn dưới chấm chặng', () => {
+    expect(nhanMoLucNgan(at(21, 21, 20), bay)).toBe('21:20')
+    expect(nhanMoLucNgan(at(21, 0, 0), bay)).toBe('Hôm nay')
+    expect(nhanMoLucNgan(at(22, 20, 0), bay)).toBe('Mai')
+    expect(nhanMoLucNgan(at(24, 0, 0), bay)).toBe('24/09')
+    expect(nhanMoLucNgan('x', bay)).toBe('')
   })
 })
