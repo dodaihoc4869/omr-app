@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import { mulberry32 } from '../src/lib/exam-shuffle'
 import {
-  DAY, NGAY_NGHI_CAU_DUNG, SO_CAU_MOI_LUOT, TRAN_LUOT_NGAY, advance, chooseLuotMoi, chooseSessionWithRoles, luotHomNay, targetLevel, tranCauDaiTheoCap,
+  DAY, NGAY_NGHI_CAU_DUNG, SO_CAU_MOI_LUOT, TRAN_LUOT_NGAY, advance, chooseLuotMoi, chooseSessionWithRoles, luotHomNay, dauVaoLuotTuSo, targetLevel, tranCauDaiTheoCap,
   type Attempt, type CauLuot, type Evidence, type Mastery, type OptLuot, type PrivateQuestion,
 } from '../src/game/than-thu-v2/core'
 
@@ -277,6 +277,41 @@ describe('luotHomNay — số lượt mỗi ngày', () => {
       const k = luotHomNay(v({ xongChangHomNay: c, xongOnToiHan: c === null, datHomNay: d, dungHomNay: du, tongHomNay: to }))
       expect(k.tongLuotMo).toBeGreaterThanOrEqual(3)
       expect(k.tongLuotMo).toBeLessThanOrEqual(6)
+    }
+  })
+})
+
+describe('dauVaoLuotTuSo — luật "xong chặng / xong ôn tới hạn" một chỗ', () => {
+  const d = (o: Partial<Parameters<typeof dauVaoLuotTuSo>[0]> = {}) => dauVaoLuotTuSo({ changXongHomNay: false, soCauOnHomNay: 0, conCauToiHan: 0, coBaiConChang: true, ...o })
+  it('có bài còn chặng: xongChangHomNay = chặng XONG hẳn hôm nay (mới làm 1 câu chưa tính); không có bài còn chặng ⇒ null', () => {
+    expect(d({ coBaiConChang: true, changXongHomNay: true }).xongChangHomNay).toBe(true)
+    expect(d({ coBaiConChang: true, changXongHomNay: false }).xongChangHomNay).toBe(false)
+    expect(d({ coBaiConChang: false, changXongHomNay: true }).xongChangHomNay).toBeNull()
+    expect(d({ coBaiConChang: false }).xongChangHomNay).toBeNull()
+  })
+  it('xongOnToiHan ⇔ đã ôn ≥ 1 câu hôm nay VÀ hết câu tới hạn; không có câu tới hạn từ đầu (chưa ôn) ⇒ false; còn tới hạn ⇒ false; số lạ ⇒ false', () => {
+    expect(d({ soCauOnHomNay: 5, conCauToiHan: 0 }).xongOnToiHan).toBe(true)
+    expect(d({ soCauOnHomNay: 1, conCauToiHan: 0 }).xongOnToiHan).toBe(true)
+    expect(d({ soCauOnHomNay: 0, conCauToiHan: 0 }).xongOnToiHan).toBe(false)
+    expect(d({ soCauOnHomNay: 5, conCauToiHan: 1 }).xongOnToiHan).toBe(false)
+    expect(d({ soCauOnHomNay: Number.NaN, conCauToiHan: 0 }).xongOnToiHan).toBe(false)
+    expect(d({ soCauOnHomNay: 5, conCauToiHan: Number.NaN }).xongOnToiHan).toBe(false)
+    expect(d({ soCauOnHomNay: 5, conCauToiHan: -1 }).xongOnToiHan).toBe(false)
+    expect(d({ soCauOnHomNay: 5, conCauToiHan: 0.5 }).xongOnToiHan).toBe(true) // 0,5 câu ⇒ làm tròn xuống 0
+  })
+  it('NỐI VỚI luotHomNay: có bài còn chặng + ôn xong nhưng chặng chưa xong ⇒ 3 lượt; chặng xong ⇒ 4; không có bài còn chặng + ôn xong ⇒ 4; không có bài + chưa ôn ⇒ 3', () => {
+    const lt = (o: Parameters<typeof dauVaoLuotTuSo>[0]) => luotHomNay({ soLuotDaLam: 0, datHomNay: false, dungHomNay: 0, tongHomNay: 0, ...dauVaoLuotTuSo(o) }).tongLuotMo
+    expect(lt({ coBaiConChang: true, changXongHomNay: false, soCauOnHomNay: 9, conCauToiHan: 0 })).toBe(3)
+    expect(lt({ coBaiConChang: true, changXongHomNay: true, soCauOnHomNay: 0, conCauToiHan: 4 })).toBe(4)
+    expect(lt({ coBaiConChang: false, changXongHomNay: false, soCauOnHomNay: 9, conCauToiHan: 0 })).toBe(4)
+    expect(lt({ coBaiConChang: false, changXongHomNay: false, soCauOnHomNay: 0, conCauToiHan: 0 })).toBe(3)
+    expect(lt({ coBaiConChang: false, changXongHomNay: false, soCauOnHomNay: 3, conCauToiHan: 2 })).toBe(3)
+  })
+  it('TÍNH CHẤT mọi tổ hợp: lượt thưởng do chặng/ôn mở tối đa MỘT (không cộng đôi), và chỉ khi điều kiện thật đúng', () => {
+    for (const cb of [true, false]) for (const cx of [true, false]) for (const on of [0, 1, 7]) for (const con of [0, 3]) {
+      const r = dauVaoLuotTuSo({ changXongHomNay: cx, soCauOnHomNay: on, conCauToiHan: con, coBaiConChang: cb })
+      const mo = luotHomNay({ soLuotDaLam: 0, datHomNay: false, dungHomNay: 0, tongHomNay: 0, ...r }).tongLuotMo - 3
+      expect(mo).toBe(cb ? (cx ? 1 : 0) : on >= 1 && con === 0 ? 1 : 0)
     }
   })
 })

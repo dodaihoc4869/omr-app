@@ -219,6 +219,22 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
   return out.slice(0,N)
 }
 
+/**
+ * LUẬT "XONG CHẶNG / XONG ÔN TỚI HẠN" cho `luotHomNay` — MỘT chỗ (Boss 21/09 chiều; sửa hai chỗ lỏng của W2a: 1 câu chặng, 1 câu ôn đã mở lượt).
+ *   • `coBaiConChang` = có bài tập về nhà ĐANG CHẠY còn ít nhất một chặng CHƯA xong (bài đã xong hết chặng nhưng chưa bấm nộp KHÔNG tính là đang chạy).
+ *     Không có ⇒ `xongChangHomNay = null` (lượt thưởng do ôn tới hạn mở); có ⇒ `xongChangHomNay = changXongHomNay` (một chặng đã XONG HẲN hôm nay, đủ câu — không phải mới làm 1 câu).
+ *   • `xongOnToiHan` = hôm nay em đã ôn ≥ 1 câu (`soCauOnHomNay`, chỉ nguồn ôn lại — không tính phiếu khắc phục) VÀ không còn câu tới hạn nào (`conCauToiHan = 0`).
+ *     Không có câu nào tới hạn từ đầu ngày thì em chưa ôn gì ⇒ false (không cho lượt thưởng miễn phí). Số không hợp lệ ⇒ coi là CHƯA xong (đóng cửa).
+ */
+export function dauVaoLuotTuSo(v: { changXongHomNay: boolean; soCauOnHomNay: number; conCauToiHan: number; coBaiConChang: boolean }): { xongChangHomNay: boolean | null; xongOnToiHan: boolean } {
+  const so = (x: number) => (Number.isFinite(x) ? Math.floor(x) : Number.NaN)
+  const on = so(v.soCauOnHomNay), con = so(v.conCauToiHan)
+  return {
+    xongChangHomNay: v.coBaiConChang === true ? v.changXongHomNay === true : null,
+    xongOnToiHan: on >= 1 && con === 0,
+  }
+}
+
 export interface DauVaoLuot { soLuotDaLam:number; xongChangHomNay:boolean|null; xongOnToiHan:boolean; datHomNay:boolean; dungHomNay:number; tongHomNay:number }
 export interface KhoaLuot { ma:'chang'|'dat'|'trum'; daMo:boolean; moKhi:string }
 export interface KetQuaLuot { tongLuotMo:number; conLai:number; tran:number; danhSach:{so:number;loai:LoaiLuot;thuong:boolean}[]; luotTiepTheo:{so:number;loai:LoaiLuot;thuong:boolean}|null; khoa:KhoaLuot[]; tongCauToiDa:number }
