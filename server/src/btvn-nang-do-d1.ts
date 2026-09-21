@@ -483,6 +483,16 @@ export function docTomTat(v: unknown): TomTatBo | null {
   }
 }
 
+/**
+ * LÕI CỦA EM (lõi đúng bậc, thầy chốt 21/09): em có dạng ổn định thì vài câu lõi mức thấp được ĐỔI 1–1 bằng câu cùng dạng đúng bậc; danh sách qid lõi của em nằm ở
+ * `tomTat.loiCuaEm` (chỉ có khi KHÁC lõi của bài; lưu sẵn trong `btvn_em.tom_tat_json`, không đổi lược đồ). Vắng / rỗng / sai kiểu ⇒ lõi của em = lõi của bài (bộ đã chốt trước bản này).
+ * Mọi chỗ máy chủ cần "lõi của MỘT em" (thích nghi sau chặng, điểm lõi ở /btvn/theo-doi) phải đi qua hàm này, KHÔNG đọc `btvn_cau.loi` thẳng.
+ */
+export function loiCuaEm(tomTat: TomTatBo | null | undefined, loiBai: readonly string[]): string[] {
+  const v = (tomTat as { loiCuaEm?: unknown } | null | undefined)?.loiCuaEm
+  return Array.isArray(v) && v.length > 0 && v.every((q) => typeof q === 'string') ? [...(v as string[])] : [...loiBai]
+}
+
 // ================================================================== CHẶNG ==================================================================
 
 export { LAN_MOI_LUOT, moLucChang, trangThaiCacChang, type TrangThaiChang } from './btvn-nang-do-chang'
@@ -1117,11 +1127,12 @@ const docLam = (v: unknown): Record<string, string> => docDapAnDaLuu(v)
 /**
  * Thống kê thêm cho `/btvn/theo-doi` của MỘT bài `ca_nhan`: theo em (số câu của em, chặng, đúng/lõi, câu thưởng sai) + tập lõi (để chống chép bài CHỈ so trên lõi).
  * `diemLoi` = đúng lõi / số câu lõi × 10, chỉ có khi em đã nộp (chưa nộp thì null — chưa làm hết thì con số so lớp vô nghĩa). Lõi tính `loi_cao` BÌNH THƯỜNG.
+ * Lõi ở đây là lõi CỦA EM (`loiCuaEm`, lõi đúng bậc): công thức giữ nguyên nhưng thước KHÔNG còn chung giữa các em (docs/hop-dong-btvn-nang-do-2109.md). `soLoi` / `loi` vẫn là lõi CỦA BÀI.
  */
 export async function thongKeTheoDoiCaNhan(env: Env, bt: Hang, dsEm: Hang[]): Promise<{ soLoi: number; loi: Set<string>; theoEm: Map<string, ThongKeCaNhanEm> }> {
   const maBtvn = chuoi(bt.ma_btvn)
   const [rEm, rCau, rBo] = await Promise.all([
-    env.DB.prepare('SELECT sbd, so_cau_em, so_chang, lo_da_xong, chot_luc FROM btvn_em WHERE ma_btvn = ?').bind(maBtvn).all<Hang>(),
+    env.DB.prepare('SELECT sbd, so_cau_em, so_chang, lo_da_xong, chot_luc, tom_tat_json FROM btvn_em WHERE ma_btvn = ?').bind(maBtvn).all<Hang>(),
     env.DB.prepare('SELECT qid FROM btvn_cau WHERE ma_btvn = ? AND loi = 1').bind(maBtvn).all<Hang>(),
     env.DB.prepare('SELECT sbd, qid, nhan FROM btvn_em_cau WHERE ma_btvn = ? AND chang >= 0').bind(maBtvn).all<Hang>(), // chỉ câu BẮT BUỘC (nhóm thử sức thêm chang = -1 không tính lõi/thưởng sai của em)
   ])
@@ -1150,8 +1161,9 @@ export async function thongKeTheoDoiCaNhan(env: Env, bt: Hang, dsEm: Hang[]): Pr
     const daChot = !!t?.chot_luc
     const lam = docLam(x.dap_an_json)
     const nhan = nhanCuaEm.get(sbd)
-    // Lõi CỦA EM = lõi chung ∩ câu bắt buộc của em (em yếu: lõi cao hơn bậc là "thử sức thêm", không tính vào điểm lõi).
-    const loiEm = nhan ? [...loi].filter((q) => nhan.has(q)) : [...loi]
+    // Lõi CỦA EM = (lõi đúng bậc của em `tomTat.loiCuaEm`, vắng ⇒ lõi của bài) ∩ câu bắt buộc của em (em yếu: lõi cao hơn bậc là "thử sức thêm", không tính vào điểm lõi).
+    const nguonLoi = loiCuaEm(docTomTat(t?.tom_tat_json), [...loi])
+    const loiEm = nhan ? nguonLoi.filter((q) => nhan.has(q)) : nguonLoi
     const soDungLoi = daChot ? loiEm.filter((q) => dung(lam, q)).length : 0
     const daNop = !!x.nop_luc
     theoEm.set(sbd, {
@@ -1260,7 +1272,7 @@ export async function thichNghiSauChang(env: Env, bt: Hang, em: Hang, sbd: strin
   const viTri = new Map(bai.cau.map((c, i) => [c.qid, i]))
   const theoDe = (ds: string[]) => [...ds].sort((a, b) => (viTri.get(a) ?? 0) - (viTri.get(b) ?? 0))
   const tatCa = da.chang.flat()
-  const loiSet = new Set(bai.loi)
+  const loiSet = new Set(loiCuaEm(tomTat, bai.loi)) // LÕI CỦA EM (đúng bậc): câu lõi đã thay KHÔNG bị coi là câu riêng để thích nghi đổi mất
   const bo: BoCuaEm = {
     loi: theoDe([...tatCa, ...da.thuSucThem].filter((q) => loiSet.has(q))), // lõi chung gồm cả câu thử sức thêm (thuSucThem ⊆ loi)
     thuSucThem: theoDe(da.thuSucThem), // KHÔNG đổi ở thích nghi: nhóm này không nằm trong chặng nào
