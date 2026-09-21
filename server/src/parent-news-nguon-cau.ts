@@ -74,7 +74,7 @@ export function cauChoMom(q: PrivateQuestion): Record<string, unknown> {
   }
 }
 
-async function docCauKho(env: Env, dieuKien: string, thamSo: unknown[], baoVe: ReadonlySet<string>, gioiHan: number): Promise<PrivateQuestion[]> {
+export async function docCauKho(env: Env, dieuKien: string, thamSo: unknown[], baoVe: ReadonlySet<string>, gioiHan: number): Promise<PrivateQuestion[]> {
   const r = await tat(
     () => env.DB.prepare(`${CHON_CAU_KHO} ${dieuKien} ORDER BY q.content_group, q.qid LIMIT ${gioiHan}`).bind(...thamSo).all<{ json: string }>(),
     trong<{ json: string }>(),

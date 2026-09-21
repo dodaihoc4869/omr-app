@@ -15,7 +15,7 @@ import { PHUT_NGAY_MAC_DINH, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU } from './ho-
 import { datPhutMoiNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
 
 export type KieuTruyCap = 'token' | 'sbd_tran'
-export type DuongPh = 'parent-news' | 'mom' | 'ph-ke-hoach' | 'ph-thoi-gian-hoc' | 'ph-xac-dinh' | 'ph-canh-bao-xem'
+export type DuongPh = 'parent-news' | 'mom' | 'ph-ke-hoach' | 'ph-thoi-gian-hoc' | 'ph-xac-dinh' | 'ph-canh-bao-xem' | 'ph-giao-them'
 
 /** Địa chỉ app (Pages). Liên kết phát cho phụ huynh: `<APP>/ph?ph=<pass>`; cổng phụ huynh lưu `pass` rồi gửi `{pass}` ở mọi lệnh. */
 export const DIA_CHI_APP = 'https://omr-app-b3u.pages.dev'

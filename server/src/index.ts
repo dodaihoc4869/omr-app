@@ -20,6 +20,7 @@ import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
 import {gvBangTin} from './gv-bang-tin'
 import {ghiLoiMay} from './nhat-ky-may'
 import {chotNgayRoiTruKhien} from './khien-mat'
+import {phGiaoThem} from './ph-giao-them'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {docThanThuSoThat,hsThuThachHomNay,hsThuThachNop} from './thu-thach-rieng'
 import {dailyHonors} from './honors'
@@ -3050,6 +3051,7 @@ export default {
       if (p === '/ph/ke-hoach') return ra(await phKeHoach(env, b))
       if (p === '/ph/canh-bao/xem') return ra(await phCanhBaoXem(env, b))
       if (p === '/ph/thoi-gian-hoc') return ra(await phThoiGianHoc(env, b))
+      if (p === '/ph/giao-them') return ra(await phGiaoThem(env, b))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))

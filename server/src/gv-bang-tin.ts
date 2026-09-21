@@ -235,8 +235,8 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const rBt = await Q.hoi(`SELECT ngay, json, nop_luc, so_em, so_nhan, so_bi_loai FROM ai_ban_tin WHERE ngay <= ? ORDER BY ngay DESC LIMIT ${SO_DEM_TRUNG_VI + 1}`, ngay)
   // 9 · vinh danh hôm nay (bản đã đăng hôm nay lưu ở ngày hôm qua)
   // (vinh danh hôm nay + số em đã làm thử thách riêng: MỘT truy vấn; thiếu bảng daily_honors ⇒ chỉ đọc phần thử thách)
-  // (thêm: số em bị trừ 1 khiên hôm nay vì vắng nhiệm vụ ngày — `khien_mat_so`; thiếu bảng ⇒ lùi về truy vấn không có nó)
-  let rVd = await Q.hoi("SELECT 'vd' AS k, body AS v FROM daily_honors WHERE day = ? UNION ALL SELECT 'tt', COUNT(DISTINCT sbd) FROM su_kien_hoc WHERE nguon = ? AND ngay_vn = ? AND luc >= ? UNION ALL SELECT 'km', COUNT(*) FROM khien_mat_so WHERE ngay_vn = ?", homQua, NGUON_THU_THACH, ngay, tuHomNay, ngay)
+  // (thêm: số em bị trừ 1 khiên hôm nay vì vắng nhiệm vụ ngày — `khien_mat_so` — và số gói "bài gia đình giao" hôm nay — `ph_giao_them`; thiếu bảng ⇒ lùi về truy vấn không có chúng)
+  let rVd = await Q.hoi("SELECT 'vd' AS k, body AS v FROM daily_honors WHERE day = ? UNION ALL SELECT 'tt', COUNT(DISTINCT sbd) FROM su_kien_hoc WHERE nguon = ? AND ngay_vn = ? AND luc >= ? UNION ALL SELECT 'km', COUNT(*) FROM khien_mat_so WHERE ngay_vn = ? UNION ALL SELECT 'gt', COUNT(*) FROM ph_giao_them WHERE ngay_vn = ?", homQua, NGUON_THU_THACH, ngay, tuHomNay, ngay, ngay)
   if (!rVd) rVd = await Q.hoi("SELECT 'vd' AS k, body AS v FROM daily_honors WHERE day = ? UNION ALL SELECT 'tt', COUNT(DISTINCT sbd) FROM su_kien_hoc WHERE nguon = ? AND ngay_vn = ? AND luc >= ?", homQua, NGUON_THU_THACH, ngay, tuHomNay)
   if (!rVd) rVd = await Q.hoi("SELECT 'tt' AS k, COUNT(DISTINCT sbd) AS v FROM su_kien_hoc WHERE nguon = ? AND ngay_vn = ? AND luc >= ?", NGUON_THU_THACH, ngay, tuHomNay)
   // 10 · lỗi của các việc nền trong 24 giờ (B11; bảng `nhat_ky_may`)
@@ -387,6 +387,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   } catch { soVinhDanh = 0 }
   const soEmDaLamThuThach = so((rVd ?? []).find((x) => chuoi(x.k) === 'tt')?.v)
   const soEmMatKhien = so((rVd ?? []).find((x) => chuoi(x.k) === 'km')?.v)
+  const soGoiGiaoThem = so((rVd ?? []).find((x) => chuoi(x.k) === 'gt')?.v)
   let soEmNhanThuThach = 0
   for (const x of rDcTho ?? []) if (docThuThachTuDieuChinh(x.json) && thuThachDaApTuHang(x.json, x.ap_dung)) soEmNhanThuThach++
   const emNhac = new Set(nhacTuDong.map((x) => chuoi(x.sbd)))
@@ -400,6 +401,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     { loai: 'vinh_danh', so: soVinhDanh, chu: `Vinh danh ${soVinhDanh} em` },
     { loai: 'thu_thach_rieng', so: soEmNhanThuThach, soDaLam: soEmDaLamThuThach, chu: `${soEmNhanThuThach} em nhận thử thách riêng · ${soEmDaLamThuThach} em đã làm` },
     { loai: 'bo_nao_soi', so: soEmBoNaoSoi, chu: `Bộ não A.I soi ${soEmBoNaoSoi} em` },
+    { loai: 'giao_them', so: soGoiGiaoThem, chu: `A.I Đỗ Đại Học soạn ${soGoiGiaoThem} gói bài gia đình giao hôm nay` },
     { loai: 'khien_mat', so: soEmMatKhien, chu: `A.I Đỗ Đại Học đã trừ 1 khiên của ${soEmMatKhien} em vắng nhiệm vụ ngày ${KHIEN_MAT_KHI_VANG_NGAY} ngày liên tiếp` },
   ].filter((x) => (x.so as number) > 0)
 
