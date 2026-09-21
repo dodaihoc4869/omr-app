@@ -12,6 +12,7 @@ cp src/lib/bo-nao-khuon.ts src/lib/bo-nao-nen.ts src/lib/bo-nao-vang.ts src/lib/
 # thư viện mà btvn-nang-do.ts import (nếu có) — chép theo danh sách import tương đối
 grep -hoE "from '\./[^']+'" src/lib/bo-nao-khuon.ts src/lib/bo-nao-nen.ts src/lib/bo-nao-vang.ts src/lib/btvn-nang-do.ts | sed -E "s/from '\.\/([^']+)'/\1/" | sort -u | while read -r m; do [ -f "src/lib/$m.ts" ] && cp "src/lib/$m.ts" "$DICH/src/lib/" || true; done
 cp bo-nao/HUONG-DAN-BO-NAO.md bo-nao/LOI-DAN-PHIEN.md bo-nao/LUAT-RUT-GON.md "$DICH/bo-nao/"
+if [ -f bo-nao/LUAT-TAM-THOI.md ]; then cp bo-nao/LUAT-TAM-THOI.md "$DICH/bo-nao/"; else rm -f "$DICH/bo-nao/LUAT-TAM-THOI.md"; fi
 for f in bai-hoc.md do-token.md; do [ -f "$DICH/bo-nao/so-tay/$f" ] || cp "bo-nao/so-tay/$f" "$DICH/bo-nao/so-tay/"; done   # sổ tay: chỉ chép lần đầu, về sau bộ não tự ghi
 printf '{"type":"module"}\n' > "$DICH/package.json"
 chmod 700 "$HOME/.omr-bo-nao" "$DICH"; chmod +x "$DICH/scripts/bo-nao/"*.sh
