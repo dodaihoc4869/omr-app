@@ -196,12 +196,13 @@ export async function docDauVaoLuot(env: Env, sbd: string, ngay: string, nowMs: 
   let xongOnToiHan = false
   try {
     const r = await env.DB.prepare(
+      // `+nguon` (dấu cộng đơn ngôi) CẤM planner dùng idx_skh_nguon(nguon, ma_nguon): không có ANALYZE nó ưu tiên chỉ mục có cột `nguon` và đọc MỌI dòng btvn_lo / on_lai của CẢ TRƯỜNG (≈2,4 nghìn dòng mỗi lượt, tăng theo số chặng nộp — Code 1 đo bằng EXPLAIN 21/09); có dấu cộng thì đi idx_skh_em_ngay(sbd, ngay_vn) chỉ các dòng của em hôm nay. Không đổi kết quả.
       // Bài "đang chạy" = CÒN chặng chưa xong (đã xong hết chặng mà chưa bấm nộp KHÔNG tính). Chặng "xong hôm nay" = có câu btvn_lo hôm nay của chặng ĐÃ XONG (chỉ số < lo_da_xong), không phải mới làm 1 câu.
       `SELECT (SELECT COUNT(*) FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn WHERE be.sbd = ? AND be.nop_luc IS NULL AND b.da_xoa = 0 AND COALESCE(be.thu_hoi, 0) = 0 AND b.han_nop > ?
                  AND (be.so_chang IS NULL OR COALESCE(be.lo_da_xong, 0) < be.so_chang)) AS dang_chay,
-              (SELECT COUNT(*) FROM (SELECT DISTINCT s.ma_nguon AS ma, (s.lan % ${LAN_MOI_LUOT}) AS chi FROM su_kien_hoc s WHERE s.sbd = ? AND s.ngay_vn = ? AND s.nguon = 'btvn_lo' AND s.ket_qua IS NOT NULL) x
+              (SELECT COUNT(*) FROM (SELECT DISTINCT s.ma_nguon AS ma, (s.lan % ${LAN_MOI_LUOT}) AS chi FROM su_kien_hoc s WHERE s.sbd = ? AND s.ngay_vn = ? AND +s.nguon = 'btvn_lo' AND s.ket_qua IS NOT NULL) x
                  JOIN btvn_em be2 ON be2.ma_btvn = x.ma AND be2.sbd = ? WHERE x.chi < COALESCE(be2.lo_da_xong, 0)) AS chang_xong_hom_nay,
-              (SELECT COUNT(*) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND nguon = 'on_lai') AS on_hom_nay,
+              (SELECT COUNT(*) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND +nguon = 'on_lai') AS on_hom_nay,
               (SELECT COUNT(*) FROM nam_kt_cau WHERE sbd = ? AND moc_on_ke IS NOT NULL AND substr(moc_on_ke, 1, 10) <= ? AND trang_thai IN ('moi_sai', 'dang_on') AND COALESCE(can_day_lai, 0) = 0) AS con_toi_han`,
     ).bind(sbd, new Date(nowMs).toISOString(), sbd, ngay, sbd, sbd, ngay, sbd, ngay).first<{ dang_chay: number; chang_xong_hom_nay: number; on_hom_nay: number; con_toi_han: number }>()
     // Luật "xong chặng / xong ôn tới hạn" là hàm thuần của Code 1 (`dauVaoLuotTuSo`): ôn tới hạn xong = hôm nay có ≥ 1 câu ôn lại VÀ không còn câu tới hạn; khắc phục không tính; số lạ ⇒ chưa xong.
