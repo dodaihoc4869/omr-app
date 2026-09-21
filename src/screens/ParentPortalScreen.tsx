@@ -9,6 +9,8 @@ import { momApi, migrateMom, momReviewHtml, chuanHoaBaiMom, parentNewsApi, datPa
 import { docPass, nhanPassTuDiaChi, xacDinhPhuHuynh, xoaPass } from '../lib/ph-token'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useMemo, useState } from 'react'
+import { taiBoNaoPhuHuynh } from '../lib/bo-nao-lay-loi-ph'
+import type { BoNaoPhuHuynh } from '../lib/bo-nao-hien-thi'
 import DongDemCau from '../components/DongDemCau'
 import {
   Search,
@@ -101,6 +103,22 @@ export default function ParentPortalScreen() {
   const [dangGiao, setDangGiao] = useState(false)
   const [thongBaoGiao, setThongBaoGiao] = useState<{ loai: 'ok' | 'loi'; chu: string } | null>(null)
   const nowHocTap = useGioHocTap()
+  // "Bộ não A.I hỗ trợ riêng em <tên>": lời cho phụ huynh + thư tuần (lệnh riêng /ph/ke-hoach bằng token phụ huynh của app).
+  // Không có lời / chạy thử / mất mạng / phụ huynh vào bằng SBD trần ⇒ null ⇒ không thẻ.
+  const [boNaoPh, setBoNaoPh] = useState<BoNaoPhuHuynh | null>(null)
+  useEffect(() => {
+    if (!sbdHienTai) {
+      setBoNaoPh(null)
+      return
+    }
+    let huy = false
+    void taiBoNaoPhuHuynh().then((v) => {
+      if (!huy) setBoNaoPh(v)
+    })
+    return () => {
+      huy = true
+    }
+  }, [sbdHienTai])
 
   const caGanNhat = useMemo(() => {
     if (dsBaiThi.length === 0) return null
@@ -642,6 +660,7 @@ export default function ParentPortalScreen() {
           duLieu={dungBanNho ? banNho! : duLieuNhiemVu}
           dangTai={!sanSangBang && !dungBanNho}
           dangLamMoi={keHoachNgay.dangLamMoi}
+          boNaoPh={boNaoPh}
           mucMenu={mucMenuPhuHuynh(setTabPh, dangXuat, {
             // Kết quả giao nhanh hiện ở khung thông báo của sheet "khắc phục", nên mở sheet ngay.
             khacPhuc: () => {

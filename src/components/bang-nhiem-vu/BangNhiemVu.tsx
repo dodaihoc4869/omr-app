@@ -3,6 +3,8 @@
 // sách 4 bậc, (4) nút Vào thi, (5) vinh danh top 3 — trên nền động tinh tế.
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
+import TheBoNao from './TheBoNao'
+import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, MessageSquare, PawPrint, Plus, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
 import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/nhiem-vu-adapter'
@@ -109,6 +111,8 @@ export interface BangNhiemVuProps {
   giaoBai?: GiaoBaiHangNgay
   onNhanThay?: () => void
   taiVinhDanh?: () => Promise<DuLieuVinhDanh | null>
+  /** Lời cho phụ huynh + thư tuần của "Bộ não A.I" (lệnh riêng /ph/ke-hoach). Học sinh KHÔNG nhận qua đây (lời của em đi theo `duLieu.boNao`). */
+  boNaoPh?: BoNaoPhuHuynh | null
 }
 
 export default function BangNhiemVu({
@@ -132,6 +136,7 @@ export default function BangNhiemVu({
   giaoBai,
   onNhanThay,
   taiVinhDanh,
+  boNaoPh,
 }: BangNhiemVuProps) {
   const laPh = vaiTro === 'phuhuynh'
   const choDong = useChoPhepChuyenDong()
@@ -344,6 +349,9 @@ export default function BangNhiemVu({
                 </span>
               )}
             </section>
+
+            {/* TheBoNao tự chọn phần theo vai: học sinh chỉ thấy lời của em, phụ huynh chỉ thấy lời + thư tuần (test bo-nao-the/bo-nao-bang khoá). */}
+            <TheBoNao vaiTro={vaiTro} hoTen={hoTen} now={now} hs={duLieu.boNao?.hs ?? null} ph={boNaoPh ?? null} />
 
             {duLieu.exp && (
               <section className="bnv-exp" aria-label={laPh ? 'EXP học tập hôm nay của con' : 'EXP học tập hôm nay'} data-vung="exp">

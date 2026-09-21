@@ -1,0 +1,54 @@
+/* THẺ "BỘ NÃO A.I HỖ TRỢ RIÊNG EM <tên>" (học sinh + phụ huynh) và tờ "7 lời gần nhất". Ngôn ngữ M3 của Bảng nhiệm vụ:
+ * chỉ dùng token của m3-theme.css (.bnv/.m3) và tokens.css — KHÔNG mã màu thô (npm run check:mau). Không emoji. */
+.bnv-bn {
+  margin: 0; padding: 16px; border-radius: var(--m3-bo-28);
+  background: var(--m3-surface-container-lowest); box-shadow: var(--m3-cao-do-1);
+  color: var(--m3-on-surface); font-family: var(--sans);
+}
+.bnv-bn-dau { display: flex; align-items: flex-start; gap: 12px; }
+.bnv-bn-o {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--m3-tertiary-container); color: var(--m3-tertiary);
+}
+.bnv-bn-tieu { min-width: 0; }
+.bnv-bn-tieu h2 { margin: 0; font-size: var(--cx-2); font-weight: 700; line-height: 1.3; }
+.bnv-bn-tieu span { display: block; margin-top: 2px; font-size: var(--cx-1); color: var(--m3-on-surface-variant); }
+.bnv-bn-loi { margin: 12px 0 0; font-size: var(--cx-3); line-height: 1.55; white-space: pre-line; }
+.bnv-bn-chan { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+.bnv-bn-nut {
+  min-height: 48px; padding: 0 8px; border: 0; background: transparent; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 4px; font: inherit; font-size: var(--cx-2); font-weight: 600; color: var(--m3-primary);
+}
+.bnv-bn-nut--phu { color: var(--m3-on-surface-variant); font-weight: 500; }
+.bnv-bn-nut:focus-visible, .bnv-bn-dong:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; border-radius: var(--m3-bo-12); }
+.bnv-bn-thu { margin-top: 12px; padding-top: 4px; border-top: 1px solid var(--m3-hang-2); }
+.bnv-bn-thu-dau {
+  width: 100%; min-height: 48px; padding: 0; border: 0; background: transparent; cursor: pointer; text-align: left;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; font: inherit; font-size: var(--cx-2); font-weight: 700; color: var(--m3-on-surface);
+}
+.bnv-bn-thu-dau small { display: block; font-size: var(--cx-1); font-weight: 500; color: var(--m3-on-surface-variant); }
+.bnv-bn-thu-dau svg { transition: transform 160ms ease; flex: none; }
+.bnv-bn-thu-dau[aria-expanded="true"] svg { transform: rotate(180deg); }
+.bnv-bn-thu-noi p { margin: 0 0 8px; font-size: var(--cx-2); line-height: 1.6; }
+
+/* Tờ "7 lời gần nhất" — M3 modal bottom sheet (nằm TRONG cây bảng, position: fixed; không cổng riêng) */
+.bnv-bn-man { position: fixed; inset: 0; z-index: 90; background: rgb(0 0 0 / 0.32); border: 0; padding: 0; cursor: default; }
+.bnv-bn-to {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 91; max-height: 82%; display: flex; flex-direction: column;
+  border-radius: var(--m3-bo-28) var(--m3-bo-28) 0 0; background: var(--m3-surface); color: var(--m3-on-surface);
+  box-shadow: var(--m3-cao-do-3); font-family: var(--sans);
+}
+.bnv-bn-tay { width: 32px; height: 4px; border-radius: var(--m3-bo-tron); background: var(--m3-outline); opacity: 0.4; margin: 10px auto 0; }
+.bnv-bn-to-dau { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 8px 8px 20px; }
+.bnv-bn-to-dau h2 { margin: 0; font-size: var(--cx-4); font-weight: 700; }
+.bnv-bn-to-dau small { display: block; font-size: var(--cx-1); color: var(--m3-on-surface-variant); margin-top: 2px; }
+.bnv-bn-dong { width: 48px; height: 48px; border-radius: 50%; border: 0; background: transparent; color: var(--m3-on-surface); display: grid; place-items: center; cursor: pointer; }
+.bnv-bn-ds { list-style: none; margin: 0; padding: 0 20px 20px; overflow-y: auto; }
+.bnv-bn-ds li { padding: 14px 0; }
+.bnv-bn-ds li + li { border-top: 1px solid var(--m3-hang-2); }
+.bnv-bn-ds time { display: block; margin-bottom: 4px; font-size: var(--cx-1); font-weight: 700; color: var(--m3-primary); }
+.bnv-bn-ds p { margin: 0; font-size: var(--cx-3); line-height: 1.5; white-space: pre-line; }
+@media (prefers-reduced-motion: no-preference) {
+  .bnv-bn-to { animation: bnv-bn-vao 200ms ease-out; }
+  @keyframes bnv-bn-vao { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+}
