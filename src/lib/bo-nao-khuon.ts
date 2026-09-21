@@ -198,6 +198,8 @@ export const TU_CAM_RIENG_LOI_MOI: readonly string[] = [
   'chắc chắn', 'đảm bảo', 'nhất định', 'cam kết', 'xong là', 'là đủ', 'chỉ cần', 'sẽ lên cấp', 'chắc sẽ', 'chắc là', 'ơi',
   // KHEN CHUNG CHUNG (thầy 21/09: "quan tâm sâu sắc" = khen ĐÚNG việc em làm bằng dữ kiện, không khen suông)
   'tuyệt vời', 'xuất sắc', 'làm tốt lắm', 'rất tốt', 'cố lên', 'tiếp tục phát huy', 'quá giỏi',
+  // SO SÁNH NGẦM VỚI BẠN KHÁC (Boss 21/09: lời E046 "hiếm có" hàm ý hơn bạn khác): khen chỉ so với CHÍNH em, không nói em "hiếm" so với ai.
+  'hiếm có', 'hiếm ai', 'ít ai',
   // TẠM CẤM (Boss 21/09 15:xx): thầy đang siết khiên lên 36 ngày, con số 12 mảnh sắp đổi — lời mời chỉ dùng EXP còn thiếu + cấp. Bỏ hai dòng này khi luật khiên mới chốt.
   'khiên', 'mảnh khiên',
 ]

@@ -78,6 +78,10 @@ describe('loiMoi — ý nghĩa, bậc, mở đầu, khiên (Boss 21/09 sau lư�
     for (const t of ['tuyệt vời', 'xuất sắc', 'làm tốt lắm', 'rất tốt', 'cố lên', 'tiếp tục phát huy', 'quá giỏi']) expect(tt(`Chuỗi 4 ngày rồi, ${t}, hôm nay thử vài câu nhé.`, 'dung_bac'), t).toContain('hứa điều không chắc')
     expect(tt('Chuỗi 4 ngày liền, nghĩa là thói quen đang thành hình. Hôm nay hãy thử vài câu nhé.', 'dung_bac')).toBe('')
   })
+  it('SO SÁNH NGẦM VỚI BẠN KHÁC bị chặn ("hiếm có", "hiếm ai", "ít ai" — mọi kiểu viết hoa); "hiếm hoi", "có" đứng riêng thì được', () => {
+    for (const t of ['hiếm có', 'Hiếm Có', 'hiếm ai', 'ít ai']) expect(tt(`Chuỗi 4 ngày liền, nhịp đều như vậy là ${t}. Hôm nay hãy thử vài câu nhé.`, 'dung_bac'), t).toContain('hứa điều không chắc hoặc gọi tên')
+    expect(tt('Chuỗi 4 ngày liền, có những hôm hiếm hoi em nghỉ, nghĩa là thói quen đang thành hình. Hôm nay hãy thử vài câu nhé.', 'dung_bac')).toBe('')
+  })
   it('TẠM CẤM khiên / mảnh khiên trong lời mời (thầy đang siết khiên lên 36 ngày, số /12 sắp đổi)', () => {
     expect(tt('Rồng Lửa đang có 3 mảnh khiên, hôm nay thử vài câu nhé.', 'dung_bac')).toContain('hứa điều không chắc hoặc gọi tên: khiên, mảnh khiên')
     expect(tt('Rồng Lửa còn thiếu 40 EXP, hôm nay thử vài câu nhé.', 'dung_bac')).toBe('')

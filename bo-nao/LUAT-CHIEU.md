@@ -20,10 +20,10 @@ Em nào chưa có gì đáng mời hôm nay: BỎ QUA em đó. Ghi xong chỉ tr
 
 ## LỜI MỜI — BA Ý BẮT BUỘC, ĐỦ CẢ BA
 (1) ĐIỀU EM ĐÃ LÀM, bằng số thật trong thẻ (đúng lại N câu từng sai · đúng N trong M câu · chuỗi N ngày · tự làm thêm N câu…). Số "đúng" = số đã gặp − số đã sai của dạng (hoặc làm 7 ngày − sai 7 ngày).
-(2) Ý NGHĨA với chính em: MỘT mệnh đề ngắn nói điều đó CHO THẤY GÌ ở em, dựa dữ kiện ("đó là cách nhớ lâu nhất", "nghĩa là thói quen học đang thành hình", "nhịp đều như vậy là nền vững cho bài dài"). CẤM khen chung chung ("tuyệt vời", "xuất sắc", "làm tốt lắm", "rất tốt", "cố lên", "tiếp tục phát huy").
+(2) Ý NGHĨA với chính em: MỘT mệnh đề ngắn nói điều đó CHO THẤY GÌ ở em, dựa dữ kiện ("đó là cách nhớ lâu nhất", "nghĩa là thói quen học đang thành hình", "nhịp đều như vậy là nền vững cho bài dài"). CẤM khen chung chung ("tuyệt vời", "xuất sắc", "làm tốt lắm", "rất tốt", "cố lên", "tiếp tục phát huy") và khen ngầm so với bạn khác ("hiếm có", "hiếm ai", "ít ai").
 (3) LỜI MỜI có lực + phần thưởng: động từ mời mạnh ("Hôm nay em hãy…", "Thử ngay mấy câu…", "Cùng <tên thú> luyện…"), phần thưởng bằng số thật: EXP còn thiếu và cấp. KHÔNG nhắc khiên / mảnh khiên (tạm cấm).
 THEO BẬC: `cao_hon_mot_bac` ⇒ lời PHẢI có "hôm nay thử câu khó hơn một bậc ở dạng X, vì em đã đúng N trong M câu dạng này" · `thap_hon_mot_bac` ⇒ "mình lùi một bậc để em lấy lại nhịp" (không chữ "yếu") · `dung_bac` ⇒ không nói "khó hơn" hay "lùi".
-ĐA DẠNG (trong tệp của bạn): ≥ 4 kiểu MỞ ĐẦU khác nhau; KHÔNG mở bằng "Hôm qua" quá 1/3 số lời (máy cảnh báo khi quá nửa); mỗi lời một ĐUÔI khác nhau; thay em khác vào mà lời vẫn đúng thì viết lại.
+ĐA DẠNG (trong tệp của bạn): ≥ 4 kiểu MỞ ĐẦU khác nhau; KHÔNG mở bằng "Hôm qua" quá 1/3, "Em vừa"/"Em đã" quá 1/4 số lời (máy cảnh báo "Hôm qua" khi quá nửa); mở bằng con số ("Chuỗi 4 ngày…"), tên thú ("Rồng Lửa đang chờ…"), dạng bài ("Thuỷ phân ester em làm đều tay…") hay nhịp ("8 câu mỗi ngày…"); mỗi lời một ĐUÔI khác nhau; thay em khác vào mà lời vẫn đúng thì viết lại.
 Em CHƯA có thú (thẻ không có `thanThu`): không nhắc thú; NÊN đặt ở CÂU CUỐI một câu mời chọn thú, đổi cách nói giữa các em: "chọn một thần thú để EXP của em có chỗ về" · "chọn một bạn đồng hành nhé" · "chọn thần thú của em nhé". Không nêu tên thú, không hứa EXP cụ thể.
 LUẬT CỨNG (kiểm ở máy thầy và máy chủ; sai là BỎ CẢ thử thách): ít nhất MỘT số thật, MỌI số phải có trong thẻ · không nêu số câu sẽ làm ("mấy câu", "vài câu") · tên thú CHỈ lấy từ `thanThu.ten` · không nhãn năng lực ("nắm chắc", "giỏi", "yếu"), không so với bạn, không doạ · không hứa ("chắc chắn", "xong là", "chỉ cần", "đảm bảo") · không gọi tên (không "ơi") · không nói điều mình "biết" về em ("em thích…", "mình biết em…") · một dòng, ≤ 200 ký tự, không emoji, không dấu gạch dài.
 
@@ -44,5 +44,6 @@ LUẬT CỨNG (kiểm ở máy thầy và máy chủ; sai là BỎ CẢ thử th
 - Hôm nay thử 6 câu Thuỷ phân ester, xong là Rồng Lửa lên cấp 6. ⇒ nêu số câu sẽ làm + hứa "xong là".
 - Các bạn khác đã làm 4 câu rồi, em thử mấy câu nhé. ⇒ so em với bạn.
 - Em làm tuyệt vời lắm, 4 ngày liền rồi, hôm nay thử mấy câu nhé. ⇒ khen chung chung ("tuyệt vời").
+- Em đều tay thế này là hiếm có, hôm nay thử mấy câu nhé. ⇒ khen ngầm so với bạn khác ("hiếm có").
 - Rồng Lửa đang có 3 mảnh khiên, hôm nay em hãy thử vài câu nhé. ⇒ nhắc khiên (tạm cấm).
 - Em đúng 8 trong 9 câu Thuỷ phân ester, hôm nay thử vài câu dạng này nhé. ⇒ bậc cao_hon_mot_bac mà không nói "khó hơn một bậc" và không nêu "đúng N trong M".

@@ -98,7 +98,7 @@ Vì sao tốt: mở bằng việc em đã làm (số thật) · có MỘT mệnh
 2. Rồng Lửa còn thiếu 55 EXP để lên cấp, thử mấy câu nhé. — số 55 không có trong thẻ.
 3. Hôm nay thử 6 câu Thuỷ phân ester, xong là Rồng Lửa lên cấp 6. — nêu số câu sẽ làm và hứa "xong là".
 4. Các bạn khác đã làm 4 câu rồi, em thử mấy câu nhé. — so em với bạn.
-5. Em làm tuyệt vời lắm, 4 ngày liền rồi, hôm nay thử mấy câu nhé. — khen chung chung ("tuyệt vời").
+5. Em làm tuyệt vời lắm, 4 ngày liền rồi, hôm nay thử mấy câu nhé. — khen chung chung ("tuyệt vời"). Em đều tay thế này là hiếm có, hôm nay thử mấy câu nhé. — khen ngầm so với bạn khác ("hiếm có").
 6. Rồng Lửa đang có 3 mảnh khiên, hôm nay em hãy thử vài câu nhé. — nhắc khiên (tạm cấm).
 7. Em đúng 8 trong 9 câu Thuỷ phân ester, hôm nay thử vài câu dạng này nhé. — đẩy bậc mà không nói "khó hơn một bậc" và không nêu "đúng N trong M".
 Cũng CẤM: "Minh ơi…" (gọi tên; thẻ ẩn danh, Bộ não không biết tên em), nhắc thú khi thẻ không có `thanThu`, "chắc chắn / đảm bảo / chỉ cần", nói điều mình "biết" về em ("em thích…", "mình biết em…"), emoji, dấu gạch dài, xuống dòng.
