@@ -2,13 +2,14 @@
 // Chỉ VẼ số đã tính ở lib/bao-cao-mot-em.ts; dùng bộ thành phần chung `xd-*` của Code 2. Khối nào không có dữ liệu thật thì ẨN, không bịa:
 // (bậc từng dạng, so với lần trước, "A.I Đỗ Đại Học đã lo", lịch ôn, tiến bộ qua các ca) chờ /gv/bao-cao-ca-em của Code 3.
 // Trang thay hộp báo cáo cũ CHỈ ở đường của thầy (màn Theo dõi ca); hộp cũ vẫn dùng cho học sinh/phụ huynh.
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Check, ChevronDown, Minus, TrendingDown, TrendingUp, X } from 'lucide-react'
 import '../m3'
 import '../xem-diem/xem-diem.css'
 import './xem-diem-gv.css'
 import { NutXd, ThanhTrenXd } from '../xem-diem/thanh-phan'
+import TheTienBo, { type CaLichSu } from '../TheTienBo'
 import { ChemText } from '../../lib/chem-format'
 import { chuanHoaLoiGiaiCau } from '../../lib/chuan-hoa-loi-giai'
 import { soVn } from '../../lib/ket-qua-sau-nop'
@@ -317,6 +318,27 @@ function CauXemLaiEm({ bc }: { bc: BaoCaoMotEm }) {
   )
 }
 
+/** TIẾN BỘ QUA CÁC CA — nối lệnh lịch sử ca sẵn có (`hsLichSuCaApi`), dùng CHUNG một thẻ `TheTienBo` với mọi báo cáo (thầy chốt 14/09: một biểu đồ, một cách đánh giá).
+ *  Chỉ tải khi trang của em mở ra (lười); đang tải ⇒ dòng chờ; lỗi mạng/không có ⇒ ẨN cả khối, không chặn trang. Khi /gv/bao-cao-ca-em có thì đổi nguồn. */
+function TienBoQuaCacCa({ tt, ds, dangMo }: { tt: 'cho' | 'co'; ds: CaLichSu[]; dangMo: Parameters<typeof TheTienBo>[0]['dangMo'] }) {
+  if (tt === 'cho') {
+    return (
+      <p className="xd-muc__mo-ta" role="status" aria-live="polite">
+        Đang lấy điểm các ca trước của em ấy…
+      </p>
+    )
+  }
+  return (
+    <section className="xd-muc" id="gv2-tien-bo" aria-labelledby="gv2-t-tien-bo">
+      <div className="xd-muc__dau">
+        <h2 id="gv2-t-tien-bo">Tiến bộ qua các ca</h2>
+        <p>Chỉ so với chính em ấy</p>
+      </div>
+      <TheTienBo lichSu={ds} dangMo={dangMo} />
+    </section>
+  )
+}
+
 function ChuaCoBaoCao({ trangThai, soLanRoiMan, tongGiayRoiMan }: { trangThai: TrangThaiLuot; soLanRoiMan: number; tongGiayRoiMan: number }) {
   const chu =
     trangThai === 'dang_lam' ? 'Em ấy đang làm bài — báo cáo sẽ có sau khi em ấy nộp.' : trangThai === 'duoc_duyet_lai' ? 'Em ấy đang chờ thi lại — chưa có bài nộp để báo cáo.' : 'Bài của em ấy chưa có điểm — chưa có gì để báo cáo.'
@@ -351,6 +373,10 @@ interface Props {
   bc: BaoCaoMotEm
   hoTen: string
   sbd: string
+  /** Mã ca đang xem (để thẻ tiến bộ đặt đúng ca này làm mốc cuối). */
+  maCa: string
+  /** Lấy điểm các ca trước của em (lịch sử ca). Vắng hoặc trả null/lỗi ⇒ không có khối Tiến bộ. */
+  layLichSu?: () => Promise<CaLichSu[] | null>
   lop: string
   tenCa: string
   thoiGianPhut: number
@@ -364,7 +390,7 @@ interface Props {
 }
 
 /** Trang báo cáo một em — phủ kín màn, đóng bằng nút quay lại hoặc phím Esc. */
-export default function BaoCaoMotEmTrang({ bc, hoTen, sbd, lop, tenCa, thoiGianPhut, nopLuc, trangThai, soLanRoiMan, tongGiayRoiMan, onDong, onToanCanh, onGiaoRieng }: Props) {
+export default function BaoCaoMotEmTrang({ bc, hoTen, sbd, maCa, layLichSu, lop, tenCa, thoiGianPhut, nopLuc, trangThai, soLanRoiMan, tongGiayRoiMan, onDong, onToanCanh, onGiaoRieng }: Props) {
   const goc = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const truoc = document.body.style.overflow
@@ -380,6 +406,25 @@ export default function BaoCaoMotEmTrang({ bc, hoTen, sbd, lop, tenCa, thoiGianP
     }
   }, [onDong])
 
+  // lịch sử ca của em (chỉ khi em đã nộp và chỗ gọi có đưa hàm lấy): 'cho' → 'co' | 'khong'
+  const [lichSu, setLichSu] = useState<{ tt: 'cho' | 'co' | 'khong'; ds: CaLichSu[] }>({ tt: 'khong', ds: [] })
+  const coDiem = bc.daNop && bc.tong != null
+  useEffect(() => {
+    if (!layLichSu || !coDiem) {
+      setLichSu({ tt: 'khong', ds: [] })
+      return
+    }
+    let con = true
+    setLichSu({ tt: 'cho', ds: [] })
+    layLichSu()
+      .then((ds) => con && setLichSu(ds ? { tt: 'co', ds } : { tt: 'khong', ds: [] }))
+      .catch(() => con && setLichSu({ tt: 'khong', ds: [] }))
+    return () => {
+      con = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ tải lại khi đổi em / có điểm; `layLichSu` đổi định danh mỗi lần vẽ
+  }, [sbd, coDiem])
+
   const ten = hoTen || `SBD ${sbd}`
   const phu = [tenCa, lop, `SBD ${sbd}`, thoiGianPhut > 0 ? `${thoiGianPhut} phút` : ''].filter(Boolean).join(' · ')
   const tong = bc.daNop ? bc.tong : null
@@ -389,6 +434,7 @@ export default function BaoCaoMotEmTrang({ bc, hoTen, sbd, lop, tenCa, thoiGianP
     ['gv2-ba-phan', 'Ba phần', bc.phan.length > 0],
     ['gv2-dang', 'Theo dạng bài', bc.dang.length > 0],
     ['gv2-cau', 'Câu cần xem lại', bc.cauXemLai.length > 0],
+    ['gv2-tien-bo', 'Tiến bộ', lichSu.tt === 'co'],
   ] as const
 
   return createPortal(
@@ -420,6 +466,21 @@ export default function BaoCaoMotEmTrang({ bc, hoTen, sbd, lop, tenCa, thoiGianP
               )}
               <DangEm bc={bc} />
               <CauXemLaiEm bc={bc} />
+              {lichSu.tt !== 'khong' && (
+                <TienBoQuaCacCa
+                  tt={lichSu.tt}
+                  ds={lichSu.ds}
+                  dangMo={{
+                    maCa,
+                    tenCa,
+                    ngayThi: typeof nopLuc === 'string' ? nopLuc : undefined,
+                    diem: tong,
+                    diemI: bc.phan.find((p) => p.ma === 'I')?.diem ?? null,
+                    diemII: bc.phan.find((p) => p.ma === 'II')?.diem ?? null,
+                    diemIII: bc.phan.find((p) => p.ma === 'III')?.diem ?? null,
+                  }}
+                />
+              )}
               <Hanh onToanCanh={onToanCanh} onGiaoRieng={onGiaoRieng} />
             </div>
           </div>

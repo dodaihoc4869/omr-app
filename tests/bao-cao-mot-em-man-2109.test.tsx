@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import ExamMonitorScreen from '../src/screens/ExamMonitorScreen'
 
-const m = vi.hoisted(() => ({ setScreen: vi.fn(), moToanCanh: vi.fn(), datSbdGiaoRieng: vi.fn(), detail: vi.fn(), tao: vi.fn(), gio: { ms: Date.parse('2026-09-21T01:00:00Z') }, bankMuon: { bat: false } }))
+const m = vi.hoisted(() => ({ lichSu: vi.fn(), setScreen: vi.fn(), moToanCanh: vi.fn(), datSbdGiaoRieng: vi.fn(), detail: vi.fn(), tao: vi.fn(), gio: { ms: Date.parse('2026-09-21T01:00:00Z') }, bankMuon: { bat: false } }))
 vi.mock('../src/store/appStore', () => ({
   useAppStore: (select: (s: unknown) => unknown) => select({ maCaTheoDoi: 'C1', classList: [], setScreen: m.setScreen, showToast: vi.fn(), moToanCanh: m.moToanCanh, datSbdGiaoRieng: m.datSbdGiaoRieng }),
 }))
@@ -32,6 +32,7 @@ vi.mock('../src/lib/exam-api', async (original) => ({
   ...(await original<typeof import('../src/lib/exam-api')>()),
   chiTietCa: m.detail,
   danhSachCa: async () => [],
+  hsLichSuCaApi: (...a: unknown[]) => m.lichSu(...a),
 }))
 vi.mock('../src/lib/gio-may-chu', () => ({ gioMayChu: () => m.gio.ms, dongBoGioMayChu: () => {}, daDongBoGio: () => true }))
 vi.mock('../src/lib/chi-tiet-cau', async (original) => {
@@ -63,6 +64,8 @@ const SO_EM_NOP = 3
 
 beforeEach(() => {
   m.bankMuon.bat = false
+  m.lichSu.mockReset()
+  m.lichSu.mockResolvedValue({ ok: true, items: [{ maCa: 'C0', tenCa: 'Ca trước', nopLuc: '2026-09-10T02:00:00Z', tong: 6, lanThu: 1 }] })
   m.tao.mockClear()
   m.setScreen.mockClear()
   m.moToanCanh.mockClear()
@@ -152,5 +155,45 @@ describe('GV-2 · trang báo cáo một em trên màn Theo dõi ca thật', () =
     fireEvent.click(khoi.getAllByRole('button').find((b) => /Báo cáo/.test(b.textContent || '') && b.className.includes('gv-em-can'))!)
     await waitFor(() => expect(trang()).toBeTruthy())
     expect(trang()!.getAttribute('aria-label')).toMatch(/^Báo cáo của /)
+  })
+
+  it('Tiến bộ qua các ca: mở trang của em đã nộp ⇒ tải lịch sử ĐÚNG MỘT lần với SBD của em; hiện khối; đổi sang em khác ⇒ tải lại cho em đó', async () => {
+    await mo()
+    chamTen('Lê Hoàng Nam')
+    await waitFor(() => expect(trang()!.querySelector('#gv2-tien-bo')).toBeTruthy())
+    expect(m.lichSu).toHaveBeenCalledTimes(1)
+    expect(m.lichSu.mock.calls[0][1]).toBe('12002')
+    fireEvent.click(within(trang()!).getByRole('button', { name: 'Quay lại ca' }))
+    await waitFor(() => expect(trang()).toBeNull())
+    chamTen('Vũ Đức Anh')
+    await waitFor(() => expect(m.lichSu).toHaveBeenCalledTimes(2))
+    expect(m.lichSu.mock.calls[1][1]).toBe('12003')
+  })
+
+  it('không chạm em nào ⇒ KHÔNG gọi lịch sử; em đang làm / bị khoá chưa điểm ⇒ cũng không gọi', async () => {
+    await mo()
+    expect(m.lichSu).not.toHaveBeenCalled()
+    chamTen('Hoàng Mai Chi')
+    await waitFor(() => expect(trang()).toBeTruthy())
+    fireEvent.click(within(trang()!).getByRole('button', { name: 'Quay lại ca' }))
+    chamTen('Cao Minh Tuệ')
+    await waitFor(() => expect(trang()!.textContent).toContain('Chưa có báo cáo'))
+    expect(m.lichSu).not.toHaveBeenCalled()
+  })
+
+  it('lịch sử lỗi (mạng hỏng hoặc máy chủ báo ok=false) ⇒ trang vẫn mở đủ, chỉ ẩn khối Tiến bộ', async () => {
+    m.lichSu.mockResolvedValue({ ok: false })
+    await mo()
+    chamTen('Lê Hoàng Nam')
+    await waitFor(() => expect(m.lichSu).toHaveBeenCalled())
+    await waitFor(() => expect(trang()!.textContent).not.toContain('Đang lấy điểm các ca trước'))
+    expect(trang()!.querySelector('#gv2-tien-bo')).toBeNull()
+    expect(trang()!.querySelector('#gv2-cau')).toBeTruthy()
+    m.lichSu.mockRejectedValue(new Error('mạng'))
+    fireEvent.click(within(trang()!).getByRole('button', { name: 'Quay lại ca' }))
+    chamTen('Vũ Đức Anh')
+    await waitFor(() => expect(m.lichSu).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(trang()!.textContent).not.toContain('Đang lấy điểm các ca trước'))
+    expect(trang()!.querySelector('#gv2-tien-bo')).toBeNull()
   })
 })

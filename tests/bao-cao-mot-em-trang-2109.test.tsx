@@ -1,7 +1,7 @@
 // XEM ĐIỂM BẢN 2 · GV-2 — trang VẼ "Báo cáo một em" của thầy (components/xem-diem-gv/BaoCaoMotEm.tsx). Số đã có test riêng ở bao-cao-mot-em-2109.test.ts.
 // Soi ở đây: khối nào không có dữ liệu thì ẨN (không bịa), hạng chỉ ở đây (thầy), ô câu không chỉ dựa vào màu, một nút chính, đóng bằng Esc, không mã nội bộ.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import BaoCaoMotEmTrang, { chuNopLuc } from '../src/components/xem-diem-gv/BaoCaoMotEm'
 import type { BaoCaoMotEm } from '../src/lib/bao-cao-mot-em'
 
@@ -37,6 +37,7 @@ const props = (o: Partial<Parameters<typeof BaoCaoMotEmTrang>[0]> = {}) => ({
   bc: DAY,
   hoTen: 'Nguyễn Minh Anh',
   sbd: '12121007',
+  maCa: 'C1',
   lop: '12 - Tinh Hoa',
   tenCa: 'Ester – lipid',
   thoiGianPhut: 45,
@@ -290,6 +291,97 @@ describe('GV-2 · em chưa có báo cáo', () => {
     cleanup()
     const c = ve({ bc: { ...DAY, daNop: false, tong: null }, trangThai: 'dang_lam', soLanRoiMan: 0 })
     expect(c.trang.textContent).not.toContain('Rời màn')
+  })
+})
+
+describe('GV-2 · Tiến bộ qua các ca (lịch sử ca sẵn có; tải lười; lỗi ⇒ ẩn khối, không chặn trang)', () => {
+  const LICH_SU = [
+    { maCa: 'C0', tenCa: 'Ca trước', nopLuc: '2026-09-10T02:00:00Z', tong: 6, lanThu: 1 },
+    { maCa: 'C1', tenCa: 'Ester – lipid', nopLuc: '2026-09-19T02:12:00Z', tong: 7.5, lanThu: 1 },
+  ]
+  const co = (ds: unknown[] | null) => vi.fn(() => Promise.resolve(ds as never))
+
+  it('có lịch sử ⇒ khối "Tiến bộ qua các ca" (nhãn "Chỉ so với chính em ấy") dựng bằng thẻ TheTienBo dùng chung, và mục lục có "Tiến bộ"', async () => {
+    const lay = co(LICH_SU)
+    const { trang, q } = ve({ layLichSu: lay })
+    await waitFor(() => expect(trang.querySelector('#gv2-tien-bo')).toBeTruthy())
+    const muc = trang.querySelector('#gv2-tien-bo') as HTMLElement
+    expect(within(muc).getByRole('heading', { name: 'Tiến bộ qua các ca' })).toBeTruthy()
+    expect(muc.textContent).toContain('Chỉ so với chính em ấy')
+    expect(muc.querySelector('.animate-google-fade')).toBeTruthy() // thẻ chung TheTienBo (một bản cho mọi báo cáo)
+    expect(q.getByRole('link', { name: 'Tiến bộ' })).toBeTruthy()
+    expect(lay).toHaveBeenCalledTimes(1)
+  })
+
+  it('đang tải ⇒ dòng chờ có vai trò status, CHƯA có mục trong mục lục; tải xong ⇒ dòng chờ biến mất', async () => {
+    let xong!: (v: unknown[]) => void
+    const lay = vi.fn(() => new Promise<never>((r) => (xong = r as never)))
+    const { trang, q } = ve({ layLichSu: lay })
+    await waitFor(() => expect(q.getByText('Đang lấy điểm các ca trước của em ấy…')).toBeTruthy())
+    expect(q.getByText('Đang lấy điểm các ca trước của em ấy…').getAttribute('role')).toBe('status')
+    expect(q.queryByRole('link', { name: 'Tiến bộ' })).toBeNull()
+    await act(async () => xong(LICH_SU))
+    await waitFor(() => expect(trang.querySelector('#gv2-tien-bo')).toBeTruthy())
+    expect(q.queryByText('Đang lấy điểm các ca trước của em ấy…')).toBeNull()
+  })
+
+  it('lỗi mạng hoặc máy chủ không trả ⇒ ẨN khối (không thông báo lỗi chặn trang, không mục lục), phần còn lại của trang vẫn đủ', async () => {
+    const hong = vi.fn(() => Promise.reject(new Error('mạng')))
+    const a = ve({ layLichSu: hong })
+    await waitFor(() => expect(hong).toHaveBeenCalled())
+    await waitFor(() => expect(a.q.queryByText('Đang lấy điểm các ca trước của em ấy…')).toBeNull())
+    expect(a.trang.querySelector('#gv2-tien-bo')).toBeNull()
+    expect(a.q.queryByRole('link', { name: 'Tiến bộ' })).toBeNull()
+    expect(a.trang.querySelector('#gv2-ket-qua')).toBeTruthy()
+    expect(a.trang.querySelector('#gv2-cau')).toBeTruthy()
+    cleanup()
+    const trong = co(null)
+    const b = ve({ layLichSu: trong })
+    await waitFor(() => expect(trong).toHaveBeenCalled())
+    await waitFor(() => expect(b.q.queryByText('Đang lấy điểm các ca trước của em ấy…')).toBeNull())
+    expect(b.trang.querySelector('#gv2-tien-bo')).toBeNull()
+  })
+
+  it('không đưa hàm lấy lịch sử, hoặc em chưa nộp ⇒ KHÔNG tải gì và không có khối', async () => {
+    const a = ve()
+    expect(a.trang.querySelector('#gv2-tien-bo')).toBeNull()
+    cleanup()
+    const lay = co(LICH_SU)
+    const b = ve({ bc: { ...DAY, daNop: false, tong: null }, trangThai: 'dang_lam', layLichSu: lay })
+    await new Promise((r) => setTimeout(r, 30))
+    expect(lay).not.toHaveBeenCalled()
+    expect(b.trang.querySelector('#gv2-tien-bo')).toBeNull()
+  })
+
+  it('đổi sang em khác khi lượt tải của em trước CHƯA về ⇒ tải lại cho em mới, và kết quả muộn của em trước KHÔNG đè lên', async () => {
+    const cho: Array<(v: unknown[]) => void> = []
+    const lay = vi.fn(() => new Promise<never>((r) => cho.push(r as never)))
+    const a = ve({ layLichSu: lay, sbd: 'A' })
+    await waitFor(() => expect(lay).toHaveBeenCalledTimes(1))
+    a.rerender(<BaoCaoMotEmTrang {...props({ layLichSu: lay, sbd: 'B' })} />)
+    await waitFor(() => expect(lay).toHaveBeenCalledTimes(2)) // đổi em ⇒ tải lại
+    await act(async () => cho[0](LICH_SU)) // kết quả MUỘN của em A
+    expect(document.querySelector('#gv2-tien-bo')).toBeNull()
+    expect(screen.getByText('Đang lấy điểm các ca trước của em ấy…')).toBeTruthy() // vẫn đang chờ em B
+    await act(async () => cho[1](LICH_SU))
+    await waitFor(() => expect(document.querySelector('#gv2-tien-bo')).toBeTruthy())
+  })
+
+  it('điểm ca ĐANG XEM luôn có mặt trong biểu đồ dù lịch sử máy chủ chưa kịp có ca này', async () => {
+    const lay = co([{ maCa: 'C0', tenCa: 'Ca trước', nopLuc: '2026-09-10T02:00:00Z', tong: 6, lanThu: 1 }]) // không có C1
+    const { trang } = ve({ layLichSu: lay })
+    await waitFor(() => expect(trang.querySelector('#gv2-tien-bo')).toBeTruthy())
+    expect(trang.querySelector('#gv2-tien-bo')!.textContent).toContain('7,5')
+  })
+
+  it('kết quả về SAU khi thầy đã đóng trang (gỡ) thì không cập nhật gì (không lỗi)', async () => {
+    let xong!: (v: unknown[]) => void
+    const lay = vi.fn(() => new Promise<never>((r) => (xong = r as never)))
+    const a = ve({ layLichSu: lay })
+    await waitFor(() => expect(lay).toHaveBeenCalled())
+    a.unmount()
+    await act(async () => xong(LICH_SU))
+    expect(document.querySelector('#gv2-tien-bo')).toBeNull()
   })
 })
 

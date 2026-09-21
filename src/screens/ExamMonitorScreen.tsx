@@ -26,7 +26,8 @@ import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/tin-nhan-thay'
 import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
-import { hoSoEm, type HoSoEm } from '../lib/exam-api'
+import { hoSoEm, hsLichSuCaApi, type HoSoEm } from '../lib/exam-api'
+import type { CaLichSu } from '../components/TheTienBo'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { chuTatDe } from '../lib/giu-de-doc'
 import { useAppStore } from '../store/appStore'
@@ -1983,6 +1984,8 @@ export default function ExamMonitorScreen() {
           bc={baoCaoMotEm}
           hoTen={emTrongCa.hoTen || hoSo?.em.hoTen || ''}
           sbd={sbdHoSo}
+          maCa={chiTiet.ca.maCa}
+          layLichSu={() => hsLichSuCaApi(scriptUrl.trim(), sbdHoSo).then((r) => (r && r.ok && Array.isArray(r.items) ? (r.items as CaLichSu[]) : null))}
           lop={emTrongCa.lop || hoSo?.em.lop || chiTiet.ca.lop || ''}
           tenCa={chiTiet.ca.tenCa || ''}
           thoiGianPhut={chiTiet.ca.thoiGianPhut}
