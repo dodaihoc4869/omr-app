@@ -362,6 +362,15 @@
   font-size: 14px;
   font-weight: 700;
 }
+.bn-tp-canh {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--m3-canh-bao-nen);
+  color: var(--m3-tren-canh-bao);
+  font-size: 14px;
+  font-weight: 700;
+}
 .bn-tp-luoi {
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);

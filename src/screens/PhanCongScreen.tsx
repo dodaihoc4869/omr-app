@@ -2,7 +2,7 @@ import { hanNhapVietNam, hanChoOChon, mocThoiGian, gioHanVietNam } from '../lib/
 import KhoiBtvnLo from '../components/KhoiBtvnLo'
 import KhoiCaNhanHoa from '../components/KhoiCaNhanHoa'
 import XemTruocPhanBo from '../components/XemTruocPhanBo'
-import { LOI_XAC_NHAN_LAM_LAI, choLamLaiBtvn, taoCauGiao, taoHatGiong } from '../lib/btvn-nang-do-thay'
+import { LOI_XAC_NHAN_LAM_LAI, canhBaoTuMayChu, choLamLaiBtvn, hanMacDinhVN, taoCauGiao, taoHatGiong } from '../lib/btvn-nang-do-thay'
 import { useAppStore } from '../store/appStore'
 import { layHomNay, type HomNay } from '../lib/hom-nay-api'
 import { useGioHocTap } from '../hooks/useGioHocTap'
@@ -187,7 +187,8 @@ function TheGiaoBtvn() {
   // Hạt giống MỘT lần cho mỗi hộp thoại giao: dùng chung cho Xem trước và Giao để bộ xem trước = bộ thật (hợp đồng docs/hop-dong-btvn-nang-do-2109.md mục 2/5).
   const hatGiongRef = useRef(taoHatGiong())
   const [bao, setBao] = useState<{ ok: boolean; chu: string } | null>(null)
-  const [hanMoi, setHanMoi] = useState('')
+  // Hạn nộp mặc định 23:59 (giờ chốt mỗi ngày của học sinh — thầy chốt 21/09); thầy vẫn đổi được, và xoá trắng thì máy chủ tự đặt như cũ.
+  const [hanMoi, setHanMoi] = useState(() => hanMacDinhVN(Date.now()))
   const [suaHan, setSuaHan] = useState<Record<string,string>>({})
   const [dangSua, setDangSua] = useState('')
   const [xacNhan,setXacNhan]=useState<{text:string;run:()=>Promise<void>}|null>(null)
@@ -459,11 +460,7 @@ function TheGiaoBtvn() {
       // Máy chủ chưa hỗ trợ nâng đỡ thì bỏ qua các trường lạ và giao NHƯ CŨ — nói thật, không để thầy tưởng mỗi em một bộ.
       const canh: string[] = []
       if (nangDo && kq.caNhan !== true) canh.push(`Máy chủ chưa hỗ trợ cá nhân hoá — bài này đã giao NHƯ CŨ: cả lớp nhận đủ ${kq.soCau} câu, không phân bổ riêng từng em.`)
-      else if (nangDo) {
-        if (kq.canhBao === 'loi_it_hon_6') canh.push(`Lõi chung chỉ có ${kq.soLoi ?? 0} câu (dưới 6): so chống chép bài không đủ mẫu chung — bài vẫn giao.`)
-        if ((kq.boQuaQid?.length ?? 0) > 0) canh.push(`Máy chủ không nhận ${kq.boQuaQid!.length} mã câu máy thầy gửi (lệch mã với tờ đề trong kho) nên bỏ qua — nhãn dạng/mức của các câu ấy lấy từ kho, cá nhân hoá có thể kém chính xác.`)
-        if ((kq.thieuMeta ?? 0) > 0) canh.push(`${kq.thieuMeta} câu máy thầy không gửi được nhãn dạng/mức — máy chủ lấy từ tờ kho (thiếu nữa thì tính là mức Biết).`)
-      }
+      else if (nangDo) canh.push(...canhBaoTuMayChu(kq))
       setCanhBaoNangDo(canh.join(' '))
       const noiDungNangDo = nangDo && kq.caNhan === true ? ` Mỗi em một bộ riêng, lõi chung ${kq.soLoi ?? 0} câu.` : ''
       if (nangDo) hatGiongRef.current = taoHatGiong() // hộp thoại giao kế tiếp có hạt giống mới
@@ -963,7 +960,7 @@ function TheGiaoBtvn() {
                 />
               </label>
               <span className="text-slate-500 dark:text-slate-400">
-                {hanMoi ? 'Áp dụng giờ Việt Nam đã chọn. Học sinh cần nộp trước mốc này.' : '(Để trống: mặc định hạn nộp sau 48 giờ)'}
+                {hanMoi ? (hanMoi.endsWith('T23:59') ? 'Mặc định 23:59 — giờ chốt mỗi ngày của học sinh (giờ Việt Nam). Học sinh cần nộp trước mốc này.' : 'Áp dụng giờ Việt Nam đã chọn. Học sinh cần nộp trước mốc này.') : '(Để trống: mặc định hạn nộp sau 48 giờ)'}
               </span>
             </div>
 

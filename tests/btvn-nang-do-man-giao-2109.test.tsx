@@ -84,6 +84,18 @@ describe('màn Giao bài · Cá nhân hoá', () => {
     expect(screen.queryByText(/Mỗi em một bộ riêng/)).toBeNull()
   })
 
+  it('HẠN NỘP MẶC ĐỊNH 23:59 (giờ chốt mỗi ngày của học sinh): ô đã điền sẵn, giao gửi ISO đúng 23:59 giờ Việt Nam; xoá trắng ⇒ gửi undefined như cũ', async () => {
+    await moManGiao()
+    const o = screen.getByLabelText('Hạn nộp bài mới') as HTMLInputElement
+    expect(o.value).toMatch(/^\d{4}-\d{2}-\d{2}T23:59$/)
+    expect(screen.getByText(/Mặc định 23:59 — giờ chốt mỗi ngày của học sinh/)).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /Giao bài tập/ }))
+    await waitFor(() => expect(m.giao).toHaveBeenCalled())
+    const han = m.giao.mock.calls[0][5] as string
+    expect(new Date(han).toISOString().slice(11, 16)).toBe('16:59') // 23:59 giờ VN = 16:59 UTC
+    expect(new Date(han).getTime()).toBeGreaterThan(Date.now())
+  })
+
   it('cảnh báo của máy chủ: lõi dưới 6 câu · qid lạ bị bỏ · câu thiếu dạng/mức — nói thật, bài vẫn giao', async () => {
     m.giao.mockResolvedValue({ maBtvn: 'B1', soEm: 2, soCau: 3, hanNop: '2026-09-25T15:00:00Z', caNhan: true, soLoi: 3, canhBao: 'loi_it_hon_6', boQuaQid: ['Z1', 'Z2'], thieuMeta: 1 })
     await moManGiao()

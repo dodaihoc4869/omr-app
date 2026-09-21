@@ -112,6 +112,11 @@ export interface KetQuaXemTruoc {
   hatGiong: string
   soCauBai: number
   soLoi: number
+  /** Cảnh báo của máy chủ lúc xem trước (chỉ chế độ "trước khi giao"): 'loi_it_hon_6' ⇒ lõi < 6 câu. Vắng ⇒ null. */
+  canhBao: string | null
+  /** qid máy thầy gửi mà tờ kho không có (bị bỏ) · số câu của tờ mà máy thầy không gửi được nhãn (máy chủ tự điền) — cùng nghĩa như ở `/btvn/giao`. */
+  boQuaQid: string[]
+  thieuMeta: number
   /** Lõi chung (qid) — giống nhau ở mọi em. */
   loi: string[]
   ds: EmXemTruoc[]
@@ -166,6 +171,9 @@ export async function xemTruocPhanBo(v: DauVaoXemTruoc): Promise<KetQuaXemTruoc>
     hatGiong: String(j.hatGiong ?? v.hatGiong),
     soCauBai: Number(j.soCauBai) || v.cau.length,
     soLoi: Number(j.soLoi) || 0,
+    canhBao: typeof j.canhBao === 'string' && j.canhBao ? j.canhBao : null,
+    boQuaQid: Array.isArray(j.boQuaQid) ? (j.boQuaQid as unknown[]).map(String) : [],
+    thieuMeta: Number(j.thieuMeta) || 0,
     loi: Array.isArray(j.loi) ? (j.loi as unknown[]).map(String) : [],
     ds: ds.map((x) => ({ sbd: String(x.sbd ?? ''), hoTen: String(x.hoTen ?? ''), daChot: x.daChot === true, coHoSo: x.coHoSo !== false, tomTat: x.tomTat as TomTatBo })).filter((x) => x.sbd && x.tomTat),
     chiTiet: ct && Array.isArray(ct.chang) ? { sbd: String(ct.sbd ?? ''), chang: (ct.chang as unknown[][]).map((c) => (Array.isArray(c) ? c.map(String) : [])), nhan: (ct.nhan ?? {}) as Record<string, NhanCau> } : null,
@@ -225,4 +233,21 @@ export async function choLamLaiBtvn(maBtvn: string, sbd: string): Promise<{ soLa
   }
   if (!res.ok || j.ok !== true) throw new Error(String(j.error || j.loi || 'Máy chủ không cho em làm lại. Kết quả của em vẫn giữ nguyên.'))
   return { soLanLam: typeof j.soLanLam === 'number' && Number.isFinite(j.soLanLam) ? j.soLanLam : null }
+}
+
+// ─────────────────────────────── CẢNH BÁO CỦA MÁY CHỦ + HẠN MẶC ĐỊNH ───────────────────────────────
+
+/** Cảnh báo NÓI THẬT từ máy chủ về bộ câu (dùng chung cho lúc GIAO và lúc XEM TRƯỚC): lõi < 6 · mã câu bị bỏ · câu thiếu nhãn. Rỗng ⇒ không có gì cần nói. */
+export function canhBaoTuMayChu(kq: { canhBao?: string | null; soLoi?: number; boQuaQid?: string[]; thieuMeta?: number }): string[] {
+  const canh: string[] = []
+  if (kq.canhBao === 'loi_it_hon_6') canh.push(`Lõi chung chỉ có ${kq.soLoi ?? 0} câu (dưới 6): so chống chép bài không đủ mẫu chung — bài vẫn giao.`)
+  if ((kq.boQuaQid?.length ?? 0) > 0) canh.push(`Máy chủ không nhận ${kq.boQuaQid!.length} mã câu máy thầy gửi (lệch mã với tờ đề trong kho) nên bỏ qua — nhãn dạng/mức của các câu ấy lấy từ kho, cá nhân hoá có thể kém chính xác.`)
+  if ((kq.thieuMeta ?? 0) > 0) canh.push(`${kq.thieuMeta} câu máy thầy không gửi được nhãn dạng/mức — máy chủ lấy từ tờ kho (thiếu nữa thì tính là mức Biết).`)
+  return canh
+}
+
+/** Hạn nộp MẶC ĐỊNH của ô "Hạn nộp bài mới" (thầy chốt 21/09): giờ chốt mỗi ngày của học sinh là 23:59 (giờ Việt Nam). Giữ khoảng ~2 ngày như trước ("sau 48 giờ"): 23:59 của ngày (hôm nay VN + `soNgay`).
+ *  Trả chuỗi cho `<input type="datetime-local">` ('YYYY-MM-DDT23:59'). */
+export function hanMacDinhVN(nayMs: number, soNgay = 2): string {
+  return `${new Date(nayMs + 7 * 3600_000 + soNgay * 86_400_000).toISOString().slice(0, 10)}T23:59`
 }

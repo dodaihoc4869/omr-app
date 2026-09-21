@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import type { CauGiao } from '../lib/btvn-nang-do'
-import { EM_MOI_LUOT, TEN_MUC, nhanCuaCau, xemTruocPhanBo, type ChiTietEmXemTruoc, type DauVaoXemTruoc, type EmXemTruoc } from '../lib/btvn-nang-do-thay'
+import { EM_MOI_LUOT, TEN_MUC, canhBaoTuMayChu, nhanCuaCau, xemTruocPhanBo, type ChiTietEmXemTruoc, type DauVaoXemTruoc, type EmXemTruoc } from '../lib/btvn-nang-do-thay'
 import '../screens/btvn-nang-do-m3.css'
 
 /** XEM TRƯỚC PHÂN BỔ (bản vẽ docs/ban-ve-btvn-nang-do-2109/2-xem-truoc-phan-bo.jpg, thầy duyệt 21/09): tấm phủ toàn màn — bảng từng em (tổng · lõi/riêng · bậc Biết/Hiểu/Vận dụng · số
@@ -29,6 +29,7 @@ export default function XemTruocPhanBo({
   const [ds, setDs] = useState<EmXemTruoc[]>([])
   const [soCauBai, setSoCauBai] = useState(0)
   const [soLoi, setSoLoi] = useState(0)
+  const [canhBao, setCanhBao] = useState<string[]>([])
   const [loi, setLoi] = useState('')
   const [dangTai, setDangTai] = useState(dsSbd.length > 0)
   const [daLay, setDaLay] = useState(0)
@@ -51,6 +52,7 @@ export default function XemTruocPhanBo({
       setDs((truoc) => (tu > 0 ? [...truoc, ...r.ds] : r.ds))
       setSoCauBai(r.soCauBai)
       setSoLoi(r.soLoi)
+      if (tu === 0) setCanhBao(canhBaoTuMayChu(r))
       setDaLay(tu + lat.length)
       if (r.chiTiet) setChiTiet((c) => ({ ...c, [r.chiTiet!.sbd]: r.chiTiet! }))
     } catch (e) {
@@ -126,6 +128,11 @@ export default function XemTruocPhanBo({
         <span className="bn-chip bn-chip--canh">Xem trước — chưa ghi gì</span>
       </div>
 
+      {canhBao.length > 0 && (
+        <p className="bn-tp-canh" role="status" data-khoi="canh-bao-may-chu">
+          {canhBao.join(' ')}
+        </p>
+      )}
       {loiGiao && (
         <p className="bn-tp-loi" role="alert">
           {loiGiao}
