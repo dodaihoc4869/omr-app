@@ -657,14 +657,14 @@ export default function ExamSetupScreen() {
                     setPhamVi(p.id as PhamViCa)
                     if (p.id === 'chon') setHienChonEm(true)
                   }}
-                  className={`tap-target text-xs font-semibold py-2 px-2.5 rounded-xl transition-[transform,background-color,box-shadow,opacity] text-center cursor-pointer truncate active:scale-95 ${
+                  className={`tap-target text-xs font-semibold py-2 px-2.5 rounded-xl transition-[transform,background-color,box-shadow,opacity] flex items-center justify-center gap-[5px] leading-tight text-center cursor-pointer active:scale-95 ${
                     chon
                       ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
                       : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                   }`}
                 >
-                  <p.Icon size={14} aria-hidden="true" style={BIEU_TUONG_NHAN} />
-                  {p.label}
+                  <p.Icon size={14} aria-hidden="true" className="shrink-0" />
+                  <span>{p.label}</span>
                 </button>
               )
             })}
@@ -772,14 +772,14 @@ export default function ExamSetupScreen() {
                     key={c.id}
                     type="button"
                     onClick={() => setCongBoDiem(c.id as CongBoDiem)}
-                    className={`tap-target text-xs font-semibold py-1.5 px-2 rounded-xl transition-[transform,background-color,box-shadow,opacity] text-center cursor-pointer truncate active:scale-95 ${
+                    className={`tap-target text-xs font-semibold py-1.5 px-2 rounded-xl transition-[transform,background-color,box-shadow,opacity] flex items-center justify-center gap-[5px] leading-tight text-center cursor-pointer active:scale-95 ${
                       chon
                         ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
                         : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                     }`}
                   >
-                    <c.Icon size={14} aria-hidden="true" style={BIEU_TUONG_NHAN} />
-                    {c.label}
+                    <c.Icon size={14} aria-hidden="true" className="shrink-0" />
+                    <span>{c.label}</span>
                   </button>
                 )
               })}
