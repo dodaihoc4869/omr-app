@@ -575,9 +575,11 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
     tongQuan.soLanHoc = dongThoiGian.length
     tongQuan.lanDaiNhatPhut = Math.max(...dongThoiGian.map((x) => so(x.phut)))
   }
-  // việc của kế hoạch ngày: "còn lại" = việc BẮT BUỘC/NÊN LÀM còn trong kế hoạch lưu (không tính việc tự chọn: nhãn tuy_chon, lượt luyện dạng than_thu);
+  // việc của kế hoạch ngày (KHÔNG có chặng nâng đỡ): "còn lại" = việc BẮT BUỘC/NÊN LÀM còn trong kế hoạch lưu (không tính việc tự chọn: nhãn tuy_chon, lượt luyện dạng than_thu);
   // "xong" = việc ĐO ĐƯỢC từ sổ hôm nay (từ mốc): ôn lại (đã ngồi ôn và kế hoạch không còn việc ôn), bài về nhà đã nộp hôm nay, bài gia đình giao đã nộp hôm nay. Không có kế hoạch ⇒ vắng cả hai.
-  if (Array.isArray(keHoachHomNay)) {
+  // CHÍNH XÁC HOẶC VẮNG (Boss 21/09): hôm nay con có CHẶNG bài nâng đỡ (còn trong kế hoạch hoặc đã làm hôm nay) mà máy chủ chưa đếm được ⇒ KHÔNG gửi hai khoá này (màn tự ẩn vòng "N/M việc").
+  const coChangHomNay = Array.isArray(keHoachHomNay) && (keHoachHomNay.some((v: Row) => chuoi(v?.loai) === 'btvn_lo') || homNayEv.some((e) => e.nguon === 'btvn_lo'))
+  if (Array.isArray(keHoachHomNay) && !coChangHomNay) {
     const conLai = keHoachHomNay.filter((v: Row) => chuoi(v?.loai) !== 'than_thu' && chuoi(v?.nhan) !== 'tuy_chon')
     const onXong = homNayEv.some((e) => e.nguon === 'on_lai') && !conLai.some((v: Row) => chuoi(v?.loai) === 'on_lai') ? 1 : 0
     const nopHomNay = (rBt ?? []).filter((x) => (x.k === 'bt' || x.k === 'mom') && chuoi(x.c2) !== '' && ngayVn(chuoi(x.c2)) === homNay && Date.parse(chuoi(x.c2)) >= moc.ms).length

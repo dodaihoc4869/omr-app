@@ -1474,11 +1474,11 @@ describe('bảng kiểu Apple — trường mới của lệnh /ph/tat-ca-ve-con
 
   it('viecXong / viecTong: việc kế hoạch còn lại (không tính tuỳ chọn / lượt luyện dạng) + việc xong ĐO ĐƯỢC hôm nay (ôn lại đã ngồi, bài về nhà đã nộp); không có kế hoạch ⇒ vắng cả hai', async () => {
     const { d } = dung()
-    themKeHoachApple(d, [{ loai: 'btvn_nop', batBuoc: true }, { loai: 'btvn_lo', nhan: null }, { loai: 'than_thu', nhan: null }, { loai: 'mom', nhan: 'tuy_chon' }]) // than_thu (lượt luyện dạng) và việc nhãn tuy_chon KHÔNG tính
+    themKeHoachApple(d, [{ loai: 'btvn_nop', batBuoc: true }, { loai: 'on_thi', soCau: 3 }, { loai: 'than_thu', nhan: null }, { loai: 'mom', nhan: 'tuy_chon' }]) // than_thu (lượt luyện dạng) và việc nhãn tuy_chon KHÔNG tính
     suKien(d, { qid: 'A', ngay: NGAY, gio: '10:00', nguon: 'on_lai', kq: 1 }) // ôn lại xong (kế hoạch không còn việc ôn) ⇒ xong 1
     themBtvn(d, 'DA-NOP', { giao: '2026-09-21T03:00:00.000Z', han: '2026-09-23T05:00:00.000Z', nop: '2026-09-22T05:00:00.000Z', soDung: 3, soCau: 4 }) // nộp hôm nay ⇒ xong +1
     const r = await chayApple(d)
-    expect(r.homNay.tongQuan).toMatchObject({ viecXong: 2, viecTong: 4 }) // còn lại 2 (btvn_nop, btvn_lo) + xong 2
+    expect(r.homNay.tongQuan).toMatchObject({ viecXong: 2, viecTong: 4 }) // còn lại 2 (btvn_nop, on_thi) + xong 2
     const { d: d2 } = dung()
     suKien(d2, { qid: 'A', ngay: NGAY, gio: '10:00', nguon: 'on_lai', kq: 1 })
     const t2 = (await chayApple(d2)).homNay.tongQuan
@@ -1562,5 +1562,30 @@ describe('bảng kiểu Apple — trường mới của lệnh /ph/tat-ca-ve-con
     await dungLaiHoSo(d.env, ['S1'], 'x')
     const l = (await chayApple(d)).lichOn
     expect(l).toMatchObject({ daKhacPhuc14Ngay: 1, conSaiChuaKhacPhuc: 2, tongTungSai: 3 })
+  })
+
+  it('CHÍNH XÁC HOẶC VẮNG: hôm nay con có CHẶNG bài nâng đỡ (còn trong kế hoạch, hoặc đã làm chặng hôm nay) ⇒ KHÔNG gửi viecXong/viecTong; không chặng ⇒ số khớp', async () => {
+    const co = (t: Record<string, unknown>) => ['viecXong' in t, 'viecTong' in t]
+    // (a) chặng còn trong kế hoạch
+    const { d } = dung()
+    themKeHoachApple(d, [{ loai: 'btvn_lo', soCau: 4 }, { loai: 'btvn_nop' }])
+    suKien(d, { qid: 'A', ngay: NGAY, gio: '10:00', nguon: 'game' })
+    expect(co((await chayApple(d)).homNay.tongQuan)).toEqual([false, false])
+    // (b) con đã làm chặng hôm nay (kế hoạch không còn chặng ấy)
+    const { d: d2 } = dung()
+    themKeHoachApple(d2, [{ loai: 'btvn_nop' }])
+    suKien(d2, { qid: 'A', ngay: NGAY, gio: '10:00', nguon: 'btvn_lo', ma: 'B1' })
+    expect(co((await chayApple(d2)).homNay.tongQuan)).toEqual([false, false])
+    // (c) không chặng: số khớp
+    const { d: d3 } = dung()
+    themKeHoachApple(d3, [{ loai: 'btvn_nop' }])
+    suKien(d3, { qid: 'A', ngay: NGAY, gio: '10:00', nguon: 'game' })
+    expect((await chayApple(d3)).homNay.tongQuan).toMatchObject({ viecXong: 0, viecTong: 1 })
+    // chặng của NGÀY KHÁC không làm mất số của hôm nay
+    const { d: d4 } = dung({ moc: null })
+    themKeHoachApple(d4, [{ loai: 'btvn_nop' }])
+    suKien(d4, { qid: 'A', ngay: NGAY_HOM_QUA, gio: '14:00', nguon: 'btvn_lo', ma: 'B1' })
+    suKien(d4, { qid: 'B', ngay: NGAY, gio: '10:00', nguon: 'game' })
+    expect((await chayApple(d4)).homNay.tongQuan).toMatchObject({ viecXong: 0, viecTong: 1 })
   })
 })
