@@ -410,11 +410,11 @@ describe('/ai/dem-qua · /ai/nhat-ky · /ai/dieu-chinh/bo', () => {
 })
 
 describe('khoá nguồn', () => {
-  it('server/src/bo-nao.ts: không tự kiểm mã bí mật, không sửa index.ts, chỉ import lõi thuần + kiểu; không tên em trong thẻ (chỉ ghép tên ở đường đọc)', () => {
+  it('server/src/bo-nao.ts: không tự kiểm mã bí mật, chỉ import lõi thuần + kiểu; không tên em trong thẻ (chỉ ghép tên ở đường đọc)', () => {
     const nguon = readFileSync('server/src/bo-nao.ts', 'utf8')
     expect(nguon.split('\n').filter((l) => !l.trimStart().startsWith('//')).join('\n')).not.toMatch(/MA_BI_MAT|x-ma-bi-mat|laThay/) // chú thích được nhắc tên; MÃ thì không
     expect([...nguon.matchAll(/^(?:import|\}).* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./kieu', '../../src/lib/bo-nao-dac-trung', '../../src/lib/bo-nao-khuon'])
     expect(nguon).not.toMatch(/console\./)
-    expect(readFileSync('server/src/index.ts', 'utf8')).not.toContain('bo-nao') // Code 3 nối sau; tệp này không đụng tới index.ts
+    expect(readFileSync('server/src/index.ts', 'utf8')).toContain("from './bo-nao'") // Code 3 ĐÃ nối (chỉ sau cổng laThay, khoá ở tests/bo-nao-noi-route-2109.test.ts); tệp này không tự sửa index.ts
   })
 })

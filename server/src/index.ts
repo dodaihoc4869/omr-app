@@ -37,6 +37,7 @@ import { CA_DO_TAI, TRANG_DO_TAI } from './do-tai'
 import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import * as ND from './btvn-nang-do-d1'
+import * as AI from './bo-nao'
 import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env } from './kieu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
@@ -3114,6 +3115,13 @@ export default {
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
       if (p === '/btvn/sua') return suaBtvn(env,b)
       if (p === '/btvn/cho-lam-lai') return ra(await ND.choLamLaiCaNhan(env, b, Date.now()))
+      // BỘ NÃO A.I (Code 1, `bo-nao.ts`; hợp đồng docs/hop-dong-bo-nao-2109.md): MỌI lệnh /ai/* là lệnh THẦY — nằm SAU cổng `laThay`; các hàm tự trả {ok,…}, không tự kiểm mã.
+      if (p === '/ai/cau-hinh') return ra(await AI.boNaoCauHinh(env, b))
+      if (p === '/ai/ho-so-ngay') return ra(await AI.boNaoHoSoNgay(env, b))
+      if (p === '/ai/dieu-chinh/nop') return ra(await AI.boNaoNop(env, b))
+      if (p === '/ai/dem-qua') return ra(await AI.boNaoDemQua(env, b))
+      if (p === '/ai/nhat-ky') return ra(await AI.boNaoNhatKy(env, b))
+      if (p === '/ai/dieu-chinh/bo') return ra(await AI.boNaoBoDieuChinh(env, b))
       if (p === '/btvn/giao') return giaoBtvn(env, b)
       if (p === '/btvn/xem-truoc') return ra(await ND.xemTruocBtvn(env, b, Date.now()))
       if (p === '/btvn/bai-lam') return xemBaiBtvn(env,b)
