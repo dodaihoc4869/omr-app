@@ -1,0 +1,131 @@
+/* PHẦN RIÊNG CỦA GIÁO VIÊN trong "Xem điểm bản 2" (Code 4, 21/09) — bổ sung cho bộ thành phần chung `xd-*` (components/xem-diem/xem-diem.css).
+ * Chỉ dùng token --m3-* và biến của bộ chung; không hex; đích chạm ≥ 48; hoạt ảnh không có. Gốc: `<section className="m3 xd xd-gv">`. */
+.xd.xd-gv {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px 0 8px;
+  border-radius: var(--m3-bo-28);
+  background: transparent;
+}
+.xd-gv .gv-bc-dau {
+  font-size: var(--bnv-cx-4);
+  font-weight: 700;
+}
+/* đầu khối là NÚT gập/mở (48+ px): tên khối bên trái, tóm tắt một dòng khi gập, mũi tên ở cuối */
+.gv-bc-nut {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 20px;
+  border-radius: var(--m3-bo-28);
+  background: var(--m3-surface-container-low);
+  box-shadow: inset 0 0 0 1px var(--xd-vien);
+  text-align: left;
+}
+.gv-bc-nut:hover {
+  background: var(--m3-surface-container);
+}
+.gv-bc-nut__ten {
+  font-size: var(--bnv-cx-4);
+  font-weight: 700;
+}
+.gv-bc-nut__tom {
+  font-size: var(--bnv-cx-1);
+  font-weight: 600;
+  color: var(--xd-nhat);
+}
+.gv-bc-nut__mui {
+  margin-left: auto;
+  color: var(--xd-nhat);
+}
+.gv-bc-noi-dung {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.xd-gv h3 {
+  font-size: var(--bnv-cx-3);
+  font-weight: 700;
+}
+.gv-so {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 16px;
+}
+@media (min-width: 900px) {
+  .gv-so {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+.gv-so > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: var(--m3-bo-16);
+  background: var(--m3-surface-container);
+}
+.gv-so dt {
+  font-size: var(--bnv-cx-1);
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+}
+.gv-so dd {
+  margin: 0;
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 700;
+  color: var(--m3-primary);
+}
+.gv-so dd small {
+  display: inline-block;
+  margin-left: 6px;
+  line-height: 1.3;
+  vertical-align: baseline;
+  font-size: var(--bnv-cx-1);
+  font-weight: 600;
+  color: var(--m3-on-surface-variant);
+}
+.gv-cot {
+  height: 148px;
+  gap: 6px;
+}
+.xd-gv .gv-cot > div:last-child i {
+  background: var(--m3-secondary-container);
+}
+.xd-gv .gv-cot > div[data-nhieu-nhat] i {
+  background: var(--m3-primary);
+}
+.gv-cot__nhan {
+  color: var(--m3-on-surface-variant);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.gv-cot__chu {
+  margin-top: 8px;
+}
+.gv-luoi {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+@media (min-width: 900px) {
+  .gv-luoi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+/* dòng "em cần để ý" là một nút thật (chạm ⇒ báo cáo của em trong ca) — dùng lại kiểu dòng ca của bộ chung */
+.gv-em-can {
+  width: 100%;
+  min-height: 48px;
+  text-align: left;
+}
+.gv-em-can__mo {
+  font-size: var(--bnv-cx-2);
+}

@@ -41,6 +41,8 @@ import { themPhutCa, cauKetQuaThemPhut } from '../lib/them-phut-api'
 import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
+import BaoCaoCaLopKhoi from '../components/xem-diem-gv/BaoCaoCaLop'
+import { tinhBaoCaoCaLop } from '../lib/bao-cao-ca-lop'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -467,6 +469,29 @@ export default function ExamMonitorScreen() {
     out.sort((a, b) => thuTu(a.moiNhat) - thuTu(b.moiNhat) || (a.hoTen || a.sbd).localeCompare(b.hoTen || b.sbd, 'vi'))
     return out
   }, [chiTiet, teacherBank, soCauCa, classList, deRiengCa, lapDungLai])
+
+  // BÁO CÁO CẢ LỚP (Xem điểm bản 2 · GV-1): chỉ GOM số đã có ở máy này — điểm đã chấm + bảng chấm từng câu của em đã nộp. Không chấm lại, không gọi mạng.
+  const baoCaoLop = useMemo(() => {
+    if (!chiTiet) return null
+    let bank: ReturnType<typeof mergeKeepAnswers> | null = null
+    try {
+      bank = teacherBank ? mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung) : null
+    } catch {
+      bank = null
+    }
+    const em = dsEm.map((e) => {
+      let rows: ChiTietCauRow[] | null = null
+      if (bank && e.graded && e.moiNhat.dapAn) {
+        try {
+          rows = taoChiTietCau(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.dapAn, e.moiNhat.giayCau)
+        } catch {
+          rows = null
+        }
+      }
+      return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, trangThai: e.moiNhat.trangThai, diem: e.diem, score: e.graded?.score ?? null, vaoLuc: e.moiNhat.vaoLuc, nopLuc: e.moiNhat.nopLuc, soLanRoiMan: e.moiNhat.soLanRoiMan, tongGiayRoiMan: e.moiNhat.tongGiayRoiMan, rows }
+    })
+    return tinhBaoCaoCaLop(em, dsEm.length)
+  }, [chiTiet, dsEm, teacherBank, soCauCa, boTheoEmDung])
 
   // VÁ NGƯỢC KHOÁ `key/<maCa>.json` CHO CA CŨ — TỰ LÀNH KHI THẦY MỞ MÀN.
   //
@@ -1637,6 +1662,7 @@ export default function ExamMonitorScreen() {
 
           </div>
           <div className="ca-cot ca-cot-trai">
+          {baoCaoLop && <BaoCaoCaLopKhoi key={chiTiet.ca.maCa} bc={baoCaoLop} phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />}
           {/* DANH SÁCH EM */}
           <TheNoiDung className="gv-monitor-students">
             <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Học sinh trong ca ({dsEm.length})</div>
