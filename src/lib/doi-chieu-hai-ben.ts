@@ -84,7 +84,7 @@ export function dungBangDoiChieu(moi: SoMayChuMoi): DongDoiChieu[] {
   })
 
   return [
-    dong('Ca kiểm tra (kể cả đã xoá)', moi.ca, 'Đây là số ca màn Ca thi đọc ra.'),
+    dong('Ca kiểm tra (kể cả đã xoá)', moi.ca, 'Đây là số ca màn Ca kiểm tra đọc ra.'),
     dong('Ca chưa xoá', moi.caChuaXoa, 'Số ca đang hiện cho thầy chọn.'),
     dong('Lượt thi', moi.luot, 'Mỗi lượt là một lần em vào làm bài.'),
     dong('Danh sách lớp', moi.danhSach, 'Bảng RỖNG thì cổng chặn số báo danh lạ không hoạt động — ai có mã ca cũng vào được.'),

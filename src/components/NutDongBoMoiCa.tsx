@@ -100,7 +100,7 @@ export default function NutDongBoMoiCa() {
       {hoi && (
         <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
           <OThongBao tone="cam">
-            Chạy lâu, mỗi ca vài chục giây, lớp nhiều ca thì mất mươi phút. <b>Đừng đóng tab</b> và đừng chạy khi đang có ca thi mở.
+            Chạy lâu, mỗi ca vài chục giây, lớp nhiều ca thì mất mươi phút. <b>Đừng đóng tab</b> và đừng chạy khi đang có ca kiểm tra mở.
           </OThongBao>
           <div className="flex" style={{ gap: 'var(--k2)' }}>
             <NutChinh variant="phu" onClick={() => setHoi(false)}>

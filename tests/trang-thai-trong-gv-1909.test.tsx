@@ -50,14 +50,14 @@ describe('ExamMonitorScreen: mã ca không có', () => {
     expect(loiKhongTimThayCa('123456', false)).toBe('Không tìm thấy ca kiểm tra #123456. Bạn hãy kiểm tra lại mã ca.')
   })
 
-  it('CÓ ca gợi ý bên dưới: vẫn nhắc "hoặc chọn từ danh sách ca thi bên dưới"; mã được cắt khoảng trắng', () => {
-    expect(loiKhongTimThayCa(' 123456 ', true)).toBe('Không tìm thấy ca kiểm tra #123456. Bạn hãy kiểm tra lại mã ca hoặc chọn từ danh sách ca thi bên dưới.')
+  it('CÓ ca gợi ý bên dưới: vẫn nhắc "hoặc chọn từ danh sách ca kiểm tra bên dưới"; mã được cắt khoảng trắng', () => {
+    expect(loiKhongTimThayCa(' 123456 ', true)).toBe('Không tìm thấy ca kiểm tra #123456. Bạn hãy kiểm tra lại mã ca hoặc chọn từ danh sách ca kiểm tra bên dưới.')
   })
 
   it('màn dùng hàm ấy với ĐÚNG điều kiện có danh sách gợi ý (dsCaGoiY), không còn chuỗi cứng', () => {
     const src = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamMonitorScreen.tsx'), 'utf8')
     expect(src).toContain('setLoi(loiKhongTimThayCa(ma, dsCaGoiY.length > 0))')
-    expect(src).not.toContain('chọn từ danh sách ca thi bên dưới')
+    expect(src).not.toContain('chọn từ danh sách ca kiểm tra bên dưới')
     expect(src).toContain("import { loiKhongTimThayCa } from '../lib/cau-chu-ca'")
   })
 })

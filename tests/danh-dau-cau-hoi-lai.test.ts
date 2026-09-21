@@ -325,7 +325,7 @@ describe('NÚT ĐỒNG BỘ LẠI PHIẾU MỌI CA — bấm được từ mọi
   it('BỎ QUA ca đã xoá, và HỎI LẠI trước khi chạy', () => {
     expect(NUT).toContain("filter((c) => c.trangThai !== 'da_xoa')")
     expect(NUT).toContain('Chạy ngay')
-    expect(NUT).toContain('đừng chạy khi đang có ca thi mở')
+    expect(NUT).toContain('đừng chạy khi đang có ca kiểm tra mở')
   })
 
   it('CA LỖI PHẢI LIỆT KÊ RA, không gộp thành một con số', () => {

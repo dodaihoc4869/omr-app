@@ -56,7 +56,7 @@ export async function choEmThiLai(url: string, mat: string, maCa: string, sbd: s
   if (!em) throw new Error('Thiếu số báo danh')
 
   const bank = await loadSessionTeacherBank(ma)
-  if (!bank || bank.length === 0) throw new Error('Máy này chưa có bản đề CÓ đáp án của ca — mở lại màn Ca thi rồi thử lại')
+  if (!bank || bank.length === 0) throw new Error('Máy này chưa có bản đề CÓ đáp án của ca — mở lại màn Ca kiểm tra rồi thử lại')
   const sc = await docSoCauCa(ma)
   if (!sc) throw new Error('Ca này chưa ghi số câu mỗi phần')
 
