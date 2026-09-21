@@ -1,4 +1,4 @@
-// BỘ NÃO — LỜI CHO PHỤ HUYNH KHÔNG NHẮC GAME (thầy lệnh 21/09/2026; đề bài `prompt-ph-giao-them-bai-2109.md` mục B, Code 1): `loiNhanChoPhuHuynh` và `thuTuan` cấm thần thú, EXP, khiên, mảnh khiên, Đoàn Hộ Tống, Đảo, Võ đài, game.
+// BỘ NÃO — LỜI CHO PHỤ HUYNH KHÔNG NHẮC GAME (thầy lệnh 21/09/2026; đề bài `prompt-ph-giao-them-bai-2109.md` mục B, Code 1): `loiNhanChoPhuHuynh` và `thuTuan` cấm thần thú, EXP, khiên, mảnh khiên, Đoàn Hộ Tống, Đảo thần thú / đảo của em, Võ đài, game.
 // Sai ⇒ CHỈ bỏ lời ấy (giữ núm) như mọi lỗi lời phụ huynh; lời cho EM (em thấy game) KHÔNG bị cấm.
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
@@ -10,12 +10,13 @@ const nen = (o: Partial<DauRaEm> = {}): DauRaEm => ({
   biDanh: 'A17', doTinCay: 0.8, nhip: { lech: 0, khoiDong: 2 }, dang: [], khacPhuc: [], co: 'khong', loiNhanChoEm: '', loiNhanChoPhuHuynh: '', thuTuan: '',
   goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' }, ghiChuHlv: '', canSau: false, ...o,
 })
-const TU_GAME = ['thần thú', 'EXP', 'khiên', 'mảnh khiên', 'Đoàn Hộ Tống', 'Đảo', 'Võ đài', 'game', 'trò chơi']
+const TU_GAME = ['thần thú', 'EXP', 'khiên', 'mảnh khiên', 'Đoàn Hộ Tống', 'Đảo thần thú', 'đảo của em', 'Võ đài', 'game', 'trò chơi']
 const LOI_SACH = 'Anh chị ơi, con đã đúng lại 4 câu từng sai trong tuần này, bộ não đã xếp thêm vài câu cùng dạng để con luyện.'
 
 describe('lời cho PHỤ HUYNH không nhắc game', () => {
   it('danh sách từ cấm của phụ huynh có đủ các từ game', () => {
-    for (const t of ['thần thú', 'exp', 'khiên', 'mảnh khiên', 'đoàn hộ tống', 'đảo', 'võ đài', 'game', 'trò chơi']) expect(TU_CAM_CHO_PHU_HUYNH, t).toContain(t)
+    for (const t of ['thần thú', 'exp', 'khiên', 'mảnh khiên', 'đoàn hộ tống', 'đảo thần thú', 'đảo của em', 'võ đài', 'game', 'trò chơi']) expect(TU_CAM_CHO_PHU_HUYNH, t).toContain(t)
+    expect(TU_CAM_CHO_PHU_HUYNH, 'đảo đứng riêng KHÔNG còn bị cấm').not.toContain('đảo')
   })
   it('lời sạch qua; MỖI từ game bị chặn ở loiNhanChoPhuHuynh: phần tử vẫn hợp lệ, chỉ bỏ lời ấy, giữ núm', () => {
     const k0 = kiemKhuon(nen({ loiNhanChoPhuHuynh: LOI_SACH }), the)
@@ -41,7 +42,11 @@ describe('lời cho PHỤ HUYNH không nhắc game', () => {
       expect(k.boLoi, t).toEqual(['thuTuan'])
     }
   })
-  it('KHÔNG gộp nhầm: chữ thường gặp có chứa các âm tiết ấy vẫn được ("hòn đảo" là từ khác? — "đảo" bị cấm cố ý), "exp" chỉ khi là TỪ; "khiêng", "gameshow" không phải từ cấm', () => {
+  it('KHÔNG gộp nhầm: "đảo" đứng riêng được dùng (đảo thứ tự, nghịch đảo, hòn đảo); chỉ cụm "đảo thần thú" / "đảo của em" bị cấm; "exp" chỉ khi là TỪ; "khiêng", "gameshow" không phải từ cấm', () => {
+    for (const ok of ['con làm đúng dạng đảo thứ tự các bước', 'câu nghịch đảo của phép nhân', 'Con thích đọc về hòn đảo Phú Quốc', 'Đảo ngược thứ tự làm bài giúp con nhớ lâu']) expect(timTuCam(ok, TU_CAM_CHO_PHU_HUYNH), ok).toEqual([])
+    expect(timTuCam('Con vừa lên Đảo Thần Thú', TU_CAM_CHO_PHU_HUYNH), 'không phân biệt hoa thường').toContain('đảo thần thú')
+    expect(timTuCam('hôm nay đảo của em có nhiều việc', TU_CAM_CHO_PHU_HUYNH)).toEqual(['đảo của em'])
+    expect(timTuCam('ĐẢO   CỦA   EM', TU_CAM_CHO_PHU_HUYNH), 'nhiều dấu cách / chữ hoa').toEqual(['đảo của em'])
     expect(timTuCam('con khiêng bài giúp cô', TU_CAM_CHO_PHU_HUYNH)).toEqual([])
     expect(timTuCam('con thử thách bản thân', TU_CAM_CHO_PHU_HUYNH)).toEqual([])
     expect(timTuCam('con đã EXPERT hoá phần này', TU_CAM_CHO_PHU_HUYNH)).toEqual([])
@@ -56,7 +61,7 @@ describe('lời cho PHỤ HUYNH không nhắc game', () => {
     const luat = readFileSync('bo-nao/LUAT-RUT-GON.md', 'utf8')
     const cn = readFileSync('bo-nao/HUONG-DAN-BO-NAO.md', 'utf8')
     expect(luat.split(/\s+/).filter(Boolean).length).toBeLessThanOrEqual(1200)
-    for (const t of ['MỌI thứ của game', 'thần thú, EXP, khiên, Đoàn Hộ Tống, Đảo, Võ đài', 'phụ huynh không thấy game', 'cũng cấm game']) expect(luat, t).toContain(t)
-    for (const t of ['MỌI thứ của game', 'mảnh khiên', 'Đoàn Hộ Tống', 'Võ đài', 'trò chơi', 'KHÔNG hiện gì của game']) expect(cn, t).toContain(t)
+    for (const t of ['MỌI thứ của game', 'thần thú, EXP, khiên, Đoàn Hộ Tống, Đảo thần thú, Võ đài', 'phụ huynh không thấy game', 'cũng cấm game']) expect(luat, t).toContain(t)
+    for (const t of ['MỌI thứ của game', 'mảnh khiên', 'Đoàn Hộ Tống', 'Đảo thần thú / đảo của em', 'Võ đài', 'trò chơi', 'KHÔNG hiện gì của game']) expect(cn, t).toContain(t)
   })
 })

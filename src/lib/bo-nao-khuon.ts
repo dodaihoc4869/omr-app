@@ -215,7 +215,7 @@ export const TU_CAM_CHO_PHU_HUYNH: readonly string[] = [
   'chép bài', 'gian lận', 'sao chép', 'đạo văn', 'nghi vấn', 'nghi ngờ',
   'cảnh báo', 'báo động', 'khẩn cấp', 'nghiêm trọng', 'nguy hiểm', 'thảm hại', 'vô vọng', 'đáp án',
   // GAME (thầy lệnh 21/09/2026: app phụ huynh KHÔNG hiện thần thú / EXP / khiên / gì liên quan tới game): cả `loiNhanChoPhuHuynh` lẫn `thuTuan`. Lời cho EM vẫn được nhắc (em thấy game).
-  'thần thú', 'exp', 'khiên', 'mảnh khiên', 'đoàn hộ tống', 'đảo', 'võ đài', 'game', 'trò chơi',
+  'thần thú', 'exp', 'khiên', 'mảnh khiên', 'đoàn hộ tống', 'đảo thần thú', 'đảo của em', 'võ đài', 'game', 'trò chơi',
 ]
 
 // ══════════════════════════════ HÀM PHỤ ══════════════════════════════

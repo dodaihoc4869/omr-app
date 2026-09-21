@@ -33,7 +33,7 @@ const dem = (r: KetQuaGiaoThem, loai: string) => r.thanhPhan.filter((t) => t.loa
 describe('hằng số và hàm nhỏ', () => {
   it('trần từng lượt: 10 · 6 · 4; kẹp lượt 1: 4–10, vượt mục tiêu 4–6; sau 21:30 ≤ 4; tổng 16; tối đa 3 lượt', () => {
     expect([1, 2, 3].map(tranLuot)).toEqual([10, 6, 4])
-    expect(GIAO_THEM).toMatchObject({ SO_LUOT_TOI_DA: 3, TONG_CAU_TOI_DA_NGAY: 16, LUOT_1_TOI_THIEU: 4, LUOT_1_TOI_DA: 10, VUOT_MUC_TIEU_TOI_THIEU: 4, VUOT_MUC_TIEU_TOI_DA: 6, SAU_GIO_TOI_DA: 4, THU_SUC_TI_LE: 0.8 })
+    expect(GIAO_THEM).toMatchObject({ SO_LUOT_TOI_DA: 3, TONG_CAU_TOI_DA_NGAY: 16, LUOT_1_TOI_THIEU: 4, LUOT_1_TOI_DA: 10, VUOT_MUC_TIEU_TOI_THIEU: 4, VUOT_MUC_TIEU_TOI_DA: 6, SAU_GIO_TOI_DA: 4, KHOA_SAU_PHUT: 22 * 60 + 30, THU_SUC_TI_LE: 0.8 })
   })
   it('thử sức: đúng ≥ 80 % trong ≥ 5 câu (4/5 được; 7/10 không; 4/4 chưa đủ mẫu; dung > daLam bị kẹp)', () => {
     expect(duDieuKienThuSuc(5, 4)).toBe(true)
@@ -175,10 +175,41 @@ describe('TỪ CHỐI đúng ca — soCau 0, thanhPhan rỗng, lý do bằng s�
     const r = tinhGiaoThem(vao({ hoSo: { dang: [dang('A', { soKhaDungDungBac: 1, soKhaDungThapHon: 0 })], soCauDenLichOn: 0, soCauSaiChuaKhacPhuc: 1 } }))
     expect(chuan(r, 'khong_co_cau')).toBe('Hôm nay chưa có đủ câu phù hợp để giao thêm (ôn lại 0 câu, dạng con đang vấp 1 câu, câu từng sai 1 câu).')
   })
-  it('THỨ TỰ từ chối: hết lượt → việc bắt buộc → gói trước chưa xong → hết trần → không có câu', () => {
+  it('SAU 22:30 giờ VN ⇒ từ chối HẲN (qua_muon) bằng lời của thầy; 22:29 và đúng 22:30:00 còn giao (≤ 4 câu); 22:30:00.001 đã từ chối; múi giờ đổi đúng', () => {
+    const LOI = 'Đã muộn rồi, để con nghỉ. Mai anh/chị giao tiếp được.'
+    for (const luot of [1, 2, 3]) {
+      const c229 = tinhGiaoThem(vao({ bayGioMs: vn('22:29'), luot }))
+      expect(c229.tuChoi, `lượt ${luot} 22:29`).toBeUndefined()
+      expect(c229.soCau).toBeGreaterThanOrEqual(3)
+      expect(c229.soCau).toBeLessThanOrEqual(4)
+      const c2230 = tinhGiaoThem(vao({ bayGioMs: vn('22:30'), luot }))
+      expect(c2230.tuChoi, `lượt ${luot} 22:30:00`).toBeUndefined()
+      expect(c2230.soCau).toBeLessThanOrEqual(4)
+      expect(chuan(tinhGiaoThem(vao({ bayGioMs: vn('22:30') + 1000, luot })), 'qua_muon'), `lượt ${luot} 22:30:01`).toBe(LOI)
+      expect(chuan(tinhGiaoThem(vao({ bayGioMs: vn('22:30') + 1, luot })), 'qua_muon')).toBe(LOI) // 22:30:00.001 cũng đã "sau"
+    }
+    // 21:30–22:30 vẫn ≤ 4 câu như cũ (không đổi luật cũ)
+    for (const g of ['21:31', '22:00', '22:29']) expect(tinhGiaoThem(vao({ bayGioMs: vn(g) })).soCau, g).toBeLessThanOrEqual(4)
+    expect(tinhGiaoThem(vao({ bayGioMs: vn('21:30') })).soCau).toBeGreaterThan(4) // đúng 21:30:00 chưa "sau"
+    // buổi tối muộn: 23:00 và 23:59 giờ VN đều đã quá 22:30
+    expect(tinhGiaoThem(vao({ bayGioMs: vn('23:59') })).tuChoi?.ma).toBe('qua_muon')
+    expect(tinhGiaoThem(vao({ bayGioMs: vn('23:00') })).tuChoi?.ma).toBe('qua_muon')
+    // quy đổi múi giờ đúng: 22:31 giờ VN = 15:31 UTC ⇒ từ chối; 22:29 giờ VN = 15:29 UTC ⇒ còn giao
+    expect(tinhGiaoThem(vao({ bayGioMs: Date.parse('2026-09-21T15:31:00Z') })).tuChoi?.ma).toBe('qua_muon')
+    expect(tinhGiaoThem(vao({ bayGioMs: Date.parse('2026-09-21T15:29:00Z') })).tuChoi).toBeUndefined()
+  })
+  it('từ chối vì quá muộn KHÔNG tính vào lượt: kết quả không có trường lượt/đếm, chỉ soCau 0 + tuChoi; cùng đầu vào lúc 20:00 vẫn giao được đủ lượt đó', () => {
+    const tre = tinhGiaoThem(vao({ bayGioMs: vn('22:45'), luot: 2, tongDaGiaoHomNay: 6 }))
+    expect(Object.keys(tre).sort()).toEqual(['lyDo', 'phutUocTinh', 'soCau', 'thanhPhan', 'tuChoi'])
+    expect(tre.tuChoi?.lyDo).toEqual(['Đã muộn rồi, để con nghỉ. Mai anh/chị giao tiếp được.'])
+    expect(tinhGiaoThem(vao({ bayGioMs: vn('20:00'), luot: 2, tongDaGiaoHomNay: 6 })).tuChoi).toBeUndefined()
+  })
+  it('THỨ TỰ từ chối: hết lượt → quá 22:30 → việc bắt buộc → gói trước chưa xong → hết trần → không có câu', () => {
     const bb = { mucTieuCau: 20, daLam: 5, dung: 5, batBuocConLai: [{ loai: 'chang_btvn' as const, soCau: 2 }] }
     const goi = { soCau: 6, soDaLam: 1, lucGiaoMs: vn('19:40') }
     expect(tinhGiaoThem(vao({ luot: 4, nganSach: bb, goiTruoc: goi, tongDaGiaoHomNay: 15 })).tuChoi?.ma).toBe('het_luot')
+    expect(tinhGiaoThem(vao({ bayGioMs: vn('22:45'), luot: 4, nganSach: bb, goiTruoc: goi, tongDaGiaoHomNay: 15 })).tuChoi?.ma).toBe('het_luot')
+    expect(tinhGiaoThem(vao({ bayGioMs: vn('22:45'), nganSach: bb, goiTruoc: goi, tongDaGiaoHomNay: 15 })).tuChoi?.ma).toBe('qua_muon')
     expect(tinhGiaoThem(vao({ nganSach: bb, goiTruoc: goi, tongDaGiaoHomNay: 15 })).tuChoi?.ma).toBe('con_viec_bat_buoc')
     expect(tinhGiaoThem(vao({ goiTruoc: goi, tongDaGiaoHomNay: 15 })).tuChoi?.ma).toBe('goi_truoc_chua_xong')
     expect(tinhGiaoThem(vao({ tongDaGiaoHomNay: 15 })).tuChoi?.ma).toBe('het_tran_ngay')
@@ -259,7 +290,10 @@ describe('TÍNH CHẤT trên 6000 đầu vào ngẫu nhiên', () => {
       const r = tinhGiaoThem(v)
       const bb = v.nganSach.batBuocConLai.some((x) => x.soCau > 0)
       const goiDo = !!v.goiTruoc && v.goiTruoc.soCau > 0 && v.goiTruoc.soDaLam < v.goiTruoc.soCau
+      const gioVn = new Date(v.bayGioMs + 7 * 3_600_000)
+      const giay = gioVn.getUTCHours() * 3600 + gioVn.getUTCMinutes() * 60 + gioVn.getUTCSeconds() + gioVn.getUTCMilliseconds() / 1000
       if (v.luot > 3) expect(r.tuChoi?.ma, `#${i}`).toBe('het_luot')
+      else if (giay > 22.5 * 3600) expect(r.tuChoi?.ma, `#${i}`).toBe('qua_muon')
       else if (bb) expect(r.tuChoi?.ma, `#${i}`).toBe('con_viec_bat_buoc')
       else if (goiDo) expect(r.tuChoi?.ma, `#${i}`).toBe('goi_truoc_chua_xong')
       else if (16 - v.tongDaGiaoHomNay < 3) expect(r.tuChoi?.ma, `#${i}`).toBe('het_tran_ngay')
@@ -268,7 +302,7 @@ describe('TÍNH CHẤT trên 6000 đầu vào ngẫu nhiên', () => {
         soTuChoi++
         expect(r.soCau, `#${i}`).toBe(0)
         expect(r.thanhPhan, `#${i}`).toEqual([])
-        expect(/\d/.test(r.tuChoi.lyDo.join(' ')), `#${i} lý do có số`).toBe(true)
+        if (r.tuChoi.ma !== 'qua_muon') expect(/\d/.test(r.tuChoi.lyDo.join(' ')), `#${i} lý do có số`).toBe(true) // lời "quá muộn" do thầy chốt, không có số
       }
     }
     expect(soTuChoi).toBeGreaterThan(500)

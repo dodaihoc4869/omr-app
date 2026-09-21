@@ -20,6 +20,8 @@ export const GIAO_THEM = {
   /** Sau giờ này (phút kể từ 00:00 giờ VN; 21:30) gói ≤ `SAU_GIO_TOI_DA` câu để con nghỉ sớm. */
   SAU_GIO_PHUT: 21 * 60 + 30,
   SAU_GIO_TOI_DA: 4,
+  /** Sau giờ này (22:30 giờ VN, tới từng mili-giây) TỪ CHỐI HẲN — "để con nghỉ" (Boss chốt 21/09). Đúng 22:30:00 còn giao; 22:30:01 từ chối. */
+  KHOA_SAU_PHUT: 22 * 60 + 30,
   /** Gói nhỏ hơn chừng này không đáng giao (hết trần ngày hoặc hết câu phù hợp ⇒ từ chối). */
   TOI_THIEU_MOI_GOI: 3,
   /** Câu "thử sức" (bậc + 1) CHỈ khi hôm nay con đúng ≥ tỉ lệ này trong ≥ chừng này câu; tối đa MỘT câu. */
@@ -31,7 +33,7 @@ export const GIAO_THEM = {
 
 export type LoaiThanhPhan = 'on_lai' | 'dang_vap' | 'cau_sai' | 'thu_suc'
 export type BacGoiY = 'dung_bac' | 'thap_hon_mot_bac' | 'cao_hon_mot_bac'
-export type MaTuChoi = 'het_luot' | 'con_viec_bat_buoc' | 'goi_truoc_chua_xong' | 'het_tran_ngay' | 'khong_co_cau'
+export type MaTuChoi = 'het_luot' | 'qua_muon' | 'con_viec_bat_buoc' | 'goi_truoc_chua_xong' | 'het_tran_ngay' | 'khong_co_cau'
 
 /** MỘT DẠNG của con. `soKhaDung*` = số câu MÁY CHỦ đã đếm là dùng được (đã loại tự luận, câu trong bài tập về nhà chưa nộp, câu làm trong 14 ngày, câu vượt bậc + 1). */
 export interface DangCuaCon {
@@ -128,6 +130,8 @@ const soNguyen = (x: unknown): number => (typeof x === 'number' && Number.isFini
 const phutTrongNgayVn = (ms: number): number => Math.floor(((((ms + LECH_VN) % MS_NGAY) + MS_NGAY) % MS_NGAY) / MS_PHUT)
 /** ĐÃ QUA 21:30 giờ Việt Nam (so tới từng mili-giây: 21:30:01 đã là "sau 21:30"). */
 const daQuaGioNghi = (ms: number): boolean => ((((ms + LECH_VN) % MS_NGAY) + MS_NGAY) % MS_NGAY) > GIAO_THEM.SAU_GIO_PHUT * MS_PHUT
+/** ĐÃ QUA 22:30 giờ Việt Nam ⇒ không giao nữa (so tới từng mili-giây). */
+const daQuaGioKhoa = (ms: number): boolean => ((((ms + LECH_VN) % MS_NGAY) + MS_NGAY) % MS_NGAY) > GIAO_THEM.KHOA_SAU_PHUT * MS_PHUT
 const gioPhut = (ms: number): string => {
   const p = phutTrongNgayVn(ms)
   return `${String(Math.floor(p / 60)).padStart(2, '0')}:${String(p % 60).padStart(2, '0')}`
@@ -173,7 +177,7 @@ function tuChoi(ma: MaTuChoi, lyDo: string[]): KetQuaGiaoThem {
 }
 
 /**
- * Tính gói "Giao thêm bài cho con". Thứ tự TỪ CHỐI (dừng ở cái đầu tiên đúng): hết 3 lượt → còn việc BẮT BUỘC hôm nay → gói trước chưa làm xong → hết trần 16 câu/ngày (còn < 3 câu) → không có câu phù hợp (< 3 câu).
+ * Tính gói "Giao thêm bài cho con". Thứ tự TỪ CHỐI (dừng ở cái đầu tiên đúng): hết 3 lượt → quá 22:30 (không mất lượt) → còn việc BẮT BUỘC hôm nay → gói trước chưa làm xong → hết trần 16 câu/ngày (còn < 3 câu) → không có câu phù hợp (< 3 câu).
  * Nếu không từ chối: liều theo `lieuMongMuon`, rồi chia CƠ CẤU theo ưu tiên: câu đến lịch ôn → câu dạng con đang vấp (chia vòng tròn giữa các dạng, dạng yếu / sai nhiều trước) → câu từng sai chưa khắc phục;
  * cộng MỘT câu "thử sức" (bậc + 1) CHỈ khi hôm nay con đúng ≥ 80 % (≥ 5 câu) và có dạng ổn (không yếu, bậc < Vận dụng) còn câu bậc + 1. Không bao giờ đòi nhiều hơn số câu khả dụng.
  */
@@ -186,7 +190,10 @@ export function tinhGiaoThem(vao: DauVaoGiaoThem): KetQuaGiaoThem {
   // 1 · hết lượt
   if (luot > G.SO_LUOT_TOI_DA) return tuChoi('het_luot', [`Hôm nay đã giao đủ ${G.SO_LUOT_TOI_DA} lượt, mai giao tiếp được.`])
 
-  // 2 · còn việc BẮT BUỘC hôm nay
+  // 2 · quá muộn (sau 22:30): để con nghỉ, không mất lượt
+  if (daQuaGioKhoa(vao.bayGioMs)) return tuChoi('qua_muon', ['Đã muộn rồi, để con nghỉ. Mai anh/chị giao tiếp được.'])
+
+  // 3 · còn việc BẮT BUỘC hôm nay
   const batBuoc = (nganSach.batBuocConLai ?? []).filter((v) => soNguyen(v.soCau) > 0)
   if (batBuoc.length > 0) {
     const tongBb = batBuoc.reduce((s, v) => s + soNguyen(v.soCau), 0)
@@ -195,17 +202,17 @@ export function tinhGiaoThem(vao: DauVaoGiaoThem): KetQuaGiaoThem {
     return tuChoi('con_viec_bat_buoc', [`${chu} — con nên làm phần này trước.`])
   }
 
-  // 3 · gói trước chưa xong
+  // 4 · gói trước chưa xong
   const gt = vao.goiTruoc
   if (gt && soNguyen(gt.soCau) > 0 && soNguyen(gt.soDaLam) < soNguyen(gt.soCau)) {
     return tuChoi('goi_truoc_chua_xong', [`Gói lúc ${gioPhut(gt.lucGiaoMs)} con mới làm ${soNguyen(gt.soDaLam)} trong ${soNguyen(gt.soCau)} câu — chờ con làm xong rồi giao tiếp.`])
   }
 
-  // 4 · hết trần ngày
+  // 5 · hết trần ngày
   const conTran = Math.max(0, G.TONG_CAU_TOI_DA_NGAY - tong)
   if (conTran < G.TOI_THIEU_MOI_GOI) return tuChoi('het_tran_ngay', [`Hôm nay đã giao thêm ${tong} trên ${G.TONG_CAU_TOI_DA_NGAY} câu — để con nghỉ, mai giao tiếp được.`])
 
-  // 5 · liều mong muốn + cơ cấu
+  // 6 · liều mong muốn + cơ cấu
   const { lieu, vuotMucTieu, thieu } = lieuMongMuon(luot, nganSach, vao.bayGioMs, tong)
   const daLam = soNguyen(nganSach.daLam)
   const dung = Math.min(soNguyen(nganSach.dung), daLam)
@@ -259,7 +266,7 @@ export function tinhGiaoThem(vao: DauVaoGiaoThem): KetQuaGiaoThem {
     return tuChoi('khong_co_cau', [`Hôm nay chưa có đủ câu phù hợp để giao thêm (ôn lại ${soNguyen(hoSo.soCauDenLichOn)} câu, dạng con đang vấp ${tongVap} câu, câu từng sai ${soNguyen(hoSo.soCauSaiChuaKhacPhuc)} câu).`])
   }
 
-  // 6 · lời giải thích có số thật
+  // 7 · lời giải thích có số thật
   const lyDo: string[] = []
   if (vuotMucTieu) lyDo.push(`Con đã làm ${daLam}/${soNguyen(nganSach.mucTieuCau)} câu, vượt mục tiêu hôm nay — chỉ giao gói nhẹ ${soCau} câu.`)
   else if (luot <= 1) lyDo.push(`Con mới làm ${daLam}/${soNguyen(nganSach.mucTieuCau)} câu mục tiêu hôm nay, còn thiếu ${thieu} câu — gói ${soCau} câu cho phần còn thiếu.`)
