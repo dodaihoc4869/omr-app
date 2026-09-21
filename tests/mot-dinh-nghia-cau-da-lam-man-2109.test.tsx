@@ -285,6 +285,27 @@ describe('bảng phụ huynh — thẻ Tổng quan dựng đủ (vòng + chữ g
   })
 })
 
+describe('THÂN THẬT của Worker 5bb39dd4 (SBD thử 12121212, 21/09 18:3x, chỉ đọc): 21 câu đã làm, 7 câu có kết quả, đúng 1', () => {
+  // Chép nguyên khối tongQuan + ngày nhịp học máy chủ thật trả (câu che chiếm 14 trong 21): soDung/soCauCoKetQua chỉ trên câu KHÔNG che.
+  const THAT = { soCau: 21, soDung: 1, soCauCoKetQua: 7, datNhiemVu: true, mucTieu: { cau: 8, phut: 6 }, soLanHoc: 7, lanDaiNhatPhut: 1, viecXong: 3, viecTong: 3, chuoiNgayHoc: 1 }
+  const pmThat = () => {
+    const r = nhan(PH_APPLE)
+    r.homNay.tongQuan = nhan(THAT)
+    r.nhipHoc = { ngay: [{ ngay: '2026-09-21', soCau: 21, soCauDung: 1, soCauCoKetQua: 7 }], gioThuongHoc: '19:00', trungBinhCauMoiNgay: 21, tongCau: 21 }
+    return docTatCaVeCon(r)!
+  }
+  it('đọc đúng: soCau 21 (gồm che), soDung 1, mẫu số 7', () => {
+    const t = pmThat().tongQuan!
+    expect([t.soCau, t.soDung, t.soCauCoKetQua]).toEqual([21, 1, 7])
+    expect(pmThat().nhipHoc!.ngay).toEqual([{ ngay: '2026-09-21', soCau: 21, soCauDung: 1 }])
+  })
+  it('bảng: vòng 1 "21/8 câu · đã làm · vượt mục tiêu"; vòng 2 "14 %" và "đúng 1 trong 7 câu đã có kết quả" (không 5 % của 1/21)', () => {
+    const dong = chuGiaiVong(pmThat().tongQuan!)
+    expect(dong[0]).toMatchObject({ so: '21', don: '/8 câu', nhan: 'đã làm · vượt mục tiêu' })
+    expect(dong[1]).toEqual({ mau: '2', so: '14', don: '%', nhan: 'đúng 1 trong 7 câu đã có kết quả' })
+  })
+})
+
 describe('bảng phụ huynh — so với hôm qua theo mẫu số', () => {
   const t = { soCau: 38, soDung: 30, soCauCoKetQua: 35, phutHoc: 52 }
   it('tỉ lệ hôm nay 30/35 = 86 % so với hôm qua 76 % ⇒ "đúng hơn 10 %"', () => {
