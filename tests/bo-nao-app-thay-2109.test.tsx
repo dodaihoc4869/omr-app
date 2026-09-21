@@ -331,19 +331,6 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
     expect(await screen.findByText('Bộ não A.I đang tắt')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Mở Cài đặt' })).toBeTruthy()
   })
-
-  it('bản GỌN (Bảng tin): soDongGon=0 ⇒ chỉ tiêu đề + số đếm, không dòng, không nút; soDongGon=3 ⇒ ≤ 3 dòng không nút', async () => {
-    const cac = Array.from({ length: 5 }, (_, i) => ({ loai: 'can_thay_y', chu: `Dòng ${'ABCDE'[i]}`, sbd: '12007', hoTen: 'A', hanhDong: 'xem_ho_so' }))
-    chay({ banTin: { cacDong: cac } }, { gon: true, soDongGon: 0 })
-    await screen.findByRole('heading', { name: /Bộ não A.I · đêm qua/ })
-    expect(screen.queryByText('Dòng A')).toBeNull()
-    expect(screen.queryAllByRole('button')).toHaveLength(0)
-    cleanup()
-    chay({ banTin: { cacDong: cac } }, { gon: true, soDongGon: 3 })
-    await screen.findByText('Dòng A')
-    expect(screen.queryByText('Dòng D')).toBeNull()
-    expect(screen.queryAllByRole('button')).toHaveLength(0)
-  })
 })
 
 // ---------------------------------------------------------------- nhật ký từng em

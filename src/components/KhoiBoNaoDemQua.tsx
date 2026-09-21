@@ -25,8 +25,7 @@ import '../styles/bo-nao-m3.css'
 /** KHỐI "BỘ NÃO ĐÊM QUA" (bản vẽ docs/ban-ve-bo-nao-2109/, thầy duyệt 21/09; giọng TỰ HÀNH thầy chốt cùng ngày: thầy KHÔNG phải làm gì, chỉ ĐỌC báo cáo).
  *  Tiêu đề "Đêm qua đã hỗ trợ N em"; mỗi dòng thể ĐÃ LÀM + kết quả hôm sau khi đã có; nút chỉ còn "Xem" (mở hồ sơ / Gọi lên bảng — hàm SẴN CÓ) và "Bỏ điều chỉnh" (tuỳ thầy).
  *  Dòng CHỈ BÁO (thầy xem lại · em vắng lâu) không có nút Bỏ. Nhãn "CHẠY THỬ" (mã nội bộ `cheDo:'bong'`) chỉ hiện khi chế độ thử — thử thì KHÔNG nói "đã làm" (dòng ghi "ĐỀ XUẤT").
- *  NÓI THẬT: máy chủ chưa có lệnh / chưa chạy lần nào / quá 36 giờ ⇒ hiện đúng lý do, không dựng bản tin. Hợp đồng `docs/hop-dong-bo-nao-2109.md`; dạng trường `src/lib/bo-nao-thay.ts`.
- *  `gon` = bản tóm tắt cho BẢNG TIN giáo viên: tiêu đề + tối đa `soDongGon` dòng, không nút. */
+ *  NÓI THẬT: máy chủ chưa có lệnh / chưa chạy lần nào / quá 36 giờ ⇒ hiện đúng lý do, không dựng bản tin. Hợp đồng `docs/hop-dong-bo-nao-2109.md`; dạng trường `src/lib/bo-nao-thay.ts`. */
 /** Phần TRẠNG THÁI của tiêu đề cũ ("… đã hỗ trợ 9 em") chuyển xuống DÒNG PHỤ để tiêu đề chỉ còn một dòng "Bộ não A.I · đêm qua" (thầy lệnh 21/09, chữ dài bị ngắt). Rỗng ⇒ ''. */
 function trangThaiKhoi(d: Parameters<typeof tieuDeKhoi>[0], tatCaThat: boolean): string {
   const t = tieuDeKhoi(d, tatCaThat).replace(/^Bộ não A\.I · đêm qua\s*/, '')
@@ -38,18 +37,11 @@ export default function KhoiBoNaoDemQua({
   onGoiLenBang,
   onMoCaiDat,
   ngay,
-  gon = false,
-  soDongGon = 3,
-  onXemDayDu,
 }: {
   onMoHoSo?: (sbd: string) => void
   onGoiLenBang?: () => void
   onMoCaiDat?: () => void
   ngay?: string
-  gon?: boolean
-  /** Bản gọn: số dòng tối đa hiện ra (0 = chỉ tiêu đề + số đếm, khi khối đầy đủ đã nằm ngay trên màn). */
-  soDongGon?: number
-  onXemDayDu?: () => void
 }) {
   const classList = useAppStore((s) => s.classList)
   const showToast = useAppStore((s) => s.showToast)
@@ -127,7 +119,7 @@ export default function KhoiBoNaoDemQua({
             Bộ não A.I đang <b>tắt</b> trong Cài đặt.
           </span>
         </p>
-        {onMoCaiDat && !gon && (
+        {onMoCaiDat && (
           <div className="bnao-hang-nut">
             <button type="button" className="bnao-nut bnao-nut--vien" onClick={onMoCaiDat}>
               Mở Cài đặt
@@ -181,7 +173,6 @@ export default function KhoiBoNaoDemQua({
     .join(' ')
   const tenLop = (sbd: string) => classList.find((h) => h.sbd === sbd)?.lop ?? ''
   const tenEm = (x: DongBanTin) => x.hoTen || classList.find((h) => h.sbd === x.sbd)?.hoTen || (x.sbd ? `SBD ${x.sbd}` : '')
-  const dsHien = gon ? d.banTin.slice(0, soDongGon) : d.banTin
 
   const boMot = async (i: number, x: DongBanTin) => {
     setDangBo(true)
@@ -200,7 +191,6 @@ export default function KhoiBoNaoDemQua({
   }
 
   const nutDong = (x: DongBanTin, i: number) => {
-    if (gon) return null
     if (daBo.has(i)) return <span className="bnao-chip bnao-chip--nho">Đã bỏ điều chỉnh</span>
     if (xacNhan === i) {
       return (
@@ -249,14 +239,14 @@ export default function KhoiBoNaoDemQua({
         </p>
       )}
 
-      {gon && dsHien.length === 0 ? null : d.banTin.length === 0 ? (
+      {d.banTin.length === 0 ? (
         <p className="bnao-ghi-chu">
           <Info size={18} aria-hidden="true" />
           <span>Lượt chạy gần nhất không có gì cần báo thầy.</span>
         </p>
       ) : (
         <div>
-          {dsHien.map((x, i) => {
+          {d.banTin.map((x, i) => {
             const nh = nhanCuaDong(x)
             const ten = tenEm(x)
             const lop = x.sbd ? tenLop(x.sbd) : ''
@@ -290,16 +280,7 @@ export default function KhoiBoNaoDemQua({
         </div>
       )}
 
-      {gon ? (
-        onXemDayDu && (
-          <div className="bnao-hang-nut">
-            <button type="button" className="bnao-nut bnao-nut--vien" onClick={onXemDayDu}>
-              Xem đầy đủ
-              <ChevronRight size={18} aria-hidden="true" />
-            </button>
-          </div>
-        )
-      ) : (
+      {(
         <>
           <p className="bnao-ghi-chu">
             <Info size={18} aria-hidden="true" />
