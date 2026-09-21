@@ -94,7 +94,7 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
 .hai-nut{display:flex;gap:10px}
 .hai-nut>*{flex:1;min-width:0}
 
-/* ───── bộ lọc theo ô gắn ───── */
+/* ───── bộ lọc theo chỗ đeo ───── */
 .loc{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -14px;padding:2px 14px}
 .loc::-webkit-scrollbar{display:none}
 .loc button{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:22px;background:var(--kinh);box-shadow:inset 0 0 0 1px var(--kinh-vien);font-size:14px;font-weight:700;color:var(--chu-mo);white-space:nowrap;transition:background .2s ease,color .2s ease,box-shadow .2s ease}
@@ -103,9 +103,10 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
 .loc em{font-style:normal;font-size:11px;font-weight:800;padding:2px 7px;border-radius:9px;background:rgba(127,127,160,.28)}
 .chu-giai{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;font-weight:700}
 .chu-giai span{display:inline-flex;align-items:center;gap:5px;color:var(--bac-t)}
+.chu-giai b{color:var(--chu-mo);font-weight:700}
 .chu-giai i{width:9px;height:9px;border-radius:2px;transform:rotate(45deg);background:rgb(var(--bac-c));box-shadow:0 0 8px rgba(var(--bac-c),.8)}
 
-/* ───── bậc độ hiếm ───── */
+/* ───── năm bậc ───── */
 .bac-1{--bac-c:var(--b1c);--bac-t:var(--b1t)}.bac-2{--bac-c:var(--b2c);--bac-t:var(--b2t)}.bac-3{--bac-c:var(--b3c);--bac-t:var(--b3t)}.bac-4{--bac-c:var(--b4c);--bac-t:var(--b4t)}.bac-5{--bac-c:var(--b5c);--bac-t:var(--b5t)}
 
 /* ───── lưới thẻ món ───── */
@@ -191,6 +192,9 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
 .bao-thieu span{display:block;font-weight:500;font-size:13px;margin-top:2px}
 .hop-xn{padding:12px 14px;border-radius:16px;background:var(--kinh);box-shadow:inset 0 0 0 1px var(--kinh-vien);font-size:14px}
 .hop-xn b{font-weight:800}
+.bat-mi{padding:10px 12px;border-radius:14px;background:rgba(var(--bac-c),.1);box-shadow:inset 0 0 0 1px rgba(var(--bac-c),.4);font-size:14px;line-height:1.4;color:var(--chu)}
+.bat-mi b{display:block;margin-bottom:2px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--bac-t)}
+.doi h3 small{display:block;margin-top:2px;font-size:13px;font-weight:500;color:var(--chu-mo)}
 .bao-xong{min-height:20px;font-size:14px;font-weight:700;color:var(--xanh-chu);text-align:center}
 .chan{font-size:12px;color:var(--chu-mo);text-align:center;padding:0 8px}
 [hidden]{display:none!important}
@@ -252,7 +256,7 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
     <div class="may">
       <div class="dau">
         <button class="nut-tron" type="button" aria-label="Về Đảo thần thú"><svg width="22" height="22" aria-hidden="true"><use href="#bt-lui"/></svg></button>
-        <h2>Cửa hàng phụ kiện<small>Mùa 1 · bán tới hết học kỳ I</small></h2>
+        <h2>Cửa hàng<small>Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I</small></h2>
         <button class="nut-tron" type="button"><svg width="20" height="20" aria-hidden="true"><use href="#bt-tu"/></svg>Tủ đồ</button>
       </div>
 
@@ -264,28 +268,29 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
             <div><strong class="so" data-vang>340</strong><span>vàng</span></div>
           </div>
         </div>
-        <div class="vi-phu">Ống nghiệm: <b class="so"><span data-ong>620</span> EXP</b> · Dự trữ đủ <b class="so"><span data-ngay-an>3</span> ngày ăn</b> cho thần thú</div>
+        <div class="vi-phu">Ống nghiệm có <b class="so"><span data-ong>620</span> EXP</b> · Dự trữ đủ <b class="so"><span data-ngay-an>3</span> ngày ăn</b></div>
       </div>
 
       <div class="kinh doi" id="khoi-doi">
-        <h3>Đổi EXP thừa lấy vàng</h3>
-        <div class="doi-dong noi"><span>Em đổi</span><b class="so"><span data-doi-exp>180</span> EXP → nhận <span data-doi-vang>180</span> vàng</b></div>
+        <h3>Đổi vàng<small>EXP thừa trong ống nghiệm đổi được thành vàng.</small></h3>
+        <div class="doi-dong noi"><span>Em đổi</span><b class="so"><span data-doi-exp>180</span> EXP thành <span data-doi-vang>180</span> vàng</b></div>
         <input class="truot" id="truot" type="range" min="0" max="420" step="10" value="180" aria-label="Số EXP thừa em muốn đổi thành vàng">
-        <div class="doi-moc so"><span>0 EXP</span><span>Đổi tối đa <span data-doi-max>420</span> EXP</span></div>
-        <div class="doi-dong"><span>Dự trữ trước khi đổi</span><b class="so"><span data-truoc>620</span> EXP · đủ <span data-truoc-ngay>3</span> ngày ăn</b></div>
-        <div class="doi-dong"><span>Dự trữ sau khi đổi</span><b class="so"><span data-sau>440</span> EXP · Dự trữ còn <span data-sau-ngay>2</span> ngày ăn</b></div>
-        <p class="ghi-chu">1 EXP thừa = 1 vàng. Luôn giữ lại 200 EXP (1 ngày ăn) cho thần thú. Đổi rồi không đổi ngược lại được.</p>
+        <div class="doi-moc so"><span>0 EXP</span><span>Đổi được nhiều nhất <span data-doi-max>420</span> EXP</span></div>
+        <div class="doi-dong"><span>Trước khi đổi</span><b class="so"><span data-truoc>620</span> EXP · đủ <span data-truoc-ngay>3</span> ngày ăn</b></div>
+        <div class="doi-dong"><span>Sau khi đổi</span><b class="so"><span data-sau>440</span> EXP · đủ <span data-sau-ngay>2</span> ngày ăn</b></div>
+        <p class="ghi-chu">1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.</p>
         <div class="hop-xn" id="xn-doi" hidden></div>
         <div class="hai-nut" id="nut-doi-khung">
           <button class="nut-vang" id="nut-doi" type="button"><span>Đổi 180 EXP lấy 180 vàng</span></button>
         </div>
+        <div class="bao-xong" id="bao-doi" role="status" aria-live="polite" hidden></div>
       </div>
 
       <div>
-        <div class="loc" id="loc" role="group" aria-label="Lọc theo ô gắn trên thần thú"></div>
+        <div class="loc" id="loc" role="group" aria-label="Lọc theo chỗ đeo trên thần thú"></div>
       </div>
-      <div class="chu-giai" aria-label="Năm bậc độ hiếm">
-        <span class="bac-1"><i></i>Thường</span><span class="bac-2"><i></i>Đẹp</span><span class="bac-3"><i></i>Hiếm</span><span class="bac-4"><i></i>Sử thi</span><span class="bac-5"><i></i>Huyền thoại</span>
+      <div class="chu-giai" aria-label="Năm bậc, đắt dần từ Thường tới Huyền thoại">
+        <b>Đắt dần:</b><span class="bac-1"><i></i>Thường</span><span class="bac-2"><i></i>Đẹp</span><span class="bac-3"><i></i>Hiếm</span><span class="bac-4"><i></i>Sử thi</span><span class="bac-5"><i></i>Huyền thoại</span>
       </div>
 
       <div class="luoi" id="luoi"></div>
@@ -299,7 +304,7 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
     <div class="may">
       <div class="dau">
         <button class="nut-tron" type="button" aria-label="Về Cửa hàng"><svg width="22" height="22" aria-hidden="true"><use href="#bt-lui"/></svg></button>
-        <h2>Thử đồ<small>Thử thoải mái, chưa mất vàng</small></h2>
+        <h2>Thử đồ<small>Thử thoải mái, không mất vàng</small></h2>
         <span class="nut-tron" style="cursor:default" aria-label="Vàng của em"><svg width="22" height="22" aria-hidden="true"><use href="#dong-vang"/></svg><span class="so"><span data-vang>340</span> vàng</span></span>
       </div>
 
@@ -338,16 +343,16 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
         <div class="san-nhan"><span id="nhan-dang-thu">Đang thử 3 phụ kiện</span></div>
         <div class="san-ten lop" id="lop-ten"></div>
       </div>
-      <div class="ban-be"><svg width="18" height="18" aria-hidden="true"><use href="#bt-mat"/></svg><span>Bạn cùng đoàn và Bảng vinh danh sẽ thấy thần thú của em đúng như thế này.</span></div>
+      <div class="ban-be"><svg width="18" height="18" aria-hidden="true"><use href="#bt-mat"/></svg><span>Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.</span></div>
 
       <div class="kinh thu-ds">
-        <h3>Em đang thử — chạm một món để xem và mua</h3>
+        <h3>Em đang thử · chạm một món để xem kỹ</h3>
         <div id="thu-ds"></div>
       </div>
 
       <div class="kinh chi-tiet" id="chi-tiet"></div>
       <div class="bao-xong" id="bao-xong" role="status" aria-live="polite"></div>
-      <p class="chan">Bản phác — số vàng thật luôn do máy chủ trả về; phụ kiện chỉ để trang trí, không đổi sức mạnh của thần thú.</p>
+      <p class="chan">Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.</p>
     </div>
   </section>
 </main>
@@ -355,19 +360,21 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
 <script>
 (function () {
   'use strict'
-  var O = { 'hao-quang': 'Hào quang', 'vet': 'Vệt di chuyển', 'khung': 'Khung tên' }
+  // CHỮ theo mục 9 của DE-XUAT-SHOP-PHU-KIEN-2109.md: tên món không có tên chất; tên chất chỉ nằm ở dòng Bật mí Hoá học (bm).
+  var O = { 'hao-quang': 'Vòng sáng', 'vet': 'Đuôi sáng', 'khung': 'Khung tên' }
   var BAC = ['', 'Thường', 'Đẹp', 'Hiếm', 'Sử thi', 'Huyền thoại']
+  var DU_MOI_NGAY = 80 // mức dư mỗi ngày của em học đủ (mục 2) — chỉ dùng cho lời chỉ đường "khoảng N ngày"
   var MON = [
-    { ma: 'VD-01', ten: 'Vệt Bọt khí Carbon dioxide', o: 'vet', bac: 1, gia: 20, hinh: 'bot-khi', ta: 'Chuỗi bong bóng tròn nhỏ dần phía sau mỗi bước chân.' },
-    { ma: 'KT-03', ten: 'Khung Ô nguyên tố', o: 'khung', bac: 1, gia: 50, hinh: 'o-nguyen-to', ta: 'Ô bảng tuần hoàn: kí hiệu ở góc, tên thần thú ở giữa.' },
-    { ma: 'VD-04', ten: 'Vệt Lửa Potassium', o: 'vet', bac: 2, gia: 120, hinh: 'potassium', ta: 'Đuôi lửa tím hoa cà — đúng màu ngọn lửa của potassium.' },
-    { ma: 'HQ-03', ten: 'Hào quang Ngọn lửa Sodium', o: 'hao-quang', bac: 2, gia: 150, hinh: 'sodium', ta: 'Quầng vàng cam ấm với năm lưỡi lửa nhỏ — màu ngọn lửa của sodium.' },
-    { ma: 'HQ-05', ten: 'Hào quang Khí Neon', o: 'hao-quang', bac: 3, gia: 600, hinh: 'neon', ta: 'Vòng ống sáng đỏ cam như đèn neon, sáng lên rồi dịu xuống rất chậm.' },
-    { ma: 'KT-07', ten: 'Khung Titanium ngũ sắc', o: 'khung', bac: 4, gia: 1800, hinh: 'titanium', ta: 'Kim loại chuyển màu lam – tím – vàng theo góc nhìn.' },
-    { ma: 'HQ-07', ten: 'Hào quang Cực quang Oxygen', o: 'hao-quang', bac: 4, gia: 2400, hinh: 'cuc-quang', dk: { chuoi: 7 }, ta: 'Dải cực quang lục – tím uốn sau lưng thần thú.' },
-    { ma: 'KT-08', ten: 'Khung Vàng ròng Gold 999', o: 'khung', bac: 5, gia: 6000, hinh: 'gold', dk: { chuoi: 14 }, suat: { con: 12, tong: 30 }, ta: 'Khung vàng kim chạm nổi kí hiệu Au, ánh sáng chạy chậm từ trái sang phải.' },
-    { ma: 'VD-08', ten: 'Vệt Dòng Electron', o: 'vet', bac: 5, gia: 7500, hinh: 'electron', dk: { chuoi: 21 }, suat: { con: 25, tong: 25 }, ta: 'Tia sét lam – vàng kim chạy dọc đường đi, để lại kí hiệu electron mờ dần.' },
-    { ma: 'HQ-08', ten: 'Hào quang Orbital Vàng kim', o: 'hao-quang', bac: 5, gia: 9000, hinh: 'orbital', dk: { chuoi: 14, an: 5 }, suat: { con: 20, tong: 20 }, ta: 'Ba quỹ đạo electron vàng kim xoay chậm quanh thần thú.' }
+    { ma: 'VD-01', ten: 'Đuôi Bong Bóng', o: 'vet', bac: 1, gia: 20, hinh: 'bot-khi', ta: 'Mỗi bước chân thả lại một chuỗi bong bóng nhỏ dần.', bm: 'Bọt trong nước ngọt có ga là khí carbon dioxide thoát ra.' },
+    { ma: 'KT-03', ten: 'Khung Ô Nguyên Tố', o: 'khung', bac: 1, gia: 50, hinh: 'o-nguyen-to', ta: 'Tên thần thú nằm trong một ô của bảng tuần hoàn.', bm: 'Bảng tuần hoàn có 118 nguyên tố, mỗi ô một nguyên tố.' },
+    { ma: 'VD-04', ten: 'Đuôi Lửa Tím', o: 'vet', bac: 2, gia: 120, hinh: 'potassium', ta: 'Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.', bm: 'Đốt muối potassium, ngọn lửa chuyển sang màu tím.' },
+    { ma: 'HQ-03', ten: 'Vòng Lửa Vàng', o: 'hao-quang', bac: 2, gia: 150, hinh: 'sodium', ta: 'Quầng sáng vàng ấm với năm lưỡi lửa nhỏ lay nhẹ.', bm: 'Đốt muối sodium, ngọn lửa chuyển sang màu vàng.' },
+    { ma: 'HQ-05', ten: 'Vòng Sáng Neon', o: 'hao-quang', bac: 3, gia: 600, hinh: 'neon', ta: 'Vòng đèn đỏ cam quanh thần thú, sáng lên rồi dịu xuống.', bm: 'Khí neon phát sáng đỏ cam khi có dòng điện chạy qua.' },
+    { ma: 'KT-07', ten: 'Khung Đổi Màu', o: 'khung', bac: 4, gia: 1800, hinh: 'titanium', ta: 'Khung kim loại đổi màu lam, tím, vàng theo góc nhìn.', bm: 'Lớp oxide mỏng trên titanium làm ánh sáng giao thoa, tạo nhiều màu.' },
+    { ma: 'HQ-07', ten: 'Dải Cực Quang', o: 'hao-quang', bac: 4, gia: 2400, hinh: 'cuc-quang', dk: { chuoi: 7 }, ta: 'Dải sáng lục tím uốn lượn sau lưng thần thú.', bm: 'Màu lục của cực quang do nguyên tử oxygen trên cao phát ra.' },
+    { ma: 'KT-08', ten: 'Khung Vàng 999', o: 'khung', bac: 5, gia: 6000, hinh: 'gold', dk: { chuoi: 14 }, suat: { con: 12, tong: 30 }, ta: 'Khung vàng chạm nổi, ánh sáng chạy chậm qua tên thần thú.', bm: 'Vàng 999 chứa 99,9 % gold, để lâu không gỉ.' },
+    { ma: 'VD-08', ten: 'Đuôi Tia Sét', o: 'vet', bac: 5, gia: 7500, hinh: 'electron', dk: { chuoi: 21 }, suat: { con: 25, tong: 25 }, ta: 'Tia sét lam vàng chạy dọc đường thần thú đi qua.', bm: 'Dòng điện trong dây kim loại là dòng electron chuyển động có hướng.' },
+    { ma: 'HQ-08', ten: 'Vòng Nguyên Tử Vàng', o: 'hao-quang', bac: 5, gia: 9000, hinh: 'orbital', dk: { chuoi: 14, an: 5 }, suat: { con: 20, tong: 20 }, ta: 'Ba vòng vàng kim xoay chậm quanh thần thú.', bm: 'Electron chuyển động rất nhanh quanh hạt nhân, tạo thành đám mây electron.' }
   ]
   // Trạng thái MÔ PHỎNG — ở app thật mọi số đều do máy chủ trả, máy em không tự tính.
   var em = { vang: 340, ong: 620, chuoi: 9, an: 3, soHuu: { 'VD-01': 1, 'KT-03': 1 }, dangMac: { khung: 'KT-03' }, dangThu: { 'hao-quang': 'HQ-05', vet: 'VD-04', khung: 'KT-08' }, tieuDiem: 'VD-04', loc: 'tat-ca', choXn: false }
@@ -384,6 +391,29 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
     if (m.dk.chuoi && em.chuoi < m.dk.chuoi) thieu.push('chuỗi ' + m.dk.chuoi + ' ngày (em đang chuỗi ' + em.chuoi + ' ngày)')
     if (m.dk.an && em.an < m.dk.an) thieu.push(m.dk.an + ' ấn thạch sáng (em đang có ' + em.an + ' ấn thạch)')
     return thieu.length ? 'Cần ' + thieu.join(' và ') : ''
+  }
+  function khoaNgan(m) { // trạng thái ngắn theo bảng từ chuẩn: "Cần chuỗi 14 ngày"
+    var t = []
+    if (m.dk.chuoi && em.chuoi < m.dk.chuoi) t.push('chuỗi ' + m.dk.chuoi + ' ngày')
+    if (m.dk.an && em.an < m.dk.an) t.push(m.dk.an + ' ấn thạch sáng')
+    return 'Cần ' + t.join(' + ')
+  }
+  function duongMoKhoa(m) { // lời chỉ đường khi còn khoá — nói đúng số còn thiếu
+    var t = []
+    if (m.dk.chuoi && em.chuoi < m.dk.chuoi) t.push('Giữ chuỗi thêm ' + (m.dk.chuoi - em.chuoi) + ' ngày nữa là mở.')
+    if (m.dk.an && em.an < m.dk.an) t.push('Kiếm thêm ' + (m.dk.an - em.an) + ' ấn thạch sáng ở Đoàn Hộ Tống là mở.')
+    if (t.length === 2) return 'Giữ chuỗi thêm ' + (m.dk.chuoi - em.chuoi) + ' ngày. Kiếm thêm ' + (m.dk.an - em.an) + ' ấn thạch sáng ở Đoàn Hộ Tống.'
+    return t.join(' ')
+  }
+  function duongToiVang(thieu) { // lời chỉ đường khi thiếu vàng — ước lượng, luôn có chữ "khoảng"
+    var doiDuoc = Math.max(0, em.ong - 200)
+    if (doiDuoc >= thieu) return 'Em có đủ EXP thừa. Đổi vàng là mua được.'
+    return 'Học đều khoảng ' + Math.ceil((thieu - doiDuoc) / DU_MOI_NGAY) + ' ngày nữa là đủ vàng.'
+  }
+  function soLuong(m, dai) { // "Chỉ còn N cái" — chưa ai mua thì nói thật "Mùa 1 chỉ có N cái"
+    if (m.suat.con <= 0) return 'Đã hết'
+    if (m.suat.con === m.suat.tong) return 'Mùa 1 chỉ có ' + m.suat.tong + ' cái'
+    return 'Chỉ còn ' + m.suat.con + ' cái' + (dai ? ' · mùa 1 có ' + m.suat.tong + ' cái' : '')
   }
 
   /* ── hình phụ kiện: SVG lớp phủ, dùng chung cho thẻ và sân khấu ── */
@@ -431,22 +461,22 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
 
   /* ── màn 1 ── */
   function veLoc() {
-    var ds = [['tat-ca', 'Tất cả'], ['hao-quang', 'Hào quang'], ['vet', 'Vệt di chuyển'], ['khung', 'Khung tên'], ['dau', 'Đầu', 1], ['co-lung', 'Cổ, lưng', 1]]
+    var ds = [['tat-ca', 'Tất cả'], ['hao-quang', 'Vòng sáng'], ['vet', 'Đuôi sáng'], ['khung', 'Khung tên'], ['dau', 'Trên đầu', 1], ['co-lung', 'Trên lưng', 1]]
     $('loc').innerHTML = ds.map(function (d) { return '<button type="button" data-loc="' + d[0] + '" aria-pressed="' + (em.loc === d[0]) + '"' + (d[2] ? ' disabled' : '') + '>' + d[1] + (d[2] ? ' <em>Sắp mở</em>' : '') + '</button>' }).join('')
   }
   function veLuoi() {
     var ds = MON.filter(function (m) { return em.loc === 'tat-ca' || m.o === em.loc })
     $('luoi').innerHTML = ds.map(function (m) {
       var dangThu = em.dangThu[m.o] === m.ma, co = em.soHuu[m.ma], mac = em.dangMac[m.o] === m.ma, k = khoa(m), phu = ''
-      if (co) phu = '<span class="the-phu co">' + bt('tich', 14) + '<span>' + (mac ? 'Đã có · đang mặc' : 'Đã có trong Tủ đồ') + '</span></span>'
+      if (co) phu = '<span class="the-phu co">' + bt('tich', 14) + '<span>' + (mac ? 'Đang mặc' : 'Đã có') + '</span></span>'
       else if (k) phu = '<span class="the-phu">' + bt('khoa', 14) + '<span>' + k + '</span></span>'
-      if (!co && m.suat) phu += '<span class="the-phu so"><span>Còn ' + m.suat.con + ' trong ' + m.suat.tong + ' suất của mùa 1</span></span>'
+      if (!co && m.suat) phu += '<span class="the-phu so"><span>' + soLuong(m) + '</span></span>'
       return '<button type="button" class="the bac-' + m.bac + '" data-ma="' + m.ma + '" aria-pressed="' + dangThu + '" aria-label="Thử ' + m.ten + ', bậc ' + BAC[m.bac] + ', giá ' + so(m.gia) + ' vàng">' +
         '<span class="the-tranh">' + tranhThe(m) + '</span>' + (dangThu ? '<span class="the-dang-thu">Đang thử</span>' : '') +
-        '<span class="the-bac">' + BAC[m.bac] + '</span><span class="the-ten">' + m.ten + '</span><span class="the-o">Ô gắn: ' + O[m.o] + '</span>' +
+        '<span class="the-bac">' + BAC[m.bac] + '</span><span class="the-ten">' + m.ten + '</span><span class="the-o">Chỗ đeo: ' + O[m.o] + '</span>' +
         '<span class="the-gia so">' + vang(20) + '<span>Giá <b>' + so(m.gia) + '</b> vàng</span></span>' + phu + '</button>'
     }).join('')
-    $('dem-mon').textContent = 'Đang hiện ' + ds.length + ' phụ kiện mẫu — đợt 1 có 24 phụ kiện ở ba ô: hào quang, vệt di chuyển, khung tên.'
+    $('dem-mon').textContent = 'Đang hiện ' + ds.length + ' phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.'
   }
   function veDoi() {
     var max = Math.max(0, em.ong - 200), t = $('truot')
@@ -485,17 +515,17 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
     if (ngay) { $('lop-hq').innerHTML = a; $('lop-vet').innerHTML = b; $('lop-ten').innerHTML = c; $('lop-hq').dataset.html = a; $('lop-vet').dataset.html = b; $('lop-ten').dataset.html = c }
     else { doiLop($('lop-hq'), a); doiLop($('lop-vet'), b); doiLop($('lop-ten'), c) }
     var n = Object.keys(em.dangThu).length
-    $('nhan-dang-thu').textContent = n ? 'Đang thử ' + n + ' phụ kiện' : 'Đồ em đang mặc'
+    $('nhan-dang-thu').textContent = n ? 'Đang thử ' + n + ' phụ kiện' : 'Đồ thần thú đang mặc'
   }
   function trangThai(m) {
-    if (em.soHuu[m.ma]) return { lop: 'du', chu: em.dangMac[m.o] === m.ma ? 'Đã có · đang mặc' : 'Đã có' }
-    var k = khoa(m); if (k) return { lop: 'khoa', chu: 'Chưa mở điều kiện học' }
+    if (em.soHuu[m.ma]) return { lop: 'du', chu: em.dangMac[m.o] === m.ma ? 'Đang mặc' : 'Đã có' }
+    var k = khoa(m); if (k) return { lop: 'khoa', chu: khoaNgan(m) }
     if (em.vang < m.gia) return { lop: 'thieu', chu: 'Chưa đủ vàng — còn thiếu ' + so(m.gia - em.vang) + ' vàng' }
-    return { lop: 'du', chu: 'Đủ vàng để mua' }
+    return { lop: 'du', chu: 'Đủ vàng rồi' }
   }
   function veDangThu() {
     var ma = Object.keys(em.dangThu).map(function (o) { return em.dangThu[o] })
-    if (!ma.length) { $('thu-ds').innerHTML = '<p class="ghi-chu" style="padding:8px 10px 12px">Em chưa thử món nào. Chạm một phụ kiện ở Cửa hàng để thử lên thần thú.</p>'; return }
+    if (!ma.length) { $('thu-ds').innerHTML = '<p class="ghi-chu" style="padding:8px 10px 12px">Em chưa thử món nào. Chạm một phụ kiện ở Cửa hàng, thần thú mặc thử liền.</p>'; return }
     $('thu-ds').innerHTML = ma.map(function (x) { var m = mon(x), tt = trangThai(m)
       return '<button type="button" class="thu-hang bac-' + m.bac + '" data-tieu-diem="' + m.ma + '" aria-pressed="' + (em.tieuDiem === m.ma) + '"><span class="thu-ngoc" aria-hidden="true"></span><span class="thu-chu"><b>' + m.ten + '</b><span><span class="bac-chu">' + BAC[m.bac] + '</span> · ' + O[m.o] + ' · <span class="so">giá ' + so(m.gia) + ' vàng</span></span></span><span class="thu-tt ' + tt.lop + '">' + tt.chu + '</span></button>' }).join('')
   }
@@ -503,25 +533,32 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
     var m = mon(em.tieuDiem), el = $('chi-tiet')
     if (!m) { el.hidden = true; return }
     el.hidden = false; el.className = 'kinh chi-tiet bac-' + m.bac
-    var h = '<span class="the-bac">' + BAC[m.bac] + ' · ' + O[m.o] + '</span><h3>' + m.ten + '</h3><p>' + m.ta + '</p>' +
+    var h = '<span class="the-bac">' + BAC[m.bac] + ' · ' + O[m.o] + '</span><h3>' + m.ten + '</h3><p>' + m.ta + '</p><div class="bat-mi"><b>Bật mí Hoá học</b>' + m.bm + '</div>' +
       '<div class="ct-dong"><span>Giá</span><span class="gia so">' + vang(24) + so(m.gia) + ' <small>vàng</small></span></div>' +
       '<div class="ct-dong"><span>Vàng của em</span><b class="so">' + so(em.vang) + ' vàng</b></div>'
-    if (m.dk) h += '<div class="ct-dong"><span>Điều kiện học</span><b>' + (m.dk.chuoi ? 'Chuỗi ' + m.dk.chuoi + ' ngày' : '') + (m.dk.an ? ' + ' + m.dk.an + ' ấn thạch sáng' : '') + '</b></div>'
-    if (m.suat) h += '<div class="ct-dong"><span>Số lượng mùa 1</span><b class="so">Còn ' + m.suat.con + ' trong ' + m.suat.tong + ' suất</b></div>'
+    if (m.dk) h += '<div class="ct-dong"><span>Cần có</span><b>' + (m.dk.chuoi ? 'Chuỗi ' + m.dk.chuoi + ' ngày' : '') + (m.dk.an ? ' + ' + m.dk.an + ' ấn thạch sáng' : '') + '</b></div>'
+    if (m.suat) h += '<div class="ct-dong"><span>Số lượng</span><b class="so">' + soLuong(m, true) + '</b></div>'
     var k = khoa(m), co = em.soHuu[m.ma]
     if (co) {
-      h += em.dangMac[m.o] === m.ma ? '<div class="nut-khoa">' + bt('tich', 18) + 'Thần thú đang mặc món này</div>' : '<button type="button" class="nut-vang" data-viec="mac"><span>Mặc món này</span></button>'
+      h += em.dangMac[m.o] === m.ma ? '<div class="nut-khoa">' + bt('tich', 18) + 'Thần thú đang mặc món này</div>' : '<button type="button" class="nut-vang" data-viec="mac"><span>Mặc ngay</span></button>'
     } else if (k) {
-      h += '<div class="nut-khoa">' + bt('khoa', 18) + '<span>Chưa mua được — ' + k.charAt(0).toLowerCase() + k.slice(1) + '</span></div>'
+      h += '<div class="nut-khoa">' + bt('khoa', 18) + '<span>Chưa mua được — ' + k.charAt(0).toLowerCase() + k.slice(1) + '</span></div><p class="ghi-chu" style="text-align:center">' + duongMoKhoa(m) + '</p>'
     } else if (em.vang < m.gia) {
-      h += '<div class="bao-thieu">' + bt('canh-bao', 20) + '<div class="so">Chưa đủ vàng — còn thiếu ' + so(m.gia - em.vang) + ' vàng<span>Em có thể đổi EXP thừa trong ống nghiệm lấy vàng, hoặc học thêm vài ngày.</span></div></div><button type="button" class="nut-mo" data-viec="toi-doi">' + vang(20) + 'Đổi EXP thừa lấy vàng</button>'
+      h += '<div class="bao-thieu">' + bt('canh-bao', 20) + '<div class="so">Chưa đủ vàng — còn thiếu ' + so(m.gia - em.vang) + ' vàng<span>' + duongToiVang(m.gia - em.vang) + '</span></div></div><button type="button" class="nut-mo" data-viec="toi-doi">' + vang(20) + 'Đổi vàng</button>'
     } else if (em.choXn) {
-      h += '<div class="hop-xn so">Em trả <b>' + so(m.gia) + ' vàng</b>, còn lại <b>' + so(em.vang - m.gia) + ' vàng</b>. Mua rồi không trả lại, không bán lại được.</div><div class="hai-nut"><button type="button" class="nut-mo" data-viec="de-sau">Để sau</button><button type="button" class="nut-vang" data-viec="mua-that"><span class="so">Mua · ' + so(m.gia) + ' vàng</span></button></div>'
+      h += '<div class="hop-xn so">Em trả <b>' + so(m.gia) + ' vàng</b>, còn lại <b>' + so(em.vang - m.gia) + ' vàng</b>. Mua rồi giữ mãi, không trả lại hay bán lại được.</div><div class="hai-nut"><button type="button" class="nut-mo" data-viec="de-sau">Để sau</button><button type="button" class="nut-vang" data-viec="mua-that"><span class="so">Mua · ' + so(m.gia) + ' vàng</span></button></div>'
     } else {
       h += '<button type="button" class="nut-vang" data-viec="mua">' + vang(24) + '<span class="so">Mua · ' + so(m.gia) + ' vàng</span></button>'
     }
     h += '<button type="button" class="nut-mo" data-viec="bo-thu">Bỏ thử món này</button>'
     el.innerHTML = h
+  }
+  function monKe() { // một câu chỉ món kế sau khi mua: nói thật, không ép
+    var ds = MON.filter(function (x) { return !em.soHuu[x.ma] && !khoa(x) }).sort(function (p, q) { return p.gia - q.gia })
+    if (!ds.length) return ''
+    var vua = ds.filter(function (x) { return x.gia <= em.vang })
+    if (vua.length) { var t = vua[vua.length - 1]; return ' Em vẫn đủ vàng cho ' + t.ten + ', giá ' + so(t.gia) + ' vàng.' }
+    return ' Món kế: ' + ds[0].ten + '. ' + duongToiVang(ds[0].gia - em.vang)
   }
   function veHet(ngay) { veLuoi(); veSan(ngay); veDangThu(); veChiTiet() }
 
@@ -536,20 +573,20 @@ svg{display:inline-block;vertical-align:middle;flex-shrink:0}
     if (v === 'mua') { em.choXn = true; veChiTiet() }
     else if (v === 'de-sau') { em.choXn = false; veChiTiet() }
     else if (v === 'mua-that') { var cu = em.vang; em.vang -= m.gia; em.soHuu[m.ma] = 1; em.dangMac[m.o] = m.ma; delete em.dangThu[m.o]; em.dangThu[m.o] = m.ma; em.choXn = false; chaySo(cu, em.vang); if (navigator.vibrate && !giamChuyenDong) navigator.vibrate(18)
-      $('bao-xong').textContent = 'Đã mua ' + m.ten + ' — vàng của em còn ' + so(em.vang) + ' vàng.'; veHet() }
-    else if (v === 'mac') { em.dangMac[m.o] = m.ma; veHet() }
+      $('bao-xong').textContent = 'Hợp quá! ' + m.ten + ' đã là của em. Em còn ' + so(em.vang) + ' vàng.' + monKe(); veHet() }
+    else if (v === 'mac') { em.dangMac[m.o] = m.ma; $('bao-xong').textContent = 'Đã mặc ' + m.ten + '.'; veHet() }
     else if (v === 'bo-thu') { delete em.dangThu[m.o]; var con = Object.keys(em.dangThu); em.tieuDiem = con.length ? em.dangThu[con[0]] : ''; em.choXn = false; veHet() }
     else if (v === 'toi-doi') { $('khoi-doi').scrollIntoView({ behavior: giamChuyenDong ? 'auto' : 'smooth', block: 'center' }); $('truot').focus({ preventScroll: true }) } })
-  $('truot').addEventListener('input', function () { $('xn-doi').hidden = true; khungNutDoi(false); veDoi() })
+  $('truot').addEventListener('input', function () { $('xn-doi').hidden = true; $('bao-doi').hidden = true; khungNutDoi(false); veDoi() })
   function khungNutDoi(xn) {
     var x = +$('truot').value
     $('nut-doi-khung').innerHTML = xn ? '<button type="button" class="nut-mo" id="nut-doi-sau">Để sau</button><button type="button" class="nut-vang" id="nut-doi-that"><span class="so">Đổi ' + so(x) + ' EXP</span></button>' : '<button class="nut-vang" id="nut-doi" type="button"><span></span></button>'
     if (!xn) veDoi()
   }
   $('khoi-doi').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; var x = +$('truot').value
-    if (b.id === 'nut-doi' && x > 0) { $('xn-doi').hidden = false; $('xn-doi').innerHTML = 'Thần thú mất <b class="so">' + so(x) + ' EXP</b> dự trữ, em nhận <b class="so">' + so(x) + ' vàng</b>. Dự trữ còn <b class="so">' + Math.floor((em.ong - x) / 200) + ' ngày ăn</b>. Không đổi ngược lại được.'; khungNutDoi(true) }
+    if (b.id === 'nut-doi' && x > 0) { $('xn-doi').hidden = false; $('bao-doi').hidden = true; $('xn-doi').innerHTML = 'Thần thú bớt <b class="so">' + so(x) + ' EXP</b> dự trữ, vẫn đủ <b class="so">' + Math.floor((em.ong - x) / 200) + ' ngày ăn</b>. Em nhận <b class="so">' + so(x) + ' vàng</b>, đổi rồi không đổi ngược lại được.'; khungNutDoi(true) }
     else if (b.id === 'nut-doi-sau') { $('xn-doi').hidden = true; khungNutDoi(false) }
-    else if (b.id === 'nut-doi-that') { var cu = em.vang; em.vang += x; em.ong -= x; $('xn-doi').hidden = true; $('truot').value = 0; khungNutDoi(false); chaySo(cu, em.vang); veHet() } })
+    else if (b.id === 'nut-doi-that') { var cu = em.vang; em.vang += x; em.ong -= x; $('xn-doi').hidden = true; $('truot').value = 0; khungNutDoi(false); chaySo(cu, em.vang); $('bao-doi').hidden = false; $('bao-doi').textContent = 'Đã đổi xong. Em có ' + so(em.vang) + ' vàng, thần thú vẫn đủ ' + Math.floor(em.ong / 200) + ' ngày ăn.'; veHet() } })
 
   /* ── Sáng / Tối ── */
   function datGiaoDien(g) { document.documentElement.setAttribute('data-giao-dien', g); $('chu-giao-dien').textContent = 'Giao diện: ' + (g === 'sang' ? 'Sáng' : 'Tối'); $('bt-giao-dien').setAttribute('href', g === 'sang' ? '#bt-mat-troi' : '#bt-trang') }
