@@ -1328,41 +1328,6 @@ export async function sendStudentMessage(scriptUrl: string, sbd: string, hoTenHi
   if (!result.ok) throw new Error(result.error || 'Gửi tin nhắn thất bại')
 }
 
-export interface ParentMessage {
-  id: string
-  sdt: string
-  hoTenPhuHuynh: string
-  sbd: string
-  lop: string
-  hoTenHocSinh: string
-  noiDung: string
-  thoiGian: string
-  daDoc: boolean
-  nguoiGui: 'phuhuynh' | 'hocsinh'
-}
-
-export async function listParentMessages(scriptUrl: string, secret: string): Promise<ParentMessage[]> {
-  const data = await postJson(scriptUrl, { action: 'listMessages', secret })
-  return data.items || []
-}
-
-/** ĐẾM TIN CHƯA ĐỌC — dùng cho vòng hỏi lại của bong bóng nổi.
- *
- * Lấy `listParentMessages` để đếm là kéo cả hộp thư (mọi cột, mọi nội dung tin)
- * về chỉ để lấy một con số, cứ vài chục giây một lần, suốt ngày. Lệnh này đọc
- * đúng một cột trên máy chủ và trả về hai con số. */
-export async function demTinMoi(scriptUrl: string, secret: string): Promise<{ soChuaDoc: number; tong: number }> {
-  const r = await postJson(scriptUrl, { action: 'demTinMoi', secret })
-  if (!r.ok) throw new Error(r.error || 'Không đếm được tin')
-  return { soChuaDoc: Number(r.soChuaDoc) || 0, tong: Number(r.tong) || 0 }
-}
-
-export async function markMessagesRead(scriptUrl: string, ids: string[]): Promise<void> {
-  if (ids.length === 0) return
-  const result = await postJson(scriptUrl, { action: 'markMessagesRead', ids })
-  if (!result.ok) throw new Error(result.error || 'Đánh dấu đã đọc thất bại')
-}
-
 // ============================================================================
 // TIN NHẮN THẦY → PHỤ HUYNH/HỌC SINH (chiều ngược lại) — thầy chọn đúng 1 em
 // theo SBD (không suy đoán/khớp mờ tên) rồi gửi, phụ huynh/học sinh của em đó
