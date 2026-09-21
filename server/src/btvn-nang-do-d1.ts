@@ -477,15 +477,17 @@ export async function phanHoiMoBaiCaNhan(env: Env, bt: Hang, em: Hang, sbd: stri
   let chang: string[][]
   let nhan: Record<string, NhanCau>
   let tomTat: TomTatBo | null
+  let lich: LichDaLuu | null
   if (!chotLuc) {
     const c = await chotBoChoEm(env, bt, sbd, now)
     if (!c) return { ok: false, lyDo: 'bai_chua_san_sang', error: 'Bài này chưa sẵn sàng. Em thử lại sau ít phút.' }
-    ;({ chotLuc, chang, nhan, tomTat } = c)
+    ;({ chotLuc, chang, nhan, tomTat, lich } = c)
   } else {
     const da = await docBoDaChot(env, maBtvn, sbd)
     if (!da) return { ok: false, lyDo: 'bai_chua_san_sang', error: 'Bài này chưa sẵn sàng. Em thử lại sau ít phút.' }
     ;({ chang, nhan } = da)
     tomTat = docTomTat(em.tom_tat_json)
+    lich = docLichDaLuu(em.chang_mo_json, chang.length) // bài chốt trước bản 1.1 ⇒ null ⇒ `moLucChang` cũ
   }
   let tho: Hang[]
   try {
@@ -495,7 +497,7 @@ export async function phanHoiMoBaiCaNhan(env: Env, bt: Hang, em: Hang, sbd: stri
   }
   const daNop = !!em.nop_luc
   const loDaXong = Math.min(chang.length, soHoac(em.lo_da_xong))
-  const tt = trangThaiCacChang(chang, chotLuc, loDaXong, daNop, now)
+  const tt = trangThaiCacChang(chang, chotLuc, loDaXong, daNop, now, lich)
   const theoQid = new Map(tho.map((c) => [chuoi(c.qid), c]))
   const dsQidMo = chang.flatMap((qs, k) => (tt.chang[k].daMo ? qs : []))
   const nhanMo: Record<string, NhanCau> = {}
@@ -508,6 +510,8 @@ export async function phanHoiMoBaiCaNhan(env: Env, bt: Hang, em: Hang, sbd: stri
     soChang: chang.length,
     loDaXong,
     changDangMo: tt.changDangMo,
+    /** Bản 1.1: `true` = hạn ngắn, chặng chia THEO GIỜ trong cửa sổ học (mỗi chặng có `moLuc`, `dungNhipTruoc`). */
+    theoGio: lich?.cheDo === 'ngan',
     chang: tt.chang,
     nhan: nhanMo,
     tomTat,
@@ -574,7 +578,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
   const chotLuc = chuoi(em.chot_luc)
   const loDaXong = Math.min(soChang, soHoac(em.lo_da_xong))
   if (chiSo < 0 || chiSo >= soChang) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
-  const moLuc = moLucChang(chotLuc, soChang)
+  const moLuc = docLichDaLuu(em.chang_mo_json, soChang)?.moLuc ?? moLucChang(chotLuc, soChang)
   if (!(chiSo === 0 || (chiSo <= loDaXong && now >= Date.parse(moLuc[chiSo])))) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
   if (em.nop_luc && chiSo >= loDaXong) return { ok: false, lyDo: 'da_nop', error: 'Em đã nộp bài này rồi.' }
 
@@ -786,7 +790,7 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
     hatGiong = hatGiongCuaBai(bt)
     hanMs = Date.parse(chuoi(bt.han_nop))
     const r = await env.DB.prepare(
-      'SELECT sbd, ho_ten, chot_luc, so_cau_em, so_chang, tom_tat_json, ngan_sach_json FROM btvn_em WHERE ma_btvn = ? AND thu_hoi = 0 AND sbd IN (SELECT value FROM json_each(?))',
+      'SELECT sbd, ho_ten, chot_luc, so_cau_em, so_chang, tom_tat_json, ngan_sach_json, chang_mo_json FROM btvn_em WHERE ma_btvn = ? AND thu_hoi = 0 AND sbd IN (SELECT value FROM json_each(?))',
     ).bind(maBtvn, json(dsSbd)).all<Hang>()
     for (const x of r.results ?? []) daChotCua.set(chuoi(x.sbd), x)
     coTrongBai = new Set(daChotCua.keys())
@@ -811,6 +815,12 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
   ])
   const ds: Hang[] = []
   let chiTiet: Hang | undefined
+  let scMin: SucChua | null = null // em CHẶT nhất (sức chứa nhỏ nhất) để cảnh báo hạn ngắn
+  const hanIso = Number.isFinite(hanMs) ? new Date(hanMs).toISOString() : ''
+  const lichCho = (lich: LichDaLuu | null, chang: string[][], chotLuc: string) => {
+    const moLuc = lich?.moLuc ?? moLucChang(chotLuc, chang.length)
+    return { lich: chang.map((qs, k) => ({ chiSo: k, moLuc: moLuc[k]!, soCau: qs.length })), theoGio: lich?.cheDo === 'ngan' }
+  }
   for (const sbd of dsXet) {
     const da = daChotCua.get(sbd)
     const daChot = !!da?.chot_luc
@@ -819,12 +829,17 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
       ds.push({ sbd, hoTen: chuoi(da!.ho_ten), daChot: true, coHoSo: hs.coHoSo, nganSach: docJsonHang(da!.ngan_sach_json), tomTat: docTomTat(da!.tom_tat_json) })
       if (sbd === sbdChiTiet) {
         const bo = await docBoDaChot(env, maBtvn, sbd)
-        if (bo) chiTiet = { sbd, chang: bo.chang, nhan: bo.nhan }
+        if (bo) chiTiet = { sbd, chang: bo.chang, nhan: bo.nhan, ...lichCho(docLichDaLuu(da!.chang_mo_json, bo.chang.length), bo.chang, chuoi(da!.chot_luc)) }
       }
     } else {
-      const { bo, nganSach } = dungBoChoEm(bai, hatGiong, sbd, now, hanMs, dv.get(sbd)!, hs, dcAll.get(sbd)?.dieuChinh)
+      const { bo, nganSach, goc, giay, sc } = dungBoChoEm(bai, hatGiong, sbd, now, hanMs, dv.get(sbd)!, hs, dcAll.get(sbd)?.dieuChinh)
       ds.push({ sbd, hoTen: chuoi(da?.ho_ten) || ten.get(sbd) || '', daChot: false, coHoSo: hs.coHoSo, nganSach, tomTat: bo.tomTat })
-      if (sbd === sbdChiTiet) chiTiet = { sbd, chang: bo.chang, nhan: bo.nhan }
+      if (!scMin || sc.soCauToiDa < scMin.soCauToiDa) scMin = sc
+      if (sbd === sbdChiTiet) {
+        // Lịch TÍNH THỬ bằng cùng hàm/hạt giống lúc chốt (giờ mở thật tính từ lúc em mở bài, nên có thể lệch nếu em mở muộn).
+        const xep = hanIso ? xepLichChoBo(new Date(now).toISOString(), hanIso, bo.chang, goc, giay) : null
+        chiTiet = { sbd, chang: bo.chang, nhan: bo.nhan, ...lichCho(xep?.lich ?? null, bo.chang, new Date(now).toISOString()) }
+      }
     }
   }
   return {
@@ -838,6 +853,11 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
     ...(coTrongBai ? { khongCoTrongBai: dsSbd.filter((s) => !coTrongBai!.has(s)) } : {}),
     ...(canhBao ? { canhBao } : {}),
     ...(doiChieu ?? {}),
+    // Bản 1.1: hạn NGẮN mà lõi vượt sức chứa lành mạnh ⇒ vẫn giao đủ lõi, cảnh báo thầy cân nhắc lùi hạn (số của em chặt nhất).
+    ...(() => {
+      const chu = scMin ? canhBaoHanNgan(bai.loi.length, scMin) : null
+      return chu && scMin ? { canhBaoHanNgan: { soCauLoiToiThieu: bai.loi.length, soPhien: scMin.soPhien, chu } } : {}
+    })(),
   }
 }
 
@@ -1053,7 +1073,7 @@ export async function thichNghiSauChang(env: Env, bt: Hang, em: Hang, sbd: strin
     nhan: da.nhan,
     tomTat,
   }
-  const soChangDaMo = trangThaiCacChang(da.chang, chuoi(em.chot_luc), loDaXongMoi, false, now).chang.filter((c) => c.daMo).length
+  const soChangDaMo = trangThaiCacChang(da.chang, chuoi(em.chot_luc), loDaXongMoi, false, now, docLichDaLuu(em.chang_mo_json, da.chang.length)).chang.filter((c) => c.daMo).length
   const hoSo = (await docHoSoRut(env, [sbd], bai.cau, now)).get(sbd)!.hoSo
   const kq = thichNghiChangSau(bo, bai.cau, hoSo, chiSo, { dung }, { soChangDaMo, dieuChinh: dc.dieuChinh })
   if (kq.doi.length === 0) return 0

@@ -70,3 +70,12 @@ Mở bài lần đầu (chốt) ≤ 12 truy vấn D1 (đo 8); mở lại ≤ 6 (
 
 ## 9 · Đợt 2 (chữ ký giữ chỗ)
 `POST /btvn/lam-them {maBtvn, sbd}` mở sớm chặng kế (thưởng EXP, hằng số vào `exp-cau-hinh.ts`); sau mỗi chặng máy chủ chạy `thichNghiChangSau` cho chặng CHƯA MỞ; phản hồi `/btvn/xong-lo` thêm `theTienBo: TienBo` (chỉ số đếm).
+
+## 10 · BẢN 1.1 — LỊCH CHẶNG THEO GIỜ (thầy chốt 21/09; hàm thuần `src/lib/btvn-nang-do-lich.ts` của Code 1)
+- **Lịch tính MỘT lần lúc chốt** bằng `xepLichChang` và LƯU ở `btvn_em.chang_mo_json` = `{cheDo:'dai'|'ngan', chang:[{chiSo, moLuc, dungNhipTruoc}]}`. Bài đã chốt TRƯỚC bản này (cột NULL / hỏng / lệch số chặng) ⇒ lịch cũ `moLucChang` theo `chot_luc`, `theoGio:false`, không có `dungNhipTruoc`.
+- **Hạn dài** (> 48 giờ, tải vừa sức): Y HỆT lịch cũ, một chặng/ngày, chặng k mở 00:00 giờ VN ngày thứ k. **Hạn ngắn** (≤ 48 giờ hoặc tải/ngày > ngân sách × 1,3): chặng 0 mở NGAY lúc chốt, các chặng sau trong cửa sổ học 20:00–23:59 giờ VN (ví dụ 20:00 · 21:20 · 22:40), cách ≥ 40 phút, không mở 00:00–05:59, mọi mốc < hạn; thiếu giờ ⇒ bỏ giãn cách (deadline thắng). Chặng k vẫn chỉ mở khi chặng k−1 XONG và tới giờ ⇒ em vào muộn không phải chờ thêm.
+- **Sức chứa**: hạn dài = số NGÀY LỊCH VN từ ngày chốt tới ngày hạn (`soNgayToiHan`; ví dụ chốt 22/09 hạn 29/09 ⇒ 8, trước bản này là ceil(giờ/24) = 7) × ngân sách/ngày; hạn ngắn = số PHIÊN × câu/phiên (`sucChua`) đưa cho lõi qua `nganSach {soNgay: soPhien, cauMoiNgay: cauMoiPhien, onLaiMoiNgay: 0}`. Tổng bộ = min(số câu bài, sức chứa) nhưng ≥ lõi.
+- `/btvn/cua-em` (bài ca_nhan) thêm: root `theoGio: boolean`; `chang[].dungNhipTruoc` (ISO; "xong đúng nhịp" = 23:59 giờ VN của ngày mở chặng, không quá hạn; chỉ có khi bài có lịch lưu). `chang[].moLuc` giữ nguyên tên.
+- `/btvn/xem-truoc`: `chiTiet.lich: [{chiSo, moLuc, soCau}]` + `chiTiet.theoGio: boolean` (chế độ (a) tính thử theo giờ hiện tại; (b) em đã chốt = ĐÚNG lịch đã lưu); ở GỐC phản hồi khi lõi vượt sức chứa lành mạnh của hạn ngắn: `canhBaoHanNgan: {soCauLoiToiThieu, soPhien, chu}` (chu = "Hạn ngắn: mỗi em tối thiểu N câu lõi trong M phiên — cân nhắc lùi hạn"; số của em CHẶT nhất). Vẫn giao đủ lõi.
+- Kế hoạch ngày (`/hs/ke-hoach-ngay`): lô ≡ chặng dùng mốc mở ĐÃ LƯU (`btvn_lo.chiTiet`, `sapToi[].moLuc`); bài cũ dùng lịch cũ.
+

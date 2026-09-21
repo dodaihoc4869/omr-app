@@ -88,7 +88,7 @@ describe('/btvn/cho-lam-lai', () => {
     await giao(d)
     await mo(d)
     // Lùi giờ chốt để MỌI chặng đã tới giờ mở ⇒ cả bài làm xong trong MỘT ngày (một lượt gọi liên tiếp, cùng đồng hồ).
-    d.sql.prepare("UPDATE btvn_em SET chot_luc = '2026-09-10T03:00:00.000Z' WHERE sbd = 'S1'").run()
+    d.sql.prepare("UPDATE btvn_em SET chot_luc = '2026-09-10T03:00:00.000Z', chang_mo_json = NULL WHERE sbd = 'S1'").run() // chang_mo_json NULL = bài chốt TRƯỚC bản 1.1 ⇒ lịch cũ theo chot_luc
     await lamHet(d, (q) => DAP_AN_DUNG(q), BAY_GIO.getTime(), 0)
     expect(em(d).nop_luc).not.toBeNull()
     const truoc = d.sql.prepare("SELECT COUNT(*) AS n, COALESCE(SUM(exp),0) AS tong FROM exp_so WHERE sbd = 'S1'").get() as { n: number; tong: number }

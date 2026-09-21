@@ -16,7 +16,7 @@ import {
 import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
 import { qidPhucVuDuoc } from './cau-theo-qid'
 import { ngayVn } from './su-kien-hoc'
-import { moLucChang } from './btvn-nang-do-chang'
+import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
 import { docDieuChinhHieuLuc } from './bo-nao-doc'
 
 export const TOI_DA_EM_MOI_LO = 50
@@ -108,14 +108,14 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
        FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn
       WHERE be.sbd IN (SELECT value FROM json_each(?)) AND be.thu_hoi = 0 AND b.da_xoa = 0 AND be.nop_luc IS NULL AND b.han_nop > ?`
   // Ba cột BTVN "nâng đỡ" (migration-2109-btvn-nang-do.sql): chưa chạy migration thì lùi về truy vấn cũ, bài nào cũng là bài cũ.
-  let rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)', ', b.ca_nhan, be.so_cau_em, be.chot_luc')).bind(arr, cat14).all<Record<string, unknown>>(), null)
+  let rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)', ', b.ca_nhan, be.so_cau_em, be.chot_luc, be.chang_mo_json')).bind(arr, cat14).all<Record<string, unknown>>(), null)
   if (!rb) rb = await tat(() => env.DB.prepare(q('COALESCE(be.lo_da_xong, 0)')).bind(arr, cat14).all<Record<string, unknown>>(), null)
   if (!rb) rb = await tat(() => env.DB.prepare(q('0')).bind(arr, cat14).all<Record<string, unknown>>(), trong())
-  const baiChot = new Map<string, { chotLuc: string; sbd: string }>() // `<ma_btvn>|<sbd>` → bài cá nhân hoá ĐÃ chốt (cần kích cỡ từng chặng)
+  const baiChot = new Map<string, { chotLuc: string; sbd: string; lich: string | null }>() // `<ma_btvn>|<sbd>` → bài cá nhân hoá ĐÃ chốt (cần kích cỡ từng chặng)
   for (const x of rb.results ?? []) {
     const caNhan = Number(x.ca_nhan) === 1
     const chotLuc = caNhan && x.chot_luc ? String(x.chot_luc) : null
-    if (chotLuc) baiChot.set(`${x.ma_btvn}|${x.sbd}`, { chotLuc, sbd: String(x.sbd) })
+    if (chotLuc) baiChot.set(`${x.ma_btvn}|${x.sbd}`, { chotLuc, sbd: String(x.sbd), lich: x.chang_mo_json ? String(x.chang_mo_json) : null })
     cua(x)?.btvn.push({
       ma: String(x.ma_btvn), soCau: chotLuc ? Number(x.so_cau_em) || 0 : Number(x.so_cau) || 0, giaoLuc: String(x.giao_luc ?? ''), hanNop: String(x.han_nop ?? ''), loDaXong: Number(x.lo) || 0, daNop: false,
       ...(caNhan ? { caNhan: { chotLuc, cacChang: [] } } : {}),
@@ -137,7 +137,8 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
         const ban = baiChot.get(k)
         const kc = soCauChang.get(k)
         if (!b.caNhan || !ban || !kc) continue
-        const moLuc = moLucChang(ban.chotLuc, kc.length)
+        // Bản 1.1: lịch ĐÃ LƯU lúc chốt (chặng theo giờ khi hạn ngắn); bài chốt trước bản 1.1 ⇒ `moLucChang` cũ.
+        const moLuc = docLichDaLuu(ban.lich, kc.length)?.moLuc ?? moLucChang(ban.chotLuc, kc.length)
         b.caNhan = { chotLuc: ban.chotLuc, cacChang: kc.map((n, i) => ({ soCau: n, moLuc: moLuc[i]! })) }
       }
     }
