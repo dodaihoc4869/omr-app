@@ -2,12 +2,9 @@ tests/apps-script-vao-thi.test.ts
 tests/ba-loi-0609.test.tsx
 tests/btvn-ui-1609.test.tsx
 tests/btvn-va-khong-apps-script-1209.test.ts
-tests/chi-tiet-ca-va-mo-ca-len-may-chu-1109.test.ts
-tests/co-may-chu-toi-may-em-1109.test.ts
 tests/danh-dau-cau-hoi-lai.test.ts
 tests/dau-tru-phan-ba-1009.test.ts
 tests/dau-truong-chan-ly.test.ts
-tests/de-rieng-luc-bat-dau.test.ts
 tests/dong-bo-kho-sang-may-em-1409.test.ts
 tests/duyet-hang-loat.test.tsx
 tests/giao-btvn-tung-hoc-sinh-1309.test.ts
@@ -19,8 +16,6 @@ tests/khong-dung-bien-truoc-khi-khai.test.ts
 tests/luyen-dang-bai-1509.test.ts
 tests/luyen-khac-phuc.test.tsx
 tests/man-hoc-sinh-hoi.test.ts
-tests/mo-ca-khong-doi-sheet-1109.test.ts
-tests/mo-ca-tach-ma-de.test.tsx
 tests/nop-bai-khong-treo-1009.test.ts
 tests/nop-phieu-khac-phuc.test.ts
 tests/parent-news.test.ts
