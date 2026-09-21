@@ -44,6 +44,7 @@ import { mom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2 } from './game-v2'
+import { shopBatCho } from './game-v2-shop'
 import { gameToken, gameIdentity } from './game-v2-auth'
 import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } from './gian-lan-btvn'
 // MÁY CHỦ MỚI — bốn lệnh nóng lúc thi (MAY-CHU-MOI.md).
@@ -3146,6 +3147,8 @@ const boXuLy = {
           if ('expNhan' in kh) kh.expNhan = []
           if ('manhNhan' in kh) kh.manhNhan = []
         }
+        // `shopBat` trong khối `thanThu` (boolean): máy em hiện nút "Cửa hàng" hay không, không tốn lượt gọi nào (cờ đọc từ đệm 30 giây). Tạo khối MỚI: không ghi bẩn bản trong đệm kế hoạch.
+        if (kh.ok === true && kh.thanThu && typeof kh.thanThu === 'object') kh.thanThu = { ...(kh.thanThu as object), shopBat: await shopBatCho(env, sbdKhoa) }
         return themMocReset(env, ra(kh))
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))

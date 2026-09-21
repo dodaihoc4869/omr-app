@@ -18,7 +18,7 @@ describe('/hs/ke-hoach-ngay trả thêm thanThu (thần thú THẬT từ game_v2
     hoSo(d, 'S1', { pet: 'hoa_long', choice: false, cap: 7, nickname: 'Bé Lửa', exp: 3 })
     const r = await goi(d, 'S1')
     expect(r.ok).toBe(true)
-    expect(r.thanThu).toEqual({ pet: 'hoa_long', cap: 7, nickname: 'Bé Lửa' })
+    expect(r.thanThu).toEqual({ pet: 'hoa_long', cap: 7, nickname: 'Bé Lửa', shopBat: false }) // SỬA CÓ CHỦ Ý 21/09: khối thanThu mang thêm shopBat (cờ cửa hàng, mặc định false) cho nút Cửa hàng của máy em
   })
 
   it('em CHƯA chọn thần thú (choice=true, pet chỉ là dat_quy điền tạm) → null, không bịa', async () => {
@@ -60,9 +60,9 @@ describe('/hs/ke-hoach-ngay trả thêm thanThu (thần thú THẬT từ game_v2
     themHs(d, 'B3'); hoSo(d, 'B3', { pet: 'hoa_long', choice: false, cap: 2, nickname: ' Tí ' })
     themHs(d, 'B4'); hoSo(d, 'B4', { pet: { x: 1 }, choice: false, cap: 2 })
     themHs(d, 'B5'); hoSo(d, 'B5', { pet: '', choice: false, cap: 2 })
-    expect((await goi(d, 'B1')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: null })
-    expect((await goi(d, 'B2')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: null })
-    expect((await goi(d, 'B3')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: 'Tí' })
+    expect((await goi(d, 'B1')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: null, shopBat: false })
+    expect((await goi(d, 'B2')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: null, shopBat: false })
+    expect((await goi(d, 'B3')).thanThu).toEqual({ pet: 'hoa_long', cap: 2, nickname: 'Tí', shopBat: false })
     expect((await goi(d, 'B4')).thanThu).toBeNull()
     expect((await goi(d, 'B5')).thanThu).toBeNull()
   })
@@ -90,7 +90,7 @@ describe('/hs/ke-hoach-ngay trả thêm thanThu (thần thú THẬT từ game_v2
     expect(d.chup('ke_hoach_ngay')).not.toMatch(/thanThu|hoa_long|Bé Lửa/)
     // Đổi thần thú rồi gọi lại → thấy ngay (đọc tươi, không cache trong kế hoạch).
     d.sql.prepare("UPDATE game_v2_profile SET json = json_set(json, '$.pet', 'thuy_long', '$.cap', 9) WHERE sbd = 'S1'").run()
-    expect((await goi(d, 'S1')).thanThu).toEqual({ pet: 'thuy_long', cap: 9, nickname: 'Bé Lửa' })
+    expect((await goi(d, 'S1')).thanThu).toEqual({ pet: 'thuy_long', cap: 9, nickname: 'Bé Lửa', shopBat: false })
   })
 
   it('thêm đúng MỘT truy vấn', async () => {

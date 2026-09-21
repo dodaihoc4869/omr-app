@@ -24,7 +24,7 @@ import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
 import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDangLop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot} from './game-v2-luot'
 import {ghiKhoanExpGame} from './exp-d1'
-import {LENH_SHOP,shopAction} from './game-v2-shop'
+import {LENH_SHOP,shopAction,shopBatCho} from './game-v2-shop'
 import {expMotCau} from './exp-hoc-tap'
 export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
 type Row={revision:number;json:string}
@@ -173,7 +173,13 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
   if(!inserted.meta.changes)return startDoanKhoLop(env,sbd,p)
   return {ok:true,id,questions:chon.map(x=>({...publicQuestion(x.q),role:x.role})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(hetCauMoi?{hetCauMoi:true}:{})}
 }
+/** Bọc `gameV2Tho`: phản hồi `recommendations` (Đảo mở là gọi) mang thêm `shopBat` (boolean; cờ cửa hàng bật VÀ em thuộc chiSbd nếu có) để máy em biết có hiện nút "Cửa hàng" hay không mà KHÔNG thêm lượt gọi nào. Cờ đọc từ đệm 30 giây. */
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
+  const r=await gameV2Tho(env,action,b)
+  if(action==='recommendations'&&r&&r.ok===true)r.shopBat=await shopBatCho(env,await gameIdentity(env,b))
+  return r
+}
+async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
   const sbd=await gameIdentity(env,b)
   if(action==='sync')return {ok:true,...await syncIndex(env)}
   const {profile:p,revision}=await loadProfile(env,sbd)

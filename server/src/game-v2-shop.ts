@@ -10,6 +10,7 @@
 // Bấm lặp (cùng khoaYeuCau) ⇒ đọc sổ trước: đã có ⇒ trả kết quả cũ `lapLai:true`, không ghi thêm.
 import type { Env } from './kieu'
 import type { Profile } from './game-v2'
+import { DemTTL } from './dem-chung'
 import { DOT_MO_BAN, MUA_BAN, O_GAN, docMonPhuKien, monDangBan, type MonPhuKien, type OGanPhuKien } from '../../src/lib/phu-kien-danh-muc'
 import { docAnThach } from './game-v2-doan-an'
 import { docChuoiTruoc } from './exp-d1'
@@ -37,14 +38,27 @@ const thieuBang = (e: unknown): boolean => /no such table/i.test(e instanceof Er
 const nguyen = (v: unknown): number => Math.max(0, Math.floor(Number(v) || 0))
 const conNgayAn = (ongNghiem: number): number => Math.floor(ongNghiem / GIU_LAI_EXP)
 
-/** Cờ: `{"bat":true,"chiSbd":[…]?}`. Vắng / bat≠true / lỗi đọc ⇒ đóng. Có mảng `chiSbd` ⇒ chỉ các em trong mảng thấy cửa hàng mở (mảng rỗng ⇒ không ai). */
-async function moCua(env: Env, sbd: string): Promise<boolean> {
+/** Đọc giá trị cờ ra quyết định cho MỘT em: `{"bat":true,"chiSbd":[…]?}`. Vắng / bat≠true / hỏng ⇒ đóng. Có mảng `chiSbd` ⇒ chỉ các em trong mảng thấy cửa hàng mở (mảng rỗng ⇒ không ai). */
+function coMo(giaTri: string | null | undefined, sbd: string): boolean {
   try {
-    const r = await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'shop_phu_kien'").first<{ gia_tri: string }>()
-    if (!r?.gia_tri) return false
-    const c = JSON.parse(r.gia_tri) as { bat?: unknown; chiSbd?: unknown }
+    if (!giaTri) return false
+    const c = JSON.parse(giaTri) as { bat?: unknown; chiSbd?: unknown }
     if (c.bat !== true) return false
     return Array.isArray(c.chiSbd) ? c.chiSbd.map(String).includes(sbd) : true
+  } catch { return false }
+}
+/** Lệnh GHI tiền / đồ (vang-doi, shop-mua…) đọc cờ TƯƠI mỗi lượt (không đệm): tắt cờ là ngừng bán ngay. */
+async function moCua(env: Env, sbd: string): Promise<boolean> {
+  try { return coMo((await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'shop_phu_kien'").first<{ gia_tri: string }>())?.gia_tri, sbd) } catch { return false }
+}
+
+/** Cờ cho việc HIỆN cửa vào cửa hàng (không tốn lượt D1 mỗi phản hồi: đệm 30 giây mức mô-đun, chỉ đọc). Cờ bật/tắt hiện chậm nhất 30 giây ở nút cửa hàng; lệnh mua/đổi vẫn kiểm cờ tươi. */
+const demCo = new DemTTL<string | null>(30_000, 2)
+export async function shopBatCho(env: Env, sbd: string, nowMs: number = Date.now()): Promise<boolean> {
+  try {
+    let gt = demCo.doc('co', nowMs)
+    if (gt === undefined) { gt = (await env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'shop_phu_kien'").first<{ gia_tri: string }>())?.gia_tri ?? null; demCo.ghi('co', nowMs, gt) }
+    return coMo(gt, sbd)
   } catch { return false }
 }
 

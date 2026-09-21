@@ -3,10 +3,12 @@
 // Hợp đồng: docs/hop-dong-shop-phu-kien-2109.md. Mọi đối tượng ghi (ví, sổ, đồ) đều được đối chiếu THẲNG trong D1 giả (node:sqlite, lược đồ thật).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
+import { shopBatCho } from '../server/src/game-v2-shop'
+import worker from '../server/src/index'
 import { gameToken } from '../server/src/game-v2-auth'
 import { LUAT_CAP_MOI } from '../src/lib/hap-thu-ngay'
 import { DANH_MUC_PHU_KIEN } from '../src/lib/phu-kien-danh-muc'
-import { taoD1That, type D1That } from './_d1-that'
+import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
 const T0 = Date.parse('2026-09-22T12:00:00+07:00')
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) })
@@ -319,5 +321,34 @@ describe('thu-mac-do', () => {
     expect(await goi(d, 'S1', 'thu-mac-do', { oGan: 'tay', maMon: 'VD-04' })).toMatchObject({ ok: false, ma: 'sai_dau_vao' })
     expect(await goi(d, 'S1', 'thu-mac-do', { oGan: 'vet', maMon: 5 })).toMatchObject({ ok: false, ma: 'sai_dau_vao' })
     expect(await goi(d, 'S1', 'thu-mac-do', { oGan: 'vet', maMon: null })).toMatchObject({ ok: true, dangMac: { vet: null, khung: 'KT-03' } })
+  })
+})
+
+describe('shopBat — cửa vào cửa hàng không tốn lượt gọi thêm (Code 2, B4)', () => {
+  it('recommendations mang shopBat: vắng cờ / bat:false ⇒ false; bat:true ⇒ true; chiSbd chỉ em trong danh sách', async () => {
+    const chay = async (o: Parameters<typeof dung>[0], sbd = 'S1') => (await goi(dung(o), sbd, 'recommendations') as any).shopBat
+    expect(await chay({ khongCo: true })).toBe(false); expect(await chay({ co: { bat: false } })).toBe(false); expect(await chay({ co: { bat: true } })).toBe(true)
+    expect(await chay({ co: { bat: true, chiSbd: ['S1'] } }, 'S1')).toBe(true); expect(await chay({ co: { bat: true, chiSbd: ['S1'] } }, 'S2')).toBe(false); expect(await chay({ co: { bat: true, chiSbd: [] } })).toBe(false)
+  })
+  it('/hs/ke-hoach-ngay: khối thanThu mang shopBat (lượt thật VÀ lượt đệm), không có thanThu thì không thêm; không ghi bẩn đệm kế hoạch', async () => {
+    const d = dung({ co: { bat: true } })
+    const a = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' }); expect(a.thanThu).toMatchObject({ pet: 'lua_phuong', shopBat: true })
+    const b = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' }); expect(b.thanThu).toMatchObject({ shopBat: true })   // lượt đệm
+    d.sql.prepare("UPDATE cau_hinh SET gia_tri = ? WHERE khoa = 'shop_phu_kien'").run(JSON.stringify({ bat: false })); vi.setSystemTime(T0 + 31_000)
+    const c = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' }); expect(c.thanThu.shopBat).toBe(false)              // cờ tắt hiện sau đệm 30 s
+    const e = dung({ khongCo: true }); d.sql.exec('SELECT 1')
+    expect((await goiWorker(worker, e.env, '/hs/ke-hoach-ngay', { sbd: 'S1' })).thanThu.shopBat).toBe(false)
+  })
+  it('cờ đọc từ đệm 30 giây: hai lượt một truy vấn; sau 30 giây đọc lại; lệnh mua/đổi vẫn kiểm cờ TƯƠI (tắt là ngừng bán ngay)', async () => {
+    const d = dung({ co: { bat: true } }); cap(d, 'S1', 500)
+    let n = 0; const goc = d.env.DB.prepare.bind(d.env.DB)
+    d.env.DB.prepare = ((q: string) => { if (/FROM cau_hinh WHERE khoa = 'shop_phu_kien'/.test(q)) n++; return goc(q) }) as typeof d.env.DB.prepare
+    expect(await shopBatCho(d.env, 'S1')).toBe(true); expect(await shopBatCho(d.env, 'S2')).toBe(true); expect(n).toBe(1)
+    d.sql.prepare("UPDATE cau_hinh SET gia_tri = ? WHERE khoa = 'shop_phu_kien'").run(JSON.stringify({ bat: false }))
+    expect(await shopBatCho(d.env, 'S1')).toBe(true)                                            // còn đệm
+    expect(await goi(d, 'S1', 'shop-mua', { maMon: 'VD-04', giaThay: 120, khoaYeuCau: K('t') })).toMatchObject({ ok: false, ma: 'tam_dong' })   // mua: cờ tươi
+    vi.setSystemTime(T0 + 30_000); expect(await shopBatCho(d.env, 'S1')).toBe(false)
+    const thieu = dung({ co: { bat: true } }); for (const b of ['phu_kien_dang_mac', 'phu_kien_so_huu', 'vang_so']) thieu.sql.exec(`DROP TABLE ${b}`)
+    expect(await shopBatCho(thieu.env, 'S1')).toBe(true)                                        // cờ đọc được ⇒ hiện; mua sẽ báo tam_dong khi chưa có bảng
   })
 })
