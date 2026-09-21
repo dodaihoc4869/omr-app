@@ -5,7 +5,7 @@ import type { DongTheoDoiBtvn } from '../src/lib/btvn-may-chu-moi'
 import { nhomBtvn } from '../src/lib/nhom-btvn'
 import {
   baiChoThe, chuHanNop, chuHocGanNhat, chuNopTre, chuTienDoEm, daiCanYNhu, demEmTheoNhom, demNguocHan, docChang, docNhomBai, duongChang, emKhopTim, emTheoNhom, locBai, lopCuaCacBai,
-  mucCanYCuaNhom, NGUONG_DOAN_HEP, sapXepThe, soEmCanY, thanhNhom, type NhomBai, type TheBai,
+  chuaNopQuaHan, laChuaNop, mucCanYCuaNhom, NGUONG_DOAN_HEP, sapXepThe, soEmCanY, thanhNhom, type NhomBai, type TheBai,
 } from '../src/lib/btvn-da-giao'
 
 const vn = (s: string) => Date.parse(`${s}:00+07:00`)
@@ -71,8 +71,8 @@ describe('sắp thẻ + dải "cần thầy để ý"', () => {
     expect(d.chamNhip).toEqual({ em: 4, bai: 1 })
     expect(d.hanGanNhat).toMatchObject({ chu: 'còn 2 ngày 2 giờ', cam: false })
     expect(d.moiBaiDungNhip).toBe(false)
-    const sach = daiCanYNhu([the({ nhom: N({ dungNhip: 4, daNop: 2 }), tong: 6, daNop: 2, hanNop: new Date(vn('2026-09-20T12:00')).toISOString() })], now)
-    expect(sach).toMatchObject({ chuaMo: null, chamNhip: null, hanGanNhat: null, coDuNhom: true, moiBaiDungNhip: true })
+    const sach = daiCanYNhu([the({ nhom: N({ daNop: 6 }), tong: 6, daNop: 6, hanNop: new Date(vn('2026-09-20T12:00')).toISOString() })], now) // đã nộp hết, hạn đã qua
+    expect(sach).toMatchObject({ chuaMo: null, chamNhip: null, chuaNopQuaHan: null, hanGanNhat: null, coDuNhom: true, moiBaiDungNhip: true })
   })
   it('thiếu nhóm của MỘT bài (máy cũ) ⇒ KHÔNG nói "mọi bài đúng nhịp" (không biết); hạn dưới 6 giờ ⇒ cam', () => {
     const now = vn('2026-09-22T10:00')
@@ -84,12 +84,46 @@ describe('sắp thẻ + dải "cần thầy để ý"', () => {
   })
 })
 
+describe('bài QUÁ HẠN còn em chưa nộp (Boss soát 21/09: không được nói "mọi bài đúng nhịp")', () => {
+  const now = vn('2026-09-22T10:00')
+  const qua = new Date(vn('2026-09-21T12:00')).toISOString()
+  it('chuaNopQuaHan = tổng − đã nộp CHỈ khi hạn đã qua; chưa quá hạn / không hạn ⇒ 0', () => {
+    expect(chuaNopQuaHan({ hanMs: vn('2026-09-21T12:00'), tong: 10, daNop: 7 }, now)).toBe(3)
+    expect(chuaNopQuaHan({ hanMs: vn('2026-09-23T12:00'), tong: 10, daNop: 7 }, now)).toBe(0)
+    expect(chuaNopQuaHan({ hanMs: now, tong: 10, daNop: 7 }, now)).toBe(3) // đúng lúc hết hạn: coi là quá hạn
+    expect(chuaNopQuaHan({ hanMs: null, tong: 10, daNop: 7 }, now)).toBe(0)
+    expect(chuaNopQuaHan({ hanMs: vn('2026-09-21T12:00'), tong: 10, daNop: 12 }, now)).toBe(0)
+  })
+  it('bài KHÔNG chia chặng quá hạn, em đang làm dở (không chưa mở, không chậm nhịp) ⇒ ô "chưa nộp quá hạn", KHÔNG "mọi bài đúng nhịp"', () => {
+    const d = daiCanYNhu([the({ nhom: N({ dungNhip: 4, daNop: 6 }), tong: 10, daNop: 6, hanNop: qua })], now)
+    expect(d.chuaNopQuaHan).toEqual({ em: 4, bai: 1 })
+    expect(d.chuaMo).toBeNull()
+    expect(d.chamNhip).toBeNull()
+    expect(d.moiBaiDungNhip).toBe(false)
+  })
+  it('máy chủ cũ (không nhóm) quá hạn còn em chưa nộp: vẫn hiện ô (chỉ cần tổng / đã nộp); cộng qua bài', () => {
+    const d = daiCanYNhu([the({ tong: 10, daNop: 6, hanNop: qua }), the({ tong: 8, daNop: 8, hanNop: qua }), the({ nhom: N({ chuaMo: 2, dungNhip: 3, daNop: 5 }), tong: 10, daNop: 5, hanNop: qua })], now)
+    expect(d.chuaNopQuaHan).toEqual({ em: 9, bai: 2 })
+    expect(d.coDuNhom).toBe(false)
+  })
+  it('em chưa nộp cho ngăn: có nhóm ⇒ khác "đã nộp"; máy cũ ⇒ chưa có giờ nộp; tab "chua_nop" lọc đúng và đếm đúng', () => {
+    expect(laChuaNop({ nhom: 'dung_nhip', nopLuc: null })).toBe(true)
+    expect(laChuaNop({ nhom: 'da_nop', nopLuc: null })).toBe(false)
+    expect(laChuaNop({ nhom: undefined, nopLuc: null })).toBe(true)
+    expect(laChuaNop({ nhom: undefined, nopLuc: '2026-09-21T01:00:00Z' })).toBe(false)
+    const hs = [em('S1', 'An', 'dung_nhip'), em('S2', 'Bình', 'da_nop', { nopLuc: '2026-09-21T01:00:00Z' }), em('S3', 'Chi', 'chua_mo'), em('S4', 'Dũng', undefined, { nopLuc: null })]
+    expect(emTheoNhom(hs, 'chua_nop').map((e) => e.sbd)).toEqual(['S1', 'S3', 'S4'])
+    expect(demEmTheoNhom(hs).chuaNop).toBe(3)
+  })
+})
+
 describe('chữ hạn nộp + đếm ngược (giờ VN)', () => {
   it('chuHanNop: "12:00 Thứ Năm 24/09"; đếm ngược theo phút; dưới 6 giờ cam; qua hạn', () => {
     expect(chuHanNop(Date.parse('2026-09-24T05:00:00Z'))).toBe('12:00 Thứ Năm 24/09')
     expect(chuHanNop(null)).toBe('Chưa có hạn hợp lệ')
     const han = vn('2026-09-24T12:00')
     expect(demNguocHan(han, vn('2026-09-22T18:45'))).toEqual({ chu: 'còn 1 ngày 17 giờ', cam: false, qua: false })
+    expect(demNguocHan(han, vn('2026-09-21T19:00'))).toEqual({ chu: 'còn 2 ngày 17 giờ', cam: false, qua: false }) // đúng số của mẫu phác (65 giờ)
     expect(demNguocHan(han, vn('2026-09-24T06:48'))).toEqual({ chu: 'còn 5 giờ 12 phút', cam: true, qua: false })
     expect(demNguocHan(han, vn('2026-09-24T11:18'))).toEqual({ chu: 'còn 42 phút', cam: true, qua: false })
     expect(demNguocHan(han, han - 1000)).toEqual({ chu: 'còn 1 phút', cam: true, qua: false })
@@ -164,7 +198,7 @@ describe('ngăn danh sách em', () => {
     expect(emTheoNhom(undefined, 'tat_ca')).toEqual([])
   })
   it('đếm tab theo nhóm của từng em (máy chủ tính); thiếu nhóm ở một em ⇒ coNhom = false', () => {
-    expect(demEmTheoNhom(ds)).toEqual({ tatCa: 4, canY: 2, theo: { chua_mo: 1, dung_nhip: 1, cham_nhip: 1, xong_hom_nay: 0, da_nop: 1 }, coNhom: true })
+    expect(demEmTheoNhom(ds)).toEqual({ tatCa: 4, canY: 2, chuaNop: 3, theo: { chua_mo: 1, dung_nhip: 1, cham_nhip: 1, xong_hom_nay: 0, da_nop: 1 }, coNhom: true })
     expect(demEmTheoNhom([...ds, em('S6', 'Cũ Không Nhóm', undefined)]).coNhom).toBe(false)
     expect(demEmTheoNhom(ds, 'thi').tatCa).toBe(1) // chỉ Nguyễn Thị An (em thu hồi không đếm)
   })

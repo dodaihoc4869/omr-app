@@ -1,13 +1,6 @@
 /* MỤC "BÀI TẬP VỀ NHÀ ĐÃ GIAO" thiết kế lại (Code 1, 21/09/2026; mẫu phác docs/ban-ve-btvn-da-giao-2109/mau-phac.html). Tiền tố lớp `btg-`.
-   Màu bề mặt / chữ / viền lấy từ token của app (sáng + tối tự đổi); riêng BẢNG MÀU ĐOẠN THANH NHÓM là màu dữ liệu cố định (chữ số nằm trong đoạn nên chọn sẵn cặp nền–chữ đủ tương phản ở cả hai nền). */
+   Màu bề mặt / chữ / viền lấy từ token của app (sáng + tối tự đổi); màu năm đoạn THANH NHÓM là token dữ liệu `--btg-*` ở src/styles/tokens.css. */
 .btg {
-  --btg-xam: rgb(180, 178, 169);
-  --btg-duong: rgb(133, 183, 235);
-  --btg-cam: rgb(250, 199, 117);
-  --btg-la: rgb(151, 196, 89);
-  --btg-la-dam: rgb(46, 125, 50);
-  --btg-chu-doan: rgb(31, 31, 31);
-  --btg-chu-doan-dam: rgb(255, 255, 255);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -50,6 +43,12 @@
 .btg-tim { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--vien); background: var(--the); color: var(--nhat); flex: 1 1 240px; max-width: 360px; }
 .btg-tim input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--muc); font: inherit; font-size: 14px; }
 .btg-tim:focus-within { border-color: var(--gg-xanh); }
+
+/* kết quả tìm học sinh (gõ chỉ lọc; ngăn mở khi Enter / bấm một dòng) */
+.btg-ket-qua { display: flex; flex-direction: column; gap: 6px; padding: 10px 14px; border-radius: 16px; background: var(--the-2); }
+.btg-ket-qua-ds { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.btg-ket-qua-muc { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; width: 100%; padding: 0 8px; border: 0; border-radius: 10px; background: transparent; color: var(--muc); font-size: 14px; text-align: left; cursor: pointer; }
+.btg-ket-qua-muc:hover { background: var(--the); }
 
 /* dải "cần thầy để ý" */
 .btg-dai { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
@@ -177,4 +176,8 @@
   .btg-chang { flex-wrap: wrap; }
   .btg-chang-o { flex: 1 1 30%; }
   .btg-tim { max-width: none; }
+  /* điện thoại: ba ô số xếp hai cột, gọn hơn để thẻ bài đầu hiện sớm hơn */
+  .btg-dai { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .btg-o { padding: 10px 12px; }
+  .btg-o b { font-size: 22px; }
 }

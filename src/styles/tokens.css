@@ -373,3 +373,16 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ── MÀU DỮ LIỆU của THANH NHÓM (mục "Bài tập về nhà đã giao", 21/09) ────────────────────────────────────────────────
+ * Năm đoạn của thanh nhóm là màu DỮ LIỆU: cố định ở cả sáng lẫn tối (số nằm TRONG đoạn nên đã chọn sẵn cặp nền–chữ đủ tương phản trên cả hai nền).
+ * Lấy từ mẫu phác thầy duyệt: chưa mở (xám) · đúng nhịp (xanh dương) · chậm nhịp (cam) · xong chặng hôm nay (xanh lá) · đã nộp (xanh lá đậm). */
+:root {
+  --btg-xam: #b4b2a9;
+  --btg-duong: #85b7eb;
+  --btg-cam: #fac775;
+  --btg-la: #97c459;
+  --btg-la-dam: #2e7d32;
+  --btg-chu-doan: #1f1f1f; /* chữ trên bốn đoạn nhạt */
+  --btg-chu-doan-dam: #ffffff; /* chữ trên đoạn xanh lá đậm */
+}

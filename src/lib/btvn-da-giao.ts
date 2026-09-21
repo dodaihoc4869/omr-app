@@ -43,6 +43,8 @@ export interface TheBai {
   coTenMoi: boolean
   tenLop: string
   tong: number
+  /** Số em đã nộp (số máy chủ). */
+  daNop: number
   soCau: number
   soCauLoi: number | null
   /** Bài nâng đỡ (mỗi em một bộ câu riêng). */
@@ -62,6 +64,14 @@ export interface TheBai {
 
 export const mucCanYCuaNhom = (n: NhomBai | null): number => (n ? n.chamNhip * 2 + n.chuaMo : 0)
 
+/**
+ * Số em CHƯA NỘP của bài ĐÃ QUA HẠN (số máy chủ: tổng − đã nộp; không tính thu hồi vì `tong` đã loại). Bài chưa quá hạn ⇒ 0. Dùng cho dải "cần thầy để ý" và thẻ: bài KHÔNG chia chặng quá hạn còn em đang làm dở
+ * vốn không có nhóm "chậm nhịp" (nhóm ấy chỉ có ở bài chia chặng) nhưng vẫn là việc thầy cần thấy — không được nói "mọi bài đúng nhịp".
+ */
+export function chuaNopQuaHan(b: Pick<TheBai, 'hanMs' | 'tong' | 'daNop'>, nowMs: number): number {
+  return b.hanMs !== null && b.hanMs <= nowMs ? Math.max(0, b.tong - b.daNop) : 0
+}
+
 const khongTrung = (ds: readonly string[]): string[] => [...new Set(ds.map((x) => x.trim()).filter(Boolean))]
 
 /** Từ MỘT lần giao (`nhomBtvn`) ra thẻ. `tenCu` = cách gọi tên cũ khi máy chủ chưa trả `ten`. */
@@ -79,6 +89,7 @@ export function baiChoThe(t: NhomBtvn, tenCu: (t: NhomBtvn) => string): TheBai {
     coTenMoi: tenMoi !== '',
     tenLop: khongTrung(dong.map((d) => (typeof d.tenLop === 'string' ? d.tenLop : ''))).join(' · '),
     tong: t.tong,
+    daNop: t.daNop,
     soCau: t.soCau,
     soCauLoi,
     caNhan: t.caNhan === true,
@@ -146,6 +157,8 @@ export interface DaiCanY {
   chuaMo: { em: number; bai: number } | null
   /** Ô "Em chậm nhịp": số em; null = 0 ⇒ ẨN. */
   chamNhip: { em: number; bai: number } | null
+  /** Ô "Em chưa nộp quá hạn": số em chưa nộp của các bài ĐÃ QUA HẠN; null = 0 ⇒ ẨN. */
+  chuaNopQuaHan: { em: number; bai: number } | null
   /** Ô "Hạn gần nhất": bài CHƯA nộp hết còn hạn, hạn gần nhất; null ⇒ ẨN. */
   hanGanNhat: { ten: string; chu: string; cam: boolean; hanMs: number } | null
   /** Mọi bài đều có số nhóm (máy chủ mới). Thiếu ⇒ KHÔNG nói "mọi bài đúng nhịp" (không biết). */
@@ -155,9 +168,11 @@ export interface DaiCanY {
 }
 
 export function daiCanYNhu(ds: readonly TheBai[], nowMs: number): DaiCanY {
-  let emChua = 0, baiChua = 0, emCham = 0, baiCham = 0
+  let emChua = 0, baiChua = 0, emCham = 0, baiCham = 0, emQua = 0, baiQua = 0
   const coDuNhom = ds.length > 0 && ds.every((b) => b.nhom !== null)
   for (const b of ds) {
+    const qua = chuaNopQuaHan(b, nowMs)
+    if (qua > 0) { emQua += qua; baiQua++ }
     if (!b.nhom) continue
     if (b.nhom.chuaMo > 0) { emChua += b.nhom.chuaMo; baiChua++ }
     if (b.nhom.chamNhip > 0) { emCham += b.nhom.chamNhip; baiCham++ }
@@ -169,9 +184,10 @@ export function daiCanYNhu(ds: readonly TheBai[], nowMs: number): DaiCanY {
   }
   const chuaMo = emChua > 0 ? { em: emChua, bai: baiChua } : null
   const chamNhip = emCham > 0 ? { em: emCham, bai: baiCham } : null
+  const quaHan = emQua > 0 ? { em: emQua, bai: baiQua } : null
   return {
-    chuaMo, chamNhip, hanGanNhat: gan ? { ten: gan.ten, chu: gan.chu, cam: gan.cam, hanMs: gan.hanMs } : null, coDuNhom,
-    moiBaiDungNhip: coDuNhom && !chuaMo && !chamNhip && !gan,
+    chuaMo, chamNhip, chuaNopQuaHan: quaHan, hanGanNhat: gan ? { ten: gan.ten, chu: gan.chu, cam: gan.cam, hanMs: gan.hanMs } : null, coDuNhom,
+    moiBaiDungNhip: coDuNhom && !chuaMo && !chamNhip && !quaHan && !gan,
   }
 }
 
@@ -238,22 +254,24 @@ const tenGoiEm = (hoTen: string): string => hoTen.trim().split(/\s+/).pop() ?? h
 
 /** Em của bài (đã gộp) — thu hồi bị bỏ; máy cũ chưa có `nhom` của em ⇒ trả rỗng cho tab (ngăn nói "Cập nhật máy chủ"). */
 /** Tab của ngăn: một nhóm, "cần để ý" (chưa mở + chậm nhịp — nút "Xem N em này") hoặc tất cả. */
-export type NhomChon = NhomEm | 'can_y' | 'tat_ca'
+export type NhomChon = NhomEm | 'can_y' | 'chua_nop' | 'tat_ca'
 export const laCanY = (n: NhomEm | undefined): boolean => n === 'chua_mo' || n === 'cham_nhip'
+/** Em CHƯA NỘP: có nhóm ⇒ khác "đã nộp"; máy cũ chưa có nhóm ⇒ chưa có giờ nộp. */
+export const laChuaNop = (e: Pick<EmCuaBai, 'nhom' | 'nopLuc'>): boolean => (e.nhom ? e.nhom !== 'da_nop' : !e.nopLuc)
 
 export function emTheoNhom(hs: readonly EmCuaBai[] | undefined, nhom: NhomChon, q = ''): EmCuaBai[] {
   return (hs ?? [])
-    .filter((e) => !e.thuHoi && (nhom === 'tat_ca' || (nhom === 'can_y' ? laCanY(e.nhom) : e.nhom === nhom)) && emKhopTim(e, q))
+    .filter((e) => !e.thuHoi && (nhom === 'tat_ca' || (nhom === 'can_y' ? laCanY(e.nhom) : nhom === 'chua_nop' ? laChuaNop(e) : e.nhom === nhom)) && emKhopTim(e, q))
     .slice()
     .sort((a, b) => tenGoiEm(a.hoTen).localeCompare(tenGoiEm(b.hoTen), 'vi') || a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd))
 }
 
 /** Đếm em theo nhóm cho các tab của ngăn: ĐỌC `nhom` của từng em (máy chủ tính). `coNhom` = mọi em đều có nhóm. */
-export function demEmTheoNhom(hs: readonly EmCuaBai[] | undefined, q = ''): { tatCa: number; canY: number; theo: Record<NhomEm, number>; coNhom: boolean } {
+export function demEmTheoNhom(hs: readonly EmCuaBai[] | undefined, q = ''): { tatCa: number; canY: number; chuaNop: number; theo: Record<NhomEm, number>; coNhom: boolean } {
   const ds = (hs ?? []).filter((e) => !e.thuHoi && emKhopTim(e, q))
   const theo: Record<NhomEm, number> = { chua_mo: 0, dung_nhip: 0, cham_nhip: 0, xong_hom_nay: 0, da_nop: 0 }
   for (const e of ds) if (e.nhom) theo[e.nhom]++
-  return { tatCa: ds.length, canY: theo.chua_mo + theo.cham_nhip, theo, coNhom: ds.length > 0 && ds.every((e) => !!e.nhom) }
+  return { tatCa: ds.length, canY: theo.chua_mo + theo.cham_nhip, chuaNop: ds.filter(laChuaNop).length, theo, coNhom: ds.length > 0 && ds.every((e) => !!e.nhom) }
 }
 
 /** "hôm nay 20:41" · "hôm qua 20:41" · "3 ngày trước" · null ⇒ "chưa mở". */

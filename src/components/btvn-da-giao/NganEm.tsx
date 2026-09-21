@@ -23,6 +23,7 @@ export default function NganEm({
   onMoToanCanh: (sbd: string) => void
 }) {
   const dem = demEmTheoNhom(hocSinh, q)
+  const quaHan = bai.hanMs !== null && bai.hanMs <= nowMs
   const ds = emTheoNhom(hocSinh, nhom, q)
   const goc = useRef<HTMLElement>(null)
   useEffect(() => {
@@ -52,12 +53,12 @@ export default function NganEm({
           Đang lọc theo “{q.trim()}”. <button type="button" className="btg-lien-ket" onClick={boLoc}>Bỏ lọc</button>
         </p>
       )}
-      {!dem.coNhom && dem.tatCa > 0 ? (
-        <p className="btg-phu btg-ghi-chu">Cập nhật máy chủ để xem theo nhóm.</p>
-      ) : (
+      {!dem.coNhom && dem.tatCa > 0 && <p className="btg-phu btg-ghi-chu">Cập nhật máy chủ để xem theo nhóm.</p>}
+      {(dem.coNhom || quaHan) && (
         <div role="tablist" aria-label="Nhóm em" className="btg-tab-hang">
-          {dem.canY > 0 && tab('can_y', 'Cần để ý', dem.canY)}
-          {TAB_NHOM.filter((k) => dem.theo[k] > 0).map((k) => tab(k, nhanNhomEm(k, bai.chiaChang), dem.theo[k]))}
+          {quaHan && dem.chuaNop > 0 && tab('chua_nop', 'Chưa nộp', dem.chuaNop)}
+          {dem.coNhom && dem.canY > 0 && tab('can_y', 'Cần để ý', dem.canY)}
+          {dem.coNhom && TAB_NHOM.filter((k) => dem.theo[k] > 0).map((k) => tab(k, nhanNhomEm(k, bai.chiaChang), dem.theo[k]))}
           {tab('tat_ca', 'Tất cả', dem.tatCa)}
         </div>
       )}

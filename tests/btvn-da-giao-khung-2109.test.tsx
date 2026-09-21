@@ -61,7 +61,7 @@ describe('dải "cần thầy để ý"', () => {
     expect(screen.getByText('Hạn gần nhất')).toBeTruthy()
   })
   it('cả ba ô trống mà biết chắc ⇒ một dòng xanh "Mọi bài đang đúng nhịp."', () => {
-    const d = canh('binh-thuong').map((b) => ({ ...b, hanNop: '2026-09-20T05:00:00.000Z', nhom: { chuaMo: 0, dungNhip: b.tong, chamNhip: 0, xongHomNay: 0, daNop: 0, nopTre: 0 }, hocSinh: b.hocSinh?.map((e) => ({ ...e, nhom: 'dung_nhip' as const })) }))
+    const d = canh('binh-thuong').map((b) => ({ ...b, hanNop: '2026-09-20T05:00:00.000Z', daNop: b.tong, nhom: { chuaMo: 0, dungNhip: 0, chamNhip: 0, xongHomNay: 0, daNop: b.tong, nopTre: 0 }, hocSinh: b.hocSinh?.map((e) => ({ ...e, nhom: 'da_nop' as const })) })) // hạn đã qua VÀ đã nộp hết
     dung('binh-thuong', { ds: nhomBtvn(d) })
     expect(screen.getByText('Mọi bài đang đúng nhịp.')).toBeTruthy()
     expect(document.querySelector('.btg-dai')).toBeNull()
@@ -164,15 +164,89 @@ describe('bộ lọc lớp + ô tìm chung', () => {
     fireEvent.change(o, { target: { value: em.sbd.toLowerCase() } })
     expect(tenThe().length).toBeLessThan(3)
     expect(tenThe()).toContain('Lớp 12 · Chương 2 · Bài 4')
+    expect(screen.queryByRole('dialog')).toBeNull() // GÕ chỉ lọc, không tự mở ngăn
+    const kq = screen.getByRole('region', { name: 'Kết quả tìm học sinh' })
+    expect(kq.textContent).toContain(ten)
+    fireEvent.keyDown(o, { key: 'Enter' }) // Enter ⇒ mở ngăn ở bài đầu tiên khớp
     const ngan = screen.getByRole('dialog', { name: /Danh sách em của/ })
     expect(ngan.textContent).toContain(ten)
     fireEvent.change(o, { target: { value: '' } })
     expect(tenThe().length).toBe(3)
+    expect(screen.queryByRole('region', { name: 'Kết quả tìm học sinh' })).toBeNull()
+  })
+  it('BỀ RỘNG HẸP: gõ TỪNG KÝ TỰ — không lần nào tấm trượt / lớp phủ xuất hiện, ô tìm giữ tiêu điểm và giữ đủ chữ; bấm một kết quả mới mở ngăn', () => {
+    dung('binh-thuong') // jsdom không có matchMedia ⇒ màn hẹp (tấm trượt)
+    const o = screen.getByRole('searchbox') as HTMLInputElement
+    o.focus()
+    const chu = 'b001' // số báo danh của em đầu bài Lớp 12
+    let go = ''
+    for (const k of chu) {
+      go += k
+      fireEvent.change(o, { target: { value: go } })
+      expect(screen.queryByRole('dialog'), `sau "${go}"`).toBeNull()
+      expect(document.querySelector('.btg-nen-tam'), `sau "${go}"`).toBeNull()
+      expect(document.activeElement, `sau "${go}"`).toBe(o)
+      expect(o.value).toBe(go)
+    }
+    fireEvent.click(within(screen.getByRole('region', { name: 'Kết quả tìm học sinh' })).getAllByRole('button')[0]!)
+    expect(screen.getByRole('dialog', { name: /Danh sách em của Lớp 12/ })).toBeTruthy()
+  })
+  it('kết quả tìm: tối đa 6 dòng, còn lại nói "và N em khác"; không ai khớp ⇒ nói thật', () => {
+    dung('binh-thuong')
+    const o = screen.getByRole('searchbox')
+    fireEvent.change(o, { target: { value: 'nguyen' } }) // họ phổ biến: nhiều em khớp ở cả ba bài
+    const kq = screen.getByRole('region', { name: 'Kết quả tìm học sinh' })
+    expect(kq.querySelectorAll('.btg-ket-qua-muc').length).toBe(6)
+    expect(kq.textContent).toMatch(/và \d+ em khác/)
+    fireEvent.change(o, { target: { value: 'zzzz không ai' } })
+    expect(screen.getByRole('region', { name: 'Kết quả tìm học sinh' }).textContent).toContain('Không có học sinh nào khớp')
   })
   it('gõ tên không có ai ⇒ nói thật "Không có bài nào khớp bộ lọc."', () => {
     dung('binh-thuong')
     fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'zzzz không ai' } })
     expect(screen.getByText('Không có bài nào khớp bộ lọc.')).toBeTruthy()
+  })
+})
+
+describe('bài quá hạn còn em chưa nộp + chi tiết thanh nhóm', () => {
+  it('ô "Em chưa nộp quá hạn" hiện ở dải; "Xem N em chưa nộp" mở ngăn ở tab "Chưa nộp" đúng N em; dòng tóm tắt nói rõ', () => {
+    dung('qua-han')
+    const dai = screen.getByRole('group', { name: 'Cần thầy để ý' })
+    expect(within(dai).getByText('Em chưa nộp quá hạn').parentElement!.textContent).toContain('7') // 45 − 38 ở bài Lớp 10
+    expect(the()[0]!.textContent).toContain('7 em chưa nộp quá hạn')
+    fireEvent.click(within(the()[0]!).getByRole('button', { name: 'Xem 7 em chưa nộp' }))
+    const ngan = screen.getByRole('dialog', { name: /Danh sách em của/ })
+    expect(within(ngan).getByRole('tab', { selected: true }).textContent).toContain('Chưa nộp')
+    expect(ngan.querySelectorAll('.btg-em').length).toBe(7)
+  })
+  it('bài KHÔNG chia chặng quá hạn, em đang làm dở: KHÔNG dòng "Mọi bài đang đúng nhịp."', () => {
+    const d = canh('khong-chang').map((b) => ({ ...b, hanNop: '2026-09-21T05:00:00.000Z', quaHan: true }))
+    dung('khong-chang', { ds: nhomBtvn(d) })
+    expect(screen.queryByText('Mọi bài đang đúng nhịp.')).toBeNull()
+    expect(screen.getByText('Em chưa nộp quá hạn')).toBeTruthy()
+  })
+  it('đoạn quá hẹp: số KHÔNG nằm trong đoạn mà ra chú giải; tab "Cần để ý" mang đúng số em', () => {
+    const d = canh('binh-thuong')
+    d[0]!.nhom = { chuaMo: 1, dungNhip: 40, chamNhip: 0, xongHomNay: 0, daNop: 0, nopTre: 0 }
+    d[0]!.hocSinh = d[0]!.hocSinh!.map((e, i) => ({ ...e, nhom: i === 0 ? ('chua_mo' as const) : ('dung_nhip' as const) }))
+    dung('binh-thuong', { ds: nhomBtvn(d) })
+    const doanDau = [...document.querySelectorAll('.btg-doan')].find((x) => x.getAttribute('aria-label')?.startsWith('chưa mở: 1 em'))!
+    expect(doanDau.textContent).toBe('')
+    expect(document.body.textContent).toContain('chưa mở 1')
+    cleanup()
+    dung('binh-thuong')
+    fireEvent.click(within(the()[0]!).getByRole('button', { name: 'Xem 20 em này' }))
+    expect(within(screen.getByRole('dialog', { name: /Danh sách em của/ })).getByRole('tab', { name: /Cần để ý\s*20/ })).toBeTruthy()
+  })
+  it('thông báo kết quả hiện CẢ TRONG hộp đang mở (không nằm sau lớp phủ)', () => {
+    dung('binh-thuong', { thongBao: <p data-testid="tb">Đã cho Lê Minh Đức làm lại</p> })
+    fireEvent.click(within(the()[0]!).getByRole('button', { name: /Thêm thao tác/ }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Xem bài làm' }))
+    expect(within(screen.getByRole('dialog', { name: /Bài làm/ })).getByTestId('tb')).toBeTruthy()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    fireEvent.click(within(the()[0]!).getByRole('button', { name: /Thêm thao tác/ }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Đổi hạn nộp' }))
+    expect(within(screen.getByRole('dialog', { name: 'Đổi hạn nộp' })).getByTestId('tb')).toBeTruthy()
   })
 })
 

@@ -187,7 +187,6 @@ function TheGiaoBtvn() {
   const [hanMoi, setHanMoi] = useState(() => hanMacDinhVN(Date.now()))
   // Lỗi của ô hạn (ngày không có thật / đã qua / nhập dở) — chặn Giao để hạn không bị lặng lẽ rơi về mặc định.
   const [loiHan, setLoiHan] = useState('')
-  const [suaHan] = useState<Record<string,string>>({}) // ô hạn cũ: hạn nay đến từ hộp Đổi hạn nộp (hanTay)
   const [dangSua, setDangSua] = useState('')
   const [xacNhan,setXacNhan]=useState<{text:string;nut:string;run:()=>Promise<void>}|null>(null)
   const nowHocTap = useGioHocTap()
@@ -452,7 +451,7 @@ function TheGiaoBtvn() {
     setDangSua(t.maBtvn)
     try {
       const ch=await layCauHinhMayChu(), mat=(await loadTeacherSecret())||''
-      const hanGui=hanTay??suaHan[t.maBtvn] // hạn từ hộp Đổi hạn nộp (mục thiết kế lại) hoặc ô cũ
+      const hanGui:string=hanTay??'' // hạn từ hộp Đổi hạn nộp của mục thiết kế lại (ô hạn mở sẵn ở từng thẻ đã bỏ)
       if(!thuHoi && !hanGui)throw new Error('Thầy chọn ngày giờ hạn nộp trước.')
       for (const original of (t as NhomBtvn).baiGoc||[t]) await suaGiaoBtvn(ch,mat,original.maBtvn,thuHoi?{thuHoi:true}:{hanNop:hanNhapVietNam(hanGui, nowHocTap)})
       setTheoDoi(await theoDoiBtvn(ch,mat))

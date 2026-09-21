@@ -58,5 +58,6 @@ describe('theo dõi bài NÂNG ĐỠ', () => {
     expect(src).toContain('Cá nhân hoá · {bai.find((b) => b.khoa === tHop.maBtvn)?.soCauLoi ?? 0} câu cốt lõi')
     expect(src).toContain('Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên câu cốt lõi.')
     expect(fs.readFileSync(path.join(process.cwd(), 'src/components/btvn-da-giao/TheBai.tsx'), 'utf8')).toContain('câu lõi')
+    // Đã BỎ kiểm dòng cũ "Ca {mã ca} · N câu trong bài" (`{t.caNhan ? ' trong bài' : ''}`): mã ca là mã nội bộ (thầy chê ở đề 21/09 §0.1); dòng phụ mới "N em · M câu, K câu lõi · giao …" thay nó, mã ca chỉ còn trong hộp "Chi tiết bài".
   })
 })

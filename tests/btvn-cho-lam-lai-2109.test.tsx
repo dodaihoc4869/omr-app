@@ -140,7 +140,7 @@ describe('màn Giao bài · tab đã giao — Cho làm lại từng em (một b�
     fireEvent.click(within(hop).getByRole('button', { name: 'Cho làm lại' }))
     await waitFor(() => expect(m.lamLai).toHaveBeenCalledWith('B1', '001'))
     expect(m.sua).not.toHaveBeenCalled()
-    expect(await screen.findByText(/Đã cho Lê Minh Đức làm lại \(lượt làm thứ 2\): em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi\./)).toBeTruthy()
+    expect((await screen.findAllByText(/Đã cho Lê Minh Đức làm lại \(lượt làm thứ 2\): em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi\./)).length).toBeGreaterThan(0) // thông báo hiện cả TRONG hộp Bài làm (không nằm sau lớp phủ) lẫn ở mục phía sau
     await waitFor(() => expect(m.theoDoi.mock.calls.length).toBeGreaterThanOrEqual(2)) // đã tải lại
   })
 
@@ -148,7 +148,7 @@ describe('màn Giao bài · tab đã giao — Cho làm lại từng em (một b�
     m.lamLai.mockRejectedValue(new Error('Máy chủ chưa có lệnh Cho làm lại — chưa mở lại được bài. Kết quả của em vẫn giữ nguyên.'))
     const hop = await moXacNhan()
     fireEvent.click(within(hop).getByRole('button', { name: 'Cho làm lại' }))
-    expect(await screen.findByText(/Máy chủ chưa có lệnh Cho làm lại — chưa mở lại được bài/)).toBeTruthy()
+    expect((await screen.findAllByText(/Máy chủ chưa có lệnh Cho làm lại — chưa mở lại được bài/)).length).toBeGreaterThan(0)
     expect(screen.queryByText(/Đã cho Lê Minh Đức làm lại/)).toBeNull()
   })
 

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { ClipboardCheck, RefreshCw, Search, Send } from 'lucide-react'
 import ONgayGio24 from '../ONgayGio24'
 import { gioDayDu } from '../../lib/ngay-gio-24'
-import { baiChoThe, daiCanYNhu, locBai, lopCuaCacBai, sapXepThe, type NhomChon, type TheBai } from '../../lib/btvn-da-giao'
+import { baiChoThe, daiCanYNhu, emTheoNhom, locBai, lopCuaCacBai, sapXepThe, type NhomChon, type TheBai } from '../../lib/btvn-da-giao'
 import type { NhomBtvn } from '../../lib/nhom-btvn'
 import HopBtg from './HopBtg'
 import NganEm from './NganEm'
@@ -93,12 +93,14 @@ export default function KhungBtvnDaGiao(p: KhungBtvnDaGiaoProps) {
   const laMo = (b: TheBai, i: number) => moTay[b.khoa] ?? i === 0
   const doiMo = (b: TheBai, i: number) => setMoTay((c) => { const v = { ...c, [b.khoa]: !laMo(b, i) }; ghiMoTay(v); return v })
   const moNgan = (b: TheBai, nhom: NhomChon) => { setNgan({ khoa: b.khoa, nhom }); setMoTay((c) => { const v = { ...c, [b.khoa]: true }; ghiMoTay(v); return v }) }
-  const timEm = (v: string) => {
-    setQ(v)
-    if (v.trim() === '') return
-    const dau = locBai(bai, emCua, lop, v)[0]
-    if (dau) moNgan(dau.bai, 'tat_ca')
-  }
+  // Gõ chỉ LỌC danh sách bài; KHÔNG mở ngăn mỗi ký tự (màn hẹp: tấm trượt sẽ cướp tiêu điểm và che ô tìm, không gõ được ký tự thứ hai). Ngăn mở khi thầy nhấn Enter hoặc bấm một kết quả.
+  const timEm = (v: string) => setQ(v)
+  const ketQuaTim = useMemo(() => {
+    if (q.trim() === '') return { ds: [] as { bai: TheBai; em: { sbd: string; hoTen: string } }[], them: 0 }
+    const tat = hienThi.flatMap(({ bai: b }) => emTheoNhom(emCua(b.khoa), 'tat_ca', q).map((em) => ({ bai: b, em })))
+    return { ds: tat.slice(0, 6), them: Math.max(0, tat.length - 6) }
+  }, [hienThi, emCua, q])
+  const moKetQua = (b: TheBai) => moNgan(b, 'tat_ca')
   // Ngăn đang mở mà bài biến mất (đổi lớp, thu hồi): đóng.
   useEffect(() => { if (ngan && !baiNgan) setNgan(null) }, [ngan, baiNgan])
   const bai1 = (khoa: string) => tuKhoa.get(khoa)
@@ -149,14 +151,37 @@ export default function KhungBtvnDaGiao(p: KhungBtvnDaGiaoProps) {
             <label className="btg-tim">
               <Search size={16} aria-hidden="true" />
               <span className="btg-an-chu">Tìm học sinh theo tên hoặc số báo danh</span>
-              <input type="search" value={q} placeholder="Tìm tên hoặc số báo danh" onChange={(e) => timEm(e.target.value)} />
+              <input type="search" value={q} placeholder="Tìm tên hoặc số báo danh" onChange={(e) => timEm(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && ketQuaTim.ds[0]) { e.preventDefault(); moKetQua(ketQuaTim.ds[0].bai) } }} />
             </label>
           </div>
 
-          {(dai.chuaMo || dai.chamNhip || dai.hanGanNhat) && (
+          {q.trim() !== '' && (
+            <div className="btg-ket-qua" role="region" aria-label="Kết quả tìm học sinh">
+              {ketQuaTim.ds.length === 0 ? (
+                <p className="btg-phu" role="status">Không có học sinh nào khớp “{q.trim()}”.</p>
+              ) : (
+                <>
+                  <p className="btg-phu">Nhấn Enter hoặc bấm một dòng để mở danh sách em của bài.</p>
+                  <ul className="btg-ket-qua-ds">
+                    {ketQuaTim.ds.map(({ bai: b, em }) => (
+                      <li key={`${b.khoa}|${em.sbd}`}>
+                        <button type="button" className="btg-ket-qua-muc" onClick={() => moKetQua(b)}>
+                          <b>{em.hoTen || em.sbd}</b> <span className="btg-phu">{b.ten}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  {ketQuaTim.them > 0 && <p className="btg-phu">và {ketQuaTim.them} em khác — gõ thêm để thu hẹp.</p>}
+                </>
+              )}
+            </div>
+          )}
+
+          {(dai.chuaMo || dai.chamNhip || dai.chuaNopQuaHan || dai.hanGanNhat) && (
             <div className="btg-dai" role="group" aria-label="Cần thầy để ý">
               {dai.chuaMo && <div className="btg-o btg-o--cam"><small>Em chưa mở bài</small><b>{dai.chuaMo.em}</b> em · {dai.chuaMo.bai} bài</div>}
               {dai.chamNhip && <div className="btg-o btg-o--cam"><small>Em chậm nhịp</small><b>{dai.chamNhip.em}</b> em · {dai.chamNhip.bai} bài</div>}
+              {dai.chuaNopQuaHan && <div className="btg-o btg-o--cam"><small>Em chưa nộp quá hạn</small><b>{dai.chuaNopQuaHan.em}</b> em · {dai.chuaNopQuaHan.bai} bài</div>}
               {dai.hanGanNhat && <div className={`btg-o${dai.hanGanNhat.cam ? ' btg-o--cam' : ''}`}><small>Hạn gần nhất</small><b>{dai.hanGanNhat.chu.replace(/^còn /, '')}</b><span className="btg-o-phu">{dai.hanGanNhat.ten}</span></div>}
             </div>
           )}
@@ -204,6 +229,7 @@ export default function KhungBtvnDaGiao(p: KhungBtvnDaGiaoProps) {
 
       {hop?.kieu === 'doi_han' && tHop && (
         <HopBtg tieuDe="Đổi hạn nộp" dong={dongHop}>
+          {p.thongBao}
           <p className="btg-phu">{bai.find((b) => b.khoa === tHop.maBtvn)?.ten ?? tHop.maBtvn}</p>
           <ONgayGio24 nhan="Hạn nộp mới" value={hanNhap} onChange={setHanNhap} nhanh khongQuaKhu />
           <div className="btg-hop-chan">
@@ -233,6 +259,7 @@ export default function KhungBtvnDaGiao(p: KhungBtvnDaGiaoProps) {
       )}
       {hop?.kieu === 'bai_lam' && tHop && (
         <HopBtg tieuDe={`Bài làm · ${bai.find((b) => b.khoa === tHop.maBtvn)?.ten ?? ''}`} dong={dongHop} rong>
+          {p.thongBao}
           {p.dungBaiLam(tHop)}
         </HopBtg>
       )}

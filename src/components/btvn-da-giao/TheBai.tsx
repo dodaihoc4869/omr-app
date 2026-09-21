@@ -2,7 +2,7 @@
 // Đổi hạn nộp / Xem bài làm / Chi tiết bài / Thu hồi cất trong nút ⋯ (Thu hồi ở cuối, màu cảnh báo, luôn qua hộp xác nhận ở nơi gọi).
 import { useEffect, useRef, useState } from 'react'
 import { ChevronDown, ChevronRight, MoreHorizontal } from 'lucide-react'
-import { chuGiaoLuc, chuHanNop, demNguocHan, soEmCanY, type NhomChon, type TheBai } from '../../lib/btvn-da-giao'
+import { chuGiaoLuc, chuHanNop, chuaNopQuaHan, demNguocHan, soEmCanY, type NhomChon, type TheBai } from '../../lib/btvn-da-giao'
 import DuongChang from './DuongChang'
 import ThanhNhom from './ThanhNhom'
 import './btg.css'
@@ -60,10 +60,13 @@ export default function TheBaiBtg({
 }) {
   const han = demNguocHan(bai.hanMs, nowMs)
   const canY = soEmCanY(bai.nhom)
+  const quaN = chuaNopQuaHan(bai, nowMs) // bài QUÁ HẠN còn em chưa nộp: việc thầy cần thấy kể cả khi bài không chia chặng
   const nhom = bai.nhom
-  const tomTat = nhom
-    ? [nhom.chuaMo > 0 ? `${nhom.chuaMo} em chưa mở` : '', nhom.chamNhip > 0 ? `${nhom.chamNhip} em chậm nhịp` : ''].filter(Boolean).join(' · ')
-    : ''
+  const tomTat = [
+    nhom && nhom.chuaMo > 0 ? `${nhom.chuaMo} em chưa mở` : '',
+    nhom && nhom.chamNhip > 0 ? `${nhom.chamNhip} em chậm nhịp` : '',
+    quaN > 0 ? `${quaN} em chưa nộp quá hạn` : '',
+  ].filter(Boolean).join(' · ')
   const homNay = bai.chang.find((c) => c.laHomNay)
   const chuChang = bai.chiaChang ? (homNay ? `chặng ${homNay.so} trong ${bai.chang.length}` : `${bai.chang.length} chặng`) : ''
   const hanChu = han.qua ? `Đã qua hạn${nhom && nhom.nopTre > 0 ? ` · ${nhom.nopTre} em nộp trễ` : ''}` : han.chu
@@ -102,7 +105,9 @@ export default function TheBaiBtg({
           )}
           <div className="btg-hanh-dong">
             <span className="btg-phu btg-hanh-dong-chu">{tomTat || (nhom ? 'Mọi em đang đúng nhịp' : '')}</span>
-            {nhom ? (
+            {quaN > 0 ? (
+              <button type="button" className="btg-nut" onClick={() => moNgan('chua_nop')}>Xem {quaN} em chưa nộp</button>
+            ) : nhom ? (
               canY > 0 && <button type="button" className="btg-nut" onClick={() => moNgan('can_y')}>Xem {canY} em này</button>
             ) : (
               <button type="button" className="btg-nut" onClick={hd.xemBaiLam}>Xem bài làm</button>
