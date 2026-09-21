@@ -599,6 +599,7 @@ describe('homNay.cau — LUẬT CHE: ca chưa công bố / BTVN chưa nộp / g�
     const r = await chay(d, await capPass(d))
     const c = tuoiChe(r, 'ca_kiem_tra')
     expect(c).toEqual([{ luc: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', che: 'chua_cong_bo', giay: 40 }])
+    expect(JSON.stringify(r)).not.toContain('Q-KIEM') // câu bị che không lộ cả MÃ CÂU (qid chỉ có ở câu được phép, để màn gọi lệnh lời giải)
     soiRo(r)
     expect(JSON.stringify(r)).not.toMatch(/Đề bí mật|8\.25|Thuỷ phân ester/)
     // dòng thời gian: có phiên nhưng không số câu/đúng
@@ -616,7 +617,7 @@ describe('homNay.cau — LUẬT CHE: ca chưa công bố / BTVN chưa nộp / g�
     suKien(d, { qid: 'Q-KIEM', ngay: NGAY, gio: '10:00', nguon: 'thi', ma: 'CA', kq: 0, dang: 'ES', giay: 40 })
     await dungLaiHoSo(d.env, ['S1'], 'x')
     const r = await chay(d, await capPass(d))
-    expect(r.homNay.cau).toEqual([{ luc: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', tenDang: 'Thuỷ phân ester', deRutGon: 'Este nào thuỷ phân ra ancol?', conChon: 'A', dapAn: 'B', dung: false, giay: 40, coLoiGiai: true }])
+    expect(r.homNay.cau).toEqual([{ luc: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', qid: 'Q-KIEM', tenDang: 'Thuỷ phân ester', deRutGon: 'Este nào thuỷ phân ra ancol?', conChon: 'A', dapAn: 'B', dung: false, giay: 40, coLoiGiai: true }])
     expect(JSON.stringify(r)).not.toContain('LG-BI-MAT') // lời giải chỉ có ở lệnh mở từng câu, không ở danh sách
   })
 
@@ -859,6 +860,42 @@ describe('phChiTietCauVeCon — lời giải một câu, CÙNG luật che', () =
     await expect(phChiTietCauVeCon(d.env, { sbd: 'KHONG-CO', qid: 'Q' }, NOW)).rejects.toThrow(/Không tìm thấy số báo danh/)
     expect((await phChiTietCauVeCon(d.env, { sbd: 'S1', qid: 'Q' }, NOW)).ok).toBe(false) // SBD trần được nhận; câu con chưa làm thì từ chối vì lý do khác
     expect((await goi(d, '')).ok).toBe(false)
+  })
+  it('BA ca từ chối: qid LẠ (không có ở đâu) · qid của EM KHÁC · qid của câu BỊ CHE của chính con — không lộ đề, đáp án, lời giải; qid của câu được phép thì có', async () => {
+    const { d } = dung()
+    khoLG(d, 'Q-EM-KHAC'); khoLG(d, 'Q-CHE'); khoLG(d, 'Q-DUOC')
+    suKien(d, { qid: 'Q-EM-KHAC', ngay: NGAY, gio: '09:00', sbd: 'S2', kq: 1 }) // con của nhà khác làm, S1 (con của phụ huynh này) chưa làm
+    themCa(d, 'CA-CHE', 'khong'); themLuot(d, 'CA-CHE', 'S1', { tong: 6 })
+    suKien(d, { qid: 'Q-CHE', ngay: NGAY, gio: '10:00', nguon: 'thi', ma: 'CA-CHE', kq: 0 }) // ca chưa công bố
+    suKien(d, { qid: 'Q-DUOC', ngay: NGAY, gio: '11:00', nguon: 'on_lai', ma: 'm', kq: 1 })
+    const pass = await capPass(d)
+    for (const qid of ['Q-KHONG-CO-DAU', 'Q-EM-KHAC']) {
+      const r = await goi(d, qid, pass)
+      expect(r, qid).toMatchObject({ ok: false })
+      expect(JSON.stringify(r), qid).not.toMatch(/LG-BI-MAT|Đề đầy đủ|"dapAn"/)
+    }
+    const che = await goi(d, 'Q-CHE', pass)
+    expect(che).toMatchObject({ ok: false, che: 'chua_cong_bo' })
+    expect(JSON.stringify(che)).not.toMatch(/LG-BI-MAT|Đề đầy đủ|"dapAn"/)
+    const duoc = await goi(d, 'Q-DUOC', pass)
+    expect(duoc.ok).toBe(true)
+    expect(duoc.loiGiai).toContain('LG-BI-MAT-Q-DUOC')
+  })
+  it('qid trong danh sách hôm nay khớp lệnh lời giải: mọi câu CÓ qid mở được, mọi câu KHÔNG qid (bị che) thì lệnh từ chối', async () => {
+    const { d } = dung()
+    khoLG(d, 'Q-A'); khoLG(d, 'Q-B')
+    themCa(d, 'CA-B', 'khong'); themLuot(d, 'CA-B', 'S1', { tong: 6 })
+    suKien(d, { qid: 'Q-A', ngay: NGAY, gio: '10:00', nguon: 'on_lai', ma: 'm', kq: 1 })
+    suKien(d, { qid: 'Q-B', ngay: NGAY, gio: '10:30', nguon: 'thi', ma: 'CA-B', kq: 0 })
+    const pass = await capPass(d)
+    const r = await chay(d, pass)
+    const conQid = (r.homNay.cau as any[]).filter((c) => 'qid' in c)
+    const bi = (r.homNay.cau as any[]).filter((c) => !('qid' in c))
+    expect(conQid.map((c) => c.qid)).toEqual(['Q-A'])
+    expect(bi).toHaveLength(1)
+    expect(bi[0].che).toBe('chua_cong_bo')
+    expect((await goi(d, 'Q-A', pass)).ok).toBe(true)
+    expect((await goi(d, 'Q-B', pass)).ok).toBe(false)
   })
   it('câu con CHƯA làm ⇒ từ chối (không thành đường đọc kho tuỳ ý)', async () => {
     const { d } = dung()

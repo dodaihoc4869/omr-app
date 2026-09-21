@@ -3,7 +3,7 @@
 // Khối nào không có số thật thì VẮNG (không số 0 giả, không mảng bịa).
 //
 // LUẬT CHE (đứng trên mọi khối; luật công bố ở `cong-bo-diem.ts`): sự kiện học của ca CHƯA công bố, của bài tập về nhà CHƯA NỘP, của gói "gia đình giao" CHƯA NỘP bị CHE — nó KHÔNG vào bất kỳ con số nào có đúng/sai
-// (tổng quan, nhịp học, dạng vấp, bậc dạng, lịch ôn, tiến bộ), và ở `homNay.cau[]` chỉ còn `{luc, nguon, che, giay?}` (không đề, không đáp án, không đúng/sai, không tên dạng). Điện thoại phụ huynh không được thành đường lộ đáp án cho con.
+// (tổng quan, nhịp học, dạng vấp, bậc dạng, lịch ôn, tiến bộ), và ở `homNay.cau[]` chỉ còn `{luc, nguon, che, giay?}` (không đề, không đáp án, không đúng/sai, không tên dạng, KHÔNG mã câu `qid`). Điện thoại phụ huynh không được thành đường lộ đáp án cho con.
 // Ca chưa công bố ở `caGanNhat`: chỉ `congBo` + `soEmDaNop/soEmDaVao` (không điểm, số câu, phần, so với lần trước); `tienBo.diem` chỉ gồm ca ĐÃ công bố.
 // Hồ sơ nắm kiến thức (bậc, lịch ôn) ở đây được PHÁT LẠI từ sổ học ĐÃ BỎ sự kiện bị che (bằng chính `phatLaiSuKien` của hồ sơ) — bảng `nam_kt_*` dựng từ toàn bộ sổ nên đếm câu sai của ca chưa công bố; đọc thẳng chúng là lộ điểm.
 // Xác thực: `sbdCuaPhuHuynh` nhận token HOẶC SBD trần (hằng `CHI_NHAN_TOKEN`; như `/ph/giao-them` sau da5b5b5). Việc DUY NHẤT có ghi D1 là dòng đếm truy cập `ph_truy_cap` của chính hàm xác thực đó (không phải của tệp này).
@@ -439,7 +439,8 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
     const conChon = ct && chuoi(ct.dap_an_chon) && !/^[-–—_\s]+$/.test(chuoi(ct.dap_an_chon)) ? chuoi(ct.dap_an_chon) : ''
     const dapAn = (ct && chuoi(ct.dap_an_dung)) || chuoi(q.correct)
     cau.push({
-      luc: e.luc, nguon, ...(tenDang ? { tenDang } : {}), deRutGon: deRutGon(q.text),
+      // `qid` CHỈ ở câu KHÔNG bị che (để màn gọi /ph/chi-tiet-cau-ve-con); câu bị che ở trên không bao giờ có mã câu.
+      luc: e.luc, nguon, qid: e.qid, ...(tenDang ? { tenDang } : {}), deRutGon: deRutGon(q.text),
       ...(conChon ? { conChon } : {}), ...(dapAn ? { dapAn } : {}), ...(e.ketQua !== null ? { dung: e.ketQua === 1 } : {}),
       ...(e.giay && e.giay > 0 ? { giay: e.giay } : {}), coLoiGiai: chuoi(typeof q.solution === 'string' ? q.solution : q.solution ? json(q.solution) : '') !== '',
     })
