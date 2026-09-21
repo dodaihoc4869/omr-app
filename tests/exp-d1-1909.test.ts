@@ -612,29 +612,29 @@ describe('trạng thái đạt ngày cho giao diện: còn THIẾU gì', () => {
 })
 
 describe('tiếp sức đồng đội cho game (ghiTiepSuc)', () => {
-  it('+3 EXP mỗi lần, tối đa 5 lần một ngày VN, sang ngày mới đếm lại; khoá `<sbd>|tiepsuc|<ngày>|<n>`', async () => {
+  it('+5 EXP mỗi lần (sửa CÓ CHỦ Ý 21/09 Điều 9: 3 ⇒ 5; qua cửa trần 120 EXP game), tối đa 5 lần một ngày VN, sang ngày mới đếm lại; khoá `<sbd>|tiepsuc|<ngày>|<n>`', async () => {
     const d = await dung()
     const kq = []
     for (let i = 0; i < 7; i++) kq.push(await ghiTiepSuc(d.env, 'S1', NOW + i))
-    expect(kq.map((x) => [x.exp, x.lanThu, x.conLai])).toEqual([[3, 1, 4], [3, 2, 3], [3, 3, 2], [3, 4, 1], [3, 5, 0], [0, 0, 0], [0, 0, 0]])
+    expect(kq.map((x) => [x.exp, x.lanThu, x.conLai])).toEqual([[5, 1, 4], [5, 2, 3], [5, 3, 2], [5, 4, 1], [5, 5, 0], [0, 0, 0], [0, 0, 0]])
     expect(khoaExp(d)).toEqual([1, 2, 3, 4, 5].map((n) => `tiepsuc|${HOM_NAY}|${n}`))
-    expect(docHoSoGame(d).earned).toBe(15)
-    expect((await ghiTiepSuc(d.env, 'S1', NOW + D)).exp).toBe(3)
+    expect(docHoSoGame(d).earned).toBe(25)
+    expect((await ghiTiepSuc(d.env, 'S1', NOW + D)).exp).toBe(5)
   })
   it('gọi lại cùng `idLuot` không cộng đôi', async () => {
     const d = await dung()
-    expect((await ghiTiepSuc(d.env, 'S1', NOW, 'luot-1')).exp).toBe(3)
+    expect((await ghiTiepSuc(d.env, 'S1', NOW, 'luot-1')).exp).toBe(5)
     const l = await ghiTiepSuc(d.env, 'S1', NOW + 1, 'luot-1')
     expect(l).toMatchObject({ exp: 0, daGhiTruoc: true, conLai: 4 })
     expect((await ghiTiepSuc(d.env, 'S1', NOW + 2, 'luot-2')).lanThu).toBe(2)
-    expect(tongExp(d)).toBe(6)
+    expect(tongExp(d)).toBe(10)
   })
   it('năm lượt CHỒNG NHAU vẫn đúng 5 khoản, mỗi ô một lần', async () => {
     const d = await dung()
     const r = await Promise.all(Array.from({ length: 8 }, (_, i) => ghiTiepSuc(d.env, 'S1', NOW + i, `l${i}`)))
-    expect(r.filter((x) => x.exp === 3)).toHaveLength(5)
+    expect(r.filter((x) => x.exp === 5)).toHaveLength(5)
     expect(new Set(khoaExp(d)).size).toBe(5)
-    expect(docHoSoGame(d).earned).toBe(15)
+    expect(docHoSoGame(d).earned).toBe(25)
   })
   it('cờ tắt → không ghi gì; không ném lỗi khi thiếu bảng', async () => {
     const t = taoD1That()

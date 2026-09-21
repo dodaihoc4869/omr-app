@@ -38,7 +38,7 @@ export const EXP_LEN_BANG_CHUA_DAT = 5
 /** Ca thi theo điểm: round(điểm 0..10) × hệ số. */
 export const EXP_DIEM_CA_HE_SO = 3
 /** Game "Đoàn Hộ Tống" — tiếp sức đồng đội: EXP mỗi lần, tối đa số lần mỗi ngày VN (game GỌI `ghiTiepSuc` của `exp-d1.ts`, không tự ghi sổ EXP). */
-export const EXP_TIEP_SUC = 3
+export const EXP_TIEP_SUC = 5 // 3 ⇒ 5 (Điều 9, thầy lệnh 21/09 13:43); vẫn qua cửa trần 120 EXP game/ngày
 export const TIEP_SUC_TOI_DA_NGAY = 5
 /** Chuỗi ngày đạt: HE_SO × min(chuỗi, TOI_DA). */
 export const EXP_CHUOI_HE_SO = 2

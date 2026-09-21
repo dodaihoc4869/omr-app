@@ -323,7 +323,7 @@ describe('Đoàn Hộ Tống · máy chủ · Tiếp sức', () => {
     khongLo(xemThe.goiY, ['S2']); expect(JSON.stringify(xemThe)).not.toContain(`${BI_MAT}-Y1`); expect(JSON.stringify(xemThe.goiY)).not.toMatch(/noiDung|choices|Kiến thức gốc|Phương án [ABCD] không/)
     await expect(goi(d, 'S1', 'tiep-suc', { ma, hiep: 1, den: 1, the: 'buoc_dau' })).rejects.toThrow('không dùng được')
     const gui = await goi(d, 'S1', 'tiep-suc', { ma, hiep: 1, den: 1, the: 'loai_phuong_an' }) as any
-    expect(gui.expTiepSuc).toEqual({ bat: true, exp: 3, conLai: 4 }); expect(gui.doan.tiepSuc).toMatchObject({ banCan: [], daGiup: true, lienKichSanSang: true }); expect(JSON.stringify(gui)).not.toContain(`${BI_MAT}-Y1`); expect(JSON.stringify(gui)).not.toContain('"S2"')
+    expect(gui.expTiepSuc).toEqual({ bat: true, exp: 5, conLai: 4 }); expect(gui.doan.tiepSuc).toMatchObject({ banCan: [], daGiup: true, lienKichSanSang: true }); expect(JSON.stringify(gui)).not.toContain(`${BI_MAT}-Y1`); expect(JSON.stringify(gui)).not.toContain('"S2"')
     expect(JSON.stringify(gui)).not.toContain('không đúng — em gạch') // nội dung thẻ không về máy người giúp
     const b = await goi(d, 'S2', 'xem', { ma })
     expect(b.doan.tiepSuc).toMatchObject({ conLuotNhan: 1, daXin: false, lienKichSanSang: true, theNhan: { tuTen: 'Thu Hà', tuLaMay: false, loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án' } })
@@ -336,7 +336,7 @@ describe('Đoàn Hộ Tống · máy chủ · Tiếp sức', () => {
     expect(lan.attempt).toMatchObject({ qid: 'Y1', correct: true, assisted: true }); expect(lan.reward).toBe(0)
     expect(dem(d, "SELECT COUNT(*) n FROM su_kien_hoc WHERE sbd='S2' AND nguon='game'")).toBe(0); expect(dem(d, "SELECT COUNT(*) n FROM su_kien_hoc WHERE sbd='S1' AND nguon='game'")).toBe(1)
     expect(d.sql.prepare('SELECT hiep,den_sbd,tu_sbd,the,thanh_cong FROM doan_tiep_suc WHERE ma_chang=?').all(ma)).toEqual([{ hiep: 1, den_sbd: 'S2', tu_sbd: 'S1', the: 'loai_phuong_an', thanh_cong: 1 }])
-    expect(d.sql.prepare("SELECT loai,exp,ma_nguon FROM exp_so WHERE sbd='S1' AND loai='tiepsuc'").all()).toEqual([{ loai: 'tiepsuc', exp: 3, ma_nguon: `${ma}|1|1` }])
+    expect(d.sql.prepare("SELECT loai,exp,ma_nguon FROM exp_so WHERE sbd='S1' AND loai='tiepsuc'").all()).toEqual([{ loai: 'tiepsuc', exp: 5, ma_nguon: `${ma}|1|1` }])
     expect(dem(d, "SELECT COUNT(*) n FROM exp_so WHERE sbd='S2'")).toBe(0) // người ĐƯỢC giúp không có EXP tiếp sức
   })
   it('bạn làm lại vẫn SAI → không Liên Kích, sổ tiếp sức ghi thanh_cong=0; mỗi hiệp em giúp MỘT bạn; thẻ chỉ tới khi bạn đã bật tín hiệu', async () => {
@@ -405,13 +405,13 @@ describe('Đoàn Hộ Tống · máy chủ · luật cũ vẫn khoá', () => {
     const q = thuong.questions[0].qid as string
     expect(await gameV2(d.env, 'answer', { token, session: thuong.id, qid: q, answer: dapAn.get(q) })).toMatchObject({ ok: true, correct: true })
   })
-  it('trần 200 câu game/ngày: đã đủ 200 thì không lên đường được; em chưa có bằng chứng học thì được báo bằng lời, không mở chặng rỗng', async () => {
+  it('trần 60 câu game/ngày (sửa CÓ CHỦ Ý 21/09: 200 ⇒ 60): đã đủ 60 thì không lên đường được; em chưa có bằng chứng học thì được báo bằng lời, không mở chặng rỗng', async () => {
     const d = dungTruong(); await bangChung(d, 'S1', 'X1')
     await expect(goi(d, 'S2', 'mo')).rejects.toThrow('Chưa có câu')
     expect(dem(d, 'SELECT COUNT(*) n FROM doan_chang')).toBe(0)
     const ins = d.sql.prepare("INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,'S1','s',?,?,?,?)")
-    for (let i = 0; i < 200; i++) ins.run(`a${i}`, `cu${i}`, `g-cu${i}`, JSON.stringify({ attempt: { id: `a${i}`, session: 's', qid: `cu${i}`, group: `g-cu${i}`, dang: 'ES.A.X', mucDo: 'biet', correct: true, assisted: false, at: T0 - 60_000, novel: true } }), new Date(T0 - 60_000).toISOString())
-    await expect(goi(d, 'S1', 'mo')).rejects.toThrow('200 câu')
+    for (let i = 0; i < 60; i++) ins.run(`a${i}`, `cu${i}`, `g-cu${i}`, JSON.stringify({ attempt: { id: `a${i}`, session: 's', qid: `cu${i}`, group: `g-cu${i}`, dang: 'ES.A.X', mucDo: 'biet', correct: true, assisted: false, at: T0 - 60_000, novel: true } }), new Date(T0 - 60_000).toISOString())
+    await expect(goi(d, 'S1', 'mo')).rejects.toThrow('60 câu')
   })
   it('chưa chọn thần thú thì chưa lên đường; thầy tạm dừng game của em thì Đoàn cũng dừng', async () => {
     const d = dungTruong(); await bangChung(d, 'S1', 'X1')

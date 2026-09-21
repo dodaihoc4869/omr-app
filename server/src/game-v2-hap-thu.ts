@@ -4,7 +4,7 @@
 // Chuyển đổi hồ sơ đã chơi (luatCap ≠ 2) là LƯỜI (khi mở hồ sơ) + cron quét từng lô; luôn ghi bằng CAS theo `revision` (thua CAS = em đang chơi ⇒ KHÔNG đè, lần sau làm lại).
 import type { Env } from './kieu'
 import type { Profile } from './game-v2'
-import { LUAT_CAP_MOI, chuyenDoiLuatCap, tranExpGameNgay, tranHapThu } from '../../src/lib/hap-thu-ngay'
+import { CO_HOC_TOI_THIEU_CAU, LUAT_CAP_MOI, chuyenDoiLuatCap, tranExpGameNgay, tranHapThu } from '../../src/lib/hap-thu-ngay'
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { NGAY_BANG_GIA_MOI } from './exp-cau-hinh'
 import { ngayVn } from './su-kien-hoc'
@@ -17,20 +17,25 @@ export const LOI_LUAT_CAP = 'Từ 21/09 thần thú lớn theo từng ngày em h
 
 const batDauNgay = (ngay: string): string => new Date(`${ngay}T00:00:00+07:00`).toISOString()
 
-/** Hôm nay em ĐẠT nhiệm vụ ngày / CÓ HỌC chưa (đọc-chỉ, MỘT truy vấn). Lỗi đọc ⇒ coi như chưa học (trần 0: không nạp nhầm). */
-export async function docTranHapThu(env: Env, sbd: string, ngay: string): Promise<{ tran: number; dat: boolean; coHoc: boolean }> {
+export interface TranHapThu { tran: number; dat: boolean; coHoc: boolean; /** Số câu KHÁC NHAU hôm nay (mọi nguồn, có kết quả). */ soCauHomNay: number; /** Số câu tối thiểu để tính "có học" (`CO_HOC_TOI_THIEU_CAU`). */ canCau: number }
+
+/**
+ * Hôm nay em ĐẠT nhiệm vụ ngày (khoản `dat_ngay`) và làm bao nhiêu câu KHÁC NHAU (`su_kien_hoc`, mọi nguồn kể cả game, có kết quả) — đọc-chỉ, MỘT truy vấn. "Có học" = ≥ `CO_HOC_TOI_THIEU_CAU` (4) câu khác nhau
+ * (Boss siết 21/09: một câu sai mỗi ngày không còn ăn 120 từ ống). Lỗi đọc ⇒ coi như chưa học (trần 0: không nạp nhầm).
+ */
+export async function docTranHapThu(env: Env, sbd: string, ngay: string): Promise<TranHapThu> {
   try {
     const r = await env.DB.prepare(
       `SELECT (SELECT COUNT(*) FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'dat_ngay') AS dat,
-              (SELECT COUNT(*) FROM exp_so WHERE sbd = ? AND ngay_vn = ?) AS ex,
-              (SELECT COUNT(*) FROM game_v2_attempt WHERE sbd = ? AND created_at >= ? AND created_at < ?) AS tt`,
-    ).bind(sbd, ngay, sbd, ngay, sbd, batDauNgay(ngay), new Date(Date.parse(batDauNgay(ngay)) + 86_400_000).toISOString()).first<{ dat: number; ex: number; tt: number }>()
+              (SELECT COUNT(DISTINCT qid) FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND ket_qua IS NOT NULL) AS so_cau`,
+    ).bind(sbd, ngay, sbd, ngay).first<{ dat: number; so_cau: number }>()
     const dat = (Number(r?.dat) || 0) > 0
-    const coHoc = dat || (Number(r?.ex) || 0) > 0 || (Number(r?.tt) || 0) > 0
-    return { tran: tranHapThu({ datHomNay: dat, coHocHomNay: coHoc }), dat, coHoc }
+    const soCauHomNay = Math.max(0, Math.floor(Number(r?.so_cau) || 0))
+    const tran = tranHapThu({ datHomNay: dat, soCauHomNay })
+    return { tran, dat, coHoc: dat || tran > 0, soCauHomNay, canCau: CO_HOC_TOI_THIEU_CAU }
   } catch (e) {
     console.error('[hap-thu] đọc trần lỗi (coi như chưa học):', e instanceof Error ? e.message : e)
-    return { tran: 0, dat: false, coHoc: false }
+    return { tran: 0, dat: false, coHoc: false, soCauHomNay: 0, canCau: CO_HOC_TOI_THIEU_CAU }
   }
 }
 

@@ -29,6 +29,11 @@ const docHoSo = (d: D1That, sbd = 'S1') => JSON.parse((d.sql.prepare('SELECT jso
 const revision = (d: D1That, sbd = 'S1') => (d.sql.prepare('SELECT revision FROM game_v2_profile WHERE sbd=?').get(sbd) as { revision: number }).revision
 const themExp = (d: D1That, loai: string, ngay = NGAY, sbd = 'S1') => d.sql.prepare("INSERT INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu) VALUES(?,?,?,?,NULL,NULL,5,?,'x')").run(`${sbd}|${loai}|${ngay}|${Math.random()}`, sbd, ngay, loai, `${ngay}T03:00:00.000Z`)
 const invest = (d: D1That) => gameV2(d.env, 'invest', { token: 'token-S1' })
+/** Em làm `n` câu KHÁC NHAU trong ngày `ngay` (sổ sự kiện học, mọi nguồn; `ketQua` 1/0, null = chưa có kết quả). "Có học" = ≥ 4 câu khác nhau (Boss siết 21/09). */
+const lamCau = (d: D1That, n: number, ngay = NGAY, o: { nguon?: string; ketQua?: 0 | 1 | null; tienTo?: string } = {}) => {
+  for (let i = 0; i < n; i++) d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES (?, 'S1', ?, ?, 'x', 1, ?, 40, ?, ?)")
+    .run(`${o.tienTo ?? 'k'}${ngay}-${i}`, `${o.tienTo ?? 'Q'}-${ngay}-${i}`, o.nguon ?? 'btvn', o.ketQua === undefined ? 1 : o.ketQua, `${ngay}T03:0${i % 10}:00.000Z`, ngay)
+}
 
 describe('cổng hấp thụ `invest`', () => {
   it('chưa học hôm nay ⇒ nạp 0, nói thật lý do, KHÔNG ghi (revision giữ nguyên, EXP nằm nguyên ở ống)', async () => {
@@ -37,13 +42,13 @@ describe('cổng hấp thụ `invest`', () => {
     const r = await invest(d)
     expect(r).toMatchObject({ ok: true, daNap: 0, lyDo: 'chua_hoc', conTran: 0 })
     expect(docHoSo(d)).toMatchObject({ cap: 1, exp: 0, wallet: 500 }); expect(revision(d)).toBe(0)
-    expect((r.profile as any).hapThuHomNay).toEqual({ da: 0, tran: 0, lyDo: 'chua_hoc' })
+    expect((r.profile as any).hapThuHomNay).toEqual({ da: 0, tran: 0, lyDo: 'chua_hoc', soCauHomNay: 0, canCau: 4 })
   })
 
   it('có học chưa đạt ⇒ trần 120; sau đó ĐẠT nhiệm vụ ngày ⇒ nạp tiếp tới 200; đủ rồi ⇒ 0 (lý do "no")', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That(); themHoSo(d)
-    themExp(d, 'cau')
+    lamCau(d, 4)
     const a = await invest(d)
     expect(a).toMatchObject({ daNap: 120, lyDo: 'no', conTran: 0 })
     expect(docHoSo(d)).toMatchObject({ cap: 1, exp: 120, wallet: 380, hapThu: { ngay: NGAY, da: 120 } })
@@ -53,15 +58,30 @@ describe('cổng hấp thụ `invest`', () => {
     expect(docHoSo(d)).toMatchObject({ cap: 2, exp: 40, wallet: 300, hapThu: { ngay: NGAY, da: 200 } }) // thanh cấp 1 = 160 ⇒ 200 = 1 cấp + 40
     const c = await invest(d)
     expect(c).toMatchObject({ daNap: 0, lyDo: 'no' }); expect(docHoSo(d).wallet).toBe(300)
-    expect((c.profile as any).hapThuHomNay).toEqual({ da: 200, tran: 200, lyDo: 'no' })
+    expect((c.profile as any).hapThuHomNay).toEqual({ da: 200, tran: 200, lyDo: 'no', soCauHomNay: 4, canCau: 4 })
   })
 
-  it('ống ít hơn trần ⇒ nạp hết ống, lý do "het_ong"; chỉ có LƯỢT GAME hôm nay (không exp_so) cũng tính là có học', async () => {
+  it('ống ít hơn trần ⇒ nạp hết ống, lý do "het_ong"; 4 câu GAME khác nhau (không có exp_so nào) cũng tính là có học', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That(); themHoSo(d, { wallet: 30 })
-    d.sql.prepare("INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES('a','S1','s','q','g','{}',?)").run(new Date().toISOString())
+    lamCau(d, 4, NGAY, { nguon: 'game' })
     expect(await invest(d)).toMatchObject({ daNap: 30, lyDo: 'het_ong' })
     expect(docHoSo(d)).toMatchObject({ cap: 1, exp: 30, wallet: 0 })
+  })
+
+  it('SIẾT "CÓ HỌC" (Boss 21/09): 1–3 câu ⇒ CHƯA học (0, nói rõ đã làm mấy/cần mấy); câu chưa có kết quả và câu lặp không tính; đủ 4 câu KHÁC NHAU ⇒ 120; một dòng exp_so lẻ không còn đủ', async () => {
+    gio(`${NGAY}T10:00:00`)
+    const d = taoD1That(); themHoSo(d)
+    themExp(d, 'cau'); themExp(d, 'len_bac') // trước đây chỉ cần 1 dòng exp_so là ăn 120
+    lamCau(d, 3)
+    lamCau(d, 2, NGAY, { ketQua: null, tienTo: 'N' }) // chưa có kết quả ⇒ không tính
+    d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES ('lap', 'S1', 'Q-2026-09-22-0', 'game', 'y', 1, 0, 40, ?, ?)").run(`${NGAY}T04:00:00.000Z`, NGAY) // cùng qid câu đầu ⇒ vẫn 3 câu khác nhau
+    lamCau(d, 4, '2026-09-21', { tienTo: 'H' }) // hôm qua không tính cho hôm nay
+    const a = await invest(d)
+    expect(a).toMatchObject({ daNap: 0, lyDo: 'chua_hoc' }); expect((a.profile as any).hapThuHomNay).toMatchObject({ tran: 0, soCauHomNay: 3, canCau: 4 })
+    expect(docHoSo(d)).toMatchObject({ cap: 1, exp: 0, wallet: 500 })
+    lamCau(d, 1, NGAY, { tienTo: 'Z' })
+    expect(await invest(d)).toMatchObject({ daNap: 120 })
   })
 
   it('SANG NGÀY MỚI trần tính lại từ 0: hôm qua đạt không cho hôm nay ăn; hôm nay có học thì 120', async () => {
@@ -71,7 +91,7 @@ describe('cổng hấp thụ `invest`', () => {
     expect(await invest(d)).toMatchObject({ daNap: 200 })
     gio('2026-09-23T09:00:00')
     expect(await invest(d)).toMatchObject({ daNap: 0, lyDo: 'chua_hoc' }) // 23/09 chưa học gì
-    themExp(d, 'cau', '2026-09-23')
+    lamCau(d, 4, '2026-09-23')
     expect(await invest(d)).toMatchObject({ daNap: 120 })
     expect(docHoSo(d).hapThu).toEqual({ ngay: '2026-09-23', da: 120 })
   })
@@ -250,16 +270,16 @@ describe('hồ sơ hiển thị cho máy em (chỉ-thêm)', () => {
   it('`profile` trả hapThuHomNay {da, tran}, expGameHomNay {da, tran: 120}, ongNghiem; KHÔNG lộ truocSiet/legacy', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That(); themHoSo(d, { wallet: 77, truocSiet: { cap: 9 }, hapThu: { ngay: NGAY, da: 50 }, expGame: { ngay: NGAY, da: 30 } })
-    themExp(d, 'cau')
+    lamCau(d, 4)
     const r = await gameV2(d.env, 'profile', { token: 'token-S1' }) as any
-    expect(r.profile).toMatchObject({ ongNghiem: 77, hapThuHomNay: { da: 50, tran: 120 }, expGameHomNay: { da: 30, tran: 120 } })
+    expect(r.profile).toMatchObject({ ongNghiem: 77, hapThuHomNay: { da: 50, tran: 120, soCauHomNay: 4, canCau: 4 }, expGameHomNay: { da: 30, tran: 120 } })
     expect(r.profile).not.toHaveProperty('truocSiet'); expect(r.profile).not.toHaveProperty('legacy')
   })
   it('sang ngày mới: hapThuHomNay.da và expGameHomNay.da về 0', async () => {
     gio('2026-09-24T10:00:00')
     const d = taoD1That(); themHoSo(d, { hapThu: { ngay: NGAY, da: 200 }, expGame: { ngay: NGAY, da: 120 } })
     const r = await gameV2(d.env, 'profile', { token: 'token-S1' }) as any
-    expect(r.profile.hapThuHomNay).toEqual({ da: 0, tran: 0, lyDo: null }); expect(r.profile.expGameHomNay).toEqual({ da: 0, tran: 120 })
+    expect(r.profile.hapThuHomNay).toEqual({ da: 0, tran: 0, lyDo: null, soCauHomNay: 0, canCau: 4 }); expect(r.profile.expGameHomNay).toEqual({ da: 0, tran: 120 })
   })
 })
 
@@ -267,7 +287,7 @@ describe('ba con số cho Bảng nhiệm vụ (khối `exp`): expConThieu · ong
   it('expConThieu = thanh cấp − EXP đã hấp thụ (KHÔNG trừ ống); ongNghiem = ví; hapThuConLaiHomNay = trần hôm nay − đã ăn hôm nay', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That(); themHoSo(d, { cap: 2, exp: 40, wallet: 300, hapThu: { ngay: NGAY, da: 120 } })
-    themExp(d, 'cau')
+    lamCau(d, 4)
     expect(await docHapThuChoEm(d.env, 'S1')).toEqual({ expConThieu: thanhExp(2) - 40, ongNghiem: 300, hapThuConLaiHomNay: 0 })
     themExp(d, 'dat_ngay')
     expect(await docHapThuChoEm(d.env, 'S1')).toMatchObject({ hapThuConLaiHomNay: 80 })

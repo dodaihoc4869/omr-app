@@ -207,21 +207,24 @@ it('Linh Tâm tải lại đúng câu cùng lượt và từ chối câu của l
  expect(f.sql.prepare('SELECT COUNT(*) n FROM game_v2_attempt').get()?.n).toBe(0)
 })
 
-it('nhiệm vụ cá nhân không lộ đáp án, giới hạn 200 câu theo ngày Việt Nam, không ảnh hưởng hồ sơ khác',async()=>{
+it('nhiệm vụ cá nhân không lộ đáp án, giới hạn 60 câu theo ngày Việt Nam (sửa CÓ CHỦ Ý 21/09: 200 ⇒ 60), không ảnh hưởng hồ sơ khác',async()=>{
  const f=fixture();f.seed();await syncIndex(f.env);const token=await gameToken(f.env,'1');await gameV2(f.env,'choose',{token,pet:'nuoc_long'})
  const suggestion:any=await gameV2(f.env,'recommendations',{token})
- expect(suggestion.dailyUsed).toBe(0);expect(suggestion.remaining).toBe(200);expect(suggestion.suggestions.length).toBeGreaterThan(0)
+ expect(suggestion.dailyUsed).toBe(0);expect(suggestion.remaining).toBe(60);expect(suggestion.suggestions.length).toBeGreaterThan(0)
  expect(JSON.stringify(suggestion)).not.toContain('correct');expect(suggestion.suggestions[0]).toHaveProperty('source')
  const session:any=await gameV2(f.env,'start',{token});const at=new Date().toISOString()
  const insert=f.sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
- for(let i=0;i<199;i++)insert.run('limit'+i,'1','old','q'+i,'g'+i,JSON.stringify({attempt:{at:Date.now(),group:'g'+i,correct:true}}),at)
+ for(let i=0;i<59;i++)insert.run('limit'+i,'1','old','q'+i,'g'+i,JSON.stringify({attempt:{at:Date.now(),group:'g'+i,correct:true}}),at)
  const last:any=await gameV2(f.env,'start',{token});expect(last.questions).toHaveLength(1)
  await gameV2(f.env,'answer',{token,session:session.id,qid:session.questions[0].qid,answer:'B'})
  expect((await gameV2(f.env,'recommendations',{token})).remaining).toBe(0)
- await expect(gameV2(f.env,'start',{token})).rejects.toThrow('200 câu')
- await expect(gameV2(f.env,'answer',{token,session:last.id,qid:last.questions[0].qid,answer:'B'})).rejects.toThrow('200 câu')
+ await expect(gameV2(f.env,'start',{token})).rejects.toThrow('60 câu')
+ /* Đợt 2 (21/09): `start` lần hai khi lượt cũ CHƯA trả lời câu nào trả lại CHÍNH lượt ấy (không bốc lại câu, không tốn lượt). Trần 60 vẫn chặn trả lời ở MỘT lượt khác. */
+ expect(last.id).toBe(session.id)
+ f.sql.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) SELECT ?,sbd,json,created_at FROM game_v2_session WHERE id=?').run('khac',session.id)
+ await expect(gameV2(f.env,'answer',{token,session:'khac',qid:session.questions[0].qid,answer:'B'})).rejects.toThrow('60 câu')
  const replay:any=await gameV2(f.env,'answer',{token,session:session.id,qid:session.questions[0].qid,answer:'B'});expect(replay.replayed).toBe(true)
- const other=await gameToken(f.env,'2');expect((await gameV2(f.env,'recommendations',{token:other})).remaining).toBe(200)
+ const other=await gameToken(f.env,'2');expect((await gameV2(f.env,'recommendations',{token:other})).remaining).toBe(60)
 })
 
 it('PvP 1 đấu 1: đủ hai người mới bắt đầu, chặn người thứ ba, không tạo Boss',async()=>{

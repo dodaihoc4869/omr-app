@@ -21,7 +21,8 @@ import type { SuKienDoc } from './ho-so-nam-kt'
 import { traCuuTheoQid } from './ho-so-nam-kt'
 import { demChuoiDat } from './ke-hoach-ngay'
 import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
-import { docHapThuChoEm } from './game-v2-hap-thu'
+import { docHapThuChoEm, nhanExpGame } from './game-v2-hap-thu'
+import type { Profile } from './game-v2'
 import { tinhDatNhiemVuNgay } from '../../src/lib/dat-nhiem-vu-ngay'
 import type { ThieuDat } from '../../src/lib/dat-nhiem-vu-ngay'
 import { ngayVn } from './su-kien-hoc'
@@ -554,12 +555,14 @@ export async function ghiTiepSuc(env: Env, sbd: string, nowMs: number, idLuot: s
       if (idLuot && co.some((x) => x.ma_nguon === idLuot)) return { bat: true, exp: 0, lanThu: 0, conLai: Math.max(0, TIEP_SUC_TOI_DA_NGAY - co.length), daGhiTruoc: true }
       if (co.length >= TIEP_SUC_TOI_DA_NGAY) return { bat: true, exp: 0, lanThu: 0, conLai: 0, daGhiTruoc: false }
       const n = co.length + 1
+      // ĐIỀU 9: tiếp sức là EXP sinh trong game ⇒ qua cửa trần 120 EXP/ngày (quá trần ghi khoản 0 EXP, vẫn tính là một lần tiếp sức).
+      const nhan = await giuChoExpGame(env, sbd, ngay, EXP_TIEP_SUC)
       const w = await env.DB.prepare(
         `INSERT OR IGNORE INTO exp_so (khoa, sbd, ngay_vn, loai, qid, ma_nguon, exp, luc, ghi_chu) VALUES (?, ?, ?, 'tiepsuc', NULL, ?, ?, ?, ?)`,
-      ).bind(`${sbd}|tiepsuc|${ngay}|${n}`, sbd, ngay, idLuot, EXP_TIEP_SUC, luc, `Tiếp sức đồng đội lần ${n}: +${EXP_TIEP_SUC}`).run()
+      ).bind(`${sbd}|tiepsuc|${ngay}|${n}`, sbd, ngay, idLuot, nhan, luc, nhan < EXP_TIEP_SUC ? `Tiếp sức đồng đội lần ${n}: +${nhan} (hôm nay em đã đủ EXP game)` : `Tiếp sức đồng đội lần ${n}: +${nhan}`).run()
       if (w.meta.changes) {
-        await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
-        return { bat: true, exp: EXP_TIEP_SUC, lanThu: n, conLai: TIEP_SUC_TOI_DA_NGAY - n, daGhiTruoc: false }
+        if (nhan > 0) await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
+        return { bat: true, exp: nhan, lanThu: n, conLai: TIEP_SUC_TOI_DA_NGAY - n, daGhiTruoc: false }
       }
       // Ô số n vừa bị lượt khác giữ chỗ: đọc lại và thử ô kế.
     }
@@ -567,6 +570,56 @@ export async function ghiTiepSuc(env: Env, sbd: string, nowMs: number, idLuot: s
   } catch (e) {
     console.error('[exp] tiếp sức lỗi (bỏ qua):', e instanceof Error ? e.message : e)
     return khong
+  }
+}
+
+/**
+ * ĐIỀU 9 — GIỮ CHỖ trần EXP game (120/ngày VN) cho MỘT khoản sinh trong game: CAS lên hồ sơ (`expGame {ngay, da}`) và trả phần THẬT được nhận (≤ xin). Em chưa có hồ sơ game ⇒ trả `xin` (chưa có bộ đếm để kẹp,
+ * khoản nằm chờ như mọi khoản). Không giữ được chỗ (hồ sơ đổi liên tục) ⇒ 0 — an toàn: không bao giờ vượt trần. Không ném lỗi.
+ */
+export async function giuChoExpGame(env: Env, sbd: string, ngay: string, xin: number): Promise<number> {
+  for (let lan = 0; lan < 8; lan++) {
+    const row = await an(() => env.DB.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ revision: number; json: string }>(), null)
+    if (!row) return Math.max(0, Math.floor(Number.isFinite(xin) ? xin : 0))
+    let p: Profile
+    try { p = JSON.parse(row.json) as Profile } catch { return 0 }
+    const nhan = nhanExpGame(p, ngay, xin)
+    const r = await env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(json(p), sbd, row.revision).run()
+    if (r.meta.changes) return nhan
+  }
+  return 0
+}
+
+export interface KhoanGame {
+  /** Khoá KHÔNG gồm sbd (ví dụ `thuthach|<qid>`, `doan_chang|<mã chặng>`); ghi vào sổ là `<sbd>|<khoa>` — trùng khoá ⇒ không cộng đôi. */
+  khoa: string
+  loai: string
+  exp: number
+  ngay: string
+  luc: string
+  ghiChu: string
+  maNguon?: string | null
+  qid?: string | null
+}
+
+/**
+ * Ghi MỘT khoản EXP sinh trong game (thử thách/Lượt trùm, kết chặng Đoàn, vỡ giáp…) vào sổ `exp_so`, qua cửa trần 120/ngày (`giuChoExpGame`), rồi cộng phần chênh sổ vào ống nghiệm. Idempotent theo `khoa`.
+ * Quá trần ⇒ ghi khoản 0 EXP (đánh dấu đã xét, không tự cộng lại khi sang ngày). EXP mới TẮT cho em ⇒ không ghi gì. Không ném lỗi.
+ */
+export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs: number): Promise<{ bat: boolean; exp: number; daGhiTruoc: boolean }> {
+  try {
+    if (!mocExpCuaEm(await docCauHinhExp(env), sbd, nowMs)) return { bat: false, exp: 0, daGhiTruoc: false }
+    const khoa = `${sbd}|${k.khoa}`
+    if (await an(() => env.DB.prepare('SELECT 1 AS x FROM exp_so WHERE khoa = ?').bind(khoa).first(), null)) return { bat: true, exp: 0, daGhiTruoc: true }
+    const nhan = await giuChoExpGame(env, sbd, k.ngay, k.exp)
+    const w = await env.DB.prepare('INSERT OR IGNORE INTO exp_so (khoa, sbd, ngay_vn, loai, qid, ma_nguon, exp, luc, ghi_chu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(khoa, sbd, k.ngay, k.loai, k.qid ?? null, k.maNguon ?? null, nhan, k.luc, nhan < k.exp ? `${k.ghiChu} (hôm nay em đã đủ EXP game)` : k.ghiChu).run()
+    if (!w.meta.changes) return { bat: true, exp: 0, daGhiTruoc: true }
+    if (nhan > 0) await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
+    return { bat: true, exp: nhan, daGhiTruoc: false }
+  } catch (e) {
+    console.error('[exp] ghi khoản game lỗi (bỏ qua):', e instanceof Error ? e.message : e)
+    return { bat: false, exp: 0, daGhiTruoc: false }
   }
 }
 
@@ -682,7 +735,7 @@ export async function chotExpNgayQuaDayDu(env: Env, nowMs: number, tuyChon: { to
 
 const TEN_LOAI: Record<string, string> = {
   cau: 'câu đúng', lo: 'lô BTVN', btvn: 'nộp bài BTVN đúng hạn', mom: 'bài được giao', len_bac: 'câu ôn lên bậc', khac_phuc: 'câu khắc phục xong',
-  len_bang: 'lần lên bảng', diem_ca: 'ca thi có điểm', dat_ngay: 'lần đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt', tiepsuc: 'lượt tiếp sức', dau_ngay: 'câu đúng đầu tiên trong ngày', tro_lai: 'lần mừng em trở lại',
+  len_bang: 'lần lên bảng', diem_ca: 'ca thi có điểm', dat_ngay: 'lần đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt', tiepsuc: 'lượt tiếp sức', dau_ngay: 'câu đúng đầu tiên trong ngày', tro_lai: 'lần mừng em trở lại', thu_thach: 'câu thử thách đúng', doan_chang: 'chặng Đoàn thắng', doan_giap: 'lần vỡ giáp trùm',
 }
 
 export interface ExpHomNay {

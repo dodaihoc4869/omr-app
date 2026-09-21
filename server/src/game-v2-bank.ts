@@ -74,7 +74,7 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
   }
   protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});return blocked
 }
-export async function readScope(env:Env,sbd:string):Promise<{evidence:Evidence[];pool:PrivateQuestion[];missing:number}> {
+export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[]):Promise<{evidence:Evidence[];pool:PrivateQuestion[];missing:number}> {
   const rows=await env.DB.prepare(`SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu,l.nop_luc FROM chi_tiet_cau c JOIN luot l ON l.ma_ca=c.ma_ca AND l.sbd=c.sbd AND l.lan_thu=c.lan_thu JOIN ca ON ca.ma_ca=c.ma_ca WHERE c.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND c.dung_sai IN (0,1) AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>()
   // Recover missing detail rows read-only, using only qids explicitly submitted by this learner.
   // Never fill an incomplete personal paper with the rest of the class bank.
@@ -108,7 +108,7 @@ export async function readScope(env:Env,sbd:string):Promise<{evidence:Evidence[]
   const qids=[...new Set(rows.results.map(r=>str(r.qid)))];const originals=new Map<string,PrivateQuestion>()
   for(let i=0;i<qids.length;i+=80){const ids=qids.slice(i,i+80);const r=await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.qid IN (${ids.map(()=>'?').join(',')})`).bind(...ids).all<{json:string}>();for(const x of r.results){const q=JSON.parse(x.json) as PrivateQuestion;originals.set(q.qid,q)}}
   for(const r of rows.results){const q=originals.get(str(r.qid));if(!q){missing++;continue}evidence.push({qid:q.qid,group:q.group,dang:q.dang,mucDo:q.mucDo,kienThuc:q.kienThuc,wrong:r.dung_sai===0,date:str(r.nop_luc),ca:str(r.ma_ca)})}
-  const types=[...new Set(evidence.map(e=>e.dang).filter(Boolean))];const pool=[...originals.values()]
+  const types=[...new Set([...evidence.map(e=>e.dang),...dangLop].filter(Boolean))] as string[]/* ĐỢT 2: thêm các dạng LỚP đã học (bảng đệm lop_da_hoc) — kho rút không còn bó theo bằng chứng của CHÍNH em */;const pool=[...originals.values()]
   for(let i=0;i<types.length;i+=60){const ids=types.slice(i,i+60);let after='';for(;;){const r=await env.DB.prepare(`SELECT q.json,q.ma_de||'|'||q.qid cursor FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${ids.map(()=>'?').join(',')}) AND q.ma_de||'|'||q.qid>? ORDER BY cursor LIMIT 300`).bind(...ids,after).all<{json:string;cursor:string}>();pool.push(...r.results.map(r=>JSON.parse(r.json) as PrivateQuestion));if(r.results.length<300)break;after=r.results[r.results.length-1]!.cursor}}
   return {evidence,pool:[...new Map(pool.map(q=>[q.qid,q])).values()],missing}
 }
