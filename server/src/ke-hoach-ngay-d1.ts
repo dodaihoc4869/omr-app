@@ -17,6 +17,7 @@ import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from
 import { qidPhucVuDuoc } from './cau-theo-qid'
 import { ngayVn } from './su-kien-hoc'
 import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
+import { ketQuaChotNgay } from '../../src/lib/dat-nhiem-vu-ngay'
 import { docDieuChinhHieuLuc } from './bo-nao-doc'
 
 export const TOI_DA_EM_MOI_LO = 50
@@ -385,8 +386,7 @@ export async function chotNgayCu(env: Env, dsSbd: string[], homNay: string, nowI
       coToiHan = Number(v?.soCauToiHan) || 0
       treNhip = v?.treNhip === true
     } catch { /* kế hoạch hỏng: chốt theo số câu thô */ }
-    const dat = tb.da >= toiThieu && !treNhip && (tb.len >= 1 || coToiHan === 0)
-    return { k: String(r.khoa), r: dat ? 'dat' : tb.da >= 1 ? 'mot_phan' : 'khong', l: tb.da, u: tb.len, t: tb.tut }
+    return { k: String(r.khoa), r: ketQuaChotNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan }), l: tb.da, u: tb.len, t: tb.tut }
   })
   for (const d of chunk(dong, 60)) {
     await env.DB.prepare(

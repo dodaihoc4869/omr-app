@@ -7,6 +7,7 @@ import type { Env } from './kieu'
 import { quyetDinhVaoThi } from './luat-vao-thi'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { TIEN_BO_NGAY, phanTichNgayNghi } from './ke-hoach-ngay-d1'
+import { laDatNgay } from '../../src/lib/dat-nhiem-vu-ngay'
 import { muaHienTai, tramCuaLop, SO_TRAM } from './game-v2-doan-mua'
 
 const MOT_NGAY_MS = 86_400_000
@@ -154,7 +155,7 @@ export async function homNayThay(env: Env, b: Record<string, unknown>, nowMs: nu
         const toiThieu = Number(h.nganSach?.toiThieuCau) || 4
         const coToiHan = Number(h.viec?.tienBo?.soCauToiHan) || 0
         const treNhip = h.viec?.tienBo?.treNhip === true
-        return tb.da >= toiThieu && !treNhip && (tb.len >= 1 || coToiHan === 0)
+        return laDatNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan })
       }).length
       const qua = hang.filter((h) => h.ngay === homQua && !h.nghi)
       const daChot = qua.filter((h) => h.ketQua !== null)

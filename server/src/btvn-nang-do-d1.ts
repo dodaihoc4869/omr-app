@@ -15,7 +15,7 @@ import {
   type BoCuaEm, type CauGiao, type DieuChinhEm, type HoSoEmRut, type Muc, type NganSachBai, type NhanCau, type PhanCau, type Sao, type TienBo, type TomTatBo,
 } from '../../src/lib/btvn-nang-do'
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
-import { capNhatExp, docExpHomNay, expNhanCuaKetQua, manhNhanCuaKetQua } from './exp-d1'
+import { capNhatExp, capNhatExpSauNopLo, docExpHomNay, expNhanCuaKetQua, manhNhanCuaKetQua } from './exp-d1'
 import { PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU, TY_LE_ON_TOI_DA } from './ho-so-cau-hinh'
 import { dungLaiHoSo, themNgay } from './ho-so-nam-kt'
 import { tinhNganSach, tinhVanToc, type DauVaoKeHoach } from './ke-hoach-ngay'
@@ -724,7 +724,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
     for (const c of daLam) dung[chuoi(c.qid)] = isAnswerCorrect(gop[chuoi(c.qid)], answerText(c.dap_an ?? c.dapAn), phanTuQid(chuoi(c.qid), phanCua(c)))
     await thichNghiSauChang(env, bt, em, sbd, chiSo, loMoi, dung, dc, now)
   }
-  const moiExp = await capNhatExp(env, sbd, now)
+  const moiExp = await capNhatExpSauNopLo(env, sbd, now) // lập lại kế hoạch ngày trước: treNhip đã lưu là bản cũ (sau nộp bù phải được gỡ)
   const ketQua = daLam.map((c) => {
     const q = chuoi(c.qid)
     const dungDapAn = answerText(c.dap_an ?? c.dapAn)

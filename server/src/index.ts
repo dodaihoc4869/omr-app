@@ -1778,7 +1778,7 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>): Promise<Respons
   const dapAn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
   const ghi = dapAn && Object.keys(dapAn).length ? await ghiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn) : null
   // EXP HỌC TẬP MỚI (exp-d1.ts): xong lô đúng nhịp/trễ nhịp + EXP từng câu; cờ tắt thì không đính gì.
-  const expMoi = ghi?.ok ? await expNhanSauNop(env, sbd, Date.now()) : {}
+  const expMoi = ghi?.ok ? await expNhanSauNop(env, sbd, Date.now(), { laNopLo: true }) : {}
   return ra({ ok: true, loDaXong: Number(em?.lo_da_xong ?? loDaXongMoi), ...(ghi ? { suKien: ghi.soGui } : {}), ...expMoi })
 }
 

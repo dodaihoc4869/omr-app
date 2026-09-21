@@ -20,7 +20,9 @@ import { NGAN_SACH_SAN, SO_NGAY_LICH_SU, TOI_THIEU_CAU_SAN } from './ho-so-cau-h
 import type { SuKienDoc } from './ho-so-nam-kt'
 import { traCuuTheoQid } from './ho-so-nam-kt'
 import { demChuoiDat } from './ke-hoach-ngay'
-import { docNgayNghi, hsKeHoachNgay } from './ke-hoach-ngay-d1'
+import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
+import { tinhDatNhiemVuNgay } from '../../src/lib/dat-nhiem-vu-ngay'
+import type { ThieuDat } from '../../src/lib/dat-nhiem-vu-ngay'
 import { ngayVn } from './su-kien-hoc'
 
 const MOT_NGAY_MS = 86_400_000
@@ -249,7 +251,7 @@ export interface KetQuaExp {
   datNgay: TrangThaiDatNgay | null
 }
 
-export type ThieuDat = 'cau_toi_thieu' | 'tre_nhip' | 'chua_len_bac'
+export type { ThieuDat }
 
 export interface TrangThaiDatNgay {
   /** Đủ điều kiện đạt (định nghĩa của chốt ngày). */
@@ -266,10 +268,10 @@ const KHONG_BAT: KetQuaExp = { bat: false, khoan: [], manh: [], daCong: null, da
 
 /**
  * Gọi SAU khi ghi sổ ở một lệnh NỘP của em: cập nhật EXP rồi trả phần đính thêm vào phản hồi. Cờ tắt → `{}` (phản hồi y hệt cũ).
- * Không ném lỗi.
+ * `laNopLo` (nộp chặng/lô BTVN): lập lại kế hoạch ngày trước để gỡ `treNhip` cũ (`capNhatExpSauNopLo`). Không ném lỗi.
  */
-export async function expNhanSauNop(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
-  const k = await capNhatExp(env, sbd, nowMs)
+export async function expNhanSauNop(env: Env, sbd: string, nowMs: number, tuyChon: { laNopLo?: boolean } = {}): Promise<Record<string, unknown>> {
+  const k = tuyChon.laNopLo ? await capNhatExpSauNopLo(env, sbd, nowMs) : await capNhatExp(env, sbd, nowMs)
   return k.bat ? { expNhan: expNhanCuaKetQua(k), manhNhan: manhNhanCuaKetQua(k) } : {}
 }
 
@@ -300,6 +302,25 @@ export async function capNhatExp(env: Env, sbd: string, nowMs: number, tuyChon: 
   } catch (e) {
     console.error('[exp] cập nhật lỗi (bỏ qua, lần gọi sau tự bắt kịp):', e instanceof Error ? e.message : e)
     return { bat: true, khoan: [], manh: [], daCong: null, datNgay: null }
+  }
+}
+
+/**
+ * `capNhatExp` cho lệnh NỘP CHẶNG BTVN (xong lô): LẬP LẠI kế hoạch ngày của em TRƯỚC, rồi tính EXP từ kế hoạch tươi.
+ * Vì sao: `tienBo.treNhip` nằm trong kế hoạch đã lưu (lập lúc em mở nhiệm vụ). Em trễ nhịp buổi sáng, nộp bù xong mà kế hoạch cũ vẫn ghi "trễ nhịp"
+ * ⇒ không đạt ngày ⇒ chốt 00:01 ra `mot_phan`, đứt chuỗi (Code 1 tìm ra, Boss 21/09). Chỉ chạy khi EXP mới đang bật cho em (cờ tắt ⇒ y như cũ, không tốn truy vấn).
+ * Lập lại lỗi ⇒ tính như cũ bằng kế hoạch đã lưu; KHÔNG ném lỗi (nộp đã ghi sổ rồi).
+ */
+export async function capNhatExpSauNopLo(env: Env, sbd: string, nowMs: number): Promise<KetQuaExp> {
+  try {
+    const tu = mocExpCuaEm(await docCauHinhExp(env), sbd, nowMs)
+    if (!tu) return KHONG_BAT
+    const kh = (await lapVaLuuKeHoach(env, [sbd], nowMs)).get(sbd)
+    if (!kh) return await capNhatExp(env, sbd, nowMs)
+    return await capNhatExp(env, sbd, nowMs, { kh: { nganSach: kh.nganSach, tienBo: kh.tienBo, lanNghi: kh.lanNghi, chuoiDat: kh.chuoiDat } })
+  } catch (e) {
+    console.error('[exp] lập lại kế hoạch sau nộp chặng lỗi (tính bằng kế hoạch đã lưu):', e instanceof Error ? e.message : e)
+    return capNhatExp(env, sbd, nowMs)
   }
 }
 
@@ -414,26 +435,9 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   const tuNgay = ngayVn(ms(tu))
   const daTraCu = tuNgay === homNay ? await docQidDaTraTheoLuatCu(env, sbd) : new Set<string>()
 
-  // Đạt nhiệm vụ ngày (định nghĩa của CHỐT NGÀY `chotNgayCu`, để khớp chuỗi ngày đạt): đã làm ≥ mức tối thiểu, không việc bắt buộc nào trễ nhịp,
-  // và (có câu lên bậc HOẶC không có câu tới hạn). Chưa có kế hoạch ngày đã lưu thì chưa xét (em chưa từng mở nhiệm vụ hôm nay).
-  const chiTietDat = ((): { dat: boolean; thieu: ThieuDat[]; daLam: number; toiThieu: number; luc: string; laNghi: boolean } | null => {
-    if (!coKeHoach || toiThieu === undefined) return null
-    if (laNghi) return { dat: false, thieu: [], daLam: 0, toiThieu, luc: '', laNghi: true }
-    // NGÀY PHÁT HÀNH: chỉ việc SAU mốc mới tính (không tính lại quá khứ) — không thì mọi em đã đạt từ sáng nhận +20 miễn phí lúc bật.
-    const sauMoc = (e: DongSo) => homNay !== tuNgay || e.luc >= tu
-    const dsHomNay = soTho.filter((e) => e.ngayVn === homNay && sauMoc(e))
-    const daLam = new Set(dsHomNay.map((e) => e.qid)).size
-    // "Đã làm" đếm cả bài thi chưa công bố (không nói gì về đúng/sai), nhưng "lên bậc" chỉ đếm trên sổ ĐÃ LỌC: ca chưa công bố mà lên bậc bị đếm
-    // thì việc đạt ngày sẽ lộ câu thi làm đúng.
-    const truocHomNay = new Map<string, boolean>()
-    for (const e of so) if (e.ngayVn < homNay && (e.ketQua === 0 || e.ketQua === null)) truocHomNay.set(e.qid, true)
-    const lenBac = new Set(so.filter((e) => e.ngayVn === homNay && sauMoc(e) && e.ketQua === 1 && truocHomNay.has(e.qid)).map((e) => e.qid)).size
-    const thieu: ThieuDat[] = []
-    if (daLam < toiThieu) thieu.push('cau_toi_thieu')
-    if (treNhip) thieu.push('tre_nhip')
-    if (lenBac < 1 && soCauToiHan > 0) thieu.push('chua_len_bac')
-    return { dat: thieu.length === 0, thieu, daLam, toiThieu, luc: dsHomNay.reduce((m, e) => (e.luc > m ? e.luc : m), ''), laNghi: false }
-  })()
+  // Đạt nhiệm vụ ngày: MỘT định nghĩa dùng chung với chốt ngày (`chotNgayCu`) và bảng thầy — hàm thuần `tinhDatNhiemVuNgay` (Code 1, src/lib/dat-nhiem-vu-ngay.ts).
+  // Chưa có kế hoạch ngày đã lưu thì chưa xét (em chưa từng mở nhiệm vụ hôm nay). "Đã làm" đếm trên sổ CHƯA lọc, "lên bậc" trên sổ ĐÃ lọc ca chưa công bố.
+  const chiTietDat = tinhDatNhiemVuNgay({ coKeHoach, toiThieu, laNghi, homNay, tu, tuNgay, soTho, so, treNhip, soCauToiHan })
   let datNgay: VaoTinhExp['datNgay'] = null
   if (chiTietDat?.dat) datNgay = { chuoi: (kh ? kh.chuoiDat : await docChuoiTruoc(env, sbd, homNay)) + 1, luc: chiTietDat.luc }
 
