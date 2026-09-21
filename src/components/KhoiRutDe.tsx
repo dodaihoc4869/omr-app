@@ -8,7 +8,7 @@
 //   · Câu đã ra ở ca trước thì gắn nhãn "đã ra", không lặng lẽ phát lại.
 //   · Cỡ gói đề gửi lên hiện thành số KB, vì đó chính là thứ mỗi em phải tải.
 import { useEffect, useMemo, useState } from 'react'
-import { Dices, RefreshCw, X, ImageIcon, ChevronDown } from 'lucide-react'
+import { Dices, RefreshCw, X, ImageIcon, ChevronDown, Target, Zap, ClipboardList, Users } from 'lucide-react'
 import type { TeacherExamSource } from '../data/examContent'
 import { Nhan, OThongBao } from './DesignSystem'
 import { boMotCau, demDangUngVien, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
@@ -302,7 +302,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
 
       <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Cách lấy câu">
         <Chip chon={rut} onClick={() => setCheDo('rut')}>
-          🎯 Rút đề thông minh
+          <Target size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+          Rút đề thông minh
         </Chip>
         {tongKho <= 28 && (
           <Chip chon={cheDo === 'tron'} onClick={() => setCheDo('tron')}>
@@ -392,7 +393,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 cursor: 'pointer',
               }}
             >
-              ⚡ Chuẩn 14 câu (9 Phần I · 2 Phần II · 3 Phần III)
+              <Zap size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+              Chuẩn 14 câu (9 Phần I · 2 Phần II · 3 Phần III)
             </button>
             <button
               type="button"
@@ -411,7 +413,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 cursor: 'pointer',
               }}
             >
-              📋 Đề THPT 28 câu (18 · 4 · 6)
+              <ClipboardList size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+              Đề THPT 28 câu (18 · 4 · 6)
             </button>
           </div>
 
@@ -456,7 +459,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 }}
                 mau="tim"
               >
-                🎯 Đề riêng từng em — Nâng đỡ tiến bộ
+                <Target size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+                Đề riêng từng em — Nâng đỡ tiến bộ
               </Chip>
               <Chip
                 chon={!deRieng}
@@ -465,7 +469,8 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                   setRieng(false)
                 }}
               >
-                👥 Cả lớp cùng một đề
+                <Users size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+                Cả lớp cùng một đề
               </Chip>
             </div>
           </div>
@@ -474,13 +479,13 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
             {deRieng ? (
               <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
                 <div style={NHAN_NHO}>
-                  ✨ <b>Thuật toán mới cá nhân hóa 100%:</b> Mỗi học sinh nhận một đề riêng biệt (độ trùng ≈ 0%, triệt tiêu quay cóp).
+                  <b>Thuật toán mới cá nhân hóa 100%:</b> Mỗi học sinh nhận một đề riêng biệt (độ trùng ≈ 0%, triệt tiêu quay cóp).
                 </div>
                 <div style={NHAN_NHO}>
-                  🔄 <b>Cặp đôi Song sinh (50/50):</b> Tự động rút 50% câu sai gốc (đo độ hiểu lời giải) + 50% câu song sinh cùng dạng đổi số từ kho đề (chống học vẹt đáp án). Áp dụng trần chuẩn {'{I: 3, II: 1, III: 1}'} cho ca 14 câu.
+                  <b>Cặp đôi Song sinh (50/50):</b> Tự động rút 50% câu sai gốc (đo độ hiểu lời giải) + 50% câu song sinh cùng dạng đổi số từ kho đề (chống học vẹt đáp án). Áp dụng trần chuẩn {'{I: 3, II: 1, III: 1}'} cho ca 14 câu.
                 </div>
                 <div style={NHAN_NHO}>
-                  📈 <b>70% câu mới:</b> Rút thích ứng dạng bài để củng cố lỗ hổng và phát triển năng lực cho từng em.
+                  <b>70% câu mới:</b> Rút thích ứng dạng bài để củng cố lỗ hổng và phát triển năng lực cho từng em.
                 </div>
 
                 <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)', marginTop: 'var(--k1)' }} role="radiogroup" aria-label="Lấy câu sai từ đâu">
@@ -612,7 +617,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
           <div style={NHAN_NHO}>
             {rieng ? (
               <span>
-                ✨ <b>Thuật toán mới cá nhân hóa 100%:</b> Quét toàn bộ kho {tongKho} câu ứng viên để rút đề riêng biệt đẳng cấu cho từng em (cùng dạng bài và mức độ, triệt tiêu quay cóp lân cận). Tự động lồng ghép Cặp đôi Song sinh 50/50 từ câu sai ca trước và 70% câu mới nâng đỡ tiến bộ.
+                <b>Thuật toán mới cá nhân hóa 100%:</b> Quét toàn bộ kho {tongKho} câu ứng viên để rút đề riêng biệt đẳng cấu cho từng em (cùng dạng bài và mức độ, triệt tiêu quay cóp lân cận). Tự động lồng ghép Cặp đôi Song sinh 50/50 từ câu sai ca trước và 70% câu mới nâng đỡ tiến bộ.
               </span>
             ) : (
               'Cả lớp làm cùng bộ câu này, chỉ đảo thứ tự câu và thứ tự A–D riêng từng em. Điểm hai em so được trực tiếp với nhau.'
