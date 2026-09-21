@@ -8,7 +8,7 @@ import { CAN_DANG_NHAP } from '../server/src/on-lai-nop'
 import { ghiSuKien, ngayVn } from '../server/src/su-kien-hoc'
 import { SBD_THU } from '../server/src/gv-bang-tin'
 import {
-  duSauMuoiPhanTram, gvChuaHocHomNay, hangChamCuaEm, hsThiDuaHomNay, LOI_KHONG_XEM_DUOC, SBD_THU_NGHIEM, soSanhCham, soViTriNhomCuoi, tenRutGon, tinhBangThiDua, trongNhomCuoi, xepHangCham,
+  duSauMuoiPhanTram, gvChuaHocHomNay, hangChamCuaEm, hsThiDuaHomNay, xoaDemThiDua, LOI_KHONG_XEM_DUOC, SBD_THU_NGHIEM, soSanhCham, soViTriNhomCuoi, tenRutGon, tinhBangThiDua, trongNhomCuoi, xepHangCham,
   type EmCham,
 } from '../server/src/thi-dua-hom-nay'
 import { taoD1That as taoD1ThatTho, type D1That } from './_d1-that'
@@ -392,6 +392,7 @@ describe('em duy nhất trong lớp', () => {
     themEm(d, 'ONE', 'Cao Duy Nhất', '10')
     expect(await goi(d, 'ONE')).toMatchObject({ lop: '10', siSo: 1, daHoc: 0, top: [], cuaEm: { hang: null, soCau: 0, themDeVuot: { soCau: 1, soBan: 0 }, nhomCuoi: false } })
     await lamN(d, 'ONE', 3, '08:00')
+    xoaDemThiDua() // SỬA CÓ CHỦ Ý 21/09 (đệm 30 giây theo lớp): cùng D1 và cùng giờ giả, số liệu vừa đổi ⇒ xoá đệm để đọc lại
     const r = await goi(d, 'ONE')
     expect(r).toMatchObject({ siSo: 1, daHoc: 1, cuaEm: { hang: 1, soCau: 3, themDeVuot: null, nhomCuoi: false } })
     expect(r.top).toEqual([{ hang: 1, ten: 'Duy Nhất C.', soCau: 3, chuoi: 1, thu: null, laEm: true }])
@@ -571,6 +572,7 @@ describe('chỉ đọc · trần truy vấn · thiếu bảng', () => {
     // B mất "đạt" ⇒ C (chuỗi 3) lên trên B
     expect((r.top as { ten: string }[]).map((x) => x.ten)).toEqual(['Văn An L.', 'Gia Cường Đ.', 'Thu Bình P.'])
     d.sql.exec('DROP TABLE su_kien_hoc')
+    xoaDemThiDua() // đệm 30 giây (SỬA CÓ CHỦ Ý 21/09)
     expect(await goi(d, 'HS7104')).toMatchObject({ ok: true, siSo: 9, daHoc: 0, top: [], cuaEm: { hang: null, soCau: 0, themDeVuot: { soCau: 1, soBan: 0 }, nhomCuoi: false } })
     expect(await hangChamCuaEm(d.env, 'HS7104', NOW)).toBeNull()
   })

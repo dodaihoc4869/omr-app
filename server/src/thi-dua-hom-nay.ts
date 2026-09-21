@@ -244,7 +244,27 @@ export async function docLopHomNay(env: Env, sbd: string, nowMs: number, moc: Mo
  * Số liệu chăm hôm nay của MỘT lớp (2 truy vấn): mỗi (em, ngày) số qid KHÁC NHAU có kết quả + thời điểm của qid thứ N (MAX của "lần đầu làm từng qid"); ngày có dòng = ngày có học (chuỗi); đạt nhiệm vụ ngày.
  * `sbdThem` (chỉ chế độ XEM THỬ của tài khoản thử): đọc thêm số liệu của em này CÙNG hai truy vấn (không thêm truy vấn) và trả riêng ở `rieng` — KHÔNG lẫn vào `thanhVien`.
  */
+/**
+ * ĐỆM 30 GIÂY (Boss 21/09: Thi đua là truy vấn ĐỌC lớn nhất, 3,1 triệu dòng/giờ = 216 lượt × 14,5 nghìn dòng): bảng số liệu của MỘT LỚP dùng chung cho mọi em cùng lớp trong 30 giây (theo isolate; khoá = lớp + ngày + mốc + danh sách em).
+ * Số của em hiện chậm nhất 30 giây so với sổ (thẻ Hôm nay đọc thẳng nên có thể hơn vài câu trong khoảng ấy). KHÔNG đệm chế độ xem thử (có `sbdThem`). Đệm theo `env.DB` để các phiên bản D1 khác nhau (test) không lẫn.
+ */
+export const DEM_THI_DUA_MS = 30_000
+const demThiDua = new WeakMap<object, Map<string, { at: number; kq: { thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null } }>>()
+export function xoaDemThiDua(): void { /* WeakMap không xoá được hàng loạt: thay bằng khoá phiên bản */ phienBanDem++ }
+let phienBanDem = 0
 async function soLieuCuaLop(env: Env, cungLop: [string, EmTrongTruong][], sbdThem: string | null, nowMs: number, moc: MocHienThi): Promise<{ thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null }> {
+  if (sbdThem !== null) return soLieuCuaLopTho(env, cungLop, sbdThem, nowMs, moc)
+  const khoa = `${phienBanDem}|${ngayVn(nowMs)}|${moc.iso}|${cungLop.map(([s, e]) => `${s}:${e.hoTen}`).join(',')}`
+  const kho = demThiDua.get(env.DB as object) ?? new Map()
+  demThiDua.set(env.DB as object, kho)
+  const co = kho.get(khoa)
+  if (co && nowMs - co.at >= 0 && nowMs - co.at < DEM_THI_DUA_MS) return co.kq
+  const kq = await soLieuCuaLopTho(env, cungLop, null, nowMs, moc)
+  kho.set(khoa, { at: nowMs, kq })
+  if (kho.size > 40) for (const k of [...kho.keys()].slice(0, kho.size - 40)) kho.delete(k)
+  return kq
+}
+async function soLieuCuaLopTho(env: Env, cungLop: [string, EmTrongTruong][], sbdThem: string | null, nowMs: number, moc: MocHienThi): Promise<{ thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null }> {
   const homNay = ngayVn(nowMs)
   const dsSbd = [...cungLop.map(([s]) => s), ...(sbdThem ? [sbdThem] : [])]
   const rSo = await tat(
