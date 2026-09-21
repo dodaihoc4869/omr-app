@@ -17,6 +17,7 @@ import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from
 import { qidPhucVuDuoc } from './cau-theo-qid'
 import { ngayVn } from './su-kien-hoc'
 import { moLucChang } from './btvn-nang-do-chang'
+import { docDieuChinhHieuLuc } from './bo-nao-doc'
 
 export const TOI_DA_EM_MOI_LO = 50
 const MOT_NGAY_MS = 86_400_000
@@ -235,7 +236,35 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
       cua(x)?.cauOnThi?.push({ qid: String(x.qid), lanSai: Number(x.lan_sai) || 0, moiSai: String(x.trang_thai) === 'moi_sai' })
     }
   }
+  // BỘ NÃO A.I (chế độ THẬT): điều chỉnh còn hạn của các em — nhịp vào ngân sách ngày; `on_som` kéo `moc_on_ke` của câu vừa sai thuộc dạng đó VỀ NGÀY MAI (chỉ SỚM hơn).
+  // Chạy thử / tắt ⇒ `docDieuChinhHieuLuc` trả rỗng, kế hoạch Y HỆT (một truy vấn cấu hình). Không đụng hạn nộp bài nào.
+  const dieuChinh = await docDieuChinhHieuLuc(env, em, homNay)
+  for (const [sbd, dc] of dieuChinh) {
+    const c = map.get(sbd)
+    if (!c) continue
+    if (dc.nhip !== 0) c.boNao = { nhip: dc.nhip }
+    if (dc.onSom.length > 0) await keoOnSom(env, c, dc.onSom, themNgay(dc.ngay, 1), homNay)
+  }
   return map
+}
+
+/**
+ * `on_som`: câu ĐÃ TỪNG sai, còn đang ôn (`moi_sai`/`dang_on`), thuộc dạng được bộ não chọn, mà mốc ôn kế còn ở tương lai ⇒ mốc HIỆU LỰC = min(mốc, ngày mai của đêm điều chỉnh).
+ * CHỈ SỚM hơn, không bao giờ muộn hơn, không ghi lại `nam_kt_cau` (hồ sơ nguồn không đổi). Vào hàng ôn qua đúng cửa `cauToiHan` (cùng bộ lọc phục vụ được).
+ */
+async function keoOnSom(env: Env, c: DauVaoKeHoach, dsDang: string[], ngayMai: string, homNay: string): Promise<void> {
+  if (ngayMai > homNay) return // chưa tới "ngày mai" của đêm điều chỉnh
+  const daCo = new Set(c.cauToiHan.map((x) => x.qid))
+  const r = await tat(() => env.DB.prepare(
+    `SELECT qid, ma_dang, moc_on_ke, lan_sai FROM nam_kt_cau
+      WHERE sbd = ? AND ma_dang IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai','dang_on') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke > ?`,
+  ).bind(c.sbd, json(dsDang), homNay).all<Record<string, unknown>>(), trong())
+  const ung = (r.results ?? []).filter((x) => !daCo.has(String(x.qid)))
+  const phucVu = await tapQidPhucVu(env, ung.map((x) => String(x.qid)))
+  for (const x of ung) {
+    if (phucVu && !phucVu.has(String(x.qid))) continue
+    c.cauToiHan.push({ qid: String(x.qid), maDang: x.ma_dang ? String(x.ma_dang) : null, mocOnKe: ngayMai < String(x.moc_on_ke) ? ngayMai : String(x.moc_on_ke), lanSai: Number(x.lan_sai) || 0 })
+  }
 }
 
 /** Số câu đã làm / lên bậc / tụt bậc trong MỘT ngày VN, mỗi em một dòng. */

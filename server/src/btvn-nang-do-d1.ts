@@ -11,8 +11,8 @@
 import type { D1PreparedStatement, Env } from './kieu'
 import { answerText, gradeHomework, homeworkKeys, homeworkQuestions, isAnswerCorrect } from './btvn-grading'
 import {
-  chonBoCuaEm, chonLoi, maDangCua, mucTuChu, theTienBo,
-  type BoCuaEm, type CauGiao, type HoSoEmRut, type Muc, type NganSachBai, type NhanCau, type PhanCau, type Sao, type TienBo, type TomTatBo,
+  chonBoCuaEm, chonLoi, maDangCua, mucTuChu, theTienBo, thichNghiChangSau,
+  type BoCuaEm, type CauGiao, type DieuChinhEm, type HoSoEmRut, type Muc, type NganSachBai, type NhanCau, type PhanCau, type Sao, type TienBo, type TomTatBo,
 } from '../../src/lib/btvn-nang-do'
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { capNhatExp, docExpHomNay, expNhanCuaKetQua, manhNhanCuaKetQua } from './exp-d1'
@@ -21,6 +21,7 @@ import { dungLaiHoSo, themNgay } from './ho-so-nam-kt'
 import { tinhNganSach, type DauVaoKeHoach } from './ke-hoach-ngay'
 import { chuyenDeThat, ghiSuKien, ngayVn, phanTuQid, suKienChamBai, suKienTuKetQuaCham, cauTuKho } from './su-kien-hoc'
 import { daTraLoi } from './on-lai-nop'
+import { docDieuChinhHieuLuc, type DieuChinhHieuLuc } from './bo-nao-doc'
 import { LAN_MOI_LUOT, moLucChang, trangThaiCacChang } from './btvn-nang-do-chang'
 
 type Hang = Record<string, unknown>
@@ -344,9 +345,10 @@ export async function docBoDaChot(env: Env, maBtvn: string, sbd: string): Promis
 }
 
 /** Dựng bộ cho một em từ hồ sơ + ngân sách đã đọc (thuần — dùng chung với xem trước, nên bộ xem trước = bộ thật khi hồ sơ không đổi). */
-export function dungBoChoEm(bai: BaiNangDo, hatGiongBai: string, sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: HoSoRutCuaEm): { bo: BoCuaEm; nganSach: NganSachBai } {
+export function dungBoChoEm(bai: BaiNangDo, hatGiongBai: string, sbd: string, now: number, hanMs: number, dv: DauVaoNganSach, hs: HoSoRutCuaEm, dieuChinh?: DieuChinhEm): { bo: BoCuaEm; nganSach: NganSachBai } {
   const nganSach = nganSachChoEm(sbd, now, hanMs, dv, hs)
-  return { bo: chonBoCuaEm(bai.cau, bai.loi, hs.hoSo, nganSach, `${hatGiongBai}|${sbd}`), nganSach }
+  // `dieuChinh` (Bộ não A.I chế độ THẬT) là cổng TUỲ CHỌN của lõi: vắng ⇒ Y HỆT không có cổng (test của Code 1 + test bóng ở `tests/bo-nao-doc-2109.test.ts`).
+  return { bo: chonBoCuaEm(bai.cau, bai.loi, hs.hoSo, nganSach, `${hatGiongBai}|${sbd}`, dieuChinh), nganSach }
 }
 
 /**
@@ -357,10 +359,11 @@ export async function chotBoChoEm(env: Env, bt: Hang, sbd: string, now: number):
   const maBtvn = chuoi(bt.ma_btvn)
   const khoa = `${maBtvn}|${sbd}`
   const hanMs = Date.parse(chuoi(bt.han_nop))
-  const [bai, hs, dvAll] = await Promise.all([docBaiNangDo(env, maBtvn), docHoSoRutSauKhiCoBai(env, maBtvn, sbd, now), docDauVaoNganSach(env, [sbd], now)])
+  const [bai, hs, dvAll, dcAll] = await Promise.all([docBaiNangDo(env, maBtvn), docHoSoRutSauKhiCoBai(env, maBtvn, sbd, now), docDauVaoNganSach(env, [sbd], now), docDieuChinhHieuLuc(env, [sbd], ngayVn(now))])
   if (!bai || !hs) return null
   const dv = dvAll.get(sbd)!
-  const { bo, nganSach } = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) ? hanMs : now + MOT_NGAY_MS, dv, hs.get(sbd)!)
+  const dc = dcAll.get(sbd)
+  const { bo, nganSach } = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) ? hanMs : now + MOT_NGAY_MS, dv, hs.get(sbd)!, dc?.dieuChinh)
   const chotLuc = new Date(now).toISOString()
   let thuTu = 0
   const hang = bo.chang.flatMap((qs, c) => qs.map((q) => ({ q, c, n: bo.nhan[q], t: thuTu++ })))
@@ -368,7 +371,7 @@ export async function chotBoChoEm(env: Env, bt: Hang, sbd: string, now: number):
   const kq = await env.DB.batch([
     env.DB.prepare(
       `UPDATE btvn_em SET chot_luc = ?, so_cau_em = ?, so_chang = ?, tom_tat_json = ?, ngan_sach_json = ? WHERE khoa = ? AND chot_luc IS NULL AND thu_hoi = 0`,
-    ).bind(chotLuc, hang.length, soChang, json(bo.tomTat), json(nganSach), khoa),
+    ).bind(chotLuc, hang.length, soChang, json(bo.tomTat), json({ ...nganSach, ...(dc ? { dieuChinh: dc.dieuChinh, dieuChinhNgay: dc.ngay } : {}) }), khoa),
     env.DB.prepare(
       `INSERT OR IGNORE INTO btvn_em_cau (khoa, ma_btvn, sbd, qid, chang, nhan, thu_tu)
        SELECT ? || '|' || json_extract(j.value,'$.q'), ?, ?, json_extract(j.value,'$.q'), json_extract(j.value,'$.c'), json_extract(j.value,'$.n'), json_extract(j.value,'$.t')
@@ -611,6 +614,15 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
     const n = await nopBaiCaNhan(env, bt, sbd, {}, now)
     if (n.ok) nop = { daNop: true, nopLuc: n.nopLuc, soDung: n.soDung, soCau: n.soCau, soCauCuaEm: n.soCauCuaEm, soCauThuongSai: n.soCauThuongSai, qidSai: n.qidSai }
   }
+  // BỘ NÃO A.I chế độ THẬT: em có điều chỉnh còn hạn ⇒ sau chặng vừa XONG chạy `thichNghiChangSau` cho các chặng CHƯA MỞ. Chạy thử/tắt/không có điều chỉnh ⇒ KHÔNG gọi (bộ y nguyên).
+  if (xong && !nop && loMoi < soChang) {
+    const dc = (await docDieuChinhHieuLuc(env, [sbd], ngayVn(now))).get(sbd)
+    if (dc) {
+      const dung: Record<string, boolean> = {}
+      for (const c of daLam) dung[chuoi(c.qid)] = isAnswerCorrect(gop[chuoi(c.qid)], answerText(c.dap_an ?? c.dapAn), phanTuQid(chuoi(c.qid), phanCua(c)))
+      await thichNghiSauChang(env, bt, em, sbd, chiSo, loMoi, dung, dc, now)
+    }
+  }
   const moiExp = await capNhatExp(env, sbd, now)
   const ketQua = daLam.map((c) => {
     const q = chuoi(c.qid)
@@ -750,10 +762,11 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
     if (!Number.isFinite(hanMs) || hanMs <= now) return { ok: false, error: 'Hạn nộp phải là thời điểm trong tương lai.' }
   }
   const dsXet = coTrongBai ? dsSbd.filter((s) => coTrongBai!.has(s)) : dsSbd
-  const [hoSo, dv, ten] = await Promise.all([
+  const [hoSo, dv, ten, dcAll] = await Promise.all([
     docHoSoRut(env, dsXet, bai.cau, now),
     docDauVaoNganSach(env, dsXet, now),
     moiEmDaCoTen(daChotCua) ? Promise.resolve(new Map<string, string>()) : docTenEm(env, dsXet),
+    docDieuChinhHieuLuc(env, dsXet, ngayVn(now)), // Bộ não THẬT: bộ tính thử theo cùng điều chỉnh như lúc chốt; chạy thử/tắt ⇒ rỗng
   ])
   const ds: Hang[] = []
   let chiTiet: Hang | undefined
@@ -768,7 +781,7 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
         if (bo) chiTiet = { sbd, chang: bo.chang, nhan: bo.nhan }
       }
     } else {
-      const { bo, nganSach } = dungBoChoEm(bai, hatGiong, sbd, now, hanMs, dv.get(sbd)!, hs)
+      const { bo, nganSach } = dungBoChoEm(bai, hatGiong, sbd, now, hanMs, dv.get(sbd)!, hs, dcAll.get(sbd)?.dieuChinh)
       ds.push({ sbd, hoTen: chuoi(da?.ho_ten) || ten.get(sbd) || '', daChot: false, coHoSo: hs.coHoSo, nganSach, tomTat: bo.tomTat })
       if (sbd === sbdChiTiet) chiTiet = { sbd, chang: bo.chang, nhan: bo.nhan }
     }
@@ -972,4 +985,57 @@ export async function choLamLaiCaNhan(env: Env, b: Hang, now: number): Promise<H
   ])
   if (!Number((kq[1] as { meta?: { changes?: number } })?.meta?.changes ?? 0)) return { ok: false, lyDo: 'da_thay_doi', error: 'Bài của em vừa được cập nhật ở nơi khác. Thầy tải lại rồi thử lại.' }
   return { ok: true, soLanLam }
+}
+
+// ================================================================== BỘ NÃO A.I: thích nghi các chặng CHƯA MỞ ==================================================================
+
+/**
+ * Sau chặng `chiSo` (đã xong): gọi `thichNghiChangSau` của lõi với điều chỉnh CÒN HẠN của em và LƯU bộ mới. Trả số thay đổi đã lưu.
+ * BẤT BIẾN kiểm lại ở đây trước khi ghi (lõi cũng khoá bằng test — kiểm thêm để một lỗi lõi không bao giờ chạm tới em): số chặng không đổi (⇒ mốc mở + HẠN NỘP không đổi), chặng ĐÃ MỞ
+ * không đổi một câu, lõi và thử thách còn nguyên, mọi chặng còn lõi chưa làm. Vi phạm ⇒ bỏ cả thay đổi (ghi log), em giữ bộ cũ.
+ */
+export async function thichNghiSauChang(env: Env, bt: Hang, em: Hang, sbd: string, chiSo: number, loDaXongMoi: number, dung: Record<string, boolean>, dc: DieuChinhHieuLuc, now: number): Promise<number> {
+  const maBtvn = chuoi(bt.ma_btvn)
+  const khoa = `${maBtvn}|${sbd}`
+  const [bai, da] = await Promise.all([docBaiNangDo(env, maBtvn), docBoDaChot(env, maBtvn, sbd)])
+  const tomTat = docTomTat(em.tom_tat_json)
+  if (!bai || !da || !tomTat || !em.chot_luc) return 0
+  const viTri = new Map(bai.cau.map((c, i) => [c.qid, i]))
+  const theoDe = (ds: string[]) => [...ds].sort((a, b) => (viTri.get(a) ?? 0) - (viTri.get(b) ?? 0))
+  const tatCa = da.chang.flat()
+  const loiSet = new Set(bai.loi)
+  const bo: BoCuaEm = {
+    loi: theoDe(tatCa.filter((q) => loiSet.has(q))),
+    rieng: theoDe(tatCa.filter((q) => !loiSet.has(q) && da.nhan[q] !== 'thu_thach')),
+    thuThach: theoDe(tatCa.filter((q) => da.nhan[q] === 'thu_thach')),
+    chang: da.chang,
+    nhan: da.nhan,
+    tomTat,
+  }
+  const soChangDaMo = trangThaiCacChang(da.chang, chuoi(em.chot_luc), loDaXongMoi, false, now).chang.filter((c) => c.daMo).length
+  const hoSo = (await docHoSoRut(env, [sbd], bai.cau, now)).get(sbd)!.hoSo
+  const kq = thichNghiChangSau(bo, bai.cau, hoSo, chiSo, { dung }, { soChangDaMo, dieuChinh: dc.dieuChinh })
+  if (kq.doi.length === 0) return 0
+  const moi = kq.bo
+  const giuNguyen =
+    moi.chang.length === da.chang.length &&
+    da.chang.every((qs, c) => c >= Math.max(chiSo + 1, soChangDaMo) || JSON.stringify(qs) === JSON.stringify(moi.chang[c])) &&
+    bo.loi.every((q) => moi.chang.flat().includes(q)) &&
+    bo.thuThach.every((q) => moi.chang.flat().includes(q))
+  if (!giuNguyen) {
+    console.error('[btvn-nang-do] thích nghi vi phạm bất biến — bỏ thay đổi, em giữ bộ cũ', maBtvn, sbd)
+    return 0
+  }
+  let thuTu = 0
+  const hang = moi.chang.flatMap((qs, c) => qs.map((q) => ({ q, c, n: moi.nhan[q], t: thuTu++ })))
+  await env.DB.batch([
+    env.DB.prepare('DELETE FROM btvn_em_cau WHERE ma_btvn = ? AND sbd = ? AND EXISTS (SELECT 1 FROM btvn_em WHERE khoa = ? AND nop_luc IS NULL)').bind(maBtvn, sbd, khoa),
+    env.DB.prepare(
+      `INSERT OR IGNORE INTO btvn_em_cau (khoa, ma_btvn, sbd, qid, chang, nhan, thu_tu)
+       SELECT ? || '|' || json_extract(j.value,'$.q'), ?, ?, json_extract(j.value,'$.q'), json_extract(j.value,'$.c'), json_extract(j.value,'$.n'), json_extract(j.value,'$.t')
+         FROM json_each(?) j WHERE EXISTS (SELECT 1 FROM btvn_em WHERE khoa = ? AND nop_luc IS NULL)`,
+    ).bind(khoa, maBtvn, sbd, json(hang), khoa),
+    env.DB.prepare('UPDATE btvn_em SET so_cau_em = ?, tom_tat_json = ? WHERE khoa = ? AND nop_luc IS NULL').bind(hang.length, json(moi.tomTat), khoa),
+  ])
+  return kq.doi.length
 }

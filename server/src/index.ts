@@ -38,6 +38,7 @@ import { chuanHoaDanhSach } from './danh-sach'
 import * as G from './goi-cu'
 import * as ND from './btvn-nang-do-d1'
 import * as AI from './bo-nao'
+import {docLoiNhanHlv} from './bo-nao-doc'
 import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env } from './kieu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
@@ -3036,6 +3037,11 @@ export default {
         const kh = await hsKeHoachNgayCoExp(env, b)
         // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
         if (kh.ok === true && typeof kh.sbd === 'string') kh.doanMo = await doanMoCho(env, kh.sbd)
+        // BỘ NÃO A.I chế độ THẬT: lời nhắn cho ĐÚNG em này (chỉ lời cho em, không lời phụ huynh). Chạy thử/tắt/không có lời ⇒ KHÔNG có khoá `loiNhanHlv` (phản hồi y hệt cũ).
+        if (kh.ok === true && typeof kh.sbd === 'string') {
+          const loiHlv = await docLoiNhanHlv(env, kh.sbd, typeof kh.ngay === 'string' ? kh.ngay : ngayVn(Date.now()))
+          if (loiHlv) kh.loiNhanHlv = loiHlv
+        }
         return themMocReset(env, ra(kh))
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))

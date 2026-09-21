@@ -7,6 +7,7 @@
 //
 // Quy tắc: có `pass` thì DANH TÍNH lấy từ token, mọi `sbd` trong thân bị bỏ qua (không cho token của em A đọc em B). Token sai/hết hạn/bị thu hồi thì báo lỗi,
 // KHÔNG rơi xuống SBD trần. Đếm lỗi (thiếu bảng, D1 lỗi tạm) không bao giờ làm hỏng lệnh chính.
+import { docBoNaoAiChoPhuHuynh } from './bo-nao-doc'
 import type { Env } from './kieu'
 import { parentIdentity, parentPass } from './game-v2-auth'
 import { PHUT_NGAY_MAC_DINH, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU } from './ho-so-cau-hinh'
@@ -74,6 +75,7 @@ export async function phKeHoach(env: Env, b: Record<string, unknown>): Promise<R
   const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-ke-hoach', { chiToken: true })
   const em = await env.DB.prepare('SELECT ho_ten, lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
   const kh = (await lapVaLuuKeHoach(env, [sbd], Date.now())).get(sbd)!
+  const boNaoAi = await docBoNaoAiChoPhuHuynh(env, sbd, kh.ngay)
   return {
     ok: true,
     hoTen: em?.ho_ten ?? '',
@@ -92,6 +94,8 @@ export async function phKeHoach(env: Env, b: Record<string, unknown>): Promise<R
     chuoiDat: kh.chuoiDat,
     canhBao: kh.canhBao.map((c) => c.loai),
     tonCuTong: kh.tonCuTong,
+    // BỘ NÃO A.I chế độ THẬT: lời nhắn + thư tuần cho phụ huynh, CHỈ của đúng con (SBD từ token). Chạy thử/tắt/không có ⇒ KHÔNG có khoá này.
+    ...(boNaoAi ? { boNaoAi } : {}),
   }
 }
 

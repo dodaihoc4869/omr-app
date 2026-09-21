@@ -109,6 +109,11 @@ export interface DauVaoKeHoach {
   lichSu: { ngay: string; ketQua: 'dat' | 'mot_phan' | 'khong' | null }[]
   daLamHomNay: { soCau: number; lenBac: number; tutBac: number }
   homNayLaNgayNghi: boolean
+  /**
+   * BỘ NÃO A.I (chế độ THẬT, `bo-nao-doc.ts`): điều chỉnh CÒN HẠN của em. Vắng ⇒ kế hoạch Y HỆT không có tầng này (chạy thử/tắt không bao giờ đặt trường này — test khoá).
+   * `nhip` = thêm/bớt câu MỖI NGÀY (kẹp [−3, +3]; số câu/ngày sau điều chỉnh kẹp [6, 16], ngân sách gốc ngoài khoảng ấy không bị kéo vào). KHÔNG đổi hạn nộp bài nào.
+   */
+  boNao?: { nhip: number }
 }
 
 export type LoaiViec = 'btvn_lo' | 'btvn_nop' | 'mom' | 'on_lai' | 'than_thu' | 'on_thi'
@@ -240,7 +245,17 @@ export function tinhNganSach(d: DauVaoKeHoach, soBaiChuaNop: number): NganSachNg
     dieuChinh.push({ lyDo: `${phutNgay} phút/ngày${phutLaMacDinh ? ' (mặc định)' : ''} ở ${vt.giay} giây/câu chỉ đủ ${Math.max(NGAN_SACH_SAN, theoPhut)} câu`, delta: Math.max(NGAN_SACH_SAN, theoPhut) - b })
     b = theoPhut
   }
-  const mucTieuCau = kep(b, NGAN_SACH_SAN, NGAN_SACH_TRAN)
+  let mucTieuCau = kep(b, NGAN_SACH_SAN, NGAN_SACH_TRAN)
+  // Bộ não A.I: núm NHỊP (±3 câu/ngày) tác động SỨC CHỨA mỗi ngày, không đổi hạn nộp; sau điều chỉnh kẹp [6, 16] (gốc ngoài khoảng ấy giữ nguyên).
+  const nhipBoNao = Math.max(-3, Math.min(3, Math.round(d.boNao?.nhip ?? 0)))
+  if (nhipBoNao !== 0) {
+    // TĂNG nhịp không được vượt sức chứa theo số phút/ngày em (phụ huynh) đã đặt: thời gian của em là ràng buộc cứng hơn núm của AI.
+    const sau = Math.min(Math.max(mucTieuCau + nhipBoNao, Math.min(6, mucTieuCau)), Math.max(16, mucTieuCau), Math.max(mucTieuCau, theoPhut))
+    if (sau !== mucTieuCau) {
+      dieuChinh.push({ lyDo: `Bộ não A.I: ${nhipBoNao > 0 ? 'thêm' : 'bớt'} ${Math.abs(nhipBoNao)} câu/ngày`, delta: sau - mucTieuCau })
+      mucTieuCau = sau
+    }
+  }
   return {
     mucTieuCau,
     toiThieuCau: kep(Math.round(mucTieuCau / 2), TOI_THIEU_CAU_SAN, TOI_THIEU_CAU_TRAN),
