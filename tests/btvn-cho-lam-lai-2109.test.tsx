@@ -117,6 +117,9 @@ describe('màn Giao bài · tab đã giao — Cho làm lại từng em (một b�
   })
   const moXacNhan = async () => {
     render(<PhanCongScreen />)
+    // Thiết kế lại 21/09: danh sách em + thao tác từng em nằm sau nút ⋯ → "Xem bài làm" (sửa CÓ CHỦ Ý; hộp xác nhận vẫn là hộp cũ).
+    fireEvent.click(await screen.findByRole('button', { name: /Thêm thao tác cho/ }))
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Xem bài làm' }))
     await screen.findByText('Lê Minh Đức')
     fireEvent.click(screen.getByRole('button', { name: 'Cho làm lại' }))
     return await screen.findByRole('dialog', { name: 'Xác nhận thay đổi bài tập' })
@@ -127,7 +130,7 @@ describe('màn Giao bài · tab đã giao — Cho làm lại từng em (một b�
     expect(hop.textContent).toContain('Cho Lê Minh Đức làm lại?')
     expect(hop.textContent).toContain('Em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi; điểm mới thay điểm cũ, điểm cũ vẫn lưu trong lịch sử.')
     fireEvent.click(within(hop).getByRole('button', { name: 'Giữ nguyên' }))
-    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(screen.queryByRole('dialog', { name: 'Xác nhận thay đổi bài tập' })).toBeNull() // hộp Bài làm (mục thiết kế lại) vẫn mở phía sau
     expect(m.lamLai).not.toHaveBeenCalled()
     expect(m.sua).not.toHaveBeenCalled()
   })

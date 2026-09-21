@@ -47,6 +47,12 @@ export interface DongTheoDoiBtvn {
   caNhan?: boolean
   /** Số câu LÕI chung của bài nâng đỡ. */
   soLoi?: number
+  /** BẢN 2 (chỉ-thêm): tên đọc được (`tenBaiHienThi`, một nguồn với Bảng tin) · tên lớp chuẩn · số câu lõi · đường chặng CÓ NGÀY · số em theo nhóm (MÁY CHỦ tính, màn chỉ đọc). Vắng cả nhóm ⇒ máy chủ cũ. */
+  ten?: string
+  tenLop?: string
+  soCauLoi?: number | null
+  chang?: { so: number; ngay: string; laHomNay: boolean }[]
+  nhom?: { chuaMo: number; dungNhip: number; chamNhip: number; xongHomNay: number; daNop: number; nopTre: number }
   hocSinh?: {
     sbd: string
     hoTen: string
@@ -54,6 +60,13 @@ export interface DongTheoDoiBtvn {
     soDung: number | null
     soCau: number | null
     thuHoi: boolean
+    /** BẢN 2 (docs/hop-dong-btvn-theo-doi-v2-2109.md, CHỈ-THÊM; máy chủ cũ thiếu ⇒ màn không thanh nhóm): nhóm của em do MÁY CHỦ tính — màn KHÔNG tự tính. */
+    nhom?: 'chua_mo' | 'dung_nhip' | 'cham_nhip' | 'xong_hom_nay' | 'da_nop'
+    /** Chặng em đang ở (từ 1; null = chưa mở / bài không chia chặng) · số câu đã làm · lần học gần nhất trong bài (ISO; null = chưa mở) · số giờ nộp trễ (có ⇒ nộp trễ). */
+    changHienTai?: number | null
+    soCauDaLam?: number | null
+    hocGanNhat?: string | null
+    nopTreGio?: number
     /** Bài nâng đỡ: số câu CỦA EM (null = em chưa mở bài, bộ chưa chốt) · số chặng · chặng đã xong · đúng/lõi (so lớp CHỈ trên lõi) · câu thưởng em sai (không vào điểm). */
     soCauCuaEm?: number | null
     /** BẢN 1.2: số câu "thử sức thêm — không bắt buộc" của em (KHÔNG nằm trong `soCauCuaEm` / chặng). Vắng ⇒ bài chưa có luật 1.2 (màn giữ cách hiện cũ). */

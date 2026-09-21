@@ -297,7 +297,8 @@ describe('nguồn: các chỗ còn sống đã thay ô, giá trị gửi y cũ (
   it('PhanCong (hạn mới + gia hạn) · ExamSetup dùng ONgayGio24; không còn input datetime-local/date', () => {
     const pc = doc('src/screens/PhanCongScreen.tsx')
     expect(pc).toContain('<ONgayGio24 nhan="Hạn nộp bài mới"')
-    expect(pc).toContain('nhan={`Hạn nộp ${t.maBtvn}`}')
+    // Thiết kế lại 21/09: ô gia hạn nằm trong hộp "Đổi hạn nộp" của mục mới (sửa CÓ CHỦ Ý) — vẫn ONgayGio24, nhanh + không quá khứ.
+    expect(doc('src/components/btvn-da-giao/KhungBtvnDaGiao.tsx')).toContain('<ONgayGio24 nhan="Hạn nộp mới" value={hanNhap} onChange={setHanNhap} nhanh khongQuaKhu />')
     expect(doc('src/screens/ExamSetupScreen.tsx')).toContain('<ONgayGio24 nhan="Thời điểm tự động mở ca" value={batDauLocal} onChange={setBatDauLocal} muiGio="may" />')
     for (const f of ['src/screens/PhanCongScreen.tsx', 'src/screens/ExamSetupScreen.tsx']) {
       expect(doc(f)).not.toMatch(/type="(datetime-local|date|time)"/)
@@ -306,7 +307,7 @@ describe('nguồn: các chỗ còn sống đã thay ô, giá trị gửi y cũ (
   it('GIÁ TRỊ GỬI Y CŨ: PhanCong vẫn hanNhapVietNam(hanMoi, …) và suaGiaoBtvn {hanNop: hanNhapVietNam(...)}; ExamSetup (LUỒNG THI) vẫn new Date(batDauLocal) + ISO + kiểm giờ đã qua', () => {
     const pc = doc('src/screens/PhanCongScreen.tsx')
     expect(pc).toContain('hanMoi ? hanNhapVietNam(hanMoi, nowHocTap) : undefined')
-    expect(pc).toContain('{hanNop:hanNhapVietNam(suaHan[t.maBtvn], nowHocTap)}')
+    expect(pc).toContain('{hanNop:hanNhapVietNam(hanGui, nowHocTap)}') // hanGui = hạn từ hộp Đổi hạn nộp (hanTay) hoặc ô cũ; cùng giá trị gửi
     const es = doc('src/screens/ExamSetupScreen.tsx')
     expect(es).toContain('const t = new Date(batDauLocal).getTime()')
     expect(es).toContain("if (t < Date.now() - 60000) return showToast('Giờ bắt đầu đã qua")

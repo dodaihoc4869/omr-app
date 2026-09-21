@@ -1,14 +1,12 @@
-import { hanNhapVietNam, hanChoOChon, mocThoiGian } from '../lib/han-bai-tap'
+import { hanNhapVietNam, hanChoOChon } from '../lib/han-bai-tap'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import ONgayGio24 from '../components/ONgayGio24'
-import KhoiBtvnLo from '../components/KhoiBtvnLo'
+import KhungBtvnDaGiao from '../components/btvn-da-giao/KhungBtvnDaGiao'
 import KhoiCaNhanHoa from '../components/KhoiCaNhanHoa'
 import XemTruocPhanBo from '../components/XemTruocPhanBo'
 import { LOI_XAC_NHAN_LAM_LAI, canhBaoTuMayChu, choLamLaiBtvn, hanMacDinhVN, taoCauGiao, taoHatGiong } from '../lib/btvn-nang-do-thay'
 import { useAppStore } from '../store/appStore'
-import { layHomNay, type HomNay } from '../lib/hom-nay-api'
 import { useGioHocTap } from '../hooks/useGioHocTap'
-import NhanHanBaiTap from '../components/NhanHanBaiTap'
 import {nhomBtvn, type NhomBtvn} from '../lib/nhom-btvn'
 import NhomCaThuGon from '../components/NhomCaThuGon'
 import HocSinhNhanBai from '../components/HocSinhNhanBai'
@@ -135,17 +133,9 @@ export default function PhanCongScreen() {
 
 function TheGiaoBtvn() {
   const [tabBtvn, setTabBtvn] = useState<'giao' | 'theodoi'>('theodoi')
-  // LÔ BTVN (G5): các bài đang chạy + lô hiện tại, đọc từ lệnh Hôm nay của thầy (`/ke-hoach/hom-nay-thay`, chỉ đọc). undefined = đang tải.
-  const [homNay, setHomNay] = useState<HomNay | null | undefined>(undefined)
   // "Giao bài riêng" từ hồ sơ một em (G3→G5): mở sẵn tab Giao bài mới, chế độ chọn từng em, đã tick em ấy. Đọc MỘT lần rồi xoá.
   const sbdGiaoRieng = useAppStore((st) => st.sbdGiaoRieng)
-  useEffect(() => {
-    let huy = false
-    void layHomNay().then((r) => !huy && setHomNay(r))
-    return () => {
-      huy = true
-    }
-  }, [])
+  const moToanCanh = useAppStore((st) => st.moToanCanh)
   const [cheDo, setCheDo] = useState<'ca' | 'hoc_sinh' | 'theo_em'>('ca')
   const [dsCa, setDsCa] = useState<CaTomTat[]>([])
   const [dsDe, setDsDe] = useState<DeKho[]>([])
@@ -197,7 +187,7 @@ function TheGiaoBtvn() {
   const [hanMoi, setHanMoi] = useState(() => hanMacDinhVN(Date.now()))
   // Lỗi của ô hạn (ngày không có thật / đã qua / nhập dở) — chặn Giao để hạn không bị lặng lẽ rơi về mặc định.
   const [loiHan, setLoiHan] = useState('')
-  const [suaHan, setSuaHan] = useState<Record<string,string>>({})
+  const [suaHan] = useState<Record<string,string>>({}) // ô hạn cũ: hạn nay đến từ hộp Đổi hạn nộp (hanTay)
   const [dangSua, setDangSua] = useState('')
   const [xacNhan,setXacNhan]=useState<{text:string;nut:string;run:()=>Promise<void>}|null>(null)
   const nowHocTap = useGioHocTap()
@@ -458,12 +448,13 @@ function TheGiaoBtvn() {
     setDangSua('')
   }
 
-  async function capNhatBai(t:DongTheoDoiBtvn,thuHoi=false) {
+  async function capNhatBai(t:DongTheoDoiBtvn,thuHoi=false,hanTay?:string) {
     setDangSua(t.maBtvn)
     try {
       const ch=await layCauHinhMayChu(), mat=(await loadTeacherSecret())||''
-      if(!thuHoi && !suaHan[t.maBtvn])throw new Error('Thầy chọn ngày giờ hạn nộp trước.')
-      for (const original of (t as NhomBtvn).baiGoc||[t]) await suaGiaoBtvn(ch,mat,original.maBtvn,thuHoi?{thuHoi:true}:{hanNop:hanNhapVietNam(suaHan[t.maBtvn], nowHocTap)})
+      const hanGui=hanTay??suaHan[t.maBtvn] // hạn từ hộp Đổi hạn nộp (mục thiết kế lại) hoặc ô cũ
+      if(!thuHoi && !hanGui)throw new Error('Thầy chọn ngày giờ hạn nộp trước.')
+      for (const original of (t as NhomBtvn).baiGoc||[t]) await suaGiaoBtvn(ch,mat,original.maBtvn,thuHoi?{thuHoi:true}:{hanNop:hanNhapVietNam(hanGui, nowHocTap)})
       setTheoDoi(await theoDoiBtvn(ch,mat))
       setBao({ok:true,chu:thuHoi?'Đã thu hồi bài. Kết quả đã nộp được giữ nguyên.':'Đã cập nhật hạn nộp cho học sinh.'})
     } catch(e){setBao({ok:false,chu:e instanceof Error?e.message:'Chưa cập nhật được.'})}
@@ -1116,156 +1107,54 @@ function TheGiaoBtvn() {
           onGiao={() => void giao()}
         />
       )}
-      {tabBtvn === 'theodoi' && !dangNap && <section aria-label="Bài tập cần theo dõi" className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {[['Bài chưa nộp đã quá hạn', theoDoi.filter(b => (mocThoiGian(b.hanNop) ?? Infinity) <= nowHocTap).reduce((n,b) => n + b.chuaNop.length, 0)],
-          ['Bài chưa nộp đến hạn trong 24 giờ', theoDoi.filter(b => (mocThoiGian(b.hanNop) ?? Infinity) > nowHocTap && (mocThoiGian(b.hanNop) ?? Infinity) <= nowHocTap + 86400_000).reduce((n,b) => n + b.chuaNop.length, 0)],
-          ['Lượt bài đã nộp', theoDoi.reduce((n,b) => n + b.daNop, 0)]].map(([label, count]) => <div key={label} className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 bg-white dark:bg-slate-900"><p className="text-2xl font-bold">{count}</p><p className="text-xs mt-1">{label}</p></div>)}
-      </section>}
-      {/* TAB 2: ĐỢT BÀI ĐÃ GIAO & THEO DÕI NỘP BÀI */}
-      {tabBtvn === 'theodoi' && <KhoiBtvnLo bt={homNay === undefined ? undefined : (homNay?.btvn ?? null)} tai={homNay === undefined} lyDo={homNay?.lyDoThieu?.btvn || 'đang chờ máy chủ'} />}
+      {/* MỤC "BÀI TẬP VỀ NHÀ ĐÃ GIAO" thiết kế lại (thầy chốt 21/09 18:1x): chỉ đổi PHẦN NHÌN; hạn nộp / thu hồi / lệnh /btvn/sua đi qua các hàm cũ dưới đây. */}
       {tabBtvn === 'theodoi' && (
-        <div className="w-full max-w-full min-w-0 flex flex-col gap-4">
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                Danh sách bài tập về nhà đã giao
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Ưu tiên hỗ trợ học sinh chưa nộp bài gần hạn. Gia hạn trước khi mở lại bài đã hết hạn.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => void nap()}
-              disabled={dangNap}
-              className="text-xs font-bold text-[color:var(--m3-primary)] dark:text-blue-400 inline-flex items-center gap-1.5 p-2 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors cursor-pointer"
-            >
-              <RefreshCw size={14} className={dangNap ? 'animate-spin' : ''} /> Cập nhật dữ liệu
-            </button>
-          </div>
-
-          {bao && <OThongBao tone={bao.ok ? 'xanh' : 'do'}>{bao.chu}</OThongBao>}
-          {canhBaoNangDo && <OThongBao tone="cam">{canhBaoNangDo}</OThongBao>}
-          {dangSua && <p className="text-xs text-blue-600 font-semibold">Đang cập nhật bài tập…</p>}
-
-          {nhomBtvn(theoDoi).length === 0 ? (
-            <div className="p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950 text-[color:var(--m3-primary)] flex items-center justify-center mx-auto">
-                <ClipboardCheck size={24} />
-              </div>
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Chưa có bài tập về nhà nào</h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Hãy chuyển sang tab &ldquo;Giao bài mới&rdquo; để bắt đầu giao bài tập cho học sinh.
-              </p>
-              <button
-                type="button"
-                onClick={() => setTabBtvn('giao')}
-                className="mt-2 px-4 py-2 rounded-xl bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs hover:bg-blue-700 cursor-pointer"
-              >
-                <Send size={14} /> Giao bài mới ngay
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-              {nhomBtvn(theoDoi).sort((a,b) => Number(b.chuaNop.length > 0) - Number(a.chuaNop.length > 0) || (mocThoiGian(a.hanNop) ?? Infinity) - (mocThoiGian(b.hanNop) ?? Infinity)).map((t) => {
-                const daDu = t.daNop === t.tong
-                const quaHan = t.quaHan
-                return (
-                  <div
-                    key={t.maBtvn}
-                    className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs hover:border-blue-300 dark:hover:border-blue-700 transition-colors space-y-3.5"
-                  >
-                    {/* TIÊU ĐỀ & TRẠNG THÁI */}
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 block mb-0.5">
-                          Ca {t.maCa} · {t.soCau} câu{t.caNhan ? ' trong bài' : ''}
-                        </span>
-                        {t.caNhan && (
-                          <p className="bn-theo-doi-nang-do">
-                            <span className="bn-chip bn-chip--tot bn-chip--nho">Cá nhân hoá · {t.soLoi ?? 0} câu cốt lõi</span>
-                            <span>Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên câu cốt lõi.</span>
-                          </p>
-                        )}
-                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">
-                          {dinhDangDeCayThuMuc(t.maDe)}
-                        </h3>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                          Giao lúc {gioVN(t.giaoLuc)}
-                          <NhanHanBaiTap han={t.hanNop} now={nowHocTap} daNop={t.chuaNop.length === 0} dayDu />
-                        </p>
-                      </div>
-                      <span
-                        className={`text-xs font-bold px-2.5 py-1 rounded-full shrink-0 ${
-                          daDu
-                            ? 'bg-emerald-50 dark:bg-emerald-950/60 text-[color:var(--m3-on-tertiary-container)] border border-emerald-200 dark:border-emerald-800'
-                            : quaHan
-                            ? 'bg-rose-50 dark:bg-rose-950/60 text-[color:var(--m3-on-error-container)] border border-rose-200 dark:border-rose-800'
-                            : 'bg-amber-50 dark:bg-amber-950/60 text-[color:var(--m3-tren-canh-bao)] border border-amber-200 dark:border-amber-800'
-                        }`}
-                      >
-                        {t.daNop}/{t.tong} nộp
-                      </span>
-                    </div>
-
-                    {/* HÀNG THAO TÁC HẠN NỘP & THU HỒI */}
-                    <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 flex flex-wrap items-center gap-2">
-                      <ONgayGio24
-                        nhan={`Hạn nộp ${t.maBtvn}`}
-                        value={suaHan[t.maBtvn] ?? hanChoOChon(t.hanNop)}
-                        onChange={(v) => setSuaHan((c) => ({ ...c, [t.maBtvn]: v }))}
-                        nhanh
-                        khongQuaKhu
-                      />
-                      <button
-                        disabled={dangSua === t.maBtvn}
-                        onClick={() => capNhatBai(t)}
-                        className="rounded-lg bg-[color:var(--m3-primary)] hover:bg-blue-700 px-3 py-1.5 text-xs font-bold text-[color:var(--m3-on-primary)] disabled:opacity-50 transition-colors cursor-pointer"
-                      >
-                        Lưu hạn
-                      </button>
-                      <button
-                        disabled={dangSua === t.maBtvn}
-                        onClick={() =>
-                          setXacNhan({
-                            text: `Thu hồi bài này của ${t.tong} học sinh? Kết quả đã nộp vẫn được giữ lại.`,
-                            nut: 'Thu hồi bài',
-                            run: () => capNhatBai(t, true),
-                          })
-                        }
-                        className="rounded-lg border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/50 px-3 py-1.5 text-xs font-bold text-rose-700 dark:text-rose-300 hover:bg-rose-100 disabled:opacity-50 transition-colors cursor-pointer"
-                      >
-                        Thu hồi
-                      </button>
-                    </div>
-
-                    {/* KHỐI DANH SÁCH HỌC SINH (KÈM DẤU SAO ĐỎ ⭐ PHÁT HIỆN GIAN LẬN ĐẨY LÊN ĐẦU) */}
-                    <div className="pt-1">
-                      <HocSinhNhanBai
-                        maTheoSbd={t.maTheoSbd}
-                        bai={t}
-                        busy={dangSua === t.maBtvn}
-                        onAction={(sbd, action) =>
-                          action === 'cho-lam-lai'
-                            ? setXacNhan({
-                                text: `Cho ${t.hocSinh?.find((e) => e.sbd === sbd)?.hoTen || `học sinh ${sbd}`} làm lại? ${LOI_XAC_NHAN_LAM_LAI}`,
-                                nut: 'Cho làm lại',
-                                run: () => choLamLai(t, sbd),
-                              })
-                            : setXacNhan({
-                                text: `${action === 'reset' ? 'Cho làm lại' : 'Thu hồi bài của'} học sinh ${sbd}? Kết quả cũ được lưu lại.`,
-                                nut: action === 'reset' ? 'Cho làm lại' : 'Thu hồi bài',
-                                run: () => capNhatHocSinh(t, sbd, action),
-                              })
-                        }
-                      />
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+        <KhungBtvnDaGiao
+          ds={nhomBtvn(theoDoi)}
+          nowMs={nowHocTap}
+          dangNap={dangNap}
+          onNap={() => void nap()}
+          tenCu={(t) => dinhDangDeCayThuMuc(t.maDe)}
+          dangSua={dangSua}
+          hanChoOChon={hanChoOChon}
+          onLuuHan={(t, gio) => capNhatBai(t, false, gio)}
+          onThuHoi={(t) =>
+            setXacNhan({
+              text: `Thu hồi bài này của ${t.tong} học sinh? Kết quả đã nộp vẫn được giữ lại.`,
+              nut: 'Thu hồi bài',
+              run: () => capNhatBai(t, true),
+            })
+          }
+          dungBaiLam={(t) => (
+            <HocSinhNhanBai
+              maTheoSbd={t.maTheoSbd}
+              bai={t}
+              busy={dangSua === t.maBtvn}
+              onAction={(sbd, action) =>
+                action === 'cho-lam-lai'
+                  ? setXacNhan({
+                      text: `Cho ${t.hocSinh?.find((e) => e.sbd === sbd)?.hoTen || `học sinh ${sbd}`} làm lại? ${LOI_XAC_NHAN_LAM_LAI}`,
+                      nut: 'Cho làm lại',
+                      run: () => choLamLai(t, sbd),
+                    })
+                  : setXacNhan({
+                      text: `${action === 'reset' ? 'Cho làm lại' : 'Thu hồi bài của'} học sinh ${sbd}? Kết quả cũ được lưu lại.`,
+                      nut: action === 'reset' ? 'Cho làm lại' : 'Thu hồi bài',
+                      run: () => capNhatHocSinh(t, sbd, action),
+                    })
+              }
+            />
           )}
-        </div>
+          onMoToanCanh={moToanCanh}
+          onGiaoBaiMoi={() => setTabBtvn('giao')}
+          thongBao={
+            <>
+              {bao && <OThongBao tone={bao.ok ? 'xanh' : 'do'}>{bao.chu}</OThongBao>}
+              {canhBaoNangDo && <OThongBao tone="cam">{canhBaoNangDo}</OThongBao>}
+              {dangSua && <p className="text-xs text-blue-600 font-semibold">Đang cập nhật bài tập…</p>}
+            </>
+          }
+        />
       )}
     </div>
   )

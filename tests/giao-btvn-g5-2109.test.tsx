@@ -59,9 +59,10 @@ describe('KhoiBtvnLo — lô BTVN', () => {
     expect(doc('src/screens/HomNayCu.tsx')).not.toContain('KhoiBtvnLo')
     expect(doc('src/screens/HomNayCu.tsx')).toContain('<ViecGap />')
     const pc = doc('src/screens/PhanCongScreen.tsx')
-    expect(pc).toContain("tabBtvn === 'theodoi' && <KhoiBtvnLo")
-    expect(pc).toContain('layHomNay()')
-    expect(pc).toContain("homNay?.lyDoThieu?.btvn || 'đang chờ máy chủ'")
+    // Thiết kế lại 21/09 (thầy chốt 18:1x, đề prompt-btvn-da-giao-thiet-ke-lai-2109.md §1.E): mục "Bài tập về nhà đã giao" KHÔNG còn dựng KhoiBtvnLo (bốn bài hiện hai lần) — sửa CÓ CHỦ Ý.
+    expect(pc).not.toContain('KhoiBtvnLo')
+    expect(pc).not.toContain('layHomNay()')
+    expect(pc).toContain('<KhungBtvnDaGiao')
   })
 })
 

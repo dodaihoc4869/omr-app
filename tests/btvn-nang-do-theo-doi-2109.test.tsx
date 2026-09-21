@@ -53,9 +53,10 @@ describe('theo dõi bài NÂNG ĐỠ', () => {
   })
 
   it('màn Giao bài: thẻ bài nâng đỡ có chip "Cá nhân hoá · lõi N câu" + "Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên câu cốt lõi."', () => {
-    const src = fs.readFileSync(path.join(process.cwd(), 'src/screens/PhanCongScreen.tsx'), 'utf8')
-    expect(src).toContain('Cá nhân hoá · {t.soLoi ?? 0} câu cốt lõi')
+    // Thiết kế lại 21/09: chip + lời giải thích chuyển vào hộp "Chi tiết bài" (nút ⋯) của mục mới; dòng phụ thẻ nói "N câu lõi" (sửa CÓ CHỦ Ý).
+    const src = fs.readFileSync(path.join(process.cwd(), 'src/components/btvn-da-giao/KhungBtvnDaGiao.tsx'), 'utf8')
+    expect(src).toContain('Cá nhân hoá · {bai.find((b) => b.khoa === tHop.maBtvn)?.soCauLoi ?? 0} câu cốt lõi')
     expect(src).toContain('Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên câu cốt lõi.')
-    expect(src).toContain("{t.caNhan ? ' trong bài' : ''}")
+    expect(fs.readFileSync(path.join(process.cwd(), 'src/components/btvn-da-giao/TheBai.tsx'), 'utf8')).toContain('câu lõi')
   })
 })
