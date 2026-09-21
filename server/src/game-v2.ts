@@ -23,6 +23,7 @@ import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
 import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,dieuKienLoaiPhien,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDangLop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot} from './game-v2-luot'
 import {ghiKhoanExpGame} from './exp-d1'
+import {LENH_SHOP,shopAction} from './game-v2-shop'
 import {expMotCau} from './exp-hoc-tap'
 export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
 type Row={revision:number;json:string}
@@ -174,6 +175,7 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
   if(action.startsWith('escort-')){if(p.choice)throw new Error('Em chọn thần thú trước khi vào võ đài.');return escortAction(env,sbd,p.pet,p.cap,action,b)}
   if(action.startsWith('room-'))return roomAction(env,sbd,p.pet,action,b)
   if(action.startsWith('doan-')){if(p.choice)throw new Error('Em chọn thần thú trước khi lên đường cùng Đoàn Hộ Tống.');return doanAction(env,sbd,p,action,b,gameV2)}
+  if(LENH_SHOP.has(action)){if(p.choice)throw new Error('Em chọn thần thú trước khi vào Cửa hàng.');return shopAction(env,sbd,p,revision,action,b,()=>loadProfile(env,sbd))} // Cửa hàng phụ kiện (game-v2-shop.ts; cờ cau_hinh.shop_phu_kien mặc định TẮT)
   if(action==='academic-sync'){const result=await syncAcademic(env,sbd,p,b.mom);return {ok:true,...result,profile:visible(p),revision:await save(env,sbd,p,revision)}}
   if(action==='progress-history'){
     const rows=await env.DB.prepare(`SELECT date(created_at,'+7 hours') AS day, COUNT(*) AS total,

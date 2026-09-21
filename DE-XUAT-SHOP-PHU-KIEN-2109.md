@@ -287,5 +287,8 @@ Thầy duyệt bản thiết kế 21/09 kèm lệnh "đặt lại ngôn ngữ d�
 - [L6] `gia_doi`: Giá vừa thay đổi, em xem lại rồi mua nhé.
 - [L7] `tam_dong`: Cửa hàng đang tạm đóng. Đồ em đã mua vẫn còn nguyên.
 - [L8] `chua_co`: Em chưa có món này nên chưa mặc được.
+- [L11] `khong_co_mon`: Cửa hàng không có món này. Em tải lại Cửa hàng rồi chọn lại nhé.
+- [L12] `sap_mo`: Món này sắp mở bán. Em ghé lại sau nhé.
+- [L13] `sai_dau_vao`: Có gì đó chưa đúng. Em tải lại trang rồi thử lại nhé.
 - [L9] Mất mạng: Mất mạng rồi. Có mạng lại mới mua được, em vẫn xem được Tủ đồ.
 - [L10] Lỗi không rõ: Cửa hàng chưa tải được. Em bấm Thử lại nhé.

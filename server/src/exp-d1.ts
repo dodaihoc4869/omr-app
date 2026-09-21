@@ -163,8 +163,9 @@ async function docKeHoachLuu(env: Env, sbd: string, tuNgay: string): Promise<KeH
 }
 
 /** Chuỗi ngày đạt LIÊN TIẾP TRƯỚC `ngay` (đúng cách `docDauVao` dựng `lichSu`), để ngày này thành `chuỗi + 1`. */
-async function docChuoiTruoc(env: Env, sbd: string, ngay: string): Promise<number> {
-  const tuNgay = themNgay(ngay, -SO_NGAY_LICH_SU)
+/** Số ngày ĐẠT nhiệm vụ ngày liên tiếp TRƯỚC `ngay` (ngày nghỉ không đứt chuỗi), nhìn lại tối đa `soNgay` ngày (mặc định cửa sổ lịch sử của kế hoạch = 7). Cửa hàng phụ kiện đọc với cửa sổ dài hơn (điều kiện "cần chuỗi 14–30 ngày"). */
+export async function docChuoiTruoc(env: Env, sbd: string, ngay: string, soNgay: number = SO_NGAY_LICH_SU): Promise<number> {
+  const tuNgay = themNgay(ngay, -soNgay)
   const nghi = await docNgayNghi(env)
   const r = await an(
     () => env.DB.prepare('SELECT ngay, ket_qua FROM ke_hoach_ngay WHERE sbd = ? AND ngay < ? AND ngay >= ? ORDER BY ngay DESC').bind(sbd, ngay, tuNgay).all<Record<string, unknown>>(),
