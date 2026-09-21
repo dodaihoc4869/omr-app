@@ -8,8 +8,8 @@
 // (exam-db: qidRaPhieu). Máy chủ chỉ biết câu em đã NỘP, mà phiếu in ra thì em
 // đã cầm rồi dù chưa nộp — thiếu sổ này là lần sau phát lại đúng đề cũ.
 //
-// jsPDF và font nhúng nặng gần 300KB, nên cả bộ vẽ được NẠP ĐỘNG lúc thầy bấm
-// nút: người không dùng tới không phải tải.
+// Phiếu nay dựng bằng HTML (NutPhieuHtml / lib/html-phieu.ts) — KHÔNG còn jsPDF
+// hay font nhúng cho PDF (đã gỡ khỏi dự án 21/09).
 import { useEffect, useState } from 'react'
 import { OThongBao } from './DesignSystem'
 import NutPhieuHtml from './NutPhieuHtml'
