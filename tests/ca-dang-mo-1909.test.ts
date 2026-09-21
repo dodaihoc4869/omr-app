@@ -95,7 +95,7 @@ describe('/hs/ca-dang-mo', () => {
     const chu = await (await worker.fetch(req, d.env)).text()
     expect(chu).not.toMatch(/ma_?ca|ten_?ca|BIMAT|matkhau|bank|de\/|Tên bí mật/i)
     const j = JSON.parse(chu)
-    expect(Object.keys(j).sort()).toEqual(['coCaMo', 'ok', 'serverNow', 'soCa'])
+    expect(Object.keys(j).sort()).toEqual(['coCaMo', 'nhipDeNghi', 'ok', 'serverNow', 'soCa']) // SỬA CÓ CHỦ Ý 21/09: mọi phản hồi JSON mang nhipDeNghi (hệ số nhịp, suc-khoe-may.ts) — không lộ gì về ca
     expect(j).toMatchObject({ ok: true, coCaMo: true, soCa: 1 })
   })
 

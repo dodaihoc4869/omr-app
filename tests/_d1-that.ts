@@ -10,6 +10,7 @@ import type { D1PreparedStatement, Env } from '../server/src/kieu'
 import { xoaDemThiDua } from '../server/src/dem-thi-dua'
 import { xoaMoiDem } from '../server/src/dem-chung'
 import { xoaDemKeHoach } from '../server/src/dem-ke-hoach'
+import { xoaSucKhoe } from '../server/src/suc-khoe-may'
 
 /** Duy nhất tệp này phụ thuộc thứ tự (cần `game_v2_settings` dựng trước) — bỏ qua, không dùng tới. */
 const BO_QUA = new Set(['migration-1609-academic-start.sql'])
@@ -35,7 +36,7 @@ export function demTermUnionToiDa(query: string): number {
 }
 
 export function taoD1That() {
-  xoaDemThiDua(); xoaMoiDem(); xoaDemKeHoach() // đệm Thi đua 30 giây (mức mô-đun) không được lẫn giữa các D1 giả khác nhau
+  xoaDemThiDua(); xoaMoiDem(); xoaDemKeHoach(); xoaSucKhoe() // đệm Thi đua 30 giây (mức mô-đun) không được lẫn giữa các D1 giả khác nhau
   const sql = new DatabaseSync(':memory:')
   const tep = ['schema.sql', ...readdirSync('server').filter((f) => /^migration-.*\.sql$/.test(f)).sort()]
   for (const f of tep) {
@@ -126,10 +127,13 @@ export function taoD1That() {
 export type D1That = ReturnType<typeof taoD1That>
 
 /** Gọi Worker thật qua `fetch` — đúng đường của app. `thay` = true thì kèm mã bí mật của thầy. */
-export async function goiWorker(worker: { fetch(r: Request, e: Env): Promise<Response> }, env: Env, duong: string, body: Record<string, unknown>, thay = false) {
+/** `giuNhipDeNghi` = false (mặc định) ⇒ BỎ trường `nhipDeNghi` (hệ số nhịp, gắn ở MỌI phản hồi từ 21/09) khỏi kết quả để các test "phản hồi đúng từng khoá" không phải nhắc tới nó; bật true khi test chính trường ấy. */
+export async function goiWorker(worker: { fetch(r: Request, e: Env): Promise<Response> }, env: Env, duong: string, body: Record<string, unknown>, thay = false, giuNhipDeNghi = false) {
   const r = await worker.fetch(
     new Request(`https://test${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(thay ? { ...body, secret: 'bi-mat-thu' } : body) }),
     env,
   )
-  return (await r.json()) as Record<string, any>
+  const kq = (await r.json()) as Record<string, any>
+  if (!giuNhipDeNghi) delete kq.nhipDeNghi
+  return kq
 }

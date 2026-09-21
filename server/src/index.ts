@@ -1,3 +1,4 @@
+import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
 import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
@@ -106,7 +107,7 @@ async function sauGhi<T>(env: Env, b: Record<string, unknown>, viec: Promise<T>)
   try { return await viec } finally { try { emCoGhi(await gameIdentity(env, b)) } catch { /* token sai / hết hạn */ } }
 }
 function ra(data: unknown, status = 200): Response {
-  return new Response(JSON.stringify({ ...(data as object), serverNow: Date.now() }), { status, headers: JSON_HEADERS })
+  return new Response(JSON.stringify({ ...(data as object), serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
 }
 
 function laThay(req: Request, env: Env, body: Record<string, unknown>): boolean {
@@ -2990,7 +2991,7 @@ async function themMocReset(env: Env, res: Response): Promise<Response> {
   }
 }
 
-export default {
+const boXuLy = {
   async scheduled(event:{cron:string}, env:Env) {
     // RESET TOÀN APP (chỉ chạy đúng một lần, sau mốc 00:01 thứ Hai 21/09; trước mốc và sau khi xong thì trả về ngay). PHẢI chạy trước mọi việc khác của cron.
     // Job chia bước (≤ 40 truy vấn D1 mỗi lượt): đang làm/nhường thì các việc cron khác nghỉ lượt này (kế hoạch, tin PH, vinh danh đều dựng lại theo yêu cầu khi có người mở).
@@ -3196,6 +3197,7 @@ export default {
       // BÁO CÁO CA cho THẦY (docs/hop-dong-xem-diem-v2-2109.md mục 2 + 4): ĐỌC-CHỈ, không bị chặn công bố (trả `congBo`); `phan[].toiDa` / `phanTb[].toiDa` = trần điểm từng phần từ `quotaPhan` (một nguồn với chấm điểm). Lỗi đọc ⇒ {ok:false, lyDo:'loi_doc'}.
       if (p === '/gv/bao-cao-ca') return ra(await gvBaoCaoCa(env, b))
       if (p === '/gv/bao-cao-ca-em') return ra(await gvBaoCaoCaEm(env, b))
+      if (p === '/gv/suc-khoe-may-chu') return ra({ ok: true, ...sucKhoeMay(), nguong: { banMs: 1500, nghenMs: 3500, toiThieuMau: 20 }, ghiChu: 'Số đo của chính isolate đang trả lời (mỗi lượt có thể rơi vào isolate khác): lấy MAX của vài lượt gần nhất.' })
       if (p === '/gv/bang-tin-song') {
         const co = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('bang_tin_san').first<{ gia_tri: unknown }>().catch(() => null)
         if (String(co?.gia_tri ?? '').trim().toLowerCase() === 'tat') return ra({ ok: false, lyDo: 'tat', error: 'Bảng tin kiểu sàn đang tắt.' })
@@ -3275,5 +3277,14 @@ export default {
       const ma = (e as { ma?: unknown } | null)?.ma // mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời; lỗi thường không có
       return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ', ...(typeof ma === 'string' ? { ma } : {}) }, 500)
     }
+  },
+}
+
+/** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */
+export default {
+  ...boXuLy,
+  async fetch(req: Request, env: Env): Promise<Response> {
+    const t0 = Date.now()
+    try { return await boXuLy.fetch(req, env) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
   },
 }
