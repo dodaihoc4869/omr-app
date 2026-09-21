@@ -9,6 +9,7 @@
 // theo luật cũ, không tính lại.
 //
 // KHÔNG BAO GIỜ NÉM LỖI: EXP hỏng thì lượt nộp bài vẫn thành công (sổ là nguồn sự thật, lần gọi sau tự bắt kịp).
+import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
@@ -392,9 +393,11 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   const loMap = new Map<string, { maBtvn: string; chiSo: number; luc: string }>()
   for (const e of so) {
     if (e.nguon !== 'btvn_lo' || e.ketQua === null || e.luc < tu) continue
-    const k = `${e.maNguon}|${e.lan}`
+    // Bài cá nhân hoá làm lại: `lan = chiSo + LAN_MOI_LUOT × (lượt − 1)` ⇒ cùng lô ở mọi lượt về CÙNG khoá EXP `lo|<bài>|<chỉ số>` (không cộng đôi). Bài cũ: lan < 1000, không đổi.
+    const chiSo = e.lan % LAN_MOI_LUOT
+    const k = `${e.maNguon}|${chiSo}`
     const cu = loMap.get(k)
-    if (!cu || e.luc > cu.luc) loMap.set(k, { maBtvn: e.maNguon, chiSo: e.lan, luc: e.luc })
+    if (!cu || e.luc > cu.luc) loMap.set(k, { maBtvn: e.maNguon, chiSo, luc: e.luc })
   }
   const loXong = [...loMap.values()].map((l) => {
     const han = luuKh.map((k) => k.hanMemLo.get(`btvn_lo:${l.maBtvn}:${l.chiSo}`)).find((h) => h !== undefined) ?? hanNopBtvn.get(l.maBtvn)

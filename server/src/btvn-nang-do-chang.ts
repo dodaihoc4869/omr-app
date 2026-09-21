@@ -2,6 +2,9 @@
 import { themNgay } from './ho-so-nam-kt'
 import { ngayVn } from './su-kien-hoc'
 
+/** Khoảng cách `lan` của sổ `btvn_lo` giữa hai lượt làm của cùng một bài cá nhân hoá (chỉ số chặng luôn < 1000): `lan = chiSo + LAN_MOI_LUOT × (lượt − 1)`. Nơi đọc `lan` làm chỉ số lô phải lấy `lan % LAN_MOI_LUOT`. */
+export const LAN_MOI_LUOT = 1000
+
 /** Mốc mở từng chặng: chặng 0 = lúc chốt; chặng k ≥ 1 = 00:00 giờ VN của ngày thứ k kể từ ngày chốt (luôn < hạn nộp vì soChang ≤ ceil((hạn − lúc chốt)/ngày)). */
 export function moLucChang(chotLuc: string, soChang: number): string[] {
   const ngayChot = ngayVn(chotLuc)

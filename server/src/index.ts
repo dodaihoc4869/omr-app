@@ -3113,6 +3113,7 @@ export default {
       if (p === '/kho/rut-cau') return rutCau(env, b)
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
       if (p === '/btvn/sua') return suaBtvn(env,b)
+      if (p === '/btvn/cho-lam-lai') return ra(await ND.choLamLaiCaNhan(env, b, Date.now()))
       if (p === '/btvn/giao') return giaoBtvn(env, b)
       if (p === '/btvn/xem-truoc') return ra(await ND.xemTruocBtvn(env, b, Date.now()))
       if (p === '/btvn/bai-lam') return xemBaiBtvn(env,b)

@@ -21,7 +21,7 @@ import { dungLaiHoSo, themNgay } from './ho-so-nam-kt'
 import { tinhNganSach, type DauVaoKeHoach } from './ke-hoach-ngay'
 import { chuyenDeThat, ghiSuKien, ngayVn, phanTuQid, suKienChamBai, suKienTuKetQuaCham, cauTuKho } from './su-kien-hoc'
 import { daTraLoi } from './on-lai-nop'
-import { moLucChang, trangThaiCacChang } from './btvn-nang-do-chang'
+import { LAN_MOI_LUOT, moLucChang, trangThaiCacChang } from './btvn-nang-do-chang'
 
 type Hang = Record<string, unknown>
 
@@ -405,7 +405,7 @@ export function docTomTat(v: unknown): TomTatBo | null {
 
 // ================================================================== CHẶNG ==================================================================
 
-export { moLucChang, trangThaiCacChang, type TrangThaiChang } from './btvn-nang-do-chang'
+export { LAN_MOI_LUOT, moLucChang, trangThaiCacChang, type TrangThaiChang } from './btvn-nang-do-chang'
 
 // ================================================================== BÓC ĐÁP ÁN ==================================================================
 
@@ -590,7 +590,9 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
 
   // GHI SỔ (idempotent, khoá đầu thắng) — chưa ghi được thì KHÔNG có đáp án nào đi ra.
   const luc = new Date(now).toISOString()
-  const ghi = await ghiSuKien(env, suKienChamBai('btvn_lo', maBtvn, sbd, chiSo, luc, cauTuKho(daLam), gop))
+  // `lan` của sổ = chỉ số chặng ở lượt 1; lượt làm lại (thầy bấm "Cho làm lại") cộng 1000 mỗi lượt để khoá sổ khác đi, kết quả lượt mới không bị nuốt.
+  const lanSo = chiSo + LAN_MOI_LUOT * (Math.max(1, soHoac(em.so_lan_lam, 1)) - 1)
+  const ghi = await ghiSuKien(env, suKienChamBai('btvn_lo', maBtvn, sbd, lanSo, luc, cauTuKho(daLam), gop))
   if (!ghi.ok) return { ok: false, error: 'Chưa ghi được bài làm. Em nộp lại nhé.' }
   try {
     await dungLaiHoSo(env, [sbd], luc)
@@ -600,10 +602,16 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
   const hoSoSau = await docHoSoTheoCauCuaBai(env, maBtvn, sbd, dsQid, now)
   const tien = theTienBo(hoSoTruoc, hoSoSau)
   const ten = await tenDangTheoMa(env, tien.dangLenBac.map((d) => d.ma))
-  const moiExp = await capNhatExp(env, sbd, now)
-
   const xong = chuaLam.length === 0
   const loMoi = xong ? Math.max(loDaXong, chiSo + 1) : loDaXong
+  // CHẶNG CUỐI XONG (mọi câu của bài đã có đáp án) ⇒ máy chủ TỰ CHỐT NỘP bài bằng đáp án đã lưu: em không cần (và không phải) gọi thêm `/btvn/nop`.
+  // Gọi thêm `/btvn/nop` với `dapAn: {}` vẫn an toàn — idempotent (`daNhan`), không chấm hai lần. Nộp TRƯỚC khi tính EXP để khoản "nộp đúng hạn" tính ngay lượt này.
+  let nop: Hang | null = null
+  if (xong && loMoi >= soChang && !em.nop_luc) {
+    const n = await nopBaiCaNhan(env, bt, sbd, {}, now)
+    if (n.ok) nop = { daNop: true, nopLuc: n.nopLuc, soDung: n.soDung, soCau: n.soCau, soCauCuaEm: n.soCauCuaEm, soCauThuongSai: n.soCauThuongSai, qidSai: n.qidSai }
+  }
+  const moiExp = await capNhatExp(env, sbd, now)
   const ketQua = daLam.map((c) => {
     const q = chuoi(c.qid)
     const dungDapAn = answerText(c.dap_an ?? c.dapAn)
@@ -615,13 +623,6 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
       anhLoiGiai: (Array.isArray(c.hinh) ? (c.hinh as Hang[]) : []).filter((h) => h && h.vi_tri === 'sau_loi_giai'),
     }
   })
-  // CHẶNG CUỐI XONG (mọi câu của bài đã có đáp án) ⇒ máy chủ TỰ CHỐT NỘP bài bằng đáp án đã lưu: em không cần (và không phải) gọi thêm `/btvn/nop`.
-  // Gọi thêm `/btvn/nop` với `dapAn: {}` vẫn an toàn — idempotent (`daNhan`), không chấm hai lần.
-  let nop: Hang | null = null
-  if (xong && loMoi >= soChang && !em.nop_luc) {
-    const n = await nopBaiCaNhan(env, bt, sbd, {}, now)
-    if (n.ok) nop = { daNop: true, nopLuc: n.nopLuc, soDung: n.soDung, soCau: n.soCau, soCauCuaEm: n.soCauCuaEm, soCauThuongSai: n.soCauThuongSai, qidSai: n.qidSai }
-  }
   const homNay = await docExpHomNay(env, sbd, now)
   return {
     ok: true,
@@ -690,12 +691,13 @@ export async function nopBaiCaNhan(env: Env, bt: Hang, sbd: string, lam: Hang, n
     return { ok: false, error: 'Bài cá nhân hoá đã nộp, không làm lại được.', daHetLuot: true }
   }
   const nay = new Date(now).toISOString()
-  const saved = await env.DB.prepare('UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ?, so_lan_lam = ? WHERE khoa = ? AND thu_hoi = 0 AND nop_luc IS NULL')
-    .bind(nay, graded.soDung, mau, luuLam, 1, khoa).run()
+  const luot = Math.max(1, soHoac(cu.so_lan_lam, 1)) // lượt làm hiện tại (tăng khi thầy bấm "Cho làm lại")
+  const saved = await env.DB.prepare('UPDATE btvn_em SET nop_luc = ?, so_dung = ?, so_cau = ?, dap_an_json = ? WHERE khoa = ? AND thu_hoi = 0 AND nop_luc IS NULL')
+    .bind(nay, graded.soDung, mau, luuLam, khoa).run()
   if (!saved.meta.changes) return { ok: false, error: 'Bài vừa được cập nhật từ một lần nộp khác. Em tải lại để xem kết quả.' }
   // Sổ: mọi câu của em (kể cả thưởng sai — hồ sơ cần biết). Câu đã ghi qua chặng (`btvn_lo`) không ghi đôi.
-  await ghiSuKien(env, suKienTuKetQuaCham('btvn', maBtvn, sbd, 1, nay, graded), { tranhTrungLo: true })
-  return { ok: true, lanThu: 1, soCau: mau, soDung: graded.soDung, qidSai: graded.qidSai, nopLuc: nay, soLanLamLaiConLai: 0, ...chung }
+  await ghiSuKien(env, suKienTuKetQuaCham('btvn', maBtvn, sbd, luot, nay, graded), { tranhTrungLo: true })
+  return { ok: true, lanThu: luot, soCau: mau, soDung: graded.soDung, qidSai: graded.qidSai, nopLuc: nay, soLanLamLaiConLai: 0, ...chung }
 }
 
 // ================================================================== XEM TRƯỚC PHÂN BỔ (thầy, CHỈ ĐỌC) ==================================================================
@@ -721,6 +723,7 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
   let daChotCua = new Map<string, Hang>() // sbd → dòng btvn_em (chỉ ở chế độ (b))
   let coTrongBai: Set<string> | null = null
   let canhBao: string | undefined
+  let doiChieu: { boQuaQid: string[]; thieuMeta: number } | undefined
   if (maBtvn) {
     const bt = await env.DB.prepare('SELECT * FROM btvn WHERE ma_btvn = ? AND da_xoa = 0').bind(maBtvn).first<Hang>()
     if (!bt) return { ok: false, error: 'Bài không còn được giao.' }
@@ -741,6 +744,7 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
     if (!dung.ok) return dung
     bai = { cau: dung.cau, loi: dung.loi, ghim: dung.ghim }
     canhBao = dung.canhBao
+    doiChieu = { boQuaQid: dung.boQuaQid, thieuMeta: dung.thieuMeta }
     hatGiong = chuoi(b.hatGiong).trim().slice(0, 40) || 'xem-truoc'
     hanMs = b.hanNop ? Date.parse(chuoi(b.hanNop)) : now + 48 * 3_600_000
     if (!Number.isFinite(hanMs) || hanMs <= now) return { ok: false, error: 'Hạn nộp phải là thời điểm trong tương lai.' }
@@ -779,6 +783,7 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
     ...(chiTiet ? { chiTiet } : {}),
     ...(coTrongBai ? { khongCoTrongBai: dsSbd.filter((s) => !coTrongBai!.has(s)) } : {}),
     ...(canhBao ? { canhBao } : {}),
+    ...(doiChieu ?? {}),
   }
 }
 
@@ -931,4 +936,40 @@ export async function baiLamCaNhan(env: Env, em: Hang): Promise<Hang> {
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Chưa mở được bài.' }
   }
+}
+
+// ================================================================== THẦY CHO LÀM LẠI (bài cá nhân hoá) ==================================================================
+
+/**
+ * `POST /btvn/cho-lam-lai {maBtvn, sbd}` (thầy). Bài cá nhân hoá KHÔNG tự cho làm lại; thầy bấm nút cho MỘT em ĐÃ NỘP, còn hạn.
+ * Chép kết quả hiện tại vào `btvn_em_lich_su`, `so_lan_lam + 1`, xoá nộp/đáp án/điểm, `lo_da_xong = 0`; GIỮ bộ câu đã chốt (`btvn_em_cau`, `chot_luc`) và hạn nộp.
+ * Sổ lượt mới ghi với `lan` mới (`LAN_MOI_LUOT`); EXP dùng khoá idempotent sẵn có nên không cộng đôi trong cùng ngày. Ra `{ok, soLanLam}`.
+ */
+export async function choLamLaiCaNhan(env: Env, b: Hang, now: number): Promise<Hang> {
+  const maBtvn = chuoi(b.maBtvn).trim()
+  const sbd = chuoi(b.sbd).trim()
+  if (!maBtvn || !sbd) return { ok: false, error: 'Thiếu mã bài hoặc số báo danh.' }
+  const bt = await env.DB.prepare('SELECT * FROM btvn WHERE ma_btvn = ? AND da_xoa = 0').bind(maBtvn).first<Hang>()
+  if (!bt) return { ok: false, error: 'Bài không còn được giao.' }
+  if (!laBaiCaNhan(bt)) return { ok: false, lyDo: 'khong_ca_nhan', error: 'Bài này không cá nhân hoá — bài thường dùng nút làm lại có sẵn.' }
+  const hanMs = Date.parse(chuoi(bt.han_nop))
+  if (Number.isFinite(hanMs) && hanMs <= now) return { ok: false, lyDo: 'qua_han', error: 'Bài đã quá hạn nộp. Thầy gia hạn nộp trước rồi cho em làm lại.' }
+  const khoa = `${maBtvn}|${sbd}`
+  const em = await env.DB.prepare('SELECT * FROM btvn_em WHERE khoa = ?').bind(khoa).first<Hang>()
+  if (!em || em.thu_hoi) return { ok: false, error: 'Học sinh không có trong lượt giao này.' }
+  if (!em.nop_luc) return { ok: false, lyDo: 'chua_nop', error: 'Em chưa nộp bài nên chưa cần cho làm lại.' }
+  const soLanLam = Math.max(1, soHoac(em.so_lan_lam, 1)) + 1
+  // MỘT batch: bản chép lịch sử CHỈ ghi khi dòng còn đúng bản đã đọc (bấm đúp/hai máy thầy: bên sau không ghi thêm gì).
+  const kq = await env.DB.batch([
+    env.DB.prepare(
+      `INSERT INTO btvn_em_lich_su (id, khoa, luu_luc, hanh_dong, du_lieu)
+       SELECT ?, ?, ?, 'cho-lam-lai', ? WHERE EXISTS (SELECT 1 FROM btvn_em WHERE khoa = ? AND thu_hoi = 0 AND nop_luc = ?)`,
+    ).bind(crypto.randomUUID(), khoa, new Date(now).toISOString(), json(em), khoa, chuoi(em.nop_luc)),
+    env.DB.prepare(
+      `UPDATE btvn_em SET nop_luc = NULL, so_dung = NULL, so_cau = NULL, dap_an_json = NULL, so_lan_lam = ?, xong_vong1_luc = NULL, lo_da_xong = 0
+        WHERE khoa = ? AND thu_hoi = 0 AND nop_luc = ?`,
+    ).bind(soLanLam, khoa, chuoi(em.nop_luc)),
+  ])
+  if (!Number((kq[1] as { meta?: { changes?: number } })?.meta?.changes ?? 0)) return { ok: false, lyDo: 'da_thay_doi', error: 'Bài của em vừa được cập nhật ở nơi khác. Thầy tải lại rồi thử lại.' }
+  return { ok: true, soLanLam }
 }
