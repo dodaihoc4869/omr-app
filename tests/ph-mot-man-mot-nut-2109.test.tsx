@@ -49,23 +49,28 @@ describe('MỘT màn, MỘT nút — cây màn phụ huynh thật', () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="hom-nay"]')).toBeTruthy())
     await waitFor(() => expect(container.textContent).toContain('Hôm nay còn 3 lượt giao'))
-    const chinh = container.querySelectorAll('.phm-nut--chinh')
+    const chinh = container.querySelectorAll('[data-vung="giao-them"]')
     expect(chinh).toHaveLength(1)
     expect(chinh[0]!.textContent).toContain('Giao thêm bài cho con')
     const ten = (e: Element) => `${e.textContent} ${e.getAttribute('aria-label') ?? ''} ${e.getAttribute('title') ?? ''}`
     const chu = [container.textContent ?? '', ...[...container.querySelectorAll('button,[role],[title],[aria-label],a')].map(ten)].join('\n')
     for (const cam of CAM_CU) expect(chu, String(cam)).not.toMatch(cam)
-    expect(container.querySelector('[role="menu"], .bnv-menu, .bnv, [role="tablist"]')).toBeNull()
+    expect(container.querySelector('[role="menu"], .bnv-menu, .bnv, [role="tablist"]')).toBeNull() // menu tài khoản chỉ dựng khi bấm nút tròn
     expect(document.querySelector('.fixed.inset-0')).toBeNull() // không sheet toàn màn
   })
 
-  it('MỌI nút bấm được trên màn chính khớp danh sách hữu hạn: thẻ Hôm nay của con · thẻ Ca kiểm tra gần nhất · "Đã xem" · "Giao thêm bài cho con" · "Đổi số báo danh"', async () => {
+  it('MỌI nút bấm được trên màn chính khớp danh sách hữu hạn: nút tròn tài khoản · thẻ "Xem mọi thứ về con" · "Đã xem" · "Giao thêm bài cho con"; menu mở ⇒ thêm "Đóng menu" + mục "Đổi số báo danh" (đúng MỘT mục)', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="ca-gan-nhat"]')).toBeTruthy())
-    const ten = [...container.querySelectorAll('button')].map((b) => (b.getAttribute('aria-label') || b.textContent || '').replace(/\s+/g, ' ').trim())
-    for (const t of ten) expect(t, t).toMatch(/^(Hôm nay của con: .*Xem mọi thứ về con|Ca kiểm tra gần nhất của con: .*Xem trong bảng|Đã xem|Giao thêm bài cho con|Đổi số báo danh)$/)
-    expect(ten.filter((t) => t === 'Giao thêm bài cho con')).toHaveLength(1)
-    expect(ten.filter((t) => t === 'Đổi số báo danh')).toHaveLength(1)
+    const ten = () => [...container.querySelectorAll('button')].map((b) => (b.getAttribute('aria-label') || b.textContent || '').replace(/\s+/g, ' ').trim())
+    const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Xem mọi thứ về conTừng câu, điểm mạnh, dạng còn vấp|Đã xem|Giao thêm bài cho con|Đóng menu|Đổi số báo danh)$/
+    for (const t of ten()) expect(t, t).toMatch(HOP_LE)
+    expect(ten().filter((t) => t === 'Giao thêm bài cho con')).toHaveLength(1)
+    expect(ten().filter((t) => t === 'Đổi số báo danh')).toHaveLength(0) // còn ẩn trong menu
+    fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
+    for (const t of ten()) expect(t, t).toMatch(HOP_LE)
+    expect(ten().filter((t) => t === 'Đổi số báo danh')).toHaveLength(1)
+    expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(1)
   })
 
   it('lời Bộ não / thư tuần KHÔNG hiện dù lệnh /ph/ke-hoach có trả; dải cảnh báo của thầy vẫn còn (thụ động)', async () => {
@@ -75,16 +80,17 @@ describe('MỘT màn, MỘT nút — cây màn phụ huynh thật', () => {
     expect(screen.queryByRole('button', { name: 'Làm ngay' })).toBeNull()
   })
 
-  it('chân màn: "Đổi số báo danh" (đích ≥ 48 px theo CSS) + số bản app; bấm ⇒ về màn đăng nhập, xoá SBD nhớ', async () => {
+  it('"Đổi số báo danh" nằm trong menu của nút tròn (đích ≥ 48 px theo CSS) cùng số bản app; màn KHÔNG còn chân "Bản app"; bấm ⇒ về màn đăng nhập, xoá SBD nhớ', async () => {
     const { container } = render(<ParentPortalScreen />)
-    const chan = await waitFor(() => {
-      const e = container.querySelector('[data-vung="chan-ph"]')
-      expect(e).toBeTruthy()
-      return e as HTMLElement
-    })
-    expect(chan.querySelector('span')!.textContent).toBe(chuBanApp())
-    expect(doc('src/components/ph-moi/ph-moi-them.css')).toMatch(/\.phm-chan__nut \{[^}]*min-height: 48px/)
-    fireEvent.click(screen.getByRole('button', { name: 'Đổi số báo danh' }))
+    await waitFor(() => expect(container.querySelector('[data-vung="hom-nay"]')).toBeTruthy())
+    expect(container.querySelector('[data-vung="chan-ph"]')).toBeNull()
+    expect(container.textContent).not.toMatch(/Bản app|Bản chạy thử/)
+    const css = doc('src/components/ph-moi/ph-apple.css')
+    expect(css).toMatch(/\.phm-ap-anh \{[^}]*width: 48px; height: 48px/)
+    expect(css).toMatch(/\.phm-ap-menu__muc \{[^}]*min-height: 50px/)
+    fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
+    expect(container.querySelector('[data-vung="ban-app"]')!.textContent).toBe(chuBanApp())
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Đổi số báo danh' }))
     await screen.findByRole('button', { name: 'Vào xem kết quả của con' })
     expect(localStorage.getItem('omr_ph_sbd')).toBeNull()
   })

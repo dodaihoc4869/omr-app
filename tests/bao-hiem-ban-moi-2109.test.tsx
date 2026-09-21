@@ -462,15 +462,17 @@ describe('số bản ở cuối menu ba chấm', () => {
     localStorage.setItem('omr_ph_sbd', '12121212')
   })
 
-  it('cổng phụ huynh (một màn một nút, 21/09): KHÔNG còn menu ba chấm; số bản nằm ở CHÂN màn, cạnh "Đổi số báo danh" (đích ≥ 48 px, chữ nhỏ)', async () => {
+  it('cổng phụ huynh (một màn một nút, 21/09; màn chính kiểu Apple B): KHÔNG còn menu ba chấm; số bản KHÔNG còn ở chân màn — chỉ ở menu nút tròn tài khoản, dưới mục "Đổi số báo danh" (chữ xám rất nhỏ)', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeTruthy())
     expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
     expect(container.querySelector('.bnv-menu')).toBeNull()
-    const chan = container.querySelector('[data-vung="chan-ph"]') as HTMLElement
-    expect(chan).toBeTruthy()
-    expect((chan.querySelector('span') as HTMLElement).textContent).toBe(chuBanApp())
-    expect((chan.querySelector('button') as HTMLElement).textContent).toBe('Đổi số báo danh')
+    expect(container.querySelector('[data-vung="chan-ph"]')).toBeNull()
+    expect(container.textContent).not.toContain(chuBanApp())
+    fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
+    const menu = container.querySelector('[role="menu"]') as HTMLElement
+    expect((menu.querySelector('[data-vung="ban-app"]') as HTMLElement).textContent).toBe(chuBanApp())
+    expect((menu.querySelector('[role="menuitem"]') as HTMLElement).textContent).toBe('Đổi số báo danh')
   })
 
   it('cổng học sinh và phụ huynh dùng CHUNG một DauTrang ⇒ một chỗ sửa (khoá nguồn); chữ tiếng Việt, số có nhãn "Bản app"', () => {

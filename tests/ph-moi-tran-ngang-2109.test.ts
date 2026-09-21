@@ -35,7 +35,7 @@ const lopTrongTsx = (src: string): string[] => {
 
 describe('không va chạm tên lớp với CSS khác', () => {
   it('mọi lớp `phm-*` / `phm` của app PH mới CHỈ được định nghĩa trong src/components/ph-moi/; không tệp CSS nào khác có bộ chọn trùng; nguồn không còn tiền tố `mt-` của mũi tên hoá học', () => {
-    const tsx = ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx'].map(doc)
+    const tsx = ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/ThanhDayAp.tsx', 'src/components/ph-moi/BieuTuongAp.tsx', 'src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx'].map(doc)
     const lop = [...new Set(tsx.flatMap(lopTrongTsx))].filter((t) => t === 'phm' || t.startsWith('phm-'))
     expect(lop.length).toBeGreaterThan(40)
     for (const p of CSS_KHAC) {
@@ -43,12 +43,15 @@ describe('không va chạm tên lớp với CSS khác', () => {
       for (const t of lop) expect(new RegExp(`\\.${t}(?![\\w-])`).test(css), `${p} có .${t}`).toBe(false)
     }
     for (const p of CSS_PH_MOI) expect(doc(p).replace(/\/\*[\s\S]*?\*\//g, ''), p).not.toMatch(/\.mt(?![\w])|\.mt-/)
-    for (const f of ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx']) expect(lopTrongTsx(doc(f)).filter((t) => t === 'mt' || t.startsWith('mt-')), f).toEqual([])
+    for (const f of ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/ThanhDayAp.tsx', 'src/components/ph-moi/BieuTuongAp.tsx', 'src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx']) expect(lopTrongTsx(doc(f)).filter((t) => t === 'mt' || t.startsWith('mt-')), f).toEqual([])
   })
-  it('chốt phòng thủ: gốc `.phm` là khối thường không co theo nội dung, có min-width 0 và overflow-x: clip (khi hỗ trợ)', () => {
+  it('chốt phòng thủ: gốc `.phm` (bảng) và `.phm-ap` (màn chính kiểu Apple) là khối thường không co theo nội dung, có min-width 0 và overflow-x: clip (khi hỗ trợ)', () => {
     const css = doc('src/components/ph-moi/ph-moi-them.css')
     expect(css).toMatch(/\.phm \{[^}]*display: block[^}]*min-width: 0/)
     expect(css).toMatch(/@supports \(overflow: clip\) \{ \.phm \{ overflow-x: clip; \} \}/)
+    const ap = doc('src/components/ph-moi/ph-apple.css')
+    expect(ap).toMatch(/\.phm-ap \{ display: block; min-width: 0; max-width: 100%; \}/)
+    expect(ap).toMatch(/@supports \(overflow: clip\) \{ \.phm-ap \{ overflow-x: clip; \} \}/)
   })
 })
 
@@ -68,12 +71,28 @@ const THIEU = {
   },
   giaoThem: { conLaiHomNay: 3 },
 }
+const VIEC = (() => {
+  const o = JSON.parse(JSON.stringify(PH_OK))
+  o.homNay.tongQuan.viecXong = 3
+  o.homNay.tongQuan.viecTong = 4
+  return o
+})()
+const CHUA_HOC = { ok: true, serverNow: Date.UTC(2026, 8, 21, 14, 0), hoTen: 'Đỗ Đại Học', giaoThem: { conLaiHomNay: 3 } }
+// Tên rất dài + số rất lớn + ca chưa công bố: ép mọi ô co giãn tới giới hạn.
+const DAI = (() => {
+  const o = JSON.parse(JSON.stringify(PH_OK))
+  o.hoTen = 'Nguyễn Hoàng Bảo Khánh An Nhiên Thuỵ Vy'
+  o.homNay.tongQuan = { soCau: 1234, soDung: 700, phutHoc: 1875, datNhiemVu: true, chuoiNgayHoc: 100, viecXong: 12, viecTong: 12 }
+  o.caGanNhat.congBo = { congBo: 'ca_lop_xong', daCongBo: false, soEmDaNop: 27, soEmDaVao: 32 }
+  delete o.caGanNhat.ketQua
+  return o
+})()
 const giaoThem = { san: true, dangTai: false, conLai: 3, goiGanNhat: null, the: null, dangGui: false, giao: () => {} }
 const html = (raw: unknown, man: 'chinh' | 'bang'): string => {
   const pm = docTatCaVeCon(raw)!
   const cay =
     man === 'chinh'
-      ? createElement(ManChinh, { v: { trangThai: 'ok', pm, chuLoi: '', dangLamMoi: false, thuLai: () => {} }, tenCon: pm.hoTen, lop: '12 - Tinh Hoa', now: Date.UTC(2026, 8, 21, 14, 0), canhBao: [], onCanhBaoDaXem: () => {}, giaoThem: giaoThem as never, onMoBang: () => {}, onDoiSbd: () => {} })
+      ? createElement(ManChinh, { v: { trangThai: 'ok', pm, chuLoi: '', dangLamMoi: false, thuLai: () => {} }, tenCon: pm.hoTen, lop: '12 - Tinh Hoa', sbd: '12121212', now: Date.UTC(2026, 8, 21, 14, 0), canhBao: [], onCanhBaoDaXem: () => {}, giaoThem: giaoThem as never, onMoBang: () => {}, onDoiSbd: () => {} })
       : createElement(BangMoiThu, { pm, sbd: '1', lop: '12 - Tinh Hoa', giaoThem: giaoThem as never, onVe: () => {} })
   return renderToStaticMarkup(cay)
 }
@@ -82,6 +101,9 @@ const css = ['src/styles/tokens.css', 'src/components/bang-nhiem-vu/m3-theme.css
   .filter((p) => fs.existsSync(path.join(goc, p)))
   .map((p) => doc(p).replace(/@import[^;]*;/g, ''))
   .join('\n')
+// Máy Android không có phông Apple ⇒ ra Inter: nhúng đúng hai tệp woff2 của app (base64) và đè chồng phông về Inter để đo bề rộng THẬT của phông sẽ chạy trên máy phụ huynh.
+const b64 = (f: string) => fs.readFileSync(path.join(goc, 'src/components/ph-moi/phong', f)).toString('base64')
+const INTER = `@font-face{font-family:"Inter";font-weight:100 900;src:url(data:font/woff2;base64,${b64('inter-vietnamese-wght-normal.woff2')}) format("woff2");unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}@font-face{font-family:"Inter";font-weight:100 900;src:url(data:font/woff2;base64,${b64('inter-latin-wght-normal.woff2')}) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}.phm-ap{--phm-ap-phong:"Inter",sans-serif!important}`
 let browser: Browser | null = null
 beforeAll(async () => {
   try {
@@ -94,16 +116,20 @@ afterAll(async () => {
   await browser?.close()
 })
 
-for (const [ten, raw] of [['ĐỦ khối', PH_OK], ['THIẾU khối (tài khoản thử)', THIEU]] as const)
-  for (const man of ['chinh', 'bang'] as const)
+const BO_CHINH = [['ĐỦ khối', PH_OK], ['ĐỦ khối + vòng N/M việc', VIEC], ['THIẾU khối (tài khoản thử)', THIEU], ['CHƯA HỌC hôm nay', CHUA_HOC], ['TÊN DÀI + số lớn + ca chưa công bố', DAI]] as const
+const BO_BANG = [['ĐỦ khối', PH_OK], ['THIẾU khối (tài khoản thử)', THIEU]] as const
+for (const man of ['chinh', 'bang'] as const)
+  for (const [ten, raw] of man === 'chinh' ? BO_CHINH : BO_BANG)
     for (const w of [320, 360, 390, 412])
       for (const cs of [100, 115])
-        it(`${man === 'chinh' ? 'màn chính' : 'bảng'} · ${ten} · ${w}px · chữ ${cs} %: KHÔNG tràn ngang (scrollWidth ≤ innerWidth)`, async () => {
+        it(`${man === 'chinh' ? 'màn chính (phông Inter)' : 'bảng'} · ${ten} · ${w}px · chữ ${cs} %: KHÔNG tràn ngang (scrollWidth ≤ innerWidth)`, async () => {
           if (!browser) return // máy không có Chromium: bỏ qua (test khoá tên lớp ở trên vẫn chạy)
           const page = await browser.newPage({ viewport: { width: w, height: 800 } })
-          await page.setContent(`<!doctype html><html lang="vi" style="font-size:${cs}%"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style></head><body><div id="root"><div class="m3"><div class="min-h-screen flex flex-col" style="display:flex;flex-direction:column;min-height:100vh">${html(raw, man)}</div></div></div></body></html>`)
-          const r = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, goc: getComputedStyle(document.querySelector('.phm')!).display }))
+          await page.setContent(`<!doctype html><html lang="vi" style="font-size:${cs}%"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style>${man === 'chinh' ? `<style>${INTER}</style>` : ''}</head><body><div id="root"><div class="m3"><div class="min-h-screen flex flex-col" style="display:flex;flex-direction:column;min-height:100vh">${html(raw, man)}</div></div></div></body></html>`)
+          await page.evaluate(() => document.fonts.ready)
+          const r = await page.evaluate((g) => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, goc: getComputedStyle(document.querySelector(g)!).display, phong: getComputedStyle(document.querySelector(g)!).fontFamily }), man === 'chinh' ? '.phm-ap' : '.phm')
           await page.close()
           expect(r.goc).not.toBe('inline-grid')
+          if (man === 'chinh') expect(r.phong).toMatch(/^Inter\b/)
           expect(r.sw).toBeLessThanOrEqual(r.iw)
         }, 30000)

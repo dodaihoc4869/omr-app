@@ -31,6 +31,9 @@ export interface TongQuan {
   datNhiemVu: boolean | null
   chuoiNgayHoc: number | null
   soVoiHomQua: { soCau: number; tiLeDung: number } | null
+  /** Việc trong kế hoạch hôm nay: đã xong / tổng. CHỈ khi máy chủ trả ĐỦ cả hai (viecTong > 0, viecXong ≤ viecTong); thiếu ⇒ cả hai null và màn KHÔNG vẽ "N/M việc". */
+  viecXong: number | null
+  viecTong: number | null
 }
 export interface MocThoiGian { batDau: string; nguon: NguonHien; ten: string; soCau: number | null; soDung: number | null; che: LyDoChe | null; phut: number; ghiChu: string }
 export interface CauChe { kieu: 'che'; luc: string; nguon: NguonHien; che: LyDoChe; giay: number | null }
@@ -119,6 +122,9 @@ function docCaGanNhat(x: unknown): CaGanNhat | null {
 function docTongQuan(x: unknown): TongQuan | null {
   if (!laDoiTuong(x)) return null
   const v = laDoiTuong(x.soVoiHomQua) ? x.soVoiHomQua : null
+  const vx = nguyenKhongAm(x.viecXong)
+  const vt = nguyenKhongAm(x.viecTong)
+  const coViec = vx !== null && vt !== null && vt > 0 && vx <= vt
   const t: TongQuan = {
     soCau: nguyenKhongAm(x.soCau),
     soDung: nguyenKhongAm(x.soDung),
@@ -126,8 +132,10 @@ function docTongQuan(x: unknown): TongQuan | null {
     datNhiemVu: typeof x.datNhiemVu === 'boolean' ? x.datNhiemVu : null,
     chuoiNgayHoc: nguyenKhongAm(x.chuoiNgayHoc),
     soVoiHomQua: v && nguyenKhongAm(v.soCau) !== null && soKhongAm(v.tiLeDung) !== null && (v.tiLeDung as number) <= 1 ? { soCau: v.soCau as number, tiLeDung: v.tiLeDung as number } : null,
+    viecXong: coViec ? vx : null,
+    viecTong: coViec ? vt : null,
   }
-  const co = t.soCau !== null || t.soDung !== null || t.phutHoc !== null || t.datNhiemVu !== null || t.chuoiNgayHoc !== null
+  const co = t.soCau !== null || t.soDung !== null || t.phutHoc !== null || t.datNhiemVu !== null || t.chuoiNgayHoc !== null || t.viecTong !== null
   return co ? t : null
 }
 

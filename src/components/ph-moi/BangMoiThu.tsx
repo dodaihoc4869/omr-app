@@ -9,11 +9,13 @@ import './ph-moi-them.css'
 import { ChemText } from '../../lib/chem-format'
 import type { ViewGiaoThem } from '../../lib/use-giao-them'
 import { taiChiTietCau } from '../../lib/ph-moi/api'
+import { ChuoiMuoiBonNgay } from '../../lib/ph-moi/nhip-ngay'
 import { chuThoiGian, gioVn, ngayChuoiNgan, ngayDayDuVn, ngayNganVn, soVn, tachVn, thuNgayVn, thuTuChuoiNgay } from '../../lib/ph-moi/dinh-dang'
 import type { CauChe, CauHomNay, CauThuong, ChiTietCau, MocThoiGian, PhMoi } from '../../lib/ph-moi/du-lieu'
 import { CHU_CHE, NHAN_BAC, NHAN_NGUON, TEN_BAC_SO, chuCongBoCa, tenMoc } from './nhan'
 import ThanhDay from './ThanhDay'
 
+export { ChuoiMuoiBonNgay }
 export const NGUONG_LAM_LAU_GIAY = 180
 export const NGUONG_NHOM_LAZY = 40
 
@@ -713,21 +715,6 @@ function KhoiLichOn({ pm }: { pm: PhMoi }) {
 }
 
 // ───────────────────────────────────────────── ⑧ 14 ngày
-export function ChuoiMuoiBonNgay(pm: Pick<PhMoi, 'nhipHoc' | 'serverNow'>): { ngay: string; soCau: number | null; soDung: number }[] {
-  const nh = pm.nhipHoc
-  if (!nh) return []
-  const homNay = tachVn(pm.serverNow ?? Date.now())
-  if (!homNay) return []
-  const map = new Map(nh.ngay.map((n) => [n.ngay, n]))
-  const ra: { ngay: string; soCau: number | null; soDung: number }[] = []
-  for (let i = 13; i >= 0; i--) {
-    const t = new Date(Date.UTC(homNay.y, homNay.m - 1, homNay.d) - i * 86_400_000)
-    const k = `${t.getUTCFullYear()}-${hai(t.getUTCMonth() + 1)}-${hai(t.getUTCDate())}`
-    const e = map.get(k)
-    ra.push({ ngay: k, soCau: e ? e.soCau : null, soDung: e ? e.soCauDung : 0 })
-  }
-  return ra
-}
 const NHAN_THU_NGAN = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 function KhoiNhip({ pm }: { pm: PhMoi }) {
   const ds = ChuoiMuoiBonNgay(pm)

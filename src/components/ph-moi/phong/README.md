@@ -1,0 +1,3 @@
+# Phông Inter (chỉ cho app phụ huynh)
+Nguồn: gói npm chính thống `@fontsource-variable/inter@5.3.0` (Inter, The Inter Project Authors) — giấy phép SIL OFL 1.1 (`INTER-OFL-LICENSE.txt`). Chỉ hai tập ký tự cần cho tiếng Việt: `latin` (48 KB) + `vietnamese` (10 KB) = 58 KB (yêu cầu ≤ 150 KB).
+Nạp bằng `@font-face` trong `../ph-apple.css` (`font-display: swap`, `unicode-range`), nên CHỈ vào gói `ParentPortalScreen` (không vào gói vào, không vào precache — xem `globIgnores` ở vite.config.ts; máy đã tải một lần thì kho chạy-lúc của service worker giữ). iPhone/Mac dùng phông hệ thống (San Francisco), KHÔNG nhúng phông của Apple.

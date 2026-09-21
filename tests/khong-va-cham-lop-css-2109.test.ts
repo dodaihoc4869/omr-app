@@ -35,7 +35,8 @@ const CA = [
   { ten: 'Thẻ Giao thêm bài cho con', tsx: ['src/components/bang-nhiem-vu/GiaoThemChoCon.tsx'], css: ['src/components/bang-nhiem-vu/bang-nhiem-vu.css'], tienTo: /^bnv-giao-them/ },
   { ten: 'Đường về đích', tsx: ['src/components/bang-nhiem-vu/TheVeDich.tsx'], css: ['src/components/bang-nhiem-vu/ve-dich.css'], tienTo: /^vd(-|$)/ },
   { ten: 'Thanh hấp thụ của Đảo', tsx: ['src/game/than-thu-v2/dao/DaoCuaEm.tsx'], css: ['src/game/than-thu-v2/dao/dao.css'], tienTo: /^dao-hap-thu/ },
-  { ten: 'App phụ huynh mới', tsx: ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx'], css: ['src/components/ph-moi/ph-moi.css', 'src/components/ph-moi/ph-moi-them.css'], tienTo: /^phm(-|$)/ },
+  { ten: 'App phụ huynh mới (bảng "Mọi thứ về con")', tsx: ['src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx'], css: ['src/components/ph-moi/ph-moi.css', 'src/components/ph-moi/ph-moi-them.css'], tienTo: /^phm(-|$)/ },
+  { ten: 'App phụ huynh mới (màn chính kiểu Apple)', tsx: ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/ThanhDayAp.tsx', 'src/components/ph-moi/BieuTuongAp.tsx'], css: ['src/components/ph-moi/ph-apple.css'], tienTo: /^phm-ap(-|$)/ },
 ] as const
 
 describe('không va chạm tên lớp CSS', () => {

@@ -246,6 +246,7 @@ export default function ParentPortalScreen() {
             v={phMoi}
             tenCon={hoTenCon}
             lop={lopCon}
+            sbd={sbdHienTai}
             now={nowHocTap}
             canhBao={canhBaoPh}
             onCanhBaoDaXem={(cb) => void baoDaXemPhuHuynh(cb.id)}

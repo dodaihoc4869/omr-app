@@ -105,7 +105,7 @@ describe('ParentPortalScreen với liên kết ?ph=', () => {
     await waitFor(() => expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeTruthy())
     expect(location.search).toBe('?vai=phuhuynh')
     expect(goi[0]).toEqual({ url: 'https://may.test/ph/xac-dinh', body: { pass: 'PASS-B' } })
-    expect(container.textContent).toContain('Con: Nguyễn Văn Minh') // tên thật từ /ph/xac-dinh (màn chỉ hiện tên gọi)
+    expect(container.querySelector('.phm-ap-dau__con')!.textContent).toContain('Nguyễn Văn Minh') // tên thật từ /ph/xac-dinh (màn chỉ hiện tên gọi)
     expect(container.textContent).not.toContain('TRẦN') // không phải tên tra bằng SBD trần
     await waitFor(() => expect(goi.some((g) => g.url.endsWith('/ph/tat-ca-ve-con'))).toBe(true))
     for (const g of goi.filter((x) => /tat-ca-ve-con|giao-them/.test(x.url))) expect(g.body.pass).toBe('PASS-B')

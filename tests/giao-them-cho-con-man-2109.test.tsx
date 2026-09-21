@@ -362,7 +362,7 @@ describe('Cổng phụ huynh thật — MỘT màn, MỘT nút, mọi kiểu đ�
     expect(container.querySelector('[data-vung="giao-bai"]')).toBeNull()
     expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
     await waitFor(() => expect(container.textContent).toContain('Hôm nay còn 3 lượt giao'))
-    expect(container.querySelectorAll('.phm-nut--chinh').length).toBe(1)
+    expect(container.querySelectorAll('[data-vung="giao-them"]').length).toBe(1)
     fireEvent.click(screen.getByRole('button', { name: 'Giao thêm bài cho con' }))
     await waitFor(() => expect(container.querySelector('[data-vung="the-giao-them"]')).toBeTruthy())
     const the = container.querySelector('[data-vung="the-giao-them"]')!.textContent!

@@ -97,6 +97,30 @@ describe('docTatCaVeCon — đọc chặt', () => {
     expect(docTatCaVeCon(r2)!.tongQuan!.soVoiHomQua).toBeNull()
   })
 
+  it('viecXong / viecTong (vòng "N/M việc đã xong" của màn chính): chỉ khi máy chủ trả ĐỦ cả hai và hợp lý (tổng > 0, xong ≤ tổng); máy chủ chưa có ⇒ cả hai null (không bịa)', () => {
+    const cho = (x: unknown, t: unknown) => {
+      const r = nhan(PH_OK)
+      r.homNay.tongQuan.viecXong = x
+      r.homNay.tongQuan.viecTong = t
+      const q = docTatCaVeCon(r)!.tongQuan!
+      return [q.viecXong, q.viecTong]
+    }
+    expect(docTatCaVeCon(PH_OK)!.tongQuan).toMatchObject({ viecXong: null, viecTong: null })
+    expect(cho(3, 4)).toEqual([3, 4])
+    expect(cho(0, 4)).toEqual([0, 4])
+    expect(cho(4, 4)).toEqual([4, 4])
+    expect(cho(5, 4)).toEqual([null, null]) // xong > tổng: vô lý
+    expect(cho(0, 0)).toEqual([null, null]) // tổng 0: không có việc để đếm
+    expect(cho(2, undefined)).toEqual([null, null]) // thiếu một vế
+    expect(cho('2', 4)).toEqual([null, null])
+    expect(cho(-1, 4)).toEqual([null, null])
+    expect(cho(1.5, 4)).toEqual([null, null])
+    // khối tổng quan chỉ có vế việc vẫn được giữ (vòng vẽ được)
+    const r = nhan(PH_OK)
+    r.homNay.tongQuan = { viecXong: 1, viecTong: 3 }
+    expect(docTatCaVeCon(r)!.tongQuan).toMatchObject({ viecXong: 1, viecTong: 3, soCau: null })
+  })
+
   it('trần mảng theo hợp đồng: câu ≤ 120, bậc theo dạng ≤ 5, làm tốt ≤ 3; dạng có dung > tong bị bỏ', () => {
     const raw = nhan(PH_OK)
     raw.homNay.cau = Array.from({ length: 150 }, (_, i) => ({ luc: PH_OK.homNay.cau[0].luc, nguon: 'on_lai', deRutGon: `Đề ${i}`, dung: true }))

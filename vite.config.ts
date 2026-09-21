@@ -129,6 +129,8 @@ export default defineConfig({
           '**/logo-gv-*',
           // Phiếu HTML: chỉ mở khi em bấm làm phiếu (đang có mạng), tải một lần rồi cất.
           '**/html-phieu-*.js',
+          // Phông Inter (58 KB) chỉ cho app phụ huynh trên máy KHÔNG phải Apple: tải một lần khi phụ huynh mở app rồi cất ở kho chạy-lúc (đường /assets/*.woff2 của src/sw.ts); không ép vào precache vỏ.
+          '**/inter-*-wght-normal-*.woff2',
         ],
         // ĐƯỜNG LUI CHO MỌI LƯỢT ĐIỀU HƯỚNG — khai TƯỜNG MINH.
         //
