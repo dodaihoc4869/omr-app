@@ -1,0 +1,82 @@
+diff --git a/server/src/parent-news-nguon-cau.ts b/server/src/parent-news-nguon-cau.ts
+index e46e31f..c23baae 100644
+--- a/server/src/parent-news-nguon-cau.ts
++++ b/server/src/parent-news-nguon-cau.ts
+@@ -9,6 +9,7 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
+ import { hashSeed } from '../../src/lib/exam-shuffle'
+ import { chuoiLoiGiai } from './goi-cu'
+ import { protectedQuestions } from './game-v2-bank'
++import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
+ import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
+ import { hopLe3DangChuan } from './loc-cau-chuan'
+ import { laCauTuLuan } from './cam-tu-luan'
+@@ -139,7 +140,9 @@ export async function chonCauBaiHangNgay(env: Env, sbd: string, soCan: number, n
+   const loLop = lop ? ' AND d.lop = ?' : ''
+   const themLop = lop ? [lop] : []
+   const kho = new Map<string, PrivateQuestion>()
+-  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (!kho.has(q.qid)) kho.set(q.qid, q) }
++  // LUẬT KHỐI (Boss 21/09): câu nạp theo qid (tới hạn) nằm ngoài bộ lọc `d.lop` — câu khối CAO đã lọt vào sổ em từ trước vẫn không được phát lại. Khối em không rõ ⇒ không lọc.
++  const khoiEm = khoiCuaEm({ lop: lopEm })
++  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && !kho.has(q.qid)) kho.set(q.qid, q) }
+   if (toiHan.length > 0) nap(await docCauKho(env, 'AND q.qid IN (SELECT value FROM json_each(?))', [JSON.stringify(toiHan.map((c) => c.qid))], baoVe, TRAN_DOC_TOI_HAN))
+   if (dangYeuEm.length > 0) nap(await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [JSON.stringify(dangYeuEm.map((d) => d.maDang)), ...themLop], baoVe, TRAN_DOC_MOI_NHOM))
+   const chuyenDe = [...new Set([...dangYeuEm.map((d) => d.maDang), ...toiHanDong.map((x) => (x.ma_dang ? String(x.ma_dang) : ''))].map(chuyenDeCuaDang).filter(Boolean))]
+diff --git a/server/src/ph-giao-them.ts b/server/src/ph-giao-them.ts
+index 2c390e0..000ea7b 100644
+--- a/server/src/ph-giao-them.ts
++++ b/server/src/ph-giao-them.ts
+@@ -8,6 +8,7 @@ import { phutUocTinhChang } from '../../src/lib/btvn-nang-do-lich'
+ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
+ import { chuHan } from './canh-bao-thay'
+ import { protectedQuestions } from './game-v2-bank'
++import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
+ import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
+ import { lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
+ import { mom } from './mom'
+@@ -116,12 +117,14 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
+     else if (chuoi(x.trang_thai) === 'moi_sai' || chuoi(x.trang_thai) === 'dang_on') saiQid.push(q)
+   }
+   const kho = new Map<string, PrivateQuestion>()
+-  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (!kho.has(q.qid)) kho.set(q.qid, q) }
++  // LUẬT KHỐI (Boss 21/09): câu đến lịch / sai chưa khắc phục nạp theo qid nằm ngoài bộ lọc `d.lop` — câu khối CAO đã lọt vào sổ con từ trước vẫn không được giao lại. Khối con không rõ ⇒ không lọc.
++  const khoiEm = khoiCuaEm({ lop: lopEm })
++  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && !kho.has(q.qid)) kho.set(q.qid, q) }
+   const cacQid = [...new Set([...denLichQid, ...saiQid])].slice(0, 600)
+   if (cacQid.length > 0) nap(await docCauKho(env, 'AND q.qid IN (SELECT value FROM json_each(?))', [json(cacQid)], baoVe, 600))
+   const maDangLay = [...dangEm].sort((a, b) => Number(dangYeu(b, homNay)) - Number(dangYeu(a, homNay)) || b.soMoiSai - a.soMoiSai || a.maDang.localeCompare(b.maDang)).slice(0, 12).map((d) => d.maDang)
+   const khoDang = new Map<string, PrivateQuestion>()
+-  if (maDangLay.length > 0) for (const q of await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [json(maDangLay), ...themLop], baoVe, 600)) khoDang.set(q.qid, q)
++  if (maDangLay.length > 0) for (const q of await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [json(maDangLay), ...themLop], baoVe, 600)) if (cauHopKhoi(khoiEm, q)) khoDang.set(q.qid, q)
+ 
+   const khaDungCu = (qid: string) => kho.get(qid) ?? khoDang.get(qid)
+   const denLichOn = denLichQid.map(khaDungCu).filter((q): q is PrivateQuestion => !!q && !btvnChuaNop.has(q.qid) && !khongGiaoLai.has(q.qid))
+diff --git a/server/src/thu-thach-rieng.ts b/server/src/thu-thach-rieng.ts
+index 436ccf9..a20045d 100644
+--- a/server/src/thu-thach-rieng.ts
++++ b/server/src/thu-thach-rieng.ts
+@@ -6,6 +6,8 @@
+ //   · `chonCauThuThach`   hàm THUẦN xếp câu (tất định theo sbd|ngày, không Math.random).
+ //   · `hsThuThachHomNay` / `hsThuThachNop`  hai lệnh của máy em.
+ import type { Env } from './kieu'
++import { docKhoiEm } from './game-v2-bank'
++import { cauHopKhoi } from '../../src/lib/khoi-cau'
+ import { gameIdentity } from './game-v2-auth'
+ import { protectedQuestions } from './game-v2-bank'
+ import { jsonLaTuLuan } from './cam-tu-luan'
+@@ -253,13 +255,15 @@ export async function chotThuThach(env: Env, sbd: string, ngay: string, nowMs: n
+     // ứng viên: cùng chỉ mục "phục vụ được" như /hs/cau-theo-qid (câu còn ở kho, chỉ mục khớp), không tự luận
+     const ungVien: UngVien[] = []
+     const nhomCua = new Map<string, string>()
++    const khoiEm = await docKhoiEm(env, sbd) // LUẬT KHỐI (Boss 21/09): thử thách chỉ lấy câu khối em hoặc THẤP hơn — dạng dùng chung nhiều khối
+     for (const d of tt.dang) {
+       const rc = await env.DB.prepare(
+-        `SELECT q.qid, q.content_group, q.json FROM game_v2_question q JOIN de_kho k ON k.ma_de = q.ma_de JOIN game_v2_index g ON g.ma_de = k.ma_de AND g.source_version = k.cap_nhat_luc
++        `SELECT q.qid, q.ma_de, k.lop AS lop_to, q.content_group, q.json FROM game_v2_question q JOIN de_kho k ON k.ma_de = q.ma_de JOIN game_v2_index g ON g.ma_de = k.ma_de AND g.source_version = k.cap_nhat_luc
+           WHERE COALESCE(k.da_xoa, 0) = 0 AND q.dang = ? LIMIT 600`,
+       ).bind(d).all<Dong>()
+       for (const x of rc.results ?? []) {
+         if (jsonLaTuLuan(x.json)) continue
++        if (!cauHopKhoi(khoiEm, { qid: x.qid, ma_de: x.ma_de, lop: x.lop_to })) continue
+         let muc: 0 | 1 | 2 = 0
+         try { muc = mucTuChu((JSON.parse(chuoi(x.json)) as Dong).mucDo as string) } catch { continue }
+         if (!nhomCua.has(chuoi(x.qid))) { nhomCua.set(chuoi(x.qid), chuoi(x.content_group)); ungVien.push({ qid: chuoi(x.qid), dang: d, muc }) }

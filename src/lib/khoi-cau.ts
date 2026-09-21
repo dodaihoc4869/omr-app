@@ -78,6 +78,26 @@ export function locCauHopKhoi<T>(khoiEm: Khoi | null | undefined, ds: readonly T
   return Array.isArray(ds) ? ds.filter((c) => cauHopKhoi(khoiEm, c)) : []
 }
 
+/** Kết quả lọc kèm ĐẾM (Boss 21/09: máy chủ đo sau giờ cao điểm — nhiều câu "không rõ khối" thì sửa mã tờ, không sửa luật). */
+export interface KetQuaLocKhoi<T> {
+  /** Câu hợp khối, GIỮ NGUYÊN thứ tự. */
+  giu: T[]
+  /** Số câu bị LOẠI vì khối cao hơn khối em. */
+  boCao: number
+  /** Số câu ĐƯỢC GIỮ nhưng khối KHÔNG đọc ra (tờ lạc khối) — chỉ để đo, không chặn. */
+  khongRo: number
+}
+export function locCauKemDem<T>(khoiEm: Khoi | null | undefined, ds: readonly T[]): KetQuaLocKhoi<T> {
+  const ra: KetQuaLocKhoi<T> = { giu: [], boCao: 0, khongRo: 0 }
+  if (!Array.isArray(ds)) return ra
+  for (const c of ds) {
+    if (!cauHopKhoi(khoiEm, c)) { ra.boCao++; continue }
+    if (khoiCuaCau(c) === null) ra.khongRo++
+    ra.giu.push(c)
+  }
+  return ra
+}
+
 /** Số câu có khối KHÔNG đọc ra (tờ lạc khối) — để máy chủ báo, không để chặn. */
 export const demCauKhongRoKhoi = (ds: readonly unknown[]): number => (Array.isArray(ds) ? ds.filter((c) => khoiCuaCau(c) === null).length : 0)
 

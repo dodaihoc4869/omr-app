@@ -3,7 +3,7 @@
 // Luật: chỉ câu của khối em đang học hoặc khối THẤP hơn; không bao giờ khối cao hơn (kể cả trùng mã dạng, kể cả câu "sửa lỗi"); không biết ⇒ không kết tội.
 import { describe, expect, it } from 'vitest'
 import { mulberry32 } from '../src/lib/exam-shuffle'
-import { CAC_KHOI, cauHopKhoi, demCauKhongRoKhoi, khoiCaoHon, khoiCuaCau, khoiCuaEm, khoiCuaLop, khoiCuaMaDe, locCauHopKhoi, type Khoi } from '../src/lib/khoi-cau'
+import { CAC_KHOI, cauHopKhoi, demCauKhongRoKhoi, khoiCaoHon, khoiCuaCau, khoiCuaEm, khoiCuaLop, khoiCuaMaDe, locCauHopKhoi, locCauKemDem, type Khoi } from '../src/lib/khoi-cau'
 
 describe('khoiCuaMaDe — đọc khối từ mã tờ / mã câu (đoạn thứ 2)', () => {
   it.each([
@@ -107,5 +107,31 @@ describe('locCauHopKhoi / demCauKhongRoKhoi / khoiCaoHon', () => {
     expect(khoiCaoHon(12)).toEqual([])
     expect(khoiCaoHon(null)).toEqual([])
     expect(khoiCaoHon(9 as unknown as Khoi)).toEqual([])
+  })
+})
+
+describe('locCauKemDem — lọc kèm ĐẾM để máy chủ đo (Boss 21/09: tờ không rõ khối vẫn cho, nhưng phải đếm được)', () => {
+  const kho = [
+    { qid: 'a', maDe: 'DH-10-C1' }, { qid: 'b', maDe: 'DH-12-C1' }, { qid: 'c', maDe: 'DH-11-C1' }, { qid: 'd', maDe: 'D1' }, { qid: 'e', maDe: 'DB-12-B8-D1' }, { qid: 'f', maDe: 'TO-LA' },
+  ]
+  it('em 11: giữ a,c,d,f (thứ tự cũ); loại 2 câu khối 12; đếm 2 câu không rõ khối (d,f) — vẫn được giữ', () => {
+    const r = locCauKemDem(11, kho)
+    expect(r.giu.map((c) => c.qid)).toEqual(['a', 'c', 'd', 'f'])
+    expect(r.boCao).toBe(2)
+    expect(r.khongRo).toBe(2)
+  })
+  it('em không rõ khối ⇒ không loại câu nào (boCao 0) nhưng vẫn đếm câu không rõ khối; em 12 ⇒ boCao 0', () => {
+    expect(locCauKemDem(null, kho)).toMatchObject({ boCao: 0, khongRo: 2 })
+    expect(locCauKemDem(undefined, kho).giu).toHaveLength(6)
+    expect(locCauKemDem(12, kho)).toMatchObject({ boCao: 0, khongRo: 2 })
+  })
+  it('em 10: loại b,c,e; giữ a,d,f; đầu vào không phải mảng ⇒ rỗng, không ném lỗi; không sửa đầu vào', () => {
+    const goc = JSON.stringify(kho)
+    expect(locCauKemDem(10, kho)).toMatchObject({ boCao: 3, khongRo: 2 })
+    expect(JSON.stringify(kho)).toBe(goc)
+    expect(locCauKemDem(10, null as unknown as never[])).toEqual({ giu: [], boCao: 0, khongRo: 0 })
+  })
+  it('khớp locCauHopKhoi: cùng tập câu được giữ, với mọi khối em', () => {
+    for (const e of [null, 10, 11, 12] as Array<Khoi | null>) expect(locCauKemDem(e, kho).giu).toEqual(locCauHopKhoi(e, kho))
   })
 })
