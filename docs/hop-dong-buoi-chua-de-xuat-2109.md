@@ -20,3 +20,10 @@ Bên CUNG CẤP: **Code 3** (`server/src`, chỉ đọc, ≤ 12 truy vấn, giai
 ## Việc của app thầy (Code 1 — đã có ở `buoi-chua-de-xuat.ts`)
 - `docDauVao`: dạng yếu của mọi lớp cùng mã cộng dồn số em; dạng có trong `dangBoNao` thêm nguồn "Bộ não A.I" (thấy ở CẢ hai nơi xếp trước); `dongBoNao` chỉ giữ hai hành động gọi lên bảng. Phần tử hỏng bị bỏ.
 - `deXuatBuoiChua(dauVao, kho)`: ẩn khi < 5 em có sổ; câu ≥ 3 em sai và ≥ 30 % (ngưỡng ở app, máy chủ lọc sàn); ghép kho trên máy thầy (thiếu ⇒ bỏ + đếm; tự luận ⇒ bỏ + đếm); mỗi dạng ≤ 2 câu, tổng ≤ 10; vừa ngân sách 90 phút (`giayBienGhepDoi` + hao phí); em = gợi ý Bộ não trước rồi em sai nhiều câu trong buổi, ≤ 20.
+
+## Ghi chú máy chủ (Code 3, đã nối ở `server/src/gv-buoi-chua-de-xuat.ts`)
+- `lop` (ở thân yêu cầu và ở mỗi phần tử trả về) = **TÊN LỚP hiệu lực** (`docs/hop-dong-ten-lop-2109.md`: "12 - Lớp Thường", "12 - Tinh Hoa", khối 10/11 = chính khối). Thân yêu cầu `lop` khớp TÊN LỚP **hoặc KHỐI** ("12" gồm cả hai lớp khối 12). `dangCaLopYeu[]` có thêm `khoi`; `siSo` = số em của lớp (đã áp bộ lọc `lop`).
+- `cauSaiNhieu`: đếm MỌI nguồn sổ (kể cả lên bảng), chỉ lượt ĐÃ CHẤM; `soEmLam` = số em có lượt chấm của câu ấy. Câu không tra được nội dung trong kho ⇒ bỏ (không bịa). Không kiểm được đề thi đang bảo vệ ⇒ `cauSaiNhieu: []` + `lyDoThieu.cauSaiNhieu`.
+- `loi` = câu cốt lõi (`btvn_cau.loi = 1`) của một bài chưa xoá. `soEmCoSo3Ngay` = số em có BẤT KỲ sổ học trong 3 ngày tới `ngay`.
+- Tối đa 11 truy vấn D1 (`soTruyVan`); không ghi gì.
+- Test: `tests/buoi-chua-de-xuat-may-chu-2109.test.ts` (14 test, đột biến 25/25 sau bổ sung).
