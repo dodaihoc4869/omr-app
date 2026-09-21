@@ -20,12 +20,13 @@ describe('Danh mục đọc được cả hai đời nhãn', () => {
   })
 })
 
-it('mở đề trước; từng mũi tên chỉ hiện đúng học sinh của nửa bảng đó', () => {
+// Từ M3 (64bfa4e) thẻ tên ẩn-tới-khi-bấm chỉ còn ở chế độ DẠY HỌC; chế độ thường gọi tên ngay khi vào đợt (giao-dien-to-chieu-1909).
+it('chế độ dạy học: mở đề trước; từng mũi tên chỉ hiện đúng học sinh của nửa bảng đó', () => {
   const o = (name: string): OBang => ({ sbd: name, hoTen: name, soCau: 1,
     cau: { phan: 'I', id: name, text: 'Đề kiểm tra', luaChon: ['A','B','C','D'], dapAn: 'A', buoc: [] } as OBang['cau'],
     thanThu: { anh: '', ten: 'Thú ' + name, danhHieu: '', he: '', capDo: 1, hinhThai: '', tangThapCaoNhat: 0, soCauDaThanhTay: 0 },
   })
-  const dom = new JSDOM(taoHtmlMayChieu([o('An'), o('Bình')]), { runScripts: 'dangerously' })
+  const dom = new JSDOM(taoHtmlMayChieu([o('An'), o('Bình')], { dayHoc: true }), { runScripts: 'dangerously' })
   const doc = dom.window.document
   const heads = [...doc.querySelectorAll<HTMLElement>('header[id^="em-"]')]
   expect(heads.map(h => h.hidden)).toEqual([true, true])

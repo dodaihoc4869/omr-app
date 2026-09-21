@@ -203,19 +203,28 @@ describe('Lỗi 3 — bàn phím iPhone không có dấu trừ', () => {
 describe('Lỗi 1 — nút gạt Giữ để đọc bấm không ăn', () => {
   const man = doc('src/screens/ExamSetupScreen.tsx')
 
+  // Mở ca dựng lại (M3): mỗi công tắc là MỘT nút cả hàng (tiêu đề + dòng mô tả + nhãn BẬT/TẮT nằm TRONG nút), không còn ô gạt bé ở mép phải.
+  const khoiNut = () => {
+    const tieuDe = man.indexOf('<span>Giữ để đọc đề</span>')
+    expect(tieuDe).toBeGreaterThan(0)
+    const dauNut = man.lastIndexOf('<button', tieuDe)
+    return man.slice(dauNut, man.indexOf('</button>', tieuDe))
+  }
+
   it('CẢ HÀNG là nút, không phải chỉ ô gạt bé ở mép phải', () => {
-    const dau = man.indexOf('aria-label="Giữ để đọc"')
-    expect(dau).toBeGreaterThan(0)
-    const khoi = man.slice(Math.max(0, dau - 500), dau + 900)
-    expect(khoi).toContain('className="tap-target w-full flex items-center justify-between"')
-    // Tiêu đề nằm TRONG nút, nên chạm vào chữ cũng đổi được.
-    expect(khoi).toContain('<span style={TIEU_DE_MUC}>Giữ để đọc</span>')
+    const khoi = khoiNut()
+    // Chạm vào chữ tiêu đề, dòng mô tả hay nhãn BẬT/TẮT đều đổi được vì tất cả nằm trong <button>.
+    expect(khoi).toContain('type="button"')
+    expect(khoi).toContain('setGiuDeDoc((v) =>')
+    expect(khoi).toContain('Chống chụp ảnh đề & chia sẻ')
+    expect(khoi).toContain("{giuDeDoc ? 'BẬT (3s)' : 'TẮT'}")
   })
 
   it('vùng chạm đạt 44px — dưới ngưỡng là ngón tay trượt ra ngoài', () => {
-    const dau = man.indexOf('aria-label="Giữ để đọc"')
-    const khoi = man.slice(dau, dau + 700)
-    expect(khoi).toContain('minHeight: 44')
+    const khoi = khoiNut()
+    // Vùng chạm 44px nay do lớp `tap-target` (min-height/min-width 44px ở index.css) đảm nhiệm, không còn `minHeight` nội tuyến.
+    expect(khoi).toMatch(/className=\{`tap-target /)
+    expect(doc('src/index.css')).toMatch(/\.tap-target\s*\{[^}]*min-height:\s*44px/)
     expect(khoi).not.toMatch(/minHeight:\s*3[0-9]\b/)
   })
 

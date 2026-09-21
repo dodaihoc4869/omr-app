@@ -175,14 +175,17 @@ describe('màn của thầy', () => {
 })
 
 describe('màn Mở ca', () => {
-  it('có công tắc Phòng chờ, mặc định TẮT', () => {
+  it('có công tắc Phòng chờ, mặc định TẮT, gửi lên máy chủ theo giá trị hiệu lực', () => {
     expect(MAN_MO).toContain('const [phongCho, setPhongCho] = useState(false)')
-    expect(MAN_MO).toContain('aria-label="Phòng chờ"')
-    expect(MAN_MO).toContain('phongCho,')
+    expect(MAN_MO).toContain('<span>Phòng chờ phát đề</span>')
+    // Đề riêng từng em và Đồng bộ giờ cả phòng đều BẮT BUỘC phòng chờ ⇒ giá trị gửi đi gộp cả hai.
+    expect(MAN_MO).toContain('phongCho: phongCho || deRiengBat || dongBoGio,')
   })
 
-  it('dòng mô tả nói rõ cả hai trạng thái', () => {
-    expect(MAN_MO).toMatch(/đứng ở màn chờ, chưa nhận đề và đồng hồ chưa chạy/)
-    expect(MAN_MO).toMatch(/Em vào ca là nhận đề ngay/)
+  it('dòng mô tả nói rõ cả hai trạng thái, nhãn BẬT/TẮT cạnh bên', () => {
+    // Mở ca dựng lại (M3): dòng mô tả ngắn thay cho hai câu dài cũ; hai trạng thái vẫn có chữ riêng.
+    expect(MAN_MO).toContain('Chờ Thầy bấm Bắt đầu mới đếm ngược')
+    expect(MAN_MO).toContain('Bật sẵn và không tắt được (Đề riêng từng em)')
+    expect(MAN_MO).toContain("{phongCho || deRiengBat || dongBoGio ? 'BẬT' : 'TẮT'}")
   })
 })

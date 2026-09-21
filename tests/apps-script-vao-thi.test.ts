@@ -249,31 +249,20 @@ describe('Chế độ SỐ BÁO DANH đòi đủ mã ca + số báo danh + họ 
     expect(than).toContain('trongDs = null')
   })
 
-  it('DÒNG MÔ TẢ trên màn Mở ca phải nói đúng việc máy chủ làm', async () => {
+  it('màn Mở ca chỉ còn BA chế độ phạm vi (Tự do · SBD cả lớp · Chọn em), không "Theo khối", không dặn gõ họ tên/năm sinh', async () => {
     const { readFileSync } = await import('node:fs')
     const { resolve } = await import('node:path')
     const man = readFileSync(resolve(__dirname, '../src/screens/ExamSetupScreen.tsx'), 'utf8')
-    const dau = man.indexOf('const PHAM_VI_CHON')
+    // Từ khi Mở ca dựng lại (M3) bỏ khối `PHAM_VI_CHON` + dòng `mota`, ba chế độ là ba nút trong lưới "Phạm vi học sinh tham gia".
+    const dau = man.indexOf('Phạm vi học sinh tham gia')
     expect(dau).toBeGreaterThan(0)
-    // Cắt tới dấu `]` ĐẦU DÒNG — dấu `]` đầu tiên nằm trong kiểu `{...}[]`,
-    // cắt ở đó thì khối rỗng và phép kiểm tự đạt.
-    const khoi = man.slice(dau, man.indexOf('\n]', dau))
-    const dong = khoi.split('\n').filter((d) => d.includes("mota: '"))
-    // BA chế độ (thầy chốt 07/09): "Theo khối" đã bỏ vì nó lọc bằng năm sinh,
-    // mà em không gõ năm sinh nữa.
-    expect(dong).toHaveLength(3)
+    const khoi = man.slice(dau, man.indexOf('.map((p) =>', dau))
+    const ids = [...khoi.matchAll(/id: '([a-z_]+)'/g)].map((m) => m[1])
+    // BA chế độ (thầy chốt 07/09): "Theo khối" đã bỏ vì nó lọc bằng năm sinh, mà em không gõ năm sinh nữa.
+    expect(ids).toEqual(['tu_do', 'sbd', 'chon'])
     expect(khoi).not.toContain("id: 'khoi'")
-    expect(khoi).toContain("id: 'sbd'")
-    expect(khoi).toContain("id: 'chon'")
-    // Hai chế độ có cổng KHÔNG được nói là phải gõ đủ ba ô nữa — nói vậy là
-    // sai việc máy chủ đang làm, và thầy đọc xong sẽ dặn em gõ thứ không có ô.
-    for (const d of dong.filter((x) => /'chon'|'sbd'/.test(x))) {
-      expect(d).not.toContain('họ tên, năm sinh')
-      expect(d).toContain('số báo danh')
-    }
-    // Và Tự do phải nói rõ nó là chế độ DUY NHẤT không dò danh sách.
-    const tuDo = khoi.split('\n').find((d) => d.includes("'tu_do'"))!
-    expect(tuDo).toContain('DUY NHẤT')
+    // Màn không được dặn em gõ thứ không có ô: em vào bằng số báo danh, không còn họ tên + năm sinh.
+    expect(man).not.toContain('họ tên, năm sinh')
   })
 })
 
