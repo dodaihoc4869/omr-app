@@ -7,7 +7,8 @@ import ThamHiem from './ThamHiem'
 import type {PhanHoiAi} from './ThamHiem'
 import SoTay from './SoTay'
 import TuiDo from './TuiDo'
-import {chiSoThu,lyDoThuongTuKetQua,lyDoTranExpGame,tenThu} from './dao-core'
+import {chiSoThu,docLuotNgay,docMaiCho,lyDoThuongTuKetQua,lyDoTranExpGame,tenThu} from './dao-core'
+import type {LuotNgay,MaiCho} from './dao-core'
 import type {CauDao,DaoKetQua,DaoThanThuProps,ManDao} from './kieu'
 import './dao.css'
 
@@ -31,6 +32,8 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  const [man,setMan]=useState<ManDao>('dao'),[dangTham,setDangTham]=useState(false)
  const [busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[bao,setBao]=useState('')
  const [goiY,setGoiY]=useState<{title:string}[]|null>(null),[conLai,setConLai]=useState<number|null>(null)
+ // Đợt 2: lượt trong ngày (recommendations/start) + "Mai thú chờ em" (start khi hết lượt) — đọc chặt; máy chủ cũ không gửi ⇒ null ⇒ không dải lượt.
+ const [luotNgay,setLuotNgay]=useState<LuotNgay|null>(null),[maiCho,setMaiCho]=useState<MaiCho|null>(null)
  const [danhMuc,setDanhMuc]=useState<{key:string;ten:string;chuong:string}[]|null>(null),[tenDang,setTenDang]=useState<Record<string,string>>({})
  const [luot,setLuot]=useState<Luot|null>(null),[viTri,setViTri]=useState(0),[ketQua,setKetQua]=useState<BattleAnswer[]>([]),[traLoi,setTraLoi]=useState(''),[assisted,setAssisted]=useState(false),[phanHoi,setPhanHoi]=useState<PhanHoiAi|null>(null),[xong,setXong]=useState(false),[thuong,setThuong]=useState({exp:0,sao:0})
  const dangChay=useRef(false),conSong=useRef(true)
@@ -39,7 +42,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
  const hocTen=(cau:readonly CauDao[])=>setTenDang(cu=>{const moi={...cu};for(const c of cau)if(c.tenDang)moi[c.dang??c.group]=c.tenDang;return moi})
 
  // gợi ý hôm nay + danh mục sổ tay: đọc-chỉ, hỏng thì màn vẫn chạy (Worker cũ chưa có `so-tay`)
- const napGoiY=useCallback(()=>{void call('recommendations').then(r=>{if(conSong.current){setGoiY(r.suggestions??[]);setConLai(typeof r.remaining==='number'?r.remaining:null)}}).catch(()=>{})},[call])
+ const napGoiY=useCallback(()=>{void call('recommendations').then(r=>{if(conSong.current){setGoiY(r.suggestions??[]);setConLai(typeof r.remaining==='number'?r.remaining:null);if(r.luot!==undefined)setLuotNgay(docLuotNgay(r.luot))}}).catch(()=>{})},[call])
  const daChon=!profile.choice
  useEffect(()=>{if(!daChon)return;napGoiY();void call('so-tay').then(r=>{if(conSong.current&&Array.isArray(r.dang)){setDanhMuc(r.dang);setTenDang(cu=>({...Object.fromEntries(r.dang!.filter(d=>d.ten).map(d=>[d.key,d.ten])),...cu}))}}).catch(()=>{})},[daChon,call,napGoiY])
 
@@ -58,6 +61,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
   let r=await call('sync')
   for(let i=0;i<400&&(r.remaining??0)>0&&conSong.current;i++){setBao(`Đang soạn hành trang… còn ${r.remaining} bài cần xem lại`);r=await call('sync')}
   const s=await call('start',{mode,dang})
+  if(s.luot!==undefined)setLuotNgay(docLuotNgay(s.luot));if(s.maiCho!==undefined)setMaiCho(docMaiCho(s.maiCho))
   if(!s.questions?.length){setBao(s.message||THONG_BAO_TRONG);napGoiY();return}
   setBao(s.message||'');moLuot(s,false)})
  const nop=()=>chay(async()=>{const q=luot?.cau[viTri];if(!luot||!q)return
@@ -78,7 +82,7 @@ export default function DaoThanThu({sbd,profile,doanMo,call:callProp,exp,chuoiNg
 
  const muc:[ManDao|'doan',string][]=[['dao','Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ']]
  return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}>
-  {man==='dao'&&<DaoCuaEm profile={profile} exp={exp} chuoiNgay={chuoiNgay} goiY={goiY} conLai={conLai} tenDang={tenDang} tasks={tasks} busy={busy} loi={loi||loiChon} thongBao={bao||(luot&&!xong?'Em đang đi dở một chuyến — bấm LÊN ĐƯỜNG để đi tiếp.':'')}
+  {man==='dao'&&<DaoCuaEm profile={profile} exp={exp} chuoiNgay={chuoiNgay} goiY={goiY} conLai={conLai} luotNgay={luotNgay} maiCho={maiCho} tenDang={tenDang} tasks={tasks} busy={busy} loi={loi||loiChon} thongBao={bao||(luot&&!xong?'Em đang đi dở một chuyến — bấm LÊN ĐƯỜNG để đi tiếp.':'')}
    onLenDuong={()=>void lenDuong()} onOnTheoNhac={dang=>void lenDuong('repair',dang)} onNap={()=>void chay(async()=>{await call('invest')})} onDoiTen={ten=>void chay(async()=>{await call('rename',{name:ten});setLoiChon('')})}/>}
   {man==='so-tay'&&<SoTay profile={profile} danhMuc={danhMuc} tenDang={tenDang}/>}
   {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onDungKhien={id=>chay(async()=>{await call('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}

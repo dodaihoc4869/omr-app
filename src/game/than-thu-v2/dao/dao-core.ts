@@ -16,7 +16,8 @@ export const NHOM_AI:readonly {vai:VaiAi;ten:string;suat:number;ta:string}[]=[
  {vai:'lap',ten:'Luyện đều',suat:2,ta:'câu vừa sức để giữ nhịp'},
  {vai:'thu_thach',ten:'Trùm ải',suat:1,ta:'câu khó hơn sức em một bậc'},
 ]
-export const tenNhomAi=(vai:VaiAi|undefined)=>NHOM_AI.find(n=>n.vai===vai)?.ten??'Luyện đều'
+/** Tên ải. `roleV2` (Đợt 2, máy chủ mới) thêm hai vai: 'moi' = dạng lớp đã học mà em chưa gặp · 'trum' = Lượt trùm. Máy chủ cũ/vai lạ ⇒ "Luyện đều". */
+export const tenNhomAi=(vai:string|undefined)=>vai==='moi'?'Dạng mới':vai==='trum'?'Lượt trùm':NHOM_AI.find(n=>n.vai===vai)?.ten??'Luyện đều'
 /** Đếm ải theo vai của một lượt THẬT (máy chủ trả `role`); câu thiếu `role` (Worker cũ, lệnh resume) tính là "lấp". */
 export function demNhomAi(cau:readonly {role?:VaiAi}[]){return NHOM_AI.map(n=>({...n,so:cau.filter(c=>(c.role??'lap')===n.vai).length}))}
 
@@ -111,3 +112,43 @@ export function soTay(mastery:readonly Mastery[],now:number,danhMuc?:readonly {k
  const tatCa=chuong.flatMap(c=>c.dang)
  return {chuong,thanhThao:tatCa.filter(d=>d.sao===3).length,tong:tatCa.length,yeu:tatCa.filter(d=>d.yeu)}
 }
+
+// ── ĐỢT 2 · LƯỢT TRONG NGÀY (máy chủ `luot` của start/recommendations; luật ở `core.ts luotHomNay`) — màn chỉ ĐỌC + nói, không tự tính lượt ────────────────────────────────────────────────────
+export type LoaiLuotHien='khoi_dong'|'kham_pha'|'trum'
+export interface LuotNgay{tongLuotMo:number;daLam:number;conLai:number;tran:number;tongCauToiDa:number
+ danhSach:{so:number;loai:LoaiLuotHien;thuong:boolean}[]
+ luotTiepTheo:{so:number;loai:LoaiLuotHien;thuong:boolean}|null
+ khoa:{ma:'chang'|'dat'|'trum';daMo:boolean;moKhi:string}[]}
+export interface MaiCho{dangMoi:number;toiHan:number}
+const nguyenKhongAm=(x:unknown):number|null=>typeof x==='number'&&Number.isInteger(x)&&x>=0?x:null
+const laLoaiLuot=(x:unknown):x is LoaiLuotHien=>x==='khoi_dong'||x==='kham_pha'||x==='trum'
+/** Đọc CHẶT `luot` của máy chủ; thiếu/sai dạng ⇒ null (ẩn dải lượt, KHÔNG bịa số lượt). */
+export function docLuotNgay(raw:unknown):LuotNgay|null{
+ if(!raw||typeof raw!=='object'||Array.isArray(raw))return null
+ const r=raw as Record<string,unknown>
+ const tongLuotMo=nguyenKhongAm(r.tongLuotMo),daLam=nguyenKhongAm(r.daLam),conLai=nguyenKhongAm(r.conLai),tran=nguyenKhongAm(r.tran),tongCau=nguyenKhongAm(r.tongCauToiDa)
+ if(tongLuotMo===null||daLam===null||conLai===null||tran===null||tran<1||tongLuotMo>tran)return null
+ const mot=(x:unknown)=>{if(!x||typeof x!=='object')return null;const o=x as Record<string,unknown>,so=nguyenKhongAm(o.so);return so!==null&&so>=1&&laLoaiLuot(o.loai)?{so,loai:o.loai,thuong:o.thuong===true}:null}
+ const danhSach=(Array.isArray(r.danhSach)?r.danhSach:[]).map(mot).filter((x):x is NonNullable<ReturnType<typeof mot>>=>x!==null).slice(0,tran)
+ if(danhSach.length===0)return null
+ const khoa=(Array.isArray(r.khoa)?r.khoa:[]).flatMap(k=>{if(!k||typeof k!=='object')return [];const o=k as Record<string,unknown>;const ma=o.ma;return (ma==='chang'||ma==='dat'||ma==='trum')&&typeof o.moKhi==='string'&&o.moKhi.trim()?[{ma:ma as 'chang'|'dat'|'trum',daMo:o.daMo===true,moKhi:o.moKhi.trim().slice(0,200)}]:[]})
+ return {tongLuotMo,daLam,conLai,tran,tongCauToiDa:tongCau??0,danhSach,luotTiepTheo:mot(r.luotTiepTheo),khoa}}
+/** Đọc CHẶT `maiCho` (màn hết lượt). Thiếu ⇒ null (màn chỉ nói "Mai … chờ em", không số). */
+export function docMaiCho(raw:unknown):MaiCho|null{
+ if(!raw||typeof raw!=='object'||Array.isArray(raw))return null
+ const o=raw as Record<string,unknown>,dangMoi=nguyenKhongAm(o.dangMoi),toiHan=nguyenKhongAm(o.toiHan)
+ return dangMoi===null||toiHan===null?null:{dangMoi,toiHan}}
+/** "Hôm nay còn 4 trên 5 lượt". Hết lượt ⇒ "Hôm nay em đã dùng hết 5 lượt." */
+export const chuLuotConLai=(l:LuotNgay):string=>l.conLai>0?`Hôm nay còn ${l.conLai} trên ${l.tongLuotMo} lượt`:`Hôm nay em đã dùng hết ${l.tongLuotMo} lượt`
+/** Trạng thái từng ô lượt: đã đi (số ≤ đã làm) · lượt kế tiếp · chưa tới. */
+export function trangLuot(l:LuotNgay,so:number):'xong'|'tiep'|'cho'{return so<=l.daLam?'xong':l.luotTiepTheo&&so===l.luotTiepTheo.so?'tiep':'cho'}
+/** Nhãn ô: "Lượt trùm" · "Lượt thưởng" · "Lượt n". */
+export const nhanLuot=(o:{so:number;loai:LoaiLuotHien;thuong:boolean}):string=>o.loai==='trum'?'Lượt trùm':o.thuong?`Lượt thưởng ${o.so}`:`Lượt ${o.so}`
+/** Cách MỞ THÊM lượt (chỉ các khoá chưa mở): máy chủ viết sẵn "Em xong chặng…" ⇒ "Mở thêm 1 lượt khi em xong chặng…". */
+export const chuMoThemLuot=(k:{moKhi:string}):string=>`Mở thêm 1 lượt khi ${k.moKhi.charAt(0).toLocaleLowerCase('vi')}${k.moKhi.slice(1).replace(/[.\s]+$/,'')}`
+/** Màn HẾT LƯỢT: "Mai {tên thú} chờ em · N dạng mới · M câu tới hạn ôn" (số chỉ khi máy chủ gửi `maiCho`). */
+export function chuMaiCho(tenThuCuaEm:string,m:MaiCho|null):string{
+ const dau=`Mai ${tenThuCuaEm} chờ em`
+ if(!m||(m.dangMoi===0&&m.toiHan===0))return `${dau}.`
+ return `${dau}: ${[m.dangMoi>0?`${m.dangMoi} dạng mới`:'',m.toiHan>0?`${m.toiHan} câu tới hạn ôn`:''].filter(Boolean).join(' · ')}.`}
+

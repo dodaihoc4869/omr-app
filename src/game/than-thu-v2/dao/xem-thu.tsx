@@ -2,6 +2,7 @@
 // Dựng từng màn của Đảo thần thú với dữ liệu giả, bọc trong .spirit-game như Game.tsx thật để lộ xung đột CSS.
 import {StrictMode,useState} from 'react'
 import {createRoot} from 'react-dom/client'
+import {docLuotNgay,docMaiCho} from './dao-core'
 import '@fontsource/be-vietnam-pro/vietnamese-400.css'
 import '@fontsource/be-vietnam-pro/vietnamese-600.css'
 import '@fontsource/be-vietnam-pro/vietnamese-700.css'
@@ -30,9 +31,12 @@ const hoSo=():DaoProfile=>({nickname:q.get('ten')??'Lửa Nhỏ',pet:['dat_quy',
  shields:{used:1,activeUntil:0},khienRen:q.has('khongkhien')?undefined:{manh:8,daRen:1,moiKhien:12},
  hapThuHomNay:q.has('hapthu')?{da:Number(q.get('da')??120),tran:Number(q.get('tran')??200),lyDo:q.get('lydo')}:undefined, // ?hapthu&da=120&tran=200&lydo=no|chua_hoc&vi=300
  mastery:[{key:'ES-TP',stage:2,first:BAY_GIO-8*NGAY,due:BAY_GIO-NGAY,groups:['a','b'],repaired:false},{key:'ES-TEN',stage:3,first:BAY_GIO-20*NGAY,due:BAY_GIO+5*NGAY,groups:['c','d','e'],repaired:true},{key:'ES-DOT',stage:1,first:BAY_GIO-2*NGAY,due:BAY_GIO+NGAY,groups:['f'],repaired:false},{key:'CB-LM',stage:0,first:0,due:BAY_GIO+NGAY,groups:[],repaired:false}]})
+// ?luot (5 lượt, đã đi 2, trùm là lượt 5) · ?hetluot (hết lượt) · ?mai=3,4 (Mai thú chờ em: 3 dạng mới · 4 câu tới hạn ôn)
+const LUOT_XEM=(het:boolean)=>({tongLuotMo:5,daLam:het?5:2,conLai:het?0:3,tran:6,tongCauToiDa:36,danhSach:[{so:1,loai:'khoi_dong',thuong:false},{so:2,loai:'kham_pha',thuong:false},{so:3,loai:'kham_pha',thuong:false},{so:4,loai:'kham_pha',thuong:true},{so:5,loai:'trum',thuong:true}],luotTiepTheo:het?null:{so:3,loai:'kham_pha',thuong:false},khoa:[{ma:'chang',daMo:true,moKhi:'Em xong chặng bài tập về nhà của hôm nay'},{ma:'dat',daMo:false,moKhi:'Em đạt nhiệm vụ ngày'},{ma:'trum',daMo:false,moKhi:'Em đúng từ 80 % trong ít nhất 12 câu thần thú hôm nay (hôm nay 9/12 câu)'}]})
 const TEN_DANG={'ES-TP':'Ester thuỷ phân','ES-TEN':'Tên gọi ester','ES-DOT':'Đốt cháy ester','CB-LM':'Lên men'}
 function ManDao(){const [bao,setBao]=useState('')
  return <div className="dao dao-vo"><DaoCuaEm profile={hoSo()} exp={q.has('khongexp')?null:{homNay:46,manhKhien:{manh:8,moiKhien:12}}} chuoiNgay={q.has('khongchuoi')?undefined:5} tenDang={TEN_DANG} goiY={q.has('khonggoiy')?null:[{title:'Ester thuỷ phân'},{title:'Glucose tráng bạc'},{title:'Đốt cháy ester'}]} conLai={q.has('het')?0:180}
+  luotNgay={q.has('luot')||q.has('hetluot')?docLuotNgay(LUOT_XEM(q.has('hetluot'))):null} maiCho={q.has('mai')?docMaiCho({dangMoi:Number(q.get('mai')?.split(',')[0]??3),toiHan:Number(q.get('mai')?.split(',')[1]??4)}):null}
   tasks={q.has('nhac')?[{id:'t1',dang:'Xà phòng hoá'}]:[]} thongBao={bao} onLenDuong={()=>setBao('Đang lên đường…')} onNap={()=>setBao('Đã nạp')} onDoiTen={t=>setBao(`Tên mới: ${t}`)} onOnTheoNhac={d=>setBao(`Ôn ${d}`)}/></div>}
 const cauGia=(i:number,role:CauDao['role'],phan:'I'|'II'|'III'='I'):CauDao=>({qid:`q${i}`,maDe:'DE01',version:'1',group:`g${i}`,phan,text:['Oxi hoá ethanol bằng CuO, đun nóng, thu được chất hữu cơ X. X là','Thuỷ phân hoàn toàn 8,8 gam ethyl acetate trong dung dịch NaOH dư, thu được m gam muối. Giá trị của m là','Cho các phát biểu về ester, mỗi phát biểu đúng hay sai?'][i%3]!,choices:phan==='I'?['CH₃COOH','CH₃CHO','HCHO','C₂H₄']:[],ideas:phan==='II'?['Ester no đơn chức có công thức CnH2nO2.','Phản ứng xà phòng hoá là thuận nghịch.','Ethyl acetate tan tốt trong nước.','Isoamyl acetate có mùi chuối chín.']:[],hinhAnh:[],dang:'AN-OXH',tenDang:['Ancol · oxi hoá','Ester thuỷ phân','Lý thuyết ester'][i%3]!,mucDo:'hieu',sao:2,kienThuc:[],role})
 const CAU_GIA=[cauGia(0,'yeu'),cauGia(1,'yeu','III'),cauGia(2,'toi_han','II'),cauGia(3,'lap'),cauGia(4,'lap'),cauGia(5,'thu_thach')]

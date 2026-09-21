@@ -4,8 +4,8 @@ import {PETS} from '../core'
 import {EVOLUTION_NAMES,evolutionStage} from '../evolution'
 import {normalizePetName} from '../pet-name'
 import {anhThu,anhThuTheoDang} from './anh'
-import {CAP_TOI_DA,NHOM_AI,chiSoThu,duTruNgayAn,duongTienHoa,hapThuHienThi,loiThu,mucTieuGanNhat,tenThu,tienHoaKe,vongExp} from './dao-core'
-import type {MucTieu} from './dao-core'
+import {CAP_TOI_DA,NHOM_AI,chiSoThu,chuLuotConLai,chuMaiCho,chuMoThemLuot,duTruNgayAn,duongTienHoa,hapThuHienThi,loiThu,mucTieuGanNhat,nhanLuot,tenThu,tienHoaKe,trangLuot,vongExp} from './dao-core'
+import type {LuotNgay,MaiCho,MucTieu} from './dao-core'
 import type {DaoExp,DaoProfile} from './kieu'
 import './dao.css'
 
@@ -13,6 +13,8 @@ export interface DaoCuaEmProps{
  profile:DaoProfile;exp?:DaoExp|null;chuoiNgay?:number;now?:number
  /** Từ lệnh `recommendations`: tên 3 dạng sẽ gặp + số câu còn lại hôm nay. `null` = chưa tải xong. */
  goiY?:readonly {title:string}[]|null;conLai?:number|null
+ /** Đợt 2 (máy chủ mới; đọc chặt bằng `docLuotNgay`/`docMaiCho`): lượt trong ngày + "Mai thú chờ em". Vắng ⇒ không dải lượt, không màn hết lượt (máy chủ cũ). */
+ luotNgay?:LuotNgay|null;maiCho?:MaiCho|null
  /** Tên dạng đã biết (mã → tên) để gọi tên mục tiêu "thành thạo dạng …". */
  tenDang?:Readonly<Record<string,string>>
  tasks?:readonly {id:string;dang:string}[]
@@ -28,11 +30,11 @@ const ICON:Record<MucTieu['loai'],ReactNode>={
 }
 const BAN_KINH=118,CHU_VI=2*Math.PI*BAN_KINH
 
-export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null,conLai=null,tenDang,tasks=[],busy=false,thongBao='',loi='',onLenDuong,onOnTheoNhac,onNap,onDoiTen}:DaoCuaEmProps){
+export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null,conLai=null,luotNgay=null,maiCho=null,tenDang,tasks=[],busy=false,thongBao='',loi='',onLenDuong,onOnTheoNhac,onNap,onDoiTen}:DaoCuaEmProps){
  const thu=chiSoThu(profile.pet),ten=tenThu(profile),vong=vongExp(profile.cap,profile.exp),ke=tienHoaKe(profile.cap)
  const [suaTen,setSuaTen]=useState(false),[tenMoi,setTenMoi]=useState(''),[loiTen,setLoiTen]=useState('')
  const luuTen=(e:FormEvent)=>{e.preventDefault();try{const sach=normalizePetName(tenMoi);setLoiTen('');setSuaTen(false);onDoiTen?.(sach)}catch(x){setLoiTen(x instanceof Error?x.message:'Tên chưa hợp lệ.')}}
- const hetLuot=conLai===0,soAi=NHOM_AI.reduce((s,n)=>s+n.suat,0)
+ const hetLuotCau=conLai===0,hetLuotNgay=!!luotNgay&&luotNgay.conLai===0,hetLuot=hetLuotCau||hetLuotNgay,soAi=NHOM_AI.reduce((s,n)=>s+n.suat,0)
  const hapThu=hapThuHienThi(profile.hapThuHomNay,ten,profile.wallet>0)
  const duTru=hapThu?duTruNgayAn(profile.wallet):null
  return <div className="dao-nha" data-thu={thu}>
@@ -64,10 +66,16 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
   <section className="dao-chuyen" aria-labelledby="dao-chuyen-ten">
    <div className="dao-chuyen-dau"><h3 id="dao-chuyen-ten">CHUYẾN THÁM HIỂM HÔM NAY</h3><span>{soAi} ải · {soAi}–{soAi+2} phút</span></div>
    <ol className="dao-chuyen-ai">{NHOM_AI.map(n=><li key={n.vai} data-vai={n.vai}><b>{n.suat}</b><span>{n.ten}</span></li>)}</ol>
-   <p className="dao-chuyen-ta">{hetLuot?'Em đã làm đủ 200 câu hôm nay. Mai đảo có chuyến mới.':goiY?.length?<>Hôm nay em sẽ gặp: {goiY.slice(0,3).map((g,i)=><span key={i}>{i>0&&' · '}<b>{g.title}</b></span>)}.</>
+   <p className="dao-chuyen-ta">{hetLuotCau?'Em đã làm đủ 200 câu hôm nay. Mai đảo có chuyến mới.':goiY?.length?<>Hôm nay em sẽ gặp: {goiY.slice(0,3).map((g,i)=><span key={i}>{i>0&&' · '}<b>{g.title}</b></span>)}.</>
     :<>Mỗi chuyến: <b>2 câu dạng em hay sai</b> · <b>1 câu đến lịch ôn lại</b> · 2 câu vừa sức · 1 câu khó hơn sức em một bậc để đánh Trùm ải.</>}</p>
+   {luotNgay&&<div className="dao-luot" data-vung="luot-ngay" data-het={hetLuotNgay?'':undefined}>
+    <p className="dao-luot-chu" role="status">{chuLuotConLai(luotNgay)}</p>
+    <ol className="dao-luot-ds" aria-label="Các lượt hôm nay">{luotNgay.danhSach.map(o=>{const tt=trangLuot(luotNgay,o.so);return <li key={o.so} data-trang={tt} data-loai={o.loai} data-thuong={o.thuong?'':undefined} aria-label={`${nhanLuot(o)}: ${tt==='xong'?'đã đi':tt==='tiep'?'lượt kế tiếp':'chưa tới'}`}><b aria-hidden="true">{o.loai==='trum'?'T':o.so}</b><span aria-hidden="true">{o.loai==='trum'?'Trùm':o.thuong?'Thưởng':`Lượt ${o.so}`}</span></li>})}</ol>
+    {luotNgay.khoa.filter(k=>!k.daMo).map(k=><p className="dao-luot-mo" key={k.ma} data-ma={k.ma}>{chuMoThemLuot(k)}.</p>)}
+   </div>}
+   {hetLuotNgay&&<div className="dao-het-luot" data-vung="het-luot" role="status"><p>{chuMaiCho(ten,maiCho)}</p></div>}
    {(thongBao||loi)&&<p className={loi?'dao-loi':'dao-chuyen-bao'} role={loi?'alert':'status'}>{loi||thongBao}</p>}
-   <button type="button" className="dao-nut-vang" disabled={busy||hetLuot} onClick={onLenDuong}><span className="dao-nut-tam-giac" aria-hidden="true"/><span>{busy?'ĐANG SOẠN HÀNH TRANG…':'LÊN ĐƯỜNG'}</span></button>
+   <button type="button" className="dao-nut-vang" disabled={busy||hetLuot} onClick={onLenDuong}><span className="dao-nut-tam-giac" aria-hidden="true"/><span>{busy?'ĐANG SOẠN HÀNH TRANG…':hetLuotNgay?'HẾT LƯỢT HÔM NAY':'LÊN ĐƯỜNG'}</span></button>
   </section>
 
   <section className="dao-kinh dao-muc-tieu" aria-labelledby="dao-mt-ten"><h3 id="dao-mt-ten" className="dao-nhan-nho">MỤC TIÊU GẦN NHẤT</h3>

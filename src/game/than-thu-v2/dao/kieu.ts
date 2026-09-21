@@ -16,12 +16,16 @@ export interface DaoProfile{nickname?:string;pet:string;choice:boolean;cap:numbe
 export interface DaoExp{homNay:number;manhKhien?:{manh:number;moiKhien:number;khienConLai?:number}|null}
 /** Vai của một ải = đúng suất của `chooseSession`: 2 yếu · 1 tới hạn · lấp · 1 thử thách. */
 export type VaiAi='yeu'|'toi_han'|'lap'|'thu_thach'
-export interface CauDao extends Question{role?:VaiAi}
+export interface CauDao extends Question{role?:VaiAi
+ /** Đợt 2 (máy chủ mới): vai THẬT của ải — thêm 'moi' (dạng mới) và 'trum' (Lượt trùm); `role` giữ tập cũ cho máy em đang sống. */
+ roleV2?:string}
 export interface LyDoThuong{moc:0|1|2|3;exp:number;chu:string}
 export interface DaoKetQua{ok:boolean;error?:string;message?:string;missing?:number;remaining?:number;dailyUsed?:number
  suggestions?:{title:string;source:string;part:string}[]
  id?:string;mode?:Mode;questions?:CauDao[];answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[]
  correct?:boolean;answer?:string;solution?:unknown;reward?:number;stage?:number;solutionImages?:HinhAnh[];lyDoThuong?:LyDoThuong
+ /** Đợt 2 (chỉ-thêm): tóm tắt lượt trong ngày · màn hết lượt (`het`) + "Mai thú chờ em" (`maiCho`) — đọc chặt bằng `docLuotNgay`/`docMaiCho`. */
+ luot?:unknown;maiCho?:unknown;het?:boolean
  /** Thưởng ĐÁNG LẼ của câu — chỉ có khi trần 120 EXP/ngày từ game đã CẮT `reward` (máy chủ Đợt 1). */
  thuongGoc?:number
  dang?:{key:string;ten:string;chuong:string}[]}

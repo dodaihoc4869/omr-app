@@ -309,3 +309,18 @@
 .dao .dao-san-ta{align-items:flex-end;gap:6px}.dao .dao-san-ta .dao-san-mau{width:100px;flex:none}
 .dao .dao-san-ten{display:flex;flex-direction:column;gap:1px;max-width:104px;line-height:1.25;overflow-wrap:anywhere}
 .dao .dao-san-ten small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10px;font-weight:600;opacity:.9}
+/* ĐỢT 2 · dải lượt trong ngày + màn hết lượt (chỉ đọc số máy chủ) */
+.dao .dao-luot{display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:18px;background:rgba(255,255,255,.14)}
+.dao .dao-luot-chu{margin:0;font-size:13px;font-weight:700;color:rgb(255,255,255)}
+.dao .dao-luot-ds{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.dao .dao-luot-ds li{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:44px}
+.dao .dao-luot-ds b{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.22);color:rgb(255,255,255);font-size:14px;font-weight:800;box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
+.dao .dao-luot-ds span{font-size:10px;font-weight:700;color:rgb(223,232,255);line-height:1.2;text-align:center}
+.dao .dao-luot-ds li[data-trang="xong"] b{background:rgb(127,233,255);color:rgb(11,18,48);box-shadow:none}
+.dao .dao-luot-ds li[data-trang="tiep"] b{background:var(--dao-vang);color:var(--dao-vang-chu);box-shadow:0 0 0 3px rgba(255,255,255,.65)}
+.dao .dao-luot-ds li[data-loai="trum"] b{box-shadow:inset 0 0 0 2px rgb(255,209,102)}
+.dao .dao-luot-ds li[data-loai="trum"][data-trang="cho"] b{color:rgb(255,209,102)}
+.dao .dao-luot-mo{margin:0;font-size:12px;font-weight:600;line-height:1.4;color:rgb(255,236,179)}
+.dao .dao-het-luot{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:18px;background:rgba(11,18,48,.4)}
+.dao .dao-het-luot p{margin:0;font-size:14px;font-weight:700;line-height:1.45;color:rgb(255,236,179)}
+

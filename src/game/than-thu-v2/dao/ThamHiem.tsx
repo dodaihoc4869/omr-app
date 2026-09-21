@@ -31,7 +31,7 @@ export function DaiAi({cau,viTri,ketQua,xong}:{cau:readonly CauDao[];viTri:numbe
  const daQua=xong?cau.length:viTri,tiLe=cau.length>1?Math.min(1,daQua/(cau.length-1)):1
  return <ol className="dao-dai" aria-label={`Chuyến thám hiểm ${cau.length} ải`} style={{'--dai-tile':tiLe} as React.CSSProperties}>{cau.map((c,i)=>{
   const kq=ketQua.find(k=>k.qid===c.qid),trang=kq?(kq.correct?'dung':'sai'):i===viTri&&!xong?'dang':'cho',dauNhom=i===0||(cau[i-1]!.role??'lap')!==(c.role??'lap')
-  return <li key={c.qid} data-trang={trang} data-vai={c.role??'lap'} aria-current={trang==='dang'?'step':undefined} aria-label={`Ải ${i+1} · ${tenNhomAi(c.role)} · ${trang==='dung'?'đã qua, đúng':trang==='sai'?'đã qua, chưa đúng':trang==='dang'?'đang làm':'chưa tới'}`}><i/>{dauNhom&&<small>{tenNhomAi(c.role)}</small>}</li>})}</ol>
+  return <li key={c.qid} data-trang={trang} data-vai={c.role??'lap'} aria-current={trang==='dang'?'step':undefined} aria-label={`Ải ${i+1} · ${tenNhomAi(c.roleV2??c.role)} · ${trang==='dung'?'đã qua, đúng':trang==='sai'?'đã qua, chưa đúng':trang==='dang'?'đang làm':'chưa tới'}`}><i/>{dauNhom&&<small>{tenNhomAi(c.roleV2??c.role)}</small>}</li>})}</ol>
 }
 
 /** Vùng cuộn gần nhất của khung (vỏ sheet cuộn riêng); không có thì cuộn của trang. */
@@ -98,7 +98,7 @@ export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanH
   :q&&pc&&<>
    {phanHoi&&<div className="dao-thuong" data-moc={phanHoi.lyDo.moc} data-dung={phanHoi.correct?'':undefined} role="status"><b data-don-vi={phanHoi.lyDo.exp>0?'EXP':undefined}>{phanHoi.lyDo.exp>0?`+${phanHoi.lyDo.exp}`:phanHoi.correct?'Đúng':'Ôn lại'}</b><p>{phanHoi.lyDo.chu.replace(/^\+\d+\s*·\s*/,'')}</p></div>}
    <section className="dao-cau" aria-label={`Ải ${viTri+1}`}>
-    <p className="dao-cau-nhan"><b data-vai={q.role??'lap'}>ẢI {viTri+1} · {tenNhomAi(q.role).toLocaleUpperCase('vi')}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
+    <p className="dao-cau-nhan"><b data-vai={q.role??'lap'}>ẢI {viTri+1} · {tenNhomAi(q.roleV2??q.role).toLocaleUpperCase('vi')}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
     <div onErrorCapture={e=>{if((e.target as HTMLElement).tagName==='IMG')setHinhLoi(true)}}><TheCau {...pc}/></div>
     {hinhLoi&&<p role="alert" className="dao-cau-loi">Hình của câu chưa tải được. Em về đảo rồi bấm LÊN ĐƯỜNG để mở lại; câu này chưa bị tính sai.</p>}
     {phanHoi&&<div className="dao-cau-giai"><LoiGiaiCauSai hoaHoc c={{text:q.text,phan:q.phan,dapAnDung:phanHoi.answer,loiGiai:phanHoi.solution}}/><HinhTaiViTri hinhAnh={phanHoi.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={setZoom}/></div>}
