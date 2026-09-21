@@ -436,6 +436,7 @@
   .m3 .dark\:text-purple-400 { color: var(--m3-primary); }
   .m3 .dark\:text-red-200 { color: var(--m3-error); }
   .m3 .dark\:text-red-300 { color: var(--m3-error); }
+  .m3 .dark\:text-red-400 { color: var(--m3-error); }
   .m3 .dark\:text-rose-100 { color: var(--m3-on-error-container); }
   .m3 .dark\:text-rose-200 { color: var(--m3-error); }
   .m3 .dark\:text-rose-300 { color: var(--m3-error); }
