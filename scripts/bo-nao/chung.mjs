@@ -22,6 +22,9 @@ export const TOI_DA_HO_SO_MOI_TEP = 12
 export const TOI_DA_MOI_LUOT_NOP = 100
 export const SO_TRANG_TOI_DA = 80
 export const SO_DONG_LOI_IN_TOI_DA = 10
+/** Lượt CHIỀU: tối đa bấy nhiêu em mỗi lượt (chi phí token) và bấy nhiêu thẻ mỗi tệp vào. */
+export const TOI_DA_EM_CHIEU = 60
+export const TOI_DA_THE_MOI_TEP_CHIEU = 20
 
 /** Lỗi có thể nói thẳng với người chạy: `.message` là lời tiếng Việt không chứa bí mật. */
 export class LoiBoNao extends Error {
@@ -153,6 +156,12 @@ export function ghiJson(duong, obj, { rieng = false, dep = false } = {}) {
   mkdirSync(dirname(duong), { recursive: true })
   writeFileSync(duong, JSON.stringify(obj, null, dep ? 2 : 0), rieng ? { mode: 0o600 } : undefined)
   if (rieng) chmodSync(duong, 0o600)
+}
+
+/** Ghi một tệp CHỮ (bản xem trước, báo cáo). Không dùng cho mã bí mật. */
+export function ghiChu(duong, chu) {
+  mkdirSync(dirname(duong), { recursive: true })
+  writeFileSync(duong, chu)
 }
 
 export function docJsonNeuCo(duong, macDinh = null) {

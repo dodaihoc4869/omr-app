@@ -37,6 +37,8 @@ import {
   soTep,
   taoGoiMayChu,
   tepLanCuoi,
+  TOI_DA_EM_CHIEU,
+  TOI_DA_THE_MOI_TEP_CHIEU,
 } from './chung.mjs'
 
 /**
@@ -135,6 +137,82 @@ export async function chayLay({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
   return { ngay, thuMuc, dem, chayBu, cheDo: cauHinh?.cheDo ?? 'bong' }
 }
 
+/**
+ * LƯỢT CHIỀU (thầy chốt 21/09 — "Thử thách riêng hôm nay"): lấy thẻ của em CÓ TÍN HIỆU trong ngày (`mocDangKhen`, làm bài hôm qua / 3 ngày), không vắng, có mã dạng — tối đa `toiDa` em, ưu tiên nhiều tín hiệu.
+ * Ghi ở `bo-nao/<ngày>/chieu/` (KHÔNG đụng lượt đêm): `vao/chieu-NN.json` (thẻ NÉN, ≤ ${TOI_DA_THE_MOI_TEP_CHIEU} em/tệp; đã có `thanThu` nếu máy chủ trả), `ra/` trống, `LUAT-CHIEU.md`, `tom-tat.json`,
+ * `.bi-danh.json` + `.the-day-du.json` (quyền 600, AI không mở). Không cập nhật `lan-cuoi.json` (không lẫn chạy bù của lượt đêm). Cờ `bo_nao.thuThach` tắt ⇒ dừng.
+ */
+export function diemTinHieuChieu(the) {
+  const t = the && typeof the === 'object' ? the : {}
+  const moc = Array.isArray(t.mocDangKhen) ? t.mocDangKhen.length : 0
+  const cau = t.cau && typeof t.cau === 'object' ? t.cau : {}
+  return 2 * moc + (Number(cau.lamHomQua) > 0 ? 1 : 0) + (Number(cau.lam3) > 0 ? 1 : 0) + (t.thanThu && typeof t.thanThu === 'object' ? 1 : 0)
+}
+
+export async function chayLayChieu({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(), rng, toiDa = TOI_DA_EM_CHIEU }) {
+  const cauHinh = (await goi('/ai/cau-hinh', {})).cauHinh
+  if (cauHinh && cauHinh.bat === false) throw new LoiBoNao('Bộ não đang TẮT ở Cài đặt (bat = false) — không lấy dữ liệu. Dừng.', 4)
+  if (cauHinh && cauHinh.thuThach === false) throw new LoiBoNao('Cờ "Thử thách riêng hôm nay" đang TẮT (thuThach = false) — không lấy dữ liệu lượt chiều. Dừng.', 4)
+
+  const cacEm = []
+  let soTrang = 1
+  for (let trang = 1; trang <= soTrang && trang <= SO_TRANG_TOI_DA; trang++) {
+    const r = await goi('/ai/ho-so-ngay', { ngay, trang, coTrang: CO_TRANG })
+    if (!Array.isArray(r.cacEm)) throw new LoiBoNao('Máy chủ trả hồ sơ ngày sai dạng (thiếu cacEm).', 3)
+    soTrang = Number.isInteger(r.soTrang) && r.soTrang > 0 ? r.soTrang : 1
+    cacEm.push(...r.cacEm)
+  }
+  const thuMuc = join(goc, ngay, 'chieu')
+  const coThe = cacEm.filter((e) => e && e.the && e.luong !== 'bo_qua' && e.luong !== 'vang' && Array.isArray(e.the.maDang) && e.the.maDang.length > 0)
+  const chon = coThe
+    .map((e) => ({ e, diem: diemTinHieuChieu(e.the) }))
+    .filter((x) => x.diem > 0)
+    .sort((a, b) => b.diem - a.diem || (String(a.e.sbd) < String(b.e.sbd) ? -1 : 1))
+    .slice(0, Math.max(1, toiDa))
+    .map((x) => x.e)
+  const cu = docJsonNeuCo(join(thuMuc, '.bi-danh.json'), null)
+  const { bang, dao } = capBiDanh(chon.map((e) => String(e.sbd)), cu && cu.ngay === ngay && cu.bang && typeof cu.bang === 'object' ? cu.bang : {}, rng)
+
+  const the = {}
+  const nhom = []
+  for (const e of chon) {
+    const b = dao.get(String(e.sbd))
+    the[b] = e.the
+    nhom.push({ biDanh: b, the: nenThe(e.the) })
+  }
+  nhom.sort((a, b) => (a.biDanh < b.biDanh ? -1 : 1))
+  mkdirSync(join(thuMuc, 'vao'), { recursive: true })
+  mkdirSync(join(thuMuc, 'ra'), { recursive: true })
+  donVao(join(thuMuc, 'vao'))
+  const tepChia = chiaTep(nhom, TOI_DA_THE_MOI_TEP_CHIEU)
+  tepChia.forEach((c, i) => ghiJson(join(thuMuc, 'vao', `chieu-${soTep(i)}.json`), c))
+  ghiJson(join(thuMuc, '.bi-danh.json'), { ngay, bang }, { rieng: true })
+  ghiJson(join(thuMuc, '.the-day-du.json'), { ngay, the }, { rieng: true })
+  const nguonLuat = join(THU_MUC_CAM_NANG, 'LUAT-CHIEU.md')
+  const coLuat = existsSync(nguonLuat)
+  if (coLuat) copyFileSync(nguonLuat, join(thuMuc, 'LUAT-CHIEU.md'))
+  const dem = {
+    soEmCoThe: cacEm.length,
+    soEmDuDieuKien: coThe.length,
+    soEmDuocLay: chon.length,
+    coThanThu: chon.filter((e) => e.the.thanThu && typeof e.the.thanThu === 'object').length,
+    coLuatChieu: coLuat,
+    tep: tepChia.length,
+  }
+  ghiJson(join(thuMuc, 'tom-tat.json'), { ngay, layLuc: new Date(bayGio).toISOString(), ...dem }, { dep: true })
+  return { ngay, thuMuc, dem, cheDo: cauHinh?.cheDo ?? 'bong' }
+}
+
+export function dongTomTatChieu(kq) {
+  const { dem } = kq
+  return [
+    `Đã lấy dữ liệu LƯỢT CHIỀU ngày ${kq.ngay} → bo-nao/${kq.ngay}/chieu/   (chế độ: ${kq.cheDo === 'that' ? 'thật' : 'chạy thử'})`,
+    `  ${dem.soEmCoThe} em có thẻ · ${dem.soEmDuDieuKien} đủ điều kiện (không vắng, có mã dạng) · lấy ${dem.soEmDuocLay} em có tín hiệu (${dem.coThanThu} có số thật thần thú) · ${dem.tep} tệp vao/chieu-NN.json.`,
+    '  Trợ lý con đọc LUAT-CHIEU.md; MỖI tệp vào → MỘT tệp ra cùng số ở ra/. Xong: node scripts/bo-nao/nop.mjs --chieu --xem-truoc (KHÔNG nộp; người chạy đọc xem-truoc.md rồi mới nộp).',
+    ...(dem.soEmDuocLay === 0 ? ['  Không có em nào có tín hiệu hôm nay → dừng, không cần nộp.'] : []),
+  ]
+}
+
 export function dongTomTat(kq) {
   const { dem } = kq
   const d = [
@@ -148,11 +226,21 @@ export function dongTomTat(kq) {
 }
 
 async function main() {
-  const doi = process.argv[2]
+  const args = process.argv.slice(2)
+  const chieu = args.includes('--chieu')
+  const iToiDa = args.indexOf('--toi-da')
+  const toiDa = iToiDa >= 0 ? Number(args[iToiDa + 1]) : TOI_DA_EM_CHIEU
+  const doi = args.find((a, i) => !a.startsWith('--') && !(iToiDa >= 0 && i === iToiDa + 1))
   if (doi && !laNgay(doi)) throw new LoiBoNao(`Ngày phải có dạng YYYY-MM-DD (nhận "${String(doi).slice(0, 20)}").`, 1)
+  if (chieu && (!Number.isInteger(toiDa) || toiDa < 1 || toiDa > 400)) throw new LoiBoNao('--toi-da phải là số nguyên 1…400.', 1)
   const ngay = doi || homNayVn()
   const { ma, canhBao } = docMaBiMat()
   if (canhBao) console.log(canhBao)
+  if (chieu) {
+    const kq = await chayLayChieu({ ngay, goi: taoGoiMayChu({ ma }), toiDa })
+    for (const d of dongTomTatChieu(kq)) console.log(d)
+    return
+  }
   const kq = await chayLay({ ngay, goi: taoGoiMayChu({ ma }) })
   for (const d of dongTomTat(kq)) console.log(d)
 }

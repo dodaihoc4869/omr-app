@@ -5,7 +5,7 @@
 // mà máy chủ sẽ chạy LẦN NỮA, đổi bí danh → SBD (bảng `.bi-danh.json`), rồi nộp `/ai/dieu-chinh/nop` theo lô ≤ 100 em.
 // Phần tử sai khuôn bị BỎ (không sửa hộ) và báo lý do bằng bí danh. In CHỈ số đếm + lý do ngắn; không in SBD, không in lời nhắn, không in dữ liệu thẻ.
 // Nộp lại nhiều lần vô hại (máy chủ ghi đè theo (em, ngày)).
-import { existsSync, readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { HAN_MUC_BO_NAO, kiemBanTin, kiemKhuon } from '../../src/lib/bo-nao-khuon.ts'
@@ -17,6 +17,7 @@ import {
   chiaTep,
   docJsonNeuCo,
   docMaBiMat,
+  ghiChu,
   ghiJson,
   giauSbd,
   homNayVn,
@@ -107,7 +108,7 @@ export function kiemCacEm(phanTu, bang, the) {
       loai.push({ biDanh: b, tep, lyDo: k.lyDo })
       continue
     }
-    hopLe.push({ biDanh: b, sbd: bang[b], dauRa: x, canhBao: k.canhBao ?? [], tep })
+    hopLe.push({ biDanh: b, sbd: bang[b], dauRa: x, canhBao: k.canhBao ?? [], boLoi: k.boLoi ?? [], tep })
   }
   return { hopLe, loai }
 }
@@ -219,6 +220,117 @@ export async function chayNop({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
   return tomTat
 }
 
+// ══════════════════════════════ LƯỢT CHIỀU: THỬ THÁCH RIÊNG ══════════════════════════════
+
+/** Phần tử chiều của AI (`{biDanh, doTinCay, thuThach, loiMoi}`) → phần tử ĐẦY ĐỦ khuôn `DauRaEm`: núm RỖNG, không lời nhắn — chỉ mang thử thách. Khoá thừa của AI bị bỏ. */
+export function moRongPhanTuChieu(x) {
+  if (!laDoiTuong(x)) return x
+  return {
+    biDanh: x.biDanh,
+    doTinCay: x.doTinCay,
+    nhip: { lech: 0, khoiDong: 2 },
+    dang: [],
+    khacPhuc: [],
+    co: 'khong',
+    loiNhanChoEm: '',
+    loiNhanChoPhuHuynh: '',
+    thuTuan: '',
+    goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' },
+    ghiChuHlv: 'Lượt chiều: chỉ thử thách riêng hôm nay',
+    canSau: false,
+    thuThach: x.thuThach,
+    loiMoi: x.loiMoi,
+  }
+}
+
+const thuMucChieu = (goc, ngay) => join(goc, ngay, 'chieu')
+const soTrongLoi = (chu) => [...new Set(String(chu).match(/\d+(?:[.,]\d+)?/g) ?? [])].join(', ') || 'không có'
+
+/** Bản XEM TRƯỚC dạng chữ để người chạy đọc (KHÔNG có SBD, KHÔNG có tên — chỉ bí danh). */
+export function soanXemTruoc({ ngay, hopLe, loai, tao }) {
+  const d = [
+    `# XEM TRƯỚC — LƯỢT CHIỀU ${ngay} (CHƯA NỘP)`,
+    '',
+    `Tạo lúc ${tao} · ${hopLe.length} em hợp lệ · ${loai.length} em bị loại. Đọc từng lời; ưng thì nộp bằng: \`bash scripts/bo-nao/chay-chieu.sh --nop ${ngay}\`. Chưa ưng: sửa/xoá phần tử trong \`bo-nao/${ngay}/chieu/ra/\` rồi chạy lại \`--xem-truoc\`.`,
+    '',
+    '## Hợp lệ',
+  ]
+  hopLe.forEach((h, i) => {
+    const t = h.dauRa.thuThach
+    d.push(`${i + 1}. **${h.biDanh}** · dạng ${t.dang.join(' + ')} · ${t.bac === 'dung_bac' ? 'đúng bậc' : t.bac === 'thap_hon_mot_bac' ? 'thấp hơn một bậc' : 'cao hơn một bậc'} · muốn ${t.soCau} câu · tin cậy ${h.dauRa.doTinCay}`)
+    d.push(`   > ${h.dauRa.loiMoi}`)
+    d.push(`   (số trong lời: ${soTrongLoi(h.dauRa.loiMoi)}; máy đã kiểm đều có trong thẻ)`)
+  })
+  if (!hopLe.length) d.push('(không có em nào hợp lệ)')
+  d.push('', '## Bị loại')
+  for (const l of loai) d.push(`- **${l.biDanh}**: ${l.lyDo.join('; ').slice(0, 300)}`)
+  if (!loai.length) d.push('(không có)')
+  return d.join('\n') + '\n'
+}
+
+/**
+ * LƯỢT CHIỀU — kiểm khuôn + XEM TRƯỚC hoặc NỘP. `xemTruoc: true` ⇒ chỉ GHI `chieu/xem-truoc.md` + `xem-truoc.json`, KHÔNG gọi máy chủ. Nộp thật chỉ khi đã có bản xem trước và `ra/` không đổi sau nó.
+ * Phần tử phải có ĐỦ `thuThach` + `loiMoi` và qua `kiemKhuon` (sai thử thách ⇒ loại, vì lượt chiều chỉ có việc này). Trả bản tóm tắt KHÔNG có SBD.
+ */
+export async function chayNopChieu({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(), xemTruoc = false }) {
+  const thuMuc = thuMucChieu(goc, ngay)
+  const bd = docJsonNeuCo(join(thuMuc, '.bi-danh.json'), null)
+  if (!bd || bd.ngay !== ngay || !laDoiTuong(bd.bang)) throw new LoiBoNao(`Chưa có dữ liệu lượt chiều ngày ${ngay} — chạy trước: node scripts/bo-nao/lay.mjs --chieu ${ngay}`, 5)
+  const bang = bd.bang
+  const the = docTheDaLay(thuMuc)
+  const thuMucRa = join(thuMuc, 'ra')
+  const { phanTu: phanTuAi, loiTep } = docThuMucRa(thuMucRa)
+  if (phanTuAi.length === 0) throw new LoiBoNao(`Không có gì để ${xemTruoc ? 'xem trước' : 'nộp'}: bo-nao/${ngay}/chieu/ra/ chưa có tệp kết quả hợp lệ${loiTep.length ? ` (${loiTep[0]})` : ''}.`, 6)
+  const { hopLe: qua, loai: loaiKhuon } = kiemCacEm(phanTuAi.map(({ tep, x }) => ({ tep, x: moRongPhanTuChieu(x) })), bang, the)
+  const loai = [...loaiKhuon]
+  const hopLe = []
+  for (const h of qua) {
+    if (h.boLoi.includes('thuThach')) loai.push({ biDanh: h.biDanh, tep: h.tep, lyDo: h.canhBao.filter((c) => c.startsWith('thuThach')).map((c) => c.replace(/^thuThach bị bỏ \(giữ núm\): /, '')) })
+    else if (!h.dauRa.thuThach || !h.dauRa.loiMoi) loai.push({ biDanh: h.biDanh, tep: h.tep, lyDo: ['thiếu thuThach hoặc loiMoi — lượt chiều chỉ có việc này'] })
+    else hopLe.push(h)
+  }
+  const tao = new Date(bayGio).toISOString()
+  const tomTat = { ngay, luc: tao, soPhanTu: phanTuAi.length, hopLe: hopLe.length, biLoai: loai.length, loai: loai.map((l) => ({ biDanh: l.biDanh, lyDo: l.lyDo })), loiTep }
+  if (xemTruoc) {
+    const tepMd = join(thuMuc, 'xem-truoc.md')
+    ghiChu(tepMd, soanXemTruoc({ ngay, hopLe, loai, tao }))
+    ghiJson(join(thuMuc, 'xem-truoc.json'), { ...tomTat, cacEm: hopLe.map((h) => ({ biDanh: h.biDanh, doTinCay: h.dauRa.doTinCay, thuThach: h.dauRa.thuThach, loiMoi: h.dauRa.loiMoi })) }, { dep: true })
+    return { ...tomTat, daNop: false, tepXemTruoc: `bo-nao/${ngay}/chieu/xem-truoc.md` }
+  }
+  const tepXem = join(thuMuc, 'xem-truoc.json')
+  if (!existsSync(tepXem)) throw new LoiBoNao('Chưa có bản xem trước: chạy trước `node scripts/bo-nao/nop.mjs --chieu --xem-truoc` rồi ĐỌC xem-truoc.md trước khi nộp.', 7)
+  const moiNhat = Math.max(0, ...readdirSync(thuMucRa).filter((f) => f.endsWith('.json')).map((f) => statSync(join(thuMucRa, f)).mtimeMs))
+  if (moiNhat > statSync(tepXem).mtimeMs) throw new LoiBoNao('Tệp trong ra/ đã đổi SAU bản xem trước — chạy lại --xem-truoc và đọc lại trước khi nộp.', 7)
+  if (hopLe.length === 0) throw new LoiBoNao('Không có em nào hợp lệ để nộp (xem lý do ở xem-truoc.md).', 6)
+  const dao = new Map(Object.entries(bang).map(([b, sbd]) => [String(sbd), b]))
+  let nhan = 0
+  let chiGhiSo = 0
+  let soApDung = 0
+  let biLoaiMayChu = 0
+  const loaiMayChu = []
+  for (const lo of chiaTep(hopLe, TOI_DA_MOI_LUOT_NOP)) {
+    const r = await goi('/ai/dieu-chinh/nop', { ngay, cacEm: lo.map(({ sbd, dauRa }) => { const { biDanh: _b, ...con } = dauRa; void _b; return { sbd, ...con } }) })
+    nhan += Number(r.nhan) || 0
+    chiGhiSo += Number(r.chiGhiSo) || 0
+    soApDung += Number(r.soApDung) || 0
+    biLoaiMayChu += Number(r.biLoai) || 0
+    for (const l of r.loai ?? []) loaiMayChu.push({ biDanh: dao.get(String(l.sbd)) ?? '?', lyDo: (l.lyDo ?? []).map((x) => giauSbd(x, dao)) })
+  }
+  const ketQua = { ...tomTat, luc: tao, nhan, chiGhiSo, soApDung, biLoaiMayChu, loai: [...tomTat.loai, ...loaiMayChu] }
+  ghiJson(join(thuMuc, 'nop-ket-qua.json'), ketQua, { dep: true })
+  return { ...ketQua, daNop: true }
+}
+
+export function dongTomTatChieu(kq) {
+  const d = kq.daNop
+    ? [`Nộp xong LƯỢT CHIỀU ${kq.ngay}: nhận ${kq.nhan}/${kq.hopLe} em (áp dụng ngay ${kq.soApDung} · chỉ ghi sổ ${kq.chiGhiSo}) · loại ${kq.biLoai + kq.biLoaiMayChu} em.`]
+    : [`Xem trước LƯỢT CHIỀU ${kq.ngay}: ${kq.hopLe} em hợp lệ · loại ${kq.biLoai} em — CHƯA NỘP. Đọc ${kq.tepXemTruoc} rồi nộp bằng: bash scripts/bo-nao/chay-chieu.sh --nop ${kq.ngay}`]
+  for (const l of kq.loai.slice(0, SO_DONG_LOI_IN_TOI_DA)) d.push(`  Loại ${l.biDanh}: ${l.lyDo.join('; ').slice(0, 220)}`)
+  if (kq.loai.length > SO_DONG_LOI_IN_TOI_DA) d.push(`  … và ${kq.loai.length - SO_DONG_LOI_IN_TOI_DA} em nữa (xem xem-truoc.md).`)
+  for (const l of kq.loiTep) d.push(`  Tệp: ${l}`)
+  return d
+}
+
 export function dongTomTat(kq) {
   const d = [
     `Nộp xong ngày ${kq.ngay}: nhận ${kq.nhan}/${kq.soPhanTu} phần tử (áp dụng ngay ${kq.soApDung} · chỉ ghi sổ ${kq.chiGhiSo}; ${kq.tuDong ?? 0} lời mời vắng do thuật toán soạn) · loại ${kq.biLoaiCucBo + kq.biLoaiMayChu} · cảnh báo ${kq.canhBao.length} · bản tin ${kq.banTin.nhan} dòng.`,
@@ -236,11 +348,24 @@ export function dongTomTat(kq) {
 }
 
 async function main() {
-  const doi = process.argv[2]
+  const args = process.argv.slice(2)
+  const chieu = args.includes('--chieu')
+  const xemTruoc = args.includes('--xem-truoc')
+  if (xemTruoc && !chieu) throw new LoiBoNao('--xem-truoc chỉ dùng cùng --chieu.', 1)
+  const doi = args.find((a) => !a.startsWith('--'))
   if (doi && !laNgay(doi)) throw new LoiBoNao(`Ngày phải có dạng YYYY-MM-DD (nhận "${String(doi).slice(0, 20)}").`, 1)
   const ngay = doi || homNayVn()
+  if (chieu && xemTruoc) {
+    // xem trước KHÔNG gọi máy chủ ⇒ không cần (và không đọc) mã bí mật
+    for (const d of dongTomTatChieu(await chayNopChieu({ ngay, xemTruoc: true }))) console.log(d)
+    return
+  }
   const { ma, canhBao } = docMaBiMat()
   if (canhBao) console.log(canhBao)
+  if (chieu) {
+    for (const d of dongTomTatChieu(await chayNopChieu({ ngay, goi: taoGoiMayChu({ ma }) }))) console.log(d)
+    return
+  }
   const kq = await chayNop({ ngay, goi: taoGoiMayChu({ ma }) })
   for (const d of dongTomTat(kq)) console.log(d)
 }
