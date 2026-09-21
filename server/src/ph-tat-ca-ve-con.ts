@@ -2,6 +2,7 @@
 // ĐỌC-CHỈ, không AI, ≤ 12 truy vấn D1 cho phần dữ liệu + 3 cho `doCham` (hangChamCuaEm dùng chung với lệnh thi đua) + 5 cho `no` của con (`docVeDichCuaEm`, W3b Dồn về đích) = ≤ 20 tổng (kể cả xác thực; đo trong test). KHÔNG trường nào của game (không thần thú, EXP, khiên, chuỗi game, đoàn, đảo, võ đài), không xếp hạng, không so với bạn.
 // Khối nào không có số thật thì VẮNG (không số 0 giả, không mảng bịa).
 //
+// TRƯỜNG MỚI CHO BẢNG KIỂU APPLE (thầy chốt 21/09 16:16): xem docs/ph-tat-ca-ve-con-truong-apple-2109.md (mucTieu, viecXong/viecTong, soLanHoc, dieuDangMung, aiDaLam/aiDaChuanBi, cau[].lan/lamLau, chang[], nopTreGio, lichOn.bayNgayToi…).
 // MỐC HIỂN THỊ (thầy chốt 21/09 15:56, `moc-no.ts`): mọi CON SỐ hiển thị (nhịp học, dạng vấp/làm tốt, tổng quan hôm nay, chuỗi học đều, so với hôm qua, tiến bộ bậc, "đã khắc phục x trong y") chỉ tính từ sự kiện `luc ≥ mốc`
 // (`cau_hinh.hien_thi_tu` ⇒ … ⇒ hằng 12:00 trưa 21/09). Sổ TRƯỚC mốc chỉ để THUẬT TOÁN dùng: bậc dạng hiện tại (`bacTheoDang`), lịch ôn (`lichOn.homNay/ngayMai`), câu từng sai trước hôm nay. "Vừa lên bậc / tiến bộ bậc" = bậc
 // so với TRẠNG THÁI TẠI MỐC (lên bậc trước mốc không hiện). NGOẠI LỆ: `caGanNhat` + `tienBo.diem` (ca kiểm tra đã công bố) vẫn lấy cả ca trước mốc. Khối vì thế thiếu dữ liệu ⇒ VẮNG.
@@ -52,7 +53,11 @@ export const SO_NGAY_VUA_LEN_BAC = 3
 export const PHIEN_CACH_TOI_DA_PHUT = 10
 export const TOI_DA_CAU_HOM_NAY = 120
 export const DE_RUT_GON_TOI_DA = 160
-export const TOI_DA_TRUY_VAN = 12
+export const TOI_DA_TRUY_VAN = 13 // 12 + 1 truy vấn gộp thử thách riêng + lần nhắc hạn (bảng kiểu Apple, 21/09)
+/** Câu làm từ chừng này giây trở lên là "làm lâu" (bộ lọc "Làm lâu" ở bảng phụ huynh; máy khách không phải chép ngưỡng). */
+export const NGUONG_LAM_LAU_GIAY = 120
+export const SO_NGAY_LICH_ON_TOI = 7
+export const CHU_THU = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'] as const
 /** Ngân sách câu/ngày mặc định của kế hoạch ngày (docs/ke-hoach-ngay-api-1909.md: mucTieuCau 8) — chỉ để tính TRẦN ôn khi con chưa có kế hoạch hôm nay. */
 export const MUC_TIEU_CAU_MAC_DINH = 8
 const MOI_GIAY_MAC_DINH = 90
@@ -187,6 +192,25 @@ function gomPhien(homNayEv: readonly Sk[]): Phien[] {
   return ra.sort((a, b) => (Date.parse(a.ev[0]!.luc) || 0) - (Date.parse(b.ev[0]!.luc) || 0) || (a.key < b.key ? -1 : 1))
 }
 
+// ------------------------------------------------------------------ chặng của bài tập về nhà nâng đỡ ------------------------------------------------------------------
+/**
+ * Các chấm chặng của MỘT bài (lịch mở đã lưu ở `btvn_em.chang_mo_json`, Code 3): `[{ thu, ngay, trangThai }]`, `thu` = thứ của NGÀY MỞ (giờ VN), `trangThai`: `xong` (đã xong chặng thứ i) | `hom_nay` (chưa xong, ĐÃ MỞ)
+ * | `sap_toi` (chưa mở). Lịch thiếu / hỏng / số chặng lệch `soChang` ⇒ `null` (vắng — máy khách vẫn có `changXong/changTong`). Không có `soDung/soCau/nopLuc` từng chặng (sổ không tách theo chặng một cách chắc chắn).
+ */
+export function lichChangCuaEm(chuoiLich: unknown, soChang: number, loDaXong: number, nowMs: number): { thu: string; ngay: string; trangThai: 'xong' | 'hom_nay' | 'sap_toi' }[] | null {
+  if (soChang <= 0) return null
+  const lich = parse<{ chang?: { moLuc?: unknown }[] }>(chuoiLich, {})
+  if (!Array.isArray(lich.chang) || lich.chang.length !== soChang) return null
+  const ra: { thu: string; ngay: string; trangThai: 'xong' | 'hom_nay' | 'sap_toi' }[] = []
+  for (let i = 0; i < soChang; i++) {
+    const ms = Date.parse(chuoi(lich.chang[i]?.moLuc))
+    if (!Number.isFinite(ms)) return null
+    const ngay = ngayVn(ms)
+    ra.push({ thu: CHU_THU[new Date(`${ngay}T00:00:00Z`).getUTCDay()]!, ngay, trangThai: i < loDaXong ? 'xong' : ms <= nowMs ? 'hom_nay' : 'sap_toi' })
+  }
+  return ra
+}
+
 // ------------------------------------------------------------------ TRUY VẤN GỘP ------------------------------------------------------------------
 interface PhanHoSo { bang: string; batBuoc: boolean; sql: string; bind: (sbd: string, homNay: string) => unknown[] }
 const PHAN_HO_SO: PhanHoSo[] = [
@@ -210,22 +234,22 @@ async function docHoSo(hoi: ReturnType<typeof boHoi>['hoi'], sbd: string, homNay
   }
 }
 
-function sqlBtvn(nangDo: boolean, coMom: boolean): string {
+function sqlBtvn(nangDo: boolean, coMom: boolean, coLich: boolean): string {
   const cotNangDo = nangDo
-    ? 'be.so_chang, COALESCE(be.lo_da_xong, 0) AS lo_da_xong, be.so_cau_em, COALESCE(b.ca_nhan, 0) AS ca_nhan'
-    : 'NULL AS so_chang, COALESCE(be.lo_da_xong, 0) AS lo_da_xong, NULL AS so_cau_em, 0 AS ca_nhan'
-  const bt = `SELECT 'bt' AS k, x.ma_btvn AS c1, x.nop_luc AS c2, x.so_dung AS c3, x.em_so_cau AS c4, x.han_nop AS c5, x.giao_luc AS c6, x.so_cau_bai AS c7, x.ten AS c8, x.so_chang AS c9, x.lo_da_xong AS c10, x.so_cau_em AS c11, x.ca_nhan AS c12
+    ? `be.so_chang, COALESCE(be.lo_da_xong, 0) AS lo_da_xong, be.so_cau_em, COALESCE(b.ca_nhan, 0) AS ca_nhan, ${coLich ? 'be.chang_mo_json' : 'NULL'} AS chang_mo`
+    : 'NULL AS so_chang, COALESCE(be.lo_da_xong, 0) AS lo_da_xong, NULL AS so_cau_em, 0 AS ca_nhan, NULL AS chang_mo'
+  const bt = `SELECT 'bt' AS k, x.ma_btvn AS c1, x.nop_luc AS c2, x.so_dung AS c3, x.em_so_cau AS c4, x.han_nop AS c5, x.giao_luc AS c6, x.so_cau_bai AS c7, x.ten AS c8, x.so_chang AS c9, x.lo_da_xong AS c10, x.so_cau_em AS c11, x.ca_nhan AS c12, x.chang_mo AS c13
     FROM (SELECT be.ma_btvn, be.nop_luc, be.so_dung, be.so_cau AS em_so_cau, b.han_nop, b.giao_luc, b.so_cau AS so_cau_bai, COALESCE(NULLIF(TRIM(c.ten_ca), ''), NULLIF(TRIM(d.ten_de), ''), '') AS ten, ${cotNangDo}
             FROM btvn_em be JOIN btvn b ON b.ma_btvn = be.ma_btvn LEFT JOIN ca c ON c.ma_ca = b.ma_ca LEFT JOIN de_kho d ON d.ma_de = b.ma_de
            WHERE be.sbd = ? AND be.thu_hoi = 0 AND b.da_xoa = 0 ORDER BY b.giao_luc DESC LIMIT 200) x`
-  const mom = " UNION ALL SELECT 'mom', id, submitted_at, title, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM mom_bai WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))"
+  const mom = " UNION ALL SELECT 'mom', id, submitted_at, title, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM mom_bai WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))"
   return coMom ? bt + mom : bt
 }
 
 /** BTVN + gói mom (gộp một truy vấn). Thiếu cột nâng đỡ ⇒ lùi; thiếu bảng mom ⇒ bỏ nhánh mom; thiếu bảng BTVN ⇒ `null`. */
 async function docBtvnVaMom(hoi: ReturnType<typeof boHoi>['hoi'], sbd: string, dsMom: string[]): Promise<Row[] | null> {
-  for (const [nangDo, coMom] of [[true, true], [false, true], [true, false], [false, false]] as const) {
-    const r = await hoi(sqlBtvn(nangDo, coMom), sbd, ...(coMom ? [sbd, json(dsMom)] : []))
+  for (const [nangDo, coMom, coLich] of [[true, true, true], [true, true, false], [false, true, false], [true, false, true], [true, false, false], [false, false, false]] as const) {
+    const r = await hoi(sqlBtvn(nangDo, coMom, coLich), sbd, ...(coMom ? [sbd, json(dsMom)] : []))
     if (r !== null) return r
   }
   return null
@@ -290,6 +314,19 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
 
   // 5 · BTVN + gói gia đình giao (nộp hay chưa; bài đang chạy; bài đã nộp)
   const rBt = await docBtvnVaMom(hoi, sbd, [...new Set(skTho.filter((e) => e.nguon === 'mom').map((e) => e.maNguon))])
+  // A.I đã làm gì cho con hôm nay (số THẬT, từ mốc): thử thách riêng đã soạn + lần nhắc nộp đã gửi cho phụ huynh — MỘT truy vấn gộp; thiếu bảng ⇒ từng phần một, phần nào thiếu thì bỏ dòng ấy.
+  const aiTho = { thuThach: null as { so: number; luc: string } | null, nhac: null as { so: number; luc: string } | null }
+  {
+    const tt = "SELECT 'tt' AS k, so_cau AS a, tao_luc AS b FROM thu_thach_rieng WHERE sbd = ? AND ngay = ? AND tao_luc >= ?"
+    const nh = "SELECT 'nh' AS k, COUNT(*) AS a, MAX(gui_luc) AS b FROM canh_bao_thay WHERE sbd = ? AND ngay = ? AND gui_ph = 1 AND gui_luc >= ?"
+    const bind = [sbd, homNay, moc.iso]
+    let r = await hoi(`${tt} UNION ALL ${nh}`, ...bind, ...bind)
+    if (r === null) r = [...((await hoi(tt, ...bind)) ?? []), ...((await hoi(nh, ...bind)) ?? [])]
+    for (const x of r) {
+      if (x.k === 'tt' && so(x.a) > 0) aiTho.thuThach = { so: so(x.a), luc: chuoi(x.b) }
+      else if (x.k === 'nh' && so(x.a) > 0) aiTho.nhac = { so: so(x.a), luc: chuoi(x.b) }
+    }
+  }
   const btvnDaNop = new Map<string, boolean>()
   const momDaNop = new Map<string, boolean>()
   const tenPhien = new Map<string, string>() // `${nguon}|${maNguon}` → tên bài
@@ -368,7 +405,8 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   const ngayCoHoc = [...theoNgay.keys()].sort().map((ngay) => ({ ngay, ...theoNgay.get(ngay)! }))
   if (ngayCoHoc.length > 0) {
     const gio = gioThuongHoc(chamTrong14.map((e) => e.luc))
-    ra.nhipHoc = { ngay: ngayCoHoc, ...(gio ? { gioThuongHoc: gio } : {}) }
+    const tongCauNhip = ngayCoHoc.reduce((t, x) => t + x.soCau, 0)
+    ra.nhipHoc = { ngay: ngayCoHoc, tongCau: tongCauNhip, trungBinhCauMoiNgay: tron(tongCauNhip / ngayCoHoc.length, 1), ...(gio ? { gioThuongHoc: gio } : {}) } // trung bình trên các NGÀY CÓ HỌC (khớp danh sách `ngay`)
   }
 
   const demTheoDang = (nguon: readonly SuKienDoc[]): Map<string, { dung: number; tong: number; luot: number }> => { // 14 ngày, theo mã dạng
@@ -427,6 +465,16 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   }).sort((a, c) => (a.ngay < c.ngay ? 1 : a.ngay > c.ngay ? -1 : a.ma < c.ma ? -1 : 1))
   const lenBacHomNayTho = cacDangCoBac.filter((ma) => bacDau(bacNay, ma) > bacDau(bacHomQua, ma)).sort()
 
+  // kế hoạch ngày HÔM NAY của con (hàng đã đọc trong truy vấn gộp) + ngân sách; giây/câu trung vị (THUẬT TOÁN đọc cả sổ 14 ngày, không phải con số hiển thị)
+  const keHoachHomNay = kh ? parse<{ viec?: unknown }>(kh.b, {}).viec : undefined
+  const mucTieuCau = Math.max(0, Math.round(so(kh ? parse<Row>(kh.a, {}).mucTieuCau : 0)))
+  const tranOn = Math.floor((mucTieuCau || MUC_TIEU_CAU_MAC_DINH) * TRAN_ON_KHI_KHONG_NO)
+  const onTrongKeHoach = Array.isArray(keHoachHomNay)
+    ? keHoachHomNay.reduce((t: number, v: Row) => t + (chuoi(v?.loai) === 'on_lai' ? Math.max(0, Math.round(so(v.soCau))) : 0), 0)
+    : null
+  const giayMau = skRo.filter((e) => e.ngayVn >= dau14 && e.giay !== null && e.giay >= 5 && e.giay <= 1200).map((e) => e.giay as number).sort((a, c) => a - c)
+  const giayMoiCau = giayMau.length >= 5 ? giayMau[Math.floor(giayMau.length / 2)]! : MOI_GIAY_MAC_DINH
+
   // ── homNay: câu (≤ 120, mới nhất trước), dòng thời gian, tổng quan ─────────────────────────────────────────────────────
   const homNayEv = skTho.filter((e) => e.ngayVn === homNay && tuMoc(e) && nhanNguon(e.nguon) !== null)
   const cauMoiNhat = [...homNayEv].sort((a, c) => (Date.parse(c.luc) || 0) - (Date.parse(a.luc) || 0) || (a.khoa < c.khoa ? 1 : -1)).slice(0, TOI_DA_CAU_HOM_NAY)
@@ -452,11 +500,15 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   }
   const chiTietCua = (e: Sk): Row | undefined => rCt.find((x) => chuoi(x.ma_ca) === e.maNguon && so(x.lan_thu) === e.lan && chuoi(x.qid) === e.qid)
 
+  const cacPhien = gomPhien(homNayEv)
+  const lanCua = new Map<string, number>() // khoá sự kiện → chỉ số lần ngồi học (= vị trí trong dongThoiGian[]), để máy khách nhóm câu theo phiên
+  cacPhien.forEach((p, i) => { for (const e of p.ev) lanCua.set(e.khoa, i) })
+  const lamLauCua = (e: Sk): { lamLau?: boolean } => (e.giay && e.giay > 0 ? { lamLau: e.giay >= NGUONG_LAM_LAU_GIAY } : {})
   const cau: Row[] = []
   for (const e of cauMoiNhat) {
     const nguon = nhanNguon(e.nguon)!
     if (e.che !== null) {
-      cau.push({ luc: e.luc, nguon, che: e.che, ...(e.giay && e.giay > 0 ? { giay: e.giay } : {}) })
+      cau.push({ luc: e.luc, nguon, che: e.che, ...(e.giay && e.giay > 0 ? { giay: e.giay } : {}), ...lamLauCua(e), lan: lanCua.get(e.khoa) ?? 0 })
       continue
     }
     const q = kho.get(e.qid)
@@ -470,12 +522,12 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
       // `qid` CHỈ ở câu KHÔNG bị che (để màn gọi /ph/chi-tiet-cau-ve-con); câu bị che ở trên không bao giờ có mã câu.
       luc: e.luc, nguon, qid: e.qid, ...(tenDang ? { tenDang } : {}), deRutGon: deRutGon(q.text),
       ...(conChon ? { conChon } : {}), ...(dapAn ? { dapAn } : {}), ...(e.ketQua !== null ? { dung: e.ketQua === 1 } : {}),
-      ...(e.giay && e.giay > 0 ? { giay: e.giay } : {}), coLoiGiai: chuoi(typeof q.solution === 'string' ? q.solution : q.solution ? json(q.solution) : '') !== '',
+      ...(e.giay && e.giay > 0 ? { giay: e.giay } : {}), ...lamLauCua(e), lan: lanCua.get(e.khoa) ?? 0, coLoiGiai: chuoi(typeof q.solution === 'string' ? q.solution : q.solution ? json(q.solution) : '') !== '',
     })
   }
 
   const dongThoiGian: Row[] = []
-  for (const p of gomPhien(homNayEv)) {
+  for (const p of cacPhien) {
     const dau = p.ev[0]!
     const nguon = nhanNguon(dau.nguon)!
     const che = dau.che
@@ -493,7 +545,7 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
       if (Number.isFinite(nop) && Number.isFinite(han) && ngayVn(nop) === homNay) ghiChu = nop <= han ? 'Nộp đúng hạn' : 'Nộp sau hạn'
     }
     dongThoiGian.push({
-      batDau: dau.luc, nguon, ...(tenBai ? { ten: tenBai } : {}), ...(che === null ? { soCau: khacNhau.size, soDung: dung.size } : { che }),
+      batDau: dau.luc, nguon, ...(tenBai ? { ten: tenBai } : {}), ...(che === null ? { soCau: khacNhau.size, soDung: dung.size } : { che, soCauDaLam: khacNhau.size }),
       phut, ...(ghiChu ? { ghiChu } : {}),
     })
   }
@@ -505,13 +557,33 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   const tongQuan: Row = {}
   if (soCauHomNay > 0) { tongQuan.soCau = soCauHomNay; tongQuan.soDung = soDungHomNay }
   if (giayHomNay > 0) tongQuan.phutHoc = Math.round(giayHomNay / 60)
-  if (soCauHomNay > 0 && kh && so(kh.c) !== 1) {
-    const truocHomNay = new Map<string, { sai: boolean }>() // CẢ sổ cũ: câu từng sai TRƯỚC hôm nay (thuật toán); con số `lenBac` vẫn chỉ đếm câu làm đúng hôm nay TỪ MỐC (rHomNay)
+  // Câu từng sai TRƯỚC hôm nay (CẢ sổ cũ = thuật toán) nay làm đúng — con số chỉ đếm câu làm hôm nay TỪ MỐC (rHomNay)
+  let lenBacDem = 0
+  if (soCauHomNay > 0) {
+    const truocHomNay = new Map<string, { sai: boolean }>()
     for (const e of skRo) if (e.ngayVn < homNay) { const c = truocHomNay.get(e.qid) ?? { sai: false }; if (e.ketQua !== 1) c.sai = true; truocHomNay.set(e.qid, c) }
-    const lenBac = new Set(rHomNay.filter((e) => e.ketQua === 1 && truocHomNay.get(e.qid)?.sai === true).map((e) => e.qid)).size
+    lenBacDem = new Set(rHomNay.filter((e) => e.ketQua === 1 && truocHomNay.get(e.qid)?.sai === true).map((e) => e.qid)).size
+  }
+  if (soCauHomNay > 0 && kh && so(kh.c) !== 1) {
     const ngan = parse<Row>(kh.a, {})
     const viec = parse<{ tienBo?: { soCauToiHan?: unknown; treNhip?: unknown } }>(kh.b, {})
-    tongQuan.datNhiemVu = laDatNgay({ daLam: soCauHomNay, lenBac, toiThieu: Number(ngan.toiThieuCau) || 4, treNhip: viec.tienBo?.treNhip === true, soCauToiHan: Number(viec.tienBo?.soCauToiHan) || 0, ngayVn: homNay, soCauDungHomNay: soDungHomNay })
+    tongQuan.datNhiemVu = laDatNgay({ daLam: soCauHomNay, lenBac: lenBacDem, toiThieu: Number(ngan.toiThieuCau) || 4, treNhip: viec.tienBo?.treNhip === true, soCauToiHan: Number(viec.tienBo?.soCauToiHan) || 0, ngayVn: homNay, soCauDungHomNay: soDungHomNay })
+  }
+  // mục tiêu ngày để vẽ vòng: câu = `mucTieuCau` của kế hoạch ngày; phút = ước theo tốc độ CỦA CON (cùng hàm với "Nhắc con làm … khoảng N phút"); không có kế hoạch ⇒ vắng
+  if (mucTieuCau > 0) tongQuan.mucTieu = { cau: mucTieuCau, phut: phutUocTinhChang(mucTieuCau, giayMoiCau) }
+  if (dongThoiGian.length > 0) {
+    tongQuan.soLanHoc = dongThoiGian.length
+    tongQuan.lanDaiNhatPhut = Math.max(...dongThoiGian.map((x) => so(x.phut)))
+  }
+  // việc của kế hoạch ngày: "còn lại" = việc BẮT BUỘC/NÊN LÀM còn trong kế hoạch lưu (không tính việc tự chọn: nhãn tuy_chon, lượt luyện dạng than_thu);
+  // "xong" = việc ĐO ĐƯỢC từ sổ hôm nay (từ mốc): ôn lại (đã ngồi ôn và kế hoạch không còn việc ôn), bài về nhà đã nộp hôm nay, bài gia đình giao đã nộp hôm nay. Không có kế hoạch ⇒ vắng cả hai.
+  if (Array.isArray(keHoachHomNay)) {
+    const conLai = keHoachHomNay.filter((v: Row) => chuoi(v?.loai) !== 'than_thu' && chuoi(v?.nhan) !== 'tuy_chon')
+    const onXong = homNayEv.some((e) => e.nguon === 'on_lai') && !conLai.some((v: Row) => chuoi(v?.loai) === 'on_lai') ? 1 : 0
+    const nopHomNay = (rBt ?? []).filter((x) => (x.k === 'bt' || x.k === 'mom') && chuoi(x.c2) !== '' && ngayVn(chuoi(x.c2)) === homNay && Date.parse(chuoi(x.c2)) >= moc.ms).length
+    const viecXong = onXong + nopHomNay
+    tongQuan.viecXong = viecXong
+    tongQuan.viecTong = conLai.length + viecXong
   }
   if (skHt.some((e) => e.ketQua !== null)) {
     const ngayCoHocSet = new Set(skHt.filter((e) => e.ketQua !== null && nhanNguon(e.nguon) !== null).map((e) => e.ngayVn))
@@ -524,7 +596,8 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   if (quaHomQua.length > 0) {
     const sc = new Set(quaHomQua.map((e) => e.qid)).size
     const sd = new Set(quaHomQua.filter((e) => e.ketQua === 1).map((e) => e.qid)).size
-    tongQuan.soVoiHomQua = { soCau: sc, tiLeDung: tron(sd / sc, 3) }
+    const giayQua = skTho.filter((e) => e.ngayVn === homQua && tuMoc(e) && nhanNguon(e.nguon) !== null).reduce((t, e) => t + (e.giay && e.giay > 0 ? e.giay : 0), 0)
+    tongQuan.soVoiHomQua = { soCau: sc, tiLeDung: tron(sd / sc, 3), ...(giayQua > 0 ? { phutHoc: Math.round(giayQua / 60) } : {}) }
   }
   const homNayKhoi: Row = {}
   if (Object.keys(tongQuan).length > 0) homNayKhoi.tongQuan = tongQuan
@@ -559,7 +632,8 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
     .sort((a, c) => Date.parse(chuoi(a.c5)) - Date.parse(chuoi(c.c5)) || (chuoi(a.c1) < chuoi(c.c1) ? -1 : 1)).slice(0, TOI_DA_BAI_DANG_CHAY)
     .map((x) => {
       const chang = so(x.c9)
-      return { maBtvn: chuoi(x.c1), ten: tenBtvn(x), hanNop: chuoi(x.c5), ...(chang > 0 ? { changXong: Math.min(chang, so(x.c10)), changTong: chang } : {}) }
+      const dsChang = lichChangCuaEm(x.c13, chang, so(x.c10), nowMs)
+      return { maBtvn: chuoi(x.c1), ten: tenBtvn(x), hanNop: chuoi(x.c5), ...(chang > 0 ? { changXong: Math.min(chang, so(x.c10)), changTong: chang } : {}), ...(dsChang ? { chang: dsChang } : {}) }
     })
   const ganNop = baiTho.filter((x) => chuoi(x.c2) !== '' && baiTuNgayMoc(x.c6, moc.ngayVn)).sort((a, c) => (chuoi(a.c2) < chuoi(c.c2) ? 1 : chuoi(a.c2) > chuoi(c.c2) ? -1 : 0)).slice(0, TOI_DA_BAI_GAN)
     .map((x) => {
@@ -570,17 +644,13 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
       const han = Date.parse(chuoi(x.c5))
       return {
         maBtvn: chuoi(x.c1), ten: tenBtvn(x), nopLuc: chuoi(x.c2), ...(Number.isFinite(nop) && Number.isFinite(han) ? { dungHan: nop <= han } : {}),
+        ...(Number.isFinite(nop) && Number.isFinite(han) && nop > han ? { nopTreGio: tron((nop - han) / 3_600_000, 1) } : {}),
         ...(soDung !== null && soCau > 0 ? { diem: Math.round((soDung / soCau) * 1000) / 100 } : {}),
       }
     })
   if (dangChay.length > 0 || ganNop.length > 0) ra.baiTapVeNha = { ...(dangChay.length > 0 ? { dangChay } : {}), ...(ganNop.length > 0 ? { gan: ganNop } : {}) }
 
   // ── lịch ôn (chỉ khi con có hồ sơ nắm kiến thức) ───────────────────────────────────────────────────────────────────────
-  const keHoachHomNay = kh ? parse<{ viec?: unknown }>(kh.b, {}).viec : undefined
-  const onTrongKeHoach = Array.isArray(keHoachHomNay)
-    ? keHoachHomNay.reduce((t: number, v: Row) => t + (chuoi(v?.loai) === 'on_lai' ? Math.max(0, Math.round(so(v.soCau))) : 0), 0)
-    : null
-  const tranOn = Math.floor((so(kh ? parse<Row>(kh.a, {}).mucTieuCau : 0) || MUC_TIEU_CAU_MAC_DINH) * TRAN_ON_KHI_KHONG_NO)
   let lichOn: { homNay: number; ngayMai: number; daKhacPhuc14Ngay: number; conSaiChuaKhacPhuc: number } | null = null
   if (coSo) {
     const cauHs = phatLaiSuKien(skRo, traCuu).cau
@@ -595,12 +665,16 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
       conSaiChuaKhacPhuc: cauHs.filter((c) => (c.trangThai === 'moi_sai' || c.trangThai === 'dang_on') && chamTuMoc.has(c.qid)).length,
     }
     ra.lichOn = lichOn
+    Object.assign(lichOn, {
+      tongTungSai: lichOn.daKhacPhuc14Ngay + lichOn.conSaiChuaKhacPhuc,
+      // số câu đến lịch của từng ngày trong 7 ngày tới (ngày mai … +7), mỗi ngày kẹp bằng trần ôn của ngày (không hiện tồn đọng cũ)
+      bayNgayToi: Array.from({ length: SO_NGAY_LICH_ON_TOI }, (_, i) => { const ngay = themNgay(homNay, i + 1); return { ngay, soCau: Math.min(denHan.filter((c) => c.mocOnKe === ngay).length, tranOn) } }),
+      ...(lichOn.ngayMai > 0 ? { phutNgayMai: phutUocTinhChang(lichOn.ngayMai, giayMoiCau) } : {}),
+    })
   }
 
   // ── lời cho phụ huynh: mẫu có số thật, xưng "con" ───────────────────────────────────────────────────────────────────────
   if (lichOn) {
-    const giay = skRo.filter((e) => e.ngayVn >= dau14 && e.giay !== null && e.giay >= 5 && e.giay <= 1200).map((e) => e.giay as number).sort((a, c) => a - c)
-    const giayMoiCau = giay.length >= 5 ? giay[Math.floor(giay.length / 2)]! : MOI_GIAY_MAC_DINH
     const cau1: string[] = []
     if (lichOn.homNay > 0) cau1.push(`Nhắc con làm ${lichOn.homNay} câu ôn lại hôm nay, khoảng ${phutUocTinhChang(lichOn.homNay, giayMoiCau)} phút.`)
     if (lichOn.ngayMai > 0) cau1.push(`Nhắc con làm ${lichOn.ngayMai} câu ôn lại vào ngày mai, khoảng ${phutUocTinhChang(lichOn.ngayMai, giayMoiCau)} phút.`)
@@ -623,6 +697,30 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   // Chỉ hai con số hạng + sĩ số — không tên bạn nào, không thần thú. Con chưa học hôm nay / chưa xác định được lớp / đọc lỗi ⇒ VẮNG (không hạng bịa).
   const doCham = await hangChamCuaEm(env, sbd, nowMs, moc)
   if (doCham) ra.doCham = { hang: doCham.hang, siSo: doCham.siSo }
+
+  // ── điều đáng mừng · A.I đã làm / đã chuẩn bị (CHỈ sự thật ĐO ĐƯỢC từ mốc; không có gì ⇒ mảng rỗng / vắng, KHÔNG bịa) ────────────────────────────────
+  const dieuDangMung: Row[] = []
+  if (lenBacDem > 0) dieuDangMung.push({ loai: 'dung_lai', so: lenBacDem }) // câu từng sai nay đúng lại
+  if (lenBacHomNay.length > 0) dieuDangMung.push({ loai: 'len_bac', so: lenBacHomNay.length, chiTiet: lenBacHomNay.slice(0, 3).map((x) => x.tenDang) })
+  if (so(tongQuan.chuoiNgayHoc) >= 2) dieuDangMung.push({ loai: 'chuoi', so: so(tongQuan.chuoiNgayHoc) }) // học đều nhiều ngày liền (từ ngày mốc)
+  const aiChung: Row[] = []
+  if (Array.isArray(keHoachHomNay)) {
+    const chon: Record<string, number> = {}
+    for (const v of keHoachHomNay as Row[]) { const l = chuoi(v?.loai); if (['on_lai', 'than_thu', 'on_thi', 'btvn_lo'].includes(l)) chon[l] = (chon[l] ?? 0) + Math.max(0, Math.round(so(v.soCau))) }
+    const tongChon = Object.values(chon).reduce((t, x) => t + x, 0)
+    if (tongChon > 0) aiChung.push({ loai: 'chon_rieng', so: tongChon, chiTiet: chon })
+  }
+  if (lichOn && lichOn.ngayMai > 0) aiChung.push({ loai: 'xep_on', so: lichOn.ngayMai })
+  if (aiTho.thuThach) aiChung.push({ loai: 'soan_thu_thach', so: aiTho.thuThach.so, luc: aiTho.thuThach.luc })
+  if (aiTho.nhac) aiChung.push({ loai: 'nhac_han', so: aiTho.nhac.so, luc: aiTho.nhac.luc })
+  const daHocHomNay = homNayEv.length > 0
+  const homNayCuoi: Row = (ra.homNay as Row | undefined) ?? {}
+  if (daHocHomNay) {
+    homNayCuoi.dieuDangMung = dieuDangMung // tối đa 3 loại theo cách dựng (dung_lai, len_bac, chuoi)
+    const aiDaLam = [...aiChung, ...(soCauHomNay > 0 ? [{ loai: 'cham', so: soCauHomNay }] : [])] // tối đa 5 loại theo cách dựng
+    if (aiDaLam.length > 0) homNayCuoi.aiDaLam = aiDaLam
+  } else if (aiChung.length > 0) homNayCuoi.aiDaChuanBi = aiChung // cảnh "hôm nay con chưa học"
+  if (Object.keys(homNayCuoi).length > 0) ra.homNay = homNayCuoi
 
   // ── `no` (Dồn về đích, thầy chốt 21/09): { theoNgay:[{ngay, loai, ten, soCau, phut}], tongCau, tongPhut } — nối `docVeDichCuaEm` (ve-dich-d1.ts, Code 4 soạn; Code 3 nối W3). CHỈ khi có nợ; không nợ / lỗi ⇒ vắng khoá (khối thiếu ⇒ vắng, không bịa).
   try {

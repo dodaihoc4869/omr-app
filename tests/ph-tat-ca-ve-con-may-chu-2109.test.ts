@@ -9,7 +9,7 @@ import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { docCauHinhTangDoc } from '../server/src/bo-nao-doc'
 import { chuGameTrong } from '../server/src/chu-game'
 import {
-  CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
+  CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, NGUONG_LAM_LAU_GIAY, lichChangCuaEm, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
   DANG_VAP_TI_LE_DUNG_TOI_DA, DANG_VAP_TOI_THIEU_LUOT, PHIEN_CACH_TOI_DA_PHUT, TOI_DA_CAU_HOM_NAY, TOI_THIEU_LUOT_GIO_THUONG_HOC,
 } from '../server/src/ph-tat-ca-ve-con'
 import type { Env } from '../server/src/kieu'
@@ -20,6 +20,7 @@ const T = (s: string): number => Date.parse(`${s}+07:00`)
 const NGAY = '2026-09-22'
 const NOW = T(`${NGAY}T20:30:00`)
 const themNgay = (ngay: string, n: number): string => new Date(Date.parse(`${ngay}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10)
+const iso2 = (ngay: string, gio: string): string => vn(ngay, gio) // ISO của giờ VN `gio` ngày `ngay`
 const vn = (ngay: string, gio: string): string => new Date(T(`${ngay}T${gio}:00`)).toISOString()
 
 // ------------------------------------------------------------------ dựng dữ liệu ------------------------------------------------------------------
@@ -283,7 +284,7 @@ describe('đủ khối khi có số thật', () => {
     for (const c of r.phuHuynhLamGi) { expect(c).toMatch(/^Nhắc con làm \d+ câu ôn lại .*, khoảng \d+ phút\.$/); expect(c).not.toMatch(/\bem\b/) }
   })
 
-  it('≤ 12 truy vấn D1 (kể cả xác thực); KHÔNG ghi ngoài dòng đếm truy cập của hàm xác thực; bảng dữ liệu không đổi một byte', async () => {
+  it('≤ 13 truy vấn D1 cho phần dữ liệu (kể cả xác thực); KHÔNG ghi ngoài dòng đếm truy cập của hàm xác thực; bảng dữ liệu không đổi một byte', async () => {
     const { d, pass } = await dungDayDu()
     const truoc = BANG_DOI_CHIEU.map((b) => d.chup(b))
     const { env, log } = ghi(d)
@@ -294,8 +295,8 @@ describe('đủ khối khi có số thật', () => {
     // Sửa CÓ CHỦ Ý 21/09 (W3b Dồn về đích): `docVeDichCuaEm` (Code 4, đọc-chỉ) đọc đúng 5 truy vấn + 1 truy vấn mốc tính nợ (W3c) để trả `no` của con — ngân sách phần dữ liệu vẫn 12 (trừ riêng phần dồn về đích), tổng 15 → 22.
     const cuaVeDich = log.filter((q) => /^SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN \(\?, \?, \?\)$/.test(q.trim()) || /^WITH dang AS \(SELECT be\.ma_btvn/.test(q) || /FROM nam_kt_cau WHERE sbd = \? AND trang_thai IN \('moi_sai', 'dang_on', 'da_khac_phuc'\) AND can_day_lai = 0 AND moc_on_ke IS NOT NULL/.test(q) || /FROM mom_bai WHERE sbd = \? AND COALESCE\(submitted_at, ''\) = ''/.test(q) || /^SELECT 'g' AS k, giay AS a/.test(q) || /^SELECT 'em' AS k, lop AS a, nam_sinh AS b/.test(q))
     expect(cuaVeDich.length, log.join('\n')).toBeLessThanOrEqual(7) // 5 dữ liệu + 1 mốc tính nợ của docVeDichCuaEm + (tối đa) 1 mốc hiển thị của hangChamCuaEm (Code 4, cùng câu SQL)
-    expect(log.length - cuaDoCham.length - cuaVeDich.length, log.join('\n')).toBeLessThanOrEqual(12) // phần dữ liệu của hợp đồng: vẫn ≤ 12
-    expect(log.length, log.join('\n')).toBeLessThanOrEqual(22)
+    expect(log.length - cuaDoCham.length - cuaVeDich.length, log.join('\n')).toBeLessThanOrEqual(13) // phần dữ liệu của hợp đồng: 12 + 1 truy vấn gộp (thử thách riêng + lần nhắc hạn, bảng kiểu Apple 21/09)
+    expect(log.length, log.join('\n')).toBeLessThanOrEqual(23)
     expect(log.length).toBeGreaterThanOrEqual(8) // đo thật: chống test rỗng
     const ghiSql = log.filter((q) => /^\s*(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b/i.test(q) || q === 'BATCH')
     expect(ghiSql.length, ghiSql.join('\n')).toBe(1)
@@ -355,7 +356,9 @@ describe('khối thiếu dữ liệu ⇒ VẮNG (không có khoá, không số 0
     suKien(d, { qid: 'Q1', ngay: themNgay(NGAY, -6), kq: 1, dang: 'ES' }) // đúng từ lâu: chưa từng sai ⇒ không vào lịch
     await dungLaiHoSo(d.env, ['S1'], 'x')
     const r = await chay(d, await capPass(d))
-    expect(r.lichOn).toEqual({ homNay: 0, ngayMai: 0, daKhacPhuc14Ngay: 0, conSaiChuaKhacPhuc: 0 })
+    expect(r.lichOn).toMatchObject({ homNay: 0, ngayMai: 0, daKhacPhuc14Ngay: 0, conSaiChuaKhacPhuc: 0, tongTungSai: 0 })
+    expect(r.lichOn.bayNgayToi.map((x: any) => x.soCau)).toEqual([0, 0, 0, 0, 0, 0, 0])
+    expect('phutNgayMai' in r.lichOn).toBe(false)
     expect('phuHuynhLamGi' in r).toBe(false)
   })
   it('Bộ não chạy thử (bong) / tắt / không có lời ⇒ vắng loiBoNao; lời có chữ game bị loại', async () => {
@@ -605,14 +608,14 @@ describe('homNay.cau — LUẬT CHE: ca chưa công bố / BTVN chưa nộp / g�
     await dungLaiHoSo(d.env, ['S1'], 'x')
     const r = await chay(d, await capPass(d))
     const c = tuoiChe(r, 'ca_kiem_tra')
-    expect(c).toEqual([{ luc: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', che: 'chua_cong_bo', giay: 40 }])
+    expect(c).toEqual([{ luc: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', che: 'chua_cong_bo', giay: 40, lamLau: false, lan: 0 }])
     expect(JSON.stringify(r)).not.toContain('Q-KIEM') // câu bị che không lộ cả MÃ CÂU (qid chỉ có ở câu được phép, để màn gọi lệnh lời giải)
     soiRo(r)
     expect(JSON.stringify(r)).not.toMatch(/Đề bí mật|8\.25|Thuỷ phân ester/)
     // dòng thời gian: có phiên nhưng không số câu/đúng
-    expect(r.homNay.dongThoiGian).toEqual([{ batDau: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', ten: 'Ca CA', che: 'chua_cong_bo', phut: 1 }])
+    expect(r.homNay.dongThoiGian).toEqual([{ batDau: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', ten: 'Ca CA', che: 'chua_cong_bo', soCauDaLam: 1, phut: 1 }])
     // không lọt vào bất kỳ con số nào có đúng/sai
-    expect(r.homNay.tongQuan).toEqual({ phutHoc: 1 }) // chỉ thời gian; KHÔNG soCau/soDung của ca chưa công bố
+    expect(r.homNay.tongQuan).toEqual({ phutHoc: 1, soLanHoc: 1, lanDaiNhatPhut: 1 }) // chỉ thời gian + số lần học; KHÔNG soCau/soDung của ca chưa công bố
     for (const k of ['nhipHoc', 'lichOn', 'dangVap', 'bacTheoDang', 'vuaLenBac', 'manhYeu', 'phuHuynhLamGi', 'tienBo']) expect(k in r, k).toBe(false)
   })
 
@@ -624,7 +627,7 @@ describe('homNay.cau — LUẬT CHE: ca chưa công bố / BTVN chưa nộp / g�
     suKien(d, { qid: 'Q-KIEM', ngay: NGAY, gio: '10:00', nguon: 'thi', ma: 'CA', kq: 0, dang: 'ES', giay: 40 })
     await dungLaiHoSo(d.env, ['S1'], 'x')
     const r = await chay(d, await capPass(d))
-    expect(r.homNay.cau).toEqual([{ luc: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', qid: 'Q-KIEM', tenDang: 'Thuỷ phân ester', deRutGon: 'Este nào thuỷ phân ra ancol?', conChon: 'A', dapAn: 'B', dung: false, giay: 40, coLoiGiai: true }])
+    expect(r.homNay.cau).toEqual([{ luc: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', qid: 'Q-KIEM', tenDang: 'Thuỷ phân ester', deRutGon: 'Este nào thuỷ phân ra ancol?', conChon: 'A', dapAn: 'B', dung: false, giay: 40, lamLau: false, lan: 0, coLoiGiai: true }])
     expect(JSON.stringify(r)).not.toContain('LG-BI-MAT') // lời giải chỉ có ở lệnh mở từng câu, không ở danh sách
   })
 
@@ -652,7 +655,7 @@ describe('homNay.cau — LUẬT CHE: ca chưa công bố / BTVN chưa nộp / g�
     suKien(d, { qid: 'Q-MOM', ngay: NGAY, gio: '17:00', nguon: 'mom', ma: 'giao_them_2026-09-22_1', kq: 0, dang: 'ES' })
     const pass = await capPass(d)
     let r = await chay(d, pass)
-    expect(tuoiChe(r, 'gia_dinh_giao')).toEqual([{ luc: vn(NGAY, '17:00'), nguon: 'gia_dinh_giao', che: 'chua_nop', giay: 30 }])
+    expect(tuoiChe(r, 'gia_dinh_giao')).toEqual([{ luc: vn(NGAY, '17:00'), nguon: 'gia_dinh_giao', che: 'chua_nop', giay: 30, lamLau: false, lan: 0 }])
     soiRo(r)
     d.sql.prepare("UPDATE mom_bai SET submitted_at = '2026-09-22T12:00:00.000Z'").run()
     r = await chay(d, pass)
@@ -711,13 +714,13 @@ describe('homNay — tongQuan, dongThoiGian, giới hạn câu, nhãn nguồn', 
     suKien(d, { qid: 'Q5', ngay: themNgay(NGAY, -2), gio: '09:00', kq: 1 })
     suKien(d, { qid: 'Q6', ngay: themNgay(NGAY, -4), gio: '09:00', kq: 1 }) // ngắt chuỗi
     const r = await chay(d, await capPass(d))
-    expect(r.homNay.tongQuan).toEqual({ soCau: 2, soDung: 2, phutHoc: 3, chuoiNgayHoc: 3, soVoiHomQua: { soCau: 2, tiLeDung: 0.5 } })
+    expect(r.homNay.tongQuan).toEqual({ soCau: 2, soDung: 2, phutHoc: 3, chuoiNgayHoc: 3, soLanHoc: 1, lanDaiNhatPhut: 3, soVoiHomQua: { soCau: 2, tiLeDung: 0.5, phutHoc: 1 } })
   })
   it('hôm nay chưa học ⇒ chuỗi tính từ hôm qua, không soCau/soDung/dòng thời gian/câu; không có hôm qua ⇒ vắng soVoiHomQua; không sổ nào ⇒ vắng cả homNay', async () => {
     const { d } = dung()
     suKien(d, { qid: 'Q1', ngay: themNgay(NGAY, -1), kq: 1 })
     let r = await chay(d, await capPass(d))
-    expect(r.homNay).toEqual({ tongQuan: { chuoiNgayHoc: 1, soVoiHomQua: { soCau: 1, tiLeDung: 1 } } })
+    expect(r.homNay).toEqual({ tongQuan: { chuoiNgayHoc: 1, soVoiHomQua: { soCau: 1, tiLeDung: 1, phutHoc: 1 } } })
     expect(r.nhipHoc.ngay).toHaveLength(1)
     const { d: d2 } = dung()
     suKien(d2, { qid: 'Q1', ngay: NGAY, kq: 1 })
@@ -798,7 +801,7 @@ describe('baiTapVeNha — dangChay (còn hạn, chưa nộp), gan ≤ 5 đã n�
     themBtvn(d, 'XOA', { nop: '2026-09-17T12:00:00.000Z', soDung: 5 })
     d.sql.prepare("UPDATE btvn SET da_xoa = 1 WHERE ma_btvn = 'XOA'").run()
     const r = await chay(d, await capPass(d))
-    expect(r.baiTapVeNha.gan).toEqual([{ maBtvn: 'TRE', ten: 'Bài TRE', nopLuc: '2026-09-15T12:00:00.000Z', dungHan: false }])
+    expect(r.baiTapVeNha.gan).toEqual([{ maBtvn: 'TRE', ten: 'Bài TRE', nopLuc: '2026-09-15T12:00:00.000Z', dungHan: false, nopTreGio: 7 }]) // hạn 05:00Z, nộp 12:00Z ⇒ trễ 7 giờ
     expect('dangChay' in r.baiTapVeNha).toBe(false)
   })
 })
@@ -813,7 +816,7 @@ describe('lichOn và phuHuynhLamGi — số thật từ hồ sơ, xưng "con"', 
     suKien(d, { qid: 'QH', ngay: themNgay(NGAY, -5), dang: 'ES', kq: 0 })
     await dungLaiHoSo(d.env, ['S1'], 'x')
     const r = await chay(d, await capPass(d))
-    expect(r.lichOn).toEqual({ homNay: 4, ngayMai: 2, daKhacPhuc14Ngay: 0, conSaiChuaKhacPhuc: 6 })
+    expect(r.lichOn).toMatchObject({ homNay: 4, ngayMai: 2, daKhacPhuc14Ngay: 0, conSaiChuaKhacPhuc: 6, tongTungSai: 6 })
     expect(r.phuHuynhLamGi).toEqual(['Nhắc con làm 4 câu ôn lại hôm nay, khoảng 2 phút.', 'Nhắc con làm 2 câu ôn lại vào ngày mai, khoảng 1 phút.']) // 30 giây/câu (trung vị của sổ 14 ngày)
   })
   it('câu "cần dạy lại" (sai nhiều lần chưa đúng lại) không vào lịch ôn; câu đã khắc phục trong 14 ngày được đếm', async () => {
@@ -837,7 +840,7 @@ describe('lichOn và phuHuynhLamGi — số thật từ hồ sơ, xưng "con"', 
     await dungLaiHoSo(d.env, ['S1'], 'x')
     expect(d.dem('nam_kt_cau', "sbd = 'S1' AND trang_thai = 'moi_sai'")).toBe(7) // hồ sơ đầy đủ đếm cả 6 câu sai của ca chưa công bố
     const r = await chay(d, await capPass(d))
-    expect(r.lichOn).toEqual({ homNay: 1, ngayMai: 0, daKhacPhuc14Ngay: 0, conSaiChuaKhacPhuc: 1 })
+    expect(r.lichOn).toMatchObject({ homNay: 1, ngayMai: 0, daKhacPhuc14Ngay: 0, conSaiChuaKhacPhuc: 1, tongTungSai: 1 })
     expect(r.bacTheoDang).toEqual([{ ma: 'ES', ten: 'Este', bac: 0 }]) // các câu đúng của ca chưa công bố KHÔNG nâng bậc
     for (const k of ['vuaLenBac', 'manhYeu']) expect(k in r, k).toBe(false)
     expect(r.tienBo).toBeUndefined()
@@ -1080,7 +1083,7 @@ describe('MỐC HIỂN THỊ — sự kiện trước 12:00 trưa 21/09 không l
     for (let i = 0; i < 4; i++) suKien(d, { qid: `S${i}`, ngay: homQua, gio: '08:00', kq: 1 })
     for (let i = 0; i < 2; i++) suKien(d, { qid: `C${i}`, ngay: homQua, gio: '14:00', kq: i === 0 ? 1 : 0 })
     suKien(d, { qid: 'H', ngay: NGAY, gio: '10:00' })
-    expect((await chayMoc(d)).homNay.tongQuan.soVoiHomQua).toEqual({ soCau: 2, tiLeDung: 0.5 })
+    expect((await chayMoc(d)).homNay.tongQuan.soVoiHomQua).toEqual({ soCau: 2, tiLeDung: 0.5, phutHoc: 1 })
     const { d: d2 } = dung({ moc: null })
     for (let i = 0; i < 4; i++) suKien(d2, { qid: `S${i}`, ngay: homQua, gio: '08:00', kq: 1 })
     suKien(d2, { qid: 'H', ngay: NGAY, gio: '10:00' })
@@ -1235,5 +1238,329 @@ describe('MỐC HIỂN THỊ — sự kiện trước 12:00 trưa 21/09 không l
     expect(r.baiTapVeNha.dangChay.map((x: any) => x.maBtvn)).toEqual(['CHAY-CU'])
     const d2 = dat()
     expect((await chay(d2, await capPass(d2))).baiTapVeNha.gan.map((x: any) => x.maBtvn)).toEqual(['MOI', 'CU'])
+  })
+})
+
+// ================================================================== BẢNG "MỌI THỨ VỀ CON" KIỂU APPLE — trường máy chủ MỚI (thầy chốt 21/09 16:16) ==================================================================
+// Chỉ-thêm, chỉ đọc, từ mốc, luật che giữ nguyên. Mỗi trường: có số thật ⇒ có; thiếu ⇒ VẮNG (không bịa).
+describe('bảng kiểu Apple — trường mới của lệnh /ph/tat-ca-ve-con', () => {
+  const NGAY_HOM_QUA = themNgay(NGAY, -1) // 21/09 = ngày mốc
+  const themKeHoachApple = (d: D1That, viec: unknown[], mucTieu = 8) =>
+    d.sql.prepare("INSERT INTO ke_hoach_ngay(khoa,sbd,ngay,phien_ban,seed,ngan_sach_json,viec_json,canh_bao_json,cap_nhat_luc) VALUES(?,?,?,1,1,?,?,'[]','x')")
+      .run(`S1|${NGAY}`, 'S1', NGAY, JSON.stringify({ mucTieuCau: mucTieu }), JSON.stringify({ viec }))
+  const chayApple = async (d: D1That, now = NOW) => (await phTatCaVeCon(d.env, { sbd: 'S1' }, now)) as Record<string, any>
+  const themThuThach = (d: D1That, taoLuc: string, soCau = 5, ngay = NGAY) =>
+    d.sql.prepare("INSERT INTO thu_thach_rieng(sbd,ngay,dang_json,bac,so_cau,so_cau_muon,qid_json,loi_moi,tao_luc) VALUES('S1',?,'[]','dung_bac',?,5,'[]','',?)").run(ngay, soCau, taoLuc)
+  const themNhac = (d: D1That, id: string, guiLuc: string, o: { ngay?: string; guiPh?: number } = {}) =>
+    d.sql.prepare("INSERT INTO canh_bao_thay(id,ma_btvn,sbd,ngay,ten_btvn,han_nop,loi_em,loi_ph,trang_thai_em,gui_luc,moc,gui_ph) VALUES(?,'B','S1',?,'Bài','2026-09-25T05:00:00.000Z','a','b','chua_mo',?,'tay',?)").run(id, o.ngay ?? NGAY, guiLuc, o.guiPh ?? 1)
+
+  it('tongQuan.mucTieu {cau, phut}: câu = mucTieuCau của kế hoạch ngày, phút = ước theo tốc độ của con (cùng hàm phutUocTinhChang); không có kế hoạch ⇒ vắng', async () => {
+    const { d } = dung()
+    themKeHoachApple(d, [], 12)
+    suKien(d, { qid: 'A', ngay: NGAY, gio: '10:00', kq: 1 })
+    const r = await chayApple(d)
+    expect(r.homNay.tongQuan.mucTieu).toEqual({ cau: 12, phut: phutUocTinhChang(12, 90) }) // < 5 mẫu giây ⇒ 90 giây/câu mặc định
+    const { d: d2 } = dung()
+    suKien(d2, { qid: 'A', ngay: NGAY, gio: '10:00', kq: 1 })
+    expect('mucTieu' in (await chayApple(d2)).homNay.tongQuan).toBe(false)
+  })
+
+  it('mucTieu.phut theo tốc độ THẬT của con: ≥ 5 mẫu giây ⇒ trung vị (30 giây) chứ không phải mặc định 90', async () => {
+    const { d } = dung()
+    themKeHoachApple(d, [], 12)
+    for (let i = 0; i < 5; i++) suKien(d, { qid: `T${i}`, ngay: NGAY, gio: `10:0${i}`, kq: 1, giay: 30 })
+    const r = await chayApple(d)
+    expect(r.homNay.tongQuan.mucTieu).toEqual({ cau: 12, phut: phutUocTinhChang(12, 30) })
+    expect(phutUocTinhChang(12, 30)).not.toBe(phutUocTinhChang(12, 90))
+  })
+
+  it('soLanHoc + lanDaiNhatPhut đếm từ dongThoiGian[] (kể cả phiên bị che): 2 phiên, dài nhất 5 phút', async () => {
+    const { d } = dung()
+    for (let i = 0; i < 3; i++) suKien(d, { qid: `S${i}`, ngay: NGAY, gio: `08:0${i}`, kq: 1, giay: 60 }) // 3 phút
+    for (let i = 0; i < 2; i++) suKien(d, { qid: `C${i}`, ngay: NGAY, gio: `15:0${i}`, kq: 1, giay: 150 }) // 5 phút
+    const r = await chayApple(d)
+    expect(r.homNay.dongThoiGian.map((x: any) => x.phut)).toEqual([3, 5])
+    expect(r.homNay.tongQuan).toMatchObject({ soLanHoc: 2, lanDaiNhatPhut: 5 })
+    const { d: d2 } = dung()
+    themCa(d2, 'CA-CHE', 'khong'); themLuot(d2, 'CA-CHE', 'S1')
+    suKien(d2, { qid: 'Q', ngay: NGAY, gio: '10:00', nguon: 'thi', ma: 'CA-CHE', kq: 1, giay: 240 })
+    expect((await chayApple(d2)).homNay.tongQuan).toMatchObject({ soLanHoc: 1, lanDaiNhatPhut: 4 }) // phiên bị che vẫn là một lần học
+  })
+
+  it('soVoiHomQua.phutHoc: tổng giây hôm qua (từ mốc) / 60; sổ hôm qua không có giây ⇒ vắng phutHoc (không số 0 giả)', async () => {
+    const { d } = dung({ moc: null })
+    suKien(d, { qid: 'A', ngay: NGAY_HOM_QUA, gio: '14:00', kq: 1, giay: 120 }); suKien(d, { qid: 'B', ngay: NGAY_HOM_QUA, gio: '14:01', kq: 0, giay: 180 })
+    suKien(d, { qid: 'H', ngay: NGAY_HOM_QUA, gio: '08:00', kq: 1, giay: 600 }) // trước mốc: không tính
+    suKien(d, { qid: 'N', ngay: NGAY, gio: '10:00' })
+    expect((await chayApple(d)).homNay.tongQuan.soVoiHomQua).toEqual({ soCau: 2, tiLeDung: 0.5, phutHoc: 5 })
+    const { d: d2 } = dung({ moc: null })
+    suKien(d2, { qid: 'A', ngay: NGAY_HOM_QUA, gio: '14:00', kq: 1, giay: null }); suKien(d2, { qid: 'N', ngay: NGAY, gio: '10:00' })
+    expect('phutHoc' in (await chayApple(d2)).homNay.tongQuan.soVoiHomQua).toBe(false)
+  })
+
+  it('dieuDangMung: dung_lai (câu sai từ mốc nay đúng), len_bac (kèm tên dạng), chuoi (≥ 2 ngày học liền) — đúng thứ tự, ≤ 3; hôm nay học mà chưa có gì đáng mừng ⇒ mảng RỖNG (không bịa)', async () => {
+    const { d } = dung()
+    kho(d, 'UP-q', { dang: 'UP', tenDang: 'Lên bậc hôm nay' })
+    suKien(d, { qid: 'W', ngay: NGAY_HOM_QUA, gio: '14:00', dang: 'ES', kq: 0 }) // sai từ mốc…
+    suKien(d, { qid: 'W', ngay: NGAY, gio: '10:00', dang: 'ES', kq: 1, lan: 2 }) // …nay đúng lại
+    suKien(d, { qid: 'UP-1', ngay: NGAY, gio: '11:00', dang: 'UP', kq: 1 }) // bậc UP 1 → 2 hôm nay
+    await dungLaiHoSo(d.env, ['S1'], 'x')
+    const r = await chayApple(d)
+    expect(r.homNay.dieuDangMung).toEqual([{ loai: 'dung_lai', so: 1 }, { loai: 'len_bac', so: 1, chiTiet: ['Lên bậc hôm nay'] }, { loai: 'chuoi', so: 2 }])
+    const { d: d2 } = dung()
+    suKien(d2, { qid: 'X', ngay: NGAY, gio: '10:00', kq: 0 })
+    expect((await chayApple(d2)).homNay.dieuDangMung).toEqual([])
+  })
+
+  it('dieuDangMung: câu sai TRƯỚC mốc rồi đúng hôm nay vẫn là "đúng lại" (thành tích từ mốc); chuỗi 1 ngày không phải điều đáng mừng; hôm nay CHƯA học ⇒ không có dieuDangMung', async () => {
+    const { d } = dung()
+    suKien(d, { qid: 'W', ngay: themNgay(NGAY_HOM_QUA, -1), gio: '10:00', dang: 'ES', kq: 0 })
+    suKien(d, { qid: 'W', ngay: NGAY, gio: '10:00', dang: 'ES', kq: 1, lan: 2 })
+    expect((await chayApple(d)).homNay.dieuDangMung).toEqual([{ loai: 'dung_lai', so: 1 }])
+    const { d: d2 } = dung()
+    suKien(d2, { qid: 'Q', ngay: NGAY_HOM_QUA, gio: '14:00' })
+    const r2 = await chayApple(d2)
+    expect('dieuDangMung' in (r2.homNay ?? {})).toBe(false)
+  })
+
+  it('aiDaLam: chon_rieng (câu A.I chọn trong kế hoạch, theo nguồn) · xep_on (lịch ôn ngày mai) · soan_thu_thach · nhac_han (đếm lần nhắc) · cham (số câu đã chấm) — đúng thứ tự, số thật', async () => {
+    const { d } = dung()
+    themKeHoachApple(d, [{ loai: 'on_lai', soCau: 2, nhan: 'bu' }, { loai: 'than_thu', soCau: 6, nhan: 'tuy_chon' }, { loai: 'btvn_nop', soCau: 0 }, { loai: 'mom', soCau: 9 }])
+    themThuThach(d, iso2(NGAY, '05:30'), 5)
+    themNhac(d, 'n1', iso2(NGAY, '12:00')); themNhac(d, 'n2', iso2(NGAY, '13:00'))
+    for (let i = 0; i < 3; i++) suKien(d, { qid: `M${i}`, ngay: NGAY, gio: '10:00', dang: 'ES', kq: 0 }) // sai hôm nay ⇒ lịch ôn ngày mai 3 câu
+    await dungLaiHoSo(d.env, ['S1'], 'x')
+    for (let i = 0; i < 2; i++) suKien(d, { qid: `N${i}`, ngay: NGAY, gio: '10:30', kq: 1 })
+    const r = await chayApple(d)
+    expect(r.homNay.aiDaLam).toEqual([
+      { loai: 'chon_rieng', so: 8, chiTiet: { on_lai: 2, than_thu: 6 } },
+      { loai: 'xep_on', so: 3 },
+      { loai: 'soan_thu_thach', so: 5, luc: iso2(NGAY, '05:30') },
+      { loai: 'nhac_han', so: 2, luc: iso2(NGAY, '13:00') },
+      { loai: 'cham', so: 5 },
+    ])
+    expect(r.homNay.aiDaChuanBi).toBeUndefined()
+  })
+
+  it('aiDaLam: nhắc chỉ tính lần GỬI CHO PHỤ HUYNH (gui_ph = 1), của hôm nay, từ mốc; thử thách soạn trước mốc/ngày khác ⇒ bỏ dòng; thiếu bảng ⇒ bỏ dòng, không ném', async () => {
+    const { d } = dung({ moc: null })
+    themNhac(d, 'a', iso2(NGAY, '12:00'), { guiPh: 0 }); themNhac(d, 'b', iso2(NGAY_HOM_QUA, '12:00'), { ngay: NGAY_HOM_QUA }); themNhac(d, 'c', iso2(NGAY_HOM_QUA, '04:00'), { ngay: NGAY })
+    themThuThach(d, iso2(NGAY_HOM_QUA, '04:00'), 5, NGAY) // soạn lúc 11:00 ngày mốc (trước mốc 12:00)
+    suKien(d, { qid: 'N', ngay: NGAY, gio: '10:00', kq: 1 })
+    expect((await chayApple(d)).homNay.aiDaLam).toEqual([{ loai: 'cham', so: 1 }])
+    d.sql.exec('DROP TABLE canh_bao_thay'); d.sql.exec('DROP TABLE thu_thach_rieng')
+    expect((await chayApple(d)).homNay.aiDaLam).toEqual([{ loai: 'cham', so: 1 }])
+  })
+
+  it('aiDaChuanBi (cảnh "hôm nay con chưa học"): cùng khuôn nhưng KHÔNG có cham, KHÔNG có aiDaLam / dieuDangMung; không có gì để nói ⇒ vắng', async () => {
+    const { d } = dung()
+    themKeHoachApple(d, [{ loai: 'on_lai', soCau: 4 }])
+    themThuThach(d, iso2(NGAY, '05:00'), 3)
+    const r = await chayApple(d)
+    expect(r.homNay.aiDaChuanBi).toEqual([{ loai: 'chon_rieng', so: 4, chiTiet: { on_lai: 4 } }, { loai: 'soan_thu_thach', so: 3, luc: iso2(NGAY, '05:00') }])
+    expect(Object.keys(r.homNay).sort()).toEqual(['aiDaChuanBi', 'tongQuan']) // tongQuan chỉ có mục tiêu/việc của kế hoạch; không cham, aiDaLam, dieuDangMung, dongThoiGian, cau
+    const { d: d2 } = dung()
+    expect('homNay' in (await chayApple(d2))).toBe(false)
+  })
+
+  it('cau[].lan = vị trí phiên trong dongThoiGian[]; cau[].lamLau = giây ≥ ngưỡng (biên 119 / 120); câu bị che cũng có lan/lamLau nhưng vẫn KHÔNG có đúng/sai/mã câu', async () => {
+    expect(NGUONG_LAM_LAU_GIAY).toBe(120)
+    const { d } = dung()
+    kho(d, 'K1', { dang: 'ES', tenDang: 'Este' }); kho(d, 'K2', { dang: 'ES', tenDang: 'Este' })
+    suKien(d, { qid: 'K1', ngay: NGAY, gio: '08:00', kq: 1, giay: 119 })
+    suKien(d, { qid: 'K2', ngay: NGAY, gio: '15:00', kq: 0, giay: 120 })
+    themCa(d, 'CA-CHE', 'khong'); themLuot(d, 'CA-CHE', 'S1')
+    suKien(d, { qid: 'KX', ngay: NGAY, gio: '20:00', nguon: 'thi', ma: 'CA-CHE', kq: 1, giay: 200 })
+    const r = await chayApple(d)
+    const theoLuc = [...r.homNay.cau].sort((a: any, b: any) => (a.luc < b.luc ? -1 : 1))
+    expect(theoLuc.map((c: any) => [c.lan, c.lamLau])).toEqual([[0, false], [1, true], [2, true]])
+    expect(r.homNay.dongThoiGian).toHaveLength(3)
+    const che = theoLuc[2]
+    expect(che.che).toBe('chua_cong_bo')
+    for (const k of ['qid', 'dung', 'dapAn', 'conChon', 'deRutGon']) expect(k in che, k).toBe(false)
+  })
+
+  it('cau[].lamLau vắng khi sổ không có giây; dongThoiGian[] bị che có soCauDaLam (số câu KHÁC NHAU, không đúng/sai)', async () => {
+    const { d } = dung()
+    themCa(d, 'CA-CHE', 'khong'); themLuot(d, 'CA-CHE', 'S1')
+    for (const [i, q] of ['Q1', 'Q2', 'Q2'].entries()) suKien(d, { qid: q, ngay: NGAY, gio: `10:0${i}`, nguon: 'thi', ma: 'CA-CHE', kq: 1, giay: null, lan: i + 1 })
+    const r = await chayApple(d)
+    expect(r.homNay.dongThoiGian).toEqual([expect.objectContaining({ che: 'chua_cong_bo', soCauDaLam: 2 })])
+    expect(JSON.stringify(r.homNay.dongThoiGian)).not.toMatch(/soDung|soCau"/)
+    expect(r.homNay.cau.every((c: any) => !('lamLau' in c))).toBe(true)
+  })
+
+  it('conChon KHÔNG bịa: câu ngoài ca kiểm tra (bài về nhà đã nộp, ôn lại) không bao giờ có conChon vì sổ không lưu lựa chọn', async () => {
+    const { d } = dung()
+    kho(d, 'B1', { dang: 'ES', tenDang: 'Este', correct: 'B' })
+    themBtvn(d, 'BT1', { nop: '2026-09-22T05:00:00.000Z', han: '2026-09-23T05:00:00.000Z', soDung: 1, soCau: 1 })
+    suKien(d, { qid: 'B1', ngay: NGAY, gio: '10:00', nguon: 'btvn', ma: 'BT1', kq: 0 })
+    const c = (await chayApple(d)).homNay.cau
+    expect(c).toHaveLength(1)
+    expect('conChon' in c[0]).toBe(false)
+    expect(c[0]).toMatchObject({ dapAn: 'B', dung: false })
+  })
+
+  it('baiTapVeNha.dangChay[].chang[]: 5 chấm {thu, ngay, trangThai} theo lịch mở đã lưu — xong / hom_nay (đã mở, chưa xong) / sap_toi (chưa mở); thu = thứ của NGÀY MỞ giờ VN', async () => {
+    const { d } = dung()
+    themBtvn(d, 'NH', { han: '2026-09-26T05:00:00.000Z', chang: [2, 5], soCau: 20 })
+    const moLuc = ['2026-09-20T02:00:00.000Z', '2026-09-21T02:00:00.000Z', '2026-09-22T02:00:00.000Z', '2026-09-23T02:00:00.000Z', '2026-09-24T02:00:00.000Z']
+    d.sql.prepare("UPDATE btvn_em SET chang_mo_json = ? WHERE ma_btvn = 'NH'").run(JSON.stringify({ cheDo: 'dai', chang: moLuc.map((m, i) => ({ chiSo: i, moLuc: m })) }))
+    const r = await chayApple(d)
+    expect(r.baiTapVeNha.dangChay[0]).toMatchObject({ changXong: 2, changTong: 5 })
+    expect(r.baiTapVeNha.dangChay[0].chang).toEqual([
+      { thu: 'CN', ngay: '2026-09-20', trangThai: 'xong' }, { thu: 'T2', ngay: '2026-09-21', trangThai: 'xong' },
+      { thu: 'T3', ngay: '2026-09-22', trangThai: 'hom_nay' }, { thu: 'T4', ngay: '2026-09-23', trangThai: 'sap_toi' }, { thu: 'T5', ngay: '2026-09-24', trangThai: 'sap_toi' },
+    ])
+  })
+
+  it('lichChangCuaEm: lịch thiếu / hỏng / lệch số chặng / giờ mở hỏng / 0 chặng ⇒ null (vắng chang, không vẽ chấm bịa); giờ mở qua nửa đêm UTC lấy NGÀY VN', () => {
+    const NOW_T = Date.parse('2026-09-22T09:00:00.000Z')
+    const lich = (moLuc: unknown[]) => JSON.stringify({ chang: moLuc.map((m, chiSo) => ({ chiSo, moLuc: m })) })
+    expect(lichChangCuaEm(null, 3, 0, NOW_T)).toBeNull()
+    expect(lichChangCuaEm('không phải json', 3, 0, NOW_T)).toBeNull()
+    expect(lichChangCuaEm(lich(['2026-09-22T00:00:00.000Z']), 3, 0, NOW_T)).toBeNull()
+    expect(lichChangCuaEm(lich(['2026-09-22T00:00:00.000Z', 'hỏng']), 2, 0, NOW_T)).toBeNull()
+    expect(lichChangCuaEm(lich([]), 0, 0, NOW_T)).toBeNull()
+    expect(lichChangCuaEm(lich(['2026-09-21T18:00:00.000Z']), 1, 0, NOW_T)).toEqual([{ thu: 'T3', ngay: '2026-09-22', trangThai: 'hom_nay' }]) // 01:00 VN ngày 22/09 = Thứ Ba
+    expect(lichChangCuaEm(lich(['2026-09-22T09:00:00.000Z']), 1, 0, NOW_T)![0]!.trangThai).toBe('hom_nay') // mở đúng lúc này = đã mở
+    expect(lichChangCuaEm(lich(['2026-09-22T09:00:00.001Z']), 1, 0, NOW_T)![0]!.trangThai).toBe('sap_toi')
+    expect(lichChangCuaEm(lich(['2026-09-22T09:00:00.001Z', '2026-09-22T09:00:00.001Z']), 2, 5, NOW_T)!.map((x) => x.trangThai)).toEqual(['xong', 'xong']) // loDaXong ≥ soChang ⇒ tất cả xong
+  })
+
+  it('bài không có lịch chặng lưu ⇒ vẫn có changXong/changTong nhưng KHÔNG có chang[]', async () => {
+    const { d } = dung()
+    themBtvn(d, 'NH2', { han: '2026-09-26T05:00:00.000Z', chang: [1, 4], soCau: 20 })
+    const b = (await chayApple(d)).baiTapVeNha.dangChay[0]
+    expect(b).toMatchObject({ changXong: 1, changTong: 4 })
+    expect('chang' in b).toBe(false)
+  })
+
+  it('baiTapVeNha.gan[].nopTreGio: chỉ khi nộp SAU hạn, số giờ (1 chữ số thập phân); nộp đúng hạn ⇒ vắng', async () => {
+    const { d } = dung()
+    themBtvn(d, 'TRE1', { giao: '2026-09-21T03:00:00.000Z', han: '2026-09-22T00:00:00.000Z', nop: '2026-09-22T00:30:00.000Z', soDung: 5, soCau: 10 })
+    themBtvn(d, 'DUNG', { giao: '2026-09-21T03:00:00.000Z', han: '2026-09-22T05:00:00.000Z', nop: '2026-09-22T04:00:00.000Z', soDung: 5, soCau: 10 })
+    const gan = (await chayApple(d)).baiTapVeNha.gan
+    expect(gan.find((x: any) => x.maBtvn === 'TRE1')).toMatchObject({ dungHan: false, nopTreGio: 0.5 })
+    expect('nopTreGio' in gan.find((x: any) => x.maBtvn === 'DUNG')).toBe(false)
+  })
+
+  it('lichOn.tongTungSai = đã khắc phục + còn sai; bayNgayToi = 7 ngày (mai … +7) kẹp bằng trần ôn; phutNgayMai chỉ khi ngày mai có câu', async () => {
+    const { d } = dung()
+    for (let i = 0; i < 6; i++) suKien(d, { qid: `A${i}`, ngay: NGAY, gio: '10:00', dang: 'ES', kq: 0 }) // đến hạn ngày mai: 6 câu (> trần 4)
+    for (let i = 0; i < 2; i++) suKien(d, { qid: `B${i}`, ngay: themNgay(NGAY, -1), gio: '15:00', dang: 'ES', kq: 1 }) // đúng 21/09 ⇒ mốc ôn kế 22/09+… (không phải ngày mai)
+    await dungLaiHoSo(d.env, ['S1'], 'x')
+    const r = await chayApple(d)
+    expect(r.lichOn.bayNgayToi).toHaveLength(7)
+    expect(r.lichOn.bayNgayToi[0]).toEqual({ ngay: themNgay(NGAY, 1), soCau: 4 }) // 6 câu ⇒ kẹp trần 4
+    expect(r.lichOn.bayNgayToi.every((x: any, i: number) => x.ngay === themNgay(NGAY, i + 1))).toBe(true)
+    expect(r.lichOn.tongTungSai).toBe(r.lichOn.daKhacPhuc14Ngay + r.lichOn.conSaiChuaKhacPhuc)
+    expect(r.lichOn.phutNgayMai).toBe(phutUocTinhChang(r.lichOn.ngayMai, 30)) // trung vị giây thật của sổ (30)
+    const { d: d2 } = dung()
+    suKien(d2, { qid: 'Z', ngay: themNgay(NGAY, -5), dang: 'ES', kq: 1 })
+    await dungLaiHoSo(d2.env, ['S1'], 'x')
+    expect('phutNgayMai' in (await chayApple(d2)).lichOn).toBe(false)
+  })
+
+  it('nhipHoc.tongCau + trungBinhCauMoiNgay: trên các NGÀY CÓ HỌC từ mốc — khớp danh sách ngay[] (không lẫn ngày trước mốc)', async () => {
+    const { d } = dung({ moc: null })
+    for (let i = 0; i < 9; i++) suKien(d, { qid: `X${i}`, ngay: themNgay(NGAY, -3), gio: '10:00' }) // trước mốc: không tính
+    for (let i = 0; i < 2; i++) suKien(d, { qid: `Y${i}`, ngay: NGAY_HOM_QUA, gio: '14:00' })
+    for (let i = 0; i < 5; i++) suKien(d, { qid: `Z${i}`, ngay: NGAY, gio: '10:00' })
+    const n = (await chayApple(d)).nhipHoc
+    expect(n.ngay.map((x: any) => x.soCau)).toEqual([2, 5])
+    expect(n).toMatchObject({ tongCau: 7, trungBinhCauMoiNgay: 3.5 })
+  })
+
+  it('viecXong / viecTong: việc kế hoạch còn lại (không tính tuỳ chọn / lượt luyện dạng) + việc xong ĐO ĐƯỢC hôm nay (ôn lại đã ngồi, bài về nhà đã nộp); không có kế hoạch ⇒ vắng cả hai', async () => {
+    const { d } = dung()
+    themKeHoachApple(d, [{ loai: 'btvn_nop', batBuoc: true }, { loai: 'btvn_lo', nhan: null }, { loai: 'than_thu', nhan: null }, { loai: 'mom', nhan: 'tuy_chon' }]) // than_thu (lượt luyện dạng) và việc nhãn tuy_chon KHÔNG tính
+    suKien(d, { qid: 'A', ngay: NGAY, gio: '10:00', nguon: 'on_lai', kq: 1 }) // ôn lại xong (kế hoạch không còn việc ôn) ⇒ xong 1
+    themBtvn(d, 'DA-NOP', { giao: '2026-09-21T03:00:00.000Z', han: '2026-09-23T05:00:00.000Z', nop: '2026-09-22T05:00:00.000Z', soDung: 3, soCau: 4 }) // nộp hôm nay ⇒ xong +1
+    const r = await chayApple(d)
+    expect(r.homNay.tongQuan).toMatchObject({ viecXong: 2, viecTong: 4 }) // còn lại 2 (btvn_nop, btvn_lo) + xong 2
+    const { d: d2 } = dung()
+    suKien(d2, { qid: 'A', ngay: NGAY, gio: '10:00', nguon: 'on_lai', kq: 1 })
+    const t2 = (await chayApple(d2)).homNay.tongQuan
+    expect('viecXong' in t2).toBe(false)
+    expect('viecTong' in t2).toBe(false)
+  })
+
+  it('viecXong: kế hoạch VẪN còn việc ôn thì chưa tính "ôn xong"; kế hoạch rỗng + chưa làm gì ⇒ 0/0 thật; bài nộp trước mốc/ngày khác không tính', async () => {
+    const { d } = dung()
+    themKeHoachApple(d, [{ loai: 'on_lai', soCau: 3, nhan: 'bu' }])
+    suKien(d, { qid: 'A', ngay: NGAY, gio: '10:00', nguon: 'on_lai', kq: 1 })
+    themBtvn(d, 'CU', { giao: '2026-09-20T03:00:00.000Z', han: '2026-09-21T05:00:00.000Z', nop: '2026-09-21T04:00:00.000Z', soDung: 1, soCau: 2 }) // nộp 11:00 ngày mốc (trước mốc, không phải hôm nay)
+    themBtvn(d, 'HOM-QUA', { giao: '2026-09-21T03:00:00.000Z', han: '2026-09-22T05:00:00.000Z', nop: '2026-09-21T09:00:00.000Z', soDung: 1, soCau: 2 }) // nộp 16:00 hôm qua (sau mốc) ⇒ KHÔNG phải hôm nay
+    expect((await chayApple(d)).homNay.tongQuan).toMatchObject({ viecXong: 0, viecTong: 1 })
+    const { d: d2 } = dung()
+    themKeHoachApple(d2, [])
+    expect((await chayApple(d2)).homNay.tongQuan).toMatchObject({ viecXong: 0, viecTong: 0 })
+  })
+
+  it('viecXong: bài nộp SÁNG ngày mốc (trước 12:00) không tính khi "hôm nay" là ngày mốc; nộp chiều thì tính', async () => {
+    const { d } = dung({ moc: null })
+    themKeHoachApple(d, [], 8)
+    d.sql.prepare("UPDATE ke_hoach_ngay SET khoa = ?, ngay = ?").run(`S1|${NGAY_HOM_QUA}`, NGAY_HOM_QUA)
+    themBtvn(d, 'SANG', { giao: '2026-09-20T03:00:00.000Z', han: '2026-09-22T05:00:00.000Z', nop: '2026-09-21T02:00:00.000Z', soDung: 1, soCau: 2 }) // 09:00 VN ngày mốc
+    themBtvn(d, 'CHIEU', { giao: '2026-09-20T03:00:00.000Z', han: '2026-09-22T05:00:00.000Z', nop: '2026-09-21T08:00:00.000Z', soDung: 1, soCau: 2 }) // 15:00 VN ngày mốc
+    suKien(d, { qid: 'Q', ngay: NGAY_HOM_QUA, gio: '14:00', nguon: 'game' }) // không phải ôn lại ⇒ không thêm việc xong
+    const r = await chayApple(d, T(`${NGAY_HOM_QUA}T20:30:00`))
+    expect(r.homNay.tongQuan).toMatchObject({ viecXong: 1, viecTong: 1 })
+  })
+
+  it('dieuDangMung: chiTiet nêu tối đa 3 tên dạng lên bậc (4 dạng lên ⇒ so 4, tên 3)', async () => {
+    const { d } = dung()
+    for (const m of ['D1', 'D2', 'D3', 'D4']) { kho(d, `${m}-q`, { dang: m, tenDang: `Dạng ${m}` }); suKien(d, { qid: `${m}-1`, ngay: NGAY, gio: '10:00', dang: m, kq: 1 }) }
+    await dungLaiHoSo(d.env, ['S1'], 'x')
+    const lb = (await chayApple(d)).homNay.dieuDangMung.find((x: any) => x.loai === 'len_bac')
+    expect(lb.so).toBe(4)
+    expect(lb.chiTiet).toHaveLength(3)
+  })
+
+  it('hôm nay CHỈ có phiên bị che (chưa có câu nào chấm): coi là ĐÃ HỌC — dieuDangMung là mảng rỗng, không aiDaChuanBi, không "cham"', async () => {
+    const { d } = dung({ moc: null })
+    themCa(d, 'CA-CHE', 'khong'); themLuot(d, 'CA-CHE', 'S1')
+    themKeHoachApple(d, [{ loai: 'on_lai', soCau: 2 }])
+    suKien(d, { qid: 'Q', ngay: NGAY, gio: '10:00', nguon: 'thi', ma: 'CA-CHE', kq: 1 })
+    const r = await chayApple(d)
+    expect(r.homNay.dieuDangMung).toEqual([])
+    expect('aiDaChuanBi' in r.homNay).toBe(false)
+    expect(r.homNay.aiDaLam).toEqual([{ loai: 'chon_rieng', so: 2, chiTiet: { on_lai: 2 } }]) // không có dòng cham (0 câu chấm)
+  })
+
+  it('chon_rieng tính CẢ chặng bài tập về nhà (btvn_lo) và ôn thi; việc không phải "câu chọn riêng" (btvn_nop, mom) không cộng; kế hoạch không có câu chọn riêng ⇒ không có dòng chon_rieng', async () => {
+    const { d } = dung()
+    themKeHoachApple(d, [{ loai: 'btvn_lo', soCau: 5 }, { loai: 'on_thi', soCau: 4 }, { loai: 'btvn_nop', soCau: 20 }, { loai: 'mom', soCau: 9 }])
+    expect((await chayApple(d)).homNay.aiDaChuanBi).toEqual([{ loai: 'chon_rieng', so: 9, chiTiet: { btvn_lo: 5, on_thi: 4 } }])
+    const { d: d2 } = dung()
+    themKeHoachApple(d2, [{ loai: 'btvn_nop', soCau: 20 }])
+    expect('aiDaChuanBi' in ((await chayApple(d2)).homNay ?? {})).toBe(false)
+  })
+
+  it('lichChangCuaEm: lịch có NHIỀU chặng hơn soChang cũng là lệch ⇒ null', () => {
+    const j = JSON.stringify({ chang: [{ moLuc: '2026-09-22T00:00:00.000Z' }, { moLuc: '2026-09-23T00:00:00.000Z' }, { moLuc: '2026-09-24T00:00:00.000Z' }] })
+    expect(lichChangCuaEm(j, 2, 0, 0)).toBeNull()
+    expect(lichChangCuaEm(j, 3, 0, 0)).toHaveLength(3)
+  })
+
+  it('nopTreGio: nộp ĐÚNG hạn (bằng nhau) không phải nộp trễ ⇒ vắng; trễ 1 phút ⇒ 0 giờ (làm tròn 1 chữ số)', async () => {
+    const { d } = dung()
+    themBtvn(d, 'BANG', { giao: '2026-09-21T03:00:00.000Z', han: '2026-09-22T05:00:00.000Z', nop: '2026-09-22T05:00:00.000Z', soDung: 1, soCau: 2 })
+    themBtvn(d, 'TRE2', { giao: '2026-09-21T03:00:00.000Z', han: '2026-09-22T03:00:00.000Z', nop: '2026-09-22T05:06:00.000Z', soDung: 1, soCau: 2 }) // trễ 2 giờ 6 phút
+    const gan = (await chayApple(d)).baiTapVeNha.gan
+    expect(gan.find((x: any) => x.maBtvn === 'BANG')).toMatchObject({ dungHan: true })
+    expect('nopTreGio' in gan.find((x: any) => x.maBtvn === 'BANG')).toBe(false)
+    expect(gan.find((x: any) => x.maBtvn === 'TRE2').nopTreGio).toBe(2.1)
+  })
+
+  it('lichOn.tongTungSai gồm CẢ câu đã khắc phục: câu sai rồi đúng ở 3 ngày khác nhau + 2 câu còn sai ⇒ 1 + 2', async () => {
+    const { d } = dung()
+    suKien(d, { qid: 'KP', ngay: themNgay(NGAY, -6), gio: '10:00', dang: 'ES', kq: 0 })
+    for (const n of [-5, -3, -1]) suKien(d, { qid: 'KP', ngay: themNgay(NGAY, n), gio: '10:00', dang: 'ES', kq: 1, lan: 2 })
+    for (let i = 0; i < 2; i++) suKien(d, { qid: `S${i}`, ngay: NGAY, gio: '10:00', dang: 'ES', kq: 0 })
+    await dungLaiHoSo(d.env, ['S1'], 'x')
+    const l = (await chayApple(d)).lichOn
+    expect(l).toMatchObject({ daKhacPhuc14Ngay: 1, conSaiChuaKhacPhuc: 2, tongTungSai: 3 })
   })
 })
