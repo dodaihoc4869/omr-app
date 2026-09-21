@@ -569,7 +569,7 @@ export default function BaoCaoCaThiHocSinhModal({
           {/* TAB 4: MỨC TIẾN BỘ */}
 
           {/* THẺ MỨC TIẾN BỘ — dùng chung `TheTienBo` với cổng phụ huynh. */}
-          {tabHienThi === 'tien_bo' && <TheTienBo lichSu={dsLichSu} dangMo={{ ...baiThi, diem }} />}
+          {tabHienThi === 'tien_bo' && <TheTienBo lichSu={dsLichSu} dangMo={{ ...baiThi, diem }} anNhanNangLuc />}
 
         </div>
 

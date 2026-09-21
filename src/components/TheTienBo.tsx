@@ -97,14 +97,14 @@ export function gomCaChoBieuDo(lichSu: CaLichSu[] | null | undefined, dangMo: Ca
   return ds as unknown as HoSoEm['ca']
 }
 
-export default function TheTienBo({ lichSu, dangMo }: { lichSu: CaLichSu[] | null | undefined; dangMo: CaDangMo }) {
+export default function TheTienBo({ lichSu, dangMo, anNhanNangLuc = false }: { lichSu: CaLichSu[] | null | undefined; dangMo: CaDangMo; anNhanNangLuc?: boolean }) {
   const ca = useMemo(() => gomCaChoBieuDo(lichSu, dangMo), [lichSu, dangMo])
   // Điểm của ca ĐANG MỞ đè lên bản máy chủ: máy thầy vừa chấm lại tại chỗ thì
   // con số trước mắt mới là con số đúng.
   const diemDe = useMemo(() => ({ [dangMo.maCa]: dangMo.diem }), [dangMo.maCa, dangMo.diem])
   return (
     <div className="animate-google-fade">
-      <BieuDoTienBoGoogle ca={ca} diemDe={diemDe} />
+      <BieuDoTienBoGoogle ca={ca} diemDe={diemDe} anNhanNangLuc={anNhanNangLuc} />
     </div>
   )
 }

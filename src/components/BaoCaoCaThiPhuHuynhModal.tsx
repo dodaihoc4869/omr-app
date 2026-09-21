@@ -588,6 +588,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
             <TheTienBo
               lichSu={dsLichSu}
               dangMo={{ ...baiThi, diem, tenCa: baiThi.tenCa, ngayThi: baiThi.ngayNop, tongCau }}
+              anNhanNangLuc
             />
           )}
 

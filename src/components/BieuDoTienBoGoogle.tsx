@@ -9,6 +9,8 @@ interface BieuDoTienBoGoogleProps {
   ca: HoSoEm['ca']
   diemDe?: Record<string, number> | null
   onChonCa?: (maCa: string) => void
+  /** HỌC SINH / PHỤ HUYNH (chuẩn từ ngữ 21/09): KHÔNG in nhãn xếp loại ("Yếu", "Khá"…) cạnh điểm và KHÔNG in "Hạng x/sĩ số" — chỉ số điểm và so với lần trước của chính em. Màn thầy giữ nguyên (mặc định false). */
+  anNhanNangLuc?: boolean
 }
 
 function ngayVN(iso: string): string {
@@ -21,7 +23,7 @@ function soVN(x: number, le = 2): string {
   return x.toFixed(le).replace('.', ',')
 }
 
-export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienBoGoogleProps) {
+export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa, anNhanNangLuc = false }: BieuDoTienBoGoogleProps) {
   const ds = useMemo(() => chuoiTienBo(ca, diemDe), [ca, diemDe])
   const cong = useMemo(() => trungBinhCongDon(ds.map((d) => d.diem)), [ds])
   const nx = useMemo(() => nhanXetTienBo(ds), [ds])
@@ -307,16 +309,18 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
               </div>
               <div className="text-[11px] text-blue-700 dark:text-blue-400 mt-0.5">
                 Ngày thi: {selectedCa.ngay ? ngayVN(selectedCa.ngay) : 'Đã nộp'}
-                {selectedCa.hang && selectedCa.siSo ? ` · Hạng ${selectedCa.hang}/${selectedCa.siSo}` : ''}
+                {!anNhanNangLuc && selectedCa.hang && selectedCa.siSo ? ` · Hạng ${selectedCa.hang}/${selectedCa.siSo}` : ''}
               </div>
             </div>
             <div className="text-right shrink-0">
               <div className="text-xl font-black text-blue-600 dark:text-blue-400 leading-none">
                 {soVN(selectedCa.diem)}
               </div>
-              <div className="text-[10px] text-blue-600/70 dark:text-blue-400/70 mt-0.5">
-                {classify(selectedCa.diem)}
-              </div>
+              {!anNhanNangLuc && (
+                <div className="text-[10px] text-blue-600/70 dark:text-blue-400/70 mt-0.5">
+                  {classify(selectedCa.diem)}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -365,7 +369,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                   </div>
                   <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2">
                     <span>{c.ngay ? ngayVN(c.ngay) : 'Đã nộp'}</span>
-                    {c.hang && c.siSo && (
+                    {!anNhanNangLuc && c.hang && c.siSo && (
                       <>
                         <span>·</span>
                         <span>Hạng {c.hang}/{c.siSo}</span>
@@ -392,9 +396,11 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                     <div className="text-base font-black text-slate-900 dark:text-white leading-none">
                       {soVN(c.diem)}
                     </div>
-                    <div className="text-[10px] font-semibold text-slate-400 mt-0.5">
-                      {classify(c.diem)}
-                    </div>
+                    {!anNhanNangLuc && (
+                      <div className="text-[10px] font-semibold text-slate-400 mt-0.5">
+                        {classify(c.diem)}
+                      </div>
+                    )}
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600" />
                 </div>
