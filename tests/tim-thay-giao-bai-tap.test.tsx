@@ -11,6 +11,7 @@ import { render, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 import ExamHubScreen from '../src/screens/ExamHubScreen'
 import BottomNav from '../src/components/BottomNav'
+import ThanhBenTrai from '../src/components/ThanhBenTrai'
 import { useAppStore } from '../src/store/appStore'
 import maHocSinh from '../src/screens/HocSinhScreen.tsx?raw'
 
@@ -23,11 +24,16 @@ describe('Màn chính của thầy', () => {
     expect(screen.queryByText('Quản lý đăng ký')).toBeNull()
   })
 
-  it('ba thẻ còn lại vẫn nguyên', () => {
-    render(<ExamHubScreen />)
+  // Màn chính nay là BẢNG TIN "Hôm nay" (thầy chốt bản 3): ba thẻ lối tắt cũ không còn ở màn chính. Ba đường ấy vẫn còn — ở THANH BÊN.
+  it('ba đường Mở ca kiểm tra · Ngân hàng đề · Ca kiểm tra vẫn còn, nay nằm ở thanh bên (không còn thẻ ở màn chính)', () => {
+    const { unmount } = render(<ExamHubScreen />)
+    expect(screen.queryByText('Mở ca kiểm tra')).toBeNull()
+    expect(screen.queryByText('Ngân hàng câu hỏi')).toBeNull()
+    unmount()
+    render(<ThanhBenTrai />)
     expect(screen.getByText('Mở ca kiểm tra')).toBeTruthy()
-    expect(screen.getByText('Ngân hàng câu hỏi')).toBeTruthy()
-    expect(screen.getByText('Ca kiểm tra')).toBeTruthy()
+    expect(screen.getByText('Ngân hàng đề')).toBeTruthy()
+    expect(screen.getAllByText('Ca kiểm tra').length).toBeGreaterThan(0)
   })
 })
 
@@ -41,7 +47,7 @@ describe('Tab Học sinh', () => {
   // Dòng chỉ đường đổi khi thầy chốt hai nút mỗi em (05/09): không còn "chạm
   // một em" chung chung, mà nói thẳng hai nút đó mở ra cái gì.
   it('có dòng chỉ đường nói rõ hai nút của mỗi em mở ra cái gì', () => {
-    expect(maHocSinh).toContain('Mỗi em có hai nút')
+    expect(maHocSinh).toContain('Mỗi em có các nút')
     expect(maHocSinh).toContain('chuyên đề mạnh–yếu')
     expect(maHocSinh).toContain('điểm và hạng lớp')
   })

@@ -25,6 +25,7 @@ import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
 import NutThemHocSinh from '../components/NutThemHocSinh'
 import KhoiHoSoHocTap from '../components/KhoiHoSoHocTap'
 import NhatKyDieuChinh from '../components/NhatKyDieuChinh'
+import HopXacNhan from '../components/HopXacNhan'
 import DoiTenHocSinh from '../components/DoiTenHocSinh'
 import { doiTenEmTrongDanhSachLop } from '../lib/classlist-db'
 import type { KetQuaDoiTen } from '../lib/doi-ten-hs-api'
@@ -147,11 +148,16 @@ export default function HocSinhScreen() {
    * Bắt gõ đúng số báo danh, giống cách xoá ca: em vào thi là tự có tên nên
    * danh sách sẽ đông, chạm nhầm rất dễ. Xoá hồ sơ chứ KHÔNG xoá bài làm —
    * điểm và lịch sử ca vẫn nằm trong LuotThi, em thi lại là tên hiện ra lại. */
+  /** Hộp xác nhận M3 (thay hộp hỏi gốc của trình duyệt — dọn dư thừa G9). `null` = không có hộp nào đang mở. */
+  const [canXacNhan, setCanXacNhan] = useState<{ loai: 'xoa-em' | 'dat-lai-mat-khau'; sbd: string; hoTen: string } | null>(null)
+  const [dangXoaEm, setDangXoaEm] = useState(false)
+  const hoiXoaEm = (sbd: string, hoTen: string) => {
+    if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
+    setCanXacNhan({ loai: 'xoa-em', sbd, hoTen })
+  }
   const xoaEm = async (sbd: string, hoTen: string) => {
     if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
-    const go = prompt(`Xoá "${hoTen || `SBD ${sbd}`}" khỏi danh sách học sinh?\n\nBài làm và điểm của em GIỮ NGUYÊN; em thi ca tiếp theo là tên tự hiện lại.\n\nGõ đúng số báo danh ${sbd} để xoá:`)
-    if (go === null) return
-    if (go.trim() !== sbd) return showToast('Số báo danh gõ vào không khớp — chưa xoá gì', 'warn')
+    setDangXoaEm(true)
     try {
       await deleteStudentRegistration(cauHinh.url, cauHinh.mat, sbd)
       setDs((truoc) => (truoc ?? []).filter((e) => e.sbd !== sbd))
@@ -159,26 +165,32 @@ export default function HocSinhScreen() {
       showToast(`Đã xoá ${hoTen || `SBD ${sbd}`} khỏi danh sách`, 'success')
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Không xoá được', 'error')
+    } finally {
+      setDangXoaEm(false)
+      setCanXacNhan(null)
     }
   }
 
   const [dangResetMk, setDangResetMk] = useState(false)
-  const resetMatKhau = async (sbd: string, hoTen: string) => {
+  const hoiDatLaiMatKhau = (sbd: string, hoTen: string) => {
     if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
-    const xn = confirm(`Đặt lại mật khẩu cho ${hoTen || `SBD ${sbd}`} về mặc định "12121212"?`)
-    if (!xn) return
+    setCanXacNhan({ loai: 'dat-lai-mat-khau', sbd, hoTen })
+  }
+  const datLaiMatKhau = async (sbd: string, hoTen: string) => {
+    if (!cauHinh) return showToast('Chưa có địa chỉ máy chủ hoặc mã bí mật', 'error')
     setDangResetMk(true)
     try {
       const res = await resetMatKhauHsApi(cauHinh.url, cauHinh.mat, sbd)
       if (res.ok) {
-        showToast(`Đã reset mật khẩu của ${hoTen || sbd} về mặc định (12121212)`, 'success')
+        showToast(`Đã đặt lại mật khẩu của ${hoTen || sbd} về mật khẩu mặc định`, 'success')
       } else {
-        showToast(res.error || 'Không reset được mật khẩu', 'error')
+        showToast(res.error || 'Không đặt lại được mật khẩu', 'error')
       }
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Lỗi kết nối máy chủ', 'error')
     } finally {
       setDangResetMk(false)
+      setCanXacNhan(null)
     }
   }
 
@@ -231,6 +243,41 @@ export default function HocSinhScreen() {
   }, [hoSo?.ca])
 
   // ------------------------------------------------------------------ HỒ SƠ
+  // HỘP XÁC NHẬN (Đặt lại mật khẩu / Xoá khỏi danh sách) — dùng ở cả hai nhánh vẽ: hồ sơ một em và danh sách.
+  const hopXacNhan = (
+    <>
+    {canXacNhan?.loai === 'dat-lai-mat-khau' && (
+      <HopXacNhan
+        tieuDe="Đặt lại mật khẩu?"
+        noiDung={<p>Mật khẩu đăng nhập của {canXacNhan.hoTen || `SBD ${canXacNhan.sbd}`} sẽ về mật khẩu mặc định. Em cần đăng nhập lại bằng mật khẩu mặc định.</p>}
+        nhanXacNhan="Đặt lại mật khẩu"
+        nhanDangLam="Đang đặt lại…"
+        dangLam={dangResetMk}
+        onXacNhan={() => void datLaiMatKhau(canXacNhan.sbd, canXacNhan.hoTen)}
+        onHuy={() => setCanXacNhan(null)}
+      />
+    )}
+    {canXacNhan?.loai === 'xoa-em' && (
+      <HopXacNhan
+        tieuDe="Xoá khỏi danh sách học sinh?"
+        noiDung={
+          <>
+            <p>Xoá {canXacNhan.hoTen || `SBD ${canXacNhan.sbd}`} khỏi danh sách học sinh.</p>
+            <p>Bài làm và điểm của em giữ nguyên; em thi ca kiểm tra tiếp theo là tên tự hiện lại.</p>
+          </>
+        }
+        yeuCauGo={{ nhan: `Gõ đúng số báo danh ${canXacNhan.sbd} để xoá`, giaTri: canXacNhan.sbd }}
+        nhanXacNhan="Xoá khỏi danh sách"
+        nhanDangLam="Đang xoá…"
+        nguyHiem
+        dangLam={dangXoaEm}
+        onXacNhan={() => void xoaEm(canXacNhan.sbd, canXacNhan.hoTen)}
+        onHuy={() => setCanXacNhan(null)}
+      />
+    )}
+    </>
+  )
+
   if (sbdDangXem) {
     const diemGanNhat = hoSo?.ca.find((c) => c.tong !== null)?.tong ?? null
     return (
@@ -413,13 +460,13 @@ export default function HocSinhScreen() {
                         Mật khẩu tài khoản học sinh
                       </div>
                       <div style={NHAN_NHO}>
-                        Khôi phục mật khẩu đăng nhập cổng học sinh về mặc định (12121212)
+                        Khôi phục mật khẩu đăng nhập cổng học sinh về mật khẩu mặc định
                       </div>
                     </div>
                     <button
                       type="button"
                       disabled={dangResetMk}
-                      onClick={() => void resetMatKhau(hoSo.em.sbd, hoSo.em.hoTen)}
+                      onClick={() => hoiDatLaiMatKhau(hoSo.em.sbd, hoSo.em.hoTen)}
                       className="tap-target font-bold inline-flex items-center justify-center shrink-0"
                       style={{
                         height: 40,
@@ -432,13 +479,13 @@ export default function HocSinhScreen() {
                         gap: 6,
                       }}
                     >
-                      <KeyRound size={16} /> {dangResetMk ? 'Đang reset…' : 'Reset mật khẩu (12121212)'}
+                      <KeyRound size={16} /> {dangResetMk ? 'Đang đặt lại…' : 'Đặt lại mật khẩu'}
                     </button>
                   </div>
                 </TheNoiDung>
 
                 {/* XOÁ EM KHỎI DANH SÁCH — CHỈ THẦY, và để tận đáy. */}
-                <NutChinh variant="nguyhiem" onClick={() => void xoaEm(hoSo.em.sbd, hoSo.em.hoTen)}>
+                <NutChinh variant="nguyhiem" onClick={() => hoiXoaEm(hoSo.em.sbd, hoSo.em.hoTen)}>
                   <span className="inline-flex items-center" style={{ gap: 6 }}>
                     <Trash2 size={18} /> Xoá em khỏi danh sách
                   </span>
@@ -478,6 +525,7 @@ export default function HocSinhScreen() {
             }}
           />
         )}
+        {hopXacNhan}
       </div>
     )
   }
@@ -529,7 +577,7 @@ export default function HocSinhScreen() {
         <div style={NHAN_NHO} className="hs-huong-dan-than">
           Mỗi em có các nút: <b style={{ color: 'var(--muc)' }}>Báo cáo</b> (tiến bộ, chuyên đề mạnh–yếu) và{' '}
           <b style={{ color: 'var(--muc)' }}>Lịch sử ca</b> (mọi ca đã làm, điểm và hạng lớp), cùng nút{' '}
-          <b style={{ color: 'var(--muc)' }}>Reset mật khẩu</b>. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp file danh sách đã đồng bộ.
+          <b style={{ color: 'var(--muc)' }}>Đặt lại mật khẩu</b>. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp file danh sách đã đồng bộ.
         </div>
       </details>
 
@@ -703,12 +751,12 @@ export default function HocSinhScreen() {
                     <button
                       type="button"
                       disabled={dangResetMk}
-                      onClick={() => void resetMatKhau(e.sbd, e.hoTen)}
-                      aria-label={`Reset mật khẩu của ${e.hoTen || `SBD ${e.sbd}`}`}
+                      onClick={() => hoiDatLaiMatKhau(e.sbd, e.hoTen)}
+                      aria-label={`Đặt lại mật khẩu của ${e.hoTen || `SBD ${e.sbd}`}`}
                       className="tap-target hs-nut-phu"
                       style={{ minHeight: 44, fontSize: 'var(--cx-1)' }}
                     >
-                      <KeyRound size={15} /> {dangResetMk ? 'Đang reset…' : 'Reset mật khẩu'}
+                      <KeyRound size={15} /> {dangResetMk ? 'Đang đặt lại…' : 'Đặt lại mật khẩu'}
                     </button>
                   </span>
                 </Hang>
@@ -717,6 +765,7 @@ export default function HocSinhScreen() {
           </div>
         )}
       </TheNoiDung>
+      {hopXacNhan}
     </div>
   )
 }

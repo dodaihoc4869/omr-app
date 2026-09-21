@@ -1,7 +1,7 @@
 // G3 · HỌC SINH (app giáo viên M3, 21/09): danh sách + hồ sơ một em theo bản vẽ 3-ho-so-hoc-sinh.jpg.
 // Số liệu mới (lịch ôn 1·3·7, kế hoạch hôm nay, thần thú/EXP) ĐỌC từ hai lệnh sẵn có; không lệnh → "đang chờ máy chủ", không bịa số.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import type { EmTomTat, HoSoEm } from '../src/lib/exam-api'
@@ -16,6 +16,9 @@ const m = vi.hoisted(() => ({
   setScreen: vi.fn(),
   moChiTietCa: vi.fn(),
   datSbd: vi.fn(),
+  toast: vi.fn(),
+  reset: vi.fn(),
+  xoa: vi.fn(),
   sbd: { v: '' },
 }))
 
@@ -204,14 +207,15 @@ const HO_SO = {
 } as unknown as HoSoEm
 
 vi.mock('../src/store/appStore', () => ({
-  useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ sbdDangXem: m.sbd.v, moHoSoEm: m.moHoSoEm, showToast: vi.fn(), setScreen: m.setScreen, moChiTietCa: m.moChiTietCa, datSbdGiaoRieng: m.datSbd }),
+  useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ sbdDangXem: m.sbd.v, moHoSoEm: m.moHoSoEm, showToast: m.toast, setScreen: m.setScreen, moChiTietCa: m.moChiTietCa, datSbdGiaoRieng: m.datSbd }),
 }))
 vi.mock('../src/lib/exam-db', () => ({ loadScriptUrl: async () => 'https://x', loadTeacherSecret: async () => 'mat' }))
 vi.mock('../src/lib/exam-api', async (goc) => ({
   ...(await goc<Record<string, unknown>>()),
   danhSachEm: async () => DS,
   hoSoEm: async () => HO_SO,
-  deleteStudentRegistration: vi.fn(),
+  deleteStudentRegistration: (...a: unknown[]) => m.xoa(...a),
+  resetMatKhauHsApi: (...a: unknown[]) => m.reset(...a),
   loadKhoaApp: async () => null,
   saveKhoaApp: vi.fn(),
   goKhoaApp: vi.fn(),
@@ -296,13 +300,106 @@ describe('HocSinhScreen · hồ sơ tổng quan', () => {
     expect(container.querySelector('.hs-luoi')).toBeNull()
   })
 
-  it('mọi nút cũ trong hồ sơ còn: Reset mật khẩu · Xoá em khỏi danh sách · Danh sách học sinh (quay lại)', async () => {
+  it('mọi nút cũ trong hồ sơ còn: Đặt lại mật khẩu · Xoá em khỏi danh sách · Danh sách học sinh (quay lại)', async () => {
     const { container } = await moHoSo('ten')
     await waitFor(() => expect(container.querySelector('.hs-viec')).toBeTruthy())
-    expect(screen.getByRole('button', { name: /Reset mật khẩu \(12121212\)/ })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Đặt lại mật khẩu' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /Xoá em khỏi danh sách/ })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: /Danh sách học sinh/ }))
     expect(m.moHoSoEm).toHaveBeenCalledWith('')
+  })
+})
+
+describe('G9 · hộp xác nhận M3 thay confirm()/prompt() của trình duyệt (dọn dư thừa, Boss soát)', () => {
+  beforeEach(() => {
+    m.sbd.v = ''
+    m.namKt.mockResolvedValue(NAMKT)
+    m.keHoach.mockResolvedValue(KEHOACH)
+    m.reset.mockResolvedValue({ ok: true })
+    m.xoa.mockResolvedValue(undefined)
+  })
+  afterEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+    vi.restoreAllMocks()
+  })
+  const moHoSo2 = async () => {
+    const r = render(<HocSinhScreen />)
+    await waitFor(() => expect(r.container.textContent).toContain('Lê Minh Đức'))
+    fireEvent.click(screen.getByText('Lê Minh Đức'))
+    m.sbd.v = '001'
+    r.rerender(<HocSinhScreen />)
+    await waitFor(() => expect(r.container.querySelector('.hs-viec')).toBeTruthy())
+    return r
+  }
+
+  it('Đặt lại mật khẩu: hỏi bằng HỘP M3 (không gọi confirm/prompt của trình duyệt), nút mang tên việc, KHÔNG in mật khẩu mặc định ở đâu trên màn', async () => {
+    const confirm = vi.spyOn(window, 'confirm')
+    const prompt = vi.spyOn(window, 'prompt')
+    const { container } = await moHoSo2()
+    expect(container.textContent).not.toContain('12121212') // không in mật khẩu mặc định ở nút, dòng chú thích, toast, hộp
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt lại mật khẩu' }))
+    const hop = await screen.findByRole('alertdialog', { name: 'Đặt lại mật khẩu?' })
+    expect(hop.textContent).toContain('mật khẩu mặc định')
+    expect(hop.textContent).not.toContain('12121212')
+    expect(confirm).not.toHaveBeenCalled()
+    expect(prompt).not.toHaveBeenCalled()
+    expect(m.reset).not.toHaveBeenCalled() // chưa bấm xác nhận thì chưa làm gì
+    const trong = within(hop)
+    expect(trong.getByRole('button', { name: 'Huỷ' })).toBeTruthy()
+    fireEvent.click(trong.getByRole('button', { name: 'Đặt lại mật khẩu' }))
+    await waitFor(() => expect(m.reset).toHaveBeenCalledTimes(1))
+    expect(m.reset.mock.calls[0][2]).toBe('001')
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
+    expect(m.toast).toHaveBeenCalledWith(expect.stringMatching(/^Đã đặt lại mật khẩu của .* về mật khẩu mặc định$/), 'success')
+    expect(JSON.stringify(m.toast.mock.calls)).not.toContain('12121212')
+  })
+
+  it('Huỷ hoặc Esc ⇒ đóng hộp, KHÔNG gọi máy chủ; lỗi máy chủ ⇒ báo lỗi và vẫn đóng hộp', async () => {
+    await moHoSo2()
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt lại mật khẩu' }))
+    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Huỷ' }))
+    expect(screen.queryByRole('alertdialog')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt lại mật khẩu' }))
+    await screen.findByRole('alertdialog')
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('alertdialog')).toBeNull()
+    expect(m.reset).not.toHaveBeenCalled()
+    m.reset.mockResolvedValue({ ok: false, error: 'Máy chủ từ chối' })
+    fireEvent.click(screen.getByRole('button', { name: 'Đặt lại mật khẩu' }))
+    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Đặt lại mật khẩu' }))
+    await waitFor(() => expect(m.toast).toHaveBeenCalledWith('Máy chủ từ chối', 'error'))
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
+  })
+
+  it('Xoá em khỏi danh sách: hộp M3 bắt gõ ĐÚNG số báo danh mới bật nút; gõ sai thì nút tắt và chưa xoá gì; gõ đúng ⇒ xoá', async () => {
+    const prompt = vi.spyOn(window, 'prompt')
+    await moHoSo2()
+    fireEvent.click(screen.getByRole('button', { name: /Xoá em khỏi danh sách/ }))
+    const hop = await screen.findByRole('alertdialog', { name: 'Xoá khỏi danh sách học sinh?' })
+    expect(prompt).not.toHaveBeenCalled()
+    const trong = within(hop)
+    const nut = trong.getByRole('button', { name: 'Xoá khỏi danh sách' }) as HTMLButtonElement
+    expect(nut.disabled).toBe(true)
+    const o = trong.getByLabelText('Gõ đúng số báo danh 001 để xoá')
+    fireEvent.change(o, { target: { value: '002' } })
+    expect(nut.disabled).toBe(true)
+    fireEvent.click(nut)
+    expect(m.xoa).not.toHaveBeenCalled()
+    fireEvent.change(o, { target: { value: ' 001 ' } }) // khoảng trắng đầu/cuối được bỏ như bản cũ
+    expect(nut.disabled).toBe(false)
+    fireEvent.click(nut)
+    await waitFor(() => expect(m.xoa).toHaveBeenCalledTimes(1))
+    expect(m.xoa.mock.calls[0][2]).toBe('001')
+    expect(m.moHoSoEm).toHaveBeenCalledWith('')
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
+  })
+
+  it('nguồn: màn Học sinh không còn confirm( / prompt( của trình duyệt', () => {
+    const src = fs.readFileSync(path.join(process.cwd(), 'src/screens/HocSinhScreen.tsx'), 'utf8')
+    expect(src).not.toMatch(/\b(window\.)?(confirm|prompt)\(/)
+    expect(src).not.toContain('12121212')
+    expect(src).not.toMatch(/Reset mật khẩu|Đang reset/)
   })
 })
 
