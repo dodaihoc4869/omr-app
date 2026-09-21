@@ -16,7 +16,10 @@ describe('Hộp chọn bài hiện ĐỦ số câu trong kho', () => {
   })
 
   it('khử trùng chuyển sang lúc DỰNG danh sách chữa', () => {
-    expect(s).toContain('mergeKeepAnswers(khuTrungNguon(deDaLuu.filter((d) => maDeChon.has(d.maDe))).nguon)')
+    // Khử trùng nằm ở bước DỰNG `bankTichTay` (từ các đề đã tích), không ở hộp chọn. Từ 21/09 có thêm nhánh chế độ dạy học (giữ nguyên câu, không khử)
+    // và nhánh "buổi chữa xếp sẵn" (lấy đúng các câu máy đề xuất); nhánh thường vẫn khử trùng sau khi thầy tích.
+    expect(s).toContain('const bankTichTay: BanDeCa = useMemo(')
+    expect(s).toContain('khuTrungNguon(deDaLuu.filter((d) => maDeChon.has(d.maDe))).nguon')
   })
 
   it('nói ra số câu trùng đã bỏ, không để thầy thắc mắc tích 40 ra 36', () => {

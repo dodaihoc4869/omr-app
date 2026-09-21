@@ -212,9 +212,9 @@ describe('thầy tự chọn bài thì CHỈ chữa bài đó', () => {
 
   it('màn Gọi lên bảng bỏ hẳn câu của ca khi thầy tự chọn bài', async () => {
     const ma = (await import('../src/screens/GoiLenBangScreen.tsx?raw')).default
-    // v4 thêm chế độ thứ ba "theo dạng câu cả lớp sai" — cũng chỉ lấy câu do
-    // cổng chọn, không chen câu của ca. Luật cũ giữ nguyên, chỉ dài thêm một vế.
-    expect(ma).toContain("if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang') return cauTuBanDe(bankThem)")
+    // v4 thêm chế độ thứ ba "theo dạng câu cả lớp sai", rồi "chữa BTVN đã phân gần nhất" — cũng chỉ lấy câu do
+    // cổng chọn, không chen câu của ca. Luật cũ giữ nguyên, chỉ dài thêm vế (21/09: thêm `btvn_gan_nhat`).
+    expect(ma).toContain("if (cachLayCau === 'tu_chon' || cachLayCau === 'theo_dang' || cachLayCau === 'btvn_gan_nhat') return cauTuBanDe(bankThem)")
   })
 
   it('danh sách chữa chỉ còn chuyên đề của bài đã tích', () => {

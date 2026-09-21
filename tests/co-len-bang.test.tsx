@@ -12,7 +12,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
 
-const KHO: TeacherExamSource[] = [
+const KHO_DAY: TeacherExamSource[] = [
   {
     maDe: '12-C1-B1',
     nhom: '12 · C1 - Ester lipid',
@@ -29,7 +29,10 @@ const KHO: TeacherExamSource[] = [
     phanIII: [],
   } as unknown as TeacherExamSource,
 ]
+/** Kho NHỎ (20 câu): chip "Lấy trọn kho (N câu)" chỉ hiện khi kho ≤ 28 câu. */
+const KHO_NHO: TeacherExamSource[] = [{ ...(KHO_DAY[0] as unknown as Record<string, unknown>), phanI: (KHO_DAY[0].phanI as unknown[]).slice(0, 20) } as unknown as TeacherExamSource]
 
+const khoHienTai = vi.hoisted(() => ({ ds: [] as unknown[] }))
 const publishSession = vi.fn(async () => ({ batDau: '', hetHanVao: '' }))
 const saveSessionTeacherBank = vi.fn(async () => {})
 
@@ -41,7 +44,7 @@ vi.mock('../src/lib/exam-api', async (goc) => ({
 vi.mock('../src/lib/exam-db', () => ({
   loadScriptUrl: async () => 'https://x',
   loadTeacherSecret: async () => 'mat',
-  loadExamSources: async () => KHO,
+  loadExamSources: async () => khoHienTai.ds,
   loadAllSessionTeacherBanks: async () => [],
   docSoCauCa: async () => undefined,
   luuSoCauCa: async () => {},
@@ -56,6 +59,8 @@ vi.mock('../src/lib/exam-db', () => ({
   goKhoaApp: vi.fn(),
   batKhoaApp: vi.fn(),
 }))
+// Địa chỉ máy chủ nay do `dia-chi-may-chu.ts` cấp (không còn `scriptUrl` trong IndexedDB): thiếu thì màn Mở ca báo "Chưa có kết nối máy chủ" và KHÔNG gọi publishSession.
+vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu.test' }))
 vi.mock('../src/lib/exam-sync', () => ({ dongBoNganHang: async () => ({ moi: [], capNhat: [], canXem: [] }) }))
 vi.mock('../src/lib/ca-link', () => ({ randomSessionCode: () => '123456', taoLinkMoi: async () => 'https://link' }))
 vi.mock('../src/store/appStore', () => ({
@@ -65,7 +70,8 @@ vi.mock('../src/store/appStore', () => ({
 const { default: ExamSetupScreen } = await import('../src/screens/ExamSetupScreen')
 
 type CachLay = 'rut' | 'tron' | 'lenbang'
-const TEN_CHIP: Record<CachLay, RegExp> = { rut: /^Rút bộ câu$/, tron: /^Lấy trọn kho/, lenbang: /^Kiểm tra điểm yếu$/ }
+// Nhãn hiện tại của khối Bộ câu ra đề: "Rút đề thông minh" (trước là "Rút bộ câu"); "Lấy trọn kho (N câu)" CHỈ hiện khi kho ≤ 28 câu.
+const TEN_CHIP: Record<CachLay, RegExp> = { rut: /^Rút đề thông minh$/, tron: /^Lấy trọn kho/, lenbang: /^Kiểm tra điểm yếu$/ }
 
 /** Soạn đủ một ca hợp lệ theo cách lấy câu đã chọn rồi bấm Mở ca. */
 /** HẠN CHO CẢ PHÉP KIỂM, không chỉ cho từng lượt chờ bên trong.
@@ -103,9 +109,14 @@ async function moCa(cach: CachLay) {
   // Gỡ màn của lần trước: một `it` mở ca hai lần thì hai màn cùng nằm trong
   // DOM, và getByRole thấy hai chip trùng tên.
   cleanup()
+  khoHienTai.ds = cach === 'tron' ? KHO_NHO : KHO_DAY
   publishSession.mockClear()
   saveSessionTeacherBank.mockClear()
   const r = render(<ExamSetupScreen />)
+  // MÀN MỞ CA THIẾT KẾ LẠI (M3): khối "Bộ câu ra đề" nay nằm trong tấm "Rút đề theo số câu & dạng bài" — mở bằng nút "Rút câu"
+  // (hoặc "Rút N câu" khi đã có bộ rút), chọn cách lấy câu rồi bấm "Xong". Phần luật của cờ lên bảng KHÔNG đổi: chọn "Kiểm tra điểm yếu" ⇒ đẩy sang màn Gọi lên bảng.
+  await waitFor(() => expect(nutRutCau(r)).toBeTruthy(), { timeout: 20000 })
+  fireEvent.click(nutRutCau(r)!)
   // CHỜ RỘNG, KHÔNG PHẢI NỚI ĐIỀU KIỆN KIỂM. Màn Mở ca dựng xong mới gọi
   // publishSession; chạy cả bộ 78 tệp song song thì bước dựng có lúc quá mốc
   // 1 giây mặc định và phép kiểm đỏ ngẫu nhiên. Điều kiện kiểm giữ nguyên,
@@ -132,27 +143,36 @@ async function moCa(cach: CachLay) {
     },
     { timeout: 20000 },
   )
-  fireEvent.change(r.getByPlaceholderText('Lớp (vd 12A1)'), { target: { value: '12A1' } })
-  // Tiêu đề màn cũng là chữ "Mở ca kiểm tra" — lấy đúng cái NÚT.
-  fireEvent.click(r.getAllByText('Mở ca kiểm tra').find((e) => e.tagName === 'BUTTON')!)
+  fireEvent.click(r.getByRole('button', { name: 'Xong' })) // đóng tấm Rút đề; bộ rút đã lưu ở màn Mở ca
+  fireEvent.change(r.getByLabelText('Lớp của ca kiểm tra'), { target: { value: '12A1' } })
+  // Tiêu đề màn cũng có chữ "Mở ca kiểm tra" — lấy đúng cái NÚT "Mở ca kiểm tra ngay".
+  fireEvent.click(r.getAllByRole('button').find((e) => /Mở ca kiểm tra ngay/.test(e.textContent ?? ''))!)
   await waitFor(() => expect(publishSession).toHaveBeenCalled(), { timeout: 20000 })
   return { r, goi: publishSession.mock.calls.at(-1) as unknown as unknown[] }
 }
 
 const co = (goi: unknown[]) => (goi[7] as { lenBang?: boolean }).lenBang
+/** Nút mở tấm Rút đề trên màn Mở ca ("Rút câu" hoặc "Rút N câu"). */
+const nutRutCau = (r: ReturnType<typeof render>) => r.queryAllByRole('button').find((e) => /^Rút( \d+)? câu$/.test((e.textContent ?? '').trim()))
 
 describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
   it('KHÔNG còn nút gạt LÊN BẢNG riêng trên màn Mở ca', async () => {
     // Cờ lên bảng suy từ khối Bộ câu ra đề, không có công tắc riêng nữa. Kiểm
-    // theo NHÃN chứ không đếm tổng số công tắc: màn này còn hai việc khác hẳn
-    // cũng dùng nút gạt — "Giữ để đọc" (GIUDEDOC) và "Phòng chờ" (07/09).
+    // theo NHÃN chứ không đếm tổng số công tắc: màn này còn việc khác cũng dùng
+    // nút gạt ("Đồng bộ giờ cả phòng"; "Giữ để đọc", "Phòng chờ" nay là nút bật/tắt trong khối Kiểm soát phòng thi).
+    // Màn thiết kế lại (M3) nên danh sách công tắc đổi; điều thật sự phải khoá thì không đổi: KHÔNG có công tắc/nút bật-tắt nào cho việc lên bảng.
+    khoHienTai.ds = KHO_DAY
     const r = render(<ExamSetupScreen />)
-    await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
-    const congTac = r.queryAllByRole('switch')
-    expect(congTac.map((n) => n.getAttribute('aria-label')).sort()).toEqual(['Giữ để đọc', 'Phòng chờ'])
-    // Điều thật sự phải khoá: KHÔNG có nút gạt nào cho việc lên bảng.
-    for (const n of congTac) expect(n.getAttribute('aria-label')).not.toMatch(/bảng/i)
+    await waitFor(() => expect(nutRutCau(r)).toBeTruthy(), { timeout: 20000 })
+    for (const n of [...r.queryAllByRole('switch'), ...r.queryAllByRole('checkbox'), ...r.container.querySelectorAll('[aria-pressed]')]) {
+      const nhan = `${n.getAttribute('aria-label') ?? ''} ${(n.textContent ?? '').slice(0, 80)}`
+      expect(nhan, 'công tắc/nút bật-tắt trên màn Mở ca').not.toMatch(/lên bảng|Gọi lên bảng/i)
+    }
     expect(r.container.textContent).not.toContain('Ca này dùng làm gì')
+    // và cờ vẫn chỉ nằm trong khối Bộ câu ra đề (mở bằng "Rút câu")
+    fireEvent.click(nutRutCau(r)!)
+    await waitFor(() => expect(r.container.textContent).toContain('Bộ câu ra đề'), { timeout: 20000 })
+    expect(r.container.textContent).toContain('Kiểm tra điểm yếu')
   }, HAN_PHEP_KIEM)
 
   it('chọn "Kiểm tra điểm yếu" → ca đẩy dữ liệu sang màn Gọi lên bảng', async () => {
@@ -160,7 +180,7 @@ describe('cờ lên bảng suy từ khối Bộ câu ra đề', () => {
     expect(co(goi)).toBe(true)
   }, HAN_PHEP_KIEM)
 
-  it('chọn "Rút bộ câu" → không đẩy', async () => {
+  it('chọn "Rút đề thông minh" → không đẩy', async () => {
     const { goi } = await moCa('rut')
     expect(co(goi)).toBe(false)
   }, HAN_PHEP_KIEM)
@@ -185,7 +205,15 @@ describe('mọi lựa chọn đều lấy dữ liệu phiếu phụ huynh và m�
     // 5 = cách công bố · 6 = keyBank. Hai thứ quyết định em xem được điểm và
     // thầy chấm lại được — không được dính gì tới cờ lên bảng.
     expect(a[5]).toBe(b[5])
-    expect(JSON.stringify(a[6])).toBe(JSON.stringify(b[6]))
+    // keyBank: "Kiểm tra điểm yếu" và "Rút đề thông minh" chọn số câu KHÁC nhau theo thiết kế (chẩn đoán 15 câu I, rút mặc định 9), nên không còn so nội dung
+    // từng câu; điều phải giữ là CẢ HAI đều mang đáp án (thầy chấm lại được) — cờ lên bảng không bao giờ làm mất đáp án.
+    const coDapAn = (k: unknown) => {
+      const bank = k as { phanI: { correct?: unknown }[]; phanII: { correct?: unknown }[]; phanIII: { correct?: unknown }[] }
+      const ds = [...bank.phanI, ...bank.phanII, ...bank.phanIII]
+      return ds.length > 0 && ds.every((c) => c.correct !== undefined && c.correct !== null && String(c.correct) !== '')
+    }
+    expect(coDapAn(a[6])).toBe(true)
+    expect(coDapAn(b[6])).toBe(true)
     const { lenBang: _a, ...conLaiA } = a[7] as Record<string, unknown>
     const { lenBang: _b, ...conLaiB } = b[7] as Record<string, unknown>
     expect(conLaiA).toEqual(conLaiB)

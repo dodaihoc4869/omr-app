@@ -92,6 +92,7 @@ describe('Gọi lên bảng — chọn nhiều đề', () => {
   it('tích ô CHƯƠNG là lấy hết mọi dạng trong chương, một chạm', async () => {
     const { container, getByRole } = render(<GoiLenBangScreen />)
     await waitFor(() => expect(container.textContent).toContain('Khối 12'))
+    await moHetCay(container) // cây chọn đề mặc định GẬP (chỉ thấy khối): mở ra mới thấy ô chương
     fireEvent.click(getByRole('checkbox', { name: /C1 - Ester lipid/ }))
     expect(container.textContent).toContain('Đã chọn: 8 câu')
   })
@@ -99,6 +100,7 @@ describe('Gọi lên bảng — chọn nhiều đề', () => {
   it('bỏ tích hết thì thanh tổng về 0', async () => {
     const { container, getByRole, getByText } = render(<GoiLenBangScreen />)
     await waitFor(() => expect(container.textContent).toContain('Khối 12'))
+    await moHetCay(container)
     fireEvent.click(getByRole('checkbox', { name: /C1 - Ester lipid/ }))
     expect(container.textContent).toContain('Đã chọn: 8 câu')
     fireEvent.click(getByText('Bỏ chọn hết'))

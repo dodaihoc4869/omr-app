@@ -237,8 +237,15 @@ describe('Màn Gọi lên bảng', () => {
     // 14/09 lượt 10: `dsPc` mang thêm dữ liệu bài tập về nhà nên phải khai
     // kiểu tường minh, không viết gọn một dòng được nữa. Ý ĐỊNH giữ nguyên:
     // nguồn ưu tiên vẫn là `kqBuoi`, và vẫn lùi về `kq.phanCong` khi chưa xếp.
-    expect(than).toMatch(/const dsPc:[\s\S]{0,400}\}\[\] = kqBuoi/)
+    // 21/09: nguồn ưu tiên là BUỔI CHỮA mới, nay tách thành `dongLenBang` (dòng có em lên bảng của `kqBuoi`) rồi `dsPc` lấy từ đó khi có dòng; không có mới lùi về `kq.phanCong`.
+    expect(than).toMatch(/const dongLenBang = kqBuoi \? kqBuoi\.dong\.filter/)
+    expect(than).toMatch(/const dsPc:[\s\S]{0,400}\}\[\] = dongLenBang\.length > 0/)
     expect(than).toContain('(kq?.phanCong ?? [])')
+  })
+
+  // NGHI LỖI THẬT — CHỜ BOSS QUYẾT (đã báo 21/09). Commit d001ccc (18/09) thay lời báo "N em chưa tra được đề" bằng câu luyện dự phòng ("Nội dung câu hỏi <số>") để tờ chiếu LUÔN mở được,
+  // nhưng KHÔNG còn báo gì cho thầy khi câu thiếu nội dung: thầy có thể chiếu chỗ trống mà không biết. Hoặc thêm lại một dòng báo mềm (tờ vẫn mở), hoặc bỏ phép kiểm này.
+  it('câu không tra được đề thì BÁO thầy (tờ vẫn mở bằng câu dự phòng)', () => {
     expect(than).toContain('chưa tra được đề')
   })
 })
