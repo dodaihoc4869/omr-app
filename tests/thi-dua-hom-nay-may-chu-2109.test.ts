@@ -11,8 +11,9 @@ import {
   duSauMuoiPhanTram, gvChuaHocHomNay, hangChamCuaEm, hsThiDuaHomNay, LOI_KHONG_XEM_DUOC, SBD_THU_NGHIEM, soSanhCham, soViTriNhomCuoi, tenRutGon, tinhBangThiDua, trongNhomCuoi, xepHangCham,
   type EmCham,
 } from '../server/src/thi-dua-hom-nay'
-import { taoD1That, type D1That } from './_d1-that'
+import { taoD1That as taoD1ThatTho, type D1That } from './_d1-that'
 import { docThuBan } from '../src/lib/thi-dua'
+import { giaiMocHienThi } from '../server/src/moc-no'
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({
   ...(await orig<typeof import('../server/src/game-v2-auth')>()),
@@ -23,6 +24,13 @@ vi.mock('../server/src/game-v2-auth', async (orig) => ({
   },
 }))
 afterEach(() => vi.restoreAllMocks())
+
+/** D1 thật + MỐC HIỂN THỊ đặt từ rất lâu (2020) để các test cũ (dữ liệu 19–22/09) giữ nguyên nghĩa; test về mốc (khối cuối) tự đặt mốc riêng. */
+const taoD1That = () => {
+  const d = taoD1ThatTho()
+  d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('hien_thi_tu','2020-01-01T00:00:00.000Z','x')").run()
+  return d
+}
 
 const NGAY = '2026-09-22'
 const NOW = Date.parse(`${NGAY}T15:00:00+07:00`)
@@ -514,7 +522,7 @@ describe('XEM THỬ — tài khoản thử (12121212) thấy bảng của một 
     expect(docThuBan(r.top[1]!.thu).chiSo).toBeNull() // B chưa chọn thú
   })
 
-  it('không ghi; ≤ 6 truy vấn (xếp hạng 3 + cấu hình + em đã học cả trường... + thần thú) cho tài khoản thử', async () => {
+  it('không ghi; ≤ 7 truy vấn (mốc hiển thị 1 + xếp hạng 3 + cấu hình + em đã học cả trường... + thần thú) cho tài khoản thử', async () => {
     const d = await lopMau()
     themEm(d, SBD_THU_NGHIEM, 'Đỗ Đại Học')
     const ghi = dungGhi(d)
@@ -523,27 +531,34 @@ describe('XEM THỬ — tài khoản thử (12121212) thấy bảng của một 
     d.env.DB.prepare = ((q: string) => { dem.push(q); return goc(q) }) as typeof d.env.DB.prepare
     await goi(d, SBD_THU_NGHIEM)
     expect(ghi).toEqual([])
-    expect(dem.length, dem.join('\n')).toBeLessThanOrEqual(6)
+    expect(dem.length, dem.join('\n')).toBeLessThanOrEqual(7)
   })
 })
 
 describe('chỉ đọc · trần truy vấn · thiếu bảng', () => {
-  it('KHÔNG câu INSERT/UPDATE/DELETE nào chạy và không dùng batch; ≤ 4 truy vấn (3 xếp hạng + 1 thần thú) / ≤ 3 (hangChamCuaEm) / ≤ 2 (lệnh thầy)', async () => {
+  it('KHÔNG câu INSERT/UPDATE/DELETE nào chạy và không dùng batch; ≤ 5 truy vấn (1 mốc hiển thị + 3 xếp hạng + 1 thần thú) / ≤ 4 (hangChamCuaEm) / ≤ 3 (lệnh thầy); truyền sẵn mốc ⇒ bớt đúng 1', async () => {
     const d = await lopMau()
     hoSoThu(d, 'HS7101')
     const ghi = dungGhi(d)
     const b0 = d.soLenh.batch
     let t = d.soLenh.prepare
     await goi(d, 'HS7104')
-    expect(d.soLenh.prepare - t).toBeLessThanOrEqual(4)
+    expect(d.soLenh.prepare - t).toBeLessThanOrEqual(5)
     t = d.soLenh.prepare
     await goi(d, 'HS7108')
-    expect(d.soLenh.prepare - t).toBeLessThanOrEqual(4)
+    expect(d.soLenh.prepare - t).toBeLessThanOrEqual(5)
     t = d.soLenh.prepare
     await hangChamCuaEm(d.env, 'HS7104', NOW)
+    expect(d.soLenh.prepare - t).toBeLessThanOrEqual(4)
+    const moc = giaiMocHienThi('2020-01-01T00:00:00.000Z')
+    t = d.soLenh.prepare
+    await hangChamCuaEm(d.env, 'HS7104', NOW, moc)
     expect(d.soLenh.prepare - t).toBeLessThanOrEqual(3)
     t = d.soLenh.prepare
     await gvChuaHocHomNay(d.env, NOW)
+    expect(d.soLenh.prepare - t).toBeLessThanOrEqual(3)
+    t = d.soLenh.prepare
+    await gvChuaHocHomNay(d.env, NOW, moc)
     expect(d.soLenh.prepare - t).toBeLessThanOrEqual(2)
     expect(ghi).toEqual([])
     expect(d.soLenh.batch).toBe(b0)
@@ -631,5 +646,116 @@ describe('gvChuaHocHomNay', () => {
     themEm(d, 'S1', 'Lê Sổ Một')
     d.sql.exec('DROP TABLE su_kien_hoc')
     expect((await gvChuaHocHomNay(d.env, NOW)).theoLop).toEqual([{ lop: '12 - Lớp Thường', siSo: 1, chuaHoc: 1, em: [{ sbd: 'S1', hoTen: 'Lê Sổ Một' }] }])
+  })
+})
+
+// ───────────────────────────────────────────────────────────────────────────────────────────────
+// MỐC HIỂN THỊ (thầy chốt 21/09 15:56): số hiển thị chỉ tính từ 12:00 trưa 21/09 (`cau_hinh.hien_thi_tu` ⇒ … ⇒ hằng 2026-09-21T05:00:00.000Z).
+// Mỗi chỗ MỘT test "sự kiện trước mốc không lọt vào số hiển thị". Các test ở đây KHÔNG đặt mốc cổ ⇒ dùng mốc mặc định.
+describe('MỐC HIỂN THỊ — sự kiện trước 12:00 trưa 21/09 không lọt vào số hiển thị', () => {
+  const D = '2026-09-21'
+  const NOW_MOC = Date.parse(`${D}T16:00:00+07:00`)
+  const taoTho = () => taoD1ThatTho() // KHÔNG có hàng cau_hinh ⇒ mốc mặc định
+  const datMoc = (d: D1That, v: string) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('hien_thi_tu',?,'x')").run(v)
+  const bang = (r: Dong) => r as { top: { ten: string; soCau: number; chuoi: number; hang: number }[]; daHoc: number; cuaEm: { soCau: number } }
+  type Dong = Record<string, unknown>
+
+  /** `n` câu KHÁC NHAU mang nhãn `tag` (tránh trùng khoá sổ khi cùng em, cùng ngày, hai đợt giờ khác nhau). */
+  const lamQ = async (d: D1That, sbd: string, tag: string, n: number, gio: string, ngay: string) => {
+    for (let i = 0; i < n; i++) await lam(d, sbd, `${sbd}-${tag}-${i}`, iso(gio, ngay, i))
+  }
+  /** Lớp hai em: A học 19/09 + 20/09 (trước mốc) + 21/09 lúc 08:00 (TRƯỚC mốc) và 14:00 (SAU mốc); B chỉ học 21/09 lúc 09:00 (trước mốc). */
+  async function lopHai(d: D1That) {
+    themEm(d, 'M1', 'Lê Văn An')
+    themEm(d, 'M2', 'Phạm Thu Bình')
+    await lamQ(d, 'M1', 'a', 2, '09:00', ba)
+    await lamQ(d, 'M1', 'b', 2, '09:00', HAI_NGAY_TRUOC)
+    await lamQ(d, 'M1', 'c', 5, '08:00', D) // trước mốc
+    await lamQ(d, 'M1', 'd', 2, '14:00', D) // sau mốc
+    await lamQ(d, 'M2', 'e', 4, '09:00', D) // trước mốc
+  }
+
+  it('số câu HÔM NAY chỉ đếm sự kiện từ mốc: 5 câu lúc 08:00 (trước mốc) không tính, chỉ 2 câu lúc 14:00', async () => {
+    const d = taoTho()
+    await lopHai(d)
+    const r = bang(await hsThiDuaHomNay(d.env, { token: 'token-M1' }, NOW_MOC))
+    expect(r.cuaEm.soCau).toBe(2)
+    expect(r.top.find((x) => x.ten.startsWith('Văn An'))!.soCau).toBe(2)
+  })
+
+  it('CHUỖI ngày học chỉ đếm từ ngày mốc: học 19/09 + 20/09 + 21/09 nhưng 19 và 20 trước mốc ⇒ chuỗi 1 (không phải 3)', async () => {
+    const d = taoTho()
+    await lopHai(d)
+    const r = bang(await hsThiDuaHomNay(d.env, { token: 'token-M1' }, NOW_MOC))
+    expect(r.top.find((x) => x.ten.startsWith('Văn An'))!.chuoi).toBe(1)
+  })
+
+  it('em chỉ học TRƯỚC mốc (B: 4 câu lúc 09:00) ⇒ hôm nay coi như chưa học: không hạng, không tính vào daHoc', async () => {
+    const d = taoTho()
+    await lopHai(d)
+    const r = bang(await hsThiDuaHomNay(d.env, { token: 'token-M2' }, NOW_MOC))
+    expect(r.daHoc).toBe(1)
+    expect(r.cuaEm).toMatchObject({ hang: null, soCau: 0 })
+    expect((await hangChamCuaEm(d.env, 'M2', NOW_MOC))).toBeNull()
+    expect((await hangChamCuaEm(d.env, 'M1', NOW_MOC))).toEqual({ hang: 1, siSo: 2 })
+  })
+
+  it('đối chứng: đặt mốc cổ (2020) thì CHÍNH các sự kiện ấy tính lại — soCau 7, chuỗi 3, B có hạng ⇒ bộ lọc mốc là thứ duy nhất đổi kết quả', async () => {
+    const d = taoTho()
+    datMoc(d, '2020-01-01T00:00:00.000Z')
+    await lopHai(d)
+    const r = bang(await hsThiDuaHomNay(d.env, { token: 'token-M1' }, NOW_MOC))
+    expect(r.cuaEm.soCau).toBe(7)
+    expect(r.top.find((x) => x.ten.startsWith('Văn An'))!.chuoi).toBe(3)
+    expect(r.daHoc).toBe(2)
+  })
+
+  it('mốc đọc từ cấu hình: hien_thi_tu = 10:00 VN ⇒ 08:00 và 09:00 bị loại, 14:00 giữ; ngày sạch (YYYY-MM-DD) ⇒ tính từ 00:00 VN ngày đó', async () => {
+    const d = taoTho()
+    datMoc(d, `${D}T03:00:00.000Z`) // 10:00 VN
+    await lopHai(d)
+    await lam(d, 'M2', 'M2-muon', iso('11:00', D))
+    const r = bang(await hsThiDuaHomNay(d.env, { token: 'token-M2' }, NOW_MOC))
+    expect(r.cuaEm.soCau).toBe(1) // chỉ câu 11:00; 4 câu 09:00 bị loại
+    datMoc(d, D) // ngày sạch ⇒ 00:00 VN ngày 21/09 ⇒ cả 08:00/09:00 hôm nay đều tính
+    const r2 = bang(await hsThiDuaHomNay(d.env, { token: 'token-M2' }, NOW_MOC))
+    expect(r2.cuaEm.soCau).toBe(5)
+  })
+
+  it('TÀI KHOẢN THỬ (xem thử): lớp được chọn theo số em đã học TỪ MỐC — lớp có 3 em học sáng (trước mốc) thua lớp có 1 em học chiều', async () => {
+    const d = taoTho()
+    themEm(d, 'S1', 'Sáng Một', '12', '12 - Lớp Sáng'); themEm(d, 'S2', 'Sáng Hai', '12', '12 - Lớp Sáng'); themEm(d, 'S3', 'Sáng Ba', '12', '12 - Lớp Sáng')
+    themEm(d, 'C1', 'Chiều Một', '12', '12 - Lớp Chiều'); themEm(d, 'C2', 'Chiều Hai', '12', '12 - Lớp Chiều')
+    for (const s of ['S1', 'S2', 'S3']) await lamN(d, s, 2, '08:00', D)
+    await lamN(d, 'C1', 2, '14:00', D)
+    themEm(d, SBD_THU_NGHIEM, 'Đỗ Đại Học')
+    const r = (await hsThiDuaHomNay(d.env, { token: `token-${SBD_THU_NGHIEM}` }, NOW_MOC)) as { lop: string; daHoc: number }
+    expect(r.lop).toBe('12 - Lớp Chiều')
+    expect(r.daHoc).toBe(1)
+  })
+
+  it('gvChuaHocHomNay (thầy): "đã học hôm nay" cũng từ mốc — em chỉ học lúc 08:00 vẫn nằm trong "chưa học"; em học 14:00 thì không', async () => {
+    const d = taoTho()
+    await lopHai(d)
+    const r = await gvChuaHocHomNay(d.env, NOW_MOC)
+    expect(r.theoLop).toEqual([{ lop: '12 - Lớp Thường', siSo: 2, chuaHoc: 1, em: [{ sbd: 'M2', hoTen: 'Phạm Thu Bình' }] }])
+  })
+
+  it('bảng thiếu cau_hinh / lỗi đọc mốc ⇒ dùng HẰNG 2026-09-21T05:00:00.000Z (không ném, không lộ sự kiện trước mốc)', async () => {
+    const d = taoTho()
+    await lopHai(d)
+    d.sql.exec('DROP TABLE cau_hinh')
+    const r = bang(await hsThiDuaHomNay(d.env, { token: 'token-M1' }, NOW_MOC))
+    expect(r.cuaEm.soCau).toBe(2)
+  })
+
+  it('CHỈ ĐỌC: mốc không làm phát sinh câu ghi nào', async () => {
+    const d = taoTho()
+    await lopHai(d)
+    const ghi = dungGhi(d)
+    await hsThiDuaHomNay(d.env, { token: 'token-M1' }, NOW_MOC)
+    await gvChuaHocHomNay(d.env, NOW_MOC)
+    await hangChamCuaEm(d.env, 'M1', NOW_MOC)
+    expect(ghi).toEqual([])
   })
 })

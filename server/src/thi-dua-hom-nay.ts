@@ -14,12 +14,14 @@
 // "20 % CUỐI": xếp em đã học theo hạng; nhóm cuối = ceil(số em đã học / 5) vị trí cuối. Đồng hạng ở RANH GIỚI thì CÙNG RA (cả nhóm hoà chỉ tính là nhóm cuối khi TOÀN BỘ nhóm hoà nằm trong các vị trí cuối);
 // hạng 1 không bao giờ ở nhóm cuối (cả lớp hoà hết ⇒ không ai là "cuối"; lớp một em ⇒ không ai là "cuối"). `nhomCuoi` chỉ bật khi ≥ 60 % sĩ số đã học (lớp còn vắng nhiều thì "cuối" chưa có nghĩa).
 // XEM THỬ: tài khoản thử SBD_THU_NGHIEM (không thuộc lớp nào) được xem bảng của một lớp thật với tư cách NGƯỜI XEM (xem `docLopXemThu`, `xemThu`); không bao giờ lọt vào sĩ số/top/xếp hạng của lớp.
+// MỐC HIỂN THỊ (thầy chốt 21/09 15:56, `moc-no.ts`): số câu hôm nay, chuỗi ngày học, "đã học hôm nay" chỉ đếm sự kiện `luc ≥ mốc` (12:00 trưa 21/09) — sự kiện trước mốc KHÔNG vào số hiển thị (chuỗi bắt đầu đếm từ ngày mốc).
 // Truy vấn D1 (chỉ đọc, không ghi): xếp hạng 3 (danh sách em + số câu/ngày + đạt nhiệm vụ ngày); thêm 1 truy vấn thần thú của top 3; lệnh thầy 2 truy vấn. Thiếu bảng/cột (chưa migration) ⇒ giá trị an toàn.
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { CAN_DANG_NHAP } from './on-lai-nop'
 import { themNgay } from './ho-so-nam-kt'
 import { ngayVn } from './su-kien-hoc'
+import { docMocHienThi, type MocHienThi } from './moc-no'
 import { tenLopCuaEm } from './ten-lop'
 import { ALIASES, PETS } from '../../src/game/than-thu-v2/core'
 import { chuoiNgayHoc } from '../../src/lib/han-bai-tap'
@@ -219,11 +221,11 @@ interface ThanhVienLop extends EmCham {
 }
 
 /** Lớp của em `sbd` + số liệu chăm hôm nay của cả lớp: 3 truy vấn (danh sách em, số câu/ngày, đạt nhiệm vụ ngày). Em không thuộc danh sách lớp (tài khoản thử, đã khoá) ⇒ null. */
-async function docLopHomNay(env: Env, sbd: string, nowMs: number): Promise<{ lop: string; thanhVien: ThanhVienLop[] } | null> {
+async function docLopHomNay(env: Env, sbd: string, nowMs: number, moc: MocHienThi): Promise<{ lop: string; thanhVien: ThanhVienLop[] } | null> {
   const tatCa = await docTatCaEm(env)
   const emNay = tatCa.get(sbd)
   if (!emNay) return null
-  const { thanhVien } = await soLieuCuaLop(env, [...tatCa].filter(([, e]) => e.tenLop === emNay.tenLop), null, nowMs)
+  const { thanhVien } = await soLieuCuaLop(env, [...tatCa].filter(([, e]) => e.tenLop === emNay.tenLop), null, nowMs, moc)
   return { lop: emNay.tenLop, thanhVien }
 }
 
@@ -231,17 +233,17 @@ async function docLopHomNay(env: Env, sbd: string, nowMs: number): Promise<{ lop
  * Số liệu chăm hôm nay của MỘT lớp (2 truy vấn): mỗi (em, ngày) số qid KHÁC NHAU có kết quả + thời điểm của qid thứ N (MAX của "lần đầu làm từng qid"); ngày có dòng = ngày có học (chuỗi); đạt nhiệm vụ ngày.
  * `sbdThem` (chỉ chế độ XEM THỬ của tài khoản thử): đọc thêm số liệu của em này CÙNG hai truy vấn (không thêm truy vấn) và trả riêng ở `rieng` — KHÔNG lẫn vào `thanhVien`.
  */
-async function soLieuCuaLop(env: Env, cungLop: [string, EmTrongTruong][], sbdThem: string | null, nowMs: number): Promise<{ thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null }> {
+async function soLieuCuaLop(env: Env, cungLop: [string, EmTrongTruong][], sbdThem: string | null, nowMs: number, moc: MocHienThi): Promise<{ thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null }> {
   const homNay = ngayVn(nowMs)
   const dsSbd = [...cungLop.map(([s]) => s), ...(sbdThem ? [sbdThem] : [])]
   const rSo = await tat(
     () => env.DB.prepare(
       `SELECT sbd, ngay_vn, COUNT(*) AS n, MAX(luc1) AS luc FROM (
          SELECT sbd, ngay_vn, qid, MIN(luc) AS luc1 FROM su_kien_hoc
-          WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL
+          WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay_vn >= ? AND ngay_vn <= ? AND luc >= ? AND ket_qua IS NOT NULL
           GROUP BY sbd, ngay_vn, qid
        ) GROUP BY sbd, ngay_vn`,
-    ).bind(json(dsSbd), themNgay(homNay, -(SO_NGAY_DOC_CHUOI - 1)), homNay).all<Dong>(),
+    ).bind(json(dsSbd), themNgay(homNay, -(SO_NGAY_DOC_CHUOI - 1)), homNay, moc.iso).all<Dong>(), // `luc >= mốc` ⇒ chuỗi chỉ đếm từ ngày mốc
     rong,
   )
   const rDat = await tat(
@@ -268,7 +270,7 @@ async function soLieuCuaLop(env: Env, cungLop: [string, EmTrongTruong][], sbdThe
  * XEM THỬ (tài khoản thử của hệ thống, `SBD_THU_NGHIEM`, không thuộc lớp nào): để thầy THẤY sản phẩm. Lớp xem = `cau_hinh.thi_dua_lop_xem_thu` nếu là một lớp có thật, không thì lớp có NHIỀU em đã học hôm nay nhất
  * (hoà ⇒ lớp đông hơn, rồi theo tên). Tài khoản thử KHÔNG được tính vào sĩ số/đã học/top/xếp hạng của lớp ấy. Thêm 2 truy vấn (cấu hình + em đã học hôm nay cả trường) so với lệnh của em thật.
  */
-async function docLopXemThu(env: Env, nowMs: number): Promise<{ lop: string; thanhVien: ThanhVienLop[]; rieng: ThanhVienLop } | null> {
+async function docLopXemThu(env: Env, nowMs: number, moc: MocHienThi): Promise<{ lop: string; thanhVien: ThanhVienLop[]; rieng: ThanhVienLop } | null> {
   const tatCa = await docTatCaEm(env)
   const soEmCuaLop = new Map<string, number>()
   for (const e of tatCa.values()) soEmCuaLop.set(e.tenLop, (soEmCuaLop.get(e.tenLop) ?? 0) + 1)
@@ -276,7 +278,7 @@ async function docLopXemThu(env: Env, nowMs: number): Promise<{ lop: string; tha
   const cfg = await tat(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'thi_dua_lop_xem_thu'").first<Dong>(), null)
   let lop = chuoi(cfg?.gia_tri)
   if (!lop || !soEmCuaLop.has(lop)) {
-    const rHoc = await tat(() => env.DB.prepare('SELECT DISTINCT sbd FROM su_kien_hoc WHERE ngay_vn = ? AND ket_qua IS NOT NULL').bind(ngayVn(nowMs)).all<Dong>(), rong)
+    const rHoc = await tat(() => env.DB.prepare('SELECT DISTINCT sbd FROM su_kien_hoc WHERE ngay_vn = ? AND luc >= ? AND ket_qua IS NOT NULL').bind(ngayVn(nowMs), moc.iso).all<Dong>(), rong)
     const daHocCuaLop = new Map<string, number>()
     for (const x of rHoc.results ?? []) {
       const e = tatCa.get(chuoi(x.sbd))
@@ -284,7 +286,7 @@ async function docLopXemThu(env: Env, nowMs: number): Promise<{ lop: string; tha
     }
     lop = [...soEmCuaLop.keys()].sort((a, c) => (daHocCuaLop.get(c) ?? 0) - (daHocCuaLop.get(a) ?? 0) || (soEmCuaLop.get(c) ?? 0) - (soEmCuaLop.get(a) ?? 0) || a.localeCompare(c, 'vi'))[0]!
   }
-  const { thanhVien, rieng } = await soLieuCuaLop(env, [...tatCa].filter(([, e]) => e.tenLop === lop), SBD_THU_NGHIEM, nowMs)
+  const { thanhVien, rieng } = await soLieuCuaLop(env, [...tatCa].filter(([, e]) => e.tenLop === lop), SBD_THU_NGHIEM, nowMs, moc)
   return { lop, thanhVien, rieng: rieng! }
 }
 
@@ -347,8 +349,9 @@ export async function hsThiDuaHomNay(env: Env, b: Dong, nowMs: number = Date.now
   }
   const capNhatLuc = new Date(nowMs).toISOString()
   try {
-    if (sbd === SBD_THU_NGHIEM) return await xemThu(env, nowMs, capNhatLuc)
-    const lop = await docLopHomNay(env, sbd, nowMs)
+    const moc = await docMocHienThi(env)
+    if (sbd === SBD_THU_NGHIEM) return await xemThu(env, nowMs, capNhatLuc, moc)
+    const lop = await docLopHomNay(env, sbd, nowMs, moc)
     if (!lop) return { ok: true, lop: '', siSo: 0, daHoc: 0, top: [], cuaEm: { hang: null, soCau: 0, themDeVuot: null, nhomCuoi: false }, capNhatLuc }
     const bang = tinhBangThiDua(lop.thanhVien, sbd)
     const dau = bang.thuTu.slice(0, TOP_TOI_DA)
@@ -367,8 +370,8 @@ export async function hsThiDuaHomNay(env: Env, b: Dong, nowMs: number = Date.now
  * hạng chỉ là GIẢ ĐỊNH "nếu em ở lớp này" (không ghi vào đâu; kẹp ≤ sĩ số vì màn học sinh bỏ ô khi hạng vượt sĩ số); chưa làm câu nào ⇒ hạng null + themDeVuot như em 0 câu; `nhomCuoi`, `thoatNhomCuoi` theo đúng luật xếp.
  * Không có lớp nào trong hệ thống ⇒ `siSo = 0` (màn ẩn ô). Luôn kèm `cheDoXemThu: true`.
  */
-async function xemThu(env: Env, nowMs: number, capNhatLuc: string): Promise<Dong> {
-  const lop = await docLopXemThu(env, nowMs)
+async function xemThu(env: Env, nowMs: number, capNhatLuc: string, moc: MocHienThi): Promise<Dong> {
+  const lop = await docLopXemThu(env, nowMs, moc)
   if (!lop) return { ok: true, lop: '', siSo: 0, daHoc: 0, top: [], cuaEm: { hang: null, soCau: 0, themDeVuot: null, nhomCuoi: false }, capNhatLuc, cheDoXemThu: true }
   const that = tinhBangThiDua(lop.thanhVien, SBD_THU_NGHIEM) // lớp thật, không có tài khoản thử
   const gia = lop.rieng.soCau > 0 ? tinhBangThiDua([...lop.thanhVien, lop.rieng], SBD_THU_NGHIEM) : that // giả định em ở lớp này
@@ -381,9 +384,9 @@ async function xemThu(env: Env, nowMs: number, capNhatLuc: string): Promise<Dong
 }
 
 /** Hạng chăm hôm nay của MỘT em trong lớp em ấy (cùng luật xếp hạng); null nếu em chưa học hôm nay, không xác định được lớp, hoặc đọc lỗi. 3 truy vấn. */
-export async function hangChamCuaEm(env: Env, sbd: string, nowMs: number = Date.now()): Promise<{ hang: number; siSo: number } | null> {
+export async function hangChamCuaEm(env: Env, sbd: string, nowMs: number = Date.now(), moc?: MocHienThi): Promise<{ hang: number; siSo: number } | null> {
   try {
-    const lop = await docLopHomNay(env, sbd, nowMs)
+    const lop = await docLopHomNay(env, sbd, nowMs, moc ?? (await docMocHienThi(env)))
     if (!lop) return null
     const bang = tinhBangThiDua(lop.thanhVien, sbd)
     return bang.cuaEm.hang === null ? null : { hang: bang.cuaEm.hang, siSo: bang.siSo }
@@ -399,15 +402,17 @@ const soSanhTen = (a: { sbd: string; hoTen: string }, b: { sbd: string; hoTen: s
 
 /**
  * CHO THẦY (cổng thầy ở router — KHÔNG kiểm mã ở đây): theo lớp, số em CHƯA làm câu nào hôm nay / sĩ số + tên thật. Chỉ lớp có ≥ 1 em chưa học; lớp xếp theo tên; trong lớp xếp theo TÊN (chữ cuối họ tên, rồi cả họ tên). 2 truy vấn.
- * "Đã học" = có ≥ 1 câu có kết quả hôm nay (cùng luật với bảng thi đua).
+ * "Đã học" = có ≥ 1 câu có kết quả hôm nay TỪ MỐC HIỂN THỊ (cùng luật với bảng thi đua và số "Em đã học hôm nay" của Bảng tin).
  */
 export async function gvChuaHocHomNay(
   env: Env,
   nowMs: number = Date.now(),
+  moc?: MocHienThi,
 ): Promise<{ ngay: string; theoLop: { lop: string; siSo: number; chuaHoc: number; em: { sbd: string; hoTen: string }[] }[] }> {
   const ngay = ngayVn(nowMs)
   const tatCa = await docTatCaEm(env)
-  const rHoc = await tat(() => env.DB.prepare('SELECT DISTINCT sbd FROM su_kien_hoc WHERE ngay_vn = ? AND ket_qua IS NOT NULL').bind(ngay).all<Dong>(), rong)
+  const mocHt = moc ?? (await docMocHienThi(env))
+  const rHoc = await tat(() => env.DB.prepare('SELECT DISTINCT sbd FROM su_kien_hoc WHERE ngay_vn = ? AND luc >= ? AND ket_qua IS NOT NULL').bind(ngay, mocHt.iso).all<Dong>(), rong)
   const daHoc = new Set((rHoc.results ?? []).map((x) => chuoi(x.sbd)))
   const nhom = new Map<string, { siSo: number; em: { sbd: string; hoTen: string }[] }>()
   for (const [sbd, e] of tatCa) {
