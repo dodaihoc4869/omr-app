@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react'
+import {useEffect,useRef,useState} from 'react'
 import {learningBattle} from '../learning-battle'
 import type {BattleAnswer} from '../learning-battle'
 import {battleMuted,playBattleSound,setBattleMuted,unlockBattleAudio} from '../battle-audio'
@@ -34,15 +34,29 @@ export function DaiAi({cau,viTri,ketQua,xong}:{cau:readonly CauDao[];viTri:numbe
   return <li key={c.qid} data-trang={trang} data-vai={c.role??'lap'} aria-current={trang==='dang'?'step':undefined} aria-label={`Ải ${i+1} · ${tenNhomAi(c.role)} · ${trang==='dung'?'đã qua, đúng':trang==='sai'?'đã qua, chưa đúng':trang==='dang'?'đang làm':'chưa tới'}`}><i/>{dauNhom&&<small>{tenNhomAi(c.role)}</small>}</li>})}</ol>
 }
 
+/** Vùng cuộn gần nhất của khung (vỏ sheet cuộn riêng); không có thì cuộn của trang. */
+function vungCuon(e:HTMLElement|null):HTMLElement|Window{for(let p=e?.parentElement;p;p=p.parentElement){const o=getComputedStyle(p).overflowY;if(o==='auto'||o==='scroll')return p}return window}
+export const NGUONG_CUON_GON=40,NGUONG_CUON_MO=8,CAO_MAN_GON=700
+/** GHIM KHUNG TRẬN (thầy lệnh 21/09): khung trận tự THU GỌN khi màn thấp (≤ 700 px cao) hoặc em đã cuộn > 40 px; mở lại khi về gần đầu (< 8 px).
+ *  Hai ngưỡng cách nhau nên không nhấp nháy quanh một điểm. Chỉ đổi kích thước, KHÔNG đổi luật trận. */
+export function useKhungGon(ref:{current:HTMLElement|null}):boolean{
+ const thap=()=>typeof window!=='undefined'&&window.innerHeight<=CAO_MAN_GON
+ const [gon,setGon]=useState(thap)
+ useEffect(()=>{const goc=vungCuon(ref.current),y=()=>goc===window?window.scrollY:(goc as HTMLElement).scrollTop
+  const cap=()=>setGon(g=>thap()||(g?y()>=NGUONG_CUON_MO:y()>NGUONG_CUON_GON))
+  cap();goc.addEventListener('scroll',cap,{passive:true});window.addEventListener('resize',cap)
+  return()=>{goc.removeEventListener('scroll',cap);window.removeEventListener('resize',cap)}},[ref])
+ return gon}
+
 /** Sân đấu: giữ công thức `learning-battle.ts` (HP, 3 đúng liền → cuồng nộ ×2); Cuồng nộ hiện bằng TRANH cuồng nộ thật. */
 export function SanDau({profile,ketQua,tong,suKien,xong}:{profile:DaoProfile;ketQua:readonly BattleAnswer[];tong:number;suKien:number;xong:boolean}){
- const thu=chiSoThu(profile.pet),ten=tenThu(profile),tran=learningBattle([...ketQua],tong),[tat,setTat]=useState(battleMuted)
+ const thu=chiSoThu(profile.pet),ten=tenThu(profile),tran=learningBattle([...ketQua],tong),[tat,setTat]=useState(battleMuted),khung=useRef<HTMLElement>(null),gon=useKhungGon(khung)
  const vuaNop=suKien>0&&tran.count>0
  useEffect(()=>{if(vuaNop)playBattleSound(thu,evolutionStage(profile.cap),!!tran.correct,tran.rage)},[suKien]) // eslint-disable-line react-hooks/exhaustive-deps
  // sắp đủ 3 câu đúng liền ⇒ nạp trước tranh cuồng nộ (~70 KB) để lúc bùng nổ hiện ngay
  useEffect(()=>{if(tran.streak%3===2){const i=new Image();i.src=anhThe(thu,'cuong-no')}},[tran.streak,thu])
  const no=vuaNop&&tran.rage
- return <section className="dao-san" data-thu={thu} data-no={no?'':undefined} aria-label="Trận đấu">
+ return <section ref={khung} className="dao-san" data-thu={thu} data-no={no?'':undefined} data-gon={gon?'':undefined} aria-label="Trận đấu">
   {no&&<div className="dao-san-tia" aria-hidden="true"/>}
   {no?<div className="dao-san-tranh" key={`no-${suKien}`}><img src={anhThe(thu,'cuong-no')} alt="" width="512" height="512" decoding="async" draggable={false}/></div>
    :<img key={`thu-${suKien}`} className="dao-san-thu" data-dong={vuaNop?(tran.correct?'danh':'dau'):undefined} src={anhThu(thu,profile.cap)} alt="" width="288" height="288" decoding="async" draggable={false}/>}

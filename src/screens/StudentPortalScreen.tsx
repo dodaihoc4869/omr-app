@@ -1389,7 +1389,9 @@ export default function StudentPortalScreen() {
               }
             />
           )}
-          {!vaoM3 && <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
+          {/* GAME KHÔNG CÒN THANH TRÊN CỦA VỎ SHEET (thầy lệnh 21/09 · H4): trước đây "Quay lại Bảng tin" + "Đóng" nằm đè lên dải ải và trùng việc với nút "Về app học sinh" của chính game (bị thanh này che). Game tự có nút về ở MỌI màn
+              (Đảo: nút dính trên cùng · Thám hiểm: "Về đảo" · Đoàn/Võ đài/Tiến bộ: thanh riêng) nên chỉ còn MỘT nút về. */}
+          {!vaoM3 && tab !== 'thanthu' && <header className="sticky top-0 z-30 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between gap-2 shadow-xs">
             <NutQuayLai onClick={() => setTab(null)} label="Quay lại Bảng tin" />
 
             <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-md">

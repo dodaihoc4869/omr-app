@@ -186,8 +186,26 @@
 .dao .dao-dai li small{position:absolute;top:38px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:var(--dao-chu-nhat);white-space:nowrap}
 .dao .dao-dai li:first-child small{left:0;transform:none}.dao .dao-dai li:last-child small{left:auto;right:0;transform:none}
 .dao .dao-dai li[data-trang="dang"] small{color:rgb(255,255,255)}.dao .dao-dai li[data-vai="thu_thach"] small{color:var(--dao-vang)}
-.dao .dao-san{position:relative;height:clamp(128px,20vh,268px);border-radius:28px;overflow:hidden;background:radial-gradient(100% 90% at 30% 40%,rgb(44,52,120) 0%,rgb(28,26,84) 50%,rgb(13,8,40) 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 14px 30px rgba(0,0,0,.45)}
+.dao .dao-san{position:sticky;top:max(8px,env(safe-area-inset-top,0px));z-index:8;height:clamp(128px,20vh,268px);transition:height .18s ease,border-radius .18s ease;border-radius:28px;overflow:hidden;background:radial-gradient(100% 90% at 30% 40%,rgb(44,52,120) 0%,rgb(28,26,84) 50%,rgb(13,8,40) 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 14px 30px rgba(0,0,0,.45)}
 .dao .dao-san[data-no]{background:radial-gradient(100% 90% at 30% 40%,rgb(122,42,16) 0%,rgb(58,20,48) 50%,rgb(13,8,40) 100%)}
+/* ───── GHIM KHUNG TRẬN (thầy lệnh 21/09): khung trận DÍNH ngay dưới mép trên (chừa tai thỏ), nền đặc, nổi trên thẻ câu; phần câu hỏi cuộn bên dưới, không bao giờ chui lên che khung.
+   THU GỌN (~104 px) khi màn thấp (≤ 700 px, useKhungGon) hoặc đã cuộn > 40 px: hai hình nhỏ + hai thanh máu + số máu, ẩn chữ phụ; đổi cỡ ≤ 200 ms, tôn trọng giảm chuyển động.
+   Cỡ khung cố định theo trạng thái (không theo số máu) ⇒ máu đổi KHÔNG làm giật bố cục. ───── */
+@media (prefers-reduced-motion:reduce){.dao .dao-san{transition:none}}
+.dao .dao-san[data-gon]{height:104px;border-radius:22px}
+.dao .dao-san[data-gon] .dao-san-thu{left:8px;top:6px;bottom:auto;height:60px}
+.dao .dao-san[data-gon] .dao-san-tranh{left:8px;top:6px;height:60px;transform:rotate(-3deg);border-radius:14px;box-shadow:0 0 0 2px rgb(255,184,77),0 0 18px rgba(255,140,40,.8);animation:none}
+.dao .dao-san[data-gon] .dao-san-chuoi,.dao .dao-san[data-gon] .dao-san-tia{display:none}
+.dao .dao-san[data-gon] .dao-san-no{left:auto;right:44px;top:6px;padding:2px 8px;font-size:10px}
+.dao .dao-san[data-gon] .dao-san-quai{left:50%;right:8px;top:6px;bottom:8px;flex-direction:column-reverse;align-items:stretch;justify-content:flex-start;gap:3px}
+.dao .dao-san[data-gon] .dao-san-quai p{font-size:10.5px;line-height:14px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dao .dao-san[data-gon] .dao-san-quai svg{align-self:flex-end;height:46px;margin-right:34px}
+.dao .dao-san[data-gon] .dao-san-mau,.dao .dao-san[data-gon] .dao-san-mau-quai{width:100%;height:7px}
+.dao .dao-san[data-gon] .dao-san-ta{left:10px;right:calc(50% + 6px);bottom:8px;flex-direction:column;align-items:stretch;gap:3px}
+.dao .dao-san[data-gon] .dao-san-ten{display:block;max-width:none;font-size:10.5px;line-height:14px;white-space:nowrap}
+.dao .dao-san[data-gon] .dao-san-ten small{display:none}
+.dao .dao-san[data-gon] .dao-san-so{font-size:22px}
+.dao .dao-san[data-gon] button.dao-san-tieng{top:4px;right:4px;bottom:auto;width:30px;height:30px}
 .dao .dao-san-tia{position:absolute;left:-12%;top:-30%;height:160%;aspect-ratio:1;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,170,60,.3) 0deg 4deg,rgba(255,170,60,0) 4deg 12deg);-webkit-mask-image:radial-gradient(circle,rgb(0,0,0) 20%,rgba(0,0,0,0) 66%);mask-image:radial-gradient(circle,rgb(0,0,0) 20%,rgba(0,0,0,0) 66%);animation:dao-xoay 30s linear infinite}
 .dao .dao-san-thu{position:absolute;left:4%;bottom:26px;height:calc(100% - 44px);width:auto;aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 6px 8px rgba(0,0,0,.45)) drop-shadow(0 0 14px rgba(140,170,255,.4));transform-origin:50% 92%;animation:dao-tho 4s ease-in-out infinite;-webkit-user-drag:none;user-select:none}
 .dao .dao-san-thu[data-dong="danh"]{animation:dao-danh .9s ease-out both}
