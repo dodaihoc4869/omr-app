@@ -2153,6 +2153,7 @@ export default function StudentPortalScreen() {
                 dsLichSu={dsLichSu}
                 scriptUrl={scriptUrl}
                 initialCheDo={cheDoKhacPhuc}
+                lop={auth.lop}
               />
             </div>
           </div>
@@ -2390,6 +2391,7 @@ export default function StudentPortalScreen() {
           sbd={auth.sbd}
           tieuDeCa={tieuDeKhacPhucModal}
           cheDoMacDinh={cheDoKhacPhucMacDinh}
+          lop={auth.lop}
           onTaoPhieuXong={(html) => {
             setDsCauSaiKhacPhucModal(null)
             setPhieuHtml(html)
