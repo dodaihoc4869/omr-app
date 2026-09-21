@@ -188,6 +188,25 @@ describe('PhanCongScreen — Chọn theo lớp', () => {
     expect(m.giao.mock.calls[0][2]).toEqual([]) // không kèm ca nào
   })
 
+  it('BA LỚP KHỐI 12 (thêm "12 - Nhóm 10 điểm"): chip giữ ĐÚNG thứ tự máy chủ (khối lớn trước, cùng khối theo tên), tên dài không cắt chữ; hộp Đổi lớp liệt kê đủ ba lớp', async () => {
+    const BA = { ok: true, lop: [{ tenLop: '12 - Lớp Thường', khoi: '12', soEm: 2, sbd: ['003', '004'] }, { tenLop: '12 - Nhóm 10 điểm', khoi: '12', soEm: 1, sbd: ['002'] }, { tenLop: '12 - Tinh Hoa', khoi: '12', soEm: 1, sbd: ['001'] }, { tenLop: '11B1', khoi: '11', soEm: 1, sbd: ['005'] }] }
+    dungMayChu({ '/gv/lop': () => ({ json: BA }) })
+    const nhom = await moGiao()
+    expect(within(nhom).getAllByRole('button').map((b) => b.textContent)).toEqual(['12 - Lớp Thường · 2 em', '12 - Nhóm 10 điểm · 1 em', '12 - Tinh Hoa · 1 em', '11B1 · 1 em'])
+    cleanup()
+    xoaNhoLop()
+    m.sbd.v = ''
+    const r = render(<HocSinhScreen />)
+    await waitFor(() => expect(r.container.textContent).toContain('Lê Minh Đức'))
+    fireEvent.click(screen.getByText('Lê Minh Đức'))
+    m.sbd.v = '001'
+    r.rerender(<HocSinhScreen />)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Đổi lớp' })).toBeTruthy())
+    fireEvent.click(screen.getByRole('button', { name: 'Đổi lớp' }))
+    const chon = within(screen.getByRole('dialog')).getByLabelText('Chuyển sang lớp') as HTMLSelectElement
+    expect([...chon.options].map((o) => o.textContent)).toEqual(['12 - Lớp Thường', '12 - Nhóm 10 điểm', '12 - Tinh Hoa', '11B1', 'Lớp mới…'])
+  })
+
   it('SBD lạ (lớp có em mà danh sách học sinh KHÔNG có): không đếm, không tick ma — chip nói số em THẬT có trong danh sách', async () => {
     dungMayChu({ '/gv/lop': () => ({ json: { ok: true, lop: [{ tenLop: '12 - Tinh Hoa', khoi: '12', soEm: 3, sbd: ['001', '002', '999'] }] } }) })
     const nhom = await moGiao()
