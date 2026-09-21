@@ -45,3 +45,17 @@ describe('/gv/bang-tin có khối chuaHocHomNay (chỉ-thêm)', () => {
     expect(r).not.toHaveProperty('chuaHocHomNay')
   })
 })
+
+describe('POST /ph/tat-ca-ve-con và /ph/chi-tiet-cau-ve-con (Code 4, đã soát) — chỉ định tuyến', () => {
+  it('SBD trần hợp lệ ⇒ ok:true, khối kết quả có mặt và ghi truy cập đúng đường; SBD lạ / thiếu ⇒ ok:false hoặc lỗi chữ, không lộ dữ liệu', async () => {
+    const d = dung()
+    const r = await goiWorker(worker, d.env, '/ph/tat-ca-ve-con', { sbd: 'S1' }) as any
+    expect(r.ok).toBe(true)
+    expect(d.sql.prepare("SELECT kieu FROM ph_truy_cap WHERE duong = 'ph-tat-ca-ve-con'").all()).toEqual([{ kieu: 'sbd_tran' }])
+    const sai = await goiWorker(worker, d.env, '/ph/tat-ca-ve-con', { sbd: 'KHONG-CO' }) as any
+    expect(sai.ok).toBe(false)
+    expect((await goiWorker(worker, d.env, '/ph/tat-ca-ve-con', {}) as any).ok).toBe(false)
+    const ct = await goiWorker(worker, d.env, '/ph/chi-tiet-cau-ve-con', { sbd: 'KHONG-CO' }) as any
+    expect(ct.ok).toBe(false)
+  })
+})

@@ -223,8 +223,7 @@ async function docBtvnVaMom(hoi: ReturnType<typeof boHoi>['hoi'], sbd: string, d
 
 // ------------------------------------------------------------------ LỆNH ------------------------------------------------------------------
 export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: number = Date.now()): Promise<Row> {
-  // Code 3 thêm 'ph-tat-ca-ve-con' vào DuongPh khi định tuyến (ph-truy-cap.ts không sửa ở đây): tạm dùng 'ph-ke-hoach'.
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-ke-hoach', { chiToken: CHI_NHAN_TOKEN })
+  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-tat-ca-ve-con', { chiToken: CHI_NHAN_TOKEN })
   const { hoi } = boHoi(env)
   const homNay = ngayVn(nowMs)
   const homQua = themNgay(homNay, -1)
@@ -599,8 +598,7 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
  * Không tự luận. Không ghi (ngoài dòng đếm truy cập của hàm xác thực). ≤ 9 truy vấn D1 kể cả xác thực.
  */
 export async function phChiTietCauVeCon(env: Env, b: Record<string, unknown>, nowMs: number = Date.now()): Promise<Row> {
-  // Code 3 thêm 'ph-chi-tiet-cau-ve-con' vào DuongPh khi định tuyến: tạm dùng 'ph-ke-hoach'.
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-ke-hoach', { chiToken: CHI_NHAN_TOKEN })
+  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-chi-tiet-cau-ve-con', { chiToken: CHI_NHAN_TOKEN })
   const qid = chuoi(b.qid)
   if (!qid || qid.length > 200) return { ok: false, error: 'Thiếu mã câu.' }
   const { hoi } = boHoi(env)

@@ -22,6 +22,7 @@ import {ghiLoiMay} from './nhat-ky-may'
 import {chotNgayRoiTruKhien} from './khien-mat'
 import {chuyenDoiLoCron} from './game-v2-hap-thu'
 import {hsThiDuaHomNay,gvChuaHocHomNay} from './thi-dua-hom-nay'
+import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {phGiaoThem} from './ph-giao-them'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {docThanThuSoThat,hsThuThachHomNay,hsThuThachNop} from './thu-thach-rieng'
@@ -3056,6 +3057,9 @@ export default {
       if (p === '/ph/canh-bao/xem') return ra(await phCanhBaoXem(env, b))
       if (p === '/ph/thoi-gian-hoc') return ra(await phThoiGianHoc(env, b))
       if (p === '/ph/giao-them') return ra(await phGiaoThem(env, b))
+      // "Mọi thứ về con" (Code 4, đã soát): ĐỌC-CHỈ, token hoặc SBD trần; chi tiết một câu (lời giải) cùng luật che.
+      if (p === '/ph/tat-ca-ve-con') return ra(await phTatCaVeCon(env, b))
+      if (p === '/ph/chi-tiet-cau-ve-con') return ra(await phChiTietCauVeCon(env, b))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
