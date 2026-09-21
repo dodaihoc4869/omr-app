@@ -26,6 +26,20 @@ export function tenThu(p:Pick<DaoProfile,'pet'|'nickname'>){return p.nickname||B
 export function vongExp(cap:number,exp:number){const can=thanhExp(cap);if(cap>=CAP_TOI_DA||can<=0)return {toiDa:true,can:0,con:0,tiLe:1}
  const co=Math.max(0,Math.min(can,Math.floor(exp)));return {toiDa:false,can,con:can-co,tiLe:co/can}}
 
+/** Trần hấp thụ tối đa mỗi ngày (khi đạt nhiệm vụ ngày). = `HAP_THU_DAT` của Code 1 (`src/lib/hap-thu-ngay.ts`); đổi sang import khi tệp ấy có. */
+export const HAP_THU_TOI_DA_NGAY=200
+export interface HapThuView{da:number;toiDa:number;tiLe:number;chu:string;bao:string}
+/** THANH "Hôm nay {tên} đã hấp thụ 120 / 200 EXP" + lời báo khi lần nạp bị chặn (giọng trung tính, nói thật). Thiếu/sai dạng ⇒ null (ẩn, KHÔNG bịa số).
+ *  `coExpDeNap` = ống nghiệm đang có EXP chờ nạp: chỉ khi đó lời báo mới có nghĩa (không có gì để nạp thì không cần báo bị chặn). */
+export function hapThuHienThi(h:DaoProfile['hapThuHomNay'],ten:string,coExpDeNap:boolean):HapThuView|null{
+ if(!h||typeof h!=='object'||!Number.isFinite(h.da)||!Number.isFinite(h.tran)||h.da<0||h.tran<0)return null
+ const toiDa=HAP_THU_TOI_DA_NGAY,da=Math.min(toiDa,Math.floor(h.da)),tran=Math.min(toiDa,Math.floor(h.tran))
+ let bao=''
+ if(coExpDeNap){
+  if(h.lyDo==='chua_hoc')bao='Thần thú chỉ ăn vào ngày em có học. Em làm vài câu rồi quay lại nạp nhé.'
+  else if(h.lyDo==='no')bao=tran>=toiDa?`Hôm nay ${ten} đã ăn no. EXP còn lại nằm trong ống nghiệm, mai em nạp tiếp.`:`Đạt nhiệm vụ ngày hôm nay thì ${ten} ăn được thêm ${toiDa-tran} EXP.`}
+ return {da,toiDa,tiLe:da/toiDa,chu:`Hôm nay ${ten} đã hấp thụ ${da} / ${toiDa} EXP`,bao}}
+
 export interface MucTieu{loai:'cap'|'dang'|'khien'|'tien-hoa';tieuDe:string;phu:string;tiLe:number}
 /** Dạng gần thành thạo nhất: nhiều sao nhất trong các dạng chưa đủ 3 sao; hoà thì dạng tới hạn sớm hơn. */
 export function dangGanThanhThao(mastery:readonly Mastery[]){return [...mastery].filter(m=>m.stage<3).sort((a,b)=>b.stage-a.stage||a.due-b.due||a.key.localeCompare(b.key))[0]}

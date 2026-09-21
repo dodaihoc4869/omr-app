@@ -28,6 +28,7 @@ const NGAY=86400000,BAY_GIO=Date.now()
 /** Hồ sơ giả: ?thu=2&cap=34&exp=640&vi=120 */
 const hoSo=():DaoProfile=>({nickname:q.get('ten')??'Lửa Nhỏ',pet:['dat_quy','nuoc_long','lua_phuong','khi_lang','ductin_lan','tinhyeu_ho','bieton_huou','sangy_cu'][Number(q.get('thu')??2)]!,choice:false,cap:Number(q.get('cap')??34),exp:Number(q.get('exp')??640),wallet:Number(q.get('vi')??0),
  shields:{used:1,activeUntil:0},khienRen:q.has('khongkhien')?undefined:{manh:8,daRen:1,moiKhien:12},
+ hapThuHomNay:q.has('hapthu')?{da:Number(q.get('da')??120),tran:Number(q.get('tran')??200),lyDo:q.get('lydo')}:undefined, // ?hapthu&da=120&tran=200&lydo=no|chua_hoc&vi=300
  mastery:[{key:'ES-TP',stage:2,first:BAY_GIO-8*NGAY,due:BAY_GIO-NGAY,groups:['a','b'],repaired:false},{key:'ES-TEN',stage:3,first:BAY_GIO-20*NGAY,due:BAY_GIO+5*NGAY,groups:['c','d','e'],repaired:true},{key:'ES-DOT',stage:1,first:BAY_GIO-2*NGAY,due:BAY_GIO+NGAY,groups:['f'],repaired:false},{key:'CB-LM',stage:0,first:0,due:BAY_GIO+NGAY,groups:[],repaired:false}]})
 const TEN_DANG={'ES-TP':'Ester thuỷ phân','ES-TEN':'Tên gọi ester','ES-DOT':'Đốt cháy ester','CB-LM':'Lên men'}
 function ManDao(){const [bao,setBao]=useState('')
