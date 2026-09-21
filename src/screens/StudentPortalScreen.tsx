@@ -1403,7 +1403,6 @@ export default function StudentPortalScreen() {
                 {tab === 'khacphuc' && 'Khắc Phục Lỗi Sai & Luyện Đề'}
                 {tab === 'vaothi' && 'Vào Phòng Thi Trực Tuyến'}
                 {tab === 'cauon' && 'Ôn câu hôm nay'}
-                {tab === 'thanthu' && 'Thần Thú Hóa Học (Alchemon)'}
                 {tab === 'bantin' && 'Bảng tin & bài luyện hôm nay'}
               </h2>
             </div>
