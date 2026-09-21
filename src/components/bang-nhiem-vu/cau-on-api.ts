@@ -5,6 +5,7 @@
 // Mọi lỗi mạng → null, KHÔNG ném (màn phải sống được khi mất mạng). Khác `goiPost` của may-chu.ts: ở đây cần cả chữ báo lỗi của
 // máy chủ (`ok:false, error`) nên trả kèm mã HTTP và thân JSON.
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
+import { chanCauTuLuan } from '../../lib/cau-tu-luan-may-hs'
 
 /** Một câu ôn — hình dạng `publicQuestion` của game v2: KHÔNG có đáp án, lời giải. */
 export interface CauOn {
@@ -97,7 +98,8 @@ export async function taiCauTheoQid(token: string, qid: string[]): Promise<KetQu
   if (!r) return { ok: false, loi: 'Chưa tải được câu ôn. Em kiểm tra mạng rồi thử lại.' }
   const d = r.du
   if (!d || d.ok !== true || !Array.isArray(d.cau)) return { ok: false, loi: 'Máy chủ chưa đưa được câu ôn lúc này. Em thử lại sau ít phút.' }
-  const cau = (d.cau as any[]).filter((c) => c && typeof c.qid === 'string' && (c.phan === 'I' || c.phan === 'II' || c.phan === 'III')) as CauOn[]
+  // Chốt chặn cuối (thầy lệnh 21/09 cấm rút câu tự luận): máy chủ đã lọc, đây chỉ để chắc — câu tự luận KHÔNG vào màn ôn.
+  const cau = chanCauTuLuan((d.cau as any[]).filter((c) => c && typeof c.qid === 'string' && (c.phan === 'I' || c.phan === 'II' || c.phan === 'III')) as CauOn[], 'on-lai/cau-theo-qid')
   return { ok: true, cau, khongCo: Array.isArray(d.khongCo) ? d.khongCo.map(String) : [] }
 }
 

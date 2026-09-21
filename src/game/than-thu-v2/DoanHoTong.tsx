@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { Question } from './core'
+import { choPhepCauChoEm } from '../../lib/cau-tu-luan-may-hs'
 import type { HanhDong, KhungNhinHiep } from './doan-core'
 import { HIEP_TRUM } from './doan-core'
 import type { AnXem, BanDongHanhXem, DoanXem, GoiDoan, GoiYTiepSuc, KetQuaCau, PhanHoiDoan, SanhXem } from './doan-kieu'
@@ -42,8 +43,9 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (d.ma === phienBan.current.ma && d.revision < phienBan.current.revision) return // gói tin cũ tới trễ
     phienBan.current = { ma: d.ma, revision: d.revision }
     try { sessionStorage.setItem(khoaLuu(sbd), d.ma) } catch { /* máy chặn lưu: vẫn chơi được */ }
-    if (d.cau?.de && d.cau.qid) de.current.set(d.cau.qid, d.cau.de)
-    if (d.trum?.de && d.trum.qid) de.current.set(d.trum.qid, d.trum.de)
+    // Chốt chặn cuối (thầy lệnh 21/09 cấm rút câu tự luận): câu tự luận KHÔNG vào bộ nhớ đề ⇒ màn không dựng ô nhập cho nó.
+    if (d.cau?.de && d.cau.qid && choPhepCauChoEm(d.cau.de, 'game-v2/doan')) de.current.set(d.cau.qid, d.cau.de)
+    if (d.trum?.de && d.trum.qid && choPhepCauChoEm(d.trum.de, 'game-v2/doan-trum')) de.current.set(d.trum.qid, d.trum.de)
     moc.current = { luc: performance.now(), conMs: d.tran?.conMs ?? 0, moSauMs: d.tran?.moSauMs ?? 0 }
     const hiep = d.tran?.hiep ?? 0
     if (hiep !== hiepDangLam.current) { hiepDangLam.current = hiep; setChon(''); setHanhDong('danh'); setYChon({}); setKetQuaCau(null); setChoRoi(false); setGoiYTiepSuc(null); setExpTiepSuc(0) }

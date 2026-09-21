@@ -5,6 +5,7 @@ import LearningBattle from './LearningBattle'
 import type {BattleAnswer} from './learning-battle'
 import {unlockBattleAudio} from './battle-audio'
 import EscortRoom from './EscortRoom'
+import {chanPhanHoiCau} from '../../lib/cau-tu-luan-may-hs'
 // Lối chơi chính mới (19/09): nạp riêng để không làm nặng đảo thần thú.
 const DoanHoTong=lazy(()=>import('./DoanHoTong'))
 // Đảo thần thú bản mới: MỘT vỏ của Code 6, nạp lazy.
@@ -52,7 +53,7 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  const mounted=useRef(true);const running=useRef(false)
  useEffect(()=>()=>{mounted.current=false},[])
  const request=useCallback(async(action:string,data:Record<string,unknown>={},sessionToken=token):Promise<Result>=>{
-  const base=await layDiaChiMayChu('');const response=await fetch(`${base}/game-v2/${action}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...data,token:sessionToken})});const r=await response.json() as Result
+  const base=await layDiaChiMayChu('');const response=await fetch(`${base}/game-v2/${action}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...data,token:sessionToken})});const r=chanPhanHoiCau(await response.json() as Result,`game-v2/${action}`) // chốt chặn cuối: bỏ câu tự luận (thầy lệnh 21/09)
   if(!r.ok){if(/Phiên game|Mật khẩu đã đổi|nhập lại mật khẩu/.test(r.error??'')){setToken('');setProfile(null);try{sessionStorage.removeItem(`game-v2:${sbd}`)}catch{/* Storage may be disabled. */}}throw new Error(r.error||'Chưa kết nối được game. Em thử lại.')}
   if(mounted.current){if(typeof r.doanMo==='boolean')setDoanMo(r.doanMo);if(r.tasks)setTasks(r.tasks);if(r.profile&&(r.revision??0)>=latestRevision.current){setProfile(r.profile);latestRevision.current=r.revision??0;if(r.revision!==undefined)setRevision(r.revision)}}return r
  },[token,sbd])

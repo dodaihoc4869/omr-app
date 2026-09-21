@@ -3,6 +3,7 @@
 // Yêu cầu của thầy:
 // 1. Không rút câu có nhãn dán thuộc phần "Ví dụ minh hoạ" và "Các dạng toán trọng tâm".
 // 2. Không rút câu tự luận vì không điền được đáp án chính xác (chỉ nhận trắc nghiệm chuẩn & trả lời ngắn có đáp án số/ngắn điền được).
+import { laCauRutDuoc } from './cau-tu-luan'
 
 /**
  * Kiểm tra xem câu / đề có thuộc phần "Ví dụ minh hoạ" hoặc "Các dạng toán trọng tâm" không.
@@ -195,6 +196,14 @@ export function hopLeDeRut(c: {
   const choices = c.choices || c.luaChon || c.ideas || q.choices || q.luaChon || q.ideas
 
   if (laCauTuLuan(phan, da, txt, { choices })) return false
+
+  // ĐỊNH NGHĨA DÙNG CHUNG (Code 1, thầy lệnh 21/09 "tuyệt đối không rút câu tự luận"): thêm các luật của `cau-tu-luan.ts`
+  // (câu gắn nhãn tự luận, mã -TL, phần I/II thiếu phương án/ý, phần III hỏi mở) — cùng một chốt cho mọi chỗ rút, cả phiếu của em.
+  const cauChung: Record<string, unknown> = { ...(typeof q === 'object' && q ? q : {}) }
+  if (phan) cauChung.phan = phan
+  if (maDe) cauChung.maDe = maDe
+  if (da !== undefined && da !== null && String(da).trim() !== '' && ['correct', 'dapAn', 'dap_an', 'dapAnDung'].every((k) => cauChung[k] === undefined)) cauChung.dapAnDung = da
+  if (!laCauRutDuoc(cauChung)) return false
 
   return true
 }
