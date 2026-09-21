@@ -7,7 +7,7 @@ Ngày 21/09/2026 app xoá bài tập về nhà, kế hoạch ngày, game… (GI�
 - Em "vắng": chỉ tính vắng theo các ngày TỪ 21/09 trở đi.
 - Lời cho PHỤ HUYNH trong giai đoạn này: CHỈ viết khi có MỐC ĐÁNG KHEN thật (đúng lại câu từng sai, lên bậc, chuỗi ngày) hoặc con vắng ≥ 3 ngày tính từ 21/09. Không viết chỉ vì "con hay vấp một dạng". Mỗi em tối đa 2 lời/tuần (xem `loiNhanGanDay`/`lanCuoiLoiPhuHuynh` nếu thẻ có).
 - Các núm vẫn dùng bình thường vì dựa trên sổ học THẬT: `uu_tien`, `khac_phuc` (khi thẻ cho phép), `on_som`, `ha_mot_bac`, `cho_thu_len_bac`, `tam_nghi`.
-- Trong `lyDo`, `goiYChoThay`, bản tin: viết số cửa sổ thời gian bằng CHỮ ("bảy ngày", "ba ngày"); công thức hoá viết bằng TÊN ("đơn chất nitrogen", không "N2") — bộ kiểm hiện loại các chữ số không có trong thẻ. `khacPhuc`: mỗi DẠNG chỉ MỘT dòng (chọn `khac_phuc` HOẶC `on_som`) cho tới khi bộ kiểm được sửa.
+- Trong `lyDo`, `goiYChoThay`, bản tin: viết số cửa sổ thời gian bằng CHỮ ("bảy ngày", "ba ngày"); công thức hoá viết bằng TÊN ("đơn chất nitrogen", không "N2") — bộ kiểm hiện loại các chữ số không có trong thẻ.
 
 ## CHỈ HỨA ĐIỀU CHẮC CHẮN XẢY RA (Boss đặt 21/09, SỬA 21/09 09:50 sau khi máy chủ e268ce35 đã nối `khac_phuc` — hiệu lực tới khi Boss gỡ)
 - `khac_phuc` ĐÃ chạy thật: chỉ dùng khi thẻ có `coBaiCaNhanDangChay` và `soCauConLaiCungDang` của dạng ấy còn câu (đúng `LUAT-RUT-GON.md`). Khi dùng, lời cho em nói đúng mức: "Ở chặng tới của bài đang làm, mình đã xếp thêm vài câu dạng … cho em." KHÔNG nêu con số câu trong lời (máy chủ có thể chỉ chèn được ít hơn), KHÔNG nói "ngày mai".
