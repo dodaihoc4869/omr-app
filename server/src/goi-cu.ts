@@ -212,7 +212,7 @@ export async function hoSoEm(env: Env, b: Record<string, unknown>): Promise<Reco
     `SELECT l.ma_ca, l.lan_thu, l.nop_luc, l.trang_thai, l.diem_i, l.diem_ii, l.diem_iii, l.tong,
             l.so_lan_roi_man, l.dap_an_json, c.ten_ca, c.lop, c.bo_theo_em_json, c.so_cau_json
        FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca
-      WHERE l.sbd = ? ORDER BY l.nop_luc DESC LIMIT 200`,
+      WHERE l.sbd = ? AND c.trang_thai IS NOT 'da_xoa' ORDER BY l.nop_luc DESC LIMIT 200`,
   )
     .bind(sbd)
     .all<Record<string, unknown>>()
@@ -656,7 +656,7 @@ export async function phieuCuaEm(env: Env, b: Record<string, unknown>): Promise<
        FROM luot l
        LEFT JOIN danh_sach d ON d.sbd = l.sbd
        LEFT JOIN ca c ON c.ma_ca = l.ma_ca
-      WHERE l.ma_ca = ? AND l.sbd = ? ORDER BY l.lan_thu DESC LIMIT 1`,
+      WHERE l.ma_ca = ? AND l.sbd = ? AND c.trang_thai IS NOT 'da_xoa' ORDER BY l.lan_thu DESC LIMIT 1`,
   )
     .bind(maCa, sbd)
     .first<Record<string, unknown>>()
@@ -786,7 +786,7 @@ export async function lichSuEm(env: Env, b: Record<string, unknown>): Promise<Re
     `SELECT l.ma_ca, l.tong, l.nop_luc, l.lan_thu, l.diem_i, l.diem_ii, l.diem_iii,
             COALESCE(c.ten_ca,'') AS ten_ca, c.thoi_gian_phut
        FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca
-      WHERE l.sbd = ? AND l.tong IS NOT NULL ORDER BY l.nop_luc DESC LIMIT 50`,
+      WHERE l.sbd = ? AND l.tong IS NOT NULL AND c.trang_thai IS NOT 'da_xoa' ORDER BY l.nop_luc DESC LIMIT 50`,
   )
     .bind(sbd)
     .all<Record<string, unknown>>()
@@ -3203,7 +3203,7 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
             c.dap_an_chon, c.dap_an_dung, c.dung_sai, ca.ten_ca
        FROM chi_tiet_cau c
        LEFT JOIN ca ON ca.ma_ca = c.ma_ca
-      WHERE c.sbd = ?${chiSai ? ' AND COALESCE(c.dung_sai, 0) = 0' : ''}`
+      WHERE c.sbd = ? AND ca.trang_thai IS NOT 'da_xoa'${chiSai ? ' AND COALESCE(c.dung_sai, 0) = 0' : ''}`
   const params: unknown[] = [sbd]
 
   if (dsMaCa.length > 0) {
@@ -3228,7 +3228,7 @@ export async function hsCauSai(env: Env, b: Record<string, unknown>): Promise<Re
                             ca.bo_theo_em_json, ca.so_cau_json
        FROM luot l
        LEFT JOIN ca ON ca.ma_ca = l.ma_ca
-      WHERE l.sbd = ? AND (l.trang_thai = 'da_nop' OR l.trang_thai = 'khoa' OR l.nop_luc IS NOT NULL) AND l.dap_an_json IS NOT NULL`
+      WHERE l.sbd = ? AND (l.trang_thai = 'da_nop' OR l.trang_thai = 'khoa' OR l.nop_luc IS NOT NULL) AND l.dap_an_json IS NOT NULL AND ca.trang_thai IS NOT 'da_xoa'`
     const lParams: unknown[] = [sbd]
     if (dsMaCa.length > 0) {
       luotQuery += ` AND l.ma_ca IN (${dsMaCa.map(() => '?').join(',')})`

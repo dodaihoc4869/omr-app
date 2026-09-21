@@ -218,12 +218,12 @@ async function data(env: Env, sbd?: string, now = Date.now()) {
   const exams = await q(
     `SELECT l.sbd,l.ma_ca,l.nop_luc,l.tong,c.ten_ca FROM luot l LEFT JOIN ca c ON c.ma_ca=l.ma_ca WHERE l.nop_luc IS NOT NULL ${
       sbd ? 'AND l.sbd=?' : ''
-    } AND l.ma_ca IN (SELECT c2.ma_ca FROM ca c2 WHERE ${SQL_DA_CONG_BO('c2')}) AND l.lan_thu=(SELECT MAX(z.lan_thu) FROM luot z WHERE z.ma_ca=l.ma_ca AND z.sbd=l.sbd) ORDER BY l.nop_luc DESC`
+    } AND l.ma_ca IN (SELECT c2.ma_ca FROM ca c2 WHERE ${SQL_DA_CONG_BO('c2')} AND c2.trang_thai IS NOT 'da_xoa') AND l.lan_thu=(SELECT MAX(z.lan_thu) FROM luot z WHERE z.ma_ca=l.ma_ca AND z.sbd=l.sbd) ORDER BY l.nop_luc DESC`
   )
   const details = await q(
     `SELECT t.sbd,t.qid,t.chuyen_de,t.dung_sai,t.giay,t.muc_do,l.nop_luc FROM chi_tiet_cau t JOIN luot l ON l.ma_ca=t.ma_ca AND l.sbd=t.sbd AND l.lan_thu=t.lan_thu WHERE l.nop_luc IS NOT NULL ${
       sbd ? 'AND t.sbd=?' : ''
-    } AND t.ma_ca IN (SELECT c2.ma_ca FROM ca c2 WHERE ${SQL_DA_CONG_BO('c2')}) AND NOT EXISTS(SELECT 1 FROM chi_tiet_cau z JOIN luot n ON n.ma_ca=z.ma_ca AND n.sbd=z.sbd AND n.lan_thu=z.lan_thu WHERE z.sbd=t.sbd AND z.qid=t.qid AND n.nop_luc>l.nop_luc)`
+    } AND t.ma_ca IN (SELECT c2.ma_ca FROM ca c2 WHERE ${SQL_DA_CONG_BO('c2')} AND c2.trang_thai IS NOT 'da_xoa') AND NOT EXISTS(SELECT 1 FROM chi_tiet_cau z JOIN luot n ON n.ma_ca=z.ma_ca AND n.sbd=z.sbd AND n.lan_thu=z.lan_thu WHERE z.sbd=t.sbd AND z.qid=t.qid AND n.nop_luc>l.nop_luc)`
   )
   // Bài hằng ngày chỉ tính là tồn đọng khi là bài CỦA HÔM NAY hoặc đã bắt đầu và còn trong 120 phút; bài của ngày cũ mà chưa bắt đầu bị bỏ.
   const pendingDaily = await q(
