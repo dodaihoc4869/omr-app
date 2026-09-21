@@ -48,6 +48,9 @@
 .bnv-bn-ds li + li { border-top: 1px solid var(--m3-hang-2); }
 .bnv-bn-ds time { display: block; margin-bottom: 4px; font-size: var(--cx-1); font-weight: 700; color: var(--m3-primary); }
 .bnv-bn-ds p { margin: 0; font-size: var(--cx-3); line-height: 1.5; white-space: pre-line; }
+/* Tờ nằm trong cột nội dung có tầng z riêng nên KHÔNG thể phủ nút nổi "Vào thi" (tầng ngoài, z 20): khi tờ mở thì ẩn nút nổi
+   (visibility giữ nguyên bố cục). Trình duyệt cũ chưa có :has thì chỉ còn cảnh nút nổi nằm trên tờ — không mất chức năng. */
+.bnv:has(.bnv-bn-to) .bnv-fab { visibility: hidden; }
 @media (prefers-reduced-motion: no-preference) {
   .bnv-bn-to { animation: bnv-bn-vao 200ms ease-out; }
   @keyframes bnv-bn-vao { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }

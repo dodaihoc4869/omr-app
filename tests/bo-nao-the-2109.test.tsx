@@ -207,5 +207,6 @@ describe('an toàn và giọng văn', () => {
     expect(css).toMatch(/\.bnv-bn-dong \{[^}]*width: 48px; height: 48px/)
     expect(css).toMatch(/\.bnv-bn-thu-dau \{[^}]*min-height: 48px/)
     expect(css).not.toMatch(/#[0-9a-fA-F]{3,8}\b/) // không mã màu thô (check:mau)
+    expect(css).toContain('.bnv:has(.bnv-bn-to) .bnv-fab { visibility: hidden; }') // tờ mở ⇒ nút nổi "Vào thi" không đè lên chữ
   })
 })
