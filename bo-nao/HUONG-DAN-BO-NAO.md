@@ -16,15 +16,16 @@ Thầy KHÔNG duyệt từng điều chỉnh: cái bạn nộp mà qua kiểm kh
 - Tiết kiệm: không đọc lại tệp đã đọc; không in dữ liệu ra hội thoại; việc theo lô giao cho trợ lý con đúng mô hình ghi dưới; tổng kết ≤ 15 dòng.
 
 ## QUY TRÌNH MỖI ĐÊM
-1. `node scripts/bo-nao/lay.mjs` → in đường dẫn `bo-nao/<ngày>/`: `lop.json` (bức tranh lớp + kết quả các điều chỉnh hôm qua), `vao/nhanh-*.json` (mỗi tệp ≤ 40 thẻ NGẮN), `vao/sau-*.json` (mỗi tệp ≤ 12 hồ sơ ĐẦY ĐỦ), `vao/vang.json` (em vắng ≥ 2 ngày). Lệnh báo lỗi/không có dữ liệu ⇒ ghi `bao-cao.md` một dòng rồi DỪNG.
+0. **Chọn NGÀY cần soi** (giờ Việt Nam): nếu có tệp `bo-nao/CHAY-NGAY.txt` chứa một ngày `YYYY-MM-DD` ⇒ soi đúng ngày đó rồi XOÁ tệp ấy; nếu không: chạy TRƯỚC 12:00 ⇒ soi **HÔM QUA** (đêm 04:00 phải soi trọn ngày vừa qua — học sinh học tới 23:59), chạy từ 12:00 trở đi ⇒ soi hôm nay. Lấy ngày bằng lệnh `TZ=Asia/Ho_Chi_Minh date +%F` (hôm qua: `TZ=Asia/Ho_Chi_Minh date -v-1d +%F`). Gọi `<ngày>` là ngày đã chọn.
+1. `node scripts/bo-nao/lay.mjs <ngày>` → in đường dẫn `bo-nao/<ngày>/`: `lop.json` (bức tranh lớp + kết quả các điều chỉnh hôm qua), `vao/nhanh-*.json` (mỗi tệp ≤ 40 thẻ NGẮN), `vao/sau-*.json` (mỗi tệp ≤ 12 hồ sơ ĐẦY ĐỦ), `vao/vang.json` (em vắng ≥ 2 ngày). Lệnh báo lỗi/không có dữ liệu ⇒ ghi `bao-cao.md` một dòng rồi DỪNG.
 2. Đọc `bo-nao/so-tay/bai-hoc.md` (≤ 2.000 chữ) + `lop.json`.
 3. Chia việc cho trợ lý con, chạy song song, mỗi trợ lý MỘT tệp vào → MỘT tệp `ra/<cùng tên>.json` đúng KHUÔN:
    - `nhanh-*` và `vang`: mô hình VỪA (sonnet) — vì MỖI em đều nhận lời nhắn viết riêng, mô hình nhỏ viết dễ sáo. Em nào thấy cần nhìn kỹ hơn ⇒ đặt `canSau: true`, KHÔNG đoán bừa.
    - `sau-*`: mô hình MẠNH NHẤT đang có (opus). Gồm: em bị thuật toán gắn cờ + em tới lượt "soi kỹ hằng tuần" (mỗi đêm 1/7 lớp ⇒ tuần nào em nào cũng được soi kỹ một lần).
    Dặn trợ lý con: đọc mục NGUYÊN TẮC + KHUÔN của tệp này, chỉ trả về đường dẫn tệp ra + 1 dòng đếm.
 4. Tự mình (mô hình chính) viết `ra/lop.json`: bản tin sáng cho thầy ≤ 6 dòng — (a) em cần thầy để ý: lý do BẰNG SỐ + một hành động; (b) dạng cả lớp nên chữa lại; (c) gợi ý gọi lên bảng; (d) điều chỉnh hôm qua có ăn thua không.
-5. `node scripts/bo-nao/nop.mjs <ngày>` — mã lệnh tự kiểm khuôn, đổi bí danh, nộp. Đọc kết quả: bao nhiêu điều chỉnh được nhận / bị loại và vì sao.
-6. Cập nhật `bo-nao/so-tay/bai-hoc.md`: thêm ≤ 3 dòng bài học MỚI có bằng chứng số (kiểu: "em bỏ dở 2 ngày liền: giảm 3 câu + 3 khởi động ⇒ 7/9 em xong chặng hôm sau"); gộp/xoá dòng cũ để tệp ≤ 2.000 chữ. Ghi `bo-nao/<ngày>/bao-cao.md` ≤ 15 dòng.
+5. `node scripts/bo-nao/nop.mjs <ngày>` (đúng ngày ở bước 0) — mã lệnh tự kiểm khuôn, đổi bí danh, nộp. Đọc kết quả: bao nhiêu điều chỉnh được nhận / bị loại và vì sao.
+6. Cập nhật `bo-nao/so-tay/bai-hoc.md`: thêm ≤ 3 dòng bài học MỚI có bằng chứng số (kiểu: "em bỏ dở 2 ngày liền: giảm 3 câu + 3 khởi động ⇒ 7/9 em xong chặng hôm sau"); gộp/xoá dòng cũ để tệp ≤ 2.000 chữ. Ghi `bo-nao/<ngày>/bao-cao.md` ≤ 15 dòng. Thêm MỘT dòng vào bảng `bo-nao/so-tay/do-token.md`: đêm · số em soi nhanh · soi kỹ · vắng · số trợ lý con · thời gian chạy (phút) · token ước (nếu không đo được ghi "?") · số phần tử qua/bị loại ở kiểm khuôn · ghi chú.
 
 ## NGUYÊN TẮC RA QUYẾT ĐỊNH (thứ tự ưu tiên từ trên xuống)
 1. **An toàn động lực trước**: em bỏ dở giữa chặng 2 ngày liền, hoặc chuỗi ngày vừa gãy ⇒ cờ `qua_tai`/`tut_nhip`: nhịp −2…−3, khởi động = 3, lời nhắn ghi nhận MỘT việc cụ thể em đã làm được. Không thêm việc mới cho em đang đuối.

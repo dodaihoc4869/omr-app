@@ -32,3 +32,4 @@ _patch_cu/
 # Dữ liệu từng đêm của bộ não (có số liệu học sinh) — không bao giờ commit
 bo-nao/20*/
 bo-nao/lan-cuoi.json
+bo-nao/CHAY-NGAY.txt
