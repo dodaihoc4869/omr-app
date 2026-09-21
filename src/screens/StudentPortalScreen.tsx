@@ -21,6 +21,7 @@ import { tachDongTheoY } from '../lib/tach-dong-cau'
 import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
 import LichSuCaM3 from '../components/bang-nhiem-vu/LichSuCaM3'
+import { useThiDua } from '../lib/use-thi-dua'
 import { useHopThoai } from '../components/HopThoaiCong'
 import BtvnM3 from '../components/bang-nhiem-vu/BtvnM3'
 import VaoThiForm from '../components/bang-nhiem-vu/VaoThiForm'
@@ -985,6 +986,8 @@ export default function StudentPortalScreen() {
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet)
   // "Thử thách riêng hôm nay" của Bộ não A.I (lệnh riêng, hợp đồng docs/hop-dong-thu-thach-rieng-2109.md): co:false/lỗi/404 ⇒ null ⇒ không thẻ. "Để sau" ẩn tới ngày mai.
   const thuThachMayChu = useThuThachHomNay(auth?.token, lamMoiSheet)
+  // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
+  const thiDua = useThiDua(auth?.token, !!auth?.token && tab === null)
   const [deSauThuThach, setDeSauThuThach] = useState('')
   const homNayVn = ngayVietNam(nowHocTap) ?? ''
   const thuThachRieng = useMemo(() => {
@@ -1324,6 +1327,7 @@ export default function StudentPortalScreen() {
           hoTen={auth.hoTen}
           now={nowHocTap}
           duLieu={duLieuBang}
+          thiDua={thiDua}
           onLamThuThach={(t: ThuThachRieng) => {
             setCauOn({ viecId: `thu_thach_rieng:${t.ngay || homNayVn}`, qid: t.cau.map((c) => c.qid), tieuDe: 'Thử thách riêng hôm nay', cauSan: t.cau as unknown as CauOn[], duongNop: DUONG_NOP_THU_THACH })
             setTab('cauon')

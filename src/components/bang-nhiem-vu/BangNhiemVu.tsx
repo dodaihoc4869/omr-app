@@ -8,6 +8,8 @@ import TheCanhBaoThay from './TheCanhBaoThay'
 import TheThuThachRieng from './TheThuThachRieng'
 import GiaoThemChoCon from './GiaoThemChoCon'
 import type { ViewGiaoThem } from '../../lib/use-giao-them'
+import type { ViewThiDua } from '../../lib/use-thi-dua'
+import OThiDua from './OThiDua'
 import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
@@ -131,6 +133,8 @@ export interface BangNhiemVuProps {
   boNaoPh?: BoNaoPhuHuynh | null
   /** Chỗ đặt thẻ "Ca kiểm tra gần nhất của con" (chỉ phụ huynh): ngay dưới khối tiến độ, trên việc hôm nay. */
   theCaGanNhat?: ReactNode
+  /** Ô "Thi đua hôm nay" (chỉ học sinh; phương án 8A): ngay dưới khối tiến độ, trên việc hôm nay. Màn cha truyền vào; thiếu dữ liệu ⇒ không dựng. */
+  thiDua?: ViewThiDua
   /** MỘT nút "Giao thêm bài cho con" (phụ huynh; máy chủ có `/ph/giao-them`). `san` ⇒ thay HẲN ô giao bài cũ. Vắng/`san = false` ⇒ giữ ô cũ. */
   giaoThem?: ViewGiaoThem
   /** "Cảnh báo của thầy" của PHỤ HUYNH (lời cho phụ huynh, lệnh /ph/ke-hoach). Học sinh nhận qua `duLieu.canhBaoThay`. */
@@ -166,6 +170,7 @@ export default function BangNhiemVu({
   taiVinhDanh,
   boNaoPh: boNaoPhGoc,
   theCaGanNhat,
+  thiDua,
   giaoThem,
   canhBaoPh,
   onCanhBaoDaXem,
@@ -232,6 +237,12 @@ export default function BangNhiemVu({
   const chon = (viec: TheNhiemVu) => onHanhDong?.(viec.hanhDong)
   const { tienDo, tocDo } = duLieu
   const viec = tatCaViec(duLieu)
+  // Nút của ô Thi đua dẫn tới việc CHƯA XONG đầu tiên (không bị cổng); hết việc ⇒ Đảo thần thú (Boss 21/09).
+  const lamViecDau = () => {
+    const dau = viec.find((x) => !x.biCong)
+    if (dau) chon(dau)
+    else onMoThanThu?.()
+  }
   const conLai = Math.max(0, tienDo.mucTieu - tienDo.daLam)
 
   // Ô giao bài của phụ huynh: mọi câu chữ và số là của máy chủ; giao diện chỉ chọn dạng nút.
@@ -402,6 +413,9 @@ export default function BangNhiemVu({
 
             {/* THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" (chỉ phụ huynh, thầy lệnh 21/09): ngay dưới thanh tiến độ, TRÊN việc hôm nay. Màn cha truyền vào; không có ca nào ⇒ không thẻ. */}
             {laPh && theCaGanNhat}
+
+            {/* Ô "THI ĐUA HÔM NAY" (chỉ học sinh; 8A): ngay dưới thanh tiến độ, TRÊN việc hôm nay. */}
+            {!laPh && thiDua && <OThiDua v={thiDua} onLam={lamViecDau} />}
 
             {/* THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I, thầy chốt 21/09): ngay dưới thanh tiến độ, TRÊN việc hôm nay. Chỉ học sinh; không thử thách hợp lệ ⇒ không dựng. */}
             {!laPh && duLieu.thuThachRieng && (duLieu.thuThachRieng.trangThai === 'xong' || (onLamThuThach && onDeSauThuThach)) && (
