@@ -15,7 +15,7 @@ const LUOT = {
   tongLuotMo: 5, daLam: 2, conLai: 3, tran: 6, tongCauToiDa: 36,
   danhSach: [{ so: 1, loai: 'khoi_dong', thuong: false }, { so: 2, loai: 'kham_pha', thuong: false }, { so: 3, loai: 'kham_pha', thuong: false }, { so: 4, loai: 'kham_pha', thuong: true }, { so: 5, loai: 'trum', thuong: true }],
   luotTiepTheo: { so: 3, loai: 'kham_pha', thuong: false },
-  khoa: [{ ma: 'chang', daMo: true, moKhi: 'Em xong chặng bài tập về nhà của hôm nay' }, { ma: 'dat', daMo: false, moKhi: 'Em đạt nhiệm vụ ngày' }, { ma: 'trum', daMo: false, moKhi: 'Em đúng từ 80 % trong ít nhất 12 câu thần thú hôm nay (hôm nay 9/12 câu)' }],
+  khoa: [{ ma: 'chang', daMo: true, moKhi: 'Em xong chặng bài tập về nhà của hôm nay' }, { ma: 'dat', daMo: false, moKhi: 'Em đạt nhiệm vụ ngày' }, { ma: 'trum', daMo: true, moKhi: 'Em đúng từ 80 % trong ít nhất 12 câu thần thú hôm nay (hôm nay 12/12 câu)' }], // KHỚP LUẬT MÁY CHỦ: danhSach có lượt trùm ⇒ khoá trùm đã mở
 }
 const HET = { ...LUOT, daLam: 5, conLai: 0, luotTiepTheo: null }
 const nhan = <T,>(o: T): T => JSON.parse(JSON.stringify(o))
@@ -27,7 +27,7 @@ describe('docLuotNgay / docMaiCho — đọc chặt', () => {
     expect(l).toMatchObject({ tongLuotMo: 5, daLam: 2, conLai: 3, tran: 6 })
     expect(l.danhSach).toHaveLength(5)
     expect(l.luotTiepTheo).toEqual({ so: 3, loai: 'kham_pha', thuong: false })
-    expect(l.khoa.map((k) => [k.ma, k.daMo])).toEqual([['chang', true], ['dat', false], ['trum', false]])
+    expect(l.khoa.map((k) => [k.ma, k.daMo])).toEqual([['chang', true], ['dat', false], ['trum', true]])
     expect(docLuotNgay(HET)!.luotTiepTheo).toBeNull()
   })
   it('sai dạng ⇒ null (ẩn dải): không phải đối tượng, thiếu số, số âm/lẻ, tongLuotMo > tran, danh sách rỗng/loại lạ', () => {
@@ -86,8 +86,9 @@ describe('DaoCuaEm — dải lượt + màn hết lượt', () => {
     expect(o[4]!.textContent).toContain('Trùm')
     expect(o[3]!.textContent).toContain('Thưởng')
     const mo = [...d.querySelectorAll('.dao-luot-mo')].map((p) => p.textContent)
-    expect(mo).toEqual(['Mở thêm 1 lượt khi em đạt nhiệm vụ ngày.', 'Mở thêm 1 lượt khi em đúng từ 80 % trong ít nhất 12 câu thần thú hôm nay (hôm nay 9/12 câu).'])
+    expect(mo).toEqual(['Mở thêm 1 lượt khi em đạt nhiệm vụ ngày.']) // chỉ khoá 'dat' chưa mở
     expect(d.querySelector('.dao-luot-mo[data-ma="chang"]')).toBeNull() // khoá đã mở ⇒ không nhắc
+    expect(d.querySelector('.dao-luot-mo[data-ma="trum"]')).toBeNull() // luật máy chủ: lượt trùm CHỈ có trong danh sách khi khoá trùm đã mở ⇒ hết nhắc
     expect(container.querySelector('[data-vung="het-luot"]')).toBeNull()
     expect(screen.getByRole('button', { name: 'LÊN ĐƯỜNG' })).toBeTruthy()
   })
