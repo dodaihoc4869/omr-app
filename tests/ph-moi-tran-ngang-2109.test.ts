@@ -125,6 +125,9 @@ const DAI_B = (() => {
   Object.assign(o.homNay.tongQuan, { soCau: 1234, soDung: 700, phutHoc: 1875, chuoiNgayHoc: 100, soLanHoc: 48 })
   o.caGanNhat.congBo = { congBo: 'ca_lop_xong', daCongBo: false, soEmDaNop: 27, soEmDaVao: 32 }
   delete o.caGanNhat.ketQua
+  // câu có các ý (a)…(e) dồn trong 200 ký tự (thầy lệnh ngắt dòng 21/09): tách dòng không được làm tràn ngang
+  const c0 = o.homNay.cau.find((c: { che?: string }) => !c.che)
+  c0.deRutGon = 'Cho các phát biểu sau về triolein: (a) Triolein là chất béo không no. (b) Triolein làm mất màu nước bromine. (c) Thuỷ phân triolein thu được C3H5(OH)3. (d) Triolein không tan trong nước. (e) Xà phòng hoá là phản ứng thuận nghịch. Số phát biểu không đúng là'.slice(0, 200)
   o.baiTapVeNha.dangChay[0].ten = 'Bài tập về nhà cực dài về hợp chất hữu cơ có nhóm chức ester lipid carbohydrate amine amino acid polime'
   return o
 })()
@@ -138,9 +141,10 @@ for (const man of ['chinh', 'bang'] as const)
           const page = await browser.newPage({ viewport: { width: w, height: 800 } })
           await page.setContent(`<!doctype html><html lang="vi" style="font-size:${cs}%"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style><style>${INTER}</style></head><body><div id="root"><div class="m3"><div class="min-h-screen flex flex-col" style="display:flex;flex-direction:column;min-height:100vh">${html(raw, man)}</div></div></div></body></html>`)
           await page.evaluate(() => document.fonts.ready)
-          const r = await page.evaluate((g) => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, goc: getComputedStyle(document.querySelector(g)!).display, phong: getComputedStyle(document.querySelector(g)!).fontFamily }), man === 'chinh' ? '.phm-ap' : '.phm-goc')
+          const r = await page.evaluate((g) => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, deTach: (() => { const e = document.querySelector('.phm-cau__de'); return e ? getComputedStyle(e).whiteSpace : 'pre-line' })(), goc: getComputedStyle(document.querySelector(g)!).display, phong: getComputedStyle(document.querySelector(g)!).fontFamily }), man === 'chinh' ? '.phm-ap' : '.phm-goc')
           await page.close()
           expect(r.goc).not.toBe('inline-grid')
           expect(r.phong).toMatch(/^Inter\b/)
           expect(r.sw).toBeLessThanOrEqual(r.iw)
+          expect(r.deTach).toBe('pre-line') // đề hiện từng dòng theo ý (tachDongTheoY) — không dồn cục
         }, 30000)

@@ -35,3 +35,6 @@
 .phm-lg-buoc li { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 9px; align-items: start; font-size: 0.9375rem; line-height: 1.47; }
 .phm-lg-buoc li > i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 0.75rem; font-weight: 700; background: var(--phm-nhan-nen); color: var(--phm-tren-nhan-nen); }
 .phm-lg-ket { padding-top: 8px; border-top: 1px solid var(--phm-vach); }
+
+/* NGẮT DÒNG THEO Ý (thầy lệnh 21/09 17:3x, câu Triolein (a)…(e) dồn một cục): đề, phương án, lời giải đi qua tachDongTheoY (src/lib/tach-dong-cau.ts — MỘT nguồn với TheCau) rồi hiện từng dòng nhờ pre-line */
+.phm-cau__de, .phm-pa li > span, .phm-loi-giai p, .phm-lg-chot, .phm-lg-ket, .phm-lg-buoc li > span { white-space: pre-line; }

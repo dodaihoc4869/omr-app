@@ -1,6 +1,8 @@
 // BẢNG "MỌI THỨ VỀ CON" KIỂU APPLE — phần B: DÒNG THỜI GIAN + TỪNG CÂU (src/components/ph-moi/bang/{nhom-cau.ts,DongThoiGian.tsx,TungCau.tsx}). Mẫu thầy chốt: docs/ban-ve-ph-apple-2109/ph-d + ph-e.
 // Khoá: đủ dữ liệu / thiếu trường ⇒ ẩn; gom câu theo `lan` (thiếu ⇒ thuật toán cũ); cờ làm lâu máy chủ đứng trên ngưỡng dự phòng; câu/mốc BỊ CHE không lộ đúng-sai, đáp án, đề; lọc Sai/Làm lâu/Chưa công bố; danh sách dài dựng theo nhóm mở;
 // mở câu ⇒ hỏi máy chủ (taiChiTietCau) đúng một lần, có trạng thái đang tải / lỗi thật / bị từ chối; lời giải chỉ khi có qid + máy chủ trả; bấm một lần ở dòng thời gian ⇒ mở + cuộn tới nhóm.
+import fs from 'node:fs'
+import path from 'node:path'
 import { useMemo, useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, renderHook, waitFor } from '@testing-library/react'
@@ -603,6 +605,63 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     const b3 = moMotCau()
     fireEvent.click(b3.hang()[1]!.querySelector('button')!)
     await waitFor(() => expect(b3.container.querySelectorAll('[data-vung="cau-che"]').length).toBeGreaterThan(0))
+  })
+
+  it('NGẮT DÒNG THEO Ý (thầy lệnh 21/09 17:3x, câu Triolein (a)…(e) dồn một cục): đề (danh sách + đã mở), phương án, lời giải đều qua tachDongTheoY — mỗi ý một dòng, câu hỏi kết một dòng riêng; (1)…(4) cũng vậy; đề không có ý KHÔNG đổi; công thức vẫn chỉ số dưới', async () => {
+    const TRIO = 'Cho các phát biểu sau về triolein: (a) Triolein là chất béo không no. (b) Triolein làm mất màu nước bromine. (c) Thuỷ phân triolein thu được $C_3H_5(OH)_3$. (d) Triolein không tan trong nước. (e) Xà phòng hoá là phản ứng thuận nghịch. Số phát biểu không đúng là'
+    const raw = nhan(PH_APPLE)
+    const c0 = raw.homNay.cau.find((c: { che?: string }) => !c.che)
+    c0.deRutGon = TRIO.slice(0, 200)
+    const { hang } = moMotCau(['moc-1'], pmOf(raw))
+    const de = (hang()[0]!.querySelector('.phm-cau__de') as HTMLElement).textContent!
+    const dongDe = de.split('\n')
+    expect(dongDe.length).toBeGreaterThanOrEqual(5) // đầu câu + các ý (a)…(d…) mỗi ý một dòng
+    expect(dongDe[0]).toBe('Cho các phát biểu sau về triolein:')
+    expect(dongDe.slice(1).every((d) => /^\([a-e]\) /.test(d))).toBe(true)
+    cleanup()
+    // đã mở: đề ĐẦY ĐỦ của máy chủ + phương án + lời giải có ý
+    const cauSau = JSON.stringify({ chot: 'Xét từng ý: (a) đúng vì có nối đôi. (b) đúng. (c) đúng. (d) đúng. (e) sai vì phản ứng xà phòng hoá là một chiều.', buoc: ['Đếm số phát biểu sai: (e) sai. Vậy có 1 phát biểu không đúng.'], ketQua: '(e)' })
+    goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: docChiTietCau({ ...CHI_TIET, de: TRIO, phuongAn: ['A. 1. Nhận định (a) đúng. (b) sai.', 'B. 2', 'C. 3', 'D. 4'], dapAn: 'A', loiGiai: cauSau })! })
+    const b = moMotCau(['moc-1'], pmOf(raw))
+    const r0 = b.hang()[0]!
+    fireEvent.click(r0.querySelector('button')!)
+    await waitFor(() => expect(r0.querySelectorAll('.phm-pa li')).toHaveLength(4))
+    const deDay = r0.querySelector('.phm-cau__de')!.textContent!.split('\n').filter(Boolean) // bộ chuẩn chèn một dòng trống trước câu hỏi kết
+    expect(deDay).toHaveLength(7) // câu dẫn + 5 ý + câu hỏi kết
+    expect(deDay[5]).toMatch(/^\(e\) /)
+    expect(deDay[6]).toBe('Số phát biểu không đúng là') // câu hỏi kết một dòng riêng
+    expect(r0.querySelector('.phm-cau__de sub, .phm-cau__de .katex')).toBeTruthy() // C₃H₅(OH)₃ vẫn có chỉ số dưới sau khi tách
+    expect(r0.querySelector('.phm-cau__de')!.textContent).not.toContain('$')
+    const pa = r0.querySelector('.phm-pa li:first-child > span')!.textContent!.split('\n')
+    expect(pa.length).toBeGreaterThanOrEqual(2) // phương án cũng tách ý
+    const chot = r0.querySelector('.phm-lg-chot')!.textContent!.split('\n')
+    expect(chot.length).toBeGreaterThanOrEqual(5) // lời giải: Chốt tách (a)…(e)
+    expect(r0.querySelector('.phm-lg-buoc li span')!.textContent!.split('\n').length).toBeGreaterThanOrEqual(2)
+    // (1)…(4) và đề không có ý
+    cleanup()
+    const raw2 = nhan(PH_APPLE)
+    const cc = raw2.homNay.cau.find((c: { che?: string }) => !c.che)
+    cc.deRutGon = 'Cho các thí nghiệm sau: (1) Nung nóng KNO3. (2) Cho Zn vào HCl. (3) Điện phân NaCl. (4) Cho Na vào nước. Số thí nghiệm thu được khí là'
+    const dong4 = (moMotCau(['moc-1'], pmOf(raw2)).hang()[0]!.querySelector('.phm-cau__de') as HTMLElement).textContent!.split('\n')
+    expect(dong4.length).toBeGreaterThanOrEqual(5)
+    expect(dong4.slice(1, 5).map((d) => d.slice(0, 3))).toEqual(['(1)', '(2)', '(3)', '(4)'])
+    cleanup()
+    const raw3 = nhan(PH_APPLE)
+    const cd = raw3.homNay.cau.find((c: { che?: string }) => !c.che)
+    cd.deRutGon = 'Công thức phân tử của acetylene là gì?'
+    expect((moMotCau(['moc-1'], pmOf(raw3)).hang()[0]!.querySelector('.phm-cau__de') as HTMLElement).textContent).toBe('Công thức phân tử của acetylene là gì?')
+  })
+
+  it('khoá nguồn ngắt dòng: MỌI chỗ TungCau in đề / phương án / lời giải qua tachDongTheoY (một nguồn với TheCau, không regex mới) + CSS pre-line cho các khối ấy', () => {
+    const tsx = fs.readFileSync(path.join(process.cwd(), 'src/components/ph-moi/bang/TungCau.tsx'), 'utf8').replace(/\/\/.*$/gm, '')
+    const dung = [...tsx.matchAll(/<ChemText text=\{([^}]*(?:\}[^}]*)?)\}/g)].map((m) => m[1]!)
+    expect(dung.length).toBeGreaterThanOrEqual(6)
+    for (const d of dung) expect(d, d).toMatch(/^tachDongTheoY\(/)
+    expect(tsx).toContain("from '../../../lib/tach-dong-cau'")
+    expect(tsx).not.toMatch(/\.replace\(\/[^/]*\((?:1|a)\)/) // không tự viết regex tách ý
+    const css = fs.readFileSync(path.join(process.cwd(), 'src/components/ph-moi/bang/TungCau.css'), 'utf8')
+    for (const lop of ['.phm-cau__de', '.phm-pa li > span', '.phm-loi-giai p', '.phm-lg-chot', '.phm-lg-ket', '.phm-lg-buoc li > span']) expect(css, lop).toContain(lop)
+    expect(css).toMatch(/white-space: pre-line/)
   })
 
   it('phương án: "Đáp án đúng" ở B; "Con chọn" đỏ ở A (con chọn sai); lời giải ngắn từ máy chủ; đề đầy đủ của máy chủ thay đề rút gọn', async () => {

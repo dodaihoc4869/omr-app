@@ -4,6 +4,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { MutableRefObject } from 'react'
 import './TungCau.css'
 import { ChemText } from '../../../lib/chem-format'
+import { tachDongTheoY } from '../../../lib/tach-dong-cau'
 import { taiChiTietCau } from '../../../lib/ph-moi/api'
 import { chuThoiGian, gioVn } from '../../../lib/ph-moi/dinh-dang'
 import type { CauChe, CauHomNay, CauThuong, ChiTietCau, LyDoChe, PhMoi } from '../../../lib/ph-moi/du-lieu'
@@ -314,7 +315,7 @@ function DongCauThuong({ c, sbd, kho, cheCau }: { c: CauThuong; sbd: string; kho
             <span>{gioVn(c.luc)}</span>
           </span>
           <span className="phm-cau__de">
-            <ChemText text={de} />
+            <ChemText text={tachDongTheoY(de)} />
           </span>
           <span className="phm-cau__kq">
             <Chip mau={kq.mau} icon={kq.i}>
@@ -395,7 +396,7 @@ function ChiTietMo({ ct, conChon }: { ct: Extract<ChiTietCau, { kieu: 'ok' }>; c
               <li key={i} data-dung={laDung ? '' : undefined} data-chon={laChon && !laDung ? '' : undefined}>
                 <i>{ma}</i>
                 <span>
-                  <ChemText text={chu} />
+                  <ChemText text={tachDongTheoY(chu)} />
                 </span>
                 {laDung ? (
                   <em>
@@ -417,7 +418,7 @@ function ChiTietMo({ ct, conChon }: { ct: Extract<ChiTietCau, { kieu: 'ok' }>; c
           {ct.loiGiaiCT.chot && (
             <p className="phm-lg-chot">
               <b>Chốt: </b>
-              <ChemText text={ct.loiGiaiCT.chot} />
+              <ChemText text={tachDongTheoY(ct.loiGiaiCT.chot)} />
             </p>
           )}
           {ct.loiGiaiCT.buoc.length > 0 && (
@@ -427,7 +428,7 @@ function ChiTietMo({ ct, conChon }: { ct: Extract<ChiTietCau, { kieu: 'ok' }>; c
                   <i aria-hidden="true">{i + 1}</i>
                   <span>
                     <span className="phm-sr">Bước {i + 1}: </span>
-                    <ChemText text={b} />
+                    <ChemText text={tachDongTheoY(b)} />
                   </span>
                 </li>
               ))}
@@ -436,7 +437,7 @@ function ChiTietMo({ ct, conChon }: { ct: Extract<ChiTietCau, { kieu: 'ok' }>; c
           {ct.loiGiaiCT.ketQua && (
             <p className="phm-lg-ket">
               <b>Kết quả: </b>
-              <ChemText text={ct.loiGiaiCT.ketQua} />
+              <ChemText text={tachDongTheoY(ct.loiGiaiCT.ketQua)} />
             </p>
           )}
         </div>
@@ -444,7 +445,7 @@ function ChiTietMo({ ct, conChon }: { ct: Extract<ChiTietCau, { kieu: 'ok' }>; c
         <div className="phm-loi-giai">
           <h4>Lời giải ngắn</h4>
           <p>
-            <ChemText text={ct.loiGiai} />
+            <ChemText text={tachDongTheoY(ct.loiGiai)} />
           </p>
         </div>
       ) : (
