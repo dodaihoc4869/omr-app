@@ -44,6 +44,20 @@ export const NGUONG_BO_NAO = {
   SO_MA_DANG_TOI_DA: 6,
   SO_DANG_HO_SO: 10,
   SO_CAU_SAI_HO_SO: 8,
+  /** CẢ LỚP CÙNG SAI MỘT DẠNG: ≥ 30 % em có hoạt động (không vắng) cùng sai lặp một dạng (và ≥ 3 em) ⇒ ghi MỘT lần vào bản tin lớp (`dangCaLopYeu`), KHÔNG đẩy từng em vào luồng sâu vì lý do đó. */
+  TI_LE_DANG_CA_LOP: 0.3,
+  SO_EM_DANG_CA_LOP_TOI_THIEU: 3,
+  /** Luồng SÂU ≤ 25 % số em có thẻ mỗi đêm (ít nhất 1 em), chọn theo điểm ưu tiên; phần còn lại về luồng nhanh. */
+  TRAN_LUONG_SAU: 0.25,
+  /** Điểm ưu tiên luồng sâu (cao vào trước): điều chỉnh hôm qua xấu đi · bỏ dở/tụt nhịp · làm cho xong/đúng nhanh (thầy cần biết) · sai lặp RIÊNG · vừa thi · xoay vòng hằng tuần. */
+  DIEM_XAU_DI: 120,
+  DIEM_BO_DO: 100,
+  DIEM_TUT_NHIP: 100,
+  DIEM_LAM_CHO_XONG: 80,
+  DIEM_DUNG_NHANH: 80,
+  DIEM_SAI_LAP_RIENG: 50,
+  DIEM_VUA_THI: 30,
+  DIEM_XOAY_VONG: 10,
 } as const
 const N = NGUONG_BO_NAO
 
@@ -199,6 +213,8 @@ export type Luong = 'nhanh' | 'sau' | 'vang' | 'bo_qua'
 export interface KetQuaPhanLuong {
   luong: Luong
   lyDo: string[]
+  /** Điểm ưu tiên vào luồng sâu (cao hơn = cần soi kỹ hơn); chỉ có khi `luong === 'sau'`. */
+  diem?: number
 }
 
 export type KetQuaDieuChinh = 'an_thua' | 'khong_doi' | 'xau_di' | 'chua_du_du_lieu'
@@ -445,27 +461,33 @@ export function toiLuotSoiKy(sbd: string, ngay: string): boolean {
  * PHÂN LUỒNG một em cho đêm `ngay`. Thứ tự: không hoạt động ⇒ `bo_qua`; vắng ≥ 2 ngày ⇒ `vang`; có cờ thuật toán hoặc tới lượt xoay vòng ⇒ `sau`; còn lại ⇒ `nhanh`.
  * `lyDo` là những câu ngắn BẰNG SỐ lấy đúng từ thẻ (không có tên em).
  */
-export function phanLuong(the: TheNgan, boiCanh: { sbd: string; ngay: string }): KetQuaPhanLuong {
+export function phanLuong(the: TheNgan, boiCanh: { sbd: string; ngay: string }, tuyChon: { dangCaLop?: ReadonlySet<string> } = {}): KetQuaPhanLuong {
   const h = the.hoatDong
   const c = the.cau
   if (the.hoatDong.soNgayTuLucDau === null || h.soNgayVang > N.KHONG_HOAT_DONG_BO_QUA) return { luong: 'bo_qua', lyDo: [`không có hoạt động trong ${N.KHONG_HOAT_DONG_BO_QUA} ngày`] }
   if (h.soNgayVang >= N.VANG_TOI_THIEU) return { luong: 'vang', lyDo: [`vắng ${h.soNgayVang} ngày liền`] }
   const lyDo: string[] = []
+  let diem = 0
+  const them = (d: number, chu: string) => {
+    lyDo.push(chu)
+    diem = Math.max(diem, d)
+  }
   for (const co of the.co) {
-    if (co === 'tut_nhip') lyDo.push(`tụt nhịp: ${c.lam3} câu / 3 ngày so với ${c.lam4Truoc} câu / 4 ngày trước`)
-    else if (co === 'bo_do') lyDo.push(`bỏ dở BTVN: ${the.btvn.changXong} chặng xong, 2 ngày qua không làm câu nào của bài`)
+    if (co === 'tut_nhip') them(N.DIEM_TUT_NHIP, `tụt nhịp: ${c.lam3} câu / 3 ngày so với ${c.lam4Truoc} câu / 4 ngày trước`)
+    else if (co === 'bo_do') them(N.DIEM_BO_DO, `bỏ dở BTVN: ${the.btvn.changXong} chặng xong, 2 ngày qua không làm câu nào của bài`)
     else if (co === 'sai_lap') {
-      const d = the.dangChuY.find((x) => x.sai7 >= N.SAI_LAP_SO_LAN)
-      if (d) lyDo.push(`sai lặp: dạng ${d.ma} sai ${d.sai7}/${d.lam7} lần trong 7 ngày`)
-    } else if (co === 'dung_nhanh') lyDo.push(`đúng nhanh bất thường: ${Math.round((c.tiLe3 ?? 0) * 100)} % đúng, ${the.giay.homQua} giây/câu so với trung vị ${the.giay.trungVi7}`)
-    else if (co === 'lam_cho_xong') lyDo.push(`làm cho xong: ${Math.round((c.tiLe3 ?? 0) * 100)} % đúng, ${the.giay.homQua} giây/câu so với trung vị ${the.giay.trungVi7}`)
-    else if (co === 'vua_thi' && the.ca) lyDo.push(`vừa thi ${the.ca.ngayTruoc} ngày trước`)
+      // sai lặp RIÊNG: bỏ những dạng cả lớp cùng sai (đã ghi một lần ở bản tin lớp); em chỉ sai lặp dạng cả lớp thì không vì thế mà vào luồng sâu
+      const d = the.dangChuY.find((x) => x.sai7 >= N.SAI_LAP_SO_LAN && !tuyChon.dangCaLop?.has(x.ma))
+      if (d) them(N.DIEM_SAI_LAP_RIENG, `sai lặp: dạng ${d.ma} sai ${d.sai7}/${d.lam7} lần trong 7 ngày`)
+    } else if (co === 'dung_nhanh') them(N.DIEM_DUNG_NHANH, `đúng nhanh bất thường: ${Math.round((c.tiLe3 ?? 0) * 100)} % đúng, ${the.giay.homQua} giây/câu so với trung vị ${the.giay.trungVi7}`)
+    else if (co === 'lam_cho_xong') them(N.DIEM_LAM_CHO_XONG, `làm cho xong: ${Math.round((c.tiLe3 ?? 0) * 100)} % đúng, ${the.giay.homQua} giây/câu so với trung vị ${the.giay.trungVi7}`)
+    else if (co === 'vua_thi' && the.ca) them(N.DIEM_VUA_THI, `vừa thi ${the.ca.ngayTruoc} ngày trước`)
     // `moi_vao` chỉ là GHI CHÚ trong thẻ (AI thấy để giữ tải nhẹ), KHÔNG tự đẩy em vào luồng sâu: sau đợt xoá sổ 21/09 MỌI em đều "mới vào" trong 7 ngày ⇒ cả lớp thành luồng sâu (tốn mô hình mạnh nhất, không thêm tín hiệu).
     // Em mới vẫn được soi kỹ đúng một lần mỗi tuần (xoay vòng) và AI đặt `canSau` khi cần.
-    else if (co === 'xau_di_hom_qua') lyDo.push('điều chỉnh hôm qua chưa hiệu quả')
+    else if (co === 'xau_di_hom_qua') them(N.DIEM_XAU_DI, 'điều chỉnh hôm qua chưa hiệu quả')
   }
-  if (lyDo.length === 0 && toiLuotSoiKy(boiCanh.sbd, boiCanh.ngay)) lyDo.push('tới lượt soi kỹ xoay vòng hằng tuần')
-  return lyDo.length ? { luong: 'sau', lyDo } : { luong: 'nhanh', lyDo: [] }
+  if (lyDo.length === 0 && toiLuotSoiKy(boiCanh.sbd, boiCanh.ngay)) them(N.DIEM_XOAY_VONG, 'tới lượt soi kỹ xoay vòng hằng tuần')
+  return lyDo.length ? { luong: 'sau', lyDo, diem: diem + lyDo.length / 100 } : { luong: 'nhanh', lyDo: [] }
 }
 
 // ══════════════════════════════ ĐÁNH GIÁ ĐIỀU CHỈNH HÔM QUA ══════════════════════════════
@@ -514,12 +536,69 @@ export interface BucTranhLop {
   soBoQua: number
   /** Dạng nhiều em sai lặp nhất (≥ 3 lần/7 ngày): số em, tổng lần sai — theo mã dạng. */
   dangKet: { ma: string; soEm: number; tongSai: number }[]
+  /** Số em có hoạt động (luồng nhanh + sâu) — mẫu số của `dangCaLopYeu`. */
+  soEmHoatDong: number
+  /** CẢ LỚP CÙNG SAI: dạng có ≥ 30 % em có hoạt động cùng sai lặp (≥ 3 em). Nên chữa lại chung cho cả lớp; từng em KHÔNG bị đẩy vào luồng sâu vì dạng này. */
+  dangCaLopYeu: { ma: string; soEm: number; phanTram: number; tongSai: number }[]
   soEmBoDoBtvn: number
   soEmTutNhip: number
   soEmVangLau: number
   /** SBD (mã lệnh đổi sang bí danh): em đang lên rõ (≥ 15 câu/7 ngày, ≥ 85 % đúng, xu hướng lên). */
   emNoiLen: string[]
   ketQuaDieuChinh: { anThua: number; khongDoi: number; xauDi: number; chuaDu: number }
+}
+
+/** Dạng cả lớp cùng sai lặp (xem `TI_LE_DANG_CA_LOP`). Mẫu số = em có hoạt động (luồng nhanh + sâu; em vắng không tính). Thứ tự: nhiều em nhất trước, rồi mã dạng. */
+export function tinhDangCaLopYeu(cacEm: Pick<TheCuaEmLop, 'luong' | 'the'>[]): BucTranhLop['dangCaLopYeu'] {
+  const hoatDong = cacEm.filter((e) => e.luong === 'nhanh' || e.luong === 'sau')
+  const dem = new Map<string, { soEm: number; tongSai: number }>()
+  for (const e of hoatDong) {
+    for (const d of e.the.dangChuY) {
+      if (d.sai7 < N.SAI_LAP_SO_LAN) continue
+      const x = dem.get(d.ma) ?? { soEm: 0, tongSai: 0 }
+      x.soEm++
+      x.tongSai += d.sai7
+      dem.set(d.ma, x)
+    }
+  }
+  return [...dem.entries()]
+    .filter(([, x]) => x.soEm >= N.SO_EM_DANG_CA_LOP_TOI_THIEU && x.soEm >= N.TI_LE_DANG_CA_LOP * hoatDong.length)
+    .map(([ma, x]) => ({ ma, soEm: x.soEm, phanTram: Math.round((100 * x.soEm) / hoatDong.length), tongSai: x.tongSai }))
+    .sort((a, b) => b.soEm - a.soEm || (a.ma < b.ma ? -1 : 1))
+}
+
+export interface KetQuaChotLuong {
+  luong: Luong
+  lyDo: string[]
+}
+
+/**
+ * CHỐT LUỒNG CẢ LỚP (sau khi đã có thẻ của mọi em). (1) Dạng cả lớp cùng sai ⇒ `dangCaLopYeu`, và sai lặp dạng ấy KHÔNG còn là lý do vào luồng sâu; (2) luồng sâu ≤ 25 % số em có thẻ
+ * (ít nhất 1), chọn theo điểm ưu tiên (xấu đi > bỏ dở/tụt nhịp > làm cho xong/đúng nhanh > sai lặp riêng > vừa thi > xoay vòng; nhiều lý do cộng chút), hoà thì băm `sbd|ngày` (tất định, không dồn về SBD nhỏ);
+ * phần còn lại về `nhanh`. Em vắng / bỏ qua giữ nguyên. Chỉ ĐỌC thẻ, không đọc luồng cũ của em nhanh/sâu ⇒ chạy lại nhiều lần ra cùng kết quả.
+ */
+export function chotLuongCaLop(
+  ngay: string,
+  cacEm: Pick<TheCuaEmLop, 'sbd' | 'luong' | 'the'>[],
+): { luong: Map<string, KetQuaChotLuong>; dangCaLopYeu: BucTranhLop['dangCaLopYeu']; tran: { soEmCoThe: number; toiDaSau: number; soUngVienSau: number; soSau: number } } {
+  const dangCaLopYeu = tinhDangCaLopYeu(cacEm)
+  const dangCaLop = new Set(dangCaLopYeu.map((d) => d.ma))
+  const luong = new Map<string, KetQuaChotLuong>()
+  const ungVien: { sbd: string; diem: number; kq: KetQuaChotLuong }[] = []
+  for (const e of cacEm) {
+    if (e.luong !== 'nhanh' && e.luong !== 'sau') {
+      luong.set(e.sbd, { luong: e.luong, lyDo: [] })
+      continue
+    }
+    const pl = phanLuong(e.the, { sbd: e.sbd, ngay }, { dangCaLop })
+    if (pl.luong === 'sau') ungVien.push({ sbd: e.sbd, diem: pl.diem ?? 0, kq: { luong: 'sau', lyDo: pl.lyDo } })
+    else luong.set(e.sbd, { luong: 'nhanh', lyDo: [] })
+  }
+  const soEmCoThe = cacEm.filter((e) => e.luong !== 'bo_qua').length
+  const toiDaSau = soEmCoThe > 0 ? Math.max(1, Math.floor(N.TRAN_LUONG_SAU * soEmCoThe)) : 0
+  ungVien.sort((a, b) => b.diem - a.diem || hashSeed(`${a.sbd}|${ngay}`) - hashSeed(`${b.sbd}|${ngay}`) || (a.sbd < b.sbd ? -1 : 1))
+  ungVien.forEach((u, i) => luong.set(u.sbd, i < toiDaSau ? u.kq : { luong: 'nhanh', lyDo: [] }))
+  return { luong, dangCaLopYeu, tran: { soEmCoThe, toiDaSau, soUngVienSau: ungVien.length, soSau: Math.min(ungVien.length, toiDaSau) } }
 }
 
 export function tinhBucTranhLop(ngay: string, cacEm: TheCuaEmLop[]): BucTranhLop {
@@ -546,6 +625,8 @@ export function tinhBucTranhLop(ngay: string, cacEm: TheCuaEmLop[]): BucTranhLop
       .map(([ma, x]) => ({ ma, ...x }))
       .sort((a, b) => b.soEm - a.soEm || b.tongSai - a.tongSai || (a.ma < b.ma ? -1 : 1))
       .slice(0, 5),
+    soEmHoatDong: cacEm.filter((e) => e.luong === 'nhanh' || e.luong === 'sau').length,
+    dangCaLopYeu: tinhDangCaLopYeu(cacEm),
     soEmBoDoBtvn: cacEm.filter((e) => e.the.co.includes('bo_do')).length,
     soEmTutNhip: cacEm.filter((e) => e.the.co.includes('tut_nhip')).length,
     soEmVangLau: cacEm.filter((e) => e.the.co.includes('vang_lau')).length,
