@@ -98,15 +98,16 @@ describe('MỐC: biên đúng ở mọi nguồn (04:59:59Z không đếm, 05:00:
     const r = await goi(d)
     expect(r.nhip).toMatchObject({ soEmHoc: 2, soCau: 2, soCauDung: 1, tiLeDung: 0.5 })
   })
-  it('bài tập: giao 04:59:59Z không hiện, giao 05:00:00Z hiện; nhắc tự động gui_luc 04:59:59Z không đếm', async () => {
+  it('bài tập: lọc theo NGÀY của mốc (giao trước 00:00 ngày mốc không hiện; giao lúc 10:48 sáng cùng ngày, trước mốc 12:00, VẪN hiện); nhắc tự động gui_luc 04:59:59Z không đếm', async () => {
     const d = truong()
-    themBai(d, 'B-TRUOC', '2026-09-21T04:59:59.000Z', T('2026-09-24T12:00:00')); themBaiEm(d, 'B-TRUOC', EM[0]!)
-    themBai(d, 'B-DUNG', '2026-09-21T05:00:00.000Z', T('2026-09-24T12:00:00')); themBaiEm(d, 'B-DUNG', EM[0]!); themBaiEm(d, 'B-DUNG', EM[1]!)
+    themBai(d, 'B-TRUOC', T('2026-09-20T23:59:59'), T('2026-09-24T12:00:00')); themBaiEm(d, 'B-TRUOC', EM[0]!) // giao trước ngày mốc
+    themBai(d, 'B-SANG', T('2026-09-21T00:00:00'), T('2026-09-24T12:00:00')); themBaiEm(d, 'B-SANG', EM[2]!) // đúng 00:00 ngày mốc: hiện
+    themBai(d, 'B-DUNG', T('2026-09-21T10:48:00'), T('2026-09-24T12:00:00')); themBaiEm(d, 'B-DUNG', EM[0]!); themBaiEm(d, 'B-DUNG', EM[1]!) // 10:48 sáng, TRƯỚC mốc 12:00: hiện
     const nhac = (id: string, sbd: string, luc: string) => d.sql.prepare("INSERT INTO canh_bao_thay(id,ma_btvn,sbd,ngay,ten_btvn,han_nop,loi_em,loi_ph,trang_thai_em,gui_luc,moc,gui_ph,ph_nhom) VALUES(?,?,?,'2026-09-21','x','x','a','b','chua_mo',?,'M1',1,?)").run(id, 'B-DUNG', sbd, luc, `${sbd}|2026-09-21`)
     nhac('n1', EM[0]!, '2026-09-21T04:59:59.000Z'); nhac('n2', EM[1]!, '2026-09-21T05:00:00.000Z')
     const r = await goi(d)
-    expect((r.baiTap as { maBtvn: string }[]).map((b) => b.maBtvn)).toEqual(['B-DUNG'])
-    expect(r.baiTap[0].nhac).toMatchObject({ soEm: 1, soPhuHuynh: 1 })
+    expect((r.baiTap as { maBtvn: string }[]).map((b) => b.maBtvn).sort()).toEqual(['B-DUNG', 'B-SANG'])
+    expect(r.baiTap.find((b: { maBtvn: string }) => b.maBtvn === 'B-DUNG').nhac).toMatchObject({ soEm: 1, soPhuHuynh: 1 })
     expect(r.mayDaLam).toEqual(expect.arrayContaining([expect.objectContaining({ loai: 'nhac_nop_bai', so: 1, soPhuHuynh: 1 })]))
   })
   it('hồ sơ nắm kiến thức: luc_cuoi 04:59:59Z không đếm, 05:00:00Z đếm (tiến bộ nhất, câu về lịch ôn lại)', async () => {

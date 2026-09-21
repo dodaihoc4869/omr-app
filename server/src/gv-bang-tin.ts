@@ -172,7 +172,8 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     `SELECT b.ma_btvn, b.giao_luc, b.han_nop, ${coCaNhan ? 'COALESCE(b.ca_nhan, 0)' : '0'} AS ca_nhan, COALESCE(NULLIF(TRIM(c.ten_ca), ''), d.ten_de, b.ma_de) AS ten
        FROM btvn b LEFT JOIN ca c ON c.ma_ca = b.ma_ca LEFT JOIN de_kho d ON d.ma_de = b.ma_de
       WHERE b.da_xoa = 0 AND b.giao_luc >= ? AND b.giao_luc <= ? AND b.han_nop >= ? ORDER BY b.han_nop, b.ma_btvn LIMIT ${TOI_DA_BAI}`
-  const bindBai = [iso(tuMs), iso(nowMs), iso(nowMs - MOT_NGAY_MS)]
+  // Bài KHÔNG lọc theo giờ của mốc: bài thầy giao trong CÙNG ngày với mốc (vd 10:48 sáng, trước mốc 12:00) vẫn là bài mới cần hiện; bài cũ đã bị xoá (`da_xoa`). Chỉ lấy bài giao từ 00:00 ngày của mốc.
+  const bindBai = [iso(dauNgayMs(ngayVnCuaMs(tuMs))), iso(nowMs), iso(nowMs - MOT_NGAY_MS)]
   let rBai = await Q.hoi(sqlBai(true), ...bindBai)
   if (!rBai) rBai = await Q.hoi(sqlBai(false), ...bindBai)
   if (!rBai) lyDoThieu.baiTap = 'Không đọc được bài tập về nhà'
