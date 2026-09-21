@@ -29,7 +29,7 @@ import { ngayVn } from './su-kien-hoc'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { baiTuNgayMoc, giaiMocHienThi } from './moc-no'
 import { TRAN_ON_KHI_KHONG_NO } from '../../src/lib/ve-dich'
-import { hangChamCuaEm } from './thi-dua-hom-nay'
+import { hangChamCuaEm, tuLucEmDaHoc } from './thi-dua-hom-nay'
 import { docVeDichCuaEm } from './ve-dich-d1'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 
@@ -447,14 +447,20 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
 
   // ── nhịp học · dạng · bậc · lịch ôn (chỉ từ sổ KHÔNG bị che) ─────────────────────────────────────────────────────────
   const chamTrong14 = skHt.filter((e) => e.ketQua !== null && e.ngayVn >= dau14 && e.ngayVn <= homNay)
-  const theoNgay = new Map<string, { soCau: number; soCauDung: number }>()
-  for (const e of chamTrong14) {
-    const c = theoNgay.get(e.ngayVn) ?? { soCau: 0, soCauDung: 0 }
-    c.soCau++
-    if (e.ketQua === 1) c.soCauDung++
+  // ĐỊNH NGHĨA CHUẨN "câu đã làm" (Boss/thầy 21/09, cùng ô Thi đua): số câu KHÁC NHAU đã TRẢ LỜI, mọi nguồn, từ mốc hiển thị — GỒM cả câu bị che (đếm số câu, không lộ đúng/sai).
+  // Số câu ĐÚNG và MẪU SỐ của tỉ lệ đúng (`soCauCoKetQua`) chỉ tính trên câu KHÔNG che ⇒ hiệu hai số không cho biết đúng/sai của câu che.
+  const theoNgay = new Map<string, { qid: Set<string>; ro: Set<string>; dung: Set<string> }>()
+  for (const e of skTho) {
+    if (e.ketQua === null || !tuMoc(e) || e.ngayVn < dau14 || e.ngayVn > homNay) continue
+    const c = theoNgay.get(e.ngayVn) ?? { qid: new Set(), ro: new Set(), dung: new Set() }
+    c.qid.add(e.qid)
+    if (e.che === null) { c.ro.add(e.qid); if (e.ketQua === 1) c.dung.add(e.qid) }
     theoNgay.set(e.ngayVn, c)
   }
-  const ngayCoHoc = [...theoNgay.keys()].sort().map((ngay) => ({ ngay, ...theoNgay.get(ngay)! }))
+  const ngayCoHoc = [...theoNgay.keys()].sort().map((ngay) => {
+    const c = theoNgay.get(ngay)!
+    return { ngay, soCau: c.qid.size, ...(c.ro.size > 0 ? { soCauDung: c.dung.size, soCauCoKetQua: c.ro.size } : {}) } // ngày chỉ có câu bị che: chỉ số câu (không "0 đúng" giả)
+  })
   if (ngayCoHoc.length > 0) {
     const gio = gioThuongHoc(chamTrong14.map((e) => e.luc))
     const tongCauNhip = ngayCoHoc.reduce((t, x) => t + x.soCau, 0)
@@ -603,24 +609,29 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
     })
   }
 
-  const rHomNay = skHt.filter((e) => e.ngayVn === homNay && nhanNguon(e.nguon) !== null && e.ketQua !== null)
-  const soCauHomNay = new Set(rHomNay.map((e) => e.qid)).size
+  // ĐỊNH NGHĨA CHUẨN (cùng ô Thi đua, `tuLucEmDaHoc`): số câu KHÁC NHAU đã trả lời hôm nay, mọi nguồn, từ MAX(mốc, 00:00 hôm nay), GỒM câu bị che. `rHomNay` = phần KHÔNG che (đúng + mẫu số tỉ lệ đúng).
+  const tuLucHomNay = tuLucEmDaHoc(moc.iso, homNay)
+  const laCauHomNay = (e: Sk): boolean => e.ketQua !== null && e.ngayVn === homNay && e.luc >= tuLucHomNay
+  const soCauHomNay = new Set(skTho.filter(laCauHomNay).map((e) => e.qid)).size
+  const rHomNay = skHt.filter(laCauHomNay)
+  const soCauCoKetQua = new Set(rHomNay.map((e) => e.qid)).size
   const soDungHomNay = new Set(rHomNay.filter((e) => e.ketQua === 1).map((e) => e.qid)).size
   const giayHomNay = homNayEv.reduce((t, e) => t + (e.giay && e.giay > 0 ? e.giay : 0), 0)
   const tongQuan: Row = {}
-  if (soCauHomNay > 0) { tongQuan.soCau = soCauHomNay; tongQuan.soDung = soDungHomNay }
+  if (soCauHomNay > 0) tongQuan.soCau = soCauHomNay
+  if (soCauCoKetQua > 0) { tongQuan.soDung = soDungHomNay; tongQuan.soCauCoKetQua = soCauCoKetQua } // "đúng {soDung} trong {soCauCoKetQua} câu đã có kết quả"; cả ngày chỉ có câu che ⇒ vắng (không số 0 giả)
   if (giayHomNay > 0) tongQuan.phutHoc = Math.round(giayHomNay / 60)
   // Câu từng sai TRƯỚC hôm nay (CẢ sổ cũ = thuật toán) nay làm đúng — con số chỉ đếm câu làm hôm nay TỪ MỐC (rHomNay)
   let lenBacDem = 0
-  if (soCauHomNay > 0) {
+  if (soCauCoKetQua > 0) {
     const truocHomNay = new Map<string, { sai: boolean }>()
     for (const e of skRo) if (e.ngayVn < homNay) { const c = truocHomNay.get(e.qid) ?? { sai: false }; if (e.ketQua !== 1) c.sai = true; truocHomNay.set(e.qid, c) }
     lenBacDem = new Set(rHomNay.filter((e) => e.ketQua === 1 && truocHomNay.get(e.qid)?.sai === true).map((e) => e.qid)).size
   }
-  if (soCauHomNay > 0 && kh && so(kh.c) !== 1) {
+  if (soCauCoKetQua > 0 && kh && so(kh.c) !== 1) {
     const ngan = parse<Row>(kh.a, {})
     const viec = parse<{ tienBo?: { soCauToiHan?: unknown; treNhip?: unknown } }>(kh.b, {})
-    tongQuan.datNhiemVu = laDatNgay({ daLam: soCauHomNay, lenBac: lenBacDem, toiThieu: Number(ngan.toiThieuCau) || 4, treNhip: viec.tienBo?.treNhip === true, soCauToiHan: Number(viec.tienBo?.soCauToiHan) || 0, ngayVn: homNay, soCauDungHomNay: soDungHomNay })
+    tongQuan.datNhiemVu = laDatNgay({ daLam: soCauCoKetQua, lenBac: lenBacDem, toiThieu: Number(ngan.toiThieuCau) || 4, treNhip: viec.tienBo?.treNhip === true, soCauToiHan: Number(viec.tienBo?.soCauToiHan) || 0, ngayVn: homNay, soCauDungHomNay: soDungHomNay })
   }
   // mục tiêu ngày để vẽ vòng: câu = `mucTieuCau` của kế hoạch ngày; phút = ước theo tốc độ CỦA CON (cùng hàm với "Nhắc con làm … khoảng N phút"); không có kế hoạch ⇒ vắng
   if (mucTieuCau > 0) tongQuan.mucTieu = { cau: mucTieuCau, phut: phutUocTinhChang(mucTieuCau, giayMoiCau) }
@@ -647,12 +658,14 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
     while (ngayCoHocSet.has(d)) { chuoiNgay++; d = themNgay(d, -1) }
     if (chuoiNgay > 0) tongQuan.chuoiNgayHoc = chuoiNgay
   }
-  const quaHomQua = skHt.filter((e) => e.ngayVn === homQua && nhanNguon(e.nguon) !== null && e.ketQua !== null)
-  if (quaHomQua.length > 0) {
-    const sc = new Set(quaHomQua.map((e) => e.qid)).size
-    const sd = new Set(quaHomQua.filter((e) => e.ketQua === 1).map((e) => e.qid)).size
+  const traLoiHomQua = skTho.filter((e) => e.ketQua !== null && tuMoc(e) && e.ngayVn === homQua) // cùng định nghĩa chuẩn: mọi nguồn, cả câu bị che
+  if (traLoiHomQua.length > 0) {
+    const sc = new Set(traLoiHomQua.map((e) => e.qid)).size
+    const roQua = traLoiHomQua.filter((e) => e.che === null)
+    const scRo = new Set(roQua.map((e) => e.qid)).size
+    const sd = new Set(roQua.filter((e) => e.ketQua === 1).map((e) => e.qid)).size
     const giayQua = skTho.filter((e) => e.ngayVn === homQua && tuMoc(e) && nhanNguon(e.nguon) !== null).reduce((t, e) => t + (e.giay && e.giay > 0 ? e.giay : 0), 0)
-    tongQuan.soVoiHomQua = { soCau: sc, tiLeDung: tron(sd / sc, 3), ...(giayQua > 0 ? { phutHoc: Math.round(giayQua / 60) } : {}) }
+    tongQuan.soVoiHomQua = { soCau: sc, ...(scRo > 0 ? { soCauCoKetQua: scRo, tiLeDung: tron(sd / scRo, 3) } : {}), ...(giayQua > 0 ? { phutHoc: Math.round(giayQua / 60) } : {}) }
   }
   const homNayKhoi: Row = {}
   if (Object.keys(tongQuan).length > 0) homNayKhoi.tongQuan = tongQuan

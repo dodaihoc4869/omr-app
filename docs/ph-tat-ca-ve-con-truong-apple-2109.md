@@ -50,3 +50,10 @@ Test: `tests/ph-tat-ca-ve-con-may-chu-2109.test.ts`, khối "bảng kiểu Apple
 }
 ```
 Cảnh "hôm nay con chưa học": `homNay: { "tongQuan": { "mucTieu": {…}, "viecXong": 0, "viecTong": 3 }, "aiDaChuanBi": [ {"loai":"chon_rieng","so":20,…}, {"loai":"xep_on","so":6} ] }` (không `dieuDangMung`, `aiDaLam`, `dongThoiGian`, `cau`).
+
+## Một định nghĩa "câu đã làm" (21/09, thầy: thẻ Hôm nay 93 ≠ Thi đua 78)
+Đề bài: `prompt-mot-dinh-nghia-cau-da-lam-2109.md`. **Câu đã làm hôm nay = số câu KHÁC NHAU (DISTINCT qid) đã TRẢ LỜI (`ket_qua IS NOT NULL`), mọi nguồn, có `luc ≥ MAX(mốc hiển thị, 00:00 hôm nay giờ VN)`** — đúng định nghĩa ô Thi đua (`tuLucEmDaHoc`). Ở `/ph/tat-ca-ve-con`:
+- `homNay.tongQuan.soCau` = số trên, **GỒM cả câu bị che** (đếm số câu, không lộ đúng/sai). `soDung` + **`soCauCoKetQua`** (mẫu số của tỉ lệ đúng) chỉ tính trên câu KHÔNG che ⇒ màn ghi "đúng {soDung} trong {soCauCoKetQua} câu đã có kết quả". Cả ngày chỉ có câu che ⇒ vắng `soDung` / `soCauCoKetQua` (không "0 đúng" giả).
+- `nhipHoc.ngay[]` và `homNay.tongQuan.soVoiHomQua`: cùng định nghĩa cho từng ngày (trước đây đếm LƯỢT ở nhịp). `soCauDung` + `soCauCoKetQua` (nhịp) / `soCauCoKetQua` + `tiLeDung` (so với hôm qua) chỉ trên câu không che; ngày chỉ có câu che ⇒ chỉ `soCau`.
+- `aiDaLam` dòng `cham` = `soCau` (cùng số). `datNhiemVu` giữ đúng số cũ (`soCauCoKetQua`) — luật đạt nhiệm vụ ngày không đổi.
+- Test khoá: `tests/ph-tat-ca-ve-con-may-chu-2109.test.ts`, khối "ĐỊNH NGHĨA CHUẨN": khớp truy vấn của định nghĩa; câu làm lại / bỏ trống / trước mốc / bị che mỗi loại một ca; **đổi đúng ⇄ sai của câu che không đổi một byte phản hồi** (không suy ngược được).

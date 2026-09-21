@@ -8,6 +8,7 @@ import { parentPass } from '../server/src/game-v2-auth'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { docCauHinhTangDoc } from '../server/src/bo-nao-doc'
 import { docCauBtvnChuaNop } from '../server/src/game-v2-luot'
+import { tuLucEmDaHoc } from '../server/src/thi-dua-hom-nay'
 import { chuGameTrong } from '../server/src/chu-game'
 import {
   CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, docCauChanBtvnChuaNop, lyDoCheCuaCau, NGUONG_LAM_LAU_GIAY, lichChangCuaEm, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
@@ -153,7 +154,10 @@ describe('ca CHƯA công bố: chỉ congBo + soEmDaNop/soEmDaVao — không đi
   }
   const soiKhongLo = (r: Record<string, any>) => {
     const s = JSON.stringify(r)
-    for (const dauBiMat of ['8.25', 'LG-BI-MAT', '"dapAn"', '"dung"', '"conChon"', 'ketQua', 'truoc', '"phan":', '"soCau"', '"soDung"', 'soCauDung', 'diem']) {
+    // "soCau" (số câu ĐÃ LÀM hôm nay, gồm câu bị che — định nghĩa chuẩn 21/09) chỉ được ở homNay + nhipHoc; đúng / mẫu số tỉ lệ đúng thì KHÔNG bao giờ
+    const { homNay: _hn, nhipHoc: _nh, ...conLai } = r
+    expect(JSON.stringify(conLai), '"soCau" ngoài số đếm hôm nay / nhịp').not.toContain('"soCau"')
+    for (const dauBiMat of ['8.25', 'LG-BI-MAT', '"dapAn"', '"dung"', '"conChon"', 'ketQua', 'truoc', '"phan":', '"soDung"', 'soCauDung', 'soCauCoKetQua', 'diem']) {
       // (`phan` của caGanNhat, không phải `phan` nào khác: chuỗi `"phan":` chỉ ra ở khối phần điểm)
       expect(s, dauBiMat).not.toContain(dauBiMat)
     }
@@ -351,7 +355,7 @@ describe('khối thiếu dữ liệu ⇒ VẮNG (không có khoá, không số 0
     suKien(d, { qid: 'Q1', ngay: NGAY, gio: '19:00', kq: 1, dang: 'ES' })
     const r = await chay(d, await capPass(d))
     for (const k of ['lichOn', 'bacTheoDang', 'vuaLenBac', 'dangVap', 'phuHuynhLamGi', 'tienBo', 'manhYeu', 'loiBoNao', 'baiTapVeNha', 'caGanNhat']) expect(k in r, k).toBe(false)
-    expect(r.nhipHoc.ngay).toEqual([{ ngay: NGAY, soCau: 1, soCauDung: 1 }])
+    expect(r.nhipHoc.ngay).toEqual([{ ngay: NGAY, soCau: 1, soCauDung: 1, soCauCoKetQua: 1 }])
   })
   it('có hồ sơ nhưng không có câu tới hạn ôn hôm nay/mai ⇒ lichOn có số 0 thật, phuHuynhLamGi VẮNG', async () => {
     const { d } = dung()
@@ -462,7 +466,7 @@ describe('nhipHoc — chỉ ngày có học, cửa sổ 14 ngày (giờ Việt N
     suKien(d, { qid: 'B', ngay: themNgay(NGAY, -13), kq: 1 }); suKien(d, { qid: 'B2', ngay: themNgay(NGAY, -13), kq: 0 }); suKien(d, { qid: 'B3', ngay: themNgay(NGAY, -13), kq: null })
     suKien(d, { qid: 'C', ngay: NGAY, kq: 1 })
     const r = await chay(d, await capPass(d))
-    expect(r.nhipHoc.ngay).toEqual([{ ngay: themNgay(NGAY, -13), soCau: 2, soCauDung: 1 }, { ngay: NGAY, soCau: 1, soCauDung: 1 }])
+    expect(r.nhipHoc.ngay).toEqual([{ ngay: themNgay(NGAY, -13), soCau: 2, soCauDung: 1, soCauCoKetQua: 2 }, { ngay: NGAY, soCau: 1, soCauDung: 1, soCauCoKetQua: 1 }])
   })
   it('gioThuongHoc: 19 lượt ⇒ vắng; 20 lượt ⇒ khung 2 giờ nhiều lượt nhất', async () => {
     const soLuot = async (n: number, gioLe = 19) => {
@@ -617,8 +621,9 @@ describe('homNay.cau — LUẬT CHE: ca chưa công bố / BTVN chưa nộp / g�
     // dòng thời gian: có phiên nhưng không số câu/đúng
     expect(r.homNay.dongThoiGian).toEqual([{ batDau: vn(NGAY, '10:00'), nguon: 'ca_kiem_tra', ten: 'Ca CA', che: 'chua_cong_bo', soCauDaLam: 1, phut: 1 }])
     // không lọt vào bất kỳ con số nào có đúng/sai
-    expect(r.homNay.tongQuan).toEqual({ phutHoc: 1, soLanHoc: 1, lanDaiNhatPhut: 1 }) // chỉ thời gian + số lần học; KHÔNG soCau/soDung của ca chưa công bố
-    for (const k of ['nhipHoc', 'lichOn', 'dangVap', 'bacTheoDang', 'vuaLenBac', 'manhYeu', 'phuHuynhLamGi', 'tienBo']) expect(k in r, k).toBe(false)
+    expect(r.homNay.tongQuan).toEqual({ soCau: 1, phutHoc: 1, soLanHoc: 1, lanDaiNhatPhut: 1 }) // số câu ĐÃ LÀM (gồm câu ca chưa công bố, định nghĩa chuẩn) + thời gian + số lần học; KHÔNG soDung / soCauCoKetQua (đúng/sai của câu che)
+    for (const k of ['lichOn', 'dangVap', 'bacTheoDang', 'vuaLenBac', 'manhYeu', 'phuHuynhLamGi', 'tienBo']) expect(k in r, k).toBe(false)
+    expect(r.nhipHoc.ngay).toEqual([{ ngay: NGAY, soCau: 1 }]) // ngày CHỈ có câu che: chỉ số câu đã làm — không soCauDung / soCauCoKetQua (không "0 đúng" giả)
   })
 
   it('ca đã công bố (ngay) ⇒ câu hiện đủ: conChon (từ chi_tiet_cau), dapAn, dung, coLoiGiai, deRutGon, tenDang — nhưng KHÔNG lời giải', async () => {
@@ -697,8 +702,8 @@ describe('homNay.cau — LUẬT CHE: ca chưa công bố / BTVN chưa nộp / g�
     kho(d, 'OK1', { dang: 'ES', tenDang: 'Este' }); kho(d, 'OK2', { dang: 'ES', tenDang: 'Este' })
     await dungLaiHoSo(d.env, ['S1'], 'x')
     const r = await chay(d, await capPass(d))
-    expect(r.homNay.tongQuan).toMatchObject({ soCau: 2, soDung: 1 })
-    expect(r.nhipHoc.ngay).toEqual([{ ngay: NGAY, soCau: 2, soCauDung: 1 }])
+    expect(r.homNay.tongQuan).toMatchObject({ soCau: 11, soCauCoKetQua: 2, soDung: 1 }) // soCau gồm 9 câu bị che; đúng + mẫu số chỉ trên 2 câu không che
+    expect(r.nhipHoc.ngay).toEqual([{ ngay: NGAY, soCau: 11, soCauDung: 1, soCauCoKetQua: 2 }])
     expect(r.homNay.cau).toHaveLength(11) // 9 stub bị che + 2 câu rõ
     expect(r.homNay.cau.filter((c: any) => c.che)).toHaveLength(9)
   })
@@ -716,13 +721,13 @@ describe('homNay — tongQuan, dongThoiGian, giới hạn câu, nhãn nguồn', 
     suKien(d, { qid: 'Q5', ngay: themNgay(NGAY, -2), gio: '09:00', kq: 1 })
     suKien(d, { qid: 'Q6', ngay: themNgay(NGAY, -4), gio: '09:00', kq: 1 }) // ngắt chuỗi
     const r = await chay(d, await capPass(d))
-    expect(r.homNay.tongQuan).toEqual({ soCau: 2, soDung: 2, phutHoc: 3, chuoiNgayHoc: 3, soLanHoc: 1, lanDaiNhatPhut: 3, soVoiHomQua: { soCau: 2, tiLeDung: 0.5, phutHoc: 1 } })
+    expect(r.homNay.tongQuan).toEqual({ soCau: 2, soDung: 2, soCauCoKetQua: 2, phutHoc: 3, chuoiNgayHoc: 3, soLanHoc: 1, lanDaiNhatPhut: 3, soVoiHomQua: { soCau: 2, soCauCoKetQua: 2, tiLeDung: 0.5, phutHoc: 1 } })
   })
   it('hôm nay chưa học ⇒ chuỗi tính từ hôm qua, không soCau/soDung/dòng thời gian/câu; không có hôm qua ⇒ vắng soVoiHomQua; không sổ nào ⇒ vắng cả homNay', async () => {
     const { d } = dung()
     suKien(d, { qid: 'Q1', ngay: themNgay(NGAY, -1), kq: 1 })
     let r = await chay(d, await capPass(d))
-    expect(r.homNay).toEqual({ tongQuan: { chuoiNgayHoc: 1, soVoiHomQua: { soCau: 1, tiLeDung: 1, phutHoc: 1 } } })
+    expect(r.homNay).toEqual({ tongQuan: { chuoiNgayHoc: 1, soVoiHomQua: { soCau: 1, soCauCoKetQua: 1, tiLeDung: 1, phutHoc: 1 } } })
     expect(r.nhipHoc.ngay).toHaveLength(1)
     const { d: d2 } = dung()
     suKien(d2, { qid: 'Q1', ngay: NGAY, kq: 1 })
@@ -991,9 +996,9 @@ describe('MỐC HIỂN THỊ — sự kiện trước 12:00 trưa 21/09 không l
       return d
     }
     const r = await chayMoc(dat({ moc: null }))
-    expect(r.nhipHoc.ngay).toEqual([{ ngay: NGAY_MOC, soCau: 2, soCauDung: 1 }, { ngay: NGAY, soCau: 1, soCauDung: 1 }])
+    expect(r.nhipHoc.ngay).toEqual([{ ngay: NGAY_MOC, soCau: 2, soCauDung: 1, soCauCoKetQua: 2 }, { ngay: NGAY, soCau: 1, soCauDung: 1, soCauCoKetQua: 1 }])
     const doiChung = await chayMoc(dat())
-    expect(doiChung.nhipHoc.ngay).toEqual([{ ngay: truoc, soCau: 3, soCauDung: 3 }, { ngay: NGAY_MOC, soCau: 4, soCauDung: 3 }, { ngay: NGAY, soCau: 1, soCauDung: 1 }])
+    expect(doiChung.nhipHoc.ngay).toEqual([{ ngay: truoc, soCau: 3, soCauDung: 3, soCauCoKetQua: 3 }, { ngay: NGAY_MOC, soCau: 4, soCauDung: 3, soCauCoKetQua: 4 }, { ngay: NGAY, soCau: 1, soCauDung: 1, soCauCoKetQua: 1 }])
   })
 
   it('mọi sự kiện đều trước mốc ⇒ nhipHoc, tổng quan, chuỗi, dạng… VẮNG (khối thiếu dữ liệu ⇒ vắng, không số 0 giả)', async () => {
@@ -1085,7 +1090,7 @@ describe('MỐC HIỂN THỊ — sự kiện trước 12:00 trưa 21/09 không l
     for (let i = 0; i < 4; i++) suKien(d, { qid: `S${i}`, ngay: homQua, gio: '08:00', kq: 1 })
     for (let i = 0; i < 2; i++) suKien(d, { qid: `C${i}`, ngay: homQua, gio: '14:00', kq: i === 0 ? 1 : 0 })
     suKien(d, { qid: 'H', ngay: NGAY, gio: '10:00' })
-    expect((await chayMoc(d)).homNay.tongQuan.soVoiHomQua).toEqual({ soCau: 2, tiLeDung: 0.5, phutHoc: 1 })
+    expect((await chayMoc(d)).homNay.tongQuan.soVoiHomQua).toEqual({ soCau: 2, soCauCoKetQua: 2, tiLeDung: 0.5, phutHoc: 1 })
     const { d: d2 } = dung({ moc: null })
     for (let i = 0; i < 4; i++) suKien(d2, { qid: `S${i}`, ngay: homQua, gio: '08:00', kq: 1 })
     suKien(d2, { qid: 'H', ngay: NGAY, gio: '10:00' })
@@ -1145,7 +1150,7 @@ describe('MỐC HIỂN THỊ — sự kiện trước 12:00 trưa 21/09 không l
     suKien(d, { qid: 'SM-1', ngay: NGAY_MOC, gio: '11:59', dang: 'SM', kq: 1 }) // 1 phút trước mốc ⇒ lên bậc TRƯỚC mốc
     await dungLaiHoSo(d.env, ['S1'], 'x')
     const r = await chayMoc(d, T_MOC)
-    expect(r.nhipHoc.ngay).toEqual([{ ngay: NGAY_MOC, soCau: 1, soCauDung: 1 }])
+    expect(r.nhipHoc.ngay).toEqual([{ ngay: NGAY_MOC, soCau: 1, soCauDung: 1, soCauCoKetQua: 1 }])
     expect(r.vuaLenBac.map((x: any) => x.ma)).toEqual(['EX'])
   })
 
@@ -1294,7 +1299,7 @@ describe('bảng kiểu Apple — trường mới của lệnh /ph/tat-ca-ve-con
     suKien(d, { qid: 'A', ngay: NGAY_HOM_QUA, gio: '14:00', kq: 1, giay: 120 }); suKien(d, { qid: 'B', ngay: NGAY_HOM_QUA, gio: '14:01', kq: 0, giay: 180 })
     suKien(d, { qid: 'H', ngay: NGAY_HOM_QUA, gio: '08:00', kq: 1, giay: 600 }) // trước mốc: không tính
     suKien(d, { qid: 'N', ngay: NGAY, gio: '10:00' })
-    expect((await chayApple(d)).homNay.tongQuan.soVoiHomQua).toEqual({ soCau: 2, tiLeDung: 0.5, phutHoc: 5 })
+    expect((await chayApple(d)).homNay.tongQuan.soVoiHomQua).toEqual({ soCau: 2, soCauCoKetQua: 2, tiLeDung: 0.5, phutHoc: 5 })
     const { d: d2 } = dung({ moc: null })
     suKien(d2, { qid: 'A', ngay: NGAY_HOM_QUA, gio: '14:00', kq: 1, giay: null }); suKien(d2, { qid: 'N', ngay: NGAY, gio: '10:00' })
     expect('phutHoc' in (await chayApple(d2)).homNay.tongQuan.soVoiHomQua).toBe(false)
@@ -1528,7 +1533,7 @@ describe('bảng kiểu Apple — trường mới của lệnh /ph/tat-ca-ve-con
     const r = await chayApple(d)
     expect(r.homNay.dieuDangMung).toEqual([])
     expect('aiDaChuanBi' in r.homNay).toBe(false)
-    expect(r.homNay.aiDaLam).toEqual([{ loai: 'chon_rieng', so: 2, chiTiet: { on_lai: 2 } }]) // không có dòng cham (0 câu chấm)
+    expect(r.homNay.aiDaLam).toEqual([{ loai: 'chon_rieng', so: 2, chiTiet: { on_lai: 2 } }, { loai: 'cham', so: 1 }]) // 'chấm 1 câu' = số câu đã làm (định nghĩa chuẩn, gồm câu che): đếm, không lộ đúng/sai
   })
 
   it('chon_rieng tính CẢ chặng bài tập về nhà (btvn_lo) và ôn thi; việc không phải "câu chọn riêng" (btvn_nop, mom) không cộng; kế hoạch không có câu chọn riêng ⇒ không có dòng chon_rieng', async () => {
@@ -1687,11 +1692,11 @@ describe('luật che THEO CÂU — mọi kênh; danh sách ⇔ chi tiết', () =
     suKien(d, { qid: 'QCHE', ngay: NGAY, gio: '14:01', nguon: 'btvn', ma: 'BT-MO', kq: 1, dang: 'ES' })
     suKien(d, { qid: 'QTHUONG', ngay: NGAY, gio: '14:02', nguon: 'on_lai', kq: 0, dang: 'ES' })
     const hn = await danhSach(d)
-    expect(hn.tongQuan).toMatchObject({ soCau: 1, soDung: 0 }) // chỉ QTHUONG
+    expect(hn.tongQuan).toMatchObject({ soCau: 2, soCauCoKetQua: 1, soDung: 0 }) // soCau gồm QCHE (che) + QTHUONG; đúng + mẫu số chỉ trên QTHUONG
     const phien = hn.dongThoiGian.find((x: any) => x.nguon === 'on_lai')
     expect(phien).toMatchObject({ soCau: 1, soDung: 0, soCauDaLam: 2 })
     const ra = (await phTatCaVeCon(d.env, { sbd: 'S1' }, NOW)) as Record<string, any>
-    expect(ra.nhipHoc.ngay).toEqual([{ ngay: NGAY, soCau: 1, soCauDung: 0 }])
+    expect(ra.nhipHoc.ngay).toEqual([{ ngay: NGAY, soCau: 2, soCauDung: 0, soCauCoKetQua: 1 }])
   })
 
   it('lyDoCheCuaCau (hàm THUẦN chung): không lần làm nào ⇒ null; ưu tiên chua_cong_bo; thiếu trạng thái ⇒ che (đóng cửa)', () => {
@@ -1811,5 +1816,59 @@ describe('luật che THEO CÂU — mọi kênh; danh sách ⇔ chi tiết', () =
       const c2 = (await phChiTietCauVeCon(hong(/^WITH bai AS|^SELECT q\.qid AS qid, q\.content_group AS grp/), { sbd: 'S1', qid: 'QG' }, NOW)) as Record<string, any>
       expect(c2.ok).toBe(true) // chi tiết cũng không sập
     } finally { console.error = nhat }
+  })
+})
+
+// ── MỘT ĐỊNH NGHĨA "câu đã làm" (thầy 21/09: thẻ Hôm nay 93 ≠ Thi đua 78, cùng một em) — đề bài prompt-mot-dinh-nghia-cau-da-lam-2109.md ──
+describe('ĐỊNH NGHĨA CHUẨN "câu đã làm hôm nay" = số câu KHÁC NHAU đã trả lời, mọi nguồn, từ MAX(mốc, 00:00 hôm nay), GỒM câu bị che', () => {
+  const MOC_THAT = '2026-09-21T05:00:00.000Z' // mốc hiển thị mặc định 12:00 VN 21/09
+  const hoi = async (d: D1That) => (await phTatCaVeCon(d.env, { sbd: 'S1' }, NOW)) as Record<string, any>
+  const xay = (kqCheThi: 0 | 1, kqCheBtvn: 0 | 1) => {
+    const { d } = dung({ moc: null })
+    themCa(d, 'CA-CHE', 'khong'); themLuot(d, 'CA-CHE', 'S1')
+    themBtvn(d, 'BT-MO', { de: 'DE-BT' }) // chưa nộp
+    for (const g of ['09:00', '09:10', '09:20']) suKien(d, { qid: 'QA', ngay: NGAY, gio: g, nguon: 'on_lai', kq: g === '09:00' ? 0 : 1 }) // làm lại 3 lần = MỘT câu
+    suKien(d, { qid: 'QB', ngay: NGAY, gio: '09:30', nguon: 'on_lai', kq: null }) // bỏ trống ⇒ không đếm
+    suKien(d, { qid: 'QC', ngay: NGAY, gio: '08:00', nguon: 'on_lai', kq: 0 })
+    suKien(d, { qid: 'QD', ngay: NGAY, gio: '10:00', nguon: 'thi', ma: 'CA-CHE', kq: kqCheThi }) // ca chưa công bố ⇒ che
+    suKien(d, { qid: 'QE', ngay: NGAY, gio: '10:10', nguon: 'btvn', ma: 'BT-MO', kq: kqCheBtvn }) // bài chưa nộp ⇒ che
+    suKien(d, { qid: 'QF', ngay: '2026-09-21', gio: '14:00', nguon: 'on_lai', kq: 1 }) // hôm qua (sau mốc)
+    suKien(d, { qid: 'QG', ngay: '2026-09-21', gio: '09:00', nguon: 'on_lai', kq: 1 }) // hôm qua TRƯỚC mốc 12:00 ⇒ không lọt vào đâu
+    suKien(d, { qid: 'QH', ngay: '2026-09-21', gio: '15:00', nguon: 'thi', ma: 'CA-CHE', kq: kqCheThi === 1 ? 0 : 1 }) // hôm qua, câu che: vào số câu, KHÔNG vào tỉ lệ đúng
+    return d
+  }
+  it('soCau = DISTINCT qid đã trả lời hôm nay, từ mốc, GỒM câu che; soDung + soCauCoKetQua chỉ trên câu KHÔNG che; đúng bằng truy vấn của định nghĩa (khớp ô Thi đua)', async () => {
+    const d = xay(1, 0)
+    const r = await hoi(d)
+    const sql = (d.sql.prepare('SELECT COUNT(DISTINCT qid) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND luc >= ? AND ket_qua IS NOT NULL').get('S1', NGAY, tuLucEmDaHoc(MOC_THAT, NGAY)) as { n: number }).n
+    expect(sql).toBe(4) // QA (làm lại 3 lần = 1), QC, QD, QE — QB bỏ trống không đếm; QF hôm qua, QG trước mốc không đếm
+    expect(r.homNay.tongQuan.soCau).toBe(sql)
+    expect(r.homNay.tongQuan).toMatchObject({ soCauCoKetQua: 2, soDung: 1 }) // QA (đúng lần cuối), QC (sai) — QD, QE bị che không vào
+    expect(r.homNay.tongQuan.soCau).toBeGreaterThan(r.homNay.tongQuan.soCauCoKetQua)
+  })
+  it('KHÔNG SUY NGƯỢC: đổi đúng ⇄ sai của các câu bị che KHÔNG đổi một byte nào của phản hồi', async () => {
+    const a = JSON.stringify(await hoi(xay(1, 0)))
+    const b = JSON.stringify(await hoi(xay(0, 1)))
+    expect(a).toBe(b)
+    expect(a).toContain('"soCauCoKetQua"')
+  })
+  it('nhịp học: MỖI NGÀY = số câu khác nhau (làm lại không phồng), gồm câu che; so với hôm qua: câu trước mốc không vào, tỉ lệ đúng trên mẫu số câu không che', async () => {
+    const d = xay(1, 0)
+    const r = await hoi(d)
+    const homNay = r.nhipHoc.ngay.find((x: any) => x.ngay === NGAY)
+    expect(homNay).toMatchObject({ soCau: r.homNay.tongQuan.soCau, soCauCoKetQua: 2 })
+    expect(r.homNay.tongQuan.soVoiHomQua).toMatchObject({ soCau: 2, soCauCoKetQua: 1, tiLeDung: 1 }) // QF + QH (che); QG trước mốc không vào; tỉ lệ đúng chỉ trên QF
+  })
+  it('ngày chỉ có câu che: có soCau (đếm) nhưng KHÔNG soDung / soCauCoKetQua / tiLeDung (không "0 đúng" giả)', async () => {
+    const { d } = dung({ moc: null })
+    themCa(d, 'CA-CHE', 'khong'); themLuot(d, 'CA-CHE', 'S1')
+    suKien(d, { qid: 'QD', ngay: NGAY, gio: '10:00', nguon: 'thi', ma: 'CA-CHE', kq: 1 })
+    suKien(d, { qid: 'QH', ngay: '2026-09-21', gio: '14:00', nguon: 'thi', ma: 'CA-CHE', kq: 0 })
+    const r = await hoi(d)
+    expect(r.homNay.tongQuan).toMatchObject({ soCau: 1 })
+    expect('soDung' in r.homNay.tongQuan || 'soCauCoKetQua' in r.homNay.tongQuan).toBe(false)
+    expect(r.homNay.tongQuan.soVoiHomQua).toMatchObject({ soCau: 1 })
+    expect('tiLeDung' in r.homNay.tongQuan.soVoiHomQua || 'soCauCoKetQua' in r.homNay.tongQuan.soVoiHomQua).toBe(false)
+    expect(r.nhipHoc.ngay.every((x: any) => !('soCauDung' in x) && !('soCauCoKetQua' in x))).toBe(true)
   })
 })
