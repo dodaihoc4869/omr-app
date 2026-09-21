@@ -23,7 +23,6 @@ const O_NHAP: React.CSSProperties = {
   fontFamily: 'var(--serif)',
   fontSize: 'var(--cx-2)',
   color: 'var(--muc)',
-  outline: 'none',
 }
 
 const NAC: NacHoiLai[] = ['moi_lan_mo', 'sau_15_phut', 'sau_60_phut']

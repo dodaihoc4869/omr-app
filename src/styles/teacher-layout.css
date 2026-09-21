@@ -46,7 +46,7 @@
   border:1px solid var(--vien)!important;
   background:var(--the)!important;
   box-shadow:0 2px 8px rgba(0,0,0,.02)!important;
-  transition:all 0.15s ease-in-out!important;
+  transition:border-color 0.15s ease-in-out,box-shadow 0.15s ease-in-out!important;
 }
 [data-teacher-screen] .gv-student-list>[data-sbd]:hover{
   border-color:var(--m3-primary)!important;

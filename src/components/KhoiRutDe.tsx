@@ -78,7 +78,6 @@ function OSo({ nhan, tri, doi, tran }: { nhan: string; tri: number; doi: (n: num
           fontSize: 'var(--cx-3)',
           fontWeight: 700,
           color: 'var(--muc)',
-          outline: 'none',
         }}
       />
     </label>

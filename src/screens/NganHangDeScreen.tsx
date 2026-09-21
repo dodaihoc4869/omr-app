@@ -99,7 +99,6 @@ const O_NHAP: React.CSSProperties = {
   fontFamily: 'var(--sans)',
   fontSize: 'var(--cx-2)',
   color: 'var(--muc)',
-  outline: 'none',
   width: '100%',
 }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }

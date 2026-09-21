@@ -171,7 +171,7 @@ export default function NutTaiDeCa({ banks, maCa, tenCa, ghiChu, soCauCa, dsEm, 
                 }}
                 placeholder="Gõ SBD hoặc tên em"
                 aria-label="Tìm em theo số báo danh hoặc tên"
-                style={{ height: 44, borderRadius: 'var(--bo-1)', padding: '0 var(--k3)', background: 'var(--the-2)', border: '1.5px solid transparent', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)', width: '100%', outline: 'none' }}
+                style={{ height: 44, borderRadius: 'var(--bo-1)', padding: '0 var(--k3)', background: 'var(--the-2)', border: '1.5px solid transparent', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)', width: '100%', }}
               />
               {emLoc.length === 0 ? (
                 <div style={NHAN_NHO}>Không có em nào khớp "{tim.trim()}".</div>

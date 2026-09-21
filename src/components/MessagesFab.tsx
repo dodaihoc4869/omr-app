@@ -384,6 +384,15 @@ export default function MessagesFab() {
                 return (
                   <div
                     key={m.id}
+                    // Tin của HỌC SINH/PHỤ HUYNH bấm được (mở khung trả lời em ấy) ⇒ vai nút + bàn phím; tin của thầy thì không bấm.
+                    role={!laThay && m.nguoiGui.sbd ? 'button' : undefined}
+                    tabIndex={!laThay && m.nguoiGui.sbd ? 0 : undefined}
+                    onKeyDown={(e) => {
+                      if (!laThay && m.nguoiGui.sbd && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault()
+                        e.currentTarget.click()
+                      }
+                    }}
                     onClick={() => {
                       if (!laThay && m.nguoiGui.sbd) {
                         setMucTieuSbd(m.nguoiGui.sbd)
@@ -455,7 +464,7 @@ export default function MessagesFab() {
                     }
                   }}
                   placeholder="Nhập tin nhắn của Thầy..."
-                  className="flex-1 text-xs px-2.5 py-1.5 rounded-lg border outline-none bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                  className="flex-1 text-xs px-2.5 py-1.5 rounded-lg border outline-none focus-visible:ring-2 focus-visible:ring-blue-500 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
                 />
                 <button
                   type="button"

@@ -144,7 +144,7 @@ export default function ClassListScreen() {
       <div className="flex gap-2">
         <button
           onClick={() => setMode('gviz')}
-          className={`tap-target flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
+          className={`tap-target flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
             mode === 'gviz'
               ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-xs'
               : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-300'
@@ -155,7 +155,7 @@ export default function ClassListScreen() {
         </button>
         <button
           onClick={() => setMode('tsv')}
-          className={`tap-target flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
+          className={`tap-target flex-1 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-2xs ${
             mode === 'tsv'
               ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-xs'
               : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:border-blue-300'

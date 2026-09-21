@@ -135,7 +135,7 @@ export function Hang({
     <Comp
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`tap-target w-full text-left flex items-center gap-2 transition-all ${className}`}
+      className={`tap-target w-full text-left flex items-center gap-2 transition-colors ${className}`}
       style={{
         minHeight: 56,
         borderRadius: 'var(--bo-2)',
@@ -247,7 +247,7 @@ export function NutChinh({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`tap-target w-full font-bold flex items-center justify-center gap-2 select-none active:scale-[0.98] hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-150 ${className}`}
+      className={`tap-target w-full font-bold flex items-center justify-center gap-2 select-none active:scale-[0.98] hover:-translate-y-0.5 disabled:hover:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed transition-[transform,background-color,box-shadow,opacity] duration-150 ${className}`}
       style={{
         height: 52,
         borderRadius: 'var(--bo-tron)',

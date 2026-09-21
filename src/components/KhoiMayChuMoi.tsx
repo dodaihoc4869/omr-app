@@ -24,7 +24,6 @@ const O_NHAP: React.CSSProperties = {
   fontFamily: 'var(--serif)',
   fontSize: 'var(--cx-2)',
   color: 'var(--muc)',
-  outline: 'none',
 }
 
 export default function KhoiMayChuMoi({ showToast }: { showToast: (chu: string, kieu?: 'success' | 'error' | 'warn') => void }) {

@@ -27,7 +27,7 @@ export default function NhomCaThuGon<T extends { maCa: string; tenCa: string }>(
         return (
           <details
             key={g.nam}
-            className="group/nhom rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-2 sm:p-2.5 transition-all shadow-2xs hover:border-blue-300 dark:hover:border-blue-700"
+            className="group/nhom rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-2 sm:p-2.5 transition-colors shadow-2xs hover:border-blue-300 dark:hover:border-blue-700"
           >
             <summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer select-none flex items-center justify-between p-2.5 sm:p-3 rounded-xl transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60 tap-target">
               <div className="flex items-center gap-2 flex-wrap min-w-0">

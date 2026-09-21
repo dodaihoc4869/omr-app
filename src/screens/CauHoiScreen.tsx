@@ -219,7 +219,7 @@ export default function CauHoiScreen() {
           type="button"
           onClick={() => void doiChe('chinh')}
           disabled={dang}
-          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-all cursor-pointer ${
+          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-colors cursor-pointer ${
             !laRac
               ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] ring-2 ring-blue-400/30 shadow-xs'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200/80 dark:border-slate-700'
@@ -231,7 +231,7 @@ export default function CauHoiScreen() {
           type="button"
           onClick={() => void doiChe('rac')}
           disabled={dang}
-          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-all cursor-pointer ${
+          className={`tap-target text-xs sm:text-sm font-bold px-4 py-2 rounded-full transition-colors cursor-pointer ${
             laRac
               ? 'bg-[color:var(--m3-error)] text-[color:var(--m3-on-error)] ring-2 ring-rose-400/30 shadow-xs'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 border border-slate-200/80 dark:border-slate-700'

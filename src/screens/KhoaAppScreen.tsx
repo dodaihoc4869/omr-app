@@ -29,7 +29,6 @@ const O_NHAP: React.CSSProperties = {
   fontFamily: 'var(--sans)',
   fontSize: 'var(--cx-3)',
   color: 'var(--muc)',
-  outline: 'none',
 }
 
 export type PhaKhoa = 'dat' | 'mo'

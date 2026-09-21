@@ -277,7 +277,7 @@ export default function LichSuCaScreen() {
             <button
               type="button"
               onClick={() => setDaChon(tichHet ? [] : dsLoc.map((c) => c.maCa))}
-              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-[transform,background-color,box-shadow,opacity] cursor-pointer shadow-xs"
               style={{ ...SO, gap: 6, fontSize: 'var(--cx-1)', minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)' }}
             >
               {tichHet ? <CheckSquare size={16} /> : <Square size={16} />}
@@ -290,7 +290,7 @@ export default function LichSuCaScreen() {
               type="button"
               onClick={() => setHoiXoa(true)}
               disabled={chonTrongLoc.length === 0}
-              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-[transform,background-color,box-shadow,opacity] cursor-pointer shadow-xs disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{
                 ...SO,
                 gap: 6,
@@ -312,7 +312,7 @@ export default function LichSuCaScreen() {
             <button
               type="button"
               onClick={() => setDaChon(tichHet ? [] : dsLoc.map((c) => c.maCa))}
-              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-[transform,background-color,box-shadow,opacity] cursor-pointer shadow-xs"
               style={{ ...SO, gap: 6, fontSize: 'var(--cx-1)', minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)' }}
             >
               {tichHet ? <CheckSquare size={16} /> : <Square size={16} />}
@@ -325,7 +325,7 @@ export default function LichSuCaScreen() {
               type="button"
               onClick={handleKhoiPhucNhieu}
               disabled={chonTrongLoc.length === 0 || dangKhoiPhuc === 'nhieu'}
-              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-[transform,background-color,box-shadow,opacity] cursor-pointer shadow-xs disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{
                 ...SO,
                 gap: 6,
@@ -343,7 +343,7 @@ export default function LichSuCaScreen() {
               type="button"
               onClick={() => setDsXoaVinhVien(chonTrongLoc.map((c) => c.maCa))}
               disabled={chonTrongLoc.length === 0}
-              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-all cursor-pointer shadow-xs disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="tap-target font-bold inline-flex items-center active:scale-[0.98] hover:-translate-y-0.5 transition-[transform,background-color,box-shadow,opacity] cursor-pointer shadow-xs disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{
                 ...SO,
                 gap: 6,
@@ -425,6 +425,15 @@ export default function LichSuCaScreen() {
                 <div
                   key={c.maCa}
                   onClick={chonMode ? () => bat(c.maCa) : (!xemDaXoa ? () => moChiTietCa(c.maCa) : undefined)}
+                  // Hàng ca bấm được (chọn / mở chi tiết) ⇒ vai nút + bàn phím; ca đã xoá (chỉ xem) không bấm.
+                  role={chonMode || !xemDaXoa ? 'button' : undefined}
+                  tabIndex={chonMode || !xemDaXoa ? 0 : undefined}
+                  onKeyDown={(e) => {
+                    if ((chonMode || !xemDaXoa) && e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault()
+                      e.currentTarget.click()
+                    }
+                  }}
                   data-trang-thai={tt.ten}
                   className={`ls-ca${chonMode && tich ? ' ls-ca--chon' : ''}`}
                 >

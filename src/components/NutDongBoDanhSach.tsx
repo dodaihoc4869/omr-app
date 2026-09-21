@@ -224,7 +224,6 @@ export default function NutDongBoDanhSach({
               fontFamily: 'var(--sans)',
               fontSize: 'var(--cx-1)',
               color: 'var(--muc)',
-              outline: 'none',
               resize: 'vertical',
             }}
           />
