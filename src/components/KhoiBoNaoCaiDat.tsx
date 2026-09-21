@@ -70,11 +70,11 @@ export default function KhoiBoNaoCaiDat() {
             type="button"
             role="switch"
             aria-checked={ch.du.bat}
-            aria-label="Bật bộ não"
+            aria-label="Bật Bộ não A.I"
             className="bnao-cong-tac"
             data-bat={ch.du.bat ? 'co' : 'khong'}
             disabled={dangLuu}
-            onClick={() => void luu({ bat: !ch.du.bat }, ch.du.bat ? 'Đã tắt bộ não.' : 'Đã bật bộ não.')}
+            onClick={() => void luu({ bat: !ch.du.bat }, ch.du.bat ? 'Đã tắt Bộ não A.I.' : 'Đã bật Bộ não A.I.')}
           >
             <span className="bnao-cong-tac-nut" />
           </button>
@@ -142,7 +142,7 @@ export default function KhoiBoNaoCaiDat() {
             <div className="bnao-xac-nhan" role="alertdialog" aria-label={`Chuyển lớp ${xacNhanLop} sang chế độ thật`}>
               <b>Chuyển lớp {xacNhanLop} sang chạy THẬT?</b>
               <span>
-                “Thật” cho phép điều chỉnh của bộ não tác động tới học sinh lớp này (nhịp, dạng ưu tiên, câu khắc phục) và học sinh thấy lời nhắn của Bộ não A.I. Không đổi hạn nộp. Nếu máy chủ chưa bật phần áp dụng thì mới chỉ ghi nhận — màn Hôm nay sẽ nói rõ điều chỉnh nào đã được áp. Thầy quay lại “Chạy thử” được bất cứ lúc nào.
+                “Thật” cho phép điều chỉnh của Bộ não A.I tác động tới học sinh lớp này (nhịp, dạng ưu tiên, câu ôn lại) và học sinh thấy lời nhắn của Bộ não A.I. Không đổi hạn nộp. Nếu máy chủ chưa bật phần áp dụng thì mới chỉ ghi nhận — màn Hôm nay sẽ nói rõ điều chỉnh nào đã được áp. Thầy quay lại “Chạy thử” được bất cứ lúc nào.
               </span>
               <div className="bnao-hang-nut">
                 <button
@@ -163,13 +163,13 @@ export default function KhoiBoNaoCaiDat() {
           <p className="bnao-ghi-chu bnao-ghi-chu--canh">
             <Info size={18} aria-hidden="true" />
             <span>
-              <b>Chạy thử</b>: bộ não vẫn đọc và viết điều chỉnh, nhưng <b>không tầng nào đọc</b> — kế hoạch ngày và bài tập của học sinh không đổi một byte. <b>Thật</b>: điều chỉnh đạt kiểm khuôn được phép áp cho em (khi máy chủ đã bật phần áp dụng); chuyển sẽ hỏi xác nhận.
+              <b>Chạy thử</b>: Bộ não A.I vẫn đọc và viết điều chỉnh, nhưng <b>không tầng nào đọc</b> — kế hoạch ngày và bài tập của học sinh không đổi một byte. <b>Thật</b>: điều chỉnh đạt kiểm khuôn được phép áp cho em (khi máy chủ đã bật phần áp dụng); chuyển sẽ hỏi xác nhận.
             </span>
           </p>
           {!ch.du.bat && (
             <p className="bnao-ghi-chu">
               <Info size={18} aria-hidden="true" />
-              <span>Bộ não đang <b>tắt</b>: không viết báo cáo và không điều chỉnh gì.</span>
+              <span>Bộ não A.I đang <b>tắt</b>: không viết báo cáo và không điều chỉnh gì.</span>
             </p>
           )}
         </>

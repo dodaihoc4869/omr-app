@@ -10,7 +10,7 @@ export const TEN_LOAI: Record<LoaiSuKien, string> = {
   btvn: 'Bài tập về nhà',
   on_lai: 'Ôn lại',
   bai_rieng: 'Bài riêng',
-  len_bang: 'Lên bảng',
+  len_bang: 'Gọi lên bảng',
   game: 'Game',
   exp: 'EXP',
   bo_nao: 'Bộ não A.I',

@@ -90,7 +90,7 @@ export default function KhoiBoNaoDemQua({
 
   if (kq === undefined) {
     return (
-      <section className="bnao" data-khoi="bo-nao-dem-qua" aria-busy="true" aria-label="Bộ não đêm qua">
+      <section className="bnao" data-khoi="bo-nao-dem-qua" aria-busy="true" aria-label="Bộ não A.I đêm qua">
         {dauKhoi('Bộ não A.I · đêm qua', 'Đang đọc báo cáo…')}
       </section>
     )
@@ -99,8 +99,8 @@ export default function KhoiBoNaoDemQua({
   if (!kq.ok) {
     const chuaCoLenh = kq.loai === 'chua_co_lenh'
     return (
-      <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não đêm qua">
-        {dauKhoi('Bộ não A.I · đêm qua', chuaCoLenh ? 'Máy chủ chưa có bản tin bộ não' : 'Chưa đọc được bản tin bộ não')}
+      <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não A.I đêm qua">
+        {dauKhoi('Bộ não A.I · đêm qua', chuaCoLenh ? 'Máy chủ chưa có bản tin Bộ não A.I' : 'Chưa đọc được bản tin Bộ não A.I')}
         <p className={`bnao-ghi-chu ${chuaCoLenh ? 'bnao-ghi-chu--loi' : 'bnao-ghi-chu--canh'}`} role="status">
           <AlertTriangle size={18} aria-hidden="true" />
           <span>
@@ -119,12 +119,12 @@ export default function KhoiBoNaoDemQua({
   const d = kq.du
   if (!d.bat) {
     return (
-      <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não đêm qua">
-        {dauKhoi('Bộ não đang tắt', 'Không viết báo cáo và không điều chỉnh gì cho học sinh')}
+      <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não A.I đêm qua">
+        {dauKhoi('Bộ não A.I đang tắt', 'Không viết báo cáo và không điều chỉnh gì cho học sinh')}
         <p className="bnao-ghi-chu">
           <Info size={18} aria-hidden="true" />
           <span>
-            Bộ não đang <b>tắt</b> trong Cài đặt.
+            Bộ não A.I đang <b>tắt</b> trong Cài đặt.
           </span>
         </p>
         {onMoCaiDat && !gon && (
@@ -160,7 +160,7 @@ export default function KhoiBoNaoDemQua({
   if (tt === 'chua_chay') {
     // CHƯA có bản tin (lượt chạy đầu chưa tới) là trạng thái TRUNG TÍNH — không phải lỗi (Boss 21/09): nền xám, chữ thường; đỏ chỉ khi > 36 giờ không chạy hoặc lệnh lỗi thật.
     return (
-      <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não đêm qua">
+      <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não A.I đêm qua">
         {dauKhoi('Bộ não A.I · đêm qua', 'Chưa có bản tin cho hôm nay', chip)}
         <p className="bnao-ghi-chu" role="status">
           <Clock size={18} aria-hidden="true" />
@@ -193,7 +193,7 @@ export default function KhoiBoNaoDemQua({
       showToast(`Đã bỏ điều chỉnh của ${tenEm(x)}.`)
     } else if (r.ok) {
       // Máy chủ trả ok nhưng KHÔNG có điều chỉnh nào để bỏ (đã bỏ, đã tự gỡ hoặc chưa được lưu) — không nói "đã bỏ".
-      showToast(`Không có điều chỉnh nào của ${tenEm(x)} để bỏ (có thể đã được bỏ hoặc bộ não đã tự gỡ).`, 'warn')
+      showToast(`Không có điều chỉnh nào của ${tenEm(x)} để bỏ (có thể đã được bỏ hoặc Bộ não A.I đã tự gỡ).`, 'warn')
     } else {
       showToast(r.chu, 'warn')
     }
@@ -233,7 +233,7 @@ export default function KhoiBoNaoDemQua({
   }
 
   return (
-    <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não đêm qua">
+    <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não A.I đêm qua">
       {dauKhoi(
         'Bộ não A.I · đêm qua',
         `${trangThaiKhoi(d, tatCaThat)}Chạy lần cuối ${gioChayCuoi(d.chayLanCuoi!, nayMs)} (${truocDay(d.chayLanCuoi!, nayMs)})${dem ? ` · ${dem}` : ''}`,
@@ -244,7 +244,7 @@ export default function KhoiBoNaoDemQua({
         <p className="bnao-ghi-chu bnao-ghi-chu--canh" role="alert">
           <AlertTriangle size={18} aria-hidden="true" />
           <span>
-            <b>Bộ não chưa chạy {gio} giờ</b> (quá {QUA_HAN_GIO} giờ). Kiểm tra máy thầy còn thức và hai mã lệnh còn được phép. <b>Học sinh vẫn học bình thường.</b> Báo cáo dưới đây là của lượt cũ.
+            <b>Bộ não A.I chưa chạy {gio} giờ</b> (quá {QUA_HAN_GIO} giờ). Kiểm tra máy thầy còn thức và hai mã lệnh còn được phép. <b>Học sinh vẫn học bình thường.</b> Báo cáo dưới đây là của lượt cũ.
           </span>
         </p>
       )}
@@ -279,7 +279,7 @@ export default function KhoiBoNaoDemQua({
                       <span aria-hidden="true">→</span>
                       <span className={`bnao-chip bnao-chip--nho${kqDong?.vai === 'tot' ? ' bnao-chip--tot' : kqDong?.vai === 'xau' ? ' bnao-chip--xau' : ''}`}>{kqDong?.chu ?? 'Kết quả hôm nay'}</span>
                       {x.ketQuaChu && <span>{x.ketQuaChu}</span>}
-                      {x.tuGo && <span>· bộ não đã tự gỡ điều chỉnh này</span>}
+                      {x.tuGo && <span>· Bộ não A.I đã tự gỡ điều chỉnh này</span>}
                     </p>
                   )}
                 </div>
@@ -306,7 +306,7 @@ export default function KhoiBoNaoDemQua({
             <span>
               {tatCaThat && daApDung ? (
                 <>
-                  Bộ não tự điều chỉnh trong khung an toàn — <b>không đổi hạn nộp</b>, không đụng câu lõi, tự hết hạn sau 3 ngày. Thầy không cần làm gì; chỉ bấm <b>Bỏ điều chỉnh</b> nếu không đồng ý.
+                  Bộ não A.I tự điều chỉnh trong khung an toàn — <b>không đổi hạn nộp</b>, không đụng câu lõi, tự hết hạn sau 3 ngày. Thầy không cần làm gì; chỉ bấm <b>Bỏ điều chỉnh</b> nếu không đồng ý.
                 </>
               ) : tatCaThat ? (
                 <>
@@ -330,7 +330,7 @@ export default function KhoiBoNaoDemQua({
           {onMoCaiDat && (
             <div className="bnao-hang-nut">
               <button type="button" className="bnao-nut bnao-nut--vien" onClick={onMoCaiDat}>
-                Cài đặt bộ não
+                Cài đặt Bộ não A.I
                 <ChevronRight size={18} aria-hidden="true" />
               </button>
             </div>

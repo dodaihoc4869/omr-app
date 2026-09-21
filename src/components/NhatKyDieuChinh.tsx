@@ -16,7 +16,7 @@ const phanTram = (x: number) => x.toLocaleString('vi-VN', { maximumFractionDigit
 /** TRẠNG THÁI THẬT của một dòng nhật ký (không nói "đã áp" khi chưa áp). */
 function trangThai(d: DongNhatKy): { chu: string; vai: 'tot' | 'bong' | 'xau' | '' } {
   if (d.daBo) return { chu: 'Thầy đã bỏ', vai: '' }
-  if (d.tuGo) return { chu: 'Bộ não đã tự gỡ (kết quả chưa tốt)', vai: 'xau' }
+  if (d.tuGo) return { chu: 'Bộ não A.I đã tự gỡ (kết quả chưa tốt)', vai: 'xau' }
   if (d.apDung === true) return { chu: 'Đã áp cho em', vai: 'tot' }
   if (d.cheDo === 'bong') return { chu: 'Chỉ ghi sổ — chạy thử', vai: 'bong' }
   return { chu: `Chỉ ghi sổ — độ tin cậy thấp (${phanTram(d.doTin)})`, vai: 'bong' }
@@ -56,7 +56,7 @@ export default function NhatKyDieuChinh({ sbd }: { sbd: string }) {
       tai()
     } else if (r.ok) {
       setXacNhan(null)
-      showToast(`Không có điều chỉnh ngày ${ngayNgan(d.ngay)} để bỏ (có thể đã được bỏ hoặc bộ não đã tự gỡ).`, 'warn')
+      showToast(`Không có điều chỉnh ngày ${ngayNgan(d.ngay)} để bỏ (có thể đã được bỏ hoặc Bộ não A.I đã tự gỡ).`, 'warn')
       tai()
     } else {
       setXacNhan(null)
@@ -110,7 +110,7 @@ export default function NhatKyDieuChinh({ sbd }: { sbd: string }) {
         {dau(undefined, 'Chưa có điều chỉnh nào cho em này')}
         <p className="bnao-ghi-chu">
           <Info size={18} aria-hidden="true" />
-          <span>Bộ não chưa điều chỉnh gì cho em này (em ổn, chưa có dữ liệu, hoặc bộ não chưa chạy).</span>
+          <span>Bộ não A.I chưa điều chỉnh gì cho em này (em ổn, chưa có dữ liệu, hoặc Bộ não A.I chưa chạy).</span>
         </p>
       </section>
     )
@@ -128,7 +128,7 @@ export default function NhatKyDieuChinh({ sbd }: { sbd: string }) {
     <section className="bnao" data-khoi="nhat-ky-dieu-chinh" aria-label="Nhật ký điều chỉnh">
       {dau(chip, `${ds.length} lần gần nhất · chỉ thầy thấy`)}
 
-      <div className="bnao-nk" role="table" aria-label="Điều chỉnh của bộ não cho em này">
+      <div className="bnao-nk" role="table" aria-label="Điều chỉnh của Bộ não A.I cho em này">
         <div className="bnao-nk-hang bnao-nk-hang--dau" role="row">
           <span role="columnheader">NGÀY</span>
           <span role="columnheader">NÚM BỘ NÃO VẶN</span>
@@ -204,7 +204,7 @@ export default function NhatKyDieuChinh({ sbd }: { sbd: string }) {
                     <div className="bnao-nk-hop">
                       {d.ghiChuHlv && (
                         <div>
-                          <b>Bộ não đang thử:</b> {d.ghiChuHlv}
+                          <b>Bộ não A.I đang thử:</b> {d.ghiChuHlv}
                         </div>
                       )}
                       {d.goiYChoThay && (
@@ -229,7 +229,7 @@ export default function NhatKyDieuChinh({ sbd }: { sbd: string }) {
       <p className="bnao-ghi-chu">
         <Info size={18} aria-hidden="true" />
         <span>
-          <b>Bỏ điều chỉnh này</b>: kế hoạch của em về đúng như thuật toán tự chọn; bộ não ghi nhận thầy đã bỏ. Bỏ là <b>tuỳ thầy</b> — bộ não đã tự giữ deadline, không đổi hạn nộp và tự gỡ điều chỉnh nếu hôm sau kết quả chưa tốt.
+          <b>Bỏ điều chỉnh này</b>: kế hoạch của em về đúng như thuật toán tự chọn; Bộ não A.I ghi nhận thầy đã bỏ. Bỏ là <b>tuỳ thầy</b> — Bộ não A.I đã tự giữ deadline, không đổi hạn nộp và tự gỡ điều chỉnh nếu hôm sau kết quả chưa tốt.
         </span>
       </p>
     </section>

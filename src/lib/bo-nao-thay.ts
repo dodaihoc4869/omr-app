@@ -158,12 +158,12 @@ export function docNhatKy(j: Record<string, unknown>): DongNhatKy[] {
 
 /** `ngay` 'YYYY-MM-DD' (tuỳ chọn; mặc định đêm gần nhất có dữ liệu). */
 export async function layDemQua(ngay?: string): Promise<KetQuaLenh<DemQua>> {
-  const r = await goiLenh('/ai/dem-qua', ngay ? { ngay } : {}, 'Bộ não chưa chạy — máy chủ chưa có bản tin bộ não.')
+  const r = await goiLenh('/ai/dem-qua', ngay ? { ngay } : {}, 'Bộ não A.I chưa chạy — máy chủ chưa có bản tin Bộ não A.I.')
   return r.ok ? { ok: true, du: docDemQua(r.du) } : r
 }
 
 export async function layNhatKy(sbd: string): Promise<KetQuaLenh<DongNhatKy[]>> {
-  const r = await goiLenh('/ai/nhat-ky', { sbd }, 'Bộ não chưa chạy — máy chủ chưa có nhật ký điều chỉnh.')
+  const r = await goiLenh('/ai/nhat-ky', { sbd }, 'Bộ não A.I chưa chạy — máy chủ chưa có nhật ký điều chỉnh.')
   return r.ok ? { ok: true, du: docNhatKy(r.du) } : r
 }
 
@@ -180,13 +180,13 @@ function docCauHinh(j: Record<string, unknown>): CauHinhBoNao {
 }
 
 export async function layCauHinhBoNao(): Promise<KetQuaLenh<CauHinhBoNao>> {
-  const r = await goiLenh('/ai/cau-hinh', {}, 'Máy chủ chưa có lệnh cài đặt bộ não — chưa đọc được công tắc.')
+  const r = await goiLenh('/ai/cau-hinh', {}, 'Máy chủ chưa có lệnh cài đặt Bộ não A.I — chưa đọc được công tắc.')
   return r.ok ? { ok: true, du: docCauHinh(r.du) } : r
 }
 
 /** Ghi công tắc / chế độ theo lớp. Máy chủ chưa có lệnh ⇒ "chưa lưu được" (KHÔNG giả là đã lưu). */
 export async function datCauHinhBoNao(moi: Partial<CauHinhBoNao>): Promise<KetQuaLenh<CauHinhBoNao>> {
-  const r = await goiLenh('/ai/cau-hinh', moi, 'Máy chủ chưa có lệnh cài đặt bộ não — chưa lưu được.', 'Máy chủ trả lời chậm — CHƯA CHẮC đã lưu. Tải lại trang để xem cài đặt thật.')
+  const r = await goiLenh('/ai/cau-hinh', moi, 'Máy chủ chưa có lệnh cài đặt Bộ não A.I — chưa lưu được.', 'Máy chủ trả lời chậm — CHƯA CHẮC đã lưu. Tải lại trang để xem cài đặt thật.')
   return r.ok ? { ok: true, du: docCauHinh(r.du) } : r
 }
 

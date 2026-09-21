@@ -217,7 +217,7 @@ describe('ToanCanhEmScreen — trang Toàn cảnh một em', () => {
   it('BỘ LỌC: không chip đếm số; có 9 loại (không "Mở app" khi chưa thấy); bấm loại ⇒ hỏi {sbd, loai:[…]} và thay dòng thời gian; "Tất cả" trả lại', async () => {
     await chay((b) => ((b.loai as string[] | undefined)?.[0] === 'on_lai' ? { json: day({ dong: DONG_2, conNua: '' }) } : { json: day() }))
     const nhom = screen.getByRole('group', { name: 'Lọc theo loại việc' })
-    expect(within(nhom).getAllByRole('button').map((b) => b.textContent)).toEqual(['Tất cả', 'Ca kiểm tra', 'Bài tập về nhà', 'Ôn lại', 'Bài riêng', 'Lên bảng', 'Game', 'EXP', 'Bộ não A.I', 'Cảnh báo của thầy'])
+    expect(within(nhom).getAllByRole('button').map((b) => b.textContent)).toEqual(['Tất cả', 'Ca kiểm tra', 'Bài tập về nhà', 'Ôn lại', 'Bài riêng', 'Gọi lên bảng', 'Game', 'EXP', 'Bộ não A.I', 'Cảnh báo của thầy'])
     fireEvent.click(within(nhom).getByRole('button', { name: 'Ôn lại' }))
     await screen.findByText('Ôn lại 1·3·7 ngày')
     expect(goi.mock.calls.at(-1)).toEqual(['/gv/em-toan-canh', { sbd: '12121007', loai: ['on_lai'] }])

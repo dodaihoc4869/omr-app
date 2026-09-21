@@ -23,7 +23,7 @@ export default function CaiDatScreen() {
       <div className="gv-page-header">
         <div>
           <h1>Cài đặt</h1>
-          <p>Giao diện, bộ não, kết nối máy chủ và mật khẩu mở app</p>
+          <p>Giao diện, Bộ não A.I, kết nối máy chủ và mật khẩu mở app</p>
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 // BỘ NÃO A.I — PHÍA APP THẦY (Code 4, 21/09; bản vẽ docs/ban-ve-bo-nao-2109/, hợp đồng docs/hop-dong-bo-nao-2109.md).
-// Bộ não TỰ HÀNH: thầy chỉ ĐỌC; nút chỉ "Xem" / "Bỏ điều chỉnh"; chạy THỬ ⇒ nhãn "CHẠY THỬ" + KHÔNG nói "đã làm"; máy chủ chưa có lệnh ⇒ nói thật, không giả số.
+// Bộ não A.I TỰ HÀNH: thầy chỉ ĐỌC; nút chỉ "Xem" / "Bỏ điều chỉnh"; chạy THỬ ⇒ nhãn "CHẠY THỬ" + KHÔNG nói "đã làm"; máy chủ chưa có lệnh ⇒ nói thật, không giả số.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import fs from 'node:fs'
@@ -94,7 +94,7 @@ describe('lớp nối bo-nao-thay — đọc hợp đồng, không đoán', () =
     const [y] = docNhatKy({ ds: [{ ngay: '2026-09-22', hetHan: '2026-09-25', cheDo: 'that', doTin: 0.8, nhip: null, dang: [{ ma: 'ESTE.THUY_PHAN', ten: 'Thuỷ phân ester', hanhDong: 'uu_tien', lyDo: '' }], khacPhuc: [{ dang: 'ESTE.THUY_PHAN', tenDang: 'Thuỷ phân ester', kieu: 'khac_phuc', soCau: 3, bac: '' }], co: 'khong' }] })
     expect(moTaNum(y).phu).toEqual(['Ưu tiên: Thuỷ phân ester', 'Ôn lại: Thuỷ phân ester · 3 câu'])
     expect(tenDangHienThi('A', '  ')).toBe('dạng chưa đặt tên (mã A)')
-    // máy chủ điền nhịp mặc định {lech:0, khoiDong:2} khi bộ não KHÔNG vặn nhịp ⇒ không in "Nhịp ±0"
+    // máy chủ điền nhịp mặc định {lech:0, khoiDong:2} khi Bộ não A.I KHÔNG vặn nhịp ⇒ không in "Nhịp ±0"
     expect(moTaNum({ nhip: { lech: 0, khoiDong: 2 }, dang: [{ ma: 'X', ten: '', hanhDong: 'uu_tien', lyDo: '' }], co: 'khong' })).toEqual({ chinh: '', phu: ['Ưu tiên: dạng chưa đặt tên (mã X)'] })
     expect(moTaNum({ nhip: { lech: 0, khoiDong: 2 }, dang: [], co: 'khong' }).chinh).toBe('Giữ nguyên')
     expect(moTaNum({ nhip: { lech: 0, khoiDong: 3 }, dang: [], co: 'khong' }).chinh).toBe('Nhịp ±0 · khởi động 3') // vặn khởi động thì vẫn in
@@ -174,10 +174,10 @@ describe('gọi lệnh /ai/* — 404, chậm, từ chối; gửi mã bí mật',
     const { layDemQua, layNhatKy, layCauHinhBoNao, datCauHinhBoNao, boDieuChinh } = await import('../src/lib/bo-nao-thay')
     const a = await layDemQua()
     expect(a).toMatchObject({ ok: false, loai: 'chua_co_lenh' })
-    expect(a.ok === false && a.chu).toContain('chưa có bản tin bộ não')
+    expect(a.ok === false && a.chu).toContain('chưa có bản tin Bộ não A.I')
     expect((await layNhatKy('1')).ok).toBe(false)
     const c = await layCauHinhBoNao()
-    expect(c.ok === false && c.chu).toContain('chưa có lệnh cài đặt bộ não')
+    expect(c.ok === false && c.chu).toContain('chưa có lệnh cài đặt Bộ não A.I')
     const d = await datCauHinhBoNao({ bat: false })
     expect(d.ok === false && d.chu).toContain('chưa lưu được')
     expect((await boDieuChinh('1', '2026-09-22')).ok).toBe(false)
@@ -224,7 +224,7 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
   it('máy chủ chưa có lệnh ⇒ nói thật, không dựng dòng nào, có "Thử lại"', async () => {
     dungMayChu({})
     render(<KhoiBoNaoDemQua />)
-    expect(await screen.findByText('Máy chủ chưa có bản tin bộ não')).toBeTruthy()
+    expect(await screen.findByText('Máy chủ chưa có bản tin Bộ não A.I')).toBeTruthy()
     expect(screen.getByText(/Chưa có số nào để hiện/)).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Thử lại' })).toBeTruthy()
     expect(screen.queryByText(/CHẠY THỬ/)).toBeNull()
@@ -301,7 +301,7 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
     expect(screen.queryByText('Đã bỏ điều chỉnh')).toBeNull()
   })
 
-  it('dòng CHỈ BÁO (thầy xem lại · em vắng lâu) và dòng bộ não đã tự gỡ KHÔNG có nút "Bỏ điều chỉnh"; dòng cả lớp nối Gọi lên bảng', async () => {
+  it('dòng CHỈ BÁO (thầy xem lại · em vắng lâu) và dòng Bộ não A.I đã tự gỡ KHÔNG có nút "Bỏ điều chỉnh"; dòng cả lớp nối Gọi lên bảng', async () => {
     const { onGoiLenBang } = chay({
       cheDo: 'that',
       banTin: {
@@ -315,7 +315,7 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
     })
     await screen.findByText('THẦY XEM LẠI')
     expect(screen.queryByRole('button', { name: 'Bỏ điều chỉnh' })).toBeNull()
-    expect(screen.getByText(/bộ não đã tự gỡ điều chỉnh này/)).toBeTruthy()
+    expect(screen.getByText(/Bộ não A.I đã tự gỡ điều chỉnh này/)).toBeTruthy()
     expect(screen.getByText('Chưa hiệu quả')).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Xem' })) // dòng cả lớp (không có tên) chỉ có "Xem"
     expect(onGoiLenBang).toHaveBeenCalledTimes(1)
@@ -324,11 +324,11 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
   it('quá 36 giờ ⇒ cảnh báo "chưa chạy N giờ" + học sinh vẫn học bình thường; đang tắt ⇒ nói tắt', async () => {
     chay({ chayLanCuoi: gioTruoc(40) })
     const canh = await screen.findByRole('alert')
-    expect(canh.textContent).toContain('Bộ não chưa chạy 40 giờ')
+    expect(canh.textContent).toContain('Bộ não A.I chưa chạy 40 giờ')
     expect(canh.textContent).toContain('Học sinh vẫn học bình thường')
     cleanup()
     chay({ bat: false })
-    expect(await screen.findByText('Bộ não đang tắt')).toBeTruthy()
+    expect(await screen.findByText('Bộ não A.I đang tắt')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Mở Cài đặt' })).toBeTruthy()
   })
 
@@ -393,7 +393,7 @@ describe('NhatKyDieuChinh — nhật ký + nguyên văn lời đã gửi em và 
     expect(screen.getByText('xong 2/2 chặng, đúng 78 %')).toBeTruthy()
     expect(screen.getByText('Lời cũ cho em')).toBeTruthy() // nguyên văn kèm ngày cũ
     expect(screen.getByText(`Lời đã gửi cho em · ${ngayNgan(ngayCong(-6))}`)).toBeTruthy()
-    expect(screen.getByText('Bộ não đã tự gỡ (kết quả chưa tốt)')).toBeTruthy()
+    expect(screen.getByText('Bộ não A.I đã tự gỡ (kết quả chưa tốt)')).toBeTruthy()
     expect(screen.getByText('Thầy đã bỏ')).toBeTruthy()
     expect(screen.getAllByRole('button', { name: /Bỏ điều chỉnh ngày/ })).toHaveLength(1) // chỉ dòng hôm nay còn hiệu lực
   })
@@ -449,20 +449,20 @@ describe('KhoiBoNaoCaiDat — công tắc và chế độ theo lớp', () => {
 
   it('đọc cờ: công tắc BẬT, mọi lớp "Chạy thử"; tắt công tắc ⇒ POST {bat:false} rồi mới đổi màn', async () => {
     render(<KhoiBoNaoCaiDat />)
-    const cong = await screen.findByRole('switch', { name: 'Bật bộ não' })
+    const cong = await screen.findByRole('switch', { name: 'Bật Bộ não A.I' })
     expect(cong.getAttribute('aria-checked')).toBe('true')
     const g12A1 = screen.getByRole('radiogroup', { name: 'Chế độ lớp 12A1' })
     expect(within(g12A1).getByRole('radio', { name: 'Chạy thử' }).getAttribute('aria-checked')).toBe('true')
     expect(within(g12A1).getByRole('radio', { name: 'Thật' }).getAttribute('aria-checked')).toBe('false')
     fireEvent.click(cong)
-    await waitFor(() => expect(screen.getByRole('switch', { name: 'Bật bộ não' }).getAttribute('aria-checked')).toBe('false'))
+    await waitFor(() => expect(screen.getByRole('switch', { name: 'Bật Bộ não A.I' }).getAttribute('aria-checked')).toBe('false'))
     expect(goi.mock.calls.filter((c) => c[0] === '/ai/cau-hinh').at(-1)![1]).toEqual({ bat: false })
-    expect(screen.getByText(/Bộ não đang/)).toBeTruthy()
+    expect(screen.getByText(/Bộ não A.I đang/)).toBeTruthy()
   })
 
   it('chuyển lớp sang THẬT phải XÁC NHẬN; giữ chạy thử thì không ghi; xác nhận ⇒ POST {cheDo:"bong", lopThat:[lớp]}', async () => {
     render(<KhoiBoNaoCaiDat />)
-    await screen.findByRole('switch', { name: 'Bật bộ não' })
+    await screen.findByRole('switch', { name: 'Bật Bộ não A.I' })
     const soGhi = () => goi.mock.calls.filter((c) => c[0] === '/ai/cau-hinh' && Object.keys(c[1] as object).length > 0).length
     fireEvent.click(within(screen.getByRole('radiogroup', { name: 'Chế độ lớp 12A1' })).getByRole('radio', { name: 'Thật' }))
     const hop = screen.getByRole('alertdialog', { name: 'Chuyển lớp 12A1 sang chế độ thật' })
@@ -485,25 +485,25 @@ describe('KhoiBoNaoCaiDat — công tắc và chế độ theo lớp', () => {
   it('máy chủ chưa có lệnh ⇒ KHÔNG có công tắc giả, nói "chưa lưu được"; lưu lỗi ⇒ giữ nguyên màn + báo thật', async () => {
     dungMayChu({})
     render(<KhoiBoNaoCaiDat />)
-    expect(await screen.findByText(/Máy chủ chưa có lệnh cài đặt bộ não/)).toBeTruthy()
+    expect(await screen.findByText(/Máy chủ chưa có lệnh cài đặt Bộ não A.I/)).toBeTruthy()
     expect(screen.getByText(/Chưa lưu được công tắc/)).toBeTruthy()
     expect(screen.queryByRole('switch')).toBeNull()
     cleanup()
     let lan = 0
     dungMayChu({ '/ai/cau-hinh': (b) => (Object.keys(b).length === 0 ? { json: { ok: true, cauHinh: { bat: true, cheDo: 'bong', lopThat: [] } } } : ++lan && { json: { ok: false, error: 'lopThat quá 50 phần tử' } }), '/ai/dem-qua': () => ({ json: demQuaJson() }) })
     render(<KhoiBoNaoCaiDat />)
-    fireEvent.click(await screen.findByRole('switch', { name: 'Bật bộ não' }))
+    fireEvent.click(await screen.findByRole('switch', { name: 'Bật Bộ não A.I' }))
     expect((await screen.findByRole('alert')).textContent).toContain('Chưa lưu được: lopThat quá 50 phần tử')
-    expect(screen.getByRole('switch', { name: 'Bật bộ não' }).getAttribute('aria-checked')).toBe('true') // máy chủ không xác nhận ⇒ màn không đổi
+    expect(screen.getByRole('switch', { name: 'Bật Bộ não A.I' }).getAttribute('aria-checked')).toBe('true') // máy chủ không xác nhận ⇒ màn không đổi
   })
 })
 
 // ---------------------------------------------------------------- nối vào màn thật + chữ thầy chốt
 describe('nguồn: nối vào màn, đổi chữ "bóng" → "thử", không hex', () => {
   const doc = (f: string) => fs.readFileSync(path.join(__dirname, '..', f), 'utf8')
-  it('Hôm nay · hồ sơ em · Cài đặt · Bảng tin đều gắn khối Bộ não; nút nối hàm SẴN CÓ', () => {
+  it('Hôm nay · hồ sơ em · Cài đặt · Bảng tin đều gắn khối Bộ não A.I; nút nối hàm SẴN CÓ', () => {
     const hn = doc('src/screens/HomNayScreen.tsx')
-    // Bước 5 (Hôm nay v2, 21/09): bấm em ở khối Bộ não mở TOÀN CẢNH (moToanCanh) thay vì hồ sơ; khoá Ý cũ: khối vẫn được dựng và cả ba lối nối đều là HÀM SẴN CÓ của store / setScreen.
+    // Bước 5 (Hôm nay v2, 21/09): bấm em ở khối Bộ não A.I mở TOÀN CẢNH (moToanCanh) thay vì hồ sơ; khoá Ý cũ: khối vẫn được dựng và cả ba lối nối đều là HÀM SẴN CÓ của store / setScreen.
     expect(hn).toContain("<KhoiBoNaoDemQua onMoHoSo={moToanCanh} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />")
     expect(hn).toContain('const moToanCanh = useAppStore((s) => s.moToanCanh)')
     expect(doc('src/store/appStore.ts')).toContain("moToanCanh: (sbd) => set({ sbdToanCanh: sbd, screen: 'toancanh' })")

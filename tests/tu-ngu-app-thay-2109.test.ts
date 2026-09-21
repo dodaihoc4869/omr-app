@@ -81,3 +81,26 @@ describe('CỤM 2 · Hồ sơ em / Bộ não / Ngân hàng đề (hàng 8, 10, 1
     expect(chuHienRa('src/data/examContent.ts')).toContain('chưa đánh dấu đủ Đúng/Sai cho cả 4 ý')
   })
 })
+
+describe('CỤM 3 · Bộ não A.I · ngày giờ · Gọi lên bảng (hàng 9, 13, 18)', () => {
+  it('hàng 9: "Bộ não A.I" ở mọi chữ hiện ra của app thầy (thông báo, nhãn nút, aria, lời lỗi) — không "bộ não" trơn', () => {
+    for (const f of ['src/components/KhoiBoNaoDemQua.tsx', 'src/components/KhoiBoNaoCaiDat.tsx', 'src/components/NhatKyDieuChinh.tsx', 'src/lib/bo-nao-thay.ts', 'src/screens/CaiDatScreen.tsx']) {
+      const c = chuHienRa(f).replace(/\/\^Bộ não A\\\.I/g, '') // bỏ regex nội bộ dò tiêu đề
+      expect(c, f).not.toMatch(/\b[Bb]ộ não(?! A\.I)/)
+    }
+    expect(chuHienRa('src/components/KhoiBoNaoCaiDat.tsx')).toContain('aria-label="Bật Bộ não A.I"')
+    expect(chuHienRa('src/components/KhoiBoNaoCaiDat.tsx')).not.toContain('câu khắc phục') // hoạt động gọi "ôn lại"
+  })
+
+  it('hàng 13: Gọi lên bảng hiện ngày giờ kiểu chuẩn "Hạn nộp 23:59 · Thứ … dd/mm/yyyy" (gioDayDu), không toLocaleDateString', () => {
+    const g = chuHienRa('src/screens/GoiLenBangScreen.tsx')
+    expect(g).toContain('Hạn nộp {gioDayDu(bt.hanNop)}')
+    expect(g).toContain('Giao {gioDayDu(bt.giaoLuc)}')
+    expect(g).not.toContain('toLocaleDateString(\'vi-VN\')}</span>')
+  })
+
+  it('hàng 18: một từ — mục "Gọi lên bảng" ở thanh bên và bộ lọc Toàn cảnh (nhãn ngắn thanh dưới điện thoại "Lên bảng" giữ vì hết chỗ)', () => {
+    expect(chuHienRa('src/components/ThanhBenTrai.tsx')).toContain("ten: 'Gọi lên bảng'")
+    expect(chuHienRa('src/lib/em-toan-canh.ts')).toContain("len_bang: 'Gọi lên bảng'")
+  })
+})

@@ -53,6 +53,7 @@ import { KHO_DO_KHO_RONG, gopCaVaoKho, thongKeKho, type KhoDoKhoLuu } from '../l
 import { docKhoDoKho, luuKhoDoKho } from '../lib/exam-db'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
+import { gioDayDu } from '../lib/ngay-gio-24'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -1693,9 +1694,9 @@ export default function GoiLenBangScreen() {
                           )}
                         </div>
                         <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
-                          <span>Giao: {new Date(bt.giaoLuc).toLocaleDateString('vi-VN')}</span>
+                          <span>Giao {gioDayDu(bt.giaoLuc)}</span>
                           <span>·</span>
-                          <span>Hạn: {new Date(bt.hanNop).toLocaleDateString('vi-VN')}</span>
+                          <span>Hạn nộp {gioDayDu(bt.hanNop)}</span>
                           {bt.quaHan && <span className="text-rose-500 font-bold">(Đã quá hạn)</span>}
                         </div>
                       </div>
