@@ -22,6 +22,7 @@ interface PhamVi {
 export default function ViecGap() {
   const classList = useAppStore((s) => s.classList)
   const showToast = useAppStore((s) => s.showToast)
+  const moToanCanh = useAppStore((s) => s.moToanCanh)
   const [kq, setKq] = useState<KetQuaLenh<DongTheoDoiBtvn[]> | undefined>(undefined)
   const [nayMs, setNayMs] = useState(() => Date.now())
   // Bài nào đang mở (mặc định chỉ bài đầu = gấp nhất) và bài nào xem hết danh sách em.
@@ -104,9 +105,9 @@ export default function ViecGap() {
         {e.hoTen.trim().split(/\s+/).pop()?.[0]?.toUpperCase() ?? '?'}
       </span>
       <div className="hn2-em-thong-tin">
-        <span className="hn2-em-ten">
+        <button type="button" className="hn2-em-ten hn2-em-ten--nut" onClick={() => moToanCanh(e.sbd)} aria-label={`${e.hoTen}${e.lop ? ` · ${e.lop}` : ''} — mở toàn cảnh`}>
           {e.hoTen} {e.lop && <span className="hn2-em-lop">· {e.lop}</span>}
-        </span>
+        </button>
         <span className={`hn2-em-tt hn2-em-tt--${e.muc}`}>{e.chu}</span>
         {daGui[e.sbd] && (
           <span className="hn2-em-da-gui">

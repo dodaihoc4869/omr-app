@@ -16,6 +16,7 @@ export type ScreenId =
   | 'exammonitor'
   | 'lichsuca'
   | 'hocsinh'
+  | 'toancanh'
   | 'giaobtvn'
   | 'goilenbang'
   | 'cauhoi'
@@ -44,6 +45,9 @@ interface AppState {
   /** SBD đang mở hồ sơ ở màn Học sinh (BA-APP.md đợt 2). Rỗng = đang ở danh sách. */
   sbdDangXem: string
   moHoSoEm: (sbd: string) => void
+  /** SBD đang mở ở trang "Toàn cảnh một em" (Hôm nay v2, bước 5) — mở từ ô tra cứu / bấm tên em ở các ô của màn Hôm nay. */
+  sbdToanCanh: string
+  moToanCanh: (sbd: string) => void
   /** Em thầy vừa bấm "Giao bài riêng" ở hồ sơ: màn Giao bài tập về nhà đọc một lần để chọn sẵn em ấy, rồi xoá. Rỗng = không có. */
   sbdGiaoRieng: string
   datSbdGiaoRieng: (sbd: string) => void
@@ -81,6 +85,8 @@ export const useAppStore = create<AppState>((set) => ({
   moChiTietCa: (maCa) => set({ maCaTheoDoi: maCa, screen: 'exammonitor' }),
   sbdDangXem: '',
   moHoSoEm: (sbd) => set({ sbdDangXem: sbd, screen: 'hocsinh' }),
+  sbdToanCanh: '',
+  moToanCanh: (sbd) => set({ sbdToanCanh: sbd, screen: 'toancanh' }),
   sbdGiaoRieng: '',
   datSbdGiaoRieng: (sbd) => set({ sbdGiaoRieng: sbd }),
 

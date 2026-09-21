@@ -46,12 +46,16 @@ export default function EmCanGiup({
   dangTaiRutGon,
   lyDoRutGon,
   onMoEm,
+  onMoHoSo,
 }: {
   /** Danh sách rút gọn cũ (từ `/ke-hoach/hom-nay-thay`) — dùng khi lệnh chi tiết chưa có. */
   rutGon: HomNay['canYTuong'] | null | undefined
   dangTaiRutGon: boolean
   lyDoRutGon: string
+  /** Bấm TÊN em ⇒ trang Toàn cảnh một em. */
   onMoEm: (sbd: string) => void
+  /** Nút "Xem hồ sơ" của danh sách rút gọn cũ ⇒ hồ sơ ở màn Học sinh. */
+  onMoHoSo: (sbd: string) => void
 }) {
   const setScreen = useAppStore((s) => s.setScreen)
   const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
@@ -119,7 +123,7 @@ export default function EmCanGiup({
             <Info size={16} aria-hidden="true" />
             <span>{kq.chu}</span>
           </p>
-          <DanhSachRutGon rutGon={rutGon} dangTai={dangTaiRutGon} lyDo={lyDoRutGon} onMoEm={onMoEm} />
+          <DanhSachRutGon rutGon={rutGon} dangTai={dangTaiRutGon} lyDo={lyDoRutGon} onMoHoSo={onMoHoSo} />
         </>
       )}
 
@@ -174,15 +178,15 @@ function DanhSachRutGon({
   rutGon,
   dangTai,
   lyDo,
-  onMoEm,
+  onMoHoSo,
 }: {
   rutGon: HomNay['canYTuong'] | null | undefined
   dangTai: boolean
   lyDo: string
-  onMoEm: (sbd: string) => void
+  onMoHoSo: (sbd: string) => void
 }) {
   const setScreen = useAppStore((s) => s.setScreen)
-  const lam = (e: HomNayEm) => (hanhDongCua(e) === 'dua_vao_buoi_chua' ? setScreen('goilenbang') : onMoEm(e.sbd))
+  const lam = (e: HomNayEm) => (hanhDongCua(e) === 'dua_vao_buoi_chua' ? setScreen('goilenbang') : onMoHoSo(e.sbd))
   if (!rutGon) return <p className="hn2-trong">{dangTai ? 'Đang tải…' : `Danh sách em cần giúp: ${lyDo}${/[.!]$/.test(lyDo) ? '' : '.'}`}</p>
   if (rutGon.ds.length === 0) return <p className="hn2-trong">Hôm nay không có em nào cần thầy giúp.</p>
   return (

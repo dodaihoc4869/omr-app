@@ -48,8 +48,9 @@ const RUT_GON = { tong: 2, ds: [{ sbd: '9', hoTen: 'Đỗ Khánh Linh', lop: '11
 const dung = (o: { canGiup?: (b: Record<string, unknown>) => Tra; rutGon?: unknown }) => {
   dungMayChu({ ...(o.canGiup ? { '/gv/can-giup': o.canGiup } : {}) })
   const moEm = vi.fn()
-  const r = render(<EmCanGiup rutGon={(o.rutGon ?? null) as never} dangTaiRutGon={false} lyDoRutGon="đang chờ máy chủ" onMoEm={moEm} />)
-  return { moEm, ...r }
+  const moHoSo = vi.fn()
+  const r = render(<EmCanGiup rutGon={(o.rutGon ?? null) as never} dangTaiRutGon={false} lyDoRutGon="đang chờ máy chủ" onMoEm={moEm} onMoHoSo={moHoSo} />)
+  return { moEm, moHoSo, ...r }
 }
 const luoc = (b: Record<string, unknown>) => {
   const lop = b.lop as string | undefined
@@ -145,7 +146,7 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
 
   it('LỌC THEO LỚP: nút Tất cả + từng lớp kèm số em; bấm lớp ⇒ hỏi máy chủ với {lop}; giữ đủ nút lớp; lớp trống ⇒ nói rõ', async () => {
     dungMayChu({ '/gv/can-giup': (b) => (b.lop === '11B1' ? { json: { ok: true, tong: 0, lop: ['12A1', '12A2', '11B1'], ds: [] } } : luoc(b)) })
-    const { container } = render(<EmCanGiup rutGon={null} dangTaiRutGon={false} lyDoRutGon="" onMoEm={() => {}} />)
+    const { container } = render(<EmCanGiup rutGon={null} dangTaiRutGon={false} lyDoRutGon="" onMoEm={() => {}} onMoHoSo={() => {}} />)
     await screen.findByText('Trần Thu Hà')
     const nhom = screen.getByRole('group', { name: 'Lọc theo lớp' })
     expect(within(nhom).getAllByRole('button').map((b) => b.textContent)).toEqual(['Tất cả', '12A1 · 3', '12A2 · 1', '11B1 · 1'])
@@ -162,7 +163,7 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
 
   it('MÁY CHỦ CẮT BỚT (tổng > số em trả về): không đếm số em từng lớp (sẽ sai) · nút "Xem thêm" + liên kết sang màn Học sinh', async () => {
     dungMayChu({ '/gv/can-giup': () => ({ json: { ok: true, tong: 17, lop: ['12A1', '12A2'], ds: NGUOI } }) })
-    const { container } = render(<EmCanGiup rutGon={null} dangTaiRutGon={false} lyDoRutGon="" onMoEm={() => {}} />)
+    const { container } = render(<EmCanGiup rutGon={null} dangTaiRutGon={false} lyDoRutGon="" onMoEm={() => {}} onMoHoSo={() => {}} />)
     await screen.findByText('Trần Thu Hà')
     expect(container.querySelector('.hn2-em-tong')!.textContent).toBe('17 em')
     expect(within(screen.getByRole('group', { name: 'Lọc theo lớp' })).getAllByRole('button').map((b) => b.textContent)).toEqual(['Tất cả', '12A1', '12A2'])
@@ -172,14 +173,14 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
   })
 
   it('CHƯA CÓ LỆNH: lời thật (trung tính, không đỏ) + rơi về danh sách rút gọn cũ với nút theo lý do — không mất tính năng', async () => {
-    const { container, moEm } = dung({ rutGon: RUT_GON })
+    const { container, moHoSo } = dung({ rutGon: RUT_GON })
     const ghi = await screen.findByText(/chưa có lệnh chi tiết/)
     expect(ghi.closest('.hn2-ghi-chu')!.className).not.toMatch(/--(canh|loi)/)
     expect(ghi.closest('.hn2-ghi-chu')!.getAttribute('role')).toBe('status')
     expect(screen.getByText('Đỗ Khánh Linh')).toBeTruthy()
     expect(container.querySelector('.hn2-em-tong')!.textContent).toBe('2 em')
     fireEvent.click(screen.getByRole('button', { name: 'Xem hồ sơ' }))
-    expect(moEm).toHaveBeenCalledWith('9')
+    expect(moHoSo).toHaveBeenCalledWith('9') // danh sách rút gọn cũ: "Xem hồ sơ" ⇒ hồ sơ ở màn Học sinh (KHÔNG phải Toàn cảnh)
     fireEvent.click(screen.getByRole('button', { name: 'Xem cả 2 em' }))
     expect(useAppStore.getState().screen).toBe('hocsinh')
   })
@@ -196,7 +197,7 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
 
   it('MỘT LỚP DUY NHẤT: không dựng thanh lọc (lọc một lựa chọn là thừa)', async () => {
     dungMayChu({ '/gv/can-giup': () => ({ json: { ok: true, tong: 1, lop: ['12A1'], ds: [NGUOI[0]] } }) })
-    render(<EmCanGiup rutGon={null} dangTaiRutGon={false} lyDoRutGon="" onMoEm={() => {}} />)
+    render(<EmCanGiup rutGon={null} dangTaiRutGon={false} lyDoRutGon="" onMoEm={() => {}} onMoHoSo={() => {}} />)
     await screen.findByText('Trần Thu Hà')
     expect(screen.queryByRole('group', { name: 'Lọc theo lớp' })).toBeNull()
   })

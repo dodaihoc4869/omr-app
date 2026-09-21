@@ -196,7 +196,7 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
     expect(useAppStore.getState().screen).toBe('goilenbang')
   })
 
-  it('ô tra cứu: 6 số → Chi tiết ca; tên KHÔNG DẤU hoặc SBD có trong danh sách lớp → hồ sơ em; không có → báo ngay trong ô, không đổi màn', async () => {
+  it('ô tra cứu: 6 số → Chi tiết ca; tên KHÔNG DẤU hoặc SBD có trong danh sách lớp → TOÀN CẢNH em (bước 5; trước là hồ sơ); không có → báo ngay trong ô, không đổi màn', async () => {
     render(<HomNayScreen />)
     const o = screen.getByRole('combobox', { name: 'Tìm học sinh theo tên hoặc số báo danh' })
     fireEvent.change(o, { target: { value: '111222' } })
@@ -205,7 +205,7 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
     useAppStore.getState().setScreen('examhub')
     fireEvent.change(o, { target: { value: 'minh khoi' } }) // không dấu
     fireEvent.keyDown(o, { key: 'Enter' })
-    expect([useAppStore.getState().screen, useAppStore.getState().sbdDangXem]).toEqual(['hocsinh', '12001'])
+    expect([useAppStore.getState().screen, useAppStore.getState().sbdToanCanh]).toEqual(['toancanh', '12001'])
     useAppStore.getState().setScreen('examhub')
     fireEvent.change(o, { target: { value: 'không có ai' } })
     fireEvent.keyDown(o, { key: 'Enter' })

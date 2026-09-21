@@ -32,6 +32,7 @@ export default function HomNayScreen() {
   const classList = useAppStore((s) => s.classList)
   const setScreen = useAppStore((s) => s.setScreen)
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
+  const moToanCanh = useAppStore((s) => s.moToanCanh)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const [hom, setHom] = useState<HomNay | null | undefined>(undefined) // undefined = đang tải
   const [cau, setCau] = useState<CauToiHan | null | undefined>(undefined)
@@ -72,7 +73,7 @@ export default function HomNayScreen() {
             {hom?.caDangMo != null && ` · ${hom.caDangMo > 0 ? `${hom.caDangMo} ca kiểm tra đang mở` : 'không có ca kiểm tra nào đang mở'}`}
           </p>
         </div>
-        <OTraCuu ds={dsTraCuu} onMoEm={moHoSoEm} onMoCa={moChiTietCa} />
+        <OTraCuu ds={dsTraCuu} onMoEm={moToanCanh} onMoCa={moChiTietCa} />
       </header>
 
       <section className="hn-hang-so" aria-label="Số liệu hôm nay">
@@ -85,11 +86,11 @@ export default function HomNayScreen() {
       <div className="hn2-luoi-a">
         <ViecGap />
 
-        <EmCanGiup rutGon={ty} dangTaiRutGon={tai} lyDoRutGon={lyDo('canYTuong')} onMoEm={moHoSoEm} />
+        <EmCanGiup rutGon={ty} dangTaiRutGon={tai} lyDoRutGon={lyDo('canYTuong')} onMoEm={moToanCanh} onMoHoSo={moHoSoEm} />
       </div>
 
       <div className="hn2-luoi-b">
-        <KhoiBoNaoDemQua onMoHoSo={moHoSoEm} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />
+        <KhoiBoNaoDemQua onMoHoSo={moToanCanh} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />
 
         <section className="hn2-the" aria-labelledby="hn2-yeu">
           <h2 id="hn2-yeu" className="hn2-tieu-de">
@@ -131,7 +132,7 @@ export default function HomNayScreen() {
         </section>
       </div>
 
-      <VinhDanh onMoEm={moHoSoEm} />
+      <VinhDanh onMoEm={moToanCanh} />
 
       <div className="hn2-cuoi">
         <section className="hn2-the" aria-labelledby="hn2-ca" data-khoi="ca-hom-nay">

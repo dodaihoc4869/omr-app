@@ -23,7 +23,7 @@ export interface MucDieuHuong {
 }
 
 export const MUC_DIEU_HUONG: MucDieuHuong[] = [
-  { id: 'examhub', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home },
+  { id: 'examhub', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home, con: ['toancanh'] },
   // "Danh sách lớp" không có mục riêng (thầy chốt 04-09): danh sách đã nạp lên máy chủ; màn ấy thuộc mục Học sinh.
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist'] },
   { id: 'lichsuca', ten: 'Ca thi', ngan: 'Ca thi', icon: CalendarDays, con: ['exammonitor', 'examsetup'] },
