@@ -7,7 +7,8 @@ Mục đích: máy khách (app em, PH, thầy) TỰ giãn nhịp hỏi nền khi
 - `heSo` là HỆ SỐ (không phải giây): máy khách nhân vào nhịp hỏi nền GỐC của mình rồi kẹp trần của mình (vd Bảng nhiệm vụ 180 s ⇒ tối đa 300 s; Bảng tin sàn 10 s ⇒ 20 / 40 s). `1` = giữ nhịp; `2` = bận; `4` = nghẽn.
 - Cách tính: cửa sổ 2 phút của chính isolate đang trả lời; dưới 20 mẫu ⇒ `tot`; p95 > 1.500 ms ⇒ `ban`; p95 > 3.500 ms ⇒ `nghen`.
 - Mỗi isolate có bộ đo riêng ⇒ mỗi lượt có thể thấy số khác nhau. Máy khách lấy **MAX của 3 phản hồi gần nhất**, và chỉ về 1 khi **3 phản hồi liền** đều `heSo:1` (hoặc 120 giây không có phản hồi nào). Không dùng `heSo` để quyết việc quan trọng (nộp bài không bao giờ bị trì hoãn vì `heSo`).
-- Có ở mọi lệnh đi qua `ra()`; lệnh trả `Response` dựng tay (phiếu, đề, redirect) thì KHÔNG có.
+- Có ở mọi lệnh đi qua `ra()`; lệnh trả `Response` dựng tay (phiếu, đề, redirect) thì KHÔNG có trường JSON — nhưng vẫn có HEADER.
+- **HEADER song song** (cho máy yếu khỏi clone + parse thân): `x-nhip-de-nghi: 1|2|4` (cùng `heSo`) + `access-control-expose-headers: x-nhip-de-nghi`, gắn ở MỌI phản hồi của Worker (JSON, lỗi, chuyển hướng, OPTIONS). Máy khách bọc `fetch` chỉ đọc header này; chưa có header ⇒ coi `heSo = 1`. Thân phản hồi đi nguyên (stream).
 
 ## 2. `POST /gv/suc-khoe-may-chu` (chỉ thầy: header `x-ma-bi-mat`; thiếu ⇒ 403)
 Vào `{}` · ra `{ ok:true, muc, heSo, p50Ms, p95Ms, soLuot, cuaSoGiay:120, theoLenh:[{duong,soLuot,p50Ms,p95Ms}] (≤ 8 lệnh nhiều lượt nhất), nguong:{banMs:1500,nghenMs:3500,toiThieuMau:20}, ghiChu }`.

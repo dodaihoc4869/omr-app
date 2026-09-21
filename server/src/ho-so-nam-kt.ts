@@ -12,7 +12,7 @@
 //   ĐÚNG ngày khác → đúng-liên-tiếp+1 · mốc = ngày + MOC_ON[min(dl-1, 2)] · dạng nâng 1 bậc ·
 //                    `da_khac_phuc` khi từng sai và đã đúng ở ≥ SO_MOC_KHAC_PHUC ngày khác nhau
 //   nhãn `can_day_lai` khi sai ≥ SO_LAN_SAI_DAY_LAI lần mà chưa đúng lại lần nào.
-import type { Env } from './kieu'
+import type { D1PreparedStatement, Env } from './kieu'
 import {
   BAC_DANG_BAT_DAU,
   BAC_DANG_TOI_DA,
@@ -304,31 +304,51 @@ export interface KetQuaDung {
  * Một `batch` (giao dịch): xoá bản cũ của các em rồi chèn bản phát lại — không bao giờ để hồ sơ nửa cũ nửa mới.
  * `nay` do nơi gọi truyền (giờ máy chủ), hàm này không đọc đồng hồ.
  */
+/** Số/Chuỗi chuẩn hoá để so hai dòng (hồ sơ cũ trong D1 với hồ sơ mới dựng) — khác kiểu số/chuỗi không được làm hai dòng giống nhau bị coi là khác (chỉ tốn ghi), nhưng khác nội dung phải bị coi là khác. */
+const so = (v: unknown): number | null => (v === null || v === undefined ? null : Number(v))
+const chu = (v: unknown): string | null => (v === null || v === undefined ? null : String(v))
+const dau = (v: unknown[]): string => JSON.stringify(v)
+
+/**
+ * DỰNG LẠI hồ sơ mạnh yếu của các em từ sổ học. HẠ TẢI D1 (Boss 21/09): bản cũ XOÁ TOÀN BỘ hồ sơ của em rồi CHÈN LẠI TẤT CẢ mỗi lần em nộp một câu (em nặng ~900 dòng ghi/lượt nộp, nhân với 250 em) — ghi là việc đắt nhất của D1 một luồng.
+ * Bản này ĐỌC hồ sơ hiện có, so từng dòng, và chỉ GHI phần THAY ĐỔI: dòng mới / đổi nội dung ⇒ INSERT OR REPLACE; dòng không còn trong sổ ⇒ DELETE; dòng y nguyên ⇒ không đụng (cả `cap_nhat_luc`, cột này giờ là "lần đổi cuối" của dòng, không nơi nào khác đọc).
+ * KẾT QUẢ CUỐI (nội dung mọi dòng) giống hệt bản xoá-chèn-lại, và không bao giờ có lúc hồ sơ của em bị rỗng giữa chừng.
+ */
 export async function dungLaiHoSo(env: Env, dsSbd: string[], nay: string): Promise<KetQuaDung> {
   const em = [...new Set(dsSbd.map((x) => x.trim()).filter(Boolean))]
   const ds = await docSuKienDoc(env, em)
   const tra = await traCuuTheoQid(env, [...new Set(ds.filter((e) => !e.maDang || !e.chuyenDe).map((e) => e.qid))])
   const { cau, dang } = phatLaiSuKien(ds, tra)
+  const arr = JSON.stringify(em)
 
-  const lenh = [
-    env.DB.prepare('DELETE FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?))').bind(JSON.stringify(em)),
-    env.DB.prepare('DELETE FROM nam_kt_dang WHERE sbd IN (SELECT value FROM json_each(?))').bind(JSON.stringify(em)),
-  ]
-  for (let i = 0; i < cau.length; i += DONG_MOI_LENH) {
-    const dong = cau.slice(i, i + DONG_MOI_LENH).map((c) => ({
-      k: `${c.sbd}|${c.qid}`, s: c.sbd, q: c.qid, a: c.maDang, c: c.chuyenDe, g: c.lanGap, x: c.lanSai, t: c.lanTrong,
-      d: c.dungLienTiep, n: c.ngayDungKhacNhau, r: c.ketQuaCuoi, o: c.nguonCuoi, l: c.lucCuoi, m: c.mocOnKe,
-      z: c.trangThai, y: c.canDayLai ? 1 : 0, b: c.giayTb,
-    }))
-    lenh.push(env.DB.prepare(CHEN_CAU).bind(nay, JSON.stringify(dong)))
-  }
-  for (let i = 0; i < dang.length; i += DONG_MOI_LENH) {
-    const dong = dang.slice(i, i + DONG_MOI_LENH).map((d) => ({
-      k: `${d.sbd}|${d.maDang}`, s: d.sbd, a: d.maDang, g: d.soGap, x: d.soSai, d: d.soDaKhacPhuc, m: d.soMoiSai,
-      c: d.soChuaThaySai, b: d.bac, o: d.mocOnKe, p: d.mocMoiSai,
-    }))
-    lenh.push(env.DB.prepare(CHEN_DANG).bind(nay, JSON.stringify(dong)))
-  }
+  const [rcCu, rdCu] = await Promise.all([
+    env.DB.prepare(`SELECT khoa, ma_dang, chuyen_de, lan_gap, lan_sai, lan_trong, dung_lien_tiep, ngay_dung_khac_nhau, ket_qua_cuoi, nguon_cuoi, luc_cuoi, moc_on_ke, trang_thai, can_day_lai, giay_tb FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?))`).bind(arr).all<Record<string, unknown>>(),
+    env.DB.prepare(`SELECT khoa, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE sbd IN (SELECT value FROM json_each(?))`).bind(arr).all<Record<string, unknown>>(),
+  ])
+  const dauCauCu = new Map((rcCu.results ?? []).map((r) => [String(r.khoa), dau([chu(r.ma_dang), chu(r.chuyen_de), so(r.lan_gap), so(r.lan_sai), so(r.lan_trong), so(r.dung_lien_tiep), so(r.ngay_dung_khac_nhau), so(r.ket_qua_cuoi), chu(r.nguon_cuoi), chu(r.luc_cuoi), chu(r.moc_on_ke), chu(r.trang_thai), so(r.can_day_lai), so(r.giay_tb)])]))
+  const dauDangCu = new Map((rdCu.results ?? []).map((r) => [String(r.khoa), dau([so(r.so_gap), so(r.so_sai), so(r.so_da_khac_phuc), so(r.so_moi_sai), so(r.so_chua_thay_sai), so(r.bac), chu(r.moc_on_ke), chu(r.moc_moi_sai)])]))
+
+  const cauMoi = cau.map((c) => ({
+    k: `${c.sbd}|${c.qid}`, s: c.sbd, q: c.qid, a: c.maDang, c: c.chuyenDe, g: c.lanGap, x: c.lanSai, t: c.lanTrong,
+    d: c.dungLienTiep, n: c.ngayDungKhacNhau, r: c.ketQuaCuoi, o: c.nguonCuoi, l: c.lucCuoi, m: c.mocOnKe,
+    z: c.trangThai, y: c.canDayLai ? 1 : 0, b: c.giayTb,
+  }))
+  const dangMoi = dang.map((d) => ({
+    k: `${d.sbd}|${d.maDang}`, s: d.sbd, a: d.maDang, g: d.soGap, x: d.soSai, d: d.soDaKhacPhuc, m: d.soMoiSai,
+    c: d.soChuaThaySai, b: d.bac, o: d.mocOnKe, p: d.mocMoiSai,
+  }))
+  const dauCauMoi = (c: (typeof cauMoi)[number]) => dau([chu(c.a), chu(c.c), so(c.g), so(c.x), so(c.t), so(c.d), so(c.n), so(c.r), chu(c.o), chu(c.l), chu(c.m), chu(c.z), so(c.y), so(c.b)])
+  const dauDangMoi = (d: (typeof dangMoi)[number]) => dau([so(d.g), so(d.x), so(d.d), so(d.m), so(d.c), so(d.b), chu(d.o), chu(d.p)])
+  const cauDoi = cauMoi.filter((c) => dauCauCu.get(c.k) !== dauCauMoi(c))
+  const dangDoi = dangMoi.filter((d) => dauDangCu.get(d.k) !== dauDangMoi(d))
+  const khoaCauMoi = new Set(cauMoi.map((c) => c.k)), khoaDangMoi = new Set(dangMoi.map((d) => d.k))
+  const cauBo = [...dauCauCu.keys()].filter((k) => !khoaCauMoi.has(k)), dangBo = [...dauDangCu.keys()].filter((k) => !khoaDangMoi.has(k))
+
+  const lenh: D1PreparedStatement[] = []
+  for (let i = 0; i < cauBo.length; i += 300) lenh.push(env.DB.prepare('DELETE FROM nam_kt_cau WHERE khoa IN (SELECT value FROM json_each(?))').bind(JSON.stringify(cauBo.slice(i, i + 300))))
+  for (let i = 0; i < dangBo.length; i += 300) lenh.push(env.DB.prepare('DELETE FROM nam_kt_dang WHERE khoa IN (SELECT value FROM json_each(?))').bind(JSON.stringify(dangBo.slice(i, i + 300))))
+  for (let i = 0; i < cauDoi.length; i += DONG_MOI_LENH) lenh.push(env.DB.prepare(CHEN_CAU.replace('INSERT INTO', 'INSERT OR REPLACE INTO')).bind(nay, JSON.stringify(cauDoi.slice(i, i + DONG_MOI_LENH))))
+  for (let i = 0; i < dangDoi.length; i += DONG_MOI_LENH) lenh.push(env.DB.prepare(CHEN_DANG.replace('INSERT INTO', 'INSERT OR REPLACE INTO')).bind(nay, JSON.stringify(dangDoi.slice(i, i + DONG_MOI_LENH))))
   for (let i = 0; i < lenh.length; i += 25) await env.DB.batch(lenh.slice(i, i + 25))
   return { soEm: em.length, soCau: cau.length, soDang: dang.length, cauKhongDang: cau.filter((c) => !c.maDang).length }
 }

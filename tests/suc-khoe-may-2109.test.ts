@@ -74,6 +74,18 @@ describe('qua Worker', () => {
     expect(dem).toBeLessThanOrEqual(3)                                         // chỉ phần cổng chung (cờ reset / mã bí mật), KHÔNG truy vấn của lệnh
     expect(r.theoLenh.some((x: { duong: string }) => x.duong === '/gv/suc-khoe-may-chu')).toBe(false); void truoc
   })
+  it('HEADER x-nhip-de-nghi (1|2|4) + access-control-expose-headers ở MỌI phản hồi (JSON, lỗi, chuyển hướng, OPTIONS), thân phản hồi nguyên vẹn', async () => {
+    const d = taoD1That(); const now = Date.now()
+    const goi = (path: string, method = 'POST') => worker.fetch(new Request(`https://test${path}`, { method, headers: { 'content-type': 'application/json' }, body: method === 'POST' ? JSON.stringify({ sbd: 'KHONGCO' }) : undefined }), d.env)
+    for (const r of [await goi('/hs/ke-hoach-ngay'), await goi('/khoe', 'GET'), await goi('/hs', 'GET'), await goi('/hs/ke-hoach-ngay', 'OPTIONS')]) {
+      expect(r.headers.get('x-nhip-de-nghi'), String(r.status)).toBe('1'); expect(r.headers.get('access-control-expose-headers')).toContain('x-nhip-de-nghi')
+    }
+    const j = await (await goi('/hs/ke-hoach-ngay')).json() as any; expect(j.ok).toBe(false); expect(j.nhipDeNghi.heSo).toBe(1)   // thân vẫn parse được
+    for (let i = 0; i < 40; i++) ghiDoLenh('/hs/ke-hoach-ngay', 2000, now)
+    expect((await goi('/hs/ke-hoach-ngay')).headers.get('x-nhip-de-nghi')).toBe('2')     // p95 2000 ms ⇒ bận
+    xoaSucKhoe(); for (let i = 0; i < 40; i++) ghiDoLenh('/hs/ke-hoach-ngay', 5000, Date.now())
+    expect((await goi('/hs/ke-hoach-ngay')).headers.get('x-nhip-de-nghi')).toBe('4')     // p95 5000 ms ⇒ nghẽn
+  })
   it('OPTIONS không được đếm; lượt thường được đếm', async () => {
     const d = taoD1That(); xoaSucKhoe()
     await worker.fetch(new Request('https://test/hs/ke-hoach-ngay', { method: 'OPTIONS' }), d.env); expect(sucKhoeMay().soLuot).toBe(0)

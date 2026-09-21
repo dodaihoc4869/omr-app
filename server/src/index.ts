@@ -3289,6 +3289,12 @@ export default {
   ...boXuLy,
   async fetch(req: Request, env: Env): Promise<Response> {
     const t0 = Date.now()
-    try { return await boXuLy.fetch(req, env) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
+    let res: Response
+    try { res = await boXuLy.fetch(req, env) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
+    // HEADER song song với trường JSON `nhipDeNghi` (Code 2: máy em yếu, khỏi phải clone + parse thân phản hồi 20–100 KB): `x-nhip-de-nghi: 1|2|4` + cho trình duyệt đọc qua CORS. Thân phản hồi đi nguyên (stream).
+    const h = new Headers(res.headers)
+    h.set('x-nhip-de-nghi', String(nhipDeNghi().heSo))
+    const ex = h.get('access-control-expose-headers'); h.set('access-control-expose-headers', ex ? `${ex}, x-nhip-de-nghi` : 'x-nhip-de-nghi')
+    return new Response(res.body, { status: res.status, statusText: res.statusText, headers: h })
   },
 }
