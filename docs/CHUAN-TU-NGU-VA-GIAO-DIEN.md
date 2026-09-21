@@ -18,7 +18,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Bài thầy giao về nhà | **Bài tập về nhà** (viết tắt BTVN) | bài tập, homework, mã tờ đề làm tên |
 | Một phần bài làm trong một buổi | **Chặng** ("Chặng 2 trong 7 chặng") | lô, đợt, phần, vòng |
 | Thời điểm cuối được nộp | **Hạn nộp** | deadline, mốc, hạn chót |
-| Buổi kiểm tra trên app | **Ca kiểm tra** (màn học sinh/phụ huynh + chữ mới). APP THẦY: chữ quen "Ca thi", "Cho thi lại" ở luồng thi GIỮ NGUYÊN (test khoá, thầy quen dùng) | đợt thi, bài thi |
+| Buổi kiểm tra trên app | **Ca kiểm tra** ở CẢ BA APP (cập nhật 21/09: màn Mở ca + Theo dõi ca của thầy cũng đã đổi, vì app thầy vốn dùng "ca kiểm tra" nhiều hơn "ca thi" — một khái niệm một từ). GIỮ NGUYÊN các chữ thầy đã chốt ở luồng thi: "Bắt đầu thi", "Cho thi lại", "Vào thi", và mọi câu cảnh báo của màn thi thật (test khoá) | ca thi (chữ hiển thị), đợt thi, bài thi |
 | Câu cả lớp cùng làm | **Câu cốt lõi** | lõi, core |
 | Câu chọn riêng cho em | **Câu dành riêng cho em** | riêng, cá nhân hoá |
 | Câu cao hơn bậc của em | **Câu thử thách (sai không sao)** · **Thử sức thêm (không bắt buộc)** | loi_cao, bonus |
