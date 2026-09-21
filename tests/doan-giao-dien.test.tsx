@@ -48,7 +48,7 @@ describe('Đoàn Hộ Tống · giao diện · Sảnh', () => {
   it('đi cùng bạn: mở đoàn lấy mã, nhập mã để vào; phòng chờ hiện mã + tên gọi, chỉ chủ đoàn thấy nút lên đường', async () => {
     const phong: DoanXem = { ma: 'DH7A2C', revision: 1, laChu: false, batDau: false, ghe: ghe(['cho', 'cho', 'cho']), gioMayChu: 0 }
     const { call } = dung(null, lenh => lenh === 'doan-vao' ? { ok: true, doan: phong } : { ok: true })
-    fireEvent.change(await screen.findByLabelText('Mã đoàn của bạn'), { target: { value: 'dh7a2c' } }); fireEvent.click(screen.getByRole('button', { name: 'Vào' }))
+    fireEvent.change(await screen.findByLabelText('Mã đoàn của bạn'), { target: { value: 'dh7a2c' } }); fireEvent.click(screen.getByRole('button', { name: 'Vào đoàn' }))
     await waitFor(() => expect(call).toHaveBeenCalledWith('doan-vao', { ma: 'DH7A2C' }))
     expect(await screen.findByLabelText('Mã đoàn DH7A2C')).toBeTruthy(); expect(screen.getByText('Thu Hà')).toBeTruthy()
     expect(screen.queryByRole('button', { name: /LÊN ĐƯỜNG/ })).toBeNull(); expect(screen.getByText(/Chờ bạn mở đoàn/)).toBeTruthy()
@@ -181,7 +181,7 @@ describe('Đoàn Hộ Tống · giao diện · Trùm câu chung', () => {
     expect(await screen.findByText('ý thứ hai')).toBeTruthy(); expect(man().dataset.man).toBe('trum')
     const the = screen.getByLabelText('Câu chung cả đội')
     expect(screen.getAllByRole('button', { name: 'Đúng' })).toHaveLength(1); expect(the.querySelectorAll('em.dh-xong')).toHaveLength(1); expect(the.querySelectorAll('em.dh-nghi')).toHaveLength(2); expect(the.textContent).not.toMatch(/"dung"|nopY/)
-    expect(screen.queryByRole('button', { name: 'Chốt' })).toBeNull(); fireEvent.click(screen.getByRole('button', { name: 'Sai' })); fireEvent.click(screen.getByRole('button', { name: 'Chốt' }))
+    expect(screen.queryByRole('button', { name: 'Chốt ý này' })).toBeNull(); fireEvent.click(screen.getByRole('button', { name: 'Sai' })); fireEvent.click(screen.getByRole('button', { name: 'Chốt ý này' }))
     await waitFor(() => expect(call).toHaveBeenCalledWith('doan-nop-y', { ma: 'DH1', hiep: 4, y: 1, answer: 'S' }))
     expect(screen.getByRole('group', { name: 'Tín hiệu cho đồng đội' }).querySelectorAll('button')).toHaveLength(3); expect(man().querySelectorAll('input,textarea')).toHaveLength(0)
     fireEvent.click(screen.getByRole('button', { name: 'Cần bàn thêm' })); await waitFor(() => expect(call).toHaveBeenCalledWith('doan-tin-hieu', { ma: 'DH1', tinHieu: 'ban_them' }))

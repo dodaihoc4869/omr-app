@@ -323,3 +323,7 @@
 @media (prefers-reduced-motion:reduce){.dh-chuong .dh-chuong-chop,.dh-chuong .dh-chuong-tia-nen{display:none}}
 @media (max-width:380px){.dh .dh-pa button{font-size:13px;gap:7px;padding:6px 8px 6px 7px}.dh .dh-pa button>i{width:25px;height:25px;font-size:12px}.dh-de{font-size:15px}}
 @media (max-height:780px){.dh-canh{height:clamp(124px,22vh,176px)}.dh .dh-don button{min-height:54px}.dh .dh-pa button{min-height:42px}}
+
+.dh-the-so svg{flex-shrink:0}
+
+.dh-the-goi-y button>i svg{display:block}

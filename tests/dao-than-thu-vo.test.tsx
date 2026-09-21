@@ -92,7 +92,7 @@ describe('Vỏ Đảo thần thú', () => {
     expect(mc.nhat.find(n => n[0] === 'start')![1]).toEqual({ mode: 'repair', dang: 'Xà phòng hoá' }); expect(mc.ten()).not.toContain('resume')
     fireEvent.click(screen.getByRole('button', { name: /Về đảo/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Sổ tay' })); expect(screen.getByLabelText('Nhóm ES')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Túi đồ' })); fireEvent.click(screen.getByRole('button', { name: 'Dùng Khiên chống đuổi' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Túi đồ' })); fireEvent.click(screen.getByRole('button', { name: 'Dùng khiên' }))
     await waitFor(() => expect(mc.ten()).toContain('shield-use'))
     expect(typeof mc.nhat.find(n => n[0] === 'shield-use')![1].useId).toBe('string')
   })

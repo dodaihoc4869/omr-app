@@ -297,7 +297,7 @@ describe('CHƯA NỘP: bịt ĐỦ BỐN đường tới đáp án (thầy bắt
     expect(html).toContain('body.chua-nop .q-nut-giai, body.chua-nop .sol-wrap { display: none !important; }')
   })
 
-  it('2. nút "Mở tất cả" và "Hiện đề" ở thanh trên bị giấu', () => {
+  it('2. nút "Mở hết lời giải" và "Ẩn lời giải" ở thanh trên bị giấu', () => {
     expect(html).toContain('body.chua-nop #mo-het, body.chua-nop #chi-de, body.chua-nop #pdf-giai, body.chua-nop .dem-giai { display: none !important; }')
   })
 

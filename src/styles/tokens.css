@@ -151,6 +151,25 @@
   --p3-nen: #fbfaf7;
 }
 
+/* KHUNG LỜI GIẢI ĐỌC ĐƯỢC (`.readable-solution`, src/index.css) — cặp màu riêng để chữ lời giải luôn đủ tương phản dù bị lớp tiện ích
+ * Tailwind trộn sáng/tối. Trước 21/09 nằm thẳng trong index.css (mã màu thô, làm `npm run check:mau` đỏ); nay đứng đây, một chỗ.
+ * Nền tối theo lớp `.dark` / `[data-theme="dark"]` — đúng bộ chọn cũ của khung này (không theo prefers-color-scheme). */
+:root {
+  --loi-giai-nen: #fff8e9;
+  --loi-giai-chu: #322c22;
+  --loi-giai-vien: #dbc58e;
+  --loi-giai-cam-chu: #493a20;
+  --loi-giai-nhan: #815512;
+}
+.dark,
+[data-theme="dark"] {
+  --loi-giai-nen: #292f35;
+  --loi-giai-chu: #f2eee3;
+  --loi-giai-vien: #786645;
+  --loi-giai-cam-chu: #f2eee3;
+  --loi-giai-nhan: #e8c477;
+}
+
 /* NỀN TỐI — MANCUAVAOVANENTOI.md mục 1. Giữ nguyên tên biến, chỉ đổi giá trị;
  * gradient --g1..--g4 giữ nguyên (đủ tương phản ở cả hai nền). Các biến cỡ
  * chữ/khoảng cách/bo góc không đổi theo nền. */

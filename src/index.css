@@ -925,11 +925,11 @@ input:is([type="date"], [type="datetime-local"], [type="time"])::-webkit-calenda
   color-scheme: dark;
   color: #f1f5f9;
   -webkit-text-fill-color: #f1f5f9;
-  background-color: var(--the, #1e293b);
-  border-color: var(--vien-dam, #475569);
+  background-color: var(--the);
+  border-color: var(--vien-dam);
 }
 /* Explicit contrast protects solution text from mixed light/dark utility overrides. */
-.readable-solution{background:#fff8e9!important;color:#322c22!important;border-color:#dbc58e!important}.readable-solution [class*="text-amber"]{color:#493a20!important}.readable-solution [class*="uppercase"]{color:#815512!important}.dark .readable-solution,[data-theme="dark"] .readable-solution{background:#292f35!important;color:#f2eee3!important;border-color:#786645!important}.dark .readable-solution [class*="text-amber"],[data-theme="dark"] .readable-solution [class*="text-amber"]{color:#f2eee3!important}.dark .readable-solution [class*="uppercase"],[data-theme="dark"] .readable-solution [class*="uppercase"]{color:#e8c477!important}
+.readable-solution{background:var(--loi-giai-nen)!important;color:var(--loi-giai-chu)!important;border-color:var(--loi-giai-vien)!important}.readable-solution [class*="text-amber"]{color:var(--loi-giai-cam-chu)!important}.readable-solution [class*="uppercase"]{color:var(--loi-giai-nhan)!important}
 .khac-phuc-modal{border-color:var(--vien-dam)!important;background:var(--the)!important;color:var(--muc)!important}
 .khac-phuc-modal [class*="bg-white"],.khac-phuc-modal [class*="bg-slate-50"],.khac-phuc-modal [class*="bg-slate-100"]{background:var(--the-2)!important}
 .khac-phuc-modal [class*="bg-blue-50"]{background:var(--xanh-nen)!important}

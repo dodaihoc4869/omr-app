@@ -85,9 +85,9 @@ describe('C4 · DANH SÁCH ở cổng học sinh (/hs)', () => {
     const theo = (t: string) => Array.from(document.querySelectorAll<HTMLElement>('.mom-the')).find((e) => e.textContent!.includes(t))!
     expect(within(theo('Bài chưa làm')).getByText('Chưa làm')).toBeTruthy()
     expect(within(theo('Bài chưa làm')).getByRole('button', { name: 'Bắt đầu làm bài (2 tiếng)' }).className).toContain('m3-nut-chinh')
-    expect(within(theo('Bài đang làm')).getByText('⏳ Đang làm')).toBeTruthy()
+    expect(within(theo('Bài đang làm')).getByText('Đang làm')).toBeTruthy()
     expect(within(theo('Bài đang làm')).getByRole('button', { name: 'Tiếp tục làm bài' })).toBeTruthy()
-    expect(within(theo('Bài đã nộp')).getByText('✓ Đã nộp (7.5/10đ)')).toBeTruthy()
+    expect(within(theo('Bài đã nộp')).getByText('Đã nộp (7.5/10đ)')).toBeTruthy()
     expect(within(theo('Bài đã nộp')).getByRole('button', { name: 'Xem kết quả & Lời giải HTML' })).toBeTruthy()
     expect(within(theo('Bài chưa làm')).getByText('Thời gian làm: 2 giờ')).toBeTruthy()
     expect(screen.getByRole('region', { name: 'Bài gia đình giao' })).toBeTruthy()

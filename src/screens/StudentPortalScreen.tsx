@@ -2047,11 +2047,11 @@ export default function StudentPortalScreen() {
                               </span>
                               {daNop ? (
                                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
-                                  ✓ Đã nộp ({bai.diem}/10đ)
+                                  <CheckCircle2 className="w-3 h-3 inline -mt-0.5" aria-hidden="true" /> Đã nộp ({bai.diem}/10đ)
                                 </span>
                               ) : dangLam ? (
                                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800">
-                                  ⏳ Đang làm
+                                  <Clock className="w-3 h-3 inline -mt-0.5" aria-hidden="true" /> Đang làm
                                 </span>
                               ) : (
                                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800">

@@ -1,5 +1,6 @@
 import {useEffect,useRef,useState} from 'react'
 import {createPortal} from 'react-dom'
+import {Shield,Sparkles} from 'lucide-react'
 import {EVOLUTION_LEVELS,evolutionStage} from './evolution'
 import {shieldEntitlement,shieldRemaining,type ShieldState} from './shields'
 const TITLES=['Khiên Khởi Nguyên','Khiên Tinh Tú','Khiên Long Giáp','Khiên Thiên Quang','Khiên Bất Diệt']
@@ -13,9 +14,9 @@ export default function ImmortalShield({level,state,busy,onUse}:{level:number;st
  useEffect(()=>{if(!active)return;const previous=document.activeElement as HTMLElement|null,overflow=document.body.style.overflow;document.body.style.overflow='hidden';overlay.current?.focus();return()=>{document.body.style.overflow=overflow;previous?.focus()}},[active])
  const use=async()=>{pending.current||=crypto.randomUUID();await onUse(pending.current)}
  useEffect(()=>{if(state?.lastUse===pending.current)pending.current=''},[state?.lastUse])
- return <><div className="immortal-inventory mission-shield"><div>{gift>0&&<p role="status" className="immortal-gift">✨ Tiến hoá thành công! Em nhận thêm {gift} Khiên chống đuổi.</p>}<strong>🛡 Khiên chống đuổi · {remaining} lượt</strong><p>{stage?`${TITLES[tier]} · Quà tiến hoá đã nhận ${[1,3,6,9,12][tier]} khiên`:'Đạt cấp 10 để nhận khiên đầu tiên.'} · Mỗi lần dùng hiện 10 giây.</p><small>Cấp 10: +1 · cấp 30: +2 · cấp 50, 70, 100: mỗi mốc +3.</small></div><button ref={button} disabled={busy||active||remaining<1} onClick={()=>void use()}>Dùng Khiên chống đuổi</button></div>{active&&createPortal(<div ref={overlay} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Khiên chống đuổi đang kích hoạt" className={`immortal-screen immortal-tier-${tier}`} style={{'--shield-color':COLORS[tier]} as React.CSSProperties} onKeyDown={e=>{if(e.key==='Tab')e.preventDefault()}}>
+ return <><div className="immortal-inventory mission-shield"><div>{gift>0&&<p role="status" className="immortal-gift"><Sparkles size={16} aria-hidden="true"/> Tiến hoá thành công! Em nhận thêm {gift} khiên.</p>}<strong><Shield size={16} aria-hidden="true"/> Khiên · {remaining} lượt</strong><p>{stage?`${TITLES[tier]} · Quà tiến hoá đã nhận ${[1,3,6,9,12][tier]} khiên`:'Đạt cấp 10 để nhận khiên đầu tiên.'} · Mỗi lần dùng: khiên hiện 10 giây và trừ 1 lượt.</p><small>Cấp 10: +1 · cấp 30: +2 · cấp 50, 70, 100: mỗi mốc +3.</small></div><button ref={button} disabled={busy||active||remaining<1} onClick={()=>void use()}>Dùng khiên</button></div>{active&&createPortal(<div ref={overlay} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Khiên đang bật" className={`immortal-screen immortal-tier-${tier}`} style={{'--shield-color':COLORS[tier]} as React.CSSProperties} onKeyDown={e=>{if(e.key==='Tab')e.preventDefault()}}>
  <div className="immortal-orbit"/><div className="immortal-orbit second"/>
- <p className="immortal-kicker">PHẦN THƯỞNG TIẾN HOÁ · CẤP {EVOLUTION_LEVELS[stage]}</p><h2>KHIÊN CHỐNG ĐUỔI</h2>
+ <p className="immortal-kicker">PHẦN THƯỞNG TIẾN HOÁ · CẤP {EVOLUTION_LEVELS[stage]}</p><h2>KHIÊN ĐANG BẬT</h2>
  <svg className="immortal-emblem" viewBox="0 0 400 440" aria-hidden="true"><defs><linearGradient id="shield-metal" x2="1" y2="1"><stop stopColor="#fff7ce"/><stop offset=".45" stopColor="var(--shield-color)"/><stop offset="1" stopColor="#fff7ce"/></linearGradient><radialGradient id="shield-core"><stop stopColor="var(--shield-color)"/><stop offset="1" stopColor="#10152d"/></radialGradient></defs>
  <path d="M200 15 340 80 325 252Q304 340 200 414Q96 340 75 252L60 80Z" fill="url(#shield-core)" stroke="url(#shield-metal)" strokeWidth="12"/>
  <path d="M200 46 310 100 296 245Q277 318 200 375Q123 318 104 245L90 100Z" fill="none" stroke="var(--shield-color)" strokeWidth="3"/>

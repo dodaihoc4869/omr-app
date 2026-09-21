@@ -1,6 +1,7 @@
 // ĐOÀN HỘ TỐNG — SẢNH hằng ngày (bản vẽ 1) + phòng chờ khi đi cùng bạn. Khối nào cần số liệu mà máy chủ chưa trả (Đoàn lớp, vé,
 // rương chuỗi, Trùm lớp, ấn thạch — bước 5 và 6) thì KHÔNG hiện: không bịa số.
 import { useState } from 'react'
+import { Flame, Ticket, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { AnXem, BanDongHanhXem, DoanXem, SanhXem } from './doan-kieu'
 import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh } from './DoanHinh'
@@ -32,9 +33,9 @@ export default function DoanSanh(p: Props) {
       <header className="dh-dau">
         <div><div className="dh-nhan">{s ? `MÙA ${s.mua.so} · CÒN ${s.mua.conNgay} NGÀY` : 'HỘ TỐNG LINH TÂM · CẢ LỚP MỘT ĐOÀN'}</div><h1>{s?.tenDoan ?? p.tenDoan}</h1></div>
         <div className="dh-dau-phai">
-          {s && s.ve !== null && <span className="dh-the-so dh-the-ve" aria-label={`Em có ${s.ve} vé hộ tống`}>🎟 {s.ve}</span>}
-          {s && s.chuoi.ngay > 0 && <span className="dh-the-so dh-the-chuoi" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}>🔥 {s.chuoi.ngay}</span>}
-          <button type="button" className="dh-nut-dong" aria-label="Về Đảo thần thú" title="Về Đảo thần thú" onClick={p.onDong}>✕</button>
+          {s && s.ve !== null && <span className="dh-the-so dh-the-ve" aria-label={`Em có ${s.ve} vé hộ tống`}><Ticket size={16} aria-hidden="true" />Vé hộ tống: {s.ve}</span>}
+          {s && s.chuoi.ngay > 0 && <span className="dh-the-so dh-the-chuoi" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}><Flame size={16} aria-hidden="true" />Chuỗi {s.chuoi.ngay} ngày</span>}
+          <button type="button" className="dh-nut-dong" aria-label="Về Đảo thần thú" title="Về Đảo thần thú" onClick={p.onDong}><X size={18} aria-hidden="true" /></button>
         </div>
       </header>
 
@@ -134,7 +135,7 @@ export default function DoanSanh(p: Props) {
             <button type="button" className="dh-nut-mo" disabled={p.ban || !!p.goiY?.hetLuot} onClick={p.onMoPhong}>Mở đoàn mới · lấy mã cho bạn</button>
             <form className="dh-ma-doan" onSubmit={e => { e.preventDefault(); if (ma.trim()) p.onVaoPhong(ma.trim().toUpperCase()) }}>
               <input aria-label="Mã đoàn của bạn" placeholder="Nhập mã đoàn của bạn" value={ma} maxLength={12} autoComplete="off" autoCapitalize="characters" onChange={e => setMa(e.target.value)} />
-              <button type="submit" className="dh-nut-lam" disabled={p.ban || !ma.trim()}>Vào</button>
+              <button type="submit" className="dh-nut-lam" disabled={p.ban || !ma.trim()}>Vào đoàn</button>
             </form>
           </section>
         </>

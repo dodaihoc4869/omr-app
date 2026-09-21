@@ -137,7 +137,7 @@ export default function DoanTran(p: Props) {
                   <div className="dh-ds">
                     <button type="button" disabled={p.ban} aria-pressed={p.yChon[i] === 'D'} onClick={() => p.onYChon(i, 'D')}>Đúng</button>
                     <button type="button" disabled={p.ban} aria-pressed={p.yChon[i] === 'S'} onClick={() => p.onYChon(i, 'S')}>Sai</button>
-                    {p.yChon[i] && <button type="button" className="dh-chot-y" disabled={p.ban} onClick={() => p.onChotY(i)}>Chốt</button>}
+                    {p.yChon[i] && <button type="button" className="dh-chot-y" disabled={p.ban} onClick={() => p.onChotY(i)}>Chốt ý này</button>}
                   </div>
                 ) : <em className={daChot ? 'dh-xong' : 'dh-nghi'}>{daChot ? 'đã chốt' : giu?.laMay || giu?.roi ? 'máy đỡ' : 'đang nghĩ…'}</em>}
               </div>

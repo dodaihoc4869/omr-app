@@ -65,6 +65,9 @@ export interface ThongTinPhieu {
   giaoDienHocSinh?: boolean
 }
 
+// Biểu tượng nét (SVG, kế thừa màu chữ) thay emoji: emoji hiện khác nhau theo máy và đọc thành tên lạ khi dùng đọc màn hình.
+const ICO_SAO = '<svg class="ico-nho" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>'
+const ICO_KHOA = '<svg class="ico-nho" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>'
 const CHU_PA = ['A', 'B', 'C', 'D']
 const CHU_Y = ['a', 'b', 'c', 'd']
 const TEN_MUC: Record<string, string> = { biet: 'Nhận biết', hieu: 'Thông hiểu', van_dung: 'Vận dụng' }
@@ -716,6 +719,7 @@ body.co-lam .thanh:not(#thanh-nop) { position: static; }
   border-color: rgba(71, 85, 105, 0.5);
   color: #94a3b8;
 }
+.ico-nho { width: 1em; height: 1em; vertical-align: -0.15em; margin-right: 4px; flex-shrink: 0; }
 .q-tag.muc-tieu-hom-nay-tag {
   background: linear-gradient(135deg, #2563eb, #4f46e5);
   color: #ffffff !important;
@@ -1207,7 +1211,7 @@ export function theCauHtml(
       : '<span class="q-tag vong-btvn vong-1">Vòng 1: Lõi Căn Bản</span>'
     : ''
   const tagMucTieu = Boolean(laBtvn && soCauSang && stt <= soCauSang)
-    ? '<span class="q-tag muc-tieu-hom-nay-tag">✨ Mục tiêu hôm nay</span>'
+    ? `<span class="q-tag muc-tieu-hom-nay-tag">${ICO_SAO}Mục tiêu hôm nay</span>`
     : ''
   const tags = [
     cn?.thuSuc ? chipThuSucHtml() : cn?.nhan ? nhanChipHtml(cn.nhan) : '',
@@ -1317,7 +1321,7 @@ export function theCauHtml(
       : ''
 
   const bannerDimmed = laDimmed
-    ? `<div class="dimmed-pacing-banner"><span class="dimmed-lock-icon">🔒</span><span>Câu thuộc chặng tiếp theo · Hoàn thành ${soCauSang} câu sáng hôm nay trước để đạt chỉ tiêu</span></div>`
+    ? `<div class="dimmed-pacing-banner"><span class="dimmed-lock-icon">${ICO_KHOA}</span><span>Câu thuộc chặng tiếp theo · Hoàn thành ${soCauSang} câu sáng hôm nay trước để đạt chỉ tiêu</span></div>`
     : ''
 
   const cacLop = [
@@ -1659,8 +1663,8 @@ export function thanhHtml(soCau: number, anGiai = false): string {
   <div class="thanh-chu"><span class="dem-giai">Đã xem lời giải <b id="dem-mo">0</b>/<span id="dem-tong">${soCau}</span> câu</span><span class="the-loc" id="the-loc" hidden> · <b id="ten-loc"></b></span></div>
   <button class="nut nho" type="button" id="bo-loc" hidden>Bỏ lọc</button>
   <button class="nut nho" type="button" id="doi-mau" title="Đổi sang sắc cầu vồng tiếp theo">Đổi màu</button>
-  <button class="nut" type="button" id="chi-de" aria-pressed="false" title="Giấu đáp án và lời giải để đọc đề trần"><span class="chu-mo">Hiện đề</span><span class="chu-dong">Hiện cả lời giải</span></button>
-  <button class="nut chinh" type="button" id="mo-het" aria-pressed="false"><span class="chu-mo">Mở tất cả</span><span class="chu-dong">Đóng tất cả</span></button>
+  <button class="nut" type="button" id="chi-de" aria-pressed="false" title="Giấu đáp án và lời giải để đọc đề trần"><span class="chu-mo">Ẩn lời giải</span><span class="chu-dong">Hiện cả lời giải</span></button>
+  <button class="nut chinh" type="button" id="mo-het" aria-pressed="false"><span class="chu-mo">Mở hết lời giải</span><span class="chu-dong">Đóng hết lời giải</span></button>
   <span class="pdf-boc">
     <button class="nut dam" type="button" id="tai-pdf" aria-haspopup="true" aria-expanded="false">Tải PDF</button>
     <span class="pdf-chon" id="pdf-chon" role="menu" hidden>
@@ -1817,7 +1821,7 @@ export const JS_PHIEU = `
       var banners = document.querySelectorAll('.dimmed-pacing-banner');
       for (var j = 0; j < banners.length; j++) banners[j].remove();
       var tpt = document.getElementById('thanh-phan-tang-btvn');
-      if (tpt) tpt.innerHTML = '<div class="tpt-trai"><span class="tpt-sao">✨</span><span>Đã mở toàn bộ ' + tatCa.length + ' câu của bài tập. Em có thể làm tiếp để nhận thêm EXP Thần Thú!</span></div>';
+      if (tpt) tpt.innerHTML = '<div class="tpt-trai"><span class="tpt-sao">${ICO_SAO}</span><span>Đã mở toàn bộ ' + tatCa.length + ' câu của bài tập. Em có thể làm tiếp để nhận thêm EXP Thần Thú!</span></div>';
     });
   }
   /** HIỆN ĐỀ — giấu đáp án và lời giải ngay trên màn hình.
@@ -2718,6 +2722,7 @@ html.gd-m3 body .q-card.q-card-dimmed, html.gd-m3 body .q-card.q-card-dimmed:hov
 html.gd-m3 body .dimmed-pacing-banner {
   padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--gm-on-surface-v); font-size: 14px; font-weight: 500;
 }
+html.gd-m3 body .dimmed-lock-icon svg { display: none; }
 html.gd-m3 body .dimmed-lock-icon {
   display: inline-block; width: 18px; height: 18px; font-size: 0; flex-shrink: 0; background: currentColor;
   -webkit-mask: var(--gm-i-khoa) center / contain no-repeat; mask: var(--gm-i-khoa) center / contain no-repeat;
@@ -3217,7 +3222,7 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   const thanhPhanTang = (laBtvn && typeof soCauSang === 'number' && soCauSang < cau.length)
     ? `<div class="thanh-phan-tang-btvn" id="thanh-phan-tang-btvn">
         <div class="tpt-trai">
-          <span class="tpt-sao">✨</span>
+          <span class="tpt-sao">${ICO_SAO}</span>
           <span>Hôm nay em làm <b>${soCauSang}</b> câu sáng · <b>${cau.length - soCauSang}</b> câu còn lại mở dần theo ngày/giờ để tránh quá tải.</span>
         </div>
         <button type="button" class="tpt-nut-mo" id="nut-mo-het-cau">Hiện tất cả ${cau.length} câu</button>

@@ -4,7 +4,7 @@
 // chọn); Phần III chữ tự do. KHÔNG dùng position:fixed (sheet có transform từ animate-google-fade ⇒ con fixed trôi theo nội dung): thanh
 // đồng hồ dính bằng `position: sticky` dưới thanh trên của sheet.
 import type { ReactNode } from 'react'
-import { ArrowLeft, ArrowRight, Check, Eye, Heart, Pause, RefreshCw, Timer } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, Eye, Heart, Hourglass, Pause, RefreshCw, Timer, X } from 'lucide-react'
 import '../m3'
 import './mom-m3.css'
 import { MomOption, MomQuestionStem } from '../MomQuestionMedia'
@@ -70,7 +70,7 @@ export function MomDanhSachM3({
         <div className="mom-ok" role="status">
           <span>{thongBaoNop}</span>
           <button type="button" onClick={onDongThongBao} aria-label="Đóng thông báo" className="mom-ok-dong">
-            ✕
+            <X size={18} aria-hidden="true" />
           </button>
         </div>
       )}
@@ -95,9 +95,9 @@ export function MomDanhSachM3({
                 <div className="mom-the-dau">
                   <span className="mom-gio">{bai.ngayGiao ? ngayGio(String(bai.ngayGiao)) : ''}</span>
                   {daNop ? (
-                    <span className="m3-chip mom-chip-xong">✓ Đã nộp ({bai.diem}/10đ)</span>
+                    <span className="m3-chip mom-chip-xong"><Check size={14} aria-hidden="true" /> Đã nộp ({bai.diem}/10đ)</span>
                   ) : dangLam ? (
-                    <span className="m3-chip mom-chip-canh-bao">⏳ Đang làm</span>
+                    <span className="m3-chip mom-chip-canh-bao"><Hourglass size={14} aria-hidden="true" /> Đang làm</span>
                   ) : (
                     <span className="m3-chip mom-chip-loi">Chưa làm</span>
                   )}

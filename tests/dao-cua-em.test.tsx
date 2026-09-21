@@ -114,9 +114,9 @@ describe('Túi đồ', () => {
   it('giữ NGUYÊN khiên chống đuổi (component cũ, cùng lệnh dùng khiên) + mảnh khiên; phần thưởng chưa có ⇒ SẮP MỞ', () => {
     const onDungKhien = vi.fn(async () => {})
     render(<div className="dao"><TuiDo profile={hoSo({ shields: { used: 0, activeUntil: 0 }, khienRen: { manh: 8, daRen: 1, moiKhien: 12 } })} onDungKhien={onDungKhien} /></div>)
-    const khien = screen.getByLabelText('Khiên chống đuổi')
-    expect(within(khien).getByText(/Khiên chống đuổi · 3 lượt/)).toBeTruthy() // cấp 34 = đã qua mốc 10 (+1) và 30 (+2)
-    fireEvent.click(within(khien).getByRole('button', { name: 'Dùng Khiên chống đuổi' })); expect(onDungKhien).toHaveBeenCalledTimes(1)
+    const khien = screen.getByLabelText('Khiên')
+    expect(within(khien).getByText(/Khiên · 3 lượt/)).toBeTruthy() // cấp 34 = đã qua mốc 10 (+1) và 30 (+2)
+    fireEvent.click(within(khien).getByRole('button', { name: 'Dùng khiên' })); expect(onDungKhien).toHaveBeenCalledTimes(1)
     expect(screen.getByLabelText('Mảnh khiên').textContent).toContain('8/12')
     expect(screen.getByLabelText('Trang phục, sắp mở').textContent).toContain('SẮP MỞ')
   })

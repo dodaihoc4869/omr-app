@@ -318,16 +318,16 @@ describe('thanhHtml', () => {
     expect(h).toContain('id="dem-mo">0</b>/<span id="dem-tong">12</span>')
     expect(h).toContain('id="mo-het"')
     expect(h).toContain('id="bo-loc"')
-    expect(h).toContain('Mở tất cả')
+    expect(h).toContain('Mở hết lời giải')
   })
 })
 
 describe('hai lựa chọn in', () => {
-  it('thanh có nút Hiện đề và nút Tải PDF hai lựa chọn (thầy chốt 06/09)', () => {
+  it('thanh có nút Ẩn lời giải (chế độ Hiện đề) và nút Tải PDF hai lựa chọn (thầy chốt 06/09)', () => {
     const h = thanhHtml(10)
     // HIỆN ĐỀ — giấu đáp án và lời giải NGAY TRÊN MÀN HÌNH, không chỉ khi in.
     expect(h).toContain('id="chi-de"')
-    expect(h).toContain('Hiện đề')
+    expect(h).toContain('Ẩn lời giải')
     // TẢI PDF hỏi tải bản nào, không đoán hộ: hai lựa chọn ra hai tệp khác hẳn.
     expect(h).toContain('id="tai-pdf"')
     expect(h).toContain('id="pdf-de"')
@@ -340,7 +340,7 @@ describe('hai lựa chọn in', () => {
     expect(h).not.toContain('id="tai-tep"')
   })
 
-  it('bản chỉ có đề KHÔNG dựng nút Hiện đề — không có gì để giấu', () => {
+  it('bản chỉ có đề KHÔNG dựng nút Ẩn lời giải — không có gì để giấu', () => {
     const h = thanhHtml(10, true)
     expect(h).not.toContain('id="chi-de"')
     expect(h).toContain('id="pdf-de"')

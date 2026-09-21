@@ -1,9 +1,11 @@
 // ĐOÀN HỘ TỐNG — màn 3 TIẾP SỨC (bản vẽ 3): tấm trượt 3 THẺ GỢI Ý. Thẻ do MÁY CHỦ soạn từ kiến thức + lời giải có sẵn của câu —
 // người tiếp sức chỉ chọn LOẠI thẻ, không thấy nội dung thẻ, không thấy bạn đã chọn gì. Không bao giờ là đáp án.
+import type { ReactElement } from 'react'
 import type { GoiYTiepSuc } from './doan-kieu'
+import { BookOpen, Ban, ArrowUpRight } from 'lucide-react'
 import { ThuHinh } from './DoanHinh'
 
-const HINH: Record<string, string> = { nhac_cong_thuc: '📖', loai_phuong_an: '⊗', buoc_dau: '↗' }
+const HINH: Record<string, ReactElement> = { nhac_cong_thuc: <BookOpen size={22} />, loai_phuong_an: <Ban size={22} />, buoc_dau: <ArrowUpRight size={22} /> }
 const THU_TU = ['nhac_cong_thuc', 'loai_phuong_an', 'buoc_dau'] as const
 const MAC_DINH: Record<string, [string, string]> = { nhac_cong_thuc: ['Nhắc công thức', 'Gửi bạn kiến thức gốc của câu'], loai_phuong_an: ['Loại 1 phương án', 'Máy gạch một đáp án sai'], buoc_dau: ['Chỉ bước đầu', 'Hé bước đầu của lời giải'] }
 
