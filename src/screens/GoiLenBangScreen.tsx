@@ -46,6 +46,7 @@ import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-
 import { deXuatBuoiChua, type DauVaoDeXuat } from '../lib/buoi-chua-de-xuat'
 import { khoTuNguon, layDeXuatBuoiChua } from '../lib/buoi-chua-de-xuat-lenh'
 import TheBuoiChuaXepSan from '../components/TheBuoiChuaXepSan'
+import { chuThieuNoiDung, demCauThieuNoiDung, timCauTheoId } from '../lib/tra-cau-chieu'
 import { noiDungTuCauGoc } from '../lib/thoi-gian-len-bang'
 import { uocLuongBacCau, uocLuongBacCauGoc } from '../lib/uoc-luong-bo-cuc'
 import { heSoCua, heSoHieuChinh } from '../lib/hieu-chinh-giay-thuc'
@@ -596,6 +597,15 @@ export default function GoiLenBangScreen() {
     return m
   }, [du, bankThem, deDaLuu])
 
+  /** Số câu (khác nhau) trên bảng sắp chiếu mà máy KHÔNG tra được nội dung đề — tờ chiếu vẫn mở nhưng hiện dòng thay thế; thầy được báo TRƯỚC khi mở (Boss 21/09). Cùng nguồn với `moMayChieu`:
+   *  buổi chữa mới khi có em lên bảng, không thì bảng phân công cũ. */
+  const soCauThieuNoiDung = useMemo(() => {
+    const dongLen = kqBuoi ? kqBuoi.dong.filter((d) => d.tang === 'len_bang' && d.em) : []
+    const ids = dongLen.length > 0 ? dongLen.map((d) => d.cau.id) : (kq?.phanCong ?? []).map((p) => p.cau.id)
+    return demCauThieuNoiDung(ids, traCau)
+  }, [kqBuoi, kq, traCau])
+  const dongBaoThieuNoiDung = chuThieuNoiDung(soCauThieuNoiDung)
+
   // ------------------------------------------------ GIÁO ÁN 80 PHÚT: dữ liệu
   //
   // Dùng CHUNG `dsCau` / `dsEmCa` với đường phân công cũ — một nguồn sự thật về
@@ -1107,15 +1117,7 @@ export default function GoiLenBangScreen() {
       // Các ô CÓ TRÊN tờ, tra theo `khoa` khi tờ gửi lệnh ghi (không tin sbd/qid trong tin đến).
       const oTrenTo = new Map<string, { sbd: string; hoTen: string; cau: CauChua }>()
       for (const p of dsPc) {
-        let day = traCau.get(p.cau.id)
-        if (!day) {
-          for (const [k, v] of traCau.entries()) {
-            if (k.endsWith(p.cau.id) || p.cau.id.endsWith(k)) {
-              day = v
-              break
-            }
-          }
-        }
+        const day = timCauTheoId(traCau, p.cau.id) // cùng hàm tra với dòng báo "câu chưa tra được nội dung" ở màn
 
         let cl: CauLuyen | undefined
         if (day) {
@@ -2099,6 +2101,11 @@ export default function GoiLenBangScreen() {
                     </div>
                   ))}
               </div>
+              {dongBaoThieuNoiDung && (
+                <div role="status" data-thieu-noi-dung style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>
+                  {dongBaoThieuNoiDung}
+                </div>
+              )}
               <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: 'var(--k3)' }}>
                 <button
                   type="button"
@@ -2232,6 +2239,11 @@ export default function GoiLenBangScreen() {
           chiếu lên bảng là bước sau, và chỉ có nghĩa khi đã có bảng phân công.
           Nên nó mang dáng nút viền (Material 3 outlined), không tranh chỗ với
           nút xanh ở trên. */}
+      {kq && kq.phanCong.length > 0 && !kqBuoi && dongBaoThieuNoiDung && (
+        <div role="status" data-thieu-noi-dung style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>
+          {dongBaoThieuNoiDung}
+        </div>
+      )}
       {kq && kq.phanCong.length > 0 && (
         <button
           type="button"

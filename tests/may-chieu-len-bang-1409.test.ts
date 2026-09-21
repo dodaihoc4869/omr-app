@@ -243,9 +243,13 @@ describe('Màn Gọi lên bảng', () => {
     expect(than).toContain('(kq?.phanCong ?? [])')
   })
 
-  // NGHI LỖI THẬT — CHỜ BOSS QUYẾT (đã báo 21/09). Commit d001ccc (18/09) thay lời báo "N em chưa tra được đề" bằng câu luyện dự phòng ("Nội dung câu hỏi <số>") để tờ chiếu LUÔN mở được,
-  // nhưng KHÔNG còn báo gì cho thầy khi câu thiếu nội dung: thầy có thể chiếu chỗ trống mà không biết. Hoặc thêm lại một dòng báo mềm (tờ vẫn mở), hoặc bỏ phép kiểm này.
+  // Boss quyết 21/09: tờ VẪN mở bằng câu dự phòng ("Nội dung câu hỏi <số>", d001ccc 18/09) nhưng thầy PHẢI được báo — một dòng báo mềm ngay trên màn, trước khi mở tờ, không chặn, không hộp thoại.
+  // Hành vi được khoá đầy đủ ở `tests/tra-cau-chieu-2109.test.ts` (hàm thuần, chữ báo, nguồn màn) và `tests/goi-len-bang-buoi-xep-san-2109.test.tsx` (0 câu thiếu ⇒ không hiện dòng).
   it('câu không tra được đề thì BÁO thầy (tờ vẫn mở bằng câu dự phòng)', () => {
-    expect(than).toContain('chưa tra được đề')
+    expect(than).toContain('const dongBaoThieuNoiDung = chuThieuNoiDung(soCauThieuNoiDung)')
+    expect(than).toContain('timCauTheoId(traCau, p.cau.id)')
+    expect(than).toContain('Nội dung câu hỏi ${p.cau.so}') // câu dự phòng: tờ vẫn mở (mã nguồn ở đây đã bỏ chú thích)
+    const lib = readFileSync('src/lib/tra-cau-chieu.ts', 'utf8')
+    expect(lib).toContain('chưa tra được nội dung đề — tờ chiếu sẽ hiện dòng thay thế')
   })
 })

@@ -128,6 +128,21 @@ describe('thẻ ẨN — luồng cũ y nguyên', () => {
   })
 })
 
+describe('dòng báo "câu chưa tra được nội dung đề" (tờ chiếu)', () => {
+  it('0 câu thiếu ⇒ KHÔNG hiện dòng báo: buổi xếp sẵn dùng câu có trong kho nên mọi câu tra được', async () => {
+    mocks.goiLenh.mockResolvedValue({ ok: true, du: THAN_TRA })
+    const { container, getByRole } = render(<GoiLenBangScreen />)
+    await waitFor(() => expect(the(container)).not.toBeNull())
+    await choKho(container)
+    fireEvent.click(getByRole('button', { name: 'Mở buổi chữa này' }))
+    await waitFor(() => expect(container.querySelector('[data-dang-dung-xep-san]')).not.toBeNull(), { timeout: 4000 })
+    // chờ buổi được xếp (tự chạy sau khi điền câu) rồi kiểm dòng báo
+    await waitFor(() => expect(container.textContent).toMatch(/em lên bảng/), { timeout: 6000 })
+    expect(container.querySelector('[data-thieu-noi-dung]')).toBeNull()
+    expect(container.textContent).not.toContain('chưa tra được nội dung đề')
+  })
+})
+
 describe('thẻ HIỆN với số thật', () => {
   beforeEach(() => mocks.goiLenh.mockResolvedValue({ ok: true, du: THAN_TRA }))
 
