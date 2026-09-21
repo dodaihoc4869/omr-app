@@ -143,7 +143,7 @@ export default function BangTinPhuHuynh({
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="m3-chip-nhieu-dong text-[10px] sm:text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-blue-600 text-white shadow-2xs">
-                  Điểm ca thi gần nhất
+                  Điểm ca kiểm tra gần nhất
                 </span>
                 {latestCa.maCa && (
                   <span className="font-mono text-xs font-bold text-slate-500 dark:text-slate-400">
@@ -155,7 +155,7 @@ export default function BangTinPhuHuynh({
                 {latestCa.tenCa || 'Bài kiểm tra hoàn thành'}
               </h3>
               <p className="text-xs text-blue-600 dark:text-blue-300 font-semibold flex items-center gap-0.5 mt-0.5">
-                <span>Xem điểm tất cả ({tabStats?.diemCount ?? 0} ca thi)</span>
+                <span>Xem điểm tất cả ({tabStats?.diemCount ?? 0} ca kiểm tra)</span>
                 <ChevronRight size={14} />
               </p>
             </div>
@@ -290,7 +290,7 @@ export default function BangTinPhuHuynh({
                   1. Sửa câu sai
                 </div>
                 <div className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
-                  Rút câu từng làm sai từ các ca thi
+                  Rút câu từng làm sai từ các ca kiểm tra
                 </div>
               </div>
             </div>
@@ -399,7 +399,7 @@ export default function BangTinPhuHuynh({
           <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300">
             <span className="flex items-center gap-1.5">
               <FileCheck size={15} className="text-blue-600" />
-              Bài thi đã nộp hôm nay ({report.today.length})
+              Ca kiểm tra đã nộp hôm nay ({report.today.length})
             </span>
           </div>
           <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
@@ -459,7 +459,7 @@ export default function BangTinPhuHuynh({
                   Xem điểm
                 </div>
                 <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
-                  Lịch sử ca thi
+                  Lịch sử ca kiểm tra
                 </div>
               </div>
             </button>
@@ -621,7 +621,7 @@ export default function BangTinPhuHuynh({
       {report.today.length === 0 && (
         <div className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-slate-50/90 dark:bg-slate-800/50 border border-slate-200/70 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 text-center shadow-2xs mt-auto">
           <Info size={14} className="text-blue-600 shrink-0" />
-          <span>Hôm nay chưa có bài thi mới · Đề xuất dựa trên kết quả gần nhất</span>
+          <span>Hôm nay chưa có ca kiểm tra mới · Đề xuất dựa trên kết quả gần nhất</span>
         </div>
       )}
     </div>

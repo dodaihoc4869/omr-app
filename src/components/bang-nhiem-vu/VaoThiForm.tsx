@@ -30,8 +30,8 @@ export default function VaoThiForm({
         <span className="vtf-bt" aria-hidden="true">
           <LogIn size={26} />
         </span>
-        <h2 className="vtf-h">Vào phòng thi trực tuyến</h2>
-        <p className="vtf-phu">Nhập mã ca thi từ Thầy và mật khẩu ca (nếu có) để bắt đầu làm bài</p>
+        <h2 className="vtf-h">Vào ca kiểm tra trực tuyến</h2>
+        <p className="vtf-phu">Nhập mã ca kiểm tra từ Thầy và mật khẩu ca (nếu có) để bắt đầu làm bài</p>
       </div>
 
       {loi && (
@@ -43,7 +43,7 @@ export default function VaoThiForm({
 
       <form onSubmit={onSubmit} className="vtf-form">
         <label className="vtf-truong">
-          <span className="vtf-nhan">Mã ca thi (6 chữ số)</span>
+          <span className="vtf-nhan">Mã ca kiểm tra (thường 6 chữ số)</span>
           <input
             type="text"
             inputMode="numeric"
@@ -59,7 +59,7 @@ export default function VaoThiForm({
         </label>
 
         <label className="vtf-truong">
-          <span className="vtf-nhan">Mật khẩu ca thi (nếu ca thi có yêu cầu)</span>
+          <span className="vtf-nhan">Mật khẩu ca kiểm tra (nếu ca có yêu cầu)</span>
           <input
             type="password"
             autoComplete="off"
@@ -77,7 +77,7 @@ export default function VaoThiForm({
 
         <button type="submit" className="m3-nut-chinh vtf-nut">
           <LogIn size={20} aria-hidden="true" />
-          <span>Vào thi ngay</span>
+          <span>Vào ca kiểm tra</span>
         </button>
       </form>
     </div>

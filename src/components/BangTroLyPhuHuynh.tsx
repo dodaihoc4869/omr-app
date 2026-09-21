@@ -64,7 +64,7 @@ export default function BangTroLyPhuHuynh({
       danhGia = `Ca gần nhất đạt ${diemGanNhat.toFixed(1)} điểm. Cần xem thêm lỗi sai và kết quả những lần kiểm tra sau để đánh giá tiến bộ.`
       mucDoKhanCap = 'khen_ngoi'
     } else if (soCaThi > 0) {
-      danhGia = `Con có ${soCaThi} ca thi trong danh sách. Anh/chị xem báo cáo gần nhất để biết phần con còn cần sửa.`
+      danhGia = `Con có ${soCaThi} ca kiểm tra trong danh sách. Anh/chị xem báo cáo gần nhất để biết phần con còn cần sửa.`
     }
 
     return {
@@ -194,7 +194,7 @@ export default function BangTroLyPhuHuynh({
               </h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
                 {tongCauSai > 0
-                  ? `Chọn lọc từ ${tongCauSai} câu con đã làm sai ở các ca thi để con luyện lại.`
+                  ? `Chọn lọc từ ${tongCauSai} câu con đã làm sai ở các ca kiểm tra để con luyện lại.`
                   : 'Chưa có câu sai trong dữ liệu đang xem. Anh/chị kiểm tra bài cần nộp trước khi giao thêm.'}
               </p>
             </div>
@@ -230,7 +230,7 @@ export default function BangTroLyPhuHuynh({
                   )}
                 </div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
-                  {caGanNhat.tenCa || 'Ca thi vừa hoàn thành'}
+                  {caGanNhat.tenCa || 'Ca kiểm tra vừa hoàn thành'}
                 </h4>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
                   Điểm số: <b className="text-blue-600 dark:text-blue-400 text-sm">{typeof thongKe.diemGanNhat === 'number' ? thongKe.diemGanNhat.toFixed(1) : 'Đã nộp'}</b>
@@ -262,10 +262,10 @@ export default function BangTroLyPhuHuynh({
                   </span>
                 </div>
                 <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm group-hover:text-blue-600 transition">
-                  Bảng điểm các ca thi
+                  Bảng điểm các ca kiểm tra
                 </h4>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                  Xem lịch sử làm bài và tiến trình hoàn thành các ca thi của con.
+                  Xem lịch sử làm bài và tiến trình hoàn thành các ca kiểm tra của con.
                 </p>
               </div>
               <button

@@ -419,7 +419,7 @@ export function tongHopKeHoachTroLy(input: {
       id: 'sua_loi_cot_loi',
       loai: 'sua_loi_vong1',
       tieuDe: `Luyện sửa ${soCauSua} câu sai căn bản`,
-      moTa: `Tự tay làm lại câu sai ca thi gần nhất để không sai lặp lại`,
+      moTa: `Tự tay làm lại câu sai ca kiểm tra gần nhất để không sai lặp lại`,
       soCau: soCauSua,
       phutUocTinh: Math.ceil((soCauSua * 80) / 60),
       expThuong: soCauSua * 3,

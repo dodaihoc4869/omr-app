@@ -1,4 +1,4 @@
-// VIỆC C · C2 — tab "Xem điểm & lịch sử ca thi" của cổng học sinh mặc Material 3 (LichSuCaM3).
+// VIỆC C · C2 — tab "Xem điểm & lịch sử ca kiểm tra" của cổng học sinh mặc Material 3 (LichSuCaM3).
 // Đổi áo, không đổi xương: hai hành động ("Xem báo cáo", "Xem đề và lời giải kèm lỗi sai") và dòng đếm câu (DongDemCau, khuôn chung
 // 3 app) giữ nguyên; ca CHƯA CHẤM không in số bịa. Đường không phải cổng học sinh giữ đúng đoạn JSX cũ.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -43,7 +43,7 @@ afterEach(() => {
 })
 const moTab = async () => {
   fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-  fireEvent.click(await screen.findByRole('menuitem', { name: 'Xem điểm & lịch sử ca thi' }))
+  fireEvent.click(await screen.findByRole('menuitem', { name: 'Xem điểm & lịch sử ca kiểm tra' }))
 }
 
 describe('mucDiem: bậc điểm → vai trò màu', () => {
@@ -67,7 +67,7 @@ describe('C2 · tab điểm ở cổng học sinh (/hs)', () => {
     expect(b.querySelector('.lsc-diem')!.getAttribute('data-muc')).toBe('kha')
     expect(within(a).getByText('Phần I (TN)').nextElementSibling!.textContent).toBe('3.00')
     expect(a.querySelector('.lsc-dem')!.textContent).toMatch(/Đúng 23\/28 câu/)
-    expect(screen.getByRole('region', { name: 'Lịch sử thi và báo cáo' })).toBeTruthy()
+    expect(screen.getByRole('region', { name: 'Lịch sử ca kiểm tra và báo cáo' })).toBeTruthy()
     expect(document.querySelector('.max-h-\\[65vh\\]')).toBeNull()
   })
 
@@ -110,8 +110,8 @@ describe('C2 · tab điểm ở cổng học sinh (/hs)', () => {
     expect(container.querySelector('[aria-busy="true"]')).toBeTruthy()
     expect(container.querySelectorAll('.m3-xuong').length).toBe(2)
     rerender(<LichSuCaM3 dangTai={false} ds={[]} ngayGio={() => ''} dongDem={() => null} dangMoDe={false} onXemBaoCao={() => {}} onXemDe={() => {}} />)
-    expect(screen.getByText('Chưa có ca thi nào')).toBeTruthy()
-    expect(screen.getByText(/chưa tham gia ca thi nào/)).toBeTruthy()
+    expect(screen.getByText('Chưa có ca kiểm tra nào')).toBeTruthy()
+    expect(screen.getByText(/chưa tham gia ca kiểm tra nào/)).toBeTruthy()
   })
 
   it('đang mở đề thì nút "Xem đề…" tắt (chống bấm đôi)', () => {
@@ -125,8 +125,8 @@ describe('C2 · cô lập', () => {
     datDuong('/')
     render(<StudentPortalScreen />)
     await moTab()
-    expect(await screen.findByText('Lịch sử thi & Báo cáo kết quả')).toBeTruthy()
-    await waitFor(() => expect(screen.getByRole('region', { name: 'Lịch sử thi và báo cáo' }).className).toContain('max-h-[65vh]'))
+    expect(await screen.findByText('Lịch sử ca kiểm tra & Báo cáo kết quả')).toBeTruthy()
+    await waitFor(() => expect(screen.getByRole('region', { name: 'Lịch sử ca kiểm tra và báo cáo' }).className).toContain('max-h-[65vh]'))
     expect(document.querySelector('.lsc')).toBeNull()
   })
 })

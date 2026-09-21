@@ -53,7 +53,7 @@ export default function NutVaoThi({ caDangMo = false, onVaoThi }: { caDangMo?: b
       onClick={onVaoThi}
     >
       {caDangMo ? <span className="bnv-fab-cham" aria-hidden="true" /> : <PencilLine size={22} aria-hidden="true" />}
-      <span>{caDangMo ? 'Vào thi · ca đang mở' : 'Vào thi'}</span>
+      <span>{caDangMo ? 'Vào ca kiểm tra (đang mở)' : 'Vào thi'}</span>
     </button>
   )
 }

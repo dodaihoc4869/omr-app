@@ -54,7 +54,7 @@ describe('ParentPortalScreen — đã đăng nhập: khung sheet toàn màn', ()
     expect(container.firstElementChild!.classList.contains('m3')).toBe(true)
     expect(container.querySelector('.bnv')!.closest('.m3')).toBeTruthy()
     fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-    fireEvent.click(await screen.findByText('Báo cáo điểm các ca thi'))
+    fireEvent.click(await screen.findByText('Báo cáo điểm các ca kiểm tra'))
     const dong = await screen.findByTitle('Đóng toàn màn hình')
     expect(dong.className).toContain('min-w-[48px]')
     expect(screen.getByText('Ca Ancol 15/09')).toBeTruthy()
@@ -70,8 +70,8 @@ describe('hai lỗi nhỏ ghi tồn — sửa ở chỗ dùng (0.Planer 19/09)',
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
     fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-    fireEvent.click(await screen.findByText('Báo cáo điểm các ca thi'))
-    const tieuDe = (await screen.findByText('Báo Cáo Điểm Tất Cả Các Ca Thi')) as HTMLElement
+    fireEvent.click(await screen.findByText('Báo cáo điểm các ca kiểm tra'))
+    const tieuDe = (await screen.findByText('Báo Cáo Điểm Tất Cả Các Ca Kiểm Tra')) as HTMLElement
     expect(tieuDe.className).toContain('truncate')
     const khung = tieuDe.parentElement!
     expect(khung.className).toContain('basis-full')

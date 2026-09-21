@@ -83,7 +83,7 @@ describe('BaoCaoCaThiHocSinhModal (dùng chung với app giáo viên)', () => {
     expect(screen.getByText('Lý thuyết cơ bản, công thức, khái niệm')).toBeTruthy()
     expect(document.body.textContent).not.toMatch(/Vòng [123]|Lõi Căn Bản|Trọng Tâm Cá Nhân|Thử Thách Bứt Phá/)
     fireEvent.click(screen.getByRole('button', { name: 'Mức tiến bộ' }))
-    expect(await screen.findByText('Mức độ tiến bộ qua các ca thi')).toBeTruthy()
+    expect(await screen.findByText('Mức độ tiến bộ qua các ca kiểm tra')).toBeTruthy()
   })
 })
 

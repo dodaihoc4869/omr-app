@@ -11,7 +11,7 @@ export type ManCuPhuHuynh = 'diem' | 'khacphuc' | 'bantin'
 
 export function mucMenuHocSinh(moMan: (man: ManCuHocSinh) => void, dangXuat: () => void): MucMenu[] {
   return [
-    { id: 'diem', nhan: 'Xem điểm & lịch sử ca thi', bieuTuong: <BarChart3 size={CO} aria-hidden="true" />, onChon: () => moMan('diem') },
+    { id: 'diem', nhan: 'Xem điểm & lịch sử ca kiểm tra', bieuTuong: <BarChart3 size={CO} aria-hidden="true" />, onChon: () => moMan('diem') },
     { id: 'btvn', nhan: 'Bài tập về nhà', bieuTuong: <ClipboardList size={CO} aria-hidden="true" />, onChon: () => moMan('btvn') },
     { id: 'mom', nhan: 'Bài gia đình giao', bieuTuong: <Heart size={CO} aria-hidden="true" />, onChon: () => moMan('mom') },
     { id: 'khacphuc', nhan: 'Khắc phục lỗi sai', bieuTuong: <RotateCcw size={CO} aria-hidden="true" />, onChon: () => moMan('khacphuc') },
@@ -28,7 +28,7 @@ export function mucMenuPhuHuynh(
   giaoNhanh?: { khacPhuc: () => void; luyen: () => void },
 ): MucMenu[] {
   return [
-    { id: 'diem', nhan: 'Báo cáo điểm các ca thi', bieuTuong: <BarChart3 size={CO} aria-hidden="true" />, onChon: () => moMan('diem') },
+    { id: 'diem', nhan: 'Báo cáo điểm các ca kiểm tra', bieuTuong: <BarChart3 size={CO} aria-hidden="true" />, onChon: () => moMan('diem') },
     { id: 'khacphuc', nhan: 'Giao bài khắc phục cho con', bieuTuong: <BookOpen size={CO} aria-hidden="true" />, onChon: () => moMan('khacphuc') },
     { id: 'bantin', nhan: 'Bảng tin của con', bieuTuong: <Newspaper size={CO} aria-hidden="true" />, onChon: () => moMan('bantin') },
     ...(giaoNhanh

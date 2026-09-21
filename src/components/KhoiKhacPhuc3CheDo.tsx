@@ -303,7 +303,7 @@ export default function KhoiKhacPhuc3CheDo({
     const map = new Map<string, { maCa: string; tenCa: string; soCauSai: number }>()
     for (const c of dsCauSai2) {
       const ma = c.maCa || 'mac_dinh'
-      const ten = c.tenCa || (c.maCa ? `Ca thi #${c.maCa}` : 'Bài kiểm tra')
+      const ten = c.tenCa || (c.maCa ? `Ca kiểm tra mã ${c.maCa}` : 'Bài kiểm tra')
       const hien = map.get(ma)
       if (hien) {
         hien.soCauSai += 1
@@ -536,12 +536,12 @@ export default function KhoiKhacPhuc3CheDo({
         // Chế độ 1: Rút từ ca đã chọn
         const dsMa = Array.from(cacCaChon)
         if (dsMa.length === 0) {
-          setLoi(vaiTro === 'ph' ? 'Vui lòng chọn ít nhất 1 ca thi để rút câu sai cho con.' : 'Vui lòng chọn ít nhất 1 ca thi để rút câu sai.')
+          setLoi(vaiTro === 'ph' ? 'Vui lòng chọn ít nhất 1 ca kiểm tra để rút câu sai cho con.' : 'Vui lòng chọn ít nhất 1 ca kiểm tra để rút câu sai.')
           return
         }
         const res = await hsCauSaiApi(url, sbd, dsMa)
         if (!res.ok || !res.items || res.items.length === 0) {
-          setLoi(res.error || (vaiTro === 'ph' ? 'Các ca thi đã chọn không có câu sai nào cần khắc phục!' : 'Các ca thi đã chọn không có câu sai nào cần khắc phục!'))
+          setLoi(res.error || (vaiTro === 'ph' ? 'Các ca kiểm tra đã chọn không có câu sai nào cần khắc phục!' : 'Các ca kiểm tra đã chọn không có câu sai nào cần khắc phục!'))
           return
         }
         const { dsCau } = taoDeLamLaiCauSai(res.items as CauSaiDauVao[], {
@@ -578,7 +578,7 @@ export default function KhoiKhacPhuc3CheDo({
       } else if (cheDo === 2) {
         // Chế độ 2: Dạng câu sai — rút câu cùng nhãn dán theo tỷ lệ từ kho
         if (dsCauSaiCheDo2.length === 0) {
-          setLoi(vaiTro === 'ph' ? 'Vui lòng tick chọn ít nhất một ca thi có câu sai của con.' : 'Vui lòng tick chọn ít nhất một ca thi có câu sai.')
+          setLoi(vaiTro === 'ph' ? 'Vui lòng tick chọn ít nhất một ca kiểm tra có câu sai của con.' : 'Vui lòng tick chọn ít nhất một ca kiểm tra có câu sai.')
           return
         }
         if (khoDe2.length === 0) {
@@ -1036,7 +1036,7 @@ export default function KhoiKhacPhuc3CheDo({
       {cheDo === 1 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span>Chọn các ca thi để rút câu làm sai:</span>
+            <span>Chọn các ca kiểm tra để rút câu làm sai:</span>
             <button
               onClick={() => {
                 if (cacCaChon.size === dsLichSu.length) {
@@ -1053,12 +1053,12 @@ export default function KhoiKhacPhuc3CheDo({
 
           {dsLichSu.length === 0 ? (
             <p className="p-4 text-xs text-slate-400 text-center bg-slate-50 dark:bg-slate-800 rounded-xl">
-              Chưa có dữ liệu ca thi nào.
+              Chưa có dữ liệu ca kiểm tra nào.
             </p>
           ) : (
             <div
               role="region"
-              aria-label="Danh sách ca thi chọn rút câu sai"
+              aria-label="Danh sách ca kiểm tra chọn rút câu sai"
               tabIndex={0}
               className="max-h-56 overflow-y-auto space-y-1.5 pr-1"
             >
@@ -1162,7 +1162,7 @@ export default function KhoiKhacPhuc3CheDo({
                   <div className="flex items-center justify-between">
                     <div className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                       <Layers size={14} className="text-blue-500" />
-                      <span>Ca thi có câu sai ({caChonCheDo2.size}/{dsCaThi2.length} ca · {dsCauSaiCheDo2.length} câu sai)</span>
+                      <span>Ca kiểm tra có câu sai ({caChonCheDo2.size}/{dsCaThi2.length} ca · {dsCauSaiCheDo2.length} câu sai)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <button
@@ -1233,7 +1233,7 @@ export default function KhoiKhacPhuc3CheDo({
               {dsCauSaiCheDo2.length === 0 ? (
                 <div className="text-xs text-slate-500 bg-slate-100 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-2">
                   <Info size={14} className="shrink-0" />
-                  Vui lòng tick chọn ít nhất một ca thi ở danh sách trên để tính câu khắc phục.
+                  Vui lòng tick chọn ít nhất một ca kiểm tra ở danh sách trên để tính câu khắc phục.
                 </div>
               ) : tongToiDaCheDo2 > 0 ? (
                 <>

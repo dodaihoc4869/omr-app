@@ -1,4 +1,4 @@
-// Việc C · nhóm C (Code 4): báo cáo ca thi + tiến bộ — BaoCaoCaThiPhuHuynhModal (chỉ phụ huynh), BieuDoTienBoGoogle (biểu đồ, còn app giáo viên dùng), TheTienBo.
+// Việc C · nhóm C (Code 4): báo cáo ca kiểm tra + tiến bộ — BaoCaoCaThiPhuHuynhModal (chỉ phụ huynh), BieuDoTienBoGoogle (biểu đồ, còn app giáo viên dùng), TheTienBo.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import fs from 'node:fs'
@@ -64,7 +64,7 @@ describe('BaoCaoCaThiPhuHuynhModal (chỉ phụ huynh)', () => {
     giaLapMayChu()
     dungPH()
     expect((document.querySelector('.fixed.inset-0') as HTMLElement).classList.contains('m3')).toBe(true)
-    const chip = screen.getByText('Kết quả bài thi của con').closest('div') as HTMLElement
+    const chip = screen.getByText('Kết quả ca kiểm tra của con').closest('div') as HTMLElement
     expect(chip.className).toContain('m3-chip')
     expect(chip.getAttribute('style') || '').not.toMatch(/rgba?\(/)
     expect(chip.getAttribute('data-vai-tro')).toBe('primary')

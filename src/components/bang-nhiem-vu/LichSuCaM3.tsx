@@ -49,8 +49,8 @@ export default function LichSuCaM3({
   return (
     <div className="lsc">
       <div className="lsc-tieu">
-        <h2 className="lsc-h">Lịch sử thi & Báo cáo kết quả</h2>
-        <p className="lsc-phu">Xem điểm chi tiết và báo cáo học tập của tất cả các ca thi em đã tham gia</p>
+        <h2 className="lsc-h">Lịch sử ca kiểm tra & Báo cáo kết quả</h2>
+        <p className="lsc-phu">Xem điểm chi tiết và báo cáo học tập của tất cả các ca kiểm tra em đã tham gia</p>
       </div>
 
       {dangTai ? (
@@ -62,20 +62,20 @@ export default function LichSuCaM3({
       ) : ds.length === 0 ? (
         <div className="lsc-trong">
           <Award size={40} aria-hidden="true" />
-          <h3 className="lsc-trong-ten">Chưa có ca thi nào</h3>
-          <p className="lsc-phu">Em chưa tham gia ca thi nào trên hệ thống hoặc bài thi chưa được đồng bộ.</p>
+          <h3 className="lsc-trong-ten">Chưa có ca kiểm tra nào</h3>
+          <p className="lsc-phu">Em chưa tham gia ca kiểm tra nào trên hệ thống hoặc ca kiểm tra chưa được đồng bộ.</p>
         </div>
       ) : (
-        <div role="region" aria-label="Lịch sử thi và báo cáo" className="lsc-ds">
+        <div role="region" aria-label="Lịch sử ca kiểm tra và báo cáo" className="lsc-ds">
           {ds.map((item) => {
             const muc = mucDiem(item.tong)
             const coDem = typeof item.tongCau === 'number' && item.tongCau > 0
             return (
-              <article key={item.maCa} className="lsc-the" aria-label={item.tenCa || `Ca thi ${item.maCa}`}>
+              <article key={item.maCa} className="lsc-the" aria-label={item.tenCa || `Ca kiểm tra mã ${item.maCa}`}>
                 <div className="lsc-dau">
                   <div className="lsc-ten">
                     <span className="lsc-ma">#{item.maCa}</span>
-                    <h3 className="lsc-ten-ca">{item.tenCa || `Ca thi ${item.maCa}`}</h3>
+                    <h3 className="lsc-ten-ca">{item.tenCa || `Ca kiểm tra mã ${item.maCa}`}</h3>
                   </div>
                   <div className="lsc-diem" data-muc={muc} aria-label={`Điểm ${fmt(item.tong)} trên 10`}>
                     <b>{fmt(item.tong)}</b>

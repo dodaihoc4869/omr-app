@@ -41,7 +41,7 @@ function mauDiem(diem: number | null | undefined): string {
 export default function CardCaThiGanNhat({ ca, onXemBaoCao }: CardCaThiGanNhatProps) {
   return (
     <section
-      aria-label="Kết quả ca thi gần nhất"
+      aria-label="Kết quả ca kiểm tra gần nhất"
       className="rounded-3xl border border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-900/90 p-4 sm:p-5 shadow-xs hover:shadow-md transition space-y-4"
     >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -49,7 +49,7 @@ export default function CardCaThiGanNhat({ ca, onXemBaoCao }: CardCaThiGanNhatPr
           <div className="flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-0.5 rounded-full border border-blue-200/60 dark:border-blue-900/60">
               <Award className="w-3.5 h-3.5 text-amber-500" />
-              <span>Kết quả ca thi gần nhất</span>
+              <span>Kết quả ca kiểm tra gần nhất</span>
             </span>
             <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
               #{ca.maCa}
@@ -63,7 +63,7 @@ export default function CardCaThiGanNhat({ ca, onXemBaoCao }: CardCaThiGanNhatPr
           </div>
 
           <h3 className="font-bold text-slate-900 dark:text-white text-base sm:text-lg mt-1.5">
-            {ca.tenCa || `Ca thi ${ca.maCa}`}
+            {ca.tenCa || `Ca kiểm tra mã ${ca.maCa}`}
           </h3>
         </div>
 
@@ -88,7 +88,7 @@ export default function CardCaThiGanNhat({ ca, onXemBaoCao }: CardCaThiGanNhatPr
             {typeof ca.tongCau === 'number' && ca.tongCau > 0 ? (
               <DongDemCau so={ca} />
             ) : (
-              <span>Bài thi đang được hệ thống xử lý bảng điểm</span>
+              <span>Ca kiểm tra đang được hệ thống xử lý bảng điểm</span>
             )}
           </div>
         </div>

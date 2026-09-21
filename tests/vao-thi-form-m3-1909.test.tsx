@@ -1,4 +1,4 @@
-// VIỆC C · C5 — form "Vào phòng thi trực tuyến" của cổng học sinh mặc Material 3 (VaoThiForm).
+// VIỆC C · C5 — form "Vào ca kiểm tra trực tuyến" của cổng học sinh mặc Material 3 (VaoThiForm).
 // Đổi áo, không đổi xương: `vaoThi` (kiểm mã 4–8 chữ số, trao danh tính đã xác thực + mật khẩu ca cho màn thi) giữ nguyên; chữ, tên nút,
 // `autoFocus`, chỉ nhận chữ số ở ô mã giữ nguyên; đường không phải cổng học sinh giữ đoạn JSX cũ.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -48,11 +48,11 @@ describe('C5 · form vào phòng thi ở cổng học sinh (/hs)', () => {
     render(<StudentPortalScreen />)
     const hop = await moForm()
     expect(hop.querySelector('.vtf')).toBeTruthy()
-    expect(within(hop).getByRole('heading', { name: 'Vào phòng thi trực tuyến' })).toBeTruthy()
-    expect(within(hop).getByLabelText('Mã ca thi (6 chữ số)')).toBeTruthy()
-    expect(within(hop).getByLabelText('Mật khẩu ca thi (nếu ca thi có yêu cầu)')).toBeTruthy()
+    expect(within(hop).getByRole('heading', { name: 'Vào ca kiểm tra trực tuyến' })).toBeTruthy()
+    expect(within(hop).getByLabelText('Mã ca kiểm tra (thường 6 chữ số)')).toBeTruthy()
+    expect(within(hop).getByLabelText('Mật khẩu ca kiểm tra (nếu ca có yêu cầu)')).toBeTruthy()
     expect(hop.querySelector('.vtf-sbd')!.textContent).toBe('Số báo danh đăng nhập của em: 12121212 (Đỗ Minh)')
-    const nut = within(hop).getByRole('button', { name: 'Vào thi ngay' })
+    const nut = within(hop).getByRole('button', { name: 'Vào ca kiểm tra' })
     expect(nut.className).toContain('m3-nut-chinh')
     expect(nut.getAttribute('type')).toBe('submit')
     expect(hop.innerHTML).not.toMatch(/purple/)
@@ -62,7 +62,7 @@ describe('C5 · form vào phòng thi ở cổng học sinh (/hs)', () => {
     datDuong('/hs')
     render(<StudentPortalScreen />)
     const hop = await moForm()
-    const ma = within(hop).getByLabelText('Mã ca thi (6 chữ số)') as HTMLInputElement
+    const ma = within(hop).getByLabelText('Mã ca kiểm tra (thường 6 chữ số)') as HTMLInputElement
     expect(ma.maxLength).toBe(8)
     expect(ma.getAttribute('inputmode')).toBe('numeric')
     expect(ma.required).toBe(true)
@@ -75,10 +75,10 @@ describe('C5 · form vào phòng thi ở cổng học sinh (/hs)', () => {
     datDuong('/hs')
     render(<StudentPortalScreen />)
     const hop = await moForm()
-    const ma = within(hop).getByLabelText('Mã ca thi (6 chữ số)')
+    const ma = within(hop).getByLabelText('Mã ca kiểm tra (thường 6 chữ số)')
     fireEvent.change(ma, { target: { value: '123' } })
     fireEvent.submit(hop.querySelector('form')!)
-    expect((await within(hop).findByRole('alert')).textContent).toBe('Vui lòng nhập mã ca thi hợp lệ (từ 4 đến 8 chữ số)')
+    expect((await within(hop).findByRole('alert')).textContent).toBe('Vui lòng nhập mã ca kiểm tra hợp lệ (từ 4 đến 8 chữ số)')
     expect(screen.queryByTestId('man-thi')).toBeNull()
     fireEvent.change(ma, { target: { value: '543998' } })
     fireEvent.submit(hop.querySelector('form')!)
@@ -90,9 +90,9 @@ describe('C5 · form vào phòng thi ở cổng học sinh (/hs)', () => {
     datDuong('/hs')
     render(<StudentPortalScreen />)
     const hop = await moForm()
-    fireEvent.change(within(hop).getByLabelText('Mã ca thi (6 chữ số)'), { target: { value: '543998' } })
-    fireEvent.change(within(hop).getByLabelText('Mật khẩu ca thi (nếu ca thi có yêu cầu)'), { target: { value: '  mk123  ' } })
-    fireEvent.click(within(hop).getByRole('button', { name: 'Vào thi ngay' }))
+    fireEvent.change(within(hop).getByLabelText('Mã ca kiểm tra (thường 6 chữ số)'), { target: { value: '543998' } })
+    fireEvent.change(within(hop).getByLabelText('Mật khẩu ca kiểm tra (nếu ca có yêu cầu)'), { target: { value: '  mk123  ' } })
+    fireEvent.click(within(hop).getByRole('button', { name: 'Vào ca kiểm tra' }))
     expect(await screen.findByTestId('man-thi')).toBeTruthy()
     expect(mocks.tuCong).toHaveBeenLastCalledWith({ maCa: '543998', sbd: '12121212', hoTen: 'Đỗ Minh', namSinh: '2008', lop: '12A1', matKhau: 'mk123' })
   })
@@ -101,8 +101,8 @@ describe('C5 · form vào phòng thi ở cổng học sinh (/hs)', () => {
     datDuong('/hs')
     render(<StudentPortalScreen />)
     const hop = await moForm()
-    fireEvent.change(within(hop).getByLabelText('Mã ca thi (6 chữ số)'), { target: { value: '543998' } })
-    fireEvent.click(within(hop).getByRole('button', { name: 'Vào thi ngay' }))
+    fireEvent.change(within(hop).getByLabelText('Mã ca kiểm tra (thường 6 chữ số)'), { target: { value: '543998' } })
+    fireEvent.click(within(hop).getByRole('button', { name: 'Vào ca kiểm tra' }))
     await screen.findByTestId('man-thi')
     expect(mocks.tuCong.mock.calls.at(-1)![0].matKhau).toBe('')
   })
@@ -129,7 +129,7 @@ describe('C5 · thành phần độc lập và cô lập', () => {
     render(<StudentPortalScreen />)
     const hop = await moForm()
     expect(hop.querySelector('.vtf')).toBeNull()
-    expect(within(hop).getByRole('button', { name: 'Vào thi ngay' }).className).toContain('btn-google-primary')
+    expect(within(hop).getByRole('button', { name: 'Vào ca kiểm tra' }).className).toContain('btn-google-primary')
   })
 
   const css = fs.readFileSync(path.join(process.cwd(), 'src/components/bang-nhiem-vu/vao-thi-form.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')

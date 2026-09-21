@@ -37,9 +37,9 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
         <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto">
           <TrendingUp className="w-6 h-6" />
         </div>
-        <h3 className="font-bold text-slate-800 dark:text-slate-200 text-base">Chưa có bài thi nào</h3>
+        <h3 className="font-bold text-slate-800 dark:text-slate-200 text-base">Chưa có ca kiểm tra nào</h3>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-          Em chưa có bài thi nào đã nộp hoặc được chấm điểm trong hệ thống.
+          Em chưa có ca kiểm tra nào đã nộp hoặc được chấm điểm trong hệ thống.
         </p>
       </div>
     )
@@ -81,11 +81,11 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                 <TrendingUp className="w-5 h-5" />
               </span>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                Mức độ tiến bộ qua các ca thi
+                Mức độ tiến bộ qua các ca kiểm tra
               </h2>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Phân tích và theo dõi xu hướng điểm số trực quan của tất cả {n} ca thi
+              Phân tích và theo dõi xu hướng điểm số trực quan của tất cả {n} ca kiểm tra
             </p>
           </div>
 
@@ -290,7 +290,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
           {/* CHÚ THÍCH ĐƯỜNG VẼ */}
           <div className="flex items-center justify-center flex-wrap gap-5 pt-2 text-xs text-slate-500 dark:text-slate-400">
             <span className="inline-flex items-center gap-1.5 font-medium">
-              <span className="w-3.5 h-1 rounded-full bg-blue-600 inline-block" /> Điểm từng ca thi
+              <span className="w-3.5 h-1 rounded-full bg-blue-600 inline-block" /> Điểm từng ca kiểm tra
             </span>
             <span className="inline-flex items-center gap-1.5 font-medium">
               <span className="w-3.5 h-0 border-t-2 border-dashed border-amber-600 inline-block" /> Xu hướng trung bình
@@ -330,7 +330,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
       {/* DANH SÁCH TẤT CẢ CÁC CA THI */}
       <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-3">
         <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm">
-          Lịch sử điểm tất cả các ca thi ({n})
+          Lịch sử điểm tất cả các ca kiểm tra ({n})
         </h3>
 
         <div className="space-y-2">

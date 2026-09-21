@@ -128,7 +128,7 @@ describe('một nút nổi bật', () => {
 
   it('ca đang mở: nút Vào thi đổi sang tertiary + chấm nhịp, vẫn là tonal', async () => {
     const { container } = ve({ caDangMo: true })
-    const fab = screen.getByRole('button', { name: 'Vào thi · ca đang mở' })
+    const fab = screen.getByRole('button', { name: 'Vào ca kiểm tra (đang mở)' })
     expect(fab.getAttribute('data-ca-mo')).toBe('true')
     expect(fab.querySelector('.bnv-fab-cham')).not.toBeNull()
     expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)

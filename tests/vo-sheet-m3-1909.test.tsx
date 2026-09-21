@@ -47,7 +47,7 @@ const moMan = async (nhan: string) => {
 const tam = () => document.querySelector('.fixed.inset-0.z-50') as HTMLElement
 
 const TAB: [string, string][] = [
-  ['Xem điểm & lịch sử ca thi', 'Xem điểm & lịch sử ca thi'],
+  ['Xem điểm & lịch sử ca kiểm tra', 'Xem điểm & lịch sử ca kiểm tra'],
   ['Bài tập về nhà', 'Bài tập về nhà'],
   ['Bài gia đình giao', 'Bài gia đình giao'],
   ['Khắc phục lỗi sai', 'Khắc phục lỗi sai & luyện đề'],

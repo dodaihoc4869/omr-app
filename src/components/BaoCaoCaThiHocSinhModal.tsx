@@ -278,10 +278,10 @@ export default function BaoCaoCaThiHocSinhModal({
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200/60 dark:border-blue-800/60 mb-1.5">
               <Sparkles className="w-3 h-3 text-blue-500" />
-              <span>Báo cáo kết quả ca thi #{baiThi.maCa}</span>
+              <span>Báo cáo kết quả ca kiểm tra (mã {baiThi.maCa})</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-              {baiThi.tenCa || `Ca thi #${baiThi.maCa}`}
+              {baiThi.tenCa || `Ca kiểm tra mã ${baiThi.maCa}`}
             </h2>
             <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
               Học sinh: <strong>{hoTen}</strong> (SBD: <strong>{sbd}</strong>) {lop ? `· Lớp: ${lop}` : ''} {baiThi.ngayThi ? `· ${baiThi.ngayThi}` : ''}
@@ -325,7 +325,7 @@ export default function BaoCaoCaThiHocSinhModal({
                     </div>
                   ) : (
                     <div className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-                      {(soSai ?? 0) > 0 ? `Sai ${soSai} câu` : 'Bài thi đã hoàn thành'}
+                      {(soSai ?? 0) > 0 ? `Sai ${soSai} câu` : 'Ca kiểm tra đã hoàn thành'}
                     </div>
                   )}
                   {/* VÌ SAO EM CÓ ĐIỂM MÀ KHÔNG CÂU NÀO ĐÚNG TRỌN — phần II
@@ -489,7 +489,7 @@ export default function BaoCaoCaThiHocSinhModal({
                         Tuyệt đối xuất sắc: Đúng tất cả {tongCau} câu!
                       </div>
                       <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
-                        Chúc mừng em đã hoàn thành trọn vẹn và chính xác tất cả các câu trong ca thi này.
+                        Chúc mừng em đã hoàn thành trọn vẹn và chính xác tất cả các câu trong ca kiểm tra này.
                       </div>
                     </>
                   ) : (soBoTrong ?? 0) > 0 ? (
@@ -506,10 +506,10 @@ export default function BaoCaoCaThiHocSinhModal({
                     <>
                       <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto mb-2" />
                       <div className="text-base font-bold text-emerald-800 dark:text-emerald-200">
-                        Không có câu sai nào trong ca thi này!
+                        Không có câu sai nào trong ca kiểm tra này!
                       </div>
                       <div className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
-                        Chúc mừng em đã làm đúng tất cả các câu đã nộp trong ca thi này.
+                        Chúc mừng em đã làm đúng tất cả các câu đã nộp trong ca kiểm tra này.
                       </div>
                     </>
                   )}

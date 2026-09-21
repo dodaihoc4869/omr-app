@@ -320,7 +320,7 @@ export default function ParentPortalScreen() {
             setDsBaiThi(
               ls.items.map((c: any) => ({
                 maCa: c.maCa || '',
-                tenCa: c.tenCa || `Ca thi #${c.maCa}`,
+                tenCa: c.tenCa || `Ca kiểm tra mã ${c.maCa}`,
                 ngayNop: c.nopLuc || '',
                 diem: typeof c.tong === 'number' ? c.tong : (typeof c.diem === 'number' ? c.diem : 0),
                 tong: typeof c.tong === 'number' ? c.tong : (typeof c.diem === 'number' ? c.diem : 0),
@@ -543,12 +543,12 @@ export default function ParentPortalScreen() {
 
       if (dsCauSai.length === 0) {
         // Rỗng vì KHÔNG SAI CÂU NÀO và rỗng vì GỌI HỎNG là hai chuyện khác nhau.
-        const chu = loiGoi || 'Con chưa có câu sai nào trong các ca thi đã hoàn thành!'
+        const chu = loiGoi || 'Con chưa có câu sai nào trong các ca kiểm tra đã hoàn thành!'
         setThongBaoMom({ loai: 'loi', chu })
         return
       }
 
-      setTieuDeCaMom('Tất cả các ca thi')
+      setTieuDeCaMom('Tất cả các ca kiểm tra')
       setDsCauSaiModalMom(dsCauSai)
     } catch (e) {
       setThongBaoMom({
@@ -564,7 +564,7 @@ export default function ParentPortalScreen() {
   const xuLyTaoBaiCuaMomTuCa = (dsCauSaiCa: any[], maCa?: string) => {
     if (!sbdHienTai) return
     if (Array.isArray(dsCauSaiCa) && dsCauSaiCa.length > 0) {
-      setTieuDeCaMom(maCa ? `Ca thi #${maCa}` : 'Ca thi đã chọn')
+      setTieuDeCaMom(maCa ? `Ca kiểm tra mã ${maCa}` : 'Ca kiểm tra đã chọn')
       setDsCauSaiModalMom(dsCauSaiCa)
     } else {
       void xuLyTaoBaiCuaMom()
@@ -707,7 +707,7 @@ export default function ParentPortalScreen() {
             <div className="flex items-center gap-2 min-w-0 order-last basis-full sm:order-none sm:basis-auto sm:flex-1 sm:max-w-md">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
               <h2 className="font-bold text-xs sm:text-base text-slate-900 dark:text-white truncate">
-                {tabPh === 'diem' && 'Báo Cáo Điểm Tất Cả Các Ca Thi'}
+                {tabPh === 'diem' && 'Báo Cáo Điểm Tất Cả Các Ca Kiểm Tra'}
                 {tabPh === 'khacphuc' && 'Khắc Phục Lỗi Sai & Luyện Đề (4 Lựa Chọn)'}
                 {tabPh === 'bantin' && 'Bảng tin của con'}
               </h2>
@@ -748,14 +748,14 @@ export default function ParentPortalScreen() {
                 <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
                   <div>
                     <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                      Báo Cáo Điểm Các Ca Thi Của Con
+                      Báo Cáo Điểm Các Ca Kiểm Tra Của Con
                     </h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Kết quả và chi tiết tất cả các ca thi con đã nộp
+                      Kết quả và chi tiết tất cả các ca kiểm tra con đã nộp
                     </p>
                   </div>
                   <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3 py-1.5 rounded-full border border-blue-100 dark:border-blue-900">
-                    {dsBaiThi.length} ca thi
+                    {dsBaiThi.length} ca kiểm tra
                   </span>
                 </div>
 
@@ -764,7 +764,7 @@ export default function ParentPortalScreen() {
                   {dsBaiThi.length === 0 ? (
                     <div className="p-12 text-center text-slate-400 flex flex-col items-center gap-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
                       <BookOpen size={40} className="text-slate-300 dark:text-slate-700" />
-                      <p className="text-sm font-medium">Chưa có kết quả ca thi nào của con được ghi nhận.</p>
+                      <p className="text-sm font-medium">Chưa có kết quả ca kiểm tra nào của con được ghi nhận.</p>
                     </div>
                   ) : (
                     dsBaiThi.map((b) => (

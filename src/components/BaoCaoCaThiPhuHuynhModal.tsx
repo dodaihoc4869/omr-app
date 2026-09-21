@@ -248,7 +248,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
     if (diem >= 9.0) {
       return {
         tieuDe: `Điểm ca này cao: ${d}/10`,
-        loiNhan: `Em ${hoTenCon} được ${d}/10 điểm ở ca thi này. Phụ huynh hãy ghi nhận cố gắng của con, đồng thời khuyến khích con thử sức thêm với các dạng bài vận dụng cao.`,
+        loiNhan: `Em ${hoTenCon} được ${d}/10 điểm ở ca kiểm tra này. Phụ huynh hãy ghi nhận cố gắng của con, đồng thời khuyến khích con thử sức thêm với các dạng bài vận dụng cao.`,
         viecCanLam: 'Luyện thêm các bài toán phân hóa khó của các đề thi thử trường chuyên để tối ưu tốc độ.',
       }
     }
@@ -268,7 +268,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
     }
     return {
       tieuDe: `Điểm ca này ${d}/10, còn nhiều câu cần chữa`,
-      loiNhan: `Ca thi này con được ${d}/10 điểm. Phụ huynh đừng tạo áp lực mà hãy cùng Thầy đồng hành: xem lại lời giải chi tiết của từng câu sai và làm đều đặn bài tập mỗi tối.`,
+      loiNhan: `Ca kiểm tra này con được ${d}/10 điểm. Phụ huynh đừng tạo áp lực mà hãy cùng Thầy đồng hành: xem lại lời giải chi tiết của từng câu sai và làm đều đặn bài tập mỗi tối.`,
       viecCanLam: 'Tạo bài tập 10-15 câu mỗi ngày từ các câu con sai để con làm lại từng bước một.',
     }
   }, [diem, hoTenCon])
@@ -381,7 +381,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
               <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/50 dark:from-slate-800/80 dark:via-slate-900 dark:to-indigo-950/40 border border-blue-100 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div className="space-y-3 text-center sm:text-left">
                   <div className="m3-chip uppercase tracking-wider" data-vai-tro="primary">
-                    <Award size={14} /> Kết quả bài thi của con
+                    <Award size={14} /> Kết quả ca kiểm tra của con
                   </div>
                   <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
                     {hoTenCon}
@@ -603,16 +603,16 @@ export default function BaoCaoCaThiPhuHuynhModal({
                 <div className="p-8 rounded-3xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 text-center space-y-2">
                   <CheckCircle2 size={36} className="text-emerald-600 dark:text-emerald-400 mx-auto" />
                   <h4 className="font-bold text-sm text-emerald-900 dark:text-emerald-200">
-                    Không có câu sai nào được ghi nhận trong ca thi này!
+                    Không có câu sai nào được ghi nhận trong ca kiểm tra này!
                   </h4>
                   <p className="text-xs text-emerald-700 dark:text-emerald-300 max-w-md mx-auto">
-                    Con đã làm đúng tuyệt đối hoặc ca thi không có lỗi sai cần khắc phục.
+                    Con đã làm đúng tuyệt đối hoặc ca kiểm tra không có lỗi sai cần khắc phục.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 px-1">
-                    <span>Tổng số <strong>{dsCauSai.length}</strong> câu con làm sai trong ca thi #{baiThi.maCa}:</span>
+                    <span>Tổng số <strong>{dsCauSai.length}</strong> câu con làm sai trong ca kiểm tra (mã {baiThi.maCa}):</span>
                     <button
                       type="button"
                       onClick={() => setHienModalKhacPhuc(true)}

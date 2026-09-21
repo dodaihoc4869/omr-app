@@ -71,7 +71,7 @@ describe('BangTinPhuHuynh dưới M3', () => {
     giaLap()
     const onSelectTab = vi.fn()
     dung({ onSelectTab })
-    fireEvent.click((await screen.findByText('Điểm ca thi gần nhất')).closest('button')!)
+    fireEvent.click((await screen.findByText('Điểm ca kiểm tra gần nhất')).closest('button')!)
     expect(onSelectTab).toHaveBeenCalledWith('diem')
     for (const t of ['Bài hôm nay', 'Câu cần ôn', 'Chờ làm']) expect(screen.getByText(t)).toBeTruthy()
   })

@@ -674,7 +674,7 @@ const TEN_LOAI: Record<string, string> = {
   btvn_lo: 'Chặng bài tập về nhà',
   mom: 'Bài gia đình giao',
   on_lai: 'Ôn câu tới hạn nhắc lại',
-  on_thi: 'Ôn trước ca thi',
+  on_thi: 'Ôn trước ca kiểm tra',
   than_thu: 'Thần thú: luyện dạng còn yếu',
 }
 

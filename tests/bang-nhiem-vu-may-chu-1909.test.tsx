@@ -237,7 +237,7 @@ describe('StudentPortalScreen thật: nối kế hoạch máy chủ và "ca đan
     tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
     tra['/hs/ca-dang-mo'] = { body: { ok: true, coCaMo: true, soCa: 1 } }
     const { container } = render(<StudentPortalScreen />)
-    const fab = await screen.findByRole('button', { name: /Vào thi · ca đang mở/ })
+    const fab = await screen.findByRole('button', { name: /Vào ca kiểm tra \(đang mở\)/ })
     expect(fab.getAttribute('data-ca-mo')).toBe('true')
     expect(fab.querySelector('.bnv-fab-cham')).not.toBeNull()
     expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1)
@@ -436,18 +436,18 @@ describe('C11 · việc on_lai mở màn LamCauOn với ĐÚNG câu máy chủ c
     await waitFor(() => expect(goiTheo('/hs/ke-hoach-ngay').length).toBeGreaterThan(truoc))
   })
 
-  it('việc on_thi (ôn trước ca thi) có chiTiet.qid: bấm "Ôn ngay" cũng mở LamCauOn, gọi /hs/cau-theo-qid với ĐÚNG qid của việc — không mở luồng khắc phục cũ', async () => {
+  it('việc on_thi (ôn trước ca kiểm tra) có chiTiet.qid: bấm "Ôn ngay" cũng mở LamCauOn, gọi /hs/cau-theo-qid với ĐÚNG qid của việc — không mở luồng khắc phục cũ', async () => {
     datDuong('/hs')
     localStorage.setItem('omr_student_portal_auth', JSON.stringify({ sbd: 'test', hoTen: 'Em thử', token: 'test-token' }))
     mocks.items = []
     mocks.momItems = []
     const qid = ['thi-1', 'thi-2']
-    const viecThi = { ...KE_HOACH.viec[0], id: 'on_thi:CA1', loai: 'on_thi', soCau: 2, ghiChu: 'Ôn trước ca thi', chiTiet: { qid } }
+    const viecThi = { ...KE_HOACH.viec[0], id: 'on_thi:CA1', loai: 'on_thi', soCau: 2, ghiChu: 'Ôn trước ca kiểm tra', chiTiet: { qid } }
     tra['/hs/ke-hoach-ngay'] = { body: { ...KE_HOACH, viec: [viecThi] } }
-    tra['/hs/cau-theo-qid'] = { body: { ok: true, cau: [{ qid: qid[0], phan: 'I', text: 'Câu ôn trước ca thi phải hiện', choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [] }], khongCo: [] } }
+    tra['/hs/cau-theo-qid'] = { body: { ok: true, cau: [{ qid: qid[0], phan: 'I', text: 'Câu ôn trước ca kiểm tra phải hiện', choices: ['a', 'b', 'c', 'd'], ideas: [], hinhAnh: [] }], khongCo: [] } }
     render(<StudentPortalScreen />)
     fireEvent.click(await screen.findByRole('button', { name: /Ôn ngay/ }))
-    expect(await screen.findByText('Câu ôn trước ca thi phải hiện')).toBeTruthy()
+    expect(await screen.findByText('Câu ôn trước ca kiểm tra phải hiện')).toBeTruthy()
     expect(goiTheo('/hs/cau-theo-qid')[0].body).toEqual({ token: 'test-token', qid })
     expect(goiTheo('/hs/cau-sai').length).toBe(0)
   })

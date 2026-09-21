@@ -192,7 +192,7 @@ export default function ModalKhacPhucCauSai({
     const map = new Map<string, { maCa: string; tenCa: string; soCauSai: number }>()
     for (const c of dsCauSai) {
       const ma = c.maCa || 'mac_dinh'
-      const ten = c.tenCa || (c.maCa ? `Ca thi #${c.maCa}` : 'Bài kiểm tra')
+      const ten = c.tenCa || (c.maCa ? `Ca kiểm tra mã ${c.maCa}` : 'Bài kiểm tra')
       const hien = map.get(ma)
       if (hien) {
         hien.soCauSai += 1
@@ -618,7 +618,7 @@ export default function ModalKhacPhucCauSai({
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
                         <Layers className="w-3.5 h-3.5 text-blue-600" />
-                        <span>Ca thi của học sinh ({caChonCheDo2.size}/{dsCaThi.length} ca · {dsCauSaiCheDo2.length} câu sai)</span>
+                        <span>Ca kiểm tra của học sinh ({caChonCheDo2.size}/{dsCaThi.length} ca · {dsCauSaiCheDo2.length} câu sai)</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <button
@@ -699,7 +699,7 @@ export default function ModalKhacPhucCauSai({
                 {dsCauSaiCheDo2.length === 0 ? (
                   <div className="text-xs text-slate-500 bg-slate-100 p-3 rounded-xl border border-slate-200 flex items-center gap-2">
                     <Info className="w-4 h-4 shrink-0" />
-                    Vui lòng tick chọn ít nhất một ca thi ở danh sách trên để tính câu khắc phục.
+                    Vui lòng tick chọn ít nhất một ca kiểm tra ở danh sách trên để tính câu khắc phục.
                   </div>
                 ) : tongToiDaCheDo2 > 0 ? (
                   <div className="space-y-2">

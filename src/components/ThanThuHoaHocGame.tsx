@@ -827,7 +827,7 @@ export default function ThanThuHoaHocGame({
 
     setOngDayKhongNhan(0)
     const TEN_VIEC: Record<NguonKiemExp, string> = {
-      caThi: 'ca thi', btvn: 'bài tập', mom: 'bài MOM', leoThap: 'tầng tháp', sanBoss: 'quái câu sai',
+      caThi: 'ca kiểm tra', btvn: 'bài tập', mom: 'bài MOM', leoThap: 'tầng tháp', sanBoss: 'quái câu sai',
     }
     for (const g of gom) {
       if (g.exp > 0) themVaoKho(g.exp, g.nguon, `${g.so} ${TEN_VIEC[g.nguon]}`)
@@ -1827,7 +1827,7 @@ export default function ThanThuHoaHocGame({
                 </div>
                 <div className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
                   {/* Chưa có dữ liệu thì NÓI LÀ CHƯA CÓ, không in 7.00đ và 80% */}
-                  • Điểm trung bình ca thi:{' '}
+                  • Điểm trung bình ca kiểm tra:{' '}
                   <strong>
                     {chiSoHocTap.diemTb === null
                       ? 'chưa thi ca nào'
@@ -2358,7 +2358,7 @@ export default function ThanThuHoaHocGame({
                 className="btn-google-primary !bg-purple-600 hover:!bg-purple-700 text-white text-xs py-1.5 px-3 rounded-full flex items-center gap-1 cursor-pointer"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>Vào phòng thi</span>
+                <span>Vào ca kiểm tra</span>
               </button>
               <button
                 onClick={onChuyenSangBtvn}
@@ -2474,7 +2474,7 @@ export default function ThanThuHoaHocGame({
                 <div className="font-bold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
                   <span>🥚</span> Nuôi Thần Thú & Nhận EXP
                 </div>
-                <p>Mỗi câu Hoá học làm đúng trong ca thi, BTVN và bài luyện khắc phục tự động cộng <b>2 EXP</b> cho Thần thú. Tích đủ EXP để tăng cấp độ và tiến hoá lên các bậc cao hơn.</p>
+                <p>Mỗi câu Hoá học làm đúng trong ca kiểm tra, BTVN và bài luyện khắc phục tự động cộng <b>2 EXP</b> cho Thần thú. Tích đủ EXP để tăng cấp độ và tiến hoá lên các bậc cao hơn.</p>
               </div>
 
               <div className="p-3.5 rounded-2xl bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-900/40 space-y-1">

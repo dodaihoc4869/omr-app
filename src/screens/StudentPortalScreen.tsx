@@ -1074,7 +1074,7 @@ export default function StudentPortalScreen() {
         return
       }
 
-      setTieuDeKhacPhucModal(dsMaCa.length === 1 ? `Ca thi #${dsMaCa[0]}` : `${dsMaCa.length} ca thi đã chọn`)
+      setTieuDeKhacPhucModal(dsMaCa.length === 1 ? `Ca kiểm tra mã ${dsMaCa[0]}` : `${dsMaCa.length} ca kiểm tra đã chọn`)
       setDsCauSaiKhacPhucModal(res.items as CauSaiDauVao[])
     } catch {}
   }
@@ -1084,7 +1084,7 @@ export default function StudentPortalScreen() {
     if (e) e.preventDefault()
     const ma = maCaVaoThi.trim()
     if (!ma || ma.length < 4) {
-      setLoiVaoThi('Vui lòng nhập mã ca thi hợp lệ (từ 4 đến 8 chữ số)')
+      setLoiVaoThi('Vui lòng nhập mã ca kiểm tra hợp lệ (từ 4 đến 8 chữ số)')
       return
     }
     setLoiVaoThi('')
@@ -1269,11 +1269,11 @@ export default function StudentPortalScreen() {
   // Vỏ M3 của sheet toàn màn: chỉ ở cổng học sinh (dungM3) và không phải game (game thần thú giữ nguyên, test khoá).
   const vaoM3 = dungM3() && tab !== 'thanthu'
   const tieuSheet =
-    tab === 'diem' ? 'Xem điểm & lịch sử ca thi'
+    tab === 'diem' ? 'Xem điểm & lịch sử ca kiểm tra'
     : tab === 'btvn' ? 'Bài tập về nhà'
     : tab === 'mom' ? 'Bài gia đình giao'
     : tab === 'khacphuc' ? 'Khắc phục lỗi sai & luyện đề'
-    : tab === 'vaothi' ? 'Vào phòng thi trực tuyến'
+    : tab === 'vaothi' ? 'Vào ca kiểm tra trực tuyến'
     : tab === 'cauon' ? 'Ôn câu hôm nay'
     : 'Bảng tin & bài luyện hôm nay'
 
@@ -1355,7 +1355,7 @@ export default function StudentPortalScreen() {
             <div className="flex items-center gap-2 min-w-0 max-w-[200px] sm:max-w-md">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
               <h2 className="font-bold text-xs sm:text-base text-slate-900 dark:text-white truncate">
-                {tab === 'diem' && 'Xem Điểm & Lịch Sử Ca Thi'}
+                {tab === 'diem' && 'Xem Điểm & Lịch Sử Ca Kiểm Tra'}
                 {tab === 'btvn' && 'Bài Tập Về Nhà'}
                 {tab === 'mom' && 'Bài gia đình giao (120 phút từ khi bắt đầu)'}
                 {tab === 'khacphuc' && 'Khắc Phục Lỗi Sai & Luyện Đề'}
@@ -1422,10 +1422,10 @@ export default function StudentPortalScreen() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                  Lịch sử thi & Báo cáo kết quả
+                  Lịch sử ca kiểm tra & Báo cáo kết quả
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Xem điểm chi tiết và báo cáo học tập của tất cả các ca thi em đã tham gia
+                  Xem điểm chi tiết và báo cáo học tập của tất cả các ca kiểm tra em đã tham gia
                 </p>
               </div>
             </div>
@@ -1439,14 +1439,14 @@ export default function StudentPortalScreen() {
               <div className="p-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-center">
                 <Award className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
                 <h3 className="font-semibold text-slate-800 dark:text-slate-200 text-sm">
-                  Chưa có ca thi nào
+                  Chưa có ca kiểm tra nào
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
-                  Em chưa tham gia ca thi nào trên hệ thống hoặc bài thi chưa được đồng bộ.
+                  Em chưa tham gia ca kiểm tra nào trên hệ thống hoặc ca kiểm tra chưa được đồng bộ.
                 </p>
               </div>
             ) : (
-              <div role="region" aria-label="Lịch sử thi và báo cáo" tabIndex={0} className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-3 sm:p-4">
+              <div role="region" aria-label="Lịch sử ca kiểm tra và báo cáo" tabIndex={0} className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto overscroll-contain rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-3 sm:p-4">
                 {dsLichSu.map((item) => (
                   <div
                     key={item.maCa}
@@ -1459,7 +1459,7 @@ export default function StudentPortalScreen() {
                             #{item.maCa}
                           </span>
                           <h3 className="font-bold text-slate-900 dark:text-white text-base mt-1.5">
-                            {item.tenCa || `Ca thi ${item.maCa}`}
+                            {item.tenCa || `Ca kiểm tra mã ${item.maCa}`}
                           </h3>
                         </div>
                         <div
@@ -2137,10 +2137,10 @@ export default function StudentPortalScreen() {
                   <LogIn className="w-6 h-6" />
                 </div>
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                  Vào phòng thi trực tuyến
+                  Vào ca kiểm tra trực tuyến
                 </h2>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Nhập mã ca thi từ Thầy và mật khẩu ca (nếu có) để bắt đầu làm bài
+                  Nhập mã ca kiểm tra từ Thầy và mật khẩu ca (nếu có) để bắt đầu làm bài
                 </p>
               </div>
 
@@ -2154,7 +2154,7 @@ export default function StudentPortalScreen() {
               <form onSubmit={vaoThi} className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Mã ca thi (6 chữ số)
+                    Mã ca kiểm tra (thường 6 chữ số)
                   </label>
                   <input
                     type="text"
@@ -2170,13 +2170,13 @@ export default function StudentPortalScreen() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                    Mật khẩu ca thi (nếu ca thi có yêu cầu)
+                    Mật khẩu ca kiểm tra (nếu ca có yêu cầu)
                   </label>
                   <input
                     type="password"
                     value={matKhauCaVaoThi}
                     onChange={(e) => setMatKhauCaVaoThi(e.target.value)}
-                    placeholder="Nhập mật khẩu ca thi (để trống nếu không có)..."
+                    placeholder="Nhập mật khẩu ca kiểm tra (để trống nếu không có)..."
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                   />
                 </div>
@@ -2190,7 +2190,7 @@ export default function StudentPortalScreen() {
                   className="w-full py-3 px-4 rounded-full btn-google-primary !bg-purple-600 hover:!bg-purple-700 !border-purple-600 text-white font-semibold text-sm shadow-sm flex items-center justify-center gap-2 mt-2 cursor-pointer"
                 >
                   <LogIn className="w-4 h-4" />
-                  <span>Vào thi ngay</span>
+                  <span>Vào ca kiểm tra</span>
                 </button>
               </form>
             </div>
