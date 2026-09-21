@@ -22,14 +22,18 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Câu cả lớp cùng làm | **Câu cốt lõi** | lõi, core |
 | Câu chọn riêng cho em | **Câu dành riêng cho em** | riêng, cá nhân hoá |
 | Câu cao hơn bậc của em | **Câu thử thách (sai không sao)** · **Thử sức thêm (không bắt buộc)** | loi_cao, bonus |
-| Ba mức của một dạng | **Biết · Hiểu · Vận dụng** | NB/TH/VD, bậc 0/1/2 |
+| Ba mức của một dạng | Bậc thang của em (BTVN nâng đỡ, Bộ não A.I): **bậc Biết · Hiểu · Vận dụng**. Nhãn mức độ của CÂU trên phiếu/đề: **Nhận biết · Thông hiểu · Vận dụng** (chữ quen của chương trình) | NB/TH/VD, bậc 0/1/2 |
 | Làm lại câu từng sai theo lịch | **Ôn lại** | on_lai, khắc phục (trừ phiếu "Khắc phục sau ca" đã quen) |
 | Con vật đồng hành | **Thần thú** ("Thần thú của em: <biệt danh>") | pet, spirit, linh thú |
 | Thanh sức của thần thú / quái | **Máu** ("Máu 83/100") | HP, số trơn |
 | Điểm tích luỹ do học | **EXP** ("+46 EXP hôm nay") | điểm, xp |
-| Vật chống bị trừ chuỗi | **Khiên** · **Mảnh khiên 3/12** | shield |
+| Vật bảo vệ trong game | **Khiên** + MỘT dòng phụ nói đúng tác dụng thật bằng chữ thường (đọc mã rồi viết, không đoán) · **Mảnh khiên 3/12** | shield, "khiên chống đuổi" đứng một mình |
 | Số ngày học liên tục | **Chuỗi ngày** ("Chuỗi 5 ngày") | streak |
-| Trò chơi cả lớp | **Đoàn Hộ Tống** · **Trạm 4/30** | escort, stage |
+| Trò chơi cả lớp | **Đoàn Hộ Tống** (tên trò duy nhất; "Linh Tâm" là vật được hộ tống) · một lần chơi = **Chuyến hộ tống** · trong chuyến có các **Hiệp** · tiến độ lớp = **Trạm 4/30** | escort, stage, "Hộ Tống Linh Tâm" làm tên trò, "chặng" (dành cho BTVN) |
+| Trò chơi một mình | **Đảo thần thú** · một lần chơi = **Chuyến thám hiểm** (6 ải) · **Ải** = một câu trong chuyến | lượt, màn, level |
+| Đấu cuối tuần (nếu còn đường vào) | **Võ đài thứ Bảy** | arena |
+| Bài phụ huynh giao cho con | **Bài gia đình giao** (tiêu đề ĐÃ LƯU trong dữ liệu cũ giữ nguyên) | Mom, Mẹ giao, bài của Mom |
+| Lịch làm lại câu sai (màn HS/PH) | **đến lịch ôn lại** · **chuyển sang lịch ôn xa hơn** | hạn ôn, lên bậc ôn, tụt bậc (chỉ app thầy) |
 | Trợ lý AI của từng em | **Bộ não A.I hỗ trợ riêng em <họ tên>** | bộ não (trơn), HLV, AI coach |
 | Chế độ chưa tác động học sinh | **Chạy thử** | chạy bóng, shadow |
 | Thầy nhắc em chưa nộp | **Cảnh báo của thầy** | push, notice |
