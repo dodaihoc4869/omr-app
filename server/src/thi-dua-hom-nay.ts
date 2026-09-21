@@ -31,6 +31,12 @@ const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : Stri
 const so = (v: unknown): number => Number(v) || 0
 const json = (v: unknown): string => JSON.stringify(v)
 
+/**
+ * Các em có câu ĐÃ CHẤM hôm nay (từ mốc hiển thị): `bind(mốc ISO, ngày VN)` — THỨ TỰ THAM SỐ (luc trước, ngày sau).
+ * Cùng tập em với `SELECT DISTINCT sbd … WHERE ngay_vn = ? AND luc >= ? AND ket_qua IS NOT NULL`, nhưng bọc truy vấn con `LIMIT -1` để SQLite đi chỉ mục phủ `idx_skh_luc(luc, …)` (chỉ các sự kiện hôm nay)
+ * thay vì quét cả sổ theo `idx_skh_em_ngay` (DISTINCT ưa chỉ mục đứng đầu bằng sbd): đo 21/09 trên D1 thật 29.156 → ~1,8 nghìn dòng/lần. Thiếu chỉ mục vẫn chạy đúng (chậm hơn).
+ */
+export const SQL_EM_DA_HOC_HOM_NAY = 'SELECT DISTINCT sbd FROM (SELECT sbd, ngay_vn FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL LIMIT -1) WHERE ngay_vn = ?'
 /** Tài khoản thử của hệ thống — không tính vào lớp (khớp `SBD_THU` của gv-bang-tin.ts; test giữ hai chỗ khớp nhau, không nhập chéo để tránh vòng nhập). */
 export const SBD_THU_NGHIEM = '12121212'
 export const TOP_TOI_DA = 3
@@ -278,7 +284,7 @@ async function docLopXemThu(env: Env, nowMs: number, moc: MocHienThi): Promise<{
   const cfg = await tat(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'thi_dua_lop_xem_thu'").first<Dong>(), null)
   let lop = chuoi(cfg?.gia_tri)
   if (!lop || !soEmCuaLop.has(lop)) {
-    const rHoc = await tat(() => env.DB.prepare('SELECT DISTINCT sbd FROM su_kien_hoc WHERE ngay_vn = ? AND luc >= ? AND ket_qua IS NOT NULL').bind(ngayVn(nowMs), moc.iso).all<Dong>(), rong)
+    const rHoc = await tat(() => env.DB.prepare(SQL_EM_DA_HOC_HOM_NAY).bind(moc.iso, ngayVn(nowMs)).all<Dong>(), rong)
     const daHocCuaLop = new Map<string, number>()
     for (const x of rHoc.results ?? []) {
       const e = tatCa.get(chuoi(x.sbd))
@@ -412,7 +418,7 @@ export async function gvChuaHocHomNay(
   const ngay = ngayVn(nowMs)
   const tatCa = await docTatCaEm(env)
   const mocHt = moc ?? (await docMocHienThi(env))
-  const rHoc = await tat(() => env.DB.prepare('SELECT DISTINCT sbd FROM su_kien_hoc WHERE ngay_vn = ? AND luc >= ? AND ket_qua IS NOT NULL').bind(ngay, mocHt.iso).all<Dong>(), rong)
+  const rHoc = await tat(() => env.DB.prepare(SQL_EM_DA_HOC_HOM_NAY).bind(mocHt.iso, ngay).all<Dong>(), rong)
   const daHoc = new Set((rHoc.results ?? []).map((x) => chuoi(x.sbd)))
   const nhom = new Map<string, { siSo: number; em: { sbd: string; hoTen: string }[] }>()
   for (const [sbd, e] of tatCa) {
