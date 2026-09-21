@@ -56,7 +56,7 @@ export interface DauBaiCaNhanVao {
 
 /** Thẻ đầu bài "Bài của riêng em": chỉ số ĐẾM của chính em — không bao giờ có số của bạn khác. */
 export function heroCaNhanHtml(d: DauBaiCaNhanVao): string {
-  const dong = [d.phutMoiNgay ? `Khoảng ${d.phutMoiNgay} phút mỗi ngày` : '', d.han ? `hạn ${d.han}` : ''].filter(Boolean).join(' · ')
+  const dong = [d.phutMoiNgay ? `Khoảng ${d.phutMoiNgay} phút mỗi ngày` : '', d.han ? `Hạn nộp: ${d.han}` : ''].filter(Boolean).join(' · ')
   const cham = d.chang
     .map((c) => {
       const nay = c.chiSo === d.chiSoHienThi

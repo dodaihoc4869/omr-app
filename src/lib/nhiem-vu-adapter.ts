@@ -544,7 +544,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     const han = v.hanCung || v.hanMem || undefined
     const moc = msIso(v.hanCung ?? v.hanMem)
     const conLaiMs = moc === undefined ? undefined : moc - now
-    const conLaiChu = conLaiMs === undefined ? undefined : dinhDangConLai(conLaiMs)
+    const conLaiChu = conLaiMs === undefined ? undefined : dinhDangConLai(conLaiMs, now)
     const biCong = v.hien === false
     const phanMoTa: string[] = []
     if (v.loai === 'btvn_lo') {
@@ -621,7 +621,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       return { id: `qua_han:mom:${q.ma}`, loai: 'mom', tieuDe: bai?.tieuDe || 'Bài của Mẹ giao', chu: 'Đã hết giờ — mở để nộp phần đã lưu', hanhDong: { loai: 'mo_mom', payload: bai ? { id: bai.id, bai } : { id: q.ma }, nhanNut: 'Mở để nộp' } }
     }
     const bt = btvnTheoMa(q.ma)
-    return { id: `qua_han:btvn:${q.ma}`, loai: 'btvn', tieuDe: tenBaiTapVeNha(bt), chu: 'Đã quá hạn — cần Thầy gia hạn' }
+    return { id: `qua_han:btvn:${q.ma}`, loai: 'btvn', tieuDe: tenBaiTapVeNha(bt), chu: 'Đã qua Hạn nộp — nhờ Thầy gia hạn' }
   })
 
   const mucTieu = Math.max(0, Number(keHoach.nganSach.mucTieuCau) || 0)
@@ -764,7 +764,7 @@ function lamMoiThe(v: TheNhiemVu, now: number): TheNhiemVu {
   const moc = msIso(v.hanNop)
   if (moc === undefined) return v
   const conLaiMs = moc - now
-  return { ...v, conLaiMs, conLaiChu: dinhDangConLai(conLaiMs) }
+  return { ...v, conLaiMs, conLaiChu: dinhDangConLai(conLaiMs, now) }
 }
 
 /**

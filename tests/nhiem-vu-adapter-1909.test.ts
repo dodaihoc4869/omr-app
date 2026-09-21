@@ -271,7 +271,7 @@ describe('nhánh máy chủ: tên, payload khi bấm, quá hạn, cảnh báo', 
 
   it('quaHan liệt kê RIÊNG, không thành nhiệm vụ: BTVN chỉ đọc, bài Mẹ hết giờ mở được để nộp', () => {
     expect(d.quaHan.length).toBe(1)
-    expect(d.quaHan[0]).toMatchObject({ loai: 'btvn', chu: 'Đã quá hạn — cần Thầy gia hạn' })
+    expect(d.quaHan[0]).toMatchObject({ loai: 'btvn', chu: 'Đã qua Hạn nộp — nhờ Thầy gia hạn' })
     expect(d.quaHan[0].hanhDong).toBeUndefined()
     expect(tatCaViec(d).some((x) => x.id.includes('BT-CU'))).toBe(false)
     const kh = { ...keHoachMayChu, quaHan: [{ loai: 'mom' as const, ma: 'M9', hanNop: gio(-1), conLai: 8 }] }
@@ -685,7 +685,7 @@ describe('bản nhớ (stale-while-revalidate): đóng gói và phục hồi', (
     // Quá hạn thì nói "Đã quá hạn", không còn số dương.
     const het = tatCaViec(phucHoiBanNho(b, NOW + 3 * 3600_000)!).find((x) => x.id === 'mom:M9')!
     expect(het.conLaiMs!).toBeLessThan(0)
-    expect(het.conLaiChu).toBe('Đã quá hạn')
+    expect(het.conLaiChu).toBe('Đã qua Hạn nộp')
   })
 
   it('bản nhớ của NGÀY KHÁC (theo ngày VN) không dùng để vẽ việc', () => {

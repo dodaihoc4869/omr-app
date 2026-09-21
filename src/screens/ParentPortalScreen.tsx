@@ -11,6 +11,7 @@ import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import { useEffect, useMemo, useState } from 'react'
 import { taiThongTinPhuHuynh } from '../lib/bo-nao-lay-loi-ph'
 import { baoDaXemPhuHuynh } from '../lib/canh-bao-thay-may-chu'
+import { gioDayDu } from '../lib/ngay-gio-24'
 import type { CanhBaoThay } from '../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../lib/bo-nao-hien-thi'
 import DongDemCau from '../components/DongDemCau'
@@ -784,7 +785,7 @@ export default function ParentPortalScreen() {
                           <div className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 flex flex-wrap items-center gap-2.5">
                             <span className="flex items-center gap-1">
                               <Calendar size={13} />
-                              <span>{b.ngayNop ? new Date(b.ngayNop).toLocaleDateString('vi-VN') : 'Đã thi'}</span>
+                              <span>{b.ngayNop ? gioDayDu(b.ngayNop, 'Đã thi') : 'Đã thi'}</span>
                             </span>
                             {typeof b.tongSoCau === 'number' && b.tongSoCau > 0 && typeof b.soCauDung === 'number' && (
                               <>

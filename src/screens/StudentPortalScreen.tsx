@@ -82,6 +82,7 @@ const LamCauOn = lazy(() => import('../components/bang-nhiem-vu/LamCauOn'))
 const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang'))
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
+import { gioDayDu } from '../lib/ngay-gio-24'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
 
@@ -156,14 +157,7 @@ interface ThongTinHs {
 
 function dinhDangNgayGio(iso: string): string {
   if (!iso) return ''
-  const d = new Date(iso)
-  if (!Number.isFinite(d.getTime())) return iso
-  const gio = String(d.getHours()).padStart(2, '0')
-  const phut = String(d.getMinutes()).padStart(2, '0')
-  const ngay = String(d.getDate()).padStart(2, '0')
-  const thang = String(d.getMonth() + 1).padStart(2, '0')
-  const nam = d.getFullYear()
-  return `${gio}:${phut} ${ngay}/${thang}/${nam}`
+  return gioDayDu(iso, iso) // "HH:mm · Thứ Năm 24/09/2026" (luật 6 CHUAN-TU-NGU); mốc hỏng ⇒ trả nguyên chuỗi
 }
 
 function mauDiem(diem: number | null): string {
@@ -1685,7 +1679,7 @@ export default function StudentPortalScreen() {
                           bt.soCau > 0 && <span>Số câu: <strong>{bt.soCau}</strong></span>
                         )}
                         {bt.hanNop && (
-                          <NhanHanBaiTap han={bt.hanNop} now={nowHocTap} daNop={!!bt.daNop} />
+                          <NhanHanBaiTap han={bt.hanNop} now={nowHocTap} daNop={!!bt.daNop} dayDu />
                         )}
                         {bt.nopLuc && (
                           <span>Nộp lúc: {dinhDangNgayGio(bt.nopLuc)}</span>

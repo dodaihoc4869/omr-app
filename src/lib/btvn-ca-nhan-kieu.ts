@@ -1,3 +1,5 @@
+import { gioDayDu } from './ngay-gio-24'
+
 // BTVN "NÂNG ĐỠ" — KIỂU + HÀM THUẦN phía máy em. Hợp đồng: docs/hop-dong-btvn-nang-do-2109.md (mục 3, 4).
 //
 // TỆP NÀY KHÔNG ĐƯỢC ĐỤNG API TRÌNH DUYỆT (localStorage, window, document…): `bai-tap-pdf.ts` (kéo theo `cau-hinh-chua.ts`)
@@ -277,13 +279,10 @@ export function nhanMoLucNgan(moLuc: string, bayGio: Date): string {
   return `${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
 }
 
-/** "23:59 Thứ Năm 24/09" — hạn nói bằng NGÀY GIỜ THẬT (giờ máy em). Hỏng ⇒ ''. */
+/** "23:59 · Thứ Năm 24/09/2026" — hạn nói bằng NGÀY GIỜ THẬT theo chuẩn từ ngữ (luật 6; giờ Việt Nam). Hỏng ⇒ ''. */
 export function hanChu(iso: unknown): string {
-  if (typeof iso !== 'string' || iso.trim() === '') return ''
-  const d = new Date(iso)
-  if (!Number.isFinite(d.getTime())) return ''
-  const THU = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy']
-  return `${hai(d.getHours())}:${hai(d.getMinutes())} ${THU[d.getDay()]} ${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
+  if (typeof iso !== 'string') return ''
+  return gioDayDu(iso, '')
 }
 
 /** Các dòng phụ dưới tên thẻ việc của bài cá nhân hoá (thầy 21/09): "Chặng 1 trong 7 chặng", hạn thật, tờ đề (chữ nhỏ).

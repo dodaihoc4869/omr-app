@@ -157,7 +157,7 @@ export default function BangTroLyPhuHuynh({
           const hetGio = !daNop && (mocThoiGian(han) ?? Infinity) <= now
           return <div key={b.id} className="border-t border-slate-100 dark:border-slate-800 pt-3 space-y-1">
             <p className="text-sm font-semibold">{b.tieuDe || 'Bài gia đình giao'}</p>
-            {han ? <NhanHanBaiTap han={han} now={now} daNop={daNop} /> : <p className="text-xs">{daNop ? 'Đã nộp' : 'Chưa bắt đầu. Thời gian làm bài: 120 phút từ khi bắt đầu.'}</p>}
+            {han ? <NhanHanBaiTap han={han} now={now} daNop={daNop} dayDu /> : <p className="text-xs">{daNop ? 'Đã nộp' : 'Chưa bắt đầu. Thời gian làm bài: 120 phút từ khi bắt đầu.'}</p>}
             {hetGio && <p className="text-xs text-amber-800 dark:text-amber-200">Anh/chị nhắc con mở bài để hoàn tất nộp phần đã lưu.</p>}
           </div>
         })}

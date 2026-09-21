@@ -3,6 +3,7 @@ import { chuoiNgayHoc, hanBaiMom, mocThoiGian, ngayVietNam } from './han-bai-tap
 import { gioMayChu } from './gio-may-chu'
 import { loDangCho, tinhLichLoBtvn } from './lich-lo-btvn'
 import { tenBaiTapVeNha } from './btvn-ca-nhan-kieu'
+import { gioDayDu } from './ngay-gio-24'
 
 export type LoaiNhiemVu =
   | 'btvn_lo'
@@ -82,19 +83,28 @@ export interface KeHoachNgayTroLy {
   }
 }
 
-/** Định dạng mili-giây còn lại thành chuỗi dễ đọc */
-export function dinhDangConLai(ms?: number): string {
+/**
+ * Định dạng mili-giây còn lại thành chuỗi dễ đọc (chuẩn từ ngữ 21/09, luật 6: khoảng còn lại ghi kèm MỐC THẬT).
+ * `nayMs` (giờ hiện tại) có ⇒ ghi thêm mốc hạn: "Còn 3 giờ 5 phút (tới 23:59 · Thứ Năm 24/09/2026)". Hết hạn ⇒ "Đã qua Hạn nộp".
+ */
+export function dinhDangConLai(ms?: number, nayMs?: number): string {
   if (ms === undefined || Number.isNaN(ms)) return 'Không rõ'
-  if (ms <= 0) return 'Đã quá hạn'
+  if (ms <= 0) return 'Đã qua Hạn nộp'
   const phut = Math.floor(ms / (60 * 1000))
-  if (ms < 60_000) return 'Còn dưới 1 phút'
-  if (phut < 60) return `Còn ${phut} phút`
-  const gio = Math.floor(phut / 60)
-  const phutLe = phut % 60
-  if (gio < 24) return `Còn ${gio}h ${phutLe > 0 ? `${phutLe}p` : ''}`
-  const ngay = Math.floor(gio / 24)
-  const gioLe = gio % 24
-  return `Còn ${ngay} ngày ${gioLe > 0 ? `${gioLe}h` : ''}`
+  let chu: string
+  if (ms < 60_000) chu = 'Còn dưới 1 phút'
+  else if (phut < 60) chu = `Còn ${phut} phút`
+  else {
+    const gio = Math.floor(phut / 60)
+    const phutLe = phut % 60
+    if (gio < 24) chu = `Còn ${gio} giờ${phutLe > 0 ? ` ${phutLe} phút` : ''}`
+    else {
+      const ngay = Math.floor(gio / 24)
+      const gioLe = gio % 24
+      chu = `Còn ${ngay} ngày${gioLe > 0 ? ` ${gioLe} giờ` : ''}`
+    }
+  }
+  return nayMs !== undefined && Number.isFinite(nayMs) ? `${chu} (tới ${gioDayDu(nayMs + ms)})` : chu
 }
 
 /**
@@ -285,7 +295,7 @@ export function tongHopKeHoachTroLy(input: {
     const hanMom = hanBaiMom(mom)
     if (hanMom) {
       conLaiMs = Date.parse(hanMom) - now
-      conLaiChu = dinhDangConLai(conLaiMs)
+      conLaiChu = dinhDangConLai(conLaiMs, now)
       isOverdue = conLaiMs <= 0
     } else {
       conLaiChu = '120 phút từ khi bắt đầu'
@@ -359,7 +369,7 @@ export function tongHopKeHoachTroLy(input: {
     const dangCho = loDangCho(lich, Math.max(0, Number(bt.loDaXong) || 0), now)
     if (!dangCho || !dangCho.daToiMoc) continue // xong hết lô bắt buộc, hoặc lô kế chưa tới nhịp
 
-    const conLaiChu = dinhDangConLai(conLaiMsHanChung)
+    const conLaiChu = dinhDangConLai(conLaiMsHanChung, now)
     // TRỄ NHỊP (đã qua mốc lô KẾ TIẾP mà lô này vẫn chưa xong) ⇒ ép mức khẩn
     // cấp lên hẳn thay vì chỉ dựa hạn chung còn xa — đúng "gán nhãn khẩn cấp
     // hơn" thầy yêu cầu khi chưa hoàn thành nhiệm vụ trước.
@@ -533,7 +543,7 @@ export function tongHopKeHoachTroLy(input: {
       }
       const quaHanChung = conLaiMsHanChung !== undefined && conLaiMsHanChung <= 0
 
-      const conLaiChu = dangChoRadar?.treNhip && !quaHanChung ? 'Đã trễ nhịp chặng' : dinhDangConLai(conLaiMsHanChung)
+      const conLaiChu = dangChoRadar?.treNhip && !quaHanChung ? 'Đã trễ nhịp chặng' : dinhDangConLai(conLaiMsHanChung, now)
       let tt: DongRadarDeadline['trangThai'] = 'binh_thuong'
       if (quaHanChung) {
         tt = 'qua_han'

@@ -118,16 +118,16 @@ describe('thẻ bài cá nhân hoá — tên "Bài tập về nhà · Chặng k"
   })
 
   it('hạn chặng KHÁC hạn cả bài ⇒ hai dòng, đều bằng ngày giờ thật', () => {
-    expect(cn(0, HAN_CHANG, HAN_BAI).dongPhu).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 Thứ Hai 21/09', 'Hạn nộp cả bài: 23:59 Thứ Năm 24/09', `Tờ đề: ${TEN_TO}`])
+    expect(cn(0, HAN_CHANG, HAN_BAI).dongPhu).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 · Thứ Hai 21/09/2026', 'Hạn nộp cả bài: 23:59 · Thứ Năm 24/09/2026', `Tờ đề: ${TEN_TO}`])
   })
 
   it('chưa có mốc riêng từng chặng (hạn chặng = hạn cả bài) ⇒ nói đúng thế, MỘT dòng', () => {
-    expect(cn(0, HAN_BAI, HAN_BAI).dongPhu).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 Thứ Năm 24/09 · bằng hạn nộp cả bài', `Tờ đề: ${TEN_TO}`])
+    expect(cn(0, HAN_BAI, HAN_BAI).dongPhu).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 · Thứ Năm 24/09/2026 · bằng hạn nộp cả bài', `Tờ đề: ${TEN_TO}`])
   })
 
   it('không biết hạn cả bài (danh sách BTVN chưa về) ⇒ chỉ nói hạn của chặng, không bịa hạn bài', () => {
     const d = cn(0, HAN_BAI).dongPhu!
-    expect(d).toContain('Hạn chặng này: 23:59 Thứ Năm 24/09')
+    expect(d).toContain('Hạn chặng này: 23:59 · Thứ Năm 24/09/2026')
     expect(d.join('|')).not.toContain('cả bài')
   })
 
@@ -149,8 +149,8 @@ describe('thẻ bài cá nhân hoá — tên "Bài tập về nhà · Chặng k"
       const sec = document.querySelector('[data-vung="lam-ngay"]')!
       expect(sec.querySelector('h2')!.textContent).toBe('Bài tập về nhà · Chặng 1')
       expect(sec.textContent).toContain('Chặng 1 trong 7 chặng')
-      expect(sec.textContent).toContain('Hạn chặng này: 23:59 Thứ Hai 21/09')
-      expect(sec.textContent).toContain('Hạn nộp cả bài: 23:59 Thứ Năm 24/09')
+      expect(sec.textContent).toContain('Hạn chặng này: 23:59 · Thứ Hai 21/09/2026')
+      expect(sec.textContent).toContain('Hạn nộp cả bài: 23:59 · Thứ Năm 24/09/2026')
       expect(sec.getAttribute('aria-label')).not.toContain('DH-12')
       unmount()
     }
@@ -161,7 +161,7 @@ describe('thẻ bài cá nhân hoá — tên "Bài tập về nhà · Chặng k"
     render(<TheViec viec={t} nhanBac="BẮT BUỘC" docChi={false} onChon={() => {}} />)
     expect(document.body.textContent).toContain('Bài tập về nhà · Chặng 2')
     expect(document.body.textContent).toContain('Chặng 2 trong 7 chặng')
-    expect(document.body.textContent).toContain('Hạn chặng này: 23:59 Thứ Hai 21/09')
+    expect(document.body.textContent).toContain('Hạn chặng này: 23:59 · Thứ Hai 21/09/2026')
   })
 })
 

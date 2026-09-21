@@ -67,7 +67,7 @@ describe('sắp xếp và nhãn hạn: đúng như bản cũ', () => {
 
   it('nhanHan ra ĐÚNG chữ của NhanHanBaiTap (dùng chung với app giáo viên) ở cả bốn trạng thái', () => {
     for (const [han, daNop] of [[gio(48), false], [gio(5), false], [gio(-3), false], [gio(5), true]] as const) {
-      const { container, unmount } = render(<NhanHanBaiTap han={han} now={NOW} daNop={daNop} />)
+      const { container, unmount } = render(<NhanHanBaiTap han={han} now={NOW} daNop={daNop} dayDu />)
       expect(nhanHan(han, NOW, daNop).chu).toBe(container.textContent!.replace(/\s+/g, ' ').trim())
       unmount()
     }

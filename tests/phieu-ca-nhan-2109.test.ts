@@ -102,7 +102,7 @@ describe('đầu bài "Bài của riêng em" và nhãn từng câu', () => {
     expect(hero).toContain('Bài của riêng em')
     expect(hero).toContain('<b>52</b> câu')
     expect(hero).toContain('<b>7</b> chặng')
-    expect(hero).toContain('Khoảng 10 phút mỗi ngày · hạn 28/09')
+    expect(hero).toContain('Khoảng 10 phút mỗi ngày · Hạn nộp: 28/09')
     expect(hero.match(/<li class="gcn-c/g)).toHaveLength(7)
     expect(hero).toContain('aria-current="step"')
     expect(hero).toContain('Hôm nay')

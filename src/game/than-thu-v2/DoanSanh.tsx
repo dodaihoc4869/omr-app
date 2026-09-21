@@ -9,7 +9,7 @@ import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh } from './DoanHinh'
 const SAP_MO = [
   ['Đoàn lớp', 'Mỗi chặng thắng đẩy Linh Tâm của cả lớp tiến một trạm trên bản đồ mùa.'],
   ['Rương chuỗi ngày', 'Đi đều mỗi ngày để mở rương — đứt chuỗi thì đếm lại.'],
-  ['Trùm lớp', 'Chủ nhật 20:00, cả lớp cùng online đánh trùm mùa.'],
+  ['Trùm lớp', '20:00 · Chủ nhật, cả lớp cùng online đánh trùm mùa.'],
   ['Ấn thạch dạng', 'Khắc phục xong một dạng bài thì ấn sáng, mở biến thể kỹ năng.'],
 ] as const
 export interface GoiYHomNay { tong: number; nhom: { ten: string; so: number }[]; hetLuot: boolean }
@@ -97,7 +97,7 @@ export default function DoanSanh(p: Props) {
                     <p><b style={{ color: 'rgb(255,255,255)' }}>{s.trumLop.daHa ? 'Lớp em đã hạ trùm!' : s.trumLop.dangMo ? `Đang mở · ${hen(s.trumLop.conMs)}` : 'Tối Chủ nhật vừa rồi'}</b><br />Cả lớp đã góp {s.trumLop.daGop}/{s.trumLop.mucTieu} sát thương</p>
                     <div className="dh-mau" style={{ height: 8 }}><i style={{ width: `${Math.min(100, Math.round(s.trumLop.daGop * 100 / Math.max(1, s.trumLop.mucTieu)))}%`, background: 'linear-gradient(90deg,rgb(183,156,255),rgb(255,138,92))' }} /></div>
                   </>
-                ) : <p><b style={{ color: 'rgb(255,255,255)', fontSize: 16 }}>Chủ nhật 20:00</b><br />Cả lớp cùng đánh 20 phút · {hen(s.trumLop.moSauMs)}</p>}
+                ) : <p><b style={{ color: 'rgb(255,255,255)', fontSize: 16 }}>20:00 · Chủ nhật</b><br />Cả lớp cùng đánh 20 phút · {hen(s.trumLop.moSauMs)}</p>}
               </section>
             </div>
           )}

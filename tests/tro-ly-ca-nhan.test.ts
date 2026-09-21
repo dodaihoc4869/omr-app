@@ -10,11 +10,26 @@ describe('Thuật toán Trợ lý Cá nhân AI (tro-ly-ca-nhan.ts)', () => {
   describe('1. Định dạng thời gian còn lại (dinhDangConLai)', () => {
     it('xử lý các mốc thời gian chính xác', () => {
       expect(dinhDangConLai(undefined)).toBe('Không rõ')
-      expect(dinhDangConLai(-100)).toBe('Đã quá hạn')
-      expect(dinhDangConLai(0)).toBe('Đã quá hạn')
+      expect(dinhDangConLai(-100)).toBe('Đã qua Hạn nộp')
+      expect(dinhDangConLai(0)).toBe('Đã qua Hạn nộp')
       expect(dinhDangConLai(45 * 60 * 1000)).toBe('Còn 45 phút')
-      expect(dinhDangConLai((2 * 60 + 15) * 60 * 1000)).toBe('Còn 2h 15p')
-      expect(dinhDangConLai((25 * 60) * 60 * 1000)).toBe('Còn 1 ngày 1h')
+      expect(dinhDangConLai((2 * 60 + 15) * 60 * 1000)).toBe('Còn 2 giờ 15 phút')
+      expect(dinhDangConLai((25 * 60) * 60 * 1000)).toBe('Còn 1 ngày 1 giờ')
+      expect(dinhDangConLai(3 * 3600 * 1000)).toBe('Còn 3 giờ') // tròn giờ: không "0 phút", không khoảng trắng thừa
+      expect(dinhDangConLai(2 * 24 * 3600 * 1000)).toBe('Còn 2 ngày')
+      expect(dinhDangConLai(30_000)).toBe('Còn dưới 1 phút')
+    })
+    it('kèm MỐC THẬT khi biết giờ hiện tại (luật 6): "Còn 3 giờ 5 phút (tới 23:59 · Thứ Năm 24/09/2026)"; hết hạn thì không kèm', () => {
+      const nay = Date.parse('2026-09-24T13:54:00+07:00') // 13:54 giờ VN
+      expect(dinhDangConLai((3 * 60 + 5) * 60_000 + 60_000 * 0, nay)).toBe('Còn 3 giờ 5 phút (tới 16:59 · Thứ Năm 24/09/2026)')
+      expect(dinhDangConLai(10 * 3600_000 + 5 * 60_000, nay)).toBe('Còn 10 giờ 5 phút (tới 23:59 · Thứ Năm 24/09/2026)')
+      expect(dinhDangConLai(3 * 24 * 3600_000, nay)).toBe('Còn 3 ngày (tới 13:54 · Chủ nhật 27/09/2026)')
+      expect(dinhDangConLai(-1, nay)).toBe('Đã qua Hạn nộp')
+      expect(dinhDangConLai(undefined, nay)).toBe('Không rõ')
+      expect(dinhDangConLai(45 * 60_000, undefined)).toBe('Còn 45 phút') // không có giờ hiện tại ⇒ như cũ, không bịa mốc
+      expect(dinhDangConLai(45 * 60_000, NaN)).toBe('Còn 45 phút') // giờ hiện tại hỏng ⇒ không in "tới Chưa có hạn…"
+      expect(dinhDangConLai(60 * 60_000)).toBe('Còn 1 giờ') // đúng 60 phút là 1 giờ, không phải "60 phút"
+      expect(dinhDangConLai(59 * 60_000)).toBe('Còn 59 phút')
     })
   })
 

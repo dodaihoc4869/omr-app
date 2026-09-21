@@ -39,7 +39,7 @@ describe('Đoàn Hộ Tống · giao diện · Sảnh', () => {
     const { call } = dung(null)
     expect(await screen.findByText('2 câu Ester')).toBeTruthy(); expect(screen.getByText('1 câu Ancol')).toBeTruthy()
     expect(man().dataset.man).toBe('sanh'); expect(man().textContent).not.toMatch(/Trạm \d|\d+\/30|\d+ vé|chuỗi \d/i)
-    // Bốn ô SẮP MỞ có khoá: tên + một dòng mô tả, KHÔNG con số nào ngoài giờ hẹn Chủ nhật 20:00
+    // Bốn ô SẮP MỞ có khoá: tên + một dòng mô tả, KHÔNG con số nào ngoài giờ hẹn 20:00 · Chủ nhật
     const sapMo = screen.getByLabelText('Sắp mở'); expect([...sapMo.querySelectorAll('b')].map(b => b.textContent)).toEqual(['Đoàn lớp', 'Rương chuỗi ngày', 'Trùm lớp', 'Ấn thạch dạng'])
     expect(sapMo.querySelectorAll('.dh-khoa')).toHaveLength(4); expect(sapMo.textContent!.replace('20:00', '')).not.toMatch(/\d/); expect(sapMo.querySelectorAll('button')).toHaveLength(0)
     fireEvent.click(screen.getByRole('button', { name: /LÊN ĐƯỜNG/ }))
@@ -72,7 +72,7 @@ describe('Đoàn Hộ Tống · giao diện · Sảnh bước 5 (vé, chuỗi, �
     expect(screen.getByText('Trạm 17/30 · còn 3 trạm tới Hồ Cân Bằng')).toBeTruthy(); expect(man().textContent).toContain('9/32 bạn góp sức hôm nay'); expect(man().textContent).toContain('còn 4 chặng thắng nữa là lớp tiến một trạm')
     expect(screen.getByText('CHẶNG HÔM NAY · MIỄN PHÍ')).toBeTruthy()
     expect(screen.getByLabelText('Rương chuỗi ngày').textContent).toContain('Còn 2 ngày mở rương 7 ngày'); expect(screen.getByLabelText('Rương chuỗi ngày').textContent).toContain('đi chặng hôm nay để giữ chuỗi'); expect(document.querySelectorAll('.dh-chuoi-vach i.dh-xong')).toHaveLength(5)
-    expect(screen.getByLabelText('Trùm lớp').textContent).toContain('Chủ nhật 20:00'); expect(screen.getByLabelText('Trùm lớp').textContent).toContain('còn 4 ngày 4 giờ')
+    expect(screen.getByLabelText('Trùm lớp').textContent).toContain('20:00 · Chủ nhật'); expect(screen.getByLabelText('Trùm lớp').textContent).toContain('còn 4 ngày 4 giờ')
     expect([...screen.getByLabelText('Sắp mở').querySelectorAll('b')].map(b => b.textContent)).toEqual(['Ấn thạch dạng'])
   })
   it('bước 6: 6 ấn thạch (nứt trước), "khắc phục thêm 3 câu là sáng → mở <biến thể kỹ năng>", thẻ bạn đồng hành BÙ NHAU chỉ nói điều mỗi bên vững; có ấn thật thì hết ô SẮP MỞ', async () => {

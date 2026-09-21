@@ -4,7 +4,8 @@
 import { CheckCircle2, Clock, Eye, RefreshCw, RotateCcw, ArrowRight, BookOpen } from 'lucide-react'
 import '../m3'
 import './btvn-m3.css'
-import { gioHanVietNam, mocThoiGian } from '../../lib/han-bai-tap'
+import { mocThoiGian } from '../../lib/han-bai-tap'
+import { gioDayDu } from '../../lib/ngay-gio-24'
 
 export interface MucBtvn {
   maBtvn?: string
@@ -31,7 +32,7 @@ export function nhanHan(han: string | undefined, now: number, daNop: boolean): {
   const qua = ms !== undefined && ms <= now
   const sap = ms !== undefined && ms > now && ms - now <= 86400_000
   const nhan = daNop ? 'Đã nộp' : qua ? 'Quá hạn' : sap ? 'Hạn trong 24 giờ' : 'Hạn nộp'
-  return { chu: `${nhan}: ${gioHanVietNam(han)} (giờ Việt Nam)`, muc: daNop ? 'xong' : qua || sap ? 'gap' : 'thuong' }
+  return { chu: `${nhan}: ${gioDayDu(han, 'Chưa có hạn hợp lệ')} (giờ Việt Nam)`, muc: daNop ? 'xong' : qua || sap ? 'gap' : 'thuong' }
 }
 
 export default function BtvnM3({

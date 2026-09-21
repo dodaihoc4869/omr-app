@@ -10,6 +10,7 @@ import type { CauHinhMayChu } from './cau-hinh-may-chu'
 import type { CauLuyen } from './bai-tap-pdf'
 import { layCauHinhMayChu, xongNapDiaChi } from './may-chu-moi'
 import { loDangCho, tinhLichLoBtvn, tongCauDenLo } from './lich-lo-btvn'
+import { gioDayDu } from './ngay-gio-24'
 import {
   cauCuaChang,
   chuDauBai,
@@ -153,8 +154,8 @@ export async function dungPhieuBtvn(
       loiNhac: r.daNop
         ? `Em đã nộp bài này rồi — đây là bản xem lại, bấm vào từng câu để mở lời giải.${conLai > 0 ? ` Thầy cho phép làm lại tối đa 3 lần (còn ${conLai} lượt).` : ' (Đã hết 3 lượt làm lại)'}`
         : laLamLai
-        ? `Bài tập về nhà (Làm lại lần ${lanLamHienTai - 1} · còn ${conLai} lượt) · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (chặng ${(dangCho?.chiSo ?? 0) + 1} trong ${tongLo} chặng)` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`
-        : `Bài tập về nhà · ${cau.length} câu${han ? ` · hạn nộp ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (chặng ${(dangCho?.chiSo ?? 0) + 1} trong ${tongLo} chặng)` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`,
+        ? `Bài tập về nhà (Làm lại lần ${lanLamHienTai - 1} · còn ${conLai} lượt) · ${cau.length} câu${han ? ` · Hạn nộp: ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (chặng ${(dangCho?.chiSo ?? 0) + 1} trong ${tongLo} chặng)` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`
+        : `Bài tập về nhà · ${cau.length} câu${han ? ` · Hạn nộp: ${gioVN(han)}` : ''}. Hôm nay làm ${soCauSang} câu${tongLo > 1 ? ` (chặng ${(dangCho?.chiSo ?? 0) + 1} trong ${tongLo} chặng)` : ''}; câu còn lại mở dần theo ngày/giờ, không dồn hết một lúc. Làm xong bấm Nộp bài ở thanh trên.`,
     },
   )
 }
@@ -276,7 +277,7 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
           tong: dauBai.tong,
           soChang: dauBai.soChang,
           phutMoiNgay: dauBai.phutMoiNgay,
-          han: ngayNganVN(han),
+          han: gioVN(han),
           chang: b.chang.map((c) => ({ chiSo: c.chiSo, daXong: c.daXong })),
           chiSoHienThi: chiSoHT,
           nhanChang: nhanChangNgan(b, chiSoHT, bayGio),
@@ -294,20 +295,9 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
   )
 }
 
-/** "28/09" — hạn nộp ngắn cho đầu bài; hỏng thì rỗng. */
-function ngayNganVN(iso: string): string {
-  const d = new Date(iso)
-  if (!Number.isFinite(d.getTime())) return ''
-  const hai = (n: number) => String(n).padStart(2, '0')
-  return `${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
-}
-
-/** Giờ Việt Nam gọn cho phiếu: 20:30 ngày 13/09. */
+/** Hạn cho phiếu theo chuẩn từ ngữ (luật 6): "20:30 · Thứ Bảy 13/09/2026" (24 giờ, giờ Việt Nam). Hỏng ⇒ ''. */
 function gioVN(iso: string): string {
-  const d = new Date(iso)
-  if (!Number.isFinite(d.getTime())) return ''
-  const hai = (n: number) => String(n).padStart(2, '0')
-  return `${hai(d.getHours())}:${hai(d.getMinutes())} ngày ${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
+  return gioDayDu(iso, '')
 }
 
 /** Rút câu từ gói đề. Nhận mọi dạng gói qua các đời, và KHÔNG đoán khi lạ. */

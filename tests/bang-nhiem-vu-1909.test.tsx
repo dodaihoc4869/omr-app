@@ -417,8 +417,8 @@ describe('dòng nói thật từ kế hoạch máy chủ', () => {
     const { container } = ve({ duLieu: duLieuMay() })
     await screen.findByText('Hoả Long')
     const qh = container.querySelector('[data-bac="qua_han"]')!
-    expect(qh.textContent).toContain('QUÁ HẠN · 1')
-    expect(qh.textContent).toContain('cần Thầy gia hạn')
+    expect(qh.textContent).toContain('ĐÃ QUA HẠN NỘP · 1')
+    expect(qh.textContent).toContain('nhờ Thầy gia hạn')
     expect(qh.querySelectorAll('button').length).toBe(0)
   })
 
@@ -427,7 +427,7 @@ describe('dòng nói thật từ kế hoạch máy chủ', () => {
     const kh = conThu(tuKeHoachNgay({ ...keHoachMayChu, quaHan: [{ loai: 'mom', ma: 'M9', hanNop: gio(-1), conLai: 8 }] }, NOW, phu))
     ve({ duLieu: kh, onHanhDong })
     await screen.findByText('Hoả Long')
-    fireEvent.click(screen.getByRole('button', { name: /QUÁ HẠN/ }))
+    fireEvent.click(screen.getByRole('button', { name: /đã qua Hạn nộp/ }))
     expect(onHanhDong.mock.calls[0][0]).toMatchObject({ loai: 'mo_mom', payload: { id: 'M9' } })
   })
 

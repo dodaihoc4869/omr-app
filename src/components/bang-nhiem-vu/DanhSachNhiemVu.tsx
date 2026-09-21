@@ -148,10 +148,10 @@ export default function DanhSachNhiemVu({
 export function DanhSachQuaHan({ viec, docChi, onChon }: { viec: TheQuaHan[]; docChi: boolean; onChon: (viec: TheQuaHan) => void }) {
   if (viec.length === 0) return null
   return (
-    <section className="bnv-bac" data-bac="qua_han" aria-label={`Đã quá hạn: ${viec.length} việc`}>
+    <section className="bnv-bac" data-bac="qua_han" aria-label={`Đã qua Hạn nộp: ${viec.length} việc`}>
       <h2 className="bnv-bac-dau">
         <span className="bnv-bac-cham" aria-hidden="true" />
-        <span>QUÁ HẠN · {viec.length}</span>
+        <span>ĐÃ QUA HẠN NỘP · {viec.length}</span>
       </h2>
       {viec.map((v) => {
         const Icon = v.loai === 'mom' ? Heart : BookOpen
@@ -168,11 +168,11 @@ export function DanhSachQuaHan({ viec, docChi, onChon }: { viec: TheQuaHan[]; do
           </>
         )
         return v.hanhDong && !docChi ? (
-          <button key={v.id} type="button" className="bnv-the bnv-the--nhat" aria-label={`${v.tieuDe} ${v.chu} — QUÁ HẠN`} onClick={() => onChon(v)}>
+          <button key={v.id} type="button" className="bnv-the bnv-the--nhat" aria-label={`${v.tieuDe} ${v.chu} — đã qua Hạn nộp`} onClick={() => onChon(v)}>
             {ruot}
           </button>
         ) : (
-          <div key={v.id} className="bnv-the bnv-the--nhat" role="group" aria-label={`${v.tieuDe} ${v.chu} — QUÁ HẠN`}>
+          <div key={v.id} className="bnv-the bnv-the--nhat" role="group" aria-label={`${v.tieuDe} ${v.chu} — đã qua Hạn nộp`}>
             {ruot}
           </div>
         )

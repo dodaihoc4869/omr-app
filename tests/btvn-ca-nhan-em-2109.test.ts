@@ -495,19 +495,19 @@ describe('chuMoLuc — chặng kế mở lúc nào (lịch theo giờ, bản 1.1
 })
 
 describe('hanChu / dongPhuChang — hạn bằng ngày giờ thật (thầy 21/09)', () => {
-  it('hanChu: "23:59 Thứ Năm 24/09"; hỏng ⇒ chuỗi rỗng', () => {
-    expect(hanChu(new Date(2026, 8, 24, 23, 59).toISOString())).toBe('23:59 Thứ Năm 24/09')
-    expect(hanChu(new Date(2026, 8, 21, 0, 5).toISOString())).toBe('00:05 Thứ Hai 21/09')
-    expect(hanChu(new Date(2026, 8, 27, 20, 0).toISOString())).toBe('20:00 Chủ nhật 27/09')
+  it('hanChu: "23:59 · Thứ Năm 24/09/2026"; hỏng ⇒ chuỗi rỗng', () => {
+    expect(hanChu(new Date(2026, 8, 24, 23, 59).toISOString())).toBe('23:59 · Thứ Năm 24/09/2026')
+    expect(hanChu(new Date(2026, 8, 21, 0, 5).toISOString())).toBe('00:05 · Thứ Hai 21/09/2026')
+    expect(hanChu(new Date(2026, 8, 27, 20, 0).toISOString())).toBe('20:00 · Chủ nhật 27/09/2026')
     for (const x of ['', '  ', 'không phải ngày', null, undefined, 5, {}]) expect(hanChu(x)).toBe('')
   })
   it('dongPhuChang: hạn chặng ≠ hạn bài ⇒ hai dòng; bằng nhau ⇒ MỘT dòng "bằng hạn nộp cả bài"; chỉ có một hạn ⇒ một dòng, không bịa', () => {
     const c = new Date(2026, 8, 21, 23, 59).toISOString()
     const b = new Date(2026, 8, 24, 23, 59).toISOString()
-    expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanChang: c, hanBai: b })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 Thứ Hai 21/09', 'Hạn nộp cả bài: 23:59 Thứ Năm 24/09'])
-    expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanChang: b, hanBai: b })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 Thứ Năm 24/09 · bằng hạn nộp cả bài'])
-    expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanChang: c })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 Thứ Hai 21/09'])
-    expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanBai: b })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 Thứ Năm 24/09'])
+    expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanChang: c, hanBai: b })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 · Thứ Hai 21/09/2026', 'Hạn nộp cả bài: 23:59 · Thứ Năm 24/09/2026'])
+    expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanChang: b, hanBai: b })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 · Thứ Năm 24/09/2026 · bằng hạn nộp cả bài'])
+    expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanChang: c })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 · Thứ Hai 21/09/2026'])
+    expect(dongPhuChang({ chiSo: 0, tongChang: 7, hanBai: b })).toEqual(['Chặng 1 trong 7 chặng', 'Hạn chặng này: 23:59 · Thứ Năm 24/09/2026'])
     expect(dongPhuChang({ chiSo: 0, tongChang: 7 })).toEqual(['Chặng 1 trong 7 chặng'])
   })
   it('dongPhuChang: tổng số chặng không hợp lệ ⇒ chỉ "Chặng k"; tờ đề trống ⇒ không dòng tờ đề', () => {

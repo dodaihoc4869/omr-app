@@ -25,10 +25,12 @@ function ngayVietNamChu(now: number): string {
     weekday: 'long',
     day: '2-digit',
     month: '2-digit',
+    year: 'numeric',
   }).formatToParts(new Date(now))
   const lay = (k: string) => phan.find((p) => p.type === k)?.value ?? ''
   const thu = lay('weekday')
-  return `${thu.charAt(0).toUpperCase()}${thu.slice(1)}, ${lay('day')}/${lay('month')}`
+  // Luật 6 CHUAN-TU-NGU: "Thứ Năm 24/09/2026" (đủ năm, không dấu phẩy)
+  return `${thu.charAt(0).toUpperCase()}${thu.slice(1)} ${lay('day')}/${lay('month')}/${lay('year')}`
 }
 
 /** Tên gọi của người Việt là chữ cuối của họ tên. Tên dự phòng kiểu "Học sinh SBD 123" không có tên thật. */
