@@ -24,6 +24,7 @@ import { qidChanHomNay } from './game-v2-ho-so'
 import { ngayVn } from './su-kien-hoc'
 import { soanThe, deRutGon, MO_TA_THE, type LoaiThe, type TheGoiY } from './game-v2-doan-the'
 import { ghiTiepSuc } from './exp-d1'
+import { docExpKetChang, traoExpKetChang } from './game-v2-doan-exp'
 import { docSanh, quaCongVe, hoanVe, ketChangChoLop } from './game-v2-doan-mua'
 import { docAnThach, anChoSanh, goiYBanDongHanh, docHienThi } from './game-v2-doan-an'
 
@@ -120,6 +121,8 @@ async function luuPhong(env: Env, ma: string, p: PhongDoan, revision: number): P
   }
   for (const g of choGhi) lenh.push(env.DB.prepare('UPDATE doan_tiep_suc SET thanh_cong=? WHERE ma_chang=? AND hiep=? AND den_sbd=? AND EXISTS(SELECT 1 FROM doan_chang WHERE ma=? AND revision=?)').bind(g.thanhCong ? 1 : 0, ma, g.hiep, g.den, ma, revision + 1))
   const r = await env.DB.batch(lenh)
+  // ĐIỀU 9: chặng vừa kết thúc ⇒ trao EXP kết chặng (thắng 5/10/15, vỡ giáp +3/trùm) cho từng bạn thật, qua cửa trần 120 EXP game/ngày. Idempotent theo khoá; lỗi chỉ ghi log.
+  if (r[0]?.meta.changes && c?.ketThuc && p.ketLuc) await traoExpKetChang(env, ma, p.ketLuc, tomTatChang(c))
   // Sổ câu trùm là sổ PHỤ cho thầy (bảng của bước 6 có thể chưa có) → ghi ngoài giao dịch, lỗi thì bỏ qua.
   if (r[0]?.meta.changes) for (const g of choGhiTrum) await env.DB.prepare('INSERT OR IGNORE INTO doan_trum_cau(ma_chang,hiep,lop,ngay_vn,ma_dang,qid,y_dung,so_ghe) VALUES(?,?,?,?,?,?,?,?)').bind(ma, g.hiep, p.nguoi[0]?.lop ?? '', ngayVn(iso(p.hiepLuc)), g.maDang, g.qid, g.yDung, p.nguoi.length).run().catch(() => {})
   return !!r[0]?.meta.changes
@@ -342,6 +345,8 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
     doan.ketChang = {
       thang: t.thang, sao: t.sao, linhTam: t.linhTam, trumVoGiap: t.trumVoGiap, quaiHaGuc: t.quaiHaGuc, soLienKich: t.soLienKich,
       cuaEm: t.ghe[i], tienBo: await tienBoHomNay(env, p, i),
+      // Đợt 2 (chỉ-thêm): các khoản EXP của chặng này của em, chữ sẵn có số ("Thắng chặng 3 sao +15 EXP", "Vỡ giáp 2 trùm +6 EXP", "Tiếp sức …").
+      expChang: await docExpKetChang(env, sbd, ma),
       // Bước 5: trạm của LỚP trước → sau chặng này, em là bạn thứ mấy góp sức hôm nay (đọc từ sổ lượt — bạn máy không có dòng nên không bao giờ được tính).
       // Bước 6: ấn đang nứt gần sáng nhất của em (đọc hồ sơ thật).
       anThach: anChoSanh(await docAnThach(env, sbd, ngayVn(iso(p.ketLuc ?? now))), p.nguoi[i]!.pet).ganSang,
