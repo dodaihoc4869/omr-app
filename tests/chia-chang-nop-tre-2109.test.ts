@@ -25,6 +25,15 @@ describe('chiaChangNopTre', () => {
     // 3 câu 900 giây (15 phút) + câu thứ 5 sẽ là 75 phút ⇒ 4 câu / chặng
     expect(chiaChangNopTre({ now: 0, cauLoi: cau(9, 900) }).chang.map((c) => c.length)).toEqual([4, 4, 1])
   })
+  it('giây lạ bị thay bằng tốc độ em: dưới 5 s hoặc trên 900 s (cả giayMoiCau lẫn giay từng câu) ⇒ 90; trần phút nhỏ hơn 1 câu chậm vẫn KHÔNG sinh chặng rỗng (mỗi câu một chặng)', () => {
+    // 100 câu giay = 1 (lạ ⇒ 90 s): trần 60 phút = 40 câu/chặng ⇒ 40 · 40 · 20 (nếu tin 1 s thì ra 1 chặng 100 câu)
+    expect(chiaChangNopTre({ now: 0, cauLoi: cau(100, 1), tranBuoi: { cau: 100 } }).chang.map((c) => c.length)).toEqual([40, 40, 20])
+    // giayMoiCau = 5 000 (lạ ⇒ 90): 100 câu ⇒ 40 · 40 · 20; nếu tin 5 000 s thì mỗi câu một chặng
+    expect(chiaChangNopTre({ now: 0, cauLoi: cau(100), giayMoiCau: 5000, tranBuoi: { cau: 100 } }).chang.map((c) => c.length)).toEqual([40, 40, 20])
+    const nho = chiaChangNopTre({ now: 0, cauLoi: cau(3, 900), tranBuoi: { phut: 5 } })
+    expect(nho.chang).toEqual([['Q0'], ['Q1'], ['Q2']])
+    expect(nho.moLuc).toHaveLength(3)
+  })
   it('mỗi ngày VN tối đa 2 chặng (tuỳ chọn): 5 chặng ⇒ ngày 0 ×2, ngày 1 ×2, ngày 2 ×1; mốc mở đúng 00:00 giờ VN các ngày kế; không lùi; qua nửa đêm VN vẫn theo ngày VN', () => {
     const now = vn('2026-09-26T23:50')
     const r = chiaChangNopTre({ now, cauLoi: cau(150) })
