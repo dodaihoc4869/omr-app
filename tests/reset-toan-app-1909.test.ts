@@ -140,6 +140,8 @@ describe('chạy thử (dryRun): chỉ đếm, không ghi gì', () => {
     expect(await resetDryRun(d.env)).toMatchObject({ ok: true, choPhep: false, lenDanLuc: null, hanTuChay: null, sanSang: true })
   })
   it('lệnh của thầy /reset/dry-run đòi mã bí mật', async () => {
+    // Sửa 21/09 (Boss): bỏ phụ thuộc ĐỒNG HỒ THẬT — LEN_DAN cố định 09:00Z + cửa sổ đóng băng 60 phút làm test đỏ oan nếu chạy đúng khung 16:00–17:00 VN 21/09. Giờ giả: 1 giờ TRƯỚC lúc lên đạn.
+    vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(LEN_DAN_MS - 3_600_000)
     const d = dung()
     expect((await goiWorker(worker, d.env, '/reset/dry-run', {})).ok).not.toBe(true)
     const r = await goiWorker(worker, d.env, '/reset/dry-run', {}, true)
@@ -798,6 +800,7 @@ describe('mocReset cho máy khách: CHỈ sau khi job xong, = ngày VN lúc XONG
 
 describe('lệnh của thầy: chạy tiếp tay và đo giới hạn', () => {
   it('lệnh chạy tiếp tay và đo giới hạn qua Worker đòi mã bí mật; đo giới hạn trả số truy vấn', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(LEN_DAN_MS - 3_600_000) // bỏ phụ thuộc đồng hồ thật (xem test /reset/dry-run)
     const d = dung()
     expect((await goiWorker(worker, d.env, '/reset/chay-tiep', {})).ok).not.toBe(true)
     expect((await goiWorker(worker, d.env, '/reset/do-gioi-han', {})).ok).not.toBe(true)
