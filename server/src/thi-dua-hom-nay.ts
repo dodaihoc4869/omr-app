@@ -17,6 +17,7 @@
 // MỐC HIỂN THỊ (thầy chốt 21/09 15:56, `moc-no.ts`): số câu hôm nay, chuỗi ngày học, "đã học hôm nay" chỉ đếm sự kiện `luc ≥ mốc` (12:00 trưa 21/09) — sự kiện trước mốc KHÔNG vào số hiển thị (chuỗi bắt đầu đếm từ ngày mốc).
 // Truy vấn D1 (chỉ đọc, không ghi): xếp hạng 3 (danh sách em + số câu/ngày + đạt nhiệm vụ ngày); thêm 1 truy vấn thần thú của top 3; lệnh thầy 2 truy vấn. Thiếu bảng/cột (chưa migration) ⇒ giá trị an toàn.
 import { tuLucTuNgay } from './cau-da-lam'
+import { docDemThiDua, ghiDemThiDua, xoaDemThiDua } from './dem-thi-dua'
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { CAN_DANG_NHAP } from './on-lai-nop'
@@ -236,7 +237,11 @@ export async function docLopHomNay(env: Env, sbd: string, nowMs: number, moc: Mo
   const tatCa = await docTatCaEm(env)
   const emNay = tatCa.get(sbd)
   if (!emNay) return null
-  const { thanhVien } = await soLieuCuaLop(env, [...tatCa].filter(([, e]) => e.tenLop === emNay.tenLop), null, nowMs, moc)
+  const { thanhVien: theoDem, tuoi: bangVuaDem } = await soLieuCuaLop(env, [...tatCa].filter(([, e]) => e.tenLop === emNay.tenLop), null, nowMs, moc)
+  if (bangVuaDem) return { lop: emNay.tenLop, thanhVien: theoDem } // bảng vừa đếm xong trong lệnh này ⇒ số của em đã tươi, khỏi đọc lại
+  // Bảng lấy từ ĐỆM: số CỦA CHÍNH EM luôn tươi (không chậm 30 giây): đọc lại riêng em (vài chục dòng, 2 truy vấn) và ghi đè dòng của em; xếp hạng do nơi gọi tính trên bảng đã ghi đè.
+  const tuoi = (await soLieuCuaLopTho(env, [[sbd, emNay]], null, nowMs, moc)).thanhVien[0]
+  const thanhVien = tuoi ? theoDem.map((x) => (x.sbd === sbd ? { ...tuoi, hoTen: x.hoTen } : x)) : theoDem
   return { lop: emNay.tenLop, thanhVien }
 }
 
@@ -245,24 +250,20 @@ export async function docLopHomNay(env: Env, sbd: string, nowMs: number, moc: Mo
  * `sbdThem` (chỉ chế độ XEM THỬ của tài khoản thử): đọc thêm số liệu của em này CÙNG hai truy vấn (không thêm truy vấn) và trả riêng ở `rieng` — KHÔNG lẫn vào `thanhVien`.
  */
 /**
- * ĐỆM 30 GIÂY (Boss 21/09: Thi đua là truy vấn ĐỌC lớn nhất, 3,1 triệu dòng/giờ = 216 lượt × 14,5 nghìn dòng): bảng số liệu của MỘT LỚP dùng chung cho mọi em cùng lớp trong 30 giây (theo isolate; khoá = lớp + ngày + mốc + danh sách em).
- * Số của em hiện chậm nhất 30 giây so với sổ (thẻ Hôm nay đọc thẳng nên có thể hơn vài câu trong khoảng ấy). KHÔNG đệm chế độ xem thử (có `sbdThem`). Đệm theo `env.DB` để các phiên bản D1 khác nhau (test) không lẫn.
+ * ĐỆM 30 GIÂY (Boss 21/09: Thi đua là truy vấn ĐỌC lớn nhất, 3,1 triệu dòng/giờ = 216 lượt × 14,5 nghìn dòng): bảng số liệu của MỘT LỚP dùng chung cho mọi em cùng lớp trong 30 giây (kho mức mô-đun `dem-thi-dua.ts`, theo isolate; khoá = ngày + mốc + danh sách em).
+ * SỐ CỦA CHÍNH EM ĐANG HỎI luôn ĐẾM TƯƠI (`docLopHomNay` ghi đè dòng của em) ⇒ thẻ Hôm nay = ô Thi đua của em ngay lập tức; chỉ số của BẠN cùng lớp chậm nhất 30 giây. KHÔNG đệm chế độ xem thử (có `sbdThem`).
  */
 export const DEM_THI_DUA_MS = 30_000
-const demThiDua = new WeakMap<object, Map<string, { at: number; kq: { thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null } }>>()
-export function xoaDemThiDua(): void { /* WeakMap không xoá được hàng loạt: thay bằng khoá phiên bản */ phienBanDem++ }
-let phienBanDem = 0
-async function soLieuCuaLop(env: Env, cungLop: [string, EmTrongTruong][], sbdThem: string | null, nowMs: number, moc: MocHienThi): Promise<{ thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null }> {
-  if (sbdThem !== null) return soLieuCuaLopTho(env, cungLop, sbdThem, nowMs, moc)
-  const khoa = `${phienBanDem}|${ngayVn(nowMs)}|${moc.iso}|${cungLop.map(([s, e]) => `${s}:${e.hoTen}`).join(',')}`
-  const kho = demThiDua.get(env.DB as object) ?? new Map()
-  demThiDua.set(env.DB as object, kho)
-  const co = kho.get(khoa)
-  if (co && nowMs - co.at >= 0 && nowMs - co.at < DEM_THI_DUA_MS) return co.kq
+export { xoaDemThiDua }
+/** `tuoi` = bảng vừa được ĐẾM trong lệnh này (true) hay lấy từ đệm (false). */
+async function soLieuCuaLop(env: Env, cungLop: [string, EmTrongTruong][], sbdThem: string | null, nowMs: number, moc: MocHienThi): Promise<{ thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null; tuoi: boolean }> {
+  if (sbdThem !== null) return { ...(await soLieuCuaLopTho(env, cungLop, sbdThem, nowMs, moc)), tuoi: true }
+  const khoa = `${ngayVn(nowMs)}|${moc.iso}|${cungLop.map(([s, e]) => `${s}:${e.hoTen}`).join(',')}`
+  const co = docDemThiDua<{ thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null }>(khoa, nowMs, DEM_THI_DUA_MS)
+  if (co) return { ...co, tuoi: false }
   const kq = await soLieuCuaLopTho(env, cungLop, null, nowMs, moc)
-  kho.set(khoa, { at: nowMs, kq })
-  if (kho.size > 40) for (const k of [...kho.keys()].slice(0, kho.size - 40)) kho.delete(k)
-  return kq
+  ghiDemThiDua(khoa, nowMs, kq)
+  return { ...kq, tuoi: true }
 }
 async function soLieuCuaLopTho(env: Env, cungLop: [string, EmTrongTruong][], sbdThem: string | null, nowMs: number, moc: MocHienThi): Promise<{ thanhVien: ThanhVienLop[]; rieng: ThanhVienLop | null }> {
   const homNay = ngayVn(nowMs)
