@@ -1,3 +1,4 @@
+import {laCauTuLuan} from '../../src/lib/cau-tu-luan'
 import {DemTTL} from './dem-chung'
 import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
 import type { Env } from './kieu'
@@ -76,7 +77,23 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
   }
   protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});return blocked
 }
-const demKhoDang=new DemTTL<{k:string;json:string}[]>(60_000,400,16_000_000)
+/** Câu trong POOL của readScope: câu ĐẦY ĐỦ (bằng chứng của em, `originals`) hoặc bản NHẸ của kho theo dạng (`nhe: true`: chỉ siêu dữ liệu để CHỌN + cờ `tuLuan` tính sẵn; KHÔNG có text, choices, ideas, hinhAnh, correct, solution).
+ *  Bản nhẹ là đối tượng ĐÓNG BĂNG dùng chung nhiều lượt: không được sửa; muốn đưa cho em thì phải qua `doDayDu`. */
+export type CauPool=PrivateQuestion&{nhe?:true;tuLuan?:boolean}
+const CO_NHE=['qid','maDe','version','group','phan','dang','tenDang','mucDo','sao','kienThuc','reviewed'] as const
+export function lamNhe(q:PrivateQuestion):CauPool{const n:Record<string,unknown>={};for(const k of CO_NHE)n[k]=(q as unknown as Record<string,unknown>)[k];n.nhe=true;n.tuLuan=laCauTuLuan(q);return Object.freeze(n) as unknown as CauPool}
+/** `laCauTuLuan` cho câu trong pool: bản nhẹ dùng cờ tính sẵn (hàm gốc cần text/đáp án); câu đầy đủ tính tại chỗ. */
+export const laTuLuanPool=(q:CauPool):boolean=>q.tuLuan??laCauTuLuan(q)
+/** Nạp bản ĐẦY ĐỦ của các câu nhẹ (một truy vấn, theo (ma_de, qid, version)); câu đầy đủ giữ nguyên. Thứ tự và độ dài giữ nguyên. Câu vừa bị sửa/rút khỏi kho ⇒ lỗi để em mở lượt mới (không tính sai). */
+export async function doDayDu(env:Env,cau:readonly CauPool[]):Promise<PrivateQuestion[]>{
+  const can=cau.filter(q=>q.nhe);if(!can.length)return cau as PrivateQuestion[]
+  const r=await env.DB.prepare(`SELECT q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') AND q.version=json_extract(j.value,'$[2]')`).bind(JSON.stringify(can.map(q=>[q.maDe,q.qid,q.version]))).all<{json:string}>()
+  const theo=new Map<string,PrivateQuestion>();for(const x of r.results??[]){const q=JSON.parse(str(x.json)) as PrivateQuestion;theo.set(`${q.maDe}|${q.qid}|${q.version}`,q)}
+  return cau.map(q=>{if(!q.nhe)return q as PrivateQuestion;const d=theo.get(`${q.maDe}|${q.qid}|${q.version}`);if(!d)throw new Error('Câu đã được sửa hoặc rút khỏi kho. Em mở lượt mới; lượt này không bị tính sai.');return d})
+}
+// ĐỆM KHO NHẸ THEO DẠNG (Code 1 đo trên kho thật: 15.359 câu / 953 dạng / 60 triệu ký tự JSON ⇒ đệm json 16 triệu ký tự bị đẩy liên tục): chỉ giữ SIÊU DỮ LIỆU (~300 byte/câu ⇒ cả kho ~5 MB), sống 15 phút;
+// đổi kho (thêm/sửa/xoá tờ) đổi khoá `phienBanKho` nên không bao giờ dùng bản cũ. Câu đầy đủ chỉ nạp cho vài câu được chọn (`doDayDu`).
+const demKhoDang=new DemTTL<{k:string;q:CauPool}[]>(900_000,1500,30_000_000)
 /** KHỐI CỦA EM (`hoc_sinh.lop` + tên lớp) — luật Boss 21/09 (P0 khối 11 nhận câu khối 12): MỌI kênh rút câu tự động chỉ được đưa câu khối em hoặc THẤP hơn (`src/lib/khoi-cau.ts`). Không đọc được ⇒ null (không lọc, "không biết ⇒ không kết tội"). */
 export async function docKhoiCacEm(env:Env,sbds:readonly string[]):Promise<Map<string,Khoi|null>>{
   const ra=new Map<string,Khoi|null>();const ds=[...new Set(sbds.filter(Boolean))];if(!ds.length)return ra
@@ -92,7 +109,7 @@ export async function docKhoiThapNhat(env:Env,sbds:readonly string[]):Promise<Kh
   let ra:Khoi|null=null;for(const k of (await docKhoiCacEm(env,sbds)).values())if(k!==null&&(ra===null||k<ra))ra=k
   return ra
 }
-export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[]):Promise<{evidence:Evidence[];pool:PrivateQuestion[];missing:number}> {
+export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[]):Promise<{evidence:Evidence[];pool:CauPool[];missing:number}> {
   const rows=await env.DB.prepare(`SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu,l.nop_luc FROM chi_tiet_cau c JOIN luot l ON l.ma_ca=c.ma_ca AND l.sbd=c.sbd AND l.lan_thu=c.lan_thu JOIN ca ON ca.ma_ca=c.ma_ca WHERE c.sbd=? AND l.nop_luc IS NOT NULL AND l.trang_thai IN ('da_nop','khoa') AND c.dung_sai IN (0,1) AND ca.trang_thai<>'da_xoa' AND (ca.cong_bo='ngay' OR (ca.cong_bo='ca_lop_xong' AND (ca.trang_thai='dong' OR (EXISTS(SELECT 1 FROM luot lc WHERE lc.ma_ca=ca.ma_ca) AND NOT EXISTS(SELECT 1 FROM luot ln WHERE ln.ma_ca=ca.ma_ca AND ln.trang_thai<>'da_nop'))))) ORDER BY l.nop_luc DESC`).bind(sbd).all<Row>()
   // Recover missing detail rows read-only, using only qids explicitly submitted by this learner.
   // Never fill an incomplete personal paper with the rest of the class bank.
@@ -137,7 +154,7 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
   let phienBanKho='?';try{const v=await env.DB.prepare(`SELECT COUNT(*) AS n, COALESCE(MAX(d.cap_nhat_luc),'') AS t, COALESCE(GROUP_CONCAT(d.ma_de),'') AS ids FROM de_kho d JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0`).first<{n:number;t:string;ids:string}>();phienBanKho=`${v?.n}|${v?.t}|${v?.ids}`}catch{phienBanKho='?'+Math.random()}
   const bayGio=Date.now()
   for(let i=0;i<types.length;i+=60){const ids=types.slice(i,i+60)
-    const theoDang=new Map<string,{k:string;json:string}[]>();const thieu:string[]=[]
+    const theoDang=new Map<string,{k:string;q:CauPool}[]>();const thieu:string[]=[]
     for(const d of ids){const c=demKhoDang.doc(phienBanKho+'|'+d,bayGio);if(c)theoDang.set(d,c);else thieu.push(d)}
     if(thieu.length){
       const khoa=await env.DB.prepare(`SELECT q.dang,q.ma_de,q.qid FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${thieu.map(()=>'?').join(',')})`).bind(...thieu).all<{dang:string;ma_de:string;qid:string}>()
@@ -146,11 +163,11 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
       const moi=new Map<string,{k:string;json:string}[]>(thieu.map(d=>[d,[]]))
       for(let j=0;j<ds.length;j+=300){const r=await env.DB.prepare(`SELECT q.ma_de,q.qid,q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') ORDER BY j.key`).bind(JSON.stringify(ds.slice(j,j+300))).all<{ma_de:string;qid:string;json:string}>()
         for(const x of r.results){const k=str(x.ma_de)+'|'+str(x.qid);moi.get(dangCua.get(k)??'')?.push({k,json:str(x.json)})}}
-      for(const [d,v] of moi){theoDang.set(d,v);demKhoDang.ghi(phienBanKho+'|'+d,bayGio,v,v.reduce((a,x)=>a+x.json.length,0)+64)}
+      for(const [d,v] of moi){const nhe=v.map(x=>({k:x.k,q:lamNhe(JSON.parse(x.json) as PrivateQuestion)}));theoDang.set(d,nhe);demKhoDang.ghi(phienBanKho+'|'+d,bayGio,nhe,nhe.length*300+64)}
     }
     const gop=ids.flatMap(d=>theoDang.get(d)??[]).sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0)
-    pool.push(...gop.map(x=>JSON.parse(x.json) as PrivateQuestion))
+    pool.push(...gop.map(x=>x.q))
   }
   // LUẬT KHỐI (Boss 21/09): kho ứng viên chỉ gồm câu khối em hoặc thấp hơn — dạng dùng chung nhiều khối nên lọc theo DẠNG không đủ. Bằng chứng (`evidence`) là lịch sử THẬT của em, giữ nguyên. Lọc đứng SAU đệm kho theo dạng (đệm chung mọi em), riêng từng em.
-  return {evidence,pool:locCauHopKhoi(await docKhoiEm(env,sbd),[...new Map(pool.map(q=>[q.qid,q])).values()]),missing}
+  return {evidence,pool:locCauHopKhoi(await docKhoiEm(env,sbd),[...pool.reduce((m,q)=>{const c=q as CauPool,cu=m.get(c.qid);if(!(cu&&!cu.nhe&&c.nhe))m.set(c.qid,c);return m},new Map<string,CauPool>()).values()] /* qid trùng: bản SAU thắng như cũ, TRỪ khi bản đang giữ là câu đầy đủ và bản mới là bản nhẹ */),missing}
 }

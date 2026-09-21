@@ -2,7 +2,7 @@
 // CHI PHÍ D1 của kho rút câu game (Boss 21/09: truy vấn `game_v2_question … ORDER BY cursor LIMIT 300` ≈ 246 triệu dòng đọc/ngày): bản mới TÁCH HAI PHA (khoá rồi json theo 300), tuyến tính.
 // Khoá: kết quả (nội dung + THỨ TỰ) đúng như thuật toán cũ; đề đã xoá / chỉ mục lệch phiên bản bị loại; mọi truy vấn ≤ 100 tham số (giới hạn D1); không còn phân trang bằng ORDER BY cursor. SQLite thật.
 import { describe, expect, it } from 'vitest'
-import { readScope } from '../server/src/game-v2-bank'
+import { lamNhe, readScope } from '../server/src/game-v2-bank'
 import { taoD1That, type D1That } from './_d1-that'
 
 /** Bộ giả: 4 dạng; đề 'A' và 'A1' CÙNG qid (thứ tự `ma_de|qid` khác thứ tự bộ (ma_de, qid): 'A1|q' < 'A|q'); đề 'Z' đã xoá; đề 'OLD' chỉ mục lệch phiên bản. > 300 câu để nhiều trang. */
@@ -19,7 +19,7 @@ function dung(): { d: D1That; dang: string[]; soKhop: number } {
   for (const [ma] of de) {
     for (let i = 1; i <= 260; i++) {
       const qid = ma === 'B' ? `b${i}` : `q${i}` // 'A' và 'A1' CÙNG qid: qid thắng cuối theo thứ tự `ma_de|qid` ('A1|q' < 'A|q' ⇒ bản của 'A' thắng); 'B' qid riêng
-      them.run(ma, qid, 'v', `g-${ma}-${i}`, dang[i % 4], JSON.stringify({ qid, ma_de: ma, dang: dang[i % 4], i }))
+      them.run(ma, qid, 'v', `g-${ma}-${i}`, dang[i % 4], JSON.stringify({ qid, maDe: ma, version: 'v', group: `g-${ma}-${i}`, phan: 'I', dang: dang[i % 4], tenDang: 'T', mucDo: 'biet', sao: 1, kienThuc: ['K'], reviewed: true, text: `Đề ${ma}-${i}`, i }))
       if (ma !== 'Z' && ma !== 'OLD') khop++
     }
   }
@@ -27,8 +27,8 @@ function dung(): { d: D1That; dang: string[]; soKhop: number } {
 }
 
 /** Thuật toán CŨ (nguyên văn truy vấn phân trang bằng cursor) — chuẩn đối chiếu. */
-async function poolCu(d: D1That, ids: string[]): Promise<{ qid: string; ma_de: string }[]> {
-  const pool: { qid: string; ma_de: string }[] = []
+async function poolCu(d: D1That, ids: string[]): Promise<{ qid: string; maDe: string }[]> {
+  const pool: { qid: string; maDe: string }[] = []
   let after = ''
   for (;;) {
     const r = await d.env.DB.prepare(`SELECT q.json,q.ma_de||'|'||q.qid cursor FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${ids.map(() => '?').join(',')}) AND q.ma_de||'|'||q.qid>? ORDER BY cursor LIMIT 300`).bind(...ids, after).all<{ json: string; cursor: string }>()
@@ -43,12 +43,13 @@ describe('readScope: pool kho rút câu (hai pha) == thuật toán cũ', () => {
   it('nội dung + THỨ TỰ giống hệt bản cũ (kể cả qid trùng giữa đề A / A1 và > 300 câu), đề đã xoá và chỉ mục lệch phiên bản bị loại', async () => {
     const { d, dang, soKhop } = dung()
     const cu = await poolCu(d, dang)
-    const moi = (await readScope(d.env, 'S1', dang)).pool as unknown as { qid: string; ma_de: string }[]
-    expect(moi).toEqual(cu)
+    const moi = (await readScope(d.env, 'S1', dang)).pool as unknown as { qid: string; maDe: string }[]
+    // SỬA CÓ CHỦ Ý 21/09 (pool NHẸ): pool là bản nhẹ của đúng những câu ấy, đúng thứ tự ⇒ so với bản cũ đã chiếu nhẹ; nội dung đầy đủ kiểm ở tests/ha-tai-d1-2109 (doDayDu)
+    expect(moi).toEqual(cu.map((q) => lamNhe(q as never)))
     expect(soKhop).toBeGreaterThan(300 * 2) // ≥ 3 trang
-    expect(moi.map((q) => q.ma_de).every((m) => m !== 'Z' && m !== 'OLD')).toBe(true)
+    expect(moi.map((q) => q.maDe).every((m) => m !== 'Z' && m !== 'OLD')).toBe(true)
     expect(new Set(moi.map((q) => q.qid)).size).toBe(520) // A/A1 gộp theo qid như cũ (260) + B (260)
-    expect(moi.filter((q) => q.qid === 'q1').map((q) => q.ma_de)).toEqual(['A']) // thứ tự `ma_de|qid`: A1 trước A ⇒ A thắng (sắp chỉ theo qid sẽ ra A1)
+    expect(moi.filter((q) => q.qid === 'q1').map((q) => q.maDe)).toEqual(['A']) // thứ tự `ma_de|qid`: A1 trước A ⇒ A thắng (sắp chỉ theo qid sẽ ra A1)
   })
 
   it('nhiều lô dạng (> 60 dạng ⇒ nhiều lượt) vẫn giống bản cũ theo từng lô', async () => {
@@ -57,7 +58,7 @@ describe('readScope: pool kho rút câu (hai pha) == thuật toán cũ', () => {
     const moi = (await readScope(d.env, 'S1', nhieu)).pool as unknown as { qid: string }[]
     const cu: { qid: string }[] = []
     for (let i = 0; i < nhieu.length; i += 60) cu.push(...await poolCu(d, nhieu.slice(i, i + 60)))
-    expect(moi).toEqual([...new Map(cu.map((q) => [q.qid, q])).values()])
+    expect(moi).toEqual([...new Map(cu.map((q) => [q.qid, q])).values()].map((q) => lamNhe(q as never)))
     expect(moi.length).toBe(520)
   })
 

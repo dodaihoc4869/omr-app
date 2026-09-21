@@ -3,7 +3,8 @@
 // (3) xác thực token đệm 60 giây (đổi mật khẩu có hiệu lực ≤ 60 giây), token sai / hết hạn / sửa nội dung không bao giờ lọt.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DemTTL, xoaMoiDem } from '../server/src/dem-chung'
-import { readScope } from '../server/src/game-v2-bank'
+import { doDayDu, laTuLuanPool, readScope } from '../server/src/game-v2-bank'
+import { laCauTuLuan } from '../src/lib/cau-tu-luan'
 import { gameIdentity, gameToken } from '../server/src/game-v2-auth'
 import { taoD1That, type D1That } from './_d1-that'
 
@@ -74,11 +75,11 @@ describe('readScope · đệm kho câu theo dạng', () => {
     xoaMoiDem(); expect(await readScope(d.env, 'S1', ['A.1', 'B.2'])).toEqual(a)         // bản không đệm cho đúng kết quả ấy
     expect(qids(await readScope(d.env, 'S1', ['B.2', 'A.1']))).toEqual(['DE-A-0', 'DE-A-1', 'DE-A-2', 'DE-B-0', 'DE-B-1', 'DE-B-2'])   // thứ tự đúng theo ma_de|qid dù dạng đưa vào ngược
   })
-  it('hết 60 giây ⇒ nạp lại; còn 59 giây ⇒ vẫn đệm', async () => {
+  it('hết 15 phút ⇒ nạp lại; còn 14 phút ⇒ vẫn đệm (đệm kho NHẸ sống lâu; đổi kho đã có phiên bản kho lo)', async () => {
     const d = kho(); const lenh = ghiLenh(d)
     await readScope(d.env, 'S1', ['A.1']); const n0 = lenh.filter(laTruyVanKho).length
-    vi.setSystemTime(T0 + 59_000); await readScope(d.env, 'S1', ['A.1']); expect(lenh.filter(laTruyVanKho).length).toBe(n0)
-    vi.setSystemTime(T0 + 61_000); await readScope(d.env, 'S1', ['A.1']); expect(lenh.filter(laTruyVanKho).length).toBeGreaterThan(n0)
+    vi.setSystemTime(T0 + 14 * 60_000); await readScope(d.env, 'S1', ['A.1']); expect(lenh.filter(laTruyVanKho).length).toBe(n0)
+    vi.setSystemTime(T0 + 15 * 60_000 + 1000); await readScope(d.env, 'S1', ['A.1']); expect(lenh.filter(laTruyVanKho).length).toBeGreaterThan(n0)
   })
   it('KHÔNG lẫn giữa lớp: em lớp A chỉ có dạng A.1, em lớp B chỉ có B.2, xen kẽ A-B-A vẫn đúng', async () => {
     const d = kho()
@@ -97,10 +98,10 @@ describe('readScope · đệm kho câu theo dạng', () => {
   })
   it('đổi phiên bản kho (tải đề mới / sửa đề / xoá đề): đệm cũ KHÔNG được dùng, không chờ hết 60 giây', async () => {
     const d = kho()
-    expect((await readScope(d.env, 'S1', ['A.1'])).pool[0]!.text).toBe('Đề DE-A-0')
+    expect((await doDayDu(d.env, (await readScope(d.env, 'S1', ['A.1'])).pool))[0]!.text).toBe('Đề DE-A-0')
     taiDe(d, 'DE-A', 'A.1', 'v2', 3, ' (đã sửa)')                                       // đề được sửa: cap_nhat_luc + chỉ mục đổi
     vi.setSystemTime(T0 + 1000)
-    const p = await readScope(d.env, 'S1', ['A.1']); expect(p.pool[0]!.text).toBe('Đề DE-A-0 (đã sửa)'); expect(p.pool[0]!.version).toBe('v2')
+    const p = await readScope(d.env, 'S1', ['A.1']); expect((await doDayDu(d.env, p.pool))[0]!.text).toBe('Đề DE-A-0 (đã sửa)'); expect(p.pool[0]!.version).toBe('v2')
     d.sql.prepare("UPDATE de_kho SET da_xoa=1 WHERE ma_de='DE-A'").run(); vi.setSystemTime(T0 + 2000)
     expect((await readScope(d.env, 'S1', ['A.1'])).pool).toEqual([])                     // xoá đề: biến mất ngay
     taiDe(d, 'DE-C', 'A.1', 'v1', 2); vi.setSystemTime(T0 + 3000)
@@ -131,5 +132,55 @@ describe('gameIdentity · đệm xác thực token 60 giây', () => {
     const d = kho(); const token = await gameToken(d.env, 'S1'); const exp = (JSON.parse(atob(token.split('.')[0]!)) as { exp: number }).exp
     vi.setSystemTime(exp - 20_000); expect(await gameIdentity(d.env, { token })).toBe('S1')     // hạn còn 20 giây: xác thực và đệm
     vi.setSystemTime(exp + 5_000); await expect(gameIdentity(d.env, { token })).rejects.toThrow(/hết hạn/)
+  })
+})
+
+describe('pool NHẸ + nạp đầy đủ khi chọn (Code 1 đo: kho thật 60 triệu ký tự làm đệm json 16 triệu bị đẩy liên tục)', () => {
+  it('bản nhẹ chỉ có siêu dữ liệu + cờ tuLuan tính sẵn, ĐÓNG BĂNG, không có text/choices/đáp án/lời giải; cờ tuLuan = laCauTuLuan của câu đầy đủ', async () => {
+    const d = kho(); const p = (await readScope(d.env, 'S1', ['A.1'])).pool
+    expect(p).toHaveLength(3)
+    for (const q of p) {
+      expect(q.nhe).toBe(true); expect(Object.isFrozen(q)).toBe(true); expect(q.tuLuan).toBe(false)
+      for (const k of ['text', 'choices', 'ideas', 'correct', 'solution', 'hinhAnh']) expect(k in q, k).toBe(false)
+      expect(q).toMatchObject({ maDe: 'DE-A', version: 'v1', dang: 'A.1', phan: 'I', reviewed: true, mucDo: 'biet' })
+    }
+    const day = await doDayDu(d.env, p)
+    expect(day.map((q) => q.text)).toEqual(['Đề DE-A-0', 'Đề DE-A-1', 'Đề DE-A-2']); for (const q of day) { expect(q.correct).toBe('B'); expect(q.choices).toHaveLength(4); expect(laTuLuanPool(p[0]!)).toBe(laCauTuLuan(q)) }
+  })
+  it('cờ tuLuan bắt câu tự luận đúng như hàm gốc (Phần I thiếu phương án) — bản nhẹ KHÔNG được lọt qua bộ lọc', async () => {
+    const d = kho()
+    const hong = { ...cau('DE-A-9', 'A.1', 'DE-A'), choices: ['a'] }                // Phần I chỉ 1 phương án ⇒ tự luận
+    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE-A', hong.qid, 'v1', hong.group, 'A.1', JSON.stringify(hong))
+    const p = (await readScope(d.env, 'S1', ['A.1'])).pool; const h = p.find((q) => q.qid === 'DE-A-9')!
+    expect(laCauTuLuan(hong)).toBe(true); expect(h.tuLuan).toBe(true); expect(laTuLuanPool(h)).toBe(true); expect(laTuLuanPool(p.find((q) => q.qid === 'DE-A-0')!)).toBe(false)
+  })
+  it('doDayDu: câu đầy đủ giữ nguyên; câu vừa bị rút khỏi kho ⇒ lỗi (em mở lượt mới), không trả bừa; thứ tự giữ nguyên', async () => {
+    const d = kho(); const p = (await readScope(d.env, 'S1', ['A.1'])).pool
+    const da = await doDayDu(d.env, [p[2]!, p[0]!]); expect(da.map((q) => q.qid)).toEqual(['DE-A-2', 'DE-A-0'])
+    expect(await doDayDu(d.env, da)).toBe(da)                                                    // đã đầy đủ ⇒ không truy vấn, cùng mảng
+    d.sql.prepare("DELETE FROM game_v2_question WHERE qid = 'DE-A-1'").run()
+    await expect(doDayDu(d.env, [p[1]!])).rejects.toThrow(/sửa hoặc rút khỏi kho/)
+  })
+  it('doDayDu kiểm PHIÊN BẢN: câu trong bảng đã đổi phiên bản kể từ lúc bản nhẹ được đệm ⇒ lỗi (không trả câu khác phiên bản với câu em đã được phát)', async () => {
+    const d = kho(); const p = (await readScope(d.env, 'S1', ['A.1'])).pool
+    const [v1] = await doDayDu(d.env, [p[0]!]); expect(v1!.version).toBe('v1')
+    d.sql.prepare("UPDATE game_v2_question SET version = 'v2', json = json_set(json, '$.version', 'v2') WHERE qid = 'DE-A-0'").run()
+    await expect(doDayDu(d.env, [p[0]!])).rejects.toThrow(/sửa hoặc rút khỏi kho/)
+  })
+  it('câu ĐẦY ĐỦ của bằng chứng (em từng gặp) được ƯU TIÊN hơn bản nhẹ cùng qid trong pool', async () => {
+    const d = kho()
+    d.sql.prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang) VALUES ('s1','S1','DE-A-1','on_lai','m',1,0,30,'2026-09-22T01:00:00.000Z','2026-09-22','A.1')").run()
+    d.sql.prepare("INSERT INTO nam_kt_cau(khoa,sbd,qid,ma_dang,chuyen_de,lan_gap,lan_sai,lan_trong,dung_lien_tiep,ngay_dung_khac_nhau,ket_qua_cuoi,nguon_cuoi,luc_cuoi,moc_on_ke,trang_thai,can_day_lai,cap_nhat_luc) VALUES('k1','S1','DE-A-1','A.1','',1,1,0,0,0,0,'on_lai','2026-09-22T01:00:00.000Z',NULL,'moi_sai',0,'x')").run()
+    const p = (await readScope(d.env, 'S1', ['A.1'])).pool
+    const q1 = p.find((q) => q.qid === 'DE-A-1')!; expect(q1.nhe).toBeUndefined(); expect(q1.text).toBe('Đề DE-A-1'); expect(q1.correct).toBe('B')
+    expect(p.filter((q) => q.qid === 'DE-A-1')).toHaveLength(1); expect(p.map((q) => q.qid)).toEqual(['DE-A-1', 'DE-A-0', 'DE-A-2'])   // vị trí: câu bằng chứng đứng đầu như cũ
+  })
+  it('KHÔNG đẩy nhau: 300 dạng × 4 câu (kho lớn hơn trần cũ) đều nằm trong đệm — lượt hai của một em khác KHÔNG truy vấn nạp câu nào', async () => {
+    const d = kho()
+    for (let i = 0; i < 300; i++) taiDe(d, `DE-K${i}`, `K.${i}`, 'v1', 4)
+    const dang = Array.from({ length: 300 }, (_, i) => `K.${i}`)
+    const a = await readScope(d.env, 'S1', dang); expect(a.pool).toHaveLength(1200)
+    const lenh = ghiLenh(d); const b = await readScope(d.env, 'S2', dang)
+    expect(lenh.filter(laTruyVanKho)).toEqual([]); expect(b.pool.map((q) => q.qid)).toEqual(a.pool.map((q) => q.qid))
   })
 })
