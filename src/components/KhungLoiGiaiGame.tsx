@@ -99,7 +99,7 @@ export default function KhungLoiGiaiGame({
         <div className="flex items-start gap-2 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-800 text-[12px] text-amber-900 dark:text-amber-200">
           <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
           <span>
-            <b>Câu này đang lệch đáp án.</b> Máy tự giải ra một đáp án, tác giả đề ghi
+            <b>Câu này đang lệch đáp án.</b> A.I Đỗ Đại Học tự giải ra một đáp án, tác giả đề ghi
             một đáp án khác. Em hỏi lại thầy trước khi tin lời giải dưới đây.
             {co.ghiChu !== '' && <> ({co.ghiChu})</>}
           </span>

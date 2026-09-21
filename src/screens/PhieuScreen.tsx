@@ -756,7 +756,7 @@ function NutXemDeDaLam({ du, laCuaEm = false }: { du: PhieuDayDu; laCuaEm?: bool
         {dang ? 'Đang dựng đề…' : `Xem đề ${xung} vừa làm (${du.deCuaEm?.length ?? 0} câu) kèm lời giải`}
       </button>
       <div style={{ fontSize: 12, color: 'var(--p-nhat)', marginTop: 7, lineHeight: 1.6 }}>
-        Đúng bộ câu máy đã gán riêng cho {xung}. Bấm vào từng câu để xem đáp án và lời giải.
+        Đúng bộ câu A.I Đỗ Đại Học đã gán riêng cho {xung}. Bấm vào từng câu để xem đáp án và lời giải.
       </div>
       {loi && <div style={{ fontSize: 12.5, color: 'var(--p-do)', marginTop: 6 }}>{loi}</div>}
       {html && <KhungXemPhieu html={html} ten={`Đề ${xung} vừa làm`} dong={() => setHtml('')} />}

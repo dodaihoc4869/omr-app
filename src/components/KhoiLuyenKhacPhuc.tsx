@@ -183,7 +183,7 @@ export default function KhoiLuyenKhacPhuc({ scriptUrl, maBiMat }: { scriptUrl: s
         <div className="flex flex-col" style={{ gap: 'var(--k3)', marginTop: 'var(--k3)' }}>
           {/* NÓI THẲNG GIỚI HẠN, ngay chỗ thầy đọc số. */}
           <OThongBao tone="cam">
-            <b>Nộp</b> là em bấm nộp và máy chấm — đó là "em có làm". <b>Mở</b> chỉ là em bấm vào link. Phiếu dựng trước 08/09 không có nút nộp nên chỉ có số mở; dựng lại phiếu cho ca đó là em nộp được.
+            <b>Nộp</b> là em bấm nộp và A.I Đỗ Đại Học chấm — đó là "em có làm". <b>Mở</b> chỉ là em bấm vào link. Phiếu dựng trước 08/09 không có nút nộp nên chỉ có số mở; dựng lại phiếu cho ca đó là em nộp được.
           </OThongBao>
 
           <div className="relative">

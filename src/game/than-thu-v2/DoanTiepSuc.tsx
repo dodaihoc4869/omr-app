@@ -7,7 +7,7 @@ import { ThuHinh } from './DoanHinh'
 
 const HINH: Record<string, ReactElement> = { nhac_cong_thuc: <BookOpen size={22} />, loai_phuong_an: <Ban size={22} />, buoc_dau: <ArrowUpRight size={22} /> }
 const THU_TU = ['nhac_cong_thuc', 'loai_phuong_an', 'buoc_dau'] as const
-const MAC_DINH: Record<string, [string, string]> = { nhac_cong_thuc: ['Nhắc công thức', 'Gửi bạn kiến thức gốc của câu'], loai_phuong_an: ['Loại 1 phương án', 'Máy gạch một đáp án sai'], buoc_dau: ['Chỉ bước đầu', 'Hé bước đầu của lời giải'] }
+const MAC_DINH: Record<string, [string, string]> = { nhac_cong_thuc: ['Nhắc công thức', 'Gửi bạn kiến thức gốc của câu'], loai_phuong_an: ['Loại 1 phương án', 'A.I Đỗ Đại Học gạch một đáp án sai'], buoc_dau: ['Chỉ bước đầu', 'Hé bước đầu của lời giải'] }
 
 export default function DoanTiepSuc({ goiY, ban, loi, onChon, onDong }: { goiY: GoiYTiepSuc; ban: boolean; loi: string; onChon: (loai: string) => void; onDong: () => void }) {
   const co = new Map(goiY.the.map(t => [t.loai, t]))
@@ -31,7 +31,7 @@ export default function DoanTiepSuc({ goiY, ban, loi, onChon, onDong }: { goiY: 
         </div>
         {loi && <div className="dh-loi" role="alert">{loi}</div>}
         <div className="dh-tam-chan">
-          <span>Thẻ do máy soạn từ lời giải — <b>không bao giờ là đáp án</b>. Câu được giúp hôm nay sẽ quay lại để {goiY.ten} tự làm vào ngày mai.</span>
+          <span>Thẻ do A.I Đỗ Đại Học soạn từ lời giải — <b>không bao giờ là đáp án</b>. Câu được giúp hôm nay sẽ quay lại để {goiY.ten} tự làm vào ngày mai.</span>
           <button type="button" className="dh-nut-mo" onClick={onDong}>Để sau</button>
         </div>
       </section>

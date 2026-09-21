@@ -143,7 +143,7 @@ describe('Đoàn Hộ Tống · giao diện · Trong trận', () => {
 
 describe('Đoàn Hộ Tống · giao diện · Tiếp sức (màn 3)', () => {
   const ts = (o: Record<string, unknown> = {}) => ({ conLuotNhan: 2, daXin: false, theNhan: null, banCan: [], daGiup: false, lienKichSanSang: false, ...o })
-  const goiY = { den: 1, ten: 'Thu Hà', pet: 1, cap: 30, tenDang: 'Ancol', de: 'Oxi hoá ethanol bằng CuO, đun nóng, thu được chất hữu cơ X. X là…', the: [{ loai: 'nhac_cong_thuc', tieuDe: 'Nhắc công thức', moTa: 'Gửi bạn kiến thức gốc của câu' }, { loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án', moTa: 'Máy gạch một đáp án sai' }] }
+  const goiY = { den: 1, ten: 'Thu Hà', pet: 1, cap: 30, tenDang: 'Ancol', de: 'Oxi hoá ethanol bằng CuO, đun nóng, thu được chất hữu cơ X. X là…', the: [{ loai: 'nhac_cong_thuc', tieuDe: 'Nhắc công thức', moTa: 'Gửi bạn kiến thức gốc của câu' }, { loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án', moTa: 'A.I Đỗ Đại Học gạch một đáp án sai' }] }
   it('em CHƯA chốt: nút "Cần tiếp sức · còn 2 lần được tiếp sức" bật tín hiệu; hết lượt thì nói rõ; nhận thẻ thì hiện nội dung thẻ + biểu ngữ Liên Kích', async () => {
     const { call } = dung(trongTran({ tiepSuc: ts() as never }))
     fireEvent.click(await screen.findByRole('button', { name: /Cần tiếp sức · còn 2 lần được tiếp sức/ }))

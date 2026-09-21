@@ -766,7 +766,7 @@ export default function StudentPortalScreen() {
                   sbd: auth.sbd,
                   url: `${String(url || '').replace(/\/+$/, '')}/goi`,
                 },
-                loiNhac: `Em chọn đáp án trực tiếp trên từng câu và bấm "Nộp bài" ở thanh trên để máy chấm điểm ngay và mở lời giải chi tiết.`,
+                loiNhac: `Em chọn đáp án trực tiếp trên từng câu và bấm "Nộp bài" ở thanh trên để A.I Đỗ Đại Học chấm điểm ngay và mở lời giải chi tiết.`,
               }
             )
 

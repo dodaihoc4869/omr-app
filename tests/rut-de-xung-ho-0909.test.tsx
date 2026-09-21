@@ -8,7 +8,7 @@
 //
 //   · nhãn bìa đề dựng ra:  "Đề con vừa làm, kèm lời giải"
 //   · chữ trên nút:         "Xem đề con vừa làm (N câu) kèm lời giải"
-//   · dòng chú thích:       "…máy đã gán riêng cho con."
+//   · dòng chú thích:       "…A.I Đỗ Đại Học đã gán riêng cho con."
 //   · tên khung xem:        "Đề con vừa làm"
 //   · câu báo lỗi:          "Phụ huynh thử lại khi có mạng ổn định."
 //
@@ -60,14 +60,14 @@ describe('khối RÚT ĐỀ xưng hô theo đúng người đang đọc', () => 
   it('BÁO CÁO CỦA EM: nút và chú thích xưng "em", không còn chữ "con"', () => {
     render(<PhieuScreen duCoSan={goiPhieu()} laCuaEm />)
     expect(screen.getByText(/Xem đề em vừa làm \(1 câu\) kèm lời giải/)).toBeTruthy()
-    expect(screen.getByText(/máy đã gán riêng cho/).textContent).toContain('cho em')
+    expect(screen.getByText(/A.I Đỗ Đại Học đã gán riêng cho/).textContent).toContain('cho em')
     expect(screen.queryByText(/Xem đề con vừa làm/)).toBeNull()
   })
 
   it('BÁO CÁO GỬI PHỤ HUYNH: giữ nguyên xưng "con" — không được chữa hỏng vế kia', () => {
     render(<PhieuScreen duCoSan={goiPhieu()} />)
     expect(screen.getByText(/Xem đề con vừa làm \(1 câu\) kèm lời giải/)).toBeTruthy()
-    expect(screen.getByText(/máy đã gán riêng cho/).textContent).toContain('cho con')
+    expect(screen.getByText(/A.I Đỗ Đại Học đã gán riêng cho/).textContent).toContain('cho con')
     expect(screen.queryByText(/Xem đề em vừa làm/)).toBeNull()
   })
 

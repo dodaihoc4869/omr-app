@@ -225,7 +225,7 @@ function NutTaiBaiTap({ du, laCuaEm = false, xinLink }: { du: PhieuDayDu; laCuaE
       <div className="bc-tieu">{laCuaEm ? 'Bộ câu khắc phục lỗi sai' : 'Bài luyện theo đúng chỗ em mất điểm'}</div>
       {laCuaEm && (
         <div className="bc-viec-chu" style={{ marginTop: 6 }}>
-          Em hãy tạo câu khắc phục lỗi sai để luyện tập. Máy rút đúng chuyên đề em vừa mất điểm, xếp từ dễ lên khó.
+          Em hãy tạo câu khắc phục lỗi sai để luyện tập. A.I Đỗ Đại Học rút đúng chuyên đề em vừa mất điểm, xếp từ dễ lên khó.
         </div>
       )}
 
