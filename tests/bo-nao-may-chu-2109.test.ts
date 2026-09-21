@@ -589,3 +589,48 @@ describe('khoá nguồn', () => {
     expect(readFileSync('server/src/index.ts', 'utf8')).toContain("from './bo-nao'") // Code 3 ĐÃ nối (chỉ sau cổng laThay, khoá ở tests/bo-nao-noi-route-2109.test.ts); tệp này không tự sửa index.ts
   })
 })
+
+describe('/ai/dieu-chinh/nop · THỬ THÁCH RIÊNG (khuôn d27ca44 của Code 1 khớp hợp đồng docs/hop-dong-thu-thach-rieng-2109.md)', () => {
+  const nop = (cacEm: unknown[]) => boNaoNop(d.env, { ngay: NGAY, cacEm }, NOW)
+  const daLuu = () => JSON.parse((d.sql.prepare(`SELECT json FROM ai_dieu_chinh WHERE sbd = '12001'`).get() as { json: string }).json) as Record<string, unknown>
+  const TT = { dang: ['ESTE.THUY_PHAN'], soCau: 5, bac: 'dung_bac' }
+  const LOI = 'Hôm qua em đúng 7/8 câu. Hôm nay thử mấy câu cùng dạng nhé.'
+  beforeEach(async () => {
+    dungBaEm()
+    await hoSo()
+  })
+
+  it('thuThach + loiMoi HỢP LỆ đi qua kiểm khuôn lần hai và được LƯU nguyên vẹn (kể cả chế độ bóng: lưu nhưng không áp dụng)', async () => {
+    const r = await nop([dauRa({ thuThach: TT, loiMoi: LOI })])
+    expect(r).toMatchObject({ ok: true, nhan: 1, biLoai: 0 })
+    expect(daLuu()).toMatchObject({ thuThach: TT, loiMoi: LOI })
+    expect(d.sql.prepare(`SELECT ap_dung FROM ai_dieu_chinh WHERE sbd = '12001'`).get()).toEqual({ ap_dung: 0 })
+  })
+
+  it('SAI KHUÔN riêng phần thử thách (số câu hứa trong lời mời, dạng lạ, số ngoài thẻ, thiếu một nửa) ⇒ phần tử VẪN nhận nhưng thuThach + loiMoi bị bỏ CẢ HAI; phần còn lại giữ', async () => {
+    const trường = [
+      { thuThach: TT, loiMoi: 'Hôm qua em đúng 7/8 câu. Hôm nay thử 5 câu cùng dạng nhé.' }, // hứa số câu (số 5 không có trong thẻ)
+      { thuThach: { ...TT, dang: ['DANG.LA'] }, loiMoi: LOI },
+      { thuThach: { ...TT, soCau: 9 }, loiMoi: LOI },
+      { thuThach: TT, loiMoi: 'Hôm qua em đúng 99 câu.' },
+      { thuThach: TT },
+      { loiMoi: LOI },
+    ]
+    for (const t of trường) {
+      const r = await nop([dauRa(t)])
+      expect(r, JSON.stringify(t)).toMatchObject({ ok: true, nhan: 1, biLoai: 0 })
+      const x = daLuu()
+      expect(x).not.toHaveProperty('thuThach')
+      expect(x).not.toHaveProperty('loiMoi')
+      expect(x.loiNhanChoEm).toBe('Hôm qua em đúng 7/8 câu. Mai mình xếp sẵn ba câu cùng dạng cho em nhé.') // phần khác của phần tử giữ nguyên
+      expect(((r.canhBao as { sbd: string; canhBao: string[] }[]) ?? []).some((c) => c.sbd === '12001' && c.canhBao.join().includes('thuThach bị bỏ'))).toBe(true)
+    }
+  })
+
+  it('không gửi thuThach ⇒ y hệt trước (không khoá thuThach/loiMoi trong bản lưu)', async () => {
+    await nop([dauRa()])
+    const x = daLuu()
+    expect(x).not.toHaveProperty('thuThach')
+    expect(x).not.toHaveProperty('loiMoi')
+  })
+})
