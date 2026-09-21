@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { mulberry32 } from '../src/lib/exam-shuffle'
 import {
   BU_DAT_NGAY, CHENH_THUONG_NAC, HAP_THU_CO_HOC, HAP_THU_DAT, LUAT_CAP_MOI, NGAY_SOM_NHAT_CAP_10, NGAY_SOM_NHAT_CAP_120, TRAN_EXP_GAME_NGAY,
-  chenhDinhGia, chuyenDoiLuatCap, hapThu, tongExpTheoDuongCu, tranExpGameNgay, tranHapThu, type HoSoCapExp, type HoSoCu,
+  CO_HOC_TOI_THIEU_CAU, chenhDinhGia, chuyenDoiLuatCap, hapThu, laCoHoc, tongExpTheoDuongCu, tranExpGameNgay, tranHapThu, type HoSoCapExp, type HoSoCu,
 } from '../src/lib/hap-thu-ngay'
 import { BANG_THANH_EXP, nhanExp, thanhExp, thanhExpCu, tongExpToiCap, tongExpToiDinh } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 
@@ -77,6 +77,19 @@ describe('tranHapThu · tranExpGameNgay', () => {
     expect(tranHapThu({ datHomNay: true, coHocHomNay: false })).toBe(200)
     expect(tranHapThu({ datHomNay: false, coHocHomNay: true })).toBe(120)
     expect(tranHapThu({ datHomNay: false, coHocHomNay: false })).toBe(0)
+  })
+  it('"CÓ HỌC" cần ≥ 4 câu KHÁC NHAU hôm nay (Boss siết 21/09): soCauHomNay 3 ⇒ 0 · 4 ⇒ 120; đạt ⇒ 200 bất kể số câu; soCauHomNay thắng coHocHomNay; số lạ ⇒ chưa học; chữ ký cũ (chỉ boolean) vẫn chạy', () => {
+    expect(CO_HOC_TOI_THIEU_CAU).toBe(4)
+    expect([0, 1, 3].map((n) => tranHapThu({ datHomNay: false, soCauHomNay: n }))).toEqual([0, 0, 0])
+    expect([4, 5, 40].map((n) => tranHapThu({ datHomNay: false, soCauHomNay: n }))).toEqual([120, 120, 120])
+    expect(tranHapThu({ datHomNay: true, soCauHomNay: 0 })).toBe(200)
+    expect(tranHapThu({ datHomNay: false, coHocHomNay: true, soCauHomNay: 2 })).toBe(0) // số câu thắng cờ
+    expect(tranHapThu({ datHomNay: false, coHocHomNay: false, soCauHomNay: 9 })).toBe(120)
+    for (const n of [Number.NaN, -3, Number.NEGATIVE_INFINITY]) expect(tranHapThu({ datHomNay: false, soCauHomNay: n }), String(n)).toBe(0)
+    expect(laCoHoc(3.9)).toBe(false)
+    expect(laCoHoc(4)).toBe(true)
+    expect(tranHapThu({ datHomNay: false, coHocHomNay: true })).toBe(120)
+    expect(tranHapThu({ datHomNay: false })).toBe(0)
   })
   it('EXP game tối đa 120 mỗi ngày: nhận phần còn lại của trần, quá trần ⇒ 0, không âm, số lạ ⇒ 0', () => {
     expect(TRAN_EXP_GAME_NGAY).toBe(120)

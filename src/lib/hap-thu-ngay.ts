@@ -37,9 +37,20 @@ export interface HoSoCapExp {
 const soNguyen = (x: unknown): number => (typeof x === 'number' && Number.isFinite(x) ? Math.max(0, Math.floor(x)) : 0)
 const kepCap = (c: unknown): number => Math.min(CAP_TOI_DA, Math.max(1, Math.round(typeof c === 'number' && Number.isFinite(c) ? c : 1)))
 
-/** Sức hấp thụ của ngày hôm nay: đạt ⇒ 200, có học ⇒ 120, còn lại ⇒ 0. (Đạt mà "không có học" không xảy ra: đạt ⇒ đã làm ≥ mức tối thiểu ⇒ có học.) */
-export function tranHapThu(v: { datHomNay: boolean; coHocHomNay: boolean }): number {
-  return v.datHomNay ? HAP_THU_DAT : v.coHocHomNay ? HAP_THU_CO_HOC : 0
+/**
+ * "CÓ HỌC" (siết 21/09 chiều, Boss chốt): hôm nay em làm ít nhất chừng này câu KHÁC NHAU (mọi nguồn) mới được hấp thụ `HAP_THU_CO_HOC`. Trước đó chỉ cần ≥ 1 sự kiện — một câu sai mỗi ngày
+ * là đủ ăn 120 từ ống dự trữ. Đạt nhiệm vụ ngày thì hiển nhiên đã làm đủ (mức tối thiểu ≥ 4 câu).
+ */
+export const CO_HOC_TOI_THIEU_CAU = 4
+export const laCoHoc = (soCauKhacNhauHomNay: number): boolean => soNguyen(soCauKhacNhauHomNay) >= CO_HOC_TOI_THIEU_CAU
+
+/**
+ * Sức hấp thụ của ngày hôm nay: đạt ⇒ 200, có học ⇒ 120, còn lại ⇒ 0. Truyền `soCauHomNay` (số câu KHÁC NHAU hôm nay, mọi nguồn) ⇒ "có học" = `laCoHoc(soCauHomNay)` và BỎ QUA `coHocHomNay`;
+ * chỉ truyền `coHocHomNay` (boolean, chữ ký cũ) ⇒ dùng như máy chủ báo. (Đạt mà "không có học" không xảy ra: đạt ⇒ đã làm ≥ mức tối thiểu.)
+ */
+export function tranHapThu(v: { datHomNay: boolean; coHocHomNay?: boolean; soCauHomNay?: number }): number {
+  const coHoc = v.soCauHomNay !== undefined ? laCoHoc(v.soCauHomNay) : v.coHocHomNay === true
+  return v.datHomNay ? HAP_THU_DAT : coHoc ? HAP_THU_CO_HOC : 0
 }
 
 /** Số EXP game em được NHẬN thêm hôm nay: `xin` bị chặn ở phần còn lại của trần 120/ngày (không âm). Quá trần ⇒ 0 (câu, bản đồ, vé vẫn ghi — chỉ thưởng EXP bằng 0). */
