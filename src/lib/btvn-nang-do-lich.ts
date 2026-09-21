@@ -39,6 +39,10 @@ export const LICH_CHANG = {
   /** Không chặng nào mở trong khoảng này (giờ VN), trừ chặng mở ngay lúc chốt. */
   GIO_CAM_MO_TU: 0,
   GIO_CAM_MO_DEN: 6,
+  /** CHẶNG NẶNG (Boss chốt 21/09, hướng (c)): một chặng > chừng này câu HOẶC > chừng này phút làm (theo giây/câu của em) ⇒ báo mềm, KHÔNG đổi bộ hay lịch.
+   * MỘT nguồn cho máy em (Code 2) và Xem trước của thầy (Code 4) — xem `laChangNang`. Xảy ra khi lõi vượt sức chứa còn lại của cửa sổ học (em mở sát hạn). */
+  CHANG_NANG_CAU: 20,
+  CHANG_NANG_PHUT: 40,
 } as const
 
 export type CheDoLich = 'dai' | 'ngan'
@@ -138,6 +142,18 @@ function cuaSoHieuLuc(cs?: CuaSoHoc): { tu: number; den: number } {
 
 function giayHopLe(g: number): number {
   return Number.isFinite(g) && g >= 5 && g <= 900 ? g : LICH_CHANG.GIAY_MAC_DINH
+}
+
+/** Phút ước tính để làm `soCau` câu (làm tròn LÊN, để hiện cho người đọc). Giây/câu lạ ⇒ mặc định. */
+export function phutUocTinhChang(soCau: number, giayMoiCau: number): number {
+  const n = Number.isFinite(soCau) && soCau > 0 ? Math.floor(soCau) : 0
+  return Math.ceil((n * giayHopLe(giayMoiCau)) / 60)
+}
+
+/** CHẶNG NẶNG? Chỉ so số thực (không làm tròn): > `CHANG_NANG_CAU` câu HOẶC > `CHANG_NANG_PHUT` phút. Đúng 20 câu / đúng 40 phút chưa nặng. Không đổi bộ, không đổi lịch — chỉ để CẢNH BÁO. */
+export function laChangNang(soCau: number, giayMoiCau: number): boolean {
+  const n = Number.isFinite(soCau) && soCau > 0 ? Math.floor(soCau) : 0
+  return n > LICH_CHANG.CHANG_NANG_CAU || n * giayHopLe(giayMoiCau) > LICH_CHANG.CHANG_NANG_PHUT * 60
 }
 
 /**

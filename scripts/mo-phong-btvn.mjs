@@ -17,6 +17,7 @@
 //   bắt buộc    số câu BẮT BUỘC của em: nhỏ nhất / giữa / lớn nhất (không gồm "thử sức thêm")
 //   thử sức     số câu "thử sức thêm — không bắt buộc": giữa / lớn nhất
 //   chặng       số chặng: nhỏ nhất–lớn nhất · chặng lớn nhất (số câu; số phút ước tính theo giây/câu của em ấy)
+//   chặng nặng  số em có ≥ 1 chặng > 20 câu hoặc > 40 phút (`laChangNang` ở btvn-nang-do-lich.ts — cùng ngưỡng máy em và Xem trước; cảnh báo)
 //   yếu thiếu   số em có dạng YẾU mà bộ ít hơn 2 câu ở dạng ấy (bị thiệt — cảnh báo, không phải lỗi: hạn ngắn cắt phần riêng là theo thiết kế)
 //   tối nặng    số em có buổi tối phải làm > 1,5 × ngân sách/ngày (lõi ép; `canhBaoHanNgan` báo thầy — cảnh báo)
 // Sau bảng là các phép KIỂM (lỗi ⇒ in ví dụ + thoát mã 1): bộ không rỗng · không trùng câu · lõi bắt buộc đủ · số đếm khớp · lịch hợp lệ · chặng cuối không
@@ -41,7 +42,7 @@ registerHooks({
 const GOC = join(dirname(fileURLToPath(import.meta.url)), '..')
 const nap = (t) => import(pathToFileURL(join(GOC, 'src', 'lib', t)).href)
 const { chonLoi, chonBoCuaEm, thichNghiChangSau, maDangCua, BTVN_NANG_DO } = await nap('btvn-nang-do.ts')
-const { sucChua, nganSachHanNgan, xepLichChang, cheDoLich, LICH_CHANG } = await nap('btvn-nang-do-lich.ts')
+const { sucChua, nganSachHanNgan, xepLichChang, cheDoLich, laChangNang, LICH_CHANG } = await nap('btvn-nang-do-lich.ts')
 const { mulberry32 } = await nap('exam-shuffle.ts')
 
 // ══════════════════════════════ THAM SỐ ══════════════════════════════
@@ -257,7 +258,7 @@ const trungVi = (a) => {
 }
 const hoNhan = createHash('sha1')
 const bang = []
-const canhBaoTong = { yeuThieu: 0, toiNang: 0 }
+const canhBaoTong = { yeuThieu: 0, toiNang: 0, changNang: 0 }
 const thiet = []
 const t0 = Date.now()
 
@@ -283,7 +284,7 @@ BAI.forEach(([n, d], bi) => {
     moHopLe.forEach((m, mi) => {
       const nhan = `bài ${n}×${soDangThat} · hạn ${gioHan} · mở ${m.nhan}`
       const tong = [], batBuocTheoEm = [], thuSuc = [], soChang = [], changLon = [], phutLon = []
-      let dai = 0, yeuThieu = 0, toiNang = 0, chiLoi = 0, loiChay = 0
+      let dai = 0, yeuThieu = 0, toiNang = 0, chiLoi = 0, changNang = 0, loiChay = 0
       dsEm.forEach((em, ei) => {
         let r
         try {
@@ -303,6 +304,7 @@ BAI.forEach(([n, d], bi) => {
         soChang.push(bo.chang.length)
         const lon = Math.max(...bo.chang.map((c) => c.length))
         changLon.push(lon)
+        if (bo.chang.some((c) => laChangNang(c.length, em.giayMoiCau))) changNang++
         phutLon.push(Math.ceil((lon * em.giayMoiCau) / 60))
         if (r.cheDo === 'dai') dai++
         const soThieu = dangYeuThieu(bai, em, bo)
@@ -336,6 +338,7 @@ BAI.forEach(([n, d], bi) => {
       })
       canhBaoTong.yeuThieu += yeuThieu
       canhBaoTong.toiNang += toiNang
+      canhBaoTong.changNang += changNang
       const daChay = tong.length
       const iLon = changLon.indexOf(Math.max(...changLon))
       bang.push({
@@ -344,7 +347,7 @@ BAI.forEach(([n, d], bi) => {
         thuSuc: [trungVi(thuSuc), Math.max(...thuSuc)],
         soChang: [Math.min(...soChang), Math.max(...soChang)],
         changLon: [Math.max(...changLon), phutLon[iLon]],
-        chiLoi, yeuThieu, toiNang,
+        chiLoi, changNang, yeuThieu, toiNang,
       })
     })
     // ĐƠN ĐIỆU theo các thời điểm mở của bảng
@@ -396,12 +399,12 @@ for (const b of bang) {
   if (tieuDe !== cuoi) {
     if (cuoi) console.log('')
     console.log(tieuDe)
-    console.log('  mở                dài/ngắn   bắt buộc nhỏ·giữa·lớn   thử sức giữa·lớn   chỉ lõi   chặng     chặng lớn nhất        yếu thiếu   tối nặng')
+    console.log('  mở                dài/ngắn   bắt buộc nhỏ·giữa·lớn   thử sức giữa·lớn   chỉ lõi   chặng     chặng lớn nhất        chặng nặng  yếu thiếu   tối nặng')
     cuoi = tieuDe
   }
   const cot = (s, w) => String(s).padEnd(w)
   console.log(
-    `  ${cot(b.mo, 17)}  ${cot(`${b.dai}/${b.ngan}`, 9)}  ${cot(b.batBuoc.join(' · '), 22)}  ${cot(b.thuSuc.join(' · '), 17)}  ${cot(`${b.chiLoi}/${b.em}`, 8)}  ${cot(b.soChang[0] === b.soChang[1] ? b.soChang[0] : b.soChang.join('–'), 8)}  ${cot(`${b.changLon[0]} câu · ${b.changLon[1]} phút`, 20)}  ${cot(`${b.yeuThieu}/${b.em}`, 10)}  ${b.toiNang}/${b.em}`,
+    `  ${cot(b.mo, 17)}  ${cot(`${b.dai}/${b.ngan}`, 9)}  ${cot(b.batBuoc.join(' · '), 22)}  ${cot(b.thuSuc.join(' · '), 17)}  ${cot(`${b.chiLoi}/${b.em}`, 8)}  ${cot(b.soChang[0] === b.soChang[1] ? b.soChang[0] : b.soChang.join('–'), 8)}  ${cot(`${b.changLon[0]} câu · ${b.changLon[1]} phút`, 20)}  ${cot(`${b.changNang}/${b.em}`, 10)}  ${cot(`${b.yeuThieu}/${b.em}`, 10)}  ${b.toiNang}/${b.em}`,
   )
 }
 {
@@ -417,6 +420,6 @@ for (const [k, ten] of KIEM) {
   console.log(`  ${loi[k].n === 0 ? '✓' : '✗'} ${ten}${loi[k].n ? ` — ${loi[k].n} vi phạm` : ''}`)
   for (const vd of loi[k].vd) console.log(`      ví dụ: ${vd}`)
 }
-console.log(`CẢNH BÁO (không tính lỗi — để thầy/Boss nhìn): ${canhBaoTong.yeuThieu} lượt em có dạng yếu bị thiếu câu · ${canhBaoTong.toiNang} lượt em có buổi tối nặng hơn 1,5 × ngân sách/ngày`)
+console.log(`CẢNH BÁO (không tính lỗi — để thầy/Boss nhìn): ${canhBaoTong.yeuThieu} lượt em có dạng yếu bị thiếu câu · ${canhBaoTong.toiNang} lượt em có buổi tối nặng hơn 1,5 × ngân sách/ngày · ${canhBaoTong.changNang} lượt em có CHẶNG NẶNG (> ${LICH_CHANG.CHANG_NANG_CAU} câu hoặc > ${LICH_CHANG.CHANG_NANG_PHUT} phút — ngưỡng dùng chung với máy em và Xem trước)`)
 console.log(soLoi === 0 ? '\nKẾT LUẬN: ĐẠT — mọi phép kiểm xanh.' : `\nKẾT LUẬN: TRƯỢT — ${soLoi} vi phạm ở ${KIEM.filter(([k]) => loi[k].n).length} phép kiểm (xem ví dụ ở trên).`)
 process.exit(soLoi ? 1 : 0)
