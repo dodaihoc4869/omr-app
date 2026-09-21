@@ -83,6 +83,8 @@ const TheCuoiChang = lazy(() => import('../components/bang-nhiem-vu/TheCuoiChang
 import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
+import { useToanManHinhGame } from '../components/useToanManHinhGame'
+import { ketThucLuotToanManHinh, xinToanManHinh } from '../lib/toan-man-hinh-game'
 
 const KHOA_LUU_AUTH = 'omr_student_portal_auth'
 
@@ -218,6 +220,13 @@ export default function StudentPortalScreen() {
 
   // Tab
   const [tab, setTab] = useState<TabType | null>(null)
+  // GAME TỰ VÀO TOÀN MÀN HÌNH (thầy lệnh 21/09): mọi cửa vào game gọi `moGame()` để xin toàn màn hình NGAY TRONG cú chạm; vào thẳng bằng link/tải lại thì
+  // hook xin ở lần chạm đầu tiên; rời game ⇒ thoát. Không nút bật/thoát. Xem lib/toan-man-hinh-game.ts.
+  const moGame = () => {
+    xinToanManHinh('cu-cham-vao')
+    setTab('thanthu')
+  }
+  useToanManHinhGame(tab === 'thanthu')
   const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
 
   // Dữ liệu ca thi & điểm
@@ -820,7 +829,7 @@ export default function StudentPortalScreen() {
         setTab('vaothi')
         break
       case 'mo_than_thu':
-        setTab('thanthu')
+        moGame()
         break
       default:
         break
@@ -1300,6 +1309,7 @@ export default function StudentPortalScreen() {
             <ThongBaoHocSinh
               token={auth.token}
               onOpen={(t, noticeId) => {
+                if (t === 'thanthu') xinToanManHinh('cu-cham-vao')
                 setTab(t)
                 if (t === 'mom') {
                   void napDsMom()
@@ -1315,7 +1325,7 @@ export default function StudentPortalScreen() {
           }
           caDangMo={caDangMo}
           onHanhDong={xuLyHanhDongTroLy}
-          onMoThanThu={() => setTab('thanthu')}
+          onMoThanThu={moGame}
           onLenDuongDoan={() => {
             // Hợp đồng cửa vào của game (docs/hop-dong-mo-game-doan-ho-tong-1909.md): khoá màn đầu rồi mở tab game; game đọc MỘT lần rồi tự xoá.
             try {
@@ -1323,7 +1333,7 @@ export default function StudentPortalScreen() {
             } catch {
               /* máy chặn lưu: game vẫn mở, ở màn Đảo thần thú */
             }
-            setTab('thanthu')
+            moGame()
           }}
           onVaoThi={() => setTab('vaothi')}
           onXemBaiDaNop={() => moManCu('diem')}
@@ -2212,7 +2222,10 @@ export default function StudentPortalScreen() {
             docThanThuMayChu={docThanThuChoGame}
             ghiThanThuMayChu={ghiThanThuChoGame}
             congVoDai={congVoDai}
-            onDong={() => setTab(null)}
+            onDong={() => {
+              ketThucLuotToanManHinh() // Về app học sinh: thoát toàn màn hình rồi về app
+              setTab(null)
+            }}
             onChuyenSangKhacPhuc={() => setTab('khacphuc')}
             onChuyenSangBtvn={() => setTab('btvn')}
             onChuyenSangVaoThi={() => setTab('vaothi')}

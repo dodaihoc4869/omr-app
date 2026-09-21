@@ -142,13 +142,16 @@
 
 /* ───── vỏ + thanh điều hướng dưới ───── */
 .dao-vo{min-height:min(100dvh,1240px);padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+.dao-vo:has(>.dao-ve-app){padding-top:calc(60px + max(8px,env(safe-area-inset-top,0px)))}
 .dao-vo.dao-vo-tham{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 .dao .dao-nav{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;transform:translateX(-50%);width:min(calc(100vw - 24px),420px);height:68px;border-radius:34px;display:flex;align-items:center;justify-content:space-around;background:rgba(14,20,52,.94);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 -6px 22px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .dao .dao-nav button{--nut-chu:var(--dao-chu-nhat);flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:center;font-size:11px;font-weight:600}
 .dao .dao-nav button>span{display:flex;align-items:center;justify-content:center;width:52px;height:30px;border-radius:15px}
 .dao .dao-nav button[aria-current]{--nut-chu:var(--dao-vang);font-weight:800}
 .dao .dao-nav button[aria-current]>span{background:rgba(255,209,102,.18)}
-.dao button.dao-ve-app{--nut-chu:var(--dao-chu-nhat);display:block;margin:18px auto 0;padding:10px 16px;font-size:13px;text-decoration:underline;text-underline-offset:3px}
+/* Nút "Về app học sinh" LUÔN HIỆN (thầy lệnh 21/09, game tự toàn màn hình): dải mỏng dính ở trên cùng, đích chạm ≥ 48 px, chừa tai thỏ/thanh hệ thống
+   bằng vùng an toàn; nội dung đảo nằm dưới dải (padding-top của .dao-vo). Không có nút bật/thoát toàn màn hình. */
+.dao button.dao-ve-app{--nut-chu:var(--dao-chu);position:fixed;top:max(8px,env(safe-area-inset-top,0px));left:max(8px,env(safe-area-inset-left,0px));z-index:60;display:inline-flex;align-items:center;justify-content:center;min-height:48px;min-width:48px;margin:0;padding:0 18px;border-radius:999px;font-size:14px;font-weight:700;background:rgba(9,13,40,.78);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 6px 16px rgba(0,0,0,.35);text-decoration:none}
 
 /* ───── Túi đồ ───── */
 .dao .dao-tui{display:flex;flex-direction:column;gap:14px;padding:max(18px,4vh) 16px 0}

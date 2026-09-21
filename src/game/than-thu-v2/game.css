@@ -8,7 +8,10 @@
 .spirit-game button{border-radius:24px;font-size:14px;line-height:1.4;font-weight:600;min-height:48px;background:var(--the,#fff);color:var(--muc,#202124);box-shadow:0 1px 2px #3c404314}
 .spirit-game button:hover:not(:disabled){background:#e8f0fe;transform:none;box-shadow:0 2px 5px #3c404325}
 .spirit-game button:focus-visible,.spirit-game input:focus-visible{outline:3px solid #4285f4;outline-offset:3px}
-.spirit-game h1{font-size:30px;letter-spacing:-.5px;font-weight:700}.spirit-game h2{font-weight:650}.spirit-header{padding:8px 0}.spirit-header small{color:var(--nhat,#5f6368);letter-spacing:1.2px}
+.spirit-game h1{font-size:30px;letter-spacing:-.5px;font-weight:700}.spirit-game h2{font-weight:650}.spirit-header{padding:8px 0}
+/* Khung game cũ (Võ đài…): nút "Về app học sinh" dính trên cùng, chừa vùng an toàn, đích chạm ≥ 48 px (thầy lệnh 21/09). */
+.spirit-game>.spirit-header{position:sticky;top:0;z-index:40;padding-top:max(8px,env(safe-area-inset-top,0px));background:var(--nen,rgb(242,247,246))}
+.spirit-game>.spirit-header>button{min-height:48px;min-width:48px}.spirit-header small{color:var(--nhat,#5f6368);letter-spacing:1.2px}
 .spirit-nav{gap:6px;padding:6px;background:var(--the,#fff);border:1px solid var(--sg-line);border-radius:28px}.spirit-nav button{flex:1;border-color:transparent;box-shadow:none;background:transparent}.spirit-nav button[aria-current=page]{background:#d3e3fd;color:#174ea6}.spirit-game .spirit-primary{background:#1a73e8;color:#fff;border-color:transparent}.spirit-game .spirit-primary:hover:not(:disabled){background:#185abc;color:white}
 .spirit-panel,.spirit-cards button,.spirit-progress article{background:var(--the,#fff);border:1px solid var(--sg-line);border-radius:24px;box-shadow:0 1px 3px #3c40430d}.spirit-cards button{padding:24px}.spirit-cards small,.spirit-cards strong{color:#1967d2}.spirit-cards button:nth-child(2) small{color:#188038}.spirit-cards button:nth-child(3) small{color:#b06000}
 .spirit-status{color:#1967d2}.spirit-note,.spirit-source{color:var(--nhat,#5f6368);font-size:13px}.spirit-game progress{accent-color:#4285f4}.spirit-nodes .current{background:#1a73e8;box-shadow:0 0 0 5px #e8f0fe}.spirit-nodes .completed{background:#ceead6;color:#137333}.spirit-stats span{background:#e8f0fe;color:#174ea6;font-weight:600}

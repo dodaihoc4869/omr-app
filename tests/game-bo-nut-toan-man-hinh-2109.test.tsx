@@ -31,6 +31,19 @@ describe('Game: không còn nút / mã toàn màn hình', () => {
   })
 })
 
+describe('Game TỰ vào toàn màn hình (thầy lệnh 21/09) — vẫn KHÔNG có nút, chỉ có mã tự xin', () => {
+  it('mã tự xin nằm ở lib + hook của cổng (không trong tệp game), không JSX/nút; cổng dùng hook + moGame', () => {
+    const lib = doc('src/lib/toan-man-hinh-game.ts')
+    expect(lib).toContain('requestFullscreen')
+    expect(lib).not.toMatch(/<button|<\/|React|onClick/)
+    expect(doc('src/components/useToanManHinhGame.ts')).not.toMatch(/<button|<\/[a-z]/i)
+    const cong = doc('src/screens/StudentPortalScreen.tsx')
+    expect(cong).toContain("useToanManHinhGame(tab === 'thanthu')")
+    expect(cong).toContain("xinToanManHinh('cu-cham-vao')")
+    // toàn bộ khoá hành vi (xin trong cú chạm, một lần/lượt, từ chối im lặng, em thoát không ép lại, Về app thoát): tests/toan-man-hinh-game-2109.test.tsx
+  })
+})
+
 describe('Vỏ Đảo thần thú: chỉ còn nút "Về app học sinh" ở góc, không nút nổi toàn màn hình', () => {
   const hoSo: DaoProfile = { nickname: 'Lửa Nhỏ', pet: 'lua_phuong', choice: false, cap: 34, exp: 10, wallet: 0, mastery: [] }
   it('render thật: có "Về app học sinh" (gọi onDong), KHÔNG nút nào tên chứa "toàn màn hình"', async () => {
