@@ -9,7 +9,7 @@
 // TÔN TRỌNG (luật thầy): chỉ SỐ ĐẾM; không xếp hạng em với em; không chữ "nắm chắc"; không kết luận năng lực từ điểm.
 //
 // ─── TRẠNG THÁI: kiểu + chữ ký chốt ở 27059a6 (Code 3/4/2 đã bám); `chonLoi` · `chonBoCuaEm` · `theTienBo` cài ở 569ebfd; Đợt 2: `thichNghiChangSau` cài,
-// `chonBoCuaEm` nhận thêm cổng `dieuChinh?` tuỳ chọn (vắng ⇒ kết quả Y HỆT 569ebfd, khoá bằng chữ ký vàng trong test).
+// `chonBoCuaEm` nhận thêm cổng `dieuChinh?` tuỳ chọn (vắng ⇒ kết quả Y HỆT 569ebfd, khoá bằng chữ ký vàng trong test). KHẮC PHỤC LUÔN (`dieuChinh.khacPhuc`) cài 21/09 chiều (Boss: bộ não chạy thật).
 // BẢN 1.2 (Boss 21/09, bài thật đầu tiên: bài 29 dạng, em yếu nhận 29 câu toàn lõi, 14 câu `loi_cao`, phần riêng 0): LÕI BẮT BUỘC của từng em = câu lõi mức ≤ bậc đích + 1 (hoặc câu GHIM);
 // lõi cao hơn ⇒ `thuSucThem[]` ("thử sức thêm — không bắt buộc": không nằm trong `chang`, không tính vào ngân sách/xong chặng/xong bài); ngân sách so với LÕI BẮT BUỘC ⇒ em yếu còn chỗ cho phần riêng đúng bậc. ───
 import { hashSeed } from './exam-shuffle'
@@ -38,6 +38,10 @@ export const BTVN_NANG_DO = {
   KHOI_DONG_TOI_THIEU: 1,
   KHOI_DONG_TOI_DA: 3,
   DANG_DIEU_CHINH_TOI_DA: 3,
+  /** Khắc phục luôn (`dieuChinh.khacPhuc`): tối đa 2 dạng, mỗi dạng 2–4 câu. */
+  KHAC_PHUC_TOI_DA: 2,
+  KHAC_PHUC_SO_CAU_TOI_THIEU: 2,
+  KHAC_PHUC_SO_CAU_TOI_DA: 4,
   /** Thích nghi sau chặng (bước G, Đợt 2): đúng ≥ 80 % (≥ 2 câu thường của dạng, dạng yếu cần ≥ 3) ⇒ đổi 1 câu sang bậc cao hơn; sai ≥ 50 % (≥ 2 câu) ⇒ thêm 1 câu cùng dạng bậc thấp hơn. */
   TL_DUNG_LEN_BAC: 0.8,
   TL_SAI_HA_THAP: 0.5,
@@ -168,6 +172,24 @@ export interface BoCuaEm {
   chang: string[][]
   nhan: Record<string, NhanCau>
   tomTat: TomTatBo
+  /** KẾT QUẢ "khắc phục luôn" — CHỈ có khi `dieuChinh.khacPhuc` có phần tử (vắng ⇒ không có trường: bộ Y HỆT bản không có cổng). Mỗi dạng được yêu cầu một dòng: làm được bao nhiêu + lý do nếu thiếu. */
+  khacPhuc?: KetQuaKhacPhuc[]
+}
+
+/** KẾT QUẢ MỘT YÊU CẦU `khacPhuc` (để ghi nhật ký / cho thầy đọc — máy chủ không bịa hơn con số này). Không đủ câu thì làm được bao nhiêu trả bấy nhiêu; `lyDo` rỗng khi làm đủ. */
+export interface KetQuaKhacPhuc {
+  dang: string
+  /** Số câu bộ não xin (đã kẹp 2–4). */
+  yeuCau: number
+  /** Số câu THẬT SỰ được chèn (0 ≤ duoc ≤ yeuCau). */
+  duoc: number
+  /** Câu chèn vào / câu phần riêng bị bớt để tổng tải không tăng (cùng độ dài `duoc`). */
+  vao: string[]
+  ra: string[]
+  /** Chỉ số chặng (từ 0) được chèn; `null` khi không chèn được câu nào. */
+  chang: number | null
+  /** Một câu ngắn tiếng Việt khi `duoc < yeuCau`; rỗng khi đủ. */
+  lyDo: string
 }
 
 /** KẾT QUẢ MỘT CHẶNG (máy chủ chấm) — đầu vào của `thichNghiChangSau` (ĐỢT 2). */
@@ -179,7 +201,7 @@ export interface KetQuaChang {
 /** MỘT THAY ĐỔI của `thichNghiChangSau` (để ghi sổ / hiện chỉ số): `len_bac` = đổi `ra` (bậc thấp) lấy `vao` (bậc cao hơn) · `them_cau_de` = thêm `vao` (bậc thấp hơn); nếu hết chỗ thì `ra` là câu củng cố bị nhường chỗ. */
 export interface DoiThichNghi {
   ma: string
-  loai: 'len_bac' | 'them_cau_de'
+  loai: 'len_bac' | 'them_cau_de' | 'khac_phuc'
   /** Chỉ số chặng (từ 0) bị đổi. */
   chang: number
   vao: string
@@ -191,6 +213,8 @@ export interface KetQuaThichNghi {
   bo: BoCuaEm
   henOnLai: string[]
   doi: DoiThichNghi[]
+  /** Kết quả "khắc phục luôn" — chỉ có khi cổng `dieuChinh.khacPhuc` có phần tử (mỗi dạng một dòng; chèn thật nằm ở `doi` với `loai: 'khac_phuc'`). */
+  khacPhuc?: KetQuaKhacPhuc[]
 }
 
 /** NÚT VẶN TỪNG DẠNG của bộ não đêm (`DE-XUAT-BO-NAO-AI-2109.md` mục 4): ưu tiên · hạ một bậc · cho thử lên bậc · tạm nghỉ. */
@@ -208,8 +232,9 @@ export interface DieuChinhEm {
    *  · `cho_thu_len_bac`: bậc đích của dạng cao thêm một bậc, KHÔNG quá bậc hồ sơ + 1 và không áp cho dạng YẾU; · `tam_nghi`: phần riêng và thử thách không lấy câu của dạng
    *  (câu lõi của dạng vẫn ở lại). */
   dang?: { ma: string; nut: NutDang }[]
-  /** KHẮC PHỤC LUÔN (bộ não tự hành, ≤ 2 dạng): rút `soCau` (2–4) câu cùng dạng CHƯA giao từ kho của chính bài, đúng bậc đích hoặc thấp hơn một bậc, chèn vào chặng CHƯA mở kế tiếp,
-   *  và BỚT câu phần riêng dễ nhất để tổng tải không tăng. Chưa cài ở commit này (chỉ kiểu). */
+  /** KHẮC PHỤC LUÔN (bộ não tự hành, ≤ 2 dạng; đã cài): rút `soCau` (2–4) câu cùng dạng CHƯA giao từ kho của chính bài, đúng bậc đích (`dung_bac`) hoặc thấp hơn một bậc (`thap_hon_mot_bac`),
+   *  chèn vào chặng CHƯA mở kế tiếp (lúc chọn bộ = chặng đầu; sau chặng xong = chặng kế chưa mở) và BỚT câu CỦNG CỐ dễ nhất của dạng KHÁC để tổng tải không tăng.
+   *  Không đủ câu (hoặc không còn câu củng cố để bớt) thì chèn được bao nhiêu trả bấy nhiêu (`BoCuaEm.khacPhuc` / `KetQuaThichNghi.khacPhuc` nêu lý do). Không đổi số chặng, lõi, thử thách, chặng đã mở, hạn nộp. */
   khacPhuc?: { dang: string; soCau: number; bac: 'dung_bac' | 'thap_hon_mot_bac' }[]
 }
 
@@ -394,11 +419,106 @@ function hangDe(dq: CauCuaEm | undefined): number {
   return dq.trangThai === 'da_khac_phuc' || dq.trangThai === 'chua_thay_sai' ? 0 : 2
 }
 
+type KhacPhucYeuCau = NonNullable<DieuChinhEm['khacPhuc']>[number]
+
+/** Chuẩn hoá `dieuChinh.khacPhuc` (dữ liệu từ ngoài, không tin): ≤ 2 dạng không lặp, bậc hợp lệ, `soCau` nguyên kẹp 2–4; phần tử sai bị bỏ. */
+function chuanKhacPhuc(dc: DieuChinhEm | null | undefined): KhacPhucYeuCau[] {
+  const ra: KhacPhucYeuCau[] = []
+  const daCo = new Set<string>()
+  for (const x of Array.isArray(dc?.khacPhuc) ? dc!.khacPhuc! : []) {
+    if (ra.length >= D.KHAC_PHUC_TOI_DA) break
+    if (!x || typeof x.dang !== 'string' || x.dang === '' || daCo.has(x.dang)) continue
+    if (x.bac !== 'dung_bac' && x.bac !== 'thap_hon_mot_bac') continue
+    if (!Number.isFinite(x.soCau)) continue
+    daCo.add(x.dang)
+    ra.push({ dang: x.dang, bac: x.bac, soCau: Math.max(D.KHAC_PHUC_SO_CAU_TOI_THIEU, Math.min(D.KHAC_PHUC_SO_CAU_TOI_DA, Math.trunc(x.soCau))) })
+  }
+  return ra
+}
+
+/**
+ * KHẮC PHỤC LUÔN lên một bộ đã dựng. Với mỗi yêu cầu (theo thứ tự): rút tối đa `soCau` câu cùng dạng CHƯA giao (không lõi, không trong chặng, không "thử sức thêm") ở đúng bậc đích (hoặc thấp hơn một bậc),
+ * chèn vào chặng `chiSoDich` (chặng CHƯA mở đầu tiên), ngay sau khởi động/lõi/dạng yếu; đồng thời BỚT đúng bấy nhiêu câu CỦNG CỐ dễ nhất của dạng KHÁC ở các chặng chưa mở (chặng đích trước) — tổng tải KHÔNG tăng.
+ * Chỉ động vào chặng ≥ `chiSoDich`; không đổi số chặng, lõi, thử thách, "thử sức thêm". Thiếu câu / thiếu câu để bớt ⇒ làm được bao nhiêu trả bấy nhiêu + lý do. Câu em đã đúng lại ≥ 2 ngày khác nhau không được chọn.
+ */
+function apKhacPhucLenBo(bo: BoCuaEm, ds: CauGiao[], hs: HoSoEmRut, dang: Map<string, TinDang>, kp: KhacPhucYeuCau[], chiSoDich: number): { bo: BoCuaEm; doi: DoiThichNghi[]; ketQua: KetQuaKhacPhuc[] } {
+  const theoQid = new Map(ds.map((c, i) => [c.qid, { c, i }]))
+  const chang = bo.chang.map((c) => [...c])
+  const nhan: Record<string, NhanCau> = { ...bo.nhan }
+  const rieng = [...bo.rieng]
+  const loiSet = new Set(bo.loi)
+  const thuSucSet = new Set(bo.thuSucThem ?? [])
+  const thuThachSet = new Set(bo.thuThach)
+  const daCo = new Set<string>([...chang.flat(), ...loiSet, ...thuSucSet]) // đã giao (kể cả câu vừa bị bớt: không rút lại)
+  const coChang = Number.isInteger(chiSoDich) && chiSoDich >= 0 && chiSoDich < chang.length
+  const doi: DoiThichNghi[] = []
+  const ketQua: KetQuaKhacPhuc[] = []
+  const hangCau = (q: string) => hangDe(hs.cau[q])
+
+  for (const y of kp) {
+    const khong = (lyDo: string) => ketQua.push({ dang: y.dang, yeuCau: y.soCau, duoc: 0, vao: [], ra: [], chang: null, lyDo })
+    const t = dang.get(y.dang)
+    if (!t) { khong('Dạng này không có trong bài'); continue }
+    if (!coChang) { khong('Không còn chặng nào chưa mở để chèn câu'); continue }
+    if (t.nghi) { khong('Dạng đang được tạm nghỉ'); continue }
+    const muc = y.bac === 'dung_bac' ? t.bacDich : t.bacDich - 1
+    if (muc < 0) { khong('Dạng đang ở bậc Biết, không có bậc thấp hơn'); continue }
+
+    // ứng viên: câu chưa từng làm trước, rồi câu từng sai, sau cùng câu em đã đúng; đúng ≥ 2 ngày khác nhau thì bỏ (phí sức)
+    const ung = ds
+      .map((c, i) => ({ c, i }))
+      .filter(({ c }) => maDangCua(c) === y.dang && c.mucDo === muc && !daCo.has(c.qid) && (hs.cau[c.qid]?.ngayDungKhacNhau ?? 0) < D.NGAY_DUNG_LAI_BO)
+      .sort((a, b) => (hangCau(a.c.qid) === 1 ? 0 : hangCau(a.c.qid) === 2 ? 1 : 2) - (hangCau(b.c.qid) === 1 ? 0 : hangCau(b.c.qid) === 2 ? 1 : 2) || b.c.sao - a.c.sao || a.i - b.i)
+    // câu có thể BỚT: củng cố (không lõi, không thử thách, không khởi động, không dạng yếu/ưu tiên) của dạng KHÁC, ở chặng chưa mở; chặng đích trước, rồi dễ nhất
+    const bot: { q: string; c: number; i: number }[] = []
+    for (let c = chiSoDich; c < chang.length; c++)
+      for (const q of chang[c]) {
+        const x = theoQid.get(q)
+        if (x && nhan[q] === 'cung_co' && !loiSet.has(q) && !thuThachSet.has(q) && maDangCua(x.c) !== y.dang) bot.push({ q, c, i: x.i })
+      }
+    bot.sort((a, b) => Number(a.c !== chiSoDich) - Number(b.c !== chiSoDich) || ds[a.i].mucDo - ds[b.i].mucDo || hangCau(a.q) - hangCau(b.q) || ds[a.i].sao - ds[b.i].sao || a.i - b.i)
+
+    const duoc = Math.min(y.soCau, ung.length, bot.length)
+    const vao: string[] = []
+    const ra: string[] = []
+    for (let k = 0; k < duoc; k++) {
+      const moi = ung[k].c.qid
+      const cu = bot[k]
+      chang[cu.c].splice(chang[cu.c].indexOf(cu.q), 1)
+      rieng.splice(rieng.indexOf(cu.q), 1)
+      delete nhan[cu.q]
+      const dich = chang[chiSoDich]
+      let vt = 0
+      while (vt < dich.length && (nhan[dich[vt]] === 'khoi_dong' || nhan[dich[vt]] === 'loi' || nhan[dich[vt]] === 'dang_yeu')) vt++
+      dich.splice(vt, 0, moi)
+      rieng.push(moi)
+      nhan[moi] = 'dang_yeu'
+      daCo.add(moi)
+      vao.push(moi)
+      ra.push(cu.q)
+      doi.push({ ma: y.dang, loai: 'khac_phuc', chang: chiSoDich, vao: moi, ra: cu.q })
+    }
+    const lyDo = duoc >= y.soCau ? '' : ung.length <= bot.length ? (ung.length === 0 ? 'Không còn câu cùng dạng chưa giao ở đúng bậc' : `Chỉ còn ${ung.length} câu cùng dạng chưa giao ở đúng bậc`) : 'Không còn câu củng cố để bớt, giữ nguyên tổng số câu'
+    ketQua.push({ dang: y.dang, yeuCau: y.soCau, duoc, vao, ra, chang: duoc > 0 ? chiSoDich : null, lyDo })
+  }
+  if (doi.length === 0) return { bo, doi, ketQua }
+
+  const rienDoDe = [...rieng].sort((a, b) => (theoQid.get(a)?.i ?? 0) - (theoQid.get(b)?.i ?? 0))
+  const tatCa = [...bo.loi.filter((q) => !thuSucSet.has(q)), ...rienDoDe, ...bo.thuThach] // câu BẮT BUỘC (không gồm thử sức thêm)
+  const demMuc = (m: Muc) => tatCa.filter((q) => theoQid.get(q)?.c.mucDo === m).length
+  const dangYeuDu = [...dang.entries()].filter(([ma, t]) => t.yeu && tatCa.filter((q) => { const x = theoQid.get(q); return !!x && maDangCua(x.c) === ma }).length >= D.DANG_YEU_TOI_THIEU_CAU).length
+  return {
+    bo: { ...bo, rieng: rienDoDe, chang, nhan, tomTat: { ...bo.tomTat, tong: tatCa.length, soBatBuoc: tatCa.length, soRieng: rienDoDe.length, soBiet: demMuc(0), soHieu: demMuc(1), soVanDung: demMuc(2), soDangYeuDuCau: dangYeuDu } },
+    doi,
+    ketQua,
+  }
+}
+
 /**
  * BỘ CÂU CỦA MỘT EM (bước C–F). `loi` = kết quả `chonLoi`; `hoSo` = hồ sơ em (rỗng ⇒ lõi + Biết, Hiểu là thử thách); `nganSach` = của em; `hatGiong` = `maBtvn|sbd`.
  * Tất định. |bộ bắt buộc| ∈ [|lõi bắt buộc|, N] và ≤ ngân sách; câu NGOÀI lõi không vượt bậc đích + 1; câu lõi cao hơn bậc đích + 1 (không ghim) thành `thuSucThem` (nhãn `loi_cao`, ngoài chặng).
  * `tuyChon.ghim` (hoặc `CauGiao.ghim`): câu ghim của thầy LUÔN bắt buộc với mọi em.
- * `dieuChinh` (tuỳ chọn, bộ não đêm / thầy): nhịp ±, khởi động 1–3, nút từng dạng — VẮNG (hoặc rỗng) ⇒ kết quả Y HỆT không có cổng; lõi không bao giờ bị rút.
+ * `dieuChinh` (tuỳ chọn, bộ não đêm / thầy): nhịp ±, khởi động 1–3, nút từng dạng, `khacPhuc` (chèn câu cùng dạng vào chặng đầu, bớt câu củng cố dễ nhất — kết quả ở `BoCuaEm.khacPhuc`) — VẮNG (hoặc rỗng) ⇒ kết quả Y HỆT không có cổng; lõi không bao giờ bị rút.
  */
 export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, nganSach: NganSachBai, hatGiong: string, dieuChinh?: DieuChinhEm, tuyChon: { ghim?: string[] } = {}): BoCuaEm {
   const ds = duyNhat(cau)
@@ -559,7 +679,7 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
   const dangYeuTrongBai = [...dang.values()].filter((t) => t.yeu).length
   const dangYeuDu = dangCanDu.filter(([ma, t]) => t.yeu && tatCa.filter((j) => maDangCua(ds[j]) === ma).length >= D.DANG_YEU_TOI_THIEU_CAU).length
   const demMuc = (m: Muc) => tatCa.filter((i) => ds[i].mucDo === m).length
-  return {
+  const boXong: BoCuaEm = {
     loi: loiIdx.map((i) => ds[i].qid),
     thuSucThem: thuSucIdx.map((i) => ds[i].qid),
     rieng: rieng.map((i) => ds[i].qid),
@@ -583,6 +703,11 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
       nganSachCau,
     },
   }
+  // KHẮC PHỤC LUÔN (bộ não): vắng/rỗng ⇒ trả đúng `boXong` (không thêm trường); có ⇒ chèn vào chặng đầu (lúc chọn bộ chưa chặng nào mở)
+  const kp = chuanKhacPhuc(dieuChinh)
+  if (kp.length === 0) return boXong
+  const r = apKhacPhucLenBo(boXong, ds, hoSoAnToan, dang, kp, 0)
+  return { ...r.bo, khacPhuc: r.ketQua }
 }
 
 /**
@@ -594,9 +719,35 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
  *   · câu THƯỜNG sai ⇒ `henOnLai` (lịch ôn 1·3·7). Khởi động không vào mẫu dạng (quá dễ), thử thách và lõi cao KHÔNG BAO GIỜ vào mẫu hay lịch ôn ("sai không sao").
  *
  * BẤT BIẾN (test khoá): lõi và thử thách không đổi · chặng đã mở không đổi · câu mới không thuộc lõi, không trùng, không vượt bậc đích + 1 · tổng không vượt ngân sách ·
- * mỗi chặng tối đa 3 thay đổi. Câu mới chọn theo thứ tự đề (tất định).
+ * mỗi chặng tối đa 3 thay đổi THEO MẪU. Câu mới chọn theo thứ tự đề (tất định).
+ *
+ * KHẮC PHỤC LUÔN (`tuyChon.dieuChinh.khacPhuc`): sau khi thích nghi theo mẫu, chèn câu cùng dạng CHƯA giao vào chặng chưa mở đầu tiên và bớt câu củng cố dễ nhất của dạng khác (tổng không tăng, chặng đã mở/lõi/thử thách
+ * nguyên; các chèn nằm ở `doi` với `loai: 'khac_phuc'`, tối đa 2 dạng × 4 câu; kết quả + lý do thiếu ở `khacPhuc`). Mỗi lần gọi bảo đảm THÊM tối đa `soCau` câu — điều chỉnh tự hết hạn sau 3 ngày nên không lặp mãi.
+ * Gọi với `chiSoChangVuaXong = -1` để áp khắc phục lên bộ đang chạy khi chưa chặng nào xong (chặng đích = `max(0, soChangDaMo)`). Không có mẫu hay không còn chặng chưa mở thì phần theo mẫu không đổi, khắc phục vẫn áp nếu còn chặng.
  */
 export function thichNghiChangSau(
+  bo: BoCuaEm,
+  cau: CauGiao[],
+  hoSo: HoSoEmRut,
+  chiSoChangVuaXong: number,
+  ketQua: KetQuaChang,
+  tuyChon: { soChangDaMo?: number; dieuChinh?: DieuChinhEm } = {},
+): KetQuaThichNghi {
+  const r = thichNghiTheoMau(bo, cau, hoSo, chiSoChangVuaXong, ketQua, tuyChon)
+  const kp = chuanKhacPhuc(tuyChon.dieuChinh)
+  if (kp.length === 0) return r // vắng khắc phục ⇒ Y HỆT bản trước (không thêm trường)
+  // KHẮC PHỤC LUÔN: áp lên bộ SAU khi đã thích nghi theo mẫu, vào chặng CHƯA MỞ đầu tiên. `chiSoChangVuaXong = -1` = áp lên bộ đang chạy khi chưa chặng nào xong.
+  if (!Number.isInteger(chiSoChangVuaXong)) return r
+  const ds = duyNhat(cau)
+  const hs: HoSoEmRut = { dang: hoSo?.dang ?? {}, cau: hoSo?.cau ?? {} }
+  const dang = tinhDang(ds, hs)
+  apNutDang(dang, chuanDieuChinh(tuyChon.dieuChinh).nut)
+  const chiSoDich = Math.max(chiSoChangVuaXong + 1, Math.floor(tuyChon.soChangDaMo ?? 0))
+  const k = apKhacPhucLenBo(r.bo, ds, hs, dang, kp, chiSoDich)
+  return { bo: k.bo, henOnLai: r.henOnLai, doi: [...r.doi, ...k.doi], khacPhuc: k.ketQua }
+}
+
+function thichNghiTheoMau(
   bo: BoCuaEm,
   cau: CauGiao[],
   hoSo: HoSoEmRut,
