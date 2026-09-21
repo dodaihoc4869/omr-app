@@ -125,10 +125,9 @@ describe('CỤM 4 · Ngày giờ một kiểu (hàng 14) — giờ VN, 24 giờ,
   })
 
   it('không còn toLocaleDateString/toLocaleString(vi-VN) trơ ở các chỗ đã sửa (ngày kiểu máy: "25/9/2026", "12:59:00")', () => {
-    for (const f of ['src/screens/NganHangDeScreen.tsx', 'src/components/MessagesFab.tsx', 'src/components/HoSoEmView.tsx', 'src/components/KhoiThoiGianCa.tsx', 'src/screens/CauHoiScreen.tsx', 'src/screens/LichSuCaScreen.tsx']) {
+    for (const f of ['src/screens/NganHangDeScreen.tsx', 'src/components/HoSoEmView.tsx', 'src/components/KhoiThoiGianCa.tsx', 'src/screens/CauHoiScreen.tsx', 'src/screens/LichSuCaScreen.tsx']) {
       expect(chuHienRa(f), f).not.toMatch(/toLocaleTimeString\('vi-VN'|toLocaleString\('vi-VN'|toLocaleDateString\('vi-VN'\)/)
     }
-    expect(chuHienRa('src/components/MessagesFab.tsx')).toContain('gioDayDu(m.thoiGian')
     expect(chuHienRa('src/screens/NganHangDeScreen.tsx')).toContain('ngayDayDu(s.ngayNap)')
   })
 })

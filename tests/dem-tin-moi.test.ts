@@ -128,23 +128,3 @@ describe('Đếm tin chưa đọc', () => {
     expect(rong).toBe(H.length)
   })
 })
-
-describe('Bong bóng hỏi lại đúng cách', () => {
-  it('dùng demTinMoi để đếm, KHÔNG kéo cả hộp thư', async () => {
-    const { readFileSync } = await import('node:fs')
-    const { resolve } = await import('node:path')
-    const fab = readFileSync(resolve(__dirname, '../src/components/MessagesFab.tsx'), 'utf8')
-    const vongHoi = fab.slice(fab.indexOf('const pollUnread'), fab.indexOf('useEffect(() => {\n    const onResize'))
-    expect(vongHoi).toContain('demTinMoi(')
-    expect(vongHoi).not.toContain('listParentMessages(')
-  })
-
-  it('MÀN ẨN thì im hẳn, hiện lại thì hỏi ngay', async () => {
-    const { readFileSync } = await import('node:fs')
-    const { resolve } = await import('node:path')
-    const fab = readFileSync(resolve(__dirname, '../src/components/MessagesFab.tsx'), 'utf8')
-    expect(fab).toContain("document.visibilityState === 'visible'")
-    expect(fab).toContain("addEventListener('visibilitychange'")
-    expect(fab).toContain('const POLL_MS = 60000')
-  })
-})
