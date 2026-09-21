@@ -30,3 +30,7 @@ Người viết: Boss · 21/09/2026. Thầy lệnh: "màn xem điểm sau thi th
 
 ## 4 · KHI BUILD (sau duyệt) — rào
 `ExamTakeScreen`: CHỈ đổi phần nhìn khối kết quả sau nộp; không đổi luật công bố, luật chấm, câu chữ cảnh báo, tín hiệu rời màn. Đáp án không xuống máy em trước khi được phép. Test khoá chữ/cấu trúc báo cáo (19 tệp, xem kiểm kê của Boss trong Nhật ký) sửa CÓ CHỦ Ý, liệt kê. Code 3: xác nhận máy chủ chặn `hsCauSaiApi`/lời giải theo luật công bố + trả thêm trường cần cho mục 3–5 (chỉ-thêm).
+
+---
+## THẦY ĐÃ CHỐT TOÀN BỘ THIẾT KẾ — 21/09/2026 ~11:50 ("Chốt toàn bộ thiết kế triển luôn nhé") ⇒ BUILD
+Bản vẽ HS + PH + bản in của Code 2 (4df297a, docs/ban-ve-xem-diem-2109/) là bản được chốt. Build theo mục 4 (rào). Sửa khi build: "Este" ⇒ "Ester" (danh pháp 2018); thẻ "Máy đã lo" ⇒ **"A.I Đỗ Đại Học đã lo"** (thầy lệnh thay chữ "Máy" làm chủ ngữ bằng "A.I Đỗ Đại Học" — xem bảng A2 của chuẩn từ ngữ). Bản vẽ GV (Code 4): vẽ theo đúng bộ thành phần chung, Boss soát rồi build luôn, gửi ảnh thầy xem sau. Thứ tự build: HS-1 (kết quả sau nộp, 3 trạng thái công bố) → HS-2 → HS-3 → PH-1/PH-2 → bản in → GV.

@@ -44,6 +44,8 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Dạng em sai nhiều | App thầy: **Dạng em đang yếu**. Màn học sinh/phụ huynh: **Dạng em đang luyện thêm** | yếu kém, hổng |
 | Bảng mỗi em nhận câu nào | **Xem trước phân bổ** (app thầy) | — |
 
+| Hệ thống tự động của app khi là CHỦ NGỮ làm việc thay thầy (nhắc nộp, xếp ôn, khắc phục, rút bộ câu, vinh danh…) | **A.I Đỗ Đại Học** — thầy lệnh 21/09: "Thay toàn bộ từ Máy bằng A.I Đỗ Đại Học". Ví dụ: "A.I Đỗ Đại Học đã tự làm hôm nay", "A.I Đỗ Đại Học đã lo", "A.I Đỗ Đại Học đã nhắc 9 em". Lời RIÊNG cho từng em vẫn ký "Bộ não A.I hỗ trợ riêng em <họ tên>". KHÔNG đổi chữ "máy" chỉ THIẾT BỊ: máy chủ, máy này, máy em, máy chiếu, máy tính | Máy (làm chủ ngữ), hệ thống, app tự… |
+
 ### A3. Cách làm đợt chuẩn hoá (KHÔNG sửa bừa — nhiều test đang khoá chuỗi)
 Mỗi phiên rà làn của mình, lập BẢNG trong `docs/ra-soat-tu-ngu-2109-<phiên>.md`: `màn · chữ hiện tại · vấn đề (luật số mấy) · chữ đề nghị · tệp:dòng · test nào khoá`. Boss duyệt bảng ⇒ phiên sửa chữ + sửa test CÓ CHỦ Ý theo từng cụm màn, commit nhỏ, ảnh trước/sau. Ưu tiên: màn học sinh nhìn mỗi ngày (bảng nhiệm vụ, phiếu, game Đảo thần thú, Đoàn) → phụ huynh → thầy. KHÔNG đổi: câu chữ cảnh báo của MÀN THI THẬT (đã khoá), tên bảng/cột/mã nội bộ.
 
