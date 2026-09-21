@@ -36,6 +36,7 @@ const giongGV = (h) =>
     .replaceAll('3 dạng bài em tiến bộ nhất', '3 dạng bài em ấy tiến bộ nhất')
     .replaceAll('Bậc của em ở mỗi dạng', 'Bậc của em ấy ở mỗi dạng')
     .replaceAll('Dạng em còn vấp', 'Dạng em ấy còn vấp')
+    .replaceAll('glixerol', 'glycerol')
 
 const LOP = '12 - Tinh Hoa'
 const CA = { ten: 'Kiểm tra 45 phút · Ester – lipid', ma: '784817', ngay: 'Thứ Bảy 19/09/2026', nopDen: '09:30' }
@@ -85,8 +86,8 @@ G.dangLop = () => {
 /** Câu cả lớp sai nhiều nhất: dùng lại thẻ `xd-cau`, thêm số em sai + đáp án em chọn nhiều nhất (GV thấy cả đáp án và lời giải). */
 G.cauSaiNhieu = () => {
   const ds = [
-    { c: CAU_MAU[1], sai: 27, chon: 'Được 1,84 g (12 em quên làm tròn đến một chữ số thập phân)', tl: 68 },
-    { c: CAU_MAU[0], sai: 22, chon: 'Chọn C · 9,8 g — nhầm khối lượng mol của sodium acetate (9 em)', tl: 55 },
+    { c: CAU_MAU[1], sai: 27, chon: '1,84 g (12 em)', tl: 68 },
+    { c: CAU_MAU[0], sai: 22, chon: 'Chọn C · 9,8 g (9 em)', tl: 55 },
     { c: { ...CAU_MAU[0], id: 'II-2', so: 2, phan: 'Phần II · Đúng–sai', dang: 'Chỉ số chất béo', de: 'Ý c) Chỉ số xà phòng hoá của một chất béo luôn lớn hơn chỉ số axit của nó.', em: 'Chọn Sai (cả lớp: 19 em)', dapAn: 'Đúng' }, sai: 19, chon: 'Chọn Sai (19 em)', tl: 48 },
   ]
   return ds
