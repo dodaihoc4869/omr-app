@@ -183,8 +183,9 @@ export default function LamCauOn({ token, sbd, viecId, qid, tieuDe, onXong, cauS
   // Hàng đợi của cổng nộp xong (hoặc bị máy chủ từ chối hẳn) việc của MÀN NÀY ⇒ vẽ kết quả / hiện lỗi. Màn đã đóng thì cổng tự lo (nạp lại kế hoạch).
   useEffect(() => {
     const khiXong = (e: Event) => {
-      const d = (e as CustomEvent<{ id?: string; phanHoi?: PhanHoiNopOn }>).detail
+      const d = (e as CustomEvent<{ id?: string; phanHoi?: PhanHoiNopOn; daNhan?: boolean }>).detail
       if (!d || !d.phanHoi || d.id !== idHang.current) return
+      d.daNhan = true // cổng biết màn này đã nhận (không cần hộp thoại báo thay)
       idHang.current = ''
       setChoMayChu(false)
       if (d.phanHoi.ok) apDungRef.current(d.phanHoi)

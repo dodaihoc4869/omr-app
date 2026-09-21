@@ -639,8 +639,17 @@ export default function StudentPortalScreen() {
   // (khoá đáp án đầu) nên nộp lại không nhân đôi. Nộp được: đang mở đúng phiếu ấy thì vẽ lại phiếu có kết quả, không thì nạp lại danh sách bài.
   phieuMoRef.current = !!phieuHtml
   const hangNop = useHangDoiNop(auth?.sbd, async (m) => {
+    // CHỈ nộp việc của ĐÚNG em đang đăng nhập (máy dùng chung: em trước đăng xuất, em sau đăng nhập ⇒ việc của em trước NGỦ trong kho tới khi chính em ấy đăng nhập lại;
+    // token không lưu trong hàng, mỗi lượt lấy token của em đang đăng nhập rồi mới gửi).
+    if (!auth || m.sbd !== auth.sbd) return 'ban'
+    // Việc ôn câu bị từ chối hẳn / hết lần thử: màn ôn đang mở nhận qua sự kiện (`daNhan`); màn đã đóng thì báo bằng hộp thoại — em luôn biết bài chưa vào.
+    const baoOnCau = (error: string) => {
+      const chiTiet = { id: m.id, phanHoi: { ok: false, error }, daNhan: false }
+      window.dispatchEvent(new CustomEvent(SU_KIEN_HANG_DOI_XONG, { detail: chiTiet }))
+      if (!chiTiet.daNhan) void bao(`${error} Bài của em vẫn ở máy — em mở lại bài ôn rồi nộp nhé.`, 'Chưa nộp được bài ôn')
+    }
     if (m.lanThu >= TOI_DA_LAN_THU) {
-      if (m.loai === 'on_cau') window.dispatchEvent(new CustomEvent(SU_KIEN_HANG_DOI_XONG, { detail: { id: m.id, phanHoi: { ok: false, error: 'Chưa nộp được sau nhiều lần thử. Bài của em vẫn ở máy — em bấm nộp lại nhé.' } } }))
+      if (m.loai === 'on_cau') baoOnCau('Chưa nộp được sau nhiều lần thử.')
       else void bao('Chưa nộp được chặng sau nhiều lần thử. Bài của em vẫn ở máy — em mở lại bài rồi bấm nộp nhé.', 'Chưa nộp được chặng')
       return 'bo'
     }
@@ -651,8 +660,11 @@ export default function StudentPortalScreen() {
       const { nopOnLai } = await import('../components/bang-nhiem-vu/cau-on-api')
       const r = await nopOnLai(auth.token, g.traLoi, g.duong)
       if (r.ban) return 'ban'
-      window.dispatchEvent(new CustomEvent(SU_KIEN_HANG_DOI_XONG, { detail: { id: m.id, phanHoi: r } }))
-      if (!r.ok) return 'bo'
+      if (!r.ok) {
+        baoOnCau(r.error || 'Máy chủ chưa nhận bài ôn.') // bị từ chối hẳn (đăng nhập hết hạn, bài không còn…): gỡ khỏi hàng, báo rõ
+        return 'bo'
+      }
+      window.dispatchEvent(new CustomEvent(SU_KIEN_HANG_DOI_XONG, { detail: { id: m.id, phanHoi: r, daNhan: false } }))
       setLamMoiKeHoach((n) => n + 1)
       return 'xong'
     }

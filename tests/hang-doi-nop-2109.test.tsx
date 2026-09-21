@@ -153,7 +153,8 @@ describe('vòng chạy useHangDoiNop (đồng hồ giả)', () => {
       bay--
       return 'xong' as const
     })
-    const { result } = renderHook(() => useHangDoiNop('A1', xuLy, { kho: kho(), ngauNhien: GIUA }))
+    const k = kho()
+    const { result } = renderHook(() => useHangDoiNop('A1', xuLy, { kho: k, ngauNhien: GIUA }))
     act(() => { result.current.them(muc('m1')); result.current.them(muc('m2')) })
     await chay(30_000)
     expect(xuLy).toHaveBeenCalledTimes(2)
@@ -175,7 +176,8 @@ describe('vòng chạy useHangDoiNop (đồng hồ giả)', () => {
 
   it('ném lỗi cũng tính là "ban" (không mất việc); go(id) gỡ việc đã nộp bằng đường bấm tay', async () => {
     const xuLy = vi.fn(async () => { throw new Error('mạng') })
-    const { result } = renderHook(() => useHangDoiNop('A1', xuLy, { kho: kho(), ngauNhien: GIUA }))
+    const k = kho()
+    const { result } = renderHook(() => useHangDoiNop('A1', xuLy, { kho: k, ngauNhien: GIUA }))
     act(() => result.current.them(muc('m1')))
     await chay(21_000)
     expect(xuLy).toHaveBeenCalledTimes(1)
@@ -207,6 +209,67 @@ describe('vòng chạy useHangDoiNop (đồng hồ giả)', () => {
     }
   })
 
+  it('MÁY DÙNG CHUNG: việc của em A chỉ chạy khi CHÍNH em A đăng nhập; em B đăng nhập ⇒ việc của A ngủ trong kho (không bị nộp bằng phiên của B), A đăng nhập lại ⇒ mới nộp', async () => {
+    const k = kho()
+    const xuLy = vi.fn(async () => 'xong' as const)
+    const a = renderHook(({ sbd }) => useHangDoiNop(sbd, xuLy, { kho: k, ngauNhien: GIUA }), { initialProps: { sbd: 'A1' as string | undefined } })
+    act(() => a.result.current.them(muc('viec-cua-A', 'A1')))
+    a.rerender({ sbd: undefined }) // A đăng xuất trước khi hàng kịp nộp
+    await chay(60_000)
+    expect(xuLy).not.toHaveBeenCalled()
+    a.rerender({ sbd: 'B2' }) // B đăng nhập trên cùng máy
+    expect(a.result.current.soCho).toBe(0) // dải "Đã lưu ở máy" của B không đếm việc của A
+    await chay(60_000)
+    expect(xuLy).not.toHaveBeenCalled()
+    expect(docHang(k.v).map((m) => m.id)).toEqual(['viec-cua-A']) // việc của A còn nguyên trong kho
+    a.rerender({ sbd: 'A1' })
+    await chay(2_000)
+    expect(xuLy).toHaveBeenCalledTimes(1)
+    expect(xuLy).toHaveBeenCalledWith(expect.objectContaining({ id: 'viec-cua-A', sbd: 'A1' }))
+  })
+
+  it('HAI TAB cùng máy (localStorage thật + sự kiện storage): tab 2 biết việc do tab 1 thêm, nhưng tới hạn chỉ MỘT tab nộp (giữ chỗ trong kho); không ai nộp lại sau khi xong', async () => {
+    localStorage.clear()
+    let bay = 0
+    const xuLy = vi.fn(async () => {
+      bay++
+      await new Promise((r) => setTimeout(r, 4000))
+      return 'xong' as const
+    })
+    const t1 = renderHook(() => useHangDoiNop('A1', xuLy, { ngauNhien: GIUA }))
+    const t2 = renderHook(() => useHangDoiNop('A1', xuLy, { ngauNhien: GIUA }))
+    act(() => t1.result.current.them(muc('chung', 'A1')))
+    // Trình duyệt bắn `storage` cho CÁC TAB KHÁC khi một tab ghi localStorage; jsdom không tự bắn trong cùng cửa sổ ⇒ bắn tay.
+    await act(async () => { window.dispatchEvent(new StorageEvent('storage', { key: KHOA_LUU_HANG, newValue: localStorage.getItem(KHOA_LUU_HANG) })) })
+    expect(t2.result.current.soCho).toBe(1) // tab 2 thấy việc
+    await chay(30_000)
+    expect(bay).toBe(1) // cả hai tab tới hạn cùng lúc, chỉ MỘT tab giữ chỗ và nộp
+    expect(xuLy).toHaveBeenCalledTimes(1)
+    await act(async () => { window.dispatchEvent(new StorageEvent('storage', { key: KHOA_LUU_HANG, newValue: localStorage.getItem(KHOA_LUU_HANG) })) })
+    expect(docHang(localStorage.getItem(KHOA_LUU_HANG))).toEqual([]) // nộp xong, gỡ khỏi kho
+    expect(t2.result.current.soCho).toBe(0)
+    await chay(300_000)
+    expect(xuLy).toHaveBeenCalledTimes(1) // không ai nộp lại
+    t1.unmount()
+    t2.unmount()
+    localStorage.clear()
+  })
+
+  it('lượt bay dài hơn thời gian giữ chỗ 90 s không làm mất kết quả: vẫn ghi vào hàng khi xong (kể cả state đã đổi vì giữ chỗ)', async () => {
+    const k = kho()
+    const xuLy = vi.fn(async () => {
+      await new Promise((r) => setTimeout(r, 3000))
+      return 'ban' as const
+    })
+    const { result } = renderHook(() => useHangDoiNop('A1', xuLy, { kho: k, ngauNhien: GIUA }))
+    act(() => result.current.them(muc('m1', 'A1')))
+    await chay(25_000)
+    expect(xuLy).toHaveBeenCalledTimes(1)
+    const m = docHang(k.v)[0]!
+    expect(m.lanThu).toBe(1) // kết quả "ban" đã được ghi (lần thử tăng), hạn mới theo bậc lùi 40 s
+    expect(m.henLuc - T0).toBeGreaterThan(20_000 + 3_000 + 30_000)
+  })
+
   it('không có sbd (chưa đăng nhập) ⇒ không chạy, soCho 0', async () => {
     const xuLy = vi.fn(async () => 'xong' as const)
     const { result } = renderHook(() => useHangDoiNop(undefined, xuLy, { kho: kho(), ngauNhien: GIUA }))
@@ -226,6 +289,12 @@ describe('khoá nguồn', () => {
     expect(sp).toMatch(/maBtvnPhieuRef\.current === g\.ma/)
     expect(sp).toMatch(/m\.lanThu >= TOI_DA_LAN_THU/)
     expect(sp).toMatch(/dangChoNop=\{hangNop\.soCho\}/)
+  })
+  it('cổng học sinh: chỉ nộp việc của ĐÚNG em đang đăng nhập; ôn câu bị từ chối / hết lần thử mà màn đã đóng ⇒ hộp thoại báo (không lặng lẽ mất); màn ôn nhận qua cờ daNhan', () => {
+    expect(sp).toMatch(/if \(!auth \|\| m\.sbd !== auth\.sbd\) return 'ban'/)
+    expect(sp).toMatch(/if \(!chiTiet\.daNhan\) void bao\(/)
+    expect(sp).toMatch(/baoOnCau\(r\.error \|\| 'Máy chủ chưa nhận bài ôn\.'\)/)
+    expect(doc('src/components/bang-nhiem-vu/LamCauOn.tsx')).toMatch(/d\.daNhan = true/)
   })
   it('KHÔNG có token trong gói xếp hàng (không lưu bí mật ở kho hàng đợi)', () => {
     expect(sp).not.toMatch(/hangNop\.them\([^)]*token/)
