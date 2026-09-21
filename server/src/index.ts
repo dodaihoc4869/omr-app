@@ -20,6 +20,7 @@ import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
 import {gvBangTin} from './gv-bang-tin'
 import {ghiLoiMay} from './nhat-ky-may'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
+import {docThanThuSoThat,hsThuThachHomNay,hsThuThachNop} from './thu-thach-rieng'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
 import {parentNews,refreshDailyNews} from './parent-news'
@@ -3089,6 +3090,9 @@ export default {
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
       if (p === '/hs/canh-bao/xem') return ra(await emXemCanhBao(env, await gameIdentity(env, b), String(b.id ?? '')))
       if (p === '/hs/on-lai/nop') return ra(await hsOnLaiNop(env, b))
+      // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
+      if (p === '/hs/thu-thach-hom-nay') return ra(await hsThuThachHomNay(env, b))
+      if (p === '/hs/thu-thach-hom-nay/nop') return ra(await hsThuThachNop(env, b))
       if (p === '/hs/thoi-gian-hoc') return ra(await hsThoiGianHoc(env, b))
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
@@ -3184,7 +3188,7 @@ export default {
       if (p === '/btvn/cho-lam-lai') return ra(await ND.choLamLaiCaNhan(env, b, Date.now()))
       // BỘ NÃO A.I (Code 1, `bo-nao.ts`; hợp đồng docs/hop-dong-bo-nao-2109.md): MỌI lệnh /ai/* là lệnh THẦY — nằm SAU cổng `laThay`; các hàm tự trả {ok,…}, không tự kiểm mã.
       if (p === '/ai/cau-hinh') return ra(await AI.boNaoCauHinh(env, b))
-      if (p === '/ai/ho-so-ngay') return ra(await AI.boNaoHoSoNgay(env, b))
+      if (p === '/ai/ho-so-ngay') return ra(await AI.boNaoHoSoNgay(env, b, Date.now(), { thanThu: (ds) => docThanThuSoThat(env, ds) })) // + SỐ THẬT thần thú trong thẻ (Nấc 1)
       if (p === '/ai/dieu-chinh/nop') return ra(await AI.boNaoNop(env, b))
       // TÊN DẠNG cạnh mã dạng (chuẩn từ ngữ luật 4: mã nội bộ không hiện cho thầy) — lớp mỏng `ten-dang-bo-nao.ts`, không sửa lõi Bộ não.
       if (p === '/ai/dem-qua') return ra(await themTenDangDemQua(env, await AI.boNaoDemQua(env, b)))

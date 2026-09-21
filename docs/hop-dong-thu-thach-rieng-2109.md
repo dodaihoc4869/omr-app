@@ -56,13 +56,18 @@ Với mỗi dạng (soCau chia đều, dạng đầu nhận phần dư): câu c�
 `nguon = 'thu_thach_rieng'`, `maNguon = 'thu_thach:<ngày>'` ở `su_kien_hoc`; EXP đúng như `on_lai` (mỗi câu đúng), EXP mới (`capNhatExp`) tính như ôn lại; hồ sơ mạnh–yếu (`dungLaiHoSo`) dùng chung ⇒ câu sai vào lịch ôn 1·3·7. Không mở thêm loại EXP/mảnh khiên; mảnh khiên vẫn "đạt nhiệm vụ ngày +1".
 
 ## 7 · Bảng tin của thầy
-`/gv/bang-tin.mayDaLam` thêm `{ "loai": "thu_thach_rieng", "so": N, "soDaLam": M, "chu": "N em nhận thử thách riêng · M em đã làm" }` (chỉ khi N > 0): N = số em có thử thách áp hôm nay, M = số em đã nộp ít nhất một câu.
+`/gv/bang-tin.mayDaLam` (ĐÃ CÓ) thêm `{ "loai": "thu_thach_rieng", "so": N, "soDaLam": M, "chu": "N em nhận thử thách riêng · M em đã làm" }` (chỉ khi N > 0): N = số em có thử thách áp hôm nay, M = số em đã nộp ít nhất một câu.
 
 ## 8 · Bảng D1 (chỉ-thêm, `server/migration-2109-thu-thach-rieng.sql`)
-`thu_thach_rieng(sbd, ngay, dang_json, bac, so_cau, qid_json, loi_moi, tao_luc, PRIMARY KEY(sbd, ngay))` — chốt câu của ngày. Kết quả làm bài lấy từ sổ `su_kien_hoc` (không lặp dữ liệu). Reset toàn app GIỮ bảng này (số liệu vận hành).
+`thu_thach_rieng(sbd, ngay, dang_json, bac, so_cau, so_cau_muon, qid_json, loi_moi, tao_luc, PRIMARY KEY(sbd, ngay))` (`so_cau` = số câu đã chốt, `so_cau_muon` = số Bộ não muốn ⇒ `thieu` khi nhỏ hơn) — chốt câu của ngày. Kết quả làm bài lấy từ sổ `su_kien_hoc` (không lặp dữ liệu). Reset toàn app GIỮ bảng này (số liệu vận hành).
 
 ## 9 · Phân công · mốc
 - **Code 3**: thẻ `thanThu`; áp thử thách khi nhận điều chỉnh; `/hs/thu-thach-hom-nay(+/nop)`; chọn câu; bảng + migration; `mayDaLam`; rà mọi chỗ đọc `bo.loi`/`so_loi` cho "lõi đúng bậc" (theo danh sách Code 1 gửi). Xong 15:30.
 - **Code 1**: khai kiểu `thanThu` ở `TheNgan`; sửa `bo-nao-khuon.ts` (`thuThach`, `loiMoi`, luật số thật, cờ), cẩm nang + mã lệnh `lay.mjs`/`nop.mjs` chạy được với khuôn mới; lõi đúng bậc.
 - **Code 2 (hoặc 4)**: thẻ ở đầu Bảng nhiệm vụ của em: tiêu đề = `loiMoi`, thanh EXP từ `thanThu`, nút "Làm N câu này" mở màn làm câu (dùng lại màn ôn lại + `traLoi`), trạng thái `xong` ⇒ thẻ đổi thành "Hôm nay em đã làm N câu" với số thật; `co:false`/lỗi ⇒ ẩn thẻ. Lệnh 404 (Worker chưa lên) ⇒ ẩn.
 - Mốc: hợp đồng 12:30 · mã ba phía 15:30 · Boss soát 16:30 · Worker + Pages 17:00.
+
+## 10 · Ghi chú cài đặt (Code 3, đã làm)
+- `thanThu` vào thẻ qua tham số phụ của `boNaoHoSoNgay(env, b, now, {thanThu})` (giữ `bo-nao.ts` chỉ import lõi thuần + kiểu; nối ở `index.ts`); thẻ LƯU cũng có `thanThu` ⇒ lúc nộp kiểm lại đúng số này. Cờ `thuThach` ở `/ai/cau-hinh` đã có (mặc định bật; ghi cờ khác không làm mất nó).
+- Đường nộp dùng CHUNG lõi `chamVaGhiTraLoi` của `/hs/on-lai/nop` (nguồn `thu_thach_rieng`, tập qid ĐÃ CHỐT được nộp dù em chưa "gặp"; qid ngoài tập ⇒ `khongCo`). `/hs/cau-theo-qid` KHÔNG mở thêm đường lấy câu chưa gặp.
+- Test: `tests/thu-thach-rieng-may-chu-2109.test.ts` (25 test, đột biến 38/39 mẫu).

@@ -16,9 +16,9 @@
 import type { D1PreparedStatement, Env } from './kieu'
 import { answerText, homeworkQuestions, isAnswerCorrect } from './btvn-grading'
 
-export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai'
+export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng'
 
-export const CAC_NGUON: readonly NguonSuKien[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'len_bang', 'game', 'luyen', 'on_lai']
+export const CAC_NGUON: readonly NguonSuKien[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'len_bang', 'game', 'luyen', 'on_lai', 'thu_thach_rieng']
 
 export interface SuKien {
   nguon: NguonSuKien

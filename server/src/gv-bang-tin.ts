@@ -9,6 +9,7 @@ import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { tenLopCuaEm } from './ten-lop'
 import { tenViec } from './nhat-ky-may'
 import { docCoTuDong, KHOA_TU_DONG } from './tu-dong-cac-viec'
+import { docThuThachTuDieuChinh, NGUON_THU_THACH } from './thu-thach-rieng'
 
 type Dong = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -207,7 +208,9 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const rDc = await Q.hoi('SELECT sbd, json FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 1 AND huy = 0', ngay)
   const rBt = await Q.hoi(`SELECT ngay, json, nop_luc, so_em, so_nhan, so_bi_loai FROM ai_ban_tin WHERE ngay <= ? ORDER BY ngay DESC LIMIT ${SO_DEM_TRUNG_VI + 1}`, ngay)
   // 9 · vinh danh hôm nay (bản đã đăng hôm nay lưu ở ngày hôm qua)
-  const rVd = await Q.hoi('SELECT body FROM daily_honors WHERE day = ?', homQua)
+  // (vinh danh hôm nay + số em đã làm thử thách riêng: MỘT truy vấn; thiếu bảng daily_honors ⇒ chỉ đọc phần thử thách)
+  let rVd = await Q.hoi("SELECT 'vd' AS k, body AS v FROM daily_honors WHERE day = ? UNION ALL SELECT 'tt', COUNT(DISTINCT sbd) FROM su_kien_hoc WHERE nguon = ? AND ngay_vn = ? AND luc >= ?", homQua, NGUON_THU_THACH, ngay, tuHomNay)
+  if (!rVd) rVd = await Q.hoi("SELECT 'tt' AS k, COUNT(DISTINCT sbd) AS v FROM su_kien_hoc WHERE nguon = ? AND ngay_vn = ? AND luc >= ?", NGUON_THU_THACH, ngay, tuHomNay)
   // 10 · lỗi của các việc nền trong 24 giờ (B11; bảng `nhat_ky_may`)
   const rLoiMay = await Q.hoi('SELECT nguon, COUNT(*) AS n, MAX(luc) AS cuoi FROM nhat_ky_may WHERE luc >= ? GROUP BY nguon', iso(nowMs - LOI_MAY_SO_GIO * 3_600_000))
   if (!rLoiMay) lyDoThieu.nhatKyMay = 'Chưa có bảng nhật ký lỗi của máy'
@@ -344,9 +347,13 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   // ---------------------------------------------------------------- mayDaLam[]
   let soVinhDanh = 0
   try {
-    const o = rVd?.[0] ? (JSON.parse(chuoi(rVd[0].body)) as { winners?: unknown[]; publishedAt?: string }) : null
+    const vd = (rVd ?? []).find((x) => chuoi(x.k) === 'vd')
+    const o = vd ? (JSON.parse(chuoi(vd.v)) as { winners?: unknown[]; publishedAt?: string }) : null
     if (o && Array.isArray(o.winners) && Date.parse(chuoi(o.publishedAt)) >= tuHomNayMs) soVinhDanh = o.winners.length
   } catch { soVinhDanh = 0 }
+  const soEmDaLamThuThach = so((rVd ?? []).find((x) => chuoi(x.k) === 'tt')?.v)
+  let soEmNhanThuThach = 0
+  for (const x of rDc ?? []) if (docThuThachTuDieuChinh(x.json)) soEmNhanThuThach++
   const emNhac = new Set(nhacTuDong.map((x) => chuoi(x.sbd)))
   const soPh = new Set(nhacTuDong.map((x) => chuoi(x.ph_nhom)).filter(Boolean)).size
   const soEmBoNaoSoi = bt && chuoi(bt.ngay) === ngay ? so(bt.so_em) : 0
@@ -356,6 +363,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     { loai: 'on_lai', so: soCauVeLichOn, chu: `Đưa ${soCauVeLichOn} câu sai về lịch ôn lại` },
     { loai: 'bo_cau_rieng', so: emDaChot.size, chu: `Rút bộ câu riêng cho ${emDaChot.size} em` },
     { loai: 'vinh_danh', so: soVinhDanh, chu: `Vinh danh ${soVinhDanh} em` },
+    { loai: 'thu_thach_rieng', so: soEmNhanThuThach, soDaLam: soEmDaLamThuThach, chu: `${soEmNhanThuThach} em nhận thử thách riêng · ${soEmDaLamThuThach} em đã làm` },
     { loai: 'bo_nao_soi', so: soEmBoNaoSoi, chu: `Bộ não A.I soi ${soEmBoNaoSoi} em` },
   ].filter((x) => (x.so as number) > 0)
 

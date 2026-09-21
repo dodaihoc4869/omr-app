@@ -104,7 +104,7 @@ export function cauCongKhai(q: PrivateQuestion) {
  * đúng 3 truy vấn D1 (em có thật + đã gặp; nội dung; đề bảo vệ), không R2. Trả câu RIÊNG (có đáp án) — NƠI GỌI phải tự lược sạch
  * (`cauCongKhai`) trước khi ra đường công khai. `loi` có giá trị thì KHÔNG có câu nào (SBD lạ, hoặc không kiểm được đề bảo vệ: đóng cửa).
  */
-export async function layCauChoEm(env: Env, sbd: string, xin: string[]): Promise<{ loi?: string; cau: PrivateQuestion[]; khongCo: string[] }> {
+export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepThem?: ReadonlySet<string>): Promise<{ loi?: string; cau: PrivateQuestion[]; khongCo: string[] }> {
   if (sbd.length > 40) return { loi: KHONG_TIM_THAY, cau: [], khongCo: xin }
   // Truy vấn 1: em có thật không, và trong các qid xin, em đã từng gặp những câu nào. (Em có thật = như `laHocSinhThat`.)
   const r = await env.DB.prepare(
@@ -117,7 +117,8 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[]): Promise
   try {
     daGap = (JSON.parse(r?.da_gap ?? '[]') as unknown[]).filter((x): x is string => typeof x === 'string')
   } catch { /* coi như chưa gặp câu nào */ }
-  const duoc = xin.filter((q) => daGap.includes(q))
+  // `choPhepThem`: qid máy chủ ĐÃ CHỐT cho em (thử thách riêng hôm nay) — được phục vụ dù em chưa gặp; vẫn qua mọi bộ lọc tự luận / đề bảo vệ bên dưới.
+  const duoc = xin.filter((q) => daGap.includes(q) || choPhepThem?.has(q) === true)
   if (duoc.length === 0) return { cau: [], khongCo: xin }
 
   // Truy vấn 2: nội dung từ chỉ mục game.

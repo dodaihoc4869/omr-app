@@ -10,7 +10,7 @@ import {
 } from './exp-cau-hinh'
 
 /** Nguồn cho EXP câu: mọi nguồn TRỪ game (game giữ 20/40/40 theo mastery, tránh thưởng đôi) và trừ `len_bang` (có thưởng riêng). */
-export const NGUON_EXP_CAU: readonly string[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'on_lai', 'luyen']
+export const NGUON_EXP_CAU: readonly string[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'on_lai', 'luyen', 'thu_thach_rieng']
 
 export type LoaiExp = 'cau' | 'lo' | 'btvn' | 'mom' | 'len_bac' | 'khac_phuc' | 'len_bang' | 'diem_ca' | 'dat_ngay' | 'chuoi'
 

@@ -86,7 +86,22 @@ async function ganExp(env: Env, sbd: string, qidDung: string[], luc: string): Pr
   return 0
 }
 
+/**
+ * Tuỳ chọn để CÙNG MỘT lõi chấm-và-ghi phục vụ hai đường nộp: ôn lại (`on_lai`, mặc định) và THỬ THÁCH RIÊNG (`thu_thach_rieng`, docs/hop-dong-thu-thach-rieng-2109.md).
+ * `choPhepTheoEm` = tập qid ĐƯỢC nộp ngoài quy tắc "em đã gặp" (thử thách: các câu máy chủ đã chốt cho em hôm nay). Có tuỳ chọn này thì CHỈ qid trong tập mới được nhận.
+ */
+export interface TuyChonNop {
+  nguon: 'on_lai' | 'thu_thach_rieng'
+  maNguon: (nowMs: number) => string
+  choPhepTheoEm?: (sbd: string) => Promise<ReadonlySet<string>>
+}
+const TUY_CHON_ON_LAI: TuyChonNop = { nguon: 'on_lai', maNguon: (now) => `on_lai:${ngayVn(now)}` }
+
 export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return chamVaGhiTraLoi(env, b, TUY_CHON_ON_LAI)
+}
+
+export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt: TuyChonNop): Promise<Record<string, unknown>> {
   // Không token / token sai / SBD trần đều bị từ chối. Lời báo đúng việc của đường này (em đang ÔN CÂU), không mượn lời của game.
   let sbd: string
   try {
@@ -97,26 +112,29 @@ export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<
   if (!Array.isArray(b.traLoi)) return { ok: false, error: 'Thiếu bài làm (traLoi)' }
   if (b.traLoi.length > TOI_DA_QID_MOT_LUOT) return { ok: false, error: `Mỗi lần nộp tối đa ${TOI_DA_QID_MOT_LUOT} câu` }
   const lam = docTraLoi(b.traLoi)
-  const xin = donQid(lam.map((x) => x.qid))
-  if (xin.length === 0) return { ok: true, ketQua: [], khongCo: [], chuaLam: [], tienBo: null, exp: 0 }
+  const choPhep = opt.choPhepTheoEm ? await opt.choPhepTheoEm(sbd) : undefined
+  const xinTho = donQid(lam.map((x) => x.qid))
+  const xin = choPhep ? xinTho.filter((q) => choPhep.has(q)) : xinTho
+  const ngoaiTap = choPhep ? xinTho.filter((q) => !choPhep.has(q)) : [] // qid ngoài tập được nộp: báo `khongCo` (gộp mọi lý do, không lộ câu nào có trong kho)
+  if (xin.length === 0) return { ok: true, ketQua: [], khongCo: choPhep ? xinTho : [], chuaLam: [], tienBo: null, exp: 0 }
 
-  const r = await layCauChoEm(env, sbd, xin)
+  const r = await layCauChoEm(env, sbd, xin, choPhep)
   if (r.loi) return { ok: false, error: r.loi }
   const cauTheoQid = new Map(r.cau.map((q) => [q.qid, q]))
   const nhanHet = lam.filter((x) => cauTheoQid.has(x.qid))
   // Chưa trả lời thì KHÔNG ghi, KHÔNG khoá, KHÔNG đáp án: trả lại `chuaLam` để em làm tiếp trong ngày.
   const nhan = nhanHet.filter((x) => daTraLoi(cauTheoQid.get(x.qid)!.phan, x.dapAn))
   const chuaLam = nhanHet.filter((x) => !nhan.includes(x)).map((x) => x.qid)
-  if (nhan.length === 0) return { ok: true, ketQua: [], khongCo: r.khongCo, chuaLam, tienBo: null, exp: 0 }
+  if (nhan.length === 0) return { ok: true, ketQua: [], khongCo: [...r.khongCo, ...ngoaiTap], chuaLam, tienBo: null, exp: 0 }
 
   // CHẤM rồi GHI SỔ. Chưa ghi được thì không có đáp án nào đi ra.
   const now = Date.now()
   const luc = new Date(now).toISOString()
-  const maNguon = `on_lai:${ngayVn(now)}`
+  const maNguon = opt.maNguon(now)
   const suKien: SuKien[] = nhan.map((x) => {
     const q = cauTheoQid.get(x.qid)!
     return {
-      nguon: 'on_lai', maNguon, sbd, qid: x.qid, lan: 1, luc, giay: x.giay, maDang: q.dang, chuyenDe: '', mucDo: q.mucDo ?? '',
+      nguon: opt.nguon, maNguon, sbd, qid: x.qid, lan: 1, luc, giay: x.giay, maDang: q.dang, chuyenDe: '', mucDo: q.mucDo ?? '',
       ketQua: isAnswerCorrect(x.dapAn, q.correct, phanTuQid(x.qid, q.phan)) ? 1 : 0, // đã qua `daTraLoi` nên không còn bỏ trống
     }
   })
@@ -125,8 +143,8 @@ export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<
 
   // Kết quả LẦN ĐẦU đã lưu (nộp lại cùng câu cùng ngày không đổi được).
   const daLuu = await env.DB.prepare(
-    `SELECT qid, ket_qua FROM su_kien_hoc WHERE sbd = ? AND nguon = 'on_lai' AND ma_nguon = ? AND lan = 1 AND qid IN (SELECT value FROM json_each(?))`,
-  ).bind(sbd, maNguon, JSON.stringify(nhan.map((x) => x.qid))).all<{ qid: string; ket_qua: number | null }>()
+    `SELECT qid, ket_qua FROM su_kien_hoc WHERE sbd = ? AND nguon = ? AND ma_nguon = ? AND lan = 1 AND qid IN (SELECT value FROM json_each(?))`,
+  ).bind(sbd, opt.nguon, maNguon, JSON.stringify(nhan.map((x) => x.qid))).all<{ qid: string; ket_qua: number | null }>()
   const ketQuaLuu = new Map((daLuu.results ?? []).map((x) => [String(x.qid), x.ket_qua === null ? null : Number(x.ket_qua)]))
   if (nhan.some((x) => !ketQuaLuu.has(x.qid))) return { ok: false, error: 'Chưa ghi được bài làm. Em nộp lại nhé.' }
 
@@ -157,5 +175,5 @@ export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<
       anhLoiGiai: (q.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai'),
     }
   })
-  return { ok: true, ketQua, khongCo: r.khongCo, chuaLam, tienBo, exp, ...(moi.bat ? { expNhan: expNhanCuaKetQua(moi), manhNhan: manhNhanCuaKetQua(moi) } : {}) }
+  return { ok: true, ketQua, khongCo: [...r.khongCo, ...ngoaiTap], chuaLam, tienBo, exp, ...(moi.bat ? { expNhan: expNhanCuaKetQua(moi), manhNhan: manhNhanCuaKetQua(moi) } : {}) }
 }

@@ -93,12 +93,17 @@ describe('migration `migration-2109-bo-nao.sql`', () => {
 
 // ───────────────────────── cấu hình ─────────────────────────
 describe('/ai/cau-hinh', () => {
-  it('mặc định {bat:true, cheDo:"bong", lopThat:[]}; ghi trộn từng phần; đọc lại đúng', async () => {
-    expect(await boNaoCauHinh(d.env, {})).toEqual({ ok: true, cauHinh: { bat: true, cheDo: 'bong', lopThat: [] } })
-    expect((await cauHinh({ lopThat: ['12A1', '12A1', '12B'] })).cauHinh).toEqual({ bat: true, cheDo: 'bong', lopThat: ['12A1', '12B'] })
-    expect((await cauHinh({ cheDo: 'that' })).cauHinh).toEqual({ bat: true, cheDo: 'that', lopThat: ['12A1', '12B'] })
+  it('mặc định {bat:true, cheDo:"bong", lopThat:[], thuThach:true}; ghi trộn từng phần (kể cả cờ thuThach); đọc lại đúng', async () => {
+    expect(await boNaoCauHinh(d.env, {})).toEqual({ ok: true, cauHinh: { bat: true, cheDo: 'bong', lopThat: [], thuThach: true } })
+    expect((await cauHinh({ lopThat: ['12A1', '12A1', '12B'] })).cauHinh).toEqual({ bat: true, cheDo: 'bong', lopThat: ['12A1', '12B'], thuThach: true })
+    expect((await cauHinh({ cheDo: 'that' })).cauHinh).toEqual({ bat: true, cheDo: 'that', lopThat: ['12A1', '12B'], thuThach: true })
     expect((await cauHinh({ bat: false })).cauHinh.bat).toBe(false)
-    expect(await docCauHinhBoNao(d.env)).toEqual({ bat: false, cheDo: 'that', lopThat: ['12A1', '12B'] })
+    expect((await cauHinh({ thuThach: false })).cauHinh).toMatchObject({ bat: false, thuThach: false }) // cờ thử thách riêng (Nấc 1) tắt được và các cờ khác giữ nguyên
+    expect((await cauHinh({ cheDo: 'bong' })).cauHinh.thuThach).toBe(false) // ghi cờ khác KHÔNG làm mất cờ thuThach
+    expect((await cauHinh({ thuThach: true })).cauHinh.thuThach).toBe(true)
+    expect((await cauHinh({ thuThach: 'true' })).ok).toBe(false)
+    await cauHinh({ cheDo: 'that' })
+    expect(await docCauHinhBoNao(d.env)).toEqual({ bat: false, cheDo: 'that', lopThat: ['12A1', '12B'], thuThach: true })
     expect(d.dem('cau_hinh', "khoa = 'bo_nao'")).toBe(1)
   })
   it('giá trị lạ bị từ chối và KHÔNG ghi', async () => {
@@ -112,7 +117,7 @@ describe('/ai/cau-hinh', () => {
     expect(cheDoHieuLuc({ bat: true, cheDo: 'bong', lopThat: ['12A1'] }, '12A2')).toBe('bong')
     expect(cheDoHieuLuc({ bat: true, cheDo: 'that', lopThat: [] }, '12A2')).toBe('that')
     d.sql.exec(`INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('bo_nao', 'không phải json', 'x')`)
-    expect(await docCauHinhBoNao(d.env)).toEqual({ bat: true, cheDo: 'bong', lopThat: [] })
+    expect(await docCauHinhBoNao(d.env)).toEqual({ bat: true, cheDo: 'bong', lopThat: [], thuThach: true })
   })
   it('`bat:false` ⇒ hồ sơ ngày và nộp báo "đang tắt", không ghi gì', async () => {
     dungBaEm()

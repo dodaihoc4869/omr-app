@@ -75,6 +75,8 @@ export const BANG_GIU: readonly string[] = [
   'hoc_sinh_da_go', 'danh_sach_da_go',
   // NHẬT KÝ LỖI CỦA MÁY (migration-2109-nhat-ky-may.sql, B11): số liệu vận hành, không thuộc dữ liệu học của em.
   'nhat_ky_may',
+  // THỬ THÁCH RIÊNG (migration-2109-thu-thach-rieng.sql): câu đã chốt của ngày — số liệu vận hành, kết quả nằm ở sổ `su_kien_hoc` (đã GIỮ).
+  'thu_thach_rieng',
 ]
 
 const TEN_HOP_LE = /^[a-z][a-z0-9_]*$/

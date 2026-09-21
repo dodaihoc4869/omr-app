@@ -34,8 +34,10 @@ export interface CauHinhBoNao {
   bat: boolean
   cheDo: 'bong' | 'that'
   lopThat: string[]
+  /** THỬ THÁCH RIÊNG hôm nay (Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): tắt ⇒ máy chủ vẫn nhận/lưu nhưng KHÔNG phát thẻ cho em. Mặc định BẬT (chỉ có tác dụng khi lớp em ở chế độ `that`). */
+  thuThach?: boolean
 }
-export const CAU_HINH_BO_NAO_MAC_DINH: CauHinhBoNao = { bat: true, cheDo: 'bong', lopThat: [] }
+export const CAU_HINH_BO_NAO_MAC_DINH: CauHinhBoNao = { bat: true, cheDo: 'bong', lopThat: [], thuThach: true }
 const KHOA_CAU_HINH = 'bo_nao'
 const CO_TRANG_MAC_DINH = 40
 const CO_TRANG_TOI_DA = 60
@@ -99,6 +101,7 @@ function chuanCauHinh(v: unknown): CauHinhBoNao {
     bat: typeof o.bat === 'boolean' ? o.bat : CAU_HINH_BO_NAO_MAC_DINH.bat,
     cheDo: o.cheDo === 'that' ? 'that' : 'bong',
     lopThat: [...new Set(lop)],
+    thuThach: o.thuThach !== false,
   }
 }
 
@@ -112,15 +115,19 @@ export function cheDoHieuLuc(ch: CauHinhBoNao, lop: string): 'bong' | 'that' {
   return ch.lopThat.includes(lop) ? 'that' : ch.cheDo
 }
 
-/** `POST /ai/cau-hinh` — thân rỗng = ĐỌC; có `bat` / `cheDo` / `lopThat` = GHI (trộn vào giá trị cũ). */
+/** `POST /ai/cau-hinh` — thân rỗng = ĐỌC; có `bat` / `cheDo` / `lopThat` / `thuThach` = GHI (trộn vào giá trị cũ). */
 export async function boNaoCauHinh(env: Env, b: Obj = {}): Promise<Obj> {
   const cu = await docCauHinhBoNao(env)
-  const coGhi = 'bat' in b || 'cheDo' in b || 'lopThat' in b
+  const coGhi = 'bat' in b || 'cheDo' in b || 'lopThat' in b || 'thuThach' in b
   if (!coGhi) return { ok: true, cauHinh: cu }
   const moi: CauHinhBoNao = { ...cu }
   if ('bat' in b) {
     if (typeof b.bat !== 'boolean') return { ok: false, error: 'bat phải là true hoặc false' }
     moi.bat = b.bat
+  }
+  if ('thuThach' in b) {
+    if (typeof b.thuThach !== 'boolean') return { ok: false, error: 'thuThach phải là true hoặc false' }
+    moi.thuThach = b.thuThach
   }
   if ('cheDo' in b) {
     if (b.cheDo !== 'bong' && b.cheDo !== 'that') return { ok: false, error: 'cheDo chỉ nhận "bong" hoặc "that"' }
@@ -350,7 +357,12 @@ function dieuChinhDaNopTuDong(r: Obj | undefined): DieuChinhDaNop | null {
 }
 
 /** `POST /ai/ho-so-ngay` — dựng thẻ/hồ sơ ngày cho MỘT TRANG em (`phan:'em'`, mặc định) hoặc bức tranh cả lớp (`phan:'lop'`). Lưu thẻ vào `ai_ho_so_ngay`. */
-export async function boNaoHoSoNgay(env: Env, b: Obj = {}, nowMs: number = Date.now()): Promise<Obj> {
+/** Phần PHỤ nối từ ngoài (giữ tệp này chỉ import lõi thuần + kiểu): số thật thần thú của cả trang em (Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md). */
+export interface PhuHoSoNgay {
+  thanThu?: (dsSbd: string[]) => Promise<Map<string, unknown>>
+}
+
+export async function boNaoHoSoNgay(env: Env, b: Obj = {}, nowMs: number = Date.now(), phu: PhuHoSoNgay = {}): Promise<Obj> {
   const ch = await docCauHinhBoNao(env)
   if (!ch.bat) return { ok: false, error: 'Bộ não đang tắt (Cài đặt → Bộ não)' }
   const ngay = b.ngay === undefined || b.ngay === '' ? ngayVnTuMs(nowMs) : b.ngay
@@ -365,6 +377,7 @@ export async function boNaoHoSoNgay(env: Env, b: Obj = {}, nowMs: number = Date.
   const { ds, tong } = await docDanhSachEm(env, trang, coTrang)
   const sbds = ds.map((d) => d.sbd)
   const dl = sbds.length ? await docDuLieuTrang(env, sbds, ngay) : null
+  const thanThuCuaEm = phu.thanThu && sbds.length ? await phu.thanThu(sbds).catch(() => new Map<string, unknown>()) : new Map<string, unknown>() // SỐ THẬT thần thú: ẩn danh, em không có thú ⇒ vắng
   const mocReset = await docMocReset(env, nowMs) // ngày xoá sổ toàn app gần nhất (null nếu chưa từng): tín hiệu suy từ kế hoạch/BTVN chưa đáng tin ngay sau đó
   const tao = new Date(nowMs).toISOString()
   const luu: D1PreparedStatement[] = []
@@ -401,6 +414,8 @@ export async function boNaoHoSoNgay(env: Env, b: Obj = {}, nowMs: number = Date.
       continue
     }
     const { the, hoSo } = tinhDacTrung(v)
+    const tt = thanThuCuaEm.get(d.sbd)
+    if (tt) { (the as { thanThu?: unknown }).thanThu = tt; (hoSo as { thanThu?: unknown }).thanThu = tt }
     // TỰ CHẤM điều chỉnh đêm qua; `xau_di` ⇒ cờ + TỰ GỠ nếu đang áp dụng
     let dg = null as ReturnType<typeof danhGiaDieuChinh> | null
     const hq = dl?.dcHomQua.get(d.sbd)
