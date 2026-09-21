@@ -1,5 +1,6 @@
 // `POST /gv/bang-tin-song` — BẢNG TIN KIỂU "SÀN GIAO DỊCH" của thầy (prompt-bang-tin-san-2109.md mục CODE 3; hợp đồng hai bên docs/hop-dong-bang-tin-song-2109.md — Code 4 ⇄ Code 3; màn đọc bằng `docSan`).
 // ĐỌC-CHỈ, mã bí mật của thầy như `/gv/bang-tin`. Trả `{ ok, serverNow, ...MỌI khoá của /gv/bang-tin (gọi chung `gvBangTin`), song:{ tongEm, dungNhip, tia60, nen, theoLop, nhiet, suKienMoi, danDau } }`.
+// MỘT ĐỊNH NGHĨA "câu" (`cau-da-lam.ts`, Boss 21/09): mọi số CÂU ở đây = câu KHÁC NHAU em đã trả lời hôm nay (làm lại một câu = một câu; bỏ trống không tính), `soCauDung` = câu có ≥ 1 lần đúng; chỉ GIÁ nến A(t), `nen[].soLuot` và dòng tin "lượt sai" của dạng đếm LƯỢT.
 // MỘT nguồn số: tổng câu / câu đúng / em đã học / theo lớp / ô nhiệt / nến / tia đều tính từ CÙNG danh sách sự kiện hôm nay ⇒ khớp nhau (luật khớp của hợp đồng); `nhip.soCau|soCauDung|soEmHoc|tiLeDung` của bản 3 được GHI ĐÈ bằng số này
 // (bản 3 đệm 60 giây, phần trực tiếp 10 giây — không để hai số lệch nhau). Mọi số TỪ MỐC hiển thị (`tuHomNay` của Bảng tin = max(mốc, 00:00 hôm nay)). Khối không có số thật ⇒ null / [] (không bịa).
 //
@@ -11,6 +12,7 @@ import type { Env } from './kieu'
 import { gvBangTin, SBD_THU } from './gv-bang-tin'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { tenLopCuaEm } from './ten-lop'
+import { demCauKhacNhau } from './cau-da-lam'
 
 type Hang = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -35,9 +37,16 @@ export const MOC_CHUOI_DUNG = [5, 8, 12, 20] as const
 export const CAU_MOI_DONG_LOP = 12
 export const LUOT_SAI_MOI_DONG_DANG = 3
 
-export interface NenSan { tu: number; mo: number; cao: number; thap: number; dong: number; soCau: number }
+/** `soCau` = số CÂU KHÁC NHAU xuất hiện LẦN ĐẦU trong khung (Σ mọi khung = số câu đã làm hôm nay — MỘT định nghĩa `cau-da-lam.ts`); `soLuot` = số lượt làm trong khung (làm lại một câu cũng là một lượt, chỉ giá A(t) dùng). */
+export interface NenSan { tu: number; mo: number; cao: number; thap: number; dong: number; soCau: number; soLuot: number }
 export interface TinSan { luc: number; loai: 'len' | 'xuong' | 'cham'; chu: string; phu?: string }
-export interface Ev { sbd: string; ms: number; kq: 0 | 1; dang: string }
+/** Một LƯỢT làm đã chấm. `qid` vắng ⇒ coi mỗi lượt là một câu riêng (hàm thuần dùng trong test). */
+export interface Ev { sbd: string; ms: number; kq: 0 | 1; dang: string; qid?: string }
+/** Đánh dấu các lượt là LẦN ĐẦU của (em, câu) — `ev` tăng dần theo `ms`. */
+function danhDauCauMoi(ev: readonly Ev[]): boolean[] {
+  const daGap = new Set<string>()
+  return ev.map((e, i) => { const k = `${e.sbd}|${e.qid ?? `#${i}`}`; if (daGap.has(k)) return false; daGap.add(k); return true })
+}
 export interface EmInfo { hoTen: string; tenLop: string }
 
 let demBangTin: { at: number; kq: Hang } | null = null
@@ -52,14 +61,15 @@ const conHan = (at: number, nowMs: number, han: number): boolean => nowMs - at >
 // ------------------------------------------------------------------ HÀM THUẦN ------------------------------------------------------------------
 /**
  * NẾN 5 PHÚT (định nghĩa của hợp đồng): A(t) = % câu ĐÚNG trong các câu có kết quả có `luc ∈ (t − 5 phút, t]` (cửa sổ trượt). Khung [T, T+5'): `mo` = A(T) (khung trước không có câu ⇒ `dong` khung trước; câu đầu ngày ⇒ A tại câu đầu),
- * `dong` = A(min(bây giờ, T+5')) (cửa sổ rỗng ⇒ giữ giá trước), `cao/thap` = max/min của A tại mọi câu trong khung (kể cả `mo`, `dong`), `soCau` = số sự kiện có kết quả trong khung. Khung yên ⇒ nến phẳng, soCau 0. Không có câu nào ⇒ [].
+ * `dong` = A(min(bây giờ, T+5')) (cửa sổ rỗng ⇒ giữ giá trước), `cao/thap` = max/min của A tại mọi lượt trong khung (kể cả `mo`, `dong`; giá tính theo LƯỢT), `soCau` = số câu MỚI (lần đầu trong ngày) trong khung, `soLuot` = số lượt. Khung yên ⇒ nến phẳng, soCau 0. Không có câu nào ⇒ [].
  * Trả tối đa `TOI_DA_NEN` khung mới nhất, cũ → mới. `ev` phải tăng dần theo `ms`.
  */
 export function tinhNen(ev: readonly Ev[], nowMs: number): NenSan[] {
   if (ev.length === 0) return []
   const n = ev.length
-  const pN: number[] = [0], pD: number[] = [0]
-  for (const e of ev) { pN.push(pN[pN.length - 1]! + 1); pD.push(pD[pD.length - 1]! + e.kq) }
+  const pN: number[] = [0], pD: number[] = [0], pM: number[] = [0] // pM: luỹ kế số câu MỚI
+  const moi = danhDauCauMoi(ev)
+  ev.forEach((e, i) => { pN.push(pN[pN.length - 1]! + 1); pD.push(pD[pD.length - 1]! + e.kq); pM.push(pM[pM.length - 1]! + (moi[i] ? 1 : 0)) })
   // số sự kiện có ms ≤ t (chia đôi)
   const dem = (t: number): number => { let lo = 0, hi = n; while (lo < hi) { const m = (lo + hi) >> 1; if (ev[m]!.ms <= t) lo = m + 1; else hi = m } return lo }
   const A = (t: number): number | null => {
@@ -79,20 +89,30 @@ export function tinhNen(ev: readonly Ev[], nowMs: number): NenSan[] {
     const c: number = cuoi ?? o
     if (cao < 0) { cao = Math.max(o, c); thap = Math.min(o, c) } else { cao = Math.max(cao, o, c); thap = Math.min(thap, o, c) }
     dongTruoc = c
-    ra.push({ tu: t, mo: tron(o, 1), cao: tron(cao, 1), thap: tron(thap, 1), dong: tron(c, 1), soCau: b - a })
+    ra.push({ tu: t, mo: tron(o, 1), cao: tron(cao, 1), thap: tron(thap, 1), dong: tron(c, 1), soCau: pM[b]! - pM[a]!, soLuot: b - a })
   }
   return ra.slice(-TOI_DA_NEN)
 }
 
-/** TIA 60 phút: 60 điểm, mỗi điểm một phút, điểm cuối = phút hiện tại; giá trị LUỸ KẾ từ mốc tại cuối phút ấy: em đã học, câu đã làm, tỉ lệ đúng cả ngày (%). */
+/**
+ * TIA 60 phút: 60 điểm, mỗi điểm một phút, điểm cuối = phút hiện tại; giá trị LUỸ KẾ từ mốc tại cuối phút ấy: em đã học, CÂU KHÁC NHAU đã làm (một câu làm lại vẫn một câu), tỉ lệ đúng cả ngày (%) = câu có ≥ 1 lần đúng / câu đã làm.
+ * Điểm cuối luôn = số ở `nhip.soCau` / `soEmHoc` (cùng định nghĩa `cau-da-lam.ts`).
+ */
 export function tinhTia(ev: readonly Ev[], nowMs: number): { hs: number[]; cau: number[]; tile: number[] } {
   const hs: number[] = [], cau: number[] = [], tile: number[] = []
   const phutNay = Math.floor(nowMs / 60_000)
   const daHoc = new Set<string>()
+  const cauDaLam = new Map<string, boolean>() // (em|câu) → đã có lần đúng
   let n = 0, dung = 0, i = 0
   for (let k = 0; k < 60; k++) {
     const het = k === 59 ? Infinity : (phutNay - 59 + k + 1) * 60_000
-    while (i < ev.length && ev[i]!.ms < het) { daHoc.add(ev[i]!.sbd); n++; dung += ev[i]!.kq; i++ }
+    while (i < ev.length && ev[i]!.ms < het) {
+      const e = ev[i]!, khoa = `${e.sbd}|${e.qid ?? `#${i}`}`
+      daHoc.add(e.sbd)
+      if (!cauDaLam.has(khoa)) { cauDaLam.set(khoa, false); n++ }
+      if (e.kq === 1 && !cauDaLam.get(khoa)) { cauDaLam.set(khoa, true); dung++ }
+      i++
+    }
     hs.push(daHoc.size); cau.push(n); tile.push(n ? tron((dung / n) * 100, 2) : 0)
   }
   return { hs, cau, tile }
@@ -106,20 +126,23 @@ export function taoTinTuSu(ev: readonly Ev[], em: ReadonlyMap<string, EmInfo>): 
   const tin: (TinSan & { dang?: string })[] = []
   const chuoiDung = new Map<string, number>(), daVao = new Set<string>()
   const lop = new Map<string, { n: number; dung: number }>(), dang = new Map<string, number>()
-  for (const e of ev) {
+  const moi = danhDauCauMoi(ev)
+  for (const [i, e] of ev.entries()) {
     const x = em.get(e.sbd)
     if (!x) continue
     if (!daVao.has(e.sbd)) { daVao.add(e.sbd); tin.push({ luc: e.ms, loai: 'cham', chu: x.hoTen, phu: `· ${x.tenLop} · vừa vào học` }) }
-    const c = e.kq === 1 ? (chuoiDung.get(e.sbd) ?? 0) + 1 : 0
-    chuoiDung.set(e.sbd, c)
-    if ((MOC_CHUOI_DUNG as readonly number[]).includes(c)) tin.push({ luc: e.ms, loai: 'len', chu: x.hoTen, phu: `· ${x.tenLop} · đúng ${c} câu liền` })
-    const l = lop.get(x.tenLop) ?? { n: 0, dung: 0 }
-    l.n++; l.dung += e.kq
-    if (l.n >= CAU_MOI_DONG_LOP) {
-      tin.push({ luc: e.ms, loai: 'cham', chu: x.tenLop, phu: `· thêm ${l.n} câu · đúng ${Math.round((l.dung / l.n) * 100)} %` })
-      l.n = 0; l.dung = 0
+    if (moi[i]) { // chuỗi "câu liền" và "lớp thêm N câu" chỉ đếm CÂU KHÁC NHAU (lần đầu làm câu ấy hôm nay) — cùng định nghĩa `cau-da-lam.ts`; làm lại câu cũ không nuôi chuỗi
+      const c = e.kq === 1 ? (chuoiDung.get(e.sbd) ?? 0) + 1 : 0
+      chuoiDung.set(e.sbd, c)
+      if ((MOC_CHUOI_DUNG as readonly number[]).includes(c)) tin.push({ luc: e.ms, loai: 'len', chu: x.hoTen, phu: `· ${x.tenLop} · đúng ${c} câu liền` })
+      const l = lop.get(x.tenLop) ?? { n: 0, dung: 0 }
+      l.n++; l.dung += e.kq
+      if (l.n >= CAU_MOI_DONG_LOP) {
+        tin.push({ luc: e.ms, loai: 'cham', chu: x.tenLop, phu: `· thêm ${l.n} câu · đúng ${Math.round((l.dung / l.n) * 100)} %` })
+        l.n = 0; l.dung = 0
+      }
+      lop.set(x.tenLop, l)
     }
-    lop.set(x.tenLop, l)
     if (e.kq === 0 && e.dang) {
       const s = (dang.get(e.dang) ?? 0) + 1
       if (s >= LUOT_SAI_MOI_DONG_DANG) { tin.push({ luc: e.ms, loai: 'xuong', chu: e.dang, phu: `· ${s} lượt sai vừa qua`, dang: e.dang }); dang.set(e.dang, 0) } else dang.set(e.dang, s)
@@ -149,22 +172,22 @@ async function tinhSong(env: Env, bt: Hang, nowMs: number): Promise<{ phan: Hang
   else { em = await docEm(env); soTruyVan++; demEm = { at: nowMs, em } }
   // sự kiện HÔM NAY (từ mốc), đã chấm, theo thời gian (đi chỉ mục idx_skh_luc khi đã có)
   const rSu = await env.DB.prepare(
-    "SELECT sbd, luc, ket_qua, COALESCE(ma_dang, '') AS ma_dang FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL ORDER BY luc LIMIT ?",
+    "SELECT sbd, luc, ket_qua, COALESCE(ma_dang, '') AS ma_dang, qid FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL ORDER BY luc LIMIT ?",
   ).bind(tuHomNay, TOI_DA_SU_KIEN).all<Hang>(); soTruyVan++
   const ev: Ev[] = []
   for (const x of rSu.results ?? []) {
     const sbd = chuoi(x.sbd), ms = Date.parse(chuoi(x.luc))
     if (!em.has(sbd) || !Number.isFinite(ms) || ms > nowMs) continue
-    ev.push({ sbd, ms, kq: so(x.ket_qua) === 1 ? 1 : 0, dang: chuoi(x.ma_dang) })
+    ev.push({ sbd, ms, kq: so(x.ket_qua) === 1 ? 1 : 0, dang: chuoi(x.ma_dang), qid: chuoi(x.qid) })
   }
-  // tổng + theo em + theo lớp (MỘT nguồn ⇒ các khối khớp nhau)
-  const theoEm = new Map<string, { n: number; dung: number }>(), theoLop = new Map<string, { daHoc: Set<string>; n: number; dung: number }>()
-  let soCauDung = 0
-  for (const e of ev) {
-    const a = theoEm.get(e.sbd) ?? { n: 0, dung: 0 }; a.n++; a.dung += e.kq; theoEm.set(e.sbd, a)
-    const tl = em.get(e.sbd)!.tenLop
-    const l = theoLop.get(tl) ?? { daHoc: new Set<string>(), n: 0, dung: 0 }; l.daHoc.add(e.sbd); l.n++; l.dung += e.kq; theoLop.set(tl, l)
-    soCauDung += e.kq
+  // tổng + theo em + theo lớp (MỘT nguồn ⇒ các khối khớp nhau). SỐ "CÂU" = câu KHÁC NHAU em đã trả lời hôm nay, `soCauDung` = câu có ≥ 1 lần đúng (MỘT định nghĩa `cau-da-lam.ts`); lượt làm lại không phồng số.
+  const theoEm = demCauKhacNhau(ev.map((e, i) => ({ sbd: e.sbd, qid: e.qid || `#${i}`, ketQua: e.kq })))
+  const theoLop = new Map<string, { daHoc: Set<string>; n: number; dung: number }>()
+  let soCauTong = 0, soCauDung = 0
+  for (const [sbd, a] of theoEm) {
+    const tl = em.get(sbd)!.tenLop
+    const l = theoLop.get(tl) ?? { daHoc: new Set<string>(), n: 0, dung: 0 }; l.daHoc.add(sbd); l.n += a.soCau; l.dung += a.soCauDung; theoLop.set(tl, l)
+    soCauTong += a.soCau; soCauDung += a.soCauDung
   }
   const siSo = new Map<string, number>()
   for (const [, x] of em) siSo.set(x.tenLop, (siSo.get(x.tenLop) ?? 0) + 1)
@@ -178,15 +201,15 @@ async function tinhSong(env: Env, bt: Hang, nowMs: number): Promise<{ phan: Hang
     if (demNen && demNen.khoa === khoaNen && conHan(demNen.at, nowMs, DEM_CHAM_MS)) nen0 = demNen.nen
     else {
       const rNen = await env.DB.prepare(
-        'SELECT sbd, COUNT(*) AS n, SUM(ket_qua) AS d FROM su_kien_hoc WHERE luc >= ? AND luc < ? AND ket_qua IS NOT NULL GROUP BY sbd',
+        'SELECT sbd, COUNT(*) AS n, SUM(m) AS d FROM (SELECT sbd, ngay_vn, qid, MAX(ket_qua) AS m FROM su_kien_hoc WHERE luc >= ? AND luc < ? AND ket_qua IS NOT NULL GROUP BY sbd, ngay_vn, qid) GROUP BY sbd', // câu KHÁC NHAU mỗi ngày (cùng định nghĩa)
       ).bind(new Date(tuNenMs).toISOString(), tuHomNay).all<Hang>().catch(() => null); soTruyVan++
       for (const x of rNen?.results ?? []) nen0.set(chuoi(x.sbd), { n: so(x.n), dung: so(x.d) })
       if (rNen) demNen = { at: nowMs, khoa: khoaNen, nen: nen0 } // lỗi đọc ⇒ KHÔNG đệm (lần sau đọc lại)
     }
   }
-  const danDau = [...theoEm].filter(([sbd, a]) => em.has(sbd) && a.n >= DAN_DAU_TOI_THIEU_CAU).map(([sbd, a]) => {
+  const danDau = [...theoEm].filter(([sbd, a]) => em.has(sbd) && a.soCau >= DAN_DAU_TOI_THIEU_CAU).map(([sbd, a]) => {
     const b = nen0.get(sbd), x = em.get(sbd)!
-    return { sbd, hoTen: x.hoTen, tenLop: x.tenLop, soCau: a.n, tienBo: b && b.n > 0 ? Math.round((a.dung / a.n - b.dung / b.n) * 100) : 0 }
+    return { sbd, hoTen: x.hoTen, tenLop: x.tenLop, soCau: a.soCau, tienBo: b && b.n > 0 ? Math.round((a.soCauDung / a.soCau - b.dung / b.n) * 100) : 0 }
   }).sort((p, q) => q.soCau - p.soCau || q.tienBo - p.tienBo || (p.sbd < q.sbd ? -1 : 1)).slice(0, TOI_DA_DAN_DAU)
   // băng tin: từ sổ + bài vừa nộp; cũ → mới, ≤ 20 mới nhất
   const tin = taoTinTuSu(ev, em)
@@ -213,7 +236,7 @@ async function tinhSong(env: Env, bt: Hang, nowMs: number): Promise<{ phan: Hang
   const suKienMoi: TinSan[] = tinCat.map(({ luc, loai, chu, phu }) => ({ luc, loai, chu, ...(phu ? { phu } : {}) }))
   const dn = (bt.nhip as { btvnDungNhip?: { dungNhip?: number; tongEm?: number } } | undefined)?.btvnDungNhip
   const nen = tinhNen(ev, nowMs)
-  const nhipGhiDe = { soCau: ev.length, soCauDung, soEmHoc: theoEm.size, tongEm: em.size, ...(ev.length ? { tiLeDung: tron(soCauDung / ev.length, 3) } : {}) }
+  const nhipGhiDe = { soCau: soCauTong, soCauDung, soEmHoc: theoEm.size, tongEm: em.size, ...(soCauTong ? { tiLeDung: tron(soCauDung / soCauTong, 3) } : {}) }
   return {
     soTruyVan,
     nhip: nhipGhiDe,
@@ -224,7 +247,7 @@ async function tinhSong(env: Env, bt: Hang, nowMs: number): Promise<{ phan: Hang
       tia60: { ...tinhTia(ev, nowMs), nhip: null },
       nen,
       theoLop: [...siSo].map(([lop, n]) => ({ lop, siSo: n, daHoc: theoLop.get(lop)?.daHoc.size ?? 0, soCau: theoLop.get(lop)?.n ?? 0, soCauDung: theoLop.get(lop)?.dung ?? 0 })).sort((a, b) => a.lop.localeCompare(b.lop, 'vi')),
-      nhiet: [...em].map(([sbd, x]) => ({ sbd, hoTen: x.hoTen, lop: x.tenLop, soCau: theoEm.get(sbd)?.n ?? 0, soCauDung: theoEm.get(sbd)?.dung ?? 0, dangVap: dangVap.has(sbd) }))
+      nhiet: [...em].map(([sbd, x]) => ({ sbd, hoTen: x.hoTen, lop: x.tenLop, soCau: theoEm.get(sbd)?.soCau ?? 0, soCauDung: theoEm.get(sbd)?.soCauDung ?? 0, dangVap: dangVap.has(sbd) }))
         .sort((a, b) => a.lop.localeCompare(b.lop, 'vi') || a.hoTen.localeCompare(b.hoTen, 'vi') || (a.sbd < b.sbd ? -1 : 1)),
       suKienMoi,
       danDau,

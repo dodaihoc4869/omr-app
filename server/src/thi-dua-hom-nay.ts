@@ -232,7 +232,7 @@ interface ThanhVienLop extends EmCham {
 }
 
 /** Lớp của em `sbd` + số liệu chăm hôm nay của cả lớp: 3 truy vấn (danh sách em, số câu/ngày, đạt nhiệm vụ ngày). Em không thuộc danh sách lớp (tài khoản thử, đã khoá) ⇒ null. */
-async function docLopHomNay(env: Env, sbd: string, nowMs: number, moc: MocHienThi): Promise<{ lop: string; thanhVien: ThanhVienLop[] } | null> {
+export async function docLopHomNay(env: Env, sbd: string, nowMs: number, moc: MocHienThi): Promise<{ lop: string; thanhVien: ThanhVienLop[] } | null> {
   const tatCa = await docTatCaEm(env)
   const emNay = tatCa.get(sbd)
   if (!emNay) return null

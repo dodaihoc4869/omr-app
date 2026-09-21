@@ -8,7 +8,7 @@ import { buoiCua, docCauHinhNhac, KHOA_CAU_HINH, KHOA_LAN_CHAY, lanChayKe, thuCu
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { tenLopCuaEm } from './ten-lop'
 import { docLichDaLuu, moLucChang, moLucGocChangMoSom } from './btvn-nang-do-chang'
-import { baiTuNgayMoc, giaiMocHienThi, KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, type MocHienThi } from './moc-no'
+import { baiTuNgayMoc, docMocHienThiMs, giaiMocHienThi, KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, type MocHienThi } from './moc-no'
 import { tenViec } from './nhat-ky-may'
 import { docCoTuDong, KHOA_TU_DONG } from './tu-dong-cac-viec'
 import { docThuThachTuDieuChinh, NGUON_THU_THACH, thuThachDaApTuHang } from './thu-thach-rieng'
@@ -152,7 +152,9 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   // 2 · cấu hình: mốc, cờ nhắc, lượt cron nhắc gần nhất
   const rCfg = await Q.hoi("SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (?, ?, ?, ?, ?, ?, ?)", KHOA_MOC_BANG_TIN, KHOA_CAU_HINH, KHOA_LAN_CHAY, KHOA_TU_DONG, KHOA_SAI_NHANH_GV, KHOA_VE_DICH_TU, KHOA_HIEN_THI_TU)
   const cfg = new Map((rCfg ?? []).map((x) => [chuoi(x.khoa), x]))
-  const { tuMs, tuDangAp } = docMocBangTin(cfg.get(KHOA_MOC_BANG_TIN)?.gia_tri, ngay)
+  // MỐC: MỘT nguồn với Thi đua / thẻ Hôm nay / phụ huynh (`docMocHienThi`: hien_thi_tu ⇒ ve_dich_tu ⇒ bang_tin_tu). Mốc chung vắng hết ⇒ luật cũ của bảng tin (00:00 hôm nay, `tuDangAp = false`).
+  const giaTriMoc = [KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN].map((k) => chuoi(cfg.get(k)?.gia_tri)).find((v) => /^\d{4}-\d{2}-\d{2}(T|$)/.test(v) && Number.isFinite(docMocHienThiMs(v)) && (v.includes('T') || Number.isFinite(Date.parse(`${v}T00:00:00Z`))))
+  const { tuMs, tuDangAp } = giaTriMoc ? { tuMs: docMocHienThiMs(giaTriMoc), tuDangAp: true } : docMocBangTin(undefined, ngay)
   const dauHomNay = dauNgayMs(ngay)
   const tuHomNayMs = Math.max(tuMs, dauHomNay)
   const tuHomNay = iso(tuHomNayMs)
@@ -160,17 +162,20 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const cronNhacLuc = chuoi(cfg.get(KHOA_LAN_CHAY)?.cap_nhat_luc)
   const coTuDong = docCoTuDong(cfg.get(KHOA_TU_DONG)?.gia_tri)
 
-  // 3 · sổ học từ mốc (cửa sổ ≤ 14 ngày): (ngày, em, dạng) → số lượt đã chấm, số đúng
+  // 3 · sổ học từ mốc (cửa sổ ≤ 14 ngày): (ngày, em, dạng) → số CÂU KHÁC NHAU đã trả lời (`n`), số câu có ≥ 1 lần đúng (`dung`) — MỘT ĐỊNH NGHĨA `cau-da-lam.ts` (Boss 21/09); `luot`/`luot_dung` = số LƯỢT cũ, chỉ cho luật "dạng vấp".
+  // Mỗi (ngày, em, qid) được gán MỘT dạng (`MAX(ma_dang)`) ⇒ Σ theo dạng = số qid khác nhau của em trong ngày (đo D1 thật: có qid mang ≥ 2 mã dạng, cộng theo dạng sẽ phồng).
   const batDauSo = Math.max(tuMs, dauNgayMs(themNgay(ngay, -(SO_NGAY_CUA_SO - 1))))
   const rSo = await Q.hoi(
-    `SELECT ngay_vn, sbd, COALESCE(ma_dang, '') AS ma_dang, COUNT(*) AS n, SUM(CASE WHEN ket_qua = 1 THEN 1 ELSE 0 END) AS dung
-       FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL GROUP BY ngay_vn, sbd, ma_dang`,
+    `SELECT ngay_vn, sbd, ma_dang, COUNT(*) AS n, SUM(m) AS dung, SUM(c) AS luot, SUM(d) AS luot_dung
+       FROM (SELECT ngay_vn, sbd, qid, MAX(COALESCE(ma_dang, '')) AS ma_dang, MAX(ket_qua) AS m, COUNT(*) AS c, SUM(ket_qua) AS d
+               FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL GROUP BY ngay_vn, sbd, qid)
+      GROUP BY ngay_vn, sbd, ma_dang`,
     iso(batDauSo),
   )
   if (!rSo) lyDoThieu.nhip = 'Không đọc được sổ học'
   interface Sl { n: number; dung: number }
   const homNay = new Map<string, Map<string, Sl>>() // sbd → dạng → số
-  const theoNgayEm = new Map<string, Map<string, number>>() // sbd → ngày → số lượt
+  const theoNgayEm = new Map<string, Map<string, number>>() // sbd → ngày → số CÂU khác nhau
   const dangVapSo = new Map<string, Map<string, Sl>>() // dạng → sbd → số (3 ngày gần nhất)
   const tongHomQua: Sl & { em: Set<string> } = { n: 0, dung: 0, em: new Set() }
   const dauVap = themNgay(ngay, -(SO_NGAY_DANG_VAP - 1))
@@ -191,10 +196,10 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
       homNay.set(sbd, m)
     }
     if (nd === homQua) { tongHomQua.n += n; tongHomQua.dung += dung; tongHomQua.em.add(sbd) }
-    if (nd >= dauVap && ma) {
+    if (nd >= dauVap && ma) { // luật "dạng vấp" giữ số LƯỢT (em sai đi sai lại một câu vẫn là vấp) — không phải số "câu" hiển thị
       const d = dangVapSo.get(ma) ?? new Map<string, Sl>()
       const c = d.get(sbd) ?? { n: 0, dung: 0 }
-      d.set(sbd, { n: c.n + n, dung: c.dung + dung })
+      d.set(sbd, { n: c.n + so(x.luot), dung: c.dung + so(x.luot_dung) })
       dangVapSo.set(ma, d)
     }
   }

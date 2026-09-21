@@ -51,8 +51,8 @@ describe('hàm thuần: nến trượt 5 phút', () => {
     const e = ev([30, 1], [90, 1], [150, 0], [210, 1], [270, 1]) // 100, 100, 66,7, 75, 80
     const nen = tinhNen(e, T0 + 6 * 60_000)
     expect(nen).toEqual([
-      { tu: T0, mo: 100, cao: 100, thap: 66.7, dong: 80, soCau: 5 },
-      { tu: T0 + 300_000, mo: 80, cao: 80, thap: 75, dong: 75, soCau: 0 }, // A(T0+5') = 80; A(now) = cửa sổ (T0+60s, T0+360s] = 1,0,1,1 = 75
+      { tu: T0, mo: 100, cao: 100, thap: 66.7, dong: 80, soCau: 5, soLuot: 5 },
+      { tu: T0 + 300_000, mo: 80, cao: 80, thap: 75, dong: 75, soCau: 0, soLuot: 0 }, // A(T0+5') = 80; A(now) = cửa sổ (T0+60s, T0+360s] = 1,0,1,1 = 75
     ])
   })
   it('tổng soCau các nến = số sự kiện; khung trống giữa hai đợt là nến phẳng; tối đa 100 nến (cũ → mới)', () => {
@@ -187,6 +187,15 @@ describe('/gv/bang-tin-song: khối song và luật KHỚP', () => {
     expect((await goi(d)).song.danDau).toEqual([{ sbd: 'S1', hoTen: 'An', tenLop: '12 - Tinh Hoa', soCau: 10, tienBo: -100 }]) // hôm nay 0 %, nền 22/09 100 %
   })
 
+  it('nền tiến bộ đếm CÂU khác nhau của các ngày trước (làm lại một câu 5 lần chưa là 5 câu): hôm qua 10 lượt trên 2 câu (một câu có lần đúng) = 50 %, hôm nay 10/10 ⇒ tienBo +50, không phải +90', async () => {
+    const d = truong()
+    const hqua = VN('2026-09-21T15:00:00')
+    for (let i = 0; i < 5; i++) sk(d, { sbd: 'S1', qid: 'A', luc: hqua + i * 60_000, kq: i === 4 ? 1 : 0 }) // A: 4 lượt sai + 1 đúng ⇒ câu A có lần đúng
+    for (let i = 0; i < 5; i++) sk(d, { sbd: 'S1', qid: 'B', luc: hqua + (10 + i) * 60_000, kq: 0 })      // B: 5 lượt sai ⇒ chưa từng đúng
+    for (let i = 0; i < 10; i++) sk(d, { sbd: 'S1', qid: `T${i}`, luc: VN('2026-09-22T08:00:00') + i * 60_000, kq: 1 })
+    expect((await goi(d)).song.danDau).toEqual([{ sbd: 'S1', hoTen: 'An', tenLop: '12 - Tinh Hoa', soCau: 10, tienBo: 50 }])
+  })
+
   it('băng tin chỉ giữ 20 tin MỚI NHẤT (cũ → mới): nhiều em học liên tục ⇒ tin cũ nhất bị cắt, tin mới nhất còn', async () => {
     const d = truong()
     const base = VN('2026-09-22T06:00:00')
@@ -241,6 +250,42 @@ describe('/gv/bang-tin-song: khối song và luật KHỚP', () => {
     expect(r.nhip).toMatchObject({ soCau: 10, soCauDung: 7, soEmHoc: 1 })
     expect(r.song.danDau).toEqual([{ sbd: 'S2', hoTen: 'Bình', tenLop: '12 - Tinh Hoa', soCau: 10, tienBo: 0 }])
     expect(r.song.nen.reduce((a: number, x: any) => a + x.soCau, 0)).toBe(10)
+  })
+})
+
+describe('MỘT định nghĩa "câu": câu khác nhau, không phải lượt (cau-da-lam.ts)', () => {
+  const ev = (...x: [string, string, number, 0 | 1][]): Ev[] => x.map(([sbd, qid, s, kq]) => ({ sbd, qid, ms: VN('2026-09-22T09:00:00') + s * 1000, kq, dang: '' }))
+  it('hàm thuần: làm lại một câu ⇒ nến.soCau đếm MỘT lần (soLuot đếm mọi lượt), tia cuối = câu khác nhau, tỉ lệ = câu có ≥ 1 lần đúng / câu', () => {
+    const e = ev(['S1', 'A', 5, 0], ['S1', 'A', 20, 0], ['S1', 'A', 35, 1], ['S1', 'B', 50, 1], ['S2', 'A', 65, 1]) // S1 làm A 3 lần (sai, sai, đúng) + B; S2 làm A
+    const nen = tinhNen(e, VN('2026-09-22T09:02:00'))
+    expect(nen.reduce((a, n) => a + n.soCau, 0)).toBe(3)   // (S1,A) (S1,B) (S2,A)
+    expect(nen.reduce((a, n) => a + n.soLuot, 0)).toBe(5)
+    const t = tinhTia(e, VN('2026-09-22T09:02:00'))
+    expect([t.hs[59], t.cau[59], t.tile[59]]).toEqual([2, 3, 100]) // 3 câu, cả 3 có lần đúng ⇒ 100 %
+  })
+  it('chuỗi "đúng N câu liền" và "lớp thêm 12 câu" chỉ nuôi bởi câu MỚI: đúng 10 lần cùng một câu không ra "đúng 5 câu liền"', () => {
+    const em = new Map([['S1', { hoTen: 'An', tenLop: 'Lớp A' }]])
+    const lapLai = taoTinTuSu(Array.from({ length: 30 }, (_, i) => ({ sbd: 'S1', qid: 'A', ms: 1000 + i, kq: 1 as const, dang: '' })), em)
+    expect(lapLai.filter((t) => /câu liền|thêm 12 câu/.test(t.phu ?? ''))).toEqual([])
+    const khacNhau = taoTinTuSu(Array.from({ length: 5 }, (_, i) => ({ sbd: 'S1', qid: `Q${i}`, ms: 1000 + i, kq: 1 as const, dang: '' })), em)
+    expect(khacNhau.some((t) => t.phu === '· Lớp A · đúng 5 câu liền')).toBe(true)
+  })
+  it('/gv/bang-tin-song: em làm lại một câu nhiều lần ⇒ soCau (nhip · theoLop · nhiet · tia · dẫn đầu) đều đếm câu khác nhau, luật KHỚP vẫn đúng; lượt làm lại chỉ ở nến.soLuot', async () => {
+    const d = truong()
+    const t = (phut: number) => VN('2026-09-22T09:00:00') + phut * 60_000
+    for (let i = 0; i < 10; i++) sk(d, { sbd: 'S1', qid: `Q${i}`, luc: t(i), kq: 1 })                 // 10 câu khác nhau ⇒ vào Dẫn đầu (≥ 10)
+    for (let i = 0; i < 20; i++) sk(d, { sbd: 'S1', qid: 'Q0', luc: t(20 + i), kq: i % 2 as 0 | 1 })  // làm lại Q0 20 lần
+    sk(d, { sbd: 'S2', qid: 'Q0', luc: t(2), kq: 0 })                                                // S2: một câu, sai
+    sk(d, { sbd: 'S2', qid: 'Q0', luc: t(3), kq: null })                                             // chưa chấm: bỏ
+    const r = await goi(d); const s = r.song
+    expect(r.nhip).toMatchObject({ soCau: 11, soCauDung: 10, soEmHoc: 2, tiLeDung: 0.909 })         // 10 + 1 câu; đúng: S1 10 (Q0 có lần đúng), S2 0
+    expect(s.nhiet.find((x: any) => x.sbd === 'S1')).toMatchObject({ soCau: 10, soCauDung: 10 })
+    expect(s.theoLop.reduce((a: number, x: any) => a + x.soCau, 0)).toBe(11)
+    expect(s.tia60.cau[59]).toBe(11)
+    expect(s.tia60.tile[59]).toBe(90.91)
+    expect(s.nen.reduce((a: number, x: any) => a + x.soCau, 0)).toBe(11)
+    expect(s.nen.reduce((a: number, x: any) => a + x.soLuot, 0)).toBe(31)                            // 10 + 20 + 1 lượt
+    expect(s.danDau).toEqual([{ sbd: 'S1', hoTen: 'An', tenLop: '12 - Tinh Hoa', soCau: 10, tienBo: 0 }])
   })
 })
 

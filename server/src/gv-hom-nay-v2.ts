@@ -10,6 +10,8 @@ import { demChuoiDat } from './ke-hoach-ngay'
 import { phanTichNgayNghi } from './ke-hoach-ngay-d1'
 import { NGUONG_TRE_NHIP_NGAY, NGUONG_TUT_BAC_CAU, SO_NGAY_TUT_BAC } from './hom-nay-thay'
 import { docCauHinh, lanChayKe, nhacKeCuaEm } from './nhac-tu-dong'
+import { tuLucTuNgay } from './cau-da-lam'
+import { giaiMocHienThi, KHOA_HIEN_THI_TU, KHOA_MOC_BANG_TIN_NO, KHOA_VE_DICH_TU } from './moc-no'
 
 type Dong = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -548,7 +550,11 @@ export async function gvEmToanCanh(env: Env, b: Record<string, unknown>, nowMs: 
 
   // 4 · nhịp 30 ngày (đủ 30 ngày, ngày không làm = 0)
   const d29 = themNgay(homNay, -29)
-  const rNhip = await Q.hoi('SELECT ngay_vn, COUNT(*) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? GROUP BY ngay_vn', sbd, d29, homNay)
+  // MỘT định nghĩa "câu" (`cau-da-lam.ts`): số câu KHÁC NHAU đã trả lời mỗi ngày; ô HÔM NAY tính từ MAX(mốc hiển thị, 00:00) — các ngày trước giữ nguyên (lịch sử 30 ngày, không lọc mốc). Mốc đọc lỗi ⇒ mốc mặc định.
+  const rMoc = await Q.hoi('SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?)', KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO)
+  const cMoc = new Map((rMoc ?? []).map((x) => [chuoi(x.khoa), x.gia_tri]))
+  const tuLucNay = tuLucTuNgay(giaiMocHienThi(cMoc.get(KHOA_HIEN_THI_TU), cMoc.get(KHOA_VE_DICH_TU), cMoc.get(KHOA_MOC_BANG_TIN_NO)).iso, homNay)
+  const rNhip = await Q.hoi('SELECT ngay_vn, COUNT(DISTINCT qid) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL AND (ngay_vn < ? OR luc >= ?) GROUP BY ngay_vn', sbd, d29, homNay, homNay, tuLucNay)
   const nhip = new Map((rNhip ?? []).map((x) => [chuoi(x.ngay_vn), so(x.n)]))
   const nhip30 = Array.from({ length: 30 }, (_, i) => { const ngay = themNgay(d29, i); return { ngay, muc: mucNhip(nhip.get(ngay) ?? 0) } })
 

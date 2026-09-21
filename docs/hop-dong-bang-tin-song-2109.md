@@ -44,6 +44,9 @@ Gọi A(t) = % câu ĐÚNG trong các câu có kết quả (`ket_qua IS NOT NULL
 - `baiTap[].ten` = chuyên đề trội nhất của bài + tên lớp (không mã kỹ thuật; bài không có chuyên đề mà tên là mã ⇒ "Bài tập về nhà"); `baiTap[].tenGoc` giữ tên cũ để đối chiếu. Đổi này áp cả cho `/gv/bang-tin` (cùng hàm).
 - `suKienMoi`: từ sổ học (vừa vào học · đúng 5/8/12/20 câu liền · lớp thêm 12 câu · dạng 3 lượt sai) + bài vừa nộp (không tính bài đã thu hồi); dòng "xuống" đổi mã dạng thành TÊN dạng (chưa có tên ⇒ "Một dạng bài").
 
+## MỘT ĐỊNH NGHĨA "câu" (Boss 21/09, đề prompt-mot-dinh-nghia-cau-da-lam-2109.md) — đổi GIÁ TRỊ, không đổi tên khoá
+Mọi số có chữ "câu" (`nhip.soCau/soCauDung/tiLeDung`, `theoLop[].soCau/soCauDung`, `nhiet[].soCau/soCauDung`, `tia60.cau/tile`, `danDau[].soCau`, `nen[].soCau`, tin "đúng N câu liền", "lớp thêm 12 câu") = câu KHÁC NHAU em đã trả lời hôm nay (từ MAX(mốc, 00:00 VN)); `soCauDung` = câu có ≥ 1 lần đúng; `tienBo` so tỉ lệ đó với chính em ở các ngày trước. **Thêm** `nen[].soLuot` (số lượt trong khung; `nen[].soCau` nay = số câu MỚI trong khung, Σ khung = số câu đã làm). Giá nến A(t) vẫn theo LƯỢT (giá thị trường theo từng lần trả lời). Mốc của Bảng tin (`/gv/bang-tin` và lệnh này) theo mốc CHUNG `hien_thi_tu ⇒ ve_dich_tu ⇒ bang_tin_tu`.
+
 ## Chi phí (Boss dặn) — ước lượng dòng đọc/ngày
 - Chỉ mục mới `idx_skh_luc(luc, sbd, ket_qua, ma_dang)` (`server/migration-2109-index-luc.sql`, lùi `lui-2109-index-luc.sql`; CHỈ THÊM, chờ Boss soát rồi mới chạy `--remote`): "sự kiện hôm nay" từ quét CẢ sổ (≈ 28,5 nghìn dòng, tăng mỗi ngày) xuống đúng số sự kiện hôm nay (đo trên bản sao 21/09: 28.564 → 1.150 dòng).
 - Mỗi lần TÍNH LẠI phần trực tiếp (10 giây): 2 truy vấn — sự kiện hôm nay (1–8 nghìn dòng tuỳ giờ; trung bình cả ngày ≈ 3 nghìn) + bài vừa nộp (quét `btvn_em` ≈ 0,6 nghìn dòng). Danh sách em (≈ 0,5 nghìn dòng) đệm 60 giây; nền tiến bộ và tên dạng đệm 10 phút.
