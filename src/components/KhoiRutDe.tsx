@@ -302,7 +302,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
 
       <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="radiogroup" aria-label="Cách lấy câu">
         <Chip chon={rut} onClick={() => setCheDo('rut')}>
-          <Target size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+          <Target size={16} aria-hidden="true" style={{ display: 'inline-block', verticalAlign: '-3px', marginRight: 6 }} />
           Rút đề thông minh
         </Chip>
         {tongKho <= 28 && (
@@ -393,7 +393,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 cursor: 'pointer',
               }}
             >
-              <Zap size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+              <Zap size={16} aria-hidden="true" style={{ display: 'inline-block', verticalAlign: '-3px', marginRight: 6 }} />
               Chuẩn 14 câu (9 Phần I · 2 Phần II · 3 Phần III)
             </button>
             <button
@@ -413,7 +413,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 cursor: 'pointer',
               }}
             >
-              <ClipboardList size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+              <ClipboardList size={16} aria-hidden="true" style={{ display: 'inline-block', verticalAlign: '-3px', marginRight: 6 }} />
               Đề THPT 28 câu (18 · 4 · 6)
             </button>
           </div>
@@ -459,7 +459,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 }}
                 mau="tim"
               >
-                <Target size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+                <Target size={16} aria-hidden="true" style={{ display: 'inline-block', verticalAlign: '-3px', marginRight: 6 }} />
                 Đề riêng từng em — Nâng đỡ tiến bộ
               </Chip>
               <Chip
@@ -469,7 +469,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                   setRieng(false)
                 }}
               >
-                <Users size={16} aria-hidden="true" style={{ verticalAlign: '-3px', marginRight: 6 }} />
+                <Users size={16} aria-hidden="true" style={{ display: 'inline-block', verticalAlign: '-3px', marginRight: 6 }} />
                 Cả lớp cùng một đề
               </Chip>
             </div>
