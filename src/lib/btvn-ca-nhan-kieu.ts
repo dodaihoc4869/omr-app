@@ -1,4 +1,5 @@
 import { gioDayDu } from './ngay-gio-24'
+import { chuMoSomChang } from './mo-som-chang'
 
 // BTVN "NÂNG ĐỠ" — KIỂU + HÀM THUẦN phía máy em. Hợp đồng: docs/hop-dong-btvn-nang-do-2109.md (mục 3, 4).
 //
@@ -362,6 +363,8 @@ export interface KetQuaChang {
   thuSucThem?: { chiSo: number; soCau: number; soDaLam: number; soDung: number; daNop: boolean }
   /** BẢN 1.2 — chỉ khi BÀI ĐÃ NỘP: điểm hiện tại SAU KHI cộng thử sức đúng (điểm = soDung / soCau × 10). */
   baiDaNop?: { soDung: number; soCau: number }
+  /** ĐIỀU 6 (mở sớm chặng, Boss chốt B): chỉ khi chặng vừa xong KHÔNG phải chặng cuối. `duoc` = máy chủ ĐÃ mở sớm chặng kế; `lyDo` (khi không được): het_chang · da_mo_som_hom_nay · chua_du_ti_le · da_mo_san · thua_cas. Máy khách tự dựng chữ bằng `chuMoSomChang` (mo-som-chang.ts), KHÔNG in `chu` của máy chủ. */
+  moSom?: { duoc: boolean; lyDo: string | null }
 }
 
 /** Đọc phản hồi `/btvn/xong-lo` của bài cá nhân hoá. null khi không phải một đối tượng. */
@@ -393,6 +396,7 @@ export function docKetQuaChang(r: unknown): KetQuaChang | null {
   if (laDoiTuong(r.chang) && laSoNguyenKhongAm(r.chang.chiSo) && laSoNguyenKhongAm(r.chang.soCau) && laSoNguyenKhongAm(r.chang.soDung)) {
     out.chang = { chiSo: r.chang.chiSo, soCau: r.chang.soCau, soDung: r.chang.soDung, xong: r.chang.xong === true }
   }
+  if (laDoiTuong(r.moSom) && typeof r.moSom.duoc === 'boolean') out.moSom = { duoc: r.moSom.duoc, lyDo: typeof r.moSom.lyDo === 'string' ? r.moSom.lyDo : null }
   if (laDoiTuong(r.exp) && laSo(r.exp.homNay)) {
     out.exp = { homNay: r.exp.homNay, conLaiLenCap: laSo(r.exp.conLaiLenCap) ? r.exp.conLaiLenCap : null }
     const { expConThieu, ongNghiem, hapThuConLaiHomNay } = r.exp as Record<string, unknown>
@@ -492,6 +496,20 @@ export interface TheChangView {
   /** Chỉ khi chặng CUỐI vừa xong và máy chủ đã tự chốt nộp bài. */
   nop: { chu: string; ghiThuong: string | null } | null
   tram: { xong: number; tong: number } | null
+  /** Điều 6: chữ nói chặng kế đã MỞ SỚM hay mở 00:00 ngày mai (chỉ chặng thường chưa phải cuối, máy chủ trả `moSom`). Không có gì đáng nói ⇒ null. */
+  moSom: { duoc: boolean; chu: string } | null
+}
+
+/** Chữ mở sớm chặng (Điều 6) từ `moSom` của máy chủ + số của chặng vừa xong. Câu chữ CỦA CODE 1 (`chuMoSomChang`); `da_mo_san` (chặng kế đã mở sẵn) / `thua_cas` (không ghi được) / lý do lạ ⇒ null: không nói điều chưa chắc. */
+export function chuMoSomCuaChang(ket: KetQuaChang): { duoc: boolean; chu: string } | null {
+  if (!ket.moSom || !ket.chang) return null
+  const { duoc, lyDo } = ket.moSom
+  const soChangXong = ket.chang.chiSo + 1
+  const soChangKe = (ket.loDaXong ?? soChangXong) + 1
+  const d = { soChangXong, soChangKe, dung: ket.chang.soDung, tong: ket.chang.soCau }
+  if (duoc) return { duoc: true, chu: chuMoSomChang({ duoc: true, lyDo: null }, d) }
+  if (lyDo === 'het_chang' || lyDo === 'da_mo_som_hom_nay' || lyDo === 'chua_du_ti_le') return { duoc: false, chu: chuMoSomChang({ duoc: false, lyDo }, d) }
+  return null
 }
 
 /** null khi chặng CHƯA xong hẳn (còn câu bỏ trống): chỉ làm mới phiếu, không bật thẻ. */
@@ -529,5 +547,6 @@ export function theChangView(ket: KetQuaChang, soChang?: number | null): TheChan
     exp: ket.exp && ket.exp.homNay > 0 ? { homNay: ket.exp.homNay, conLai: ket.exp.conLaiLenCap, ...(ket.exp.thu ? { thu: ket.exp.thu } : {}) } : null,
     nop,
     tram: tong && !thuSuc ? { xong: Math.min(ket.loDaXong ?? k, tong), tong } : null,
+    moSom: thuSuc || nop ? null : chuMoSomCuaChang(ket),
   }
 }

@@ -20,10 +20,10 @@ describe('lõi thuần không đụng API trình duyệt', () => {
 
   it('tệp thuần không import tệp nào của trình duyệt (chỉ tự đứng một mình)', () => {
     const ma = boChuThich(doc('src/lib/btvn-ca-nhan-kieu.ts'))
-    // ĐÚNG MỘT import được phép: './ngay-gio-24' (hàm thuần định dạng ngày giờ VN, không API trình duyệt) cho `hanChu`
+    // HAI import được phép, đều THUẦN (không API trình duyệt): './ngay-gio-24' (định dạng ngày giờ VN) cho `hanChu`; './mo-som-chang' (Code 1: luật + câu chữ mở sớm chặng, Điều 6) cho `chuMoSomCuaChang`
     const dong = ma.match(/^\s*import\s.*$/gm) ?? []
-    expect(dong).toHaveLength(1)
-    expect(dong[0]).toMatch(/from '\.\/ngay-gio-24'/)
+    expect(dong.map((d) => /from '([^']+)'/.exec(d)![1]).sort()).toEqual(['./mo-som-chang', './ngay-gio-24'])
+    expect(doc('src/lib/mo-som-chang.ts').replace(/\/\/.*$/gm, '')).not.toMatch(/localStorage|sessionStorage|\bwindow\b|\bdocument\b|navigator/)
   })
 
   it('tệp lưu máy (btvn-ca-nhan-em.ts) mới là nơi có localStorage, và tái xuất trọn tệp thuần', () => {

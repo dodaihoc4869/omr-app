@@ -31,6 +31,9 @@
 .lop-the-chang .tcc-the { border-radius: var(--m3-bo-28); background: var(--m3-surface-container); padding: 16px; }
 .lop-the-chang .tcc-nop { background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container); display: flex; flex-direction: column; gap: 4px; font-size: var(--cx-3); }
 .lop-the-chang .tcc-nop span { font-size: var(--cx-2); color: var(--m3-on-tertiary-container-phu); }
+/* Điều 6: chặng kế mở sớm hay mở 00:00 mai — được mở sớm ⇒ nền xanh như thẻ nộp; chưa ⇒ nền trung tính */
+.lop-the-chang .tcc-mo-som { color: var(--m3-on-surface); font-size: var(--cx-3); }
+.lop-the-chang .tcc-mo-som[data-duoc] { background: var(--m3-tertiary-container); color: var(--m3-on-tertiary-container); }
 .lop-the-chang .tcc-tienbo { border-radius: var(--m3-bo-28); background: var(--m3-primary-container); color: var(--m3-on-primary-container); padding: 16px; }
 .lop-the-chang .tcc-nhan { display: flex; align-items: center; gap: 10px; font-size: var(--cx-2); font-weight: 700; color: var(--m3-on-primary-container-phu); }
 .lop-the-chang .tcc-bac { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: var(--m3-on-primary-container-phu); }

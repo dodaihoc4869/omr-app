@@ -56,6 +56,13 @@ export default function TheCuoiChang({ view, dong, veBang }: { view: TheChangVie
           </div>
         )}
 
+        {view.moSom && (
+          // ĐIỀU 6 (mở sớm chặng, Boss chốt B): đủ điều kiện ⇒ "Em được mở sớm chặng k ngay hôm nay"; không thì "Chặng k mở 00:00 ngày mai. Muốn luyện thêm hôm nay: vào Đảo thần thú." — chữ do mo-som-chang.ts (Code 1).
+          <div className="tcc-the tcc-mo-som" role="status" data-vung="mo-som" data-duoc={view.moSom.duoc ? '' : undefined}>
+            <b>{view.moSom.chu}</b>
+          </div>
+        )}
+
         {view.dangLenBac.map((d) => (
           <section key={d.ten} className="tcc-tienbo" aria-label={`Dạng ${d.ten} lên bậc`}>
             <div className="tcc-nhan">
