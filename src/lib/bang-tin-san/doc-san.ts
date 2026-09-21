@@ -8,7 +8,8 @@ import type { DanDauSan, DuLieuSan, DungNhipSan, EmNhiet, LoaiTin, LopSan, NenSa
 /** Tên lớp máy chủ đặt cho em chưa được xếp lớp (`TEN_LOP_CHUA_XEP` ở server/src/ten-lop.ts — test giữ hai chỗ khớp nhau): chữ nội bộ, màn thầy nói "Chưa rõ lớp". */
 export const TEN_LOP_MAY_CHU_CHUA_XEP = 'Chưa xếp lớp'
 export const TEN_LOP_CHUA_RO = 'Chưa rõ lớp'
-export const tenLopHienThi = (ten: string): string => (ten === TEN_LOP_MAY_CHU_CHUA_XEP ? TEN_LOP_CHUA_RO : ten)
+/** Đổi chữ nội bộ ở MỌI chỗ xuất hiện (tên lớp đứng riêng hoặc nằm trong câu chữ soạn sẵn, vd băng tin "· Chưa xếp lớp · vừa vào học"). */
+export const tenLopHienThi = (ten: string): string => (ten.includes(TEN_LOP_MAY_CHU_CHUA_XEP) ? ten.split(TEN_LOP_MAY_CHU_CHUA_XEP).join(TEN_LOP_CHUA_RO) : ten)
 
 const so = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null)
 const chuoi = (v: unknown): string => (typeof v === 'string' ? v.trim() : '')
@@ -89,10 +90,10 @@ export function docTin(v: unknown): TinSan[] {
     const o = doiTuong(x)
     if (!o) continue
     const luc = so(o.luc)
-    const chu = chuoi(o.chu)
+    const chu = tenLopHienThi(chuoi(o.chu))
     const loai = LOAI_TIN.find((l) => l === o.loai)
     if (luc === null || !chu || !loai) continue
-    const phu = chuoi(o.phu)
+    const phu = tenLopHienThi(chuoi(o.phu))
     ra.push({ luc, loai, chu, ...(phu ? { phu } : {}) })
   }
   ra.sort((a, b) => a.luc - b.luc)
@@ -120,13 +121,12 @@ export function docDungNhip(v: unknown): DungNhipSan | null {
   return soEm !== null && soCoLo !== null && soCoLo > 0 ? { soEm: Math.min(soEm, soCoLo), soCoLo } : null
 }
 
-/** Chữ nội bộ của tên lớp trong các khối lấy nguyên từ `/gv/bang-tin` (bài tập về nhà, em cần để ý). */
-function doiTenLopTrongBangTin(bt: BangTin): BangTin {
-  return {
-    ...bt,
-    baiTap: bt.baiTap.map((b) => ({ ...b, tenLop: tenLopHienThi(b.tenLop) })),
-    canDeY: { ...bt.canDeY, ds: bt.canDeY.ds.map((e) => ({ ...e, tenLop: tenLopHienThi(e.tenLop) })) },
-  }
+/** Chữ nội bộ của tên lớp trong các khối lấy nguyên từ `/gv/bang-tin` (bài tập về nhà, em cần để ý, em chưa học, nợ theo lớp, sai nhanh…): đổi MỌI chuỗi đúng bằng tên nội bộ, ở mọi tầng — không phải nhớ từng khoá. */
+function doiTenLopSau<T>(v: T): T {
+  if (typeof v === 'string') return (tenLopHienThi(v) as unknown) as T
+  if (Array.isArray(v)) return v.map(doiTenLopSau) as unknown as T
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, doiTenLopSau(x)])) as T
+  return v
 }
 
 /** Thân `/gv/bang-tin-song` ⇒ `DuLieuSan`; thiếu `song`, thiếu `nhip`, hoặc không có mốc ⇒ null (màn dùng Bảng tin bản 3). `nhanLucMs` = giờ máy khách lúc nhận. */
@@ -137,7 +137,7 @@ export function docSan(j: Record<string, unknown>, nhanLucMs: number): DuLieuSan
   if (!btTho) return null
   const mocMs = Date.parse(btTho.tuHomNay || btTho.tu)
   if (!Number.isFinite(mocMs)) return null
-  const bt = doiTenLopTrongBangTin(btTho)
+  const bt = doiTenLopSau(btTho)
   const theoLop = docTheoLop(song.theoLop)
   const tongEm = khongAm(song.tongEm) ?? bt.nhip.tongEm
   return {

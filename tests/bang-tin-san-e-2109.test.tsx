@@ -83,6 +83,7 @@ describe('docSan — đọc CÓ CHỐNG SAI KIỂU; thiếu mảnh ⇒ ẩn kh�
     expect(TEN_LOP_MAY_CHU_CHUA_XEP).toBe(TEN_LOP_CHUA_XEP)
     expect(tenLopHienThi('Chưa xếp lớp')).toBe('Chưa rõ lớp')
     expect(tenLopHienThi('12 - Tinh Hoa')).toBe('12 - Tinh Hoa')
+    expect(tenLopHienThi('· Chưa xếp lớp · vừa vào học')).toBe('· Chưa rõ lớp · vừa vào học') // nằm trong câu chữ soạn sẵn (băng tin)
     const d = docSan(
       {
         ...thanSong((s) => {
