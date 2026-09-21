@@ -8,10 +8,28 @@ export const EXP_CAU: Readonly<Record<'I' | 'II' | 'III', readonly [number, numb
   III: [4, 6, 10],
 }
 
-/** Thưởng theo việc. */
-export const EXP_LO_DUNG_NHIP = 10
-export const EXP_LO_TRE_NHIP = 4
-export const EXP_BTVN_DUNG_HAN = 15
+/**
+ * BẢNG GIÁ ĐỔI THEO NGÀY VN (Điều 10, thầy lệnh 21/09/2026 13:47: khớp 36 ngày khiên / 21 ngày cấp 10 / 1 200 ngày cấp 120): em ĐẠT nhiệm vụ ngày và chơi 3 lượt thú phải kiếm đủ 200 EXP dù học yếu.
+ * Ngày < `NGAY_BANG_GIA_MOI` giữ bảng CŨ (sổ cũ không tính lại); từ ngày đó dùng bảng MỚI. Giá tra bằng `bangGiaExp(ngày của khoản)` — cấm rải số ra chỗ khác.
+ * `dauNgay`: câu ĐÚNG đầu tiên trong ngày (mọi nguồn kể cả game; KHÔNG tính vào trần EXP game 120/ngày). `troLai`: ngày đầu em có sự kiện học sau ≥ `TRO_LAI_VANG_TOI_THIEU` ngày VN liền không có sự kiện nào,
+ * nhiều nhất 1 lần trong `TRO_LAI_CACH_NHAU` ngày; em chưa từng học thì không có.
+ */
+export const NGAY_BANG_GIA_MOI = '2026-09-22'
+export interface BangGiaExp {
+  datNgay: number
+  loDungNhip: number
+  loTreNhip: number
+  btvnDungHan: number
+  dauNgay: number
+  troLai: number
+}
+export const BANG_GIA_CU: Readonly<BangGiaExp> = { datNgay: 20, loDungNhip: 10, loTreNhip: 4, btvnDungHan: 15, dauNgay: 0, troLai: 0 }
+export const BANG_GIA_MOI: Readonly<BangGiaExp> = { datNgay: 80, loDungNhip: 20, loTreNhip: 8, btvnDungHan: 30, dauNgay: 10, troLai: 30 }
+export const bangGiaExp = (ngay: string): Readonly<BangGiaExp> => (ngay >= NGAY_BANG_GIA_MOI ? BANG_GIA_MOI : BANG_GIA_CU)
+export const TRO_LAI_VANG_TOI_THIEU = 3
+export const TRO_LAI_CACH_NHAU = 14
+
+/** Thưởng theo việc (giữ nguyên qua Điều 10). */
 export const EXP_MOM_XONG = 10
 export const EXP_LEN_BAC = 6
 export const EXP_KHAC_PHUC = 30
@@ -19,7 +37,6 @@ export const EXP_LEN_BANG_DAT = 15
 export const EXP_LEN_BANG_CHUA_DAT = 5
 /** Ca thi theo điểm: round(điểm 0..10) × hệ số. */
 export const EXP_DIEM_CA_HE_SO = 3
-export const EXP_DAT_NGAY = 20
 /** Game "Đoàn Hộ Tống" — tiếp sức đồng đội: EXP mỗi lần, tối đa số lần mỗi ngày VN (game GỌI `ghiTiepSuc` của `exp-d1.ts`, không tự ghi sổ EXP). */
 export const EXP_TIEP_SUC = 3
 export const TIEP_SUC_TOI_DA_NGAY = 5

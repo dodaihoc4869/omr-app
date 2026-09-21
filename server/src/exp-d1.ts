@@ -13,7 +13,7 @@ import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
-import { EXP_LO_DUNG_NHIP, EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, TIEP_SUC_TOI_DA_NGAY } from './exp-cau-hinh'
+import { EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, TIEP_SUC_TOI_DA_NGAY, bangGiaExp } from './exp-cau-hinh'
 import { congManh, NGUON_EXP_CAU, tinhExp, type KhoanExp, type KhoanManh, type MetaCauExp, type VaoTinhExp } from './exp-hoc-tap'
 import { congTongSoVaoHoSo, khienConLai, khienRenChuaDung, type DaCong, type HoSoGameExp } from './exp-ho-so-game'
 import { NGAN_SACH_SAN, SO_NGAY_LICH_SU, TOI_THIEU_CAU_SAN } from './ho-so-cau-hinh'
@@ -443,6 +443,12 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
 
   const cacKhoan: KhoanExp[] = []
   const cacManh: KhoanManh[] = []
+  // "Mừng em trở lại" (Điều 10, từ 22/09): ngày VN của khoản gần nhất đã ghi (1 lần / 14 ngày). Chỉ hỏi khi có ngày nào trong lần tính này dùng bảng giá mới.
+  let troLaiGanNhat: string | null = null
+  if ([...ngayCanTinh].some((n) => bangGiaExp(n).troLai > 0)) {
+    const t = await an(() => env.DB.prepare("SELECT MAX(ngay_vn) AS m FROM exp_so WHERE sbd = ? AND loai = 'tro_lai'").bind(sbd).first<{ m: string | null }>(), null)
+    troLaiGanNhat = t?.m ? String(t.m) : null
+  }
   const metaTatCa = await docMetaCau(env, [...new Set(so.filter((e) => e.ketQua === 1 && NGUON_EXP_CAU.includes(e.nguon)).map((e) => e.qid))])
   for (const ngay of [...ngayCanTinh].sort()) {
     const chinh = ngay === homNay
@@ -454,8 +460,10 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
       lenBac: ct.lenBac, khacPhuc: ct.khacPhuc, dangRoiYeu: ct.dangRoiYeu,
       loXong: chinh ? loXong : [], baiBtvnNop: chinh ? baiBtvnNop : [], momXong: chinh ? momXong : [], diemCa: chinh ? diemCa : [],
       datNgay: chinh ? datNgay : null, daCoKhoa: daCo,
+      ngayTruocGanNhat: soTho.reduce<string | null>((m, e) => (e.ngayVn < ngay && (m === null || e.ngayVn > m) ? e.ngayVn : m), null), troLaiGanNhat,
     }
     const ra = tinhExp(vao)
+    if (ra.khoan.some((k) => k.loai === 'tro_lai')) troLaiGanNhat = ngay
     for (const k of ra.khoan) { cacKhoan.push(k); daCo.add(k.khoa) }
     for (const m of ra.manh) { cacManh.push(m); daCo.add(m.khoa) }
   }
@@ -587,7 +595,7 @@ export async function docThanhTichNgay(env: Env, sbd: string, nowMs: number, nga
     for (const x of r?.results ?? []) {
       const khoa = String(x.khoa).slice(tienTo.length)
       if (x.loai === 'dat_ngay') ra.datNgay = true
-      else if (Number(x.exp) === EXP_LO_DUNG_NHIP) ra.loDungNhip.push({ maBtvn: String(x.ma_nguon ?? ''), chiSo: Number(khoa.split('|')[2]), khoa })
+      else if (Number(x.exp) === bangGiaExp(ngay).loDungNhip) ra.loDungNhip.push({ maBtvn: String(x.ma_nguon ?? ''), chiSo: Number(khoa.split('|')[2]), khoa })
     }
     return ra
   } catch (e) {
@@ -672,7 +680,7 @@ export async function chotExpNgayQuaDayDu(env: Env, nowMs: number, tuyChon: { to
 
 const TEN_LOAI: Record<string, string> = {
   cau: 'câu đúng', lo: 'lô BTVN', btvn: 'nộp bài BTVN đúng hạn', mom: 'bài được giao', len_bac: 'câu ôn lên bậc', khac_phuc: 'câu khắc phục xong',
-  len_bang: 'lần lên bảng', diem_ca: 'ca thi có điểm', dat_ngay: 'lần đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt', tiepsuc: 'lượt tiếp sức',
+  len_bang: 'lần lên bảng', diem_ca: 'ca thi có điểm', dat_ngay: 'lần đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt', tiepsuc: 'lượt tiếp sức', dau_ngay: 'câu đúng đầu tiên trong ngày', tro_lai: 'lần mừng em trở lại',
 }
 
 export interface ExpHomNay {

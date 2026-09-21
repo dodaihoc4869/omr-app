@@ -4,15 +4,15 @@
 // Tất định: cùng đầu vào → cùng danh sách; thứ tự theo `luc`, hoà thì theo `khoa`. Mọi khoản có KHOÁ idempotent; khoá nằm trong `daCoKhoa` thì
 // KHÔNG sinh lại (gọi lại/nạp lại sổ không cộng trùng).
 import {
-  EXP_BTVN_DUNG_HAN, EXP_CAU, EXP_CHUOI_HE_SO, EXP_CHUOI_TOI_DA, EXP_DAT_NGAY, EXP_DIEM_CA_HE_SO, EXP_KHAC_PHUC, EXP_LEN_BAC, EXP_LEN_BANG_CHUA_DAT,
-  EXP_LEN_BANG_DAT, EXP_LO_DUNG_NHIP, EXP_LO_TRE_NHIP, EXP_MOM_XONG, KHIEN_REN_TOI_DA, MANH_CHUOI_BOI_SO, MANH_CHUOI_BOI_SO_THUONG, MANH_DANG_ROI_YEU,
-  MANH_DAT_NGAY, MANH_MOI_KHIEN, MANH_TOI_DA, TRAN_MEM_HE_SO, TRAN_MEM_TY_LE,
+  EXP_CAU, EXP_CHUOI_HE_SO, EXP_CHUOI_TOI_DA, EXP_DIEM_CA_HE_SO, EXP_KHAC_PHUC, EXP_LEN_BAC, EXP_LEN_BANG_CHUA_DAT,
+  EXP_LEN_BANG_DAT, EXP_MOM_XONG, KHIEN_REN_TOI_DA, MANH_CHUOI_BOI_SO, MANH_CHUOI_BOI_SO_THUONG, MANH_DANG_ROI_YEU,
+  MANH_DAT_NGAY, MANH_MOI_KHIEN, MANH_TOI_DA, TRAN_MEM_HE_SO, TRAN_MEM_TY_LE, TRO_LAI_CACH_NHAU, TRO_LAI_VANG_TOI_THIEU, bangGiaExp,
 } from './exp-cau-hinh'
 
 /** Nguồn cho EXP câu: mọi nguồn TRỪ game (game giữ 20/40/40 theo mastery, tránh thưởng đôi) và trừ `len_bang` (có thưởng riêng). */
 export const NGUON_EXP_CAU: readonly string[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'on_lai', 'luyen', 'thu_thach_rieng']
 
-export type LoaiExp = 'cau' | 'lo' | 'btvn' | 'mom' | 'len_bac' | 'khac_phuc' | 'len_bang' | 'diem_ca' | 'dat_ngay' | 'chuoi'
+export type LoaiExp = 'cau' | 'lo' | 'btvn' | 'mom' | 'len_bac' | 'khac_phuc' | 'len_bang' | 'diem_ca' | 'dat_ngay' | 'chuoi' | 'dau_ngay' | 'tro_lai'
 
 export interface SuKienExp {
   khoa: string
@@ -57,6 +57,19 @@ export interface VaoTinhExp {
   dangRoiYeu: { maDang: string; lan: number; luc: string }[]
   /** Khoá đã ghi trong `exp_so`/`manh_khien_so` — không sinh lại. */
   daCoKhoa: ReadonlySet<string>
+  /** Ngày VN GẦN NHẤT TRƯỚC `ngay` em có một sự kiện học (mọi nguồn, kể cả trước mốc EXP). null = chưa từng học (⇒ không có "mừng em trở lại"). Vắng ⇒ null. */
+  ngayTruocGanNhat?: string | null
+  /** Ngày VN của khoản `tro_lai` gần nhất đã ghi cho em (giới hạn 1 lần / 14 ngày). null / vắng = chưa có. */
+  troLaiGanNhat?: string | null
+}
+
+/** Số ngày lịch giữa hai chuỗi `YYYY-MM-DD` (a − b, có dấu). Chuỗi hỏng ⇒ NaN. */
+export function soNgayCach(a: string, b: string): number {
+  const t = (s: string): number => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s)
+    return m ? Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : NaN
+  }
+  return Math.round((t(a) - t(b)) / 86_400_000)
 }
 
 export interface KhoanExp {
@@ -101,6 +114,7 @@ export const expSauTran = (goc: number): number => Math.max(1, Math.ceil(goc * T
 export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] } {
   const khoan: KhoanExp[] = []
   const manh: KhoanManh[] = []
+  const gia = bangGiaExp(v.ngay) // giá theo NGÀY của khoản (Điều 10): ngày < 22/09 bảng cũ
   const them = (k: KhoanExp) => {
     if (k.exp > 0 && !v.daCoKhoa.has(k.khoa)) khoan.push(k)
   }
@@ -123,13 +137,27 @@ export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] }
     them({ khoa: `cau|${e.qid}|${v.ngay}`, loai: 'cau', exp, ngay: v.ngay, qid: e.qid, maNguon: e.maNguon, luc: e.luc, ghiChu: `Câu đúng Phần ${phan}${meta?.sao ? `, ${meta.sao} sao` : ''}: +${exp}${qua ? ' (đã quá mục tiêu ngày, tính 25%)' : ''}` })
   }
 
+  // 1b. Câu ĐÚNG ĐẦU TIÊN trong ngày (Điều 10): MỌI nguồn kể cả game (khác EXP câu ở trên), một khoản mỗi ngày, không tính vào trần game. Bảng cũ (trước 22/09) giá 0 ⇒ không sinh.
+  const dauTien = gia.dauNgay > 0 ? sapXep(v.suKien.filter((e) => e.ketQua === 1 && e.qid))[0] : undefined
+  if (dauTien) them({ khoa: `dau_ngay|${v.ngay}`, loai: 'dau_ngay', exp: gia.dauNgay, ngay: v.ngay, maNguon: dauTien.maNguon, luc: dauTien.luc, ghiChu: `Câu đúng đầu tiên hôm nay +${gia.dauNgay} EXP` })
+
+  // 1c. Mừng em trở lại (Điều 10): ngày đầu có ≥ 1 sự kiện học sau ≥ TRO_LAI_VANG_TOI_THIEU ngày liền không có sự kiện nào; nhiều nhất 1 lần / TRO_LAI_CACH_NHAU ngày; chưa từng học ⇒ không.
+  if (gia.troLai > 0 && v.suKien.length > 0 && v.ngayTruocGanNhat) {
+    const vang = soNgayCach(v.ngay, v.ngayTruocGanNhat) - 1
+    const cachLanTruoc = v.troLaiGanNhat ? Math.abs(soNgayCach(v.ngay, v.troLaiGanNhat)) : Infinity
+    if (vang >= TRO_LAI_VANG_TOI_THIEU && cachLanTruoc >= TRO_LAI_CACH_NHAU) {
+      const dau = sapXep(v.suKien)[0]!
+      them({ khoa: `tro_lai|${v.ngay}`, loai: 'tro_lai', exp: gia.troLai, ngay: v.ngay, luc: dau.luc, ghiChu: `Mừng em trở lại +${gia.troLai} EXP` })
+    }
+  }
+
   // 2. Thưởng theo việc (không bị trần).
   for (const l of v.loXong) {
-    const exp = l.dungNhip ? EXP_LO_DUNG_NHIP : EXP_LO_TRE_NHIP
+    const exp = l.dungNhip ? gia.loDungNhip : gia.loTreNhip
     them({ khoa: `lo|${l.maBtvn}|${l.chiSo}`, loai: 'lo', exp, ngay: v.ngay, maNguon: l.maBtvn, luc: l.luc, ghiChu: l.dungNhip ? `Xong lô ${l.chiSo + 1} đúng nhịp: +${exp}` : `Xong lô ${l.chiSo + 1} (trễ nhịp): +${exp}` })
   }
   for (const b of v.baiBtvnNop) {
-    if (b.dungHan) them({ khoa: `btvn|${b.maBtvn}`, loai: 'btvn', exp: EXP_BTVN_DUNG_HAN, ngay: v.ngay, maNguon: b.maBtvn, luc: b.luc, ghiChu: `Nộp cả bài BTVN đúng hạn: +${EXP_BTVN_DUNG_HAN}` })
+    if (b.dungHan) them({ khoa: `btvn|${b.maBtvn}`, loai: 'btvn', exp: gia.btvnDungHan, ngay: v.ngay, maNguon: b.maBtvn, luc: b.luc, ghiChu: `Nộp cả bài BTVN đúng hạn: +${gia.btvnDungHan}` })
   }
   for (const m of v.momXong) them({ khoa: `mom|${m.id}`, loai: 'mom', exp: EXP_MOM_XONG, ngay: v.ngay, maNguon: m.id, luc: m.luc, ghiChu: `Xong bài được giao: +${EXP_MOM_XONG}` })
   for (const qid of [...new Set(v.lenBac)].sort()) {
@@ -150,7 +178,7 @@ export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] }
   // 3. Đạt nhiệm vụ ngày + chuỗi (trao CÙNG LÚC) và mảnh khiên tương ứng.
   if (v.datNgay) {
     const { chuoi, luc } = v.datNgay
-    them({ khoa: `dat|${v.ngay}`, loai: 'dat_ngay', exp: EXP_DAT_NGAY, ngay: v.ngay, luc, ghiChu: `Đạt nhiệm vụ ngày: +${EXP_DAT_NGAY}` })
+    them({ khoa: `dat|${v.ngay}`, loai: 'dat_ngay', exp: gia.datNgay, ngay: v.ngay, luc, ghiChu: `Đạt nhiệm vụ ngày: +${gia.datNgay}` })
     const nhan = Math.min(Math.max(1, chuoi), EXP_CHUOI_TOI_DA)
     them({ khoa: `chuoi|${v.ngay}`, loai: 'chuoi', exp: EXP_CHUOI_HE_SO * nhan, ngay: v.ngay, luc, ghiChu: `Chuỗi ${chuoi} ngày đạt: +${EXP_CHUOI_HE_SO * nhan}` })
     if (!v.daCoKhoa.has(`manh|dat|${v.ngay}`)) manh.push({ khoa: `manh|dat|${v.ngay}`, loai: 'dat', so: MANH_DAT_NGAY, ngay: v.ngay, luc, ghiChu: `Đạt nhiệm vụ ngày: +${MANH_DAT_NGAY} mảnh khiên` })
