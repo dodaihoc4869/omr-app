@@ -2191,7 +2191,7 @@ export const JS_PHIEU = `
       /** CHẤM TẠI CHỖ để hiện ngay. Máy chủ vẫn chấm LẠI và con số ghi vào
        * Sheet là con số của máy chủ — máy em sửa được. */
       function chamTaiCho() {
-        // PHẦN III chấm Y HỆT luật chính thức `normalizeNumericAnswer` (src/engine/score.ts): tám kiểu dấu trừ → "-", bỏ MỌI khoảng trắng (kể cả
+        // PHẦN III chấm Y HỆT luật chính thức normalizeNumericAnswer (src/engine/score.ts): tám kiểu dấu trừ → "-", bỏ MỌI khoảng trắng (kể cả
         // no-break), "," → ".", rồi so CHUỖI. KHÔNG bỏ dấu "+", KHÔNG bỏ đơn vị (mol, g, %…), KHÔNG so theo số học: chữ số có nghĩa là có
         // tính điểm ("0,80" ≠ "0,8", "+5" ≠ "5", "5 mol" ≠ "5"). Máy chủ chấm lại bằng đúng luật này nên chỗ này không được "nới hơn" —
         // nới thì em thấy "đúng" rồi bị chấm sai. Test dau-tru-phan-ba-1009 + cham-tai-cho-dung-luat-2109 khoá cả hai bên.

@@ -6,6 +6,8 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { normalizeNumericAnswer } from '../src/engine/score'
+import { dungPhieu } from '../src/lib/html-phieu'
+import type { CauLuyen } from '../src/lib/bai-tap-pdf'
 
 const NGUON = readFileSync(resolve(__dirname, '..', 'src/lib/html-phieu.ts'), 'utf8')
 const a = NGUON.indexOf('      function chamTaiCho() {')
@@ -53,5 +55,23 @@ describe('Phần III chấm tại chỗ: KHỚP luật chính thức, không n�
     expect(dungIII('5', '')).toBe(false)
     const r = chamTaiCho({ cau: [{ id: 'a', phan: 'I', dapAn: 'B' }, { id: 'b', phan: 'II', dapAn: 'ĐSĐS' }, { id: 'c', phan: 'II', dapAn: 'ĐSĐS' }] }, { a: 'b', b: 'DSDS', c: 'DSDD' })
     expect(r.dung).toBe(2); expect(r.sai).toEqual(['c'])
+  })
+})
+
+describe('trang phiếu THẬT sinh ra vẫn là JS hợp lệ và mang đúng hàm chấm', () => {
+  // Lỗi 21/09: một dấu ` trong chú thích của chuỗi mẫu làm cả tệp html-phieu.ts KHÔNG biên dịch được — đọc chữ trong tệp không bắt được.
+  // Nên dựng phiếu nộp được THẬT, lấy các khối <script> chạy được (không thuộc tính), và biên dịch từng khối (Function: chỉ kiểm cú pháp, không chạy).
+  const cau = (o: Partial<CauLuyen>): CauLuyen =>
+    ({ phan: 'I', id: 'x', maDe: 'X', chuyenDe: 'Ester', dang: 'chua_ro', sao: 0, mucDo: 'hieu', text: 'Đề', luaChon: ['a', 'b', 'c', 'd'], dapAn: 'A', chot: 'c', lyDo: null, buoc: null, ketQua: '', ...o }) as CauLuyen
+  it('phiếu nộp được: mọi <script> biên dịch được, có chuanIII đúng luật, không còn phần bỏ đơn vị / so số học', () => {
+    const tt = { hoTen: 'Nguyễn Văn A', sbd: '12050', ngay: new Date(2026, 8, 8), tenChuyenDe: 'Ester', ketQua: '', hienDapAn: true }
+    const html = dungPhieu(tt as never, [cau({ id: 'q1', phan: 'III', luaChon: null, dapAn: '12,5' })], { nop: { ma: 'abcd1234ef', sbd: '12050', url: 'https://script.google.com/x/exec' } })
+    const khoi = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]!).filter((x) => x.trim())
+    expect(khoi.length).toBeGreaterThan(0)
+    for (const k of khoi) expect(() => new Function(k)).not.toThrow()
+    expect(html).toContain('var chuanIII = function (v)')
+    expect(html).toContain('chuanIII(chon) === chuanIII(dapAn)')
+    expect(html).not.toMatch(/gam\|lit\|lít\|mol/)
+    expect(html).not.toContain('1e-4')
   })
 })
