@@ -3,7 +3,7 @@
 Boss soạn · 21/09/2026 · CHỜ THẦY DUYỆT, chưa phiên nào build.
 Gộp 5 lệnh của thầy trưa nay: (1) rút câu thần thú rộng hết phần đã học, (2) ít nhất **21 ngày chăm chỉ** mới tới cấp 10, (3) ít nhất **1 200 ngày** mới tới cấp 120, (4) tính lại EXP cho em đã chơi, (5) có **số câu tối đa mỗi ngày**, đủ mà không chán, kéo em vào app mỗi ngày, câu khó và dài dần.
 
-## 0 · SỐ THẬT HÔM NAY (đọc dữ liệu thật lúc 13:45, chỉ đọc)
+## 0 · SỐ THẬT HÔM NAY (đọc dữ liệu thật khoảng 13:25, chỉ đọc)
 | Điều đo được | Con số |
 |---|---|
 | Mùa game mới bắt đầu | 05:05 sáng nay |
@@ -90,7 +90,7 @@ Hiện chặng kế chỉ mở 00:00 hôm sau, em chăm không có đường là
 ## ĐIỀU 7 · Siết "đạt nhiệm vụ ngày" (vì nay nó quyết định khiên, sức hấp thụ 200 và lượt thưởng)
 Code 1 rà thấy: làm 4 câu SAI HẾT vẫn được tính đạt. Đề nghị thêm một điều kiện: **ít nhất một nửa số câu tối thiểu phải ĐÚNG**. Giữ nguyên yêu cầu "có câu tới hạn ôn thì phải ôn". (Lỗ chốt ngày lúc 00:01 chỉ xử lý 40 em: đã giao vá trong hôm nay, không cần thầy duyệt.)
 
-## ĐIỀU 8 · Ô "Thi đua hôm nay" trên app học sinh, theo thời gian thực (thầy lệnh 14:0x)
+## ĐIỀU 8 · Ô "Thi đua hôm nay" trên app học sinh, theo thời gian thực (thầy lệnh khoảng 13:30)
 - Đặt ngay đầu Bảng nhiệm vụ của em, cập nhật mỗi phút, theo LỚP của em (12 - Tinh Hoa, 12 - Nhóm 10 điểm, khối 11…). Xếp theo SỰ CHĂM trong ngày, không theo điểm: số câu đã làm hôm nay → đã đạt nhiệm vụ ngày chưa → chuỗi ngày học đều. Em yếu mà chăm vẫn đứng đầu được.
 - Phần trên: **bục 3 bạn chăm nhất lúc này** (tên, số câu hôm nay, chuỗi ngày, thần thú của bạn) + dòng chạy "Minh Anh vừa vượt lên hạng 2". Phần giữa: **vị trí của chính em** thật to: "Em đang hạng 9 trong 42 bạn · làm thêm 5 câu là vượt 2 bạn". Thanh cả lớp: "27 trong 42 bạn đã học hôm nay".
 - Phần "lười nhất" — hai cách, thầy chọn:

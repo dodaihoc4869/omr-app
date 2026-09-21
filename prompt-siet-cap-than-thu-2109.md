@@ -2,9 +2,9 @@
 
 # ĐỀ BÀI — SIẾT ĐƯỜNG LÊN CẤP THẦN THÚ: ít nhất 10 ngày mới tới cấp 10, ít nhất 1200 ngày mới tới cấp 120 + TÍNH LẠI cho mọi em đã chơi
 
-Người viết: Boss · 21/09/2026. Thầy lệnh (3 tin liên tiếp ~13:30–13:50): "Siết exp lên cấp, ít nhất 10 ngày mới lên được cấp 10" · "Tăng lên 1200 ngày mới lên được cấp 120. Hãy tính toán cẩn thận và thông minh, hiệu quả" · "Siết xong điều chỉnh lại toàn bộ exp của các học sinh đã chơi".
+Người viết: Boss · 21/09/2026. Thầy lệnh (3 tin liên tiếp, khoảng 13:20–13:30): "Siết exp lên cấp, ít nhất 10 ngày mới lên được cấp 10" · "Tăng lên 1200 ngày mới lên được cấp 120. Hãy tính toán cẩn thận và thông minh, hiệu quả" · "Siết xong điều chỉnh lại toàn bộ exp của các học sinh đã chơi".
 
-## 0 · SỐ THẬT HÔM NAY (Boss đọc D1 chỉ-đọc, 13:45)
+## 0 · SỐ THẬT HÔM NAY (Boss đọc D1 chỉ-đọc, khoảng 13:25)
 - Mùa mới bắt đầu 05:05 sáng nay. Sau CHƯA ĐẦY 9 GIỜ: 3 em cấp 7, 5 em cấp 6, 7 em cấp 5 (97 hồ sơ, 43 em có EXP). Đường cũ: tới cấp 10 chỉ 1 630 EXP.
 - EXP vào ống nghiệm trong ngày của em có chơi: giữa 297 · một phần tư trên 710 · cao nhất 1 119. Em ĐẠT nhiệm vụ ngày: giữa 498. (Riêng EXP học tập: giữa 106, cao nhất 474; thưởng game lần đầu gặp dạng 20/40/40: giữa 200.)
 - ⇒ EXP kiếm được KHÔNG có trần cứng (trần mềm thầy đã chốt 19/09, giữ nguyên). Muốn BẢO ĐẢM "ít nhất N ngày" thì không siết chỗ KIẾM, mà siết chỗ THẦN THÚ HẤP THỤ.
