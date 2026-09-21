@@ -64,6 +64,24 @@ describe('ví dụ của đặc tả', () => {
     expect(l.map((x) => gioVn(x.moLuc))).toEqual(['22:30', '23:10', '23:36'])
     expect(ms(HAN) - ms(l[2].moLuc)).toBeGreaterThanOrEqual(1.5 * 10 * 90 * 1000)
   })
+  it('KHÔNG BẮT HỌC KHUYA: giao 21:30, hạn 23:59 NGÀY MAI, 30 câu, 12 câu/ngày, 90 giây/câu ⇒ chặng 2 không mở 23:40 đêm nay mà dời sang ĐẦU cửa sổ mai (20:00)', () => {
+    const goc = { chotLuc: luc('2026-09-21', '21:30'), hanNop: HAN, cauMoiNgay: 12, giayMoiCau: 90 }
+    const tuTong = xepLichChang({ ...goc, tongCau: 30 })
+    expect(tuTong.map((x) => vn(x.moLuc))).toEqual(['09-21 21:30', '09-22 20:00', '09-22 21:50'])
+    expect(xepLichChang({ ...goc, soCauTungChang: [10, 10, 10] })).toEqual(tuTong)
+  })
+  it('chặng LỚN (lõi vượt sức chứa: 30 câu ≈ 45 phút) cần dư thêm: mốc mở ≤ cuối cửa sổ − 1,5 × 45 − 15 phút = 22:36 ⇒ chặng 22:40 dời sang 20:00 mai', () => {
+    const l = xepLichChang(co({ chotLuc: luc('2026-09-21', '20:00'), hanNop: HAN, soCauTungChang: [30, 30, 30] }))
+    expect(l.map((x) => vn(x.moLuc))).toEqual(['09-21 20:00', '09-22 20:00', '09-22 21:20'])
+  })
+  it('chốt trong 45 phút cuối cửa sổ (23:40) vẫn mở NGAY (chặng 0); các chặng sau sang tối hôm sau', () => {
+    const l = xepLichChang(co({ chotLuc: luc('2026-09-21', '23:40'), hanNop: HAN, soCauTungChang: [10, 10, 10] }))
+    expect(l.map((x) => vn(x.moLuc))).toEqual(['09-21 23:40', '09-22 21:05', '09-22 22:35'])
+  })
+  it('chỉ phá luật khuya khi HẠN ép (không còn cửa sổ nào): mở 22:50, hạn 23:59 cùng đêm ⇒ 22:50 · 23:30', () => {
+    const l = xepLichChang(co({ chotLuc: luc('2026-09-21', '22:50'), hanNop: hanNopMacDinh('2026-09-21'), soCauTungChang: [10, 10] }))
+    expect(l.map((x) => gioVn(x.moLuc))).toEqual(['22:50', '23:30'])
+  })
   it('hạn dài (7 ngày, 8 câu/ngày): chặng 0 lúc chốt, chặng k mở 00:00 giờ VN ngày thứ k, đúng nhịp 23:59', () => {
     const l = xepLichChang(co({ chotLuc: luc('2026-09-22', '09:30'), hanNop: hanNopMacDinh('2026-09-28'), soCauTungChang: Array(7).fill(8) }))
     expect(l.map((x) => vn(x.moLuc))).toEqual(['09-22 09:30', '09-23 00:00', '09-24 00:00', '09-25 00:00', '09-26 00:00', '09-27 00:00', '09-28 00:00'])
@@ -224,6 +242,21 @@ describe('TÍNH CHẤT: mọi tình huống', () => {
       }
     }
   })
+  it('HẠN NGẮN · CÒN cửa sổ sau ⇒ không chặng nào (trừ chặng mở ngay lúc chốt) mở trong 45 phút cuối cửa sổ (23:15–23:59 mặc định), trừ khi bị mốc muộn nhất của hạn ép', () => {
+    let soDaXet = 0
+    for (const t of ca.filter((x) => x.cheDo === 'ngan' && !x.p.cuaSo)) {
+      const l = xepLichChang(t.p)
+      for (let k = 1; k < l.length; k++) {
+        const con = l.slice(k).reduce((a, y) => a + y.soCau * t.p.giayMoiCau * 1000, 0)
+        if (ms(l[k].moLuc) === t.m0 || ms(l[k].moLuc) >= mocMoMuonNhat(t.han, con)) continue
+        const cuaSoSauBatDau = (ngayVn(l[k].moLuc) + 1) * MS_NGAY - LECH + 20 * 60 * MS_PHUT
+        if (cuaSoSauBatDau >= t.han) continue // không còn cửa sổ nào sau: được phép mở sát giờ (hạn ép)
+        soDaXet++
+        expect(phutVn(l[k].moLuc), `chặng ${k} mở ${vn(l[k].moLuc)} mà hạn ${vn(t.p.hanNop)} còn cửa sổ sau`).toBeLessThan(23 * 60 + 15)
+      }
+    }
+    expect(soDaXet).toBeGreaterThan(300) // không rỗng: đủ chặng có cửa sổ sau để luật bị thử
+  })
   it('HẠN NGẮN · đủ giờ học (hạn ≥ 4 ngày, cửa sổ mặc định): mọi chặng sau chặng 0 mở TRONG cửa sổ 20:00–23:59, trừ khi bị mốc muộn nhất của hạn ép', () => {
     const r = mulberry32(4242)
     let soCa = 0
@@ -374,6 +407,12 @@ describe('sucChua', () => {
     expect(p(240).cauMoiPhien).toBe(5)
     expect(p(900).cauMoiPhien).toBe(1)
     expect(p(Number.NaN).cauMoiPhien).toBe(10) // 90 giây ⇒ 13 ⇒ kẹp 10
+  })
+  it('cửa sổ CUỐI chỉ cần kịp hạn (1,5 × thời gian làm), không phải chừa 45 phút khuya: chốt 22:00, hạn 23:59 cùng đêm ⇒ 3 phiên', () => {
+    expect(sucChua(co({ chotLuc: luc('2026-09-22', '22:00'), hanNop: HAN }))).toMatchObject({ soPhien: 3, soCauToiDa: 18 })
+  })
+  it('cửa sổ KHÔNG cuối chừa phần khuya: chốt 22:00, hạn mai ⇒ tối nay chỉ 2 phiên (22:00, 22:40; 23:20 là khuya) + 3 tối mai', () => {
+    expect(sucChua(co({ chotLuc: luc('2026-09-21', '22:00'), hanNop: HAN })).soPhien).toBe(2 + 3)
   })
   it('không bao giờ 0: chốt sát hạn vẫn có 1 phiên và ≥ 1 câu', () => {
     const s = sucChua(co({ chotLuc: luc('2026-09-22', '23:55'), hanNop: HAN }))

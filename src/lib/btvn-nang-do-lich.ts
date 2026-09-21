@@ -3,7 +3,7 @@
 // Chặng xếp theo PHIÊN HỌC chứ không cứng theo ngày. Mọi giờ tính theo giờ Việt Nam (UTC+7, không có giờ mùa hè) BẰNG SỐ HỌC: không Intl, không đồng hồ, không ngẫu nhiên ⇒ cùng đầu vào, cùng lịch.
 //   • HẠN DÀI (tải mỗi ngày ≤ ngân sách × 1,3 và hạn > 48 giờ): một chặng/ngày; chặng 0 mở lúc chốt, chặng k mở 00:00 giờ VN của ngày thứ k (Y HỆT `moLucChang` cũ); "đúng nhịp" = xong trước 23:59 của ngày đó.
 //   • HẠN NGẮN (tải mỗi ngày > ngân sách × 1,3 HOẶC hạn ≤ 48 giờ): chia THEO GIỜ trong cửa sổ học (mặc định 20:00–23:59): chặng ≤ ~10 câu, hai chặng cách nhau ≥ 40 phút, dàn ĐỀU trên thời gian còn lại
-//     (ví dụ 20:00 · 21:20 · 22:40). Chặng 0 luôn mở NGAY lúc chốt. Chặng cuối phải mở sớm hơn hạn ≥ 1,5 × thời gian làm; thiếu giờ ⇒ BỎ giãn cách (DEADLINE THẮNG). Không chặng nào mở 00:00–05:59.
+//     (ví dụ 20:00 · 21:20 · 22:40). Chặng 0 luôn mở NGAY lúc chốt. Chặng cuối phải mở sớm hơn hạn ≥ 1,5 × thời gian làm; thiếu giờ ⇒ BỎ giãn cách (DEADLINE THẮNG). Không chặng nào mở 00:00–05:59; còn cửa sổ sau thì không mở khuya (23:15–23:59) mà dời sang đầu cửa sổ kế.
 // Lịch chỉ nói "sớm nhất chặng mở lúc nào"; ai vào muộn vẫn làm được (chặng k mở khi chặng k−1 xong VÀ tới giờ — `trangThaiCacChang`), không bao giờ nhốt em.
 // Chỉ nhận CHUỖI ISO (lúc chốt, hạn nộp) và trả chuỗi ISO UTC, như `moLucChang`. Hạn thầy không ghi giờ ⇒ `hanNopMacDinh('YYYY-MM-DD')` = 23:59 giờ VN của ngày ấy.
 
@@ -20,6 +20,10 @@ export const LICH_CHANG = {
   PHUT_TOI_DA_MOI_PHIEN: 20,
   /** Chặng phải mở sớm hơn hạn ít nhất chừng này × thời gian làm ước tính của phần còn lại. */
   HE_SO_DU_GIO: 1.5,
+  /** KHÔNG BẮT EM HỌC KHUYA: khi CÒN cửa sổ học sau, chặng phải mở ≤ (cuối cửa sổ − 1,5 × thời gian làm chặng − DU_PHUT) và không bao giờ trong KHUYA_PHUT phút cuối cửa sổ
+   * (mặc định 23:15–23:59); không kịp ⇒ dời sang ĐẦU cửa sổ kế. Chỉ phá khi hạn nộp ép (không còn cửa sổ nào). */
+  DU_PHUT: 15,
+  KHUYA_PHUT: 45,
   /** Hạn ≤ chừng này giờ kể từ lúc chốt ⇒ luôn là hạn ngắn. */
   NGUONG_HAN_NGAN_GIO: 48,
   /** Tải mỗi ngày > ngân sách của em × hệ số này ⇒ hạn ngắn. */
@@ -178,6 +182,11 @@ function cacCuaSoHoc(m0: number, han: number, tuP: number, denP: number): CuaSoT
   return ra
 }
 
+/** Phần cuối cửa sổ (ms) mà chặng làm hết `thoiGianLam` ms KHÔNG được mở trong đó khi còn cửa sổ sau: max(KHUYA_PHUT, DU_PHUT + 1,5 × thời gian làm). */
+function duTruCuoiCuaSo(thoiGianLam: number): number {
+  return Math.max(LICH_CHANG.KHUYA_PHUT * MS_PHUT, LICH_CHANG.DU_PHUT * MS_PHUT + LICH_CHANG.HE_SO_DU_GIO * thoiGianLam)
+}
+
 // ══════════════════════════════ SỨC CHỨA ══════════════════════════════
 
 /**
@@ -203,7 +212,9 @@ export function sucChua(p: Pick<DauVaoLich, 'chotLuc' | 'hanNop' | 'cauMoiNgay' 
   const theoNgay = new Map<number, number>()
   for (const w of cacCuaSo) {
     const dai = w.e - w.s
-    const cho = dai >= LICH_CHANG.HE_SO_DU_GIO * thoiGianPhien ? Math.floor((dai - LICH_CHANG.HE_SO_DU_GIO * thoiGianPhien) / (LICH_CHANG.GIAN_CACH_PHUT * MS_PHUT)) + 1 : 0
+    // cửa sổ KHÔNG phải cuối cùng: phiên phải mở sớm để không học khuya (`duTruCuoiCuaSo`); cửa sổ cuối: chỉ cần kịp hạn (1,5 × thời gian làm)
+    const can = w === cacCuaSo[cacCuaSo.length - 1] ? LICH_CHANG.HE_SO_DU_GIO * thoiGianPhien : duTruCuoiCuaSo(thoiGianPhien)
+    const cho = dai >= can ? Math.floor((dai - can) / (LICH_CHANG.GIAN_CACH_PHUT * MS_PHUT)) + 1 : 0
     theoNgay.set(chiSoNgayVn(w.s), Math.min(LICH_CHANG.PHIEN_TOI_DA_MOI_NGAY, cho))
   }
   // chặng 0 mở NGAY lúc chốt luôn là một phiên: khi chốt ngoài cửa sổ (phiên riêng) hoặc cửa sổ ngày chốt không còn chỗ cho phiên nào
@@ -299,6 +310,11 @@ export function xepLichChang(p: DauVaoLich): ChangLich[] {
         // Hết giờ học trước hạn mà hạn còn xa (cửa sổ ngắn/hạn có giờ lẻ): kéo dài tiếp NGOÀI cửa sổ để vẫn giữ giãn cách ≥ 40 phút.
         return cacCuaSo.length > 0 ? cacCuaSo[cacCuaSo.length - 1].s + (pos - dau[dau.length - 1]) * MS_PHUT : m0 + pos * MS_PHUT
       }
+      /** Mốc rơi vào phần cuối một cửa sổ mà CÒN cửa sổ sau ⇒ dời sang ĐẦU cửa sổ kế (không bắt em học khuya). Chỉ dời MUỘN hơn ⇒ không mất giãn cách. */
+      const dichKhuya = (t: number, thoiGianLam: number): number => {
+        for (let i = 0; i < cacCuaSo.length - 1; i++) if (t >= cacCuaSo[i].s && t <= cacCuaSo[i].e && t > cacCuaSo[i].e - duTruCuoiCuaSo(thoiGianLam)) return cacCuaSo[i + 1].s
+        return t
+      }
       /** Đẩy mốc ra khỏi 00:00–05:59 (tới 06:00), chỉ đẩy MUỘN hơn nên không làm mất giãn cách. */
       const traGioCam = (t: number): number => {
         const p = phutTrongNgayVn(t)
@@ -312,7 +328,7 @@ export function xepLichChang(p: DauVaoLich): ChangLich[] {
         const pos = Math.max(lamTron5(goc), somNhat)
         truoc = pos
         // DEADLINE THẮNG giãn cách: không muộn hơn mốc muộn nhất của phần việc còn lại; không sớm hơn chặng trước.
-        const ungVien = traGioCam(Math.max(veMs(pos), mo[k - 1] + LICH_CHANG.GIAN_CACH_PHUT * MS_PHUT))
+        const ungVien = traGioCam(dichKhuya(Math.max(veMs(pos), mo[k - 1] + LICH_CHANG.GIAN_CACH_PHUT * MS_PHUT), soCau[k] * giay * 1000))
         mo[k] = Math.max(mo[k - 1], Math.min(ungVien, mocMoMuonNhat(han, con[k])))
       }
     }
