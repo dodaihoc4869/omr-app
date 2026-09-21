@@ -177,3 +177,37 @@ export function taoDuLieuGia(nowMs: number, hatGiong = 20260921): DuLieuSan {
     moPhong: true,
   }
 }
+
+/**
+ * MỘT sự kiện "em vừa làm một câu" trên dữ liệu giả (thuần: trả bản MỚI, không sửa bản cũ): cộng câu cho một em đang học, lớp của em, tổng, nến cuối (thêm nến mới khi sang khung 5 phút),
+ * chuỗi tia; mọi khối vẫn KHỚP nhau (`kiemTraKhop` rỗng). Chỉ dùng cho bản vẽ / kiểm thử — màn thật KHÔNG bịa sự kiện.
+ */
+export function phatSuKienGia(du: DuLieuSan, nowMs: number, hat: number): DuLieuSan {
+  const rnd = taoNgauNhien(hat)
+  const nhietCu = du.nhiet ?? []
+  const dangHoc = nhietCu.map((e, i) => [e, i] as const).filter(([e]) => e.soCau > 0)
+  if (dangHoc.length === 0 || !du.theoLop || !du.nen || !du.tia) return du
+  const [em, chiSo] = dangHoc[Math.floor(rnd() * dangHoc.length)]!
+  const lop = du.theoLop.find((l) => l.lop === em.lop)
+  const pDung = lop && lop.soCau > 0 ? lop.soCauDung / lop.soCau : 0.85
+  const dung = rnd() < pDung
+  const nhiet = nhietCu.map((e, i) => (i === chiSo ? { ...e, soCau: e.soCau + 1, soCauDung: e.soCauDung + (dung ? 1 : 0) } : e))
+  const theoLop = du.theoLop.map((l) => (l.lop === em.lop ? { ...l, soCau: l.soCau + 1, soCauDung: l.soCauDung + (dung ? 1 : 0) } : l))
+  const nen = du.nen.map((n) => ({ ...n }))
+  const cuoi = nen[nen.length - 1]!
+  if (nowMs >= cuoi.tu + NEN_MS) {
+    const tu = cuoi.tu + Math.floor((nowMs - cuoi.tu) / NEN_MS) * NEN_MS
+    nen.push({ tu, mo: cuoi.dong, cao: cuoi.dong, thap: cuoi.dong, dong: cuoi.dong, soCau: 0 })
+  }
+  const n = nen[nen.length - 1]!
+  n.dong += ((dung ? 100 : 0) - n.dong) * 0.018
+  n.cao = Math.max(n.cao, n.dong)
+  n.thap = Math.min(n.thap, n.dong)
+  n.soCau += 1
+  const soCau = du.soCau + 1
+  const soCauDung = du.soCauDung + (dung ? 1 : 0)
+  const tia = { hs: [...du.tia.hs], cau: [...du.tia.cau], tile: [...du.tia.tile], nhip: du.tia.nhip ? [...du.tia.nhip] : null }
+  tia.cau[59] = soCau
+  tia.tile[59] = (soCauDung / soCau) * 100
+  return { ...du, serverNow: nowMs, nhanLucMs: nowMs, soCau, soCauDung, nhiet, theoLop, nen, tia }
+}

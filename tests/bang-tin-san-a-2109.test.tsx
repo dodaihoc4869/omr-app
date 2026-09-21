@@ -223,7 +223,7 @@ describe('BangTinSan — khung, bốn ô số', () => {
     cleanup()
     const c2 = render(<BangTinSan du={{ ...goc(), tia: null, tin: [] }} nayMs={NAY} />).container
     expect(c2.querySelectorAll('.bts-o-so')).toHaveLength(4)
-    expect(c2.querySelectorAll('canvas')).toHaveLength(0)
+    expect(c2.querySelectorAll('.bts-o-tia canvas')).toHaveLength(0)
     expect(c2.querySelectorAll('.bts-lech')).toHaveLength(0)
     expect(c2.querySelector('[data-khoi="bang-chay"]')).toBeNull()
     expect(c2.querySelector('[data-khoi="em-hoc"] .bts-so-lan')!.getAttribute('aria-label')).toBe('34')
@@ -238,7 +238,7 @@ describe('BangTinSan — khung, bốn ô số', () => {
 
   it('mỗi đường tia là canvas có nhãn đọc được (mô tả bằng chữ)', () => {
     const { container } = render(<BangTinSan du={goc()} nayMs={NAY} />)
-    const nhan = [...container.querySelectorAll('canvas')].map((c) => c.getAttribute('aria-label'))
+    const nhan = [...container.querySelectorAll('.bts-o-tia canvas')].map((c) => c.getAttribute('aria-label'))
     expect(nhan).toEqual([
       'Số em đã học trong 60 phút gần nhất', 'Số câu đã làm trong 60 phút gần nhất', 'Tỉ lệ đúng trong 60 phút gần nhất', 'Số em nộp chặng đúng nhịp trong 60 phút gần nhất',
     ])

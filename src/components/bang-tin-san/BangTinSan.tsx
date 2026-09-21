@@ -4,6 +4,7 @@ import { useMemo, useRef } from 'react'
 import type { DuLieuSan } from '../../lib/bang-tin-san/kieu'
 import { chenhLech, chotSo } from '../../lib/bang-tin-san/trang-thai'
 import { BangChay } from './BangChay'
+import { NenHoc } from './NenHoc'
 import { OSo } from './OSo'
 import { ThanhTren } from './ThanhTren'
 import { useGioMayChu, useItDong, useMauSan } from './hooks'
@@ -84,6 +85,11 @@ export default function BangTinSan({ du, nayMs }: BangTinSanProps) {
           />
         )}
       </section>
+      {(du.nen?.length ?? 0) > 0 && (
+        <section className="bts-hang-chinh" data-khoi="hang-chinh">
+          <NenHoc nen={du.nen!} nowMs={now} mau={mau} phienBanMau={phienBan} itDong={itDong} />
+        </section>
+      )}
     </main>
   )
 }

@@ -60,3 +60,18 @@ export function chuMoc(mocMs: number): string {
   const d = new Date(mocMs + 7 * 3_600_000)
   return `Từ ${hai(d.getUTCHours())}:${hai(d.getUTCMinutes())} · ${THU[d.getUTCDay()]} ${hai(d.getUTCDate())}/${hai(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`
 }
+
+/** HH:MM giờ Việt Nam của một mốc ms. */
+export function gioPhutMs(ms: number): string {
+  const d = new Date(ms + 7 * 3_600_000)
+  return `${hai(d.getUTCHours())}:${hai(d.getUTCMinutes())}`
+}
+
+/** "mm:ss" còn lại đến `denMs` (không âm). */
+export function conLai(denMs: number, nowMs: number): string {
+  const s = Math.max(0, Math.floor((denMs - nowMs) / 1000))
+  return `${hai(Math.floor(s / 60))}:${hai(s % 60)}`
+}
+
+/** Số thực → "84,5" (dấu phẩy Việt Nam, `k` chữ số thập phân). */
+export const phay = (n: number, k = 1): string => n.toFixed(k).replace('.', ',')
