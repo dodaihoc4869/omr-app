@@ -130,7 +130,8 @@ describe('Báo cáo ca thi — nút khắc phục đi theo DANH SÁCH THẬT', (
   })
 
   it('app phụ huynh: nút "Tạo bài luyện khắc phục" không còn hiện vô điều kiện', () => {
-    expect(BC_PH).toContain('{dsCauSai.length > 0 ? (')
+    // Thêm chế độ `khongGiaoBai` (app PH một màn một nút, 21/09): không giao bài ⇒ không nút; còn lại vẫn đi theo DANH SÁCH THẬT.
+    expect(BC_PH).toContain('{khongGiaoBai ? null : dsCauSai.length > 0 ? (')
     expect(BC_PH).toContain('Ca này con không có câu nào cần khắc phục')
   })
 })

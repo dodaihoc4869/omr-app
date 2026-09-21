@@ -192,7 +192,9 @@ describe('Cấm nuốt lỗi im lặng', () => {
     expect(BC_PH).toContain("loiCauSai || 'Ca này con không có câu nào cần khắc phục'")
   })
 
-  it('cổng phụ huynh: phân biệt "không sai câu nào" với "gọi hỏng"', () => {
-    expect(CONG_PH).toContain('loiGoi ||')
+  // Cổng phụ huynh: luồng tạo bài khắc phục từ câu sai ĐÃ GỠ (app một màn một nút, 21/09) ⇒ không còn chỗ nào ở cổng để nuốt lỗi câu sai; phần "gọi hỏng" của hộp báo cáo giữ ở test phía trên.
+  it('cổng phụ huynh: không còn luồng gọi câu sai để tạo bài khắc phục (đã gỡ, không còn chỗ nuốt lỗi)', () => {
+    expect(CONG_PH).not.toContain('loiGoi')
+    expect(CONG_PH).not.toContain('xuLyTaoBaiCuaMom')
   })
 })

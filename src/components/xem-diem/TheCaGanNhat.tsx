@@ -1,6 +1,6 @@
 // THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" (đầu Bảng nhiệm vụ phụ huynh; mẫu ph-3-the-ca-gan-nhat.html, Boss soát ĐẠT 21/09). Ghép từ bộ xd-* đã chốt.
-// Cả thẻ là MỘT nút ≥ 48 px ("Xem tất cả về con"); bấm ⇒ `onMo` (tạm mở tab Xem điểm cho tới khi trang "Tất cả về con" được thầy chốt).
-// Ca CHƯA công bố ⇒ thẻ trung tính: KHÔNG điểm, KHÔNG số câu, KHÔNG phần. Không game, không xếp hạng, không so con với bạn. Không mã nội bộ.
+// Ca ĐÃ công bố: cả thẻ là MỘT nút ≥ 48 px ("Xem báo cáo ca này"); bấm ⇒ `onMo` (TẠM mở hộp báo cáo của đúng ca đó cho tới khi bảng "Mọi thứ về con" được thầy chốt; app PH đã gỡ tab Xem điểm).
+// Ca CHƯA công bố ⇒ thẻ trung tính, KHÔNG bấm được (không có gì để mở): KHÔNG điểm, KHÔNG số câu, KHÔNG phần. Không game, không xếp hạng, không so con với bạn. Không mã nội bộ.
 import { ChevronRight, Lock, Users } from 'lucide-react'
 import '../m3'
 import './xem-diem.css'
@@ -10,12 +10,12 @@ import type { TheCaGanNhat } from '../../lib/the-ca-gan-nhat'
 
 const TIEU_DE = 'Ca kiểm tra gần nhất của con'
 
-export default function TheCaGanNhatCua({ the, onMo }: { the: TheCaGanNhat | null; onMo: () => void }) {
+export default function TheCaGanNhatCua({ the, onMo }: { the: TheCaGanNhat | null; onMo?: () => void }) {
   if (!the) return null
   const luc = chuGioNop(the.nopLuc)
   const duoi = (
     <span className="xd-tcg__duoi">
-      <span>Xem tất cả về con</span>
+      <span>Xem báo cáo ca này</span>
       <ChevronRight className="xd-i xd-i--l" aria-hidden="true" />
     </span>
   )
@@ -27,7 +27,7 @@ export default function TheCaGanNhatCua({ the, onMo }: { the: TheCaGanNhat | nul
         : `Con đã nộp bài${gioBai}. Thầy chưa công bố điểm.`
     return (
       <div className="xd xd--trong" data-vung="the-ca-gan-nhat" data-kieu={the.kieu}>
-        <button type="button" className="xd-the xd-tcg" onClick={onMo} aria-label={`${TIEU_DE}: ${the.tenCa}. ${dong} Xem tất cả về con.`}>
+        <div className="xd-the xd-tcg" role="group" aria-label={`${TIEU_DE}: ${the.tenCa}. ${dong}`}>
           <span className="xd-tcg__tren">
             <span className="xd-tcg__nhan">{TIEU_DE}</span>
             <ChipCongBo tt={the.kieu} />
@@ -42,8 +42,7 @@ export default function TheCaGanNhatCua({ the, onMo }: { the: TheCaGanNhat | nul
               <p>{dong}</p>
             </span>
           </span>
-          {duoi}
-        </button>
+        </div>
       </div>
     )
   }
@@ -51,7 +50,7 @@ export default function TheCaGanNhatCua({ the, onMo }: { the: TheCaGanNhat | nul
   const nhanSoCau = coSoCau ? `, đúng ${the.dung} trên ${the.tong} câu` : ''
   return (
     <div className="xd xd--trong" data-vung="the-ca-gan-nhat" data-kieu="da_cong_bo">
-      <button type="button" className="xd-the xd-tcg" onClick={onMo} aria-label={`${TIEU_DE}: ${the.tenCa}, ${soVn(the.diem)} trên 10 điểm${nhanSoCau}. Xem tất cả về con.`}>
+      <button type="button" className="xd-the xd-tcg" onClick={onMo} disabled={!onMo} aria-label={`${TIEU_DE}: ${the.tenCa}, ${soVn(the.diem)} trên 10 điểm${nhanSoCau}. Xem báo cáo ca này.`}>
         <span className="xd-tcg__tren">
           <span className="xd-tcg__nhan">{TIEU_DE}</span>
           <ChipCongBo tt="da_cong_bo" />

@@ -59,7 +59,7 @@ describe('1. Xem đề và lời giải — là TỜ ĐỀ, không phải phiế
 describe('2. Đếm câu — không app nào được tự trừ ngược nữa', () => {
   const nguon = [
     'src/screens/StudentPortalScreen.tsx',
-    'src/screens/ParentPortalScreen.tsx',
+    // ParentPortalScreen: ĐÃ GỠ khỏi danh sách (app PH một màn một nút, 21/09 — màn không còn danh sách ca/đếm câu; báo cáo ca nằm ở BaoCaoCaThiPhuHuynhModal bên dưới).
     'src/components/BaoCaoCaThiHocSinhModal.tsx',
     'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
   ]

@@ -1202,3 +1202,9 @@ button.bnv-chon-thu:focus-visible { outline: 3px solid var(--m3-primary); outlin
 .bnv-cho-an:active { transform: scale(0.99); }
 .bnv-cho-an:focus-visible { outline: 3px solid var(--m3-tertiary); outline-offset: 2px; }
 
+/* CHÂN MÀN PHỤ HUYNH: "Đổi số báo danh" + số bản app — chữ nhỏ, đích chạm ≥ 48 px, không phải tính năng. */
+.bnv-chan-ph { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; margin-top: 8px; padding-top: 4px; border-top: 1px solid color-mix(in srgb, var(--m3-outline) 30%, transparent); }
+.bnv-chan-ph-nut { display: inline-flex; align-items: center; min-height: 48px; padding: 0 4px; background: none; border: 0; color: var(--m3-on-surface-variant); font-size: var(--bnv-cx-1); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.bnv-chan-ph-nut:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; border-radius: 6px; }
+.bnv-chan-ph-ban { font-size: var(--bnv-cx-1); color: var(--m3-on-surface-variant); }
+

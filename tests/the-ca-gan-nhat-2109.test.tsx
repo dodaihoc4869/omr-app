@@ -101,12 +101,12 @@ describe('chonTheCaGanNhat — chọn ca + luật công bố (thuần)', () => {
 })
 
 describe('TheCaGanNhatCua — vẽ thẻ', () => {
-  it('đã công bố: điểm/10 to, tên ca, giờ nộp, "đúng 21/28 câu", so với lần trước của CON, ba phần có SỐ ĐIỂM, "Xem tất cả về con"; MỘT nút bấm được', () => {
+  it('đã công bố: điểm/10 to, tên ca, giờ nộp, "đúng 21/28 câu", so với lần trước của CON, ba phần có SỐ ĐIỂM, "Xem báo cáo ca này"; MỘT nút bấm được', () => {
     const onMo = vi.fn()
     const { container } = render(<TheCaGanNhatCua the={chonTheCaGanNhat([CA_CU, CA_MOI], [])} onMo={onMo} />)
-    const nut = screen.getByRole('button', { name: /Ca kiểm tra gần nhất của con: Kiểm tra 45 phút · Ester – lipid, 7,5 trên 10 điểm, đúng 21 trên 28 câu\. Xem tất cả về con\./ })
+    const nut = screen.getByRole('button', { name: /Ca kiểm tra gần nhất của con: Kiểm tra 45 phút · Ester – lipid, 7,5 trên 10 điểm, đúng 21 trên 28 câu\. Xem báo cáo ca này\./ })
     const chu = container.textContent || ''
-    for (const m of [/7,5/, /trên 10 điểm/, /Kiểm tra 45 phút · Ester – lipid/, /Nộp 09:12/, /Con làm đúng 21\/28 câu/, /\+0,75 điểm so với lần trước của con \(6,75\)/, /Phần I3,75điểm/, /Phần II2,75điểm/, /Phần III1điểm/, /Đã có điểm/, /Xem tất cả về con/]) expect(chu).toMatch(m)
+    for (const m of [/7,5/, /trên 10 điểm/, /Kiểm tra 45 phút · Ester – lipid/, /Nộp 09:12/, /Con làm đúng 21\/28 câu/, /\+0,75 điểm so với lần trước của con \(6,75\)/, /Phần I3,75điểm/, /Phần II2,75điểm/, /Phần III1điểm/, /Đã có điểm/, /Xem báo cáo ca này/]) expect(chu).toMatch(m)
     expect(container.querySelectorAll('button').length).toBe(1) // cả thẻ là MỘT nút
     expect(chu).not.toMatch(CAM)
     fireEvent.click(nut)
@@ -141,11 +141,13 @@ describe('TheCaGanNhatCua — vẽ thẻ', () => {
     expect(b.container.textContent).toMatch(/Thầy chưa công bố điểm/)
     expect(b.container.textContent).toMatch(/Con đã nộp bài lúc 11:00/) // 04:00Z = 11:00 giờ Việt Nam
     expect(b.container.textContent).not.toMatch(/7,5|6,75|Con làm đúng|Phần I|trên 10|\d+\/\d+ em/)
-    const nut = b.container.querySelector('button')!
-    expect(nut.getAttribute('aria-label')).toMatch(/Thầy chưa công bố điểm\. Xem tất cả về con\.$/)
-    fireEvent.click(nut) // thẻ trung tính CŨNG là một đích chạm mở "Xem tất cả về con"
-    expect(mo).toHaveBeenCalledTimes(1)
-    expect(nut.getAttribute('aria-label')).not.toMatch(/\d,\d|trên 10/)
+    // Ca CHƯA công bố: KHÔNG có gì để mở (một màn một nút, 21/09) ⇒ thẻ là nhóm trung tính, KHÔNG phải nút, không dải "Xem báo cáo ca này".
+    expect(b.container.querySelector('button')).toBeNull()
+    const nhom = screen.getByRole('group', { name: /Ca kiểm tra gần nhất của con: .*Thầy chưa công bố điểm\.$/ })
+    expect(nhom.getAttribute('aria-label')).not.toMatch(/\d,\d|trên 10|Xem báo cáo/)
+    expect(b.container.textContent).not.toMatch(/Xem báo cáo ca này|Xem tất cả về con/)
+    fireEvent.click(nhom)
+    expect(mo).not.toHaveBeenCalled()
   })
 
   it('null ⇒ không vẽ gì', () => {
@@ -154,8 +156,8 @@ describe('TheCaGanNhatCua — vẽ thẻ', () => {
   })
 })
 
-describe('Bảng nhiệm vụ phụ huynh — thẻ ở ĐẦU, bấm mở Xem điểm', () => {
-  it('ca đã công bố: thẻ nằm NGAY DƯỚI khối tiến độ và TRÊN việc/lời Bộ não; bấm thẻ ⇒ mở tab "Báo cáo điểm các ca kiểm tra"', async () => {
+describe('Bảng nhiệm vụ phụ huynh — thẻ ở ĐẦU, bấm mở báo cáo của ĐÚNG ca đó', () => {
+  it('ca đã công bố: thẻ nằm NGAY DƯỚI khối tiến độ và TRÊN việc/lời Bộ não; bấm thẻ ⇒ mở hộp báo cáo của đúng ca (không còn tab Xem điểm)', async () => {
     mocks.ls = { ok: true, items: [CA_CU, CA_MOI], chuaCongBo: [] } as any
     localStorage.setItem('omr_ph_sbd', '12121212')
     const { container } = render(<ParentPortalScreen />)
@@ -171,7 +173,10 @@ describe('Bảng nhiệm vụ phụ huynh — thẻ ở ĐẦU, bấm mở Xem �
     expect(the.textContent).toMatch(/7,5/)
     expect(the.textContent).not.toMatch(CAM)
     fireEvent.click(the.querySelector('button')!)
-    await screen.findByText('Báo Cáo Điểm Tất Cả Các Ca Kiểm Tra')
+    // Hộp báo cáo của CHÍNH ca ở thẻ (CA_MOI), chỉ để xem: không tab Xem điểm, không nút "Tạo bài luyện khắc phục"
+    await waitFor(() => expect(document.body.textContent).toContain(CA_MOI.tenCa))
+    expect(screen.queryByText('Báo Cáo Điểm Tất Cả Các Ca Kiểm Tra')).toBeNull()
+    expect(screen.queryByText(/Tạo bài luyện khắc phục cho con/)).toBeNull()
   })
 
   it('ca mới nhất CHƯA công bố (chuaCongBo[] của máy chủ) ⇒ thẻ trung tính, không điểm ở thẻ', async () => {
@@ -186,6 +191,7 @@ describe('Bảng nhiệm vụ phụ huynh — thẻ ở ĐẦU, bấm mở Xem �
     expect(the.getAttribute('data-kieu')).toBe('ca_lop')
     expect(the.textContent).toMatch(/27\/32 em đã nộp/)
     expect(the.textContent).not.toMatch(/7,5|6,75|Con làm đúng/)
+    expect(the.querySelector('button')).toBeNull() // không có gì để mở
   })
 
   it('con chưa nộp ca nào ⇒ KHÔNG thẻ; máy chủ cũ (không có chuaCongBo) vẫn chạy', async () => {
@@ -209,16 +215,19 @@ describe('khoá nguồn', () => {
     expect(b.indexOf('data-vung="tien-do"')).toBeLessThan(b.indexOf('{laPh && theCaGanNhat}'))
     expect(b.indexOf('{laPh && theCaGanNhat}')).toBeLessThan(b.indexOf('THỬ THÁCH RIÊNG HÔM NAY'))
   })
-  it('cả thẻ là MỘT <button> ≥ 48 px (dải "Xem tất cả về con" 52 px), không lồng nút/liên kết, dùng bộ xd-* và biến m3', () => {
+  it('ca đã công bố: cả thẻ là MỘT <button> ≥ 48 px (dải "Xem báo cáo ca này" 52 px); ca chưa công bố: <div role="group"> (không nút); không lồng nút/liên kết, dùng bộ xd-* và biến m3', () => {
     const t = doc('src/components/xem-diem/TheCaGanNhat.tsx')
-    expect((t.match(/<button/g) || []).length).toBe(2) // hai nhánh (đã công bố / chưa) — mỗi nhánh MỘT nút
+    expect((t.match(/<button/g) || []).length).toBe(1) // chỉ nhánh ĐÃ công bố có nút
+    expect(t).toContain('role="group"')
     expect(t).not.toMatch(/<a\s/)
     expect(doc('src/components/xem-diem/xem-diem.css')).toMatch(/\.xd-tcg__duoi \{[^}]*min-height: 52px/)
     expect(t).toContain("import { ChipCongBo, SoSanh } from './thanh-phan'")
   })
-  it('màn phụ huynh nạp `chuaCongBo` từ lịch sử và tạm mở tab Xem điểm khi bấm thẻ', () => {
+  it('màn phụ huynh nạp `chuaCongBo` từ lịch sử; thẻ ĐÃ công bố mở hộp báo cáo của đúng ca (`moBaoCaoCa`), thẻ chưa công bố không bấm được; không còn tab Xem điểm', () => {
     const p = doc('src/screens/ParentPortalScreen.tsx')
     expect(p).toContain('setDsChuaCongBo(Array.isArray(ls.chuaCongBo) ? ls.chuaCongBo : [])')
-    expect(p).toContain("onMo={() => setTabPh('diem')}")
+    expect(p).toContain("onMo={theCaGanNhat?.kieu === 'da_cong_bo' ? moBaoCaoCa : undefined}")
+    expect(p).not.toContain('setTabPh')
+    expect(p).toContain('khongGiaoBai')
   })
 })

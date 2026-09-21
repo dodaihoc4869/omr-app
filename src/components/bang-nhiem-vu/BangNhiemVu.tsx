@@ -10,12 +10,13 @@ import GiaoThemChoCon from './GiaoThemChoCon'
 import type { ViewGiaoThem } from '../../lib/use-giao-them'
 import type { ViewThiDua } from '../../lib/use-thi-dua'
 import OThiDua from './OThiDua'
+import { chuBanApp } from '../../lib/cap-nhat-app'
 import TheChoAn, { viewChoAn } from './TheChoAn'
 import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, MessageSquare, PawPrint, Plus, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
+import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, PawPrint, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
 import { boGameChoPhuHuynh, sachBoNaoChoPhuHuynh, type DuLieuBangNhiemVu, type HanhDongNhiemVu, type TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
@@ -29,19 +30,6 @@ import './NenDong.css'
 
 export type { MucMenu, ThanThuGoc }
 
-/** Dữ liệu ô "Giao bài cho con" của phụ huynh — LẤY TỪ MÁY CHỦ (/parent-news), giao diện không tự tính, không tự viết câu. */
-export interface GiaoBaiHangNgay {
-  /** Câu NGUYÊN VĂN của máy chủ (kèm số). Vắng = chưa có dữ liệu ⇒ không in câu nào. */
-  reason?: string
-  /** Số câu còn dư chỗ giao hôm nay (0 = con đã đủ việc). Vắng = chưa biết. */
-  soCauDeXuat?: number
-  /** Hôm nay đã giao bài hằng ngày rồi (máy chủ không tạo bài thứ hai). */
-  daGiao?: { soCau: number; trangThai: 'chua_lam' | 'dang_lam' | 'da_nop' } | null
-  dangGui?: boolean
-  thongBao?: { loai: 'ok' | 'loi'; chu: string } | null
-}
-
-const TEN_TRANG_THAI_BAI = { chua_lam: 'con chưa làm', dang_lam: 'con đang làm', da_nop: 'con đã nộp' } as const
 
 /** Cho phép chuyển động khi máy KHÔNG xin giảm chuyển động và KHÔNG yếu pin.
  *  `navigator.getBattery` không có (Safari, Firefox) thì bỏ qua vế pin. */
@@ -123,12 +111,6 @@ export interface BangNhiemVuProps {
   onLenDuongDoan?: () => void
   onVaoThi?: () => void
   onXemBaiDaNop?: () => void
-  /** Luồng giao TAY cũ (chọn câu). Vẫn vào được khi con đã đủ việc — không chặn. */
-  onGiaoBai?: () => void
-  /** Giao bài hằng ngày đã cá nhân hoá (máy chủ chọn câu). */
-  onGiaoHangNgay?: () => void
-  giaoBai?: GiaoBaiHangNgay
-  onNhanThay?: () => void
   taiVinhDanh?: () => Promise<DuLieuVinhDanh | null>
   /** Lời cho phụ huynh + thư tuần của "Bộ não A.I" (lệnh riêng /ph/ke-hoach). Học sinh KHÔNG nhận qua đây (lời của em đi theo `duLieu.boNao`). */
   boNaoPh?: BoNaoPhuHuynh | null
@@ -136,8 +118,10 @@ export interface BangNhiemVuProps {
   theCaGanNhat?: ReactNode
   /** Ô "Thi đua hôm nay" (chỉ học sinh; phương án 8A): ngay dưới khối tiến độ, trên việc hôm nay. Màn cha truyền vào; thiếu dữ liệu ⇒ không dựng. */
   thiDua?: ViewThiDua
-  /** MỘT nút "Giao thêm bài cho con" (phụ huynh; máy chủ có `/ph/giao-them`). `san` ⇒ thay HẲN ô giao bài cũ. Vắng/`san = false` ⇒ giữ ô cũ. */
+  /** MỘT nút "Giao thêm bài cho con" (phụ huynh) — nút hành động DUY NHẤT của app phụ huynh. Vắng ⇒ không dựng. */
   giaoThem?: ViewGiaoThem
+  /** Chân màn phụ huynh: "Đổi số báo danh" (chữ nhỏ, cuối màn). Vắng ⇒ không dựng. */
+  onDoiSbd?: () => void
   /** "Cảnh báo của thầy" của PHỤ HUYNH (lời cho phụ huynh, lệnh /ph/ke-hoach). Học sinh nhận qua `duLieu.canhBaoThay`. */
   canhBaoPh?: CanhBaoThay[]
   /** Em/phụ huynh bấm "Đã xem" (hoặc "Làm ngay") ở một cảnh báo ⇒ màn cha báo máy chủ. */
@@ -164,10 +148,6 @@ export default function BangNhiemVu({
   onLenDuongDoan,
   onVaoThi,
   onXemBaiDaNop,
-  onGiaoBai,
-  onGiaoHangNgay,
-  giaoBai,
-  onNhanThay,
   taiVinhDanh,
   boNaoPh: boNaoPhGoc,
   theCaGanNhat,
@@ -175,6 +155,7 @@ export default function BangNhiemVu({
   giaoThem,
   canhBaoPh,
   onCanhBaoDaXem,
+  onDoiSbd,
   onLamThuThach,
   onDeSauThuThach,
 }: BangNhiemVuProps) {
@@ -247,12 +228,6 @@ export default function BangNhiemVu({
   }
   const conLai = Math.max(0, tienDo.mucTieu - tienDo.daLam)
 
-  // Ô giao bài của phụ huynh: mọi câu chữ và số là của máy chủ; giao diện chỉ chọn dạng nút.
-  const gb = giaoBai ?? {}
-  const conDu = !gb.daGiao && typeof gb.soCauDeXuat === 'number' && gb.soCauDeXuat > 0
-  const daDu = !gb.daGiao && gb.soCauDeXuat === 0
-  const trangThaiGiao = gb.daGiao ? 'da-giao' : conDu ? 'con-du' : daDu ? 'da-du' : 'chua-biet'
-  const bamGiao = conDu && onGiaoHangNgay ? onGiaoHangNgay : onGiaoBai
 
   return (
     <div
@@ -517,48 +492,25 @@ export default function BangNhiemVu({
 
             <HangTonCu tonCu={duLieu.tonCu} docChi={laPh} onChon={(b) => onHanhDong?.(b.hanhDong)} />
             <DanhSachQuaHan viec={duLieu.quaHan} docChi={laPh} onChon={(q) => q.hanhDong && onHanhDong?.(q.hanhDong)} />
-
-            {laPh && giaoThem?.san && <GiaoThemChoCon v={giaoThem} />}
-
-            {laPh && onGiaoBai && !giaoThem?.san && (
-              <section className="bnv-giao-bai" data-trang-thai={trangThaiGiao} aria-label="Giao bài cho con" data-vung="giao-bai">
-                {gb.reason && <p data-vung="ly-do-giao-bai">{gb.reason}</p>}
-                {gb.daGiao && (
-                  <p data-vung="da-giao">
-                    Hôm nay đã giao {gb.daGiao.soCau} câu · {TEN_TRANG_THAI_BAI[gb.daGiao.trangThai]}
-                  </p>
-                )}
-                {gb.thongBao && (
-                  <p role={gb.thongBao.loai === 'loi' ? 'alert' : 'status'} data-vung="thong-bao-giao-bai" data-loai={gb.thongBao.loai}>
-                    {gb.thongBao.chu}
-                  </p>
-                )}
-                <div className="bnv-giao-bai-nut">
-                  <button
-                    type="button"
-                    className={conDu ? 'bnv-nut-tonal' : 'bnv-nut-vien'}
-                    data-vai-tro={conDu ? 'secondary' : undefined}
-                    disabled={gb.dangGui}
-                    aria-busy={gb.dangGui || undefined}
-                    onClick={bamGiao}
-                  >
-                    <Plus size={18} aria-hidden="true" />
-                    <span>{gb.dangGui ? 'Đang giao…' : 'Giao bài cho con'}</span>
-                  </button>
-                  {onNhanThay && (
-                    <button type="button" className="bnv-nut-vien" onClick={onNhanThay}>
-                      <MessageSquare size={18} aria-hidden="true" />
-                      <span>Nhắn Thầy</span>
-                    </button>
-                  )}
-                </div>
-              </section>
-            )}
           </>
         )}
 
+        {/* MỘT nút duy nhất của app phụ huynh (thầy lệnh 21/09): "Giao thêm bài cho con". Luôn hiện — kể cả khi con chưa có việc; lỗi/thiếu lệnh ⇒ lời thật của máy chủ ngay dưới nút. */}
+        {laPh && giaoThem && <GiaoThemChoCon v={giaoThem} />}
+
+        {/* CHÂN MÀN phụ huynh: đường ra/vào tài khoản (phụ huynh hai con) + số bản app, chữ nhỏ; đích chạm ≥ 48 px. Không phải tính năng. */}
+        {laPh && onDoiSbd && (
+          <footer className="bnv-chan-ph" data-vung="chan-ph">
+            <button type="button" className="bnv-chan-ph-nut" onClick={onDoiSbd}>
+              Đổi số báo danh
+            </button>
+            <span className="bnv-chan-ph-ban">{chuBanApp()}</span>
+          </footer>
+        )}
+
         {/* Không dựng khi còn skeleton: thẻ này nằm dưới vùng nhiệm vụ, nội dung thật phình ra sẽ đẩy nó đi (CLS). */}
-        {!dangTai && <TheVinhDanh tatChuyenDong={!choDong} taiDuLieu={taiVinhDanh} hienThu={!laPh} />}
+        {/* "Vinh danh hôm nay" chỉ ở học sinh: app phụ huynh một màn một nút (21/09) không còn khối này. */}
+        {!dangTai && !laPh && <TheVinhDanh tatChuyenDong={!choDong} taiDuLieu={taiVinhDanh} hienThu />}
       </main>
 
       {!laPh && onVaoThi && <NutVaoThi caDangMo={caDangMo} onVaoThi={onVaoThi} />}

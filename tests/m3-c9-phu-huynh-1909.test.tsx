@@ -47,38 +47,29 @@ describe('ParentPortalScreen — màn đăng nhập (chưa có SBD)', () => {
 })
 
 describe('ParentPortalScreen — đã đăng nhập: khung sheet toàn màn', () => {
-  it('Bảng nhiệm vụ nằm trong gốc `m3`; mở sheet Báo cáo điểm: thanh trên có nút Đóng ≥ 48 px ngang, bấm đóng thì về Bảng nhiệm vụ', async () => {
+  it('Bảng nhiệm vụ nằm trong gốc `m3`; app phụ huynh MỘT màn (21/09): không menu, không sheet toàn màn "Báo cáo điểm"; hộp báo cáo của ca gần nhất mở/đóng được', async () => {
     localStorage.setItem('omr_ph_sbd', '12121212')
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
     expect(container.firstElementChild!.classList.contains('m3')).toBe(true)
     expect(container.querySelector('.bnv')!.closest('.m3')).toBeTruthy()
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-    fireEvent.click(await screen.findByText('Báo cáo điểm các ca kiểm tra'))
-    const dong = await screen.findByTitle('Đóng toàn màn hình')
-    expect(dong.className).toContain('min-w-[48px]')
-    expect(screen.getByText('Ca Ancol 15/09')).toBeTruthy()
-    fireEvent.click(dong)
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
+    expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
     expect(screen.queryByTitle('Đóng toàn màn hình')).toBeNull()
+    // Thẻ ca gần nhất (ca đã công bố) mở hộp báo cáo của ĐÚNG ca đó; đóng lại thì về Bảng nhiệm vụ
+    const the = await waitFor(() => {
+      const e = container.querySelector('[data-vung="the-ca-gan-nhat"] button')
+      expect(e).toBeTruthy()
+      return e as HTMLElement
+    })
+    fireEvent.click(the)
+    await waitFor(() => expect(document.body.textContent).toContain('Ca Ancol 15/09'))
+    fireEvent.click(screen.getAllByRole('button', { name: 'Đóng' })[0]!)
+    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
   })
 })
 
 describe('hai lỗi nhỏ ghi tồn — sửa ở chỗ dùng (0.Planer 19/09)', () => {
-  it('(ii) tiêu đề sheet không còn bị chặn 200 px: ở màn hẹp xuống hàng riêng full bề rộng, cắt (truncate) chỉ khi thật sự hết chỗ', async () => {
-    localStorage.setItem('omr_ph_sbd', '12121212')
-    const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('.bnv')).toBeTruthy())
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-    fireEvent.click(await screen.findByText('Báo cáo điểm các ca kiểm tra'))
-    const tieuDe = (await screen.findByText('Báo Cáo Điểm Tất Cả Các Ca Kiểm Tra')) as HTMLElement
-    expect(tieuDe.className).toContain('truncate')
-    const khung = tieuDe.parentElement!
-    expect(khung.className).toContain('basis-full')
-    expect(khung.className).toContain('order-last')
-    expect(khung.className).not.toContain('max-w-[200px]')
-    expect(khung.parentElement!.className).toContain('flex-wrap')
-  })
+  // (ii) tiêu đề sheet Báo cáo điểm — ĐÃ GỠ cùng sheet (app phụ huynh một màn một nút, 21/09).
 
   it('(i) thanh trên màn đăng nhập chừa tối thiểu 10 px phía trên (env() rỗng ở máy không tai thỏ làm chữ ĐỖ ĐẠI HỌC bị cắt mép); LogoApp.tsx KHÔNG bị sửa', () => {
     const t = doc('src/screens/ParentPortalScreen.tsx')

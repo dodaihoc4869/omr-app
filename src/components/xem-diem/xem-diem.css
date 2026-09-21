@@ -264,7 +264,9 @@
 
 /* ── PH · THẺ "CA KIỂM TRA GẦN NHẤT CỦA CON" + TRANG "TẤT CẢ VỀ CON" (bản vẽ 21/09, thầy lệnh; prompt-ph-giao-them-bai-2109.md mục D) ──
  * Ghép từ bộ xd-* đã chốt; chỉ thêm các khối riêng của phụ huynh. Không game, không xếp hạng, không so con với bạn. */
-a.xd-tcg, button.xd-tcg { display: grid; gap: 14px; width: 100%; padding: 18px 18px 0; color: inherit; cursor: pointer; text-align: left; }
+a.xd-tcg, button.xd-tcg, div.xd-tcg { display: grid; gap: 14px; width: 100%; padding: 18px 18px 0; color: inherit; cursor: pointer; text-align: left; }
+div.xd-tcg { padding-bottom: 18px; cursor: default; }
+button.xd-tcg:disabled { cursor: default; }
 a.xd-tcg:hover, button.xd-tcg:hover { background: var(--m3-surface-container); }
 .xd-tcg__tren { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
 .xd-tcg__nhan { font-size: var(--bnv-cx-1); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--xd-nhat); }

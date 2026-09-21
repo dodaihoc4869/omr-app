@@ -46,7 +46,9 @@ describe('chữ mới đúng chuẩn', () => {
   it('menu + tiêu đề sheet: "Xem điểm & lịch sử ca kiểm tra", "Báo cáo điểm các ca kiểm tra"', () => {
     const menu = doc('src/components/bang-nhiem-vu/muc-menu.tsx')
     expect(menu).toContain("nhan: 'Xem điểm & lịch sử ca kiểm tra'")
-    expect(menu).toContain("nhan: 'Báo cáo điểm các ca kiểm tra'")
+    // Menu phụ huynh ĐÃ GỠ (app PH một màn một nút, 21/09): không còn mục "Báo cáo điểm các ca kiểm tra" ở menu.
+    expect(menu).not.toContain('mucMenuPhuHuynh')
+    expect(menu).not.toContain('Báo cáo điểm các ca kiểm tra')
     expect(doc('src/screens/StudentPortalScreen.tsx')).toContain("tab === 'diem' ? 'Xem điểm & lịch sử ca kiểm tra'")
   })
   it('mã ca KHÔNG làm tên: "Ca kiểm tra mã …" (HS lịch sử, PH danh sách, khắc phục, thẻ gần nhất, báo cáo)', () => {

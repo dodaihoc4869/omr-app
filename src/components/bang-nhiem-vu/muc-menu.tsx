@@ -1,13 +1,12 @@
 // Menu ba chấm của "Bảng nhiệm vụ": lối vào mọi màn cũ (mở dạng sheet toàn màn
 // ở màn cổng). Đặt ở đây để StudentPortalScreen/ParentPortalScreen chỉ còn nối
 // dây, không phải mang theo danh sách biểu tượng.
-import { BarChart3, BookOpen, ClipboardList, Heart, Newspaper, PawPrint, RotateCcw, LogOut, Zap } from 'lucide-react'
+import { BarChart3, ClipboardList, Heart, Newspaper, PawPrint, RotateCcw, LogOut } from 'lucide-react'
 import type { MucMenu } from './DauTrang'
 
 const CO = 18
 
 export type ManCuHocSinh = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'bantin' | 'thanthu'
-export type ManCuPhuHuynh = 'diem' | 'khacphuc' | 'bantin'
 
 export function mucMenuHocSinh(moMan: (man: ManCuHocSinh) => void, dangXuat: () => void): MucMenu[] {
   return [
@@ -21,31 +20,4 @@ export function mucMenuHocSinh(moMan: (man: ManCuHocSinh) => void, dangXuat: () 
   ]
 }
 
-/** `giaoNhanh`: hai lối 1 chạm cũ của màn phụ huynh (khắc phục câu sai / luyện bứt phá). */
-/**
- * `giaoThemSan` (máy chủ có `/ph/giao-them`): phụ huynh chỉ còn MỘT đường giao bài — nút "Giao thêm bài cho con" trên Bảng nhiệm vụ (thầy lệnh 21/09, H13).
- * Bỏ khỏi menu "Giao bài khắc phục cho con", "Giao nhanh: …" và "Bảng tin của con" (sheet chủ yếu là các cách giao). Máy chủ chưa có lệnh ⇒ menu cũ nguyên.
- */
-export function mucMenuPhuHuynh(
-  moMan: (man: ManCuPhuHuynh) => void,
-  doiSbd: () => void,
-  giaoNhanh?: { khacPhuc: () => void; luyen: () => void },
-  giaoThemSan = false,
-): MucMenu[] {
-  return [
-    { id: 'diem', nhan: 'Báo cáo điểm các ca kiểm tra', bieuTuong: <BarChart3 size={CO} aria-hidden="true" />, onChon: () => moMan('diem') },
-    ...(giaoThemSan
-      ? []
-      : [
-          { id: 'khacphuc', nhan: 'Giao bài khắc phục cho con', bieuTuong: <BookOpen size={CO} aria-hidden="true" />, onChon: () => moMan('khacphuc') },
-          { id: 'bantin', nhan: 'Bảng tin của con', bieuTuong: <Newspaper size={CO} aria-hidden="true" />, onChon: () => moMan('bantin') },
-        ]),
-    ...(giaoNhanh && !giaoThemSan
-      ? [
-          { id: 'giao-khac-phuc', nhan: 'Giao nhanh: bài khắc phục câu sai', bieuTuong: <Zap size={CO} aria-hidden="true" />, onChon: giaoNhanh.khacPhuc },
-          { id: 'giao-luyen', nhan: 'Giao nhanh: bài luyện bứt phá', bieuTuong: <Zap size={CO} aria-hidden="true" />, onChon: giaoNhanh.luyen },
-        ]
-      : []),
-    { id: 'doisbd', nhan: 'Đổi số báo danh', bieuTuong: <LogOut size={CO} aria-hidden="true" />, keTren: true, onChon: doiSbd },
-  ]
-}
+// Phụ huynh: KHÔNG còn menu ba chấm (thầy lệnh 21/09 — một màn một nút). Đường "Đổi số báo danh" nằm ở chân màn (BangNhiemVu `onDoiSbd`).

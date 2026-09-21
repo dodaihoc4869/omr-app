@@ -107,8 +107,8 @@ describe('ParentPortalScreen với liên kết ?ph=', () => {
     expect(goi[0]).toEqual({ url: 'https://may.test/ph/xac-dinh', body: { pass: 'PASS-B' } })
     expect(container.textContent).toContain('Hôm nay của Minh') // tên thật từ /ph/xac-dinh (màn chỉ hiện tên gọi)
     expect(container.textContent).not.toContain('TRẦN') // không phải tên tra bằng SBD trần
-    await waitFor(() => expect(goi.some((g) => g.url.endsWith('/parent-news/list'))).toBe(true))
-    for (const g of goi.filter((x) => /parent-news|parent-list/.test(x.url))) expect(g.body.pass).toBe('PASS-B')
+    await waitFor(() => expect(goi.some((g) => g.url.endsWith('/parent-list'))).toBe(true))
+    for (const g of goi.filter((x) => /parent-news|parent-list|giao-them/.test(x.url))) expect(g.body.pass).toBe('PASS-B')
     expect(localStorage.getItem(KHOA_PH_PASS)).toBe('PASS-B')
   })
 

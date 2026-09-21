@@ -8,7 +8,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 import BangNhiemVu from '../src/components/bang-nhiem-vu/BangNhiemVu'
 import BangTinPhuHuynh from '../src/components/BangTinPhuHuynh'
-import { mucMenuPhuHuynh } from '../src/components/bang-nhiem-vu/muc-menu'
 import { boGameChoPhuHuynh, CHU_GAME_PH, khongChuGame, sachBoNaoChoPhuHuynh, TEN_VIEC_LUYEN_DANG_PH, type DuLieuBangNhiemVu, type TheNhiemVu } from '../src/lib/nhiem-vu-adapter'
 
 configure({ asyncUtilTimeout: 8000 })
@@ -111,8 +110,7 @@ function veBangPh(tuy: Record<string, unknown> = {}) {
       boNaoPh={BO_NAO_PH}
       onLenDuongDoan={() => {}}
       onMoThanThu={() => {}}
-      mucMenu={mucMenuPhuHuynh(() => {}, () => {})}
-      onGiaoBai={() => {}}
+      onDoiSbd={() => {}}
       {...(tuy as object)}
     />,
   )
@@ -194,19 +192,22 @@ describe('CHỐT CHẶN — chữ hiển thị của MÀN PHỤ HUYNH không cò
   it('Bảng nhiệm vụ phụ huynh với dữ liệu ĐẦY game: 0 chuỗi cấm trong nội dung + aria-label + title + alt; 0 ảnh thú; 0 khối EXP/Đoàn/chọn thú', async () => {
     const { container } = veBangPh()
     await screen.findByText('Bài tập về nhà · Chặng 2')
-    // Chờ vinh danh tải xong (cũng có thú trong dữ liệu).
-    await screen.findByText(/Nguyễn M\.|Bông/)
+    // (Vinh danh KHÔNG còn ở app phụ huynh — một màn một nút, 21/09.)
     expect(chuHienThi(container)).not.toMatch(CAM)
     expect(screen.queryByTestId('anh-thu')).toBeNull()
     for (const vung of ['exp', 'exp-moi', 'doan-ho-tong', 'chon-than-thu']) expect(container.querySelector(`[data-vung="${vung}"]`), vung).toBeNull()
     expect(container.querySelector('.bnv-thu, .bnv-thu-vong, .bnv-thu-danh, .bnv-exp, .bnv-doan, .bnv-vd-thu')).toBeNull()
   })
 
-  it('bấm mở MENU BA CHẤM: không mục nào nhắc game (và số bản vẫn ở cuối)', async () => {
+  it('app phụ huynh một màn một nút (21/09): KHÔNG menu ba chấm; chân màn có "Đổi số báo danh" + số bản, không chữ game', async () => {
     const { container } = veBangPh()
-    fireEvent.click(await screen.findByRole('button', { name: 'Mở menu' }))
-    expect(chuHienThi(container.querySelector('.bnv-menu') as HTMLElement)).not.toMatch(CAM)
-    expect(container.querySelector('.bnv-menu-ban')).toBeTruthy()
+    await screen.findByText('Bài tập về nhà · Chặng 2')
+    expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
+    expect(container.querySelector('.bnv-menu')).toBeNull()
+    const chan = container.querySelector('[data-vung="chan-ph"]') as HTMLElement
+    expect(chan).toBeTruthy()
+    expect(chuHienThi(chan)).not.toMatch(CAM)
+    expect(chan.querySelector('.bnv-chan-ph-ban')).toBeTruthy()
   })
 
   it('việc `than_thu` hiện là "Luyện dạng con còn vấp" kèm số câu; việc bài tập về nhà và hạn nộp GIỮ nguyên', async () => {
@@ -219,13 +220,12 @@ describe('CHỐT CHẶN — chữ hiển thị của MÀN PHỤ HUYNH không cò
     expect(container.textContent).not.toContain('sắp lên cấp')
   })
 
-  it('"Vinh danh hôm nay" GIỮ (tên + điểm + số phút) nhưng không hình thú và không chữ "Thần thú"', async () => {
+  it('"Vinh danh hôm nay" KHÔNG còn ở app phụ huynh (một màn một nút, 21/09) — học sinh vẫn có', async () => {
     const { container } = veBangPh()
-    await screen.findByText(/Nguyễn M\.|Bông/)
-    const vd = container.querySelector('.bnv-vd, [data-vung="vinh-danh"]') || container
-    expect(vd.textContent).toMatch(/9,5 điểm/)
-    expect(vd.textContent).toMatch(/30 phút/)
-    expect(container.querySelector('.bnv-vd-thu')).toBeNull()
+    await screen.findByText('Bài tập về nhà · Chặng 2')
+    await new Promise((r) => setTimeout(r, 200))
+    expect(container.textContent).not.toMatch(/Vinh danh|Nguyễn M\.|9,5 điểm/)
+    expect(container.querySelector('.bnv-vd, [data-vung="vinh-danh"]')).toBeNull()
   })
 
   it('lời Bộ não cho phụ huynh: câu nhắc thú/EXP bị bỏ, thư tuần không chữ game vẫn hiện', async () => {
@@ -275,7 +275,7 @@ describe('khoá nguồn — các chốt `laPh` nằm đúng chỗ (đột biến
     expect(bang).toContain("const coBaoNhan = !dangTai && !laPh && khoaNhan !== '#'")
     expect(bang).toContain("const chuaChonThu = !dangTai && !laPh && duLieu.thanThu.kieu === 'chua_chon'")
     expect(bang).toContain('{duLieu.exp && !laPh && (')
-    expect(bang).toContain('hienThu={!laPh}')
+    expect(bang).toContain('{!dangTai && !laPh && <TheVinhDanh') // Vinh danh chỉ ở học sinh (app PH một màn một nút, 21/09) — trước đây `hienThu={!laPh}`
   })
   it('DauTrang: phụ huynh không vẽ khối thần thú; TheVinhDanh có `hienThu`; BangTinPhuHuynh chỉ vẽ ô Thần thú khi có studentToken', () => {
     expect(doc('src/components/bang-nhiem-vu/DauTrang.tsx')).toContain('{laPh ? null : onMoThanThu && (co || chuaChon) ? (')

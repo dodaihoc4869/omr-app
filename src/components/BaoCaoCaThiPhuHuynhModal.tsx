@@ -55,9 +55,11 @@ interface Props {
   lop?: string
   scriptUrl: string
   onClose: () => void
-  onGiaoBaiChoCon: (dsCauSai: any[], tieuDe?: string) => void
-  onNhanTinChoThay: (noiDung: string) => void
+  onGiaoBaiChoCon?: (dsCauSai: any[], tieuDe?: string) => void
+  onNhanTinChoThay?: (noiDung: string) => void
   onXemPhieuGoc?: (html: string) => void
+  /** App phụ huynh một màn một nút (thầy lệnh 21/09): hộp báo cáo CHỈ ĐỂ XEM — không nút "Tạo bài luyện khắc phục", không hộp khắc phục (đường giao bài duy nhất là nút "Giao thêm bài cho con"). */
+  khongGiaoBai?: boolean
 }
 
 export default function BaoCaoCaThiPhuHuynhModal({
@@ -70,6 +72,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
   onGiaoBaiChoCon,
   onNhanTinChoThay: _onNhanTinChoThay,
   onXemPhieuGoc: _onXemPhieuGoc,
+  khongGiaoBai = false,
 }: Props) {
   const [dsLichSu, setDsLichSu] = useState<CaLichSu[]>([])
   const [dsCauSai, setDsCauSai] = useState<any[]>([])
@@ -263,15 +266,19 @@ export default function BaoCaoCaThiPhuHuynhModal({
       return {
         tieuDe: `Điểm ca này ${d}/10`,
         loiNhan: `Em ${hoTenCon} được ${d}/10 điểm. Các câu mất điểm được liệt kê ở mục Câu sai cần chữa; con làm lại đúng các dạng câu đó sẽ thấy rõ mình sai ở bước nào.`,
-        viecCanLam: 'Bấm nút "Tạo bài luyện khắc phục cho con" để con làm lại đúng các dạng câu vừa mất điểm.',
+        viecCanLam: khongGiaoBai
+          ? 'Cho con làm lại các câu ở mục Câu sai cần chữa và đọc lời giải từng câu. Nút "Giao thêm bài cho con" ở màn chính sẽ chọn thêm câu hợp với con.'
+          : 'Bấm nút "Tạo bài luyện khắc phục cho con" để con làm lại đúng các dạng câu vừa mất điểm.',
       }
     }
     return {
       tieuDe: `Điểm ca này ${d}/10, còn nhiều câu cần chữa`,
       loiNhan: `Ca kiểm tra này con được ${d}/10 điểm. Phụ huynh đừng tạo áp lực mà hãy cùng Thầy đồng hành: xem lại lời giải chi tiết của từng câu sai và làm đều đặn bài tập mỗi tối.`,
-      viecCanLam: 'Tạo bài tập 10-15 câu mỗi ngày từ các câu con sai để con làm lại từng bước một.',
+      viecCanLam: khongGiaoBai
+        ? 'Mỗi ngày cho con làm lại vài câu ở mục Câu sai cần chữa, từng bước một. Nút "Giao thêm bài cho con" ở màn chính sẽ chọn thêm câu hợp với con.'
+        : 'Tạo bài tập 10-15 câu mỗi ngày từ các câu con sai để con làm lại từng bước một.',
     }
-  }, [diem, hoTenCon])
+  }, [diem, hoTenCon, khongGiaoBai])
 
   return (
     <div className="m3 fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/70 backdrop-blur-md overflow-y-auto animate-google-fade">
@@ -649,7 +656,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
           {/* Nút: Tạo ngay bài tập khắc phục cho con.
               Chỉ sống khi DANH SÁCH THẬT có câu — bản cũ hiện vô điều kiện nên
               ca con làm đúng hết vẫn mở ra một modal không tạo được gì. */}
-          {dsCauSai.length > 0 ? (
+          {khongGiaoBai ? null : dsCauSai.length > 0 ? (
             <button
               type="button"
               onClick={() => setHienModalKhacPhuc(true)}
@@ -669,7 +676,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
       </div>
 
       {/* MODAL KHẮC PHỤC CÂU SAI ĐỒNG BỘ 3 LỰA CHỌN */}
-      {hienModalKhacPhuc && (
+      {!khongGiaoBai && hienModalKhacPhuc && (
         <ModalKhacPhucCauSai
           isOpen={hienModalKhacPhuc}
           onClose={() => setHienModalKhacPhuc(false)}
@@ -680,7 +687,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
           onGiaoBaiChoCon={(dsCau, tieuDe) => {
             setHienModalKhacPhuc(false)
             onClose()
-            onGiaoBaiChoCon(dsCau, tieuDe)
+            onGiaoBaiChoCon?.(dsCau, tieuDe)
           }}
         />
       )}
