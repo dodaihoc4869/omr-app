@@ -129,3 +129,36 @@
 .gv-em-can__mo {
   font-size: var(--bnv-cx-2);
 }
+
+/* ── GV-2 · trang báo cáo MỘT EM (phủ kín màn, cuộn riêng; đóng bằng nút quay lại hoặc Esc) ─────────────────────────── */
+.xd.xd-gv.gv2-trang {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0;
+  border-radius: 0;
+  background: var(--m3-surface);
+}
+.gv2-phan > summary {
+  cursor: pointer;
+  list-style: none;
+}
+.gv2-phan > summary::-webkit-details-marker {
+  display: none;
+}
+.gv2-phan[open] > summary {
+  padding-bottom: 8px;
+}
+.gv2-so-lop {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 12px;
+}
+.gv2-lop-chu {
+  margin-top: 12px;
+  font-size: var(--bnv-cx-2);
+}
+.gv2-hanh-dong {
+  gap: 12px;
+}

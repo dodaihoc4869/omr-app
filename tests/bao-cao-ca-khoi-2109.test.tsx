@@ -214,9 +214,9 @@ describe('GV-1 · chỗ nối ở ExamMonitorScreen (chỉ phần nhìn)', () =>
     expect(nguon.indexOf('<BaoCaoCaLopKhoi')).toBeLessThan(nguon.indexOf('Học sinh trong ca ({dsEm.length})'))
   })
 
-  it('chỉ GOM số đã có: không chấm lại, không gọi mạng, không đụng công bố/khoá/rời màn; phần nặng nằm TRONG hàm tính lười, không trong useMemo chạy mỗi lần làm mới', () => {
-    const a = nguon.indexOf('const tinhBaoCaoLop = () =>')
-    const khoi = nguon.slice(a, nguon.indexOf('return tinhBaoCaoCaLop(em, dsEm.length)', a))
+  it('chỉ GOM số đã có: không chấm lại, không gọi mạng, không đụng công bố/khoá/rời màn; phần nặng nằm TRONG hàm tính lười, không trong phần rẻ chạy mỗi lần làm mới', () => {
+    const a = nguon.indexOf('const dungNganHangBaoCao = () =>')
+    const khoi = nguon.slice(a, nguon.indexOf('const tinhBaoCaoLop = () =>', a))
     expect(khoi).not.toMatch(/gradeSubmissionFull|fetch|await|ghiDiem|khoaCa|moKhoa|congBo|setLoi|useState|useMemo/)
     expect(khoi).toContain('taoChiTietCau')
     // taoChiTietCau + mergeKeepAnswers không được nằm trong phần rẻ chạy theo dsEm

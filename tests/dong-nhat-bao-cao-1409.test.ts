@@ -88,18 +88,26 @@ describe('một gói, một con số — ba app phải khớp', () => {
 })
 
 describe('không chỗ gọi nào được tự nhặt trường nữa', () => {
+  // Xem điểm bản 2 (thầy chốt 21/09): màn Theo dõi ca của THẦY đổi sang trang báo cáo một em mới (`BaoCaoMotEm`), không còn dùng hộp báo cáo
+  // chung nên không còn gọi `goiBaiThi`. Nó vẫn đếm bằng ĐÚNG luật chung `demKetQua` (kiểm ở test dưới), không đếm kiểu khác.
   const goi = [
     'src/screens/StudentPortalScreen.tsx',
     'src/screens/HocSinhScreen.tsx',
-    'src/screens/ExamMonitorScreen.tsx',
   ]
+  const chiaSe = ['src/screens/ExamMonitorScreen.tsx', 'src/lib/bao-cao-mot-em.ts']
 
-  it('cả ba chỗ mở báo cáo đều đi qua `goiBaiThi`', () => {
+  it('hai chỗ còn mở hộp báo cáo chung (học sinh, hồ sơ em) đều đi qua `goiBaiThi`', () => {
     for (const f of goi) expect(doc(f), f).toContain('goiBaiThi(')
   })
 
+  it('trang báo cáo một em của thầy đếm câu bằng `demKetQua` dùng chung, và màn Theo dõi ca không tự đếm', () => {
+    expect(doc('src/lib/bao-cao-mot-em.ts')).toContain("import { demKetQua, soYDungPhanII } from './dem-ket-qua'")
+    expect(doc('src/lib/bao-cao-mot-em.ts')).toContain('demKetQua(rows)')
+    expect(doc('src/screens/ExamMonitorScreen.tsx')).not.toContain('BaoCaoCaThiHocSinhModal')
+  })
+
   it('không chỗ nào còn tự tính số câu sai bằng phép trừ', () => {
-    for (const f of goi) {
+    for (const f of [...goi, ...chiaSe]) {
       const t = doc(f)
       expect(t, f).not.toMatch(/Math\.max\(0,\s*caBaoCao\.tongCau\s*-\s*caBaoCao\.soCauDung\)/)
       expect(t, f).not.toMatch(/soCauSai:\s*Math\.max/)

@@ -17,7 +17,7 @@ export function chuDapAn(phan: 'I' | 'II' | 'III', dapAn: string): string {
   return [...dapAn].map((c, i) => `${'abcd'[i]} ${c === 'D' ? 'Đ' : c === 'S' ? 'S' : '–'}`).join(' · ')
 }
 
-const TEN_PHAN_DAY_DU = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng–sai', III: 'Phần III · Trả lời ngắn' } as const
+export const TEN_PHAN_DAY_DU = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng–sai', III: 'Phần III · Trả lời ngắn' } as const
 
 function TongQuan({ bc, phutDe }: { bc: BaoCaoCaLop; phutDe: number }) {
   return (
