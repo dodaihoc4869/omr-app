@@ -183,7 +183,7 @@ describe('Đoàn Hộ Tống · giao diện · Trùm câu chung', () => {
     expect(await screen.findByText('ý thứ hai')).toBeTruthy(); expect(man().dataset.man).toBe('trum')
     const the = screen.getByLabelText('Câu chung cả đội')
     expect(screen.getAllByRole('button', { name: 'Đúng' })).toHaveLength(1); expect(the.querySelectorAll('em.dh-xong')).toHaveLength(1); expect(the.querySelectorAll('em.dh-nghi')).toHaveLength(2); expect(the.textContent).not.toMatch(/"dung"|nopY/)
-    expect(screen.queryByRole('button', { name: 'Chốt ý này' })).toBeNull(); fireEvent.click(screen.getByRole('button', { name: 'Sai' })); fireEvent.click(screen.getByRole('button', { name: 'Chốt ý này' }))
+    expect((screen.getByRole('button', { name: 'Chốt ý này' }) as HTMLButtonElement).disabled).toBe(true) /* nút CÓ SẴN, khoá tới khi chọn (P0 "đáp án bị nhảy": hiện sau khi chọn làm hàng nở ra) */; fireEvent.click(screen.getByRole('button', { name: 'Sai' })); expect((screen.getByRole('button', { name: 'Chốt ý này' }) as HTMLButtonElement).disabled).toBe(false); fireEvent.click(screen.getByRole('button', { name: 'Chốt ý này' }))
     await waitFor(() => expect(call).toHaveBeenCalledWith('doan-nop-y', { ma: 'DH1', hiep: 4, y: 1, answer: 'S' }))
     expect(screen.getByRole('group', { name: 'Tín hiệu cho đồng đội' }).querySelectorAll('button')).toHaveLength(3); expect(man().querySelectorAll('input,textarea')).toHaveLength(0)
     fireEvent.click(screen.getByRole('button', { name: 'Cần bàn thêm' })); await waitFor(() => expect(call).toHaveBeenCalledWith('doan-tin-hieu', { ma: 'DH1', tinHieu: 'ban_them' }))

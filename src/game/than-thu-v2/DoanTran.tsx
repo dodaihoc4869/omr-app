@@ -5,6 +5,7 @@ import type { Question } from './core'
 import { CHIEU, HIEP_TRUM, NL_KY_NANG, CHAN, satThuongDon, type HanhDong } from './doan-core'
 import { CHU_TRANG_THAI, NHAN_CAU, TIN_HIEU_TRUM, type DoanXem, type GheXem, type KetQuaCau } from './doan-kieu'
 import DoanCau, { DeBai, duDapAn } from './DoanCau'
+import { cacAnhCuaCau, useAnhSanSang } from './anh-san-sang'
 import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh, TrumHinh } from './DoanHinh'
 import { ChemText } from '../../lib/chem-format'
 import { LoiGiaiCauSai } from '../../components/KhoiCauSai'
@@ -17,7 +18,7 @@ interface Props {
   chon: string; onChon: (v: string) => void; hanhDong: HanhDong; onHanhDong: (h: HanhDong) => void
   yChon: Record<number, 'D' | 'S'>; onYChon: (y: number, v: 'D' | 'S') => void
   onChot: (boTrong: boolean) => void; onChotY: (y: number) => void; onTinHieu: (t: string) => void; onRoi: () => void; onZoom: (src: string) => void
-  ban: boolean; loi: string; ketQuaCau?: KetQuaCau | null; cauVuaLam?: CauVuaLam | null; loiGiaiTrum?: LoiGiaiTrum | null
+  ban: boolean; dangChot?: boolean; loi: string; ketQuaCau?: KetQuaCau | null; cauVuaLam?: CauVuaLam | null; loiGiaiTrum?: LoiGiaiTrum | null
   /** Tiếp sức: xin (khi em chưa chốt) và mở tấm trượt giúp bạn (khi em đã chốt). */
   onXinTiepSuc: (bat: boolean) => void; onMoTiepSuc: (ghe: number) => void; expTiepSuc?: number
 }
@@ -54,6 +55,8 @@ function DoiHinh({ ghe }: { ghe: GheXem[] }) {
 
 export default function DoanTran(p: Props) {
   const { xem } = p, tran = xem.tran!, em = xem.ghe.find(g => g.laEm)!
+  // Ảnh của câu tải xong rồi mới dựng thẻ câu (ảnh nạp trễ đẩy lưới đáp án xuống dưới ngón tay — P0 "đáp án bị nhảy"); câu không ảnh ⇒ sẵn sàng ngay.
+  const anhCauXong = useAnhSanSang(cacAnhCuaCau(p.de)), anhTrumXong = useAnhSanSang(cacAnhCuaCau(p.deTrum))
   const mo = p.moSauGiay <= 0 && !tran.ketThuc
   const tenQuai = tran.tenQuai[tran.hiep < HIEP_TRUM[0]! ? 0 : 1] ?? 'Tạp Chất'
   const phanTramLinhTam = Math.round(tran.linhTam.hp * 100 / tran.linhTam.toiDa)
@@ -119,7 +122,9 @@ export default function DoanTran(p: Props) {
     )
   } else if (tran.laTrum) {
     const trum = xem.trum
-    than = !trum?.coCau || !p.deTrum ? (
+    than = trum?.coCau && p.deTrum && !anhTrumXong ? (
+      <section className="dh-giay" aria-label="Câu chung cả đội"><div className="dh-giay-dau"><b className="dh-vien-thuoc dh-tim">CÂU CHUNG CẢ ĐỘI</b></div><div className="dh-de" role="status">Đang tải hình của câu chung…</div></section>
+    ) : !trum?.coCau || !p.deTrum ? (
       <section className="dh-giay"><div className="dh-giay-dau"><b className="dh-vien-thuoc dh-tim">TRÙM</b></div>
         <div className="dh-de">Hiệp này không có câu chung phù hợp với cả đội. Giáp trùm sẽ vỡ theo phong độ ba hiệp vừa rồi: bạn nào tự làm đúng từ 2/3 câu thì phá được đoạn giáp của mình.</div></section>
     ) : (
@@ -135,9 +140,10 @@ export default function DoanTran(p: Props) {
                 <span><small>Ý {'abcd'[i]} · {cuaEm ? 'CỦA EM' : (giu?.ten ?? '').toUpperCase()}</small><ChemText text={y} /></span>
                 {cuaEm && !daChot ? (
                   <div className="dh-ds">
-                    <button type="button" disabled={p.ban} aria-pressed={p.yChon[i] === 'D'} onClick={() => p.onYChon(i, 'D')}>Đúng</button>
-                    <button type="button" disabled={p.ban} aria-pressed={p.yChon[i] === 'S'} onClick={() => p.onYChon(i, 'S')}>Sai</button>
-                    {p.yChon[i] && <button type="button" className="dh-chot-y" disabled={p.ban} onClick={() => p.onChotY(i)}>Chốt ý này</button>}
+                    {/* Chọn / đổi Đúng-Sai KHÔNG khoá theo lệnh đang bay; nút "Chốt ý này" CÓ SẴN (khoá tới khi chọn) — hiện SAU khi chọn thì hàng bị nở ra, đẩy các hàng dưới xuống dưới ngón tay. */}
+                    <button type="button" aria-pressed={p.yChon[i] === 'D'} onClick={() => p.onYChon(i, 'D')}>Đúng</button>
+                    <button type="button" aria-pressed={p.yChon[i] === 'S'} onClick={() => p.onYChon(i, 'S')}>Sai</button>
+                    <button type="button" className="dh-chot-y" disabled={p.ban || !p.yChon[i]} onClick={() => p.onChotY(i)}>Chốt ý này</button>
                   </div>
                 ) : <em className={daChot ? 'dh-xong' : 'dh-nghi'}>{daChot ? 'đã chốt' : giu?.laMay || giu?.roi ? 'máy đỡ' : 'đang nghĩ…'}</em>}
               </div>
@@ -148,10 +154,12 @@ export default function DoanTran(p: Props) {
     )
   } else {
     const cau = xem.cau
-    than = cau?.het || cau?.rut || !p.de ? (
+    than = !(cau?.het || cau?.rut) && p.de && !anhCauXong ? (
+      <section className="dh-giay" aria-label="Câu của em"><div className="dh-giay-dau"><b className="dh-vien-thuoc">CÂU CỦA EM</b></div><div className="dh-de" role="status">Đang tải hình của câu…</div></section>
+    ) : cau?.het || cau?.rut || !p.de ? (
       <section className="dh-giay"><div className="dh-giay-dau"><b className="dh-vien-thuoc">CÂU CỦA EM</b></div><div className="dh-de">{cau?.loiNhan ?? 'Đang tải câu của em…'}</div></section>
     ) : (
-      <DoanCau q={p.de} chon={p.chon} onChon={p.onChon} khoa={p.ban || !!cau?.daChot} ketQua={cau?.daChot ? p.ketQuaCau ?? cau.ketQua ?? null : null} onZoom={p.onZoom}
+      <DoanCau q={p.de} chon={p.chon} onChon={p.onChon} khoa={!!p.dangChot || !!cau?.daChot} ketQua={cau?.daChot ? p.ketQuaCau ?? cau.ketQua ?? null : null} onZoom={p.onZoom}
         dau={<><b className="dh-vien-thuoc">CÂU CỦA EM</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}{cau?.an ? ' · ấn đã sáng' : ''}</span></>} />
     )
   }
@@ -182,7 +190,7 @@ export default function DoanTran(p: Props) {
         ? <button type="button" className="dh-xin" aria-pressed={ts.daXin} disabled={p.ban} onClick={() => p.onXinTiepSuc(!ts.daXin)}>{ts.daXin ? 'Đang chờ bạn tiếp sức… (chạm để thôi)' : `Cần tiếp sức · còn ${ts.conLuotNhan} lần được tiếp sức`}</button>
         : <div className="dh-cho" style={{ fontSize: 12 }}>Em đã dùng hết 2 lần được tiếp sức của chuyến này — câu này em tự làm nhé.</div>)}
       <button type="button" className="dh-nut-lam" disabled={p.ban || !(du || boTrong) || !!cau?.rut && !boTrong} onClick={() => p.onChot(boTrong)}>
-        {p.ban ? 'Đang chốt…' : du ? `Chốt đòn · ${p.de!.phan === 'I' ? p.chon + ' + ' : ''}${tenDon}` : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt đòn'}
+        {p.dangChot ? 'Đang chốt…' : p.ban ? 'Chờ một chút…' : du ? `Chốt đòn · ${p.de!.phan === 'I' ? p.chon + ' + ' : ''}${tenDon}` : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt đòn'}
       </button>
     </>
   )
@@ -192,8 +200,9 @@ export default function DoanTran(p: Props) {
       <ThanhHiep hiep={tran.hiep} soHiep={tran.soHiep} ketThuc={tran.ketThuc} con={p.conGiay} giay={tran.giay} hien={mo} onRoi={p.onRoi} />
       {canh}
       {daiDoi}
-      {mo && ts?.theNhan && <div className="dh-the-nhan" role="status"><small>{ts.theNhan.tuLaMay ? 'BẠN ĐỒNG HÀNH' : ts.theNhan.tuTen.toUpperCase()} TIẾP SỨC · {ts.theNhan.tieuDe.toUpperCase()}</small>{ts.theNhan.noiDung}</div>}
       {than}
+      {/* Thẻ tiếp sức của bạn nằm DƯỚI câu: đặt trên câu thì mỗi lần bạn gửi thẻ (nhịp hỏi 1,5 s) cả lưới đáp án bị đẩy xuống dưới ngón tay em (P0 "đáp án bị nhảy"). */}
+      {mo && ts?.theNhan && <div className="dh-the-nhan" role="status"><small>{ts.theNhan.tuLaMay ? 'BẠN ĐỒNG HÀNH' : ts.theNhan.tuTen.toUpperCase()} TIẾP SỨC · {ts.theNhan.tieuDe.toUpperCase()}</small>{ts.theNhan.noiDung}</div>}
       {p.loi && <div className="dh-loi" role="alert">{p.loi}</div>}
       {duoi}
       {!mo && !tran.ketThuc && <div className="dh-cho" role="status">{tran.hiep === 1 && !xem.hiepVuaXong ? 'Chuẩn bị lên đường' : `Hiệp ${tran.hiep}${tran.laTrum ? ' · TRÙM' : ''} mở sau`} {Math.max(1, p.moSauGiay)} giây</div>}

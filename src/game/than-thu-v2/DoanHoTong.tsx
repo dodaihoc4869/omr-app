@@ -27,6 +27,9 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const [goiY, setGoiY] = useState<GoiYHomNay | null>(null), [sanh, setSanh] = useState<SanhXem | null>(null)
   const [anThach, setAnThach] = useState<AnXem | null>(null), [banDongHanh, setBanDongHanh] = useState<BanDongHanhXem | null>(null)
   const [ban, setBan] = useState(false), [loi, setLoi] = useState(''), [zoom, setZoom] = useState('')
+  // ĐANG CHỐT câu này (lệnh doan-nop đang bay). Chỉ lúc này lưới đáp án mới khoá (đáp án trên màn = đáp án đã gửi); `ban` là MỌI lệnh (tín hiệu, xin tiếp sức…) và KHÔNG được khoá lưới:
+  // mạng điện thoại 1–2 giây làm em đổi ý bấm lại bị nuốt ⇒ máy lấy đáp án bấm ĐẦU (thầy 19:24: "đáp án bị nhảy").
+  const [dangChot, setDangChot] = useState(false)
   const [chon, setChon] = useState(''), [hanhDong, setHanhDong] = useState<HanhDong>('danh'), [yChon, setYChon] = useState<Record<number, 'D' | 'S'>>({})
   const [ketQuaCau, setKetQuaCau] = useState<KetQuaCau | null>(null), [cauVuaLam, setCauVuaLam] = useState<CauVuaLam | null>(null)
   const [tungChuong, setTungChuong] = useState<KhungNhinHiep | null>(null), [loiGiaiTrum, setLoiGiaiTrum] = useState<LoiGiaiTrum | null>(null)
@@ -102,9 +105,11 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const deTrum = xem?.trum?.qid ? de.current.get(xem.trum.qid) : undefined
 
   const chot = async (boTrong: boolean) => {
-    if (!xem || !tran) return
+    if (!xem || !tran || khoa.current) return // đang có lệnh khác bay: không chốt chồng (nút chốt cũng khoá theo `ban`)
     unlockBattleAudio()
-    const r = await goi('doan-nop', boTrong ? { ma: xem.ma, hiep: tran.hiep, boTrong: true, hanhDong: 'chan' } : { ma: xem.ma, hiep: tran.hiep, answer: chon, hanhDong })
+    setDangChot(true)
+    let r: PhanHoiDoan | null = null
+    try { r = await goi('doan-nop', boTrong ? { ma: xem.ma, hiep: tran.hiep, boTrong: true, hanhDong: 'chan' } : { ma: xem.ma, hiep: tran.hiep, answer: chon, hanhDong }) } finally { if (song.current) setDangChot(false) }
     if (!r) return
     const kq = r.ketQuaCau ?? null
     // Đi một mình thì chốt xong hiệp giải NGAY và máy chủ đã sang hiệp mới: kết quả này thuộc hiệp cũ, chỉ hiện ở quãng nghỉ (cauVuaLam).
@@ -153,7 +158,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     <DoanTran xem={xem} de={deHienTai} deTrum={deTrum} conGiay={conGiay} moSauGiay={moSauGiay} chon={chon} onChon={setChon} hanhDong={hanhDong} onHanhDong={setHanhDong}
       yChon={yChon} onYChon={(y, v) => setYChon(o => ({ ...o, [y]: v }))} onChot={b => void chot(b)} onChotY={chotY} onTinHieu={t => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: t })}
       onXinTiepSuc={bat => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: bat ? 'can_tiep_suc' : '' })} onMoTiepSuc={g => void moTiepSuc(g)} expTiepSuc={expTiepSuc}
-      onRoi={() => void roi()} onZoom={setZoom} ban={ban} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum} />
+      onRoi={() => void roi()} onZoom={setZoom} ban={ban} dangChot={dangChot} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum} />
   )
 
   return createPortal(
