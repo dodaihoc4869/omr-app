@@ -255,3 +255,9 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 - [x] Bảng tin giáo viên: bản gọn (đêm hiện tại chỉ tiêu đề + số đếm vì khối đầy đủ ở ngay trên cùng màn Hôm nay; chọn ngày khác ⇒ kèm 3 dòng). Ghi chú: ExamHub gắn cả Hôm nay lẫn Bảng tin trên một màn ⇒ `teacher-news` KHÔNG cần thêm mục Bộ não (tránh trùng).
 - [x] Bằng chứng: 28 test + đột biến 14/14; tsc -b --force + build exit 0; m3-b/m3-c xanh; 3 test đỏ ở man-hoc-sinh-hoi / tim-thay-giao-bai-tap ĐÚNG như HEAD sạch (nền đỏ); ảnh 1440/390 sáng/tối, đo 0 tương phản < AA, 0 vùng chạm nhỏ, 0 tràn ngang, 0 lỗi console.
 - [ ] CHƯA thử với Worker thật (/ai/* chưa lên). Khi lên: đối chiếu tên trường thật (loai, apDung, soEmHoTro), thử Bỏ điều chỉnh + công tắc trên một em/12121212.
+
+## BTVN NÂNG ĐỠ — "Cho làm lại" từng em (904653f)
+- [x] Thầy chốt: bài cá nhân hoá KHÔNG tự cho làm lại. `HocSinhNhanBai`: bài cá nhân hoá ⇒ nút "Cho làm lại" CHỈ ở em ĐÃ NỘP (chưa thu hồi); bài QUÁ HẠN ⇒ không nút, nói "gia hạn bài rồi mới cho làm lại"; bài cũ y như trước (mọi em, /btvn/sua reset).
+- [x] `PhanCongScreen`: MỘT bước xác nhận nói thật ("Cho <tên> làm lại? Em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi; điểm mới thay điểm cũ, điểm cũ vẫn lưu trong lịch sử.") → `choLamLaiBtvn(maBtvn theo ca, sbd)` (`POST /btvn/cho-lam-lai`, lệnh của Code 3, commit 2de35c7 chưa lên Worker) → báo "Đã cho <tên> làm lại (lượt làm thứ N)…"; 404 ⇒ "Máy chủ chưa có lệnh Cho làm lại… Kết quả của em vẫn giữ nguyên"; máy chủ từ chối (quá hạn / chưa nộp / đã thay đổi…) ⇒ hiện NGUYÊN câu của máy chủ; quá hạn chờ ⇒ "CHƯA CHẮC đã cho em làm lại"; luôn tải lại danh sách.
+- [x] 11 test + đột biến 8/8; tsc -b + build exit 0; ảnh `cll-giao-{xac-nhan,ket-qua,qua-han}-*.jpg` (1440/390 sáng/tối, 10 tệp ≤ 73 KB), 0 lỗi tương phản/vùng chạm/tràn; test đỏ còn lại (`btvn-ui-1609`) thuộc nền đỏ 19/09.
+- [ ] CHƯA thử với Worker thật (lệnh chưa lên). Khi lên: thử một em đã nộp ở 12121212.
