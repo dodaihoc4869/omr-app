@@ -19,6 +19,7 @@ import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
 import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
 import {gvBangTin} from './gv-bang-tin'
 import {ghiLoiMay} from './nhat-ky-may'
+import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
 import {parentNews,refreshDailyNews} from './parent-news'
@@ -3135,6 +3136,8 @@ export default {
       if (p === '/gv/buoi-chua-de-xuat') return ra(await gvBuoiChuaDeXuat(env, b))
       // BẢNG TIN CỦA THẦY bản 3 (docs/hop-dong-bang-tin-v3-2109.md): MỘT lệnh đọc-chỉ ≤ 12 truy vấn cho cả màn Hôm nay, số liệu tính từ mốc `cau_hinh.bang_tin_tu`.
       if (p === '/gv/bang-tin') return ra(await gvBangTin(env, b))
+      // CỜ TẮT chung của các việc máy tự làm B7–B11 (thầy chỉ tắt/bật): đọc-ghi khoá `cau_hinh.tu_dong_cac_viec`.
+      if (p === '/gv/tu-dong-cac-viec') return ra(await gvTuDongCacViec(env, b))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)

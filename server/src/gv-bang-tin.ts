@@ -8,6 +8,7 @@ import { buoiCua, docCauHinhNhac, KHOA_CAU_HINH, KHOA_LAN_CHAY, lanChayKe, thuCu
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { tenLopCuaEm } from './ten-lop'
 import { tenViec } from './nhat-ky-may'
+import { docCoTuDong, KHOA_TU_DONG } from './tu-dong-cac-viec'
 
 type Dong = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -104,7 +105,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   }
 
   // 2 · cấu hình: mốc, cờ nhắc, lượt cron nhắc gần nhất
-  const rCfg = await Q.hoi("SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (?, ?, ?)", KHOA_MOC_BANG_TIN, KHOA_CAU_HINH, KHOA_LAN_CHAY)
+  const rCfg = await Q.hoi("SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (?, ?, ?, ?)", KHOA_MOC_BANG_TIN, KHOA_CAU_HINH, KHOA_LAN_CHAY, KHOA_TU_DONG)
   const cfg = new Map((rCfg ?? []).map((x) => [chuoi(x.khoa), x]))
   const { tuMs, tuDangAp } = docMocBangTin(cfg.get(KHOA_MOC_BANG_TIN)?.gia_tri, ngay)
   const dauHomNay = dauNgayMs(ngay)
@@ -112,6 +113,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const tuHomNay = iso(tuHomNayMs)
   const cfgNhac = docCauHinhNhac(cfg.get(KHOA_CAU_HINH)?.gia_tri)
   const cronNhacLuc = chuoi(cfg.get(KHOA_LAN_CHAY)?.cap_nhat_luc)
+  const coTuDong = docCoTuDong(cfg.get(KHOA_TU_DONG)?.gia_tri)
 
   // 3 · sổ học từ mốc (cửa sổ ≤ 14 ngày): (ngày, em, dạng) → số lượt đã chấm, số đúng
   const batDauSo = Math.max(tuMs, dauNgayMs(themNgay(ngay, -(SO_NGAY_CUA_SO - 1))))
@@ -391,8 +393,9 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
       canhBao.push({ nguon: 'ty_le_loai', muc: 'vang', chu: `Bộ não A.I bị loại ${so(moiNhat.so_bi_loai)}/${so(moiNhat.so_em)} lời (${Math.round(tl(moiNhat) * 100)} %), nhiều hơn hẳn các đêm trước` })
     }
   }
+  if (!coTuDong.suKhoe) canhBao.length = 0 // thầy đã tắt việc "tự canh sức khoẻ" (cờ suKhoe): không hiện cảnh báo
   canhBao.sort((a, c) => (a.muc === c.muc ? 0 : a.muc === 'do' ? -1 : 1) || (a.nguon < c.nguon ? -1 : 1))
-  const muc = canhBao.some((x) => x.muc === 'do') || soTre === 2 ? 'do' : canhBao.length > 0 ? 'vang' : 'xanh'
+  const muc = !coTuDong.suKhoe ? 'xanh' : canhBao.some((x) => x.muc === 'do') || soTre === 2 ? 'do' : canhBao.length > 0 ? 'vang' : 'xanh'
   const sucKhoe: Dong = {
     muc, chu: `${chuBoNao} · ${chuCron}`, canhBao,
     ...(Number.isFinite(boNaoLuc) ? { boNaoChayLuc: iso(boNaoLuc) } : {}),
