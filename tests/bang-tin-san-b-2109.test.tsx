@@ -2,6 +2,7 @@
 // nhãn giá bám giá trị hiện tại, "còn mm:ss", nhãn giờ, màu nến xanh/đỏ theo tăng/giảm, nội suy giữa hai lần hỏi (không bịa nến), giảm chuyển động, thiếu nến ⇒ ẩn, chú giải rõ "tỉ lệ đúng trong 5 phút".
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
+import { datKhungGia } from './_khung-gia-2109'
 import fs from 'node:fs'
 import path from 'node:path'
 import { kiemTraKhop, phay, conLai, gioPhutMs } from '../src/lib/bang-tin-san/trang-thai'
@@ -186,14 +187,13 @@ describe('NenHoc — khối', () => {
   })
 
   it('giảm chuyển động ⇒ KHÔNG chạy vòng requestAnimationFrame; cho phép chuyển động ⇒ có', () => {
-    const rAF = vi.spyOn(window, 'requestAnimationFrame')
+    const khung = datKhungGia()
     const nen = nenGia()
     const a = render(<NenHoc nen={nen} nowMs={NAY} mau={MAU} phienBanMau={1} itDong />)
-    expect(rAF).not.toHaveBeenCalled()
+    expect(khung.soXin()).toBe(0)
     a.unmount()
     render(<NenHoc nen={nen} nowMs={NAY} mau={MAU} phienBanMau={1} itDong={false} />)
-    expect(rAF).toHaveBeenCalled()
-    rAF.mockRestore()
+    expect(khung.soXin()).toBeGreaterThan(0)
   })
 
   it('chú giải nói RÕ "tỉ lệ đúng trong 5 phút" (không lẫn ô "Tỉ lệ đúng" cả ngày) + xanh/đỏ/cột/đường mảnh', () => {

@@ -1,7 +1,8 @@
 // BẢNG TIN KIỂU SÀN GIAO DỊCH · cụm (a): khung + bốn ô số + băng chạy (Boss giao 21/09; đề bài prompt-bang-tin-san-2109.md).
 // Khoá: MỘT nguồn trạng thái (số các khối KHỚP nhau) · khối thiếu ⇒ ẩn · số lăn kiểu công-tơ · chip chênh 10 phút · băng chạy chỉ nhận tin thật, không bịa · nút Sáng/Tối dùng cơ chế sẵn có ·
 // mọi lớp `bts-` có định nghĩa CSS, màu chỉ qua token (sáng + tối), chữ ≥ 12 px.
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { datKhungGia } from './_khung-gia-2109'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -22,7 +23,9 @@ beforeEach(() => {
   try { localStorage.removeItem(KHOA_GIAO_DIEN) } catch { /* không có localStorage */ }
   document.documentElement.removeAttribute('data-giao-dien')
 })
-afterEach(() => cleanup())
+let khung = datKhungGia()
+beforeEach(() => { khung = datKhungGia() })
+afterEach(() => { cleanup(); vi.unstubAllGlobals() })
 
 describe('dữ liệu giả có hạt giống — đúng hợp đồng và KHỚP nhau', () => {
   it('cùng hạt giống ⇒ cùng dữ liệu; hạt giống khác ⇒ khác', () => {
@@ -130,7 +133,7 @@ describe('SoLan — số lăn kiểu công-tơ', () => {
     expect(container.querySelector('.bts-cs')).toBeNull()
     expect(container.querySelector('.bts-kt')!.textContent).toBe('—')
     expect(container.querySelector('.bts-so-lan')!.className).not.toContain('bts-so-lan--chay')
-    await act(async () => { await new Promise((r) => requestAnimationFrame(() => r(null))) })
+    await khung.chay(1)
     expect(container.querySelector('.bts-so-lan')!.className).toContain('bts-so-lan--chay')
   })
 })
@@ -291,7 +294,7 @@ describe('BangChay — chỉ nhận tin thật, không bịa', () => {
     expect((container.querySelector('.bts-bang-day') as HTMLElement).style.transform).toBe('')
     unmount()
     const { container: c2 } = render(<BangChay tin={[tin(3), tin(2)]} itDong={false} />)
-    await act(async () => { await new Promise((r) => setTimeout(r, 60)) })
+    await khung.chay(2)
     expect((c2.querySelector('.bts-bang-day') as HTMLElement).style.transform).toMatch(/^translate3d\(/)
   })
 })
@@ -300,7 +303,7 @@ describe('BangChay — đổi sang giảm chuyển động giữa chừng', () =
   it('đang chạy mà bật "giảm chuyển động" ⇒ băng về vị trí gốc và đứng yên', async () => {
     const tin: TinSan[] = [{ luc: NAY, loai: 'len', chu: 'A', phu: 'x' }, { luc: NAY + 1, loai: 'cham', chu: 'B' }]
     const { container, rerender } = render(<BangChay tin={tin} itDong={false} />)
-    await act(async () => { await new Promise((r) => setTimeout(r, 60)) })
+    await khung.chay(2)
     const day = container.querySelector('.bts-bang-day') as HTMLElement
     expect(day.style.transform).toMatch(/^translate3d\(/)
     rerender(<BangChay tin={tin} itDong />)

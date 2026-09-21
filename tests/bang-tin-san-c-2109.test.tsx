@@ -192,12 +192,20 @@ vi.mock('../src/components/bang-tin-san/ban-do-3d-three', () => ({
 describe('BanDo3D — điều phối', () => {
   let BanDo3D: typeof import('../src/components/bang-tin-san/BanDo3D').BanDo3D
   const dsLop = () => taoDuLieuGia(NAY).theoLop!
+  // Đồng hồ khung hình GIẢ: vòng vẽ chỉ chạy khi test gọi chayKhung(n) — không phụ thuộc requestAnimationFrame / timer thật (máy tải nặng không làm test đỏ oan)
+  let hangDoi: Array<[number, FrameRequestCallback]> = []
+  let idKhung = 0
+  let dongHo = 0
+  const chayKhung = (n = 1) => act(() => { for (let k = 0; k < n; k++) { const ds = hangDoi; hangDoi = []; dongHo += 16; ds.forEach(([, cb]) => cb(dongHo)) } })
   const hop = (w = 400, h = 300) => {
     Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, get: () => w })
     Object.defineProperty(HTMLElement.prototype, 'clientHeight', { configurable: true, get: () => h })
   }
   beforeEach(async () => {
     vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} })
+    hangDoi = []; idKhung = 0; dongHo = performance.now()
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => { hangDoi.push([++idKhung, cb]); return idKhung })
+    vi.stubGlobal('cancelAnimationFrame', (id: number) => { hangDoi = hangDoi.filter(([i]) => i !== id) })
     for (const f of Object.values(fake.ban)) if (typeof f === 'function' && 'mockClear' in f) (f as ReturnType<typeof vi.fn>).mockClear()
     fake.taoBan3D.mockClear()
     fake.taoBan3D.mockImplementation(() => fake.ban as unknown)
@@ -216,6 +224,7 @@ describe('BanDo3D — điều phối', () => {
   const dung = async (o: { lop?: readonly LopSan[]; itDong?: boolean } = {}) => {
     const r = render(<BanDo3D lop={o.lop ?? dsLop()} mau={MAU} phienBanMau={1} itDong={o.itDong ?? true} />)
     await waitFor(() => expect(r.container.querySelector('[data-kieu]')!.getAttribute('data-kieu')).not.toBe('cho'))
+    await act(async () => {}) // xả nốt hiệu ứng thụ động (vòng vẽ) — không đoán theo thời gian
     return r
   }
 
@@ -270,26 +279,29 @@ describe('BanDo3D — điều phối', () => {
   })
 
   it('giảm chuyển động ⇒ vẽ TĨNH (buoc với itDong = true, không xoay), KHÔNG chạy vòng requestAnimationFrame', async () => {
-    const rAF = vi.spyOn(window, 'requestAnimationFrame')
     await dung({ itDong: true })
     expect(fake.ban.buoc).toHaveBeenCalled()
     expect(fake.ban.buoc.mock.calls.every((c) => c[2] === true && c[1] === false)).toBe(true)
-    expect(rAF).not.toHaveBeenCalled()
-    rAF.mockRestore()
+    await chayKhung(3) // dù "qua" vài khung, không có vòng nào được xin
+    expect(idKhung).toBe(0) // không một lần requestAnimationFrame
+    expect(hangDoi).toHaveLength(0)
   })
 
   it('cho phép chuyển động ⇒ có vòng vẽ, camera xoay; RÊ CHUỘT ⇒ dừng xoay; rời chuột ⇒ xoay lại', async () => {
     const { container } = await dung({ itDong: false })
-    await waitFor(() => expect(fake.ban.buoc.mock.calls.length).toBeGreaterThan(2))
+    await chayKhung(3)
+    expect(fake.ban.buoc.mock.calls.length).toBe(3) // mỗi khung một lần vẽ
     expect(fake.ban.buoc.mock.calls.at(-1)![1]).toBe(true) // đang xoay
     const ve = container.querySelector('.bts-hop-3d')!
     fireEvent.pointerMove(ve, { clientX: 50, clientY: 60 })
     const n = fake.ban.buoc.mock.calls.length
-    await waitFor(() => expect(fake.ban.buoc.mock.calls.length).toBeGreaterThan(n + 2))
+    await chayKhung(3)
+    expect(fake.ban.buoc.mock.calls.length).toBe(n + 3)
     expect(fake.ban.buoc.mock.calls.at(-1)![1]).toBe(false) // dừng xoay
     fireEvent.pointerLeave(ve)
     const n2 = fake.ban.buoc.mock.calls.length
-    await waitFor(() => expect(fake.ban.buoc.mock.calls.length).toBeGreaterThan(n2 + 2))
+    await chayKhung(3)
+    expect(fake.ban.buoc.mock.calls.length).toBe(n2 + 3)
     expect(fake.ban.buoc.mock.calls.at(-1)![1]).toBe(true)
   })
 
@@ -316,14 +328,20 @@ describe('BanDo3D — điều phối', () => {
 
   it('tab ẩn ⇒ vòng vẽ NGỪNG (không gọi buoc thêm); hiện lại ⇒ chạy tiếp', async () => {
     await dung({ itDong: false })
-    await waitFor(() => expect(fake.ban.buoc).toHaveBeenCalled())
+    await chayKhung(2)
+    expect(fake.ban.buoc).toHaveBeenCalled()
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => true })
-    await act(async () => { await new Promise((r) => setTimeout(r, 40)) })
-    const n = fake.ban.buoc.mock.calls.length
-    await act(async () => { await new Promise((r) => setTimeout(r, 80)) })
-    expect(fake.ban.buoc.mock.calls.length).toBe(n)
-    Object.defineProperty(document, 'hidden', { configurable: true, get: () => false })
-    await waitFor(() => expect(fake.ban.buoc.mock.calls.length).toBeGreaterThan(n))
+    try {
+      await chayKhung(1)
+      const n = fake.ban.buoc.mock.calls.length
+      await chayKhung(5)
+      expect(fake.ban.buoc.mock.calls.length).toBe(n)
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => false })
+      await chayKhung(1)
+      expect(fake.ban.buoc.mock.calls.length).toBeGreaterThan(n)
+    } finally {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => false })
+    }
   })
 
   it('rời màn ⇒ GIẢI PHÓNG WebGL đúng một lần và gỡ canvas; mất ngữ cảnh WebGL ⇒ giải phóng rồi lùi 2D bằng canvas MỚI', async () => {

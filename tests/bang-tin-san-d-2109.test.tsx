@@ -3,6 +3,7 @@
 // dẫn đầu (hạng trượt, mũi tên, chạm tên) · em cần để ý (mức) · cột A.I (số nhảy, không vẽ 0 giả) · số KHỚP nhau · thiếu khối ⇒ ẩn.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react'
+import { datKhungGia } from './_khung-gia-2109'
 import fs from 'node:fs'
 import path from 'node:path'
 import { taoDuLieuGia } from '../src/lib/bang-tin-san/mau-gia'
@@ -26,7 +27,8 @@ const bai = (o: Partial<BaiTapBangTin> = {}): BaiTapBangTin => ({ ma: 'B1', ten:
 const em = (sbd: string, hoTen: string, lop: string, soCau: number, soCauDung = soCau, dangVap = false): EmNhiet => ({ sbd, hoTen, lop, soCau, soCauDung, dangVap })
 const lop = (ten: string, siSo: number, daHoc: number, soCau = 0, dung = 0): LopSan => ({ lop: ten, siSo, daHoc, soCau, soCauDung: dung })
 
-beforeEach(() => { vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} }) })
+let khung = datKhungGia()
+beforeEach(() => { vi.stubGlobal('ResizeObserver', class { observe() {} disconnect() {} }); khung = datKhungGia() })
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 describe('conLaiHan — đếm ngược tới hạn nộp', () => {
@@ -243,12 +245,12 @@ describe('BanDoNhiet — khối', () => {
 
   it('lần vẽ ĐẦU không lóe ô nào (chỉ có viền vấp đỏ); có em LÀM THÊM câu ⇒ lần vẽ kế có vòng sáng quanh em ấy', async () => {
     const { rerender, ve } = dung({ itDong: false })
-    await act(async () => { await new Promise((r) => setTimeout(r, 10)) })
+    await khung.chay(1)
     expect(dem.kieu.length).toBeGreaterThanOrEqual(1)
     expect(dem.kieu.every((k) => k === MAU.do)).toBe(true) // toàn bộ nét vẽ đầu = viền vấp
     expect(vong()).toBe(0)
     rerender(ve(nhiet.map((e) => (e.sbd === '1' ? { ...e, soCau: 41, soCauDung: 31 } : e)))) // em 1 vừa làm thêm
-    await act(async () => { await new Promise((r) => setTimeout(r, 30)) })
+    await khung.chay(2)
     expect(vong()).toBeGreaterThan(0)
   })
 
@@ -403,9 +405,10 @@ describe('CotAI — A.I Đỗ Đại Học đã tự làm', () => {
     const { container, rerender } = render(<CotAI bt={b} />)
     expect(container.querySelector('.bts-vua')).toBeNull()
     rerender(<CotAI bt={{ ...b, mayDaLam: b.mayDaLam.map((v) => (v.loai === 'on_lai' ? { ...v, so: 129, chu: 'Đưa 129 câu sai về lịch ôn lại' } : v)) }} />)
-    expect(container.querySelectorAll('.bts-vua').length).toBeGreaterThanOrEqual(0)
+    expect(container.querySelectorAll('.bts-vua').length).toBeGreaterThan(0) // vừa đổi ⇒ đang nháy
     expect(container.querySelector('.bts-ai-ds li')!.textContent).toBe('Đưa 129 câu sai về lịch ôn lại')
-    await waitFor(() => expect(container.querySelector('.bts-vua')).toBeNull())
+    await khung.chay(2) // tắt sau HAI khung hình (khung giả, không đoán theo thời gian)
+    expect(container.querySelector('.bts-vua')).toBeNull()
   })
   it('KHÔNG vẽ 0 giả: Bộ não thiếu số nào bỏ số ấy; không Bộ não ⇒ không khối; không dạng vấp / không việc / không sức khoẻ ⇒ bỏ khối ấy', () => {
     const b = goc()
