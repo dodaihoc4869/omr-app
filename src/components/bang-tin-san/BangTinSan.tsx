@@ -27,6 +27,9 @@ export interface BangTinSanProps {
   matKetNoi?: boolean
 }
 
+/** Khung màn (px) dưới mức này là điện thoại: nến không vẽ lưới (thầy 21/09). Màn rộng giữ lưới, mờ đúng token. */
+export const DIEN_THOAI_RONG = 640
+
 export default function BangTinSan({ du, nayMs, onMoEm = () => {}, matKetNoi = false }: BangTinSanProps) {
   const goc = useRef<HTMLElement>(null)
   const { mau, phienBan } = useMauSan(goc)
@@ -35,6 +38,7 @@ export default function BangTinSan({ du, nayMs, onMoEm = () => {}, matKetNoi = f
   const so = useMemo(() => chotSo(du), [du])
   const ktGoc = useKichThuoc(goc)
   const motMan = useMotMan() && ktGoc.w >= 980 // MỘT MÀN không cuộn: cửa sổ đủ cao và khung đủ rộng (khớp `data-mot-man` ở CSS)
+  const dienThoai = ktGoc.w > 0 && ktGoc.w < DIEN_THOAI_RONG // điện thoại: nến KHÔNG vẽ lưới ngang / dọc
   const tia = du.tia
 
   const tiLe = so.tiLeDung
@@ -98,7 +102,7 @@ export default function BangTinSan({ du, nayMs, onMoEm = () => {}, matKetNoi = f
       </section>
       {((du.nen?.length ?? 0) > 0 || (du.theoLop?.length ?? 0) > 0) && (
         <section className="bts-hang-chinh" data-khoi="hang-chinh">
-          {(du.nen?.length ?? 0) > 0 && <NenHoc nen={du.nen!} nowMs={now} mau={mau} phienBanMau={phienBan} itDong={itDong} />}
+          {(du.nen?.length ?? 0) > 0 && <NenHoc nen={du.nen!} nowMs={now} mau={mau} phienBanMau={phienBan} itDong={itDong} dienThoai={dienThoai} />}
           {(du.theoLop?.length ?? 0) > 0 && <BanDo3D lop={du.theoLop!} mau={mau} phienBanMau={phienBan} itDong={itDong} />}
         </section>
       )}

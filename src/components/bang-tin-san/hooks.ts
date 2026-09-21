@@ -41,10 +41,16 @@ export function useMauSan(goc: RefObject<HTMLElement | null>): { mau: MauSan; ph
       if (!el) return
       const cs = getComputedStyle(el)
       const mau = Object.fromEntries(TEN_MAU.map((k) => [k, cs.getPropertyValue(`--bts-${k}`).trim()])) as MauSan
-      setTrang((t) => ({ mau, phienBan: t.phienBan + 1 }))
+      // không đổi màu nào ⇒ giữ nguyên (khỏi vẽ lại canvas vô ích)
+      setTrang((t) => (t.phienBan > 0 && TEN_MAU.every((k) => t.mau[k] === mau[k]) ? t : { mau, phienBan: t.phienBan + 1 }))
     }
     doc()
-    const mo = new MutationObserver(doc)
+    // đổi giao diện: đọc ngay và đọc LẠI sau hai khung hình (điều kiện media / CSS nạp muộn có thể được tính lại sau lần đọc đầu)
+    const sau = () => {
+      doc()
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => requestAnimationFrame(doc))
+    }
+    const mo = new MutationObserver(sau)
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-giao-dien', 'class', 'style'] })
     const mq = typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: dark)') : null
     mq?.addEventListener?.('change', doc)

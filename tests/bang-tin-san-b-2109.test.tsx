@@ -41,6 +41,25 @@ function canvasGia(w = 700, h = 300) {
 const hienMoi = () => ({ c: 0, h: 0, l: 0, v: 0, yMin: 0, yMax: 0, vMax: 0, soNen: -1, batDau: 0 })
 const chuoiNen = (n: number, dong = 86): NenSan[] => Array.from({ length: n }, (_, i) => nenMau(dong - 0.2, dong, 12 * 3_600_000 - 7 * 3_600_000 + i * NEN_MS))
 
+describe('veNen — lưới ngang / dọc chỉ ở màn rộng (điện thoại KHÔNG vẽ lưới; thầy 21/09)', () => {
+  it('mặc định có lưới: nét vẽ đúng màu token lưới (ngang lẫn dọc); coLuoi = false ⇒ KHÔNG nét nào màu lưới, vẫn đủ nhãn trục % + nhãn giờ + nhãn giá', () => {
+    const co = canvasGia()
+    veNen(co.cv, chuoiNen(30), NAY, hienMoi(), MAU, 0, true, 0)
+    expect(co.stroke.filter((c) => c === MAU.luoi).length).toBeGreaterThan(3) // vài đường ngang + vài đường dọc
+    const khong = canvasGia()
+    veNen(khong.cv, chuoiNen(30), NAY, hienMoi(), MAU, 0, true, 0, false)
+    expect(khong.stroke.filter((c) => c === MAU.luoi)).toHaveLength(0)
+    const chuCo = co.chu.map((c) => c.t).sort()
+    const chuKhong = khong.chu.map((c) => c.t).sort()
+    expect(chuKhong).toEqual(chuCo) // mọi nhãn (trục %, giờ, giá, còn mm:ss) không mất
+    expect(chuKhong.some((t) => /^\d\d:\d\d$/.test(t))).toBe(true)
+    expect(chuKhong.some((t) => /^\d+ %$/.test(t))).toBe(true)
+    // vạch còn lại (viền vạch ngăn, đường giá hiện tại, nến, đường mảnh) không bị mất theo lưới
+    expect(khong.stroke.length).toBeGreaterThan(0)
+    expect(co.stroke.length - khong.stroke.length).toBe(co.stroke.filter((c) => c === MAU.luoi).length)
+  })
+})
+
 describe('veNen — những gì THẬT SỰ được vẽ', () => {
   it('không có nến hoặc hộp chưa có kích thước ⇒ trả false, không vẽ gì', () => {
     const { cv, chu } = canvasGia()

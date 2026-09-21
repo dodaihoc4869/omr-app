@@ -35,7 +35,8 @@ interface Hien {
 }
 
 /** Vẽ MỘT khung hình. `dt` giây kể từ khung trước (0 = vẽ tĩnh); `hien` là trạng thái nội suy (đổi tại chỗ). Trả về `false` nếu hộp chưa có kích thước. */
-export function veNen(cv: HTMLCanvasElement, nen: readonly NenSan[], nowMs: number, hien: Hien, mau: MauSan, dt: number, itDong: boolean, nhipMs: number): boolean {
+/** `coLuoi = false` (điện thoại): KHÔNG vẽ lưới ngang / dọc (thầy 21/09 — vạch lưới đè lên nến trên màn nhỏ); vẫn giữ nhãn trục %, nhãn giờ, đường giá hiện tại. */
+export function veNen(cv: HTMLCanvasElement, nen: readonly NenSan[], nowMs: number, hien: Hien, mau: MauSan, dt: number, itDong: boolean, nhipMs: number, coLuoi = true): boolean {
   const k0 = chuanBiCanvas(cv)
   if (!k0 || nen.length === 0) return false
   const { ctx, w, h } = k0
@@ -103,11 +104,13 @@ export function veNen(cv: HTMLCanvasElement, nen: readonly NenSan[], nowMs: numb
   for (let v = Math.ceil(hien.yMin / buoc) * buoc; v <= hien.yMax; v += buoc) {
     const y = Math.round(Y(v)) + 0.5
     if (y < pT + 4 || y > pT + giaH - 2) continue
-    ctx.strokeStyle = mau.luoi
-    ctx.beginPath()
-    ctx.moveTo(pL, y)
-    ctx.lineTo(pL + plotW, y)
-    ctx.stroke()
+    if (coLuoi) {
+      ctx.strokeStyle = mau.luoi
+      ctx.beginPath()
+      ctx.moveTo(pL, y)
+      ctx.lineTo(pL + plotW, y)
+      ctx.stroke()
+    }
     if (Math.abs(y - yG) > 14 && Math.abs(y - yC) > 10) {
       ctx.fillStyle = mau['chu-mo']
       ctx.fillText(`${v} %`, pL + plotW + 8, y)
@@ -120,11 +123,13 @@ export function veNen(cv: HTMLCanvasElement, nen: readonly NenSan[], nowMs: numb
     if (n.tu % moiMoc) return
     const x = Math.round(X(i)) + 0.5
     if (x < pL + 18) return
-    ctx.strokeStyle = mau.luoi
-    ctx.beginPath()
-    ctx.moveTo(x, pT)
-    ctx.lineTo(x, pT + plotH)
-    ctx.stroke()
+    if (coLuoi) {
+      ctx.strokeStyle = mau.luoi
+      ctx.beginPath()
+      ctx.moveTo(x, pT)
+      ctx.lineTo(x, pT + plotH)
+      ctx.stroke()
+    }
     ctx.fillStyle = mau['chu-mo']
     ctx.fillText(gioPhutMs(n.tu), x, h - 8)
   })
@@ -213,20 +218,20 @@ export function veNen(cv: HTMLCanvasElement, nen: readonly NenSan[], nowMs: numb
   return true
 }
 
-export function NenHoc({ nen, nowMs, mau, phienBanMau, itDong }: { nen: readonly NenSan[]; nowMs: number; mau: MauSan; phienBanMau: number; itDong: boolean }) {
+export function NenHoc({ nen, nowMs, mau, phienBanMau, itDong, dienThoai = false }: { nen: readonly NenSan[]; nowMs: number; mau: MauSan; phienBanMau: number; itDong: boolean; dienThoai?: boolean }) {
   const hopRef = useRef<HTMLDivElement>(null)
   const cvRef = useRef<HTMLCanvasElement>(null)
   const kt = useKichThuoc(hopRef)
   const hien = useRef<Hien>({ c: 0, h: 0, l: 0, v: 0, yMin: 0, yMax: 0, vMax: 0, soNen: -1, batDau: 0 })
-  const tuoi = useRef({ nen, nowMs, mau, itDong })
-  tuoi.current = { nen, nowMs, mau, itDong }
+  const tuoi = useRef({ nen, nowMs, mau, itDong, dienThoai })
+  tuoi.current = { nen, nowMs, mau, itDong, dienThoai }
   const cuoi = nen[nen.length - 1]
 
   // vẽ tĩnh khi dữ liệu / màu / kích thước / giờ đổi
   useEffect(() => {
     const cv = cvRef.current
-    if (cv) veNen(cv, nen, nowMs, hien.current, mau, 0, itDong, 0)
-  }, [nen, nowMs, mau, phienBanMau, itDong, kt.w, kt.h])
+    if (cv) veNen(cv, nen, nowMs, hien.current, mau, 0, itDong, 0, !dienThoai)
+  }, [nen, nowMs, mau, phienBanMau, itDong, dienThoai, kt.w, kt.h])
 
   // nội suy mượt + vòng nhấp nháy: chỉ khi được phép chuyển động và tab đang hiện
   useEffect(() => {
@@ -238,7 +243,7 @@ export function NenHoc({ nen, nowMs, mau, phienBanMau, itDong }: { nen: readonly
       truoc = t
       const cv = cvRef.current
       const s = tuoi.current
-      if (cv && !document.hidden) veNen(cv, s.nen, s.nowMs, hien.current, s.mau, dt, s.itDong, t)
+      if (cv && !document.hidden) veNen(cv, s.nen, s.nowMs, hien.current, s.mau, dt, s.itDong, t, !s.dienThoai)
       id = requestAnimationFrame(buoc)
     }
     id = requestAnimationFrame(buoc)

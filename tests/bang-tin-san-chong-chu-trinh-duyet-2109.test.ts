@@ -76,3 +76,87 @@ describe('Bảng tin sàn trong Chromium thật — không chồng chữ, không
     }
   }
 })
+
+// ── LƯỚI NẾN + TOKEN TỐI khi thầy ép bằng nút (thầy báo 21/09: máy sáng + bấm Tối mà vạch lưới nến vẫn SÁNG, đè lên nến trên điện thoại) ──
+import fs from 'node:fs'
+const TOKEN_TOI = (() => {
+  const css = fs.readFileSync('src/styles/tokens.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+  const m = /:root\[data-giao-dien='toi'\]\s*\{([^}]*)\}/.exec(css)!
+  return Object.fromEntries([...m[1]!.matchAll(/(--bts-[a-z0-9-]+)\s*:\s*([^;]+);/g)].map((x) => [x[1]!, x[2]!.trim()]))
+})()
+const LUOI_SANG = '#eaeef3'
+const LUOI_TOI = TOKEN_TOI['--bts-luoi']!
+
+async function mo(rong: number, cao: number, os: 'light' | 'dark') {
+  const ctx = await trinhDuyet.newContext({ viewport: { width: rong, height: cao }, colorScheme: os, deviceScaleFactor: 1 })
+  const trang = await ctx.newPage()
+  await trang.addInitScript('window.__name = window.__name || ((f) => f)')
+  await trang.addInitScript(() => {
+    const w = window as unknown as { __net: string[] }
+    w.__net = []
+    const stroke = CanvasRenderingContext2D.prototype.stroke
+    CanvasRenderingContext2D.prototype.stroke = function (this: CanvasRenderingContext2D) {
+      if (this.canvas.closest('[data-khoi="nen"]')) w.__net.push(String(this.strokeStyle))
+      return stroke.apply(this)
+    } as typeof stroke
+  })
+  await trang.goto(`${goc}/tests/_trinh-duyet-bts/bts.html?vo=0`, { waitUntil: 'networkidle' })
+  await trang.waitForSelector('[data-khoi="nen"] canvas')
+  await trang.waitForTimeout(700)
+  const netSauKhi = async () => {
+    await trang.evaluate(() => { (window as unknown as { __net: string[] }).__net = [] })
+    await trang.waitForTimeout(600)
+    return trang.evaluate(() => [...new Set((window as unknown as { __net: string[] }).__net)])
+  }
+  const token = (k: string) => trang.evaluate((t) => getComputedStyle(document.querySelector('.bts-san')!).getPropertyValue(t).trim(), k)
+  return { ctx, trang, netSauKhi, token }
+}
+
+describe('nến + token khi thầy ÉP Tối trên máy SÁNG', () => {
+  it('máy sáng, "theo máy" ⇒ lưới vẽ màu SÁNG; đặt data-giao-dien="toi" KHÔNG qua viết lại media ⇒ MỌI token --bts-* thành bản tối ngay và lưới đổi sang màu tối (không còn vạch sáng)', async () => {
+    const t = await mo(1280, 800, 'light')
+    expect(await t.token('--bts-luoi')).toBe(LUOI_SANG)
+    expect(await t.netSauKhi()).toContain(LUOI_SANG)
+    await t.trang.evaluate(() => document.documentElement.setAttribute('data-giao-dien', 'toi')) // cố ý KHÔNG gọi datGiaoDien: không viết lại @media
+    await t.trang.waitForTimeout(300)
+    for (const [k, v] of Object.entries(TOKEN_TOI)) expect(await t.token(k), k).toBe(v)
+    const net = await t.netSauKhi()
+    expect(net).toContain(LUOI_TOI)
+    expect(net).not.toContain(LUOI_SANG)
+    await t.ctx.close()
+  }, 120_000)
+  it('bấm nút "Tối" thật (máy sáng) ở màn rộng ⇒ lưới vẫn CÓ nhưng MỜ đúng token tối; ép Sáng khi máy tối ⇒ lưới sáng', async () => {
+    const t = await mo(1280, 800, 'light')
+    await t.trang.getByRole('button', { name: 'Tối' }).click()
+    await t.trang.waitForTimeout(300)
+    expect(await t.token('--bts-luoi')).toBe(LUOI_TOI)
+    const net = await t.netSauKhi()
+    expect(net).toContain(LUOI_TOI)
+    expect(net).not.toContain(LUOI_SANG)
+    await t.ctx.close()
+    const s = await mo(1280, 800, 'dark')
+    await s.trang.getByRole('button', { name: 'Sáng' }).click()
+    await s.trang.waitForTimeout(300)
+    expect(await s.token('--bts-luoi')).toBe(LUOI_SANG)
+    const netS = await s.netSauKhi()
+    expect(netS).toContain(LUOI_SANG)
+    expect(netS).not.toContain(LUOI_TOI)
+    await s.ctx.close()
+  }, 120_000)
+  it('ĐIỆN THOẠI (390 px): nến KHÔNG vẽ lưới ngang / dọc — ở cả sáng lẫn tối, kể cả máy sáng + bấm Tối; nhãn trục % và giờ vẫn có', async () => {
+    for (const os of ['light', 'dark'] as const) {
+      const t = await mo(390, 844, os)
+      expect(await t.trang.evaluate(() => document.querySelector('[data-khoi="nen"]')!.getBoundingClientRect().width)).toBeLessThan(640)
+      let net = await t.netSauKhi()
+      expect(net, `${os}: có nét vẽ lưới`).not.toContain(LUOI_SANG)
+      expect(net).not.toContain(LUOI_TOI)
+      await t.trang.getByRole('button', { name: 'Tối' }).click()
+      await t.trang.waitForTimeout(300)
+      net = await t.netSauKhi()
+      expect(net, `${os} + bấm Tối: có nét vẽ lưới`).not.toContain(LUOI_SANG)
+      expect(net).not.toContain(LUOI_TOI)
+      expect(await t.trang.evaluate(() => (document.querySelector('[data-khoi="nen"]') as HTMLElement).innerText)).toMatch(/Nhịp học trực tiếp/)
+      await t.ctx.close()
+    }
+  }, 120_000)
+})
