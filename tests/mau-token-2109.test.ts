@@ -2,6 +2,7 @@
 // BangVinhDanh.css/.tsx (bốn màu Vinh danh). Khoá cho khỏi lộn lại; giá trị nằm ở src/styles/tokens.css và được khoá ở đó.
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { spawnSync } from 'node:child_process'
 import { it, expect } from 'vitest'
 
 const doc = (t: string) => readFileSync(resolve(__dirname, '..', t), 'utf8')
@@ -19,4 +20,16 @@ it('tokens.css giữ đúng bảng slate ấm và `@theme` của index.css trỏ
   }
   expect(tk).toContain('--chu-o-gio-toi: #f1f5f9;')
   expect(tk).toContain('--loi-giai-nen: #fff8e9;')
+})
+
+it('check-mau.mjs: ngoại lệ ĐÓNG cho tranh vẽ của game — đúng 7 tệp, đủ đường dẫn, không glob; lệnh kiểm màu thoát 0', () => {
+  const gs = doc('scripts/check-mau.mjs')
+  const game = [...gs.matchAll(/^\s*'(game\/[^']+)',\s*$/gm)].map((m) => m[1])
+  expect(game.sort()).toEqual([
+    'game/than-thu-v2/EscortRoom.tsx', 'game/than-thu-v2/ImmortalShield.tsx', 'game/than-thu-v2/LinhTam.tsx', 'game/than-thu-v2/ProgressChart.tsx',
+    'game/than-thu-v2/escort.css', 'game/than-thu-v2/game.css', 'game/than-thu-v2/progress-chart.css',
+  ])
+  for (const g of game) expect(g).not.toMatch(/[*?]/)
+  const r = spawnSync(process.execPath, ['scripts/check-mau.mjs'], { cwd: resolve(__dirname, '..'), encoding: 'utf8' })
+  expect(r.status, r.stdout.slice(-300)).toBe(0)
 })

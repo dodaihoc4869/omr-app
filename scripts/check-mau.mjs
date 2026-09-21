@@ -24,6 +24,16 @@ const CHO_PHEP = new Set([
   'lib/experiments/render.ts',
   'lib/experiments/scene.ts',
   'screens/exam-setup.css',
+  // BẢNG MÀU TRANH VẼ / NỀN TỐI CỐ ĐỊNH CỦA GAME (Boss duyệt 21/09): đất, cát, biển, thần thú, khiên, vòng EXP… là TRANH nên KHÔNG đổi theo nền
+  // sáng/tối của app (~330 mã, hơn 250 màu riêng — không thể thành token mà vẫn đọc được). Ngoại lệ ĐÓNG: đúng 7 tệp, liệt kê đủ đường dẫn, KHÔNG glob.
+  // Chữ/nút/nền GIAO DIỆN MỚI trong các tệp này VẪN phải dùng token (biến ở tokens.css); chỉ phần tranh mới được giữ mã màu thô.
+  'game/than-thu-v2/game.css',
+  'game/than-thu-v2/escort.css',
+  'game/than-thu-v2/progress-chart.css',
+  'game/than-thu-v2/EscortRoom.tsx',
+  'game/than-thu-v2/LinhTam.tsx',
+  'game/than-thu-v2/ImmortalShield.tsx',
+  'game/than-thu-v2/ProgressChart.tsx',
 ])
 const HEX = /#[0-9a-fA-F]{3,8}\b/g
 // bỏ qua: id URL fragment kiểu "#root", tham chiếu React key… — chỉ bắt chuỗi hex thuần
