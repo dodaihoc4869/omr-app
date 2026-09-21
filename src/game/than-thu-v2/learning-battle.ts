@@ -9,7 +9,7 @@ export function learningBattle(answers:BattleAnswer[],total:number){
   if(a.correct){streak++;rage=streak%3===0;damage=base*(rage?2:1);enemy=Math.max(0,enemy-damage);if(i>0&&!unique[i-1]!.correct){heal=Math.min(10,100-hp);hp+=heal}}
   else{streak=0;damage=Math.min(18,hp);hp=Math.max(0,hp-damage)}
  }
- return {hp,enemy,streak,damage,heal,rage,count:unique.length,correct:unique.at(-1)?.correct,protected:hp===0}
+ return {hp,enemy,streak,damage,heal,rage,count:unique.length,correct:unique[unique.length-1]?.correct,protected:hp===0}
 }
 export const BATTLE_SKINS=[
  {name:'Thạch Quy',move:'Địa Tinh Pháo',color:'255,190,65',symbol:'◆'},

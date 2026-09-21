@@ -4,6 +4,11 @@
 // gửi kèm gì ngoài mã ca + SBD; xoá dữ liệu trình duyệt thì thành máy mới.
 const KHOA = 'ddh_id_thiet_bi'
 
+/** Mã ngẫu nhiên CÓ DỰ PHÒNG (iOS < 15.4 không có `crypto.randomUUID`): dùng hàm này thay vì gọi trần. */
+export function sinhMaNgauNhien(): string {
+  return sinhId()
+}
+
 function sinhId(): string {
   const c = typeof crypto !== 'undefined' ? crypto : undefined
   if (c && typeof c.randomUUID === 'function') return c.randomUUID()

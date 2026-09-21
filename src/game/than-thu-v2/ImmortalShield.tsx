@@ -3,6 +3,7 @@ import {createPortal} from 'react-dom'
 import {Shield,Sparkles} from 'lucide-react'
 import {EVOLUTION_LEVELS,evolutionStage} from './evolution'
 import {shieldEntitlement,shieldRemaining,type ShieldState} from './shields'
+import {sinhMaNgauNhien} from '../../lib/thiet-bi'
 const TITLES=['Khiên Khởi Nguyên','Khiên Tinh Tú','Khiên Long Giáp','Khiên Thiên Quang','Khiên Bất Diệt']
 const COLORS=['#5eead4','#60a5fa','#c084fc','#fbbf24','#fb7185']
 export default function ImmortalShield({level,state,busy,onUse}:{level:number;state?:ShieldState;busy:boolean;onUse:(id:string)=>Promise<unknown>}){
@@ -12,7 +13,7 @@ export default function ImmortalShield({level,state,busy,onUse}:{level:number;st
  const until=state?.activeUntil??0,active=until>now,remaining=shieldRemaining(level,state),stage=evolutionStage(level),tier=Math.max(0,stage-1)
  useEffect(()=>{setNow(Date.now());if(until<=Date.now())return;const t=setInterval(()=>setNow(Date.now()),100);return()=>clearInterval(t)},[until])
  useEffect(()=>{if(!active)return;const previous=document.activeElement as HTMLElement|null,overflow=document.body.style.overflow;document.body.style.overflow='hidden';overlay.current?.focus();return()=>{document.body.style.overflow=overflow;previous?.focus()}},[active])
- const use=async()=>{pending.current||=crypto.randomUUID();await onUse(pending.current)}
+ const use=async()=>{pending.current||=sinhMaNgauNhien();await onUse(pending.current)}
  useEffect(()=>{if(state?.lastUse===pending.current)pending.current=''},[state?.lastUse])
  return <><div className="immortal-inventory mission-shield"><div>{gift>0&&<p role="status" className="immortal-gift"><Sparkles size={16} aria-hidden="true"/> Tiến hoá thành công! Em nhận thêm {gift} khiên.</p>}<strong><Shield size={16} aria-hidden="true"/> Khiên · {remaining} lượt</strong><p>{stage?`${TITLES[tier]} · Quà tiến hoá đã nhận ${[1,3,6,9,12][tier]} khiên`:'Đạt cấp 10 để nhận khiên đầu tiên.'} · Mỗi lần dùng: khiên hiện 10 giây và trừ 1 lượt.</p><small>Cấp 10: +1 · cấp 30: +2 · cấp 50, 70, 100: mỗi mốc +3.</small></div><button ref={button} disabled={busy||active||remaining<1} onClick={()=>void use()}>Dùng khiên</button></div>{active&&createPortal(<div ref={overlay} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Khiên đang bật" className={`immortal-screen immortal-tier-${tier}`} style={{'--shield-color':COLORS[tier]} as React.CSSProperties} onKeyDown={e=>{if(e.key==='Tab')e.preventDefault()}}>
  <div className="immortal-orbit"/><div className="immortal-orbit second"/>

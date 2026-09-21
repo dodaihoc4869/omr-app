@@ -184,14 +184,15 @@ export function timTuCam(chu: string, danhSach: readonly string[]): string[] {
  */
 export function timSoTrongChu(chu: string): string[] {
   const ra: string[] = []
-  for (const m of chu.matchAll(/(?<![\p{L}\d])\d+(?:[.,]\d+)?(?![\p{Lu}\d])/gu)) ra.push(chuanSo(m[0]))
+  // KHÔNG dùng lookbehind (nhìn-lùi) trong regex: Safari/iOS < 16.4 ném SyntaxError ngay khi nạp mô-đun (máy học sinh cũ không mở được app). Thay bằng nhóm `(^|[^\p{L}\d])` rồi lấy nhóm 2.
+  for (const m of chu.matchAll(/(^|[^\p{L}\d])(\d+(?:[.,]\d+)?)(?![\p{Lu}\d])/gu)) ra.push(chuanSo(m[2]))
   return ra
 }
 
 /** Cụm CỬA SỔ THỜI GIAN của luật ("7 ngày", "3 ngày", "30 ngày", "1 tuần", "1·3·7") — số trong đó luôn hợp lệ dù thẻ không ghi (Boss 21/09). */
-const CUM_CUA_SO = /(?<![\p{L}\d])(?:(?:1|3|7|30)\s*ngày|1\s*tuần|1\s*[·•\-–,./]\s*3\s*[·•\-–,./]\s*7)(?![\p{L}\d])/giu
+const CUM_CUA_SO = /(^|[^\p{L}\d])(?:(?:1|3|7|30)\s*ngày|1\s*tuần|1\s*[·•\-–,./]\s*3\s*[·•\-–,./]\s*7)(?![\p{L}\d])/giu
 function boCumCuaSo(chu: string): string {
-  return chu.replace(CUM_CUA_SO, ' ')
+  return chu.replace(CUM_CUA_SO, '$1 ') // giữ ký tự đứng trước (nhóm 1) — kết quả y hệt bản dùng lookbehind
 }
 
 function chuanSo(x: string): string {

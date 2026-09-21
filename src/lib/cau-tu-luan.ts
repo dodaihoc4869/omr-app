@@ -69,7 +69,7 @@ const CO_ANH = (x: unknown): boolean => (Array.isArray(x) ? x.some(Boolean) : Bo
 /** Chữ đề phần III hỏi MỞ: cụm hỏi ("theo em", "phương pháp nào", "vì sao"…) hoặc ĐỘNG TỪ RA LỆNH đứng đầu câu / sau "hãy" ("Giải thích…", "Hãy mô tả…"). Dạng BỊ ĐỘNG trong đề tính toán
  * ("được mô tả theo phương trình", "Cho các mô tả về…") KHÔNG dính. Phần III đúng nghĩa hỏi ra MỘT SỐ hay một mã ngắn. */
 const CUM_HOI_MO = ['theo em', 'vì sao', 'tại sao', 'phương pháp nào', 'cách nào', 'cách gì', 'như thế nào']
-const DONG_TU_HOI_MO = /(?:^|[.?!:;]\s*|(?<![\p{L}])hãy\s+)(?:giải thích|trình bày|mô tả|nêu|so sánh|nhận xét|đề xuất)(?![\p{L}])/iu
+const DONG_TU_HOI_MO = /(?:^|[.?!:;]\s*|(?:^|[^\p{L}])hãy\s+)(?:giải thích|trình bày|mô tả|nêu|so sánh|nhận xét|đề xuất)(?![\p{L}])/iu
 const hoiMo = (text: string): boolean => {
   const t = text.toLowerCase()
   return CUM_HOI_MO.some((m) => t.includes(m)) || DONG_TU_HOI_MO.test(t)
