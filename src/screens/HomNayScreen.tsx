@@ -9,9 +9,23 @@ import { layCanGiup, lyDoCanGiup } from '../lib/hom-nay-v2'
 import BangTinV3, { BangTinXuong } from '../components/bang-tin/BangTin'
 import type { DungNhip } from '../components/bang-tin/cac-khoi'
 import { useTuLamMoi } from '../components/bang-tin/hooks'
+import BangTinSan from '../components/bang-tin-san/BangTinSan'
+import { useSanSong } from '../components/bang-tin-san/use-san-song'
 import HomNayCu from './HomNayCu'
 
+/**
+ * MÀN HÔM NAY = BẢNG TIN KIỂU SÀN GIAO DỊCH (thầy chốt mẫu 21/09; hợp đồng docs/hop-dong-bang-tin-song-2109.md): hỏi `/gv/bang-tin-song` mỗi 10 giây. Máy chủ chưa có lệnh / cờ `cau_hinh.bang_tin_san = tat` /
+ * lỗi / thân sai dạng ⇒ rơi về Bảng tin bản 3 (`HomNayBan3`, `/gv/bang-tin`) rồi bản 2 — không màn trắng. Đang dùng sàn thì KHÔNG gọi lệnh của bản 3 (lệnh sống đã mang đủ khoá, khỏi tính hai lần).
+ */
 export default function HomNayScreen() {
+  const san = useSanSong()
+  const moToanCanh = useAppStore((s) => s.moToanCanh)
+  if (san.kieu === 'cho') return <BangTinXuong />
+  if (san.kieu === 'san') return <BangTinSan du={san.du} onMoEm={moToanCanh} />
+  return <HomNayBan3 />
+}
+
+function HomNayBan3() {
   const classList = useAppStore((s) => s.classList)
   const moToanCanh = useAppStore((s) => s.moToanCanh)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
