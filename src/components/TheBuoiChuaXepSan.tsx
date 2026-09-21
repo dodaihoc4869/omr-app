@@ -21,7 +21,7 @@ export default function TheBuoiChuaXepSan({ deXuat, dangMo = false, onMo, onTuCh
   if (!deXuat || !deXuat.co) return null
   const { boQua } = deXuat
   return (
-    <section data-buoi-xep-san aria-label="Buổi chữa tối nay đã xếp sẵn" style={{ background: 'var(--xanh-nen)', borderRadius: 'var(--bo-1)', padding: 'var(--k3) var(--k4)', marginBottom: 'var(--k3)' }}>
+    <section data-buoi-xep-san aria-label="Buổi chữa tối nay đã xếp sẵn" style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3) var(--k4)', marginBottom: 'var(--k3)' }}>
       <div style={{ fontFamily: 'var(--serif)', fontSize: 'var(--cx-2)', fontWeight: 700, color: 'var(--muc)' }}>Buổi chữa tối nay (đã xếp sẵn)</div>
       <div className="flex flex-wrap" style={{ gap: 'var(--k1) var(--k4)', marginTop: 'var(--k2)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)', ...SO }}>
         <span>
@@ -59,14 +59,16 @@ export default function TheBuoiChuaXepSan({ deXuat, dangMo = false, onMo, onTuCh
         </div>
       )}
       <div className="flex flex-wrap items-center" style={{ gap: 'var(--k3)', marginTop: 'var(--k3)' }}>
-        <NutChinh onClick={onMo} disabled={dangMo}>
-          Mở buổi chữa này
-        </NutChinh>
+        <div style={{ flex: '1 1 240px', maxWidth: 360, minWidth: 0 }}>
+          <NutChinh onClick={onMo} disabled={dangMo}>
+            Mở buổi chữa này
+          </NutChinh>
+        </div>
         <button
           type="button"
           onClick={onTuChon}
           className="tap-target font-bold"
-          style={{ minHeight: 44, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the-2)', color: 'var(--muc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+          style={{ minHeight: 44, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'var(--the)', color: 'var(--muc)', border: '1px solid var(--vien-dam)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
         >
           Tự chọn lại
         </button>
