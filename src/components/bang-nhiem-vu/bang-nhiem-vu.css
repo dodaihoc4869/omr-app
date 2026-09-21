@@ -912,6 +912,19 @@ button.bnv-chon-thu:focus-visible { outline: 3px solid var(--m3-primary); outlin
   background: var(--m3-tertiary-container);
   color: var(--m3-on-tertiary-container);
 }
+/* Nhường nút chính: nút nổi sắp che nút "Làm …" của thẻ Làm ngay ⇒ mờ đi, không bấm trúng, tới khi em cuộn khỏi chỗ đó (NutVaoThi.tsx). */
+.bnv-fab {
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+.bnv-fab[data-nhuong='true'] {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+.bnv-fab[data-nhuong='true']:focus-visible {
+  opacity: 1;
+  transform: none;
+}
 .bnv-fab-cham {
   width: 10px;
   height: 10px;
@@ -956,6 +969,9 @@ button.bnv-chon-thu:focus-visible { outline: 3px solid var(--m3-primary); outlin
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .bnv-fab {
+    transition: none;
+  }
   .bnv-vd-shimmer,
   .bnv-fab-cham,
   .bnv-xuong,
