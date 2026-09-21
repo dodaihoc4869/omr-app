@@ -25,6 +25,7 @@ import { daTraLoi } from './on-lai-nop'
 import { docDieuChinhHieuLuc, type DieuChinhHieuLuc } from './bo-nao-doc'
 import { docLichDaLuu, ghiNopTre, LAN_MOI_LUOT, moLucChang, trangThaiCacChang, type LichDaLuu } from './btvn-nang-do-chang'
 import { chiaChangNopTre } from '../../src/lib/ve-dich'
+import { chuMoSomChang, duocMoSomChang } from '../../src/lib/mo-som-chang'
 import { canhBaoHanNgan, cheDoLich, nganSachHanNgan, sucChua, xepLichChang, type SucChua } from '../../src/lib/btvn-nang-do-lich'
 
 type Hang = Record<string, unknown>
@@ -486,6 +487,38 @@ export async function chotBoChoEm(env: Env, bt: Hang, sbd: string, now: number):
   return { chotLuc: chuoi(em.chot_luc), chang: da.chang, thuSucThem: da.thuSucThem, nhan: da.nhan, tomTat: docTomTat(em.tom_tat_json), soCauEm: da.chang.flat().length, soChang: da.chang.length, lich: docLichDaLuu(em.chang_mo_json, da.chang.length) }
 }
 
+export interface MoSomKq { duoc: boolean; lyDo: string | null; chu: string }
+
+/**
+ * MỞ SỚM CHẶNG KẾ (Điều 6, hàm thuần `duocMoSomChang` của Code 1): sửa mốc mở chặng kế trong `btvn_em.chang_mo_json` thành BÂY GIỜ (chỉ sớm hơn, không đổi hạn nộp, không đổi `dungNhipTruoc` nên EXP đúng nhịp không đổi);
+ * ghi `moSom: [{chiSo, luc}]` cùng JSON để đếm hạn mức 1 chặng/ngày VN. Mọi nơi đọc lịch (cửa chặng, cổng nộp, kế hoạch ngày, bảng tin) tự thấy chặng đã mở. Bài chưa có lịch lưu (chốt trước bản 1.1) hoặc lỗi ⇒ null (không mở sớm).
+ * Chặng kế ĐÃ mở sẵn (mốc ≤ bây giờ, ví dụ đang nợ) ⇒ không cần mở, không tính hạn mức. CAS theo giá trị cũ của `chang_mo_json`: thua ⇒ không mở (lần sau).
+ */
+async function moSomChangKe(env: Env, khoa: string, soChang: number, chiSoXong: number, chiSoKe: number, dung: number, tong: number, now: number): Promise<MoSomKq | null> {
+  try {
+    const cu = await env.DB.prepare('SELECT chang_mo_json FROM btvn_em WHERE khoa = ?').bind(khoa).first<Hang>()
+    const raw = chuoi(cu?.chang_mo_json)
+    if (!raw) return null
+    const o = JSON.parse(raw) as { chang?: { moLuc?: string }[]; moSom?: { chiSo: number; luc: string }[] }
+    if (!Array.isArray(o.chang) || o.chang.length !== soChang || !o.chang[chiSoKe]?.moLuc) return null
+    const hom = ngayVn(now)
+    const soMoSomHomNay = (o.moSom ?? []).filter((x) => Number.isFinite(Date.parse(x.luc)) && ngayVn(Date.parse(x.luc)) === hom).length
+    const kq = duocMoSomChang({ tiLeDungChangVuaXong: tong > 0 ? dung / tong : 0, soChangMoSomHomNay: soMoSomHomNay, conChangKe: chiSoKe < soChang })
+    const chu = chuMoSomChang(kq, { soChangXong: chiSoXong + 1, soChangKe: chiSoKe + 1, dung, tong })
+    if (!kq.duoc) return { duoc: false, lyDo: kq.lyDo, chu }
+    if (Date.parse(String(o.chang[chiSoKe]!.moLuc)) <= now) return { duoc: false, lyDo: 'da_mo_san', chu } // đã mở sẵn: không cần và không tính hạn mức
+    const iso = new Date(now).toISOString()
+    o.chang[chiSoKe]!.moLuc = iso
+    for (let k = chiSoKe + 1; k < o.chang.length; k++) if (Date.parse(String(o.chang[k]!.moLuc)) < now) o.chang[k]!.moLuc = iso // giữ mốc không lùi
+    o.moSom = [...(o.moSom ?? []), { chiSo: chiSoKe, luc: iso }]
+    const w = await env.DB.prepare('UPDATE btvn_em SET chang_mo_json = ? WHERE khoa = ? AND chang_mo_json = ?').bind(JSON.stringify(o), khoa, raw).run()
+    return w.meta.changes ? { duoc: true, lyDo: null, chu } : { duoc: false, lyDo: 'thua_cas', chu }
+  } catch (e) {
+    console.error('[mo-som] lỗi (không mở sớm):', e instanceof Error ? e.message : e)
+    return null
+  }
+}
+
 /** `docHoSoRut` cần danh sách câu của bài; ở đường chốt đã có `bai` nên chỉ cần một lượt đọc — bọc lại để chạy song song với `docBaiNangDo`. */
 async function docHoSoRutSauKhiCoBai(env: Env, maBtvn: string, sbd: string, now: number): Promise<Map<string, HoSoRutCuaEm> | null> {
   const bai = await docBaiNangDo(env, maBtvn)
@@ -742,6 +775,12 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
     for (const c of daLam) dung[chuoi(c.qid)] = isAnswerCorrect(gop[chuoi(c.qid)], answerText(c.dap_an ?? c.dapAn), phanTuQid(chuoi(c.qid), phanCua(c)))
     await thichNghiSauChang(env, bt, em, sbd, chiSo, loMoi, dung, dc, now)
   }
+  // ĐIỀU 6 (mở sớm chặng, Boss chốt B): đúng ≥ 80 % chặng vừa xong ⇒ MỞ SỚM đúng 1 chặng kế trong ngày VN (SAU thích nghi, TRƯỚC khi lập lại kế hoạch để kế hoạch thấy chặng đã mở).
+  let moSom: MoSomKq | null = null
+  if (xong && !nop && loMoi < soChang) {
+    const dungChang = daLam.filter((c) => isAnswerCorrect(gop[chuoi(c.qid)], answerText(c.dap_an ?? c.dapAn), phanTuQid(chuoi(c.qid), phanCua(c)))).length
+    moSom = await moSomChangKe(env, khoa, soChang, chiSo, loMoi, dungChang, dsQid.length, now)
+  }
   const moiExp = await capNhatExpSauNopLo(env, sbd, now) // lập lại kế hoạch ngày trước: treNhip đã lưu là bản cũ (sau nộp bù phải được gỡ)
   const ketQua = daLam.map((c) => {
     const q = chuoi(c.qid)
@@ -759,7 +798,8 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
     ok: true,
     ...(nop ? { nop } : {}),
     loDaXong: loMoi,
-    changDangMo: ganChang(loMoi),
+    changDangMo: moSom?.duoc ? loMoi : ganChang(loMoi),
+    ...(moSom ? { moSom: { duoc: moSom.duoc, lyDo: moSom.lyDo, chu: moSom.chu } } : {}),
     chang: { chiSo, soCau: dsQid.length, soDung: ketQua.filter((k) => k.dung).length, xong },
     ketQua,
     chuaLam,
