@@ -3,6 +3,7 @@
 //   (docs/hop-dong-bang-tin-v3-2109.md, Code 3). Lệnh CHỈ ĐỌC. Mọi con số "hôm nay" chỉ đếm từ mốc `tuHomNay`.
 // Luật đọc: khoá vắng = KHÔNG có số thật ⇒ ẩn hoặc ghi "chưa có", không vẽ số 0 giả; sai kiểu ⇒ bỏ dòng ấy, không làm hỏng cả màn; chưa có lệnh (404) ⇒ lời thật, màn rơi về các lệnh cũ.
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
+import { TIN_HIEU_SAI_NHANH, type KetQuaSaiNhanh } from './tin-hieu-sai-nhanh'
 import { gioPhutVN, ngayThuChu, ngayVN } from './em-toan-canh'
 
 export interface NhipBangTin {
@@ -14,6 +15,21 @@ export interface NhipBangTin {
   tiLeDung: number | null
   /** CHỈ có khi cả ngày hôm qua ≥ mốc; sáng 21–22/09 vắng. */
   homQua: { soEmHoc?: number; soCau?: number; tiLeDung?: number } | null
+  /** Dồn về đích (Code 3, khoá `nhip.noTheoLop`): theo lớp, số em đang NỢ chặng bài tập về nhà / sĩ số. Vắng ⇒ null (ẩn, không vẽ 0 giả). */
+  noTheoLop: NoTheoLop[] | null
+}
+
+export interface NoTheoLop {
+  lop: string
+  siSo: number
+  soEmNo: number
+}
+
+/** Một em có tín hiệu "sai rất nhanh rồi đúng lại hôm sau" (khoá `saiNhanh`, đúng `KetQuaSaiNhanh` của Code 1 + sbd/hoTen/tenLop). Chỉ thầy thấy; là số ĐO, không phải nhãn năng lực. */
+export interface EmSaiNhanh extends KetQuaSaiNhanh {
+  sbd: string
+  hoTen: string
+  tenLop: string
 }
 
 export interface BaiTapBangTin {
@@ -106,6 +122,8 @@ export interface BangTin {
   canDeY: { ds: EmCanDeY[]; conLai: number }
   /** Em CHƯA HỌC hôm nay theo lớp (khối `chuaHocHomNay`, Code 3). null = máy chủ chưa trả / không có em nào chưa học ⇒ ẩn (không bịa "cả lớp đã học"). Chỉ thầy thấy tên. */
   chuaHoc: LopChuaHoc[] | null
+  /** Em có tín hiệu sai rất nhanh rồi đúng lại (khoá `saiNhanh`, Code 3). null = máy chủ chưa trả / không em nào `co` ⇒ ẩn. */
+  saiNhanh: EmSaiNhanh[] | null
   dangVap: DangVapBangTin[]
   boNao: BoNaoBangTin | null
   mayDaLam: ViecMayLam[]
@@ -125,6 +143,41 @@ const mang = (v: unknown): unknown[] => (Array.isArray(v) ? v : [])
 const BUC: readonly BucTienBo[] = ['cham_nhat', 'tien_bo_nhat', 'ben_bi_nhat']
 const MUC: readonly MucSucKhoe[] = ['xanh', 'vang', 'do']
 
+/** `nhip.noTheoLop` = `[{lop, siSo, soEmNo}]`: bỏ lớp thiếu tên hoặc soEmNo < 1; sĩ số tối thiểu bằng soEmNo; xếp soEmNo giảm dần; rỗng ⇒ null. */
+export function docNoTheoLop(v: unknown): NoTheoLop[] | null {
+  const ra: NoTheoLop[] = []
+  for (const x of mang(v)) {
+    const l = doiTuong(x)
+    if (!l) continue
+    const ten = chu(l.lop)
+    const soEmNo = Math.round(soKhong(l.soEmNo))
+    if (!ten || soEmNo < 1) continue
+    ra.push({ lop: ten, siSo: Math.max(soEmNo, Math.round(soKhong(l.siSo))), soEmNo })
+  }
+  ra.sort((a, b) => b.soEmNo - a.soEmNo || a.lop.localeCompare(b.lop, 'vi'))
+  return ra.length > 0 ? ra : null
+}
+
+/** Khoá `saiNhanh` = `{ds:[{sbd, hoTen, tenLop, soCau, nguongSoCau, nguongGiay, cuaSoNgay, tuNgay, co}]}` (hoặc thẳng mảng). Chỉ em `co` (máy chủ báo, hoặc soCau ≥ ngưỡng); thiếu ngưỡng ⇒ dùng ngưỡng mặc định của Code 1; xếp soCau giảm dần, ≤ 20; rỗng ⇒ null. */
+export function docSaiNhanh(v: unknown): EmSaiNhanh[] | null {
+  const o = doiTuong(v)
+  const ds = Array.isArray(v) ? v : o ? mang(o.ds) : []
+  const ra: EmSaiNhanh[] = []
+  for (const x of ds) {
+    const e = doiTuong(x)
+    if (!e || !chu(e.sbd) || !chu(e.hoTen)) continue
+    const soCau = Math.max(0, Math.round(soKhong(e.soCau)))
+    const nguongSoCau = Math.max(1, Math.round(soKhong(e.nguongSoCau)) || TIN_HIEU_SAI_NHANH.nguongSoCau)
+    const nguongGiay = so(e.nguongGiay) ?? TIN_HIEU_SAI_NHANH.nguongGiay
+    const cuaSoNgay = Math.max(2, Math.round(soKhong(e.cuaSoNgay)) || TIN_HIEU_SAI_NHANH.cuaSoNgay)
+    const co = typeof e.co === 'boolean' ? e.co : soCau >= nguongSoCau
+    if (!co || soCau < 1) continue
+    ra.push({ sbd: chu(e.sbd), hoTen: chu(e.hoTen), tenLop: chu(e.tenLop), soCau, nguongSoCau, nguongGiay, cuaSoNgay, tuNgay: chu(e.tuNgay), co: true })
+  }
+  ra.sort((a, b) => b.soCau - a.soCau || a.hoTen.localeCompare(b.hoTen, 'vi'))
+  return ra.length > 0 ? ra.slice(0, 20) : null
+}
+
 function docNhip(v: unknown): NhipBangTin | null {
   const o = doiTuong(v)
   if (!o) return null
@@ -143,6 +196,7 @@ function docNhip(v: unknown): NhipBangTin | null {
     soCauDung: so(o.soCauDung),
     tiLeDung: so(o.tiLeDung),
     homQua: homQua && Object.keys(homQua).length > 0 ? homQua : null,
+    noTheoLop: docNoTheoLop(o.noTheoLop),
   }
 }
 
@@ -275,6 +329,7 @@ export function docBangTin(j: Record<string, unknown>): BangTin | null {
       conLai: Math.max(0, Math.round(soKhong(cd ? cd.conLai : j.canDeYConLai))),
     },
     chuaHoc: docChuaHoc(j.chuaHocHomNay),
+    saiNhanh: docSaiNhanh(j.saiNhanh),
     dangVap: mang(j.dangVap).map(docDangVap).filter((d): d is DangVapBangTin => d != null),
     boNao: docBoNao(j.boNao),
     mayDaLam: mang(j.mayDaLam).map(docViec).filter((v): v is ViecMayLam => v != null),

@@ -13,12 +13,15 @@ import {
   type BoNaoBangTin,
   type DangVapBangTin,
   type EmCanDeY,
+  type EmSaiNhanh,
   type LopChuaHoc,
+  type NoTheoLop,
   type SucKhoeBangTin,
   type TienBoBangTin,
   type ViecMayLam,
 } from '../../lib/bang-tin-thay'
 import { gioPhutVN } from '../../lib/em-toan-canh'
+import { chuTinHieuSaiNhanh } from '../../lib/tin-hieu-sai-nhanh'
 import { chiaHang, useChieuCao, useDaVao, useDemLen } from './hooks'
 
 const dinhDangSo = (n: number) => Math.round(n).toLocaleString('vi-VN')
@@ -83,9 +86,9 @@ function SoDem({ so }: { so: number | null }) {
   return <>{v == null ? '—' : dinhDangSo(v)}</>
 }
 
-function SoLon({ nhan, so, donVi, phu }: { nhan: string; so: number | null; donVi?: string; phu?: string }) {
-  return (
-    <div className="bt3-so">
+function SoLon({ nhan, so, donVi, phu, onMo }: { nhan: string; so: number | null; donVi?: string; phu?: string; onMo?: () => void }) {
+  const than = (
+    <>
       <span className="bt3-so-nhan">{nhan}</span>
       <span className="bt3-so-gia-tri">
         <b>
@@ -93,8 +96,19 @@ function SoLon({ nhan, so, donVi, phu }: { nhan: string; so: number | null; donV
         </b>
         {donVi && <small>{donVi}</small>}
       </span>
-      <span className="bt3-so-phu">{phu}</span>
-    </div>
+      <span className="bt3-so-phu">
+        <span className="bt3-so-phu-chu">{phu}</span>
+        {onMo && <ChevronRight size={18} aria-hidden="true" />}
+      </span>
+    </>
+  )
+  // Ô có chi tiết theo lớp ở tấm bên ⇒ là MỘT nút thật (cả ô cao 124 px làm vùng chạm); ô khác chỉ để đọc.
+  return onMo ? (
+    <button type="button" className="bt3-so bt3-so--nut" onClick={onMo} data-khoi="no-chang">
+      {than}
+    </button>
+  ) : (
+    <div className="bt3-so">{than}</div>
   )
 }
 
@@ -104,10 +118,17 @@ export interface DungNhip {
   soCoLo: number
 }
 
-export function BonSoLon({ bt, nayMs, dungNhip }: { bt: BangTin; nayMs: number; dungNhip?: DungNhip | null }) {
+/** Dòng phụ ô "Bài tập về nhà đúng nhịp" khi máy chủ trả `nhip.noTheoLop` (Dồn về đích): tổng em đang NỢ chặng + số lớp. Tên từng lớp dài (vd. "12 - Tinh Hoa") không nhét vừa dòng phụ một hàng ⇒ chi tiết theo lớp nằm ở tấm bên (bấm ô). */
+export function chuNoTheoLop(ds: NoTheoLop[]): string {
+  const tong = ds.reduce((s, l) => s + l.soEmNo, 0)
+  return `${tong.toLocaleString('vi-VN')} em đang nợ chặng · ${ds.length.toLocaleString('vi-VN')} lớp`
+}
+
+export function BonSoLon({ bt, nayMs, dungNhip, onMoNoTheoLop }: { bt: BangTin; nayMs: number; dungNhip?: DungNhip | null; onMoNoTheoLop?: () => void }) {
   const n = bt.nhip
   const tiLe = phanTramTiLe(n.tiLeDung)
   const phanEm = n.tongEm > 0 ? `${Math.round((n.soEmHoc / n.tongEm) * 100)}% số em · ${chuTinhTu(bt, nayMs)}` : chuTinhTu(bt, nayMs)
+  const noTheoLop = n.noTheoLop && onMoNoTheoLop ? chuNoTheoLop(n.noTheoLop) : null
   const trungBinh = n.soEmHoc > 0 ? `trung bình ${(n.soCau / n.soEmHoc).toLocaleString('vi-VN', { maximumFractionDigits: 1 })} câu mỗi em đã học` : `chưa có em nào làm bài ${chuTinhTu(bt, nayMs).replace(/^tính /, '')}`
   return (
     <div className="bt3-hang-so" role="group" aria-label="Nhịp học hôm nay">
@@ -123,7 +144,8 @@ export function BonSoLon({ bt, nayMs, dungNhip }: { bt: BangTin; nayMs: number; 
         nhan="Bài tập về nhà đúng nhịp"
         so={dungNhip ? dungNhip.soEm : null}
         donVi={dungNhip ? `/ ${dungNhip.soCoLo.toLocaleString('vi-VN')} em` : undefined}
-        phu={dungNhip ? `${Math.max(0, dungNhip.soCoLo - dungNhip.soEm).toLocaleString('vi-VN')} em chậm một chặng trở lên` : 'chưa có số liệu đúng nhịp'}
+        phu={noTheoLop ?? (dungNhip ? `${Math.max(0, dungNhip.soCoLo - dungNhip.soEm).toLocaleString('vi-VN')} em chậm một chặng trở lên` : 'chưa có số liệu đúng nhịp')}
+        onMo={noTheoLop ? onMoNoTheoLop : undefined}
       />
     </div>
   )
@@ -283,7 +305,7 @@ export function HangEm({ e, onMoEm }: { e: EmCanDeY; onMoEm: (sbd: string) => vo
   )
 }
 
-export function KhoiCanDeY({ bt, nayMs, onMoEm, onMoTatCa, onMoChuaHoc }: { bt: BangTin; nayMs: number; onMoEm: (sbd: string) => void; onMoTatCa: () => void; onMoChuaHoc?: () => void }) {
+export function KhoiCanDeY({ bt, nayMs, onMoEm, onMoTatCa, onMoChuaHoc, onMoSaiNhanh }: { bt: BangTin; nayMs: number; onMoEm: (sbd: string) => void; onMoTatCa: () => void; onMoChuaHoc?: () => void; onMoSaiNhanh?: () => void }) {
   const [ref, cao, hang] = useChieuCao<HTMLDivElement>(56)
   const { ds, conLai } = bt.canDeY
   const n = chiaHang(ds.length, cao, hang, CAO_NUT_NUA, conLai)
@@ -295,6 +317,7 @@ export function KhoiCanDeY({ bt, nayMs, onMoEm, onMoTatCa, onMoChuaHoc }: { bt: 
         {con > 0 && <NutNua conLai={con} don="em" onMo={onMoTatCa} />}
       </div>
       {bt.chuaHoc && onMoChuaHoc && <DongChuaHoc ds={bt.chuaHoc} onMo={onMoChuaHoc} />}
+      {bt.saiNhanh && onMoSaiNhanh && <DongSaiNhanh ds={bt.saiNhanh} onMo={onMoSaiNhanh} />}
     </O>
   )
 }
@@ -316,6 +339,42 @@ export function DongChuaHoc({ ds, onMo }: { ds: LopChuaHoc[]; onMo: () => void }
       </span>
       <ChevronRight size={18} aria-hidden="true" />
     </button>
+  )
+}
+
+/** "Sai rất nhanh rồi đúng lại" (tín hiệu ĐO của Code 1, khoá `saiNhanh`) — MỘT dòng 48 px cùng kiểu dòng "Chưa học": tổng số em + em đầu (số câu, một dòng phụ); chạm ⇒ tấm bên có từng em.
+ *  Chỉ số đo, không là nhận xét về em; chỉ thầy thấy. */
+export function DongSaiNhanh({ ds, onMo }: { ds: EmSaiNhanh[]; onMo: () => void }) {
+  const em = ds.slice(0, 1).map((e) => `${e.hoTen} ${e.soCau} câu`)
+  const them = ds.length - em.length
+  return (
+    <button type="button" className="bt3-chua-hoc" onClick={onMo} data-khoi="sai-nhanh">
+      <span className="bt3-chua-hoc-chu">
+        <b>Sai rất nhanh rồi đúng lại: {ds.length.toLocaleString('vi-VN')} em</b>
+        <span>
+          {em.join(' · ')}
+          {them > 0 ? ` · +${them} em` : ''}
+        </span>
+      </span>
+      <ChevronRight size={18} aria-hidden="true" />
+    </button>
+  )
+}
+
+/** Một em có tín hiệu sai nhanh trong tấm bên: tên + lớp + câu nói số đo của Code 1; chạm ⇒ Toàn cảnh một em. */
+export function HangSaiNhanh({ e, onMoEm }: { e: EmSaiNhanh; onMoEm: (sbd: string) => void }) {
+  return (
+    <li>
+      <button type="button" className="bt3-em" onClick={() => onMoEm(e.sbd)} aria-label={`${e.hoTen}${e.tenLop ? ` · ${e.tenLop}` : ''} — sai rất nhanh rồi đúng lại, mở toàn cảnh`}>
+        <span className="bt3-em-tt">
+          <span className="bt3-em-ten">
+            <b title={e.hoTen}>{e.hoTen}</b>
+            {e.tenLop && <span className="bt3-em-lop"> · {e.tenLop}</span>}
+          </span>
+          <span className="bt3-em-ly bt3-em-ly--trung">{chuTinHieuSaiNhanh(e)}</span>
+        </span>
+      </button>
+    </li>
   )
 }
 
@@ -348,6 +407,25 @@ export function HangDang({ d }: { d: DangVapBangTin }) {
         {d.soEmVap} / {d.soEmGap} em vấp
       </span>
       <span className="bt3-dv-thanh" role="img" aria-label={`${d.soEmVap} trên ${d.soEmGap} em đã gặp dạng này bị vấp`}>
+        <i style={{ transform: `scaleX(${vao ? ti / 100 : 0})` }} />
+      </span>
+    </li>
+  )
+}
+
+/** Một lớp trong tấm bên "Em đang nợ chặng": tên lớp + số em nợ / sĩ số + thanh tỉ lệ. Chỉ ĐỌC (khoá `nhip.noTheoLop` không mang tên em). */
+export function HangNoLop({ l }: { l: NoTheoLop }) {
+  const vao = useDaVao()
+  const ti = l.siSo > 0 ? Math.min(100, Math.round((l.soEmNo / l.siSo) * 100)) : 0
+  return (
+    <li className="bt3-dv bt3-dv--no">
+      <span className="bt3-dv-ten" title={l.lop}>
+        <span>{l.lop}</span>
+      </span>
+      <span className="bt3-dv-so">
+        {l.soEmNo} / {l.siSo} em đang nợ
+      </span>
+      <span className="bt3-dv-thanh" role="img" aria-label={`${l.soEmNo} trên ${l.siSo} em của lớp ${l.lop} đang nợ chặng`}>
         <i style={{ transform: `scaleX(${vao ? ti / 100 : 0})` }} />
       </span>
     </li>

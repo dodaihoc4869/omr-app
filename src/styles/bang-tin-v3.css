@@ -141,6 +141,37 @@
   text-overflow: ellipsis;
 }
 
+/* ô số có chi tiết theo lớp ở tấm bên ⇒ nút thật: cả ô là vùng chạm; dòng phụ = chữ + mũi tên */
+.bt3-so--nut {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bt3-so--nut:hover {
+  background: color-mix(in srgb, var(--m3-primary) 6%, var(--bt3-the));
+}
+.bt3-so--nut:focus-visible {
+  outline: 3px solid var(--m3-primary);
+  outline-offset: 2px;
+}
+.bt3-so--nut .bt3-so-phu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.bt3-so-phu-chu {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bt3-dv--no .bt3-dv-thanh i {
+  background: var(--bt-dang-lam);
+}
+
 /* ── hai hàng ô ───────────────────────────────────────────────────── */
 .bt3-giua {
   flex: 0 0 auto;
@@ -519,6 +550,10 @@
   line-height: 16px;
   color: var(--m3-tren-canh-bao);
 }
+/* tín hiệu ĐO (không cảnh báo đỏ): câu nói của tín hiệu sai nhanh dùng màu chữ phụ */
+.bt3-em-ly--trung {
+  color: var(--m3-on-surface-variant);
+}
 .bt3-o-em .bt3-ds > li,
 .bt3-ds--tam > li:has(.bt3-em) {
   box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--m3-outline) 16%, transparent);
@@ -748,6 +783,9 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
+}
+.bt3-chua-hoc + .bt3-chua-hoc {
+  margin-top: 0;
 }
 .bt3-chua-hoc:hover {
   background: color-mix(in srgb, var(--m3-primary) 6%, transparent);

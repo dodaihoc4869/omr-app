@@ -10,7 +10,7 @@ import type { EmTraCuu } from '../../lib/hom-nay-v2'
 import OTraCuu from '../hom-nay/OTraCuu'
 import TamBen from './TamBen'
 import { useMedia, useTrangLuot } from './hooks'
-import { BonSoLon, ChuGiaiBaiTap, HangBaiTap, HangChuaHoc, HangDang, HangEm, HangViec, KhoiBaiTap, dongThuThach, KhoiBoNao, KhoiCanDeY, KhoiDangVap, KhoiMayDaLam, KhoiTienBo, TEN_O_MAY, viecCuaMay, type DungNhip } from './cac-khoi'
+import { BonSoLon, ChuGiaiBaiTap, HangBaiTap, HangChuaHoc, HangDang, HangEm, HangNoLop, HangSaiNhanh, HangViec, KhoiBaiTap, dongThuThach, KhoiBoNao, KhoiCanDeY, KhoiDangVap, KhoiMayDaLam, KhoiTienBo, TEN_O_MAY, viecCuaMay, type DungNhip } from './cac-khoi'
 import '../../styles/hom-nay-v2.css'
 import '../../styles/bang-tin-v3.css'
 
@@ -26,7 +26,7 @@ export interface BangTinProps {
   taiTatCaCanDeY?: () => Promise<EmCanDeY[] | null>
 }
 
-type Tam = null | 'bai' | 'em' | 'dang' | 'may' | 'tim' | 'chua-hoc'
+type Tam = null | 'bai' | 'em' | 'dang' | 'may' | 'tim' | 'chua-hoc' | 'sai-nhanh' | 'no-lop'
 
 function ChuCapNhat({ bt, ngan }: { bt: BangTin; ngan?: boolean }) {
   const gio = bt.capNhatLuc ? gioPhutVN(bt.capNhatLuc) : ''
@@ -99,6 +99,45 @@ function TamChuaHoc({ bt, onMoEm, onDong }: { bt: BangTin; onMoEm: (sbd: string)
   )
 }
 
+function TamNoTheoLop({ bt, onDong }: { bt: BangTin; onDong: () => void }) {
+  const ds = bt.nhip.noTheoLop ?? []
+  const luc = bt.capNhatLuc ? gioPhutVN(bt.capNhatLuc) : ''
+  return (
+    <TamBen tieuDe="Em đang nợ chặng, theo lớp" phu={`Số em đang nợ chặng bài tập về nhà / sĩ số lớp${luc ? ` · tính đến ${luc}` : ''}.`} onDong={onDong}>
+      <ul className="bt3-ds bt3-ds--tam">
+        {ds.map((l) => (
+          <HangNoLop key={l.lop} l={l} />
+        ))}
+      </ul>
+    </TamBen>
+  )
+}
+
+function TamSaiNhanh({ bt, onMoEm, onDong }: { bt: BangTin; onMoEm: (sbd: string) => void; onDong: () => void }) {
+  const ds = bt.saiNhanh ?? []
+  const k = ds[0]
+  return (
+    <TamBen
+      tieuDe="Sai rất nhanh rồi đúng lại"
+      phu={`${k ? `Trong ${k.cuaSoNgay} ngày gần nhất: từ ${k.nguongSoCau} câu sai dưới ${k.nguongGiay} giây rồi làm đúng hôm sau. ` : ''}Đây là số đo, không phải nhận xét về em. Bấm vào một em để xem toàn cảnh.`}
+      onDong={onDong}
+    >
+      <ul className="bt3-ds bt3-ds--tam">
+        {ds.map((e) => (
+          <HangSaiNhanh
+            key={e.sbd}
+            e={e}
+            onMoEm={(s) => {
+              onDong()
+              onMoEm(s)
+            }}
+          />
+        ))}
+      </ul>
+    </TamBen>
+  )
+}
+
 function TamKhac({ tam, bt, onDong }: { tam: 'bai' | 'dang' | 'may'; bt: BangTin; onDong: () => void }) {
   if (tam === 'bai')
     return (
@@ -129,10 +168,10 @@ export default function BangTinV3(p: BangTinProps) {
   const moc = chuMocDau(bt, nayMs)
 
   const khoi = {
-    so: <BonSoLon bt={bt} nayMs={nayMs} dungNhip={p.dungNhip} />,
+    so: <BonSoLon bt={bt} nayMs={nayMs} dungNhip={p.dungNhip} onMoNoTheoLop={moTam('no-lop')} />,
     bai: <KhoiBaiTap bt={bt} nayMs={nayMs} onMoTatCa={moTam('bai')} />,
     tien: <KhoiTienBo bt={bt} nayMs={nayMs} onMoEm={onMoEm} />,
-    em: <KhoiCanDeY bt={bt} nayMs={nayMs} onMoEm={onMoEm} onMoTatCa={moTam('em')} onMoChuaHoc={moTam('chua-hoc')} />,
+    em: <KhoiCanDeY bt={bt} nayMs={nayMs} onMoEm={onMoEm} onMoTatCa={moTam('em')} onMoChuaHoc={moTam('chua-hoc')} onMoSaiNhanh={moTam('sai-nhanh')} />,
     dang: <KhoiDangVap bt={bt} nayMs={nayMs} onMoTatCa={moTam('dang')} />,
     bn: <KhoiBoNao bn={bt.boNao} lyDo={bt.lyDoThieu.boNao} thuThach={dongThuThach(bt)} />,
     may: <KhoiMayDaLam bt={bt} nayMs={nayMs} onMoTatCa={moTam('may')} />,
@@ -207,6 +246,8 @@ export default function BangTinV3(p: BangTinProps) {
         )}
       </div>
       {tam === 'chua-hoc' && <TamChuaHoc bt={bt} onMoEm={onMoEm} onDong={dong} />}
+      {tam === 'sai-nhanh' && <TamSaiNhanh bt={bt} onMoEm={onMoEm} onDong={dong} />}
+      {tam === 'no-lop' && <TamNoTheoLop bt={bt} onDong={dong} />}
       {tam === 'em' && <TamEmCanDeY bt={bt} onMoEm={onMoEm} onDong={dong} taiTatCa={p.taiTatCaCanDeY} />}
       {(tam === 'bai' || tam === 'dang' || tam === 'may') && <TamKhac tam={tam} bt={bt} onDong={dong} />}
       {tam === 'tim' && (
