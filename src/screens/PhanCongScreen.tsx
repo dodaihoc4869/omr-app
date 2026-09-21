@@ -118,7 +118,7 @@ export default function PhanCongScreen() {
                 Giao bài tập về nhà
               </h1>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-                Chia lô theo hạn nộp
+                Chia chặng theo hạn nộp
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -196,7 +196,7 @@ function TheGiaoBtvn() {
   const [loiHan, setLoiHan] = useState('')
   const [suaHan, setSuaHan] = useState<Record<string,string>>({})
   const [dangSua, setDangSua] = useState('')
-  const [xacNhan,setXacNhan]=useState<{text:string;run:()=>Promise<void>}|null>(null)
+  const [xacNhan,setXacNhan]=useState<{text:string;nut:string;run:()=>Promise<void>}|null>(null)
   const nowHocTap = useGioHocTap()
   const [theoDoi, setTheoDoi] = useState<DongTheoDoiBtvn[]>([])
 
@@ -478,10 +478,10 @@ function TheGiaoBtvn() {
       const kq = await giaoBtvn(ch, mat, dsCaGui, [...daChon], dsSbdGui, hanMoi ? hanNhapVietNam(hanMoi, nowHocTap) : undefined, cheDo === 'ca' && chonRieng ? [...sbdChon] : undefined, nangDo)
       // Máy chủ chưa hỗ trợ nâng đỡ thì bỏ qua các trường lạ và giao NHƯ CŨ — nói thật, không để thầy tưởng mỗi em một bộ.
       const canh: string[] = []
-      if (nangDo && kq.caNhan !== true) canh.push(`Máy chủ chưa hỗ trợ cá nhân hoá — bài này đã giao NHƯ CŨ: cả lớp nhận đủ ${kq.soCau} câu, không phân bổ riêng từng em.`)
+      if (nangDo && kq.caNhan !== true) canh.push(`Máy chủ chưa hỗ trợ cá nhân hoá — bài này đã giao NHƯ CŨ: cả lớp nhận đủ ${kq.soCau} câu, không chia câu dành riêng cho từng em.`)
       else if (nangDo) canh.push(...canhBaoTuMayChu(kq))
       setCanhBaoNangDo(canh.join(' '))
-      const noiDungNangDo = nangDo && kq.caNhan === true ? ` Mỗi em một bộ riêng, lõi chung ${kq.soLoi ?? 0} câu.` : ''
+      const noiDungNangDo = nangDo && kq.caNhan === true ? ` Mỗi em một bộ câu dành riêng, ${kq.soLoi ?? 0} câu cốt lõi chung.` : ''
       if (nangDo) hatGiongRef.current = taoHatGiong() // hộp thoại giao kế tiếp có hạt giống mới
       const boQua = kq.caRong && kq.caRong.length > 0 ? ` Bỏ qua ${kq.caRong.length} ca chưa em nào vào thi: ${kq.caRong.join(', ')}.` : ''
       const noiDungCa = kq.soCa ? ` ở ${kq.soCa} ca` : ''
@@ -509,8 +509,8 @@ function TheGiaoBtvn() {
           <h2 id="confirm-homework" style={{fontSize:20,fontWeight:700}}>Xác nhận thay đổi bài tập</h2>
           <p style={{margin:'16px 0',lineHeight:1.7}}>{xacNhan.text}</p>
           <div style={{display:'flex',gap:12,justifyContent:'flex-end'}}>
-            <button autoFocus className="btn-google-outlined" onClick={()=>setXacNhan(null)}>Hủy</button>
-            <button style={{padding:'10px 18px',borderRadius:12,background:'var(--gg-xanh)',color:'var(--muc-nguoc)',fontWeight:700}} onClick={()=>{const action=xacNhan.run;setXacNhan(null);void action()}}>Xác nhận</button>
+            <button autoFocus className="btn-google-outlined" onClick={()=>setXacNhan(null)}>Giữ nguyên</button>
+            <button style={{padding:'10px 18px',borderRadius:12,background:'var(--gg-xanh)',color:'var(--muc-nguoc)',fontWeight:700}} onClick={()=>{const action=xacNhan.run;setXacNhan(null);void action()}}>{xacNhan.nut}</button>
           </div>
         </div>
       </div>}
@@ -536,7 +536,7 @@ function TheGiaoBtvn() {
               : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
-          <ClipboardCheck size={16} /> Đợt bài đã giao
+          <ClipboardCheck size={16} /> Bài tập về nhà đã giao
           {nhomBtvn(theoDoi).length > 0 && (
             <span className="px-2 py-0.5 text-[11px] rounded-full bg-blue-100 dark:bg-blue-950 text-[color:var(--m3-primary)] dark:text-blue-300 font-bold ml-0.5">
               {nhomBtvn(theoDoi).length}
@@ -1125,8 +1125,8 @@ function TheGiaoBtvn() {
                         </span>
                         {t.caNhan && (
                           <p className="bn-theo-doi-nang-do">
-                            <span className="bn-chip bn-chip--tot bn-chip--nho">Cá nhân hoá · lõi {t.soLoi ?? 0} câu</span>
-                            <span>Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên phần lõi.</span>
+                            <span className="bn-chip bn-chip--tot bn-chip--nho">Cá nhân hoá · {t.soLoi ?? 0} câu cốt lõi</span>
+                            <span>Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên câu cốt lõi.</span>
                           </p>
                         )}
                         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">
@@ -1171,6 +1171,7 @@ function TheGiaoBtvn() {
                         onClick={() =>
                           setXacNhan({
                             text: `Thu hồi bài này của ${t.tong} học sinh? Kết quả đã nộp vẫn được giữ lại.`,
+                            nut: 'Thu hồi bài',
                             run: () => capNhatBai(t, true),
                           })
                         }
@@ -1190,10 +1191,12 @@ function TheGiaoBtvn() {
                           action === 'cho-lam-lai'
                             ? setXacNhan({
                                 text: `Cho ${t.hocSinh?.find((e) => e.sbd === sbd)?.hoTen || `học sinh ${sbd}`} làm lại? ${LOI_XAC_NHAN_LAM_LAI}`,
+                                nut: 'Cho làm lại',
                                 run: () => choLamLai(t, sbd),
                               })
                             : setXacNhan({
                                 text: `${action === 'reset' ? 'Cho làm lại' : 'Thu hồi bài của'} học sinh ${sbd}? Kết quả cũ được lưu lại.`,
+                                nut: action === 'reset' ? 'Cho làm lại' : 'Thu hồi bài',
                                 run: () => capNhatHocSinh(t, sbd, action),
                               })
                         }

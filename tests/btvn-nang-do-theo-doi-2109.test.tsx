@@ -20,7 +20,7 @@ describe('theo dõi bài NÂNG ĐỠ', () => {
     )
     const dong = container.querySelector('[data-khoi="nang-do"]') as HTMLElement
     expect(dong.textContent).toContain('Bộ của em: 46 câu · chặng 3/7')
-    expect(dong.textContent).toContain('Lõi: 20/26 (7.7/10)')
+    expect(dong.textContent).toContain('Câu cốt lõi: 20/26 (7.7/10)')
     expect(dong.textContent).toContain('Câu thưởng chưa đúng: 2 (không tính vào điểm)')
     expect(container.textContent).toContain('30/46 câu đúng (trên câu của em)')
     expect(container.textContent).not.toMatch(/xếp hạng|thứ hạng|top \d/i)
@@ -52,10 +52,10 @@ describe('theo dõi bài NÂNG ĐỠ', () => {
     expect((container.querySelector('[data-khoi="nang-do"]') as HTMLElement).textContent).toBe('Bộ của em: 40 câu · chặng 0/6')
   })
 
-  it('màn Giao bài: thẻ bài nâng đỡ có chip "Cá nhân hoá · lõi N câu" + "Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên phần lõi."', () => {
+  it('màn Giao bài: thẻ bài nâng đỡ có chip "Cá nhân hoá · lõi N câu" + "Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên câu cốt lõi."', () => {
     const src = fs.readFileSync(path.join(process.cwd(), 'src/screens/PhanCongScreen.tsx'), 'utf8')
-    expect(src).toContain('Cá nhân hoá · lõi {t.soLoi ?? 0} câu')
-    expect(src).toContain('Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên phần lõi.')
+    expect(src).toContain('Cá nhân hoá · {t.soLoi ?? 0} câu cốt lõi')
+    expect(src).toContain('Điểm mỗi em tính trên số câu của em; so cả lớp CHỈ trên câu cốt lõi.')
     expect(src).toContain("{t.caNhan ? ' trong bài' : ''}")
   })
 })

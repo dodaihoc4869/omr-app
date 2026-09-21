@@ -15,7 +15,7 @@ describe('PhanCongScreen — nhãn hệ BTVN', () => {
     expect(MAN).not.toMatch(/ba vòng/i)
   })
 
-  it('nói hệ lô theo hạn nộp', () => {
-    expect(MAN).toContain('Chia lô theo hạn nộp')
+  it('nói hệ chặng theo hạn nộp (21/09: "lô" → "chặng" theo chuẩn từ ngữ, hàng 2)', () => {
+    expect(MAN).toContain('Chia chặng theo hạn nộp')
   })
 })

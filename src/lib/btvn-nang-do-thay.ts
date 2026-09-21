@@ -210,6 +210,15 @@ export async function xemTruocPhanBo(v: DauVaoXemTruoc): Promise<KetQuaXemTruoc>
 
 // ─────────────────────────────── NHÃN CHO THẦY ───────────────────────────────
 
+/** Chữ khi câu không còn trong bài (không hiện mã câu nội bộ). */
+export const TEN_CAU_MAT = 'Câu không còn trong bài'
+
+/** MỘT dòng mô tả câu cho thầy: "Câu 14 · Este – khái niệm · Biết · phần I". Chưa biết dạng ⇒ "chưa gắn dạng"; có mã dạng mà chưa có tên ⇒ "dạng chưa đặt tên" — KHÔNG bao giờ hiện mã nội bộ. */
+export function moTaCauChoThay(so: number, c: { chuyenDe?: string | null; dang?: string | null; mucDo: Muc; phan: string }): string {
+  const ten = (c.chuyenDe || '').trim() || (c.dang ? 'dạng chưa đặt tên' : 'chưa gắn dạng')
+  return `Câu ${so} · ${ten} · ${TEN_MUC[c.mucDo]} · phần ${c.phan}`
+}
+
 /** Nhãn của câu THỬ SỨC THÊM (bản 1.2, Boss chốt 21/09): câu lõi cao hơn bậc của em — không bắt buộc, sai không tính, không hẹn ôn. */
 export const NHAN_THU_SUC_THEM = 'Câu cốt lõi · thử sức thêm (sai không sao)'
 
@@ -240,13 +249,13 @@ export function nhanCuaCau(n: NhanCau | undefined): { chu: string; ly: string; l
     case 'khoi_dong':
       return { chu: 'Khởi động', ly: 'câu mở đầu chặng', loai: 'khoi_dong' }
     case 'loi':
-      return { chu: 'Cốt lõi', ly: 'câu cả lớp cùng làm', loai: 'loi' }
+      return { chu: 'Câu cốt lõi', ly: 'câu cả lớp cùng làm', loai: 'loi' }
     case 'dang_yeu':
-      return { chu: 'Dành riêng cho em', ly: 'dạng em đang yếu · đúng bậc của em', loai: 'rieng' }
+      return { chu: 'Câu dành riêng cho em', ly: 'dạng em đang yếu · đúng bậc của em', loai: 'rieng' }
     case 'cung_co':
-      return { chu: 'Dành riêng cho em', ly: 'củng cố dạng em đang ổn', loai: 'rieng' }
+      return { chu: 'Câu dành riêng cho em', ly: 'củng cố dạng em đang ổn', loai: 'rieng' }
     case 'thu_thach':
-      return { chu: 'Thử thách · sai không sao', ly: '+1 bậc, chỉ ở dạng em đang ổn', loai: 'thu_thach' }
+      return { chu: 'Câu thử thách (sai không sao)', ly: '+1 bậc, chỉ ở dạng em đang ổn', loai: 'thu_thach' }
     case 'loi_cao':
       return { chu: NHAN_THU_SUC_THEM, ly: 'câu cả lớp cùng làm, cao hơn bậc của em — không bắt buộc, sai không sao', loai: 'thu_thach' }
     default:
@@ -307,8 +316,8 @@ export function gioMoChang(iso: string, moc0?: string): string {
 /** Cảnh báo NÓI THẬT từ máy chủ về bộ câu (dùng chung cho lúc GIAO và lúc XEM TRƯỚC): hạn ngắn · lõi < 6 · mã câu bị bỏ · câu thiếu nhãn. Rỗng ⇒ không có gì cần nói. */
 export function canhBaoTuMayChu(kq: { canhBao?: string | null; canhBaoHanNgan?: { soCauLoiToiThieu: number; soPhien: number } | null; soLoi?: number; boQuaQid?: string[]; thieuMeta?: number }): string[] {
   const canh: string[] = []
-  if (kq.canhBaoHanNgan) canh.push(`Hạn ngắn: mỗi em tối thiểu ${kq.canhBaoHanNgan.soCauLoiToiThieu} câu lõi trong ${kq.canhBaoHanNgan.soPhien} phiên — cân nhắc lùi hạn.`)
-  if (kq.canhBao === 'loi_it_hon_6') canh.push(`Lõi chung chỉ có ${kq.soLoi ?? 0} câu (dưới 6): so chống chép bài không đủ mẫu chung — bài vẫn giao.`)
+  if (kq.canhBaoHanNgan) canh.push(`Hạn ngắn: mỗi em tối thiểu ${kq.canhBaoHanNgan.soCauLoiToiThieu} câu cốt lõi trong ${kq.canhBaoHanNgan.soPhien} phiên — cân nhắc lùi hạn.`)
+  if (kq.canhBao === 'loi_it_hon_6') canh.push(`Câu cốt lõi chung chỉ có ${kq.soLoi ?? 0} câu (dưới 6): so chống chép bài không đủ mẫu chung — bài vẫn giao.`)
   if ((kq.boQuaQid?.length ?? 0) > 0) canh.push(`Máy chủ không nhận ${kq.boQuaQid!.length} mã câu máy thầy gửi (lệch mã với tờ đề trong kho) nên bỏ qua — nhãn dạng/mức của các câu ấy lấy từ kho, cá nhân hoá có thể kém chính xác.`)
   if ((kq.thieuMeta ?? 0) > 0) canh.push(`${kq.thieuMeta} câu máy thầy không gửi được nhãn dạng/mức — máy chủ lấy từ tờ kho (thiếu nữa thì tính là mức Biết).`)
   return canh

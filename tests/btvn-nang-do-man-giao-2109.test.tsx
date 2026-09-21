@@ -55,7 +55,7 @@ describe('màn Giao bài · Cá nhân hoá', () => {
     expect(nangDo.cau[0]).toMatchObject({ dang: 'ESTE_KN', mucDo: 1, sao: 2, phan: 'I' })
     expect(nangDo.cau[1]).toMatchObject({ dang: null, mucDo: 0 })
     expect(nangDo.hatGiong.length).toBeGreaterThan(5)
-    expect(await screen.findByText(/Mỗi em một bộ riêng, lõi chung 3 câu\./)).toBeTruthy()
+    expect(await screen.findByText(/Mỗi em một bộ câu dành riêng, 3 câu cốt lõi chung\./)).toBeTruthy()
   })
 
   it('TẮT công tắc → giao NHƯ CŨ: không gửi nangDo (tham số cuối vắng)', async () => {
@@ -80,7 +80,7 @@ describe('màn Giao bài · Cá nhân hoá', () => {
     m.giao.mockResolvedValue({ maBtvn: 'B1', soEm: 2, soCau: 80, hanNop: '2026-09-25T15:00:00Z', caNhan: false })
     await moManGiao()
     fireEvent.click(screen.getByRole('button', { name: /Giao bài tập/ }))
-    expect(await screen.findByText('Máy chủ chưa hỗ trợ cá nhân hoá — bài này đã giao NHƯ CŨ: cả lớp nhận đủ 80 câu, không phân bổ riêng từng em.')).toBeTruthy()
+    expect(await screen.findByText('Máy chủ chưa hỗ trợ cá nhân hoá — bài này đã giao NHƯ CŨ: cả lớp nhận đủ 80 câu, không chia câu dành riêng cho từng em.')).toBeTruthy()
     expect(screen.queryByText(/Mỗi em một bộ riêng/)).toBeNull()
   })
 
@@ -127,7 +127,7 @@ describe('màn Giao bài · Cá nhân hoá', () => {
     m.giao.mockResolvedValue({ maBtvn: 'B1', soEm: 2, soCau: 3, hanNop: '2026-09-25T15:00:00Z', caNhan: true, soLoi: 3, canhBao: 'loi_it_hon_6', boQuaQid: ['Z1', 'Z2'], thieuMeta: 1 })
     await moManGiao()
     fireEvent.click(screen.getByRole('button', { name: /Giao bài tập/ }))
-    expect(await screen.findByText(/Lõi chung chỉ có 3 câu \(dưới 6\)/)).toBeTruthy()
+    expect(await screen.findByText(/Câu cốt lõi chung chỉ có 3 câu \(dưới 6\)/)).toBeTruthy()
     expect(screen.getByText(/Máy chủ không nhận 2 mã câu máy thầy gửi \(lệch mã với tờ đề trong kho\)/)).toBeTruthy()
     expect(screen.getByText(/1 câu máy thầy không gửi được nhãn dạng\/mức — máy chủ lấy từ tờ kho/)).toBeTruthy()
   })

@@ -179,7 +179,7 @@ export default function HocSinhNhanBai({
                   {e.soCauCuaEm == null ? <span>Chưa mở bài — bộ câu chưa chốt</span> : <span>{chuBoCuaEm(e)}</span>}
                   {e.soCauLoi != null && e.soCauLoi > 0 && typeof e.soDungLoi === 'number' && (
                     <span>
-                      Lõi: {e.soDungLoi}/{e.soCauLoi}
+                      Câu cốt lõi: {e.soDungLoi}/{e.soCauLoi}
                       {typeof e.diemLoi === 'number' ? ` (${e.diemLoi.toFixed(1)}/10)` : ''}
                     </span>
                   )}

@@ -394,7 +394,7 @@
 }
 .bn-tp-hang {
   display: grid;
-  grid-template-columns: minmax(0, 1.8fr) 44px 112px 168px 52px;
+  grid-template-columns: minmax(0, 1.6fr) 44px 156px 168px 52px;
   gap: 12px;
   align-items: center;
   width: 100%;
@@ -461,6 +461,14 @@
 .bn-tp-chang small {
   font-size: 11px;
   opacity: 0.85;
+  white-space: nowrap;
+}
+/* "26 câu cốt lõi · 20 câu dành riêng": được xuống dòng ở dấu "·", mỗi cụm số + chữ giữ liền */
+.bn-tp-thanh small {
+  white-space: normal;
+  line-height: 1.35;
+}
+.bn-tp-thanh small > span {
   white-space: nowrap;
 }
 .bn-tp-bb {

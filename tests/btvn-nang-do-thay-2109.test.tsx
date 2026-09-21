@@ -55,7 +55,7 @@ describe('taoCauGiao — câu của các tờ đề đã tick, kèm dạng/mức
     expect(canhBaoTuMayChu({ canhBao: null, boQuaQid: [], thieuMeta: 0 })).toEqual([])
     const c = canhBaoTuMayChu({ canhBao: 'loi_it_hon_6', soLoi: 3, boQuaQid: ['Z1', 'Z2'], thieuMeta: 4 })
     expect(c).toHaveLength(3)
-    expect(c[0]).toContain('Lõi chung chỉ có 3 câu (dưới 6)')
+    expect(c[0]).toContain('Câu cốt lõi chung chỉ có 3 câu (dưới 6)')
     expect(c[1]).toContain('Máy chủ không nhận 2 mã câu')
     expect(c[2]).toContain('4 câu máy thầy không gửi được nhãn')
     expect(canhBaoTuMayChu({ canhBao: 'la' })).toEqual([]) // cảnh báo lạ ⇒ không đoán
@@ -69,10 +69,10 @@ describe('taoCauGiao — câu của các tờ đề đã tick, kèm dạng/mức
     expect(gioMoChang('không phải ngày')).toBe('')
   })
   it('hạn NGẮN: cảnh báo "Hạn ngắn: mỗi em tối thiểu N câu lõi trong M phiên — cân nhắc lùi hạn." đứng đầu; thiếu/0 ⇒ không cảnh báo', () => {
-    expect(canhBaoTuMayChu({ canhBaoHanNgan: { soCauLoiToiThieu: 12, soPhien: 3 } })).toEqual(['Hạn ngắn: mỗi em tối thiểu 12 câu lõi trong 3 phiên — cân nhắc lùi hạn.'])
+    expect(canhBaoTuMayChu({ canhBaoHanNgan: { soCauLoiToiThieu: 12, soPhien: 3 } })).toEqual(['Hạn ngắn: mỗi em tối thiểu 12 câu cốt lõi trong 3 phiên — cân nhắc lùi hạn.'])
     const c = canhBaoTuMayChu({ canhBaoHanNgan: { soCauLoiToiThieu: 12, soPhien: 3 }, canhBao: 'loi_it_hon_6', soLoi: 3 })
     expect(c[0]).toContain('Hạn ngắn:')
-    expect(c[1]).toContain('Lõi chung chỉ có 3 câu')
+    expect(c[1]).toContain('Câu cốt lõi chung chỉ có 3 câu')
     expect(canhBaoTuMayChu({ canhBaoHanNgan: null })).toEqual([])
   })
   it('mucSo / maDangCuaThay / nhãn câu', () => {
@@ -80,10 +80,10 @@ describe('taoCauGiao — câu của các tờ đề đã tick, kèm dạng/mức
     expect(maDangCuaThay({ dang: 'D1', chuyenDe: 'Ester' })).toBe('D1')
     expect(maDangCuaThay({ dang: null, chuyenDe: 'Ester' })).toBe('CD:Ester')
     expect(nhanCuaCau('khoi_dong').chu).toBe('Khởi động')
-    expect(nhanCuaCau('loi').chu).toBe('Cốt lõi')
-    expect(nhanCuaCau('dang_yeu').chu).toBe('Dành riêng cho em')
-    expect(nhanCuaCau('cung_co').chu).toBe('Dành riêng cho em')
-    expect(nhanCuaCau('thu_thach').chu).toBe('Thử thách · sai không sao')
+    expect(nhanCuaCau('loi').chu).toBe('Câu cốt lõi')
+    expect(nhanCuaCau('dang_yeu').chu).toBe('Câu dành riêng cho em')
+    expect(nhanCuaCau('cung_co').chu).toBe('Câu dành riêng cho em')
+    expect(nhanCuaCau('thu_thach').chu).toBe('Câu thử thách (sai không sao)')
     expect(nhanCuaCau('loi_cao').chu).toBe('Câu cốt lõi · thử sức thêm (sai không sao)') // bản 1.2 (Boss 21/09): trước là "Cốt lõi · câu thưởng"
     expect(taoHatGiong().length).toBeLessThanOrEqual(40)
     expect(taoHatGiong()).not.toBe(taoHatGiong())
@@ -290,7 +290,7 @@ describe('XemTruocPhanBo — bảng từng em + danh sách câu', () => {
       expect(el).toBeTruthy()
       return el as HTMLElement
     })
-    expect(canh.textContent).toContain('Lõi chung chỉ có 3 câu (dưới 6)')
+    expect(canh.textContent).toContain('Câu cốt lõi chung chỉ có 3 câu (dưới 6)')
     expect(canh.textContent).toContain('Máy chủ không nhận 2 mã câu')
     expect(canh.textContent).toContain('2 câu máy thầy không gửi được nhãn')
     cleanup()
@@ -307,7 +307,7 @@ describe('XemTruocPhanBo — bảng từng em + danh sách câu', () => {
     await screen.findByRole('button', { name: /Trần Thu Hà/ })
     const ten = () => [...container.querySelectorAll('.bn-tp-chang-ten')].map((h) => h.textContent)
     await waitFor(() => expect(ten()).toEqual(['Chặng 1 · 20:00 · 2 câu', 'Chặng 2 · 21:20 · 3 câu']))
-    expect(container.querySelector('[data-khoi="canh-bao-may-chu"]')!.textContent).toContain('Hạn ngắn: mỗi em tối thiểu 12 câu lõi trong 3 phiên — cân nhắc lùi hạn.')
+    expect(container.querySelector('[data-khoi="canh-bao-may-chu"]')!.textContent).toContain('Hạn ngắn: mỗi em tối thiểu 12 câu cốt lõi trong 3 phiên — cân nhắc lùi hạn.')
     expect(container.querySelector('[data-khoi="lich-theo-gio"]')).toBeTruthy()
     cleanup()
     m.xemTruoc.mockResolvedValue({ ...KQ, chiTiet: { ...CT, theoGio: false, lich } })
@@ -327,23 +327,23 @@ describe('XemTruocPhanBo — bảng từng em + danh sách câu', () => {
     const hang = [...container.querySelectorAll('.bn-tp-hang:not(.bn-tp-hang--dau)')]
     expect(hang.map((h) => h.querySelector('.bn-tp-ten b')?.textContent)).toEqual(['Trần Thu Hà', 'Nguyễn Minh Khôi', 'Đỗ Khánh Linh'])
     expect(hang[0].querySelector('.bn-tp-tong')?.textContent).toBe('46')
-    expect(hang[0].querySelector('.bn-tp-thanh small')?.textContent).toBe('26 lõi · 20 riêng') // riêng = soRieng 15 + thử thách 5
+    expect(hang[0].querySelector('.bn-tp-thanh small')?.textContent).toBe('26 câu cốt lõi · 20 câu dành riêng') // riêng = soRieng 15 + thử thách 5
     expect([...hang[0].querySelectorAll('.bn-tp-bac-o b')].map((x) => x.textContent)).toEqual(['24', '17', '5'])
     expect(hang[0].querySelector('.bn-tp-chang b')?.textContent).toBe('7')
     expect(hang[0].textContent).toContain('đang yếu 3 dạng')
     expect(hang[2].textContent).toContain('chưa có hồ sơ')
-    expect(screen.getByText('Lõi chung 26 câu')).toBeTruthy()
+    expect(screen.getByText('26 câu cốt lõi chung')).toBeTruthy()
     expect(screen.getByText('Xem trước — chưa ghi gì')).toBeTruthy()
     expect(container.textContent).not.toMatch(/xếp hạng|top \d|thứ nhất/i)
   })
 
-  it('em đầu có sẵn danh sách câu theo chặng + nhãn lý do (Khởi động / Cốt lõi / Dành riêng / Thử thách / Câu cốt lõi · thử sức thêm); em khác → gọi lại xin chi tiết đúng em ấy', async () => {
+  it('em đầu có sẵn danh sách câu theo chặng + nhãn lý do (Khởi động / Câu cốt lõi / Câu dành riêng cho em / Câu thử thách / Câu cốt lõi · thử sức thêm); em khác → gọi lại xin chi tiết đúng em ấy', async () => {
     m.xemTruoc.mockResolvedValueOnce(KQ).mockResolvedValueOnce({ ...KQ, ds: [KQ.ds[1]], chiTiet: { sbd: '034', chang: [['Q1']], nhan: { Q1: 'khoi_dong' } } })
     const { container } = dung()
     await screen.findByRole('button', { name: /Trần Thu Hà/ })
     const ct = () => container.querySelector('.bn-tp-chi-tiet') as HTMLElement
     expect([...ct().querySelectorAll('.bn-tp-chang-ten')].map((x) => x.textContent)).toEqual(['Chặng 1 · 2 câu', 'Chặng 2 · 3 câu'])
-    expect([...ct().querySelectorAll('.bn-tp-cau .bn-chip')].map((x) => x.textContent)).toEqual(['Khởi động', 'Dành riêng cho em', 'Cốt lõi', 'Thử thách · sai không sao', 'Câu cốt lõi · thử sức thêm (sai không sao)'])
+    expect([...ct().querySelectorAll('.bn-tp-cau .bn-chip')].map((x) => x.textContent)).toEqual(['Khởi động', 'Câu dành riêng cho em', 'Câu cốt lõi', 'Câu thử thách (sai không sao)', 'Câu cốt lõi · thử sức thêm (sai không sao)'])
     expect(ct().textContent).toContain('dạng em đang yếu · đúng bậc của em')
     expect(ct().textContent).toContain('Câu 1 ·') // số thứ tự trong đề, không lộ qid
     fireEvent.click(screen.getByRole('button', { name: /Nguyễn Minh Khôi/ }))
@@ -491,7 +491,7 @@ describe('BẢN 1.2 — "bắt buộc N câu · thử sức thêm M câu (không
       const { container } = dung()
       await screen.findByRole('button', { name: /Trần Thu Hà/ })
       const ct = container.querySelector('.bn-tp-chi-tiet') as HTMLElement
-      expect(ct.querySelector('.bn-phu')!.textContent).toBe('20 câu bắt buộc · 4 chặng · lõi 14 + riêng 6 · thử thách 0 · thử sức thêm 9 câu (không bắt buộc)')
+      expect(ct.querySelector('.bn-phu')!.textContent).toBe('20 câu bắt buộc · 4 chặng · 14 câu cốt lõi + 6 câu dành riêng · 0 câu thử thách · thử sức thêm 9 câu (không bắt buộc)')
       const khoi = [...ct.querySelectorAll('.bn-tp-chang-khoi')]
       expect(khoi.map((k) => k.querySelector('h4')!.textContent)).toEqual(['Chặng 1 · 2 câu', 'Chặng 2 · 2 câu', 'Thử sức thêm · 2 câu · không bắt buộc · mở cùng chặng cuối'])
       const nhom = ct.querySelector('[data-khoi="thu-suc-them"]') as HTMLElement
@@ -512,7 +512,7 @@ describe('BẢN 1.2 — "bắt buộc N câu · thử sức thêm M câu (không
       expect(container.querySelector('.bn-tp-bang')!.textContent).not.toMatch(/bắt buộc/) // bảng từng em (lý do của câu loi_cao ở chi tiết có chữ "không bắt buộc" — đó là lý do CỦA CÂU)
       expect(container.querySelector('[data-khoi="bat-buoc-thu-suc"]')).toBeNull() // (nhãn của câu loi_cao trong chặng — máy chủ cũ — vẫn có chữ "thử sức thêm": đó là NHÃN CÂU, không phải số của em)
       expect(container.querySelector('[data-khoi="thu-suc-them"]')).toBeNull()
-      expect(container.querySelector('.bn-tp-chi-tiet .bn-phu')!.textContent).toBe('46 câu · 7 chặng · lõi 26 + riêng 15 · thử thách 5')
+      expect(container.querySelector('.bn-tp-chi-tiet .bn-phu')!.textContent).toBe('46 câu · 7 chặng · 26 câu cốt lõi + 15 câu dành riêng · 5 câu thử thách')
     })
   })
 })

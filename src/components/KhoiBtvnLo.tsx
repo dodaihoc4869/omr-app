@@ -24,13 +24,13 @@ export default function KhoiBtvnLo({ bt, tai, lyDo, onGiaoMoi }: { bt: HomNay['b
             <span className="hn-btvn-ten">
               {b.ten} · {b.lop}
             </span>
-            <span className="hn-lo" aria-label={`Lô ${b.loHienTai} trên ${b.tongLo}`}>
+            <span className="hn-lo" aria-label={`Chặng ${b.loHienTai} trong ${b.tongLo} chặng`}>
               {Array.from({ length: b.tongLo }, (_, i) => (
                 <i key={i} className={i < b.loHienTai ? 'da' : ''} />
               ))}
             </span>
             <span className="hn-btvn-lo">
-              lô {b.loHienTai}/{b.tongLo}
+              Chặng {b.loHienTai} trong {b.tongLo} chặng
             </span>
             <span className="hn-btvn-kip">{kip == null ? '' : `${kip}% kịp`}</span>
             <span className="hn-btvn-han">{b.han ? `hạn ${thuCuaHan(b.han)}` : ''}</span>

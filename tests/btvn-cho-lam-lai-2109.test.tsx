@@ -122,19 +122,19 @@ describe('màn Giao bài · tab đã giao — Cho làm lại từng em (một b�
     return await screen.findByRole('dialog', { name: 'Xác nhận thay đổi bài tập' })
   }
 
-  it('hỏi lại bằng lời NÓI THẬT (làm lại từ chặng 1, cùng bộ câu, hạn không đổi, điểm cũ vào lịch sử); Hủy thì KHÔNG gọi máy chủ', async () => {
+  it('hỏi lại bằng lời NÓI THẬT (làm lại từ chặng 1, cùng bộ câu, hạn không đổi, điểm cũ vào lịch sử); Giữ nguyên thì KHÔNG gọi máy chủ', async () => {
     const hop = await moXacNhan()
     expect(hop.textContent).toContain('Cho Lê Minh Đức làm lại?')
     expect(hop.textContent).toContain('Em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi; điểm mới thay điểm cũ, điểm cũ vẫn lưu trong lịch sử.')
-    fireEvent.click(within(hop).getByRole('button', { name: 'Hủy' }))
+    fireEvent.click(within(hop).getByRole('button', { name: 'Giữ nguyên' }))
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(m.lamLai).not.toHaveBeenCalled()
     expect(m.sua).not.toHaveBeenCalled()
   })
 
-  it('Xác nhận ⇒ gọi /btvn/cho-lam-lai (KHÔNG phải /btvn/sua) với mã bài + SBD; báo kết quả thật + tải lại danh sách', async () => {
+  it('Bấm "Cho làm lại" trong hộp ⇒ gọi /btvn/cho-lam-lai (KHÔNG phải /btvn/sua) với mã bài + SBD; báo kết quả thật + tải lại danh sách', async () => {
     const hop = await moXacNhan()
-    fireEvent.click(within(hop).getByRole('button', { name: 'Xác nhận' }))
+    fireEvent.click(within(hop).getByRole('button', { name: 'Cho làm lại' }))
     await waitFor(() => expect(m.lamLai).toHaveBeenCalledWith('B1', '001'))
     expect(m.sua).not.toHaveBeenCalled()
     expect(await screen.findByText(/Đã cho Lê Minh Đức làm lại \(lượt làm thứ 2\): em làm lại từ chặng 1, cùng bộ câu, hạn nộp không đổi\./)).toBeTruthy()
@@ -144,7 +144,7 @@ describe('màn Giao bài · tab đã giao — Cho làm lại từng em (một b�
   it('máy chủ từ chối / chưa có lệnh ⇒ hiện ĐÚNG lời ấy, KHÔNG nói "đã cho làm lại"', async () => {
     m.lamLai.mockRejectedValue(new Error('Máy chủ chưa có lệnh Cho làm lại — chưa mở lại được bài. Kết quả của em vẫn giữ nguyên.'))
     const hop = await moXacNhan()
-    fireEvent.click(within(hop).getByRole('button', { name: 'Xác nhận' }))
+    fireEvent.click(within(hop).getByRole('button', { name: 'Cho làm lại' }))
     expect(await screen.findByText(/Máy chủ chưa có lệnh Cho làm lại — chưa mở lại được bài/)).toBeTruthy()
     expect(screen.queryByText(/Đã cho Lê Minh Đức làm lại/)).toBeNull()
   })
@@ -153,7 +153,7 @@ describe('màn Giao bài · tab đã giao — Cho làm lại từng em (một b�
     // hai dòng bài cùng một lần giao (cùng giaoLuc + đề) nhưng khác ca: em 001 thuộc dòng "CA2-xyz"
     m.theoDoi.mockResolvedValue([bai({ caNhan: true }, [HS[1]]), bai({ caNhan: true, maBtvn: 'CA2-xyz', maCa: 'C2' }, [HS[0]])])
     const hop = await moXacNhan()
-    fireEvent.click(within(hop).getByRole('button', { name: 'Xác nhận' }))
+    fireEvent.click(within(hop).getByRole('button', { name: 'Cho làm lại' }))
     await waitFor(() => expect(m.lamLai).toHaveBeenCalledWith('CA2-xyz', '001'))
   })
 })

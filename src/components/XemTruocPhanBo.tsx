@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import type { CauGiao } from '../lib/btvn-nang-do'
-import { EM_MOI_LUOT, NHAN_THU_SUC_THEM, TEN_MUC, batBuocVaThuSucThem, canhBaoTuMayChu, chuBatBuoc, gioMoChang, nhanCuaCau, xemTruocPhanBo, type ChiTietEmXemTruoc, type DauVaoXemTruoc, type EmXemTruoc } from '../lib/btvn-nang-do-thay'
+import { EM_MOI_LUOT, NHAN_THU_SUC_THEM, TEN_CAU_MAT, batBuocVaThuSucThem, canhBaoTuMayChu, chuBatBuoc, gioMoChang, moTaCauChoThay, nhanCuaCau, xemTruocPhanBo, type ChiTietEmXemTruoc, type DauVaoXemTruoc, type EmXemTruoc } from '../lib/btvn-nang-do-thay'
 import '../screens/btvn-nang-do-m3.css'
 
 /** XEM TRƯỚC PHÂN BỔ (bản vẽ docs/ban-ve-btvn-nang-do-2109/2-xem-truoc-phan-bo.jpg, thầy duyệt 21/09): tấm phủ toàn màn — bảng từng em (tổng · lõi/riêng · bậc Biết/Hiểu/Vận dụng · số
@@ -101,7 +101,7 @@ export default function XemTruocPhanBo({
   const coBanMoi = ds.some((x) => batBuocVaThuSucThem(x.tomTat).thuSucThem != null)
   const moTaCau = (qid: string) => {
     const v = viTri.get(qid)
-    return v ? `Câu ${v.so} · ${v.c.chuyenDe || (v.c.dang ?? 'chưa gắn dạng')} · ${TEN_MUC[v.c.mucDo]} · phần ${v.c.phan}` : qid
+    return v ? moTaCauChoThay(v.so, v.c) : TEN_CAU_MAT
   }
 
   return (
@@ -126,7 +126,7 @@ export default function XemTruocPhanBo({
         <span className="bn-chip bn-chip--chinh">
           {dau.dsMaDe.length} tờ đề · {soCauBai || cau.length} câu
         </span>
-        {ds.length > 0 && <span className="bn-chip bn-chip--tot">Lõi chung {soLoi} câu</span>}
+        {ds.length > 0 && <span className="bn-chip bn-chip--tot">{soLoi} câu cốt lõi chung</span>}
         <span className="bn-chip bn-chip--trung">{dsSbd.length} em</span>
         <span className="bn-chip bn-chip--canh">Xem trước — chưa ghi gì</span>
       </div>
@@ -155,7 +155,7 @@ export default function XemTruocPhanBo({
             <div className="bn-tp-hang bn-tp-hang--dau" aria-hidden="true">
               <span>HỌC SINH</span>
               <span>{coBanMoi ? 'BẮT BUỘC' : 'TỔNG'}</span>
-              <span>LÕI / RIÊNG</span>
+              <span>CÂU CỐT LÕI / DÀNH RIÊNG</span>
               <span>BẬC</span>
               <span>CHẶNG</span>
             </div>
@@ -184,7 +184,7 @@ export default function XemTruocPhanBo({
                       <i style={{ width: `${((t.soRieng + t.soThuThach) / Math.max(1, t.tong)) * 100}%` }} className="bn-tp-doan bn-tp-doan--rieng" />
                     </i>
                     <small>
-                      {t.soLoi} lõi · {t.soRieng + t.soThuThach} riêng
+                      <span>{t.soLoi} câu cốt lõi</span> · <span>{t.soRieng + t.soThuThach} câu dành riêng</span>
                     </small>
                   </span>
                   <span className="bn-tp-bac">
@@ -224,7 +224,7 @@ export default function XemTruocPhanBo({
                 {em.hoTen || `SBD ${em.sbd}`} <small>· {em.sbd}</small>
               </h3>
               <p className="bn-phu">
-                {batBuocVaThuSucThem(em.tomTat).thuSucThem != null ? `${batBuocVaThuSucThem(em.tomTat).batBuoc} câu bắt buộc` : `${em.tomTat.tong} câu`} · {em.tomTat.soChang} chặng · lõi {em.tomTat.soLoi} + riêng {em.tomTat.soRieng} · thử thách {em.tomTat.soThuThach}
+                {batBuocVaThuSucThem(em.tomTat).thuSucThem != null ? `${batBuocVaThuSucThem(em.tomTat).batBuoc} câu bắt buộc` : `${em.tomTat.tong} câu`} · {em.tomTat.soChang} chặng · {em.tomTat.soLoi} câu cốt lõi + {em.tomTat.soRieng} câu dành riêng · {em.tomTat.soThuThach} câu thử thách
                 {chuBatBuoc(batBuocVaThuSucThem(em.tomTat).batBuoc, batBuocVaThuSucThem(em.tomTat).thuSucThem) && ` · thử sức thêm ${batBuocVaThuSucThem(em.tomTat).thuSucThem} câu (không bắt buộc)`}
               </p>
               {!ct && dangTaiCT && <p className="bn-phu">Đang tải danh sách câu…</p>}

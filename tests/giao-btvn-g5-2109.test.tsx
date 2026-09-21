@@ -23,15 +23,15 @@ const BT: NonNullable<HomNay['btvn']> = {
 }
 
 describe('KhoiBtvnLo — lô BTVN', () => {
-  it('mỗi bài một dòng: tên · lớp, dải lô (số chấm đầy = lô hiện tại), "lô x/y", % kịp, hạn', () => {
+  it('mỗi bài một dòng: tên · lớp, dải chặng (số chấm đầy = chặng hiện tại), "Chặng x trong y chặng", % kịp, hạn', () => {
     const { container } = render(<KhoiBtvnLo bt={BT} tai={false} lyDo="đang chờ máy chủ" />)
     const dong = [...container.querySelectorAll('.hn-btvn')]
     expect(dong).toHaveLength(2)
     expect(dong[0].querySelector('.hn-btvn-ten')?.textContent).toBe('Chương 1 · Ester – Lipid · 12A1')
-    expect(dong[0].querySelector('.hn-lo')?.getAttribute('aria-label')).toBe('Lô 3 trên 5')
+    expect(dong[0].querySelector('.hn-lo')?.getAttribute('aria-label')).toBe('Chặng 3 trong 5 chặng')
     expect(dong[0].querySelectorAll('.hn-lo i')).toHaveLength(5)
     expect(dong[0].querySelectorAll('.hn-lo i.da')).toHaveLength(3)
-    expect(dong[0].querySelector('.hn-btvn-lo')?.textContent).toBe('lô 3/5')
+    expect(dong[0].querySelector('.hn-btvn-lo')?.textContent).toBe('Chặng 3 trong 5 chặng')
     expect(dong[0].querySelector('.hn-btvn-kip')?.textContent).toBe('88% kịp') // 30/34
     expect(dong[0].querySelector('.hn-btvn-han')?.textContent).toBe('hạn thứ Sáu')
     expect(dong[1].querySelector('.hn-btvn-han')?.textContent).toBe('') // không hạn → không bịa

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Eye, Info, Pin, Plus, X } from 'lucide-react'
 import type { CauGiao } from '../lib/btvn-nang-do'
 import { chonLoi } from '../lib/btvn-nang-do'
-import { GHIM_TOI_DA, TEN_MUC, maDangCuaThay } from '../lib/btvn-nang-do-thay'
+import { GHIM_TOI_DA, TEN_CAU_MAT, maDangCuaThay, moTaCauChoThay } from '../lib/btvn-nang-do-thay'
 import '../screens/btvn-nang-do-m3.css'
 
 /** LÕI CHUNG tính ngay ở máy thầy khi lõi thuần của Code 1 đã cài; chưa cài (hoặc lỗi) ⇒ `null` và khối nói "≈ 30 %", KHÔNG bịa con số. */
@@ -24,7 +24,7 @@ export default function KhoiCaNhanHoa({ bat, doi, cau, ghim, doiGhim, onXemTruoc
   const soDang = useMemo(() => new Set(cau.map((c) => maDangCuaThay(c))).size, [cau])
   const loi = useMemo(() => (bat ? tinhLoiMayThay(cau, ghim) : null), [bat, cau, ghim])
   const viTri = useMemo(() => new Map(cau.map((c, i) => [c.qid, i + 1])), [cau])
-  const nhanCau = (c: CauGiao) => `Câu ${viTri.get(c.qid)} · ${c.chuyenDe || (c.dang ?? 'chưa gắn dạng')} · ${TEN_MUC[c.mucDo]} · phần ${c.phan}`
+  const nhanCau = (c: CauGiao) => moTaCauChoThay(viTri.get(c.qid) ?? 0, c)
   const daDay = ghim.length >= GHIM_TOI_DA
   const bo = (qid: string) => doiGhim(ghim.filter((g) => g !== qid))
   const them = (qid: string) => !daDay && !ghim.includes(qid) && doiGhim([...ghim, qid])
@@ -40,7 +40,7 @@ export default function KhoiCaNhanHoa({ bat, doi, cau, ghim, doiGhim, onXemTruoc
             <span className="bn-chip bn-chip--tot">Khuyên dùng</span>
           </div>
           <p className="bn-mo-ta">
-            Mỗi em nhận bộ câu <b>vừa sức</b> theo hồ sơ của em: <b>lõi chung</b> (cả lớp giống nhau, phủ hết các dạng) + <b>phần riêng</b>, chia thành chặng mỗi ngày. Em yếu không nhận câu vượt bậc; em khá bỏ bớt câu dễ đã đúng lại.
+            Mỗi em nhận bộ câu <b>vừa sức</b> theo hồ sơ của em: <b>câu cốt lõi chung</b> (cả lớp giống nhau, phủ hết các dạng) + <b>câu dành riêng cho em</b>, chia thành chặng mỗi ngày. Em yếu không nhận câu vượt bậc; em khá bỏ bớt câu dễ đã đúng lại.
           </p>
         </div>
         <button type="button" role="switch" aria-checked={bat} aria-label="Cá nhân hoá (khuyên dùng)" className="bn-cong-tac" data-bat={bat ? 'co' : 'khong'} onClick={() => doi(!bat)}>
@@ -85,8 +85,8 @@ export default function KhoiCaNhanHoa({ bat, doi, cau, ghim, doiGhim, onXemTruoc
                 return (
                   <span key={qid} className="bn-chip bn-chip--ghim">
                     <Pin size={14} aria-hidden="true" />
-                    {c ? nhanCau(c) : qid}
-                    <button type="button" className="bn-chip-bo" aria-label={`Bỏ ghim ${c ? nhanCau(c) : qid}`} onClick={() => bo(qid)}>
+                    {c ? nhanCau(c) : TEN_CAU_MAT}
+                    <button type="button" className="bn-chip-bo" aria-label={`Bỏ ghim ${c ? nhanCau(c) : TEN_CAU_MAT}`} onClick={() => bo(qid)}>
                       <X size={14} aria-hidden="true" />
                     </button>
                   </span>
@@ -97,7 +97,7 @@ export default function KhoiCaNhanHoa({ bat, doi, cau, ghim, doiGhim, onXemTruoc
                 {moChon ? 'Xong' : 'Chọn câu để ghim…'}
               </button>
             </div>
-            <p className="bn-phu">Câu ghim luôn nằm trong bộ của MỌI em (thêm vào lõi). Tối đa {GHIM_TOI_DA} câu. Không ghim câu nào vẫn giao và xem trước bình thường.</p>
+            <p className="bn-phu">Câu ghim luôn nằm trong bộ của MỌI em (thêm vào câu cốt lõi). Tối đa {GHIM_TOI_DA} câu. Không ghim câu nào vẫn giao và xem trước bình thường.</p>
 
             {moChon && (
               <div className="bn-chon" role="group" aria-label="Chọn câu để ghim">
