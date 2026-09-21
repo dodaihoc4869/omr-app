@@ -308,6 +308,7 @@ describe('NỘP CHẶNG (/btvn/xong-lo của bài cá nhân hoá)', () => {
   it('chặng CHƯA MỞ: chặng 1 khi chặng 0 chưa xong, chặng 1 trước 00:00 ngày mai, chiSo ngoài phạm vi ⇒ chang_chua_mo; chưa mở bài ⇒ chua_chot', async () => {
     gio(BAY_GIO)
     const d = dung()
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('btvn_mo_som','tat','x')").run() // Điều 6 mở sớm chặng tắt: test này khoá lịch/mốc mở chặng như cũ (sửa CÓ CHỦ Ý 21/09)
     await giao(d)
     expect(await nopChang(d, 0, { 'DE1-I-1': 'A' })).toMatchObject({ ok: false, lyDo: 'chua_chot' })
     const m = await mo(d)

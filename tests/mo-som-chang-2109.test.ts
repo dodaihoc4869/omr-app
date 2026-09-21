@@ -65,6 +65,15 @@ describe('mở sớm chặng kế', () => {
     expect(await lam(d, 1)).toMatchObject({ ok: false, lyDo: 'chang_chua_mo' })
   })
 
+  it("cờ LÙI NHANH `cau_hinh.btvn_mo_som = 'tat'` ⇒ không mở sớm (chặng kế chỉ mở theo lịch như trước), không moSom", async () => {
+    gio(BAY_GIO)
+    const d = dung(); await giao(d); await mo(d)
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('btvn_mo_som','tat','x')").run()
+    const r = await lam(d, 0)
+    expect(r).toMatchObject({ ok: true, loDaXong: 1, changDangMo: null }); expect(r).not.toHaveProperty('moSom')
+    expect(lichCua(d).moSom).toBeUndefined()
+  })
+
   it('chặng CUỐI xong ⇒ không có moSom (het_chang không phát ra: đã tự nộp); lịch hỏng/thiếu ⇒ không mở sớm, không lỗi', async () => {
     gio(BAY_GIO)
     const d = dung(); await giao(d); await mo(d)

@@ -97,6 +97,7 @@ describe('HẠN NGẮN (≤ 48 giờ): chia theo giờ trong cửa sổ học', 
   it('EM VÀO MUỘN: chặng k mở khi chặng k−1 xong VÀ tới giờ; xong chặng 0 lúc 22:30 thì chặng 1 (mốc 21:20) mở NGAY, không bắt chờ; xong sớm thì chờ tới mốc', async () => {
     gio(BAY_GIO)
     const d = dung()
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('btvn_mo_som','tat','x')").run() // Điều 6 mở sớm chặng tắt: test này khoá lịch/mốc mở chặng như cũ (sửa CÓ CHỦ Ý 21/09)
     await giaoHan(d, cong(BAY_GIO, 40))
     await mo(d)
     const l = luuLich(d)
@@ -210,6 +211,7 @@ describe('kế hoạch ngày dùng lịch ĐÃ LƯU', () => {
   it('hạn ngắn: sau chặng 0, sapToi trỏ đúng mốc chặng 1 đã lưu (giờ tối), không phải 00:00 ngày mai', async () => {
     gio(BAY_GIO)
     const d = dung()
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('btvn_mo_som','tat','x')").run() // Điều 6 mở sớm chặng tắt: test này khoá lịch/mốc mở chặng như cũ (sửa CÓ CHỦ Ý 21/09)
     await giaoHan(d, cong(BAY_GIO, 40))
     await mo(d)
     const l = luuLich(d)

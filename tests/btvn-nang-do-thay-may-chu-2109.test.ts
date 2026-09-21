@@ -162,6 +162,7 @@ describe('kế hoạch ngày — lô ≡ chặng', () => {
   it('ĐÃ chốt: soCau lô = số câu chặng 0, tongLo = soChang; chặng 1 chưa tới 00:00 ⇒ sapToi; sang ngày mới ⇒ lô 1 hiện', async () => {
     gio(BAY_GIO)
     const d = dung()
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('btvn_mo_som','tat','x')").run() // Điều 6 mở sớm chặng tắt: test này khoá lịch/mốc mở chặng như cũ (sửa CÓ CHỦ Ý 21/09)
     await giao(d)
     const m = await mo(d)
     const c0 = boCuaEm(d).filter((x) => x.chang === 0).map((x) => x.qid)

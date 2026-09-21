@@ -496,6 +496,9 @@ export interface MoSomKq { duoc: boolean; lyDo: string | null; chu: string }
  */
 async function moSomChangKe(env: Env, khoa: string, soChang: number, chiSoXong: number, chiSoKe: number, dung: number, tong: number, now: number): Promise<MoSomKq | null> {
   try {
+    // Cờ LÙI NHANH: `cau_hinh.btvn_mo_som = 'tat'` ⇒ không mở sớm (chặng kế chỉ mở theo lịch như trước). Vắng / khác ⇒ BẬT.
+    const co = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('btvn_mo_som').first<Hang>().catch(() => null)
+    if (chuoi(co?.gia_tri).trim().toLowerCase() === 'tat') return null
     const cu = await env.DB.prepare('SELECT chang_mo_json FROM btvn_em WHERE khoa = ?').bind(khoa).first<Hang>()
     const raw = chuoi(cu?.chang_mo_json)
     if (!raw) return null
