@@ -734,6 +734,59 @@ export function dungBangNhiemVu(input: {
   return tuKeHoachTroLy(input.keHoachTroLy, { dsMomGiao: input.dsMomGiao, now: input.now })
 }
 
+// ─── APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy lệnh 21/09; `prompt-ph-giao-them-bai-2109.md` mục B) ─────────────────────────────
+// Phụ huynh chỉ thấy việc HỌC: điểm, số câu, lên bậc, dạng con vấp, lịch ôn, bài tập về nhà, hạn nộp. Không thần thú, EXP, mảnh khiên/khiên, Đoàn Hộ Tống,
+// Đảo thần thú, Võ đài, đường vào game. Ba lớp: (1) máy chủ không gửi (Code 3) · (2) hàm này gỡ ở DỮ LIỆU trước khi vẽ · (3) màn phụ huynh cũng không vẽ (BangNhiemVu/
+// DauTrang/TheVinhDanh/BangTinPhuHuynh có chốt `laPh`) — test chốt chặn quét chữ hiển thị của cả cây.
+
+/** Chữ thuộc game. `EXP` đứng riêng (không dính chữ khác); "Linh Tâm" là tên quái của Đoàn Hộ Tống. */
+export const CHU_GAME_PH = /thần thú|\bEXP\b|khiên|Đoàn Hộ Tống|Đảo thần thú|Võ đài|Linh Tâm/i
+
+/** Chữ tự do của máy chủ (cảnh báo, ghi chú, lời Bộ não…): có chữ game ⇒ bỏ CẢ câu (rỗng), không cắt vụn. */
+export const khongChuGame = (s: string | null | undefined): string => {
+  const t = typeof s === 'string' ? s : ''
+  return CHU_GAME_PH.test(t) ? '' : t
+}
+
+/** Lời Bộ não cho phụ huynh: câu nào có chữ game bị bỏ; hết cả lời lẫn thư ⇒ null (không thẻ). */
+export function sachBoNaoChoPhuHuynh<T extends { loiNhan: string; thuTuan: string } | null | undefined>(ph: T): T | null {
+  if (!ph) return null
+  const loiNhan = khongChuGame(ph.loiNhan)
+  const thuTuan = khongChuGame(ph.thuTuan)
+  return loiNhan || thuTuan ? { ...ph, loiNhan, thuTuan } : null
+}
+
+/** Việc "luyện dạng còn yếu" (loại `than_thu` của máy chủ) nói bằng chữ HỌC TẬP: "Luyện dạng con còn vấp · 6 câu" (số câu do thẻ tự in). */
+export const TEN_VIEC_LUYEN_DANG_PH = 'Luyện dạng con còn vấp'
+
+function sachViecPh(v: TheNhiemVu): TheNhiemVu {
+  const laViecGame = v.hanhDong.loai === 'mo_than_thu'
+  return {
+    ...v,
+    tieuDe: laViecGame ? TEN_VIEC_LUYEN_DANG_PH : v.tieuDe,
+    moTa: khongChuGame(v.moTa),
+    dongPhu: v.dongPhu?.filter((x) => khongChuGame(x)),
+    hanhDong: laViecGame ? { ...v.hanhDong, nhanNut: 'Luyện dạng còn vấp' } : v.hanhDong,
+  }
+}
+
+/** Gỡ MỌI thứ của game khỏi dữ liệu Bảng nhiệm vụ trước khi đưa cho màn phụ huynh. Thuần; không đụng điểm, số câu, hạn nộp, bậc việc. */
+export function boGameChoPhuHuynh(d: DuLieuBangNhiemVu): DuLieuBangNhiemVu {
+  return {
+    ...d,
+    thanThu: { kieu: 'chua_biet' },
+    exp: null,
+    expNhan: [],
+    manhNhan: [],
+    doanMo: false,
+    thuThachRieng: null,
+    lamNgay: d.lamNgay ? sachViecPh(d.lamNgay) : null,
+    cacBac: d.cacBac.map((n) => ({ ...n, viec: n.viec.map(sachViecPh) })),
+    canhBao: d.canhBao.filter((c) => khongChuGame(c.noiDung)),
+    tienDo: { ...d.tienDo, ghiChu: khongChuGame(d.tienDo.ghiChu) || undefined },
+  }
+}
+
 // ─── BẢN NHỚ (stale-while-revalidate) ────────────────────────────────────────────────────
 // Mỗi lần mở app đều phải chờ thêm một vòng API. Nên nhớ bản kế hoạch vừa vẽ xong (cả tên bài và
 // payload để bấm được) và VẼ NGAY từ đó khi mở lại, rồi gọi máy chủ và thay khi có bản mới.

@@ -106,7 +106,7 @@ export default function DauTrang({
   // Luật 1–2 (CHUAN-TU-NGU): tên riêng do em đặt luôn đi sau danh từ chung — "Thần thú của em" / "Thần thú của con" rồi mới tới "Bông · Cấp 37".
   const nhan = nhanThu ? (
     <span className="bnv-thu-ten">
-      {co && <span className="bnv-thu-danh">{laPh ? 'Thần thú của con' : 'Thần thú của em'}</span>}
+      {co && <span className="bnv-thu-danh">Thần thú của em</span>}
       <span className="bnv-thu-goi">{nhanThu}</span>
     </span>
   ) : null
@@ -174,7 +174,8 @@ export default function DauTrang({
           )}
         </div>
 
-        {onMoThanThu && (co || chuaChon) ? (
+        {/* APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy 21/09): không thần thú (tên/ảnh/cấp), không đường vào game — không vẽ cả khung chỗ trống. */}
+        {laPh ? null : onMoThanThu && (co || chuaChon) ? (
           <button
             type="button"
             className="bnv-thu"
@@ -185,7 +186,7 @@ export default function DauTrang({
             {nhan}
           </button>
         ) : co || chuaChon ? (
-          <div className="bnv-thu" role="group" aria-label={co ? `Thần thú của con: ${nhanThu}` : 'Con chưa chọn thần thú'}>
+          <div className="bnv-thu" role="group" aria-label={co ? `Thần thú của em: ${nhanThu}` : 'Em chưa chọn thần thú'}>
             {hinhThu}
             {nhan}
           </div>

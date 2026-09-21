@@ -353,14 +353,17 @@ describe('thần thú CỦA EM (lỗi thầy báo: mọi em đều ra Hoả Long
     expect(container.textContent).not.toContain('Hoả Long · Cấp')
   })
 
-  it('phụ huynh: thấy thần thú của con (chỉ đọc); chưa chọn thì nói "Con chưa chọn thần thú"', async () => {
+  // SỬA CÓ CHỦ Ý 21/09 (thầy lệnh, prompt-ph-giao-them-bai-2109.md mục B): app phụ huynh KHÔNG còn thần thú — cả khi máy chủ có gửi, cả khi con chưa chọn.
+  it('phụ huynh: KHÔNG thấy thần thú của con (có thú hay chưa chọn đều không vẽ gì)', async () => {
     const { container, unmount } = ve({ vaiTro: 'phuhuynh', duLieu: dl({ kieu: 'co', pet: 'nuoc_long', cap: 37, ten: 'Bông' }), onGiaoBai: () => {} })
-    await cho()
-    expect(screen.getByRole('group', { name: 'Thần thú của con: Bông · Cấp 37' })).toBeTruthy()
-    expect(container.querySelector('button.bnv-thu')).toBeNull()
+    await new Promise((r) => setTimeout(r, 250)) // (không có ảnh thú để chờ)
+    expect(screen.queryByRole('group', { name: /Thần thú/ })).toBeNull()
+    expect(container.querySelector('.bnv-thu')).toBeNull()
+    expect(container.textContent).not.toMatch(/thần thú|Bông · Cấp/i)
     unmount()
-    ve({ vaiTro: 'phuhuynh', duLieu: dl({ kieu: 'chua_chon' }), onGiaoBai: () => {} })
-    expect(screen.getByRole('group', { name: 'Con chưa chọn thần thú' })).toBeTruthy()
+    const chua = ve({ vaiTro: 'phuhuynh', duLieu: dl({ kieu: 'chua_chon' }), onGiaoBai: () => {} })
+    expect(screen.queryByRole('group', { name: /chưa chọn thần thú/i })).toBeNull()
+    expect(chua.container.querySelector('[data-vung="chon-than-thu"]')).toBeNull()
   })
 
   it('bỏ nền: khung thần thú KHÔNG còn vòng tròn/bóng khối; lơ lửng ±4px ~3,2 s chỉ bằng transform; chỉ chạy khi cho phép chuyển động', () => {
@@ -443,13 +446,13 @@ describe('phụ huynh: đọc-chỉ', () => {
   const phuHuynh = (props: Partial<BangNhiemVuProps> = {}) =>
     ve({ vaiTro: 'phuhuynh', hoTen: 'Đỗ Minh', duLieu: duLieuMay(), onGiaoBai: () => {}, ...props })
 
-  it('không nút Vào thi, không nút "Làm ngay", các thẻ không bấm được; thần thú của con vẫn hiện', async () => {
+  it('không nút Vào thi, không nút "Làm ngay", các thẻ không bấm được; KHÔNG thần thú (21/09)', async () => {
     const { container } = phuHuynh()
     await screen.findByText('Hoả Long')
     expect(screen.queryByRole('button', { name: /Vào thi/ })).toBeNull()
     expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(0)
     expect(container.querySelectorAll('button.bnv-the').length).toBe(0)
-    expect(screen.getByRole('group', { name: /Thần thú của con/ })).toBeTruthy()
+    expect(screen.queryByRole('group', { name: /Thần thú/ })).toBeNull()
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Hôm nay của Minh')
   })
 
@@ -705,7 +708,7 @@ describe('EXP học tập + mảnh khiên trên bảng', () => {
   }
   const co = (extra: object = {}) => conThu(tuKeHoachNgay({ ...keHoachMayChu, exp: EXP, ...extra } as any, NOW, phu))
 
-  it('có exp: dòng "EXP hôm nay 22" + "Mảnh khiên 1/12", chi tiết nguyên văn máy chủ; PH đọc "của con"', () => {
+  it('có exp: dòng "EXP hôm nay 22" + "Mảnh khiên 1/12", chi tiết nguyên văn máy chủ; PH KHÔNG thấy vùng EXP (21/09)', () => {
     const { container, unmount } = ve({ duLieu: co(), taiVinhDanh: vinhDanhRong })
     const e = container.querySelector('[data-vung="exp"]') as HTMLElement
     expect(e.textContent).toContain('EXP hôm nay')
@@ -715,7 +718,9 @@ describe('EXP học tập + mảnh khiên trên bảng', () => {
     expect(Array.from(e.querySelectorAll('li')).map((x) => x.textContent)).toEqual(['6 câu đúng · +12 EXP', 'Xong lô đúng nhịp · +10 EXP'])
     unmount()
     const ph = render(<BangNhiemVu vaiTro="phuhuynh" hoTen="PH" now={NOW} duLieu={co()} taiVinhDanh={vinhDanhRong} />).container
-    expect(ph.querySelector('[data-vung="exp"]')!.textContent).toContain('EXP hôm nay của con')
+    // SỬA CÓ CHỦ Ý 21/09: trước đây PH đọc "EXP hôm nay của con". Nay app phụ huynh không có gì của game.
+    expect(ph.querySelector('[data-vung="exp"]')).toBeNull()
+    expect(ph.textContent).not.toMatch(/EXP|khiên/i)
   })
 
   it('còn khiên dùng được thì nói số khiên; thiếu exp ⇒ KHÔNG dựng vùng EXP, không số bịa', () => {
@@ -781,12 +786,10 @@ describe('chưa chọn thần thú: thẻ mời đầu bảng', () => {
     expect(container.querySelector('[data-vung="chon-than-thu"]')).toBeNull()
   })
 
-  it('phụ huynh: "Con chưa chọn thần thú" đọc-chỉ, KHÔNG có nút; cũng khi app không có lối mở game', () => {
+  it('phụ huynh: KHÔNG vẽ khối "chưa chọn thần thú" (21/09); học sinh không có lối mở game thì vẫn đọc-chỉ', () => {
     const { container, unmount } = render(<BangNhiemVu vaiTro="phuhuynh" hoTen="PH" now={NOW} duLieu={chua()} onMoThanThu={() => {}} taiVinhDanh={vinhDanhRong} />)
-    const s = container.querySelector('[data-vung="chon-than-thu"]') as HTMLElement
-    expect(s.tagName).toBe('SECTION')
-    expect(s.querySelector('h2')!.textContent).toBe('Con chưa chọn thần thú')
-    expect(s.querySelectorAll('button').length).toBe(0)
+    expect(container.querySelector('[data-vung="chon-than-thu"]')).toBeNull()
+    expect(container.textContent).not.toMatch(/thần thú/i)
     unmount()
     const hs = render(<BangNhiemVu vaiTro="hocsinh" hoTen="Em" now={NOW} duLieu={chua()} taiVinhDanh={vinhDanhRong} />).container
     expect(hs.querySelector('[data-vung="chon-than-thu"]')!.tagName).toBe('SECTION')

@@ -33,10 +33,12 @@ describe('Đầu Bảng nhiệm vụ: biệt danh đi sau "Thần thú của em/
     expect(ten.querySelector('.bnv-thu-goi')!.textContent).toBe('Mập Địch · Cấp 37')
     expect(container.querySelector('button[aria-label="Mở thần thú Mập Địch · Cấp 37"]')).not.toBeNull()
   })
-  it('phụ huynh: "Thần thú của con"', () => {
+  // SỬA CÓ CHỦ Ý 21/09 (thầy lệnh, prompt-ph-giao-them-bai-2109.md mục B): app phụ huynh KHÔNG còn thần thú. Trước đây: "Thần thú của con" + nhóm aria.
+  it('phụ huynh: KHÔNG thần thú (không nhãn, không nhóm aria, không khung chỗ trống)', () => {
     const { container } = bang('phuhuynh', THU)
-    expect(container.querySelector('.bnv-thu-danh')!.textContent).toBe('Thần thú của con')
-    expect(container.querySelector('[role="group"][aria-label="Thần thú của con: Mập Địch · Cấp 37"]')).not.toBeNull()
+    expect(container.querySelector('.bnv-thu-danh')).toBeNull()
+    expect(container.querySelector('.bnv-thu')).toBeNull()
+    expect(container.textContent).not.toMatch(/thần thú|Mập Địch/i)
   })
   it('chưa chọn thú: KHÔNG có nhãn "Thần thú của em" đứng một mình', () => {
     const { container } = bang('hocsinh', { kieu: 'chua_chon' })
@@ -113,7 +115,8 @@ describe('Không còn "HP" trơn trên màn học sinh (game)', () => {
 
 describe('Vinh danh: biệt danh đứng sau "Thần thú"; phiếu không có "nắm chắc"', () => {
   it('TheVinhDanh có nhãn "Thần thú" trước biệt danh', () => {
-    expect(doc('src/components/bang-nhiem-vu/TheVinhDanh.tsx')).toMatch(/<span className="bnv-chu-phu">Thần thú<\/span> \{ten\}/)
+    // SỬA CÓ CHỦ Ý 21/09: chữ "Thần thú" chỉ hiện cho học sinh (`hienThu`); phụ huynh chỉ thấy tên + điểm. Khoá nhãn học sinh vẫn còn.
+    expect(doc('src/components/bang-nhiem-vu/TheVinhDanh.tsx')).toMatch(/\{hienThu && <span className="bnv-chu-phu">Thần thú <\/span>\}\s*\{ten\}/)
   })
   it('html-phieu.ts không còn chữ "nắm chắc" (nộp ≠ nắm; bộ soi giao diện báo LỖI ở dòng 1566)', () => {
     expect(doc('src/lib/html-phieu.ts')).not.toMatch(/nắm chắc/i)

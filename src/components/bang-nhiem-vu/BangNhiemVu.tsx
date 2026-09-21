@@ -9,9 +9,9 @@ import TheThuThachRieng from './TheThuThachRieng'
 import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, MessageSquare, PawPrint, Plus, RefreshCw, Shield, Sparkles, Zap } from 'lucide-react'
-import type { DuLieuBangNhiemVu, HanhDongNhiemVu, TheNhiemVu } from '../../lib/nhiem-vu-adapter'
+import { boGameChoPhuHuynh, sachBoNaoChoPhuHuynh, type DuLieuBangNhiemVu, type HanhDongNhiemVu, type TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
 import TheLamNgay from './TheLamNgay'
@@ -141,7 +141,7 @@ export default function BangNhiemVu({
   vaiTro,
   hoTen,
   now,
-  duLieu,
+  duLieu: duLieuGoc,
   dangTai = false,
   mucMenu = [],
   khePhai,
@@ -158,7 +158,7 @@ export default function BangNhiemVu({
   giaoBai,
   onNhanThay,
   taiVinhDanh,
-  boNaoPh,
+  boNaoPh: boNaoPhGoc,
   canhBaoPh,
   onCanhBaoDaXem,
   onLamThuThach,
@@ -166,6 +166,10 @@ export default function BangNhiemVu({
 }: BangNhiemVuProps) {
   const laPh = vaiTro === 'phuhuynh'
   const choDong = useChoPhepChuyenDong()
+  // APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy 21/09): dữ liệu vào từ MỌI chỗ (bản mới, bản nhớ, test) đều bị gỡ thần thú/EXP/khiên/Đoàn ở ĐÂY, một cửa duy nhất;
+  // việc "luyện dạng còn yếu" đọc thành "Luyện dạng con còn vấp". Học sinh giữ nguyên. Xem `boGameChoPhuHuynh` (nhiem-vu-adapter.ts).
+  const duLieu = useMemo(() => (laPh ? boGameChoPhuHuynh(duLieuGoc) : duLieuGoc), [laPh, duLieuGoc])
+  const boNaoPh = useMemo(() => (laPh ? sachBoNaoChoPhuHuynh(boNaoPhGoc) : boNaoPhGoc), [laPh, boNaoPhGoc])
 
   // Thần thú mừng 1,2 s khi em vừa làm thêm được câu TRONG phiên này.
   const [dongThu, setDongThu] = useState<SpiritMotion>('idle')
@@ -197,11 +201,11 @@ export default function BangNhiemVu({
     const t = setTimeout(() => setKhoaDaAn(khoaNhan), 12000)
     return () => clearTimeout(t)
   }, [khoaNhan, dangTai])
-  const coBaoNhan = !dangTai && khoaNhan !== '#' && khoaNhan !== khoaDaAn
+  const coBaoNhan = !dangTai && !laPh && khoaNhan !== '#' && khoaNhan !== khoaDaAn
   const tongExpMoi = duLieu.expNhan.reduce((t, x) => t + x.exp, 0)
 
   // Máy chủ nói RÕ em chưa chọn thần thú (`thanThu: null`) — vd sáng sau khi đặt lại mùa: thẻ mời nổi bật đầu bảng. Không hiện khi chưa biết.
-  const chuaChonThu = !dangTai && duLieu.thanThu.kieu === 'chua_chon'
+  const chuaChonThu = !dangTai && !laPh && duLieu.thanThu.kieu === 'chua_chon'
   // Thẻ mời game Đoàn Hộ Tống: chỉ học sinh, chỉ khi máy chủ báo game mở cho em. Em chưa chọn thú vẫn thấy: game tự mở màn chọn thú có lời mời.
   const theDoan =
     !dangTai && !laPh && duLieu.doanMo === true && onLenDuongDoan ? (
@@ -289,14 +293,14 @@ export default function BangNhiemVu({
               onDaXem={onCanhBaoDaXem}
             />
             {chuaChonThu &&
-              (laPh || !onMoThanThu ? (
-                <section className="bnv-chon-thu bnv-chon-thu--doc" data-vung="chon-than-thu" aria-label={laPh ? 'Con chưa chọn thần thú' : 'Em chưa chọn thần thú'}>
+              (!onMoThanThu ? (
+                <section className="bnv-chon-thu bnv-chon-thu--doc" data-vung="chon-than-thu" aria-label="Em chưa chọn thần thú">
                   <span className="bnv-chon-thu-bt" aria-hidden="true">
                     <PawPrint size={28} />
                   </span>
                   <div className="bnv-chon-thu-chu">
-                    <h2>{laPh ? 'Con chưa chọn thần thú' : 'Em chưa chọn thần thú'}</h2>
-                    <p>{laPh ? 'Khi con chọn, thần thú sẽ hiện ở đầu trang này.' : 'Em mở game để chọn một bạn đồng hành.'}</p>
+                    <h2>Em chưa chọn thần thú</h2>
+                    <p>Em mở game để chọn một bạn đồng hành.</p>
                   </div>
                 </section>
               ) : (
@@ -450,12 +454,12 @@ export default function BangNhiemVu({
             {/* TheBoNao tự chọn phần theo vai: học sinh chỉ thấy lời của em, phụ huynh chỉ thấy lời + thư tuần (test bo-nao-the/bo-nao-bang khoá). */}
             <TheBoNao vaiTro={vaiTro} hoTen={hoTen} now={now} hs={duLieu.boNao?.hs ?? null} ph={boNaoPh ?? null} />
 
-            {duLieu.exp && (
-              <section className="bnv-exp" aria-label={laPh ? 'EXP học tập hôm nay của con' : 'EXP học tập hôm nay'} data-vung="exp">
+            {duLieu.exp && !laPh && (
+              <section className="bnv-exp" aria-label="EXP học tập hôm nay" data-vung="exp">
                 <div className="bnv-exp-hang">
                   <span className="bnv-exp-so">
                     <Zap size={18} aria-hidden="true" />
-                    <span>{laPh ? 'EXP hôm nay của con' : 'EXP hôm nay'}</span>
+                    <span>EXP hôm nay</span>
                     <b>{duLieu.exp.homNay}</b>
                   </span>
                   {duLieu.exp.manhKhien && (
@@ -522,7 +526,7 @@ export default function BangNhiemVu({
         )}
 
         {/* Không dựng khi còn skeleton: thẻ này nằm dưới vùng nhiệm vụ, nội dung thật phình ra sẽ đẩy nó đi (CLS). */}
-        {!dangTai && <TheVinhDanh tatChuyenDong={!choDong} taiDuLieu={taiVinhDanh} />}
+        {!dangTai && <TheVinhDanh tatChuyenDong={!choDong} taiDuLieu={taiVinhDanh} hienThu={!laPh} />}
       </main>
 
       {!laPh && onVaoThi && <NutVaoThi caDangMo={caDangMo} onVaoThi={onVaoThi} />}

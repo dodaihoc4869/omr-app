@@ -581,32 +581,34 @@ export default function BangTinPhuHuynh({
               </div>
             </button>
 
-            {/* 6. Thần thú */}
-            <button
-              type="button"
-              onClick={() => onSelectTab?.('thanthu')}
-              className={`p-2.5 rounded-2xl border text-left transition duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
-                activeTab === 'thanthu'
-                  ? 'border-2 border-orange-600 bg-orange-50 dark:bg-orange-950/80 shadow-sm ring-2 ring-orange-400/30'
-                  : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-orange-300 hover:shadow-xs'
-              }`}
-            >
-              <div className="flex items-center justify-between w-full">
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                  activeTab === 'thanthu' ? 'bg-orange-600 text-white' : 'bg-orange-50 dark:bg-orange-950/60 text-orange-600'
-                }`}>
-                  <Sparkles size={17} />
+            {/* 6. Thần thú — CHỈ học sinh. App phụ huynh không còn gì của game (thầy 21/09). */}
+            {studentToken && (
+              <button
+                type="button"
+                onClick={() => onSelectTab?.('thanthu')}
+                className={`p-2.5 rounded-2xl border text-left transition duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+                  activeTab === 'thanthu'
+                    ? 'border-2 border-orange-600 bg-orange-50 dark:bg-orange-950/80 shadow-sm ring-2 ring-orange-400/30'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-orange-300 hover:shadow-xs'
+                }`}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                    activeTab === 'thanthu' ? 'bg-orange-600 text-white' : 'bg-orange-50 dark:bg-orange-950/60 text-orange-600'
+                  }`}>
+                    <Sparkles size={17} />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-orange-600 transition">
-                  Thần thú của {studentToken ? 'em' : 'con'}
+                <div>
+                  <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight truncate group-hover:text-orange-600 transition">
+                    Thần thú của {studentToken ? 'em' : 'con'}
+                  </div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                    {studentToken ? 'Em' : 'Con'} luyện để lên cấp
+                  </div>
                 </div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
-                  {studentToken ? 'Em' : 'Con'} luyện để lên cấp
-                </div>
-              </div>
-            </button>
+              </button>
+            )}
           </div>
         </div>
       )}

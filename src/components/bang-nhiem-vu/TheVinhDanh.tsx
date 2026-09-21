@@ -49,8 +49,9 @@ function ngayThang(day: string): string {
   return ngay && thang ? `${ngay}/${thang}` : day
 }
 
-function Hang({ w }: { w: NguoiVinhDanh }) {
-  const pet = PETS.findIndex((p) => p.id === w.pet)
+function Hang({ w, hienThu }: { w: NguoiVinhDanh; hienThu: boolean }) {
+  // Phụ huynh (`hienThu = false`) KHÔNG thấy hình thú và chữ "Thần thú": vinh danh chỉ là tên (biệt danh/tên rút gọn) + điểm + số phút.
+  const pet = hienThu ? PETS.findIndex((p) => p.id === w.pet) : -1
   // Luật ẩn danh của BangVinhDanh: có biệt danh thần thú thì dùng, không thì tên
   // máy chủ đã rút gọn; không bao giờ có SBD.
   const ten = w.nickname || w.name
@@ -68,7 +69,8 @@ function Hang({ w }: { w: NguoiVinhDanh }) {
       )}
       <span className="bnv-the-chu">
         <span className="bnv-vd-ten">
-          <span className="bnv-chu-phu">Thần thú</span> {ten}
+          {hienThu && <span className="bnv-chu-phu">Thần thú </span>}
+          {ten}
         </span>
         <span className="bnv-chu-phu">
           {diem} điểm{phut === null ? '' : ` · ${phut} phút`}
@@ -82,8 +84,11 @@ function Hang({ w }: { w: NguoiVinhDanh }) {
 export default function TheVinhDanh({
   tatChuyenDong,
   taiDuLieu = taiTuMayChu,
+  hienThu = true,
 }: {
   tatChuyenDong: boolean
+  /** `false` ở app phụ huynh: không hình thú, không chữ "Thần thú" (app phụ huynh không có gì của game). */
+  hienThu?: boolean
   /** Chỗ cắm cho test và ảnh chụp; mặc định gọi máy chủ. */
   taiDuLieu?: () => Promise<DuLieuVinhDanh | null>
 }) {
@@ -146,7 +151,7 @@ export default function TheVinhDanh({
       ) : top3.length > 0 ? (
         <ol style={{ display: 'grid', gap: 12, margin: 0, padding: 0, listStyle: 'none' }}>
           {top3.map((w) => (
-            <Hang key={w.rank} w={w} />
+            <Hang key={w.rank} w={w} hienThu={hienThu} />
           ))}
         </ol>
       ) : (
