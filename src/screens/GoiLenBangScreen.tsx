@@ -16,8 +16,9 @@ import { TIN_TO_CHIEU, gocGuiLai, khoaToChieu, kiemTinToChieu, taoMaPhienChieu }
 //   · phần còn lại mới chia cho em, ưu tiên em SAI CHÍNH CÂU ĐÓ.
 // Thuật toán ở lib/phan-cong.ts, phần đọc dữ liệu ca ở lib/du-lieu-len-bang.ts.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay, UserCheck } from 'lucide-react'
+import { ClipboardCopy, Check, RefreshCw, Search, Wand2, Megaphone, BookOpenCheck, ThumbsUp, ThumbsDown, X, Printer, Shuffle, MonitorPlay, UserCheck, Trash2 } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
+import HopXacNhan from '../components/HopXacNhan'
 import { chiTietCa, chuoi, danhSachCa, ghiLenBang, hoSoEm, lichSuLenBang, thanThuLopDocApi, type CaTomTat, type LichSuLenBangEm } from '../lib/exam-api'
 import { docBuoiChua, docKhoChuaCa, docMauGiayThuc, loadExamSources, loadScriptUrl, loadSessionTeacherBank, loadTeacherSecret, luuBuoiChua, themMauGiayThuc, xoaBuoiChua } from '../lib/exam-db'
 import { HAN_BUOI_CHUA_NGAY, MOC_KHOA_BUOI, chuTheTiepTuc, conHan, emGiuKhiNoi, khoaBuoiChua, laBuoiChuaHopLe, taoBanGhiBuoi, tinhTrangBuoi, type BuoiChuaLuu } from '../lib/noi-buoi-chua'
@@ -325,6 +326,8 @@ export default function GoiLenBangScreen() {
   const [lichSu, setLichSu] = useState<{ soNgay: number; theoEm: Record<string, LichSuLenBangEm> } | null>(null)
   /** "Em đã làm câu này chưa": lịch sử MỌI ngày của từng cặp (em, câu) trên bảng phân công (`/gv/lich-su-cau-cua-em`). `null` = chưa có / không đọc được ⇒ không nhãn, không bịa. */
   const [lichSuCauEm, setLichSuCauEm] = useState<Map<string, LichSuCauEm> | null>(null)
+  /** Hộp xác nhận "Xoá phiên phân công lên bảng". */
+  const [hoiXoaPhien, setHoiXoaPhien] = useState(false)
   const [daCopy, setDaCopy] = useState(false)
   const [xemCau, setXemCau] = useState('')
   const [dangCham, setDangCham] = useState('')
@@ -984,6 +987,31 @@ export default function GoiLenBangScreen() {
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kqBuoi, ketQuaBuoi])
+
+  /** "XOÁ PHIÊN PHÂN CÔNG LÊN BẢNG" (thầy lệnh 21/09 16:4x): dọn phiên đang có TRÊN MÁY NÀY — buổi dở đã lưu (`xoaBuoiChua`) + bảng phân công, tiến độ các đợt, tờ chiếu, kết quả Đạt / Chưa đạt đang nhớ trên màn —
+   * rồi đưa màn về lúc chưa phân công để phân công lại từ đầu. KHÔNG GỬI LỆNH GHI NÀO lên máy chủ: bảng `len_bang` và sổ học của học sinh giữ nguyên (kết quả đã ghi vẫn còn). Ca đang mở (`du`) giữ nguyên. */
+  const xoaPhienPhanCong = async () => {
+    const khoaCa = du ? khoaBuoiChua(MOC_KHOA_BUOI, du.lop, du.maCa) : ''
+    for (const khoa of new Set([khoaCa, buoiDo?.khoa ?? ''])) if (khoa) await xoaBuoiChua(khoa).catch(() => {})
+    phienChieu.current = null
+    setKq(null)
+    setKqXep(null)
+    setKqBuoi(null)
+    setHtmlMayChieu('')
+    setKetQuaBuoi({})
+    setDaGoiCau({})
+    setSoLuot(1)
+    setXemCau('')
+    setBuoiDo(null)
+    setBuoiQuyet(null)
+    setTiepBuoi(null)
+    setTuDongXep(false)
+    goiBuoiGoc.current = null
+    batDauBuoiMoi.current = ''
+    setLichSuCauEm(null)
+    setHoiXoaPhien(false)
+    showToast('Đã xoá phiên phân công lên bảng — phân công lại từ đầu', 'success')
+  }
 
   /** "Tiếp tục buổi trước": dựng lại nguồn câu của buổi, rồi xếp CHỈ các câu còn lại cho em CÓ MẶT hôm nay (em vắng được thay). */
   const tiepTucBuoi = () => {
@@ -2084,6 +2112,19 @@ export default function GoiLenBangScreen() {
             <div style={{ ...NHAN_NHO, marginTop: 6, textAlign: 'center' }}>
               {dayHoc ? 'Mỗi câu được phân cho một em; số lượt trong buổi được tính để chia đều.' : 'Một lượt bấm ra cả giáo án theo phút và bảng phân công từng em.'}
             </div>
+          {(kq || kqBuoi || kqXep || buoiDo) && (
+            <div style={{ marginTop: 'var(--k3)' }}>
+              <button
+                type="button"
+                data-nut="xoa-phien-phan-cong"
+                onClick={() => setHoiXoaPhien(true)}
+                className="tap-target inline-flex items-center font-bold"
+                style={{ gap: 6, minHeight: 36, padding: '0 var(--k3)', borderRadius: 'var(--bo-tron)', background: 'transparent', color: 'var(--nhat)', border: '1px solid var(--vien)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+              >
+                <Trash2 size={14} /> Xoá phiên phân công lên bảng
+              </button>
+            </div>
+          )}
           </div>
 
           {/* BUỔI CHỮA 90 PHÚT — thuật toán viết lại 14/09. Hai con số thầy cần
@@ -2509,6 +2550,19 @@ export default function GoiLenBangScreen() {
       {/* TỜ MÁY CHIẾU — mở đúng trong khung xem chung với mọi phiếu khác. */}
       {htmlMayChieu && (
         <KhungXemPhieu html={htmlMayChieu} ten="Tờ máy chiếu — gọi lên bảng" dong={() => setHtmlMayChieu('')} />
+      )}
+
+      {/* XOÁ PHIÊN PHÂN CÔNG — chỉ dọn trên máy này, không đụng máy chủ (nói thật trong hộp). */}
+      {hoiXoaPhien && (
+        <HopXacNhan
+          tieuDe={`Xoá phiên phân công lên bảng của ca ${du?.ten || du?.maCa || 'này'}?`}
+          noiDung="Bảng phân công và tiến độ các đợt trên máy này sẽ mất. Kết quả Đạt / Chưa đạt đã ghi vào hồ sơ học sinh KHÔNG bị xoá."
+          nhanXacNhan="Xoá phiên"
+          nhanHuy="Giữ lại"
+          nguyHiem
+          onXacNhan={() => void xoaPhienPhanCong()}
+          onHuy={() => setHoiXoaPhien(false)}
+        />
       )}
     </div>
   )
