@@ -23,7 +23,6 @@ import { buildTeacherSourceFromKhoDe, parseKhoDeJsonText } from '../lib/exam-kho
 import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
 import { maDeTheoPhan, PHAN_DE_TACH, TEN_PHAN_TACH } from '../lib/tach-phan-de'
 import TheCau from '../components/TheCau'
-import NutQuayLai from '../components/NutQuayLai'
 import { useAppStore } from '../store/appStore'
 import { apDungSoSua, type SoSuaDang } from '../lib/sua-dang'
 import { ngayDayDu } from '../lib/ngay-gio-24'
@@ -106,7 +105,6 @@ const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'va
 
 export default function NganHangDeScreen() {
   const showToast = useAppStore((s) => s.showToast)
-  const setScreen = useAppStore((s) => s.setScreen)
 
   const [scriptUrl, setScriptUrl] = useState('')
   const [secret, setSecret] = useState('')
@@ -387,7 +385,6 @@ export default function NganHangDeScreen() {
             </p>
           </div>
         </div>
-        <NutQuayLai onClick={() => setScreen('examhub')} label="Kiểm tra" />
       </div>
 
       <TheNoiDung className="gv-bank-overview">

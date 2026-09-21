@@ -11,7 +11,6 @@ import { danhSachCa, khoiPhucCa, xoaNhieuCa, xoaVinhVienCa, type CaTomTat } from
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
-import NutQuayLai from '../components/NutQuayLai'
 import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
 import './lich-su-ca-m3.css'
 import { gioPhutVN } from '../lib/em-toan-canh'
@@ -210,7 +209,6 @@ export default function LichSuCaScreen() {
             </p>
           </div>
         </div>
-        <NutQuayLai onClick={() => setScreen('examhub')} label="Kiểm tra" />
       </div>
 
       <TheNoiDung className="gv-directory">

@@ -436,7 +436,7 @@ export default function ExamSetupScreen() {
       {/* HEADER COMPACT */}
       <div className="flex items-center justify-between gap-2 pb-1">
         <div className="flex items-center gap-2">
-          <NutQuayLai onClick={() => setScreen('examhub')} label="Kiểm tra" />
+          <NutQuayLai onClick={() => setScreen('lichsuca')} label="Ca kiểm tra" />
           <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
             Mở ca kiểm tra
           </h1>
