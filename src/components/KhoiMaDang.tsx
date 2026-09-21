@@ -236,7 +236,7 @@ export default function KhoiMaDang({
       {tk.canThayChot.length > 0 && (
         <div style={{ marginTop: 'var(--k4)' }}>
           <button className="tap-target font-bold w-full text-left" onClick={() => setMoChot((v) => !v)} style={{ background: 'var(--cam-nen)', color: 'var(--cam)', borderRadius: 'var(--bo-2)', padding: 'var(--k3) var(--k4)', fontSize: 'var(--cx-2)', fontFamily: 'var(--sans)' }}>
-            {moChot ? '▾' : '▸'} {tk.canThayChot.length} câu máy không dám gán — thầy chốt tay
+            {moChot ? '▾' : '▸'} {tk.canThayChot.length} câu A.I Đỗ Đại Học không dám gán — thầy chốt tay
           </button>
           {moChot && (
             <div style={{ marginTop: 'var(--k2)' }}>

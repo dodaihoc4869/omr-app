@@ -646,12 +646,12 @@ export default function NganHangDeScreen() {
                     <b style={{ color: 'var(--muc)' }}>{d.tong} câu</b> sẽ được hạ cờ:
                     {d.thieu > 0 && (
                       <div>
-                        · <b style={{ color: 'var(--muc)' }}>{d.thieu} câu</b> đề gốc không có đáp án, máy tự giải — duyệt là công nhận đáp án máy giải.
+                        · <b style={{ color: 'var(--muc)' }}>{d.thieu} câu</b> đề gốc không có đáp án, A.I Đỗ Đại Học tự giải — duyệt là công nhận đáp án A.I Đỗ Đại Học giải.
                       </div>
                     )}
                     {d.nghi > 0 && (
                       <div>
-                        · <b style={{ color: 'var(--muc)' }}>{d.nghi} câu</b> máy giải ra khác đề — duyệt là <b style={{ color: 'var(--muc)' }}>giữ đáp án của tác giả đề</b>.
+                        · <b style={{ color: 'var(--muc)' }}>{d.nghi} câu</b> A.I Đỗ Đại Học giải ra khác đề — duyệt là <b style={{ color: 'var(--muc)' }}>giữ đáp án của tác giả đề</b>.
                       </div>
                     )}
                   </div>
@@ -660,7 +660,7 @@ export default function NganHangDeScreen() {
                   </OThongBao>
                   {d.nghi > 0 && (
                     <OThongBao tone="cam">
-                      Có {d.nghi} câu máy giải ra khác đề. Duyệt hết là bỏ qua cảnh báo đó. Muốn xem trước thì bấm Huỷ rồi mở mục "Câu nghi đáp án đề sai".
+                      Có {d.nghi} câu A.I Đỗ Đại Học giải ra khác đề. Duyệt hết là bỏ qua cảnh báo đó. Muốn xem trước thì bấm Huỷ rồi mở mục "Câu nghi đáp án đề sai".
                     </OThongBao>
                   )}
                 </>

@@ -325,7 +325,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
       {lenBang ? (
         <div className="flex flex-col" style={{ gap: 'var(--k2)' }} data-khoi="len-bang">
           <div style={NHAN_NHO}>
-            Máy tự chọn câu trong kho thầy đã tích: phủ đều chuyên đề trước, trong mỗi chuyên đề lấy câu nhiều sao nhất, đẩy câu nghi đáp án và câu đã ra ca trước xuống cuối. Ca này để ĐO điểm yếu; muốn tự tay chọn bài chữa thì
+            A.I Đỗ Đại Học tự chọn câu trong kho thầy đã tích: phủ đều chuyên đề trước, trong mỗi chuyên đề lấy câu nhiều sao nhất, đẩy câu nghi đáp án và câu đã ra ca trước xuống cuối. Ca này để ĐO điểm yếu; muốn tự tay chọn bài chữa thì
             chọn ở màn Gọi lên bảng.
           </div>
           <div style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
@@ -338,7 +338,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
             </div>
           )}
           <OThongBao tone="xanh">
-            Cả lớp làm CÙNG một đề — bắt buộc với buổi chữa bài. Có cùng đề thì máy mới đếm được bao nhiêu em cùng sai một kiểu, và đó là thứ quyết định câu nào giảng cả lớp thay vì gọi một em lên bảng.
+            Cả lớp làm CÙNG một đề — bắt buộc với buổi chữa bài. Có cùng đề thì A.I Đỗ Đại Học mới đếm được bao nhiêu em cùng sai một kiểu, và đó là thứ quyết định câu nào giảng cả lớp thay vì gọi một em lên bảng.
           </OThongBao>
           <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }}>
             <button
@@ -353,7 +353,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
         </div>
       ) : cheDo === 'tron' ? (
         <OThongBao tone="cam">
-          Cả {tongKho} câu được đẩy lên máy chủ, mỗi em vẫn chỉ làm {SO_CAU_CHUAN.I}/{SO_CAU_CHUAN.II}/{SO_CAU_CHUAN.III} câu máy bốc ngẫu nhiên. Gói đề nặng, mà thầy không chọn được chuyên đề lẫn mức độ. Chỉ nên dùng khi kho vừa đúng một đề.
+          Cả {tongKho} câu được đẩy lên máy chủ, mỗi em vẫn chỉ làm {SO_CAU_CHUAN.I}/{SO_CAU_CHUAN.II}/{SO_CAU_CHUAN.III} câu A.I Đỗ Đại Học bốc ngẫu nhiên. Gói đề nặng, mà thầy không chọn được chuyên đề lẫn mức độ. Chỉ nên dùng khi kho vừa đúng một đề.
         </OThongBao>
       ) : (
         <>
@@ -498,7 +498,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 </div>
                 <div style={NHAN_NHO}>{GIAI_THICH_PHAM_VI[phamViHoiLai]}</div>
                 <OThongBao tone="xanh">
-                  Ca này <b>tự bật phòng chờ</b>. Em vào thì đứng ở màn chờ; thầy bấm <b>Bắt đầu thi</b> thì máy mới rút bộ câu riêng cho ĐÚNG những em đang có mặt, rồi mới phát đề.
+                  Ca này <b>tự bật phòng chờ</b>. Em vào thì đứng ở màn chờ; thầy bấm <b>Bắt đầu thi</b> thì A.I Đỗ Đại Học mới rút bộ câu riêng cho ĐÚNG những em đang có mặt, rồi mới phát đề.
                 </OThongBao>
               </div>
             ) : (
@@ -536,7 +536,7 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
             </div>
             <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
               Kho đang có {demDang.ly_thuyet} câu {TEN_DANG.ly_thuyet.toLowerCase()}, {demDang.bai_tap} câu {TEN_DANG.bai_tap.toLowerCase()}
-              {demDang.chua_ro > 0 ? `, và ${demDang.chua_ro} câu máy chưa phân loại chắc chắn — số này chỉ vào đề khi chọn Ngẫu nhiên.` : '.'}
+              {demDang.chua_ro > 0 ? `, và ${demDang.chua_ro} câu A.I Đỗ Đại Học chưa phân loại chắc chắn — số này chỉ vào đề khi chọn Ngẫu nhiên.` : '.'}
             </div>
           </div>
 

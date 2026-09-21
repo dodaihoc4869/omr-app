@@ -1256,7 +1256,7 @@ export default function ExamMonitorScreen() {
                 </div>
                 {caCanDeRieng && (
                   <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)', color: 'var(--tim)' }}>
-                    Ca này hỏi lại câu em từng sai. Bấm Bắt đầu thì máy rút bộ câu riêng cho đúng {(chiTiet.dsCho ?? []).length} em đang chờ — em vào sau đó nhận đề theo luật bốc ngẫu nhiên như ca thường.
+                    Ca này hỏi lại câu em từng sai. Bấm Bắt đầu thì A.I Đỗ Đại Học rút bộ câu riêng cho đúng {(chiTiet.dsCho ?? []).length} em đang chờ — em vào sau đó nhận đề theo luật bốc ngẫu nhiên như ca thường.
                   </div>
                 )}
                 {chiTiet.ca.loai !== 'baitap' && (

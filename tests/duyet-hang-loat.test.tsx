@@ -126,7 +126,8 @@ describe('màn Ngân hàng đề — nút duyệt hàng loạt', () => {
     const { findByRole, getByText } = render(<NganHangDeScreen />)
     fireEvent.click(await findByRole('button', { name: /Duyệt hết 4 câu(?! của đề này)/ }))
     expect(getByText(/Duyệt hàng loạt cả 1 đề/)).toBeTruthy()
-    expect(document.body.textContent).toContain('máy tự giải')
+    // Sửa có chủ ý 21/09 (thầy lệnh: thay chủ ngữ "Máy" bằng "A.I Đỗ Đại Học").
+    expect(document.body.textContent).toContain('A.I Đỗ Đại Học tự giải')
     expect(document.body.textContent).toContain('giữ đáp án của tác giả đề')
     expect(document.body.textContent).toContain('không ca nào phải chấm lại')
     // Chưa xác nhận thì chưa ghi gì xuống máy.
