@@ -477,8 +477,9 @@ export async function gvEmToanCanh(env: Env, b: Record<string, unknown>, nowMs: 
   const rTong = await Q.hoi(
     `SELECT (SELECT MAX(luc) FROM ph_truy_cap WHERE sbd = ?) AS ph, (SELECT SUM(exp) FROM exp_so WHERE sbd = ?) AS exp_tong, (SELECT SUM(exp) FROM exp_so WHERE sbd = ? AND ngay_vn = ?) AS exp_nay,
             (SELECT luc FROM su_kien_hoc WHERE sbd = ? ORDER BY luc DESC LIMIT 1) AS cuoi_luc, (SELECT nguon FROM su_kien_hoc WHERE sbd = ? ORDER BY luc DESC LIMIT 1) AS cuoi_nguon,
-            (SELECT nop_luc FROM luot WHERE sbd = ? AND nop_luc IS NOT NULL ORDER BY nop_luc DESC LIMIT 1) AS ca_luc`,
-    sbd, sbd, sbd, homNay, sbd, sbd, sbd,
+            (SELECT nop_luc FROM luot WHERE sbd = ? AND nop_luc IS NOT NULL ORDER BY nop_luc DESC LIMIT 1) AS ca_luc,
+            (SELECT gia_tri FROM cau_hinh WHERE khoa = ?) AS moc_hien_thi, (SELECT gia_tri FROM cau_hinh WHERE khoa = ?) AS moc_ve_dich, (SELECT gia_tri FROM cau_hinh WHERE khoa = ?) AS moc_bang_tin`,
+    sbd, sbd, sbd, homNay, sbd, sbd, sbd, KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO, // ba khoá mốc đọc CHUNG truy vấn này (giữ ≤ 12 truy vấn)
   )
   const rDiem = await Q.hoi(
     `SELECT l.tong, l.ma_ca, l.nop_luc, COALESCE(c.ten_ca, '') AS ten_ca FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca
@@ -551,9 +552,7 @@ export async function gvEmToanCanh(env: Env, b: Record<string, unknown>, nowMs: 
   // 4 · nhịp 30 ngày (đủ 30 ngày, ngày không làm = 0)
   const d29 = themNgay(homNay, -29)
   // MỘT định nghĩa "câu" (`cau-da-lam.ts`): số câu KHÁC NHAU đã trả lời mỗi ngày; ô HÔM NAY tính từ MAX(mốc hiển thị, 00:00) — các ngày trước giữ nguyên (lịch sử 30 ngày, không lọc mốc). Mốc đọc lỗi ⇒ mốc mặc định.
-  const rMoc = await Q.hoi('SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?)', KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO)
-  const cMoc = new Map((rMoc ?? []).map((x) => [chuoi(x.khoa), x.gia_tri]))
-  const tuLucNay = tuLucTuNgay(giaiMocHienThi(cMoc.get(KHOA_HIEN_THI_TU), cMoc.get(KHOA_VE_DICH_TU), cMoc.get(KHOA_MOC_BANG_TIN_NO)).iso, homNay)
+  const tuLucNay = tuLucTuNgay(giaiMocHienThi(rTong?.[0]?.moc_hien_thi, rTong?.[0]?.moc_ve_dich, rTong?.[0]?.moc_bang_tin).iso, homNay) // rTong lỗi ⇒ mốc mặc định
   const rNhip = await Q.hoi('SELECT ngay_vn, COUNT(DISTINCT qid) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND ngay_vn <= ? AND ket_qua IS NOT NULL AND (ngay_vn < ? OR luc >= ?) GROUP BY ngay_vn', sbd, d29, homNay, homNay, tuLucNay)
   const nhip = new Map((rNhip ?? []).map((x) => [chuoi(x.ngay_vn), so(x.n)]))
   const nhip30 = Array.from({ length: 30 }, (_, i) => { const ngay = themNgay(d29, i); return { ngay, muc: mucNhip(nhip.get(ngay) ?? 0) } })

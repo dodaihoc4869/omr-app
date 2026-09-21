@@ -130,7 +130,10 @@ describe('cùng một sổ ⇒ cùng một con số ở mọi nơi', () => {
 
   it('Toàn cảnh em (thầy): ô nhịp 30 ngày HÔM NAY chỉ nhận câu khác nhau đã trả lời từ mốc (S1: 3 câu ⇒ cùng mức với 3 câu; ô hôm qua tính Q6)', async () => {
     const d = await dung()
+    const goc = d.env.DB.prepare.bind(d.env.DB), cauHinh: string[] = []
+    d.env.DB.prepare = ((q: string) => { if (/FROM cau_hinh WHERE khoa IN/.test(q)) cauHinh.push(q); return goc(q) }) as typeof d.env.DB.prepare
     const r = (await gvEmToanCanh(d.env, { sbd: 'S1' }, NOW)) as { nhip30: { ngay: string; muc: number }[] }
+    expect(cauHinh).toEqual([]) // ba khoá mốc đọc CHUNG truy vấn tổng đầu trang (không thêm truy vấn — giữ ≤ 12)
     const homNay = r.nhip30.find((x) => x.ngay === '2026-09-22')!.muc
     const homQua = r.nhip30.find((x) => x.ngay === '2026-09-21')!.muc
     // cùng bộ thước với dữ liệu 3 câu / 1 câu: đối chiếu với em có ĐÚNG 3 và 1 câu khác nhau
