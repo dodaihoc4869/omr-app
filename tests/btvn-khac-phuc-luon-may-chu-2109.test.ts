@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { docDieuChinhHieuLuc } from '../server/src/bo-nao-doc'
 import { themNgay } from '../server/src/ho-so-nam-kt'
 import type { D1That } from './_d1-that'
-import { BAY_GIO, boCuaEm, dung, giao, gio, mo, nopChang } from './_btvn-nang-do-mau'
+import { BAY_GIO, boCuaEm, dung, giao, gio, loiThieuKhongThay, mo, nopChang } from './_btvn-nang-do-mau'
 
 afterEach(() => vi.useRealTimers())
 
@@ -75,8 +75,7 @@ describe('CHỐT BỘ: dieuChinh.khacPhuc từ ai_dieu_chinh tới lõi', () => 
     expect(loiCua(d)).toEqual(loiCua(goc))
     expect(emRow(d).so_chang).toBe(emRow(goc).so_chang)
     expect(emRow(d).so_cau_em).toBe(boCuaEm(d).length)
-    const cuaEm = new Set(boCuaEm(d).map((x) => x.qid))
-    for (const q of loiCua(d)) expect(cuaEm.has(q), q).toBe(true) // lõi vẫn đủ
+    expect(loiThieuKhongThay(d)).toEqual([]) // lõi vẫn đủ (lõi đúng bậc: câu lõi mức thấp chỉ được thay bằng câu cùng dạng mức cao hơn)
     expect(chang(d, 0).filter((x) => x.nhan === 'khoi_dong')).toEqual(chang(goc, 0).filter((x) => x.nhan === 'khoi_dong')) // khởi động nguyên
   })
   it('CHẠY THỬ (bong) / cờ tắt / điều chỉnh của đêm chạy thử ⇒ bộ Y HỆT không có điều chỉnh (từng dòng)', async () => {
@@ -119,8 +118,7 @@ describe('THÍCH NGHI SAU CHẶNG: điều chỉnh tới SAU khi em đã chốt 
     expect(emRow(d).so_chang).toBe(lopSo)
     expect(emRow(d).so_cau_em).toBe(boCuaEm(d).length)
     expect(loiCua(d)).toEqual(loi)
-    const cuaEm = new Set(boCuaEm(d).map((x) => x.qid))
-    for (const q of loi) expect(cuaEm.has(q), q).toBe(true)
+    expect(loiThieuKhongThay(d)).toEqual([])
   })
   it('điều chỉnh của đêm CHẠY THỬ tới sau khi mở bài: thích nghi y hệt cũ (không chèn theo yêu cầu)', async () => {
     const a = await bai(null)

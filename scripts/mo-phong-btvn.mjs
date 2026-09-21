@@ -18,6 +18,7 @@
 //   thử sức     số câu "thử sức thêm — không bắt buộc": giữa / lớn nhất
 //   chặng       số chặng: nhỏ nhất–lớn nhất · chặng lớn nhất (số câu; số phút ước tính theo giây/câu của em ấy)
 //   chặng nặng  số em có ≥ 1 chặng > 20 câu hoặc > 40 phút (`laChangNang` ở btvn-nang-do-lich.ts — cùng ngưỡng máy em và Xem trước; cảnh báo)
+//   đúng bậc    trong em có dạng ỔN ĐỊNH (bậc ≥ Hiểu, không yếu): % em nhận ≥ 1 câu bắt buộc đúng bậc của mình · % câu bắt buộc thuộc dạng ổn định đúng bậc · % em "chỉ lõi" nhận ≥ 1 câu đúng bậc
 //   yếu thiếu   số em có dạng YẾU mà bộ ít hơn 2 câu ở dạng ấy (bị thiệt — cảnh báo, không phải lỗi: hạn ngắn cắt phần riêng là theo thiết kế)
 //   tối nặng    số em có buổi tối phải làm > 1,5 × ngân sách/ngày (lõi ép; `canhBaoHanNgan` báo thầy — cảnh báo)
 // Sau bảng là các phép KIỂM (lỗi ⇒ in ví dụ + thoát mã 1): bộ không rỗng · không trùng câu · lõi bắt buộc đủ · số đếm khớp · lịch hợp lệ · chặng cuối không
@@ -180,6 +181,39 @@ function chayEm(bai, em, chotMs, hanMs) {
   return { bo, ns, sc, lich: xepLichChang(p), cheDo: cheDoLich(p), q }
 }
 
+/** Dạng ỔN ĐỊNH của em: đủ tin (≥ 4 câu đã gặp), không yếu (khắc phục ≥ 70 %), bậc hồ sơ ≥ Hiểu. Trả bậc hồ sơ hoặc null. */
+function bacOnDinh(em, ma) {
+  const d = em.hoSo.dang[ma]
+  return d && d.soGap >= BTVN_NANG_DO.SO_CAU_DU_TIN_DANG && !(d.tiLeKhacPhuc !== null && d.tiLeKhacPhuc < BTVN_NANG_DO.NGUONG_DANG_YEU) && d.bac >= 1 ? d.bac : null
+}
+/** Trong các câu BẮT BUỘC thuộc dạng ổn định của em: có bao nhiêu câu, bao nhiêu câu mức == bậc của em ("đúng bậc"). */
+function demDungBac(bai, em, chang) {
+  let mau = 0, dung = 0
+  for (const q of chang.flat()) {
+    const c = bai.theoQid.get(q)
+    const bac = bacOnDinh(em, maDangCua(c))
+    if (bac === null) continue
+    mau++
+    if (c.mucDo === bac) dung++
+  }
+  return { mau, dung }
+}
+/** Lõi THEO EM (thầy chốt 21/09: "lõi đúng bậc"): cùng số câu và cùng độ phủ dạng với lõi của bài; câu khác lõi gốc chỉ là câu THAY ở dạng ổn định (gốc mức < bậc, thay mức = bậc). Trả mô tả lỗi hoặc ''. */
+function kiemLoiTheoEm(bai, em, bo) {
+  if (bo.loi.length !== bai.loi.length) return `${bo.loi.length} câu lõi ≠ ${bai.loi.length} của bài`
+  const goc = new Set(bai.loi), rieng = new Set(bo.loi)
+  const boQua = bai.loi.filter((q) => !rieng.has(q)), them = bo.loi.filter((q) => !goc.has(q))
+  const theoDang = (ds) => { const m = new Map(); for (const q of ds) m.set(maDangCua(bai.theoQid.get(q)), [...(m.get(maDangCua(bai.theoQid.get(q))) ?? []), bai.theoQid.get(q)]); return m }
+  const a = theoDang(boQua), b = theoDang(them)
+  if ([...new Set([...a.keys(), ...b.keys()])].some((ma) => (a.get(ma)?.length ?? 0) !== (b.get(ma)?.length ?? 0))) return 'câu thay không cùng dạng với câu bị thay'
+  for (const [ma, ds] of a) {
+    const bac = bacOnDinh(em, ma)
+    if (bac === null) return `thay lõi ở dạng ${ma} chưa ổn định`
+    if (ds.some((c) => c.mucDo >= bac) || (b.get(ma) ?? []).some((c) => c.mucDo !== bac)) return `dạng ${ma}: câu bị thay phải mức < ${bac}, câu thay phải mức = ${bac}`
+  }
+  return ''
+}
+
 /** Số dạng YẾU của em mà bộ ít hơn min(2, số câu KHẢ DỤNG của dạng) câu (khả dụng = chưa bị bỏ vì em đã đúng lại ≥ 2 ngày). Dạng bài chỉ có 1 câu không tính là thiệt. */
 function dangYeuThieu(bai, em, bo) {
   const co = new Set(bo.chang.flat())
@@ -198,7 +232,7 @@ function dangYeuThieu(bai, em, bo) {
 const KIEM = [
   ['bo-rong', 'bộ không rỗng (≥ 1 chặng, mọi chặng ≥ 1 câu)'],
   ['trung', 'không trùng câu (chặng + thử sức thêm), mọi câu thuộc bài'],
-  ['loi', 'lõi bắt buộc nằm ĐỦ trong các chặng, và lõi chung của bộ = lõi của bài (mọi em cùng lõi)'],
+  ['loi', 'lõi CỦA EM nằm đủ trong các chặng; cùng số câu + cùng độ phủ dạng với lõi của bài; câu khác lõi gốc chỉ là câu THAY đúng bậc ở dạng ổn định'],
   ['dem', 'số đếm khớp (tong = Σ chặng = lõi + riêng + thử thách; số chặng ≤ ngân sách chặng)'],
   ['lich', 'lịch hợp lệ (đủ chặng, chặng 0 mở lúc chốt, giờ mở không lùi, không mở sau hạn, đúng nhịp ≤ hạn)'],
   ['cuoi-han', 'chặng cuối không mở NGÀY HẠN khi giờ hạn trước cửa sổ học (hạn 12:00 ⇒ tối hôm trước là muộn nhất)'],
@@ -224,9 +258,10 @@ function kiemMotBo(mo, bai, em, r, hanMs, chotMs) {
   soPhepKiem++
   if (bo.chang.length < 1 || bo.chang.some((c) => c.length < 1) || bo.tomTat.tong < 1) baoLoi('bo-rong', mo, `${em.sbd}: ${bo.chang.length} chặng, cỡ [${bo.chang.map((c) => c.length).join(',')}]`)
   if (trung(tatCa) > 0 || tatCa.some((q) => !thuocBai.has(q))) baoLoi('trung', mo, `${em.sbd}: trùng ${trung(tatCa)} câu / có câu lạ`)
-  const thieuLoi = bai.loi.filter((q) => !bo.thuSucThem.includes(q) && !batBuoc.includes(q))
+  const thieuLoi = bo.loi.filter((q) => !bo.thuSucThem.includes(q) && !batBuoc.includes(q))
   if (thieuLoi.length) baoLoi('loi', mo, `${em.sbd}: thiếu lõi ${thieuLoi.slice(0, 3).join(',')}`)
-  if (JSON.stringify(bo.loi) !== JSON.stringify(bai.loi)) baoLoi('loi', mo, `${em.sbd}: lõi chung của bộ khác lõi của bài (${bo.loi.length} ≠ ${bai.loi.length} câu)`)
+  const loiSai = kiemLoiTheoEm(bai, em, bo)
+  if (loiSai) baoLoi('loi', mo, `${em.sbd}: ${loiSai}`)
   const t = bo.tomTat
   if (t.tong !== batBuoc.length || t.soChang !== bo.chang.length || t.soLoi + t.soRieng + t.soThuThach !== t.tong || bo.chang.length > Math.max(1, ns.soNgay))
     baoLoi('dem', mo, `${em.sbd}: tong ${t.tong}/${batBuoc.length} · chặng ${t.soChang}/${bo.chang.length} (ngân sách ${ns.soNgay}) · ${t.soLoi}+${t.soRieng}+${t.soThuThach}`)
@@ -274,7 +309,7 @@ BAI.forEach(([n, d], bi) => {
   }
   const dangCau = new Map()
   for (const c of cau) dangCau.set(maDangCua(c), [...(dangCau.get(maDangCua(c)) ?? []), c])
-  const bai = { n, d: soDangThat, cau, ghim, dangCau, hat: `hg-${hat}`, loi: chonLoi(cau, ghim) }
+  const bai = { n, d: soDangThat, cau, ghim, dangCau, theoQid: new Map(cau.map((c) => [c.qid, c])), hat: `hg-${hat}`, loi: chonLoi(cau, ghim) }
   const dsEm = Array.from({ length: SO_EM }, (_, i) => dungEm(cau, hat, i))
   for (const gioHan of HANS) {
     const hanMs = vn(themNgay(v.giao, SO_NGAY_HAN), gioHan)
@@ -285,6 +320,7 @@ BAI.forEach(([n, d], bi) => {
       const nhan = `bài ${n}×${soDangThat} · hạn ${gioHan} · mở ${m.nhan}`
       const tong = [], batBuocTheoEm = [], thuSuc = [], soChang = [], changLon = [], phutLon = []
       let dai = 0, yeuThieu = 0, toiNang = 0, chiLoi = 0, changNang = 0, loiChay = 0
+      let emOnDinh = 0, em1DungBac = 0, mauDb = 0, dungDb = 0, clOnDinh = 0, cl1DungBac = 0
       dsEm.forEach((em, ei) => {
         let r
         try {
@@ -310,6 +346,14 @@ BAI.forEach(([n, d], bi) => {
         const soThieu = dangYeuThieu(bai, em, bo)
         if (soThieu > 0) yeuThieu++
         if (bo.tomTat.soRieng + bo.tomTat.soThuThach === 0) chiLoi++
+        const db = demDungBac(bai, em, bo.chang)
+        if (db.mau > 0) {
+          emOnDinh++
+          mauDb += db.mau
+          dungDb += db.dung
+          if (db.dung > 0) em1DungBac++
+          if (bo.tomTat.soRieng + bo.tomTat.soThuThach === 0) { clOnDinh++; if (db.dung > 0) cl1DungBac++ }
+        }
         thiet.push({ nhan, sbd: em.sbd, kieu: em.kieu, cauMoiNgay: em.cauMoiNgay, thieu: soThieu, phut: phutLon[phutLon.length - 1], lon, tong: bo.tomTat.tong, loi: bai.loi.length })
         // tối nặng: tổng câu các chặng CÙNG BUỔI TỐI (ngày VN của giờ mở) > 1,5 × ngân sách/ngày
         const theoNgay = new Map()
@@ -330,7 +374,7 @@ BAI.forEach(([n, d], bi) => {
           const hongTn = []
           if (JSON.stringify(k.bo.chang[0]) !== JSON.stringify(bo.chang[0])) hongTn.push('chặng đã mở bị đổi')
           if (trung(moi) > 0) hongTn.push(`trùng ${trung(moi)} câu`)
-          const thieuLoiTn = bai.loi.filter((q) => !bo.thuSucThem.includes(q) && !k.bo.chang.flat().includes(q))
+          const thieuLoiTn = bo.loi.filter((q) => !bo.thuSucThem.includes(q) && !k.bo.chang.flat().includes(q))
           if (thieuLoiTn.length) hongTn.push(`mất lõi ${thieuLoiTn.slice(0, 2).join(',')}`)
           if (k.bo.chang.length !== bo.chang.length) hongTn.push('đổi số chặng')
           if (hongTn.length) baoLoi('thich-nghi', nhan, `${em.sbd}: ${hongTn.join('; ')}`)
@@ -348,6 +392,7 @@ BAI.forEach(([n, d], bi) => {
         soChang: [Math.min(...soChang), Math.max(...soChang)],
         changLon: [Math.max(...changLon), phutLon[iLon]],
         chiLoi, changNang, yeuThieu, toiNang,
+        dungBac: { emOnDinh, em1: em1DungBac, tiLeCau: mauDb ? dungDb / mauDb : null, chiLoiOnDinh: clOnDinh, chiLoi1: cl1DungBac },
       })
     })
     // ĐƠN ĐIỆU theo các thời điểm mở của bảng
@@ -390,6 +435,7 @@ if (v.json) {
   console.log(JSON.stringify({ dauVanTay, soEm: SO_EM, seed: SEED, giao: v.giao, bang, loi: Object.fromEntries(KIEM.map(([k, ten]) => [k, { ten, n: loi[k].n, viDu: loi[k].vd }])), canhBao: canhBaoTong }, null, 1))
   process.exit(soLoi ? 1 : 0)
 }
+const pcent = (a, b) => (b ? `${Math.round((100 * a) / b)}%` : '–')
 const ngayHienThi = (s) => `${s.slice(8, 10)}/${s.slice(5, 7)}/${s.slice(0, 4)}`
 console.log(`BỘ MÔ PHỎNG TỰ KIỂM · BTVN nâng đỡ — thuần, không đọc D1 · giao ${ngayHienThi(v.giao)} · hạn +${SO_NGAY_HAN} ngày · ${SO_EM} em giả/bài · seed ${SEED}`)
 console.log(`Dấu vân tay bộ + lịch: ${dauVanTay} (đổi lõi mà số này KHÔNG đổi = mô phỏng không chạm tới chỗ vừa sửa; đổi ngoài ý muốn = so lại bảng)\n`)
@@ -399,12 +445,12 @@ for (const b of bang) {
   if (tieuDe !== cuoi) {
     if (cuoi) console.log('')
     console.log(tieuDe)
-    console.log('  mở                dài/ngắn   bắt buộc nhỏ·giữa·lớn   thử sức giữa·lớn   chỉ lõi   chặng     chặng lớn nhất        chặng nặng  yếu thiếu   tối nặng')
+    console.log('  mở                dài/ngắn   bắt buộc nhỏ·giữa·lớn   thử sức giữa·lớn   chỉ lõi   chặng     chặng lớn nhất        chặng nặng  đúng bậc em·câu·chỉ-lõi  yếu thiếu   tối nặng')
     cuoi = tieuDe
   }
   const cot = (s, w) => String(s).padEnd(w)
   console.log(
-    `  ${cot(b.mo, 17)}  ${cot(`${b.dai}/${b.ngan}`, 9)}  ${cot(b.batBuoc.join(' · '), 22)}  ${cot(b.thuSuc.join(' · '), 17)}  ${cot(`${b.chiLoi}/${b.em}`, 8)}  ${cot(b.soChang[0] === b.soChang[1] ? b.soChang[0] : b.soChang.join('–'), 8)}  ${cot(`${b.changLon[0]} câu · ${b.changLon[1]} phút`, 20)}  ${cot(`${b.changNang}/${b.em}`, 10)}  ${cot(`${b.yeuThieu}/${b.em}`, 10)}  ${b.toiNang}/${b.em}`,
+    `  ${cot(b.mo, 17)}  ${cot(`${b.dai}/${b.ngan}`, 9)}  ${cot(b.batBuoc.join(' · '), 22)}  ${cot(b.thuSuc.join(' · '), 17)}  ${cot(`${b.chiLoi}/${b.em}`, 8)}  ${cot(b.soChang[0] === b.soChang[1] ? b.soChang[0] : b.soChang.join('–'), 8)}  ${cot(`${b.changLon[0]} câu · ${b.changLon[1]} phút`, 20)}  ${cot(`${b.changNang}/${b.em}`, 10)}  ${cot(`${pcent(b.dungBac.em1, b.dungBac.emOnDinh)} · ${b.dungBac.tiLeCau === null ? '–' : Math.round(100 * b.dungBac.tiLeCau) + '%'} · ${pcent(b.dungBac.chiLoi1, b.dungBac.chiLoiOnDinh)}`, 22)}  ${cot(`${b.yeuThieu}/${b.em}`, 10)}  ${b.toiNang}/${b.em}`,
   )
 }
 {

@@ -10,7 +10,7 @@ import { thichNghiSauChang } from '../server/src/btvn-nang-do-d1'
 import { parentPass } from '../server/src/game-v2-auth'
 import { themNgay } from '../server/src/ho-so-nam-kt'
 import { goiWorker, type D1That } from './_d1-that'
-import { BAY_GIO, DAP_AN_DUNG, boCuaEm, dung, giao, gio, maBtvn, mo, nopChang } from './_btvn-nang-do-mau'
+import { BAY_GIO, DAP_AN_DUNG, boCuaEm, dung, giao, gio, loiThieuKhongThay, maBtvn, mo, nopChang } from './_btvn-nang-do-mau'
 
 // Lõi BTVN của Code 1 bọc lại để một test có thể GIẢ một lỗi lõi (trả bộ vi phạm bất biến) — mặc định đi thẳng qua hàm thật.
 const loiLoi = { bien: null as null | ((kq: { bo: { chang: string[][]; loi: string[]; thuThach: string[] }; doi: unknown[]; henOnLai: string[] }) => unknown) }
@@ -273,10 +273,12 @@ describe('THẬT: BTVN nâng đỡ — chốt bộ + thích nghi chặng CHƯA M
     await mo(d)
     const loi = new Set((d.sql.prepare('SELECT qid FROM btvn_cau WHERE loi = 1').all() as { qid: string }[]).map((x) => x.qid))
     const dangCua = new Map((d.sql.prepare('SELECT qid, dang FROM btvn_cau').all() as { qid: string; dang: string }[]).map((x) => [x.qid, x.dang]))
-    const rieng = boCuaEm(d).filter((x) => !loi.has(x.qid)).map((x) => x.qid)
-    expect(rieng.some((q) => dangCua.get(q) === 'DA-1')).toBe(false) // tam_nghi
-    expect(boCuaEm(goc).filter((x) => !loi.has(x.qid)).some((x) => dangCua.get(x.qid) === 'DA-1')).toBe(true) // đối chứng: không điều chỉnh thì có
-    expect([...loi].every((q) => boCuaEm(d).some((x) => x.qid === q))).toBe(true) // lõi còn nguyên
+    // LÕI ĐÚNG BẬC: câu thay lõi cũng không thuộc `loi` của bài ⇒ đếm theo DẠNG: tam_nghi ⇒ dạng ấy chỉ còn ĐÚNG số câu lõi của nó, không thêm câu riêng nào
+    const soDA1 = (sbd: string, ds = boCuaEm(d, sbd)) => ds.filter((x) => dangCua.get(x.qid) === 'DA-1').length
+    const soLoiDA1 = [...loi].filter((q) => dangCua.get(q) === 'DA-1').length
+    expect(soDA1('S1')).toBeLessThanOrEqual(soLoiDA1) // tam_nghi
+    expect(soDA1('S1', boCuaEm(goc))).toBeGreaterThan(soLoiDA1) // đối chứng: không điều chỉnh thì có câu riêng của dạng
+    expect(loiThieuKhongThay(d)).toEqual([]) // lõi còn đủ
     const nsj = JSON.parse((d.sql.prepare("SELECT ngan_sach_json FROM btvn_em WHERE sbd='S1'").get() as { ngan_sach_json: string }).ngan_sach_json)
     expect(nsj.dieuChinh.dang).toEqual([{ ma: 'DA-1', nut: 'tam_nghi' }])
     expect(d.sql.prepare('SELECT han_nop FROM btvn').get()).toEqual(han)

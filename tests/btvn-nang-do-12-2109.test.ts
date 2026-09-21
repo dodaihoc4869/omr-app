@@ -16,6 +16,7 @@ import {
   type NganSachBai,
 } from '../src/lib/btvn-nang-do'
 import { mulberry32 } from '../src/lib/exam-shuffle'
+import { kiemLoiTheoEm } from './_btvn-loi-theo-em'
 
 // ───────────────────────── BÀI MẪU GIỐNG BÀI THẬT ─────────────────────────
 /** 29 dạng (như bài thật, 88 câu): D0–D14 có 4 câu [Biết, Biết, Hiểu, Vận dụng]; D15–D28 CHỈ có Vận dụng (2 câu). Lõi (mức thấp nhất mỗi dạng): 15 câu Biết + 14 câu Vận dụng = 29. */
@@ -70,7 +71,8 @@ describe('BÀI THẬT: em yếu, ngân sách 20 < lõi 29', () => {
       expect(bo.thuSucThem).toEqual([])
       expect(bo.tomTat.soLoi).toBe(29)
       expect(bo.tomTat.soThuSucThem).toBe(0)
-      for (const q of LOI) expect(bo.chang.flat()).toContain(q)
+      for (const q of bo.loi) expect(bo.chang.flat()).toContain(q) // lõi CỦA EM (lõi đúng bậc: em khá/hiểu nhận câu lõi đúng bậc của mình)
+      expect(kiemLoiTheoEm(CAU, LOI, bo, ho)).toBe('')
       // không còn nhãn loi_cao
       expect(Object.values(bo.nhan)).not.toContain('loi_cao')
     }

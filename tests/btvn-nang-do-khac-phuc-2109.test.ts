@@ -16,11 +16,12 @@ import {
 } from '../src/lib/btvn-nang-do'
 import { mulberry32 } from '../src/lib/exam-shuffle'
 
-/** 8 dạng × 10 câu [Biết ×3, Hiểu ×5, Vận dụng ×2] (80 câu): lõi = 2 câu Biết mỗi dạng ⇒ mỗi dạng còn 1 câu Biết + ≥ 4 câu Hiểu chưa giao khi ngân sách vừa. */
+/** 8 dạng × 14 câu [Biết ×3, Hiểu ×9, Vận dụng ×2] (112 câu): lõi gốc = 2 câu Biết mỗi dạng; em Hiểu (ổn định) nhận lõi ĐÚNG BẬC (2 câu Hiểu mỗi dạng, thầy chốt 21/09) ⇒ mỗi dạng vẫn còn ≥ 1 câu Biết + ≥ 4 câu Hiểu chưa giao khi ngân sách vừa
+ * (bản 10 câu/dạng, Hiểu ×5, hết câu Hiểu sau khi lõi lấy 2). */
 function bai(nDang = 8): CauGiao[] {
   const ra: CauGiao[] = []
   for (let d = 0; d < nDang; d++)
-    ([0, 0, 0, 1, 1, 1, 1, 1, 2, 2] as const).forEach((m, k) => ra.push({ qid: `d${d}-m${m}-${k}`, dang: `D${d}`, chuyenDe: `CD${d % 3}`, mucDo: m, sao: ((d + k) % 3) as 0 | 1 | 2, phan: (['I', 'I', 'I', 'II', 'II', 'II', 'II', 'II', 'III', 'III'] as const)[k] }))
+    ([0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2] as const).forEach((m, k) => ra.push({ qid: `d${d}-m${m}-${k}`, dang: `D${d}`, chuyenDe: `CD${d % 3}`, mucDo: m, sao: ((d + k) % 3) as 0 | 1 | 2, phan: (['I', 'I', 'I', 'II', 'II', 'II', 'II', 'II', 'II', 'II', 'II', 'II', 'III', 'III'] as const)[k] }))
   return ra
 }
 const CAU = bai()
@@ -33,7 +34,7 @@ const emHieu = (): HoSoEmRut => ({ dang: Object.fromEntries(Array.from({ length:
 /** Em ở bậc Biết (0) mọi dạng, đủ tin, ổn: bậc đích 0. */
 const emBiet = (): HoSoEmRut => ({ dang: Object.fromEntries(Array.from({ length: 8 }, (_, d) => [`D${d}`, dangHS(0, 8, 0.9)])), cau: {} })
 const NS = (soNgay: number, cauMoiNgay: number, onLaiMoiNgay = 0): NganSachBai => ({ soNgay, cauMoiNgay, onLaiMoiNgay })
-const NS_VUA = NS(3, 8) // 24 câu: lõi 16 (2 câu Biết mỗi dạng) + 8 riêng ⇒ có câu củng cố để bớt, mỗi dạng còn ≥ 4 câu Hiểu chưa giao
+const NS_VUA = NS(3, 10) // 30 câu: lõi 16 (em Hiểu: 2 câu Hiểu mỗi dạng — lõi đúng bậc) + 14 riêng ⇒ 6 câu khởi động + ≥ 4 câu củng cố để bớt, mỗi dạng còn ≥ 4 câu Hiểu chưa giao (bản cũ 3 × 8 = 24: khởi động ăn bớt câu riêng)
 const HAT = 'KP|em'
 const KP = (dang: string, soCau: number, bac: 'dung_bac' | 'thap_hon_mot_bac' = 'dung_bac') => ({ dang, soCau, bac })
 const kd = (khacPhuc: DieuChinhEm['khacPhuc']): DieuChinhEm => ({ khacPhuc })
@@ -66,9 +67,9 @@ function epConLai(hs: HoSoEmRut, ma: string, nSong: number): { goc: BoCuaEm; son
 }
 
 describe('khắc phục — nền: bộ mẫu có đủ câu chưa giao và câu củng cố để thử', () => {
-  it('tiền đề của bộ mẫu (em Hiểu, 3 ngày × 8 câu): tổng ≤ 24 < 80; ≥ 4 câu củng cố; MỖI dạng còn ≥ 1 câu Biết và ≥ 4 câu Hiểu chưa giao', () => {
+  it('tiền đề của bộ mẫu (em Hiểu, 3 ngày × 10 câu): tổng ≤ 30 < 112; ≥ 4 câu củng cố; MỖI dạng còn ≥ 1 câu Biết và ≥ 4 câu Hiểu chưa giao', () => {
     const goc = chonBoCuaEm(CAU, LOI, emHieu(), NS_VUA, HAT)
-    expect(goc.tomTat.tong).toBeLessThanOrEqual(24)
+    expect(goc.tomTat.tong).toBeLessThanOrEqual(30)
     expect(Object.values(goc.nhan).filter((n) => n === 'cung_co').length).toBeGreaterThanOrEqual(4)
     expect(tatCa(goc).length).toBeLessThan(CAU.length)
     expect('khacPhuc' in goc).toBe(false)

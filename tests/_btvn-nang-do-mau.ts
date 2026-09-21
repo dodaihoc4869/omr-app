@@ -46,3 +46,22 @@ export const boCuaEm = (d: D1That, sbd = 'S1') => (d.sql.prepare('SELECT qid, ch
 
 export const gio = (t: Date | string) => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date(t)) }
 
+
+/**
+ * LÕI ĐÚNG BẬC (thầy chốt 21/09/2026): lõi CỦA EM có thể khác lõi của bài ở dạng em ổn định — câu lõi mức thấp được ĐỔI 1–1 bằng câu cùng dạng mức cao hơn (không thuộc lõi bài).
+ * Trả các câu lõi của BÀI mà bộ của em không có VÀ không có câu thay như thế. Rỗng = lõi của em hợp lệ.
+ */
+export function loiThieuKhongThay(d: D1That, sbd = 'S1'): string[] {
+  const cau = d.sql.prepare('SELECT qid, dang, muc_do, loi FROM btvn_cau').all() as { qid: string; dang: string | null; muc_do: number; loi: number }[]
+  const boEm = new Set((d.sql.prepare('SELECT qid FROM btvn_em_cau WHERE sbd = ?').all(sbd) as { qid: string }[]).map((x) => x.qid))
+  const thay = cau.filter((c) => c.loi !== 1 && boEm.has(c.qid))
+  const daDung = new Set<string>()
+  return cau
+    .filter((c) => c.loi === 1 && !boEm.has(c.qid))
+    .filter((c) => {
+      const t = thay.find((x) => x.dang === c.dang && x.muc_do > c.muc_do && !daDung.has(x.qid))
+      if (t) daDung.add(t.qid)
+      return !t
+    })
+    .map((c) => c.qid)
+}

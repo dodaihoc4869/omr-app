@@ -24,6 +24,7 @@ import {
 } from '../src/lib/btvn-nang-do'
 import { NGUONG_DANG_YEU, SO_CAU_DU_TIN_DANG } from '../src/lib/ho-so-lop'
 import { hashSeed, mulberry32 } from '../src/lib/exam-shuffle'
+import { bacOnDinh, kiemLoiTheoEm } from './_btvn-loi-theo-em'
 
 // ───────────────────────── dữ liệu mẫu ─────────────────────────
 /** 80 câu, 20 dạng × 4 câu: mức [Biết, Biết, Hiểu, Vận dụng]; phần [I, I, II, III]; sao xoay vòng. */
@@ -205,9 +206,12 @@ describe('chonBoCuaEm — tính chất trên nhiều em', () => {
   it('MỌI em × MỌI ngân sách: lõi ⊆ bộ · ba tập rời nhau, hợp = các chặng · |bộ| ∈ [|lõi|, N] và ≤ ngân sách · nhãn đủ cho từng câu', () => {
     for (const [ten, tao] of emMau)
       for (const ns of nganSachMau) {
-        const bo = chonBoCuaEm(CAU, LOI, tao(), ns, `B1|${ten}`)
+        const ho = tao()
+        const bo = chonBoCuaEm(CAU, LOI, ho, ns, `B1|${ten}`)
         const tap = tapCua(bo)
-        expect(bo.loi, ten).toEqual(LOI)
+        // LÕI ĐÚNG BẬC (thầy chốt 21/09): lõi CỦA EM cùng số câu + cùng độ phủ dạng với lõi của bài; khác chỉ ở câu THAY đúng bậc của dạng ổn định. Hồ sơ rỗng ⇒ đúng lõi của bài.
+        expect(kiemLoiTheoEm(CAU, LOI, bo, ho), ten).toBe('')
+        if (ten === 'rỗng') expect(bo.loi, ten).toEqual(LOI)
         expect(new Set(tap).size, `${ten} trùng`).toBe(tap.length)
         expect(tap.length, ten).toBeGreaterThanOrEqual(LOI.length)
         expect(tap.length, ten).toBeLessThanOrEqual(CAU.length)
@@ -323,9 +327,24 @@ describe('chonBoCuaEm — tính chất trên nhiều em', () => {
     const ho = emKha()
     const bo = chonBoCuaEm(CAU, LOI, ho, NS(7, 16, 2), 'B1|kha')
     for (const q of bo.rieng) expect(ho.cau[q]?.ngayDungKhacNhau ?? 0, q).toBeLessThan(2)
-    expect(bo.rieng.some((q) => mucCua(CAU, q) === 1)).toBe(true) // câu Hiểu (đúng bậc)
-    expect(bo.thuThach.length).toBeGreaterThan(0) // Vận dụng làm thử thách
+    expect(tapCua(bo).some((q) => mucCua(CAU, q) === 1)).toBe(true) // câu Hiểu (đúng bậc) — nay nằm cả ở lõi (lõi đúng bậc) lẫn phần riêng
+    expect(bo.loi.some((q) => mucCua(CAU, q) === 1)).toBe(true) // lõi ĐÚNG BẬC: em khá (bậc Hiểu ổn định) nhận câu lõi Hiểu, không chỉ câu Biết
+    // Bộ mẫu 80 câu chỉ có MỘT câu Hiểu mỗi dạng: lõi đúng bậc dùng hết chúng ⇒ không còn phần riêng để giữ thử thách (trần 20 % của phần NGOÀI lõi thật) — cố ý, không phải lỗi.
     for (const q of bo.thuThach) expect(mucCua(CAU, q)).toBe(2)
+  })
+
+  it('EM KHÁ trong bài RỘNG hơn (6 câu/dạng: Biết ×2, Hiểu ×2, Vận dụng ×2): lõi đúng bậc VÀ vẫn còn phần riêng đúng bậc + thử thách', () => {
+    const cauRong: CauGiao[] = Array.from({ length: 120 }, (_, i) => ({ qid: `w${i}`, dang: `D${i % 20}`, chuyenDe: `CD${i % 5}`, mucDo: ([0, 0, 1, 1, 2, 2] as const)[Math.floor(i / 20)], sao: ((i * 7) % 3) as 0 | 1 | 2, phan: 'I' }))
+    const ho: HoSoEmRut = { dang: Object.fromEntries(Array.from({ length: 20 }, (_, d) => [`D${d}`, dangHS(1, 10, 0.95)])), cau: {} }
+    const loiRong = chonLoi(cauRong, [])
+    const bo = chonBoCuaEm(cauRong, loiRong, ho, NS(7, 16, 2), 'B1|khaRong')
+    expect(kiemLoiTheoEm(cauRong, loiRong, bo, ho)).toBe('')
+    expect(loiRong.every((q) => mucCua(cauRong, q) === 0)).toBe(true) // lõi gốc: toàn câu Biết
+    expect(bo.loi.every((q) => mucCua(cauRong, q) === 1)).toBe(true) // lõi của em khá: toàn câu Hiểu (đúng bậc)
+    expect(bo.rieng.some((q) => mucCua(cauRong, q) === 1)).toBe(true)
+    expect(bo.thuThach.length).toBeGreaterThan(0)
+    expect(bo.loi.length).toBe(loiRong.length) // đổi 1–1: số câu lõi (nên cả ngân sách còn lại cho phần riêng) không đổi
+    expect(bo.tomTat.soLoi).toBe(loiRong.length)
   })
 
   it('MỞ +1 BẬC: đúng ≥ 2 câu ở bậc hiện tại của dạng (dạng ổn) ⇒ câu Hiểu của dạng đó thành phần riêng; chưa đủ thì không', () => {
@@ -447,9 +466,14 @@ describe('chonBoCuaEm — tính chất trên nhiều em', () => {
   })
 
   it('3 em (yếu · trung bình · khá) nhận 3 bộ KHÁC nhau, cùng chứa đủ lõi; em yếu 0 câu vượt bậc đích ngoài lõi', () => {
-    const bo = [emYeu(), emTB(), emKha()].map((h, k) => chonBoCuaEm(CAU, LOI, h, NS(7, 12, 3), `B1|${k}`))
+    const hs = [emYeu(), emTB(), emKha()]
+    const bo = hs.map((h, k) => chonBoCuaEm(CAU, LOI, h, NS(7, 12, 3), `B1|${k}`))
     expect(new Set(bo.map((b) => JSON.stringify(tapCua(b).sort()))).size).toBe(3)
-    for (const b of bo) for (const q of LOI) expect(tapCua(b)).toContain(q)
+    bo.forEach((b, k) => {
+      expect(kiemLoiTheoEm(CAU, LOI, b, hs[k])).toBe('')
+      for (const q of b.loi) expect(tapCua(b)).toContain(q) // đủ lõi CỦA EM
+    })
+    expect(bo[0].loi).toEqual(LOI) // em yếu: dạng yếu/chưa đủ tin ⇒ lõi gốc y hệt
     for (const q of [...bo[0].rieng, ...bo[0].thuThach]) expect(mucCua(CAU, q)).toBeLessThanOrEqual(1)
   })
 
@@ -506,8 +530,10 @@ describe('chonBoCuaEm — cổng `dieuChinh` (bộ não đêm)', () => {
   const LOI = chonLoi(CAU, [])
   /** Chữ ký vàng của kết quả khi VẮNG cổng: 60 em ngẫu nhiên × 6 ngân sách (hạt giống cố định). Đổi số này = đổi hành vi khi vắng cổng — phải có lý do.
    * Lịch sử: 1036170693 = bản 569ebfd (đã kiểm: bản có cổng cho đúng số ấy). 21/09 Boss QUYẾT sửa cách chia chỗ trống (thử thách tính trên phần NGOÀI lõi, ≤ 20 % làm tròn xuống)
-   * ⇒ số mới 1419150711; chưa có gì của lõi lên máy chủ nên đổi kết quả không hại. */
-  const VANG = 1419150711
+   * ⇒ số mới 1419150711; chưa có gì của lõi lên máy chủ nên đổi kết quả không hại.
+   * 21/09 thầy chốt LÕI ĐÚNG BẬC ⇒ em có dạng ổn định ở bậc ≥ Hiểu nay nhận lõi khác ⇒ số mới 3229971911 (60 em ngẫu nhiên). Số cũ 1419150711 vẫn ĐÚNG cho mọi em KHÔNG có dạng ổn định — khoá ở
+   * `VANG_KHONG_ON_DINH` bên dưới ("vắng hồ sơ ⇒ y hệt bản trước"). */
+  const VANG = 3229971911
   const NS6: [number, number, number][] = [[7, 12, 3], [7, 10, 4], [5, 16, 2], [3, 8, 8], [14, 16, 0], [1, 12, 2]]
   /** BẢN 1.2 thêm `thuSucThem` / `tomTat.soThuSucThem` / `tomTat.soBatBuoc`: bỏ ba trường MỚI (phải rỗng / bằng số cũ) rồi băm ⇒ vẫn ra ĐÚNG số 1419150711 của bản trước ⇒ với bài
    * KHÔNG có lõi cao (như bộ mẫu 80 câu) bản 1.2 cho kết quả Y HỆT từng byte. */
@@ -519,12 +545,24 @@ describe('chonBoCuaEm — cổng `dieuChinh` (bộ não đêm)', () => {
     expect(soBatBuoc).toBe(con.tomTat.tong)
     return { ...con, tomTat: tt }
   }
-  const chuKy = (dc?: DieuChinhEm | null) => {
+  const chuKy = (dc?: DieuChinhEm | null, chiEm?: (ho: HoSoEmRut) => boolean) => {
     let x = 0
-    for (let sd = 1; sd <= 60; sd++)
-      for (const [a, b, c] of NS6) x = (Math.imul(x, 31) + hashSeed(JSON.stringify(gocCu(chonBoCuaEm(CAU, LOI, emNgauNhien(sd, CAU), { soNgay: a, cauMoiNgay: b, onLaiMoiNgay: c }, `B1|ngẫu nhiên ${sd}`, dc as DieuChinhEm))))) >>> 0
+    for (let sd = 1; sd <= 60; sd++) {
+      const ho = emNgauNhien(sd, CAU)
+      if (chiEm && !chiEm(ho)) continue
+      for (const [a, b, c] of NS6) x = (Math.imul(x, 31) + hashSeed(JSON.stringify(gocCu(chonBoCuaEm(CAU, LOI, ho, { soNgay: a, cauMoiNgay: b, onLaiMoiNgay: c }, `B1|ngẫu nhiên ${sd}`, dc as DieuChinhEm))))) >>> 0
+    }
     return x
   }
+  /** Em KHÔNG có dạng ổn định nào (đủ tin, không yếu, bậc ≥ Hiểu) ⇒ lõi đúng bậc không chạm tới ⇒ bộ Y HỆT bản TRƯỚC lõi đúng bậc. Số này tính bằng bản 11:31 (trước khi có lõi đúng bậc). */
+  const VANG_KHONG_ON_DINH = 2855389306 // 10 em × 6 ngân sách = 60 bộ
+  const khongOnDinh = (ho: HoSoEmRut) => CAU.every((c) => bacOnDinh(ho, maDangCua(c)) === null)
+
+  it('LÕI ĐÚNG BẬC: hồ sơ không có dạng ổn định (rỗng, chưa đủ tin, bậc Biết, dạng yếu) ⇒ bộ Y HỆT bản trước lõi đúng bậc — chữ ký vàng CŨ trên các em ấy', () => {
+    expect(chuKy(undefined, khongOnDinh)).toBe(VANG_KHONG_ON_DINH)
+    expect(chonBoCuaEm(CAU, LOI, rong(), NS(7, 12, 3), 'B1|rong').loi).toEqual(LOI)
+    expect(chonBoCuaEm(CAU, LOI, emYeu(), NS(7, 12, 3), 'B1|yeu').loi).toEqual(LOI)
+  })
 
   it('VẮNG cổng (hoặc cổng rỗng / vô hại) ⇒ kết quả Y HỆT bản trước khi có cổng — khoá bằng chữ ký vàng trên 360 bộ', () => {
     expect(chuKy(undefined)).toBe(VANG)
@@ -687,7 +725,9 @@ describe('chonBoCuaEm — cổng `dieuChinh` (bộ não đêm)', () => {
         const ns = NS6[k % 6]
         const bo = chonBoCuaEm(CAU, LOI, ho, { soNgay: ns[0], cauMoiNgay: ns[1], onLaiMoiNgay: ns[2] }, `B1|${sd}`, dc)
         const tap = tapCua(bo)
-        expect(bo.loi, `em ${sd}`).toEqual(LOI)
+        // lõi (kể cả lõi đúng bậc) CHỈ phụ thuộc hồ sơ + hạt giống: núm bộ não KHÔNG đổi lõi của em
+        expect(bo.loi, `em ${sd}`).toEqual(chonBoCuaEm(CAU, LOI, ho, { soNgay: ns[0], cauMoiNgay: ns[1], onLaiMoiNgay: ns[2] }, `B1|${sd}`).loi)
+        expect(kiemLoiTheoEm(CAU, LOI, bo, ho), `em ${sd}`).toBe('')
         expect(new Set(tap).size).toBe(tap.length)
         expect([...bo.chang.flat()].sort()).toEqual([...tap].sort())
         expect(Object.keys(bo.nhan).sort()).toEqual([...tap].sort())

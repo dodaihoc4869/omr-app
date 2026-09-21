@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { boDapAn, chotBoChoEm, docCoCaNhan, moLucChang, trangThaiCacChang } from '../server/src/btvn-nang-do-d1'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
-import { BAY_GIO, HAN, NGAY_MAI_0H_VN, toKho, DAP_AN_DUNG, TAT_CA_QID, cauThay, dung, giao, maBtvn, mo, nopChang, boCuaEm, gio } from './_btvn-nang-do-mau'
+import { BAY_GIO, HAN, NGAY_MAI_0H_VN, toKho, DAP_AN_DUNG, TAT_CA_QID, cauThay, dung, giao, maBtvn, mo, nopChang, boCuaEm, gio, loiThieuKhongThay } from './_btvn-nang-do-mau'
 
 afterEach(() => vi.useRealTimers())
 
@@ -163,7 +163,7 @@ describe('MỞ BÀI của bài cá nhân hoá', () => {
     for (const s of ['S1', 'S2', 'S3']) expect((await mo(d, s)).ok).toBe(true)
     const loi = (d.sql.prepare('SELECT qid FROM btvn_cau WHERE loi = 1').all() as { qid: string }[]).map((x) => x.qid)
     const bo = (s: string) => boCuaEm(d, s)
-    for (const s of ['S1', 'S2', 'S3']) expect(loi.every((q) => bo(s).some((x) => x.qid === q))).toBe(true)
+    for (const s of ['S1', 'S2', 'S3']) expect(loiThieuKhongThay(d, s), s).toEqual([]) // lõi đúng bậc: thiếu câu lõi gốc chỉ khi có câu thay cùng dạng mức cao hơn
     const dan = (s: string) => bo(s).map((x) => x.qid).sort().join(',')
     expect(new Set([dan('S1'), dan('S2'), dan('S3')]).size).toBe(3)
     const muc = new Map((d.sql.prepare('SELECT qid, muc_do, dang FROM btvn_cau').all() as { qid: string; muc_do: number; dang: string }[]).map((x) => [x.qid, x]))

@@ -527,8 +527,8 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
   const ds = duyNhat(cau)
   const n = ds.length
   const viTri = new Map(ds.map((c, i) => [c.qid, i]))
-  const loiIdx = [...new Set(loi.map((q) => viTri.get(q)).filter((i): i is number => i !== undefined))].sort((a, b) => a - b)
-  const loiSet = new Set(loiIdx)
+  let loiIdx = [...new Set(loi.map((q) => viTri.get(q)).filter((i): i is number => i !== undefined))].sort((a, b) => a - b)
+  let loiSet = new Set(loiIdx)
   const soNgay = Math.max(1, Math.floor(Number.isFinite(nganSach.soNgay) ? nganSach.soNgay : 1))
   const dc = chuanDieuChinh(dieuChinh)
   const cauNgayGoc = Math.floor(Number.isFinite(nganSach.cauMoiNgay) ? nganSach.cauMoiNgay : 0)
@@ -542,6 +542,44 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
 
   // ── LÕI BẮT BUỘC (bản 1.2): lõi mức ≤ bậc đích GỐC + 1, hoặc ghim; còn lại = THỬ SỨC THÊM (không bắt buộc). Bậc GỐC ⇒ núm bộ não không bao giờ kéo lõi ra khỏi phần bắt buộc. ──
   const ghimSet = new Set<string>([...(tuyChon.ghim ?? []), ...ds.filter((c) => c.ghim === true).map((c) => c.qid)])
+
+  // ── LÕI ĐÚNG BẬC (thầy chốt 21/09/2026): dạng em ỔN ĐỊNH ở bậc ≥ Hiểu (đủ tin, không yếu) thì câu lõi mức THẤP HƠN bậc của em được ĐỔI TẠI CHỖ 1–1 bằng MỘT câu cùng dạng
+  // ĐÚNG bậc (câu không phải lõi, em chưa đúng lại ≥ 2 ngày; câu em đang cần ôn được ưu tiên). Không có câu như vậy ⇒ giữ câu lõi gốc. Bất biến: mỗi dạng giữ nguyên số câu lõi (độ phủ + tổng số câu
+  // không đổi); mức thay = bậc HỒ SƠ ≤ bậc đích gốc ⇒ không bao giờ vượt bậc đích, càng không vượt bậc + 1; câu GHIM không bị thay; hạn/điểm/lịch không liên quan. CHỈ phụ thuộc hồ sơ + hạt giống: núm bộ não
+  // (`dieuChinh`) KHÔNG đổi lõi. Vắng hồ sơ, dạng chưa đủ tin, bậc Biết, dạng yếu ⇒ Y HỆT bản trước (lõi giống nhau ở mọi em). `BoCuaEm.loi` là lõi CỦA EM; câu lõi gốc bị thay KHÔNG quay lại làm phần riêng.
+  const daThay = new Set<number>()
+  {
+    const dungRoi = new Set<number>(loiIdx)
+    const moi: number[] = []
+    for (const i of loiIdx) {
+      const t = dangCua[i]
+      const muc = t.bacHoSo // hồ sơ (không phải bậc đích sau núm): lõi không đổi theo `dieuChinh`
+      if (ghimSet.has(ds[i].qid) || !t.duTin || t.yeu || muc < 1 || ds[i].mucDo >= muc) {
+        moi.push(i)
+        continue
+      }
+      const ma = maDangCua(ds[i])
+      const cho = (j: number): number => {
+        const dq = hoSoAnToan.cau[ds[j].qid]
+        if (!dq) return 1
+        return dq.trangThai === 'moi_sai' || dq.trangThai === 'dang_on' || (dq.lanSai > 0 && dq.trangThai !== 'da_khac_phuc') ? 0 : 2
+      }
+      const ung = Array.from(ds.keys())
+        .filter((j) => !dungRoi.has(j) && maDangCua(ds[j]) === ma && ds[j].mucDo === muc && !((hoSoAnToan.cau[ds[j].qid]?.ngayDungKhacNhau ?? 0) >= D.NGAY_DUNG_LAI_BO))
+        .sort((a, b) => cho(a) - cho(b) || ds[b].sao - ds[a].sao || nhieu(a) - nhieu(b) || a - b)
+      if (ung.length === 0) {
+        moi.push(i)
+        continue
+      }
+      dungRoi.add(ung[0])
+      daThay.add(i)
+      moi.push(ung[0])
+    }
+    if (daThay.size > 0) {
+      loiIdx = [...new Set(moi)].sort((a, b) => a - b)
+      loiSet = new Set(loiIdx)
+    }
+  }
   let batBuocIdx = loiIdx.filter((i) => ghimSet.has(ds[i].qid) || ds[i].mucDo <= dangCua[i].bacGoc + 1)
   let thuSucIdx = loiIdx.filter((i) => !(ghimSet.has(ds[i].qid) || ds[i].mucDo <= dangCua[i].bacGoc + 1))
   const tranTong = Number.isFinite(nganSach.tongToiDa) && (nganSach.tongToiDa as number) >= 0 ? Math.floor(nganSach.tongToiDa as number) : Infinity
@@ -551,7 +589,7 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
   const ungRieng: number[] = []
   const ungThu: number[] = []
   ds.forEach((c, i) => {
-    if (loiSet.has(i)) return
+    if (loiSet.has(i) || daThay.has(i)) return // câu lõi gốc đã bị thay bằng câu đúng bậc không quay lại làm phần riêng
     const t = dangCua[i]
     if (t.nghi) return // tạm nghỉ dạng này: phần riêng và thử thách không lấy (lõi vẫn ở lại)
     if (c.mucDo <= t.bacDich) ungRieng.push(i)
