@@ -227,7 +227,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const nhacTuDong = (rNhac ?? []).filter((x) => chuoi(x.moc) !== 'tay')
 
   // 8 · Bộ não: điều chỉnh đã áp hôm nay + bản tin gần nhất
-  const rDc = await Q.hoi('SELECT sbd, json FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 1 AND huy = 0', ngay)
+  const rDc = await Q.hoi("SELECT sbd, json FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 1 AND huy = 0 AND COALESCE(json_extract(json, '$.luot'), '') <> 'chieu'", ngay)
   const rBt = await Q.hoi(`SELECT ngay, json, nop_luc, so_em, so_nhan, so_bi_loai FROM ai_ban_tin WHERE ngay <= ? ORDER BY ngay DESC LIMIT ${SO_DEM_TRUNG_VI + 1}`, ngay)
   // 9 · vinh danh hôm nay (bản đã đăng hôm nay lưu ở ngày hôm qua)
   // (vinh danh hôm nay + số em đã làm thử thách riêng: MỘT truy vấn; thiếu bảng daily_honors ⇒ chỉ đọc phần thử thách)

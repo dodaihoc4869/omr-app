@@ -67,6 +67,20 @@ function parseJson<T>(s: unknown, macDinh: T): T {
   }
 }
 
+/**
+ * LƯỢT CHIỀU (Nấc 1 thử thách riêng): phần tử chỉ mang `thuThach` + `loiMoi`, KHÔNG núm nào (nhịp 0, dạng / khắc phục rỗng) và KHÔNG lời nhắn. Nhận diện bằng NỘI DUNG (không migration).
+ * Hàng chiều và hàng đêm CÙNG khoá `(sbd, ngay)`: nộp chiều KHÔNG được ghi đè núm của đêm (xem `boNaoNop`), và hàng chiều-riêng-lẻ (em không có hàng đêm hôm ấy) mang dấu `luot: 'chieu'`
+ * để tầng đọc (`bo-nao-doc.ts`) + mọi con số đếm BỎ QUA nó — chỉ `thu-thach-rieng.ts` đọc hàng ấy.
+ */
+export function laPhanTuChieu(d: Obj): boolean {
+  const nhip = d.nhip as Obj | undefined
+  return d.thuThach !== undefined && d.thuThach !== null && (Number(nhip?.lech) || 0) === 0 && !(Array.isArray(d.dang) && d.dang.length > 0) && !(Array.isArray(d.khacPhuc) && d.khacPhuc.length > 0) && chuoi(d.loiNhanChoEm) === '' && chuoi(d.loiNhanChoPhuHuynh) === '' && chuoi(d.thuTuan) === ''
+}
+/** Dấu ghi trong `json` của hàng chiều-riêng-lẻ. */
+export const DAU_HANG_CHIEU = 'chieu'
+/** Điều kiện SQL: hàng KHÔNG phải chiều-riêng-lẻ (`cot` = tên cột json, có thể kèm bí danh). */
+export const khongPhaiHangChieu = (cot = 'json'): string => `COALESCE(json_extract(${cot}, '$.luot'), '') <> '${DAU_HANG_CHIEU}'`
+
 /** Chia mảng thành các lô nhỏ. */
 function chia<T>(a: T[], n: number): T[][] {
   const ra: T[][] = []
@@ -230,11 +244,11 @@ async function docDuLieuTrang(env: Env, sbds: string[], ngay: string): Promise<D
       tuCa,
     ),
     // 9 — điều chỉnh đêm qua
-    P(`SELECT sbd, json, che_do, ap_dung FROM ai_dieu_chinh WHERE ${IN} AND ngay = ?`, j, homQua),
+    P(`SELECT sbd, json, che_do, ap_dung FROM ai_dieu_chinh WHERE ${IN} AND ngay = ? AND ${khongPhaiHangChieu()}`, j, homQua),
     // 10 — thẻ đêm trước
     P(`SELECT sbd, the_json FROM ai_ho_so_ngay WHERE ${IN} AND ngay = ?`, j, homQua),
     // 11 — lời nhắn gần đây (chống lặp)
-    P(`SELECT sbd, json, ngay FROM ai_dieu_chinh WHERE ${IN} AND ngay >= ? AND ngay < ? ORDER BY ngay DESC`, j, tuLoi, ngay),
+    P(`SELECT sbd, json, ngay FROM ai_dieu_chinh WHERE ${IN} AND ngay >= ? AND ngay < ? AND ${khongPhaiHangChieu()} ORDER BY ngay DESC`, j, tuLoi, ngay),
   ]
   // `btvn_em.so_chang` chỉ có sau migration BTVN nâng đỡ; máy chủ chưa có cột ấy thì hỏi lại không có nó (bài cũ không có chặng).
   let kq: Awaited<ReturnType<typeof env.DB.batch<Obj>>>
@@ -514,6 +528,12 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
       if (t) the.set(chuoi(x.sbd), { the: t, lop: chuoi(x.lop) })
     }
   }
+  // Hàng (sbd, ngay) ĐÃ CÓ: lượt chiều gộp `thuThach` vào núm của đêm (không ghi đè), đêm nộp lại giữ `thuThach` đã có.
+  const cu = new Map<string, Obj>()
+  if (sbds.length) {
+    const r = await env.DB.prepare(`SELECT sbd, json FROM ai_dieu_chinh WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))`).bind(ngay, JSON.stringify(sbds)).all<Obj>()
+    for (const x of r.results ?? []) cu.set(chuoi(x.sbd), parseJson<Obj>(x.json, {}))
+  }
   const nop = new Date(nowMs).toISOString()
   const hetHan = themNgay(ngay, HAN_MUC_BO_NAO.HAN_NGAY)
   const loai: { sbd: string; lyDo: string[] }[] = []
@@ -521,6 +541,7 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
   const luu: D1PreparedStatement[] = []
   const daCo = new Set<string>()
   let nhan = 0
+  let nhanChieu = 0
   let chiGhiSo = 0
   let soApDung = 0
 
@@ -551,9 +572,27 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
     const sach = lamSachDauRa({ ...(dauRa as unknown as DauRaEm), biDanh: '' }, k)
     const cheDo = cheDoHieuLuc(ch, t.lop)
     const apDung = cheDo === 'that' && sach.doTinCay >= HAN_MUC_BO_NAO.NGUONG_TIN_CAY
-    nhan++
-    if (apDung) soApDung++
-    else chiGhiSo++
+    const truoc = cu.get(sbd)
+    const chieu = laPhanTuChieu(sach as unknown as Obj)
+    if (chieu && truoc && truoc.luot !== DAU_HANG_CHIEU) {
+      // LƯỢT CHIỀU trên hàng ĐÊM cùng ngày: chỉ thêm `thuThach` + `loiMoi`; núm, chế độ, áp dụng, hạn, độ tin cậy của đêm GIỮ NGUYÊN (không tính là một điều chỉnh mới).
+      luu.push(env.DB.prepare(`UPDATE ai_dieu_chinh SET json = ?, nop_luc = ? WHERE sbd = ? AND ngay = ?`).bind(JSON.stringify({ ...truoc, thuThach: (sach as unknown as Obj).thuThach, loiMoi: (sach as unknown as Obj).loiMoi }), nop, sbd, ngay))
+      nhanChieu++
+      continue
+    }
+    const ghi: Obj = { ...(sach as unknown as Obj) }
+    if (chieu) {
+      ghi.luot = DAU_HANG_CHIEU // hàng chiều-riêng-lẻ: tầng đọc và các số đếm bỏ qua
+      nhanChieu++
+    } else {
+      if (truoc && truoc.thuThach !== undefined && ghi.thuThach === undefined) {
+        ghi.thuThach = truoc.thuThach // đêm nộp lại SAU chiều: giữ thử thách đã có
+        ghi.loiMoi = truoc.loiMoi
+      }
+      nhan++
+      if (apDung) soApDung++
+      else chiGhiSo++
+    }
     // `biDanh` rỗng: bí danh là chuyện của mã lệnh, không lưu ở máy chủ
     luu.push(
       env.DB.prepare(
@@ -561,7 +600,7 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
          VALUES (?,?,?,?,?,?,?,0,0,'[]',NULL,NULL,?)
          ON CONFLICT(sbd, ngay) DO UPDATE SET json = excluded.json, do_tin = excluded.do_tin, che_do = excluded.che_do, ap_dung = CASE WHEN ai_dieu_chinh.huy = 1 THEN 0 ELSE excluded.ap_dung END,
            het_han = excluded.het_han, nop_luc = excluded.nop_luc`,
-      ).bind(sbd, ngay, JSON.stringify(sach), sach.doTinCay, cheDo, apDung ? 1 : 0, hetHan, nop),
+      ).bind(sbd, ngay, JSON.stringify(ghi), sach.doTinCay, cheDo, apDung ? 1 : 0, hetHan, nop),
     )
   }
 
@@ -586,7 +625,7 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
         ).bind(ngay, JSON.stringify({ cacDong }), ch.cheDo, nop, soLieuLop.soEm, soLieuLop.soSoiNhanh, soLieuLop.soSoiKy, soLieuLop.soVang, nhan, chiGhiSo, loai.length),
         // mã lệnh nộp nhiều lô (≤ 100 em/lô) và gắn bản tin vào lô cuối: số "đã hỗ trợ" tính lại từ bảng để không chỉ đếm lô này
         env.DB.prepare(
-          `UPDATE ai_ban_tin SET so_nhan = (SELECT COUNT(*) FROM ai_dieu_chinh WHERE ngay = ?), so_chi_ghi_so = (SELECT COUNT(*) FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 0) WHERE ngay = ?`,
+          `UPDATE ai_ban_tin SET so_nhan = (SELECT COUNT(*) FROM ai_dieu_chinh WHERE ngay = ? AND ${khongPhaiHangChieu()}), so_chi_ghi_so = (SELECT COUNT(*) FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 0 AND ${khongPhaiHangChieu()}) WHERE ngay = ?`,
         ).bind(ngay, ngay, ngay),
       )
     }
@@ -596,6 +635,7 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
     ok: true,
     ngay,
     nhan,
+    nhanChieu,
     chiGhiSo,
     soApDung,
     biLoai: loai.length,
@@ -630,13 +670,13 @@ export async function boNaoDemQua(env: Env, b: Obj = {}, nowMs: number = Date.no
   if (sbds.length) {
     const j = JSON.stringify(sbds)
     const [a, c] = await env.DB.batch<Obj>([
-      env.DB.prepare(`SELECT sbd, ap_dung, huy FROM ai_dieu_chinh WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))`).bind(ngay, j),
-      env.DB.prepare(`SELECT sbd, ket_qua, ket_qua_chu, tu_go FROM ai_dieu_chinh WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))`).bind(homQua, j),
+      env.DB.prepare(`SELECT sbd, ap_dung, huy FROM ai_dieu_chinh WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?)) AND ${khongPhaiHangChieu()}`).bind(ngay, j),
+      env.DB.prepare(`SELECT sbd, ket_qua, ket_qua_chu, tu_go FROM ai_dieu_chinh WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?)) AND ${khongPhaiHangChieu()}`).bind(homQua, j),
     ])
     for (const r of a.results ?? []) dc.set(chuoi(r.sbd), r)
     for (const r of c.results ?? []) dcQua.set(chuoi(r.sbd), r)
   }
-  const ho = await env.DB.prepare('SELECT COUNT(*) AS n FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 1 AND huy = 0').bind(ngay).first<{ n: number }>()
+  const ho = await env.DB.prepare(`SELECT COUNT(*) AS n FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 1 AND huy = 0 AND ${khongPhaiHangChieu()}`).bind(ngay).first<{ n: number }>()
   return {
     ok: true,
     ngay,
@@ -697,6 +737,9 @@ export async function boNaoNhatKy(env: Env, b: Obj = {}): Promise<Obj> {
         thuTuan: d.thuTuan ?? '',
         goiYChoThay: d.goiYChoThay ?? { chu: '', hanhDong: 'khong', dang: '' },
         ghiChuHlv: d.ghiChuHlv ?? '',
+        // chỉ-thêm (Nấc 1): hàng chiều-riêng-lẻ nhận diện được; thử thách + lời mời của Bộ não nếu có
+        ...((d as Obj).luot === DAU_HANG_CHIEU ? { luot: DAU_HANG_CHIEU } : {}),
+        ...((d as Obj).thuThach !== undefined ? { thuThach: (d as Obj).thuThach, loiMoi: (d as Obj).loiMoi ?? '' } : {}),
         apDung: Number(x.ap_dung) === 1 && Number(x.huy) === 0,
         lyDoBo: parseJson<string[]>(x.ly_do_bo, []),
         ketQua: x.ket_qua ?? null,

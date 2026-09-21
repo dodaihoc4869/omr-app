@@ -382,7 +382,7 @@ const DONG_THOI_GIAN = (coCanhBao: boolean) => `
     FROM su_kien_hoc s WHERE s.sbd = ? AND s.nguon NOT IN ('thi', 'len_bang') GROUP BY s.nguon, s.ma_nguon, s.ngay_vn
   UNION ALL SELECT luc, 'len_bang', qid, COALESCE(chuyen_de, ''), COALESCE(dat, 0), 0, 0, 0, '' FROM len_bang WHERE sbd = ?
   UNION ALL SELECT MAX(luc), 'exp', ngay_vn, '', SUM(exp), COUNT(*), 0, 0, '' FROM exp_so WHERE sbd = ? GROUP BY ngay_vn
-  UNION ALL SELECT COALESCE(nop_luc, ngay || 'T05:00:00.000Z'), 'bo_nao', ngay, COALESCE(che_do, ''), 0, 0, 0, 0, COALESCE(json, '') FROM ai_dieu_chinh WHERE sbd = ? AND COALESCE(huy, 0) = 0
+  UNION ALL SELECT COALESCE(nop_luc, ngay || 'T05:00:00.000Z'), 'bo_nao', ngay, COALESCE(che_do, ''), 0, 0, 0, 0, COALESCE(json, '') FROM ai_dieu_chinh WHERE sbd = ? AND COALESCE(huy, 0) = 0 AND COALESCE(json_extract(json, '$.luot'), '') <> 'chieu'
   ${coCanhBao ? "UNION ALL SELECT gui_luc, 'canh_bao', id, ma_btvn, CASE WHEN em_xem_luc IS NULL THEN 0 ELSE 1 END, CASE WHEN ph_xem_luc IS NULL THEN 0 ELSE 1 END, 0, 0, loi_em FROM canh_bao_thay WHERE sbd = ?" : ''}`
 
 function dongTuHang(x: Dong): { luc: string; loai: LoaiDong; tieuDe: string; chiTiet: Record<string, unknown>; chips: Chip[] } {

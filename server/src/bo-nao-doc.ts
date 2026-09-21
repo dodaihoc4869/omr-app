@@ -9,7 +9,7 @@ import type { Env } from './kieu'
 import { dieuChinhTuDauRa } from '../../src/lib/bo-nao-khuon'
 import type { DauRaEm, KhacPhucEm } from '../../src/lib/bo-nao-khuon'
 import type { DieuChinhEm } from '../../src/lib/btvn-nang-do'
-import { cheDoHieuLuc, docCauHinhBoNao, type CauHinhBoNao } from './bo-nao'
+import { cheDoHieuLuc, docCauHinhBoNao, khongPhaiHangChieu, type CauHinhBoNao } from './bo-nao'
 import { themNgay } from './ho-so-nam-kt'
 
 type Hang = Record<string, unknown>
@@ -69,7 +69,7 @@ export async function docDieuChinhHieuLuc(env: Env, dsSbd: string[], homNay: str
     r = await env.DB.prepare(
       `SELECT d.sbd, d.ngay, d.json, d.do_tin, d.het_han, COALESCE(h.lop, '') AS lop
          FROM ai_dieu_chinh d LEFT JOIN ai_ho_so_ngay h ON h.sbd = d.sbd AND h.ngay = d.ngay
-        WHERE d.sbd IN (SELECT value FROM json_each(?)) AND d.ap_dung = 1 AND d.huy = 0 AND d.tu_go = 0 AND d.het_han >= ? AND d.ngay <= ?
+        WHERE d.sbd IN (SELECT value FROM json_each(?)) AND d.ap_dung = 1 AND d.huy = 0 AND d.tu_go = 0 AND d.het_han >= ? AND d.ngay <= ? AND ${khongPhaiHangChieu('d.json')}
         ORDER BY d.ngay DESC`,
     ).bind(json(dsSbd), homNay, homNay).all<Hang>()
   } catch {
@@ -111,7 +111,7 @@ async function docLoiNhanCuaEm(env: Env, sbd: string, homNay: string, soNgay: nu
     r = await env.DB.prepare(
       `SELECT d.ngay, d.json, COALESCE(h.lop, '') AS lop
          FROM ai_dieu_chinh d LEFT JOIN ai_ho_so_ngay h ON h.sbd = d.sbd AND h.ngay = d.ngay
-        WHERE d.sbd = ? AND d.che_do = 'that' AND d.huy = 0 AND d.ngay <= ? AND d.ngay >= ? ORDER BY d.ngay DESC LIMIT ?`,
+        WHERE d.sbd = ? AND d.che_do = 'that' AND d.huy = 0 AND d.ngay <= ? AND d.ngay >= ? AND ${khongPhaiHangChieu('d.json')} ORDER BY d.ngay DESC LIMIT ?`,
     ).bind(sbd, homNay, themNgay(homNay, -(soNgay - 1)), soNgay).all<Hang>()
   } catch {
     return []

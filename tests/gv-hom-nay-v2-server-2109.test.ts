@@ -276,6 +276,14 @@ describe('/gv/em-toan-canh', () => {
     const trong = (await goi(d, '/gv/em-toan-canh', { sbd: '2001' })).em
     expect(trong).toEqual({ sbd: '2001', hoTen: 'Phạm Minh Châu', lop: '12B', chuoiNgay: 0 })
   })
+  it('dòng thời gian: hàng CHIỀU-riêng-lẻ của Bộ não (json.luot = "chieu", chỉ có thử thách) KHÔNG thành thêm một dòng "Bộ não A.I"', async () => {
+    const d = await emDayDu()
+    const soBoNao = async () => (await goi(d, '/gv/em-toan-canh', { sbd: '1001' })).dong.filter((x: { loai: string }) => x.loai === 'bo_nao').length
+    expect(await soBoNao()).toBe(2)
+    d.sql.prepare("INSERT INTO ai_dieu_chinh(sbd,ngay,json,che_do,het_han,nop_luc) VALUES('1001','2026-09-22',?,'that','2026-09-30',?)")
+      .run(JSON.stringify({ luot: 'chieu', thuThach: { dang: ['DA-1'], soCau: 5, bac: 'dung_bac' }, loiMoi: 'Hôm nay thử mấy câu nhé.', loiNhanChoEm: '', loiNhanChoPhuHuynh: '' }), luc(0, 5))
+    expect(await soBoNao()).toBe(2)
+  })
   it('dòng thời gian: mới nhất trước; đủ loại (ca, btvn, on_lai, game, len_bang, exp, bo_nao, canh_bao); mota bằng SỐ THẬT; chiTiet có maCa/maBtvn; KHÔNG bao giờ có loại mo_app', async () => {
     const d = await emDayDu()
     const r = await goi(d, '/gv/em-toan-canh', { sbd: '1001' })

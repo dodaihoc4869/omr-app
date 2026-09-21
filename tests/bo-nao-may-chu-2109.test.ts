@@ -4,8 +4,11 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { taoD1That, type D1That } from './_d1-that'
-import { boNaoBoDieuChinh, boNaoCauHinh, boNaoDemQua, boNaoHoSoNgay, boNaoNhatKy, boNaoNop, cheDoHieuLuc, docCauHinhBoNao, ngayVnTuMs } from '../server/src/bo-nao'
+import { boNaoBoDieuChinh, boNaoCauHinh, boNaoDemQua, boNaoHoSoNgay, boNaoNhatKy, boNaoNop, cheDoHieuLuc, docCauHinhBoNao, laPhanTuChieu, ngayVnTuMs } from '../server/src/bo-nao'
 import { themNgay } from '../src/lib/bo-nao-dac-trung'
+import { docDieuChinhHieuLuc } from '../server/src/bo-nao-doc'
+import { docThuThachDaAp } from '../server/src/thu-thach-rieng'
+import { gvBangTin } from '../server/src/gv-bang-tin'
 
 const NGAY = '2026-09-22'
 const NOW = Date.parse('2026-09-21T21:00:00.000Z') // 04:00 sáng 22/09 giờ Việt Nam
@@ -632,5 +635,142 @@ describe('/ai/dieu-chinh/nop · THỬ THÁCH RIÊNG (khuôn d27ca44 của Code 1
     const x = daLuu()
     expect(x).not.toHaveProperty('thuThach')
     expect(x).not.toHaveProperty('loiMoi')
+  })
+})
+
+describe('LƯỢT CHIỀU không đè núm của đêm (Code 1 + Boss 21/09; hàng chiều và hàng đêm CÙNG khoá (sbd, ngay))', () => {
+  const nop = (cacEm: unknown[], banTin?: unknown) => boNaoNop(d.env, { ngay: NGAY, cacEm, ...(banTin ? { banTin } : {}) }, NOW)
+  const TT = { dang: ['ESTE.THUY_PHAN'], soCau: 5, bac: 'dung_bac' }
+  const LOI = 'Hôm qua em đúng 7/8 câu. Hôm nay thử mấy câu cùng dạng nhé.'
+  /** Phần tử CHIỀU đúng như `nop.mjs --chieu` gửi: núm rỗng, không lời, chỉ thuThach + loiMoi. */
+  const chieu = (o: Record<string, unknown> = {}) => dauRa({
+    nhip: { lech: 0, khoiDong: 2 }, dang: [], khacPhuc: [], co: 'khong', loiNhanChoEm: '', loiNhanChoPhuHuynh: '', thuTuan: '',
+    goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' }, ghiChuHlv: 'Lượt chiều: chỉ thử thách riêng hôm nay', canSau: false, thuThach: TT, loiMoi: LOI, ...o,
+  })
+  /** Phần tử ĐÊM: núm thật (nhịp −2, ưu tiên một dạng, khắc phục luôn kiểu on_som), không thuThach. */
+  const dem = (o: Record<string, unknown> = {}) => dauRa({ nhip: { lech: -2, khoiDong: 3 }, khacPhuc: [{ dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }], ...o })
+  const hang = (sbd = '12001', ngay = NGAY) => d.sql.prepare('SELECT * FROM ai_dieu_chinh WHERE sbd = ? AND ngay = ?').get(sbd, ngay) as Record<string, unknown> | undefined
+  const json = (sbd = '12001', ngay = NGAY) => JSON.parse(String(hang(sbd, ngay)?.json ?? '{}')) as Record<string, any>
+  const hieuLuc = async (sbd = '12001') => (await docDieuChinhHieuLuc(d.env, [sbd], NGAY, await docCauHinhBoNao(d.env))).get(sbd)
+  beforeEach(async () => {
+    dungBaEm()
+    await hoSo()
+    await cauHinh({ cheDo: 'that' })
+  })
+
+  it('đêm rồi chiều CÙNG ngày: núm của đêm GIỮ NGUYÊN, hàng có thêm thuThach + loiMoi; áp dụng / độ tin cậy / hạn của đêm không đổi; chiều không tính là điều chỉnh mới', async () => {
+    expect(await nop([dem({ doTinCay: 0.9 })])).toMatchObject({ ok: true, nhan: 1, soApDung: 1, nhanChieu: 0 })
+    const truoc = hang()!
+    const r = await nop([chieu({ doTinCay: 0.7 })])
+    expect(r).toMatchObject({ ok: true, nhan: 0, nhanChieu: 1, soApDung: 0, chiGhiSo: 0, biLoai: 0 })
+    const sau = hang()!
+    expect(json()).toMatchObject({ nhip: { lech: -2, khoiDong: 3 }, dang: [{ ma: 'ESTE.THUY_PHAN', hanhDong: 'uu_tien' }], khacPhuc: [{ dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }], thuThach: TT, loiMoi: LOI })
+    expect(json()).not.toHaveProperty('luot') // vẫn là hàng ĐÊM
+    expect({ do_tin: sau.do_tin, che_do: sau.che_do, ap_dung: sau.ap_dung, het_han: sau.het_han, huy: sau.huy }).toEqual({ do_tin: truoc.do_tin, che_do: truoc.che_do, ap_dung: truoc.ap_dung, het_han: truoc.het_han, huy: truoc.huy })
+    const hl = await hieuLuc()
+    expect(hl?.nhip).toBe(-2) // lõi vẫn nhận núm đêm
+    expect(hl?.onSom).toEqual(['ESTE.THUY_PHAN'])
+    expect(await docThuThachDaAp(d.env, '12001', NGAY)).toMatchObject({ thuThach: TT, loiMoi: LOI }) // thẻ thử thách vẫn có
+    expect(d.dem('ai_dieu_chinh', `ngay = '${NGAY}'`)).toBe(1) // MỘT hàng, không thêm
+  })
+
+  it('chiều nộp hai lần (chạy lại) ⇒ vẫn một hàng, núm đêm còn, thuThach là bản mới nhất', async () => {
+    await nop([dem()])
+    await nop([chieu()])
+    await nop([chieu({ thuThach: { ...TT, soCau: 7 }, loiMoi: 'Hôm qua em đúng 7/8 câu. Mai thử thêm nhé.' })])
+    expect(d.dem('ai_dieu_chinh', `ngay = '${NGAY}'`)).toBe(1)
+    expect(json().thuThach.soCau).toBe(7)
+    expect((await hieuLuc())?.nhip).toBe(-2)
+  })
+
+  it('em CHỈ có hàng chiều: hàng mang dấu luot:"chieu"; điều chỉnh hiệu lực = VẮNG (y hệt không có); thử thách vẫn đọc được; không tính vào số đếm', async () => {
+    const r = await nop([chieu()])
+    expect(r).toMatchObject({ ok: true, nhan: 0, nhanChieu: 1, biLoai: 0 })
+    expect(json()).toMatchObject({ luot: 'chieu', thuThach: TT, loiMoi: LOI })
+    expect(await hieuLuc()).toBeUndefined()
+    expect(await docThuThachDaAp(d.env, '12001', NGAY)).toMatchObject({ thuThach: TT, loiMoi: LOI })
+    // số đếm: bản tin sáng (so_nhan, so_chi_ghi_so), soEmHoTro của /ai/dem-qua, bảng tin của thầy
+    await nop([], { cacDong: [] })
+    expect(d.sql.prepare('SELECT so_nhan, so_chi_ghi_so FROM ai_ban_tin WHERE ngay = ?').get(NGAY)).toEqual({ so_nhan: 0, so_chi_ghi_so: 0 })
+    expect(await boNaoDemQua(d.env, { ngay: NGAY }, NOW)).toMatchObject({ soEmHoTro: 0 })
+  })
+
+  it('đêm HÔM QUA còn hạn + chiều-riêng-lẻ HÔM NAY ⇒ lõi vẫn nhận núm đêm hôm qua (hàng chiều không "mới nhất")', async () => {
+    const homQua = themNgay(NGAY, -1)
+    d.sql.prepare("INSERT INTO ai_dieu_chinh(sbd,ngay,json,do_tin,che_do,ap_dung,het_han,huy,tu_go,ly_do_bo,nop_luc) VALUES('12001',?,?,0.9,'that',1,?,0,0,'[]','x')")
+      .run(homQua, JSON.stringify(dem()), themNgay(NGAY, 2))
+    await nop([chieu()])
+    const hl = await hieuLuc()
+    expect(hl?.ngay).toBe(homQua)
+    expect(hl?.nhip).toBe(-2)
+    expect(await docThuThachDaAp(d.env, '12001', NGAY)).toMatchObject({ thuThach: TT })
+  })
+
+  it('đêm nộp lại SAU chiều (cùng ngày) giữ thuThach + loiMoi đã có, núm mới của đêm có hiệu lực', async () => {
+    await nop([chieu()]) // hàng chiều-riêng-lẻ
+    await nop([dem({ nhip: { lech: -1, khoiDong: 2 } })])
+    expect(json()).toMatchObject({ nhip: { lech: -1 }, thuThach: TT, loiMoi: LOI })
+    expect(json()).not.toHaveProperty('luot') // nay là hàng đêm thật
+    expect((await hieuLuc())?.nhip).toBe(-1)
+    expect(await docThuThachDaAp(d.env, '12001', NGAY)).toMatchObject({ thuThach: TT })
+  })
+
+  it('phần tử có thuThach nhưng CÓ núm hoặc CÓ lời nhắn không phải hàng chiều: ghi như hàng thường, tính là điều chỉnh', async () => {
+    for (const o of [{ nhip: { lech: 1, khoiDong: 2 } }, { dang: [{ ma: 'ESTE.THUY_PHAN', hanhDong: 'uu_tien', lyDo: 'đúng 7/8 câu hôm qua' }] }, { khacPhuc: [{ dang: 'ESTE.THUY_PHAN', kieu: 'on_som' }] }, { loiNhanChoEm: 'Hôm qua em đúng 7/8 câu.' }]) {
+      d.sql.exec(`DELETE FROM ai_dieu_chinh`)
+      const r = await nop([chieu(o)])
+      expect(r, JSON.stringify(o)).toMatchObject({ ok: true, nhan: 1, nhanChieu: 0 })
+      expect(json()).not.toHaveProperty('luot')
+    }
+  })
+
+  it('laPhanTuChieu (hàm thuần): chỉ đúng khi có thuThach VÀ không núm nào VÀ không lời nào', () => {
+    const goc = { thuThach: TT, loiMoi: LOI, nhip: { lech: 0, khoiDong: 2 }, dang: [], khacPhuc: [], loiNhanChoEm: '', loiNhanChoPhuHuynh: '', thuTuan: '' }
+    expect(laPhanTuChieu(goc)).toBe(true)
+    expect(laPhanTuChieu({ ...goc, nhip: { lech: 0, khoiDong: 4 } })).toBe(true) // khoiDong không phải "núm" của đêm (chiều luôn gửi 2)
+    for (const kac of [{ thuThach: undefined }, { thuThach: null }, { nhip: { lech: -1, khoiDong: 2 } }, { dang: [{ ma: 'A' }] }, { khacPhuc: [{ dang: 'A', kieu: 'on_som' }] }, { loiNhanChoEm: 'x' }, { loiNhanChoPhuHuynh: 'x' }, { thuTuan: 'x' }]) {
+      expect(laPhanTuChieu({ ...goc, ...kac }), JSON.stringify(kac)).toBe(false)
+    }
+    expect(laPhanTuChieu({})).toBe(false)
+  })
+
+  it('số đếm: chiều-riêng-lẻ KHÔNG vào so_chi_ghi_so, không làm "áp dụng" trong dòng bản tin của /ai/dem-qua; hàng đêm thì có (đối chứng)', async () => {
+    const dong = { loai: 'can_thay_y', sbd: '12001', chu: 'Có 1 em vắng liền nhiều ngày', hanhDong: 'nhan_phu_huynh', dang: '' }
+    await nop([chieu({ doTinCay: 0.5 })]) // độ tin cậy thấp ⇒ ap_dung = 0 (chỉ ghi sổ)
+    await nop([], { cacDong: [dong] })
+    expect(d.sql.prepare('SELECT so_nhan, so_chi_ghi_so FROM ai_ban_tin WHERE ngay = ?').get(NGAY)).toEqual({ so_nhan: 0, so_chi_ghi_so: 0 })
+    d.sql.exec('DELETE FROM ai_dieu_chinh')
+    await nop([chieu()]) // ap_dung = 1
+    let dq = await boNaoDemQua(d.env, { ngay: NGAY }, NOW)
+    expect(dq).toMatchObject({ soEmHoTro: 0 })
+    expect((dq.banTin as { cacDong: { apDung: boolean }[] }).cacDong[0]!.apDung).toBe(false) // không có điều chỉnh của đêm ⇒ không "áp dụng"
+    d.sql.exec('DELETE FROM ai_dieu_chinh')
+    await nop([dem({ doTinCay: 0.5 })])
+    await nop([], { cacDong: [dong] })
+    expect(d.sql.prepare('SELECT so_nhan, so_chi_ghi_so FROM ai_ban_tin WHERE ngay = ?').get(NGAY)).toEqual({ so_nhan: 1, so_chi_ghi_so: 1 }) // đối chứng: hàng đêm được đếm
+    d.sql.exec('DELETE FROM ai_dieu_chinh')
+    await nop([dem()])
+    dq = await boNaoDemQua(d.env, { ngay: NGAY }, NOW)
+    expect(dq).toMatchObject({ soEmHoTro: 1 })
+    expect((dq.banTin as { cacDong: { apDung: boolean }[] }).cacDong[0]!.apDung).toBe(true)
+  })
+
+  it('bảng tin của thầy không đếm hàng chiều-riêng-lẻ là "Bộ não đã điều chỉnh" (đối chứng: hàng đêm đếm 1)', async () => {
+    await nop([chieu()])
+    await nop([], { cacDong: [] })
+    const bt = await gvBangTin(d.env, {}, NOW)
+    expect((bt.boNao as { soEmDieuChinh?: number } | undefined)?.soEmDieuChinh).toBe(0)
+    d.sql.exec('DELETE FROM ai_dieu_chinh')
+    await nop([dem()])
+    expect(((await gvBangTin(d.env, {}, NOW)).boNao as { soEmDieuChinh?: number } | undefined)?.soEmDieuChinh).toBe(1)
+  })
+
+  it('nhật ký của em: hàng chiều-riêng-lẻ nhận diện được (luot) + thuThach/loiMoi; hàng đêm không có khoá luot', async () => {
+    await nop([chieu()])
+    const nk = (await boNaoNhatKy(d.env, { sbd: '12001' })).ds as Record<string, unknown>[]
+    expect(nk[0]).toMatchObject({ luot: 'chieu', thuThach: TT, loiMoi: LOI })
+    d.sql.exec(`DELETE FROM ai_dieu_chinh`)
+    await nop([dem()])
+    expect(((await boNaoNhatKy(d.env, { sbd: '12001' })).ds as Record<string, unknown>[])[0]).not.toHaveProperty('luot')
   })
 })
