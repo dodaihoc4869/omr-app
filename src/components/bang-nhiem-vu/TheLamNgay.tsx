@@ -40,6 +40,13 @@ export default function TheLamNgay({
         )}
       </div>
       <h2 className="bnv-lam-ngay-ten">{viec.tieuDe}</h2>
+      {viec.dongPhu && viec.dongPhu.length > 0 && (
+        <ul className="bnv-lam-ngay-phu" aria-label="Chi tiết chặng">
+          {viec.dongPhu.map((d) => (
+            <li key={d}>{d}</li>
+          ))}
+        </ul>
+      )}
       <p className="bnv-lam-ngay-mo-ta">
         {viec.soCau > 0 ? `${viec.soCau} câu · khoảng ${viec.phutUocTinh} phút` : viec.moTa}
       </p>

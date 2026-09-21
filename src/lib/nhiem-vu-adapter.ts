@@ -3,6 +3,7 @@
 // DE-XUAT-CA-NHAN-HOA-1909.md) — ra CÙNG một cấu trúc `DuLieuBangNhiemVu`.
 // Hàm thuần: không đọc giờ, không gọi mạng, KHÔNG xếp lại thứ tự — thứ tự là
 // của dữ liệu; ở đây chỉ gán bậc, tính cổng và chọn thẻ "Làm ngay".
+import { dongPhuChang } from './btvn-ca-nhan-kieu'
 import { dinhDangConLai } from './tro-ly-ca-nhan'
 import { ngayVietNam } from './han-bai-tap'
 import type { CapDoUuTien, KeHoachNgayTroLy, NhiemVuTroLy } from './tro-ly-ca-nhan'
@@ -48,6 +49,8 @@ export interface TheNhiemVu {
   conLaiChu?: string
   /** Lô BTVN: `hienTai` đếm từ 1. Chỉ có khi dữ liệu nói rõ "Lô x/y". `laChang` = bài BTVN "nâng đỡ" (cá nhân hoá): lô ≡ CHẶNG. */
   tienDoLo?: { hienTai: number; tong: number; laChang?: boolean }
+  /** Dòng phụ chữ nhỏ dưới tên thẻ (chỉ bài BTVN cá nhân hoá): "Chặng k trong K chặng", hạn thật, tờ đề. */
+  dongPhu?: string[]
   biCong: boolean
   /** Tên việc phải xong trước — chỉ có khi `biCong`. */
   moSauKhiXong?: string
@@ -468,8 +471,9 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       case 'btvn_lo': {
         const bt = btvnTheoMa(ct.ma)
         // Bài cá nhân hoá (hợp đồng BTVN nâng đỡ mục 7): lô ≡ chặng, `chiTiet.caNhan:true`.
-        const nhanLo = ct.caNhan === true ? 'Chặng' : 'Lô'
-        return `${bt?.tenBtvn || bt?.tieuDe || 'BTVN'}: ${nhanLo} ${Number(ct.chiSo) + 1}/${Number(ct.tongLo)}`
+        // Thầy 21/09: thẻ bài cá nhân hoá KHÔNG lấy mã tờ đề làm tên — "Bài tập về nhà · Chặng k"; mã tờ xuống dòng phụ (`dongPhu`).
+        if (ct.caNhan === true) return `Bài tập về nhà · Chặng ${Number(ct.chiSo) + 1}`
+        return `${bt?.tenBtvn || bt?.tieuDe || 'BTVN'}: Lô ${Number(ct.chiSo) + 1}/${Number(ct.tongLo)}`
       }
       case 'btvn_nop': {
         const bt = btvnTheoMa(ct.ma)
@@ -545,6 +549,12 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
       hanNop: han,
       conLaiMs,
       conLaiChu,
+      dongPhu: v.loai === 'btvn_lo' && ct.caNhan === true
+        ? (() => {
+            const bt = btvnTheoMa(ct.ma)
+            return dongPhuChang({ chiSo: Number(ct.chiSo), tongChang: Number(ct.tongLo), hanChang: han, hanBai: bt?.hanNop, tenTo: bt?.tenBtvn || bt?.tieuDe })
+          })()
+        : undefined,
       tienDoLo: v.loai === 'btvn_lo' && Number.isFinite(Number(ct.chiSo)) && Number(ct.tongLo) > Number(ct.chiSo)
         ? { hienTai: Number(ct.chiSo) + 1, tong: Number(ct.tongLo), ...(ct.caNhan === true ? { laChang: true } : {}) }
         : undefined,

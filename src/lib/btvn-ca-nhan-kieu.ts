@@ -170,6 +170,33 @@ export function nhanMoLucNgan(moLuc: string, bayGio: Date): string {
   return `${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
 }
 
+/** "23:59 Thứ Năm 24/09" — hạn nói bằng NGÀY GIỜ THẬT (giờ máy em). Hỏng ⇒ ''. */
+export function hanChu(iso: unknown): string {
+  if (typeof iso !== 'string' || iso.trim() === '') return ''
+  const d = new Date(iso)
+  if (!Number.isFinite(d.getTime())) return ''
+  const THU = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy']
+  return `${hai(d.getHours())}:${hai(d.getMinutes())} ${THU[d.getDay()]} ${hai(d.getDate())}/${hai(d.getMonth() + 1)}`
+}
+
+/** Các dòng phụ dưới tên thẻ việc của bài cá nhân hoá (thầy 21/09): "Chặng 1 trong 7 chặng", hạn thật, tờ đề (chữ nhỏ).
+ * `hanChang` = mốc của CHẶNG (máy chủ), `hanBai` = hạn nộp cả bài. Chưa có mốc riêng từng chặng ⇒ hạn chặng = hạn cả bài, nói đúng thế. */
+export function dongPhuChang(v: { chiSo: number; tongChang: number; hanChang?: unknown; hanBai?: unknown; tenTo?: unknown }): string[] {
+  const ra: string[] = []
+  const k = v.chiSo + 1
+  ra.push(Number.isFinite(v.tongChang) && v.tongChang >= 1 ? `Chặng ${k} trong ${v.tongChang} chặng` : `Chặng ${k}`)
+  const hc = hanChu(v.hanChang)
+  const hb = hanChu(v.hanBai)
+  if (hc && hb && hc !== hb) {
+    ra.push(`Hạn chặng này: ${hc}`, `Hạn nộp cả bài: ${hb}`)
+  } else if (hc || hb) {
+    ra.push(hc && hb ? `Hạn chặng này: ${hc} · bằng hạn nộp cả bài` : `Hạn chặng này: ${hc || hb}`)
+  }
+  const to = typeof v.tenTo === 'string' ? v.tenTo.trim() : ''
+  if (to) ra.push(`Tờ đề: ${to}`)
+  return ra
+}
+
 // ───────────────────────── kết quả nộp chặng ─────────────────────────
 
 /** Giá trị đáp án/lời giải máy chủ trả NGUYÊN DẠNG như kho lưu: chuỗi ("B", "DSDS", "12,5") hoặc đối tượng có cấu trúc

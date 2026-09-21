@@ -62,6 +62,13 @@ function The({
       <span className="bnv-the-chu">
         <span className="bnv-the-ten">{viec.tieuDe}</span>{' '}
         <span className="bnv-the-mo-ta">{moTa}</span>
+        {viec.dongPhu && viec.dongPhu.length > 0 && (
+          <span className="bnv-the-phu">
+            {viec.dongPhu.map((d) => (
+              <span key={d}>{d}</span>
+            ))}
+          </span>
+        )}
       </span>
       {viec.biCong ? null : docChi ? (
         <span className="bnv-chip">{viec.trangThai === 'dang_lam' ? 'Đang làm' : 'Chưa làm'}</span>
@@ -224,3 +231,6 @@ export function HangTonCu({ tonCu, docChi, onChon }: { tonCu: TonCu; docChi: boo
     </section>
   )
 }
+
+// Xuất riêng thẻ việc để test khoá chuỗi (không đổi hành vi).
+export { The as TheViec }

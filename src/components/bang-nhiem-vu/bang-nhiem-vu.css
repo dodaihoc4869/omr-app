@@ -967,3 +967,7 @@ button.bnv-chon-thu:focus-visible { outline: 3px solid var(--m3-primary); outlin
     display: none;
   }
 }
+
+/* Dòng phụ của thẻ việc bài cá nhân hoá (thầy 21/09): "Chặng k trong K chặng", hạn thật, tờ đề — chữ nhỏ, đọc được, không tranh nút chính. */
+.bnv-lam-ngay-phu { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; font-size: var(--cx-1); line-height: 1.4; opacity: 0.92; }
+.bnv-the-phu { display: flex; flex-direction: column; gap: 1px; margin-top: 2px; font-size: var(--cx-1); line-height: 1.4; color: var(--m3-on-surface-variant); }
