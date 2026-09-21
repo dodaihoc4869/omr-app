@@ -112,6 +112,140 @@ export function advance(old:Mastery|undefined,a:Attempt):{mastery:Mastery;reward
   return {mastery:m,reward,milestone:reward?m.stage:0}
 }
 
+/* ══════════════════════════ BỘ CHỌN LƯỢT MỚI — ĐỢT 2 (thầy chốt 21/09/2026) ══════════════════════════
+ * Thuần, tất định, KHÔNG đổi `chooseSession*` cũ (máy chủ cũ vẫn chạy). Điều 3–5 của `DE-XUAT-THAN-THU-MOI-NGAY-2109.md`:
+ *  • KHO = phần LỚP đã học (máy chủ đưa vào `pool`): bỏ điều kiện "chính em phải có bằng chứng cùng dạng"; vẫn chặn `blocked`, không tự luận (máy chủ lọc trước, hàm còn kiểm `phan`),
+ *    bậc ≤ bậc của em ở dạng đó (+1 CHỈ cho suất thử thách và Lượt trùm); dạng em chưa có bằng chứng ⇒ bậc Biết (`targetLevel`).
+ *  • CHỐNG LẶP: mỗi lượt ≥ 3 (thực tế ≥ 4) câu em CHƯA TỪNG gặp khi kho còn, ≤ 2 câu cũ; câu SAI quay lại sớm nhất NGÀY VN hôm sau; đã sai ≥ 3 lần ⇒ đổi sang câu KHÁC cùng dạng;
+ *    câu đã ĐÚNG nghỉ 30 ngày. Lượt ôn (`mastery`) vốn đòi nhóm mới nên không cần ngoại lệ.
+ *  • LOẠI LƯỢT: `khoi_dong` (đúng bậc, chỉ Phần I) · `kham_pha` (ưu tiên dạng em chưa gặp; 1 câu dài, lượt thưởng 2 câu dài) · `trum` (6 câu bậc + 1 từ CẢ kho, ≥ 3 câu dài Phần II/III).
+ *    Trần câu dài theo cấp thú: 1–9 ⇒ 1 · 10–29 ⇒ 2 · ≥ 30 ⇒ 3 (Lượt trùm không theo trần này). Em không có câu yếu: 1 tới hạn + 3 mới đúng bậc + 2 thử thách.
+ *  • THANG NỚI khi thiếu câu: dạng đang học → dạng đã học khác → bậc + 1 → câu lâu nhất chưa gặp; KHÔNG trả rỗng khi kho còn câu. */
+export type LoaiLuot='khoi_dong'|'kham_pha'|'trum'
+export type QuestionRoleV2=QuestionRole|'moi'|'trum'
+export const NGAY_NGHI_CAU_DUNG=30
+export const LAN_SAI_DOI_CAU=3
+export const SO_CAU_MOI_LUOT=6
+/** Trần số câu DÀI (Phần II/III) trong một lượt thường theo cấp thú. Lượt trùm không theo trần này. */
+export const tranCauDaiTheoCap=(cap:number)=>cap>=30?3:cap>=10?2:1
+const GIO_VN=7*3600000
+const ngayVnChi=(ms:number)=>Math.floor((ms+GIO_VN)/DAY)
+const ngayVnChuoi=(ms:number)=>new Date(ms+GIO_VN).toISOString().slice(0,10)
+export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number }
+export interface CauLuot { q:PrivateQuestion; role:QuestionRoleV2; dai:boolean; moi:boolean }
+interface ThongKeNhom { gap:number; sai:number; lucSaiCuoi:number; lucDungCuoi:number; lucCuoi:number }
+export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempts:Attempt[],mastery:Mastery[],opt:OptLuot):CauLuot[] {
+  const N=Math.max(1,Math.min(12,Math.floor(opt.soCau??SO_CAU_MOI_LUOT))),now=opt.now,hom=ngayVnChi(now),homChuoi=ngayVnChuoi(now)
+  const blocked=opt.blocked??new Set<string>()
+  const tk=new Map<string,ThongKeNhom>();const lay=(g:string)=>{let t=tk.get(g);if(!t){t={gap:0,sai:0,lucSaiCuoi:-1,lucDungCuoi:-1,lucCuoi:-1};tk.set(g,t)}return t}
+  for(const a of [...attempts].sort((x,y)=>x.at-y.at)){const t=lay(a.group);t.gap++;t.lucCuoi=a.at;if(a.correct&&!a.assisted)t.lucDungCuoi=a.at;else t.lucSaiCuoi=a.at;if(!a.correct)t.sai++}
+  const saiHomNayEv=new Set<string>()
+  for(const e of evidence){const t=lay(e.group);t.gap++;if(e.wrong){t.sai++;if(e.date>=homChuoi)saiHomNayEv.add(e.group)}}
+  const daGapDang=new Set<string>();for(const q of pool)if(tk.has(q.group)&&q.dang)daGapDang.add(q.dang)
+  const gapNhom=(q:Question)=>(tk.get(q.group)?.gap??0)>0
+  const saiHomNay=(q:Question)=>{const t=tk.get(q.group);return saiHomNayEv.has(q.group)||(!!t&&t.lucSaiCuoi>=0&&ngayVnChi(t.lucSaiCuoi)>=hom&&t.lucSaiCuoi>=t.lucDungCuoi)}
+  const sai3=(q:Question)=>(tk.get(q.group)?.sai??0)>=LAN_SAI_DOI_CAU
+  const dung30=(q:Question)=>{const t=tk.get(q.group);return !!t&&t.lucDungCuoi>=0&&hom-ngayVnChi(t.lucDungCuoi)<NGAY_NGHI_CAU_DUNG}
+  const key=(q:Question)=>q.dang??q.group
+  const weak=new Set(evidence.filter(e=>e.wrong).map(e=>e.dang??e.group))
+  for(const a of attempts)if(!a.correct||a.assisted)weak.add(a.dang??a.group)
+  const due=new Set(mastery.filter(m=>m.due<=now).map(m=>m.key))
+  const levels=new Map<string|null,number>();const target=(d:string|null)=>{if(!levels.has(d))levels.set(d,targetLevel(d,evidence,attempts));return levels.get(d)!}
+  const level=(q:Question)=>q.mucDo===null?-1:LEVELS.indexOf(q.mucDo)
+  const dai=(q:Question)=>q.phan!=='I'
+  const rank=(q:Question)=>{let h=2166136261;for(const c of q.group)h=Math.imul(h^c.charCodeAt(0),16777619);return (h^(Math.floor(now/3600000)+attempts.length)*2654435761)>>>0}
+  const kho=pool.filter(q=>q.reviewed&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(q.phan==='I'||q.phan==='II'||q.phan==='III'))
+  const nhanCoYeu=kho.some(q=>weak.has(key(q))&&level(q)<=target(q.dang)&&!saiHomNay(q)),nhanCoTH=kho.some(q=>due.has(key(q))&&level(q)<=target(q.dang)&&!saiHomNay(q))
+  const tranDai=opt.loai==='trum'?N:Math.min(opt.thuong?2:1,tranCauDaiTheoCap(opt.cap))
+  const tranDaiToiDa=opt.loai==='trum'?N:tranCauDaiTheoCap(opt.cap)
+  type Suat={role:QuestionRoleV2;mucCao:boolean;dai:boolean}
+  let suat:Suat[]
+  const S=(role:QuestionRoleV2,mucCao=false,dai=false):Suat=>({role,mucCao,dai})
+  if(opt.loai==='trum')suat=Array.from({length:N},(_,i)=>S('trum',true,i<3))
+  else{
+    const goc:QuestionRoleV2[]=opt.loai==='khoi_dong'
+      ?(nhanCoYeu?['yeu','yeu',...(nhanCoTH?['toi_han' as const]:[]),'moi','moi','moi','moi']:[...(nhanCoTH?['toi_han' as const]:[]),'moi','moi','moi','moi','moi','moi'])
+      :(nhanCoYeu?['yeu','yeu',...(nhanCoTH?['toi_han' as const]:[]),'moi','moi','thu_thach','moi']:[...(nhanCoTH?['toi_han' as const]:[]),'moi','moi','moi','thu_thach','thu_thach','moi'])
+    let daiCon=opt.loai==='khoi_dong'?0:tranDai
+    suat=goc.slice(0,N).map(r=>{const dsd=r==='moi'&&daiCon>0;if(dsd)daiCon--;return S(r,r==='thu_thach',dsd)})
+  }
+  // Thứ tự chọn: suất yếu / tới hạn (mục tiêu sư phạm) → thử thách → suất DÀI của khám phá → còn lại; Lượt trùm giữ nguyên (3 suất dài đứng đầu). Hạn mức câu dài tính CHUNG cho cả lượt.
+  const uuTien=(x:Suat)=>opt.loai==='trum'?(x.dai?0:1):x.role==='yeu'||x.role==='toi_han'?0:x.role==='thu_thach'?1:x.dai?2:3
+  suat=suat.map((x,i)=>({x,i})).sort((a,b)=>uuTien(a.x)-uuTien(b.x)||a.i-b.i).map(o=>o.x)
+  const dung=new Set<string>(),out:CauLuot[]=[];let soDai=0,soCu=0
+  // THANG NỚI (5 mức): 0 chặt · 1 bỏ đòi câu dài · 2 cho bậc + 1 (suất thường) · 3 cho câu sai ≥ 3 lần / đúng chưa đủ 30 ngày · 4 cho cả câu sai hôm nay và lấy quá hạn mức câu dài ("câu lâu nhất chưa gặp").
+  // Suất chuyên biệt (yếu, tới hạn) chỉ đi tới mức 1; hết câu thì đổi thành suất mới / lấp. KHÔNG BAO GIỜ vượt bậc + 1 ở mọi mức.
+  const thuTuNoi=[0,1,2,3,4] as const
+  const noiToiDa=(r:QuestionRoleV2)=>r==='yeu'||r==='toi_han'?1:4
+  const hopLe=(q:PrivateQuestion,s:Suat,noi:number)=>{
+    if(dung.has(q.group))return false
+    const L=level(q),T=target(q.dang),T1=Math.min(2,T+1)
+    if(s.mucCao){if(noi<=1?L!==T1:noi===2?!(L>=T&&L<=T1):L>T1)return false}
+    else if(!(L<=T||(noi>=2&&L===T+1)))return false
+    if(opt.loai==='khoi_dong'&&noi<4&&dai(q))return false
+    if(opt.loai!=='trum'&&dai(q)&&soDai>=Math.min(tranDai,tranDaiToiDa)&&noi<4)return false   // MỘT lượt thường: câu dài ≤ 1 (thưởng ≤ 2) VÀ ≤ trần theo cấp thú
+    if(s.dai&&noi<1&&!dai(q))return false
+    if(noi<3&&(sai3(q)||dung30(q)))return false
+    if(noi<4&&saiHomNay(q))return false
+    if(s.role==='yeu'&&!weak.has(key(q)))return false
+    if(s.role==='toi_han'&&!due.has(key(q)))return false
+    return true
+  }
+  const tot=(a:PrivateQuestion,b:PrivateQuestion,s:Suat)=>{
+    const ma=gapNhom(a)?1:0,mb=gapNhom(b)?1:0
+    if(ma!==mb)return ma-mb                                  // câu CHƯA gặp trước
+    if(s.role==='moi'&&opt.loai==='kham_pha'){const da=daGapDang.has(a.dang??'')?1:0,db=daGapDang.has(b.dang??'')?1:0;if(da!==db)return da-db}  // khám phá: dạng em chưa gặp trước
+    const la=tk.get(a.group)?.lucCuoi??-1,lb=tk.get(b.group)?.lucCuoi??-1
+    if(la!==lb)return la-lb                                   // lâu chưa gặp trước
+    return rank(a)-rank(b)||a.qid.localeCompare(b.qid)
+  }
+  const datSuat=(s:Suat):boolean=>{
+    for(const noi of thuTuNoi){
+      if(noi>noiToiDa(s.role))break
+      let ds=kho.filter(q=>hopLe(q,s,noi))
+      if(!ds.length)continue
+      if(soCu>=2){const moi=ds.filter(q=>!gapNhom(q));if(moi.length)ds=moi}
+      ds.sort((a,b)=>tot(a,b,s));const q=ds[0]!
+      dung.add(q.group);out.push({q,role:s.role,dai:dai(q),moi:!gapNhom(q)});if(dai(q))soDai++;if(gapNhom(q))soCu++
+      return true
+    }
+    return false
+  }
+  for(const s of suat)if(!datSuat(s)){
+    // suất chuyên biệt không có câu phù hợp ⇒ đổi thành suất "mới/lấp" (không trả thiếu khi kho còn)
+    if(s.role!=='moi'&&s.role!=='lap'&&s.role!=='trum')datSuat(S(s.role==='thu_thach'?'lap':'moi',false,false))
+  }
+  while(out.length<N&&datSuat(S(opt.loai==='trum'?'trum':'lap',opt.loai==='trum',false)));
+  return out.slice(0,N)
+}
+
+export interface DauVaoLuot { soLuotDaLam:number; xongChangHomNay:boolean|null; xongOnToiHan:boolean; datHomNay:boolean; dungHomNay:number; tongHomNay:number }
+export interface KhoaLuot { ma:'chang'|'dat'|'trum'; daMo:boolean; moKhi:string }
+export interface KetQuaLuot { tongLuotMo:number; conLai:number; tran:number; danhSach:{so:number;loai:LoaiLuot;thuong:boolean}[]; luotTiepTheo:{so:number;loai:LoaiLuot;thuong:boolean}|null; khoa:KhoaLuot[]; tongCauToiDa:number }
+export const SO_LUOT_MO_SAN=3
+export const TRAN_LUOT_NGAY=6
+export const TI_LE_LUOT_TRUM=0.8
+export const SO_CAU_TOI_THIEU_LUOT_TRUM=12
+/** Số lượt của HÔM NAY (ngày VN): 3 sẵn · +1 xong chặng BTVN hôm nay (không có bài đang chạy: xong ôn tới hạn) · +1 đạt nhiệm vụ ngày · +1 Lượt trùm khi đúng ≥ 80 % trong ≥ 12 câu thú hôm nay. Trần 6 lượt (36 câu), KHÔNG cộng dồn sang hôm sau. */
+export function luotHomNay(v:DauVaoLuot):KetQuaLuot {
+  const so=(x:number)=>Number.isFinite(x)?Math.max(0,Math.floor(x)):0
+  const dung=so(v.dungHomNay),tong=so(v.tongHomNay),daLam=so(v.soLuotDaLam)
+  const moChang=v.xongChangHomNay===null?!!v.xongOnToiHan:v.xongChangHomNay===true
+  const moDat=!!v.datHomNay
+  const moTrum=tong>=SO_CAU_TOI_THIEU_LUOT_TRUM&&dung>=TI_LE_LUOT_TRUM*tong-1e-9
+  const khoa:KhoaLuot[]=[
+    {ma:'chang',daMo:moChang,moKhi:v.xongChangHomNay===null?'Em xong phần ôn lại đến lịch hôm nay':'Em xong chặng bài tập về nhà của hôm nay'},
+    {ma:'dat',daMo:moDat,moKhi:'Em đạt nhiệm vụ ngày'},
+    {ma:'trum',daMo:moTrum,moKhi:`Em đúng từ 80 % trong ít nhất ${SO_CAU_TOI_THIEU_LUOT_TRUM} câu thần thú hôm nay (hôm nay ${dung}/${tong} câu)`},
+  ]
+  const danhSach:{so:number;loai:LoaiLuot;thuong:boolean}[]=[{so:1,loai:'khoi_dong',thuong:false},{so:2,loai:'kham_pha',thuong:false},{so:3,loai:'kham_pha',thuong:false}]
+  if(moChang)danhSach.push({so:danhSach.length+1,loai:'kham_pha',thuong:true})
+  if(moDat)danhSach.push({so:danhSach.length+1,loai:'kham_pha',thuong:true})
+  if(moTrum)danhSach.push({so:danhSach.length+1,loai:'trum',thuong:true})
+  const tongLuotMo=Math.min(TRAN_LUOT_NGAY,danhSach.length)
+  return {tongLuotMo,conLai:Math.max(0,tongLuotMo-daLam),tran:TRAN_LUOT_NGAY,danhSach:danhSach.slice(0,TRAN_LUOT_NGAY),luotTiepTheo:daLam<tongLuotMo?danhSach[daLam]!:null,khoa,tongCauToiDa:TRAN_LUOT_NGAY*SO_CAU_MOI_LUOT}
+}
+
 export interface Unit { id:string; pet:number; star:number; pos:number|null }
 export interface Arena { round:number; hp:number; gold:number; level:number; xp:number; shop:(number|null)[]; units:Unit[]; seed:number; learned:number; studied?:number; learnedGroups?:string[]; log:string[]; finished:boolean }
 export type ArenaAction={type:'buy';slot:number}|{type:'sell';id:string}|{type:'place';id:string;pos:number|null}|{type:'refresh'}|{type:'xp'}|{type:'fight'}
