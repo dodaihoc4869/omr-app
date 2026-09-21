@@ -13,6 +13,7 @@ import ManChinh from '../src/components/ph-moi/ManChinh'
 import BangMoiThu from '../src/components/ph-moi/BangMoiThu'
 import { docTatCaVeCon } from '../src/lib/ph-moi/du-lieu'
 import { H, PH_OK } from './_ph-moi/du-lieu-mau'
+import { PH_APPLE, PH_APPLE_CHUA_HOC, PH_APPLE_NO, PH_APPLE_THUA } from './_ph-moi/du-lieu-mau-apple'
 
 const goc = process.cwd()
 const doc = (p: string) => fs.readFileSync(path.join(goc, p), 'utf8')
@@ -27,6 +28,7 @@ function duyetCss(dir: string, ra: string[] = []): string[] {
 }
 const CSS_KHAC = duyetCss('src').filter((p) => !p.startsWith('src/components/ph-moi/'))
 const CSS_PH_MOI = duyetCss('src/components/ph-moi')
+const tsxPhMoi = (d = 'src/components/ph-moi'): string[] => fs.readdirSync(path.join(goc, d), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? tsxPhMoi(`${d}/${e.name}`) : e.name.endsWith('.tsx') ? [`${d}/${e.name}`] : []))
 const lopTrongTsx = (src: string): string[] => {
   const ra = new Set<string>()
   for (const m of src.matchAll(/className=(?:"([^"]*)"|\{`([^`]*)`\})/g)) for (const t of (m[1] ?? m[2] ?? '').replace(/\$\{[^}]*\}/g, ' ').split(/\s+/)) if (t && /^[A-Za-z][\w-]*$/.test(t)) ra.add(t)
@@ -35,7 +37,7 @@ const lopTrongTsx = (src: string): string[] => {
 
 describe('không va chạm tên lớp với CSS khác', () => {
   it('mọi lớp `phm-*` / `phm` của app PH mới CHỈ được định nghĩa trong src/components/ph-moi/; không tệp CSS nào khác có bộ chọn trùng; nguồn không còn tiền tố `mt-` của mũi tên hoá học', () => {
-    const tsx = ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/ThanhDayAp.tsx', 'src/components/ph-moi/BieuTuongAp.tsx', 'src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx'].map(doc)
+    const tsx = tsxPhMoi().map(doc)
     const lop = [...new Set(tsx.flatMap(lopTrongTsx))].filter((t) => t === 'phm' || t.startsWith('phm-'))
     expect(lop.length).toBeGreaterThan(40)
     for (const p of CSS_KHAC) {
@@ -43,15 +45,14 @@ describe('không va chạm tên lớp với CSS khác', () => {
       for (const t of lop) expect(new RegExp(`\\.${t}(?![\\w-])`).test(css), `${p} có .${t}`).toBe(false)
     }
     for (const p of CSS_PH_MOI) expect(doc(p).replace(/\/\*[\s\S]*?\*\//g, ''), p).not.toMatch(/\.mt(?![\w])|\.mt-/)
-    for (const f of ['src/components/ph-moi/ManChinh.tsx', 'src/components/ph-moi/ThanhDayAp.tsx', 'src/components/ph-moi/BieuTuongAp.tsx', 'src/components/ph-moi/BangMoiThu.tsx', 'src/components/ph-moi/ThanhDay.tsx']) expect(lopTrongTsx(doc(f)).filter((t) => t === 'mt' || t.startsWith('mt-')), f).toEqual([])
+    for (const f of tsxPhMoi()) expect(lopTrongTsx(doc(f)).filter((t) => t === 'mt' || t.startsWith('mt-')), f).toEqual([])
   })
-  it('chốt phòng thủ: gốc `.phm` (bảng) và `.phm-ap` (màn chính kiểu Apple) là khối thường không co theo nội dung, có min-width 0 và overflow-x: clip (khi hỗ trợ)', () => {
-    const css = doc('src/components/ph-moi/ph-moi-them.css')
-    expect(css).toMatch(/\.phm \{[^}]*display: block[^}]*min-width: 0/)
-    expect(css).toMatch(/@supports \(overflow: clip\) \{ \.phm \{ overflow-x: clip; \} \}/)
+  it('chốt phòng thủ: gốc màn chính `.phm-ap` là khối thường không co theo nội dung, có min-width 0 và overflow-x: clip (khi hỗ trợ); vỏ bảng mang CẢ `phm-goc` và `phm-ap` nên hưởng cùng chốt', () => {
     const ap = doc('src/components/ph-moi/ph-apple.css')
     expect(ap).toMatch(/\.phm-ap \{ display: block; min-width: 0; max-width: 100%; \}/)
     expect(ap).toMatch(/@supports \(overflow: clip\) \{ \.phm-ap \{ overflow-x: clip; \} \}/)
+    expect(doc('src/components/ph-moi/bang/VoBang.tsx')).toMatch(/className="m3 phm-goc phm-ap"/)
+    expect(doc('src/components/ph-moi/ManChinh.tsx')).toMatch(/className="m3 phm-ap"/)
   })
 })
 
@@ -117,19 +118,29 @@ afterAll(async () => {
 })
 
 const BO_CHINH = [['ĐỦ khối', PH_OK], ['ĐỦ khối + vòng N/M việc', VIEC], ['THIẾU khối (tài khoản thử)', THIEU], ['CHƯA HỌC hôm nay', CHUA_HOC], ['TÊN DÀI + số lớn + ca chưa công bố', DAI]] as const
-const BO_BANG = [['ĐỦ khối', PH_OK], ['THIẾU khối (tài khoản thử)', THIEU]] as const
+// Tên rất dài + số rất lớn + ca chưa công bố + việc A.I dài: ép mọi khối của bảng co giãn tới giới hạn.
+const DAI_B = (() => {
+  const o = JSON.parse(JSON.stringify(PH_APPLE))
+  o.hoTen = 'Nguyễn Hoàng Bảo Khánh An Nhiên Thuỵ Vy'
+  Object.assign(o.homNay.tongQuan, { soCau: 1234, soDung: 700, phutHoc: 1875, chuoiNgayHoc: 100, soLanHoc: 48 })
+  o.caGanNhat.congBo = { congBo: 'ca_lop_xong', daCongBo: false, soEmDaNop: 27, soEmDaVao: 32 }
+  delete o.caGanNhat.ketQua
+  o.baiTapVeNha.dangChay[0].ten = 'Bài tập về nhà cực dài về hợp chất hữu cơ có nhóm chức ester lipid carbohydrate amine amino acid polime'
+  return o
+})()
+const BO_BANG = [['ĐỦ khối (trường mới của Code 4)', PH_APPLE], ['ĐỦ khối, bộ cũ chưa có trường mới', PH_OK], ['CÓ NỢ Dồn về đích', PH_APPLE_NO], ['THIẾU khối (tài khoản thử)', THIEU], ['THƯA (con mới học 4 ngày)', PH_APPLE_THUA], ['CHƯA HỌC hôm nay', PH_APPLE_CHUA_HOC], ['TÊN DÀI + số lớn + ca chưa công bố', DAI_B]] as const
 for (const man of ['chinh', 'bang'] as const)
   for (const [ten, raw] of man === 'chinh' ? BO_CHINH : BO_BANG)
     for (const w of [320, 360, 390, 412])
       for (const cs of [100, 115])
-        it(`${man === 'chinh' ? 'màn chính (phông Inter)' : 'bảng'} · ${ten} · ${w}px · chữ ${cs} %: KHÔNG tràn ngang (scrollWidth ≤ innerWidth)`, async () => {
+        it(`${man === 'chinh' ? 'màn chính (phông Inter)' : 'bảng (phông Inter)'} · ${ten} · ${w}px · chữ ${cs} %: KHÔNG tràn ngang (scrollWidth ≤ innerWidth)`, async () => {
           if (!browser) return // máy không có Chromium: bỏ qua (test khoá tên lớp ở trên vẫn chạy)
           const page = await browser.newPage({ viewport: { width: w, height: 800 } })
-          await page.setContent(`<!doctype html><html lang="vi" style="font-size:${cs}%"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style>${man === 'chinh' ? `<style>${INTER}</style>` : ''}</head><body><div id="root"><div class="m3"><div class="min-h-screen flex flex-col" style="display:flex;flex-direction:column;min-height:100vh">${html(raw, man)}</div></div></div></body></html>`)
+          await page.setContent(`<!doctype html><html lang="vi" style="font-size:${cs}%"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${css}</style><style>${INTER}</style></head><body><div id="root"><div class="m3"><div class="min-h-screen flex flex-col" style="display:flex;flex-direction:column;min-height:100vh">${html(raw, man)}</div></div></div></body></html>`)
           await page.evaluate(() => document.fonts.ready)
-          const r = await page.evaluate((g) => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, goc: getComputedStyle(document.querySelector(g)!).display, phong: getComputedStyle(document.querySelector(g)!).fontFamily }), man === 'chinh' ? '.phm-ap' : '.phm')
+          const r = await page.evaluate((g) => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth, goc: getComputedStyle(document.querySelector(g)!).display, phong: getComputedStyle(document.querySelector(g)!).fontFamily }), man === 'chinh' ? '.phm-ap' : '.phm-goc')
           await page.close()
           expect(r.goc).not.toBe('inline-grid')
-          if (man === 'chinh') expect(r.phong).toMatch(/^Inter\b/)
+          expect(r.phong).toMatch(/^Inter\b/)
           expect(r.sw).toBeLessThanOrEqual(r.iw)
         }, 30000)

@@ -1,0 +1,35 @@
+/* Bổ sung nhỏ + CHUYỂN ĐỘNG cho các khối Ca · Dạng · Bài tập về nhà · Lịch ôn lại · 14 ngày gần đây của bảng "Mọi thứ về con" kiểu Apple (Agent C).
+ * KHÔNG sửa ph-apple-bang.css: chỉ thêm quy tắc bằng bộ chọn thuộc tính trên lớp đã có; không có lớp `phm-` mới (chỉ tên keyframes `phm-c-…`). Không mã màu thô, không `order`.
+ * Chuyển động ≤ 700 ms, CHỈ chạy khi người dùng không chọn "giảm chuyển động" (mọi `animation` nằm trong @media no-preference): cột 14 ngày và cột 7 ngày tới mọc từ chân trục, thanh phần điểm/dạng lấp đầy từ trái, vòng khắc phục chạy đầy. */
+
+/* Dòng "so với lần trước của chính con": bằng/kém KHÔNG tô xanh "hơn". */
+.phm-ca__hon[data-doi="xuong"],
+.phm-ca__hon[data-doi="bang"] { color: var(--phm-chu-2); }
+.phm-ca__hon[data-doi="xuong"] i,
+.phm-ca__hon[data-doi="bang"] i { background: var(--phm-o); color: var(--phm-chu-2); }
+
+/* Dòng cam nợ nằm ngay dưới thẻ bài đang chạy: cách thẻ 12 px như hai thẻ liền nhau. */
+.phm-the + .phm-dong-cam { margin-top: 12px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .phm-14 ol li:not([data-nghi]) i,
+  .phm-tuan li:not([data-khong]) i {
+    transform-origin: 50% 100%;
+    animation: phm-c-moc 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation-delay: calc(var(--k, 0) * 24ms);
+  }
+  .phm-phan .phm-thanh > i,
+  .phm-dang .phm-thanh > i {
+    transform-origin: 0 50%;
+    animation: phm-c-dien 520ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .phm-phan li:nth-child(2) .phm-thanh > i,
+  .phm-dang li:nth-child(2) .phm-thanh > i { animation-delay: 70ms; }
+  .phm-phan li:nth-child(3) .phm-thanh > i,
+  .phm-dang li:nth-child(3) .phm-thanh > i { animation-delay: 140ms; }
+  .phm-vong1 .phm-v-dat { animation: phm-c-vong 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+}
+
+@keyframes phm-c-moc { from { transform: scaleY(0); } }
+@keyframes phm-c-dien { from { transform: scaleX(0); } }
+@keyframes phm-c-vong { from { stroke-dasharray: 0 270.2; } }

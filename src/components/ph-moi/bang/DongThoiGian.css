@@ -1,0 +1,16 @@
+/* Phần CSS THÊM của "Dòng thời gian trong ngày" (bảng Mọi thứ về con kiểu Apple). Lớp gốc ở ../ph-apple-bang.css; tệp này chỉ thêm: đệm đầu thẻ, ô biểu tượng của lần bị che, cột giờ mọc từ chân trục. */
+.phm-dt-dau { padding: 18px 18px 0; }
+.phm-lan .phm-o-bt[data-mau="xam"] { background: var(--phm-o); color: var(--phm-chu-2); }
+
+/* Cột giờ mọc từ chân trục (scaleY), lệch nhau 24 ms; tắt hẳn khi người dùng chọn giảm chuyển động. */
+@media (prefers-reduced-motion: no-preference) {
+  .phm-gio ol li i {
+    transform-origin: 50% 100%;
+    animation: phm-dt-moc 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--phm-dt-tre, 0) * 24ms);
+  }
+}
+@keyframes phm-dt-moc {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
