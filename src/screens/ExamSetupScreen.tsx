@@ -1030,7 +1030,7 @@ export default function ExamSetupScreen() {
                 </label>
                 <input
                   type="text"
-                  aria-label="Mật khẩu ca thi"
+                  aria-label="Mật khẩu ca kiểm tra"
                   placeholder="Để trống nếu không đặt mật khẩu"
                   value={matKhauCa}
                   onChange={(e) => setMatKhauCa(e.target.value)}
