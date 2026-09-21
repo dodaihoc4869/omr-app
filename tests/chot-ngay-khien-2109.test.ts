@@ -98,6 +98,61 @@ describe('chốt "đạt ngày" đầy đủ theo con trỏ', () => {
   })
 })
 
+/** Thêm một em có dòng kế hoạch hôm qua ở trạng thái `ketQua` (null = CHƯA chốt), đã làm 4 câu, có khiên rèn 1 và đã đạt 21→26/09. */
+function themEm(d: D1That, sbd: string, o: { ketQua: string | null; nghi?: number; hocSinh?: 'dang_hoc' | 'khoa' | 'khong_co'; ngay?: string }) {
+  const ngay = o.ngay ?? HOM_QUA
+  if (o.hocSinh !== 'khong_co') d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,trang_thai,cap_nhat_luc) VALUES(?,'x',?,'x')").run(sbd, o.hocSinh === 'khoa' ? 'khoa' : '')
+  d.sql.prepare('INSERT INTO game_v2_profile(sbd,revision,json,created_at) VALUES(?,0,?,?)').run(sbd, JSON.stringify(hoSoGame({ khienRen: { manh: 0, daRen: 1 } })), 'x')
+  d.sql.prepare(
+    `INSERT OR REPLACE INTO ke_hoach_ngay(khoa,sbd,ngay,phien_ban,seed,ngan_sach_json,viec_json,canh_bao_json,ket_qua,la_ngay_nghi,so_su_kien,cap_nhat_luc) VALUES(?,?,?,1,1,?,?,'[]',?,?,0,'x')`,
+  ).run(`${sbd}|${ngay}`, sbd, ngay, JSON.stringify({ mucTieuCau: 8, toiThieuCau: 4 }), JSON.stringify({ viec: [], tienBo: { soCauToiHan: 0, treNhip: false } }), o.ketQua, o.nghi ?? 0)
+  for (let k = 0; k <= 5; k++) d.sql.prepare("INSERT OR IGNORE INTO manh_khien_so(khoa,sbd,ngay_vn,loai,so,luc,ghi_chu) VALUES(?,?,?,'dat',1,?,'x')").run(`${sbd}|manh|dat|2026-09-2${1 + k}`, sbd, `2026-09-2${1 + k}`, `2026-09-2${1 + k}T05:00:00.000Z`)
+}
+const laiSoCau = async (d: D1That, sbd: string) => {
+  const sk = [1, 2, 3, 4].map((k) => ({ nguon: 'btvn' as const, maNguon: 'B', sbd, qid: `DE1-I-${k}`, lan: k, ketQua: 1 as const, luc: `${HOM_QUA}T05:0${k}:00.000Z` }))
+  expect((await ghiSuKien(d.env, sk)).ok).toBe(true)
+}
+const chotKeHoach = (d: D1That, sbd: string, ketQua: string) => d.sql.prepare('UPDATE ke_hoach_ngay SET ket_qua = ? WHERE sbd = ? AND ngay = ?').run(ketQua, sbd, HOM_QUA)
+
+describe('KẼ HỞ: cron mỗi phút tới khi chốt kế hoạch (chayCaLop 00:01) CHƯA xong cho mọi lô', () => {
+  it('còn em có kế hoạch hôm qua chưa chốt ⇒ KHÔNG xong, con trỏ về đầu, lượt sau vẫn quét; em chốt "dat" MUỘN vẫn được ghi mảnh rồi mới xong', async () => {
+    const d = await dung(3)
+    themEm(d, 'P1', { ketQua: null })
+    await laiSoCau(d, 'P1')
+    const l1 = await chotExpNgayQuaDayDu(d.env, VN_00_02)
+    expect(l1).toMatchObject({ soEm: 3, xong: false })
+    expect(trangThai(d)).toMatchObject({ ngay: HOM_QUA, xong: false, sbdCuoi: '' }) // con trỏ đặt lại ⇒ lượt sau quét lại từ đầu
+    expect(soDat(d)).toEqual(['E00', 'E01', 'E02'])
+    expect(await chotExpNgayQuaDayDu(d.env, VN_00_02 + 60_000)).toMatchObject({ soEm: 0, xong: false }) // vẫn chờ, không xong sớm
+    chotKeHoach(d, 'P1', 'dat') // chayCaLop chốt nốt lô cuối
+    expect(await chotExpNgayQuaDayDu(d.env, VN_00_02 + 120_000)).toMatchObject({ soEm: 1, xong: true })
+    expect(soDat(d)).toEqual(['E00', 'E01', 'E02', 'P1']) // P1 KHÔNG còn mất mảnh
+    expect(await chotExpNgayQuaDayDu(d.env, VN_00_02 + 180_000)).toMatchObject({ soEm: 0, xong: true })
+  })
+
+  it('dòng chưa chốt của em KHOÁ, em không còn trong hoc_sinh, ngày nghỉ, hay của NGÀY KHÁC không chặn `xong` (chayCaLop không chốt tập đó)', async () => {
+    const d = await dung(2)
+    themEm(d, 'K1', { ketQua: null, hocSinh: 'khoa' })
+    themEm(d, 'K2', { ketQua: null, hocSinh: 'khong_co' })
+    themEm(d, 'K3', { ketQua: null, nghi: 1 })
+    themEm(d, 'K4', { ketQua: null, ngay: '2026-09-26' })
+    themEm(d, 'K5', { ketQua: null, ngay: '2026-09-28' }) // kế hoạch của HÔM NAY luôn chưa chốt — không được chặn
+    expect(await chotExpNgayQuaDayDu(d.env, VN_00_02)).toMatchObject({ soEm: 2, xong: true })
+  })
+
+  it('cờ EXP mới TẮT cho mọi em ⇒ không có gì để chốt: xong ngay dù còn dòng kế hoạch chưa chốt (không kẹt khiên mãi)', async () => {
+    const d = taoD1That()
+    themEm(d, 'P1', { ketQua: null })
+    expect(await chotExpNgayQuaDayDu(d.env, VN_00_02)).toMatchObject({ soEm: 0, xong: true })
+  })
+
+  it('không đọc được để biết còn dòng chưa chốt hay không ⇒ coi là CÒN (không xong nhầm, không trừ khiên nhầm)', async () => {
+    const d = await dung(2)
+    d.sql.exec('DROP TABLE hoc_sinh')
+    expect(await chotExpNgayQuaDayDu(d.env, VN_00_02)).toMatchObject({ soEm: 2, xong: false })
+  })
+})
+
 describe('trừ khiên chỉ sau khi chốt ngày xong cho mọi em, một lần mỗi ngày, trong khung 00:02–05:00', () => {
   const dungKhien = async (n: number) => {
     const d = await dung(n)
@@ -145,5 +200,19 @@ describe('trừ khiên chỉ sau khi chốt ngày xong cho mọi em, một lần
     expect(d.sql.prepare("SELECT 1 FROM cau_hinh WHERE khoa = 'khien_mat_ngay'").get()).toBeUndefined()
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('khien_moc','2026-09-21','x')").run()
     expect((await chotNgayRoiTruKhien(d.env, VN_00_02 + 60_000)).truKhien).toMatchObject({ chay: true, soTru: 1 })
+  })
+
+  it('KẼ HỞ: còn kế hoạch hôm qua chưa chốt ⇒ KHÔNG trừ khiên (dù lô EXP đã chạy hết); em chốt "dat" muộn được ghi mảnh và KHÔNG bị trừ khiên', async () => {
+    const d = await dungKhien(2)
+    themEm(d, 'P1', { ketQua: null })
+    await laiSoCau(d, 'P1')
+    for (let i = 0; i < 3; i++) expect(await chotNgayRoiTruKhien(d.env, VN_00_02 + i * 60_000)).toMatchObject({ chotXong: false, truKhien: null })
+    expect(daTru(d)).toEqual([])
+    expect(d.sql.prepare("SELECT 1 FROM cau_hinh WHERE khoa = 'khien_mat_ngay'").get()).toBeUndefined()
+    chotKeHoach(d, 'P1', 'dat')
+    const l = await chotNgayRoiTruKhien(d.env, VN_00_02 + 5 * 60_000)
+    expect(l.chotXong).toBe(true); expect(l.truKhien).toMatchObject({ chay: true, soTru: 1 })
+    expect(daTru(d)).toEqual(['ZZ']) // P1 đạt hôm qua ⇒ có mảnh `dat|27/09` ⇒ không mất khiên
+    expect(soDat(d)).toContain('P1')
   })
 })

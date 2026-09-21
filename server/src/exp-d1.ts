@@ -630,6 +630,18 @@ async function chotMotLoNgayQua(env: Env, nowMs: number, sbdSau: string, toiDa: 
 
 const KHOA_CHOT_NGAY = 'chot_exp_ngay_qua'
 
+/** Còn em ĐANG HỌC (không bị khoá, có trong `hoc_sinh` — đúng tập `chayCaLop` chốt) có dòng kế hoạch ngày `ngay` chưa chốt (`ket_qua` NULL, không phải ngày nghỉ)? Lỗi truy vấn ⇒ coi là CÒN (không xong nhầm). */
+async function conKeHoachChuaChot(env: Env, ngay: string): Promise<boolean> {
+  const r = await an(
+    () => env.DB.prepare(
+      `SELECT 1 AS con FROM ke_hoach_ngay k WHERE k.ngay = ? AND k.ket_qua IS NULL AND k.la_ngay_nghi = 0
+          AND k.sbd IN (SELECT h.sbd FROM hoc_sinh h WHERE COALESCE(h.trang_thai, '') <> 'khoa') LIMIT 1`,
+    ).bind(ngay).first<{ con: number }>(),
+    undefined,
+  )
+  return r === undefined || r !== null
+}
+
 /**
  * CHỐT "ĐẠT NGÀY" ĐẦY ĐỦ cho MỌI em (vá lỗ: `chotExpNgayQua` cũ chỉ chạy MỘT lần và chỉ 40 em ⇒ em đạt mà không mở app lại mất mảnh/EXP ngày ấy). Mỗi lượt gọi làm MỘT lô (≤ `toiDa`, mặc định 40) rồi ghi CON TRỎ
  * `cau_hinh.chot_exp_ngay_qua = {ngay, sbdCuoi, xong}`; cron mỗi phút gọi tiếp cho tới khi `xong` (con trỏ chạy hết danh sách, KHÔNG dựa vào "còn thiếu khoản" vì em có thể không tạo khoản dù kế hoạch chốt 'dat').
@@ -644,6 +656,9 @@ export async function chotExpNgayQuaDayDu(env: Env, nowMs: number, tuyChon: { to
   if (cungNgay && tt.xong === true) return { soEm: 0, daTinh: 0, xong: true, ngay }
   const lo = await chotMotLoNgayQua(env, nowMs, cungNgay ? String(tt.sbdCuoi ?? '') : '', tuyChon.toiDa ?? TOI_DA_EM_CHOT_MOT_LUOT)
   const moi = { ngay, sbdCuoi: lo?.sbdCuoi ?? '', xong: lo ? !lo.conNua : true }
+  // KẼ HỞ (Boss soát 5759cc8): cron mỗi phút có thể tới khi `chayCaLop` (00:01) CHƯA chốt xong `ket_qua` của mọi lô ⇒ em chốt 'dat' SAU lượt quét này sẽ không bao giờ được trao mảnh,
+  // và trừ khiên chạy sớm. Còn dòng kế hoạch hôm qua chưa chốt (em đang học, không ngày nghỉ) ⇒ CHƯA xong: đặt con trỏ về đầu để lượt sau quét lại (idempotent nhờ NOT EXISTS + khoá sổ).
+  if (lo && moi.xong && (await conKeHoachChuaChot(env, ngay))) { moi.xong = false; moi.sbdCuoi = '' }
   await env.DB.prepare("INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc")
     .bind(KHOA_CHOT_NGAY, json(moi), new Date(nowMs).toISOString()).run()
   return { soEm: lo?.soEm ?? 0, daTinh: lo?.daTinh ?? 0, xong: moi.xong, ngay }
