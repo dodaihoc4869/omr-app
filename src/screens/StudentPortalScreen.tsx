@@ -11,7 +11,6 @@ import BangTinPhuHuynh from '../components/BangTinPhuHuynh'
 import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 import PhongVaoThi from '../components/PhongVaoThi'
-import KhungThanThuToanManHinh from '../components/KhungThanThuToanManHinh'
 import LuyenDeChuan from '../components/LuyenDeChuan'
 import KhoiKhacPhuc3CheDo from '../components/KhoiKhacPhuc3CheDo'
 import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
@@ -2207,7 +2206,6 @@ export default function StudentPortalScreen() {
         {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) — Nuôi thú, leo tháp & săn boss câu sai.
             Gắn kết chặt chẽ với nhiệm vụ làm BTVN, sửa câu sai và vào phòng thi. */}
         {tab === 'thanthu' && (
-          <KhungThanThuToanManHinh>
           <Suspense fallback={<ChoNapGame />}>
           <ThanThuHoaHocGame
             sbd={auth.sbd}
@@ -2225,7 +2223,6 @@ export default function StudentPortalScreen() {
             onChuyenSangVaoThi={() => setTab('vaothi')}
           />
           </Suspense>
-          </KhungThanThuToanManHinh>
         )}
           </main>
         </div>
