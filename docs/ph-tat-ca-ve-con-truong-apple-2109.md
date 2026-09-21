@@ -1,7 +1,9 @@
 # `/ph/tat-ca-ve-con` — trường MỚI cho bảng "Mọi thứ về con" kiểu Apple (Code 4, 21/09)
 
 Chỉ THÊM, chỉ ĐỌC, mọi con số tính TỪ MỐC hiển thị (`hien_thi_tu` ⇒ … ⇒ 12:00 trưa 21/09), luật che giữ nguyên. Khối nào không có số thật thì VẮNG (không số 0 giả, không mảng bịa) — trừ `dieuDangMung` (mảng rỗng là câu trả lời thật: "hôm nay học rồi mà chưa có gì đáng mừng").
-Test: `tests/ph-tat-ca-ve-con-may-chu-2109.test.ts`, khối "bảng kiểu Apple — trường mới". Ngân sách truy vấn: phần dữ liệu ≤ 13 (thêm 1 truy vấn gộp thử thách riêng + lần nhắc hạn), tổng ≤ 23.
+Test: `tests/ph-tat-ca-ve-con-may-chu-2109.test.ts`, khối "bảng kiểu Apple — trường mới". Ngân sách truy vấn: phần dữ liệu ≤ 14 (thêm 1 truy vấn gộp thử thách riêng + lần nhắc hạn; thêm 1 truy vấn "câu của bài tập về nhà chưa nộp" — `docCauChanBtvnChuaNop`, che theo bài 21/09), tổng ≤ 24.
+
+**Che theo bài chưa nộp (21/09):** ngoài luật che theo câu từ sổ, câu nằm trong bài tập về nhà con CHƯA nộp (cá nhân hoá = câu giao cho con; bài thường = cả tờ đề; bỏ bài đã xoá/thu hồi) bị che `chua_nop` ở danh sách và từ chối ở chi tiết dù con làm câu ấy ở kênh ôn. Cùng luật với `docCauBtvnChuaNop` của game, mở rộng ra mọi qid cùng nhóm nội dung. Lỗi đọc ⇒ lùi về hàm của game; lỗi nữa ⇒ không che thêm + ghi console.
 
 | Khoá | Ý nghĩa · khi nào vắng |
 |---|---|

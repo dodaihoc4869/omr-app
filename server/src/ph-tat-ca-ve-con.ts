@@ -1,5 +1,5 @@
 // `POST /ph/tat-ca-ve-con {pass}` — thẻ "Ca kiểm tra gần nhất của con" + trang "Tất cả về con" của phụ huynh (hợp đồng docs/hop-dong-xem-diem-v2-2109.md mục 6 + bổ sung `homNay`, `manhYeu` của điều phối 21/09).
-// ĐỌC-CHỈ, không AI, ≤ 12 truy vấn D1 cho phần dữ liệu + 3 cho `doCham` (hangChamCuaEm dùng chung với lệnh thi đua) + 5 cho `no` của con (`docVeDichCuaEm`, W3b Dồn về đích) = ≤ 20 tổng (kể cả xác thực; đo trong test). KHÔNG trường nào của game (không thần thú, EXP, khiên, chuỗi game, đoàn, đảo, võ đài), không xếp hạng, không so với bạn.
+// ĐỌC-CHỈ, không AI, ≤ 14 truy vấn D1 cho phần dữ liệu + 3 cho `doCham` (hangChamCuaEm dùng chung với lệnh thi đua) + 5 cho `no` của con (`docVeDichCuaEm`, W3b Dồn về đích) = ≤ 20 tổng (kể cả xác thực; đo trong test). KHÔNG trường nào của game (không thần thú, EXP, khiên, chuỗi game, đoàn, đảo, võ đài), không xếp hạng, không so với bạn.
 // Khối nào không có số thật thì VẮNG (không số 0 giả, không mảng bịa).
 //
 // TRƯỜNG MỚI CHO BẢNG KIỂU APPLE (thầy chốt 21/09 16:16): xem docs/ph-tat-ca-ve-con-truong-apple-2109.md (mucTieu, viecXong/viecTong, soLanHoc, dieuDangMung, aiDaLam/aiDaChuanBi, cau[].lan/lamLau, chang[], nopTreGio, lichOn.bayNgayToi…).
@@ -31,6 +31,7 @@ import { baiTuNgayMoc, giaiMocHienThi } from './moc-no'
 import { TRAN_ON_KHI_KHONG_NO } from '../../src/lib/ve-dich'
 import { hangChamCuaEm } from './thi-dua-hom-nay'
 import { docVeDichCuaEm } from './ve-dich-d1'
+import { docCauBtvnChuaNop } from './game-v2-luot'
 
 type Row = Record<string, unknown>
 
@@ -53,7 +54,7 @@ export const SO_NGAY_VUA_LEN_BAC = 3
 export const PHIEN_CACH_TOI_DA_PHUT = 10
 export const TOI_DA_CAU_HOM_NAY = 120
 export const DE_RUT_GON_TOI_DA = 160
-export const TOI_DA_TRUY_VAN = 13 // 12 + 1 truy vấn gộp thử thách riêng + lần nhắc hạn (bảng kiểu Apple, 21/09)
+export const TOI_DA_TRUY_VAN = 14 // 12 + 1 truy vấn gộp thử thách riêng + lần nhắc hạn (bảng kiểu Apple, 21/09) + 1 câu của bài chưa nộp (che theo bài, 21/09)
 /** Câu làm từ chừng này giây trở lên là "làm lâu" (bộ lọc "Làm lâu" ở bảng phụ huynh; máy khách không phải chép ngưỡng). */
 export const NGUONG_LAM_LAU_GIAY = 120
 export const SO_NGAY_LICH_ON_TOI = 7
@@ -138,6 +139,31 @@ export function lyDoCheCuaCau(lanLam: readonly { nguon: string; maNguon: string 
     if (c !== null) ra = c
   }
   return ra
+}
+
+/**
+ * CÂU NẰM TRONG BÀI TẬP VỀ NHÀ CON CHƯA NỘP — kể cả khi con chưa làm câu ấy Ở BÀI ĐÓ mà làm ở kênh khác (ôn lại, luyện, game): lỗ che cuối cùng của luật che theo câu.
+ * Cùng luật với `docCauBtvnChuaNop` (game-v2-luot.ts): bài cá nhân hoá = các câu của em (`btvn_em_cau`), bài thường = cả tờ đề; bài đã xoá / thu hồi không tính. Game chặn theo qid HOẶC nhóm nội dung (một nội dung ở hai đề khác nhau) ⇒
+ * ở đây cũng che MỌI qid cùng nhóm nội dung với câu của bài chưa nộp (đáp án của qid này lộ đáp án của bài kia). MỘT truy vấn D1 (≤ 5 nhánh UNION). Nộp bài ⇒ tập rỗng lại ⇒ câu hiện lại.
+ * Lỗi đọc ⇒ lùi về `docCauBtvnChuaNop` (từng nguồn một); lỗi nữa ⇒ tập rỗng: KHÔNG che thêm + ghi console (không làm sập bảng của phụ huynh).
+ */
+export async function docCauChanBtvnChuaNop(env: Env, sbd: string): Promise<Set<string>> {
+  const bai = `SELECT q.qid AS qid, q.content_group AS grp FROM btvn_em_cau ec JOIN btvn_em be ON be.ma_btvn = ec.ma_btvn AND be.sbd = ec.sbd JOIN btvn b ON b.ma_btvn = ec.ma_btvn
+       JOIN game_v2_question q ON q.qid = ec.qid WHERE ec.sbd = ? AND be.nop_luc IS NULL AND b.da_xoa = 0 AND COALESCE(be.thu_hoi, 0) = 0
+     UNION ALL
+     SELECT q.qid, q.content_group FROM btvn b JOIN btvn_em be ON be.ma_btvn = b.ma_btvn JOIN game_v2_question q ON q.ma_de = b.ma_de
+      WHERE be.sbd = ? AND be.nop_luc IS NULL AND b.da_xoa = 0 AND COALESCE(b.ca_nhan, 0) = 0 AND COALESCE(be.thu_hoi, 0) = 0`
+  try {
+    const r = await env.DB.prepare(
+      `WITH bai AS (${bai}) SELECT qid, grp FROM bai UNION ALL SELECT q2.qid, q2.content_group FROM game_v2_question q2 WHERE q2.content_group IN (SELECT grp FROM bai)`,
+    ).bind(sbd, sbd).all<{ qid: string; grp: string | null }>()
+    const ra = new Set<string>()
+    for (const x of r.results ?? []) { ra.add(String(x.qid)); if (x.grp) ra.add(String(x.grp)) }
+    return ra
+  } catch (e) {
+    console.error('[ph-tat-ca-ve-con] không đọc được câu của bài chưa nộp (thử từng nguồn):', e instanceof Error ? e.message : e)
+    try { return await docCauBtvnChuaNop(env, sbd) } catch { return new Set() }
+  }
 }
 
 /** Nhãn NGUỒN hiển thị cho phụ huynh — không một chữ nào của game. `null` = bỏ khỏi dòng thời gian / danh sách câu. */
@@ -358,6 +384,11 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   for (const e of skTho) if (nhanNguon(e.nguon) !== null) { const l = suKienTheoQid.get(e.qid); if (l) l.push(e); else suKienTheoQid.set(e.qid, [e]) }
   const cheTheoQid = new Map<string, LyDoChe>()
   for (const [qid, ds] of suKienTheoQid) { const c = lyDoCheCuaCau(ds, congBo, btvnDaNop, momDaNop); if (c) cheTheoQid.set(qid, c) }
+  // câu thuộc bài tập về nhà CHƯA nộp dù em làm ở kênh ôn (chưa có sự kiện nào ở bài đó): che 'chua_nop' (chua_cong_bo từ sự kiện vẫn thắng)
+  if (suKienTheoQid.size > 0) {
+    const chanBtvn = await docCauChanBtvnChuaNop(env, sbd)
+    if (chanBtvn.size > 0) for (const qid of suKienTheoQid.keys()) if (!cheTheoQid.has(qid) && chanBtvn.has(qid)) cheTheoQid.set(qid, 'chua_nop')
+  }
   for (const e of skTho) e.che = cheTheoQid.get(e.qid) ?? null
   const skRo = skTho.filter((e) => e.che === null)
   const tuMoc = (e: { luc: string }): boolean => Date.parse(e.luc) >= moc.ms
@@ -778,7 +809,7 @@ export async function phChiTietCauVeCon(env: Env, b: Record<string, unknown>, no
   const rMom = dsMom.length > 0 ? ((await hoi('SELECT id AS ma, submitted_at AS nop FROM mom_bai WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))', sbd, json(dsMom))) ?? []) : []
   const btvnDaNop = new Map(rBt.map((x) => [chuoi(x.ma), chuoi(x.nop) !== ''] as const))
   const momDaNop = new Map(rMom.map((x) => [chuoi(x.ma), chuoi(x.nop) !== ''] as const))
-  const che = lyDoCheCuaCau(lanLam, congBo, btvnDaNop, momDaNop)
+  const che = lyDoCheCuaCau(lanLam, congBo, btvnDaNop, momDaNop) ?? ((await docCauChanBtvnChuaNop(env, sbd)).has(qid) ? 'chua_nop' : null) // cùng tập với danh sách: câu thuộc bài chưa nộp dù em làm ở kênh ôn
   if (che) return { ok: false, che, error: che === 'chua_cong_bo' ? 'Ca này chưa công bố điểm nên chưa xem được lời giải.' : 'Bài này con chưa nộp nên chưa xem được lời giải.' }
   const r = (await hoi('SELECT MIN(json) AS json FROM game_v2_question WHERE qid = ?', qid)) ?? []
   const q = parse<Row | null>(r[0]?.json, null)

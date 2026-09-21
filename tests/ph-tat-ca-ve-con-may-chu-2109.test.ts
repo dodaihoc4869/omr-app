@@ -7,9 +7,10 @@ import { describe, expect, it } from 'vitest'
 import { parentPass } from '../server/src/game-v2-auth'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { docCauHinhTangDoc } from '../server/src/bo-nao-doc'
+import { docCauBtvnChuaNop } from '../server/src/game-v2-luot'
 import { chuGameTrong } from '../server/src/chu-game'
 import {
-  CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, lyDoCheCuaCau, NGUONG_LAM_LAU_GIAY, lichChangCuaEm, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
+  CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, docCauChanBtvnChuaNop, lyDoCheCuaCau, NGUONG_LAM_LAU_GIAY, lichChangCuaEm, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
   DANG_VAP_TI_LE_DUNG_TOI_DA, DANG_VAP_TOI_THIEU_LUOT, PHIEN_CACH_TOI_DA_PHUT, TOI_DA_CAU_HOM_NAY, TOI_THIEU_LUOT_GIO_THUONG_HOC,
 } from '../server/src/ph-tat-ca-ve-con'
 import type { Env } from '../server/src/kieu'
@@ -46,9 +47,10 @@ const kho = (d: D1That, qid: string, o: OKho = {}) => {
   const c = { qid, maDe: 'DE', phan: o.phan ?? 'I', text: o.text ?? `Chọn phát biểu đúng về ${qid}.`, choices: o.choices ?? ['A. a', 'B. b', 'C. c', 'D. d'], dang: o.dang ?? null, tenDang: o.tenDang ?? '', correct: o.correct ?? 'B', solution: o.solution ?? `LG-BI-MAT-${qid}`, reviewed: true }
   d.sql.prepare('INSERT OR REPLACE INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE', qid, 'v', `g-${qid}`, o.dang ?? null, JSON.stringify(c))
 }
-const themBtvn = (d: D1That, ma: string, o: { han?: string; giao?: string; nop?: string | null; soDung?: number | null; soCau?: number; ten?: string; chang?: [number, number] } = {}) => {
+const themBtvn = (d: D1That, ma: string, o: { han?: string; giao?: string; nop?: string | null; soDung?: number | null; soCau?: number; ten?: string; chang?: [number, number]; de?: string; caNhan?: boolean } = {}) => {
   themCa(d, `CA-${ma}`, 'ngay', 'mo', o.ten ?? `Bài ${ma}`)
-  d.sql.prepare('INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc) VALUES(?,?,?,?,?,?,0,?)').run(ma, `CA-${ma}`, 'DE', o.soCau ?? 10, o.giao ?? '2026-09-21T03:00:00.000Z', o.han ?? '2026-09-25T05:00:00.000Z', 'x')
+  // đề của bài mặc định là 'DE' = cùng kho với mọi câu của test; bài chưa nộp thì CẢ tờ đề bị che (luật che theo bài chưa nộp) ⇒ test cần câu "ôn lại tự do" phải đặt bài ở đề riêng (de: 'DE-BT')
+  d.sql.prepare('INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES(?,?,?,?,?,?,0,?,?)').run(ma, `CA-${ma}`, o.de ?? 'DE', o.soCau ?? 10, o.giao ?? '2026-09-21T03:00:00.000Z', o.han ?? '2026-09-25T05:00:00.000Z', 'x', o.caNhan ? 1 : 0)
   d.sql.prepare('INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten,nop_luc,so_dung,so_cau,so_chang,lo_da_xong) VALUES(?,?,?,?,?,?,?,?,?)')
     .run(`${ma}|S1`, ma, 'S1', 'Em', o.nop === undefined ? null : o.nop, o.soDung === undefined ? null : o.soDung, o.soCau ?? 10, o.chang ? o.chang[1] : null, o.chang ? o.chang[0] : 0)
 }
@@ -230,7 +232,7 @@ async function dungDayDu() {
   suKien(d, { qid: 'AM-1', ngay: NGAY, gio: '18:00', dang: 'AM', kq: 0, lan: 2 })
   await dungLaiHoSo(d.env, ['S1'], 'x')
   // BTVN: một bài đang chạy (chặng 2/5), một bài đã nộp đúng hạn
-  themBtvn(d, 'BT-CHAY', { han: '2026-09-25T05:00:00.000Z', chang: [2, 5], ten: 'Bài Este' })
+  themBtvn(d, 'BT-CHAY', { han: '2026-09-25T05:00:00.000Z', chang: [2, 5], ten: 'Bài Este', de: 'DE-BT' })
   themBtvn(d, 'BT-NOP', { nop: '2026-09-21T10:00:00.000Z', soDung: 8, soCau: 10, han: '2026-09-22T05:00:00.000Z', ten: 'Bài Amin' })
   // Bộ não thật + lời cho phụ huynh
   d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bo_nao',?,'x')").run(JSON.stringify({ bat: true, cheDo: 'that', lopThat: [] }))
@@ -284,7 +286,7 @@ describe('đủ khối khi có số thật', () => {
     for (const c of r.phuHuynhLamGi) { expect(c).toMatch(/^Nhắc con làm \d+ câu ôn lại .*, khoảng \d+ phút\.$/); expect(c).not.toMatch(/\bem\b/) }
   })
 
-  it('≤ 13 truy vấn D1 cho phần dữ liệu (kể cả xác thực); KHÔNG ghi ngoài dòng đếm truy cập của hàm xác thực; bảng dữ liệu không đổi một byte', async () => {
+  it('≤ 14 truy vấn D1 cho phần dữ liệu (kể cả xác thực); KHÔNG ghi ngoài dòng đếm truy cập của hàm xác thực; bảng dữ liệu không đổi một byte', async () => {
     const { d, pass } = await dungDayDu()
     const truoc = BANG_DOI_CHIEU.map((b) => d.chup(b))
     const { env, log } = ghi(d)
@@ -295,8 +297,8 @@ describe('đủ khối khi có số thật', () => {
     // Sửa CÓ CHỦ Ý 21/09 (W3b Dồn về đích): `docVeDichCuaEm` (Code 4, đọc-chỉ) đọc đúng 5 truy vấn + 1 truy vấn mốc tính nợ (W3c) để trả `no` của con — ngân sách phần dữ liệu vẫn 12 (trừ riêng phần dồn về đích), tổng 15 → 22.
     const cuaVeDich = log.filter((q) => /^SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN \(\?, \?, \?\)$/.test(q.trim()) || /^WITH dang AS \(SELECT be\.ma_btvn/.test(q) || /FROM nam_kt_cau WHERE sbd = \? AND trang_thai IN \('moi_sai', 'dang_on', 'da_khac_phuc'\) AND can_day_lai = 0 AND moc_on_ke IS NOT NULL/.test(q) || /FROM mom_bai WHERE sbd = \? AND COALESCE\(submitted_at, ''\) = ''/.test(q) || /^SELECT 'g' AS k, giay AS a/.test(q) || /^SELECT 'em' AS k, lop AS a, nam_sinh AS b/.test(q))
     expect(cuaVeDich.length, log.join('\n')).toBeLessThanOrEqual(7) // 5 dữ liệu + 1 mốc tính nợ của docVeDichCuaEm + (tối đa) 1 mốc hiển thị của hangChamCuaEm (Code 4, cùng câu SQL)
-    expect(log.length - cuaDoCham.length - cuaVeDich.length, log.join('\n')).toBeLessThanOrEqual(13) // phần dữ liệu của hợp đồng: 12 + 1 truy vấn gộp (thử thách riêng + lần nhắc hạn, bảng kiểu Apple 21/09)
-    expect(log.length, log.join('\n')).toBeLessThanOrEqual(23)
+    expect(log.length - cuaDoCham.length - cuaVeDich.length, log.join('\n')).toBeLessThanOrEqual(14) // phần dữ liệu của hợp đồng: 12 + 1 truy vấn gộp (thử thách riêng + lần nhắc hạn, bảng kiểu Apple 21/09) + 1 truy vấn câu của bài chưa nộp (che theo bài, 21/09)
+    expect(log.length, log.join('\n')).toBeLessThanOrEqual(24)
     expect(log.length).toBeGreaterThanOrEqual(8) // đo thật: chống test rỗng
     const ghiSql = log.filter((q) => /^\s*(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER)\b/i.test(q) || q === 'BATCH')
     expect(ghiSql.length, ghiSql.join('\n')).toBe(1)
@@ -688,7 +690,7 @@ describe('homNay.cau — LUẬT CHE: ca chưa công bố / BTVN chưa nộp / g�
 
   it('tổng quan chỉ đếm sổ KHÔNG bị che: ca chưa công bố + BTVN chưa nộp không lọt vào soCau/soDung/nhịp/dạng', async () => {
     const { d } = dung()
-    themCa(d, 'CA', 'khong'); themLuot(d, 'CA', 'S1'); themBtvn(d, 'BT1', { nop: null })
+    themCa(d, 'CA', 'khong'); themLuot(d, 'CA', 'S1'); themBtvn(d, 'BT1', { nop: null, de: 'DE-BT' })
     for (let i = 0; i < 5; i++) suKien(d, { qid: `T${i}`, ngay: NGAY, gio: `09:0${i}`, nguon: 'thi', ma: 'CA', kq: 1, dang: 'ES' })
     for (let i = 0; i < 4; i++) suKien(d, { qid: `B${i}`, ngay: NGAY, gio: `10:0${i}`, nguon: 'btvn_lo', ma: 'BT1', kq: 1, dang: 'ES' })
     suKien(d, { qid: 'OK1', ngay: NGAY, gio: '11:00', nguon: 'on_lai', kq: 1, dang: 'ES' }); suKien(d, { qid: 'OK2', ngay: NGAY, gio: '11:01', nguon: 'on_lai', kq: 0, dang: 'ES' })
@@ -1645,7 +1647,7 @@ describe('luật che THEO CÂU — mọi kênh; danh sách ⇔ chi tiết', () =
     const { d } = dung()
     themCa(d, 'CA-CHE', 'khong'); themLuot(d, 'CA-CHE', 'S1')
     themCa(d, 'CA-MO', 'ngay'); themLuot(d, 'CA-MO', 'S1')
-    themBtvn(d, 'BT-MO'); themBtvn(d, 'BT-XONG', { nop: '2026-09-22T05:00:00.000Z', soDung: 1, soCau: 1 })
+    themBtvn(d, 'BT-MO', { de: 'DE-BT' }); themBtvn(d, 'BT-XONG', { nop: '2026-09-22T05:00:00.000Z', soDung: 1, soCau: 1, de: 'DE-BT' })
     themMom(d, 'MOM-MO', false); themMom(d, 'MOM-XONG', true)
     const to: [string, Array<[string, string?]>][] = [
       ['Q1', [['on_lai'], ['btvn', 'BT-MO']]], ['Q2', [['on_lai']]], ['Q3', [['game'], ['thi', 'CA-CHE']]], ['Q4', [['btvn', 'BT-XONG'], ['on_lai']]],
@@ -1680,7 +1682,7 @@ describe('luật che THEO CÂU — mọi kênh; danh sách ⇔ chi tiết', () =
   it('SỐ TỔNG không suy ngược: sự kiện ÔN của câu bị che KHÔNG vào tổng câu/đúng hôm nay, nhịp học, dạng; phiên ôn lẫn câu bị che: đúng/sai chỉ tính câu không che, có soCauDaLam', async () => {
     const { d } = dung({ moc: null })
     khoCau(d, 'QCHE'); khoCau(d, 'QTHUONG')
-    themBtvn(d, 'BT-MO')
+    themBtvn(d, 'BT-MO', { de: 'DE-BT' })
     suKien(d, { qid: 'QCHE', ngay: NGAY, gio: '14:00', nguon: 'on_lai', kq: 1, dang: 'ES' }) // ôn, nhưng câu thuộc bài chưa nộp
     suKien(d, { qid: 'QCHE', ngay: NGAY, gio: '14:01', nguon: 'btvn', ma: 'BT-MO', kq: 1, dang: 'ES' })
     suKien(d, { qid: 'QTHUONG', ngay: NGAY, gio: '14:02', nguon: 'on_lai', kq: 0, dang: 'ES' })
@@ -1702,5 +1704,112 @@ describe('luật che THEO CÂU — mọi kênh; danh sách ⇔ chi tiết', () =
     expect(lyDoCheCuaCau([vao('thi', 'CA-LA'), vao('btvn', 'B1')], cb, new Map([['B1', false]]), new Map())).toBe('chua_cong_bo') // thứ tự không đổi kết quả
     expect(lyDoCheCuaCau([vao('mom', 'M1')], cb, new Map(), new Map())).toBe('chua_nop') // không biết gói ⇒ che
     expect(lyDoCheCuaCau([vao('mom', 'M1')], cb, new Map(), new Map([['M1', true]]))).toBeNull()
+  })
+
+  // ── LỖ CHE CUỐI (Boss 21/09): câu CHỈ được giao trong bài chưa nộp, em làm ở kênh ôn — chưa có sự kiện nào ở bài ấy ──
+  const khoDe = (d: D1That, maDe: string, qid: string, nhom: string) => {
+    const c = { qid, maDe, phan: 'I', text: `Đề ${qid}`, choices: ['A. a', 'B. b', 'C. c', 'D. d'], dang: 'ES', tenDang: 'Thuỷ phân ester', correct: 'C', solution: `LG-${qid}` }
+    d.sql.prepare('INSERT OR REPLACE INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run(maDe, qid, 'v', nhom, 'ES', JSON.stringify(c))
+  }
+  const giaoCa = (d: D1That, ma: string, sbd: string, qids: string[]) => qids.forEach((q, i) => d.sql.prepare('INSERT INTO btvn_em_cau(khoa,ma_btvn,sbd,qid,chang,nhan,thu_tu) VALUES(?,?,?,?,0,?,?)').run(`${ma}|${sbd}|${q}`, ma, sbd, q, 'x', i))
+  const nopBai = (d: D1That, ma: string) => d.sql.prepare("UPDATE btvn_em SET nop_luc = '2026-09-22T05:00:00.000Z' WHERE ma_btvn = ?").run(ma)
+
+  it('P0: câu CHỈ được giao trong bài cá nhân hoá CHƯA nộp, em làm ở kênh ÔN (không sự kiện nào ở bài) ⇒ danh sách che chua_nop + chi tiết từ chối; NỘP bài ⇒ hiện lại ở cả hai', async () => {
+    const { d } = dung()
+    khoCau(d, 'QG'); khoCau(d, 'QTU-DO'); khoDe(d, 'DE-BT', 'QCUNG-DE', 'g-cung-de') // QCUNG-DE cùng đề với bài nhưng KHÔNG được giao cho em ⇒ bài cá nhân hoá không che cả tờ đề
+    themBtvn(d, 'BT-CN', { de: 'DE-BT', caNhan: true }); giaoCa(d, 'BT-CN', 'S1', ['QG'])
+    suKien(d, { qid: 'QG', ngay: NGAY, gio: '09:00', nguon: 'on_lai', kq: 1 })
+    suKien(d, { qid: 'QTU-DO', ngay: NGAY, gio: '09:05', nguon: 'on_lai', kq: 1 })
+    suKien(d, { qid: 'QCUNG-DE', ngay: NGAY, gio: '09:06', nguon: 'on_lai', kq: 1 })
+    let hn = await danhSach(d)
+    const dongG = hn.cau.filter((c: any) => 'che' in c)
+    expect(dongG).toHaveLength(1)
+    expect(dongG[0].che).toBe('chua_nop')
+    for (const k of RO) expect(k in dongG[0], k).toBe(false)
+    expect(JSON.stringify(hn)).not.toContain('LG-QG')
+    expect(hn.cau.filter((c: any) => !('che' in c)).map((c: any) => c.qid).sort()).toEqual(['QCUNG-DE', 'QTU-DO']) // câu tự do + câu cùng đề nhưng không được giao vẫn hiện
+    expect((await chiTiet(d, 'QCUNG-DE')).ok).toBe(true)
+    expect(await chiTiet(d, 'QG')).toMatchObject({ ok: false, che: 'chua_nop' })
+    expect((await chiTiet(d, 'QTU-DO')).ok).toBe(true)
+    nopBai(d, 'BT-CN')
+    hn = await danhSach(d)
+    expect(hn.cau.every((c: any) => !('che' in c))).toBe(true)
+    expect((await chiTiet(d, 'QG')).ok).toBe(true)
+  })
+
+  it('P0: bài THƯỜNG chưa nộp = CẢ TỜ ĐỀ; câu của đề ấy em làm ở kênh ôn ⇒ che; câu ở đề khác không che; bài đã xoá / thu hồi / của EM KHÁC không che', async () => {
+    const { d } = dung()
+    khoDe(d, 'DE-BT', 'QTRONG', 'g-trong'); khoCau(d, 'QNGOAI') // QNGOAI ở đề DE
+    themBtvn(d, 'BT-TH', { de: 'DE-BT' })
+    suKien(d, { qid: 'QTRONG', ngay: NGAY, gio: '09:00', nguon: 'on_lai', kq: 1 })
+    suKien(d, { qid: 'QNGOAI', ngay: NGAY, gio: '09:05', nguon: 'on_lai', kq: 1 })
+    const hn = async () => (await danhSach(d)).cau.filter((c: any) => 'che' in c).map((c: any) => c.qid ?? 'che')
+    expect((await danhSach(d)).cau.filter((c: any) => 'che' in c)).toHaveLength(1)
+    expect((await chiTiet(d, 'QTRONG')).che).toBe('chua_nop')
+    expect((await chiTiet(d, 'QNGOAI')).ok).toBe(true)
+    d.sql.prepare("UPDATE btvn SET da_xoa = 1 WHERE ma_btvn = 'BT-TH'").run()
+    expect(await hn()).toEqual([]); expect((await chiTiet(d, 'QTRONG')).ok).toBe(true) // bài đã xoá
+    d.sql.prepare("UPDATE btvn SET da_xoa = 0 WHERE ma_btvn = 'BT-TH'").run(); d.sql.prepare("UPDATE btvn_em SET thu_hoi = 1 WHERE ma_btvn = 'BT-TH'").run()
+    expect(await hn()).toEqual([]); expect((await chiTiet(d, 'QTRONG')).ok).toBe(true) // thu hồi
+    d.sql.prepare("UPDATE btvn_em SET thu_hoi = 0, sbd = 'S2' WHERE ma_btvn = 'BT-TH'").run()
+    expect(await hn()).toEqual([]); expect((await chiTiet(d, 'QTRONG')).ok).toBe(true) // bài chưa nộp là của em KHÁC
+  })
+
+  it('P0: cùng NHÓM NỘI DUNG khác qid (giống game): câu QA ở đề khác nhưng cùng nhóm với câu QB của bài chưa nộp ⇒ QA cũng che; nộp bài ⇒ hiện lại', async () => {
+    const { d } = dung()
+    khoDe(d, 'DE-KHAC', 'QA', 'g-chung'); khoDe(d, 'DE-BT', 'QB', 'g-chung'); khoDe(d, 'DE-KHAC', 'QC', 'g-rieng')
+    themBtvn(d, 'BT-NH', { de: 'DE-BT' })
+    suKien(d, { qid: 'QA', ngay: NGAY, gio: '09:00', nguon: 'on_lai', kq: 1 })
+    suKien(d, { qid: 'QC', ngay: NGAY, gio: '09:05', nguon: 'on_lai', kq: 1 })
+    expect((await chiTiet(d, 'QA')).che).toBe('chua_nop')
+    expect((await chiTiet(d, 'QC')).ok).toBe(true)
+    const hn = await danhSach(d)
+    expect(hn.cau.filter((c: any) => 'che' in c)).toHaveLength(1)
+    expect(JSON.stringify(hn)).not.toContain('LG-QA')
+    nopBai(d, 'BT-NH')
+    expect((await chiTiet(d, 'QA')).ok).toBe(true)
+    expect((await danhSach(d)).cau.every((c: any) => !('che' in c))).toBe(true)
+  })
+
+  it('P0: ca chưa công bố vẫn THẮNG lý do (chua_cong_bo) khi câu còn nằm trong bài chưa nộp; danh sách ⇔ chi tiết cùng lý do', async () => {
+    const { d } = dung()
+    khoCau(d, 'QK')
+    themCa(d, 'CA-K', 'khong'); themLuot(d, 'CA-K', 'S1')
+    themBtvn(d, 'BT-K', { de: 'DE-BT', caNhan: true }); giaoCa(d, 'BT-K', 'S1', ['QK'])
+    suKien(d, { qid: 'QK', ngay: NGAY, gio: '09:00', nguon: 'thi', ma: 'CA-K', kq: 1 })
+    expect((await danhSach(d)).cau.map((c: any) => c.che)).toEqual(['chua_cong_bo'])
+    expect(await chiTiet(d, 'QK')).toMatchObject({ ok: false, che: 'chua_cong_bo' })
+  })
+
+  it('P0: tập che = tập của game (docCauBtvnChuaNop) + các qid CÙNG NHÓM; không thêm gì khác (song song với game, chống lệch luật)', async () => {
+    const { d } = dung()
+    khoDe(d, 'DE-KHAC', 'QA', 'g-chung'); khoDe(d, 'DE-BT', 'QB', 'g-chung'); khoDe(d, 'DE-KHAC', 'QC', 'g-rieng'); khoDe(d, 'DE-CN', 'QD', 'g-d'); khoDe(d, 'DE-KHAC', 'QE', 'g-d')
+    themBtvn(d, 'BT-A', { de: 'DE-BT' }); themBtvn(d, 'BT-B', { de: 'DE-CN', caNhan: true }); giaoCa(d, 'BT-B', 'S1', ['QD'])
+    const game = await docCauBtvnChuaNop(d.env, 'S1')
+    const chan = await docCauChanBtvnChuaNop(d.env, 'S1')
+    for (const x of game) expect(chan.has(x), x).toBe(true) // game chặn gì thì bảng che nấy
+    const nhomCua = (q: string) => (d.sql.prepare('SELECT MIN(content_group) AS g FROM game_v2_question WHERE qid = ?').get(q) as { g: string }).g
+    for (const x of chan) if (!game.has(x)) expect(game.has(nhomCua(x)), `${x} chỉ được thêm vì cùng nhóm với câu của bài`).toBe(true)
+    expect([...chan].filter((x) => x.startsWith('Q')).sort()).toEqual(['QA', 'QB', 'QD', 'QE']) // QC (nhóm riêng, đề khác) không vào
+    expect(chan.has('g-chung') && chan.has('g-d')).toBe(true) // nhóm nội dung cũng có mặt như ở game
+  })
+
+  it('P0: lỗi đọc truy vấn gộp ⇒ lùi về docCauBtvnChuaNop (vẫn che câu được giao); lỗi cả hai ⇒ KHÔNG che thêm, KHÔNG sập bảng, có ghi console', async () => {
+    const { d } = dung()
+    khoCau(d, 'QG')
+    themBtvn(d, 'BT-CN', { de: 'DE-BT', caNhan: true }); giaoCa(d, 'BT-CN', 'S1', ['QG'])
+    suKien(d, { qid: 'QG', ngay: NGAY, gio: '09:00', nguon: 'on_lai', kq: 1 })
+    const hong = (khop: RegExp): Env => ({ ...d.env, DB: { prepare: (q: string) => { if (khop.test(q.replace(/\s+/g, ' ').trim())) throw new Error('D1 hỏng giả'); return d.env.DB.prepare(q) }, batch: (x: never) => d.env.DB.batch(x) } }) as unknown as Env
+    const nhat = console.error; const dong: string[] = []; console.error = (...a: unknown[]) => { dong.push(a.map(String).join(' ')) }
+    try {
+      const r1 = (await phTatCaVeCon(hong(/^WITH bai AS/), { sbd: 'S1' }, NOW)) as Record<string, any>
+      expect(r1.homNay.cau.filter((c: any) => c.che === 'chua_nop')).toHaveLength(1) // đường lùi vẫn che
+      const r2 = (await phTatCaVeCon(hong(/^WITH bai AS|^SELECT q\.qid AS qid, q\.content_group AS grp/), { sbd: 'S1' }, NOW)) as Record<string, any>
+      expect(r2.ok).toBe(true)
+      expect(r2.homNay.cau.some((c: any) => 'che' in c)).toBe(false) // không che thêm khi không đọc được
+      expect(dong.some((x) => x.includes('bài chưa nộp'))).toBe(true)
+      const c2 = (await phChiTietCauVeCon(hong(/^WITH bai AS|^SELECT q\.qid AS qid, q\.content_group AS grp/), { sbd: 'S1', qid: 'QG' }, NOW)) as Record<string, any>
+      expect(c2.ok).toBe(true) // chi tiết cũng không sập
+    } finally { console.error = nhat }
   })
 })
