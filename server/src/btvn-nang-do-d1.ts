@@ -523,7 +523,7 @@ export async function phanHoiMoBaiCaNhan(env: Env, bt: Hang, em: Hang, sbd: stri
     if (!da) return { ok: false, lyDo: 'bai_chua_san_sang', error: 'Bài này chưa sẵn sàng. Em thử lại sau ít phút.' }
     ;({ chang, thuSucThem, nhan } = da)
     tomTat = docTomTat(em.tom_tat_json)
-    lich = docLichDaLuu(em.chang_mo_json, chang.length) // bài chốt trước bản 1.1 ⇒ null ⇒ `moLucChang` cũ
+    lich = docLichDaLuu(em.chang_mo_json, chang.length, { chotLuc, hanNop: chuoi(bt.han_nop), nowMs: now }) // bài chốt trước bản 1.1 ⇒ null ⇒ `moLucChang` cũ; hạn dài chốt trước bản 1.3 ⇒ chặng chưa mở tính lại (chỉ sớm hơn)
   }
   let tho: Hang[]
   try {
@@ -624,7 +624,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
   const loDaXong = Math.min(soChang, soHoac(em.lo_da_xong))
   if (chiSo === soChang && soChang > 0) return nopThuSucThem(env, bt, em, sbd, dapAnTho, now) // chặng ẢO "thử sức thêm" (bản 1.2): nộp RIÊNG, tới hạn nộp kể cả khi phần bắt buộc đã nộp
   if (chiSo < 0 || chiSo >= soChang) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
-  const moLuc = docLichDaLuu(em.chang_mo_json, soChang)?.moLuc ?? moLucChang(chotLuc, soChang)
+  const moLuc = docLichDaLuu(em.chang_mo_json, soChang, { chotLuc, hanNop: chuoi(bt.han_nop), nowMs: now })?.moLuc ?? moLucChang(chotLuc, soChang)
   if (!(chiSo === 0 || (chiSo <= loDaXong && now >= Date.parse(moLuc[chiSo])))) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
   if (em.nop_luc && chiSo >= loDaXong) return { ok: false, lyDo: 'da_nop', error: 'Em đã nộp bài này rồi.' }
 
@@ -757,7 +757,7 @@ async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTh
   if (Number.isFinite(hanMs) && now > hanMs) return { ok: false, lyDo: 'qua_han', error: 'Bạn đã quá hạn nộp BTVN' }
   const bo = await docBoDaChot(env, maBtvn, sbd)
   if (!bo || bo.thuSucThem.length === 0) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
-  const moLuc = docLichDaLuu(em.chang_mo_json, soChang)?.moLuc ?? moLucChang(chuoi(em.chot_luc), soChang)
+  const moLuc = docLichDaLuu(em.chang_mo_json, soChang, { chotLuc: chuoi(em.chot_luc), hanNop: chuoi(bt.han_nop), nowMs: now })?.moLuc ?? moLucChang(chuoi(em.chot_luc), soChang)
   if (!(now >= Date.parse(moLuc[soChang - 1]))) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
   let tho: Hang[]
   try {
@@ -992,7 +992,7 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
       ds.push({ sbd, hoTen: chuoi(da!.ho_ten), daChot: true, coHoSo: hs.coHoSo, nganSach: docJsonHang(da!.ngan_sach_json), tomTat: docTomTat(da!.tom_tat_json) })
       if (sbd === sbdChiTiet) {
         const bo = await docBoDaChot(env, maBtvn, sbd)
-        if (bo) chiTiet = { sbd, chang: bo.chang, thuSucThem: bo.thuSucThem, nhan: bo.nhan, ...lichCho(docLichDaLuu(da!.chang_mo_json, bo.chang.length), bo.chang, chuoi(da!.chot_luc)) }
+        if (bo) chiTiet = { sbd, chang: bo.chang, thuSucThem: bo.thuSucThem, nhan: bo.nhan, ...lichCho(docLichDaLuu(da!.chang_mo_json, bo.chang.length, { chotLuc: chuoi(da!.chot_luc), hanNop: hanIso, nowMs: now }), bo.chang, chuoi(da!.chot_luc)) }
       }
     } else {
       const { bo, nganSach, goc, giay, sc } = dungBoChoEm(bai, hatGiong, sbd, now, hanMs, dv.get(sbd)!, hs, dcAll.get(sbd)?.dieuChinh)
@@ -1269,7 +1269,7 @@ export async function thichNghiSauChang(env: Env, bt: Hang, em: Hang, sbd: strin
     nhan: da.nhan,
     tomTat,
   }
-  const soChangDaMo = trangThaiCacChang(da.chang, chuoi(em.chot_luc), loDaXongMoi, false, now, docLichDaLuu(em.chang_mo_json, da.chang.length)).chang.filter((c) => c.daMo).length
+  const soChangDaMo = trangThaiCacChang(da.chang, chuoi(em.chot_luc), loDaXongMoi, false, now, docLichDaLuu(em.chang_mo_json, da.chang.length, { chotLuc: chuoi(em.chot_luc), hanNop: chuoi(bt.han_nop), nowMs: now })).chang.filter((c) => c.daMo).length
   const hoSo = (await docHoSoRut(env, [sbd], bai.cau, now)).get(sbd)!.hoSo
   const kq = thichNghiChangSau(bo, bai.cau, hoSo, chiSo, { dung }, { soChangDaMo, dieuChinh: dc?.dieuChinh })
   if (kq.doi.length === 0) return 0

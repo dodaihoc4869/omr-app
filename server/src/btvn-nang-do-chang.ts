@@ -1,6 +1,7 @@
 // BTVN "NÂNG ĐỠ" — LỊCH CHẶNG (hàm THUẦN, không IO). Tách riêng để cả `btvn-nang-do-d1.ts` lẫn `ke-hoach-ngay-d1.ts` dùng mà không vòng import.
 import { themNgay } from './ho-so-nam-kt'
 import { ngayVn } from './su-kien-hoc'
+import { lichDaiSomHon } from '../../src/lib/btvn-nang-do-lich'
 
 /** Khoảng cách `lan` của sổ `btvn_lo` giữa hai lượt làm của cùng một bài cá nhân hoá (chỉ số chặng luôn < 1000): `lan = chiSo + LAN_MOI_LUOT × (lượt − 1)`. Nơi đọc `lan` làm chỉ số lô phải lấy `lan % LAN_MOI_LUOT`. */
 export const LAN_MOI_LUOT = 1000
@@ -30,8 +31,29 @@ export interface LichDaLuu {
   dungNhipTruoc: string[]
 }
 
-/** Đọc `chang_mo_json`. Vắng / hỏng / lệch số chặng / mốc không phải ISO hoặc lùi giờ ⇒ `null` (bài chốt trước bản 1.1 ⇒ dùng `moLucChang` cũ). */
-export function docLichDaLuu(v: unknown, soChang: number): LichDaLuu | null {
+/** Ngữ cảnh để áp BẢN 1.3 khi đọc (hạn rơi buổi trưa): lịch hạn dài chốt trước bản vá được tính lại, chặng CHƯA MỞ chỉ được mở SỚM hơn (`lichDaiSomHon`, Code 1). */
+export interface NguCanhLich {
+  chotLuc: string
+  hanNop: string
+  nowMs: number
+}
+
+/**
+ * Đọc `chang_mo_json`. Vắng / hỏng / lệch số chặng / mốc không phải ISO hoặc lùi giờ ⇒ `null` (bài chốt trước bản 1.1 ⇒ dùng `moLucChang` cũ).
+ * Có `nguCanh` và lịch đã lưu là hạn DÀI ⇒ mốc mở chặng chưa mở tính lại theo bản 1.3 (chỉ sớm hơn, không migration, áp lại vẫn cùng kết quả); lỗi thời gian ⇒ giữ lịch đã lưu.
+ */
+export function docLichDaLuu(v: unknown, soChang: number, nguCanh?: NguCanhLich): LichDaLuu | null {
+  const lich = docLichDaLuuGoc(v, soChang)
+  if (!lich || !nguCanh || lich.cheDo !== 'dai') return lich
+  try {
+    const moi = lichDaiSomHon(lich.moLuc, { chotLuc: nguCanh.chotLuc, hanNop: nguCanh.hanNop }, nguCanh.nowMs)
+    return moi.length === lich.moLuc.length ? { ...lich, moLuc: moi } : lich
+  } catch {
+    return lich
+  }
+}
+
+function docLichDaLuuGoc(v: unknown, soChang: number): LichDaLuu | null {
   if (v === null || v === undefined || v === '') return null
   try {
     const o = JSON.parse(String(v)) as { cheDo?: unknown; chang?: unknown }

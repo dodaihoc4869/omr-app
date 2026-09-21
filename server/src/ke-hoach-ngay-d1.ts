@@ -138,7 +138,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
         const kc = soCauChang.get(k)
         if (!b.caNhan || !ban || !kc) continue
         // Bản 1.1: lịch ĐÃ LƯU lúc chốt (chặng theo giờ khi hạn ngắn); bài chốt trước bản 1.1 ⇒ `moLucChang` cũ.
-        const moLuc = docLichDaLuu(ban.lich, kc.length)?.moLuc ?? moLucChang(ban.chotLuc, kc.length)
+        const moLuc = docLichDaLuu(ban.lich, kc.length, { chotLuc: ban.chotLuc, hanNop: b.hanNop, nowMs: now })?.moLuc ?? moLucChang(ban.chotLuc, kc.length)
         b.caNhan = { chotLuc: ban.chotLuc, cacChang: kc.map((n, i) => ({ soCau: n, moLuc: moLuc[i]! })) }
       }
     }

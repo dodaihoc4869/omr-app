@@ -320,7 +320,7 @@ async function chayLuot(env: Env, nowMs: number, cfg: CauHinhNhac): Promise<KetQ
       if (!cfg.mocTat.includes('M2') && conHanMs > 0 && ngayGuiM2(b.hanMs) === homNay && phutNay >= PHUT_TOI_HAN_CHOT) chon.push('M2')
       let cham = 0
       if (lichChang) {
-        const moLuc = docLichDaLuu(e.row.chang_mo_json, tongChang)?.moLuc ?? moLucChang(chuoi(e.row.chot_luc), tongChang)
+        const moLuc = docLichDaLuu(e.row.chang_mo_json, tongChang, { chotLuc: chuoi(e.row.chot_luc), hanNop: b.han, nowMs })?.moLuc ?? moLucChang(chuoi(e.row.chot_luc), tongChang)
         cham = moLuc.filter((m) => Date.parse(m) <= nowMs).length - daXongChang
       }
       if (!cfg.mocTat.includes('M3') && conHanMs >= MOT_NGAY_MS && phutNay >= PHUT_TOI_HAN_CHOT && cham >= SO_CHANG_CHAM_M3) chon.push('M3')
