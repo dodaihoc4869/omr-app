@@ -1,6 +1,7 @@
 // Khối "Ca kiểm tra gần nhất" của bảng "Mọi thứ về con" kiểu Apple (mẫu docs/ban-ve-ph-apple-2109/ph-d-bang-day-du.html #muc-ca). Điểm to + so với lần trước của CHÍNH con + ba phần I/II/III.
 // Ca CHƯA công bố: KHÔNG điểm / phần / so sánh dù gói có mang (chỉ dòng khoá + chữ máy chủ). Thiếu số nào ⇒ ẩn đúng vế đó, không bịa 0.
 import { chuThoiGian, gioVn, ngayDayDuVn, soVn } from '../../../lib/ph-moi/dinh-dang'
+import { SoDem } from './so-dem'
 import type { CaGanNhat, PhMoi, PhanDiem } from '../../../lib/ph-moi/du-lieu'
 import { chuCongBoCa } from '../nhan'
 import { BtBang, BtDongHo, BtKhoa, BtMuiLen } from './bieu-tuong'
@@ -78,7 +79,9 @@ export function Ca({ pm }: { pm: PhMoi }) {
           {ca.tenCa}
         </p>
         <p className="phm-diem" role="img" aria-label={`${soVn(kq.tong)} trên 10 điểm`}>
-          <b>{soVn(kq.tong)}</b>
+          <b>
+            <SoDem chu={soVn(kq.tong)} />
+          </b>
           <span>/10 điểm</span>
         </p>
         {truoc && <SoVoiLanTruoc doi={truoc.doi} />}

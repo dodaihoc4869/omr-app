@@ -1,6 +1,7 @@
 // Thẻ TỔNG QUAN của bảng "Mọi thứ về con" kiểu Apple: ngày + giờ cập nhật, "Hôm nay của {tên}", ba vòng + chú giải có nhãn, câu tóm tắt, "So với hôm qua của chính con"; kèm biến thể "hôm nay con chưa học".
 // Nguồn mẫu: docs/ban-ve-ph-apple-2109/ph-d-bang-day-du.html (đầy đủ) + ph-e-bang-thua.html (thưa, `#canh=chua-hoc`). NÓI THẬT THEO DỮ LIỆU: trường máy chủ không trả ⇒ ẩn đúng phần đó (không bịa 0, không chữ giả). Dòng nợ cam thuộc khối Bài tập về nhà (phần agent C), không dựng ở đây.
 import type { ReactNode } from "react";
+import { SoDem } from "./so-dem";
 import { gioVn, ngayChuoiNgan, ngayDayDuVn, thuTuChuoiNgay } from "../../../lib/ph-moi/dinh-dang";
 import type { PhMoi, TongQuan as TongQuanPh } from "../../../lib/ph-moi/du-lieu";
 import { ChuoiMuoiBonNgay } from "../../../lib/ph-moi/nhip-ngay";
@@ -184,10 +185,10 @@ export function TongQuan({ pm, now }: { pm: PhMoi; now?: number }) {
           <div className="phm-ah__than">
             {vong}
             <ul className="phm-chu-giai">
-              {dong.map((d) => (
+              {dong.map((d, i) => (
                 <li key={d.mau} data-mau={d.mau} data-rong={chua ? "" : undefined}>
                   <b>
-                    {d.so}
+                    <SoDem chu={d.so} tre={i * 80} />
                     {d.don && <small>{d.don}</small>}
                   </b>
                   <span>{d.nhan}</span>

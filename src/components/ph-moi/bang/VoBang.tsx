@@ -7,6 +7,7 @@ import '../ph-apple.css'
 import '../ph-apple-bang.css'
 import type { ViewGiaoThem } from '../../../lib/use-giao-them'
 import type { PhMoi } from '../../../lib/ph-moi/du-lieu'
+import { tachVn } from '../../../lib/ph-moi/dinh-dang'
 import ThanhDayAp from '../ThanhDayAp'
 import { AiLam, coAiLam } from './AiLam'
 import { Btvn, coBtvn } from './Btvn'
@@ -22,7 +23,7 @@ import { DoCham, SapCo, coDoCham, coSapCo } from './SapCo'
 import { TongQuan, coTongQuan } from './TongQuan'
 import { TungCau, coTungCau, useNhomMo } from './TungCau'
 import { gomNhomCau, nhomMoSan } from './nhom-cau'
-import { conChuaHoc } from './dung-chung'
+import { conChuaHoc, useLanDauTrongNgay } from './dung-chung'
 
 export interface BangMoiThuProps {
   pm: PhMoi
@@ -51,6 +52,9 @@ function useHaiCot(rongTu = 900): boolean {
 export default function BangMoiThu({ pm, sbd, lop, giaoThem, onVe, mucDau }: BangMoiThuProps) {
   const haiCot = useHaiCot()
   const chuaHoc = conChuaHoc(pm)
+  // Điều đáng mừng hiện lần lượt CHỈ lần mở đầu tiên trong ngày VN của MỖI con (khoá theo số báo danh + ngày).
+  const t = tachVn(pm.serverNow ?? Date.now())
+  const lanDauMung = useLanDauTrongNgay(`phm-mung-da-hien|${sbd}|${t ? `${t.y}-${t.m}-${t.d}` : 'khong-ro-ngay'}`)
   const nhom = useMemo(() => gomNhomCau(pm), [pm])
   const nm = useNhomMo(useMemo(() => nhomMoSan(nhom), [nhom]))
   const [lanBay, setLanBay] = useState<string | null>(null)
@@ -81,7 +85,7 @@ export default function BangMoiThu({ pm, sbd, lop, giaoThem, onVe, mucDau }: Ban
   ].filter((x): x is MucLuc => !!x)
 
   const tq = coTongQuan(pm) ? <TongQuan key="tq" pm={pm} now={pm.serverNow ?? undefined} /> : null
-  const mung = coDieuMung(pm) ? <DieuMung key="mung" pm={pm} /> : null
+  const mung = coDieuMung(pm) ? <DieuMung key="mung" pm={pm} lanDau={lanDauMung} /> : null
   const ai = coAiLam(pm) ? <AiLam key="ai" pm={pm} /> : null
   const tg = coDongThoiGian(pm) ? <DongThoiGian key="tg" pm={pm} nhom={nhom} onChonMoc={chonMoc} /> : null
   const ca = coCa(pm) ? <Ca key="ca" pm={pm} /> : null

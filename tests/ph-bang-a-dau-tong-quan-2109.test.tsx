@@ -748,7 +748,7 @@ describe('luật cứng của phần A (đọc tệp nguồn)', () => {
     expect(ngoai).not.toMatch(/animation\s*:|animation-|@keyframes/)
     for (const k of ['phm-tq-chay', 'phm-tq-dau', 'phm-tq-hien', 'phm-tq-tich']) expect(trong).toContain(`@keyframes ${k}`)
     expect(trong).toMatch(/\.phm-vong3 \.phm-v-cung\s*\{[^}]*animation/)
-    expect(trong).toMatch(/\.phm-mung > li\s*\{[^}]*animation/)
+    expect(trong).toMatch(/\.phm-mung\[data-hien\] > li\s*\{[^}]*animation/) // CHỈ lần mở đầu tiên trong ngày (data-hien)
     expect(trong).toMatch(/\.phm-lam \.phm-tich\s*\{[^}]*animation/)
     expect(css).not.toMatch(/transition\s*:[^;]*(width|height|margin|padding)/)
   })

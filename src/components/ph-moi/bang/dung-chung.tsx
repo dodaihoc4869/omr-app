@@ -1,5 +1,5 @@
 // Phần DÙNG CHUNG của bảng "Mọi thứ về con" kiểu Apple: thanh mảnh, chip, tên gọi của con, giờ từ mốc máy chủ, và câu hỏi "hôm nay con chưa học?". Thuần, không gọi mạng.
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { gioVn } from "../../../lib/ph-moi/dinh-dang";
 import type { PhMoi } from "../../../lib/ph-moi/du-lieu";
 
@@ -63,4 +63,24 @@ export function Chip({
       {children}
     </span>
   );
+}
+
+/** Lần MỞ ĐẦU TIÊN của `khoa` (đã gồm số báo danh + ngày VN) — nhớ ở localStorage của máy; mở lại ⇒ false. Không có localStorage (chế độ riêng tư, jsdom bị chặn) ⇒ luôn true (chỉ mất phần "chỉ một lần", không hỏng). Đọc lúc dựng, GHI sau khi hiện (effect) ⇒ StrictMode không nuốt mất lần đầu. */
+export function useLanDauTrongNgay(khoa: string): boolean {
+  const [lanDau] = useState(() => {
+    try {
+      return window.localStorage.getItem(khoa) === null
+    } catch {
+      return true
+    }
+  })
+  useEffect(() => {
+    if (!lanDau) return
+    try {
+      window.localStorage.setItem(khoa, '1')
+    } catch {
+      /* Storage bị chặn: bỏ qua. */
+    }
+  }, [lanDau, khoa])
+  return lanDau
 }

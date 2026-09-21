@@ -129,7 +129,8 @@ function DongMung({ pm, d, i }: { pm: PhMoi; d: DieuDangMung; i: number }) {
   );
 }
 
-export function DieuMung({ pm }: { pm: PhMoi }) {
+/** `lanDau`: đây là lần MỞ ĐẦU TIÊN trong ngày (vỏ tính bằng useLanDauTrongNgay) ⇒ ba dòng hiện lần lượt; mở lại trong ngày ⇒ hiện ngay, không chuyển động (GHI-CHU-BUILD mục 3). Không truyền ⇒ coi là lần đầu. */
+export function DieuMung({ pm, lanDau }: { pm: PhMoi; lanDau?: boolean }) {
   const ds = cacDong(pm);
   if (ds.length === 0) return null;
   return (
@@ -139,7 +140,7 @@ export function DieuMung({ pm }: { pm: PhMoi }) {
           <BtSao />
           Điều đáng mừng hôm nay
         </p>
-        <ul className="phm-mung">
+        <ul className="phm-mung" data-hien={lanDau === false ? undefined : ""}>
           {ds.map((d, i) => (
             <DongMung key={`${d.loai}-${i}`} pm={pm} d={d} i={i} />
           ))}
