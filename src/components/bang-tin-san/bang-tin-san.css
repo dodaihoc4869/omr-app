@@ -1276,3 +1276,25 @@
 .bts-mat-ket-noi i::after {
   display: none;
 }
+
+/* chip "Máy chủ: tốt / đang bận / nghẽn" (từ /gv/suc-khoe-may-chu): chấm đứng yên + chữ thường; màu theo mức, đủ tương phản sáng/tối qua token */
+.bts-may {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+.bts-may i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.bts-may-tot { color: var(--bts-la); }
+.bts-may-tot i { background: var(--bts-la); }
+.bts-may-ban { color: var(--bts-vang-chu); }
+.bts-may-ban i { background: var(--bts-vang); }
+.bts-may-nghen { color: var(--bts-do); }
+.bts-may-nghen i { background: var(--bts-do); }

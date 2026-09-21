@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useGiaoDien } from '../../lib/giao-dien-thay'
 import { chuMoc, gioGiayVN, gioPhutMs } from '../../lib/bang-tin-san/trang-thai'
+import { CHU_MUC_MAY, type MucMay } from '../../lib/suc-khoe-may-chu'
 
 /** Giao diện ĐANG HIỆU LỰC: người dùng ép sáng/tối thì theo đó; "theo máy" thì theo prefers-color-scheme. */
 function useToiMay(): boolean {
@@ -17,7 +18,7 @@ function useToiMay(): boolean {
   return toiMay
 }
 
-export function ThanhTren({ mocMs, nowMs, moPhong, matKetNoiLuc = null }: { mocMs: number; nowMs: number; moPhong?: boolean; matKetNoiLuc?: number | null }) {
+export function ThanhTren({ mocMs, nowMs, moPhong, matKetNoiLuc = null, sucKhoe = null }: { mocMs: number; nowMs: number; moPhong?: boolean; matKetNoiLuc?: number | null; sucKhoe?: MucMay | null }) {
   const [chon, datGiaoDien] = useGiaoDien()
   const toiMay = useToiMay()
   const toi = chon === 'toi' || (chon === 'may' && toiMay)
@@ -30,6 +31,12 @@ export function ThanhTren({ mocMs, nowMs, moPhong, matKetNoiLuc = null }: { mocM
         <span className="bts-dong-ho bts-so" aria-label="Giờ hiện tại">
           {gioGiayVN(nowMs)}
         </span>
+        {sucKhoe !== null && (
+          <span className={`bts-may bts-may-${sucKhoe}`} role="status" data-khoi="suc-khoe-may" data-muc={sucKhoe}>
+            <i />
+            {CHU_MUC_MAY[sucKhoe]}
+          </span>
+        )}
         {matKetNoiLuc !== null ? (
           <span className="bts-truc-tiep bts-mat-ket-noi" role="status">
             <i />

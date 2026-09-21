@@ -1,6 +1,6 @@
 // Móc dùng chung cho Bảng tin bản 3: đo chỗ trống để chọn "top-N", số đếm lên, chuyển bố cục theo bề rộng, trang lướt ngang.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
-import { useNhipThay } from '../../lib/nhip-may-thay'
+import { useNhipThay, type TuyChonNhipThay } from '../../lib/nhip-may-thay'
 
 const coTheDo = () => typeof window !== 'undefined'
 
@@ -124,6 +124,6 @@ export function useTrangLuot(soTrang: number): { ref: RefObject<HTMLDivElement |
  * lỗi ⇒ lùi dần 30 → 60 → 120 s. Muốn được lùi dần thì `lam` phải TRẢ Promise báo lỗi bằng `false` / ném lỗi; `lam` trả void = luôn coi là tốt (vẫn không chồng lệnh nếu trả Promise).
  * KHÔNG gọi ngay khi gắn (nơi dùng tự nạp lần đầu).
  */
-export function useTuLamMoi(lam: () => Promise<unknown> | unknown, ms = 60000): void {
-  useNhipThay(lam, ms)
+export function useTuLamMoi(lam: () => Promise<unknown> | unknown, ms = 60000, tuyChon?: TuyChonNhipThay): void {
+  useNhipThay(lam, ms, true, tuyChon)
 }

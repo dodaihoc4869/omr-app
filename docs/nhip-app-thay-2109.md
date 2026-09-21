@@ -23,6 +23,9 @@ Trước đợt này: Theo dõi ca là `setInterval` trần 20 s (không đợi 
 ## Bộ đếm giao diện (KHÔNG gọi máy chủ)
 `KhoaAppScreen` đếm ngược 1 s khi bị chờ khoá · `bang-tin-san/hooks.ts` số lăn kiểu công-tơ 1 s · `KhoiThoiGianCa` đồng hồ ca 1 s (giờ máy chủ đã nạp sẵn, tính cục bộ) · `App.tsx` `visibilitychange` = đồng hồ khoá app (cục bộ). Tờ chiếu Gọi lên bảng (`html-may-chieu.ts`, `to-chieu-cau-noi.ts`) nói chuyện bằng `postMessage`, không gọi máy chủ.
 
+## Máy chủ đề nghị giãn (`nhipDeNghi`) + chip sức khoẻ — ĐÃ NỐI (hợp đồng `docs/hop-dong-suc-khoe-may-chu-2109.md`)
+- **Giãn nhịp:** Worker gắn header `x-nhip-de-nghi: 1|2|4` (hệ số) ở mọi phản hồi; `src/lib/nhip-de-nghi.ts` (Code 2) đọc, lấy MAX 3 phản hồi gần nhất (về 1 sau 3 liền heSo 1 hoặc 120 s im); `batNhipBenVung` nhân vào nhịp gốc. Vòng của thầy mỗi cái một TRẦN (`TUY_CHON_NHIP_THAY` ở `src/lib/nhip-may-thay.ts`): **Bảng tin sàn 10 s → 20 s (bận) → 30 s (nghẽn)** · Bảng tin bản 3 60 s → 120 s · **Theo dõi ca 20 s → tối đa 40 s** (thầy đang coi ca thi thật) · chip 10 s → 20 s. Chưa có header ⇒ hệ số 1, không hỏng gì. Việc quan trọng (nộp / lưu) KHÔNG bao giờ bị hệ số làm chậm.
+- **Chip "Máy chủ: tốt / đang bận / nghẽn"** ở thanh trên Bảng tin sàn (`components/bang-tin-san/use-suc-khoe.ts`, `lib/suc-khoe-may-chu.ts`): `POST /gv/suc-khoe-may-chu` mỗi 10 s (useNhipThay: tab ẩn dừng, không chồng, hụt ⇒ lùi, GIỮ chip cũ khi hụt mạng), lấy MAX 3 lượt gần nhất (chỉ về "tốt" khi 3 lượt liền tốt). Máy chủ chưa có lệnh / từ chối / thân sai dạng ⇒ KHÔNG chip (không bịa "tốt"), 5 phút sau mới hỏi lại. Chỉ hỏi khi sàn đang hiện (rơi về bản 3 thì không gọi). Ảnh: `docs/anh-nhip-thay-2109/chip-may-chu.jpg`.
+
 ## Còn chờ
-- **`nhipDeNghi`** (Code 3, sáng 22/09): máy chủ trả nhịp đề nghị (mặc định 10 s, bận ⇒ 30 s) ⇒ Bảng tin sàn đọc và truyền vào `useNhipThay` (đổi `coSoMs` = vòng mới).
-- **Chip "Máy chủ: tốt / đang bận"** từ `/gv/suc-khoe-may-chu` (Code 3 làm sáng 22/09, chờ hợp đồng).
+- Không còn việc treo của kế hoạch giờ cao điểm phía app thầy. Thêm vòng tự gọi mới ⇒ dòng ở bảng trên + `BANG_NHIP_THAY` + trần trong `TUY_CHON_NHIP_THAY`.

@@ -8,9 +8,11 @@ import { layCanGiup, lyDoCanGiup } from '../lib/hom-nay-v2'
 import BangTinV3, { BangTinXuong } from '../components/bang-tin/BangTin'
 import type { DungNhip } from '../components/bang-tin/cac-khoi'
 import { useTuLamMoi } from '../components/bang-tin/hooks'
-import { BANG_NHIP_THAY } from '../lib/nhip-may-thay'
+import { BANG_NHIP_THAY, TUY_CHON_NHIP_THAY } from '../lib/nhip-may-thay'
 import BangTinSan from '../components/bang-tin-san/BangTinSan'
 import { useSanSong } from '../components/bang-tin-san/use-san-song'
+import { useSucKhoeMay } from '../components/bang-tin-san/use-suc-khoe'
+import type { DuLieuSan } from '../lib/bang-tin-san/kieu'
 import HomNayCu from './HomNayCu'
 
 /**
@@ -21,8 +23,14 @@ export default function HomNayScreen() {
   const san = useSanSong()
   const moToanCanh = useAppStore((s) => s.moToanCanh)
   if (san.kieu === 'cho') return <BangTinXuong />
-  if (san.kieu === 'san') return <BangTinSan du={san.du} onMoEm={moToanCanh} matKetNoi={san.matKetNoi} />
+  if (san.kieu === 'san') return <BangTinSanCoChip du={san.du} onMoEm={moToanCanh} matKetNoi={san.matKetNoi} />
   return <HomNayBan3 />
+}
+
+/** Bảng tin sàn + chip "Máy chủ: tốt / đang bận / nghẽn": chip chỉ hỏi máy chủ KHI SÀN ĐANG HIỆN (rơi về bản 3 thì không gọi lệnh sức khoẻ). */
+function BangTinSanCoChip({ du, onMoEm, matKetNoi }: { du: DuLieuSan; onMoEm: (sbd: string) => void; matKetNoi: boolean }) {
+  const sucKhoe = useSucKhoeMay(true)
+  return <BangTinSan du={du} onMoEm={onMoEm} matKetNoi={matKetNoi} sucKhoe={sucKhoe} />
 }
 
 function HomNayBan3() {
@@ -46,7 +54,7 @@ function HomNayBan3() {
   useEffect(() => {
     void lam()
   }, [lam])
-  useTuLamMoi(lam, BANG_NHIP_THAY.bangTinV3)
+  useTuLamMoi(lam, BANG_NHIP_THAY.bangTinV3, TUY_CHON_NHIP_THAY.bangTinV3)
 
   /** Danh sách ĐỦ em cần để ý cho tấm bên: lệnh chi tiết cũ `/gv/can-giup`; lỗi ⇒ null ⇒ tấm bên nói thật. */
   const taiTatCaCanDeY = useCallback(async (): Promise<EmCanDeY[] | null> => {

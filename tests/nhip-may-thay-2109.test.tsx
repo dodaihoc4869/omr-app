@@ -5,7 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, renderHook } from '@testing-library/react'
 import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { BANG_NHIP_THAY, LUI_MAC_DINH_THAY, LUI_THEO_DOI_CA_MS, useNhipThay } from '../src/lib/nhip-may-thay'
+import { BANG_NHIP_THAY, LUI_MAC_DINH_THAY, LUI_THEO_DOI_CA_MS, TUY_CHON_NHIP_THAY, useNhipThay } from '../src/lib/nhip-may-thay'
+import { datLaiHeSo, ghiHeSo } from '../src/lib/nhip-de-nghi'
 import DongMatKetNoiCa, { chuMatKetNoiCa, NGUONG_MAT_KET_NOI_CA } from '../src/components/theo-doi-ca/DongMatKetNoiCa'
 import { render } from '@testing-library/react'
 
@@ -19,6 +20,7 @@ beforeEach(() => {
 })
 afterEach(() => {
   cleanup()
+  datLaiHeSo()
   an(false)
   vi.useRealTimers()
 })
@@ -27,6 +29,51 @@ const troi = async (ms: number) => act(async () => void (await vi.advanceTimersB
 describe('BẢNG NHỊP của app thầy', () => {
   it('đúng bảng: Bảng tin sàn 10 s · Bảng tin bản 3 60 s · Theo dõi ca 20 s', () => {
     expect(BANG_NHIP_THAY).toEqual({ bangTinSan: 10_000, bangTinV3: 60_000, theoDoiCa: 20_000 })
+  })
+})
+
+describe('MÁY CHỦ ĐỀ NGHỊ GIÃN (nhipDeNghi): hệ số × nhịp gốc, kẹp TRẦN riêng từng vòng của thầy', () => {
+  it('bảng trần: sàn ≤ 30 s (10 s ×4 kẹp), bản 3 ≤ 120 s, Theo dõi ca ≤ 40 s (thầy đang coi ca thi thật), chip ≤ 20 s', () => {
+    expect(TUY_CHON_NHIP_THAY.bangTinSan).toEqual({ heSoToiDa: 4, tranMs: 30_000 })
+    expect(TUY_CHON_NHIP_THAY.bangTinV3).toEqual({ heSoToiDa: 2, tranMs: 120_000 })
+    expect(TUY_CHON_NHIP_THAY.theoDoiCa.tranMs).toBeLessThanOrEqual(40_000)
+    expect(TUY_CHON_NHIP_THAY.theoDoiCa.heSoToiDa).toBe(2)
+    expect(TUY_CHON_NHIP_THAY.sucKhoeMay).toEqual({ heSoToiDa: 2, tranMs: 20_000 })
+  })
+  const dat = (heSo: number) => { for (let i = 0; i < 3; i++) ghiHeSo(heSo) }
+  /** Số lần gọi trong `ms` đầu sau khi bật vòng với nhịp gốc `coSo`. */
+  const goiTrong = async (coSo: number, o: typeof TUY_CHON_NHIP_THAY[keyof typeof TUY_CHON_NHIP_THAY] | undefined, ms: number) => {
+    const chay = vi.fn(async () => true)
+    const r = renderHook(() => useNhipThay(chay, coSo, true, o))
+    await troi(ms)
+    r.unmount()
+    return chay.mock.calls.length
+  }
+  it('hệ số 1 ⇒ nhịp gốc; hệ số 2 ⇒ ×2; hệ số 4 ⇒ ×4 NHƯNG kẹp trần của từng vòng', async () => {
+    /** Đặt hệ số MỚI (mẫu hết hạn sau 120 s giả nên đặt lại trước mỗi phép đo) rồi đếm số lần gọi trong `ms`. */
+    const dem = async (heSo: number, coSo: number, o: Parameters<typeof goiTrong>[1], ms: number) => {
+      datLaiHeSo()
+      dat(heSo)
+      return goiTrong(coSo, o, ms)
+    }
+    const SAN = TUY_CHON_NHIP_THAY.bangTinSan, CA = TUY_CHON_NHIP_THAY.theoDoiCa, V3 = TUY_CHON_NHIP_THAY.bangTinV3
+    expect(await dem(1, 10_000, SAN, 10_100)).toBe(1) // hệ số 1: 10 s
+    expect(await dem(2, 10_000, SAN, 19_000)).toBe(0) // ×2 = 20 s
+    expect(await dem(2, 10_000, SAN, 20_100)).toBe(1)
+    expect(await dem(4, 10_000, SAN, 29_000)).toBe(0) // ×4 = 40 s nhưng trần sàn 30 s
+    expect(await dem(4, 10_000, SAN, 30_100)).toBe(1)
+    expect(await dem(4, 20_000, CA, 39_000)).toBe(0) // Theo dõi ca: hệ số kẹp 2 ⇒ 40 s, KHÔNG 80 s
+    expect(await dem(4, 20_000, CA, 40_100)).toBe(1)
+    expect(await dem(4, 60_000, V3, 119_000)).toBe(0) // bản 3: 60 s ×2 = 120 s
+    expect(await dem(4, 60_000, V3, 120_100)).toBe(1)
+    expect(await dem(4, 10_000, undefined, 39_000)).toBe(0) // không khai trần: mặc định ×4 = 40 s
+    expect(await dem(4, 10_000, undefined, 40_100)).toBe(1)
+  })
+  it('hệ số về 1 (3 phản hồi liền heSo 1) ⇒ trở lại nhịp gốc', async () => {
+    dat(4)
+    datLaiHeSo()
+    dat(1)
+    expect(await goiTrong(10_000, TUY_CHON_NHIP_THAY.bangTinSan, 10_100)).toBe(1)
   })
 })
 
@@ -114,7 +161,7 @@ describe('useNhipThay — tab ẩn thì dừng, không gọi chồng, lỗi thì
     expect(LUI_THEO_DOI_CA_MS).toEqual([30_000, 40_000])
     let tot = false
     const chay = vi.fn(async () => tot)
-    renderHook(() => useNhipThay(chay, 20_000, true, LUI_THEO_DOI_CA_MS))
+    renderHook(() => useNhipThay(chay, 20_000, true, { luiDanMs: LUI_THEO_DOI_CA_MS }))
     await troi(20_100) // lần 1 (lỗi) ⇒ chờ 30 s
     expect(chay).toHaveBeenCalledTimes(1)
     await troi(29_000)
@@ -175,7 +222,10 @@ describe('mã chạy: MỌI vòng tự gọi máy chủ của app thầy đi qua
   })
   it('Theo dõi ca: bảng lùi riêng ≤ 40 s; đếm hụt liền (nền và tay) ⇒ DongMatKetNoiCa; tải tốt reset; nút Làm mới tay gọi tai() thẳng (không qua nhịp / backoff)', () => {
     const m = boChuThich(doc(tepMan('ExamMonitorScreen.tsx')))
-    expect(m).toContain('BANG_NHIP_THAY.theoDoiCa, conDangLam, LUI_THEO_DOI_CA_MS)')
+    expect(m).toContain('BANG_NHIP_THAY.theoDoiCa, conDangLam, TUY_CHON_NHIP_THAY.theoDoiCa)')
+    expect(boChuThich(doc('src/components/bang-tin-san/use-san-song.ts'))).toContain('TUY_CHON_NHIP_THAY.bangTinSan')
+    expect(boChuThich(doc('src/screens/HomNayScreen.tsx'))).toContain('TUY_CHON_NHIP_THAY.bangTinV3')
+    expect(boChuThich(doc('src/components/bang-tin-san/use-suc-khoe.ts'))).toContain('TUY_CHON_NHIP_THAY.sucKhoeMay')
     expect(m).toContain('<DongMatKetNoiCa soHut={soHut} gioTotMs={gioTot} />')
     expect(m).toMatch(/setSoHut\(0\)\s*setGioTot\(Date\.now\(\)\)/)
     expect(m).toMatch(/setSoHut\(\(n\) => n \+ 1\)\s*return false/)
@@ -184,7 +234,7 @@ describe('mã chạy: MỌI vòng tự gọi máy chủ của app thầy đi qua
   })
   it('useTuLamMoi (Bảng tin bản 3 + sàn) là vỏ của useNhipThay: không còn setInterval / visibilitychange tự viết', () => {
     const h = boChuThich(doc('src/components/bang-tin/hooks.ts'))
-    expect(h).toContain('useNhipThay(lam, ms)')
+    expect(h).toContain('useNhipThay(lam, ms, true, tuyChon)')
     expect(h).not.toMatch(/setInterval\(|visibilitychange/)
   })
   it('Bảng tin sàn: lam trả Promise báo hụt; nhịp từ bảng; Bảng tin bản 3: lam trả r.ok và nhịp từ bảng', () => {
@@ -193,7 +243,7 @@ describe('mã chạy: MỌI vòng tự gọi máy chủ của app thầy đi qua
     expect(s).toMatch(/useCallback\(\(\): Promise<boolean> =>/)
     expect(s).not.toMatch(/setInterval\(/)
     const hn = boChuThich(doc('src/screens/HomNayScreen.tsx'))
-    expect(hn).toContain('useTuLamMoi(lam, BANG_NHIP_THAY.bangTinV3)')
+    expect(hn).toContain('useTuLamMoi(lam, BANG_NHIP_THAY.bangTinV3, TUY_CHON_NHIP_THAY.bangTinV3)')
     expect(hn).toContain('return r.ok')
     expect(hn).not.toMatch(/useEffect\(\(\) => lam\(\), \[lam\]\)/) // effect trả Promise là sai
   })
@@ -214,7 +264,7 @@ describe('mã chạy: MỌI vòng tự gọi máy chủ của app thầy đi qua
   })
   it('bảng nhịp đã ghi ở docs/nhip-app-thay-2109.md (đủ ba vòng + các vòng của tab khác)', () => {
     const d = doc('docs/nhip-app-thay-2109.md')
-    for (const tu of ['Bảng tin sàn', 'Bảng tin bản 3', 'Theo dõi ca', 'app-presence', 'cap-nhat-app', 'nhipDeNghi']) expect(d, tu).toContain(tu)
+    for (const tu of ['Bảng tin sàn', 'Bảng tin bản 3', 'Theo dõi ca', 'app-presence', 'cap-nhat-app', 'nhipDeNghi', 'TUY_CHON_NHIP_THAY', 'suc-khoe-may-chu']) expect(d, tu).toContain(tu)
   })
 })
 

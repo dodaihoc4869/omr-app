@@ -22,7 +22,9 @@ useAppStore.getState().setScreen('examhub')
 const NAY = Date.parse('2026-09-21T08:28:36.000Z') // 15:28:36 giờ VN — đồng hồ CỐ ĐỊNH
 // `window.__DU` (chỉ bản thử): dữ liệu ĐÃ ĐỌC qua docSan từ thân thật của máy chủ — để soi độ dài chữ thật (tên dài, tên lớp thật)
 const duThat = (window as unknown as { __DU?: Parameters<typeof BangTinSan>[0]['du'] }).__DU
-const man = <BangTinSan du={duThat ?? taoDuLieuGia(NAY)} nayMs={duThat ? duThat.serverNow : NAY} />
+// `?may=tot|ban|nghen` (chỉ bản thử): chip "Máy chủ: …" ở thanh trên — soi chồng chữ với chip dài nhất ("đang bận")
+const may = q.get('may')
+const man = <BangTinSan du={duThat ?? taoDuLieuGia(NAY)} nayMs={duThat ? duThat.serverNow : NAY} sucKhoe={may === 'tot' || may === 'ban' || may === 'nghen' ? may : null} />
 
 createRoot(document.getElementById('root')!).render(
   q.get('vo') === '0' ? (

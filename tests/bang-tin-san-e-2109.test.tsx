@@ -13,6 +13,8 @@ import { useAppStore } from '../src/store/appStore'
 import HomNayScreen from '../src/screens/HomNayScreen'
 import { NHIP_HOI_SAN_MS, NHIP_HUT_MAT_KET_NOI, THU_LAI_SAU_KHI_TU_CHOI_MS } from '../src/components/bang-tin-san/use-san-song'
 import { LUI_DAN_MS } from '../src/lib/nhip-ben-vung'
+import { datLaiHeSo, ghiHeSo } from '../src/lib/nhip-de-nghi'
+import { NHIP_SUC_KHOE_MS, THU_LAI_CHIP_SAU_KHI_TU_CHOI_MS } from '../src/lib/suc-khoe-may-chu'
 import { tenGoiKhongTrung } from '../src/lib/bang-tin-san/ten-goi'
 import { DanDau } from '../src/components/bang-tin-san/DanDau'
 
@@ -50,6 +52,7 @@ beforeEach(() => {
 })
 afterEach(() => {
   cleanup()
+  datLaiHeSo()
   vi.useRealTimers()
   vi.unstubAllGlobals()
   vi.restoreAllMocks()
@@ -151,7 +154,7 @@ describe('docSan — đọc CÓ CHỐNG SAI KIỂU; thiếu mảnh ⇒ ẩn kh�
 // ─────────────────────────────── MÀN HÔM NAY: sàn ⇄ bản 3 ───────────────────────────────
 type Tra = { ok: boolean; status: number; json: () => Promise<unknown> }
 describe('HomNayScreen — Bảng tin sàn khi máy chủ có lệnh sống; rơi về Bảng tin bản 3 khi không', () => {
-  const nap: { song: (() => Promise<Tra> | Tra) | null; bangTin: unknown } = { song: null, bangTin: MAU_DAY }
+  const nap: { song: (() => Promise<Tra> | Tra) | null; bangTin: unknown; suc: () => Promise<Tra> | Tra } = { song: null, bangTin: MAU_DAY, suc: () => ok({ ok: true }) }
   const goi: string[] = []
   const ok = (b: unknown): Tra => ({ ok: true, status: 200, json: async () => b })
   const kho: Tra = { ok: false, status: 404, json: async () => ({ ok: false }) }
@@ -160,6 +163,7 @@ describe('HomNayScreen — Bảng tin sàn khi máy chủ có lệnh sống; rơ
     goi.length = 0
     nap.song = () => ok(thanSong())
     nap.bangTin = MAU_DAY
+    nap.suc = () => ok({ ok: true }) // không có `muc` ⇒ không chip (các test cũ không đổi)
     useAppStore.getState().setScreen('examhub')
     vi.stubGlobal(
       'fetch',
@@ -167,6 +171,7 @@ describe('HomNayScreen — Bảng tin sàn khi máy chủ có lệnh sống; rơ
         const u = new URL(String(url)).pathname
         goi.push(u)
         if (u === '/gv/bang-tin-song') return nap.song ? nap.song() : kho
+        if (u === '/gv/suc-khoe-may-chu') return nap.suc()
         if (u === '/gv/bang-tin') return nap.bangTin ? ok(nap.bangTin) : kho
         if (u === '/ke-hoach/hom-nay-thay') return ok({ ok: true, btvn: { soEmCoLo: 148, soEmDungNhip: 97, dangChay: [] } })
         if (u === '/gv/can-giup') return kho
@@ -313,6 +318,86 @@ const yen = async (ms = 50) => act(async () => void (await vi.advanceTimersByTim
     await yen(NHIP_HOI_SAN_MS + 200)
     expect(chip()).toBeNull()
   })
+  it('CHIP "Máy chủ: …": tốt ⇒ chip tốt; lấy MAX 3 lượt gần nhất (1 lượt bận ⇒ "đang bận"; cần 3 lượt liền tốt mới về "tốt"); nghẽn ⇒ "nghẽn"', async () => {
+    dongHoGia()
+    nap.suc = () => ok({ ok: true, muc: 'tot', heSo: 1 })
+    const { container } = render(<HomNayScreen />)
+    await yen()
+    const chip = () => container.querySelector('[data-khoi="suc-khoe-may"]')?.textContent ?? null
+    expect(chip()).toBe('Máy chủ: tốt')
+    nap.suc = () => ok({ ok: true, muc: 'ban', heSo: 2 })
+    await yen(NHIP_SUC_KHOE_MS)
+    expect(chip()).toBe('Máy chủ: đang bận')
+    nap.suc = () => ok({ ok: true, muc: 'tot', heSo: 1 })
+    await yen(NHIP_SUC_KHOE_MS) // [tốt, bận, tốt]
+    expect(chip()).toBe('Máy chủ: đang bận')
+    await yen(NHIP_SUC_KHOE_MS) // [bận, tốt, tốt]
+    expect(chip()).toBe('Máy chủ: đang bận')
+    await yen(NHIP_SUC_KHOE_MS) // [tốt, tốt, tốt]
+    expect(chip()).toBe('Máy chủ: tốt')
+    nap.suc = () => ok({ ok: true, muc: 'nghen', heSo: 4 })
+    await yen(NHIP_SUC_KHOE_MS)
+    expect(chip()).toBe('Máy chủ: nghẽn')
+  })
+  it('CHIP: máy chủ CHƯA có lệnh sức khoẻ (404) ⇒ không chip, 5 phút sau mới hỏi lại; thân sai dạng ⇒ không chip; hụt mạng ⇒ GIỮ chip đang có', async () => {
+    dongHoGia()
+    nap.suc = () => kho
+    const { container } = render(<HomNayScreen />)
+    await yen()
+    const chip = () => container.querySelector('[data-khoi="suc-khoe-may"]')
+    expect(chip()).toBeNull()
+    expect(dem('/gv/suc-khoe-may-chu')).toBe(1)
+    await yen(NHIP_SUC_KHOE_MS * 6)
+    expect(dem('/gv/suc-khoe-may-chu')).toBe(1) // đang nghỉ 5 phút, không đập vào lệnh chưa có
+    nap.suc = () => ok({ ok: true, muc: 'tot' })
+    await yen(THU_LAI_CHIP_SAU_KHI_TU_CHOI_MS)
+    expect(chip()?.textContent).toBe('Máy chủ: tốt')
+    nap.suc = () => { throw new TypeError('mất mạng') }
+    await yen(NHIP_SUC_KHOE_MS + 200)
+    expect(chip()?.textContent).toBe('Máy chủ: tốt') // hụt mạng: giữ
+    nap.suc = () => ok({ ok: true, muc: 'la-la' })
+    await yen(LUI_HUT_DAU_MS + 200) // vòng đang lùi 30 s sau hụt
+    expect(chip()).toBeNull() // sai dạng ⇒ ẩn (không bịa)
+  })
+  it('CHIP: sàn chưa có lệnh (rơi về bản 3) ⇒ KHÔNG gọi lệnh sức khoẻ; tab ẩn ⇒ chip cũng dừng hỏi', async () => {
+    dongHoGia()
+    nap.song = null
+    render(<HomNayScreen />)
+    await yen()
+    await yen(NHIP_SUC_KHOE_MS * 3)
+    expect(dem('/gv/suc-khoe-may-chu')).toBe(0)
+    cleanup()
+    nap.song = () => ok(thanSong())
+    render(<HomNayScreen />)
+    await yen()
+    expect(dem('/gv/suc-khoe-may-chu')).toBe(1)
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true })
+    try {
+      await act(async () => void document.dispatchEvent(new Event('visibilitychange')))
+      await yen(NHIP_SUC_KHOE_MS * 4)
+      expect(dem('/gv/suc-khoe-may-chu')).toBe(1)
+    } finally {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => false })
+    }
+  })
+  it('MÁY CHỦ ĐỀ NGHỊ GIÃN (header x-nhip-de-nghi): hệ số 2 ⇒ Bảng tin sàn hỏi mỗi 20 s; hệ số 4 ⇒ 30 s (TRẦN của sàn, không phải 40 s); hệ số 1 ⇒ về 10 s', async () => {
+    dongHoGia()
+    const hoi = async (ms: number) => { const t = dem('/gv/bang-tin-song'); await yen(ms); return dem('/gv/bang-tin-song') - t }
+    render(<HomNayScreen />)
+    await yen()
+    for (let i = 0; i < 3; i++) ghiHeSo(2)
+    await yen(NHIP_HOI_SAN_MS) // lượt đã hẹn 10 s từ trước — còn theo hệ số cũ
+    expect(await hoi(NHIP_HOI_SAN_MS + 1_000)).toBe(0) // từ nay 20 s
+    expect(await hoi(NHIP_HOI_SAN_MS)).toBe(1)
+    for (let i = 0; i < 3; i++) ghiHeSo(4)
+    expect(await hoi(NHIP_HOI_SAN_MS * 2)).toBe(1) // lượt kế còn hẹn theo hệ số 2 (20 s)…
+    expect(await hoi(NHIP_HOI_SAN_MS * 2 + 5_000)).toBe(0) // …rồi 30 s (trần), không phải 40 s
+    expect(await hoi(5_000)).toBe(1)
+    datLaiHeSo()
+    for (let i = 0; i < 3; i++) ghiHeSo(1)
+    await yen(NHIP_HOI_SAN_MS * 3)
+    expect(await hoi(NHIP_HOI_SAN_MS + 500)).toBeGreaterThanOrEqual(1) // hệ số 1 ⇒ nhịp gốc 10 s
+  })
   it('tên gọi ngắn: HAI CHỮ CUỐI, không "…"; hai em trùng tên gọi ⇒ thêm chữ đứng trước; cùng một em hai lần không tính trùng; một chữ / rỗng không vỡ', () => {
     const t = (...ds: [string, string][]) => tenGoiKhongTrung(ds.map(([sbd, hoTen]) => ({ sbd, hoTen })))
     expect(t(['1', 'Nguyễn Thị Thanh Thảo']).get('1')).toBe('Thanh Thảo')
@@ -353,7 +438,8 @@ const yen = async (ms = 50) => act(async () => void (await vi.advanceTimersByTim
     const man = doc('src/screens/HomNayScreen.tsx')
     expect(man).toMatch(/useSanSong\(\)/)
     expect(man).toMatch(/function HomNayBan3\(\)/)
-    expect(man).toMatch(/BangTinSan du=\{san\.du\} onMoEm=\{moToanCanh\}/)
+    expect(man).toMatch(/BangTinSanCoChip du=\{san\.du\} onMoEm=\{moToanCanh\}/)
+    expect(man).toMatch(/<BangTinSan du=\{du\} onMoEm=\{onMoEm\} matKetNoi=\{matKetNoi\} sucKhoe=\{sucKhoe\} \/>/) // chip chỉ ở sàn
     expect(doc('src/components/bang-tin-san/ThanhTren.tsx')).toMatch(/useGiaoDien/)
     expect(doc('src/components/bang-tin-san/use-san-song.ts')).not.toMatch(/localStorage|sessionStorage/)
   })

@@ -48,10 +48,12 @@ async function chup(rong: number, cao: number, gd: 'sang' | 'toi'): Promise<{ la
   trang.on('console', (m) => { if (m.type() === 'error' && !/403|Failed to load resource/.test(m.text())) loi.push(m.text().slice(0, 160)) })
   await trang.addInitScript('window.__name = window.__name || ((f) => f)')
   await trang.addInitScript(caiBatChuCanvas)
-  await trang.goto(`${goc}/tests/_trinh-duyet-bts/bts.html?gd=${gd}`, { waitUntil: 'networkidle' })
+  await trang.goto(`${goc}/tests/_trinh-duyet-bts/bts.html?gd=${gd}&may=ban`, { waitUntil: 'networkidle' }) // có chip "Máy chủ: đang bận" (chữ dài nhất) ở thanh trên
   await trang.waitForSelector('[data-khoi="bang-tin-san"]')
   await trang.waitForFunction(() => document.querySelector('[data-kieu]')?.getAttribute('data-kieu') !== 'cho', undefined, { timeout: 60_000 })
   await trang.waitForTimeout(1200)
+  const coChip = await trang.evaluate(() => document.querySelector('[data-khoi="suc-khoe-may"]')?.textContent ?? null)
+  if (coChip !== 'Máy chủ: đang bận') loi.push(`không thấy chip Máy chủ (${coChip})`)
   const lan: KetQuaDo[] = []
   for (let k = 0; k < 3; k++) {
     lan.push(await trang.evaluate(doChongChu))

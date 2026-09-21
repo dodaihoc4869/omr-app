@@ -12,6 +12,7 @@ import { BangChay } from './BangChay'
 import { NenHoc } from './NenHoc'
 import { OSo } from './OSo'
 import { ThanhTren } from './ThanhTren'
+import type { MucMay } from '../../lib/suc-khoe-may-chu'
 import { useGioMayChu, useItDong, useKichThuoc, useMauSan, useMotMan } from './hooks'
 import './bang-tin-san.css'
 
@@ -25,12 +26,14 @@ export interface BangTinSanProps {
   nayMs?: number
   /** Hỏi máy chủ hụt ≥ 2 nhịp liền: chip "TRỰC TIẾP" đổi thành "Mất kết nối · số lúc HH:MM" (giờ máy chủ của số đang hiện); hỏi được lại ⇒ tự mất. */
   matKetNoi?: boolean
+  /** Chip "Máy chủ: tốt / đang bận / nghẽn" (từ `/gv/suc-khoe-may-chu`); null / không truyền ⇒ không chip (chưa biết ⇒ không bịa). */
+  sucKhoe?: MucMay | null
 }
 
 /** Khung màn (px) dưới mức này là điện thoại: nến không vẽ lưới (thầy 21/09). Màn rộng giữ lưới, mờ đúng token. */
 export const DIEN_THOAI_RONG = 640
 
-export default function BangTinSan({ du, nayMs, onMoEm = () => {}, matKetNoi = false }: BangTinSanProps) {
+export default function BangTinSan({ du, nayMs, onMoEm = () => {}, matKetNoi = false, sucKhoe = null }: BangTinSanProps) {
   const goc = useRef<HTMLElement>(null)
   const { mau, phienBan } = useMauSan(goc)
   const itDong = useItDong()
@@ -46,7 +49,7 @@ export default function BangTinSan({ du, nayMs, onMoEm = () => {}, matKetNoi = f
   const nhip = du.dungNhip
   return (
     <main className="bts-san" ref={goc} data-khoi="bang-tin-san" data-it-dong={itDong ? '1' : '0'} data-mot-man={motMan ? '1' : '0'}>
-      <ThanhTren mocMs={du.mocMs} nowMs={now} moPhong={du.moPhong} matKetNoiLuc={matKetNoi ? du.serverNow : null} />
+      <ThanhTren mocMs={du.mocMs} nowMs={now} moPhong={du.moPhong} matKetNoiLuc={matKetNoi ? du.serverNow : null} sucKhoe={sucKhoe} />
       {du.tin.length > 0 && <BangChay tin={du.tin} itDong={itDong} />}
       <section className="bts-hang-so" aria-label="Bốn con số hôm nay" data-so-o={nhip ? '4' : '3'}>
         <OSo

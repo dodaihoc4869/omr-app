@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { laySan } from '../../lib/bang-tin-san/doc-san'
 import type { DuLieuSan } from '../../lib/bang-tin-san/kieu'
 import { useTuLamMoi } from '../bang-tin/hooks'
-import { BANG_NHIP_THAY } from '../../lib/nhip-may-thay'
+import { BANG_NHIP_THAY, TUY_CHON_NHIP_THAY } from '../../lib/nhip-may-thay'
 
 export type TrangThaiSan = { kieu: 'cho' } | { kieu: 'san'; du: DuLieuSan; matKetNoi: boolean } | { kieu: 'v3' }
 
@@ -59,6 +59,6 @@ export function useSanSong(): TrangThaiSan {
       conSong.current = false
     }
   }, [lam])
-  useTuLamMoi(lam, NHIP_HOI_SAN_MS)
+  useTuLamMoi(lam, NHIP_HOI_SAN_MS, TUY_CHON_NHIP_THAY.bangTinSan)
   return tt
 }

@@ -6,7 +6,7 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BANG_NHIP_THAY, LUI_THEO_DOI_CA_MS, useNhipThay } from '../lib/nhip-may-thay'
+import { BANG_NHIP_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
 import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
 import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
@@ -619,7 +619,7 @@ export default function ExamMonitorScreen() {
   // `setInterval` trần: một lượt chậm 20 s dồn thêm lượt, lỗi cũng cứ 20 s một lần), lỗi ⇒ lùi dần 30 → 60 → 120 s. Vòng chạy MỘT mạch (không dựng lại mỗi lần chiTiet đổi).
   const conDangLam = !!chiTiet && chiTiet.luot.some((l) => l.trangThai === 'dang_lam')
   const maCaTheoDoiNen = chiTiet?.ca.maCa
-  useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), BANG_NHIP_THAY.theoDoiCa, conDangLam, LUI_THEO_DOI_CA_MS)
+  useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), BANG_NHIP_THAY.theoDoiCa, conDangLam, TUY_CHON_NHIP_THAY.theoDoiCa)
 
   const handleChoThiLai = async (sbd: string) => {
     if (!chiTiet) return
