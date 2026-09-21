@@ -13,7 +13,7 @@ import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
-import { EXP_LO_DUNG_NHIP, EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, TIEP_SUC_TOI_DA_NGAY } from './exp-cau-hinh'
+import { EXP_LO_DUNG_NHIP, EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, TIEP_SUC_TOI_DA_NGAY } from './exp-cau-hinh'
 import { congManh, NGUON_EXP_CAU, tinhExp, type KhoanExp, type KhoanManh, type MetaCauExp, type VaoTinhExp } from './exp-hoc-tap'
 import { congTongSoVaoHoSo, khienConLai, khienRenChuaDung, type DaCong, type HoSoGameExp } from './exp-ho-so-game'
 import { NGAN_SACH_SAN, SO_NGAY_LICH_SU, TOI_THIEU_CAU_SAN } from './ho-so-cau-hinh'
@@ -492,15 +492,18 @@ export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Pro
     try { p = JSON.parse(row.json) as HoSoGameExp & Record<string, unknown> } catch { return null }
     const t = await an(
       () => env.DB.prepare(
-        `SELECT (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) AS e, (SELECT COALESCE(SUM(so), 0) FROM manh_khien_so WHERE sbd = ? AND luc >= ?) AS m`,
-      ).bind(sbd, since, sbd, since).first<{ e: number; m: number }>(),
+        `SELECT (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) AS e,
+                (SELECT COALESCE(SUM(${SQL_SO_MANH_TINH}), 0) FROM manh_khien_so WHERE sbd = ? AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS m,
+                (SELECT COUNT(*) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS d`,
+      ).bind(sbd, since, sbd, since, sbd, since).first<{ e: number; m: number; d: number }>(),
       null,
     )
     if (!t) return null
     const tongExp = Number(t.e) || 0
     const tongManh = Number(t.m) || 0
-    if (tongExp === (p.expMoi?.daCong ?? 0) && tongManh === (p.expMoi?.manhDaTinh ?? 0)) return { exp: 0, manh: 0, khienMoi: 0 }
-    const ra = congTongSoVaoHoSo(p, tongExp, tongManh)
+    const ngayDat = Number(t.d) || 0
+    if (tongExp === (p.expMoi?.daCong ?? 0) && tongManh === (p.expMoi?.manhDaTinh ?? 0) && ngayDat === (p.expMoi?.ngayDat ?? 0)) return { exp: 0, manh: 0, khienMoi: 0 }
+    const ra = congTongSoVaoHoSo(p, tongExp, tongManh, ngayDat)
     const r = await env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(json(p), sbd, row.revision).run()
     if (r.meta.changes) return ra
   }
@@ -654,10 +657,10 @@ export async function docExpHomNay(env: Env, sbd: string, nowMs: number): Promis
   if (p) {
     manh = p.khienRen?.manh ?? 0
     khienRen = khienRenChuaDung(p)
-    const t = await an(() => env.DB.prepare('SELECT COALESCE(SUM(so), 0) AS m FROM manh_khien_so WHERE sbd = ?').bind(sbd).first<{ m: number }>(), null)
+    const t = await an(() => env.DB.prepare(`SELECT COALESCE(SUM(${SQL_SO_MANH_TINH}), 0) AS m FROM manh_khien_so WHERE sbd = ? AND ngay_vn >= ${SQL_KHIEN_MOC}`).bind(sbd).first<{ m: number }>(), null)
     cho = (Number(t?.m) || 0) > (p.expMoi?.manhDaTinh ?? 0)
   } else {
-    const t = await an(() => env.DB.prepare('SELECT COALESCE(SUM(so), 0) AS m FROM manh_khien_so WHERE sbd = ?').bind(sbd).first<{ m: number }>(), null)
+    const t = await an(() => env.DB.prepare(`SELECT COALESCE(SUM(${SQL_SO_MANH_TINH}), 0) AS m FROM manh_khien_so WHERE sbd = ? AND ngay_vn >= ${SQL_KHIEN_MOC}`).bind(sbd).first<{ m: number }>(), null)
     manh = congManh({ manh: 0, daRen: 0 }, Number(t?.m) || 0, 0).manh
     cho = (Number(t?.m) || 0) > 0
   }

@@ -49,6 +49,26 @@ export const KHIEN_REN_TOI_DA = 5
 export const MANH_TOI_DA = 2 * MANH_MOI_KHIEN
 
 /**
+ * MỐC TÍNH LẠI KHIÊN (thầy lệnh 21/09: "RESET lại hết mảnh khiên và mốc ban đầu cho công bằng"): `cau_hinh.khien_moc` = ngày VN 'YYYY-MM-DD'. Có mốc ⇒ mảnh chỉ tính từ các dòng `manh_khien_so`
+ * có `ngay_vn` ≥ mốc (dòng cũ GIỮ NGUYÊN trong sổ, chỉ không được đếm); vắng / sai dạng ⇒ y hệt cũ (chuỗi rỗng ≤ mọi ngày). Dùng chung MỘT đoạn SQL này ở mọi nơi cộng mảnh.
+ */
+export const KHOA_KHIEN_MOC = 'khien_moc'
+export const SQL_KHIEN_MOC = `COALESCE((SELECT CASE WHEN gia_tri GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' THEN gia_tri END FROM cau_hinh WHERE khoa = '${KHOA_KHIEN_MOC}'), '')`
+/**
+ * SỐ MẢNH được tính của một dòng `manh_khien_so`: có mốc ⇒ CHỈ dòng `loai = 'dat'` (nguồn mảnh duy nhất: đạt nhiệm vụ ngày). Dòng `dang` (+2) / `chuoi7` (+3) sinh TRƯỚC lệnh thầy 21/09 nằm ngay trong ngày mốc
+ * (171 dòng = 342 mảnh của 29 em ngày 21/09) — không được cộng lại sau reset. Vắng mốc ⇒ đếm mọi dòng như cũ.
+ */
+export const SQL_SO_MANH_TINH = `CASE WHEN loai = 'dat' OR ${SQL_KHIEN_MOC} = '' THEN so ELSE 0 END`
+/** Khiên QUÀ TIẾN HOÁ ĐẦU TIÊN (mốc cấp 10) chỉ mở khi em có ≥ chừng này NGÀY ĐẠT nhiệm vụ ngày tính từ `khien_moc` (thầy chọn phương án B, 21/09). MÁY CHỦ là nguồn duy nhất tính khiên còn lại. */
+export const NGAY_DAT_MO_KHIEN_QUA = 36
+/** Cấp thần thú của mốc tiến hoá đầu (`EVOLUTION_LEVELS[1]`): khiên quà ở mốc này là "khiên quà đầu tiên" bị khoá theo ngày đạt. */
+export const CAP_KHIEN_QUA_DAU = 10
+/** Vắng bao nhiêu NGÀY LIÊN TIẾP không đạt nhiệm vụ ngày thì mất 1 khiên (Boss chốt 7; thầy đổi được ở đây). Ngày nghỉ hợp lệ không tính là vắng. */
+export const KHIEN_MAT_KHI_VANG_NGAY = 7
+/** Ngày vắng thứ mấy thì báo em MỘT tin (chỉ khi em đang có khiên). */
+export const KHIEN_BAO_VANG_NGAY = 5
+
+/**
  * Mốc chuyển tiếp: sự kiện có `luc` TRƯỚC mốc này giữ như đã trả theo luật cũ (KHÔNG tính lại EXP quá khứ). Đặt lúc phát hành EXP mới
  * (ISO). `null` = chưa phát hành (không khoản nào được sinh).
  */

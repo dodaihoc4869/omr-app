@@ -410,12 +410,16 @@ describe('mảnh khiên → khiên rèn (nối vào hồ sơ game)', () => {
     expect(khienRenChuaDung(p)).toBeLessThanOrEqual(5)
   })
   it('khiên quà tiến hoá dùng TRƯỚC: khiên rèn chưa dùng = min(đã rèn, còn lại)', () => {
-    const p: any = hoSoGame({ cap: 10, khienRen: { manh: 0, daRen: 2 }, shields: { used: 1, activeUntil: 0 } })
+    // 21/09 (phương án B): khiên quà ĐẦU (cấp 10) chỉ mở khi có ≥ 36 ngày đạt từ mốc `khien_moc` (`expMoi.ngayDat`). Đủ 36 ngày ⇒ công thức cũ.
+    const p: any = hoSoGame({ cap: 10, khienRen: { manh: 0, daRen: 2 }, shields: { used: 1, activeUntil: 0 }, expMoi: { daCong: 0, manhDaTinh: 0, ngayDat: 36 } })
     expect(khienConLai(p)).toBe(2)
     expect(khienRenChuaDung(p)).toBe(2)
     p.shields.used = 3
     expect(khienConLai(p)).toBe(0)
     expect(khienRenChuaDung(p)).toBe(0)
+    const q: any = hoSoGame({ cap: 10, khienRen: { manh: 0, daRen: 2 }, shields: { used: 1, activeUntil: 0 } }) // chưa đủ ngày đạt: quà đầu còn khoá
+    expect(khienConLai(q)).toBe(1)
+    expect(khienRenChuaDung(q)).toBe(1)
   })
   it('lệnh `shield-use` của game v2 dùng được khiên rèn (còn lại = quà + rèn − đã dùng)', async () => {
     const d = await dung()

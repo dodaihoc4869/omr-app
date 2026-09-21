@@ -9,6 +9,7 @@ export const TEN_NGUON_NHAT_KY: Readonly<Record<string, string>> = {
   nhac_nop_bai: 'Nhắc nộp bài',
   ke_hoach_ngay: 'Lập kế hoạch ngày',
   exp_ngay: 'Chốt điểm ngày',
+  khien_mat: 'Trừ khiên khi vắng nhiệm vụ ngày',
   tin_phu_huynh: 'Tin phụ huynh và vinh danh',
   gui_thong_bao: 'Gửi thông báo',
 }

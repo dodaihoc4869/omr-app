@@ -19,6 +19,7 @@ import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
 import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
 import {gvBangTin} from './gv-bang-tin'
 import {ghiLoiMay} from './nhat-ky-may'
+import {matKhienVangNgay} from './khien-mat'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {docThanThuSoThat,hsThuThachHomNay,hsThuThachNop} from './thu-thach-rieng'
 import {dailyHonors} from './honors'
@@ -2960,6 +2961,8 @@ export default {
       await chayCaLop(env,Date.now()).then(r=>console.log('[ke-hoach] cron',JSON.stringify(r))).catch(async e=>{console.error('[ke-hoach] cron lỗi:',e);await ghiLoiMay(env,'ke_hoach_ngay')})
       // EXP học tập mới: chốt "đạt ngày/chuỗi" của ngày vừa qua cho em nào chưa được trao (chỉ em đang bật cờ). Lỗi chỉ ghi log.
       await chotExpNgayQua(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(async e=>{console.error('[exp] cron lỗi:',e);await ghiLoiMay(env,'exp_ngay')})
+      // MẤT KHIÊN KHI VẮNG (thầy lệnh 21/09): SAU khi đã chốt "đạt ngày" hôm qua (đọc `manh_khien_so.loai = dat`); idempotent bằng khoá sổ; lỗi chỉ ghi nhật ký máy.
+      await matKhienVangNgay(env,Date.now()).then(r=>{if(r.chay)console.log('[khien-mat] cron',JSON.stringify(r))}).catch(async e=>{console.error('[khien-mat] cron lỗi:',e);await ghiLoiMay(env,'khien_mat')})
       await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]).catch(async e=>{console.error('[tin-ph] cron lỗi:',e);await ghiLoiMay(env,'tin_phu_huynh')}) // lỗi ghi vào nhật ký máy (B11) thay vì làm hỏng cả lượt cron
     }else{
       // NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09): mỗi phút gọi nhưng chỉ chạy MỘT lần/30 phút, trong khung 07:00–21:30 giờ VN, khoá idempotent. Lỗi chỉ ghi log — không kéo `deliverNotices` đổ theo.

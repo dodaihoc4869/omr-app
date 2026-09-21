@@ -16,7 +16,7 @@ describe('ghiLoiMay', () => {
     const d = taoD1That()
     expect(await ghiLoiMay(d.env, 'nhac_nop_bai', NAY)).toBe(true)
     expect(dong(d)).toEqual([{ nguon: 'nhac_nop_bai', luc: new Date(NAY).toISOString(), muc: 'loi', chu: 'Nhắc nộp bài lỗi, A.I Đỗ Đại Học sẽ thử lại' }])
-    expect(Object.keys(TEN_NGUON_NHAT_KY).sort()).toEqual(['exp_ngay', 'gui_thong_bao', 'ke_hoach_ngay', 'nhac_nop_bai', 'tin_phu_huynh'])
+    expect(Object.keys(TEN_NGUON_NHAT_KY).sort()).toEqual(['exp_ngay', 'gui_thong_bao', 'ke_hoach_ngay', 'khien_mat', 'nhac_nop_bai', 'tin_phu_huynh']) // 21/09: thêm khien_mat (mất khiên khi vắng)
     for (const n of Object.keys(TEN_NGUON_NHAT_KY)) expect(chuLoiMay(n)).toMatch(/ lỗi, A.I Đỗ Đại Học sẽ thử lại$/)
     expect(chuLoiMay('nguon_la')).toBe('Một việc của máy lỗi, A.I Đỗ Đại Học sẽ thử lại')
   })
@@ -66,7 +66,7 @@ describe('móc vào cron', () => {
   })
   it('tệp index.ts móc ghi lỗi ở cả năm việc nền (kế hoạch ngày, chốt điểm ngày, tin phụ huynh + vinh danh, nhắc nộp bài, gửi thông báo)', () => {
     const ma = readFileSync('server/src/index.ts', 'utf-8')
-    for (const n of ['ke_hoach_ngay', 'exp_ngay', 'tin_phu_huynh', 'nhac_nop_bai', 'gui_thong_bao']) expect(ma, n).toContain(`ghiLoiMay(env,'${n}')`)
+    for (const n of ['ke_hoach_ngay', 'exp_ngay', 'khien_mat', 'tin_phu_huynh', 'nhac_nop_bai', 'gui_thong_bao']) expect(ma, n).toContain(`ghiLoiMay(env,'${n}')`)
   })
 })
 
