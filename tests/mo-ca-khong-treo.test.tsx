@@ -19,7 +19,7 @@ afterEach(() => {cleanup();vi.useRealTimers();vi.clearAllMocks();vi.unstubAllGlo
 async function prepare() {
  render(<ExamSetupScreen />)
  fireEvent.change(screen.getByPlaceholderText('Nhập lớp…'),{target:{value:'TEST'}})
- const button = screen.getByRole('button',{name:/🚀 Mở ca kiểm tra ngay/})
+ const button = screen.getByRole('button',{name:/Mở ca kiểm tra ngay/})
  await waitFor(() => expect((button as HTMLButtonElement).disabled).toBe(false))
  return button
 }
@@ -43,6 +43,6 @@ it('cấu hình không phản hồi: thoát trạng thái quay và giữ lỗi �
  const button=await prepare();m.address.mockImplementation(()=>new Promise(()=>{}));vi.useFakeTimers();fireEvent.click(button)
  await act(async()=>{await vi.advanceTimersByTimeAsync(10001)})
  expect(screen.getByRole('alert').textContent).toContain('Chưa đọc được kết nối')
- expect((screen.getByRole('button',{name:/🚀 Mở ca kiểm tra ngay/}) as HTMLButtonElement).disabled).toBe(false)
+ expect((screen.getByRole('button',{name:/Mở ca kiểm tra ngay/}) as HTMLButtonElement).disabled).toBe(false)
  expect(m.publish).not.toHaveBeenCalled()
 })

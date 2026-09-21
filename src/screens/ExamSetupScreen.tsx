@@ -17,6 +17,14 @@ import {
   RefreshCw,
   ShieldAlert,
   KeyRound,
+  Zap,
+  AlarmClock,
+  Globe,
+  Target,
+  DoorOpen,
+  Pointer,
+  Lock,
+  Rocket,
 } from 'lucide-react'
 import NutQuayLai from '../components/NutQuayLai'
 import { mergeAndStrip, mergeKeepAnswers, type TeacherExamSource } from '../data/examContent'
@@ -67,6 +75,9 @@ function gioHienThi(iso: string): string {
   if (!Number.isFinite(d.getTime())) return ''
   return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
 }
+
+/** Biểu tượng đứng trước chữ trên nút/chip (thay emoji — app cấm emoji, chữ giữ nguyên). */
+const BIEU_TUONG_NHAN = { display: 'inline-block', verticalAlign: '-3px', marginRight: 5 } as const
 
 /** Chip chọn 1 trong nhiều (bắt đầu ngay/hẹn giờ, hạn vào phòng) — cùng kiểu với chip lớp. */
 function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -591,7 +602,8 @@ export default function ExamSetupScreen() {
                     : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                 }`}
               >
-                ⚡ Bắt đầu ngay
+                <Zap size={14} aria-hidden="true" style={BIEU_TUONG_NHAN} />
+                Bắt đầu ngay
               </button>
               <button
                 type="button"
@@ -602,7 +614,8 @@ export default function ExamSetupScreen() {
                     : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                 }`}
               >
-                ⏰ Hẹn giờ mở
+                <AlarmClock size={14} aria-hidden="true" style={BIEU_TUONG_NHAN} />
+                Hẹn giờ mở
               </button>
             </div>
           </div>
@@ -631,9 +644,9 @@ export default function ExamSetupScreen() {
 
           <div className="grid grid-cols-3 gap-2">
             {[
-              { id: 'tu_do', label: '🌐 Tự do' },
-              { id: 'sbd', label: '👥 SBD cả lớp' },
-              { id: 'chon', label: `🎯 Chọn em${chonSbd.size > 0 ? ` (${chonSbd.size})` : ''}` },
+              { id: 'tu_do', Icon: Globe, label: 'Tự do' },
+              { id: 'sbd', Icon: Users, label: 'SBD cả lớp' },
+              { id: 'chon', Icon: Target, label: `Chọn em${chonSbd.size > 0 ? ` (${chonSbd.size})` : ''}` },
             ].map((p) => {
               const chon = phamVi === p.id
               return (
@@ -650,6 +663,7 @@ export default function ExamSetupScreen() {
                       : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                   }`}
                 >
+                  <p.Icon size={14} aria-hidden="true" style={BIEU_TUONG_NHAN} />
                   {p.label}
                 </button>
               )
@@ -683,7 +697,8 @@ export default function ExamSetupScreen() {
             >
               <div className="min-w-0">
                 <div className="text-xs font-bold flex items-center gap-1.5">
-                  <span>🚪 Phòng chờ phát đề</span>
+                  <DoorOpen size={14} aria-hidden="true" />
+                  <span>Phòng chờ phát đề</span>
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                   {deRiengBat ? 'Bật sẵn và không tắt được (Đề riêng từng em)' : 'Chờ Thầy bấm Bắt đầu mới đếm ngược'}
@@ -719,7 +734,8 @@ export default function ExamSetupScreen() {
             >
               <div className="min-w-0">
                 <div className="text-xs font-bold flex items-center gap-1.5">
-                  <span>👆 Giữ để đọc đề</span>
+                  <Pointer size={14} aria-hidden="true" />
+                  <span>Giữ để đọc đề</span>
                 </div>
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                   Chống chụp ảnh đề & chia sẻ · Mặc định 3s
@@ -746,9 +762,9 @@ export default function ExamSetupScreen() {
             </span>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { id: 'khong', label: '🔒 Không hiện' },
-                { id: 'ngay', label: '⚡ Khi nộp bài' },
-                { id: 'ca_lop_xong', label: '👥 Cả lớp xong' },
+                { id: 'khong', Icon: Lock, label: 'Không hiện' },
+                { id: 'ngay', Icon: Zap, label: 'Khi nộp bài' },
+                { id: 'ca_lop_xong', Icon: Users, label: 'Cả lớp xong' },
               ].map((c) => {
                 const chon = congBoDiem === c.id
                 return (
@@ -762,6 +778,7 @@ export default function ExamSetupScreen() {
                         : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
                     }`}
                   >
+                    <c.Icon size={14} aria-hidden="true" style={BIEU_TUONG_NHAN} />
                     {c.label}
                   </button>
                 )
@@ -820,7 +837,8 @@ export default function ExamSetupScreen() {
             </>
           ) : (
             <>
-              <span>🚀 Mở ca kiểm tra ngay</span>
+              <Rocket size={18} aria-hidden="true" />
+              <span>Mở ca kiểm tra ngay</span>
               <span className="text-xs sm:text-sm font-normal opacity-90 pl-1 border-l border-white/30">
                 {lop.trim() || 'Chưa chọn lớp'} · {tongCauDaChon} câu · {chuan2026 ? 50 : thoiGianPhut} phút
               </span>
