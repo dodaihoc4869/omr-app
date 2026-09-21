@@ -6,6 +6,7 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { BANG_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
 import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
@@ -307,12 +308,17 @@ export default function ExamMonitorScreen() {
     }
   }, [chiTiet, scriptUrl, secret])
 
-  const tai = async (ma: string, imLang = false) => {
+  /** Đang có một lượt tải chạy (tay hoặc nền): lượt NỀN không chồng lên (kế hoạch giờ cao điểm 21/09 — không gọi chồng). */
+  const dangTaiRef = useRef(false)
+  /** Trả `true` = tải được; `false` = lỗi / thiếu cấu hình (vòng tự làm mới dùng để LÙI DẦN). */
+  const tai = async (ma: string, imLang = false): Promise<boolean> => {
     const url = (scriptUrl || (await loadScriptUrl())).trim()
     const mat = (secret || (await loadTeacherSecret())).trim()
-    if (!url) return setLoi('Chưa cấu hình địa chỉ máy chủ — vào Cài đặt → Kết nối máy chủ')
-    if (!mat) return setLoi('Chưa nhập mã bí mật — vào Cài đặt → Kết nối máy chủ')
-    if (!ma.trim()) return setLoi('Nhập mã ca')
+    if (!url) { setLoi('Chưa cấu hình địa chỉ máy chủ — vào Cài đặt → Kết nối máy chủ'); return false }
+    if (!mat) { setLoi('Chưa nhập mã bí mật — vào Cài đặt → Kết nối máy chủ'); return false }
+    if (!ma.trim()) { setLoi('Nhập mã ca'); return false }
+    if (imLang && dangTaiRef.current) return true
+    dangTaiRef.current = true
     if (!imLang) setDangTai(true)
     setLoi('')
     try {
@@ -346,6 +352,7 @@ export default function ExamMonitorScreen() {
       // (ca 933467).
       const drMayChu = (ct.ca as { deRieng?: boolean }).deRieng === true
       setCaCanDeRieng(drMayChu || (await docCheDoDeRieng(ma.trim()).catch(() => false)))
+      return true
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'lỗi không rõ'
       if (msg.includes('Không tìm thấy ca kiểm tra')) {
@@ -353,7 +360,9 @@ export default function ExamMonitorScreen() {
       } else {
         setLoi(`Không tải được ca: ${msg}`)
       }
+      return false
     } finally {
+      dangTaiRef.current = false
       setDangTai(false)
     }
   }
@@ -599,17 +608,11 @@ export default function ExamMonitorScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dsEm])
 
-  // Ca đang mở và còn em đang làm → tự tải lại mỗi 20 giây (theo dõi gần thời gian thực).
-  useEffect(() => {
-    if (!chiTiet) return
-    const conDangLam = chiTiet.luot.some((l) => l.trangThai === 'dang_lam')
-    if (!conDangLam) return
-    const id = setInterval(() => {
-      if (!document.hidden) tai(chiTiet.ca.maCa, true)
-    }, 20000)
-    return () => clearInterval(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chiTiet])
+  // Ca đang mở và còn em đang làm → tự tải lại mỗi 20 giây (theo dõi gần thời gian thực). Nhịp THEO LUẬT app thầy (src/lib/nhip-may-thay.ts): tab ẩn thì dừng, không gọi chồng (trước đây
+  // `setInterval` trần: một lượt chậm 20 s dồn thêm lượt, lỗi cũng cứ 20 s một lần), lỗi ⇒ lùi dần 30 → 60 → 120 s. Vòng chạy MỘT mạch (không dựng lại mỗi lần chiTiet đổi).
+  const conDangLam = !!chiTiet && chiTiet.luot.some((l) => l.trangThai === 'dang_lam')
+  const maCaTheoDoiNen = chiTiet?.ca.maCa
+  useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), BANG_NHIP_THAY.theoDoiCa, conDangLam)
 
   const handleChoThiLai = async (sbd: string) => {
     if (!chiTiet) return

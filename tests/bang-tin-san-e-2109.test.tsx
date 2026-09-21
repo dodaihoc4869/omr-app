@@ -12,6 +12,7 @@ import { datKhungGia } from './_khung-gia-2109'
 import { useAppStore } from '../src/store/appStore'
 import HomNayScreen from '../src/screens/HomNayScreen'
 import { NHIP_HOI_SAN_MS, NHIP_HUT_MAT_KET_NOI, THU_LAI_SAU_KHI_TU_CHOI_MS } from '../src/components/bang-tin-san/use-san-song'
+import { LUI_DAN_MS } from '../src/lib/nhip-ben-vung'
 import { tenGoiKhongTrung } from '../src/lib/bang-tin-san/ten-goi'
 import { DanDau } from '../src/components/bang-tin-san/DanDau'
 
@@ -175,7 +176,10 @@ describe('HomNayScreen — Bảng tin sàn khi máy chủ có lệnh sống; rơ
   })
   const laSan = (c: HTMLElement) => c.querySelector('[data-khoi="bang-tin-san"]')
   const laV3 = (c: HTMLElement) => c.querySelector('[data-khung="bang-tin-v3"]')
-  const yen = async (ms = 50) => act(async () => void (await vi.advanceTimersByTimeAsync(ms)))
+  /** Lùi dần sau hụt (kế hoạch giờ cao điểm 21/09): hụt lần 1 ⇒ 30 s, lần 2 ⇒ 60 s. */
+const LUI_HUT_DAU_MS = LUI_DAN_MS[0]!
+const LUI_HUT_HAI_MS = LUI_DAN_MS[1]!
+const yen = async (ms = 50) => act(async () => void (await vi.advanceTimersByTimeAsync(ms)))
 
   it('đang chờ câu trả lời đầu ⇒ khung xương (không màn trắng)', () => {
     nap.song = () => new Promise<Tra>(() => {})
@@ -244,7 +248,7 @@ describe('HomNayScreen — Bảng tin sàn khi máy chủ có lệnh sống; rơ
     await yen(NHIP_HOI_SAN_MS + 200)
     expect(laSan(container)).toBeTruthy()
     nap.song = () => ok({ ok: false, lyDo: 'tat' })
-    await yen(NHIP_HOI_SAN_MS + 200)
+    await yen(LUI_HUT_DAU_MS + 200) // hụt một lần ⇒ vòng LÙI 30 giây (kế hoạch giờ cao điểm), không phải 10 giây
     expect(laSan(container)).toBeNull()
     expect(laV3(container)).toBeTruthy()
   })
@@ -276,8 +280,8 @@ describe('HomNayScreen — Bảng tin sàn khi máy chủ có lệnh sống; rơ
     expect(dem('/gv/bang-tin-song')).toBe(truoc)
     await act(async () => mo(ok(thanSong())))
   })
-  it('MẤT KẾT NỐI: hỏi hụt ≥ 3 nhịp liền ⇒ chip "Mất kết nối · số lúc HH:MM" (giờ của số đang hiện) thay "TRỰC TIẾP"; hỏi được lại ⇒ tự mất; 2 nhịp hụt chưa đủ', async () => {
-    expect(NHIP_HUT_MAT_KET_NOI).toBe(3)
+  it('MẤT KẾT NỐI: hỏi hụt ≥ 2 nhịp liền ⇒ chip "Mất kết nối · số lúc HH:MM" (giờ của số đang hiện) thay "TRỰC TIẾP"; hụt thì vòng LÙI (30 s rồi 60 s, không dồn lệnh); hỏi được lại ⇒ tự mất; 1 nhịp hụt chưa đủ', async () => {
+    expect(NHIP_HUT_MAT_KET_NOI).toBe(2)
     dongHoGia()
     const { container } = render(<HomNayScreen />)
     await yen()
@@ -286,24 +290,27 @@ describe('HomNayScreen — Bảng tin sàn khi máy chủ có lệnh sống; rơ
     expect(chip()).toBeNull()
     expect(container.textContent).toContain('TRỰC TIẾP')
     nap.song = () => { throw new TypeError('mất mạng') }
-    await yen(NHIP_HOI_SAN_MS * 2 + 200)
-    expect(chip()).toBeNull() // mới hụt 2 nhịp
+    await yen(NHIP_HOI_SAN_MS + 200)
+    expect(chip()).toBeNull() // mới hụt 1 nhịp
     expect(container.textContent).toContain('TRỰC TIẾP')
-    await yen(NHIP_HOI_SAN_MS)
+    const truoc = dem('/gv/bang-tin-song')
+    await yen(NHIP_HOI_SAN_MS * 2) // đang lùi: 20 giây sau vẫn KHÔNG có lệnh mới (nhịp kế là 30 giây, không phải 10)
+    expect(dem('/gv/bang-tin-song')).toBe(truoc)
+    await yen(NHIP_HOI_SAN_MS + 200) // đủ 30 giây ⇒ hụt thứ hai
     expect(chip()).toBe('Mất kết nối · số lúc 15:28') // serverNow của số cuối = 08:28:36Z = 15:28 giờ VN
     expect(container.textContent).not.toContain('TRỰC TIẾP')
     expect(laSan(container)).toBeTruthy() // vẫn giữ số
     nap.song = () => ok(thanSong())
-    await yen(NHIP_HOI_SAN_MS + 200)
+    await yen(LUI_HUT_HAI_MS + 200) // hụt hai lần ⇒ lùi 60 giây, rồi hỏi được
     expect(chip()).toBeNull()
     expect(container.textContent).toContain('TRỰC TIẾP')
-    // hụt rải rác (không liền nhau) không đủ 3
+    // hụt rải rác (không liền nhau) không đủ 2
     nap.song = () => { throw new TypeError('mất mạng') }
-    await yen(NHIP_HOI_SAN_MS * 2)
+    await yen(NHIP_HOI_SAN_MS + 200)
     nap.song = () => ok(thanSong())
-    await yen(NHIP_HOI_SAN_MS)
+    await yen(LUI_HUT_DAU_MS + 200) // hỏi được lại ⇒ số hụt liền về 0, nhịp về 10 giây
     nap.song = () => { throw new TypeError('mất mạng') }
-    await yen(NHIP_HOI_SAN_MS * 2)
+    await yen(NHIP_HOI_SAN_MS + 200)
     expect(chip()).toBeNull()
   })
   it('tên gọi ngắn: HAI CHỮ CUỐI, không "…"; hai em trùng tên gọi ⇒ thêm chữ đứng trước; cùng một em hai lần không tính trùng; một chữ / rỗng không vỡ', () => {

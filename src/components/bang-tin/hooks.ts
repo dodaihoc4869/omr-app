@@ -1,5 +1,6 @@
 // Móc dùng chung cho Bảng tin bản 3: đo chỗ trống để chọn "top-N", số đếm lên, chuyển bố cục theo bề rộng, trang lướt ngang.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
+import { useNhipThay } from '../../lib/nhip-may-thay'
 
 const coTheDo = () => typeof window !== 'undefined'
 
@@ -118,32 +119,11 @@ export function useTrangLuot(soTrang: number): { ref: RefObject<HTMLDivElement |
   return { ref, trang, chuyen }
 }
 
-/** Tự làm mới mỗi `ms` (mặc định 60 giây), DỪNG khi tab ẩn, làm mới ngay khi tab hiện lại. */
-export function useTuLamMoi(lam: () => void, ms = 60000): void {
-  const goi = useRef(lam)
-  goi.current = lam
-  useEffect(() => {
-    if (typeof document === 'undefined') return
-    let id: ReturnType<typeof setInterval> | null = null
-    const bat = () => {
-      if (id == null) id = setInterval(() => goi.current(), ms)
-    }
-    const tat = () => {
-      if (id != null) clearInterval(id)
-      id = null
-    }
-    const doi = () => {
-      if (document.hidden) tat()
-      else {
-        goi.current()
-        bat()
-      }
-    }
-    if (!document.hidden) bat()
-    document.addEventListener('visibilitychange', doi)
-    return () => {
-      tat()
-      document.removeEventListener('visibilitychange', doi)
-    }
-  }, [ms])
+/**
+ * Tự làm mới mỗi `ms` (mặc định 60 giây) — dùng `useNhipThay` (src/lib/nhip-may-thay.ts): DỪNG khi tab ẩn, hiện lại thì làm mới (chặn dội), KHÔNG gọi chồng khi lần trước chưa xong,
+ * lỗi ⇒ lùi dần 30 → 60 → 120 s. Muốn được lùi dần thì `lam` phải TRẢ Promise báo lỗi bằng `false` / ném lỗi; `lam` trả void = luôn coi là tốt (vẫn không chồng lệnh nếu trả Promise).
+ * KHÔNG gọi ngay khi gắn (nơi dùng tự nạp lần đầu).
+ */
+export function useTuLamMoi(lam: () => Promise<unknown> | unknown, ms = 60000): void {
+  useNhipThay(lam, ms)
 }

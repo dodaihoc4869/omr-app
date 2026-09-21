@@ -8,6 +8,7 @@ import { layCanGiup, lyDoCanGiup } from '../lib/hom-nay-v2'
 import BangTinV3, { BangTinXuong } from '../components/bang-tin/BangTin'
 import type { DungNhip } from '../components/bang-tin/cac-khoi'
 import { useTuLamMoi } from '../components/bang-tin/hooks'
+import { BANG_NHIP_THAY } from '../lib/nhip-may-thay'
 import BangTinSan from '../components/bang-tin-san/BangTinSan'
 import { useSanSong } from '../components/bang-tin-san/use-san-song'
 import HomNayCu from './HomNayCu'
@@ -32,14 +33,20 @@ function HomNayBan3() {
   const [tt, setTt] = useState<{ bt: BangTin | null; xong: boolean }>({ bt: null, xong: false })
   const [nayMs, setNayMs] = useState(() => Date.now())
 
-  const lam = useCallback(() => {
-    void layBangTin().then((r) => {
-      setNayMs(Date.now())
-      setTt((t) => ({ bt: r.ok ? r.du : t.bt, xong: true }))
-    })
-  }, [])
-  useEffect(() => lam(), [lam])
-  useTuLamMoi(lam, 60000)
+  /** Trả `true` khi đọc được (`false` ⇒ vòng tự làm mới LÙI DẦN 30 → 60 → 120 s; không gọi chồng — xem src/lib/nhip-may-thay.ts). */
+  const lam = useCallback(
+    () =>
+      layBangTin().then((r) => {
+        setNayMs(Date.now())
+        setTt((t) => ({ bt: r.ok ? r.du : t.bt, xong: true }))
+        return r.ok
+      }),
+    [],
+  )
+  useEffect(() => {
+    void lam()
+  }, [lam])
+  useTuLamMoi(lam, BANG_NHIP_THAY.bangTinV3)
 
   /** Danh sách ĐỦ em cần để ý cho tấm bên: lệnh chi tiết cũ `/gv/can-giup`; lỗi ⇒ null ⇒ tấm bên nói thật. */
   const taiTatCaCanDeY = useCallback(async (): Promise<EmCanDeY[] | null> => {
