@@ -601,24 +601,52 @@ const TOI_DA_EM_CHOT_MOT_LUOT = 40
  * thì tính lại đúng ngày đó. Chỉ xét em đang bật cờ; tối đa 40 em mỗi lượt để không vượt trần truy vấn của một lượt chạy.
  */
 export async function chotExpNgayQua(env: Env, nowMs: number): Promise<{ soEm: number; daTinh: number }> {
+  const lo = await chotMotLoNgayQua(env, nowMs, '', TOI_DA_EM_CHOT_MOT_LUOT)
+  return lo ? { soEm: lo.soEm, daTinh: lo.daTinh } : { soEm: 0, daTinh: 0 }
+}
+
+/** MỘT lô (≤ `toiDa` em, xếp theo sbd, chỉ em có sbd > `sbdSau`). `null` = EXP mới chưa bật cho ai (không có gì để chốt). `conNua` = lô đầy ⇒ có thể còn em sau `sbdCuoi`. */
+async function chotMotLoNgayQua(env: Env, nowMs: number, sbdSau: string, toiDa: number): Promise<{ soEm: number; daTinh: number; sbdCuoi: string; conNua: boolean } | null> {
   const cfg = await docCauHinhExp(env)
   const tuToanBo = cfg.toanBo && cfg.tu && ms(cfg.tu) <= nowMs
   const mocRieng = cfg.tuDsSbd ?? cfg.tu
   const tuRieng = cfg.dsSbd.length > 0 && mocRieng && ms(mocRieng) <= nowMs
-  if (!tuToanBo && !tuRieng) return { soEm: 0, daTinh: 0 }
+  if (!tuToanBo && !tuRieng) return null
   const homQua = themNgay(ngayVn(nowMs), -1)
   const loc = tuToanBo ? '' : 'AND k.sbd IN (SELECT value FROM json_each(?))'
   const lenh = env.DB.prepare(
     `SELECT k.sbd FROM ke_hoach_ngay k WHERE k.ngay = ? AND k.ket_qua = 'dat'
-        AND NOT EXISTS (SELECT 1 FROM exp_so e WHERE e.khoa = k.sbd || '|dat|' || k.ngay) ${loc} ORDER BY k.sbd LIMIT ${TOI_DA_EM_CHOT_MOT_LUOT}`,
+        AND NOT EXISTS (SELECT 1 FROM exp_so e WHERE e.khoa = k.sbd || '|dat|' || k.ngay) AND k.sbd > ? ${loc} ORDER BY k.sbd LIMIT ${Math.max(1, Math.floor(toiDa))}`,
   )
-  const r = await an(() => (tuToanBo ? lenh.bind(homQua) : lenh.bind(homQua, json(cfg.dsSbd))).all<{ sbd: string }>(), null)
+  const r = await an(() => (tuToanBo ? lenh.bind(homQua, sbdSau) : lenh.bind(homQua, sbdSau, json(cfg.dsSbd))).all<{ sbd: string }>(), null)
   let daTinh = 0
-  for (const x of r?.results ?? []) {
+  const ds = r?.results ?? []
+  for (const x of ds) {
     const k = await capNhatExp(env, String(x.sbd), nowMs, { ngay: homQua })
     if (k.bat) daTinh++
   }
-  return { soEm: (r?.results ?? []).length, daTinh }
+  return { soEm: ds.length, daTinh, sbdCuoi: ds.length ? String(ds[ds.length - 1]!.sbd) : sbdSau, conNua: ds.length >= Math.max(1, Math.floor(toiDa)) }
+}
+
+const KHOA_CHOT_NGAY = 'chot_exp_ngay_qua'
+
+/**
+ * CHỐT "ĐẠT NGÀY" ĐẦY ĐỦ cho MỌI em (vá lỗ: `chotExpNgayQua` cũ chỉ chạy MỘT lần và chỉ 40 em ⇒ em đạt mà không mở app lại mất mảnh/EXP ngày ấy). Mỗi lượt gọi làm MỘT lô (≤ `toiDa`, mặc định 40) rồi ghi CON TRỎ
+ * `cau_hinh.chot_exp_ngay_qua = {ngay, sbdCuoi, xong}`; cron mỗi phút gọi tiếp cho tới khi `xong` (con trỏ chạy hết danh sách, KHÔNG dựa vào "còn thiếu khoản" vì em có thể không tạo khoản dù kế hoạch chốt 'dat').
+ * Idempotent: `capNhatExp` có khoá sổ; chạy lại một em không cộng đôi. `xong` cũng đúng khi EXP mới chưa bật cho ai.
+ */
+export async function chotExpNgayQuaDayDu(env: Env, nowMs: number, tuyChon: { toiDa?: number } = {}): Promise<{ soEm: number; daTinh: number; xong: boolean; ngay: string }> {
+  const ngay = themNgay(ngayVn(nowMs), -1)
+  const r = await an(() => env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CHOT_NGAY).first<{ gia_tri: string }>(), null)
+  let tt: { ngay?: string; sbdCuoi?: string; xong?: boolean } = {}
+  try { tt = r?.gia_tri ? (JSON.parse(r.gia_tri) as typeof tt) : {} } catch { tt = {} }
+  const cungNgay = tt.ngay === ngay
+  if (cungNgay && tt.xong === true) return { soEm: 0, daTinh: 0, xong: true, ngay }
+  const lo = await chotMotLoNgayQua(env, nowMs, cungNgay ? String(tt.sbdCuoi ?? '') : '', tuyChon.toiDa ?? TOI_DA_EM_CHOT_MOT_LUOT)
+  const moi = { ngay, sbdCuoi: lo?.sbdCuoi ?? '', xong: lo ? !lo.conNua : true }
+  await env.DB.prepare("INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc")
+    .bind(KHOA_CHOT_NGAY, json(moi), new Date(nowMs).toISOString()).run()
+  return { soEm: lo?.soEm ?? 0, daTinh: lo?.daTinh ?? 0, xong: moi.xong, ngay }
 }
 
 // --- Đọc cho màn hình -----------------------------------------------------------------------------

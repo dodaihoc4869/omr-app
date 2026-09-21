@@ -6,7 +6,7 @@ import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
 import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
-import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQua} from './exp-d1'
+import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
 import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsOnLaiNop} from './on-lai-nop'
@@ -19,7 +19,7 @@ import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
 import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
 import {gvBangTin} from './gv-bang-tin'
 import {ghiLoiMay} from './nhat-ky-may'
-import {matKhienVangNgay} from './khien-mat'
+import {chotNgayRoiTruKhien} from './khien-mat'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {docThanThuSoThat,hsThuThachHomNay,hsThuThachNop} from './thu-thach-rieng'
 import {dailyHonors} from './honors'
@@ -2960,12 +2960,13 @@ export default {
       // thì tin có thể đọc kế hoạch của ngày cũ hoặc thiếu.
       await chayCaLop(env,Date.now()).then(r=>console.log('[ke-hoach] cron',JSON.stringify(r))).catch(async e=>{console.error('[ke-hoach] cron lỗi:',e);await ghiLoiMay(env,'ke_hoach_ngay')})
       // EXP học tập mới: chốt "đạt ngày/chuỗi" của ngày vừa qua cho em nào chưa được trao (chỉ em đang bật cờ). Lỗi chỉ ghi log.
-      await chotExpNgayQua(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(async e=>{console.error('[exp] cron lỗi:',e);await ghiLoiMay(env,'exp_ngay')})
-      // MẤT KHIÊN KHI VẮNG (thầy lệnh 21/09): SAU khi đã chốt "đạt ngày" hôm qua (đọc `manh_khien_so.loai = dat`); idempotent bằng khoá sổ; lỗi chỉ ghi nhật ký máy.
-      await matKhienVangNgay(env,Date.now()).then(r=>{if(r.chay)console.log('[khien-mat] cron',JSON.stringify(r))}).catch(async e=>{console.error('[khien-mat] cron lỗi:',e);await ghiLoiMay(env,'khien_mat')})
+      // Lô ĐẦU của chốt "đạt ngày" (con trỏ theo lô 40 em; cron mỗi phút ở nhánh dưới chạy tiếp cho tới khi xong). Lỗ cũ: chỉ MỘT lô 40 em/đêm ⇒ em đạt mà chưa được ghi mất mảnh ngày ấy.
+      await chotExpNgayQuaDayDu(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(async e=>{console.error('[exp] cron lỗi:',e);await ghiLoiMay(env,'exp_ngay')})
       await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]).catch(async e=>{console.error('[tin-ph] cron lỗi:',e);await ghiLoiMay(env,'tin_phu_huynh')}) // lỗi ghi vào nhật ký máy (B11) thay vì làm hỏng cả lượt cron
     }else{
       // NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09): mỗi phút gọi nhưng chỉ chạy MỘT lần/30 phút, trong khung 07:00–21:30 giờ VN, khoá idempotent. Lỗi chỉ ghi log — không kéo `deliverNotices` đổ theo.
+      // CHỐT "ĐẠT NGÀY" còn lại + MẤT KHIÊN KHI VẮNG (khung 00:02–05:00 giờ VN; ngoài khung trả về ngay, không truy vấn). Trừ khiên CHỈ chạy khi chốt ngày đã xong cho mọi em.
+      await chotNgayRoiTruKhien(env,Date.now()).then(r=>{if(r.truKhien?.chay)console.log('[khien-mat] cron',JSON.stringify(r))}).catch(async e=>{console.error('[khien-mat] cron lỗi:',e);await ghiLoiMay(env,'khien_mat')})
       await nhacTuDong(env,Date.now()).then(async r=>{if(r.chay)console.log('[nhac-tu-dong] cron',JSON.stringify(r));if(r.lyDo==='loi')await ghiLoiMay(env,'nhac_nop_bai')}).catch(async e=>{console.error('[nhac-tu-dong] cron lỗi:',e);await ghiLoiMay(env,'nhac_nop_bai')})
       await deliverNotices(env).catch(async e=>{console.error('[thong-bao] cron lỗi:',e);await ghiLoiMay(env,'gui_thong_bao')})
     }

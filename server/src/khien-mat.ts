@@ -7,6 +7,7 @@
 // Idempotent bằng khoá sổ `khien|mat|<sbd>|<ngày>` (bảng `khien_mat_so`; ghi để đối soát/lùi) và CAS theo `revision` của hồ sơ game. Không ném lỗi ra ngoài (cron bọc `ghiLoiMay`).
 import type { Env } from './kieu'
 import { KHIEN_BAO_VANG_NGAY, KHIEN_MAT_KHI_VANG_NGAY, KHOA_KHIEN_MOC } from './exp-cau-hinh'
+import { chotExpNgayQuaDayDu } from './exp-d1'
 import { khienConLai, khienRenChuaDung, type HoSoGameExp } from './exp-ho-so-game'
 import { themNgay } from './ho-so-nam-kt'
 import { docNgayNghi } from './ke-hoach-ngay-d1'
@@ -33,6 +34,31 @@ export function soNgayVang(homQua: string, batDau: string, ngayDat: ReadonlySet<
     dem++
   }
   return dem
+}
+
+/** Cửa sổ chạy (phút kể từ 00:00 giờ VN): 00:02 → 05:00. Sau 00:01 (cron ngày) để "chốt đạt ngày" có chỗ chạy nhiều lượt. */
+const CUA_SO_TU_PHUT = 2
+const CUA_SO_DEN_PHUT = 300
+const KHOA_MAT_NGAY = 'khien_mat_ngay'
+
+/**
+ * THỨ TỰ ĐÊM (Boss 21/09, vá lỗ chốt ngày): `matKhienVangNgay` CHỈ chạy SAU KHI đã chốt "đạt ngày" của hôm qua xong cho MỌI em (`chotExpNgayQuaDayDu`, con trỏ theo lô 40 em, cron mỗi phút tiếp tục),
+ * kẻo em đạt mà chưa được ghi mảnh bị đếm là vắng. Chạy trong khung 00:02–05:00; mỗi ngày chỉ chạy trừ khiên MỘT lần (`cau_hinh.khien_mat_ngay`; chưa chạy được ⇒ lượt sau thử lại).
+ */
+export async function chotNgayRoiTruKhien(env: Env, nowMs: number, tuyChon: { toiDa?: number } = {}): Promise<{ trongKhung: boolean; chotXong: boolean; truKhien: KetQuaMatKhien | null; soEmChot: number }> {
+  const phut = Math.floor((((nowMs + 7 * 3_600_000) % 86_400_000) + 86_400_000) % 86_400_000 / 60_000)
+  if (phut < CUA_SO_TU_PHUT || phut >= CUA_SO_DEN_PHUT) return { trongKhung: false, chotXong: false, truKhien: null, soEmChot: 0 }
+  const chot = await chotExpNgayQuaDayDu(env, nowMs, tuyChon)
+  if (!chot.xong) return { trongKhung: true, chotXong: false, truKhien: null, soEmChot: chot.soEm }
+  const homNay = ngayVn(nowMs)
+  const daChay = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_MAT_NGAY).first<{ gia_tri: string }>()
+  if (String(daChay?.gia_tri ?? '') === homNay) return { trongKhung: true, chotXong: true, truKhien: null, soEmChot: chot.soEm }
+  const kq = await matKhienVangNgay(env, nowMs)
+  if (kq.chay) {
+    await env.DB.prepare('INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
+      .bind(KHOA_MAT_NGAY, homNay, new Date(nowMs).toISOString()).run()
+  }
+  return { trongKhung: true, chotXong: true, truKhien: kq, soEmChot: chot.soEm }
 }
 
 export interface KetQuaMatKhien {
