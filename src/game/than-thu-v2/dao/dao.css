@@ -280,4 +280,6 @@
 /* Luật 1 (CHUAN-TU-NGU): con số nào cũng có nhãn/đơn vị — chữ nằm ở CSS để phần tử số giữ nguyên (test khoá `−N`, `+N`). */
 .dao .dao-san-so::after,.dao .dao-san-hoi::after{content:' máu';font-size:13px;font-weight:700}
 .dao .dao-thuong b[data-don-vi]::after{content:' ' attr(data-don-vi);margin-left:2px;font-size:11px;font-weight:700}
-.dao .dao-san-ten{display:flex;flex-direction:column;gap:1px;max-width:190px;line-height:1.25;overflow-wrap:anywhere}.dao .dao-san-ten small{font-size:10px;font-weight:600;opacity:.9}
+.dao .dao-san-ta{align-items:flex-end;gap:6px}.dao .dao-san-ta .dao-san-mau{width:100px;flex:none}
+.dao .dao-san-ten{display:flex;flex-direction:column;gap:1px;max-width:104px;line-height:1.25;overflow-wrap:anywhere}
+.dao .dao-san-ten small{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10px;font-weight:600;opacity:.9}

@@ -62,9 +62,10 @@ describe('Đảo · thám hiểm · sân đấu', () => {
     expect(container.querySelector('.dao-san-ta')!.textContent).toMatch(/^Thần thú của em: Mập ĐịchMáu \d+\/100$/)
     expect(container.querySelector('.dao-san-so')!.textContent).toMatch(/^−\d+$/) // số nổi giữ nguyên phần tử (test cũ khoá); chữ "máu" đi bằng CSS
   })
-  it('tên thần thú dài 30 ký tự vẫn gói trong khung (không tràn ngang): có overflow-wrap + max-width', () => {
+  it('tên thần thú dài 30 ký tự vẫn gói trong khung (không tràn ngang): có overflow-wrap + max-width + cắt 2 dòng', () => {
     const css = doc('src/game/than-thu-v2/dao/dao.css')
-    expect(css).toMatch(/\.dao \.dao-san-ten\{[^}]*max-width:190px[^}]*overflow-wrap:anywhere/)
+    expect(css).toMatch(/\.dao \.dao-san-ten\{[^}]*max-width:104px[^}]*overflow-wrap:anywhere/)
+    expect(css).toMatch(/\.dao-san-ten small\{[^}]*-webkit-line-clamp:2/) // tên dài: tối đa 2 dòng, tên đầy đủ nằm ở aria của thanh máu
   })
   it('đơn vị của số nổi và của thưởng nằm ở CSS: "−N máu", "+N máu", "+N EXP"', () => {
     const css = doc('src/game/than-thu-v2/dao/dao.css')
