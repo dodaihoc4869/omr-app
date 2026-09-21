@@ -709,7 +709,7 @@ describe('LƯỢT CHIỀU không đè núm của đêm (Code 1 + Boss 21/09; hà
   it('đêm nộp lại SAU chiều (cùng ngày) giữ thuThach + loiMoi đã có, núm mới của đêm có hiệu lực', async () => {
     await nop([chieu()]) // hàng chiều-riêng-lẻ
     await nop([dem({ nhip: { lech: -1, khoiDong: 2 } })])
-    expect(json()).toMatchObject({ nhip: { lech: -1 }, thuThach: TT, loiMoi: LOI })
+    expect(json()).toMatchObject({ nhip: { lech: -1 }, thuThach: TT, loiMoi: LOI, thuThachApDung: true })
     expect(json()).not.toHaveProperty('luot') // nay là hàng đêm thật
     expect((await hieuLuc())?.nhip).toBe(-1)
     expect(await docThuThachDaAp(d.env, '12001', NGAY)).toMatchObject({ thuThach: TT })
@@ -721,7 +721,75 @@ describe('LƯỢT CHIỀU không đè núm của đêm (Code 1 + Boss 21/09; hà
       const r = await nop([chieu(o)])
       expect(r, JSON.stringify(o)).toMatchObject({ ok: true, nhan: 1, nhanChieu: 0 })
       expect(json()).not.toHaveProperty('luot')
+      expect(json().thuThachApDung, JSON.stringify(o)).toBe(true) // hàng thường mang thuThach cũng có cờ áp riêng (chế độ thật, tin cậy đạt)
     }
+  })
+
+  describe('CỜ ÁP RIÊNG của thử thách (`json.thuThachApDung`) — hàng đêm BÓNG vẫn cho thẻ khi chiều nộp ở chế độ THẬT', () => {
+    const mayDaLam = async () => ((await gvBangTin(d.env, {}, NOW)).mayDaLam as { loai: string; so: number }[]).find((x) => x.loai === 'thu_thach_rieng')
+    it('(a) hàng đêm BÓNG (ap_dung 0) + chiều nộp chế độ THẬT ⇒ thẻ HIỆN, núm đêm vẫn KHÔNG áp', async () => {
+      await cauHinh({ cheDo: 'bong' })
+      await nop([dem()])
+      expect(hang()?.ap_dung).toBe(0)
+      await cauHinh({ cheDo: 'that' })
+      expect(await nop([chieu()])).toMatchObject({ ok: true, nhanChieu: 1 })
+      expect(hang()?.ap_dung).toBe(0) // ap_dung của đêm GIỮ NGUYÊN
+      expect(json()).toMatchObject({ thuThachApDung: true, nhip: { lech: -2 } })
+      expect(await docThuThachDaAp(d.env, '12001', NGAY)).toMatchObject({ thuThach: TT, loiMoi: LOI })
+      expect(await hieuLuc()).toBeUndefined() // hàng bóng: núm KHÔNG áp
+      expect((await mayDaLam())?.so).toBe(1) // (e) bảng tin đếm theo cờ riêng
+    })
+    it('(b) chiều nộp ở chế độ CHẠY THỬ ⇒ thẻ KHÔNG hiện — dù hàng đêm đang áp (cờ riêng nói không)', async () => {
+      await nop([dem()]) // đêm thật, ap_dung 1
+      await cauHinh({ cheDo: 'bong' })
+      await nop([chieu()])
+      expect(json().thuThachApDung).toBe(false)
+      expect(hang()?.ap_dung).toBe(1)
+      expect(await docThuThachDaAp(d.env, '12001', NGAY)).toBeNull()
+      expect(await mayDaLam()).toBeUndefined()
+      // em chỉ có hàng chiều, chế độ chạy thử
+      d.sql.exec('DELETE FROM ai_dieu_chinh')
+      await nop([chieu()])
+      expect(json()).toMatchObject({ luot: 'chieu', thuThachApDung: false })
+      expect(await docThuThachDaAp(d.env, '12001', NGAY)).toBeNull()
+    })
+    it('độ tin cậy dưới ngưỡng hoặc cờ bo_nao.thuThach tắt lúc nộp ⇒ cờ riêng false', async () => {
+      await nop([chieu({ doTinCay: 0.5 })])
+      expect(json().thuThachApDung).toBe(false)
+      expect(await docThuThachDaAp(d.env, '12001', NGAY)).toBeNull()
+      d.sql.exec('DELETE FROM ai_dieu_chinh')
+      await cauHinh({ thuThach: false })
+      await nop([chieu()])
+      expect(json().thuThachApDung).toBe(false)
+      await cauHinh({ thuThach: true })
+      expect(await docThuThachDaAp(d.env, '12001', NGAY)).toBeNull() // cờ false đã ghi thì bật lại cờ chung KHÔNG làm sống lại hàng cũ (phải nộp lại)
+      // cờ chung tắt + đã có hàng đêm (đường GỘP): cũng false
+      d.sql.exec('DELETE FROM ai_dieu_chinh')
+      await nop([dem()])
+      await cauHinh({ thuThach: false })
+      await nop([chieu()])
+      expect(json().thuThachApDung).toBe(false)
+    })
+    it('(c) thầy huỷ điều chỉnh (huy = 1) ⇒ thẻ mất', async () => {
+      await nop([chieu()])
+      expect(await docThuThachDaAp(d.env, '12001', NGAY)).not.toBeNull()
+      expect(await boNaoBoDieuChinh(d.env, { sbd: '12001', ngay: NGAY })).toMatchObject({ ok: true })
+      expect(await docThuThachDaAp(d.env, '12001', NGAY)).toBeNull()
+      expect(await mayDaLam()).toBeUndefined()
+    })
+    it('hàng chiều-riêng-lẻ chế độ thật ⇒ thẻ HIỆN và được đếm ở bảng tin (dù bị bỏ qua ở núm và số đếm điều chỉnh)', async () => {
+      await nop([chieu()])
+      expect(await docThuThachDaAp(d.env, '12001', NGAY)).toMatchObject({ thuThach: TT })
+      expect(await hieuLuc()).toBeUndefined()
+      expect((await mayDaLam())?.so).toBe(1)
+    })
+    it('hàng cũ CHƯA có cờ riêng ⇒ theo ap_dung của điều chỉnh (tương thích ngược)', async () => {
+      for (const [ap, kq] of [[1, true], [0, false]] as const) {
+        d.sql.exec('DELETE FROM ai_dieu_chinh')
+        d.sql.prepare("INSERT INTO ai_dieu_chinh(sbd,ngay,json,do_tin,che_do,ap_dung,het_han,huy,tu_go,ly_do_bo,nop_luc) VALUES('12001',?,?,0.9,'that',?,?,0,0,'[]','x')").run(NGAY, JSON.stringify({ thuThach: TT, loiMoi: LOI }), ap, themNgay(NGAY, 3))
+        expect((await docThuThachDaAp(d.env, '12001', NGAY)) !== null, `ap_dung ${ap}`).toBe(kq)
+      }
+    })
   })
 
   it('laPhanTuChieu (hàm thuần): chỉ đúng khi có thuThach VÀ không núm nào VÀ không lời nào', () => {

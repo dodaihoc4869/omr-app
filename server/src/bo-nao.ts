@@ -576,18 +576,22 @@ export async function boNaoNop(env: Env, b: Obj = {}, nowMs: number = Date.now()
     const chieu = laPhanTuChieu(sach as unknown as Obj)
     if (chieu && truoc && truoc.luot !== DAU_HANG_CHIEU) {
       // LƯỢT CHIỀU trên hàng ĐÊM cùng ngày: chỉ thêm `thuThach` + `loiMoi`; núm, chế độ, áp dụng, hạn, độ tin cậy của đêm GIỮ NGUYÊN (không tính là một điều chỉnh mới).
-      luu.push(env.DB.prepare(`UPDATE ai_dieu_chinh SET json = ?, nop_luc = ? WHERE sbd = ? AND ngay = ?`).bind(JSON.stringify({ ...truoc, thuThach: (sach as unknown as Obj).thuThach, loiMoi: (sach as unknown as Obj).loiMoi }), nop, sbd, ngay))
+      // Thử thách có CỜ ÁP RIÊNG (`thuThachApDung`): hàng đêm có thể là hàng BÓNG (ap_dung = 0) mà chiều nộp ở chế độ THẬT vẫn phải hiện thẻ; núm đêm vẫn theo `ap_dung` như cũ.
+      luu.push(env.DB.prepare(`UPDATE ai_dieu_chinh SET json = ?, nop_luc = ? WHERE sbd = ? AND ngay = ?`).bind(JSON.stringify({ ...truoc, thuThach: (sach as unknown as Obj).thuThach, loiMoi: (sach as unknown as Obj).loiMoi, thuThachApDung: apDung && ch.thuThach !== false }), nop, sbd, ngay))
       nhanChieu++
       continue
     }
     const ghi: Obj = { ...(sach as unknown as Obj) }
     if (chieu) {
       ghi.luot = DAU_HANG_CHIEU // hàng chiều-riêng-lẻ: tầng đọc và các số đếm bỏ qua
+      ghi.thuThachApDung = apDung && ch.thuThach !== false
       nhanChieu++
     } else {
-      if (truoc && truoc.thuThach !== undefined && ghi.thuThach === undefined) {
-        ghi.thuThach = truoc.thuThach // đêm nộp lại SAU chiều: giữ thử thách đã có
+      if (ghi.thuThach !== undefined && ghi.thuThach !== null) ghi.thuThachApDung = apDung && ch.thuThach !== false
+      else if (truoc && truoc.thuThach !== undefined) {
+        ghi.thuThach = truoc.thuThach // đêm nộp lại SAU chiều: giữ thử thách đã có (cả cờ áp riêng)
         ghi.loiMoi = truoc.loiMoi
+        if (truoc.thuThachApDung !== undefined) ghi.thuThachApDung = truoc.thuThachApDung
       }
       nhan++
       if (apDung) soApDung++

@@ -10,7 +10,7 @@ import { tenLopCuaEm } from './ten-lop'
 import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
 import { tenViec } from './nhat-ky-may'
 import { docCoTuDong, KHOA_TU_DONG } from './tu-dong-cac-viec'
-import { docThuThachTuDieuChinh, NGUON_THU_THACH } from './thu-thach-rieng'
+import { docThuThachTuDieuChinh, NGUON_THU_THACH, thuThachDaApTuHang } from './thu-thach-rieng'
 
 type Dong = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -227,7 +227,10 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const nhacTuDong = (rNhac ?? []).filter((x) => chuoi(x.moc) !== 'tay')
 
   // 8 · Bộ não: điều chỉnh đã áp hôm nay + bản tin gần nhất
-  const rDc = await Q.hoi("SELECT sbd, json FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 1 AND huy = 0 AND COALESCE(json_extract(json, '$.luot'), '') <> 'chieu'", ngay)
+  // Điều chỉnh đã áp (`ap_dung = 1`) VÀ hàng có thử thách được áp riêng (`thuThachApDung`; hàng đêm bóng + chiều thật). MỘT truy vấn; tách hai tập ở dưới.
+  const rDcTho = await Q.hoi("SELECT sbd, json, ap_dung FROM ai_dieu_chinh WHERE ngay = ? AND huy = 0 AND (ap_dung = 1 OR json_extract(json, '$.thuThachApDung') = 1)", ngay)
+  const luotChieu = (json: unknown): boolean => { try { return (JSON.parse(chuoi(json)) as { luot?: unknown })?.luot === 'chieu' } catch { return false } }
+  const rDc = rDcTho ? rDcTho.filter((x) => so(x.ap_dung) === 1 && !luotChieu(x.json)) : rDcTho
   const rBt = await Q.hoi(`SELECT ngay, json, nop_luc, so_em, so_nhan, so_bi_loai FROM ai_ban_tin WHERE ngay <= ? ORDER BY ngay DESC LIMIT ${SO_DEM_TRUNG_VI + 1}`, ngay)
   // 9 · vinh danh hôm nay (bản đã đăng hôm nay lưu ở ngày hôm qua)
   // (vinh danh hôm nay + số em đã làm thử thách riêng: MỘT truy vấn; thiếu bảng daily_honors ⇒ chỉ đọc phần thử thách)
@@ -381,7 +384,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   } catch { soVinhDanh = 0 }
   const soEmDaLamThuThach = so((rVd ?? []).find((x) => chuoi(x.k) === 'tt')?.v)
   let soEmNhanThuThach = 0
-  for (const x of rDc ?? []) if (docThuThachTuDieuChinh(x.json)) soEmNhanThuThach++
+  for (const x of rDcTho ?? []) if (docThuThachTuDieuChinh(x.json) && thuThachDaApTuHang(x.json, x.ap_dung)) soEmNhanThuThach++
   const emNhac = new Set(nhacTuDong.map((x) => chuoi(x.sbd)))
   const soPh = new Set(nhacTuDong.map((x) => chuoi(x.ph_nhom)).filter(Boolean)).size
   const soEmBoNaoSoi = bt && chuoi(bt.ngay) === ngay ? so(bt.so_em) : 0

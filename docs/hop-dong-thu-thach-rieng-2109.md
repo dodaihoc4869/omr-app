@@ -79,3 +79,10 @@ Với mỗi dạng (soCau chia đều, dạng đầu nhận phần dư): câu c�
 - **Đọc:** hàng `luot = "chieu"` bị BỎ QUA ở: điều chỉnh có hiệu lực cho kế hoạch ngày / BTVN (`docDieuChinhHieuLuc`), lời nhắn, `so_nhan` + `so_chi_ghi_so` của bản tin, `soEmHoTro` + `apDung` của `/ai/dem-qua`, "kết quả đêm qua" và chống lặp lời của `/ai/ho-so-ngay`, `boNao.soEmDieuChinh` của `/gv/bang-tin`, dòng thời gian `bo_nao` của Toàn cảnh một em. Chỉ `thu-thach-rieng.ts` đọc hàng ấy (`ap_dung = 1`, `huy = 0`). `/ai/nhat-ky` trả thêm (chỉ-thêm) `luot: "chieu"` (chỉ hàng chiều-riêng-lẻ) và `thuThach` + `loiMoi` khi có.
 - Em chỉ có hàng chiều ⇒ điều chỉnh hiệu lực = VẮNG (y hệt không có bộ não); hàng đêm hôm qua còn hạn vẫn có hiệu lực.
 - Test: `tests/bo-nao-may-chu-2109.test.ts` (mục "LƯỢT CHIỀU không đè núm của đêm", đột biến 22/22 chết) + `tests/gv-hom-nay-v2-server-2109.test.ts`.
+
+## 12 · CỜ ÁP RIÊNG của thử thách `json.thuThachApDung` (Boss 21/09; lượt sáng nộp ở chế độ chạy thử ⇒ 147 hàng `ap_dung = 0`)
+- Thử thách KHÔNG còn theo `ap_dung` của điều chỉnh. Lúc nộp, máy chủ ghi `thuThachApDung = true` khi **chế độ hiệu lực của em là THẬT** VÀ **độ tin cậy ≥ ngưỡng** VÀ **cờ `bo_nao.thuThach` bật** (phần tử đã qua khuôn); ngược lại `false`. Áp cho cả đường GỘP vào hàng đêm, hàng chiều-riêng-lẻ và hàng thường có `thuThach`.
+- Đọc (`docThuThachDaAp`): hàng `(sbd, ngay, huy = 0)` có `thuThachApDung === true` (hàng CŨ chưa có cờ ⇒ theo `ap_dung`) + cờ `bo_nao.thuThach` còn bật lúc đọc + đúng khuôn. Thầy huỷ điều chỉnh (`huy = 1`) ⇒ thẻ mất. Đêm nộp lại giữ `thuThach` + `loiMoi` + cờ đã có.
+- Núm đêm (nhịp, dạng, khắc phục) VẪN theo `ap_dung`: hàng bóng KHÔNG áp núm dù thẻ thử thách hiện.
+- `/gv/bang-tin` `mayDaLam.thu_thach_rieng`: "N em nhận thử thách riêng" đếm theo cờ riêng (kể cả hàng bóng và chiều-riêng-lẻ); `boNao.soEmDieuChinh` vẫn đếm điều chỉnh đã áp (`ap_dung = 1`, không tính hàng chiều-riêng-lẻ). Vẫn ≤ 12 truy vấn (một truy vấn hàng `ai_dieu_chinh` lấy cả hai tập).
+- Test: `tests/bo-nao-may-chu-2109.test.ts` mục "CỜ ÁP RIÊNG" (bóng + chiều thật ⇒ hiện; chiều chạy thử ⇒ không; tin cậy thấp / cờ tắt ⇒ không; huỷ ⇒ mất; hàng cũ ⇒ theo `ap_dung`).

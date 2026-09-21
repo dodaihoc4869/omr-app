@@ -179,11 +179,25 @@ export async function docCoThuThach(env: Env): Promise<boolean> {
   }
 }
 
-/** Thử thách Bộ não ĐÃ ÁP cho (em, ngày): điều chỉnh `ap_dung = 1`, chưa huỷ, đúng khuôn, cờ bật. */
+/**
+ * Hàng `ai_dieu_chinh` có ÁP thử thách không? CỜ ÁP RIÊNG `json.thuThachApDung` (máy chủ ghi lúc nộp: chế độ hiệu lực của em là THẬT + cờ `bo_nao.thuThach` bật + độ tin cậy đạt);
+ * hàng cũ chưa có cờ ⇒ theo `ap_dung` của điều chỉnh. Hàng đêm BÓNG (`ap_dung = 0`) mà chiều nộp ở chế độ thật vẫn có thẻ; núm đêm vẫn theo `ap_dung`.
+ */
+export function thuThachDaApTuHang(json: unknown, apDung: unknown): boolean {
+  let flag: unknown
+  try {
+    flag = (JSON.parse(String(json ?? '')) as Dong)?.thuThachApDung
+  } catch {
+    flag = undefined
+  }
+  return typeof flag === 'boolean' ? flag : Number(apDung) === 1
+}
+
+/** Thử thách Bộ não ĐÃ ÁP cho (em, ngày): hàng chưa huỷ (`huy = 0`) có cờ áp riêng (`thuThachApDung`), đúng khuôn, cờ `bo_nao.thuThach` còn bật. */
 export async function docThuThachDaAp(env: Env, sbd: string, ngay: string): Promise<{ thuThach: ThuThachBoNao; loiMoi: string } | null> {
   try {
-    const r = await env.DB.prepare('SELECT json FROM ai_dieu_chinh WHERE sbd = ? AND ngay = ? AND ap_dung = 1 AND huy = 0').bind(sbd, ngay).first<{ json: string }>()
-    if (!r) return null
+    const r = await env.DB.prepare('SELECT json, ap_dung FROM ai_dieu_chinh WHERE sbd = ? AND ngay = ? AND huy = 0').bind(sbd, ngay).first<{ json: string; ap_dung: number }>()
+    if (!r || !thuThachDaApTuHang(r.json, r.ap_dung)) return null
     const t = docThuThachTuDieuChinh(r.json)
     if (!t || !(await docCoThuThach(env))) return null
     return t
