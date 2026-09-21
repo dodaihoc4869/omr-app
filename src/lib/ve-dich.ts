@@ -319,3 +319,46 @@ export function raiOnQuaLich(soCau: number, nganSach: number, coNoChang: boolean
   }
   return { cacNgay, tran, conLai: n - cacNgay.reduce((s, x) => s + x, 0) }
 }
+
+// ══════════════════════════════ NỘP TRỄ: CHIA CHẶNG CHO EM CHƯA TỪNG MỞ BÀI (Điều 4 B) ══════════════════════════════
+export interface CauLoiNopTre { qid: string; giay?: number }
+export interface KetQuaChiaNopTre {
+  /** Các chặng, mỗi chặng là danh sách qid theo ĐÚNG thứ tự câu lõi đầu vào (không xáo, không thêm, không chặng rỗng). */
+  chang: string[][]
+  /** Giờ mở từng chặng (ISO UTC): chặng của NGÀY VN đầu tiên mở NGAY (`now`); mỗi ngày VN tiếp theo mở 00:00 giờ VN. Không lùi. */
+  moLuc: string[]
+}
+export const TRAN_NOP_TRE_MAC_DINH = { cau: 30, phut: 60, changMoiNgay: 2 } as const
+
+/**
+ * Bài cá nhân hoá em CHƯA TỪNG MỞ mà hạn đã qua (nộp trễ): chia phần LÕI thành chặng ≤ `tranBuoi.cau` câu VÀ ≤ `tranBuoi.phut` phút (mỗi câu tính `giay` của nó, thiếu / không hợp lệ (ngoài 5…900) thì `giayMoiCau`,
+ * mặc định 90), MỖI NGÀY VN tối đa `changMoiNgay` chặng: các chặng của ngày đầu (`now`) mở NGAY (chặng sau vẫn phải chờ chặng trước xong nhờ luật tuần tự), chặng ngày kế mở 00:00 giờ VN của ngày ấy, v.v.
+ * Thứ tự câu giữ NGUYÊN; mọi câu đúng MỘT chặng; không chặng rỗng; một câu luôn vừa một chặng (≤ 15 phút).
+ */
+export function chiaChangNopTre(v: { now: number; cauLoi: readonly CauLoiNopTre[]; giayMoiCau?: number; tranBuoi?: Partial<{ cau: number; phut: number; changMoiNgay: number }> }): KetQuaChiaNopTre {
+  const tran = { ...TRAN_NOP_TRE_MAC_DINH, ...(v.tranBuoi ?? {}) }
+  const tranCau = Math.max(1, soNguyenDuong(tran.cau) || TRAN_NOP_TRE_MAC_DINH.cau)
+  const tranPhut = Math.max(1, soDuong(tran.phut) || TRAN_NOP_TRE_MAC_DINH.phut)
+  const moiNgay = Math.max(1, soNguyenDuong(tran.changMoiNgay) || TRAN_NOP_TRE_MAC_DINH.changMoiNgay)
+  const macDinh = typeof v.giayMoiCau === 'number' && Number.isFinite(v.giayMoiCau) && v.giayMoiCau >= 5 && v.giayMoiCau <= 900 ? v.giayMoiCau : LICH_CHANG.GIAY_MAC_DINH
+  const giayCua = (c: CauLoiNopTre): number => (typeof c.giay === 'number' && Number.isFinite(c.giay) && c.giay >= 5 && c.giay <= 900 ? c.giay : macDinh)
+  const chang: string[][] = []
+  let hienTai: string[] = []
+  let giayHienTai = 0
+  for (const c of v.cauLoi) {
+    const g = giayCua(c)
+    if (hienTai.length > 0 && (hienTai.length + 1 > tranCau || Math.ceil((giayHienTai + g) / 60) > tranPhut)) {
+      chang.push(hienTai)
+      hienTai = []
+      giayHienTai = 0
+    }
+    hienTai.push(c.qid)
+    giayHienTai += g
+  }
+  if (hienTai.length > 0) chang.push(hienTai)
+  const moLuc = chang.map((_, i) => {
+    const ngayThu = Math.floor(i / moiNgay)
+    return new Date(ngayThu === 0 ? v.now : dauNgayVn(v.now) + ngayThu * MS_NGAY).toISOString()
+  })
+  return { chang, moLuc }
+}
