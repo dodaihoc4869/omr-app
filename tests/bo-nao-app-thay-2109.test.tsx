@@ -224,10 +224,14 @@ describe('KhoiBoNaoDemQua — bản tin đêm qua (tự hành)', () => {
     expect(screen.queryByText(/CHẠY THỬ/)).toBeNull()
   })
 
-  it('chưa chạy lần nào ⇒ "Bộ não chưa chạy lần nào", KHÔNG có bản tin', async () => {
+  it('chưa có bản tin (chưa chạy lần nào) ⇒ trạng thái TRUNG TÍNH "chưa có bản tin cho hôm nay — lượt đầu chạy khoảng 04:00", KHÔNG khung đỏ', async () => {
     chay({ chayLanCuoi: null })
-    expect(await screen.findByText('Bộ não chưa chạy lần nào')).toBeTruthy()
-    expect(screen.getByText(/Chưa có báo cáo/)).toBeTruthy()
+    expect(await screen.findByText('Chưa có bản tin cho hôm nay')).toBeTruthy()
+    expect(screen.getByText('Bộ não A.I chưa có bản tin cho hôm nay')).toBeTruthy()
+    expect(screen.getByText(/lượt đầu chạy khoảng 04:00/)).toBeTruthy()
+    // TRUNG TÍNH: không khung đỏ / cảnh báo vàng-đỏ, không role=alert
+    expect(document.querySelector('.bnao-ghi-chu--loi, .bnao-ghi-chu--canh')).toBeNull()
+    expect(screen.queryByRole('alert')).toBeNull()
   })
 
   it('CHẠY THỬ: nhãn "CHẠY THỬ — chưa tác động tới học sinh", tiêu đề chỉ nói đã soi, dòng điều chỉnh ghi "ĐỀ XUẤT" (không "ĐÃ LÀM")', async () => {

@@ -152,13 +152,14 @@ export default function KhoiBoNaoDemQua({
   const daApDung = (d.soEmHoTro ?? 0) > 0 || d.banTin.some((x) => x.apDung === true)
   const tt = trangThaiChay(d.chayLanCuoi, nayMs)
   if (tt === 'chua_chay') {
+    // CHƯA có bản tin (lượt chạy đầu chưa tới) là trạng thái TRUNG TÍNH — không phải lỗi (Boss 21/09): nền xám, chữ thường; đỏ chỉ khi > 36 giờ không chạy hoặc lệnh lỗi thật.
     return (
       <section className="bnao" data-khoi="bo-nao-dem-qua" aria-label="Bộ não đêm qua">
-        {dauKhoi('Bộ não A.I · đêm qua', 'Bộ não chưa chạy lần nào', chip)}
-        <p className="bnao-ghi-chu bnao-ghi-chu--canh" role="status">
+        {dauKhoi('Bộ não A.I · đêm qua', 'Chưa có bản tin cho hôm nay', chip)}
+        <p className="bnao-ghi-chu" role="status">
           <Clock size={18} aria-hidden="true" />
           <span>
-            <b>Chưa có báo cáo.</b> Báo cáo đầu tiên xuất hiện sau lượt chạy đầu của bộ não trên máy thầy. Học sinh vẫn học bình thường.
+            <b>Bộ não A.I chưa có bản tin cho hôm nay</b> — lượt đầu chạy khoảng 04:00. Học sinh vẫn học bình thường.
           </span>
         </p>
       </section>
