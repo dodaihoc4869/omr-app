@@ -342,6 +342,36 @@ describe('docDauVao — đọc thân trả về của /gv/buoi-chua-de-xuat (Cod
   })
 })
 
+describe('THÂN TRẢ THẬT của Code 3 (`docs/mau-tra-buoi-chua-de-xuat-2109.json`) đi qua đúng đường ống', () => {
+  const mau = JSON.parse(readFileSync('docs/mau-tra-buoi-chua-de-xuat-2109.json', 'utf8'))
+  it('parser đọc đúng: 8 em có sổ, dạng yếu 3 em (có thêm nguồn Bộ não vì có ở dangBoNao), 2 câu, 1 gợi ý gọi lên bảng; `lop`/`khoi`/`tiLeSai`/`soTruyVan` thừa không làm hỏng', () => {
+    const d = docDauVao(mau)!
+    expect(d).not.toBeNull()
+    expect(d.soEmCoSo).toBe(8)
+    expect(d.lop).toBe('12')
+    expect(d.dangYeu).toEqual([{ ma: 'ESTE.THUY_PHAN', ten: 'ESTE.THUY_PHAN', soEmYeu: 3, nguon: ['ho_so', 'bo_nao'] }])
+    expect(d.cauSaiNhieu.map((c) => [c.qid, c.soEmLam, c.soEmSai, c.loi, c.emSai.length])).toEqual([['DH-12-C1-B2-I-49', 8, 5, false, 5], ['DH-12-C1-B2-II-3', 6, 3, false, 3]])
+    expect(d.goiY).toEqual([{ sbd: '12002', hoTen: 'Học sinh mẫu 2', hanhDong: 'goi_len_bang', dang: 'ESTE.THUY_PHAN' }])
+  })
+  it('có kho trên máy thầy khớp mã ⇒ thẻ có 2 câu + em; tên dạng LẤY TỪ KHO (`dang.ten`) khi máy chủ chỉ trả mã; không kho ⇒ thẻ ẩn', () => {
+    const cauKho = (qid: string, phan: 'I' | 'II', dang: string, ten: string): CauKho => ({ qid, phan, dang, sao: 1, q: phan === 'I' ? { ...cauI(qid), dang: { ma: dang, ten } } : { id: qid, text: 'Câu đúng sai', ideas: ['a', 'b', 'c', 'd'], correct: ['D', 'S', 'D', 'S'], dang: { ma: dang, ten } } })
+    const kho = [cauKho('DH-12-C1-B2-I-49', 'I', 'ESTE.THUY_PHAN', 'Thuỷ phân ester'), cauKho('DH-12-C1-B2-II-3', 'II', 'ESTE.XA_PHONG', 'Xà phòng hoá')]
+    const r = deXuatBuoiChua(docDauVao(mau)!, kho)
+    expect(r.co).toBe(true)
+    expect(r.cau.map((c) => c.qid)).toEqual(['DH-12-C1-B2-I-49', 'DH-12-C1-B2-II-3'])
+    expect(r.cacLyDo[0]).toBe('Dạng em đang yếu: Thuỷ phân ester — 3/8 em') // không lộ mã ESTE.THUY_PHAN ra màn thầy
+    expect(r.em[0]).toEqual({ sbd: '12002', hoTen: 'Học sinh mẫu 2', lyDo: 'Bộ não A.I gợi ý' })
+    expect(r.boQua).toEqual({ khongCoTrongKho: 0, tuLuan: 0 })
+    expect(deXuatBuoiChua(docDauVao(mau)!, []).co).toBe(false)
+  })
+  it('tên dạng: máy chủ trả tên thật thì giữ; trả mã mà kho không có tên thì giữ mã (không bịa)', () => {
+    const dv = docDauVao({ ...mau, dangCaLopYeu: [{ lop: 'A', siSo: 9, dang: [{ ma: 'D0', ten: 'Tên do máy chủ', soEmYeu: 5 }, { ma: 'D1', ten: 'D1', soEmYeu: 4 }] }], cauSaiNhieu: [], dangBoNao: [] })!
+    const r = deXuatBuoiChua(dv, KHO)
+    expect(r.cacLyDo).toContain('Dạng em đang yếu: Tên do máy chủ — 5/8 em')
+    expect(r.cacLyDo).toContain('Dạng em đang yếu: D1 — 4/8 em')
+  })
+})
+
 describe('tính chất: tất định, biên, không sửa đầu vào', () => {
   it('300 đầu vào ngẫu nhiên: cùng đầu vào ⇒ cùng kết quả; câu ∈ kho, không tự luận, không trùng, ≤ 10, mỗi dạng ≤ 2, vừa ngân sách; em không trùng ≤ 20; không sửa đầu vào', () => {
     const rnd = mulberry32(21092026)

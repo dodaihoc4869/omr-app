@@ -185,6 +185,13 @@ export function deXuatBuoiChua(dv: DauVaoDeXuat, kho: readonly CauKho[], ch: Cau
   if (dv.soEmCoSo < D.SO_EM_TOI_THIEU_CO_SO) return AN('it_du_lieu')
   const theoQid = new Map<string, CauKho>()
   for (const c of kho) if (!theoQid.has(c.qid)) theoQid.set(c.qid, c)
+  // Tên dạng thân thiện: máy chủ chỉ có mã dạng (`ten` = mã) ⇒ lấy tên đã ghi trên câu của kho máy thầy (`dang.ten`); không có thì giữ như máy chủ trả.
+  const tenKho = new Map<string, string>()
+  for (const c of kho) {
+    const d = (c.q as { dang?: { ma?: unknown; ten?: unknown } } | null | undefined)?.dang
+    if (d && typeof d.ma === 'string' && typeof d.ten === 'string' && d.ten.trim() && !tenKho.has(d.ma)) tenKho.set(d.ma, d.ten.trim())
+  }
+  const tenDang = (d: DangYeuLop): string => (d.ten && d.ten !== d.ma ? d.ten : tenKho.get(d.ma) ?? d.ten ?? d.ma)
 
   // 2 — dạng cả lớp yếu
   const dangTop = dv.dangYeu
@@ -265,7 +272,7 @@ export function deXuatBuoiChua(dv: DauVaoDeXuat, kho: readonly CauKho[], ch: Cau
 
   // lý do hiển thị
   const cacLyDo: string[] = []
-  for (const d of dangTop.filter((x) => chon.some((c) => c.dang === x.ma)).slice(0, 2)) cacLyDo.push(`Dạng em đang yếu: ${d.ten} — ${d.soEmYeu}/${dv.soEmCoSo} em`)
+  for (const d of dangTop.filter((x) => chon.some((c) => c.dang === x.ma)).slice(0, 2)) cacLyDo.push(`Dạng em đang yếu: ${tenDang(d)} — ${d.soEmYeu}/${dv.soEmCoSo} em`)
   const soLoi = chon.filter((c) => c.loi).length
   if (soLoi > 0) cacLyDo.push(`Câu cốt lõi nhiều em sai: ${soLoi} câu`)
   const nBoNao = em.filter((e) => e.lyDo === 'Bộ não A.I gợi ý').length
