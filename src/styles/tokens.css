@@ -182,6 +182,19 @@
   --vd-do: #ea4335;
 }
 
+/* BẢNG TIN CỦA THẦY bản 3 (thầy chốt 21/09; bản vẽ docs/ban-ve-bang-tin-v3-2109/) — màu KHÔNG có sẵn trong bảng M3/gg: thanh "đang làm" (hổ phách),
+ * thanh "dạng vấp" (cam đậm), ô "Máy đã tự làm hôm nay" (nền xanh đen ở CẢ sáng và tối). Chữ/nền còn lại dùng token --m3-* sẵn có. Dùng ở src/styles/bang-tin-v3.css. */
+:root {
+  --bt-dang-lam: #f1b44c;
+  --bt-dang-lam-chu: #3a2500;
+  --bt-vap: #c2410c;
+  --bt-may-nen: #10233f;
+  --bt-may-chu: #ffffff;
+  --bt-may-phu: #c9d8f0;
+  --bt-may-vien: #2b4166;
+  --bt-may-xanh: #7ee0a6;
+}
+
 /* KHUNG LỜI GIẢI ĐỌC ĐƯỢC (`.readable-solution`, src/index.css) — cặp màu riêng để chữ lời giải luôn đủ tương phản dù bị lớp tiện ích
  * Tailwind trộn sáng/tối. Trước 21/09 nằm thẳng trong index.css (mã màu thô, làm `npm run check:mau` đỏ); nay đứng đây, một chỗ.
  * Nền tối theo lớp `.dark` / `[data-theme="dark"]` — đúng bộ chọn cũ của khung này (không theo prefers-color-scheme). */
@@ -245,6 +258,12 @@
 
     --bong-1: 0 1px 3px rgba(0, 0, 0, 0.4);
     --bong-2: 0 4px 16px rgba(0, 0, 0, 0.5);
+
+    /* bảng tin của thầy: ô "Máy đã tự làm" vẫn nền đậm (sáng hơn nền trang một chút để còn nổi khối) */
+    --bt-dang-lam: #e9a93a;
+    --bt-vap: #fb923c;
+    --bt-may-nen: #16305a;
+    --bt-may-vien: #34507d;
   }
 }
 

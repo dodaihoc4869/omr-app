@@ -6,7 +6,7 @@ import '../../styles/hom-nay-v2.css'
 /** Ô TRA CỨU ở đầu màn Hôm nay (bản vẽ docs/ban-ve-hom-nay-v2-2109/): gõ tên hoặc số báo danh — KHÔNG DẤU cũng ra — gợi ý hiện khi gõ; ↑ ↓ chọn, Enter mở TOÀN CẢNH em đó, Esc đóng.
  *  Mã ca 6 số vẫn mở ca (như ô cũ). Tìm MÁY CHỦ trước (`/gv/tim-em`, trễ ~200 ms, lượt cũ bị bỏ) rồi GỘP với danh sách lớp trên máy thầy — máy chủ lỗi/chưa có lệnh ⇒ vẫn dùng danh sách trên máy, không báo đỏ.
  *  Enter KHÔNG BAO GIỜ chết (lỗi thầy gặp 21/09): không có gợi ý ⇒ hỏi máy chủ đúng chuỗi đã gõ; có em thì mở, không có thì hiện dòng thật ("Không thấy em nào có số báo danh 12074"). */
-export default function OTraCuu({ ds, onMoEm, onMoCa, placeholder = 'Gõ tên hoặc số báo danh…' }: { ds: EmTraCuu[]; onMoEm: (sbd: string) => void; onMoCa: (ma: string) => void; placeholder?: string }) {
+export default function OTraCuu({ ds, onMoEm, onMoCa, placeholder = 'Gõ tên hoặc số báo danh…', autoFocus = false }: { ds: EmTraCuu[]; onMoEm: (sbd: string) => void; onMoCa: (ma: string) => void; placeholder?: string; autoFocus?: boolean }) {
   const [q, setQ] = useState('')
   const [mo, setMo] = useState(false)
   const [chon, setChon] = useState(0)
@@ -92,6 +92,8 @@ export default function OTraCuu({ ds, onMoEm, onMoCa, placeholder = 'Gõ tên ho
           aria-autocomplete="list"
           aria-label="Tìm học sinh theo tên hoặc số báo danh"
           autoComplete="off"
+          // eslint-disable-next-line jsx-a11y/no-autofocus -- tấm tìm em vừa mở ⇒ đặt con trỏ vào ô ngay
+          autoFocus={autoFocus}
           value={q}
           placeholder={placeholder}
           onChange={(e) => {

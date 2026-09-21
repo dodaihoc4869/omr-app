@@ -19,7 +19,7 @@ const nap = vi.hoisted(() => ({ hom: null as unknown, cau: null as unknown, cho:
 vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }) }))
 vi.mock('../src/lib/exam-db', () => ({ loadTeacherSecret: async () => 'bi-mat-thu' }))
 vi.mock('../src/lib/cap-nhat-app', () => ({ daySangBanMoi: () => {} }))
-import HomNayScreen from '../src/screens/HomNayScreen'
+import HomNayCu from '../src/screens/HomNayCu'
 import ExamHubScreen from '../src/screens/ExamHubScreen'
 
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
@@ -104,9 +104,9 @@ describe('hom-nay-api: gọi máy chủ', () => {
   })
 })
 
-describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các chuỗi của bản 1)', () => {
+describe('HomNayCu = màn Hôm nay BẢN 2, nay là bản DỰ PHÒNG khi máy chủ chưa có /gv/bang-tin (thầy lệnh 21/09, sửa CÓ CHỦ Ý các chuỗi của bản 1)', () => {
   it('ĐANG CHỜ MÁY CHỦ (lệnh chưa có): bốn thẻ số hiện "—" và "đang chờ máy chủ", KHÔNG số nào bịa; vẫn có ô tra cứu lớn và các ô', async () => {
-    const { container } = render(<HomNayScreen />)
+    const { container } = render(<HomNayCu />)
     await screen.findByText('Danh sách em cần giúp: đang chờ máy chủ.')
     const so = [...container.querySelectorAll('.hn-so-gia-tri')].map((e) => e.textContent)
     expect(so).toEqual(['—', '—', '—', '—'])
@@ -128,7 +128,7 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
       lyDoThieu: { nhiemVu: 'Chưa có kế hoạch ngày hôm nay (cron 00:01 hoặc lượt mở của em chưa lập)', btvn: 'Chưa có kế hoạch ngày hôm nay', canYTuong: 'Không đọc được hồ sơ dạng', dangYeu: 'Không đọc được hồ sơ dạng' },
     }
     nap.cau = { qidToiHan: 1179, qidPhucVuDuoc: 939 } // lệnh câu cần ôn lại trả lời được — chỉ các khối kế hoạch/hồ sơ thiếu
-    const { container } = render(<HomNayScreen />)
+    const { container } = render(<HomNayCu />)
     expect(await screen.findByText('Danh sách em cần giúp: Không đọc được hồ sơ dạng.')).toBeTruthy()
     expect(screen.getByText('Dạng yếu theo lớp: Không đọc được hồ sơ dạng.')).toBeTruthy()
     expect(screen.getByText('Chưa có kế hoạch ngày hôm nay (cron 00:01 hoặc lượt mở của em chưa lập)')).toBeTruthy() // thẻ số nhiệm vụ
@@ -140,7 +140,7 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
 
   it('ĐANG TẢI: chữ "Đang tải…", chưa số nào', () => {
     nap.cho = true
-    const { container } = render(<HomNayScreen />)
+    const { container } = render(<HomNayCu />)
     expect(screen.getAllByText('Đang tải…').length).toBeGreaterThan(0)
     expect([...container.querySelectorAll('.hn-so-gia-tri')].map((e) => e.textContent)).toEqual(['—', '—', '—', '—'])
   })
@@ -148,7 +148,7 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
   it('CÓ DỮ LIỆU: mỗi số trên thẻ truy được về một trường của lệnh; danh sách em, dạng yếu, Đoàn Hộ Tống; chữ theo CHUẨN TỪ NGỮ', async () => {
     nap.hom = MAU
     nap.cau = { qidToiHan: 1179, qidPhucVuDuoc: 939 }
-    const { container } = render(<HomNayScreen />)
+    const { container } = render(<HomNayCu />)
     await screen.findByText('Nguyễn Minh Khôi')
     await waitFor(() => expect(container.querySelectorAll('.hn-so-gia-tri')[2].textContent).toBe('1.179'))
     const so = [...container.querySelectorAll('.hn-so-gia-tri')].map((e) => e.textContent)
@@ -178,7 +178,7 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
 
   it('nút hành động: Xem hồ sơ (em trễ nhịp và em tụt bậc) → hồ sơ em; Đưa vào buổi chữa → Gọi lên bảng; Giao bài tập về nhà theo dạng → giaobtvn; Rút đề → examsetup', async () => {
     nap.hom = MAU
-    render(<HomNayScreen />)
+    render(<HomNayCu />)
     const xem = await screen.findAllByRole('button', { name: 'Xem hồ sơ' })
     expect(xem).toHaveLength(2)
     expect(screen.queryByRole('button', { name: 'Nhắn phụ huynh' })).toBeNull() // gỡ 21/09 (thầy lệnh Bỏ phiếu Zalo)
@@ -197,7 +197,7 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
   })
 
   it('ô tra cứu: 6 số → Chi tiết ca; tên KHÔNG DẤU hoặc SBD có trong danh sách lớp → TOÀN CẢNH em (bước 5; trước là hồ sơ); không có → báo ngay trong ô, không đổi màn', async () => {
-    render(<HomNayScreen />)
+    render(<HomNayCu />)
     const o = screen.getByRole('combobox', { name: 'Tìm học sinh theo tên hoặc số báo danh' })
     fireEvent.change(o, { target: { value: '111222' } })
     fireEvent.keyDown(o, { key: 'Enter' })
@@ -216,9 +216,10 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
 })
 
 describe('ExamHubScreen = trang chủ Hôm nay bản 2 (đã bỏ Bảng tin cũ); CSS', () => {
-  it('ExamHubScreen dựng HomNayScreen + nút Lấy bản mới; KHÔNG còn bảng tin hoạt động cũ (thầy lệnh bỏ)', async () => {
+  it('ExamHubScreen dựng HomNayScreen; máy chủ CHƯA có /gv/bang-tin ⇒ rơi về bản dự phòng HomNayCu (có nút Lấy bản mới); KHÔNG còn bảng tin hoạt động cũ (thầy lệnh bỏ)', async () => {
     render(<ExamHubScreen />)
-    expect(screen.getByText('Chào thầy Học')).toBeTruthy()
+    // Sửa có chủ ý 21/09 (Bảng tin bản 3): chờ lệnh /gv/bang-tin trả 404 rồi mới rơi về bản dự phòng — không còn dựng đồng bộ.
+    expect(await screen.findByText('Chào thầy Học')).toBeTruthy()
     expect(screen.queryByText('bảng tin hoạt động')).toBeNull()
     expect(screen.getByRole('button', { name: /Lấy bản mới/ })).toBeTruthy()
     expect(doc('src/screens/ExamHubScreen.tsx')).not.toContain('BangTinGiaoVien')
@@ -247,9 +248,9 @@ describe('ExamHubScreen = trang chủ Hôm nay bản 2 (đã bỏ Bảng tin cũ
 
   it('hợp đồng: màn (đủ dữ liệu) không có chữ "nắm chắc" hay kết luận năng lực; nguồn không dùng chữ "nắm chắc"', async () => {
     nap.hom = MAU
-    const { container } = render(<HomNayScreen />)
+    const { container } = render(<HomNayCu />)
     await screen.findByText('Nguyễn Minh Khôi')
     expect(container.textContent).not.toMatch(/nắm chắc|năng lực|giỏi|kém/i)
-    for (const t of ['src/screens/HomNayScreen.tsx', 'src/lib/hom-nay-api.ts', 'src/lib/hom-nay-v2.ts', 'src/components/hom-nay/ViecGap.tsx', 'src/components/hom-nay/OTraCuu.tsx']) expect(doc(t)).not.toContain('nắm chắc')
+    for (const t of ['src/screens/HomNayScreen.tsx', 'src/screens/HomNayCu.tsx', 'src/lib/hom-nay-api.ts', 'src/lib/hom-nay-v2.ts', 'src/components/hom-nay/ViecGap.tsx', 'src/components/hom-nay/OTraCuu.tsx']) expect(doc(t)).not.toContain('nắm chắc')
   })
 })

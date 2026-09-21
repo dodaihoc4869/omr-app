@@ -489,7 +489,7 @@ describe('KhoiBoNaoCaiDat — công tắc và chế độ theo lớp', () => {
 describe('nguồn: nối vào màn, đổi chữ "bóng" → "thử", không hex', () => {
   const doc = (f: string) => fs.readFileSync(path.join(__dirname, '..', f), 'utf8')
   it('Hôm nay · hồ sơ em · Cài đặt · Bảng tin đều gắn khối Bộ não A.I; nút nối hàm SẴN CÓ', () => {
-    const hn = doc('src/screens/HomNayScreen.tsx')
+    const hn = doc('src/screens/HomNayCu.tsx')
     // Bước 5 (Hôm nay v2, 21/09): bấm em ở khối Bộ não A.I mở TOÀN CẢNH (moToanCanh) thay vì hồ sơ; khoá Ý cũ: khối vẫn được dựng và cả ba lối nối đều là HÀM SẴN CÓ của store / setScreen.
     expect(hn).toContain("<KhoiBoNaoDemQua onMoHoSo={moToanCanh} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />")
     expect(hn).toContain('const moToanCanh = useAppStore((s) => s.moToanCanh)')

@@ -56,8 +56,8 @@ describe('KhoiBtvnLo — lô BTVN', () => {
   })
 
   it('khối lô BTVN nay CHỈ ở màn Giao BTVN — tab theo dõi, đọc lệnh Hôm nay chỉ đọc; màn Hôm nay bản 2 đã thay bằng ô Việc gấp (thầy lệnh 21/09, sửa CÓ CHỦ Ý)', () => {
-    expect(doc('src/screens/HomNayScreen.tsx')).not.toContain('KhoiBtvnLo')
-    expect(doc('src/screens/HomNayScreen.tsx')).toContain('<ViecGap />')
+    expect(doc('src/screens/HomNayCu.tsx')).not.toContain('KhoiBtvnLo')
+    expect(doc('src/screens/HomNayCu.tsx')).toContain('<ViecGap />')
     const pc = doc('src/screens/PhanCongScreen.tsx')
     expect(pc).toContain("tabBtvn === 'theodoi' && <KhoiBtvnLo")
     expect(pc).toContain('layHomNay()')

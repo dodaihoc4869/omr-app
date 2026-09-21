@@ -293,7 +293,8 @@ describe('Chế độ 2 — tối đa là số câu PHÂN BIỆT, không cộng 
 // đã phục vụ bản mới từ 01:06 và Actions báo success.
 // ===========================================================================
 describe('Nút lấy bản mới', () => {
-  const HUB = readFileSync(joinPath(process.cwd(), 'src/screens/ExamHubScreen.tsx'), 'utf8')
+  // Sửa có chủ ý 21/09 (Bảng tin bản 3 chỉ đọc, không nút): hàm nút dời từ ExamHubScreen sang NutCapNhatApp (nội dung giữ y nguyên; đặt ở Cài đặt và bản Hôm nay dự phòng).
+  const HUB = readFileSync(joinPath(process.cwd(), 'src/components/NutCapNhatApp.tsx'), 'utf8')
   const than = HUB.slice(HUB.indexOf('const capNhat = async ()'), HUB.indexOf('const capNhat = async ()') + 2600)
 
   it('xoá sạch mọi bộ đệm', () => {

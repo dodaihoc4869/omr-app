@@ -5,6 +5,7 @@ import { TheNoiDung } from '../components/DesignSystem'
 import KhoiBoNaoCaiDat from '../components/KhoiBoNaoCaiDat'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
 import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
+import NutCapNhatApp from '../components/NutCapNhatApp'
 import { useAppStore } from '../store/appStore'
 import { useGiaoDien, type GiaoDien } from '../lib/giao-dien-thay'
 
@@ -23,7 +24,7 @@ export default function CaiDatScreen() {
       <div className="gv-page-header">
         <div>
           <h1>Cài đặt</h1>
-          <p>Giao diện, Bộ não A.I, kết nối máy chủ và mật khẩu mở app</p>
+          <p>Giao diện, Bộ não A.I, kết nối máy chủ, mật khẩu mở app và cập nhật app</p>
         </div>
       </div>
 
@@ -56,6 +57,12 @@ export default function CaiDatScreen() {
 
       <TheNoiDung>
         <KhoiMatKhauApp showToast={showToast} />
+      </TheNoiDung>
+
+      <TheNoiDung>
+        <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k3)' }}>Cập nhật app</h2>
+        <p style={{ marginBottom: 'var(--k3)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Máy này chưa thấy tính năng mới? Bấm “Lấy bản mới” để tải bản mới nhất về; app tự mở lại một lần.</p>
+        <NutCapNhatApp />
       </TheNoiDung>
     </div>
   )
