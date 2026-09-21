@@ -18,7 +18,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Bài thầy giao về nhà | **Bài tập về nhà** (viết tắt BTVN) | bài tập, homework, mã tờ đề làm tên |
 | Một phần bài làm trong một buổi | **Chặng** ("Chặng 2 trong 7 chặng") | lô, đợt, phần, vòng |
 | Thời điểm cuối được nộp | **Hạn nộp** | deadline, mốc, hạn chót |
-| Buổi kiểm tra trên app | **Ca kiểm tra** | ca thi, đợt thi, bài thi |
+| Buổi kiểm tra trên app | **Ca kiểm tra** (màn học sinh/phụ huynh + chữ mới). APP THẦY: chữ quen "Ca thi", "Cho thi lại" ở luồng thi GIỮ NGUYÊN (test khoá, thầy quen dùng) | đợt thi, bài thi |
 | Câu cả lớp cùng làm | **Câu cốt lõi** | lõi, core |
 | Câu chọn riêng cho em | **Câu dành riêng cho em** | riêng, cá nhân hoá |
 | Câu cao hơn bậc của em | **Câu thử thách (sai không sao)** · **Thử sức thêm (không bắt buộc)** | loi_cao, bonus |
@@ -33,6 +33,12 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Trợ lý AI của từng em | **Bộ não A.I hỗ trợ riêng em <họ tên>** | bộ não (trơn), HLV, AI coach |
 | Chế độ chưa tác động học sinh | **Chạy thử** | chạy bóng, shadow |
 | Thầy nhắc em chưa nộp | **Cảnh báo của thầy** | push, notice |
+| Câu từng sai nay đã đúng lại đủ lịch | **Đã khắc phục** (trạng thái) — hoạt động làm lại gọi là **Ôn lại** | fixed, done |
+| Công tắc chia câu theo từng em (app thầy) | **Cá nhân hoá** (chữ của thầy, giữ) | — |
+| Số ngày liền em chưa làm câu nào trong kế hoạch | **Trễ nhịp N ngày** (chỉ app thầy) | lười, bỏ bê |
+| Em xuống một bậc ở một dạng | **Tụt bậc** (chỉ app thầy) | sa sút |
+| Dạng em sai nhiều | App thầy: **Dạng em đang yếu**. Màn học sinh/phụ huynh: **Dạng em đang luyện thêm** | yếu kém, hổng |
+| Bảng mỗi em nhận câu nào | **Xem trước phân bổ** (app thầy) | — |
 
 ### A3. Cách làm đợt chuẩn hoá (KHÔNG sửa bừa — nhiều test đang khoá chuỗi)
 Mỗi phiên rà làn của mình, lập BẢNG trong `docs/ra-soat-tu-ngu-2109-<phiên>.md`: `màn · chữ hiện tại · vấn đề (luật số mấy) · chữ đề nghị · tệp:dòng · test nào khoá`. Boss duyệt bảng ⇒ phiên sửa chữ + sửa test CÓ CHỦ Ý theo từng cụm màn, commit nhỏ, ảnh trước/sau. Ưu tiên: màn học sinh nhìn mỗi ngày (bảng nhiệm vụ, phiếu, game Đảo thần thú, Đoàn) → phụ huynh → thầy. KHÔNG đổi: câu chữ cảnh báo của MÀN THI THẬT (đã khoá), tên bảng/cột/mã nội bộ.
