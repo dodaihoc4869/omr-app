@@ -96,6 +96,7 @@ Phân vùng dự kiến theo hai bản thiết kế:
 
 > Chỉ giữ 12 dòng mới nhất ở đây để mỗi phiên đọc nhanh, đỡ tốn ngữ cảnh. Dòng cũ hơn: `docs/nhat-ky-dieu-phoi-cu.md` (các dòng "đã soát <mã>" cũ vẫn có hiệu lực — tra ở đó bằng `grep`).
 
+- 21/09 07:21 (giờ máy) · Boss · THẦY YÊU CẦU: ô chọn HẠN NỘP trong app giáo viên nhập theo NGÀY/THÁNG/NĂM + GIỜ:PHÚT, ĐỒNG BỘ 24 GIỜ ở mọi nơi (không phụ thuộc máy hiện AM/PM hay tháng/ngày). Giao Code 4: một ô dùng chung `ONgayGio24` thay mọi `datetime-local`/`date`/`time` của app thầy + mọi chỗ HIỆN hạn ghi "HH:mm · Thứ … dd/mm/yyyy" giờ VN.
 - 21/09 07:20 (giờ máy) · Boss · Boss đã soát adc85f1 (Code 4: adapter Bộ não khớp máy chủ THẬT — chỉ nói "đã hỗ trợ/đã làm" khi máy chủ báo apDung, bỏ điều chỉnh `daBo:false` không nói "đã bỏ") + 5cfb94a (Xem trước hiện lịch chặng theo GIỜ + cảnh báo hạn ngắn khi máy chủ trả; chưa trả ⇒ như cũ). Worktree sạch: 3 tệp test xanh, tsc -b --force sạch. ĐƯỢC ĐẨY.
 - 21/09 07:20 (giờ máy) · Boss · THẦY ĐÃ GIAO THỬ bài cá nhân hoá thật (thẻ "Bài tập: DH-12-C2-B6-TN: Chặng 1/1 · 8 câu") và YÊU CẦU sửa thẻ ở bảng nhiệm vụ học sinh: tên thẻ = "Bài tập về nhà · Chặng k", ghi RÕ tổng số chặng và HẠN CUỐI của chặng đang hiện (không hiện mã tờ đề làm tên). Giao Code 2 làm NGAY (việc nhỏ, trước thẻ Bộ não).
 - 21/09 07:14 (giờ máy) · Boss · Boss đã soát e6dca3a (Code 4, bản 1.1 phần làm ngay: hạn nộp mặc định 23:59 giờ VN, Xem trước hiện cảnh báo THẬT của máy chủ; test xanh, tsc -b --force sạch). ĐƯỢC ĐẨY.
