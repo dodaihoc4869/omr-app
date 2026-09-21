@@ -130,7 +130,7 @@ export default function BangTinPhuHuynh({
       <button
         type="button"
         onClick={() => onSelectTab?.('diem')}
-        className="m3-the-diem w-full text-left p-4 sm:p-5 rounded-3xl border-2 border-blue-600 dark:border-blue-300 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-blue-50/40 dark:from-blue-950/80 dark:via-slate-900 dark:to-indigo-950/60 shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.99]"
+        className="m3-the-diem w-full text-left p-4 sm:p-5 rounded-3xl border-2 border-blue-600 dark:border-blue-300 bg-gradient-to-r from-blue-50/90 via-indigo-50/70 to-blue-50/40 dark:from-blue-950/80 dark:via-slate-900 dark:to-indigo-950/60 shadow-md hover:shadow-lg transition duration-200 cursor-pointer group relative overflow-hidden active:scale-[0.99]"
       >
         {/* Vầng sáng nhấp nháy chuẩn Google */}
         <div className="m3-an absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-green-500/20 to-blue-500/20 rounded-3xl blur-md animate-pulse pointer-events-none" />
@@ -242,7 +242,7 @@ export default function BangTinPhuHuynh({
       {/* KHỐI 4 LỰA CHỌN KHẮC PHỤC LUYỆN ĐỀ (HIỆN TRỰC TIẾP TRONG Ô) - Ẩn ở app học sinh theo yêu cầu */}
       {!studentToken && (
         <div
-          className={`w-full p-3.5 sm:p-4 rounded-2xl border transition-all duration-150 shadow-2xs ${
+          className={`w-full p-3.5 sm:p-4 rounded-2xl border transition duration-150 shadow-2xs ${
             activeTab === 'khacphuc'
               ? 'border-2 border-amber-500 bg-amber-50/40 dark:bg-amber-950/30 shadow-md ring-2 ring-amber-400/30'
               : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
@@ -271,7 +271,7 @@ export default function BangTinPhuHuynh({
           <button
             type="button"
             onClick={() => onSelectTab?.('khacphuc', 1)}
-            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-rose-200/90 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:border-rose-300 dark:hover:border-rose-600 hover:shadow-sm transition-all cursor-pointer active:scale-[0.98] flex flex-col justify-between"
+            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-rose-200/90 dark:border-rose-900/60 bg-rose-50/40 dark:bg-rose-950/20 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:border-rose-300 dark:hover:border-rose-600 hover:shadow-sm transition cursor-pointer active:scale-[0.98] flex flex-col justify-between"
           >
             <div>
               <div className="flex items-start justify-between gap-2">
@@ -301,7 +301,7 @@ export default function BangTinPhuHuynh({
           <button
             type="button"
             onClick={() => onSelectTab?.('khacphuc', 2)}
-            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-amber-200/90 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:border-amber-300 dark:hover:border-amber-600 hover:shadow-sm transition-all cursor-pointer active:scale-[0.98] flex flex-col justify-between"
+            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-amber-200/90 dark:border-amber-900/60 bg-amber-50/40 dark:bg-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-950/40 hover:border-amber-300 dark:hover:border-amber-600 hover:shadow-sm transition cursor-pointer active:scale-[0.98] flex flex-col justify-between"
           >
             <div>
               <div className="flex items-start justify-between gap-2">
@@ -331,7 +331,7 @@ export default function BangTinPhuHuynh({
           <button
             type="button"
             onClick={() => onSelectTab?.('khacphuc', 3)}
-            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-blue-200/90 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm transition-all cursor-pointer active:scale-[0.98] flex flex-col justify-between"
+            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-blue-200/90 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 hover:bg-blue-50 dark:hover:bg-blue-950/40 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-sm transition cursor-pointer active:scale-[0.98] flex flex-col justify-between"
           >
             <div>
               <div className="flex items-start justify-between gap-2">
@@ -361,7 +361,7 @@ export default function BangTinPhuHuynh({
           <button
             type="button"
             onClick={() => onSelectTab?.('khacphuc', 4)}
-            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-purple-200/90 dark:border-purple-900/60 bg-purple-50/40 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:border-purple-300 dark:hover:border-purple-600 hover:shadow-sm transition-all cursor-pointer active:scale-[0.98] flex flex-col justify-between"
+            className="group/opt text-left p-4 sm:p-4.5 rounded-2xl border border-purple-200/90 dark:border-purple-900/60 bg-purple-50/40 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:border-purple-300 dark:hover:border-purple-600 hover:shadow-sm transition cursor-pointer active:scale-[0.98] flex flex-col justify-between"
           >
             <div>
               <div className="flex items-start justify-between gap-2">
@@ -435,7 +435,7 @@ export default function BangTinPhuHuynh({
             <button
               type="button"
               onClick={() => onSelectTab?.('diem')}
-              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+              className={`p-2.5 rounded-2xl border text-left transition duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
                 activeTab === 'diem'
                   ? 'border-2 border-blue-600 bg-blue-50 dark:bg-blue-950/80 shadow-sm ring-2 ring-blue-400/30'
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-300 hover:shadow-xs'
@@ -465,7 +465,7 @@ export default function BangTinPhuHuynh({
             <button
               type="button"
               onClick={() => onSelectTab?.('btvn')}
-              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+              className={`p-2.5 rounded-2xl border text-left transition duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
                 activeTab === 'btvn'
                   ? 'border-2 border-green-600 bg-emerald-50 dark:bg-emerald-950/80 shadow-sm ring-2 ring-emerald-400/30'
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-emerald-300 hover:shadow-xs'
@@ -495,7 +495,7 @@ export default function BangTinPhuHuynh({
             <button
               type="button"
               onClick={() => onSelectTab?.('mom')}
-              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+              className={`p-2.5 rounded-2xl border text-left transition duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
                 activeTab === 'mom'
                   ? 'border-2 border-red-600 bg-rose-50 dark:bg-rose-950/80 shadow-sm ring-2 ring-rose-400/30'
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-rose-300 hover:shadow-xs'
@@ -525,7 +525,7 @@ export default function BangTinPhuHuynh({
             <button
               type="button"
               onClick={() => onSelectTab?.('khacphuc')}
-              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+              className={`p-2.5 rounded-2xl border text-left transition duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
                 activeTab === 'khacphuc'
                   ? 'border-2 border-amber-500 bg-amber-50 dark:bg-amber-950/80 shadow-sm ring-2 ring-amber-400/30'
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-amber-300 hover:shadow-xs'
@@ -555,7 +555,7 @@ export default function BangTinPhuHuynh({
             <button
               type="button"
               onClick={() => onSelectTab?.('vaothi')}
-              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+              className={`p-2.5 rounded-2xl border text-left transition duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
                 activeTab === 'vaothi'
                   ? 'border-2 border-purple-600 bg-purple-50 dark:bg-purple-950/80 shadow-sm ring-2 ring-purple-400/30'
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-purple-300 hover:shadow-xs'
@@ -585,7 +585,7 @@ export default function BangTinPhuHuynh({
             <button
               type="button"
               onClick={() => onSelectTab?.('thanthu')}
-              className={`p-2.5 rounded-2xl border text-left transition-all duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
+              className={`p-2.5 rounded-2xl border text-left transition duration-150 cursor-pointer flex flex-col justify-between gap-2 active:scale-95 group shadow-2xs ${
                 activeTab === 'thanthu'
                   ? 'border-2 border-orange-600 bg-orange-50 dark:bg-orange-950/80 shadow-sm ring-2 ring-orange-400/30'
                   : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-orange-300 hover:shadow-xs'

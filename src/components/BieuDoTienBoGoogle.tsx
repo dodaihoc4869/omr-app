@@ -346,7 +346,7 @@ export default function BieuDoTienBoGoogle({ ca, diemDe, onChonCa }: BieuDoTienB
                   setChonIdx(idx)
                   if (onChonCa) onChonCa(c.maCa)
                 }}
-                className={`p-3.5 rounded-xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
+                className={`p-3.5 rounded-xl border transition flex items-center justify-between gap-3 cursor-pointer ${
                   chonIdx === idx
                     ? 'border-blue-500 bg-blue-50/40 dark:bg-blue-950/30'
                     : 'border-slate-100 dark:border-slate-800 hover:border-slate-300 bg-slate-50/50 dark:bg-slate-800/30'

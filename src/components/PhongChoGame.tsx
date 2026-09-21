@@ -314,7 +314,7 @@ export default function PhongChoGame({ cho, loiCho }: PhongChoGameProps) {
 
   const phong = (
     <div className="w-full flex flex-col items-center justify-center p-3 sm:p-4 select-none">
-      <div className="w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden text-center transition-all">
+      <div className="w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl overflow-hidden text-center transition">
         {/* Thanh tiêu đề Free Fire X Google Parachute */}
         <div className="m3-phong-cho-dau bg-gradient-to-r from-blue-600 via-emerald-600 to-indigo-600 p-3.5 text-white flex items-center justify-between text-xs font-bold">
           <div className="flex items-center gap-2">

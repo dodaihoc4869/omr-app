@@ -352,7 +352,7 @@ export function DongCauSai({ c, stt }: { c: CauSaiHienThi; stt: number }) {
   const yDung = phan === 'II' ? soYDungPhanII(c.dapAnChon, c.dapAnDung) : null
   const daTo = String(c.dapAnChon ?? '').replace(/-/g, '').trim()
   return (
-    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 overflow-hidden shadow-sm transition-all">
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 overflow-hidden shadow-sm transition">
       <button
         type="button"
         onClick={() => setMo((v) => !v)}

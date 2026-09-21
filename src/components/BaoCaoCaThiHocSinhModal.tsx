@@ -358,7 +358,7 @@ export default function BaoCaoCaThiHocSinhModal({
                     }}
                     className={m3
                       ? 'm3-nut-chinh w-full sm:w-auto cursor-pointer'
-                      : 'w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'}
+                      : 'w-full sm:w-auto px-5 py-3 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-500 to-amber-500 text-white font-bold text-sm shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.02] active:scale-[0.98] transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100'}
                   >
                     <Flame className={m3 ? 'w-4 h-4' : 'w-4 h-4 text-amber-200 animate-pulse'} />
                     <span>
@@ -557,7 +557,7 @@ export default function BaoCaoCaThiHocSinhModal({
                   {/* Thanh tiến độ */}
                   <div className="h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                     <div
-                      className={`h-full ${item.mauBar} rounded-full transition-all duration-500`}
+                      className={`h-full ${item.mauBar} rounded-full transition-[width,background-color] duration-500`}
                       style={{ width: `${item.phanTram}%` }}
                     />
                   </div>

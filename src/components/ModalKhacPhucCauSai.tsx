@@ -518,7 +518,7 @@ export default function ModalKhacPhucCauSai({
               {/* THẺ 1: LÀM LẠI CÁC CÂU SAI */}
               <div
                 onClick={() => setCheDo(1)}
-                className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-start gap-4 ${
+                className={`p-4 rounded-2xl border-2 transition cursor-pointer flex items-start gap-4 ${
                   cheDo === 1
                     ? 'border-blue-500 bg-blue-50/50 shadow-sm'
                     : 'border-slate-100 hover:border-slate-200 bg-white'
@@ -546,7 +546,7 @@ export default function ModalKhacPhucCauSai({
               <div
                 onClick={() => coKhoDe && setCheDo(2)}
                 aria-disabled={!coKhoDe}
-                className={`p-4 rounded-2xl border-2 transition-all flex items-start gap-4 ${
+                className={`p-4 rounded-2xl border-2 transition flex items-start gap-4 ${
                   !coKhoDe
                     ? 'border-slate-100 bg-slate-50 opacity-55 cursor-not-allowed'
                     : cheDo === 2
@@ -583,7 +583,7 @@ export default function ModalKhacPhucCauSai({
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCheDo(3) } }}
-                className={`p-4 rounded-2xl border-2 transition-all flex items-start gap-4 ${
+                className={`p-4 rounded-2xl border-2 transition flex items-start gap-4 ${
                   cheDo === 3
                       ? 'border-blue-500 bg-blue-50/50 shadow-sm cursor-pointer'
                       : 'border-slate-100 hover:border-slate-200 bg-white cursor-pointer'
@@ -779,7 +779,7 @@ export default function ModalKhacPhucCauSai({
                           setBaiChon('')
                           setDangChon(null)
                         }}
-                        className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${
+                        className={`py-2 px-3 rounded-xl text-xs font-bold transition border ${
                           lopChon === l.lop
                             ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                             : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
@@ -806,7 +806,7 @@ export default function ModalKhacPhucCauSai({
                             setBaiChon(b.tenBai)
                             setDangChon(null)
                           }}
-                          className={`w-full text-left py-2 px-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-between gap-2 ${
+                          className={`w-full text-left py-2 px-3 rounded-xl text-xs font-bold transition border flex items-center justify-between gap-2 ${
                             baiChon === b.tenBai
                               ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                               : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
@@ -838,7 +838,7 @@ export default function ModalKhacPhucCauSai({
                           key={d.ma}
                           type="button"
                           onClick={() => setDangChon(d)}
-                          className={`w-full text-left py-2 px-3 rounded-xl text-xs font-bold transition-all border flex items-center gap-2 ${
+                          className={`w-full text-left py-2 px-3 rounded-xl text-xs font-bold transition border flex items-center gap-2 ${
                             dangChon?.ma === d.ma
                               ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                               : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
@@ -963,7 +963,7 @@ export default function ModalKhacPhucCauSai({
                   type="button"
                   onClick={() => handleTaoDe(false)}
                   disabled={dangTao || soCauSeRut <= 0}
-                  className="tap-target px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="tap-target px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 text-sm font-bold transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                   title="Xem trước đề dạng HTML"
                 >
                   <Eye className="w-4 h-4" />
@@ -975,7 +975,7 @@ export default function ModalKhacPhucCauSai({
                 type="button"
                 onClick={() => handleTaoDe(Boolean(onGiaoBaiChoCon))}
                 disabled={dangTao || soCauSeRut <= 0}
-                className={`tap-target px-6 py-2.5 rounded-xl text-white text-sm font-bold shadow-md active:scale-95 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`tap-target px-6 py-2.5 rounded-xl text-white text-sm font-bold shadow-md active:scale-95 transition flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                   onGiaoBaiChoCon
                     ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20'
                     : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/20'

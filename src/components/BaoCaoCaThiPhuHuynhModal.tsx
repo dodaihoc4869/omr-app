@@ -572,7 +572,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
                     <div>
                       <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
                         <div
-                          className={`${m.mauBar} h-full rounded-full transition-all duration-500`}
+                          className={`${m.mauBar} h-full rounded-full transition-[width,background-color] duration-500`}
                           style={{ width: `${m.phanTram}%` }}
                         />
                       </div>

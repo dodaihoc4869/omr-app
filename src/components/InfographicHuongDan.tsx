@@ -71,7 +71,7 @@ export default function InfographicHuongDan({ onClose, vaiMacDinh }: Infographic
         <div className="p-6 sm:p-8 grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* CỘT 1: HỌC SINH */}
           <div
-            className={`rounded-2xl p-5 border flex flex-col justify-between transition-all ${
+            className={`rounded-2xl p-5 border flex flex-col justify-between transition ${
               vaiMacDinh === 'hocsinh'
                 ? 'ring-2 ring-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/20'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
@@ -137,7 +137,7 @@ export default function InfographicHuongDan({ onClose, vaiMacDinh }: Infographic
 
           {/* CỘT 2: PHỤ HUYNH */}
           <div
-            className={`rounded-2xl p-5 border flex flex-col justify-between transition-all ${
+            className={`rounded-2xl p-5 border flex flex-col justify-between transition ${
               vaiMacDinh === 'phuhuynh'
                 ? 'ring-2 ring-blue-500 bg-blue-50/40 dark:bg-blue-950/20'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
@@ -203,7 +203,7 @@ export default function InfographicHuongDan({ onClose, vaiMacDinh }: Infographic
 
           {/* CỘT 3: GIÁO VIÊN */}
           <div
-            className={`rounded-2xl p-5 border flex flex-col justify-between transition-all ${
+            className={`rounded-2xl p-5 border flex flex-col justify-between transition ${
               vaiMacDinh === 'giaovien'
                 ? 'ring-2 ring-indigo-500 bg-indigo-50/40 dark:bg-indigo-950/20'
                 : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
