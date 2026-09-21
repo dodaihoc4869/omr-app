@@ -235,6 +235,32 @@ export function sucChua(p: Pick<DauVaoLich, 'chotLuc' | 'hanNop' | 'cauMoiNgay' 
   return { cheDo: 'ngan', soNgay, soPhien: Math.max(1, soPhien), cauMoiPhien, soCauToiDa: Math.max(1, soCau) }
 }
 
+/** NGÂN SÁCH đưa cho lõi `chonBoCuaEm` (`NganSachBai` của `btvn-nang-do.ts`: số chặng tối đa × câu/chặng, ôn lại đã trừ, `tongToiDa` = trần tổng câu). */
+export interface NganSachChoLoi {
+  soNgay: number
+  cauMoiNgay: number
+  onLaiMoiNgay: number
+  tongToiDa?: number
+}
+
+/**
+ * NGÂN SÁCH CHO LÕI (bản 1.4, Boss duyệt 21/09, hệ số 1,0: "em mở muộn KHÔNG BAO GIỜ nhận nhiều câu hơn em mở sớm"). Trước đây hạn ngắn đưa `soPhien × cauMoiPhien` (ví dụ 6 phiên × 10 = 60 câu cho em mở 22/09 21:00 trong
+ * khi em mở 21/09 20:30 chỉ nhận 36) — trần lành mạnh `soCauToiDa` đã có nhưng không ai dùng.
+ *   · HẠN DÀI: trả Y HỆT như cũ (`soNgay`, ngân sách gốc, ôn lại) — không trần.
+ *   · HẠN NGẮN: TRẦN TỔNG = min(`soCauToiDa`, ngân sách gốc mỗi buổi × SỐ BUỔI TỐI còn trọn trước hạn) — số cuối là mức em sẽ nhận ở chế độ dài nếu còn từng ấy buổi tối, nên mở muộn hơn không bao giờ nhiều hơn mở sớm hơn
+ *     (quét 194 nghìn thời điểm chốt: 0 vi phạm; test tính chất khoá). Trần đi qua `NganSachBai.tongToiDa` (chính xác từng câu, không làm tròn theo số phiên). Số chặng tối đa (`soNgay`) = số phiên; nếu biết số câu LÕI (`soLoi`)
+ *     thì chỉ mở đủ phiên cho max(trần, lõi) (mỗi phiên ≤ `cauMoiPhien` câu) để chặng không vụn; không biết ⇒ dùng hết số phiên như cũ.
+ * LÕI BẮT BUỘC luôn đủ: `chonBoCuaEm` kẹp tổng ≥ lõi bắt buộc (`canhBaoHanNgan` vẫn báo thầy) — chỉ phần riêng + thử thách bị chặn.
+ */
+export function nganSachHanNgan(sc: SucChua, p: Pick<DauVaoLich, 'chotLuc' | 'hanNop' | 'cauMoiNgay' | 'onLaiMoiNgay' | 'cuaSo'>, soLoi?: number): NganSachChoLoi {
+  if (sc.cheDo !== 'ngan') return { soNgay: sc.soNgay, cauMoiNgay: p.cauMoiNgay, onLaiMoiNgay: p.onLaiMoiNgay ?? 0 }
+  const rong = nganSachRong(p.cauMoiNgay, p.onLaiMoiNgay)
+  const soBuoi = soNgayToiHan(p.chotLuc, p.hanNop, p.cuaSo)
+  const tran = Math.max(1, Math.min(sc.soCauToiDa, rong * soBuoi))
+  const canPhien = soLoi === undefined || !Number.isFinite(soLoi) ? sc.soPhien : Math.ceil(Math.max(tran, Math.max(0, Math.floor(soLoi))) / Math.max(1, sc.cauMoiPhien))
+  return { soNgay: Math.max(1, Math.min(sc.soPhien, canPhien)), cauMoiNgay: sc.cauMoiPhien, onLaiMoiNgay: 0, tongToiDa: tran }
+}
+
 /** Câu chữ cảnh báo cho màn Xem trước của thầy khi LÕI vượt sức chứa lành mạnh (vẫn giao đủ lõi). Không vượt ⇒ null. */
 export function canhBaoHanNgan(soCauLoi: number, sc: SucChua): string | null {
   if (sc.cheDo !== 'ngan' || soCauLoi <= sc.soCauToiDa) return null

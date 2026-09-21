@@ -124,6 +124,9 @@ export interface NganSachBai {
   cauMoiNgay: number
   /** Trong số đó, bao nhiêu câu mỗi ngày dành cho ôn lại 1·3·7 tới hạn (không thuộc bài này). */
   onLaiMoiNgay: number
+  /** TRẦN TỔNG số câu của bộ (bản 1.4, hạn ngắn — `nganSachHanNgan` của `btvn-nang-do-lich.ts`): tổng câu bắt buộc ≤ max(lõi bắt buộc, min(soNgay × (cauMoiNgay − ôn lại), tongToiDa)) — LÕI luôn đủ, chỉ phần riêng
+   *  + thử thách bị chặn. Vắng / không phải số hữu hạn ≥ 0 ⇒ không trần (kết quả Y HỆT bản trước). */
+  tongToiDa?: number
 }
 
 /** Nhãn LÝ DO của từng câu trong bộ của em (Code 2 hiện chữ nhẹ: khởi động / cốt lõi / dành riêng cho em / thử thách).
@@ -541,7 +544,8 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
   const ghimSet = new Set<string>([...(tuyChon.ghim ?? []), ...ds.filter((c) => c.ghim === true).map((c) => c.qid)])
   let batBuocIdx = loiIdx.filter((i) => ghimSet.has(ds[i].qid) || ds[i].mucDo <= dangCua[i].bacGoc + 1)
   let thuSucIdx = loiIdx.filter((i) => !(ghimSet.has(ds[i].qid) || ds[i].mucDo <= dangCua[i].bacGoc + 1))
-  const nganSachCau = Math.min(Math.max(0, n - thuSucIdx.length), Math.max(batBuocIdx.length, soNgay * moiNgay))
+  const tranTong = Number.isFinite(nganSach.tongToiDa) && (nganSach.tongToiDa as number) >= 0 ? Math.floor(nganSach.tongToiDa as number) : Infinity
+  const nganSachCau = Math.min(Math.max(0, n - thuSucIdx.length), Math.max(batBuocIdx.length, Math.min(soNgay * moiNgay, tranTong)))
 
   // ── ứng viên PHẦN RIÊNG (mức ≤ bậc đích; dạng chưa đủ tin: bậc đích Biết) và THỬ THÁCH (đúng bậc đích + 1, dạng KHÔNG yếu) ──
   const ungRieng: number[] = []
