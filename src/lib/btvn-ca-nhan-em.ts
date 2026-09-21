@@ -49,3 +49,42 @@ export function luuKetQuaChang(maBtvn: string, sbd: string, chiSo: number, moi: 
   }
   return gop
 }
+
+// ───────────────────────── "CHO LÀM LẠI" của thầy: đổi lượt làm ─────────────────────────
+// Thầy bấm "Cho làm lại" (`/btvn/cho-lam-lai`) ⇒ máy chủ tăng `soLanLam`, xoá nộp/đáp án/chặng đã xong, GIỮ NGUYÊN bộ câu
+// và hạn nộp. Bộ câu giữ nguyên nên nháp của phiếu (khoá theo VÂN TAY bộ câu) sẽ hiện LẠI đáp án lượt cũ nếu không xoá.
+// Máy em nhớ số lượt đã thấy; thấy khác ⇒ bỏ nháp + kết quả chặng của lượt cũ, mở lại từ chặng 1.
+
+export const khoaLuotLam = (maBtvn: string, sbd: string): string => `ddh.btvn.luot.${maBtvn}.${sbd}`
+
+/** Xoá mọi thứ ở máy thuộc bài này của em này: nháp (host + phiếu) và kết quả từng chặng. Không đụng bài/em khác. */
+function xoaLamDoLuotCu(maBtvn: string, sbd: string): void {
+  try {
+    const bo = [`ddh.btvn.draft.${maBtvn}.${sbd}`, `ddh.lam.${maBtvn}`]
+    const tienTo = [`ddh.lam.${maBtvn}.`, `ddh.btvn.ketqua.${maBtvn}.${sbd}.`]
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i)
+      if (k && (bo.includes(k) || tienTo.some((t) => k.startsWith(t)))) localStorage.removeItem(k)
+    }
+  } catch {
+    /* máy chặn lưu: không có gì để xoá */
+  }
+}
+
+/** Gọi MỖI LẦN mở/dựng lại phiếu bài `ca_nhan`, TRƯỚC khi đọc nháp/kết quả. Trả true nếu vừa bỏ làm dở của lượt cũ.
+ * `soLanLam` không phải số nguyên ≥ 1 (máy chủ cũ, thiếu trường) ⇒ không làm gì. Lần đầu thấy lượt 1 ⇒ chỉ ghi nhớ, KHÔNG xoá
+ * (không phá bài đang làm). */
+export function doiLuotLam(maBtvn: string, sbd: string, soLanLam: unknown): boolean {
+  if (!maBtvn || typeof soLanLam !== 'number' || !Number.isInteger(soLanLam) || soLanLam < 1) return false
+  try {
+    const cu = localStorage.getItem(khoaLuotLam(maBtvn, sbd))
+    const daThay = cu === null || cu.trim() === '' ? null : Number(cu)
+    if (daThay === soLanLam) return false
+    const laLuotMoi = daThay === null ? soLanLam > 1 : true
+    if (laLuotMoi) xoaLamDoLuotCu(maBtvn, sbd)
+    localStorage.setItem(khoaLuotLam(maBtvn, sbd), String(soLanLam))
+    return laLuotMoi
+  } catch {
+    return false
+  }
+}

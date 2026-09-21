@@ -7,7 +7,7 @@
 //   2. lưu kết quả ở máy (để mở lại chặng vẫn thấy lời giải — máy chủ không gửi lại đáp án qua `de.cau`);
 //   3. tải lại bài (trạng thái chặng máy chủ vừa đổi) rồi dựng phiếu mới có kết quả.
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
-import { docBaiCaNhan, luuKetQuaChang, type KetQuaChang } from './btvn-ca-nhan-em'
+import { docBaiCaNhan, doiLuotLam, luuKetQuaChang, type KetQuaChang } from './btvn-ca-nhan-em'
 
 export interface TinNopChang {
   ma: string
@@ -56,15 +56,24 @@ export async function nopChangCaNhan(tin: TinNopChang, maCa: string, dep: PhuThu
     if (!ket.ok) return { ok: false, error: loiChoEm(ket) }
     // Không câu nào được chấm (đáp án chưa hợp lệ: Phần II chưa đủ 4 ý, Phần III chưa có số…) ⇒ báo, không dựng lại.
     if (ket.ketQua.length === 0) return { ok: false, error: 'Chưa có câu nào được chấm. Em kiểm tra lại đáp án (Phần II cần đủ 4 ý, Phần III cần có số) rồi nộp lại nhé.', ket }
-    luuKetQuaChang(tin.ma, tin.sbd, tin.chiSo, ket.ketQua, tin.dapAn)
+    // Tải lại bài TRƯỚC khi lưu: nếu thầy vừa "Cho làm lại" (soLanLam đổi) thì bỏ làm dở lượt cũ rồi mới lưu kết quả lượt MỚI —
+    // lưu trước thì kết quả vừa chấm bị xoá nhầm cùng lượt cũ.
+    let r: (Record<string, unknown> & { ok: boolean }) | null = null
     try {
-      const r = await dep.cuaEm(ch, maCa, tin.sbd, tin.ma)
-      if (r.ok) {
+      const x = await dep.cuaEm(ch, maCa, tin.sbd, tin.ma)
+      if (x.ok) r = x
+    } catch {
+      /* không tải lại được: vẫn lưu kết quả vừa nhận */
+    }
+    if (r) doiLuotLam(tin.ma, tin.sbd, r.soLanLam)
+    luuKetQuaChang(tin.ma, tin.sbd, tin.chiSo, ket.ketQua, tin.dapAn)
+    if (r) {
+      try {
         const soChang = docBaiCaNhan(r)?.soChang
         return { ok: true, ket, html: await dep.dungPhieu(r, maCa, tin.sbd), ...(soChang ? { soChang } : {}) }
+      } catch {
+        /* đã nộp thành công và đã lưu kết quả — chỉ không dựng lại được phiếu lúc này */
       }
-    } catch {
-      /* đã nộp thành công và đã lưu kết quả — chỉ không dựng lại được phiếu lúc này */
     }
     return { ok: true, ket }
   } catch {

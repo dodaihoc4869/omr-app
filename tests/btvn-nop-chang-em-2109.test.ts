@@ -1,6 +1,6 @@
 // NỘP CHẶNG — bộ điều phối phía host. Không mạng thật: phụ thuộc được tiêm.
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { docKetQuaChangDaLuu, type KetQuaChang } from '../src/lib/btvn-ca-nhan-em'
+import { docKetQuaChangDaLuu, doiLuotLam, khoaLuotLam, type KetQuaChang } from '../src/lib/btvn-ca-nhan-em'
 import { loiChoEm, nopChangCaNhan, type PhuThuocNopChang, type TinNopChang } from '../src/lib/btvn-nop-chang-em'
 
 const TIN: TinNopChang = { ma: 'B1', sbd: '12121212', chiSo: 0, dapAn: { q1: 'B', q3: '12,5' } }
@@ -47,6 +47,19 @@ describe('nộp chặng thành công', () => {
     localStorage.clear()
     const khong = await nopChangCaNhan(TIN, 'R', dep().d)
     expect(khong).not.toHaveProperty('soChang')
+  })
+
+  it('thầy cho làm lại ĐÚNG lúc em đang nộp (soLanLam đổi khi tải lại): bỏ làm dở lượt cũ nhưng GIỮ kết quả lượt MỚI vừa chấm', async () => {
+    doiLuotLam('B1', '12121212', 1)
+    localStorage.setItem('ddh.btvn.draft.B1.12121212', '{"q9":"X"}')
+    localStorage.setItem('ddh.btvn.ketqua.B1.12121212.0', JSON.stringify({ ketQua: [{ qid: 'cu', dung: true, dapAnDung: 'A', loiGiai: null, anhLoiGiai: [] }], dapAn: { cu: 'A' } }))
+    const { d } = dep({ cuaEm: vi.fn(async () => ({ ok: true, caNhan: true, soChang: 2, soLanLam: 2 })) })
+    const kq = await nopChangCaNhan(TIN, 'R', d)
+    expect(kq.ok).toBe(true)
+    expect(localStorage.getItem(khoaLuotLam('B1', '12121212'))).toBe('2')
+    expect(localStorage.getItem('ddh.btvn.draft.B1.12121212')).toBeNull() // làm dở lượt cũ đã bỏ
+    const luu = docKetQuaChangDaLuu('B1', '12121212', 0)
+    expect(luu.ketQua.map((k) => k.qid)).toEqual(['q1', 'q3']) // kết quả lượt mới còn; câu 'cu' của lượt cũ đã mất
   })
 
   it('nộp lần hai cùng câu: kết quả lần đầu thắng (đáp án đầu khoá)', async () => {

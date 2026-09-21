@@ -16,6 +16,7 @@ import {
   chuNgayMo,
   docBaiCaNhan,
   docKetQuaChangDaLuu,
+  doiLuotLam,
   ghepKetQuaVaoCau,
   themDapAnGiaChoCau,
   type BaiCaNhanEm,
@@ -194,6 +195,8 @@ async function dungPhieuCaNhan(r: Record<string, unknown>, b: BaiCaNhanEm, maCa:
   const cauChang = cauCuaChang(b, docCauBtvn(de), chiSoHT)
   if (cauChang.length === 0) throw new Error('Chặng này chưa có câu nào để làm')
 
+  // THẦY CHO LÀM LẠI: `soLanLam` khác lượt máy em đã thấy ⇒ bỏ nháp + kết quả chặng của lượt cũ TRƯỚC khi đọc chúng.
+  doiLuotLam(maBtvn, sbd, r.soLanLam)
   // Kết quả máy chủ đã trả lúc nộp chặng (giữ ở máy) → câu đã chấm có đáp án đúng + lời giải; còn lại KHÔNG có gì.
   const daLuu = docKetQuaChangDaLuu(maBtvn, sbd, chiSoHT)
   const { cau: cauTho, chuaCo } = themDapAnGiaChoCau(ghepKetQuaVaoCau(cauChang, daLuu.ketQua))

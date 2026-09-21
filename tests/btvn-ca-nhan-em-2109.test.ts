@@ -6,8 +6,10 @@ import {
   docBaiCaNhan,
   docKetQuaChang,
   docKetQuaChangDaLuu,
+  doiLuotLam,
   ghepKetQuaVaoCau,
   khoaKetQuaChang,
+  khoaLuotLam,
   luuKetQuaChang,
   tenMucBac,
   themDapAnGiaChoCau,
@@ -363,5 +365,82 @@ describe('theChangView — thẻ cuối chặng: chỉ nói điều có số đ�
   it('không xếp hạng, không chữ "nắm chắc"', () => {
     const v = JSON.stringify(theChangView(ket(), 7))
     expect(v).not.toMatch(/nắm chắc|xếp hạng|hạng \d|bạn khác/i)
+  })
+})
+
+describe('doiLuotLam — thầy "Cho làm lại": bỏ làm dở của lượt cũ', () => {
+  const dat = () => {
+    localStorage.clear()
+    localStorage.setItem('ddh.btvn.draft.B1.S1', '{"q1":"A"}')
+    localStorage.setItem('ddh.lam.B1.abc123', '{"q1":"A"}')
+    localStorage.setItem('ddh.lam.B1', '{"q1":"A"}')
+    localStorage.setItem(khoaKetQuaChang('B1', 'S1', 0), '{"ketQua":[]}')
+    localStorage.setItem(khoaKetQuaChang('B1', 'S1', 1), '{"ketQua":[]}')
+    // KHÔNG được đụng: em khác cùng bài, bài khác, khoá lạ
+    localStorage.setItem('ddh.btvn.draft.B1.S2', '{"q1":"B"}')
+    localStorage.setItem(khoaKetQuaChang('B1', 'S2', 0), '{"ketQua":[]}')
+    localStorage.setItem('ddh.btvn.draft.B2.S1', '{"q9":"C"}')
+    localStorage.setItem('ddh.lam.B2.zzz', '{"q9":"C"}')
+    localStorage.setItem('ddh.lam.B10.zzz', '{"q9":"C"}') // tiền tố gần giống B1 nhưng là bài KHÁC
+    localStorage.setItem('khoa-la', 'x')
+  }
+  const con = () => Object.keys(localStorage).filter((k) => k !== khoaLuotLam('B1', 'S1')).sort()
+
+  it('lần đầu thấy lượt 1: chỉ ghi nhớ, KHÔNG xoá (không phá bài đang làm)', () => {
+    dat()
+    expect(doiLuotLam('B1', 'S1', 1)).toBe(false)
+    expect(localStorage.getItem(khoaLuotLam('B1', 'S1'))).toBe('1')
+    expect(localStorage.getItem('ddh.btvn.draft.B1.S1')).not.toBeNull()
+    expect(localStorage.getItem('ddh.lam.B1.abc123')).not.toBeNull()
+  })
+
+  it('cùng lượt: không làm gì', () => {
+    dat()
+    doiLuotLam('B1', 'S1', 1)
+    expect(doiLuotLam('B1', 'S1', 1)).toBe(false)
+    expect(localStorage.getItem('ddh.btvn.draft.B1.S1')).not.toBeNull()
+  })
+
+  it('lượt TĂNG: xoá nháp (host + phiếu) và kết quả MỌI chặng của em này, ghi nhớ lượt mới; KHÔNG đụng em khác / bài khác', () => {
+    dat()
+    doiLuotLam('B1', 'S1', 1)
+    expect(doiLuotLam('B1', 'S1', 2)).toBe(true)
+    expect(localStorage.getItem(khoaLuotLam('B1', 'S1'))).toBe('2')
+    expect(con()).toEqual(['ddh.btvn.draft.B1.S2', 'ddh.btvn.draft.B2.S1', 'ddh.lam.B10.zzz', 'ddh.lam.B2.zzz', khoaKetQuaChang('B1', 'S2', 0), 'khoa-la'].sort())
+  })
+
+  it('máy chưa từng thấy bài mà máy chủ báo lượt ≥ 2 ⇒ xoá cho chắc; báo lượt 1 ⇒ không xoá', () => {
+    dat()
+    expect(doiLuotLam('B1', 'S1', 3)).toBe(true)
+    expect(localStorage.getItem('ddh.btvn.draft.B1.S1')).toBeNull()
+    dat()
+    expect(doiLuotLam('B1', 'S1', 1)).toBe(false)
+    expect(localStorage.getItem('ddh.btvn.draft.B1.S1')).not.toBeNull()
+  })
+
+  it('lượt GIẢM (thầy đặt lại bài từ đầu) cũng là lượt mới', () => {
+    dat()
+    localStorage.setItem(khoaLuotLam('B1', 'S1'), '3')
+    expect(doiLuotLam('B1', 'S1', 1)).toBe(true)
+    expect(localStorage.getItem('ddh.btvn.draft.B1.S1')).toBeNull()
+    expect(localStorage.getItem(khoaLuotLam('B1', 'S1'))).toBe('1')
+  })
+
+  it('máy chủ cũ / trường hỏng ⇒ không làm gì, không ghi nhớ', () => {
+    for (const v of [undefined, null, 'x', '2', 0, -1, 1.5, NaN]) {
+      dat()
+      expect(doiLuotLam('B1', 'S1', v)).toBe(false)
+      expect(localStorage.getItem(khoaLuotLam('B1', 'S1'))).toBeNull()
+      expect(localStorage.getItem('ddh.btvn.draft.B1.S1')).not.toBeNull()
+    }
+    expect(doiLuotLam('', 'S1', 2)).toBe(false)
+  })
+
+  it('máy chặn lưu ⇒ không ném lỗi', () => {
+    const spy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('chặn')
+    })
+    expect(() => doiLuotLam('B1', 'S1', 2)).not.toThrow()
+    spy.mockRestore()
   })
 })
