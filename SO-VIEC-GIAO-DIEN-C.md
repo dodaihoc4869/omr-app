@@ -318,3 +318,7 @@ Giao bởi 0.Planer (thầy đã uỷ quyền 100%: "nghe theo điều phối, k
 - [x] Tên lớp khớp hợp đồng (7640699): `/gv/lop` có `lyDoThieu` ⇒ dòng "Máy chủ báo: …".
 - Phát hiện (không đụng): `components/BangTroLyHocSinh.tsx` + `BangTroLyPhuHuynh.tsx` không ai nhập trong src (chỉ test) — nghi mã chết làn HS/PH; 9 lỗi soi.
 - [ ] Chờ: Worker có `/gv/lop` ⇒ kiểm bản sống "Chọn theo lớp" (2 lớp khối 12 đúng số em, Tinh Hoa 42); cảnh báo bộ soi G07/G08/G09/G11 (ô nhập thiếu nhãn, "..."→"…", emoji ở KhoiRutDe).
+- [x] 21/09 Boss soát 69689f0+cbf8b1a+098aa3e+446c83d ĐẠT. aria-label "Mật khẩu ca thi"→"…ca kiểm tra" (1d73630). Emoji màn Mở ca → lucide (757a9da, commit riêng, chữ/logic/thứ tự giữ; nhóm 23 tệp mo-ca+ExamSetup 15 đỏ = nền; G09 11→0).
+- [x] LỖI TỰ TÌM (b4fbd6d): 446c83d KhoiRutDe — Tailwind preflight `svg{display:block}` ⇒ biểu tượng lucide chèn trong nút KHÔNG flex xuống hàng riêng trên chữ; sửa `display:inline-block`. Luật từ nay: chèn biểu tượng vào nút/chip → chụp 390 xem tận mắt, không chỉ dựa test/soi.
+- Sẵn từ bản emoji (chưa sửa, chờ Boss): 390 px chip "SBD cả lớp"/"Không hiện"/"Khi nộp bài"/"Cả lớp xong" ở Mở ca bị cắt "…" 1–7 px; chữ hiển thị "Mật khẩu ca thi (tùy chọn)" còn "ca thi".
+- [!] Kiểm SỐNG `/gv/lop` (Worker f9c4e6b6 đã sống, 6 lớp): trình duyệt của tôi KHÔNG có phiên thầy (trang xin mã bí mật) ⇒ chưa kiểm được bản thật; đã mô phỏng đúng hình dạng 6 lớp: chip 67/15/42/91/41/9 đúng, 390+1440 không tràn. Chờ thầy/Boss mở giúp.
