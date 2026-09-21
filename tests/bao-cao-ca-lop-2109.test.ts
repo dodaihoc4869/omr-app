@@ -1,7 +1,7 @@
 // XEM ĐIỂM BẢN 2 · GV-1 — số của khối "Báo cáo cả lớp" (lib/bao-cao-ca-lop.ts). THUẦN TÍNH TOÁN từ điểm/bảng chấm đã có ở máy thầy.
 // Luật soi ở đây: không bịa số (thiếu dữ liệu ⇒ null/rỗng), lý do "em cần để ý" bằng SỐ, "Nhiều em chọn" chỉ nêu đáp án + số em.
 import { describe, expect, it } from 'vitest'
-import { chuGiay, KHOANG_DIEM, NGUONG_DIEM_THAP, NGUONG_ROI_MAN, tinhBaoCaoCaLop, type EmChoBaoCao } from '../src/lib/bao-cao-ca-lop'
+import { chuGiay, KHOANG_DIEM, NGUONG_DIEM_THAP, NGUONG_ROI_MAN, tinhBaoCaoCaLop, tomTatCaLop, type EmChoBaoCao } from '../src/lib/bao-cao-ca-lop'
 import type { ChiTietCauRow } from '../src/lib/exam-api'
 import type { ScoreResult } from '../src/engine/score'
 
@@ -87,6 +87,24 @@ describe('GV-1 · tổng quan cả lớp', () => {
     expect(tinhBaoCaoCaLop([em('1', 5)], 1).phutTB).toBeNull()
     // mốc là số mili-giây (máy chủ có lúc trả số)
     expect(tinhBaoCaoCaLop([em('1', 5, { vaoLuc: 1_000_000, nopLuc: 1_000_000 + 20 * 60000 })], 1).phutTB).toBe(20)
+  })
+})
+
+describe('GV-1 · phần RẺ cho dòng gập (tomTatCaLop)', () => {
+  it('đếm đúng bài đã nộp/khoá có điểm và điểm trung bình; luôn khớp với phần nặng', () => {
+    const ds = [em('1', 8), em('2', 6), em('3', 4), em('4', null), em('5', 9, { trangThai: 'dang_lam' }), em('6', 2, { trangThai: 'khoa' })]
+    const r = tomTatCaLop(ds)
+    expect(r.nop).toBe(4)
+    expect(r.tb).toBeCloseTo(5, 5)
+    const day = tinhBaoCaoCaLop(ds, 8)
+    expect(r).toEqual({ nop: day.nop, tb: day.tb })
+  })
+  it('chưa ai nộp ⇒ nop 0 và tb null (không "0" giả)', () => {
+    expect(tomTatCaLop([em('1', null, { trangThai: 'dang_lam' })])).toEqual({ nop: 0, tb: null })
+    expect(tomTatCaLop([])).toEqual({ nop: 0, tb: null })
+  })
+  it('không cần bảng chấm từng câu: chạy được với chỉ trạng thái + điểm', () => {
+    expect(tomTatCaLop([{ trangThai: 'da_nop', diem: 7 }, { trangThai: 'da_nop', diem: 5 }])).toEqual({ nop: 2, tb: 6 })
   })
 })
 

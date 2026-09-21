@@ -1,6 +1,6 @@
 // BÁO CÁO CẢ LỚP của một ca — Xem điểm bản 2 · GV-1 (bản vẽ docs/ban-ve-xem-diem-2109/gv-1-chi-tiet-ca.html; Boss duyệt build 21/09).
 // Chỉ VẼ số đã tính ở lib/bao-cao-ca-lop.ts; dùng bộ thành phần chung `xd-*` của Code 2 (components/xem-diem). Khối nào không có dữ liệu thật thì ẨN, không bịa.
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ChevronDown, ChevronRight, ChevronUp } from 'lucide-react'
 import '../m3'
 import '../xem-diem/xem-diem.css'
@@ -228,36 +228,44 @@ function EmCanYY({ bc, onMoEm }: { bc: BaoCaoCaLop; onMoEm: (sbd: string) => voi
   )
 }
 
+/** PHẦN NẶNG của khối — chỉ được dựng khi thầy MỞ khối (hoặc ca đã đóng). `tinh` chạy lại chỉ khi `khoa` đổi (ca, số em nộp, tổng điểm, tổng lần rời màn, có đáp án hay chưa):
+ * màn Theo dõi ca tự làm mới liên tục trong giờ kiểm tra, không được chấm/gom lại 44 em × 28 câu mỗi lần. */
+function NoiDungBaoCao({ tinh, khoa, phutDe, onMoEm }: { tinh: () => BaoCaoCaLop; khoa: string; phutDe: number; onMoEm: (sbd: string) => void }) {
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `tinh` đổi định danh mỗi lần vẽ; chỉ `khoa` quyết định có tính lại hay không
+  const bc = useMemo(tinh, [khoa])
+  return (
+    <div id="bc-noi-dung" className="gv-bc-noi-dung">
+      <TongQuan bc={bc} phutDe={phutDe} />
+      <div className="gv-luoi">
+        <PhoDiem bc={bc} />
+        <BaPhan bc={bc} />
+        <DangVap bc={bc} />
+        <CauSai bc={bc} />
+      </div>
+      <EmCanYY bc={bc} onMoEm={onMoEm} />
+    </div>
+  )
+}
+
 /** Khối "Báo cáo cả lớp" của màn Chi tiết ca. Chỉ dựng khi đã có ít nhất một bài nộp có điểm.
- * `moSan`: ca đã đóng ⇒ mở sẵn; ca đang mở thì gập lại (thầy đang coi danh sách em), chỉ còn một dòng tóm tắt. */
-export default function BaoCaoCaLopKhoi({ bc, phutDe, moSan, onMoEm }: { bc: BaoCaoCaLop; phutDe: number; moSan: boolean; onMoEm: (sbd: string) => void }) {
+ * `moSan`: ca đã đóng ⇒ mở sẵn; ca đang mở thì gập lại (thầy đang coi danh sách em), chỉ còn một dòng tóm tắt lấy từ `tomTat` (rẻ). */
+export default function BaoCaoCaLopKhoi({ tomTat, tinh, khoa, phutDe, moSan, onMoEm }: { tomTat: { nop: number; tb: number | null }; tinh: () => BaoCaoCaLop; khoa: string; phutDe: number; moSan: boolean; onMoEm: (sbd: string) => void }) {
   const [mo, setMo] = useState(moSan)
-  if (bc.nop === 0) return null
+  if (tomTat.nop === 0) return null
   return (
     <section className="m3 xd xd-gv" aria-labelledby="bc-lop" data-khoi="bao-cao-ca-lop">
       <h2 id="bc-lop" className="gv-bc-dau">
         <button type="button" className="gv-bc-nut" aria-expanded={mo} aria-controls={mo ? 'bc-noi-dung' : undefined} onClick={() => setMo((v) => !v)}>
           <span className="gv-bc-nut__ten">Báo cáo cả lớp</span>
-          {!mo && bc.tb != null && (
+          {!mo && tomTat.tb != null && (
             <span className="gv-bc-nut__tom xd-so">
-              Điểm trung bình {soVn(bc.tb)} · {bc.nop} em đã nộp
+              Điểm trung bình {soVn(tomTat.tb)} · {tomTat.nop} em đã nộp
             </span>
           )}
           {mo ? <ChevronUp className="xd-i xd-i--l gv-bc-nut__mui" aria-hidden="true" /> : <ChevronDown className="xd-i xd-i--l gv-bc-nut__mui" aria-hidden="true" />}
         </button>
       </h2>
-      {mo && (
-        <div id="bc-noi-dung" className="gv-bc-noi-dung">
-          <TongQuan bc={bc} phutDe={phutDe} />
-          <div className="gv-luoi">
-            <PhoDiem bc={bc} />
-            <BaPhan bc={bc} />
-            <DangVap bc={bc} />
-            <CauSai bc={bc} />
-          </div>
-          <EmCanYY bc={bc} onMoEm={onMoEm} />
-        </div>
-      )}
+      {mo && <NoiDungBaoCao tinh={tinh} khoa={khoa} phutDe={phutDe} onMoEm={onMoEm} />}
     </section>
   )
 }

@@ -97,10 +97,16 @@ const TOI_DA_EM_CAN_YY = 5
 const TOI_DA_DANG = 5
 const TOI_DA_CAU_SAI = 3
 
-const laDaNop = (e: EmChoBaoCao) => (e.trangThai === 'da_nop' || e.trangThai === 'khoa') && Number.isFinite(e.diem)
+const laDaNop = (e: Pick<EmChoBaoCao, 'trangThai' | 'diem'>) => (e.trangThai === 'da_nop' || e.trangThai === 'khoa') && Number.isFinite(e.diem)
 const tb = (ds: number[]): number | null => (ds.length ? ds.reduce((s, v) => s + v, 0) / ds.length : null)
 const tenDang = (chuyenDe: string): string => chuyenDe.replace(/^CD:/, '').trim()
 const ms = (v: unknown): number => (typeof v === 'number' ? v : typeof v === 'string' && v.trim() ? Date.parse(v) : NaN)
+
+/** PHẦN RẺ cho dòng gập của khối (chạy mỗi lần màn làm mới): chỉ đếm bài đã nộp có điểm + điểm trung bình, KHÔNG đụng bảng chấm từng câu. */
+export function tomTatCaLop(em: Pick<EmChoBaoCao, 'trangThai' | 'diem'>[]): { nop: number; tb: number | null } {
+  const diem = em.filter(laDaNop).map((e) => e.diem as number)
+  return { nop: diem.length, tb: tb(diem) }
+}
 
 /** "2 phút 10 giây" từ số giây (làm tròn). */
 export function chuGiay(giay: number): string {

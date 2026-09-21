@@ -42,7 +42,7 @@ import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 import BaoCaoCaLopKhoi from '../components/xem-diem-gv/BaoCaoCaLop'
-import { tinhBaoCaoCaLop } from '../lib/bao-cao-ca-lop'
+import { tinhBaoCaoCaLop, tomTatCaLop } from '../lib/bao-cao-ca-lop'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -470,9 +470,19 @@ export default function ExamMonitorScreen() {
     return out
   }, [chiTiet, teacherBank, soCauCa, classList, deRiengCa, lapDungLai])
 
-  // BÁO CÁO CẢ LỚP (Xem điểm bản 2 · GV-1): chỉ GOM số đã có ở máy này — điểm đã chấm + bảng chấm từng câu của em đã nộp. Không chấm lại, không gọi mạng.
-  const baoCaoLop = useMemo(() => {
-    if (!chiTiet) return null
+  // BÁO CÁO CẢ LỚP (Xem điểm bản 2 · GV-1): chỉ GOM số đã có ở máy này — không chấm lại, không gọi mạng.
+  // TÍNH LƯỜI: màn tự làm mới suốt giờ kiểm tra, nên dòng gập chỉ dùng phần RẺ (`tomTatLop`: đếm bài nộp + điểm trung bình);
+  // phần nặng (bảng chấm từng câu của MỌI em) chỉ chạy khi thầy mở khối / ca đã đóng, và nhớ theo `khoaBaoCaoLop`.
+  const tomTatLop = useMemo(() => tomTatCaLop(dsEm.map((e) => ({ trangThai: e.moiNhat.trangThai, diem: e.diem }))), [dsEm])
+  // (đổi ca ⇒ khối dựng lại nhờ `key` ở chỗ vẽ, nên khoá không cần mã ca)
+  const khoaBaoCaoLop = [
+    tomTatLop.nop,
+    Math.round(dsEm.reduce((t, e) => t + (e.diem ?? 0), 0) * 100),
+    dsEm.reduce((t, e) => t + e.moiNhat.soLanRoiMan, 0),
+    teacherBank ? teacherBank.length : -1,
+    soCauCa ? soCauCa.I + soCauCa.II + soCauCa.III : 0,
+  ].join('|')
+  const tinhBaoCaoLop = () => {
     let bank: ReturnType<typeof mergeKeepAnswers> | null = null
     try {
       bank = teacherBank ? mergeKeepAnswers(teacherBank, soCauCa, boTheoEmDung) : null
@@ -481,7 +491,7 @@ export default function ExamMonitorScreen() {
     }
     const em = dsEm.map((e) => {
       let rows: ChiTietCauRow[] | null = null
-      if (bank && e.graded && e.moiNhat.dapAn) {
+      if (bank && chiTiet && e.graded && e.moiNhat.dapAn) {
         try {
           rows = taoChiTietCau(bank, chiTiet.ca.maCa, e.sbd, e.moiNhat.dapAn, e.moiNhat.giayCau)
         } catch {
@@ -491,7 +501,7 @@ export default function ExamMonitorScreen() {
       return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, trangThai: e.moiNhat.trangThai, diem: e.diem, score: e.graded?.score ?? null, vaoLuc: e.moiNhat.vaoLuc, nopLuc: e.moiNhat.nopLuc, soLanRoiMan: e.moiNhat.soLanRoiMan, tongGiayRoiMan: e.moiNhat.tongGiayRoiMan, rows }
     })
     return tinhBaoCaoCaLop(em, dsEm.length)
-  }, [chiTiet, dsEm, teacherBank, soCauCa, boTheoEmDung])
+  }
 
   // VÁ NGƯỢC KHOÁ `key/<maCa>.json` CHO CA CŨ — TỰ LÀNH KHI THẦY MỞ MÀN.
   //
@@ -1662,7 +1672,7 @@ export default function ExamMonitorScreen() {
 
           </div>
           <div className="ca-cot ca-cot-trai">
-          {baoCaoLop && <BaoCaoCaLopKhoi key={chiTiet.ca.maCa} bc={baoCaoLop} phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />}
+          <BaoCaoCaLopKhoi key={chiTiet.ca.maCa} tomTat={tomTatLop} tinh={tinhBaoCaoLop} khoa={khoaBaoCaoLop} phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />
           {/* DANH SÁCH EM */}
           <TheNoiDung className="gv-monitor-students">
             <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Học sinh trong ca ({dsEm.length})</div>

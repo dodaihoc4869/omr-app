@@ -36,7 +36,13 @@ const DAY: BaoCaoCaLop = {
 }
 const KHONG_DAP_AN: BaoCaoCaLop = { ...DAY, baPhan: [], dang: [], cauSai: [], coBangCham: false }
 
-const ve = (bc: BaoCaoCaLop, moSan: boolean, onMoEm = vi.fn()) => ({ ...render(<BaoCaoCaLopKhoi bc={bc} phutDe={45} moSan={moSan} onMoEm={onMoEm} />), onMoEm })
+/** `tinh` là spy: khối chỉ được gọi nó khi thật sự dựng phần nặng. `tomTat` là phần rẻ cho dòng gập. */
+const ve = (bc: BaoCaoCaLop, moSan: boolean, onMoEm = vi.fn(), khoa = 'k1') => {
+  const tinh = vi.fn(() => bc)
+  const cau = (k: string) => <BaoCaoCaLopKhoi tomTat={{ nop: bc.nop, tb: bc.tb }} tinh={tinh} khoa={k} phutDe={45} moSan={moSan} onMoEm={onMoEm} />
+  const r = render(cau(khoa))
+  return { ...r, onMoEm, tinh, veLai: (k: string) => r.rerender(cau(k)) }
+}
 
 describe('GV-1 · gập/mở theo trạng thái ca', () => {
   it('chưa ai nộp ⇒ không vẽ gì (không khối rỗng)', () => {
@@ -63,6 +69,47 @@ describe('GV-1 · gập/mở theo trạng thái ca', () => {
   it('ca đã đóng (moSan=true): mở sẵn, thấy đủ các khối', () => {
     const r = ve(DAY, true)
     for (const t of ['Phổ điểm của lớp', 'Ba phần của bài (trung bình cả lớp)', 'Dạng cả lớp đang vấp', 'Câu cả lớp sai nhiều nhất', 'Em cần thầy để ý']) expect(r.getByText(t)).toBeTruthy()
+  })
+})
+
+describe('GV-1 · TÍNH LƯỜI (màn tự làm mới suốt giờ kiểm tra — Boss soát 21/09)', () => {
+  it('ca đang mở + khối gập: dòng tóm tắt lấy từ phần rẻ, phần nặng KHÔNG được tính', () => {
+    const r = ve(DAY, false)
+    expect(r.getByRole('button', { name: /Báo cáo cả lớp/ }).textContent).toContain('Điểm trung bình 6,15 · 12 em đã nộp')
+    r.veLai('k2')
+    r.veLai('k3')
+    expect(r.tinh).not.toHaveBeenCalled()
+  })
+
+  it('bấm mở ⇒ tính đúng MỘT lượt; vẽ lại nhiều lần với cùng khoá ⇒ không tính lại; khoá đổi (có em nộp thêm…) ⇒ tính lại đúng một lượt nữa', () => {
+    const r = ve(DAY, false)
+    fireEvent.click(r.getByRole('button', { name: /Báo cáo cả lớp/ }))
+    expect(r.tinh).toHaveBeenCalledTimes(1)
+    r.veLai('k1')
+    r.veLai('k1')
+    expect(r.tinh).toHaveBeenCalledTimes(1)
+    r.veLai('k2')
+    expect(r.tinh).toHaveBeenCalledTimes(2)
+  })
+
+  it('gập rồi mở lại với cùng khoá vẫn hiện đủ (tính lại là được, nhưng không được hỏng)', () => {
+    const r = ve(DAY, false)
+    const nut = r.getByRole('button', { name: /Báo cáo cả lớp/ })
+    fireEvent.click(nut)
+    fireEvent.click(nut)
+    fireEvent.click(nut)
+    expect(r.getByText('Phổ điểm của lớp')).toBeTruthy()
+    expect(r.tinh.mock.calls.length).toBeLessThanOrEqual(2)
+  })
+
+  it('ca đã đóng (mở sẵn): tính một lượt lúc dựng', () => {
+    const r = ve(DAY, true)
+    expect(r.tinh).toHaveBeenCalledTimes(1)
+  })
+
+  it('chưa ai nộp ⇒ không tính gì', () => {
+    const r = ve({ ...DAY, nop: 0, tb: null }, true)
+    expect(r.tinh).not.toHaveBeenCalled()
   })
 })
 
@@ -163,15 +210,17 @@ describe('GV-1 · chỗ nối ở ExamMonitorScreen (chỉ phần nhìn)', () =>
   const nguon = readFileSync('src/screens/ExamMonitorScreen.tsx', 'utf8')
 
   it('khối đứng trong cột danh sách em, ngay trên "Học sinh trong ca"; ca đang mở thì gập, đóng thì mở; đổi ca thì dựng lại', () => {
-    expect(nguon).toContain("<BaoCaoCaLopKhoi key={chiTiet.ca.maCa} bc={baoCaoLop} phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />")
+    expect(nguon).toContain("<BaoCaoCaLopKhoi key={chiTiet.ca.maCa} tomTat={tomTatLop} tinh={tinhBaoCaoLop} khoa={khoaBaoCaoLop} phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />")
     expect(nguon.indexOf('<BaoCaoCaLopKhoi')).toBeLessThan(nguon.indexOf('Học sinh trong ca ({dsEm.length})'))
   })
 
-  it('chỉ GOM số đã có: không chấm lại, không gọi mạng, không đụng công bố/khoá/rời màn', () => {
-    const i = nguon.indexOf('const baoCaoLop = useMemo')
-    const khoi = nguon.slice(i, nguon.indexOf('}, [chiTiet, dsEm, teacherBank, soCauCa, boTheoEmDung])', i))
-    expect(khoi).not.toMatch(/gradeSubmissionFull|fetch|await|ghiDiem|khoaCa|moKhoa|congBo|setLoi|useState/)
+  it('chỉ GOM số đã có: không chấm lại, không gọi mạng, không đụng công bố/khoá/rời màn; phần nặng nằm TRONG hàm tính lười, không trong useMemo chạy mỗi lần làm mới', () => {
+    const a = nguon.indexOf('const tinhBaoCaoLop = () =>')
+    const khoi = nguon.slice(a, nguon.indexOf('return tinhBaoCaoCaLop(em, dsEm.length)', a))
+    expect(khoi).not.toMatch(/gradeSubmissionFull|fetch|await|ghiDiem|khoaCa|moKhoa|congBo|setLoi|useState|useMemo/)
     expect(khoi).toContain('taoChiTietCau')
-    expect(khoi).toContain('tinhBaoCaoCaLop')
+    // taoChiTietCau + mergeKeepAnswers không được nằm trong phần rẻ chạy theo dsEm
+    const re = nguon.slice(nguon.indexOf('const tomTatLop = useMemo'), a)
+    expect(re).not.toMatch(/taoChiTietCau|mergeKeepAnswers/)
   })
 })
