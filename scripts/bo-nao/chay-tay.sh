@@ -16,5 +16,5 @@ awk 'BEGIN{d=0} /^---[[:space:]]*$/ && d<2 {d++; next} d>=2 || d==0 {print}' "$L
   --allowedTools \
     "Bash(node scripts/bo-nao/lay.mjs:*)" "Bash(node scripts/bo-nao/nop.mjs:*)" \
     "Bash(date:*)" "Bash(TZ=Asia/Ho_Chi_Minh date:*)" "Bash(ls:*)" "Bash(cat bo-nao/CHAY-NGAY.txt)" "Bash(rm bo-nao/CHAY-NGAY.txt)" "Bash(rm -f bo-nao/CHAY-NGAY.txt)" \
-    "Read(bo-nao/**)" "Edit(bo-nao/**)" "Write(bo-nao/**)" "Glob" "Grep" "Agent" "Task" \
+    "Read(bo-nao/**)" "Edit(bo-nao/**)" "Glob" "Grep" "Agent" "Task" \
   --disallowedTools "WebFetch" "WebSearch" "Bash(git:*)" "Bash(curl:*)" "Bash(wrangler:*)" "Bash(npx:*)"
