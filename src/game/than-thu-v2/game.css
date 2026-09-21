@@ -32,4 +32,4 @@
 .spirit-game.spirit-game-dao{padding:0;background:transparent;border-radius:0;max-width:none}
 
 /* cụm 6 (21/09): biểu tượng nét thay emoji trước chữ */
-.immortal-inventory strong svg,.immortal-gift svg{vertical-align:-3px;margin-right:2px}
+.immortal-inventory strong svg,.immortal-gift svg{display:inline-block;vertical-align:-3px;margin-right:2px}

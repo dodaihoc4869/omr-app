@@ -69,6 +69,8 @@ describe('Đoàn Hộ Tống · giao diện · Sảnh bước 5 (vé, chuỗi, �
     voi(sanh())
     expect(await screen.findByText('Đoàn Hộ Tống 12A1')).toBeTruthy(); expect(screen.getByText('MÙA 1 · CÒN 19 NGÀY')).toBeTruthy()
     expect(screen.getByLabelText('Em có 2 vé hộ tống')).toBeTruthy(); expect(screen.getByLabelText('Chuỗi 5 ngày', { selector: 'span' })).toBeTruthy()
+    // Cụm 6: chữ đủ nhãn, hai thẻ nằm hàng riêng dưới tên đoàn (390 px không chen với tên) và không còn emoji.
+    expect(document.querySelector('.dh-hang-the')!.textContent).toBe('Vé hộ tống: 2Chuỗi 5 ngày')
     expect(screen.getByText('Trạm 17/30 · còn 3 trạm tới Hồ Cân Bằng')).toBeTruthy(); expect(man().textContent).toContain('9/32 bạn góp sức hôm nay'); expect(man().textContent).toContain('còn 4 chặng thắng nữa là lớp tiến một trạm')
     expect(screen.getByText('CHẶNG HÔM NAY · MIỄN PHÍ')).toBeTruthy()
     expect(screen.getByLabelText('Rương chuỗi ngày').textContent).toContain('Còn 2 ngày mở rương 7 ngày'); expect(screen.getByLabelText('Rương chuỗi ngày').textContent).toContain('đi chặng hôm nay để giữ chuỗi'); expect(document.querySelectorAll('.dh-chuoi-vach i.dh-xong')).toHaveLength(5)
