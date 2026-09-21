@@ -93,6 +93,19 @@ describe('lay.mjs --chieu', () => {
     const b2 = await lay()
     expect(b2.bang).toEqual(b1.bang)
   })
+  it('LẤY LẠI = trang trắng: ra/, xem-truoc.*, nop-ket-qua.json của lượt trước bị xoá (không bao giờ nộp nhầm lời cũ); bí danh vẫn giữ', async () => {
+    const l1 = await lay()
+    ghiRa([pt(biDanhCua(l1.bang, '20001'), LOI_TOT[0].chu)])
+    await chayNopChieu({ ngay: NGAY, goc, goi: mayChuGia().goi, xemTruoc: true })
+    writeFileSync(join(thuMucChieu(), 'nop-ket-qua.json'), '{}')
+    expect(existsSync(join(thuMucChieu(), 'xem-truoc.md'))).toBe(true)
+    const l2 = await lay()
+    expect(l2.bang).toEqual(l1.bang)
+    for (const f of ['xem-truoc.md', 'xem-truoc.json', 'nop-ket-qua.json', join('ra', 'chieu-01.json')]) expect(existsSync(join(thuMucChieu(), f)), f).toBe(false)
+    expect(existsSync(join(thuMucChieu(), 'ra'))).toBe(true)
+    // ra/ trống ⇒ nộp bị chặn từ đầu (mã 6), không có gì để nộp nhầm
+    await expect(chayNopChieu({ ngay: NGAY, goc, goi: mayChuGia().goi })).rejects.toMatchObject({ maThoat: 6 })
+  })
   it('cờ thuThach tắt hoặc bộ não tắt ⇒ dừng bằng lời (mã 4), không gọi lệnh lấy hồ sơ', async () => {
     for (const ch of [{ bat: true, thuThach: false }, { bat: false, thuThach: true }]) {
       const mc = mayChuGia(ch)

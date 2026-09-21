@@ -140,7 +140,7 @@ export async function chayLay({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date.now(
 /**
  * LƯỢT CHIỀU (thầy chốt 21/09 — "Thử thách riêng hôm nay"): lấy thẻ của em CÓ TÍN HIỆU trong ngày (`mocDangKhen`, làm bài hôm qua / 3 ngày), không vắng, có mã dạng — tối đa `toiDa` em, ưu tiên nhiều tín hiệu.
  * Ghi ở `bo-nao/<ngày>/chieu/` (KHÔNG đụng lượt đêm): `vao/chieu-NN.json` (thẻ NÉN, ≤ ${TOI_DA_THE_MOI_TEP_CHIEU} em/tệp; đã có `thanThu` nếu máy chủ trả), `ra/` trống, `LUAT-CHIEU.md`, `tom-tat.json`,
- * `.bi-danh.json` + `.the-day-du.json` (quyền 600, AI không mở). Không cập nhật `lan-cuoi.json` (không lẫn chạy bù của lượt đêm). Cờ `bo_nao.thuThach` tắt ⇒ dừng.
+ * `.bi-danh.json` + `.the-day-du.json` (quyền 600, AI không mở). Lấy lại = trang trắng (xoá `ra/`, `xem-truoc.*`, `nop-ket-qua.json` cũ). Không cập nhật `lan-cuoi.json` (không lẫn chạy bù của lượt đêm). Cờ `bo_nao.thuThach` tắt ⇒ dừng.
  */
 export function diemTinHieuChieu(the) {
   const t = the && typeof the === 'object' ? the : {}
@@ -184,6 +184,9 @@ export async function chayLayChieu({ ngay, goc = GOC_DU_LIEU, goi, bayGio = Date
   mkdirSync(join(thuMuc, 'vao'), { recursive: true })
   mkdirSync(join(thuMuc, 'ra'), { recursive: true })
   donVao(join(thuMuc, 'vao'))
+  // LƯỢT CHIỀU LẤY MỚI = TRANG TRẮNG: kết quả / xem trước của lượt lấy trước KHÔNG được sống sót (lời cũ có thể lệch thẻ mới; không bao giờ nộp nhầm bản cũ). Khác lượt đêm (giữ `ra/`).
+  donVao(join(thuMuc, 'ra'))
+  for (const f of ['xem-truoc.md', 'xem-truoc.json', 'nop-ket-qua.json']) rmSync(join(thuMuc, f), { force: true })
   const tepChia = chiaTep(nhom, TOI_DA_THE_MOI_TEP_CHIEU)
   tepChia.forEach((c, i) => ghiJson(join(thuMuc, 'vao', `chieu-${soTep(i)}.json`), c))
   ghiJson(join(thuMuc, '.bi-danh.json'), { ngay, bang }, { rieng: true })
