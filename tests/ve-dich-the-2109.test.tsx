@@ -211,6 +211,14 @@ describe('TheVeDich — bốn trạng thái + qua hạn', () => {
     fireEvent.click(screen.getByRole('button', { name: /Làm chặng 2 ngay/ }))
     expect(onLam).toHaveBeenCalledTimes(1)
     expect(container.textContent).not.toMatch(/nhờ Thầy gia hạn|lười|muộn rồi/i)
+    // Boss soát ảnh vd-tre: khung CAM (không xanh lá), cờ "Đã qua hạn" mờ, chặng chưa xong = "Còn nợ" (không "Hôm nay"/thứ)
+    expect(the.querySelector('[data-vung="nop-tre"]')!.classList.contains('vd-mung--luu-y')).toBe(true)
+    expect(the.querySelector('.vd-moc--dich')!.classList.contains('vd-moc--het')).toBe(true)
+    expect([...the.querySelectorAll('.vd-moc__ten')].pop()!.textContent).toBe('Đã qua hạn')
+    expect([...the.querySelectorAll('.vd-moc__tt')].map((m) => m.textContent)).toEqual(['Đã xong', 'Còn nợ', 'Còn nợ', ''])
+    expect([...the.querySelectorAll('.vd-moc')].map((m) => m.getAttribute('aria-label'))).toEqual(['Chặng 1: đã xong', 'Chặng 2: còn nợ', 'Chặng 3: còn nợ', 'Đích: đã qua hạn nộp'])
+    expect(container.textContent).not.toMatch(/Hôm nay|Thứ Sáu|Hạn nộp 12/)
+    expect(doc('src/components/bang-nhiem-vu/ve-dich.css')).toMatch(/\.vd-mung--luu-y \{[^}]*canh-bao-nen/)
   })
 
   it('nhiều bài: bài KHẨN NHẤT (hạn sớm nhất) là thẻ đầy đủ; bài khác một dòng (tối đa 3); chỉ nợ ôn (không bài) ⇒ chỉ khối ngày trước', () => {
@@ -289,5 +297,51 @@ describe('khoá nguồn', () => {
       expect(s, p).not.toMatch(/thần thú|khiên|Võ đài|lười/i)
     }
     expect(doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')).toMatch(/\{!laPh && duLieu\.veDich && !dangTai && \(/)
+  })
+})
+
+describe('NỘP TRỄ ở máy em (Điều 4 = B): thẻ "Đã qua Hạn nộp" không còn chặn khi máy chủ cho nộp', () => {
+  const NOW_T = Date.parse('2026-09-26T10:00:00+07:00')
+  const keHoachTre = (veDich: unknown): KeHoachNgayMayChu =>
+    ({
+      ok: true,
+      nganSach: { mucTieuCau: 12, toiThieuCau: 6, vanTocGiay: 78, vanTocNguon: 'do', ghiChuVanToc: '' },
+      viec: [],
+      canhBao: [],
+      quaHan: [{ loai: 'btvn', ma: 'B1', hanNop: '2026-09-25T05:00:00Z', conLai: 24 }],
+      tienBo: { daLamCau: 0, lenBac: 0, conThieu: 6 },
+      chuoiDat: 0,
+      lanNghi: false,
+      capNhatLuc: new Date(NOW_T - 60_000).toISOString(),
+      ...(veDich === undefined ? {} : { veDich, no: { theoNgay: [] } }),
+    }) as KeHoachNgayMayChu
+  const phu = { dsBtvn: [{ maBtvn: 'B1', maCa: 'CA-1', tenBtvn: 'Ester – Lipid', soCau: 12 }], dsMomGiao: [] as any[] }
+  const baiTre = (chang_: string[], quaHan = true) => ({ ...nhan(BAI_MOT_NO), quaHan, chang: chang(chang_, ['2026-09-20', '2026-09-22', '2026-09-23'].slice(0, chang_.length)), toiNay: null })
+
+  it('máy chủ có veDich báo quaHan ⇒ "Bài đã qua Hạn nộp · em vẫn cần làm nốt 2 chặng · sẽ ghi nộp trễ", BẤM ĐƯỢC (mo_btvn "Làm nốt bài"), không "nhờ Thầy gia hạn"', () => {
+    const d = tuKeHoachNgay(keHoachTre([baiTre(['xong', 'hom_nay', 'sap_toi'])]), NOW_T, phu)
+    expect(d.quaHan[0]).toMatchObject({ loai: 'btvn', chu: 'Bài đã qua Hạn nộp · em vẫn cần làm nốt 2 chặng · sẽ ghi nộp trễ' })
+    expect(d.quaHan[0]!.hanhDong).toMatchObject({ loai: 'mo_btvn', nhanNut: 'Làm nốt bài' })
+    expect(JSON.stringify(d.quaHan[0])).not.toMatch(/nhờ Thầy gia hạn/)
+    const onHanhDong = vi.fn()
+    render(<BangNhiemVu vaiTro="hocsinh" hoTen="Minh" now={NOW_T} duLieu={{ ...d, thanThu: { kieu: 'chua_biet' } } as any} onHanhDong={onHanhDong} taiVinhDanh={async () => null} />)
+    const nut = screen.getAllByRole('button').find((b) => /Đã qua Hạn nộp|qua Hạn nộp/.test(b.getAttribute('aria-label') || ''))!
+    expect(nut.getAttribute('aria-label')).toContain('sẽ ghi nộp trễ')
+    fireEvent.click(nut)
+    expect(onHanhDong).toHaveBeenCalledTimes(1)
+    expect(onHanhDong.mock.calls[0]![0]).toMatchObject({ loai: 'mo_btvn' })
+  })
+  it('chặng còn lại 0 ⇒ câu "em vẫn làm và nộp được"; máy chủ CŨ (không veDich) hoặc bài KHÔNG quaHan hoặc mã khác ⇒ GIỮ chữ cũ "nhờ Thầy gia hạn" và không nút', () => {
+    expect(tuKeHoachNgay(keHoachTre([baiTre(['xong', 'xong'])]), NOW_T, phu).quaHan[0]!.chu).toBe('Bài đã qua Hạn nộp · em vẫn làm và nộp được · sẽ ghi nộp trễ')
+    for (const kh of [keHoachTre(undefined), keHoachTre([baiTre(['xong', 'hom_nay'], false)]), keHoachTre([{ ...baiTre(['xong', 'hom_nay']), maBtvn: 'B9' }])]) {
+      const q = tuKeHoachNgay(kh, NOW_T, phu).quaHan[0]!
+      expect(q.chu).toBe('Đã qua Hạn nộp — nhờ Thầy gia hạn')
+      expect(q.hanhDong).toBeUndefined()
+    }
+  })
+  it('máy em KHÔNG tự chặn theo hạn: nguồn nộp chặng chỉ dịch lời của MÁY CHỦ (qua_han ⇒ câu chung), không so hạn với giờ máy', () => {
+    const s = doc('src/lib/btvn-nop-chang-em.ts')
+    expect(s).toMatch(/if \(ket\.lyDo === 'qua_han'\) return 'Bài đã quá hạn nộp\.'/)
+    expect(s).not.toMatch(/hanNop|Date\.now\(\)\s*[<>]/)
   })
 })

@@ -185,7 +185,7 @@ export interface TheQuaHan {
   loai: 'btvn' | 'mom'
   tieuDe: string
   chu: string
-  /** Chỉ bài Mẹ giao mới mở được (nộp phần đã lưu); BTVN quá hạn cần Thầy gia hạn. */
+  /** Bài Mẹ giao mở được (nộp phần đã lưu); BTVN quá hạn: mở được KHI máy chủ cho nộp trễ (`veDich[].quaHan`), còn khoá thì cần Thầy gia hạn. */
   hanhDong?: HanhDongNhiemVu
 }
 
@@ -652,12 +652,26 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     bai: baiTonCu,
   }
 
+  const veDichView = docVeDich(keHoach)
   const quaHan: TheQuaHan[] = (keHoach.quaHan || []).map((q) => {
     if (q.loai === 'mom') {
       const bai = momTheoId(q.ma)
       return { id: `qua_han:mom:${q.ma}`, loai: 'mom', tieuDe: bai?.tieuDe || 'Bài gia đình giao', chu: 'Đã hết giờ — mở để nộp phần đã lưu', hanhDong: { loai: 'mo_mom', payload: bai ? { id: bai.id, bai } : { id: q.ma }, nhanNut: 'Mở để nộp' } }
     }
     const bt = btvnTheoMa(q.ma)
+    // NỘP TRỄ (Điều 4 = B, thầy chốt 21/09): máy chủ báo bài qua hạn mà em VẪN làm và nộp được (`veDich[].quaHan`) ⇒ KHÔNG chặn ở máy em: thẻ mở được, chữ "sẽ ghi nộp trễ".
+    // Máy chủ cũ / bài máy chủ vẫn khoá (không có trong `veDich`) ⇒ giữ nguyên chữ cũ "nhờ Thầy gia hạn", không nút.
+    const baiTre = veDichView?.bai.find((b) => b.quaHan && (b.maBtvn === q.ma || (bt && b.maBtvn === bt.maBtvn)))
+    if (baiTre) {
+      const conLai = baiTre.chang.filter((c) => c.trangThai !== 'xong').length
+      return {
+        id: `qua_han:btvn:${q.ma}`,
+        loai: 'btvn',
+        tieuDe: tenBaiTapVeNha(bt),
+        chu: conLai > 0 ? `Bài đã qua Hạn nộp · em vẫn cần làm nốt ${conLai} chặng · sẽ ghi nộp trễ` : 'Bài đã qua Hạn nộp · em vẫn làm và nộp được · sẽ ghi nộp trễ',
+        hanhDong: bt ? { loai: 'mo_btvn', payload: { bt }, nhanNut: 'Làm nốt bài' } : undefined,
+      }
+    }
     return { id: `qua_han:btvn:${q.ma}`, loai: 'btvn', tieuDe: tenBaiTapVeNha(bt), chu: 'Đã qua Hạn nộp — nhờ Thầy gia hạn' }
   })
 
@@ -703,7 +717,7 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     capNhatLuc: keHoach.capNhatLuc,
     ghiChuCu: cu && keHoach.capNhatLuc ? `Kế hoạch lúc ${gioVietNam(keHoach.capNhatLuc)} — chưa cập nhật được, đang hiện bản cuối.` : undefined,
     ngayNghi: keHoach.lanNghi === true,
-    veDich: docVeDich(keHoach),
+    veDich: veDichView,
     thanThu: docThanThu(keHoach.thanThu),
     tonCu,
     ...docExp(keHoach),

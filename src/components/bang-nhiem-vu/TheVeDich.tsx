@@ -24,6 +24,7 @@ export interface TheVeDichProps {
 const tenCang = (b: BaiVeDich) => b.chang.length
 
 function DuongChang({ b, now, vua }: { b: BaiVeDich; now: number; vua: boolean }) {
+  const qua = b.quaHan
   const n = b.chang.length
   if (n === 0) return null
   const soXong = b.chang.filter((c) => c.trangThai === 'xong').length
@@ -37,9 +38,10 @@ function DuongChang({ b, now, vua }: { b: BaiVeDich; now: number; vua: boolean }
         {soNo > 0 && <i className="vd-day--no" style={{ left: `${xongPct.toFixed(1)}%`, width: `${(noPct - (soXong > 1 ? 0 : 0)).toFixed(1)}%` }} />}
       </li>
       {b.chang.map((c, i) => {
-        const cls = c.trangThai === 'xong' ? 'xong' : c.trangThai === 'no' ? 'no' : c.trangThai === 'hom_nay' ? 'nay' : 'toi'
-        const tt = c.trangThai === 'xong' ? (vua && i === soXong - 1 ? 'Vừa xong' : 'Đã xong') : c.trangThai === 'hom_nay' ? 'Hôm nay' : thuCuaNgay(c.ngay)
-        const ten = c.trangThai === 'xong' ? 'đã xong' : c.trangThai === 'no' ? `còn lại từ ${thuCuaNgay(c.ngay)}` : c.trangThai === 'hom_nay' ? 'của hôm nay' : `sắp tới, ${thuCuaNgay(c.ngay)}`
+        // QUÁ HẠN: hạn đã qua thì không còn lịch theo thứ — mọi chặng chưa xong đều là "còn nợ".
+        const cls = c.trangThai === 'xong' ? 'xong' : qua || c.trangThai === 'no' ? 'no' : c.trangThai === 'hom_nay' ? 'nay' : 'toi'
+        const tt = c.trangThai === 'xong' ? (vua && i === soXong - 1 ? 'Vừa xong' : 'Đã xong') : qua ? 'Còn nợ' : c.trangThai === 'hom_nay' ? 'Hôm nay' : thuCuaNgay(c.ngay)
+        const ten = c.trangThai === 'xong' ? 'đã xong' : qua ? 'còn nợ' : c.trangThai === 'no' ? `còn lại từ ${thuCuaNgay(c.ngay)}` : c.trangThai === 'hom_nay' ? 'của hôm nay' : `sắp tới, ${thuCuaNgay(c.ngay)}`
         return (
           <li key={c.chiSo} className={`vd-moc vd-moc--${cls}${vua && c.trangThai === 'xong' && i === soXong - 1 ? ' vd-moc--vua' : ''}`} aria-label={`Chặng ${c.chiSo + 1}: ${ten}`}>
             <span className="vd-moc__o" aria-hidden="true">
@@ -54,17 +56,17 @@ function DuongChang({ b, now, vua }: { b: BaiVeDich; now: number; vua: boolean }
           </li>
         )
       })}
-      <li className="vd-moc vd-moc--dich" aria-label={`Đích: Hạn nộp ${chuHanNop(b.hanNop).split(' · ')[0]} ${nhanCoHan(b.hanNop, now)}`}>
+      <li className={`vd-moc vd-moc--dich${qua ? ' vd-moc--het' : ''}`} aria-label={qua ? 'Đích: đã qua hạn nộp' : `Đích: Hạn nộp ${chuHanNop(b.hanNop).split(' · ')[0]} ${nhanCoHan(b.hanNop, now)}`}>
         <span className="vd-moc__o" aria-hidden="true">
           <span className="vd-moc__tron">
             <Flag className="vd-i" aria-hidden="true" />
           </span>
         </span>
         <span className="vd-moc__ten" aria-hidden="true">
-          Hạn nộp
+          {qua ? 'Đã qua hạn' : 'Hạn nộp'}
         </span>
         <span className="vd-moc__tt vd-so" aria-hidden="true">
-          {nhanCoHan(b.hanNop, now)}
+          {qua ? '' : nhanCoHan(b.hanNop, now)}
         </span>
       </li>
     </ol>
@@ -131,7 +133,7 @@ function TheMotBai({ b, no, now, onLam, soViecConLai, ngayVuaTra }: { b: BaiVeDi
           <p className="vd-dau__nhan">Đường về đích · Bài tập về nhà</p>
           <h2 id={`vd-t-${b.maBtvn}`}>{b.ten}</h2>
         </div>
-        <div className="vd-mung" role="status" data-vung="nop-tre">
+        <div className="vd-mung vd-mung--luu-y" role="status" data-vung="nop-tre">
           <i aria-hidden="true">
             <Clock className="vd-i" />
           </i>

@@ -169,4 +169,9 @@
 .vd-khac small { font-size: var(--bnv-cx-1); font-weight: 600; color: var(--vd-nhat); }
 .vd-nhom { display: grid; gap: 10px; }
 .vd { display: grid; gap: 12px; }
+/* QUÁ HẠN (nộp trễ): khung cảnh báo CAM (không xanh lá — không đọc như tin vui); cờ hạn mờ, "Đã qua hạn"; chặng chưa xong ghi "còn nợ". */
+.vd-mung--luu-y { background: var(--m3-canh-bao-nen); color: var(--m3-canh-bao-chu); box-shadow: inset 0 0 0 1px var(--m3-canh-bao-chu); }
+.vd-mung--luu-y > i { background: var(--vd-no); color: var(--vd-no-chu); }
+.vd-mung--luu-y p { color: var(--m3-canh-bao-chu); }
+.vd-moc--het { opacity: 0.6; }
 
