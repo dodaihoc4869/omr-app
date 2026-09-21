@@ -12,6 +12,9 @@ LOI_DAN="bo-nao/LOI-DAN-PHIEN.md"   # lời dặn đi cùng gói, không phụ t
 [ -f "$LOI_DAN" ] || { echo "Không thấy lời dặn: $LOI_DAN"; exit 1; }
 echo "Bộ não A.I bắt đầu chạy… (thường 10–25 phút; xong sẽ in tổng kết ≤ 8 dòng)"
 # Bỏ phần đầu tệp (frontmatter giữa hai dòng ---) rồi đưa lời dặn qua ĐƯỜNG NHẬP CHUẨN: lời dặn bắt đầu bằng "---" sẽ bị hiểu nhầm là tuỳ chọn nếu truyền làm tham số.
+# Trợ lý con chạy NỀN: bản `claude -p` mặc định chỉ chờ việc nền 600 giây rồi tự kết thúc ("Background tasks still running after 600s; terminating") —
+# lượt 21/09 13:02 bị cắt giữa chừng, không ra tệp xem trước. Nới trần chờ lên 90 phút (không để vô hạn kẻo treo).
+export CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS="${CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS:-5400000}"
 awk 'BEGIN{d=0} /^---[[:space:]]*$/ && d<2 {d++; next} d>=2 || d==0 {print}' "$LOI_DAN" | claude -p \
   --allowedTools \
     "Bash(node scripts/bo-nao/lay.mjs:*)" "Bash(node scripts/bo-nao/nop.mjs:*)" \

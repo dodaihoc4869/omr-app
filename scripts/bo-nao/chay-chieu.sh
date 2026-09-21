@@ -23,6 +23,9 @@ LOI_DAN="bo-nao/LOI-DAN-CHIEU.md"
 [ -f "$LOI_DAN" ] || { echo "Không thấy lời dặn: $LOI_DAN"; exit 1; }
 if [ -n "$NGAY" ]; then printf '%s\n' "$NGAY" > bo-nao/CHAY-NGAY-CHIEU.txt; else rm -f bo-nao/CHAY-NGAY-CHIEU.txt; fi
 echo "Bộ não A.I lượt chiều bắt đầu… (thường 3–8 phút; xong sẽ in ≤ 6 dòng và tệp xem-truoc.md — CHƯA nộp)"
+# Trợ lý con chạy NỀN: bản `claude -p` mặc định chỉ chờ việc nền 600 giây rồi tự kết thúc ("Background tasks still running after 600s; terminating") —
+# lượt 21/09 13:02 bị cắt giữa chừng, không ra tệp xem trước. Nới trần chờ lên 40 phút (không để vô hạn kẻo treo).
+export CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS="${CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS:-2400000}"
 claude -p --allowedTools \
     "Bash(node scripts/bo-nao/lay.mjs --chieu:*)" "Bash(node scripts/bo-nao/nop.mjs --chieu --xem-truoc:*)" \
     "Bash(date:*)" "Bash(TZ=Asia/Ho_Chi_Minh date:*)" "Bash(ls:*)" "Bash(cat bo-nao/CHAY-NGAY-CHIEU.txt)" "Bash(rm bo-nao/CHAY-NGAY-CHIEU.txt)" "Bash(rm -f bo-nao/CHAY-NGAY-CHIEU.txt)" \
