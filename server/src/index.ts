@@ -15,6 +15,7 @@ import {notifications,deliverNotices} from './notifications'
 import {canhBaoChoEm,emXemCanhBao,guiCanhBao} from './canh-bao-thay'
 import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
 import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-nay-v2'
+import {gvLichSuCauCuaEm} from './gv-lich-su-cau'
 import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
 import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
 import {gvBangTin} from './gv-bang-tin'
@@ -3158,6 +3159,8 @@ export default {
       if (p === '/gv/vinh-danh-ngay') return ra(await gvVinhDanhNgay(env, b))
       if (p === '/gv/tim-em') return ra(await gvTimEm(env, b))
       if (p === '/gv/em-toan-canh') return ra(await gvEmToanCanh(env, b))
+      // GỌI LÊN BẢNG (thầy lệnh 21/09): em đã làm câu này chưa, đúng hay sai, quét HẾT lịch sử (KHÔNG áp mốc 12:00). ĐỌC-CHỈ, ≤ 200 cặp, 2 truy vấn (docs/hop-dong-lich-su-cau-len-bang-2109.md).
+      if (p === '/gv/lich-su-cau-cua-em') return ra(await gvLichSuCauCuaEm(env, b))
       // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
       if (p === '/gv/lop') return ra(await gvLop(env))
       if (p === '/gv/doi-lop-em') return ra(await gvDoiLopEm(env, b))
