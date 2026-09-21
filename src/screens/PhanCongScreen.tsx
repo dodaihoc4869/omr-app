@@ -643,6 +643,11 @@ function TheGiaoBtvn() {
                   })}
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Bấm một lớp để chọn sẵn mọi em của lớp ấy; bỏ chọn từng em ở danh sách “Theo em” bên dưới.</p>
+                {lopThay.lyDoThieu && (
+                  <p data-khoi="ly-do-thieu-lop" className="text-xs text-slate-500 dark:text-slate-400">
+                    Máy chủ báo: {lopThay.lyDoThieu}
+                  </p>
+                )}
               </div>
             )}
 

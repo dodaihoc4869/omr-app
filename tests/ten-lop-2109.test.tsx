@@ -108,8 +108,12 @@ describe('lớp nối /gv/lop và /gv/doi-lop-em', () => {
   it('layLopThay: POST /gv/lop kèm mã bí mật; 404 ⇒ lời thật; trả không có `lop` ⇒ không đọc được (KHÔNG danh sách rỗng giả)', async () => {
     dungMayChu({ '/gv/lop': () => ({ json: LOP }) })
     const a = await layLopThay()
-    expect(a.ok && a.du).toHaveLength(3)
+    expect(a.ok && a.du.lop).toHaveLength(3)
+    expect(a.ok && a.du.lyDoThieu).toBe('')
     expect(goi).toHaveBeenLastCalledWith('/gv/lop', {})
+    dungMayChu({ '/gv/lop': () => ({ json: { ok: true, lop: [{ tenLop: '12 - Lớp Thường', khoi: '12', soEm: 1, sbd: ['1'] }], lyDoThieu: 'Chưa có cột tên lớp trên máy chủ.' } }) })
+    const thieu = await layLopThay()
+    expect(thieu.ok && thieu.du.lyDoThieu).toBe('Chưa có cột tên lớp trên máy chủ.') // Worker lên trước migration: vẫn ok, kèm lý do nói thật
     dungMayChu({})
     expect(await layLopThay()).toMatchObject({ ok: false, loai: 'chua_co_lenh' })
     dungMayChu({ '/gv/lop': () => ({ json: { ok: true } }) })
@@ -191,6 +195,18 @@ describe('PhanCongScreen — Chọn theo lớp', () => {
     fireEvent.click(within(nhom).getByRole('button', { name: '12 - Tinh Hoa · 2 em' }))
     await waitFor(() => expect(daChon()).toEqual([2, 5]))
     expect(within(nhom).getByRole('button', { name: '12 - Tinh Hoa · 2 em' }).getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('WORKER LÊN TRƯỚC MIGRATION (`lyDoThieu`): chip vẫn dùng được (lớp mặc định theo khối) và màn nói thật "Máy chủ báo: …" nguyên văn', async () => {
+    dungMayChu({ '/gv/lop': () => ({ json: { ok: true, lop: [{ tenLop: '12 - Lớp Thường', khoi: '12', soEm: 4, sbd: ['001', '002', '003', '004'] }], lyDoThieu: 'Chưa có cột tên lớp trên máy chủ.' } }) })
+    const nhom = await moGiao()
+    expect(within(nhom).getAllByRole('button').map((b) => b.textContent)).toEqual(['12 - Lớp Thường · 4 em'])
+    expect(document.body.querySelector('[data-khoi="ly-do-thieu-lop"]')!.textContent).toBe('Máy chủ báo: Chưa có cột tên lớp trên máy chủ.')
+    cleanup()
+    xoaNhoLop()
+    dungMayChu({ '/gv/lop': () => ({ json: LOP }) })
+    await moGiao()
+    expect(document.body.querySelector('[data-khoi="ly-do-thieu-lop"]')).toBeNull() // bình thường: không dòng "Máy chủ báo"
   })
 
   it('máy chủ trả DANH SÁCH LỚP RỖNG: mục ẨN (không dựng nhóm chip trống)', async () => {

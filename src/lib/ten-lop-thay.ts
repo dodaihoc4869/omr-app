@@ -1,7 +1,7 @@
 // LỚP NỐI "TÊN LỚP" của app thầy (thầy lệnh 21/09: tách khối 12 thành "12 - Tinh Hoa" / "12 - Lớp Thường"; `lop` vẫn là khối, `ten_lop` là tên lớp thật).
-// Chỉ tệp này biết hình dạng hai lệnh (Code 3 chốt ở docs/hop-dong-ten-lop-2109.md; dạng ĐỀ NGHỊ của Code 4, chờ xác nhận):
-//   POST /gv/lop {}                        → { ok, lop: [{ tenLop, khoi, soEm, sbd: [..] }] }   (đọc)
-//   POST /gv/doi-lop-em {sbd, tenLop}      → { ok, sbd, tenLop }                                  (GHI — đổi tên lớp MỘT em)
+// Chỉ tệp này biết hình dạng hai lệnh (hợp đồng docs/hop-dong-ten-lop-2109.md, Code 3, main 98d26c2):
+//   POST /gv/lop {}                        → { ok, soEm, lop: [{ tenLop, khoi, soEm, sbd: [..] }], lyDoThieu? }   (đọc; `lyDoThieu` chỉ có khi máy chủ chưa chạy migration ⇒ mọi em ở lớp mặc định theo khối)
+//   POST /gv/doi-lop-em {sbd, tenLop}      → { ok, sbd, tenLop }  hoặc { ok:false, error: lời tiếng Việt }         (GHI — đổi tên lớp MỘT em)
 // Lệnh chưa có (404) ⇒ mọi chỗ dùng ẨN mục tên lớp, KHÔNG lỗi đỏ.
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
@@ -30,11 +30,16 @@ export function docLop(j: Record<string, unknown>): LopThay[] {
 }
 
 /** Danh sách lớp của thầy (lệnh CHỈ ĐỌC). 404 ⇒ lời thật, không danh sách giả. */
-export async function layLopThay(): Promise<KetQuaLenh<LopThay[]>> {
+export interface DanhSachLop {
+  lop: LopThay[]
+  /** Máy chủ nói VÌ SAO chưa có tên lớp thật (vd chưa chạy migration) — hiện nguyên văn, không bịa. Vắng ⇒ ''. */
+  lyDoThieu: string
+}
+export async function layLopThay(): Promise<KetQuaLenh<DanhSachLop>> {
   const r = await goiLenh('/gv/lop', {}, 'Máy chủ chưa có lệnh tên lớp.')
   if (!r.ok) return r
   if (!Array.isArray(r.du.lop)) return { ok: false, loai: 'khong_doc_duoc', chu: 'Máy chủ trả danh sách lớp không đúng dạng.' }
-  return { ok: true, du: docLop(r.du) }
+  return { ok: true, du: { lop: docLop(r.du), lyDoThieu: chu(r.du.lyDoThieu) } }
 }
 
 /** Đổi tên lớp của MỘT em (lệnh GHI). Máy chủ từ chối ⇒ giữ nguyên lời của máy chủ; chậm ⇒ nói CHƯA CHẮC. */
@@ -61,12 +66,12 @@ export function banDoTenLop(ds: LopThay[]): Record<string, string> {
 }
 
 // Nhớ ngắn trong bộ nhớ (60 giây) để mở nhanh giữa Giao bài / Học sinh không gọi máy chủ lặp; đổi lớp xong thì xoá.
-let nho: { luc: number; r: KetQuaLenh<LopThay[]> } | null = null
+let nho: { luc: number; r: KetQuaLenh<DanhSachLop> } | null = null
 const HAN_NHO_MS = 60_000
 export const xoaNhoLop = () => {
   nho = null
 }
-async function layCoNho(): Promise<KetQuaLenh<LopThay[]>> {
+async function layCoNho(): Promise<KetQuaLenh<DanhSachLop>> {
   if (nho && Date.now() - nho.luc < HAN_NHO_MS) return nho.r
   const r = await layLopThay()
   nho = { luc: Date.now(), r }
@@ -74,8 +79,8 @@ async function layCoNho(): Promise<KetQuaLenh<LopThay[]>> {
 }
 
 /** Hook: danh sách lớp + tên lớp của từng em. `ds === null` ⇒ chưa có (đang tải hoặc lệnh chưa có) — nơi dùng ẩn mục tên lớp. */
-export function useLopThay(): { ds: LopThay[] | null; tenLopCua: (sbd: string) => string; lamMoi: () => void } {
-  const [ket, setKet] = useState<KetQuaLenh<LopThay[]> | undefined>(undefined)
+export function useLopThay(): { ds: LopThay[] | null; lyDoThieu: string; tenLopCua: (sbd: string) => string; lamMoi: () => void } {
+  const [ket, setKet] = useState<KetQuaLenh<DanhSachLop> | undefined>(undefined)
   const [lan, setLan] = useState(0)
   useEffect(() => {
     let con = true
@@ -84,11 +89,11 @@ export function useLopThay(): { ds: LopThay[] | null; tenLopCua: (sbd: string) =
       con = false
     }
   }, [lan])
-  const ds = ket?.ok && ket.du.length > 0 ? ket.du : null
+  const ds = ket?.ok && ket.du.lop.length > 0 ? ket.du.lop : null
   const ban = useMemo(() => (ds ? banDoTenLop(ds) : {}), [ds])
   const lamMoi = useCallback(() => {
     xoaNhoLop()
     setLan((n) => n + 1)
   }, [])
-  return { ds, tenLopCua: (sbd) => ban[sbd] ?? '', lamMoi }
+  return { ds, lyDoThieu: ket?.ok ? ket.du.lyDoThieu : '', tenLopCua: (sbd) => ban[sbd] ?? '', lamMoi }
 }
