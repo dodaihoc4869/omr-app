@@ -460,7 +460,8 @@ export function phanLuong(the: TheNgan, boiCanh: { sbd: string; ngay: string }):
     } else if (co === 'dung_nhanh') lyDo.push(`đúng nhanh bất thường: ${Math.round((c.tiLe3 ?? 0) * 100)} % đúng, ${the.giay.homQua} giây/câu so với trung vị ${the.giay.trungVi7}`)
     else if (co === 'lam_cho_xong') lyDo.push(`làm cho xong: ${Math.round((c.tiLe3 ?? 0) * 100)} % đúng, ${the.giay.homQua} giây/câu so với trung vị ${the.giay.trungVi7}`)
     else if (co === 'vua_thi' && the.ca) lyDo.push(`vừa thi ${the.ca.ngayTruoc} ngày trước`)
-    else if (co === 'moi_vao') lyDo.push(`mới vào ${h.soNgayTuLucDau} ngày`)
+    // `moi_vao` chỉ là GHI CHÚ trong thẻ (AI thấy để giữ tải nhẹ), KHÔNG tự đẩy em vào luồng sâu: sau đợt xoá sổ 21/09 MỌI em đều "mới vào" trong 7 ngày ⇒ cả lớp thành luồng sâu (tốn mô hình mạnh nhất, không thêm tín hiệu).
+    // Em mới vẫn được soi kỹ đúng một lần mỗi tuần (xoay vòng) và AI đặt `canSau` khi cần.
     else if (co === 'xau_di_hom_qua') lyDo.push('điều chỉnh hôm qua chưa hiệu quả')
   }
   if (lyDo.length === 0 && toiLuotSoiKy(boiCanh.sbd, boiCanh.ngay)) lyDo.push('tới lượt soi kỹ xoay vòng hằng tuần')

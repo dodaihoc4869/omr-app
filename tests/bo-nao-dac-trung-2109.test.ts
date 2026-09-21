@@ -224,7 +224,11 @@ describe('PHÂN LUỒNG', () => {
     const r2 = luong({ suKien: sai, cau: sai.map((e) => ({ qid: e.qid, dang: 'ESTE.X', lanSai: 1, trangThai: 'moi_sai' as const })) })
     expect(r2.lyDo).toContain('sai lặp: dạng ESTE.X sai 3/3 lần trong 7 ngày')
     expect(luong({ caGanNhat: { diem: 6, ngayNop: ngayTruoc(2) } }).lyDo).toContain('vừa thi 2 ngày trước')
-    expect(luong({ ngayHoatDongDau: ngayTruoc(3) }).lyDo).toContain('mới vào 3 ngày')
+    // mới vào (≤ 7 ngày) chỉ là ghi chú trong thẻ: KHÔNG tự đẩy vào luồng sâu (sau xoá sổ cả lớp đều "mới vào")
+    const sbdKhongToiLuot = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'].find((x) => !toiLuotSoiKy(x, NGAY))!
+    const the3 = the({ sbd: sbdKhongToiLuot, ngayHoatDongDau: ngayTruoc(3), suKien: ngay(1, 5, 4) })
+    expect(the3.co).toEqual(['moi_vao']) // cờ VẪN có trong thẻ cho AI…
+    expect(phanLuong(the3, { sbd: sbdKhongToiLuot, ngay: NGAY })).toEqual({ luong: 'nhanh', lyDo: [] }) // …nhưng không đẩy em vào luồng sâu
   })
   it('không cờ, không tới lượt xoay vòng ⇒ nhanh; tới lượt ⇒ sâu vì xoay vòng', () => {
     const sbds = Array.from({ length: 300 }, (_, i) => `sb${i}`)
