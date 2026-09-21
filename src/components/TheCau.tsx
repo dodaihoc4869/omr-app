@@ -15,6 +15,7 @@ import { ChemText } from '../lib/chem-format'
 import { tachDongTheoY } from '../lib/tach-dong-cau'
 import { BangSoLieu, CauHinh, HinhTaiViTri } from './QuestionMedia'
 import { TheNoiDung, DauThe, Hang, Nhan } from './DesignSystem'
+import ONhapDapSo from './ONhapDapSo'
 import './m3/the-cau.css' // chỉ có hiệu lực dưới tổ tiên `.m3` (luyện đề / khắc phục / báo cáo…); game và app giáo viên không đổi
 
 export type CheDo = 'thi' | 'xem_lai'
@@ -89,39 +90,8 @@ export type TheCauProps = McqProps | TfProps | SaProps
 // hai của "thẳng tuyệt đối". Hằng CHU_CAI cũ đặt bề rộng bằng tay nên đã bỏ.
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)', flexShrink: 0 }
 
-/** Đáp án đang mang dấu âm chưa. Bỏ khoảng trắng đầu vì em hay gõ lỡ. */
-export function laAm(v: string | null | undefined): boolean {
-  return String(v ?? '').trimStart().startsWith('-')
-}
-
-/** ĐỔI DẤU đáp án phần III — bàn phím số của iPhone không có dấu trừ.
- *
- * Ô trống bấm dấu trừ vẫn ra `-`, để em bấm dấu trước rồi gõ số cũng được. */
-export function doiDau(v: string): string {
-  const s = String(v ?? '')
-  const dau = s.match(/^\s*/)?.[0] ?? ''
-  const than = s.slice(dau.length)
-  return than.startsWith('-') ? dau + than.slice(1) : dau + '-' + than
-}
-
-/** THÊM DẤU PHẨY vào đáp án phần III — thầy báo 07/09: "có một số bàn phím
- * của iPhone không hiển thị dấu ,".
- *
- * `inputMode="decimal"` đáng ra cho dấu thập phân, nhưng trên vài bố cục bàn
- * phím iOS nó ra dấu chấm hoặc không ra gì. Em không gõ nổi `1,5` thì mọi câu
- * có phần thập phân đều mất điểm oan.
- *
- * ĐÃ CÓ dấu thập phân rồi thì không thêm nữa: `1,,5` không phải số. */
-export function themPhay(v: string): string {
-  const s = String(v ?? '')
-  return s.includes(',') || s.includes('.') ? s : s + ','
-}
-
-/** Đáp án đã có dấu thập phân chưa — để khoá nút, không cho gõ thành `1,,5`. */
-export function coPhay(v: string | null | undefined): boolean {
-  const s = String(v ?? '')
-  return s.includes(',') || s.includes('.')
-}
+// Các phép về dấu âm / dấu phẩy của ô trả lời ngắn nay nằm ở `src/lib/nhap-dap-so.ts` (dùng chung mọi app + tờ phiếu); giữ tên xuất cũ cho các nơi/test đã nhập từ đây.
+export { laAm, doiDau, themPhay, coPhay } from '../lib/nhap-dap-so'
 
 /** MỘT NGUỒN SỰ THẬT — dấu ✓/✗ ở màn xem lại phải khớp từng ly với cách CHẤM.
  *
@@ -408,67 +378,37 @@ export default function TheCau(props: TheCauProps) {
       //
       // 07/09 thêm nút DẤU PHẨY cùng lý do: vài bố cục bàn phím iOS không hiện
       // dấu phẩy, em không gõ nổi `1,5`.
-      <div className="flex items-stretch" style={{ gap: 'var(--k2)' }}>
-        <button
-          type="button"
-          className="tap-target shrink-0"
-          aria-label={laAm(selected) ? 'Bỏ dấu âm' : 'Thêm dấu âm'}
-          onClick={() => onChange?.(doiDau(selected ?? ''))}
-          style={{
-            minHeight: 56,
-            width: 56,
-            borderRadius: 'var(--bo-1)',
-            border: '1.5px solid var(--vien)',
-            background: laAm(selected) ? 'var(--muc)' : 'var(--the-2)',
-            color: laAm(selected) ? 'var(--muc-nguoc)' : 'var(--muc)',
-            fontFamily: 'var(--serif)',
-            fontSize: 'var(--cx-3)',
-            fontWeight: 700,
-            lineHeight: 1,
-          }}
-        >
-          −
-        </button>
-        <button
-          type="button"
-          className="tap-target shrink-0"
-          aria-label="Thêm dấu phẩy"
-          disabled={coPhay(selected)}
-          onClick={() => onChange?.(themPhay(selected ?? ''))}
-          style={{
-            minHeight: 56,
-            width: 48,
-            borderRadius: 'var(--bo-1)',
-            border: '1.5px solid var(--vien)',
-            background: 'var(--the-2)',
-            color: 'var(--muc)',
-            opacity: coPhay(selected) ? 0.45 : 1,
-            fontFamily: 'var(--serif)',
-            fontSize: 'var(--cx-3)',
-            fontWeight: 700,
-            lineHeight: 1,
-          }}
-        >
-          ,
-        </button>
-        <input
-          className="tap-target w-full"
-          style={{
-            minHeight: 56,
-            borderRadius: 'var(--bo-1)',
-            padding: 'var(--k3) var(--k4)',
-            background: 'var(--the-2)',
-            border: `1.5px solid ${daTraLoi ? 'var(--xanh)' : 'transparent'}`,
-            fontFamily: 'var(--serif)',
-            fontSize: 'var(--cx-3)',
-            color: 'var(--muc)',
-          }}
-          placeholder="Nhập đáp án"
-          inputMode="decimal"
-          value={selected ?? ''}
-          onChange={(e) => onChange?.(e.target.value)}
-        />
-      </div>
+      // 21/09 (thầy: "quét mọi chỗ mọi app"): hai nút nay là THÀNH PHẦN DÙNG CHUNG `ONhapDapSo` — bấm nút KHÔNG làm mất tiêu điểm (bàn phím không đóng),
+      // "," chèn TẠI CON TRỎ; bố cục cũ giữ nguyên (− , rồi ô), aria-label cũ giữ nguyên. Giá trị gửi lên vẫn là chuỗi em gõ (`onChange(chuỗi)`), không chuẩn hoá.
+      <ONhapDapSo
+        nutTruoc
+        value={selected ?? ''}
+        onChange={(v) => onChange?.(v)}
+        placeholder="Nhập đáp án"
+        style={{
+          gap: 'var(--k2)',
+          ['--ond-cao' as string]: '56px',
+          ['--ond-bo' as string]: 'var(--bo-1)',
+          ['--ond-vien' as string]: 'var(--vien)',
+          ['--ond-nut-nen' as string]: 'var(--the-2)',
+          ['--ond-nut-chu' as string]: 'var(--muc)',
+          ['--ond-bat-nen' as string]: 'var(--muc)',
+          ['--ond-bat-chu' as string]: 'var(--muc-nguoc)',
+        }}
+        nutClassName="tap-target"
+        nutStyle={{ minHeight: 56, borderRadius: 'var(--bo-1)', fontFamily: 'var(--serif)', fontSize: 'var(--cx-3)', minWidth: 48 }}
+        inputClassName="tap-target"
+        inputStyle={{
+          minHeight: 56,
+          borderRadius: 'var(--bo-1)',
+          padding: 'var(--k3) var(--k4)',
+          background: 'var(--the-2)',
+          border: `1.5px solid ${daTraLoi ? 'var(--xanh)' : 'transparent'}`,
+          fontFamily: 'var(--serif)',
+          fontSize: 'var(--cx-3)',
+          color: 'var(--muc)',
+        }}
+      />
     )
   }
 
