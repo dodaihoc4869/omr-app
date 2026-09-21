@@ -216,6 +216,10 @@ describe('taoShopApiThat — nối 5 lệnh thật', () => {
     expect(v).toMatch(/ThuMacDo/)
     expect(v).toMatch(/useMemo\(\(\) => taoShopApiThat/) // api ổn định giữa các lần vẽ (ManShop yêu cầu)
     const dao = doc('src/game/than-thu-v2/dao/DaoThanThu.tsx')
+    // Gói chính / gói Đảo KHÔNG nhập chu-shop.ts (module dùng chung với gói cửa hàng bị gộp NGUYÊN vào gói chứa nó — đo ở bản dựng): chỉ nhãn nhỏ ở chu-cua-vao.ts
+    expect(dao).not.toMatch(/shop\/chu-shop/)
+    expect(doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')).not.toMatch(/shop\/chu-shop/)
+    expect(doc('src/game/than-thu-v2/shop/chu-shop.ts')).toMatch(/export \{ chuCuaHang \} from '\.\/chu-cua-vao'/)
     expect(dao).toMatch(/lazy\(\(\)=>import\('\.\/ManShopThat'\)\)/)
     expect(doc('src/game/than-thu-v2/shop/ManShop.tsx')).not.toMatch(/phu-kien\/ThuMacDo/) // màn cửa hàng vẫn không import lớp mặc đồ
   })

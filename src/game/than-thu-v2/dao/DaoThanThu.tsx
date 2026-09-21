@@ -12,7 +12,7 @@ import type {LuotNgay,MaiCho} from './dao-core'
 import type {CauDao,DaoKetQua,DaoThanThuProps,ManDao} from './kieu'
 import {docLuotCauNgay,type LuotCauNgay} from '../chu-het-luot'
 import {laLoiHetTran,maCuaLoi} from '../loi-het-tran'
-import {chuCuaHang,chuDangTai} from '../shop/chu-shop'
+import {chuCuaHang} from '../shop/chu-cua-vao' // KHÔNG nhập chu-shop ở đây: module dùng chung với gói cửa hàng sẽ bị gộp NGUYÊN vào gói Đảo
 import './dao.css'
 
 const ManShopThat=lazy(()=>import('./ManShopThat')) // nạp lười: chỉ tải khi em bấm Cửa hàng (và chỉ có nút khi máy chủ báo shopBat)
@@ -91,7 +91,7 @@ export default function DaoThanThu({sbd,token,moShopLucDau,profile,doanMo,call:c
  if(dangTham&&luot)return <div className="dao dao-vo dao-vo-tham" data-thu={chiSoThu(profile.pet)}><ThamHiem profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} xong={xong} tongKet={{dung:ketQua.filter(k=>k.correct).length,tong:luot.cau.length,...thuong}}
   busy={busy} loi={loi} maLoi={maLoi} thongBao={bao} onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onVeDao={veDao} onChuyenMoi={conLai===0?undefined:()=>{setLuot(null);void lenDuong()}} onMoSoTay={()=>{veDao();setMan('so-tay')}}/></div>
 
- if(dangShop&&token)return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}><Suspense fallback={<p role="status" className="spirit-status">{chuDangTai}</p>}><ManShopThat token={token} pet={chiSoThu(profile.pet)} cap={profile.cap} tenThu={profile.nickname} onDong={()=>setDangShop(false)}/></Suspense></div>
+ if(dangShop&&token)return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}><Suspense fallback={<p role="status" aria-busy="true" className="spirit-status">{chuCuaHang}</p>}><ManShopThat token={token} pet={chiSoThu(profile.pet)} cap={profile.cap} tenThu={profile.nickname} onDong={()=>setDangShop(false)}/></Suspense></div>
  const muc:[ManDao|'doan'|'cua-hang',string][]=[['dao','Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ'],...(shopBat&&token?[['cua-hang',chuCuaHang]] as [ManDao|'doan'|'cua-hang',string][]:[])]
  return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}>
   {man==='dao'&&<DaoCuaEm profile={profile} exp={exp} chuoiNgay={chuoiNgay} goiY={goiY} conLai={conLai} luotCau={luotCau} luotNgay={luotNgay} maiCho={maiCho} tenDang={tenDang} tasks={tasks} busy={busy} loi={loi||loiChon} thongBao={bao||(luot&&!xong?'Em đang đi dở một chuyến — bấm LÊN ĐƯỜNG để đi tiếp.':'')}

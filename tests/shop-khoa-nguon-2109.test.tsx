@@ -27,7 +27,7 @@ describe('(h) khoá nguồn: màu · chữ · tiền tố', () => {
   it('chữ tiếng Việt hiển thị CHỈ nằm ở chu-shop.ts: mọi tệp TS/TSX/CSS/HTML khác không có ký tự có dấu ngoài chú thích', () => {
     const co: string[] = []
     for (const f of TEP) {
-      if (f.endsWith('chu-shop.ts')) continue
+      if (f.endsWith('chu-shop.ts') || f.endsWith('chu-cua-vao.ts')) continue // chu-cua-vao.ts = nhãn 'Cửa hàng' tách riêng để không kéo chu-shop vào gói chính (SỬA CÓ CHỦ Ý, B4)
       const s = bo(doc(f))
       const dong = s.split('\n').filter((l) => DAU.test(l))
       if (dong.length) co.push(`${f}: ${dong.slice(0, 3).map((l) => l.trim().slice(0, 90)).join(' ⏎ ')}`)

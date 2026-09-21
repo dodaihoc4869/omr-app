@@ -8,7 +8,7 @@ import type { Bac, OGan } from './kieu'
 export const so = (n: number): string => Number(n).toLocaleString('vi-VN')
 
 // ── Tiêu đề màn + nhãn [N1–N12] ──
-export const chuCuaHang = 'Cửa hàng' // [N1]
+export { chuCuaHang } from './chu-cua-vao' // [N1] — định nghĩa ở chu-cua-vao.ts (nhãn cửa vào dùng ở gói chính)
 export const chuCuaHangPhu = 'Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I' // [N1]
 export const chuThuDo = 'Thử đồ' // [N2]
 export const chuThuDoPhu = 'Thử thoải mái, không mất vàng' // [N2]
