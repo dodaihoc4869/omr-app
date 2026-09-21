@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { mulberry32 } from '../src/lib/exam-shuffle'
 import {
   BU_DAT_NGAY, CHENH_THUONG_NAC, HAP_THU_CO_HOC, HAP_THU_DAT, LUAT_CAP_MOI, NGAY_SOM_NHAT_CAP_10, NGAY_SOM_NHAT_CAP_120, TRAN_EXP_GAME_NGAY,
-  CO_HOC_TOI_THIEU_CAU, chenhDinhGia, chuyenDoiLuatCap, hapThu, laCoHoc, tongExpTheoDuongCu, tranExpGameNgay, tranHapThu, type HoSoCapExp, type HoSoCu,
+  CO_HOC_TOI_THIEU_CAU, chenhDinhGia, chuChuaDatNhiemVu, chuHapThu, chuThanhHapThu, chuyenDoiLuatCap, hapThu, laCoHoc, tongExpTheoDuongCu, tranExpGameNgay, tranHapThu, type HoSoCapExp, type HoSoCu,
 } from '../src/lib/hap-thu-ngay'
 import { BANG_THANH_EXP, nhanExp, thanhExp, thanhExpCu, tongExpToiCap, tongExpToiDinh } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 
@@ -162,6 +162,19 @@ describe('hapThu — cổng nạp của thần thú', () => {
     expect(hapThu({ cap: 5, exp: 0, wallet: 100 }, -50, NGAY, 200).daNap).toBe(0)
     expect(hapThu({ cap: 5, exp: 0, wallet: 100 }, 50, NGAY, 9999).hoSo.hapThu).toEqual({ ngay: NGAY, da: 50 }) // trần kẹp 200
     expect(hapThu({ cap: 5, exp: 0, wallet: 500 }, Number.POSITIVE_INFINITY, NGAY, 9999).daNap).toBe(200)
+  })
+})
+
+describe('chữ cho màn (Code 2 dùng nguyên chữ)', () => {
+  it('bốn lý do + nhắc chưa đạt + thanh hấp thụ: đúng chữ, có số thật, tên thú thiếu ⇒ "Thần thú"/"thần thú"', () => {
+    expect(chuHapThu('no', { tenThu: 'Mập Địch' })).toBe('Hôm nay Mập Địch đã ăn no. EXP còn lại nằm trong ống nghiệm, mai em nạp tiếp.')
+    expect(chuHapThu('chua_hoc', { tenThu: 'Mập Địch', soCauHomNay: 2 })).toBe('Em làm đủ 4 câu hôm nay rồi cho Mập Địch ăn nhé · em đã làm 2 câu.')
+    expect(chuHapThu('chua_hoc', { tenThu: ' ', soCauHomNay: Number.NaN })).toBe('Em làm đủ 4 câu hôm nay rồi cho Thần thú ăn nhé · em đã làm 0 câu.')
+    expect(chuHapThu('het_ong', { tenThu: 'X' })).toBe('Ống nghiệm của em đang hết EXP. Em làm bài tập về nhà hoặc phần ôn lại để có thêm EXP.')
+    expect(chuHapThu('cap_toi_da', { tenThu: 'Mập Địch' })).toBe('Mập Địch đã đạt cấp tối đa 120.')
+    expect(chuChuaDatNhiemVu('Mập Địch')).toBe('Đạt nhiệm vụ ngày hôm nay thì Mập Địch ăn được thêm 80 EXP.')
+    expect(chuThanhHapThu('Mập Địch', 120, 200)).toBe('Hôm nay Mập Địch đã hấp thụ 120 / 200 EXP')
+    expect(chuThanhHapThu('', -5, Number.NaN)).toBe('Hôm nay thần thú đã hấp thụ 0 / 0 EXP')
   })
 })
 

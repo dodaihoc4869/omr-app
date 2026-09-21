@@ -66,6 +66,22 @@ function sucChuaDenDinh(cap: number, exp: number): number {
   return Math.max(0, c)
 }
 
+/**
+ * CHỮ CHO MÀN (Boss + đề bài Đợt 1; từ chuẩn: "thần thú", "ống nghiệm", "EXP", "ôn lại", "nhiệm vụ ngày"): giọng trung tính, nói thật lý do, có số thật. Code 2 dùng NGUYÊN CHỮ.
+ * `tenThu` = tên thú của em (biệt danh hoặc tên loài); `soCauHomNay` = số câu KHÁC NHAU em đã làm hôm nay.
+ */
+export function chuHapThu(lyDo: Exclude<LyDoHapThu, null>, d: { tenThu: string; soCauHomNay?: number }): string {
+  const ten = d.tenThu.trim() || 'Thần thú'
+  if (lyDo === 'no') return `Hôm nay ${ten} đã ăn no. EXP còn lại nằm trong ống nghiệm, mai em nạp tiếp.`
+  if (lyDo === 'chua_hoc') return `Em làm đủ ${CO_HOC_TOI_THIEU_CAU} câu hôm nay rồi cho ${ten} ăn nhé · em đã làm ${soNguyen(d.soCauHomNay)} câu.`
+  if (lyDo === 'het_ong') return 'Ống nghiệm của em đang hết EXP. Em làm bài tập về nhà hoặc phần ôn lại để có thêm EXP.'
+  return `${ten} đã đạt cấp tối đa 120.`
+}
+/** Dòng nhắc khi em CÓ HỌC nhưng chưa đạt nhiệm vụ ngày (trần hôm nay 120): đạt thì thú ăn thêm phần chênh (80 EXP). */
+export const chuChuaDatNhiemVu = (tenThu: string): string => `Đạt nhiệm vụ ngày hôm nay thì ${tenThu.trim() || 'thần thú'} ăn được thêm ${HAP_THU_DAT - HAP_THU_CO_HOC} EXP.`
+/** Thanh nhỏ cạnh nút nạp: "Hôm nay {tên thú} đã hấp thụ 120 / 200 EXP". */
+export const chuThanhHapThu = (tenThu: string, da: number, tran: number): string => `Hôm nay ${tenThu.trim() || 'thần thú'} đã hấp thụ ${soNguyen(da)} / ${soNguyen(tran)} EXP`
+
 export interface KetQuaHapThu<H extends HoSoCapExp> {
   /** Hồ sơ sau khi nạp (đầu vào KHÔNG bị sửa). `daNap = 0` ⇒ trả lại CHÍNH đầu vào. */
   hoSo: H
