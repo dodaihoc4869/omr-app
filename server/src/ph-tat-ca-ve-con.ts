@@ -30,6 +30,7 @@ import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { baiTuNgayMoc, giaiMocHienThi } from './moc-no'
 import { TRAN_ON_KHI_KHONG_NO } from '../../src/lib/ve-dich'
 import { tuLucTuNgay } from './cau-da-lam'
+import { quotaPhan } from '../../src/engine/score'
 import { hangChamCuaEm } from './thi-dua-hom-nay'
 import { docVeDichCuaEm } from './ve-dich-d1'
 import { docCauBtvnChuaNop } from './game-v2-luot'
@@ -434,9 +435,11 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
       const truoc = cacCaDaCongBo.find((x) => chuoi(x.ma_ca) !== maCa && soHoacNull(x.tong) !== null)
       if (tong !== null && truoc) caGanNhat.truoc = { tong: soHoacNull(truoc.tong), doi: tron(tong - so(truoc.tong), 2) }
       const diemPhan: Record<string, number | null> = { I: soHoacNull(gan.diem_i), II: soHoacNull(gan.diem_ii), III: soHoacNull(gan.diem_iii) }
+      // `toiDa` (Code 2 xin cho thanh điểm từng phần; CHỈ-THÊM): trần điểm của phần = quotaPhan(số câu từng phần của lượt)/100 — MỘT nguồn với chấm điểm (src/engine/score.ts, tỉ lệ 450/400/150; phần thiếu chia lại).
+      const quota = quotaPhan({ I: cua.filter((x) => chuoi(x.phan) === 'I').length, II: cua.filter((x) => chuoi(x.phan) === 'II').length, III: cua.filter((x) => chuoi(x.phan) === 'III').length })
       const phan = (['I', 'II', 'III'] as const).map((ma) => {
         const c = cua.filter((x) => chuoi(x.phan) === ma)
-        return { ma, dung: c.filter((x) => x.dung_sai !== null && Number(x.dung_sai) === 1).length, tong: c.length, ...(diemPhan[ma] !== null ? { diem: diemPhan[ma] } : {}) }
+        return { ma, dung: c.filter((x) => x.dung_sai !== null && Number(x.dung_sai) === 1).length, tong: c.length, ...(diemPhan[ma] !== null ? { diem: diemPhan[ma] } : {}), toiDa: quota[ma] / 100 }
       }).filter((p) => p.tong > 0)
       if (phan.length > 0) caGanNhat.phan = phan
     }

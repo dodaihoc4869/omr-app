@@ -182,7 +182,8 @@ describe('ca CHƯA công bố: chỉ congBo + soEmDaNop/soEmDaVao — không đi
     const r = await chay(d, pass)
     expect(r.caGanNhat.congBo.daCongBo).toBe(true)
     expect(r.caGanNhat.ketQua).toEqual({ tong: 8.25, soCau: 2, soCauDung: 1 })
-    expect(r.caGanNhat.phan).toEqual([{ ma: 'I', dung: 1, tong: 2, diem: 3 }])
+    // SỬA CÓ CHỦ Ý 21/09: thêm `toiDa` (trần điểm phần = quotaPhan(số câu từng phần)/100). Ca CHỈ có phần I ⇒ phần I nhận đủ 10 (phần thiếu chia lại, src/engine/score.ts).
+    expect(r.caGanNhat.phan).toEqual([{ ma: 'I', dung: 1, tong: 2, diem: 3, toiDa: 10 }])
   })
   it('ca_lop_xong: cả lớp đã nộp HOẶC ca đã đóng ⇒ công bố; ca chưa ai vào KHÔNG tính là xong', async () => {
     for (const [tt, s2Nop] of [['mo', true], ['dong', false]] as const) {
@@ -260,7 +261,7 @@ describe('đủ khối khi có số thật', () => {
       congBo: { congBo: 'ngay', daCongBo: true, soEmDaNop: 1, soEmDaVao: 1 },
       ketQua: { tong: 7.5, soCau: 7, soCauDung: 4 },
       truoc: { tong: 6.75, doi: 0.75 },
-      phan: [{ ma: 'I', dung: 2, tong: 3, diem: 3 }, { ma: 'II', dung: 1, tong: 2, diem: 2.5 }, { ma: 'III', dung: 1, tong: 2, diem: 2 }],
+      phan: [{ ma: 'I', dung: 2, tong: 3, diem: 3, toiDa: 4.5 }, { ma: 'II', dung: 1, tong: 2, diem: 2.5, toiDa: 4 }, { ma: 'III', dung: 1, tong: 2, diem: 2, toiDa: 1.5 }], // toiDa: SỬA CÓ CHỦ Ý 21/09 (đủ ba phần ⇒ 4,5 / 4 / 1,5)
     })
     // tienBo.diem: cũ → mới
     expect(r.tienBo.diem).toEqual([
