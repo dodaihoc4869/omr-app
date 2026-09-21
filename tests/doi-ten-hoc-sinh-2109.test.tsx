@@ -234,7 +234,6 @@ vi.mock('../src/lib/ho-so-em-thay', async (goc) => ({ ...(await goc<typeof impor
 vi.mock('../src/components/NutDongBoDanhSach', () => ({ default: () => null }))
 vi.mock('../src/components/NutThemHocSinh', () => ({ default: () => null }))
 vi.mock('../src/components/NutBaiTapPdf', () => ({ default: () => null }))
-vi.mock('../src/components/PhieuZaloEm', () => ({ default: () => null }))
 vi.mock('../src/components/KhoiTienBo', () => ({ default: () => null }))
 const { default: HocSinhScreen } = await import('../src/screens/HocSinhScreen')
 

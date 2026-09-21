@@ -206,7 +206,7 @@ describe('bảng nghiệm thu mục 8 — phần nhãn', () => {
     // Thiếu ở một chỗ là chỗ đó cắt câu theo luật hash và dựng bảng của người
     // khác — sai điểm mà màn hình không báo gì. Đây là phép kiểm chống hồi quy
     // cho đúng cái bẫy đó.
-    for (const f of ['src/screens/ExamMonitorScreen.tsx', 'src/components/PhieuZaloEm.tsx', 'src/lib/phieu-ca-ca.ts', 'src/lib/de-rieng-nguon.ts']) {
+    for (const f of ['src/screens/ExamMonitorScreen.tsx', 'src/lib/phieu-ca-ca.ts', 'src/lib/de-rieng-nguon.ts']) {
       const ma = doc(f)
       const goi = ma.match(/mergeKeepAnswers\([^)]*\)/g) ?? []
       expect(goi.length).toBeGreaterThan(0)

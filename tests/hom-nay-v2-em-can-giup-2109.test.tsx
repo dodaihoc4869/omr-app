@@ -43,7 +43,7 @@ const NGUOI = [
   { sbd: '4', hoTen: 'Phạm Gia Bảo', lop: '12A1', lyDo: 'tut_bac', ngayTre: null, dang: [dang({ ma: 'D4', ten: 'Este – khái niệm', sai: 5, gap: 9, bac: 'van_dung', xuHuong: 'tang' })] },
   { sbd: '5', hoTen: 'Vũ Đức An', lop: '11B1', lyDo: 'dang_yeu', ngayTre: null, dang: [] },
 ]
-const RUT_GON = { tong: 2, ds: [{ sbd: '9', hoTen: 'Đỗ Khánh Linh', lop: '11B1', lyDo: 'tre_nhip', ngayTre: 3, dangYeu: [], hanhDong: 'nhan_phu_huynh' }] } as never
+const RUT_GON = { tong: 2, ds: [{ sbd: '9', hoTen: 'Đỗ Khánh Linh', lop: '11B1', lyDo: 'tre_nhip', ngayTre: 3, dangYeu: [], hanhDong: 'xem_ho_so' }] } as never
 
 const dung = (o: { canGiup?: (b: Record<string, unknown>) => Tra; rutGon?: unknown }) => {
   dungMayChu({ ...(o.canGiup ? { '/gv/can-giup': o.canGiup } : {}) })
@@ -127,20 +127,20 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
     for (const cam of ['xấu đi', 'khá lên', 'kém', 'tệ', 'lười', 'dở tệ']) expect(chu).not.toContain(cam)
   })
 
-  it('BA HÀNH ĐỘNG: Đưa vào buổi chữa ⇒ màn Gọi lên bảng · Giao bài riêng ⇒ tick sẵn em này rồi mở Giao bài · Nhắn phụ huynh ⇒ mở hồ sơ em', async () => {
+  it('HAI HÀNH ĐỘNG: Đưa vào buổi chữa ⇒ màn Gọi lên bảng · Giao bài riêng ⇒ tick sẵn em này rồi mở Giao bài; KHÔNG còn nút Nhắn phụ huynh (gỡ 21/09, thầy lệnh Bỏ phiếu Zalo)', async () => {
     const { container, moEm } = dung({ canGiup: luoc })
     await screen.findByText('Trần Thu Hà')
     const ha = () => container.querySelector('[data-sbd="1"]') as HTMLElement
+    expect(within(ha()).getAllByRole('button').map((b) => b.textContent)).toEqual(['Trần Thu Hà · 12A1', 'Đưa vào buổi chữa', 'Giao bài riêng'])
+    expect(screen.queryByRole('button', { name: 'Nhắn phụ huynh' })).toBeNull()
     fireEvent.click(within(ha()).getByRole('button', { name: 'Đưa vào buổi chữa' }))
     expect(useAppStore.getState().screen).toBe('goilenbang')
     fireEvent.click(within(ha()).getByRole('button', { name: 'Giao bài riêng' }))
     expect(useAppStore.getState().sbdGiaoRieng).toBe('1')
     expect(useAppStore.getState().screen).toBe('giaobtvn')
-    fireEvent.click(within(ha()).getByRole('button', { name: 'Nhắn phụ huynh' }))
-    expect(moEm).toHaveBeenLastCalledWith('1')
     fireEvent.click(within(ha()).getByRole('button', { name: /Trần Thu Hà · 12A1 — mở toàn cảnh/ }))
     expect(moEm).toHaveBeenLastCalledWith('1')
-    expect(moEm).toHaveBeenCalledTimes(2)
+    expect(moEm).toHaveBeenCalledTimes(1)
   })
 
   it('LỌC THEO LỚP: nút Tất cả + từng lớp kèm số em; bấm lớp ⇒ hỏi máy chủ với {lop}; giữ đủ nút lớp; lớp trống ⇒ nói rõ', async () => {
@@ -178,7 +178,7 @@ describe('EmCanGiup — ô EM CẦN THẦY GIÚP', () => {
     expect(ghi.closest('.hn2-ghi-chu')!.getAttribute('role')).toBe('status')
     expect(screen.getByText('Đỗ Khánh Linh')).toBeTruthy()
     expect(container.querySelector('.hn2-em-tong')!.textContent).toBe('2 em')
-    fireEvent.click(screen.getByRole('button', { name: 'Nhắn phụ huynh' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Xem hồ sơ' }))
     expect(moEm).toHaveBeenCalledWith('9')
     fireEvent.click(screen.getByRole('button', { name: 'Xem cả 2 em' }))
     expect(useAppStore.getState().screen).toBe('hocsinh')

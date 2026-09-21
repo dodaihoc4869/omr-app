@@ -26,7 +26,6 @@ import NhatKyDieuChinh from '../components/NhatKyDieuChinh'
 import DoiTenHocSinh from '../components/DoiTenHocSinh'
 import { doiTenEmTrongDanhSachLop } from '../lib/classlist-db'
 import type { KetQuaDoiTen } from '../lib/doi-ten-hs-api'
-import PhieuZaloEm from '../components/PhieuZaloEm'
 import './hoc-sinh-m3.css'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -66,7 +65,6 @@ export default function HocSinhScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
   const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
-  const [hienZalo, setHienZalo] = useState(false)
 
   /** Mở hồ sơ một em, ĐẶT SẴN mục cần xem. Bấm tên là vào TỔNG QUAN (G3): mạnh–yếu, lịch ôn, kế hoạch hôm nay, thần thú — câu hỏi đầu
    * tiên về một em là đang lên hay đang xuống, và trả lời ngay trên trang; nút Báo cáo vẫn mở báo cáo ca gần nhất như trước. */
@@ -301,9 +299,6 @@ export default function HocSinhScreen() {
                 >
                   Cho thi lại
                 </button>
-                <button type="button" className="tap-target hs-nut-vien" aria-pressed={hienZalo} onClick={() => setHienZalo((v) => !v)}>
-                  Nhắn phụ huynh
-                </button>
               </div>
 
               <div className="hs-ho-so-chan">
@@ -382,11 +377,6 @@ export default function HocSinhScreen() {
                 <div style={{ display: 'none' }} aria-hidden="true">
                   <KhoiTienBo ca={hoSo.ca} />
                   <NutBaiTapPdf sbd={hoSo.em.sbd} hoTen={hoSo.em.hoTen} lop={hoSo.em.lop} chuyenDe={hoSo.chuyenDe} chuyenDeCa={(hoSo.chuyenDeCaGanNhat ?? []).map((c) => c.ten)} showToast={showToast} />
-                </div>
-
-                {/* "Nhắn phụ huynh" (G3) mở phiếu Zalo có sẵn — cùng khối, cùng nút Gửi; chưa bấm thì ẩn như trước. */}
-                <div style={{ display: hienZalo ? 'block' : 'none' }} aria-hidden={!hienZalo}>
-                  <PhieuZaloEm hoSo={hoSo} showToast={showToast} />
                 </div>
 
                 <TheNoiDung>

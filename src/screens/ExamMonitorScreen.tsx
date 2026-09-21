@@ -27,7 +27,7 @@ import { dungDeRiengChoCa, dungLapTuMayChu } from '../lib/de-rieng-nguon'
 import { choEmThiLai } from '../lib/thi-lai'
 import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
-import { soanTinRoiMan } from '../lib/phieu-zalo'
+import { soanTinRoiMan } from '../lib/tin-nhan-thay'
 import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
 import { hoSoEm, type HoSoEm } from '../lib/exam-api'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
@@ -1722,7 +1722,7 @@ export default function ExamMonitorScreen() {
                       <span className="ca-o ca-o-em">
                         <span className="flex items-center flex-wrap" style={{ gap: 6 }}>
                           {/* CHẠM TÊN EM → hồ sơ đầy đủ ngay trong màn này:
-                              mạnh–yếu, lịch sử ca, tin nhắn và ảnh phiếu Zalo. */}
+                              mạnh–yếu và lịch sử ca. */}
                           <button
                             type="button"
                             onClick={() => setSbdHoSo(e.sbd)}

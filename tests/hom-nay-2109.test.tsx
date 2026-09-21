@@ -66,7 +66,7 @@ describe('hom-nay-api: hàm thuần', () => {
     expect(cauLyDo(em('tut_bac', { soCau: 5, soNgay: 3 }))).toBe('Tụt bậc 5 câu trong 3 ngày')
     expect(cauLyDo(em('dang_yeu', { ten: 'Oxi hoá ancol', soCauSai: 4 }))).toBe('Dạng "Oxi hoá ancol" sai 4 câu')
     expect(cauLyDo(em('dang_yeu', { ma: 'CD:x' }))).toContain('CD:x')
-    expect([hanhDongCua(em('tre_nhip', {})), hanhDongCua(em('tut_bac', {})), hanhDongCua(em('dang_yeu', {}))]).toEqual(['nhan_phu_huynh', 'xem_ho_so', 'dua_vao_buoi_chua'])
+    expect([hanhDongCua(em('tre_nhip', {})), hanhDongCua(em('tut_bac', {})), hanhDongCua(em('dang_yeu', {}))]).toEqual(['xem_ho_so', 'xem_ho_so', 'dua_vao_buoi_chua'])
     for (const s of [cauLyDo(em('tre_nhip', {})), cauLyDo(em('tut_bac', {})), cauLyDo(em('dang_yeu', {}))]) expect(s).not.toMatch(/nắm chắc|năng lực|giỏi|kém/i)
   })
 
@@ -163,7 +163,7 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
     // em cần giúp: MỘT lý do + MỘT nút mỗi em
     const dong = container.querySelectorAll('[data-khoi="em-can-giup"] .hn2-em')
     expect(dong).toHaveLength(3)
-    expect(within(dong[0] as HTMLElement).getByRole('button', { name: 'Nhắn phụ huynh' })).toBeTruthy()
+    expect(within(dong[0] as HTMLElement).getByRole('button', { name: 'Xem hồ sơ' })).toBeTruthy() // trễ nhịp: 21/09 bỏ nút Nhắn phụ huynh
     expect(within(dong[1] as HTMLElement).getByRole('button', { name: 'Đưa vào buổi chữa' })).toBeTruthy()
     expect(within(dong[2] as HTMLElement).getByRole('button', { name: 'Xem hồ sơ' })).toBeTruthy()
     for (const d of dong) expect(d.querySelectorAll('button')).toHaveLength(1)
@@ -176,12 +176,15 @@ describe('HomNayScreen (BẢN 2 — thầy lệnh 21/09, sửa CÓ CHỦ Ý các
     expect(container.textContent).not.toMatch(/Việc cần theo dõi hôm nay|Bảng tin của thầy|Hoạt động dạy học|Bài đã giao|CẦN THẦY ĐỂ Ý|lô \d/)
   })
 
-  it('nút hành động: Xem hồ sơ / Nhắn phụ huynh → hồ sơ em; Đưa vào buổi chữa → Gọi lên bảng; Giao bài tập về nhà theo dạng → giaobtvn; Rút đề → examsetup', async () => {
+  it('nút hành động: Xem hồ sơ (em trễ nhịp và em tụt bậc) → hồ sơ em; Đưa vào buổi chữa → Gọi lên bảng; Giao bài tập về nhà theo dạng → giaobtvn; Rút đề → examsetup', async () => {
     nap.hom = MAU
     render(<HomNayScreen />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Xem hồ sơ' }))
+    const xem = await screen.findAllByRole('button', { name: 'Xem hồ sơ' })
+    expect(xem).toHaveLength(2)
+    expect(screen.queryByRole('button', { name: 'Nhắn phụ huynh' })).toBeNull() // gỡ 21/09 (thầy lệnh Bỏ phiếu Zalo)
+    fireEvent.click(xem[1])
     expect([useAppStore.getState().screen, useAppStore.getState().sbdDangXem]).toEqual(['hocsinh', '12003'])
-    fireEvent.click(screen.getByRole('button', { name: 'Nhắn phụ huynh' }))
+    fireEvent.click(xem[0])
     expect(useAppStore.getState().sbdDangXem).toBe('12001')
     fireEvent.click(screen.getByRole('button', { name: 'Đưa vào buổi chữa' }))
     expect(useAppStore.getState().screen).toBe('goilenbang')

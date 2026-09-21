@@ -1,5 +1,5 @@
 // Việc C · C6 (Code 4): KhungXemPhieu — khung toàn màn bao phiếu HTML — mặc M3 CHỈ ở cổng học sinh / phụ huynh (dungM3()).
-// Khung còn được app giáo viên dùng chung (tờ máy chiếu, NutPhieuHtml, PhieuZaloEm) nên điều khoá số một là ĐỘ CÔ LẬP:
+// Khung còn được app giáo viên dùng chung (tờ máy chiếu, NutPhieuHtml) nên điều khoá số một là ĐỘ CÔ LẬP:
 // ngoài M3 khung ra đúng DOM cũ (`.lop-xem-phieu` + `.nut-dong-phieu`), không một lớp / kiểu nội tuyến nào khác.
 // Hành vi (Esc, quay lại, nút Đóng, hàm dong mới nhất) do tests/khung-xem-phieu.test.tsx khoá; ở đây khoá lại cho nhánh M3.
 import { afterEach, describe, expect, it, vi } from 'vitest'

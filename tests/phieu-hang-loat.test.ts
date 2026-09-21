@@ -1,10 +1,10 @@
-// TẢI PHIẾU HÀNG LOẠT — gói .zip tự viết và bảng chuyên đề của riêng một ca.
+// GÓI .zip tự viết (lib/zip) và bảng chuyên đề của riêng một ca. (Phần tên tệp zip của ảnh phiếu đã gỡ cùng phiếu Zalo, 21/09.)
 //
 // Tệp zip hỏng thì thầy chỉ biết lúc giải nén trước mặt phụ huynh, nên test
 // này đọc ngược lại từng byte header thay vì chỉ xem hàm có ném lỗi không.
 import { describe, expect, it } from 'vitest'
 import { crc32, taoZip } from '../src/lib/zip'
-import { chuyenDeTuChiTiet, tenTepZipCa } from '../src/lib/phieu-hang-loat'
+import { chuyenDeTuChiTiet } from '../src/lib/phieu-hang-loat'
 import type { ChiTietCauRow } from '../src/lib/exam-api'
 
 const bytes = (s: string) => new TextEncoder().encode(s) as Uint8Array<ArrayBuffer>
@@ -95,14 +95,5 @@ describe('Chuyên đề của riêng một ca', () => {
 
   it('câu bỏ trống (dungSai null) không tính là sai', () => {
     expect(chuyenDeTuChiTiet([row('A', null), row('A', true)])[0]).toEqual({ ten: 'A', soCau: 2, soSai: 0 })
-  })
-})
-
-describe('Tên tệp zip', () => {
-  it('bỏ dấu, kèm ngày', () => {
-    expect(tenTepZipCa('Kiểm tra 45 phút — Ester', '802553', new Date('2026-09-04T08:00:00+07:00'))).toBe('phieu-Kiem-tra-45-phut-Ester-20260904.zip')
-  })
-  it('ca không đặt tên thì lấy mã ca', () => {
-    expect(tenTepZipCa('', '802553', new Date('2026-09-04T08:00:00+07:00'))).toBe('phieu-ca-802553-20260904.zip')
   })
 })

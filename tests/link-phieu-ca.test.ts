@@ -111,9 +111,10 @@ describe('lệnh máy chủ và nút trên màn Theo dõi', () => {
   it('client gắn loại phiếu đúng chỗ, và `loai` không bị `...d` rải đè', async () => {
     const ma = (await import('../src/lib/exam-api.ts?raw')).default
     expect(ma).toContain("...d, loai: d.loai || 'ketqua'")
-    const pz = (await import('../src/components/PhieuZaloEm.tsx?raw')).default
-    expect(pz).toContain("loai: 'baitap'")
-    expect(pz).toContain("loai: 'ketqua'")
+    // (Chỗ dựng phiếu từng em — khối phiếu Zalo — đã gỡ 21/09; đường dựng phiếu cả ca còn giữ `loai` đúng loại.)
+    const caCa = (await import('../src/lib/phieu-ca-ca.ts?raw')).default
+    expect(caCa).toContain("loai: 'baitap'")
+    expect(caCa).toContain("loai: 'ketqua'")
   })
 
   // ĐỔI 15/09: thầy chốt gỡ hẳn thẻ "Xuất kết quả" khỏi màn Chi tiết ca, nên

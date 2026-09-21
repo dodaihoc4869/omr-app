@@ -39,7 +39,7 @@ function DongDang({ d }: { d: DangCanGiup }) {
   )
 }
 
-/** Ô EM CẦN THẦY GIÚP (bản vẽ docs/ban-ve-hom-nay-v2-2109/): mỗi em — lý do bằng SỐ + chi tiết từng dạng (sai x/y câu · bậc · xu hướng 7 ngày) + 3 hành động; lọc theo lớp; "Xem cả N em".
+/** Ô EM CẦN THẦY GIÚP (bản vẽ docs/ban-ve-hom-nay-v2-2109/): mỗi em — lý do bằng SỐ + chi tiết từng dạng (sai x/y câu · bậc · xu hướng 7 ngày) + 2 hành động (Đưa vào buổi chữa · Giao bài riêng; nút Nhắn phụ huynh gỡ 21/09 — kênh tới phụ huynh nay là Gửi cảnh báo + lời Bộ não A.I); lọc theo lớp; "Xem cả N em".
  *  Nguồn chi tiết: lệnh thầy CHỈ ĐỌC `/gv/can-giup` (Code 3). Chưa có lệnh / lỗi ⇒ nói thật rồi rơi về danh sách rút gọn của `/ke-hoach/hom-nay-thay` (không mất tính năng cũ, không bịa chi tiết). */
 export default function EmCanGiup({
   rutGon,
@@ -150,9 +150,6 @@ export default function EmCanGiup({
             </button>
             <button type="button" className="hn2-nut hn2-nut--vien hn2-nut--nho" onClick={() => giaoRieng(e.sbd)}>
               Giao bài riêng
-            </button>
-            <button type="button" className="hn2-nut hn2-nut--vien hn2-nut--nho" onClick={() => onMoEm(e.sbd)}>
-              Nhắn phụ huynh
             </button>
           </div>
         </div>

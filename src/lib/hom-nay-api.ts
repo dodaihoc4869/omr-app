@@ -80,12 +80,12 @@ export function cauLyDo(e: HomNayEm): string {
   return `Dạng "${s.ten || s.ma || '?'}" sai ${s.soCauSai ?? '?'} câu`
 }
 
-/** Nhãn nút hành động theo lý do (mỗi em MỘT nút). */
-export function hanhDongCua(e: HomNayEm): 'nhan_phu_huynh' | 'dua_vao_buoi_chua' | 'xem_ho_so' {
-  return e.lyDo === 'tre_nhip' ? 'nhan_phu_huynh' : e.lyDo === 'dang_yeu' ? 'dua_vao_buoi_chua' : 'xem_ho_so'
+/** Nhãn nút hành động theo lý do (mỗi em MỘT nút). 21/09 thầy lệnh "Bỏ phiếu Zalo": nút "Nhắn phụ huynh" gỡ hẳn — em trễ nhịp nay mở hồ sơ như tụt bậc. */
+export function hanhDongCua(e: HomNayEm): 'dua_vao_buoi_chua' | 'xem_ho_so' {
+  return e.lyDo === 'dang_yeu' ? 'dua_vao_buoi_chua' : 'xem_ho_so'
 }
 
-export const NHAN_HANH_DONG = { nhan_phu_huynh: 'Nhắn phụ huynh', dua_vao_buoi_chua: 'Đưa vào buổi chữa', xem_ho_so: 'Xem hồ sơ' } as const
+export const NHAN_HANH_DONG = { dua_vao_buoi_chua: 'Đưa vào buổi chữa', xem_ho_so: 'Xem hồ sơ' } as const
 
 /** Tỉ lệ nguyên (%) — `null` khi mẫu số 0 (không bịa 0%). */
 export function phanTram(tu: number, mau: number): number | null {

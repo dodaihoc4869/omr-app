@@ -220,7 +220,6 @@ vi.mock('../src/lib/exam-api', async (goc) => ({
 vi.mock('../src/components/NutDongBoDanhSach', () => ({ default: () => null }))
 vi.mock('../src/components/NutThemHocSinh', () => ({ default: () => null }))
 vi.mock('../src/components/NutBaiTapPdf', () => ({ default: () => null }))
-vi.mock('../src/components/PhieuZaloEm', () => ({ default: () => <div>KHOI PHIEU ZALO</div> }))
 vi.mock('../src/components/KhoiTienBo', () => ({ default: () => <div>KHOI TIEN BO</div> }))
 vi.mock('../src/components/BaoCaoCaThiHocSinhModal', () => ({
   default: (p: { onClose: () => void }) => (
@@ -268,7 +267,7 @@ describe('HocSinhScreen · hồ sơ tổng quan', () => {
     expect(document.querySelector('.hs-luoi')).toBeTruthy()
   })
 
-  it('ba nút hành động: Giao bài riêng → màn Giao BTVN · Cho thi lại → mở CA GẦN NHẤT của em · Nhắn phụ huynh → hiện phiếu Zalo', async () => {
+  it('hai nút hành động: Giao bài riêng → màn Giao BTVN · Cho thi lại → mở CA GẦN NHẤT của em (nút Nhắn phụ huynh + phiếu Zalo đã gỡ 21/09)', async () => {
     const { container } = await moHoSo('ten')
     await waitFor(() => expect(container.querySelector('.hs-viec')).toBeTruthy())
     fireEvent.click(screen.getByRole('button', { name: 'Giao bài riêng' }))
@@ -276,11 +275,8 @@ describe('HocSinhScreen · hồ sơ tổng quan', () => {
     expect(m.datSbd).toHaveBeenCalledWith('001') // màn Giao bài mở sẵn, đã tick đúng em này
     fireEvent.click(screen.getByRole('button', { name: 'Cho thi lại' }))
     expect(m.moChiTietCa).toHaveBeenCalledWith('222222') // nộp 03/09 — muộn hơn ca 01/09
-    const zalo = screen.getByText('KHOI PHIEU ZALO').parentElement as HTMLElement
-    expect(zalo.style.display).toBe('none')
-    fireEvent.click(screen.getByRole('button', { name: 'Nhắn phụ huynh' }))
-    expect(zalo.style.display).toBe('block')
-    expect(screen.getByRole('button', { name: 'Nhắn phụ huynh' }).getAttribute('aria-pressed')).toBe('true')
+    expect(screen.queryByRole('button', { name: 'Nhắn phụ huynh' })).toBeNull()
+    expect(container.textContent).not.toContain('Gửi phụ huynh')
   })
 
   it('em chưa có ca nào: nút Cho thi lại tắt (không mở ca không có)', async () => {

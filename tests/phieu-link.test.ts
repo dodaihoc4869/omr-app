@@ -1,8 +1,7 @@
-// LINK BÁO CÁO GỬI PHỤ HUYNH — đường /p#<mã> và tin nhắn mang link.
+// LINK BÁO CÁO GỬI PHỤ HUYNH — đường /p#<mã>. (Khối "tin nhắn Zalo mang link" đã gỡ cùng phiếu Zalo, thầy lệnh 21/09.)
 import { describe, expect, it } from 'vitest'
 import { docMaTuHash, taoLinkPhieu } from '../src/lib/phieu-link'
 import { docDuongVao, docVaiTuDuongDan } from '../src/lib/vai-tro'
-import { NHAN_XEM_PHIEU, soanPhieuZalo } from '../src/lib/phieu-zalo'
 import { sinhMaPhieu } from '../src/lib/exam-api'
 import trang404 from '../public/404.html?raw'
 
@@ -75,44 +74,5 @@ describe('đường /p vào đúng màn báo cáo', () => {
 
   it('404.html có nhánh /p và BÊ NGUYÊN location.hash sang — bỏ hash là mất mã', () => {
     expect(trang404).toContain("'?vai=phieu' + location.hash")
-  })
-})
-
-describe('tin nhắn Zalo mang link báo cáo', () => {
-  const duTin = {
-    hoTen: 'Nguyễn Thị Hồng Nhung',
-    ngay: '2026-09-04T02:20:21.482Z',
-    diem: 6.6,
-    xepLoai: 'Khá',
-    diemPhan: { I: 4, II: 1.6, III: 1 },
-    soCauSai: 9,
-    chuyenDeSai: { ten: 'Ester – lipid', soSai: 6 },
-    baiTapDaGiao: null,
-  }
-  const link = taoLinkPhieu(GOC, 'Abcd234567')
-
-  it('khối link đứng NGAY SAU dòng mở đầu, trước cả điểm', () => {
-    const tin = soanPhieuZalo(duTin, undefined, link)
-    const khoi = tin.split('\n\n')
-    expect(khoi[0]).toContain('Thầy Đỗ Đại Học gửi kết quả')
-    expect(khoi[1]).toBe(`${NHAN_XEM_PHIEU} ${link}`)
-    expect(tin.indexOf(NHAN_XEM_PHIEU)).toBeLessThan(tin.indexOf('ĐIỂM:'))
-  })
-
-  it('KHÔNG có link thì không hứa suông có phiếu để xem', () => {
-    const tin = soanPhieuZalo(duTin)
-    expect(tin).not.toContain(NHAN_XEM_PHIEU)
-    expect(tin).not.toContain('http')
-  })
-
-  it('tin vẫn tự đủ ý khi phụ huynh không bấm link', () => {
-    const tin = soanPhieuZalo(duTin, undefined, link)
-    const khongLink = tin
-      .split('\n\n')
-      .filter((k) => !k.startsWith(NHAN_XEM_PHIEU))
-      .join('\n\n')
-    expect(khongLink).toContain('ĐIỂM: 6,60/10')
-    expect(khongLink).toContain('CHỖ MẤT ĐIỂM:')
-    expect(khongLink).toContain('VIỆC CẦN LÀM:')
   })
 })

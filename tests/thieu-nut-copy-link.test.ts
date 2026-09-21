@@ -10,7 +10,7 @@
 // chỗ trong code đẻ ra được đúng trạng thái lệch đó: khối `try/catch` ở
 // `PhieuZaloEm` bắt lỗi cất phiếu rồi bỏ qua im lặng.
 //
-// Test này khoá hai điều: không nuốt lỗi nữa, và thầy được báo.
+// 21/09 thầy lệnh "Bỏ phiếu Zalo": `PhieuZaloEm` đã gỡ nên năm phép kiểm đọc mã của nó (1–5) bỏ theo. Còn giữ: thứ tự gắn link trong lõi dựng phiếu cả ca (6) và điều kiện hai nút trong báo cáo (7).
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -19,47 +19,6 @@ const goc = resolve(__dirname, '..')
 const doc = (f: string) => readFileSync(resolve(goc, f), 'utf8')
 
 describe('không gửi lặng lẽ một báo cáo thiếu nút', () => {
-  const zalo = doc('src/components/PhieuZaloEm.tsx')
-
-  it('1. khối cất phiếu bài tập KHÔNG còn catch rỗng', () => {
-    const dau = zalo.indexOf('const dsBaiTap = phieu.baiTap')
-    const cuoi = zalo.indexOf('const { phieu: goiGui } = giamGoiPhieu(phieu)')
-    expect(dau).toBeGreaterThan(0)
-    expect(cuoi).toBeGreaterThan(dau)
-    const than = zalo.slice(dau, cuoi)
-    // catch rỗng là đúng cái đã giấu lỗi này suốt hai vòng báo lỗi
-    expect(than).not.toMatch(/catch\s*\{\s*(\/\/[^\n]*\n\s*)*\}/)
-    expect(than).toContain('setThieuNutBaiTap(true)')
-  })
-
-  it('2. có thử lại một nhịp trước khi chịu thua', () => {
-    const dau = zalo.indexOf('const dsBaiTap = phieu.baiTap')
-    const cuoi = zalo.indexOf('const { phieu: goiGui } = giamGoiPhieu(phieu)')
-    const than = zalo.slice(dau, cuoi)
-    expect(than.split('await catPhieuBaiTap()').length - 1).toBe(2)
-  })
-
-  it('3. cất được thì cờ phải tắt, không để cảnh báo ma nằm lại', () => {
-    expect(zalo).toContain('if (con && phieu.linkBaiTap) setThieuNutBaiTap(false)')
-  })
-
-  it('4. màn hình NÓI RA, và nói đúng thứ bị thiếu', () => {
-    expect(zalo).toContain('{link && thieuNutBaiTap && (')
-    const dau = zalo.indexOf('{link && thieuNutBaiTap && (')
-    const doan = zalo.slice(dau, dau + 700)
-    expect(doan).toContain('thiếu hai nút copy link đề và lời giải')
-    // phải chỉ ra việc cần làm, không chỉ than
-    expect(doan).toContain('Dựng lại')
-  })
-
-  it('5. link vẫn gắn TRƯỚC khi gói phiếu kết quả — thứ tự này là cả lỗi cũ', () => {
-    // Gói xong mới gắn link thì bản lên máy chủ vĩnh viễn thiếu trường.
-    const gan = zalo.indexOf('phieu.linkBaiTap = btRef.current?.link')
-    const goi = zalo.indexOf('const { phieu: goiGui } = giamGoiPhieu(phieu)')
-    expect(gan).toBeGreaterThan(0)
-    expect(goi).toBeGreaterThan(gan)
-  })
-
   it('6. lõi dựng phiếu cả ca cũng giữ đúng thứ tự đó', () => {
     const ca = doc('src/lib/phieu-ca-ca.ts')
     const gan = ca.indexOf('phieu.linkBaiTap = taoLinkPhieu(goc, maBt)')

@@ -22,7 +22,7 @@ describe('Lớp phủ xem báo cáo không tự đóng', () => {
     const r = render(<KhungXemPhieu src="https://x/p#m1" ten="Báo cáo" dong={() => dong()} />)
     expect(conLopPhu()).toBe(1)
 
-    // Đúng cảnh `PhieuZaloEm` dựng xong ảnh phiếu rồi vẽ lại: hàm nội tuyến
+    // Đúng cảnh một khối dựng xong ảnh phiếu bất đồng bộ rồi vẽ lại (trước là `PhieuZaloEm`, đã gỡ 21/09): hàm nội tuyến
     // đổi danh tính, nhưng lớp phủ không được đụng tới.
     for (let i = 0; i < 3; i++) r.rerender(<KhungXemPhieu src="https://x/p#m1" ten="Báo cáo" dong={() => dong()} />)
 

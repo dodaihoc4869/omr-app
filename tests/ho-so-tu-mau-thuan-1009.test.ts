@@ -4,7 +4,7 @@
 //
 //     5,60  điểm ca này  · 1 ca đã làm
 //     Tiến bộ qua các bài → "Em chưa có bài nào đã chấm điểm."
-//     Gửi phụ huynh      → "Em chưa có ca nào đã chấm điểm — chưa soạn được phiếu."
+//     Gửi phụ huynh      → "Em chưa có ca nào đã chấm điểm — chưa soạn được phiếu."  (khối này đã gỡ 21/09 cùng phiếu Zalo; hai dòng còn lại vẫn khoá bằng test dưới)
 //
 // Ba dòng, cùng một màn, chỏi nhau.
 //
@@ -22,8 +22,6 @@
 // Cả hai cùng một giả định sai: coi ô Sheet rỗng là "chưa chấm", trong khi màn
 // ĐANG cầm điểm tự chấm trong tay.
 import { describe, expect, it } from 'vitest'
-import fs from 'node:fs'
-import path from 'node:path'
 import { chuoiTienBo } from '../src/lib/tien-bo'
 import type { HoSoEm } from '../src/lib/exam-api'
 
@@ -75,26 +73,5 @@ describe('BIỂU ĐỒ TIẾN BỘ — điểm tự chấm phải được tính
     const ds = chuoiTienBo(ca, { c1: 5 })
     expect(ds.map((d) => d.maCa)).toEqual(['c1', 'c2', 'c3'])
     expect(ds.map((d) => d.diem)).toEqual([5, 6, 8])
-  })
-})
-
-describe('PHIẾU GỬI PHỤ HUYNH — không bỏ đúng ca thầy đang đứng', () => {
-  const ma = fs.readFileSync(path.join(process.cwd(), 'src/components/PhieuZaloEm.tsx'), 'utf8')
-
-  it('`chonCa` nhận cờ có-điểm-tự-chấm, không đòi ô Sheet vô điều kiện', () => {
-    expect(ma).toContain('function chonCa(hoSo: HoSoEm, maCa?: string, coDiemChamLai = false)')
-    expect(ma).toContain('(coDiemChamLai || x.tong !== null)')
-    // Bản cũ đòi vô điều kiện — không được quay lại.
-    expect(ma).not.toContain('x.maCa === maCa && x.tong !== null')
-  })
-
-  it('chỗ gọi truyền đúng cờ ấy từ `diemChamLai`', () => {
-    expect(ma).toContain("chonCa(hoSo, maCa, typeof diemChamLai?.tong === 'number')")
-  })
-
-  it('BƯỚC LUI vẫn còn cho màn KHÔNG có điểm tự chấm', () => {
-    // Bỏ hẳn điều kiện thì màn Học sinh sẽ chọn phải một ca chưa chấm rồi kẹt
-    // y như cũ — chỉ khác chỗ kẹt.
-    expect(ma).toContain('return hoSo.caGanNhat')
   })
 })

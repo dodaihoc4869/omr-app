@@ -2,7 +2,7 @@
 //
 // Trước đây chạm bất kỳ đâu trên hàng là mở hồ sơ, rồi hồ sơ đổ hết mọi khối
 // xuống một cột: muốn xem lịch sử ca của em phải cuộn qua biểu đồ tiến bộ,
-// phiếu Zalo và bảng chuyên đề. Nay mỗi tên có hai nút đi thẳng vào đúng mục.
+// khối gửi phụ huynh (đã gỡ 21/09) và bảng chuyên đề. Nay mỗi tên có hai nút đi thẳng vào đúng mục.
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import type { EmTomTat, HoSoEm } from '../src/lib/exam-api'
@@ -41,7 +41,6 @@ vi.mock('../src/lib/exam-api', async (goc) => ({
 }))
 vi.mock('../src/components/NutDongBoDanhSach', () => ({ default: () => null }))
 vi.mock('../src/components/NutBaiTapPdf', () => ({ default: () => null }))
-vi.mock('../src/components/PhieuZaloEm', () => ({ default: () => <div>KHOI PHIEU ZALO</div> }))
 vi.mock('../src/components/KhoiTienBo', () => ({ default: () => <div>KHOI TIEN BO</div> }))
 
 const { default: HocSinhScreen } = await import('../src/screens/HocSinhScreen')
@@ -100,18 +99,18 @@ describe('danh sách học sinh — hai nút mỗi em', () => {
 })
 
 describe('hồ sơ một em — hai mục tách hẳn', () => {
-  it('vào từ nút Báo cáo: thấy tiến bộ và phiếu, KHÔNG đổ lịch sử ca vào cùng trang', async () => {
+  it('vào từ nút Báo cáo: thấy tiến bộ, KHÔNG đổ lịch sử ca vào cùng trang, không còn khối Gửi phụ huynh (phiếu Zalo đã gỡ)', async () => {
     const { getByLabelText, container, rerender } = render(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Lê Minh Đức'))
     fireEvent.click(getByLabelText('Báo cáo của Lê Minh Đức'))
     sbdDangXem = '001'
     rerender(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('KHOI TIEN BO'))
-    expect(container.textContent).toContain('KHOI PHIEU ZALO')
+    expect(container.textContent).not.toContain('Gửi phụ huynh')
     expect(container.textContent).not.toContain('Ca Ester')
   })
 
-  it('vào từ nút Lịch sử ca: thấy thẳng danh sách ca, không phải cuộn qua phiếu', async () => {
+  it('vào từ nút Lịch sử ca: thấy thẳng danh sách ca, không phải cuộn qua báo cáo', async () => {
     const { getByLabelText, container, rerender } = render(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Lê Minh Đức'))
     fireEvent.click(getByLabelText('Lịch sử ca thi của Lê Minh Đức'))
@@ -119,7 +118,7 @@ describe('hồ sơ một em — hai mục tách hẳn', () => {
     rerender(<HocSinhScreen />)
     await waitFor(() => expect(container.textContent).toContain('Ca Ester'))
     expect(container.textContent).toContain('Ca Amine')
-    expect(container.textContent).not.toContain('KHOI PHIEU ZALO')
+    expect(container.textContent).not.toContain('KHOI TIEN BO')
   })
 
   it('trong hồ sơ vẫn đổi qua lại được giữa hai mục', async () => {

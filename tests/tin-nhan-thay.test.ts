@@ -1,19 +1,9 @@
-// PHIẾU KẾT QUẢ GỬI PHỤ HUYNH — phải tuân đúng bộ quy tắc viết của thầy:
-// không lời chào, không lời chúc, không khen suông, không thổi phồng, không
-// emoji, không gạch ngang dài; số liệu lấy nguyên từ bài đã chấm.
+// TIN NHẮN THẦY SOẠN SẴN — báo phụ huynh việc em rời màn hình (gửi vào hộp thư TRONG APP) và tin báo bài tập mới cho em.
+// Chuyển từ tests/phieu-zalo.test.ts khi thầy lệnh "Bỏ phiếu Zalo" (21/09): phần phiếu Zalo gửi phụ huynh đã gỡ cùng hàm `soanPhieuZalo`; hai khối dưới GIỮ NGUYÊN (chữ không đổi).
 import { describe, expect, it } from 'vitest'
-import { demChu, soanPhieuZalo, soanTinRoiMan, tinBaoBaiTap, type DuLieuPhieu } from '../src/lib/phieu-zalo'
+import { soanTinRoiMan, tinBaoBaiTap } from '../src/lib/tin-nhan-thay'
 
-const mau: DuLieuPhieu = {
-  hoTen: 'Lê Minh Đức',
-  ngay: '2026-09-03T07:00:00Z',
-  diem: 6.6,
-  xepLoai: 'Khá',
-  diemPhan: { I: 4, II: 1.6, III: 1 },
-  soCauSai: 4,
-  chuyenDeSai: { ten: 'pH và tính acid–base', soSai: 3 },
-  baiTapDaGiao: { soCau: 10, hanNop: '2026-09-10T16:59:00Z' },
-}
+const demChu = (s: string) => s.trim().split(/\s+/).filter(Boolean).length // đếm chữ (trước ở lib/phieu-zalo, đã gỡ cùng phiếu Zalo)
 
 const TU_CAM = [
   'Kính gửi',
@@ -42,65 +32,6 @@ const TU_CAM = [
   'cần lưu ý',
   'trung tâm',
 ]
-
-describe('soanPhieuZalo — nội dung', () => {
-  it('nêu đúng điểm, xếp loại, số câu sai và chuyên đề — không làm tròn sai', () => {
-    const s = soanPhieuZalo(mau)
-    expect(s).toContain('ĐIỂM: 6,60/10, xếp loại Khá')
-    expect(s).toContain('xếp loại Khá')
-    expect(s).toContain('sai 4 câu')
-    expect(s).toContain('3 câu thuộc pH và tính acid–base')
-    expect(s).toContain('03/09')
-  })
-
-  it('có việc em phải làm kèm số lượng và hạn, có mốc thầy kiểm lại', () => {
-    const s = soanPhieuZalo(mau)
-    expect(s).toContain('10 câu bài tập')
-    expect(s).toContain('hạn nộp 10/09')
-    expect(s.toLowerCase()).toContain('thầy chấm')
-  })
-
-  // Thầy chốt 04-09: mở đầu bằng TÊN NGƯỜI GỬI, không phải xưng hô với phụ
-  // huynh. Phụ huynh mở Zalo thấy ngay ai gửi, khỏi phải đoán.
-  it('mở đầu bằng "Thầy Đỗ Đại Học gửi kết quả", xưng THẦY', () => {
-    const s = soanPhieuZalo(mau)
-    expect(s.startsWith('Thầy Đỗ Đại Học gửi kết quả bài kiểm tra ngày ')).toBe(true)
-    expect(s).not.toContain('Anh/chị')
-    expect(s).not.toContain('tôi ')
-    expect(s).not.toContain('mình ')
-  })
-
-  it('không lời chào, lời chúc, khen suông, thổi phồng, emoji, gạch ngang dài', () => {
-    for (const bienThe of [mau, { ...mau, baiTapDaGiao: null }, { ...mau, soCauSai: 0, chuyenDeSai: null }]) {
-      const s = soanPhieuZalo(bienThe as DuLieuPhieu)
-      for (const tu of TU_CAM) expect(s.toLowerCase()).not.toContain(tu.toLowerCase())
-      expect(s).not.toContain('—')
-      expect(/\p{Extended_Pictographic}/u.test(s)).toBe(false)
-    }
-  })
-
-  it('độ dài trong khoảng 40–120 chữ ở mọi biến thể', () => {
-    for (const bienThe of [mau, { ...mau, baiTapDaGiao: null }, { ...mau, diemPhan: null }, { ...mau, soCauSai: 0, chuyenDeSai: null }]) {
-      const n = demChu(soanPhieuZalo(bienThe as DuLieuPhieu))
-      expect(n).toBeGreaterThanOrEqual(40)
-      expect(n).toBeLessThanOrEqual(120)
-    }
-  })
-
-  it('làm đúng hết thì KHÔNG bịa lỗi', () => {
-    const s = soanPhieuZalo({ ...mau, soCauSai: 0, chuyenDeSai: null, baiTapDaGiao: null })
-    expect(s).toContain('đúng toàn bộ')
-    expect(s).not.toContain('sai')
-  })
-
-  it('chưa giao bài thì không hứa hạn nộp không có thật', () => {
-    const s = soanPhieuZalo({ ...mau, baiTapDaGiao: null })
-    expect(s).not.toContain('hạn nộp')
-    // Chưa có bài cụ thể thì dùng lời nhắn luyện tập thầy tự viết, không bịa
-    // ra một mốc thời gian nào.
-    expect(s).toContain('Không ai có thể giúp em tiến bộ bằng chính em.')
-  })
-})
 
 describe('soanTinRoiMan — báo phụ huynh việc rời màn', () => {
   const d = { hoTen: 'Lê Minh Đức', maCa: '984033', tenCa: 'Ca 12A1', ngay: '2026-09-03T07:00:00Z', soLan: 3, tongGiay: 47, daKhoa: true }
