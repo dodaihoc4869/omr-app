@@ -67,14 +67,22 @@ export interface MonNo { ngay: string; loai: LoaiNo; ten: string; soCau: number;
 
 const THU_TU_LOAI: Record<LoaiNo, number> = { chang_btvn: 0, goi_gia_dinh: 1, on_lai: 2 }
 
+/** Mốc tính nợ `tuNgay` hợp lệ (đúng YYYY-MM-DD) ⇒ hàm giữ món có ngày ≥ mốc; vắng / sai dạng ⇒ giữ hết (hành vi cũ). */
+const giuTuNgay = (tuNgay: unknown): ((ngay: string) => boolean) => {
+  if (typeof tuNgay !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(tuNgay)) return () => true
+  return (ngay) => ngay >= tuNgay
+}
+
 /**
  * SỔ NỢ: việc BẮT BUỘC lẽ ra xong trước 00:00 hôm nay (giờ VN) mà chưa xong, mỗi món gắn NGÀY của nó:
  *   • chặng bài tập về nhà có `moLuc` < 00:00 hôm nay và chỉ số ≥ `daXong` (bài đã QUÁ HẠN vẫn còn nợ — Điều 4 B: em vẫn phải làm nốt, ghi nộp trễ);
  *   • câu ôn lại có mốc < hôm nay; • gói gia đình giao chưa xong của ngày trước.
  * Việc tự chọn (lượt thần thú, thử thách riêng) KHÔNG thành nợ. Trả về sắp theo ngày tăng dần, rồi chặng → gói → ôn. `giayMoiCau` (mặc định như lịch chặng) để đổi câu ôn ra phút.
+ * `tuNgay` (YYYY-MM-DD, ngày VN của MỐC TÍNH NỢ — thầy lệnh 21/09 15:52): món có `ngay` < `tuNgay` KHÔNG vào sổ (cả ba loại); món đúng ngày mốc được giữ. Vắng / không đúng dạng YYYY-MM-DD ⇒ hành vi cũ (giữ hết).
  */
-export function soNo(v: { now: number; baiDangChay: readonly BaiDangChay[]; onQuaLich?: readonly OnQuaLich[]; goiGiaDinh?: readonly GoiGiaDinhChuaXong[]; giayMoiCau?: number }): MonNo[] {
+export function soNo(v: { now: number; baiDangChay: readonly BaiDangChay[]; onQuaLich?: readonly OnQuaLich[]; goiGiaDinh?: readonly GoiGiaDinhChuaXong[]; giayMoiCau?: number; tuNgay?: string }): MonNo[] {
   if (!Number.isFinite(v.now)) return []
+  const giu = giuTuNgay(v.tuNgay)
   const homNay = dauNgayVn(v.now)
   const homNayChuoi = ngayVn(v.now)
   const ra: MonNo[] = []
@@ -83,17 +91,18 @@ export function soNo(v: { now: number; baiDangChay: readonly BaiDangChay[]; onQu
     for (let k = daXong; k < b.moLuc.length; k++) {
       const mo = docMs(b.moLuc[k])
       if (!Number.isFinite(mo) || mo >= homNay) continue
+      if (!giu(ngayVn(mo))) continue
       const soCau = soNguyenDuong(b.cauMoiChang[k])
       ra.push({ ngay: ngayVn(mo), loai: 'chang_btvn', ten: `${b.ten} · chặng ${k + 1}`, soCau, phut: soNguyenDuong(b.phutMoiChang[k]) || phutUocTinhChang(soCau, v.giayMoiCau ?? LICH_CHANG.GIAY_MAC_DINH), maBtvn: b.maBtvn, chiSo: k })
     }
   }
   for (const g of v.goiGiaDinh ?? []) {
-    if (!(g.ngay < homNayChuoi) || soNguyenDuong(g.soCau) <= 0) continue
+    if (!(g.ngay < homNayChuoi) || soNguyenDuong(g.soCau) <= 0 || !giu(g.ngay)) continue
     const soCau = soNguyenDuong(g.soCau)
     ra.push({ ngay: g.ngay, loai: 'goi_gia_dinh', ten: g.ten ?? 'Bài gia đình giao', soCau, phut: soNguyenDuong(g.phut) || phutUocTinhChang(soCau, v.giayMoiCau ?? LICH_CHANG.GIAY_MAC_DINH) })
   }
   for (const o of v.onQuaLich ?? []) {
-    if (!(o.ngay < homNayChuoi) || soNguyenDuong(o.soCau) <= 0) continue
+    if (!(o.ngay < homNayChuoi) || soNguyenDuong(o.soCau) <= 0 || !giu(o.ngay)) continue
     const soCau = soNguyenDuong(o.soCau)
     ra.push({ ngay: o.ngay, loai: 'on_lai', ten: 'Ôn lại', soCau, phut: phutUocTinhChang(soCau, v.giayMoiCau ?? LICH_CHANG.GIAY_MAC_DINH) })
   }
@@ -102,6 +111,16 @@ export function soNo(v: { now: number; baiDangChay: readonly BaiDangChay[]; onQu
 
 // ══════════════════════════════ KẾ HOẠCH VỀ ĐÍCH ══════════════════════════════
 export type TrangThaiViec = 'no' | 'hom_nay' | 'sap_toi'
+
+/**
+ * Nhãn của MỘT chặng chưa xong theo mốc mở `moMs` (mốc GỐC của lịch: chặng mở sớm phải truyền mốc gốc): mở trước 00:00 hôm nay ⇒ 'no'; mở hôm nay ⇒ 'hom_nay'; mở sau ⇒ 'sap_toi'; mốc hỏng ⇒ 'hom_nay' (không bịa nợ).
+ * `tuNgay` (mốc tính nợ, xem `soNo`): chặng mở trước 00:00 hôm nay nhưng ngày mở < `tuNgay` ⇒ 'hom_nay' (VẪN phải làm, không gắn nhãn nợ). Vắng ⇒ hành vi cũ.
+ */
+export function trangThaiChangTheoMoc(moMs: number, v: { dauHomNay: number; dauMai: number; tuNgay?: string }): TrangThaiViec {
+  if (!Number.isFinite(moMs)) return 'hom_nay'
+  if (moMs < v.dauHomNay) return giuTuNgay(v.tuNgay)(ngayVn(moMs)) ? 'no' : 'hom_nay'
+  return moMs < v.dauMai ? 'hom_nay' : 'sap_toi'
+}
 export interface ViecVeDich {
   loai: LoaiNo
   trangThai: TrangThaiViec
