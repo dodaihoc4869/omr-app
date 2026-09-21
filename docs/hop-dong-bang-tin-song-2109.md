@@ -36,5 +36,15 @@ Gọi A(t) = % câu ĐÚNG trong các câu có kết quả (`ket_qua IS NOT NULL
 ## Tên
 `nhiet[].hoTen`, `danDau[].hoTen`: tên THẬT (lệnh của thầy, có cổng mật khẩu). `suKienMoi.chu`: tên gọi ngắn hoặc tên lớp/dạng (tên dạng, không mã). Tên bài tập về nhà ở `baiTap[].ten` = TÊN CHUYÊN ĐỀ + lớp (`tenHienThi` từ kho đề), không mã kỹ thuật.
 
-## Chi phí (Boss dặn): báo ước lượng dòng đọc/ngày khi xin soát
-Gom nến/tia/lớp từ `su_kien_hoc` bằng truy vấn có index `ngay_vn`/`luc` (từ mốc), ≤ vài nghìn dòng mỗi lần tính; đệm 10 giây.
+## Máy chủ đã làm (Code 3, 21/09) — điều màn cần biết
+- Cờ lùi: `cau_hinh.bang_tin_san = 'tat'` ⇒ `{ok:false, lyDo:'tat'}`; phần "trực tiếp" lỗi ⇒ vẫn `ok:true` với mọi khoá bản 3 nhưng VẮNG khoá `song` (dùng Bảng tin bản 3). Kèm `dem:{bangTin,song}` (true = lấy từ đệm) và `soTruyVan` (số truy vấn D1 của lần này; 0 khi từ đệm).
+- `nhip.soCau|soCauDung|soEmHoc|tongEm|tiLeDung` được GHI ĐÈ bằng số của phần trực tiếp (cùng nguồn với theoLop / nhiet / tia / nến ⇒ khớp tuyệt đối). `tiLeDung` vắng khi chưa có câu.
+- `song.dungNhip = { soEm: số em ĐÚNG nhịp, soCoLo: số em CÓ bài đang chạy }` (mẫu số = em có bài, không phải sĩ số); chưa có bài ⇒ `null`. `tia60.nhip` luôn `null` (chưa đo được nhịp theo phút). `nen: []` khi chưa có câu nào hôm nay.
+- `danDau`: em ≥ 10 câu hôm nay, xếp SỐ CÂU giảm dần rồi TIẾN BỘ giảm dần, ≤ 5. `tienBo` = (% đúng hôm nay − % đúng của CHÍNH em ở các ngày TRƯỚC hôm nay, tối đa 7 ngày và không sớm hơn mốc); em chưa có ngày nào trước ⇒ 0; số âm giữ nguyên dấu.
+- `baiTap[].ten` = chuyên đề trội nhất của bài + tên lớp (không mã kỹ thuật; bài không có chuyên đề mà tên là mã ⇒ "Bài tập về nhà"); `baiTap[].tenGoc` giữ tên cũ để đối chiếu. Đổi này áp cả cho `/gv/bang-tin` (cùng hàm).
+- `suKienMoi`: từ sổ học (vừa vào học · đúng 5/8/12/20 câu liền · lớp thêm 12 câu · dạng 3 lượt sai) + bài vừa nộp (không tính bài đã thu hồi); dòng "xuống" đổi mã dạng thành TÊN dạng (chưa có tên ⇒ "Một dạng bài").
+
+## Chi phí (Boss dặn) — ước lượng dòng đọc/ngày
+- Chỉ mục mới `idx_skh_luc(luc, sbd, ket_qua, ma_dang)` (`server/migration-2109-index-luc.sql`, lùi `lui-2109-index-luc.sql`; CHỈ THÊM, chờ Boss soát rồi mới chạy `--remote`): "sự kiện hôm nay" từ quét CẢ sổ (≈ 28,5 nghìn dòng, tăng mỗi ngày) xuống đúng số sự kiện hôm nay (đo trên bản sao 21/09: 28.564 → 1.150 dòng).
+- Mỗi lần TÍNH LẠI phần trực tiếp (10 giây): 2 truy vấn — sự kiện hôm nay (1–8 nghìn dòng tuỳ giờ; trung bình cả ngày ≈ 3 nghìn) + bài vừa nộp (quét `btvn_em` ≈ 0,6 nghìn dòng). Danh sách em (≈ 0,5 nghìn dòng) đệm 60 giây; nền tiến bộ và tên dạng đệm 10 phút.
+- Máy thầy mở bảng 4 giờ/ngày ⇒ ≈ 1.440 lượt tính ⇒ ≈ 4–7 triệu dòng/ngày; cộng phần bản 3 (60 giây × 4 giờ = 240 lượt × ≈ 28 nghìn) ≈ 7 triệu ⇒ ≈ 11–14 triệu dòng/ngày khi bảng mở 4 giờ (đệm nằm trong từng isolate của Worker: nhiều isolate cùng phục vụ có thể nhân 2–3 ở tình huống xấu). Không ghi D1. Núm giảm chi phí: `DEM_SONG_MS` (10 s → 20 s ≈ giảm một nửa phần trực tiếp).

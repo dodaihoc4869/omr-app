@@ -52,6 +52,14 @@ export const LOAI_TOI_THIEU_LOI = 5
 export const LOAI_GAP_TRUNG_VI = 2
 export const SO_DEM_TRUNG_VI = 7
 
+/** Mã kỹ thuật của tờ đề (vd `DH-12-C2-B4-TN` hoặc danh sách `DH-…-TN,DH-…-DS`): không được hiện ra cho thầy. */
+const LA_MA_KY_THUAT = /^[A-Z]{1,5}(-[A-Z0-9]+){2,}(\s*,\s*[A-Z]{1,5}(-[A-Z0-9]+){2,})*$/
+/** TÊN HIỂN THỊ của một bài tập về nhà (Boss/Code 4 21/09: "tên chuyên đề + lớp", không mã kỹ thuật): chuyên đề trội nhất của bộ câu (`btvn_cau.chuyen_de`) → tên ca/tờ nếu KHÔNG phải mã → "Bài tập về nhà"; kèm " · <lớp>" khi có. */
+export function tenBaiHienThi(chuyenDe: string, ten: string, tenLop = ''): string {
+  const goc = chuyenDe || (ten && !LA_MA_KY_THUAT.test(ten) ? ten : 'Bài tập về nhà')
+  return tenLop ? `${goc} · ${tenLop}` : goc
+}
+
 function boDem(env: Env) {
   let n = 0
   return {
@@ -216,7 +224,8 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
 
   // 5 · bài tập về nhà giao sau mốc, còn sống
   const sqlBai = (coCaNhan: boolean) =>
-    `SELECT b.ma_btvn, b.giao_luc, b.han_nop, ${coCaNhan ? 'COALESCE(b.ca_nhan, 0)' : '0'} AS ca_nhan, COALESCE(NULLIF(TRIM(c.ten_ca), ''), d.ten_de, b.ma_de) AS ten
+    `SELECT b.ma_btvn, b.giao_luc, b.han_nop, ${coCaNhan ? 'COALESCE(b.ca_nhan, 0)' : '0'} AS ca_nhan, COALESCE(NULLIF(TRIM(c.ten_ca), ''), d.ten_de, b.ma_de) AS ten,
+            ${coCaNhan ? "(SELECT bc.chuyen_de FROM btvn_cau bc WHERE bc.ma_btvn = b.ma_btvn AND COALESCE(bc.chuyen_de, '') <> '' GROUP BY bc.chuyen_de ORDER BY COUNT(*) DESC, bc.chuyen_de LIMIT 1)" : 'NULL'} AS cd
        FROM btvn b LEFT JOIN ca c ON c.ma_ca = b.ma_ca LEFT JOIN de_kho d ON d.ma_de = b.ma_de
       WHERE b.da_xoa = 0 AND b.giao_luc >= ? AND b.giao_luc <= ? AND b.han_nop >= ? ORDER BY b.han_nop, b.ma_btvn LIMIT ${TOI_DA_BAI}`
   // Bài KHÔNG lọc theo giờ của mốc: bài thầy giao trong CÙNG ngày với mốc (vd 10:48 sáng, trước mốc 12:00) vẫn là bài mới cần hiện; bài cũ đã bị xoá (`da_xoa`). Chỉ lấy bài giao từ 00:00 ngày của mốc.
@@ -224,7 +233,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   let rBai = await Q.hoi(sqlBai(true), ...bindBai)
   if (!rBai) rBai = await Q.hoi(sqlBai(false), ...bindBai)
   if (!rBai) lyDoThieu.baiTap = 'Không đọc được bài tập về nhà'
-  const bai = (rBai ?? []).map((x) => ({ ma: chuoi(x.ma_btvn), giaoLuc: chuoi(x.giao_luc), han: chuoi(x.han_nop), hanMs: Date.parse(chuoi(x.han_nop)), ten: chuoi(x.ten) })).filter((b) => b.ma)
+  const bai = (rBai ?? []).map((x) => ({ ma: chuoi(x.ma_btvn), giaoLuc: chuoi(x.giao_luc), han: chuoi(x.han_nop), hanMs: Date.parse(chuoi(x.han_nop)), ten: chuoi(x.ten), tenHT: tenBaiHienThi(chuoi(x.cd), chuoi(x.ten)), cd: chuoi(x.cd) })).filter((b) => b.ma)
 
   // 6 · em của các bài đó
   const sqlEm = (day: boolean) =>
@@ -285,8 +294,8 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     const tl = em.get(sbd)!.tenLop
     d.tenLop.set(tl, (d.tenLop.get(tl) ?? 0) + 1)
     daoBai.set(ma, d)
-    if (!nop && st.trangThai === 'chua_mo' && b.hanMs > nowMs && b.hanMs - nowMs <= MOT_NGAY_MS) emChuaMoSatHan.set(sbd, [...(emChuaMoSatHan.get(sbd) ?? []), { ten: b.ten, han: b.han, hanMs: b.hanMs }])
-    if (!nop && b.hanMs <= nowMs) emQuaHan.set(sbd, [...(emQuaHan.get(sbd) ?? []), { ten: b.ten, han: b.han }])
+    if (!nop && st.trangThai === 'chua_mo' && b.hanMs > nowMs && b.hanMs - nowMs <= MOT_NGAY_MS) emChuaMoSatHan.set(sbd, [...(emChuaMoSatHan.get(sbd) ?? []), { ten: b.tenHT, han: b.han, hanMs: b.hanMs }])
+    if (!nop && b.hanMs <= nowMs) emQuaHan.set(sbd, [...(emQuaHan.get(sbd) ?? []), { ten: b.tenHT, han: b.han }])
   }
   // nhip.btvnDungNhip: tính từ mốc (chỉ các bài đang hiện ở baiTap, tức bài giao từ ngày của mốc); vắng khi không có bài / không đọc được em của bài
   if (rBe && emTrongBai.size > 0) nhip.btvnDungNhip = { dungNhip: emTrongBai.size - emCham.size, tongEm: emTrongBai.size, cham: emCham.size }
@@ -305,7 +314,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     const lop = [...d.tenLop].sort((a, c) => c[1] - a[1] || (a[0] < c[0] ? -1 : 1))
     const nhac = nhacTuDong.filter((x) => chuoi(x.ma_btvn) === b.ma)
     baiTap.push({
-      maBtvn: b.ma, ten: b.ten, tenLop: lop[0]?.[0] ?? '', nhieuLop: lop.length > 1, giaoLuc: b.giaoLuc, hanNop: b.han, quaHan: b.hanMs <= nowMs,
+      maBtvn: b.ma, ten: tenBaiHienThi(b.cd, b.ten, lop[0]?.[0] ?? ''), tenGoc: b.ten, tenLop: lop[0]?.[0] ?? '', nhieuLop: lop.length > 1, giaoLuc: b.giaoLuc, hanNop: b.han, quaHan: b.hanMs <= nowMs,
       tong, chuaMo: d.chuaMo, dangLam: d.dangLam, daNop: d.daNop,
       ...(d.chotSo > 0 ? { chang: { tbDaXong: tron(d.chotXong / d.chotSo, 1), tong: Math.round(d.chotTong / d.chotSo), soEm: d.chotSo } } : {}),
       nhac: { soEm: new Set(nhac.map((x) => chuoi(x.sbd))).size, soPhuHuynh: new Set(nhac.map((x) => chuoi(x.ph_nhom)).filter(Boolean)).size, ...(luotKe ? { luotKe } : {}) },
