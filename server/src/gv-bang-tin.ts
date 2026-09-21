@@ -7,6 +7,7 @@ import { ngayVnCuaMs, trangThaiNopBai } from './canh-bao-thay'
 import { buoiCua, docCauHinhNhac, KHOA_CAU_HINH, KHOA_LAN_CHAY, lanChayKe, thuCua, trongKhung } from './nhac-tu-dong'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { tenLopCuaEm } from './ten-lop'
+import { tenViec } from './nhat-ky-may'
 
 type Dong = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -37,6 +38,13 @@ export const VAP_TI_LE = 0.5
 export const DANG_VAP_TOI_THIEU_EM = 3
 export const GIO_BO_NAO_TOI_DA = 26
 export const PHUT_CRON_NHAC_TOI_DA = 45
+/** Trễ nặng ⇒ ĐỎ: Bộ não quá gấp đôi ngưỡng (52 giờ), cron nhắc quá 120 phút; lỗi lặp ≥ 3 lần trong 24 giờ; lời bị loại ≥ 5 và ≥ gấp đôi trung vị 7 đêm gần nhất ⇒ vàng. */
+export const PHUT_CRON_NHAC_DO = 120
+export const LOI_MAY_DO_TU_LAN = 3
+export const LOI_MAY_SO_GIO = 24
+export const LOAI_TOI_THIEU_LOI = 5
+export const LOAI_GAP_TRUNG_VI = 2
+export const SO_DEM_TRUNG_VI = 7
 
 function boDem(env: Env) {
   let n = 0
@@ -195,9 +203,12 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
 
   // 8 · Bộ não: điều chỉnh đã áp hôm nay + bản tin gần nhất
   const rDc = await Q.hoi('SELECT sbd, json FROM ai_dieu_chinh WHERE ngay = ? AND ap_dung = 1 AND huy = 0', ngay)
-  const rBt = await Q.hoi('SELECT ngay, json, nop_luc, so_em, so_nhan FROM ai_ban_tin WHERE ngay <= ? ORDER BY ngay DESC LIMIT 1', ngay)
+  const rBt = await Q.hoi(`SELECT ngay, json, nop_luc, so_em, so_nhan, so_bi_loai FROM ai_ban_tin WHERE ngay <= ? ORDER BY ngay DESC LIMIT ${SO_DEM_TRUNG_VI + 1}`, ngay)
   // 9 · vinh danh hôm nay (bản đã đăng hôm nay lưu ở ngày hôm qua)
   const rVd = await Q.hoi('SELECT body FROM daily_honors WHERE day = ?', homQua)
+  // 10 · lỗi của các việc nền trong 24 giờ (B11; bảng `nhat_ky_may`)
+  const rLoiMay = await Q.hoi('SELECT nguon, COUNT(*) AS n, MAX(luc) AS cuoi FROM nhat_ky_may WHERE luc >= ? GROUP BY nguon', iso(nowMs - LOI_MAY_SO_GIO * 3_600_000))
+  if (!rLoiMay) lyDoThieu.nhatKyMay = 'Chưa có bảng nhật ký lỗi của máy'
 
   // ---------------------------------------------------------------- baiTap[]
   const baiTap: Dong[] = []
@@ -282,7 +293,17 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
       }
     }
   }
-  const maDangCan = [...dangVapCat.map((d) => d.ma), ...[...daiSai.values()].map((d) => d.ma).filter(Boolean)]
+  const bt = rBt?.[0]
+  let cacDongBt: Dong[] = []
+  if (bt) {
+    try {
+      const o = JSON.parse(chuoi(bt.json)) as { cacDong?: Dong[] }
+      cacDongBt = Array.isArray(o.cacDong) ? o.cacDong : []
+    } catch { cacDongBt = [] }
+  }
+  const goiYTho = cacDongBt.filter((d) => chuoi(d.loai) === 'ca_lop' && chuoi(d.chu)).slice(0, TOI_DA_GOI_Y)
+  // MỘT lần tra tên dạng cho cả dạng vấp, dạng sai nhiều và gợi ý của Bộ não (giữ ngân sách ≤ 12 truy vấn)
+  const maDangCan = [...dangVapCat.map((d) => d.ma), ...[...daiSai.values()].map((d) => d.ma).filter(Boolean), ...goiYTho.map((d) => chuoi(d.dang)).filter(Boolean)]
   Q.tinh()
   const tenDang = await tenCuaCacDang(env, maDangCan)
   const tenCua = (ma: string): string => tenDang.get(ma) ?? ma.replace(/^CD:/, '')
@@ -299,7 +320,6 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
 
   // ---------------------------------------------------------------- boNao
   let boNao: Dong | undefined
-  const bt = rBt?.[0]
   const dcEm = new Set((rDc ?? []).map((x) => chuoi(x.sbd)))
   let khacPhucLuon = 0
   for (const x of rDc ?? []) {
@@ -309,17 +329,9 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
     } catch { /* dòng hỏng: bỏ */ }
   }
   if (bt) {
-    let cacDong: Dong[] = []
-    try {
-      const o = JSON.parse(chuoi(bt.json)) as { cacDong?: Dong[] }
-      cacDong = Array.isArray(o.cacDong) ? o.cacDong : []
-    } catch { cacDong = [] }
-    const goiY = cacDong.filter((d) => chuoi(d.loai) === 'ca_lop' && chuoi(d.chu)).slice(0, TOI_DA_GOI_Y)
-    const tenGoiY = goiY.some((d) => chuoi(d.dang)) ? await tenCuaCacDang(env, goiY.map((d) => chuoi(d.dang))) : new Map<string, string>()
-    if (goiY.some((d) => chuoi(d.dang))) Q.tinh()
     boNao = {
       ngay: chuoi(bt.ngay), chayLuc: chuoi(bt.nop_luc), soEmSoi: so(bt.so_em), soEmDieuChinh: dcEm.size, soLoiNhan: so(bt.so_nhan),
-      goiY: goiY.map((d) => ({ chu: chuoi(d.chu), ...(chuoi(d.dang) ? { dang: chuoi(d.dang), ...(tenGoiY.has(chuoi(d.dang)) ? { tenDang: tenGoiY.get(chuoi(d.dang)) } : {}) } : {}) })),
+      goiY: goiYTho.map((d) => ({ chu: chuoi(d.chu), ...(chuoi(d.dang) ? { dang: chuoi(d.dang), ...(tenDang.has(chuoi(d.dang)) ? { tenDang: tenDang.get(chuoi(d.dang)) } : {}) } : {}) })),
     }
   } else if (rBt) {
     lyDoThieu.boNao = 'Chưa có bản tin Bộ não A.I'
@@ -351,11 +363,38 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const boNaoTt: 'ok' | 'tre' | 'chua_biet' = Number.isFinite(boNaoLuc) ? (nowMs - boNaoLuc <= GIO_BO_NAO_TOI_DA * 3_600_000 ? 'ok' : 'tre') : 'chua_biet'
   const cronTt: 'ok' | 'tre' | 'chua_biet' | 'tat' = !cfgNhac.bat ? 'tat' : !trongKhung(nowMs, cfgNhac) ? 'ok' : Number.isFinite(cronLuc) ? (nowMs - cronLuc <= PHUT_CRON_NHAC_TOI_DA * 60_000 ? 'ok' : 'tre') : 'chua_biet'
   const soTre = Number(boNaoTt === 'tre') + Number(cronTt === 'tre')
-  const muc = soTre === 2 ? 'do' : soTre === 1 || boNaoTt === 'chua_biet' || cronTt === 'chua_biet' || cronTt === 'tat' ? 'vang' : 'xanh'
   const chuBoNao = Number.isFinite(boNaoLuc) ? `Bộ não A.I chạy lúc ${gioVn(boNaoLuc)}${boNaoTt === 'tre' ? ' (đã quá 26 giờ)' : ''}` : 'Chưa có dữ liệu Bộ não A.I'
   const chuCron = cronTt === 'tat' ? 'nhắc nộp bài đang tắt' : Number.isFinite(cronLuc) ? `nhắc nộp bài chạy lúc ${gioVn(cronLuc)}${cronTt === 'tre' ? ' (trễ hơn 45 phút)' : ''}` : 'chưa có dữ liệu nhắc nộp bài'
+  // B11 · CẢNH BÁO của máy (chỉ HIỂN THỊ; mỗi dòng một câu đơn giản, không chi tiết kỹ thuật)
+  const canhBao: { nguon: string; muc: 'vang' | 'do'; chu: string }[] = []
+  const tuLuc = (ms: number): string => `${gioVn(ms)}${ngayVnCuaMs(ms) === ngay ? '' : ` ${ddmm(ngayVnCuaMs(ms))}`}`
+  if (boNaoTt === 'tre') canhBao.push({ nguon: 'bo_nao', muc: nowMs - boNaoLuc > 2 * GIO_BO_NAO_TOI_DA * 3_600_000 ? 'do' : 'vang', chu: `Bộ não A.I chưa chạy lại từ ${tuLuc(boNaoLuc)} (đã quá ${GIO_BO_NAO_TOI_DA} giờ)` })
+  else if (boNaoTt === 'chua_biet') canhBao.push({ nguon: 'bo_nao', muc: 'vang', chu: 'Chưa có dữ liệu Bộ não A.I để kiểm' })
+  if (cronTt === 'tre') canhBao.push({ nguon: 'nhac_nop_bai', muc: nowMs - cronLuc > PHUT_CRON_NHAC_DO * 60_000 ? 'do' : 'vang', chu: `Nhắc nộp bài chưa chạy lại từ ${tuLuc(cronLuc)}` })
+  else if (cronTt === 'chua_biet') canhBao.push({ nguon: 'nhac_nop_bai', muc: 'vang', chu: 'Chưa có dữ liệu nhắc nộp bài để kiểm' })
+  else if (cronTt === 'tat') canhBao.push({ nguon: 'nhac_nop_bai', muc: 'vang', chu: 'Nhắc nộp bài đang tắt' })
+  for (const x of rLoiMay ?? []) {
+    const n = so(x.n)
+    if (n < 1) continue
+    const cuoi = Date.parse(chuoi(x.cuoi))
+    canhBao.push({
+      nguon: `loi_${chuoi(x.nguon)}`, muc: n >= LOI_MAY_DO_TU_LAN ? 'do' : 'vang',
+      chu: n === 1 ? `${tenViec(chuoi(x.nguon))} lỗi lúc ${Number.isFinite(cuoi) ? tuLuc(cuoi) : 'gần đây'}, máy sẽ thử lại` : `${tenViec(chuoi(x.nguon))} lỗi ${n} lần trong ${LOI_MAY_SO_GIO} giờ, lần cuối lúc ${Number.isFinite(cuoi) ? tuLuc(cuoi) : 'gần đây'}`,
+    })
+  }
+  // tỉ lệ lời bị loại tăng: đêm mới nhất ≥ 5 lời bị loại và ≥ gấp đôi trung vị các đêm trước (tối đa 7)
+  if (rBt && rBt.length >= 2) {
+    const tl = (x: Dong): number => (so(x.so_em) > 0 ? so(x.so_bi_loai) / so(x.so_em) : NaN)
+    const truoc = rBt.slice(1).map(tl).filter(Number.isFinite).sort((a, c) => a - c)
+    const moiNhat = rBt[0]!
+    if (truoc.length > 0 && so(moiNhat.so_bi_loai) >= LOAI_TOI_THIEU_LOI && tl(moiNhat) >= LOAI_GAP_TRUNG_VI * (truoc.length % 2 ? truoc[(truoc.length - 1) / 2]! : (truoc[truoc.length / 2 - 1]! + truoc[truoc.length / 2]!) / 2)) {
+      canhBao.push({ nguon: 'ty_le_loai', muc: 'vang', chu: `Bộ não A.I bị loại ${so(moiNhat.so_bi_loai)}/${so(moiNhat.so_em)} lời (${Math.round(tl(moiNhat) * 100)} %), nhiều hơn hẳn các đêm trước` })
+    }
+  }
+  canhBao.sort((a, c) => (a.muc === c.muc ? 0 : a.muc === 'do' ? -1 : 1) || (a.nguon < c.nguon ? -1 : 1))
+  const muc = canhBao.some((x) => x.muc === 'do') || soTre === 2 ? 'do' : canhBao.length > 0 ? 'vang' : 'xanh'
   const sucKhoe: Dong = {
-    muc, chu: `${chuBoNao} · ${chuCron}`,
+    muc, chu: `${chuBoNao} · ${chuCron}`, canhBao,
     ...(Number.isFinite(boNaoLuc) ? { boNaoChayLuc: iso(boNaoLuc) } : {}),
     ...(Number.isFinite(cronLuc) ? { cronNhacLuc: iso(cronLuc) } : {}),
   }

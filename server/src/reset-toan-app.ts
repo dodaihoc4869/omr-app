@@ -73,6 +73,8 @@ export const BANG_GIU: readonly string[] = [
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin',
   // BẢNG LƯU khi gỡ em khỏi danh sách (migration-2109-hoc-sinh-da-go.sql): để KHÔI PHỤC được, không bao giờ xoá.
   'hoc_sinh_da_go', 'danh_sach_da_go',
+  // NHẬT KÝ LỖI CỦA MÁY (migration-2109-nhat-ky-may.sql, B11): số liệu vận hành, không thuộc dữ liệu học của em.
+  'nhat_ky_may',
 ]
 
 const TEN_HOP_LE = /^[a-z][a-z0-9_]*$/

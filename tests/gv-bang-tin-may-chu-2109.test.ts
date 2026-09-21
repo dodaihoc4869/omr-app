@@ -339,3 +339,98 @@ describe('thiếu bảng ⇒ khối vắng, lệnh vẫn ok', () => {
     expect(r.tienBo[0]).toMatchObject({ sbd: EM[0], tenLop: '12 - Lớp Thường' })
   })
 })
+
+describe('sucKhoe.canhBao (B11): trễ, lỗi của máy, tỉ lệ lời bị loại', () => {
+  const banTin = (d: D1That, ngay: string, nopLuc: string, soEm = 100, soBiLoai = 0) =>
+    d.sql.prepare("INSERT INTO ai_ban_tin(ngay,json,nop_luc,so_em,so_nhan,so_bi_loai) VALUES(?,?,?,?,30,?)").run(ngay, JSON.stringify({ cacDong: [] }), nopLuc, soEm, soBiLoai)
+  const lan = (d: D1That, luc: string) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('nhac_tu_dong_lan','x',?)").run(luc)
+  const loi = (d: D1That, nguon: string, luc: string) => d.sql.prepare("INSERT INTO nhat_ky_may(luc,nguon,muc,chu) VALUES(?,?,'loi','x')").run(luc, nguon)
+  const khoe = async (d: D1That) => (await goi(d)).sucKhoe as { muc: string; chu: string; canhBao: { nguon: string; muc: string; chu: string }[] }
+  it('mọi thứ ổn ⇒ xanh, canhBao rỗng (khoá luôn có)', async () => {
+    const d = truong('2026-09-21T13:10:00')
+    banTin(d, '2026-09-21', T('2026-09-21T01:04:00')); lan(d, T('2026-09-21T13:00:00'))
+    expect(await khoe(d)).toMatchObject({ muc: 'xanh', canhBao: [] })
+  })
+  it('Bộ não quá 26 giờ ⇒ vàng, quá 52 giờ ⇒ ĐỎ; câu có giờ (+ ngày khi không phải hôm nay); đúng biên 26 giờ chưa cảnh báo', async () => {
+    const a = truong('2026-09-22T10:00:00'); banTin(a, '2026-09-21', T('2026-09-21T01:04:00')); lan(a, T('2026-09-22T09:50:00')) // 32 giờ 56 phút
+    expect(await khoe(a)).toMatchObject({ muc: 'vang', canhBao: [{ nguon: 'bo_nao', muc: 'vang', chu: 'Bộ não A.I chưa chạy lại từ 01:04 21/09 (đã quá 26 giờ)' }] })
+    const b = truong('2026-09-24T10:00:00'); banTin(b, '2026-09-21', T('2026-09-21T01:04:00')); lan(b, T('2026-09-24T09:50:00'))
+    expect((await khoe(b)).canhBao[0]).toMatchObject({ nguon: 'bo_nao', muc: 'do' })
+    const b2 = truong('2026-09-23T10:00:00'); banTin(b2, '2026-09-21', T('2026-09-21T01:04:00')); lan(b2, T('2026-09-23T09:50:00')) // 56 giờ: đã quá 52 giờ
+    expect((await khoe(b2)).canhBao[0]).toMatchObject({ muc: 'do' })
+    const b3 = truong('2026-09-23T00:00:00'); banTin(b3, '2026-09-21', T('2026-09-21T01:04:00')) // 46 giờ: giữa 26 và 52 ⇒ vàng; ngoài khung nhắc
+    expect((await khoe(b3)).canhBao).toEqual([expect.objectContaining({ nguon: 'bo_nao', muc: 'vang' })])
+    const c = truong('2026-09-22T03:04:00'); banTin(c, '2026-09-21', T('2026-09-21T01:04:00')) // đúng 26 giờ, ngoài khung nhắc
+    expect((await khoe(c)).canhBao).toEqual([])
+  })
+  it('cron nhắc quá 45 phút (trong khung) ⇒ vàng, quá 120 phút ⇒ ĐỎ; ngoài khung không cảnh báo; chưa có dữ liệu / đang tắt ⇒ vàng', async () => {
+    const mk = (now: string, lanLuc: string | null) => { const d = truong(now); banTin(d, '2026-09-21', T('2026-09-21T01:04:00')); if (lanLuc) lan(d, T(lanLuc)); return d }
+    expect((await khoe(mk('2026-09-21T14:00:00', '2026-09-21T13:00:00'))).canhBao).toEqual([{ nguon: 'nhac_nop_bai', muc: 'vang', chu: 'Nhắc nộp bài chưa chạy lại từ 13:00' }])
+    expect((await khoe(mk('2026-09-21T15:01:00', '2026-09-21T13:00:00'))).canhBao[0]).toMatchObject({ muc: 'do' })
+    expect((await khoe(mk('2026-09-21T15:00:00', '2026-09-21T13:00:00'))).canhBao[0]).toMatchObject({ muc: 'vang' }) // đúng 120 phút: chưa đỏ
+    expect((await khoe(mk('2026-09-21T23:00:00', '2026-09-21T13:00:00'))).canhBao).toEqual([]) // ngoài khung 07:00–21:30
+    // cả hai trễ (mỗi cái mới ở mức vàng) ⇒ tổng thể vẫn ĐỎ theo luật "cả hai kênh trễ"
+    const ca = truong('2026-09-22T10:00:00'); banTin(ca, '2026-09-21', T('2026-09-21T01:04:00')); lan(ca, T('2026-09-22T09:00:00'))
+    expect(await khoe(ca)).toMatchObject({ muc: 'do', canhBao: [{ muc: 'vang' }, { muc: 'vang' }] })
+    expect((await khoe(mk('2026-09-21T13:10:00', null))).canhBao).toEqual([{ nguon: 'nhac_nop_bai', muc: 'vang', chu: 'Chưa có dữ liệu nhắc nộp bài để kiểm' }])
+    const t = mk('2026-09-21T13:10:00', '2026-09-21T13:00:00'); t.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('canh_bao_tu_dong','{\"bat\":false}','x')").run()
+    expect((await khoe(t)).canhBao).toEqual([{ nguon: 'nhac_nop_bai', muc: 'vang', chu: 'Nhắc nộp bài đang tắt' }])
+  })
+  it('lỗi của máy trong 24 giờ: 1–2 lần ⇒ vàng, ≥ 3 lần ⇒ ĐỎ; dòng cũ hơn 24 giờ không tính; câu đơn giản, không chi tiết kỹ thuật; đỏ xếp trước', async () => {
+    const d = truong('2026-09-21T13:10:00')
+    banTin(d, '2026-09-21', T('2026-09-21T01:04:00')); lan(d, T('2026-09-21T13:00:00'))
+    loi(d, 'ke_hoach_ngay', T('2026-09-21T00:01:00')) // 1 lần
+    for (const g of ['11:00', '12:00', '13:00']) loi(d, 'nhac_nop_bai', T(`2026-09-21T${g}:00`)) // 3 lần
+    loi(d, 'exp_ngay', T('2026-09-20T13:09:59')) // quá 24 giờ
+    loi(d, 'gui_thong_bao', T('2026-09-21T12:00:00')); loi(d, 'gui_thong_bao', T('2026-09-21T12:40:00')) // 2 lần ⇒ vẫn vàng (đỏ từ 3)
+    const k = await khoe(d)
+    expect(k.muc).toBe('do')
+    expect(k.canhBao).toEqual([
+      { nguon: 'loi_nhac_nop_bai', muc: 'do', chu: 'Nhắc nộp bài lỗi 3 lần trong 24 giờ, lần cuối lúc 13:00' },
+      { nguon: 'loi_gui_thong_bao', muc: 'vang', chu: 'Gửi thông báo lỗi 2 lần trong 24 giờ, lần cuối lúc 12:40' },
+      { nguon: 'loi_ke_hoach_ngay', muc: 'vang', chu: 'Lập kế hoạch ngày lỗi lúc 00:01, máy sẽ thử lại' },
+    ])
+    expect(JSON.stringify(k)).not.toMatch(/stack|Error|exception|SQLITE/i)
+    d.sql.exec('DROP TABLE nhat_ky_may')
+    expect(await goi(d)).toMatchObject({ ok: true, lyDoThieu: { nhatKyMay: 'Chưa có bảng nhật ký lỗi của máy' } })
+  })
+  it('tỉ lệ lời bị loại: đêm nay ≥ 5 lời và ≥ gấp đôi trung vị các đêm trước ⇒ vàng; dưới 5 lời hoặc dưới gấp đôi ⇒ không; chưa có đêm trước ⇒ không', async () => {
+    const mk = (truoc: [number, number][], nay: [number, number]) => {
+      const d = truong('2026-09-21T13:10:00'); lan(d, T('2026-09-21T13:00:00'))
+      truoc.forEach(([soEm, loai], i) => banTin(d, `2026-09-${String(20 - i).padStart(2, '0')}`, T(`2026-09-${String(20 - i).padStart(2, '0')}T01:00:00`), soEm, loai))
+      banTin(d, '2026-09-21', T('2026-09-21T01:04:00'), nay[0], nay[1])
+      return d
+    }
+    const chu = 'Bộ não A.I bị loại 6/50 lời (12 %), nhiều hơn hẳn các đêm trước'
+    expect((await khoe(mk([[50, 1], [50, 1], [50, 2]], [50, 6]))).canhBao).toEqual([{ nguon: 'ty_le_loai', muc: 'vang', chu }]) // trung vị 2 % ⇒ 12 % ≥ 4 %
+    expect((await khoe(mk([[50, 1], [50, 1], [50, 2]], [50, 4]))).canhBao).toEqual([]) // chỉ 4 lời (< 5)
+    expect((await khoe(mk([[50, 0], [50, 0], [50, 0]], [50, 5]))).canhBao).toHaveLength(1) // đúng 5 lời (biên) so với các đêm 0 lời
+    expect((await khoe(mk([[50, 3], [50, 5], [50, 1]], [50, 5]))).canhBao).toEqual([]) // trung vị 3 đêm là 6 % (số Ở GIỮA sau khi sắp) ⇒ ngưỡng 12 %, 10 % chưa tới
+    expect((await khoe(mk([[50, 5], [50, 6], [50, 6]], [50, 6]))).canhBao).toEqual([]) // trung vị 12 %: không gấp đôi
+    expect((await khoe(mk([], [50, 9]))).canhBao).toEqual([]) // không có đêm trước để so
+    expect((await khoe(mk([[50, 1], [50, 3]], [50, 6]))).canhBao).toHaveLength(1) // trung vị 2 đêm = 4 %: 12 % ≥ 8 % ⇒ có
+    expect((await khoe(mk([[50, 1], [50, 5]], [50, 5]))).canhBao).toEqual([]) // trung vị 6 % ⇒ ngưỡng 12 %: 10 % chưa tới
+    expect((await khoe(mk([[50, 1], [50, 5]], [50, 7]))).canhBao).toHaveLength(1) // 14 % ≥ 12 %
+  })
+})
+
+describe('ngân sách truy vấn khi MỌI khối đều có dữ liệu', () => {
+  it('sổ học + bài + nhắc + hồ sơ + Bộ não (gợi ý có dạng) + điều chỉnh + vinh danh + lỗi máy: soTruyVan ≤ 12 và không có câu ghi', async () => {
+    const d = truong()
+    d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DEA', 'DEA-I-1', 'v1', 'G', 'ESTE.X', JSON.stringify({ tenDang: 'Xà phòng hoá' }))
+    for (const e of EM.slice(0, 6)) await sk(d, e, 3, 2, T('2026-09-21T13:00:00'), 'ESTE.X')
+    themBai(d, 'B1', T('2026-09-21T10:48:00'), T('2026-09-22T12:00:00')); for (const e of EM.slice(0, 4)) themBaiEm(d, 'B1', e, { soChang: 4 })
+    d.sql.prepare("INSERT INTO canh_bao_thay(id,ma_btvn,sbd,ngay,ten_btvn,han_nop,loi_em,loi_ph,trang_thai_em,gui_luc,moc,gui_ph,ph_nhom) VALUES('a','B1',?,'2026-09-21','x','x','a','b','chua_mo',?,'M1',1,?)").run(EM[0], T('2026-09-21T12:45:00'), `${EM[0]}|2026-09-21`)
+    d.sql.prepare("INSERT INTO ai_ban_tin(ngay,json,nop_luc,so_em,so_nhan,so_bi_loai) VALUES('2026-09-21',?,?,100,30,0)").run(JSON.stringify({ cacDong: [{ loai: 'ca_lop', chu: 'Gợi ý', dang: 'ESTE.X' }] }), T('2026-09-21T01:04:00'))
+    d.sql.prepare("INSERT INTO ai_dieu_chinh(sbd,ngay,json,ap_dung,het_han,huy,nop_luc) VALUES(?,'2026-09-21','{}',1,'2026-09-24',0,'x')").run(EM[0])
+    d.sql.prepare("INSERT INTO daily_honors(day,created_at,body) VALUES('2026-09-20','x',?)").run(JSON.stringify({ winners: [{}], publishedAt: T('2026-09-21T13:00:00') }))
+    d.sql.prepare("INSERT INTO nhat_ky_may(luc,nguon,muc,chu) VALUES(?,'nhac_nop_bai','loi','x')").run(T('2026-09-21T12:00:00'))
+    const ghi = theoDoiGhi(d)
+    const r = await goi(d)
+    expect(r.boNao.goiY[0].tenDang).toBe('Xà phòng hoá')
+    expect(r.dangVap[0].ten).toBe('Xà phòng hoá')
+    expect(r.baiTap).toHaveLength(1)
+    expect(r.soTruyVan).toBeLessThanOrEqual(12)
+    expect(ghi).toEqual([])
+  })
+})
