@@ -102,7 +102,7 @@ export function emChamNhip(x: Dong, hanIso: string, hanMs: number, nowMs: number
   const chot = chuoi(x.chot_luc)
   // Có `moc` (MỐC TÍNH NỢ, thầy lệnh 21/09 15:52 — dùng cho `nhip.noTheoLop`): việc TRƯỚC mốc không phải nợ — bài thường/chưa chốt: hạn rơi trước NGÀY mốc; chặng: mốc mở GỐC trước mốc THEO GIỜ (cùng luật `soNo` của thẻ em: `moGoc >= moc.ms`).
   // Vắng ⇒ luật chậm cũ, không đổi một byte.
-  if (soChang <= 0 || chot === '' || !Number.isFinite(Date.parse(chot))) return hanMs <= nowMs && (moc === undefined || ngayVnCuaMs(hanMs) >= moc.ngayVn)
+  if (soChang <= 0 || chot === '' || !Number.isFinite(Date.parse(chot))) return hanMs <= nowMs && (moc === undefined || Date.parse(`${ngayVnCuaMs(hanMs)}T00:00:00+07:00`) >= moc.ms) // cùng luật soNo của thẻ em: mốc mở = 00:00 NGÀY hạn, so với mốc GIỜ
   const lich = docLichDaLuu(x.chang_mo_json, soChang, { chotLuc: chot, hanNop: hanIso, nowMs })
   const moLuc = lich && lich.moLuc.length === soChang ? lich.moLuc : moLucChang(chot, soChang)
   let toiHan = 0

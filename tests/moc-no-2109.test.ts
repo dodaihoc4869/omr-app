@@ -165,6 +165,15 @@ describe('emChamNhip(moc) — nợ theo mốc GIỜ cho nhip.noTheoLop (cùng lu
     expect(emChamNhip(chuaChot, new Date(han).toISOString(), han, nowMs, moc21)).toBe(false) // hạn 20/09 < mốc
     expect(emChamNhip(chuaChot, new Date(han).toISOString(), han, nowMs, giaiMocHienThi('2026-09-20'))).toBe(true)
   })
+  it('khớp soNo ở nhánh bài thường: hạn tay rơi ĐÚNG ngày mốc (21/09) — mốc mở 00:00 21/09 < 12:00 ⇒ KHÔNG nợ; hạn 22/09 ⇒ nợ khi quá hạn', () => {
+    const chuaChot = { nop_luc: null, so_chang: 0, chot_luc: null, lo_da_xong: 0, chang_mo_json: null }
+    const han21 = Date.parse('2026-09-21T08:00:00.000Z') // 15:00 VN 21/09
+    const han22 = Date.parse('2026-09-22T08:00:00.000Z')
+    const nowMs = Date.parse('2026-09-23T10:00:00+07:00')
+    expect(emChamNhip(chuaChot, new Date(han21).toISOString(), han21, nowMs, moc21)).toBe(false)
+    expect(emChamNhip(chuaChot, new Date(han22).toISOString(), han22, nowMs, moc21)).toBe(true)
+    expect(emChamNhip(chuaChot, new Date(han21).toISOString(), han21, nowMs)).toBe(true) // không moc ⇒ luật cũ
+  })
 })
 
 describe('/gv/bang-tin: nhip.noTheoLop theo mốc', () => {
