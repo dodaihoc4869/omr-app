@@ -354,3 +354,61 @@ describe('MÔ PHỎNG 60 em giả × 7 ngày × 3–6 lượt: không lượt r�
     expect(lap / tong, `tỉ lệ lặp ${(lap / tong * 100).toFixed(1)} %`).toBeLessThan(0.3)
   }, 120_000)
 })
+
+describe('ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: "đúng luật cá nhân hoá, nâng đỡ, chặn lặp")', () => {
+  // Máy chủ (`startDoanKhoLop`) bỏ Phần II trước khi gọi (hiệp Đoàn trả lời một chữ A–D hoặc một số), chặn câu em đã làm HÔM NAY, mỗi chặng 6 câu (SO_HIEP − 2), tối đa 4 chặng/ngày.
+  const KHO_DOAN = POOL.filter((q) => q.phan !== 'II')
+  const NHAN: Array<OptLuot['loai']> = ['kham_pha', 'khoi_dong']
+  for (const loai of NHAN) {
+    it(`loại "${loai}": 30 em × 7 ngày × 4 chặng — mỗi chặng đủ 6 câu, KHÔNG Phần II, không nhóm nào lặp trong ngày, bậc ≤ bậc em + 1, câu chưa gặp ≥ 3 khi kho còn nhiều${loai === 'khoi_dong' ? ', chỉ Phần I' : ', câu dài ≤ 1'}`, () => {
+      const r = mulberry32(2109 + NHAN.indexOf(loai))
+      for (let em = 0; em < 30; em++) {
+        const dung = [0.5, 0.7, 0.9][em % 3]!
+        const attempts: Attempt[] = []
+        const mastery = new Map<string, Mastery>()
+        for (let ngay = 0; ngay < 7; ngay++) {
+          const t0 = Date.parse('2026-09-18T12:00:00+07:00') + ngay * DAY
+          const lamHomNay = new Set<string>() // qid câu em đã làm hôm nay — máy chủ chặn (qidChanHomNay)
+          for (let chang = 0; chang < 4; chang++) {
+            const eligible = KHO_DOAN.filter((q) => !lamHomNay.has(q.qid))
+            const daGap = new Set(attempts.map((a) => a.group))
+            // câu chưa gặp VÀ đủ bậc (≤ bậc em ở dạng đó): câu chưa gặp mà cao hơn bậc em thì hàm KHÔNG được chọn (nâng đỡ thắng chống lặp)
+            const chuaGap = eligible.filter((q) => !daGap.has(q.group) && LV.indexOf(q.mucDo as (typeof LV)[number]) <= targetLevel(q.dang, [], attempts)).length
+            const ra = chooseLuotMoi(eligible, [], attempts, [...mastery.values()], { loai, cap: 3 + ngay, now: t0 + chang * 900_000, blocked: new Set(lamHomNay), soCau: 6 })
+            const ten = `em${em} ngày${ngay} chặng${chang}`
+            expect(ra, ten).toHaveLength(6)
+            expect(new Set(ra.map((x) => x.q.group)).size, `${ten} trùng nhóm`).toBe(6)
+            for (const x of ra) {
+              expect(x.q.phan, `${ten} Phần II lọt vào Đoàn`).not.toBe('II')
+              expect(lamHomNay.has(x.q.qid), `${ten} lặp trong ngày`).toBe(false)
+              const T = targetLevel(x.q.dang, [], attempts)
+              expect(LV.indexOf(x.q.mucDo as (typeof LV)[number]), `${ten} vượt bậc + 1`).toBeLessThanOrEqual(T + 1)
+              if (loai === 'khoi_dong') expect(x.q.phan, `${ten} khởi động chỉ Phần I`).toBe('I')
+            }
+            if (chuaGap >= 60) expect(ra.filter((x) => x.moi).length, `${ten} câu chưa gặp`).toBeGreaterThanOrEqual(3)
+            if (loai === 'kham_pha' && chuaGap >= 60) expect(ra.filter((x) => x.dai).length, `${ten} câu dài`).toBeLessThanOrEqual(1)
+            for (const x of ra) {
+              lamHomNay.add(x.q.qid)
+              const dungCau = r() < dung
+              const a = att(x.q, dungCau, t0 + chang * 900_000 + attempts.length, { novel: !daGap.has(x.q.group) })
+              attempts.push(a)
+              const m = advance(mastery.get(x.q.dang ?? x.q.group), a)
+              mastery.set(m.mastery.key, m.mastery)
+            }
+          }
+        }
+      }
+    }, 120_000)
+  }
+  it('KHÔNG lượt rỗng khi kho Đoàn thu hẹp còn ít câu (7–20 câu Phần I/III): trả đủ min(6, số câu ĐỦ BẬC) — Đoàn chỉ báo "chưa có câu vừa sức" khi kho thật sự chỉ còn câu quá bậc', () => {
+    const r = mulberry32(88)
+    for (let i = 0; i < 300; i++) {
+      const kho = KHO_DOAN.filter(() => r() < 0.06)
+      const attempts = kho.filter(() => r() < 0.5).map((q) => att(q, r() < 0.5, NOW - (1 + Math.floor(r() * 40)) * DAY))
+      const ra = chooseLuotMoi(kho, [], attempts, [], { loai: 'kham_pha', cap: 1 + Math.floor(r() * 40), now: NOW, soCau: 6 })
+      // "đủ bậc" = bậc ≤ bậc em + 1 (nâng đỡ: KHÔNG BAO GIỜ vượt); câu cao hơn nữa không được chọn dù kho còn ⇒ máy chủ báo "chỉ còn câu quá bậc", không phải lỗi hàm
+      const duBac = kho.filter((q) => LV.indexOf(q.mucDo as (typeof LV)[number]) <= targetLevel(q.dang, [], attempts) + 1).length
+      expect(ra.length, `#${i} kho ${kho.length} đủ bậc ${duBac}`).toBe(Math.min(6, duBac))
+    }
+  })
+})
