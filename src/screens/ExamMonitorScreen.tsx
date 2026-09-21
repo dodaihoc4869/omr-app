@@ -41,6 +41,7 @@ import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 import BaoCaoCaLopKhoi from '../components/xem-diem-gv/BaoCaoCaLop'
 import { tinhBaoCaoCaLop, tomTatCaLop, type EmChoBaoCao } from '../lib/bao-cao-ca-lop'
+import { layBaoCaoCaLopMayChu } from '../lib/bao-cao-may-chu'
 import BaoCaoMotEmTrang from '../components/xem-diem-gv/BaoCaoMotEm'
 import { nguonCauTuNganHang, tinhBaoCaoMotEm } from '../lib/bao-cao-mot-em'
 
@@ -1662,7 +1663,7 @@ export default function ExamMonitorScreen() {
 
           </div>
           <div className="ca-cot ca-cot-trai">
-          <BaoCaoCaLopKhoi key={chiTiet.ca.maCa} tomTat={tomTatLop} tinh={tinhBaoCaoLop} khoa={khoaBaoCaoLop} phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />
+          <BaoCaoCaLopKhoi key={chiTiet.ca.maCa} tomTat={tomTatLop} tinh={tinhBaoCaoLop} khoa={khoaBaoCaoLop} layMayChu={() => layBaoCaoCaLopMayChu(chiTiet.ca.maCa, dsEm.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, soLanRoiMan: e.moiNhat.soLanRoiMan, tongGiayRoiMan: e.moiNhat.tongGiayRoiMan })))} phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />
           {/* DANH SÁCH EM */}
           <TheNoiDung className="gv-monitor-students">
             <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Học sinh trong ca ({dsEm.length})</div>

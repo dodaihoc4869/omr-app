@@ -210,7 +210,8 @@ describe('GV-1 · chỗ nối ở ExamMonitorScreen (chỉ phần nhìn)', () =>
   const nguon = readFileSync('src/screens/ExamMonitorScreen.tsx', 'utf8')
 
   it('khối đứng trong cột danh sách em, ngay trên "Học sinh trong ca"; ca đang mở thì gập, đóng thì mở; đổi ca thì dựng lại', () => {
-    expect(nguon).toContain("<BaoCaoCaLopKhoi key={chiTiet.ca.maCa} tomTat={tomTatLop} tinh={tinhBaoCaoLop} khoa={khoaBaoCaoLop} phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />")
+    expect(nguon).toContain('<BaoCaoCaLopKhoi key={chiTiet.ca.maCa} tomTat={tomTatLop} tinh={tinhBaoCaoLop} khoa={khoaBaoCaoLop} layMayChu={() => layBaoCaoCaLopMayChu(chiTiet.ca.maCa,')
+    expect(nguon).toContain("phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />") // lấy từ máy chủ khi mở khối; rơi về tinhBaoCaoLop khi không có lệnh
     expect(nguon.indexOf('<BaoCaoCaLopKhoi')).toBeLessThan(nguon.indexOf('Học sinh trong ca ({dsEm.length})'))
   })
 

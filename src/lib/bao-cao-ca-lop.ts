@@ -93,9 +93,18 @@ export const KHOANG_DIEM: readonly [number, number, string][] = [
 /** Ngưỡng "em cần để ý": điểm dưới nửa thang; rời màn từ 3 lần. Số cố định, nói rõ trong chữ của màn. */
 export const NGUONG_DIEM_THAP = 5
 export const NGUONG_ROI_MAN = 3
-const TOI_DA_EM_CAN_YY = 5
-const TOI_DA_DANG = 5
-const TOI_DA_CAU_SAI = 3
+export const TOI_DA_EM_CAN_YY = 5
+export const TOI_DA_DANG = 5
+export const TOI_DA_CAU_SAI = 3
+
+/** Lý do BẰNG SỐ của em điểm thấp (dùng chung số tính ở máy và số của máy chủ). `dung`/`tong` null ⇒ chỉ nêu điểm. */
+export function lyDoDiemThap(diem: number, dung: number | null, tong: number | null): string {
+  return dung != null && tong ? `Đúng ${dung}/${tong} câu (${Math.round((dung / tong) * 100)}%) — điểm ${soVn(diem)}` : `Điểm ${soVn(diem)}, dưới ${NGUONG_DIEM_THAP}`
+}
+/** Lý do rời màn làm bài (dữ kiện, có ở máy thầy: đếm khi em làm bài). */
+export function lyDoRoiMan(soLan: number, tongGiay: number): string {
+  return `Rời màn làm bài ${soLan} lần, tổng ${chuGiay(tongGiay)}`
+}
 
 const laDaNop = (e: Pick<EmChoBaoCao, 'trangThai' | 'diem'>) => (e.trangThai === 'da_nop' || e.trangThai === 'khoa') && Number.isFinite(e.diem)
 const tb = (ds: number[]): number | null => (ds.length ? ds.reduce((s, v) => s + v, 0) / ds.length : null)
@@ -199,11 +208,11 @@ export function tinhBaoCaoCaLop(em: EmChoBaoCao[], daVao: number): BaoCaoCaLop {
       const p = e.score ? phanTuDiem(e.score) : null
       const dung = p ? p.reduce((s, x) => s + x.dung, 0) : null
       const tong = p ? p.reduce((s, x) => s + x.tong, 0) : null
-      them(e, dung != null && tong ? `Đúng ${dung}/${tong} câu (${Math.round((dung / tong) * 100)}%) — điểm ${soVn(e.diem as number)}` : `Điểm ${soVn(e.diem as number)}, dưới ${NGUONG_DIEM_THAP}`)
+      them(e, lyDoDiemThap(e.diem as number, dung, tong))
     }
   }
   for (const e of [...em].sort((a, b) => b.soLanRoiMan - a.soLanRoiMan)) {
-    if (e.soLanRoiMan >= NGUONG_ROI_MAN) them(e, `Rời màn làm bài ${e.soLanRoiMan} lần, tổng ${chuGiay(e.tongGiayRoiMan)}`)
+    if (e.soLanRoiMan >= NGUONG_ROI_MAN) them(e, lyDoRoiMan(e.soLanRoiMan, e.tongGiayRoiMan))
   }
 
   return {
