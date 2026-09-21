@@ -421,3 +421,18 @@
   --btg-chu-doan: #1f1f1f; /* chữ trên bốn đoạn nhạt */
   --btg-chu-doan-dam: #ffffff; /* chữ trên đoạn xanh lá đậm */
 }
+
+/* ── PHỤ KIỆN THẦN THÚ (cửa hàng phụ kiện, thầy chốt 21/09; đề xuất DE-XUAT-SHOP-PHU-KIEN-2109.md mục 3 + 6) ──────────────────────────────────────────────
+ * Năm BẬC của phụ kiện là màu DỮ LIỆU: cố định ở cả sáng lẫn tối. Mỗi bậc là BA SỐ RGB để dùng `rgb(var(--pk-b3) / 0.5)` (viền, toả nhẹ, ánh chạy);
+ * bậc 1 Thường: bạc, không toả · 2 Đẹp: lục · 3 Hiếm: lam, toả nhẹ · 4 Sử thi: tím, nhịp thở 4 giây · 5 Huyền thoại: vàng kim, ánh chạy chậm 6 giây.
+ * Khung tên luôn nằm trên nền TỐI riêng (đọc được trên mọi nền của app) nên chữ + nền khung cũng cố định. Bảng màu riêng từng món (--pk-1…--pk-3) ở src/game/than-thu-v2/phu-kien/phu-kien.css. */
+:root {
+  --pk-b1: 176 186 206;
+  --pk-b2: 98 224 160;
+  --pk-b3: 110 170 255;
+  --pk-b4: 190 140 255;
+  --pk-b5: 255 205 96;
+  --pk-nen-khung: rgb(5 10 30 / 0.7);
+  --pk-chu: rgb(238 243 255);
+  --pk-chu-mo: rgb(180 196 232);
+}
