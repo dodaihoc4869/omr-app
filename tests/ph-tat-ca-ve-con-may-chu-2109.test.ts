@@ -9,7 +9,7 @@ import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { docCauHinhTangDoc } from '../server/src/bo-nao-doc'
 import { chuGameTrong } from '../server/src/chu-game'
 import {
-  CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, NGUONG_LAM_LAU_GIAY, lichChangCuaEm, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
+  CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, lyDoCheCuaCau, NGUONG_LAM_LAU_GIAY, lichChangCuaEm, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
   DANG_VAP_TI_LE_DUNG_TOI_DA, DANG_VAP_TOI_THIEU_LUOT, PHIEN_CACH_TOI_DA_PHUT, TOI_DA_CAU_HOM_NAY, TOI_THIEU_LUOT_GIO_THUONG_HOC,
 } from '../server/src/ph-tat-ca-ve-con'
 import type { Env } from '../server/src/kieu'
@@ -1587,5 +1587,120 @@ describe('bảng kiểu Apple — trường mới của lệnh /ph/tat-ca-ve-con
     suKien(d4, { qid: 'A', ngay: NGAY_HOM_QUA, gio: '14:00', nguon: 'btvn_lo', ma: 'B1' })
     suKien(d4, { qid: 'B', ngay: NGAY, gio: '10:00', nguon: 'game' })
     expect((await chayApple(d4)).homNay.tongQuan).toMatchObject({ viecXong: 0, viecTong: 1 })
+  })
+})
+
+// ================================================================== LUẬT CHE THEO CÂU (P0 21/09): danh sách và chi tiết DÙNG MỘT QUYẾT ĐỊNH ==================================================================
+// Lỗi thật: cùng một qid vừa có sự kiện ở kênh thường (ôn lại/luyện) vừa nằm trong bài về nhà CHƯA NỘP ⇒ danh sách hiện "Đúng · Đáp án C" cho sự kiện kênh thường, còn chi tiết từ chối "Bài này con chưa nộp".
+describe('luật che THEO CÂU — mọi kênh; danh sách ⇔ chi tiết', () => {
+  const chiTiet = async (d: D1That, qid: string) => (await phChiTietCauVeCon(d.env, { sbd: 'S1', qid }, NOW)) as Record<string, any>
+  const danhSach = async (d: D1That) => ((await phTatCaVeCon(d.env, { sbd: 'S1' }, NOW)) as Record<string, any>).homNay
+  const khoCau = (d: D1That, qid: string) => kho(d, qid, { dang: 'ES', tenDang: 'Thuỷ phân ester', text: `Đề ${qid}`, correct: 'C', solution: `LG-${qid}` })
+  const RO = ['qid', 'dung', 'dapAn', 'conChon', 'tenDang', 'deRutGon', 'coLoiGiai']
+
+  it('cùng qid ở kênh ÔN + bài về nhà CHƯA NỘP ⇒ danh sách che CẢ HAI lần làm (không đúng/sai, không đáp án, không mã câu, không tên dạng); chi tiết từ chối cùng lý do', async () => {
+    const { d } = dung()
+    khoCau(d, 'QX')
+    themBtvn(d, 'BT-MO') // chưa nộp
+    suKien(d, { qid: 'QX', ngay: NGAY, gio: '09:00', nguon: 'on_lai', kq: 1 }) // kênh thường
+    suKien(d, { qid: 'QX', ngay: NGAY, gio: '10:00', nguon: 'btvn', ma: 'BT-MO', kq: 0 }) // bài đang mở
+    const hn = await danhSach(d)
+    expect(hn.cau).toHaveLength(2)
+    for (const c of hn.cau) {
+      expect(c.che, JSON.stringify(c)).toBe('chua_nop')
+      for (const k of RO) expect(k in c, k).toBe(false)
+    }
+    expect(JSON.stringify(hn)).not.toContain('LG-QX')
+    expect(await chiTiet(d, 'QX')).toMatchObject({ ok: false, che: 'chua_nop' })
+  })
+
+  it('cùng qid ở kênh ÔN + ca CHƯA công bố ⇒ che (chua_cong_bo) ở cả danh sách lẫn chi tiết; nhiều lý do ⇒ chua_cong_bo thắng, hai lệnh luôn nói CÙNG lý do', async () => {
+    const { d } = dung()
+    khoCau(d, 'QY')
+    themCa(d, 'CA-CHE', 'khong'); themLuot(d, 'CA-CHE', 'S1')
+    themBtvn(d, 'BT-MO')
+    suKien(d, { qid: 'QY', ngay: NGAY, gio: '09:00', nguon: 'on_lai', kq: 1 })
+    suKien(d, { qid: 'QY', ngay: NGAY, gio: '10:00', nguon: 'btvn', ma: 'BT-MO', kq: 0 })
+    suKien(d, { qid: 'QY', ngay: NGAY, gio: '11:00', nguon: 'thi', ma: 'CA-CHE', kq: 1 })
+    const hn = await danhSach(d)
+    expect(hn.cau.map((c: any) => c.che)).toEqual(['chua_cong_bo', 'chua_cong_bo', 'chua_cong_bo'])
+    expect(await chiTiet(d, 'QY')).toMatchObject({ ok: false, che: 'chua_cong_bo' })
+  })
+
+  it('bài về nhà ĐÃ NỘP ⇒ cùng qid hiện đủ ở cả hai kênh trong danh sách và chi tiết mở được; câu chỉ ở kênh ôn (không dính bài nào) vẫn hiện bình thường', async () => {
+    const { d } = dung()
+    khoCau(d, 'QZ'); khoCau(d, 'QON')
+    themBtvn(d, 'BT-XONG', { nop: '2026-09-22T05:00:00.000Z', soDung: 1, soCau: 1 })
+    suKien(d, { qid: 'QZ', ngay: NGAY, gio: '09:00', nguon: 'on_lai', kq: 1 })
+    suKien(d, { qid: 'QZ', ngay: NGAY, gio: '10:00', nguon: 'btvn', ma: 'BT-XONG', kq: 0 })
+    suKien(d, { qid: 'QON', ngay: NGAY, gio: '11:00', nguon: 'on_lai', kq: 1 })
+    const hn = await danhSach(d)
+    expect(hn.cau.every((c: any) => !('che' in c) && c.dapAn === 'C')).toBe(true)
+    expect(hn.cau).toHaveLength(3)
+    expect((await chiTiet(d, 'QZ')).ok).toBe(true)
+    expect((await chiTiet(d, 'QON')).ok).toBe(true)
+  })
+
+  it('BẤT BIẾN trên nhiều tổ hợp: câu nào chi tiết TỪ CHỐI (có che) ⇒ mọi dòng của câu ấy trong danh sách đều che, không lộ đáp án; câu nào chi tiết mở ⇒ danh sách không che nó', async () => {
+    const { d } = dung()
+    themCa(d, 'CA-CHE', 'khong'); themLuot(d, 'CA-CHE', 'S1')
+    themCa(d, 'CA-MO', 'ngay'); themLuot(d, 'CA-MO', 'S1')
+    themBtvn(d, 'BT-MO'); themBtvn(d, 'BT-XONG', { nop: '2026-09-22T05:00:00.000Z', soDung: 1, soCau: 1 })
+    themMom(d, 'MOM-MO', false); themMom(d, 'MOM-XONG', true)
+    const to: [string, Array<[string, string?]>][] = [
+      ['Q1', [['on_lai'], ['btvn', 'BT-MO']]], ['Q2', [['on_lai']]], ['Q3', [['game'], ['thi', 'CA-CHE']]], ['Q4', [['btvn', 'BT-XONG'], ['on_lai']]],
+      ['Q5', [['mom', 'MOM-MO'], ['on_lai']]], ['Q6', [['mom', 'MOM-XONG'], ['on_lai']]], ['Q7', [['thi', 'CA-MO'], ['on_lai']]], ['Q8', [['luyen'], ['btvn', 'BT-MO'], ['thi', 'CA-CHE']]],
+    ]
+    let g = 0
+    for (const [qid, kenh] of to) {
+      khoCau(d, qid)
+      for (const [nguon, ma] of kenh) suKien(d, { qid, ngay: NGAY, gio: `${String(8 + Math.floor(g / 6)).padStart(2, '0')}:${String((g++ * 7) % 60).padStart(2, '0')}`, nguon, ma: ma ?? 'm', kq: g % 2 })
+    }
+    const hn = await danhSach(d)
+    const theoLuc = new Map<string, any[]>()
+    // danh sách che KHÔNG mang qid ⇒ nhóm theo thứ tự sự kiện: dựng lại bảng qid → số dòng bằng số lần làm
+    const soDong = new Map(to.map(([q, k]) => [q, k.length] as const))
+    const che = new Set<string>()
+    for (const [qid] of to) {
+      const r = await chiTiet(d, qid)
+      if (r.ok === false && r.che) che.add(qid)
+      else expect(r.ok, qid).toBe(true)
+    }
+    expect([...che].sort()).toEqual(['Q1', 'Q3', 'Q5', 'Q8']) // dính ca chưa công bố / bài chưa nộp / gói chưa nộp
+    const dongChe = hn.cau.filter((c: any) => 'che' in c)
+    const dongRo = hn.cau.filter((c: any) => !('che' in c))
+    expect(dongChe.length).toBe([...che].reduce((t, q) => t + soDong.get(q)!, 0))
+    expect(dongRo.length).toBe(to.reduce((t, [q, k]) => t + (che.has(q) ? 0 : k.length), 0))
+    for (const c of dongChe) for (const k of RO) expect(k in c, k).toBe(false)
+    expect(new Set(dongRo.map((c: any) => c.qid))).toEqual(new Set(['Q2', 'Q4', 'Q6', 'Q7']))
+    expect(JSON.stringify(hn)).not.toMatch(/LG-Q[1358]/)
+    void theoLuc
+  })
+
+  it('SỐ TỔNG không suy ngược: sự kiện ÔN của câu bị che KHÔNG vào tổng câu/đúng hôm nay, nhịp học, dạng; phiên ôn lẫn câu bị che: đúng/sai chỉ tính câu không che, có soCauDaLam', async () => {
+    const { d } = dung({ moc: null })
+    khoCau(d, 'QCHE'); khoCau(d, 'QTHUONG')
+    themBtvn(d, 'BT-MO')
+    suKien(d, { qid: 'QCHE', ngay: NGAY, gio: '14:00', nguon: 'on_lai', kq: 1, dang: 'ES' }) // ôn, nhưng câu thuộc bài chưa nộp
+    suKien(d, { qid: 'QCHE', ngay: NGAY, gio: '14:01', nguon: 'btvn', ma: 'BT-MO', kq: 1, dang: 'ES' })
+    suKien(d, { qid: 'QTHUONG', ngay: NGAY, gio: '14:02', nguon: 'on_lai', kq: 0, dang: 'ES' })
+    const hn = await danhSach(d)
+    expect(hn.tongQuan).toMatchObject({ soCau: 1, soDung: 0 }) // chỉ QTHUONG
+    const phien = hn.dongThoiGian.find((x: any) => x.nguon === 'on_lai')
+    expect(phien).toMatchObject({ soCau: 1, soDung: 0, soCauDaLam: 2 })
+    const ra = (await phTatCaVeCon(d.env, { sbd: 'S1' }, NOW)) as Record<string, any>
+    expect(ra.nhipHoc.ngay).toEqual([{ ngay: NGAY, soCau: 1, soCauDung: 0 }])
+  })
+
+  it('lyDoCheCuaCau (hàm THUẦN chung): không lần làm nào ⇒ null; ưu tiên chua_cong_bo; thiếu trạng thái ⇒ che (đóng cửa)', () => {
+    const cb = new Map([['CA1', { congBo: 'ngay', daCongBo: true, soEmDaNop: 1, soEmDaVao: 1 }]]) as never
+    const vao = (nguon: string, maNguon: string) => ({ nguon, maNguon })
+    expect(lyDoCheCuaCau([], cb, new Map(), new Map())).toBeNull()
+    expect(lyDoCheCuaCau([vao('on_lai', 'm'), vao('thi', 'CA1')], cb, new Map(), new Map())).toBeNull()
+    expect(lyDoCheCuaCau([vao('on_lai', 'm'), vao('btvn', 'B1')], cb, new Map([['B1', false]]), new Map())).toBe('chua_nop')
+    expect(lyDoCheCuaCau([vao('btvn', 'B1'), vao('thi', 'CA-LA')], cb, new Map([['B1', false]]), new Map())).toBe('chua_cong_bo') // CA-LA không có trạng thái ⇒ chưa công bố, thắng
+    expect(lyDoCheCuaCau([vao('thi', 'CA-LA'), vao('btvn', 'B1')], cb, new Map([['B1', false]]), new Map())).toBe('chua_cong_bo') // thứ tự không đổi kết quả
+    expect(lyDoCheCuaCau([vao('mom', 'M1')], cb, new Map(), new Map())).toBe('chua_nop') // không biết gói ⇒ che
+    expect(lyDoCheCuaCau([vao('mom', 'M1')], cb, new Map(), new Map([['M1', true]]))).toBeNull()
   })
 })

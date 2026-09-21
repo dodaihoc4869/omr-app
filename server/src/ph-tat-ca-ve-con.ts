@@ -125,6 +125,21 @@ function cheCua(e: Pick<Sk, 'nguon' | 'maNguon'>, congBo: ReadonlyMap<string, Tr
   return null
 }
 
+/**
+ * MỘT QUYẾT ĐỊNH CHE cho một CÂU, dùng CHUNG cho danh sách (`homNay.cau[]`) và chi tiết (`/ph/chi-tiet-cau-ve-con`): câu bị che nếu BẤT KỲ lần con làm câu ấy — ở MỌI kênh (ôn lại, luyện, game, bài về nhà, ca kiểm tra…) —
+ * thuộc ca CHƯA công bố, bài về nhà CHƯA nộp, hoặc gói gia đình giao CHƯA nộp. Vì thế một câu con đã gặp ở kênh thường mà cũng nằm trong bài đang mở KHÔNG lộ đáp án ở kênh thường (điện thoại phụ huynh không là đường lộ đáp án bài chưa nộp).
+ * Nhiều lý do ⇒ ưu tiên `chua_cong_bo` (cố định, để hai lệnh luôn nói cùng một lý do). Không biết trạng thái ⇒ CHE (đóng cửa khi thiếu tin), như `cheCua`.
+ */
+export function lyDoCheCuaCau(lanLam: readonly { nguon: string; maNguon: string }[], congBo: ReadonlyMap<string, TrangThaiCongBoCa>, btvnDaNop: ReadonlyMap<string, boolean>, momDaNop: ReadonlyMap<string, boolean>): LyDoChe | null {
+  let ra: LyDoChe | null = null
+  for (const e of lanLam) {
+    const c = cheCua(e, congBo, btvnDaNop, momDaNop)
+    if (c === 'chua_cong_bo') return c
+    if (c !== null) ra = c
+  }
+  return ra
+}
+
 /** Nhãn NGUỒN hiển thị cho phụ huynh — không một chữ nào của game. `null` = bỏ khỏi dòng thời gian / danh sách câu. */
 export function nhanNguon(nguon: string): string | null {
   switch (nguon) {
@@ -338,7 +353,12 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   for (const x of dsCa) tenPhien.set(`thi|${chuoi(x.ma_ca)}`, chuoi(x.ten_ca) || `Ca ${chuoi(x.ma_ca)}`)
 
   // LUẬT CHE áp lên MỌI sự kiện; `skRo` = phần không bị che (nguồn của mọi con số có đúng/sai)
-  for (const e of skTho) e.che = cheCua(e, congBo, btvnDaNop, momDaNop)
+  // che THEO CÂU (cùng hàm với chi tiết): mọi sự kiện của một câu bị che nếu BẤT KỲ lần làm câu ấy (kênh nào) bị che — không phụ thuộc sự kiện đến từ kênh nào
+  const suKienTheoQid = new Map<string, Sk[]>()
+  for (const e of skTho) if (nhanNguon(e.nguon) !== null) { const l = suKienTheoQid.get(e.qid); if (l) l.push(e); else suKienTheoQid.set(e.qid, [e]) }
+  const cheTheoQid = new Map<string, LyDoChe>()
+  for (const [qid, ds] of suKienTheoQid) { const c = lyDoCheCuaCau(ds, congBo, btvnDaNop, momDaNop); if (c) cheTheoQid.set(qid, c) }
+  for (const e of skTho) e.che = cheTheoQid.get(e.qid) ?? null
   const skRo = skTho.filter((e) => e.che === null)
   const tuMoc = (e: { luc: string }): boolean => Date.parse(e.luc) >= moc.ms
   const skHt = skRo.filter(tuMoc) // sổ KHÔNG bị che VÀ từ mốc = nguồn của mọi con số hiển thị; `skRo` (cả sổ cũ) chỉ cho thuật toán
@@ -531,12 +551,13 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   for (const p of cacPhien) {
     const dau = p.ev[0]!
     const nguon = nhanNguon(dau.nguon)!
-    const che = dau.che
+    const che = p.ev.every((e) => e.che !== null) ? dau.che : null // phiên chỉ bị che khi MỌI lần làm trong đó bị che; lẫn câu không che ⇒ hiện phần không che (đúng/sai chỉ từ câu không che)
     const giay = p.ev.reduce((t, e) => t + (e.giay && e.giay > 0 ? e.giay : 0), 0)
     const span = ((Date.parse(p.ev[p.ev.length - 1]!.luc) || 0) - (Date.parse(dau.luc) || 0)) / 60_000
     const phut = Math.max(1, Math.round(giay > 0 ? giay / 60 : span))
-    const khacNhau = new Set(p.ev.map((e) => e.qid))
-    const dung = new Set(p.ev.filter((e) => e.ketQua === 1).map((e) => e.qid))
+    const khacNhau = new Set(p.ev.map((e) => e.qid)) // số câu khác nhau (kể cả câu bị che — chỉ là SỐ, không đúng/sai)
+    const khacNhauRo = new Set(p.ev.filter((e) => e.che === null).map((e) => e.qid))
+    const dung = new Set(p.ev.filter((e) => e.che === null && e.ketQua === 1).map((e) => e.qid)) // đúng/sai CHỈ từ câu KHÔNG bị che (một phiên ôn lẫn câu thuộc bài chưa nộp không lộ kết quả câu ấy)
     const tenBai = tenPhien.get(`${dau.nguon === 'btvn_lo' ? 'btvn' : dau.nguon}|${dau.maNguon}`)
     let ghiChu = ''
     if ((dau.nguon === 'btvn' || dau.nguon === 'btvn_lo') && che === null) {
@@ -546,7 +567,7 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
       if (Number.isFinite(nop) && Number.isFinite(han) && ngayVn(nop) === homNay) ghiChu = nop <= han ? 'Nộp đúng hạn' : 'Nộp sau hạn'
     }
     dongThoiGian.push({
-      batDau: dau.luc, nguon, ...(tenBai ? { ten: tenBai } : {}), ...(che === null ? { soCau: khacNhau.size, soDung: dung.size } : { che, soCauDaLam: khacNhau.size }),
+      batDau: dau.luc, nguon, ...(tenBai ? { ten: tenBai } : {}), ...(che === null ? { soCau: khacNhauRo.size, soDung: dung.size, ...(khacNhauRo.size !== khacNhau.size ? { soCauDaLam: khacNhau.size } : {}) } : { che, soCauDaLam: khacNhau.size }),
       phut, ...(ghiChu ? { ghiChu } : {}),
     })
   }
@@ -757,7 +778,7 @@ export async function phChiTietCauVeCon(env: Env, b: Record<string, unknown>, no
   const rMom = dsMom.length > 0 ? ((await hoi('SELECT id AS ma, submitted_at AS nop FROM mom_bai WHERE sbd = ? AND id IN (SELECT value FROM json_each(?))', sbd, json(dsMom))) ?? []) : []
   const btvnDaNop = new Map(rBt.map((x) => [chuoi(x.ma), chuoi(x.nop) !== ''] as const))
   const momDaNop = new Map(rMom.map((x) => [chuoi(x.ma), chuoi(x.nop) !== ''] as const))
-  const che = lanLam.map((e) => cheCua(e, congBo, btvnDaNop, momDaNop)).find((c) => c !== null)
+  const che = lyDoCheCuaCau(lanLam, congBo, btvnDaNop, momDaNop)
   if (che) return { ok: false, che, error: che === 'chua_cong_bo' ? 'Ca này chưa công bố điểm nên chưa xem được lời giải.' : 'Bài này con chưa nộp nên chưa xem được lời giải.' }
   const r = (await hoi('SELECT MIN(json) AS json FROM game_v2_question WHERE qid = ?', qid)) ?? []
   const q = parse<Row | null>(r[0]?.json, null)
