@@ -395,6 +395,13 @@ describe('G9 · hộp xác nhận M3 thay confirm()/prompt() của trình duyệ
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
   })
 
+  it('G10: MỘT tên cho mục lịch sử ca — "Lịch sử ca kiểm tra" ở cả tab hồ sơ lẫn nút ở danh sách; không còn "Mức độ tiến bộ" ở màn này', () => {
+    const src = fs.readFileSync(path.join(process.cwd(), 'src/screens/HocSinhScreen.tsx'), 'utf8')
+    expect(src).not.toContain('Mức độ tiến bộ')
+    expect(src).toContain("`${TEN_MUC_HO_SO['lich-su']} (${e.soCa})`")
+    expect(src).toContain('<span>{TEN_MUC_HO_SO[m]}</span>')
+  })
+
   it('nguồn: màn Học sinh không còn confirm( / prompt( của trình duyệt', () => {
     const src = fs.readFileSync(path.join(process.cwd(), 'src/screens/HocSinhScreen.tsx'), 'utf8')
     expect(src).not.toMatch(/\b(window\.)?(confirm|prompt)\(/)

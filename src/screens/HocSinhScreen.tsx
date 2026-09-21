@@ -400,7 +400,7 @@ export default function HocSinhScreen() {
                     className={`tap-target hs-tab${dang ? ' hs-tab--chon' : ''}`}
                   >
                     {m === 'bao-cao' ? <FileText size={16} /> : <TrendingUp size={16} />}
-                    <span>{m === 'lich-su' ? 'Mức độ tiến bộ (Lịch sử ca kiểm tra)' : TEN_MUC_HO_SO[m]}</span>
+                    <span>{TEN_MUC_HO_SO[m]}</span>
                     {m === 'lich-su' && <span className="hs-tab-so">({hoSo.ca.length})</span>}
                   </button>
                 )
@@ -725,7 +725,7 @@ export default function HocSinhScreen() {
                     {(
                       [
                         ['bao-cao', <FileText key="i" size={15} />, 'Báo cáo'],
-                        ['lich-su', <History key="i" size={15} />, `Mức độ tiến bộ (${e.soCa})`],
+                        ['lich-su', <History key="i" size={15} />, `${TEN_MUC_HO_SO['lich-su']} (${e.soCa})`],
                       ] as const
                     ).map(([muc, icon, chu]) => (
                       <button
