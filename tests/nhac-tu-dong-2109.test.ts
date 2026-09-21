@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { gameToken, parentPass } from '../server/src/game-v2-auth'
 import {
-  CAU_HINH_MAC_DINH, chuHanCoThu, docCauHinhNhac, gvNhacTuDong, khoaLuot, lanChayKe, loiEmTheoMoc, loiPhGop, loiPhMotBai, nhacKeCuaEm, nhacTuDong, trongKhung, type DauVaoLoi,
+  CAU_HINH_MAC_DINH, chuHanCoThu, chuHanM2, docCauHinhNhac, gvNhacTuDong, khoaLuot, lanChayKe, loiEmTheoMoc, loiPhGop, loiPhMotBai, nhacKeCuaEm, ngayGuiM2, nhacTuDong, trongKhung, type DauVaoLoi,
 } from '../server/src/nhac-tu-dong'
 import { docLichDaLuu, moLucChang } from '../server/src/btvn-nang-do-chang'
 import { goiWorker, type D1That } from './_d1-that'
@@ -54,7 +54,7 @@ describe('hàm thuần: cờ, khung giờ, lượt 30 phút, giờ dự kiến',
   it('chuHanCoThu: "23:59 Thứ Sáu"', () => {
     expect(chuHanCoThu(HAN_23_59_T6)).toBe('23:59 Thứ Sáu')
   })
-  it('nhacKeCuaEm: em chưa mở ⇒ M1 (24 giờ trước hạn, trong khung); sau M1 ⇒ M2 20:00 ngày hạn; sau M2 ⇒ M4 07:00 sáng hôm sau; tắt/hết mốc ⇒ vắng', () => {
+  it('nhacKeCuaEm: em chưa mở ⇒ M1 (24 giờ trước hạn, trong khung); sau M1 ⇒ M2 20:00 ngày hạn (hạn 23:59); sau M2 ⇒ M4 07:00 sáng hôm sau; tắt/hết mốc ⇒ vắng', () => {
     const c = CAU_HINH_MAC_DINH
     const co = (daCoMoc: string[], nowMs: number, chuaMo = true, cfg = c) => nhacKeCuaEm({ hanIso: HAN_23_59_T6, nowMs, chuaMo, daCoMoc: new Set(daCoMoc), cfg })
     expect(co([], VN('2026-09-23', '10:00'))).toEqual({ moc: 'M1', luc: new Date(VN('2026-09-25', '07:00')).toISOString() }) // 24 giờ trước hạn = 23:59 24/09 (ngoài khung) ⇒ 07:00 sáng hạn
@@ -65,6 +65,17 @@ describe('hàm thuần: cờ, khung giờ, lượt 30 phút, giờ dự kiến',
     expect(co([], VN('2026-09-23', '10:00'), true, { ...c, bat: false })).toBeUndefined()
     expect(co([], VN('2026-09-23', '10:00'), true, { ...c, mocTat: ['M1'] })?.moc).toBe('M2')
   })
+  it('ngayGuiM2: hạn từ 20:30 trở đi ⇒ M2 gửi chính ngày hạn; hạn trước 20:30 (00:00, 12:00 trưa, 20:29) ⇒ tối HÔM TRƯỚC', () => {
+    const h = (hhmm: string) => VN('2026-09-26', hhmm)
+    expect(['00:00', '07:00', '12:00', '20:29'].map((g) => ngayGuiM2(h(g)))).toEqual(['2026-09-25', '2026-09-25', '2026-09-25', '2026-09-25'])
+    expect(['20:30', '23:59'].map((g) => ngayGuiM2(h(g)))).toEqual(['2026-09-26', '2026-09-26'])
+  })
+  it('nhacKeCuaEm: hạn 12:00 trưa ⇒ M2 lúc 20:00 HÔM TRƯỚC hạn (không phải ngày hạn); sau đó M4 07:00 sáng hôm sau hạn', () => {
+    const han = new Date(VN('2026-09-26', '12:00')).toISOString()
+    const co = (daCoMoc: string[], nowMs: number) => nhacKeCuaEm({ hanIso: han, nowMs, chuaMo: false, daCoMoc: new Set(daCoMoc), cfg: CAU_HINH_MAC_DINH })
+    expect(co([], VN('2026-09-24', '10:00'))).toEqual({ moc: 'M2', luc: new Date(VN('2026-09-25', '20:00')).toISOString() })
+    expect(co(['M2'], VN('2026-09-25', '21:00'))).toEqual({ moc: 'M4', luc: new Date(VN('2026-09-27', '07:00')).toISOString() })
+  })
 })
 
 describe('LỜI MẪU: số thật, xưng Thầy/Anh chị, không so bạn/doạ/emoji/gạch dài, ≤ 30 chữ mỗi câu', () => {
@@ -73,16 +84,28 @@ describe('LỜI MẪU: số thật, xưng Thầy/Anh chị, không so bạn/do�
     expect(loiEmTheoMoc('M1', x({ chang1: { soCau: 5, phut: 12 } }))).toBe('Bài tập về nhà «Este – lipid» hạn nộp 23:59 Thứ Sáu. Em chưa mở bài. Chặng 1 có 5 câu, khoảng 12 phút.')
     expect(loiEmTheoMoc('M1', x({ soCauBai: 40 }))).toContain('Bài có 40 câu.') // bài thường: không nói chặng
     expect(loiEmTheoMoc('M1', x())).not.toMatch(/Chặng 1|khoảng/) // không có số thật ⇒ không bịa
-    expect(loiEmTheoMoc('M2', x())).toBe('Hạn nộp 23:59 tối nay của Bài tập về nhà «Este – lipid». Em còn chặng 3 trong 5 chặng.')
+    expect(loiEmTheoMoc('M2', x())).toBe('Hạn nộp 23:59 tối nay của Bài tập về nhà «Este – lipid». Em còn 3 trong 5 chặng.')
     expect(loiEmTheoMoc('M2', x({ tongChang: undefined }))).toContain('Em chưa nộp bài.')
     expect(loiEmTheoMoc('M3', x({ chamChang: 2, soCauChangKe: 6 }))).toBe('Em đang chậm 2 chặng so với lịch của Bài tập về nhà «Este – lipid». Tối nay làm một chặng (6 câu) là bắt kịp.')
     expect(loiEmTheoMoc('M4', x({ nowMs: VN('2026-09-26', '07:00'), daLam: 7, tongCau: 25 }))).toBe('Bài tập về nhà «Este – lipid» đã quá hạn 23:59 hôm qua. Em đã làm 7 trong 25 câu.')
   })
+  it('chuHanM2: hạn hôm nay ⇒ "tối nay"; hạn ngày mai ⇒ "12:00 trưa mai (Thứ Bảy 26/09)" (buổi theo giờ); ngày khác như chuHan', () => {
+    const t = (ngay: string, hhmm: string) => new Date(VN(ngay, hhmm)).toISOString()
+    const nay = VN('2026-09-25', '20:00')
+    expect(chuHanM2(HAN_23_59_T6, nay)).toBe('23:59 tối nay')
+    expect(chuHanM2(t('2026-09-26', '12:00'), nay)).toBe('12:00 trưa mai (Thứ Bảy 26/09)')
+    expect([['09:00', 'sáng'], ['10:59', 'sáng'], ['11:00', 'trưa'], ['13:29', 'trưa'], ['13:30', 'chiều'], ['17:59', 'chiều'], ['18:00', 'tối'], ['20:15', 'tối']].map(([g]) => chuHanM2(t('2026-09-26', g!), nay).split(' ')[1]))
+      .toEqual(['sáng', 'sáng', 'trưa', 'trưa', 'chiều', 'chiều', 'tối', 'tối'])
+    expect(chuHanM2(t('2026-09-28', '12:00'), nay)).toBe('12:00 28/09')
+    expect(loiEmTheoMoc('M2', x({ hanIso: t('2026-09-26', '12:00') }))).toBe('Hạn nộp 12:00 trưa mai (Thứ Bảy 26/09) của Bài tập về nhà «Este – lipid». Em còn 3 trong 5 chặng.')
+    expect(loiPhMotBai('M2', x({ hanIso: t('2026-09-26', '12:00') }))).toBe('Anh/chị, em Hà còn 3 trong 5 chặng của Bài tập về nhà «Este – lipid», hạn nộp 12:00 trưa mai (Thứ Bảy 26/09). Anh/chị nhắc em mở app giúp Thầy.')
+    expect(loiPhGop('Hà', [{ m: 'M2', x: x({ hanIso: t('2026-09-26', '12:00') }) }, { m: 'M2', x: x() }])).toContain('«Este – lipid» hạn nộp 12:00 trưa mai (Thứ Bảy 26/09), còn 3 trong 5 chặng; «Este – lipid» hạn nộp 23:59 tối nay, còn 3 trong 5 chặng.')
+  })
   it('lời phụ huynh: một bài; nhiều bài GỘP một tin; không tên ⇒ "con"', () => {
-    expect(loiPhMotBai('M2', x())).toBe('Anh/chị, em Hà còn chặng 3 trong 5 chặng của Bài tập về nhà «Este – lipid», hạn nộp 23:59 tối nay. Anh/chị nhắc em mở app giúp Thầy.')
+    expect(loiPhMotBai('M2', x())).toBe('Anh/chị, em Hà còn 3 trong 5 chặng của Bài tập về nhà «Este – lipid», hạn nộp 23:59 tối nay. Anh/chị nhắc em mở app giúp Thầy.')
     expect(loiPhMotBai('M4', x({ nowMs: VN('2026-09-26', '07:00'), daLam: 7, tongCau: 25, hoTen: '' }))).toBe('Anh/chị, con chưa nộp Bài tập về nhà «Este – lipid», đã quá hạn 23:59 hôm qua, con đã làm 7 trong 25 câu. Anh/chị nhắc con mở bài và nộp.')
     const gop = loiPhGop('Nguyễn Thu Hà', [{ m: 'M2', x: x() }, { m: 'M2', x: x({ tenBai: 'Amin', tongChang: 4, daXongChang: 3 }) }])
-    expect(gop).toBe('Anh/chị, em Hà còn 2 bài tập về nhà chưa nộp: «Este – lipid» hạn nộp 23:59 tối nay, còn chặng 3 trong 5; «Amin» hạn nộp 23:59 tối nay, còn chặng 1 trong 4. Anh/chị nhắc em mở app giúp Thầy.')
+    expect(gop).toBe('Anh/chị, em Hà còn 2 bài tập về nhà chưa nộp: «Este – lipid» hạn nộp 23:59 tối nay, còn 3 trong 5 chặng; «Amin» hạn nộp 23:59 tối nay, còn 1 trong 4 chặng. Anh/chị nhắc em mở app giúp Thầy.')
   })
   it('mọi lời: không emoji, không gạch ngang dài, không doạ / so bạn / khen suông; mỗi câu ≤ 30 chữ', () => {
     const cacLoi = [
@@ -162,7 +185,7 @@ describe('M1 · nhắc sớm: còn ≤ 24 giờ, em CHƯA MỞ bài ⇒ EM', () 
 })
 
 describe('M2 · tối hạn chót (20:00 ngày hạn) ⇒ EM + PHỤ HUYNH', () => {
-  it('20:00 ngày hạn: em chưa nộp nhận M2 (còn chặng k trong K), phụ huynh nhận MỘT tin; trước 20:00 chưa; em đã nộp không nhận', async () => {
+  it('20:00 ngày hạn: em chưa nộp nhận M2 (còn k trong K chặng), phụ huynh nhận MỘT tin; trước 20:00 chưa; em đã nộp không nhận', async () => {
     const d = await bai()
     await mo(d, 'S1')
     d.sql.exec("UPDATE btvn_em SET nop_luc = '2026-09-25T05:00:00.000Z' WHERE sbd = 'S3'") // S3 đã nộp
@@ -174,10 +197,33 @@ describe('M2 · tối hạn chót (20:00 ngày hạn) ⇒ EM + PHỤ HUYNH', () 
     const ds = emDongs(d, 'M2')
     expect(ds.map((x) => x.sbd)).toEqual(['S1', 'S2'])
     const tong = Number((d.sql.prepare("SELECT so_chang FROM btvn_em WHERE sbd = 'S1'").get() as { so_chang: number }).so_chang)
-    expect(ds[0]!.loi_em).toMatch(new RegExp(`^Hạn nộp 23:59 tối nay của Bài tập về nhà «.+»\\. Em còn chặng ${tong} trong ${tong} chặng\\.$`))
+    expect(ds[0]!.loi_em).toMatch(new RegExp(`^Hạn nộp 23:59 tối nay của Bài tập về nhà «.+»\\. Em còn ${tong} trong ${tong} chặng\\.$`))
     expect(ds[0]).toMatchObject({ gui_ph: 1, ph_nhom: '#'.length ? `S1|2026-09-25` : '' })
-    expect(String(ds[0]!.loi_ph)).toMatch(/^Anh\/chị, em Một còn chặng \d+ trong \d+ chặng của Bài tập về nhà «.+», hạn nộp 23:59 tối nay\. Anh\/chị nhắc em mở app giúp Thầy\.$/)
+    expect(String(ds[0]!.loi_ph)).toMatch(/^Anh\/chị, em Một còn \d+ trong \d+ chặng của Bài tập về nhà «.+», hạn nộp 23:59 tối nay\. Anh\/chị nhắc em mở app giúp Thầy\.$/)
     expect(ds[1]!.loi_em).toContain('Em chưa nộp bài.') // S2 chưa mở bài (chưa chốt): không có số chặng ⇒ không bịa
+  })
+  it('HẠN 12:00 TRƯA (thầy hay đặt): M2 gửi 20:00 HÔM TRƯỚC hạn cho em + phụ huynh, lời "Hạn nộp 12:00 trưa mai (Thứ Bảy 26/09)"; sáng/tối ngày hạn không có M2 nữa; M4 vẫn 07:00 sáng hôm sau hạn', async () => {
+    const han = new Date(VN('2026-09-26', '12:00')).toISOString()
+    const d = await bai(3, han)
+    await mo(d, 'S1')
+    await chay(d, '2026-09-25', '19:30')
+    expect(emDongs(d, 'M2')).toEqual([])
+    const r = await chay(d, '2026-09-25', '20:00')
+    expect(r.theoMoc).toMatchObject({ M2: 3 })
+    expect(r.soTinPhuHuynh).toBe(3)
+    const ma = maBtvn(d)
+    const ds = emDongs(d, 'M2')
+    expect(ds.map((x) => x.id)).toEqual([`ca:${ma}:S1:M2:2026-09-25`, `ca:${ma}:S2:M2:2026-09-25`, `ca:${ma}:S3:M2:2026-09-25`])
+    const tong = Number((d.sql.prepare("SELECT so_chang FROM btvn_em WHERE sbd = 'S1'").get() as { so_chang: number }).so_chang)
+    expect(ds[0]!.loi_em).toBe(`Hạn nộp 12:00 trưa mai (Thứ Bảy 26/09) của Bài tập về nhà «${ds[0]!.ten_btvn}». Em còn ${tong} trong ${tong} chặng.`)
+    expect(ds[1]!.loi_em).toBe(`Hạn nộp 12:00 trưa mai (Thứ Bảy 26/09) của Bài tập về nhà «${ds[1]!.ten_btvn}». Em chưa nộp bài.`)
+    expect(String(ds[0]!.loi_ph)).toBe(`Anh/chị, em Một còn ${tong} trong ${tong} chặng của Bài tập về nhà «${ds[0]!.ten_btvn}», hạn nộp 12:00 trưa mai (Thứ Bảy 26/09). Anh/chị nhắc em mở app giúp Thầy.`)
+    expect(ds[0]).toMatchObject({ gui_ph: 1, ph_nhom: 'S1|2026-09-25' })
+    await chay(d, '2026-09-26', '07:30') // sáng ngày hạn: không M2 mới
+    await chay(d, '2026-09-26', '20:00') // hạn đã qua
+    expect(emDongs(d, 'M2')).toHaveLength(3)
+    await chay(d, '2026-09-27', '07:00')
+    expect(emDongs(d, 'M4').map((x) => x.sbd)).toEqual(['S1', 'S2', 'S3'])
   })
   it('M2 không đè M1 cùng lượt (em chưa mở lúc 20:00: chỉ M2); ngày hạn M1 sáng + M2 tối là hai mốc khác nhau', async () => {
     const d = await bai()

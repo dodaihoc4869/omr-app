@@ -3,7 +3,7 @@
 // Cron mỗi phút gọi `nhacTuDong` nhưng CHỈ chạy MỘT lần mỗi 30 phút (chiếm lượt bằng `cau_hinh.nhac_tu_dong_lan`) và CHỈ trong khung `gioTu`–`gioDen` (mặc định 07:00–21:30 giờ VN).
 // Bốn mốc cho mỗi em CHƯA nộp của mỗi bài đang chạy (bài thường lẫn cá nhân hoá):
 //   M1 · nhắc sớm     còn ≤ 24 giờ tới hạn, em CHƯA MỞ bài .................. EM
-//   M2 · tối hạn chót 20:00 NGÀY HẠN, chưa nộp ............................... EM + PHỤ HUYNH
+//   M2 · tối cuối trước hạn 20:00 NGÀY HẠN (hạn từ 20:30 trở đi) HOẶC 20:00 HÔM TRƯỚC (hạn trước 20:30, vd 12:00 trưa), chưa nộp ... EM + PHỤ HUYNH
 //   M3 · trễ nhịp     20:00, chậm ≥ 2 chặng so với lịch (bài còn hạn ≥ 1 ngày) . EM
 //   M4 · quá hạn      07:00 sáng hôm sau hạn, vẫn chưa nộp .................... EM + PHỤ HUYNH (MỘT lần/bài)
 // TRẦN: em ≤ 1 tin "nhắc thường" (M1/M3, kể cả tin thầy bấm tay) / bài / ngày — M2 và M4 là hai mốc CHỐT HẠN, mỗi mốc đúng một lần/bài, không tính vào trần ấy (ngày hạn có thể có M1 sáng + M2 tối);
@@ -33,6 +33,8 @@ export const NGAY_PH_DEM = 7
 /** M1: còn ≤ ngần này giờ; M2/M3 gửi từ 20:00; M4 từ 07:00 sáng hôm sau; M3: chậm ≥ ngần này chặng và bài còn ≥ 1 ngày. */
 export const GIO_M1_TRUOC_HAN = 24
 export const PHUT_TOI_HAN_CHOT = 20 * 60
+/** Hạn nộp TỪ giờ này trở đi ⇒ M2 gửi 20:00 chính ngày hạn; hạn sớm hơn (vd 12:00 trưa) ⇒ M2 gửi 20:00 HÔM TRƯỚC (buổi tối cuối trước hạn). */
+export const PHUT_HAN_MUON = 20 * 60 + 30
 export const PHUT_SANG_QUA_HAN = 7 * 60
 export const SO_CHANG_CHAM_M3 = 2
 /** Mỗi lượt chạy ghi tối đa ngần này dòng (bảo vệ giới hạn D1); phần còn lại được xử lý ở lượt 30 phút kế (khoá idempotent). */
@@ -91,6 +93,11 @@ export const khoaLuot = (ms: number): string => {
   const d = new Date(Math.floor(ms / NUA_GIO_MS) * NUA_GIO_MS + GIO_VN_MS).toISOString()
   return d.slice(0, 16)
 }
+/** Ngày VN gửi M2 của một hạn: hạn từ 20:30 trở đi ⇒ chính ngày hạn; hạn trước 20:30 ⇒ tối HÔM TRƯỚC (buổi tối cuối trước hạn). */
+export const ngayGuiM2 = (hanMs: number): string => {
+  const ngay = ngayVnCuaMs(hanMs)
+  return phutTrongNgayVn(hanMs) >= PHUT_HAN_MUON ? ngay : ngayKe(ngay, -1)
+}
 /** Mốc `HH:MM` (giờ VN) của ngày VN `ngay` → ISO UTC. */
 const gioVnLaIso = (ngay: string, phut: number): string => new Date(Date.parse(`${ngay}T00:00:00Z`) - GIO_VN_MS + phut * 60_000).toISOString()
 const ngayKe = (ngay: string, n: number): string => new Date(Date.parse(`${ngay}T00:00:00Z`) + n * MOT_NGAY_MS).toISOString().slice(0, 10)
@@ -108,6 +115,22 @@ const thuCua = (ngay: string): string => THU[new Date(`${ngay}T00:00:00Z`).getUT
 export const chuHanCoThu = (hanIso: string): string => {
   const v = new Date(Date.parse(hanIso) + GIO_VN_MS).toISOString()
   return `${v.slice(11, 16)} ${thuCua(v.slice(0, 10))}`
+}
+
+/** Buổi của một giờ hạn ("12:00" ⇒ trưa): trước 11:00 sáng · đến 13:30 trưa · đến 18:00 chiều · sau đó tối. */
+const buoiCua = (gio: string): string => {
+  const p = phutCuaGio(gio)
+  return p < 11 * 60 ? 'sáng' : p < 13 * 60 + 30 ? 'trưa' : p < 18 * 60 ? 'chiều' : 'tối'
+}
+/** Hạn nộp trong tin M2: "23:59 tối nay" (hạn hôm nay) · "12:00 trưa mai (Thứ Tư 24/09)" (hạn ngày mai) · ngày khác như `chuHan`. */
+export function chuHanM2(hanIso: string, nowMs: number): string {
+  const han = Date.parse(hanIso)
+  if (!Number.isFinite(han)) return 'chưa rõ'
+  const ngay = ngayVnCuaMs(han)
+  const gio = new Date(han + GIO_VN_MS).toISOString().slice(11, 16)
+  if (ngay === ngayVnCuaMs(nowMs)) return `${gio} tối nay`
+  if (ngay === ngayVnCuaMs(nowMs + MOT_NGAY_MS)) return `${gio} ${buoiCua(gio)} mai (${thuCua(ngay)} ${ngay.slice(8, 10)}/${ngay.slice(5, 7)})`
+  return chuHan(hanIso, nowMs)
 }
 
 /** Tên gọi của em (chữ cuối họ tên); không có ⇒ ''. */
@@ -145,8 +168,8 @@ export function loiEmTheoMoc(m: Moc, x: DauVaoLoi): string {
     return `Bài tập về nhà ${bai} hạn nộp ${han}. Em chưa mở bài.${c1}`
   }
   if (m === 'M2') {
-    const con = x.tongChang && x.tongChang > 0 ? ` Em còn chặng ${Math.max(0, x.tongChang - (x.daXongChang ?? 0))} trong ${x.tongChang} chặng.` : ' Em chưa nộp bài.'
-    return `Hạn nộp ${chuHan(x.hanIso, x.nowMs).replace(/ hôm nay$/, ' tối nay')} của Bài tập về nhà ${bai}.${con}`
+    const con = x.tongChang && x.tongChang > 0 ? ` Em còn ${Math.max(0, x.tongChang - (x.daXongChang ?? 0))} trong ${x.tongChang} chặng.` : ' Em chưa nộp bài.'
+    return `Hạn nộp ${chuHanM2(x.hanIso, x.nowMs)} của Bài tập về nhà ${bai}.${con}`
   }
   if (m === 'M3') return `Em đang chậm ${x.chamChang ?? SO_CHANG_CHAM_M3} chặng so với lịch của Bài tập về nhà ${bai}. Tối nay làm một chặng${x.soCauChangKe ? ` (${x.soCauChangKe} câu)` : ''} là bắt kịp.`
   return `Bài tập về nhà ${bai} đã quá hạn ${chuHan(x.hanIso, x.nowMs - MOT_NGAY_MS).replace(/ hôm nay$/, ' hôm qua')}. Em đã làm ${x.daLam ?? 0} trong ${x.tongCau ?? 0} câu.`
@@ -158,8 +181,8 @@ export function loiPhMotBai(m: Moc, x: DauVaoLoi): string {
   const em = ten ? `em ${ten}` : 'con'
   const bai = tenBaiNgoac(x.tenBai)
   if (m === 'M2') {
-    const con = x.tongChang && x.tongChang > 0 ? `${em} còn chặng ${Math.max(0, x.tongChang - (x.daXongChang ?? 0))} trong ${x.tongChang} chặng` : `${em} chưa nộp`
-    return `Anh/chị, ${con} của Bài tập về nhà ${bai}, hạn nộp ${chuHan(x.hanIso, x.nowMs).replace(/ hôm nay$/, ' tối nay')}. Anh/chị nhắc ${ten ? 'em' : 'con'} mở app giúp Thầy.`
+    const con = x.tongChang && x.tongChang > 0 ? `${em} còn ${Math.max(0, x.tongChang - (x.daXongChang ?? 0))} trong ${x.tongChang} chặng` : `${em} chưa nộp`
+    return `Anh/chị, ${con} của Bài tập về nhà ${bai}, hạn nộp ${chuHanM2(x.hanIso, x.nowMs)}. Anh/chị nhắc ${ten ? 'em' : 'con'} mở app giúp Thầy.`
   }
   return `Anh/chị, ${em} chưa nộp Bài tập về nhà ${bai}, đã quá hạn ${chuHan(x.hanIso, x.nowMs - MOT_NGAY_MS).replace(/ hôm nay$/, ' hôm qua')}, ${ten ? 'em' : 'con'} đã làm ${x.daLam ?? 0} trong ${x.tongCau ?? 0} câu. Anh/chị nhắc ${ten ? 'em' : 'con'} mở bài và nộp.`
 }
@@ -170,7 +193,7 @@ export function loiPhGop(hoTen: string, cacBai: { m: Moc; x: DauVaoLoi }[]): str
   const em = ten ? `em ${ten}` : 'con'
   const dong = cacBai.map(({ m, x }) => {
     const bai = tenBaiNgoac(x.tenBai)
-    if (m === 'M2') return `${bai} hạn nộp ${chuHan(x.hanIso, x.nowMs).replace(/ hôm nay$/, ' tối nay')}${x.tongChang && x.tongChang > 0 ? `, còn chặng ${Math.max(0, x.tongChang - (x.daXongChang ?? 0))} trong ${x.tongChang}` : ''}`
+    if (m === 'M2') return `${bai} hạn nộp ${chuHanM2(x.hanIso, x.nowMs)}${x.tongChang && x.tongChang > 0 ? `, còn ${Math.max(0, x.tongChang - (x.daXongChang ?? 0))} trong ${x.tongChang} chặng` : ''}`
     return `${bai} đã quá hạn ${chuHan(x.hanIso, x.nowMs - MOT_NGAY_MS).replace(/ hôm nay$/, ' hôm qua')}, đã làm ${x.daLam ?? 0} trong ${x.tongCau ?? 0} câu`
   })
   return `Anh/chị, ${em} còn ${cacBai.length} bài tập về nhà chưa nộp: ${dong.join('; ')}. Anh/chị nhắc ${ten ? 'em' : 'con'} mở app giúp Thầy.`
@@ -294,7 +317,7 @@ async function chayLuot(env: Env, nowMs: number, cfg: CauHinhNhac): Promise<KetQ
       const chon: Moc[] = []
       // Thứ tự ƯU TIÊN: M4 > M2 > M3 > M1 (mỗi lượt chọn các mốc ĐẾN HẠN; trần quyết định cái nào được gửi).
       if (!cfg.mocTat.includes('M4') && conHanMs < 0 && ngayHan < homNay && phutNay >= PHUT_SANG_QUA_HAN && !daCoM4.has(`${b.ma}|${e.sbd}`)) chon.push('M4')
-      if (!cfg.mocTat.includes('M2') && conHanMs > 0 && ngayHan === homNay && phutNay >= PHUT_TOI_HAN_CHOT) chon.push('M2')
+      if (!cfg.mocTat.includes('M2') && conHanMs > 0 && ngayGuiM2(b.hanMs) === homNay && phutNay >= PHUT_TOI_HAN_CHOT) chon.push('M2')
       let cham = 0
       if (lichChang) {
         const moLuc = docLichDaLuu(e.row.chang_mo_json, tongChang)?.moLuc ?? moLucChang(chuoi(e.row.chot_luc), tongChang)
@@ -396,7 +419,7 @@ export function nhacKeCuaEm(x: { hanIso: string; nowMs: number; chuaMo: boolean;
     if (Date.parse(luc) < han) ds.push({ moc: 'M1', luc })
   }
   if (!cfg.mocTat.includes('M2') && !daCoMoc.has('M2')) {
-    const luc = gioVnLaIso(ngayHan, PHUT_TOI_HAN_CHOT)
+    const luc = gioVnLaIso(ngayGuiM2(han), PHUT_TOI_HAN_CHOT)
     if (Date.parse(luc) > nowMs && Date.parse(luc) < han) ds.push({ moc: 'M2', luc })
   }
   if (!cfg.mocTat.includes('M4') && !daCoMoc.has('M4')) {

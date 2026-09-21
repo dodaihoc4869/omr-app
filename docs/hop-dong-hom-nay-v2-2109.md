@@ -85,7 +85,7 @@ Cron mỗi phút gọi nhưng CHỈ chạy MỘT lần mỗi 30 phút, CHỈ tro
 | Mốc | Điều kiện (mỗi em CHƯA nộp của mỗi bài đang chạy, thường lẫn cá nhân hoá) | Gửi cho |
 |---|---|---|
 | M1 nhắc sớm | còn ≤ 24 giờ tới hạn, em CHƯA MỞ bài | EM |
-| M2 tối hạn chót | 20:00 NGÀY HẠN, chưa nộp | EM + PHỤ HUYNH |
+| M2 tối cuối trước hạn | 20:00 NGÀY HẠN nếu hạn từ 20:30 trở đi (vd 23:59); 20:00 HÔM TRƯỚC nếu hạn trước 20:30 (vd 12:00 trưa, thầy hay đặt). Lời: "Hạn nộp 12:00 trưa mai (Thứ Bảy 26/09) của Bài tập về nhà «…». Em còn N trong K chặng." (hạn hôm nay: "23:59 tối nay"). `nhacKe` của `/gv/chua-nop` theo cùng luật. Chưa nộp | EM + PHỤ HUYNH |
 | M3 trễ nhịp | 20:00, chậm ≥ 2 chặng so với lịch, bài còn ≥ 1 ngày (bài cá nhân hoá) | EM |
 | M4 quá hạn | 07:00 sáng hôm sau hạn, vẫn chưa nộp — MỘT lần/bài | EM + PHỤ HUYNH |
 **Trần:** em ≤ 1 tin "nhắc thường" (M1/M3, kể cả tin thầy bấm tay) / bài / ngày; M2 và M4 là hai mốc CHỐT HẠN, mỗi mốc một lần/bài, không tính vào trần ấy. Phụ huynh ≤ 1 tin tự động/ngày (nhiều bài ⇒ GỘP một tin: `loi_ph` chỉ ở dòng đầu của nhóm `ph_nhom`) và ≤ 3 tin/7 ngày; chạm trần thì em VẪN nhận, phụ huynh không (`gui_ph = 0`). Không gửi cho em đã nộp, bài thu hồi/xoá, hạn đã gia hạn sang ngày khác (tính theo hạn HIỆN TẠI của bài).
