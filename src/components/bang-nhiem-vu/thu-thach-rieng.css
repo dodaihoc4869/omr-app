@@ -30,8 +30,8 @@
 }
 .bnv-tt-de-sau:hover { background: var(--m3-surface-container); }
 .bnv-tt-de-sau:focus-visible { outline: 3px solid var(--m3-primary); outline-offset: 2px; }
-.bnv-tt-so { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 4px; font-size: var(--cx-2); color: var(--m3-on-surface-variant); }
-.bnv-tt-so li { line-height: 1.45; }
-.bnv-tt-thanh { display: flex; align-items: center; gap: 8px; margin-top: 8px; color: var(--m3-on-surface-variant); }
+.bnv-tt-so { margin: 8px 0 0; font-size: var(--cx-2); color: var(--m3-on-surface-variant); line-height: 1.45; }
+.bnv-tt-khien { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: var(--cx-1); font-weight: 600; color: var(--m3-on-surface-variant); }
+.bnv-tt-khien-chu { flex: none; white-space: nowrap; }
 .bnv-tt-thanh-nen { flex: 1 1 auto; height: 8px; border-radius: 999px; background: var(--m3-surface-container-high); overflow: hidden; }
 .bnv-tt-thanh-nen i { display: block; height: 100%; border-radius: 999px; background: var(--m3-tertiary); }

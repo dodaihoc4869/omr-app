@@ -126,18 +126,17 @@ export function chuDaXong(t: ThuThachRieng): string {
 /** Dòng đang làm dở: "Em đã làm 2/6 câu của thử thách hôm nay". */
 export const chuDangLam = (t: ThuThachRieng): string => `Em đã làm ${t.soDaLam}/${t.soCau} câu của thử thách hôm nay`
 
-/** Các dòng SỐ THẬT của thần thú (chỉ khi máy chủ trả): cấp + EXP còn thiếu, mảnh khiên, chuỗi ngày. Mỗi dòng có nhãn. */
-export function dongThanThu(t: ThuThachRieng): string[] {
+/** Dòng SỐ THẬT của thần thú (chỉ khi máy chủ trả): tên loài + cấp + EXP còn thiếu. Thiếu ⇒ rỗng. (Chuỗi ngày đã có ở đầu trang nên KHÔNG lặp lại ở thẻ; mảnh khiên vẽ thành thanh riêng.) */
+export function chuExpThanThu(t: ThuThachRieng): string {
   const th = t.thanThu
-  if (!th) return []
-  const ra: string[] = []
-  if (th.expConThieu !== null) {
-    const cap = th.cap !== null ? ` · cấp ${th.cap}` : ''
-    ra.push(th.expConThieu === 0 ? `${th.ten}${cap} · đã đủ EXP để lên cấp kế` : `${th.ten}${cap} · còn ${th.expConThieu} EXP nữa để lên cấp kế`)
-  }
-  if (th.manhKhien !== null && th.manhKhienTong !== null) ra.push(`Mảnh khiên ${th.manhKhien}/${th.manhKhienTong}`)
-  if (th.chuoiNgay !== null && th.chuoiNgay > 0) ra.push(`Chuỗi ${th.chuoiNgay} ngày`)
-  return ra
+  if (!th || th.expConThieu === null) return ''
+  const cap = th.cap !== null ? ` · cấp ${th.cap}` : ''
+  return th.expConThieu === 0 ? `${th.ten}${cap} · đã đủ EXP để lên cấp kế` : `${th.ten}${cap} · còn ${th.expConThieu} EXP nữa để lên cấp kế`
+}
+/** Nhãn thanh mảnh khiên: "Mảnh khiên 3/12" (chỉ khi máy chủ trả đủ hai số hợp lệ). */
+export function chuManhKhien(t: ThuThachRieng): string {
+  const th = t.thanThu
+  return th && th.manhKhien !== null && th.manhKhienTong !== null ? `Mảnh khiên ${th.manhKhien}/${th.manhKhienTong}` : ''
 }
 
 // ── "Để sau": ẩn thẻ tới ngày mai, không hỏi lại ─────────────────────────────

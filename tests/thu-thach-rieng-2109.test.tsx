@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, configure, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 import TheThuThachRieng from '../src/components/bang-nhiem-vu/TheThuThachRieng'
-import { chuDaXong, chuDangLam, dangDeSau, docDeSau, docThuThachRieng, dongThanThu, luuDeSau, type ThuThachRieng } from '../src/lib/thu-thach-rieng'
+import { chuDaXong, chuDangLam, chuExpThanThu, chuManhKhien, dangDeSau, docDeSau, docThuThachRieng, luuDeSau, type ThuThachRieng } from '../src/lib/thu-thach-rieng'
 import { taiThuThachHomNay } from '../src/components/bang-nhiem-vu/cau-on-api'
 
 configure({ asyncUtilTimeout: 8000 })
@@ -90,7 +90,7 @@ describe('docThuThachRieng — đọc chặt hợp đồng máy chủ', () => {
     expect(t.soCau).toBe(2); expect(t.cau.map((c) => c.qid)).toEqual(['tt1', 'tt2']); expect(t.trangThai).toBe('chua_lam')
     expect(t.dang).toEqual([{ ma: 'ESTE.THUY_PHAN', ten: 'Thuỷ phân ester' }])
     expect(t.thanThu).toEqual({ ten: 'Rồng Lửa', cap: 6, expConThieu: 40, manhKhien: 3, manhKhienTong: 12, chuoiNgay: 4 })
-    expect(dongThanThu(t)).toEqual(['Rồng Lửa · cấp 6 · còn 40 EXP nữa để lên cấp kế', 'Mảnh khiên 3/12', 'Chuỗi 4 ngày'])
+    expect(chuExpThanThu(t)).toBe('Rồng Lửa · cấp 6 · còn 40 EXP nữa để lên cấp kế'); expect(chuManhKhien(t)).toBe('Mảnh khiên 3/12')
   })
   it('co:false · ok:false · không phải đối tượng · thiếu lời mời · chưa xong mà không có câu ⇒ null (không thẻ)', () => {
     for (const x of [null, 'x', [], { ok: true, co: false }, { ok: false, error: 'x' }, THU_THACH({ loiMoi: '   ' }), THU_THACH({ cau: [] }), THU_THACH({ cau: [{ qid: '', phan: 'I', text: 'x' }] })]) expect(docThuThachRieng(x)).toBeNull()
@@ -102,8 +102,10 @@ describe('docThuThachRieng — đọc chặt hợp đồng máy chủ', () => {
     expect(docThuThachRieng(THU_THACH({ cau: [tl] }))).toBeNull()
   })
   it('thiếu số thật thì BỎ dòng đó, không đoán: thanThu hỏng ⇒ không dòng; khiên vượt tổng ⇒ bỏ', () => {
-    expect(dongThanThu(docThuThachRieng(THU_THACH({ thanThu: { ten: 'Rồng Lửa' } }))!)).toEqual([])
-    expect(dongThanThu(docThuThachRieng(THU_THACH({ thanThu: { ten: 'Rồng Lửa', manhKhien: 20, manhKhienTong: 12, chuoiNgay: 0 } }))!)).toEqual([])
+    const ThieuHet = docThuThachRieng(THU_THACH({ thanThu: { ten: 'Rồng Lửa' } }))!
+    expect(chuExpThanThu(ThieuHet)).toBe(''); expect(chuManhKhien(ThieuHet)).toBe('')
+    const KhienSai = docThuThachRieng(THU_THACH({ thanThu: { ten: 'Rồng Lửa', manhKhien: 20, manhKhienTong: 12, expConThieu: 0 } }))!
+    expect(chuManhKhien(KhienSai)).toBe(''); expect(chuExpThanThu(KhienSai)).toBe('Rồng Lửa · đã đủ EXP để lên cấp kế')
     expect(docThuThachRieng(THU_THACH({ thanThu: 5 }))!.thanThu).toBeNull()
   })
   it('đã xong: "Em đã xong thử thách hôm nay · đúng x trong y câu" từ daNop; đang làm dở: "đã làm 1/2 câu"', () => {
@@ -142,7 +144,7 @@ describe('TheThuThachRieng — thẻ', () => {
     expect(the.textContent).toContain('Bộ não A.I hỗ trợ riêng em Minh Anh')
     expect(the.textContent).toContain('Rồng Lửa còn thiếu 40 EXP để lên cấp 7. Hôm nay thử 2 câu Thuỷ phân ester, xong là đủ.')
     expect(within(the).getByText('2 câu')).toBeTruthy(); expect(within(the).getByText('Không bắt buộc, không có hạn')).toBeTruthy()
-    expect(within(the).getByText('Mảnh khiên 3/12')).toBeTruthy()
+    expect(within(the).getByText('Mảnh khiên 3/12')).toBeTruthy(); expect(the.textContent).not.toContain('Chuỗi') // chuỗi ngày đã có ở đầu trang, không lặp
     expect(within(the).getAllByRole('button').map((b) => b.textContent)).toEqual(['Làm mấy câu này', 'Để sau'])
     expect(the.querySelectorAll('.bnv-nut-chinh').length).toBe(0) // nút chính của màn vẫn là "Làm ngay" (luật C2)
     fireEvent.click(screen.getByRole('button', { name: 'Làm mấy câu này' })); expect(onLam).toHaveBeenCalledWith(moi)

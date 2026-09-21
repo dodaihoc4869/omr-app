@@ -4,7 +4,7 @@
 // (cấp, EXP còn thiếu, mảnh khiên, chuỗi ngày) là SỐ THẬT máy chủ trả — thiếu số nào thì bỏ dòng đó. Không thử thách hợp lệ ⇒ màn cha KHÔNG dựng thẻ.
 // Không emoji. Màu chỉ đọc biến --m3-* (thu-thach-rieng.css).
 import { CheckCircle2, Shield, Sparkles } from 'lucide-react'
-import { CHU_KHONG_BAT_BUOC, chuDaXong, chuDangLam, chuSoCau, dongThanThu, soCauConLai, type ThuThachRieng } from '../../lib/thu-thach-rieng'
+import { CHU_KHONG_BAT_BUOC, chuDaXong, chuDangLam, chuExpThanThu, chuManhKhien, chuSoCau, soCauConLai, type ThuThachRieng } from '../../lib/thu-thach-rieng'
 import './m3-theme.css'
 import './thu-thach-rieng.css'
 
@@ -22,9 +22,9 @@ export default function TheThuThachRieng({
   const nhan = `Bộ não A.I hỗ trợ riêng em ${hoTen}`.trim()
   const xong = thuThach.trangThai === 'xong'
   const dangLam = thuThach.trangThai === 'dang_lam'
-  const dong = dongThanThu(thuThach)
+  const dongExp = chuExpThanThu(thuThach)
+  const nhanKhien = chuManhKhien(thuThach)
   const th = thuThach.thanThu
-  const coThanhKhien = !!th && th.manhKhien !== null && th.manhKhienTong !== null
   const conLai = soCauConLai(thuThach)
   return (
     <section className="bnv-tt" data-vung="thu-thach-rieng" data-trang-thai={thuThach.trangThai} aria-labelledby="bnv-tt-ten">
@@ -45,23 +45,22 @@ export default function TheThuThachRieng({
         <p className="bnv-tt-loi">{thuThach.loiMoi}</p>
       )}
 
-      {dong.length > 0 && (
-        <ul className="bnv-tt-so" aria-label={`Số thật của ${th?.ten ?? 'thần thú'}`} data-vung="thu-thach-than-thu">
-          {dong.map((d) => (
-            <li key={d}>{d}</li>
-          ))}
-        </ul>
+      {dongExp && (
+        <p className="bnv-tt-so" data-vung="thu-thach-than-thu">
+          {dongExp}
+        </p>
       )}
-      {coThanhKhien && (
+      {nhanKhien && (
         <div
-          className="bnv-tt-thanh"
+          className="bnv-tt-khien"
           role="progressbar"
-          aria-label="Mảnh khiên đã có"
+          aria-label={nhanKhien}
           aria-valuemin={0}
           aria-valuemax={th!.manhKhienTong!}
           aria-valuenow={th!.manhKhien!}
         >
           <Shield size={16} aria-hidden="true" />
+          <span className="bnv-tt-khien-chu">{nhanKhien}</span>
           <span className="bnv-tt-thanh-nen">
             <i style={{ width: `${Math.round((th!.manhKhien! / th!.manhKhienTong!) * 100)}%` }} />
           </span>
