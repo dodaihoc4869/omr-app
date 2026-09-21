@@ -9,7 +9,7 @@ import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { docCauHinhTangDoc } from '../server/src/bo-nao-doc'
 import { chuGameTrong } from '../server/src/chu-game'
 import {
-  CHI_NHAN_TOKEN, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
+  CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
   DANG_VAP_TI_LE_DUNG_TOI_DA, DANG_VAP_TOI_THIEU_LUOT, PHIEN_CACH_TOI_DA_PHUT, TOI_DA_CAU_HOM_NAY, TOI_THIEU_LUOT_GIO_THUONG_HOC,
 } from '../server/src/ph-tat-ca-ve-con'
 import type { Env } from '../server/src/kieu'
@@ -1167,5 +1167,73 @@ describe('MỐC HIỂN THỊ — sự kiện trước 12:00 trưa 21/09 không l
     const { d } = dung({ moc: null })
     suKien(d, { qid: 'S', ngay: NGAY_MOC, gio: '08:00' }); suKien(d, { qid: 'C', ngay: NGAY_MOC, gio: '14:00' })
     expect((await chayMoc(d, T_MOC)).homNay.tongQuan.soCau).toBe(1)
+  })
+
+  // ── Boss chốt 21/09 (sau cfac193): lịch ôn = SỐ CÂU ÔN TRONG KẾ HOẠCH NGÀY; bài về nhà đã nộp chỉ từ NGÀY mốc ──
+  const themKeHoach = (d: D1That, o: { ngay?: string; viec?: unknown[]; mucTieu?: number } = {}) =>
+    d.sql.prepare("INSERT INTO ke_hoach_ngay(khoa,sbd,ngay,phien_ban,seed,ngan_sach_json,viec_json,canh_bao_json,cap_nhat_luc) VALUES(?,?,?,1,1,?,?,'[]','x')")
+      .run(`S1|${o.ngay ?? NGAY}`, 'S1', o.ngay ?? NGAY, JSON.stringify({ mucTieuCau: o.mucTieu ?? 8 }), JSON.stringify({ viec: o.viec ?? [] }))
+  /** 12 câu sai hôm qua (đến hạn ôn hôm nay) + 10 câu sai hôm nay (đến hạn ngày mai) ⇒ tồn đọng lớn hơn mọi trần. */
+  const tonDong = async (d: D1Wrap) => {
+    for (let i = 0; i < 12; i++) suKien(d, { qid: `H${i}`, ngay: themNgay(NGAY, -1), gio: '10:00', dang: 'ES', kq: 0 })
+    for (let i = 0; i < 10; i++) suKien(d, { qid: `N${i}`, ngay: NGAY, gio: '10:00', dang: 'ES', kq: 0 })
+    await dungLaiHoSo(d.env, ['S1'], 'x')
+  }
+  type D1Wrap = D1That
+
+  it('lichOn.homNay = SỐ CÂU ÔN CÓ TRONG KẾ HOẠCH NGÀY (tổng soCau các việc on_lai), không phải cả tồn đọng 12 câu; việc loại khác không cộng vào', async () => {
+    const { d } = dung()
+    await tonDong(d)
+    themKeHoach(d, { viec: [{ loai: 'on_lai', soCau: 2 }, { loai: 'on_lai', soCau: 1 }, { loai: 'than_thu', soCau: 6 }, { loai: 'btvn_lo', soCau: 9 }] })
+    const r = await chay(d, await capPass(d))
+    expect(r.lichOn.homNay).toBe(3)
+    expect(r.phuHuynhLamGi[0]).toMatch(/^Nhắc con làm 3 câu ôn lại hôm nay/)
+  })
+
+  it('kế hoạch hôm nay CÓ nhưng không có việc ôn ⇒ homNay 0 (không rơi về tồn đọng) ⇒ không có câu "Nhắc con làm … ôn lại hôm nay"', async () => {
+    const { d } = dung()
+    await tonDong(d)
+    themKeHoach(d, { viec: [{ loai: 'than_thu', soCau: 6 }] })
+    const r = await chay(d, await capPass(d))
+    expect(r.lichOn.homNay).toBe(0)
+    expect(JSON.stringify(r.phuHuynhLamGi ?? [])).not.toContain('hôm nay')
+  })
+
+  it('chưa có kế hoạch hôm nay ⇒ tồn đọng bị KẸP bằng trần ôn của ngày (60 % ngân sách mặc định); ngày mai (chưa có kế hoạch) cũng kẹp', async () => {
+    const { d } = dung()
+    await tonDong(d)
+    const r = await chay(d, await capPass(d))
+    const tran = Math.floor(MUC_TIEU_CAU_MAC_DINH * 0.6)
+    expect(tran).toBe(4)
+    expect(r.lichOn.homNay).toBe(tran) // tồn 12 ⇒ kẹp 4
+    expect(r.lichOn.ngayMai).toBe(tran) // tồn 10 ⇒ kẹp 4
+  })
+
+  it('trần ôn theo NGÂN SÁCH của kế hoạch hôm nay (mucTieuCau 20 ⇒ trần 12) áp cho ngày mai; ngày mai ít hơn trần thì giữ nguyên số thật', async () => {
+    const { d } = dung()
+    await tonDong(d)
+    themKeHoach(d, { viec: [], mucTieu: 20 })
+    const r = await chay(d, await capPass(d))
+    expect(r.lichOn.ngayMai).toBe(10) // 10 câu đến hạn ngày mai < trần 12 ⇒ nguyên 10
+    const { d: d2 } = dung()
+    await tonDong(d2)
+    themKeHoach(d2, { viec: [], mucTieu: 10 })
+    expect((await chay(d2, await capPass(d2))).lichOn.ngayMai).toBe(6) // trần 6
+  })
+
+  it('baiTapVeNha.gan: chỉ bài GIAO từ ngày mốc (bài giao 20/09 đã nộp không hiện); đối chứng mốc cổ ⇒ hiện đủ; dangChay không đổi', async () => {
+    const dat = (o?: { moc?: string | null }) => {
+      const { d } = dung(o)
+      themBtvn(d, 'CU', { giao: '2026-09-20T03:00:00.000Z', nop: '2026-09-21T09:00:00.000Z', han: '2026-09-21T12:00:00.000Z', soDung: 5, soCau: 10 })
+      themBtvn(d, 'MOI', { giao: '2026-09-21T03:00:00.000Z', nop: '2026-09-22T05:00:00.000Z', han: '2026-09-22T12:00:00.000Z', soDung: 8, soCau: 10 })
+      themBtvn(d, 'CHAY-CU', { giao: '2026-09-19T03:00:00.000Z', han: '2026-09-24T05:00:00.000Z' })
+      return d
+    }
+    const d1 = dat({ moc: null })
+    const r = await chay(d1, await capPass(d1))
+    expect(r.baiTapVeNha.gan.map((x: any) => x.maBtvn)).toEqual(['MOI'])
+    expect(r.baiTapVeNha.dangChay.map((x: any) => x.maBtvn)).toEqual(['CHAY-CU'])
+    const d2 = dat()
+    expect((await chay(d2, await capPass(d2))).baiTapVeNha.gan.map((x: any) => x.maBtvn)).toEqual(['MOI', 'CU'])
   })
 })

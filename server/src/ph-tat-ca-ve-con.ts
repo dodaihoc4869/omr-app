@@ -26,7 +26,8 @@ import { phatLaiSuKien, themNgay, type SuKienDoc, type TraCuuCau } from './ho-so
 import { sbdCuaPhuHuynh } from './ph-truy-cap'
 import { ngayVn } from './su-kien-hoc'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
-import { giaiMocHienThi } from './moc-no'
+import { baiTuNgayMoc, giaiMocHienThi } from './moc-no'
+import { TRAN_ON_KHI_KHONG_NO } from '../../src/lib/ve-dich'
 import { hangChamCuaEm } from './thi-dua-hom-nay'
 import { docVeDichCuaEm } from './ve-dich-d1'
 
@@ -52,6 +53,8 @@ export const PHIEN_CACH_TOI_DA_PHUT = 10
 export const TOI_DA_CAU_HOM_NAY = 120
 export const DE_RUT_GON_TOI_DA = 160
 export const TOI_DA_TRUY_VAN = 12
+/** Ngân sách câu/ngày mặc định của kế hoạch ngày (docs/ke-hoach-ngay-api-1909.md: mucTieuCau 8) — chỉ để tính TRẦN ôn khi con chưa có kế hoạch hôm nay. */
+export const MUC_TIEU_CAU_MAC_DINH = 8
 const MOI_GIAY_MAC_DINH = 90
 
 const so = (v: unknown): number => Number(v) || 0
@@ -558,7 +561,7 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
       const chang = so(x.c9)
       return { maBtvn: chuoi(x.c1), ten: tenBtvn(x), hanNop: chuoi(x.c5), ...(chang > 0 ? { changXong: Math.min(chang, so(x.c10)), changTong: chang } : {}) }
     })
-  const ganNop = baiTho.filter((x) => chuoi(x.c2) !== '').sort((a, c) => (chuoi(a.c2) < chuoi(c.c2) ? 1 : chuoi(a.c2) > chuoi(c.c2) ? -1 : 0)).slice(0, TOI_DA_BAI_GAN)
+  const ganNop = baiTho.filter((x) => chuoi(x.c2) !== '' && baiTuNgayMoc(x.c6, moc.ngayVn)).sort((a, c) => (chuoi(a.c2) < chuoi(c.c2) ? 1 : chuoi(a.c2) > chuoi(c.c2) ? -1 : 0)).slice(0, TOI_DA_BAI_GAN)
     .map((x) => {
       const soDung = soHoacNull(x.c3)
       const caNhan = so(x.c12) === 1
@@ -573,14 +576,20 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
   if (dangChay.length > 0 || ganNop.length > 0) ra.baiTapVeNha = { ...(dangChay.length > 0 ? { dangChay } : {}), ...(ganNop.length > 0 ? { gan: ganNop } : {}) }
 
   // ── lịch ôn (chỉ khi con có hồ sơ nắm kiến thức) ───────────────────────────────────────────────────────────────────────
+  const keHoachHomNay = kh ? parse<{ viec?: unknown }>(kh.b, {}).viec : undefined
+  const onTrongKeHoach = Array.isArray(keHoachHomNay)
+    ? keHoachHomNay.reduce((t: number, v: Row) => t + (chuoi(v?.loai) === 'on_lai' ? Math.max(0, Math.round(so(v.soCau))) : 0), 0)
+    : null
+  const tranOn = Math.floor((so(kh ? parse<Row>(kh.a, {}).mucTieuCau : 0) || MUC_TIEU_CAU_MAC_DINH) * TRAN_ON_KHI_KHONG_NO)
   let lichOn: { homNay: number; ngayMai: number; daKhacPhuc14Ngay: number; conSaiChuaKhacPhuc: number } | null = null
   if (coSo) {
     const cauHs = phatLaiSuKien(skRo, traCuu).cau
     const chamTuMoc = new Set(skHt.map((e) => e.qid))
     const denHan = cauHs.filter((c) => (c.trangThai === 'moi_sai' || c.trangThai === 'dang_on' || c.trangThai === 'da_khac_phuc') && !c.canDayLai && c.mocOnKe)
     lichOn = {
-      homNay: denHan.filter((c) => c.mocOnKe! <= homNay).length,
-      ngayMai: denHan.filter((c) => c.mocOnKe === ngayMai).length,
+      // Hiện SỐ CÂU ÔN CÓ TRONG KẾ HOẠCH NGÀY của con (đã qua trần ôn); KHÔNG hiện cả tồn đọng cũ (= "nợ cũ", thầy bỏ 21/09). Chưa có kế hoạch hôm nay ⇒ kẹp tồn bằng trần ôn của ngày (60 % ngân sách); ngày mai chưa có kế hoạch ⇒ cũng kẹp bằng trần.
+      homNay: onTrongKeHoach ?? Math.min(denHan.filter((c) => c.mocOnKe! <= homNay).length, tranOn),
+      ngayMai: Math.min(denHan.filter((c) => c.mocOnKe === ngayMai).length, tranOn),
       // "đã khắc phục x trong y câu từng sai": chỉ câu CON ĐÃ LÀM TỪ MỐC (câu sai từ trước mốc mà chưa động tới = khoản nợ cũ, loại hẳn)
       daKhacPhuc14Ngay: cauHs.filter((c) => c.trangThai === 'da_khac_phuc' && chamTuMoc.has(c.qid) && ngayVn(c.lucCuoi) >= dau14).length,
       conSaiChuaKhacPhuc: cauHs.filter((c) => (c.trangThai === 'moi_sai' || c.trangThai === 'dang_on') && chamTuMoc.has(c.qid)).length,
