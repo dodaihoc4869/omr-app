@@ -11,7 +11,7 @@ import type { CauChe, CauHomNay, CauThuong, ChiTietCau, LyDoChe, PhMoi } from '.
 import { CHU_CHE, NHAN_NGUON } from '../nhan'
 import { BtCheo, BtDongHo, BtKhoa, BtMui, BtMuiXuong, BtTich } from './bieu-tuong'
 import { Chip } from './dung-chung'
-import { SO_CAU_XEM_TRUOC, chuKetQuaChe, chuNguongLamLau, laChe, laLamLau, laLamLauThuong, laNhomChe, laSai, lyDoCheNhom, soOChe, tachChuCai, type NhomCau } from './nhom-cau'
+import { GOP_ID, SO_CAU_XEM_TRUOC, chuKetQuaChe, chuNguongLamLau, laChe, laLamLau, laLamLauThuong, laNhomChe, gopNhomThua, laSai, lyDoCheNhom, soOChe, tachChuCai, type NhomCau } from './nhom-cau'
 
 /** Có câu nào để vẽ mục "Từng câu con đã làm"? */
 export function coTungCau(pm: PhMoi): boolean {
@@ -70,8 +70,16 @@ export function lyDoCheCuaTuChoi(ct: Extract<ChiTietCau, { kieu: 'tu_choi' }>): 
   return /chưa công bố/i.test(ct.chu) ? 'chua_cong_bo' : /chưa nộp/i.test(ct.chu) ? 'chua_nop' : null
 }
 
-export function TungCau({ pm, nhom: nhomGoc, sbd, nhomMo, batMo, dongMo, lanBay }: TungCauProps) {
+export function TungCau({ pm, nhom: nhomTheoLan, sbd, nhomMo, batMo, dongMo, lanBay }: TungCauProps) {
   const [loc, setLoc] = useState<LocCau>('tat-ca')
+  // DỮ LIỆU THƯA (mẫu ph-e): ít câu, nhiều lần ngồi học, không câu che ⇒ MỘT thẻ không tiêu đề lần (tính trên nhóm gốc ⇒ không nhảy khi lưới an toàn che câu).
+  const gopKq = useMemo(() => gopNhomThua(nhomTheoLan), [nhomTheoLan])
+  const nhomGoc = gopKq ?? nhomTheoLan
+  const gop = gopKq !== null
+  useEffect(() => {
+    if (gop) batMo(GOP_ID) // thẻ gộp mở sẵn (mẫu ph-e); người dùng "Thu gọn" rồi thì không tự mở lại
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gop])
   // LƯỚI AN TOÀN (Boss 21/09): chi tiết một câu bị từ chối kiểu "chưa nộp / chưa công bố" ⇒ dòng câu ấy CHUYỂN NGAY sang dạng che trong phiên (ẩn đúng/sai + đáp án đã hiện ở danh sách), kể cả khi máy chủ (bản cũ) đã lỡ gửi câu thường.
   const [daChe, setDaChe] = useState<ReadonlyMap<string, LyDoChe>>(() => new Map())
   const cheCau = useCallback((qid: string, lyDo: LyDoChe) => setDaChe((m) => (m.has(qid) ? m : new Map(m).set(qid, lyDo))), [])
@@ -82,11 +90,12 @@ export function TungCau({ pm, nhom: nhomGoc, sbd, nhomMo, batMo, dongMo, lanBay 
 
   useEffect(() => {
     if (!lanBay) return
-    const n = nhom.find((x) => x.id === lanBay)
+    const dich = gop ? GOP_ID : lanBay // chế độ gộp: mọi lần ngồi học đều dẫn tới thẻ gộp
+    const n = nhom.find((x) => x.id === dich)
     if (!n) return
-    batMo(lanBay)
+    batMo(dich)
     setLoc((l) => (l !== 'tat-ca' && !hienTheoLoc(n, l) ? 'tat-ca' : l))
-    const h = window.setTimeout(() => document.getElementById(lanBay)?.scrollIntoView?.({ block: 'start', behavior: giamChuyenDong() ? 'auto' : 'smooth' }), 0)
+    const h = window.setTimeout(() => document.getElementById(dich)?.scrollIntoView?.({ block: 'start', behavior: giamChuyenDong() ? 'auto' : 'smooth' }), 0)
     return () => window.clearTimeout(h)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lanBay])
@@ -153,14 +162,14 @@ export function TungCau({ pm, nhom: nhomGoc, sbd, nhomMo, batMo, dongMo, lanBay 
         {nhom
           .filter((n) => hienTheoLoc(n, locHieu))
           .map((n) => (
-            <KhoiNhom key={n.id} n={n} loc={locHieu} sbd={sbd} kho={kho} dangMo={nhomMo.has(n.id)} hienDu={duNhom.has(n.id)} bay={lanBay === n.id} batMo={batMo} thuGon={thuGon} moHet={moHet} cheCau={cheCau} />
+            <KhoiNhom key={n.id} n={n} loc={locHieu} sbd={sbd} kho={kho} dangMo={nhomMo.has(n.id)} hienDu={duNhom.has(n.id)} bay={lanBay === n.id || (gop && !!lanBay)} gop={n.id === GOP_ID} batMo={batMo} thuGon={thuGon} moHet={moHet} cheCau={cheCau} />
           ))}
       </div>
     </section>
   )
 }
 
-function KhoiNhom({ n, loc, sbd, kho, dangMo, hienDu, bay, batMo, thuGon, moHet, cheCau }: { n: NhomCau; loc: LocCau; sbd: string; kho: Kho; dangMo: boolean; hienDu: boolean; bay: boolean; batMo: (id: string) => void; thuGon: (id: string) => void; moHet: (id: string) => void; cheCau: (qid: string, lyDo: LyDoChe) => void }) {
+function KhoiNhom({ n, loc, sbd, kho, dangMo, hienDu, bay, gop, batMo, thuGon, moHet, cheCau }: { n: NhomCau; loc: LocCau; sbd: string; kho: Kho; dangMo: boolean; hienDu: boolean; bay: boolean; gop: boolean; batMo: (id: string) => void; thuGon: (id: string) => void; moHet: (id: string) => void; cheCau: (qid: string, lyDo: LyDoChe) => void }) {
   const idTieuDe = `${n.id}-h`
   // Nhóm bị che: MỘT dòng khoá + dải ô che, không dòng câu, không nút mở.
   if (laNhomChe(n)) {
@@ -203,13 +212,15 @@ function KhoiNhom({ n, loc, sbd, kho, dangMo, hienDu, bay, batMo, thuGon, moHet,
   const con = ds.length - hien.length
   const idDs = `${n.id}-ds`
   return (
-    <div className="phm-nhom" id={n.id} role="group" aria-labelledby={idTieuDe} data-vung="nhom-cau" data-bay={bay ? '' : undefined}>
-      <div className="phm-nhom__dau">
-        <h3 id={idTieuDe}>
-          <b>{n.gio}</b> · {n.ten}
-        </h3>
-        <p>{tomTat}</p>
-      </div>
+    <div className={`phm-nhom${gop ? ' phm-nhom--gop' : ''}`} id={n.id} role="group" {...(gop ? { 'aria-label': 'Các câu con đã làm hôm nay' } : { 'aria-labelledby': idTieuDe })} data-vung="nhom-cau" data-bay={bay ? '' : undefined}>
+      {!gop && (
+        <div className="phm-nhom__dau">
+          <h3 id={idTieuDe}>
+            <b>{n.gio}</b> · {n.ten}
+          </h3>
+          <p>{tomTat}</p>
+        </div>
+      )}
       <div className="phm-the">
         <div className="phm-dai-o" role="img" aria-label={nhanDai}>
           {n.cau.map((c, i) => (

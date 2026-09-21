@@ -38,3 +38,6 @@
 
 /* NGẮT DÒNG THEO Ý (thầy lệnh 21/09 17:3x, câu Triolein (a)…(e) dồn một cục): đề và các dòng lời giải đi qua tachDongTheoY (PHƯƠNG ÁN thì KHÔNG: "(a), (b) và (c)" nằm trong một phương án) (src/lib/tach-dong-cau.ts — MỘT nguồn với TheCau) rồi hiện từng dòng nhờ pre-line */
 .phm-cau__de, .phm-loi-giai p, .phm-lg-chot, .phm-lg-ket, .phm-lg-buoc li > span { white-space: pre-line; }
+
+/* NHÓM GỘP (dữ liệu thưa, mẫu ph-e): một thẻ không tiêu đề lần — chừa khoảng trên như mẫu (margin-top 14px) */
+.phm-nhom--gop { margin-top: 14px; }

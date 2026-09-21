@@ -8,7 +8,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, renderHook, waitFor } from '@testing-library/react'
 import { DongThoiGian, coDongThoiGian } from '../src/components/ph-moi/bang/DongThoiGian'
 import { TungCau, coTungCau, useNhomMo } from '../src/components/ph-moi/bang/TungCau'
-import { NGUONG_LAM_LAU_GIAY, NGUONG_NHOM_LAZY, SO_CAU_XEM_TRUOC, chuKetQuaChe, chuNguongLamLau, gomNhomCau, laChe, laLamLau, laNhomChe, laSai, nhomMoSan, phutTheoGio, tachChuCai } from '../src/components/ph-moi/bang/nhom-cau'
+import { NGUONG_LAM_LAU_GIAY, NGUONG_NHOM_LAZY, SO_CAU_XEM_TRUOC, chuKetQuaChe, chuNguongLamLau, GOP_ID, gomNhomCau, gopNhomThua, laChe, laLamLau, laNhomChe, laSai, nhomMoSan, phutTheoGio, tachChuCai } from '../src/components/ph-moi/bang/nhom-cau'
+import type { NhomCau } from '../src/components/ph-moi/bang/nhom-cau'
 import { docChiTietCau, docTatCaVeCon, type PhMoi } from '../src/lib/ph-moi/du-lieu'
 import { taiChiTietCau } from '../src/lib/ph-moi/api'
 import { CHI_TIET, H, PH_OK } from './_ph-moi/du-lieu-mau'
@@ -861,15 +862,97 @@ describe('Chữ và luật chung', () => {
     for (const svg of container.querySelectorAll('svg')) expect(svg.getAttribute('aria-hidden')).toBe('true')
   })
 
-  it('bộ thưa (9 câu, 2 lần): hai mục vẫn dựng đủ, số theo tổng quan', () => {
+  it('bộ thưa (9 câu, 2 lần): hai mục vẫn dựng đủ, số theo tổng quan; Từng câu GỘP thành MỘT thẻ (mẫu ph-e)', () => {
     const pm = pmOf(PH_APPLE_THUA)
     const { container } = render(<Bang pm={pm} />)
     expect(container.querySelector('.phm-so-to b')!.textContent).toBe('2lần ngồi học')
     expect(container.querySelector('.phm-so-to > span')!.textContent).toBe('dài nhất 21 phút · tổng 14 phút')
     expect(container.querySelector('.phm-muc__dau p')!.textContent).toBe('chạm một lần ngồi học để xem từng câu')
     expect(container.querySelectorAll('#muc-cau .phm-muc__dau p')[0]!.textContent).toBe('9 câu hôm nay · xếp theo giờ làm')
-    expect(container.querySelectorAll('.phm-nhom')).toHaveLength(2)
+    expect(container.querySelectorAll('.phm-nhom')).toHaveLength(1) // gộp: một thẻ không tiêu đề lần
     expect(container.textContent).not.toMatch(CAM_GAME)
+  })
+
+  it('GỘP NHÓM (dữ liệu thưa, mẫu ph-e): ≥ 2 lần có câu, tổng ≤ 12 câu, không câu che ⇒ MỘT thẻ không tiêu đề, mở sẵn, câu xếp theo giờ, dải ô cả 9 câu, "Hiện đủ 9 câu"; bấm lần ngồi học ở dòng thời gian dẫn tới thẻ gộp; lọc Sai chỉ còn câu sai', async () => {
+    const pm = pmOf(PH_APPLE_THUA)
+    const { container } = render(<Bang pm={pm} />)
+    const g = container.querySelector('.phm-nhom') as HTMLElement
+    expect(g.id).toBe('nhom-gop')
+    expect(g.classList.contains('phm-nhom--gop')).toBe(true)
+    expect(g.querySelector('.phm-nhom__dau, h3')).toBeNull() // không tiêu đề lần
+    expect(g.getAttribute('aria-label')).toBe('Các câu con đã làm hôm nay')
+    expect(g.querySelectorAll('.phm-dai-o .phm-o-cau')).toHaveLength(9)
+    const gio = hangCau(g).map((li) => li.querySelector('.phm-cau__dau span')!.textContent!)
+    expect(gio).toEqual([...gio].sort()) // xếp theo giờ làm
+    expect(hangCau(g)).toHaveLength(4) // mở sẵn: 4 câu đầu
+    expect(g.querySelector('[data-vung="hien-du"]')!.textContent).toContain('Hiện đủ 9 câu')
+    // dòng thời gian: bấm một lần ⇒ vẫn dẫn được tới thẻ gộp (không còn nhóm theo lần)
+    const lan = container.querySelector('.phm-lan a') as HTMLElement
+    fireEvent.click(lan)
+    await waitFor(() => expect(g.getAttribute('data-bay')).not.toBeNull())
+    // lọc "Sai": chỉ câu sai
+    fireEvent.click([...container.querySelectorAll('.phm-seg button')].find((b) => /Sai/.test(b.textContent!))!)
+    const sai = hangCau(g)
+    expect(sai.length).toBeGreaterThan(0)
+    expect(sai.every((li) => li.hasAttribute('data-sai'))).toBe(true)
+  })
+
+  it('KHÔNG gộp khi: đủ dữ liệu (38 câu); chỉ MỘT lần có câu; đúng ngưỡng 12 thì gộp, 13 thì không; có câu / nhóm che', () => {
+    expect(gopNhomThua(gomNhomCau(pmOf(PH_APPLE)))).toBeNull() // 38 câu + có che
+    // một lần duy nhất
+    const mot = nhan(PH_APPLE_THUA)
+    mot.homNay.dongThoiGian = mot.homNay.dongThoiGian.slice(0, 1)
+    mot.homNay.cau = mot.homNay.cau.filter((c: { nguon: string }) => c.nguon === mot.homNay.dongThoiGian[0].nguon)
+    expect(gopNhomThua(gomNhomCau(pmOf(mot)))).toBeNull()
+    // ngưỡng
+    const dem = (k: number) => {
+      const r = nhan(PH_APPLE_THUA)
+      const ds = r.homNay.cau.filter((c: { che?: string }) => !c.che)
+      while (ds.length < 13) ds.push({ ...ds[0], luc: H(9, ds.length) })
+      r.homNay.cau = ds.slice(0, k)
+      return gopNhomThua(gomNhomCau(pmOf(r)))
+    }
+    expect(dem(12)).not.toBeNull()
+    expect(dem(12)![0]!.cau).toHaveLength(12)
+    expect(dem(13)).toBeNull()
+    // có câu che ⇒ không gộp
+    const che = nhan(PH_APPLE_THUA)
+    che.homNay.cau[0] = { luc: che.homNay.cau[0].luc, nguon: che.homNay.cau[0].nguon, che: 'chua_nop', giay: 40 }
+    expect(gopNhomThua(gomNhomCau(pmOf(che)))).toBeNull()
+    // không có dữ liệu: null
+    expect(gopNhomThua([])).toBeNull()
+  })
+
+  it('gopNhomThua (hàm thuần, nhóm dựng tay): nhóm rỗng không tính là "một lần"; mốc bị che (nhóm không câu) chặn gộp; kết quả đủ số câu, xếp giờ, cộng phút', () => {
+    const cau = (qid: string, luc: string) => ({ kieu: 'thuong', qid, luc, nguon: 'kiem_tra', ket: 'dung' }) as unknown as NhomCau['cau'][number]
+    const nhom = (id: string, cs: NhomCau['cau'], phut: number | null, che: NhomCau['che'] = null): NhomCau => ({ id, gio: '09:00', ten: id, cau: cs, soCau: cs.length, soDung: null, phut, nguon: null, che, soCauDaLam: null, batDau: cs[0]?.luc ?? '2026-09-21T02:00:00Z' })
+    const A = nhom('a', [cau('q1', '2026-09-21T03:00:00Z'), cau('q2', '2026-09-21T03:05:00Z')], 4)
+    const B = nhom('b', [cau('q3', '2026-09-21T02:00:00Z')], 6)
+    const rong = nhom('r', [], null)
+    // một nhóm có câu + một nhóm rỗng: chỉ là MỘT lần ⇒ không gộp
+    expect(gopNhomThua([A, rong])).toBeNull()
+    // mốc bị che (không câu, che ≠ null) chặn gộp dù hai nhóm kia đủ điều kiện
+    expect(gopNhomThua([A, B, nhom('c', [], null, 'chua_nop')])).toBeNull()
+    // đủ điều kiện (nhóm rỗng không che bị bỏ qua): gộp, xếp giờ, cộng phút, số câu thật
+    const g = gopNhomThua([A, rong, B])!
+    expect(g).toHaveLength(1)
+    expect(g[0]!.id).toBe(GOP_ID)
+    expect(g[0]!.cau.map((c) => c.qid)).toEqual(['q3', 'q1', 'q2'])
+    expect(g[0]!.soCau).toBe(3)
+    expect(g[0]!.phut).toBe(10)
+    expect(g[0]!.batDau).toBe('2026-09-21T02:00:00Z')
+    // một nhóm chưa biết phút ⇒ tổng phút không đoán
+    expect(gopNhomThua([A, nhom('b2', B.cau, null)])![0]!.phut).toBeNull()
+  })
+
+  it('lưới an toàn che câu KHÔNG làm bố cục nhảy: thẻ gộp vẫn là thẻ gộp sau khi một câu bị che trong phiên', async () => {
+    goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: { kieu: 'tu_choi', chu: 'Bài này con chưa nộp nên chưa xem được lời giải.', che: null } })
+    const { container } = render(<Bang pm={pmOf(PH_APPLE_THUA)} />)
+    const g = container.querySelector('#nhom-gop') as HTMLElement
+    fireEvent.click(hangCau(g)[0]!.querySelector('button')!)
+    await waitFor(() => expect(g.querySelectorAll('[data-vung="cau-che"]').length).toBe(1))
+    expect(container.querySelectorAll('.phm-nhom')).toHaveLength(1)
+    expect(container.querySelector('#nhom-gop')).toBe(g)
   })
 
   it('hằng ngưỡng khớp mẫu chữ: NGUONG_LAM_LAU_GIAY / 60 phút; laSai/laChe chỉ đúng kiểu', () => {

@@ -125,3 +125,22 @@ export function tachChuCai(s: string): string[] {
   const t = s.trim()
   return /^[A-Da-d]([\s,;·+&/-]*[A-Da-d])*$/.test(t) ? [...t.toUpperCase().replace(/[^A-D]/g, '')] : []
 }
+
+/** Id của nhóm GỘP (chế độ dữ liệu THƯA của mẫu ph-e). */
+export const GOP_ID = 'nhom-gop'
+/** Tổng số câu tối đa để gộp các lần ngồi học thành MỘT thẻ không tiêu đề (con mới học / hôm nay học ít). Mẫu ph-e: 9 câu. */
+export const NGUONG_GOP_CAU = 12
+
+/**
+ * THUẦN. Dữ liệu THƯA (mẫu ph-e): từ 2 nhóm có câu trở lên mà TỔNG ≤ NGUONG_GOP_CAU câu, và KHÔNG có nhóm/câu bị che ⇒ gộp thành MỘT nhóm, câu xếp theo giờ, không tiêu đề lần (dải ô + danh sách + "Hiện đủ N câu").
+ * Không đủ điều kiện ⇒ null (giữ nhóm theo lần). Câu bị che KHÔNG gộp: nhóm che có dòng khoá riêng nói lý do, gộp sẽ làm mất chỗ nói. Tính trên nhóm GỐC (trước khi lưới an toàn che câu trong phiên) ⇒ bố cục không nhảy giữa chừng.
+ */
+export function gopNhomThua(nhom: readonly NhomCau[]): NhomCau[] | null {
+  const co = nhom.filter((n) => n.cau.length > 0)
+  const tong = co.reduce((t, n) => t + n.cau.length, 0)
+  if (co.length < 2 || tong > NGUONG_GOP_CAU) return null
+  if (nhom.some(laNhomChe) || co.some((n) => n.cau.some(laChe))) return null
+  const cau = co.flatMap((n) => n.cau).sort((a, b) => Date.parse(a.luc) - Date.parse(b.luc))
+  const phut = co.every((n) => n.phut !== null) ? co.reduce((t, n) => t + (n.phut ?? 0), 0) : null
+  return [{ id: GOP_ID, gio: gioVn(cau[0]!.luc), ten: 'Các câu hôm nay', cau, soCau: cau.length, soDung: null, phut, nguon: null, che: null, soCauDaLam: null, batDau: cau[0]!.luc }]
+}
