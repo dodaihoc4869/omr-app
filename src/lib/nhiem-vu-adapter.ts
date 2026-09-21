@@ -355,6 +355,7 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     capNhatLuc: undefined,
     ghiChuCu: undefined,
     ngayNghi: false,
+    veDich: null,
     // Nguồn trợ lý chỉ có bảng V1 (không có id thần thú) — KHÔNG đoán, để giữ chỗ.
     thanThu: { kieu: 'chua_biet' },
     tonCu: { soBai: 0, soCau: 0, bai: [] },
