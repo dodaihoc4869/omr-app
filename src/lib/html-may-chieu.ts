@@ -261,6 +261,18 @@ function tenGoi(o: OBang): string {
   return t[t.length - 1] || ten
 }
 
+/** Nhãn vùng làm bài (góc dưới phải bảng) KHI THẺ TÊN CÒN ẨN: KHÔNG tên, không số báo danh. Tờ chiếu từng in "Phần làm bài của <tên em>" ngay từ đầu, trước cả khi thầy bấm "Hiện học sinh và thần thú" (thầy lệnh 21/09 16:4x). */
+export const NHAN_LAM_BAI_KHONG_TEN = 'Phần làm bài của học sinh'
+
+/**
+ * Thuộc tính nhãn vùng làm bài. Chế độ dạy học: thẻ tên ẩn tới khi hết giờ / thầy bấm ⇒ `data-nhan` (thứ CSS in ra) là nhãn KHÔNG tên; tên thật chỉ nằm ở `data-nhan-em`, script (`dongBoNhan`) đổi sang khi thẻ hiện và đổi về khi thẻ ẩn lại.
+ * Chế độ thường: thẻ tên hiện sẵn nên nhãn có tên như trước (không đổi một byte).
+ */
+function thuocTinhNhan(o: OBang, dayHoc: boolean): string {
+  const co = `Phần làm bài của ${thoat(tenGoi(o))}`
+  return dayHoc ? `data-nhan="${NHAN_LAM_BAI_KHONG_TEN}" data-nhan-em="${co}"` : `data-nhan="${co}"`
+}
+
 /** THẺ TÊN (M3): giấy ấm; thần thú có hào quang theo hệ (`--mc-he`); tên; "thú · cấp · lần lên bảng thứ N"; chip số câu.
  * KHÔNG in `viSao` (lý do gọi em). Nhãn bài tập về nhà (`btvnHtml`, thầy chốt 14/09) vẫn nằm trong mã cho các test cũ nhưng
  * CSS không vẽ nó — bản vẽ 19/09 không có, và "Ở NHÀ LÀM SAI" cạnh tên em trước cả lớp là điều thầy cấm. */
@@ -328,7 +340,7 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number, ca
       <span class="mc-nut-chu">Hiện lời giải</span>
     </button>${chamHtml(o, cauNoi)}
   </div>
-  <div class="mc-trang" aria-hidden="true" data-nhan="Phần làm bài của ${thoat(tenGoi(o))}"></div>
+  <div class="mc-trang" aria-hidden="true" ${thuocTinhNhan(o, dayHoc)}></div>
 </section>`
 }
 
@@ -356,9 +368,9 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
         <span class="mc-nut-chu">Hiện lời giải</span>
       </button>${chamHtml(o, Boolean(tuyChon.cauNoi?.maPhien))}
     </div>
-    <div class="mc-trang" aria-hidden="true" data-nhan="Phần làm bài của ${thoat(tenGoi(o))}"></div>
+    <div class="mc-trang" aria-hidden="true" ${thuocTinhNhan(o, Boolean(tuyChon.dayHoc))}></div>
   </section>
-  <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm" data-nhan="Phần làm bài của ${thoat(tenGoi(o))}"></section>
+  <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm" ${thuocTinhNhan(o, Boolean(tuyChon.dayHoc))}></section>
 </div>`
 }
 
@@ -504,6 +516,8 @@ body.mc { margin: 0; background: var(--mc-nen); color: var(--mc-muc); overflow: 
 .mc-nut-giai[aria-expanded="true"] { background: var(--mc-xanh-nen); color: var(--mc-xanh); border-color: var(--mc-xanh-nen); }
 .mc-giai { margin-top: 10px; }
 .mc-em[hidden] { display: none !important; }
+/* Chế độ dạy học: thẻ tên (tên, số báo danh, thần thú) KHÔNG được thấy dù một khung hình trước khi script chạy và ẩn thẻ — mở tờ xong script gắn lớp mc-san-sang. Dùng visibility để không đổi bố cục. */
+body.mc-day-hoc:not(.mc-san-sang) .mc-em { visibility: hidden; }
 @keyframes mc-ten-reveal {
   0% { transform: scale(2.2); opacity: 0; filter: drop-shadow(0 10px 24px rgba(35, 78, 107, 0.6)); }
   22% { transform: scale(2.2); opacity: 1; filter: drop-shadow(0 10px 24px rgba(35, 78, 107, 0.6)); }
@@ -632,6 +646,22 @@ const JS_MAY_CHIEU = `
   var dotDangVao = -1, phienBatDau = -1;
   // Ô đã báo giây thật trong đợt này: vị trí ô -> giờ CHỮA (mô hình chưa hiệu chỉnh). Xoá mỗi khi vào đợt mới.
   var dotBam = {};
+
+  /** NHÃN vùng làm bài (góc dưới phải bảng): thẻ tên còn ẩn ⇒ nhãn KHÔNG tên (data-nhan gốc); thẻ đã hiện ⇒ tên thật lấy từ data-nhan-em. Gọi mỗi khi thẻ hiện / ẩn; chỉ đụng ô có data-nhan-em (chế độ dạy học). */
+  var NHAN_KHONG_TEN = ${JSON.stringify(NHAN_LAM_BAI_KHONG_TEN)};
+  function dongBoNhan() {
+    Array.prototype.forEach.call(document.querySelectorAll('.mc-dot'), function (dot) {
+      Array.prototype.forEach.call(dot.querySelectorAll('.mc-nua'), function (nua) {
+        var trang = nua.querySelector('.mc-trang');
+        var co = trang ? trang.getAttribute('data-nhan-em') : null;
+        if (!co) return;
+        var em = nua.querySelector('.mc-em');
+        var chu = em && !em.hidden ? co : NHAN_KHONG_TEN;
+        trang.setAttribute('data-nhan', chu);
+        Array.prototype.forEach.call(dot.querySelectorAll('.mc-cot-lam-bai'), function (c) { c.setAttribute('data-nhan', chu); });
+      });
+    });
+  }
 
   function dinhDang(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
   function giamChuyenDong() { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
@@ -762,6 +792,7 @@ const JS_MAY_CHIEU = `
       }
     });
     Array.prototype.forEach.call(page.querySelectorAll('.mc-nut-hien-em'), function (b) { b.hidden = true; });
+    dongBoNhan();
   }
   function hetLam() {
     var page = dots[i];
@@ -783,6 +814,7 @@ const JS_MAY_CHIEU = `
     if (dayHoc) {
       Array.prototype.forEach.call(page.querySelectorAll('.mc-em'), function (e) { e.hidden = true; });
       Array.prototype.forEach.call(page.querySelectorAll('.mc-nut-hien-em'), function (b) { b.hidden = false; b.setAttribute('aria-expanded', 'false'); });
+      dongBoNhan();
       page.querySelectorAll('.mc-giai').forEach(function (e) { e.hidden = true; });
       page.querySelectorAll('.mc-nut-giai').forEach(function (e) { e.setAttribute('aria-expanded', 'false'); var t = e.querySelector('.mc-nut-chu'); if (t) t.textContent = 'Hiện lời giải'; });
       chuyenPha('lam');
@@ -892,7 +924,7 @@ const JS_MAY_CHIEU = `
     var hien = e.target && e.target.closest ? e.target.closest('.mc-nut-hien-em') : null;
     if (hien) {
       var em = document.getElementById(hien.getAttribute('aria-controls'));
-      if (em) { em.hidden = false; hien.setAttribute('aria-expanded', 'true'); hien.hidden = true; }
+      if (em) { em.hidden = false; hien.setAttribute('aria-expanded', 'true'); hien.hidden = true; dongBoNhan(); }
       return;
     }
     var nut = e.target && e.target.closest ? e.target.closest('.mc-nut-giai') : null;
@@ -1056,7 +1088,15 @@ const JS_MAY_CHIEU = `
 
   // MỘT nhịp duy nhất cho mọi thứ chạy theo thời gian (đồng hồ pha, tiến độ, "Buổi: x/y phút").
   setInterval(tick, 250);
+  // Nhãn vùng làm bài luôn khớp thẻ tên: đồng bộ lúc mở tờ + lưới an toàn cho MỌI đường đổi hidden của thẻ và cho ô làm bài do bố cục dựng thêm (bo-cuc-to-chieu).
+  dongBoNhan();
+  if (window.MutationObserver) {
+    var quanSatNhan = new MutationObserver(dongBoNhan);
+    if (ray) quanSatNhan.observe(ray, { attributes: true, attributeFilter: ['hidden'], subtree: true });
+    dots.forEach(function (d) { quanSatNhan.observe(d, { childList: true }); });
+  }
   ve();
+  document.body.classList.add('mc-san-sang');
 })();
 `
 
