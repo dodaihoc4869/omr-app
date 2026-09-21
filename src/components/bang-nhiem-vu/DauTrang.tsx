@@ -100,7 +100,13 @@ export default function DauTrang({
       )}
     </span>
   )
-  const nhan = nhanThu ? <span className="bnv-thu-ten">{nhanThu}</span> : null
+  // Luật 1–2 (CHUAN-TU-NGU): tên riêng do em đặt luôn đi sau danh từ chung — "Thần thú của em" / "Thần thú của con" rồi mới tới "Bông · Cấp 37".
+  const nhan = nhanThu ? (
+    <span className="bnv-thu-ten">
+      {co && <span className="bnv-thu-danh">{laPh ? 'Thần thú của con' : 'Thần thú của em'}</span>}
+      <span className="bnv-thu-goi">{nhanThu}</span>
+    </span>
+  ) : null
 
   return (
     <header className="bnv-vung-dau">

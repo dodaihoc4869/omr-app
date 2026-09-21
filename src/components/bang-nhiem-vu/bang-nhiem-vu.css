@@ -236,6 +236,14 @@
   text-align: center;
   color: var(--m3-on-surface-variant);
 }
+.bnv-thu-danh {
+  display: block;
+  font-weight: 500;
+}
+.bnv-thu-goi {
+  display: block;
+  overflow-wrap: anywhere;
+}
 /* Spirit2D nằm gọn trong vòng tròn; tắt quầng/hạt chạy liên tục của bản game. */
 .bnv-thu-vong .spirit-2d,
 .bnv-vd-thu .spirit-2d {

@@ -67,7 +67,9 @@ function Hang({ w }: { w: NguoiVinhDanh }) {
         </span>
       )}
       <span className="bnv-the-chu">
-        <span className="bnv-vd-ten">{ten}</span>
+        <span className="bnv-vd-ten">
+          <span className="bnv-chu-phu">Thần thú</span> {ten}
+        </span>
         <span className="bnv-chu-phu">
           {diem} điểm{phut === null ? '' : ` · ${phut} phút`}
         </span>

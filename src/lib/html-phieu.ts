@@ -1563,7 +1563,7 @@ export function tongQuanHtml(cau: CauLuyen[], laBtvn = false): string {
   <div class="btvn-3vong-grid">
     <div class="vong-col col-1">
       <div class="vong-head">VÒNG 1: LÕI CĂN BẢN · ${v1Count} câu</div>
-      <div class="vong-body">Kiến thức cốt lõi nhận biết & thông hiểu. Bắt buộc 100% học sinh hoàn thành để nắm chắc nền tảng.</div>
+      <div class="vong-body">Kiến thức cốt lõi nhận biết & thông hiểu. Bắt buộc 100% học sinh hoàn thành để có nền tảng cho các chặng sau.</div>
     </div>
     <div class="vong-col col-2">
       <div class="vong-head">VÒNG 2: TRỌNG TÂM CÁ NHÂN · ${v2Count} câu</div>

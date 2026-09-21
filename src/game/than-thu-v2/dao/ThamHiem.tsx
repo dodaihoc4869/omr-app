@@ -48,13 +48,13 @@ export function SanDau({profile,ketQua,tong,suKien,xong}:{profile:DaoProfile;ket
    :<img key={`thu-${suKien}`} className="dao-san-thu" data-dong={vuaNop?(tran.correct?'danh':'dau'):undefined} src={anhThu(thu,profile.cap)} alt="" width="288" height="288" decoding="async" draggable={false}/>}
   {no?<p className="dao-san-no">CUỒNG NỘ ×2 · 3 câu đúng liền</p>:tran.streak>0&&!xong&&<p className="dao-san-chuoi">Đúng liền {tran.streak%3}/3 · đủ 3 là CUỒNG NỘ</p>}
   <div className="dao-san-quai" key={`quai-${suKien}`} data-trung={vuaNop&&tran.correct?'':undefined} data-ha={tran.enemy===0?'':undefined}>
-   <p>{tran.enemy===0?`Đã hạ ${TEN_QUAI}`:`${TEN_QUAI} · ${tran.enemy}/100`}</p>
+   <p>{tran.enemy===0?`Đã hạ ${TEN_QUAI}`:`${TEN_QUAI} · Máu ${tran.enemy}/100`}</p>
    <div className="dao-san-mau dao-san-mau-quai" role="progressbar" aria-label={`Máu ${TEN_QUAI}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.enemy}><i style={{width:`${tran.enemy}%`}}/></div>
    <svg viewBox="0 0 120 104" width="104" height="90" aria-hidden="true"><ellipse className="dao-quai-bong" cx="60" cy="96" rx="40" ry="7"/><path className="dao-quai-than" d="M60 8C28 8 12 40 12 66c0 20 16 30 48 30s48-10 48-30C108 40 92 8 60 8Z"/><path className="dao-quai-sang" d="M36 30c6-10 16-14 26-14" /><circle className="dao-quai-mat" cx="44" cy="58" r="7"/><circle className="dao-quai-mat" cx="76" cy="58" r="7"/><path className="dao-quai-mieng" d="M46 76q14 10 28 0"/></svg>
   </div>
   {vuaNop&&<p className="dao-san-so" key={`so-${suKien}`} data-phia={tran.correct?'quai':'thu'}>−{tran.damage}</p>}
   {vuaNop&&tran.heal>0&&<p className="dao-san-hoi" key={`hoi-${suKien}`}>+{tran.heal}</p>}
-  <div className="dao-san-ta"><div className="dao-san-mau" role="progressbar" aria-label={`Máu của ${ten}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.hp}><i style={{width:`${tran.hp}%`}}/></div><span>{ten} {tran.hp}</span></div>
+  <div className="dao-san-ta"><div className="dao-san-mau" role="progressbar" aria-label={`Máu của ${ten}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.hp}><i style={{width:`${tran.hp}%`}}/></div><span className="dao-san-ten"><small>Thần thú của em: {ten}</small>Máu {tran.hp}/100</span></div>
   <button type="button" className="dao-san-tieng" aria-pressed={!tat} aria-label={tat?'Bật tiếng trận đấu':'Tắt tiếng trận đấu'} onClick={()=>{setBattleMuted(!tat);setTat(!tat)}}><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/>{tat?<path d="m22 9-6 6M16 9l6 6"/>:<path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>}</svg></button>
  </section>
 }
@@ -82,7 +82,7 @@ export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanH
     <button type="button" className="dao-nut-vang" onClick={onVeDao}><span>VỀ ĐẢO</span></button>
     <div className="dao-tham-phu">{onMoSoTay&&<button type="button" className="dao-nut-nho dao-nut-nho-mo" onClick={onMoSoTay}>Xem Sổ tay</button>}{onChuyenMoi&&<button type="button" className="dao-nut-nho dao-nut-nho-mo" disabled={busy} onClick={onChuyenMoi}>Đi chuyến nữa</button>}</div></section>
   :q&&pc&&<>
-   {phanHoi&&<div className="dao-thuong" data-moc={phanHoi.lyDo.moc} data-dung={phanHoi.correct?'':undefined} role="status"><b>{phanHoi.lyDo.exp>0?`+${phanHoi.lyDo.exp}`:phanHoi.correct?'Đúng':'Ôn lại'}</b><p>{phanHoi.lyDo.chu.replace(/^\+\d+\s*·\s*/,'')}</p></div>}
+   {phanHoi&&<div className="dao-thuong" data-moc={phanHoi.lyDo.moc} data-dung={phanHoi.correct?'':undefined} role="status"><b data-don-vi={phanHoi.lyDo.exp>0?'EXP':undefined}>{phanHoi.lyDo.exp>0?`+${phanHoi.lyDo.exp}`:phanHoi.correct?'Đúng':'Ôn lại'}</b><p>{phanHoi.lyDo.chu.replace(/^\+\d+\s*·\s*/,'')}</p></div>}
    <section className="dao-cau" aria-label={`Ải ${viTri+1}`}>
     <p className="dao-cau-nhan"><b data-vai={q.role??'lap'}>ẢI {viTri+1} · {tenNhomAi(q.role).toLocaleUpperCase('vi')}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
     <div onErrorCapture={e=>{if((e.target as HTMLElement).tagName==='IMG')setHinhLoi(true)}}><TheCau {...pc}/></div>
