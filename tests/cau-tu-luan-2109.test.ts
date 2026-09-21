@@ -51,6 +51,12 @@ const CAU_RUT_DUOC: [string, unknown, PhanCau?][] = [
   ['câu game công khai · phần III hỏi tính (không có đáp án ⇒ không kết tội)', { qid: 'DH-12-C2-B6-TLN-III-2', phan: 'III', text: 'Tính số mol khí.', choices: [], ideas: [] }],
   ['phần I có phương án bằng ảnh (chữ rỗng, ảnh đủ 4)', { phan: 'I', text: 'Hình nào đúng?', choices: ['', '', '', ''], choiceImgs: ['a.png', 'b.png', 'c.png', 'd.png'], correct: 'B' }],
   ['phần II có ý bằng ảnh', { phan: 'II', text: 'Xét đồ thị.', ideas: ['', '', '', ''], ideaImgs: ['1.png', '2.png', '3.png', '4.png'], correct: 'DSDS' }],
+  ['KHO THẬT (Code 3 báo) · III-18: đề có "được mô tả", đáp án số 7,5', thoKho({ phan: 'III', de: 'Phản ứng được mô tả theo phương trình sau. Tính hiệu suất (%).', dap_an: '7,5' })],
+  ['KHO THẬT · III-5: đề có "được mô tả qua sơ đồ", đáp án 53,3', thoKho({ phan: 'III', de: 'Quá trình được mô tả qua sơ đồ. Tính khối lượng (gam).', dap_an: '53,3' })],
+  ['KHO THẬT · III-21: "Cho các mô tả về …", đáp án dãy số 124', thoKho({ phan: 'III', de: 'Cho các mô tả về tính chất của este. Số mô tả đúng ghép thành dãy số.', dap_an: '124' })],
+  ['phần III đáp án số âm 12 ký tự, đề có "theo em"', thoKho({ phan: 'III', de: 'Theo em, giá trị của x là bao nhiêu?', dap_an: '-285,8' })],
+  ['phần III đề bị động "được giải thích", KHÔNG có trường đáp án (khuôn công khai)', { phan: 'III', text: 'Hiện tượng được giải thích bằng thuyết va chạm. Tính số mol khí.', choices: [], ideas: [] }],
+  ['phần III đề "Cho các mô tả về…" KHÔNG có trường đáp án', { phan: 'III', text: 'Cho các mô tả về este. Tính số mô tả đúng.', choices: [], ideas: [] }],
   ['kho thô · phan viết kiểu mã đề TN / DS / TLN vẫn được nhận ra và rút được', kho({ phan: 'TLN', de: 'Tính số mol.', dap_an: '12,5' })],
   ['kho thô · phan TN', kho({ phan: 'TN', de: 'Chất nào là este?', pa: PA, dap_an: 'A' })],
   ['kho thô · phan DS', kho({ phan: 'DS', de: 'Cho este X.', y: Y, dap_an: 'DSSD' })],
@@ -66,7 +72,7 @@ const CAU_TU_LUAN: [string, unknown, PhanCau?, RegExp?][] = [
   ['CÂU TRONG ẢNH THẦY · CauLuyen (bài thường có đáp án)', { phan: 'III', id: 'DH-12-C3-B2-TLN-III-5', maDe: 'DH-12-C3-B2-TLN', text: SACCHAROSE, luaChon: null, dapAn: 'Kết tinh' }],
   ['CÂU TRONG ẢNH THẦY · CauLuyen bài cá nhân hoá chưa có đáp án — vẫn bị bắt bằng chữ đề', { phan: 'III', id: 'DH-12-C3-B2-TLN-III-5', text: SACCHAROSE, luaChon: null, dapAn: '', caNhan: { chuaCoDapAn: true } }, undefined, /hỏi mở/],
   ['CÂU TRONG ẢNH THẦY · đề thầy (không có `phan`, phần III)', { id: 'DH-12-C3-B2-TLN-III-5', text: SACCHAROSE, correct: 'Kết tinh' }, 'III'],
-  ['kho thô · chữ đề hỏi mở nằm ở trường `de`, đáp án lại là số', kho({ phan: 'III', de: SACCHAROSE, dap_an: '3' }), undefined, /hỏi mở/],
+  ['kho thô · chữ đề hỏi mở nằm ở trường `de`, đáp án chữ 1 từ + số? (không phải số thuần)', kho({ phan: 'III', de: SACCHAROSE, dap_an: '3 lần' }), undefined, /hỏi mở/],
   ['phần III đáp án dài > 20 ký tự có khoảng trắng (luật sẵn có của BTVN)', kho({ phan: 'III', de: 'Nêu cách nhận biết.', dap_an: 'Cho tác dụng với dung dịch brom rồi quan sát' }), undefined, /dài/],
   ['phần III đáp án nhiều dòng', kho({ phan: 'III', de: 'Viết các sản phẩm.', dap_an: 'X\nY' }), undefined, /dài/],
   ['phần III đáp án có dấu chấm phẩy', kho({ phan: 'III', de: 'Viết các sản phẩm.', dap_an: 'CH3COOH; C2H5OH' }), undefined, /dài/],
@@ -85,7 +91,7 @@ const CAU_TU_LUAN: [string, unknown, PhanCau?, RegExp?][] = [
   ['KHO THÔ THẬT · phần I, ô D rỗng và ảnh hinh KHÔNG có src (ảnh hỏng) ⇒ vẫn thiếu phương án', thoKho({ phan: 'I', de: 'Chất nào?', pa: { A: 'a', B: 'b', C: 'c', D: '' }, hinh: [{ viTri: 'sau_pa_D' }], dap_an: 'A' }), undefined, /thiếu phương án/],
   ['KHO THÔ THẬT · phần I, pa đối tượng rỗng {}', thoKho({ phan: 'I', de: 'Nêu khái niệm.', pa: {}, dap_an: 'A' }), undefined, /thiếu phương án/],
   ['KHO THÔ THẬT · phần II, y đối tượng chỉ 3 ý', thoKho({ phan: 'II', de: 'Cho este X.', y: { a: 'a', b: 'b', c: 'c' }, dap_an: 'DSS' }), undefined, /thiếu ý/],
-  ['KHO THÔ THẬT · phần III hỏi mở (saccharose) khuôn thô đủ trường', thoKho({ phan: 'III', de: SACCHAROSE, dap_an: '3' }), undefined, /hỏi mở/],
+  ['KHO THÔ THẬT · phần III hỏi mở (saccharose) khuôn thô đủ trường, đáp án chữ 1 từ + số', thoKho({ phan: 'III', de: SACCHAROSE, dap_an: '3 lần' }), undefined, /hỏi mở/],
   ['phần I có 4 ô nhưng một ô trống, không ảnh', kho({ phan: 'I', de: 'Chất nào?', pa: ['A', 'B', '', 'D'], dap_an: 'A' }), undefined, /thiếu phương án/],
   ['phần I đáp án không phải A–D', kho({ phan: 'I', de: 'Chất nào?', pa: PA, dap_an: 'AB' }), undefined, /A–D/],
   ['phần I đáp án rỗng (có trường)', kho({ phan: 'I', de: 'Chất nào?', pa: PA, dap_an: '' }), undefined, /A–D/],
@@ -122,14 +128,37 @@ describe('BẢNG GIÁ TRỊ: câu TỰ LUẬN (không được rút)', () => {
   })
 })
 
-describe('phần III hỏi MỞ: từng cụm dấu hiệu đều bị bắt (chữ đề công khai, không có đáp án)', () => {
-  it.each([
-    ['theo em'], ['vì sao'], ['tại sao'], ['giải thích'], ['trình bày'], ['mô tả'], ['phương pháp nào'], ['cách nào'], ['cách gì'], ['bằng cách nào'], ['như thế nào'], ['đề xuất'], ['nhận xét'], ['so sánh'], ['hãy nêu'],
-  ])('"%s"', (cum) => {
+describe('phần III hỏi MỞ: từng cụm / động từ ra lệnh đều bị bắt (chữ đề công khai, không có đáp án)', () => {
+  it.each([['theo em'], ['vì sao'], ['tại sao'], ['phương pháp nào'], ['cách nào'], ['cách gì'], ['bằng cách nào'], ['như thế nào']])('cụm "%s"', (cum) => {
     const c = { qid: 'x-TLN-III-1', phan: 'III', text: `Trong thí nghiệm này, ${cum} ra sao?` }
     expect(laCauTuLuan(c), cum).toBe(true)
     expect(laCauTuLuan({ ...c, phan: 'I', choices: PA }), `${cum} ở phần I`).toBe(false)
     expect(laCauTuLuan({ ...c, phan: 'II', ideas: Y }), `${cum} ở phần II`).toBe(false)
+  })
+  it.each([['giải thích'], ['trình bày'], ['mô tả'], ['nêu'], ['so sánh'], ['nhận xét'], ['đề xuất']])('động từ "%s": đứng đầu câu, sau "hãy", hoặc sau dấu câu', (dt) => {
+    const dau = dt.charAt(0).toUpperCase() + dt.slice(1)
+    for (const t of [`${dau} hiện tượng quan sát được.`, `Hãy ${dt} hiện tượng quan sát được.`, `Từ thí nghiệm trên. ${dau} kết quả.`, `Cho thí nghiệm sau: ${dt} kết quả.`]) {
+      const c = { phan: 'III', text: t }
+      expect(laCauTuLuan(c), t).toBe(true)
+      expect(laCauTuLuan({ ...c, phan: 'I', choices: PA }), `${t} ở phần I`).toBe(false)
+      expect(laCauTuLuan({ ...c, phan: 'II', ideas: Y }), `${t} ở phần II`).toBe(false)
+    }
+  })
+  it('dạng BỊ ĐỘNG / danh từ trong đề tính toán KHÔNG bị bắt: "được mô tả", "Cho các mô tả", "được giải thích", "phần nêu trên", "sự so sánh"', () => {
+    for (const t of ['Phản ứng được mô tả theo phương trình sau. Tính x.', 'Cho các mô tả về este. Tính số mô tả đúng.', 'Hiện tượng được giải thích bằng thuyết va chạm. Tính số mol.', 'Tính khối lượng chất nêu trên.', 'Theo sự so sánh khối lượng, tính x.'.replace('Theo', 'Xét')])
+      expect(laCauTuLuan({ phan: 'III', text: t }), t).toBe(false)
+  })
+  it('động từ ra lệnh phải là TỪ NGUYÊN VẸN: "Nêuxyz…" hay "hãy mô tảx" không bị bắt', () => {
+    expect(laCauTuLuan({ phan: 'III', text: 'Nêuxyz tính x.' })).toBe(false)
+    expect(laCauTuLuan({ phan: 'III', text: 'Hãy mô tảx tính x.' })).toBe(false)
+    expect(laCauTuLuan({ phan: 'III', text: 'Hãy mô tả tính x.' })).toBe(true)
+  })
+  it('đáp án SỐ THUẦN (≤ 12 ký tự) ⇒ trả lời ngắn hợp lệ dù chữ đề nghe như hỏi mở; đáp án số quá dài hoặc số kèm chữ thì không được miễn', () => {
+    const c = (dap_an: string) => ({ phan: 'III', text: SACCHAROSE, dap_an })
+    for (const da of ['7,5', '53,3', '124', '-285,8', '+3', '1.000,5', '2−', '12345678901']) expect(laCauTuLuan(c(da)), da).toBe(da === '2−')
+    expect(laCauTuLuan(c('1234567890123'))).toBe(true) // 13 ký tự
+    expect(laCauTuLuan(c('3 lần'))).toBe(true)
+    expect(laCauTuLuan({ phan: 'III', text: SACCHAROSE, dap_an: '' })).toBe(true) // rỗng: không chấm được
   })
   it('chữ hoa/thường không quan trọng; câu tính toán bình thường không bị bắt nhầm', () => {
     expect(laCauTuLuan({ phan: 'III', text: 'THEO EM, làm sao tách hỗn hợp?' })).toBe(true)

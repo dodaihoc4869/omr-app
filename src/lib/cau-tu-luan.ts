@@ -66,14 +66,17 @@ export function laMaDeTuLuan(ma: string): boolean {
 const KIEU_TU_LUAN = /(?:^|[^a-z])(?:tu[\s_-]?luan|tự[\s_-]?luận|essay|open[\s_-]?ended|free[\s_-]?text)(?:$|[^a-z])/i
 const CO_ANH = (x: unknown): boolean => (Array.isArray(x) ? x.some(Boolean) : Boolean(x))
 
-/** Chữ đề phần III hỏi MỞ ("theo em…", "phương pháp nào…", "vì sao…", "giải thích…") — phần III đúng nghĩa hỏi ra MỘT SỐ hay một mã ngắn. */
-const HOI_MO_PHAN_III = [
-  'theo em', 'vì sao', 'tại sao', 'giải thích', 'trình bày', 'mô tả', 'phương pháp nào', 'cách nào', 'cách gì', 'bằng cách nào', 'như thế nào', 'đề xuất', 'nhận xét', 'so sánh', 'hãy nêu',
-]
+/** Chữ đề phần III hỏi MỞ: cụm hỏi ("theo em", "phương pháp nào", "vì sao"…) hoặc ĐỘNG TỪ RA LỆNH đứng đầu câu / sau "hãy" ("Giải thích…", "Hãy mô tả…"). Dạng BỊ ĐỘNG trong đề tính toán
+ * ("được mô tả theo phương trình", "Cho các mô tả về…") KHÔNG dính. Phần III đúng nghĩa hỏi ra MỘT SỐ hay một mã ngắn. */
+const CUM_HOI_MO = ['theo em', 'vì sao', 'tại sao', 'phương pháp nào', 'cách nào', 'cách gì', 'như thế nào']
+const DONG_TU_HOI_MO = /(?:^|[.?!:;]\s*|(?<![\p{L}])hãy\s+)(?:giải thích|trình bày|mô tả|nêu|so sánh|nhận xét|đề xuất)(?![\p{L}])/iu
 const hoiMo = (text: string): boolean => {
   const t = text.toLowerCase()
-  return HOI_MO_PHAN_III.some((m) => t.includes(m))
+  return CUM_HOI_MO.some((m) => t.includes(m)) || DONG_TU_HOI_MO.test(t)
 }
+
+/** Đáp án phần III là MỘT SỐ THUẦN (chữ số, dấu , . -, ≤ 12 ký tự): "7,5", "53,3", "124", "-285,8". Đã là số thì là trả lời ngắn hợp lệ — KHÔNG xét chữ đề hỏi mở. */
+const laSoThuan = (da: string): boolean => da.length <= 12 && /^[+\-−–]?\d+(?:[.,]\d+)*$/.test(da)
 
 /** Đáp án phần III là CHỮ NHIỀU TỪ (≥ 2 từ toàn chữ, không chứa chữ số): "kết tinh lại", "chưng cất phân đoạn". Số, công thức (C2H5OH), số kèm một đơn vị (1,5 mol) không dính. */
 const laChuNhieuTu = (da: string): boolean => da.split(/\s+/).filter((t) => t.length > 0 && !/\d/.test(t) && /^\p{L}{2,}[.,;:!?]*$/u.test(t)).length >= 2
@@ -139,7 +142,7 @@ export function lyDoTuLuan(c: unknown, phanMacDinh?: PhanCau): string | null {
       if ((da.length > 20 && /\s/.test(da)) || /[\n;→⇌:]/.test(da)) return 'phần III đáp án dài / nhiều dòng (tự luận)'
       if (laChuNhieuTu(da)) return 'phần III đáp án là chữ nhiều từ (không phải số hay mã ngắn)'
     }
-    if (text && hoiMo(text)) return 'phần III hỏi mở (theo em / phương pháp nào / giải thích …)'
+    if (text && !(coDapAn && laSoThuan(da)) && hoiMo(text)) return 'phần III hỏi mở (theo em / phương pháp nào / giải thích …)'
   }
   return null
 }
