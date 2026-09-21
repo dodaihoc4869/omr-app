@@ -5,6 +5,7 @@
 //   · ĐỌC phía em (`canhBaoChoEm`, khoá `canhBaoThay` của `/hs/ke-hoach-ngay`) và phía phụ huynh (`canhBaoChoPh`, khoá `canhBaoThay` của `/ph/ke-hoach`); ghi "đã xem" (`emXemCanhBao`, `phXemCanhBao`).
 // Chỉ THẦY bấm mới gửi. Bộ não A.I KHÔNG có đường nào tới đây (test khoá: không tệp `bo-nao*.ts` nào nhắc tới bảng này). Lời nói ĐÚNG sự thật (chưa mở / dở chặng mấy / hạn lúc nào),
 // không so với bạn, không doạ, không emoji, không gạch ngang dài; xưng Thầy; gọi phụ huynh "Anh/chị".
+import { emCoGhi } from './dem-ke-hoach'
 import type { Env } from './kieu'
 
 type Hang = Record<string, unknown>
@@ -107,7 +108,11 @@ export interface KetQuaGui {
  * `POST /gv/canh-bao-nop-bai {maBtvn, dsSbd[], loiNhan?}` — ghi cảnh báo. Không ném lỗi cho từng em: em không hợp lệ vào `boQua` kèm lý do.
  * Lỗi tổng (thiếu mã bài, bài không có, chưa chạy migration, quá 60 em) trả `{ok:false, error}`.
  */
+/** Thầy gửi cảnh báo: xong thì bỏ đệm kế hoạch ngày của từng em được gửi (cảnh báo hiện ngay ở thẻ của em, không chờ hết đệm 20 giây). */
 export async function guiCanhBao(env: Env, b: Record<string, unknown>, nowMs: number = Date.now()): Promise<KetQuaGui | { ok: false; error: string }> {
+  try { return await guiCanhBaoTho(env, b, nowMs) } finally { if (Array.isArray(b.dsSbd)) for (const s of b.dsSbd) emCoGhi(String(s ?? '').trim()) }
+}
+async function guiCanhBaoTho(env: Env, b: Record<string, unknown>, nowMs: number): Promise<KetQuaGui | { ok: false; error: string }> {
   const maBtvn = chuoi(b.maBtvn).trim()
   if (!maBtvn) return { ok: false, error: 'Thiếu mã bài tập' }
   if (!Array.isArray(b.dsSbd)) return { ok: false, error: 'Thiếu danh sách em (dsSbd)' }
@@ -226,6 +231,7 @@ export async function emXemCanhBao(env: Env, sbd: string, id: string, nowMs: num
       env.DB.prepare('UPDATE student_notice SET read_at = COALESCE(read_at, ?) WHERE id = ? AND sbd = ?').bind(luc, id, sbd),
     ])
   } catch { /* chưa có bảng: không có gì để đánh dấu */ }
+  emCoGhi(sbd) // đã xem ⇒ đệm kế hoạch ngày của em hết hiệu lực (cảnh báo nằm trong phản hồi)
   return { ok: true }
 }
 

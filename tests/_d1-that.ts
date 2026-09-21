@@ -9,6 +9,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import type { D1PreparedStatement, Env } from '../server/src/kieu'
 import { xoaDemThiDua } from '../server/src/dem-thi-dua'
 import { xoaMoiDem } from '../server/src/dem-chung'
+import { xoaDemKeHoach } from '../server/src/dem-ke-hoach'
 
 /** Duy nhất tệp này phụ thuộc thứ tự (cần `game_v2_settings` dựng trước) — bỏ qua, không dùng tới. */
 const BO_QUA = new Set(['migration-1609-academic-start.sql'])
@@ -34,7 +35,7 @@ export function demTermUnionToiDa(query: string): number {
 }
 
 export function taoD1That() {
-  xoaDemThiDua(); xoaMoiDem() // đệm Thi đua 30 giây (mức mô-đun) không được lẫn giữa các D1 giả khác nhau
+  xoaDemThiDua(); xoaMoiDem(); xoaDemKeHoach() // đệm Thi đua 30 giây (mức mô-đun) không được lẫn giữa các D1 giả khác nhau
   const sql = new DatabaseSync(':memory:')
   const tep = ['schema.sql', ...readdirSync('server').filter((f) => /^migration-.*\.sql$/.test(f)).sort()]
   for (const f of tep) {

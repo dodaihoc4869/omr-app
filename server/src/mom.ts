@@ -1,3 +1,4 @@
+import {emCoGhi} from './dem-ke-hoach'
 import type {Env} from './kieu'
 import {gameIdentity} from './game-v2-auth'
 import {ghiSuKien,suKienChamBai,type CauChamBai} from './su-kien-hoc'
@@ -27,6 +28,7 @@ export async function mom(env:Env,action:string,b:Record<string,unknown>,opts:{n
   // Mọi thao tác làm/nộp bài bắt buộc phiên học sinh và lấy SBD từ chữ ký.
   const parent=action==='parent-list'||action==='create'
   const sbd=parent?(opts.noiBo?String(b.sbd??'').trim():(await sbdCuaPhuHuynh(env,b,'mom')).sbd):await gameIdentity(env,b)
+  if(action==='create'||action==='start'||action==='save'||action==='submit')emCoGhi(sbd) // bài Mom đổi ⇒ đệm kế hoạch ngày của em hết hiệu lực (dem-ke-hoach.ts); nộp còn ghi sổ nên xoá thêm ở ghiSuKien
   if(parent&&opts.noiBo&&!await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd=?').bind(sbd).first())throw new Error('Không tìm thấy số báo danh của con.')
   if(action==='parent-list'||action==='list'){
     const r=await env.DB.prepare('SELECT * FROM mom_bai WHERE sbd=? ORDER BY created_at DESC').bind(sbd).all<Row>()

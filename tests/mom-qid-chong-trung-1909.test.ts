@@ -1,6 +1,7 @@
 // @vitest-environment node
 // Sửa lỗi: em thấy CÙNG MỘT câu ở hai nơi — việc "ôn lại" của kế hoạch ngày và bài Mom/daily_ chưa nộp (0.Planer 19/09).
 // Cách sửa: `mom_bai.qid_json` (cột chỉ-thêm) lưu mã câu của bài; kế hoạch loại các qid đó khỏi việc on_lai.
+import { xoaDemKeHoach } from '../server/src/dem-ke-hoach'
 import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
 import { lapKeHoachNgay, type DauVaoKeHoach } from '../server/src/ke-hoach-ngay'
@@ -112,6 +113,7 @@ describe('D1 thật: mom create lưu qid_json; kế hoạch loại câu trùng',
     expect((sau.viec as { loai: string }[]).some((v) => v.loai === 'mom')).toBe(true) // bài mới hiện ở viec[] (việc nhỏ 1)
     // Nộp bài (đánh dấu đã nộp): câu quay lại theo mốc ôn.
     d.sql.prepare("UPDATE mom_bai SET started_at = ?, submitted_at = ? WHERE sbd = 'S1'").run(new Date().toISOString(), new Date().toISOString())
+    xoaDemKeHoach() // SỬA CÓ CHỦ Ý 21/09: test ghi thẳng SQL (giả lập nộp) ⇒ xoá đệm kế hoạch ngày mô-đun; đường thật (mom submit) tự xoá
     const nop = qidOnLai(await kh(d))
     expect(nop).toEqual(truoc)
   })

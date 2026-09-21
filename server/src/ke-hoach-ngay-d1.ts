@@ -6,6 +6,7 @@
 // TƯƠI KHI ĐỌC, KHÔNG PHẢI KHI GHI: kế hoạch được lập lại mỗi lần em mở (và mỗi đêm bằng cron), nên "lập lại khi có sự
 // kiện" của đề xuất đạt được mà không thêm một câu truy vấn nào vào đường nộp bài. Hồ sơ được dựng lại khi số dòng sổ
 // của em khác số lúc lập kế hoạch trước (`so_su_kien`).
+import { emCoGhi } from './dem-ke-hoach'
 import type { D1Result, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { dungLaiHoSo } from './ho-so-nam-kt'
@@ -493,6 +494,7 @@ export async function datPhutMoiNgay(env: Env, sbd: string, phutTho: unknown): P
   await env.DB.prepare(
     'INSERT INTO study_preferences (sbd, minutes, updated_at) VALUES (?,?,?) ON CONFLICT(sbd) DO UPDATE SET minutes = excluded.minutes, updated_at = excluded.updated_at',
   ).bind(sbd, phut, new Date().toISOString()).run()
+  emCoGhi(sbd) // số phút mỗi ngày đổi ⇒ ngân sách kế hoạch đổi
   return { ok: true, phut }
 }
 

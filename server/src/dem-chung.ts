@@ -29,6 +29,8 @@ export class DemTTL<T> {
     }
   }
   xoa(): void { this.kho.clear(); this.tong = 0 }
+  /** Bỏ MỘT khoá (khi dữ liệu gốc vừa đổi). */
+  xoaKhoa(khoa: string): void { this.bo(khoa) }
   /** Số khoá và tổng trọng lượng hiện có (test). */
   get soKhoa(): number { return this.kho.size }
   get tongCo(): number { return this.tong }

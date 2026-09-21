@@ -1,5 +1,6 @@
 // @vitest-environment node
 // GĐ 5 — KÊNH 5 trên D1 THẬT (SQLite, lược đồ thật): bài hằng ngày của phụ huynh đọc kế hoạch ngày + hồ sơ + kho.
+import { xoaDemKeHoach } from '../server/src/dem-ke-hoach'
 import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
 import { newsDay, parentNews } from '../server/src/parent-news'
@@ -171,6 +172,7 @@ describe('Kênh 5 trên D1 thật: chọn câu cho bài hằng ngày', () => {
     expect(sau.r.tai.cung + sau.r.tai.bu + sau.r.tai.tuyChon).toBeLessThanOrEqual(sau.r.nganSach.mucTieuCau + sau.r.tai.vuot)
     // Nộp xong: các câu tới hạn quay lại theo mốc ôn bình thường.
     d.sql.prepare("UPDATE mom_bai SET started_at = ?, submitted_at = ? WHERE sbd = 'S1'").run(new Date().toISOString(), new Date().toISOString())
+    xoaDemKeHoach() // SỬA CÓ CHỦ Ý 21/09: test ghi thẳng SQL (giả lập nộp); đường thật (mom submit) tự xoá đệm kế hoạch ngày
     expect((await onLai()).qid).toEqual(truoc.qid)
   })
 

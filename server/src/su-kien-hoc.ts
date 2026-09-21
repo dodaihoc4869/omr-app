@@ -13,6 +13,7 @@
 //   - Ghi sổ KHÔNG BAO GIỜ làm hỏng lượt nộp: lỗi (vd. chưa chạy migration) chỉ
 //     được báo qua console và giá trị trả về; đường `/ho-so/nap-lai` vá chỗ hụt.
 //   - Hàm thuần (`suKien*`) không đọc đồng hồ: `luc` do nơi gọi truyền vào.
+import { emCoGhi } from './dem-ke-hoach'
 import type { D1PreparedStatement, Env } from './kieu'
 import { answerText, homeworkQuestions, isAnswerCorrect } from './btvn-grading'
 
@@ -305,6 +306,7 @@ export async function ghiSuKien(env: Env, ds: SuKien[], tuy: TuyChonGhi = {}): P
   }
   try {
     for (let i = 0; i < lenh.length; i += LENH_MOI_GOI) await env.DB.batch(lenh.slice(i, i + LENH_MOI_GOI))
+    for (const d of new Set(dong.map((x) => String(x.s)))) emCoGhi(d) // em có ghi sổ ⇒ đệm kế hoạch ngày của em hết hiệu lực (dem-ke-hoach.ts)
     return { ok: true, soGui: dong.length, boQua }
   } catch (e) {
     const loi = e instanceof Error ? e.message : String(e)

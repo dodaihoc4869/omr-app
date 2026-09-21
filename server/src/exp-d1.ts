@@ -9,6 +9,7 @@
 // theo luật cũ, không tính lại.
 //
 // KHÔNG BAO GIỜ NÉM LỖI: EXP hỏng thì lượt nộp bài vẫn thành công (sổ là nguồn sự thật, lần gọi sau tự bắt kịp).
+import { emCoGhi } from './dem-ke-hoach'
 import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 import type { D1PreparedStatement, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
@@ -628,6 +629,7 @@ export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs
       .bind(khoa, sbd, k.ngay, k.loai, k.qid ?? null, k.maNguon ?? null, nhan, k.luc, nhan < k.exp ? `${k.ghiChu} (hôm nay em đã đủ EXP game)` : k.ghiChu).run()
     if (!w.meta.changes) return { bat: true, exp: 0, daGhiTruoc: true }
     if (nhan > 0) await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
+    emCoGhi(sbd) // EXP game vừa ghi ⇒ đệm kế hoạch ngày của em hết hiệu lực
     return { bat: true, exp: nhan, daGhiTruoc: false }
   } catch (e) {
     console.error('[exp] ghi khoản game lỗi (bỏ qua):', e instanceof Error ? e.message : e)

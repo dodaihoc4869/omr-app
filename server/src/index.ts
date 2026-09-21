@@ -1,10 +1,11 @@
+import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
 import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
 import {qidTuLuanCuaTo} from './cam-tu-luan'
 import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
-import {hsThoiGianHoc,chayCaLop} from './ke-hoach-ngay-d1'
+import {hsThoiGianHoc,chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
 import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
 import {doanMoCho} from './game-v2-doan'
@@ -81,6 +82,29 @@ const CORS = {
 }
 const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS }
 
+async function dungKeHoachEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const kh = await hsKeHoachNgayCoExp(env, b)
+  // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
+  if (kh.ok === true && typeof kh.sbd === 'string') kh.doanMo = await doanMoCho(env, kh.sbd)
+  // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` (việc ngày trước chưa xong, theo ngày) + `veDich` (từng bài: chặng xong/nợ/hôm nay/sắp tới, giờ còn lại, tối nay, các buổi sau). Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
+  if (kh.ok === true && typeof kh.sbd === 'string') { try { const vd = await docVeDichCuaEm(env, kh.sbd); kh.no = vd.no; kh.veDich = vd.veDich } catch (e) { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e) } }
+  // BỘ NÃO A.I chế độ THẬT: lời nhắn cho ĐÚNG em này (chỉ lời cho em, không lời phụ huynh). Chạy thử/tắt/không có lời ⇒ KHÔNG có khoá `loiNhanHlv` (phản hồi y hệt cũ).
+  if (kh.ok === true && typeof kh.sbd === 'string') {
+    const loiHlv = await docLoiNhanHlv(env, kh.sbd, typeof kh.ngay === 'string' ? kh.ngay : ngayVn(Date.now()))
+    if (loiHlv) kh.loiNhanHlv = loiHlv
+  }
+  // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): ≤ 3, bài chưa nộp, gửi trong 48 giờ. Không có ⇒ KHÔNG có khoá `canhBaoThay` (phản hồi y hệt cũ).
+  if (kh.ok === true && typeof kh.sbd === 'string') {
+    const canhBao = await canhBaoChoEm(env, kh.sbd)
+    if (canhBao.length > 0) kh.canhBaoThay = canhBao
+  }
+  return kh
+}
+
+/** Lệnh em GHI (nộp bài, xong chặng…): SAU KHI xong (kể cả lỗi) bỏ đệm kế hoạch ngày của em — thẻ Hôm nay không đứng số sau khi nộp. Token sai ⇒ không có gì để xoá. */
+async function sauGhi<T>(env: Env, b: Record<string, unknown>, viec: Promise<T>): Promise<T> {
+  try { return await viec } finally { try { emCoGhi(await gameIdentity(env, b)) } catch { /* token sai / hết hạn */ } }
+}
 function ra(data: unknown, status = 200): Response {
   return new Response(JSON.stringify({ ...(data as object), serverNow: Date.now() }), { status, headers: JSON_HEADERS })
 }
@@ -3099,36 +3123,33 @@ export default {
       // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
       if (p === '/goi') return goiCu(req, env, b)
       if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
-      if (p === '/btvn/nop') return nopBtvn(env, b)
-      if (p === '/btvn/xong-lo') return xongLoBtvn(env, b)
+      if (p === '/btvn/nop') return sauGhi(env, b, nopBtvn(env, b))
+      if (p === '/btvn/xong-lo') return sauGhi(env, b, xongLoBtvn(env, b))
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
       // Ô "Thi đua hôm nay" (Điều 8, phương án 8A): ĐỌC-CHỈ, token của em (thi-dua-hom-nay.ts của Code 4).
       if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(env, b))
       if (p === '/hs/ke-hoach-ngay') {
-        const kh = await hsKeHoachNgayCoExp(env, b)
-        // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
-        if (kh.ok === true && typeof kh.sbd === 'string') kh.doanMo = await doanMoCho(env, kh.sbd)
-        // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` (việc ngày trước chưa xong, theo ngày) + `veDich` (từng bài: chặng xong/nợ/hôm nay/sắp tới, giờ còn lại, tối nay, các buổi sau). Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
-        if (kh.ok === true && typeof kh.sbd === 'string') { try { const vd = await docVeDichCuaEm(env, kh.sbd); kh.no = vd.no; kh.veDich = vd.veDich } catch (e) { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e) } }
-        // BỘ NÃO A.I chế độ THẬT: lời nhắn cho ĐÚNG em này (chỉ lời cho em, không lời phụ huynh). Chạy thử/tắt/không có lời ⇒ KHÔNG có khoá `loiNhanHlv` (phản hồi y hệt cũ).
-        if (kh.ok === true && typeof kh.sbd === 'string') {
-          const loiHlv = await docLoiNhanHlv(env, kh.sbd, typeof kh.ngay === 'string' ? kh.ngay : ngayVn(Date.now()))
-          if (loiHlv) kh.loiNhanHlv = loiHlv
-        }
-        // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): ≤ 3, bài chưa nộp, gửi trong 48 giờ. Không có ⇒ KHÔNG có khoá `canhBaoThay` (phản hồi y hệt cũ).
-        if (kh.ok === true && typeof kh.sbd === 'string') {
-          const canhBao = await canhBaoChoEm(env, kh.sbd)
-          if (canhBao.length > 0) kh.canhBaoThay = canhBao
+        // DỒN LƯỢT + ĐỆM 20 GIÂY theo em (dem-ke-hoach.ts; Boss 21/09): lượt đệm KHÔNG ghi gì; em có ghi thì đệm bị xoá ngay. `thanThu` luôn đọc tươi.
+        let sbdKhoa = ''
+        try { sbdKhoa = b.token ? await gameIdentity(env, b) : String(b.sbd ?? '').trim() } catch { /* để đường thật trả lỗi đúng lời */ }
+        if (!sbdKhoa || sbdKhoa.length > 40) return themMocReset(env, ra(await dungKeHoachEm(env, b)))
+        let laLuotThat = false
+        const kh = await keHoachCoDem(sbdKhoa, () => { laLuotThat = true; return dungKeHoachEm(env, b) })
+        if (!laLuotThat && kh.ok === true) {
+          kh.thanThu = await docThanThu(env, sbdKhoa)
+          // Thông báo MỘT LẦN (EXP / mảnh khiên vừa nhận) đã đi ra ở lượt thật: lượt đệm KHÔNG lặp lại (em không thấy thưởng hai lần).
+          if ('expNhan' in kh) kh.expNhan = []
+          if ('manhNhan' in kh) kh.manhNhan = []
         }
         return themMocReset(env, ra(kh))
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
       if (p === '/hs/canh-bao/xem') return ra(await emXemCanhBao(env, await gameIdentity(env, b), String(b.id ?? '')))
-      if (p === '/hs/on-lai/nop') return ra(await hsOnLaiNop(env, b))
+      if (p === '/hs/on-lai/nop') return ra(await sauGhi(env, b, hsOnLaiNop(env, b)))
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       if (p === '/hs/thu-thach-hom-nay') return ra(await hsThuThachHomNay(env, b))
-      if (p === '/hs/thu-thach-hom-nay/nop') return ra(await hsThuThachNop(env, b))
-      if (p === '/hs/thoi-gian-hoc') return ra(await hsThoiGianHoc(env, b))
+      if (p === '/hs/thu-thach-hom-nay/nop') return ra(await sauGhi(env, b, hsThuThachNop(env, b)))
+      if (p === '/hs/thoi-gian-hoc') return ra(await sauGhi(env, b, hsThoiGianHoc(env, b)))
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
 

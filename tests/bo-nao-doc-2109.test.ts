@@ -2,6 +2,7 @@
 // BỘ NÃO A.I — TẦNG ĐỌC (chế độ THẬT; `server/src/bo-nao-doc.ts`): điều chỉnh còn hạn → kế hoạch ngày (nhịp, on_som) + BTVN nâng đỡ (chốt + thích nghi chặng CHƯA MỞ);
 // lời nhắn → `/hs/ke-hoach-ngay` (loiNhanHlv) và `/ph/ke-hoach` (boNaoAi). LUẬT CỨNG: chạy thử (bong) / tắt / hết hạn / đã huỷ / độ tin cậy thấp ⇒ Y HỆT chưa có gì, từng byte;
 // không núm nào đổi han_nop; chặng đã mở không bao giờ đổi; công tắc về bong ⇒ dừng NGAY.
+import { xoaDemKeHoach } from '../server/src/dem-ke-hoach'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { tinhNganSach, type DauVaoKeHoach } from '../server/src/ke-hoach-ngay'
 import worker from '../server/src/index'
@@ -39,6 +40,7 @@ function ai(d: D1That, sbd: string, ngay: string, dauRa: Record<string, unknown>
 const keHoach = (d: D1That, sbd = 'S1') => goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd })
 /** Xoá CHỈ kế hoạch hôm nay (lập lại khi gọi). Có sẵn một dòng kế hoạch ngày trước với so_su_kien = 0 để máy chủ KHÔNG dựng lại hồ sơ từ sổ (sổ trống) và xoá hồ sơ đặt tay. */
 function xoaKeHoachHomNay(d: D1That) {
+  xoaDemKeHoach() // SỬA CÓ CHỦ Ý 21/09 (đệm kế hoạch ngày 20 giây): test ghi thẳng SQL rồi dựng lại kế hoạch ⇒ phải xoá đệm mô-đun
   d.sql.prepare('DELETE FROM ke_hoach_ngay WHERE ngay = ?').run(HOM_NAY)
   for (const s of ['S1', 'S2']) d.sql.prepare("INSERT OR IGNORE INTO ke_hoach_ngay(khoa,sbd,ngay,phien_ban,seed,ngan_sach_json,viec_json,canh_bao_json,ket_qua,so_cau_da_lam,so_cau_len_bac,so_cau_tut_bac,la_ngay_nghi,so_su_kien,cap_nhat_luc) VALUES(?,?,?,1,1,'{}','[]','[]',NULL,0,0,0,0,0,'x')").run(`${s}|${themNgay(HOM_NAY, -1)}`, s, themNgay(HOM_NAY, -1))
 }
