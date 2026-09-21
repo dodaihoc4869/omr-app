@@ -22,6 +22,7 @@ import { goTuLuanKhoiGoi, laCauTuLuan, locPhieuBaiTap, type PhanCau } from './ca
 //      `LENH_CUA_THAY` dưới đây là nơi duy nhất quyết định điều đó.
 import type { D1PreparedStatement, Env } from './kieu'
 import { docDsQid, docNamKtChoLop, type NamKtCauMayChu } from './ho-so-len-bang'
+import { tenLopCuaEm } from './ten-lop'
 
 export const NAY = (): string => new Date().toISOString()
 
@@ -1174,6 +1175,7 @@ export async function xoaEm(env: Env, b: Record<string, unknown>): Promise<Recor
 
 export async function dsEmDangKy(env: Env): Promise<Record<string, unknown>> {
   const r = await env.DB.prepare('SELECT * FROM hoc_sinh ORDER BY cap_nhat_luc DESC LIMIT 500').all<Record<string, unknown>>()
+  const coCotTenLop = (r.results ?? []).some((x) => 'ten_lop' in x) // cột `ten_lop` (migration-2109-ten-lop.sql); chưa có ⇒ không thêm trường
   return {
     ok: true,
     items: (r.results ?? []).map((x) => ({
@@ -1181,6 +1183,7 @@ export async function dsEmDangKy(env: Env): Promise<Record<string, unknown>> {
       hoTen: chuoi(x.ho_ten),
       namSinh: chuoi(x.nam_sinh),
       lop: chuoi(x.lop),
+      ...(coCotTenLop ? { tenLop: tenLopCuaEm(x.lop, x.ten_lop) } : {}),
       dangKyLuc: chuoi(x.tao_luc),
       trangThai: chuoi(x.trang_thai),
     })),

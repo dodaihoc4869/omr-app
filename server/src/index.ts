@@ -15,6 +15,7 @@ import {notifications,deliverNotices} from './notifications'
 import {canhBaoChoEm,emXemCanhBao,guiCanhBao} from './canh-bao-thay'
 import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
 import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-nay-v2'
+import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
 import {parentNews,refreshDailyNews} from './parent-news'
@@ -1267,11 +1268,13 @@ async function danhSachEmMoi(env: Env): Promise<Response> {
       ORDER BY d.lop, d.ho_ten`,
   ).all<Record<string, unknown>>()
 
+  const tenLop = await docBangTenLop(env) // thêm `tenLop` (chưa có cột ⇒ không thêm trường)
   const items = (r.results ?? []).map((v) => ({
     sbd: String(v.sbd ?? ''),
     hoTen: String(v.ho_ten ?? ''),
     namSinh: String(v.nam_sinh ?? ''),
     lop: String(v.lop ?? ''),
+    ...(tenLop ? { tenLop: tenLopCuaEm(v.lop, tenLop.get(String(v.sbd ?? ''))) } : {}),
     trangThai: '',
     soCa: Number(v.so_ca) || 0,
     diemGanNhat: v.diem_gan_nhat === null || v.diem_gan_nhat === undefined ? null : Number(v.diem_gan_nhat),
@@ -3122,6 +3125,9 @@ export default {
       if (p === '/gv/vinh-danh-ngay') return ra(await gvVinhDanhNgay(env, b))
       if (p === '/gv/tim-em') return ra(await gvTimEm(env, b))
       if (p === '/gv/em-toan-canh') return ra(await gvEmToanCanh(env, b))
+      // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
+      if (p === '/gv/lop') return ra(await gvLop(env))
+      if (p === '/gv/doi-lop-em') return ra(await gvDoiLopEm(env, b))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
