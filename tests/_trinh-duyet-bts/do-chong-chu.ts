@@ -112,6 +112,16 @@ export function doChongChu(): KetQuaDo {
       if (dom[i]!.nut !== dom[j]!.nut && chong(dom[i]!, dom[j]!) && !choPhep(dom[i]!, dom[j]!)) giao.push(`DOM ${tuHop(dom[i]!)}  ×  ${tuHop(dom[j]!)}`)
     }
   }
+  // chữ DOM đè lên tia nhỏ (canvas không chữ) của thẻ số: hộp chữ NGOÀI tia mà giao hộp của tia
+  for (const tia of Array.from(goc.querySelectorAll('.bts-o-tia'))) {
+    const rt = tia.getBoundingClientRect()
+    for (const h of dom) {
+      if (tia.contains(h.cha)) continue
+      const rong = Math.min(h.r, rt.right) - Math.max(h.l, rt.left)
+      const cao = Math.min(h.b, rt.bottom) - Math.max(h.t, rt.top)
+      if (rong > 2 && cao > 2) giao.push(`TIA ${tuHop(h)}  ×  tia nhỏ [${lam(rt.left)},${lam(rt.top)},${lam(rt.right)},${lam(rt.bottom)}]`)
+    }
+  }
   // chữ bị cắt bằng ellipsis / line-clamp, hoặc nằm ngoài màn hình
   const daBao = new Set<string>()
   for (const h of dom) {
@@ -123,7 +133,9 @@ export function doChongChu(): KetQuaDo {
         if (!daBao.has(k)) { daBao.add(k); cat.push(`DOM ${tuHop(h)} bị cắt bằng ellipsis/line-clamp ở ${tenPhan(e)}`) }
       }
     }
-    if (h.r > innerWidth + 1 || h.b > innerHeight + 1 || h.l < -1 || h.t < -1) cat.push(`DOM ${tuHop(h)} nằm ngoài màn hình ${innerWidth}×${innerHeight}`)
+    // chiều dọc: màn một cột (điện thoại) được cuộn ⇒ chỉ tính ngoài TỜ (scrollHeight), không ngoài cửa sổ
+    const caoTo = Math.max(innerHeight, (document.scrollingElement as HTMLElement).scrollHeight)
+    if (h.r > innerWidth + 1 || h.b > caoTo + 1 || h.l < -1 || h.t < -1) cat.push(`DOM ${tuHop(h)} nằm ngoài màn hình ${innerWidth}×${caoTo}`)
   }
 
   // ── chữ canvas (khung vẽ cuối) ──

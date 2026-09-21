@@ -96,7 +96,9 @@ export function veNen(cv: HTMLCanvasElement, nen: readonly NenSan[], nowMs: numb
 
   // lưới ngang + nhãn trục phải (bỏ nhãn nào đè lên nhãn giá)
   const bien = hien.yMax - hien.yMin
-  const buoc = bien > 16 ? 5 : bien > 7 ? 2 : 1
+  // bước nhãn trục: nhỏ nhất trong {1, 2, 5, 10, 20, 25, 50} mà các nhãn cách nhau ≥ 16 px (giá dao động rộng — vd đầu ngày ít câu — không để nhãn đè nhau)
+  const soNhanToiDa = Math.max(2, Math.floor(giaH / 16))
+  const buoc = [1, 2, 5, 10, 20, 25, 50].find((b) => Math.floor(bien / b) + 1 <= soNhanToiDa && (bien > 16 ? b >= 5 : bien > 7 ? b >= 2 : true)) ?? 50
   ctx.font = `500 ${PHONG_SO}`
   ctx.textBaseline = 'middle'
   ctx.textAlign = 'left'

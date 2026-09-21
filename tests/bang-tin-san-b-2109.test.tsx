@@ -41,6 +41,20 @@ function canvasGia(w = 700, h = 300) {
 const hienMoi = () => ({ c: 0, h: 0, l: 0, v: 0, yMin: 0, yMax: 0, vMax: 0, soNen: -1, batDau: 0 })
 const chuoiNen = (n: number, dong = 86): NenSan[] => Array.from({ length: n }, (_, i) => nenMau(dong - 0.2, dong, 12 * 3_600_000 - 7 * 3_600_000 + i * NEN_MS))
 
+describe('veNen — nhãn trục % không đè nhau khi giá dao động RỘNG (đầu ngày ít câu, thân thật)', () => {
+  it('giá từ ~10 % tới ~90 % trong khung thấp ⇒ các nhãn "N %" cách nhau ≥ 14 px (bước nhãn thưa theo chiều cao); giá dao động hẹp giữ bước cũ 1–2', () => {
+    const rong = [...chuoiNen(20, 88), ...chuoiNen(6, 12).map((n, i) => ({ ...n, tu: 20 * NEN_MS + i * NEN_MS + 12 * 3_600_000 - 7 * 3_600_000 }))]
+    const g = canvasGia(390, 240)
+    veNen(g.cv, rong, NAY + 40 * NEN_MS, hienMoi(), MAU, 0, true, 0)
+    const ys = g.chu.filter((c) => /^\d+ %$/.test(c.t)).map((c) => c.y).sort((a, b) => a - b)
+    expect(ys.length).toBeGreaterThan(1)
+    for (let i = 1; i < ys.length; i++) expect(ys[i]! - ys[i - 1]!, `nhãn ${i}`).toBeGreaterThanOrEqual(14)
+    const hep = canvasGia(390, 240)
+    veNen(hep.cv, chuoiNen(20, 86), NAY, hienMoi(), MAU, 0, true, 0)
+    expect(hep.chu.filter((c) => /^\d+ %$/.test(c.t)).length).toBeGreaterThanOrEqual(1)
+  })
+})
+
 describe('veNen — lưới ngang / dọc chỉ ở màn rộng (điện thoại KHÔNG vẽ lưới; thầy 21/09)', () => {
   it('mặc định có lưới: nét vẽ đúng màu token lưới (ngang lẫn dọc); coLuoi = false ⇒ KHÔNG nét nào màu lưới, vẫn đủ nhãn trục % + nhãn giờ + nhãn giá', () => {
     const co = canvasGia()

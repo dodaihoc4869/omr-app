@@ -391,7 +391,9 @@
     display: none;
   }
   .bts-o-trai {
-    width: 150px;
+    width: max-content; /* chữ dòng chênh lệch ("▲ +0,7 điểm %  10 phút qua") không tràn sang tia nhỏ */
+    min-width: 132px;
+    max-width: 68%;
   }
   .bts-o-tia {
     flex-basis: 96px;

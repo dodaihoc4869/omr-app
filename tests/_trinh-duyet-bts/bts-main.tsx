@@ -20,7 +20,9 @@ if (gd === 'sang' || gd === 'toi') datGiaoDien(gd)
 else apDungGiaoDien('may')
 useAppStore.getState().setScreen('examhub')
 const NAY = Date.parse('2026-09-21T08:28:36.000Z') // 15:28:36 giờ VN — đồng hồ CỐ ĐỊNH
-const man = <BangTinSan du={taoDuLieuGia(NAY)} nayMs={NAY} />
+// `window.__DU` (chỉ bản thử): dữ liệu ĐÃ ĐỌC qua docSan từ thân thật của máy chủ — để soi độ dài chữ thật (tên dài, tên lớp thật)
+const duThat = (window as unknown as { __DU?: Parameters<typeof BangTinSan>[0]['du'] }).__DU
+const man = <BangTinSan du={duThat ?? taoDuLieuGia(NAY)} nayMs={duThat ? duThat.serverNow : NAY} />
 
 createRoot(document.getElementById('root')!).render(
   q.get('vo') === '0' ? (

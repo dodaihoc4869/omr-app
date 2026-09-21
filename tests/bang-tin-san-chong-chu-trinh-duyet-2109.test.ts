@@ -3,12 +3,19 @@
 // hai hàng cuối bản đồ nhiệt dính nhau) — jsdom không đo được bố cục, nên dựng ĐÚNG màn trong vỏ app thầy (ThanhBenTrai + đúng CSS) bằng Vite + Chromium (WebGL giả lập bằng SwiftShader),
 // ở 1280×800 và 1366×768 (cỡ máy thầy hay dùng) + 1440×900, sáng + tối, lấy mẫu 3 lần (camera 3D xoay ⇒ nhãn di chuyển): 0 cặp hộp chữ giao nhau, 0 chữ bị cắt, không cuộn dọc ở chế độ MỘT MÀN.
 // Chữ DOM đo bằng Range; chữ canvas (bản đồ nhiệt, nến) đo bằng chặn fillText. Trang thử: tests/_trinh-duyet-bts/.
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { chromium, type Browser } from 'playwright'
 import { createServer, type ViteDevServer } from 'vite'
 import react from '@vitejs/plugin-react'
 import type { AddressInfo } from 'node:net'
 import { caiBatChuCanvas, doChongChu, type KetQuaDo } from './_trinh-duyet-bts/do-chong-chu'
+import worker from '../server/src/index'
+import { xoaDemBangTinSong } from '../server/src/gv-bang-tin-song'
+import { goiWorker, taoD1That } from './_d1-that'
+import { docSan } from '../src/lib/bang-tin-san/doc-san'
+
+vi.mock('../src/lib/may-chu-moi', () => ({ layCauHinhMayChu: async () => ({ URL: 'https://may.test' }) }))
+vi.mock('../src/lib/exam-db', () => ({ loadTeacherSecret: async () => 'mat-thu' }))
 
 let may: ViteDevServer
 let trinhDuyet: Browser
@@ -55,7 +62,7 @@ async function chup(rong: number, cao: number, gd: 'sang' | 'toi'): Promise<{ la
   return { lan, kieu, loi }
 }
 
-const CO: Array<[number, number]> = [[1280, 800], [1366, 768], [1440, 900]]
+const CO: Array<[number, number]> = [[1280, 800], [1366, 768], [1440, 900], [390, 844], [360, 800]]
 describe('Bảng tin sàn trong Chromium thật — không chồng chữ, không cắt chữ', () => {
   for (const [rong, cao] of CO) {
     for (const gd of ['sang', 'toi'] as const) {
@@ -69,7 +76,7 @@ describe('Bảng tin sàn trong Chromium thật — không chồng chữ, không
           expect(k.soChuCanvas, `lần ${i + 1}: đo chữ canvas`).toBeGreaterThan(8)
           for (const g of k.giao) loiDo.push(`[lần ${i + 1}] GIAO NHAU ${g}`)
           for (const c of k.cat) loiDo.push(`[lần ${i + 1}] BỊ CẮT ${c}`)
-          if (k.cuonDoc) loiDo.push(`[lần ${i + 1}] CUỘN DỌC (màn cao hơn cửa sổ)`)
+          if (k.cuonDoc && rong >= 980 && cao >= 700) loiDo.push(`[lần ${i + 1}] CUỘN DỌC (màn cao hơn cửa sổ ở chế độ MỘT MÀN)`) // điện thoại (một cột) được cuộn
         }
         expect([...new Set(loiDo.map((x) => x.replace(/^\[lần \d\] /, '')))], loiDo.join('\n')).toEqual([])
       }, 120_000)
@@ -159,4 +166,73 @@ describe('nến + token khi thầy ÉP Tối trên máy SÁNG', () => {
       await t.ctx.close()
     }
   }, 120_000)
+})
+
+// ── THÂN THẬT (thầy nhờ Boss 21/09: "soi lại Bảng tin sàn 360/390 tối bằng thân thật") ──
+// Không dùng dữ liệu mẫu: dựng 264 em (tên DÀI, có chữ "Mẫu" cho rõ là giả, 6 lớp kể cả em chưa xếp lớp) trên D1 giả bằng SQLite thật, gọi ĐÚNG lệnh `/gv/bang-tin-song` của máy chủ, đọc bằng `docSan`, dựng màn trong Chromium.
+// Dữ liệu thật có dao động giá rộng (đầu ngày ít câu) và chip chênh dài hơn mẫu — hai lỗi chỉ lộ ở đây: nhãn trục % đè nhau, chữ "10 phút qua" bị tia nhỏ đè (360/390 px).
+const HO = ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Huỳnh', 'Vũ', 'Đặng', 'Bùi', 'Đỗ']
+const DEM = ['Thị Thanh', 'Văn Minh', 'Hoàng Bảo', 'Ngọc Khánh', 'Đức Anh', 'Thị Ngọc', 'Gia', 'Quốc', 'Thị Hồng', 'Xuân']
+const TEN = ['Thảo', 'Nguyên', 'Phương', 'Khôi', 'Trang', 'Quỳnh', 'Hiếu', 'Vy', 'Linh', 'An', 'Khánh Linh', 'Bảo Ngọc']
+const LOP = ['12 - Tinh Hoa', '12 - Lớp Thường', '12 - Nhóm 10 điểm', 'Khối 10', 'Khối 11', null]
+const VN = (t: string): number => Date.parse(`${t}+07:00`)
+
+async function thanThat() {
+  xoaDemBangTinSong()
+  vi.useFakeTimers({ toFake: ['Date'] })
+  vi.setSystemTime(VN('2026-09-22T10:00:00'))
+  try {
+    const d = taoD1That()
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bang_tin_tu',?,'x')").run('2026-09-21T05:00:00.000Z')
+    const ins = d.sql.prepare('INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
+    let n = 0
+    for (let i = 0; i < 264; i++) {
+      const sbd = `E${1000 + i}`
+      const lop = LOP[i % 6]
+      d.sql.prepare('INSERT OR REPLACE INTO hoc_sinh(sbd,ho_ten,lop,ten_lop,trang_thai,mat_khau,cap_nhat_luc) VALUES(?,?,?,?,NULL,?,?)')
+        .run(sbd, `${HO[i % 10]} ${DEM[(i * 3) % 10]} Mẫu ${TEN[(i * 7) % 12]}`, lop ? (lop.startsWith('Khối') ? lop.slice(5) : '12') : '', lop && !lop.startsWith('Khối') ? lop : null, 'mk', 'x')
+      if (i % 5 === 0) {
+        for (let k = 0; k < 6 + (i % 25); k++) {
+          n++
+          const luc = VN('2026-09-22T09:00:00') + (i * 37 + k * 90) * 1000
+          ins.run(`k${n}`, sbd, `Q${n}`, 'on_lai', 'm', 1, (i + k) % 4 ? 1 : 0, 30, new Date(luc).toISOString(), '2026-09-22', k % 3 ? 'D.AMIN' : 'D.ESTE')
+        }
+      }
+    }
+    const r = (await goiWorker(worker, d.env, '/gv/bang-tin-song', {}, true)) as Record<string, unknown>
+    const du = docSan(r, Date.now())
+    expect(du, 'bộ đọc từ chối thân thật của máy chủ').not.toBeNull()
+    return du!
+  } finally {
+    vi.useRealTimers()
+  }
+}
+
+describe('Bảng tin sàn bằng THÂN THẬT của máy chủ (264 em, tên dài) — 360 / 390 / 1280, máy sáng + bấm Tối', () => {
+  for (const [rong, cao] of [[360, 800], [390, 844], [1280, 800]] as const) {
+    it(`${rong}×${cao}: 0 cặp chữ giao nhau (kể cả chữ × tia nhỏ), 0 chữ bị cắt`, async () => {
+      const du = await thanThat()
+      const ctx = await trinhDuyet.newContext({ viewport: { width: rong, height: cao }, colorScheme: 'light' })
+      const trang = await ctx.newPage()
+      await trang.addInitScript('window.__name = window.__name || ((f) => f)')
+      await trang.addInitScript(caiBatChuCanvas)
+      await trang.addInitScript((x) => { (window as unknown as { __DU: unknown }).__DU = x }, du)
+      await trang.goto(`${goc}/tests/_trinh-duyet-bts/bts.html?vo=0`, { waitUntil: 'networkidle' })
+      await trang.waitForFunction(() => document.querySelector('[data-kieu]')?.getAttribute('data-kieu') !== 'cho', undefined, { timeout: 60_000 })
+      await trang.getByRole('button', { name: 'Tối' }).click()
+      await trang.waitForTimeout(1500)
+      const k = await trang.evaluate(doChongChu)
+      expect(k.soChuDom).toBeGreaterThan(60)
+      expect(k.soChuCanvas).toBeGreaterThan(8)
+      const loi = [...new Set([...k.giao.map((x) => `GIAO NHAU ${x}`), ...k.cat.map((x) => `BỊ CẮT ${x}`)])]
+      expect(loi, loi.join('\n')).toEqual([])
+      // chip chênh dài nhất có thể (hàng chục điểm %) cũng không đè tia nhỏ
+      await trang.evaluate(() => { document.querySelectorAll('.bts-lech').forEach((e) => { const t = e.textContent ?? ''; if (t.includes('%') || t.includes('điểm')) e.textContent = '+12,7 điểm %' }) })
+      await trang.waitForTimeout(200)
+      const dai = await trang.evaluate(doChongChu)
+      const loiDai = [...new Set(dai.giao.filter((x) => x.startsWith('TIA')))]
+      expect(loiDai, `chip dài: ${loiDai.join('\n')}`).toEqual([])
+      await ctx.close()
+    }, 180_000)
+  }
 })
