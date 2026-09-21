@@ -12,6 +12,7 @@ import {
   type EmCham,
 } from '../server/src/thi-dua-hom-nay'
 import { taoD1That, type D1That } from './_d1-that'
+import { docThuBan } from '../src/lib/thi-dua'
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({
   ...(await orig<typeof import('../server/src/game-v2-auth')>()),
@@ -358,13 +359,12 @@ describe('lớp theo ten_lop, theo khối khi NULL', () => {
     expect(await goi(d, 'K5')).toMatchObject({ lop: '11', siSo: 1, daHoc: 1, cuaEm: { hang: 1, soCau: 20 } })
     expect(await goi(d, 'KK')).toMatchObject({ ok: true, lop: '', siSo: 0 }) // đã khoá: không thuộc lớp nào
   })
-  it('tài khoản thử tự xem: không thuộc lớp nào ⇒ ok, siSo 0, top rỗng (app ẩn thẻ); SBD_THU_NGHIEM khớp SBD_THU của Bảng tin', async () => {
+  it('tài khoản thử KHÔNG có lớp nào trong hệ thống ⇒ ok, siSo 0, top rỗng (app ẩn thẻ), cheDoXemThu; SBD_THU_NGHIEM khớp SBD_THU của Bảng tin', async () => {
     const d = taoD1That()
     themEm(d, SBD_THU_NGHIEM, 'Tài khoản thử')
-    themEm(d, 'K1', 'Trần Tinh Một')
     await lamN(d, SBD_THU_NGHIEM, 5, '08:00')
     expect(await goi(d, SBD_THU_NGHIEM)).toEqual({
-      ok: true, lop: '', siSo: 0, daHoc: 0, top: [], cuaEm: { hang: null, soCau: 0, themDeVuot: null, nhomCuoi: false }, capNhatLuc: new Date(NOW).toISOString(),
+      ok: true, lop: '', siSo: 0, daHoc: 0, top: [], cuaEm: { hang: null, soCau: 0, themDeVuot: null, nhomCuoi: false }, capNhatLuc: new Date(NOW).toISOString(), cheDoXemThu: true,
     })
     expect(SBD_THU_NGHIEM).toBe(SBD_THU)
   })
@@ -412,18 +412,118 @@ describe('top ≤ 3, riêng tư, thần thú', () => {
     const r = await goi(d, 'HS7102')
     expect((r.top as { laEm: boolean }[]).map((x) => x.laEm)).toEqual([false, true, false])
   })
-  it('thu = { ma, cap } đọc thật từ hồ sơ thần thú; chưa có hồ sơ / chưa chọn thú ⇒ null; mã cũ đổi theo ALIASES; cấp kẹp 1–120', async () => {
+  it('thu = { ma, pet, cap } (pet = ma: đúng tên trường màn học sinh đọc) đọc thật từ hồ sơ thần thú; chưa có hồ sơ / chưa chọn thú ⇒ null; mã cũ đổi theo ALIASES; cấp kẹp 1–120', async () => {
     const d = await lopMau()
     hoSoThu(d, 'HS7101', { pet: 'lua_phuong', cap: 6 })
     hoSoThu(d, 'HS7103', { pet: 'dat_quy', cap: 5, choice: true }) // đang ở màn chọn thú ⇒ chưa chọn
     const r = await goi(d, 'HS7108')
-    expect((r.top as { thu: unknown }[]).map((x) => x.thu)).toEqual([{ ma: 'lua_phuong', cap: 6 }, null, null]) // B chưa có hồ sơ
+    expect((r.top as { thu: unknown }[]).map((x) => x.thu)).toEqual([{ ma: 'lua_phuong', pet: 'lua_phuong', cap: 6 }, null, null]) // B chưa có hồ sơ
     hoSoThu(d, 'HS7102', { pet: 'hoa_long', cap: 500 })
     hoSoThu(d, 'HS7103', { pet: 'sangy_cu', cap: 0 })
     const r2 = await goi(d, 'HS7108')
-    expect((r2.top as { thu: unknown }[]).map((x) => x.thu)).toEqual([{ ma: 'lua_phuong', cap: 6 }, { ma: 'lua_phuong', cap: 120 }, { ma: 'sangy_cu', cap: 1 }])
+    expect((r2.top as { thu: unknown }[]).map((x) => x.thu)).toEqual([{ ma: 'lua_phuong', pet: 'lua_phuong', cap: 6 }, { ma: 'lua_phuong', pet: 'lua_phuong', cap: 120 }, { ma: 'sangy_cu', pet: 'sangy_cu', cap: 1 }])
     hoSoThu(d, 'HS7101', { pet: 'thu_la_hoac_khong_co' })
     expect(((await goi(d, 'HS7108')).top as { thu: unknown }[])[0]!.thu).toBeNull() // loài lạ ⇒ không bịa
+  })
+})
+
+describe('XEM THỬ — tài khoản thử (12121212) thấy bảng của một lớp thật với tư cách người xem', () => {
+  const cauHinhLop = (d: D1That, lop: string) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('thi_dua_lop_xem_thu',?,'x')").run(lop)
+  const themLopKhac = async (d: D1That) => {
+    themEm(d, 'TH1', 'Vương Tinh Hoa Một', '12', '12 - Tinh Hoa')
+    themEm(d, 'TH2', 'Vương Tinh Hoa Hai', '12', '12 - Tinh Hoa')
+    await lamN(d, 'TH1', 1, '08:00')
+  }
+  const ap = (r: Record<string, unknown>) => r as { lop: string; siSo: number; daHoc: number; top: { laEm: boolean; ten: string; hang: number; thu: unknown }[]; cuaEm: Record<string, any>; cheDoXemThu?: boolean }
+
+  it('tài khoản thử 0 câu: thấy lớp có NHIỀU em đã học nhất (siSo 9, daHoc 7, top 3), KHÔNG tính chính nó; hang null; themDeVuot như em 0 câu; cheDoXemThu', async () => {
+    const d = await lopMau()
+    await themLopKhac(d) // lớp "Tinh Hoa": 1/2 em học — ít hơn lớp Thường (7)
+    themEm(d, SBD_THU_NGHIEM, 'Đỗ Đại Học')
+    const r = ap(await goi(d, SBD_THU_NGHIEM))
+    expect(r).toMatchObject({ ok: true, lop: '12 - Lớp Thường', siSo: 9, daHoc: 7, cheDoXemThu: true })
+    expect(r.top.map((x) => x.hang)).toEqual([1, 2, 3])
+    expect(r.top.every((x) => x.laEm === false)).toBe(true)
+    expect(r.cuaEm).toEqual({ hang: null, soCau: 0, themDeVuot: { soCau: 3, soBan: 2 }, nhomCuoi: true, thoatNhomCuoi: { soCau: expect.any(Number) } }) // bạn cuối có 2 câu (F, G) ⇒ cần 3 để vượt; 7/9 ≥ 60 %
+    expect(JSON.stringify(r)).not.toContain(SBD_THU_NGHIEM)
+  })
+
+  it('tài khoản thử đã làm 5 câu: soCau THẬT; hạng GIẢ ĐỊNH số nguyên trong 1..siSo (màn học sinh bỏ ô nếu hạng ngoài khoảng); top và sĩ số KHÔNG đổi vì có nó', async () => {
+    const d = await lopMau()
+    const truoc = ap(await goi(d, 'HS7108'))
+    themEm(d, SBD_THU_NGHIEM, 'Đỗ Đại Học')
+    await lamN(d, SBD_THU_NGHIEM, 5, '14:00')
+    const r = ap(await goi(d, SBD_THU_NGHIEM))
+    expect(r.cuaEm.soCau).toBe(5)
+    expect(r.cuaEm.hang).toBe(6) // A8, B5 đạt, C5 chuỗi 3, E5 (09:04), D5 (10:00), rồi tài khoản thử 5 câu (14:04) ⇒ hạng giả định 6
+    expect(r.cuaEm.hang).toBeGreaterThanOrEqual(1)
+    expect(r.cuaEm.hang).toBeLessThanOrEqual(r.siSo)
+    expect(r).toMatchObject({ siSo: truoc.siSo, daHoc: truoc.daHoc, cheDoXemThu: true })
+    expect(r.top.map((x) => x.ten)).toEqual(truoc.top.map((x) => x.ten))
+    expect(r.top.every((x) => x.laEm === false)).toBe(true)
+    expect(r.cuaEm.themDeVuot).toEqual({ soCau: 1, soBan: 4 }) // nhóm ngay trên = B, C, E, D (cùng 5 câu nhưng hơn ở tiêu chí sau) ⇒ thêm 1 câu là vượt cả 4
+  })
+
+  it('EM THẬT của lớp KHÔNG thấy tài khoản thử: sĩ số, đã học, top, hạng như khi nó không tồn tại; thân của em thật không có cheDoXemThu', async () => {
+    const d = await lopMau()
+    const truoc = await goi(d, 'HS7108')
+    themEm(d, SBD_THU_NGHIEM, 'Đỗ Đại Học')
+    await lamN(d, SBD_THU_NGHIEM, 20, '06:00') // nhiều câu nhất lớp — nếu bị tính thì top/hạng đổi
+    expect(await goi(d, 'HS7108')).toEqual(truoc)
+    expect('cheDoXemThu' in (await goi(d, 'HS7108'))).toBe(false)
+    expect(((await goi(d, 'HS7101')).cuaEm as { hang: number }).hang).toBe(1)
+    const ds = JSON.stringify(await goi(d, 'HS7108'))
+    expect(ds).not.toContain('Đỗ Đại Học')
+  })
+
+  it('cau_hinh.thi_dua_lop_xem_thu chọn lớp; giá trị không phải lớp có thật ⇒ bỏ qua, lấy lớp nhiều em học nhất; không có ai học ⇒ lớp đông nhất', async () => {
+    const d = await lopMau()
+    await themLopKhac(d)
+    themEm(d, SBD_THU_NGHIEM, 'Đỗ Đại Học')
+    cauHinhLop(d, '12 - Tinh Hoa')
+    expect(ap(await goi(d, SBD_THU_NGHIEM))).toMatchObject({ lop: '12 - Tinh Hoa', siSo: 2, daHoc: 1 })
+    cauHinhLop(d, 'LỚP KHÔNG CÓ')
+    expect(ap(await goi(d, SBD_THU_NGHIEM)).lop).toBe('12 - Lớp Thường')
+    const d2 = taoD1That()
+    themEm(d2, 'X1', 'Lê Một')
+    themEm(d2, 'Y1', 'Lê Hai', '12', '12 - Lớp Y'); themEm(d2, 'Y2', 'Lê Ba', '12', '12 - Lớp Y')
+    themEm(d2, SBD_THU_NGHIEM, 'Đỗ Đại Học')
+    expect(ap(await goi(d2, SBD_THU_NGHIEM))).toMatchObject({ lop: '12 - Lớp Y', siSo: 2, daHoc: 0 })
+  })
+
+  it('hạng giả định luôn kẹp ≤ sĩ số (lớp 1 em có 3 câu, tài khoản thử 1 câu ⇒ hạng giả định 2 nhưng trả 1)', async () => {
+    const d = taoD1That()
+    themEm(d, 'M1', 'Trần Một')
+    await lamN(d, 'M1', 3, '08:00')
+    themEm(d, SBD_THU_NGHIEM, 'Đỗ Đại Học')
+    await lamN(d, SBD_THU_NGHIEM, 1, '09:00')
+    const r = ap(await goi(d, SBD_THU_NGHIEM))
+    expect(r).toMatchObject({ siSo: 1, daHoc: 1 })
+    expect(r.cuaEm.hang).toBe(1)
+    expect(r.cuaEm.soCau).toBe(1)
+  })
+
+  it('top[].thu có `pet` = `ma` và màn học sinh đọc được: docThuBan(thu).chiSo !== null khi bạn đã chọn thú; chưa chọn ⇒ null (không bịa)', async () => {
+    const d = await lopMau()
+    hoSoThu(d, 'HS7101', { pet: 'lua_phuong', cap: 6 })
+    const r = ap(await goi(d, 'HS7108'))
+    const thu = r.top[0]!.thu as { ma: string; pet: string; cap: number }
+    expect(thu).toEqual({ ma: 'lua_phuong', pet: 'lua_phuong', cap: 6 })
+    expect(docThuBan(thu).chiSo).not.toBeNull()
+    expect(docThuBan(thu).cap).toBe(6)
+    expect(docThuBan(r.top[1]!.thu).chiSo).toBeNull() // B chưa chọn thú
+  })
+
+  it('không ghi; ≤ 6 truy vấn (xếp hạng 3 + cấu hình + em đã học cả trường... + thần thú) cho tài khoản thử', async () => {
+    const d = await lopMau()
+    themEm(d, SBD_THU_NGHIEM, 'Đỗ Đại Học')
+    const ghi = dungGhi(d)
+    const dem: string[] = []
+    const goc = d.env.DB.prepare.bind(d.env.DB)
+    d.env.DB.prepare = ((q: string) => { dem.push(q); return goc(q) }) as typeof d.env.DB.prepare
+    await goi(d, SBD_THU_NGHIEM)
+    expect(ghi).toEqual([])
+    expect(dem.length, dem.join('\n')).toBeLessThanOrEqual(6)
   })
 })
 
