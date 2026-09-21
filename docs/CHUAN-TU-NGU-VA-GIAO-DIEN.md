@@ -48,3 +48,13 @@ Mỗi phiên rà làn của mình, lập BẢNG trong `docs/ra-soat-tu-ngu-2109-
 8. **Màu**: chỉ token M3 (`npm run check:mau`); màu không phải kênh thông tin duy nhất (kèm chữ/biểu tượng).
 9. **Hành động không hoàn tác được**: một bước xác nhận nói THẬT hậu quả; kết quả báo đúng theo máy chủ.
 10. **Bằng chứng**: ảnh Chromium thật 390 + 1440, sáng + tối; đếm lỗi tương phản/đích chạm/tràn = 0 ghi vào sổ việc.
+
+### PHẦN B (tiếp) · Các mục Boss chắt lọc thêm sau khi ĐỌC THAM KHẢO bộ "Web Interface Guidelines" (Vercel) và "taste-skill" — diễn đạt lại cho app mình, KHÔNG cài skill ngoài, KHÔNG tự tải luật từ mạng mỗi lần soát
+11. **Đúng thẻ HTML**: hành động = `<button>`, điều hướng = `<a>`; không `<div onClick>`. Nút chỉ có biểu tượng phải có `aria-label`. Không chặn phóng to trang (`user-scalable=no` bị cấm).
+12. **Focus**: không xoá viền focus mà không có thay thế; dùng `:focus-visible`; thanh dính trên/dưới (thanh đáy, nút nổi "Vào thi", "Mở ca") KHÔNG được che phần tử đang focus hay che nút chính của thẻ.
+13. **Ô nhập**: luôn có nhãn; `type`/`inputMode` đúng (số báo danh, mã ca, ngày giờ ⇒ bàn phím số); không chặn dán; lỗi hiện NGAY CẠNH ô và đưa con trỏ tới ô lỗi; rời màn khi còn nháp chưa lưu thì cảnh báo (phiếu đã có — giữ).
+14. **Chữ dài không vỡ**: phần tử con của flex có `min-width: 0`; tên em/tên dạng dùng cắt dòng có chủ đích (`line-clamp`) và xem đủ được khi bấm; dấu ba chấm là ký tự "…".
+15. **Hoạt ảnh**: chỉ `transform`/`opacity`, cấm `transition: all`; hiệu ứng game dừng được và tắt sạch khi `prefers-reduced-motion`.
+16. **Danh sách dài** (> 50 dòng: lớp 260 em, dòng thời gian toàn cảnh): phân trang hoặc `content-visibility: auto`; ảnh dưới màn đầu `loading="lazy"`, ảnh có `width`/`height`.
+17. **Chạm trên điện thoại**: `touch-action: manipulation` cho nút; tấm phủ/ngăn kéo có `overscroll-behavior: contain`; vùng tai thỏ dùng `env(safe-area-inset-*)`; `color-scheme` khớp sáng/tối để ô nhập và thanh cuộn không lệch màu.
+18. **Gu thiết kế (chống "giao diện đại trà")**: mỗi màn có MỘT điểm nhấn thị giác (con số lớn, thanh tiến độ, hình thần thú) — không rải đều; khoảng trắng rộng rãi hơn là nhồi thẻ; tối đa 2 cỡ chữ tiêu đề + 1 cỡ thân + 1 cỡ chú thích; màu nhấn chỉ cho việc chính; mật độ thông tin: học sinh THƯA, thầy ĐẶC vừa phải; nhất quán với bộ nhận diện M3 + logo Avogadro đã chốt — KHÔNG vay nhận diện của thương hiệu khác.
