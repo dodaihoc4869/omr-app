@@ -49,7 +49,7 @@ describe('MỘT màn, MỘT nút — cây màn phụ huynh thật', () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="hom-nay"]')).toBeTruthy())
     await waitFor(() => expect(container.textContent).toContain('Hôm nay còn 3 lượt giao'))
-    const chinh = container.querySelectorAll('.mt-nut--chinh')
+    const chinh = container.querySelectorAll('.phm-nut--chinh')
     expect(chinh).toHaveLength(1)
     expect(chinh[0]!.textContent).toContain('Giao thêm bài cho con')
     const ten = (e: Element) => `${e.textContent} ${e.getAttribute('aria-label') ?? ''} ${e.getAttribute('title') ?? ''}`
@@ -83,7 +83,7 @@ describe('MỘT màn, MỘT nút — cây màn phụ huynh thật', () => {
       return e as HTMLElement
     })
     expect(chan.querySelector('span')!.textContent).toBe(chuBanApp())
-    expect(doc('src/components/ph-moi/ph-moi-them.css')).toMatch(/\.mt-chan__nut \{[^}]*min-height: 48px/)
+    expect(doc('src/components/ph-moi/ph-moi-them.css')).toMatch(/\.phm-chan__nut \{[^}]*min-height: 48px/)
     fireEvent.click(screen.getByRole('button', { name: 'Đổi số báo danh' }))
     await screen.findByRole('button', { name: 'Vào xem kết quả của con' })
     expect(localStorage.getItem('omr_ph_sbd')).toBeNull()

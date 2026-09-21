@@ -36,12 +36,12 @@ export function gioHocGanNhat(pm: PhMoi): string {
 function VongDat({ dat }: { dat: boolean }) {
   const C = 2 * Math.PI * 52
   return (
-    <div className="mt-vong" role="img" aria-label={dat ? 'Nhiệm vụ hôm nay: đã đạt' : 'Nhiệm vụ hôm nay: chưa đạt'}>
+    <div className="phm-vong" role="img" aria-label={dat ? 'Nhiệm vụ hôm nay: đã đạt' : 'Nhiệm vụ hôm nay: chưa đạt'}>
       <svg viewBox="0 0 120 120" aria-hidden="true">
         <circle className="nen" cx="60" cy="60" r="52" />
         {dat && <circle className="dat" cx="60" cy="60" r="52" strokeDasharray={`${(C - 7).toFixed(1)} 7`} strokeDashoffset="-3.5" />}
       </svg>
-      <div className="mt-vong__giua">{dat ? <Check className="mt-i" aria-hidden="true" /> : <Clock className="mt-i" aria-hidden="true" />}</div>
+      <div className="phm-vong__giua">{dat ? <Check className="phm-i" aria-hidden="true" /> : <Clock className="phm-i" aria-hidden="true" />}</div>
     </div>
   )
 }
@@ -62,20 +62,20 @@ function TheHomNay({ pm, now, onMo }: { pm: PhMoi | null; now: number; onMo: () 
   const tieuDe = dat === true ? 'Con đã đạt nhiệm vụ hôm nay' : dat === false ? 'Con chưa đạt nhiệm vụ hôm nay' : coHoc ? 'Con đã học hôm nay' : 'Hôm nay con chưa học'
   const phu = coHoc ? (gan ? `Học gần nhất lúc ${gan}` : '') : 'Anh/chị có thể giao thêm bài cho con.'
   return (
-    <button type="button" className="mt-hn" data-vung="hom-nay" onClick={onMo} aria-label={`Hôm nay của con: ${tieuDe}.${o.length ? ` ${o.map((x) => `${x.b}${x.don ? ' phần trăm' : ''} ${x.n} ${x.n2}`).join(', ')}.` : ''} Xem mọi thứ về con`}>
-      <div className="mt-hn__dau">
+    <button type="button" className="phm-hn" data-vung="hom-nay" onClick={onMo} aria-label={`Hôm nay của con: ${tieuDe}.${o.length ? ` ${o.map((x) => `${x.b}${x.don ? ' phần trăm' : ''} ${x.n} ${x.n2}`).join(', ')}.` : ''} Xem mọi thứ về con`}>
+      <div className="phm-hn__dau">
         <h2>Hôm nay của con</h2>
         {ngay && <span>{ngay}</span>}
       </div>
-      <div className="mt-hn__dat">
+      <div className="phm-hn__dat">
         {dat !== null && <VongDat dat={dat} />}
         <div>
           <h3>{tieuDe}</h3>
-          {phu && <p className="mt-so">{phu}</p>}
+          {phu && <p className="phm-so">{phu}</p>}
         </div>
       </div>
       {coHoc && o.length > 0 && (
-        <ul className="mt-hn__so" style={{ gridTemplateColumns: `repeat(${o.length}, minmax(0, 1fr))` }}>
+        <ul className="phm-hn__so" style={{ gridTemplateColumns: `repeat(${o.length}, minmax(0, 1fr))` }}>
           {o.map((x) => (
             <li key={x.n2}>
               <b>
@@ -91,11 +91,11 @@ function TheHomNay({ pm, now, onMo }: { pm: PhMoi | null; now: number; onMo: () 
           ))}
         </ul>
       )}
-      <div className="mt-hn__xem">
+      <div className="phm-hn__xem">
         <span>
           Xem mọi thứ về con<small>Từng câu, điểm mạnh, dạng còn vấp</small>
         </span>
-        <ChevronRight className="mt-i mt-i--l" aria-hidden="true" />
+        <ChevronRight className="phm-i phm-i--l" aria-hidden="true" />
       </div>
     </button>
   )
@@ -109,25 +109,25 @@ function TheCaNho({ pm, onMo }: { pm: PhMoi; onMo: () => void }) {
   const tong = kq?.tong ?? null
   const doi = ca.truoc?.doi ?? null
   return (
-    <button type="button" className="mt-the mt-ca-nho" data-vung="ca-gan-nhat" onClick={onMo} aria-label={`Ca kiểm tra gần nhất của con: ${ca.tenCa}. ${nop}. ${tong !== null ? `Điểm ${soVn(tong)} trên 10.` : chuCongBoCa(ca)} Xem trong bảng`}>
+    <button type="button" className="phm-the phm-ca-nho" data-vung="ca-gan-nhat" onClick={onMo} aria-label={`Ca kiểm tra gần nhất của con: ${ca.tenCa}. ${nop}. ${tong !== null ? `Điểm ${soVn(tong)} trên 10.` : chuCongBoCa(ca)} Xem trong bảng`}>
       <h2>Ca kiểm tra gần nhất của con</h2>
-      <p className="mt-ca__ten">{ca.tenCa}</p>
-      <p className="mt-ca__phu">{nop}</p>
+      <p className="phm-ca__ten">{ca.tenCa}</p>
+      <p className="phm-ca__phu">{nop}</p>
       {tong !== null ? (
-        <div className="mt-ca-nho__than">
-          <p className="mt-ca__diem">
+        <div className="phm-ca-nho__than">
+          <p className="phm-ca__diem">
             <b>{soVn(tong)}</b>
             <span>/10 điểm</span>
           </p>
           {doi !== null && ca.truoc?.tong != null && (
-            <p className="mt-ca-nho__hon">
+            <p className="phm-ca-nho__hon">
               <b>{doi > 0 ? `Hơn ${soVn(doi)} điểm` : doi < 0 ? `Kém ${soVn(-doi)} điểm` : 'Bằng lần trước'}</b>
               <small>so với lần trước của chính con ({soVn(ca.truoc.tong)} điểm)</small>
             </p>
           )}
         </div>
       ) : (
-        <p className="mt-ca__phu" data-vung="chua-cong-bo">
+        <p className="phm-ca__phu" data-vung="chua-cong-bo">
           Thầy chưa công bố điểm. {chuCongBoCa(ca)}
         </p>
       )}
@@ -139,13 +139,13 @@ export default function ManChinh({ v, tenCon, lop, now, canhBao, onCanhBaoDaXem,
   const pm = v.pm
   const ten = pm?.hoTen || tenCon
   return (
-    <div className="m3 mt" data-vung="man-chinh-ph">
-      <main className="mt-nha">
-        <header className="mt-chao">
+    <div className="m3 phm" data-vung="man-chinh-ph">
+      <main className="phm-nha">
+        <header className="phm-chao">
           <small>Thầy Đỗ Đại Học · dành cho phụ huynh</small>
           <h1>Chào anh/chị</h1>
           {ten && (
-            <span className="mt-chao__anh" aria-hidden="true">
+            <span className="phm-chao__anh" aria-hidden="true">
               {chuCaiTen(ten)}
             </span>
           )}
@@ -164,17 +164,17 @@ export default function ManChinh({ v, tenCon, lop, now, canhBao, onCanhBaoDaXem,
         <TheCanhBaoThay vaiTro="phuhuynh" now={now} canhBao={canhBao} coTheLam={() => false} onLam={() => {}} onDaXem={onCanhBaoDaXem} />
 
         {v.trangThai === 'tai' && (
-          <div className="mt-xuong" role="status" aria-label="Đang tải dữ liệu của con" data-vung="dang-tai">
+          <div className="phm-xuong" role="status" aria-label="Đang tải dữ liệu của con" data-vung="dang-tai">
             <i />
             <i />
-            <span className="mt-sr">Đang tải dữ liệu của con…</span>
+            <span className="phm-sr">Đang tải dữ liệu của con…</span>
           </div>
         )}
         {v.trangThai === 'loi' && (
-          <div className="mt-loi" role="alert" data-vung="loi-tai">
+          <div className="phm-loi" role="alert" data-vung="loi-tai">
             <p>{v.chuLoi}</p>
-            <button type="button" className="mt-nut mt-nut--chu" onClick={v.thuLai} data-vung="thu-lai">
-              <RefreshCw className="mt-i mt-i--s" aria-hidden="true" />
+            <button type="button" className="phm-nut phm-nut--chu" onClick={v.thuLai} data-vung="thu-lai">
+              <RefreshCw className="phm-i phm-i--s" aria-hidden="true" />
               Thử lại
             </button>
           </div>
@@ -186,8 +186,8 @@ export default function ManChinh({ v, tenCon, lop, now, canhBao, onCanhBaoDaXem,
           </>
         )}
 
-        <footer className="mt-chan" data-vung="chan-ph">
-          <button type="button" className="mt-chan__nut" onClick={onDoiSbd}>
+        <footer className="phm-chan" data-vung="chan-ph">
+          <button type="button" className="phm-chan__nut" onClick={onDoiSbd}>
             Đổi số báo danh
           </button>
           <span>{chuBanApp()}</span>

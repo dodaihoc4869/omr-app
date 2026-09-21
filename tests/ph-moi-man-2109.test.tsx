@@ -47,7 +47,7 @@ describe('ManChinh — màn chính', () => {
     expect(hn.textContent).toContain('Thứ Hai 21/09')
     expect(hn.textContent).toContain('Con đã đạt nhiệm vụ hôm nay')
     expect(hn.textContent).toContain('Học gần nhất lúc 20:47')
-    const so = [...hn.querySelectorAll('.mt-hn__so li')].map((l) => l.textContent)
+    const so = [...hn.querySelectorAll('.phm-hn__so li')].map((l) => l.textContent)
     expect(so).toEqual(['38câuđã làm', '79%câuđúng', '52phúthọc', '6ngàyhọc đều'])
     expect(hn.textContent).toContain('Xem mọi thứ về con')
     const ca = container.querySelector('[data-vung="ca-gan-nhat"]') as HTMLElement
@@ -83,8 +83,8 @@ describe('ManChinh — màn chính', () => {
     const { container } = ve(view(pmOf(PH_TRONG)))
     expect(container.textContent).toContain('Hôm nay con chưa học')
     expect(container.textContent).toContain('Anh/chị có thể giao thêm bài cho con.')
-    expect(container.querySelector('.mt-hn__so')).toBeNull()
-    expect(container.querySelector('.mt-vong')).toBeNull()
+    expect(container.querySelector('.phm-hn__so')).toBeNull()
+    expect(container.querySelector('.phm-vong')).toBeNull()
     expect(container.querySelector('[data-vung="ca-gan-nhat"]')).toBeNull()
   })
 
@@ -93,7 +93,7 @@ describe('ManChinh — màn chính', () => {
     raw.homNay.tongQuan = { soCau: 12, soDung: 6, phutHoc: 20, datNhiemVu: false, chuoiNgayHoc: 0 }
     const { container } = ve(view(pmOf(raw)))
     expect(container.textContent).toContain('Con chưa đạt nhiệm vụ hôm nay')
-    expect([...container.querySelectorAll('.mt-hn__so li')].map((l) => l.textContent)).toEqual(['12câuđã làm', '50%câuđúng', '20phúthọc']) // chuỗi 0 ⇒ không ô ngày
+    expect([...container.querySelectorAll('.phm-hn__so li')].map((l) => l.textContent)).toEqual(['12câuđã làm', '50%câuđúng', '20phúthọc']) // chuỗi 0 ⇒ không ô ngày
     cleanup()
     raw.homNay.tongQuan = { soCau: 0, phutHoc: 0 }
     expect(ve(view(pmOf(raw))).container.textContent).toContain('Hôm nay con chưa học')
@@ -112,17 +112,17 @@ describe('ManChinh — màn chính', () => {
     expect(screen.getByRole('button', { name: 'Giao thêm bài cho con' })).toBeTruthy()
   })
 
-  it('đúng MỘT nút hành động chính (.mt-nut--chinh = "Giao thêm bài cho con"); dòng lượt "Hôm nay còn 2 lượt giao"; hết lượt ⇒ nút mờ; không chữ game; không emoji', () => {
+  it('đúng MỘT nút hành động chính (.phm-nut--chinh = "Giao thêm bài cho con"); dòng lượt "Hôm nay còn 2 lượt giao"; hết lượt ⇒ nút mờ; không chữ game; không emoji', () => {
     const { container } = ve(view(pmOf()))
-    expect(container.querySelectorAll('.mt-nut--chinh')).toHaveLength(1)
-    expect(container.querySelector('.mt-nut--chinh')!.textContent).toBe('Giao thêm bài cho con')
+    expect(container.querySelectorAll('.phm-nut--chinh')).toHaveLength(1)
+    expect(container.querySelector('.phm-nut--chinh')!.textContent).toBe('Giao thêm bài cho con')
     expect(container.querySelector('[data-vung="luot-giao"]')!.textContent).toBe('Hôm nay còn 2 lượt giao · A.I Đỗ Đại Học chọn câu hợp với con')
     expect(container.textContent).not.toMatch(CAM_GAME)
     expect(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(container.textContent || '')).toBe(false)
     cleanup()
     const het = ve(view(pmOf()), { giaoThem: giaoThemMau({ conLai: 0 }) })
-    expect((het.container.querySelector('.mt-nut--chinh') as HTMLButtonElement).disabled).toBe(true)
-    fireEvent.click(het.container.querySelector('.mt-nut--chinh')!)
+    expect((het.container.querySelector('.phm-nut--chinh') as HTMLButtonElement).disabled).toBe(true)
+    fireEvent.click(het.container.querySelector('.phm-nut--chinh')!)
   })
 
   it('bấm nút ⇒ giao(); thẻ kết quả (đã giao / lỗi thật) hiện NGAY TRÊN nút với role đúng', () => {
@@ -135,7 +135,7 @@ describe('ManChinh — màn chính', () => {
     const t = container.querySelector('[data-vung="the-giao-them"]') as HTMLElement
     expect(t.getAttribute('role')).toBe('alert')
     expect(t.textContent).toContain('Cần liên kết riêng của con.')
-    expect(t.compareDocumentPosition(container.querySelector('.mt-nut--chinh')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(t.compareDocumentPosition(container.querySelector('.phm-nut--chinh')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('dải cảnh báo của thầy: THỤ ĐỘNG (chỉ đọc + "Đã xem"), không nút "Làm ngay"', () => {
@@ -153,11 +153,11 @@ describe('BangMoiThu — chín khối, ẩn khối vắng', () => {
 
   it('đủ chín khối theo THỨ TỰ mẫu + mục lục 9 chip ("Từng câu (38)") + tiêu đề "Mọi thứ về con" + tên con/lớp; MỘT nút chính; không chữ game', () => {
     const { container } = bang()
-    expect([...container.querySelectorAll('.mt-muc')].map((x) => x.id)).toEqual(['tong-quan', 'dong-thoi-gian', 'ca-kiem-tra', 'manh-yeu', 'tung-cau', 'btvn', 'lich-on', 'nhip-14-ngay', 'loi-ai'])
-    expect([...container.querySelectorAll('.mt-muc-luc a')].map((a) => a.textContent)).toEqual(['Tổng quan', 'Dòng thời gian', 'Ca kiểm tra', 'Điểm mạnh · cần luyện', 'Từng câu (38)', 'Bài tập về nhà', 'Lịch ôn lại', '14 ngày', 'Lời A.I Đỗ Đại Học'])
+    expect([...container.querySelectorAll('.phm-muc')].map((x) => x.id)).toEqual(['tong-quan', 'dong-thoi-gian', 'ca-kiem-tra', 'manh-yeu', 'tung-cau', 'btvn', 'lich-on', 'nhip-14-ngay', 'loi-ai'])
+    expect([...container.querySelectorAll('.phm-muc-luc a')].map((a) => a.textContent)).toEqual(['Tổng quan', 'Dòng thời gian', 'Ca kiểm tra', 'Điểm mạnh · cần luyện', 'Từng câu (38)', 'Bài tập về nhà', 'Lịch ôn lại', '14 ngày', 'Lời A.I Đỗ Đại Học'])
     expect(container.querySelector('h1')!.textContent).toBe('Mọi thứ về con')
-    expect(container.querySelector('.mt-tren-ten p')!.textContent).toBe('Nguyễn Minh Khôi · Lớp 12 - Tinh Hoa')
-    expect(container.querySelectorAll('.mt-nut--chinh')).toHaveLength(1)
+    expect(container.querySelector('.phm-tren-ten p')!.textContent).toBe('Nguyễn Minh Khôi · Lớp 12 - Tinh Hoa')
+    expect(container.querySelectorAll('.phm-nut--chinh')).toHaveLength(1)
     expect(container.textContent).not.toMatch(CAM_GAME)
     expect(container.textContent).not.toMatch(/xếp hạng|nắm chắc|năng lực/i)
     expect(container.querySelector('[data-vung="do-cham"]')!.textContent).toBe('Độ chăm hôm nay: hạng 9 trong 42 bạn') // được phép: không tên bạn
@@ -168,22 +168,22 @@ describe('BangMoiThu — chín khối, ẩn khối vắng', () => {
     const t = container.querySelector('#tong-quan') as HTMLElement
     expect(t.textContent).toContain('Thứ Hai 21/09 · cập nhật lúc 21:00')
     expect(t.textContent).toContain('Nhiệm vụ hôm nay: đã đạt')
-    expect([...t.querySelectorAll('.mt-so-o')].map((o) => o.textContent)).toEqual(['Câu đã làm38câu5 lần ngồi học', 'Câu đúng79%30 trong 38 câu', 'Thời gian học52phútdài nhất 21 phút', 'Chuỗi học đều6ngàyliên tục từ 16/09'])
-    expect(t.querySelector('.mt-hom-qua')!.textContent).toContain('Nhiều hơn 5 câu (hôm qua 33 câu)')
-    expect(t.querySelector('.mt-hom-qua')!.textContent).toContain('Câu đúng 79 % (hôm qua 76 %)')
+    expect([...t.querySelectorAll('.phm-so-o')].map((o) => o.textContent)).toEqual(['Câu đã làm38câu5 lần ngồi học', 'Câu đúng79%30 trong 38 câu', 'Thời gian học52phútdài nhất 21 phút', 'Chuỗi học đều6ngàyliên tục từ 16/09'])
+    expect(t.querySelector('.phm-hom-qua')!.textContent).toContain('Nhiều hơn 5 câu (hôm qua 33 câu)')
+    expect(t.querySelector('.phm-hom-qua')!.textContent).toContain('Câu đúng 79 % (hôm qua 76 %)')
   })
 
   it('② dòng thời gian: 5 mốc theo giờ, tóm tắt buổi, mốc bị che có khoá + lời, thanh đúng/số câu', () => {
     const { container } = bang()
     const d = container.querySelector('#dong-thoi-gian') as HTMLElement
-    expect([...d.querySelectorAll('.mt-tl__gio')].map((x) => x.textContent)).toEqual(['06:40', '17:12', '19:35', '20:10', '20:40'])
+    expect([...d.querySelectorAll('.phm-tl__gio')].map((x) => x.textContent)).toEqual(['06:40', '17:12', '19:35', '20:10', '20:40'])
     expect(d.textContent).toContain('Con ngồi học 5 lần: 1 lần buổi sáng, 1 lần buổi chiều, 3 lần buổi tối.')
     expect(d.textContent).toContain('Ôn lại 6 câu đến lịch')
     expect(d.textContent).toContain('6 câu · đúng 5 · 7 phút')
     expect(d.textContent).toContain('Bài tập về nhà “Ester – Lipid”')
-    const che = [...d.querySelectorAll('.mt-tl li')][4]!
+    const che = [...d.querySelectorAll('.phm-tl li')][4]!
     expect(che.textContent).toContain('Con đã làm · kết quả hiện sau khi con nộp bài')
-    expect(che.querySelector('.mt-thanh')).toBeNull()
+    expect(che.querySelector('.phm-thanh')).toBeNull()
     expect(che.textContent).not.toMatch(/đúng \d/)
   })
 
@@ -213,7 +213,7 @@ describe('BangMoiThu — chín khối, ẩn khối vắng', () => {
     const { container } = bang()
     const b = container.querySelector('#btvn') as HTMLElement
     expect(b.textContent).toContain('Xong 2 trong 5 chặng')
-    expect(b.querySelectorAll('.mt-chang li[data-xong]')).toHaveLength(2)
+    expect(b.querySelectorAll('.phm-chang li[data-xong]')).toHaveLength(2)
     expect(b.textContent).toContain('Hạn nộp 12:00 · Thứ Sáu 25/09/2026')
     expect(b.textContent).toContain('còn 3 ngày 15 giờ')
     expect(b.textContent).toContain('Nộp đúng hạn')
@@ -224,8 +224,8 @@ describe('BangMoiThu — chín khối, ẩn khối vắng', () => {
     expect(l.textContent).toContain('Đã khắc phục 12 trong 31 câu từng sai')
     expect(l.textContent).toContain('còn 19 câu đang trong lịch ôn')
     const n = container.querySelector('#nhip-14-ngay') as HTMLElement
-    expect(n.querySelectorAll('.mt-14 li')).toHaveLength(14)
-    expect(n.querySelector('.mt-14 li[data-nay]')!.textContent).toContain('38')
+    expect(n.querySelectorAll('.phm-14 li')).toHaveLength(14)
+    expect(n.querySelector('.phm-14 li[data-nay]')!.textContent).toContain('38')
     expect(n.textContent).toContain('Con học 11 trong 14 ngày · tổng 283 câu')
     expect(n.textContent).toContain('Con thường học từ 19:30 đến 21:00')
     const a = container.querySelector('#loi-ai') as HTMLElement
@@ -236,25 +236,25 @@ describe('BangMoiThu — chín khối, ẩn khối vắng', () => {
 
   it('KHỐI NÀO MÁY CHỦ KHÔNG TRẢ ⇒ ẨN: con mới hoàn toàn chỉ có bảng rỗng (không khối nào, không chip mục lục), nút giao vẫn còn', () => {
     const { container } = bang(pmOf(PH_TRONG))
-    expect(container.querySelectorAll('.mt-muc')).toHaveLength(0)
-    expect(container.querySelectorAll('.mt-muc-luc a')).toHaveLength(0)
-    expect(container.querySelectorAll('.mt-nut--chinh')).toHaveLength(1)
+    expect(container.querySelectorAll('.phm-muc')).toHaveLength(0)
+    expect(container.querySelectorAll('.phm-muc-luc a')).toHaveLength(0)
+    expect(container.querySelectorAll('.phm-nut--chinh')).toHaveLength(1)
     cleanup()
     const raw = nhan(PH_OK)
     for (const k of ['manhYeu', 'baiTapVeNha', 'lichOn', 'nhipHoc', 'loiBoNao', 'phuHuynhLamGi', 'doCham']) delete raw[k]
     delete raw.homNay.cau
     const r = bang(pmOf(raw)).container
-    expect([...r.querySelectorAll('.mt-muc')].map((x) => x.id)).toEqual(['tong-quan', 'dong-thoi-gian', 'ca-kiem-tra'])
+    expect([...r.querySelectorAll('.phm-muc')].map((x) => x.id)).toEqual(['tong-quan', 'dong-thoi-gian', 'ca-kiem-tra'])
     expect(r.querySelector('#tung-cau')).toBeNull()
   })
 
   it('bấm chip mục lục ⇒ aria-current đổi; nút ← gọi onVe', () => {
     const onVe = vi.fn()
     const { container } = bang(pmOf(), { onVe })
-    const chip = [...container.querySelectorAll('.mt-muc-luc a')].find((a) => a.textContent === 'Lịch ôn lại') as HTMLElement
+    const chip = [...container.querySelectorAll('.phm-muc-luc a')].find((a) => a.textContent === 'Lịch ôn lại') as HTMLElement
     fireEvent.click(chip)
     expect(chip.getAttribute('aria-current')).toBe('true')
-    expect(container.querySelector('.mt-muc-luc a[aria-current="true"]')).toBe(chip)
+    expect(container.querySelector('.phm-muc-luc a[aria-current="true"]')).toBe(chip)
     fireEvent.click(screen.getByRole('button', { name: 'Về màn chính' }))
     expect(onVe).toHaveBeenCalledTimes(1)
   })
@@ -269,14 +269,14 @@ describe('⑤ từng câu — lọc, che, nhóm, lời giải', () => {
     const pm = pmOf()
     const sai = pm.cau!.filter((c) => c.kieu === 'thuong' && c.dung === false).length
     const lau = pm.cau!.filter((c) => c.giay !== null && c.giay > NGUONG_LAM_LAU_GIAY).length
-    const loc = [...container.querySelectorAll('.mt-loc button')].map((b) => b.textContent)
+    const loc = [...container.querySelectorAll('.phm-loc button')].map((b) => b.textContent)
     expect(loc).toEqual(['Tất cả 38', `Sai ${sai}`, `Làm lâu ${lau}`, 'Chưa công bố 6'])
     expect(sai).toBeGreaterThan(0)
-    expect(container.querySelector('.mt-chu-giai')!.textContent).toContain('Làm lâu: hơn 3 phút một câu')
+    expect(container.querySelector('.phm-chu-giai')!.textContent).toContain('Làm lâu: hơn 3 phút một câu')
     fireEvent.click(screen.getByRole('button', { name: `Sai ${sai}` }))
-    expect(container.querySelector('.mt-loc button[aria-pressed="true"]')!.textContent).toBe(`Sai ${sai}`)
+    expect(container.querySelector('.phm-loc button[aria-pressed="true"]')!.textContent).toBe(`Sai ${sai}`)
     for (const g of container.querySelectorAll('[data-vung="nhom-cau"]')) {
-      const b = g.querySelector('.mt-moc__dau') as HTMLElement
+      const b = g.querySelector('.phm-moc__dau') as HTMLElement
       if (b.getAttribute('aria-expanded') === 'true') for (const r of g.querySelectorAll('[data-vung="cau"]')) expect(r.getAttribute('data-kq')).toBe('sai')
     }
     fireEvent.click(screen.getByRole('button', { name: 'Chưa công bố 6' }))
@@ -302,16 +302,16 @@ describe('⑤ từng câu — lọc, che, nhóm, lời giải', () => {
 
   it('≤ 40 câu ⇒ mở sẵn nhóm MỚI NHẤT có câu; > 40 câu ⇒ đóng hết, chưa dựng dòng nào; mở nhóm nào dựng nhóm đó; đóng lại thì gỡ', () => {
     const it40 = bang()
-    expect(it40.container.querySelectorAll('[data-vung="nhom-cau"] .mt-moc__dau[aria-expanded="true"]')).toHaveLength(1)
+    expect(it40.container.querySelectorAll('[data-vung="nhom-cau"] .phm-moc__dau[aria-expanded="true"]')).toHaveLength(1)
     it40.unmount()
     const raw = nhan(PH_OK)
     raw.homNay.cau = Array.from({ length: 60 }, (_, i) => ({ luc: H(17, 12 + Math.floor(i / 3)), nguon: 'btvn', tenDang: 'D', deRutGon: `Đề ${i}`, dung: i % 2 === 0, giay: 30, coLoiGiai: false }))
     const { container } = bang(pmOf(raw))
     expect(container.querySelectorAll('[data-vung="cau"]')).toHaveLength(0) // chưa dựng dòng nào
     const nhom = nhomTheoTen(container, /Bài tập về nhà/)
-    fireEvent.click(nhom.querySelector('.mt-moc__dau')!)
+    fireEvent.click(nhom.querySelector('.phm-moc__dau')!)
     expect(nhom.querySelectorAll('[data-vung="cau"]')).toHaveLength(60)
-    fireEvent.click(nhom.querySelector('.mt-moc__dau')!)
+    fireEvent.click(nhom.querySelector('.phm-moc__dau')!)
     expect(container.querySelectorAll('[data-vung="cau"]')).toHaveLength(0)
   })
 
@@ -319,10 +319,10 @@ describe('⑤ từng câu — lọc, che, nhóm, lời giải', () => {
     const raw = nhan(PH_OK)
     raw.homNay.cau = raw.homNay.cau.concat(Array.from({ length: 10 }, (_, i) => ({ luc: H(17, 12 + i), nguon: 'btvn', deRutGon: `Thêm ${i}`, dung: true })))
     const { container } = bang(pmOf(raw))
-    const moc = [...container.querySelectorAll('.mt-tl__moc')].find((b) => /17:12/.test(b.textContent || '')) as HTMLElement
+    const moc = [...container.querySelectorAll('.phm-tl__moc')].find((b) => /17:12/.test(b.textContent || '')) as HTMLElement
     fireEvent.click(moc)
     const nhom = nhomTheoTen(container, /17:12/)
-    expect(nhom.querySelector('.mt-moc__dau')!.getAttribute('aria-expanded')).toBe('true')
+    expect(nhom.querySelector('.phm-moc__dau')!.getAttribute('aria-expanded')).toBe('true')
   })
 
   it('dòng câu thường: giờ, nguồn, Đúng/Sai, dạng, đề, "Con chọn B · Đáp án B", thời gian; câu BTVN không có conChon ⇒ chỉ "Đáp án C"; KHÔNG mã câu trên màn', () => {
@@ -332,7 +332,7 @@ describe('⑤ từng câu — lọc, che, nhóm, lời giải', () => {
       { luc: H(17, 16), nguon: 'on_lai', deRutGon: 'Đề B', conChon: 'B', dapAn: 'B', dung: true, giay: 52, coLoiGiai: false },
     ]
     const { container } = bang(pmOf(raw))
-    for (const b of container.querySelectorAll('[data-vung="nhom-cau"] .mt-moc__dau[aria-expanded="false"]')) fireEvent.click(b)
+    for (const b of container.querySelectorAll('[data-vung="nhom-cau"] .phm-moc__dau[aria-expanded="false"]')) fireEvent.click(b)
     const hang = [...container.querySelectorAll('[data-vung="cau"]')]
     const a = hang.find((h) => h.textContent!.includes('Đề A'))!
     expect(a.textContent).toContain('17:15')
@@ -362,7 +362,7 @@ describe('⑤ từng câu — lọc, che, nhóm, lời giải', () => {
       return { status: 200, json: async () => (b.qid === 'q-2' ? { ok: false, error: 'Ca này chưa công bố điểm nên chưa xem được lời giải.', che: 'chua_cong_bo' } : CHI_TIET) }
     }))
     const { container } = bang(pmOf(raw))
-    for (const b of container.querySelectorAll('[data-vung="nhom-cau"] .mt-moc__dau[aria-expanded="false"]')) fireEvent.click(b)
+    for (const b of container.querySelectorAll('[data-vung="nhom-cau"] .phm-moc__dau[aria-expanded="false"]')) fireEvent.click(b)
     const hang = (t: string) => [...container.querySelectorAll('[data-vung="cau"]')].find((h) => h.textContent!.includes(t)) as HTMLElement
     expect(hang('Chưa có mã').querySelector('[data-vung="xem-loi-giai"]')).toBeNull()
     expect(hang('Chưa có mã').textContent).toContain('Câu này chưa có lời giải để xem.')
@@ -444,7 +444,7 @@ describe('ParentPortalScreen thật — màn chính → bảng → về; MỘT n
     const goi = dung()
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="hom-nay"]')).toBeTruthy())
-    expect(container.querySelectorAll('.mt-nut--chinh')).toHaveLength(1)
+    expect(container.querySelectorAll('.phm-nut--chinh')).toHaveLength(1)
     expect(container.textContent).toContain('Con: Nguyễn Minh Khôi')
     expect(container.textContent).toContain('Thầy nhắc con nộp bài trước 12:00.') // dải cảnh báo
     fireEvent.click(container.querySelector('[data-vung="hom-nay"]')!)

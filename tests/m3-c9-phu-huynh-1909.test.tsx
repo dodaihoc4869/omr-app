@@ -1,5 +1,5 @@
 // Việc C · C9 (Code 4): cổng phụ huynh — phần CŨ ngoài Bảng nhiệm vụ: màn đăng nhập bằng SBD + khung sheet toàn màn (thanh trên, nút Đóng).
-// ParentPortalScreen chỉ phụ huynh dùng nên mặc M3 vô điều kiện; màn chính app PH mới (.mt, Code 2) nằm TRONG gốc `m3`.
+// ParentPortalScreen chỉ phụ huynh dùng nên mặc M3 vô điều kiện; màn chính app PH mới (.phm, Code 2) nằm TRONG gốc `m3`.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import fs from 'node:fs'
