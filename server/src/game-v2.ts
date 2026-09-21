@@ -11,7 +11,7 @@ import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../..
 import {nhanExp,thanhExp} from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import type {ShieldState} from '../../src/game/than-thu-v2/shields'
 import {khienConLai,khienRenChuaDung} from './exp-ho-so-game'
-import {MANH_MOI_KHIEN,NGAY_DAT_MO_KHIEN_QUA} from './exp-cau-hinh'
+import {CAP_KHIEN_QUA_DAU,MANH_MOI_KHIEN,NGAY_DAT_MO_KHIEN_QUA} from './exp-cau-hinh'
 import type {KhienRen} from './exp-hoc-tap'
 import {syncAcademic,type Academic,academicDay} from './game-v2-academic'
 import {laCauTuLuan,jsonLaTuLuan} from './cam-tu-luan'
@@ -92,7 +92,11 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
   if(action==='shield-use'){
     const id=String(b.useId??'');if(!/^[a-zA-Z0-9-]{16,80}$/.test(id))throw new Error('Lượt dùng khiên không hợp lệ.')
     if(p.shields?.lastUse===id||Number(p.shields?.activeUntil)>Date.now())return {ok:true,profile:visible(p),revision}
-    if(p.choice||khienConLai(p)<1)throw new Error('Em chưa có Khiên chống đuổi. Tiến hoá thần thú để nhận khiên.')
+    if(p.choice||khienConLai(p)<1){
+      // Câu báo ĐÚNG luật khiên mới (thầy lệnh 21/09): khiên quà tiến hoá đầu (cấp 10) chỉ mở khi đủ 36 ngày đạt nhiệm vụ ngày từ mốc; còn lại khiên đến từ mảnh (36 mảnh rèn một khiên).
+      const ngayDat=p.expMoi?.ngayDat??0
+      throw new Error(p.choice?'Em chưa có khiên. Em chọn thần thú của mình trước.':p.cap>=CAP_KHIEN_QUA_DAU&&ngayDat<NGAY_DAT_MO_KHIEN_QUA?`Em chưa có khiên. Khiên đầu tiên mở khi em đạt nhiệm vụ ngày đủ ${NGAY_DAT_MO_KHIEN_QUA} ngày (em đã có ${ngayDat} ngày).`:`Em chưa có khiên. Mỗi ngày đạt nhiệm vụ được 1 mảnh, đủ ${MANH_MOI_KHIEN} mảnh rèn một khiên.`)
+    }
     p.shields={used:(p.shields?.used??0)+1,activeUntil:Date.now()+10000,lastUse:id}
     return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}
   }

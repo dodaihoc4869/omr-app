@@ -90,19 +90,28 @@ it('classroom reads only chosen current-season V2 spirit without importing legac
  expect(sql.prepare('SELECT * FROM game_v2_profile').get()).toEqual(before)
 })
 
-describe('Khiên chống đuổi',()=>{
+describe('Khiên (thầy lệnh 21/09: khiên quà tiến hoá đầu chỉ mở khi đủ 36 ngày đạt nhiệm vụ ngày)',()=>{
  it('thưởng theo mốc, tiêu một lần, chặn dùng trùng và giữ qua thiết bị',async()=>{
   const {env,sql}=fixture(),token=await gameToken(env,'1');await loadProfile(env,'1')
   const put=(cap:number,extra={})=>sql.prepare('UPDATE game_v2_profile SET json=? WHERE sbd=?').run(JSON.stringify({pet:'dat_quy',choice:false,cap,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:'now',...extra}),'1')
   put(9);await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00001'})).rejects.toThrow('chưa có')
-  put(10);const first=await gameV2(env,'shield-use',{token,useId:'test-shield-00001'});expect(first.profile).toMatchObject({shields:{used:1}})
+  const du36={expMoi:{daCong:0,manhDaTinh:0,ngayDat:36}} // đủ 36 ngày đạt từ mốc ⇒ khiên quà đầu (cấp 10) mở
+  put(10);await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00009'})).rejects.toThrow('Em chưa có khiên. Khiên đầu tiên mở khi em đạt nhiệm vụ ngày đủ 36 ngày (em đã có 0 ngày).')
+  put(10,{expMoi:{daCong:0,manhDaTinh:0,ngayDat:35}});await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00009'})).rejects.toThrow('(em đã có 35 ngày)')
+  put(10,du36);const first=await gameV2(env,'shield-use',{token,useId:'test-shield-00001'});expect(first.profile).toMatchObject({shields:{used:1}})
   expect((first.profile as any).shields.activeUntil-Date.now()).toBeGreaterThan(9000)
   await gameV2(env,'shield-use',{token,useId:'test-shield-00001'});await gameV2(env,'shield-use',{token,useId:'test-shield-00002'})
   expect((await loadProfile(env,'1')).profile.shields?.used).toBe(1)
-  put(10,{shields:{used:1,activeUntil:0,lastUse:'test-shield-00001'}})
+  put(10,{...du36,shields:{used:1,activeUntil:0,lastUse:'test-shield-00001'}})
   await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00002'})).rejects.toThrow('chưa có')
-  put(30,{shields:{used:1,activeUntil:0}})
+  put(30,{...du36,shields:{used:1,activeUntil:0}})
   expect((await gameV2(env,'shield-use',{token,useId:'test-shield-00003'})).profile).toMatchObject({cap:30,shields:{used:2}})
+  put(30,{expMoi:{daCong:0,manhDaTinh:0,ngayDat:35},shields:{used:2,activeUntil:0}}) // cấp 30 nhưng chưa đủ 36 ngày: quà 3 − 1 (khoá) = 2, đã dùng 2 ⇒ hết
+  await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00004'})).rejects.toThrow('Khiên đầu tiên mở khi em đạt nhiệm vụ ngày đủ 36 ngày (em đã có 35 ngày)')
+  put(5,{khienRen:{manh:0,daRen:0}}) // cấp thường, không có gì: nói đúng luật mảnh
+  await expect(gameV2(env,'shield-use',{token,useId:'test-shield-00005'})).rejects.toThrow('đủ 36 mảnh rèn một khiên')
+  put(5,{khienRen:{manh:0,daRen:1}}) // có 1 khiên rèn ⇒ dùng được
+  expect((await gameV2(env,'shield-use',{token,useId:'test-shield-00006'})).profile).toMatchObject({cap:5,shields:{used:1}})
  })
  it('tổng quà các mốc 1,3,6,9,12, không phát quà ở cấp thường',async()=>{
   const {shieldEntitlement,shieldRemaining}=await import('../src/game/than-thu-v2/shields')
