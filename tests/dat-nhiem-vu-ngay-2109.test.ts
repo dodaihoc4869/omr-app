@@ -4,7 +4,7 @@
 // (không phải điều nên giữ mãi: Boss trình thầy hai chỗ chỉnh luật) · thuần (không sửa đầu vào, tất định).
 import { describe, expect, it } from 'vitest'
 import { mulberry32 } from '../src/lib/exam-shuffle'
-import { ketQuaChotNgay, laDatNgay, thieuDat, tinhDatNhiemVuNgay, type DauVaoDatNgay, type SoDoNgay, type SuKienDat, type ThieuDat } from '../src/lib/dat-nhiem-vu-ngay'
+import { DAT_CAN_DUNG_TU, canDungToiThieu, ketQuaChotNgay, laDatNgay, moTaThieuDat, soCauDungHomNayTuSo, thieuDat, tinhDatNhiemVuNgay, type DauVaoDatNgay, type SoDoNgay, type SuKienDat, type ThieuDat } from '../src/lib/dat-nhiem-vu-ngay'
 
 const HOM_NAY = '2026-09-21'
 const TRUOC = ['2026-09-15', '2026-09-17', '2026-09-19', '2026-09-20']
@@ -78,7 +78,7 @@ describe('công thức: đủ tối thiểu · không trễ nhịp · (lên bậ
 })
 
 describe('HÀNH VI HIỆN TẠI đã báo Boss (ghi lại, KHÔNG đổi): 2a · 2b · 3a', () => {
-  it('2a · LÀM ÍT vẫn đạt: 4 câu SAI HẾT (mục tiêu ≤ 8 ⇒ tối thiểu 4) vẫn đạt khi hôm nay không có câu tới hạn — đúng/sai không được xét', () => {
+  it('2a · (NGÀY 21/09, trước Điều 7) LÀM ÍT vẫn đạt: 4 câu SAI HẾT (mục tiêu ≤ 8 ⇒ tối thiểu 4) vẫn đạt khi hôm nay không có câu tới hạn — đúng/sai không được xét; TỪ 22/09 xem khối Điều 7 bên dưới', () => {
     const r = tinh(cauMoi(4, 0))
     expect(r).toMatchObject({ dat: true, thieu: [], daLam: 4 })
     // đảo đúng/sai không đổi kết luận
@@ -293,5 +293,92 @@ describe('HAI ĐƯỜNG KHỚP: mảnh (thời gian thực) và chuỗi (chốt 
     expect(tt).toMatchObject({ daLam: 4, dat: false, thieu: ['chua_len_bac'] })
     const tb = soDoTheoSql(soTho, HOM_NAY)
     expect(ketQuaChotNgay({ daLam: tb.da, lenBac: tb.len, toiThieu: 4, treNhip: false, soCauToiHan: 4 })).toBe('dat')
+  })
+})
+
+
+// ══════════════════════════════ ĐIỀU 7 — đạt cần câu ĐÚNG (chỉ từ ngày VN 2026-09-22) ══════════════════════════════
+const NGAY_MOI = '2026-09-22'
+/** Đổi mọi dòng "hôm nay" (21/09) của một tập sổ sang ngày mới, các ngày trước giữ nguyên (dòng hôm nay luôn có `luc` > các ngày trước). */
+const sangNgayMoi = (ds: SuKienDat[]): SuKienDat[] => ds.map((e) => (e.ngayVn === HOM_NAY ? { ...e, ngayVn: NGAY_MOI, luc: e.luc.replace(HOM_NAY, NGAY_MOI) } : e))
+const tinh22 = (ds: SuKienDat[], o: Partial<DauVaoDatNgay> = {}) => tinhDatNhiemVuNgay(vao(sangNgayMoi(ds), { homNay: NGAY_MOI, ...o }))!
+
+describe('ĐIỀU 7: đạt cần số câu ĐÚNG hôm nay ≥ ceil(tối thiểu / 2), CHỈ từ ngày VN 2026-09-22', () => {
+  it('mốc ngày và công thức: ngày 21/09 hoặc không truyền ngày ⇒ không đòi; từ 22/09 ⇒ ceil(tối thiểu/2) (4 ⇒ 2 · 5 ⇒ 3 · 7 ⇒ 4 · 8 ⇒ 4)', () => {
+    expect(DAT_CAN_DUNG_TU).toBe('2026-09-22')
+    for (const ngay of ['2026-09-21', '2026-01-01', '2026-09-21T23:59', undefined]) expect(canDungToiThieu(8, ngay as string | undefined), String(ngay)).toBe(0)
+    expect(canDungToiThieu(4, '2026-09-22')).toBe(2)
+    expect(canDungToiThieu(5, '2026-09-22')).toBe(3)
+    expect(canDungToiThieu(7, '2026-09-23')).toBe(4)
+    expect(canDungToiThieu(8, '2027-01-01')).toBe(4)
+    expect(canDungToiThieu(0, '2026-09-22')).toBe(0)
+    expect(canDungToiThieu(Number.NaN, '2026-09-22')).toBe(0)
+  })
+  it('SỬA CÓ CHỦ Ý 2a: từ 22/09, 4 câu SAI HẾT KHÔNG đạt (thiếu cau_dung_toi_thieu); 2 đúng + 2 sai đạt; ngày 21/09 vẫn như đã trao', () => {
+    expect(tinh22(cauMoi(4, 0))).toMatchObject({ dat: false, thieu: ['cau_dung_toi_thieu'], daLam: 4 })
+    expect(tinh22([...cauMoi(2, 1), ...cauMoi(2, 0, 'S')])).toMatchObject({ dat: true, thieu: [] })
+    expect(tinh22([...cauMoi(1, 1), ...cauMoi(3, 0, 'S')]).thieu).toEqual(['cau_dung_toi_thieu']) // mới 1/2 câu đúng
+    expect(tinh(cauMoi(4, 0)).dat).toBe(true) // ngày 21/09
+    // mức tối thiểu 5 ⇒ cần đúng 3; 8 ⇒ 4
+    expect(tinh22([...cauMoi(2, 1), ...cauMoi(3, 0, 'S')], { toiThieu: 5 }).thieu).toEqual(['cau_dung_toi_thieu'])
+    expect(tinh22([...cauMoi(3, 1), ...cauMoi(2, 0, 'S')], { toiThieu: 5 }).dat).toBe(true)
+  })
+  it('câu đúng đếm KHÁC NHAU và theo sổ ĐÃ lọc: một câu đúng làm 4 lần chỉ là 1; câu ca thi CHƯA công bố không tính đúng', () => {
+    const lap = [0, 1, 2, 3].map((i) => sk('Q1', HOM_NAY, 1, `1${i}:00`))
+    expect(soCauDungHomNayTuSo(vao(sangNgayMoi(lap), { homNay: NGAY_MOI }))).toBe(1)
+    // 1 câu đúng thường + 1 câu đúng của ca CHƯA công bố + 2 câu sai: sổ thô đếm 2 đúng (đủ), sổ ĐÃ lọc chỉ thấy 1 ⇒ KHÔNG đạt (không lộ câu thi làm đúng)
+    const thi = sk('THI', HOM_NAY, 1, '09:00')
+    const thuong = [...cauMoi(1, 1), ...cauMoi(2, 0, 'S')]
+    const r = tinhDatNhiemVuNgay(vao(sangNgayMoi([thi, ...thuong]), { homNay: NGAY_MOI, so: sangNgayMoi(thuong) }))!
+    expect(r).toMatchObject({ daLam: 4, dat: false }) // "đã làm" 4 (đếm cả ca chưa công bố) nhưng chỉ thấy 1 câu đúng
+    expect(r.thieu).toEqual(['cau_dung_toi_thieu'])
+    // ca đã công bố (có trong sổ đã lọc) thì được tính
+    expect(tinhDatNhiemVuNgay(vao(sangNgayMoi([thi, ...thuong]), { homNay: NGAY_MOI }))!.dat).toBe(true)
+  })
+  it('moTaThieuDat: mã + số câu đúng + chữ tiếng thường có số thật, cùng thứ tự; đã đạt ⇒ rỗng; ngày chưa đòi ⇒ can = 0', () => {
+    const d: SoDoNgay = { daLam: 4, lenBac: 0, toiThieu: 4, treNhip: false, soCauToiHan: 0, ngayVn: NGAY_MOI, soCauDungHomNay: 1 }
+    expect(moTaThieuDat(d)).toEqual({ thieu: ['cau_dung_toi_thieu'], soCauDung: { da: 1, can: 2, conThieu: 1 }, chu: ['Em cần làm đúng thêm 1 câu nữa (hôm nay em đúng 1/2 câu cần đúng).'] })
+    const nhieu = moTaThieuDat({ daLam: 1, lenBac: 0, toiThieu: 4, treNhip: true, soCauToiHan: 3, ngayVn: NGAY_MOI, soCauDungHomNay: 0 })
+    expect(nhieu.thieu).toEqual(['cau_toi_thieu', 'tre_nhip', 'chua_len_bac', 'cau_dung_toi_thieu'])
+    expect(nhieu.chu).toEqual([
+      'Em làm thêm 3 câu nữa để đủ mức tối thiểu hôm nay (1/4 câu).',
+      'Em còn chặng bài tập về nhà cần làm trước.',
+      'Em ôn lại đúng ít nhất 1 câu đến lịch ôn lại để đạt nhiệm vụ ngày.',
+      'Em cần làm đúng thêm 2 câu nữa (hôm nay em đúng 0/2 câu cần đúng).',
+    ])
+    expect(moTaThieuDat({ ...d, soCauDungHomNay: 4 })).toEqual({ thieu: [], soCauDung: { da: 4, can: 2, conThieu: 0 }, chu: [] })
+    expect(moTaThieuDat({ ...d, ngayVn: '2026-09-21' }).soCauDung).toEqual({ da: 1, can: 0, conThieu: 0 })
+    // đã có ngày ≥ mốc mà chưa truyền số câu đúng ⇒ coi là 0 (caller đã tham gia luật mới, KHÔNG âm thầm nới)
+    expect(thieuDat({ ...d, soCauDungHomNay: undefined })).toEqual(['cau_dung_toi_thieu'])
+    // không truyền ngày ⇒ luật cũ, số câu đúng bị bỏ qua
+    expect(thieuDat({ daLam: 4, lenBac: 0, toiThieu: 4, treNhip: false, soCauToiHan: 0, soCauDungHomNay: 0 })).toEqual([])
+  })
+  it('chốt ngày (số đo gom) khớp thời gian thực trên 4 000 sổ từ 22/09: ket_qua = dat ⇔ đạt thời gian thực (SQL: câu đúng khác nhau = COUNT DISTINCT ket_qua = 1)', () => {
+    for (const { c, i } of CAC) {
+      const ds = sangNgayMoi(c.sk)
+      const tt = tinhDatNhiemVuNgay(vao(ds, { homNay: NGAY_MOI, toiThieu: c.toiThieu, treNhip: c.treNhip, soCauToiHan: c.soCauToiHan }))!
+      const tb = soDoTheoSql(ds, NGAY_MOI)
+      const dung = new Set(ds.filter((e) => e.ngayVn === NGAY_MOI && e.ketQua === 1).map((e) => e.qid)).size
+      const chot = ketQuaChotNgay({ daLam: tb.da, lenBac: tb.len, toiThieu: c.toiThieu, treNhip: c.treNhip, soCauToiHan: c.soCauToiHan, ngayVn: NGAY_MOI, soCauDungHomNay: dung })
+      expect(chot === 'dat', `#${i}`).toBe(tt.dat)
+      // và luôn CHẶT hơn hoặc bằng luật ngày 21/09 trên cùng dữ liệu
+      const cu = tinhDatNhiemVuNgay(vao(c.sk, { toiThieu: c.toiThieu, treNhip: c.treNhip, soCauToiHan: c.soCauToiHan }))!
+      if (tt.dat) expect(cu.dat, `#${i} chặt hơn`).toBe(true)
+      if (tt.dat) expect(dung, `#${i}`).toBeGreaterThanOrEqual(Math.ceil(c.toiThieu / 2))
+      expect(tt.thieu.filter((t) => t !== 'cau_dung_toi_thieu'), `#${i}`).toEqual(cu.thieu)
+    }
+  })
+  it('ĐƠN ĐIỆU từ 22/09: thêm sự kiện không làm MẤT đạt; thêm câu ĐÚNG không thêm điều thiếu; nâng tối thiểu không biến chưa đạt thành đạt', () => {
+    const r = mulberry32(2209)
+    for (const { c, i } of CAC.slice(0, 2500)) {
+      const o = { toiThieu: c.toiThieu, treNhip: c.treNhip, soCauToiHan: c.soCauToiHan }
+      const truoc = tinh22(c.sk, o)
+      const them: SuKienDat[] = [sk(`X${Math.floor(r() * 20)}`, HOM_NAY, ([0, 1, null] as const)[Math.floor(r() * 3)]!, '20:00'), sk(`Y${i}`, HOM_NAY, 1, '21:00')]
+      const sau = tinh22([...c.sk, ...them], o)
+      if (truoc.dat) expect(sau.dat, `#${i}`).toBe(true)
+      for (const t of sau.thieu) expect(truoc.thieu, `#${i} thêm ${t}`).toContain(t)
+      const kho = tinh22(c.sk, { ...o, toiThieu: c.toiThieu + 1 })
+      if (!truoc.dat) expect(kho.dat, `#${i} nâng mức`).toBe(false)
+    }
   })
 })
