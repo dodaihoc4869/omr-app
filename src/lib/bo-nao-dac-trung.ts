@@ -214,6 +214,9 @@ export interface TheNgan {
   lanCuoiLoiPhuHuynh?: string
   /** Các dạng đã xử lý trong lời gần nhất cho phụ huynh — "vấp lặp đã xử lý" chỉ hợp lệ với dạng KHÔNG nằm trong danh sách này. */
   dangLoiPhuHuynhTruoc?: string[]
+  /** SỐ THẬT thần thú của em (V2, thầy chốt 21/09; máy chủ dựng ở `/ai/ho-so-ngay`, hợp đồng `docs/hop-dong-thu-thach-rieng-2109.md`). ẨN DANH: chỉ tên loài thú, không tên em/biệt danh.
+   * Khoá nào không có số thật thì VẮNG; vắng cả khối = em chưa chọn thú ⇒ Bộ não KHÔNG được nhắc thú. Là nguồn số của `loiMoi` (`tapSoCuaThe` gom mọi số ở đây). */
+  thanThu?: { ten?: string; cap?: number; expConThieu?: number; manhKhien?: number; manhKhienTong?: number; chuoiNgay?: number }
   /** ≤ 3 lời nhắn gần nhất cho em (chống lặp). KHÔNG phải nguồn số. */
   loiNhanGanDay: string[]
   /** Kết quả CHẤM điều chỉnh hôm qua (máy chủ gắn sau khi so thẻ đêm trước với thẻ này); chỉ khi em có điều chỉnh hôm qua. Số đo ở đây là nguồn số cho lời nhắn. */
