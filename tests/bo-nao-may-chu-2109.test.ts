@@ -1,0 +1,420 @@
+// BỘ NÃO — LỆNH MÁY CHỦ (`server/src/bo-nao.ts`, Code 1, 21/09/2026) trên D1 GIẢ BẰNG SQLITE THẬT (`_d1-that.ts`: nạp `schema.sql` + mọi migration, kể cả `migration-2109-bo-nao.sql`).
+// Nghiệm thu: mọi em có hoạt động đều có thẻ · kiểm khuôn LẦN HAI ở máy chủ · chế độ BÓNG không đổi một byte ở bảng nào ngoài `ai_*` · tự áp dụng khi `that` + tin cậy ≥ 0,6 ·
+// tự chấm hôm sau, `xau_di` ⇒ TỰ GỠ · bỏ điều chỉnh không bị "sống lại" khi nộp lại · số truy vấn mỗi trang ít · không có tên/SBD trong thẻ.
+import { beforeEach, describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { taoD1That, type D1That } from './_d1-that'
+import { boNaoBoDieuChinh, boNaoCauHinh, boNaoDemQua, boNaoHoSoNgay, boNaoNhatKy, boNaoNop, cheDoHieuLuc, docCauHinhBoNao, ngayVnTuMs } from '../server/src/bo-nao'
+import { themNgay } from '../src/lib/bo-nao-dac-trung'
+
+const NGAY = '2026-09-22'
+const NOW = Date.parse('2026-09-21T21:00:00.000Z') // 04:00 sáng 22/09 giờ Việt Nam
+const truoc = (n: number) => themNgay(NGAY, -n)
+
+let d: D1That
+beforeEach(() => {
+  d = taoD1That()
+})
+
+// ───────────────────────── dữ liệu mẫu ─────────────────────────
+function themEm(sbd: string, ten: string, lop = '12A1', trangThai = 'da_duyet') {
+  d.sql.exec(`INSERT OR REPLACE INTO hoc_sinh (sbd, ho_ten, lop, trang_thai, cap_nhat_luc) VALUES ('${sbd}', '${ten}', '${lop}', '${trangThai}', '2026-09-01T00:00:00Z')`)
+}
+let dem = 0
+function suKien(sbd: string, nTruoc: number, qid: string, ketQua: 0 | 1 | null, o: { nguon?: string; giay?: number | null } = {}) {
+  const ngay = truoc(nTruoc)
+  d.sql.exec(
+    `INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES ('k${++dem}', '${sbd}', '${qid}', '${o.nguon ?? 'btvn'}', 'm', 1, ${ketQua === null ? 'NULL' : ketQua}, ${o.giay ?? 'NULL'}, '${ngay}T02:00:00.000Z', '${ngay}')`,
+  )
+}
+/** `k` câu trong ngày `n` ngày trước, `dung` câu đúng. */
+function ngayHoc(sbd: string, nTruoc: number, k: number, dung: number, o: { nguon?: string; giay?: number | null; tienTo?: string } = {}) {
+  for (let i = 0; i < k; i++) suKien(sbd, nTruoc, `${o.tienTo ?? 'q'}${sbd}-${nTruoc}-${i}`, i < dung ? 1 : 0, o)
+}
+function nkCau(sbd: string, qid: string, dang: string, lanSai: number, trangThai: string, nTruoc = 1) {
+  d.sql.exec(
+    `INSERT INTO nam_kt_cau (khoa, sbd, qid, ma_dang, chuyen_de, lan_gap, lan_sai, lan_trong, dung_lien_tiep, ngay_dung_khac_nhau, ket_qua_cuoi, nguon_cuoi, luc_cuoi, moc_on_ke, trang_thai, can_day_lai, giay_tb, cap_nhat_luc)
+     VALUES ('${sbd}|${qid}', '${sbd}', '${qid}', '${dang}', 'CĐ', 2, ${lanSai}, 0, 0, 0, 0, 'btvn', '${truoc(nTruoc)}T02:00:00.000Z', '${truoc(0)}', '${trangThai}', 0, NULL, '${truoc(nTruoc)}T02:00:00.000Z')`,
+  )
+}
+function nkDang(sbd: string, ma: string, bac: number, soGap: number, soSai: number, khac = 0, chua = 0) {
+  d.sql.exec(`INSERT INTO nam_kt_dang (khoa, sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai, cap_nhat_luc) VALUES ('${sbd}|${ma}', '${sbd}', '${ma}', ${soGap}, ${soSai}, ${khac}, 0, ${chua}, ${bac}, NULL, NULL, '2026-09-21T00:00:00Z')`)
+}
+/** Em A: học đều, hôm qua 8 câu 7 đúng, có dạng ESTE.THUY_PHAN. Em B: vắng 4 ngày. Em C: chưa từng học. */
+function dungBaEm() {
+  themEm('12001', 'Nguyễn An', '12A1')
+  themEm('12002', 'Trần Bình', '12A1')
+  themEm('12003', 'Lê Chi', '12A2')
+  ngayHoc('12001', 1, 8, 7)
+  ngayHoc('12001', 3, 6, 4)
+  ngayHoc('12001', 5, 6, 5)
+  ngayHoc('12002', 5, 6, 4)
+  nkCau('12001', 'q12001-3-0', 'ESTE.THUY_PHAN', 1, 'dang_on')
+  nkDang('12001', 'ESTE.THUY_PHAN', 1, 9, 3, 2, 3)
+  d.sql.exec(`INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('khac', '{}', 'x')`)
+}
+const hoSo = (o: Record<string, unknown> = {}) => boNaoHoSoNgay(d.env, { ngay: NGAY, ...o }, NOW)
+const cauHinh = (o: Record<string, unknown>) => boNaoCauHinh(d.env, o)
+/** Một phần tử đầu ra HỢP LỆ của bộ não cho em A. */
+const dauRa = (o: Record<string, unknown> = {}) => ({
+  sbd: '12001',
+  doTinCay: 0.8,
+  nhip: { lech: -2, khoiDong: 3 },
+  dang: [{ ma: 'ESTE.THUY_PHAN', hanhDong: 'uu_tien', lyDo: 'đúng 7/8 câu hôm qua' }],
+  khacPhuc: [],
+  co: 'tut_nhip',
+  loiNhanChoEm: 'Hôm qua em đúng 7/8 câu. Mai mình xếp sẵn ba câu cùng dạng cho em nhé.',
+  loiNhanChoPhuHuynh: '',
+  thuTuan: '',
+  goiYChoThay: { chu: 'Hôm qua đúng 7/8 câu — theo dõi thêm', hanhDong: 'khong', dang: '' },
+  ghiChuHlv: 'Đang thử giảm nhịp, chờ xem em có xong chặng',
+  canSau: false,
+  ...o,
+})
+const bang = (ten: string) => d.chup(ten)
+const BANG_HOC_SINH = ['ke_hoach_ngay', 'btvn', 'btvn_em', 'su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'exp_so', 'game_v2_profile', 'luot', 'hoc_sinh']
+
+// ───────────────────────── migration ─────────────────────────
+describe('migration `migration-2109-bo-nao.sql`', () => {
+  it('chỉ THÊM ba bảng ai_*; chạy lại nhiều lần không lỗi và không mất dữ liệu; không đụng bảng đang chạy', () => {
+    const sql = readFileSync('server/migration-2109-bo-nao.sql', 'utf8')
+    d.sql.exec(`INSERT INTO ai_ban_tin (ngay, json, nop_luc) VALUES ('2026-09-22', '{}', 'x')`)
+    d.sql.exec(sql)
+    d.sql.exec(sql)
+    expect(d.dem('ai_ban_tin')).toBe(1)
+    const ten = (d.sql.prepare(`SELECT name FROM sqlite_master WHERE name LIKE 'ai_%' AND type='table' ORDER BY name`).all() as { name: string }[]).map((x) => x.name)
+    expect(ten).toEqual(['ai_ban_tin', 'ai_dieu_chinh', 'ai_ho_so_ngay'])
+    expect(sql).not.toMatch(/\b(DROP|DELETE|ALTER)\b/i)
+    expect(sql.match(/CREATE TABLE/g)).toHaveLength(3)
+    const lenh = sql.split('\n').filter((l) => !l.trimStart().startsWith('--')).join('\n') // bỏ dòng chú thích
+    expect(lenh.match(/IF NOT EXISTS/g)!.length).toBe(lenh.match(/CREATE (TABLE|INDEX)/g)!.length)
+  })
+})
+
+// ───────────────────────── cấu hình ─────────────────────────
+describe('/ai/cau-hinh', () => {
+  it('mặc định {bat:true, cheDo:"bong", lopThat:[]}; ghi trộn từng phần; đọc lại đúng', async () => {
+    expect(await boNaoCauHinh(d.env, {})).toEqual({ ok: true, cauHinh: { bat: true, cheDo: 'bong', lopThat: [] } })
+    expect((await cauHinh({ lopThat: ['12A1', '12A1', '12B'] })).cauHinh).toEqual({ bat: true, cheDo: 'bong', lopThat: ['12A1', '12B'] })
+    expect((await cauHinh({ cheDo: 'that' })).cauHinh).toEqual({ bat: true, cheDo: 'that', lopThat: ['12A1', '12B'] })
+    expect((await cauHinh({ bat: false })).cauHinh.bat).toBe(false)
+    expect(await docCauHinhBoNao(d.env)).toEqual({ bat: false, cheDo: 'that', lopThat: ['12A1', '12B'] })
+    expect(d.dem('cau_hinh', "khoa = 'bo_nao'")).toBe(1)
+  })
+  it('giá trị lạ bị từ chối và KHÔNG ghi', async () => {
+    for (const x of [{ bat: 'true' }, { cheDo: 'tu_hanh' }, { lopThat: 'a' }, { lopThat: [1] }, { lopThat: [''] }, { lopThat: ['x'.repeat(61)] }, { lopThat: Array.from({ length: 51 }, (_, i) => `l${i}`) }]) {
+      expect((await cauHinh(x)).ok, JSON.stringify(x).slice(0, 40)).toBe(false)
+    }
+    expect(d.dem('cau_hinh', "khoa = 'bo_nao'")).toBe(0)
+  })
+  it('chế độ hiệu lực của lớp: nằm trong lopThat ⇒ that, còn lại theo cheDo chung; dữ liệu hỏng trong D1 rơi về mặc định', async () => {
+    expect(cheDoHieuLuc({ bat: true, cheDo: 'bong', lopThat: ['12A1'] }, '12A1')).toBe('that')
+    expect(cheDoHieuLuc({ bat: true, cheDo: 'bong', lopThat: ['12A1'] }, '12A2')).toBe('bong')
+    expect(cheDoHieuLuc({ bat: true, cheDo: 'that', lopThat: [] }, '12A2')).toBe('that')
+    d.sql.exec(`INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('bo_nao', 'không phải json', 'x')`)
+    expect(await docCauHinhBoNao(d.env)).toEqual({ bat: true, cheDo: 'bong', lopThat: [] })
+  })
+  it('`bat:false` ⇒ hồ sơ ngày và nộp báo "đang tắt", không ghi gì', async () => {
+    dungBaEm()
+    await cauHinh({ bat: false })
+    expect((await hoSo()).ok).toBe(false)
+    expect((await boNaoNop(d.env, { ngay: NGAY, cacEm: [] }, NOW)).error).toContain('đang tắt')
+    expect(d.dem('ai_ho_so_ngay')).toBe(0)
+  })
+})
+
+// ───────────────────────── hồ sơ ngày ─────────────────────────
+describe('/ai/ho-so-ngay', () => {
+  it('mỗi em có hoạt động có thẻ + luồng; em vắng 4 ngày ⇒ vang; em chưa từng học ⇒ bo_qua (không thẻ, không lưu); thẻ được LƯU', async () => {
+    dungBaEm()
+    const r = await hoSo()
+    expect(r).toMatchObject({ ok: true, ngay: NGAY, trang: 1, soTrang: 1, soEm: 3 })
+    const em = (sbd: string) => (r.cacEm as { sbd: string; luong: string; lyDoLuong: string[]; the?: Record<string, unknown> }[]).find((x) => x.sbd === sbd)!
+    expect(em('12001').luong).toMatch(/^(nhanh|sau)$/)
+    expect(em('12001').the).toBeTruthy()
+    expect(em('12002')).toMatchObject({ luong: 'vang', lyDoLuong: ['vắng 4 ngày liền'] })
+    expect(em('12003')).toMatchObject({ luong: 'bo_qua' })
+    expect(em('12003').the).toBeUndefined()
+    expect(d.dem('ai_ho_so_ngay')).toBe(2) // chỉ em có hoạt động
+    expect(d.dem('ai_ho_so_ngay', "sbd = '12003'")).toBe(0)
+  })
+  it('số liệu thẻ đúng cửa sổ ngày: hôm qua 8 câu 7 đúng; 7 ngày = 20 câu (không tính ngày−8 trở đi, không tính hôm nay)', async () => {
+    dungBaEm()
+    ngayHoc('12001', 9, 30, 30, { tienTo: 'cu' }) // ngoài 7 ngày
+    ngayHoc('12001', 0, 9, 0, { tienTo: 'nay' }) // hôm nay
+    const r = await hoSo()
+    const t = (r.cacEm as { sbd: string; the: { cau: Record<string, number>; hoatDong: Record<string, number> } }[]).find((x) => x.sbd === '12001')!.the
+    expect(t.cau).toMatchObject({ lam7: 20, dung7: 16, lamHomQua: 8, dungHomQua: 7 })
+    expect(t.hoatDong.soNgayVang).toBe(0)
+  })
+  it('KHÔNG có SBD / tên / lớp trong thẻ đã lưu (AI không được thấy)', async () => {
+    dungBaEm()
+    await hoSo()
+    const tat = (d.sql.prepare('SELECT the_json FROM ai_ho_so_ngay').all() as { the_json: string }[]).map((x) => x.the_json).join('\n')
+    for (const cam of ['12001', '12002', 'Nguyễn An', 'Trần Bình', '12A1']) expect(tat, cam).not.toContain(cam)
+  })
+  it('PHÂN TRANG: coTrang 1 ⇒ 3 trang, mỗi trang một em theo SBD; trang ngoài phạm vi rỗng; coTrang kẹp ≤ 60', async () => {
+    dungBaEm()
+    const t1 = await hoSo({ trang: 1, coTrang: 1 })
+    expect(t1).toMatchObject({ soTrang: 3, soEm: 3 })
+    expect((t1.cacEm as { sbd: string }[]).map((x) => x.sbd)).toEqual(['12001'])
+    expect(((await hoSo({ trang: 2, coTrang: 1 })).cacEm as { sbd: string }[]).map((x) => x.sbd)).toEqual(['12002'])
+    expect(((await hoSo({ trang: 9, coTrang: 1 })).cacEm as unknown[]).length).toBe(0)
+    expect((await hoSo({ coTrang: 9999 })).soTrang).toBe(1)
+  })
+  it('em bị khoá tài khoản không vào danh sách; em chỉ có trong danh sách lớp vẫn có (bo_qua nếu chưa học)', async () => {
+    dungBaEm()
+    themEm('12009', 'Khoá', '12A1', 'khoa')
+    d.sql.exec(`INSERT INTO danh_sach (sbd, ho_ten, lop, cap_nhat_luc) VALUES ('12010', 'Chỉ có tên', '12A1', 'x')`)
+    const r = await hoSo()
+    const sbds = (r.cacEm as { sbd: string }[]).map((x) => x.sbd)
+    expect(sbds).toContain('12010')
+    expect(sbds).not.toContain('12009')
+  })
+  it('IDEMPOTENT: dựng lại cùng ngày ghi đè đúng dòng (không nhân đôi), thẻ giống hệt', async () => {
+    dungBaEm()
+    await hoSo()
+    const truoc1 = d.chup('ai_ho_so_ngay').replace(/"tao_luc":"[^"]*"/g, '')
+    await hoSo()
+    expect(d.dem('ai_ho_so_ngay')).toBe(2)
+    expect(d.chup('ai_ho_so_ngay').replace(/"tao_luc":"[^"]*"/g, '')).toBe(truoc1)
+  })
+  it('SỐ TRUY VẤN mỗi trang ít: ≤ 4 lượt batch và ≤ 25 câu lệnh với một trang 40 em', async () => {
+    for (let i = 0; i < 40; i++) {
+      themEm(`13${String(i).padStart(3, '0')}`, `Em ${i}`)
+      ngayHoc(`13${String(i).padStart(3, '0')}`, 1, 3, 2)
+    }
+    const b0 = d.soLenh.batch
+    const p0 = d.soLenh.prepare
+    const r = await hoSo({ coTrang: 40 })
+    expect((r.cacEm as unknown[]).length).toBe(40)
+    expect(d.soLenh.batch - b0).toBeLessThanOrEqual(4)
+    expect(d.soLenh.prepare - p0).toBeLessThanOrEqual(25 + 40) // truy vấn đọc (≈ 15) + 40 dòng ghi thẻ
+  })
+  it('tham số xấu: ngày sai định dạng ⇒ lỗi; `phan:"lop"` trả bức tranh cả lớp từ thẻ đã lưu', async () => {
+    dungBaEm()
+    expect((await boNaoHoSoNgay(d.env, { ngay: '22/09/2026' }, NOW)).ok).toBe(false)
+    await hoSo()
+    const l = await hoSo({ phan: 'lop' })
+    expect(l).toMatchObject({ ok: true, ngay: NGAY, lop: { soEm: 2, soVang: 1 } })
+    const macDinh = await boNaoHoSoNgay(d.env, {}, NOW) // ngày mặc định = hôm nay giờ Việt Nam
+    expect(macDinh.ngay).toBe(NGAY)
+    expect(ngayVnTuMs(NOW)).toBe(NGAY)
+  })
+  it('máy chủ chưa có cột `btvn_em.so_chang` vẫn dựng được hồ sơ (bài cũ không có chặng)', async () => {
+    dungBaEm()
+    const goc = d.env.DB.batch.bind(d.env.DB)
+    let laLanDau = true
+    ;(d.env.DB as { batch: unknown }).batch = async (ds: never[]) => {
+      if (laLanDau && (ds as { _q?: string }[]).some((x) => /e\.so_chang/.test(x._q ?? ''))) {
+        laLanDau = false
+        throw new Error('D1_ERROR: no such column: e.so_chang')
+      }
+      return goc(ds)
+    }
+    expect((await hoSo()).ok).toBe(true)
+    expect(laLanDau).toBe(false)
+  })
+})
+
+// ───────────────────────── nộp ─────────────────────────
+describe('/ai/dieu-chinh/nop', () => {
+  const nop = (cacEm: unknown[], banTin?: unknown) => boNaoNop(d.env, { ngay: NGAY, cacEm, ...(banTin ? { banTin } : {}) }, NOW)
+  beforeEach(async () => {
+    dungBaEm()
+    await hoSo()
+  })
+
+  it('CHẾ ĐỘ BÓNG (mặc định): phần tử hợp lệ được LƯU nhưng KHÔNG áp dụng; đếm đúng; bảng của học sinh không đổi một byte', async () => {
+    const truocBang = BANG_HOC_SINH.map(bang)
+    const r = await nop([dauRa()])
+    expect(r).toMatchObject({ ok: true, nhan: 1, chiGhiSo: 1, soApDung: 0, biLoai: 0 })
+    const x = d.sql.prepare(`SELECT * FROM ai_dieu_chinh WHERE sbd = '12001'`).get() as Record<string, unknown>
+    expect(x).toMatchObject({ ngay: NGAY, che_do: 'bong', ap_dung: 0, huy: 0, tu_go: 0, het_han: truoc(-3), do_tin: 0.8 })
+    expect(BANG_HOC_SINH.map(bang)).toEqual(truocBang) // bảng học sinh / kế hoạch ngày / BTVN nguyên vẹn
+  })
+  it('CHẾ ĐỘ THẬT (cả trường hoặc lớp của em trong lopThat) + tin cậy ≥ 0,6 ⇒ ÁP DỤNG; < 0,6 ⇒ chỉ ghi sổ', async () => {
+    await cauHinh({ lopThat: ['12A1'] })
+    const r = await nop([dauRa()])
+    expect(r).toMatchObject({ nhan: 1, soApDung: 1, chiGhiSo: 0 })
+    expect(d.dem('ai_dieu_chinh', "che_do = 'that' AND ap_dung = 1")).toBe(1)
+    await nop([dauRa({ doTinCay: 0.59 })])
+    expect(d.sql.prepare(`SELECT ap_dung FROM ai_dieu_chinh WHERE sbd = '12001'`).get()).toEqual({ ap_dung: 0 })
+    await nop([dauRa({ doTinCay: 0.6 })])
+    expect(d.sql.prepare(`SELECT ap_dung FROM ai_dieu_chinh WHERE sbd = '12001'`).get()).toEqual({ ap_dung: 1 })
+    // lớp KHÁC (không trong lopThat, cheDo chung bóng) ⇒ không áp dụng
+    await cauHinh({ lopThat: ['12A9'] })
+    await nop([dauRa()])
+    expect(d.sql.prepare(`SELECT che_do, ap_dung FROM ai_dieu_chinh WHERE sbd = '12001'`).get()).toEqual({ che_do: 'bong', ap_dung: 0 })
+  })
+  it('KIỂM KHUÔN LẦN HAI ở máy chủ: số không có trong thẻ, từ cấm, dạng lạ, biên độ ⇒ loại kèm lý do, KHÔNG lưu', async () => {
+    const r = await nop([
+      dauRa({ loiNhanChoEm: 'Hôm qua em đúng 99 câu.' }),
+      dauRa({ sbd: '12002', loiNhanChoEm: 'Em còn yếu.' }),
+    ])
+    expect(r).toMatchObject({ ok: true, nhan: 0, biLoai: 2 })
+    expect((r.loai as { sbd: string; lyDo: string[] }[])[0].lyDo.join()).toContain('có số không có trong thẻ: 99')
+    expect((r.loai as { sbd: string; lyDo: string[] }[])[1].lyDo.join()).toContain('có từ cấm: yếu') // em 12002 có thẻ (vắng), nhưng lời "còn yếu" là nhãn năng lực
+    expect(d.dem('ai_dieu_chinh')).toBe(0)
+    const r2 = await nop([dauRa({ nhip: { lech: 5, khoiDong: 2 } }), dauRa({ dang: [{ ma: 'DANG.LA', hanhDong: 'uu_tien', lyDo: '7 câu' }] })])
+    expect(r2.biLoai).toBe(2) // phần tử đầu sai biên độ nhịp; phần tử thứ hai cùng em ⇒ loại vì trùng (mỗi em một phần tử mỗi ngày, không "cứu" phần tử sau)
+    expect((r2.loai as { lyDo: string[] }[]).map((x) => x.lyDo[0])).toEqual([expect.stringContaining('nhip.lech'), expect.stringContaining('trùng em')])
+    expect(d.dem('ai_dieu_chinh')).toBe(0)
+  })
+  it('em KHÔNG có thẻ đêm ấy (chưa dựng hồ sơ / bo_qua) ⇒ loại; mỗi em MỘT phần tử mỗi ngày (phần tử trùng bị loại)', async () => {
+    const r = await nop([dauRa({ sbd: '12003' }), dauRa(), dauRa({ loiNhanChoEm: 'Em làm tốt, đúng 7 câu.' })])
+    expect(r).toMatchObject({ nhan: 1, biLoai: 2 })
+    const lyDo = (r.loai as { sbd: string; lyDo: string[] }[]).map((x) => `${x.sbd}:${x.lyDo[0]}`)
+    expect(lyDo.some((x) => x.startsWith('12003:không có thẻ'))).toBe(true)
+    expect(lyDo.some((x) => x.startsWith('12001:trùng em'))).toBe(true)
+    expect(d.dem('ai_dieu_chinh')).toBe(1)
+  })
+  it('LỜI CHO PHỤ HUYNH: ngày thường (thẻ không có lý do) ⇒ lời bị BỎ nhưng phần núm được giữ, báo cảnh báo; lời KHÔNG bao giờ được lưu', async () => {
+    const r = await nop([dauRa({ loiNhanChoPhuHuynh: 'Anh chị ơi, con đúng 7 câu hôm qua. Bộ não A.I đã xếp thêm câu cho con.' })])
+    expect(r.nhan).toBe(1)
+    expect((r.canhBao as { sbd: string; canhBao: string[] }[])[0].canhBao.join()).toContain('không có lý do được phép')
+    const j = JSON.parse((d.sql.prepare(`SELECT json FROM ai_dieu_chinh WHERE sbd = '12001'`).get() as { json: string }).json)
+    expect(j.loiNhanChoPhuHuynh).toBe('')
+    expect(j.nhip).toEqual({ lech: -2, khoiDong: 3 })
+  })
+  it('LỜI CHO PHỤ HUYNH có lý do (vắng 4 ngày ở thẻ em B) được LƯU nguyên văn; thư tuần chỉ khi tới lượt soi kỹ', async () => {
+    const r = await nop([{ ...dauRa({ sbd: '12002', dang: [], loiNhanChoEm: 'Em quay lại nhé, chỉ cần một chặng ngắn thôi.', loiNhanChoPhuHuynh: 'Anh chị ơi, con vắng 4 ngày. Bộ não A.I đã xếp một chặng ngắn cho con. Anh chị chỉ cần nhắc con mở app.' }), goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' } }])
+    expect(r).toMatchObject({ nhan: 1 })
+    const j = JSON.parse((d.sql.prepare(`SELECT json FROM ai_dieu_chinh WHERE sbd = '12002'`).get() as { json: string }).json)
+    expect(j.loiNhanChoPhuHuynh).toContain('Anh chị ơi')
+  })
+  it('NỘP LẠI ghi đè đúng dòng; điều chỉnh đã BỊ BỎ không "sống lại" (huy giữ nguyên, ap_dung về 0)', async () => {
+    await cauHinh({ cheDo: 'that' })
+    await nop([dauRa()])
+    expect(d.dem('ai_dieu_chinh')).toBe(1)
+    await boNaoBoDieuChinh(d.env, { sbd: '12001', ngay: NGAY })
+    await nop([dauRa({ doTinCay: 0.9 })])
+    expect(d.dem('ai_dieu_chinh')).toBe(1)
+    expect(d.sql.prepare(`SELECT huy, ap_dung, do_tin FROM ai_dieu_chinh WHERE sbd = '12001'`).get()).toEqual({ huy: 1, ap_dung: 0, do_tin: 0.9 })
+  })
+  it('BẢN TIN: hợp lệ được lưu kèm số đếm đêm; số bịa / quá 6 dòng ⇒ báo lỗi, KHÔNG lưu bản tin (điều chỉnh vẫn nhận)', async () => {
+    const dong = (o: Record<string, unknown> = {}) => ({ loai: 'ca_lop', sbd: '', chu: 'Có 2 em soi kỹ đêm nay', hanhDong: 'khong', dang: '', ...o })
+    const ok = await nop([dauRa()], { cacDong: [dong(), dong({ loai: 'can_thay_y', sbd: '12002', chu: 'Có 1 em vắng liền nhiều ngày', hanhDong: 'nhan_phu_huynh' })] })
+    expect(ok.banTin).toEqual({ nhan: 2, loi: [] })
+    expect(d.sql.prepare('SELECT so_em, so_vang, so_nhan, che_do FROM ai_ban_tin').get()).toMatchObject({ so_em: 2, so_vang: 1, so_nhan: 1, che_do: 'bong' })
+    d.sql.exec('DELETE FROM ai_ban_tin')
+    const xau = await nop([dauRa()], { cacDong: [dong({ chu: 'Có 77 em soi kỹ' })] })
+    expect((xau.banTin as { nhan: number; loi: string[] }).nhan).toBe(0)
+    expect((xau.banTin as { loi: string[] }).loi.join()).toContain('số không có trong số liệu lớp: 77')
+    expect(xau.nhan).toBe(1)
+    expect(d.dem('ai_ban_tin')).toBe(0)
+    const nhieu = await nop([], { cacDong: Array.from({ length: 7 }, () => dong()) })
+    expect((nhieu.banTin as { loi: string[] }).loi.join()).toContain('quá 6 dòng')
+  })
+  it('giới hạn: > 100 em một lượt ⇒ lỗi; ngày sai ⇒ lỗi; thân rỗng ⇒ ok, không nhận gì', async () => {
+    expect((await nop(Array.from({ length: 101 }, () => dauRa()))).ok).toBe(false)
+    expect((await boNaoNop(d.env, { ngay: 'x', cacEm: [] }, NOW)).ok).toBe(false)
+    expect(await nop([])).toMatchObject({ ok: true, nhan: 0, biLoai: 0 })
+  })
+})
+
+// ───────────────────────── tự chấm + tự gỡ ─────────────────────────
+describe('TỰ CHẤM điều chỉnh hôm qua (lúc dựng hồ sơ ngày) và TỰ GỠ khi xau_di', () => {
+  /** Đêm 21/09: em A có điều chỉnh (that hoặc bóng); hôm qua (21/09) em học `lam` câu, `dung` đúng; 7 ngày trước khá (75 %). */
+  async function chuanBi(cheDo: 'that' | 'bong', lam: number, dung: number) {
+    themEm('12001', 'Nguyễn An')
+    ngayHoc('12001', 6, 8, 6)
+    ngayHoc('12001', 4, 8, 6)
+    ngayHoc('12001', 1, lam, dung)
+    // thẻ + điều chỉnh của ĐÊM TRƯỚC (ngày 21/09)
+    await boNaoHoSoNgay(d.env, { ngay: '2026-09-21' }, NOW - 86_400_000)
+    await cauHinh({ cheDo })
+    const r = await boNaoNop(d.env, { ngay: '2026-09-21', cacEm: [dauRa({ loiNhanChoEm: 'Em làm tốt.', dang: [], goiYChoThay: { chu: '', hanhDong: 'khong', dang: '' }, ghiChuHlv: '' })] }, NOW - 86_400_000)
+    expect(r.nhan).toBe(1)
+  }
+  it('xấu đi (đúng 2/8 so với 75 % trước đó) khi ĐANG ÁP DỤNG ⇒ ket_qua=xau_di, TỰ GỠ (huy, tu_go), em vào luồng soi kỹ với cờ xau_di_hom_qua', async () => {
+    await chuanBi('that', 8, 2)
+    const r = await hoSo()
+    const em = (r.cacEm as { sbd: string; luong: string; lyDoLuong: string[]; the: { co: string[]; homQuaDanhGia: { ketQua: string } } }[])[0]
+    expect(em.luong).toBe('sau')
+    expect(em.the.co).toContain('xau_di_hom_qua')
+    expect(em.lyDoLuong).toContain('điều chỉnh hôm qua chưa hiệu quả')
+    expect(em.the.homQuaDanhGia.ketQua).toBe('xau_di')
+    expect(d.sql.prepare(`SELECT ket_qua, huy, tu_go, ap_dung FROM ai_dieu_chinh WHERE ngay = '2026-09-21'`).get()).toMatchObject({ ket_qua: 'xau_di', huy: 1, tu_go: 1 })
+    expect((d.sql.prepare(`SELECT ket_qua_chu FROM ai_dieu_chinh WHERE ngay = '2026-09-21'`).get() as { ket_qua_chu: string }).ket_qua_chu).toContain('hôm qua đúng 2/8 câu')
+  })
+  it('xấu đi nhưng chỉ CHẠY THỬ (không áp dụng) ⇒ chấm điểm ghi sổ, KHÔNG có gì để gỡ (tu_go = 0)', async () => {
+    await chuanBi('bong', 8, 2)
+    await hoSo()
+    expect(d.sql.prepare(`SELECT ket_qua, huy, tu_go FROM ai_dieu_chinh WHERE ngay = '2026-09-21'`).get()).toEqual({ ket_qua: 'xau_di', huy: 0, tu_go: 0 })
+  })
+  it('ăn thua (đúng 7/8) ⇒ an_thua, GIỮ điều chỉnh; chưa đủ dữ liệu (2 câu) ⇒ chua_du_du_lieu, GIỮ', async () => {
+    await chuanBi('that', 8, 7)
+    await hoSo()
+    expect(d.sql.prepare(`SELECT ket_qua, huy, tu_go FROM ai_dieu_chinh WHERE ngay = '2026-09-21'`).get()).toEqual({ ket_qua: 'an_thua', huy: 0, tu_go: 0 })
+    d = taoD1That()
+    await chuanBi('that', 2, 0)
+    await hoSo()
+    expect(d.sql.prepare(`SELECT ket_qua, huy FROM ai_dieu_chinh WHERE ngay = '2026-09-21'`).get()).toEqual({ ket_qua: 'chua_du_du_lieu', huy: 0 })
+  })
+})
+
+// ───────────────────────── đọc (app thầy) ─────────────────────────
+describe('/ai/dem-qua · /ai/nhat-ky · /ai/dieu-chinh/bo', () => {
+  it('CHƯA CHẠY LẦN NÀO: chayLanCuoi null, bản tin rỗng, đếm 0, có cờ cấu hình', async () => {
+    expect(await boNaoDemQua(d.env, {}, NOW)).toEqual({
+      ok: true, ngay: NGAY, chayLanCuoi: null, cheDo: 'bong', bat: true, lopThat: [], soEm: 0, soSoiNhanh: 0, soSoiKy: 0, soVang: 0, soDieuChinh: { nhan: 0, chiGhiSo: 0, biLoai: 0 }, soEmHoTro: 0, banTin: { cacDong: [] },
+    })
+  })
+  it('SAU KHI NỘP: bản tin có dòng, tên em do MÁY CHỦ ghép từ sbd, apDung/ngayDieuChinh/ketQua của điều chỉnh hôm qua, soEmHoTro, chayLanCuoi', async () => {
+    dungBaEm()
+    await hoSo()
+    await cauHinh({ lopThat: ['12A1'] })
+    await boNaoNop(d.env, { ngay: NGAY, cacEm: [dauRa()], banTin: { cacDong: [{ loai: 'dieu_chinh', sbd: '12001', chu: 'Đã giảm nhịp cho 1 em có hoạt động', hanhDong: 'xem_ho_so', dang: '' }, { loai: 'ca_lop', sbd: '', chu: 'Đêm nay có 2 em có thẻ', hanhDong: 'khong', dang: '' }] } }, NOW)
+    // điều chỉnh HÔM QUA của em 12001 đã được chấm
+    d.sql.exec(`INSERT INTO ai_dieu_chinh (sbd, ngay, json, do_tin, che_do, ap_dung, het_han, huy, tu_go, ly_do_bo, ket_qua, ket_qua_chu, nop_luc) VALUES ('12001', '${truoc(1)}', '{}', 0.7, 'that', 1, '${truoc(-2)}', 1, 1, '[]', 'xau_di', 'hôm qua đúng 2/8 câu', '${new Date(NOW - 3_600_000).toISOString()}')`)
+    const r = (await boNaoDemQua(d.env, {}, NOW)) as Record<string, any>
+    expect(r).toMatchObject({ ok: true, ngay: NGAY, cheDo: 'bong', bat: true, lopThat: ['12A1'], soEm: 2, soSoiNhanh: expect.any(Number), soVang: 1, soEmHoTro: 1 })
+    expect(r.chayLanCuoi).toBe(NOW ? new Date(NOW).toISOString() : '')
+    expect(r.soDieuChinh).toEqual({ nhan: 1, chiGhiSo: 0, biLoai: 0 })
+    expect(r.banTin.cacDong).toHaveLength(2)
+    expect(r.banTin.cacDong[0]).toEqual({ loai: 'dieu_chinh', sbd: '12001', hoTen: 'Nguyễn An', chu: 'Đã giảm nhịp cho 1 em có hoạt động', hanhDong: 'xem_ho_so', dang: '', apDung: true, ngayDieuChinh: NGAY, ketQua: 'xau_di', ketQuaChu: 'hôm qua đúng 2/8 câu', tuGo: true })
+    expect(r.banTin.cacDong[1]).toMatchObject({ sbd: '', hoTen: '', apDung: false, ketQua: null, tuGo: false })
+    const theoNgay = (await boNaoDemQua(d.env, { ngay: '2026-01-01' }, NOW)) as Record<string, any>
+    expect(theoNgay.banTin.cacDong).toEqual([])
+  })
+  it('NHẬT KÝ của một em: ≤ 14 dòng mới nhất trước, NGUYÊN VĂN lời cho em / phụ huynh / thư tuần, cờ apDung / tuGo / daBo; thiếu sbd ⇒ lỗi', async () => {
+    dungBaEm()
+    for (let i = 0; i < 16; i++) {
+      d.sql.exec(`INSERT INTO ai_dieu_chinh (sbd, ngay, json, do_tin, che_do, ap_dung, het_han, huy, tu_go, ly_do_bo, ket_qua, ket_qua_chu, nop_luc) VALUES ('12001', '${truoc(i + 1)}', '${JSON.stringify({ nhip: { lech: i, khoiDong: 2 }, loiNhanChoEm: `lời ${i}`, loiNhanChoPhuHuynh: i === 0 ? 'lời phụ huynh' : '', thuTuan: i === 0 ? 'thư tuần' : '', dang: [], khacPhuc: [], co: 'khong' })}', 0.7, 'that', ${i === 0 ? 1 : 0}, '${truoc(-2)}', ${i === 2 ? 1 : 0}, 0, '[]', NULL, NULL, 'x')`)
+    }
+    const r = (await boNaoNhatKy(d.env, { sbd: '12001' })) as { ok: boolean; hoTen: string; ds: Record<string, any>[] }
+    expect(r).toMatchObject({ ok: true, hoTen: 'Nguyễn An' })
+    expect(r.ds).toHaveLength(14)
+    expect(r.ds[0]).toMatchObject({ ngay: truoc(1), loiNhanChoEm: 'lời 0', loiNhanChoPhuHuynh: 'lời phụ huynh', thuTuan: 'thư tuần', apDung: true, daBo: false, tuGo: false, cheDo: 'that' })
+    expect(r.ds[2]).toMatchObject({ daBo: true, apDung: false })
+    expect(r.ds.map((x) => x.ngay)).toEqual([...r.ds.map((x) => x.ngay)].sort().reverse())
+    expect((await boNaoNhatKy(d.env, {})).ok).toBe(false)
+    expect(((await boNaoNhatKy(d.env, { sbd: '99999' })) as { ds: unknown[] }).ds).toEqual([])
+  })
+  it('nhật ký phân biệt THẦY BỎ (daBo) với BỘ NÃO TỰ GỠ (tuGo): điều chỉnh tự gỡ không tính là thầy bỏ', async () => {
+    dungBaEm()
+    d.sql.exec(`INSERT INTO ai_dieu_chinh (sbd, ngay, json, do_tin, che_do, ap_dung, het_han, huy, tu_go, ly_do_bo, ket_qua, ket_qua_chu, nop_luc) VALUES ('12001', '${truoc(1)}', '{}', 0.8, 'that', 1, '${truoc(-2)}', 1, 1, '[]', 'xau_di', 'hôm qua đúng 2/8 câu', 'x')`)
+    const r = (await boNaoNhatKy(d.env, { sbd: '12001' })) as { ds: Record<string, any>[] }
+    expect(r.ds[0]).toMatchObject({ daBo: false, tuGo: true, apDung: false, ketQua: 'xau_di' })
+  })
+  it('BỎ điều chỉnh: đặt huy = 1 và ap_dung = 0; không có ⇒ ok, daBo false; bỏ hai lần vô hại; thiếu tham số ⇒ lỗi', async () => {
+    d.sql.exec(`INSERT INTO ai_dieu_chinh (sbd, ngay, json, do_tin, che_do, ap_dung, het_han, huy, tu_go, ly_do_bo, nop_luc) VALUES ('12001', '${NGAY}', '{}', 0.8, 'that', 1, '${truoc(-3)}', 0, 0, '[]', 'x')`)
+    expect(await boNaoBoDieuChinh(d.env, { sbd: '12001', ngay: NGAY })).toEqual({ ok: true, daBo: true })
+    expect(d.sql.prepare(`SELECT huy, ap_dung FROM ai_dieu_chinh WHERE sbd = '12001'`).get()).toEqual({ huy: 1, ap_dung: 0 })
+    expect(await boNaoBoDieuChinh(d.env, { sbd: '12001', ngay: NGAY })).toEqual({ ok: true, daBo: true }) // dòng có, đặt lại như cũ
+    expect(await boNaoBoDieuChinh(d.env, { sbd: '12009', ngay: NGAY })).toEqual({ ok: true, daBo: false })
+    expect((await boNaoBoDieuChinh(d.env, { sbd: '12001' })).ok).toBe(false)
+    expect((await boNaoBoDieuChinh(d.env, { ngay: NGAY })).ok).toBe(false)
+  })
+})
+
+describe('khoá nguồn', () => {
+  it('server/src/bo-nao.ts: không tự kiểm mã bí mật, không sửa index.ts, chỉ import lõi thuần + kiểu; không tên em trong thẻ (chỉ ghép tên ở đường đọc)', () => {
+    const nguon = readFileSync('server/src/bo-nao.ts', 'utf8')
+    expect(nguon.split('\n').filter((l) => !l.trimStart().startsWith('//')).join('\n')).not.toMatch(/MA_BI_MAT|x-ma-bi-mat|laThay/) // chú thích được nhắc tên; MÃ thì không
+    expect([...nguon.matchAll(/^(?:import|\}).* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./kieu', '../../src/lib/bo-nao-dac-trung', '../../src/lib/bo-nao-khuon'])
+    expect(nguon).not.toMatch(/console\./)
+    expect(readFileSync('server/src/index.ts', 'utf8')).not.toContain('bo-nao') // Code 3 nối sau; tệp này không đụng tới index.ts
+  })
+})

@@ -176,6 +176,8 @@ export interface TheNgan {
   khiNaoVietPhuHuynh: string[]
   /** ≤ 3 lời nhắn gần nhất cho em (chống lặp). KHÔNG phải nguồn số. */
   loiNhanGanDay: string[]
+  /** Kết quả CHẤM điều chỉnh hôm qua (máy chủ gắn sau khi so thẻ đêm trước với thẻ này); chỉ khi em có điều chỉnh hôm qua. Số đo ở đây là nguồn số cho lời nhắn. */
+  homQuaDanhGia?: DanhGiaDieuChinh | null
   homQuaDc: {
     lech: number
     khoiDong: number

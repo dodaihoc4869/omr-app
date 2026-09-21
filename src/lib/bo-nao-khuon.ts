@@ -184,7 +184,7 @@ function chuanSo(x: string): string {
 }
 
 /** Khoá của thẻ mang MÃ / định danh / mốc thời gian / bậc 0-1-2 (nói bằng TÊN bậc: Biết, Hiểu, Vận dụng — không nói bằng số), không phải sự thật để nêu cho em: số nằm trong chúng ("D3", "12-C1", "2026-09-22") KHÔNG được coi là số có thật. */
-const KHOA_KHONG_LAY_SO = new Set(['ma', 'maDang', 'qid', 'biDanh', 'sbd', 'ngay', 'luc', 'loiNhanGanDay', 'khiNaoVietPhuHuynh', 'bac', 'tu', 'den', 'bacCuaMaDang'])
+const KHOA_KHONG_LAY_SO = new Set(['ma', 'maDang', 'qid', 'biDanh', 'sbd', 'ngay', 'luc', 'loiNhanGanDay', 'khiNaoVietPhuHuynh', 'bac', 'tu', 'den', 'bacCuaMaDang', 'emNoiLen'])
 /** Khoá mà GIÁ TRỊ CHUỖI là mã (mã dạng, tên núm…) — bỏ khi là chuỗi, nhưng vẫn đi vào khi là mảng/đối tượng (`dang: [{gap: 9}]` là số thật). */
 const KHOA_CHUOI_LA_MA = new Set(['dang', 'hanhDong', 'kieu', 'co', 'trangThai', 'xuHuong'])
 
@@ -219,7 +219,7 @@ export function soLa(chu: string, tap: Set<string>): string[] {
 
 const laChuoi = (v: unknown): v is string => typeof v === 'string'
 const laSoNguyenTrong = (v: unknown, lo: number, hi: number): v is number => typeof v === 'number' && Number.isInteger(v) && v >= lo && v <= hi
-const KY_TU_LA = /[ -<>`]|https?:|www\./i
+const KY_TU_LA = /[\u0000-\u001f\u007f<>`]|https?:|www\./i
 
 // ══════════════════════════════ KIỂM KHUÔN ══════════════════════════════
 
