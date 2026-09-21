@@ -81,8 +81,8 @@ export default function LichSuCaScreen() {
     setLoi('')
     try {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
-      if (!url.trim()) throw new Error('Chưa cấu hình địa chỉ máy chủ — vào Ngân hàng câu hỏi → Cấu hình')
-      if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
+      if (!url.trim()) throw new Error('Chưa cấu hình địa chỉ máy chủ — vào Cài đặt → Kết nối máy chủ')
+      if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Cài đặt → Kết nối máy chủ')
       setDsCa(await danhSachCa(url.trim(), mat.trim(), xemDaXoa))
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')

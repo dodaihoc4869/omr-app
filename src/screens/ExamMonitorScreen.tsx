@@ -309,8 +309,8 @@ export default function ExamMonitorScreen() {
   const tai = async (ma: string, imLang = false) => {
     const url = (scriptUrl || (await loadScriptUrl())).trim()
     const mat = (secret || (await loadTeacherSecret())).trim()
-    if (!url) return setLoi('Chưa cấu hình địa chỉ máy chủ — vào Ngân hàng câu hỏi → Cấu hình')
-    if (!mat) return setLoi('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
+    if (!url) return setLoi('Chưa cấu hình địa chỉ máy chủ — vào Cài đặt → Kết nối máy chủ')
+    if (!mat) return setLoi('Chưa nhập mã bí mật — vào Cài đặt → Kết nối máy chủ')
     if (!ma.trim()) return setLoi('Nhập mã ca')
     if (!imLang) setDangTai(true)
     setLoi('')

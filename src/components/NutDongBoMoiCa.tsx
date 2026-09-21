@@ -45,8 +45,8 @@ export default function NutDongBoMoiCa() {
     try {
       const url = (await loadScriptUrl()).trim()
       const mat = (await loadTeacherSecret()).trim()
-      if (!url) throw new Error('Chưa cấu hình địa chỉ máy chủ — vào Ngân hàng câu hỏi → Cấu hình')
-      if (!mat) throw new Error('Chưa nhập mã bí mật — vào Ngân hàng câu hỏi → Cấu hình')
+      if (!url) throw new Error('Chưa cấu hình địa chỉ máy chủ — vào Cài đặt → Kết nối máy chủ')
+      if (!mat) throw new Error('Chưa nhập mã bí mật — vào Cài đặt → Kết nối máy chủ')
 
       setTien('đang tải lại kho đề…')
       await dongBoNganHang(url, mat, true)

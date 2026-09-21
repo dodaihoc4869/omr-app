@@ -165,7 +165,7 @@ async function postJson(_scriptUrl: string, body: unknown, giay: number = HAN_GI
   // KHÔNG ÂM THẦM QUAY VỀ GOOGLE. Thiếu địa chỉ thì nói thẳng, vì cái sai ở đây
   // là cấu hình chứ không phải mạng — và im lặng đi đường cũ là đúng thứ thầy
   // vừa bảo dẹp.
-  if (!diaChi) throw new Error('Chưa có địa chỉ máy chủ mới — vào Ngân hàng câu hỏi → Cấu hình')
+  if (!diaChi) throw new Error('Chưa có địa chỉ máy chủ mới — vào Cài đặt → Kết nối máy chủ')
   const res = await fetchCoHan(
     `${diaChi}/goi`,
     {
