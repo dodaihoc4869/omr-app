@@ -68,3 +68,22 @@ Mỗi phiên rà làn của mình, lập BẢNG trong `docs/ra-soat-tu-ngu-2109-
 16. **Danh sách dài** (> 50 dòng: lớp 260 em, dòng thời gian toàn cảnh): phân trang hoặc `content-visibility: auto`; ảnh dưới màn đầu `loading="lazy"`, ảnh có `width`/`height`.
 17. **Chạm trên điện thoại**: `touch-action: manipulation` cho nút; tấm phủ/ngăn kéo có `overscroll-behavior: contain`; vùng tai thỏ dùng `env(safe-area-inset-*)`; `color-scheme` khớp sáng/tối để ô nhập và thanh cuộn không lệch màu.
 18. **Gu thiết kế (chống "giao diện đại trà")**: mỗi màn có MỘT điểm nhấn thị giác (con số lớn, thanh tiến độ, hình thần thú) — không rải đều; khoảng trắng rộng rãi hơn là nhồi thẻ; tối đa 2 cỡ chữ tiêu đề + 1 cỡ thân + 1 cỡ chú thích; màu nhấn chỉ cho việc chính; mật độ thông tin: học sinh THƯA, thầy ĐẶC vừa phải; nhất quán với bộ nhận diện M3 + logo Avogadro đã chốt — KHÔNG vay nhận diện của thương hiệu khác.
+
+## PHẦN C · LUẬT THÂN THIỆN (thầy lệnh 21/09: "mức thân thiện hãy học tập của Apple và thực hiện" — Boss chắt lọc tinh thần bộ hướng dẫn giao diện của Apple thành luật KIỂM ĐƯỢC cho 3 app; không chép nguyên văn)
+C1. **Rõ trước đẹp.** Mỗi màn trả lời ngay một câu hỏi của người dùng ("hôm nay em làm gì?", "con tôi học thế nào?", "lớp tôi ra sao?"). Đọc 5 giây không biết màn để làm gì ⇒ làm lại.
+C2. **Một việc chính mỗi màn.** Đúng MỘT nút chính (màu nhấn), các việc khác là nút phụ/nút chữ. Hai nút chính cạnh nhau = lỗi.
+C3. **Nội dung đứng trước, khung đứng sau.** Bỏ viền, nền, tiêu đề, nhãn, biểu tượng không mang thông tin. Thứ gì xoá đi mà người dùng không mất gì ⇒ XOÁ.
+C4. **Không lặp.** Một thông tin hiện MỘT chỗ trên một màn; một việc có MỘT đường vào chính (đường tắt được phép, nhưng không ba nút cùng mở một thứ).
+C5. **Hé lộ dần.** Màn đầu chỉ có thứ dùng hằng ngày; phần nâng cao nằm sau "Thêm…"/tấm bên. Cài đặt có giá trị mặc định đúng — người dùng không phải chọn mới dùng được.
+C6. **Điều hướng nông và quen.** Thanh dưới ≤ 5 mục, tên 1–2 chữ; luôn có đường về rõ; không quá 3 tầng; vị trí nút giống nhau giữa các màn.
+C7. **Phản hồi tức thì.** Mọi chạm có phản ứng ≤ 100 ms (đổi trạng thái/khung xương), việc > 1 giây có tiến độ, xong thì báo bằng chữ thật. Không để người dùng đoán "đã bấm chưa".
+C8. **Dễ tha thứ.** Việc xoá/gửi/nộp mới hỏi lại, hỏi bằng hộp thoại nói rõ hậu quả + nút mang tên việc ("Nộp bài", không "OK"); việc khác cho hoàn tác thay vì hỏi. Không bắt gõ lại thứ máy đã biết.
+C9. **Chạm thoải mái, đọc thoải mái.** Đích chạm ≥ 48 px, cách nhau ≥ 8; chữ thân ≥ 15 px trên điện thoại, chú thích ≥ 12; dòng ≤ 75 ký tự; khoảng thở theo bội số 4/8.
+C10. **Trạng thái rỗng, lỗi, chờ đều được thiết kế.** Rỗng: nói vì sao rỗng + việc làm tiếp. Lỗi: nói chuyện gì xảy ra + cách sửa, không mã lỗi trơ. Chờ: khung xương, không màn trắng.
+C11. **Nhất quán.** Cùng một thứ thì cùng tên, cùng biểu tượng, cùng màu, cùng chỗ ở cả 3 app (bảng A2). Dùng thành phần M3 dùng chung, không tự vẽ bản thứ hai.
+C12. **Cho mọi người.** Tương phản ≥ 4,5:1, nhãn cho trình đọc màn hình, tôn trọng "giảm chuyển động", dùng được bằng bàn phím ở app thầy, sáng và tối đều đẹp.
+C13. **Chuyển động có nghĩa.** Hoạt ảnh ≤ 300 ms, chỉ để chỉ hướng/nhân quả; không nhấp nháy, không trang trí.
+C14. **Tôn trọng sự tập trung.** Không bật hộp thoại khi người dùng đang làm việc khác (trừ vào ca kiểm tra); thông báo gộp, có trần; không đếm ngược gây sợ ngoài màn kiểm tra.
+
+### C-RÀO khi dọn "dư thừa"
+KHÔNG BAO GIỜ bỏ: bất cứ thứ gì của luồng kiểm tra thật (`ExamTakeScreen`, phòng chờ, cảnh báo rời màn, vân tay máy, giữ-để-đọc), luật công bố điểm, cổng mã bí mật, nút "Về app học sinh" trong game, thông tin hạn nộp, đường vào ca. Thứ thầy đã CHỐT bằng lời (tra Nhật ký) chỉ đổi khi thầy lệnh. Mỗi thứ bị bỏ phải có một dòng trong báo cáo dọn (bỏ gì · ở đâu · vì luật C mấy · ảnh trước/sau) để hoàn lại được bằng git.
