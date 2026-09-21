@@ -8,13 +8,14 @@
 // Quy tắc: có `pass` thì DANH TÍNH lấy từ token, mọi `sbd` trong thân bị bỏ qua (không cho token của em A đọc em B). Token sai/hết hạn/bị thu hồi thì báo lỗi,
 // KHÔNG rơi xuống SBD trần. Đếm lỗi (thiếu bảng, D1 lỗi tạm) không bao giờ làm hỏng lệnh chính.
 import { docBoNaoAiChoPhuHuynh } from './bo-nao-doc'
+import { canhBaoChoPh, phXemCanhBao } from './canh-bao-thay'
 import type { Env } from './kieu'
 import { parentIdentity, parentPass } from './game-v2-auth'
 import { PHUT_NGAY_MAC_DINH, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU } from './ho-so-cau-hinh'
 import { datPhutMoiNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
 
 export type KieuTruyCap = 'token' | 'sbd_tran'
-export type DuongPh = 'parent-news' | 'mom' | 'ph-ke-hoach' | 'ph-thoi-gian-hoc' | 'ph-xac-dinh'
+export type DuongPh = 'parent-news' | 'mom' | 'ph-ke-hoach' | 'ph-thoi-gian-hoc' | 'ph-xac-dinh' | 'ph-canh-bao-xem'
 
 /** Địa chỉ app (Pages). Liên kết phát cho phụ huynh: `<APP>/ph?ph=<pass>`; cổng phụ huynh lưu `pass` rồi gửi `{pass}` ở mọi lệnh. */
 export const DIA_CHI_APP = 'https://omr-app-b3u.pages.dev'
@@ -76,6 +77,7 @@ export async function phKeHoach(env: Env, b: Record<string, unknown>): Promise<R
   const em = await env.DB.prepare('SELECT ho_ten, lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
   const kh = (await lapVaLuuKeHoach(env, [sbd], Date.now())).get(sbd)!
   const boNaoAi = await docBoNaoAiChoPhuHuynh(env, sbd, kh.ngay)
+  const canhBao = await canhBaoChoPh(env, sbd)
   return {
     ok: true,
     hoTen: em?.ho_ten ?? '',
@@ -96,7 +98,15 @@ export async function phKeHoach(env: Env, b: Record<string, unknown>): Promise<R
     tonCuTong: kh.tonCuTong,
     // BỘ NÃO A.I chế độ THẬT: lời nhắn + thư tuần cho phụ huynh, CHỈ của đúng con (SBD từ token). Chạy thử/tắt/không có ⇒ KHÔNG có khoá này.
     ...(boNaoAi ? { boNaoAi } : {}),
+    // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): lời cho PHỤ HUYNH, ≤ 3, bài của con chưa nộp, gửi trong 72 giờ. Không có ⇒ KHÔNG có khoá.
+    ...(canhBao.length > 0 ? { canhBaoThay: canhBao } : {}),
   }
+}
+
+/** `POST /ph/canh-bao/xem {pass, id}` — phụ huynh đã xem cảnh báo. Chỉ nhận token; chỉ cảnh báo của đúng con (SBD từ token). */
+export async function phCanhBaoXem(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
+  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-canh-bao-xem', { chiToken: true })
+  return { ...(await phXemCanhBao(env, sbd, String(b.id ?? ''))) }
 }
 
 /** `POST /ph/thoi-gian-hoc {pass, phut?}` — phụ huynh xem hoặc đặt số phút học mỗi ngày của con (10–45). Không có `phut` thì chỉ đọc. Chỉ nhận token. */

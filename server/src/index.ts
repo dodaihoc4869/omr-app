@@ -12,10 +12,13 @@ import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsOnLaiNop} from './on-lai-nop'
 import {hoSoOnCa} from './ho-so-on-ca'
 import {notifications,deliverNotices} from './notifications'
+import {canhBaoChoEm,emXemCanhBao,guiCanhBao} from './canh-bao-thay'
+import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
+import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-nay-v2'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
 import {parentNews,refreshDailyNews} from './parent-news'
-import {phCapMa,phDemTruyCap,phKeHoach,phThoiGianHoc,phXacDinh} from './ph-truy-cap'
+import {phCanhBaoXem,phCapMa,phDemTruyCap,phKeHoach,phThoiGianHoc,phXacDinh} from './ph-truy-cap'
 import {homNayThay} from './hom-nay-thay'
 import {gvKeHoachEm} from './gv-ke-hoach-em'
 import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
@@ -2950,7 +2953,11 @@ export default {
       // EXP học tập mới: chốt "đạt ngày/chuỗi" của ngày vừa qua cho em nào chưa được trao (chỉ em đang bật cờ). Lỗi chỉ ghi log.
       await chotExpNgayQua(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(e=>console.error('[exp] cron lỗi:',e))
       await Promise.all([refreshDailyNews(env),dailyHonors(env,false)])
-    }else await deliverNotices(env)
+    }else{
+      // NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09): mỗi phút gọi nhưng chỉ chạy MỘT lần/30 phút, trong khung 07:00–21:30 giờ VN, khoá idempotent. Lỗi chỉ ghi log — không kéo `deliverNotices` đổ theo.
+      await nhacTuDong(env,Date.now()).then(r=>{if(r.chay)console.log('[nhac-tu-dong] cron',JSON.stringify(r))}).catch(e=>console.error('[nhac-tu-dong] cron lỗi:',e))
+      await deliverNotices(env)
+    }
   },
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url)
@@ -3029,6 +3036,7 @@ export default {
       // CỔNG PHỤ HUYNH — token giai đoạn mềm (docs/token-phu-huynh-1909.md): chỉ nhận `pass` (token do thầy cấp).
       if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b))
       if (p === '/ph/ke-hoach') return ra(await phKeHoach(env, b))
+      if (p === '/ph/canh-bao/xem') return ra(await phCanhBaoXem(env, b))
       if (p === '/ph/thoi-gian-hoc') return ra(await phThoiGianHoc(env, b))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
@@ -3064,9 +3072,15 @@ export default {
           const loiHlv = await docLoiNhanHlv(env, kh.sbd, typeof kh.ngay === 'string' ? kh.ngay : ngayVn(Date.now()))
           if (loiHlv) kh.loiNhanHlv = loiHlv
         }
+        // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): ≤ 3, bài chưa nộp, gửi trong 48 giờ. Không có ⇒ KHÔNG có khoá `canhBaoThay` (phản hồi y hệt cũ).
+        if (kh.ok === true && typeof kh.sbd === 'string') {
+          const canhBao = await canhBaoChoEm(env, kh.sbd)
+          if (canhBao.length > 0) kh.canhBaoThay = canhBao
+        }
         return themMocReset(env, ra(kh))
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
+      if (p === '/hs/canh-bao/xem') return ra(await emXemCanhBao(env, await gameIdentity(env, b), String(b.id ?? '')))
       if (p === '/hs/on-lai/nop') return ra(await hsOnLaiNop(env, b))
       if (p === '/hs/thoi-gian-hoc') return ra(await hsThoiGianHoc(env, b))
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
@@ -3099,6 +3113,15 @@ export default {
       if (p === '/ke-hoach/hom-nay-thay') return ra(await homNayThay(env, b))
       // Kế hoạch hôm nay của MỘT em cho màn Học sinh của thầy: CHỈ ĐỌC (không lập kế hoạch, không capNhatExp) để không nuốt `expNhan` của em.
       if (p === '/gv/ke-hoach-em') return ra(await gvKeHoachEm(env, b))
+      // HÔM NAY v2 (docs/hop-dong-hom-nay-v2-2109.md): MỘT lệnh GHI (cảnh báo em chưa nộp — chỉ thầy bấm mới gửi).
+      if (p === '/gv/canh-bao-nop-bai') return ra(await guiCanhBao(env, b))
+      if (p === '/gv/nhac-tu-dong') return ra(await gvNhacTuDong(env, b))
+      // NĂM lệnh ĐỌC-CHỈ (≤ 12 truy vấn, đo ở `soTruyVan`): ô Việc gấp, Em cần thầy giúp, Vinh danh, tra cứu, Toàn cảnh một em.
+      if (p === '/gv/chua-nop') return ra(await gvChuaNop(env, b))
+      if (p === '/gv/can-giup') return ra(await gvCanGiup(env, b))
+      if (p === '/gv/vinh-danh-ngay') return ra(await gvVinhDanhNgay(env, b))
+      if (p === '/gv/tim-em') return ra(await gvTimEm(env, b))
+      if (p === '/gv/em-toan-canh') return ra(await gvEmToanCanh(env, b))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)

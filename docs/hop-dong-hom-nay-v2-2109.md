@@ -7,7 +7,7 @@ Người viết: Code 3 (máy chủ), 21/09/2026. Đề bài: `prompt-hom-nay-gv
 - 6 lệnh `/gv/*` là **lệnh THẦY** (mã bí mật, sau cổng `laThay`). Năm lệnh ĐỌC (không ghi một byte), MỘT lệnh GHI (`/gv/canh-bao-nop-bai`). Mọi lệnh trả `{ok, error?, soTruyVan}` (đo truy vấn ≤ 12, test khoá; app bỏ qua `soTruyVan`).
 - Mọi con số truy được về dữ liệu thật; chỗ chưa có dữ liệu trả vắng khoá / mảng rỗng và app ghi "chưa có". Máy chủ KHÔNG bịa. Không kết luận năng lực từ điểm; không chữ "nắm chắc".
 - Ngày `YYYY-MM-DD` giờ Việt Nam; mọi mốc giờ trả ISO UTC (app đổi sang giờ VN dạng 24 giờ `HH:mm`).
-- Chỉ THẦY bấm mới gửi cảnh báo. Bộ não A.I KHÔNG tự gửi (test khoá: không có đường nào ngoài `/gv/canh-bao-nop-bai` ghi bảng `canh_bao_thay`).
+- **Cảnh báo gửi theo HAI cách, KHÔNG có cách thứ ba:** (1) thầy bấm tay `/gv/canh-bao-nop-bai`; (2) NHẮC TỰ ĐỘNG của máy chủ theo luật Boss (mục 9: cron 30 phút, 4 mốc, không AI). Bộ não A.I KHÔNG có đường ghi bảng `canh_bao_thay` (test khoá: chỉ `canh-bao-thay.ts` và `nhac-tu-dong.ts` ghi).
 - Bậc dạng: `bac` = `'biet' | 'hieu' | 'van_dung'` (bậc 0/1/2 của `nam_kt_dang`). Xu hướng: `xuHuong` = `'tang' | 'giam' | 'giu'` (tỉ lệ đúng 7 ngày qua so với 7 ngày trước: ≥ +15 điểm % = `tang`, ≤ −15 = `giam`, còn lại `giu`; dưới 2 câu mỗi kỳ ⇒ vắng khoá).
 
 ## 1 · `POST /gv/chua-nop {ngay?, lop?}` (đọc) — ô "Chưa nộp bài tập về nhà"
@@ -40,7 +40,7 @@ canhBaoThay: [{ id, maBtvn, tenBtvn, guiLuc: ISO, hanNop: ISO, loi,          // 
 - `POST /hs/canh-bao/xem {token, id}` (chỉ token học sinh): ghi `em_xem_luc` (lần đầu) + `student_notice.read_at`; chỉ cảnh báo của CHÍNH em. Ra `{ok}`. Em bấm "Làm ngay" cũng gọi lệnh này.
 
 ## 4 · Phía PHỤ HUYNH (Code 2)
-- `POST /ph/ke-hoach {pass}` thêm CÙNG khoá `canhBaoThay` (≤ 3; gửi trong 72 giờ qua, bài của con chưa nộp), CHỈ của đúng con (SBD từ token). `loi` = LỜI CHO PHỤ HUYNH. Vắng ⇒ không có khoá. Chưa có kênh đẩy riêng cho phụ huynh: thông báo nằm trong app phụ huynh khi phụ huynh mở app.
+- `POST /ph/ke-hoach {pass}` thêm CÙNG khoá `canhBaoThay` (≤ 3; gửi trong 72 giờ qua, bài của con chưa nộp), CÙNG hình dạng như mục 3, CHỈ của đúng con (SBD từ token). `loi` = LỜI CHO PHỤ HUYNH, `daXem` = phụ huynh đã xem. Vắng ⇒ không có khoá. Chưa có kênh đẩy riêng cho phụ huynh: thông báo nằm trong app phụ huynh khi phụ huynh mở app.
 - `POST /ph/canh-bao/xem {pass, id}`: ghi `ph_xem_luc`. Ra `{ok}`.
 
 ## 5 · `POST /gv/can-giup {ngay?, lop?}` (đọc) — ô "Em cần thầy giúp hôm nay"
@@ -79,3 +79,15 @@ Mỗi bục CHỈ có khi có số > 0; không có dữ liệu ⇒ khoá vắng 
   nhip30: [{ ngay, muc: 0|1|2|3 }] }                                  // đủ 30 ngày, ngày không làm = 0; mức theo số câu làm trong ngày
 ```
 `truoc` (ISO) = lấy sự kiện CŨ HƠN mốc này; `loai` (mảng) lọc loại. Nguồn: `luot`+`chi_tiet_cau` (loại `ca`), `btvn_em`+`btvn_em_cau`+`su_kien_hoc` (BTVN: bài nào, chặng nào, câu nào đúng/sai), `su_kien_hoc` (ôn lại, bài riêng), `len_bang`, `exp_so`, `ai_dieu_chinh` (lời Bộ não A.I đã nhắn em/phụ huynh, kèm nhãn chạy thử/thật), `canh_bao_thay`. **Loại `mo_app`** (lần mở app từng em) CHƯA có nguồn (bảng hiện diện chỉ theo phiên, không theo em): máy chủ KHÔNG trả loại này cho tới khi có nguồn thật; app ẩn bộ lọc đó khi không thấy.
+
+## 9 · NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09; `server/src/nhac-tu-dong.ts`)
+Cron mỗi phút gọi nhưng CHỈ chạy MỘT lần mỗi 30 phút, CHỈ trong khung `gioTu`–`gioDen` (mặc định 07:00–21:30 giờ VN, cả hai đầu nằm trong). KHÔNG dùng AI; lời theo MẪU có số thật; ghi vào cùng bảng `canh_bao_thay` (cột `moc` = `M1`..`M4`, `gui_ph`, `ph_nhom`) nên em/phụ huynh thấy qua CÙNG khoá `canhBaoThay` (mục 3, 4). Khoá idempotent `ca:<maBtvn>:<sbd>:<mốc>:<ngày VN>`.
+| Mốc | Điều kiện (mỗi em CHƯA nộp của mỗi bài đang chạy, thường lẫn cá nhân hoá) | Gửi cho |
+|---|---|---|
+| M1 nhắc sớm | còn ≤ 24 giờ tới hạn, em CHƯA MỞ bài | EM |
+| M2 tối hạn chót | 20:00 NGÀY HẠN, chưa nộp | EM + PHỤ HUYNH |
+| M3 trễ nhịp | 20:00, chậm ≥ 2 chặng so với lịch, bài còn ≥ 1 ngày (bài cá nhân hoá) | EM |
+| M4 quá hạn | 07:00 sáng hôm sau hạn, vẫn chưa nộp — MỘT lần/bài | EM + PHỤ HUYNH |
+**Trần:** em ≤ 1 tin "nhắc thường" (M1/M3, kể cả tin thầy bấm tay) / bài / ngày; M2 và M4 là hai mốc CHỐT HẠN, mỗi mốc một lần/bài, không tính vào trần ấy. Phụ huynh ≤ 1 tin tự động/ngày (nhiều bài ⇒ GỘP một tin: `loi_ph` chỉ ở dòng đầu của nhóm `ph_nhom`) và ≤ 3 tin/7 ngày; chạm trần thì em VẪN nhận, phụ huynh không (`gui_ph = 0`). Không gửi cho em đã nộp, bài thu hồi/xoá, hạn đã gia hạn sang ngày khác (tính theo hạn HIỆN TẠI của bài).
+**Cờ** `cau_hinh.canh_bao_tu_dong = {bat: true, mocTat: [], baiTat: [], gioTu: '07:00', gioDen: '21:30'}` — vắng/hỏng ⇒ MẶC ĐỊNH BẬT; chỉ `bat: false` mới tắt; tắt theo mốc (`mocTat`) hoặc theo bài (`baiTat`). Lệnh thầy `POST /gv/nhac-tu-dong {bat?, mocTat?, baiTat?, gioTu?, gioDen?}` đọc/ghi cờ, ra `{ok, cauHinh, lanKe?}`.
+**`/gv/chua-nop` thêm** (đúng dạng đã chốt với Code 4): top-level `tuDong {bat, gioTu, gioDen, lanKe?: ISO}` (`lanKe` chỉ khi bật: đầu lượt 30 phút SAU giờ hiện tại, trong khung), `homNay {soEm, soPhuHuynh}` (số em / số tin phụ huynh đã được tự nhắc TRONG NGÀY VN, toàn trường); mỗi em thêm `daNhac?: [{moc: 'M1'..'M4', luc: ISO, emDaXem: boolean, phDaXem: boolean | null}]` (mới nhất trước; `phDaXem = null` khi mốc đó không gửi phụ huynh) và `nhacKe?: {moc, luc: ISO}` (mốc kế + giờ dự kiến; vắng khi hết mốc / tắt).

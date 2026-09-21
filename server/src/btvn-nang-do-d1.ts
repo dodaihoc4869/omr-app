@@ -1077,6 +1077,28 @@ export async function docBoCuaCacEm(env: Env, dsMaBtvn: string[], dsSbd: string[
   return ra
 }
 
+/**
+ * Ước lượng CHẶNG 1 của các em CHƯA CHỐT bộ (số câu + số phút) bằng đúng hàm/hạt giống lúc chốt (`dungBoChoEm`) — cho lời nhắc tự động M1 ("Chặng 1 có N câu, khoảng P phút").
+ * ĐỌC-CHỈ. Bài không cá nhân hoá / lỗi đọc ⇒ rỗng (nơi gọi không nói con số — không bịa).
+ */
+export async function docChang1ChoEm(env: Env, bt: Hang, dsSbd: string[], now: number): Promise<Map<string, { soCau: number; phut: number }>> {
+  const ra = new Map<string, { soCau: number; phut: number }>()
+  if (!laBaiCaNhan(bt) || dsSbd.length === 0) return ra
+  const bai = await docBaiNangDo(env, chuoi(bt.ma_btvn))
+  if (!bai) return ra
+  const hanMs = Date.parse(chuoi(bt.han_nop))
+  const [hs, dv, dc] = await Promise.all([docHoSoRut(env, dsSbd, bai.cau, now), docDauVaoNganSach(env, dsSbd, now), docDieuChinhHieuLuc(env, dsSbd, ngayVn(now))])
+  for (const sbd of dsSbd) {
+    const h = hs.get(sbd)
+    const v = dv.get(sbd)
+    if (!h || !v) continue
+    const { bo, giay } = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) ? hanMs : now + MOT_NGAY_MS, v, h, dc.get(sbd)?.dieuChinh)
+    const n = bo.chang[0]?.length ?? 0
+    if (n > 0) ra.set(sbd, { soCau: n, phut: Math.max(1, Math.round((n * giay) / 60)) })
+  }
+  return ra
+}
+
 // ================================================================== THEO DÕI + BÀI LÀM (thầy) ==================================================================
 
 export interface ThongKeCaNhanEm {
