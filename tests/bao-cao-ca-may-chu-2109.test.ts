@@ -421,6 +421,19 @@ describe('/gv/bao-cao-ca — cauSaiNhieu', () => {
     r = await gvCa(d2, 'KV')
     expect(r.cauSaiNhieu.map((c: any) => c.qid)).toEqual(['KV-I-2'])
   })
+  it('MỘT câu trong kho có json rỗng/hỏng (json_remove ném "malformed JSON") ⇒ báo cáo VẪN ok: câu ấy vắng đề, các câu khác nguyên vẹn (cả lớp lẫn một em)', async () => {
+    const d = truong()
+    d.sql.prepare("UPDATE game_v2_question SET json = '' WHERE qid = 'DE1-I-1'").run()
+    d.sql.prepare("UPDATE game_v2_question SET json = '{hỏng' WHERE qid = 'DE1-I-2'").run()
+    const r = await gvCa(d)
+    expect(r.ok).toBe(true)
+    expect(r.cauSaiNhieu.find((c: any) => c.qid === 'DE1-I-1')).toMatchObject({ soEmSai: 6, soEm: 8 })
+    expect(r.cauSaiNhieu.find((c: any) => c.qid === 'DE1-I-1')).not.toHaveProperty('de')
+    expect(r.cauSaiNhieu.find((c: any) => c.qid === 'DE1-I-7')).toHaveProperty('de') // câu lành vẫn có đề
+    const e = await gvEm(d, 'S5')
+    expect(e.ok).toBe(true)
+    expect(e.cauCanXemLai.length).toBeGreaterThan(0)
+  })
   it('kho câu không có câu: dòng vẫn có số liệu nhưng KHÔNG đề, KHÔNG tên dạng (vắng, không bịa)', async () => {
     const d = truong()
     d.sql.prepare('DELETE FROM game_v2_question').run()

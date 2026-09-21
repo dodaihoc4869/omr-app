@@ -241,7 +241,7 @@ async function docKho(env: Env, tatCa: readonly string[], ungVien: readonly stri
   if (tatCa.length === 0) return ra
   const r = await env.DB.prepare(
     `SELECT q.qid, q.dang,
-            CASE WHEN q.qid IN (SELECT value FROM json_each(?)) THEN json_remove(q.json, '$.imageDataUrl', '$.thanCauImg') END AS j
+            CASE WHEN q.qid IN (SELECT value FROM json_each(?)) AND json_valid(q.json) THEN json_remove(q.json, '$.imageDataUrl', '$.thanCauImg') END AS j -- json rỗng/hỏng ⇒ j = NULL (câu ấy vắng đề), KHÔNG ném "malformed JSON" làm mất cả báo cáo
        FROM game_v2_question q WHERE q.qid IN (SELECT value FROM json_each(?))`,
   )
     .bind(JSON.stringify(ungVien), JSON.stringify(tatCa))
