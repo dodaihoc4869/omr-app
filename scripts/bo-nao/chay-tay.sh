@@ -8,8 +8,8 @@ cd "$(dirname "$0")/../.."
 if [ "${1:-}" != "" ]; then
   case "$1" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) printf '%s\n' "$1" > bo-nao/CHAY-NGAY.txt ;; *) echo "Ngày phải dạng YYYY-MM-DD"; exit 1 ;; esac
 fi
-LOI_DAN="$HOME/.claude/scheduled-tasks/bo-nao-ai-omr/SKILL.md"
-[ -f "$LOI_DAN" ] || { echo "Không thấy lời dặn của tác vụ: $LOI_DAN"; exit 1; }
+LOI_DAN="bo-nao/LOI-DAN-PHIEN.md"   # lời dặn đi cùng gói, không phụ thuộc đường dẫn máy
+[ -f "$LOI_DAN" ] || { echo "Không thấy lời dặn: $LOI_DAN"; exit 1; }
 echo "Bộ não A.I bắt đầu chạy… (thường 10–25 phút; xong sẽ in tổng kết ≤ 8 dòng)"
 # Bỏ phần đầu tệp (frontmatter giữa hai dòng ---) rồi đưa lời dặn qua ĐƯỜNG NHẬP CHUẨN: lời dặn bắt đầu bằng "---" sẽ bị hiểu nhầm là tuỳ chọn nếu truyền làm tham số.
 awk 'BEGIN{d=0} /^---[[:space:]]*$/ && d<2 {d++; next} d>=2 || d==0 {print}' "$LOI_DAN" | claude -p \
