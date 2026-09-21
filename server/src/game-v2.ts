@@ -17,7 +17,7 @@ import {laCauTuLuan,jsonLaTuLuan} from './cam-tu-luan'
 import {masteryTheoHoSo,qidChanHomNay} from './game-v2-ho-so'
 import {ghiSuKien} from './su-kien-hoc'
 import {doanAction,laGoiNoiBoDoan,doanMoCho} from './game-v2-doan'
-import {chonLauNhat,docCauDaLamMoiNguon,docCauLamHomNay,tachMoiCu} from './game-v2-cau-moi'
+import {buCauLauNhat,docCauDaLamMoiNguon,docCauLamHomNay,tachMoiCu} from './game-v2-cau-moi'
 import {SO_HIEP} from '../../src/game/than-thu-v2/doan-core'
 import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay'
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
@@ -151,12 +151,10 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
   const soCau=Math.min(SO_HIEP-2,remaining),opt={loai:'kham_pha' as const,cap:p.cap,now:tNow,blocked,soCau}
   let chon=chooseLuotMoi(moi,scope.evidence,history,mastery,opt),hetCauMoi=false
   if(chon.length<soCau){
-    // Bù bằng câu LÂU NHẤT chưa gặp: thử `k` câu cũ nhất trước (k = số câu còn thiếu), chỉ nới `k` khi luật bậc/đổi câu của chooseLuotMoi loại bớt.
+    // Bù bằng câu LÂU NHẤT chưa gặp (buCauLauNhat: nới `k` theo luật bậc/đổi câu của chooseLuotMoi, TỐI ĐA TOI_DA_VONG_BU vòng — không lặp theo cỡ kho lớp).
     const daChon=new Set(chon.map(x=>x.q.group)),thieu=soCau-chon.length,cuCon=cu.filter(q=>!daChon.has(q.group))
-    for(let k=thieu;k<cuCon.length+thieu;k+=thieu){
-      const bu=chooseLuotMoi(chonLauNhat(cuCon,daLam,lucGame,k),scope.evidence,history,mastery,{...opt,soCau:thieu})
-      if(bu.length>=thieu||k+thieu>=cuCon.length+thieu){if(bu.length){hetCauMoi=true;chon=[...chon,...bu]};break}
-    }
+    const {bu}=buCauLauNhat(cuCon,daLam,lucGame,thieu,ds=>chooseLuotMoi(ds,scope.evidence,history,mastery,{...opt,soCau:thieu}))
+    if(bu.length){hetCauMoi=true;chon=[...chon,...bu]}
   }
   if(!chon.length){
     const lyDo=!poolHopLe.length?'kho_trong':(!moi.length&&!cu.length)?'het_cau_moi_hom_nay':'chi_con_cau_qua_bac'

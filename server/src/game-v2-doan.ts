@@ -28,7 +28,7 @@ import { docExpKetChang, traoExpKetChang } from './game-v2-doan-exp'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 import { docSanh, quaCongVe, hoanVe, ketChangChoLop, changDaDiHomNay, TOI_DA_CHANG_NGAY } from './game-v2-doan-mua'
 import { TRAN_CAU_DOAN_NGAY, demCauTrongNgay } from './game-v2-luot'
-import { demEmDaThayTrum, docCauLamHomNay } from './game-v2-cau-moi'
+import { chonMotHaiTrum, demEmDaThayTrum, docCauLamHomNay, docTrumRaHomNay } from './game-v2-cau-moi'
 import { docAnThach, anChoSanh, goiYBanDongHanh, docHienThi } from './game-v2-doan-an'
 
 type Row = Record<string, unknown>
@@ -219,8 +219,9 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
   // Trùm nhớ câu đã ra ở chặng trước của các em trong đoàn + câu các em đã làm ở mọi nguồn/mọi ngày: câu CHƯA AI thấy đứng trước (ổn định: giữ thứ tự cũ trong cùng nhóm)
   const daThay = await demEmDaThayTrum(env, nguoi.map(n => n.sbd), ungVien.map(q => q.qid))
   ungVien.sort((a, b) => (daThay.get(a.qid) ?? 0) - (daThay.get(b.qid) ?? 0))
-  const mot = ungVien[0]; if (!mot) return { trum, giaoY }
-  const hai = ungVien.find(q => q.group !== mot.group && q.dang !== mot.dang) ?? ungVien.find(q => q.group !== mot.group)
+  // Câu trùm đã ra HÔM NAY ở chặng của các em trong đoàn: chặn hẳn khi kho còn câu khác; hết mới dùng lại, câu ra lâu nhất trước.
+  const { mot, hai } = chonMotHaiTrum(ungVien, await docTrumRaHomNay(env, nguoi.map(n => n.sbd), ngayVn(iso(now))))
+  if (!mot) return { trum, giaoY }
   const soGhe = Math.max(2, nguoi.length)
   for (const [hiep, q] of [[4, mot], [8, hai]] as const) {
     if (!q) continue
@@ -451,7 +452,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
         phong.nguoi.push(toi); i = phong.nguoi.length - 1; doi = true
         if (!await luuPhong(env, ma, phong, revision)) continue
         await env.DB.prepare('INSERT OR IGNORE INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) VALUES(?,?,?,?,?,?)').bind(ma, sbd, ngayVn(iso(now)), toi.lop, i, iso(now)).run()
-        return khungNhin(env, ma, phong, revision + 1, sbd, now, b)
+        return { ...(await khungNhin(env, ma, phong, revision + 1, sbd, now, b)), ...(toi.hetCauMoi ? { hetCauMoi: true } : {}) } // như doan-mo: hôm nay hết câu MỚI ⇒ nói thật với em
       }
     } else if (i < 0) throw new Error('Em chưa ở trong đoàn này.')
     else if (action === 'doan-xem') { /* chỉ xem */ }

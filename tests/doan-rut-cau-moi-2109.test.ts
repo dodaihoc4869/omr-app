@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import { danhDau } from '../server/src/game-v2-doan'
-import { chonLauNhat, tachMoiCu } from '../server/src/game-v2-cau-moi'
+import { TOI_DA_VONG_BU, buCauLauNhat, chonLauNhat, chonMotHaiTrum, tachMoiCu } from '../server/src/game-v2-cau-moi'
 import { taoD1That, type D1That } from './_d1-that'
 
 const T0 = Date.parse('2026-09-22T12:00:00+07:00')
@@ -170,7 +170,88 @@ describe('câu chung của TRÙM nhớ câu đã ra + câu đã làm', () => {
   })
 })
 
+describe('nợ nhẹ Boss 21/09 (a) doan-vao trả hetCauMoi', () => {
+  it('bạn vào đoàn mà kho hết câu MỚI ⇒ doan-vao báo hetCauMoi; bạn còn nhiều câu mới ⇒ không có khoá ấy', async () => {
+    const d = dung({ soA: 10, soB: 0, soII: 4 })
+    for (let i = 0; i < 7; i++) ghiSo(d, 'S2', `A-${i}`, 1, NGAY_TRUOC + i * 3_600_000) // S2 chỉ còn 3 câu mới (A-7…A-9) < 6
+    const ma = ((await gameV2(d.env, 'doan-mo', { token: await gameToken(d.env, 'S1'), cheDo: 'phong' })) as any).doan.ma as string
+    const r2 = await gameV2(d.env, 'doan-vao', { token: await gameToken(d.env, 'S2'), ma }) as any
+    expect(r2.ok).toBe(true); expect(r2.hetCauMoi).toBe(true)
+    const r3 = await gameV2(d.env, 'doan-vao', { token: await gameToken(d.env, 'S3'), ma }) as any
+    expect(r3.ok).toBe(true); expect(r3.hetCauMoi).toBeUndefined()
+  })
+})
+
+describe('nợ nhẹ Boss 21/09 (b) câu TRÙM đã ra HÔM NAY bị chặn hẳn khi kho còn câu khác', () => {
+  const trumCua = (d: D1That, ma: string) => (JSON.parse((d.sql.prepare('SELECT json FROM doan_chang WHERE ma=?').get(ma) as { json: string }).json).trum as Record<string, { qid: string } | null>)
+  /** Câu trùm `qid` đã ra ở chặng đã xong của `sbd` vào ngày `ngay` lúc `luc` (ISO). */
+  const daRa = (d: D1That, sbd: string, qid: string, ngay: string, luc: string) => {
+    const ma = `TR-${qid}-${sbd}-${ngay}`
+    d.sql.prepare("INSERT INTO doan_chang(ma,json,chu,trang_thai,tao_luc) VALUES(?,?,?,'xong',?)").run(ma, '{}', sbd, luc)
+    d.sql.prepare('INSERT INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) VALUES(?,?,?,?,0,?)').run(ma, sbd, ngay, '12', luc)
+    d.sql.prepare('INSERT INTO doan_trum_cau(ma_chang,hiep,lop,ngay_vn,ma_dang,qid,y_dung,so_ghe) VALUES(?,?,?,?,?,?,?,?)').run(ma, 4, '12', ngay, 'A.1', qid, 2, 1)
+  }
+  const moPhong = async (d: D1That): Promise<string> => {
+    for (const sbd of ['S1', 'S2']) d.sql.prepare("INSERT INTO doan_ve_so(khoa,sbd,ngay_vn,loai,so,ma_nguon,luc) VALUES(?,?,'2026-09-22','ruong',5,'x','2026-09-22T00:30:00.000Z')").run(`${sbd}|ruong|x`, sbd) // vé: dòng dựng sẵn đã tính là chặng đầu ngày của S1
+    const ma = ((await gameV2(d.env, 'doan-mo', { token: await gameToken(d.env, 'S1'), cheDo: 'phong' })) as any).doan.ma as string
+    await gameV2(d.env, 'doan-vao', { token: await gameToken(d.env, 'S2'), ma })
+    await gameV2(d.env, 'doan-bat-dau', { token: await gameToken(d.env, 'S1'), ma })
+    return ma
+  }
+  it('P-0 vừa ra hôm nay (ít em thấy nhất nên luật mềm cũ xếp đầu) ⇒ KHÔNG được chọn ở cả hai hiệp khi P-1…P-7 còn', async () => {
+    const d = dung({ soA: 40, soB: 0, soII: 8 })
+    daRa(d, 'S1', 'P-0', '2026-09-22', '2026-09-22T03:00:00.000Z')                       // hôm nay: chỉ S1 thấy (đếm 1)
+    for (let i = 1; i < 8; i++) for (const sbd of ['S1', 'S2']) daRa(d, sbd, `P-${i}`, '2026-09-15', '2026-09-15T03:00:00.000Z') // ngày cũ: cả hai thấy (đếm 2)
+    const t = trumCua(d, await moPhong(d))
+    expect(t['4']?.qid).toBeTruthy(); expect(t['4']!.qid).not.toBe('P-0'); expect(t['8']?.qid ?? '').not.toBe('P-0')
+  })
+  it('hết câu khác (cả 3 câu Phần II đều đã ra hôm nay) ⇒ dùng lại câu ra LÂU NHẤT trước', async () => {
+    const d = dung({ soA: 40, soB: 0, soII: 3 })
+    daRa(d, 'S1', 'P-0', '2026-09-22', '2026-09-22T04:00:00.000Z')                       // mới nhất
+    daRa(d, 'S1', 'P-1', '2026-09-22', '2026-09-22T03:00:00.000Z')
+    daRa(d, 'S1', 'P-2', '2026-09-22', '2026-09-22T02:00:00.000Z')                       // lâu nhất
+    const t = trumCua(d, await moPhong(d))
+    expect(t['4']!.qid).toBe('P-2'); expect(t['8']?.qid).toBe('P-1')
+  })
+})
+
+describe('nợ nhẹ Boss 21/09 (c) vòng bù có chặn trên', () => {
+  const q = (i: number) => ({ qid: `c${String(i).padStart(5, '0')}`, group: `g${i}` })
+  it('hằng số chặn trên đủ nhỏ để không cháy CPU (kho lớp hàng nghìn câu)', () => { expect(TOI_DA_VONG_BU).toBeGreaterThanOrEqual(2); expect(TOI_DA_VONG_BU).toBeLessThanOrEqual(12) })
+  it('kho cũ 5000 câu, luật loại hết: đúng TOI_DA_VONG_BU + 1 lần thử (không theo cỡ kho), lần cuối thử toàn bộ', () => {
+    const cu = Array.from({ length: 5000 }, (_, i) => q(i)), nhan: number[] = []
+    const kq = buCauLauNhat(cu, new Map(), new Map(), 1, (ds) => { nhan.push(ds.length); return [] })
+    expect(kq.soLanThu).toBe(TOI_DA_VONG_BU + 1); expect(kq.bu).toEqual([])
+    expect(nhan[0]).toBe(1); expect(nhan[1]).toBe(2); expect(nhan[nhan.length - 1]).toBe(5000)
+  })
+  it('đủ ngay ở lần thứ hai ⇒ dừng; thieu = 3 nới mỗi lần thêm 3; kho nhỏ hơn k ⇒ thử toàn bộ một lần', () => {
+    const cu = Array.from({ length: 100 }, (_, i) => q(i)), nhan: number[] = []
+    const kq = buCauLauNhat(cu, new Map(), new Map(), 3, (ds) => { nhan.push(ds.length); return nhan.length >= 2 ? ds.slice(0, 3) : [] })
+    expect(kq.soLanThu).toBe(2); expect(nhan).toEqual([3, 6]); expect(kq.bu).toHaveLength(3)
+    const nho = buCauLauNhat([q(1), q(2)], new Map(), new Map(), 5, (ds) => ds)
+    expect(nho.soLanThu).toBe(1); expect(nho.bu).toHaveLength(2)
+  })
+  it('không thiếu / kho cũ rỗng ⇒ không thử lần nào', () => {
+    let goi = 0
+    expect(buCauLauNhat([q(1)], new Map(), new Map(), 0, () => { goi++; return [] })).toEqual({ bu: [], soLanThu: 0 })
+    expect(buCauLauNhat([], new Map(), new Map(), 2, () => { goi++; return [] })).toEqual({ bu: [], soLanThu: 0 }); expect(goi).toBe(0)
+  })
+})
+
 describe('hàm thuần', () => {
+  it('chonMotHaiTrum: câu đã ra hôm nay chỉ dùng khi hết câu khác, lâu nhất trước; hai khác nhóm với mot', () => {
+    const c = (qid: string, group: string, dang: string) => ({ qid, group, dang })
+    const kho = [c('a', 'g1', 'X'), c('b', 'g2', 'X'), c('c', 'g3', 'Y')]
+    expect(chonMotHaiTrum(kho, new Map())).toMatchObject({ mot: { qid: 'a' }, hai: { qid: 'c' }, dungLai: false }) // hai ưu tiên khác dạng
+    expect(chonMotHaiTrum(kho, new Map([['a', 5]]))).toMatchObject({ mot: { qid: 'b' }, hai: { qid: 'c' }, dungLai: false }) // a đã ra hôm nay: bỏ
+    const r = chonMotHaiTrum(kho, new Map([['a', 9], ['b', 5], ['c', 7]]))                                                      // hết câu khác
+    expect(r.mot!.qid).toBe('b'); expect(r.hai!.qid).toBe('c'); expect(r.dungLai).toBe(true)                                     // lâu nhất (b=5) rồi c=7 khác nhóm
+    expect(chonMotHaiTrum([c('a', 'g1', 'X'), c('b', 'g1', 'X')], new Map())).toMatchObject({ mot: { qid: 'a' }, hai: undefined }) // cùng nhóm ⇒ không có hai
+    expect(chonMotHaiTrum([], new Map())).toEqual({ mot: undefined, hai: undefined, dungLai: false })
+    // mot còn mới nhưng hai chỉ còn câu đã ra hôm nay ⇒ vẫn lấy hai từ câu đã ra (dungLai = true)
+    expect(chonMotHaiTrum([c('a', 'g1', 'X'), c('b', 'g2', 'X')], new Map([['b', 1]]))).toMatchObject({ mot: { qid: 'a' }, hai: { qid: 'b' }, dungLai: true })
+  })
+
   const q = (qid: string) => ({ qid, group: `g-${qid}` })
   it('tachMoiCu: hôm nay loại hẳn; đã làm ở sổ hoặc nhóm đã chơi ở game ⇒ cũ; còn lại mới', () => {
     const kq = tachMoiCu([q('A'), q('B'), q('C'), q('D')], new Set(['A', 'g-B']), new Map([['C', 5]]), new Set(['g-D']))

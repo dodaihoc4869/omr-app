@@ -3,7 +3,8 @@
 //   • KHÔNG BAO GIỜ lặp câu em đã làm HÔM NAY (mọi nguồn: game, ôn lại, luyện, bài về nhà, ca…); ƯU TIÊN câu em CHƯA TỪNG làm ở đâu cả (mọi nguồn, mọi ngày); hết câu mới ⇒ lấy câu LÂU NHẤT chưa gặp và NÓI THẬT (`hetCauMoi`);
 //     không còn câu nào phù hợp ⇒ báo thật "hết câu mới hôm nay".
 //   • Câu chung của TRÙM nhớ câu đã ra ở các chặng trước của các em trong đoàn (`doan_trum_cau` nối `doan_luot`) và câu các em đã làm: câu CHƯA AI thấy đứng trước.
-// Chỉ ĐỌC. Hàm thuần `tachMoiCu` / `chonLauNhat` không đọc D1 (test được).
+//   • Câu TRÙM đã ra HÔM NAY trong chặng của các em ⇒ CHẶN hẳn khi kho còn câu khác; chỉ khi hết mới dùng lại, câu ra LÂU NHẤT trước (`chonMotHaiTrum`, `docTrumRaHomNay`).
+// Chỉ ĐỌC. Hàm thuần `tachMoiCu` / `chonLauNhat` / `buCauLauNhat` / `chonMotHaiTrum` không đọc D1 (test được).
 import type { Env } from './kieu'
 
 /** Lần làm gần nhất (ms) của mỗi câu em ĐÃ LÀM ở BẤT KỲ nguồn nào, mọi ngày (sổ học `su_kien_hoc`, đi chỉ mục (sbd, qid)). Lỗi đọc ⇒ rỗng (không chặn thêm). */
@@ -74,4 +75,54 @@ export async function demEmDaThayTrum(env: Env, dsSbd: readonly string[], qids: 
   }
   for (const [q, s] of thay) ra.set(q, s.size)
   return ra
+}
+
+/** Số vòng NỚI tối đa khi bù câu lâu nhất (kho lớp có thể hàng nghìn câu cũ: không lặp theo cỡ kho ⇒ không cháy CPU của Worker). Vòng cuối thử TOÀN BỘ câu cũ. */
+export const TOI_DA_VONG_BU = 8
+
+/**
+ * Bù `thieu` câu LÂU NHẤT chưa gặp: thử `k` câu cũ nhất (k = số câu thiếu) qua `thu` (luật bậc / đổi câu của chooseLuotMoi); `thu` loại bớt thì nới `k` thêm `thieu`, TỐI ĐA `toiDaVong` lần nới,
+ * lần cuối thử TOÀN BỘ câu cũ. Trả câu bù (có thể ít hơn `thieu`) + số lần thử (để test chặn trên). Hàm thuần (`thu` do nơi gọi truyền).
+ */
+export function buCauLauNhat<T extends { qid: string; group: string }, R>(
+  cuCon: readonly T[], daLam: ReadonlyMap<string, number>, lucGame: ReadonlyMap<string, number>, thieu: number, thu: (ds: T[]) => R[], toiDaVong: number = TOI_DA_VONG_BU,
+): { bu: R[]; soLanThu: number } {
+  if (thieu <= 0 || cuCon.length === 0) return { bu: [], soLanThu: 0 }
+  let k = thieu
+  for (let vong = 0; ; vong++) {
+    const cuoi = vong >= toiDaVong || k >= cuCon.length
+    const bu = thu(chonLauNhat(cuCon, daLam, lucGame, cuoi ? cuCon.length : k))
+    if (bu.length >= thieu || cuoi) return { bu, soLanThu: vong + 1 }
+    k += thieu
+  }
+}
+
+/** Câu TRÙM đã ra HÔM NAY trong chặng của các em này (sổ `doan_trum_cau` nối `doan_luot`, đi chỉ mục doan_luot_em(sbd, ngay_vn); chặng đã kết thúc mới có dòng): qid → lần vào chặng gần nhất (ms). Lỗi đọc ⇒ rỗng. */
+export async function docTrumRaHomNay(env: Env, dsSbd: readonly string[], ngay: string): Promise<Map<string, number>> {
+  const ra = new Map<string, number>()
+  if (dsSbd.length === 0) return ra
+  try {
+    const r = await env.DB.prepare(
+      `SELECT t.qid, MAX(l.vao_luc) AS luc FROM doan_luot l JOIN doan_trum_cau t ON t.ma_chang = l.ma_chang
+        WHERE l.sbd IN (SELECT value FROM json_each(?)) AND l.ngay_vn = ? GROUP BY t.qid`,
+    ).bind(JSON.stringify(dsSbd), ngay).all<{ qid: string; luc: string }>()
+    for (const x of r.results ?? []) { const t = Date.parse(String(x.luc)); ra.set(String(x.qid), Number.isFinite(t) ? t : 0) }
+  } catch (e) {
+    console.error('[cau-moi] không đọc được câu trùm đã ra hôm nay (giữ thứ tự cũ):', e instanceof Error ? e.message : e)
+  }
+  return ra
+}
+
+/**
+ * Chọn câu chung cho hiệp 4 (`mot`) và hiệp 8 (`hai`) từ ứng viên ĐÃ xếp (câu chưa ai thấy trước). Câu đã ra HÔM NAY (`raHomNay`) bị CHẶN hẳn khi kho còn câu khác; chỉ khi hết mới dùng lại,
+ * câu ra LÂU NHẤT trước. `hai` khác nhóm với `mot` (ưu tiên khác dạng). `dungLai` = có câu nào đã ra hôm nay bị dùng lại.
+ */
+export function chonMotHaiTrum<T extends { qid: string; group: string; dang?: string | null }>(ungVien: readonly T[], raHomNay: ReadonlyMap<string, number>): { mot: T | undefined; hai: T | undefined; dungLai: boolean } {
+  const moi = ungVien.filter((q) => !raHomNay.has(q.qid))
+  const cu = ungVien.filter((q) => raHomNay.has(q.qid)).sort((a, b) => raHomNay.get(a.qid)! - raHomNay.get(b.qid)!) // sort ổn định: hoà ⇒ giữ thứ tự đã xếp
+  const mot = moi[0] ?? cu[0]
+  if (!mot) return { mot: undefined, hai: undefined, dungLai: false }
+  const timHai = (ds: readonly T[]) => ds.find((q) => q.group !== mot.group && q.dang !== mot.dang) ?? ds.find((q) => q.group !== mot.group)
+  const hai = timHai(moi) ?? timHai(cu)
+  return { mot, hai, dungLai: raHomNay.has(mot.qid) || (hai !== undefined && raHomNay.has(hai.qid)) }
 }
