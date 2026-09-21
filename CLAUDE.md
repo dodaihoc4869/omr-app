@@ -17,6 +17,10 @@ Ba app cho trung tâm luyện thi Hoá của thầy Đỗ Đại Học: giáo vi
 - Báo cáo cho phiên khác ≤ 150 từ: việc + mã commit + điều cần; chi tiết để trong sổ việc. Không lặp lại nội dung đã có trong tệp — dẫn đường dẫn.
 - Ảnh chụp bằng chứng: JPG ≤ 150 KB; không đọc lại ảnh vừa chụp trừ khi phải nhìn để quyết.
 
+## Chữ và giao diện
+- TRƯỚC khi đặt chữ mới hoặc báo xong một màn: đọc `docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md` (bảng từ chuẩn 3 app + 10 mục tự soát giao diện). Con số nào cũng có nhãn; một khái niệm một từ; không mã nội bộ trên màn học sinh/phụ huynh.
+- KHÔNG rút câu TỰ LUẬN ở bất kỳ kênh rút đề tự động nào (dùng `src/lib/cau-tu-luan.ts`); riêng Gọi lên bảng thầy chọn gì hiện đúng thế.
+
 ## Bản đồ nhanh
 - Bảng nhiệm vụ HS/PH: `src/components/bang-nhiem-vu/`, `src/lib/nhiem-vu-adapter.ts`. M3 dùng chung: `src/components/m3/`. Phiếu HTML: `src/lib/html-phieu.ts`. Màn thi: `src/screens/ExamTakeScreen.tsx`. App thầy: `src/screens/*Screen.tsx`, khung `src/App.tsx`, `src/components/ThanhBenTrai.tsx`.
 - Game: `src/game/than-thu-v2/` (Đảo thần thú `Game.tsx`, Đoàn Hộ Tống `Doan*.tsx`, lõi `doan-core.ts`), máy chủ `server/src/game-v2*.ts`.
