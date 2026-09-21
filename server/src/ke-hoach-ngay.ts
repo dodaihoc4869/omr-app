@@ -18,6 +18,7 @@
 //   quá tải (tải cứng > B) → nhãn `qua_tai +X`, cắt hết việc mềm, giữ nguyên việc cứng.
 //   cổng hiển thị: việc hiện khi mọi việc BẮT BUỘC đứng trước nó đã xong, hoặc nó mang nhãn `khan`.
 import { hashSeed } from '../../src/lib/exam-shuffle'
+import { moTaThieuDat } from '../../src/lib/dat-nhiem-vu-ngay'
 import { loDangCho, SO_CAU_MOI_LO_TOI_THIEU, tinhLichLoBtvn, tongCauDenLo, type LichLoBtvn } from '../../src/lib/lich-lo-btvn'
 import { tinhNganSachNgay } from '../../src/lib/tro-ly-ca-nhan'
 import {
@@ -107,7 +108,7 @@ export interface DauVaoKeHoach {
   cauOnThi?: CauOnThi[]
   /** Kết quả các ngày TRƯỚC hôm nay, mới nhất trước; null = ngày nghỉ/chưa chốt (bị bỏ qua). */
   lichSu: { ngay: string; ketQua: 'dat' | 'mot_phan' | 'khong' | null }[]
-  daLamHomNay: { soCau: number; lenBac: number; tutBac: number }
+  daLamHomNay: { soCau: number; lenBac: number; tutBac: number; /** Số câu KHÁC NHAU đúng hôm nay, mọi nguồn (Điều 7). Vắng = 0. */ dung?: number }
   homNayLaNgayNghi: boolean
   /**
    * BỘ NÃO A.I (chế độ THẬT, `bo-nao-doc.ts`): điều chỉnh CÒN HẠN của em. Vắng ⇒ kế hoạch Y HỆT không có tầng này (chạy thử/tắt không bao giờ đặt trường này — test khoá).
@@ -172,7 +173,11 @@ export interface KeHoachNgay {
   /** Lô/bài chưa tới nhịp — nói cho em biết bao giờ mở, KHÔNG hiện như việc hôm nay. */
   sapToi: { loai: 'btvn_lo'; ma: string; chiSo: number; moLuc: string }[]
   tai: { cung: number; bu: number; tuyChon: number; nganSach: number; vuot: number }
-  tienBo: { daLamCau: number; lenBac: number; tutBac: number; dat: boolean; toiThieuCau: number; conThieu: number; soCauToiHan: number; treNhip: boolean }
+  tienBo: {
+    daLamCau: number; lenBac: number; tutBac: number; dat: boolean; toiThieuCau: number; conThieu: number; soCauToiHan: number; treNhip: boolean
+    /** Điều 7 (từ 22/09): CHỈ có khi "đạt nhiệm vụ ngày" còn thiếu vì chưa đủ câu ĐÚNG — `soCauDung` = số câu đúng còn thiếu, `chu` = câu chữ tiếng thường cho em (từ `moTaThieuDat` của src/lib/dat-nhiem-vu-ngay.ts). */
+    thieuDat?: { soCauDung: number; chu: string }
+  }
   /** Cấp lịch sử ngày đạt liên tiếp (ngày nghỉ không đứt) — nơi gọi truyền vào `lichSu`. */
   chuoiDat: number
   lanNghi: boolean
@@ -465,6 +470,7 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
     dat: daLam >= nganSach.toiThieuCau, toiThieuCau: nganSach.toiThieuCau, conThieu: Math.max(0, nganSach.toiThieuCau - daLam),
     soCauToiHan: d.cauToiHan.filter((c) => c.mocOnKe <= d.homNay).length,
     treNhip: viec.some((v) => v.batBuoc && v.chiTiet.treNhip === true),
+    ...thieuDatCauDung({ daLam, lenBac: d.daLamHomNay.lenBac, toiThieu: nganSach.toiThieuCau, treNhip: viec.some((v) => v.batBuoc && v.chiTiet.treNhip === true), soCauToiHan: d.cauToiHan.filter((c) => c.mocOnKe <= d.homNay).length, ngayVn: d.homNay, soCauDungHomNay: d.daLamHomNay.dung ?? 0 }),
   }
   return {
     phienBan: PHIEN_BAN_KE_HOACH, seed, sbd: d.sbd, ngay: d.homNay, nganSach, viec, canhBao, quaHan, sapToi,
@@ -557,4 +563,11 @@ function dungViecMem(d: DauVaoKeHoach, B: number, taiCung: number, seed: number,
     }
   }
   return ra
+}
+
+/** `tienBo.thieuDat` (Điều 7): chỉ khi còn thiếu CÂU ĐÚNG để đạt nhiệm vụ ngày — số câu đúng còn thiếu + câu chữ cho em. Đủ / ngày chưa áp luật ⇒ không có trường. */
+function thieuDatCauDung(soDo: Parameters<typeof moTaThieuDat>[0]): { thieuDat?: { soCauDung: number; chu: string } } {
+  const mo = moTaThieuDat(soDo)
+  const i = mo.thieu.indexOf('cau_dung_toi_thieu')
+  return i < 0 ? {} : { thieuDat: { soCauDung: mo.soCauDung.conThieu, chu: mo.chu[i] ?? '' } }
 }

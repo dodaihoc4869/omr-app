@@ -188,7 +188,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number): Promise
 
   // Đã làm hôm nay (mọi nguồn), khử trùng theo câu; "lên bậc" = đúng lại câu từng sai/trống, "tụt bậc" = sai lại câu từng đúng.
   const rt = await tat(() => env.DB.prepare(TIEN_BO_NGAY).bind(arr, homNay).all<Record<string, unknown>>(), trong())
-  for (const x of rt.results ?? []) { const c = cua(x); if (c) c.daLamHomNay = { soCau: Number(x.da_lam) || 0, lenBac: Number(x.len_bac) || 0, tutBac: Number(x.tut_bac) || 0 } }
+  for (const x of rt.results ?? []) { const c = cua(x); if (c) c.daLamHomNay = { soCau: Number(x.da_lam) || 0, lenBac: Number(x.len_bac) || 0, tutBac: Number(x.tut_bac) || 0, dung: Number(x.dung) || 0 } }
 
   // Lịch sử kết quả các ngày trước.
   const rh = await tat(() => env.DB.prepare(`SELECT sbd, ngay, ket_qua FROM ke_hoach_ngay WHERE ${IN_EM} AND ngay < ? AND ngay >= ? ORDER BY ngay DESC`).bind(arr, homNay, ngayLs).all<Record<string, unknown>>(), trong())
@@ -272,6 +272,7 @@ async function keoOnSom(env: Env, c: DauVaoKeHoach, dsDang: string[], ngayMai: s
 /** Số câu đã làm / lên bậc / tụt bậc trong MỘT ngày VN, mỗi em một dòng. */
 export const TIEN_BO_NGAY = `SELECT e.sbd,
        COUNT(DISTINCT e.qid) AS da_lam,
+       COUNT(DISTINCT CASE WHEN e.ket_qua = 1 THEN e.qid END) AS dung,
        COUNT(DISTINCT CASE WHEN e.ket_qua = 1 AND EXISTS (SELECT 1 FROM su_kien_hoc p WHERE p.sbd = e.sbd AND p.qid = e.qid AND p.ngay_vn < e.ngay_vn AND (p.ket_qua = 0 OR p.ket_qua IS NULL)) THEN e.qid END) AS len_bac,
        COUNT(DISTINCT CASE WHEN e.ket_qua = 0 AND EXISTS (SELECT 1 FROM su_kien_hoc p WHERE p.sbd = e.sbd AND p.qid = e.qid AND p.ngay_vn < e.ngay_vn AND p.ket_qua = 1) THEN e.qid END) AS tut_bac
   FROM su_kien_hoc e
@@ -372,13 +373,13 @@ export async function chotNgayCu(env: Env, dsSbd: string[], homNay: string, nowI
   if (rows.length === 0) return 0
   const theoNgay = new Map<string, string[]>()
   for (const r of rows) theoNgay.set(String(r.ngay), [...(theoNgay.get(String(r.ngay)) ?? []), String(r.sbd)])
-  const tienBo = new Map<string, { da: number; len: number; tut: number }>()
+  const tienBo = new Map<string, { da: number; len: number; tut: number; dung: number }>()
   for (const [ngay, ds] of theoNgay) {
     const r = await tat(() => env.DB.prepare(TIEN_BO_NGAY).bind(json(ds), ngay).all<Record<string, unknown>>(), trong())
-    for (const x of r.results ?? []) tienBo.set(`${x.sbd}|${ngay}`, { da: Number(x.da_lam) || 0, len: Number(x.len_bac) || 0, tut: Number(x.tut_bac) || 0 })
+    for (const x of r.results ?? []) tienBo.set(`${x.sbd}|${ngay}`, { da: Number(x.da_lam) || 0, len: Number(x.len_bac) || 0, tut: Number(x.tut_bac) || 0, dung: Number(x.dung) || 0 })
   }
   const dong = rows.map((r) => {
-    const tb = tienBo.get(`${r.sbd}|${r.ngay}`) ?? { da: 0, len: 0, tut: 0 }
+    const tb = tienBo.get(`${r.sbd}|${r.ngay}`) ?? { da: 0, len: 0, tut: 0, dung: 0 }
     let toiThieu = 4, coToiHan = 0, treNhip = false
     try {
       toiThieu = Number((JSON.parse(String(r.ngan_sach_json)) as { toiThieuCau: number }).toiThieuCau) || 4
@@ -386,7 +387,7 @@ export async function chotNgayCu(env: Env, dsSbd: string[], homNay: string, nowI
       coToiHan = Number(v?.soCauToiHan) || 0
       treNhip = v?.treNhip === true
     } catch { /* kế hoạch hỏng: chốt theo số câu thô */ }
-    return { k: String(r.khoa), r: ketQuaChotNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan }), l: tb.da, u: tb.len, t: tb.tut }
+    return { k: String(r.khoa), r: ketQuaChotNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan, ngayVn: String(r.ngay), soCauDungHomNay: tb.dung }), l: tb.da, u: tb.len, t: tb.tut }
   })
   for (const d of chunk(dong, 60)) {
     await env.DB.prepare(

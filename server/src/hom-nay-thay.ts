@@ -117,11 +117,11 @@ export async function homNayThay(env: Env, b: Record<string, unknown>, nowMs: nu
   const dsHomNay = homNay.map((h) => h.sbd)
 
   // Truy vấn 4 và 5: tiến bộ trong ngày (đúng công thức của chotNgayCu) và ngày làm câu cuối, chỉ cho em có kế hoạch hôm nay.
-  let tienBo: Map<string, { da: number; len: number; tut: number }> | null = null
+  let tienBo: Map<string, { da: number; len: number; tut: number; dung: number }> | null = null
   let cuoi: Map<string, string> | null = null
   if (r3 && dsHomNay.length > 0) {
     const r4 = await Q.hoi<Dong>(TIEN_BO_NGAY, json(dsHomNay), ngay)
-    if (r4) tienBo = new Map(r4.rows.map((x) => [chuoi(x.sbd), { da: so(x.da_lam), len: so(x.len_bac), tut: so(x.tut_bac) }]))
+    if (r4) tienBo = new Map(r4.rows.map((x) => [chuoi(x.sbd), { da: so(x.da_lam), len: so(x.len_bac), tut: so(x.tut_bac), dung: so(x.dung) }]))
     const r5 = await Q.hoi<Dong>('SELECT sbd, MAX(ngay_vn) AS cuoi FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd', json(dsHomNay))
     if (r5) cuoi = new Map(r5.rows.map((x) => [chuoi(x.sbd), chuoi(x.cuoi)]))
   }
@@ -151,11 +151,11 @@ export async function homNayThay(env: Env, b: Record<string, unknown>, nowMs: nu
     else if (!tienBo) lyDoThieu.nhiemVu = 'Không đọc được số câu đã làm trong ngày'
     else {
       const dat = homNay.filter((h) => {
-        const tb = tienBo!.get(h.sbd) ?? { da: 0, len: 0, tut: 0 }
+        const tb = tienBo!.get(h.sbd) ?? { da: 0, len: 0, tut: 0, dung: 0 }
         const toiThieu = Number(h.nganSach?.toiThieuCau) || 4
         const coToiHan = Number(h.viec?.tienBo?.soCauToiHan) || 0
         const treNhip = h.viec?.tienBo?.treNhip === true
-        return laDatNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan })
+        return laDatNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan, ngayVn: ngay, soCauDungHomNay: tb.dung })
       }).length
       const qua = hang.filter((h) => h.ngay === homQua && !h.nghi)
       const daChot = qua.filter((h) => h.ketQua !== null)
