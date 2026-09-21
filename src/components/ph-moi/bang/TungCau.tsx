@@ -390,13 +390,14 @@ function ChiTietMo({ ct, conChon }: { ct: Extract<ChiTietCau, { kieu: 'ok' }>; c
             const m = /^\s*([A-Da-d])[.)]\s*/.exec(p)
             const ma = m ? m[1]!.toUpperCase() : String.fromCharCode(65 + i)
             const chu = m ? p.slice(m[0].length) : p
+            // PHƯƠNG ÁN: KHÔNG tách ý (Boss vá 21/09 17:43) — Hoá hay viết "(a), (b) và (c)" / "(1) và (3)" trong MỘT phương án; cả app chỉ tách ĐỀ (TheCau, DoanCau, MomQuestionMedia)
             const laDung = dap.length > 0 ? dap.includes(ma) : ct.dapAn.includes(ma)
             const laChon = chon.includes(ma)
             return (
               <li key={i} data-dung={laDung ? '' : undefined} data-chon={laChon && !laDung ? '' : undefined}>
                 <i>{ma}</i>
                 <span>
-                  <ChemText text={tachDongTheoY(chu)} />
+                  <ChemText text={chu} />
                 </span>
                 {laDung ? (
                   <em>

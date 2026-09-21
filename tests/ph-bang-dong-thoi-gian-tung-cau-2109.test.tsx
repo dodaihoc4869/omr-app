@@ -607,7 +607,7 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     await waitFor(() => expect(b3.container.querySelectorAll('[data-vung="cau-che"]').length).toBeGreaterThan(0))
   })
 
-  it('NGẮT DÒNG THEO Ý (thầy lệnh 21/09 17:3x, câu Triolein (a)…(e) dồn một cục): đề (danh sách + đã mở), phương án, lời giải đều qua tachDongTheoY — mỗi ý một dòng, câu hỏi kết một dòng riêng; (1)…(4) cũng vậy; đề không có ý KHÔNG đổi; công thức vẫn chỉ số dưới', async () => {
+  it('NGẮT DÒNG THEO Ý (thầy lệnh 21/09 17:3x, câu Triolein (a)…(e) dồn một cục): đề (danh sách + đã mở) và lời giải qua tachDongTheoY; PHƯƠNG ÁN giữ nguyên — mỗi ý một dòng, câu hỏi kết một dòng riêng; (1)…(4) cũng vậy; đề không có ý KHÔNG đổi; công thức vẫn chỉ số dưới', async () => {
     const TRIO = 'Cho các phát biểu sau về triolein: (a) Triolein là chất béo không no. (b) Triolein làm mất màu nước bromine. (c) Thuỷ phân triolein thu được $C_3H_5(OH)_3$. (d) Triolein không tan trong nước. (e) Xà phòng hoá là phản ứng thuận nghịch. Số phát biểu không đúng là'
     const raw = nhan(PH_APPLE)
     const c0 = raw.homNay.cau.find((c: { che?: string }) => !c.che)
@@ -621,7 +621,7 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     cleanup()
     // đã mở: đề ĐẦY ĐỦ của máy chủ + phương án + lời giải có ý
     const cauSau = JSON.stringify({ chot: 'Xét từng ý: (a) đúng vì có nối đôi. (b) đúng. (c) đúng. (d) đúng. (e) sai vì phản ứng xà phòng hoá là một chiều.', buoc: ['Đếm số phát biểu sai: (e) sai. Vậy có 1 phát biểu không đúng.'], ketQua: '(e)' })
-    goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: docChiTietCau({ ...CHI_TIET, de: TRIO, phuongAn: ['A. 1. Nhận định (a) đúng. (b) sai.', 'B. 2', 'C. 3', 'D. 4'], dapAn: 'A', loiGiai: cauSau })! })
+    goiChiTiet.mockResolvedValue({ kieu: 'ok', ct: docChiTietCau({ ...CHI_TIET, de: TRIO, phuongAn: ['A. 1 phát biểu. (a) và (b) đúng.', 'B. Chỉ (a), (b) và (c)', 'C. (1) và (3)', 'D. 4'], dapAn: 'A', loiGiai: cauSau })! })
     const b = moMotCau(['moc-1'], pmOf(raw))
     const r0 = b.hang()[0]!
     fireEvent.click(r0.querySelector('button')!)
@@ -632,8 +632,10 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     expect(deDay[6]).toBe('Số phát biểu không đúng là') // câu hỏi kết một dòng riêng
     expect(r0.querySelector('.phm-cau__de sub, .phm-cau__de .katex')).toBeTruthy() // C₃H₅(OH)₃ vẫn có chỉ số dưới sau khi tách
     expect(r0.querySelector('.phm-cau__de')!.textContent).not.toContain('$')
-    const pa = r0.querySelector('.phm-pa li:first-child > span')!.textContent!.split('\n')
-    expect(pa.length).toBeGreaterThanOrEqual(2) // phương án cũng tách ý
+    // PHƯƠNG ÁN KHÔNG tách ý (Boss vá 17:43): "(a) và (b)", "(a), (b) và (c)", "(1) và (3)" là MỘT phương án — giữ nguyên một dòng logic
+    const pa = [...r0.querySelectorAll('.phm-pa li > span')].map((x) => x.textContent!)
+    expect(pa).toEqual(['1 phát biểu. (a) và (b) đúng.', 'Chỉ (a), (b) và (c)', '(1) và (3)', '4'])
+    expect(pa.some((x) => x.includes('\n'))).toBe(false)
     const chot = r0.querySelector('.phm-lg-chot')!.textContent!.split('\n')
     expect(chot.length).toBeGreaterThanOrEqual(5) // lời giải: Chốt tách (a)…(e)
     expect(r0.querySelector('.phm-lg-buoc li span')!.textContent!.split('\n').length).toBeGreaterThanOrEqual(2)
@@ -652,15 +654,19 @@ describe('TungCau — mở câu ⇒ hỏi máy chủ, phương án, lời giải
     expect((moMotCau(['moc-1'], pmOf(raw3)).hang()[0]!.querySelector('.phm-cau__de') as HTMLElement).textContent).toBe('Công thức phân tử của acetylene là gì?')
   })
 
-  it('khoá nguồn ngắt dòng: MỌI chỗ TungCau in đề / phương án / lời giải qua tachDongTheoY (một nguồn với TheCau, không regex mới) + CSS pre-line cho các khối ấy', () => {
+  it('khoá nguồn ngắt dòng: MỌI chỗ TungCau in ĐỀ / LỜI GIẢI qua tachDongTheoY (PHƯƠNG ÁN là chỗ duy nhất không) (một nguồn với TheCau, không regex mới) + CSS pre-line cho các khối ấy', () => {
     const tsx = fs.readFileSync(path.join(process.cwd(), 'src/components/ph-moi/bang/TungCau.tsx'), 'utf8').replace(/\/\/.*$/gm, '')
-    const dung = [...tsx.matchAll(/<ChemText text=\{([^}]*(?:\}[^}]*)?)\}/g)].map((m) => m[1]!)
+    const dung = [...tsx.matchAll(/<ChemText text=\{([^{}]*)\}/g)].map((m) => m[1]!)
     expect(dung.length).toBeGreaterThanOrEqual(6)
-    for (const d of dung) expect(d, d).toMatch(/^tachDongTheoY\(/)
+    // ĐỀ + các dòng LỜI GIẢI đều qua tachDongTheoY; PHƯƠNG ÁN (`chu`) là chỗ DUY NHẤT không tách
+    const khong = dung.filter((d) => !/^tachDongTheoY\(/.test(d))
+    expect(khong).toEqual(['chu'])
+    expect(dung.filter((d) => /^tachDongTheoY\(/.test(d))).toHaveLength(dung.length - 1)
     expect(tsx).toContain("from '../../../lib/tach-dong-cau'")
     expect(tsx).not.toMatch(/\.replace\(\/[^/]*\((?:1|a)\)/) // không tự viết regex tách ý
     const css = fs.readFileSync(path.join(process.cwd(), 'src/components/ph-moi/bang/TungCau.css'), 'utf8')
-    for (const lop of ['.phm-cau__de', '.phm-pa li > span', '.phm-loi-giai p', '.phm-lg-chot', '.phm-lg-ket', '.phm-lg-buoc li > span']) expect(css, lop).toContain(lop)
+    for (const lop of ['.phm-cau__de', '.phm-loi-giai p', '.phm-lg-chot', '.phm-lg-ket', '.phm-lg-buoc li > span']) expect(css, lop).toContain(lop)
+    expect(css).not.toContain('.phm-pa li > span') // phương án không pre-line
     expect(css).toMatch(/white-space: pre-line/)
   })
 
