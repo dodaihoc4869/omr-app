@@ -94,6 +94,26 @@ describe('cùng một sổ ⇒ cùng một con số ở mọi nơi', () => {
     expect((r.dangVap as { ma?: string }[] | undefined)?.some((x) => x.ma === 'D.V') ?? false).toBe(true)
   })
 
+  it('truy vấn sổ học của Bảng tin đi bằng chỉ mục idx_skh_luc (không quét cả sổ) và không UNION', async () => {
+    const d = await dung()
+    const goc = d.env.DB.prepare.bind(d.env.DB)
+    let sql = '', bind: unknown[] = []
+    d.env.DB.prepare = ((q: string) => {
+      const st = goc(q)
+      if (!/^\s*SELECT ngay_vn, sbd, ma_dang, COUNT\(\*\) AS n/.test(q)) return st
+      sql = q
+      const b0 = st.bind.bind(st)
+      st.bind = ((...a: unknown[]) => { bind = a; return b0(...a) }) as typeof st.bind
+      return st
+    }) as typeof d.env.DB.prepare
+    await gvBangTin(d.env, {}, NOW)
+    expect(sql).not.toBe('')
+    expect(sql).not.toMatch(/UNION/i)
+    const kh = (d.sql.prepare(`EXPLAIN QUERY PLAN ${sql}`).all(...(bind as string[])) as { detail: string }[]).map((x) => x.detail).join(' | ')
+    expect(kh).toMatch(/SEARCH .*idx_skh_luc \(luc>\?\)/)
+    expect(kh).not.toMatch(/SCAN su_kien_hoc/)
+  })
+
   it('mốc CHUNG: cau_hinh.hien_thi_tu thắng bang_tin_tu ở Bảng tin (một nguồn với Thi đua / thẻ Hôm nay); chỉ có bang_tin_tu ⇒ dùng nó như cũ', async () => {
     const d = await dung()
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bang_tin_tu','2026-09-22T00:00:00.000Z','x')").run() // sớm hơn: nếu Bảng tin còn đọc khoá này thì S2 (câu 10:00) lọt vào

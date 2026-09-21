@@ -163,12 +163,13 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   const coTuDong = docCoTuDong(cfg.get(KHOA_TU_DONG)?.gia_tri)
 
   // 3 · sổ học từ mốc (cửa sổ ≤ 14 ngày): (ngày, em, dạng) → số CÂU KHÁC NHAU đã trả lời (`n`), số câu có ≥ 1 lần đúng (`dung`) — MỘT ĐỊNH NGHĨA `cau-da-lam.ts` (Boss 21/09); `luot`/`luot_dung` = số LƯỢT cũ, chỉ cho luật "dạng vấp".
+  // Truy vấn con `LIMIT -1` giữ SQLite đi bằng chỉ mục idx_skh_luc (chỉ sự kiện từ mốc) thay vì quét cả sổ theo idx_skh_em_ngay: D1 thật 31.213 → 5.807 dòng đọc mỗi lần (60 giây/lần).
   // Mỗi (ngày, em, qid) được gán MỘT dạng (`MAX(ma_dang)`) ⇒ Σ theo dạng = số qid khác nhau của em trong ngày (đo D1 thật: có qid mang ≥ 2 mã dạng, cộng theo dạng sẽ phồng).
   const batDauSo = Math.max(tuMs, dauNgayMs(themNgay(ngay, -(SO_NGAY_CUA_SO - 1))))
   const rSo = await Q.hoi(
     `SELECT ngay_vn, sbd, ma_dang, COUNT(*) AS n, SUM(m) AS dung, SUM(c) AS luot, SUM(d) AS luot_dung
        FROM (SELECT ngay_vn, sbd, qid, MAX(COALESCE(ma_dang, '')) AS ma_dang, MAX(ket_qua) AS m, COUNT(*) AS c, SUM(ket_qua) AS d
-               FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL GROUP BY ngay_vn, sbd, qid)
+               FROM (SELECT ngay_vn, sbd, qid, ma_dang, ket_qua FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL LIMIT -1) GROUP BY ngay_vn, sbd, qid)
       GROUP BY ngay_vn, sbd, ma_dang`,
     iso(batDauSo),
   )
