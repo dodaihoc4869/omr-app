@@ -241,15 +241,15 @@ describe('chay-chieu.sh + gói + lời dặn — phiên AI KHÔNG nộp được
     const g = doc('scripts/bo-nao/dong-goi.sh')
     for (const t of ['chay-chieu.sh', 'LUAT-CHIEU.md', 'LOI-DAN-CHIEU.md']) expect(g, t).toContain(t)
   })
-  it('LOI-DAN-CHIEU.md cấm nộp thật và cấm mở tệp bí danh; LUAT-CHIEU.md ≤ 900 chữ, LUAT-RUT-GON ≤ 1200 chữ', () => {
+  it('LOI-DAN-CHIEU.md cấm nộp thật và cấm mở tệp bí danh; LUAT-CHIEU.md ≤ 950 chữ, LUAT-RUT-GON ≤ 1200 chữ', () => {
     const ld = doc('bo-nao/LOI-DAN-CHIEU.md')
     expect(ld).toContain('KHÔNG chạy `nop.mjs` mà không có `--xem-truoc`')
     expect(ld).toContain('KHÔNG mở `.bi-danh.json`, `.the-day-du.json`')
     const dem = (t: string) => t.split(/\s+/).filter(Boolean).length
-    expect(dem(doc('bo-nao/LUAT-CHIEU.md'))).toBeLessThanOrEqual(900)
+    expect(dem(doc('bo-nao/LUAT-CHIEU.md'))).toBeLessThanOrEqual(950)
     expect(dem(doc('bo-nao/LUAT-RUT-GON.md'))).toBeLessThanOrEqual(1200)
   })
-  it('6 lời mẫu TỐT + 4 lời mẫu CẤM có nguyên chữ ở cẩm nang VÀ ở LUAT-CHIEU.md; LUAT-RUT-GON dặn lượt đêm không ghi thuThach', () => {
+  it('8 lời mẫu TỐT + 4 lời mẫu CẤM có nguyên chữ ở cẩm nang VÀ ở LUAT-CHIEU.md; LUAT-RUT-GON dặn lượt đêm không ghi thuThach', () => {
     const camNang = doc('bo-nao/HUONG-DAN-BO-NAO.md')
     const luatChieu = doc('bo-nao/LUAT-CHIEU.md')
     for (const { chu } of [...LOI_TOT, ...LOI_CAM]) {
