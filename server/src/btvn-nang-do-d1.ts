@@ -732,7 +732,9 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
   const theoQid = new Map(tho.map((c) => [chuoi(c.qid), c]))
   const cauChang = dsQid.filter((q) => theoQid.has(q)).map((q) => theoQid.get(q)!)
   const phanCua = (c: Hang) => chuoi(c.phan) || phanTuQid(chuoi(c.qid))
-  const hoSoTruoc = await docHoSoTheoCauCuaBai(env, maBtvn, sbd, dsQid, now)
+  // Mã dạng của các câu chặng CHỈ đọc MỘT LẦN (Boss 22/09, lượt 2): dùng lại cho hoSoTruoc VÀ hoSoSau — btvn_cau không đổi giữa hai lượt, chỉ nam_kt_* đổi.
+  const cauGiaoChang = await docCauGiaoTheoQid(env, maBtvn, dsQid)
+  const hoSoTruoc = await docHoSoTheoCau(env, sbd, cauGiaoChang, now)
 
   // GỘP đáp án: đáp án ĐẦU khoá (đã trả lời rồi thì giữ); CAS trên `dap_an_json` để hai lượt gọi đồng thời không đè nhau (thử lại một lần).
   let gop: Record<string, string> = {}
@@ -778,7 +780,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
   } catch (e) {
     console.error('[btvn-nang-do] dựng lại hồ sơ lỗi (sổ đã ghi, kế hoạch sau sẽ tự dựng lại):', e instanceof Error ? e.message : e)
   }
-  const hoSoSau = await docHoSoTheoCauCuaBai(env, maBtvn, sbd, dsQid, now)
+  const hoSoSau = await docHoSoTheoCau(env, sbd, cauGiaoChang, now)
   const tien = theTienBo(hoSoTruoc, hoSoSau)
   const ten = await tenDangTheoMa(env, tien.dangLenBac.map((d) => d.ma))
   const xong = chuaLam.length === 0
@@ -937,11 +939,18 @@ async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTh
   }
 }
 
-/** Hồ sơ RÚT của một em chỉ theo các câu (qid) đã cho — dùng để so TRƯỚC/SAU một chặng cho thẻ tiến bộ. Đọc `btvn_cau` để biết mã dạng của từng câu. */
-async function docHoSoTheoCauCuaBai(env: Env, maBtvn: string, sbd: string, dsQid: string[], now: number): Promise<HoSoEmRut> {
-  if (dsQid.length === 0) return { dang: {}, cau: {} }
+/** Mã dạng/chuyên đề/mức độ/sao/phần của các câu (qid) của MỘT bài — tách khỏi `docHoSoTheoCauCuaBai` (Boss 22/09, lượt 2: `nopChangCaNhan` so
+ *  hồ sơ TRƯỚC/SAU một lượt ghi, gọi hàm này HAI lần với CÙNG `dsQid` — metadata câu của `btvn_cau` không đổi giữa hai lượt, chỉ `nam_kt_*` đổi
+ *  (ghi bởi `dungLaiHoSo` ở giữa) — đọc MỘT lần, dùng lại cho cả hai, bớt một truy vấn mỗi lượt nộp chặng cá nhân hoá. */
+async function docCauGiaoTheoQid(env: Env, maBtvn: string, dsQid: string[]): Promise<CauGiao[]> {
+  if (dsQid.length === 0) return []
   const r = await env.DB.prepare('SELECT qid, dang, chuyen_de, muc_do, sao, phan FROM btvn_cau WHERE ma_btvn = ? AND qid IN (SELECT value FROM json_each(?))').bind(maBtvn, json(dsQid)).all<Hang>()
-  const cau = (r.results ?? []).map(docCauGiaoTuHang)
+  return (r.results ?? []).map(docCauGiaoTuHang)
+}
+
+/** Hồ sơ RÚT của một em chỉ theo các câu (qid) đã cho — dùng để so TRƯỚC/SAU một chặng cho thẻ tiến bộ. `cau` đã tra mã dạng qua `docCauGiaoTheoQid`. */
+async function docHoSoTheoCau(env: Env, sbd: string, cau: CauGiao[], now: number): Promise<HoSoEmRut> {
+  if (cau.length === 0) return { dang: {}, cau: {} }
   return (await docHoSoRut(env, [sbd], cau, now)).get(sbd)!.hoSo
 }
 

@@ -246,6 +246,18 @@ describe('NỘP CHẶNG (/btvn/xong-lo của bài cá nhân hoá)', () => {
     expect(so.every((x) => x.lan === 0)).toBe(true)
     expect(so.find((x) => x.qid === qs[0])!.ket_qua).toBe(0)
   })
+  it('SỐ TRUY VẤN: mã dạng câu (btvn_cau) chỉ đọc MỘT LẦN, dùng chung cho hồ sơ trước/sau (Boss 22/09, lượt 2 — trước đây đọc hai lần)', async () => {
+    gio(BAY_GIO)
+    const d = dung()
+    await giao(d)
+    await mo(d)
+    const qs = chang0(d)
+    const dapAn = Object.fromEntries(qs.map((q) => [q, DAP_AN_DUNG(q)]))
+    const truoc = d.soLenh.prepare
+    const r = await nopChang(d, 0, dapAn)
+    expect(r.ok).toBe(true)
+    expect(d.soLenh.prepare - truoc).toBe(29) // đo tại chỗ (git stash bản chưa gộp): 30 — gộp còn 29
+  })
   it('ĐÁP ÁN ĐẦU KHOÁ: nộp lại với đáp án khác giữ kết quả lần đầu; không ghi đôi sổ', async () => {
     gio(BAY_GIO)
     const d = dung()
