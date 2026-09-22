@@ -5,7 +5,7 @@
 //   · `docThanThuSoThat`  SỐ THẬT thần thú (tên loài, cấp, EXP còn thiếu, mảnh khiên/12, chuỗi ngày) — dùng cho thẻ `/ai/ho-so-ngay` (ẩn danh) và cho thẻ của em.
 //   · `chonCauThuThach`   hàm THUẦN xếp câu (tất định theo sbd|ngày, không Math.random).
 //   · `hsThuThachHomNay` / `hsThuThachNop`  hai lệnh của máy em.
-import type { Env } from './kieu'
+import type { Env, ExecutionContext } from './kieu'
 import { docKhoiEm } from './game-v2-bank'
 import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import { gameIdentity } from './game-v2-auth'
@@ -326,7 +326,7 @@ export async function hsThuThachHomNay(env: Env, b: Dong, nowMs: number = Date.n
 }
 
 /** `POST /hs/thu-thach-hom-nay/nop {traLoi:[{qid,dapAn,giay?}]}` — CHỈ câu đã chốt hôm nay cho em; trả y hệt `/hs/on-lai/nop` + `trangThai`, `soDaLam`. */
-export async function hsThuThachNop(env: Env, b: Dong, nowMs: number = Date.now()): Promise<Dong> {
+export async function hsThuThachNop(env: Env, b: Dong, nowMs: number = Date.now(), ctx?: ExecutionContext): Promise<Dong> {
   const ngay = ngayVn(nowMs)
   const giu: { hang: HangThuThach | null } = { hang: null }
   const r = await chamVaGhiTraLoi(env, b, {
@@ -336,7 +336,7 @@ export async function hsThuThachNop(env: Env, b: Dong, nowMs: number = Date.now(
       giu.hang = await docHang(env, sbd, ngay).catch(() => null)
       return new Set(giu.hang?.qid ?? [])
     },
-  })
+  }, ctx)
   if (r.ok !== true || !giu.hang) return r
   const hang: HangThuThach = giu.hang
   try {

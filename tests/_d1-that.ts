@@ -128,12 +128,19 @@ export type D1That = ReturnType<typeof taoD1That>
 
 /** Gọi Worker thật qua `fetch` — đúng đường của app. `thay` = true thì kèm mã bí mật của thầy. */
 /** `giuNhipDeNghi` = false (mặc định) ⇒ BỎ trường `nhipDeNghi` (hệ số nhịp, gắn ở MỌI phản hồi từ 21/09) khỏi kết quả để các test "phản hồi đúng từng khoá" không phải nhắc tới nó; bật true khi test chính trường ấy. */
-export async function goiWorker(worker: { fetch(r: Request, e: Env): Promise<Response> }, env: Env, duong: string, body: Record<string, unknown>, thay = false, giuNhipDeNghi = false) {
+// `ctx` GIẢ (Boss 22/09, ctx.waitUntil): gom mọi việc phụ được hoãn, rồi ĐỢI HẾT trước khi trả kết quả cho test — vừa
+// đi đúng đường thật (worker nhận được `ctx`, không rơi về đường "chạy ngay tại chỗ"), vừa giữ test tất định (không
+// đọc D1/kết quả trước khi việc phụ ghi xong). Test nào cần đo query TRƯỚC khi việc phụ chạy thì tự gọi worker.fetch(req, env) không qua goiWorker.
+export async function goiWorker(worker: { fetch(r: Request, e: Env, c?: { waitUntil(p: Promise<unknown>): void }): Promise<Response> }, env: Env, duong: string, body: Record<string, unknown>, thay = false, giuNhipDeNghi = false) {
+  const choDoi: Promise<unknown>[] = []
+  const ctx = { waitUntil: (p: Promise<unknown>) => { choDoi.push(p) } }
   const r = await worker.fetch(
     new Request(`https://test${duong}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(thay ? { ...body, secret: 'bi-mat-thu' } : body) }),
     env,
+    ctx,
   )
   const kq = (await r.json()) as Record<string, any>
+  await Promise.all(choDoi)
   if (!giuNhipDeNghi) delete kq.nhipDeNghi
   return kq
 }

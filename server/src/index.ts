@@ -68,7 +68,8 @@ import * as AI from './bo-nao'
 import {themTenDangDemQua,themTenDangNhatKy} from './ten-dang-bo-nao'
 import {docLoiNhanHlv} from './bo-nao-doc'
 import * as VD from './vo-dai'
-import type { D1PreparedStatement, DongCa, DongLuot, Env } from './kieu'
+import type { D1PreparedStatement, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
+import { viecPhu } from './viec-phu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
@@ -112,6 +113,7 @@ async function dungKeHoachEm(env: Env, b: Record<string, unknown>): Promise<Reco
 async function sauGhi<T>(env: Env, b: Record<string, unknown>, viec: Promise<T>): Promise<T> {
   try { return await viec } finally { try { emCoGhi(await gameIdentity(env, b)) } catch { /* token sai / hết hạn */ } }
 }
+
 function ra(data: unknown, status = 200): Response {
   return new Response(JSON.stringify({ ...(data as object), serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
 }
@@ -1786,7 +1788,7 @@ async function nopBtvn(env: Env, b: Record<string, unknown>): Promise<Response> 
  * CHỈ TĂNG, KHÔNG BAO GIỜ GIẢM — `MAX(lo_da_xong, ?)`. Gọi lại nhiều lần (mất
  * mạng, em mở lại phiếu, báo trùng giữa hai lô) vẫn ra đúng một tiến độ thật,
  * không bao giờ lùi lại lô đã qua. */
-async function xongLoBtvn(env: Env, b: Record<string, unknown>): Promise<Response> {
+async function xongLoBtvn(env: Env, b: Record<string, unknown>, ctx?: ExecutionContext): Promise<Response> {
   const maBtvn = String(b.maBtvn ?? '').trim()
   const sbd = String(b.sbd ?? '').trim()
   const chiSo = Number(b.chiSo)
@@ -1827,8 +1829,12 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>): Promise<Respons
   const dapAn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
   const ghi = dapAn && Object.keys(dapAn).length ? await ghiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn) : null
   // EXP HỌC TẬP MỚI (exp-d1.ts): xong lô đúng nhịp/trễ nhịp + EXP từng câu; cờ tắt thì không đính gì.
-  const expMoi = ghi?.ok ? await expNhanSauNop(env, sbd, Date.now(), { laNopLo: true }) : {}
-  return ra({ ok: true, loDaXong: Number(em?.lo_da_xong ?? loDaXongMoi), ...(ghi ? { suKien: ghi.soGui } : {}), ...expMoi })
+  // HẠ TẢI D1 (Boss 22/09, tốc độ tối đa): đường "bài THƯỜNG" này — client (src/lib/btvn-may-chu-moi.ts xongLoBtvn())
+  // CHỈ đọc {ok, loDaXong, error}, không đọc expNhan/manhNhan/exp (khác bài CÁ NHÂN HOÁ ở nhánh trên, ND.nopChangCaNhan,
+  // nơi client ĐỌC exp đồng bộ để hiện "+EXP" ngay — giữ nguyên, không đụng). Vì vậy ở ĐÂY tính EXP + ghi sổ/mảnh khiên/
+  // kế hoạch ngày (bên trong capNhatExpSauNopLo) hoãn qua ctx.waitUntil — phản hồi trả nhanh hơn, việc phụ vẫn chạy hết.
+  if (ghi?.ok) await viecPhu(ctx, () => expNhanSauNop(env, sbd, Date.now(), { laNopLo: true }))
+  return ra({ ok: true, loDaXong: Number(em?.lo_da_xong ?? loDaXongMoi), ...(ghi ? { suKien: ghi.soGui } : {}) })
 }
 
 /** EM HỎI: LỚP CỦA EM CÓ CA THI ĐANG MỞ KHÔNG — để nút "Vào thi" đổi màu (Bảng nhiệm vụ).
@@ -3031,7 +3037,7 @@ const boXuLy = {
       await deliverNotices(env).catch(async e=>{console.error('[thong-bao] cron lỗi:',e);await ghiLoiMay(env,'gui_thong_bao')})
     }
   },
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
     const url = new URL(req.url)
     const p = url.pathname
 
@@ -3137,7 +3143,7 @@ const boXuLy = {
       if (p === '/goi') return goiCu(req, env, b)
       if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
       if (p === '/btvn/nop') return sauGhi(env, b, nopBtvn(env, b))
-      if (p === '/btvn/xong-lo') return sauGhi(env, b, xongLoBtvn(env, b))
+      if (p === '/btvn/xong-lo') return sauGhi(env, b, xongLoBtvn(env, b, ctx))
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
       // Ô "Thi đua hôm nay" (Điều 8, phương án 8A): ĐỌC-CHỈ, token của em (thi-dua-hom-nay.ts của Code 4).
       if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(env, b))
@@ -3160,10 +3166,10 @@ const boXuLy = {
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
       if (p === '/hs/canh-bao/xem') return ra(await emXemCanhBao(env, await gameIdentity(env, b), String(b.id ?? '')))
-      if (p === '/hs/on-lai/nop') return ra(await sauGhi(env, b, hsOnLaiNop(env, b)))
+      if (p === '/hs/on-lai/nop') return ra(await sauGhi(env, b, hsOnLaiNop(env, b, ctx)))
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       if (p === '/hs/thu-thach-hom-nay') return ra(await hsThuThachHomNay(env, b))
-      if (p === '/hs/thu-thach-hom-nay/nop') return ra(await sauGhi(env, b, hsThuThachNop(env, b)))
+      if (p === '/hs/thu-thach-hom-nay/nop') return ra(await sauGhi(env, b, hsThuThachNop(env, b, Date.now(), ctx)))
       if (p === '/hs/thoi-gian-hoc') return ra(await sauGhi(env, b, hsThoiGianHoc(env, b)))
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
@@ -3297,10 +3303,10 @@ const boXuLy = {
 /** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */
 export default {
   ...boXuLy,
-  async fetch(req: Request, env: Env): Promise<Response> {
+  async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
     const t0 = Date.now()
     let res: Response
-    try { res = await boXuLy.fetch(req, env) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
+    try { res = await boXuLy.fetch(req, env, ctx) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
     // HEADER song song với trường JSON `nhipDeNghi` (Code 2: máy em yếu, khỏi phải clone + parse thân phản hồi 20–100 KB): `x-nhip-de-nghi: 1|2|4` + cho trình duyệt đọc qua CORS. Thân phản hồi đi nguyên (stream).
     const h = new Headers(res.headers)
     h.set('x-nhip-de-nghi', String(nhipDeNghi().heSo))

@@ -17,7 +17,8 @@
 //     (sổ là nguồn sự thật, kế hoạch kế tiếp tự dựng lại khi số dòng sổ đổi).
 //   · EXP học tập: EXP MỚI (`exp-d1.ts`, bảng phần × sao, trần mềm, lên bậc, đạt ngày...) khi đã bật cho em; CHƯA bật thì đường cũ: `creditAcademic` với khoá `practice:<qid>` (mỗi câu một lần cả đời, trần 100/ngày) — CHỈ khi em đã có hồ sơ game
 //     (không tự tạo hồ sơ chỉ để cộng EXP); xung đột phiên bản thì bỏ qua EXP, không làm hỏng lượt nộp.
-import type { Env } from './kieu'
+import type { Env, ExecutionContext } from './kieu'
+import { viecPhu } from './viec-phu'
 import { isAnswerCorrect } from './btvn-grading'
 import { creditAcademic } from './game-v2-academic'
 import { loadProfile } from './game-v2'
@@ -98,8 +99,8 @@ export interface TuyChonNop {
 }
 const TUY_CHON_ON_LAI: TuyChonNop = { nguon: 'on_lai', maNguon: (now) => `on_lai:${ngayVn(now)}` }
 
-export async function hsOnLaiNop(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  return chamVaGhiTraLoi(env, b, TUY_CHON_ON_LAI)
+export async function hsOnLaiNop(env: Env, b: Record<string, unknown>, ctx?: ExecutionContext): Promise<Record<string, unknown>> {
+  return chamVaGhiTraLoi(env, b, TUY_CHON_ON_LAI, ctx)
 }
 
 /** Chấm một câu và, nếu Phần III bị chấm SAI, GHI LẠI chuỗi em gõ + đáp án lưu (chỉ nhật ký máy, không có mã em) để tìm ra kiểu gõ mà bộ chuẩn hoá còn bỏ sót (P0 "0,54" 21/09). */
@@ -110,7 +111,7 @@ export function chamMotCau(x: { qid: string; dapAn: string }, q: { correct: stri
   return dung
 }
 
-export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt: TuyChonNop): Promise<Record<string, unknown>> {
+export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt: TuyChonNop, ctx?: ExecutionContext): Promise<Record<string, unknown>> {
   // Không token / token sai / SBD trần đều bị từ chối. Lời báo đúng việc của đường này (em đang ÔN CÂU), không mượn lời của game.
   let sbd: string
   try {
@@ -157,11 +158,12 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
   const ketQuaLuu = new Map((daLuu.results ?? []).map((x) => [String(x.qid), x.ket_qua === null ? null : Number(x.ket_qua)]))
   if (nhan.some((x) => !ketQuaLuu.has(x.qid))) return { ok: false, error: 'Chưa ghi được bài làm. Em nộp lại nhé.' }
 
-  try {
-    await dungLaiHoSo(env, [sbd], luc)
-  } catch (e) {
+  // HẠ TẢI D1 (Boss 22/09, tốc độ tối đa): hồ sơ mạnh/yếu KHÔNG nằm trong hợp đồng phản hồi (tienBo dưới đây đọc thẳng
+  // su_kien_hoc, không đọc nam_kt_cau/nam_kt_dang) ⇒ hoãn qua ctx.waitUntil. Tự lành nếu chạy chưa xong: `/hs/ke-hoach-ngay`
+  // gọi kế tiếp tự phát hiện sổ đổi (so_su_kien) và tự dựng lại hồ sơ, y như khi dungLaiHoSo ở đây lỗi (dòng log cũ).
+  await viecPhu(ctx, () => dungLaiHoSo(env, [sbd], luc).catch((e) => {
     console.error('[on-lai] dựng lại hồ sơ lỗi (sổ đã ghi, kế hoạch sau sẽ tự dựng lại):', e instanceof Error ? e.message : e)
-  }
+  }))
   let tienBo: { daLamCau: number; lenBac: number; tutBac: number; soCauHienThi?: number } | null = null
   try {
     const t = await env.DB.prepare(TIEN_BO_NGAY).bind(JSON.stringify([sbd]), ngayVn(now)).first<Record<string, unknown>>()
