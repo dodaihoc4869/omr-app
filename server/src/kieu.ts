@@ -15,9 +15,17 @@ export interface D1PreparedStatement {
   run<T = unknown>(): Promise<D1Result<T>>
   all<T = unknown>(): Promise<D1Result<T>>
 }
+/** Sessions API D1 (Boss 22/09, lượt 2): `env.DB.withSession('first-unconstrained')` cho lệnh CHỈ ĐỌC — Cloudflare tự chọn bản sao (replica) gần nhất
+ *  thay vì bắt buộc đi tới primary, giảm tải D1 chính mà không đổi cú pháp gọi (cùng `.prepare()/.batch()`). `withSession` tuỳ chọn: D1 thật luôn có,
+ *  D1 giả trong test có thể bỏ qua (trả nguyên `env.DB` gốc) — nơi gọi PHẢI kiểm `env.DB.withSession` có mặt trước khi dùng. */
+export interface D1DatabaseSession {
+  prepare(query: string): D1PreparedStatement
+  batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>
+}
 export interface D1Database {
   prepare(query: string): D1PreparedStatement
   batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>
+  withSession?(constraintOrBookmark?: 'first-primary' | 'first-unconstrained' | string): D1DatabaseSession
 }
 export interface R2Object {
   body: ReadableStream

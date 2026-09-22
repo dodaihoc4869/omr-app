@@ -3040,6 +3040,12 @@ const boXuLy = {
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
     const url = new URL(req.url)
     const p = url.pathname
+    // SESSIONS API (Boss 22/09, lượt 2, docs/do-tai-d1/phan-loai-route-doc-ghi-2209.md): `env` bọc `DB.withSession('first-unconstrained')` —
+    // CHỈ dùng cho route đã soát KHÔNG có bất kỳ INSERT/UPDATE/DELETE nào ở mọi hàm nó gọi (kể cả gián tiếp, như `ghiTruyCap` khiến hầu hết
+    // /ph/* KHÔNG đủ điều kiện dù nhìn tưởng đọc-chỉ). Cloudflare tự chọn bản sao gần nhất thay vì luôn đi primary, giảm tải D1 chính; không
+    // đổi kết quả (đọc-chỉ, không cần "đọc ngay sau ghi của chính lượt này"). `withSession` vắng ở D1 giả/local ⇒ dùng nguyên `env`, hành vi cũ.
+    // `env.DB?.` (không chỉ `.withSession?`): vài test dựng `env` tối giản KHÔNG có `DB` để kiểm đường từ chối trước khi chạm D1 (vd. chưa xác thực) — phải sống sót cả khi thiếu hẳn `DB`.
+    const envDoc: Env = env.DB?.withSession ? { ...env, DB: env.DB.withSession('first-unconstrained') } : env
 
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
     // RESET TOÀN APP 00:01 thứ Hai 21/09 (reset-toan-app.ts): trong cửa sổ đóng băng [00:00, 00:20] giờ VN mà job CHƯA xong thì mọi lệnh trả lời tử tế để máy khách
@@ -3146,7 +3152,7 @@ const boXuLy = {
       if (p === '/btvn/xong-lo') return sauGhi(env, b, xongLoBtvn(env, b, ctx))
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
       // Ô "Thi đua hôm nay" (Điều 8, phương án 8A): ĐỌC-CHỈ, token của em (thi-dua-hom-nay.ts của Code 4).
-      if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(env, b))
+      if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(envDoc, b))
       if (p === '/hs/ke-hoach-ngay') {
         // DỒN LƯỢT + ĐỆM 20 GIÂY theo em (dem-ke-hoach.ts; Boss 21/09): lượt đệm KHÔNG ghi gì; em có ghi thì đệm bị xoá ngay. `thanThu` luôn đọc tươi.
         let sbdKhoa = ''
@@ -3178,8 +3184,8 @@ const boXuLy = {
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
       if (p === '/teacher-news') return ra(await teacherNews(env,b))
       // Token phụ huynh: cấp liên kết theo danh sách/lớp, và đếm truy cập (token so với SBD trần) để quyết giai đoạn cứng.
-      if (p === '/ph/cap-ma') return ra(await phCapMa(env, b))
-      if (p === '/ph/dem-truy-cap') return ra(await phDemTruyCap(env, b))
+      if (p === '/ph/cap-ma') return ra(await phCapMa(envDoc, b))
+      if (p === '/ph/dem-truy-cap') return ra(await phDemTruyCap(envDoc, b))
       if (p === '/ho-so/nap-lai') return ra(await napLaiSuKien(env, b.sbd, b.nguon as NguonNapLai | undefined))
       if (p === '/ho-so/kiem-cheo') return ra(await kiemCheoSuKien(env, b.sbd))
       // HỒ SƠ NẮM KIẾN THỨC (GĐ 1) — dựng lại từ sổ (≤ 50 em/lượt), xem một em, đo độ phủ mã dạng.
@@ -3200,37 +3206,37 @@ const boXuLy = {
       // Màn HÔM NAY của app giáo viên (docs/hop-dong-gv-hom-nay-2109.md): chỉ đọc, ≤ 8 truy vấn, khối nào không tính được thì null + lyDoThieu.
       if (p === '/ke-hoach/hom-nay-thay') return ra(await homNayThay(env, b))
       // Kế hoạch hôm nay của MỘT em cho màn Học sinh của thầy: CHỈ ĐỌC (không lập kế hoạch, không capNhatExp) để không nuốt `expNhan` của em.
-      if (p === '/gv/ke-hoach-em') return ra(await gvKeHoachEm(env, b))
+      if (p === '/gv/ke-hoach-em') return ra(await gvKeHoachEm(envDoc, b))
       // HÔM NAY v2 (docs/hop-dong-hom-nay-v2-2109.md): MỘT lệnh GHI (cảnh báo em chưa nộp — chỉ thầy bấm mới gửi).
       if (p === '/gv/canh-bao-nop-bai') return ra(await guiCanhBao(env, b))
       if (p === '/gv/nhac-tu-dong') return ra(await gvNhacTuDong(env, b))
       // NĂM lệnh ĐỌC-CHỈ (≤ 12 truy vấn, đo ở `soTruyVan`): ô Việc gấp, Em cần thầy giúp, Vinh danh, tra cứu, Toàn cảnh một em.
-      if (p === '/gv/chua-nop') return ra(await gvChuaNop(env, b))
-      if (p === '/gv/can-giup') return ra(await gvCanGiup(env, b))
-      if (p === '/gv/vinh-danh-ngay') return ra(await gvVinhDanhNgay(env, b))
-      if (p === '/gv/tim-em') return ra(await gvTimEm(env, b))
-      if (p === '/gv/em-toan-canh') return ra(await gvEmToanCanh(env, b))
+      if (p === '/gv/chua-nop') return ra(await gvChuaNop(envDoc, b))
+      if (p === '/gv/can-giup') return ra(await gvCanGiup(envDoc, b))
+      if (p === '/gv/vinh-danh-ngay') return ra(await gvVinhDanhNgay(envDoc, b))
+      if (p === '/gv/tim-em') return ra(await gvTimEm(envDoc, b))
+      if (p === '/gv/em-toan-canh') return ra(await gvEmToanCanh(envDoc, b))
       // GỌI LÊN BẢNG (thầy lệnh 21/09): em đã làm câu này chưa, đúng hay sai, quét HẾT lịch sử (KHÔNG áp mốc 12:00). ĐỌC-CHỈ, ≤ 200 cặp, 2 truy vấn (docs/hop-dong-lich-su-cau-len-bang-2109.md).
-      if (p === '/gv/lich-su-cau-cua-em') return ra(await gvLichSuCauCuaEm(env, b))
+      if (p === '/gv/lich-su-cau-cua-em') return ra(await gvLichSuCauCuaEm(envDoc, b))
       // BẢNG TIN KIỂU SÀN GIAO DỊCH (thầy chốt mẫu 21/09; hợp đồng docs/hop-dong-bang-tin-song-2109.md): mọi khoá của /gv/bang-tin (gồm `chuaHocHomNay`, đệm chung 60 giây) + `song` (nến 5 phút, tia 60 phút, theo lớp, ô nhiệt, băng tin, dẫn đầu; đệm 10 giây).
       // Cờ lùi `cau_hinh.bang_tin_san = 'tat'` ⇒ trả `{ok:false, lyDo:'tat'}` (máy thầy dùng Bảng tin bản 3). ĐỌC-CHỈ.
       // BÁO CÁO CA cho THẦY (docs/hop-dong-xem-diem-v2-2109.md mục 2 + 4): ĐỌC-CHỈ, không bị chặn công bố (trả `congBo`); `phan[].toiDa` / `phanTb[].toiDa` = trần điểm từng phần từ `quotaPhan` (một nguồn với chấm điểm). Lỗi đọc ⇒ {ok:false, lyDo:'loi_doc'}.
-      if (p === '/gv/bao-cao-ca') return ra(await gvBaoCaoCa(env, b))
-      if (p === '/gv/bao-cao-ca-em') return ra(await gvBaoCaoCaEm(env, b))
+      if (p === '/gv/bao-cao-ca') return ra(await gvBaoCaoCa(envDoc, b))
+      if (p === '/gv/bao-cao-ca-em') return ra(await gvBaoCaoCaEm(envDoc, b))
       if (p === '/gv/suc-khoe-may-chu') return ra({ ok: true, ...sucKhoeMay(), nguong: { banMs: 1500, nghenMs: 3500, toiThieuMau: 20 }, ghiChu: 'Số đo của chính isolate đang trả lời (mỗi lượt có thể rơi vào isolate khác): lấy MAX của vài lượt gần nhất.' })
       if (p === '/gv/bang-tin-song') {
-        const co = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('bang_tin_san').first<{ gia_tri: unknown }>().catch(() => null)
+        const co = await envDoc.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('bang_tin_san').first<{ gia_tri: unknown }>().catch(() => null)
         if (String(co?.gia_tri ?? '').trim().toLowerCase() === 'tat') return ra({ ok: false, lyDo: 'tat', error: 'Bảng tin kiểu sàn đang tắt.' })
-        return ra(await gvBangTinSong(env, b, Date.now(), { khoiRieng: async (e) => ({ chuaHocHomNay: await gvChuaHocHomNay(e) }) }))
+        return ra(await gvBangTinSong(envDoc, b, Date.now(), { khoiRieng: async (e) => ({ chuaHocHomNay: await gvChuaHocHomNay(e) }) }))
       }
       // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
-      if (p === '/gv/lop') return ra(await gvLop(env))
+      if (p === '/gv/lop') return ra(await gvLop(envDoc))
       if (p === '/gv/doi-lop-em') return ra(await gvDoiLopEm(env, b))
       // BUỔI CHỮA TỐI NAY (B6, docs/hop-dong-buoi-chua-de-xuat-2109.md): số liệu thô ĐỌC-CHỈ, ≤ 12 truy vấn.
-      if (p === '/gv/buoi-chua-de-xuat') return ra(await gvBuoiChuaDeXuat(env, b))
+      if (p === '/gv/buoi-chua-de-xuat') return ra(await gvBuoiChuaDeXuat(envDoc, b))
       // BẢNG TIN CỦA THẦY bản 3 (docs/hop-dong-bang-tin-v3-2109.md): MỘT lệnh đọc-chỉ ≤ 12 truy vấn cho cả màn Hôm nay, số liệu tính từ mốc `cau_hinh.bang_tin_tu`.
       // `chuaHocHomNay` (Code 4, Điều 8): chỉ-thêm, khối RIÊNG ngoài bộ đếm truy vấn của bảng tin; lỗi/thiếu ⇒ vắng khoá (máy thầy ẩn khối, không bịa).
-      if (p === '/gv/bang-tin') { const r = await gvBangTin(env, b); if (r.ok !== false) { try { r.chuaHocHomNay = await gvChuaHocHomNay(env) } catch (e) { console.error('[bang-tin] chưa học hôm nay lỗi:', e) } } return ra(r) }
+      if (p === '/gv/bang-tin') { const r = await gvBangTin(envDoc, b); if (r.ok !== false) { try { r.chuaHocHomNay = await gvChuaHocHomNay(envDoc) } catch (e) { console.error('[bang-tin] chưa học hôm nay lỗi:', e) } } return ra(r) }
       // CỜ TẮT chung của các việc máy tự làm B7–B11 (thầy chỉ tắt/bật): đọc-ghi khoá `cau_hinh.tu_dong_cac_viec`.
       if (p === '/gv/tu-dong-cac-viec') return ra(await gvTuDongCacViec(env, b))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })

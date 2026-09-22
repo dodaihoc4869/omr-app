@@ -85,25 +85,31 @@ export function taoD1That() {
     return st
   }
 
+  const dbThat = {
+    prepare,
+    async batch(ds: D1PreparedStatement[]) {
+      soLenh.batch++
+      sql.exec('BEGIN')
+      try {
+        const r = []
+        // Như D1 thật: câu SELECT trong batch trả `results` (câu ghi trả `meta.changes`).
+        for (const s of ds) r.push(/^\s*(SELECT|WITH)\b/i.test((s as unknown as { _q?: string })._q ?? '') ? await s.all() : await s.run())
+        sql.exec('COMMIT')
+        return r
+      } catch (e) {
+        sql.exec('ROLLBACK')
+        throw e
+      }
+    },
+    // Sessions API (Boss 22/09, lượt 2): D1 giả KHÔNG có replica để mô phỏng thật — trả nguyên bản sqlite trong bộ nhớ này,
+    // cùng đối tượng `prepare/batch`, để route dùng withSession chạy Y HỆT route không dùng (không đổi kết quả/số lệnh test đo).
+    withSession(_constraintOrBookmark?: string) {
+      return dbThat
+    },
+  }
   const env = {
     MA_BI_MAT: 'bi-mat-thu',
-    DB: {
-      prepare,
-      async batch(ds: D1PreparedStatement[]) {
-        soLenh.batch++
-        sql.exec('BEGIN')
-        try {
-          const r = []
-          // Như D1 thật: câu SELECT trong batch trả `results` (câu ghi trả `meta.changes`).
-          for (const s of ds) r.push(/^\s*(SELECT|WITH)\b/i.test((s as unknown as { _q?: string })._q ?? '') ? await s.all() : await s.run())
-          sql.exec('COMMIT')
-          return r
-        } catch (e) {
-          sql.exec('ROLLBACK')
-          throw e
-        }
-      },
-    },
+    DB: dbThat,
     DE: {
       async get(key: string) {
         const v = objects.get(key)
