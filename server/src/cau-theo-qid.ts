@@ -43,8 +43,12 @@ export interface PhucVuDuoc {
   tuLuan: string[]
 }
 
-/** Trong các `qids`, những qid PHỤC VỤ ĐƯỢC (không đọc nội dung, không cần R2 ngoài phạm vi bảo vệ đã có đệm). Không ném lỗi. */
-export async function qidPhucVuDuoc(env: Env, qids: string[]): Promise<PhucVuDuoc> {
+/**
+ * Trong các `qids`, những qid PHỤC VỤ ĐƯỢC (không đọc nội dung, không cần R2 ngoài phạm vi bảo vệ đã có đệm). Không ném lỗi.
+ * `baoVeDaBiet` (HẠ TẢI D1, Boss 22/09 M3): nơi gọi ĐÃ có `protectedQuestions(env)` của CÙNG một lượt xử lý (đề đang bảo vệ không đổi
+ * giữa hai lần hỏi trong một request) thì truyền vào đây thay vì để hàm này tự hỏi lại — đỡ một lượt quét bảng `ca`. Không truyền ⇒ hành vi cũ.
+ */
+export async function qidPhucVuDuoc(env: Env, qids: string[], baoVeDaBiet?: { baoVe: Set<string> | null; kiemDuocBaoVe: boolean }): Promise<PhucVuDuoc> {
   const xin = [...new Set(qids.filter((q) => q !== ''))]
   const ra: PhucVuDuoc = { duoc: new Set(), kiemDuocBaoVe: true, khongCoChiMuc: [], biBaoVe: [], tuLuan: [] }
   if (xin.length === 0) return ra
@@ -61,18 +65,34 @@ export async function qidPhucVuDuoc(env: Env, qids: string[]): Promise<PhucVuDuo
   }
   ra.tuLuan = xin.filter((q) => tuLuan.has(q) && !nhom.has(q))
   ra.khongCoChiMuc = xin.filter((q) => !nhom.has(q) && !tuLuan.has(q))
-  let baoVe: Set<string> | null = null
-  try {
-    baoVe = await protectedQuestions(env)
-  } catch (e) {
-    console.error('[phuc-vu] không kiểm được đề bảo vệ:', e instanceof Error ? e.message : e)
-    ra.kiemDuocBaoVe = false
+  let baoVe: Set<string> | null
+  if (baoVeDaBiet) {
+    baoVe = baoVeDaBiet.baoVe
+    ra.kiemDuocBaoVe = baoVeDaBiet.kiemDuocBaoVe
+  } else {
+    baoVe = null
+    try {
+      baoVe = await protectedQuestions(env)
+    } catch (e) {
+      console.error('[phuc-vu] không kiểm được đề bảo vệ:', e instanceof Error ? e.message : e)
+      ra.kiemDuocBaoVe = false
+    }
   }
   for (const [qid, group] of nhom) {
     if (baoVe && !khongBiBaoVe({ qid, group }, baoVe)) ra.biBaoVe.push(qid)
     else ra.duoc.add(qid)
   }
   return ra
+}
+
+/** `protectedQuestions(env)` MỘT LẦN cho cả lượt xử lý, hình dạng `qidPhucVuDuoc` cần — dùng khi một request gọi `qidPhucVuDuoc` nhiều lần (ví dụ kế hoạch ngày: câu tới hạn + câu ôn thi). Không ném lỗi. */
+export async function baoVeMotLuot(env: Env): Promise<{ baoVe: Set<string> | null; kiemDuocBaoVe: boolean }> {
+  try {
+    return { baoVe: await protectedQuestions(env), kiemDuocBaoVe: true }
+  } catch (e) {
+    console.error('[phuc-vu] không kiểm được đề bảo vệ:', e instanceof Error ? e.message : e)
+    return { baoVe: null, kiemDuocBaoVe: false }
+  }
 }
 
 /** Câu như máy em nhận: chỉ các trường này. KHÔNG có `correct`, `solution`, `reviewed`, `version`, `group`. */

@@ -297,6 +297,13 @@ export interface KetQuaDung {
   soDang: number
   /** Số câu KHÔNG xác định được dạng (cả mã dạng lẫn chuyên đề đều thiếu). */
   cauKhongDang: number
+  /**
+   * HẠ TẢI D1 (Boss 22/09, M3): hồ sơ ĐẦY ĐỦ vừa phát lại (không chỉ phần THAY ĐỔI) của từng em trong `dsSbd`, theo đúng
+   * thứ tự KHÔNG đảm bảo — nơi gọi tự nhóm theo `sbd`. Nơi gọi NGAY SAU `dungLaiHoSo` (ví dụ `lapVaLuuKeHoach`) dùng bản
+   * này thay vì đọc lại `nam_kt_cau`/`nam_kt_dang` từ D1 — hồ sơ nguồn không đổi giữa lúc dựng và lúc đọc lại (cùng một
+   * lượt xử lý). CHỈ có mặt cho em nằm trong `dsSbd`; em khác (không đổi sổ) không có ở đây, nơi gọi tự đọc D1 cho họ.
+   */
+  hoSo: Map<string, { cau: NamKtCau[]; dang: NamKtDang[] }>
 }
 
 /**
@@ -350,7 +357,11 @@ export async function dungLaiHoSo(env: Env, dsSbd: string[], nay: string): Promi
   for (let i = 0; i < cauDoi.length; i += DONG_MOI_LENH) lenh.push(env.DB.prepare(CHEN_CAU.replace('INSERT INTO', 'INSERT OR REPLACE INTO')).bind(nay, JSON.stringify(cauDoi.slice(i, i + DONG_MOI_LENH))))
   for (let i = 0; i < dangDoi.length; i += DONG_MOI_LENH) lenh.push(env.DB.prepare(CHEN_DANG.replace('INSERT INTO', 'INSERT OR REPLACE INTO')).bind(nay, JSON.stringify(dangDoi.slice(i, i + DONG_MOI_LENH))))
   for (let i = 0; i < lenh.length; i += 25) await env.DB.batch(lenh.slice(i, i + 25))
-  return { soEm: em.length, soCau: cau.length, soDang: dang.length, cauKhongDang: cau.filter((c) => !c.maDang).length }
+  const hoSo = new Map<string, { cau: NamKtCau[]; dang: NamKtDang[] }>()
+  for (const sbd of em) hoSo.set(sbd, { cau: [], dang: [] })
+  for (const c of cau) hoSo.get(c.sbd)?.cau.push(c)
+  for (const d of dang) hoSo.get(d.sbd)?.dang.push(d)
+  return { soEm: em.length, soCau: cau.length, soDang: dang.length, cauKhongDang: cau.filter((c) => !c.maDang).length, hoSo }
 }
 
 // --- Đọc hồ sơ đã dựng ------------------------------------------------------------

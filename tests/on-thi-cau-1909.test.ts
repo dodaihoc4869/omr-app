@@ -107,10 +107,13 @@ describe('việc on_thi mang câu từ hồ sơ, chỉ câu phục vụ được
     const dem1 = soTim(xa)
     expect((await viecOnThi(xa)).thi).toBeUndefined()
     expect(dem1()).toBe(0)
+    // Có ca sắp tới + hồ sơ vừa dựng lại trong CHÍNH lượt này (`dung()` gọi `dungLaiHoSo` rồi `lapVaLuuKeHoach` lần đầu ⇒
+    // `so_su_kien` chưa khớp `ke_hoach_ngay` ⇒ dựng lại lần nữa) ⇒ HẠ TẢI M3: ứng viên on_thi lấy từ hồ sơ VỪA dựng
+    // trong bộ nhớ, không đọc lại D1 nữa — 0 truy vấn tìm ứng viên (trước 21/09 là 1; nay 0, đỡ hẳn một lượt đọc).
     const co = await dung()
     const dem2 = soTim(co)
     expect((await viecOnThi(co)).thi).toBeDefined()
-    expect(dem2()).toBe(1)
+    expect(dem2()).toBe(0)
   })
   it('em có ca sắp tới nhưng KHÔNG có câu ứng viên (chưa sai gì, hoặc chỉ câu chưa phục vụ được) ⇒ không giao on_thi rỗng', async () => {
     const d = taoD1That()

@@ -96,12 +96,16 @@ export async function doDayDu(env:Env,cau:readonly CauPool[]):Promise<PrivateQue
 const demKhoDang=new DemTTL<{k:string;q:CauPool}[]>(900_000,1500,30_000_000)
 /** KHỐI CỦA EM (`hoc_sinh.lop` + tên lớp) — luật Boss 21/09 (P0 khối 11 nhận câu khối 12): MỌI kênh rút câu tự động chỉ được đưa câu khối em hoặc THẤP hơn (`src/lib/khoi-cau.ts`). Không đọc được ⇒ null (không lọc, "không biết ⇒ không kết tội"). */
 export async function docKhoiCacEm(env:Env,sbds:readonly string[]):Promise<Map<string,Khoi|null>>{
-  const ra=new Map<string,Khoi|null>();const ds=[...new Set(sbds.filter(Boolean))];if(!ds.length)return ra
+  return (await docKhoiVaLopCacEm(env,sbds)).khoi
+}
+/** KHỐI + LỚP THÔ (chuỗi `hoc_sinh.lop`) của em, MỘT truy vấn `hoc_sinh` cho cả hai — hạ tải (Boss 22/09, M3): nơi cần cả hai (kế hoạch ngày: khối để lọc câu hợp khối, lớp thô để khớp ca thi của lớp) gọi đây thay vì `docKhoiCacEm` + một truy vấn `hoc_sinh` riêng. */
+export async function docKhoiVaLopCacEm(env:Env,sbds:readonly string[]):Promise<{khoi:Map<string,Khoi|null>;lop:Map<string,string>}>{
+  const khoi=new Map<string,Khoi|null>();const lop=new Map<string,string>();const ds=[...new Set(sbds.filter(Boolean))];if(!ds.length)return {khoi,lop}
   const doc=async(cot:string)=>(await env.DB.prepare(`SELECT sbd,${cot} FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(ds)).all<Row>()).results??[]
   let rows:Row[]=[]
   try{rows=await doc('lop,ten_lop')}catch{try{rows=await doc('lop')}catch{rows=[]}}
-  for(const r of rows)ra.set(str(r.sbd),khoiCuaEm({lop:r.lop,tenLop:r.ten_lop}))
-  return ra
+  for(const r of rows){khoi.set(str(r.sbd),khoiCuaEm({lop:r.lop,tenLop:r.ten_lop}));lop.set(str(r.sbd),str(r.lop??'').trim())}
+  return {khoi,lop}
 }
 export async function docKhoiEm(env:Env,sbd:string):Promise<Khoi|null>{return (await docKhoiCacEm(env,[sbd])).get(sbd)??null}
 /** Khối THẤP NHẤT trong nhóm em (đội Đoàn lẫn khối: câu chung phải hợp với MỌI thành viên). Không em nào rõ khối ⇒ null. */

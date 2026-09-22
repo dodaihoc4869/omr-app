@@ -5,7 +5,7 @@
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { demCauKhacNhau, docCauDaLamHomNay, SQL_CAU_DA_LAM_CA_LOP, SQL_CAU_DA_LAM_THEO_EM, tuLucHomNay, tuLucTuNgay } from '../server/src/cau-da-lam'
-import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
+import { lapVaLuuKeHoach, TONG_HOP_EM_NGAY } from '../server/src/ke-hoach-ngay-d1'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { giaiMocHienThi } from '../server/src/moc-no'
 import { taoD1That, type D1That } from './_d1-that'
@@ -89,12 +89,16 @@ describe('/hs/ke-hoach-ngay: thêm soCauHienThi, giữ daLamCau (luật)', () =>
     expect(kh.get('S3')!.tienBo).toMatchObject({ daLamCau: 2, soCauHienThi: 2 })
   })
 
-  it('đọc số câu hiển thị lỗi ⇒ kế hoạch VẪN dựng, khoá soCauHienThi vắng (máy dùng daLamCau)', async () => {
+  it('đọc tổng hợp (tiến bộ + hiển thị + giây) lỗi ⇒ kế hoạch VẪN dựng, về 0/vắng khoá thay vì ném lỗi (không bịa số)', async () => {
+    // HẠ TẢI M3 (Boss 22/09): `/hs/ke-hoach-ngay` gộp tiến bộ hôm nay + hiển thị + giây vào MỘT truy vấn (TONG_HOP_EM_NGAY)
+    // thay cho 3 truy vấn riêng trước đây (đọc "đếm tổng số dòng sổ + tiến bộ + hiển thị + giây MỘT truy vấn" — lệnh của
+    // Boss). Đổi có chủ ý: trước đây lỗi CHỈ ở hiển thị (pHienThi) không đụng daLamCau (pRt là truy vấn khác); nay MỘT
+    // truy vấn hỏng thì CẢ HAI về mặc định an toàn (0 / vắng khoá) — kế hoạch vẫn dựng, không ném lỗi ra ngoài.
     const d = await dung()
     const goc = d.env.DB.prepare.bind(d.env.DB)
-    d.env.DB.prepare = ((q: string) => { if (q === SQL_CAU_DA_LAM_THEO_EM) throw new Error('hỏng'); return goc(q) }) as typeof d.env.DB.prepare
+    d.env.DB.prepare = ((q: string) => { if (q === TONG_HOP_EM_NGAY) throw new Error('hỏng'); return goc(q) }) as typeof d.env.DB.prepare
     const tb = (await lapVaLuuKeHoach(d.env, ['S1'], NOW)).get('S1')!.tienBo
-    expect(tb.daLamCau).toBe(5)
+    expect(tb.daLamCau).toBe(0)
     expect(tb).not.toHaveProperty('soCauHienThi')
   })
 

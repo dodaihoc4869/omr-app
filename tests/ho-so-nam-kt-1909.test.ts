@@ -193,7 +193,10 @@ describe('dựng lại hồ sơ trên D1 thật', () => {
     const d = taoD1That()
     await seed(d)
     const r = await dungLaiHoSo(d.env, ['S1'], '2026-09-23T00:00:00.000Z')
-    expect(r).toEqual({ soEm: 1, soCau: 3, soDang: 2, cauKhongDang: 1 })
+    expect({ soEm: r.soEm, soCau: r.soCau, soDang: r.soDang, cauKhongDang: r.cauKhongDang }).toEqual({ soEm: 1, soCau: 3, soDang: 2, cauKhongDang: 1 })
+    // hoSo (mới, HẠ TẢI M3): hồ sơ ĐẦY ĐỦ vừa dựng, có mặt để nơi gọi (ke-hoach-ngay) khỏi đọc lại D1.
+    expect(r.hoSo.get('S1')?.cau.map((c) => c.qid).sort()).toEqual(['Q1', 'Q2', 'Q3'])
+    expect(r.hoSo.get('S1')?.dang.length).toBe(2)
     const h = await docHoSoEm(d.env, 'S1')
     expect(h.cau.map((c) => [c.qid, c.maDang, c.trangThai, c.mocOnKe])).toEqual([
       ['Q1', 'AA.BB.CC', 'dang_on', '2026-09-22'], ['Q2', 'CD:Este', 'chua_thay_sai', '2026-09-21'], ['Q3', null, 'moi_sai', '2026-09-23'],

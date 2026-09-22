@@ -69,6 +69,6 @@ describe('dungLaiHoSo · chỉ ghi phần đổi', () => {
   })
   it('danh sách rỗng ⇒ không truy vấn ghi, kết quả 0', async () => {
     const d = truong(); const c = demGhi(d)
-    expect(await dungLaiHoSo(d.env, [], N1)).toEqual({ soEm: 0, soCau: 0, soDang: 0, cauKhongDang: 0 }); expect(c.ghi()).toBe(0)
+    expect(await dungLaiHoSo(d.env, [], N1)).toEqual({ soEm: 0, soCau: 0, soDang: 0, cauKhongDang: 0, hoSo: new Map() }); expect(c.ghi()).toBe(0)
   })
 })
