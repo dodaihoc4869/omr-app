@@ -34,6 +34,7 @@ function themCa(d: D1That, maCa: string, gio: number, qid: string[]) {
   d.objects.set(`de/${maCa}.json`, { phanI: qid.map((q) => ({ id: q, text: `Đề ${q}`, choices: ['A', 'B', 'C', 'D'], correct: 'B', dang: { ma: 'ES.A.X', ten: 'Dạng' }, mucDo: 'biet', kienThuc: ['K1'], loiGiai: { chot: 'g' } })), phanII: [], phanIII: [] })
   d.sql.prepare("INSERT INTO ca(ma_ca,ten_ca,trang_thai,cong_bo,bank_r2,loai,lop,thoi_gian_phut,bat_dau,het_han_vao,cap_nhat_luc) VALUES(?,?,'mo','ca_lop_xong',?,'thi','12',45,?,?,'x')")
     .run(maCa, `Ca ${maCa}`, `de/${maCa}.json`, new Date(Date.now() + gio * H).toISOString(), new Date(Date.now() + (gio + 2) * H).toISOString())
+  xoaDemCaBaoVe() // test tự ghi bảng `ca` bằng SQL thô, không qua lệnh thật ⇒ tự xoá đệm (production có móc bất hoạt ở mọi lệnh sửa ca thật)
 }
 const themHs = (d: D1That) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','x','12','mk','x')").run()
 const luc = (soNgayTruoc: number) => new Date(Date.now() - soNgayTruoc * D).toISOString()

@@ -12,6 +12,7 @@
 import { emCoGhi } from './dem-ke-hoach'
 import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 import type { D1PreparedStatement, Env } from './kieu'
+import { DemTTL } from './dem-chung'
 import { gameIdentity } from './game-v2-auth'
 import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
 import { EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, TIEP_SUC_TOI_DA_NGAY, bangGiaExp } from './exp-cau-hinh'
@@ -198,21 +199,37 @@ async function docQidDaTraTheoLuatCu(env: Env, sbd: string): Promise<Set<string>
   return ra
 }
 
+// HẠ TẢI D1 (Boss 22/09, đo Code 1: #4 tổng dòng đọc của /hs/ke-hoach-ngay — 1.917 lượt × 195 dòng). Phần/sao của MỘT
+// qid gần như KHÔNG ĐỔI (chỉ đổi khi thầy sửa lại kho câu) — không phải dữ liệu an toàn/chống gian lận, sai lệch tạm
+// thời chỉ làm EXP một câu tính theo phần/sao CŨ trong vài phút, tự sửa khi đệm hết hạn — ĐỆM THEO THỜI GIAN THUẦN,
+// không cần móc bất hoạt. Đệm CẢ kết quả VẮNG (`null`) để qid không có phần hợp lệ không dội D1 mỗi lần.
+const HAN_DEM_META_CAU_MS = 30 * 60_000
+const demMetaCauTheoQid = new DemTTL<MetaCauExp | null>(HAN_DEM_META_CAU_MS, 30_000)
+
 async function docMetaCau(env: Env, qids: string[]): Promise<Record<string, MetaCauExp>> {
   const ra: Record<string, MetaCauExp> = {}
   if (qids.length === 0) return ra
+  const now = Date.now()
+  const thieu = qids.filter((q) => { const c = demMetaCauTheoQid.doc(q, now); if (c === undefined) return true; if (c) ra[q] = c; return false })
+  if (thieu.length === 0) return ra
   const r = await an(
     () => env.DB.prepare(
       `SELECT qid, MIN(json_extract(json, '$.phan')) AS phan, MIN(json_extract(json, '$.sao')) AS sao FROM game_v2_question
         WHERE qid IN (SELECT value FROM json_each(?)) GROUP BY qid`,
-    ).bind(json(qids)).all<Record<string, unknown>>(),
+    ).bind(json(thieu)).all<Record<string, unknown>>(),
     null,
   )
+  const co = new Map<string, MetaCauExp>()
   for (const x of r?.results ?? []) {
     const phan = x.phan === 'I' || x.phan === 'II' || x.phan === 'III' ? x.phan : null
     if (!phan) continue
     const sao = Number(x.sao)
-    ra[String(x.qid)] = { phan, sao: sao === 1 || sao === 2 ? sao : 0 }
+    co.set(String(x.qid), { phan, sao: sao === 1 || sao === 2 ? sao : 0 })
+  }
+  for (const q of thieu) {
+    const v = co.get(q) ?? null
+    if (v) ra[q] = v
+    demMetaCauTheoQid.ghi(q, now, v)
   }
   return ra
 }

@@ -59,8 +59,20 @@ export async function syncIndex(env:Env):Promise<{remaining:number;indexed:numbe
 //   · KHÔNG bất hoạt theo `luot` (em nộp bài/hết giờ): sai lệch còn lại là bảo vệ KÉO DÀI thêm ≤ 5 giây sau khi lẽ ra đã hết — CHIỀU AN
 //     TOÀN (không lộ đề), chấp nhận được vì cửa sổ này còn NHỎ HƠN cửa sổ vốn có (câu đã phát ra máy em trước khi ca hết hạn).
 const demCaBaoVe=new DemTTL<Set<string>>(5_000,4)
-/** Xoá đệm 5 giây của `protectedQuestions` — gọi ngay sau MỌI câu ghi bảng `ca` (production) hoặc sau khi test tự tay sửa bảng `ca` bằng SQL thô (bỏ qua đường ghi thật, nên không tự kích hoạt móc bất hoạt). */
-export function xoaDemCaBaoVe():void{demCaBaoVe.xoa()}
+/** Ca sắp mở (kế hoạch ngày, "ca sắp tới") — cùng bảng `ca`, dùng CHUNG móc bất hoạt với đệm bảo vệ (Boss 22/09: không cần móc riêng). Đệm 30 giây theo (nowIso, hạn) làm tròn phút để không đổi khoá mỗi mili giây. */
+const demCaSapMo=new DemTTL<{maCa:string;tenCa:string;batDau:string;lop:string}[]>(30_000,200)
+/** Xoá đệm 5 giây của `protectedQuestions` + đệm 30 giây "ca sắp mở" — gọi ngay sau MỌI câu ghi bảng `ca` (production) hoặc sau khi test tự tay sửa bảng `ca` bằng SQL thô (bỏ qua đường ghi thật, nên không tự kích hoạt móc bất hoạt). */
+export function xoaDemCaBaoVe():void{demCaBaoVe.xoa();demCaSapMo.xoa()}
+/** Ca `mo`, loại thi, mở trong khoảng (nowIso, denCaIso]. Đệm 30 giây theo khoá làm tròn phút (bind chính xác vẫn dùng nowIso/denCaIso thật khi đọc D1 tươi — chỉ khoá đệm làm tròn để cùng phút dùng chung). */
+export async function docCaSapMo(env:Env,nowIso:string,denCaIso:string):Promise<{maCa:string;tenCa:string;batDau:string;lop:string}[]> {
+  const now=Date.now()
+  const khoa=`${nowIso.slice(0,16)}|${denCaIso.slice(0,16)}` // làm tròn tới phút
+  const nong=demCaSapMo.doc(khoa,now);if(nong)return nong
+  const r=await env.DB.prepare("SELECT ma_ca, ten_ca, bat_dau, lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau > ? AND bat_dau <= ?").bind(nowIso,denCaIso).all<Row>()
+  const ds=(r.results??[]).map(x=>({maCa:str(x.ma_ca),tenCa:str(x.ten_ca),batDau:str(x.bat_dau),lop:str(x.lop)}))
+  demCaSapMo.ghi(khoa,now,ds,ds.length+1)
+  return ds
+}
 const protectionCache=new Map<string,{fingerprint:string;blocked:Set<string>}>()
 export async function protectedQuestions(env:Env):Promise<Set<string>> {
   const now=Date.now()

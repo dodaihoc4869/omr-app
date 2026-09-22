@@ -16,7 +16,7 @@ import {
 } from './ho-so-cau-hinh'
 import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
 import { baoVeMotLuot, qidPhucVuDuoc } from './cau-theo-qid'
-import { docKhoiVaLopCacEm } from './game-v2-bank'
+import { docCaSapMo, docKhoiVaLopCacEm } from './game-v2-bank'
 import { cauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
 import { ngayVn } from './su-kien-hoc'
 import { tuLucHomNay } from './cau-da-lam'
@@ -192,7 +192,8 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const pRp = chan(tat(() => env.DB.prepare(`SELECT sbd, minutes FROM study_preferences WHERE ${IN_EM}`).bind(arr).all<Record<string, unknown>>(), trong()))
   const pRk = chan(tat(() => env.DB.prepare(`SELECT sbd, id, dang FROM game_v2_task WHERE ${IN_EM} AND completed_at IS NULL`).bind(arr).all<Record<string, unknown>>(), trong()))
   const denCa = new Date(now + NGAY_ON_THI * MOT_NGAY_MS).toISOString()
-  const pRca = chan(tat(() => env.DB.prepare("SELECT ma_ca, ten_ca, bat_dau, lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi' AND bat_dau > ? AND bat_dau <= ?").bind(nowIso, denCa).all<Record<string, unknown>>(), trong()))
+  // HẠ TẢI D1 (Boss 22/09): ca sắp mở đệm 30 giây (đọc qua docCaSapMo, game-v2-bank.ts — dùng chung móc bất hoạt với protectedQuestions).
+  const pRca = chan(tat(() => docCaSapMo(env, nowIso, denCa), []))
   const pDieuChinh = chan(docDieuChinhHieuLuc(env, em, homNay)) // có thể ném lỗi: ném ở chỗ await cuối như cũ
   const pRb = chan((async () => {
     // BTVN chưa nộp (còn hạn hoặc mới quá hạn ≤ 14 ngày). Có phòng vệ khi cột `lo_da_xong` chưa có.
@@ -339,10 +340,10 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   // Ca thi sắp tới của lớp em (một truy vấn cho cả lô — `lopEm` đã đọc chung với khối ở `pKhoiLop`, đỡ một truy vấn `hoc_sinh` riêng).
   const rca = await pRca
   for (const c of map.values()) {
-    for (const x of rca.results ?? []) {
-      const lopCa = String(x.lop ?? '').trim()
+    for (const x of rca) {
+      const lopCa = x.lop.trim()
       if (lopCa && lopCa !== lopEm.get(c.sbd)) continue
-      c.caSapToi.push({ maCa: String(x.ma_ca), tenCa: String(x.ten_ca ?? ''), batDau: String(x.bat_dau) })
+      c.caSapToi.push({ maCa: x.maCa, tenCa: x.tenCa, batDau: x.batDau })
     }
   }
 
