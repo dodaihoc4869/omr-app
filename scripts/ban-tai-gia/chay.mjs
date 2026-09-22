@@ -10,13 +10,14 @@ import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { banTai } from './ban.mjs'
 import { lapMarkdown, gomTheoLenh, topTruyVan } from './phan-tich.mjs'
+import { kiemLoDapAn } from './phan-hoi.mjs'
 
 const GOC = dirname(fileURLToPath(import.meta.url))
 const REPO = join(GOC, '../..')
 const TT = join(GOC, '.trang-thai')
 const arg = (ten, mac) => { const a = process.argv.find((x) => x.startsWith(`--${ten}=`)); return a ? a.split('=').slice(1).join('=') : mac }
 const co = (ten) => process.argv.includes(`--${ten}`)
-const soEm = Number(arg('so-em', 250)), phut = Number(arg('phut', 10)), nhanh = Number(arg('nhanh', 1)), cong = Number(arg('cong', 8788)), treD1 = Number(arg('tre-d1', 0))
+const soEm = Number(arg('so-em', 250)), phut = Number(arg('phut', 10)), nhanh = Number(arg('nhanh', 1)), cong = Number(arg('cong', 8788)), treD1 = Number(arg('tre-d1', 0)), mauPhanHoi = Number(arg('mau-phan-hoi', 40))
 const git = (...a) => execFileSync('git', a, { cwd: REPO, encoding: 'utf8' }).trim()
 const log = (...a) => console.log(new Date().toTimeString().slice(0, 8), ...a)
 
@@ -91,7 +92,7 @@ log(`Worker cục bộ sẵn sàng tại ${goc}`)
 const batDau = new Date(Date.now() + 7 * 3600_000).toISOString().replace('T', ' ').slice(0, 19) + ' (giờ VN)'
 let kq
 try {
-  kq = await banTai({ goc, soEm, phut, nhanh, log, khoiDongKeHoach: !co('khong-khoi-dong') })
+  kq = await banTai({ goc, soEm, phut, nhanh, log, khoiDongKeHoach: !co('khong-khoi-dong'), mauPhanHoi })
 } catch (e) {
   writeFileSync(nhatKy, ghiLog.join('')); tat(); console.error('Lỗi khi bắn tải:', e?.message ?? e, '\nNhật ký Worker:', nhatKy); process.exit(1)
 } finally {
@@ -104,14 +105,19 @@ tat()
 
 // (6) viết bản đo
 const cauHinh = { soEm: kq.soEm, phut, nhanh, nhipNenGiay: 180, thoiGianThatGiay: kq.thoiGianThatGiay, saoLuu: mau.saoLuu, treD1Ms: treD1 }
-const ghiChu = [...kq.ghiChu, ...(migMoi.length ? [`Migration chỉ-thêm của cây mã đã áp lên bản sao D1 cục bộ (câu MỚI so với mẫu; lỗi 'đã có' bỏ qua): ${migMoi.join(', ')}`] : []), ...(treD1 > 0 ? [`ĐỘ TRỄ GIẢ D1: mỗi truy vấn chờ thêm ${treD1} ms (mỗi batch một lần); KHÔNG mô hình hàng đợi một luồng của D1 ⇒ p50/p95 chỉ để SO SÁNH tương đối giữa các commit.`] : []), `Cây mã: ${laWorktree ? `commit ${sha} (worktree sạch)` : 'cây hiện tại của máy (không tái lập được)'}; bộ đệm mô-đun của Worker bắt đầu TRỐNG (như vừa đẩy bản mới).`]
+const ghiChu = [...kq.ghiChu, ...(migMoi.length ? [`Migration chỉ-thêm của cây mã đã áp lên bản sao D1 cục bộ (câu MỚI so với mẫu; lỗi 'đã có' bỏ qua): ${migMoi.join(', ')}`] : []), `Mẫu phản hồi để so trước/sau: ${mauPhanHoi} em đầu (\`so-sanh-phan-hoi.mjs\`); dò lộ đáp án: ${kq.phanHoi ? 'xem trên' : ''}`, ...(treD1 > 0 ? [`ĐỘ TRỄ GIẢ D1: mỗi truy vấn chờ thêm ${treD1} ms (mỗi batch một lần); KHÔNG mô hình hàng đợi một luồng của D1 ⇒ p50/p95 chỉ để SO SÁNH tương đối giữa các commit.`] : []), `Cây mã: ${laWorktree ? `commit ${sha} (worktree sạch)` : 'cây hiện tại của máy (không tái lập được)'}; bộ đệm mô-đun của Worker bắt đầu TRỐNG (như vừa đẩy bản mới).`]
 const ra = join(REPO, 'docs/do-tai-d1')
 mkdirSync(ra, { recursive: true })
 const md = lapMarkdown({ ma: nhan, batDau, cauHinh, khach: kq.khach, dump, ghiChu })
 writeFileSync(join(ra, `ban-tai-${nhan}.md`), md + '\n')
 writeFileSync(join(ra, `ban-tai-${nhan}.json`), JSON.stringify({ ma: nhan, batDau, cauHinh, theoLenh: gomTheoLenh(kq.khach, dump).map(({ lenh, n, loi, ms50, ms95, tvTb, tvMax, docTb, docMax, ghiTb, vuot }) => ({ lenh, n, loi, ms50, ms95, tvTb: +tvTb.toFixed(2), tvMax, docTb: Math.round(docTb), docMax, ghiTb: +ghiTb.toFixed(1), vuot })) }, null, 1) + '\n')
 writeFileSync(join(ra, `ban-tai-${nhan}-truy-van.json`), JSON.stringify({ ma: nhan, truyVan: topTruyVan(dump, 40).map(({ khung, lan, doc, lenhChinh }) => ({ khung, lan, doc, lenhChinh, sql: (dumpTho.sql ?? {})[khung] ?? khung })) }) + '\n')
-log(`Đã ghi docs/do-tai-d1/ban-tai-${nhan}.md (+ .json, -truy-van.json để EXPLAIN)`)
+const phanHoiRa = Object.fromEntries(kq.phanHoi)
+writeFileSync(join(ra, `ban-tai-${nhan}-phan-hoi.json`), JSON.stringify(phanHoiRa))
+const loDapAn = kiemLoDapAn(kq.phanHoi)
+if (loDapAn.length) log(`⚠️ DÒ LỘ ĐÁP ÁN: ${loDapAn.length} phản hồi CHƯA CHẤM có trường đáp án — xem docs/do-tai-d1/ban-tai-${nhan}-phan-hoi.json (khoá: ${loDapAn.slice(0, 5).map((x) => x.key).join(', ')})`)
+else log('Dò lộ đáp án: không thấy (phản hồi chưa chấm không có correct/dapAn/solution/loiGiai).')
+log(`Đã ghi docs/do-tai-d1/ban-tai-${nhan}.md (+ .json, -truy-van.json, -phan-hoi.json)`)
 const vuot = gomTheoLenh(kq.khach, dump).filter((b) => b.vuot)
 log(`Lệnh VƯỢT ngân sách: ${vuot.length}${vuot.length ? ' — ' + vuot.slice(0, 6).map((b) => b.lenh).join(' · ') : ''}`)
 

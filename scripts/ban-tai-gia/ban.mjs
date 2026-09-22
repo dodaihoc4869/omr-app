@@ -9,6 +9,7 @@
 //   S≈150–300  1 LƯỢT ĐẢO: game-v2/profile, recommendations, so-tay, resume, start → answer từng câu (cách 8–20 giây) → complete
 // Đáp án là NGẪU NHIÊN (không cần đúng — chi phí truy vấn không phụ thuộc đúng/sai nhiều; ghi chú trong bản đo).
 import { readFileSync } from 'node:fs'
+import { chuanHoa } from './phan-hoi.mjs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -19,11 +20,12 @@ function mulberry(seed) { let a = seed >>> 0; return () => { a = (a + 0x6d2b79f5
 const dapAnCho = (phan, r) => (phan === 'II' ? Array.from({ length: 4 }, () => (r() < 0.5 ? 'D' : 'S')).join('') : phan === 'III' ? String(Math.floor(r() * 90) + 1) : chonNgauNhien(['A', 'B', 'C', 'D'], r))
 
 export async function banTai(opts) {
-  const { goc, soEm = 250, phut = 10, nhanh = 1, nhipNenGiay = 180, hat = 2109, log = () => {} } = opts
+  const { goc, soEm = 250, phut = 10, nhanh = 1, nhipNenGiay = 180, hat = 2109, log = () => {}, mauPhanHoi = 40 } = opts
   if (!/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(goc)) throw new Error(`TỪ CHỐI: bộ bắn tải chỉ bắn vào Worker cục bộ (http://127.0.0.1:cổng), không phải "${goc}".`)
   const danhSach = JSON.parse(readFileSync(join(GOC, '.trang-thai/em-gia.json'), 'utf8')).em.slice(0, soEm)
   const khach = []
   const ghiChu = []
+  const phanHoi = new Map() // "stt|lệnh" -> {lenh, body} — LƯỢT ĐẦU của mỗi cặp, chỉ `mauPhanHoi` em đầu, để so trước/sau (Boss 22/09)
   const dem = { loi: new Map(), chang: { thu: 0, xong: 0, loi: 0 }, on: { co: 0, khongCoViec: 0, xong: 0 }, dao: { thu: 0, xong: 0, hetLuot: 0 } }
   const tinh = (m, k) => m.set(k, (m.get(k) ?? 0) + 1)
   let seq = 0
@@ -47,6 +49,10 @@ export async function banTai(opts) {
     } catch (e) { loi = e?.name === 'AbortError' ? 'hết giờ 60 giây' : String(e?.message ?? e).slice(0, 60) } finally { clearTimeout(tre) }
     khach.push({ id, lenh, ms: Date.now() - b, ma, loi })
     if (loi) tinh(dem.loi, `${lenh} → ${loi}`)
+    if (em.stt <= mauPhanHoi && j !== null) {
+      const kPhanHoi = `${em.stt}|${lenh}`
+      if (!phanHoi.has(kPhanHoi)) phanHoi.set(kPhanHoi, { lenh, body: chuanHoa(j) })
+    }
     return j
   }
 
@@ -177,5 +183,5 @@ export async function banTai(opts) {
   const loiTop = [...dem.loi.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8)
   if (loiTop.length) ghiChu.push('Lỗi/từ chối hay gặp (không phải lỗi bộ đo — nhiều là đúng luật máy chủ): ' + loiTop.map(([k, n]) => `${k} ×${n}`).join(' · '))
   ghiChu.push('Đáp án của em giả là NGẪU NHIÊN; thời gian "làm" giữa các bước là ngẫu nhiên. D1 cục bộ nhanh hơn D1 thật: số truy vấn và dòng đọc là thước đo chính.')
-  return { khach, ghiChu, thoiGianThatGiay, soEm: emCoToken.length, khachThietLap }
+  return { khach, ghiChu, thoiGianThatGiay, soEm: emCoToken.length, khachThietLap, phanHoi }
 }
