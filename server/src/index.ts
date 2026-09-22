@@ -3119,13 +3119,13 @@ const boXuLy = {
       if (p === '/game-v2-parent') return ra(await parentGame(env,b))
       // CỔNG PHỤ HUYNH — token giai đoạn mềm (docs/token-phu-huynh-1909.md): chỉ nhận `pass` (token do thầy cấp).
       if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b))
-      if (p === '/ph/ke-hoach') return ra(await phKeHoach(env, b))
+      if (p === '/ph/ke-hoach') return ra(await phKeHoach(env, b, envDoc, ctx))
       if (p === '/ph/canh-bao/xem') return ra(await phCanhBaoXem(env, b))
       if (p === '/ph/thoi-gian-hoc') return ra(await phThoiGianHoc(env, b))
       if (p === '/ph/giao-them') return ra(await phGiaoThem(env, b))
       // "Mọi thứ về con" (Code 4, đã soát): ĐỌC-CHỈ, token hoặc SBD trần; chi tiết một câu (lời giải) cùng luật che.
-      if (p === '/ph/tat-ca-ve-con') return ra(await phTatCaVeCon(env, b))
-      if (p === '/ph/chi-tiet-cau-ve-con') return ra(await phChiTietCauVeCon(env, b))
+      if (p === '/ph/tat-ca-ve-con') return ra(await phTatCaVeCon(env, b, Date.now(), envDoc, ctx))
+      if (p === '/ph/chi-tiet-cau-ve-con') return ra(await phChiTietCauVeCon(env, b, Date.now(), envDoc, ctx))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))

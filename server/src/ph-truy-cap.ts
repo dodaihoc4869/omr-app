@@ -9,10 +9,11 @@
 // KHÔNG rơi xuống SBD trần. Đếm lỗi (thiếu bảng, D1 lỗi tạm) không bao giờ làm hỏng lệnh chính.
 import { docBoNaoAiChoPhuHuynh } from './bo-nao-doc'
 import { canhBaoChoPh, phXemCanhBao } from './canh-bao-thay'
-import type { Env } from './kieu'
+import type { Env, ExecutionContext } from './kieu'
 import { parentIdentity, parentPass } from './game-v2-auth'
 import { PHUT_NGAY_MAC_DINH, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU } from './ho-so-cau-hinh'
 import { datPhutMoiNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
+import { viecPhu } from './viec-phu'
 
 export type KieuTruyCap = 'token' | 'sbd_tran'
 export type DuongPh = 'parent-news' | 'mom' | 'ph-ke-hoach' | 'ph-thoi-gian-hoc' | 'ph-xac-dinh' | 'ph-canh-bao-xem' | 'ph-giao-them' | 'ph-tat-ca-ve-con' | 'ph-chi-tiet-cau-ve-con'
@@ -41,8 +42,17 @@ export async function ghiTruyCap(env: Env, sbd: string, kieu: KieuTruyCap, duong
 /**
  * SBD của em mà phụ huynh đang xem. Có `pass` ⇒ token quyết định (thân `sbd` bị bỏ qua). Không có `pass` ⇒ SBD trần (giai đoạn mềm), trừ khi `chiToken`.
  * Ném lỗi có chữ nếu token hỏng hoặc em không có thật.
+ *
+ * `env` ở đây dùng cho MỌI lượt ĐỌC (tham số này có thể là bản sao/replica — Boss 22/09 lượt 2, `envDoc` của `/ph/tat-ca-ve-con` v.v.). Việc GHI DUY NHẤT
+ * của hàm (đếm truy cập `ghiTruyCap`) tách khỏi đường đọc: `tuyChon.envGhi` (mặc định lấy lại `env`) LUÔN là primary thật, và hoãn qua `viecPhu(tuyChon.ctx, …)`
+ * — trễ vài giây không sao (đây chỉ là số liệu cho thầy quyết giai đoạn cứng), còn bản thân lệnh trả lời nhanh hơn nhờ đọc trên bản sao gần nhất.
  */
-export async function sbdCuaPhuHuynh(env: Env, b: Record<string, unknown>, duong: DuongPh, tuyChon: { chiToken?: boolean } = {}): Promise<{ sbd: string; kieu: KieuTruyCap }> {
+export async function sbdCuaPhuHuynh(
+  env: Env,
+  b: Record<string, unknown>,
+  duong: DuongPh,
+  tuyChon: { chiToken?: boolean; envGhi?: Env; ctx?: ExecutionContext } = {},
+): Promise<{ sbd: string; kieu: KieuTruyCap }> {
   const coToken = b.pass !== undefined && b.pass !== null && String(b.pass).trim() !== ''
   let sbd: string
   let kieu: KieuTruyCap
@@ -57,7 +67,8 @@ export async function sbdCuaPhuHuynh(env: Env, b: Record<string, unknown>, duong
   if (!sbd || sbd.length > 40 || !(await env.DB.prepare('SELECT sbd FROM hoc_sinh WHERE sbd = ?').bind(sbd).first())) {
     throw new Error('Không tìm thấy số báo danh của con.')
   }
-  await ghiTruyCap(env, sbd, kieu, duong)
+  const envGhi = tuyChon.envGhi ?? env
+  await viecPhu(tuyChon.ctx, () => ghiTruyCap(envGhi, sbd, kieu, duong))
   return { sbd, kieu }
 }
 
@@ -71,10 +82,13 @@ export async function phXacDinh(env: Env, b: Record<string, unknown>): Promise<R
 /**
  * `POST /ph/ke-hoach {pass}` — kế hoạch HÔM NAY của con, khung nhìn cho phụ huynh: số câu, loại việc, hạn, tiến bộ trong ngày, số phút mỗi ngày.
  * KHÔNG có mã câu, mã bài, mã ca, nội dung câu hỏi hay đáp án (`chiTiet`, `ma`, `nguon` bị bỏ). Nội dung chữ (ghiChu, cảnh báo) do cổng phụ huynh tự soạn từ `loai`.
+ *
+ * `envDoc` (Boss 22/09 lượt 2, mặc định = `env`): xác định danh tính + tra tên/lớp đọc trên bản sao khi có, đếm truy cập vẫn ghi `env` (primary) qua
+ * `sbdCuaPhuHuynh`. `lapVaLuuKeHoach`/`docBoNaoAiChoPhuHuynh`/`canhBaoChoPh` GIỮ NGUYÊN `env` — có đọc-rồi-ghi (lập kế hoạch), không đổi để tránh đọc lệch bản.
  */
-export async function phKeHoach(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-ke-hoach', { chiToken: true })
-  const em = await env.DB.prepare('SELECT ho_ten, lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
+export async function phKeHoach(env: Env, b: Record<string, unknown>, envDoc: Env = env, ctx?: ExecutionContext): Promise<Record<string, unknown>> {
+  const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-ke-hoach', { chiToken: true, envGhi: env, ctx })
+  const em = await envDoc.DB.prepare('SELECT ho_ten, lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
   const kh = (await lapVaLuuKeHoach(env, [sbd], Date.now())).get(sbd)!
   const boNaoAi = await docBoNaoAiChoPhuHuynh(env, sbd, kh.ngay)
   const canhBao = await canhBaoChoPh(env, sbd)

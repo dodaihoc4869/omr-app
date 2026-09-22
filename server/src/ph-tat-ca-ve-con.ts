@@ -12,7 +12,7 @@
 // Ca chưa công bố ở `caGanNhat`: chỉ `congBo` + `soEmDaNop/soEmDaVao` (không điểm, số câu, phần, so với lần trước); `tienBo.diem` chỉ gồm ca ĐÃ công bố.
 // Hồ sơ nắm kiến thức (bậc, lịch ôn) ở đây được PHÁT LẠI từ sổ học ĐÃ BỎ sự kiện bị che (bằng chính `phatLaiSuKien` của hồ sơ) — bảng `nam_kt_*` dựng từ toàn bộ sổ nên đếm câu sai của ca chưa công bố; đọc thẳng chúng là lộ điểm.
 // Xác thực: `sbdCuaPhuHuynh` nhận token HOẶC SBD trần (hằng `CHI_NHAN_TOKEN`; như `/ph/giao-them` sau da5b5b5). Việc DUY NHẤT có ghi D1 là dòng đếm truy cập `ph_truy_cap` của chính hàm xác thực đó (không phải của tệp này).
-import type { Env } from './kieu'
+import type { Env, ExecutionContext } from './kieu'
 import { laDatNgay } from '../../src/lib/dat-nhiem-vu-ngay'
 import { GIAO_THEM } from '../../src/lib/giao-them-cho-con'
 import { phutUocTinhChang } from '../../src/lib/btvn-nang-do-lich'
@@ -300,8 +300,11 @@ async function docBtvnVaMom(hoi: ReturnType<typeof boHoi>['hoi'], sbd: string, d
 }
 
 // ------------------------------------------------------------------ LỆNH ------------------------------------------------------------------
-export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: number = Date.now()): Promise<Row> {
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-tat-ca-ve-con', { chiToken: CHI_NHAN_TOKEN })
+// `envDoc` (Boss 22/09 lượt 2, mặc định = `envGoc`): tệp này KHÔNG ghi gì ngoài đếm truy cập của `sbdCuaPhuHuynh` (đã tách sang `envGoc` primary qua `envGhi`)
+// — nên mọi lượt đọc còn lại (biến `env` từ đây xuống, che tham số `envGoc`) chạy trên bản sao gần nhất khi Worker có.
+export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowMs: number = Date.now(), envDoc: Env = envGoc, ctx?: ExecutionContext): Promise<Row> {
+  const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-tat-ca-ve-con', { chiToken: CHI_NHAN_TOKEN, envGhi: envGoc, ctx })
+  const env = envDoc
   const { hoi } = boHoi(env)
   const homNay = ngayVn(nowMs)
   const homQua = themNgay(homNay, -1)
@@ -810,8 +813,9 @@ export async function phTatCaVeCon(env: Env, b: Record<string, unknown>, nowMs: 
  * con phải ĐÃ làm câu này (có sự kiện trong sổ) và MỌI lần con làm câu ấy đều KHÔNG bị che (ca đã công bố; bài tập về nhà / gói gia đình giao đã nộp) — không thì từ chối `{ok:false, che}` và không lộ gì.
  * Không tự luận. Không ghi (ngoài dòng đếm truy cập của hàm xác thực). ≤ 9 truy vấn D1 kể cả xác thực.
  */
-export async function phChiTietCauVeCon(env: Env, b: Record<string, unknown>, nowMs: number = Date.now()): Promise<Row> {
-  const { sbd } = await sbdCuaPhuHuynh(env, b, 'ph-chi-tiet-cau-ve-con', { chiToken: CHI_NHAN_TOKEN })
+export async function phChiTietCauVeCon(envGoc: Env, b: Record<string, unknown>, nowMs: number = Date.now(), envDoc: Env = envGoc, ctx?: ExecutionContext): Promise<Row> {
+  const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-chi-tiet-cau-ve-con', { chiToken: CHI_NHAN_TOKEN, envGhi: envGoc, ctx })
+  const env = envDoc
   const qid = chuoi(b.qid)
   if (!qid || qid.length > 200) return { ok: false, error: 'Thiếu mã câu.' }
   const { hoi } = boHoi(env)
