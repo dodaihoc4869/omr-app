@@ -95,12 +95,14 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   const remaining=Math.max(0,TRAN_CAU_DAO_NGAY-count.n)
   const history=await attempts(env,sbd),mastery=await masteryTheoHoSo(env,sbd,p.mastery)
   const cho=maiCho(dangLop,mastery,tNow),tom=tomTatLuot(info,dauVao.soLuotDaLam)
+  // Khối của em CHỈ đọc MỘT LẦN (Boss 22/09, lượt 2): dùng lại cho nhánh lượt-đang-chờ VÀ chooseLuotMoi bên dưới — trước đây gọi docKhoiEm HAI LẦN khi lượt chờ tồn tại nhưng bị bỏ hết câu (tự luận/lệch khối).
+  const khoiEm=await docKhoiEm(env,sbd)
   if(action==='start'){
     // Lượt em vừa mở mà chưa trả lời câu nào: trả lại CHÍNH lượt ấy (không bốc lại câu, không tốn lượt).
     const dangCho=await docLuotDangCho(env,sbd,tNow)
     if(dangCho){
       try{
-        const old=JSON.parse(dangCho.json) as Session;const khoiEm=await docKhoiEm(env,sbd);const tuLuan=await qidTuLuanTrongLuot(env,old.questions,khoiEm);const qs=[]
+        const old=JSON.parse(dangCho.json) as Session;const tuLuan=await qidTuLuanTrongLuot(env,old.questions,khoiEm);const qs=[]
         // Thầy có thể giao BTVN SAU khi lượt này đã bốc câu: câu nào nay nằm trong bài em chưa nộp ⇒ bỏ lượt chờ, mở lượt mới (không trả lại câu có thể lộ đáp án).
         const chanBtvn=await docCauBtvnChuaNop(env,sbd);if(old.questions.some(ref=>chanBtvn.has(ref.qid)||chanBtvn.has(ref.group)||!cauHopKhoi(khoiEm,ref))){await env.DB.prepare('DELETE FROM game_v2_session WHERE id=? AND sbd=?').bind(dangCho.id,sbd).run();return startLuotMoi(env,sbd,p,b,action)} // lượt chờ chưa trả lời câu nào: bỏ hẳn rồi tính lại từ đầu (không mất lượt, số lượt đúng)
         for(const ref of old.questions){if(tuLuan.has(ref.qid))continue;qs.push({...publicQuestion(await currentQuestion(env,ref)),...vaiChoMay(ref.role)})}
@@ -118,7 +120,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   // Chỉ nhận câu ĐỦ `dang` và `mucDo` (hàm chọn coi câu thiếu mức là dễ nhất), đã duyệt, không tự luận, không bị chặn, trong phạm vi thầy đặt.
   const eligible=scope.pool.filter(q=>q.reviewed&&!laTuLuanPool(q)&&!!q.dang&&!!q.mucDo&&!blocked.has(q.qid)&&!blocked.has(q.group)&&(control.types.length===0||control.types.includes(q.dang))&&(typeof b.dang!=='string'||q.dang===b.dang))
   const lt=info.luotTiepTheo
-  const chon=chooseLuotMoi(eligible,scope.evidence,history,mastery,{loai:lt.loai,cap:p.cap,now:tNow,thuong:lt.thuong,blocked,soCau:Math.min(SO_CAU_MOI_LUOT,remaining),khoiEm:await docKhoiEm(env,sbd)})
+  const chon=chooseLuotMoi(eligible,scope.evidence,history,mastery,{loai:lt.loai,cap:p.cap,now:tNow,thuong:lt.thuong,blocked,soCau:Math.min(SO_CAU_MOI_LUOT,remaining),khoiEm})
   if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:TRAN_CAU_DAO_NGAY,suggestions:chon.map(x=>({title:x.q.tenDang||'Ôn kiến thức đã học',source:x.q.maDe,part:x.q.phan})),remaining,luot:tom}
   if(!chon.length)return {ok:true,questions:[],lyDo:eligible.length?'chi_con_cau_qua_bac':'kho_trong',luot:tom,maiCho:cho,missing:scope.missing,message:eligible.length?'Các câu còn lại của lớp đều cao hơn một bậc so với sức em ở dạng đó. Em làm thêm bài tập về nhà và phần ôn lại, mai thú mở câu mới cho em.':'Lớp em chưa học dạng nào có câu phù hợp cho thần thú. Khi Thầy giao bài mới, câu sẽ mở ra.'}
   const id=crypto.randomUUID(),groups=new Set(scope.evidence.map(e=>e.group))
