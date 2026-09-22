@@ -1,8 +1,11 @@
 // BỘ BẮN TẢI GIẢ — ĐIỀU PHỐI MỘT LƯỢT (Code 1, 21/09/2026; Boss: chạy lại sau mỗi gói của Code 3 để chứng minh giảm).
-//   node scripts/ban-tai-gia/chay.mjs [--commit=HEAD|<mã>] [--cay-hien-tai] [--so-em=250] [--phut=10] [--nhanh=1] [--cong=8788] [--khong-khoi-dong] [--tre-d1=<ms>]
+//   node scripts/ban-tai-gia/chay.mjs [--commit=HEAD|<mã>] [--cay-hien-tai] [--so-em=250] [--phut=10] [--nhanh=1] [--cong=8788] [--khong-khoi-dong] [--tre-d1=<ms>] [--nong]
 //   --tre-d1=40: mỗi truy vấn D1 chờ thêm 40 ms (đường mạng giả) để đo ĐỘ TRỄ từng lệnh — so truy vấn tuần tự với Promise.all/batch; báo cáo ghi ban-tai-<mã>-tre40.md. Không mô hình hàng đợi một luồng của D1.
+//   --nong: chạy kịch bản HAI LẦN LIÊN TIẾP trên CÙNG một Worker cục bộ (không khởi động lại ⇒ bộ đệm mô-đun trong Worker — DemTTL, sau này cả Cache API — còn ẤM từ lượt 1 sang lượt 2), ghi
+//   riêng `ban-tai-<mã>-lanh` (lượt 1, đệm rỗng) và `ban-tai-<mã>-am` (lượt 2, đệm ấm) + so-sanh.mjs + so-sanh-phan-hoi.mjs giữa hai lượt. Đo "cache trúng ⇒ giảm truy vấn" mà bộ tải giả cục bộ
+//   không mô phỏng được Cache API/Địa điểm/D1 Read Replication thật của Cloudflare (Boss 22/09, DIEU-PHOI 74a2e93 mục 1): đệm mô-đun trong MỘT Worker là xấp xỉ gần nhất làm được cục bộ.
 // Việc làm: (1) dựng cây mã ĐÚNG commit (worktree tách rời — không bị phiên khác sửa giữa chừng, không đụng cây chính); (2) chép vỏ đo + cấu hình cục bộ + D1 mẫu (đã nạp từ bản sao lưu, em giả) vào đó;
-// (3) `wrangler dev --local` (KHÔNG --remote, database_id giả) trên 127.0.0.1; (4) bắn tải (ban.mjs); (5) lấy sổ đo, viết `docs/do-tai-d1/ban-tai-<mã>.md` + `.json`; (6) tắt Worker, gỡ worktree.
+// (3) `wrangler dev --local` (KHÔNG --remote, database_id giả) trên 127.0.0.1; (4) bắn tải 1 hoặc 2 lượt (ban.mjs); (5) lấy sổ đo, viết `docs/do-tai-d1/ban-tai-<mã>.md` + `.json`; (6) tắt Worker, gỡ worktree.
 // Điều kiện: đã chạy `node scripts/ban-tai-gia/nap-sao-luu.mjs` rồi `node scripts/ban-tai-gia/chuan-bi.mjs` (tạo .trang-thai/mau.sqlite, em-gia.json, .dev.vars).
 import { execFileSync, spawn } from 'node:child_process'
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
@@ -88,38 +91,47 @@ for (let i = 0; i < 90 && !sanSang; i++) {
 if (!sanSang) { writeFileSync(nhatKy, ghiLog.join('')); tat(); console.error('Worker cục bộ không lên — xem', nhatKy); process.exit(1) }
 log(`Worker cục bộ sẵn sàng tại ${goc}`)
 
-// (4)-(5) bắn tải, lấy sổ đo
-const batDau = new Date(Date.now() + 7 * 3600_000).toISOString().replace('T', ' ').slice(0, 19) + ' (giờ VN)'
-let kq
-try {
-  kq = await banTai({ goc, soEm, phut, nhanh, log, khoiDongKeHoach: !co('khong-khoi-dong'), mauPhanHoi })
-} catch (e) {
-  writeFileSync(nhatKy, ghiLog.join('')); tat(); console.error('Lỗi khi bắn tải:', e?.message ?? e, '\nNhật ký Worker:', nhatKy); process.exit(1)
-} finally {
-  await new Promise((ok) => setTimeout(ok, 2500)) // để việc phụ sau khi trả lời (waitUntil) kịp ghi vào sổ đo
-}
-const dumpTho = await (await fetch(goc + '/__do/dump')).json()
-const dump = dumpTho.luot
-writeFileSync(nhatKy, ghiLog.join(''))
-tat()
-
-// (6) viết bản đo
-const cauHinh = { soEm: kq.soEm, phut, nhanh, nhipNenGiay: 180, thoiGianThatGiay: kq.thoiGianThatGiay, saoLuu: mau.saoLuu, treD1Ms: treD1 }
-const ghiChu = [...kq.ghiChu, ...(migMoi.length ? [`Migration chỉ-thêm của cây mã đã áp lên bản sao D1 cục bộ (câu MỚI so với mẫu; lỗi 'đã có' bỏ qua): ${migMoi.join(', ')}`] : []), `Mẫu phản hồi để so trước/sau: ${mauPhanHoi} em đầu (\`so-sanh-phan-hoi.mjs\`); dò lộ đáp án: ${kq.phanHoi ? 'xem trên' : ''}`, ...(treD1 > 0 ? [`ĐỘ TRỄ GIẢ D1: mỗi truy vấn chờ thêm ${treD1} ms (mỗi batch một lần); KHÔNG mô hình hàng đợi một luồng của D1 ⇒ p50/p95 chỉ để SO SÁNH tương đối giữa các commit.`] : []), `Cây mã: ${laWorktree ? `commit ${sha} (worktree sạch)` : 'cây hiện tại của máy (không tái lập được)'}; bộ đệm mô-đun của Worker bắt đầu TRỐNG (như vừa đẩy bản mới).`]
+// (4)-(5) bắn tải, lấy sổ đo — MỘT LƯỢT (gọi 1 lần bình thường, gọi 2 lần liên tiếp khi --nong, không tắt Worker giữa hai lượt).
 const ra = join(REPO, 'docs/do-tai-d1')
 mkdirSync(ra, { recursive: true })
-const md = lapMarkdown({ ma: nhan, batDau, cauHinh, khach: kq.khach, dump, ghiChu })
-writeFileSync(join(ra, `ban-tai-${nhan}.md`), md + '\n')
-writeFileSync(join(ra, `ban-tai-${nhan}.json`), JSON.stringify({ ma: nhan, batDau, cauHinh, theoLenh: gomTheoLenh(kq.khach, dump).map(({ lenh, n, loi, ms50, ms95, tvTb, tvMax, docTb, docMax, ghiTb, vuot }) => ({ lenh, n, loi, ms50, ms95, tvTb: +tvTb.toFixed(2), tvMax, docTb: Math.round(docTb), docMax, ghiTb: +ghiTb.toFixed(1), vuot })) }, null, 1) + '\n')
-writeFileSync(join(ra, `ban-tai-${nhan}-truy-van.json`), JSON.stringify({ ma: nhan, truyVan: topTruyVan(dump, 40).map(({ khung, lan, doc, lenhChinh }) => ({ khung, lan, doc, lenhChinh, sql: (dumpTho.sql ?? {})[khung] ?? khung })) }) + '\n')
-const phanHoiRa = Object.fromEntries(kq.phanHoi)
-writeFileSync(join(ra, `ban-tai-${nhan}-phan-hoi.json`), JSON.stringify(phanHoiRa))
-const loDapAn = kiemLoDapAn(kq.phanHoi)
-if (loDapAn.length) log(`⚠️ DÒ LỘ ĐÁP ÁN: ${loDapAn.length} phản hồi CHƯA CHẤM có trường đáp án — xem docs/do-tai-d1/ban-tai-${nhan}-phan-hoi.json (khoá: ${loDapAn.slice(0, 5).map((x) => x.key).join(', ')})`)
-else log('Dò lộ đáp án: không thấy (phản hồi chưa chấm không có correct/dapAn/solution/loiGiai).')
-log(`Đã ghi docs/do-tai-d1/ban-tai-${nhan}.md (+ .json, -truy-van.json, -phan-hoi.json)`)
-const vuot = gomTheoLenh(kq.khach, dump).filter((b) => b.vuot)
-log(`Lệnh VƯỢT ngân sách: ${vuot.length}${vuot.length ? ' — ' + vuot.slice(0, 6).map((b) => b.lenh).join(' · ') : ''}`)
+async function motLuot(nhanLuot, ghiChuThem = []) {
+  const batDau = new Date(Date.now() + 7 * 3600_000).toISOString().replace('T', ' ').slice(0, 19) + ' (giờ VN)'
+  let kq
+  try {
+    kq = await banTai({ goc, soEm, phut, nhanh, log, khoiDongKeHoach: !co('khong-khoi-dong'), mauPhanHoi })
+  } catch (e) {
+    writeFileSync(nhatKy, ghiLog.join('')); tat(); console.error('Lỗi khi bắn tải:', e?.message ?? e, '\nNhật ký Worker:', nhatKy); process.exit(1)
+  } finally {
+    await new Promise((ok) => setTimeout(ok, 2500)) // để việc phụ sau khi trả lời (waitUntil) kịp ghi vào sổ đo
+  }
+  const dumpTho = await (await fetch(goc + '/__do/dump')).json()
+  const dump = dumpTho.luot
+  const cauHinh = { soEm: kq.soEm, phut, nhanh, nhipNenGiay: 180, thoiGianThatGiay: kq.thoiGianThatGiay, saoLuu: mau.saoLuu, treD1Ms: treD1 }
+  const ghiChu = [...kq.ghiChu, ...ghiChuThem, ...(migMoi.length ? [`Migration chỉ-thêm của cây mã đã áp lên bản sao D1 cục bộ (câu MỚI so với mẫu; lỗi 'đã có' bỏ qua): ${migMoi.join(', ')}`] : []), `Mẫu phản hồi để so trước/sau: ${mauPhanHoi} em đầu (\`so-sanh-phan-hoi.mjs\`); dò lộ đáp án: ${kq.phanHoi ? 'xem trên' : ''}`, ...(treD1 > 0 ? [`ĐỘ TRỄ GIẢ D1: mỗi truy vấn chờ thêm ${treD1} ms (mỗi batch một lần); KHÔNG mô hình hàng đợi một luồng của D1 ⇒ p50/p95 chỉ để SO SÁNH tương đối giữa các commit.`] : []), `Cây mã: ${laWorktree ? `commit ${sha} (worktree sạch)` : 'cây hiện tại của máy (không tái lập được)'}.`]
+  const md = lapMarkdown({ ma: nhanLuot, batDau, cauHinh, khach: kq.khach, dump, ghiChu })
+  writeFileSync(join(ra, `ban-tai-${nhanLuot}.md`), md + '\n')
+  writeFileSync(join(ra, `ban-tai-${nhanLuot}.json`), JSON.stringify({ ma: nhanLuot, batDau, cauHinh, theoLenh: gomTheoLenh(kq.khach, dump).map(({ lenh, n, loi, ms50, ms95, tvTb, tvMax, docTb, docMax, ghiTb, vuot }) => ({ lenh, n, loi, ms50, ms95, tvTb: +tvTb.toFixed(2), tvMax, docTb: Math.round(docTb), docMax, ghiTb: +ghiTb.toFixed(1), vuot })) }, null, 1) + '\n')
+  writeFileSync(join(ra, `ban-tai-${nhanLuot}-truy-van.json`), JSON.stringify({ ma: nhanLuot, truyVan: topTruyVan(dump, 40).map(({ khung, lan, doc, lenhChinh }) => ({ khung, lan, doc, lenhChinh, sql: (dumpTho.sql ?? {})[khung] ?? khung })) }) + '\n')
+  writeFileSync(join(ra, `ban-tai-${nhanLuot}-phan-hoi.json`), JSON.stringify(Object.fromEntries(kq.phanHoi)))
+  const loDapAn = kiemLoDapAn(kq.phanHoi)
+  if (loDapAn.length) log(`⚠️ DÒ LỘ ĐÁP ÁN (${nhanLuot}): ${loDapAn.length} phản hồi CHƯA CHẤM có trường đáp án — xem docs/do-tai-d1/ban-tai-${nhanLuot}-phan-hoi.json (khoá: ${loDapAn.slice(0, 5).map((x) => x.key).join(', ')})`)
+  else log(`Dò lộ đáp án (${nhanLuot}): không thấy.`)
+  const vuot = gomTheoLenh(kq.khach, dump).filter((b) => b.vuot)
+  log(`[${nhanLuot}] Đã ghi ban-tai-${nhanLuot}.md · lệnh VƯỢT ngân sách: ${vuot.length}${vuot.length ? ' — ' + vuot.slice(0, 6).map((b) => b.lenh).join(' · ') : ''}`)
+}
+
+if (co('nong')) {
+  log('--nong: chạy 2 lượt liên tiếp trên CÙNG Worker (không tắt giữa hai lượt) để đo hiệu quả đệm mô-đun khi ấm. LƯU Ý: nếu phiên khác đang sửa server/src cùng lúc, wrangler dev hot-reload có thể xoá sạch số đo giữa chừng — chỉ tin kết quả chạy trên `--commit=<mã>` (worktree riêng), không phải `--cay-hien-tai`.')
+  await motLuot(`${nhan}-lanh`, ['LƯỢT 1 — bộ đệm mô-đun của Worker (DemTTL: kho câu, xác thực, đề bảo vệ…) còn TRỐNG, y như vừa đẩy bản mới.'])
+  await fetch(goc + '/__do/reset') // xoá SỔ ĐO (không đụng D1) — dữ liệu học tập tiếp tục như thật, chỉ đo lại từ đầu
+  await motLuot(`${nhan}-am`, ['LƯỢT 2 — CÙNG Worker, bộ đệm mô-đun đã ẤM từ lượt 1 (dữ liệu D1 đã đổi theo lượt 1: em đã nộp/ôn/chơi — sát thật hơn "vừa đẩy", vì giờ cao điểm không ai gặp Worker vừa nguội).'])
+  execFileSync('node', [join(GOC, 'so-sanh.mjs'), `${nhan}-lanh`, `${nhan}-am`], { cwd: REPO, stdio: 'inherit' })
+  execFileSync('node', [join(GOC, 'so-sanh-phan-hoi.mjs'), `${nhan}-lanh`, `${nhan}-am`], { cwd: REPO, stdio: 'inherit' })
+} else {
+  await motLuot(nhan)
+}
+writeFileSync(nhatKy, ghiLog.join(''))
+tat()
 
 if (laWorktree) { try { rmSync(join(cay, 'node_modules'), { force: true }); execFileSync('git', ['worktree', 'remove', '--force', cay], { cwd: REPO, stdio: 'ignore' }) } catch { /* để lại cho lần sau dọn */ } }
 process.exit(0)
