@@ -13,6 +13,7 @@
 //                    `da_khac_phuc` khi từng sai và đã đúng ở ≥ SO_MOC_KHAC_PHUC ngày khác nhau
 //   nhãn `can_day_lai` khi sai ≥ SO_LAN_SAI_DAY_LAI lần mà chưa đúng lại lần nào.
 import type { D1PreparedStatement, Env } from './kieu'
+import { DemTTL } from './dem-chung'
 import {
   BAC_DANG_BAT_DAU,
   BAC_DANG_TOI_DA,
@@ -250,26 +251,44 @@ export async function docSuKienDoc(env: Env, dsSbd: string[]): Promise<SuKienDoc
  * (`json_each`) nên không vướng giới hạn 100 tham số của D1. Thiếu bảng nào thì bỏ tra bảng ấy —
  * hồ sơ rơi về `CD:<chuyên đề>` hoặc không có dạng, và `docDoPhuDang` nói thật con số.
  */
+// HẠ TẢI D1 (Boss 22/09, đo Code 1: hai truy vấn này đứng #2/#3 tổng dòng đọc — 3.042 lượt × 285/qid → dạng, × ~211/qid → chuyên đề
+// ≈ 1,5 triệu dòng cộng lại). Dạng/chuyên đề của MỘT qid gần như KHÔNG ĐỔI (chỉ đổi khi thầy sửa lại kho câu, hoạ hoằn) — không phải
+// dữ liệu an toàn/chống gian lận như `protectedQuestions`, sai lệch tạm thời chỉ làm hồ sơ "chưa cập nhật dạng mới nhất" trong ít phút,
+// tự sửa ở lần gọi sau khi đệm hết hạn — nên ĐỆM THEO THỜI GIAN THUẦN (không cần móc bất hoạt) là đủ an toàn. Đệm CẢ kết quả VẮNG (chuỗi
+// rỗng) để qid không có dạng/chuyên đề (rất nhiều câu Phần I) không dội lại D1 mỗi lần — nơi đọc dùng `.get(qid) || ''` nên chuỗi rỗng
+// tương đương "vắng khoá", an toàn. TTL 30 phút: đủ dài để đỡ tải, đủ ngắn để kho vừa sửa xong vẫn thấy trong buổi.
+const HAN_DEM_TRA_CUU_MS = 30 * 60_000
+const demDangTheoQid = new DemTTL<string>(HAN_DEM_TRA_CUU_MS, 30_000)
+const demChuyenDeTheoQid = new DemTTL<string>(HAN_DEM_TRA_CUU_MS, 30_000)
+
 export async function traCuuTheoQid(env: Env, qids: string[]): Promise<TraCuuCau> {
   const dang = new Map<string, string>()
   const chuyenDe = new Map<string, string>()
   if (qids.length === 0) return { dang, chuyenDe }
-  const arr = JSON.stringify(qids)
-  try {
-    const r = await env.DB.prepare(
-      'SELECT qid, MIN(dang) AS dang FROM game_v2_question WHERE dang IS NOT NULL AND qid IN (SELECT value FROM json_each(?)) GROUP BY qid',
-    ).bind(arr).all<{ qid: string; dang: string }>()
-    for (const x of r.results ?? []) dang.set(String(x.qid), String(x.dang))
-  } catch {
-    /* chưa lập chỉ mục dạng */
+  const now = Date.now()
+  const thieuDang = qids.filter((q) => { const c = demDangTheoQid.doc(q, now); if (c === undefined) return true; if (c) dang.set(q, c); return false })
+  if (thieuDang.length > 0) {
+    try {
+      const r = await env.DB.prepare(
+        'SELECT qid, MIN(dang) AS dang FROM game_v2_question WHERE dang IS NOT NULL AND qid IN (SELECT value FROM json_each(?)) GROUP BY qid',
+      ).bind(JSON.stringify(thieuDang)).all<{ qid: string; dang: string }>()
+      const co = new Map((r.results ?? []).map((x) => [String(x.qid), String(x.dang)]))
+      for (const q of thieuDang) { const v = co.get(q) ?? ''; if (v) dang.set(q, v); demDangTheoQid.ghi(q, now, v) }
+    } catch {
+      /* chưa lập chỉ mục dạng */
+    }
   }
-  try {
-    const r = await env.DB.prepare(
-      "SELECT qid, chuyen_de FROM cau_hoi WHERE COALESCE(chuyen_de,'') <> '' AND qid IN (SELECT value FROM json_each(?))",
-    ).bind(arr).all<{ qid: string; chuyen_de: string }>()
-    for (const x of r.results ?? []) chuyenDe.set(String(x.qid), String(x.chuyen_de))
-  } catch {
-    /* chưa có chỉ mục câu hỏi */
+  const thieuCd = qids.filter((q) => { const c = demChuyenDeTheoQid.doc(q, now); if (c === undefined) return true; if (c) chuyenDe.set(q, c); return false })
+  if (thieuCd.length > 0) {
+    try {
+      const r = await env.DB.prepare(
+        "SELECT qid, chuyen_de FROM cau_hoi WHERE COALESCE(chuyen_de,'') <> '' AND qid IN (SELECT value FROM json_each(?))",
+      ).bind(JSON.stringify(thieuCd)).all<{ qid: string; chuyen_de: string }>()
+      const co = new Map((r.results ?? []).map((x) => [String(x.qid), String(x.chuyen_de)]))
+      for (const q of thieuCd) { const v = co.get(q) ?? ''; if (v) chuyenDe.set(q, v); demChuyenDeTheoQid.ghi(q, now, v) }
+    } catch {
+      /* chưa có chỉ mục câu hỏi */
+    }
   }
   return { dang, chuyenDe }
 }

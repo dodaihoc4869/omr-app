@@ -13,7 +13,7 @@ import {
 import { chayCaLop, lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { layCauChoEm, qidPhucVuDuoc } from '../server/src/cau-theo-qid'
 import { capNhatExp } from '../server/src/exp-d1'
-import { protectedQuestions, readScope } from '../server/src/game-v2-bank'
+import { protectedQuestions, readScope, xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
@@ -624,6 +624,7 @@ describe('CA THI VÀ HỒ SƠ ĐƯỢC GIỮ, BTVN/Mẹ giao/game TRỐNG: kế 
     const onLaiTruoc = await qidOnLai(d)
     await chayHet(d, RESET_LUC)
     d.sql.prepare("DELETE FROM ca WHERE ma_ca = 'CA-MO-1'").run()
+    xoaDemCaBaoVe() // test xoá bảng `ca` bằng SQL thô, không qua lệnh thật ⇒ tự xoá đệm 5 giây của protectedQuestions (production có móc bất hoạt ở mọi lệnh sửa ca thật)
     const evSau = (await readScope(d.env, 'S1')).evidence
     expect(evSau.map((e) => e.qid).sort()).toEqual(['BAOVE1', 'OK1', 'OK2', 'OK3'])
     expect(evSau.find((e) => e.qid === 'BAOVE1')).toMatchObject({ wrong: true })

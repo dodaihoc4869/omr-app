@@ -45,6 +45,7 @@ import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2 } from './game-v2'
 import { shopBatCho } from './game-v2-shop'
+import { xoaDemCaBaoVe } from './game-v2-bank'
 import { gameToken, gameIdentity } from './game-v2-auth'
 import { phanTichGianLanBtvn, type ThiThatBaseline, type ThongTinHocSinhBtvn } from './gian-lan-btvn'
 // MÁY CHỦ MỚI — bốn lệnh nóng lúc thi (MAY-CHU-MOI.md).
@@ -631,6 +632,7 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
         maCa,
       )
       .run()
+    xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): ghi bảng `ca` ⇒ đề đang bảo vệ có thể đổi, bỏ đệm ngay
     return ra({ ok: true, maCa, coDe: !!bankKey, chiMoc: true, coCa: r.meta.changes > 0 })
   }
 
@@ -694,6 +696,7 @@ async function dayCa(env: Env, b: Record<string, unknown>): Promise<Response> {
       ca.dongBoGio === true ? 1 : 0,
     )
     .run()
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): mở/đẩy lại ca ⇒ bỏ đệm `protectedQuestions` ngay
   return ra({ ok: true, maCa, coDe: !!bankKey })
 }
 
@@ -716,6 +719,7 @@ async function batDauThi(env: Env, maCa: string, dongBoGio?: unknown): Promise<R
   const r = await env.DB.prepare(`UPDATE ca SET bat_dau_thi_luc = ?, dong_bo_gio = ?, cap_nhat_luc = ?
     WHERE ma_ca = ? AND (bat_dau_thi_luc IS NULL OR bat_dau_thi_luc = '') AND trang_thai NOT IN ('dong','da_xoa')`)
     .bind(luc, (dongBoGio ?? (Number(ca.dong_bo_gio) === 1)) ? 1 : 0, luc, maCa).run()
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): ghi bảng `ca` ⇒ bỏ đệm `protectedQuestions` ngay
   const daLuu = await docCa(env, maCa)
   if (!daLuu?.bat_dau_thi_luc) return ra({ ok: false, error: 'Ca vừa thay đổi. Thầy tải lại ca rồi thử lại.' })
   return ra({ ok: true, batDauLuc: daLuu.bat_dau_thi_luc, daBatTruoc: r.meta.changes === 0,
@@ -941,6 +945,7 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
   }
 
   for (let i = 0; i < cau.length; i += 200) await env.DB.batch(cau.slice(i, i + 200))
+  if (dsCa.length > 0) xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): đồng bộ nhiều ca ⇒ bỏ đệm `protectedQuestions` ngay
   return ra({ ok: true, soCa: dsCa.length, soLuot: dsLuot.length, soCau: cau.length, ...(maCu.size > 0 ? { boQuaMaCu: [...maCu] } : {}) })
 }
 
@@ -1072,6 +1077,7 @@ async function suaCa(env: Env, b: Record<string, unknown>): Promise<Response> {
   await env.DB.prepare(`UPDATE ca SET ${cot.join(', ')}, cap_nhat_luc = ? WHERE ma_ca = ?`)
     .bind(...giaTri, nay, maCa)
     .run()
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): sửa ca (trạng thái/công bố/hạn nộp/phạm vi) ⇒ bỏ đệm `protectedQuestions` ngay
 
   // KHOÁ CA: NỘP HỘ EM ĐANG LÀM, y như Apps Script làm bên Sheet.
   //
@@ -1435,6 +1441,7 @@ async function napDayDuCa(env: Env, b: Record<string, unknown>): Promise<Respons
   }
 
   await env.DB.prepare('UPDATE ca SET sinh_tai_d1 = 1, cap_nhat_luc = ? WHERE ma_ca = ?').bind(nay, maCa).run()
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): ghi bảng `ca` ⇒ bỏ đệm `protectedQuestions` ngay
   return ra({ ok: true, coCa: true, daDat: true, soLuot: cau.length, coKey: !!(b.keyBank && env.DE) })
 }
 

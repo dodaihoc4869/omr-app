@@ -1,4 +1,4 @@
-import { docKhoiEm } from './game-v2-bank'
+import { docKhoiEm, xoaDemCaBaoVe } from './game-v2-bank'
 import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
 import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
@@ -1229,6 +1229,7 @@ export async function khoaCa(env: Env, b: Record<string, unknown>): Promise<Reco
     env.DB.prepare("UPDATE luot SET trang_thai = 'da_nop', nop_luc = COALESCE(NULLIF(nop_luc,''), ?), cap_nhat_luc = ? WHERE ma_ca = ? AND trang_thai = 'dang_lam'").bind(nay, nay, maCa),
     env.DB.prepare("UPDATE ca SET trang_thai = 'dong', cap_nhat_luc = ? WHERE ma_ca = ?").bind(nay, maCa),
   ])
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): khoá ca ⇒ bỏ đệm `protectedQuestions` ngay
   return { ok: true, soEmBiNop: r[0]?.meta?.changes ?? 0, khoaLuc: nay, trangThai: 'dong' }
 }
 
@@ -1248,6 +1249,7 @@ export async function moKhoaCa(env: Env, b: Record<string, unknown>): Promise<Re
   )
     .bind(nay, maCa)
     .run()
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): mở khoá ca ⇒ bỏ đệm `protectedQuestions` ngay
   return { ok: true, trangThai: 'mo', goHanVao: daQua }
 }
 
@@ -1259,6 +1261,7 @@ export async function xoaCa(env: Env, b: Record<string, unknown>): Promise<Recor
   if (xacNhan !== maCa) return { ok: false, error: 'Mã xác nhận không khớp' }
   const nay = NAY()
   await env.DB.prepare("UPDATE ca SET trang_thai = 'da_xoa', xoa_luc = ?, cap_nhat_luc = ? WHERE ma_ca = ?").bind(nay, nay, maCa).run()
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): xoá ca ⇒ bỏ đệm `protectedQuestions` ngay
   return { ok: true }
 }
 
@@ -1267,6 +1270,7 @@ export async function khoiPhucCa(env: Env, b: Record<string, unknown>): Promise<
   if (!maCa) return { ok: false, error: 'Thiếu mã ca' }
   const nay = NAY()
   await env.DB.prepare("UPDATE ca SET trang_thai = 'mo', xoa_luc = '', cap_nhat_luc = ? WHERE ma_ca = ?").bind(nay, maCa).run()
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): khôi phục ca ⇒ bỏ đệm `protectedQuestions` ngay
   return { ok: true }
 }
 
@@ -1322,6 +1326,7 @@ export async function xoaVinhVienCa(env: Env, b: Record<string, unknown>): Promi
       daXoa.push(maCa)
     }
 
+    if (daXoa.length > 0) xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): xoá vĩnh viễn ca ⇒ bỏ đệm `protectedQuestions` ngay
     return { ok: true, daXoa }
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Lỗi khi xoá vĩnh viễn ca thi' }
@@ -1333,6 +1338,7 @@ export async function doiTenCa(env: Env, b: Record<string, unknown>): Promise<Re
   const tenCa = chuoi(b.tenCa).trim()
   if (!maCa) return { ok: false, error: 'Thiếu mã ca' }
   await env.DB.prepare('UPDATE ca SET ten_ca = ?, cap_nhat_luc = ? WHERE ma_ca = ?').bind(tenCa, NAY(), maCa).run()
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): sửa ca (kể cả chỉ đổi tên) ⇒ bỏ đệm `protectedQuestions` ngay, chi phí thấp
   return { ok: true, tenCa }
 }
 
@@ -1508,6 +1514,7 @@ export async function choThiLai(env: Env, b: Record<string, unknown>): Promise<R
       else goiCu = (await env.DB.prepare('SELECT bo_theo_em_json FROM ca WHERE ma_ca = ?').bind(maCa).first<{ bo_theo_em_json: string | null }>())?.bo_theo_em_json ?? null
     }
     if (!daGhi) return { ok: false, error: 'Không ghi được bộ câu mới (ca vừa được sửa ở chỗ khác) — chưa xoá lượt cũ, thử lại' }
+    xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): cho thi lại (đổi bộ câu riêng) ⇒ bỏ đệm `protectedQuestions` ngay
   }
 
   // XOÁ + LƯỢT MỚI trong MỘT giao dịch. Mọi câu đều kèm điều kiện "em không đang làm bài" để nếu em vừa bấm vào thì KHÔNG xoá gì.
@@ -1969,6 +1976,7 @@ export async function noiKhoCa(env: Env, b: Record<string, unknown>): Promise<Re
   }
 
   await env.DB.prepare('UPDATE ca SET cap_nhat_luc = ? WHERE ma_ca = ?').bind(nay, maCa).run().catch(() => {})
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): nối kho vào ca ⇒ bỏ đệm `protectedQuestions` ngay
 
   return { ok: true, themBank: lenh.length, themKey: dapAnMap.size }
 }

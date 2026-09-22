@@ -10,7 +10,6 @@
 // đợt này); 24 ở đây là RIÊNG phần đã sửa — không so trực tiếp được hai con số.
 import { describe, expect, it } from 'vitest'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
-import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { taoD1That, type D1That } from './_d1-that'
 
@@ -60,13 +59,13 @@ describe('lapVaLuuKeHoach · lượt nóng (sổ vừa đổi) · số truy vấ
     expect(n).toBeGreaterThan(0)
   })
 
-  it('mutation: hồ sơ ĐÃ dựng sẵn trước (không còn "sổ đổi") ⇒ lượt sau vẫn rẻ hơn nhiều so với lượt đầu (tái dùng có tác dụng)', async () => {
+  it('mutation: lượt ĐẦU (sổ vừa đổi, phải dựng lại hồ sơ) tốn hơn lượt SAU (hồ sơ đã khớp, không dựng lại) — chứng minh hoSoSan/tái dùng có tác dụng thật', async () => {
     const d = await truong()
-    await dungLaiHoSo(d.env, ['S1'], new Date().toISOString())
+    // KHÔNG dungLaiHoSo trước: lượt ĐẦU này chính là lượt phát hiện "sổ đổi" (so_su_kien chưa khớp) ⇒ dựng hồ sơ TRONG lượt gọi, dùng hoSoSan.
     const soDem1 = dem(d)
     await lapVaLuuKeHoach(d.env, ['S1'], Date.now())
     const n1 = soDem1()
-    // Lượt kế (sổ không đổi nữa, hồ sơ đã khớp `so_su_kien`) ⇒ KHÔNG dựng lại hồ sơ ⇒ càng ít truy vấn hơn.
+    // Lượt kế: đã lưu kế hoạch ở lượt trước (so_su_kien khớp) ⇒ KHÔNG dựng lại hồ sơ, và không còn phần ghi INSERT/nhiệm vụ mới nếu không đổi gì.
     const soDem2 = dem(d)
     await lapVaLuuKeHoach(d.env, ['S1'], Date.now())
     const n2 = soDem2()

@@ -12,6 +12,7 @@
 // MỘT batch, ba câu, cùng điều kiện tiên quyết "`them_phut_tong` vẫn bằng giá trị vừa đọc" (khoá lạc quan): hai lệnh chạy chồng nhau thì chỉ một lệnh có tác dụng, lệnh kia
 // không đổi gì và báo thử lại — không bao giờ lệch giữa giờ của ca và giờ của lượt. Hai câu lượt đi TRƯỚC câu ca (cả ba đọc cùng điều kiện lúc bắt đầu batch).
 import type { D1PreparedStatement, Env } from './kieu'
+import { xoaDemCaBaoVe } from './game-v2-bank'
 
 export const PHUT_THEM_TOI_DA_MOT_LAN = 15
 export const PHUT_THEM_TOI_DA_MOT_CA = 30
@@ -66,6 +67,7 @@ export async function themPhutCa(env: Env, b: Record<string, unknown>, nowMs: nu
   if (!(Number(kq[2]?.meta?.changes) > 0)) {
     return { ok: false, error: 'Ca vừa được đổi ở nơi khác (thêm phút, đóng ca…). Thầy xem lại số phút rồi thử lại.', thuLai: true }
   }
+  xoaDemCaBaoVe() // HẠ TẢI D1 (Boss 22/09): thêm phút đổi thoi_gian_phut ⇒ bỏ đệm `protectedQuestions` ngay
   const sau = await env.DB.prepare('SELECT thoi_gian_phut, them_phut_tong FROM ca WHERE ma_ca = ?').bind(maCa).first<Record<string, unknown>>()
   return { ok: true, phut, soLuotCong, soLuotKhoaCong, thoiGianPhut: Number(sau?.thoi_gian_phut) || 0, themPhutTong: Number(sau?.them_phut_tong) || 0 }
 }

@@ -51,9 +51,20 @@ export async function syncIndex(env:Env):Promise<{remaining:number;indexed:numbe
   const n=await env.DB.prepare(`SELECT COUNT(*) n FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc)`).first<{n:number}>()
   return {remaining:n?.n??0,indexed}
 }
+// HẠ TẢI D1 (Boss 22/09, đo Code 1: truy vấn `ca` của hàm này đứng ĐẦU tổng dòng đọc — 3.077 lượt × 813 dòng ≈ 2,5 triệu/11,25 triệu
+// dòng). QUYẾT của Boss sau khi bàn về luật chống gian lận (thử đệm 30 giây thuần bị lùi lại vì trễ gỡ bảo vệ khi ca đổi trạng thái):
+//   · Đệm mô-đun CHỈ 5 GIÂY (gộp các lượt gọi CHỒNG NHAU trong cùng giây cao điểm; không phải "coi như không đổi trong 30 giây").
+//   · MÓC BẤT HOẠT `xoaDemCaBaoVe()` ngay sau MỌI câu ghi bảng `ca` (mở/đóng/công bố/đổi hạn/xoá/cho thi lại/nối kho — index.ts + goi-cu.ts):
+//     ca vừa đổi trạng thái do THẦY BẤM có hiệu lực NGAY, không chờ 5 giây.
+//   · KHÔNG bất hoạt theo `luot` (em nộp bài/hết giờ): sai lệch còn lại là bảo vệ KÉO DÀI thêm ≤ 5 giây sau khi lẽ ra đã hết — CHIỀU AN
+//     TOÀN (không lộ đề), chấp nhận được vì cửa sổ này còn NHỎ HƠN cửa sổ vốn có (câu đã phát ra máy em trước khi ca hết hạn).
+const demCaBaoVe=new DemTTL<Set<string>>(5_000,4)
+/** Xoá đệm 5 giây của `protectedQuestions` — gọi ngay sau MỌI câu ghi bảng `ca` (production) hoặc sau khi test tự tay sửa bảng `ca` bằng SQL thô (bỏ qua đường ghi thật, nên không tự kích hoạt móc bất hoạt). */
+export function xoaDemCaBaoVe():void{demCaBaoVe.xoa()}
 const protectionCache=new Map<string,{fingerprint:string;blocked:Set<string>}>()
 export async function protectedQuestions(env:Env):Promise<Set<string>> {
   const now=Date.now()
+  const nong=demCaBaoVe.doc('current',now);if(nong)return new Set(nong)
   const all=await env.DB.prepare(`SELECT ca.ma_ca,ca.bank_r2,ca.cap_nhat_luc,ca.trang_thai,ca.cong_bo,ca.het_han_vao,ca.thoi_gian_phut,ca.loai,ca.han_nop,ca.bat_dau,
     (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) entered,
     (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='da_nop') submitted,
@@ -67,7 +78,8 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
     return !released||canStillTest
   })}
   // Trả BẢN SAO ở mọi lối ra: nơi gọi (game-v2.ts `start`/`resume`/`answer`) `.add()` câu riêng của từng em vào tập này; trả thẳng tập trong đệm là ghi bẩn đệm dùng chung, câu của em A rò sang em B.
-  const fingerprint=await hash(r.results);const cached=protectionCache.get('current');if(cached?.fingerprint===fingerprint)return new Set(cached.blocked)
+  const fingerprint=await hash(r.results);const cached=protectionCache.get('current')
+  if(cached?.fingerprint===fingerprint){demCaBaoVe.ghi('current',now,new Set(cached.blocked));return new Set(cached.blocked)}
   const blocked=new Set<string>()
   for(const ca of r.results){
     if(!ca.bank_r2)continue
@@ -75,7 +87,7 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
     if(!qs.length&&['phanI','phanII','phanIII'].some(p=>Array.isArray(bank[p])&&(bank[p] as unknown[]).length))throw new Error('Chưa kiểm tra xong phạm vi đề thi đang bảo vệ.')
     for(const q of qs){blocked.add(q.qid);blocked.add(q.group)}
   }
-  protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});return blocked
+  protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});demCaBaoVe.ghi('current',now,new Set(blocked));return blocked
 }
 /** Câu trong POOL của readScope: câu ĐẦY ĐỦ (bằng chứng của em, `originals`) hoặc bản NHẸ của kho theo dạng (`nhe: true`: chỉ siêu dữ liệu để CHỌN + cờ `tuLuan` tính sẵn; KHÔNG có text, choices, ideas, hinhAnh, correct, solution).
  *  Bản nhẹ là đối tượng ĐÓNG BĂNG dùng chung nhiều lượt: không được sửa; muốn đưa cho em thì phải qua `doDayDu`. */

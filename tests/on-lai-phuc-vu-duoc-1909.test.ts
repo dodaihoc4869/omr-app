@@ -4,6 +4,7 @@
 import { describe, it, expect } from 'vitest'
 import worker from '../server/src/index'
 import { docDoPhuPhucVu, layCauChoEm, qidPhucVuDuoc } from '../server/src/cau-theo-qid'
+import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { ghiSuKien, ngayVn } from '../server/src/su-kien-hoc'
@@ -71,6 +72,7 @@ describe('kế hoạch chỉ chọn qid mà lệnh lấy đề PHỤC VỤ ĐƯ�
     const d = await dung()
     expect((await qidOnLai(d)).qid).toEqual(['OK1', 'OK2'])
     d.sql.prepare("UPDATE ca SET trang_thai='dong' WHERE ma_ca='CA-MO-1'").run()
+    xoaDemCaBaoVe() // test sửa bảng `ca` bằng SQL thô, không qua lệnh thật ⇒ tự xoá đệm 5 giây của protectedQuestions (production có móc bất hoạt ở mọi lệnh sửa ca thật)
     const sau = await qidOnLai(d)
     expect(sau.qid).toEqual(['BAOVE1', 'OK1', 'OK2'])
     const r = await layCauChoEm(d.env, 'S1', sau.qid)

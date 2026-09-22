@@ -37,6 +37,18 @@ export interface Env {
   MA_BI_MAT: string
 }
 
+/**
+ * Kiểu tối thiểu của `ExecutionContext` (Boss 22/09, tốc độ tối đa): `fetch(req, env, ctx)` — Cloudflare LUÔN truyền
+ * tham số thứ ba này ở Worker thật dù chữ ký cũ không khai nó ra. `waitUntil` cho việc PHỤ chạy SAU khi đã trả lời
+ * (không nằm trong hợp đồng phản hồi) — response trả nhanh hơn, việc phụ vẫn chắc chắn chạy xong trước khi Worker dừng.
+ * TUỲ CHỌN ở mọi chữ ký `fetch`/hàm dùng nó: nơi gọi cũ (test gọi `worker.fetch(req, env)` không có ctx) vẫn chạy —
+ * việc phụ khi đó chạy NGAY (await tại chỗ) thay vì hoãn, không mất tác dụng, chỉ mất phần "trả lời nhanh hơn".
+ */
+export interface ExecutionContext {
+  waitUntil(promise: Promise<unknown>): void
+  passThroughOnException?(): void
+}
+
 /** Một dòng `luot` — tên trường khớp cột D1 và cột sheet `LuotThi`. */
 export interface DongLuot {
   khoa: string

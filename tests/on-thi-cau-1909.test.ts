@@ -4,6 +4,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
 import { layCauChoEm } from '../server/src/cau-theo-qid'
+import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
@@ -129,6 +130,7 @@ describe('việc on_thi mang câu từ hồ sơ, chỉ câu phục vụ được
     const d = await dung()
     expect(((await viecOnThi(d)).thi!.chiTiet.qid as string[])).not.toContain('BAOVE')
     d.sql.prepare("UPDATE ca SET trang_thai='dong' WHERE ma_ca='CA-SAP'").run()
+    xoaDemCaBaoVe() // test sửa bảng `ca` bằng SQL thô, không qua lệnh thật ⇒ tự xoá đệm 5 giây của protectedQuestions
     expect((await viecOnThi(d)).thi).toBeUndefined() // ca đóng thì không còn "ca sắp tới"
     themCa(d, 'CA-KHAC', 40, [])
     const sau = await viecOnThi(d)
