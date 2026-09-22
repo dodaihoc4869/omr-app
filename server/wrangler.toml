@@ -27,6 +27,13 @@ workers_dev = true
 # Không mở thêm địa chỉ công khai nào cho máy chủ thi.
 preview_urls = false
 
+# VỊ TRÍ CHẠY (Boss 22/09, tốc độ tối đa): `wrangler d1 info omr` cho biết D1 đang chạy ở "APAC" (colo Hong Kong —
+# khớp ghi chú cũ trong kho). "smart" để Cloudflare TỰ chọn colo gần D1 nhất cho MỖI yêu cầu (không phải cố định một
+# vùng) — an toàn với học sinh gọi từ nhiều nơi trong nước, không phải chọn tay một vùng cụ thể (wrangler.toml không
+# có tuỳ chọn "gợi ý vùng" riêng, chỉ có mode). CHƯA có hiệu lực tới khi `wrangler deploy` (cần lời thầy mỗi lượt).
+[placement]
+mode = "smart"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "omr"
