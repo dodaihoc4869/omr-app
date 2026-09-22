@@ -27,12 +27,14 @@ export async function syncAcademic(env:Env,sbd:string,p:Profile,mom:unknown){
  const since=a.since??p.cutover
  const events:{key:string;at:string;amount:number}[]=[];let pending=0,processed=0
  const add=(key:string,at:string,amount=2)=>events.push({key,at,amount})
- const p_exams=env.DB.prepare(`SELECT l.*,c.bo_theo_em_json FROM luot l JOIN ca c ON c.ma_ca=l.ma_ca WHERE l.sbd=? AND l.nop_luc>=? AND l.trang_thai IN ('da_nop','khoa') AND c.trang_thai<>'da_xoa' AND (c.cong_bo='ngay' OR (c.cong_bo='ca_lop_xong' AND (c.trang_thai='dong' OR NOT EXISTS(SELECT 1 FROM luot x WHERE x.ma_ca=c.ma_ca AND x.trang_thai<>'da_nop')))) ORDER BY l.nop_luc`).bind(sbd,since).all<Row>()
- const p_details=env.DB.prepare('SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu FROM chi_tiet_cau c JOIN luot l ON l.sbd=c.sbd AND l.ma_ca=c.ma_ca AND l.lan_thu=c.lan_thu WHERE c.sbd=? AND l.nop_luc>=? AND c.dung_sai IN (0,1) ORDER BY c.qid').bind(sbd,since).all<{qid:string;dung_sai:number;ma_ca:string;lan_thu:number}>()
- const p_homework=env.DB.prepare(`SELECT e.*,b.ma_de FROM btvn_em e JOIN btvn b ON b.ma_btvn=e.ma_btvn WHERE e.sbd=? AND e.nop_luc>=? AND b.da_xoa=0 ORDER BY e.nop_luc`).bind(sbd,since).all<Row>()
- const p_repairs=env.DB.prepare('SELECT * FROM nop_khac_phuc WHERE sbd=? AND nop_luc>=? ORDER BY nop_luc').bind(sbd,since).all<Row>()
- // HẠ TẢI D1 (Boss 21/09): bốn truy vấn độc lập chạy SONG SONG (trước đây tuần tự); kết quả dùng đúng chỗ cũ
- const [exams,details,homework,repairs]=await Promise.all([p_exams,p_details,p_homework,p_repairs])
+ const st_exams=env.DB.prepare(`SELECT l.*,c.bo_theo_em_json FROM luot l JOIN ca c ON c.ma_ca=l.ma_ca WHERE l.sbd=? AND l.nop_luc>=? AND l.trang_thai IN ('da_nop','khoa') AND c.trang_thai<>'da_xoa' AND (c.cong_bo='ngay' OR (c.cong_bo='ca_lop_xong' AND (c.trang_thai='dong' OR NOT EXISTS(SELECT 1 FROM luot x WHERE x.ma_ca=c.ma_ca AND x.trang_thai<>'da_nop')))) ORDER BY l.nop_luc`).bind(sbd,since)
+ const st_details=env.DB.prepare('SELECT c.qid,c.dung_sai,c.ma_ca,c.lan_thu FROM chi_tiet_cau c JOIN luot l ON l.sbd=c.sbd AND l.ma_ca=c.ma_ca AND l.lan_thu=c.lan_thu WHERE c.sbd=? AND l.nop_luc>=? AND c.dung_sai IN (0,1) ORDER BY c.qid').bind(sbd,since)
+ const st_homework=env.DB.prepare(`SELECT e.*,b.ma_de FROM btvn_em e JOIN btvn b ON b.ma_btvn=e.ma_btvn WHERE e.sbd=? AND e.nop_luc>=? AND b.da_xoa=0 ORDER BY e.nop_luc`).bind(sbd,since)
+ const st_repairs=env.DB.prepare('SELECT * FROM nop_khac_phuc WHERE sbd=? AND nop_luc>=? ORDER BY nop_luc').bind(sbd,since)
+ // HẠ TẢI D1 (Boss 22/09, tốc độ tối đa): env.DB.batch gửi bốn câu MỘT lượt tới D1 (một round-trip) thay Promise.all bốn
+ // round-trip song song (21/09) — cùng kết quả, ít độ trễ mạng hơn. `details` đọc lại type cụ thể (batch trả một T chung).
+ const [exams,detailsTho,homework,repairs]=await env.DB.batch<Row>([st_exams,st_details,st_homework,st_repairs])
+ const details={results:detailsTho.results as unknown as {qid:string;dung_sai:number;ma_ca:string;lan_thu:number}[]}
  for(const l of exams.results){
   const rows:{results:{qid:string;dung_sai:number}[]}={results:details.results.filter(r=>r.ma_ca===l.ma_ca&&r.lan_thu===l.lan_thu)}
   if(!rows.results.length){
