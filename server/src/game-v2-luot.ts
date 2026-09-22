@@ -10,6 +10,8 @@ import { LAN_MOI_LUOT } from './btvn-nang-do-chang'
 
 /** Cờ LÙI NHANH: `cau_hinh.game_luot_moi = 'tat'` ⇒ game rút câu bằng đường CŨ (chooseSessionWithRoles). Vắng / khác ⇒ BẬT. */
 export const KHOA_GAME_LUOT_MOI = 'game_luot_moi'
+/** Trần dòng `chi_tiet_cau` đọc để tính "dạng em đã thi" (`tinhDang`), theo ca GẦN NHẤT trước — chặn D1 giờ cao điểm (Boss 22/09, lượt 2). */
+export const TRAN_DONG_TINH_DANG = 3000
 /**
  * TRẦN CÂU MỖI NGÀY VN — HAI TRẦN RIÊNG (thầy lệnh 21/09 ~19:30: "cho riêng trần hộ tống đoàn là 60 câu nhé, tính riêng hẳn"; trước đó một trần gộp 60, và trước nữa 200):
  *   • ĐOÀN HỘ TỐNG: 60 lượt trả lời/ngày, CHỈ đếm lượt thuộc phiên của Đoàn (phiên có `json $.doan = 1`, `taoNguoi` đánh dấu);
@@ -93,9 +95,16 @@ async function tinhDang(env: Env, dsSbd: string[]): Promise<Set<string>> {
   }
   await lay("SELECT DISTINCT q.dang AS dang FROM btvn b JOIN btvn_em be ON be.ma_btvn = b.ma_btvn JOIN game_v2_question q ON q.ma_de = b.ma_de WHERE b.da_xoa = 0 AND COALESCE(b.ca_nhan, 0) = 0 AND be.sbd IN (SELECT value FROM json_each(?)) AND q.dang IS NOT NULL", arr)
   await lay('SELECT DISTINCT bc.dang AS dang FROM btvn_cau bc JOIN btvn b ON b.ma_btvn = bc.ma_btvn JOIN btvn_em be ON be.ma_btvn = b.ma_btvn WHERE b.da_xoa = 0 AND be.sbd IN (SELECT value FROM json_each(?)) AND bc.dang IS NOT NULL', arr)
+  // HẠ TẢI D1 (Boss 22/09, lượt 2 — Code 1 đo: query này 268.796 dòng/200 lượt, tệ nhất 191k một lượt, `docs/do-tai-d1/ban-tai-348a09f-am.md` dòng 79): em thi
+  // càng nhiều ca thì `chi_tiet_cau` (một dòng MỖI câu MỖI lần thi) càng phình, quét KHÔNG mốc thời gian. Chặn bằng LIMIT theo ca GẦN NHẤT trước, JOIN
+  // `game_v2_question` sau — cùng ý tưởng `attempts()` ở game-v2.ts (LIMIT 3000 theo lượt gần nhất). Dạng của ca RẤT CŨ có thể rớt khỏi tập nếu em thi quá
+  // nhiều ca công bố — chấp nhận được (dạng học lâu ngày không còn phù hợp trình độ hiện tại của em cũng hợp lý cho việc chọn câu game).
   await lay(
-    `SELECT DISTINCT q.dang AS dang FROM chi_tiet_cau cc JOIN ca c ON c.ma_ca = cc.ma_ca JOIN game_v2_question q ON q.qid = cc.qid
-      WHERE cc.sbd IN (SELECT value FROM json_each(?)) AND c.trang_thai <> 'da_xoa' AND (c.trang_thai = 'dong' OR ${SQL_DA_CONG_BO('c')}) AND q.dang IS NOT NULL`,
+    `SELECT DISTINCT q.dang AS dang FROM (
+       SELECT cc.qid FROM chi_tiet_cau cc JOIN ca c ON c.ma_ca = cc.ma_ca
+        WHERE cc.sbd IN (SELECT value FROM json_each(?)) AND c.trang_thai <> 'da_xoa' AND (c.trang_thai = 'dong' OR ${SQL_DA_CONG_BO('c')})
+        ORDER BY c.bat_dau DESC LIMIT ${TRAN_DONG_TINH_DANG}
+     ) x JOIN game_v2_question q ON q.qid = x.qid WHERE q.dang IS NOT NULL`,
     arr,
   )
   return ra
