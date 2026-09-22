@@ -31,13 +31,13 @@ const mau = JSON.parse(readFileSync(join(TT, 'mau.json'), 'utf8'))
 const sha = co('cay-hien-tai') ? git('rev-parse', '--short', 'HEAD') : git('rev-parse', '--short', arg('commit', 'HEAD'))
 const nhan = (co('cay-hien-tai') ? `${sha}+cay-hien-tai` : sha) + (treD1 > 0 ? `-tre${treD1}` : '')
 
-// (1) cây mã
+// (1) cây mã — thư mục RIÊNG cho MỖI LƯỢT CHẠY (hậu tố `process.pid`), kể cả hai lượt cùng nhắm MỘT commit chạy đồng thời (vd một lượt --nong dài
+// đang chạy nền + một lượt kiểm nhanh khác) — dùng CHUNG thư mục theo `sha` từng gây va chạm thật: lượt sau `rmSync`/`worktree remove` giữa chừng xoá
+// mất `.chay` (D1 cục bộ) của lượt trước đang chạy, làm hỏng số đo của lượt đó mà không báo lỗi rõ ràng (phát hiện 22/09, xem ghi chú trong DIEU-PHOI).
 let cay = REPO, laWorktree = false
 if (!co('cay-hien-tai')) {
-  cay = join(TT, 'cay', sha)
-  try { rmSync(join(cay, 'node_modules'), { force: true }); execFileSync('git', ['worktree', 'remove', '--force', cay], { cwd: REPO, stdio: 'ignore' }) } catch { /* chưa có */ }
-  rmSync(cay, { recursive: true, force: true })
-  execFileSync('git', ['worktree', 'prune'], { cwd: REPO, stdio: 'ignore' })
+  cay = join(TT, 'cay', `${sha}-${process.pid}`)
+  rmSync(cay, { recursive: true, force: true }) // thư mục có hậu tố PID riêng ⇒ chỉ có thể là rác treo lại của chính PID này từ lượt trước, không phải của lượt khác đang chạy
   mkdirSync(join(TT, 'cay'), { recursive: true })
   execFileSync('git', ['worktree', 'add', '--detach', cay, sha], { cwd: REPO, stdio: 'ignore' })
   symlinkSync(join(REPO, 'node_modules'), join(cay, 'node_modules'))
@@ -77,7 +77,7 @@ const migMoi = []
 if (migMoi.length) log(`Migration chỉ-thêm áp thêm: ${migMoi.join(', ')}`)
 
 // (3) Worker cục bộ
-const nhatKy = join(TT, `dev-${sha}.log`)
+const nhatKy = join(TT, `dev-${sha}-${process.pid}.log`)
 const dev = spawn('npx', ['wrangler', 'dev', '--local', '--config', join(dichGoc, 'wrangler.toml'), '--persist-to', chay, '--port', String(cong), '--ip', '127.0.0.1', '--log-level', 'warn', ...(treD1 > 0 ? ['--var', `TRE_D1_MS:${treD1}`] : [])], {
   cwd: cay, detached: true, stdio: ['ignore', 'pipe', 'pipe'],
 })

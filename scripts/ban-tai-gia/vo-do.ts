@@ -101,7 +101,10 @@ function bocD1(db: any): any {
     },
     async exec(sql: string) { const t = Date.now(); await treGia(); const r = await db.exec(sql); ghiCau(sql, undefined, Date.now() - t, false); return r },
     dump: (...a: unknown[]) => db.dump(...a),
-    withSession: (...a: unknown[]) => db.withSession(...a),
+    // SESSIONS API (Boss 22/09, lượt 2): `env.DB.withSession(...)` trả một đối tượng D1 RIÊNG (bản sao) — bọc LẠI nó bằng chính bocD1 (đệ quy, WeakMap chống bọc hai lần)
+    // để truy vấn đi qua Sessions API VẪN được đếm; nếu bỏ bọc ở đây, mọi route dùng withSession (Boss danh sách 16+, docs/do-tai-d1/phan-loai-route-doc-ghi-2209.md) sẽ lọt khỏi số đo.
+    // Miniflare cục bộ (wrangler dev --local) hiện KHÔNG có `withSession` nên nhánh này chưa từng chạy thật ở bench — để sẵn cho khi D1 preview/binding thật có.
+    withSession: db.withSession ? (...a: unknown[]) => bocD1(db.withSession(...a)) : undefined,
   }
   boc.set(db, moi)
   return moi
