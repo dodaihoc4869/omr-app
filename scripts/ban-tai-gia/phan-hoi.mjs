@@ -37,11 +37,16 @@ const KHOA_DAP_AN = ['correct', 'dapAn', 'dap_an', 'dapAnDung', 'solution', 'loi
 export const LENH_CHUA_CHAM = /(\[(mở|nền|chặng|Đảo)\]|hs\/cau-theo-qid|game-v2\/(start|resume|so-tay|recommendations))/
 const LA_LENH_DA_CHAM = /(nộp|xong-lo|on-lai\/nop|game-v2\/(answer|complete))/
 
+/** Tên khoá mà GIÁ TRỊ của nó là vùng ĐÃ CHẤM hợp lệ (server chỉ điền khi em đã nộp câu ấy) dù lệnh bao quanh (vd `game-v2/resume`) còn CÂU CHƯA LÀM khác trong cùng phản hồi — không quét bên trong các khoá này.
+ * `answered`: phiếu chấm của các câu đã trả lời TRONG lượt đang resume (`game-v2/resume`, mảng `{attempt:{...,correct:boolean},correct,answer,solution}` — từ `game_v2_attempt`, định nghĩa đã-chấm). */
+const KHOA_DA_CHAM = new Set(['answered'])
+
 function timDapAnLo(v, duong = []) {
   const ra = []
   if (Array.isArray(v)) { v.forEach((x, i) => ra.push(...timDapAnLo(x, [...duong, i]))); return ra }
   if (v !== null && typeof v === 'object') {
     for (const [k, x] of Object.entries(v)) {
+      if (KHOA_DA_CHAM.has(k)) continue // vùng đã chấm hợp lệ — không quét bên trong (xem giải thích ở trên)
       // `correct` KIỂU BOOLEAN là kết quả chấm (đúng/sai) của bài ĐÃ NỘP trước đó (vd lịch sử "Mẹ giao thêm") — không phải đáp án. Chỉ đáng ngờ khi là CHUỖI (chữ cái/DS/số — chính đáp án).
       const dang = k === 'correct' && typeof x === 'boolean' ? false : KHOA_DAP_AN.includes(k) && x !== null && x !== undefined && x !== ''
       if (dang) ra.push([...duong, k].join('.'))

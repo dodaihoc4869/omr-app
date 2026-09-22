@@ -55,6 +55,16 @@ describe('kiemLoDapAn', () => {
   it('chấp nhận cả object thường ({key: {lenh, body}}) thay vì chỉ Map', () => {
     expect(kiemLoDapAn({ '1|game-v2/start [Đảo]': phanHoi('game-v2/start [Đảo]', { correct: 'A' }) })).toHaveLength(1)
   })
+  it('`game-v2/resume [Đảo]`: khoá `answered[]` (phiếu ĐÃ CHẤM của câu em làm xong trong lượt đang resume — game_v2_attempt) KHÔNG bị coi là lộ đáp án dù có correct/answer/solution; `questions[]` CÒN LẠI (câu chưa làm) vẫn bị soát bình thường', () => {
+    const resume = phanHoi('game-v2/resume [Đảo]', {
+      ok: true, id: 'x', mode: 'adventure',
+      questions: [{ qid: 'Q1', phan: 'I' }, { qid: 'Q2', phan: 'I' }],
+      answered: [{ attempt: { qid: 'Q1', correct: false, assisted: false }, correct: false, answer: 'D', solution: { chot: 'vì...' } }],
+    })
+    expect(kiemLoDapAn(new Map([['1|game-v2/resume [Đảo]', resume]]))).toEqual([])
+    const roLe = phanHoi('game-v2/resume [Đảo]', { questions: [{ qid: 'Q1', correct: 'A' }], answered: [] }) // đáp án lọt ra NGOÀI answered (giả lập lỗi thật) vẫn phải bắt được
+    expect(kiemLoDapAn(new Map([['1|game-v2/resume [Đảo]', roLe]]))).toHaveLength(1)
+  })
 })
 
 describe('soPhanHoi', () => {

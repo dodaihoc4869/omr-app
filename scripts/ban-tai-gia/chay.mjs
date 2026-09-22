@@ -23,6 +23,8 @@ const co = (ten) => process.argv.includes(`--${ten}`)
 const soEm = Number(arg('so-em', 250)), phut = Number(arg('phut', 10)), nhanh = Number(arg('nhanh', 1)), cong = Number(arg('cong', 8788)), treD1 = Number(arg('tre-d1', 0)), mauPhanHoi = Number(arg('mau-phan-hoi', 40))
 const git = (...a) => execFileSync('git', a, { cwd: REPO, encoding: 'utf8' }).trim()
 const log = (...a) => console.log(new Date().toTimeString().slice(0, 8), ...a)
+/** Chạy một script CON, in ra ngay (stdio inherit), KHÔNG ném lỗi khi nó thoát mã ≠ 0 (vd so-sanh-phan-hoi.mjs cố ý thoát 1 khi có cảnh báo lộ đáp án — đó là TIN, không phải lỗi công cụ; dừng cả `chay.mjs` giữa chừng sẽ bỏ lỡ bước dọn worktree). */
+const chayConNho = (lenh, doi) => { try { execFileSync(lenh, doi, { cwd: REPO, stdio: 'inherit' }) } catch (e) { log(`(script con thoát mã ${e.status ?? '?'} — xem cảnh báo ở trên, không dừng lượt đo)`) } }
 
 for (const f of ['mau.sqlite', 'mau.json', 'em-gia.json']) if (!existsSync(join(TT, f))) { console.error(`Thiếu .trang-thai/${f} — chạy nap-sao-luu.mjs rồi chuan-bi.mjs trước.`); process.exit(1) }
 const mau = JSON.parse(readFileSync(join(TT, 'mau.json'), 'utf8'))
@@ -125,8 +127,8 @@ if (co('nong')) {
   await motLuot(`${nhan}-lanh`, ['LƯỢT 1 — bộ đệm mô-đun của Worker (DemTTL: kho câu, xác thực, đề bảo vệ…) còn TRỐNG, y như vừa đẩy bản mới.'])
   await fetch(goc + '/__do/reset') // xoá SỔ ĐO (không đụng D1) — dữ liệu học tập tiếp tục như thật, chỉ đo lại từ đầu
   await motLuot(`${nhan}-am`, ['LƯỢT 2 — CÙNG Worker, bộ đệm mô-đun đã ẤM từ lượt 1 (dữ liệu D1 đã đổi theo lượt 1: em đã nộp/ôn/chơi — sát thật hơn "vừa đẩy", vì giờ cao điểm không ai gặp Worker vừa nguội).'])
-  execFileSync('node', [join(GOC, 'so-sanh.mjs'), `${nhan}-lanh`, `${nhan}-am`], { cwd: REPO, stdio: 'inherit' })
-  execFileSync('node', [join(GOC, 'so-sanh-phan-hoi.mjs'), `${nhan}-lanh`, `${nhan}-am`], { cwd: REPO, stdio: 'inherit' })
+  chayConNho('node', [join(GOC, 'so-sanh.mjs'), `${nhan}-lanh`, `${nhan}-am`])
+  chayConNho('node', [join(GOC, 'so-sanh-phan-hoi.mjs'), `${nhan}-lanh`, `${nhan}-am`]) // thoát mã 1 khi có lộ đáp án — CẢNH BÁO đã in ra, không phải lý do dừng cả lượt đo
 } else {
   await motLuot(nhan)
 }
