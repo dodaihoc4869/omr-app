@@ -118,6 +118,29 @@ export async function doDayDu(env:Env,cau:readonly CauPool[]):Promise<PrivateQue
 // ĐỆM KHO NHẸ THEO DẠNG (Code 1 đo trên kho thật: 15.359 câu / 953 dạng / 60 triệu ký tự JSON ⇒ đệm json 16 triệu ký tự bị đẩy liên tục): chỉ giữ SIÊU DỮ LIỆU (~300 byte/câu ⇒ cả kho ~5 MB), sống 15 phút;
 // đổi kho (thêm/sửa/xoá tờ) đổi khoá `phienBanKho` nên không bao giờ dùng bản cũ. Câu đầy đủ chỉ nạp cho vài câu được chọn (`doDayDu`).
 const demKhoDang=new DemTTL<{k:string;q:CauPool}[]>(900_000,1500,30_000_000)
+// CACHE API `caches.default` (Boss 22/09, tốc độ tối đa — LỚP 2: sống sót qua khởi động lạnh, DÙNG CHUNG giữa các isolate
+// trong CÙNG colo Cloudflare; `demKhoDang` ở trên chỉ sống trong MỘT isolate = LỚP 1, D1 = LỚP 3). Thứ tự đọc:
+// demKhoDang → caches.default → D1. Khoá theo `phienBanKho` (kho đổi ⇒ khoá đổi ⇒ KHÔNG cần móc bất hoạt, khoá cũ tự
+// hết hạn theo Cache-Control). Nội dung cache = ĐÚNG mảng nhẹ demKhoDang đang giữ (chỉ siêu dữ liệu, không đáp án/lời
+// giải — bản đầy đủ chỉ nạp riêng cho câu được CHỌN qua `doDayDu`, không đi qua cache này).
+// Node test không có `caches` toàn cục ⇒ bỏ qua lớp này, đọc thẳng D1 như cũ — không ném lỗi, không đổi kết quả test.
+type CacheStorageCF = CacheStorage & { default?: Cache }
+const KHO_CACHE_MAX_AGE_S=300
+function docCacheMacDinh():Cache|null{
+  const cs=(typeof caches==='undefined'?undefined:caches) as CacheStorageCF|undefined
+  return cs?.default??null
+}
+function khoaKhoCache(phienBanKho:string,dang:string):string{return `https://cache.omr/kho/${encodeURIComponent(phienBanKho)}/${encodeURIComponent(dang)}`}
+async function docKhoCacheAPI(phienBanKho:string,dang:string):Promise<{k:string;q:CauPool}[]|null>{
+  const c=docCacheMacDinh();if(!c)return null
+  try{const res=await c.match(khoaKhoCache(phienBanKho,dang));if(!res)return null;return await res.json() as {k:string;q:CauPool}[]}
+  catch{return null}
+}
+async function ghiKhoCacheAPI(phienBanKho:string,dang:string,nhe:{k:string;q:CauPool}[]):Promise<void>{
+  const c=docCacheMacDinh();if(!c)return
+  try{await c.put(khoaKhoCache(phienBanKho,dang),new Response(JSON.stringify(nhe),{headers:{'content-type':'application/json','cache-control':`max-age=${KHO_CACHE_MAX_AGE_S}`}}))}
+  catch{/* ghi cache lỗi không chặn đường chính, lần sau lại thử */}
+}
 /** KHỐI CỦA EM (`hoc_sinh.lop` + tên lớp) — luật Boss 21/09 (P0 khối 11 nhận câu khối 12): MỌI kênh rút câu tự động chỉ được đưa câu khối em hoặc THẤP hơn (`src/lib/khoi-cau.ts`). Không đọc được ⇒ null (không lọc, "không biết ⇒ không kết tội"). */
 export async function docKhoiCacEm(env:Env,sbds:readonly string[]):Promise<Map<string,Khoi|null>>{
   return (await docKhoiVaLopCacEm(env,sbds)).khoi
@@ -183,7 +206,14 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
   const bayGio=Date.now()
   for(let i=0;i<types.length;i+=60){const ids=types.slice(i,i+60)
     const theoDang=new Map<string,{k:string;q:CauPool}[]>();const thieu:string[]=[]
-    for(const d of ids){const c=demKhoDang.doc(phienBanKho+'|'+d,bayGio);if(c)theoDang.set(d,c);else thieu.push(d)}
+    // LỚP 1 (demKhoDang, một isolate) → LỚP 2 (caches.default, cả colo) → LỚP 3 (D1, dưới).
+    for(const d of ids){
+      const c=demKhoDang.doc(phienBanKho+'|'+d,bayGio)
+      if(c){theoDang.set(d,c);continue}
+      const viaCache=await docKhoCacheAPI(phienBanKho,d)
+      if(viaCache){theoDang.set(d,viaCache);demKhoDang.ghi(phienBanKho+'|'+d,bayGio,viaCache,viaCache.length*300+64);continue}
+      thieu.push(d)
+    }
     if(thieu.length){
       const khoa=await env.DB.prepare(`SELECT q.dang,q.ma_de,q.qid FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${thieu.map(()=>'?').join(',')})`).bind(...thieu).all<{dang:string;ma_de:string;qid:string}>()
       const dangCua=new Map(khoa.results.map(k=>[str(k.ma_de)+'|'+str(k.qid),str(k.dang)] as [string,string]))
@@ -191,7 +221,7 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
       const moi=new Map<string,{k:string;json:string}[]>(thieu.map(d=>[d,[]]))
       for(let j=0;j<ds.length;j+=300){const r=await env.DB.prepare(`SELECT q.ma_de,q.qid,q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') ORDER BY j.key`).bind(JSON.stringify(ds.slice(j,j+300))).all<{ma_de:string;qid:string;json:string}>()
         for(const x of r.results){const k=str(x.ma_de)+'|'+str(x.qid);moi.get(dangCua.get(k)??'')?.push({k,json:str(x.json)})}}
-      for(const [d,v] of moi){const nhe=v.map(x=>({k:x.k,q:lamNhe(JSON.parse(x.json) as PrivateQuestion)}));theoDang.set(d,nhe);demKhoDang.ghi(phienBanKho+'|'+d,bayGio,nhe,nhe.length*300+64)}
+      for(const [d,v] of moi){const nhe=v.map(x=>({k:x.k,q:lamNhe(JSON.parse(x.json) as PrivateQuestion)}));theoDang.set(d,nhe);demKhoDang.ghi(phienBanKho+'|'+d,bayGio,nhe,nhe.length*300+64);await ghiKhoCacheAPI(phienBanKho,d,nhe)}
     }
     const gop=ids.flatMap(d=>theoDang.get(d)??[]).sort((a,b)=>a.k<b.k?-1:a.k>b.k?1:0)
     pool.push(...gop.map(x=>x.q))
