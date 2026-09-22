@@ -52,3 +52,35 @@ describe('academic-sync · luot theo em dùng chỉ mục idx_luot_sbd_nop (migr
     expect((d.sql.prepare("SELECT COUNT(*) n FROM sqlite_master WHERE type='index' AND name='idx_luot_sbd_nop'").get() as { n: number }).n).toBe(1)
   })
 })
+
+import { syncNotices } from '../server/src/notifications'
+
+describe('notifications · syncNotices theo em dùng chỉ mục (mốc 5, Boss 22/09)', () => {
+  it('có sbd: cả hai vế UNION ALL tìm bằng chỉ mục theo sbd, không SCAN toàn bảng', async () => {
+    const d = taoD1That()
+    d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','x','x')").run()
+    const cau = await batCau(d, () => syncNotices(d.env, 'S1'))
+    const c = cau.find((x) => /UNION ALL/.test(x.sql))!; expect(c).toBeDefined()
+    const plan = kePlan(d, c)
+    expect(plan).not.toMatch(/SCAN e\b/); expect(plan).not.toMatch(/SCAN mom_bai\b/)
+    expect(plan).toMatch(/SEARCH e USING (COVERING )?INDEX idx_btvn_em/)
+    expect(plan).toMatch(/SEARCH mom_bai USING (COVERING )?INDEX mom_bai_student_date/)
+  })
+  it('đối chứng: kiểu cũ `? IS NULL OR sbd = ?` khiến planner bỏ chỉ mục, quay lại SCAN cả hai bảng (chứng minh test trên đo đúng)', async () => {
+    const d = taoD1That()
+    const cau = await batCau(d, () => syncNotices(d.env, 'S1'))
+    const c = cau.find((x) => /UNION ALL/.test(x.sql))!
+    const cu = {
+      ...c,
+      sql: c.sql.replace('AND e.sbd=?', 'AND (? IS NULL OR e.sbd=?)').replace('AND sbd=?', 'AND (? IS NULL OR sbd=?)'),
+      args: [c.args[0], c.args[0], c.args[1], c.args[1]],
+    }
+    expect(kePlan(d, cu)).toMatch(/SCAN e\b/)
+  })
+  it('không sbd (deliverNotices, cron cả trường): không lọc, hành vi y như cũ', async () => {
+    const d = taoD1That()
+    const cau = await batCau(d, () => syncNotices(d.env))
+    const c = cau.find((x) => /UNION ALL/.test(x.sql))!
+    expect(c.args).toEqual([])
+  })
+})
