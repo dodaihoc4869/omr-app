@@ -99,11 +99,16 @@ async function tinhDang(env: Env, dsSbd: string[]): Promise<Set<string>> {
   // càng nhiều ca thì `chi_tiet_cau` (một dòng MỖI câu MỖI lần thi) càng phình, quét KHÔNG mốc thời gian. Chặn bằng LIMIT theo ca GẦN NHẤT trước, JOIN
   // `game_v2_question` sau — cùng ý tưởng `attempts()` ở game-v2.ts (LIMIT 3000 theo lượt gần nhất). Dạng của ca RẤT CŨ có thể rớt khỏi tập nếu em thi quá
   // nhiều ca công bố — chấp nhận được (dạng học lâu ngày không còn phù hợp trình độ hiện tại của em cũng hợp lý cho việc chọn câu game).
+  // SỬA theo soát của Code 1 (22/09): `tinhDangLop` gọi hàm này với `dsSbd` = CẢ LỚP — LIMIT một cục trên tổng gộp (bản đầu) để em thi nhiều/gần đây chiếm hết
+  // trần, đẩy dạng của em ít hoạt động ra ngoài dù lớp vẫn đang học dạng đó. `ROW_NUMBER() OVER (PARTITION BY cc.sbd …)` áp trần ĐÚNG THEO TỪNG EM — mỗi em
+  // luôn được xét tối đa TRAN_DONG_TINH_DANG dòng gần nhất của CHÍNH mình, không bị em khác trong cùng lượt gọi lấn.
   await lay(
     `SELECT DISTINCT q.dang AS dang FROM (
-       SELECT cc.qid FROM chi_tiet_cau cc JOIN ca c ON c.ma_ca = cc.ma_ca
-        WHERE cc.sbd IN (SELECT value FROM json_each(?)) AND c.trang_thai <> 'da_xoa' AND (c.trang_thai = 'dong' OR ${SQL_DA_CONG_BO('c')})
-        ORDER BY c.bat_dau DESC LIMIT ${TRAN_DONG_TINH_DANG}
+       SELECT y.qid FROM (
+         SELECT cc.qid, ROW_NUMBER() OVER (PARTITION BY cc.sbd ORDER BY c.bat_dau DESC) AS rn
+           FROM chi_tiet_cau cc JOIN ca c ON c.ma_ca = cc.ma_ca
+          WHERE cc.sbd IN (SELECT value FROM json_each(?)) AND c.trang_thai <> 'da_xoa' AND (c.trang_thai = 'dong' OR ${SQL_DA_CONG_BO('c')})
+       ) y WHERE y.rn <= ${TRAN_DONG_TINH_DANG}
      ) x JOIN game_v2_question q ON q.qid = x.qid WHERE q.dang IS NOT NULL`,
     arr,
   )

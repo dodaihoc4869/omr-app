@@ -39,4 +39,18 @@ describe('tinhDang (qua docDangLop) chặn dòng chi_tiet_cau bằng TRAN_DONG_T
     dungChiTiet(d, 'CA-NEW', 'Q-NEW', 'S1', TRAN_DONG_TINH_DANG) // đúng bằng trần ⇒ cùng 1 dòng OLD vượt trần, bị cắt
     expect(await docDangLop(d.env, 'S1', Date.now())).toEqual(['NEW.1'])
   })
+
+  it('NHIỀU EM cùng lớp (đường tinhDangLop, Code 1 soát 22/09): trần áp theo TỪNG EM — em ÍT hoạt động không bị em NHIỀU hoạt động trong lớp lấn trần', async () => {
+    const d = taoD1That()
+    // S1: hoạt động dày (đúng bằng trần, dạng HEAVY.1). S2 CÙNG LỚP: chỉ 1 dòng CŨ (dạng RARE.1) — nếu trần áp gộp cả lớp, dòng của S2 sẽ bị dòng của S1 (mới hơn, đông hơn) đẩy hẳn ra ngoài.
+    d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Em Một','12A','x'),('S2','Em Hai','12A','x')").run()
+    dungCa(d, 'CA-HEAVY', '2026-09-20T00:00:00.000Z')
+    dungCauHoi(d, 'Q-HEAVY', 'HEAVY.1')
+    dungChiTiet(d, 'CA-HEAVY', 'Q-HEAVY', 'S1', TRAN_DONG_TINH_DANG)
+    dungCa(d, 'CA-RARE', '2020-01-01T00:00:00.000Z') // cũ hơn nhiều, nhưng là CỦA S2 — phải xét RIÊNG với trần của S2, không cộng chung với dòng của S1
+    dungCauHoi(d, 'Q-RARE', 'RARE.1')
+    dungChiTiet(d, 'CA-RARE', 'Q-RARE', 'S2', 1)
+    // docDangLop('S1') lần đầu ⇒ đệm lop_da_hoc trống ⇒ tính lại cả lớp (tinhDangLop, dsSbd = ['S1','S2']).
+    expect(await docDangLop(d.env, 'S1', Date.now())).toEqual(['HEAVY.1', 'RARE.1'])
+  })
 })
