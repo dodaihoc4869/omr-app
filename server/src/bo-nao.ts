@@ -9,6 +9,7 @@
 //   boNaoBoDieuChinh    thầy bỏ một điều chỉnh
 // TỰ HÀNH: hôm sau bộ não TỰ CHẤM điều chỉnh của đêm trước (lúc dựng hồ sơ ngày); `xau_di` ⇒ TỰ GỠ (`huy = 1`, `tu_go = 1`) và cờ `xau_di_hom_qua` đẩy em vào luồng soi kỹ.
 import type { D1PreparedStatement, Env } from './kieu'
+import { DemTTL } from './dem-chung'
 import { docMocReset } from './reset-toan-app'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import {
@@ -120,9 +121,21 @@ function chuanCauHinh(v: unknown): CauHinhBoNao {
   }
 }
 
+// HẠ TẢI D1 (Boss 22/09, tốc độ tối đa): cấu hình bộ não (bật/tắt, chế độ, lớp thật) thầy đặt hoạ hoằn mới đổi —
+// đệm mô-đun 30 giây. `boNaoCauHinh` (dưới) xoá đệm NGAY sau khi thầy ghi qua lệnh thật, nên chỉ trễ khi test/nơi khác
+// sửa thẳng D1 mà không qua đó.
+const demCauHinhBoNao = new DemTTL<CauHinhBoNao>(30_000, 2)
+/** Xoá đệm 30 giây của `docCauHinhBoNao` — gọi sau khi ghi `cau_hinh.bo_nao` (production, trong `boNaoCauHinh`) hoặc khi test tự tay sửa bằng SQL thô. */
+export function xoaDemCauHinhBoNao(): void { demCauHinhBoNao.xoa() }
+
 export async function docCauHinhBoNao(env: Env): Promise<CauHinhBoNao> {
+  const now = Date.now()
+  const nong = demCauHinhBoNao.doc('current', now)
+  if (nong) return nong
   const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CAU_HINH).first<{ gia_tri: string }>()
-  return chuanCauHinh(parseJson(r?.gia_tri, {}))
+  const ra = chuanCauHinh(parseJson(r?.gia_tri, {}))
+  demCauHinhBoNao.ghi('current', now, ra)
+  return ra
 }
 
 /** Chế độ HIỆU LỰC của một lớp: nằm trong `lopThat` thì `that`, không thì theo `cheDo` chung. */
@@ -159,6 +172,7 @@ export async function boNaoCauHinh(env: Env, b: Obj = {}): Promise<Obj> {
   )
     .bind(KHOA_CAU_HINH, JSON.stringify(moi), new Date().toISOString())
     .run()
+  xoaDemCauHinhBoNao() // HẠ TẢI D1 (Boss 22/09): thầy vừa đổi cấu hình bộ não ⇒ bỏ đệm 30 giây ngay
   return { ok: true, cauHinh: moi }
 }
 

@@ -7,6 +7,7 @@ import { docDieuChinhHieuLuc } from '../server/src/bo-nao-doc'
 import { themNgay } from '../server/src/ho-so-nam-kt'
 import type { D1That } from './_d1-that'
 import { BAY_GIO, boCuaEm, dung, giao, gio, loiThieuKhongThay, mo, nopChang } from './_btvn-nang-do-mau'
+import { xoaDemCauHinhBoNao } from '../server/src/bo-nao'
 
 afterEach(() => vi.useRealTimers())
 
@@ -25,6 +26,7 @@ function toLon(d: D1That) {
 function datCheDo(d: D1That, cauHinh: Record<string, unknown> | null) {
   d.sql.exec("DELETE FROM cau_hinh WHERE khoa = 'bo_nao'")
   if (cauHinh) d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bo_nao',?,'x')").run(JSON.stringify(cauHinh))
+  xoaDemCauHinhBoNao() // test tự sửa cau_hinh.bo_nao bằng SQL thô (không qua lệnh thật) ⇒ tự xoá đệm 30 giây (bo-nao.ts, HẠ TẢI 22/09)
 }
 function ai(d: D1That, sbd: string, khacPhuc: unknown[], o: { cheDo?: 'bong' | 'that' } = {}) {
   // Đêm CHẠY THỬ ghi `ap_dung = 0` (điều chỉnh bóng không bao giờ được áp); đêm THẬT ghi `ap_dung = 1`.

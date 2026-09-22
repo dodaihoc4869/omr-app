@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { tinhNganSach, type DauVaoKeHoach } from '../server/src/ke-hoach-ngay'
 import worker from '../server/src/index'
 import { docBoNaoAiChoPhuHuynh, docLoiNhanHlv } from '../server/src/bo-nao-doc'
+import { xoaDemCauHinhBoNao } from '../server/src/bo-nao'
 import { thichNghiSauChang } from '../server/src/btvn-nang-do-d1'
 import { parentPass } from '../server/src/game-v2-auth'
 import { themNgay } from '../server/src/ho-so-nam-kt'
@@ -28,6 +29,7 @@ const bo = (r: Record<string, unknown>) => JSON.stringify({ ...r, serverNow: 0 }
 function datCheDo(d: D1That, cauHinh: Record<string, unknown> | null) {
   d.sql.exec("DELETE FROM cau_hinh WHERE khoa = 'bo_nao'")
   if (cauHinh) d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bo_nao',?,'x')").run(JSON.stringify(cauHinh))
+  xoaDemCauHinhBoNao() // test tự sửa cau_hinh.bo_nao bằng SQL thô (không qua lệnh thật) ⇒ tự xoá đệm 30 giây (bo-nao.ts, HẠ TẢI 22/09)
 }
 interface TuyChonAi { apDung?: number; cheDo?: 'bong' | 'that'; huy?: number; tuGo?: number; hetHan?: string; lop?: string; doTin?: number }
 /** Ghi một điều chỉnh + thẻ ngày (đường ghi DB — `bo-nao.ts` của Code 1 có test riêng cho đường nộp). */

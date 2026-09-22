@@ -13,7 +13,7 @@ import {
 } from '../server/src/thi-dua-hom-nay'
 import { taoD1That as taoD1ThatTho, type D1That } from './_d1-that'
 import { docThuBan } from '../src/lib/thi-dua'
-import { giaiMocHienThi } from '../server/src/moc-no'
+import { giaiMocHienThi, xoaDemMocHienThi } from '../server/src/moc-no'
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({
   ...(await orig<typeof import('../server/src/game-v2-auth')>()),
@@ -658,7 +658,8 @@ describe('MỐC HIỂN THỊ — sự kiện trước 12:00 trưa 21/09 không l
   const D = '2026-09-21'
   const NOW_MOC = Date.parse(`${D}T16:00:00+07:00`)
   const taoTho = () => taoD1ThatTho() // KHÔNG có hàng cau_hinh ⇒ mốc mặc định
-  const datMoc = (d: D1That, v: string) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('hien_thi_tu',?,'x')").run(v)
+  // test tự sửa `cau_hinh` bằng SQL thô (không qua lệnh thật) ⇒ tự xoá đệm 30 giây của docMocHienThi (moc-no.ts, HẠ TẢI 22/09).
+  const datMoc = (d: D1That, v: string) => { const r = d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('hien_thi_tu',?,'x')").run(v); xoaDemMocHienThi(); return r }
   const bang = (r: Dong) => r as { top: { ten: string; soCau: number; chuoi: number; hang: number }[]; daHoc: number; cuaEm: { soCau: number } }
   type Dong = Record<string, unknown>
 

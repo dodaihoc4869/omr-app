@@ -5,12 +5,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { docVeDichCuaEm } from '../server/src/ve-dich-d1'
 import { emChamNhip } from '../server/src/gv-bang-tin'
-import { baiTuNgayMoc, docMocHienThi, docMocHienThiMs, docMocNo, giaiMocHienThi, MOC_HIEN_THI_MAC_DINH_ISO, ngayCuaCauHinh, NGAY_MOC_NO_MAC_DINH } from '../server/src/moc-no'
+import { baiTuNgayMoc, docMocHienThi, docMocHienThiMs, docMocNo, giaiMocHienThi, MOC_HIEN_THI_MAC_DINH_ISO, ngayCuaCauHinh, NGAY_MOC_NO_MAC_DINH, xoaDemMocHienThi } from '../server/src/moc-no'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 import { BAY_GIO, DAP_AN_DUNG, HAN, boCuaEm, dung, giao, gio, mo, nopChang } from './_btvn-nang-do-mau'
 
 afterEach(() => vi.useRealTimers())
-const datCauHinh = (d: D1That, khoa: string, v: string) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES(?,?,'x')").run(khoa, v)
+// test tự sửa `cau_hinh` bằng SQL thô (không qua lệnh thật) ⇒ tự xoá đệm 30 giây của docMocHienThi (moc-no.ts, HẠ TẢI 22/09).
+const datCauHinh = (d: D1That, khoa: string, v: string) => { const r = d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES(?,?,'x')").run(khoa, v); xoaDemMocHienThi(); return r }
 
 describe('hàm thuần', () => {
   it('ngayCuaCauHinh: ISO ⇒ ngày VN của mốc (05:00Z = 12:00 VN cùng ngày; 17:30Z sang ngày VN kế); YYYY-MM-DD ⇒ chính nó; rác ⇒ null', () => {

@@ -587,7 +587,8 @@ describe('khoá nguồn', () => {
   it('server/src/bo-nao.ts: không tự kiểm mã bí mật, chỉ import lõi thuần + kiểu; không tên em trong thẻ (chỉ ghép tên ở đường đọc)', () => {
     const nguon = readFileSync('server/src/bo-nao.ts', 'utf8')
     expect(nguon.split('\n').filter((l) => !l.trimStart().startsWith('//')).join('\n')).not.toMatch(/MA_BI_MAT|x-ma-bi-mat|laThay/) // chú thích được nhắc tên; MÃ thì không
-    expect([...nguon.matchAll(/^(?:import|\}).* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./kieu', './reset-toan-app', './cong-bo-diem', '../../src/lib/bo-nao-dac-trung', '../../src/lib/bo-nao-khuon'])
+    // ./dem-chung (HẠ TẢI D1, Boss 22/09): DemTTL đệm 30 giây cấu hình bộ não — vẫn chỉ import lõi thuần + kiểu, không thêm phụ thuộc ngoài phạm vi.
+    expect([...nguon.matchAll(/^(?:import|\}).* from '([^']+)'/gm)].map((m) => m[1])).toEqual(['./kieu', './dem-chung', './reset-toan-app', './cong-bo-diem', '../../src/lib/bo-nao-dac-trung', '../../src/lib/bo-nao-khuon'])
     expect(nguon).not.toMatch(/console\./)
     expect(readFileSync('server/src/index.ts', 'utf8')).toContain("from './bo-nao'") // Code 3 ĐÃ nối (chỉ sau cổng laThay, khoá ở tests/bo-nao-noi-route-2109.test.ts); tệp này không tự sửa index.ts
   })

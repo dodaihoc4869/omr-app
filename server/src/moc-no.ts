@@ -1,6 +1,8 @@
 // MỐC TÍNH NỢ của "Dồn về đích" (thầy lệnh 21/09 15:52: "Còn lại những ngày trước trong thẻ về đích chỉ cho tính từ 12h trưa hôm nay thôi, những ngày trước đó không tính").
 // Mốc = NGÀY VN của `cau_hinh.bang_tin_tu` (mốc của Bảng tin); khoá riêng `cau_hinh.ve_dich_tu` (ISO hoặc YYYY-MM-DD) nếu có thì THẮNG; vắng / hỏng cả hai ⇒ hằng `NGAY_MOC_NO_MAC_DINH`.
 // Món nợ (chặng bài tập về nhà theo mốc GỐC, câu ôn quá lịch, gói gia đình) có `ngay` < mốc ⇒ không phải nợ. Việc của đúng ngày mốc VẪN tính.
+import { DemTTL } from './dem-chung'
+
 const ngayVnCuaMs = (ms: number): string => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
 
 /** Mốc HIỂN THỊ chung của ba app (thầy chốt 21/09 16:10: mọi con số hiển thị chỉ tính từ 12:00 trưa 21/09). Đọc: `hien_thi_tu` ⇒ `ve_dich_tu` (riêng cho Dồn về đích) ⇒ `bang_tin_tu` ⇒ hằng. */
@@ -58,16 +60,30 @@ export function giaiMocHienThi(...uuTien: unknown[]): MocHienThi {
   return { iso: new Date(ms).toISOString(), ms, ngayVn: ngayVnCuaMs(ms) }
 }
 
+// HẠ TẢI D1 (Boss 22/09, tốc độ tối đa): `docMocHienThi` được gọi từ RẤT nhiều lệnh (kế hoạch ngày, thi đua, on-lai/nop,
+// bảng tin…) — đo Code 1: > 115k lượt/ngày trước các đợt đệm khác. Mốc hiển thị (hien_thi_tu/ve_dich_tu/bang_tin_tu) là
+// cấu hình thầy đặt MỘT LẦN rồi hầu như không đổi trong buổi — đệm mô-đun 30 giây là đủ an toàn (không phải dữ liệu
+// chống gian lận; sai lệch tối đa 30 giây chỉ làm một vài con số hiển thị trễ nhịp đổi mốc, tự sửa khi đệm hết hạn).
+const demMocHienThi = new DemTTL<MocHienThi>(30_000, 2)
+/** Xoá đệm 30 giây của `docMocHienThi` — gọi sau khi THẦY đổi `hien_thi_tu`/`ve_dich_tu`/`bang_tin_tu` qua lệnh thật, hoặc khi test tự tay sửa các khoá này bằng SQL thô. */
+export function xoaDemMocHienThi(): void { demMocHienThi.xoa() }
+
 /**
- * MỘT hàm đọc mốc dùng chung ở máy chủ (thầy chốt 21/09 16:10): `cau_hinh.hien_thi_tu` ⇒ `cau_hinh.ve_dich_tu` ⇒ `cau_hinh.bang_tin_tu` ⇒ hằng `2026-09-21T05:00:00.000Z` (12:00 trưa 21/09 giờ VN). MỘT truy vấn `cau_hinh`;
- * lỗi đọc / thiếu bảng ⇒ mặc định (không ném). Nơi đã có sẵn truy vấn `cau_hinh` thì đọc ba khoá đó rồi gọi `giaiMocHienThi` thay vì gọi hàm này (đỡ một truy vấn).
+ * MỘT hàm đọc mốc dùng chung ở máy chủ (thầy chốt 21/09 16:10): `cau_hinh.hien_thi_tu` ⇒ `cau_hinh.ve_dich_tu` ⇒ `cau_hinh.bang_tin_tu` ⇒ hằng `2026-09-21T05:00:00.000Z` (12:00 trưa 21/09 giờ VN). MỘT truy vấn `cau_hinh`
+ * (đệm 30 giây, mức mô-đun); lỗi đọc / thiếu bảng ⇒ mặc định (không ném). Nơi đã có sẵn truy vấn `cau_hinh` thì đọc ba khoá đó rồi gọi `giaiMocHienThi` thay vì gọi hàm này (đỡ một truy vấn).
  */
 export async function docMocHienThi(env: { DB: { prepare(q: string): { bind(...a: unknown[]): { all<T>(): Promise<{ results?: T[] }> } } } }): Promise<MocHienThi> {
+  const now = Date.now()
+  const nong = demMocHienThi.doc('current', now)
+  if (nong) return nong
+  let ra: MocHienThi
   try {
     const r = await env.DB.prepare('SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN (?, ?, ?)').bind(KHOA_HIEN_THI_TU, KHOA_VE_DICH_TU, KHOA_MOC_BANG_TIN_NO).all<{ khoa?: unknown; gia_tri?: unknown }>()
     const c = new Map((r.results ?? []).map((x) => [String(x.khoa ?? ''), x.gia_tri]))
-    return giaiMocHienThi(c.get(KHOA_HIEN_THI_TU), c.get(KHOA_VE_DICH_TU), c.get(KHOA_MOC_BANG_TIN_NO))
+    ra = giaiMocHienThi(c.get(KHOA_HIEN_THI_TU), c.get(KHOA_VE_DICH_TU), c.get(KHOA_MOC_BANG_TIN_NO))
   } catch {
-    return giaiMocHienThi()
+    ra = giaiMocHienThi()
   }
+  demMocHienThi.ghi('current', now, ra)
+  return ra
 }
