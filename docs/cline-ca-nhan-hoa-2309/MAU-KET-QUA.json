@@ -1,0 +1,685 @@
+{
+  "specVersion": "CNH-1.0",
+  "note": "Kết quả chuẩn để kiểm code sản phẩm. Bộ kiểm bàn giao chỉ tự kiểm số học/định dạng, không chạy grading hay API sản phẩm.",
+  "vectors": [
+    {
+      "id": "V01",
+      "kind": "core",
+      "input": {
+        "paid": 136,
+        "raw": 136,
+        "achieved": true
+      },
+      "expected": {
+        "grant": 84,
+        "paidAfter": 220
+      }
+    },
+    {
+      "id": "V02",
+      "kind": "core",
+      "input": {
+        "paid": 190,
+        "raw": 190,
+        "achieved": true
+      },
+      "expected": {
+        "grant": 30,
+        "paidAfter": 220
+      }
+    },
+    {
+      "id": "V03",
+      "kind": "core",
+      "input": {
+        "paid": 220,
+        "raw": 300,
+        "achieved": true
+      },
+      "expected": {
+        "grant": 0,
+        "paidAfter": 220
+      }
+    },
+    {
+      "id": "V04",
+      "kind": "core",
+      "input": {
+        "paid": 10,
+        "raw": 18,
+        "achieved": false
+      },
+      "expected": {
+        "grant": 8,
+        "paidAfter": 18
+      }
+    },
+    {
+      "id": "V05",
+      "kind": "optional",
+      "input": {
+        "paid": 117,
+        "price": 10
+      },
+      "expected": {
+        "grant": 3,
+        "paidAfter": 120
+      }
+    },
+    {
+      "id": "V06",
+      "kind": "optional",
+      "input": {
+        "paid": 120,
+        "price": 20
+      },
+      "expected": {
+        "grant": 0,
+        "paidAfter": 120
+      }
+    },
+    {
+      "id": "V07",
+      "kind": "absorb",
+      "input": {
+        "state": "studied",
+        "wallet": 400,
+        "absorbed": 0,
+        "missingToMax": 10000
+      },
+      "expected": {
+        "take": 120,
+        "walletAfter": 280,
+        "absorbedAfter": 120
+      }
+    },
+    {
+      "id": "V08",
+      "kind": "absorb",
+      "input": {
+        "state": "achieved",
+        "wallet": 400,
+        "absorbed": 120,
+        "missingToMax": 10000
+      },
+      "expected": {
+        "take": 80,
+        "walletAfter": 320,
+        "absorbedAfter": 200
+      }
+    },
+    {
+      "id": "V09",
+      "kind": "absorb",
+      "input": {
+        "state": "achieved",
+        "wallet": 35,
+        "absorbed": 0,
+        "missingToMax": 10000
+      },
+      "expected": {
+        "take": 35,
+        "walletAfter": 0,
+        "absorbedAfter": 35
+      }
+    },
+    {
+      "id": "V10",
+      "kind": "absorb",
+      "input": {
+        "state": "none",
+        "wallet": 100000,
+        "absorbed": 0,
+        "missingToMax": 10000
+      },
+      "expected": {
+        "take": 0,
+        "walletAfter": 100000,
+        "absorbedAfter": 0
+      }
+    },
+    {
+      "id": "V11",
+      "kind": "absorb",
+      "input": {
+        "state": "achieved",
+        "wallet": 500,
+        "absorbed": 0,
+        "missingToMax": 0
+      },
+      "expected": {
+        "take": 0,
+        "walletAfter": 500,
+        "absorbedAfter": 0
+      }
+    },
+    {
+      "id": "V12",
+      "kind": "shield",
+      "input": {
+        "firstClaimed": false,
+        "level": 10,
+        "days": 20,
+        "fragments": 20,
+        "wallet": 700,
+        "unused": 0
+      },
+      "expected": {
+        "allowed": false,
+        "cost": 0,
+        "walletAfter": 700,
+        "fragmentsAfter": 20,
+        "unusedAfter": 0
+      }
+    },
+    {
+      "id": "V13",
+      "kind": "shield",
+      "input": {
+        "firstClaimed": false,
+        "level": 10,
+        "days": 21,
+        "fragments": 21,
+        "wallet": 700,
+        "unused": 0
+      },
+      "expected": {
+        "allowed": true,
+        "cost": 0,
+        "walletAfter": 700,
+        "fragmentsAfter": 0,
+        "unusedAfter": 1
+      }
+    },
+    {
+      "id": "V14",
+      "kind": "shield",
+      "input": {
+        "firstClaimed": true,
+        "level": 10,
+        "days": 42,
+        "fragments": 21,
+        "wallet": 700,
+        "unused": 1
+      },
+      "expected": {
+        "allowed": true,
+        "cost": 300,
+        "walletAfter": 400,
+        "fragmentsAfter": 0,
+        "unusedAfter": 2
+      }
+    },
+    {
+      "id": "V15",
+      "kind": "shield",
+      "input": {
+        "firstClaimed": true,
+        "level": 10,
+        "days": 42,
+        "fragments": 21,
+        "wallet": 699,
+        "unused": 1
+      },
+      "expected": {
+        "allowed": false,
+        "cost": 0,
+        "walletAfter": 699,
+        "fragmentsAfter": 21,
+        "unusedAfter": 1
+      }
+    },
+    {
+      "id": "V16",
+      "kind": "shield",
+      "input": {
+        "firstClaimed": true,
+        "level": 10,
+        "days": 126,
+        "fragments": 21,
+        "wallet": 700,
+        "unused": 5
+      },
+      "expected": {
+        "allowed": false,
+        "cost": 0,
+        "walletAfter": 700,
+        "fragmentsAfter": 21,
+        "unusedAfter": 5
+      }
+    },
+    {
+      "id": "V17",
+      "kind": "shield",
+      "input": {
+        "firstClaimed": false,
+        "level": 9,
+        "days": 21,
+        "fragments": 21,
+        "wallet": 700,
+        "unused": 0
+      },
+      "expected": {
+        "allowed": false,
+        "cost": 0,
+        "walletAfter": 700,
+        "fragmentsAfter": 21,
+        "unusedAfter": 0
+      }
+    },
+    {
+      "id": "V18",
+      "kind": "exchange",
+      "input": {
+        "wallet": 400,
+        "gold": 20,
+        "amount": 1
+      },
+      "expected": {
+        "allowed": false,
+        "walletAfter": 400,
+        "goldAfter": 20
+      }
+    },
+    {
+      "id": "V19",
+      "kind": "exchange",
+      "input": {
+        "wallet": 700,
+        "gold": 20,
+        "amount": 300
+      },
+      "expected": {
+        "allowed": true,
+        "walletAfter": 400,
+        "goldAfter": 320
+      }
+    },
+    {
+      "id": "V20",
+      "kind": "budget",
+      "input": {
+        "budget": 600,
+        "solve": 240,
+        "feedback": 60,
+        "available": 8
+      },
+      "expected": {
+        "count": 2,
+        "total": 600
+      }
+    },
+    {
+      "id": "V21",
+      "kind": "budget",
+      "input": {
+        "budget": 300,
+        "solve": 301,
+        "feedback": 76,
+        "available": 8
+      },
+      "expected": {
+        "count": 0,
+        "total": 0
+      }
+    },
+    {
+      "id": "V22",
+      "kind": "corePartII",
+      "input": {
+        "difficulty": 1,
+        "correct": 3,
+        "total": 4
+      },
+      "expected": {
+        "raw": 4
+      }
+    },
+    {
+      "id": "V23",
+      "kind": "corePartII",
+      "input": {
+        "difficulty": 2,
+        "correct": 4,
+        "total": 4
+      },
+      "expected": {
+        "raw": 8
+      }
+    },
+    {
+      "id": "V24",
+      "kind": "corePartII",
+      "input": {
+        "difficulty": 0,
+        "correct": 0,
+        "total": 4
+      },
+      "expected": {
+        "raw": 2
+      }
+    },
+    {
+      "id": "V25",
+      "kind": "simulation",
+      "input": {
+        "earnedEachAchievedDay": 220,
+        "days": 42
+      },
+      "expected": {
+        "level10Day": 12,
+        "firstShieldDay": 21,
+        "secondShieldDay": 42,
+        "walletDay12": 240,
+        "walletDay21": 420,
+        "walletDay42": 540
+      }
+    },
+    {
+      "id": "V26",
+      "kind": "simulation",
+      "input": {
+        "earnedEachAchievedDay": 260,
+        "days": 42
+      },
+      "expected": {
+        "level10Day": 12,
+        "firstShieldDay": 21,
+        "secondShieldDay": 42,
+        "walletDay12": 720,
+        "walletDay21": 1260,
+        "walletDay42": 2220
+      }
+    },
+    {
+      "id": "V27",
+      "kind": "simulation",
+      "input": {
+        "earnedEachAchievedDay": 340,
+        "days": 42
+      },
+      "expected": {
+        "level10Day": 12,
+        "firstShieldDay": 21,
+        "secondShieldDay": 42,
+        "walletDay12": 1680,
+        "walletDay21": 2940,
+        "walletDay42": 5580
+      }
+    },
+    {
+      "id": "V28",
+      "kind": "weekdaySchedule",
+      "input": {
+        "startWeekday": "Monday",
+        "studyWeekdays": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": {
+        "studyDay12Calendar": 16,
+        "studyDay21Calendar": 29,
+        "studyDay42Calendar": 58
+      }
+    },
+    {
+      "id": "V29",
+      "kind": "day",
+      "input": {
+        "acceptedAt": "2026-09-23T16:59:59.000Z"
+      },
+      "expected": {
+        "learningDay": "2026-09-23"
+      }
+    },
+    {
+      "id": "V30",
+      "kind": "day",
+      "input": {
+        "acceptedAt": "2026-09-23T17:00:00.000Z"
+      },
+      "expected": {
+        "learningDay": "2026-09-24"
+      }
+    },
+    {
+      "id": "V31",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-value-v1",
+        "key": "0.54",
+        "answer": "０，５４０"
+      },
+      "expected": {
+        "correct": true
+      }
+    },
+    {
+      "id": "V32",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-value-v1",
+        "key": "0.0025",
+        "answer": "2,5×10^-3"
+      },
+      "expected": {
+        "correct": true
+      }
+    },
+    {
+      "id": "V33",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-value-v1",
+        "key": "12",
+        "answer": "12abc"
+      },
+      "expected": {
+        "correct": false,
+        "error": "unsupported-format"
+      }
+    },
+    {
+      "id": "V34",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-value-v1",
+        "key": "1",
+        "answer": "1.0001"
+      },
+      "expected": {
+        "correct": false
+      }
+    },
+    {
+      "id": "V35",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-value-v1",
+        "key": "1",
+        "answer": "1.00009"
+      },
+      "expected": {
+        "correct": true
+      }
+    },
+    {
+      "id": "V36",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-unit-v1",
+        "key": "12",
+        "requiredUnit": "g/mol",
+        "allowedConversions": [],
+        "answer": "12 mol"
+      },
+      "expected": {
+        "correct": false
+      }
+    },
+    {
+      "id": "V37",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-unit-v1",
+        "key": "12",
+        "requiredUnit": "g/mol",
+        "allowedConversions": [],
+        "answer": "12 g/mol"
+      },
+      "expected": {
+        "correct": true
+      }
+    },
+    {
+      "id": "V38",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-value-v1",
+        "key": "0.5",
+        "allowFraction": true,
+        "answer": "1/2"
+      },
+      "expected": {
+        "correct": true
+      }
+    },
+    {
+      "id": "V39",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-value-v1",
+        "key": "0.5",
+        "allowFraction": true,
+        "answer": "1/0"
+      },
+      "expected": {
+        "correct": false,
+        "error": "unsupported-format"
+      }
+    },
+    {
+      "id": "V40",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-rounded-v1",
+        "key": "1.25",
+        "decimals": 1,
+        "answer": "1.3"
+      },
+      "expected": {
+        "correct": true
+      }
+    },
+    {
+      "id": "V41",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-rounded-v1",
+        "key": "-1.25",
+        "decimals": 1,
+        "answer": "-1.3"
+      },
+      "expected": {
+        "correct": true
+      }
+    },
+    {
+      "id": "V42",
+      "kind": "grading",
+      "input": {
+        "policy": "numeric-value-v1",
+        "key": "0.54",
+        "answer": "0,54."
+      },
+      "expected": {
+        "correct": true
+      }
+    },
+    {
+      "id": "V43",
+      "kind": "dayGoal",
+      "input": {
+        "role": "maintenance",
+        "n": 5,
+        "submitted": 5,
+        "independentCorrect": 4
+      },
+      "expected": {
+        "state": "achieved",
+        "minimumCorrect": 4
+      }
+    },
+    {
+      "id": "V44",
+      "kind": "dayGoal",
+      "input": {
+        "role": "maintenance",
+        "n": 5,
+        "submitted": 5,
+        "independentCorrect": 3
+      },
+      "expected": {
+        "state": "studied",
+        "minimumCorrect": 4
+      }
+    },
+    {
+      "id": "V45",
+      "kind": "dayGoal",
+      "input": {
+        "role": "consolidation",
+        "n": 5,
+        "submitted": 5,
+        "independentCorrect": 3,
+        "familyConditionMet": true
+      },
+      "expected": {
+        "state": "achieved",
+        "minimumCorrect": 3
+      }
+    },
+    {
+      "id": "V46",
+      "kind": "dayGoal",
+      "input": {
+        "role": "consolidation",
+        "n": 0,
+        "submitted": 0,
+        "independentCorrect": 0,
+        "familyConditionMet": true
+      },
+      "expected": {
+        "state": "none",
+        "minimumCorrect": 0
+      }
+    },
+    {
+      "id": "V47",
+      "kind": "confidence",
+      "input": {
+        "families": 4,
+        "days": 1
+      },
+      "expected": {
+        "value": 0.4
+      }
+    },
+    {
+      "id": "V48",
+      "kind": "confidence",
+      "input": {
+        "families": 5,
+        "days": 2
+      },
+      "expected": {
+        "value": 1
+      }
+    }
+  ]
+}
+

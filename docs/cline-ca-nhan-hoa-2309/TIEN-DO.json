@@ -1,0 +1,1174 @@
+{
+  "specVersion": "CNH-1.0",
+  "description": "Bộ bàn giao mới soạn; chưa triển khai CNH-1.0. PASS chỉ với bằng chứng thật.",
+  "preparedAt": "2026-09-23",
+  "inspectedCommit": "8b67a00",
+  "codeStatus": "NOT_RUN",
+  "deploymentStatus": "NOT_RUN",
+  "learningStatus": "NOT_RUN",
+  "phases": [
+    {
+      "id": "P00",
+      "dependsOn": [],
+      "status": "IN_PROGRESS",
+      "notes": "Đã tạo BASELINE.md, ROUTE-MAPPING.md, SCHEMA-MAPPING.md, tập dữ liệu tổng hợp (seed 23092026) và baseline kiểm thử. MỤC CHƯA LÀM: thử tải tổng hợp lấy CPU/query/payload/p95 đầu tiên — BLOCKED vì không có môi trường staging cùng vùng và 07 cấm bắn tải vào production. Chưa đọc được cờ/cấu hình production.",
+      "evidence": [
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/BASELINE.md",
+          "note": "baseline môi trường + kiểm thử + A01–A08"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/ROUTE-MAPPING.md",
+          "note": "bản đồ đường gọi thật"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/SCHEMA-MAPPING.md",
+          "note": "tên logic → bảng D1 thật"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/du-lieu-tong-hop.json",
+          "note": "hai em cùng lớp khác scope"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p00-vitest-fail-tests.txt",
+          "note": "82 test đỏ nền"
+        }
+      ]
+    },
+    {
+      "id": "P01",
+      "dependsOn": [
+        "P00"
+      ],
+      "status": "IN_PROGRESS",
+      "notes": "Đã làm: module policy có version (src/lib/cham-so-policy.ts) + runtime validation + bốn policy v1; lớp mỏng src/lib/cham-so.ts dùng lại; T33 PASS. CHƯA LÀM: snapshot đề lúc giao / đổi đáp án giữa lúc làm (T34) và correction (R04, chờ P07/P08) → chưa PASS R02/R03.",
+      "evidence": [
+        {
+          "path": "src/lib/cham-so-policy.ts",
+          "note": "policy có version + 4 policy v1"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01-vitest-full.log",
+          "note": "full suite sau thay đổi"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01-so-sanh-do.log",
+          "note": "0 test mới đỏ"
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "dependsOn": [
+        "P01"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "P03",
+      "dependsOn": [
+        "P02"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "P04",
+      "dependsOn": [
+        "P03"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "P05",
+      "dependsOn": [
+        "P04"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "P06",
+      "dependsOn": [
+        "P05"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "P07",
+      "dependsOn": [
+        "P06"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "P08",
+      "dependsOn": [
+        "P07"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "P09",
+      "dependsOn": [
+        "P08"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "P10",
+      "dependsOn": [
+        "P09"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "P11",
+      "dependsOn": [
+        "P10"
+      ],
+      "status": "NOT_RUN",
+      "notes": "",
+      "evidence": []
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R01",
+      "phase": "P00",
+      "level": "code",
+      "title": "Baseline và bản đồ tất cả đường gọi",
+      "tests": [
+        "T48"
+      ],
+      "status": "IN_PROGRESS",
+      "sourceRefs": [
+        "docs/cline-ca-nhan-hoa-2309/evidence/BASELINE.md",
+        "docs/cline-ca-nhan-hoa-2309/evidence/ROUTE-MAPPING.md"
+      ],
+      "notes": "Baseline và bản đồ đường gọi đã có; T48 chỉ kết luận ở P10 nên chưa PASS.",
+      "evidence": []
+    },
+    {
+      "id": "R02",
+      "phase": "P01",
+      "level": "code",
+      "title": "Hợp đồng có version, runtime validation, tham số thống nhất",
+      "tests": [
+        "T34",
+        "T40",
+        "T50"
+      ],
+      "status": "IN_PROGRESS",
+      "sourceRefs": [
+        "src/lib/cham-so-policy.ts"
+      ],
+      "notes": "Hợp đồng chấm có POLICY_VERSION + parseChamInput kiểm kiểu lúc chạy (ChamInputError). T34/T40/T50 chưa xong.",
+      "evidence": []
+    },
+    {
+      "id": "R03",
+      "phase": "P01",
+      "level": "code",
+      "title": "Chấm tương đương số và từng ý đúng chính sách",
+      "tests": [
+        "T19",
+        "T33"
+      ],
+      "status": "IN_PROGRESS",
+      "sourceRefs": [
+        "src/lib/cham-so-policy.ts",
+        "src/lib/cham-so.ts"
+      ],
+      "notes": "T33 PASS trên 12 vector MAU-KET-QUA + bảng adapter. T19 còn thiếu phần core raw=4 thuộc P07 nên chưa PASS.",
+      "evidence": []
+    },
+    {
+      "id": "R04",
+      "phase": "P07",
+      "level": "code",
+      "title": "Sửa điểm, hồ sơ và bù quyền đúng một lần",
+      "tests": [
+        "T20",
+        "T32"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R05",
+      "phase": "P02",
+      "level": "code",
+      "title": "Phạm vi cá nhân và toàn bộ kiến thức nền",
+      "tests": [
+        "T01",
+        "T02"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R06",
+      "phase": "P02",
+      "level": "code",
+      "title": "Chất lượng kho, bản sao và family trung thực",
+      "tests": [
+        "T03",
+        "T04",
+        "T40"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R07",
+      "phase": "P02",
+      "level": "code",
+      "title": "Bảo vệ đề/bản sao/cache và quyền công bố",
+      "tests": [
+        "T11",
+        "T12",
+        "T47"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R08",
+      "phase": "P03",
+      "level": "code",
+      "title": "Sổ học chuẩn, độc lập với thiết bị và nguồn",
+      "tests": [
+        "T14",
+        "T29",
+        "T32"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R09",
+      "phase": "P03",
+      "level": "code",
+      "title": "Năng lực theo mức/family/ngày, không theo cấp thú",
+      "tests": [
+        "T05",
+        "T06"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R10",
+      "phase": "P03",
+      "level": "code",
+      "title": "Đợt cần dạy lại có đường phục hồi",
+      "tests": [
+        "T06",
+        "T17"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R11",
+      "phase": "P04",
+      "level": "code",
+      "title": "FSRS-6 state đủ, một quan sát độc lập/ngày",
+      "tests": [
+        "T29",
+        "T41"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R12",
+      "phase": "P04",
+      "level": "code",
+      "title": "Lặp có mục đích và không thưởng lại lỗi cũ",
+      "tests": [
+        "T04",
+        "T07",
+        "T17",
+        "T41"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R13",
+      "phase": "P05",
+      "level": "code",
+      "title": "Ngân sách thời gian gồm phản hồi, không sàn số câu",
+      "tests": [
+        "T08",
+        "T09"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R14",
+      "phase": "P05",
+      "level": "code",
+      "title": "Một kế hoạch ngày, mục tiêu không tăng ngầm",
+      "tests": [
+        "T13",
+        "T27",
+        "T40"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R15",
+      "phase": "P05",
+      "level": "code",
+      "title": "Đạt/có học/chưa học theo rubric đã chốt",
+      "tests": [
+        "T07",
+        "T22",
+        "T40"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R16",
+      "phase": "P05",
+      "level": "code",
+      "title": "Bộ chọn tất định, fallback không nới quyền/mức",
+      "tests": [
+        "T10",
+        "T12",
+        "T42"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R17",
+      "phase": "P05",
+      "level": "code",
+      "title": "Giữ chỗ, resume và nộp qua hai client",
+      "tests": [
+        "T13",
+        "T28",
+        "T43"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R18",
+      "phase": "P06",
+      "level": "code",
+      "title": "Mọi kênh và cờ lùi đang chạy được nối",
+      "tests": [
+        "T42"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R19",
+      "phase": "P06",
+      "level": "code",
+      "title": "Ngoại lệ bài thầy giao/thi thật không mở kho tự động",
+      "tests": [
+        "T01",
+        "T02",
+        "T42"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R20",
+      "phase": "P06",
+      "level": "code",
+      "title": "Đoàn theo cá nhân, hạn mềm, không phạt timeout như sai",
+      "tests": [
+        "T38"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R21",
+      "phase": "P06",
+      "level": "code",
+      "title": "Trợ giúp qua server, không giả bằng chứng độc lập",
+      "tests": [
+        "T29",
+        "T39"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R22",
+      "phase": "P07",
+      "level": "code",
+      "title": "Quỹ core tới tổng220, giá từng loại rõ",
+      "tests": [
+        "T15",
+        "T16",
+        "T19"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R23",
+      "phase": "P07",
+      "level": "code",
+      "title": "Optional120, một purpose, chống cày liên màn",
+      "tests": [
+        "T16",
+        "T17",
+        "T18",
+        "T39"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R24",
+      "phase": "P07",
+      "level": "code",
+      "title": "Ledger/ví/caps/receipt nguyên tử và retry an toàn",
+      "tests": [
+        "T14",
+        "T15",
+        "T28",
+        "T43"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R25",
+      "phase": "P07",
+      "level": "code",
+      "title": "Ngày VN, sự kiện muộn và embargo",
+      "tests": [
+        "T27",
+        "T47"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R26",
+      "phase": "P08",
+      "level": "code",
+      "title": "Hấp thụ200/120/0, cấp10 sớm nhất ngày12",
+      "tests": [
+        "T21",
+        "T22"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R27",
+      "phase": "P08",
+      "level": "code",
+      "title": "Một quyền khiên mỗi21mảnh, first từ21ngày",
+      "tests": [
+        "T23",
+        "T24",
+        "T25"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R28",
+      "phase": "P08",
+      "level": "code",
+      "title": "Dự trữ400, rèn300, đổi vàng/mua nguyên tử",
+      "tests": [
+        "T25",
+        "T26"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R29",
+      "phase": "P08",
+      "level": "code",
+      "title": "Không phạt vắng bằng mất tài sản, giữ kho cũ",
+      "tests": [
+        "T30",
+        "T31"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R30",
+      "phase": "P08",
+      "level": "code",
+      "title": "Migration mọi nhánh legacy, rerun và CAS",
+      "tests": [
+        "T31",
+        "T45"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R31",
+      "phase": "P10",
+      "level": "code",
+      "title": "Snapshot/correction bằng full replay",
+      "tests": [
+        "T32",
+        "T41"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R32",
+      "phase": "P09",
+      "level": "code",
+      "title": "Trải nghiệm ba app, quay lại, tuần và nhắc có điều kiện",
+      "tests": [
+        "T30",
+        "T46"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R33",
+      "phase": "P09",
+      "level": "code",
+      "title": "Nút gọi lên bảng, không timer tự gọi",
+      "tests": [
+        "T35"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R34",
+      "phase": "P09",
+      "level": "code",
+      "title": "Giao diện không tràn trên ba app",
+      "tests": [
+        "T36"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R35",
+      "phase": "P09",
+      "level": "code",
+      "title": "Ca/API server chung, cấu hình production hợp lệ",
+      "tests": [
+        "T13",
+        "T48"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R36",
+      "phase": "P10",
+      "level": "code",
+      "title": "Hiệu năng có số đo và không đổi tính đúng",
+      "tests": [
+        "T44"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R37",
+      "phase": "P10",
+      "level": "code",
+      "title": "Restore và rollback tương thích bảo toàn giao dịch",
+      "tests": [
+        "T45"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R38",
+      "phase": "P10",
+      "level": "code",
+      "title": "Tích hợp, build, typecheck và kiểm thử không bỏ sót",
+      "tests": [
+        "T42",
+        "T48",
+        "T50"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R39",
+      "phase": "P11",
+      "level": "deployment",
+      "title": "Mở/nộp ca trên hai thiết bị và mạng khác thật",
+      "tests": [
+        "T37"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R40",
+      "phase": "P11",
+      "level": "deployment",
+      "title": "Version triển khai và dữ liệu cũ đối chiếu thật",
+      "tests": [
+        "T31",
+        "T45"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R41",
+      "phase": "P11",
+      "level": "deployment",
+      "title": "Ba app, hiệu năng/canary/rollback bản phát hành đã xác minh",
+      "tests": [
+        "T37",
+        "T44",
+        "T46"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    },
+    {
+      "id": "R42",
+      "phase": "P11",
+      "level": "learning",
+      "title": "Hiệu quả học tập được đánh giá đúng dữ liệu và giới hạn",
+      "tests": [
+        "T49"
+      ],
+      "status": "NOT_RUN",
+      "sourceRefs": [],
+      "notes": "",
+      "evidence": []
+    }
+  ],
+  "tests": [
+    {
+      "id": "T01",
+      "phase": "P02",
+      "level": "code",
+      "title": "Phạm vi từng em",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T02",
+      "phase": "P02",
+      "level": "code",
+      "title": "Đủ tất cả nền",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T03",
+      "phase": "P02",
+      "level": "code",
+      "title": "Kho thiếu nhãn/thu hồi",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T04",
+      "phase": "P04",
+      "level": "code",
+      "title": "Bản sao và family",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T05",
+      "phase": "P03",
+      "level": "code",
+      "title": "Không nhảy bậc từ câu dễ",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T06",
+      "phase": "P03",
+      "level": "code",
+      "title": "Phục hồi sau ba lỗi",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T07",
+      "phase": "P05",
+      "level": "code",
+      "title": "Ôn duy trì được đạt",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T08",
+      "phase": "P05",
+      "level": "code",
+      "title": "600 giây không thành 32 phút",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T09",
+      "phase": "P06",
+      "level": "code",
+      "title": "Game dùng phần còn lại",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T10",
+      "phase": "P05",
+      "level": "code",
+      "title": "Fallback không tăng khó",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T11",
+      "phase": "P02",
+      "level": "code",
+      "title": "Bảo vệ bản sao BTVN",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T12",
+      "phase": "P05",
+      "level": "code",
+      "title": "Cache cũ",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T13",
+      "phase": "P05",
+      "level": "code",
+      "title": "Hai app đồng thời",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T14",
+      "phase": "P07",
+      "level": "code",
+      "title": "Idempotency ngữ nghĩa",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T15",
+      "phase": "P07",
+      "level": "code",
+      "title": "Bù core đồng thời",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T16",
+      "phase": "P07",
+      "level": "code",
+      "title": "Trần hai quỹ",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T17",
+      "phase": "P07",
+      "level": "code",
+      "title": "Không thưởng vì lỗi cũ",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T18",
+      "phase": "P07",
+      "level": "code",
+      "title": "Một purpose",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T19",
+      "phase": "P01",
+      "level": "code",
+      "title": "Phần II từng ý",
+      "status": "IN_PROGRESS",
+      "evidence": []
+    },
+    {
+      "id": "T20",
+      "phase": "P07",
+      "level": "code",
+      "title": "Sửa đáp án",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T21",
+      "phase": "P08",
+      "level": "code",
+      "title": "Cấp 10 không sớm",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T22",
+      "phase": "P08",
+      "level": "code",
+      "title": "Studied rồi achieved",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T23",
+      "phase": "P08",
+      "level": "code",
+      "title": "Mốc 21 ngày",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T24",
+      "phase": "P08",
+      "level": "code",
+      "title": "Quà và rèn cùng quyền",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T25",
+      "phase": "P08",
+      "level": "code",
+      "title": "Khiên tiếp theo",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T26",
+      "phase": "P08",
+      "level": "code",
+      "title": "Dự trữ và loại tiền",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T27",
+      "phase": "P07",
+      "level": "code",
+      "title": "0 giờ và sự kiện muộn",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T28",
+      "phase": "P07",
+      "level": "code",
+      "title": "Mất mạng sau commit",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T29",
+      "phase": "P03",
+      "level": "code",
+      "title": "Gợi ý qua màn khác",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T30",
+      "phase": "P09",
+      "level": "code",
+      "title": "Quay lại không mất tài sản",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T31",
+      "phase": "P08",
+      "level": "code",
+      "title": "Migration đầy đủ các nhánh",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T32",
+      "phase": "P03",
+      "level": "code",
+      "title": "Replay và correction",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T33",
+      "phase": "P01",
+      "level": "code",
+      "title": "Số/đơn vị/biên chấm",
+      "status": "PASS",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-cham-so-policy.test.ts tests/cham-so-2109.test.ts tests/cham-tai-cho-dung-luat-2109.test.ts tests/dau-tru-phan-ba-1009.test.ts tests/o-nhap-dap-so-cac-noi-2109.test.tsx",
+          "executedAt": "2026-09-23T09:44:18.064Z",
+          "exitCode": 0,
+          "sourceFingerprint": "29b2552bc23cf3cc2ac37167d6f92a102b7bff6906d5e5e8933e8f1e928fe5ec",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01-vitest-cham-so.log",
+              "sha256": "64c51714675e01a9a85a4794d787a7c0fa189846b56a6fe072913395cabc220a"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "T34",
+      "phase": "P01",
+      "level": "code",
+      "title": "Snapshot và version",
+      "status": "IN_PROGRESS",
+      "evidence": []
+    },
+    {
+      "id": "T35",
+      "phase": "P09",
+      "level": "code",
+      "title": "Gọi lên bảng thủ công",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T36",
+      "phase": "P09",
+      "level": "code",
+      "title": "Không tràn ba app",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T37",
+      "phase": "P11",
+      "level": "deployment",
+      "title": "Ca thi mạng khác",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T38",
+      "phase": "P06",
+      "level": "code",
+      "title": "Đoàn vừa mức/vừa thời gian",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T39",
+      "phase": "P07",
+      "level": "code",
+      "title": "Giúp bạn và farm nhiều màn",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T40",
+      "phase": "P05",
+      "level": "code",
+      "title": "Kho nhỏ/mục tiêu không tăng",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T41",
+      "phase": "P04",
+      "level": "code",
+      "title": "FSRS ngày/card",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T42",
+      "phase": "P06",
+      "level": "code",
+      "title": "Không sót đường gọi",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T43",
+      "phase": "P07",
+      "level": "code",
+      "title": "D1 thất bại từng bước",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T44",
+      "phase": "P10",
+      "level": "code",
+      "title": "Tải và chi phí",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T45",
+      "phase": "P10",
+      "level": "code",
+      "title": "Restore/rollback",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T46",
+      "phase": "P09",
+      "level": "code",
+      "title": "Động lực có công học",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T47",
+      "phase": "P07",
+      "level": "code",
+      "title": "Không lộ điểm trước công bố",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T48",
+      "phase": "P10",
+      "level": "code",
+      "title": "Toàn dự án và cấu hình",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T49",
+      "phase": "P11",
+      "level": "learning",
+      "title": "Đánh giá học tập thật",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "T50",
+      "phase": "P10",
+      "level": "code",
+      "title": "Version và phương án chưa bật",
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  ]
+}

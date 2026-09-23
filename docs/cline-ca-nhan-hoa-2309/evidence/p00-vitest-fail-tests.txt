@@ -1,0 +1,82 @@
+tests/bang-tin-san-chong-chu-trinh-duyet-2109.test.ts > Bảng tin sàn trong Chromium thật — không chồng chữ, không cắt chữ > 1280×800 trong vỏ app, giao diện sang: 0 cặp chữ giao nhau, 0 chữ bị cắt, không cuộn dọc
+tests/bo-nao-doc-2109.test.ts > THẬT: on_som kéo mốc ôn SỚM hơn (chỉ sớm, không muộn), công tắc dừng NGAY > câu vừa sai của dạng on_som có mốc ở tương lai ⇒ vào hàng ôn từ "ngày mai" của đêm điều chỉnh; dạng khác / mốc đã tới / hồ sơ nguồn KHÔNG đổi
+tests/bo-nao-doc-2109.test.ts > THẬT: on_som kéo mốc ôn SỚM hơn (chỉ sớm, không muộn), công tắc dừng NGAY > THẬT theo LỚP: chỉ lớp trong lopThat có hiệu lực (lớp ghi ở thẻ ngày)
+tests/btvn-ui-1609.test.tsx > thư mục ca gọn theo năm sinh, không bỏ tick khi đóng mở
+tests/btvn-va-khong-apps-script-1209.test.ts > BTVN — ba luật chốt cứng ở MÁY CHỦ > LUẬT 2 — trả NGUYÊN gói đề, không xáo không lọc
+tests/btvn-va-khong-apps-script-1209.test.ts > BTVN — ba luật chốt cứng ở MÁY CHỦ > CHẶN QUÁ HẠN Ở MÁY CHỦ — cả lúc mở lẫn lúc nộp
+tests/btvn-va-khong-apps-script-1209.test.ts > BTVN — ba luật chốt cứng ở MÁY CHỦ > nộp rồi thì nộp lại KHÔNG ghi đè — khoá nằm trong WHERE
+tests/btvn-va-khong-apps-script-1209.test.ts > BTVN — ba luật chốt cứng ở MÁY CHỦ > theo dõi kê TÊN em chưa nộp, không chỉ đếm số
+tests/cat-google-1209.test.ts > cắt Google khỏi app > postJson gửi vào cổng /goi của máy chủ mới, không nhận địa chỉ từ chỗ gọi
+tests/cau-da-lam-2109.test.ts > /hs/ke-hoach-ngay: thêm soCauHienThi, giữ daLamCau (luật) > đọc tổng hợp (tiến bộ + hiển thị + giây) lỗi ⇒ kế hoạch VẪN dựng, về 0/vắng khoá thay vì ném lỗi (không bịa số)
+tests/chon-luot-2109.test.ts > MỐC 4 — KHÔNG LƯỢT RỖNG khi kho còn câu; thang nới > kho NHỎ (7–20 câu) và em đã làm gần hết: vẫn trả đủ min(6, kho) câu, KHÔNG rỗng (thang nới: bậc + 1 → câu sai hôm nay cũng được lấy lại khi hết câu khác)
+tests/chon-luot-2109.test.ts > MÔ PHỎNG 60 em giả × 7 ngày × 3–6 lượt: không lượt rỗng, tỉ lệ câu lặp thấp, không lặp trong ngày > kho 330 câu: mọi lượt đủ 6 câu; câu lặp trong 7 ngày < 30 % (kho giả nhỏ); không nhóm nào lặp trong cùng một ngày; câu sai hôm nay không quay lại hôm nay
+tests/chon-luot-2109.test.ts > ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: "đúng luật cá nhân hoá, nâng đỡ, chặn lặp") > loại "khoi_dong": 30 em × 7 ngày × 4 chặng — mỗi chặng đủ 6 câu, KHÔNG Phần II, không nhóm nào lặp trong ngày, bậc ≤ bậc em + 1, câu chưa gặp ≥ 3 khi kho còn nhiều, chỉ Phần I
+tests/chon-luot-2109.test.ts > ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: "đúng luật cá nhân hoá, nâng đỡ, chặn lặp") > KHÔNG lượt rỗng khi kho Đoàn thu hẹp còn ít câu (7–20 câu Phần I/III): trả đủ min(6, số câu ĐỦ BẬC) — Đoàn chỉ báo "chưa có câu vừa sức" khi kho thật sự chỉ còn câu quá bậc
+tests/danh-dau-cau-hoi-lai.test.ts > gói hai bản đồ trong một ô > MÁY CHỦ CHƯA CẬP NHẬT VẪN CHẠY ĐÚNG — hai bản đồ gửi ở HAI trường riêng
+tests/dau-truong-chan-ly.test.ts > bộ quân cờ > sáu hệ đều có đủ bốn bậc giá — không hệ nào bị bỏ đói
+tests/dau-truong-chan-ly.test.ts > giao tranh > nhật ký ghi lại được và có nêu loại tương khắc
+tests/dieu-7-cau-dung-may-chu-2109.test.ts > kế hoạch ngày: `tienBo.thieuDat` (chỉ khi thiếu câu ĐÚNG, từ 22/09) > 22/09: chưa đúng câu nào ⇒ soCauDung = ceil(tối thiểu/2) kèm câu chữ có số thật; đúng đủ ⇒ trường biến mất
+tests/dong-bo-kho-sang-may-em-1409.test.ts > Modal khắc phục nối đúng đường > đang xin kho thì nói ra, không hiện 0 câu rồi nhảy số
+tests/giao-btvn-tung-hoc-sinh-1309.test.ts > GIAO BTVN CHO TỪNG HỌC SINH > PhanCongScreen có 2 chế độ: Theo ca kiểm tra và Cho từng học sinh
+tests/giao-btvn-tung-hoc-sinh-1309.test.ts > GIAO BTVN CHO TỪNG HỌC SINH > PhanCongScreen ẩn chọn ca thi khi ở chế độ giao cho từng học sinh
+tests/giao-btvn-tung-hoc-sinh-1309.test.ts > GIAO BTVN CHO TỪNG HỌC SINH > PhanCongScreen hiển thị ô danh sách học sinh có ô tick và tìm kiếm
+tests/giao-btvn-tung-hoc-sinh-1309.test.ts > GIAO BTVN CHO TỪNG HỌC SINH > giaoBtvn ở client thư viện hỗ trợ dsSbd và cho phép ca rỗng
+tests/giao-btvn-tung-hoc-sinh-1309.test.ts > GIAO BTVN CHO TỪNG HỌC SINH > Server và Client BTVN hỗ trợ nộp lại tối đa 3 lần
+tests/hang-nhom-de-1209.test.ts > DÙNG CHUNG HAI MÀN > cả Mở ca và Phân công đều dùng đúng hàng này
+tests/hom-nay-2109.test.tsx > HomNayCu = màn Hôm nay BẢN 2, nay là bản DỰ PHÒNG khi máy chủ chưa có /gv/bang-tin (thầy lệnh 21/09, sửa CÓ CHỦ Ý các chuỗi của bản 1) > CÓ DỮ LIỆU: mỗi số trên thẻ truy được về một trường của lệnh; danh sách em, dạng yếu, Đoàn Hộ Tống; chữ theo CHUẨN TỪ NGỮ
+tests/ios-pwa-chuyen-man.test.ts > Sửa triệt để lỗi iOS thêm vào màn hình chính bị nhảy vào app giáo viên > manifest học sinh có start_url trỏ tới cổng học sinh
+tests/ios-pwa-chuyen-man.test.ts > Sửa triệt để lỗi iOS thêm vào màn hình chính bị nhảy vào app giáo viên > manifest phụ huynh có start_url trỏ tới cổng phụ huynh
+tests/kenh4-than-thu-1909.test.ts > K4.1 readScope: bằng chứng từ hồ sơ (nguồn ≠ thi, ≠ game) > chưa có bảng hồ sơ / sổ (fixture cũ, migration chưa chạy): không ném lỗi, evidence như trước
+tests/khac-phuc-khong-co-cau-sai-1509.test.tsx > 0 câu sai — modal nói thẳng là rỗng, không có nút nào bấm được > không vẽ thẻ "Làm lại các câu sai" và không có nút "Bắt đầu làm bài"
+tests/khac-phuc-khong-co-cau-sai-1509.test.tsx > 0 câu sai — modal nói thẳng là rỗng, không có nút nào bấm được > nói đúng lý do: không có câu nào cần khắc phục, KHÔNG đổ cho kho đề
+tests/khac-phuc-khong-co-cau-sai-1509.test.tsx > 0 câu sai — modal nói thẳng là rỗng, không có nút nào bấm được > vẫn còn đúng một nút Đóng để thoát
+tests/khac-phuc-khong-co-cau-sai-1509.test.tsx > Cổng chặn nút "Bắt đầu làm bài" phủ CẢ BA chế độ > dùng chung một con số `soCauSeRut` cho cả hai nút
+tests/khac-phuc-tren-dien-thoai-1409.test.ts > LỖI 2 — máy học sinh không có kho đề > modal mặc định vào chế độ 1, chỉ nâng lên 2 khi kho thật sự có đề
+tests/khac-phuc-tren-dien-thoai-1409.test.ts > LỖI 2 — máy học sinh không có kho đề > khoá thẻ 2 và thẻ 3 khi kho rỗng và nói rõ vì sao
+tests/khong-dung-bien-truoc-khi-khai.test.ts > Không đọc biến trước khi khai báo > KHÔNG có chỗ vi phạm nào ngoài danh sách đã rà soát
+tests/luyen-dang-bai-1509.test.ts > Mục 4 — Luyện dạng bài trên màn hình > có đủ bốn chế độ, mặc định vẫn là chế độ 1
+tests/luyen-dang-bai-1509.test.ts > Mục 4 — Luyện dạng bài trên màn hình > thẻ 4 KHÔNG khoá theo kho câu-sai — em không sai câu nào vẫn luyện được
+tests/luyen-dang-bai-1509.test.ts > Mục 4 — Luyện dạng bài trên màn hình > kho rỗng KHÔNG còn là lý do cảnh báo của chế độ 4
+tests/luyen-dang-bai-1509.test.ts > Mục 4 — Luyện dạng bài trên màn hình > số câu trên thanh trượt đếm SAU cửa nạp, không lấy so_cau trong gói
+tests/luyen-dang-bai-1509.test.ts > Mục 4 — đồng bộ mọi chỗ mô tả các chế độ > cổng phụ huynh nói 4 phương pháp, không còn 3
+tests/luyen-khac-phuc.test.tsx > khối đứng ở màn Ca thi > ĐƯỢC GẮN Ở MÀN CA THI, không phải trong chi tiết từng ca
+tests/nop-bai-khong-treo-1009.test.ts > MỌI NHỊP GỌI MẠNG TRONG CA đều phải có chốt và lệch pha > nhịp HỎI ĐÁP ÁN sau khi nộp: có chốt `dangHoi` và lệch pha
+tests/nop-phieu-khac-phuc.test.ts > trang phiếu > CHỌN DỞ RỒI ĐÓNG MÁY vẫn còn — lưu theo mã phiếu KÈM vân tay bộ câu
+tests/nop-phieu-khac-phuc.test.ts > nộp xong mới hiện lời giải (thầy chốt 08/09) > ĐANG CHỌN thì nhìn thấy được, và đã chấm rồi thì khoá tay
+tests/parent-news-d1-1909.test.ts > Kênh 5 trên D1 thật: chọn câu cho bài hằng ngày > câu tới hạn đứng đầu, rồi câu MỚI cùng dạng yếu; đúng lớp; không lọt đề chưa công bố; id là qid thật; có đáp án cho Mom
+tests/parent-news-d1-1909.test.ts > Kênh 5 trên D1 thật: chọn câu cho bài hằng ngày > em mới chưa có hồ sơ: bài vẫn đủ câu từ kho, chỉ đúng lớp của em (lỗi cũ: kho luôn rỗng vì đọc sai tên trường)
+tests/ten-than-thu-1609.test.ts > tên sáu thần thú > đủ sáu con, mỗi hệ đúng một con
+tests/ten-than-thu-1609.test.ts > tên sáu thần thú > TÊN mang CẢ HAI nửa: một thuật ngữ Hoá và một tên thần thú
+tests/ten-than-thu-1609.test.ts > tên sáu thần thú > DANH HIỆU mang một CÔNG THỨC THẬT, không phải chữ kêu suông
+tests/ten-than-thu-1609.test.ts > tên sáu thần thú > không con nào trùng tên hay trùng danh hiệu con nào
+tests/ten-than-thu-1609.test.ts > tên sáu thần thú > CHIÊU TỐI THƯỢNG đúng sáu tên trong ảnh thầy gửi
+tests/ten-than-thu-1609.test.ts > tên sáu thần thú > kỹ năng thường cũng là một quá trình Hoá, không phải chữ fantasy trơn
+tests/ten-than-thu-1609.test.ts > tên sáu bậc tiến hoá > từ bậc 2 trở lên, bậc nào cũng nêu được THẦN THÚ của nó
+tests/ten-than-thu-1609.test.ts > âm chưởng tối thượng — sáu hệ sáu tiếng, và chỉ kêu đúng lúc > mỗi nhánh nêu đúng tên chiêu của nó trong chú thích — đọc mã là biết tiếng nào
+tests/than-thu-3d.test.ts > Mô hình 3D theo 12 hình thái > cấp nào cũng dựng được, cho cả sáu thần thú
+tests/than-thu-3d.test.ts > Mô hình 3D theo 12 hình thái > màu thân lấy đúng từ thần thú, mỗi hệ một màu
+tests/than-thu-3d.test.ts > Chiêu thức bay ra thật > mỗi hệ một hình dạng đạn — sáu hệ không được giống nhau
+tests/than-thu-chon-mot-lan.test.tsx > Hồ sơ: rỗng nghĩa là chưa chọn > hồ sơ cũ đã có thần thú thì giữ nguyên, không bắt chọn lại
+tests/than-thu-chon-mot-lan.test.tsx > Màn chọn lần đầu > bày đủ sáu con, mỗi con nói rõ khắc ai và bị ai khắc
+tests/than-thu-chon-mot-lan.test.tsx > Màn chọn lần đầu > bấm chọn thì vào game, và hồ sơ ghi lại mốc chọn
+tests/than-thu-chon-mot-lan.test.tsx > Chọn rồi thì KHÔNG đổi được > màn hình nói rõ hệ nào khắc em, hệ nào em khắc
+tests/than-thu-dong-bo-cap-do.test.ts > Những gì đã đúng thì phải giữ nguyên > bên nào đã chốt thần thú thì giữ — chọn một lần, không đổi
+tests/than-thu-dong-bo-hien-ra.test.tsx > Chưa chọn thú: KHÔNG bày nút chọn khi chưa hỏi xong máy chủ > đang hỏi máy chủ thì hiện màn chờ, KHÔNG hiện nút chọn
+tests/than-thu-dong-bo-hien-ra.test.tsx > Hỏi xong mà máy chủ không có thú thì phải NÓI RA > máy chủ CÓ thú thì không hiện câu ấy — vì màn chọn biến mất luôn
+tests/than-thu-dong-bo-man.test.tsx > Nuốt bản máy chủ khi mở game > máy chủ chưa có gì thì giữ nguyên bản trong máy
+tests/than-thu-dong-bo.test.ts > Thần thú đã chọn không bị xoá > máy chủ thắng nhưng chưa chọn thú thì lấy thú của máy này
+tests/than-thu-dong-bo.test.ts > Thần thú đã chọn không bị xoá > máy này chưa chọn, máy chủ đã chọn thì nuốt thú của máy chủ
+tests/than-thu-hinh-thai.test.ts > kinh nghiệm > BẢNG NGUỒN EXP phải khớp đúng con số trong mã — không hứa suông
+tests/than-thu-hinh-thai.test.ts > tương khắc nguyên tố — không còn là mã chết > cặp khắc chế phải có phản ứng thật đỡ lưng
+tests/than-thu-hinh-thai.test.ts > tương khắc nguyên tố — không còn là mã chết > bị khắc thì yếu đi, cùng hệ thì hoà, không quan hệ thì trung tính
+tests/than-thu-sau-he.test.ts > Bảng khắc chế sáu hệ > đúng sáu hệ, tên đủ cả hai kiểu
+tests/than-thu-sau-he.test.ts > Bảng khắc chế sáu hệ > mọi cặp đều nêu được phản ứng thật làm bằng chứng
+tests/than-thu-sau-he.test.ts > Bảng khắc chế sáu hệ > thắng + thua + trung tính luôn bằng đúng 5 đối thủ
+tests/than-thu-sau-he.test.ts > Cân bằng — đo, không nói miệng > bảng thô LỆCH — ghi lại để không ai tưởng nó cân sẵn
+tests/than-thu-sau-he.test.ts > Cân bằng — đo, không nói miệng > hệ khắc được nhiều thì chỉ số gốc phải thấp hơn
+tests/than-thu-sau-he.test.ts > Cân bằng — đo, không nói miệng > lực chiến thật sự đổi theo hệ
+tests/than-thu-sau-he.test.ts > Sáu thần thú > đúng sáu con, mỗi hệ đúng một con
+tests/than-thu-sau-he.test.ts > Sáu thần thú > id trong bản ghi khớp khoá, và màu chỉ dùng rgb
+tests/tu-ngu-cum8-2109.test.ts > cụm 8 · "Máy" làm chủ ngữ tự động ⇒ "A.I Đỗ Đại Học" > src/screens/StudentPortalScreen.tsx: có "để A.I Đỗ Đại Học chấm điểm ngay", hết "để máy chấm điểm ngay"
+tests/vao-thi-may-chu-moi-1109.test.ts > KHÔNG CÒN ĐƯỜNG LÙI — hỏng phải nói thành lời > KHÔNG CÓ ĐỊA CHỈ Ở ĐÂU CẢ ⇒ nói thẳng, không gọi đi đâu hết
+tests/vao-thi-may-chu-moi-1109.test.ts > KHÔNG CÒN ĐƯỜNG LÙI — hỏng phải nói thành lời > địa chỉ trỏ VỀ GOOGLE ⇒ bị chặn cứng, không một byte nào chạm Apps Script

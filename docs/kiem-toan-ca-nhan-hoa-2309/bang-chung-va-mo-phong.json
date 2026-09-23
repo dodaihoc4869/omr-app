@@ -1,0 +1,236 @@
+{
+  "scope": "Pure-function synthetic audit and hypothetical economy only; no production data or writes.",
+  "sourceCommit": "539cd99",
+  "findings": [
+    {
+      "id": "A01",
+      "case": "10 minutes, observed 240 seconds/question",
+      "targetQuestions": 8,
+      "targetMinutes": 32,
+      "minimumMinutes": 16
+    },
+    {
+      "id": "A02",
+      "case": "Recovered question is due; three historic errors versus two",
+      "selectedWithThreeErrors": 0,
+      "selectedWithTwoErrors": 1
+    },
+    {
+      "id": "A03",
+      "case": "Four distinct correct easy questions; same academic day",
+      "academicLevel": 2,
+      "gameLevel": 0
+    },
+    {
+      "id": "A04",
+      "case": "One old error, correct on two following days",
+      "promotionYesterday": [
+        "Q"
+      ],
+      "promotionToday": [
+        "Q"
+      ],
+      "expPerPromotion": 6
+    },
+    {
+      "id": "A05",
+      "case": "Parent selector, weak skill at level 0; only level 1 fallback exists",
+      "picked": [
+        {
+          "qid": "H",
+          "nguon": "bu_kho"
+        }
+      ]
+    },
+    {
+      "id": "A06",
+      "case": "Day 21, level 10, 21 fragments, wallet 700",
+      "beforeForge": 1,
+      "afterForge": 2,
+      "walletAfter": 400
+    },
+    {
+      "id": "A07",
+      "case": "Four mandatory questions, three due reviews, six-question optional game",
+      "budget": 8,
+      "displayedQuestions": 13,
+      "tasks": [
+        {
+          "type": "mom",
+          "count": 4,
+          "required": true
+        },
+        {
+          "type": "on_lai",
+          "count": 3,
+          "required": false
+        },
+        {
+          "type": "than_thu",
+          "count": 6,
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "A08",
+      "case": "Eight correct answers, due item has never been wrong; maintenance recall is not lenBac",
+      "missing": [
+        "chua_len_bac"
+      ]
+    }
+  ],
+  "currentLevelCurve": {
+    "xpTo10": 2400,
+    "earliestActiveDaysAt200": 12,
+    "xpTo120": 238200
+  },
+  "optionalProposedLevelCurve": {
+    "formulaFromLevel10": "10 * round((450 + 3.5 * (level - 10)) / 10)",
+    "xpTo120": 72900,
+    "earliestActiveDaysAt200": 365,
+    "costLevel10": 450,
+    "costLevel119": 830
+  },
+  "proposedEconomy": [
+    {
+      "name": "Core daily",
+      "dailyXP": 220,
+      "level10CalendarDay": 12,
+      "grants": [
+        {
+          "calendarDay": 21,
+          "activeDay": 21,
+          "cost": 0
+        },
+        {
+          "calendarDay": 42,
+          "activeDay": 42,
+          "cost": 300
+        },
+        {
+          "calendarDay": 63,
+          "activeDay": 63,
+          "cost": 300
+        }
+      ],
+      "checkpoints": [
+        {
+          "activeDay": 12,
+          "calendarDay": 12,
+          "wallet": 240,
+          "absorbed": 2400,
+          "shieldsOwned": 0,
+          "fragments": 12
+        },
+        {
+          "activeDay": 21,
+          "calendarDay": 21,
+          "wallet": 420,
+          "absorbed": 4200,
+          "shieldsOwned": 1,
+          "fragments": 0
+        },
+        {
+          "activeDay": 42,
+          "calendarDay": 42,
+          "wallet": 540,
+          "absorbed": 8400,
+          "shieldsOwned": 2,
+          "fragments": 0
+        }
+      ]
+    },
+    {
+      "name": "Core plus 40 meaningful optional XP daily",
+      "dailyXP": 260,
+      "level10CalendarDay": 12,
+      "grants": [
+        {
+          "calendarDay": 21,
+          "activeDay": 21,
+          "cost": 0
+        },
+        {
+          "calendarDay": 42,
+          "activeDay": 42,
+          "cost": 300
+        },
+        {
+          "calendarDay": 63,
+          "activeDay": 63,
+          "cost": 300
+        }
+      ],
+      "checkpoints": [
+        {
+          "activeDay": 12,
+          "calendarDay": 12,
+          "wallet": 720,
+          "absorbed": 2400,
+          "shieldsOwned": 0,
+          "fragments": 12
+        },
+        {
+          "activeDay": 21,
+          "calendarDay": 21,
+          "wallet": 1260,
+          "absorbed": 4200,
+          "shieldsOwned": 1,
+          "fragments": 0
+        },
+        {
+          "activeDay": 42,
+          "calendarDay": 42,
+          "wallet": 2220,
+          "absorbed": 8400,
+          "shieldsOwned": 2,
+          "fragments": 0
+        }
+      ]
+    },
+    {
+      "name": "Core five days/week starting Monday",
+      "dailyXP": 220,
+      "level10CalendarDay": 16,
+      "grants": [
+        {
+          "calendarDay": 29,
+          "activeDay": 21,
+          "cost": 0
+        },
+        {
+          "calendarDay": 58,
+          "activeDay": 42,
+          "cost": 300
+        }
+      ],
+      "checkpoints": [
+        {
+          "activeDay": 12,
+          "calendarDay": 16,
+          "wallet": 240,
+          "absorbed": 2400,
+          "shieldsOwned": 0,
+          "fragments": 12
+        },
+        {
+          "activeDay": 21,
+          "calendarDay": 29,
+          "wallet": 420,
+          "absorbed": 4200,
+          "shieldsOwned": 1,
+          "fragments": 0
+        },
+        {
+          "activeDay": 42,
+          "calendarDay": 58,
+          "wallet": 540,
+          "absorbed": 8400,
+          "shieldsOwned": 2,
+          "fragments": 0
+        }
+      ]
+    }
+  ]
+}
