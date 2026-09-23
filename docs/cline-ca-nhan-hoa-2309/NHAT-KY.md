@@ -494,3 +494,22 @@ Red-before-fix đã chứng minh: tạm dùng lại policy tuần tự ⇒ **4/4
 Lệnh kiểm: `tsc -b` 0 · `tsc -p server` 0 · nhóm 58 tệp xanh · `scripts/tai-hien-rv01-followup.mjs` exit 0 · toàn suite 707 xanh / 34 đỏ (= nợ cũ) / 1 skip.
 Còn OPEN: **RV06** (runtime Cloudflare: máy không có wrangler/miniflare/@cloudflare/vitest-pool-workers) · RV01/RV02 chưa kiểm hai thiết bị thật · kho thật chưa gắn nhãn `family` (lượt rút còn 1 câu theo §4.2.6 khi bật cờ).
 Việc kế tiếp: tiếp P06 còn lại (Mom/ôn/thử thách dùng chung tổng tải; Đoàn mức cá nhân + hạn mềm + continuing task) → P07 (EXP/ledger/receipt/outbox + idempotency) → P08 → P09 → P10; P11 chỉ chuẩn bị + ghi CHƯA XÁC MINH.
+
+
+CHECKPOINT CNH-1.0 — P06 (thử thách chung ngân sách + Đoàn hạn mềm §8) và RV06 trên runtime D1 THẬT
+HEAD `198a778` (đã push). Mốc trong lượt này: `849ea0e` (RV06 + RV03b) · `6700bbe` (thử thách) · `198a778` (Đoàn).
+RV06 ĐÃ CÓ RUNTIME THẬT: cài dev-dependency chính thức `@cloudflare/vitest-pool-workers@0.22.0` (peer `vitest ^4.1`, khớp vitest 4.1.11)
++ `wrangler@4`, ghi vào `package.json` + `package-lock.json`; cấu hình riêng `vitest.config.d1.ts` + `wrangler.d1-test.toml`
+(binding D1 cục bộ, `compatibility_date 2026-08-01` khớp binary workerd đang có) + `tests/_d1-runtime-stub.ts`; script `npm run test:d1`.
+Bộ `tests/d1-runtime-rv06.test.ts` chạy TRONG isolate workerd, dữ liệu TỔNG HỢP, KHÔNG deploy/không dữ liệu thật: 8 lời gọi ĐỒNG THỜI cùng
+một đơn vị nội dung ⇒ đúng MỘT thắng; xuyên nửa đêm VN; chủ đổi giữa hai lượt ⇒ gia hạn KHÔNG báo thắng; gia hạn không kéo dài `het_han_task`;
+nhả chỗ khi lượt kết thúc (xuyên ngày). Log `evidence/rv06-d1-runtime.log`; `npm run test:d1` exit 0 (5 ca xanh).
+RV03 (sót nhỏ): `SQL_NHAN_FAMILY` dùng chung cho mọi truy vấn lịch sử family (`family` → `familyId`) + ca regression kho ghi `familyId`.
+P06: thử thách dùng chung ngân sách ngày (cờ `ngan_sach_luot`); Đoàn `hanMemMotCau` = max(60, ceil(1,25×solveSeconds)) — KHÔNG trần 180,
+đồng hồ đội = min(300, max các nhiệm vụ đang mở) có tính câu trùm, bảng giây gốc dùng chung `src/lib/giay-co-so.ts` + test chống trôi số.
+RED-BEFORE-FIX (RV05, lượt trước): bản cũ ⇒ 4/4 ca RV05 ĐỎ; bản sửa ⇒ XANH.
+Còn OPEN: RV06 phần còn lại (mới kiểm nhóm GIỮ CHỖ trên D1; chưa chạy worker end-to-end trên workerd/Đoàn trên D1);
+RV01/RV02 chưa kiểm hai thiết bị thật; kho thật chưa gắn nhãn `family` (lượt rút còn 1 câu theo §4.2.6 khi bật cờ).
+P06 còn lại: continuing task + hạn session 24 giờ + `expired_unanswered` + không ghi timeout thành sai; hai lỗi chính liên tiếp ⇒ vai hỗ trợ.
+Việc kế tiếp: P07 (EXP/ledger/receipt/outbox nguyên tử + idempotency + correction) → P08 → P09 → P10 → P11 (chuẩn bị + ghi CHƯA XÁC MINH);
+bổ sung dần bằng chứng D1-runtime cho các nhóm CAS/đồng thời còn lại.

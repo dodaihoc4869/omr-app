@@ -327,7 +327,7 @@
         "P05"
       ],
       "status": "IN_PROGRESS",
-      "notes": "LAT CAT 1 (xong): `server/src/hop-dong-chung.ts` — DANH SACH duong phat cau (engine / ke_hoach / ngoai_le CO TEN) + 5 co anh huong duong phat cau; test `tests/cnh-1-0-hop-dong-chung-p06.test.ts` doi chieu HAI CHIEU voi `server/src/index.ts` (moi duong khai phai co that; moi duong khop MAU_PHAT_CAU phai da khai hoac la ngoai le co ten) — 5 ca xanh. LAT CAT 2 (xong, SUA LO THAT): CONG PHAM VI CA NHAN (P02) da ap cho DUONG DOC CAU DUNG CHUNG (`layCauChoEm` ⇒ `/hs/cau-theo-qid` + `/hs/on-lai/nop`) khi co `pham_vi_hoc` BAT: cau phai qua `eligibleScope` cho CHINH em; quyen TOAN CHUONG TRINH (do thay cap, co bang chung) mo dung pham vi da cap; co TAT ⇒ hanh vi cu; loi doc ⇒ giu nguyen va KHONG ghi la da kiem. Test 4 ca (co TAT / chua taught / da taught + em khac / quyen). SUA HOI QUY THAT: ban dau toi them 1 truy van rieng trong `lapVaLuuKeHoach` lam test ngan sach truy van red (`ha-tai-ke-hoach-ngay-2209`: 26 > 25) ⇒ da GOP vao truy van `rk` CO SAN (khong them truy van) va test xanh lai. Toan suite: 34 tep do = DUNG bo no cu da ghi o P00–P03 (34 tep, cac tep nay do ca khi chay rieng). CON LAI cua P06: Mom/on/thu thach dung CHUNG tong tai theo tung buoc (hien thu thach/vo dai la ngoai le co ten, chua di bo chon chung); Doan dung muc ca nhan + han mem + continuing task (T29/T38/T39/T42-con-lai).",
+      "notes": "LAT CAT 1 (xong): `server/src/hop-dong-chung.ts` — DANH SACH duong phat cau (engine / ke_hoach / ngoai_le CO TEN) + 5 co anh huong duong phat cau; test `tests/cnh-1-0-hop-dong-chung-p06.test.ts` doi chieu HAI CHIEU voi `server/src/index.ts` (moi duong khai phai co that; moi duong khop MAU_PHAT_CAU phai da khai hoac la ngoai le co ten) — 5 ca xanh. LAT CAT 2 (xong, SUA LO THAT): CONG PHAM VI CA NHAN (P02) da ap cho DUONG DOC CAU DUNG CHUNG (`layCauChoEm` ⇒ `/hs/cau-theo-qid` + `/hs/on-lai/nop`) khi co `pham_vi_hoc` BAT: cau phai qua `eligibleScope` cho CHINH em; quyen TOAN CHUONG TRINH (do thay cap, co bang chung) mo dung pham vi da cap; co TAT ⇒ hanh vi cu; loi doc ⇒ giu nguyen va KHONG ghi la da kiem. Test 4 ca (co TAT / chua taught / da taught + em khac / quyen). SUA HOI QUY THAT: ban dau toi them 1 truy van rieng trong `lapVaLuuKeHoach` lam test ngan sach truy van red (`ha-tai-ke-hoach-ngay-2209`: 26 > 25) ⇒ da GOP vao truy van `rk` CO SAN (khong them truy van) va test xanh lai. Toan suite: 34 tep do = DUNG bo no cu da ghi o P00–P03 (34 tep, cac tep nay do ca khi chay rieng). CON LAI cua P06: Mom/on/thu thach dung CHUNG tong tai theo tung buoc (hien thu thach/vo dai la ngoai le co ten, chua di bo chon chung); Doan dung muc ca nhan + han mem + continuing task (T29/T38/T39/T42-con-lai). LAT CAT 3 (xong — THU THACH dung CHUNG ngan sach ngay, @6700bbe): `/hs/thu-thach-hom-nay` khi co `cau_hinh.ngan_sach_luot` BAT thi cat theo PHAN CON LAI cua ngay (docNganSachConLai + uocLuongMotCau + xepVuaNganSach); het ngan sach ⇒ `{ok:true,co:false,lyDo:\"het_ngan_sach_ngay\"}` (an the, khong phat them cau). Co TAT ⇒ giu nguyen. Mom/on nam trong ke hoach ngay (mot ngan sach, mot danh sach viec) nen khong tao ngan sach thu hai. Test: 28 ca xanh.  LAT CAT 4 (xong — DOAN han mem + dong ho doi theo 02 §8, @198a778): `hanMemMotCau` = max(60, ceil(1,25×solveSeconds)) (so do rieng cua em khi co; khong thi giay goc phan×muc + thoi gian doc) — KHONG chan cung 180; `giayCuaHiep` = min(300, max(han mem cac nhiem vu DANG MO)) va cau TRUM duoc tinh vao dong ho doi (`chonCauTrum` gan phan/mucDo/soTu/coHinh). Bang giay goc tach ra `src/lib/giay-co-so.ts` dung chung + test doi chieu voi bang cua may chu (chong troi so). Da cap nhat test cu theo dac ta moi (ghi ro CU → MOI). Test dac ta Doan: 6 ca xanh; nhom 61 tep xanh.  CON LAI cua P06: continuing task + han session 24 gio + `expired_unanswered` + khong ghi timeout thanh sai; hai loi chinh lien tiep ⇒ vai ho tro/bai nen.",
       "evidence": [
         {
           "path": "server/src/hop-dong-chung.ts",
@@ -352,6 +352,22 @@
         {
           "path": "docs/cline-ca-nhan-hoa-2309/evidence/p06-tom-tat-bang-chung.md",
           "note": "tom tat bang chung P06 lat cat 1-2"
+        },
+        {
+          "path": "src/lib/giay-co-so.ts",
+          "note": "bang giay goc dung chung (Doan + may chu)"
+        },
+        {
+          "path": "tests/cnh-1-0-doan-han-mem-p06.test.ts",
+          "note": "6 ca dac ta §8 + doi chieu bang khong troi"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p06-vitest-doan-han-mem.log",
+          "note": "log test Doan han mem"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p06-vitest-thu-thach-ngan-sach.log",
+          "note": "log test thu thach dung chung ngan sach"
         }
       ]
     },
