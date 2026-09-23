@@ -1,3 +1,4 @@
+import {HAP_THU_DAT} from '../../../lib/hap-thu-ngay'
 // CỬA HÀNG PHỤ KIỆN — hàm THUẦN của lớp màn (không React, không mạng). Mọi số ở đây là số MÁY CHỦ đã trả đưa vào;
 // hàm chỉ chọn trạng thái / viết lời chỉ đường / ghép danh mục / dựng "đang mặc + đang thử". KHÔNG có hàm nào cộng trừ SỐ DƯ vàng.
 import { DANH_MUC_PHU_KIEN, DOT_MO_BAN } from '../../../lib/phu-kien-danh-muc'
@@ -45,9 +46,9 @@ export function chiDuongThieuVang(thieuVang: number, doiToiDa: number): string {
   return ngay === 0 ? chuChiDuongDuExp : chuChiDuongNgay(ngay)
 }
 
-/** Số ngày ăn ứng với `exp` dự trữ (1 ngày ăn = `giuLai` EXP). Chỉ để nói "Sau khi đổi"; số thật do máy chủ trả. */
+/** Số ngày ăn ứng với `exp` dự trữ (1 ngày ăn = HAP_THU_DAT, độc lập mức dự trữ để mua đồ). Chỉ để nói "Sau khi đổi"; số thật do máy chủ trả. */
 export function ngayAnCua(exp: number, giuLai: number): number {
-  return giuLai > 0 ? Math.max(0, Math.floor(exp / giuLai)) : 0
+  return giuLai > 0 ? Math.max(0, Math.floor(exp / HAP_THU_DAT)) : 0
 }
 
 /** Số EXP hợp lệ để gửi `vang-doi`: nguyên, 1..doiToiDa (máy chủ tính `doiToiDa`). Ngoài khoảng ⇒ kẹp; không phải số ⇒ 0. */

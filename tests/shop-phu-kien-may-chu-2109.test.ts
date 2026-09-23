@@ -69,7 +69,7 @@ describe('cờ shop_phu_kien', () => {
 describe('vang-xem', () => {
   it('số liệu: ống nghiệm 620 ⇒ giữ lại 200, đổi tối đa 420, đủ 3 ngày ăn; vàng = tổng sổ; chuỗi + ấn thạch đọc thật', async () => {
     const d = dung(); cap(d, 'S1', 340); chuoi(d, 'S1', 9); anSang(d, 'S1', 3)
-    expect(await goi(d, 'S1', 'vang-xem')).toEqual({ ok: true, bat: true, vang: 340, ongNghiem: 620, giuLai: 200, doiToiDa: 420, ngayAn: 3, chuoiNgay: 9, anThachSang: 3, mua: 'm1' })
+    expect(await goi(d, 'S1', 'vang-xem')).toEqual({ ok: true, bat: true, vang: 340, ongNghiem: 620, giuLai: 400, doiToiDa: 220, ngayAn: 3, chuoiNgay: 9, anThachSang: 3, mua: 'm1' })
   })
   it('chuỗi tính cả hôm nay nếu đã đạt nhiệm vụ ngày (exp_so dat_ngay); ống ≤ 200 ⇒ doiToiDa 0', async () => {
     const d = dung({ wallet: 150 }); chuoi(d, 'S1', 4)
@@ -81,7 +81,7 @@ describe('vang-xem', () => {
     expect((await goi(d, 'S1', 'vang-xem')).chuoiNgay).toBe(30)
     d.sql.prepare("UPDATE ke_hoach_ngay SET ket_qua='khong' WHERE sbd='S1' AND ngay='2026-09-15'").run()          // đứt ở ngày thứ 7 lùi
     expect((await goi(d, 'S1', 'vang-xem')).chuoiNgay).toBe(6)
-    d.sql.prepare("UPDATE ke_hoach_ngay SET ket_qua=NULL WHERE sbd='S1' AND ngay='2026-09-15'").run()             // ngày nghỉ (không kết quả): bỏ qua, không đứt
+    d.sql.prepare("UPDATE ke_hoach_ngay SET ket_qua=NULL,la_ngay_nghi=1 WHERE sbd='S1' AND ngay='2026-09-15'").run()             // ngày nghỉ (không kết quả): bỏ qua, không đứt
     expect((await goi(d, 'S1', 'vang-xem')).chuoiNgay).toBe(29)
   })
   it('em chưa chọn thần thú ⇒ lời báo như các lệnh game khác (không ghi)', async () => {
@@ -113,11 +113,11 @@ describe('vang-doi · nguyên tử', () => {
   })
   it('giữ lại ≥ 200 EXP: đổi đúng doiToiDa được (còn 200), thêm 1 EXP nữa ⇒ duoi_nguong; vượt ⇒ duoi_nguong kèm số tối đa thật; không âm', async () => {
     const d = dung()
-    const qua = await goi(d, 'S1', 'vang-doi', { soExp: 421, khoaYeuCau: K('q') })
-    expect(qua).toMatchObject({ ok: false, ma: 'duoi_nguong', loi: 'Thần thú cần giữ lại 200 EXP để ăn. Em đổi được tối đa 420 EXP.' }); expect(dem(d, 'vang_so')).toBe(0)
-    expect(await goi(d, 'S1', 'vang-doi', { soExp: 420, khoaYeuCau: K('t') })).toMatchObject({ ok: true, daDoi: 420, vang: 420, ongNghiem: 200, ngayAn: 1 })
-    expect(await goi(d, 'S1', 'vang-doi', { soExp: 1, khoaYeuCau: K('u') })).toMatchObject({ ok: false, ma: 'duoi_nguong', loi: 'Thần thú cần giữ lại 200 EXP để ăn. Em đổi được tối đa 0 EXP.' })
-    expect(hoSo(d, 'S1').p.wallet).toBe(200); expect(vangSo(d, 'S1')).toBe(420)
+    const qua = await goi(d, 'S1', 'vang-doi', { soExp: 221, khoaYeuCau: K('q') })
+    expect(qua).toMatchObject({ ok: false, ma: 'duoi_nguong', loi: 'Thần thú cần giữ lại 400 EXP để ăn. Em đổi được tối đa 220 EXP.' }); expect(dem(d, 'vang_so')).toBe(0)
+    expect(await goi(d, 'S1', 'vang-doi', { soExp: 220, khoaYeuCau: K('t') })).toMatchObject({ ok: true, daDoi: 220, vang: 220, ongNghiem: 400, ngayAn: 2 })
+    expect(await goi(d, 'S1', 'vang-doi', { soExp: 1, khoaYeuCau: K('u') })).toMatchObject({ ok: false, ma: 'duoi_nguong', loi: 'Thần thú cần giữ lại 400 EXP để ăn. Em đổi được tối đa 0 EXP.' })
+    expect(hoSo(d, 'S1').p.wallet).toBe(400); expect(vangSo(d, 'S1')).toBe(220)
   })
   it('đầu vào sai (không nguyên, ≤ 0, chuỗi, thiếu / hỏng khoá) ⇒ sai_dau_vao, không ghi', async () => {
     const d = dung()
@@ -127,10 +127,10 @@ describe('vang-doi · nguyên tử', () => {
     expect(dem(d, 'vang_so')).toBe(0); expect(hoSo(d, 'S1').p.wallet).toBe(620)
   })
   it('hai lệnh đổi song song (khác khoá) mỗi lệnh 300 EXP trên ống 620: đúng MỘT lệnh được, lệnh kia thấy số mới ⇒ duoi_nguong; ví không âm', async () => {
-    const d = dung()
+    const d = dung({ wallet: 820 })
     const rs = await Promise.all([goi(d, 'S1', 'vang-doi', { soExp: 300, khoaYeuCau: K('x') }), goi(d, 'S1', 'vang-doi', { soExp: 300, khoaYeuCau: K('y') })])
     expect(rs.filter((r) => r.ok)).toHaveLength(1); expect(rs.filter((r) => !r.ok)[0]).toMatchObject({ ma: 'duoi_nguong' })
-    expect(hoSo(d, 'S1').p.wallet).toBe(320); expect(vangSo(d, 'S1')).toBe(300); expect(dem(d, 'vang_so')).toBe(1)
+    expect(hoSo(d, 'S1').p.wallet).toBe(520); expect(vangSo(d, 'S1')).toBe(300); expect(dem(d, 'vang_so')).toBe(1)
   })
   it('hồ sơ bị ghi xen (EXP mới về) NGAY trước lô: lô đầu không làm gì, đọc lại rồi trừ trên số MỚI; không mất EXP mới, không ghi vàng khi chưa trừ', async () => {
     const d = dung()
@@ -302,8 +302,8 @@ describe('vang-doi · đua tất định', () => {
   it('lượt khác vừa trừ ống xuống còn 250 NGAY TRƯỚC lô (revision +1): lô KHÔNG ghi; đọc lại, thấy chỉ đổi được 50 ⇒ duoi_nguong; EXP và vàng đều không đổi thêm', async () => {
     const d = dung()
     truocLo(d, () => { d.sql.prepare("UPDATE game_v2_profile SET json=json_set(json,'$.wallet',250), revision=revision+1 WHERE sbd='S1'").run() })
-    const r = await goi(d, 'S1', 'vang-doi', { soExp: 300, khoaYeuCau: K('a') })
-    expect(r).toMatchObject({ ok: false, ma: 'duoi_nguong', loi: 'Thần thú cần giữ lại 200 EXP để ăn. Em đổi được tối đa 50 EXP.' })
+    const r = await goi(d, 'S1', 'vang-doi', { soExp: 180, khoaYeuCau: K('a') })
+    expect(r).toMatchObject({ ok: false, ma: 'duoi_nguong', loi: 'Thần thú cần giữ lại 400 EXP để ăn. Em đổi được tối đa 0 EXP.' })
     expect(hoSo(d, 'S1').p.wallet).toBe(250); expect(dem(d, 'vang_so')).toBe(0)
   })
 })

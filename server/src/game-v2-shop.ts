@@ -1,13 +1,14 @@
 // CỬA HÀNG PHỤ KIỆN THẦN THÚ — 5 lệnh dưới /game-v2/… (hợp đồng docs/hop-dong-shop-phu-kien-2109.md; danh mục src/lib/phu-kien-danh-muc.ts). Cờ `cau_hinh.shop_phu_kien` mặc định TẮT.
 //   vang-xem · vang-doi (đổi EXP thừa ở ống nghiệm thành vàng) · shop-danh-sach · shop-mua · thu-mac-do
 // Vàng KHÔNG nằm ở hồ sơ game: số dư = SUM(vang_so.so_vang) (sổ cái chỉ thêm dòng). Ống nghiệm = `wallet` của hồ sơ; đổi vàng trừ đúng số EXP ấy trong CÙNG MỘT lô với dòng sổ.
-// Không đụng luật EXP, trần 120, thú ăn 200: chỉ trừ `wallet` và luôn giữ lại ≥ 200 EXP. Phụ kiện KHÔNG cộng chỉ số/EXP/vé/thứ hạng. Máy chủ quyết giá (giao diện gửi lại `giaThay`, lệch ⇒ gia_doi).
+// Không đụng luật EXP, trần 120, thú ăn 200: chỉ trừ `wallet` và luôn giữ lại ≥ 400 EXP. Phụ kiện KHÔNG cộng chỉ số/EXP/vé/thứ hạng. Máy chủ quyết giá (giao diện gửi lại `giaThay`, lệch ⇒ gia_doi).
 //
 // NGUYÊN TỬ (mỗi lô D1 chạy trọn vẹn hoặc không chạy, không xen lệnh khác):
-//   vang-doi: (a) INSERT sổ vàng NẾU hồ sơ còn ở đúng `revision` đã đọc và còn ≥ 200 EXP sau khi trừ; (b) UPDATE hồ sơ (trừ ống, revision+1) NẾU dòng sổ của CHÍNH lượt này (khoá + `luc`) có mặt.
+//   vang-doi: (a) INSERT sổ vàng NẾU hồ sơ còn ở đúng `revision` đã đọc và còn ≥ 400 EXP sau khi trừ; (b) UPDATE hồ sơ (trừ ống, revision+1) NẾU dòng sổ của CHÍNH lượt này (khoá + `luc`) có mặt.
 //     Có ai ghi hồ sơ xen vào (revision đổi) ⇒ cả hai không làm gì ⇒ đọc lại, thử tối đa 3 lần. Khác bản phác của đề xuất: dòng sổ KHÔNG dựa vào "hồ sơ đang ở revision+1" (một lượt ghi hồ sơ của việc khác cũng làm revision+1 ⇒ có thể ghi vàng mà không trừ EXP).
 //   shop-mua: (a) INSERT sở hữu NẾU chưa có dòng sổ mang khoá này, đủ vàng, và số cái đã bán < giới hạn; (b) INSERT sổ vàng (−giá) và (c) mặc món NẾU dòng sở hữu của CHÍNH lượt này có mặt. Hai em cùng mua cái cuối ⇒ lô sau thấy đủ số cái ⇒ het_suat.
 // Bấm lặp (cùng khoaYeuCau) ⇒ đọc sổ trước: đã có ⇒ trả kết quả cũ `lapLai:true`, không ghi thêm.
+import { EXP_DU_TRU } from '../../src/lib/kinh-te-game'
 import type { Env } from './kieu'
 import type { Profile } from './game-v2'
 import { DemTTL } from './dem-chung'
@@ -19,7 +20,7 @@ import { ngayVn } from './su-kien-hoc'
 type Kq = Record<string, unknown>
 export const LENH_SHOP: ReadonlySet<string> = new Set(['vang-xem', 'vang-doi', 'shop-danh-sach', 'shop-mua', 'thu-mac-do'])
 /** EXP thần thú cần giữ lại ở ống nghiệm để ăn (luật hấp thụ 200/ngày). Đổi vàng không bao giờ xuống dưới mức này. */
-export const GIU_LAI_EXP = 200
+export const GIU_LAI_EXP = EXP_DU_TRU
 const KHOA_YEU_CAU = /^[A-Za-z0-9_-]{8,64}$/
 /** Cửa sổ nhìn lại của chuỗi ngày cho cửa hàng: cửa sổ 7 ngày của kế hoạch ngày không bao giờ đạt "chuỗi 14 ngày" nên đọc CÙNG định nghĩa (ngày đạt liên tiếp, ngày nghỉ không đứt) với cửa sổ dài; điều kiện lớn nhất của danh mục là 30. */
 export const SO_NGAY_CHUOI_SHOP = 45
@@ -36,7 +37,7 @@ const LOI: Record<string, string> = {
 const loi = (ma: string, chu?: string): Kq => ({ ok: false, ma, loi: chu ?? LOI[ma] ?? LOI.sai_dau_vao })
 const thieuBang = (e: unknown): boolean => /no such table/i.test(e instanceof Error ? e.message : String(e))
 const nguyen = (v: unknown): number => Math.max(0, Math.floor(Number(v) || 0))
-const conNgayAn = (ongNghiem: number): number => Math.floor(ongNghiem / GIU_LAI_EXP)
+const conNgayAn = (ongNghiem: number): number => Math.floor(ongNghiem / 200)
 
 /** Đọc giá trị cờ ra quyết định cho MỘT em: `{"bat":true,"chiSbd":[…]?}`. Vắng / bat≠true / hỏng ⇒ đóng. Có mảng `chiSbd` ⇒ chỉ các em trong mảng thấy cửa hàng mở (mảng rỗng ⇒ không ai). */
 function coMo(giaTri: string | null | undefined, sbd: string): boolean {

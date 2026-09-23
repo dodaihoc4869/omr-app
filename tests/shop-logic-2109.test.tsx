@@ -74,6 +74,8 @@ describe('số EXP đổi', () => {
   })
   it('ngayAnCua: 1 ngày ăn = giữ lại 200 EXP', () => {
     expect(ngayAnCua(620, 200)).toBe(3)
+    expect(ngayAnCua(400, 400)).toBe(2)
+    expect(ngayAnCua(620, 400)).toBe(3)
     expect(ngayAnCua(440, 200)).toBe(2)
     expect(ngayAnCua(199, 200)).toBe(0)
     expect(ngayAnCua(500, 0)).toBe(0)
