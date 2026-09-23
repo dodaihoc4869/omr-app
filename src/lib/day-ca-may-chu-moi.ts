@@ -422,8 +422,13 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
         // Giữ hạn chờ tới khi đọc xong JSON để tránh nút mở ca quay mãi.
         const kq = await voiHanCho((async () => {
           const res = await fetch(goc + path, { method: 'POST', headers, body: payload, signal: controller.signal })
-          if (res.status === 401 || res.status === 403) throw new Error('AUTH')
           const data = await res.json().catch(() => null) as { ok?: boolean; error?: string; daLuu?: boolean } | null
+          // 403 HTML có thể là trang chặn mạng/Cloudflare, không phải kết quả
+          // kiểm mật khẩu của Worker. Phải còn lượt thử qua tên miền app.
+          if ((res.status === 401 || res.status === 403) && data?.ok === false) throw new Error('AUTH')
+          if ((!data || typeof data !== 'object' || Array.isArray(data)) && res.status !== 413) {
+            throw new Error(`Đường kết nối trả về dữ liệu không hợp lệ (HTTP ${res.status}).`)
+          }
           return { ok: res.ok, status: res.status, data }
         })(), seconds * 1000, 'Máy chủ chưa phản hồi kịp.', () => controller.abort())
         if (kq.status >= 500) { ketQua5xx = kq; continue } // máy chủ lỗi: thử địa chỉ kế

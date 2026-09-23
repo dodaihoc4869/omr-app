@@ -73,6 +73,12 @@ export function quenDiaChiTuTep(): void {
  * cờ: cờ tắt khẩn giữa ca thi phải còn nguyên tác dụng. */
 let dangNap: Promise<void> | null = null
 
+/** Kho trình duyệt có thể bị chặn bởi tab cũ. Không để việc đọc kho giữ cả kết nối. */
+async function docCauHinhTrongHan(): Promise<CauHinhMayChu> {
+  return voiHanCho(loadCauHinhMayChu(), 1500, 'Chưa đọc được cấu hình trên máy.')
+    .catch(() => chuanHoaMayChu(null))
+}
+
 export function napDiaChiMayChuMoiChoEm(): Promise<void> {
   // Lần tải đầu có thể trượt vì máy vừa mở app chưa có mạng. Chỉ giữ lời hứa
   // khi đang tải; lượt sau được thử lại thay vì nhớ kết quả rỗng suốt phiên.
@@ -81,23 +87,23 @@ export function napDiaChiMayChuMoiChoEm(): Promise<void> {
 }
 
 async function napThat(): Promise<void> {
-  // ĐỌC THẲNG `loadCauHinhMayChu` (IndexedDB), KHÔNG qua `layCauHinhMayChu`.
-  // VÌ SAO PHẢI VẬY: `layCauHinhMayChu` khi URL còn trống lại `await xongNapDiaChi()`,
-  // mà lúc này `dangNap` ĐANG là chính `napThat` đang chạy ⇒ tự chờ chính mình, treo
-  // vô hạn. Đây là GỐC lỗi "mở ca chỉ mở được tại máy này": máy lạ (IndexedDB rỗng)
-  // nạp địa chỉ không bao giờ xong, nên mọi lệnh thầy trả "Chưa kết nối được máy chủ".
-  //
-  // CẤM TREO `dangNap`: toàn bộ thân hàm bọc try/catch và lượt tải tệp bị giới hạn
-  // thời gian — `dangNap` LUÔN kết thúc, nên `xongNapDiaChi()` không bao giờ treo
-  // theo một lượt nạp nửa chừng (mạng yếu / máy ngủ giữa chừng).
+  // Không gọi layCauHinhMayChu ở đây: nó chờ napThat, gọi ngược sẽ tự chờ mình.
   try {
-    const ch = await loadCauHinhMayChu()
-    if (ch.URL) return
-    const url = await voiHanCho(loadDiaChiMayChuMoiChoEm(), 10000, '').catch(() => '')
+    const ch = await docCauHinhTrongHan()
+    if (ch.URL) {
+      nhoCauHinh = { luc: Date.now(), ch }
+      return
+    }
+    const url = await loadDiaChiMayChuMoiChoEm()
     if (!url) return
-    diaChiTuTep = url
-    await saveCauHinhMayChu({ ...ch, BAT: true, URL: url }).catch(() => {})
+    const moi = chuanHoaMayChu({ ...ch, BAT: true, URL: url })
+    if (!moi.URL) return
+    diaChiTuTep = moi.URL
     quenCauHinhMayChu()
+    nhoCauHinh = { luc: Date.now(), ch: moi }
+    // Địa chỉ đã sẵn sàng cho mọi lệnh. Ghi bản sao là việc nền, không phải
+    // điều kiện mở ca (Safari/IndexedDB có thể không resolve lẫn reject).
+    void saveCauHinhMayChu(moi).catch(() => {})
   } catch {
     // hết đường: giữ nguyên trạng, chỗ gọi tự nói thật — KHÔNG để `dangNap` treo.
   }
@@ -123,32 +129,19 @@ export function xongNapDiaChi(): Promise<void> {
 export async function layCauHinhMayChu(): Promise<CauHinhMayChu> {
   const nay = Date.now()
   if (nhoCauHinh && nay - nhoCauHinh.luc < SONG_MS) return nhoCauHinh.ch
-  let ch = await loadCauHinhMayChu()
+  let ch = await docCauHinhTrongHan()
   // IndexedDB ghi hỏng (máy em ở chế độ riêng tư, hết chỗ) thì địa chỉ đọc được
   // lúc khởi động vẫn còn trong bộ nhớ — dùng nó, đừng bỏ em lại đường cũ.
   if (!ch.URL && diaChiTuTep) ch = chuanHoaMayChu({ ...ch, BAT: true, URL: diaChiTuTep })
-  // LỖI ĐÃ CÓ THẬT (thầy báo 23/09: "mở ca chỉ mở được tại máy này").
-  //
-  // Máy LẠ (máy thầy khác, máy tính ở nhà, trình duyệt mới) có IndexedDB RỖNG. Lượt nạp địa chỉ lúc mở app
-  // (`napDiaChiMayChuMoiChoEm`) chạy KHÔNG chờ và có thể CHƯA xong — hoặc đã trượt vì mạng yếu lúc vừa mở app.
-  // Khi đó `URL` rỗng ⇒ MỌI lệnh thầy (mở ca, giao bài, đổi tên, chấm lại…) trả "Chưa kết nối được máy chủ",
-  // nên thầy chỉ mở ca được trên ĐÚNG máy đã từng cấu hình. Hai đường lùi nữa, cùng nguồn `public/cau-hinh.json`
-  // (tệp nằm TRONG gói app — mọi máy đều có, không phụ thuộc IndexedDB của máy nào):
-  //   1. chờ lượt nạp đang chạy xong rồi hỏi lại;
-  //   2. tải thẳng tệp ấy (service worker đã đệm sẵn) rồi cất lại vào IndexedDB cho các lượt sau.
+  // Máy mới dùng chung lượt nạp nền. Bản cũ chờ nạp xong nhưng bỏ kết quả,
+  // tải tệp LẦN HAI rồi chờ ghi IndexedDB: vẫn treo dù đã có địa chỉ hợp lệ.
   if (!ch.URL) {
-    try { await xongNapDiaChi() } catch { /* vẫn còn đường 2 */ }
-    try {
-      const u = await loadDiaChiMayChuMoiChoEm()
-      if (u) {
-        diaChiTuTep = u
-        ch = chuanHoaMayChu({ ...ch, BAT: true, URL: u })
-        await saveCauHinhMayChu(ch).catch(() => {})
-      }
-    } catch { /* hết đường: trả nguyên trạng, chỗ gọi tự nói thật */ }
+    await napDiaChiMayChuMoiChoEm()
+    if (nhoCauHinh) ch = nhoCauHinh.ch
+    else if (diaChiTuTep) ch = chuanHoaMayChu({ ...ch, BAT: true, URL: diaChiTuTep })
   }
   // CẤM NHỚ CÁI RỖNG: chỉ đệm khi đã ra được địa chỉ, để lượt sau còn thử lại (cùng luật `dia-chi-may-chu.ts`).
-  if (ch.URL) nhoCauHinh = { luc: nay, ch }
+  if (ch.URL) nhoCauHinh = { luc: Date.now(), ch }
   return ch
 }
 

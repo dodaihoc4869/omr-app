@@ -9,6 +9,7 @@ import type { BanGhiKhoa } from './khoa-app'
 import { chuanHoaMayChu, diaChiMayChuHopLe, type CauHinhMayChu } from './cau-hinh-may-chu'
 import type { SoSuaDang } from './sua-dang'
 import { themMau, type MauGiayThuc } from './hieu-chinh-giay-thuc'
+import { voiHanCho } from './han-cho'
 
 export interface AnswerRecord {
   phanI: Record<string, 'A' | 'B' | 'C' | 'D'> // qid -> lựa chọn (đã quy về chữ cái GỐC, chưa xáo)
@@ -385,12 +386,15 @@ export async function loadScriptUrl(): Promise<string> {
  *
  * CẤM đưa `MA_BI_MAT` vào tệp này. Lệnh của em vốn không đòi mã bí mật. */
 export async function loadDiaChiMayChuMoiChoEm(): Promise<string> {
+  const bo = new AbortController()
   try {
-    const res = await fetch(`${import.meta.env.BASE_URL}cau-hinh.json`, { cache: 'no-cache' })
-    if (!res.ok) return ''
-    const cfg = (await res.json()) as { mayChuMoi?: string }
-    const url = (cfg.mayChuMoi || '').trim()
-    return url.startsWith('https://') ? url.replace(/\/+$/, '') : ''
+    // Hạn chờ bao gồm CẢ thân JSON; fetch có header chưa có nghĩa đã tải xong.
+    return await voiHanCho((async () => {
+      const res = await fetch(`${import.meta.env.BASE_URL}cau-hinh.json`, { cache: 'no-cache', signal: bo.signal })
+      if (!res.ok) return ''
+      const cfg = (await res.json()) as { mayChuMoi?: string }
+      return diaChiMayChuHopLe(cfg.mayChuMoi)
+    })(), 6000, 'Chưa tải được cấu hình máy chủ.', () => bo.abort())
   } catch {
     return ''
   }

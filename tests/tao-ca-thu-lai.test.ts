@@ -15,8 +15,9 @@ it('lỗi tạm thời: gửi lại đúng mã và nguyên gói đề',async()=>
  expect(f.mock.calls[0][1].body).toBe(f.mock.calls[2][1].body)
 })
 it('lỗi xác thực không bị đổi thành lỗi mạng và không gửi lại',async()=>{
+ vi.stubGlobal('location', { origin: 'https://omr-app-b3u.pages.dev' } as any)
  const f=vi.fn().mockResolvedValue(res({ok:false},403));vi.stubGlobal('fetch',f)
- await expect(taoCaDaXacNhan(ch,'bad',ca,{})).rejects.toThrow('Mã xác thực');expect(f).toHaveBeenCalledTimes(1)
+ await expect(taoCaDaXacNhan({ ...ch, URL: 'https://omr.ttadodaihoc.workers.dev' },'bad',ca,{})).rejects.toThrow('Mã xác thực');expect(f).toHaveBeenCalledTimes(1)
 })
 it('gói quá lớn báo rõ và không tải lại vô ích',async()=>{
  const f=vi.fn().mockResolvedValueOnce(res({},413)).mockResolvedValueOnce(res({daLuu:false}));vi.stubGlobal('fetch',f)
@@ -99,4 +100,14 @@ it('máy chủ thẳng TREO tới hạn: vẫn còn nguyên lượt thử của 
   expect(f.mock.calls[0][0]).toBe('https://omr.ttadodaihoc.workers.dev/ca/day')
   expect(f.mock.calls[1][0]).toBe('https://omr-app-b3u.pages.dev/api/ca/day')
  } finally { vi.useRealTimers() }
+})
+
+it.each([403, 200])('trang HTML chặn đường thẳng (HTTP %s) không bị hiểu là sai mã và vẫn thử proxy', async status => {
+ vi.stubGlobal('location', { origin: 'https://omr-app-b3u.pages.dev' } as any)
+ const f = vi.fn()
+   .mockResolvedValueOnce(new Response('<html>Kiểm tra kết nối</html>', { status, headers: { 'content-type': 'text/html' } }))
+   .mockResolvedValueOnce(res({ ok: true }))
+ vi.stubGlobal('fetch', f)
+ expect(await taoCaDaXacNhan({ BAT: true, URL: 'https://omr.ttadodaihoc.workers.dev' } as any, 'test', ca, {})).toBe(true)
+ expect(f.mock.calls[1][0]).toBe('https://omr-app-b3u.pages.dev/api/ca/day')
 })
