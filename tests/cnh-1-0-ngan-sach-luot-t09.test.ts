@@ -9,6 +9,7 @@ import { uocLuongMotCau } from '../server/src/uoc-luong-thoi-gian'
 import { docNganSachConLai, xoaDemNganSachLuot, KHOA_BAT_NGAN_SACH_LUOT } from '../server/src/ngan-sach-luot'
 import { PHIEN_BAN_KE_HOACH } from '../server/src/ho-so-cau-hinh'
 import { docHoSoCau, mucTheoKyNangCuaEm, xepLuotTheoChinhSach } from '../server/src/bo-chon-that'
+import { giuCho, nhaCho, docMotCho } from '../server/src/giu-cho'
 import { masteryTheoHoSo } from '../server/src/game-v2-ho-so'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
@@ -113,5 +114,22 @@ describe('T09 — game chỉ dùng PHẦN NGÂN SÁCH CÒN LẠI của ngày (c�
     const xep = await xepLuotTheoChinhSach(qs.map((qid) => ({ qid, version: 'v1', part: 'I' as const, mucDo: 'hieu', group: `g-${qid}`, dangKey: 'A.1', skillIds: ['K1'] })),
       { sbd: 'S1', ngay: NGAY, mastery, mucTheoKyNang: muc, hoSoCau, nowMs: T0 })
     expect(xep.xep.map((x) => x.qid)).toEqual(qs)
+  })
+
+  it('câu đã bị LƯỢT KHÁC giữ chỗ ⇒ lượt này KHÔNG nhận (và chỗ giữ không bị chiếm)', async () => {
+    const d = dung()
+    batCo(d, 'bat')
+    // Máy/lượt khác giữ chỗ Q5 trước (còn hạn).
+    await giuCho(d.env, { sbd: 'S1', ngay: NGAY, taskId: 'T-KHAC', qids: ['Q5'], nowMs: T0 })
+    const token = await gameToken(d.env, 'S1')
+    const r = await goiWorker(worker, d.env, '/game-v2/start', { token, mode: 'adventure' }) as Record<string, unknown>
+    const qs = (r.questions as { qid: string }[]).map((q) => q.qid)
+    expect(qs).not.toContain('Q5') // KHÔNG nhận câu đã chốt cho lượt khác
+    if (r.giuChoThua) expect(r.giuChoThua as string[]).toContain('Q5')
+    expect((await docMotCho(d.env, 'S1', NGAY, 'Q5'))!.taskId).toBe('T-KHAC') // không chiếm chỗ người khác
+    // Nhả chỗ ⇒ lượt sau nhận lại được (nơi gọi chọn lại phần CHƯA chốt)
+    await nhaCho(d.env, 'S1', NGAY, 'T-KHAC')
+    const g = await giuCho(d.env, { sbd: 'S1', ngay: NGAY, taskId: 'T-MOI', qids: ['Q5'], nowMs: T0 })
+    expect(g.thang).toEqual(['Q5'])
   })
 })

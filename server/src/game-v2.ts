@@ -13,6 +13,7 @@ import {nangLucBat} from './nang-luc-d1'
 import {nganSachLuotBat,docNganSachConLai} from './ngan-sach-luot'
 import {xepVuaNganSach} from './uoc-luong-thoi-gian'
 import {docHoSoCau,locTheoLuatLap,mucTheoKyNangCuaEm,xepLuotTheoChinhSach} from './bo-chon-that'
+import {giuCho} from './giu-cho'
 import {PETS,ALIASES,OLD_SIX,allowed,learnedQuestionFilter,chooseSessionWithRoles,chooseLuotMoi,luotHomNay,SO_CAU_MOI_LUOT,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
 import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
 import type {ShieldState} from '../../src/game/than-thu-v2/shields'
@@ -160,16 +161,24 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
     }
   }
   if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:TRAN_CAU_DAO_NGAY,suggestions:chon.map(x=>({title:x.q.tenDang||'Ôn kiến thức đã học',source:x.q.maDe,part:x.q.phan})),remaining,luot:tom}
+  // P05 mục 4: GIÀNH CHỖ nguyên tử cho các câu của lượt (bảng `giu_cho`, PK sbd+ngay+qid) để hai máy/hai lượt
+  // không nhận cùng câu. Thua chỗ ⇒ RÚT NGẮN lượt (không chiếm câu người khác, không nới bảo vệ). Cờ TẮT ⇒ bỏ qua.
+  const idLuot=crypto.randomUUID()
+  let giuMat:string[]=[]
+  if(await nganSachLuotBat(env)&&chon.length){
+    const g=await giuCho(env,{sbd,ngay,taskId:idLuot,qids:chon.map(x=>x.q.qid),nowMs:tNow,nguon:'game'})
+    if(g.thua.length){giuMat=g.thua;const thang=new Set(g.thang);chon=chon.filter(x=>thang.has(x.q.qid))}
+  }
   if(!chon.length){
     if(nganSachThieu&&chonGoc.length)return {ok:true,questions:[],lyDo:'het_ngan_sach_ngay',luot:tom,maiCho:cho,missing:scope.missing,nganSach:nganSachThieu,message:'Hôm nay em đã dùng gần hết thời gian học. Em làm nốt việc đang mở hoặc quay lại buổi sau nhé.'}
     const lyDo=eligible.length?'chi_con_cau_qua_bac':poolDaHoc.length?'het_cau_moi_hom_nay':'kho_trong';return {ok:true,questions:[],lyDo,luot:tom,maiCho:cho,missing:scope.missing,message:lyDo==='het_cau_moi_hom_nay'?'Hôm nay em đã làm hết câu phù hợp trong kho. Mai em quay lại nhé.':lyDo==='chi_con_cau_qua_bac'?'Các câu còn lại cao hơn mức em đang làm ở dạng đó. Em làm thêm bài Thầy giao rồi quay lại nhé.':'Chưa có câu thuộc phần em đã học. Em hoàn thành bài Thầy giao rồi quay lại nhé.'}
   }
-  const id=crypto.randomUUID(),groups=new Set(scope.evidence.map(e=>e.group))
+  const id=idLuot,groups=new Set(scope.evidence.map(e=>e.group))
   const session:Session={mode:'adventure',created:Date.now(),questions:chon.map(x=>({qid:x.q.qid,maDe:x.q.maDe,version:x.q.version,group:x.q.group,novel:!groups.has(x.q.group),role:x.role}))}
   const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
   if(!inserted.meta.changes)return startLuotMoi(env,sbd,p,b,action)
   const day=await doDayDu(env,chon.map(x=>x.q as CauPool)) // pool là bản NHẸ: chỉ các câu ĐƯỢC CHỌN mới nạp đầy đủ để đưa cho em
-  return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
+  return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),...(giuMat.length?{giuChoThua:giuMat}:{}),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
 }
 /** Đoàn Hộ Tống: sáu câu cá nhân thuộc phần chính em đã làm và kiến thức nền đã biết.
  * Câu trùng nội dung hôm nay, bài chưa nộp, câu bảo vệ và câu vượt sức đều bị chặn. */
