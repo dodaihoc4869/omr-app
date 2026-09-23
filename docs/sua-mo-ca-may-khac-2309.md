@@ -25,7 +25,7 @@ Commit mã: 12f1958. Commit kiểm thử: 8b67a00.
 
 ## Giới hạn xác minh
 
-Đường thật Pages và Worker phản hồi; trình duyệt mới đến được màn đăng nhập giáo viên. Không dùng hoặc đoán mật khẩu, không tạo ca thật trong D1. Chưa trực tiếp thao tác được trên thiết bị khác đang lỗi của thầy.
+Đường thật Pages và Worker phản hồi; trình duyệt tải được app, phiên giáo viên hiện có vào được Bảng tin và mở màn Mở ca. Không nhập hoặc đoán mật khẩu, không tạo ca thật trong D1. Chưa trực tiếp thao tác được trên thiết bị khác đang lỗi của thầy.
 
 ## Bản lùi
 
