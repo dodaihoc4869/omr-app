@@ -194,7 +194,7 @@ CON THIEU: ke-hoach-ngay*.ts (kem revisionPhamVi cho T12) va parent-news-nguon-c
 
 ### P02 tiep - noi bo loc vao kenh 5 (parent-news-nguon-cau.ts)
 
-Chen hopPhamVi(q) vao diem loc  (da co cauHopKhoi + daHocCau) => kenhtu dong thu 2 duoc kiem pham vi.
+Chen hopPhamVi(q) vao diem loc "nap" (da co cauHopKhoi + daHocCau) => kenh tu dong thu 2 duoc kiem pham vi.
 
 Bang chung: tsc server 0 loi; 3/4 file xanh, file parent-news-d1-1909 do DUNG 2 test DA CO trong nen P00 => 0 test moi do. Log: evidence/p02c-vitest-kenh5.log.
 
