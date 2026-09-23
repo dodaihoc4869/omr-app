@@ -66,7 +66,7 @@ describe('doiTenCa — lệnh gửi máy chủ', () => {
   it('gửi đúng lệnh, đúng bốn trường, và tên đã dọn sẵn', async () => {
     const goi = gia({ ok: true, maCa: '248567', tenCa: 'Ca 1' })
     await doiTenCa('https://x', 'MAT', '248567', '  =Ca   1 \n')
-    const b = JSON.parse((goi.mock.calls[0][1] as { body: string }).body)
+    const b = JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body)
     expect(b).toEqual({ action: 'doiTenCa', secret: 'MAT', maCa: '248567', tenCa: 'Ca 1' })
   })
 

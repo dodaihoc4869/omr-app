@@ -32,7 +32,7 @@ describe('tenTheoSbd — lệnh tra tên', () => {
   it('gói gửi đi CHỈ có mã ca và số báo danh, không kèm mã bí mật', async () => {
     const goi = gia({ ok: true, sbd: '10038', hoTen: 'Triệu Đức Duy', lop: '10' })
     await tenTheoSbd('https://x', '371304', '10038')
-    const b = JSON.parse((goi.mock.calls[0][1] as { body: string }).body)
+    const b = JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body)
     expect(b).toEqual({ action: 'tenTheoSbd', maCa: '371304', sbd: '10038' })
     expect(Object.keys(b)).not.toContain('secret')
   })
@@ -70,13 +70,13 @@ describe('vaoThi — cờ xác nhận bằng mắt', () => {
     const goi = gia({ ok: true, cach: 'moi', lop: '10', thoiGianPhut: 45, congBo: 'khong', lanThu: 1 })
     // canBank=false: phép kiểm này soi GÓI GỬI ĐI, không soi đường tải đề.
     await vaoThi('https://x', '371304', '10038', 'may-A', false, { hoTen: 'Triệu Đức Duy', namSinh: '', xacNhanTen: true })
-    expect(JSON.parse((goi.mock.calls[0][1] as { body: string }).body).xacNhanTen).toBe(true)
+    expect(JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body).xacNhanTen).toBe(true)
   })
 
   it('không truyền thì mặc định false — luật cũ giữ nguyên cho mọi chỗ gọi khác', async () => {
     const goi = gia({ ok: true, cach: 'moi', lop: '', thoiGianPhut: 45, congBo: 'khong', lanThu: 1 })
     await vaoThi('https://x', '371304', '10038', 'may-A', false)
-    expect(JSON.parse((goi.mock.calls[0][1] as { body: string }).body).xacNhanTen).toBe(false)
+    expect(JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body).xacNhanTen).toBe(false)
   })
 
   it('máy chủ chỉ bỏ so tên/năm khi CÓ cờ — cổng danh sách vẫn nguyên', () => {

@@ -225,7 +225,7 @@ describe('máy khách — lệnh gửi đi', () => {
   it('luuLinkDanhSachLop gửi đúng lệnh và bộ link', async () => {
     const goi = gia({ ok: true, links: ['a', 'b'] })
     expect(await luuLinkDanhSachLop('https://x', 'MAT', ['a', 'b'])).toEqual(['a', 'b'])
-    expect(JSON.parse((goi.mock.calls[0][1] as { body: string }).body)).toEqual({ action: 'luuLinkDanhSachLop', secret: 'MAT', links: ['a', 'b'] })
+    expect(JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body)).toEqual({ action: 'luuLinkDanhSachLop', secret: 'MAT', links: ['a', 'b'] })
   })
 
   it('máy chủ cũ chưa có lệnh thì ném lỗi rõ ràng, không trả rỗng im lặng', async () => {

@@ -83,7 +83,7 @@ describe('phieuCuaEm — CHỈ hỏi số báo danh', () => {
   it('gói gửi đi chỉ có mã ca và số báo danh — KHÔNG hỏi họ tên, năm sinh', () => {
     const goi = gia(DAY_DU)
     return phieuCuaEm('https://x', '248567', '12026').then(() => {
-      const b = JSON.parse((goi.mock.calls[0][1] as { body: string }).body)
+      const b = JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body)
       expect(b).toEqual({ action: 'phieuCuaEm', maCa: '248567', sbd: '12026' })
       // Thầy chốt 07/09: gõ ba ô trên điện thoại sai một dấu là tắc.
       expect(Object.keys(b)).not.toContain('hoTen')

@@ -90,7 +90,7 @@ describe('máy khách — lệnh', () => {
   it('trangThaiPhongCho gửi đúng lệnh, không kèm mã bí mật', async () => {
     const goi = gia({ ok: true, phongCho: true, batDau: false, batDauLuc: '', trangThai: 'mo' })
     const tt = await trangThaiPhongCho('https://x', '371304')
-    expect(JSON.parse((goi.mock.calls[0][1] as { body: string }).body)).toEqual({ action: 'trangThaiPhongCho', maCa: '371304' })
+    expect(JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body)).toEqual({ action: 'trangThaiPhongCho', maCa: '371304' })
     expect(tt).toEqual({ phongCho: true, batDau: false, batDauLuc: '', trangThai: 'mo' })
   })
 
@@ -102,7 +102,7 @@ describe('máy khách — lệnh', () => {
   it('batDauThi đòi mã bí mật và cho biết đã bấm trước hay chưa', async () => {
     const goi = gia({ ok: true, batDauLuc: '2026-09-07T16:00:00.000Z', daBatTruoc: true })
     const kq = await batDauThi('https://x', 'MAT', '371304')
-    expect(JSON.parse((goi.mock.calls[0][1] as { body: string }).body)).toEqual({ action: 'batDauThi', secret: 'MAT', maCa: '371304' })
+    expect(JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body)).toEqual({ action: 'batDauThi', secret: 'MAT', maCa: '371304' })
     expect(kq.daBatTruoc).toBe(true)
   })
 

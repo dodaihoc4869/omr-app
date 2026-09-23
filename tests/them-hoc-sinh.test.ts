@@ -75,7 +75,7 @@ describe('máy khách', () => {
   it('gửi đúng lệnh và đủ ba trường', async () => {
     const goi = gia({ ok: true, sbd: '12050', hoTen: 'Nguyễn Văn A', namSinh: '2009', lop: '12', tenSheet: '2009' })
     await themEmVaoSheet('https://x', 'MAT', { sbd: '12050', hoTen: 'Nguyễn Văn A', namSinh: '2009' })
-    expect(JSON.parse((goi.mock.calls[0][1] as { body: string }).body)).toEqual({
+    expect(JSON.parse((goi.mock.calls.find((c) => c[1]?.body)![1] as { body: string }).body)).toEqual({
       action: 'themEmVaoSheet',
       secret: 'MAT',
       sbd: '12050',
