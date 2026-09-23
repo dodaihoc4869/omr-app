@@ -398,36 +398,44 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
   const headers = { 'content-type': 'text/plain;charset=utf-8' }
   const directBase = ch.URL.replace(/\/+$/, '')
   const base = diaChiGuiCa(ch.URL, typeof location === 'undefined' ? '' : location.origin)
+  // THỨ TỰ ĐỊA CHỈ: gọi THẲNG máy chủ trước, proxy Pages là đường LUI.
+  //
+  // LỖI ĐÃ DÍNH, máy thầy 23/09: nút mở ca đứng ở "Đang gửi ca…" rồi báo "Mất
+  // kết nối hoặc máy chủ chưa phản hồi kịp". Nguyên nhân: đường gửi ca đi QUA
+  // PROXY Pages trước, mà bản cũ chỉ lui về gọi thẳng khi proxy trả LỖI MẠNG hoặc
+  // 5xx. Còn khi proxy TREO tới hạn thì `voiHanCho` abort cả lượt gọi, nên đường
+  // thẳng KHÔNG BAO GIỜ được thử — đúng chữ thầy thấy.
+  //
+  // Đường thẳng chắc chắn sống: MỌI lượt khác của app (vào thi, nộp bài, lưu tạm,
+  // chấm điểm…) đều gọi thẳng `workers.dev` và chạy tốt trên mạng trường; riêng
+  // `/ca/day` bị đẩy qua proxy. Proxy là một chặng thừa, kèm một lớp hạn chờ 50 s.
+  const cacDiaChi = base === directBase ? [directBase] : [directBase, base]
+  // MỖI ĐỊA CHỈ MỘT HẠN RIÊNG (không chia chung một hạn): một đường TREO tới hạn
+  // không được nuốt mất lượt thử của đường kia — đúng lỗi làm nút mở ca đứng im.
   const gui = async (path: string, payload: string, seconds: number) => {
-    const controller = new AbortController()
-    // fetch() kết thúc khi có HEADER, chưa chắc đã nhận đủ thân phản hồi.
-    // Giữ hạn chờ tới khi đọc xong JSON để tránh nút mở ca quay mãi.
-    return voiHanCho((async () => {
-      let res: Response
+    let ketQua5xx: { ok: boolean; status: number; data: { ok?: boolean; error?: string; daLuu?: boolean } | null } | null = null
+    let loiCuoi: unknown = null
+    for (const goc of cacDiaChi) {
+      const controller = new AbortController()
       try {
-        res = await fetch(base + path, { method: 'POST', headers, body: payload, signal: controller.signal })
-      } catch (err) {
-        if (base !== directBase && !controller.signal.aborted) {
-          res = await fetch(directBase + path, { method: 'POST', headers, body: payload, signal: controller.signal })
-        } else {
-          throw err
-        }
+        // fetch() kết thúc khi có HEADER, chưa chắc đã nhận đủ thân phản hồi.
+        // Giữ hạn chờ tới khi đọc xong JSON để tránh nút mở ca quay mãi.
+        const kq = await voiHanCho((async () => {
+          const res = await fetch(goc + path, { method: 'POST', headers, body: payload, signal: controller.signal })
+          if (res.status === 401 || res.status === 403) throw new Error('AUTH')
+          const data = await res.json().catch(() => null) as { ok?: boolean; error?: string; daLuu?: boolean } | null
+          return { ok: res.ok, status: res.status, data }
+        })(), seconds * 1000, 'Máy chủ chưa phản hồi kịp.', () => controller.abort())
+        if (kq.status >= 500) { ketQua5xx = kq; continue } // máy chủ lỗi: thử địa chỉ kế
+        return kq
+      } catch (e) {
+        if (e instanceof Error && e.message === 'AUTH') throw e
+        loiCuoi = e // mạng đứt / hết hạn: thử địa chỉ kế
       }
-      // Nếu proxy Pages trả lỗi máy chủ 5xx, tự động lui về gọi thẳng máy chủ
-      if (res.status >= 500 && base !== directBase && !controller.signal.aborted) {
-        try {
-          const directRes = await fetch(directBase + path, { method: 'POST', headers, body: payload, signal: controller.signal })
-          if (directRes.ok || directRes.status < 500) {
-            res = directRes
-          }
-        } catch {
-          // giữ res ban đầu nếu direct cũng lỗi mạng
-        }
-      }
-      if (res.status === 401 || res.status === 403) throw new Error('AUTH')
-      const data = await res.json().catch(() => null) as { ok?: boolean; error?: string; daLuu?: boolean } | null
-      return { ok: res.ok, status: res.status, data }
-    })(), seconds * 1000, 'Máy chủ chưa phản hồi kịp.', () => controller.abort())
+    }
+    // Hết đường mà chỉ gặp 5xx: trả kết quả ấy để vòng ngoài báo đúng chữ máy chủ.
+    if (ketQua5xx) return ketQua5xx
+    throw loiCuoi instanceof Error ? loiCuoi : new Error('Không kết nối được máy chủ.')
   }
   let loi = 'Không kết nối được máy chủ.'
   for (let lan = 0; lan < 2; lan++) {
@@ -440,7 +448,14 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
       else { loi = j?.error || `Máy chủ chưa lưu được ca (HTTP ${res.status}).`; thuLai = res.status >= 500 || res.status === 429 }
     } catch (e) {
       if (e instanceof Error && e.message === 'AUTH') throw new Error('Mã xác thực giáo viên không hợp lệ. Thầy đăng nhập lại app giáo viên.')
-      loi = 'Mất kết nối hoặc máy chủ chưa phản hồi kịp.'
+      // Kèm lý do gốc (hết hạn? mạng đứt? cỡ gói?) để lần sau đọc là biết ngay,
+      // không phải đoán — lỗi này đã từng tốn một buổi chỉ để hỏi "dừng ở đâu".
+      const them = e instanceof Error && e.message ? ` (${e.message}; gói ${Math.round(body.length / 1024)} KB)` : ''
+      loi = `Mất kết nối hoặc máy chủ chưa phản hồi kịp.${them}`
+      // Mạng đứt / hết hạn ở CẢ hai đường (proxy đã được thử trong `gui`): gửi
+      // lại y hệt ngay lập tức cũng vô ích. Vẫn đọc xác nhận (ca có thể đã lưu),
+      // rồi báo thật. Chỉ 5xx mới đáng gửi lại.
+      thuLai = false
     }
     // Chỉ đọc xác nhận; không dựng ca hay thay đổi bài của học sinh.
     try {

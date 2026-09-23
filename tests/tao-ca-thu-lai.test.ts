@@ -59,15 +59,44 @@ it('fetch không kết thúc dù đã abort: thoát hữu hạn, không quay mã
   await done
  } finally {vi.useRealTimers()}
 })
-it('proxy Pages trả 502: tự động thử đường trực tiếp và tạo ca thành công',async()=>{
+// GỐC LỖI "Đang gửi ca…" treo rồi báo "Mất kết nối": bản cũ gửi QUA PROXY Pages
+// trước, và chỉ lui về gọi thẳng khi proxy lỗi mạng/5xx. Khi proxy TREO tới hạn
+// thì abort nuốt luôn lượt gọi thẳng ⇒ hai đường đều không xong.
+// Từ 23/09: gọi THẲNG `workers.dev` trước, proxy là đường lui, mỗi đường một hạn.
+it('gọi THẲNG máy chủ trước; proxy Pages chỉ là đường lui',async()=>{
  vi.stubGlobal('location', { origin: 'https://omr-app-b3u.pages.dev' } as any)
  const chProxy = { BAT: true, URL: 'https://omr.ttadodaihoc.workers.dev' }
  const f = vi.fn()
-   .mockResolvedValueOnce(res({ error: 'Chưa kết nối được máy chủ lưu ca.' }, 502)) // proxy /api/ca/day thất bại
-   .mockResolvedValueOnce(res({ ok: true }, 200)) // direct /ca/day thành công
+   .mockResolvedValueOnce(res({ error: 'máy chủ bận' }, 503)) // đường thẳng lỗi 5xx
+   .mockResolvedValueOnce(res({ ok: true }, 200)) // proxy lưu được
  vi.stubGlobal('fetch', f)
  expect(await taoCaDaXacNhan(chProxy, 'test', ca, {})).toBe(true)
  expect(f).toHaveBeenCalledTimes(2)
- expect(f.mock.calls[0][0]).toBe('https://omr-app-b3u.pages.dev/api/ca/day')
- expect(f.mock.calls[1][0]).toBe('https://omr.ttadodaihoc.workers.dev/ca/day')
+ expect(f.mock.calls[0][0]).toBe('https://omr.ttadodaihoc.workers.dev/ca/day')
+ expect(f.mock.calls[1][0]).toBe('https://omr-app-b3u.pages.dev/api/ca/day')
+})
+it('máy chủ thẳng chạy được thì KHÔNG đụng tới proxy (bỏ hẳn chặng thừa)',async()=>{
+ vi.stubGlobal('location', { origin: 'https://omr-app-b3u.pages.dev' } as any)
+ const chProxy = { BAT: true, URL: 'https://omr.ttadodaihoc.workers.dev' }
+ const f = vi.fn().mockResolvedValue(res({ ok: true }, 200))
+ vi.stubGlobal('fetch', f)
+ expect(await taoCaDaXacNhan(chProxy, 'test', ca, {})).toBe(true)
+ expect(f).toHaveBeenCalledTimes(1)
+ expect(f.mock.calls[0][0]).toBe('https://omr.ttadodaihoc.workers.dev/ca/day')
+})
+it('máy chủ thẳng TREO tới hạn: vẫn còn nguyên lượt thử của proxy',async()=>{
+ vi.useFakeTimers()
+ try {
+  vi.stubGlobal('location', { origin: 'https://omr-app-b3u.pages.dev' } as any)
+  const chProxy = { BAT: true, URL: 'https://omr.ttadodaihoc.workers.dev' }
+  const f = vi.fn()
+    .mockResolvedValueOnce({ ok: true, status: 200, json: () => new Promise(() => {}) }) // thẳng: treo ở thân phản hồi
+    .mockResolvedValueOnce(res({ ok: true }, 200)) // proxy lưu được
+  vi.stubGlobal('fetch', f)
+  const done = taoCaDaXacNhan(chProxy, 'test', ca, {})
+  await vi.advanceTimersByTimeAsync(45001)
+  expect(await done).toBe(true)
+  expect(f.mock.calls[0][0]).toBe('https://omr.ttadodaihoc.workers.dev/ca/day')
+  expect(f.mock.calls[1][0]).toBe('https://omr-app-b3u.pages.dev/api/ca/day')
+ } finally { vi.useRealTimers() }
 })
