@@ -199,3 +199,11 @@ Chen hopPhamVi(q) vao diem loc "nap" (da co cauHopKhoi + daHocCau) => kenh tu do
 Bang chung: tsc server 0 loi; 3/4 file xanh, file parent-news-d1-1909 do DUNG 2 test DA CO trong nen P00 => 0 test moi do. Log: evidence/p02c-vitest-kenh5.log.
 
 Da noi 2/3 duong tu dong (game-v2-bank, parent-news-nguon-cau). Con thieu ke-hoach-ngay*.ts (kem revisionPhamVi cho T12).
+
+### P02 - noi not duong tu dong thu 3 + PASS T02/T03
+
+Them locPhamViChoKeHoach vao ke-hoach-ngay-d1.ts, chen vao ca hai danh sach tu dong (cau toi han va cau on thi). Co doc 1 lan cho ca luot.
+
+Bang chung: 24/24 test cnh-1-0-pham-vi-hoc xanh tren D1 that (them 6 ca cho cong ke hoach: T01 A/B khac pham vi, T03 thieu nhan/chua duyet, cau ngoai chi muc, thu hoi lam loai ngay, lo rong). Log p02d-vitest-phamvi.log. Nhom ke-hoach/cau-da-lam/dieu-7: 17 file xanh, 2 test do deu CO NGUYEN VAN trong nen P00 => 0 test moi do.
+
+Da noi 3/3 kenh tu dong: game-v2-bank, parent-news-nguon-cau, ke-hoach-ngay-d1.

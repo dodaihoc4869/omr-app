@@ -10,6 +10,7 @@ import {
   type CauXetDuyet, type NgoaiLeGiaoBai, type TrangThaiScope,
 } from '../server/src/pham-vi-hoc'
 import { khongBiBaoVe } from '../server/src/cau-theo-qid'
+import { locPhamViChoKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { taoD1That } from './_d1-that'
 
 const q = (qid: string, skillIds: string[], prerequisiteIds: string[] = [], o: Partial<CauXetDuyet> = {}): CauXetDuyet => ({
@@ -186,3 +187,61 @@ describe('T11 — BẢO VỆ BẢN SAO: câu cùng content_group không được
     expect([...r.khongLoLoiGiai]).toEqual(['Q1'])
   })
 })
+
+describe('P02 — cổng phạm vi của KẾ HOẠCH NGÀY (đường tự động thứ 3) trên D1 thật', () => {
+  /** Dựng kho nhỏ: Q1 (nhãn SK1, đã duyệt), Q2 (KHÔNG nhãn), Q3 (chưa duyệt). */
+  function dungKho() {
+    const d = taoD1That()
+    for (const sbd of ['A', 'B']) d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES(?,'x','x')").run(sbd)
+    d.sql.prepare("INSERT OR IGNORE INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',3,'kho/DE1.json',0,'v1')").run()
+    d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
+    const them = (qid: string, kienThuc: string[], reviewed: boolean) =>
+      d.sql.prepare('INSERT OR REPLACE INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
+        .run('DE1', qid, 'v1', `cg-${qid}`, 'D1', JSON.stringify({ qid, maDe: 'DE1', version: 'v1', group: `cg-${qid}`, phan: 'I', text: qid, choices: ['A. a', 'B. b'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'D', mucDo: 'biet', sao: 1, kienThuc, correct: 'A', solution: null, reviewed }))
+    them('Q1', ['SK1'], true)
+    them('Q2', [], true)
+    them('Q3', ['SK1'], false)
+    return d
+  }
+
+  it('cờ TẮT ⇒ `null` (KHÔNG lọc): đường cũ nguyên vẹn', async () => {
+    const d = dungKho()
+    expect(await locPhamViChoKeHoach(d.env, [{ sbd: 'A', qid: 'Q1' }], false)).toBeNull()
+  })
+
+  it('T01: A taught SK1 giữ được Q1; B chưa taught ⇒ Q1 BỊ LOẠI cho B trên cùng lượt kế hoạch', async () => {
+    const d = dungKho()
+    await ghiTaught(d.env, 'A', 'SK1', 'thay', 'ev-1', MOC)
+    const loai = await locPhamViChoKeHoach(d.env, [{ sbd: 'A', qid: 'Q1' }, { sbd: 'B', qid: 'Q1' }], true)
+    expect(loai).not.toBeNull()
+    expect([...(loai as Set<string>)]).toEqual(['B\u0000Q1'])
+  })
+
+  it('T03: câu thiếu nhãn (Q2) và câu chưa duyệt (Q3) BỊ LOẠI kể cả khi đã taught — kho thiếu thì trả thiếu', async () => {
+    const d = dungKho()
+    await ghiTaught(d.env, 'A', 'SK1', 'thay', 'ev-1', MOC)
+    const loai = await locPhamViChoKeHoach(d.env, [{ sbd: 'A', qid: 'Q2' }, { sbd: 'A', qid: 'Q3' }], true)
+    expect([...(loai as Set<string>)].sort()).toEqual(['A\u0000Q2', 'A\u0000Q3'])
+  })
+
+  it('câu KHÔNG có trong chỉ mục kho ⇒ bị loại (không bịa nhãn, không phát bừa)', async () => {
+    const d = dungKho()
+    await ghiTaught(d.env, 'A', 'SK1', 'thay', 'ev-1', MOC)
+    const loai = await locPhamViChoKeHoach(d.env, [{ sbd: 'A', qid: 'KHONG-CO' }], true)
+    expect([...(loai as Set<string>)]).toEqual(['A\u0000KHONG-CO'])
+  })
+
+  it('thu hồi SK1 ⇒ Q1 bị loại ngay lượt kế hoạch sau (T12: kiểm lại quyền trước khi phát)', async () => {
+    const d = dungKho()
+    await ghiTaught(d.env, 'A', 'SK1', 'thay', 'ev-1', MOC)
+    expect(await locPhamViChoKeHoach(d.env, [{ sbd: 'A', qid: 'Q1' }], true)).toEqual(new Set())
+    await thuHoiPhamVi(d.env, 'A', 'SK1', 'thu hồi', MOC)
+    expect([...((await locPhamViChoKeHoach(d.env, [{ sbd: 'A', qid: 'Q1' }], true)) as Set<string>)]).toEqual(['A\u0000Q1'])
+  })
+
+  it('lô rỗng ⇒ `null` (không truy vấn thừa)', async () => {
+    const d = dungKho()
+    expect(await locPhamViChoKeHoach(d.env, [], true)).toBeNull()
+  })
+})
+

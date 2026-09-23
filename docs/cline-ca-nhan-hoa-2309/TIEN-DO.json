@@ -75,7 +75,7 @@
         "P01"
       ],
       "status": "IN_PROGRESS",
-      "notes": "DA NOI bo loc pham vi vao 2/3 duong chon cau TU DONG: game-v2-bank.ts (docKhoCau) va parent-news-nguon-cau.ts (kenh 5, diem loc nap). Co pham_vi_hoc MAC DINH TAT nen hanh vi production khong doi. CON THIEU 1 duong: ke-hoach-ngay*.ts (kem revisionPhamVi cho T12) => chua dat moi kenh tu dong nen P02 chua PASS, T01/T02/T03/T11/T12 giu IN_PROGRESS.",
+      "notes": "DA NOI bo loc pham vi vao CA 3 duong chon cau TU DONG: game-v2-bank (docKhoCau), parent-news-nguon-cau (kenh 5), ke-hoach-ngay-d1 (cauToiHan + cauOnThi qua locPhamViChoKeHoach). Co pham_vi_hoc MAC DINH TAT nen hanh vi production khong doi; co TAT khong them truy van (doc gop cot / dem 30 giay isolate). T02+T03 PASS (24 test tren D1 that). CON THIEU: (a) T01 doi chieu end-to-end qua tung kenh; (b) T11 phan khong lo loi giai o tang kenh; (c) quyen full_curriculum_practice cho luyen-de; (d) bao cao kho thieu nhan cho giao vien; (e) btvn-nang-do la kenh GIAO BAI cua thay nen KHONG loc pham vi (dung ngoai le btvn_thay_giao).",
       "evidence": [
         {
           "path": "server/migration-2309-cnh1-learner-scope.sql",
@@ -804,16 +804,42 @@
       "phase": "P02",
       "level": "code",
       "title": "Đủ tất cả nền",
-      "status": "IN_PROGRESS",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-pham-vi-hoc.test.ts",
+          "executedAt": "2026-09-23T10:34:30.021Z",
+          "exitCode": 0,
+          "sourceFingerprint": "a0b18e055d5bdc08d9bafeb8a415c0959115ec5a6fdd921c0b5a93c7ddf4a71c",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02d-vitest-phamvi.log",
+              "sha256": "11df25409cd4a6bd18b69bc424d5216da2bb80b7b0517ae8a5968f06773a84d7"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "T03",
       "phase": "P02",
       "level": "code",
       "title": "Kho thiếu nhãn/thu hồi",
-      "status": "IN_PROGRESS",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-pham-vi-hoc.test.ts",
+          "executedAt": "2026-09-23T10:34:30.021Z",
+          "exitCode": 0,
+          "sourceFingerprint": "a0b18e055d5bdc08d9bafeb8a415c0959115ec5a6fdd921c0b5a93c7ddf4a71c",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02d-vitest-phamvi.log",
+              "sha256": "11df25409cd4a6bd18b69bc424d5216da2bb80b7b0517ae8a5968f06773a84d7"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "T04",
