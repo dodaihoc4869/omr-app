@@ -197,7 +197,7 @@
         "P04"
       ],
       "status": "IN_PROGRESS",
-      "notes": "LAT CAT 1 (xong): `uoc-luong-thoi-gian.ts` theo 02 §5.1-5.2 (bang giay goc theo PART × muc do, cong doc de/bang hinh,  he so toc do ca nhan co loc mau, solve+feedback=taskSeconds, chua loi co bai mau, xep vua ngan sach khong san 4/8 cau). LAT CAT 2 (xong — DA NOI VAO DUONG THAT): `ngan-sach-luot.ts` doc `ke_hoach_ngay.ngan_sach_json.phutNgay` × 60, tru tong  `su_kien_hoc.giay` da dung HOM NAY; ca HAI duong phat cau cua game cat luot theo phan CON LAI khi co `cau_hinh.ngan_sach_luot` BAT  (MAC DINH TAT). Tra them `nganSach:{conLaiGiay,soCauBoQua}` va ly do `het_ngan_sach_ngay`. LAT CAT 3 (xong): `bo-chon-diem.ts` theo 02 §7.2 — repairNeed/reviewNeed/transferValue/fit/coverage/fatigue dung tung so hang  (trong so tu THAM-SO), score = 0,30r+0,25v+0,20t+0,15f+0,10c−fatigue; sap TAT DINH diem giam dan → SHA-256  `student|day|plan_version|qid|question_version` tang theo byte → qid tang (khong `Math.random`). Da noi nhanh sap xep  TAT DINH vao cho cat ngan sach cua HAI duong game (co BAT), va test doc lap bang node:crypto xac nhan thu tu cau trong luot. TEST BAT DUOC 2 LOI THAT cua san pham va da sua: (a) cau CHUA den han bi cong nen 0,5 (nay tra 0 dung §7.2);  (b) san khoang on bi lan don vi giay/ms (nay doi 86400 giay → ms). LAT CAT 4 (xong): diem §7.2 nay chay tren DU LIEU THAT qua `bo-chon-that.ts` (ho so per-cau + muc dang luyen tu ban dung P03 + moc on), khong con \"moi cau cung diem\". CON LAI cua P05: day DU diem §7.2 (repairNeed/reviewNeed/transferValue/fit) vao duong that — hien duong game chua cap  duoc cac dau vao nay (can muc dich/role + working_level + due theo tung cau: P06 noi); pipeline hard filter day du chua lam;  giu cho bang SQL uniqueness/CAS + race thua chua lam; mot plan/ngay + rubric dong bang + carry-over + assignment qua tai chua lam;  ghep mau toc do theo part/muc chua lam (dang rong ⇒ he so 1). Vi vay T08/T09/T10/T13/T40 chua PASS.",
+      "notes": "LAT CAT 1 (xong): `uoc-luong-thoi-gian.ts` theo 02 §5.1-5.2 (bang giay goc theo PART × muc do, cong doc de/bang hinh,  he so toc do ca nhan co loc mau, solve+feedback=taskSeconds, chua loi co bai mau, xep vua ngan sach khong san 4/8 cau). LAT CAT 2 (xong — DA NOI VAO DUONG THAT): `ngan-sach-luot.ts` doc `ke_hoach_ngay.ngan_sach_json.phutNgay` × 60, tru tong  `su_kien_hoc.giay` da dung HOM NAY; ca HAI duong phat cau cua game cat luot theo phan CON LAI khi co `cau_hinh.ngan_sach_luot` BAT  (MAC DINH TAT). Tra them `nganSach:{conLaiGiay,soCauBoQua}` va ly do `het_ngan_sach_ngay`. LAT CAT 3 (xong): `bo-chon-diem.ts` theo 02 §7.2 — repairNeed/reviewNeed/transferValue/fit/coverage/fatigue dung tung so hang  (trong so tu THAM-SO), score = 0,30r+0,25v+0,20t+0,15f+0,10c−fatigue; sap TAT DINH diem giam dan → SHA-256  `student|day|plan_version|qid|question_version` tang theo byte → qid tang (khong `Math.random`). Da noi nhanh sap xep  TAT DINH vao cho cat ngan sach cua HAI duong game (co BAT), va test doc lap bang node:crypto xac nhan thu tu cau trong luot. TEST BAT DUOC 2 LOI THAT cua san pham va da sua: (a) cau CHUA den han bi cong nen 0,5 (nay tra 0 dung §7.2);  (b) san khoang on bi lan don vi giay/ms (nay doi 86400 giay → ms). LAT CAT 4 (xong): diem §7.2 nay chay tren DU LIEU THAT qua `bo-chon-that.ts` (ho so per-cau + muc dang luyen tu ban dung P03 + moc on), khong con \"moi cau cung diem\". LAT CAT 5 (xong — P05 muc 4): GIU CHO co UNIQUENESS/CAS — bang `giu_cho` (migration-2309-cnh1-giu-cho.sql, PK sbd+ngay+qid) + `server/src/giu-cho.ts`: thang cho = `INSERT OR IGNORE` co `meta.changes = 1`; het han thi TIEP QUAN bang MOT cau UPDATE co dieu kien han (CAS); luot THUA tra `thua` + `dangGiu` de noi goi CHON LAI phan chua chot; nha cho theo dung task. Da phan loai `giu_cho` vao BANG_XOA cua reset (job reset khong con bao bang chua phan loai). CON LAI cua P05: day DU diem §7.2 (repairNeed/reviewNeed/transferValue/fit) vao duong that — hien duong game chua cap  duoc cac dau vao nay (can muc dich/role + working_level + due theo tung cau: P06 noi); pipeline hard filter day du chua lam;  giu cho bang SQL uniqueness/CAS + race thua chua lam; mot plan/ngay + rubric dong bang + carry-over + assignment qua tai chua lam;  ghep mau toc do theo part/muc chua lam (dang rong ⇒ he so 1). Vi vay T08/T09/T10/T13/T40 chua PASS.",
       "evidence": [
         {
           "path": "server/src/uoc-luong-thoi-gian.ts",
@@ -254,6 +254,22 @@
         {
           "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05d-tom-tat-bang-chung.md",
           "note": "tom tat bang chung P05 lat cat 4"
+        },
+        {
+          "path": "server/migration-2309-cnh1-giu-cho.sql",
+          "note": "bang giu cho co uniqueness + han lease"
+        },
+        {
+          "path": "server/src/giu-cho.ts",
+          "note": "giuCho/nhaCho/docCho voi CAS that"
+        },
+        {
+          "path": "tests/cnh-1-0-giu-cho.test.ts",
+          "note": "7 ca tren D1 that (ke ca tiep quan het han)"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05e-tom-tat-bang-chung.md",
+          "note": "tom tat bang chung P05 lat cat 5"
         }
       ]
     },
@@ -469,13 +485,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T13:40:00.000Z",
+          "executedAt": "2026-09-23T13:50:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "0c3ad9d0ac426997fc247cc3237a2c24b54e48080a4a1f509f4af5acd8b90cdb",
+          "sourceFingerprint": "9e50dc31f6b04fe7e8377c77eeae2ecf492f85573502752b4465fada4dec4f4e",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05d-vitest-t05-t06.log",
-              "sha256": "b283cc79f3288f9a7b2f149a1dea365159cddf57af5dc4279afabdcc63017b09"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05e-vitest-t05-t06.log",
+              "sha256": "9b26b9c1afee18cd0baf910069376a306649873ead8f9e70cda84a54dfbdf18c"
             }
           ]
         }
@@ -1036,13 +1052,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T13:40:00.000Z",
+          "executedAt": "2026-09-23T13:50:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "0c3ad9d0ac426997fc247cc3237a2c24b54e48080a4a1f509f4af5acd8b90cdb",
+          "sourceFingerprint": "9e50dc31f6b04fe7e8377c77eeae2ecf492f85573502752b4465fada4dec4f4e",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05d-vitest-t05-t06.log",
-              "sha256": "b283cc79f3288f9a7b2f149a1dea365159cddf57af5dc4279afabdcc63017b09"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05e-vitest-t05-t06.log",
+              "sha256": "9b26b9c1afee18cd0baf910069376a306649873ead8f9e70cda84a54dfbdf18c"
             }
           ]
         }
@@ -1057,13 +1073,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T13:40:00.000Z",
+          "executedAt": "2026-09-23T13:50:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "0c3ad9d0ac426997fc247cc3237a2c24b54e48080a4a1f509f4af5acd8b90cdb",
+          "sourceFingerprint": "9e50dc31f6b04fe7e8377c77eeae2ecf492f85573502752b4465fada4dec4f4e",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05d-vitest-t05-t06.log",
-              "sha256": "b283cc79f3288f9a7b2f149a1dea365159cddf57af5dc4279afabdcc63017b09"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05e-vitest-t05-t06.log",
+              "sha256": "9b26b9c1afee18cd0baf910069376a306649873ead8f9e70cda84a54dfbdf18c"
             }
           ]
         }
@@ -1135,7 +1151,7 @@
       "phase": "P05",
       "level": "code",
       "title": "Hai app đồng thời",
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "evidence": []
     },
     {
@@ -1291,13 +1307,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-replay-t32.test.ts",
-          "executedAt": "2026-09-23T13:40:00.000Z",
+          "executedAt": "2026-09-23T13:50:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "0c3ad9d0ac426997fc247cc3237a2c24b54e48080a4a1f509f4af5acd8b90cdb",
+          "sourceFingerprint": "9e50dc31f6b04fe7e8377c77eeae2ecf492f85573502752b4465fada4dec4f4e",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05d-vitest-t32.log",
-              "sha256": "f41324469e6712dad6225b1c920867512b6a9f731e375c66c0c4497362c3cf99"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05e-vitest-t32.log",
+              "sha256": "a32a74f938c2b900d66a05bb4e79eb498b46f7a4b462bdee1e6113ec44ffd4a6"
             }
           ]
         }
