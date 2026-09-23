@@ -33,7 +33,7 @@
 // LUẬT RÚT RA, ghi to: đo bằng công cụ chạy TRÊN máy chủ thì chỉ chứng minh máy
 // chủ sống. Muốn biết NGƯỜI DÙNG có đi qua đó không thì phải đếm ở chỗ dữ liệu
 // của người dùng đọng lại — bảng `luot` và `phong_cho`.
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -41,6 +41,15 @@ const API = fs.readFileSync(path.join(process.cwd(), 'src/lib/exam-api.ts'), 'ut
 const MCM = fs.readFileSync(path.join(process.cwd(), 'src/lib/may-chu-moi.ts'), 'utf8')
 const DB = fs.readFileSync(path.join(process.cwd(), 'src/lib/exam-db.ts'), 'utf8')
 const CFG = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'public/cau-hinh.json'), 'utf8')) as Record<string, string>
+
+const kho = vi.hoisted(() => ({ get: vi.fn(), put: vi.fn() }))
+vi.mock('idb', () => ({ openDB: async () => kho }))
+beforeEach(() => {
+  vi.resetModules()
+  kho.get.mockReset().mockResolvedValue(undefined)
+  kho.put.mockReset().mockResolvedValue(undefined)
+})
+afterEach(() => vi.unstubAllGlobals())
 
 describe('ĐƯỜNG DẪN ĐỊA CHỈ TỚI MÁY EM', () => {
   it('`public/cau-hinh.json` mang địa chỉ máy chủ mới', () => {
@@ -65,9 +74,15 @@ describe('ĐƯỜNG DẪN ĐỊA CHỈ TỚI MÁY EM', () => {
     expect(Object.keys(CFG).filter((k) => !k.startsWith('ghi_chu')).sort()).toEqual(['mayChuMoi'])
   })
 
-  it('chỉ nhận địa chỉ https, và cắt dấu gạch chéo thừa ở cuối', () => {
-    expect(DB).toContain('export async function loadDiaChiMayChuMoiChoEm()')
-    expect(DB).toContain("url.startsWith('https://') ? url.replace(/\\/+$/, '') : ''")
+  it('chỉ nhận địa chỉ https công khai, và cắt dấu gạch chéo thừa ở cuối', async () => {
+    const { loadDiaChiMayChuMoiChoEm } = await import('../src/lib/exam-db')
+    for (const [url, expected] of [
+      ['https://example.edu///', 'https://example.edu'], ['http://example.edu', ''],
+      ['https://localhost', ''], ['https://script.google.com/macros/s/a', ''],
+    ]) {
+      vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ mayChuMoi: url }))))
+      expect(await loadDiaChiMayChuMoiChoEm()).toBe(expected)
+    }
   })
 
   it('tệp hỏng hay mạng hỏng thì trả rỗng, KHÔNG nổ giữa lúc em vào thi', () => {
@@ -82,16 +97,23 @@ describe('LUẬT NẠP ĐỊA CHỈ LÚC KHỞI ĐỘNG', () => {
   const MOC = 'async function napThat()'
   const HAM = MCM.slice(MCM.indexOf(MOC), MCM.indexOf(MOC) + 900)
 
-  it('máy thầy đã có cấu hình ⇒ KHÔNG đụng vào, cờ tắt khẩn còn nguyên tác dụng', () => {
-    expect(HAM).toContain('if (ch.URL) return')
-    // và vế ấy phải đứng TRƯỚC lượt đọc tệp
-    expect(HAM.indexOf('if (ch.URL) return')).toBeLessThan(HAM.indexOf('loadDiaChiMayChuMoiChoEm()'))
+  it('máy thầy đã có cấu hình ⇒ giữ máy chủ riêng, không tải hay ghi đè', async () => {
+    kho.get.mockResolvedValue({ URL: 'https://rieng.example.edu', HAN_GIAY: 15 })
+    const fetch = vi.fn()
+    vi.stubGlobal('fetch', fetch)
+    const mc = await import('../src/lib/may-chu-moi')
+    await mc.napDiaChiMayChuMoiChoEm()
+    expect(await mc.layCauHinhMayChu()).toMatchObject({ URL: 'https://rieng.example.edu', HAN_GIAY: 15 })
+    expect(fetch).not.toHaveBeenCalled()
+    expect(kho.put).not.toHaveBeenCalled()
   })
 
-  it('máy chưa có cấu hình ⇒ đọc tệp, và CẤT LẠI để lần sau offline vẫn có', () => {
-    expect(HAM).toContain('const url = await loadDiaChiMayChuMoiChoEm()')
-    expect(HAM).toContain('if (!url) return')
-    expect(HAM).toContain('await saveCauHinhMayChu(moi)')
+  it('máy chưa có cấu hình ⇒ đọc tệp, và CẤT LẠI để lần sau offline vẫn có', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(CFG))))
+    const mc = await import('../src/lib/may-chu-moi')
+    await mc.napDiaChiMayChuMoiChoEm()
+    expect(await mc.layCauHinhMayChu()).toMatchObject({ BAT: true, URL: CFG.mayChuMoi })
+    expect(kho.put).toHaveBeenCalledWith('settings', expect.objectContaining({ URL: CFG.mayChuMoi }), 'mayChuMoi')
   })
 
   it('đi qua `chuanHoaMayChu`, không tự chế cấu hình', () => {
