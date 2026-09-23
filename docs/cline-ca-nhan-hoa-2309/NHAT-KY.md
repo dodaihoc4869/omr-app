@@ -183,3 +183,11 @@ Lý do dừng: gói này cần sửa các mô-đun chọn câu lớn (240–1405
 2. Nối tương tự vào `ke-hoach-ngay*.ts` cho câu tự động, kèm `revisionPhamVi` so lại trước khi phát (T12).
 3. Chạy lại nhóm test game-v2/kế hoạch ngày; sau đó mới xét PASS P02.
 
+
+## P02 tiep - noi bo loc vao game-v2-bank (sau co)
+
+Da noi locTheoPhamVi vao docKhoCau (game-v2-bank.ts): co pham_vi_hoc doc GOP mot cot vao truy van phienBanKho => co TAT thi KHONG them truy van D1 nao. Anh xa tam kienThuc -> skill_ids, reviewed -> approved, prerequisite rong (cho thay gan nhan).
+
+Bang chung: tsc server 0 loi; nhom test game-v2/ke hoach/bo chon 16 file xanh, 3 file do deu CO SAN trong nen P00 (cau-da-lam 1, chon-luot 4, parent-news-d1 2) => 0 test moi do. Log: evidence/p02-vitest-game-plan.log.
+
+CON THIEU: ke-hoach-ngay*.ts (kem revisionPhamVi cho T12) va parent-news-nguon-cau.ts. Vi chua du moi kenh tu dong, T01/T02/T03/T11/T12 giu IN_PROGRESS va P02 CHUA PASS - khong to xanh.

@@ -75,7 +75,7 @@
         "P01"
       ],
       "status": "IN_PROGRESS",
-      "notes": "Đã làm: migration learner_scope (state/source/evidence_ref/revision), server/src/pham-vi-hoc.ts (eligibleScope THUẦN + locTheoPhamVi + docPhamVi/docPhamViNhieu/revisionPhamVi + ghiEncountered/ghiTaught/thuHoiPhamVi + co pham_vi_hoc MAC DINH TAT), phan loai bang trong BANG_GIU. 18 test T01/T02/T03/T11 xanh tren D1 that. CHUA LAM: noi bo loc vao cac bo chon TU DONG trong ROUTE-MAPPING (game-v2-bank/ke-hoach-ngay/btvn-nang-do) — day la phan con thieu de dat gate P02.",
+      "notes": "DA LAM: migration learner_scope; server/src/pham-vi-hoc.ts (eligibleScope THUAN + locTheoPhamVi + docPhamVi/revisionPhamVi + ghiEncountered/ghiTaught/thuHoiPhamVi; co pham_vi_hoc MAC DINH TAT, doc GOP 1 cot vao truy van phienBanKho cua game-v2-bank nen co TAT khong them truy van); DA NOI vao MOT duong chon cau tu dong: game-v2-bank.ts (docKhoCau). CON THIEU: noi vao ke-hoach-ngay*.ts (T12 revision) va parent-news-nguon-cau.ts => chua dat chuan moi kenh tu dong nen T01/T02/T03/T11/T12 giu IN_PROGRESS va P02 chua PASS.",
       "evidence": [
         {
           "path": "server/migration-2309-cnh1-learner-scope.sql",
@@ -86,16 +86,16 @@
           "note": "eligibility thuan + adapter D1"
         },
         {
+          "path": "server/src/game-v2-bank.ts",
+          "note": "da noi loc pham vi vao bo chon tu dong (sau co)"
+        },
+        {
           "path": "tests/cnh-1-0-pham-vi-hoc.test.ts",
-          "note": "T01/T02/T03/T11 tren D1 that"
+          "note": "18 test T01/T02/T03/T11 tren D1 that"
         },
         {
-          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02-vitest-t01-t11.log",
-          "note": "18 test xanh exit 0"
-        },
-        {
-          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02-so-sanh-do.log",
-          "note": "0 test moi do"
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02-vitest-game-plan.log",
+          "note": "nhom game-v2/ke hoach: 0 test moi do"
         }
       ]
     },
@@ -884,7 +884,7 @@
       "phase": "P05",
       "level": "code",
       "title": "Cache cũ",
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "evidence": []
     },
     {

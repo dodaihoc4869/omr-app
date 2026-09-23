@@ -5,6 +5,8 @@ import type { Env } from './kieu'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../../src/lib/exam-kho-de-import'
 import {grade} from '../../src/game/than-thu-v2/core'
 import type { Evidence, PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
+// PHẠM VI HỌC CÁ NHÂN (CNH-1.0 P02): lọc bộ chọn TỰ ĐỘNG theo `taught`/nền/bảo vệ. Cờ TẮT ⇒ không ảnh hưởng.
+import { docPhamVi, locTheoPhamVi, tomTatLyDo } from './pham-vi-hoc'
 type Row=Record<string,unknown>
 const str=(v:unknown)=>String(v??'')
 export async function hash(v:unknown):Promise<string>{const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(v)));return [...new Uint8Array(bytes)].map(x=>x.toString(16).padStart(2,'0')).join('')}
@@ -211,7 +213,8 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
      (khoá = mã dạng; chỉ giữ CHUỖI json, phân tích lại mỗi lượt; trần ~16 triệu ký tự, bỏ dạng cũ nhất). Dạng chưa có trong đệm ⇒ nạp MỘT truy vấn cho mọi dạng còn thiếu của lô 60. Kết quả (nội dung + thứ tự `ma_de|qid` trong từng lô 60 dạng) GIỐNG HỆT bản không đệm.
      PHẦN RIÊNG của em (bằng chứng, câu đã gặp `originals`, câu bị chặn, đã làm hôm nay) KHÔNG đi qua đệm: ở trên và ở nơi gọi, đọc tươi mỗi lượt. Kho đổi (tải đề mới) hiện chậm nhất 60 giây. */
   // Phiên bản kho = (số tờ đang dùng được, cap_nhat_luc lớn nhất, danh sách mã tờ): thêm / sửa / xoá một tờ đề đổi khoá ⇒ đệm cũ không bao giờ được dùng (không chờ hết 60 giây). Một truy vấn tổng hợp nhẹ trên hai bảng nhỏ.
-  let phienBanKho='?';try{const v=await env.DB.prepare(`SELECT COUNT(*) AS n, COALESCE(MAX(d.cap_nhat_luc),'') AS t, COALESCE(GROUP_CONCAT(d.ma_de),'') AS ids FROM de_kho d JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0`).first<{n:number;t:string;ids:string}>();phienBanKho=`${v?.n}|${v?.t}|${v?.ids}`}catch{phienBanKho='?'+Math.random()}
+  // CỜ PHẠM VI HỌC đọc GỘP MỘT CỘT vào CHÍNH truy vấn này (P02): cờ TẮT ⇒ KHÔNG thêm truy vấn D1 nào.
+  let phienBanKho='?';let coPhamVi=false;try{const v=await env.DB.prepare(`SELECT COUNT(*) AS n, COALESCE(MAX(d.cap_nhat_luc),'') AS t, COALESCE(GROUP_CONCAT(d.ma_de),'') AS ids, (SELECT gia_tri FROM cau_hinh WHERE khoa='pham_vi_hoc') AS co_pv FROM de_kho d JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0`).first<{n:number;t:string;ids:string;co_pv:string|null}>();phienBanKho=`${v?.n}|${v?.t}|${v?.ids}`;coPhamVi=String(v?.co_pv??'').trim()==='bat'}catch{phienBanKho='?'+Math.random()}
   const bayGio=Date.now()
   for(let i=0;i<types.length;i+=60){const ids=types.slice(i,i+60)
     const theoDang=new Map<string,{k:string;q:CauPool}[]>();const thieu:string[]=[]
@@ -236,5 +239,15 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
     pool.push(...gop.map(x=>x.q))
   }
   // LUẬT KHỐI (Boss 21/09): kho ứng viên chỉ gồm câu khối em hoặc thấp hơn — dạng dùng chung nhiều khối nên lọc theo DẠNG không đủ. Bằng chứng (`evidence`) là lịch sử THẬT của em, giữ nguyên. Lọc đứng SAU đệm kho theo dạng (đệm chung mọi em), riêng từng em.
-  return {evidence,pool:locCauHopKhoi(await docKhoiEm(env,sbd),[...pool.reduce((m,q)=>{const c=q as CauPool,cu=m.get(c.qid);if(!(cu&&!cu.nhe&&c.nhe))m.set(c.qid,c);return m},new Map<string,CauPool>()).values()] /* qid trùng: bản SAU thắng như cũ, TRỪ khi bản đang giữ là câu đầy đủ và bản mới là bản nhẹ */),missing}
+  const poolSach=locCauHopKhoi(await docKhoiEm(env,sbd),[...pool.reduce((m,q)=>{const c=q as CauPool,cu=m.get(c.qid);if(!(cu&&!cu.nhe&&c.nhe))m.set(c.qid,c);return m},new Map<string,CauPool>()).values()] /* qid trùng: bản SAU thắng như cũ, TRỪ khi bản đang giữ là câu đầy đủ và bản mới là bản nhẹ */)
+  // PHẠM VI HỌC CÁ NHÂN (CNH-1.0 P02 — đặc tả 02 §2). Cờ `pham_vi_hoc` TẮT (mặc định) ⇒ đường cũ y nguyên.
+  // Cờ BẬT ⇒ lọc theo `eligibleScope`. THIẾU câu vì thiếu `taught` thì TRẢ THIẾU, KHÔNG nới lọc và KHÔNG
+  // fallback sang kho lớp/toàn ngân hàng. ÁNH XẠ TẠM (ghi rõ để thầy xác nhận nhãn): `kienThuc`→skill_ids;
+  // `reviewed`→approved; `prerequisite_ids` chưa có nhãn trong kho nên để rỗng cho tới khi thầy gắn nhãn.
+  if(!coPhamVi)return {evidence,pool:poolSach,missing}
+  const phamVi=await docPhamVi(env,sbd)
+  const xetDuyet=poolSach.map((q)=>({qid:q.qid,version:q.version,contentGroup:q.group,skillIds:Array.isArray(q.kienThuc)?q.kienThuc:[],prerequisiteIds:[],qualityStatus:q.reviewed?'approved':'chua_duyet'}))
+  const {duoc,loai}=locTheoPhamVi(xetDuyet,phamVi)
+  const giu=new Set(duoc.map((x)=>x.qid))
+  return {evidence,pool:poolSach.filter((q)=>giu.has(q.qid)),missing,...(loai.length?{phamViLoai:tomTatLyDo(loai)}:{})}
 }
