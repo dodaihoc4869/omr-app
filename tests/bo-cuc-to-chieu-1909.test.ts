@@ -325,7 +325,7 @@ describe('mã trong tờ — đợt ĐƠN leo bậc', () => {
     expect(r.d.querySelector('.mc-ghi-chu')?.textContent).toMatch(/bảng phụ|nhỏ hơn|quá dài/)
   })
 
-  it('ghi chú của đợt đang hiện nằm ở Ô CHỮ của thanh dưới (không vẽ đè lên đề); đợt không ghi chú thì ô ấy nói giờ pha kế', () => {
+  it('ghi chú của đợt đang hiện nằm ở Ô CHỮ của thanh dưới (không vẽ đè lên đề); đợt không ghi chú thì để trống', () => {
     const co = moTo([cau('A', 'từ '.repeat(1500))])
     const phu = co.doc.querySelector('.mc-thanh-phu')!
     const chu = co.dot()[0].querySelector('.mc-ghi-chu')!.textContent
@@ -335,12 +335,12 @@ describe('mã trong tờ — đợt ĐƠN leo bậc', () => {
     const khong = moTo([ngan('A'), ngan('B')])
     const phuKhong = khong.doc.querySelector('.mc-thanh-phu')!
     expect(khong.dot()[0].querySelector('.mc-ghi-chu')).toBeNull()
-    expect(phuKhong.textContent).toMatch(/^rồi chữa \d+:\d\d$/)
+    expect(phuKhong.textContent).toBe('')
     expect(phuKhong.hasAttribute('data-ghi-chu')).toBe(false)
     // đo lại (đổi cỡ, đổi cửa sổ…) làm ghi chú BIẾN MẤT ⇒ ô chữ trả về giờ pha kế, không kẹt chữ cũ
     co.dot()[0].querySelector('.mc-ghi-chu')!.remove()
     co.doc.dispatchEvent(new co.w.CustomEvent('mc-bo-cuc-xong'))
-    expect(phu.textContent).toMatch(/^rồi chữa \d+:\d\d$/)
+    expect(phu.textContent).toBe('')
     expect(phu.hasAttribute('data-ghi-chu')).toBe(false)
   })
 

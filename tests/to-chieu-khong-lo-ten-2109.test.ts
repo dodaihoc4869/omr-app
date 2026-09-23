@@ -83,13 +83,14 @@ describe('tờ máy chiếu · sau khi hiện thẻ tên', () => {
     for (const s of CAC_CHUOI_LO) expect(chuNhinThay(dom), s).not.toContain(s)
     dom.window.close()
   })
-  it('hết giờ làm bài ⇒ hiện cả hai thẻ ⇒ cả hai nhãn có tên đúng em; đợt đơn: cả hai ô nhãn đều đổi', () => {
+  it('bấm Lên bảng ⇒ hiện cả hai thẻ ⇒ cả hai nhãn có tên đúng em; đợt đơn: cả hai ô nhãn đều đổi', () => {
     let now = 0
     let tick = () => {}
     const dom = new JSDOM(taoHtmlMayChieu([HUY, LAN], { dayHoc: true }), { runScripts: 'dangerously', beforeParse(w) { w.Date.now = () => now; w.setInterval = ((f: () => void) => { tick = f; return 1 }) as never; w.clearInterval = () => {}; w.HTMLElement.prototype.scrollTo = () => {} } })
     const doc = dom.window.document
     now = 61000
     tick()
+    doc.getElementById('mc-len-bang')!.click()
     expect(nhan(doc, '.mc-dot:first-child .mc-trang')).toEqual(['Phần làm bài của Huy', 'Phần làm bài của Lan'])
     dom.window.close()
     const don = dung([HUY_DAI])

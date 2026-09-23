@@ -159,7 +159,7 @@ describe('thanh dưới: đủ phần tử, giữ id cũ, ngân sách buổi', (
   it('có đủ id (mã cũ và mới) và hộp cài đặt chứa nền giấy, cỡ chữ, toàn màn hình', () => {
     const h = taoHtmlMayChieu([o('A', 'An')], { tenBuoi: 'Chữa bài ca 111111', nganSachPhut: 90 })
     const doc = new JSDOM(h).window.document
-    for (const id of ['mc-thanh', 'mc-truoc', 'mc-sau', 'mc-dem', 'mc-pha', 'mc-clock', 'mc-tien-dong', 'mc-tiep', 'mc-buoi', 'mc-cai-btn', 'mc-cai-dat', 'mc-palette', 'mc-size', 'mc-toan', 'mc-ray']) {
+    for (const id of ['mc-thanh', 'mc-truoc', 'mc-sau', 'mc-dem', 'mc-pha', 'mc-len-bang', 'mc-tiep', 'mc-cai-btn', 'mc-cai-dat', 'mc-palette', 'mc-size', 'mc-toan', 'mc-ray']) {
       expect(doc.getElementById(id), id).toBeTruthy()
     }
     expect(doc.getElementById('mc-cai-dat')!.hasAttribute('hidden')).toBe(true)
@@ -264,8 +264,8 @@ const HAI_EM = () => [o('A', 'Nguyễn Văn Minh', { thanThu: thu('Lửa'), lanL
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
 describe('màn gọi tên đầu đợt', () => {
-  it('có thần thú ⇒ màn gọi tên hiện ngay: mỗi em một nửa, tên to, thú · cấp, chip câu + lần lên bảng; đồng hồ đứng yên (pha "goi")', () => {
-    const t = moTo(HAI_EM())
+  it('có thần thú ⇒ bấm nút mới hiện màn gọi tên: mỗi em một nửa, tên to, thú · cấp, chip câu + lần lên bảng; đồng hồ đứng yên (pha "goi")', () => {
+    const t = moTo(HAI_EM()); t.doc.getElementById('mc-len-bang')!.click()
     const the = [...t.doc.querySelectorAll('.mc-intro-card')]
     expect(the).toHaveLength(2)
     expect(t.doc.querySelector('.mc-intro-label')!.textContent).toBe('Đợt 1 · mời hai bạn lên bảng')
@@ -277,173 +277,82 @@ describe('màn gọi tên đầu đợt', () => {
     expect((the[1] as HTMLElement).style.getPropertyValue('--aura')).toBe('43,166,208')
     expect(t.pha()).toBe('goi')
     expect(t.doc.getElementById('mc-pha')!.textContent).toBe('MỜI LÊN BẢNG')
-    // giờ LÀM BÀI chưa chạy: đồng hồ chỉ báo giờ sắp tới
-    const lam = Number(t.doc.querySelector('.mc-nua')!.getAttribute('data-lam'))
-    expect(t.dong()).toBe(mmss(Math.max(lam, Number(t.doc.querySelectorAll('.mc-nua')[1].getAttribute('data-lam')))))
+    expect(t.doc.getElementById('mc-clock')).toBeNull()
     t.dat(1000)
     t.nhip()
     expect(t.pha()).toBe('goi')
   })
 
-  it('sau 2,5 s thu về thẻ tên (bay 0,85 s) rồi sang LÀM BÀI; màn gọi tên biến mất', () => {
-    const t = moTo(HAI_EM())
+  it('sau 2,5 s thu về thẻ tên (bay 0,85 s) rồi sang CHỮA; màn gọi tên biến mất', () => {
+    const t = moTo(HAI_EM()); t.doc.getElementById('mc-len-bang')!.click()
     expect(t.hen.some((x) => !x.huy && x.ms === GIAO_DIEN_TO_CHIEU.GOI_TEN_MS)).toBe(true)
     t.chay(GIAO_DIEN_TO_CHIEU.GOI_TEN_MS)
     expect(t.doc.querySelector('.mc-intro')!.classList.contains('mc-shrink')).toBe(true)
     expect(t.pha()).toBe('goi') // còn đang bay
     t.chay(GIAO_DIEN_TO_CHIEU.BAY_VE_THE_MS + 60)
     expect(t.doc.querySelector('.mc-intro')).toBeNull()
-    expect(t.pha()).toBe('lam')
-    expect(t.doc.getElementById('mc-pha')!.textContent).toBe('ĐANG LÀM BÀI')
+    expect(t.pha()).toBe('chua')
+    expect(t.doc.getElementById('mc-pha')!.textContent).toBe('ĐANG CHỮA')
   })
 
-  it('bấm phím bất kỳ, hoặc chạm vào màn gọi tên ⇒ bỏ qua ngay và sang LÀM BÀI', () => {
-    const a = moTo(HAI_EM())
+  it('bấm phím bất kỳ, hoặc chạm vào màn gọi tên ⇒ bỏ qua ngay và sang CHỮA', () => {
+    const a = moTo(HAI_EM()); a.doc.getElementById('mc-len-bang')!.click()
     a.doc.dispatchEvent(new a.w.KeyboardEvent('keydown', { key: 'a' }))
     expect(a.doc.querySelector('.mc-intro')).toBeNull()
-    expect(a.pha()).toBe('lam')
-    const b = moTo(HAI_EM())
+    expect(a.pha()).toBe('chua')
+    const b = moTo(HAI_EM()); b.doc.getElementById('mc-len-bang')!.click()
     ;(b.doc.querySelector('.mc-intro') as HTMLElement).click()
     expect(b.doc.querySelector('.mc-intro')).toBeNull()
-    expect(b.pha()).toBe('lam')
+    expect(b.pha()).toBe('chua')
   })
 
-  it('giảm chuyển động ⇒ KHÔNG có màn gọi tên nào, vào thẳng LÀM BÀI; không phải ⇒ có', () => {
-    const giam = moTo(HAI_EM(), { giam: true })
+  it('giảm chuyển động ⇒ KHÔNG có màn gọi tên nào, bấm nút vào thẳng CHỮA; không phải ⇒ có', () => {
+    const giam = moTo(HAI_EM(), { giam: true }); giam.doc.getElementById('mc-len-bang')!.click()
     expect(giam.doc.querySelector('.mc-intro')).toBeNull()
-    expect(giam.pha()).toBe('lam')
-    expect(moTo(HAI_EM(), { giam: false }).doc.querySelector('.mc-intro')).toBeTruthy()
+    expect(giam.pha()).toBe('chua')
+    const normal=moTo(HAI_EM(),{giam:false});normal.doc.getElementById('mc-len-bang')!.click();expect(normal.doc.querySelector('.mc-intro')).toBeTruthy()
   })
 
   it('không thần thú nào tải được ⇒ bỏ qua màn gọi tên (không chờ, không bể); đợt sau vẫn gọi tên bình thường', () => {
-    const t = moTo([o('A', 'An'), o('B', 'Bình')])
+    const t = moTo([o('A', 'An'), o('B', 'Bình')]); t.doc.getElementById('mc-len-bang')!.click()
     expect(t.doc.querySelector('.mc-intro')).toBeNull()
-    expect(t.pha()).toBe('lam')
+    expect(t.pha()).toBe('chua')
   })
 
   it('sang đợt khác ⇒ dọn màn gọi tên cũ, gọi tên đợt mới ("Đợt 2 · mời hai bạn lên bảng")', () => {
     const dsO = [...HAI_EM(), o('C', 'Cường', { thanThu: thu('Đất'), soCau: 11 }), o('D', 'Dung', { thanThu: thu('Khí'), soCau: 12 })]
-    const t = moTo(dsO)
+    const t = moTo(dsO); t.doc.getElementById('mc-len-bang')!.click()
     t.goiXong()
-    t.doc.getElementById('mc-sau')!.click()
+    t.doc.getElementById('mc-sau')!.click(); expect(t.pha()).toBe('cho'); t.doc.getElementById('mc-len-bang')!.click()
     expect(t.doc.querySelectorAll('.mc-intro')).toHaveLength(1)
     expect(t.doc.querySelector('.mc-intro-label')!.textContent).toBe('Đợt 2 · mời hai bạn lên bảng')
-    t.doc.getElementById('mc-truoc')!.click()
+    t.doc.getElementById('mc-truoc')!.click(); t.doc.getElementById('mc-len-bang')!.click()
     expect(t.doc.querySelector('.mc-intro-label')!.textContent).toBe('Đợt 1 · mời hai bạn lên bảng')
   })
 })
 
-describe('thanh dưới: pha LÀM BÀI → CHỮA → quá giờ (không tự lật trang)', () => {
-  it('LÀM BÀI đếm ngược đúng T_đọc+T_làm lớn nhất của hai em; ô chữ báo "rồi chữa" = Σ T_chữa; tiến độ chạy', () => {
-    const t = moTo(HAI_EM())
-    t.goiXong()
-    const nua = [...t.doc.querySelectorAll<HTMLElement>('.mc-nua')]
-    const lam = Math.max(...nua.map((x) => Number(x.getAttribute('data-lam'))))
-    const chua = nua.reduce((a, x) => a + Number(x.getAttribute('data-chua')), 0)
-    expect(t.pha()).toBe('lam')
-    expect(t.dong()).toBe(mmss(lam))
-    expect(t.tiep()).toBe(`rồi chữa ${mmss(chua)}`)
-    expect(t.doc.getElementById('mc-tien-dong')!.style.width).toBe('0%')
-    t.dat(Math.round(lam / 2))
-    t.nhip()
-    expect(t.dong()).toBe(mmss(lam - Math.round(lam / 2)))
-    expect(t.doc.getElementById('mc-tien-dong')!.style.width).toBe(`${Math.round((Math.round(lam / 2) / lam) * 100)}%`)
-  })
-
-  it('hết giờ LÀM ⇒ sang CHỮA, đếm ngược T_chữa; ô chữ nói "làm … · chữa …"', () => {
-    const t = moTo(HAI_EM())
-    t.goiXong()
-    const nua = [...t.doc.querySelectorAll<HTMLElement>('.mc-nua')]
-    const lam = Math.max(...nua.map((x) => Number(x.getAttribute('data-lam'))))
-    const chua = nua.reduce((a, x) => a + Number(x.getAttribute('data-chua')), 0)
-    t.dat(lam + 1)
-    t.nhip()
-    expect(t.pha()).toBe('chua')
-    expect(t.doc.getElementById('mc-pha')!.textContent).toBe('ĐANG CHỮA')
-    // pha CHỮA bắt đầu ở lúc chuyển: han = (lam+1) + chua
-    t.dat(lam + 1 + 10)
-    t.nhip()
-    expect(t.dong()).toBe(mmss(chua - 10))
-    expect(t.tiep()).toBe(`làm ${mmss(lam)} · chữa ${mmss(chua)}`)
-  })
-
-  it('quá giờ chữa: chỉ ĐỔI MÀU/đổi chữ đồng hồ ("+m:ss", pha "het"), KHÔNG tự lật trang', () => {
-    const dsO = [...HAI_EM(), o('C', 'Cường'), o('D', 'Dung')]
-    const t = moTo(dsO)
-    t.goiXong()
-    const nua = [...t.doc.querySelectorAll<HTMLElement>('.mc-dot:first-child .mc-nua')]
-    const lam = Math.max(...nua.map((x) => Number(x.getAttribute('data-lam'))))
-    const chua = nua.reduce((a, x) => a + Number(x.getAttribute('data-chua')), 0)
-    t.dat(lam + 1)
-    t.nhip()
-    t.dat(lam + 1 + chua - 1)
-    t.nhip()
-    expect(t.pha()).toBe('chua') // còn 1 giây
-    t.dat(lam + 1 + chua + 5)
-    t.nhip()
-    expect(t.pha()).toBe('het')
-    expect(t.doc.getElementById('mc-pha')!.textContent).toBe('QUÁ GIỜ CHỮA')
-    expect(t.dong()).toBe('+0:05')
-    expect(t.doc.getElementById('mc-tien-dong')!.style.width).toBe('100%')
-    // vẫn ở đợt 1, không nút nào bị bấm hộ
-    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 1/2')
-    expect((t.doc.getElementById('mc-truoc') as HTMLButtonElement).disabled).toBe(true)
-    expect((t.doc.getElementById('mc-sau') as HTMLButtonElement).disabled).toBe(false)
-  })
-
-  it('thầy bấm sang đợt kế BẤT CỨ LÚC NÀO: giờ và pha làm lại từ đầu cho đợt mới', () => {
-    const dsO = [...HAI_EM(), o('C', 'Cường'), o('D', 'Dung')]
-    const t = moTo(dsO)
-    t.goiXong()
-    t.dat(30)
-    t.nhip()
-    t.doc.getElementById('mc-sau')!.click()
-    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 2/2')
-    expect(t.pha()).toBe('lam')
-    const lam2 = Math.max(...[...t.doc.querySelectorAll<HTMLElement>('.mc-dot:nth-child(2) .mc-nua')].map((x) => Number(x.getAttribute('data-lam'))))
-    expect(t.dong()).toBe(mmss(lam2))
-  })
-
-  it('"Buổi: x/N phút" chạy theo đồng hồ từ lúc mở tờ; thiếu ngân sách thì chỉ ghi số phút', () => {
-    const t = moTo(HAI_EM(), { tuyChon: { nganSachPhut: 90 } })
-    t.nhip()
-    expect(t.buoi()).toBe('Buổi: 0/90 phút')
-    t.dat(31 * 60 + 5)
-    t.nhip()
-    expect(t.buoi()).toBe('Buổi: 31/90 phút')
-    const k = moTo(HAI_EM())
-    k.nhip()
-    k.dat(125)
-    k.nhip()
-    expect(k.buoi()).toBe('Buổi: 2 phút')
-  })
-
-  it('trang đáp án (không có em) không có giờ: thanh ẩn pha/đồng hồ/tiến độ (data-pha rỗng)', () => {
-    const t = moTo([o('A', 'An', { thanThu: thu('Lửa') })], { tuyChon: { dsDapAn: [cauI('x1'), cauI('x2')] } })
-    t.goiXong()
-    t.doc.getElementById('mc-sau')!.click()
-    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 2/2')
-    expect(t.pha()).toBe('')
-    expect(CSS_GIAO_DIEN_TO_CHIEU).toContain('body.mc .mc-thanh[data-pha=""] .mc-pha')
-  })
-
-  it('chế độ DẠY HỌC giữ nguyên: thẻ tên ẩn tới hết giờ làm bài, rồi lộ tên + màn gọi tên, rồi CHỮA; nút "Hiện học sinh…" chỉ có ở chế độ này', () => {
-    const t = moTo(HAI_EM(), { tuyChon: { dayHoc: true } })
-    const heads = () => [...t.doc.querySelectorAll<HTMLElement>('.mc-em')].map((e) => e.hidden)
-    expect(heads()).toEqual([true, true])
-    expect(t.pha()).toBe('lam')
+describe('thanh dưới gọi thủ công, không còn đồng hồ',()=>{
+  it.each([false,true])('dayHoc=%s: chờ vô hạn trước bấm; gọi xong không tự đổi đợt',dayHoc=>{
+    const t=moTo([...HAI_EM(),o('C','Cường'),o('D','Dung')],{tuyChon:{dayHoc,nganSachPhut:90}})
+    expect(t.pha()).toBe('cho')
+    t.dat(3600);t.nhip()
+    expect(t.pha()).toBe('cho')
+    expect(t.doc.querySelectorAll('#mc-clock,#mc-buoi,#mc-tien-dong')).toHaveLength(0)
     expect(t.doc.querySelector('.mc-intro')).toBeNull()
-    const lam = Number(t.doc.querySelector('.mc-nua')!.getAttribute('data-lam'))
-    t.dat(lam + 1)
-    t.nhip()
-    expect(heads()).toEqual([false, false])
-    expect(t.doc.querySelectorAll('.mc-intro-card')).toHaveLength(2)
-    expect(t.pha()).toBe('goi')
-    t.goiXong()
+    t.doc.getElementById('mc-len-bang')!.click();t.goiXong()
     expect(t.pha()).toBe('chua')
-    for (const b of t.doc.querySelectorAll<HTMLElement>('.mc-nut-hien-em')) expect(b.hidden).toBe(true)
-    expect(CSS_GIAO_DIEN_TO_CHIEU).toContain('body.mc .mc-nut-hien-em{display:none}')
-    expect(CSS_GIAO_DIEN_TO_CHIEU).toContain('body.mc-day-hoc .mc-nut-hien-em{display:inline-flex')
+    t.dat(7200);t.nhip()
+    expect(t.pha()).toBe('chua')
+    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 1/2')
+    t.doc.getElementById('mc-sau')!.click()
+    expect(t.pha()).toBe('cho')
+    expect((t.doc.getElementById('mc-len-bang') as HTMLButtonElement).disabled).toBe(false)
+  })
+  it('trang đáp án không gọi học sinh',()=>{
+    const t=moTo([o('A','An')],{tuyChon:{dsDapAn:[cauI('x1')]}})
+    t.doc.getElementById('mc-sau')!.click()
+    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 2/2')
+    expect((t.doc.getElementById('mc-len-bang') as HTMLButtonElement).hidden).toBe(true)
   })
 })
 

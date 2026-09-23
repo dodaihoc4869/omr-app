@@ -304,7 +304,7 @@ function headerEmHtml(o: OBang, ma: string): string {
   </header>`
 }
 
-/** Thời gian ĐỌC VÀ LÀM của chế độ dạy học (đồng hồ đếm ngược trước khi mời em lên bảng): làm tròn 15 giây, giới hạn 1–3 phút.
+/** Ước lượng ĐỌC VÀ LÀM để lập giáo án (màn chiếu hiện tại chỉ gọi bằng nút bấm): làm tròn 15 giây, giới hạn 1–3 phút.
  *
  * Từ M1 (19/09) dùng CHUNG `thoiGianCau` (`thoi-gian-len-bang.ts`) với Engine E — không còn công thức thứ hai:
  * T_đọc + T_làm theo phần, sao, độ dài đề, hình/bảng. Kẹp 60–180 s là của RIÊNG chế độ dạy học (test `day-hoc-dem-nguoc`). */
@@ -314,9 +314,8 @@ export function thoiGianDayHoc(o: OBang): number {
   return Math.max(60, Math.min(180, Math.round((t.doc + t.lam) / 15) * 15))
 }
 
-/** GIỜ CỦA MỘT Ô cho thanh dưới (pha LÀM BÀI → CHỮA): `lam` = T_đọc + T_làm, `chua` = T_chữa — cùng công thức Engine E
- * (`thoiGianCau`), nhưng CHIA RIÊNG ba thành phần thay vì cộng thành một tổng. Chế độ dạy học: `lam` là giờ đếm ngược đã có
- * (`thoiGianDayHoc`, kẹp 60–180 s) để đồng hồ dạy học không đổi. */
+/** Ước lượng thời gian của một ô, giữ metadata tương thích giáo án: `lam` = T_đọc + T_làm, `chua` = T_chữa — cùng công thức Engine E
+ * (`thoiGianCau`), nhưng CHIA RIÊNG ba thành phần thay vì cộng thành một tổng. Chế độ dạy học dùng `thoiGianDayHoc` kẹp 60–180 s. Các giá trị này không chạy đồng hồ hay tự gọi học sinh. */
 function gioCuaO(o: OBang, dayHoc: boolean): { lam: number; chua: number; lam0: number; chua0: number } {
   const sao = (o.sao === 0 || o.sao === 1 || o.sao === 2 ? o.sao : o.mucDo === 'van_dung' ? 2 : o.mucDo === 'hieu' ? 1 : 0) as 0 | 1 | 2
   const dau = { phan: o.cau.phan, sao, noiDung: noiDungTuCauLuyen(o.cau), tiLeLopSai: o.tiLeLopSai, bacEm: o.bacEm ?? null }
@@ -647,21 +646,15 @@ const JS_MAY_CHIEU = `
   var sau = document.getElementById('mc-sau');
   var thanh = document.getElementById('mc-thanh');
   var phaEl = document.getElementById('mc-pha');
-  var tienDong = document.getElementById('mc-tien-dong');
-  var buoiEl = document.getElementById('mc-buoi');
   var caiBtn = document.getElementById('mc-cai-btn');
   var caiDat = document.getElementById('mc-cai-dat');
-  var clock = document.getElementById('mc-clock');
   var i = 0;
   var GOI_TEN_MS = ${GIAO_DIEN_TO_CHIEU.GOI_TEN_MS}, BAY_MS = ${GIAO_DIEN_TO_CHIEU.BAY_VE_THE_MS}, MUNG_MS = ${GIAO_DIEN_TO_CHIEU.AN_MUNG_MS};
-  var NGAN_SACH_PHUT = Number(document.body.getAttribute('data-ngan-sach')) || 0;
   var dayHoc = document.body.classList.contains('mc-day-hoc');
   var intro = null, introTimeout = null;
-  // Pha của đợt đang hiện: '' (không có giờ) · goi (màn gọi tên) · lam (ĐANG LÀM BÀI) · chua (ĐANG CHỮA) · het (quá giờ chữa).
-  var gd = { pha: '', han: 0, tong: 0, lam: 0, chua: 0, sau: 'lam', batLam: -1 };
-  var dotDangVao = -1, phienBatDau = -1;
-  // Ô đã báo giây thật trong đợt này: vị trí ô -> giờ CHỮA (mô hình chưa hiệu chỉnh). Xoá mỗi khi vào đợt mới.
-  var dotBam = {};
+  // Đợt luôn chờ Thầy bấm; thời lượng chỉ còn dùng cho hiệu ứng thần thú.
+  var gd = { pha: '', sau: 'chua' };
+  var dotDangVao = -1;
 
   /** NHÃN vùng làm bài (góc dưới phải bảng): thẻ tên còn ẩn ⇒ nhãn KHÔNG tên (data-nhan gốc); thẻ đã hiện ⇒ tên thật lấy từ data-nhan-em. Gọi mỗi khi thẻ hiện / ẩn; chỉ đụng ô có data-nhan-em (chế độ dạy học). */
   var NHAN_KHONG_TEN = ${JSON.stringify(NHAN_LAM_BAI_KHONG_TEN)};
@@ -680,18 +673,8 @@ const JS_MAY_CHIEU = `
     });
   }
 
-  function dinhDang(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
   function giamChuyenDong() { return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
   function anhXong(im) { return !!(im && im.complete && im.naturalWidth); }
-  /** Giờ của đợt: LÀM = max(T_đọc+T_làm) của các em còn trong đợt (làm song song); CHỮA = Σ T_chữa (chữa lần lượt). */
-  function gioDot(page) {
-    var lam = 0, chua = 0;
-    Array.prototype.forEach.call(page.querySelectorAll('.mc-nua[data-lam]'), function (n) {
-      lam = Math.max(lam, Number(n.getAttribute('data-lam')) || 0);
-      chua += Number(n.getAttribute('data-chua')) || 0;
-    });
-    return { lam: lam, chua: chua };
-  }
 
   function huyGoi() {
     if (introTimeout) clearTimeout(introTimeout);
@@ -701,9 +684,6 @@ const JS_MAY_CHIEU = `
   }
   function chuyenPha(pha) {
     gd.pha = pha;
-    if (pha === 'lam') gd.batLam = Date.now();
-    gd.tong = pha === 'lam' ? gd.lam : pha === 'chua' ? gd.chua : 0;
-    gd.han = Date.now() + gd.tong * 1000;
     veThanh();
   }
   /** Màn gọi tên xong (hết giờ, hoặc thầy bấm/chạm/gõ phím bỏ qua): thu về thẻ tên và sang pha kế. */
@@ -811,93 +791,49 @@ const JS_MAY_CHIEU = `
     Array.prototype.forEach.call(page.querySelectorAll('.mc-nut-hien-em'), function (b) { b.hidden = true; });
     dongBoNhan();
   }
-  function hetLam() {
+  /** Thầy chủ động gọi từng đợt; thời gian dự tính chỉ dùng lập giáo án. */
+  function lenBang() {
     var page = dots[i];
-    if (!page) return;
-    if (dayHoc) { loThe(page); goiTen(page, 'chua'); }
-    else chuyenPha('chua');
+    if (!page || gd.pha !== 'cho') return;
+    gd.pha = 'goi';
+    loThe(page);
+    veThanh();
+    choAnh(page, function () {
+      if (dots[i] === page && gd.pha === 'goi') goiTen(page, 'chua');
+    });
   }
-  /** VÀO MỘT ĐỢT: dọn đợt trước, tính giờ hai pha, gọi tên (rồi LÀM BÀI). Chế độ dạy học: lớp làm bài trước, thẻ tên ẩn tới khi hết giờ. */
   function vaoDot() {
     var page = dots[i];
     huyGoi();
-    var g = page ? gioDot(page) : { lam: 0, chua: 0 };
-    gd.lam = g.lam;
-    gd.chua = g.chua;
-    gd.pha = '';
-    gd.batLam = -1;
-    dotBam = {};
-    if (!page || (!g.lam && !g.chua)) { veThanh(); return; }
-    if (dayHoc) {
-      Array.prototype.forEach.call(page.querySelectorAll('.mc-em'), function (e) { e.hidden = true; });
-      Array.prototype.forEach.call(page.querySelectorAll('.mc-nut-hien-em'), function (b) { b.hidden = false; b.setAttribute('aria-expanded', 'false'); });
-      dongBoNhan();
+    gd.pha = page && page.querySelector('.mc-em[id]') ? 'cho' : '';
+    if (page) {
+      page.querySelectorAll('.mc-em[id]').forEach(function (e) { e.hidden = true; });
+      page.querySelectorAll('.mc-nut-hien-em').forEach(function (e) { e.hidden = true; });
       page.querySelectorAll('.mc-giai').forEach(function (e) { e.hidden = true; });
       page.querySelectorAll('.mc-nut-giai').forEach(function (e) { e.setAttribute('aria-expanded', 'false'); var t = e.querySelector('.mc-nut-chu'); if (t) t.textContent = 'Hiện lời giải'; });
-      chuyenPha('lam');
-      return;
-    }
-    gd.pha = 'goi';
-    gd.sau = 'lam';
-    veThanh();
-    choAnh(page, function () { if (dots[i] === page && gd.pha === 'goi') goiTen(page, 'lam'); });
-  }
-  /** GIÂY THẬT của đợt tới lúc thầy bấm một ô (M6): từ lúc đợt bắt đầu LÀM BÀI tới bây giờ, kèm T dự tính của ĐÚNG khoảng ấy — LÀM của đợt
-   * (max các ô) + Σ CHỮA của các ô đã bấm tới lúc này (kể cả ô này), đều theo giờ CHƯA hiệu chỉnh. Cầu nối gửi hai số này cho app cùng lệnh
-   * ghi. Không có giờ (chế độ dạy học, đợt không có giờ, ô không thuộc đợt đang hiện) thì trả null và lệnh ghi đi như cũ. */
-  function giayDot(vung) {
-    if (dayHoc || gd.batLam < 0) return null;
-    var page = dots[i];
-    var nua = vung && vung.closest ? vung.closest('.mc-nua') : null;
-    if (!page || !nua || !page.contains(nua)) return null;
-    var ds = Array.prototype.slice.call(page.querySelectorAll('.mc-nua[data-lam]'));
-    var vt = ds.indexOf(nua);
-    if (vt < 0) return null;
-    dotBam[vt] = Number(nua.getAttribute('data-chua0') || nua.getAttribute('data-chua')) || 0;
-    var lam0 = 0, chua0 = 0;
-    ds.forEach(function (n) { lam0 = Math.max(lam0, Number(n.getAttribute('data-lam0') || n.getAttribute('data-lam')) || 0); });
-    Object.keys(dotBam).forEach(function (k) { chua0 += dotBam[k]; });
-    return { giay: Math.round((Date.now() - gd.batLam) / 100) / 10, duTinh: lam0 + chua0 };
-  }
-  window.__mcGiayDot = giayDot;
-  function tick() {
-    var now = Date.now();
-    if (phienBatDau < 0) phienBatDau = now;
-    if (gd.pha === 'lam' || gd.pha === 'chua') {
-      if (Math.ceil((gd.han - now) / 1000) <= 0) {
-        if (gd.pha === 'lam') { hetLam(); return; }
-        gd.pha = 'het';
-      }
+      dongBoNhan();
     }
     veThanh();
   }
+  // Không đo giờ buổi/đợt khi Thầy gọi thủ công.
+  window.__mcGiayDot = function () { return null; };
 
-  // Ghi chú của đợt đang hiện (đợt tự tách, chữ nhỏ, toàn bảng…) chiếm ô chữ của thanh dưới; không có thì ô ấy nói giờ pha kế.
+  // Ghi chú bố cục của đợt đang hiện.
   function veGhiChu() {
     if (!phu) return;
     var gc = dots[i] ? dots[i].querySelector(':scope > .mc-ghi-chu') : null;
     var chu = gc ? gc.textContent : '';
-    var mac = gd.pha === 'lam' ? (gd.chua ? 'rồi chữa ' + dinhDang(gd.chua) : '') : (gd.pha === 'chua' || gd.pha === 'het') ? 'làm ' + dinhDang(gd.lam) + ' · chữa ' + dinhDang(gd.chua) : '';
-    phu.textContent = chu || mac;
+    phu.textContent = chu;
     var canhBao = !!gc && (gc.getAttribute('data-kieu') === 'canh-bao' || (dots[i].className || '').indexOf('mc-b5') >= 0);
     if (chu) phu.setAttribute('data-ghi-chu', canhBao ? 'canh-bao' : 'thong-tin'); else phu.removeAttribute('data-ghi-chu');
   }
   function veThanh() {
     if (!thanh) return;
-    var now = Date.now();
     var pha = gd.pha;
+    var nutLenBang = document.getElementById('mc-len-bang');
+    if (nutLenBang) { nutLenBang.hidden = !pha; nutLenBang.disabled = pha !== 'cho'; nutLenBang.textContent = pha === 'cho' ? 'Lên bảng' : 'Đã gọi lên bảng'; }
     thanh.setAttribute('data-pha', pha);
-    if (phaEl) phaEl.textContent = pha === 'lam' ? 'ĐANG LÀM BÀI' : pha === 'chua' ? 'ĐANG CHỮA' : pha === 'goi' ? 'MỜI LÊN BẢNG' : pha === 'het' ? 'QUÁ GIỜ CHỮA' : '';
-    var con = (pha === 'lam' || pha === 'chua') ? Math.max(0, Math.ceil((gd.han - now) / 1000)) : 0;
-    if (clock) {
-      clock.textContent = pha === 'goi' ? dinhDang(gd.lam) : pha === 'het' ? '+' + dinhDang((now - gd.han) / 1000) : pha ? dinhDang(con) : '';
-      clock.classList.toggle('mc-sap-het', (pha === 'lam' || pha === 'chua') && con > 0 && con <= 15);
-    }
-    if (tienDong) tienDong.style.width = pha === 'het' ? '100%' : (pha === 'lam' || pha === 'chua') && gd.tong ? Math.min(100, Math.round((1 - con / gd.tong) * 100)) + '%' : '0%';
-    if (buoiEl) {
-      var ph = phienBatDau < 0 ? 0 : Math.floor((now - phienBatDau) / 60000);
-      buoiEl.textContent = 'Buổi: ' + ph + (NGAN_SACH_PHUT ? '/' + NGAN_SACH_PHUT : '') + ' phút';
-    }
+    if (phaEl) phaEl.textContent = pha === 'cho' ? 'CHỜ THẦY GỌI' : pha === 'chua' ? 'ĐANG CHỮA' : pha === 'goi' ? 'MỜI LÊN BẢNG' : '';
     veGhiChu();
   }
   function ve() {
@@ -914,6 +850,8 @@ const JS_MAY_CHIEU = `
     ray.scrollTo({ left: i * ray.clientWidth, behavior: 'smooth' });
     ve();
   }
+  var nutGoi = document.getElementById('mc-len-bang');
+  if (nutGoi) nutGoi.addEventListener('click', lenBang);
   if (truoc) truoc.addEventListener('click', function () { den(i - 1); });
   if (sau) sau.addEventListener('click', function () { den(i + 1); });
   document.addEventListener('keydown', function (e) {
@@ -1092,19 +1030,11 @@ const JS_MAY_CHIEU = `
     var truocDo = dots[i];
     dots = Array.prototype.slice.call(document.querySelectorAll('.mc-dot'));
     if (i > dots.length - 1) i = Math.max(0, dots.length - 1);
-    // Đợt đang hiện vẫn là chính nó (chỉ số đợt đổi hoặc bị tách bớt em) thì KHÔNG khởi động lại giờ/màn gọi tên, chỉ cập nhật giờ pha.
-    if (dots[i] === truocDo && dotDangVao === i) {
-      var gio = gioDot(dots[i]);
-      gd.lam = gio.lam;
-      gd.chua = gio.chua;
-    } else {
-      dotDangVao = -1;
-    }
+    // Giữ trạng thái gọi khi đo bố cục chỉ thay đổi số đợt.
+    if (dots[i] !== truocDo || dotDangVao !== i) dotDangVao = -1;
     ve();
   });
 
-  // MỘT nhịp duy nhất cho mọi thứ chạy theo thời gian (đồng hồ pha, tiến độ, "Buổi: x/y phút").
-  setInterval(tick, 250);
   // Nhãn vùng làm bài luôn khớp thẻ tên: đồng bộ lúc mở tờ + lưới an toàn cho MỌI đường đổi hidden của thẻ và cho ô làm bài do bố cục dựng thêm (bo-cuc-to-chieu).
   dongBoNhan();
   if (window.MutationObserver) {
@@ -1191,8 +1121,7 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   const soDot = dot.length
   const nganSach = Math.max(0, Math.round(Number(tuyChon.nganSachPhut) || 0))
 
-  // THANH DƯỚI (M3, đúng bản vẽ): đợt k/n · pha · đồng hồ · tiến độ · ô chữ (ghi chú của đợt, hoặc giờ pha kế) · buổi x/y phút · cài đặt.
-  // Các nút cũ giữ nguyên `id` (mc-truoc, mc-sau, mc-dem, mc-clock, mc-palette, mc-size, mc-toan). Tên buổi/ngày/số em nằm trong hộp cài đặt.
+  // THANH DƯỚI: đợt k/n · trạng thái · nút gọi lên bảng · ghi chú · cài đặt.
   const than = `<div class="mc-thanh" id="mc-thanh">
   <div class="mc-buoc">
     <button type="button" id="mc-truoc" aria-label="Đợt trước">◂</button>
@@ -1200,10 +1129,8 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
     <button type="button" id="mc-sau" aria-label="Đợt tiếp">▸</button>
   </div>
   <span class="mc-pha" id="mc-pha"></span>
-  <div id="mc-clock" role="timer" aria-label="Thời gian còn lại của đợt"></div>
-  <div class="mc-tien" id="mc-tien" aria-hidden="true"><div class="mc-tien-dong" id="mc-tien-dong"></div></div>
+  <button type="button" id="mc-len-bang">Lên bảng</button>
   <div class="mc-thanh-phu" id="mc-tiep"></div>
-  <div class="mc-buoi" id="mc-buoi"></div>
   <button type="button" id="mc-cai-btn" aria-expanded="false" aria-controls="mc-cai-dat">Cài đặt</button>
 </div>
 <div id="mc-cai-dat" hidden>
