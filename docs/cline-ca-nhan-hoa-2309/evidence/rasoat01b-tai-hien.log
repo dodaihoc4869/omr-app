@@ -1,0 +1,18 @@
+{
+  "runtime": "Node SQLite trong bo nho; KHONG phai Cloudflare D1/workerd",
+  "results": [
+    {
+      "id": "RV01-followup",
+      "aThang": 1,
+      "bThang": 0,
+      "soDong": 1,
+      "bDangMo": "A"
+    },
+    {
+      "id": "RV02-followup",
+      "resumedThang": 0,
+      "chuTrongDb": "OTHER-OWNER",
+      "chuBaoThang": "OTHER-OWNER"
+    }
+  ]
+}

@@ -19,7 +19,7 @@ export const HAN_TASK_GIAY = 24 * 3600
 
 export interface YeuCauGiuCho {
   sbd: string
-  /** Ngày VN (YYYY-MM-DD) — giữ chỗ theo NGÀY, không dùng đồng hồ máy khách. */
+  /** Ngày VN (YYYY-MM-DD) của lượt gọi — ghi vào `ngay` như NGÀY HOẠT ĐỘNG GẦN NHẤT; KHÔNG nằm trong khoá. */
   ngay: string
   taskId: string
   qids: readonly string[]
@@ -30,6 +30,8 @@ export interface YeuCauGiuCho {
   hanTaskGiay?: number
   /** `content_group` của từng qid; thiếu/không có nhãn ⇒ `qid:<qid>` (mỗi câu một đơn vị). */
   nhomTheoQid?: ReadonlyMap<string, string>
+  /** `revision` mà nơi gọi biết (tuỳ chọn): CAS gia hạn/tiếp quản chỉ thắng khi đúng revision ⇒ không đè thay đổi mới. */
+  revision?: number
   nguon?: string
 }
 
@@ -67,12 +69,12 @@ const hangCho = (x: { task_id: unknown; lease_until: unknown; het_han_task?: unk
   }
 }
 
-/** Một dòng giữ chỗ theo ĐƠN VỊ NỘI DUNG. */
-export async function docTheoNhom(env: Env, sbd: string, ngay: string, nhom: string): Promise<HangCho | null> {
+/** Một dòng giữ chỗ theo ĐƠN VỊ NỘI DUNG (khoá `sbd + content_group`, không phụ thuộc ngày). */
+export async function docTheoNhom(env: Env, sbd: string, nhom: string): Promise<HangCho | null> {
   try {
     const r = await env.DB.prepare(
-      'SELECT qid, task_id, lease_until, het_han_task FROM giu_cho WHERE sbd = ? AND ngay = ? AND content_group = ?',
-    ).bind(sbd, ngay, nhom).first<{ qid: string; task_id: string; lease_until: number; het_han_task: number }>()
+      'SELECT qid, task_id, lease_until, het_han_task, revision FROM giu_cho WHERE sbd = ? AND content_group = ?',
+    ).bind(sbd, nhom).first<{ qid: string; task_id: string; lease_until: number; het_han_task: number; revision: number }>()
     return r ? hangCho(r) : null
   } catch {
     return null
@@ -92,37 +94,45 @@ export async function giuCho(env: Env, yc: YeuCauGiuCho): Promise<KetQuaGiuCho> 
   const hanTask = Math.max(han, Math.floor(yc.hanTaskGiay ?? HAN_TASK_GIAY))
   const den = yc.nowMs + han * 1000
   const denTask = yc.nowMs + hanTask * 1000
+  const moc = mocIso(yc.nowMs)
+  const coRevision = Number.isFinite(yc.revision)
   for (const qid of yc.qids) {
     const q = String(qid ?? '').trim()
     if (!q) continue
     const nhom = khoaNhom(q, yc.nhomTheoQid)
     let won = false
     try {
-      // `ON CONFLICT DO NOTHING` phủ CẢ khoá chính (sbd,ngay,qid) LẪN khoá đơn vị nội dung (sbd,ngay,content_group).
+      // (1) GIÀNH ĐƠN VỊ: PK là (sbd, content_group) nên một đơn vị chỉ có MỘT dòng, xuyên ngày (RV01-followup).
+      //     `ngay` là ngày hoạt động gần nhất, KHÔNG nằm trong khoá.
       const r = await env.DB.prepare(
-        `INSERT INTO giu_cho (sbd, ngay, qid, task_id, nguon, lease_until, cap_nhat_luc, content_group, het_han_task)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `INSERT INTO giu_cho (sbd, content_group, qid, task_id, nguon, ngay, lease_until, het_han_task, revision, cap_nhat_luc)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
          ON CONFLICT DO NOTHING`,
-      ).bind(yc.sbd, yc.ngay, q, yc.taskId, yc.nguon ?? '', den, mocIso(yc.nowMs), nhom, denTask).run()
+      ).bind(yc.sbd, nhom, q, yc.taskId, yc.nguon ?? '', yc.ngay, den, denTask, moc).run()
       won = changes(r) === 1
       if (!won) {
-        const cur = await docTheoNhom(env, yc.sbd, yc.ngay, nhom)
-        if (cur && cur.taskId === yc.taskId) {
-          // Chính nhiệm vụ này đang giữ (gọi lại/khôi phục) ⇒ gia hạn, coi như thắng (không sinh task mới).
-          await env.DB.prepare('UPDATE giu_cho SET lease_until = ?, het_han_task = ?, cap_nhat_luc = ? WHERE sbd = ? AND ngay = ? AND content_group = ?')
-            .bind(den, denTask, mocIso(yc.nowMs), yc.sbd, yc.ngay, nhom).run()
-          won = true
-        } else if (cur && cur.taskConHieuLuc(yc.nowMs)) {
-          // RV02: nhiệm vụ CÒN hiệu lực ⇒ KHÔNG sinh task mới; trả lại để nơi gọi RESUME.
-          dangMo.set(q, cur.taskId)
-        } else if (cur) {
-          // Nhiệm vụ đã kết thúc ⇒ tiếp quản bằng MỘT câu UPDATE có điều kiện (CAS).
-          const u = await env.DB.prepare(
-            `UPDATE giu_cho SET qid = ?, task_id = ?, nguon = ?, lease_until = ?, het_han_task = ?, cap_nhat_luc = ?
-              WHERE sbd = ? AND ngay = ? AND content_group = ? AND het_han_task <= ? AND lease_until < ?`,
-          ).bind(q, yc.taskId, yc.nguon ?? '', den, denTask, mocIso(yc.nowMs), yc.sbd, yc.ngay, nhom, yc.nowMs, yc.nowMs).run()
-          won = changes(u) === 1
-        }
+        // (2) GIA HẠN cho CHÍNH CHỦ: MỘT câu UPDATE có đủ điều kiện chủ + revision + nhiệm vụ CÒN hiệu lực.
+        //     RV02-followup: không đọc-rồi-ghi; `changes = 0` nghĩa là chủ đã đổi / nhiệm vụ hết hạn ⇒ KHÔNG thắng.
+        //     KHÔNG đụng `het_han_task` ⇒ hạn nộp đã chốt từ lúc phát KHÔNG bị kéo dài.
+        const u = await env.DB.prepare(
+          `UPDATE giu_cho SET lease_until = ?, ngay = ?, cap_nhat_luc = ?
+            WHERE sbd = ? AND content_group = ? AND task_id = ? AND het_han_task > ?
+              ${coRevision ? 'AND revision = ?' : ''}`,
+        ).bind(den, yc.ngay, moc, yc.sbd, nhom, yc.taskId, yc.nowMs, ...(coRevision ? [Math.floor(yc.revision as number)] : [])).run()
+        won = changes(u) === 1
+      }
+      if (!won) {
+        // (3) TIẾP QUẢN khi NHIỆM VỤ trước ĐÃ KẾT THÚC — và KHÔNG được là CHÍNH task đang hỏi (task hết hạn
+        //     không được hồi sinh/kéo dài; muốn tiếp thì máy chủ phải phát nhiệm vụ MỚI với id mới).
+        const t = await env.DB.prepare(
+          `UPDATE giu_cho SET qid = ?, task_id = ?, nguon = ?, ngay = ?, lease_until = ?, het_han_task = ?,
+                  revision = revision + 1, cap_nhat_luc = ?
+            WHERE sbd = ? AND content_group = ? AND task_id <> ?
+              AND ((het_han_task > 0 AND het_han_task <= ?) OR (het_han_task = 0 AND lease_until < ?))
+              ${coRevision ? 'AND revision = ?' : ''}`,
+        ).bind(q, yc.taskId, yc.nguon ?? '', yc.ngay, den, denTask, moc, yc.sbd, nhom, yc.taskId, yc.nowMs, yc.nowMs,
+          ...(coRevision ? [Math.floor(yc.revision as number)] : [])).run()
+        won = changes(t) === 1
       }
     } catch {
       won = false // chưa áp migration ⇒ coi như KHÔNG giữ được (không tự cho là đã chốt)
@@ -130,7 +140,7 @@ export async function giuCho(env: Env, yc: YeuCauGiuCho): Promise<KetQuaGiuCho> 
     if (won) thang.push(q)
     else {
       thua.push(q)
-      const cur = await docTheoNhom(env, yc.sbd, yc.ngay, nhom)
+      const cur = await docTheoNhom(env, yc.sbd, nhom)
       if (cur) {
         dangGiu.set(q, cur.taskId)
         if (cur.taskConHieuLuc(yc.nowMs)) dangMo.set(q, cur.taskId)
@@ -140,29 +150,31 @@ export async function giuCho(env: Env, yc: YeuCauGiuCho): Promise<KetQuaGiuCho> 
   return { thang, thua, dangGiu, dangMo }
 }
 
-/** Một dòng giữ chỗ (null khi chưa có/hết hạn/lỗi đọc). */
-export async function docMotCho(env: Env, sbd: string, ngay: string, qid: string): Promise<{ taskId: string; leaseUntil: number } | null> {
+/** Một dòng giữ chỗ theo qid (null khi chưa có/lỗi đọc). */
+export async function docMotCho(env: Env, sbd: string, qid: string): Promise<{ taskId: string; leaseUntil: number } | null> {
   try {
-    const r = await env.DB.prepare('SELECT task_id, lease_until FROM giu_cho WHERE sbd = ? AND ngay = ? AND qid = ?')
-      .bind(sbd, ngay, qid).first<{ task_id: string; lease_until: number }>()
+    const r = await env.DB.prepare('SELECT task_id, lease_until FROM giu_cho WHERE sbd = ? AND qid = ?')
+      .bind(sbd, qid).first<{ task_id: string; lease_until: number }>()
     return r ? { taskId: String(r.task_id), leaseUntil: Number(r.lease_until) } : null
   } catch {
     return null
   }
 }
 
-/** Toàn bộ chỗ đang giữ trong ngày của một em (qid → {taskId, leaseUntil, nhóm, hạn nhiệm vụ}). */
+/** Toàn bộ đơn vị CÒN HIỆU LỰC của một em (bất kể ngày) — qid → thông tin dòng. */
 export async function docCho(
-  env: Env, sbd: string, ngay: string,
-): Promise<Map<string, { taskId: string; leaseUntil: number; nhom: string; hetHanTask: number }>> {
-  const ra = new Map<string, { taskId: string; leaseUntil: number; nhom: string; hetHanTask: number }>()
+  env: Env, sbd: string, nowMs: number,
+): Promise<Map<string, { taskId: string; leaseUntil: number; nhom: string; hetHanTask: number; revision: number }>> {
+  const ra = new Map<string, { taskId: string; leaseUntil: number; nhom: string; hetHanTask: number; revision: number }>()
   try {
-    const r = await env.DB.prepare('SELECT qid, task_id, lease_until, content_group, het_han_task FROM giu_cho WHERE sbd = ? AND ngay = ?')
-      .bind(sbd, ngay).all<{ qid: string; task_id: string; lease_until: number; content_group: string; het_han_task: number }>()
+    const r = await env.DB.prepare(
+      `SELECT qid, task_id, lease_until, content_group, het_han_task, revision FROM giu_cho
+        WHERE sbd = ? AND ((het_han_task > 0 AND het_han_task > ?) OR (het_han_task = 0 AND lease_until >= ?))`,
+    ).bind(sbd, nowMs, nowMs).all<{ qid: string; task_id: string; lease_until: number; content_group: string; het_han_task: number; revision: number }>()
     for (const x of r.results ?? []) {
       ra.set(String(x.qid), {
         taskId: String(x.task_id), leaseUntil: Number(x.lease_until),
-        nhom: String(x.content_group ?? ''), hetHanTask: Number(x.het_han_task ?? 0) || 0,
+        nhom: String(x.content_group ?? ''), hetHanTask: Number(x.het_han_task ?? 0) || 0, revision: Number(x.revision ?? 1) || 1,
       })
     }
   } catch {
@@ -171,14 +183,14 @@ export async function docCho(
   return ra
 }
 
-/** NHẢ chỗ (kết thúc lượt/nộp xong/huỷ) — chỉ nhả phần do chính `taskId` giữ. */
-export async function nhaCho(env: Env, sbd: string, ngay: string, taskId: string, qids?: readonly string[]): Promise<number> {
+/** NHẢ chỗ (kết thúc lượt/nộp xong/huỷ) — chỉ nhả phần do chính `taskId` giữ, KHÔNG phụ thuộc ngày. */
+export async function nhaCho(env: Env, sbd: string, taskId: string, qids?: readonly string[]): Promise<number> {
   try {
     const ds = qids && qids.length ? [...new Set(qids.map((q) => String(q).trim()).filter(Boolean))] : null
     const r = ds
-      ? await env.DB.prepare('DELETE FROM giu_cho WHERE sbd = ? AND ngay = ? AND task_id = ? AND qid IN (SELECT value FROM json_each(?))')
-        .bind(sbd, ngay, taskId, JSON.stringify(ds)).run()
-      : await env.DB.prepare('DELETE FROM giu_cho WHERE sbd = ? AND ngay = ? AND task_id = ?').bind(sbd, ngay, taskId).run()
+      ? await env.DB.prepare('DELETE FROM giu_cho WHERE sbd = ? AND task_id = ? AND qid IN (SELECT value FROM json_each(?))')
+        .bind(sbd, taskId, JSON.stringify(ds)).run()
+      : await env.DB.prepare('DELETE FROM giu_cho WHERE sbd = ? AND task_id = ?').bind(sbd, taskId).run()
     return Number((r as { meta?: { changes?: number } }).meta?.changes ?? 0)
   } catch {
     return 0

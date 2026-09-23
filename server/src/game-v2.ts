@@ -422,7 +422,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     }
     for(const dang of new Set(session.questions.map(q=>done.find(a=>a.attempt.qid===q.qid)?.attempt.dang).filter(Boolean))){await env.DB.prepare('UPDATE game_v2_task SET completed_at=? WHERE sbd=? AND dang=? AND completed_at IS NULL').bind(now(),sbd,dang).run()}
     // P05/P07: LƯỢT KẾT THÚC ⇒ NHẢ CHỖ ngay (không để chỗ treo tới hết lease). Chỉ nhả phần do CHÍNH phiên này giữ.
-    if(await nganSachLuotBat(env))await nhaCho(env,sbd,academicDay(now()),id)
+    if(await nganSachLuotBat(env))await nhaCho(env,sbd,id)
     const fresh=await loadProfile(env,sbd)
     return {ok:true,profile:visible(fresh.profile),revision:fresh.revision,correct:done.filter(x=>x.attempt.correct).length,total:done.length}
   }

@@ -42,4 +42,27 @@ Commit chứa bản sửa: **66af333** (nối tiếp `cb39cb7`). `sourceFingerpr
 | nhóm (cnh-1-0, game, tran-ngay, doan, ke-hoach, ho-so, lich-on, reset) | 0 | 59 tệp xanh |
 | `vitest run` (toàn suite) | 1 | `rasoat01-vitest-full.log` — `ab2541a410077ae684dd6ea7caaa91a470f33622e0da9dfad4ebe70801e89f94`: **706 xanh · 35 đỏ · 1 skip**; 34/35 tệp đỏ **trùng bộ nợ cũ P00–P03**, 1 tệp là UI nặng (`bang-tin-san-chong-chu-trinh-duyet-2109`) **pass khi chạy riêng** (flaky do tải, không phải hồi quy) |
 | `tsc -b` + `tsc -p server/tsconfig.json --noEmit` | 0 / 0 | — |
+
+---
+
+## BỔ SUNG (rà soát độc lập `review-rv01-followup`) — RV01/RV02 tái hiện trên bản WIP, nay đã sửa
+
+Bằng chứng tái hiện của giám sát: `review-rv01-followup/{KET-QUA.json, repro.mjs, SNAPSHOT.json}` (hash WIP trong `SNAPSHOT.json`).
+
+| RV | Trạng thái | Sửa gì (lần này) | Regression test | Chạy lại repro của giám sát trên bản sửa |
+|---|---|---|---|---|
+| **RV01-followup** | **FIXED_PENDING_REVIEW** | Khoá cũ `(sbd, ngay, content_group)` cho phép hai nhiệm vụ cùng đơn vị nội dung khi **qua nửa đêm VN**. Nay `migration-2309-cnh1-giu-cho_z-donvi.sql` dựng lại bảng: **PK `(sbd, content_group)`** (một dòng cho MỘT đơn vị, xuyên ngày), `ngay` chỉ là ngày hoạt động gần nhất, thêm `revision`; giữ dữ liệu cũ (khử trùng theo đơn vị, giữ lease xa nhất) | `tests/cnh-1-0-giu-cho.test.ts` — ca “đơn vị ĐANG PHÁT giữ nguyên QUA NỬA ĐÊM VN” (23:59 → 00:01: B không dành được; A hết hạn thì B tiếp quản, `ngay` sang ngày mới; luôn đúng 1 dòng) | `node --experimental-strip-types scripts/tai-hien-rv01-followup.mjs` → **exit 0**: `bThang: 0 · soDong: 1 · bDangMo: "A"` |
+| **RV02-followup** | **FIXED_PENDING_REVIEW** | Nhánh cũ `cur.taskId === yc.taskId` **đọc-rồi-UPDATE** gia hạn, không predicate, không kiểm `changes` ⇒ chủ đổi giữa hai bước vẫn báo thắng. Nay gia hạn là **MỘT câu CAS**: `WHERE sbd=? AND content_group=? AND task_id=? AND het_han_task > ?` (+ `AND revision = ?` khi nơi gọi truyền `revision`), thắng ⇔ `changes = 1`; tiếp quản thêm `AND task_id <> ?` (task hết hạn **không** hồi sinh) và gia hạn **không** ghi `het_han_task` (hạn nộp đã chốt từ lúc phát không bị kéo dài) | 2 ca mới: “chủ đổi GIỮA hai bước ⇒ KHÔNG báo thắng” (chèn đổi chủ ngay trước câu UPDATE) và “gia hạn KHÔNG kéo dài `het_han_task`; task hết hạn không hồi sinh” | `repro.mjs` (bản đối chiếu trong repo) → **exit 0**: `resumedThang: 0 · chuTrongDb: "OTHER-OWNER"` |
+
+**Lệnh kiểm lượt này (exit code thật):** `tsc -b` 0 · `tsc -p server` 0 · nhóm 58 tệp xanh ·
+`scripts/tai-hien-rv01-followup.mjs` exit 0 · toàn suite `rasoat01b-vitest-full.log`: **707 xanh · 34 đỏ · 1 skip**
+(34 = đúng bộ nợ cũ P00–P03; tệp UI nặng của lượt trước nay xanh).
+
+**Giới hạn:** repro và test đều chạy **Node SQLite trong bộ nhớ** (chèn xen kẽ có kiểm soát), **không phải**
+Cloudflare D1/workerd và không phải hai client thật ⇒ RV06 vẫn mở phần runtime.
+
+**Ghi chú API đã đổi (kèm lý do):** `nhaCho(env, sbd, taskId, qids?)`, `docTheoNhom(env, sbd, nhom)`,
+`docCho(env, sbd, nowMs)`, `docMotCho(env, sbd, qid)` — bỏ tham số `ngay` vì đơn vị nội dung không phụ thuộc ngày;
+`game-v2` gọi `nhaCho(env, sbd, id)` khi lượt kết thúc.
+
 | `kiem-tra-bo-ban-giao.mjs` | 0 | — |

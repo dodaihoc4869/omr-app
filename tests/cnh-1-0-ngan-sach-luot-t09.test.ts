@@ -165,9 +165,9 @@ describe('T09 — game chỉ dùng PHẦN NGÂN SÁCH CÒN LẠI của ngày (c�
     const qs = (r.questions as { qid: string }[]).map((q) => q.qid)
     expect(qs).not.toContain('Q5') // KHÔNG nhận câu đã chốt cho lượt khác
     if (r.giuChoThua) expect(r.giuChoThua as string[]).toContain('Q5')
-    expect((await docMotCho(d.env, 'S1', NGAY, 'Q5'))!.taskId).toBe('T-KHAC') // không chiếm chỗ người khác
+    expect((await docMotCho(d.env, 'S1', 'Q5'))!.taskId).toBe('T-KHAC') // không chiếm chỗ người khác
     // Nhả chỗ ⇒ lượt sau nhận lại được (nơi gọi chọn lại phần CHƯA chốt)
-    await nhaCho(d.env, 'S1', NGAY, 'T-KHAC')
+    await nhaCho(d.env, 'S1', 'T-KHAC')
     const g = await giuCho(d.env, { sbd: 'S1', ngay: NGAY, taskId: 'T-MOI', qids: ['Q5'], nowMs: T0 })
     expect(g.thang).toEqual(['Q5'])
   })

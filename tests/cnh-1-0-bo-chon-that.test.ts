@@ -233,7 +233,7 @@ describe('P05 §7.1/§7.2 trên ĐƯỜNG THẬT (T08 · T10 · T12/T13)', () =>
     expect(kq.chon.map((c) => c.qid)).toEqual(['Q5'])
     expect(kq.dungLaiTask.get('Q3')).toBe('T-KHAC') // nhiệm vụ còn hiệu lực ⇒ TRẢ LẠI task cũ (RV02)
     // Nhả chỗ ⇒ câu trở lại ứng viên.
-    await nhaCho(d.env, 'S1', NGAY, 'T-KHAC')
+    await nhaCho(d.env, 'S1', 'T-KHAC')
     const sau = await chonCauChoLuot(d.env, ds, { sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 })
     expect(sau.chon.map((c) => c.qid).sort()).toEqual(['Q3', 'Q5'])
   })

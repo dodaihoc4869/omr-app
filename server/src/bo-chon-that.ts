@@ -244,7 +244,7 @@ export interface ChonCauKetQua {
 export async function chonCauChoLuot(env: Env, ds: readonly CauUngVien[], inp: ChonCauInput): Promise<ChonCauKetQua> {
   const lyDo: Record<string, number> = {}
   const dem = (k: string) => { lyDo[k] = (lyDo[k] ?? 0) + 1 }
-  const dangGiu = await docCho(env, inp.sbd, inp.ngay)
+  const dangGiu = await docCho(env, inp.sbd, inp.nowMs)
   const muc = inp.mucTheoKyNang ?? await mucTheoKyNangCuaEm(env, inp.sbd)
   const tranCau = Number.isFinite(inp.tranCau) ? Math.max(0, Math.floor(inp.tranCau as number)) : SO_CAU_LUOT_MAC_DINH
 
