@@ -5,16 +5,16 @@
 // `c.text && c.dapAnDung` và luôn trả rỗng; ngoài ra nó lấy 6 tờ đầu tiên, không lọc lớp, không lọc chuyên đề.
 // Chọn từ chỉ mục game thì có nhãn dạng/mức độ, có `reviewed`, và loại được đề thi đang bảo vệ (`protectedQuestions`).
 import type { D1Result, Env } from './kieu'
-import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
+import { learnedQuestionFilter, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
 import { chuoiLoiGiai } from './goi-cu'
-import { protectedQuestions } from './game-v2-bank'
+import { protectedQuestions, readScope } from './game-v2-bank'
 import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 import { laCauTuLuan } from './cam-tu-luan'
 import {
-  chonCauChoPhuHuynh, chuyenDeCuaDang, SO_NGAY_KHONG_GIAO_LAI, type CauChon, type CauToiHan, type NguonCau, type UngVien,
+  chonCauChoPhuHuynh, SO_NGAY_KHONG_GIAO_LAI, type CauChon, type CauToiHan, type NguonCau, type UngVien,
 } from './parent-news-chon-cau'
 import { ngayVn } from './su-kien-hoc'
 
@@ -109,7 +109,8 @@ export async function chonCauBaiHangNgay(env: Env, sbd: string, soCan: number, n
 
   const lopEm = String((await tat(() => env.DB.prepare('SELECT lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<Row>(), null))?.lop ?? '').trim()
   const lop = LOP_HOP_LE.has(lopEm) ? lopEm : ''
-  const baoVe = await protectedQuestions(env)
+  const [baoVe, phamVi] = await Promise.all([protectedQuestions(env), readScope(env, sbd)])
+  const daHocCau = learnedQuestionFilter(phamVi.evidence, baoVe)
 
   const rc = await tat(
     () => env.DB.prepare(
@@ -128,37 +129,34 @@ export async function chonCauBaiHangNgay(env: Env, sbd: string, soCan: number, n
     soMoiSai: Number(x.so_moi_sai), soChuaThaySai: Number(x.so_chua_thay_sai), bac: Number(x.bac),
     mocOnKe: x.moc_on_ke ? String(x.moc_on_ke) : null, mocMoiSai: x.moc_moi_sai ? String(x.moc_moi_sai) : null,
   }))
+  const dangDaHoc = new Set(dangCuaEm.filter((d) => d.soGap > 0 && !d.maDang.startsWith('CD:')).map((d) => d.maDang))
   const dangYeuEm = dangYeuNhatTruoc(dangCuaEm, homNay)
 
   const rs = await tat(
-    () => env.DB.prepare('SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ?').bind(sbd, themNgay(homNay, -(SO_NGAY_KHONG_GIAO_LAI - 1))).all<Row>(),
+    () => env.DB.prepare('SELECT DISTINCT e.qid, q.content_group FROM su_kien_hoc e LEFT JOIN game_v2_question q ON q.qid = e.qid WHERE e.sbd = ? AND e.ngay_vn >= ?').bind(sbd, themNgay(homNay, -(SO_NGAY_KHONG_GIAO_LAI - 1))).all<Row>(),
     trong(),
   )
   const suKienGanDay = new Set((rs.results ?? []).map((x) => String(x.qid)))
+  const nhomGanDay = new Set((rs.results ?? []).map((x) => String(x.content_group ?? '')).filter(Boolean))
 
-  // Kho: câu tới hạn theo qid (không lọc lớp: đây là câu em đã gặp), câu cùng dạng yếu, rồi bù cùng chuyên đề, rồi bù theo lớp.
+  // Kho: câu tới hạn, câu cùng dạng yếu, rồi các dạng khác có bằng chứng cá nhân.
   const loLop = lop ? ' AND d.lop = ?' : ''
   const themLop = lop ? [lop] : []
   const kho = new Map<string, PrivateQuestion>()
   // LUẬT KHỐI (Boss 21/09): câu nạp theo qid (tới hạn) nằm ngoài bộ lọc `d.lop` — câu khối CAO đã lọt vào sổ em từ trước vẫn không được phát lại. Khối em không rõ ⇒ không lọc.
   const khoiEm = khoiCuaEm({ lop: lopEm })
-  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && !kho.has(q.qid)) kho.set(q.qid, q) }
+  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && daHocCau(q) && !kho.has(q.qid)) kho.set(q.qid, q) }
   if (toiHan.length > 0) nap(await docCauKho(env, 'AND q.qid IN (SELECT value FROM json_each(?))', [JSON.stringify(toiHan.map((c) => c.qid))], baoVe, TRAN_DOC_TOI_HAN))
   if (dangYeuEm.length > 0) nap(await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [JSON.stringify(dangYeuEm.map((d) => d.maDang)), ...themLop], baoVe, TRAN_DOC_MOI_NHOM))
-  const chuyenDe = [...new Set([...dangYeuEm.map((d) => d.maDang), ...toiHanDong.map((x) => (x.ma_dang ? String(x.ma_dang) : ''))].map(chuyenDeCuaDang).filter(Boolean))]
-  if (chuyenDe.length > 0) nap(await docCauKho(env, `AND q.dang IS NOT NULL AND substr(q.dang, 1, instr(q.dang || '.', '.') - 1) IN (SELECT value FROM json_each(?))${loLop}`, [JSON.stringify(chuyenDe), ...themLop], baoVe, TRAN_DOC_BU))
+  // Chỉ bù trong dạng chính em đã học; thiếu câu thì giảm số lượng.
+  if (dangDaHoc.size > 0) nap(await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [JSON.stringify([...dangDaHoc]), ...themLop], baoVe, TRAN_DOC_BU))
 
   const chonTuKho = () => chonCauChoPhuHuynh({
-    soCan, seed, toiHan, suKienGanDay,
+    soCan, seed, toiHan, suKienGanDay, dangDaHoc, nhomGanDay,
     dangYeu: dangYeuEm.map((d) => ({ maDang: d.maDang, bac: d.bac })),
-    ungVien: [...kho.values()].map((q): UngVien => ({ qid: q.qid, dang: q.dang, mucDo: q.mucDo })),
+    ungVien: [...kho.values()].map((q): UngVien => ({ qid: q.qid, dang: q.dang, mucDo: q.mucDo, group: q.group })),
   })
-  let chon = chonTuKho()
-  // Vẫn thiếu (em mới, chưa có dạng yếu/chuyên đề): bù theo lớp, có nhãn dạng, cùng bộ lọc.
-  if (chon.length < soCan) {
-    nap(await docCauKho(env, `AND q.dang IS NOT NULL${loLop}`, themLop, baoVe, TRAN_DOC_BU))
-    chon = chonTuKho()
-  }
+  const chon = chonTuKho()
 
   const theoNguon: Record<NguonCau, number> = { on_toi_han: 0, cung_dang: 0, bu_kho: 0 }
   for (const c of chon) theoNguon[c.nguon]++

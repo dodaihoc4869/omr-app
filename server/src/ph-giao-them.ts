@@ -5,9 +5,9 @@
 import type { Env } from './kieu'
 import { GIAO_THEM, tinhGiaoThem, type DangCuaCon, type DauVaoGiaoThem, type KetQuaGiaoThem, type ThanhPhanGiaoThem, type ViecBatBuoc } from '../../src/lib/giao-them-cho-con'
 import { phutUocTinhChang } from '../../src/lib/btvn-nang-do-lich'
-import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
+import { learnedQuestionFilter, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { chuHan } from './canh-bao-thay'
-import { protectedQuestions } from './game-v2-bank'
+import { protectedQuestions, readScope } from './game-v2-bank'
 import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
@@ -81,13 +81,13 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
   const themLop = LOP_HOP_LE.has(lopEm) ? [lopEm] : []
   // KẾ HOẠCH NGÀY TRƯỚC, đọc hồ sơ SAU: `lapVaLuuKeHoach` dựng lại hồ sơ nắm kiến thức từ sổ khi sổ đổi so với lần lập trước — đọc song song sẽ thấy bảng đang bị xoá dựng lại.
   const kh = (await lapVaLuuKeHoach(env, [sbd], nowMs)).get(sbd)
-  const [rDang, rCau, rGan, rHomNay, rGiay, rBtvn, baoVe] = await Promise.all([
+  const [rDang, rCau, rGan, rHomNay, rGiay, rBtvn, baoVe, phamVi] = await Promise.all([
     tat(() => env.DB.prepare('SELECT * FROM nam_kt_dang WHERE sbd = ?').bind(sbd).all<Row>(), rong),
     tat(() => env.DB.prepare(
       `SELECT qid, ma_dang, trang_thai, moc_on_ke, lan_sai FROM nam_kt_cau
         WHERE sbd = ? AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc') AND can_day_lai = 0 ORDER BY moc_on_ke, lan_sai DESC, qid LIMIT 1200`,
     ).bind(sbd).all<Row>(), rong),
-    tat(() => env.DB.prepare('SELECT qid, MAX(ngay_vn) AS ngay FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? GROUP BY qid').bind(sbd, themNgay(homNay, -(SO_NGAY_KHONG_LAI - 1))).all<Row>(), rong),
+    tat(() => env.DB.prepare('SELECT e.qid, MAX(e.ngay_vn) AS ngay, q.content_group FROM su_kien_hoc e LEFT JOIN game_v2_question q ON q.qid = e.qid WHERE e.sbd = ? AND e.ngay_vn >= ? GROUP BY e.qid, q.content_group').bind(sbd, themNgay(homNay, -(SO_NGAY_KHONG_LAI - 1))).all<Row>(), rong),
     tat(() => env.DB.prepare('SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN ket_qua = 1 THEN 1 ELSE 0 END), 0) AS d FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND ket_qua IS NOT NULL').bind(sbd, homNay).first<Row>(), null),
     tat(() => env.DB.prepare('SELECT giay FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ? AND giay BETWEEN 5 AND 1200 ORDER BY luc DESC LIMIT 300').bind(sbd, themNgay(homNay, -13)).all<Row>(), rong),
     tat(() => env.DB.prepare(
@@ -95,17 +95,27 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
         WHERE c.sbd = ? AND e.nop_luc IS NULL AND e.thu_hoi = 0 AND b.da_xoa = 0`,
     ).bind(sbd).all<Row>(), rong),
     protectedQuestions(env),
+    readScope(env, sbd),
   ])
   if (!kh) throw new Error('Chưa lập được kế hoạch ngày của con nên chưa giao thêm được.')
 
+  const daHocCau = learnedQuestionFilter(phamVi.evidence, baoVe)
   const dangEm: NamKtDang[] = (rDang.results ?? []).map((x) => ({
     sbd, maDang: chuoi(x.ma_dang), soGap: so(x.so_gap), soSai: so(x.so_sai), soDaKhacPhuc: so(x.so_da_khac_phuc), soMoiSai: so(x.so_moi_sai), soChuaThaySai: so(x.so_chua_thay_sai), bac: so(x.bac),
     mocOnKe: x.moc_on_ke ? chuoi(x.moc_on_ke) : null, mocMoiSai: x.moc_moi_sai ? chuoi(x.moc_moi_sai) : null,
   })).filter((d) => d.maDang && !d.maDang.startsWith('CD:'))
+  const nhom14 = new Set((rGan.results ?? []).map((x) => chuoi(x.content_group)).filter(Boolean))
+  const nhomHomNay = new Set((rGan.results ?? []).filter((x) => chuoi(x.ngay) === homNay).map((x) => chuoi(x.content_group)).filter(Boolean))
   const daLam14 = new Set((rGan.results ?? []).map((x) => chuoi(x.qid)))
   // Câu đã làm HÔM NAY hoặc đã nằm trong gói giao thêm hôm nay không bao giờ giao lại trong ngày (kể cả câu đến lịch ôn mà con vừa sai lại).
   const khongGiaoLai = new Set<string>([...(rGan.results ?? []).filter((x) => chuoi(x.ngay) === homNay).map((x) => chuoi(x.qid)), ...cacHang.flatMap((h) => h.qid)])
   const btvnChuaNop = new Set((rBtvn.results ?? []).map((x) => chuoi(x.qid)))
+  const nhomDangGiao = new Set<string>()
+  const qidDangGiao = [...new Set([...btvnChuaNop, ...cacHang.flatMap((h) => h.qid)])]
+  if (qidDangGiao.length > 0) {
+    const rNhom = await env.DB.prepare('SELECT content_group FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(json(qidDangGiao)).all<Row>()
+    for (const x of rNhom.results ?? []) if (chuoi(x.content_group)) nhomDangGiao.add(chuoi(x.content_group))
+  }
 
   // Câu đến lịch / câu sai chưa khắc phục (theo hồ sơ), rồi đọc nội dung từ kho — CHỈ câu dùng được.
   const denLichQid: string[] = []
@@ -119,25 +129,26 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
   const kho = new Map<string, PrivateQuestion>()
   // LUẬT KHỐI (Boss 21/09): câu đến lịch / sai chưa khắc phục nạp theo qid nằm ngoài bộ lọc `d.lop` — câu khối CAO đã lọt vào sổ con từ trước vẫn không được giao lại. Khối con không rõ ⇒ không lọc.
   const khoiEm = khoiCuaEm({ lop: lopEm })
-  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && !kho.has(q.qid)) kho.set(q.qid, q) }
+  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && daHocCau(q) && !kho.has(q.qid)) kho.set(q.qid, q) }
   const cacQid = [...new Set([...denLichQid, ...saiQid])].slice(0, 600)
   if (cacQid.length > 0) nap(await docCauKho(env, 'AND q.qid IN (SELECT value FROM json_each(?))', [json(cacQid)], baoVe, 600))
   const maDangLay = [...dangEm].sort((a, b) => Number(dangYeu(b, homNay)) - Number(dangYeu(a, homNay)) || b.soMoiSai - a.soMoiSai || a.maDang.localeCompare(b.maDang)).slice(0, 12).map((d) => d.maDang)
   const khoDang = new Map<string, PrivateQuestion>()
-  if (maDangLay.length > 0) for (const q of await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [json(maDangLay), ...themLop], baoVe, 600)) if (cauHopKhoi(khoiEm, q)) khoDang.set(q.qid, q)
+  if (maDangLay.length > 0) for (const q of await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [json(maDangLay), ...themLop], baoVe, 600)) if (cauHopKhoi(khoiEm, q) && daHocCau(q)) khoDang.set(q.qid, q)
 
+  for (const qid of khongGiaoLai) { const q = kho.get(qid) ?? khoDang.get(qid); if (q?.group) nhomHomNay.add(q.group) }
   const khaDungCu = (qid: string) => kho.get(qid) ?? khoDang.get(qid)
-  const denLichOn = denLichQid.map(khaDungCu).filter((q): q is PrivateQuestion => !!q && !btvnChuaNop.has(q.qid) && !khongGiaoLai.has(q.qid))
+  const denLichOn = denLichQid.map(khaDungCu).filter((q): q is PrivateQuestion => !!q && !btvnChuaNop.has(q.qid) && !khongGiaoLai.has(q.qid) && !nhomHomNay.has(q.group) && !nhomDangGiao.has(q.group))
   const daLayDen = new Set(denLichOn.map((q) => q.qid))
   const saiChuaKhacPhuc = saiQid
     .filter((q) => !daLam14.has(q) && !daLayDen.has(q) && !khongGiaoLai.has(q))
     .map(khaDungCu)
-    .filter((q): q is PrivateQuestion => !!q && !btvnChuaNop.has(q.qid))
+    .filter((q): q is PrivateQuestion => !!q && !btvnChuaNop.has(q.qid) && !nhom14.has(q.group) && !nhomHomNay.has(q.group) && !nhomDangGiao.has(q.group))
   const daLayNhom = new Set([...daLayDen, ...saiChuaKhacPhuc.map((q) => q.qid), ...denLichQid, ...saiQid])
 
   const theoDang = new Map<string, Map<number, PrivateQuestion[]>>()
   for (const q of khoDang.values()) {
-    if (!q.dang || daLam14.has(q.qid) || khongGiaoLai.has(q.qid) || btvnChuaNop.has(q.qid) || daLayNhom.has(q.qid)) continue
+    if (!q.dang || nhomDangGiao.has(q.group) || nhom14.has(q.group) || nhomHomNay.has(q.group) || daLam14.has(q.qid) || khongGiaoLai.has(q.qid) || btvnChuaNop.has(q.qid) || daLayNhom.has(q.qid)) continue
     const muc = mucCua(q)
     if (muc < 0) continue
     const m = theoDang.get(q.dang) ?? new Map<number, PrivateQuestion[]>()
@@ -190,13 +201,15 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
 /** Chọn qid đúng `thanhPhan` (theo thứ tự ưu tiên), các nhóm KHÔNG trùng nhau. Chọn được ít hơn thì trả đúng số chọn được. */
 function chonQid(thanhPhan: ThanhPhanGiaoThem[], n: Nguon): { cau: PrivateQuestion[]; thucTe: ThanhPhanGiaoThem[] } {
   const da = new Set<string>()
+  const nhomDa = new Set<string>()
   const cau: PrivateQuestion[] = []
   const thucTe: ThanhPhanGiaoThem[] = []
   const lay = (ds: PrivateQuestion[], so_: number): PrivateQuestion[] => {
     const ra: PrivateQuestion[] = []
     for (const q of ds) {
       if (ra.length >= so_) break
-      if (da.has(q.qid)) continue
+      if (da.has(q.qid) || (q.group && nhomDa.has(q.group))) continue
+      if (q.group) nhomDa.add(q.group)
       da.add(q.qid); ra.push(q)
     }
     return ra

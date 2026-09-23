@@ -189,12 +189,21 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
     const hoSo=new Map(rh.results.map(h=>[str(h.qid),h]))
     for(const r of rows.results){const h=hoSo.get(str(r.qid));if(h){r.dung_sai=chuaKhacPhuc(h.trang_thai)?0:1;hoSo.delete(str(r.qid))}}
     for(const h of hoSo.values())rows.results.push({qid:h.qid,ma_ca:str(h.nguon_cuoi),lan_thu:1,nop_luc:str(h.luc_cuoi),dung_sai:chuaKhacPhuc(h.trang_thai)?0:1})
-  }catch{/* lược đồ cũ/fixture chưa có bảng hồ sơ: chỉ dùng bằng chứng ca thi như trước */}
+  }catch{/* hồ sơ dựng lại chưa có: dùng ca thi và sổ học của chính em ở dưới */}
+  // `su_kien_hoc` là sổ gốc; nếu hàng hồ sơ dựng lại đang thiếu/chưa tạo,
+  // giữ những câu em đã thật sự làm ở BTVN/ôn/khắc phục. Không lấy lần game
+  // (tránh tự mở rộng phạm vi từ một lượt cũ) hay ca thi chưa công bố.
+  try{
+    const co=new Set(rows.results.map(r=>str(r.qid)))
+    const su=await env.DB.prepare("SELECT qid, MAX(luc) AS nop_luc, MIN(ket_qua) AS dung_sai FROM su_kien_hoc WHERE sbd=? AND nguon NOT IN ('thi','game') AND ket_qua IN (0,1) GROUP BY qid").bind(sbd).all<Row>()
+    for(const r of su.results??[])if(!co.has(str(r.qid))){rows.results.push({qid:r.qid,ma_ca:'su_kien_hoc',lan_thu:1,nop_luc:r.nop_luc,dung_sai:r.dung_sai});co.add(str(r.qid))}
+  }catch{/* thiếu sổ học: giữ bằng chứng ca thi đã công bố */}
   const evidence:Evidence[]=[];let missing=0
-  const qids=[...new Set(rows.results.map(r=>str(r.qid)))];const originals=new Map<string,PrivateQuestion>()
-  for(let i=0;i<qids.length;i+=80){const ids=qids.slice(i,i+80);const r=await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.qid IN (${ids.map(()=>'?').join(',')})`).bind(...ids).all<{json:string}>();for(const x of r.results){const q=JSON.parse(x.json) as PrivateQuestion;originals.set(q.qid,q)}}
+  const qids=[...new Set(rows.results.map(r=>str(r.qid)))];const originals=new Map<string,PrivateQuestion>(),maTrung=new Set<string>()
+  // Sổ cũ chỉ lưu qid: trùng giữa hai đề thì không suy đoán nguồn đã học.
+  for(let i=0;i<qids.length;i+=80){const ids=qids.slice(i,i+80);const r=await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.qid IN (${ids.map(()=>'?').join(',')})`).bind(...ids).all<{json:string}>();for(const x of r.results){const q=JSON.parse(x.json) as PrivateQuestion;if(maTrung.has(q.qid))continue;if(originals.has(q.qid)){originals.delete(q.qid);maTrung.add(q.qid)}else originals.set(q.qid,q)}}
   for(const r of rows.results){const q=originals.get(str(r.qid));if(!q){missing++;continue}evidence.push({qid:q.qid,group:q.group,dang:q.dang,mucDo:q.mucDo,kienThuc:q.kienThuc,wrong:r.dung_sai===0,date:str(r.nop_luc),ca:str(r.ma_ca)})}
-  const types=[...new Set([...evidence.map(e=>e.dang),...dangLop].filter(Boolean))] as string[]/* ĐỢT 2: thêm các dạng LỚP đã học (bảng đệm lop_da_hoc) — kho rút không còn bó theo bằng chứng của CHÍNH em */;const pool=[...originals.values()]
+  const types=[...new Set([...evidence.map(e=>e.dang),...dangLop].filter(Boolean))] as string[]/* dangLop chỉ giữ tham số tương thích; readScope hiện ép về rỗng, phạm vi lấy từ bằng chứng cá nhân. */;const pool=[...originals.values()]
   /* CHI PHÍ D1 (Boss 21/09: truy vấn này ≈ 246 triệu dòng đọc/ngày): bản cũ phân trang bằng `ORDER BY ma_de||'|'||qid` + `LIMIT 300` nên MỖI trang quét lại và sắp xếp lại MỌI câu khớp (bậc hai theo cỡ kho, ~76 dòng đọc/câu).
      Bản này TÁCH HAI PHA, tuyến tính (~5 dòng đọc/câu): (1) một truy vấn chỉ lấy khoá (ma_de, qid) của các câu khớp (không tải json), sắp theo đúng thứ tự cũ `ma_de|qid` trong bộ nhớ; (2) tải json theo từng 300 khoá bằng
      MỘT tham số json_each nối thẳng vào khoá chính (D1 giới hạn 100 tham số/truy vấn). Kết quả (nội dung + thứ tự) đúng như bản cũ — khoá bằng test đối chiếu với thuật toán cũ. */

@@ -2,7 +2,7 @@
 //
 // Hai việc, cả hai không đọc đồng hồ và không Math.random (phá thế cân bằng bằng `hashSeed`):
 //   1. `tomTatKeHoach` / `soCauPhanDu`: số câu phụ huynh được giao = PHẦN DƯ của ngân sách ngày trong kế hoạch ngày.
-//   2. `chonCauChoPhuHuynh`: thứ tự chọn câu: ôn tới hạn → câu mới cùng dạng yếu → bù từ kho (đã lọc lớp/chuyên đề).
+//   2. `chonCauChoPhuHuynh`: thứ tự chọn câu: ôn tới hạn → câu mới cùng dạng yếu → bù trong dạng đã học của chính em.
 //
 // Chỉ nhận ID câu và nhãn, KHÔNG có nội dung/đáp án — lớp D1 (`parent-news.ts`) đọc nội dung sau khi đã chọn.
 import { hashSeed } from '../../src/lib/exam-shuffle'
@@ -66,6 +66,7 @@ export interface UngVien {
   /** Mã dạng thật (`CHUYEN_DE.DANG.KIEU`) hoặc null. */
   dang: string | null
   mucDo: string | null
+  group?: string
 }
 
 export interface CauToiHan {
@@ -92,6 +93,9 @@ export interface ChonCauVao {
   toiHan: CauToiHan[]
   /** Dạng yếu, yếu nhất trước. */
   dangYeu: DangCanLuyen[]
+  /** Dạng có bằng chứng học của chính em; không mở rộng theo chuyên đề/lớp. */
+  dangDaHoc?: ReadonlySet<string>
+  nhomGanDay?: ReadonlySet<string>
   /** qid có sự kiện trong `SO_NGAY_KHONG_GIAO_LAI` ngày qua (gồm hôm nay): không giao lại làm câu mới/bù. */
   suKienGanDay: ReadonlySet<string>
 }
@@ -131,9 +135,13 @@ export function chonCauChoPhuHuynh(v: ChonCauVao): CauChon[] {
   if (soCan === 0) return []
   const coNoiDung = new Map(v.ungVien.map((u) => [u.qid, u]))
   const ban = new Set<string>()
+  const nhomDaChon = new Set<string>()
+  const daHoc = v.dangDaHoc ?? new Set(v.dangYeu.map((d) => d.maDang))
+  const nhom = (qid: string) => coNoiDung.get(qid)?.group || `qid:${qid}`
   const ra: CauChon[] = []
   const lay = (qid: string, nguon: NguonCau) => {
     ban.add(qid)
+    nhomDaChon.add(nhom(qid))
     ra.push({ qid, nguon })
   }
   const bam = (qid: string) => hashSeed(`${v.seed}|${qid}`)
@@ -145,10 +153,10 @@ export function chonCauChoPhuHuynh(v: ChonCauVao): CauChon[] {
     .sort((a, b) => a.c.mocOnKe.localeCompare(b.c.mocOnKe) || b.c.lanSai - a.c.lanSai || a.h - b.h || a.c.qid.localeCompare(b.c.qid))
   for (const { c } of toiHan) {
     if (ra.length >= soCan) break
-    if (!ban.has(c.qid)) lay(c.qid, 'on_toi_han')
+    if (!ban.has(c.qid) && !nhomDaChon.has(nhom(c.qid))) lay(c.qid, 'on_toi_han')
   }
 
-  const duocPhep = (u: UngVien) => !ban.has(u.qid) && !v.suKienGanDay.has(u.qid)
+  const duocPhep = (u: UngVien) => !!u.dang && daHoc.has(u.dang) && !ban.has(u.qid) && !nhomDaChon.has(nhom(u.qid)) && !v.suKienGanDay.has(u.qid) && !v.nhomGanDay?.has(nhom(u.qid))
   const sapXep = (a: UngVien, b: UngVien, uuTien: (u: UngVien) => number) =>
     uuTien(a) - uuTien(b) || bam(a.qid) - bam(b.qid) || a.qid.localeCompare(b.qid)
 
@@ -159,22 +167,28 @@ export function chonCauChoPhuHuynh(v: ChonCauVao): CauChon[] {
         .filter((u) => u.dang === d.maDang && bacMucDo(u.mucDo) >= 0 && bacMucDo(u.mucDo) <= d.bac && duocPhep(u))
         .sort((a, b) => sapXep(a, b, (u) => d.bac - bacMucDo(u.mucDo))),
     )
-    for (const u of xoayVong(nhom, soCan - ra.length)) if (!ban.has(u.qid)) lay(u.qid, 'cung_dang')
+    for (const u of xoayVong(nhom, v.ungVien.length)) {
+      if (ra.length >= soCan) break
+      if (duocPhep(u)) lay(u.qid, 'cung_dang')
+    }
   }
 
-  // 3. Bù từ kho: cùng chuyên đề với các câu đã chọn hoặc dạng yếu thì trước; mức "biết/hiểu" hoặc chưa gắn mức thì được.
+  // 3. Bù trong dạng đã học: ưu tiên cùng chuyên đề; chỉ mức biết/hiểu có nhãn.
   if (ra.length < soCan) {
     const uaChuyenDe = new Set<string>([
       ...v.dangYeu.map((d) => chuyenDeCuaDang(d.maDang)),
       ...ra.map((c) => chuyenDeCuaDang(coNoiDung.get(c.qid)?.dang ?? null)),
     ].filter(Boolean))
     const ung = v.ungVien
-      .filter((u) => duocPhep(u) && bacMucDo(u.mucDo) <= 1)
+      .filter((u) => duocPhep(u) && bacMucDo(u.mucDo) >= 0 && bacMucDo(u.mucDo) <= 1)
       .sort((a, b) => sapXep(a, b, (u) => (uaChuyenDe.has(chuyenDeCuaDang(u.dang)) ? 0 : 1)))
     // Nhóm theo dạng (không có dạng thì nhóm riêng), giữ thứ tự xuất hiện đã sắp.
     const theoNhom = new Map<string, UngVien[]>()
     for (const u of ung) theoNhom.set(u.dang ?? '', [...(theoNhom.get(u.dang ?? '') ?? []), u])
-    for (const u of xoayVong([...theoNhom.values()], soCan - ra.length)) if (!ban.has(u.qid)) lay(u.qid, 'bu_kho')
+    for (const u of xoayVong([...theoNhom.values()], v.ungVien.length)) {
+      if (ra.length >= soCan) break
+      if (duocPhep(u)) lay(u.qid, 'bu_kho')
+    }
   }
   return ra
 }
