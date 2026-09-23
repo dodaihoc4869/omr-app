@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { xoaNhieuCa } from '../src/lib/exam-api'
+import { quenDiaChiMayChu } from '../src/lib/dia-chi-may-chu'
+import { quenCauHinhMayChu, quenDiaChiTuTep } from '../src/lib/may-chu-moi'
 
 // ĐỊA CHỈ MÁY CHỦ MỚI. Trước 12/09 chỗ này là link Apps Script; từ khi thầy
 // chốt "gỡ sạch google", `postJson` TỪ CHỐI mọi địa chỉ Google — nên một link
@@ -10,7 +12,9 @@ const URL_GIA = 'https://omr.example'
 function gaFetch(ketQua: Record<string, { ok: boolean; error?: string }>) {
   const goi: { maCa: string; xacNhan: string }[] = []
   const f = vi.fn(async (_url: string, init?: { body?: string }) => {
-    const body = JSON.parse(String(init?.body ?? '{}'))
+    // Lượt tải `cau-hinh.json` (giải địa chỉ máy chủ) KHÔNG có thân — bỏ qua, không tính là lệnh.
+    if (!init?.body) return { ok: true, json: async () => ({}) } as unknown as Response
+    const body = JSON.parse(String(init.body))
     goi.push({ maCa: body.maCa, xacNhan: body.xacNhan })
     const r = ketQua[body.maCa] ?? { ok: true }
     return { ok: true, json: async () => r, text: async () => JSON.stringify(r) } as unknown as Response
@@ -19,7 +23,14 @@ function gaFetch(ketQua: Record<string, { ok: boolean; error?: string }>) {
   return goi
 }
 
-afterEach(() => vi.unstubAllGlobals())
+afterEach(() => {
+  vi.unstubAllGlobals()
+  // Địa chỉ máy chủ là bộ nhớ tạm ở mức mô-đun — xoá để ca "Google bị từ chối" không
+  // rơi vào địa chỉ còn sót của ca trước.
+  quenDiaChiMayChu()
+  quenCauHinhMayChu()
+  quenDiaChiTuTep()
+})
 
 describe('xoaNhieuCa — xoá lô nhiều ca', () => {
   it('mỗi ca gửi đúng mã của nó làm xacNhan, gọi đủ số ca', async () => {

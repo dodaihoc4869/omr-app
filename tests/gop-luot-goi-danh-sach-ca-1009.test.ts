@@ -108,7 +108,8 @@ describe('KHÔNG ĐƯỢC HIỆN SỐ CŨ SAU KHI THẦY ĐỔI CA', () => {
 
   it('lượt gọi HỎNG không được cất vào đệm — lần sau phải thử lại', async () => {
     soLuotGoi = 0
-    vi.stubGlobal('fetch', async () => {
+    vi.stubGlobal('fetch', async (_u: string, init?: { body?: string }) => {
+      if (!init?.body) return new Response('{}', { status: 200 }) // lượt tải cấu hình, không đếm
       soLuotGoi += 1
       return new Response(JSON.stringify({ ok: false, error: 'Sai mã bí mật' }), { status: 200 })
     })

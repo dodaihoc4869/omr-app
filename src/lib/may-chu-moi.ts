@@ -80,13 +80,17 @@ export function napDiaChiMayChuMoiChoEm(): Promise<void> {
 }
 
 async function napThat(): Promise<void> {
-  const ch = await layCauHinhMayChu()
+  // ĐỌC THẲNG `loadCauHinhMayChu` (IndexedDB), KHÔNG qua `layCauHinhMayChu`.
+  // VÌ SAO PHẢI VẬY: `layCauHinhMayChu` khi URL còn trống lại `await xongNapDiaChi()`,
+  // mà lúc này `dangNap` ĐANG là chính `napThat` đang chạy ⇒ tự chờ chính mình, treo
+  // vô hạn. Đây là GỐC lỗi "mở ca chỉ mở được tại máy này": máy lạ (IndexedDB rỗng)
+  // nạp địa chỉ không bao giờ xong, nên mọi lệnh thầy trả "Chưa kết nối được máy chủ".
+  const ch = await loadCauHinhMayChu()
   if (ch.URL) return
   const url = await loadDiaChiMayChuMoiChoEm()
   if (!url) return
   diaChiTuTep = url
-  const moi = chuanHoaMayChu({ ...ch, BAT: true, URL: url })
-  await saveCauHinhMayChu(moi).catch(() => {})
+  await saveCauHinhMayChu({ ...ch, BAT: true, URL: url }).catch(() => {})
   quenCauHinhMayChu()
 }
 

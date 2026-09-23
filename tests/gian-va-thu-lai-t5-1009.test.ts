@@ -121,7 +121,8 @@ describe('② THỬ LẠI CHẠY THẬT', () => {
   it('lỗi máy chủ trả lời tử tế ⇒ CHỈ MỘT lượt, không thử lại', async () => {
     vi.resetModules()
     let lan = 0
-    vi.stubGlobal('fetch', async () => {
+    vi.stubGlobal('fetch', async (_u: string, init?: { body?: string }) => {
+      if (!init?.body) return new Response('{}', { status: 200 }) // lượt tải cấu hình, không đếm
       lan += 1
       return new Response(JSON.stringify({ ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca kiểm tra' }), { status: 200 })
     })
@@ -134,7 +135,8 @@ describe('② THỬ LẠI CHẠY THẬT', () => {
   it('hỏng suốt ⇒ ném lỗi sau đúng 3 lượt, KHÔNG thử mãi', async () => {
     vi.resetModules()
     let lan = 0
-    vi.stubGlobal('fetch', async () => {
+    vi.stubGlobal('fetch', async (_u: string, init?: { body?: string }) => {
+      if (!init?.body) return new Response('{}', { status: 200 }) // lượt tải cấu hình, không đếm
       lan += 1
       throw new Error('Failed to fetch')
     })
@@ -148,7 +150,8 @@ describe('② THỬ LẠI CHẠY THẬT', () => {
   it('LƯU TẠM chỉ thử THÊM MỘT lần — nhịp sau còn tới, không việc gì phải cố', async () => {
     vi.resetModules()
     let lan = 0
-    vi.stubGlobal('fetch', async () => {
+    vi.stubGlobal('fetch', async (_u: string, init?: { body?: string }) => {
+      if (!init?.body) return new Response('{}', { status: 200 }) // lượt tải cấu hình, không đếm
       lan += 1
       throw new Error('Failed to fetch')
     })
