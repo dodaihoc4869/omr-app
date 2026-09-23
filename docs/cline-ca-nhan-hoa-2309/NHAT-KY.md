@@ -480,3 +480,17 @@ Lệnh kiểm (exit code thật): `tsc -b` 0 · `tsc -p server` 0 · `vitest run
 Phần chưa xong và blocker đã xác minh: RV06 (runtime Cloudflare) vẫn mở — máy không có wrangler/miniflare/@cloudflare/vitest-pool-workers; RV01/RV02 chưa kiểm hai thiết bị thật; kho thật chưa gắn nhãn `family` ⇒ lượt rút còn 1 câu theo §4.2.6 (cần thầy gắn nhãn).
 Việc kế tiếp làm ngay: tiếp P06 còn lại (Mom/ôn/thử thách dùng CHUNG tổng tải; Đoàn đúng mức cá nhân + hạn mềm + continuing task), rồi P07 (EXP/ledger/receipt/outbox + idempotency), P08→P10; P11 chỉ chuẩn bị + ghi CHƯA XÁC MINH.
 Các phụ thuộc đã sẵn sàng; phần chờ gói khác: P07 cho receipt/correction; P06 cho các kênh khác dùng chung ngân sách.
+
+
+CHECKPOINT CNH-1.0 — RÀ SOÁT 01 BỔ SUNG LẦN 2 (RV05 + RV03 `familyLanCuoi`)
+HEAD `e37ac50` (đã push). Log: `evidence/rasoat01c-*.log`.
+Kết luận của giám sát (đã kiểm và thấy ĐÚNG): `chonCauChoLuot` gọi policy **trước** khi chấm điểm mà policy lại chọn TUẦN TỰ + áp trần lượt ⇒ vòng đầu chỉ 6 câu đầu được chấm; đại diện family bị chọn theo thứ tự pool; `familyLanCuoi` luôn rỗng.
+Đã sửa:
+ · `chong-lap.ts`: cờ `khongApTranLuot` + `lietKeUngVienHopLe` (xét từng ứng viên ĐỘC LẬP với `daChon` THỰC, không cộng dồn, không áp trần).
+ · `bo-chon-that.ts`: `locTheoLuatLap` dùng `lietKeUngVienHopLe`, trả thêm `ung` (family/purpose thật) cho `daChon`; vòng lặp chấm điểm toàn bộ ứng viên hợp lệ rồi chọn 1 câu vừa ngân sách tốt nhất; trần 6 do vòng lặp giữ.
+ · `docNguCanhChongLap(env,sbd,ngay,nowMs,familyCuaUngVien)`: nối lịch sử family THẬT từ sổ (chỉ khi ứng viên có nhãn).
+Test: `tests/cnh-1-0-bo-chon-that.test.ts` **20 ca xanh** (thêm RV05a đảo thứ tự pool · RV05b câu thứ 7 vừa ngân sách · RV05c cùng family câu điểm cao đứng sau thắng · RV03 lịch sử family thật).
+Red-before-fix đã chứng minh: tạm dùng lại policy tuần tự ⇒ **4/4 ca RV05 ĐỎ**; bản sửa ⇒ 4/4 xanh.
+Lệnh kiểm: `tsc -b` 0 · `tsc -p server` 0 · nhóm 58 tệp xanh · `scripts/tai-hien-rv01-followup.mjs` exit 0 · toàn suite 707 xanh / 34 đỏ (= nợ cũ) / 1 skip.
+Còn OPEN: **RV06** (runtime Cloudflare: máy không có wrangler/miniflare/@cloudflare/vitest-pool-workers) · RV01/RV02 chưa kiểm hai thiết bị thật · kho thật chưa gắn nhãn `family` (lượt rút còn 1 câu theo §4.2.6 khi bật cờ).
+Việc kế tiếp: tiếp P06 còn lại (Mom/ôn/thử thách dùng chung tổng tải; Đoàn mức cá nhân + hạn mềm + continuing task) → P07 (EXP/ledger/receipt/outbox + idempotency) → P08 → P09 → P10; P11 chỉ chuẩn bị + ghi CHƯA XÁC MINH.
