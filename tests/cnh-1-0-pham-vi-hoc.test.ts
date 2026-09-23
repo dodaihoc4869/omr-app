@@ -11,7 +11,8 @@ import {
 } from '../server/src/pham-vi-hoc'
 import { khongBiBaoVe } from '../server/src/cau-theo-qid'
 import { locPhamViChoKeHoach } from '../server/src/ke-hoach-ngay-d1'
-import { taoD1That } from './_d1-that'
+import { readScope } from '../server/src/game-v2-bank'
+import { taoD1That, type D1That } from './_d1-that'
 
 const q = (qid: string, skillIds: string[], prerequisiteIds: string[] = [], o: Partial<CauXetDuyet> = {}): CauXetDuyet => ({
   qid, version: 'v1', contentGroup: `cg-${qid}`, skillIds, prerequisiteIds, qualityStatus: 'approved', ...o,
@@ -242,6 +243,60 @@ describe('P02 — cổng phạm vi của KẾ HOẠCH NGÀY (đường tự đ�
   it('lô rỗng ⇒ `null` (không truy vấn thừa)', async () => {
     const d = dungKho()
     expect(await locPhamViChoKeHoach(d.env, [], true)).toBeNull()
+  })
+})
+
+
+describe('T01 — END-TO-END qua KÊNH GAME: `readScope` thật (hàm route game gọi) lọc theo phạm vi', () => {
+  const MOC_LUC = '2026-09-20T05:00:00.000Z'
+  /** Kho 1 câu Phần I + 1 sự kiện học của S1 ở BTVN (nguồn khác ca thi và game) ⇒ câu vào được pool game. */
+  function dungGame() {
+    const d = taoD1That()
+    d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES('S1','x','x')").run()
+    d.sql.prepare("INSERT OR IGNORE INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',1,'kho/DE1.json',0,'v1')").run()
+    d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
+    const q = {
+      qid: 'DE1-I-1', maDe: 'DE1', version: 'v1', group: 'cg-1', phan: 'I', text: 'Câu 1.',
+      choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], hinhAnh: [], dang: 'D1', tenDang: 'Dạng 1',
+      mucDo: 'biet', sao: 1, kienThuc: ['SK1'], correct: 'A', solution: null, reviewed: true,
+    }
+    d.sql.prepare('INSERT OR REPLACE INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
+      .run('DE1', 'DE1-I-1', 'v1', 'cg-1', 'D1', JSON.stringify(q))
+    d.sql.prepare("INSERT OR REPLACE INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,luc,ngay_vn,ma_dang,chuyen_de,muc_do) VALUES('k1','S1','DE1-I-1','btvn','B',1,0,?,?, 'D1','','biet')")
+      .run(MOC_LUC, '2026-09-20')
+    return d
+  }
+  const batCo = (d: D1That) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('pham_vi_hoc','bat','x')").run()
+  const qidTrongPool = (kq: { pool: { qid: string }[] }) => kq.pool.map((x) => x.qid)
+
+  it('cờ TẮT: câu vẫn vào pool game (đường cũ nguyên vẹn)', async () => {
+    const d = dungGame()
+    const kq = await readScope(d.env, 'S1')
+    expect(qidTrongPool(kq)).toContain('DE1-I-1')
+  })
+
+  it('cờ BẬT + em CHƯA taught SK1 ⇒ câu BỊ LOẠI khỏi pool game, có mã lý do NEED_TAUGHT_SCOPE', async () => {
+    const d = dungGame()
+    batCo(d)
+    const kq = (await readScope(d.env, 'S1')) as unknown as { pool: { qid: string }[]; phamViLoai?: Record<string, number> }
+    expect(qidTrongPool(kq)).not.toContain('DE1-I-1')
+    expect(kq.phamViLoai?.NEED_TAUGHT_SCOPE).toBe(1)
+  })
+
+  it('cờ BẬT + em ĐÃ taught SK1 ⇒ câu vào pool bình thường', async () => {
+    const d = dungGame()
+    batCo(d)
+    await ghiTaught(d.env, 'S1', 'SK1', 'thay', 'ev-1', MOC)
+    expect(qidTrongPool(await readScope(d.env, 'S1'))).toContain('DE1-I-1')
+  })
+
+  it('cờ BẬT + thu hồi SK1 ⇒ câu rời pool ngay lượt sau (kiểm lại quyền trước khi phát)', async () => {
+    const d = dungGame()
+    batCo(d)
+    await ghiTaught(d.env, 'S1', 'SK1', 'thay', 'ev-1', MOC)
+    expect(qidTrongPool(await readScope(d.env, 'S1'))).toContain('DE1-I-1')
+    await thuHoiPhamVi(d.env, 'S1', 'SK1', 'thu hồi', MOC)
+    expect(qidTrongPool(await readScope(d.env, 'S1'))).not.toContain('DE1-I-1')
   })
 })
 

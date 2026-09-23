@@ -207,3 +207,7 @@ Them locPhamViChoKeHoach vao ke-hoach-ngay-d1.ts, chen vao ca hai danh sach tu d
 Bang chung: 24/24 test cnh-1-0-pham-vi-hoc xanh tren D1 that (them 6 ca cho cong ke hoach: T01 A/B khac pham vi, T03 thieu nhan/chua duyet, cau ngoai chi muc, thu hoi lam loai ngay, lo rong). Log p02d-vitest-phamvi.log. Nhom ke-hoach/cau-da-lam/dieu-7: 17 file xanh, 2 test do deu CO NGUYEN VAN trong nen P00 => 0 test moi do.
 
 Da noi 3/3 kenh tu dong: game-v2-bank, parent-news-nguon-cau, ke-hoach-ngay-d1.
+
+### P02 - T01/T11 PASS voi phep chung minh END-TO-END
+
+Them 4 ca test chay readScope THAT (ham route game goi) tren D1 that: co TAT thi cau vao pool; co BAT + chua taught thi cau ROI KHOI pool kem ma ly do NEED_TAUGHT_SCOPE; co BAT + da taught thi cau vao binh thuong; thu hoi quyen thi cau roi pool ngay luot sau. 28/28 test xanh. Log p02e-vitest-end2end.log.

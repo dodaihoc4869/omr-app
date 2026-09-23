@@ -75,7 +75,7 @@
         "P01"
       ],
       "status": "IN_PROGRESS",
-      "notes": "DA NOI bo loc pham vi vao CA 3 duong chon cau TU DONG: game-v2-bank (docKhoCau), parent-news-nguon-cau (kenh 5), ke-hoach-ngay-d1 (cauToiHan + cauOnThi qua locPhamViChoKeHoach). Co pham_vi_hoc MAC DINH TAT nen hanh vi production khong doi; co TAT khong them truy van (doc gop cot / dem 30 giay isolate). T02+T03 PASS (24 test tren D1 that). CON THIEU: (a) T01 doi chieu end-to-end qua tung kenh; (b) T11 phan khong lo loi giai o tang kenh; (c) quyen full_curriculum_practice cho luyen-de; (d) bao cao kho thieu nhan cho giao vien; (e) btvn-nang-do la kenh GIAO BAI cua thay nen KHONG loc pham vi (dung ngoai le btvn_thay_giao).",
+      "notes": "P02 - DA XONG 4/5 viec: (1) eligibleScope thuan + adapter D1; (2) moi skill/prereq phai taught, encountered rieng, import khong bao gio ghi taught; (3) kiem qid/version/content_group + ngoai le teacher assignment (khong mo game); (5) kiem lai revision/quyen truoc khi phat. Da noi 3/3 kenh tu dong. T01/T02/T03/T11 PASS (28 test tren D1 that, trong do 4 ca END-TO-END qua readScope cua kenh game). CON THIEU: quyen full_curriculum_practice cho luyen-de (viec 3) va be mat de giao vien xac nhan taught/bao kho thieu nhan (viec 4).",
       "evidence": [
         {
           "path": "server/migration-2309-cnh1-learner-scope.sql",
@@ -796,8 +796,21 @@
       "phase": "P02",
       "level": "code",
       "title": "Phạm vi từng em",
-      "status": "IN_PROGRESS",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-pham-vi-hoc.test.ts",
+          "executedAt": "2026-09-23T10:38:10.354Z",
+          "exitCode": 0,
+          "sourceFingerprint": "7877bb48b587d48b7b575201f73015b05bbc7017fb8a371e56a5ab7cab6f06ed",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02e-vitest-end2end.log",
+              "sha256": "425a99f175e3598c0052a500a1110d35f7e4cdd4e4d7006a1f3728d95088c5b0"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "T02",
@@ -902,8 +915,21 @@
       "phase": "P02",
       "level": "code",
       "title": "Bảo vệ bản sao BTVN",
-      "status": "IN_PROGRESS",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-pham-vi-hoc.test.ts",
+          "executedAt": "2026-09-23T10:38:10.354Z",
+          "exitCode": 0,
+          "sourceFingerprint": "7877bb48b587d48b7b575201f73015b05bbc7017fb8a371e56a5ab7cab6f06ed",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02e-vitest-end2end.log",
+              "sha256": "425a99f175e3598c0052a500a1110d35f7e4cdd4e4d7006a1f3728d95088c5b0"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "T12",
