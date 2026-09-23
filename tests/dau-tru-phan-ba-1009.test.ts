@@ -19,6 +19,7 @@ import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import { normalizeNumericAnswer } from '../src/engine/score'
+import { khopPhanIII } from '../src/lib/cham-so'
 
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 
@@ -72,12 +73,12 @@ describe('KHOẢNG TRẮNG — kể cả no-break space Word hay chèn', () => {
   })
 })
 
-describe('KHÔNG ĐƯỢC NỚI QUÁ TAY — mấy thứ vẫn phải là SAI', () => {
-  it('CỐ Ý không so theo SỐ HỌC: "0,80" KHÁC "0,8" — chữ số có nghĩa là có tính điểm', () => {
-    expect(normalizeNumericAnswer('0,80')).not.toBe(normalizeNumericAnswer('0,8'))
+describe('LUẬT MỚI 23/09/2026 — so theo SỐ HỌC, nhưng số KHÁC NHAU vẫn phải khác', () => {
+  it('"0,80" = "0,8" (thầy chốt 23/09: bỏ phân biệt chữ số có nghĩa)', () => {
+    expect(khopPhanIII('0,80', '0,8')).toBe(true)
   })
-  it('dấu cộng đầu KHÔNG bị bỏ: "+5" khác "5"', () => {
-    expect(normalizeNumericAnswer('+5')).not.toBe(normalizeNumericAnswer('5'))
+  it('dấu cộng đầu NAY bị bỏ: "+5" = "5"', () => {
+    expect(khopPhanIII('+5', '5')).toBe(true)
   })
   it('số khác nhau vẫn khác nhau', () => {
     expect(normalizeNumericAnswer('-1')).not.toBe(normalizeNumericAnswer('-2'))
@@ -111,8 +112,8 @@ describe('MỘT NGUỒN SỰ THẬT — sáu chỗ so đáp án Phần III khôn
     // Phiếu là tệp HTML rời chạy trên máy em, không import được — nên chỗ này
     // buộc phải chép. Phép kiểm khoá hai bên không lệch nhau.
     const ma = doc('src/lib/html-phieu.ts')
-    expect(ma).toContain('var chuanIII = function (v)')
-    expect(ma).toContain('chuanIII(chon) === chuanIII(dapAn)')
+    expect(ma).toContain('var chuanSoIII = function (v)')
+    expect(ma).toContain('khopIII(chon, dapAn)')
     // Đủ tám dấu trừ, y như `MOI_DAU_TRU`.
     for (const ky of ['‐', '‑', '‒', '–', '—', '―', '−', '－']) {
       expect(ma.includes(ky)).toBe(true)
@@ -125,12 +126,14 @@ describe('MỘT NGUỒN SỰ THẬT — sáu chỗ so đáp án Phần III khôn
     // Đọc chữ trong tệp chỉ chứng minh nó CÓ MẶT. Phép kiểm này lôi hàm ra chạy
     // và bắt nó ra ĐÚNG kết quả của `normalizeNumericAnswer`.
     const ma = doc('src/lib/html-phieu.ts')
-    const m = ma.match(/var chuanIII = function \(v\) \{([\s\S]*?)\n {8}\};/)
-    expect(m).toBeTruthy()
+    const m1 = ma.match(/var chuanIII = function \(v\) \{([\s\S]*?)\n {8}\};/)
+    const m2 = ma.match(/var chuanSoIII = function \(v\) \{([\s\S]*?)\n {8}\};/)
+    expect(m1).toBeTruthy()
+    expect(m2).toBeTruthy()
     // Trong tệp nguồn `\\s` là hai ký tự; JS sinh ra nhận `\s`.
-    const than = (m as RegExpMatchArray)[1].replace(/\\\\s/g, '\\s')
-    const chuanIII = new Function('v', than) as (v: unknown) => string
+    const chuanIII = new Function('v', (m1 as RegExpMatchArray)[1].replace(/\\\\s/g, '\\s')) as (v: unknown) => string
+    const chuanSoIII = new Function('v', 'chuanIII', (m2 as RegExpMatchArray)[1].replace(/\\\\s/g, '\\s')) as (v: unknown, f: (x: unknown) => string) => string
     const CA = ['–1', '-1', '−5', '- 5', '0,87', '0.87', '0,80', '+5', '12', '1.2', '－3', '—7']
-    for (const v of CA) expect(chuanIII(v)).toBe(normalizeNumericAnswer(v))
+    for (const v of CA) expect(chuanSoIII(v, chuanIII)).toBe(normalizeNumericAnswer(v))
   })
 })

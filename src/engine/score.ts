@@ -56,6 +56,8 @@
 // sai số dấu phẩy động (0.1 + 0.2 !== 0.3). Phép chia dùng số nguyên hết cỡ
 // rồi mới làm tròn một lần, không để phép chia đôi lần nào lọt vào.
 
+import { chuanHoaSoNhap, khopPhanIII } from '../lib/cham-so'
+
 export type Choice = 'A' | 'B' | 'C' | 'D'
 export type DS = 'D' | 'S'
 export type ItemFlag = 'EMPTY' | 'WARN_ERASURE' | 'ERR_DOUBLE_MARK' | null
@@ -134,7 +136,7 @@ export type QuotaPhan = SoCauBaPhan
  *
  * Đổi biểu điểm về sau: đổi chuỗi này VÀ hằng `LUAT_DIEM` trong
  * `docs/apps-script-kiem-tra.gs` — hai nơi phải khớp từng ký tự. */
-export const LUAT_DIEM = 'tile-450-400-150-v1'
+export const LUAT_DIEM = 'tile-450-400-150-v2-sohoc-2309'
 
 /** Tổng điểm một bài, tính bằng cents. */
 export const TONG_CENTS = 1000
@@ -198,7 +200,8 @@ export function soCauCuaKey(key: AnswerKey): SoCauBaPhan {
 const MOI_DAU_TRU = /[‐‑‒–—―−－]/g
 
 /** MỌI KIỂU KHOẢNG TRẮNG, kể cả no-break space U+00A0 mà Word hay chèn. */
-const MOI_KHOANG_TRANG = /[\s   ]+/g
+const MOI_KHOANG_TRANG = /[\s\u00a0\u1680\u180e\u2000-\u200f\u2028\u2029\u202f\u205f\u2060\u3000\ufeff]+/g
+const DAP_AN_SO_HOP_LE = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/
 
 /** CHUẨN HOÁ SỐ PHẦN III — MỘT NGUỒN SỰ THẬT cho MỌI chỗ so đáp án Phần III.
  *
@@ -213,13 +216,15 @@ const MOI_KHOANG_TRANG = /[\s   ]+/g
  * 2 ca, tất cả ở Phần III. Đo trên 2 485 dòng ĐANG ĐÚNG làm đối chứng: luật này
  * không lật dòng đúng nào thành sai.
  *
- * CỐ Ý KHÔNG so theo SỐ HỌC. `Number('0,80') === Number('0.8')` sẽ làm "0,80"
- * bằng "0,8" — xoá mất phân biệt chữ số có nghĩa, thứ đề Hoá có tính điểm. */
+ * THẦY CHỐT 23/09/2026 — CA THI NAY DÙNG CHUNG LUẬT 'so_hoc' (`khopPhanIII`): "0,80" = "0,8", "5 mol" = "5",
+ * sai số tuyệt đối < 1e-4. Lý do: luật chặt cũ chấm SAI nhiều câu ĐÚNG (0,540 ≠ 0,54; kí hiệu khoa học; đơn vị;
+ * dấu chấm cuối) và những lượt sai ấy đi thẳng vào phiếu phụ huynh. Hàm này chỉ còn dọn chuỗi để HIỂN THỊ;
+ * quyết định đúng/sai nằm ở `khopPhanIII`. */
 export function normalizeNumericAnswer(raw: string): string {
-  return String(raw ?? '')
-    .replace(MOI_DAU_TRU, '-')
-    .replace(MOI_KHOANG_TRANG, '')
-    .replace(',', '.')
+  // LỚP MỎNG GỌI LẠI LUẬT DÙNG CHUNG (`src/lib/cham-so.ts`, thầy chốt 23/09/2026).
+  // Hai bước dọn cũ (dấu trừ các kiểu + mọi khoảng trắng) giữ nguyên; phần còn lại —
+  // NFKC, dấu "≈/=" ở đầu, dấu câu ở cuối, ","→".", kí hiệu khoa học, đơn vị — do `chuanHoaSoNhap` lo.
+  return chuanHoaSoNhap(String(raw ?? '').replace(MOI_DAU_TRU, '-').replace(MOI_KHOANG_TRANG, ''))
 }
 
 function centsToScore(cents: number): number {
@@ -239,6 +244,9 @@ export function scorePhanI(
   if (answers.length !== key.length) {
     throw new Error(`Phần I: số câu trả lời (${answers.length}) khác số câu đáp án (${key.length})`)
   }
+  key.forEach((v, i) => {
+    if (!/^[ABCD]$/.test(String(v ?? ''))) throw new Error(`Phần I câu ${i + 1}: khóa đáp án không hợp lệ`)
+  })
   const n = key.length
   const moiCau = centsMotCau(quota, n)
   let dung = 0
@@ -270,6 +278,9 @@ export function scorePhanII(
     if (ideaKey.length !== SO_Y_PHAN_II) {
       throw new Error(`Phần II câu ${i + 1}: có ${ideaKey.length} ý, biểu điểm chỉ định nghĩa cho ${SO_Y_PHAN_II} ý`)
     }
+    if (ideaKey.some((v) => v !== 'D' && v !== 'S')) {
+      throw new Error(`Phần II câu ${i + 1}: khóa đáp án không hợp lệ`)
+    }
     let correctIdeas = 0
     let hasDoubleMark = false
     ideaAnswers.forEach((a, j) => {
@@ -298,13 +309,18 @@ export function scorePhanIII(
   if (answers.length !== key.length) {
     throw new Error(`Phần III: số câu trả lời (${answers.length}) khác số câu đáp án (${key.length})`)
   }
+  key.forEach((v, i) => {
+    const daChuan = normalizeNumericAnswer(v)
+    if (!DAP_AN_SO_HOP_LE.test(daChuan) || !Number.isFinite(Number(daChuan))) {
+      throw new Error('Phần III câu ' + (i + 1) + ': khóa đáp án không hợp lệ')
+    }
+  })
   const n = key.length
   const moiCau = centsMotCau(quota, n)
   let dung = 0
   const items: QuestionResult[] = answers.map((a, i) => {
-    const normalizedKey = normalizeNumericAnswer(key[i])
-    const correct =
-      a.flag !== 'ERR_DOUBLE_MARK' && a.value !== null && normalizeNumericAnswer(a.value) === normalizedKey
+    // MỘT LUẬT CHO MỌI KÊNH (thầy chốt 23/09/2026): `khopPhanIII` = soKhopSo(..., 'so_hoc') trong `src/lib/cham-so.ts`.
+    const correct = a.flag !== 'ERR_DOUBLE_MARK' && khopPhanIII(a.value, key[i])
     if (correct) dung++
     return { index: i + 1, correct, cents: correct ? moiCau : 0, flag: a.flag }
   })

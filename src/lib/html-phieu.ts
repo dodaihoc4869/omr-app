@@ -2241,21 +2241,43 @@ export const JS_PHIEU = `
         // tính điểm ("0,80" ≠ "0,8", "+5" ≠ "5", "5 mol" ≠ "5"). Máy chủ chấm lại bằng đúng luật này nên chỗ này không được "nới hơn" —
         // nới thì em thấy "đúng" rồi bị chấm sai. Test dau-tru-phan-ba-1009 + cham-tai-cho-dung-luat-2109 khoá cả hai bên.
         var chuanIII = function (v) {
-          return String(v == null ? '' : v).replace(/[‐‑‒–—―−－]/g, '-').replace(/[\\s\u00a0\u202f\u2007]+/g, '').replace(',', '.');
+          return String(v == null ? '' : v).replace(/[‐‑‒–—―−－]/g, '-').replace(/[\\s\u00a0\u1680\u180e\u2000-\u200f\u202f\u205f\u2060\u3000\ufeff]+/g, '').replace(new RegExp('[\\u2028\\u2029]', 'g'), '').replace(/[，٫‚،]/g, ',').replace(/．/g, '.').replace(',', '.');
         };
         var normII = function (v) {
           return String(v == null ? '' : v).toUpperCase().replace(/Đ/g, 'D').replace(/[^DS]/g, '');
+        };
+        // MỘT LUẬT DÙNG CHUNG (thầy chốt 23/09/2026): dọn nhiễu rồi so theo SỐ HỌC, sai số 1e-4.
+        // Trước đây phiếu so CHUỖI nên chấm sai nhiều câu đúng: "0,540" != "0,54", "2,5e-3", "0,54.".
+        var chuanSoIII = function (v) {
+          var s = String(v == null ? '' : v);
+          if (s.normalize) s = s.normalize('NFKC');
+          s = chuanIII(s).toLowerCase();
+          return s.replace(/^[+~=]+/, '').replace(/[.,;:!?]+$/, '').replace(/,/g, '.');
+        };
+        var tachSo = function (s) {
+          var m = /^([+-]?(?:\d+\.?\d*|\.\d+))(.*)$/.exec(s);
+          return m ? { n: m[1], u: m[2] } : null;
+        };
+        var khopIII = function (v, d) {
+          var a = chuanSoIII(v), b = chuanSoIII(d);
+          if (!a || !b) return false;
+          if (a === b) return true;
+          var x = tachSo(a), y = tachSo(b);
+          if (!x || !y) return false;
+          if (x.u && y.u && x.u !== y.u) return false;
+          var na = Number(x.n), nb = Number(y.n);
+          return isFinite(na) && isFinite(nb) && Math.abs(na - nb) < 1e-4;
         };
         var dung = 0;
         var sai = [];
         for (var i = 0; i < du.cau.length; i++) {
           var c = du.cau[i];
-          var chon = String(lam[c.id] || '').trim();
+          var chon = String(lam[c.id] == null ? '' : lam[c.id]).trim();
           var dapAn = String(c.dapAn == null ? '' : c.dapAn).trim();
           var khop = false;
           if (!chon) khop = false;
           else if (c.phan === 'III') {
-            khop = chuanIII(chon) === chuanIII(dapAn);
+            khop = khopIII(chon, dapAn);
           } else if (c.phan === 'II') {
             var nChon = normII(chon), nDap = normII(dapAn);
             khop = nChon.length === 4 && nDap.length === 4 && nChon === nDap;

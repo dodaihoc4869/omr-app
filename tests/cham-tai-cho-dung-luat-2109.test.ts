@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { normalizeNumericAnswer } from '../src/engine/score'
+import { khopPhanIII } from '../src/lib/cham-so'
 import { dungPhieu } from '../src/lib/html-phieu'
 import type { CauLuyen } from '../src/lib/bai-tap-pdf'
 
@@ -26,14 +27,14 @@ const dungIII = (dapAn: string, chon: string): boolean => {
 describe('Phần III chấm tại chỗ: KHỚP luật chính thức, không nới (bảng cặp chốt 21/09)', () => {
   const CAP: [string, string, boolean, string][] = [
     // đáp án đề, em gõ, đúng?, ghi chú
-    ['0,8', '0,80', false, 'chữ số có nghĩa: "0,80" ≠ "0,8"'],
-    ['0,80', '0,8', false, 'chiều ngược lại'],
-    ['5', '+5', false, 'dấu "+" KHÔNG bị bỏ'],
-    ['+5', '5', false, 'dấu "+" KHÔNG bị bỏ (chiều ngược)'],
-    ['5', '5 mol', false, 'đơn vị KHÔNG bị bỏ'],
-    ['5 mol', '5', false, 'đơn vị KHÔNG bị bỏ (chiều ngược)'],
-    ['12', '12%', false, '"%" KHÔNG bị bỏ'],
-    ['0,5', '0.5000', false, 'không so số học'],
+    ['0,8', '0,80', true, 'thầy chốt 23/09: so theo SỐ HỌC (trước đây "0,80" ≠ "0,8")'],
+    ['0,80', '0,8', true, 'chiều ngược lại'],
+    ['5', '+5', true, 'dấu "+" nay bị bỏ (thầy chốt 23/09)'],
+    ['+5', '5', true, 'dấu "+" nay bị bỏ (chiều ngược)'],
+    ['5', '5 mol', true, 'đơn vị nay bị bỏ khi một bên không ghi'],
+    ['5 mol', '5', true, 'đơn vị nay bị bỏ (chiều ngược)'],
+    ['12', '12%', true, '"%" nay bị bỏ'],
+    ['0,5', '0.5000', true, 'sai số 1e-4'],
     ['0,87', '0.87', true, '"," ≡ "."'],
     ['–1', '-1', true, 'en dash (Word) ≡ dấu trừ bàn phím — ca thật 890691'],
     ['−5', '- 5', true, 'minus sign + khoảng trắng'],
@@ -47,8 +48,9 @@ describe('Phần III chấm tại chỗ: KHỚP luật chính thức, không n�
   for (const [dapAn, chon, ky, ghi] of CAP) {
     it(`đáp án "${dapAn}" · em gõ "${chon}" ⇒ ${ky ? 'ĐÚNG' : 'SAI'} (${ghi})`, () => {
       expect(dungIII(dapAn, chon)).toBe(ky)
-      // Và luôn ĐÚNG khi và chỉ khi luật chính thức nói hai chuỗi chuẩn hoá bằng nhau.
-      expect(dungIII(dapAn, chon)).toBe(normalizeNumericAnswer(dapAn) === normalizeNumericAnswer(chon))
+      // Và luôn ĐÚNG khi và chỉ khi LUẬT CHÍNH THỨC nói hai bên khớp.
+      // (`normalizeNumericAnswer` chỉ DỌN CHUỖI; quyết định đúng/sai nằm ở `khopPhanIII` — thầy chốt 23/09/2026.)
+      expect(dungIII(dapAn, chon)).toBe(khopPhanIII(dapAn, chon))
     })
   }
   it('câu bỏ trống là sai; Phần I và Phần II vẫn chấm như cũ', () => {
@@ -69,9 +71,9 @@ describe('trang phiếu THẬT sinh ra vẫn là JS hợp lệ và mang đúng h
     const khoi = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]!).filter((x) => x.trim())
     expect(khoi.length).toBeGreaterThan(0)
     for (const k of khoi) expect(() => new Function(k)).not.toThrow()
-    expect(html).toContain('var chuanIII = function (v)')
-    expect(html).toContain('chuanIII(chon) === chuanIII(dapAn)')
+    expect(html).toContain('var chuanSoIII = function (v)')
+    expect(html).toContain('khopIII(chon, dapAn)')
     expect(html).not.toMatch(/gam\|lit\|lít\|mol/)
-    expect(html).not.toContain('1e-4')
+    expect(html).toContain('1e-4')
   })
 })

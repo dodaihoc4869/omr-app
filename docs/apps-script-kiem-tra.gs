@@ -242,7 +242,7 @@ const AN_HAN_NOP_GIAY = 120
 //
 // Đổi biểu điểm về sau: đổi chuỗi này VÀ hằng `LUAT_DIEM` trong
 // `src/engine/score.ts` — hai nơi phải khớp từng ký tự, có test khoá điều này.
-const LUAT_DIEM = 'tile-450-400-150-v1'
+const LUAT_DIEM = 'tile-450-400-150-v2-sohoc-2309'
 
 /** Gom một danh sách CHỈ SỐ DÒNG GIẢM DẦN thành các khối liền mạch để xoá.
  *

@@ -73,7 +73,9 @@ export function quenDiaChiTuTep(): void {
 let dangNap: Promise<void> | null = null
 
 export function napDiaChiMayChuMoiChoEm(): Promise<void> {
-  if (!dangNap) dangNap = napThat()
+  // Lần tải đầu có thể trượt vì máy vừa mở app chưa có mạng. Chỉ giữ lời hứa
+  // khi đang tải; lượt sau được thử lại thay vì nhớ kết quả rỗng suốt phiên.
+  if (!dangNap) dangNap = napThat().finally(() => { dangNap = null })
   return dangNap
 }
 
@@ -112,7 +114,28 @@ export async function layCauHinhMayChu(): Promise<CauHinhMayChu> {
   // IndexedDB ghi hỏng (máy em ở chế độ riêng tư, hết chỗ) thì địa chỉ đọc được
   // lúc khởi động vẫn còn trong bộ nhớ — dùng nó, đừng bỏ em lại đường cũ.
   if (!ch.URL && diaChiTuTep) ch = chuanHoaMayChu({ ...ch, BAT: true, URL: diaChiTuTep })
-  nhoCauHinh = { luc: nay, ch }
+  // LỖI ĐÃ CÓ THẬT (thầy báo 23/09: "mở ca chỉ mở được tại máy này").
+  //
+  // Máy LẠ (máy thầy khác, máy tính ở nhà, trình duyệt mới) có IndexedDB RỖNG. Lượt nạp địa chỉ lúc mở app
+  // (`napDiaChiMayChuMoiChoEm`) chạy KHÔNG chờ và có thể CHƯA xong — hoặc đã trượt vì mạng yếu lúc vừa mở app.
+  // Khi đó `URL` rỗng ⇒ MỌI lệnh thầy (mở ca, giao bài, đổi tên, chấm lại…) trả "Chưa kết nối được máy chủ",
+  // nên thầy chỉ mở ca được trên ĐÚNG máy đã từng cấu hình. Hai đường lùi nữa, cùng nguồn `public/cau-hinh.json`
+  // (tệp nằm TRONG gói app — mọi máy đều có, không phụ thuộc IndexedDB của máy nào):
+  //   1. chờ lượt nạp đang chạy xong rồi hỏi lại;
+  //   2. tải thẳng tệp ấy (service worker đã đệm sẵn) rồi cất lại vào IndexedDB cho các lượt sau.
+  if (!ch.URL) {
+    try { await xongNapDiaChi() } catch { /* vẫn còn đường 2 */ }
+    try {
+      const u = await loadDiaChiMayChuMoiChoEm()
+      if (u) {
+        diaChiTuTep = u
+        ch = chuanHoaMayChu({ ...ch, BAT: true, URL: u })
+        await saveCauHinhMayChu(ch).catch(() => {})
+      }
+    } catch { /* hết đường: trả nguyên trạng, chỗ gọi tự nói thật */ }
+  }
+  // CẤM NHỚ CÁI RỖNG: chỉ đệm khi đã ra được địa chỉ, để lượt sau còn thử lại (cùng luật `dia-chi-may-chu.ts`).
+  if (ch.URL) nhoCauHinh = { luc: nay, ch }
   return ch
 }
 
