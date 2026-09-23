@@ -11,7 +11,7 @@ import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
 import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
 import {nangLucBat} from './nang-luc-d1'
 import {nganSachLuotBat,docNganSachConLai} from './ngan-sach-luot'
-import {chonCauChoLuot} from './bo-chon-that'
+import {chonCauChoLuot,familyTuNhan} from './bo-chon-that'
 import {giuCho} from './giu-cho'
 import {PETS,ALIASES,OLD_SIX,allowed,learnedQuestionFilter,chooseSessionWithRoles,chooseLuotMoi,luotHomNay,SO_CAU_MOI_LUOT,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
 import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
@@ -136,27 +136,34 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   // CNH-1.0 P05/T09 (02 §5.2 + §7.2): lượt này CHỈ lấy phần NGÂN SÁCH CÒN LẠI của ngày (mọi màn dùng chung
   // một ngân sách), và cắt theo thứ tự TẤT ĐỊNH (điểm §7.2 → hash `student|day|plan_version|qid|version`).
   // Cờ `cau_hinh.ngan_sach_luot` MẶC ĐỊNH TẮT ⇒ đường cũ nguyên vẹn.
-  let chon=chonGoc, nganSachThieu:{conLaiGiay:number;soCauBoQua:number}|undefined, lyDoLuot:Record<string,number>|undefined, hoanLuot:{deferredCount:number;overBudgetSeconds:number}|undefined
+  let chon=chonGoc, nganSachThieu:{conLaiGiay:number;soCauBoQua:number}|undefined, lyDoLuot:Record<string,number>|undefined, hoanLuot:{deferredCount:number;overBudgetSeconds:number}|undefined, giuDangMo:Record<string,string>|undefined
   if(await nganSachLuotBat(env)){
-    // BỘ CHỌN CHUNG §7.1: giữ chỗ hiệu lực + lượt làm hôm nay → trần độ khó theo mức đang luyện → điểm §7.2
-    // (dữ liệu THẬT: hồ sơ per-câu + `skill_snapshot` P03 + mốc ôn) → fit ngân sách greedy → giành chỗ nguyên tử.
+    // BỘ CHỌN CHUNG §7.1 chạy trên TOÀN BỘ tập ứng viên HỢP LỆ (`eligible`) — RV05: KHÔNG đưa cho bộ chọn mới
+    // một tập đã bị `chooseLuotMoi` cắt sẵn theo thuật toán cũ (làm thế thì trần 6 câu quyết định ai được xét).
     const ns=await docNganSachConLai(env,sbd,ngay)
-    const kq=await chonCauChoLuot(env,chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',mucDo:x.q.mucDo,group:x.q.group,dangKey:x.q.dang??x.q.group,skillIds:Array.isArray(x.q.kienThuc)?x.q.kienThuc as string[]:[]})),
-      {sbd,ngay,nowMs:tNow,mastery,conLaiGiay:ns&&ns.nganSachGiay>0?ns.conLaiGiay:null,tranCau:SO_CAU_MOI_LUOT,mauTocDo:ns?.mau})
-    const thuTu=new Map(kq.chon.map((v,i)=>[v.qid,i]))
-    chon=[...chon].filter(x=>thuTu.has(x.q.qid)).sort((a,b)=>(thuTu.get(a.q.qid)??0)-(thuTu.get(b.q.qid)??0))
+    const vaiTheoQid=new Map(chonGoc.map(x=>[x.q.qid,x.role]))
+    const nhomTheoQid=new Map(eligible.map(q=>[q.qid,q.group]))
+    const kq=await chonCauChoLuot(env,eligible.map(q=>({qid:q.qid,version:q.version,part:q.phan as 'I'|'II'|'III',mucDo:q.mucDo,group:q.group,dangKey:q.dang??q.group,skillIds:Array.isArray(q.kienThuc)?q.kienThuc as string[]:[],familyId:familyTuNhan(q)})),
+      {sbd,ngay,nowMs:tNow,mastery,conLaiGiay:ns&&ns.nganSachGiay>0?ns.conLaiGiay:null,tranCau:Math.min(SO_CAU_MOI_LUOT,remaining),mauTocDo:ns?.mau})
+    const groupsCua=new Set(scope.evidence.map(e=>e.group))
+    chon=kq.chon.flatMap(v=>{const q=eligible.find(x=>x.qid===v.qid);return q?[{q,role:vaiTheoQid.get(v.qid)??'moi',dai:q.phan!=='I',moi:!groupsCua.has(q.group)}]:[]})
     lyDoLuot=Object.keys(kq.lyDo).length?kq.lyDo:undefined
     if(kq.deferredCount)hoanLuot={deferredCount:kq.deferredCount,overBudgetSeconds:kq.overBudgetSeconds}
     if(ns&&ns.nganSachGiay>0&&kq.deferredCount)nganSachThieu={conLaiGiay:ns.conLaiGiay,soCauBoQua:kq.deferredCount}
+    // RV02: câu đã phát cho NHIỆM VỤ CÒN HIỆU LỰC (dù lease thiết bị đã hết) ⇒ trả lại để em RESUME, KHÔNG phát mới.
+    if(kq.dungLaiTask.size)giuDangMo=Object.fromEntries(kq.dungLaiTask)
+    void nhomTheoQid
   }
   if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:TRAN_CAU_DAO_NGAY,suggestions:chon.map(x=>({title:x.q.tenDang||'Ôn kiến thức đã học',source:x.q.maDe,part:x.q.phan})),remaining,luot:tom}
-  // P05 mục 4: GIÀNH CHỖ nguyên tử cho các câu của lượt (bảng `giu_cho`, PK sbd+ngay+qid) để hai máy/hai lượt
-  // không nhận cùng câu. Thua chỗ ⇒ RÚT NGẮN lượt (không chiếm câu người khác, không nới bảo vệ). Cờ TẮT ⇒ bỏ qua.
+  // P05 mục 4 + RV01/RV02: GIÀNH CHỖ nguyên tử theo ĐƠN VỊ NỘI DUNG (`content_group`) cho các câu của lượt;
+  // nhiệm vụ CÒN hiệu lực (dù hết lease thiết bị) thì KHÔNG bị chiếm — trả `giuChoDangMo` để em RESUME.
   const idLuot=crypto.randomUUID()
   let giuMat:string[]=[]
   if(await nganSachLuotBat(env)&&chon.length){
-    const g=await giuCho(env,{sbd,ngay,taskId:idLuot,qids:chon.map(x=>x.q.qid),nowMs:tNow,nguon:'game'})
+    const g=await giuCho(env,{sbd,ngay,taskId:idLuot,qids:chon.map(x=>x.q.qid),nowMs:tNow,nguon:'game',
+      nhomTheoQid:new Map(chon.map(x=>[x.q.qid,x.q.group])),hanTaskGiay:2*3600})
     if(g.thua.length){giuMat=g.thua;const thang=new Set(g.thang);chon=chon.filter(x=>thang.has(x.q.qid))}
+    if(g.dangMo.size)giuDangMo=Object.fromEntries(g.dangMo)
   }
   if(!chon.length){
     if(nganSachThieu&&chonGoc.length)return {ok:true,questions:[],lyDo:'het_ngan_sach_ngay',luot:tom,maiCho:cho,missing:scope.missing,nganSach:nganSachThieu,message:'Hôm nay em đã dùng gần hết thời gian học. Em làm nốt việc đang mở hoặc quay lại buổi sau nhé.'}
@@ -167,7 +174,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
   if(!inserted.meta.changes)return startLuotMoi(env,sbd,p,b,action)
   const day=await doDayDu(env,chon.map(x=>x.q as CauPool)) // pool là bản NHẸ: chỉ các câu ĐƯỢC CHỌN mới nạp đầy đủ để đưa cho em
-  return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),...(giuMat.length?{giuChoThua:giuMat}:{}),...(lyDoLuot?{chonLyDo:lyDoLuot}:{}),...(hoanLuot?{hoanLuot}:{}),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
+  return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),...(giuMat.length?{giuChoThua:giuMat}:{}),...(giuDangMo?{giuChoDangMo:giuDangMo}:{}),...(lyDoLuot?{chonLyDo:lyDoLuot}:{}),...(hoanLuot?{hoanLuot}:{}),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
 }
 /** Đoàn Hộ Tống: sáu câu cá nhân thuộc phần chính em đã làm và kiến thức nền đã biết.
  * Câu trùng nội dung hôm nay, bài chưa nộp, câu bảo vệ và câu vượt sức đều bị chặn. */
@@ -310,19 +317,21 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     const chonGoc=chooseSessionWithRoles(eligible,scope.evidence,history,masteryLuot,mode,tNow).slice(0,remaining)
     // CNH-1.0 P05/T09 (02 §5.2): lượt này CHỈ được lấy phần NGÂN SÁCH CÒN LẠI của ngày — nhiều màn dùng
     // chung một ngân sách. Cờ `cau_hinh.ngan_sach_luot` MẶC ĐỊNH TẮT ⇒ hành vi cũ nguyên vẹn.
-    let chon=chonGoc, nganSachThieu: { conLaiGiay: number; soCauBoQua: number } | undefined, lyDoLuot: Record<string, number> | undefined, hoanLuot: { deferredCount: number; overBudgetSeconds: number } | undefined
+    let chon=chonGoc, nganSachThieu: { conLaiGiay: number; soCauBoQua: number } | undefined, lyDoLuot: Record<string, number> | undefined, hoanLuot: { deferredCount: number; overBudgetSeconds: number } | undefined, giuDangMo: Record<string, string> | undefined
     if(await nganSachLuotBat(env)){
-      // BỘ CHỌN CHUNG §7.1 (giữ chỗ hiệu lực → lượt làm hôm nay → trần độ khó theo mức → điểm §7.2 → ngân sách greedy).
+      // BỘ CHỌN CHUNG §7.1 chạy trên TOÀN BỘ tập ứng viên HỢP LỆ (`eligible`) — RV05: không đưa vào bộ chọn mới
+      // một tập đã bị `chooseLuotMoi` cắt trước theo thuật toán cũ. Vai chỉ dùng để HIỂN THỊ (không cắt pool).
       const ns=await docNganSachConLai(env,sbd,academicDay(now()))
-      const kq=await chonCauChoLuot(env,chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',mucDo:x.q.mucDo,group:x.q.group,dangKey:x.q.dang??x.q.group,skillIds:Array.isArray(x.q.kienThuc)?x.q.kienThuc as string[]:[]})),
-        {sbd,ngay:academicDay(now()),nowMs:tNow,mastery:masteryLuot,conLaiGiay:ns&&ns.nganSachGiay>0?ns.conLaiGiay:null,tranCau:SO_CAU_MOI_LUOT,mauTocDo:ns?.mau})
-      const thuTu=new Map(kq.chon.map((v,i)=>[v.qid,i]))
-      chon=[...chon].filter(x=>thuTu.has(x.q.qid)).sort((a,b)=>(thuTu.get(a.q.qid)??0)-(thuTu.get(b.q.qid)??0))
+      const kq=await chonCauChoLuot(env,eligible.map(q=>({qid:q.qid,version:q.version,part:q.phan as 'I'|'II'|'III',mucDo:q.mucDo,group:q.group,dangKey:q.dang??q.group,skillIds:Array.isArray(q.kienThuc)?q.kienThuc as string[]:[],familyId:familyTuNhan(q)})),
+        {sbd,ngay:academicDay(now()),nowMs:tNow,mastery:masteryLuot,conLaiGiay:ns&&ns.nganSachGiay>0?ns.conLaiGiay:null,tranCau:Math.min(SO_CAU_MOI_LUOT,remaining),mauTocDo:ns?.mau})
+      const vaiCu=new Map(chonGoc.map(x=>[x.q.qid,x.role]))
+      // Vai chỉ để HIỂN THỊ: dùng vai cũ nếu bộ chọn cũ đã cấp, còn lại `toi_han` (câu đến hạn) — KHÔNG cắt pool theo vai.
+      chon=kq.chon.flatMap((v)=>{const q=eligible.find(x=>x.qid===v.qid);return q?[{q,role:vaiCu.get(v.qid)??'toi_han' as const}]:[]})
       lyDoLuot=Object.keys(kq.lyDo).length?kq.lyDo:undefined
-      if(kq.deferredCount){
-        hoanLuot={deferredCount:kq.deferredCount,overBudgetSeconds:kq.overBudgetSeconds}
-        if(ns&&ns.nganSachGiay>0)nganSachThieu={conLaiGiay:ns.conLaiGiay,soCauBoQua:kq.deferredCount}
-      }
+      if(kq.deferredCount)hoanLuot={deferredCount:kq.deferredCount,overBudgetSeconds:kq.overBudgetSeconds}
+      if(ns&&ns.nganSachGiay>0&&kq.deferredCount)nganSachThieu={conLaiGiay:ns.conLaiGiay,soCauBoQua:kq.deferredCount}
+      // RV02: câu đã phát cho nhiệm vụ CÒN hiệu lực ⇒ trả lại để RESUME, không phát mới.
+      if(kq.dungLaiTask.size)giuDangMo=Object.fromEntries(kq.dungLaiTask)
     }
     const selected=chon.map(x=>x.q),vai=new Map(chon.map(x=>[x.q.qid,x.role]))
     if(action==='recommendations')return {ok:true,dailyUsed:count.n,tranNgay:tranCuaLoai(loaiTran),suggestions:selected.map(q=>({title:q.tenDang||'Ôn kiến thức đã học',source:q.maDe,part:q.phan})),remaining}
@@ -334,7 +343,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
     if(!inserted.meta.changes)return gameV2(env,'start',b)
     const qsDay=await doDayDu(env,qs as CauPool[])
-    return {ok:true,id,questions:qsDay.map(q=>({...publicQuestion(q),role:vai.get(q.qid)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),...(lyDoLuot?{chonLyDo:lyDoLuot}:{}),...(hoanLuot?{hoanLuot}:{})}
+    return {ok:true,id,questions:qsDay.map(q=>({...publicQuestion(q),role:vai.get(q.qid)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),...(giuDangMo?{giuChoDangMo:giuDangMo}:{}),...(lyDoLuot?{chonLyDo:lyDoLuot}:{}),...(hoanLuot?{hoanLuot}:{})}
   }
   if(action==='resume'){
     const row=await env.DB.prepare("SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>? AND json_extract(json,'$.doan') IS NULL ORDER BY created_at DESC LIMIT 1").bind(sbd,new Date(Date.now()-2*3600000).toISOString()).first<{id:string;json:string}>()

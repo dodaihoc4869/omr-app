@@ -33,6 +33,8 @@ export async function normalizeBank(raw:Row,maDe:string):Promise<PrivateQuestion
         table:c.table as string[][]|undefined,thanCauImg:c.thanCauImg as string|undefined,imageDataUrl:c.imageDataUrl as string|undefined,
         choiceImgs:c.choiceImgs as string[]|undefined,ideaImgs:c.ideaImgs as string[]|undefined,hinhAnh:(c.hinhAnh??[]) as Question['hinhAnh'],
         dang:dang?.ma??null,tenDang:dang?.ten??'',mucDo:c.mucDo?str(c.mucDo):null,sao:cc?.sao??null,kienThuc:Array.isArray(c.kienThuc)?c.kienThuc as string[]:[],
+        // NHÃN FAMILY từ kho (tuỳ chọn): giữ nguyên nếu kho có, KHÔNG suy từ qid/group (không bịa nhãn).
+        family:(()=>{const f=str(c.family??c.familyId??'') ;return f?f:null})(),
         correct,solution:c.loiGiai??c.explanation??null,
         reviewed:!c.canXem&&(!c.loiGiaiTrangThai||c.loiGiaiTrangThai==='khop') && (phan==='I'?/^[ABCD]$/.test(correct):phan==='II'?/^[DS]{4}$/.test(correct):correct.trim().length>0)}
       q.group=await contentGroup(q);q.version=crypto.randomUUID();result.push(q)
@@ -106,7 +108,7 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
 /** Câu trong POOL của readScope: câu ĐẦY ĐỦ (bằng chứng của em, `originals`) hoặc bản NHẸ của kho theo dạng (`nhe: true`: chỉ siêu dữ liệu để CHỌN + cờ `tuLuan` tính sẵn; KHÔNG có text, choices, ideas, hinhAnh, correct, solution).
  *  Bản nhẹ là đối tượng ĐÓNG BĂNG dùng chung nhiều lượt: không được sửa; muốn đưa cho em thì phải qua `doDayDu`. */
 export type CauPool=PrivateQuestion&{nhe?:true;tuLuan?:boolean}
-const CO_NHE=['qid','maDe','version','group','phan','dang','tenDang','mucDo','sao','kienThuc','reviewed'] as const
+const CO_NHE=['qid','maDe','version','group','phan','dang','tenDang','mucDo','sao','kienThuc','reviewed','family'] as const
 export function lamNhe(q:PrivateQuestion):CauPool{const n:Record<string,unknown>={};for(const k of CO_NHE)n[k]=(q as unknown as Record<string,unknown>)[k];n.nhe=true;n.tuLuan=laCauTuLuan(q);return Object.freeze(n) as unknown as CauPool}
 /** `laCauTuLuan` cho câu trong pool: bản nhẹ dùng cờ tính sẵn (hàm gốc cần text/đáp án); câu đầy đủ tính tại chỗ. */
 export const laTuLuanPool=(q:CauPool):boolean=>q.tuLuan??laCauTuLuan(q)

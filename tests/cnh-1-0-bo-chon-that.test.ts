@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   chonCauChoLuot, docHoSoCau, locTheoLuatLap, mucDangLuyen, mucTheoKyNangCuaEm, trangThaiDotTuHoSoCau, xepLuotTheoChinhSach, type CauUngVien,
 } from '../server/src/bo-chon-that'
-import { giuCho } from '../server/src/giu-cho'
+import { giuCho, nhaCho } from '../server/src/giu-cho'
 import { taoD1That } from './_d1-that'
 import { dungLaiNangLuc, xoaBietCotChuanNL, xoaDemNangLuc } from '../server/src/nang-luc-d1'
 import { ghiSuKien, xoaBietCotChuan } from '../server/src/su-kien-hoc'
@@ -19,7 +19,10 @@ beforeEach(() => {
 afterEach(() => vi.useRealTimers())
 
 const cau = (qid: string, o: Partial<CauUngVien> = {}): CauUngVien => ({
-  qid, version: 'v1', part: 'I', mucDo: 'hieu', group: `g-${qid}`, dangKey: 'A.1', skillIds: ['K1'], ...o,
+  qid, version: 'v1', part: 'I', mucDo: 'biet', group: `g-${qid}`, dangKey: 'A-'.concat(qid), skillIds: ['K1'],
+  // NHÃN FAMILY: mặc định GẮN NHÃN RIÊNG cho từng câu (như kho sau khi có nhãn) để các phép đo khác không bị
+  // trần "chưa gán family" (RV03) chi phối; nhánh thiếu nhãn có test RIÊNG bên dưới.
+  familyId: `F-${qid}`, ...o,
 })
 
 /** Kho nhỏ + hồ sơ per-câu (can_day_lai) cho hai câu. */
@@ -57,10 +60,19 @@ describe('P04/P05 — adapter đọc dữ liệu THẬT cho điểm §7.2', () =
     expect(trangThaiDotTuHoSoCau(undefined)).toBeNull()
   })
 
-  it('mức đang luyện của câu = mức THẤP NHẤT trong các kỹ năng; thiếu hồ sơ ⇒ 0 (không bịa mức)', () => {
-    const c = cau('Q', { skillIds: ['K1', 'K2'] })
-    expect(mucDangLuyen(c, new Map([['K1', 2], ['K2', 1]]))).toBe(1)
-    expect(mucDangLuyen(c, new Map())).toBe(0)
+  it('RV04 — MỌI kỹ năng đều được xét; thiếu hồ sơ = mức 0 (KHÔNG nâng trần); dữ liệu hỏng cũng về 0', () => {
+    const known = new Map([['K1', 2], ['K2', 1], ['K3', 0]])
+    expect(mucDangLuyen(cau('A', { skillIds: ['K1'] }), known)).toBe(2)
+    expect(mucDangLuyen(cau('A', { skillIds: ['K1', 'K2'] }), known)).toBe(1) // lấy mức THẤP NHẤT
+    // RV04 (rà soát độc lập 01): [2, kỹ năng CHƯA có hồ sơ] PHẢI là 0, không được 2.
+    expect(mucDangLuyen(cau('A', { skillIds: ['K1', 'MISSING'] }), known)).toBe(0)
+    expect(mucDangLuyen(cau('A', { skillIds: ['K1', 'K3'] }), known)).toBe(0) // [2, 0] ⇒ 0
+    expect(mucDangLuyen(cau('A', { skillIds: ['MISSING-1', 'MISSING-2'] }), known)).toBe(0) // toàn thiếu hồ sơ
+    expect(mucDangLuyen(cau('A', { skillIds: [] }), known)).toBe(0) // câu không có nhãn kỹ năng
+    expect(mucDangLuyen(cau('A', { skillIds: ['NAN'] }), new Map([['NAN', Number.NaN]]))).toBe(0)
+    expect(mucDangLuyen(cau('A', { skillIds: ['X'] }), new Map([['X', 2.5]]))).toBe(0) // không nguyên
+    expect(mucDangLuyen(cau('A', { skillIds: ['X'] }), new Map([['X', 5]]))).toBe(0) // ngoài miền
+    expect(mucDangLuyen(cau('A', { skillIds: ['X'] }), new Map([['X', -1]]))).toBe(0)
   })
 })
 
@@ -69,8 +81,8 @@ describe('P04/P05 — điểm §7.2 chạy trên DỮ LIỆU THẬT (không còn
   it('câu `can_day_lai` (repairNeed 1) đứng TRƯỚC câu mới-sai (0,5) và điểm KHÁC NHAU', async () => {
     const d = dung()
     const hoSoCau = await docHoSoCau(d.env, 'S1', ['Q3', 'Q5'])
-    const kq = await xepLuotTheoChinhSach([cau('Q3'), cau('Q5')], {
-      sbd: 'S1', ngay: NGAY, mastery: [], mucTheoKyNang: new Map(), hoSoCau, nowMs: T0,
+    const kq = await xepLuotTheoChinhSach([cau('Q3', { mucDo: 'hieu' }), cau('Q5', { mucDo: 'hieu' })], {
+      sbd: 'S1', ngay: NGAY, mastery: [], mucTheoKyNang: new Map([['K1', 1]]), hoSoCau, nowMs: T0,
     })
     const q3 = kq.theoQid.get('Q3')!, q5 = kq.theoQid.get('Q5')!
     expect(kq.xep.map((x) => x.qid)).toEqual(['Q3', 'Q5']) // needs_teaching (1) trước recovered (0,5)
@@ -103,36 +115,59 @@ describe('P04/P05 — điểm §7.2 chạy trên DỮ LIỆU THẬT (không còn
     expect(kq.theoQid.get('Q3')!.diem.fit).toBe(0.6)
   })
 
+  it('P04/RV03: TRẦN FAMILY áp THẬT trên đường adapter — 3 câu CHƯA GẮN NHÃN ⇒ chỉ 1 câu được phát', async () => {
+    const d = dung()
+    const ds = Array.from({ length: 3 }, (_, i) => cau(`NO-FAMILY-${i}`, { familyId: null, group: `G${i}` }))
+    const r = await locTheoLuatLap(d.env, 'S1', NGAY, ds, 6, { nowMs: T0 })
+    expect(r.duocPhep.map((c) => c.qid)).toEqual(['NO-FAMILY-0']) // tối đa 1 câu chưa gán family mỗi lượt
+    expect(r.loai.get('NO-FAMILY-1')).toBe('TRAN_CAU_CHUA_FAMILY')
+    expect(r.loai.get('NO-FAMILY-2')).toBe('TRAN_CAU_CHUA_FAMILY')
+  })
+
+  it('P04/RV03: 3 câu KHÁC family (đã gắn nhãn) ⇒ phát được cả 3; cùng MỘT family ⇒ chỉ 1 câu thường', async () => {
+    const d = dung()
+    const khac = Array.from({ length: 3 }, (_, i) => cau(`L${i}`, { familyId: `F${i}`, group: `G${i}` }))
+    const r1 = await locTheoLuatLap(d.env, 'S1', NGAY, khac, 6, { nowMs: T0 })
+    expect(r1.duocPhep).toHaveLength(3)
+    const cung = Array.from({ length: 3 }, (_, i) => cau(`S${i}`, { familyId: 'F-CHUNG', group: `GS${i}` }))
+    const r2 = await locTheoLuatLap(d.env, 'S1', NGAY, cung, 6, { nowMs: T0 })
+    expect(r2.duocPhep).toHaveLength(1)
+    expect(r2.loai.get('S1')).toBe('TRAN_FAMILY')
+    expect(r2.loai.get('S2')).toBe('TRAN_FAMILY')
+  })
+
   it('P04: chặn cả BẢN SAO cùng `content_group` đã làm hôm nay (khác qid, cùng nhóm)', async () => {
     const d = dung()
-    const daLam = await locTheoLuatLap(d.env, 'S1', NGAY, [cau('Q3'), cau('Q9', { group: 'g-Q3' })], 6)
-    expect(daLam.loai.get('Q9')).toBeUndefined()
-    expect(daLam.giu.has('Q3')).toBe(true)
-    expect(daLam.giu.has('Q9')).toBe(true)
+    const dau = await locTheoLuatLap(d.env, 'S1', NGAY, [cau('Q3'), cau('Q9', { group: 'g-Q3' })], 6, { nowMs: T0 })
+    expect(dau.loai.size).toBe(0)
+    expect(dau.duocPhep.map((c) => c.qid)).toEqual(['Q3', 'Q9'])
     // Sau khi có kết quả hôm nay của nhóm 'g-Q3' (ghi qua sổ thật) ⇒ CẢ hai bị chặn.
     await ghiSuKien(d.env, [{ nguon: 'btvn', maNguon: 'M', sbd: 'S1', qid: 'Q3', lan: 1, ketQua: 1, luc: `${NGAY}T03:00:00.000Z` }])
-    const sau = await locTheoLuatLap(d.env, 'S1', NGAY, [cau('Q4', { group: 'g-Q3' }), cau('Q5')], 6)
-    expect(sau.giu.has('Q4')).toBe(false)
-    // Tên lý do theo §7.2: `REPEAT_LIMIT` (bộ lọc lặp), không dùng tên nội bộ cũ.
-    expect(sau.loai.get('Q4')).toBe('REPEAT_LIMIT')
-    expect(sau.giu.has('Q5')).toBe(true)
+    const sau = await locTheoLuatLap(d.env, 'S1', NGAY, [cau('Q4', { group: 'g-Q3' }), cau('Q5')], 6, { nowMs: T0 })
+    expect(sau.duocPhep.map((c) => c.qid)).toEqual(['Q5'])
+    expect(sau.loai.get('Q4')).toBe('DA_LAM_HOM_NAY')
   })
 
-  it('P04: trần số câu của lượt được áp theo đúng thứ tự nơi gọi đưa vào', async () => {
+  it('P04/RV02: `content_group` đang có NHIỆM VỤ MỞ ⇒ TRẢ LẠI task cũ (không phát bản khác)', async () => {
     const d = dung()
-    const ds = Array.from({ length: 8 }, (_, i) => cau(`X${i}`))
-    const r = await locTheoLuatLap(d.env, 'S1', NGAY, ds, 6)
-    expect([...r.giu]).toHaveLength(6)
-    expect(r.loai.get('X6')).toBe('TRAN_LUOT')
-    expect(r.loai.get('X7')).toBe('TRAN_LUOT')
+    await giuCho(d.env, { sbd: 'S1', ngay: NGAY, taskId: 'TASK-DANG-MO', qids: ['Q3'], nowMs: T0, hanTaskGiay: 7200, nhomTheoQid: new Map([['Q3', 'g-Q3']]) })
+    const r = await locTheoLuatLap(d.env, 'S1', NGAY, [cau('Q9', { group: 'g-Q3' })], 6, { nowMs: T0 })
+    expect(r.duocPhep).toEqual([])
+    expect(r.dungLai.get('Q9')).toBe('TASK-DANG-MO')
   })
 
-  it('P04: luật FAMILY (1 câu/family, chưa gán family ≤1) CHƯA ÁP vì kho chưa có nhãn — KHÔNG hạ lượt xuống 1 câu', async () => {
+  it('RV05: 6 câu ĐẦU quá khó, 2 câu CUỐI phù hợp ⇒ vẫn lấy được 2 câu phù hợp (không cắt pool trước khi lọc)', async () => {
     const d = dung()
-    const ds = Array.from({ length: 6 }, (_, i) => cau(`Y${i}`, { group: `g-Y${i}` }))
-    const r = await locTheoLuatLap(d.env, 'S1', NGAY, ds, 6)
-    expect([...r.giu]).toHaveLength(6) // 6 câu "chưa gán family" VẪN qua được (đây là phần chờ dữ liệu nhãn)
-    expect(r.loai.size).toBe(0)
+    const ds = [
+      ...Array.from({ length: 6 }, (_, i) => cau(`KHO${i}`, { mucDo: 'van_dung', group: `gK${i}`, familyId: `FK${i}` })),
+      cau('VUA1', { mucDo: 'biet', group: 'gV1', familyId: 'FV1' }),
+      cau('VUA2', { mucDo: 'biet', group: 'gV2', familyId: 'FV2' }),
+    ]
+    const kq = await chonCauChoLuot(d.env, ds, {
+      sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600, tranCau: 6,
+    })
+    expect(kq.chon.map((c) => c.qid).sort()).toEqual(['VUA1', 'VUA2'])
+    expect(kq.lyDo.DIFFICULTY_LIMIT).toBe(6)
   })
 })
 
@@ -149,8 +184,8 @@ describe('P05 §7.1/§7.2 trên ĐƯỜNG THẬT (T08 · T10 · T12/T13)', () =>
     expect(kq.chon).toHaveLength(2)
     expect(kq.chon.every((c) => c.taskSeconds === 300)).toBe(true)
     expect(kq.chon.reduce((s, c) => s + c.taskSeconds, 0)).toBe(600)
-    // Gói ≤6 câu (§7.2): 8 ứng viên ⇒ 2 câu bị loại vì TRẦN LƯỢT trước khi tính ngân sách.
-    expect(kq.lyDo.TRAN_LUOT).toBe(2)
+    // Gói ≤6 câu (§7.2): trần lượt do VÒNG LẶP giữ (RV05) nên `TRAN_LUOT` KHÔNG xuất hiện trong bản đồ lý do.
+    expect(kq.lyDo.TRAN_LUOT).toBeUndefined()
     // Còn 6 câu mà ngân sách chỉ chứa 2 ⇒ 4 câu bị hoãn, 1200 giây vượt tải được báo cho thầy.
     expect(kq.deferredCount).toBe(4)
     expect(kq.overBudgetSeconds).toBe(1200)
@@ -188,15 +223,18 @@ describe('P05 §7.1/§7.2 trên ĐƯỜNG THẬT (T08 · T10 · T12/T13)', () =>
     expect(co.lyDo.DIFFICULTY_LIMIT).toBe(1)
   })
 
-  it('T12/T13: câu ĐANG BỊ GIỮ CHỖ (còn hạn) bị loại TRƯỚC khi chấm điểm; hết hạn thì không chặn', async () => {
+  it('T12/T13: câu ĐANG BỊ GIỮ CHỖ (còn hạn) bị loại TRƯỚC khi chấm điểm; nhả chỗ thì trở lại', async () => {
     const d = dung()
-    const ds = [cau('B1', { mucDo: 'biet' }), cau('B2', { mucDo: 'biet' })]
-    await giuCho(d.env, { sbd: 'S1', ngay: NGAY, taskId: 'T-KHAC', qids: ['B1'], nowMs: T0 })
+    // Dùng câu CÓ THẬT trong kho fixture (Q3/Q5) để ánh xạ content_group hoạt động đúng như đường thật.
+    const ds = [cau('Q3', { mucDo: 'biet', group: 'g-Q3' }), cau('Q5', { mucDo: 'biet', group: 'g-Q5' })]
+    // Giữ chỗ theo ĐƠN VỊ NỘI DUNG (RV01): nhiệm vụ khác giữ nhóm của Q3, còn hiệu lực 2 giờ.
+    await giuCho(d.env, { sbd: 'S1', ngay: NGAY, taskId: 'T-KHAC', qids: ['Q3'], nowMs: T0, hanTaskGiay: 7200, nhomTheoQid: new Map([['Q3', 'g-Q3']]) })
     const kq = await chonCauChoLuot(d.env, ds, { sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 })
-    expect(kq.chon.map((c) => c.qid)).toEqual(['B2'])
-    expect(kq.lyDo.RESERVATION_CONFLICT).toBe(1)
-    // Hết hạn giữ chỗ ⇒ câu trở lại ứng viên (vẫn KHÔNG phải "chiếm" của ai: giữ chỗ mới do bước atomic reserve làm).
-    const sau = await chonCauChoLuot(d.env, ds, { sbd: 'S1', ngay: NGAY, nowMs: T0 + 901_000, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 })
-    expect(sau.chon.map((c) => c.qid).sort()).toEqual(['B1', 'B2'])
+    expect(kq.chon.map((c) => c.qid)).toEqual(['Q5'])
+    expect(kq.dungLaiTask.get('Q3')).toBe('T-KHAC') // nhiệm vụ còn hiệu lực ⇒ TRẢ LẠI task cũ (RV02)
+    // Nhả chỗ ⇒ câu trở lại ứng viên.
+    await nhaCho(d.env, 'S1', NGAY, 'T-KHAC')
+    const sau = await chonCauChoLuot(d.env, ds, { sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 })
+    expect(sau.chon.map((c) => c.qid).sort()).toEqual(['Q3', 'Q5'])
   })
 })

@@ -8,9 +8,8 @@
 //   · thời gian mỗi câu → `uoc-luong-thoi-gian.ts` (part × mức + phản hồi).
 // Family: KHO THẬT CHƯA GẮN NHÃN (P02 ghi nhận) ⇒ `transferValue = 0` toàn bộ; KHÔNG bịa family.
 import type { Env } from './kieu'
-import {
-  chamDiem, khoaHashSap, sapTheoDiem, type CauChonDiem, type KetQuaDiem, type TrangThaiDot,
-} from './bo-chon-diem'
+import { chamDiem, khoaHashSap, sapTheoDiem, type CauChonDiem, type KetQuaDiem, type TrangThaiDot } from './bo-chon-diem'
+import { chonTheoLuatChongLap, type DaChonTrongLuot, type LyDoNgoaiLe, type UngVienLap } from './chong-lap'
 import { uocLuongMotCau, type MauThoiGian } from './uoc-luong-thoi-gian'
 import { docNangLucEm } from './nang-luc-d1'
 import { docDaLamHomNay } from './chong-lap'
@@ -29,6 +28,25 @@ export interface CauUngVien {
   /** Khoá dạng dùng cho lịch ôn của game: `dang ?? group`. */
   dangKey: string
   skillIds: string[]
+  /**
+   * NHÃN FAMILY lấy từ KHO. Kho thật CHƯA gắn nhãn (P02) ⇒ `null`/vắng ⇒ đi trần "chưa gán family"
+   * (02 §4.2.6: tối đa 1 câu chưa family mỗi lượt). KHÔNG bịa family từ qid/group.
+   */
+  familyId?: string | null
+}
+
+/**
+ * NHÃN FAMILY của một câu, đọc từ CHÍNH bản ghi kho (`family` hoặc `familyId`) — KHO THẬT hiện CHƯA có nhãn
+ * (P02) nên trả `null` ⇒ câu đi trần "chưa gán family" của 02 §4.2.6. Khi thầy gắn nhãn vào kho thì pipeline
+ * dùng ngay, KHÔNG cần sửa thêm. KHÔNG suy nhãn từ qid/group (không bịa family).
+ */
+export function familyTuNhan(q: unknown): string | null {
+  if (!q || typeof q !== 'object') return null
+  const j = q as { family?: unknown; familyId?: unknown }
+  for (const v of [j.family, j.familyId]) {
+    if (typeof v === 'string' && v.trim()) return v.trim()
+  }
+  return null
 }
 
 export interface HangHoSoCau {
@@ -64,48 +82,105 @@ export function trangThaiDotTuHoSoCau(h: HangHoSoCau | undefined): TrangThaiDot 
   return null
 }
 
-/** Mức đang luyện của một câu = mức THẤP NHẤT trong các kỹ năng của câu (0 khi chưa có hồ sơ). */
+/**
+ * MỨC ĐANG LUYỆN của một câu = mức THẤP NHẤT trong **MỌI** kỹ năng của câu.
+ *
+ * RV04 (rà soát độc lập 01): bản cũ `map(...).filter(bỏ undefined)` đã **bỏ qua** kỹ năng CHƯA có hồ sơ,
+ * nên câu [skill A mức 2, skill B chưa có hồ sơ] bị coi là mức 2 ⇒ NÂNG trần độ khó trái đặc tả.
+ * Nay: kỹ năng thiếu hồ sơ đi theo **nhánh chưa đủ bằng chứng = mức 0** (02 §4.2/§7.1); giá trị không hữu hạn,
+ * không nguyên, hoặc ngoài miền {0,1,2} cũng về 0 (KHÔNG nâng trần từ dữ liệu hỏng). Câu không có kỹ năng ⇒ 0.
+ */
 export function mucDangLuyen(c: CauUngVien, mucTheoKyNang: ReadonlyMap<string, number>): number {
-  const ds = c.skillIds.map((s) => mucTheoKyNang.get(s)).filter((x): x is number => typeof x === 'number')
-  return ds.length ? Math.min(...ds) : 0
+  if (c.skillIds.length === 0) return 0
+  let thapNhat = 2
+  for (const s of c.skillIds) {
+    const raw = mucTheoKyNang.get(s)
+    const hopLe = typeof raw === 'number' && Number.isFinite(raw) && Number.isInteger(raw) && raw >= 0 && raw <= 2
+    const v = hopLe ? raw : 0
+    if (v < thapNhat) thapNhat = v
+  }
+  return thapNhat
 }
 
 /**
- * LỌC LUẬT LẶP (P04) cho một lượt, dùng dữ liệu THẬT: `content_group` đã có kết quả HÔM NAY của em
- * (`docDaLamHomNay`) và trần câu của lượt.
+ * NGỮ CẢNH CHỐNG LẶP của một lượt, đọc từ D1 THẬT (không bịa nhãn):
+ *   · `daLamHomNay`   = `content_group` đã có kết quả hôm nay (chong-lap.ts).
+ *   · `taskDangMo`    = `content_group` → taskId của chỗ ĐANG GIỮ còn hiệu lực (bảng `giu_cho`).
+ *   · `familyLanCuoi` = family → ngày gần nhất có bằng chứng; kho chưa gắn nhãn ⇒ RỖNG (không bịa).
+ */
+export async function docNguCanhChongLap(
+  env: Env, sbd: string, ngay: string, nowMs: number,
+): Promise<{ daLamHomNay: Set<string>; taskDangMo: Map<string, string>; familyLanCuoi: Map<string, string> }> {
+  const daLamHomNay = (await docDaLamHomNay(env, [sbd], ngay)).get(sbd) ?? new Set<string>()
+  const taskDangMo = new Map<string, string>()
+  try {
+    const r = await env.DB.prepare(
+      "SELECT q.content_group, g.task_id FROM giu_cho g JOIN game_v2_question q ON q.qid = g.qid WHERE g.sbd = ? AND g.ngay = ? AND g.lease_until >= ? AND COALESCE(q.content_group, '') <> ''",
+    ).bind(sbd, ngay, nowMs).all<{ content_group: string; task_id: string }>()
+    for (const x of r.results ?? []) taskDangMo.set(String(x.content_group), String(x.task_id))
+  } catch {
+    /* chưa áp migration bảng giữ chỗ ⇒ coi như chưa có nhiệm vụ nào đang mở */
+  }
+  return { daLamHomNay, taskDangMo, familyLanCuoi: new Map() }
+}
+
+/** Ứng viên + `repeat_reason` khi được phát (ngoại lệ của luật giãn family phải giải thích được). */
+export type CauDuocPhep = CauUngVien & { repeatReason?: LyDoNgoaiLe; dungLaiTask?: string }
+
+/**
+ * LỌC LUẬT LẶP theo 02 §4.2 bằng CHÍNH SÁCH THUẦN trong `chong-lap.ts` — RV03: trước đây adapter tự viết
+ * lại luật rồi BỎ nhánh family; nay mọi ứng viên đi qua `chonTheoLuatChongLap`.
  *
- * GHI RÕ PHẦN CHƯA ÁP ĐƯỢC: luật family của 02 §4.2.6–4.2.7 (mỗi family 1 câu thường, chưa gán family
- * tối đa 1 câu, nghỉ 1 ngày VN, 4 ngoại lệ có `repeat_reason`) **KHÔNG áp** ở đây vì KHO THẬT CHƯA GẮN
- * NHÃN FAMILY (P02 ghi nhận; thầy nhận danh sách thiếu qua `baoThieuNhan`) — áp nguyên văn sẽ hạ mọi lượt
- * xuống 1 câu. Phần đó chờ dữ liệu nhãn; KHÔNG bịa family để lách.
+ * RV05: hàm này **KHÔNG tự cắt trần số câu của lượt** nữa (trần chỉ áp lên KẾT QUẢ CHỌN CUỐI, sau khi đã lọc
+ * độ khó và chấm điểm) — nơi gọi truyền `tranCau` bằng số ứng viên khi muốn xem toàn bộ tập hợp lệ.
+ * Trả `duocPhep` (đủ điều kiện phát), `dungLai` (đã phát cho NHIỆM VỤ ĐANG MỞ ⇒ TRẢ LẠI task cũ) và `loai`.
  */
 export async function locTheoLuatLap(
   env: Env, sbd: string, ngay: string, ds: readonly CauUngVien[], tranCau?: number,
-  dangGiu?: ReadonlySet<string>,
-): Promise<{ giu: Set<string>; loai: Map<string, string> }> {
-  const daLam = (await docDaLamHomNay(env, [sbd], ngay)).get(sbd) ?? new Set<string>()
+  tuyChon: {
+    nowMs?: number
+    mastery?: readonly { key: string; due: number }[]
+    hoSoCau?: ReadonlyMap<string, HangHoSoCau>
+    daChon?: readonly DaChonTrongLuot[]
+  } = {},
+): Promise<{ duocPhep: CauDuocPhep[]; dungLai: Map<string, string>; loai: Map<string, string>; thieu: number }> {
+  const nowMs = tuyChon.nowMs ?? Date.now()
+  const ctx = await docNguCanhChongLap(env, sbd, ngay, nowMs)
+  const hoSoCau = tuyChon.hoSoCau ?? new Map<string, HangHoSoCau>()
+  const mastery = tuyChon.mastery ?? []
+  const ung: UngVienLap[] = ds.map((c) => {
+    const due = mastery.find((m) => m.key === c.dangKey)?.due ?? null
+    const dot = trangThaiDotTuHoSoCau(hoSoCau.get(c.qid))
+    const denHan = due !== null && due <= nowMs
+    const purpose = dot === 'needs_teaching' || dot === 'practicing' || dot === 'recovered'
+      ? 'repair'
+      : denHan ? 'due_review' : 'maintenance'
+    return {
+      qid: c.qid, contentGroup: c.group, familyId: c.familyId ?? null,
+      difficulty: (typeof c.mucDo === 'string' ? mucTuChu(c.mucDo) : 0) as 0 | 1 | 2,
+      skillIds: c.skillIds, denHan, purpose,
+    }
+  })
+  const theoQid = new Map(ds.map((c) => [c.qid, c]))
+  const kq = chonTheoLuatChongLap(ung, {
+    homNay: ngay,
+    taskDangMo: ctx.taskDangMo,
+    daLamHomNay: ctx.daLamHomNay,
+    familyLanCuoi: ctx.familyLanCuoi,
+    daChon: tuyChon.daChon,
+    tranCau: Number.isFinite(tranCau) ? tranCau : ds.length,
+  })
+  const duocPhep: CauDuocPhep[] = []
+  const dungLai = new Map<string, string>()
+  for (const v of kq.chon) {
+    if (v.dungLaiTask) { dungLai.set(v.qid, v.dungLaiTask); continue }
+    const goc = theoQid.get(v.qid)
+    if (!goc) continue
+    duocPhep.push(v.repeatReason ? { ...goc, repeatReason: v.repeatReason } : { ...goc })
+  }
   const loai = new Map<string, string>()
-  const giu = new Set<string>()
-  // BƯỚC 5 của §7.1 (GIỮ CHỖ ĐANG HIỆU LỰC + lượt làm hôm nay) — chạy TRƯỚC khi chấm điểm, không phải sau.
-  for (const c of ds) {
-    if (dangGiu?.has(c.qid)) { loai.set(c.qid, 'RESERVATION_CONFLICT'); continue }
-    // Ứng viên đã trả lời hôm nay (theo content_group) bị chặn — TRỪ khi có `repair_retry` do máy chủ tạo (rỗng ở đây).
-    if (c.group && daLam.has(c.group)) { loai.set(c.qid, 'REPEAT_LIMIT'); continue }
-    giu.add(c.qid)
-  }
-  // GHI RÕ PHẦN CHƯA ÁP ĐƯỢC: luật family của 02 §4.2.6–4.2.7 (mỗi family 1 câu thường, chưa gán family
-  // tối đa 1 câu, nghỉ 1 ngày VN, 4 ngoại lệ có `repeat_reason`) **KHÔNG áp** ở đây vì KHO THẬT CHƯA GẮN
-  // NHÃN FAMILY (P02 ghi nhận; thầy nhận danh sách thiếu qua `baoThieuNhan`) — áp nguyên văn sẽ hạ mọi lượt
-  // xuống 1 câu. Phần đó chờ dữ liệu nhãn; KHÔNG bịa family để lách.
-  // Trần số câu của lượt: giữ đúng thứ tự nơi gọi đưa vào (bộ chọn đã sắp ở bước sau).
-  const tran = Number.isFinite(tranCau) ? Math.max(0, Math.floor(tranCau as number)) : ds.length
-  let dem = 0
-  for (const c of ds) {
-    if (!giu.has(c.qid)) continue
-    dem++
-    if (dem > tran) { giu.delete(c.qid); loai.set(c.qid, 'TRAN_LUOT') }
-  }
-  return { giu, loai }
+  for (const x of kq.loai) loai.set(x.qid, x.lyDo)
+  return { duocPhep, dungLai, loai, thieu: Math.max(0, (Number.isFinite(tranCau) ? (tranCau as number) : ds.length) - duocPhep.length) }
 }
 
 /**
@@ -145,7 +220,7 @@ export interface ChonCauInput {
 
 export interface ChonCauKetQua {
   /** Câu ĐƯỢC CHỌN, đã sắp theo §7.2 và vừa ngân sách. */
-  chon: { qid: string; version: string; part: 'I' | 'II' | 'III'; diem: KetQuaDiem; solveSeconds: number; taskSeconds: number }[]
+  chon: { qid: string; version: string; part: 'I' | 'II' | 'III'; diem: KetQuaDiem; solveSeconds: number; taskSeconds: number; repeatReason?: LyDoNgoaiLe }[]
   /** Đếm câu bị loại theo TỪNG nguyên nhân §7.1 (cho giáo viên; KHÔNG lộ qid đề bảo vệ). */
   lyDo: Record<string, number>
   /** Số câu hoãn vì hết ngân sách ngày. */
@@ -154,6 +229,8 @@ export interface ChonCauKetQua {
   overBudgetSeconds: number
   /** Chỗ đang bị giữ (hiệu lực) trong ngày của em. */
   dangGiu: Map<string, { taskId: string; leaseUntil: number }>
+  /** `content_group` → taskId: đã phát cho NHIỆM VỤ ĐANG MỞ ⇒ nơi gọi phải TRẢ LẠI task cũ (04 §2). */
+  dungLaiTask: Map<string, string>
 }
 
 /**
@@ -168,57 +245,78 @@ export async function chonCauChoLuot(env: Env, ds: readonly CauUngVien[], inp: C
   const lyDo: Record<string, number> = {}
   const dem = (k: string) => { lyDo[k] = (lyDo[k] ?? 0) + 1 }
   const dangGiu = await docCho(env, inp.sbd, inp.ngay)
-  const conHieuLuc = new Set([...dangGiu].filter(([, v]) => v.leaseUntil >= inp.nowMs).map(([k]) => k))
-
-  // §7.1 bước 5–7: giữ chỗ hiệu lực + lượt làm hôm nay + trần câu (family chờ nhãn — xem `locTheoLuatLap`).
-  const { giu, loai } = await locTheoLuatLap(env, inp.sbd, inp.ngay, ds, inp.tranCau ?? SO_CAU_LUOT_MAC_DINH, conHieuLuc)
-  for (const r of loai.values()) dem(r)
-  const qua1 = ds.filter((c) => giu.has(c.qid))
-
-  // §7.1 bước 6: trần độ khó theo MỨC ĐANG LUYỆN (min của các skill); probe hợp lệ = +1, không quá 2.
   const muc = inp.mucTheoKyNang ?? await mucTheoKyNangCuaEm(env, inp.sbd)
-  const hoSoCau = inp.hoSoCau ?? await docHoSoCau(env, inp.sbd, qua1.map((c) => c.qid))
-  const qua2: CauUngVien[] = []
-  for (const c of qua1) {
+  const tranCau = Number.isFinite(inp.tranCau) ? Math.max(0, Math.floor(inp.tranCau as number)) : SO_CAU_LUOT_MAC_DINH
+
+  // §7.1 bước 3–6 trên TOÀN BỘ tập ứng viên (RV05: KHÔNG cắt 6 câu trước khi lọc).
+  //   · độ khó: trần theo MỨC ĐANG LUYỆN (min của MỌI skill; thiếu hồ sơ = 0), probe hợp lệ = +1 và ≤2;
+  //   · nguồn còn sống: câu đã chết trong kho thì `docCho`/scope đã lo;
+  //   · luật lặp/family: chạy TRONG vòng lặp chọn bên dưới (cần `daChon` của lượt đang hình thành).
+  const hoSoCau = inp.hoSoCau ?? await docHoSoCau(env, inp.sbd, ds.map((c) => c.qid))
+  const quaKho: CauUngVien[] = []
+  for (const c of ds) {
     const working = mucDangLuyen(c, muc)
     const difficulty = typeof c.mucDo === 'string' ? mucTuChu(c.mucDo) : 0
     const tran = inp.probeChoPhep ? Math.min(2, working + 1) : working
     if (difficulty > tran) { dem('DIFFICULTY_LIMIT'); continue }
-    qua2.push(c)
+    quaKho.push(c)
   }
 
-  // §7.2 bước 8–9: điểm tất định rồi chọn GREEDY từng câu vừa ngân sách còn lại; tính lại coverage/fatigue
-  // sau MỖI lựa chọn (đúng câu "kiểm lại coverage/family sau mỗi lựa chọn").
+  // §7.2 bước 7–9: mỗi vòng — (a) xét LUẬT LẶP/FAMILY theo `daChon` hiện tại, (b) chấm điểm §7.2,
+  // (c) chọn câu điểm cao nhất VỪA ngân sách còn lại. Trần `tranCau` chỉ áp lên KẾT QUẢ CUỐI (RV05).
   const conLaiCoTran = inp.conLaiGiay !== undefined && inp.conLaiGiay !== null
   let conLai = conLaiCoTran ? Math.max(0, Math.floor(inp.conLaiGiay as number)) : 0
   const chon: ChonCauKetQua['chon'] = []
   const daChonSkill = new Map<string, readonly string[]>()
-  let ung = [...qua2]
-  while (ung.length) {
-    const xep = await xepLuotTheoChinhSach(ung, {
+  const dungLaiTask = new Map<string, string>()
+  // Nhãn family theo qid (kho chưa gắn ⇒ `null` ⇒ trần "chưa gán family" của §4.2.6 áp đúng).
+  const familyTheoQid = new Map(ds.map((c) => [c.qid, c.familyId ?? null]))
+  let ung = [...quaKho]
+  while (ung.length && chon.length < tranCau) {
+    // (a) LUẬT LẶP + FAMILY (02 §4.2.6–4.2.7). Trần lượt truyền = `tranCau + số đã chọn` để CHÍNH VÒNG LẶP này
+    // giữ trần (RV05: trần chỉ áp lên kết quả cuối); policy không được chặn oan khi pool còn ít câu.
+    const { duocPhep, dungLai, loai } = await locTheoLuatLap(env, inp.sbd, inp.ngay, ung, tranCau + chon.length, {
+      nowMs: inp.nowMs, mastery: inp.mastery, hoSoCau,
+      daChon: chon.map((c) => ({ qid: c.qid, familyId: familyTheoQid.get(c.qid) ?? null, purpose: 'maintenance', contentGroup: ung.find((u) => u.qid === c.qid)?.group ?? '' })),
+    })
+    for (const [qid, taskId] of dungLai) dungLaiTask.set(qid, taskId)
+    // `TRAN_LUOT` của policy là TRẦN LƯỢT (do chính vòng lặp này giữ theo RV05) — không đếm lại vào bản đồ lý do.
+    for (const r of loai.values()) if (r !== 'TRAN_LUOT') dem(r)
+    if (duocPhep.length === 0) break
+    // (b)+(c) chấm điểm trên tập HỢP LỆ rồi lấy câu vừa ngân sách tốt nhất.
+    const xep = await xepLuotTheoChinhSach(duocPhep, {
       sbd: inp.sbd, ngay: inp.ngay, mastery: inp.mastery, mucTheoKyNang: muc, hoSoCau, nowMs: inp.nowMs,
       mauTocDo: inp.mauTocDo,
       daChon: chon.map((c) => ({ qid: c.qid, part: c.part, solveSeconds: c.solveSeconds, skillIds: daChonSkill.get(c.qid) ?? [] })),
     })
     const vua = xep.xep.find((v) => !conLaiCoTran || v.taskSeconds <= conLai)
-    if (!vua) break
-    const goc = ung.find((u) => u.qid === vua.qid)!
-    chon.push({ qid: vua.qid, version: goc.version, part: goc.part, diem: vua.diem, solveSeconds: vua.solveSeconds, taskSeconds: vua.taskSeconds })
+    if (!vua) break // còn hợp lệ nhưng KHÔNG vừa ngân sách ⇒ hoãn phần còn lại (không nhét, không nới)
+    const goc = duocPhep.find((u) => u.qid === vua.qid)!
+    chon.push({
+      qid: vua.qid, version: goc.version, part: goc.part, diem: vua.diem,
+      solveSeconds: vua.solveSeconds, taskSeconds: vua.taskSeconds,
+      ...(goc.repeatReason ? { repeatReason: goc.repeatReason } : {}),
+    })
     daChonSkill.set(vua.qid, goc.skillIds)
     if (conLaiCoTran) conLai -= vua.taskSeconds
     ung = ung.filter((u) => u.qid !== vua.qid)
   }
+  // Hoãn vì NGÂN SÁCH: chỉ tính phần CÒN CHỖ trong lượt (trần `tranCau` vẫn do vòng lặp giữ) và chỉ gồm câu
+  // mà luật cho phép phát ⇒ `deferred_count` = số câu thầy phải xếp thêm chỗ nếu muốn phát hết.
   let deferredCount = 0
   let overBudgetSeconds = 0
-  if (ung.length && conLaiCoTran) {
-    const cuoi = await xepLuotTheoChinhSach(ung, {
+  const conChoLuot = Math.max(0, tranCau - chon.length)
+  if (ung.length && conLaiCoTran && conChoLuot > 0) {
+    const { duocPhep } = await locTheoLuatLap(env, inp.sbd, inp.ngay, ung, tranCau + chon.length, { nowMs: inp.nowMs, mastery: inp.mastery, hoSoCau })
+    const cuoi = await xepLuotTheoChinhSach(duocPhep, {
       sbd: inp.sbd, ngay: inp.ngay, mastery: inp.mastery, mucTheoKyNang: muc, hoSoCau, nowMs: inp.nowMs, mauTocDo: inp.mauTocDo,
     })
-    deferredCount = ung.length
-    overBudgetSeconds = cuoi.xep.reduce((s, v) => s + v.taskSeconds, 0)
-    dem('BUDGET_EXHAUSTED')
+    const hanChe = cuoi.xep.slice(0, conChoLuot)
+    deferredCount = hanChe.length
+    overBudgetSeconds = hanChe.reduce((s, v) => s + v.taskSeconds, 0)
+    if (deferredCount > 0) dem('BUDGET_EXHAUSTED')
   }
-  return { chon, lyDo, deferredCount, overBudgetSeconds, dangGiu }
+  return { chon, lyDo, deferredCount, overBudgetSeconds, dangGiu, dungLaiTask }
 }
 
 export interface XepLuotInput {

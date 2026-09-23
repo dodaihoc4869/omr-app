@@ -20,6 +20,8 @@ export interface Question {
   choices:string[]; ideas:string[]; table?:string[][]; thanCauImg?:string; imageDataUrl?:string
   choiceImgs?:string[]; ideaImgs?:string[]; hinhAnh:{src:string;viTri:string;alt?:string}[]
   dang:string|null; tenDang:string; mucDo:string|null; sao:number|null; kienThuc:string[]
+  /** NHÃN FAMILY từ kho (tuỳ chọn — kho thật chưa gắn; KHÔNG suy từ qid/group). CNH-1.0: luật chống lặp. */
+  family?:string|null
 }
 export interface PrivateQuestion extends Question { correct:string; solution:unknown; reviewed:boolean }
 export interface Evidence { qid:string; group:string; dang:string|null; mucDo:string|null; kienThuc:string[]; wrong:boolean; date:string; ca:string }

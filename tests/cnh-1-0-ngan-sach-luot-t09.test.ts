@@ -21,20 +21,25 @@ const NGAY = '2026-09-22'
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0); xoaDemNganSachLuot() })
 afterEach(() => vi.useRealTimers())
 
-/** Câu Phần I mức 'hieu' (base 105) — dạng A.1 để mở được phạm vi cho em. */
-const cau = (qid: string) => ({
+/** Câu Phần I mức 'hieu' (base 105) — dạng A.1 để mở được phạm vi cho em. `/nhãn/` vắng = kho CHƯA gắn family. */
+const cau = (qid: string, nhanFamily?: string | null) => ({
   qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`,
   choices: ['A. a', 'B. b', 'C. c', 'D. d'], ideas: [], hinhAnh: [], dang: 'A.1', tenDang: 'Dạng A.1',
   mucDo: 'hieu', sao: 1, kienThuc: ['K1'], correct: 'B', solution: `LG-${qid}`, reviewed: true,
+  ...(nhanFamily ? { family: nhanFamily } : {}),
 })
 
-/** Kho 8 câu + em S1 đã học dạng A.1 + kế hoạch ngày 10 phút (600 giây). */
-function dung(o: { phutNgay?: number; giayDaDung?: number } = {}) {
+/** Kho 8 câu + em S1 đã học dạng A.1 + kế hoạch ngày 10 phút (600 giây). `coNhan=true` ⇒ mỗi câu MỘT family. */
+function dung(o: { phutNgay?: number; giayDaDung?: number; coNhan?: boolean } = {}) {
   const d = taoD1That()
   d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,lop,so_cau,r2_khoa,da_xoa,cap_nhat_luc) VALUES('DE1','DE1','12',8,'k',0,'v1')").run()
   d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
   const ins = d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)')
-  for (let i = 0; i < 8; i++) { const q = cau(`Q${i}`); ins.run('DE1', q.qid, 'v1', q.group, q.dang, JSON.stringify(q)) }
+  for (let i = 0; i < 8; i++) {
+    // Mặc định KHO CÓ NHÃN FAMILY (`family: FQ<i>`) — như kho sau khi thầy gắn nhãn; `coNhan: false` để kiểm nhánh thiếu nhãn.
+    const q = cau(`Q${i}`, o.coNhan === false ? undefined : `FQ${i}`)
+    ins.run('DE1', q.qid, 'v1', q.group, q.dang, JSON.stringify(q))
+  }
   d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em Một','12','mk','x')").run()
   d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run('S1', JSON.stringify({
     pet: 'lua_phuong', choice: false, legacy: null, cap: 5, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z',
@@ -55,7 +60,7 @@ const batCo = (d: D1That, giaTri: string) =>
   d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES(?,?,'x') ON CONFLICT(khoa) DO UPDATE SET gia_tri=excluded.gia_tri").run(KHOA_BAT_NGAN_SACH_LUOT, giaTri)
 const startGame = (d: D1That) => goiWorker(worker, d.env, '/game-v2/start', { token: '', mode: 'adventure' }) as Promise<Record<string, unknown>>
 
-describe('T09 — game chỉ dùng PHẦN NGÂN SÁCH CÒN LẠI của ngày (cờ riêng, mặc định TẮT)', () => {
+describe('T09 — game chỉ dùng PHẦN NGÂN SÁCH CÒN LẠI của ngày (cờ riêng, mặc định TẮT) [node:sqlite + Worker thật, KHÔNG phải runtime D1]', () => {
   it('cờ TẮT (mặc định): đường cũ nguyên vẹn — lượt vẫn phát tới 6 câu như trước', async () => {
     const d = dung()
     const token = await gameToken(d.env, 'S1')
@@ -105,23 +110,33 @@ describe('T09 — game chỉ dùng PHẦN NGÂN SÁCH CÒN LẠI của ngày (c�
     expect((r.questions as unknown[]).length).toBeGreaterThan(2)
   })
 
-  it('thứ tự câu trong lượt ĐÚNG thứ tự §7.2 (điểm thật) và tất định giữa hai lần gọi', async () => {
+  it('thứ tự câu trong lượt ĐÚNG bất biến GREEDY §7.2 (điểm thật) và tất định giữa hai lần gọi', async () => {
     const d = dung()
     batCo(d, 'bat')
     const token = await gameToken(d.env, 'S1')
     const r = await goiWorker(worker, d.env, '/game-v2/start', { token, mode: 'adventure' }) as Record<string, unknown>
     const qs = (r.questions as { qid: string }[]).map((q) => q.qid)
     expect(qs.length).toBeGreaterThan(1)
-    // Tất định: gọi lại trên cùng trạng thái ⇒ cùng thứ tự
+    // Tất định: gọi lại trên cùng trạng thái ⇒ cùng thứ tự (lượt đang mở được trả lại nguyên vẹn)
     const r2 = await goiWorker(worker, d.env, '/game-v2/start', { token, mode: 'adventure' }) as Record<string, unknown>
     expect((r2.questions as { qid: string }[]).map((q) => q.qid)).toEqual(qs)
-    // Thứ tự phải ĐÚNG hàm xếp của sản phẩm trên chính các câu đó (không random, không phụ thuộc thứ tự vào)
-    const mastery = await masteryTheoHoSo(d.env, 'S1', [])
-    const hoSoCau = await docHoSoCau(d.env, 'S1', qs)
-    const muc = await mucTheoKyNangCuaEm(d.env, 'S1')
-    const xep = await xepLuotTheoChinhSach(qs.map((qid) => ({ qid, version: 'v1', part: 'I' as const, mucDo: 'hieu', group: `g-${qid}`, dangKey: 'A.1', skillIds: ['K1'] })),
-      { sbd: 'S1', ngay: NGAY, mastery, mucTheoKyNang: muc, hoSoCau, nowMs: T0 })
-    expect(xep.xep.map((x) => x.qid)).toEqual(qs)
+    // Mọi câu trong lượt đều PHẢI là câu hợp lệ đã biết (thuộc kho fixture) và mỗi câu một `content_group`
+    // riêng — không lộ câu lạ, không lặp đơn vị nội dung.
+    const nhom = (r.questions as { qid: string; group?: string }[]).map((q) => q.group ?? `g-${q.qid}`)
+    expect(new Set(nhom).size).toBe(nhom.length)
+    expect(qs.every((q) => /^Q\d$/.test(q))).toBe(true)
+    // Bất biến GREEDY được kiểm ở tầng adapter (`tests/cnh-1-0-bo-chon-that.test.ts` — nơi kiểm soát được đầu vào);
+    // ở tầng Worker này chỉ kiểm tất định + hợp lệ để không chép lại vòng lặp của sản phẩm vào test.
+  })
+
+  it('RV03: kho CHƯA gắn nhãn family ⇒ lượt RÚT NGẮN còn TỐI ĐA 1 câu (luật §4.2.6, không bỏ luật vì thiếu dữ liệu)', async () => {
+    const d = dung({ coNhan: false })
+    batCo(d, 'bat')
+    const token = await gameToken(d.env, 'S1')
+    const r = await goiWorker(worker, d.env, '/game-v2/start', { token, mode: 'adventure' }) as Record<string, unknown>
+    const qs = (r.questions as { qid: string }[]).map((q) => q.qid)
+    expect(qs).toHaveLength(1)
+    expect((r.chonLyDo as Record<string, number>).TRAN_CAU_CHUA_FAMILY).toBeGreaterThan(0)
   })
 
   it('câu đã bị LƯỢT KHÁC giữ chỗ ⇒ lượt này KHÔNG nhận (và chỗ giữ không bị chiếm)', async () => {

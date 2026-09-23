@@ -1,4 +1,9 @@
-// D1 GIẢ BẰNG SQLITE THẬT (node:sqlite) — dùng chung cho test sổ/hồ sơ/kế hoạch (GĐ 0–2, 19/09).
+// D1 GIẢ BẰNG SQLITE TRONG BỘ NHỚ (node:sqlite) — dùng chung cho test sổ/hồ sơ/kế hoạch (GĐ 0–2, 19/09).
+//
+// ⚠️ RUNTIME: đây là **SQLite trong bộ nhớ của Node**, KHÔNG phải runtime Cloudflare D1/workerd. Nó chứng minh
+// hình dạng lược đồ + ngữ nghĩa câu lệnh SQL (json_each, ON CONFLICT, CAS, `changes`) — KHÔNG chứng minh hành vi
+// đồng thời ở tầng runtime D1, giới hạn tải, hay khác biệt dialect của D1 (RV06 của rà soát độc lập 01).
+// Test nào cần khẳng định ĐỒNG THỜI phải nói rõ runtime và (khi có môi trường) chạy thêm trên workerd/wrangler.
 //
 // Khác các stub tay ở nhiều test cũ: ở đây câu SQL của máy chủ CHẠY THẬT trên
 // lược đồ THẬT (nạp đúng tệp `server/schema.sql` + mọi `server/migration-*.sql`),
