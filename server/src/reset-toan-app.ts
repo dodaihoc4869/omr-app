@@ -77,6 +77,10 @@ export const BANG_GIU: readonly string[] = [
   // QUYỀN DO MÁY CHỦ XÁC NHẬN (migration-2309-cnh1-quyen-hoc-sinh.sql, CNH-1.0 P02 mục 3): thầy cấp quyền
   // luyện đề toàn chương trình… Cũng là quyền học đã được thầy mở ⇒ GIỮ.
   'quyen_hoc_sinh',
+  // HỒ SƠ NĂNG LỰC THEO BẰNG CHỨNG (migration-2309-cnh1-su-kien-chuan.sql, CNH-1.0 P03): `skill_snapshot` và
+  // `nang_luc_cursor` là BẢN DỰNG LẠI từ sổ `su_kien_hoc` — và sổ ấy đã thuộc BANG_GIU. Xoá chúng chỉ làm mất
+  // con trỏ (lần sau dựng lại từ đầu), nên GIỮ cho nhất quán với `nam_kt_cau`/`nam_kt_dang` (cũng là bản dựng lại).
+  'skill_snapshot', 'nang_luc_cursor',
   // MỌI CA THI đã thi (thầy chốt 21/09 ~01:30: khi reset giữ lại toàn bộ ca thi đã thi): ca, lượt, điểm từng câu, bản đồ sai, phòng chờ, chặn vào, trạng thái, phiếu, kho ca thêm, nhận xét, đề riêng, đồng bộ Sheet, nộp khắc phục, tiến độ theo ca
   'ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'dong_bo', 'nop_khac_phuc', 'tien_do_ca',
   // BỘ NÃO A.I (Code 1, migration-2109-bo-nao.sql): hồ sơ ngày, nhật ký điều chỉnh, bản tin — chỉ số tổng hợp + nhật ký điều chỉnh, GIỮ (Code 3 quyết 21/09 theo đề nghị của Code 1).

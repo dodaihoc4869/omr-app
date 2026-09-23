@@ -16,10 +16,16 @@
 import { emCoGhi } from './dem-ke-hoach'
 import type { D1PreparedStatement, Env } from './kieu'
 import { answerText, homeworkQuestions, isAnswerCorrect } from './btvn-grading'
+import { POLICY_VERSION } from './ho-so-cau-hinh'
 
 export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng'
 
 export const CAC_NGUON: readonly NguonSuKien[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'len_bang', 'game', 'luyen', 'on_lai', 'thu_thach_rieng']
+
+/** Hỗ trợ đã cấp cho lần làm này (CNH-1.0 04 §2). */
+export type Assistance = 'none' | 'assisted' | 'unknown'
+/** Ca chưa công bố: kết quả ở trạng thái che, KHÔNG được lộ qua hồ sơ/ví/due (T47). */
+export type Visibility = 'embargoed' | 'released'
 
 export interface SuKien {
   nguon: NguonSuKien
@@ -37,7 +43,24 @@ export interface SuKien {
   maDang?: string | null
   chuyenDe?: string
   mucDo?: string
+  // --- CNH-1.0 P03: hợp đồng sự kiện chuẩn (04 §2). Thiếu ⇒ suy giá trị an toàn, KHÔNG bịa. ---------
+  /** Cơ hội làm do MÁY CHỦ cấp. Thiếu ⇒ dùng `khoaSuKien` (idempotent như trước). */
+  attemptId?: string | null
+  /** `assisted` = máy chủ đã cấp gợi ý/lời giải; giữ cho phần hỗ trợ, KHÔNG vào mẫu tăng bậc. */
+  assistance?: Assistance
+  visibility?: Visibility
+  /** `khoaSuKien` của sự kiện bị sửa (correction) — dựng lại đúng phần bị tác động. */
+  correctionOf?: string | null
+  /** Mục đích nhiệm vụ (`maintenance`/`due_review`/`repair`/`transfer`…). */
+  purpose?: string | null
+  /** Giờ MÁY CHỦ tiếp nhận (ms). Thiếu ⇒ lấy giờ học `luc` (giữ nguyên hành vi cũ). */
+  receivedAt?: number | null
+  /** DỮ LIỆU THÔ: đáp án máy em gửi (không chứa đáp án đúng) — bảo toàn để dựng lại. */
+  raw?: unknown
+  /** Kết quả TỪNG Ý Phần II (`subitemResults` trong 04 §2). */
+  subitem?: unknown
 }
+
 
 // --- Số nhỏ ----------------------------------------------------------------
 
@@ -248,6 +271,12 @@ export interface KetQuaGhi {
 const COT =
   'khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de, muc_do'
 
+/**
+ * CỘT CHUẨN CNH-1.0 (migration `migration-2309-cnh1-su-kien-chuan.sql`). Cột mới NULL-được nên dòng cũ
+ * đọc lên vẫn hợp lệ (`assistance` rỗng ⇒ 'none', `visibility` rỗng ⇒ 'released', `attempt_id` rỗng ⇒ `khoa`).
+ */
+const COT_MOI = `${COT}, attempt_id, assistance, visibility, correction_of, policy_version, purpose, raw_json, subitem_json, received_at`
+
 /** Đọc một dòng từ JSON (một tham số duy nhất — tránh giới hạn 100 tham số của D1). */
 const CHON_TU_JSON = `SELECT json_extract(j.value,'$.k'), json_extract(j.value,'$.s'), json_extract(j.value,'$.q'),
        json_extract(j.value,'$.n'), json_extract(j.value,'$.m'), json_extract(j.value,'$.l'),
@@ -256,9 +285,25 @@ const CHON_TU_JSON = `SELECT json_extract(j.value,'$.k'), json_extract(j.value,'
        json_extract(j.value,'$.u')
   FROM json_each(?) j`
 
+const CHON_TU_JSON_MOI = `SELECT json_extract(j.value,'$.k'), json_extract(j.value,'$.s'), json_extract(j.value,'$.q'),
+       json_extract(j.value,'$.n'), json_extract(j.value,'$.m'), json_extract(j.value,'$.l'),
+       json_extract(j.value,'$.r'), json_extract(j.value,'$.g'), json_extract(j.value,'$.t'),
+       json_extract(j.value,'$.d'), json_extract(j.value,'$.a'), json_extract(j.value,'$.c'),
+       json_extract(j.value,'$.u'),
+       json_extract(j.value,'$.ai'), json_extract(j.value,'$.as'), json_extract(j.value,'$.v'),
+       json_extract(j.value,'$.co'), json_extract(j.value,'$.pv'), json_extract(j.value,'$.pu'),
+       json_extract(j.value,'$.rw'), json_extract(j.value,'$.si'), json_extract(j.value,'$.ra')
+  FROM json_each(?) j`
+
 const SQL_BO_QUA_TRUNG = `INSERT OR IGNORE INTO su_kien_hoc (${COT}) ${CHON_TU_JSON}`
+const SQL_BO_QUA_TRUNG_MOI = `INSERT OR IGNORE INTO su_kien_hoc (${COT_MOI}) ${CHON_TU_JSON_MOI}`
 
 const SQL_TRANH_TRUNG_LO = `INSERT OR IGNORE INTO su_kien_hoc (${COT}) ${CHON_TU_JSON}
+ WHERE NOT EXISTS (SELECT 1 FROM su_kien_hoc x
+                    WHERE x.nguon = 'btvn_lo' AND x.ma_nguon = json_extract(j.value,'$.m')
+                      AND x.sbd = json_extract(j.value,'$.s') AND x.qid = json_extract(j.value,'$.q'))`
+
+const SQL_TRANH_TRUNG_LO_MOI = `INSERT OR IGNORE INTO su_kien_hoc (${COT_MOI}) ${CHON_TU_JSON_MOI}
  WHERE NOT EXISTS (SELECT 1 FROM su_kien_hoc x
                     WHERE x.nguon = 'btvn_lo' AND x.ma_nguon = json_extract(j.value,'$.m')
                       AND x.sbd = json_extract(j.value,'$.s') AND x.qid = json_extract(j.value,'$.q'))`
@@ -274,7 +319,56 @@ const SQL_CAP_NHAT = `INSERT INTO su_kien_hoc (${COT}) ${CHON_TU_JSON}
    chuyen_de = COALESCE(NULLIF(excluded.chuyen_de, ''), su_kien_hoc.chuyen_de),
    muc_do = COALESCE(NULLIF(excluded.muc_do, ''), su_kien_hoc.muc_do)`
 
+/** Chấm lại ca thi: cập nhật kết quả và GIỮ NGUYÊN phần hỗ trợ/embargo đã ghi (không tự xoá dấu vết). */
+const SQL_CAP_NHAT_MOI = `INSERT INTO su_kien_hoc (${COT_MOI}) ${CHON_TU_JSON_MOI}
+ WHERE 1
+ ON CONFLICT(khoa) DO UPDATE SET
+   ket_qua = excluded.ket_qua,
+   giay = COALESCE(excluded.giay, su_kien_hoc.giay),
+   luc = excluded.luc,
+   ngay_vn = excluded.ngay_vn,
+   chuyen_de = COALESCE(NULLIF(excluded.chuyen_de, ''), su_kien_hoc.chuyen_de),
+   muc_do = COALESCE(NULLIF(excluded.muc_do, ''), su_kien_hoc.muc_do),
+   assistance = COALESCE(NULLIF(excluded.assistance, ''), su_kien_hoc.assistance),
+   visibility = COALESCE(NULLIF(excluded.visibility, ''), su_kien_hoc.visibility),
+   correction_of = COALESCE(excluded.correction_of, su_kien_hoc.correction_of),
+   purpose = COALESCE(NULLIF(excluded.purpose, ''), su_kien_hoc.purpose),
+   raw_json = COALESCE(excluded.raw_json, su_kien_hoc.raw_json),
+   subitem_json = COALESCE(excluded.subitem_json, su_kien_hoc.subitem_json),
+   received_at = COALESCE(excluded.received_at, su_kien_hoc.received_at)`
+
+/** Chọn câu SQL theo (biến thể, đã có cột chuẩn chưa). */
+function sqlGhi(bienThe: 'boQuaTrung' | 'tranhTrungLo' | 'capNhat', coCotMoi: boolean): string {
+  if (bienThe === 'capNhat') return coCotMoi ? SQL_CAP_NHAT_MOI : SQL_CAP_NHAT
+  if (bienThe === 'tranhTrungLo') return coCotMoi ? SQL_TRANH_TRUNG_LO_MOI : SQL_TRANH_TRUNG_LO
+  return coCotMoi ? SQL_BO_QUA_TRUNG_MOI : SQL_BO_QUA_TRUNG
+}
+
+
+/** SQLite/D1 báo thiếu cột theo hai kiểu: `no such column: x` và `table t has no column named x`. */
+export const thieuCot = (loi: string): boolean => /no such column|has no column named/i.test(loi)
+
 let daBaoThieuBang = false
+/**
+ * Đã biết D1 CÓ/CHƯA cột chuẩn P03. `null` = chưa biết (lần ghi đầu thử câu mới rồi lùi nếu lỗi
+ * `no such column`). Nhờ vậy: D1 chưa áp migration vẫn GHI ĐƯỢC sổ như trước — sự kiện không bị mất.
+ */
+let coCotChuan: boolean | null = null
+export function xoaBietCotChuan(): void { coCotChuan = null }
+
+/** Dòng JSON của một sự kiện (tên khoá ngắn để không phình tham số). */
+function dongJson(e: SuKien, ngay: string): Record<string, unknown> {
+  const nhan = e.receivedAt ?? Date.parse(e.luc)
+  return {
+    k: khoaSuKien(e), s: e.sbd, q: e.qid, n: e.nguon, m: e.maNguon, l: e.lan,
+    r: e.ketQua, g: e.giay ?? null, t: e.luc, d: ngay,
+    a: e.maDang ?? null, c: e.chuyenDe ?? '', u: e.mucDo ?? '',
+    ai: e.attemptId ?? null, as: e.assistance ?? null, v: e.visibility ?? null,
+    co: e.correctionOf ?? null, pv: POLICY_VERSION, pu: e.purpose ?? null,
+    rw: e.raw === undefined ? null : JSON.stringify(e.raw), si: e.subitem === undefined ? null : JSON.stringify(e.subitem),
+    ra: Number.isFinite(nhan) ? nhan : null,
+  }
+}
 
 /** Ghi sổ. KHÔNG BAO GIỜ ném lỗi ra ngoài — xem đầu tệp. */
 export async function ghiSuKien(env: Env, ds: SuKien[], tuy: TuyChonGhi = {}): Promise<KetQuaGhi> {
@@ -290,26 +384,41 @@ export async function ghiSuKien(env: Env, ds: SuKien[], tuy: TuyChonGhi = {}): P
     // Trong cùng một lượt gọi: chế độ cập nhật thì dòng sau thắng, còn lại dòng đầu thắng —
     // đúng thứ SQL sẽ làm nếu gửi từng dòng một.
     if (hang.has(k) && !tuy.capNhat) continue
-    hang.set(k, {
-      k, s: e.sbd, q: e.qid, n: e.nguon, m: e.maNguon, l: e.lan,
-      r: e.ketQua, g: e.giay ?? null, t: e.luc, d: ngay,
-      a: e.maDang ?? null, c: e.chuyenDe ?? '', u: e.mucDo ?? '',
-    })
+    hang.set(k, dongJson(e, ngay))
   }
   const dong = [...hang.values()]
   if (dong.length === 0 || !env.DB) return { ok: true, soGui: 0, boQua }
 
-  const sql = tuy.capNhat ? SQL_CAP_NHAT : tuy.tranhTrungLo ? SQL_TRANH_TRUNG_LO : SQL_BO_QUA_TRUNG
-  const lenh: D1PreparedStatement[] = []
-  for (let i = 0; i < dong.length; i += DONG_MOI_LENH) {
-    lenh.push(env.DB.prepare(sql).bind(JSON.stringify(dong.slice(i, i + DONG_MOI_LENH))))
+  const bienThe = tuy.capNhat ? 'capNhat' : tuy.tranhTrungLo ? 'tranhTrungLo' : 'boQuaTrung'
+  const chay = async (coCotMoi: boolean): Promise<D1PreparedStatement[]> => {
+    const sql = sqlGhi(bienThe, coCotMoi)
+    const lenh: D1PreparedStatement[] = []
+    for (let i = 0; i < dong.length; i += DONG_MOI_LENH) {
+      lenh.push(env.DB.prepare(sql).bind(JSON.stringify(dong.slice(i, i + DONG_MOI_LENH))))
+    }
+    for (let i = 0; i < lenh.length; i += LENH_MOI_GOI) await env.DB.batch(lenh.slice(i, i + LENH_MOI_GOI))
+    return lenh
   }
   try {
-    for (let i = 0; i < lenh.length; i += LENH_MOI_GOI) await env.DB.batch(lenh.slice(i, i + LENH_MOI_GOI))
+    await chay(coCotChuan !== false)
+    coCotChuan = true
     for (const d of new Set(dong.map((x) => String(x.s)))) emCoGhi(d) // em có ghi sổ ⇒ đệm kế hoạch ngày của em hết hiệu lực (dem-ke-hoach.ts)
     return { ok: true, soGui: dong.length, boQua }
   } catch (e) {
     const loi = e instanceof Error ? e.message : String(e)
+    // D1 CHƯA ÁP migration cột chuẩn: lùi về câu SQL cũ để sự kiện KHÔNG bị mất (sổ vẫn là nguồn sự thật).
+    if (thieuCot(loi)) {
+      coCotChuan = false
+      try {
+        await chay(false)
+        for (const d of new Set(dong.map((x) => String(x.s)))) emCoGhi(d)
+        return { ok: true, soGui: dong.length, boQua }
+      } catch (e2) {
+        const loi2 = e2 instanceof Error ? e2.message : String(e2)
+        console.error('[su-kien-hoc] không ghi được sổ (cả câu cũ):', loi2)
+        return { ok: false, soGui: 0, boQua, loi: loi2 }
+      }
+    }
     if (/no such table/i.test(loi)) {
       if (!daBaoThieuBang) {
         daBaoThieuBang = true

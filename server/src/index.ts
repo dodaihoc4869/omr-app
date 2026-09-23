@@ -6,6 +6,8 @@ import {qidTuLuanCuaTo} from './cam-tu-luan'
 import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
+import {congBoSuKien,dungLaiNangLuc,nangLucBat} from './nang-luc-d1'
+import {dtoNangLuc} from './ho-so-dto'
 import {hsThoiGianHoc,chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
 import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
@@ -3242,6 +3244,21 @@ const boXuLy = {
         return ra({ ok: true, ...(await dungLaiHoSo(env, ds, new Date().toISOString())) })
       }
       if (p === '/ho-so/xem') return ra({ ok: true, ...(await docHoSoEm(env, String(b.sbd ?? '').trim())) })
+      // HỒ SƠ NĂNG LỰC CNH-1.0 (P03): dựng lại từ bằng chứng theo cửa sổ 30 ngày rồi trả DTO CHUNG cho ba app.
+      // Cờ `nang_luc_v1` chỉ để biết đường học đã bật chưa; lệnh này chỉ ĐỌC/DỰNG, không cộng tiền.
+      if (p === '/ho-so/nang-luc') {
+        const sbd = String(b.sbd ?? '').trim()
+        if (!sbd) return ra({ ok: false, error: 'Thiếu "sbd".' })
+        const bang = await dungLaiNangLuc(env, sbd, { denNgay: ngayVn(Date.now()), moc: new Date().toISOString() })
+        return ra({ ok: true, bat: await nangLucBat(env), hoSo: dtoNangLuc(bang) })
+      }
+      // CÔNG BỐ kết quả một đợt (ca thi/bài) ⇒ kết quả rời trạng thái che, mới vào bằng chứng năng lực (T47).
+      if (p === '/ho-so/cong-bo') {
+        const nguon = String(b.nguon ?? '').trim()
+        const maNguon = String(b.maNguon ?? '').trim()
+        if (!nguon || !maNguon) return ra({ ok: false, error: 'Cần "nguon" và "maNguon".' })
+        return ra({ ok: true, daCongBo: await congBoSuKien(env, nguon, maNguon) })
+      }
       if (p === '/ho-so/do-phu-dang') return ra(await docDoPhuDang(env))
       // Chạy thử reset (chỉ ĐẾM, không ghi): job sẽ xoá bảng nào, bao nhiêu dòng, giữ bảng nào.
       if (p === '/reset/dry-run') return ra(await resetDryRun(env))

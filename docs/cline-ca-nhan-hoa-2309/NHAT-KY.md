@@ -225,3 +225,55 @@ Ket qua full suite 727 file: 82 do / 691 xanh / 1 bo qua - TONG SO DO DUNG BANG 
 Da kiem: escort-context-menu chay rieng 3 lan deu PASS 1/1 => la test dao dong (render bat dong bo), KHONG phai hoi quy cua thay doi P02. Ghi lai de nguoi nghiem thu khong hieu nham.
 
 Trang thai chot luot: P02 PASS, R05 PASS, T01/T02/T03/T11 PASS (32 test pham vi tren D1 that, gom 4 ca end-to-end qua readScope).
+
+## P03 XONG (PASS) — So hoc va ho so nang luc
+
+Ngay: 23/09/2026 (buoi chieu). HEAD vao phien: `3be54e4` (dung moc ban giao). `sourceFingerprint` khi ghi bang chung: `b4a33d6293b80bf25951ed563b33a70aa4488faadaa0adf45f95ab64537ae382`.
+
+### Lo hong da chua (doc code that truoc khi sua)
+
+1. **So thieu cot chuan** — `su_kien_hoc` chi co khoa + ket qua, nen: (a) luot co HO TRO bi bo HAN khoi so (game-v2.ts bo qua `attempt.assisted`), (b) khong the che ket qua ca chua cong bo, (c) khong lien ket duoc mot su kien sua diem voi su kien goc, (d) khong giu du lieu tho de dung lai.
+2. **Ho so nang luc khong theo bang chung** — `nam_kt_*` chi dem lan gap/sai theo CAU va nang bac DANG bang mot luat rieng; khong co `validated_level`/`working_level`/`confidence`, khong co "mot lan doc lap moi family/ngay", khong co dot day lai `needs_teaching -> ... -> stable`.
+3. **Replay khong co con tro, khong co correction** — `dungLaiHoSo` dung lai toan bo moi lan; khong co khai niem "snapshot sach" va khong ap dung dong sua diem.
+4. **Ba app tu suy bac/yeu khac nhau** — game doc `nam_kt_dang.bac` qua `masteryTheoHoSo`, lop doc `SO_CAU_DU_TIN_DANG`, ho so doc `dangYeu`.
+
+### Da lam (5/5 viec cua 05-P03)
+
+- **Event chuan**: `server/migration-2309-cnh1-su-kien-chuan.sql` CHI THEM cot (`attempt_id`, `assistance`, `visibility`, `correction_of`, `policy_version`, `purpose`, `raw_json`, `subitem_json`, `received_at`) + hai bang `skill_snapshot`, `nang_luc_cursor`. KHONG doi khoa `khoa` (nguon|ma_nguon|sbd|qid|lan) va khong doi ranh gioi giao dich. `ghiSuKien` ghi du cot moi va **co duong LUI**: D1 chua ap migration (`no such column` / `has no column named`) thi tu chay cau SQL cu => su kien KHONG bi mat (test khoa bang cach bo cot roi ghi lai).
+- **Reducer tat dinh** `server/src/nang-luc.ts` (thuan): don vi = skill x difficulty x family x ngay, chi lan DOC LAP dau; cua so 30 ngay VN; `recent5` ghi `event_id`; `confidence = min(family/5,1) x min(ngay/2,1)` (khop V47/V48); xac nhan muc can >=5 family dung muc + >=2 ngay + >=4/5 recent5 + khong co dot mo o skill/NEN; probe dung o bac tren moi nang `working_level`; bang chung qua 30 ngay giu muc da xac nhan + co `canKiemLai`; episode `needs_teaching -> practicing -> recovered -> stable` voi luat 3 loi (khac content_group, >=2 family, trong 7 ngay, khong co lan tu dung bien the moi o giua) va moc phuc hoi (>=2 nhiem vu khac HOAC >=300 giay).
+- **Snapshot/cursor + correction replay**: `skill_snapshot` + `nang_luc_cursor` luu con tro `(received_at, event_id)`, so dong + bam so => **so khong doi thi khong doc lai dong nao**; correction/toi muon/doi embargo lam DO dung ky nang do va dung lai tu SO (thieu so ⇒ NEM LOI). `apDungSuaDiem` thay ket qua dong goc, GIU vi tri thoi gian cua bai nop, dong goc bat bien.
+- **DTO chung** `server/src/ho-so-dto.ts` cho ca ba app + MOT cho noi ly do chua xac nhan muc (`THIEU_FAMILY`/`THIEU_NGAY`/`RECENT5_CHUA_DU`/`DOT_DANG_MO`/`NEN_DANG_MO`); DTO khong chua dap an, khong co cap thu.
+- **Noi duong**: lenh `/ho-so/nang-luc` (doc + dung lai) va `/ho-so/cong-bo` (embargo -> released) sau ma bi mat cua thay; game-v2 ghi su kien HANH TRO khi `cau_hinh.nang_luc_v1` BAT — co TAT (mac dinh) thi giu nguyen hanh vi cu tung dong. Hai bang moi duoc phan loai trong `BANG_GIU` cua `reset-toan-app.ts`.
+
+### Kiem thu thuc chay
+
+| Lenh | Exit | Ket qua | Log |
+|---|---|---|---|
+| `vitest run tests/cnh-1-0` | 0 | 6 tep, **106 test PASS** (69 cu + 37 moi) | `p03-vitest-cnh1.log` |
+| `vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts` | 0 | **21 PASS** (T05+T06) | `p03-vitest-t05-t06.log` |
+| `vitest run tests/cnh-1-0-su-kien-chuan.test.ts` | 0 | **10 PASS** (T14 phan event, T29 phan du lieu, T47 phan ho so, duong lui) | `p03-vitest-su-kien.log` |
+| `vitest run tests/cnh-1-0-replay-t32.test.ts` | 0 | **6 PASS** (T32: 3.000 su kien, correction qua khu, cursor tren D1 that) | `p03-vitest-t32.log` |
+| `vitest run` (toan bo 730 tep) | 1 | 81 do / 695 xanh / 1 bo qua; test 81 do / 11 218 dat | `p03-vitest-full.log` |
+| `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 loi | — |
+| `kiem-tra-bo-ban-giao.mjs` | 0 | bo ban giao hop le | — |
+| `... --acceptance` | 1 | dung du kien: 48 -> **47 muc thieu**; P02/P03 khong con trong danh sach loi, **T05/T06/T32/R09 khong bi bao loi bang chung** | — |
+
+### Hoi quy
+
+`p00` 82 do / 35 tep · `p03` **81 do / 34 tep**. `p03-so-sanh-do.log`: **FILE MOI DO: [] · TEST MOI DO: []**.
+Tep het do: `tests/bang-tin-san-chong-chu-trinh-duyet-2109.test.ts` — test UI Chromium da duoc ghi la **DAO DONG** tu phien P02, khong phai hoi quy.
+Nhom lien quan khac: `tests/cnh-1-0 tests/su-kien tests/ho-so tests/reset-toan-app-1909` = 16 tep / 294 test PASS; nhom game/ke hoach/exp = 18 tep, 1 test do CO SAN trong nen P00 (`cau-da-lam-2109.test.ts`, dong 10 cua `p00-vitest-fail-tests.txt`).
+
+### Loi con lai / dieu CHUA xac minh (khong duoc doc la da xong)
+
+- **T29/T14/T47 moi xong PHAN DU LIEU** (su kien + ho so), nen GIU `IN_PROGRESS`; phan thuong (receipt, `raw core=2`, khong FSRS Good/transfer 10, vi, thong bao) thuoc **P07** => R08 va R10 cung chua PASS.
+- **Cach bieu dien DONG SUA DIEM trong so** (dong rieng + `correction_of`) do **lenh correction cua P07 (R04)** chot; P03 chi dinh nghia luat ap dung va kiem bang fixture.
+- **Kho that chua gan nhan `family`** => `familyId` luon `null`, nen tren du lieu THAT chua xac nhan duoc muc nao (dung nhu thiet ke: khong bia family). Can thay gan nhan (P02 `baoThieuNhan` da liet ke).
+- Migration `migration-2309-cnh1-su-kien-chuan.sql` **CHUA ap** len D1 that; co `cau_hinh.nang_luc_v1` **MAC DINH TAT**; **chua deploy** (khong nhan DEPLOYMENT_VERIFIED).
+
+### Buoc tiep theo chinh xac
+
+1. **P04** (P03 da du dau ra): FSRS + chong lap — `server/src/lich-on-fsrs.ts` phai DU STATE (Card, state dau ngay, model/config version, cursor) va mot quan sat doc lap/ngay, Again thang, assisted retry khong day due; mot module repeat-eligibility de due khong bi cooldown 3/14/30 chan sai; gate T04, T06, T07, T17, T29, T41.
+2. Truoc P11: ap migration len D1 that theo canary 5% (07 §3), bat `nang_luc_v1` cho mot nhom nho, do p95 va chuan bi rollback.
+
+

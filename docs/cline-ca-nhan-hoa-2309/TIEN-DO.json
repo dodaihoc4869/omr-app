@@ -116,9 +116,34 @@
       "dependsOn": [
         "P02"
       ],
-      "status": "NOT_RUN",
-      "notes": "",
-      "evidence": []
+      "status": "PASS",
+      "notes": "XONG 5/5 viec cua 05-P03: (1) SU KIEN CHUAN: them attempt_id/assistance/visibility/correction_of/policy_version/purpose/received_at + BAO TOAN du lieu tho (raw_json, subitem_json) — migration-2309-cnh1-su-kien-chuan.sql CHI THEM cot/bang; co DUONG LUI nen D1 chua ap migration van ghi duoc so (su kien khong bi mat). (2) REDUCER TAT DINH (server/src/nang-luc.ts): don vi bang chung = skill x difficulty x family x ngay (chi lan DOC LAP dau), cua so 30 ngay VN, recent5 ghi event_id, validated/working/confidence (khop vector V47/V48), episode needs_teaching->practicing->recovered->stable, canh bao bang chung qua han. (3) SNAPSHOT/CURSOR + REPLAY: skill_snapshot/nang_luc_cursor; gop tang dan BANG phat lai day du ke ca khi correction chen vao QUA KHU; correction ap dung theo correction_of (dong goc bat bien, dung vi tri thoi gian cua bai nop); ky nang DO (correction/toi muon/doi embargo) dung lai tu SO, thieu so thi NEM LOI. (4) DTO CHUNG (server/src/ho-so-dto.ts) cho ca ba app + MOT cho duy nhat noi ly do chua xac nhan muc; DTO khong chua dap an, khong co cap thu. (5) Tai hien: bon cau de cung ngay (T05), ba loi roi phuc hoi (T06), goi y qua man khac (phan DU LIEU cua T29). TRUNG THUC: T29/T14/T47 moi xong PHAN DU LIEU (su kien + ho so) nen GIU IN_PROGRESS; phan thuong/receipt/vi/FSRS-transfer thuoc P07 => R08/R10 cung chua PASS. Cach bieu dien DONG SUA DIEM trong so do lenh correction cua P07 chot (P03 chi dinh nghia luat ap dung + fixture). Kho THAT chua gan nhan family => familyId=null, CHUA xac nhan duoc muc tren du lieu that (baoThieuNhan cua P02 liet ke phan thieu). Migration CHUA ap len D1 that; co `cau_hinh.nang_luc_v1` MAC DINH TAT; chua deploy.",
+      "evidence": [
+        {
+          "path": "server/src/nang-luc.ts",
+          "note": "reducer tat dinh + episode + replay day du/tang dan + ap dung correction"
+        },
+        {
+          "path": "server/migration-2309-cnh1-su-kien-chuan.sql",
+          "note": "cot su kien chuan + skill_snapshot + nang_luc_cursor (chi THEM)"
+        },
+        {
+          "path": "server/src/nang-luc-d1.ts",
+          "note": "coc cursor/bam so, doc so, dung lai, cong bo ket qua"
+        },
+        {
+          "path": "server/src/ho-so-dto.ts",
+          "note": "DTO chung cho ba app + ly do chua xac nhan muc"
+        },
+        {
+          "path": "server/src/su-kien-hoc.ts",
+          "note": "ghi attempt/assistance/embargo/correction + du lieu tho, co duong lui"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p03-tom-tat-bang-chung.md",
+          "note": "tom tat bang chung: lenh, exit code, fingerprint, sha256, so test, hoi quy"
+        }
+      ]
     },
     {
       "id": "P04",
@@ -318,9 +343,16 @@
         "T29",
         "T32"
       ],
-      "status": "NOT_RUN",
-      "sourceRefs": [],
-      "notes": "",
+      "status": "IN_PROGRESS",
+      "sourceRefs": [
+        "server/src/su-kien-hoc.ts",
+        "server/src/nang-luc.ts",
+        "server/src/nang-luc-d1.ts",
+        "server/migration-2309-cnh1-su-kien-chuan.sql",
+        "tests/cnh-1-0-su-kien-chuan.test.ts",
+        "tests/cnh-1-0-replay-t32.test.ts"
+      ],
+      "notes": "Phan DU LIEU da xong: su kien chuan (attempt_id/assistance/visibility/correction_of/received_at + du lieu tho), idempotent theo khoa attempt, doc lap voi thiet bi/nguon; T32 PASS. CHUA PASS R08 vi T14 (idempotency NGU NGHIA kem receipt/409) va phan thuong cua T29 (raw core=2, khong FSRS Good/transfer 10) thuoc P07.",
       "evidence": []
     },
     {
@@ -332,10 +364,28 @@
         "T05",
         "T06"
       ],
-      "status": "NOT_RUN",
-      "sourceRefs": [],
-      "notes": "",
-      "evidence": []
+      "status": "PASS",
+      "sourceRefs": [
+        "server/src/nang-luc.ts",
+        "server/src/ho-so-cau-hinh.ts",
+        "server/src/ho-so-dto.ts",
+        "tests/cnh-1-0-nang-luc-t05-t06.test.ts"
+      ],
+      "notes": "Nang luc theo bang chung: don vi skill x difficulty x family x ngay (lan doc lap dau), cua so 30 ngay VN, recent5 ghi event_id, confidence = min(family/5,1) x min(ngay/2,1) khop vector V47/V48; CAP THU khong tham gia cong thuc (co test khoa). T05+T06 PASS tren ham thuan va D1 that.",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
+          "executedAt": "2026-09-23T11:14:00.000Z",
+          "exitCode": 0,
+          "sourceFingerprint": "b4a33d6293b80bf25951ed563b33a70aa4488faadaa0adf45f95ab64537ae382",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p03-vitest-t05-t06.log",
+              "sha256": "e5e37a2af677374163b71e034c173a76e594f19cdd01bd73580607e0dc6f594d"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "R10",
@@ -346,9 +396,13 @@
         "T06",
         "T17"
       ],
-      "status": "NOT_RUN",
-      "sourceRefs": [],
-      "notes": "",
+      "status": "IN_PROGRESS",
+      "sourceRefs": [
+        "server/src/nang-luc.ts",
+        "server/src/ho-so-cau-hinh.ts",
+        "tests/cnh-1-0-nang-luc-t05-t06.test.ts"
+      ],
+      "notes": "Duong phuc hoi needs_teaching->practicing->recovered->stable da co va T06 PASS (ba loi doc lap khac content_group trong 7 ngay, >=2 family; phuc hoi can bien the moi va >=2 nhiem vu hoac >=300 giay; stable can ngay khac >=24h; loi cu khong mo lai dot). CHUA PASS R10 vi T17 (khong thuong lai vi loi cu) thuoc P07.",
       "evidence": []
     },
     {
@@ -884,16 +938,42 @@
       "phase": "P03",
       "level": "code",
       "title": "Không nhảy bậc từ câu dễ",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
+          "executedAt": "2026-09-23T11:14:00.000Z",
+          "exitCode": 0,
+          "sourceFingerprint": "b4a33d6293b80bf25951ed563b33a70aa4488faadaa0adf45f95ab64537ae382",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p03-vitest-t05-t06.log",
+              "sha256": "e5e37a2af677374163b71e034c173a76e594f19cdd01bd73580607e0dc6f594d"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "T06",
       "phase": "P03",
       "level": "code",
       "title": "Phục hồi sau ba lỗi",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
+          "executedAt": "2026-09-23T11:14:00.000Z",
+          "exitCode": 0,
+          "sourceFingerprint": "b4a33d6293b80bf25951ed563b33a70aa4488faadaa0adf45f95ab64537ae382",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p03-vitest-t05-t06.log",
+              "sha256": "e5e37a2af677374163b71e034c173a76e594f19cdd01bd73580607e0dc6f594d"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "T07",
@@ -1089,7 +1169,7 @@
       "phase": "P03",
       "level": "code",
       "title": "Gợi ý qua màn khác",
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "evidence": []
     },
     {
@@ -1113,8 +1193,21 @@
       "phase": "P03",
       "level": "code",
       "title": "Replay và correction",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-replay-t32.test.ts",
+          "executedAt": "2026-09-23T11:14:00.000Z",
+          "exitCode": 0,
+          "sourceFingerprint": "b4a33d6293b80bf25951ed563b33a70aa4488faadaa0adf45f95ab64537ae382",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p03-vitest-t32.log",
+              "sha256": "327de2f3735615fa428c3ce3dd5da1fc6f52509b306cf697fb3bbdcf975f8d79"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "T33",

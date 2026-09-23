@@ -86,3 +86,37 @@ export const MOM_CHUA_BAT_DAU_TOI_DA = 3
 
 /** Số nhiệm vụ thần thú MỞ tối đa của một em (gồm cả nhiệm vụ phụ huynh nhắc). Kế hoạch ngày tự sinh nhiệm vụ mới chỉ khi còn dưới mức này. */
 export const NHIEM_VU_THAN_THU_MO_TOI_DA = 3
+
+// --- Năng lực theo bằng chứng (CNH-1.0 P03) ------------------------------------
+// Nguồn: docs/cline-ca-nhan-hoa-2309/THAM-SO.json `learning` + 02-HOC-TAP-VA-RUT-CAU.md §3.
+// ĐÂY LÀ BẢN DUY NHẤT của các hằng số này trên máy chủ: `server/src/nang-luc.ts` KHÔNG tự khai lại.
+// Vector nghiệm thu tương ứng: MAU-KET-QUA.json V47/V48 (confidence) — công thức ở `confidenceBangChung`.
+
+/** Cửa sổ bằng chứng tính bằng ngày VN (V47/V48 và §3.1: "cửa sổ 30 ngày VN gần nhất"). */
+export const CUA_SO_BANG_CHUNG_NGAY = 30
+/** Phiên bản chính sách CNH-1.0 — một nguồn cho sổ sự kiện và hồ sơ năng lực. */
+export const POLICY_VERSION = 'CNH-1.0'
+/** Số family khác nhau tối thiểu ở ĐÚNG một mức để xác nhận mức ấy (§3.2.2). */
+export const SO_FAMILY_XAC_NHAN = 5
+/** Số ngày VN khác nhau tối thiểu có bằng chứng (§3.2.2). */
+export const SO_NGAY_BANG_CHUNG = 2
+/** Trong 5 family gần nhất, ít nhất bấy nhiêu phải đúng (§3.2.2: 4/5). */
+export const SO_DUNG_TRONG_RECENT5 = 4
+/** Mức khởi đầu trong phần đã học khi chưa có bằng chứng (§3.2.1 — `validated_level` vẫn là null). */
+export const MUC_KHOI_DAU = 0
+/** Đếm lỗi trên ba cơ hội độc lập gần nhất, trong bấy nhiêu ngày, mới mở đợt cần dạy lại (§3.3). */
+export const CUA_SO_LOI_NGAY = 7
+export const SO_LOI_MO_DOT = 3
+/** Ít nhất bấy nhiêu family đã xác minh trong ba lỗi đó (§3.3). */
+export const SO_FAMILY_LOI = 2
+/** Hai câu chính liên tiếp sai trong lượt ⇒ giảm độ khó phần chưa mở (§3.3). */
+export const SAI_LIEN_TIEP_CAN_HO_TRO = 2
+/** Phục hồi: cách lần hướng dẫn ≥ bấy nhiêu nhiệm vụ khác (§3.3). */
+export const NHIEM_VU_CACH_PHUC_HOI = 2
+/** Phục hồi: HOẶC ≥ bấy nhiêu giây hoạt động hợp lệ kể từ lần hướng dẫn (§3.3). */
+export const GIAY_HOAT_DONG_PHUC_HOI = 300
+/** `stable`: lần độc lập đúng ở NGÀY KHÁC, cách `recovered` ≥ 24 giờ (§3.3, THAM-SO `stableGapSeconds`). */
+export const GIAY_CACH_STABLE = 86_400_000
+/** Mỗi skill chỉ mở một đợt cần dạy lại tại một thời điểm (§3.3), và mỗi skill/ngày tối đa một probe (§3.2.3). */
+export const SO_DOT_MO_MOI_SKILL = 1
+export const SO_PROBE_MOI_SKILL_NGAY = 1
