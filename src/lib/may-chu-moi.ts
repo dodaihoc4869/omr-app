@@ -13,6 +13,7 @@
 //      phải đi đường cũ ngay.
 import { chuanHoaMayChu, gianVaoThi, type CauHinhMayChu } from './cau-hinh-may-chu'
 import { loadCauHinhMayChu, loadDiaChiMayChuMoiChoEm, saveCauHinhMayChu } from './exam-db'
+import { voiHanCho } from './han-cho'
 
 // ---------------------------------------------------------------------------
 // CẦU DAO: CA NÀO MÁY CHỦ MỚI KHÔNG GIỮ THÌ THÔI GỌI CHO CẢ CA
@@ -85,13 +86,21 @@ async function napThat(): Promise<void> {
   // mà lúc này `dangNap` ĐANG là chính `napThat` đang chạy ⇒ tự chờ chính mình, treo
   // vô hạn. Đây là GỐC lỗi "mở ca chỉ mở được tại máy này": máy lạ (IndexedDB rỗng)
   // nạp địa chỉ không bao giờ xong, nên mọi lệnh thầy trả "Chưa kết nối được máy chủ".
-  const ch = await loadCauHinhMayChu()
-  if (ch.URL) return
-  const url = await loadDiaChiMayChuMoiChoEm()
-  if (!url) return
-  diaChiTuTep = url
-  await saveCauHinhMayChu({ ...ch, BAT: true, URL: url }).catch(() => {})
-  quenCauHinhMayChu()
+  //
+  // CẤM TREO `dangNap`: toàn bộ thân hàm bọc try/catch và lượt tải tệp bị giới hạn
+  // thời gian — `dangNap` LUÔN kết thúc, nên `xongNapDiaChi()` không bao giờ treo
+  // theo một lượt nạp nửa chừng (mạng yếu / máy ngủ giữa chừng).
+  try {
+    const ch = await loadCauHinhMayChu()
+    if (ch.URL) return
+    const url = await voiHanCho(loadDiaChiMayChuMoiChoEm(), 10000, '').catch(() => '')
+    if (!url) return
+    diaChiTuTep = url
+    await saveCauHinhMayChu({ ...ch, BAT: true, URL: url }).catch(() => {})
+    quenCauHinhMayChu()
+  } catch {
+    // hết đường: giữ nguyên trạng, chỗ gọi tự nói thật — KHÔNG để `dangNap` treo.
+  }
 }
 
 /** CHỜ LƯỢT NẠP ĐỊA CHỈ LÚC KHỞI ĐỘNG XONG.
