@@ -5,8 +5,9 @@ Ba app cho trung tâm luyện thi Hoá của thầy Đỗ Đại Học: giáo vi
 ## Làm việc nhiều phiên
 - Đọc `DIEU-PHOI.md` (danh bạ ai lo gì, luật, 12 dòng Nhật ký mới nhất) TRƯỚC khi sửa. Điều phối = phiên **Boss**. Nhắn thẳng phiên khác bằng SendMessage; KHÔNG hỏi thầy.
 - Chỉ sửa tệp trong làn của mình. Commit theo đường dẫn: `git commit -m "…" -- <tệp>`. Cấm `git add -A`, `commit -a`, stash, `reset --hard`.
-- Đẩy Worker + migration `--remote`: CHỈ Code 3. Đẩy Pages: Code 2, từ worktree sạch. Commit luồng thi thật / làn giáo viên cần dòng "đã soát <mã>" của Boss (tra cả `docs/nhat-ky-dieu-phoi-cu.md`).
-- Phải DỪNG báo Boss: đổi luật chấm điểm, luật vào thi/chống gian lận, schema không-chỉ-thêm, xoá/ghi đè D1 thật. Không nhập/đoán mật khẩu, không in token/mã bí mật. Đáp án không xuống máy học sinh trước khi nộp.
+- **TỰ ĐỘNG BUILD / TEST / DEPLOY (thầy cấp toàn quyền 23/09/2026).** Thấy việc thì LÀM LUÔN, không xin phép: chạy `npx vitest run` (và `tsc`) cho vùng mình sửa; **test xanh ⇒ tự `git push`**; cần máy chủ ⇒ **tự đẩy Worker TỪ WORKTREE SẠCH tại đúng commit của mình** (`git worktree add --detach <WT> <commit>` + symlink `node_modules`, rồi `cd server && npx -y wrangler@latest deploy`) — KHÔNG đẩy từ thư mục chung (sẽ cõng tệp dở của phiên khác). Migration CHỈ-THÊM thì tự chạy `--remote`. Mỗi lượt deploy ghi một dòng Nhật ký (giờ · phiên · đẩy gì · commit · mã bản lùi).
+- Phải DỪNG và báo Boss CHỈ khi: **XOÁ/GHI ĐÈ DỮ LIỆU THẬT** (reset, xoá bảng, sửa điểm thật hàng loạt), **schema KHÔNG phải chỉ-thêm**, hoặc phát hiện **đang có ca thi mở**. Ngoài ba việc đó thì tự quyết và tự phát hành.
+- Không nhập/đoán mật khẩu, không in token/mã bí mật. Đáp án không xuống máy học sinh trước khi nộp.
 
 ## TIẾT KIỆM NGỮ CẢNH (thầy yêu cầu 21/09)
 - KHÔNG đọc/ls sâu: `node_modules/`, `dist/`, `.dist-old-*/`, `src/graphify-out/`, `public/than-thu-v2/*.png` (ảnh 3 MB), `docs/anh-*/`, `docs/ban-ve-*/*.jpg` (chỉ mở ảnh khi việc cần nhìn).
