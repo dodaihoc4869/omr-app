@@ -74,9 +74,30 @@
       "dependsOn": [
         "P01"
       ],
-      "status": "NOT_RUN",
-      "notes": "",
-      "evidence": []
+      "status": "IN_PROGRESS",
+      "notes": "Đã làm: migration learner_scope (state/source/evidence_ref/revision), server/src/pham-vi-hoc.ts (eligibleScope THUẦN + locTheoPhamVi + docPhamVi/docPhamViNhieu/revisionPhamVi + ghiEncountered/ghiTaught/thuHoiPhamVi + co pham_vi_hoc MAC DINH TAT), phan loai bang trong BANG_GIU. 18 test T01/T02/T03/T11 xanh tren D1 that. CHUA LAM: noi bo loc vao cac bo chon TU DONG trong ROUTE-MAPPING (game-v2-bank/ke-hoach-ngay/btvn-nang-do) — day la phan con thieu de dat gate P02.",
+      "evidence": [
+        {
+          "path": "server/migration-2309-cnh1-learner-scope.sql",
+          "note": "bang learner_scope"
+        },
+        {
+          "path": "server/src/pham-vi-hoc.ts",
+          "note": "eligibility thuan + adapter D1"
+        },
+        {
+          "path": "tests/cnh-1-0-pham-vi-hoc.test.ts",
+          "note": "T01/T02/T03/T11 tren D1 that"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02-vitest-t01-t11.log",
+          "note": "18 test xanh exit 0"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02-so-sanh-do.log",
+          "note": "0 test moi do"
+        }
+      ]
     },
     {
       "id": "P03",
@@ -775,7 +796,7 @@
       "phase": "P02",
       "level": "code",
       "title": "Phạm vi từng em",
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "evidence": []
     },
     {
@@ -783,7 +804,7 @@
       "phase": "P02",
       "level": "code",
       "title": "Đủ tất cả nền",
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "evidence": []
     },
     {
@@ -791,7 +812,7 @@
       "phase": "P02",
       "level": "code",
       "title": "Kho thiếu nhãn/thu hồi",
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "evidence": []
     },
     {
@@ -855,7 +876,7 @@
       "phase": "P02",
       "level": "code",
       "title": "Bảo vệ bản sao BTVN",
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "evidence": []
     },
     {

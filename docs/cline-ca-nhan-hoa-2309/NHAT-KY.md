@@ -144,3 +144,42 @@ mở lại câu sau khi kho đổi (ảnh chụp làm mới theo bản mới).
    scope/prerequisite/protection vào MỌI đường chọn câu trong ROUTE-MAPPING; test T01–T04, T11–T12, T40.
 2. Trước P11: áp migration, bật cờ theo canary 5% (07 §3), đo p95 và chuẩn bị rollback.
 
+
+## Phiên P02 (phần lõi) — 23/09/2026 (Cline, tiếp)
+
+Gói: **P02 IN_PROGRESS** · HEAD vào phiên `636e34f` · Fingerprint khi chạy test: xem `evidence/p02-so-sanh-do.log`
+
+### Lỗ hổng đã chữa (lõi)
+
+Đặc tả 02 §2 buộc bộ chọn tự động chỉ phát câu khi `approved ∧ mọi skill_ids taught ∧ mọi prerequisite_ids taught ∧ ¬protected`.
+Repo **không có chỗ nào ghi "kỹ năng này đã được DẠY cho em"** (chỉ có năng lực `nam_kt_*` và "đã gặp" suy từ `su_kien_hoc`)
+⇒ không có cách nào loại câu ngoài phạm vi. Đã thêm:
+
+- `server/migration-2309-cnh1-learner-scope.sql`: bảng `learner_scope(sbd, skill_id, state, source, evidence_ref, revision, cap_nhat_luc)`, PK `sbd+skill_id`, chỉ mục theo trạng thái. Thêm bảng thuần.
+- `server/src/pham-vi-hoc.ts`: `eligibleScope` **thuần** đúng công thức §2 (thứ tự cố định duyệt → nhãn → taught → nền → bảo vệ), mã lý do `NEED_TAUGHT_SCOPE`/`THIEU_NHAN`/`CHUA_DUYET`/`DE_BAO_VE`, `locTheoPhamVi`, `tomTatLyDo`; adapter D1 `docPhamVi`/`docPhamViNhieu`/`revisionPhamVi`/`docMotScope`; ghi `ghiEncountered` (import CHỈ `encountered`, không hạ bậc `taught`/`revoked`), `ghiTaught` (TỪ CHỐI nguồn `import` + bắt buộc tham chiếu), `thuHoiPhamVi`; cờ `cau_hinh.pham_vi_hoc` **mặc định TẮT** (đệm isolate 30 giây).
+- Thêm `learner_scope` vào `BANG_GIU` của `reset-toan-app.ts` (thêm bảng là buộc phải quyết).
+
+### Kiểm thử
+
+| Lệnh | Exit | Kết quả | Log |
+|---|---|---|---|
+| `vitest run tests/cnh-1-0-pham-vi-hoc.test.ts` | 0 | **18/18 PASS** (T01/T02/T03/T11, D1 thật) | `p02-vitest-t01-t11.log` |
+| `vitest run tests/reset-toan-app-1909.test.ts tests/cnh-1-0-snapshot-t34.test.ts` | 0 | PASS | — |
+| `vitest run` (toàn bộ 727 file) | 1 | 81 đỏ / 11 167 đạt | `p02-vitest-full.log` |
+| `npm run build` | 0 | build xong | `p02-build.log` |
+| `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 lỗi | — |
+
+**Hồi quy:** `p02-so-sanh-do.log` — **0 test mới đỏ, 0 file mới đỏ** so với nền P00.
+Test của tôi có 1 ca tự tính sai số đếm lý do (Q2 chưa duyệt bị xếp `CHUA_DUYET` đúng theo thứ tự đặc tả); đã sửa **số liệu kỳ vọng của test**, không đụng logic sản phẩm.
+
+### Điều CHƯA làm (phần còn thiếu để đạt gate P02)
+
+**Chưa nối bộ lọc vào các bộ chọn TỰ ĐỘNG** trong `ROUTE-MAPPING.md` (`game-v2-bank.ts`, `ke-hoach-ngay*.ts`, `btvn-nang-do-d1.ts`, `parent-news-nguon-cau.ts`). Vì vậy T01/T02/T03/T11 đang ở **IN_PROGRESS** (đã chứng minh ở cổng quyết định + D1 thật, CHƯA chứng minh "ở mọi kênh tự động"), và P02 **chưa PASS**. Cũng chưa làm T04 (P04), T12/T40 (P05).
+Lý do dừng: gói này cần sửa các mô-đun chọn câu lớn (240–1405 dòng) có đệm nhiều lớp và nhiều test khoá chi phí truy vấn; làm dở sẽ để lại cây mã hỏng — tôi dừng ở điểm sạch thay vì tô xanh.
+
+### Bước tiếp theo chính xác
+
+1. Nối `locTheoPhamVi` vào `game-v2-bank.ts` **sau cờ** (đọc cờ gộp một cột vào truy vấn `phienBanKho` để không thêm truy vấn khi cờ TẮT), ánh xạ `kienThuc`→skill_ids và `reviewed`→approved (ghi rõ đây là ánh xạ tạm, cần thầy xác nhận nhãn kỹ năng).
+2. Nối tương tự vào `ke-hoach-ngay*.ts` cho câu tự động, kèm `revisionPhamVi` so lại trước khi phát (T12).
+3. Chạy lại nhóm test game-v2/kế hoạch ngày; sau đó mới xét PASS P02.
+

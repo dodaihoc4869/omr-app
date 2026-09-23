@@ -71,6 +71,9 @@ export const BANG_GIU: readonly string[] = [
   // SNAPSHOT ĐỀ LÚC GIAO (migration-2309-cnh1-cau-snapshot.sql, CNH-1.0 P01/T34): ảnh chụp câu lúc giao
   // để chấm đúng phiên bản em đã làm. Là trạng thái chấm phía máy chủ; xoá đi chỉ làm câu đang mở bị thu hồi.
   'cau_snapshot',
+  // PHẠM VI HỌC CÁ NHÂN (migration-2309-cnh1-learner-scope.sql, CNH-1.0 P02): kỹ năng nào đã được DẠY cho em.
+  // Là quyền học của em (như hồ sơ mạnh yếu) — reset KHÔNG được xoá, nếu không em mất quyền học đã được thầy mở.
+  'learner_scope',
   // MỌI CA THI đã thi (thầy chốt 21/09 ~01:30: khi reset giữ lại toàn bộ ca thi đã thi): ca, lượt, điểm từng câu, bản đồ sai, phòng chờ, chặn vào, trạng thái, phiếu, kho ca thêm, nhận xét, đề riêng, đồng bộ Sheet, nộp khắc phục, tiến độ theo ca
   'ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'dong_bo', 'nop_khac_phuc', 'tien_do_ca',
   // BỘ NÃO A.I (Code 1, migration-2109-bo-nao.sql): hồ sơ ngày, nhật ký điều chỉnh, bản tin — chỉ số tổng hợp + nhật ký điều chỉnh, GIỮ (Code 3 quyết 21/09 theo đề nghị của Code 1).
