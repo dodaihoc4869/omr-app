@@ -481,15 +481,20 @@ export const TIEN_BO_NGAY = `SELECT e.sbd,
 // --- Lập, lưu ---------------------------------------------------------------------------
 
 const LUU = `INSERT INTO ke_hoach_ngay (khoa, sbd, ngay, phien_ban, seed, ngan_sach_json, viec_json, canh_bao_json, ket_qua, so_cau_da_lam,
-    so_cau_len_bac, so_cau_tut_bac, la_ngay_nghi, so_su_kien, cap_nhat_luc)
+    so_cau_len_bac, so_cau_tut_bac, la_ngay_nghi, so_su_kien, cap_nhat_luc, muc_tieu_json, deferred_count, over_budget_seconds)
   SELECT json_extract(j.value,'$.k'), json_extract(j.value,'$.s'), json_extract(j.value,'$.n'), json_extract(j.value,'$.p'), json_extract(j.value,'$.d'),
          json_extract(j.value,'$.a'), json_extract(j.value,'$.v'), json_extract(j.value,'$.c'), NULL, json_extract(j.value,'$.l'),
-         json_extract(j.value,'$.u'), json_extract(j.value,'$.t'), json_extract(j.value,'$.z'), json_extract(j.value,'$.e'), ?
+         json_extract(j.value,'$.u'), json_extract(j.value,'$.t'), json_extract(j.value,'$.z'), json_extract(j.value,'$.e'), ?,
+         json_extract(j.value,'$.m'), json_extract(j.value,'$.h1'), json_extract(j.value,'$.h2')
     FROM json_each(?) j WHERE 1
   ON CONFLICT(khoa) DO UPDATE SET phien_ban = excluded.phien_ban, seed = excluded.seed, ngan_sach_json = excluded.ngan_sach_json,
     viec_json = excluded.viec_json, canh_bao_json = excluded.canh_bao_json, so_cau_da_lam = excluded.so_cau_da_lam,
     so_cau_len_bac = excluded.so_cau_len_bac, so_cau_tut_bac = excluded.so_cau_tut_bac, la_ngay_nghi = excluded.la_ngay_nghi,
-    so_su_kien = excluded.so_su_kien, cap_nhat_luc = excluded.cap_nhat_luc
+    so_su_kien = excluded.so_su_kien, cap_nhat_luc = excluded.cap_nhat_luc,
+    deferred_count = excluded.deferred_count, over_budget_seconds = excluded.over_budget_seconds,
+    -- MỤC TIÊU CORE ĐÓNG BĂNG (02 §5.2 "chốt mục tiêu đầu buổi", §6 "không tăng target sau khi gần xong"):
+    -- ghi MỘT LẦN cho ngày; các lần lập lại KHÔNG được ghi đè (revision chỉ đổi qua đường boTaskLoi có lý do).
+    muc_tieu_json = CASE WHEN ke_hoach_ngay.muc_tieu_json = '' THEN excluded.muc_tieu_json ELSE ke_hoach_ngay.muc_tieu_json END
   WHERE ke_hoach_ngay.ket_qua IS NULL`
 
 /**
@@ -546,11 +551,25 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
       k: `${sbd}|${homNay}`, s: sbd, n: homNay, p: dungLoi.has(sbd) ? (phienCu.get(sbd) ?? 0) : kh.phienBan, d: kh.seed, a: json(kh.nganSach),
       v: json({ viec: kh.viec, sapToi: kh.sapToi, quaHan: kh.quaHan, tai: kh.tai, tienBo: kh.tienBo, tonCu: kh.tonCu, tonCuTong: kh.tonCuTong }), c: json(kh.canhBao),
       l: kh.tienBo.daLamCau, u: kh.tienBo.lenBac, t: kh.tienBo.tutBac, z: kh.lanNghi ? 1 : 0, e: dungLoi.has(sbd) ? (daLap.get(sbd) ?? -1) : (soSk.get(sbd) ?? 0),
+      m: json(kh.mucTieu), h1: kh.hoan.deferredCount, h2: kh.hoan.overBudgetSeconds,
     })
   }
   if (tuyChon.luu !== false) {
     const lenh = chunk(dong, 25).map((d) => env.DB.prepare(LUU).bind(nowIso, json(d)))
     await tat(async () => { for (const c of chunk(lenh, 25)) await env.DB.batch(c) }, undefined)
+    // ĐỌC LẠI mục tiêu ĐÃ ĐÓNG BĂNG của ngày (ghi lần đầu ⇒ các lần sau trả ĐÚNG bản đã chốt, không nâng target).
+    const daChot = await tat(() => env.DB.prepare(
+      'SELECT sbd, muc_tieu_json, deferred_count, over_budget_seconds FROM ke_hoach_ngay WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))',
+    ).bind(homNay, arr).all<{ sbd: string; muc_tieu_json: string; deferred_count: number; over_budget_seconds: number }>(), trong())
+    for (const x of daChot.results ?? []) {
+      const cur = ra.get(String(x.sbd))
+      if (!cur) continue
+      try {
+        const mt = JSON.parse(String(x.muc_tieu_json ?? '')) as KeHoachNgay['mucTieu']
+        if (mt && typeof mt === 'object') cur.mucTieu = mt
+      } catch { /* dòng cũ/JSON hỏng ⇒ giữ bản vừa tính (không bịa mục tiêu) */ }
+      cur.hoan = { deferredCount: Number(x.deferred_count) || 0, overBudgetSeconds: Number(x.over_budget_seconds) || 0 }
+    }
     const nv = em.flatMap((sbd) => {
       const dang = ra.get(sbd)?.viec.find((v) => v.loai === 'than_thu' && v.nhan === 'bu')?.chiTiet.dang
       return typeof dang === 'string' && dang ? [{ i: `${sbd}|than_thu|${homNay}|${dang}`, s: sbd, d: dang }] : []

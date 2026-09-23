@@ -28,6 +28,7 @@ import {
   TRAN_THAN_THU_MOT_LUOT, TY_LE_ON_TOI_DA, VAN_TOC_MAC_DINH, VAN_TOC_NHANH_DE_TANG, VAN_TOC_SAN, VAN_TOC_TRAN,
 } from './ho-so-cau-hinh'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
+import { dungMucTieuCore, type MucTieuCore } from './muc-tieu-core'
 
 const MOT_NGAY_MS = 86_400_000
 const MOM_PHUT = 120
@@ -173,6 +174,12 @@ export interface KeHoachNgay {
   /** Lô/bài chưa tới nhịp — nói cho em biết bao giờ mở, KHÔNG hiện như việc hôm nay. */
   sapToi: { loai: 'btvn_lo'; ma: string; chiSo: number; moLuc: string }[]
   tai: { cung: number; bu: number; tuyChon: number; nganSach: number; vuot: number }
+  /**
+   * PHẦN VƯỢT TẢI ĐÃ GHI VÀO PLAN (CNH-1.0 P05, 02 §5.2): việc BẮT BUỘC (BTVN…) vượt ngân sách VẪN giữ nguyên
+   * assignment + HẠN GỐC; hai số này để thầy thấy mức vượt. `deferredCount` = số câu chưa xếp được vì ngân sách,
+   * `overBudgetSeconds` = số giây tương ứng (tốc độ đo thật `mauGiay`, thiếu mẫu thì `VAN_TOC_MAC_DINH`).
+   */
+  hoan: { deferredCount: number; overBudgetSeconds: number }
   tienBo: {
     daLamCau: number; lenBac: number; tutBac: number; dat: boolean; toiThieuCau: number; conThieu: number; soCauToiHan: number; treNhip: boolean
     /** Điều 7 (từ 22/09): CHỈ có khi "đạt nhiệm vụ ngày" còn thiếu vì chưa đủ câu ĐÚNG — `soCauDung` = số câu đúng còn thiếu, `chu` = câu chữ tiếng thường cho em (từ `moTaThieuDat` của src/lib/dat-nhiem-vu-ngay.ts). */
@@ -183,6 +190,12 @@ export interface KeHoachNgay {
   /** Cấp lịch sử ngày đạt liên tiếp (ngày nghỉ không đứt) — nơi gọi truyền vào `lichSu`. */
   chuoiDat: number
   lanNghi: boolean
+  /**
+   * MỤC TIÊU CORE ĐÃ CHỐT của ngày (CNH-1.0 P05, 02 §5.2/§6): ĐÚNG MỘT mục tiêu có role + required_task_ids +
+   * n + min_success + policy_version + revision. Nơi gọi LƯU LẠI bản đã chốt đầu buổi; mở lại app KHÔNG tính
+   * lại rồi nâng điều kiện đạt (xem `ke-hoach-ngay-d1.ts` + bảng `ke_hoach_ngay.muc_tieu_json`).
+   */
+  mucTieu: MucTieuCore
   /**
    * Mom CHƯA bắt đầu mà giao từ lâu (ngoài `MOM_CHUA_BAT_DAU_SO_NGAY` ngày) hoặc vượt `MOM_CHUA_BAT_DAU_TOI_DA` bài: "tồn cũ". Đứng riêng như
    * `quaHan`: KHÔNG tính vào `tai.cung`, KHÔNG gây `qua_tai`, KHÔNG tham gia cổng. Mới nhất trước. Em vẫn mở làm được.
@@ -477,11 +490,52 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
   }
   return {
     phienBan: PHIEN_BAN_KE_HOACH, seed, sbd: d.sbd, ngay: d.homNay, nganSach, viec, canhBao, quaHan, sapToi,
+    mucTieu: mucTieuCore(d, viec),
     tai: { cung: taiCung, bu: bu.reduce((t, v) => t + v.soCau, 0), tuyChon: tuyChonCat.reduce((t, v) => t + v.soCau, 0), nganSach: B, vuot },
+    hoan: { deferredCount: vuot, overBudgetSeconds: Math.round(vuot * giayMoiCauUoc(d)) },
     tienBo, chuoiDat: demChuoiDat(d.lichSu), lanNghi: d.homNayLaNgayNghi,
     tonCu: tonCu.map((m) => ({ id: m.id, loai: 'mom' as const, soCau: m.soCau, giaoLuc: m.taoLuc })),
     tonCuTong: { soBai: tonCu.length, soCau: tonCu.reduce((t, m) => t + m.soCau, 0) },
   }
+}
+
+/**
+ * TỐC ĐỘ MỘT CÂU để quy đổi số câu vượt tải thành GIÂY (P05 §5.2 `over_budget_seconds`): trung vị `mauGiay`
+ * ĐÃ LỌC của em (10–900 giây, cần ≥ `SO_MAU_GIAY_TOI_THIEU` mẫu — cùng ngưỡng với bảng giây gốc), kẹp
+ * [`VAN_TOC_SAN`, `VAN_TOC_TRAN`]; chưa đủ mẫu ⇒ `VAN_TOC_MAC_DINH` (không bịa số đo).
+ */
+export function giayMoiCauUoc(d: Pick<DauVaoKeHoach, 'mauGiay'>): number {
+  const hopLe = d.mauGiay.filter((x) => Number.isFinite(x) && x >= 10 && x <= 900).sort((a, b) => a - b)
+  if (hopLe.length < SO_MAU_GIAY_TOI_THIEU) return VAN_TOC_MAC_DINH
+  const giua = Math.floor(hopLe.length / 2)
+  const tm = hopLe.length % 2 ? hopLe[giua]! : (hopLe[giua - 1]! + hopLe[giua]!) / 2
+  return Math.min(VAN_TOC_TRAN, Math.max(VAN_TOC_SAN, tm))
+}
+
+/**
+ * MỤC TIÊU CORE của ngày (CNH-1.0 P05 — 02 §5.2/§6). Lấy từ ĐÚNG dữ liệu kế hoạch đang có:
+ *  · `coChangQuayLai`: ngày học gần nhất TRƯỚC hôm nay cách hôm nay ≥ 3 ngày (gián đoạn) ⇒ role `return`.
+ *  · `coBtvnDenHanDuNguon`: có BTVN tới hạn là việc BẮT BUỘC với đủ nguồn câu cho một chặng ⇒ `homework_slice`.
+ *  · `coRepairDuNganSach`: có dạng YẾU đang mở (`dangYeu`) và có việc `on_lai` trong ngân sách ⇒ `repair`.
+ *  · `coCardDenHan`: có câu tới hạn ⇒ `maintenance`; còn lại `consolidation`.
+ * `requiredTaskIds` = các việc BẮT BUỘC đã xếp (core), `n` = tổng câu của chúng (đơn vị độc lập của kế hoạch
+ * này; bài mẫu/retry/probe chưa có mặt ở tầng kế hoạch nên `daLoai` rỗng — nơi gọi có thể truyền vào sau).
+ */
+function mucTieuCore(d: DauVaoKeHoach, viec: readonly Viec[]): MucTieuCore {
+  const homNayMs = Date.parse(`${d.homNay}T00:00:00+07:00`)
+  const truoc = d.lichSu.filter((x) => x.ketQua !== null).map((x) => Date.parse(`${x.ngay}T00:00:00+07:00`)).filter((t) => Number.isFinite(t) && t < homNayMs)
+  const ganNhat = truoc.length ? Math.max(...truoc) : Number.NaN
+  const coChangQuayLai = Number.isFinite(ganNhat) && (homNayMs - ganNhat) / MOT_NGAY_MS >= 3
+  const batBuoc = viec.filter((v) => v.batBuoc)
+  const coBtvnDenHanDuNguon = batBuoc.some((v) => (v.loai === 'btvn_lo' || v.loai === 'btvn_nop') && v.soCau >= SO_CAU_MOI_LO_TOI_THIEU)
+  const coRepairDuNganSach = batBuoc.some((v) => v.loai === 'on_lai') && d.dang.some((x) => dangYeu(x, d.homNay))
+  const coCardDenHan = d.cauToiHan.length > 0
+  const taskIds = batBuoc.map((v) => v.id)
+  const soDonViDocLap = batBuoc.reduce((t, v) => t + Math.max(0, v.soCau), 0)
+  return dungMucTieuCore({
+    taskIds, coChangQuayLai, coBtvnDenHanDuNguon, coRepairDuNganSach, coCardDenHan, soDonViDocLap,
+    coNhanFamily: false, // KHO THẬT CHƯA GẮN NHÃN FAMILY (P02) — không bịa; nhánh family ghi rõ là chưa áp được.
+  })
 }
 
 /** Ngày `dat` liên tiếp, mới nhất trước. Ngày nghỉ (`null`) bị BỎ QUA, không đứt chuỗi; `mot_phan`/`khong` đứt. */
