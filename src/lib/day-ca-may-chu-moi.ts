@@ -11,6 +11,7 @@
 // vẫn mở bình thường và cả lớp thi trên đường cũ.
 import type { CauHinhMayChu } from './cau-hinh-may-chu'
 import { voiHanCho } from './han-cho'
+import { guiCaBangXhr, laSamsungInternet } from './gui-ca-trinh-duyet'
 
 /** Hạn chờ khi đẩy. Rộng vì gói đề tới vài MB, nhưng vẫn hữu hạn. */
 export const HAN_DAY_CA_GIAY = 45
@@ -409,7 +410,10 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
   // Đường thẳng chắc chắn sống: MỌI lượt khác của app (vào thi, nộp bài, lưu tạm,
   // chấm điểm…) đều gọi thẳng `workers.dev` và chạy tốt trên mạng trường; riêng
   // `/ca/day` bị đẩy qua proxy. Proxy là một chặng thừa, kèm một lớp hạn chờ 50 s.
-  const cacDiaChi = base === directBase ? [directBase] : [directBase, base]
+  // Samsung Internet: đi cùng tên miền app trước, không đợi 45 giây ở đường
+  // khác tên miền rồi mới thử proxy. Máy chủ riêng vẫn giữ nguyên địa chỉ.
+  const dungXhr = laSamsungInternet()
+  const cacDiaChi = base === directBase ? [directBase] : dungXhr ? [base, directBase] : [directBase, base]
   // MỖI ĐỊA CHỈ MỘT HẠN RIÊNG (không chia chung một hạn): một đường TREO tới hạn
   // không được nuốt mất lượt thử của đường kia — đúng lỗi làm nút mở ca đứng im.
   const gui = async (path: string, payload: string, seconds: number) => {
@@ -421,8 +425,14 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
         // fetch() kết thúc khi có HEADER, chưa chắc đã nhận đủ thân phản hồi.
         // Giữ hạn chờ tới khi đọc xong JSON để tránh nút mở ca quay mãi.
         const kq = await voiHanCho((async () => {
-          const res = await fetch(goc + path, { method: 'POST', headers, body: payload, signal: controller.signal })
-          const data = await res.json().catch(() => null) as { ok?: boolean; error?: string; daLuu?: boolean } | null
+          const res = dungXhr
+            ? await guiCaBangXhr(goc + path, payload, controller.signal, seconds * 1000)
+            : await (async () => {
+              const r = await fetch(goc + path, { method: 'POST', headers, body: payload, signal: controller.signal })
+              const data = await r.json().catch(() => null) as { ok?: boolean; error?: string; daLuu?: boolean } | null
+              return { ok: r.ok, status: r.status, data }
+            })()
+          const data = res.data
           // 403 HTML có thể là trang chặn mạng/Cloudflare, không phải kết quả
           // kiểm mật khẩu của Worker. Phải còn lượt thử qua tên miền app.
           if ((res.status === 401 || res.status === 403) && data?.ok === false) throw new Error('AUTH')

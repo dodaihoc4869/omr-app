@@ -1,0 +1,3807 @@
+### 360 dark · ban đầu
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+340vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Đổi 180 EXP lấy 180 vàng
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+340 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 260 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đủ vàng rồi
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+340 vàng
+Mua · 120 vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 dark · sau mua
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+220vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Đổi 180 EXP lấy 180 vàng
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+220 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 380 vàng
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+220 vàng
+Thần thú đang mặc món này
+Bỏ thử món này
+Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 dark · hộp xác nhận đổi
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+220vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Thần thú bớt 180 EXP dự trữ, vẫn đủ 2 ngày ăn. Em nhận 180 vàng, đổi rồi không đổi ngược lại được.
+Để sau
+Đổi 180 EXP
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+220 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 380 vàng
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+220 vàng
+Thần thú đang mặc món này
+Bỏ thử món này
+Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 dark · thiếu vàng KT-07
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+
+Đang hiện 3 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 200 vàng
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+SỬ THI · KHUNG TÊN
+Khung Đổi Màu
+
+Khung kim loại đổi màu lam, tím, vàng theo góc nhìn.
+
+BẬT MÍ HOÁ HỌC
+Lớp oxide mỏng trên titanium làm ánh sáng giao thoa, tạo nhiều màu.
+Giá
+1.800
+vàng
+Vàng của em
+400 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Học đều khoảng 15 ngày nữa là đủ vàng.
+Đổi vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 dark · khoá HQ-08
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+Đang thử
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Nguyên Tử Vàng
+Huyền thoại · Vòng sáng ·
+giá 9.000 vàng
+Cần chuỗi 14 ngày + 5 ấn thạch sáng
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+HUYỀN THOẠI · VÒNG SÁNG
+Vòng Nguyên Tử Vàng
+
+Ba vòng vàng kim xoay chậm quanh thần thú.
+
+BẬT MÍ HOÁ HỌC
+Electron chuyển động rất nhanh quanh hạt nhân, tạo thành đám mây electron.
+Giá
+9.000
+vàng
+Vàng của em
+400 vàng
+Cần có
+Chuỗi 14 ngày + 5 ấn thạch sáng
+Số lượng
+Mùa 1 chỉ có 20 cái
+Chưa mua được — cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+
+Giữ chuỗi thêm 5 ngày. Kiếm thêm 2 ấn thạch sáng ở Đoàn Hộ Tống.
+
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 dark · hộp xác nhận mua HQ-03
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Lửa Vàng
+Đẹp · Vòng sáng ·
+giá 150 vàng
+Đủ vàng rồi
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · VÒNG SÁNG
+Vòng Lửa Vàng
+
+Quầng sáng vàng ấm với năm lưỡi lửa nhỏ lay nhẹ.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối sodium, ngọn lửa chuyển sang màu vàng.
+Giá
+150
+vàng
+Vàng của em
+400 vàng
+Em trả 150 vàng, còn lại 250 vàng. Mua rồi giữ mãi, không trả lại hay bán lại được.
+Để sau
+Mua · 150 vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 light · ban đầu
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+340vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Đổi 180 EXP lấy 180 vàng
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+340 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 260 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đủ vàng rồi
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+340 vàng
+Mua · 120 vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 light · sau mua
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+220vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Đổi 180 EXP lấy 180 vàng
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+220 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 380 vàng
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+220 vàng
+Thần thú đang mặc món này
+Bỏ thử món này
+Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 light · hộp xác nhận đổi
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+220vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Thần thú bớt 180 EXP dự trữ, vẫn đủ 2 ngày ăn. Em nhận 180 vàng, đổi rồi không đổi ngược lại được.
+Để sau
+Đổi 180 EXP
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+220 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 380 vàng
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+220 vàng
+Thần thú đang mặc món này
+Bỏ thử món này
+Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 light · thiếu vàng KT-07
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+
+Đang hiện 3 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 200 vàng
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+SỬ THI · KHUNG TÊN
+Khung Đổi Màu
+
+Khung kim loại đổi màu lam, tím, vàng theo góc nhìn.
+
+BẬT MÍ HOÁ HỌC
+Lớp oxide mỏng trên titanium làm ánh sáng giao thoa, tạo nhiều màu.
+Giá
+1.800
+vàng
+Vàng của em
+400 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Học đều khoảng 15 ngày nữa là đủ vàng.
+Đổi vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 light · khoá HQ-08
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+Đang thử
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Nguyên Tử Vàng
+Huyền thoại · Vòng sáng ·
+giá 9.000 vàng
+Cần chuỗi 14 ngày + 5 ấn thạch sáng
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+HUYỀN THOẠI · VÒNG SÁNG
+Vòng Nguyên Tử Vàng
+
+Ba vòng vàng kim xoay chậm quanh thần thú.
+
+BẬT MÍ HOÁ HỌC
+Electron chuyển động rất nhanh quanh hạt nhân, tạo thành đám mây electron.
+Giá
+9.000
+vàng
+Vàng của em
+400 vàng
+Cần có
+Chuỗi 14 ngày + 5 ấn thạch sáng
+Số lượng
+Mùa 1 chỉ có 20 cái
+Chưa mua được — cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+
+Giữ chuỗi thêm 5 ngày. Kiếm thêm 2 ấn thạch sáng ở Đoàn Hộ Tống.
+
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 360 light · hộp xác nhận mua HQ-03
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Lửa Vàng
+Đẹp · Vòng sáng ·
+giá 150 vàng
+Đủ vàng rồi
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · VÒNG SÁNG
+Vòng Lửa Vàng
+
+Quầng sáng vàng ấm với năm lưỡi lửa nhỏ lay nhẹ.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối sodium, ngọn lửa chuyển sang màu vàng.
+Giá
+150
+vàng
+Vàng của em
+400 vàng
+Em trả 150 vàng, còn lại 250 vàng. Mua rồi giữ mãi, không trả lại hay bán lại được.
+Để sau
+Mua · 150 vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 dark · ban đầu
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+340vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Đổi 180 EXP lấy 180 vàng
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+340 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 260 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đủ vàng rồi
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+340 vàng
+Mua · 120 vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 dark · sau mua
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+220vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Đổi 180 EXP lấy 180 vàng
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+220 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 380 vàng
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+220 vàng
+Thần thú đang mặc món này
+Bỏ thử món này
+Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 dark · hộp xác nhận đổi
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+220vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Thần thú bớt 180 EXP dự trữ, vẫn đủ 2 ngày ăn. Em nhận 180 vàng, đổi rồi không đổi ngược lại được.
+Để sau
+Đổi 180 EXP
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+220 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 380 vàng
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+220 vàng
+Thần thú đang mặc món này
+Bỏ thử món này
+Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 dark · thiếu vàng KT-07
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+
+Đang hiện 3 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 200 vàng
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+SỬ THI · KHUNG TÊN
+Khung Đổi Màu
+
+Khung kim loại đổi màu lam, tím, vàng theo góc nhìn.
+
+BẬT MÍ HOÁ HỌC
+Lớp oxide mỏng trên titanium làm ánh sáng giao thoa, tạo nhiều màu.
+Giá
+1.800
+vàng
+Vàng của em
+400 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Học đều khoảng 15 ngày nữa là đủ vàng.
+Đổi vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 dark · khoá HQ-08
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+Đang thử
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Nguyên Tử Vàng
+Huyền thoại · Vòng sáng ·
+giá 9.000 vàng
+Cần chuỗi 14 ngày + 5 ấn thạch sáng
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+HUYỀN THOẠI · VÒNG SÁNG
+Vòng Nguyên Tử Vàng
+
+Ba vòng vàng kim xoay chậm quanh thần thú.
+
+BẬT MÍ HOÁ HỌC
+Electron chuyển động rất nhanh quanh hạt nhân, tạo thành đám mây electron.
+Giá
+9.000
+vàng
+Vàng của em
+400 vàng
+Cần có
+Chuỗi 14 ngày + 5 ấn thạch sáng
+Số lượng
+Mùa 1 chỉ có 20 cái
+Chưa mua được — cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+
+Giữ chuỗi thêm 5 ngày. Kiếm thêm 2 ấn thạch sáng ở Đoàn Hộ Tống.
+
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 dark · hộp xác nhận mua HQ-03
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Tối
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Lửa Vàng
+Đẹp · Vòng sáng ·
+giá 150 vàng
+Đủ vàng rồi
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · VÒNG SÁNG
+Vòng Lửa Vàng
+
+Quầng sáng vàng ấm với năm lưỡi lửa nhỏ lay nhẹ.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối sodium, ngọn lửa chuyển sang màu vàng.
+Giá
+150
+vàng
+Vàng của em
+400 vàng
+Em trả 150 vàng, còn lại 250 vàng. Mua rồi giữ mãi, không trả lại hay bán lại được.
+Để sau
+Mua · 150 vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 light · ban đầu
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+340vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Đổi 180 EXP lấy 180 vàng
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+340 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 260 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đủ vàng rồi
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+340 vàng
+Mua · 120 vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 light · sau mua
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+220vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Đổi 180 EXP lấy 180 vàng
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+220 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 380 vàng
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+220 vàng
+Thần thú đang mặc món này
+Bỏ thử món này
+Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 light · hộp xác nhận đổi
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+220vàng
+Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+180 EXP thành 180 vàng
+0 EXP
+Đổi được nhiều nhất 420 EXP
+Trước khi đổi
+620 EXP · đủ 3 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Thần thú bớt 180 EXP dự trữ, vẫn đủ 2 ngày ăn. Em nhận 180 vàng, đổi rồi không đổi ngược lại được.
+Để sau
+Đổi 180 EXP
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+Đang thử
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+220 vàng
+Đang thử 3 phụ kiện
+Au
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 380 vàng
+Khung Vàng 999
+Huyền thoại · Khung tên ·
+giá 6.000 vàng
+Cần chuỗi 14 ngày
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · ĐUÔI SÁNG
+Đuôi Lửa Tím
+
+Thần thú chạy tới đâu, đuôi lửa tím kéo theo tới đó.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối potassium, ngọn lửa chuyển sang màu tím.
+Giá
+120
+vàng
+Vàng của em
+220 vàng
+Thần thú đang mặc món này
+Bỏ thử món này
+Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 light · thiếu vàng KT-07
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+
+Đang hiện 3 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Sáng Neon
+Hiếm · Vòng sáng ·
+giá 600 vàng
+Chưa đủ vàng — còn thiếu 200 vàng
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+SỬ THI · KHUNG TÊN
+Khung Đổi Màu
+
+Khung kim loại đổi màu lam, tím, vàng theo góc nhìn.
+
+BẬT MÍ HOÁ HỌC
+Lớp oxide mỏng trên titanium làm ánh sáng giao thoa, tạo nhiều màu.
+Giá
+1.800
+vàng
+Vàng của em
+400 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Học đều khoảng 15 ngày nữa là đủ vàng.
+Đổi vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 light · khoá HQ-08
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+Đang thử
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Nguyên Tử Vàng
+Huyền thoại · Vòng sáng ·
+giá 9.000 vàng
+Cần chuỗi 14 ngày + 5 ấn thạch sáng
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+HUYỀN THOẠI · VÒNG SÁNG
+Vòng Nguyên Tử Vàng
+
+Ba vòng vàng kim xoay chậm quanh thần thú.
+
+BẬT MÍ HOÁ HỌC
+Electron chuyển động rất nhanh quanh hạt nhân, tạo thành đám mây electron.
+Giá
+9.000
+vàng
+Vàng của em
+400 vàng
+Cần có
+Chuỗi 14 ngày + 5 ấn thạch sáng
+Số lượng
+Mùa 1 chỉ có 20 cái
+Chưa mua được — cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+
+Giữ chuỗi thêm 5 ngày. Kiếm thêm 2 ấn thạch sáng ở Đoàn Hộ Tống.
+
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây
+
+### 390 light · hộp xác nhận mua HQ-03
+Mẫu phác · Cửa hàng phụ kiện thần thú
+
+Hai màn: Cửa hàng và Thử đồ · dữ liệu mô phỏng · 21/09/2026
+
+Giao diện: Sáng
+MÀN 1 · CỬA HÀNG
+Cửa hàng
+Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I
+Tủ đồ
+VÀNG CỦA EM
+400vàng
+Ống nghiệm có 440 EXP · Dự trữ đủ 2 ngày ăn
+Đổi vàng
+EXP thừa trong ống nghiệm đổi được thành vàng.
+Em đổi
+0 EXP thành 0 vàng
+0 EXP
+Đổi được nhiều nhất 240 EXP
+Trước khi đổi
+440 EXP · đủ 2 ngày ăn
+Sau khi đổi
+440 EXP · đủ 2 ngày ăn
+
+1 EXP thừa = 1 vàng. Thần thú luôn giữ lại 200 EXP, đủ ăn 1 ngày.
+
+Kéo thanh để chọn số EXP
+Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.
+Tất cả
+Vòng sáng
+Đuôi sáng
+Khung tên
+Trên đầu
+Sắp mở
+Trên lưng
+Sắp mở
+Đắt dần:
+Thường
+Đẹp
+Hiếm
+Sử thi
+Huyền thoại
+THƯỜNG
+Đuôi Bong Bóng
+Chỗ đeo: Đuôi sáng
+Giá 20 vàng
+Đã có
+Bm
+Tên em đặt cho thần thú
+Bé Mây
+THƯỜNG
+Khung Ô Nguyên Tố
+Chỗ đeo: Khung tên
+Giá 50 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Đuôi Lửa Tím
+Chỗ đeo: Đuôi sáng
+Giá 120 vàng
+Đang mặc
+Đang thử
+ĐẸP
+Vòng Lửa Vàng
+Chỗ đeo: Vòng sáng
+Giá 150 vàng
+HIẾM
+Vòng Sáng Neon
+Chỗ đeo: Vòng sáng
+Giá 600 vàng
+Tên em đặt cho thần thú
+Bé Mây
+Đang thử
+SỬ THI
+Khung Đổi Màu
+Chỗ đeo: Khung tên
+Giá 1.800 vàng
+SỬ THI
+Dải Cực Quang
+Chỗ đeo: Vòng sáng
+Giá 2.400 vàng
+Au
+Tên em đặt cho thần thú
+Bé Mây
+HUYỀN THOẠI
+Khung Vàng 999
+Chỗ đeo: Khung tên
+Giá 6.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)
+Chỉ còn 12 cái
+e⁻
+e⁻
+e⁻
+HUYỀN THOẠI
+Đuôi Tia Sét
+Chỗ đeo: Đuôi sáng
+Giá 7.500 vàng
+Cần chuỗi 21 ngày (em đang chuỗi 9 ngày)
+Mùa 1 chỉ có 25 cái
+HUYỀN THOẠI
+Vòng Nguyên Tử Vàng
+Chỗ đeo: Vòng sáng
+Giá 9.000 vàng
+Cần chuỗi 14 ngày (em đang chuỗi 9 ngày) và 5 ấn thạch sáng (em đang có 3 ấn thạch)
+Mùa 1 chỉ có 20 cái
+
+Đang hiện 10 phụ kiện mẫu. Mở đầu có 24 phụ kiện: vòng sáng, đuôi sáng, khung tên.
+
+MÀN 2 · THỬ ĐỒ
+Thử đồ
+Thử thoải mái, không mất vàng
+400 vàng
+Đang thử 3 phụ kiện
+Tên em đặt cho thần thú
+Bé Mây
+Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.
+EM ĐANG THỬ · CHẠM MỘT MÓN ĐỂ XEM KỸ
+Vòng Lửa Vàng
+Đẹp · Vòng sáng ·
+giá 150 vàng
+Đủ vàng rồi
+Khung Đổi Màu
+Sử thi · Khung tên ·
+giá 1.800 vàng
+Chưa đủ vàng — còn thiếu 1.400 vàng
+Đuôi Lửa Tím
+Đẹp · Đuôi sáng ·
+giá 120 vàng
+Đang mặc
+ĐẸP · VÒNG SÁNG
+Vòng Lửa Vàng
+
+Quầng sáng vàng ấm với năm lưỡi lửa nhỏ lay nhẹ.
+
+BẬT MÍ HOÁ HỌC
+Đốt muối sodium, ngọn lửa chuyển sang màu vàng.
+Giá
+150
+vàng
+Vàng của em
+400 vàng
+Em trả 150 vàng, còn lại 250 vàng. Mua rồi giữ mãi, không trả lại hay bán lại được.
+Để sau
+Mua · 150 vàng
+Bỏ thử món này
+
+Bản phác: số vàng thật do máy chủ trả. Phụ kiện chỉ để đẹp, không làm thần thú mạnh hơn.
+aria: Đổi giao diện Sáng hoặc Tối
+aria: Về Đảo thần thú
+aria: Số EXP thừa em muốn đổi thành vàng
+aria: Lọc theo chỗ đeo trên thần thú
+aria: Năm bậc, đắt dần từ Thường tới Huyền thoại
+aria: Thử Đuôi Bong Bóng, bậc Thường, giá 20 vàng
+aria: Thử Khung Ô Nguyên Tố, bậc Thường, giá 50 vàng
+aria: Thử Đuôi Lửa Tím, bậc Đẹp, giá 120 vàng
+aria: Thử Vòng Lửa Vàng, bậc Đẹp, giá 150 vàng
+aria: Thử Vòng Sáng Neon, bậc Hiếm, giá 600 vàng
+aria: Thử Khung Đổi Màu, bậc Sử thi, giá 1.800 vàng
+aria: Thử Dải Cực Quang, bậc Sử thi, giá 2.400 vàng
+aria: Thử Khung Vàng 999, bậc Huyền thoại, giá 6.000 vàng
+aria: Thử Đuôi Tia Sét, bậc Huyền thoại, giá 7.500 vàng
+aria: Thử Vòng Nguyên Tử Vàng, bậc Huyền thoại, giá 9.000 vàng
+aria: Về Cửa hàng
+aria: Vàng của em
+aria: Thần thú của em: Bé Mây

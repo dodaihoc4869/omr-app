@@ -1,0 +1,28 @@
+{
+  "id": "/?vai=hocsinh",
+  "name": "ĐỖ ĐẠI HỌC - Học Sinh",
+  "short_name": "ĐĐH Học Sinh",
+  "description": "Cổng thông tin thi, điểm số và bài tập học sinh — Lớp Hoá Thầy Đỗ Đại Học",
+  "lang": "vi",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "window-controls-overlay"],
+  "orientation": "portrait",
+  "start_url": "./hs",
+  "scope": "./",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "logo-hs-192-v2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "logo-hs-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

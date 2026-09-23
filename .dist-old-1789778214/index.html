@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="vi">
+<script type="module" crossorigin src="/assets/index-Du6cnG6y.js"></script>
+<link rel="modulepreload" crossorigin href="/assets/jsx-runtime-Cx0BB4qO.js">
+<link rel="modulepreload" crossorigin href="/assets/exam-db-z_5vf0fK.js">
+<link rel="modulepreload" crossorigin href="/assets/may-chu-moi-DhF0sXp-.js">
+<link rel="modulepreload" crossorigin href="/assets/dia-chi-may-chu-LO8R8Kn7.js">
+<link rel="modulepreload" crossorigin href="/assets/createLucideIcon-S9kWsfZm.js">
+<link rel="modulepreload" crossorigin href="/assets/react-dom-C9-P71hy.js">
+<link rel="modulepreload" crossorigin href="/assets/arrow-left-D-KsIoHV.js">
+<link rel="modulepreload" crossorigin href="/assets/DesignSystem-CQTCB6pP.js">
+<link rel="modulepreload" crossorigin href="/assets/chevron-right-DVsa92lO.js">
+<link rel="modulepreload" crossorigin href="/assets/circle-check-Du-kJppJ.js">
+<link rel="modulepreload" crossorigin href="/assets/eye-Dd5zu8x1.js">
+<link rel="modulepreload" crossorigin href="/assets/graduation-cap-Bk8hCR4p.js">
+<link rel="modulepreload" crossorigin href="/assets/refresh-cw-D9HHUowk.js">
+<link rel="modulepreload" crossorigin href="/assets/sparkles-BIcF3h1G.js">
+<link rel="modulepreload" crossorigin href="/assets/exam-api-BCMXOCrt.js">
+<link rel="modulepreload" crossorigin href="/assets/loc-cau-rut-DsJ61tOb.js">
+<link rel="modulepreload" crossorigin href="/assets/KhungXemPhieu-Dp80vet0.js">
+<link rel="modulepreload" crossorigin href="/assets/cau-hinh-chua-eWhBmvPS.js">
+<link rel="modulepreload" crossorigin href="/assets/chu-la-pdf-G-SgNRQ3.js">
+<link rel="modulepreload" crossorigin href="/assets/exam-kho-de-import-fWFfGaYZ.js">
+<link rel="modulepreload" crossorigin href="/assets/chem-format-5TOrh_IH.js">
+<link rel="modulepreload" crossorigin href="/assets/chuan-hoa-loi-giai-cyQRzOHL.js">
+<link rel="modulepreload" crossorigin href="/assets/ExperimentDemo-CyT1bQfo.js">
+<link rel="modulepreload" crossorigin href="/assets/KhoiCauSai-9LVcn85n.js">
+<link rel="modulepreload" crossorigin href="/assets/nam-sinh-ca-AL6GUH3-.js">
+<link rel="modulepreload" crossorigin href="/assets/NhomCaThuGon-CJlKSIZw.js">
+<link rel="modulepreload" crossorigin href="/assets/goi-len-bang-B_dF9azu.js">
+<link rel="modulepreload" crossorigin href="/assets/bai-tap-pdf-CZrDbJPA.js">
+<link rel="modulepreload" crossorigin href="/assets/rut-de-chua-B23GK7gZ.js">
+<link rel="modulepreload" crossorigin href="/assets/html-phieu-orjDjTvL.js">
+<link rel="modulepreload" crossorigin href="/assets/thuat-toan-rut-cau-sai-Dt_s7dlh.js">
+<link rel="modulepreload" crossorigin href="/assets/ModalKhacPhucCauSai-CkYfArVp.js">
+<link rel="modulepreload" crossorigin href="/assets/circle-alert-DLazHbMy.js">
+<link rel="modulepreload" crossorigin href="/assets/clock-DYCpE1gv.js">
+<link rel="modulepreload" crossorigin href="/assets/eye-off-TB0xfrbX.js">
+<link rel="modulepreload" crossorigin href="/assets/goi-bao-cao-DzG8hJ4i.js">
+<link rel="modulepreload" crossorigin href="/assets/loader-circle-CBMau3IJ.js">
+<link rel="modulepreload" crossorigin href="/assets/exam-shuffle-DMNNTpIA.js">
+<link rel="modulepreload" crossorigin href="/assets/chi-tiet-cau-EQrgXBtb.js">
+<link rel="modulepreload" crossorigin href="/assets/exam-grade-4BRRzPBu.js">
+<link rel="modulepreload" crossorigin href="/assets/NutPhieuHtml-RQzNr4_M.js">
+<link rel="modulepreload" crossorigin href="/assets/rotate-ccw-DfKqTk69.js">
+<link rel="modulepreload" crossorigin href="/assets/classlist-db-yXR95HqO.js">
+<link rel="modulepreload" crossorigin href="/assets/khoa-phien-D_rllwD7.js">
+<link rel="modulepreload" crossorigin href="/assets/core-8Tbe5AMw.js">
+<link rel="stylesheet" crossorigin href="/assets/index-CUmkYzTT.css">
+
+  <head>
+    <meta charset="UTF-8" />
+
+
+    <!-- CHỌN MANIFEST NGAY LÚC PHÂN TÍCH HTML, TRƯỚC KHI REACT CHẠY.
+      ~
+      Thầy quay video 14/09: em lưu app ra màn hình chính iPhone, mở lên thì
+      nhảy thẳng vào app GIÁO VIÊN.
+      ~
+      Hai nguyên nhân chồng nhau:
+        1. Thẻ manifest trong HTML luôn trỏ `manifest.json` (bản của thầy).
+           Mã JS đổi thẻ sau đó là ĐÃ MUỘN — Safari đọc manifest ngay lúc phân
+           tích HTML, và người dùng bấm "Thêm vào Màn hình chính" thì nó dùng
+           bản đã đọc.
+        2. `start_url` của cả ba bản đều là `./` hoặc một đường dẫn trần. App
+           mở `/` trần thì phải TRA localStorage mới biết vai — mà app đã cài
+           trên iOS có kho lưu RIÊNG, trống trơn. Không biết vai ⇒ rơi về màn
+           quản lý của thầy.
+      ~
+      Sửa cả hai: `start_url` nay mang sẵn `?vai=`, và thẻ manifest được chọn
+      bằng đoạn mã đồng bộ ngay dưới đây, đọc vai từ chính đường dẫn đang mở.
+      Không có JS thì vẫn còn thẻ `<link>` dự phòng ở sau. -->
+    <script>
+      (function () {
+        try {
+          var d = (location.pathname || '') + (location.search || '')
+          var vai = /[?&]vai=hocsinh|(^|\/)(hoc-sinh|hocsinh|hs)\/?($|\?)/.test(d)
+            ? 'hs'
+            : /[?&]vai=phuhuynh|(^|\/)(phu-huynh|phuhuynh|ph)\/?($|\?)/.test(d)
+              ? 'ph'
+              : /[?&]vai=gv|(^|\/)gv\/?($|\?)/.test(d)
+                ? 'gv'
+                : localStorage.getItem('ddh.vaiDaDung') || ''
+          var logoVai = vai === 'hs' ? 'hs' : vai === 'ph' ? 'ph' : 'gv'
+          document.write('<link rel="icon" type="image/png" href="/logo-' + logoVai + '-64-v2.png">')
+          document.write('<link rel="apple-touch-icon" href="/logo-' + logoVai + '-180-v2.png">')
+          var ten = vai === 'hs' ? 'manifest-hs.json' : vai === 'ph' ? 'manifest-ph.json' : 'manifest.json'
+          var ten2 = vai === 'hs' ? 'ĐĐH Học Sinh' : vai === 'ph' ? 'ĐĐH Phụ Huynh' : 'ĐỖ ĐẠI HỌC'
+          document.write('<link rel="manifest" href="/' + ten + '">')
+          document.write('<meta name="apple-mobile-web-app-title" content="' + ten2 + '">')
+        } catch (e) {
+          document.write('<link rel="manifest" href="/manifest.json">')
+        }
+      })()
+    </script>
+    <noscript><link rel="manifest" href="/manifest.json" /></noscript>
+    <!-- iOS tự bo góc biểu tượng, nên file này phải là hình VUÔNG phủ kín,
+      không bo sẵn: trỏ vào icon-192 (đã bo góc) là bị bo hai lần, ra viền xấu. -->
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <!-- Màu thanh trạng thái Android / iOS: đổi thành #ffffff (hoặc #0f172a chế độ tối) để full viền tràn màn hình, không bị dải đen -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>ĐỖ ĐẠI HỌC</title>
+    <!-- Mô tả này KHÔNG để lên Google (xem public/robots.txt — app chặn hết bọ
+      tìm kiếm). Nó ở đây vì trình đọc màn hình và thẻ chia sẻ đọc nó. -->
+    <meta name="description" content="Công cụ nội bộ lớp luyện thi Hoá Thầy Đỗ Đại Học: mở ca kiểm tra, quét phiếu, chấm bài và dựng giáo án chữa." />
+    <!-- Nền khi CSS của app chưa nạp (tránh loé trắng ở nền tối) — cùng giá trị --nen trong tokens.css -->
+    <style>
+      body { margin: 0; background: #f7f8fa; }
+      @media (prefers-color-scheme: dark) { body { background: #0f1419; } }
+    </style>
+    <!-- TƯƠNG THÍCH MÁY IOS CŨ (< iOS 18) & CHỐNG TRẮNG MÀN HÌNH -->
+    <script>
+      (function () {
+        try {
+          if (!Array.prototype.at) {
+            Array.prototype.at = function (n) {
+              n = Math.trunc(n) || 0
+              if (n < 0) n += this.length
+              if (n < 0 || n >= this.length) return undefined
+              return this[n]
+            }
+          }
+          if (!String.prototype.at) {
+            String.prototype.at = function (n) {
+              n = Math.trunc(n) || 0
+              if (n < 0) n += this.length
+              if (n < 0 || n >= this.length) return undefined
+              return this[n]
+            }
+          }
+          if (!Object.hasOwn) {
+            Object.hasOwn = function (obj, prop) {
+              return Object.prototype.hasOwnProperty.call(obj, prop)
+            }
+          }
+          if (typeof crypto !== 'undefined' && !crypto.randomUUID) {
+            crypto.randomUUID = function () {
+              return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, function (c) {
+                return (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
+              })
+            }
+          }
+          if (!Promise.withResolvers) {
+            Promise.withResolvers = function () {
+              var a, b
+              var c = new Promise(function (res, rej) { a = res; b = rej })
+              return { promise: c, resolve: a, reject: b }
+            }
+          }
+          if (typeof window !== 'undefined') {
+            if (!window.requestIdleCallback) {
+              window.requestIdleCallback = function (cb) {
+                var start = Date.now()
+                return setTimeout(function () {
+                  cb({
+                    didTimeout: false,
+                    timeRemaining: function () { return Math.max(0, 50 - (Date.now() - start)) },
+                  })
+                }, 1)
+              }
+            }
+            if (!window.cancelIdleCallback) {
+              window.cancelIdleCallback = function (id) { clearTimeout(id) }
+            }
+          }
+        } catch (e) {}
+
+        // Giữ chẩn đoán khởi động, không xoá cache/bài làm khi máy chỉ tải chậm.
+        function hienLoiKhoiDong(message) {
+          var root = document.getElementById('root')
+          if (!root || (root.childElementCount && !root.querySelector('[data-startup-status]'))) return
+          root.innerHTML = '<section data-startup-status="1" style="max-width:480px;margin:12vh auto;padding:24px;font-family:system-ui,sans-serif;line-height:1.6;color:#1a2332;background:#f7f8fa">' +
+            '<h1 style="font-size:24px">ĐỖ ĐẠI HỌC</h1><p>App chưa mở xong. Em có thể chờ thêm nếu mạng chậm hoặc thử nạp bản mới.</p>' +
+            '<p>Thao tác này không xóa bài làm đã lưu.</p><button id="startup-retry" style="padding:14px 22px;border:0;border-radius:12px;background:#15803d;color:white;font-size:16px">Thử nạp bản mới</button>' +
+            '<details style="margin-top:20px"><summary>Thông tin lỗi để gửi Thầy</summary><pre id="startup-detail" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre></details></section>'
+          document.getElementById('startup-detail').textContent = String(message || 'Chưa nhận được màn hình từ app.').slice(0, 400)
+          document.getElementById('startup-retry').onclick = function () {
+            var u = new URL(location.href)
+            u.searchParams.set('_moi', String(Date.now()))
+            location.replace(u.pathname + u.search + u.hash)
+          }
+        }
+        window.addEventListener('error', function (event) {
+          var detail = event.message || 'Không nạp được mã khởi động.'
+          setTimeout(function () { hienLoiKhoiDong(detail) }, 500)
+        })
+        window.addEventListener('unhandledrejection', function (event) {
+          var reason = event.reason
+          setTimeout(function () { hienLoiKhoiDong(reason && reason.message ? reason.message : 'Không hoàn tất được bước khởi động.') }, 500)
+        })
+        setTimeout(function () { hienLoiKhoiDong('App chưa mở xong sau 30 giây. Kiểm tra kết nối rồi thử nạp bản mới nếu cần.') }, 30000)
+      })()
+    </script>
+    <main id="root"></main>
+
+  </body>
+</html>

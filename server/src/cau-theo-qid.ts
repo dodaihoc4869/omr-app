@@ -18,6 +18,10 @@ import { ghiSnapshot, quyetDinhSnapshot } from './cau-snapshot'
 // trước đây chỉ kế hoạch ngày lọc phạm vi; đường này phục vụ theo qid nên phải qua CÙNG cổng, nếu không thì
 // thử thách/ôn là "fallback" nới phạm vi. Cờ TẮT ⇒ không đổi hành vi.
 import { coQuyen, docPhamViNhieu, eligibleScope, QUYEN_TOAN_CHUONG_TRINH } from './pham-vi-hoc'
+// CNH-1.0 RV07 mục 7 (02 §7.1): ĐƯỜNG ÔN dùng CHÍNH bộ chọn chung — câu xin được phải qua cùng pipeline
+// (trần độ khó theo mức đang luyện → luật lặp/family → §7.2). Cờ TẮT ⇒ không đổi hành vi, không thêm truy vấn.
+import { chonCauChoLuot, familyTuNhan, type CauUngVien } from './bo-chon-that'
+import { ngayVn } from './su-kien-hoc'
 
 export const TOI_DA_QID_MOT_LUOT = 20
 export const DAI_QID_TOI_DA = 120
@@ -137,8 +141,9 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepT
                  THEN 1 ELSE 0 END AS co,
             (SELECT json_group_array(qid) FROM (SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)))) AS da_gap,
             (SELECT gia_tri FROM cau_hinh WHERE khoa = 'cau_snapshot') AS co_snapshot,
-            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'pham_vi_hoc') AS co_pham_vi`,
-  ).bind(sbd, sbd, sbd, sbd, JSON.stringify(xin)).first<{ co: number; da_gap: string | null; co_snapshot: string | null; co_pham_vi: string | null }>()
+            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'pham_vi_hoc') AS co_pham_vi,
+            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngan_sach_luot') AS co_ngan_sach`,
+  ).bind(sbd, sbd, sbd, sbd, JSON.stringify(xin)).first<{ co: number; da_gap: string | null; co_snapshot: string | null; co_pham_vi: string | null; co_ngan_sach: string | null }>()
   // CỜ SNAPSHOT ĐỌC GỘP VÀO CHÍNH TRUY VẤN NÀY (P01/T34): thêm một cột chứ KHÔNG thêm một truy vấn, giữ đúng
   // ngân sách truy vấn mà `tests/cau-theo-qid-1909.test.ts` (mục "chi phí") đang khoá.
   const batSnapshot = String(r?.co_snapshot ?? '').trim() === 'bat'
@@ -201,8 +206,51 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepT
       loc = cau
     }
   }
-  const co = new Set(loc.map((c) => c.qid))
-  return { cau: loc, khongCo: xin.filter((q) => !co.has(q)), snapshotBat: batSnapshot }
+  // BỘ CHỌN CHUNG (RV07 mục 7): cờ `ngan_sach_luot` BẬT ⇒ câu xin còn phải QUA §7.1 như mọi kênh khác.
+  // Lỗi đọc/lỗi chọn ⇒ giữ nguyên (null = không lọc), KHÔNG bao giờ nới luật để lấp chỗ.
+  let loc2 = loc
+  if (loc.length > 0 && String(r?.co_ngan_sach ?? '').trim() === 'bat') {
+    const cho = await locTheoBoChonChung(env, sbd, loc, Date.now())
+    if (cho) loc2 = loc.filter((q) => cho.has(q.qid))
+  }
+  // `khongCo` tính SAU mọi cửa (kể cả bộ chọn) ⇒ máy em biết đúng câu nào KHÔNG nhận được trong lượt này.
+  const co = new Set(loc2.map((c) => c.qid))
+  return { cau: loc2, khongCo: xin.filter((q) => !co.has(q)), snapshotBat: batSnapshot }
+}
+
+/**
+ * §7.1 trên ĐƯỜNG ÔN: trả tập qid CÒN HỢP LỆ theo bộ chọn chung, hoặc `null` khi không kiểm được (giữ nguyên hành vi).
+ * Thứ tự câu trong lời đáp do nơi gọi quyết (đường này phục vụ theo đúng thứ tự xin), hàm này CHỈ lọc.
+ * Không suy nhãn: câu thiếu nhãn kho ⇒ không đưa vào bộ chọn (không đoán family/dạng).
+ */
+async function locTheoBoChonChung(env: Env, sbd: string, ds: PrivateQuestion[], nowMs: number): Promise<Set<string> | null> {
+  try {
+    const uv: CauUngVien[] = ds.map((q) => {
+      const j = q as unknown as { mucDo?: unknown; kienThuc?: unknown; group?: unknown; dang?: unknown; phan?: unknown }
+      const dang = typeof j.dang === 'string' ? j.dang : (j.dang && typeof j.dang === 'object' ? String((j.dang as { ma?: unknown }).ma ?? '') : '')
+      const group = String(j.group ?? '')
+      const phan = j.phan === 'II' || j.phan === 'III' ? j.phan : 'I'
+      return {
+        qid: q.qid, version: String(q.version ?? ''), part: phan,
+        mucDo: typeof j.mucDo === 'string' ? j.mucDo : null,
+        group, dangKey: dang || group,
+        skillIds: Array.isArray(j.kienThuc) ? (j.kienThuc as string[]) : [],
+        familyId: familyTuNhan(q),
+      } satisfies CauUngVien
+    })
+    const qids = uv.map((x) => x.qid)
+    const rr = await env.DB.prepare(
+      `SELECT ma_dang, MAX(moc_on_ke) AS moc FROM nam_kt_cau
+        WHERE sbd = ? AND ma_dang IS NOT NULL AND moc_on_ke IS NOT NULL AND qid IN (SELECT value FROM json_each(?))
+        GROUP BY ma_dang`,
+    ).bind(sbd, JSON.stringify(qids)).all<{ ma_dang: string; moc: string }>()
+    const mastery = (rr.results ?? []).map((x) => ({ key: String(x.ma_dang), due: Date.parse(`${String(x.moc)}T00:00:00+07:00`) })).filter((m) => Number.isFinite(m.due))
+    const kq = await chonCauChoLuot(env, uv, { sbd, ngay: ngayVn(nowMs), nowMs, tranCau: uv.length, mastery })
+    return new Set(kq.chon.map((x) => x.qid))
+  } catch (e) {
+    console.error('[phuc-vu] không chạy được bộ chọn chung (giữ nguyên danh sách câu):', e instanceof Error ? e.message : e)
+    return null
+  }
 }
 
 /** Dọn danh sách qid do máy em gửi: chỉ chữ, bỏ rỗng/trùng/quá dài, giữ thứ tự. */

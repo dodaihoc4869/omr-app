@@ -1,0 +1,1 @@
+var e=[`biet`,`hieu`,`van_dung`];function t(t){let n=e.indexOf(t);return n<0?e.length:n}function n(e){let t=String(e??``).split(`.`);return t.length>=3&&t[0]&&t[1]?`${t[0]}.${t[1]}`:``}function r(e){return/^[A-Z0-9_]+\.[A-Z0-9_]+\.[A-Z0-9_]+$/.test(String(e??``))}export{r as n,n as r,t};

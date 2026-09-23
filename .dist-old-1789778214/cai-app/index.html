@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Cài Đặt App ĐỖ ĐẠI HỌC - Học Sinh & Phụ Huynh</title>
+  <link rel="icon" type="image/png" href="/logo-gv-64-v2.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link id="dynamic-manifest" rel="manifest" href="/manifest-hs.json">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --navy: #1a2332;
+      --navy-light: #243044;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-sub: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --radius: 18px;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 50px;
+    }
+    .header {
+      background: linear-gradient(135deg, var(--navy) 0%, #0f172a 100%);
+      color: white;
+      text-align: center;
+      padding: 32px 16px 24px;
+      border-bottom-left-radius: 28px;
+      border-bottom-right-radius: 28px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.2);
+    }
+    .logo-box {
+      width: 78px;
+      height: 78px;
+      margin: 0 auto 14px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      border: 2px solid rgba(255,255,255,0.25);
+      background: white;
+    }
+    .logo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .header h1 {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .header p {
+      font-size: 13.5px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .container {
+      max-width: 480px;
+      margin: -14px auto 0;
+      padding: 0 16px;
+    }
+
+    /* IN-APP BROWSER ALERT (Zalo / Facebook) */
+    .inapp-alert {
+      display: none;
+      background: #fffbeb;
+      border: 2px solid #f59e0b;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.18);
+    }
+    .inapp-alert-title {
+      color: #b45309;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .inapp-alert-body {
+      font-size: 13px;
+      color: #78350f;
+      line-height: 1.45;
+    }
+    .inapp-pointer {
+      font-weight: bold;
+      color: #d97706;
+      background: #fef3c7;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    /* ROLE SWITCHER TABS */
+    .tabs {
+      display: flex;
+      background: #e2e8f0;
+      border-radius: 16px;
+      padding: 4px;
+      margin-bottom: 16px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+    }
+    .tab-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 11px 8px;
+      border-radius: 12px;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .tab-btn.active {
+      background: white;
+      color: var(--navy);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+
+    /* CARD CONTAINER */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 22px 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .app-preview {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 18px;
+    }
+    .app-preview-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+      overflow: hidden;
+      flex-shrink: 0;
+      background: white;
+    }
+    .app-preview-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .app-preview-info h2 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .app-preview-info p {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-top: 2px;
+    }
+
+    /* ACTION BUTTONS */
+    .btn-main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      padding: 16px 20px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      text-align: center;
+    }
+    .btn-main:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+    }
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      background: #f8fafc;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    /* STEPS GUIDE */
+    .steps-box {
+      margin-top: 18px;
+      padding: 15px;
+      background: #f8fafc;
+      border-radius: 14px;
+      border: 1px dashed #cbd5e1;
+    }
+    .steps-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .step-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.45;
+    }
+    .step-item:last-child {
+      margin-bottom: 0;
+    }
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11.5px;
+      font-weight: bold;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .badge-ios {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+    .badge-android {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    /* MODAL POPUP FOR IOS INSTALL SUCCESS */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.65);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      padding: 26px 22px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      animation: popIn 0.25s ease-out;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-icon {
+      font-size: 44px;
+      margin-bottom: 10px;
+    }
+    .modal-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .modal-desc {
+      font-size: 13.5px;
+      color: #4b5563;
+      text-align: left;
+      line-height: 1.55;
+      background: #f8fafc;
+      padding: 14px 16px;
+      border-radius: 14px;
+      margin-bottom: 18px;
+      border: 1px solid var(--border);
+    }
+    .modal-desc strong {
+      color: #1e3a8a;
+    }
+    .modal-close-btn {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      border: none;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      width: 100%;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .direct-link-box {
+      text-align: center;
+      margin-top: 18px;
+    }
+    .direct-link-box a {
+      color: #475569;
+      font-size: 13.5px;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="logo-box">
+      <img src="/apple-touch-icon.png" alt="Đỗ Đại Học Logo">
+    </div>
+    <h1>CÀI ĐẶT APP RA MÀN HÌNH CHÍNH</h1>
+    <p>Hệ Thống Luyện Thi Hoá Thầy Đỗ Đại Học</p>
+  </div>
+
+  <div class="container">
+
+    <!-- CẢNH BÁO MỞ BẰNG TRÌNH DUYỆT IN-APP (ZALO / FB) -->
+    <div id="inapp-alert" class="inapp-alert">
+      <div class="inapp-alert-title">
+        <span>⚠️</span> Chú ý: Đang mở trong Zalo / Facebook!
+      </div>
+      <div class="inapp-alert-body">
+        Trình duyệt trong Zalo không cho phép cài app ra màn hình chính.<br>
+        👉 Hãy bấm vào biểu tượng <span class="inapp-pointer">⋯</span> hoặc <span class="inapp-pointer">⋮</span> ở góc trên bên phải ➔ chọn <strong>"Mở bằng trình duyệt"</strong> (Safari với iPhone hoặc Chrome với Android) để cài app nhé!
+      </div>
+    </div>
+
+    <!-- TABS CHỌN HỌC SINH HOẶC PHỤ HUYNH -->
+    <div class="tabs">
+      <button id="tab-hs" class="tab-btn active" onclick="switchTab('hs')">
+        🎓 App Học Sinh
+      </button>
+      <button id="tab-ph" class="tab-btn" onclick="switchTab('ph')">
+        👨‍👩‍👧 App Phụ Huynh
+      </button>
+    </div>
+
+    <!-- KHUNG CÀI ĐẶT CHO IOS (IPHONE / IPAD) -->
+    <div id="section-ios" class="card">
+      <span class="badge-ios">🍎 Dành cho iPhone / iPad</span>
+      
+      <div class="app-preview">
+        <div class="app-preview-icon">
+          <img src="/apple-touch-icon.png" alt="App Icon">
+        </div>
+        <div class="app-preview-info">
+          <h2 id="ios-app-title">ĐĐH Học Sinh</h2>
+          <p id="ios-app-desc">Làm bài kiểm tra, xem lời giải và kết quả thi trực tuyến</p>
+        </div>
+      </div>
+
+      <!-- NÚT CÀI PROFILE WEBCLIP -->
+      <a id="btn-ios-install" href="/hs.mobileconfig" class="btn-main" onclick="onIosInstallClick()">
+        <span>📥</span> Cài App Ra Màn Hình Chính
+      </a>
+
+      <!-- HƯỚNG DẪN 3 BƯỚC CÀI IOS -->
+      <div class="steps-box">
+        <div class="steps-title">
+          <span>📋</span> 3 bước hoàn tất cực nhanh (mất 5 giây):
+        </div>
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div>Bấm nút <strong>"Cài App Ra Màn Hình Chính"</strong> ở trên ➔ chọn <strong>"Cho phép"</strong> khi Safari hỏi.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>Mở ứng dụng <strong>Cài đặt (Settings)</strong> của iPhone ➔ Bấm vào dòng <strong>"Đã tải về hồ sơ"</strong> ở ngay dưới tên bạn.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>Bấm <strong>"Cài đặt"</strong> ở góc trên bên phải ➔ Nhập mật khẩu mở máy (nếu có) ➔ Bấm <strong>"Cài đặt"</strong> là hoàn tất!</div>
+        </div>
+      </div>
+
+      <!-- CÁCH 2: SAFARI SHARE SHEET -->
+      <div style="margin-top: 14px; text-align: center;">
+        <button type="button" onclick="toggleIosShareGuide()" style="background:none; border:none; color:#2563eb; font-size:12.5px; font-weight:600; cursor:pointer; text-decoration:underline;">
+          Hoặc thêm bằng nút Chia sẻ Safari (Không cần tải hồ sơ) ▾
+        </button>
+      </div>
+
+      <div id="ios-share-guide" style="display:none; margin-top: 12px;" class="steps-box">
+        <div class="steps-title"><span>💡</span> Cách thêm thủ công qua Safari:</div>
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div>Bấm biểu tượng <strong>Chia sẻ (Share <span style="font-size:14px">⎋</span>)</strong> ở thanh công cụ dưới đáy Safari.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>Cuộn xuống chọn mục <strong>"Thêm vào MH chính"</strong> (Add to Home Screen).</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div>Bấm <strong>"Thêm"</strong> ở góc trên bên phải để hoàn tất!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KHUNG CÀI ĐẶT CHO ANDROID -->
+    <div id="section-android" class="card">
+      <span class="badge-android">🤖 Dành cho Android (Samsung, Xiaomi, Oppo...)</span>
+      
+      <div class="app-preview">
+        <div class="app-preview-icon">
+          <img src="/apple-touch-icon.png" alt="App Icon">
+        </div>
+        <div class="app-preview-info">
+          <h2 id="android-app-title">ĐĐH Học Sinh</h2>
+          <p id="android-app-desc">Làm bài kiểm tra, xem lời giải và kết quả thi trực tuyến</p>
+        </div>
+      </div>
+
+      <!-- NÚT CÀI 1 CHẠM ANDROID -->
+      <button id="btn-android-install" class="btn-main" onclick="onAndroidInstallClick()">
+        <span>📲</span> Cài Đặt App Ra Màn Hình Chính
+      </button>
+
+      <div class="steps-box">
+        <div class="steps-title">
+          <span>💡</span> Hướng dẫn:
+        </div>
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div>Bấm nút <strong>"Cài Đặt App Ra Màn Hình Chính"</strong> ở trên.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div>Khi Chrome hiện bảng hỏi, bấm <strong>"Cài đặt"</strong> (hoặc "Thêm") để hoàn tất!</div>
+        </div>
+        <div class="step-item" id="android-manual-hint" style="margin-top: 8px; font-style: italic; color:#64748b;">
+          * Nếu nút không phản hồi: bấm dấu <strong>⋮</strong> (3 chấm góc trên bên phải Chrome) ➔ chọn <strong>"Cài đặt ứng dụng"</strong> hoặc <strong>"Thêm vào Màn hình chính"</strong>.
+        </div>
+      </div>
+    </div>
+
+    <!-- NÚT MỞ TRỰC TIẾP TRÊN TRÌNH DUYỆT -->
+    <div class="direct-link-box">
+      <a id="link-direct-web" href=" /?vai=hocsinh" target="_blank">🌐 Mở trực tiếp trên web (không cần cài đặt) ➔</a>
+    </div>
+
+  </div>
+
+  <!-- POPUP NHẮC MỞ CÀI ĐẶT SAU KHI TẢI PROFILE TRÊN IOS -->
+  <div id="modal-ios" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-icon">🎉</div>
+      <div class="modal-title">Đã tải về hồ sơ cài đặt!</div>
+      <div class="modal-desc">
+        Quý Phụ huynh / Học sinh chỉ cần làm bước cuối:<br><br>
+        1. Mở ứng dụng <strong>Cài đặt (Settings)</strong> trên iPhone.<br>
+        2. Bấm vào dòng <strong>"Đã tải về hồ sơ"</strong> ngay trên đầu.<br>
+        3. Bấm <strong>"Cài đặt"</strong> ở góc trên bên phải là icon app sẽ hiện ngay ở màn hình chính!
+      </div>
+      <button class="modal-close-btn" onclick="closeModal()">Đã Hiểu</button>
+    </div>
+  </div>
+
+  <script>
+    var currentRole = 'hs';
+    var deferredPrompt = null;
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var isAndroid = /Android/.test(navigator.userAgent);
+    var isInApp = /FBAN|FBAV|Instagram|Line|Zalo|MicroMessenger|TikTok/i.test(navigator.userAgent);
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var vaiParam = urlParams.get('vai');
+    if (vaiParam === 'ph' || vaiParam === 'phuhuynh') {
+      currentRole = 'ph';
+    } else {
+      currentRole = 'hs';
+    }
+
+    if (isInApp) {
+      document.getElementById('inapp-alert').style.display = 'block';
+    }
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      var btn = document.getElementById('btn-android-install');
+      if (btn) {
+        btn.innerHTML = '<span>📲</span> Cài Đặt App Ra Màn Hình Chính (1 Chạm)';
+      }
+    });
+
+    function adjustDeviceUI() {
+      var secIos = document.getElementById('section-ios');
+      var secAndroid = document.getElementById('section-android');
+      
+      if (isIOS) {
+        secIos.style.display = 'block';
+        secAndroid.style.display = 'none';
+      } else if (isAndroid) {
+        secIos.style.display = 'none';
+        secAndroid.style.display = 'block';
+      } else {
+        secIos.style.display = 'block';
+        secAndroid.style.display = 'block';
+      }
+    }
+
+    function switchTab(role) {
+      currentRole = role;
+      document.querySelectorAll('.app-preview-icon img').forEach(function(img) { img.src = '/logo-' + (role === 'hs' ? 'hs' : 'ph') + '-192-v2.png'; });
+      
+      var tabHs = document.getElementById('tab-hs');
+      var tabPh = document.getElementById('tab-ph');
+      var iosTitle = document.getElementById('ios-app-title');
+      var iosDesc = document.getElementById('ios-app-desc');
+      var iosBtn = document.getElementById('btn-ios-install');
+      var androidTitle = document.getElementById('android-app-title');
+      var androidDesc = document.getElementById('android-app-desc');
+      var linkDirect = document.getElementById('link-direct-web');
+      var manifestTag = document.getElementById('dynamic-manifest');
+
+      if (role === 'hs') {
+        tabHs.classList.add('active');
+        tabPh.classList.remove('active');
+        
+        iosTitle.textContent = 'ĐĐH Học Sinh';
+        iosDesc.textContent = 'Làm bài kiểm tra, xem lời giải và kết quả thi trực tuyến';
+        iosBtn.setAttribute('href', '/hs.mobileconfig');
+        
+        androidTitle.textContent = 'ĐĐH Học Sinh';
+        androidDesc.textContent = 'Làm bài kiểm tra, xem lời giải và kết quả thi trực tuyến';
+        
+        linkDirect.setAttribute('href', '/?vai=hocsinh');
+        linkDirect.textContent = '🌐 Mở trực tiếp App Học Sinh trên web ➔';
+        manifestTag.setAttribute('href', '/manifest-hs.json');
+      } else {
+        tabPh.classList.add('active');
+        tabHs.classList.remove('active');
+        
+        iosTitle.textContent = 'ĐĐH Phụ Huynh';
+        iosDesc.textContent = 'Theo dõi kết quả học tập của con và giao đề luyện tập';
+        iosBtn.setAttribute('href', '/ph.mobileconfig');
+        
+        androidTitle.textContent = 'ĐĐH Phụ Huynh';
+        androidDesc.textContent = 'Theo dõi kết quả học tập của con và giao đề luyện tập';
+        
+        linkDirect.setAttribute('href', '/?vai=phuhuynh');
+        linkDirect.textContent = '🌐 Mở trực tiếp App Phụ Huynh trên web ➔';
+        manifestTag.setAttribute('href', '/manifest-ph.json');
+      }
+    }
+
+    function onIosInstallClick() {
+      setTimeout(function() {
+        document.getElementById('modal-ios').classList.add('active');
+      }, 1200);
+    }
+
+    function toggleIosShareGuide() {
+      var g = document.getElementById('ios-share-guide');
+      g.style.display = g.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function closeModal() {
+      document.getElementById('modal-ios').classList.remove('active');
+    }
+
+    function onAndroidInstallClick() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(choiceResult) {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted PWA install');
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        var targetUrl = currentRole === 'ph' ? '/?vai=phuhuynh' : '/?vai=hocsinh';
+        alert('Đang mở trang cài đặt... Bạn vui lòng bấm vào biểu tượng dấu 3 chấm (⋮) ở góc trên bên phải trình duyệt Chrome và chọn "Cài đặt ứng dụng" hoặc "Thêm vào Màn hình chính" nhé!');
+        window.location.href = targetUrl;
+      }
+    }
+
+    switchTab(currentRole);
+    adjustDeviceUI();
+  </script>
+</body>
+</html>

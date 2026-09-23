@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./DAY-TAT-CA.command:*)",
+      "Bash(./DAY-LEN-PAGES.command:*)",
+      "Bash(./DAY-MAY-CHU.command:*)",
+      "Bash(npx -y wrangler@latest:*)",
+      "Bash(npx wrangler:*)",
+      "Bash(mv .git/*.lock*:*)",
+      "Bash(rm .git/*.lock:*)"
+    ]
+  }
+}

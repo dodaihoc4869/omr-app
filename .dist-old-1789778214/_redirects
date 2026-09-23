@@ -1,0 +1,32 @@
+# CLOUDFLARE PAGES — TRẢ index.html CHO MỌI ĐƯỜNG DẪN CỦA APP.
+#
+# App đọc vai và mã ca TỪ ĐƯỜNG DẪN (/hs, /ph, /t/<mã ca>, /d/<mã ca>,
+# /phieu/<mã>). Trên máy đã cài service worker thì chính service worker trả
+# index.html cho mọi đường điều hướng nên không ai thấy vấn đề — nhưng máy CHƯA
+# cài, hoặc vừa xoá bộ đệm, thì Pages đi tìm một tệp có thật tên `/hs` và không
+# thấy: ERR_FAILED / 404.
+#
+# Đúng lỗi thầy gặp 14/09: mở link học sinh trên máy khác thì không vào được,
+# và khung "Xem đề và lời giải" mở ra trang lỗi vì /t/<mã ca> trả 404.
+#
+# GitHub Pages trước đây che lỗi này bằng public/404.html. Pages.dev không có
+# cơ chế ấy, nên phải khai tường minh ở đây.
+#
+# Trang cài đặt app thông minh cho học sinh & phụ huynh
+/cai-app /cai-app/index.html 200
+/cai-dat /cai-app/index.html 200
+/cai-hs /cai-app/index.html?vai=hs 302
+/cai-ph /cai-app/index.html?vai=ph 302
+
+# BA APP, BA ĐƯỜNG — KHÔNG chuyển hướng sang `?vai=`.
+#
+# 14/09 từng có bốn dòng 302 đổi `/hs` thành `/?vai=hocsinh`. Gỡ đi vì nay VAI
+# SỐNG TRONG ĐƯỜNG DẪN (`src/lib/khoa-vai.ts`): app tự viết địa chỉ về `/hs`,
+# nên 302 chỉ tạo thêm một vòng mạng rồi bị viết ngược lại, lại còn nháy màn.
+#
+# Quan trọng hơn: máy đã cài app KHÔNG bao giờ chạm tới tệp này (service worker
+# trả thẳng index.html), nên 302 chỉ đúng với người mở lần đầu — hai đường đi
+# khác nhau cho cùng một link là mầm lỗi. Dòng `/*` ở cuối trả index.html cho
+# `/hs`, `/ph`, `/gv` là đủ và giống nhau cho mọi máy.
+
+/* /index.html 200

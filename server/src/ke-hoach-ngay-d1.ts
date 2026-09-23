@@ -12,6 +12,7 @@ import { gameIdentity } from './game-v2-auth'
 import { dungLaiHoSo } from './ho-so-nam-kt'
 import type { NamKtCau, NamKtDang } from './ho-so-nam-kt'
 // P05 (02 §6): đánh giá ngày theo MỤC TIÊU CORE đã đóng băng.
+import { chonCauChoLuot, familyTuNhan, type CauUngVien } from './bo-chon-that'
 import { danhGiaCore, type KetQuaTaskCore } from './muc-tieu-core'
 import {
   PHIEN_BAN_KE_HOACH, NGAY_LIET_KE_QUA_HAN, NGAY_ON_THI, NHIEM_VU_THAN_THU_MO_TOI_DA, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU,
@@ -64,6 +65,23 @@ function docQid(v: unknown): string[] | undefined {
 export async function docNgayNghi(env: Env): Promise<Set<string>> {
   const r = await tat(() => env.DB.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi'").first<{ gia_tri: string }>(), null)
   return phanTichNgayNghi(String(r?.gia_tri ?? ''))
+}
+
+/**
+ * CẤU HÌNH LIÊN QUAN KẾ HOẠCH, đọc trong MỘT truy vấn (không thêm chi phí D1 cho đường lập kế hoạch):
+ * `ngay_nghi` (ngày nghỉ thầy đặt) + `ngan_sach_luot` (cờ dùng CHUNG ngân sách ngày & bộ chọn §7.1).
+ */
+export async function docCauHinhKeHoach(env: Env): Promise<{ ngayNghi: Set<string>; nganSachChung: boolean }> {
+  const r = await tat(() => env.DB.prepare(
+    "SELECT khoa, gia_tri FROM cau_hinh WHERE khoa IN ('ngay_nghi', 'ngan_sach_luot')",
+  ).all<{ khoa: string; gia_tri: string }>(), trong())
+  let nghi = ''
+  let chung = false
+  for (const x of r.results ?? []) {
+    if (String(x.khoa) === 'ngay_nghi') nghi = String(x.gia_tri ?? '')
+    else if (String(x.khoa) === 'ngan_sach_luot') chung = String(x.gia_tri ?? '').trim() === 'bat'
+  }
+  return { ngayNghi: phanTichNgayNghi(nghi), nganSachChung: chung }
 }
 
 /** Phần thuần của `docNgayNghi`: đọc giá trị `cau_hinh.ngay_nghi` (mảng JSON hoặc chuỗi cách nhau bởi dấu phẩy/chấm phẩy/khoảng trắng) thành tập ngày YYYY-MM-DD. */
@@ -235,7 +253,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const hoSoSan = bo.hoSoSan
   const emCanDocHoSo = hoSoSan ? em.filter((s) => !hoSoSan.has(s)) : em
   const arrCanDoc = json(emCanDocHoSo)
-  const pNghi = chan(docNgayNghi(env))
+  const pCauHinh = chan(docCauHinhKeHoach(env))
   const pKhoiLop = chan(docKhoiVaLopCacEm(env, em).catch(() => ({ khoi: new Map<string, Khoi | null>(), lop: new Map<string, string>() })))
   const pRc = emCanDocHoSo.length === 0 ? Promise.resolve(trong<Record<string, unknown>>()) : chan(tat(() => env.DB.prepare(
     `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai FROM nam_kt_cau
@@ -278,7 +296,8 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
     if (!rm) rm = await tat(() => env.DB.prepare(qm('NULL')).bind(...tamMom).all<Record<string, unknown>>(), trong())
     return rm
   })())
-  const nghi = await pNghi
+  const cauHinh = await pCauHinh
+  const nghi = cauHinh.ngayNghi
 
   const map = new Map<string, DauVaoKeHoach>()
   for (const sbd of em) {
@@ -444,7 +463,67 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
     if (dc.nhip !== 0) c.boNao = { nhip: dc.nhip }
     if (dc.onSom.length > 0) await keoOnSom(env, c, dc.onSom, themNgay(dc.ngay, 1), homNay, hopKhoi, coChiMuc, baoVe)
   }
+  // CNH-1.0 RV07 mục 7 (02 §7.1): SẮP lại hai danh sách TỰ ĐỘNG của kế hoạch bằng CHÍNH bộ chọn chung.
+  // Cờ đọc GỘP trong `docCauHinhKeHoach` (không thêm truy vấn cho đường lập kế hoạch).
+  await sapDanhSachTuDongTheoBoChon(env, map, homNay, now, cauHinh.nganSachChung)
   return map
+}
+
+/**
+ * RV07 mục 7 (02 §7.1): hai danh sách TỰ ĐỘNG của kế hoạch (`cauToiHan`, `cauOnThi`) đi qua CHÍNH bộ chọn chung
+ * (`chonCauChoLuot`) — cùng pipeline với mọi kênh: trần độ khó theo mức đang luyện → luật lặp/family → điểm §7.2.
+ *
+ * KHÔNG đổi luật của kế hoạch: `tapQidPhucVu` đã lọc BẢO VỆ + phục vụ được TRƯỚC đó (giữ nguyên), ngân sách/tổng câu
+ * vẫn do kế hoạch quyết (bộ chọn ở đây chỉ ĐỔI THỨ TỰ và LOẠI câu không hợp lệ ⇒ kế hoạch có thể NGẮN hơn, không dài thêm).
+ * Cờ `cau_hinh.ngan_sach_luot` TẮT (mặc định) ⇒ giữ nguyên hành vi cũ, không truy vấn thêm.
+ */
+async function sapDanhSachTuDongTheoBoChon(env: Env, map: Map<string, DauVaoKeHoach>, homNay: string, now: number, bat: boolean): Promise<void> {
+  if (!bat) return
+  for (const c of map.values()) {
+    const qids = [...new Set([...c.cauToiHan.map((x) => x.qid), ...(c.cauOnThi ?? []).map((x) => x.qid)])]
+    if (qids.length === 0) continue
+    // Nhãn cần cho bộ chọn (nhóm/dạng/mức/kỹ năng/family/version) đọc từ CHÍNH kho đã phục vụ.
+    const nhan = new Map<string, { version: string; group: string; dang: string | null; mucDo: string | null; skillIds: string[]; family: string | null }>()
+    for (let i = 0; i < qids.length; i += 400) {
+      const r = await tat(() => env.DB.prepare(
+        `SELECT q.qid, q.version, q.content_group, q.dang, q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
+           JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+          WHERE COALESCE(d.da_xoa, 0) = 0 AND q.qid IN (SELECT value FROM json_each(?))`,
+      ).bind(json(qids.slice(i, i + 400))).all<{ qid: string; version: string; content_group: string; dang: string | null; json: string }>(), trong())
+      for (const x of r.results ?? []) {
+        if (nhan.has(String(x.qid))) continue
+        let j: { kienThuc?: unknown; mucDo?: unknown } = {}
+        try { j = JSON.parse(String(x.json)) as typeof j } catch { /* dòng hỏng: bỏ */ }
+        nhan.set(String(x.qid), {
+          version: String(x.version ?? ''), group: String(x.content_group ?? ''), dang: x.dang ? String(x.dang) : null,
+          mucDo: typeof j.mucDo === 'string' ? j.mucDo : null,
+          skillIds: Array.isArray(j.kienThuc) ? (j.kienThuc as string[]) : [],
+          family: familyTuNhan(j),
+        })
+      }
+    }
+    const ungVien: CauUngVien[] = []
+    for (const qid of qids) {
+      const n = nhan.get(qid)
+      if (!n) continue // không đọc được nhãn ⇒ không đưa vào bộ chọn (KHÔNG đoán)
+      ungVien.push({ qid, version: n.version, part: 'I', mucDo: n.mucDo, group: n.group, dangKey: n.dang ?? n.group, skillIds: n.skillIds, familyId: n.family })
+    }
+    if (ungVien.length === 0) continue
+    const mastery = c.cauToiHan.map((x) => ({ key: x.maDang ?? (nhan.get(x.qid)?.group ?? x.qid), due: Date.parse(`${x.mocOnKe}T00:00:00+07:00`) })).filter((m) => Number.isFinite(m.due))
+    const kq = await chonCauChoLuot(env, ungVien, { sbd: c.sbd, ngay: homNay, nowMs: now, mastery, tranCau: ungVien.length })
+    // §7.1: GIỮ đúng câu bộ chọn cho phát; câu bị CHẶN CỨNG (độ khó/lặp/family…) bị LOẠI khỏi danh sách.
+    // Bộ chọn loại hết ⇒ danh sách RỖNG (kế hoạch NGẮN hơn, KHÔNG khôi phục câu không hợp lệ để lấp chỗ).
+    const giu = new Set(kq.chon.map((v) => v.qid))
+    if (giu.size === 0) {
+      c.cauToiHan = []
+      if (c.cauOnThi) c.cauOnThi = []
+      continue
+    }
+    const thuTu = new Map(kq.chon.map((v, i) => [v.qid, i]))
+    const theoThuTu = <T extends { qid: string }>(ds: T[]): T[] => ds.filter((x) => giu.has(x.qid)).sort((a, b) => (thuTu.get(a.qid) ?? 1e9) - (thuTu.get(b.qid) ?? 1e9))
+    c.cauToiHan = theoThuTu(c.cauToiHan)
+    if (c.cauOnThi) c.cauOnThi = theoThuTu(c.cauOnThi)
+  }
 }
 
 /**

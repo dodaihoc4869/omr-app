@@ -1,0 +1,5 @@
+{
+  "ghi_chu": "Dia chi may chu cho MAY HOC SINH — app doc file nay khi mo link ngan /t/<ma ca> ma may chua luu dia chi. KHONG phai bi mat (chi la dia chi; lenh cua em von khong doi ma bi mat). Doi dia chi thi sua o day roi push.",
+  "mayChuMoi": "https://omr.ttadodaihoc.workers.dev",
+  "ghi_chu_apps_script": "12/09/2026: da cat han Google. Khoa `scriptUrl` bi go khoi file nay — app khong con duong nao goi Apps Script, va `postJson` chan cung moi dia chi Google du co ai dien lai."
+}

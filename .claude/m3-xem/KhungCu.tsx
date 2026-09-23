@@ -1,0 +1,186 @@
+// XEM PHIẾU / BÁO CÁO NGAY TRONG APP, KHÔNG NHẢY SANG TRANG MỚI.
+//
+// LỖI ĐÃ DÍNH 04-09: bấm "Xem phiếu", app dựng xong rồi mở blob URL ra thẻ
+// mới, và thầy nhận trang trắng của Chrome "Không thể truy cập vào tệp của
+// bạn". App đã CÀI VÀO MÀN HÌNH CHÍNH chạy ở chế độ standalone — cửa sổ riêng,
+// không có thẻ. Ở đó `window.open` một blob URL không mở nổi.
+//
+// Nay nội dung hiện thẳng trong một lớp phủ, nằm trong iframe. Chạy giống nhau
+// ở mọi chỗ: trình duyệt máy tính, app đã cài, điện thoại, và cả khi mất mạng.
+//
+// KHÔNG CÓ THANH CÔNG CỤ (thầy chốt 04-09 tối). Bản trước có một dải "Đóng" ở
+// đầu; mở phiếu bài tập từ trong báo cáo là ra HAI dải chồng nhau, cùng chữ
+// Đóng, chiếm mất hai dòng đầu màn hình. Nay đóng bằng đúng thứ người dùng đã
+// quen:
+//   · vuốt quay lại / nút back của trình duyệt — mở lớp phủ có ĐẨY MỘT MỤC vào
+//     lịch sử, nên back là đóng chứ không thoát app;
+//   · phím Esc trên máy tính;
+//   · nút X nhỏ nổi ở góc, để người chưa biết hai cách trên không bị kẹt.
+//
+// Các nút "In đề" / "In kèm lời giải" / "Tải tệp" nằm trên thanh của CHÍNH
+// phiếu (html-phieu.ts), nên bản xem trong app và tệp HTML tải về giống hệt
+// nhau, và không có nút nào phải đoán nghĩa.
+//
+// TRÊN MÀN RỘNG chỉ phủ NỬA PHẢI, chừa thanh điều hướng bên trái (xem
+// `.lop-xem-phieu` trong index.css). Phiếu co đúng theo bề rộng nửa phải, nên
+// thầy vẫn đổi được màn khác mà không phải đóng phiếu; kéo hẹp/rộng cột trái
+// là phiếu co theo ngay.
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { X } from 'lucide-react'
+
+export interface KhungXemPhieuProps {
+  /** Nội dung dựng sẵn tại máy. Dùng cho phiếu bài tập và đề ca. */
+  html?: string
+  /** Địa chỉ trang có sẵn, vd link báo cáo gửi phụ huynh. Dùng khi cần xem
+   * ĐÚNG thứ người nhận sẽ thấy chứ không phải bản dựng lại. */
+  src?: string
+  /** Nhãn cho trình đọc màn hình. Không hiện thành chữ trên màn. */
+  ten?: string
+  dong: () => void
+}
+
+export default function KhungXemPhieu({ html, src, ten, dong }: KhungXemPhieuProps) {
+  // ĐO THẲNG mép phải của thanh điều hướng, không trông vào CSS.
+  //
+  // Bản trước để CSS lo bằng `body:has(.ben-trai)`. Luật đó đúng và chạy được,
+  // nhưng thầy vẫn gặp một chỗ phủ kín màn — mà đo bằng JS thì không còn chỗ
+  // cho khác biệt: lấy đúng con số trình duyệt đang bố cục, mọi lối vào đều ra
+  // một kết quả. Thanh trái ẩn (màn hẹp, hoặc màn làm bài không dựng thanh) thì
+  // ra 0, tức phủ kín — đúng như mong muốn.
+  const isMayChieu = Boolean(ten && (ten.toLowerCase().includes('máy chiếu') || ten.toLowerCase().includes('chiếu')))
+  const [meTrai, setMeTrai] = useState(0)
+  useLayoutEffect(() => {
+    if (isMayChieu) {
+      setMeTrai(0)
+      return
+    }
+    const thanh = document.querySelector('.ben-trai') as HTMLElement | null
+    const do_ = () => {
+      if (!thanh || getComputedStyle(thanh).display === 'none') return setMeTrai(0)
+      const rect = thanh.getBoundingClientRect()
+      // Thanh menu ở CẠNH PHẢI màn hình (rect.left > 100) -> mép trái phủ từ 0
+      if (rect.left > 100) return setMeTrai(0)
+      setMeTrai(Math.round(rect.right))
+    }
+    do_()
+    window.addEventListener('resize', do_)
+    // Thầy kéo chỉnh bề rộng cột trong lúc đang mở phiếu thì phiếu co theo ngay.
+    const theoDoi = thanh && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(do_) : null
+    if (thanh && theoDoi) theoDoi.observe(thanh)
+    return () => {
+      window.removeEventListener('resize', do_)
+      theoDoi?.disconnect()
+    }
+  }, [isMayChieu])
+
+  // GIỮ `dong` TRONG REF, và hiệu ứng dưới chạy ĐÚNG MỘT LẦN lúc mở.
+  //
+  // LỖI ĐÃ DÍNH (thầy báo 06/09): bấm "Xem báo cáo" lần đầu bị văng ra, bấm
+  // lần hai mới xem được. Nguyên nhân: hiệu ứng lịch sử có phụ thuộc `[dong]`,
+  // mà mọi nơi gọi đều truyền hàm nội tuyến (`dong={() => setXemLink('')}`) —
+  // mỗi lần cha vẽ lại là một hàm MỚI, hiệu ứng bị dọn rồi chạy lại. Lúc dọn
+  // nó gọi `history.back()`; `back()` chạy bất đồng bộ nên sự kiện `popstate`
+  // rơi vào bộ nghe VỪA gắn của lần chạy mới, và bộ nghe đó gọi `dong()` —
+  // đóng luôn lớp phủ vừa mở. `PhieuZaloEm` dựng ảnh phiếu bất đồng bộ nên
+  // gần như chắc chắn vẽ lại một nhịp ngay sau khi mở, đúng cảnh thầy gặp.
+  //
+  // Sửa ở ĐÂY chứ không bắt từng nơi gọi phải nhớ bọc `useCallback`: bảy chỗ
+  // đang gọi, quên một chỗ là lỗi quay lại.
+  const dongRef = useRef(dong)
+  dongRef.current = dong
+
+  useEffect(() => {
+    // ĐẨY MỘT MỤC LỊCH SỬ để vuốt quay lại (và nút back) đóng lớp phủ thay vì
+    // thoát khỏi app.
+    let cuaMinh = true
+    try {
+      history.pushState({ khungXemPhieu: Date.now() }, '')
+    } catch {
+      cuaMinh = false
+    }
+    const quayLai = () => {
+      // back đã tiêu mục của mình rồi, đừng gọi back thêm lần nữa lúc dọn.
+      cuaMinh = false
+      dongRef.current()
+    }
+    const phim = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') dongRef.current()
+    }
+    const tinNhan = (e: MessageEvent) => {
+      if (e.data?.type === 'ddh-btvn-draft' && e.data.ma) {
+        try {
+          const k = `ddh.btvn.draft.${e.data.ma}.${e.data.sbd || ''}`
+          localStorage.setItem(k, JSON.stringify(e.data.lam))
+        } catch {}
+      } else if (e.data?.type === 'ddh-btvn-submitted' && e.data.ma) {
+        try {
+          const k = `ddh.btvn.draft.${e.data.ma}.${e.data.sbd || ''}`
+          localStorage.removeItem(k)
+        } catch {}
+      } else if (e.data?.type === 'ddh-btvn-xong-lo' && e.data.ma && Number.isFinite(e.data.chiSo)) {
+        // EM VỪA XONG LÔ HIỆN TẠI (thay Vòng 1/2 — lich-lo-btvn.ts) — báo máy
+        // chủ để mở lô kế tiếp đúng nhịp. Không chặn UI của phiếu: gọi nền,
+        // hỏng thì thôi, phiếu vẫn dùng được — lần mở tiếp theo (hoặc lần lưu
+        // đáp án tiếp theo) sẽ báo lại, máy chủ vốn đã idempotent (chỉ tăng).
+        void (async () => {
+          try {
+            const [{ layCauHinhChoEmBtvn }, { xongLoBtvn }] = await Promise.all([
+              import('/src/lib/btvn-cho-em'),
+              import('/src/lib/btvn-may-chu-moi'),
+            ])
+            const ch = await layCauHinhChoEmBtvn()
+            await xongLoBtvn(ch, { maBtvn: String(e.data.ma), sbd: String(e.data.sbd || ''), chiSo: Number(e.data.chiSo) })
+          } catch {}
+        })()
+      }
+    }
+    window.addEventListener('popstate', quayLai)
+    window.addEventListener('keydown', phim)
+    window.addEventListener('message', tinNhan)
+
+    // Khoá cuộn trang nền — không thì cuộn trong phiếu tới cuối là trang phía
+    // sau cuộn theo, nhìn như phiếu bị trôi.
+    const cuonCu = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      window.removeEventListener('popstate', quayLai)
+      window.removeEventListener('keydown', phim)
+      window.removeEventListener('message', tinNhan)
+      document.body.style.overflow = cuonCu
+      // Đóng bằng Esc hoặc nút X thì mục lịch sử vẫn còn — gỡ ra, không thì
+      // lần sau bấm back thành một nhịp thừa không làm gì.
+      if (cuaMinh) {
+        try {
+          history.back()
+        } catch {
+          /* trình duyệt chặn thì thôi */
+        }
+      }
+    }
+    // CỐ Ý rỗng: chạy một lần lúc mở, dọn một lần lúc đóng. Xem ghi chú trên.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return createPortal(
+    <div className="lop-xem-phieu" role="dialog" aria-modal="true" aria-label={ten || 'Phiếu bài tập'} style={{ left: isMayChieu ? 0 : meTrai, zIndex: 99999 }}>
+      <iframe
+        title={ten || 'Phiếu bài tập'}
+        {...(html ? { srcDoc: html } : { src })}
+        // TỜ CHIẾU LÊN BẢNG CÓ NÚT TOÀN MÀN HÌNH. Trang trong iframe chỉ gọi
+        // được `requestFullscreen` khi khung cha CHO PHÉP; thiếu dòng này thì
+        // nút bấm không ăn mà cũng không báo lỗi gì.
+        allow="fullscreen"
+        allowFullScreen
+        style={{ display: 'block', width: '100%', height: '100%', border: 0, background: 'var(--p-giay)' }}
+      />
+      {/* Nút thoát NHỎ, nổi góc trên phải. Không phải một dải chiếm hết bề
+          ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo. */}
+      <button className="nut-dong-phieu" type="button" onClick={() => dongRef.current()} aria-label="Đóng" title="Đóng (Esc, hoặc vuốt quay lại)">
+        <X size={18} />
+      </button>
+    </div>,
+    document.body,
+  )
+}

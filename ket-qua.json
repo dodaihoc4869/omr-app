@@ -1,0 +1,124 @@
+[
+ {
+  "w": 360,
+  "sang": "dark",
+  "truoc": {
+   "scrollWidth": 360,
+   "innerWidth": 360,
+   "khongTran": true,
+   "dichNho": [],
+   "phanTuLoiRa": 6,
+   "giaoDien": "toi",
+   "cao": 3818
+  },
+  "tuongTac": {
+   "loiMung": "Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.",
+   "hopXnDoi": "Thần thú bớt 180 EXP dự trữ, vẫn đủ 2 ngày ăn. Em nhận 180 vàng, đổi rồi không đổi ngược lại được.",
+   "loiDoi": "Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.",
+   "batMi": "Bật mí Hoá họcElectron chuyển động rất nhanh quanh hạt nhân, tạo thành đám mây electron.",
+   "sauKhoaKhongTran": true,
+   "vangSauMua": "220",
+   "vangSauDoi": "400",
+   "ongSauDoi": "440",
+   "soTheLocKhung": 3,
+   "baoThieu": "Chưa đủ vàng — còn thiếu 1.400 vàngHọc đều khoảng 15 ngày nữa là đủ vàng.",
+   "sauTuongTacKhongTran": true,
+   "dichNhoSau": [],
+   "giaoDienSauBam": "sang"
+  },
+  "loiConsole": [],
+  "yeuCauMang": []
+ },
+ {
+  "w": 360,
+  "sang": "light",
+  "truoc": {
+   "scrollWidth": 360,
+   "innerWidth": 360,
+   "khongTran": true,
+   "dichNho": [],
+   "phanTuLoiRa": 6,
+   "giaoDien": "sang",
+   "cao": 3818
+  },
+  "tuongTac": {
+   "loiMung": "Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.",
+   "hopXnDoi": "Thần thú bớt 180 EXP dự trữ, vẫn đủ 2 ngày ăn. Em nhận 180 vàng, đổi rồi không đổi ngược lại được.",
+   "loiDoi": "Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.",
+   "batMi": "Bật mí Hoá họcElectron chuyển động rất nhanh quanh hạt nhân, tạo thành đám mây electron.",
+   "sauKhoaKhongTran": true,
+   "vangSauMua": "220",
+   "vangSauDoi": "400",
+   "ongSauDoi": "440",
+   "soTheLocKhung": 3,
+   "baoThieu": "Chưa đủ vàng — còn thiếu 1.400 vàngHọc đều khoảng 15 ngày nữa là đủ vàng.",
+   "sauTuongTacKhongTran": true,
+   "dichNhoSau": [],
+   "giaoDienSauBam": "toi"
+  },
+  "loiConsole": [],
+  "yeuCauMang": []
+ },
+ {
+  "w": 390,
+  "sang": "dark",
+  "truoc": {
+   "scrollWidth": 390,
+   "innerWidth": 390,
+   "khongTran": true,
+   "dichNho": [],
+   "phanTuLoiRa": 0,
+   "giaoDien": "toi",
+   "cao": 3711,
+   "anh": "mau-phac-390-toi.jpg 137 KB (q=40)"
+  },
+  "tuongTac": {
+   "loiMung": "Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.",
+   "hopXnDoi": "Thần thú bớt 180 EXP dự trữ, vẫn đủ 2 ngày ăn. Em nhận 180 vàng, đổi rồi không đổi ngược lại được.",
+   "loiDoi": "Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.",
+   "batMi": "Bật mí Hoá họcElectron chuyển động rất nhanh quanh hạt nhân, tạo thành đám mây electron.",
+   "sauKhoaKhongTran": true,
+   "vangSauMua": "220",
+   "vangSauDoi": "400",
+   "ongSauDoi": "440",
+   "soTheLocKhung": 3,
+   "baoThieu": "Chưa đủ vàng — còn thiếu 1.400 vàngHọc đều khoảng 15 ngày nữa là đủ vàng.",
+   "sauTuongTacKhongTran": true,
+   "dichNhoSau": [],
+   "giaoDienSauBam": "sang"
+  },
+  "loiConsole": [],
+  "yeuCauMang": []
+ },
+ {
+  "w": 390,
+  "sang": "light",
+  "truoc": {
+   "scrollWidth": 390,
+   "innerWidth": 390,
+   "khongTran": true,
+   "dichNho": [],
+   "phanTuLoiRa": 0,
+   "giaoDien": "sang",
+   "cao": 3711,
+   "anh": "mau-phac-390-sang.jpg 136 KB (q=40)"
+  },
+  "tuongTac": {
+   "loiMung": "Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng. Em vẫn đủ vàng cho Vòng Lửa Vàng, giá 150 vàng.",
+   "hopXnDoi": "Thần thú bớt 180 EXP dự trữ, vẫn đủ 2 ngày ăn. Em nhận 180 vàng, đổi rồi không đổi ngược lại được.",
+   "loiDoi": "Đã đổi xong. Em có 400 vàng, thần thú vẫn đủ 2 ngày ăn.",
+   "batMi": "Bật mí Hoá họcElectron chuyển động rất nhanh quanh hạt nhân, tạo thành đám mây electron.",
+   "sauKhoaKhongTran": true,
+   "vangSauMua": "220",
+   "vangSauDoi": "400",
+   "ongSauDoi": "440",
+   "soTheLocKhung": 3,
+   "baoThieu": "Chưa đủ vàng — còn thiếu 1.400 vàngHọc đều khoảng 15 ngày nữa là đủ vàng.",
+   "sauTuongTacKhongTran": true,
+   "dichNhoSau": [],
+   "giaoDienSauBam": "toi"
+  },
+  "loiConsole": [],
+  "yeuCauMang": []
+ }
+]
