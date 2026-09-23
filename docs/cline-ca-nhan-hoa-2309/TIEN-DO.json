@@ -151,23 +151,35 @@
         "P03"
       ],
       "status": "NOT_RUN",
-      "notes": "DANG LAM (lat cat loi da xong, ghi bang chung): (1) TRANG THAI FSRS DU: `LichOnFsrs` them `khoa` (content_group#memory_version), `phienBan` (PHIEN_BAN_FSRS = fsrs6-ts5.4.2-ret0.9-cfg1), `lucGoc`, `cursor`, `docLap`, `soLanHoTro`; state cua phien ban lich khac bi DUNG LAI, khong tron. (2) KHOÁ TRI NHO `khoaTriNho(contentGroup, version)`: hai qid cung content_group + cung version DUNG CHUNG mot card; doi version => memory_version moi => card moi. (3) MOT quan sat DOC LAP/card/ngay; Again thang trong ngay; BO TRONG khong cap nhat card. (4) LAN CO HO TRO (`assisted`/`unknown`) KHONG them Good va KHONG keo moc xa (chi dem + giu cursor), va tren duong ho so thi khong tang dung_lien_tiep/ngay_dung_khac_nhau, khong doi trang thai, khong nang bac dang, KHONG go nhan can_day_lai. Them duong lui khi D1 chua ap migration (thieu cot `assistance`). CON LAI cua P04: (a) MOT module repeat-eligibility theo thu tu uu tien 02 §4.2 (due khong bi cooldown 3/14/30 chan sai, cung content_group hom nay bi chan tru task repair_retry, toi da 6 cau/luot, moi family 1 cau thuong / repair 2 voi >=2 nhiem vu hoac >=300 giay, family vua lam nghi toi thieu 1 ngay VN voi ngoai le co `repeat_reason`); (b) family spacing + repair exception co ly do; (c) noi `khoaTriNho` vao cac kenh that (can content_group tu kho — hien `docSuKienDoc` chua lay content_group nen tren duong that moi card van theo qid). Vi con thieu (a)+(b) nen T41/T04/T07 chua PASS va P04 giu IN_PROGRESS; T17/T29 cua P07.",
+      "notes": "LAT CAT 1 (xong): trang thai FSRS du + khoa tri nho (content_group#memory_version) + ho tro khong day due  + Again thang trong ngay + bo trong khong cap nhat card; duong lui khi D1 chua co cot `assistance`. LAT CAT 2 (xong, 05-P04 muc 3-4): MODULE CHONG LAP `server/src/chong-lap.ts` (ham thuan) theo 02 §4.2:  (1) pham vi/quyen cong bo thang moi thu; (2) task DANG MO ⇒ tra lai CUNG task; (3) cung content_group  HOM NAY ⇒ chan, tru `repair_retry` (retry khong nhan lai EXP cau, khong nang FSRS); (4) DEN HAN duoc on —  module KHONG co cooldown 3/14/30 ngay; chua den han thi khong dung nguyen van de lap so, chi transfer/consolidation;  (5) giai family 1 ngay VN cho consolidation MOI voi 4 ngoai le co `repeat_reason` (DUE_REVIEW/REPAIR/TEACHER_ASSIGNMENT/PROBE);  (6) toi da 6 cau/luot, moi family 1 cau thuong, repair toi da 2 va phai cach >=2 nhiem vu khac HOAC >=300 giay,  cau chua gan family toi da 1/luot; (7) thieu cung thi RUT NGAN (bao `thieu`) chu khong noi bao ve;  (8) adapter doc D1 that `docDaLamHomNay` + `familyLanCuoiTuSuKien` (family tu SU KIEN vi kho that chua gan nhan). CON LAI: NOI module vao bo chon that — 05-P05 muc 3 chu trach nhiem \"pipeline hard filter ... family-spacing va ma ly do thieu\"  (can content_group/family tu kho va task dang mo tu D1). Vi chua noi nen P04 giu IN_PROGRESS; T41/T04 chua PASS; T07/T17/T29 thuoc P05/P07.",
       "evidence": [
         {
           "path": "server/src/lich-on-fsrs.ts",
           "note": "state du + khoa tri nho + ho tro khong day due"
         },
         {
+          "path": "server/src/chong-lap.ts",
+          "note": "module chong lap thuan + adapter doc D1 that"
+        },
+        {
           "path": "server/src/ho-so-nam-kt.ts",
-          "note": "duong ho so: assistance-aware, khong tinh moc tu lam cho lan ho tro"
+          "note": "duong ho so: lan ho tro khong tinh moc tu lam"
         },
         {
           "path": "tests/cnh-1-0-fsrs-t41.test.ts",
-          "note": "T41 lat cat loi: 11 ca"
+          "note": "11 ca (lat cat 1)"
         },
         {
-          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-nhom.log",
-          "note": "nhom lien quan 33 tep: 496 PASS, 1 do CO SAN trong nen"
+          "path": "tests/cnh-1-0-chong-lap-p04.test.ts",
+          "note": "17 ca (lat cat 2)"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-tom-tat-bang-chung.md",
+          "note": "tom tat bang chung lat cat 1"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04b-tom-tat-bang-chung.md",
+          "note": "tom tat bang chung lat cat 2"
         }
       ]
     },
@@ -392,13 +404,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T11:25:00.000Z",
+          "executedAt": "2026-09-23T11:40:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "24ed5c2bfd791a8d35937aeda7813054b825c27f4d99bc07361378463cc36eee",
+          "sourceFingerprint": "c80eb18dafa3387faa4311c8d1204e45a8b6b21b1c29d6a8a4afe13bebe07fea",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-t05-t06.log",
-              "sha256": "ef31f0a81b5d6d325fe69c37e077c6054b36ae5a547341f719e6d9951f8cd4f2"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04c-vitest-t05-t06.log",
+              "sha256": "a3dff7cd0a9b889464dfa8110c5f5585e13fd2b51086b7321bb53b29154c7a22"
             }
           ]
         }
@@ -959,13 +971,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T11:25:00.000Z",
+          "executedAt": "2026-09-23T11:40:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "24ed5c2bfd791a8d35937aeda7813054b825c27f4d99bc07361378463cc36eee",
+          "sourceFingerprint": "c80eb18dafa3387faa4311c8d1204e45a8b6b21b1c29d6a8a4afe13bebe07fea",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-t05-t06.log",
-              "sha256": "ef31f0a81b5d6d325fe69c37e077c6054b36ae5a547341f719e6d9951f8cd4f2"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04c-vitest-t05-t06.log",
+              "sha256": "a3dff7cd0a9b889464dfa8110c5f5585e13fd2b51086b7321bb53b29154c7a22"
             }
           ]
         }
@@ -980,13 +992,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T11:25:00.000Z",
+          "executedAt": "2026-09-23T11:40:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "24ed5c2bfd791a8d35937aeda7813054b825c27f4d99bc07361378463cc36eee",
+          "sourceFingerprint": "c80eb18dafa3387faa4311c8d1204e45a8b6b21b1c29d6a8a4afe13bebe07fea",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-t05-t06.log",
-              "sha256": "ef31f0a81b5d6d325fe69c37e077c6054b36ae5a547341f719e6d9951f8cd4f2"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04c-vitest-t05-t06.log",
+              "sha256": "a3dff7cd0a9b889464dfa8110c5f5585e13fd2b51086b7321bb53b29154c7a22"
             }
           ]
         }
@@ -1214,13 +1226,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-replay-t32.test.ts",
-          "executedAt": "2026-09-23T11:25:00.000Z",
+          "executedAt": "2026-09-23T11:40:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "24ed5c2bfd791a8d35937aeda7813054b825c27f4d99bc07361378463cc36eee",
+          "sourceFingerprint": "c80eb18dafa3387faa4311c8d1204e45a8b6b21b1c29d6a8a4afe13bebe07fea",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-t32.log",
-              "sha256": "378b01d882c50f093f3a5cb7d9e0383c4c2ee9f7e09291aa4fa9257e14225755"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04c-vitest-t32.log",
+              "sha256": "4fd194142d6610ea954a755c0b0c535d90bd14ac0e0c13fae692f282cc29069e"
             }
           ]
         }

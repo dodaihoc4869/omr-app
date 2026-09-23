@@ -286,6 +286,41 @@ Ngay: 23/09/2026 (buoi chieu, tiep P03). `sourceFingerprint`: `24ed5c2bfd791a8d3
 | Lenh | Exit | Ket qua | Log |
 |---|---|---|---|
 | `vitest run tests/cnh-1-0-fsrs-t41.test.ts` | 0 | **11 PASS** | `p04-vitest-t41.log` |
+
+## P04 (LAT CAT 2) — module chong lap theo 02 §4.2 (gói vẫn IN_PROGRESS)
+
+Ngay: 23/09/2026 (tiep lat cat 1). `sourceFingerprint`: `c80eb18dafa3387faa4311c8d1204e45a8b6b21b1c29d6a8a4afe13bebe07fea`.
+
+### Da lam
+
+- **`server/src/chong-lap.ts` (moi, HÀM THUẦN)**: `xetChongLap` + `chonTheoLuatChongLap` + `tomTatLyDoChongLap` theo dung thu tu uu tien 02 §4.2:
+  1. pham vi/quyen cong bo (`ngoaiPhamVi`) THANG moi thu — khong ngoai le nao bo qua duoc;
+  2. nhiem vu DANG MO ⇒ tra lai CUNG task (`dungLaiTask`), khong phat ban khac o man khac;
+  3. cung `content_group` da lam HOM NAY ⇒ chan, TRU `repair_retry` do may chu tao ro — va retry do `khongNhanExpCau` + `khongNangFsrs`;
+  4. card DEN HAN duoc on; chua den han thi khong dung nguyen van de lap so (chi transfer/consolidation) — **module khong co bat ky cooldown 3/14/30 ngay nao (test khoa dieu nay)**;
+  5. giai family 1 ngay VN cho consolidation MOI, voi 4 ngoai le deu ghi `repeat_reason` (DUE_REVIEW · REPAIR · TEACHER_ASSIGNMENT · PROBE);
+  6. toi da 6 cau/luot; moi family 1 cau thuong; repair toi da 2 cau va phai cach >=2 nhiem vu khac HOAC >=300 giay; cau chua gan family toi da 1/luot;
+  7. thieu ung vien ⇒ **RUT NGAN** (bao `thieu`), khong noi long bao ve.
+- **Adapter doc D1 that**: `docDaLamHomNay` (content_group co ket qua hom nay, di chi muc theo ngay) va `familyLanCuoiTuSuKien` (family tu SU KIEN — kho that chua gan nhan family nen khong bia).
+- `tests/cnh-1-0-chong-lap-p04.test.ts`: **17 ca**, gom 2 ca tren D1 that.
+
+### Bang chung
+
+| Lenh | Exit | Ket qua | Log |
+|---|---|---|---|
+| `vitest run tests/cnh-1-0-chong-lap-p04.test.ts` | 0 | **17 PASS** | `p04b-vitest-chong-lap.log` |
+| nhom (cnh-1-0, chong-lap, game, ke-hoach, lich-on, ho-so) | 0 | 26 tep · **370 PASS / 0 do** | `p04b-vitest-nhom.log` |
+| `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 loi | — |
+| chay LAI T05/T06 + T32 (them tep moi lam fingerprint doi) | 0 | 21 + 6 PASS — bang chung P03 cap nhat theo fingerprint cuoi | `p04c-vitest-t05-t06.log`, `p04c-vitest-t32.log` |
+
+### Vi sao GOI VAN IN_PROGRESS (khong to xanh)
+
+- Module CHUA DUOC NOI VAO DUONG HOC NAO: theo `05-P05` muc 3, viec ghep pipeline hard-filter + family-spacing + ma ly do thieu thuoc **P05** (can `content_group`/`family` tu kho va danh sach task dang mo tu D1). API thuan + adapter da san sang nhung chua co noi goi ⇒ chuong trinh chua doi hanh vi that.
+- T41/T04 chua PASS; T07 (P05), T17/T29 (P07).
+- Chua ap migration len D1 that, co chua bat, chua deploy.
+
+Trang thai that sau luot nay: phases PASS **2/12** (P02, P03) · requirements PASS **2/42** (R05, R09) · tests PASS **9/50** (T01 T02 T03 T05 T06 T11 T32 T33 T34) · them T04/T41 IN_PROGRESS.
+
 | nhom lien quan (cnh-1-0, ho-so, lich-on, ke-hoach, exp, dem-ke-hoach, cau-da-lam, game) | 1 | 33 tep · **496 PASS / 1 do CO SAN trong nen P00** (khong hoi quy moi) | `p04-vitest-nhom.log` |
 | `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 loi | — |
 | chay LAI 3 tep P03 (T05/T06/T32 + su kien) | 0 | 21 + 6 + 10 PASS — bang chung P03 cap nhat theo fingerprint MOI | `p04-vitest-t05-t06.log`, `p04-vitest-t32.log`, `p04-vitest-su-kien.log` |
