@@ -16,6 +16,8 @@ import { CAN_DANG_NHAP, chamVaGhiTraLoi } from './on-lai-nop'
 import { SO_CAU_DU_TIN } from './ho-so-cau-hinh'
 import { MANH_MOI_KHIEN } from './exp-cau-hinh'
 import { demChuoiDat } from './ke-hoach-ngay'
+import { docNganSachConLai, nganSachLuotBat } from './ngan-sach-luot'
+import { uocLuongMotCau, xepVuaNganSach } from './uoc-luong-thoi-gian'
 import { themNgay } from './ho-so-nam-kt'
 import { ngayVn } from './su-kien-hoc'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
@@ -341,7 +343,31 @@ export async function hsThuThachHomNay(env: Env, b: Dong, nowMs: number = Date.n
     cau = chuaLam.flatMap((q) => (theoQid.has(q) ? [theoQid.get(q)!] : []))
     if (cau.length === 0 && daNopMap.size === 0) return { ok: true, co: false } // không phục vụ được câu nào ⇒ không thẻ
   }
-  const tenDang = await tenCuaCacDang(env, hang.dang)
+  // CNH-1.0 P06/T09 (02 §5.2): THỬ THÁCH RIÊNG dùng CHUNG ngân sách ngày với Mom/ôn/game. Cờ
+// `cau_hinh.ngan_sach_luot` BẬT ⇒ chỉ phát phần CÒN LẠI của hôm nay (mọi màn chung một tổng tải); cờ TẮT ⇒
+// giữ nguyên hành vi cũ. Hết ngân sách ⇒ trả `co:false` + `lyDo` (app ẩn thẻ, KHÔNG phát thêm câu).
+if (cau.length > 0 && (await nganSachLuotBat(env))) {
+  const ns = await docNganSachConLai(env, sbd, ngay)
+  if (ns && ns.nganSachGiay > 0) {
+    const uoc = cau.map((q) => ({
+      qid: chuoi(q.qid),
+      taskSeconds: uocLuongMotCau(
+        { qid: chuoi(q.qid), part: chuoi(q.phan) as 'I' | 'II' | 'III', difficulty: mucTuChu(chuoi(q.mucDo)) as 0 | 1 | 2 },
+        { mau: ns.mau, nowMs },
+      ).taskSeconds,
+    }))
+    const vua = xepVuaNganSach(uoc, ns.conLaiGiay)
+    const giuQid = new Set(vua.chon.map((x) => x.qid))
+    cau = cau.filter((q) => giuQid.has(chuoi(q.qid)))
+    if (cau.length === 0) {
+      return {
+        ok: true, co: false, lyDo: 'het_ngan_sach_ngay', ngay,
+        message: 'Hôm nay em đã dùng gần hết thời gian học. Em làm nốt việc đang mở hoặc quay lại buổi sau nhé.',
+      }
+    }
+  }
+}
+const tenDang = await tenCuaCacDang(env, hang.dang)
   const thanThu = (await docThanThuSoThat(env, [sbd])).get(sbd)
   const soDaLam = daNopMap.size
   return {

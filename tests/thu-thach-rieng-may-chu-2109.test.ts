@@ -393,3 +393,54 @@ describe('bảng + migration + reset', () => {
     expect((await import('../server/src/su-kien-hoc')).CAC_NGUON).toContain('thu_thach_rieng')
   })
 })
+
+
+// CNH-1.0 P06/T09 (02 §5.2): THỬ THÁCH RIÊNG dùng CHUNG ngân sách ngày với Mom/ôn/game.
+// Cờ `cau_hinh.ngan_sach_luot` TẮT (mặc định) ⇒ hành vi cũ; BẬT ⇒ thẻ chỉ phát phần CÒN LẠI của hôm nay,
+// hết ngân sách thì ẨN thẻ (`co:false` + `lyDo`) chứ KHÔNG phát thêm câu.
+describe('P06/T09 — thử thách dùng chung ngân sách ngày', () => {
+  const batNganSach = (d: D1That) =>
+    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('ngan_sach_luot','bat','x') ON CONFLICT(khoa) DO UPDATE SET gia_tri='bat'").run()
+  const themKeHoach = (d: D1That, phutNgay: number) => {
+    const ngay = ngayVn(new Date())
+    d.sql.prepare("INSERT INTO ke_hoach_ngay(khoa,sbd,ngay,phien_ban,seed,ngan_sach_json,viec_json,canh_bao_json,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?)")
+      .run(`S1|${ngay}`, 'S1', ngay, 2, 1, JSON.stringify({ phutNgay }), '[]', '[]', 'x')
+  }
+  const themGiayDaDung = (d: D1That, giay: number) => {
+    const ngay = ngayVn(new Date())
+    d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,giay,luc,ngay_vn) VALUES(?,?,?,?,?,?,?,?,?,?)')
+      .run(`k-${giay}`, 'S1', 'DEX-I-H1', 'game', 'SS', 1, 1, giay, `${ngay}T03:00:00.000Z`, ngay)
+  }
+
+  it('cờ TẮT (mặc định): hành vi cũ nguyên vẹn — thẻ vẫn trả đủ 6 câu đã chốt', async () => {
+    const d = truong()
+    const r = await thu(d)
+    expect(r.co).toBe(true)
+    expect((r.cau as unknown[]).length).toBe(6)
+  })
+
+  it('cờ BẬT + đã dùng 500/600 giây ⇒ ẨN thẻ, KHÔNG phát thêm câu (không nhét cho đủ)', async () => {
+    const { xoaDemNganSachLuot } = await import('../server/src/ngan-sach-luot')
+    const d = truong()
+    themKeHoach(d, 10)
+    themGiayDaDung(d, 500)
+    batNganSach(d)
+    xoaDemNganSachLuot()
+    const r = await thu(d)
+    expect(r.co).toBe(false)
+    expect(r.lyDo).toBe('het_ngan_sach_ngay')
+    expect(r.cau).toBeUndefined()
+  })
+
+  it('cờ BẬT + còn đủ ngân sách ⇒ phát phần VỪA (không rỗng, không quá 6) và ghi rõ `thieu`', async () => {
+    const { xoaDemNganSachLuot } = await import('../server/src/ngan-sach-luot')
+    const d = truong()
+    themKeHoach(d, 6) // 360 giây ⇒ 2 câu Phần I mức Hiểu (~135 giây/câu) vừa
+    batNganSach(d)
+    xoaDemNganSachLuot()
+    const r = await thu(d)
+    expect(r.co).toBe(true)
+    expect((r.cau as unknown[]).length).toBeGreaterThan(0)
+    expect((r.cau as unknown[]).length).toBeLessThanOrEqual(6)
+  })
+})

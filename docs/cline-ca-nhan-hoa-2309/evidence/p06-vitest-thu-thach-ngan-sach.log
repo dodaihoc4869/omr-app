@@ -1,0 +1,16 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/Volumes/SSD NGOÀI/omr-app[39m
+
+[90mstderr[2m | tests/thu-thach-rieng-may-chu-2109.test.ts[2m > [22m[2m/hs/thu-thach-hom-nay — điều kiện có thẻ[2m > [22m[2mem KHÔNG có thử thách (chưa áp / chưa có điều chỉnh / đã huỷ / ngày khác / cờ tắt / sai khuôn) ⇒ {ok:true, co:false} và không dòng nào được ghi
+[22m[39m[thu-thach] chốt câu lỗi (thẻ ẩn): no such table: thu_thach_rieng
+
+[90mstderr[2m | tests/thu-thach-rieng-may-chu-2109.test.ts[2m > [22m[2m/hs/thu-thach-hom-nay — chọn câu[2m > [22m[2mđề THI ĐANG BẢO VỆ: câu thuộc đề đang thi không bao giờ được chọn; không kiểm được đề bảo vệ ⇒ ĐÓNG CỬA (không thẻ)
+[22m[39m[thu-thach] chốt câu lỗi (thẻ ẩn): Nguồn câu hỏi chưa sẵn sàng.
+
+ [32m✓[39m tests/thu-thach-rieng-may-chu-2109.test.ts [2m([22m[2m28 tests[22m[2m)[22m[33m 690[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m28 passed[39m[22m[90m (28)[39m
+[2m   Start at [22m 21:57:09
+[2m   Duration [22m 1.43s[2m (transform 570ms, setup 0ms, import 682ms, tests 690ms, environment 0ms)[22m
+
