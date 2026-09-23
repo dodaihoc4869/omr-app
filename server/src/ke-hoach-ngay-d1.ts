@@ -533,7 +533,8 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
   const [tongHop, rk] = await Promise.all([
     (async () => { try { return await docTongHop(env, arr, homNay, tuLucHomNay(await docMocHienThi(env), now), ngay30, new Date(now).toISOString()) } catch { return null } })(),
     tat(() => env.DB.prepare(
-      `SELECT k.sbd, k.so_su_kien, k.phien_ban FROM ke_hoach_ngay k WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHERE z.sbd = k.sbd)`,
+      `SELECT k.sbd, k.ngay, k.so_su_kien, k.phien_ban, k.muc_tieu_json, k.deferred_count, k.over_budget_seconds FROM ke_hoach_ngay k
+        WHERE k.sbd IN (SELECT value FROM json_each(?)) AND k.ngay = (SELECT MAX(z.ngay) FROM ke_hoach_ngay z WHERE z.sbd = k.sbd)`,
     ).bind(arr).all<Record<string, unknown>>(), trong()),
   ])
   const soSk = new Map(em.map((s) => [s, tongHop?.get(s)?.soSuKien ?? 0]))
@@ -559,11 +560,10 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
   if (tuyChon.luu !== false) {
     const lenh = chunk(dong, 25).map((d) => env.DB.prepare(LUU).bind(nowIso, json(d)))
     await tat(async () => { for (const c of chunk(lenh, 25)) await env.DB.batch(c) }, undefined)
-    // ĐỌC LẠI mục tiêu ĐÃ ĐÓNG BĂNG của ngày (ghi lần đầu ⇒ các lần sau trả ĐÚNG bản đã chốt, không nâng target).
-    const daChot = await tat(() => env.DB.prepare(
-      'SELECT sbd, muc_tieu_json, deferred_count, over_budget_seconds FROM ke_hoach_ngay WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))',
-    ).bind(homNay, arr).all<{ sbd: string; muc_tieu_json: string; deferred_count: number; over_budget_seconds: number }>(), trong())
-    for (const x of daChot.results ?? []) {
+    // ĐỌC LẠI mục tiêu ĐÃ ĐÓNG BĂNG: KHÔNG thêm truy vấn — dùng chính dòng `rk` đã đọc ở trên (ngày mới nhất;
+    // nếu đó là HÔM NAY thì ngày hôm nay đã có mục tiêu chốt trước đó ⇒ trả ĐÚNG bản đã chốt, không nâng target).
+    for (const x of rk.results ?? []) {
+      if (String(x.ngay) !== homNay) continue
       const cur = ra.get(String(x.sbd))
       if (!cur) continue
       try {
