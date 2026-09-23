@@ -5,8 +5,9 @@
 // server/src/cau-theo-qid.ts (`khongBiBaoVe`) để hai chỗ không lệch nhau.
 import { describe, expect, it } from 'vitest'
 import {
-  docMotScope, docPhamVi, docPhamViNhieu, eligibleScope, ghiEncountered, ghiTaught, locTheoPhamVi,
-  phamViBat, revisionPhamVi, thuHoiPhamVi, tomTatLyDo, xoaDemPhamVi,
+  baoThieuNhan, capQuyen, choPhepToanChuongTrinh, coQuyen, docMotScope, docPhamVi, docPhamViNhieu,
+  eligibleScope, ghiEncountered, ghiTaught, locTheoPhamVi, phamViBat, quyenMayChuBat, revisionPhamVi,
+  thuHoiPhamVi, thuHoiQuyen, tomTatLyDo, xoaDemPhamVi, xoaDemQuyen, QUYEN_TOAN_CHUONG_TRINH,
   type CauXetDuyet, type NgoaiLeGiaoBai, type TrangThaiScope,
 } from '../server/src/pham-vi-hoc'
 import { khongBiBaoVe } from '../server/src/cau-theo-qid'
@@ -297,6 +298,52 @@ describe('T01 — END-TO-END qua KÊNH GAME: `readScope` thật (hàm route game
     expect(qidTrongPool(await readScope(d.env, 'S1'))).toContain('DE1-I-1')
     await thuHoiPhamVi(d.env, 'S1', 'SK1', 'thu hồi', MOC)
     expect(qidTrongPool(await readScope(d.env, 'S1'))).not.toContain('DE1-I-1')
+  })
+})
+
+
+describe('P02 mục 3+4 — quyền do MÁY CHỦ xác nhận + báo kho thiếu nhãn (D1 thật)', () => {
+  it('checkbox tự khai KHÔNG cấp quyền: khai của máy khách bị bỏ qua hoàn toàn', () => {
+    expect(choPhepToanChuongTrinh(false, true)).toBe(false)
+    expect(choPhepToanChuongTrinh(false, { daHocXong: true })).toBe(false)
+    expect(choPhepToanChuongTrinh(false, 'da hoc xong')).toBe(false)
+    expect(choPhepToanChuongTrinh(true, undefined)).toBe(true)
+  })
+
+  it('cấp/thu hồi quyền trên D1 thật; nguồn lạ và thiếu bằng chứng bị TỪ CHỐI', async () => {
+    const d = taoD1That()
+    expect(await coQuyen(d.env, 'S1', QUYEN_TOAN_CHUONG_TRINH)).toBe(false)
+    await expect(capQuyen(d.env, 'S1', QUYEN_TOAN_CHUONG_TRINH, 'khach_khai', 'x', MOC)).rejects.toThrow(/không được cấp/)
+    await expect(capQuyen(d.env, 'S1', QUYEN_TOAN_CHUONG_TRINH, 'thay', '', MOC)).rejects.toThrow(/bằng chứng/)
+    await capQuyen(d.env, 'S1', QUYEN_TOAN_CHUONG_TRINH, 'thay', 'GV-1', MOC)
+    expect(await coQuyen(d.env, 'S1', QUYEN_TOAN_CHUONG_TRINH)).toBe(true)
+    expect(await coQuyen(d.env, 'S2', QUYEN_TOAN_CHUONG_TRINH)).toBe(false)   // không rò quyền sang em khác
+    await thuHoiQuyen(d.env, 'S1', QUYEN_TOAN_CHUONG_TRINH)
+    expect(await coQuyen(d.env, 'S1', QUYEN_TOAN_CHUONG_TRINH)).toBe(false)
+  })
+
+  it('cờ `quyen_toan_chuong_trinh` MẶC ĐỊNH TẮT (giữ cổng cũ hai lớp: khối + khai của em)', async () => {
+    const d = taoD1That()
+    xoaDemQuyen()
+    expect(await quyenMayChuBat(d.env)).toBe(false)
+    d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('quyen_toan_chuong_trinh','bat','x')").run()
+    xoaDemQuyen()
+    expect(await quyenMayChuBat(d.env)).toBe(true)
+  })
+
+  it('baoThieuNhan: đếm đúng lý do + LIỆT KÊ kỹ năng thiếu để thầy xác nhận (không tạo nhãn giả)', async () => {
+    const d = taoD1That()
+    await ghiTaught(d.env, 'A', 'SK1', 'thay', 'ev-1', MOC)
+    const kq = await baoThieuNhan(d.env, 'A', [
+      q('Q1', ['SK1']),
+      q('Q2', ['SK2']),
+      q('Q3', []),
+      q('Q4', ['SK1'], [], { qualityStatus: 'pending' }),
+    ])
+    expect(kq.tong).toBe(4)
+    expect(kq.lyDo).toEqual({ NEED_TAUGHT_SCOPE: 1, THIEU_NHAN: 1, CHUA_DUYET: 1, DE_BAO_VE: 0 })
+    expect(kq.kyNangThieu).toEqual(['SK2'])
+    expect(kq.cauThieuNhan).toEqual(['Q3'])
   })
 })
 

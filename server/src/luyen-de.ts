@@ -9,6 +9,8 @@ import { rutDeChuan2026, SO_CAU_CHUAN_2026, laBoDe12, MA_TRAN_HOA_2026 } from '.
 import { normalizeNumericAnswer } from '../../src/engine/score'
 import { laCauTuLuan } from './cam-tu-luan'
 import { docKhoiEm } from './game-v2-bank'
+// QUYỀN DO MÁY CHỦ XÁC NHẬN (CNH-1.0 P02 mục 3): cờ TẮT ⇒ giữ nguyên cổng cũ; cờ BẬT ⇒ máy khách khai vô hiệu.
+import { QUYEN_TOAN_CHUONG_TRINH, choPhepToanChuongTrinh, coQuyen, quyenMayChuBat } from './pham-vi-hoc'
 
 type Row = { id:string;sbd:string;created_at:number;deadline:number;status:string;bank_key:string;answers:string;result:string|null }
 const read = async(env:Env,key:string):Promise<TeacherExamSource[]> => {
@@ -41,7 +43,13 @@ export async function luyenDe(env:Env, action:string,b:Record<string,unknown>):P
   }
   let row:Row|null=null
   if(action==='start') {
-    if(b.daHocXong!==true)throw new Error('Mục này chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.')
+    // CỔNG CŨ (giữ nguyên khi cờ TẮT): em tự khai đã học xong. CỔNG MỚI (cờ `quyen_toan_chuong_trinh` BẬT):
+    // quyền phải do MÁY CHỦ cấp — `b.daHocXong` do máy em gửi KHÔNG còn giá trị (đặc tả 02 §2).
+    const doiQuyenMayChu=await quyenMayChuBat(env)
+    if(doiQuyenMayChu){
+      const co=await coQuyen(env,sbd,QUYEN_TOAN_CHUONG_TRINH)
+      if(!choPhepToanChuongTrinh(co,b.daHocXong))throw new Error('Mục này cần quyền do thầy mở cho em. Em hỏi thầy nhé.')
+    }else if(b.daHocXong!==true)throw new Error('Mục này chỉ dành cho học sinh đã học xong toàn bộ chương trình Hóa THPT.')
     // LUẬT KHỐI (Boss 21/09): Bộ đề là đề khối 12; cờ `daHocXong` do MÁY EM tự gửi nên máy chủ tự kiểm khối — em khối 10/11 không mở được. Không rõ khối ⇒ giữ cổng cũ.
     const khoiEm=await docKhoiEm(env,sbd);if(khoiEm!==null&&khoiEm<12)throw new Error('Mục này chỉ dành cho học sinh khối 12.')
     row=await env.DB.prepare("SELECT * FROM luyen_de_2026 WHERE sbd=? AND status='active'").bind(sbd).first<Row>()

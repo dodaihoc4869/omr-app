@@ -211,3 +211,9 @@ Da noi 3/3 kenh tu dong: game-v2-bank, parent-news-nguon-cau, ke-hoach-ngay-d1.
 ### P02 - T01/T11 PASS voi phep chung minh END-TO-END
 
 Them 4 ca test chay readScope THAT (ham route game goi) tren D1 that: co TAT thi cau vao pool; co BAT + chua taught thi cau ROI KHOI pool kem ma ly do NEED_TAUGHT_SCOPE; co BAT + da taught thi cau vao binh thuong; thu hoi quyen thi cau roi pool ngay luot sau. 28/28 test xanh. Log p02e-vitest-end2end.log.
+
+### P02 XONG (PASS) - them quyen may chu + bao thieu nhan
+
+- Bang quyen_hoc_sinh (migration-2309-cnh1-quyen-hoc-sinh.sql) + choPhepToanChuongTrinh/coQuyen/capQuyen/thuHoiQuyen/quyenMayChuBat + baoThieuNhan.
+- luyen-de.ts: cong luyen de toan chuong trinh doi QUYEN MAY CHU khi co quyen_toan_chuong_trinh BAT; cu TAT thi giu cong cu (khuyen nghi: daHocXong do may em khai KHONG con gia tri khi BAT).
+- Bang chung: 32/32 test pham vi xanh tren D1 that (them 4 ca quyen + bao thieu nhan). Log p02f-vitest-quyen.log.

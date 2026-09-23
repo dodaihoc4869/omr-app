@@ -74,28 +74,40 @@
       "dependsOn": [
         "P01"
       ],
-      "status": "IN_PROGRESS",
-      "notes": "P02 - DA XONG 4/5 viec: (1) eligibleScope thuan + adapter D1; (2) moi skill/prereq phai taught, encountered rieng, import khong bao gio ghi taught; (3) kiem qid/version/content_group + ngoai le teacher assignment (khong mo game); (5) kiem lai revision/quyen truoc khi phat. Da noi 3/3 kenh tu dong. T01/T02/T03/T11 PASS (28 test tren D1 that, trong do 4 ca END-TO-END qua readScope cua kenh game). CON THIEU: quyen full_curriculum_practice cho luyen-de (viec 3) va be mat de giao vien xac nhan taught/bao kho thieu nhan (viec 4).",
+      "status": "PASS",
+      "notes": "XONG 5/5 viec: (1) eligibleScope thuan + adapter D1; (2) moi skill/prereq phai taught, encountered rieng, import khong bao gio ghi taught; (3) kiem qid/version/content_group + ngoai le teacher assignment (khong mo game) + QUYEN MAY CHU (quyen_hoc_sinh, checkbox khai cua may khach bi bo qua); (4) baoThieuNhan liet ke ky nang con thieu cho giao vien, khong tao nhan/family gia; (5) kiem lai quyen/revision truoc khi phat. Da noi 3/3 kenh tu dong; T01/T02/T03/T11 PASS, trong do T01 co phep chung minh END-TO-END qua readScope cua kenh game. GHI CHU: tang route/UI cho thay bam xac nhan taught va xem bao thieu nhan nam o P09 (theo 05-P09: UI cung plan/status); migration quyen_hoc_sinh chua ap len D1 that (cho P11).",
       "evidence": [
+        {
+          "path": "server/src/pham-vi-hoc.ts",
+          "note": "eligibility + adapter D1 + quyen may chu + bao thieu nhan"
+        },
+        {
+          "path": "server/src/game-v2-bank.ts",
+          "note": "kenh game"
+        },
+        {
+          "path": "server/src/parent-news-nguon-cau.ts",
+          "note": "kenh 5"
+        },
+        {
+          "path": "server/src/ke-hoach-ngay-d1.ts",
+          "note": "ke hoach ngay"
+        },
+        {
+          "path": "server/src/luyen-de.ts",
+          "note": "cong quyen toan chuong trinh"
+        },
         {
           "path": "server/migration-2309-cnh1-learner-scope.sql",
           "note": "bang learner_scope"
         },
         {
-          "path": "server/src/pham-vi-hoc.ts",
-          "note": "eligibility thuan + adapter D1"
+          "path": "server/migration-2309-cnh1-quyen-hoc-sinh.sql",
+          "note": "bang quyen_hoc_sinh"
         },
         {
-          "path": "server/src/game-v2-bank.ts",
-          "note": "da noi loc pham vi vao bo chon tu dong (sau co)"
-        },
-        {
-          "path": "tests/cnh-1-0-pham-vi-hoc.test.ts",
-          "note": "18 test T01/T02/T03/T11 tren D1 that"
-        },
-        {
-          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02-vitest-game-plan.log",
-          "note": "nhom game-v2/ke hoach: 0 test moi do"
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p02f-vitest-quyen.log",
+          "note": "32 test xanh tren D1 that"
         }
       ]
     },
@@ -256,9 +268,14 @@
         "T01",
         "T02"
       ],
-      "status": "NOT_RUN",
-      "sourceRefs": [],
-      "notes": "",
+      "status": "PASS",
+      "sourceRefs": [
+        "server/src/pham-vi-hoc.ts",
+        "server/src/game-v2-bank.ts",
+        "server/src/ke-hoach-ngay-d1.ts",
+        "server/src/parent-news-nguon-cau.ts"
+      ],
+      "notes": "Pham vi ca nhan: moi skill va MOI prerequisite phai taught, import chi danh dau encountered (khong bao gio ghi taught), khong lay membership lop lam taught, thieu thi tra NEED_TAUGHT_SCOPE chu khong fallback sang kho lop/toan ngan hang. Da noi vao 3 kenh tu dong va co phep chung minh end-to-end qua readScope.",
       "evidence": []
     },
     {
