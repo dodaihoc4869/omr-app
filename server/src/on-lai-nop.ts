@@ -29,6 +29,7 @@ import { TIEN_BO_NGAY } from './ke-hoach-ngay-d1'
 import { docCauDaLamHomNay } from './cau-da-lam'
 import { DAI_QID_TOI_DA, donQid, layCauChoEm, TOI_DA_QID_MOT_LUOT } from './cau-theo-qid'
 import { ghiSuKien, ngayVn, phanTuQid, type SuKien } from './su-kien-hoc'
+import { chamTheoSnapshot, docSnapshotNhieu, quyetDinhSnapshot, type CauSnapshot } from './cau-snapshot'
 
 export const CAN_DANG_NHAP = 'Em đăng nhập lại để nộp câu ôn.'
 const GIAY_MIN = 5
@@ -137,15 +138,48 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
   const chuaLam = nhanHet.filter((x) => !nhan.includes(x)).map((x) => x.qid)
   if (nhan.length === 0) return { ok: true, ketQua: [], khongCo: [...r.khongCo, ...ngoaiTap], chuaLam, tienBo: null, exp: 0 }
 
+  // SNAPSHOT ĐỀ LÚC GIAO (CNH-1.0 P01/T34). Cờ `cau_snapshot` TẮT (mặc định) ⇒ đoạn này không chạy,
+  // đường cũ nguyên vẹn. Cờ BẬT ⇒ đáp án dùng để chấm PHẢI lấy từ ảnh chụp lúc giao, không đọc kho sống.
+  // Cờ đọc GỘP trong truy vấn 1 của `layCauChoEm` (không thêm truy vấn nào cho lượt nộp).
+  const batSnapshot = r.snapshotBat
+  const snapTheoQid = new Map<string, CauSnapshot>()
+  const thuHoi: { qid: string; lyDo: string }[] = []
+  let nhanSau = nhan
+  if (batSnapshot) {
+    let daCo: Map<string, CauSnapshot>
+    try {
+      daCo = await docSnapshotNhieu(env, sbd, nhan.map((x) => x.qid))
+    } catch (e) {
+      // Không đọc được bản ghi lúc giao ⇒ KHÔNG chấm. Thà chậm còn hơn chấm đề cũ bằng đáp án mới.
+      console.error('[on-lai] đọc snapshot lỗi, không chấm:', e instanceof Error ? e.message : e)
+      return { ok: false, error: 'Chưa kiểm tra được bản ghi lúc giao câu. Em nộp lại nhé.' }
+    }
+    for (const x of nhan) {
+      const q = cauTheoQid.get(x.qid)!
+      const qd = quyetDinhSnapshot(
+        daCo.get(x.qid) ?? null,
+        { qid: q.qid, version: q.version, group: q.group, phan: q.phan, correct: q.correct },
+        sbd, Date.now(), 'nop',
+      )
+      if (qd.kieu === 'thu-hoi') { thuHoi.push({ qid: x.qid, lyDo: qd.lyDo }); continue }
+      snapTheoQid.set(x.qid, qd.snapshot)
+    }
+    nhanSau = nhan.filter((x) => snapTheoQid.has(x.qid))
+    if (nhanSau.length === 0) return { ok: true, ketQua: [], khongCo: [...r.khongCo, ...ngoaiTap], chuaLam, thuHoi, tienBo: null, exp: 0 }
+  }
+  /** Chấm MỘT câu: có snapshot thì dùng đáp án trong ảnh chụp, không có thì luật cũ (kho sống). */
+  const cham = (x: BaiLam, q: { correct: string; phan: string }) =>
+    snapTheoQid.has(x.qid) ? chamTheoSnapshot(snapTheoQid.get(x.qid)!, x.dapAn) : chamMotCau(x, q)
+
   // CHẤM rồi GHI SỔ. Chưa ghi được thì không có đáp án nào đi ra.
   const now = Date.now()
   const luc = new Date(now).toISOString()
   const maNguon = opt.maNguon(now)
-  const suKien: SuKien[] = nhan.map((x) => {
+  const suKien: SuKien[] = nhanSau.map((x) => {
     const q = cauTheoQid.get(x.qid)!
     return {
       nguon: opt.nguon, maNguon, sbd, qid: x.qid, lan: 1, luc, giay: x.giay, maDang: q.dang, chuyenDe: '', mucDo: q.mucDo ?? '',
-      ketQua: chamMotCau(x, q) ? 1 : 0, // đã qua `daTraLoi` nên không còn bỏ trống
+      ketQua: cham(x, q) ? 1 : 0, // đã qua `daTraLoi` nên không còn bỏ trống
     }
   })
   const ghi = await ghiSuKien(env, suKien)
@@ -154,9 +188,9 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
   // Kết quả LẦN ĐẦU đã lưu (nộp lại cùng câu cùng ngày không đổi được).
   const daLuu = await env.DB.prepare(
     `SELECT qid, ket_qua FROM su_kien_hoc WHERE sbd = ? AND nguon = ? AND ma_nguon = ? AND lan = 1 AND qid IN (SELECT value FROM json_each(?))`,
-  ).bind(sbd, opt.nguon, maNguon, JSON.stringify(nhan.map((x) => x.qid))).all<{ qid: string; ket_qua: number | null }>()
+  ).bind(sbd, opt.nguon, maNguon, JSON.stringify(nhanSau.map((x) => x.qid))).all<{ qid: string; ket_qua: number | null }>()
   const ketQuaLuu = new Map((daLuu.results ?? []).map((x) => [String(x.qid), x.ket_qua === null ? null : Number(x.ket_qua)]))
-  if (nhan.some((x) => !ketQuaLuu.has(x.qid))) return { ok: false, error: 'Chưa ghi được bài làm. Em nộp lại nhé.' }
+  if (nhanSau.some((x) => !ketQuaLuu.has(x.qid))) return { ok: false, error: 'Chưa ghi được bài làm. Em nộp lại nhé.' }
 
   // HẠ TẢI D1 (Boss 22/09, tốc độ tối đa): hồ sơ mạnh/yếu KHÔNG nằm trong hợp đồng phản hồi (tienBo dưới đây đọc thẳng
   // su_kien_hoc, không đọc nam_kt_cau/nam_kt_dang) ⇒ hoãn qua ctx.waitUntil. Tự lành nếu chạy chưa xong: `/hs/ke-hoach-ngay`
@@ -175,19 +209,19 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
 
   // EXP: EXP HỌC TẬP MỚI (exp-d1.ts) khi đã bật cho em này; chưa bật thì luật cũ (2 EXP/câu, khoá `practice:<qid>`).
   const moi = await capNhatExp(env, sbd, now)
-  const exp = moi.bat ? tongExpCuaKetQua(moi) : await ganExp(env, sbd, nhan.filter((x) => ketQuaLuu.get(x.qid) === 1).map((x) => x.qid), luc)
+  const exp = moi.bat ? tongExpCuaKetQua(moi) : await ganExp(env, sbd, nhanSau.filter((x) => ketQuaLuu.get(x.qid) === 1).map((x) => x.qid), luc)
 
   // ĐÁP ÁN Ở ĐÂY MỚI ĐI RA — sau khi đã ghi sổ và đọc lại kết quả lần đầu.
-  const ketQua = nhan.map((x) => {
+  const ketQua = nhanSau.map((x) => {
     const q = cauTheoQid.get(x.qid)!
     const k = ketQuaLuu.get(x.qid)
     return {
       qid: x.qid,
       dung: k === null || k === undefined ? null : k === 1,
-      dapAnDung: q.correct,
+      dapAnDung: snapTheoQid.get(x.qid)?.dapAn ?? q.correct,
       loiGiai: q.solution ?? null,
       anhLoiGiai: (q.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai'),
     }
   })
-  return { ok: true, ketQua, khongCo: [...r.khongCo, ...ngoaiTap], chuaLam, tienBo, exp, ...(moi.bat ? { expNhan: expNhanCuaKetQua(moi), manhNhan: manhNhanCuaKetQua(moi) } : {}) }
+  return { ok: true, ketQua, khongCo: [...r.khongCo, ...ngoaiTap], chuaLam, tienBo, exp, ...(thuHoi.length ? { thuHoi } : {}), ...(moi.bat ? { expNhan: expNhanCuaKetQua(moi), manhNhan: manhNhanCuaKetQua(moi) } : {}) }
 }

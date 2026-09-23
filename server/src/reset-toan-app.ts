@@ -68,6 +68,9 @@ export const BANG_GIU: readonly string[] = [
   'ph_truy_cap',
   // SỔ + HỒ SƠ MẠNH YẾU của học sinh (thầy chốt 21/09 00:08: giữ lại toàn bộ hồ sơ mạnh yếu đã kiểm tra)
   'su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'tien_do_hs', 'qid_da_lam',
+  // SNAPSHOT ĐỀ LÚC GIAO (migration-2309-cnh1-cau-snapshot.sql, CNH-1.0 P01/T34): ảnh chụp câu lúc giao
+  // để chấm đúng phiên bản em đã làm. Là trạng thái chấm phía máy chủ; xoá đi chỉ làm câu đang mở bị thu hồi.
+  'cau_snapshot',
   // MỌI CA THI đã thi (thầy chốt 21/09 ~01:30: khi reset giữ lại toàn bộ ca thi đã thi): ca, lượt, điểm từng câu, bản đồ sai, phòng chờ, chặn vào, trạng thái, phiếu, kho ca thêm, nhận xét, đề riêng, đồng bộ Sheet, nộp khắc phục, tiến độ theo ca
   'ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'dong_bo', 'nop_khac_phuc', 'tien_do_ca',
   // BỘ NÃO A.I (Code 1, migration-2109-bo-nao.sql): hồ sơ ngày, nhật ký điều chỉnh, bản tin — chỉ số tổng hợp + nhật ký điều chỉnh, GIỮ (Code 3 quyết 21/09 theo đề nghị của Code 1).

@@ -41,19 +41,31 @@
         "P00"
       ],
       "status": "IN_PROGRESS",
-      "notes": "Đã làm: module policy có version (src/lib/cham-so-policy.ts) + runtime validation + bốn policy v1; lớp mỏng src/lib/cham-so.ts dùng lại; T33 PASS. CHƯA LÀM: snapshot đề lúc giao / đổi đáp án giữa lúc làm (T34) và correction (R04, chờ P07/P08) → chưa PASS R02/R03.",
+      "notes": "Đã làm: module policy có version + runtime validation + bốn policy v1 (T33 PASS); SNAPSHOT ĐỀ LÚC GIAO: bảng cau_snapshot + chấm theo ảnh chụp / thu hồi có lý do, nối vào /hs/cau-theo-qid và /hs/on-lai/nop sau cờ `cau_snapshot` MẶC ĐỊNH TẮT (T34 PASS). CHƯA LÀM: correction/bù một lần (R04, chờ P07/P08) ⇒ chưa PASS R02 (còn T40/T50) và R03 (còn phần core raw=4 của T19 ở P07). Cờ chưa bật ngoài production vì chưa áp migration + chưa có phép phát hành.",
       "evidence": [
         {
           "path": "src/lib/cham-so-policy.ts",
           "note": "policy có version + 4 policy v1"
         },
         {
-          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01-vitest-full.log",
-          "note": "full suite sau thay đổi"
+          "path": "server/src/cau-snapshot.ts",
+          "note": "snapshot đề lúc giao + D1 helpers"
         },
         {
-          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01-so-sanh-do.log",
-          "note": "0 test mới đỏ"
+          "path": "server/migration-2309-cnh1-cau-snapshot.sql",
+          "note": "bảng cau_snapshot (thêm bảng thuần)"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01b-vitest-full.log",
+          "note": "full suite, 0 hồi quy mới"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01b-so-sanh-do.log",
+          "note": "so sánh test đỏ với nền P00"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01b-tom-tat-bang-chung.md",
+          "note": "tom tat bang chung: lenh, exit code, fingerprint, sha256 tung log"
         }
       ]
     },
@@ -177,9 +189,10 @@
       ],
       "status": "IN_PROGRESS",
       "sourceRefs": [
-        "src/lib/cham-so-policy.ts"
+        "src/lib/cham-so-policy.ts",
+        "server/src/cau-snapshot.ts"
       ],
-      "notes": "Hợp đồng chấm có POLICY_VERSION + parseChamInput kiểm kiểu lúc chạy (ChamInputError). T34/T40/T50 chưa xong.",
+      "notes": "Hợp đồng chấm có POLICY_VERSION + parseChamInput kiểm kiểu lúc chạy; snapshot lưu version chính sách và THU HỒI khi chính sách đổi (T34 PASS). Còn T40 (kho nhỏ/mục tiêu không tăng — P05) và T50 (một bộ hằng số, cờ 365/FSRS-7 — P10) chưa chạy nên R02 chưa PASS.",
       "evidence": []
     },
     {
@@ -1022,13 +1035,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-cham-so-policy.test.ts tests/cham-so-2109.test.ts tests/cham-tai-cho-dung-luat-2109.test.ts tests/dau-tru-phan-ba-1009.test.ts tests/o-nhap-dap-so-cac-noi-2109.test.tsx",
-          "executedAt": "2026-09-23T09:44:18.064Z",
+          "executedAt": "2026-09-23T10:03:00.195Z",
           "exitCode": 0,
-          "sourceFingerprint": "29b2552bc23cf3cc2ac37167d6f92a102b7bff6906d5e5e8933e8f1e928fe5ec",
+          "sourceFingerprint": "fe72c5bb09429cc8ca85bf6ac495b4433617979b18ab43670a2c56f895c1c153",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01-vitest-cham-so.log",
-              "sha256": "64c51714675e01a9a85a4794d787a7c0fa189846b56a6fe072913395cabc220a"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01b-vitest-cham-so.log",
+              "sha256": "c3a3601b7dd151e288daf9145c45a3d20e4e183531d47c09dfc5efdd668e65c5"
             }
           ]
         }
@@ -1039,8 +1052,21 @@
       "phase": "P01",
       "level": "code",
       "title": "Snapshot và version",
-      "status": "IN_PROGRESS",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        {
+          "command": "npm exec -- vitest run tests/cnh-1-0-snapshot-t34.test.ts tests/on-lai-nop-1909.test.ts tests/cau-theo-qid-1909.test.ts tests/reset-toan-app-1909.test.ts tests/on-lai-phuc-vu-duoc-1909.test.ts tests/thu-thach-rieng-may-chu-2109.test.ts tests/cam-tu-luan-may-chu-2109.test.ts tests/lam-cau-on-1909.test.tsx",
+          "executedAt": "2026-09-23T10:03:00.196Z",
+          "exitCode": 0,
+          "sourceFingerprint": "fe72c5bb09429cc8ca85bf6ac495b4433617979b18ab43670a2c56f895c1c153",
+          "artifacts": [
+            {
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p01b-vitest-t34.log",
+              "sha256": "d964645d5f3629cc7ffc5e6695ac9fb3af0b81436485b8bf322c0b49c93ab75b"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "T35",

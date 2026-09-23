@@ -79,3 +79,68 @@ Một test **hết đỏ**: `tests/bang-tin-san-chong-chu-trinh-duyet-2109.test.
 2. P02: bảng `learner_scope` + một hàm eligibility thuần, gắn bộ lọc scope/prerequisite/protection vào mọi đường chọn câu.
 3. P00 phần còn thiếu: khi có staging, đo baseline tải bằng `scripts/ban-tai-gia/` với seed đã lưu rồi lặp lại đúng cấu hình ở P10.
 
+
+## Phiên P01 hoàn tất phần snapshot — 23/09/2026 (Cline, tiếp)
+
+Ngày giờ: 23/09/2026 (tiếp phiên trước) · HEAD vào phiên `79a2b16`
+Gói: **P01 (IN_PROGRESS — T33 + T34 PASS)** · P00 vẫn còn 1 mục BLOCKED (staging)
+Fingerprint code lúc ghi bằng chứng: `fe72c5bb09429cc8ca85bf6ac495b4433617979b18ab43670a2c56f895c1c153`
+
+### Lỗ hổng đã tái hiện và chữa
+
+**Lỗ hổng (T34):** lúc NỘP, `/hs/on-lai/nop` gọi `layCauChoEm` để ĐỌC LẠI KHO ĐANG SỐNG rồi chấm bằng
+`chamMotCau(x, q)` (`q.correct` lấy từ kho lúc nộp). Thầy sửa đáp án / đảo lựa chọn trong lúc em đang làm
+⇒ máy chủ chấm ĐỀ CŨ bằng ĐÁP ÁN MỚI. Không có chỗ nào ghi "câu này lúc giao có đáp án gì".
+
+**Cách chữa (đã làm):**
+
+- `server/migration-2309-cnh1-cau-snapshot.sql`: bảng `cau_snapshot` (thêm bảng thuần, không DROP, không sửa cột cũ).
+- `server/src/cau-snapshot.ts`: `taoSnapshot` (ảnh chụp bất biến: phiên bản câu, nhóm nội dung, đáp án phía máy chủ,
+  policy, version chính sách), `quyetDinhSnapshot` (tạo mới / dùng lại / THU HỒI theo 4 lý do), `chamTheoSnapshot`
+  (ĐÚNG MỘT luật chấm `isAnswerCorrect`, chỉ đổi NGUỒN ĐÁP ÁN), `docSnapshot`/`docSnapshotNhieu`/`ghiSnapshot`.
+- Nối vào hai đường THẬT: `/hs/cau-theo-qid` chốt ảnh chụp NGAY LÚC GIAO; `/hs/on-lai/nop` chấm theo ảnh chụp
+  hoặc trả `thuHoi[{qid, lyDo}]` (KHÔNG ghi sổ, KHÔNG EXP, KHÔNG lộ đáp án/lời giải).
+- **Cờ `cau_hinh.cau_snapshot` MẶC ĐỊNH TẮT** ⇒ chưa áp migration + chưa bật thì hành vi production KHÔNG đổi.
+
+### Sửa gốc hai hồi quy đo được (sửa CODE, KHÔNG sửa test)
+
+1. `tests/cau-theo-qid-1909.test.ts` (mục "chi phí") yêu cầu **đúng 3 truy vấn D1**. Bản đầu của tôi đọc cờ bằng
+   một truy vấn riêng ⇒ 4 truy vấn ⇒ ĐỎ. **Sửa gốc:** đọc cờ GỘP vào chính truy vấn 1 sẵn có của `layCauChoEm`
+   (thêm một CỘT, không thêm truy vấn); cả hai đường dùng lại `snapshotBat` từ đó. Không nới ngân sách, không sửa test.
+2. `tests/reset-toan-app-1909.test.ts` yêu cầu **mọi bảng của lược đồ phải được phân loại XOÁ/GIỮ**. **Sửa gốc:**
+   thêm `cau_snapshot` vào `BANG_GIU` kèm lý do — đúng luật "thêm bảng mới là buộc phải quyết" của chính job đó.
+
+### Kiểm thử thực chạy
+
+| Lệnh | Exit | Kết quả | Log |
+|---|---|---|---|
+| `vitest run tests/cnh-1-0-snapshot-t34.test.ts` | 0 | **21/21 PASS** (lần chạy đầu) | — |
+| 8 file: T34 + `on-lai-nop` + `cau-theo-qid` + `reset-toan-app` + `on-lai-phuc-vu-duoc` + `thu-thach-rieng-may-chu` + `cam-tu-luan-may-chu` + `lam-cau-on` | 0 | tất cả PASS | `p01b-vitest-t34.log` |
+| 5 file chấm số (T33) | 0 | tất cả PASS | `p01b-vitest-cham-so.log` |
+| `vitest run` (toàn bộ 726 file) | 1 | 81 đỏ / 11 149 đạt / 1 bỏ qua | `p01b-vitest-full.log` |
+| `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 lỗi | — |
+| `npm run build` | 0 | build xong | `p01b-build.log` |
+| `npm run lint` | 1 | **nền cũ**; 0 mục thuộc tệp mới | `p01b-lint.log` |
+| `kiem-tra-bo-ban-giao.mjs` | 0 | bộ bàn giao hợp lệ | — |
+| `... --acceptance` | 1 | đúng dự kiến: 49 mục còn thiếu; **T33/T34 không bị báo lỗi** | — |
+
+### Hồi quy
+
+`p01b-so-sanh-do.log`: **0 test mới đỏ, 0 file mới đỏ** so với nền P00 (82 đỏ/35 file) VÀ so với lượt p01a (81 đỏ/34 file).
+Kiểm D1 THẬT + Worker THẬT: cờ TẮT (đường cũ nguyên vẹn); cờ BẬT (chấm theo ảnh chụp v1 khi kho đổi đáp án cùng phiên bản);
+kho TĂNG phiên bản (thu hồi có lý do, không ghi sổ, không lộ đáp án); thiếu ảnh chụp (thu hồi `thieu-snapshot`);
+mở lại câu sau khi kho đổi (ảnh chụp làm mới theo bản mới).
+
+### Lỗi còn lại / điều chưa xác minh
+
+- **Cờ CHƯA bật ở production**: chưa áp migration lên D1 thật và chưa có phép phát hành ⇒ phần "chạy thật trên máy chủ"
+  của T34 **CHƯA xác minh** (mới chứng minh trên D1 thật cục bộ + worker thật).
+- R04 (correction, bù một lần) chờ P07/P08. R02 chờ T40/T50. R03 chờ phần `core raw=4` của T19 (P07).
+- P00 vẫn BLOCKED phần baseline tải (thiếu staging).
+
+### Bước tiếp theo chính xác
+
+1. **P02** (P01 đã đủ đầu ra): bảng `learner_scope` + một hàm eligibility thuần, gắn bộ lọc
+   scope/prerequisite/protection vào MỌI đường chọn câu trong ROUTE-MAPPING; test T01–T04, T11–T12, T40.
+2. Trước P11: áp migration, bật cờ theo canary 5% (07 §3), đo p95 và chuẩn bị rollback.
+
