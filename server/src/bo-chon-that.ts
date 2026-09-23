@@ -14,6 +14,7 @@ import { uocLuongMotCau, type MauThoiGian } from './uoc-luong-thoi-gian'
 import { docNangLucEm } from './nang-luc-d1'
 import { docDaLamHomNay } from './chong-lap'
 import { docCho } from './giu-cho'
+import { PHIEN_BAN_KE_HOACH } from './ho-so-cau-hinh'
 import { mucTuChu } from '../../src/lib/btvn-nang-do'
 
 /** Câu ứng viên ở dạng bộ chọn thật dùng (khớp phần cần của `CauPool` trong `game-v2-bank`). */
@@ -41,6 +42,126 @@ export interface CauUngVien {
  * Dùng alias `q` cho bảng câu (`game_v2_question`).
  */
 export const SQL_NHAN_FAMILY = "COALESCE(NULLIF(json_extract(q.json, '$.family'), ''), NULLIF(json_extract(q.json, '$.familyId'), ''))"
+
+/**
+ * KHOẢNG ÔN THẬT theo `content_group` (RV07 — §7.2 `intervalSeconds`): khoảng giữa lần **review trước** (mốc cuối
+ * cùng em đã trả lời câu thuộc nhóm đó, đọc từ SỔ) và **mốc đến hạn hiện tại** (hồ sơ). Sàn 1 ngày (`86400 s`).
+ * Chưa có bằng chứng (chưa trả lời nhóm đó / chưa có mốc) ⇒ KHÔNG trả giá trị giả: nhóm đó không có mặt trong map
+ * và nơi chấm dùng nhánh fallback sàn 1 ngày (ghi rõ, KHÔNG coi là cá nhân hóa đầy đủ).
+ */
+export async function docKhoangOnTheoNhom(
+  env: Env, sbd: string, nhomCuaUngVien: readonly string[], mocDenHanTheoNhom: ReadonlyMap<string, number>,
+): Promise<Map<string, number>> {
+  const ra = new Map<string, number>()
+  const nhom = [...new Set(nhomCuaUngVien.map((g) => String(g ?? '').trim()).filter(Boolean))]
+  if (nhom.length === 0) return ra
+  try {
+    const r = await env.DB.prepare(
+      `SELECT q.content_group AS nhom, MAX(k.luc) AS luc FROM su_kien_hoc k JOIN game_v2_question q ON q.qid = k.qid
+        WHERE k.sbd = ? AND k.ket_qua IS NOT NULL AND q.content_group IN (SELECT value FROM json_each(?))
+        GROUP BY 1`,
+    ).bind(sbd, JSON.stringify(nhom)).all<{ nhom: string; luc: string }>()
+    for (const x of r.results ?? []) {
+      const due = mocDenHanTheoNhom.get(String(x.nhom))
+      const luc = Date.parse(String(x.luc))
+      if (due === undefined || !Number.isFinite(luc) || !Number.isFinite(due)) continue
+      ra.set(String(x.nhom), Math.max(86_400_000, due - luc))
+    }
+  } catch {
+    /* thiếu chỉ mục/bảng ⇒ không có khoảng ôn thật */
+  }
+  return ra
+}
+
+/**
+ * FAMILY em ĐÃ GẶP (RV07 — `transferValue`): family (nhãn trong kho) của những câu em đã có kết quả trong sổ.
+ * Nhãn đọc bằng `SQL_NHAN_FAMILY` (khớp `familyTuNhan`). Không bịa nhãn: family rỗng bị loại.
+ */
+export async function docFamilyDaGap(env: Env, sbd: string): Promise<Set<string>> {
+  const ra = new Set<string>()
+  try {
+    const r = await env.DB.prepare(
+      `SELECT DISTINCT ${SQL_NHAN_FAMILY} AS family FROM su_kien_hoc k JOIN game_v2_question q ON q.qid = k.qid
+        WHERE k.sbd = ? AND k.ket_qua IS NOT NULL AND ${SQL_NHAN_FAMILY} IS NOT NULL`,
+    ).bind(sbd).all<{ family: string }>()
+    for (const x of r.results ?? []) if (x.family) ra.add(String(x.family))
+  } catch {
+    /* thiếu nhãn/bảng ⇒ rỗng */
+  }
+  return ra
+}
+
+/**
+ * ĐỢT DẠY LẠI THEO **KỸ NĂNG** (RV07 — `repairNeed`): đọc bản dựng P03 (`skill_snapshot`: `episode_state`) và
+ * quy về trạng thái đợt của §7.2. Đây là nguồn THEO KỸ NĂNG (không suy thành thạo chỉ từ hồ sơ một câu);
+ * câu nhiều kỹ năng lấy đợt mở của kỹ năng THẤP NHẤT đang mở (ưu tiên `needs_teaching` trước `practicing`).
+ */
+export async function docRepairTheoKyNang(env: Env, sbd: string): Promise<Map<string, TrangThaiDot>> {
+  const ra = new Map<string, TrangThaiDot>()
+  try {
+    const bang = await docNangLucEm(env, sbd)
+    for (const s of bang?.skills ?? []) {
+      const st = String(s.dotDangMo?.state ?? '')
+      if (st === 'needs_teaching' || st === 'practicing') ra.set(s.skillId, st)
+    }
+  } catch {
+    /* chưa áp migration/chưa dựng ⇒ rỗng (không suy đoán) */
+  }
+  return ra
+}
+
+/**
+ * COVERAGE THEO **PLAN HÔM NAY** (RV07 — `coverage` = số task cùng skill đã hoàn tất HOẶC đang giữ chỗ, cả plan):
+ *   · task đã hoàn tất: việc trong `ke_hoach_ngay.viec_json` có qid đã có KẾT QUẢ trong sổ hôm nay;
+ *   · đang giữ chỗ: dòng `giu_cho` còn hiệu lực của hôm nay (kể cả xuyên ngày).
+ * Trả về `skill → số task` (theo kỹ năng của CHÍNH qid đó, đọc từ kho). Lỗi/thiếu ⇒ map rỗng (không bịa).
+ */
+export async function docCoverageTheoPlan(
+  env: Env, sbd: string, ngay: string, nowMs: number,
+): Promise<Map<string, number>> {
+  const ra = new Map<string, number>()
+  try {
+    const viec: { chiTiet?: { qid?: unknown } }[] = []
+    const row = await env.DB.prepare('SELECT viec_json FROM ke_hoach_ngay WHERE sbd = ? AND ngay = ? LIMIT 1').bind(sbd, ngay).first<{ viec_json: string }>()
+    if (row) {
+      try {
+        const v = JSON.parse(String(row.viec_json)) as { viec?: unknown }
+        if (Array.isArray(v.viec)) viec.push(...(v.viec as { chiTiet?: { qid?: unknown } }[]))
+      } catch { /* kế hoạch hỏng ⇒ chỉ còn phần giữ chỗ */ }
+    }
+    const qidKeHoach = viec.flatMap((x) => (Array.isArray(x.chiTiet?.qid) ? (x.chiTiet!.qid as string[]) : []))
+    const daXong = new Set<string>()
+    if (qidKeHoach.length) {
+      const r = await env.DB.prepare(
+        'SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND ket_qua IS NOT NULL AND qid IN (SELECT value FROM json_each(?))',
+      ).bind(sbd, ngay, JSON.stringify(qidKeHoach)).all<{ qid: string }>()
+      for (const x of r.results ?? []) daXong.add(String(x.qid))
+    }
+    const dangGiu = new Set((await docCho(env, sbd, nowMs)).keys())
+    const demTheoQid = new Map<string, number>()
+    for (const id of qidKeHoach) {
+      const xong = daXong.has(id)
+      const giu = dangGiu.has(id)
+      if (!xong && !giu) continue
+      demTheoQid.set(id, (demTheoQid.get(id) ?? 0) + 1)
+    }
+    if (demTheoQid.size === 0) return ra
+    // Kỹ năng của từng qid: đọc CHÍNH kho (một truy vấn cho cả tập).
+    const r2 = await env.DB.prepare('SELECT qid, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))')
+      .bind(JSON.stringify([...demTheoQid.keys()])).all<{ qid: string; json: string }>()
+    for (const x of r2.results ?? []) {
+      let kt: string[] = []
+      try {
+        const j = JSON.parse(String(x.json)) as { kienThuc?: unknown }
+        kt = Array.isArray(j.kienThuc) ? (j.kienThuc as string[]) : []
+      } catch { continue }
+      for (const s of kt) ra.set(s, (ra.get(s) ?? 0) + (demTheoQid.get(String(x.qid)) ?? 0))
+    }
+  } catch {
+    /* thiếu bảng/cột ⇒ rỗng */
+  }
+  return ra
+}
 
 /**
  * NHÃN FAMILY của một câu, đọc từ CHÍNH bản ghi kho (`family` hoặc `familyId`) — KHO THẬT hiện CHƯA có nhãn
@@ -230,19 +351,14 @@ export async function mucTheoKyNangCuaEm(env: Env, sbd: string): Promise<Map<str
 /** Số câu mặc định của một lượt khi nơi gọi không truyền trần (§7.2: gói ≤6 câu, có thể ít hơn). */
 export const SO_CAU_LUOT_MAC_DINH = 6
 
-export interface ChonCauInput {
-  sbd: string
-  ngay: string
-  nowMs: number
-  mastery: readonly { key: string; due: number }[]
+export type ChonCauInput = Omit<XepLuotInput, 'mucTheoKyNang' | 'hoSoCau'> & {
   /** Ngân sách còn lại của ngày (giây). Vắng = KHÔNG cắt theo ngân sách (hành vi cũ). */
   conLaiGiay?: number | null
   tranCau?: number
+  /** Vắng ⇒ `chonCauChoLuot` tự đọc từ bản dựng P03 (`skill_snapshot`). */
   mucTheoKyNang?: ReadonlyMap<string, number>
+  /** Vắng ⇒ `chonCauChoLuot` tự đọc `nam_kt_cau` cho đúng các câu ứng viên. */
   hoSoCau?: ReadonlyMap<string, HangHoSoCau>
-  /** Probe hợp lệ do server cấp: cho phép khó hơn mức tối đa +1 và không quá 2 (§7.1). */
-  probeChoPhep?: boolean
-  mauTocDo?: readonly MauThoiGian[]
 }
 
 export interface ChonCauKetQua {
@@ -275,11 +391,28 @@ export async function chonCauChoLuot(env: Env, ds: readonly CauUngVien[], inp: C
   const muc = inp.mucTheoKyNang ?? await mucTheoKyNangCuaEm(env, inp.sbd)
   const tranCau = Number.isFinite(inp.tranCau) ? Math.max(0, Math.floor(inp.tranCau as number)) : SO_CAU_LUOT_MAC_DINH
 
+  // ── RV07: đọc ĐỦ nguồn thật cho §7.2 (mỗi nguồn một lượt đọc, không đọc theo từng câu) ────────────────
+  const hoSoCau = inp.hoSoCau ?? await docHoSoCau(env, inp.sbd, ds.map((c) => c.qid))
+  // `moc đến hạn` theo NHÓM (khoá `dangKey` của hồ sơ → nhóm nội dung) để suy KHOẢNG ÔN thật.
+  const mocDenHanTheoNhom = new Map<string, number>()
+  for (const c of ds) {
+    const due = inp.mastery.find((m) => m.key === c.dangKey)?.due
+    if (typeof due === 'number' && c.group) mocDenHanTheoNhom.set(c.group, due)
+  }
+  const khoangOnTheoNhom = inp.khoangOnTheoNhom ?? await docKhoangOnTheoNhom(env, inp.sbd, ds.map((c) => c.group), mocDenHanTheoNhom)
+  const familyDaGap = inp.familyDaGap ?? await docFamilyDaGap(env, inp.sbd)
+  const repairTheoKyNang = inp.repairTheoKyNang ?? await docRepairTheoKyNang(env, inp.sbd)
+  const coverageTheoPlan = inp.coverageTheoPlan ?? await docCoverageTheoPlan(env, inp.sbd, inp.ngay, inp.nowMs)
+  const dungChung: XepLuotInput = {
+    sbd: inp.sbd, ngay: inp.ngay, mastery: inp.mastery, mucTheoKyNang: muc, hoSoCau, nowMs: inp.nowMs,
+    mauTocDo: inp.mauTocDo, phienBanKeHoach: inp.phienBanKeHoach, khoangOnTheoNhom, familyDaGap,
+    transferChoPhep: inp.transferChoPhep, coverageTheoPlan, repairTheoKyNang, probeChoPhep: inp.probeChoPhep,
+  }
+
   // §7.1 bước 3–6 trên TOÀN BỘ tập ứng viên (RV05: KHÔNG cắt 6 câu trước khi lọc).
   //   · độ khó: trần theo MỨC ĐANG LUYỆN (min của MỌI skill; thiếu hồ sơ = 0), probe hợp lệ = +1 và ≤2;
   //   · nguồn còn sống: câu đã chết trong kho thì `docCho`/scope đã lo;
   //   · luật lặp/family: chạy TRONG vòng lặp chọn bên dưới (cần `daChon` của lượt đang hình thành).
-  const hoSoCau = inp.hoSoCau ?? await docHoSoCau(env, inp.sbd, ds.map((c) => c.qid))
   const quaKho: CauUngVien[] = []
   for (const c of ds) {
     const working = mucDangLuyen(c, muc)
@@ -322,8 +455,7 @@ export async function chonCauChoLuot(env: Env, ds: readonly CauUngVien[], inp: C
     if (duocPhep.length === 0) break
     // (b)+(c) chấm điểm trên tập HỢP LỆ rồi lấy câu vừa ngân sách tốt nhất.
     const xep = await xepLuotTheoChinhSach(duocPhep, {
-      sbd: inp.sbd, ngay: inp.ngay, mastery: inp.mastery, mucTheoKyNang: muc, hoSoCau, nowMs: inp.nowMs,
-      mauTocDo: inp.mauTocDo,
+      ...dungChung,
       daChon: chon.map((c) => ({ qid: c.qid, part: c.part, solveSeconds: c.solveSeconds, skillIds: daChonSkill.get(c.qid) ?? [] })),
     })
     const vua = xep.xep.find((v) => !conLaiCoTran || v.taskSeconds <= conLai)
@@ -345,9 +477,7 @@ export async function chonCauChoLuot(env: Env, ds: readonly CauUngVien[], inp: C
   const conChoLuot = Math.max(0, tranCau - chon.length)
   if (ung.length && conLaiCoTran && conChoLuot > 0) {
     const { duocPhep } = await locTheoLuatLap(env, inp.sbd, inp.ngay, ung, tranCau + chon.length, { nowMs: inp.nowMs, mastery: inp.mastery, hoSoCau })
-    const cuoi = await xepLuotTheoChinhSach(duocPhep, {
-      sbd: inp.sbd, ngay: inp.ngay, mastery: inp.mastery, mucTheoKyNang: muc, hoSoCau, nowMs: inp.nowMs, mauTocDo: inp.mauTocDo,
-    })
+    const cuoi = await xepLuotTheoChinhSach(duocPhep, { ...dungChung })
     const hanChe = cuoi.xep.slice(0, conChoLuot)
     deferredCount = hanChe.length
     overBudgetSeconds = hanChe.reduce((s, v) => s + v.taskSeconds, 0)
@@ -370,6 +500,21 @@ export interface XepLuotInput {
   mauTocDo?: readonly MauThoiGian[]
   /** Đã chọn trong lượt trước đó (để tính `coverage`/`fatigue`). */
   daChon?: readonly { qid: string; part: 'I' | 'II' | 'III'; solveSeconds: number; skillIds: readonly string[] }[]
+  // ── RV07 (02 §7.2): DỮ LIỆU THẬT cho từng thành phần điểm ─────────────────────────────────────
+  /** Phiên bản plan THẬT cho khoá hash `student|day|plan_version|qid|version` (vắng ⇒ `PHIEN_BAN_KE_HOACH`). */
+  phienBanKeHoach?: number
+  /** `content_group` → khoảng ôn THẬT (ms) giữa lần review trước và mốc đến hạn (`docKhoangOnTheoNhom`). */
+  khoangOnTheoNhom?: ReadonlyMap<string, number>
+  /** Family em ĐÃ GẶP (`docFamilyDaGap`) — để `transferValue` biết family nào KHÔNG mới với em. */
+  familyDaGap?: ReadonlySet<string>
+  /** `qid` hoặc `content_group` được MÁY CHỦ cấp cơ hội chuyển giao (§7.2) — rỗng ⇒ `transferValue = 0`. */
+  transferChoPhep?: ReadonlySet<string>
+  /** `skill` → số task cùng skill đã hoàn tất/giữ chỗ trong PLAN hôm nay (`docCoverageTheoPlan`). */
+  coverageTheoPlan?: ReadonlyMap<string, number>
+  /** `skill` → ĐỢT DẠY LẠI đang mở theo KỸ NĂNG (`docRepairTheoKyNang`, P03) — ưu tiên hơn hồ sơ từng câu. */
+  repairTheoKyNang?: ReadonlyMap<string, TrangThaiDot>
+  /** Bật probe hợp lệ cho cả lượt (dùng khi nơi gọi đã cấp; mặc định theo từng câu). */
+  probeChoPhep?: boolean
 }
 
 export interface KetQuaXepLuot {
@@ -394,21 +539,32 @@ export async function xepLuotTheoChinhSach(ds: readonly CauUngVien[], inp: XepLu
     const due = inp.mastery.find((m) => m.key === c.dangKey)?.due ?? null
     const hoSo = inp.hoSoCau.get(c.qid)
     const soTaskCungSkill = daChon.filter((x) => x.skillIds.some((s) => c.skillIds.includes(s))).length
+      + c.skillIds.reduce((t, s) => t + (inp.coverageTheoPlan?.get(s) ?? 0), 0) // RV07: coverage tính CẢ PLAN hôm nay
     const haiTaskTruoc = daChon.slice(-2).map((x) => ({ part: x.part, solveSeconds: x.solveSeconds }))
+    // RV07: ĐỢT DẠY LẠI theo KỸ NĂNG (P03) ưu tiên hơn hồ sơ từng câu; không có ⇒ mới dùng hồ sơ câu.
+    const dotKyNang = c.skillIds.map((s) => inp.repairTheoKyNang?.get(s)).find((x): x is TrangThaiDot => x === 'needs_teaching' || x === 'practicing') ?? null
+    const family = c.familyId ?? null
     const diem = chamDiem(
-      { qid: c.qid, version: c.version, part: c.part, difficulty, familyId: null },
       {
-        nowMs: inp.nowMs, trangThaiDot: trangThaiDotTuHoSoCau(hoSo), workingLevel: mucDangLuyen(c, inp.mucTheoKyNang),
-        dueMs: due, intervalMs: null, soTaskCungSkillTrongPlan: soTaskCungSkill,
-        haiTaskTruoc, solveSeconds: uoc.solveSeconds,
+        qid: c.qid, version: c.version, part: c.part, difficulty, familyId: family,
+        // `transferValue` (§7.2): chỉ khi MÁY CHỦ cấp cơ hội; `familyMoiVoiEm` = family chưa từng gặp (đọc từ sổ).
+        transferChoPhep: Boolean(inp.transferChoPhep?.has(c.qid) || inp.transferChoPhep?.has(c.group)),
+        familyMoiVoiEm: family !== null && !(inp.familyDaGap?.has(family) ?? false),
+      },
+      {
+        nowMs: inp.nowMs, trangThaiDot: dotKyNang ?? trangThaiDotTuHoSoCau(hoSo), workingLevel: mucDangLuyen(c, inp.mucTheoKyNang),
+        dueMs: due, intervalMs: (c.group ? inp.khoangOnTheoNhom?.get(c.group) : undefined) ?? null, soTaskCungSkillTrongPlan: soTaskCungSkill,
+        haiTaskTruoc, solveSeconds: uoc.solveSeconds, probeChoPhep: inp.probeChoPhep,
       },
     )
-    diemTheo.push({ qid: c.qid, version: c.version, part: c.part, difficulty, familyId: null })
+    diemTheo.push({ qid: c.qid, version: c.version, part: c.part, difficulty, familyId: family })
     diemSo.set(c.qid, diem.score)
     theoQid.set(c.qid, { diem, solveSeconds: uoc.solveSeconds, taskSeconds: uoc.taskSeconds })
   }
 
-  const sap = await sapTheoDiem(diemTheo, diemSo, (c) => khoaHashSap(inp.sbd, inp.ngay, 0, c.qid, c.version))
+  // Khoá hash dùng PHIÊN BẢN PLAN THẬT khi nơi gọi có (RV07); vắng ⇒ hằng số phiên bản kế hoạch (KHÔNG dùng 0).
+  const phienBan = Number.isFinite(inp.phienBanKeHoach) ? Math.max(1, Math.floor(inp.phienBanKeHoach as number)) : PHIEN_BAN_KE_HOACH
+  const sap = await sapTheoDiem(diemTheo, diemSo, (c) => khoaHashSap(inp.sbd, inp.ngay, phienBan, c.qid, c.version))
   return {
     xep: sap.map((c) => {
       const t = theoQid.get(c.qid)!

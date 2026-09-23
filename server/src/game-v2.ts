@@ -144,7 +144,7 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
     const vaiTheoQid=new Map(chonGoc.map(x=>[x.q.qid,x.role]))
     const nhomTheoQid=new Map(eligible.map(q=>[q.qid,q.group]))
     const kq=await chonCauChoLuot(env,eligible.map(q=>({qid:q.qid,version:q.version,part:q.phan as 'I'|'II'|'III',mucDo:q.mucDo,group:q.group,dangKey:q.dang??q.group,skillIds:Array.isArray(q.kienThuc)?q.kienThuc as string[]:[],familyId:familyTuNhan(q)})),
-      {sbd,ngay,nowMs:tNow,mastery,conLaiGiay:ns&&ns.nganSachGiay>0?ns.conLaiGiay:null,tranCau:Math.min(SO_CAU_MOI_LUOT,remaining),mauTocDo:ns?.mau})
+      {sbd,ngay,nowMs:tNow,mastery,conLaiGiay:ns&&ns.nganSachGiay>0?ns.conLaiGiay:null,tranCau:Math.min(SO_CAU_MOI_LUOT,remaining),mauTocDo:ns?.mau,phienBanKeHoach:ns?.phienBanKeHoach})
     const groupsCua=new Set(scope.evidence.map(e=>e.group))
     chon=kq.chon.flatMap(v=>{const q=eligible.find(x=>x.qid===v.qid);return q?[{q,role:vaiTheoQid.get(v.qid)??'moi',dai:q.phan!=='I',moi:!groupsCua.has(q.group)}]:[]})
     lyDoLuot=Object.keys(kq.lyDo).length?kq.lyDo:undefined
@@ -323,7 +323,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
       // một tập đã bị `chooseLuotMoi` cắt trước theo thuật toán cũ. Vai chỉ dùng để HIỂN THỊ (không cắt pool).
       const ns=await docNganSachConLai(env,sbd,academicDay(now()))
       const kq=await chonCauChoLuot(env,eligible.map(q=>({qid:q.qid,version:q.version,part:q.phan as 'I'|'II'|'III',mucDo:q.mucDo,group:q.group,dangKey:q.dang??q.group,skillIds:Array.isArray(q.kienThuc)?q.kienThuc as string[]:[],familyId:familyTuNhan(q)})),
-        {sbd,ngay:academicDay(now()),nowMs:tNow,mastery:masteryLuot,conLaiGiay:ns&&ns.nganSachGiay>0?ns.conLaiGiay:null,tranCau:Math.min(SO_CAU_MOI_LUOT,remaining),mauTocDo:ns?.mau})
+        {sbd,ngay:academicDay(now()),nowMs:tNow,mastery:masteryLuot,conLaiGiay:ns&&ns.nganSachGiay>0?ns.conLaiGiay:null,tranCau:Math.min(SO_CAU_MOI_LUOT,remaining),mauTocDo:ns?.mau,phienBanKeHoach:ns?.phienBanKeHoach})
       const vaiCu=new Map(chonGoc.map(x=>[x.q.qid,x.role]))
       // Vai chỉ để HIỂN THỊ: dùng vai cũ nếu bộ chọn cũ đã cấp, còn lại `toi_han` (câu đến hạn) — KHÔNG cắt pool theo vai.
       chon=kq.chon.flatMap((v)=>{const q=eligible.find(x=>x.qid===v.qid);return q?[{q,role:vaiCu.get(v.qid)??'toi_han' as const}]:[]})

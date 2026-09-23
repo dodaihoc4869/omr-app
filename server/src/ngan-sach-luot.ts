@@ -31,9 +31,12 @@ export async function nganSachLuotBat(env: Env): Promise<boolean> {
   return demBat.bat
 }
 
+/** Ngân sách còn lại của ngày + PHIÊN BẢN PLAN đã chốt (RV07: khoá hash dùng phiên bản thật). */
 export interface NganSachConLai {
   /** Ngân sách ngày do kế hoạch đã chốt (`phutNgay` × 60). */
   nganSachGiay: number
+  /** Phiên bản plan trong `ke_hoach_ngay` (0 = chưa chốt/không đọc được). */
+  phienBanKeHoach: number
   /** Đã dùng hôm nay theo sổ (`su_kien_hoc.giay`, tổng — có thể thấp hơn thực tế nếu thiếu số đo). */
   daDungGiay: number
   conLaiGiay: number
@@ -93,9 +96,11 @@ export async function docMauTocDo(env: Env, sbd: string, ngay: string, soNgay = 
  */
 export async function docNganSachConLai(env: Env, sbd: string, ngay: string): Promise<NganSachConLai | null> {
   let nganSachGiay = 0
+  let phienBanKeHoach = 0
   try {
-    const r = await env.DB.prepare('SELECT ngan_sach_json FROM ke_hoach_ngay WHERE sbd = ? AND ngay = ? LIMIT 1').bind(sbd, ngay).first<{ ngan_sach_json: string }>()
+    const r = await env.DB.prepare('SELECT ngan_sach_json, phien_ban FROM ke_hoach_ngay WHERE sbd = ? AND ngay = ? LIMIT 1').bind(sbd, ngay).first<{ ngan_sach_json: string; phien_ban: number }>()
     if (!r) return null
+    phienBanKeHoach = Math.max(0, Math.floor(Number(r.phien_ban) || 0))
     const json = JSON.parse(String(r.ngan_sach_json ?? '{}')) as { phutNgay?: unknown }
     const phut = Number(json.phutNgay)
     if (!Number.isFinite(phut) || phut <= 0) return null
@@ -113,7 +118,7 @@ export async function docNganSachConLai(env: Env, sbd: string, ngay: string): Pr
   }
   const mau = await docMauTocDo(env, sbd, ngay)
   return {
-    nganSachGiay, daDungGiay, conLaiGiay: Math.max(0, nganSachGiay - daDungGiay), mau,
+    nganSachGiay, phienBanKeHoach, daDungGiay, conLaiGiay: Math.max(0, nganSachGiay - daDungGiay), mau,
     ghiChu: ghiChuDocSoDo || (mau.length ? '' : 'chưa có mẫu tốc độ độc lập trong 30 ngày ⇒ bộ ước lượng dùng hệ số 1'),
   }
 }
