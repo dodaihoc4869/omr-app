@@ -54,6 +54,12 @@ export interface BtvnDauVao {
    * mỗi chặng có mốc mở riêng); chưa chốt ⇒ `cacChang` rỗng, `soCau` là cả bài (kế hoạch ước một chặng bằng ngân sách ngày).
    */
   caNhan?: { chotLuc: string | null; cacChang: { soCau: number; moLuc: string }[] }
+  /**
+   * (CNH-1.0 RV07 mục 7 phụ) Mã câu ĐÃ CHỐT cho em theo CHẶNG (`btvn_em_cau`, bộ nâng đỡ đã chốt), khoá = chỉ số chặng.
+   * Có mặt ⇒ việc `btvn_lo` mang `chiTiet.qid` để `coverage` (§7.2) đếm đúng task cùng kỹ năng trong plan hôm nay.
+   * Bài chưa chốt bộ / bài cũ ⇒ KHÔNG có (không bịa mã câu).
+   */
+  qidTheoChang?: Record<number, string[]>
 }
 
 export interface MomDauVao {
@@ -389,19 +395,19 @@ export function lapKeHoachNgay(d: DauVaoKeHoach): KeHoachNgay {
       loai: 'btvn_lo', soCau: lo.soCau, hanMs, hanMemMs: loSau ? ms(loSau.moDuKienLuc) ?? hanMs : hanMs,
       khan: lo.treNhip || hanMs - d.now <= MOT_NGAY_MS, nguon: b.ma,
       ghiChu: lo.treNhip ? `Lô ${lo.chiSo + 1}/${lich.cacLo.length} đã trễ nhịp — làm trước.` : `Lô ${lo.chiSo + 1}/${lich.cacLo.length}`,
-      chiTiet: { ma: b.ma, chiSo: lo.chiSo, tongLo: lich.cacLo.length, treNhip: lo.treNhip, ...chiTietBai[b.ma], ...(b.caNhan ? { caNhan: true, ...(b.caNhan.chotLuc ? {} : { chuaChot: true }) } : {}) },
+      chiTiet: { ma: b.ma, chiSo: lo.chiSo, tongLo: lich.cacLo.length, treNhip: lo.treNhip, ...chiTietBai[b.ma], ...(b.caNhan ? { caNhan: true, ...(b.caNhan.chotLuc ? {} : { chuaChot: true }) } : {}), ...(b.qidTheoChang?.[lo.chiSo]?.length ? { qid: b.qidTheoChang[lo.chiSo] } : {}) },
     }))
   }
   for (const m of momCung) {
     cung.push(viecCung({
       id: `mom:${m.id}`, loai: 'mom', soCau: m.soCau, hanMs: m.hanMs, hanMemMs: m.hanMs, khan: true, nguon: m.id,
-      ghiChu: 'Bài Mom đã bắt đầu — hết giờ sau 120 phút.', chiTiet: { id: m.id },
+      ghiChu: 'Bài Mom đã bắt đầu — hết giờ sau 120 phút.', chiTiet: { id: m.id, ...(m.qid?.length ? { qid: m.qid } : {}) },
     }))
   }
   for (const m of momViec) {
     cung.push(viecCung({
       id: `mom:${m.id}`, loai: 'mom', soCau: m.soCau, hanMs: null, hanMemMs: null, khan: false, nguon: m.id,
-      ghiChu: 'Bài Mom giao, chưa bắt đầu. Bấm bắt đầu thì có 120 phút làm.', chiTiet: { id: m.id, chuaBatDau: true, taoLuc: m.taoLuc },
+      ghiChu: 'Bài Mom giao, chưa bắt đầu. Bấm bắt đầu thì có 120 phút làm.', chiTiet: { id: m.id, chuaBatDau: true, taoLuc: m.taoLuc, ...(m.qid?.length ? { qid: m.qid } : {}) },
     }))
   }
   // Hạn cứng tăng dần (không hạn = xa nhất) → hạn mềm → loại → bài giao trước đứng trước (chỉ Mom chưa bắt đầu có `taoLuc`) → id.

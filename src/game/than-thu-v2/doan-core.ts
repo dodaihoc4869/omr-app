@@ -173,6 +173,59 @@ export const giayCuaHiep = (hiep: number, cau?: readonly { phan?: string; mucDo?
 }
 /** Đồng hồ do nơi gọi đưa vào (mili giây) — lõi không tự đọc giờ. */
 export const hetGioHiep = (batDauLuc: number, bayGio: number, hiep: number) => bayGio - batDauLuc >= giayCuaHiep(hiep) * 1000
+
+// ───────────────────── VÒNG ĐỜI TASK CÁ NHÂN (02 §8) ─────────────────────
+// `phat` → (chốt) `da_nop` · (hiệp chuyển khi chưa chốt) `continuing` → (quá hạn session) `expired_unanswered`.
+// Task `continuing` VẪN NỘP ĐƯỢC tới hạn session; hết hạn thì KHÔNG tính là sai (không cập nhật lỗi học thuật) và
+// KHÔNG phát lại cùng câu — mở lại phải là một attempt MỚI do máy chủ kiểm phạm vi.
+export type TrangThaiTask = 'phat' | 'da_nop' | 'continuing' | 'expired_unanswered'
+export interface TaskDoan {
+  tt: TrangThaiTask
+  /** Lúc MÁY CHỦ phát câu (ms) — mốc tính hạn session. */
+  phatLuc: number
+  /** Hạn session = `phatLuc + 24 giờ` (§8). */
+  hanSession: number
+  qid: string | null
+  /** Lúc em nộp task (audit cho thầy) — chỉ có ở task `da_nop`. */
+  lucNop?: number
+  /** Lúc mở lại bằng câu mới (audit) — chỉ có ở task được mở lại. */
+  lucMoLai?: number
+  /** Phiên game MỚI cấp câu mở lại (khi bộ của chặng đã hết) — em làm ở phiên này, không phát lại câu cũ. */
+  phien?: string
+}
+/** Hạn session của một task: 24 giờ từ lúc phát (§8). */
+export const HAN_SESSION_MS = 24 * 60 * 60 * 1000
+export const khoaTask = (ghe: number, hiep: number) => `${ghe}|${hiep}`
+
+export function moTask(ghe: number, hiep: number, qid: string | null, now: number): TaskDoan {
+  void ghe
+  void hiep
+  return { tt: 'phat', phatLuc: now, hanSession: now + HAN_SESSION_MS, qid }
+}
+
+/** Em chốt đòn của mình. Task đã hết hạn/hỏng thì giữ nguyên (không hồi sinh bằng đường nộp). */
+export const chotTask = (t: TaskDoan): TaskDoan => (t.tt === 'phat' || t.tt === 'continuing' ? { ...t, tt: 'da_nop' } : t)
+
+/** HIỆP CHUYỂN: task chưa chốt ⇒ `continuing` (vẫn nộp được tới hạn session) — KHÔNG ghi thành sai. */
+export const chuyenHiepTask = (t: TaskDoan): TaskDoan => (t.tt === 'phat' ? { ...t, tt: 'continuing' } : t)
+
+/** Quét hạn session: quá hạn mà chưa nộp ⇒ `expired_unanswered` (không cập nhật lỗi học thuật). */
+export const hetHanTask = (t: TaskDoan, now: number): TaskDoan =>
+  (t.tt === 'phat' || t.tt === 'continuing') && now >= t.hanSession ? { ...t, tt: 'expired_unanswered' } : t
+
+/** Còn nộp được không: chỉ khi chưa chốt VÀ chưa quá hạn session. */
+export const conNopDuoc = (t: TaskDoan | undefined, now: number): boolean =>
+  !!t && (t.tt === 'phat' || t.tt === 'continuing') && now < t.hanSession
+
+/**
+ * MỞ LẠI task đã `expired_unanswered`: chỉ khi có CÂU MỚI do máy chủ kiểm phạm vi cấp (`qidMoi` khác câu cũ).
+ * Trả `null` khi không có câu mới ⇒ vẫn hết hạn (KHÔNG phát lại cùng câu).
+ */
+export function moLaiTask(t: TaskDoan, qidMoi: string | null, now: number): TaskDoan | null {
+  if (t.tt !== 'expired_unanswered') return null
+  if (!qidMoi || qidMoi === t.qid) return null
+  return moTask(0, 0, qidMoi, now)
+}
 const rut = (hatGiong: string, nhan: string) => mulberry32(hashSeed(`${hatGiong}|${nhan}`))()
 const saoChep = <T>(x: T): T => JSON.parse(JSON.stringify(x))
 const gheDoMay = (g: GheDoan) => g.laMay || g.roi

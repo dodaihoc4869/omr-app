@@ -15,6 +15,7 @@ import { PETS, publicQuestion, type PrivateQuestion, type Question } from '../..
 import {
   moChang, giaiHiep, roiTran, datGiaoY, kiemHanhDong, hiepLaTrum, giayCuaHiep, tomTatChang, khungNhinHiep, kichBanChang,
   kiemTiepSuc, NHAN_TIEP_SUC_TOI_DA, SO_GHE_TOI_DA, SO_HIEP, SO_Y_TRUM, type Chang, type HanhDong, type NopHiep, type NopTrum,
+  chotTask, chuyenHiepTask, conNopDuoc, hetHanTask, khoaTask, moLaiTask, moTask, type TaskDoan,
 } from '../../src/game/than-thu-v2/doan-core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
 import { protectedQuestions, docKhoiThapNhat } from './game-v2-bank'
@@ -83,6 +84,11 @@ export interface PhongDoan {
   choGhi: { hiep: number; den: string; thanhCong: boolean }[]
   /** Kết quả câu chung của trùm vừa giải (không tên em nào), chờ ghi vào `doan_trum_cau` cho bảng của thầy. */
   choGhiTrum?: { hiep: number; maDang: string | null; qid: string; yDung: number }[]
+  /**
+   * VÒNG ĐỜI TASK CÁ NHÂN (02 §8), khoá `ghe|hiep`: `phat` → `da_nop`, hoặc khi hiệp chuyển mà chưa chốt thì
+   * `continuing` (vẫn nộp được tới hạn session 24 giờ), quá hạn ⇒ `expired_unanswered` (KHÔNG ghi thành sai).
+   */
+  task?: Record<string, TaskDoan>
   /** Câu chung của hai hiệp trùm; null = không có câu hợp lệ → giáp vỡ theo phong độ 3 hiệp trước. */
   trum: Record<string, CauRef | null>
   /** Ý trùm giao theo bậc của từng bạn ở dạng của câu chung (ý a dễ nhất → bạn bậc thấp nhất). */
@@ -112,12 +118,49 @@ const giayHiepPhong=(p:PhongDoan)=>{
 }
 const hanHiep = (p: PhongDoan) => p.hiepLuc + giayHiepPhong(p) * 1000
 
+/** MỞ TASK cho các ghế NGƯỜI có câu ở hiệp ĐANG chạy — mỗi ghế×hiệp đúng một lần (phát lại cùng câu KHÔNG tạo task mới). */
+function moTaskHiep(p: PhongDoan, now: number): boolean {
+  const c = p.chang
+  if (!c || c.ketThuc || now < p.hiepLuc) return false
+  let doi = false
+  p.task ??= {}
+  for (const { i } of gheNguoi(p)) {
+    const ref = p.nguoi[i]!.cau[chiSoCau(c.hiep)]
+    if (!ref) continue
+    const k = khoaTask(i, c.hiep)
+    if (!p.task[k]) { p.task[k] = moTask(i, c.hiep, ref.qid, now); doi = true }
+  }
+  return doi
+}
+/** HIỆP CHUYỂN: task của hiệp vừa giải mà chưa chốt ⇒ `continuing` (không tính sai, không phát lại câu). */
+function chuyenTaskHiep(p: PhongDoan, hiep: number): boolean {
+  let doi = false
+  for (const k of Object.keys(p.task ?? {})) {
+    if (!k.endsWith(`|${hiep}`)) continue
+    const t = p.task![k]!
+    const m = chuyenHiepTask(t)
+    if (m !== t) { p.task![k] = m; doi = true }
+  }
+  return doi
+}
+/** QUÉT HẠN SESSION (mọi lần đọc/ghi phòng): quá `phatLuc + 24 giờ` mà chưa nộp ⇒ `expired_unanswered`. */
+function soiHanSession(p: PhongDoan, now: number): boolean {
+  let doi = false
+  for (const k of Object.keys(p.task ?? {})) {
+    const t = p.task![k]!
+    const m = hetHanTask(t, now)
+    if (m !== t) { p.task![k] = m; doi = true }
+  }
+  return doi
+}
+
 // ───────────────────────── Đọc / ghi phòng ─────────────────────────
 async function docPhong(env: Env, ma: string): Promise<{ phong: PhongDoan; revision: number }> {
   const row = await env.DB.prepare('SELECT json,revision FROM doan_chang WHERE ma=?').bind(ma).first<{ json: string; revision: number }>()
   if (!row) throw new Error('Không tìm thấy chặng này. Em kiểm tra lại mã đoàn.')
   const phong = JSON.parse(row.json) as PhongDoan
   phong.the ??= {}; phong.daGiup ??= []; phong.choGhi ??= [] // phòng mở trước bước 4
+  phong.task ??= {} // phòng mở trước bước 4 (vòng đời task cá nhân, 02 §8)
   return { phong, revision: row.revision }
 }
 /** Ghi có khoá lạc quan. Chặng vừa kết thúc → cùng một giao dịch chốt sổ lượt của từng em (khoá chính + `ket_luc IS NULL` chống ghi trùng). */
@@ -272,6 +315,7 @@ const gheNguoi = (p: PhongDoan) => p.chang!.ghe.map((g, i) => ({ g, i })).filter
 function batDau(p: PhongDoan, ma: string, now: number) {
   p.chang = moChang({ hatGiong: ma, nguoi: p.nguoi.map(n => ({ id: n.sbd, ten: n.ten, pet: n.pet })) })
   p.hiepLuc = now + DEM_NGUOC_MS; p.nop = {}; p.nopY = {}; p.tinHieu = {}; p.the = {}; p.daGiup = []; p.choGhi = []
+  p.task = {} // task cá nhân phát lại từ đầu cho từng hiệp (02 §8)
 }
 /** Trùm không có câu chung: ý của ghế nào ĐÚNG khi ghế ấy tự làm đúng ≥ 2 trong 3 hiệp thường vừa rồi — phong độ của đoạn đường quyết định vỡ giáp. */
 function yTheoPhongDo(c: Chang): NopTrum[] {
@@ -292,6 +336,7 @@ function giai(p: PhongDoan, now: number) {
     for (const ghe of Object.keys(p.the)) if (p.nguoi[Number(ghe)]) p.choGhi.push({ hiep: kq.hiep, den: p.nguoi[Number(ghe)]!.sbd, thanhCong: !!kq.ghe[Number(ghe)]?.dung })
   }
   p.nop = {}; p.nopY = {}; p.tinHieu = {}; p.the = {}; p.daGiup = []; p.hiepLuc = now + NGHI_GIUA_HIEP_MS
+  chuyenTaskHiep(p, c.hiep) // task chưa chốt của hiệp vừa giải ⇒ `continuing` (02 §8)
   if (p.chang.ketThuc) p.ketLuc = now
   else if (hiepLaTrum(p.chang.hiep) && p.trum[p.chang.hiep] && p.giaoY[p.chang.hiep]) p.chang = datGiaoY(p.chang, p.giaoY[p.chang.hiep]!)
 }
@@ -304,10 +349,12 @@ function duBai(p: PhongDoan): boolean {
 /** Tiến một bước nếu tới lúc: hết giờ (kể cả ân hạn), hoặc hiệp đã mở và đủ bài. Trả về true nếu phòng đổi. */
 function tienHanh(p: PhongDoan, now: number): boolean {
   const c = p.chang
-  if (!c || c.ketThuc || now < p.hiepLuc) return false
+  const doiHan = soiHanSession(p, now) // task quá hạn session ⇒ `expired_unanswered` (không ghi thành sai)
+  if (!c || c.ketThuc || now < p.hiepLuc) return doiHan
+  if (moTaskHiep(p, now)) { /* hiệp vừa mở: phát task cho các ghế có câu */ }
   if (gheNguoi(p).length === 0) { p.chang = { ...c, ketThuc: true, thang: false }; p.ketLuc = now; return true } // cả đội đã rời: đóng chặng, không ai bị phạt
   if (now >= hanHiep(p) + AN_HAN_MS || duBai(p)) { giai(p, now); return true }
-  return false
+  return doiHan
 }
 
 // ───────────────────────── Khung nhìn của MỘT em ─────────────────────────
@@ -351,6 +398,12 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
   }
   const vuaXong = c.lichSu.at(-1)
   if (vuaXong) doan.hiepVuaXong = khungNhinHiep(vuaXong, i)
+  // VÒNG ĐỜI TASK CÁ NHÂN (02 §8): em thấy nhiệm vụ ĐANG `continuing` (còn nộp tới hạn session) và nhiệm vụ
+  // `expired_unanswered` (không tính sai; mở lại phải nhận CÂU MỚI). Không lộ câu của bạn khác.
+  doan.nhiemVu = Object.entries(p.task ?? {})
+    .filter(([k]) => Number(k.split('|')[0]) === i)
+    .map(([k, t]) => ({ hiep: Number(k.split('|')[1]), tt: t.tt, hanSession: t.hanSession, qid: t.qid, conNop: conNopDuoc(t, now), ...(t.lucMoLai ? { lucMoLai: t.lucMoLai } : {}) }))
+    .sort((a, z) => a.hiep - z.hiep)
 
   if (mo && !laTrum) {
     const ref = p.nguoi[i]!.cau[chiSoCau(c.hiep)], da = p.nop[i]
@@ -562,6 +615,10 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
         dung = r.correct === true; kem = { ketQuaCau: ketQuaCau(r) }
       }
       phong.nop[i] = { dung, hanhDong, tuLam: !phong.the[i], boTrong, tiepSucBoi: phong.the[i]?.tu }
+      // VÒNG ĐỜI TASK: ghế này đã chốt đòn của hiệp ⇒ task `da_nop` (02 §8).
+      const kt = khoaTask(i, c.hiep)
+      phong.task ??= {}
+      phong.task[kt] = chotTask(phong.task[kt] ?? moTask(i, c.hiep, ref?.qid ?? null, now))
       delete phong.tinHieu[i]; tienHanh(phong, now); doi = true
     } else if (action === 'doan-nop-y') {
       const c = phong.chang, y = Number(b.y), chon = String(b.answer ?? '')
@@ -574,6 +631,38 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       const q = await cauRieng(env, ref)
       if (!q) { phong.trum[c.hiep] = null } else phong.nopY[y] = q.correct[y] === chon
       tienHanh(phong, now); doi = true
+    } else if (action === 'doan-nop-tiep') {
+      // NỘP TASK ĐANG `continuing` (02 §8): hiệp đã qua nhưng chưa quá hạn session 24 giờ ⇒ vẫn nộp được.
+      // KHÔNG sửa thứ hạng đội đã chốt: chỉ đóng task (`lucNop`) — công học/thưởng của câu do đường nộp bài của em ghi.
+      const hiep = Number(b.hiep)
+      const t = phong.task?.[khoaTask(i, hiep)]
+      if (!t) throw new Error('Hiệp này em không có nhiệm vụ nào.')
+      if (t.tt === 'da_nop') throw new Error('Nhiệm vụ này em đã nộp rồi.')
+      if (t.tt === 'expired_unanswered' || !conNopDuoc(t, now)) throw new Error('Nhiệm vụ này đã hết hạn — em bấm Mở lại để nhận câu mới nhé.')
+      phong.task![khoaTask(i, hiep)] = { ...chotTask(t), lucNop: now }
+      doi = true
+    } else if (action === 'doan-mo-lai') {
+      // MỞ LẠI task `expired_unanswered` (02 §8): cần một attempt MỚI do MÁY CHỦ kiểm phạm vi.
+      //   (1) còn câu CHƯA DÙNG trong bộ đã cấp cho chặng này (đã qua chọn câu + phạm vi) ⇒ dùng câu đó;
+      //   (2) hết bộ ⇒ xin MÁY CHỦ cấp câu mới qua đúng đường `start` (kiểm phạm vi + chọn câu + sổ phiên),
+      //       task ghi kèm `phien` để em làm ở phiên mới — KHÔNG bao giờ phát lại đúng câu cũ.
+      const hiep = Number(b.hiep)
+      const t = phong.task?.[khoaTask(i, hiep)]
+      if (!t) throw new Error('Hiệp này em không có nhiệm vụ nào.')
+      const daDung = new Set(Object.values(phong.task ?? {}).map(x => x.qid).filter((q): q is string => !!q))
+      const trongBo = phong.nguoi[i]!.cau.find(cr => !daDung.has(cr.qid))
+      let qidMoi = trongBo?.qid ?? null
+      let phienMoi: string | null = null
+      if (!qidMoi) {
+        const start = await goiGame(env, 'start', danhDau({ token: b.token, mode: 'adventure' }))
+        const q = ((start.questions ?? []) as Question[]).find(x => !daDung.has(x.qid))
+        if (q) { qidMoi = q.qid; phienMoi = String(start.id) }
+      }
+      const moi = moLaiTask(t, qidMoi, now)
+      if (!moi) throw new Error('Chưa có câu mới do máy chủ kiểm phạm vi — nhiệm vụ vẫn hết hạn, không phát lại câu cũ.')
+      phong.task![khoaTask(i, hiep)] = { ...moi, lucMoLai: now, ...(phienMoi ? { phien: phienMoi } : {}) }
+      kem = { nhiemVuMoi: { hiep, qid: moi.qid, ...(phienMoi ? { phien: phienMoi } : {}) } }
+      doi = true
     } else if (action === 'doan-loi-giai-trum') {
       // Lời giải câu chung chỉ mở SAU KHI hiệp trùm ấy đã giải xong (mọi ý đã chốt hoặc hết giờ).
       const hiep = Number(b.hiep), ref = phong.trum[hiep]

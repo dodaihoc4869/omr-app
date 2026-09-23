@@ -44,6 +44,44 @@ export interface CauUngVien {
 export const SQL_NHAN_FAMILY = "COALESCE(NULLIF(json_extract(q.json, '$.family'), ''), NULLIF(json_extract(q.json, '$.familyId'), ''))"
 
 /**
+ * CƠ HỘI TRANSFER DO MÁY CHỦ CẤP (§7.2 `transferValue`): câu CÓ NHÃN FAMILY, ĐÃ DUYỆT, và `content_group` CHƯA từng
+ * có kết quả trong sổ của em — tức "nhóm nội dung mới". Nhờ vậy:
+ *   · family đã biết + nhóm mới ⇒ `transferValue` = 1 (đúng "1 nếu có cơ hội do server cấp và content_group mới, family đã biết");
+ *   · family chưa gặp + nhóm mới ⇒ 0,5 (nơi chấm tự biết qua `familyMoiVoiEm`);
+ *   · nhóm đã gặp ⇒ KHÔNG cấp cơ hội ⇒ 0 (không gọi làm lại một nhóm cũ là "chuyển giao").
+ *
+ * ÁNH XẠ TẠM (cần thầy xác nhận nhãn): kho hiện chỉ có `reviewed` theo CÂU, chưa có trạng thái duyệt theo FAMILY ⇒
+ * điều kiện "family đã duyệt" dùng `reviewed` của chính câu đó + nhãn family không rỗng. Thiếu nhãn ⇒ KHÔNG cấp
+ * (không bịa family, không tự nới). Lỗi đọc ⇒ tập rỗng (đúng "0 nếu không có cơ hội"), KHÔNG đoán.
+ */
+export async function docCoHoiTransfer(env: Env, sbd: string, ds: readonly { qid: string; group?: string }[]): Promise<Set<string>> {
+  const ra = new Set<string>()
+  try {
+    const qids = [...new Set(ds.map((c) => c.qid))]
+    if (qids.length === 0) return ra
+    const r = await env.DB.prepare(
+      `SELECT q.qid, COALESCE(q.content_group, '') AS nhom, ${SQL_NHAN_FAMILY} AS family
+         FROM game_v2_question q
+         JOIN de_kho d ON d.ma_de = q.ma_de
+         JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+        WHERE COALESCE(d.da_xoa, 0) = 0 AND ${SQL_NHAN_FAMILY} IS NOT NULL AND json_extract(q.json, '$.reviewed') = 1
+          AND q.qid IN (SELECT value FROM json_each(?))`,
+    ).bind(JSON.stringify(qids)).all<{ qid: string; nhom: string; family: string }>()
+    const ung = (r.results ?? []).filter((x) => x.family)
+    if (ung.length === 0) return ra
+    const da = await env.DB.prepare(
+      `SELECT DISTINCT COALESCE(q.content_group, '') AS nhom FROM su_kien_hoc k JOIN game_v2_question q ON q.qid = k.qid
+        WHERE k.sbd = ? AND k.ket_qua IS NOT NULL`,
+    ).bind(sbd).all<{ nhom: string }>()
+    const daGap = new Set((da.results ?? []).map((x) => String(x.nhom)))
+    for (const x of ung) if (!daGap.has(String(x.nhom))) { ra.add(String(x.qid)); ra.add(String(x.nhom)) }
+  } catch {
+    /* thiếu nhãn/bảng ⇒ không cấp cơ hội (transferValue = 0), KHÔNG đoán */
+  }
+  return ra
+}
+
+/**
  * KHOẢNG ÔN THẬT theo `content_group` (RV07 — §7.2 `intervalSeconds`): khoảng giữa lần **review trước** (mốc cuối
  * cùng em đã trả lời câu thuộc nhóm đó, đọc từ SỔ) và **mốc đến hạn hiện tại** (hồ sơ). Sàn 1 ngày (`86400 s`).
  * Chưa có bằng chứng (chưa trả lời nhóm đó / chưa có mốc) ⇒ KHÔNG trả giá trị giả: nhóm đó không có mặt trong map
@@ -401,12 +439,14 @@ export async function chonCauChoLuot(env: Env, ds: readonly CauUngVien[], inp: C
   }
   const khoangOnTheoNhom = inp.khoangOnTheoNhom ?? await docKhoangOnTheoNhom(env, inp.sbd, ds.map((c) => c.group), mocDenHanTheoNhom)
   const familyDaGap = inp.familyDaGap ?? await docFamilyDaGap(env, inp.sbd)
+  // RV07: nguồn CẤP cơ hội transfer (§7.2) — chỉ đọc khi nơi gọi KHÔNG truyền tập đã cấp.
+  const transferChoPhep = inp.transferChoPhep ?? await docCoHoiTransfer(env, inp.sbd, ds)
   const repairTheoKyNang = inp.repairTheoKyNang ?? await docRepairTheoKyNang(env, inp.sbd)
   const coverageTheoPlan = inp.coverageTheoPlan ?? await docCoverageTheoPlan(env, inp.sbd, inp.ngay, inp.nowMs)
   const dungChung: XepLuotInput = {
     sbd: inp.sbd, ngay: inp.ngay, mastery: inp.mastery, mucTheoKyNang: muc, hoSoCau, nowMs: inp.nowMs,
     mauTocDo: inp.mauTocDo, phienBanKeHoach: inp.phienBanKeHoach, khoangOnTheoNhom, familyDaGap,
-    transferChoPhep: inp.transferChoPhep, coverageTheoPlan, repairTheoKyNang, probeChoPhep: inp.probeChoPhep,
+    transferChoPhep, coverageTheoPlan, repairTheoKyNang, probeChoPhep: inp.probeChoPhep,
   }
 
   // §7.1 bước 3–6 trên TOÀN BỘ tập ứng viên (RV05: KHÔNG cắt 6 câu trước khi lọc).

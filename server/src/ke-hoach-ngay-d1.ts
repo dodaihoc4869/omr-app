@@ -327,12 +327,17 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   // Bài cá nhân hoá đã chốt: lô ≡ chặng — một truy vấn cho kích cỡ từng chặng của cả lô em.
   if (baiChot.size > 0) {
     const rcg = await tat(() => env.DB.prepare(
-      `SELECT ma_btvn, sbd, chang, COUNT(*) AS n FROM btvn_em_cau WHERE chang >= 0 AND sbd IN (SELECT value FROM json_each(?)) AND ma_btvn IN (SELECT value FROM json_each(?)) GROUP BY ma_btvn, sbd, chang ORDER BY chang`,
+      `SELECT ma_btvn, sbd, chang, COUNT(*) AS n, json_group_array(qid) AS qids FROM btvn_em_cau WHERE chang >= 0 AND sbd IN (SELECT value FROM json_each(?)) AND ma_btvn IN (SELECT value FROM json_each(?)) GROUP BY ma_btvn, sbd, chang ORDER BY chang`,
     ).bind(arr, json([...new Set([...baiChot.keys()].map((k) => k.split('|')[0]))])).all<Record<string, unknown>>(), trong())
     const soCauChang = new Map<string, number[]>()
+    const qidChang = new Map<string, string[][]>()
     for (const x of rcg.results ?? []) {
       const k = `${x.ma_btvn}|${x.sbd}`
-      if (baiChot.has(k)) soCauChang.set(k, [...(soCauChang.get(k) ?? []), Number(x.n) || 0])
+      if (baiChot.has(k)) {
+        soCauChang.set(k, [...(soCauChang.get(k) ?? []), Number(x.n) || 0])
+        // Mã câu ĐÃ CHỐT của chặng (RV07 phụ: `coverage` đếm được task cùng kỹ năng) — cùng truy vấn, không thêm D1.
+        qidChang.set(k, [...(qidChang.get(k) ?? []), docQid(x.qids) ?? []])
+      }
     }
     for (const c of map.values()) {
       for (const b of c.btvn) {
@@ -343,6 +348,9 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
         // Bản 1.1: lịch ĐÃ LƯU lúc chốt (chặng theo giờ khi hạn ngắn); bài chốt trước bản 1.1 ⇒ `moLucChang` cũ.
         const moLuc = docLichDaLuu(ban.lich, kc.length, { chotLuc: ban.chotLuc, hanNop: b.hanNop, nowMs: now })?.moLuc ?? moLucChang(ban.chotLuc, kc.length)
         b.caNhan = { chotLuc: ban.chotLuc, cacChang: kc.map((n, i) => ({ soCau: n, moLuc: moLuc[i]! })) }
+        const qidTheoChang: Record<number, string[]> = {}
+        for (let i = 0; i < kc.length; i++) { const q = qidChang.get(k)?.[i] ?? []; if (q.length) qidTheoChang[i] = q }
+        if (Object.keys(qidTheoChang).length) b.qidTheoChang = qidTheoChang
       }
     }
   }
