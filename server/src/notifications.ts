@@ -8,15 +8,23 @@ export async function syncNotices(env:Env,sbd?:string){
  // lọc Ở NGOÀI sau khi đã gộp — trước đây mỗi lượt em mở thông báo quét CẢ HAI bảng của TOÀN TRƯỜNG rồi mới lọc. `sbd = ?` TRỰC TIẾP
  // (không phải `? IS NULL OR sbd = ?`): SQLite/D1 không dùng chỉ mục khi có OR với tham số — đo bằng EXPLAIN QUERY PLAN, xem test.
  // `deliverNotices` (cron cả trường) gọi KHÔNG `sbd` ⇒ đường KHÔNG lọc, hành vi y hệt cũ.
- const q=sbd
+ const tasks=sbd
   ? `SELECT e.sbd,'btvn:'||e.khoa id,'Bài tập mới từ Thầy' title,b.ma_de body,'btvn' target,b.giao_luc created_at,b.han_nop deadline FROM btvn_em e JOIN btvn b ON b.ma_btvn=e.ma_btvn WHERE b.da_xoa=0 AND e.thu_hoi=0 AND e.nop_luc IS NULL AND b.han_nop>strftime('%Y-%m-%dT%H:%M:%fZ','now') AND e.sbd=?
     UNION ALL SELECT sbd,'mom:'||sbd||':'||id,'Bài luyện mới',title,'mom',created_at,NULL FROM mom_bai WHERE submitted_at IS NULL AND sbd=?`
   : `SELECT e.sbd,'btvn:'||e.khoa id,'Bài tập mới từ Thầy' title,b.ma_de body,'btvn' target,b.giao_luc created_at,b.han_nop deadline FROM btvn_em e JOIN btvn b ON b.ma_btvn=e.ma_btvn WHERE b.da_xoa=0 AND e.thu_hoi=0 AND e.nop_luc IS NULL AND b.han_nop>strftime('%Y-%m-%dT%H:%M:%fZ','now')
     UNION ALL SELECT sbd,'mom:'||sbd||':'||id,'Bài luyện mới',title,'mom',created_at,NULL FROM mom_bai WHERE submitted_at IS NULL`
- const tasks=(await env.DB.prepare(q).bind(...(sbd?[sbd,sbd]:[])).all<Record<string,any>>()).results
- const statements=[]
- for(const t of tasks){statements.push(env.DB.prepare('INSERT OR IGNORE INTO student_notice(id,sbd,title,body,target,created_at) VALUES(?,?,?,?,?,?)').bind(t.id,t.sbd,t.title,t.body,t.target,t.created_at));const remaining=Date.parse(t.deadline)-Date.now();if(remaining>0&&remaining<=3600000)statements.push(env.DB.prepare('INSERT OR IGNORE INTO student_notice(id,sbd,title,body,target,created_at) VALUES(?,?,?,?,?,?)').bind(`due:${t.id}:${t.deadline}`,t.sbd,'Bài tập sắp hết hạn','Còn dưới 1 giờ. Em mở bài để kiểm tra hạn nộp.',t.target,new Date().toISOString()))}
- for(let i=0;i<statements.length;i+=50)await env.DB.batch(statements.slice(i,i+50))
+ // Một lệnh ghi thay cho SELECT + một INSERT OR IGNORE cho mỗi bài.
+ // CTE chỉ chứa bài của đúng em khi có sbd; cron không sbd vẫn quét cả trường.
+ // INSERT OR IGNORE giữ read_at và thời điểm của thông báo đã có khi thăm dò lại.
+ await env.DB.prepare(`WITH tasks AS (${tasks})
+   INSERT OR IGNORE INTO student_notice(id,sbd,title,body,target,created_at)
+   SELECT id,sbd,title,body,target,created_at FROM tasks
+   UNION ALL
+   SELECT 'due:'||id||':'||deadline,sbd,'Bài tập sắp hết hạn',
+     'Còn dưới 1 giờ. Em mở bài để kiểm tra hạn nộp.',target,
+     strftime('%Y-%m-%dT%H:%M:%fZ','now')
+   FROM tasks WHERE julianday(deadline)>julianday('now') AND julianday(deadline)<=julianday('now','+1 hour')`
+ ).bind(...(sbd?[sbd,sbd]:[])).run()
 }
 export async function notifications(env:Env,action:string,b:Record<string,unknown>){
  const sbd=await gameIdentity(env,b)
