@@ -1,4 +1,4 @@
-// KHOÁ LÝ DO CỦA BẢNG GIÁ EXP HỌC TẬP MỚI (Điều 10, Code 1, 21/09/2026): em ĐẠT mọi ngày thì bảng MỚI đưa CẢ BA kiểu em (đúng 50 / 70 / 90 %) tới cấp 10 ĐÚNG ngày 21; bảng CŨ thì em 50 % chậm ~5–6 ngày.
+// KHOÁ LÝ DO CỦA BẢNG GIÁ EXP HỌC TẬP MỚI (Điều 10, Code 1, 21/09/2026): em ĐẠT mọi ngày thì bảng MỚI đưa CẢ BA kiểu em (đúng 50 / 70 / 90 %) tới cấp 10 ĐÚNG ngày 12; bảng CŨ thì em 50 % chậm ~5–6 ngày.
 import { describe, expect, it } from 'vitest'
 import { execFileSync } from 'node:child_process'
 import { BU_DAT_NGAY, HAP_THU_DAT } from '../src/lib/hap-thu-ngay'
@@ -25,31 +25,31 @@ describe('bảng giá EXP học tập: cũ → mới (Điều 10)', () => {
       expect(Math.abs(tbTuan(k, BANG_GIA_MOI) - moi[i]!), k.ten).toBeLessThanOrEqual(8)
     })
   })
-  it('BẢNG MỚI: cả ba kiểu em tới cấp 10 ĐÚNG ngày 21 (4 200 / 200) và MỖI ngày kiếm ≥ 200 EXP (chăm là đủ, kể cả ngày đầu); không kiểu em nào tới cấp 10 sớm hơn ngày 21', () => {
-    expect(tongExpToiCap(10)).toBe(4200)
+  it('BẢNG MỚI: cả ba kiểu em tới cấp 10 ĐÚNG ngày 12 (2 400 / 200) và MỖI ngày kiếm ≥ 200 EXP (chăm là đủ, kể cả ngày đầu); không kiểu em nào tới cấp 10 sớm hơn ngày 12', () => {
+    expect(tongExpToiCap(10)).toBe(2400)
     for (const k of KIEU_EM) {
-      expect(ngayToiCap(k, BANG_GIA_MOI), k.ten).toBe(21)
+      expect(ngayToiCap(k, BANG_GIA_MOI), k.ten).toBe(12)
       for (let d = 1; d <= 40; d++) expect(expMotNgay(k, BANG_GIA_MOI, d), `${k.ten} ngày ${d}`).toBeGreaterThanOrEqual(HAP_THU_DAT)
     }
     // dù kiếm rất nhiều, không sớm hơn 21
     const giau: KieuEm = { ten: 'giàu', game: 999, cau: 500, lenBac: 200, khacPhuc: 200 }
-    expect(ngayToiCap(giau, BANG_GIA_MOI)).toBe(21)
+    expect(ngayToiCap(giau, BANG_GIA_MOI)).toBe(12)
   })
-  it('BẢNG CŨ (lý do phải đổi): em yếu mà chăm chậm hơn 5–7 ngày (ngày 26–28), em trung bình chậm 1–2 ngày, em giỏi đúng ngày 21; em yếu KHÔNG ngày nào đủ 200', () => {
+  it('BẢNG CŨ (lý do phải đổi): em yếu mà chăm chậm hơn 5–7 ngày (ngày 26–28), em trung bình chậm 1–2 ngày, em giỏi đúng ngày 12; em yếu KHÔNG ngày nào đủ 200', () => {
     const [yeu, tb, gioi] = KIEU_EM as [KieuEm, KieuEm, KieuEm]
     const nYeu = ngayToiCap(yeu, BANG_GIA_CU)
-    expect(nYeu).toBeGreaterThanOrEqual(26)
-    expect(nYeu).toBeLessThanOrEqual(28)
-    expect(ngayToiCap(tb, BANG_GIA_CU)).toBeGreaterThanOrEqual(21)
-    expect(ngayToiCap(tb, BANG_GIA_CU)).toBeLessThanOrEqual(23)
-    expect(ngayToiCap(gioi, BANG_GIA_CU)).toBe(21)
+    expect(nYeu).toBeGreaterThanOrEqual(15)
+    expect(nYeu).toBeLessThanOrEqual(17)
+    expect(ngayToiCap(tb, BANG_GIA_CU)).toBeGreaterThanOrEqual(12)
+    expect(ngayToiCap(tb, BANG_GIA_CU)).toBeLessThanOrEqual(14)
+    expect(ngayToiCap(gioi, BANG_GIA_CU)).toBe(12)
     for (let d = 1; d <= 60; d++) expect(expMotNgay(yeu, BANG_GIA_CU, d), `ngày ${d}`).toBeLessThan(HAP_THU_DAT)
-    expect(nYeu).toBeGreaterThan(ngayToiCap(yeu, BANG_GIA_MOI) + 4)
+    expect(nYeu).toBeGreaterThan(ngayToiCap(yeu, BANG_GIA_MOI) + 2)
   })
   it('lệnh `npm run mo-phong:bang-gia-exp` chạy được, in bảng và thoát 0 khi bảng mới đúng bất biến', () => {
     const ra = execFileSync(process.execPath, ['scripts/mo-phong-bang-gia-exp.mjs'], { cwd: process.cwd(), encoding: 'utf8' })
     expect(ra).toContain('Yếu mà chăm')
     expect(ra).toContain('ĐẠT')
-    expect(ra.split('\n').filter((l) => l.includes('ngày 21')).length).toBeGreaterThanOrEqual(4)
+    expect(ra.split('\n').filter((l) => l.includes('ngày 12')).length).toBeGreaterThanOrEqual(4)
   })
 })

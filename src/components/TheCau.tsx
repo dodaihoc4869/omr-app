@@ -347,8 +347,8 @@ export default function TheCau(props: TheCauProps) {
     )
   } else {
     const { selected, onChange, correct } = props
-    const daTraLoi = !!selected?.trim()
-    const dung = xemLai && daTraLoi && correct !== undefined && normSo(selected ?? '') === normSo(correct)
+    const daTraLoi = !!normSo(selected ?? '')
+    const dung = xemLai && daTraLoi && !!normSo(correct ?? '') && normSo(selected ?? '') === normSo(correct ?? '')
     body = xemLai ? (
       <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
         <Hang selected data-trang-thai="dung">

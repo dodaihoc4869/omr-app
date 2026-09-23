@@ -208,6 +208,7 @@ export default function DoanTran(p: Props) {
       {duoi}
       {!mo && !tran.ketThuc && <div className="dh-cho" role="status">{tran.hiep === 1 && !xem.hiepVuaXong ? 'Chuẩn bị lên đường' : `Hiệp ${tran.hiep}${tran.laTrum ? ' · TRÙM' : ''} mở sau`} {Math.max(1, p.moSauGiay)} giây</div>}
       {!mo && !tran.ketThuc && p.hetCauMoi && tran.hiep === 1 && <div className="dh-cho" role="status" data-vung="het-cau-moi">{CHU_HET_CAU_MOI}</div>}
+      {!mo && !tran.ketThuc && tran.hiep === 1 && !!xem.soCauThieu && <div className="dh-cho" role="status">Kho của em còn thiếu {xem.soCauThieu} câu phù hợp. Hiệp không có câu, em cổ vũ đồng đội nhé.</div>}
     </div>
   )
 }

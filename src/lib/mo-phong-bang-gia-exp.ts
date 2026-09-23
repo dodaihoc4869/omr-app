@@ -1,6 +1,6 @@
 // MÔ HÌNH "BẢNG GIÁ EXP HỌC TẬP" — khoá LÝ DO của bảng giá mới (Điều 10 của `DE-XUAT-THAN-THU-MOI-NGAY-2109.md`; Code 1, 21/09/2026). THUẦN.
 //
-// Bất biến cần giữ: em nào ĐẠT nhiệm vụ ngày MỖI ngày và chơi thú đều đặn thì kiếm đủ 200 EXP/ngày dù học yếu (đúng 50 %), nên thú ăn no 200 mỗi ngày và tới cấp 10 ĐÚNG ngày 21 (4 200 / 200).
+// Bất biến cần giữ: em nào ĐẠT nhiệm vụ ngày MỖI ngày và chơi thú đều đặn thì kiếm đủ 200 EXP/ngày dù học yếu (đúng 50 %), nên thú ăn no 200 mỗi ngày và tới cấp 10 ĐÚNG ngày 12 (2 400 / 200).
 // Bảng CŨ không làm được: thưởng nghiêng về câu đúng ⇒ em yếu-mà-chăm chỉ kiếm ~165 EXP/ngày, mất ~27 ngày. Không tính lại sổ cũ; chỉ dùng để chứng minh nên đổi bảng giá và để phát hiện ai lỡ tay hạ lại.
 //
 // Số liệu mỗi ngày của ba kiểu em (Boss cung cấp): game (kẹp 120), câu đúng, lên bậc, khắc phục — là số EXP kiếm được trong ngày ở từng nguồn. Chặng đúng nhịp 5/7 số ngày; chuỗi ngày đạt 2 × min(chuỗi, 10).

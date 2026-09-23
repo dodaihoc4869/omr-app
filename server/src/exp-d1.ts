@@ -18,10 +18,9 @@ import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
 import { EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, TIEP_SUC_TOI_DA_NGAY, bangGiaExp } from './exp-cau-hinh'
 import { congManh, NGUON_EXP_CAU, tinhExp, type KhoanExp, type KhoanManh, type MetaCauExp, type VaoTinhExp } from './exp-hoc-tap'
 import { congTongSoVaoHoSo, khienConLai, khienRenChuaDung, type DaCong, type HoSoGameExp } from './exp-ho-so-game'
-import { NGAN_SACH_SAN, SO_NGAY_LICH_SU, TOI_THIEU_CAU_SAN } from './ho-so-cau-hinh'
+import { NGAN_SACH_SAN, TOI_THIEU_CAU_SAN } from './ho-so-cau-hinh'
 import type { SuKienDoc } from './ho-so-nam-kt'
 import { traCuuTheoQid } from './ho-so-nam-kt'
-import { demChuoiDat } from './ke-hoach-ngay'
 import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
 import { docHapThuChoEm, nhanExpGame } from './game-v2-hap-thu'
 import type { Profile } from './game-v2'
@@ -165,23 +164,23 @@ async function docKeHoachLuu(env: Env, sbd: string, tuNgay: string): Promise<KeH
 }
 
 /** Chuỗi ngày đạt LIÊN TIẾP TRƯỚC `ngay` (đúng cách `docDauVao` dựng `lichSu`), để ngày này thành `chuỗi + 1`. */
-/** Số ngày ĐẠT nhiệm vụ ngày liên tiếp TRƯỚC `ngay` (ngày nghỉ không đứt chuỗi), nhìn lại tối đa `soNgay` ngày (mặc định cửa sổ lịch sử của kế hoạch = 7). Cửa hàng phụ kiện đọc với cửa sổ dài hơn (điều kiện "cần chuỗi 14–30 ngày"). */
-export async function docChuoiTruoc(env: Env, sbd: string, ngay: string, soNgay: number = SO_NGAY_LICH_SU): Promise<number> {
+/** Số ngày ĐẠT nhiệm vụ ngày liên tiếp TRƯỚC `ngay` (ngày nghỉ không đứt chuỗi), nhìn lại tối đa `soNgay` ngày (mặc định tối đa 10 năm; không cắt chuỗi ở cửa sổ 7 ngày điều chỉnh khối lượng). Cửa hàng phụ kiện đọc với cửa sổ dài hơn (điều kiện "cần chuỗi 14–30 ngày"). */
+export async function docChuoiTruoc(env: Env, sbd: string, ngay: string, soNgay: number = 3660): Promise<number> {
   const tuNgay = themNgay(ngay, -soNgay)
   const nghi = await docNgayNghi(env)
   const r = await an(
-    () => env.DB.prepare('SELECT ngay, ket_qua FROM ke_hoach_ngay WHERE sbd = ? AND ngay < ? AND ngay >= ? ORDER BY ngay DESC').bind(sbd, ngay, tuNgay).all<Record<string, unknown>>(),
+    () => env.DB.prepare('SELECT ngay, ket_qua, la_ngay_nghi FROM ke_hoach_ngay WHERE sbd = ? AND ngay < ? AND ngay >= ? ORDER BY ngay DESC').bind(sbd, ngay, tuNgay).all<Record<string, unknown>>(),
     null,
   )
-  const ls: { ngay: string; ketQua: 'dat' | 'mot_phan' | 'khong' | null }[] = []
-  for (const x of r?.results ?? []) {
-    const k = x.ket_qua === 'dat' || x.ket_qua === 'mot_phan' || x.ket_qua === 'khong' ? x.ket_qua : null
-    ls.push({ ngay: String(x.ngay), ketQua: k })
+  const ketQua = new Map((r?.results ?? []).map(x => [String(x.ngay), x.ket_qua]))
+  const ngayNghi = new Set([...nghi, ...(r?.results ?? []).filter(x=>Number(x.la_ngay_nghi)===1).map(x=>String(x.ngay))])
+  let chuoi = 0
+  for (let n = themNgay(ngay, -1); n >= tuNgay; n = themNgay(n, -1)) {
+    if (ngayNghi.has(n)) continue
+    if (ketQua.get(n) !== 'dat') break
+    chuoi++
   }
-  const co = new Set(ls.map((h) => h.ngay))
-  for (const n of nghi) if (n < ngay && n >= tuNgay && !co.has(n)) ls.push({ ngay: n, ketQua: null })
-  ls.sort((a, b) => (a.ngay < b.ngay ? 1 : a.ngay > b.ngay ? -1 : 0))
-  return demChuoiDat(ls)
+  return chuoi
 }
 
 /** qid từng được thưởng theo LUẬT CŨ (`academic.seen`: `practice:<qid>` hoặc `exam:<ma_ca>:<qid>`), để ngày phát hành không trả đôi. */
@@ -471,7 +470,7 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   // Chưa có kế hoạch ngày đã lưu thì chưa xét (em chưa từng mở nhiệm vụ hôm nay). "Đã làm" đếm trên sổ CHƯA lọc, "lên bậc" trên sổ ĐÃ lọc ca chưa công bố.
   const chiTietDat = tinhDatNhiemVuNgay({ coKeHoach, toiThieu, laNghi, homNay, tu, tuNgay, soTho, so, treNhip, soCauToiHan })
   let datNgay: VaoTinhExp['datNgay'] = null
-  if (chiTietDat?.dat) datNgay = { chuoi: (kh ? kh.chuoiDat : await docChuoiTruoc(env, sbd, homNay)) + 1, luc: chiTietDat.luc }
+  if (chiTietDat?.dat) datNgay = { chuoi: (await docChuoiTruoc(env, sbd, homNay)) + 1, luc: chiTietDat.luc }
 
   const cacKhoan: KhoanExp[] = []
   const cacManh: KhoanManh[] = []
@@ -582,17 +581,16 @@ export async function ghiTiepSuc(env: Env, sbd: string, nowMs: number, idLuot: s
     for (let thu = 0; thu < TIEP_SUC_TOI_DA_NGAY + 1; thu++) {
       const r = await env.DB.prepare("SELECT khoa, ma_nguon FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'tiepsuc'").bind(sbd, ngay).all<{ khoa: string; ma_nguon: string | null }>()
       const co = r.results ?? []
-      if (idLuot && co.some((x) => x.ma_nguon === idLuot)) return { bat: true, exp: 0, lanThu: 0, conLai: Math.max(0, TIEP_SUC_TOI_DA_NGAY - co.length), daGhiTruoc: true }
+      if (idLuot && co.some((x) => x.ma_nguon === idLuot)) { await congVaoHoSoGame(env, sbd, await docTuNgayMua(env)); return { bat: true, exp: 0, lanThu: 0, conLai: Math.max(0, TIEP_SUC_TOI_DA_NGAY - co.length), daGhiTruoc: true } }
       if (co.length >= TIEP_SUC_TOI_DA_NGAY) return { bat: true, exp: 0, lanThu: 0, conLai: 0, daGhiTruoc: false }
       const n = co.length + 1
       // ĐIỀU 9: tiếp sức là EXP sinh trong game ⇒ qua cửa trần 120 EXP/ngày (quá trần ghi khoản 0 EXP, vẫn tính là một lần tiếp sức).
-      const nhan = await giuChoExpGame(env, sbd, ngay, EXP_TIEP_SUC)
-      const w = await env.DB.prepare(
-        `INSERT OR IGNORE INTO exp_so (khoa, sbd, ngay_vn, loai, qid, ma_nguon, exp, luc, ghi_chu) VALUES (?, ?, ?, 'tiepsuc', NULL, ?, ?, ?, ?)`,
-      ).bind(`${sbd}|tiepsuc|${ngay}|${n}`, sbd, ngay, idLuot, nhan, luc, nhan < EXP_TIEP_SUC ? `Tiếp sức đồng đội lần ${n}: +${nhan} (hôm nay em đã đủ EXP game)` : `Tiếp sức đồng đội lần ${n}: +${nhan}`).run()
-      if (w.meta.changes) {
-        if (nhan > 0) await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
-        return { bat: true, exp: nhan, lanThu: n, conLai: TIEP_SUC_TOI_DA_NGAY - n, daGhiTruoc: false }
+      const k: KhoanGame = { khoa: `tiepsuc|${ngay}|${n}`, loai: 'tiepsuc', exp: EXP_TIEP_SUC, ngay, luc, maNguon: idLuot, ghiChu: `Tiếp sức đồng đội lần ${n}` }
+      const w = await ghiGameNguyenTu(env, sbd, k)
+      if (w.ghi) {
+        await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
+        emCoGhi(sbd)
+        return { bat: true, exp: w.exp, lanThu: n, conLai: TIEP_SUC_TOI_DA_NGAY - n, daGhiTruoc: false }
       }
       // Ô số n vừa bị lượt khác giữ chỗ: đọc lại và thử ô kế.
     }
@@ -601,23 +599,6 @@ export async function ghiTiepSuc(env: Env, sbd: string, nowMs: number, idLuot: s
     console.error('[exp] tiếp sức lỗi (bỏ qua):', e instanceof Error ? e.message : e)
     return khong
   }
-}
-
-/**
- * ĐIỀU 9 — GIỮ CHỖ trần EXP game (120/ngày VN) cho MỘT khoản sinh trong game: CAS lên hồ sơ (`expGame {ngay, da}`) và trả phần THẬT được nhận (≤ xin). Em chưa có hồ sơ game ⇒ trả `xin` (chưa có bộ đếm để kẹp,
- * khoản nằm chờ như mọi khoản). Không giữ được chỗ (hồ sơ đổi liên tục) ⇒ 0 — an toàn: không bao giờ vượt trần. Không ném lỗi.
- */
-export async function giuChoExpGame(env: Env, sbd: string, ngay: string, xin: number): Promise<number> {
-  for (let lan = 0; lan < 8; lan++) {
-    const row = await an(() => env.DB.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ revision: number; json: string }>(), null)
-    if (!row) return Math.max(0, Math.floor(Number.isFinite(xin) ? xin : 0))
-    let p: Profile
-    try { p = JSON.parse(row.json) as Profile } catch { return 0 }
-    const nhan = nhanExpGame(p, ngay, xin)
-    const r = await env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(json(p), sbd, row.revision).run()
-    if (r.meta.changes) return nhan
-  }
-  return 0
 }
 
 export interface KhoanGame {
@@ -633,25 +614,58 @@ export interface KhoanGame {
 }
 
 /**
- * Ghi MỘT khoản EXP sinh trong game (thử thách/Lượt trùm, kết chặng Đoàn, vỡ giáp…) vào sổ `exp_so`, qua cửa trần 120/ngày (`giuChoExpGame`), rồi cộng phần chênh sổ vào ống nghiệm. Idempotent theo `khoa`.
+ * Ghi MỘT khoản EXP sinh trong game (thử thách/Lượt trùm, kết chặng Đoàn, vỡ giáp…) cùng hạn mức 120/ngày trong một giao dịch, rồi cộng phần chênh sổ vào ống nghiệm. Idempotent theo `khoa`.
  * Quá trần ⇒ ghi khoản 0 EXP (đánh dấu đã xét, không tự cộng lại khi sang ngày). EXP mới TẮT cho em ⇒ không ghi gì. Không ném lỗi.
  */
 export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs: number): Promise<{ bat: boolean; exp: number; daGhiTruoc: boolean }> {
   try {
     if (!mocExpCuaEm(await docCauHinhExp(env), sbd, nowMs)) return { bat: false, exp: 0, daGhiTruoc: false }
     const khoa = `${sbd}|${k.khoa}`
-    if (await an(() => env.DB.prepare('SELECT 1 AS x FROM exp_so WHERE khoa = ?').bind(khoa).first(), null)) return { bat: true, exp: 0, daGhiTruoc: true }
-    const nhan = await giuChoExpGame(env, sbd, k.ngay, k.exp)
-    const w = await env.DB.prepare('INSERT OR IGNORE INTO exp_so (khoa, sbd, ngay_vn, loai, qid, ma_nguon, exp, luc, ghi_chu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-      .bind(khoa, sbd, k.ngay, k.loai, k.qid ?? null, k.maNguon ?? null, nhan, k.luc, nhan < k.exp ? `${k.ghiChu} (hôm nay em đã đủ EXP game)` : k.ghiChu).run()
-    if (!w.meta.changes) return { bat: true, exp: 0, daGhiTruoc: true }
-    if (nhan > 0) await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
+    if (await env.DB.prepare('SELECT 1 AS x FROM exp_so WHERE khoa = ?').bind(khoa).first()) { await congVaoHoSoGame(env, sbd, await docTuNgayMua(env)); return { bat: true, exp: 0, daGhiTruoc: true } }
+    const w = await ghiGameNguyenTu(env, sbd, k)
+    if (!w.ghi) return { bat: true, exp: 0, daGhiTruoc: true }
+    const nhan = w.exp
+    await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
     emCoGhi(sbd) // EXP game vừa ghi ⇒ đệm kế hoạch ngày của em hết hiệu lực
     return { bat: true, exp: nhan, daGhiTruoc: false }
   } catch (e) {
     console.error('[exp] ghi khoản game lỗi (bỏ qua):', e instanceof Error ? e.message : e)
     return { bat: false, exp: 0, daGhiTruoc: false }
   }
+}
+
+/** Ledger và hạn mức cùng một giao dịch D1: retry không tiêu thêm hạn mức.
+ * Guard revision ngay trên INSERT; changes() nối UPDATE với đúng INSERT vừa thắng.
+ */
+async function ghiGameNguyenTu(env: Env, sbd: string, k: KhoanGame): Promise<{ ghi: boolean; exp: number }> {
+  for (let lan = 0; lan < 8; lan++) {
+    const row = await env.DB.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ revision: number; json: string }>()
+    if (!row) {
+      // Thử thách học tập có thể hoàn tất trước lần đầu em mở thần thú.
+      // Khởi tạo cùng đường chuẩn rồi mới ghi, để khoản thưởng không bị mất.
+      const { loadProfile } = await import('./game-v2')
+      await loadProfile(env, sbd)
+      continue
+    }
+    const p = JSON.parse(row.json) as Profile
+    const exp = nhanExpGame(p, k.ngay, k.exp)
+    const khoa = `${sbd}|${k.khoa}`
+    const ketQua = await env.DB.batch([
+      env.DB.prepare(`INSERT OR IGNORE INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu)
+        SELECT ?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?)
+        AND (? <> 'tiepsuc' OR (
+          (SELECT COUNT(*) FROM exp_so WHERE sbd=? AND ngay_vn=? AND loai='tiepsuc') < ?
+          AND (? IS NULL OR NOT EXISTS(SELECT 1 FROM exp_so WHERE sbd=? AND ngay_vn=? AND loai='tiepsuc' AND ma_nguon=?))))`)
+        .bind(khoa,sbd,k.ngay,k.loai,k.qid??null,k.maNguon??null,exp,k.luc,k.ghiChu,sbd,row.revision,
+          k.loai,sbd,k.ngay,TIEP_SUC_TOI_DA_NGAY,k.maNguon??null,sbd,k.ngay,k.maNguon??null),
+      env.DB.prepare('UPDATE game_v2_profile SET json=?, revision=revision+1 WHERE sbd=? AND revision=? AND changes()=1')
+        .bind(json(p),sbd,row.revision),
+    ])
+    if (ketQua[0]?.meta.changes) return { ghi: true, exp }
+    if (await env.DB.prepare('SELECT 1 AS x FROM exp_so WHERE khoa=?').bind(khoa).first()) return { ghi: false, exp: 0 }
+    if (k.loai === 'tiepsuc' && k.maNguon && await env.DB.prepare("SELECT 1 AS x FROM exp_so WHERE sbd=? AND ngay_vn=? AND loai='tiepsuc' AND ma_nguon=?").bind(sbd,k.ngay,k.maNguon).first()) return { ghi: false, exp: 0 }
+  }
+  throw new Error('Hồ sơ đang cập nhật. Phần thưởng cần được thử lại.')
 }
 
 export interface ThanhTichNgay {
@@ -792,6 +806,9 @@ export async function docExpHomNay(env: Env, sbd: string, nowMs: number): Promis
     const cu = nhom.get(k)
     if (cu) { cu.exp += Number(x.exp) || 0; cu.n++ } else nhom.set(k, { exp: Number(x.exp) || 0, ghiChu: String(x.ghi_chu ?? ''), n: 1 })
   }
+  const game = await an(() => env.DB.prepare("SELECT COALESCE(SUM(amount),0) AS e, COUNT(*) AS n FROM game_v2_reward WHERE sbd=? AND created_at>=? AND created_at<? AND amount>0")
+    .bind(sbd, new Date(`${ngay}T00:00:00+07:00`).toISOString(), new Date(`${themNgay(ngay, 1)}T00:00:00+07:00`).toISOString()).first<{ e: number; n: number }>(), null)
+  if (game && game.n > 0) nhom.set('game_mastery', { exp: Number(game.e) || 0, n: game.n, ghiChu: 'Thưởng nấc học trong game' })
   const chiTiet = [...nhom].map(([loai, v]) => ({
     loai, exp: v.exp, soKhoan: v.n, ghiChu: v.n === 1 ? v.ghiChu : `${v.n} ${TEN_LOAI[loai] ?? loai}: +${v.exp}`,
   }))

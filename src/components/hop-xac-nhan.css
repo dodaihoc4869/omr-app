@@ -20,6 +20,14 @@
   position: relative;
   z-index: 1;
   width: min(420px, 100%);
+  min-width: 0;
+  /* Nội dung dài hoặc bàn phím làm thấp màn: cuộn trong hộp để vẫn tới
+   * được tiêu đề, ô xác nhận và nút cuối, không đẩy chúng khỏi viewport. */
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
   box-sizing: border-box;
   padding: 24px;
   border-radius: 28px;
@@ -69,6 +77,8 @@
 }
 .hxn-go input {
   box-sizing: border-box;
+  min-width: 0;
+  width: 100%;
   min-height: 48px;
   padding: 0 14px;
   border: 1.5px solid var(--m3-outline);
@@ -91,6 +101,7 @@
   margin-top: 24px;
 }
 .hxn-nut {
+  max-width: 100%;
   min-height: 48px;
   padding: 0 24px;
   border: 0;

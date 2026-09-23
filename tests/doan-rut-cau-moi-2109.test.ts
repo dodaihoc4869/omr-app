@@ -28,6 +28,16 @@ function dung(o: { soA?: number; soB?: number; soII?: number; em?: string[] } = 
   for (const sbd of o.em ?? ['S1', 'S2', 'S3']) {
     d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES(?,?,'12','mk','x')").run(sbd, `Em ${sbd}`)
     d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run(sbd, JSON.stringify({ pet: 'lua_phuong', choice: false, legacy: null, cap: 5, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z' }), 'x')
+    // Bằng chứng học của CHÍNH em: hai câu đã làm ở nguồn ôn 60 ngày trước.
+    // Trước 23/09 fixture chỉ có dạng của cả lớp nên trái luật phạm vi cá nhân mới.
+    for (const [qid,dang] of [['A-0','A.1'],['B-0','B.2']] as const) {
+      if (!ds.some(q=>q.qid===qid)) continue
+      const luc=new Date(T0-60*86_400_000).toISOString()
+      d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,lan,ket_qua,giay,luc,ngay_vn,ma_dang) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+        .run(`seed-${sbd}-${qid}`,sbd,qid,'on_lai','seed',1,1,30,luc,luc.slice(0,10),dang)
+      d.sql.prepare('INSERT INTO nam_kt_cau(khoa,sbd,qid,ma_dang,lan_gap,lan_sai,lan_trong,dung_lien_tiep,ngay_dung_khac_nhau,ket_qua_cuoi,nguon_cuoi,luc_cuoi,trang_thai,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+        .run(`${sbd}|${qid}`,sbd,qid,dang,1,0,0,1,1,1,'on_lai',luc,'chua_thay_sai',luc)
+    }
   }
   d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT1','CA1','DE1',30,'2026-09-20T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run()
   d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BT1|S3','BT1','S3','Em S3')").run()
@@ -79,16 +89,18 @@ describe('ưu tiên câu CHƯA TỪNG làm ở mọi nguồn; hết mới ⇒ c�
     expect(r.hetCauMoi).toBeUndefined()
   })
 
-  it('kho chỉ còn 3 câu MỚI: chặng = 3 câu mới + 3 câu LÂU NHẤT chưa gặp (không phải câu vừa làm gần đây), hetCauMoi = true', async () => {
+  it('kho chỉ còn 3 câu MỚI: câu vừa đúng chưa đến lịch không bị lặp để lấp đủ 6, hetCauMoi = true', async () => {
     const d = dung({ soA: 10, soB: 0 })
     for (let i = 0; i < 7; i++) ghiSo(d, 'S1', `A-${i}`, 1, NGAY_TRUOC + i * 3_600_000) // A-0 lâu nhất … A-6 mới nhất (cùng ngày trước)
     const r = await rutVaLam(d)
     const ids = (r.questions as { qid: string }[]).map((q) => q.qid).sort()
     expect(r.hetCauMoi).toBe(true)
-    expect(ids).toHaveLength(6)
+    expect(ids).toHaveLength(4)
+    expect(r.soCauThieu).toBe(2)
     for (const moi of ['A-7', 'A-8', 'A-9']) expect(ids).toContain(moi)
-    // 3 câu cũ = lâu nhất chưa gặp: A-0, A-1, A-2 (không phải A-4…A-6)
-    for (const cu of ['A-0', 'A-1', 'A-2']) expect(ids).toContain(cu)
+    // A-0 đã làm cách 60 ngày; A-1…A-6 vừa đúng 5 ngày trước nên chờ đủ khoảng cách.
+    expect(ids).toContain('A-0')
+    for (const vuaDung of ['A-1','A-2','A-3','A-4','A-5','A-6']) expect(ids).not.toContain(vuaDung)
   })
 
   it('làm hết câu hôm nay rồi: KHÔNG lặp dù kho nhỏ — báo thật "hết câu mới", doan-mo từ chối bằng chính lời ấy', async () => {

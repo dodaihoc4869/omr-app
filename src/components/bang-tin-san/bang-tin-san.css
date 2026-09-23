@@ -365,7 +365,8 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@container bts (min-width: 980px) {
+/* Khung 980px gồm 32px padding; container query đo phần nội dung 948px. */
+@container bts (min-width: 948px) {
   .bts-hang-so[data-so-o='4'] {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -509,7 +510,8 @@
     height: 380px;
   }
 }
-@container bts (min-width: 980px) {
+/* Khung 980px gồm 32px padding; container query đo phần nội dung 948px. */
+@container bts (min-width: 948px) {
   .bts-hang-chinh:has(.bts-the-3d) {
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   }
@@ -1089,7 +1091,8 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@container bts (min-width: 980px) {
+/* Khung 980px gồm 32px padding; container query đo phần nội dung 948px. */
+@container bts (min-width: 948px) {
   .bts-hang-duoi {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }

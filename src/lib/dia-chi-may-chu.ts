@@ -40,17 +40,7 @@
 //   3. Cấm trả về địa chỉ Google. Đường ấy đã cắt từ 12/09.
 import { layCauHinhMayChu, xongNapDiaChi } from './may-chu-moi'
 import { loadDiaChiMayChuMoiChoEm } from './exam-db'
-
-/** Địa chỉ Google — đã cắt từ 12/09, trả về là dẫn em vào ngõ cụt. */
-function laGoogle(u: string): boolean {
-  return /(^|\.)google\.com|googleusercontent|script\.googleapis/i.test(u)
-}
-
-function don(u: unknown): string {
-  const s = String(u ?? '').trim().replace(/\/+$/, '')
-  if (!s || !s.startsWith('https://') || laGoogle(s)) return ''
-  return s
-}
+import { diaChiMayChuHopLe as don } from './cau-hinh-may-chu'
 
 /** Nhớ địa chỉ ĐÃ RA ĐƯỢC. Không bao giờ nhớ chuỗi rỗng (luật 2). */
 let daBiet = ''
@@ -71,8 +61,6 @@ export function quenDiaChiMayChu(): void {
  *             không sao — đó chính là điểm của tệp này.
  */
 export async function layDiaChiMayChu(goiY = ''): Promise<string> {
-  if (daBiet) return daBiet
-
   try {
     const ch = await layCauHinhMayChu()
     const u = don(ch.URL)
@@ -102,5 +90,7 @@ export async function layDiaChiMayChu(goiY = ''): Promise<string> {
     // hết đường
   }
 
-  return ''
+  // Giữ địa chỉ đã biết nếu một lượt đọc cấu hình tạm lỗi; cấu hình hợp lệ mới
+  // ở đầu hàm luôn thắng, nên đổi máy chủ không bị bộ nhớ này khóa cứng.
+  return daBiet
 }

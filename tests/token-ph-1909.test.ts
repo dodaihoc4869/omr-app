@@ -116,7 +116,7 @@ describe('đường cũ nhận cả token lẫn SBD trần (giai đoạn mềm)'
   it('/mom/parent-list và /mom/create nhận token; token quyết định em, `sbd` trong thân bị bỏ qua', async () => {
     const d = await dung()
     const t1 = await parentPass(d.env, 'S1')
-    const tao = await goi(d, '/mom/create', { pass: t1, sbd: 'S2', id: 'PH-1', tieuDe: 'Bài của phụ huynh', dsCau: [{ qid: 'Q1', dapAn: 'A' }] })
+    const tao = await goi(d, '/mom/create', { pass: t1, sbd: 'S2', id: 'PH-1', tieuDe: 'Bài của phụ huynh', dsCau: [{ qid: 'T1', dapAn: 'B' }] })
     expect(tao.ok).toBe(true)
     expect((d.sql.prepare("SELECT sbd FROM mom_bai WHERE id='PH-1'").all() as { sbd: string }[]).map((x) => x.sbd)).toEqual(['S1'])
     const ds = await goi(d, '/mom/parent-list', { pass: t1 })
@@ -137,9 +137,10 @@ describe('đường cũ nhận cả token lẫn SBD trần (giai đoạn mềm)'
     expect(String(r.id)).toMatch(/^daily_/)
     expect(truyCap(d)).toEqual([{ sbd: 'S1', kieu: 'token', duong: 'parent-news', so: 1 }])
     // gọi trực tiếp có/không noiBo
-    await mom(d.env, 'create', { sbd: 'S2', id: 'X-1', dsCau: [{ qid: 'Q1', dapAn: 'A' }] }, { noiBo: true })
+    await mom(d.env, 'create', { sbd: 'S2', id: 'X-1', dsCau: [{ qid: 'T1', dapAn: 'B' }] }, { noiBo: true })
     expect(truyCap(d).filter((x) => x.sbd === 'S2')).toEqual([])
-    await mom(d.env, 'create', { sbd: 'S2', id: 'X-2', dsCau: [{ qid: 'Q1', dapAn: 'A' }] })
+    await ghiSuKien(d.env,[{nguon:'btvn',maNguon:'B2',sbd:'S2',qid:'T1',lan:1,ketQua:0,luc:new Date(Date.now()-3*NGAY).toISOString()}])
+    await mom(d.env, 'create', { sbd: 'S2', id: 'X-2', dsCau: [{ qid: 'T1', dapAn: 'B' }] })
     expect(truyCap(d).filter((x) => x.sbd === 'S2')).toEqual([{ sbd: 'S2', kieu: 'sbd_tran', duong: 'mom', so: 1 }])
   })
 })

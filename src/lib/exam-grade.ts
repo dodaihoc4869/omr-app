@@ -4,7 +4,7 @@
 // logic chấm điểm lần 2.
 import type { SoCauMoiPhan, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import type { AnswerKey, Choice, DS, GradedItem, StudentAnswers } from '../engine/score'
-import { normalizeNumericAnswer, scoreStudent, type ScoreResult } from '../engine/score'
+import { scoreStudent, type ScoreResult } from '../engine/score'
 import { assignStudentQuestions } from './exam-assign'
 import type { AnswerRecord } from './exam-db'
 
@@ -93,15 +93,12 @@ export function gradeFromKeyBank(bank: KeyBankLike, maCa: string, sbd: string, s
   const studentAnswers: StudentAnswers = { sbd, madeThi: maCa, phanI, phanII, phanIII }
   const score = scoreStudent(studentAnswers, key)
 
-  const wrongPhanI = phanI.map((it, i) => (it.value !== key.phanI[i] ? i + 1 : -1)).filter((n) => n > 0)
-  const wrongPhanII = phanII
-    .map((row, i) => (row.some((it, j) => it.value !== key.phanII[i][j]) ? i + 1 : -1))
-    .filter((n) => n > 0)
-  // MỘT NGUỒN SỰ THẬT — xem `normalizeNumericAnswer`.
-  const norm = normalizeNumericAnswer
-  const wrongPhanIII = phanIII
-    .map((it, i) => (norm(it.value ?? '') !== norm(key.phanIII[i]) ? i + 1 : -1))
-    .filter((n) => n > 0)
+  // Câu sai lấy từ chính kết quả chấm. scoreStudent đã dùng
+  // normalizeNumericAnswer cho Phần III; so lại tại đây dễ lệch với điểm.
+  const sai = (items: ScoreResult['phanI']['items']) => items.filter((x) => !x.correct).map((x) => x.index)
+  const wrongPhanI = sai(score.phanI.items)
+  const wrongPhanII = sai(score.phanII.items)
+  const wrongPhanIII = sai(score.phanIII.items)
 
   return { score, key, studentAnswers, wrongPhanI, wrongPhanII, wrongPhanIII }
 }

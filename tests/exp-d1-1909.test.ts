@@ -1,6 +1,6 @@
 // @vitest-environment node
 // EXP HỌC TẬP + MẢNH KHIÊN — TẦNG D1 (DE-XUAT-EXP-MANH-KHIEN-1909.md, Bước 2). Chạy trên SQLite THẬT (lược đồ thật + mọi migration).
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
 import { capNhatExp, chotExpNgayQua, congVaoHoSoGame, docCauHinhExp, docExpHomNay, docThanhTichNgay, ghiTiepSuc, hsKeHoachNgayCoExp, mocExpCuaEm } from '../server/src/exp-d1'
 import { congTongSoVaoHoSo, khienConLai, khienRenChuaDung } from '../server/src/exp-ho-so-game'
@@ -8,7 +8,7 @@ import { ghiSuKien, ngayVn } from '../server/src/su-kien-hoc'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { gameV2 } from '../server/src/game-v2'
 import { nhanExp } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
-import { goiWorker, taoD1That, type D1That } from './_d1-that'
+import { goiWorker, taoD1That, serialiseD1, type D1That } from './_d1-that'
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({
   ...(await orig<typeof import('../server/src/game-v2-auth')>()),
@@ -21,6 +21,8 @@ vi.mock('../server/src/game-v2-auth', async (orig) => ({
 const H = 3_600_000
 const D = 24 * H
 const NOW = Date.parse('2026-09-20T05:00:00.000Z') // 12:00 VN, thứ Bảy 20/09/2026
+beforeEach(()=>{vi.useFakeTimers();vi.setSystemTime(NOW)})
+afterEach(()=>vi.useRealTimers())
 const HOM_NAY = '2026-09-20'
 const TU = '2026-09-01T00:00:00.000Z'
 const iso = (ms: number) => new Date(ms).toISOString()
@@ -416,29 +418,29 @@ describe('đạt nhiệm vụ ngày + chuỗi + mảnh khiên', () => {
 })
 
 describe('mảnh khiên → khiên rèn (nối vào hồ sơ game)', () => {
-  it('đủ 36 mảnh tự rèn 1 khiên, trừ 36; khiên còn dùng được tăng 1; 35 mảnh thì CHƯA', () => {
+  it('đủ 21 mảnh tự rèn 1 khiên, trừ 21; khiên còn dùng được tăng 1; 20 mảnh thì CHƯA', () => {
     const p: any = hoSoGame({ cap: 10 })
     const truoc = khienConLai(p)
-    const r = congTongSoVaoHoSo(p, 0, 37)
-    expect(r).toEqual({ exp: 0, manh: 37, khienMoi: 1 })
+    const r = congTongSoVaoHoSo(p, 0, 22)
+    expect(r).toEqual({ exp: 0, manh: 22, khienMoi: 1 })
     expect(p.khienRen).toEqual({ manh: 1, daRen: 1 })
     expect(khienConLai(p)).toBe(truoc + 1)
-    expect(congTongSoVaoHoSo(p, 0, 37)).toEqual({ exp: 0, manh: 0, khienMoi: 0 })
+    expect(congTongSoVaoHoSo(p, 0, 22)).toEqual({ exp: 0, manh: 0, khienMoi: 0 })
     const q: any = hoSoGame({ cap: 10 })
-    expect(congTongSoVaoHoSo(q, 0, 35)).toEqual({ exp: 0, manh: 35, khienMoi: 0 })
-    expect(q.khienRen).toEqual({ manh: 35, daRen: 0 })
+    expect(congTongSoVaoHoSo(q, 0, 20)).toEqual({ exp: 0, manh: 20, khienMoi: 0 })
+    expect(q.khienRen).toEqual({ manh: 20, daRen: 0 })
   })
-  it('đang giữ 5 khiên rèn CHƯA dùng thì không rèn thêm, mảnh kẹp ở 72', () => {
+  it('đang giữ 5 khiên rèn CHƯA dùng thì không rèn thêm, mảnh kẹp ở 42', () => {
     const p: any = hoSoGame({ cap: 1, khienRen: { manh: 0, daRen: 5 } })
     expect(khienRenChuaDung(p)).toBe(5)
     congTongSoVaoHoSo(p, 0, 90)
-    expect(p.khienRen).toEqual({ manh: 72, daRen: 5 })
+    expect(p.khienRen).toEqual({ manh: 42, daRen: 5 })
     p.shields = { used: 2, activeUntil: 0 }
     expect(khienRenChuaDung(p)).toBeLessThanOrEqual(5)
   })
   it('khiên quà tiến hoá dùng TRƯỚC: khiên rèn chưa dùng = min(đã rèn, còn lại)', () => {
-    // 21/09 (phương án B): khiên quà ĐẦU (cấp 10) chỉ mở khi có ≥ 36 ngày đạt từ mốc `khien_moc` (`expMoi.ngayDat`). Đủ 36 ngày ⇒ công thức cũ.
-    const p: any = hoSoGame({ cap: 10, khienRen: { manh: 0, daRen: 2 }, shields: { used: 1, activeUntil: 0 }, expMoi: { daCong: 0, manhDaTinh: 0, ngayDat: 36 } })
+    // 21/09 (phương án B): khiên quà ĐẦU (cấp 10) chỉ mở khi có ≥ 21 ngày đạt từ mốc `khien_moc` (`expMoi.ngayDat`). Đủ 21 ngày ⇒ công thức cũ.
+    const p: any = hoSoGame({ cap: 10, khienRen: { manh: 0, daRen: 2 }, shields: { used: 1, activeUntil: 0 }, expMoi: { daCong: 0, manhDaTinh: 0, ngayDat: 21 } })
     expect(khienConLai(p)).toBe(2)
     expect(khienRenChuaDung(p)).toBe(2)
     p.shields.used = 3
@@ -535,7 +537,7 @@ describe('đường nộp và màn hình', () => {
     expect(r.ok).toBe(true)
     expect(r.exp.homNay).toBe(4)
     expect(r.exp.chiTietHomNay).toEqual([{ loai: 'cau', exp: 4, soKhoan: 2, ghiChu: '2 câu đúng: +4' }])
-    expect(r.exp.manhKhien).toMatchObject({ manh: 0, moiKhien: 36, khienRen: 0 })
+    expect(r.exp.manhKhien).toMatchObject({ manh: 0, moiKhien: 21, khienRen: 0 })
     expect(r.expNhan).toHaveLength(2)
     const r2 = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' })
     expect(r2.expNhan).toEqual([])
@@ -657,6 +659,7 @@ describe('tiếp sức đồng đội cho game (ghiTiepSuc)', () => {
   })
   it('năm lượt CHỒNG NHAU vẫn đúng 5 khoản, mỗi ô một lần', async () => {
     const d = await dung()
+    serialiseD1(d.env)
     const r = await Promise.all(Array.from({ length: 8 }, (_, i) => ghiTiepSuc(d.env, 'S1', NOW + i, `l${i}`)))
     expect(r.filter((x) => x.exp === 5)).toHaveLength(5)
     expect(new Set(khoaExp(d)).size).toBe(5)

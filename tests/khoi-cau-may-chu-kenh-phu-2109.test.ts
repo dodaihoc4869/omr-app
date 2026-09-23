@@ -1,3 +1,4 @@
+import { daHocDang } from './_pham-vi-ca-nhan'
 // @vitest-environment node
 // BẤT BIẾN KHỐI — BA KÊNH MÁY CHỦ PHỤ (Code 1, 21/09/2026; P0 thầy 20:28: khối 11 nhận câu khối 12; luật Boss: chỉ khối EM hoặc THẤP hơn). Bổ sung cho tests/khoi-cau-may-chu-2109.test.ts:
 //   • THỬ THÁCH RIÊNG hôm nay (`server/src/thu-thach-rieng.ts:257`, `q.dang = ?` LIMIT 600 — không khối);
@@ -43,9 +44,11 @@ function themKho(d: D1That, dang: string, muc = 'hieu') {
     for (let i = 0; i < SO[k]; i++) d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run(TO[k], qidI(k, i), 'v', `g-${qidI(k, i)}`, dang, JSON.stringify(cauKho(k, i, dang, muc)))
   }
 }
-const dangHs = (d: D1That, ma: string, o: { gap?: number; sai?: number; khac?: number; moi?: number; chua?: number; bac?: number } = {}) =>
+const dangHs = (d: D1That, ma: string, o: { gap?: number; sai?: number; khac?: number; moi?: number; chua?: number; bac?: number } = {}) => {
   d.sql.prepare('INSERT OR REPLACE INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?)')
     .run(`S1|${ma}`, 'S1', ma, o.gap ?? 10, o.sai ?? 6, o.khac ?? 1, o.moi ?? 3, o.chua ?? 1, o.bac ?? 1, 'x')
+  daHocDang(d, 'S1', ma)
+}
 const cauHs = (d: D1That, qid: string, dang: string, trangThai: string, moc: string | null, lanSai = 1) =>
   d.sql.prepare(`INSERT INTO nam_kt_cau (khoa, sbd, qid, ma_dang, chuyen_de, lan_gap, lan_sai, lan_trong, dung_lien_tiep, ngay_dung_khac_nhau, ket_qua_cuoi, nguon_cuoi, luc_cuoi, moc_on_ke, trang_thai, can_day_lai, giay_tb, cap_nhat_luc)
      VALUES (?, 'S1', ?, ?, 'CĐ', 2, ?, 0, 0, 0, 0, 'btvn', '2026-09-10T02:00:00.000Z', ?, ?, 0, NULL, 'x')`).run(`S1|${qid}`, qid, dang, lanSai, moc, trangThai)

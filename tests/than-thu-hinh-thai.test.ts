@@ -118,9 +118,9 @@ describe('kinh nghiệm', () => {
   it('THANH ĐẦU TIÊN LÀ 160 — em thi một ca 5 điểm (300 EXP) lên cấp 2 và còn 140/200', () => {
     expect(EXP_BAN_DAU).toBe(120)
     expect(thanhExpCu(1)).toBe(120)
-    expect(thanhExp(1)).toBe(160)
+    expect(thanhExp(1)).toBe(120)
     expect(NGUON_EXP.caThi(5)).toBe(300)
-    expect(nhanExp({ capDo: 1, exp: 0 }, 300)).toMatchObject({ capDo: 2, exp: 140, expToiDa: 200 })
+    expect(nhanExp({ capDo: 1, exp: 0 }, 300)).toMatchObject({ capDo: 3, exp: 30, expToiDa: 180 })
   })
 
   it('thanh dài dần, và cấp 120 là hết đường lên', () => {
@@ -135,9 +135,9 @@ describe('kinh nghiệm', () => {
   it('CHÍN CẤP ĐẦU = 4 200 EXP (21 ngày × 200); TỪ CẤP 10 mỗi cấp ~5 ngày; cuối đường ~20 ngày một cấp', () => {
     let chinDau = 0
     for (let c = 1; c <= 9; c++) chinDau += thanhExp(c)
-    expect(chinDau).toBe(4200)
+    expect(chinDau).toBe(2400)
     expect(thanhExp(10)).toBe(1000) // 5 ngày × 200
-    expect(thanhExp(9)).toBe(970)
+    expect(thanhExp(9)).toBe(430)
     expect(thanhExp(119)).toBe(3950) // ~20 ngày × 200
     expect(thanhExp(60)).toBeGreaterThan(thanhExp(13) * 1.5)
   })
@@ -178,14 +178,14 @@ describe('kinh nghiệm', () => {
     // Con số CHỐT, không phải khoảng ước lượng: đổi nhịp game thì phải sửa ở đây,
     // để không ai lỡ tay đổi `EXP_BAN_DAU` mà không thấy hệ quả.
     // SỬA CÓ CHỦ Ý 21/09: 1 286 590 → 240 000 (= 1 200 ngày × 200); 120 → 160; 400 → 1 000; 46 740 → 3 950.
-    expect(t).toBe(240_000)
-    expect(thanhExp(1)).toBe(160)
+    expect(t).toBe(238_200)
+    expect(thanhExp(1)).toBe(120)
     expect(thanhExp(10)).toBe(1000)
     expect(thanhExp(119)).toBe(3950)
     // VÀO NHANH VỀ CHẬM: mười hai cấp đầu chưa tới 4% cả đường (7 240 / 240 000).
     let muoiHaiDau = 0
     for (let c = 1; c <= 12; c++) muoiHaiDau += thanhExp(c)
-    expect(muoiHaiDau).toBe(7240)
+    expect(muoiHaiDau).toBe(5440)
     expect(muoiHaiDau / t).toBeLessThan(0.04)
     // MỘT CHỦ Ý: sau reset, leo lại tới cấp 12 RẺ HƠN đường 12 cấp cũ (15 120).
     expect(muoiHaiDau).toBeLessThan(15_120)
@@ -325,7 +325,7 @@ describe('hồ sơ lưu', () => {
   })
 
   it('hồ sơ mặc định bắt đầu bằng thanh 160 (đường cấp mới)', () => {
-    expect(layHoSoThanThuMacDinh().expToiDa).toBe(160)
+    expect(layHoSoThanThuMacDinh().expToiDa).toBe(120)
     expect(layHoSoThanThuMacDinh().capDo).toBe(1)
   })
 })

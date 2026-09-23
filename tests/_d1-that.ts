@@ -132,6 +132,25 @@ export function taoD1That() {
 
 export type D1That = ReturnType<typeof taoD1That>
 
+/** Với request đồng thời, mọi batch phải không bị SQL khác chen giữa hai câu.
+ * Adapter gốc await từng câu nên không đủ mô phỏng tính nguyên tử của D1. */
+export function serialiseD1(env: Env) {
+  const batch=env.DB.batch.bind(env.DB),prepare=env.DB.prepare.bind(env.DB)
+  let queue:Promise<unknown>=Promise.resolve()
+  const serial=<T,>(fn:()=>Promise<T>)=>{const next=queue.then(fn);queue=next.catch(()=>{});return next}
+  const raw=new WeakMap<object,ReturnType<typeof prepare>>()
+  env.DB.prepare=((query:string)=>{
+    const base=prepare(query)
+    const st={
+      bind(...args:unknown[]){base.bind(...args);return st},
+      first:()=>serial(()=>base.first()),all:()=>serial(()=>base.all()),run:()=>serial(()=>base.run()),
+    } as ReturnType<typeof prepare>
+    raw.set(st,base)
+    return st
+  }) as typeof prepare
+  env.DB.batch=((ds)=>serial(()=>batch(ds.map(s=>raw.get(s)??s)))) as typeof batch
+}
+
 /** Gọi Worker thật qua `fetch` — đúng đường của app. `thay` = true thì kèm mã bí mật của thầy. */
 /** `giuNhipDeNghi` = false (mặc định) ⇒ BỎ trường `nhipDeNghi` (hệ số nhịp, gắn ở MỌI phản hồi từ 21/09) khỏi kết quả để các test "phản hồi đúng từng khoá" không phải nhắc tới nó; bật true khi test chính trường ấy. */
 // `ctx` GIẢ (Boss 22/09, ctx.waitUntil): gom mọi việc phụ được hoãn, rồi ĐỢI HẾT trước khi trả kết quả cho test — vừa

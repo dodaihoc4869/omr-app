@@ -1,6 +1,6 @@
 // @vitest-environment node
-// THẦY LỆNH 21/09/2026: "Siết độ khó lấy khiên: ít nhất học đều 36 ngày mới lấy được khiên đầu tiên." (DE-XUAT-EXP-MANH-KHIEN-1909.md mục 4.)
-// Tính chất: em ĐẠT MỌI NGÀY, hưởng MỌI thưởng mảnh cũ (chuỗi bội 7, dạng rời yếu MỖI ngày) ⇒ khiên RÈN đầu tiên KHÔNG sớm hơn ngày thứ 36.
+// THẦY LỆNH 21/09/2026: "Siết độ khó lấy khiên: ít nhất học đều 21 ngày mới lấy được khiên đầu tiên." (DE-XUAT-EXP-MANH-KHIEN-1909.md mục 4.)
+// Tính chất: em ĐẠT MỌI NGÀY, hưởng MỌI thưởng mảnh cũ (chuỗi bội 7, dạng rời yếu MỖI ngày) ⇒ khiên RÈN đầu tiên KHÔNG sớm hơn ngày thứ 21.
 import { describe, expect, it } from 'vitest'
 import { congManh, tinhExp, type KhienRen, type VaoTinhExp } from '../server/src/exp-hoc-tap'
 
@@ -24,21 +24,21 @@ function ngayKhienDauTien(soNgay: number, dau: KhienRen = { manh: 0, daRen: 0 })
   return null
 }
 
-describe('khiên RÈN đầu tiên không sớm hơn ngày thứ 36 (mọi thưởng cũ bật hết)', () => {
-  it('em đạt 100 ngày liền, mọi ngày có chuỗi + dạng rời yếu: khiên đầu tiên đúng ngày 36, khiên thứ hai đúng ngày 72', () => {
-    expect(ngayKhienDauTien(100)).toBe(36)
+describe('khiên RÈN đầu tiên không sớm hơn ngày thứ 21 (mọi thưởng cũ bật hết)', () => {
+  it('em đạt 100 ngày liền, mọi ngày có chuỗi + dạng rời yếu: khiên đầu tiên đúng ngày 21, khiên thứ hai đúng ngày 42', () => {
+    expect(ngayKhienDauTien(100)).toBe(21)
     let k: KhienRen = { manh: 0, daRen: 0 }
     const ngayRen: number[] = []
-    for (let ngay = 1; ngay <= 110; ngay++) {
+    for (let ngay = 1; ngay <= 63; ngay++) {
       const sau = congManh(k, tinhExp(vaoNgay(ngay)).manh.reduce((t, m) => t + m.so, 0), 0)
       if (sau.daRen > k.daRen) ngayRen.push(ngay)
       k = sau
     }
-    expect(ngayRen).toEqual([36, 72, 108])
+    expect(ngayRen).toEqual([21, 42, 63])
   })
-  it('35 ngày đạt thì CHƯA có khiên; mỗi ngày đạt cộng đúng 1 mảnh dù chuỗi bội 7 và có dạng rời yếu', () => {
-    expect(ngayKhienDauTien(35)).toBeNull()
-    for (const k of [1, 6, 7, 14, 21, 28, 35, 36]) expect(tinhExp(vaoNgay(k)).manh.reduce((t, m) => t + m.so, 0), `ngày ${k}`).toBe(1)
+  it('20 ngày đạt thì CHƯA có khiên; mỗi ngày đạt cộng đúng 1 mảnh dù chuỗi bội 7 và có dạng rời yếu', () => {
+    expect(ngayKhienDauTien(20)).toBeNull()
+    for (const k of [1, 6, 7, 14, 21, 13, 20, 21]) expect(tinhExp(vaoNgay(k)).manh.reduce((t, m) => t + m.so, 0), `ngày ${k}`).toBe(1)
   })
   it('khoá sổ của chuỗi 7 và dạng rời yếu VẪN được ghi (0 mảnh) — chạy lại không sinh lại; ngày không đạt thì 0 mảnh', () => {
     const r = tinhExp(vaoNgay(7))
@@ -47,10 +47,10 @@ describe('khiên RÈN đầu tiên không sớm hơn ngày thứ 36 (mọi thư�
     expect(tinhExp(vaoNgay(7, { daCoKhoa: dacoKhoa })).manh).toEqual([])
     expect(tinhExp(vaoNgay(7, { datNgay: null })).manh.reduce((t, m) => t + m.so, 0)).toBe(0 + 0) // dạng rời yếu vẫn 0 mảnh khi không đạt
   })
-  it('mảnh em ĐANG có giữ nguyên (7 mảnh cũ ⇒ 7/36): cần đúng 29 ngày đạt nữa, không sớm hơn; khiên đã rèn giữ nguyên', () => {
-    expect(ngayKhienDauTien(28, { manh: 7, daRen: 1 })).toBeNull()
-    expect(ngayKhienDauTien(60, { manh: 7, daRen: 1 })).toBe(29)
+  it('mảnh em ĐANG có giữ nguyên (7 mảnh cũ ⇒ 7/21): cần đúng 14 ngày đạt nữa, không sớm hơn; khiên đã rèn giữ nguyên', () => {
+    expect(ngayKhienDauTien(13, { manh: 7, daRen: 1 })).toBeNull()
+    expect(ngayKhienDauTien(60, { manh: 7, daRen: 1 })).toBe(14)
     expect(congManh({ manh: 7, daRen: 1 }, 0, 0)).toEqual({ manh: 7, daRen: 1 })
-    expect(congManh({ manh: 20, daRen: 2 }, 0, 0)).toEqual({ manh: 20, daRen: 2 }) // 12–35 mảnh cũ đang giữ vì trần 5 khiên chưa dùng: không tự rèn ngay, không mất
+    expect(congManh({ manh: 20, daRen: 2 }, 0, 0)).toEqual({ manh: 20, daRen: 2 }) // 12–20 mảnh cũ đang giữ vì trần 5 khiên chưa dùng: không tự rèn ngay, không mất
   })
 })

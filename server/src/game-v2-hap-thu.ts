@@ -1,7 +1,7 @@
 // CỔNG HẤP THỤ + CHUYỂN ĐỔI HỒ SƠ — máy chủ của Đợt 1 "Thần thú mỗi ngày" (DE-XUAT-THAN-THU-MOI-NGAY-2109.md Điều 1, 2, 9; prompt-than-thu-moi-ngay-2109.md).
 // Luật (hàm thuần của Code 1: src/lib/hap-thu-ngay.ts): thần thú hấp thụ tối đa 200 EXP/ngày khi em ĐẠT nhiệm vụ ngày, 120 khi có học chưa đạt, 0 khi không học; EXP dư nằm ở ống nghiệm (`wallet`).
 // MỌI lên cấp đi qua `invest` → `hapThu`. Máy chủ chỉ ĐỌC hôm nay em đạt/có học chưa (từ `exp_so`, `game_v2_attempt`) rồi gọi hàm thuần; máy em chỉ hiển thị kết quả.
-// Chuyển đổi hồ sơ đã chơi (luatCap ≠ 2) là LƯỜI (khi mở hồ sơ) + cron quét từng lô; luôn ghi bằng CAS theo `revision` (thua CAS = em đang chơi ⇒ KHÔNG đè, lần sau làm lại).
+// Chuyển đổi hồ sơ đã chơi (luatCap ≠ LUAT_CAP_MOI) là LƯỜI (khi mở hồ sơ) + cron quét từng lô; luôn ghi bằng CAS theo `revision` (thua CAS = em đang chơi ⇒ KHÔNG đè, lần sau làm lại).
 import type { Env } from './kieu'
 import type { Profile } from './game-v2'
 import { CO_HOC_TOI_THIEU_CAU, LUAT_CAP_MOI, chuyenDoiLuatCap, tranExpGameNgay, tranHapThu } from '../../src/lib/hap-thu-ngay'
@@ -10,7 +10,7 @@ import { NGAY_BANG_GIA_MOI } from './exp-cau-hinh'
 import { ngayVn } from './su-kien-hoc'
 
 export const TOI_DA_HO_SO_MOI_TICK = 40
-export const KHOA_CHUYEN_DOI_XONG = 'chuyen_doi_cap'
+export const KHOA_CHUYEN_DOI_XONG = 'chuyen_doi_cap_v3'
 export const TIEU_DE_LUAT_CAP = 'A.I Đỗ Đại Học · Thần thú của em'
 export const KENH_LUAT_CAP = 'than_thu'
 export const LOI_LUAT_CAP = 'Từ 21/09 thần thú lớn theo từng ngày em học: mỗi ngày hấp thụ tối đa 200 EXP khi em đạt nhiệm vụ ngày. EXP em đã kiếm vẫn nguyên trong ống nghiệm, thần thú sẽ ăn dần mỗi ngày em học.'
@@ -44,13 +44,17 @@ export async function docTranHapThu(env: Env, sbd: string, ngay: string): Promis
 }
 
 /** EXP game em đã nhận hôm nay (Điều 9). Sang ngày mới = 0. */
-export const daExpGameHomNay = (p: Pick<Profile, 'expGame'>, ngay: string): number => (p.expGame && p.expGame.ngay === ngay ? Math.max(0, Math.floor(Number(p.expGame.da) || 0)) : 0)
+export const daExpGameHomNay = (p: Pick<Profile, 'expGame'>, ngay: string): number =>
+  Math.max(0, Math.floor(Number(p.expGame?.days?.[ngay] ?? (p.expGame?.ngay === ngay ? p.expGame.da : 0)) || 0))
 
-/** MỘT CỬA cho mọi khoản EXP sinh trong game (trần 120/ngày VN): trả phần THẬT được nhận (≤ xin) và ghi `p.expGame`. Quá trần ⇒ 0 (mastery, sổ, vé nơi gọi vẫn ghi đủ). */
+/** Ngày bù có bộ đếm riêng, không được đặt lại hạn mức của ngày mới. */
 export function nhanExpGame(p: Profile, ngay: string, xin: number): number {
-  const da = daExpGameHomNay(p, ngay)
-  const nhan = tranExpGameNgay(da, xin)
-  p.expGame = { ngay, da: da + nhan }
+  const days = { ...p.expGame?.days }
+  if (p.expGame) days[p.expGame.ngay] = Math.max(days[p.expGame.ngay] ?? 0, p.expGame.da)
+  const nhan = tranExpGameNgay(daExpGameHomNay(p, ngay), xin)
+  days[ngay] = daExpGameHomNay(p, ngay) + nhan
+  const moiNhat = p.expGame && p.expGame.ngay > ngay ? p.expGame.ngay : ngay
+  p.expGame = { ngay: moiNhat, da: days[moiNhat]!, days }
   return nhan
 }
 
@@ -97,7 +101,7 @@ export async function chuyenDoiKhiMo(env: Env, sbd: string, p: Profile, revision
   try {
     if (p.luatCap === LUAT_CAP_MOI) return null
     const tuNgay = ngayVn(Number.isFinite(Date.parse(p.cutover)) ? Date.parse(p.cutover) : nowMs)
-    const lieu = (await docLieuChuyenDoi(env, [sbd], tuNgay)).get(sbd)!
+    const lieu = p.luatCap === 2 ? { ngayCoHoc: new Set<string>(), ngayDat: [] } : (await docLieuChuyenDoi(env, [sbd], tuNgay)).get(sbd)!
     const r = await doiMotHoSo(env, sbd, p, revision, lieu, nowMs)
     return r.daDoi ? { profile: r.profile, revision: r.revision } : null
   } catch (e) {

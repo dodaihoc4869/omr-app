@@ -22,7 +22,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/game/than-thu-v2/DoanHoTong.tsx': 1, // 250 ms vẽ lại đồng hồ trận (vòng HỎI trận đã chuyển sang batVongTrucTiep)
   'src/game/than-thu-v2/ImmortalShield.tsx': 1,
   'src/hooks/useGioHocTap.ts': 1,
-  'src/lib/html-may-chieu.ts': 1,
+  'src/lib/html-may-chieu.ts': 0,
   'src/lib/html-phieu.ts': 1,
   'src/lib/thu-tin-hieu.ts': 1,
   'src/lib/to-chieu-cau-noi.ts': 1,

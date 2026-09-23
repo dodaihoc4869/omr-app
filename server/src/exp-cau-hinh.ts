@@ -1,5 +1,6 @@
 // HẰNG SỐ EXP HỌC TẬP + MẢNH KHIÊN — MỘT NGUỒN (DE-XUAT-EXP-MANH-KHIEN-1909.md, thầy chốt 19/09 "Chốt. Quá thông minh").
 // Cấm rải các con số này ra chỗ khác. Đổi luật thưởng = đổi ĐÚNG tệp này (và test bảng giá trị `tests/exp-hoc-tap-1909.test.ts`).
+import { MANH_REN_KHIEN, KHIEN_REN_GIU_TOI_DA } from '../../src/lib/kinh-te-game'
 
 /** EXP MỘT câu ĐÚNG (mọi nguồn trừ game): [phần][số sao 0/1/2]. Phần II tính khi đúng đủ 4 ý (sổ đã chấm bằng `isAnswerCorrect`). Thiếu sao → 0 sao. */
 export const EXP_CAU: Readonly<Record<'I' | 'II' | 'III', readonly [number, number, number]>> = {
@@ -9,7 +10,7 @@ export const EXP_CAU: Readonly<Record<'I' | 'II' | 'III', readonly [number, numb
 }
 
 /**
- * BẢNG GIÁ ĐỔI THEO NGÀY VN (Điều 10, thầy lệnh 21/09/2026 13:47: khớp 36 ngày khiên / 21 ngày cấp 10 / 1 200 ngày cấp 120): em ĐẠT nhiệm vụ ngày và chơi 3 lượt thú phải kiếm đủ 200 EXP dù học yếu.
+ * BẢNG GIÁ ĐỔI THEO NGÀY VN (Điều 10, thầy lệnh 21/09/2026 13:47: khớp 21 ngày khiên / 12 ngày cấp 10 / 1 191 ngày cấp 120): em ĐẠT nhiệm vụ ngày và chơi 3 lượt thú phải kiếm đủ 200 EXP dù học yếu.
  * Ngày < `NGAY_BANG_GIA_MOI` giữ bảng CŨ (sổ cũ không tính lại); từ ngày đó dùng bảng MỚI. Giá tra bằng `bangGiaExp(ngày của khoản)` — cấm rải số ra chỗ khác.
  * `dauNgay`: câu ĐÚNG đầu tiên trong ngày (mọi nguồn kể cả game; KHÔNG tính vào trần EXP game 120/ngày). `troLai`: ngày đầu em có sự kiện học sau ≥ `TRO_LAI_VANG_TOI_THIEU` ngày VN liền không có sự kiện nào,
  * nhiều nhất 1 lần trong `TRO_LAI_CACH_NHAU` ngày; em chưa từng học thì không có.
@@ -52,17 +53,17 @@ export const TRAN_MEM_HE_SO = 2
 export const TRAN_MEM_TY_LE = 0.25
 
 /**
- * Mảnh khiên (khiên RÈN, thêm vào khiên quà tiến hoá). THẦY LỆNH 21/09/2026: "ít nhất học đều 36 ngày mới lấy được khiên đầu tiên" ⇒ NGUỒN MẢNH DUY NHẤT là "đạt nhiệm vụ ngày" +1/ngày,
- * `MANH_MOI_KHIEN = 36`. Thưởng mảnh ở chuỗi 7 và ở dạng rời danh sách yếu = 0 (giữ khoá sổ + ghi chú, KHÔNG cộng mảnh, KHÔNG đổi EXP). Mảnh em đang có giữ nguyên (7/12 ⇒ 7/36);
+ * Mảnh khiên (khiên RÈN, thêm vào khiên quà tiến hoá). THẦY LỆNH 21/09/2026: "ít nhất học đều 21 ngày mới lấy được khiên đầu tiên" ⇒ NGUỒN MẢNH DUY NHẤT là "đạt nhiệm vụ ngày" +1/ngày,
+ * `MANH_MOI_KHIEN = 21`. Thưởng mảnh ở chuỗi 7 và ở dạng rời danh sách yếu = 0 (giữ khoá sổ + ghi chú, KHÔNG cộng mảnh, KHÔNG đổi EXP). Mảnh em đang có giữ nguyên (7/12 ⇒ 7/21);
  * khiên rèn đã có giữ nguyên. Núm cũ: 8 dễ / 12 vừa / 16 khó.
  */
 export const MANH_DAT_NGAY = 1
 export const MANH_CHUOI_BOI_SO = 7
 export const MANH_CHUOI_BOI_SO_THUONG = 0
 export const MANH_DANG_ROI_YEU = 0
-export const MANH_MOI_KHIEN = 36
+export const MANH_MOI_KHIEN = MANH_REN_KHIEN
 /** Khiên rèn CHƯA dùng tối đa; đang đủ thì mảnh vẫn cộng nhưng kẹp ở MANH_TOI_DA. */
-export const KHIEN_REN_TOI_DA = 5
+export const KHIEN_REN_TOI_DA = KHIEN_REN_GIU_TOI_DA
 export const MANH_TOI_DA = 2 * MANH_MOI_KHIEN
 
 /**
@@ -77,7 +78,7 @@ export const SQL_KHIEN_MOC = `COALESCE((SELECT CASE WHEN gia_tri GLOB '[0-9][0-9
  */
 export const SQL_SO_MANH_TINH = `CASE WHEN loai = 'dat' OR ${SQL_KHIEN_MOC} = '' THEN so ELSE 0 END`
 /** Khiên QUÀ TIẾN HOÁ ĐẦU TIÊN (mốc cấp 10) chỉ mở khi em có ≥ chừng này NGÀY ĐẠT nhiệm vụ ngày tính từ `khien_moc` (thầy chọn phương án B, 21/09). MÁY CHỦ là nguồn duy nhất tính khiên còn lại. */
-export const NGAY_DAT_MO_KHIEN_QUA = 36
+export const NGAY_DAT_MO_KHIEN_QUA = MANH_REN_KHIEN
 /** Cấp thần thú của mốc tiến hoá đầu (`EVOLUTION_LEVELS[1]`): khiên quà ở mốc này là "khiên quà đầu tiên" bị khoá theo ngày đạt. */
 export const CAP_KHIEN_QUA_DAU = 10
 /** Vắng bao nhiêu NGÀY LIÊN TIẾP không đạt nhiệm vụ ngày thì mất 1 khiên (Boss chốt 7; thầy đổi được ở đây). Ngày nghỉ hợp lệ không tính là vắng. */

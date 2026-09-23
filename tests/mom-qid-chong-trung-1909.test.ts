@@ -5,8 +5,11 @@ import { xoaDemKeHoach } from '../server/src/dem-ke-hoach'
 import { describe, it, expect, vi } from 'vitest'
 import worker from '../server/src/index'
 import { lapKeHoachNgay, type DauVaoKeHoach } from '../server/src/ke-hoach-ngay'
-import { mom, qidCuaBai } from '../server/src/mom'
+import { mom as rawMom, qidCuaBai } from '../server/src/mom'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
+
+// Các bài fixture đi qua đường nội bộ; xác minh kho bên ngoài có regression riêng.
+const mom=(env:Parameters<typeof rawMom>[0],action:string,b:Record<string,unknown>)=>rawMom(env,action,b,{noiBo:action==='create'})
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({ ...(await orig<typeof import('../server/src/game-v2-auth')>()), gameIdentity: async () => 'S1' }))
 

@@ -37,7 +37,7 @@ describe('dao-core', () => {
   })
   it('không có số mảnh khiên ⇒ KHÔNG bịa: thay bằng mốc tiến hoá kế; có profile.khienRen thì dùng', () => {
     expect(mucTieuGanNhat(hoSo(), null)[2]).toMatchObject({ loai: 'tien-hoa', tieuDe: 'Tiến hoá dạng 4', phu: 'còn 16 cấp' })
-    expect(mucTieuGanNhat(hoSo({ khienRen: { manh: 15, moiKhien: 12 } }), null)[2]).toMatchObject({ loai: 'khien', phu: '3/12 mảnh' })
+    expect(mucTieuGanNhat(hoSo({ khienRen: { manh: 15, moiKhien: 12 } }), null)[2]).toMatchObject({ loai: 'khien', phu: '15/12 mảnh' })
     expect(mucTieuGanNhat(hoSo({ mastery: [] }), null)[1]).toMatchObject({ tieuDe: 'Gặp dạng bài đầu tiên', tiLe: 0 })
   })
   it('đường tiến hoá 6 dạng theo EVOLUTION_LEVELS; dạng chưa tới không lộ', () => {

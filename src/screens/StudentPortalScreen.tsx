@@ -1,7 +1,7 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
-import { useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong, useThuThachHomNay } from '../components/bang-nhiem-vu/may-chu'
-import { DUONG_NOP_THU_THACH, type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
+import { taiKeHoachNgay, useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong, useThuThachHomNay } from '../components/bang-nhiem-vu/may-chu'
+import { taiThuThachHomNay, DUONG_NOP_THU_THACH, type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
 import { dangDeSau, docDeSau, luuDeSau, type ThuThachRieng } from '../lib/thu-thach-rieng'
 import { ngayVietNam } from '../lib/han-bai-tap'
 import { dungBangNhiemVu, soThuSucCua } from '../lib/nhiem-vu-adapter'
@@ -92,8 +92,6 @@ import { useToanManHinhGame } from '../components/useToanManHinhGame'
 import { ketThucLuotToanManHinh, xinToanManHinh } from '../lib/toan-man-hinh-game'
 import ONhapDapSo from '../components/ONhapDapSo'
 import { batNhipBenVung } from '../lib/nhip-ben-vung'
-import { khoiCuaEm } from '../lib/khoi-cau'
-import { chonCauThuThach } from '../lib/thu-thach-chon-cau'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, TOI_DA_LAN_THU, khoaChang } from '../lib/hang-doi-nop'
 import { useHangDoiNop } from '../lib/use-hang-doi-nop'
 
@@ -769,78 +767,25 @@ export default function StudentPortalScreen() {
         break
       case 'mo_khac_phuc':
         void (async () => {
-          if (!auth) return
+          if (!auth?.token) return
           setDangMoDe(true)
           try {
-            const url = await loadScriptUrlHoacMacDinh().catch(() => '')
-            let dsSai: any[] = []
-            try {
-              const res = await hsCauSaiApi(url, auth.sbd, [])
-              if (res && res.ok && Array.isArray(res.items)) dsSai = res.items
-            } catch {}
-
-            const { hopLeDeRut } = await import('../lib/loc-cau-rut')
-            const hopLe = dsSai.filter((c) =>
-              hopLeDeRut({
-                phan: c.phan,
-                maDe: c.maCa,
-                dapAnDung: c.dapAnDung,
-                text: c.text,
-                choices: c.choices || c.ideas,
-              })
-            )
-
-            if (hopLe.length === 0) {
-              void bao('Em không có câu sai nào cần khắc phục. Em có thể thử sức với câu hỏi bứt phá 9+.', 'Không có câu cần khắc phục')
+            const kh = await taiKeHoachNgay({ token: auth.token })
+            if (!kh) {
+              void bao('Chưa tải được lịch ôn. Em thử lại khi có kết nối.', 'Chưa mở được bài ôn')
               return
             }
-
-            // Chọn 3-5 câu căn bản theo thuật toán mới (ưu tiên Phần I & Phần II cốt lõi)
-            const soCauRut = hanhDong.payload?.soCau || (hopLe.length >= 15 ? 4 : Math.min(5, hopLe.length))
-            const phanI = hopLe.filter((c) => c.phan === 'I')
-            const phanII = hopLe.filter((c) => c.phan === 'II')
-            const phanKhac = hopLe.filter((c) => c.phan !== 'I' && c.phan !== 'II')
-            const dsChon: any[] = []
-            for (const c of [...phanI, ...phanII, ...phanKhac]) {
-              if (dsChon.length < soCauRut) dsChon.push(c)
+            const viec = kh.viec.find((v) => (v.loai === 'on_lai' || v.loai === 'on_thi') && v.hien !== false && Array.isArray(v.chiTiet?.qid) && v.chiTiet.qid.length > 0)
+            if (!viec) {
+              void bao('Hôm nay em chưa có câu cần ôn theo lịch.', 'Lịch ôn của em')
+              return
             }
-
-            const { chuyenCauSaiSangCauLuyen } = await import('../lib/thuat-toan-rut-cau-sai')
-            const { dungPhieu } = await import('../lib/html-phieu')
-            const dsCauLuyen = dsChon.map(chuyenCauSaiSangCauLuyen)
-            const maPhieu = `sua_loi_${auth.sbd}_${Date.now()}`
-
-            const html = dungPhieu(
-              {
-                hoTen: auth.hoTen,
-                sbd: auth.sbd,
-                ngay: new Date(),
-                tenChuyenDe: `BỊT LỖ HỔNG: SỬA ${dsCauLuyen.length} CÂU SAI CĂN BẢN`,
-                ketQua: `Gồm ${dsCauLuyen.length} câu sai căn bản nhất em cần tự tay làm lại để không sai lặp lại`,
-                hienDapAn: false,
-                giaoDienHocSinh: true,
-                nhanBia: 'BỊT LỖ HỔNG CÂU SAI',
-                oBia: [
-                  { nhan: 'Học sinh', gia: auth.hoTen },
-                  { nhan: 'Số báo danh', gia: auth.sbd },
-                  { nhan: 'Mục tiêu', gia: 'Khắc phục dứt điểm lỗi sai cốt lõi' },
-                ],
-              },
-              dsCauLuyen,
-              {
-                anGiai: false,
-                nop: {
-                  ma: maPhieu,
-                  sbd: auth.sbd,
-                  url: `${String(url || '').replace(/\/+$/, '')}/goi`,
-                },
-                loiNhac: `Em chọn đáp án trực tiếp trên từng câu và bấm "Nộp bài" ở thanh trên để A.I Đỗ Đại Học chấm điểm ngay và mở lời giải chi tiết.`,
-              }
-            )
-
-            setPhieuHtml(html)
+            const qid = [...new Set((viec.chiTiet!.qid as unknown[]).filter((q): q is string => typeof q === 'string' && q.length > 0))]
+            if (!qid.length) return
+            setCauOn({ viecId: viec.id, qid, tieuDe: 'Ôn câu theo lịch của em' })
+            setTab('cauon')
           } catch (err) {
-            void bao(err instanceof Error ? err.message : 'Chưa mở được bài khắc phục lỗi', 'Chưa mở được bài khắc phục')
+            void bao(err instanceof Error ? err.message : 'Chưa mở được bài ôn', 'Chưa mở được bài ôn')
           } finally {
             setDangMoDe(false)
           }
@@ -848,52 +793,16 @@ export default function StudentPortalScreen() {
         break
       case 'mo_thu_thach':
         void (async () => {
-          if (!auth) return
+          if (!auth?.token) return
           setDangMoDe(true)
           try {
-            const url = await loadScriptUrlHoacMacDinh().catch(() => '')
-            const { loadExamSources } = await import('../lib/exam-db')
-            const { cauLuyenTuNguon } = await import('../lib/bai-tap-pdf')
-            const { dungPhieu } = await import('../lib/html-phieu')
-
-            const kho = await loadExamSources()
-            // Chỉ câu HỢP KHỐI của em (Code 1 21/09: em lớp 11 không được "thử thách" bằng câu lớp 12) — luật ở `thu-thach-chon-cau.ts`.
-            const dsCau = chonCauThuThach(cauLuyenTuNguon(kho), khoiCuaEm({ lop: auth.lop }))
-
-            if (dsCau.length === 0) {
-              void bao('Kho đề đang cập nhật thêm câu hỏi thử thách. Em thử lại sau nhé.', 'Chưa có câu thử thách')
+            const t = await taiThuThachHomNay(auth.token)
+            if (!t || t.cau.length === 0) {
+              void bao('Chưa có câu thử thách phù hợp với phần em đã học hôm nay.', 'Chưa có câu thử thách')
               return
             }
-
-            const maPhieu = `thu_thach_${auth.sbd}_${Date.now()}`
-            const html = dungPhieu(
-              {
-                hoTen: auth.hoTen,
-                sbd: auth.sbd,
-                ngay: new Date(),
-                tenChuyenDe: 'THỬ THÁCH BỨT PHÁ 9+ (x2 EXP THẦN THÚ)',
-                ketQua: '2 câu Vận dụng cao rèn luyện tư duy đỉnh cao',
-                hienDapAn: false,
-                giaoDienHocSinh: true,
-                nhanBia: 'THỬ THÁCH BỨT PHÁ 9+',
-                oBia: [
-                  { nhan: 'Học sinh', gia: auth.hoTen },
-                  { nhan: 'Phần thưởng', gia: 'x2 EXP Thần Thú khi hoàn thành' },
-                ],
-              },
-              dsCau,
-              {
-                anGiai: false,
-                nop: {
-                  ma: maPhieu,
-                  sbd: auth.sbd,
-                  url: `${String(url || '').replace(/\/+$/, '')}/goi`,
-                },
-                loiNhac: 'Thử thách bứt phá điểm 9+: Hoàn thành 2 câu này em sẽ được nhân đôi EXP Thần Thú. Làm xong bấm Nộp bài.',
-              }
-            )
-
-            setPhieuHtml(html)
+            setCauOn({ viecId: `thu_thach_rieng:${t.ngay}`, qid: t.cau.map((c) => c.qid), tieuDe: 'Thử thách riêng hôm nay', cauSan: t.cau as unknown as CauOn[], duongNop: DUONG_NOP_THU_THACH })
+            setTab('cauon')
           } catch (err) {
             void bao(err instanceof Error ? err.message : 'Chưa mở được bài thử thách', 'Chưa mở được bài thử thách')
           } finally {

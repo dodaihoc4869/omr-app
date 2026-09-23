@@ -129,17 +129,6 @@ async function postCoThuLai(scriptUrl: string, body: unknown, giay: number, soLa
   throw cuoi instanceof Error ? cuoi : new Error('Không gửi được')
 }
 
-/** CHẶN CỨNG ĐƯỜNG VỀ GOOGLE.
- *
- * Đây là chỗ DUY NHẤT trong app quyết định một địa chỉ có được gọi hay không,
- * nên luật nằm ở đây chứ không rải rác: bất kỳ địa chỉ nào thuộc Google đều bị
- * loại, dù nó tới từ cấu hình cũ trong máy thầy hay từ một màn hình quên sửa. */
-function laMayChuThat(url: string): boolean {
-  const u = (url || '').trim()
-  if (!u.startsWith('http')) return false
-  return !/(^|\.)google\.com|googleusercontent|script\.googleapis/i.test(u)
-}
-
 /** GỬI MỘT LỆNH LÊN MÁY CHỦ.
  *
  * GOOGLE ĐÃ BỊ CẮT — thầy chốt 12/09 rạng sáng: "gỡ sạch google, toàn bộ app
@@ -156,12 +145,9 @@ function laMayChuThat(url: string): boolean {
  * KHÔNG còn được dùng làm địa chỉ. Địa chỉ máy chủ đọc từ cấu hình. */
 async function postJson(_scriptUrl: string, body: unknown, giay: number = HAN_GIAY): Promise<any> {
   await xongNapDiaChi()
-  const ch = await layCauHinhMayChu()
-  // Địa chỉ lấy từ cấu hình máy chủ. Tham số truyền vào chỉ được dùng khi cấu
-  // hình còn trống VÀ nó không trỏ về Google — nhờ đó bản thử vẫn trỏ được sang
-  // một máy chủ khác, còn đường về Apps Script thì bịt cứng:
-  const duPhong = laMayChuThat(_scriptUrl) ? _scriptUrl.trim() : ''
-  const diaChi = String(ch.URL ?? '').trim() || duPhong
+  // Máy mới có thể chưa lưu cấu hình, hoặc lần nạp lúc khởi động vừa trượt.
+  // Cùng bộ tìm địa chỉ của HS/PH sẽ thử lại tệp cấu hình công khai.
+  const diaChi = await layDiaChiMayChu(_scriptUrl)
   // KHÔNG ÂM THẦM QUAY VỀ GOOGLE. Thiếu địa chỉ thì nói thẳng, vì cái sai ở đây
   // là cấu hình chứ không phải mạng — và im lặng đi đường cũ là đúng thứ thầy
   // vừa bảo dẹp.
@@ -539,11 +525,7 @@ async function vaoThiQuaMayChuMoi(
   // cấu hình, nếu không lượt đầu tiên đọc phải một cấu hình rỗng.
   await xongNapDiaChi()
   const goc = await layCauHinhMayChu()
-  // MỘT LUẬT ĐỊA CHỈ CHO CẢ APP, đúng như `postJson`: lấy từ cấu hình; cấu hình
-  // còn trống thì dùng địa chỉ chỗ gọi truyền vào, MIỄN LÀ nó không trỏ về
-  // Google. Nhờ vậy máy em vừa mở app, cấu hình chưa kịp nạp, vẫn vào thi được.
-  const duPhong = laMayChuThat(scriptUrl) ? scriptUrl.trim().replace(/\/+$/, '') : ''
-  const diaChi = String(goc.URL ?? '').trim() || duPhong
+  const diaChi = await layDiaChiMayChu(scriptUrl)
   if (!diaChi) {
     throw new Error('Máy này chưa có địa chỉ máy chủ — mở đúng link Thầy gửi, hoặc báo Thầy.')
   }

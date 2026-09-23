@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { gameV2 } from '../server/src/game-v2'
 import { demLuotHomNay, docCauBtvnChuaNop, docChuoiKeThua, docDangLop, docDauVaoLuot, luotMoiBat, maiCho } from '../server/src/game-v2-luot'
 import { taoD1That, type D1That } from './_d1-that'
+import { daHocDang } from './_pham-vi-ca-nhan'
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({
   ...(await orig<typeof import('../server/src/game-v2-auth')>()),
@@ -21,7 +22,7 @@ const TEN_LOP = '12 - Lớp Thường'
 const cauJson = (qid: string, dang: string, mucDo: string) => ({ qid, maDe: 'DE1', version: 'v1', group: `g-${qid}`, phan: 'I', text: `Đề ${qid}`, choices: ['A', 'B', 'C', 'D'], ideas: [], hinhAnh: [], dang, tenDang: `Dạng ${dang}`, mucDo, sao: 1, kienThuc: ['K1'], correct: 'B', solution: { chot: 'Giải' }, reviewed: true })
 
 /** Lớp 12 (mặc định "12 - Lớp Thường"): em S1 + bạn S2. Kho: A-0…A-39 dạng A.1 (bài cá nhân hoá giao cho bạn S2 ⇒ lớp đã học), B-0…B-7 dạng B.2 (chưa ai học), C-0…C-7 dạng C.3 (ca lớp sẽ đóng). */
-function dung(o: { mucDoA?: string } = {}): D1That {
+function dung(o: { mucDoA?: string; daHoc?: boolean } = {}): D1That {
   const d = taoD1That()
   d.sql.prepare("INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DE1','Tờ 1',56,0,'v1')").run()
   d.sql.prepare("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','x')").run()
@@ -34,6 +35,7 @@ function dung(o: { mucDoA?: string } = {}): D1That {
   d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT1','CA1','DE1',40,'2026-09-20T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run()
   d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BT1|S2','BT1','S2','Em Hai')").run()
   d.sql.prepare("INSERT INTO btvn_cau(ma_btvn,qid,thu_tu,dang,muc_do,sao,phan,loi,ghim) VALUES('BT1','A-0',1,'A.1',0,0,'I',0,0)").run()
+  if (o.daHoc !== false) daHocDang(d, 'S1', 'A.1')
   return d
 }
 const start = (d: D1That, o: Record<string, unknown> = {}) => gameV2(d.env, 'start', { token: 'token-S1', mode: 'adventure', ...o }) as Promise<any>
@@ -43,9 +45,11 @@ const lamHetLuot = async (d: D1That, r: any, dapAn = 'B') => { for (const c of r
 const qids = (r: any): string[] => (r.questions as { qid: string }[]).map((x) => x.qid)
 const bangLop = (d: D1That) => d.sql.prepare('SELECT ten_lop, dang FROM lop_da_hoc ORDER BY dang').all() as { ten_lop: string; dang: string }[]
 
-describe('kho rút = phần LỚP đã học', () => {
-  it('dạng bài giao cho BẠN CÙNG LỚP mở cho em dù em CHƯA có bằng chứng; dạng chưa ai học không bao giờ ra; có `luot` (lượt đang mở, còn lại, trần 6)', async () => {
+describe('kho rút = phần CÁ NHÂN đã học; bộ đệm lớp chỉ giữ tương thích', () => {
+  it('bạn cùng lớp đã học không mở kho cho em; có bằng chứng cá nhân thì mở đúng dạng và quota', async () => {
     gio(`${NGAY}T10:00:00`)
+    const moi = dung({daHoc:false})
+    expect((await start(moi)).questions).toEqual([])
     const d = dung()
     const r = await start(d)
     expect(r.ok).toBe(true); expect(r.questions).toHaveLength(6)
@@ -53,7 +57,7 @@ describe('kho rút = phần LỚP đã học', () => {
     expect(new Set(qids(r)).size).toBe(6)
     for (const c of r.questions) { expect(c.correct).toBeUndefined(); expect(['yeu', 'toi_han', 'lap', 'thu_thach']).toContain(c.role); expect(['yeu', 'toi_han', 'moi', 'thu_thach', 'trum', 'lap']).toContain(c.roleV2) } // `role` = tập cũ cho máy em đang sống; `roleV2` = vai thật
     expect(r.luot).toMatchObject({ tran: 6, tongLuotMo: 3, daLam: 1, conLai: 2, luotDangMo: { so: 1, loai: 'khoi_dong', thuong: false } })
-    expect(bangLop(d)).toEqual([{ ten_lop: TEN_LOP, dang: 'A.1' }])
+    expect(qids(r).some(q => q.startsWith('B-') || q.startsWith('C-'))).toBe(false)
   })
 
   it('bảng đệm nạp lười: trong 6 giờ không đổi dù lớp học thêm dạng mới; qua 6 giờ nạp lại (thêm dạng của ca lớp ĐÃ ĐÓNG)', async () => {
@@ -77,7 +81,7 @@ describe('kho rút = phần LỚP đã học', () => {
 
   it('thiếu bảng đệm (Worker lên trước migration) ⇒ không lỗi: dạng lớp = []', async () => {
     gio(`${NGAY}T10:00:00`)
-    const d = dung(); d.sql.exec('DROP TABLE lop_da_hoc')
+    const d = dung({daHoc:false}); d.sql.exec('DROP TABLE lop_da_hoc')
     expect(await docDangLop(d.env, 'S1', Date.now())).toEqual([])
   })
 })
@@ -91,7 +95,7 @@ const themEmLopMoi = (d: D1That) => {
 const datKeThua = (d: D1That, v: unknown) => d.sql.prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('lop_da_hoc_ke_thua',?,'x')").run(typeof v === 'string' ? v : JSON.stringify(v))
 
 describe('KẾ THỪA kho lớp (Boss 21/09: lớp mới tách không được có kho nhỏ nhất)', () => {
-  it('lớp mới tách, chưa có bài/ca riêng: KHÔNG kế thừa ⇒ kho rỗng; có `lop_da_hoc_ke_thua` ⇒ nhận đủ dạng lớp gốc; `start` của em rút được câu lớp gốc', async () => {
+  it('lớp mới tách, chưa có bài/ca riêng: KHÔNG kế thừa ⇒ kho rỗng; có `lop_da_hoc_ke_thua` ⇒ nhận đủ dạng lớp gốc; `start` vẫn cần bằng chứng của chính em', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = dung(); themEmLopMoi(d)
     expect(await docDangLop(d.env, 'S3', Date.now())).toEqual([])
@@ -99,7 +103,7 @@ describe('KẾ THỪA kho lớp (Boss 21/09: lớp mới tách không được c
     expect(await docDangLop(d.env, 'S3', Date.now())).toEqual(['A.1']) // đổi cấu hình ⇒ nạp lại NGAY (mốc gắn chuỗi kế thừa), không chờ 6 giờ
     expect(bangLop(d)).toEqual([{ ten_lop: LOP_MOI, dang: 'A.1' }])
     const r = await gameV2(d.env, 'start', { token: 'token-S3', mode: 'adventure' }) as any
-    expect(r.ok).toBe(true); expect(r.questions.length).toBeGreaterThan(0); expect(qids(r).every((q) => q.startsWith('A-'))).toBe(true)
+    expect(r.ok).toBe(true); expect(r.questions).toEqual([])
   })
 
   it('dạng từ bài/ca CHÍNH em được giao vẫn có dù lớp hiện tại và lớp gốc không có; gỡ kế thừa ⇒ trở về chỉ phần của em', async () => {
@@ -245,6 +249,7 @@ describe('cờ lùi nhanh và lý do khi kho không đủ', () => {
   it('kho chỉ còn câu QUÁ BẬC + 1 của em ⇒ không câu, lý do rõ (không dùng lại lời "hoàn thành bài Thầy giao")', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = dung({ mucDoA: 'van_dung' })
+    d.sql.exec('UPDATE chi_tiet_cau SET dung_sai=0') // Đã gặp câu khó nhưng chưa làm đúng.
     const r = await start(d)
     expect(r.questions).toEqual([])
     expect(r.lyDo).toBe('chi_con_cau_qua_bac')
@@ -258,7 +263,7 @@ describe('cờ lùi nhanh và lý do khi kho không đủ', () => {
   })
   it('lớp chưa học dạng nào ⇒ lyDo kho_trong', async () => {
     gio(`${NGAY}T10:00:00`)
-    const d = dung(); d.sql.exec('DELETE FROM btvn_cau')
+    const d = dung({daHoc:false}); d.sql.exec('DELETE FROM btvn_cau')
     const r = await start(d)
     expect(r.questions).toEqual([]); expect(r.lyDo).toBe('kho_trong')
   })

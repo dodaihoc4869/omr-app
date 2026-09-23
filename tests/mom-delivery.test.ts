@@ -1,7 +1,11 @@
 import {it,expect,vi} from 'vitest'
-import {mom,gradeMom} from '../server/src/mom'
+import {mom as momGoc,gradeMom} from '../server/src/mom'
 import type {Env} from '../server/src/kieu'
 vi.mock('../server/src/game-v2-auth',()=>({gameIdentity:async(_e:unknown,b:any)=>{if(b.token!=='student')throw Error('login');return 'S1'}}))
+// Fixture này chỉ mô phỏng giao/nhận bài; sổ học và EXP được kiểm tra bằng SQLite trong audit-exp-2309.
+vi.mock('../server/src/su-kien-hoc',async importOriginal=>({...await importOriginal<typeof import('../server/src/su-kien-hoc')>(),ghiSuKien:async()=>({ok:true})}))
+vi.mock('../server/src/exp-d1',()=>({expNhanSauNop:async()=>({})}))
+const mom:typeof momGoc=(env,action,b,opts)=>momGoc(env,action,b,action==='create'?{noiBo:true}:opts)
 function setup(){
  const rows=new Map<string,any>(), bank=new Map<string,string>()
  const env={DE:{put:async(k:string,v:string)=>bank.set(k,v),get:async(k:string)=>bank.has(k)?{body:bank.get(k)}:null},DB:{prepare:(sql:string)=>({bind:(...a:any[])=>({
@@ -24,4 +28,21 @@ it('không dùng SBD gửi lên để giả học sinh khác và không nộp kh
 it('lưu đáp án, mở lại không mất bài; nộp chấm máy chủ và phụ huynh thấy điểm',async()=>{const {env}=setup();await mom(env,'create',assignment);await mom(env,'start',{token:'student',id:'mom_1'});await mom(env,'save',{token:'student',id:'mom_1',answers:{q1:'A'}});const resumed:any=await mom(env,'start',{token:'student',id:'mom_1'});expect(resumed.item.dapAnDaNop).toEqual({q1:'A'});await mom(env,'submit',{token:'student',id:'mom_1',answers:{q1:'A',q2:'A'},diem:10});const parent:any=await mom(env,'parent-list',{sbd:'S1'});expect(parent.items[0]).toMatchObject({trangThai:'da_nop',diem:5,soCauDung:1});const again:any=await mom(env,'submit',{token:'student',id:'mom_1',answers:{q1:'A',q2:'B'}});expect(again.item.diem).toBe(5)})
 it('quá giờ dùng đáp án đã lưu, không nhận sửa điểm sau giờ',async()=>{const {env,rows}=setup();await mom(env,'create',assignment);await mom(env,'start',{token:'student',id:'mom_1'});rows.get('S1:mom_1').started_at=new Date(Date.now()-8000000).toISOString();rows.get('S1:mom_1').answers='{"q1":"A"}';await expect(mom(env,'save',{token:'student',id:'mom_1',answers:{q1:'B'}})).rejects.toThrow('hết giờ');const r:any=await mom(env,'submit',{token:'student',id:'mom_1',answers:{q1:'A',q2:'B'}});expect(r.item.diem).toBe(5)})
 it('quy tắc chấm giữ nguyên trọng số từng câu và bỏ khoảng trắng',()=>{expect(gradeMom([{id:'a',dapAn:'DSDS'},{id:'b',dapAn:'2,5'}],{a:' dsds ',b:'2,5'})).toEqual({diem:10,soCauDung:2})})
+it('khóa Mom lỗi ở cả ba phần không được chấm; nộp gặp đề cũ lỗi vẫn giữ bài làm',async()=>{
+ for(const [phan,dung,sai,traLoi] of [['I','A',undefined,'A'],['II','DSDS','DSS','DSDS'],['III','0,54','abc','0.54']] as const){
+  const {env,bank,rows}=setup()
+  const id=`mom_khoa_${phan}`,qid=`${phan}-1`
+  const cau={id:qid,phan,text:'Câu kiểm tra khóa',dapAn:sai}
+  expect(gradeMom([cau],{[qid]:traLoi}).soCauDung).toBe(0)
+  await expect(mom(env,'create',{sbd:'S1',id,dsCau:[cau]})).rejects.toThrow()
+  await mom(env,'create',{sbd:'S1',id,dsCau:[{...cau,dapAn:dung}]})
+  await mom(env,'start',{token:'student',id})
+  const bankKey=[...bank.keys()][0]!
+  bank.set(bankKey,JSON.stringify([{...cau,_khoaXacMinh:1}])) // Bài cũ đã giao bị thiếu/hỏng khóa đáp án.
+  await expect(mom(env,'submit',{token:'student',id,answers:{[qid]:traLoi}})).rejects.toThrow(/Bài làm của em đã lưu/)
+  const row=rows.get(`S1:${id}`)
+  expect(row.submitted_at).toBeNull()
+  expect(JSON.parse(row.answers)).toEqual({[qid]:traLoi})
+ }
+})
 it('máy chủ không lưu được nội dung thì không báo thành công',async()=>{const {env,rows}=setup();env.DE.put=async()=>{throw Error('offline')};await expect(mom(env,'create',assignment)).rejects.toThrow('offline');expect(rows.size).toBe(0)})

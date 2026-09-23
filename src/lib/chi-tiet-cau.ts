@@ -97,7 +97,7 @@ export function taoChiTietCau(
   asg.phanIII.forEach((a, i) => {
     const q = a.question as TeacherShortAnswerQuestion
     const chon = answers.phanIII[a.qid] ?? ''
-    rows.push({ phan: 'III', soCau: i + 1, qid: a.qid, chuyenDe: q.chuyenDe ?? '', mucDo: q.mucDo ?? '', dapAnChon: chon, dapAnDung: q.correct, dungSai: chon.trim() ? norm(chon) === norm(q.correct) : false, giay: giayCua(giayCau, a.qid) })
+    rows.push({ phan: 'III', soCau: i + 1, qid: a.qid, chuyenDe: q.chuyenDe ?? '', mucDo: q.mucDo ?? '', dapAnChon: chon, dapAnDung: q.correct, dungSai: !!norm(chon) && !!norm(q.correct) && norm(chon) === norm(q.correct), giay: giayCua(giayCau, a.qid) })
   })
   return rows
 }

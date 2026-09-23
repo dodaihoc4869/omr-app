@@ -1,5 +1,5 @@
 // @vitest-environment node
-// GÓI KHIÊN (thầy lệnh 21/09): RESET mảnh + khiên rèn chưa dùng theo MỐC `khien_moc` (bảng lưu, SQL một lần, SQL lùi, tin cho em) + khiên quà tiến hoá ĐẦU chỉ mở khi ≥ 36 ngày đạt (phương án B)
+// GÓI KHIÊN (thầy lệnh 21/09): RESET mảnh + khiên rèn chưa dùng theo MỐC `khien_moc` (bảng lưu, SQL một lần, SQL lùi, tin cho em) + khiên quà tiến hoá ĐẦU chỉ mở khi ≥ 21 ngày đạt (phương án B)
 // + mất 1 khiên khi vắng 7 ngày liên tiếp (cron 00:01). D1 GIẢ BẰNG SQLITE THẬT; tệp SQL thật (server/dat-2109-khien-moc*.sql) được chạy nguyên văn.
 import { readFileSync } from 'node:fs'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -29,16 +29,16 @@ const datMoc = (d: D1That, v: string | null) => {
 const cauHinh = (d: D1That, khoa: string, v: string) => d.sql.prepare('INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES(?,?,?)').run(khoa, v, 'x')
 const T = (s: string): number => Date.parse(`${s}+07:00`)
 
-describe('khiên QUÀ tiến hoá đầu chỉ mở khi ≥ 36 ngày đạt từ mốc (phương án B); máy chủ là nguồn duy nhất của "khiên còn lại"', () => {
-  it('biên 35 / 36 ngày đạt, cấp 9 / 10 / 30; các mốc tiến hoá khác không đổi; khiên rèn cộng thêm', () => {
+describe('khiên QUÀ tiến hoá đầu chỉ mở khi ≥ 21 ngày đạt từ mốc (phương án B); máy chủ là nguồn duy nhất của "khiên còn lại"', () => {
+  it('biên 20 / 21 ngày đạt, cấp 9 / 10 / 30; các mốc tiến hoá khác không đổi; khiên rèn cộng thêm', () => {
     const q = (cap: number, ngayDat?: number) => khienQuaTienHoa({ cap, expMoi: ngayDat === undefined ? undefined : { daCong: 0, manhDaTinh: 0, ngayDat } })
     expect(q(9, 0)).toBe(0) // chưa tới mốc tiến hoá đầu: 0 như cũ
-    expect(q(10)).toBe(0); expect(q(10, 35)).toBe(0); expect(q(10, 36)).toBe(1); expect(q(10, 100)).toBe(1)
-    expect(q(30, 35)).toBe(2); expect(q(30, 36)).toBe(3) // 1 + 2 = 3 khi mở; chỉ khiên quà ĐẦU bị khoá
-    expect(q(50, 0)).toBe(5); expect(q(100, 0)).toBe(11); expect(q(100, 36)).toBe(12)
+    expect(q(10)).toBe(0); expect(q(10, 20)).toBe(0); expect(q(10, 21)).toBe(1); expect(q(10, 100)).toBe(1)
+    expect(q(30, 20)).toBe(2); expect(q(30, 21)).toBe(3) // 1 + 2 = 3 khi mở; chỉ khiên quà ĐẦU bị khoá
+    expect(q(50, 0)).toBe(5); expect(q(100, 0)).toBe(11); expect(q(100, 21)).toBe(12)
     const p = { cap: 10, shields: { used: 0 }, khienRen: { manh: 0, daRen: 1 }, expMoi: { daCong: 0, manhDaTinh: 0, ngayDat: 20 } }
     expect(khienConLai(p)).toBe(1) // chỉ khiên rèn
-    expect(khienConLai({ ...p, expMoi: { daCong: 0, manhDaTinh: 0, ngayDat: 36 } })).toBe(2)
+    expect(khienConLai({ ...p, expMoi: { daCong: 0, manhDaTinh: 0, ngayDat: 21 } })).toBe(2)
   })
 })
 
@@ -93,7 +93,7 @@ describe('reset: tệp SQL thật (mốc → chép lưu → đặt lại → tin
     for (const x of tin) {
       expect(x.title).toBe('A.I Đỗ Đại Học · Khiên của em')
       expect(x.body).toContain('A.I Đỗ Đại Học báo em')
-      expect(x.body).toContain('đủ 36 mảnh rèn một khiên')
+      expect(x.body).toContain('đủ 36 mảnh rèn một khiên') // nội dung SQL đã phát hành ngày 21/09, giữ lịch sử
       expect(x.body).toContain('cùng bắt đầu lại từ 0')
       expect(x.id).toMatch(/^khien\|reset\|[A-E]\|2026-09-21$/)
     }
@@ -147,14 +147,14 @@ describe('reset: tệp SQL thật (mốc → chép lưu → đặt lại → tin
   })
 })
 
-describe('mốc: mảnh chỉ tính từ dòng ngay_vn ≥ mốc; đạt 21/09 ⇒ 1/36; ngày thứ 36 đạt ⇒ rèn khiên đầu tiên và mở khiên quà đầu', () => {
+describe('mốc: mảnh chỉ tính từ dòng ngay_vn ≥ mốc; đạt 21/09 ⇒ 1/21; ngày thứ 21 đạt ⇒ rèn khiên đầu tiên và mở khiên quà đầu', () => {
   const dungMoc = (o: Ho = {}) => {
     const d = taoD1That()
     themHs(d, 'A', { cap: 10, khienRen: { manh: 11, daRen: 1 }, expMoi: { daCong: 0, manhDaTinh: 12 }, ...o })
     for (const n of [-3, -2, -1]) manhRow(d, 'A', themNgay('2026-09-21', n)) // mảnh cũ
     return d
   }
-  it('em có 11 mảnh + 1 khiên rèn chưa dùng trước mốc ⇒ sau reset 0/36, 0 khiên rèn; đạt 21/09 ⇒ 1/36; mảnh CŨ trong sổ không được đếm', async () => {
+  it('em có 11 mảnh + 1 khiên rèn chưa dùng trước mốc ⇒ sau reset 0/21, 0 khiên rèn; đạt 21/09 ⇒ 1/21; mảnh CŨ trong sổ không được đếm', async () => {
     const d = dungMoc()
     d.sql.exec(SQL_DAT)
     expect(doc(d, 'A').khienRen).toEqual({ manh: 0, daRen: 0 })
@@ -165,19 +165,19 @@ describe('mốc: mảnh chỉ tính từ dòng ngay_vn ≥ mốc; đạt 21/09 �
     expect(doc(d, 'A').khienRen).toEqual({ manh: 1, daRen: 0 })
     expect(doc(d, 'A').expMoi).toMatchObject({ manhDaTinh: 1, ngayDat: 1 })
   })
-  it('35 ngày đạt ⇒ 35/36, chưa khiên; ngày thứ 36 ⇒ rèn khiên đầu tiên (mảnh về 0) VÀ khiên quà đầu (cấp 10) mở', async () => {
+  it('20 ngày đạt ⇒ 20/21, chưa khiên; ngày thứ 21 ⇒ rèn khiên đầu tiên (mảnh về 0) VÀ khiên quà đầu (cấp 10) mở', async () => {
     const d = dungMoc()
     d.sql.exec(SQL_DAT)
-    for (let n = 0; n < 35; n++) manhRow(d, 'A', themNgay('2026-09-21', n))
+    for (let n = 0; n < 20; n++) manhRow(d, 'A', themNgay('2026-09-21', n))
     await congVaoHoSoGame(d.env, 'A', SINCE)
     let p = doc(d, 'A')
-    expect(p.khienRen).toEqual({ manh: 35, daRen: 0 })
+    expect(p.khienRen).toEqual({ manh: 20, daRen: 0 })
     expect(khienConLai(p)).toBe(0) // cấp 10 nhưng quà đầu còn khoá
-    manhRow(d, 'A', themNgay('2026-09-21', 35))
+    manhRow(d, 'A', themNgay('2026-09-21', 20))
     await congVaoHoSoGame(d.env, 'A', SINCE)
     p = doc(d, 'A')
     expect(p.khienRen).toEqual({ manh: 0, daRen: 1 })
-    expect(p.expMoi.ngayDat).toBe(36)
+    expect(p.expMoi.ngayDat).toBe(21)
     expect(khienConLai(p)).toBe(2) // 1 khiên rèn + 1 khiên quà đầu vừa mở
   })
   it('mảnh thưởng chuỗi 7 / dạng rời yếu (so = 0) không làm lệch; chỉ dòng loai = dat được đếm là NGÀY ĐẠT', async () => {

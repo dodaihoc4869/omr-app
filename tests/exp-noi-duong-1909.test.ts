@@ -1,7 +1,7 @@
 // @vitest-environment node
 // EXP HỌC TẬP MỚI nối vào các LỆNH NỘP của em (BTVN cả bài, xong lô, khắc phục, bài Mẹ giao, luyện đề): cờ bật → phản hồi có `expNhan`/`manhNhan`;
 // cờ tắt → phản hồi KHÔNG có hai trường đó (y hệt cũ). Chạy trên SQLite thật.
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import worker from '../server/src/index'
 import { nopKhacPhuc } from '../server/src/goi-cu'
 import { mom } from '../server/src/mom'
@@ -9,6 +9,9 @@ import { luyenDe } from '../server/src/luyen-de'
 import { gameToken } from '../server/src/game-v2-auth'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
+// Bảng giá được kiểm ở ngày 20/09; từ 22/09 có khoản câu đầu ngày mới.
+beforeEach(() => { vi.useFakeTimers({toFake:['Date']}); vi.setSystemTime(new Date('2026-09-20T03:00:00Z')) })
+afterEach(() => vi.useRealTimers())
 const TU = '2026-09-01T00:00:00.000Z'
 const HAN_XA = '2099-01-01T00:00:00.000Z'
 const TO_KHO = {
@@ -40,12 +43,13 @@ describe('BTVN', () => {
     seedBtvn(b)
     const r = await goiWorker(worker, b.env, '/btvn/xong-lo', { maBtvn: 'B1', sbd: 'S1', chiSo: 0, dapAn: { 'DE1-I-1': 'A', 'DE1-I-2': 'C' } })
     expect(r).toMatchObject({ ok: true, loDaXong: 1, suKien: 2 })
-    expect(loai(r)).toEqual(['cau', 'lo'])
-    expect(r.expNhan.find((x: any) => x.loai === 'lo')).toMatchObject({ exp: 10 })
+    // Xong lô trả nhanh; goiWorker đợi ctx.waitUntil, EXP được kiểm ở sổ sau hậu xử lý.
+    expect(r.expNhan).toBeUndefined()
+    expect(b.sql.prepare('SELECT loai,exp FROM exp_so ORDER BY loai').all()).toEqual([{loai:'cau',exp:2},{loai:'lo',exp:10}])
     expect(hoSo(b).earned).toBe(12)
     // Báo lại lô: không cộng thêm.
     const lai = await goiWorker(worker, b.env, '/btvn/xong-lo', { maBtvn: 'B1', sbd: 'S1', chiSo: 0, dapAn: { 'DE1-I-1': 'A', 'DE1-I-2': 'C' } })
-    expect(lai.expNhan).toEqual([])
+    expect(lai.expNhan).toBeUndefined()
     expect(hoSo(b).earned).toBe(12)
 
     const t = dung(false)
@@ -92,12 +96,12 @@ describe('khắc phục, bài Mẹ giao, luyện đề', () => {
     const d = dung(true)
     const token = await gameToken(d.env, 'S1')
     const dsCau = [{ id: 'DE1-I-1', dapAn: 'A', chuyenDe: 'ES' }, { id: 'DE1-I-2', dapAn: 'B', chuyenDe: 'ES' }]
-    await mom(d.env, 'create', { sbd: 'S1', id: 'M1', dsCau })
+    await mom(d.env, 'create', { sbd: 'S1', id: 'M1', dsCau }, {noiBo:true})
     await mom(d.env, 'start', { token, id: 'M1' })
     const r = await mom(d.env, 'submit', { token, id: 'M1', answers: { 'DE1-I-1': 'A', 'DE1-I-2': 'C' } })
     expect((r.item as { soCauDung: number }).soCauDung).toBe(1)
     expect(loai(r)).toEqual(['cau', 'mom'])
-    await mom(d.env, 'create', { sbd: 'S1', id: 'M2', dsCau })
+    await mom(d.env, 'create', { sbd: 'S1', id: 'M2', dsCau }, {noiBo:true})
     await mom(d.env, 'start', { token, id: 'M2' })
     const trong = await mom(d.env, 'submit', { token, id: 'M2', answers: {} })
     expect(trong.expNhan).toEqual([])

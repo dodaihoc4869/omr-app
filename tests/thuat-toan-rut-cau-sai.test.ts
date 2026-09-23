@@ -99,7 +99,7 @@ describe('Thuật toán rút câu sai & khắc phục lỗi sai', () => {
       // Tỷ lệ mỗi câu = 10/100 = 0.1 -> 25 * 0.1 = 2.5 -> làm tròn lên (Math.ceil) = 3 câu
       const phanBo25 = tinhSoCauMoiDang(25)
       for (let i = 1; i <= 10; i++) {
-        expect(phanBo25.get(`sai_${i}`)).toBe(3)
+        expect(phanBo25.get(`sai_${i}`)).toBe(i<=5?3:2)
       }
 
       // Khi kéo 100 câu -> mỗi câu nhận đủ 10 câu
@@ -140,7 +140,7 @@ describe('Thuật toán rút câu sai & khắc phục lỗi sai', () => {
       // A: 5 * 0.25 = 1.25 -> ceil = 2 câu
       // B: 5 * 0.75 = 3.75 -> ceil = 4 câu
       const phanBo5 = tinhSoCauMoiDang(5)
-      expect(phanBo5.get('s1')).toBe(2)
+      expect(phanBo5.get('s1')).toBe(1)
       expect(phanBo5.get('s2')).toBe(4)
     })
   })
@@ -241,14 +241,14 @@ describe('Chế độ 2 — tối đa là số câu PHÂN BIỆT, không cộng 
     expect(new Set(dsCau.map((c) => c.id)).size).toBe(dsCau.length)
   })
 
-  it('chia theo tỷ lệ, lẻ thì LÀM TRÒN LÊN — không câu sai nào bị bỏ trắng', () => {
+  it('chia phần dư lớn nhất, không vượt tổng người dùng chọn', () => {
     const { tinhSoCauMoiDang } = phanTichTyLeDang(SAI, KHO)
     // Kéo 3 câu cho 3 câu sai ngang nhau: mỗi câu 1, không ai bằng 0.
     const pb = tinhSoCauMoiDang(3)
     for (const q of ['s1', 's2', 's3']) expect(pb.get(q)).toBeGreaterThanOrEqual(1)
     // Kéo 1 câu: làm tròn LÊN nên vẫn mỗi câu tối thiểu 1, không ai mất suất.
     const pb1 = tinhSoCauMoiDang(1)
-    for (const q of ['s1', 's2', 's3']) expect(pb1.get(q)).toBeGreaterThanOrEqual(1)
+    expect([...pb1.values()].reduce((a,b)=>a+b,0)).toBe(1)
   })
 
   it('TỔNG phân bổ bám sát số kéo, không phình lên gấp nhiều lần', () => {

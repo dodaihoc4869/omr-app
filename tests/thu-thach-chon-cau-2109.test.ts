@@ -40,9 +40,10 @@ describe('chonCauThuThach', () => {
     expect(chonCauThuThach(KHO, khoiCuaEm({ lop: '' })).map((c) => c.id)).toEqual(['DH-12-C1-B1-I-1', 'DH-12-C1-B1-I-2'])
     expect(chonCauThuThach([cau('a', 'DH-12-A', { dapAn: '' }), cau('b', 'DH-12-B')], 12).map((c) => c.id)).toEqual(['b'])
   })
-  it('khoá nguồn: màn thử thách đi qua chonCauThuThach với khối của em, không còn tự cắt 2 câu đầu kho', () => {
+  it('màn thử thách legacy đi qua server và lịch riêng của em', () => {
     const s = fs.readFileSync(path.join(process.cwd(), 'src/screens/StudentPortalScreen.tsx'), 'utf8')
-    expect(s).toMatch(/chonCauThuThach\(cauLuyenTuNguon\(kho\), khoiCuaEm\(\{ lop: auth\.lop \}\)\)/)
-    expect(s).not.toMatch(/nguon\.slice\(0, 2\)/)
+    const branch = s.split("case 'mo_thu_thach':")[1]!.split("case 'mo_thi':")[0]!
+    expect(branch).toContain('taiThuThachHomNay(auth.token)')
+    expect(branch).not.toContain('loadExamSources')
   })
 })

@@ -225,92 +225,19 @@ function moTo(dsO: OBang[], opt: { dayHoc?: boolean; thu?: boolean } = {}) {
   return { html, doc, w, dat, bam, cham, goiXong, nua, so, tuCha }
 }
 
-describe('tờ chiếu ĐO giây thật của đợt', () => {
-  it('KHÔNG có thần thú (không màn gọi tên): đo từ lúc vào đợt; bấm ô 1 ⇒ giây thật + T = LÀM của đợt + CHỮA của ô 1; bấm ô 2 ⇒ cộng thêm CHỮA của ô 2', () => {
-    const t = moTo([o('A'), o('B')])
-    const [n1, n2] = t.nua()
-    const lam0 = Math.max(t.so(n1, 'data-lam0'), t.so(n2, 'data-lam0'))
-    t.dat(120)
-    t.bam(0, 'Đạt')
-    t.dat(200)
-    t.bam(1, 'Chưa đạt')
-    const [m1, m2] = t.cham()
-    expect(m1).toMatchObject({ khoa: 'A|q-A', dat: true, giay: 120, duTinh: lam0 + t.so(n1, 'data-chua0') })
-    expect(m2).toMatchObject({ khoa: 'B|q-B', dat: false, giay: 200, duTinh: lam0 + t.so(n1, 'data-chua0') + t.so(n2, 'data-chua0') })
-  })
-
-  it('CÓ màn gọi tên: đo từ lúc màn gọi tên xong và LÀM BÀI bắt đầu (không tính 3 giây thu về thẻ tên)', () => {
-    const t = moTo([o('A'), o('B')], { thu: true })
-    t.dat(4) // gọi tên xong lúc 4 s
-    t.goiXong()
-    t.dat(64)
-    t.bam(0, 'Đạt')
-    expect(t.cham()[0].giay).toBe(60)
-  })
-
-  it('bấm TRONG lúc còn màn gọi tên (chưa LÀM BÀI) ⇒ không đo (tin vẫn đi, không có giay/duTinh)', () => {
-    const t = moTo([o('A'), o('B')], { thu: true })
-    t.dat(1)
-    t.bam(0, 'Đạt')
-    const m = t.cham()[0]
-    expect(m).toMatchObject({ khoa: 'A|q-A', dat: true })
-    expect(m).not.toHaveProperty('giay')
-    expect(m).not.toHaveProperty('duTinh')
-  })
-
-  it('đo theo giờ CHƯA hiệu chỉnh: đặt hệ số 1,3 làm `data-lam`/`data-chua` lớn lên nhưng T dự tính báo về vẫn là giờ gốc', () => {
-    const goc = moTo([o('A'), o('B')])
-    const hc = moTo([o('A', { heSoHieuChinh: 1.3 }), o('B', { heSoHieuChinh: 1.3 })])
-    for (const [a, b] of [[goc.nua()[0], hc.nua()[0]], [goc.nua()[1], hc.nua()[1]]]) {
-      expect(Number(b.getAttribute('data-lam'))).toBeGreaterThan(Number(a.getAttribute('data-lam')))
-      expect(b.getAttribute('data-lam0')).toBe(a.getAttribute('data-lam0'))
-      expect(b.getAttribute('data-chua0')).toBe(a.getAttribute('data-chua0'))
-    }
-    hc.dat(100)
-    hc.bam(0, 'Đạt')
-    goc.dat(100)
-    goc.bam(0, 'Đạt')
-    expect(hc.cham()[0].duTinh).toBe(goc.cham()[0].duTinh)
-  })
-
-  it('sang ĐỢT KẾ: đồng hồ đo bắt đầu lại từ lúc vào đợt, ô đã bấm ở đợt trước KHÔNG cộng vào T của đợt sau', () => {
-    const t = moTo([o('A'), o('B'), o('C'), o('D')])
-    t.dat(100)
-    t.bam(0, 'Đạt') // đợt 1
-    t.dat(150)
+describe('tờ chiếu gọi thủ công không đo giờ',()=>{
+  it.each([false,true])('dayHoc=%s: ghi kết quả vẫn hoạt động, không gửi giây/dự tính',dayHoc=>{
+    const t=moTo([o('A'),o('B'),o('C'),o('D')],{dayHoc})
+    t.doc.getElementById('mc-len-bang')!.click()
+    t.dat(100);t.bam(0,'Đạt')
     t.doc.getElementById('mc-sau')!.click()
-    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 2/2')
-    t.dat(210)
-    t.bam(3, 'Đạt') // ô THỨ HAI của đợt 2 (vị trí khác ô đã bấm ở đợt 1 — để phép thử không trùng khoá)
-    const [truoc, sau] = t.cham()
-    const dot2 = [...t.doc.querySelectorAll<HTMLElement>('.mc-dot:nth-child(2) .mc-nua[data-lam]')]
-    expect(dot2).toHaveLength(2)
-    expect(truoc.giay).toBe(100)
-    expect(sau.giay).toBe(60) // 210 − 150, không phải 210
-    expect(sau.duTinh).toBe(Math.max(...dot2.map((n) => t.so(n, 'data-lam0'))) + t.so(dot2[1], 'data-chua0'))
-  })
-
-  it('chế độ DẠY HỌC không đo (giờ ấy là đồng hồ đếm ngược của lớp, không phải giờ chữa)', () => {
-    const t = moTo([o('A'), o('B')], { dayHoc: true })
-    t.dat(50)
-    t.bam(0, 'Đạt')
-    expect(t.cham()[0]).not.toHaveProperty('giay')
-  })
-
-  it('bấm HAI LẦN cùng một ô (lần đầu lỗi rồi bấm lại) không cộng CHỮA của ô ấy hai lần', () => {
-    const t = moTo([o('A'), o('B')])
-    const [n1] = t.nua()
-    t.dat(90)
-    const v = t.bam(0, 'Đạt')
-    // giả lập lỗi: mở lại nút như khi app báo `loi` rồi bấm lại
-    t.tuCha({ type: TIN_TO_CHIEU.PHAN_HOI, maPhien: MA, khoa: 'A|q-A', kq: 'loi' })
-    expect(v.getAttribute('data-cham')).toBe('cho')
-    t.dat(100)
-    t.bam(0, 'Đạt')
-    const [m1, m2] = t.cham()
-    expect(m2.duTinh).toBe(m1.duTinh)
-    expect(m2.giay).toBe(100)
-    void n1
+    t.doc.getElementById('mc-len-bang')!.click()
+    t.dat(300);t.bam(3,'Chưa đạt')
+    const messages=t.cham()
+    expect(messages).toHaveLength(2)
+    expect(messages[0]).toMatchObject({khoa:'A|q-A',dat:true})
+    expect(messages[1]).toMatchObject({khoa:'D|q-D',dat:false})
+    for(const m of messages){expect(m).not.toHaveProperty('giay');expect(m).not.toHaveProperty('duTinh')}
   })
 })
 
@@ -341,6 +268,6 @@ describe('khoá nguồn', () => {
   it('exam-api gửi `giayThuc` chỉ khi có; cầu nối đo qua `__mcGiayDot`', () => {
     expect(readFileSync('src/lib/exam-api.ts', 'utf8')).toContain('...(d.giayThuc !== undefined ? { giayThuc: d.giayThuc } : {})')
     expect(readFileSync('src/lib/to-chieu-cau-noi.ts', 'utf8')).toContain('window.__mcGiayDot')
-    expect(readFileSync('src/lib/html-may-chieu.ts', 'utf8')).toContain('window.__mcGiayDot = giayDot')
+    expect(readFileSync('src/lib/html-may-chieu.ts', 'utf8')).toContain('window.__mcGiayDot = function () { return null; }')
   })
 })

@@ -97,7 +97,7 @@ export default function DaoThanThu({sbd,token,moShopLucDau,profile,doanMo,call:c
   {man==='dao'&&<DaoCuaEm profile={profile} exp={exp} chuoiNgay={chuoiNgay} goiY={goiY} conLai={conLai} luotCau={luotCau} luotNgay={luotNgay} maiCho={maiCho} tenDang={tenDang} tasks={tasks} busy={busy} loi={loi||loiChon} thongBao={bao||(luot&&!xong?'Em đang đi dở một chuyến — bấm LÊN ĐƯỜNG để đi tiếp.':'')}
    onLenDuong={()=>void lenDuong()} onOnTheoNhac={dang=>void lenDuong('repair',dang)} onNap={()=>void chay(async()=>{await call('invest')})} onDoiTen={ten=>void chay(async()=>{await call('rename',{name:ten});setLoiChon('')})}/>}
   {man==='so-tay'&&<SoTay profile={profile} danhMuc={danhMuc} tenDang={tenDang}/>}
-  {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onDungKhien={id=>chay(async()=>{await call('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}
+  {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onRenKhien={n=>chay(async()=>{await call('khien-ren',{soDaRen:n})})} onDungKhien={id=>chay(async()=>{await call('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}
   <button type="button" className="dao-ve-app" onClick={onDong}>Về app học sinh</button>
   <nav className="dao-nav" aria-label="Mục của đảo">{muc.map(([id,nhan])=><button type="button" key={id} aria-current={id===man?'page':undefined} onClick={()=>{if(id==='doan')onMoDoan();else if(id==='cua-hang')setDangShop(true);else setMan(id)}}><span>{ICON[id]}</span>{nhan}</button>)}</nav>
  </div>

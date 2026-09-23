@@ -12,6 +12,7 @@ import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { cauKhacPhucGoi } from '../server/src/goi-cu'
 import { luyenDe } from '../server/src/luyen-de'
 import { taoD1That, type D1That } from './_d1-that'
+import { daHocDang } from './_pham-vi-ca-nhan'
 import { khoiCuaCau, type Khoi } from '../src/lib/khoi-cau'
 
 afterEach(() => vi.useRealTimers())
@@ -44,6 +45,8 @@ function dung(khoiEm: Khoi, o: { tenLop?: string; soII?: Record<Khoi, number> } 
   d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT1','CA1',?,8,'2026-09-20T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run(TO[khoiEm])
   d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BT1|S2','BT1','S2','Em Hai')").run()
   d.sql.prepare("INSERT INTO btvn_cau(ma_btvn,qid,thu_tu,dang,muc_do,sao,phan,loi,ghim) VALUES('BT1',?,1,'A.1',0,0,'I',0,0)").run(qidI(khoiEm, 0))
+  daHocDang(d, 'S1', 'A.1')
+  daHocDang(d, 'S2', 'A.1')
   return d
 }
 const token = (d: D1That, sbd = 'S1') => gameToken(d.env, sbd)

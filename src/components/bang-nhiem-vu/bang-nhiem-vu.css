@@ -3,7 +3,6 @@
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
-  overflow-x: hidden;
   background: var(--m3-surface);
   color: var(--m3-on-surface);
   font-family: var(--sans, system-ui, sans-serif);
@@ -491,6 +490,9 @@ button.bnv-the:active {
 .bnv-the-mo-ta {
   font-size: var(--bnv-cx-1);
   color: var(--bnv-mau-chu-phu);
+  /* Tên bài có thể là tên tệp/mã không có khoảng trắng. Không cắt mất
+   * phần cuối ở mép màn hoặc đẩy cả bảng nhiệm vụ rộng hơn điện thoại. */
+  overflow-wrap: anywhere;
 }
 .bnv-the--nhat {
   --bnv-mau-nen: var(--m3-surface-container-high);

@@ -6,6 +6,7 @@ import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import worker from '../server/src/index'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
+import { daHocDang } from './_pham-vi-ca-nhan'
 
 const T0 = Date.parse('2026-09-22T12:00:00+07:00')
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) })
@@ -31,6 +32,7 @@ function dung(o: { moDoan?: boolean; soA?: number; soII?: number } = {}): D1That
   d.sql.prepare("INSERT INTO btvn(ma_btvn,ma_ca,ma_de,so_cau,giao_luc,han_nop,da_xoa,cap_nhat_luc,ca_nhan) VALUES('BT1','CA1','DE1',30,'2026-09-20T00:00:00.000Z','2099-01-01T00:00:00.000Z',0,'x',1)").run()
   d.sql.prepare("INSERT INTO btvn_em(khoa,ma_btvn,sbd,ho_ten) VALUES('BT1|S2','BT1','S2','Em Hai')").run()
   d.sql.prepare("INSERT INTO btvn_cau(ma_btvn,qid,thu_tu,dang,muc_do,sao,phan,loi,ghim) VALUES('BT1','A-0',1,'A.1',0,0,'I',0,0)").run()
+  daHocDang(d, 'S1', 'A.1')
   return d
 }
 const goi = async (d: D1That, sbd: string, lenh: string, b: Record<string, unknown> = {}) => gameV2(d.env, `doan-${lenh}`, { token: await gameToken(d.env, sbd), ...b }) as Promise<any>

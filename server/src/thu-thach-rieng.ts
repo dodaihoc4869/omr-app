@@ -9,7 +9,7 @@ import type { Env, ExecutionContext } from './kieu'
 import { docKhoiEm } from './game-v2-bank'
 import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import { gameIdentity } from './game-v2-auth'
-import { protectedQuestions } from './game-v2-bank'
+import { protectedQuestions, readScope } from './game-v2-bank'
 import { jsonLaTuLuan } from './cam-tu-luan'
 import { cauCongKhai, khongBiBaoVe, layCauChoEm } from './cau-theo-qid'
 import { CAN_DANG_NHAP, chamVaGhiTraLoi } from './on-lai-nop'
@@ -20,7 +20,7 @@ import { themNgay } from './ho-so-nam-kt'
 import { ngayVn } from './su-kien-hoc'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
-import { PETS } from '../../src/game/than-thu-v2/core'
+import { PETS, learnedQuestionFilter, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { mucTuChu } from '../../src/lib/btvn-nang-do'
 
 type Dong = Record<string, unknown>
@@ -81,6 +81,7 @@ export interface UngVien {
   qid: string
   dang: string
   muc: 0 | 1 | 2
+  group?: string
 }
 
 /**
@@ -96,11 +97,15 @@ export function chonCauThuThach(p: { sbd: string; ngay: string; dang: string[]; 
   const hang = new Map(p.dang.map((d) => [d, xepHang(d)] as const))
   const chon = new Map<string, string[]>(p.dang.map((d) => [d, []]))
   const dung = new Set<string>()
+  const nhomCua = new Map(p.ungVien.map((u) => [u.qid, u.group || `qid:${u.qid}`]))
+  const nhomDa = new Set<string>()
+  const layDuoc = (q: string) => !dung.has(q) && !nhomDa.has(nhomCua.get(q)!)
+  const danhDau = (q: string) => { dung.add(q); nhomDa.add(nhomCua.get(q)!) }
   p.dang.forEach((d, i) => {
     const phan = Math.floor(p.soCau / p.dang.length) + (i < p.soCau % p.dang.length ? 1 : 0)
     for (const q of hang.get(d)!) {
       if (chon.get(d)!.length >= phan) break
-      if (!dung.has(q)) { chon.get(d)!.push(q); dung.add(q) }
+      if (layDuoc(q)) { chon.get(d)!.push(q); danhDau(q) }
     }
   })
   // nhường phần thiếu cho dạng còn câu
@@ -108,7 +113,7 @@ export function chonCauThuThach(p: { sbd: string; ngay: string; dang: string[]; 
   for (const d of p.dang) {
     for (const q of hang.get(d)!) {
       if (tong >= p.soCau) break
-      if (!dung.has(q)) { chon.get(d)!.push(q); dung.add(q); tong++ }
+      if (layDuoc(q)) { chon.get(d)!.push(q); danhDau(q); tong++ }
     }
   }
   const ra: string[] = []
@@ -158,7 +163,7 @@ export async function docThanThuSoThat(env: Env, dsSbd: string[]): Promise<Map<s
       const can = thanhExp(cap)
       ra.set(chuoi(x.sbd), {
         ten, cap, expConThieu: can <= 0 ? 0 : Math.max(0, can - Math.max(0, Math.round(so(x.exp)))),
-        manhKhien: Math.max(0, Math.round(so(x.manh))) % MANH_MOI_KHIEN, manhKhienTong: MANH_MOI_KHIEN,
+        manhKhien: Math.max(0, Math.round(so(x.manh))), manhKhienTong: MANH_MOI_KHIEN,
         chuoiNgay: demChuoiDat((lichSu.get(chuoi(x.sbd)) ?? []) as never),
       })
     }
@@ -234,10 +239,25 @@ async function docHang(env: Env, sbd: string, ngay: string): Promise<HangThuThac
 export async function chotThuThach(env: Env, sbd: string, ngay: string, nowMs: number = Date.now()): Promise<HangThuThach | null> {
   try {
     const da = await docHang(env, sbd, ngay)
-    if (da) return da
+    if (da) {
+      // Bài đã chốt trước bản sửa cũng phải qua phạm vi hiện tại; không chọn thêm câu thay thế.
+      const [phamVi, baoVe] = await Promise.all([readScope(env, sbd), protectedQuestions(env)])
+      const hop = learnedQuestionFilter(phamVi.evidence, baoVe)
+      const kho = new Map(phamVi.pool.filter((q) => q.reviewed && hop(q)).map((q) => [q.qid, q]))
+      const nhom = new Set<string>()
+      const qid = da.qid.filter((id) => {
+        const q = kho.get(id)
+        if (!q || (q.group && nhom.has(q.group))) return false
+        if (q.group) nhom.add(q.group)
+        return true
+      })
+      return qid.length ? { ...da, qid, soCau: qid.length } : null
+    }
     const ap = await docThuThachDaAp(env, sbd, ngay)
     if (!ap) return null
     const { thuThach: tt, loiMoi } = ap
+    const [phamVi, baoVe] = await Promise.all([readScope(env, sbd), protectedQuestions(env)])
+    const daHocCau = learnedQuestionFilter(phamVi.evidence, baoVe)
 
     // bậc đích của em ở từng dạng — cùng luật với bộ câu bài tập về nhà (đủ căn cứ ⇒ bậc hồ sơ, chưa đủ ⇒ 0)
     const rBac = await env.DB.prepare('SELECT ma_dang, so_gap, bac FROM nam_kt_dang WHERE sbd = ? AND ma_dang IN (SELECT value FROM json_each(?))').bind(sbd, json(tt.dang)).all<Dong>()
@@ -251,6 +271,12 @@ export async function chotThuThach(env: Env, sbd: string, ngay: string, nowMs: n
        UNION SELECT qid FROM btvn_em_cau WHERE sbd = ? AND ma_btvn IN (SELECT ma_btvn FROM btvn_em WHERE sbd = ? AND nop_luc IS NULL AND thu_hoi = 0)`,
     ).bind(sbd, tu, sbd, sbd).all<Dong>().catch(() => ({ results: [] as Dong[] }))
     const loaiTru = new Set((rLoai.results ?? []).map((x) => chuoi(x.qid)))
+    // Một bản sao ở tờ khác vẫn là câu đã làm/được giao, dù qid khác.
+    if (loaiTru.size > 0) {
+      const banSao = await env.DB.prepare(`SELECT q.qid FROM game_v2_question q WHERE q.content_group <> '' AND q.content_group IN
+        (SELECT content_group FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)))`).bind(json([...loaiTru])).all<Dong>()
+      for (const x of banSao.results ?? []) loaiTru.add(chuoi(x.qid))
+    }
 
     // ứng viên: cùng chỉ mục "phục vụ được" như /hs/cau-theo-qid (câu còn ở kho, chỉ mục khớp), không tự luận
     const ungVien: UngVien[] = []
@@ -265,12 +291,14 @@ export async function chotThuThach(env: Env, sbd: string, ngay: string, nowMs: n
         if (jsonLaTuLuan(x.json)) continue
         if (!cauHopKhoi(khoiEm, { qid: x.qid, ma_de: x.ma_de, lop: x.lop_to })) continue
         let muc: 0 | 1 | 2 = 0
-        try { muc = mucTuChu((JSON.parse(chuoi(x.json)) as Dong).mucDo as string) } catch { continue }
-        if (!nhomCua.has(chuoi(x.qid))) { nhomCua.set(chuoi(x.qid), chuoi(x.content_group)); ungVien.push({ qid: chuoi(x.qid), dang: d, muc }) }
+        try {
+          const q = JSON.parse(chuoi(x.json)) as PrivateQuestion
+          if (!q.reviewed || !daHocCau(q)) continue
+          muc = mucTuChu(q.mucDo ?? '')
+        } catch { continue }
+        if (!nhomCua.has(chuoi(x.qid))) { nhomCua.set(chuoi(x.qid), chuoi(x.content_group)); ungVien.push({ qid: chuoi(x.qid), dang: d, muc, group: chuoi(x.content_group) }) }
       }
     }
-    let baoVe: Set<string>
-    try { baoVe = await protectedQuestions(env) } catch { return null } // không kiểm được đề bảo vệ ⇒ đóng cửa (không phát thử thách)
     const duoc = ungVien.filter((u) => khongBiBaoVe({ qid: u.qid, group: nhomCua.get(u.qid) ?? '' }, baoVe))
 
     const kq = chonCauThuThach({ sbd, ngay, dang: tt.dang, soCau: tt.soCau, mucNhamTheoDang, ungVien: duoc, loaiTru })
@@ -333,7 +361,8 @@ export async function hsThuThachNop(env: Env, b: Dong, nowMs: number = Date.now(
     nguon: NGUON_THU_THACH,
     maNguon: (now) => maNguonThuThach(ngayVn(now)),
     choPhepTheoEm: async (sbd) => {
-      giu.hang = await docHang(env, sbd, ngay).catch(() => null)
+      const daChot = await docHang(env, sbd, ngay).catch(() => null)
+      giu.hang = daChot ? await chotThuThach(env, sbd, ngay, nowMs).catch(() => null) : null
       return new Set(giu.hang?.qid ?? [])
     },
   }, ctx)

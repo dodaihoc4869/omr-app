@@ -2,14 +2,14 @@
 //
 // Thần thú lên cấp theo NGÀY HỌC ĐỀU, không theo lượng EXP kiếm được: mỗi ngày (giờ Việt Nam) thần thú HẤP THỤ tối đa
 //   200 EXP khi em ĐẠT nhiệm vụ ngày · 120 EXP khi em có học nhưng chưa đạt · 0 khi em không học.
-// EXP kiếm dư nằm nguyên trong ỐNG NGHIỆM (`wallet`), hôm sau nạp tiếp — không em nào bị vứt công. Vì đường cấp mới tổng 240 000 EXP = 1 200 ngày × 200:
-//   SỚM NHẤT cấp 10 là ngày 21 (4 200 EXP) và cấp 120 là ngày 1 200, dù em cày bao nhiêu câu trong một ngày.
+// EXP kiếm dư nằm nguyên trong ỐNG NGHIỆM (`wallet`), hôm sau nạp tiếp — không em nào bị vứt công. Vì đường cấp mới tổng 238 200 EXP = 1 191 ngày × 200:
+//   SỚM NHẤT cấp 10 là ngày 12 (2 400 EXP) và cấp 120 là ngày 1 191, dù em cày bao nhiêu câu trong một ngày.
 // MỘT cổng: mọi nơi làm tăng `cap` / `exp` của hồ sơ game (nạp, quà, Đoàn, legacy…) phải đi qua `hapThu`; máy chủ (Code 3) gọi hàm này, máy em chỉ HIỂN THỊ kết quả máy chủ trả.
 //
 // Hồ sơ dùng ba trường của hồ sơ game v2: `cap` (1…120), `exp` (EXP đã nạp DỞ DANG trong cấp hiện tại, 0 ≤ exp < thanhExp(cap)), `wallet` (ống nghiệm) và `hapThu` = { ngay, da }
 // (số EXP đã hấp thụ trong `ngay`; sang ngày mới `da` coi như 0). Hàm KHÔNG sửa đầu vào, KHÔNG đọc đồng hồ, KHÔNG ngẫu nhiên; chuỗi ngày `YYYY-MM-DD` so sánh bằng `===`.
 import { CAP_TOI_DA } from '../game/than-thu-hoa-hoc/hinh-thai'
-import { nhanExp, thanhExp, thanhExpCu, tongExpToiCap } from '../game/than-thu-hoa-hoc/kinh-nghiem'
+import { BANG_THANH_EXP_V2_DAU, nhanExp, thanhExp, thanhExpCu, tongExpToiCap } from '../game/than-thu-hoa-hoc/kinh-nghiem'
 
 /** Sức hấp thụ của MỘT ngày em đạt nhiệm vụ ngày. */
 export const HAP_THU_DAT = 200
@@ -20,10 +20,10 @@ export const TRAN_EXP_GAME_NGAY = 120
 /** Điều 10: bảng giá EXP học tập mới từ 2026-09-22 nâng thưởng "đạt nhiệm vụ ngày" 20 ⇒ 80; em đã đạt trước mốc được BÙ phần chênh này cho mỗi ngày đạt. */
 export const BU_DAT_NGAY = 60
 /** Mã luật cấp của hồ sơ sau khi chuyển đổi (`luatCap`); hồ sơ chưa có hoặc khác 2 là hồ sơ của đường cũ. */
-export const LUAT_CAP_MOI = 2
+export const LUAT_CAP_MOI = 3
 /** Ngày sớm nhất tới cấp 10 / cấp 120 khi em ĐẠT mọi ngày (bất biến của đường mới; test khoá). */
-export const NGAY_SOM_NHAT_CAP_10 = 21
-export const NGAY_SOM_NHAT_CAP_120 = 1200
+export const NGAY_SOM_NHAT_CAP_10 = 12
+export const NGAY_SOM_NHAT_CAP_120 = 1191
 
 export type LyDoHapThu = 'no' | 'chua_hoc' | 'het_ong' | 'cap_toi_da' | null
 
@@ -188,6 +188,18 @@ export function chenhDinhGia(mastery: readonly { stage?: number }[] | undefined)
  */
 export function chuyenDoiLuatCap<H extends HoSoCu>(hoSoCu: H, soNgayCoHocTrongMua: number, ngayVN: string, tuyChon: { luc?: string; coHocHomNay?: boolean; soNgayDatTruocBangGiaMoi?: number } = {}): KetQuaChuyenDoi<H> {
   if (hoSoCu.luatCap === LUAT_CAP_MOI) return { hoSo: hoSoCu as KetQuaChuyenDoi<H>['hoSo'], daChuyen: false, tongCu: 0, tongMoi: 0, daHapThu: 0, daTruDinhGia: 0, buDatNgay: 0 }
+  // V2 -> V3: giữ cấp, trả chênh lệch giá và phần thanh dư về ví.
+  // Không tạo EXP, không dùng lại hạn mức hấp thụ của ngày chuyển.
+  if (hoSoCu.luatCap === 2) {
+    const cap = kepCap(hoSoCu.cap), exp = soNguyen(hoSoCu.exp)
+    let chenh = 0
+    for (let c = 1; c < Math.min(cap, 10); c++) chenh += BANG_THANH_EXP_V2_DAU[c - 1]! - thanhExp(c)
+    const expMoi = cap >= CAP_TOI_DA ? 0 : Math.min(exp, thanhExp(cap) - 1)
+    const traVi = chenh + exp - expMoi
+    const tongCu = tongExpToiCap(cap) + chenh + exp + soNguyen(hoSoCu.wallet)
+    const hoSo = { ...hoSoCu, exp: expMoi, wallet: soNguyen(hoSoCu.wallet) + traVi, luatCap: LUAT_CAP_MOI }
+    return { hoSo: hoSo as KetQuaChuyenDoi<H>['hoSo'], daChuyen: true, tongCu, tongMoi: tongCu, daHapThu: tongExpToiCap(cap) + expMoi, daTruDinhGia: 0, buDatNgay: 0 }
+  }
   const capCu = kepCap(hoSoCu.cap)
   const expCu = soNguyen(hoSoCu.exp)
   const wallet = soNguyen(hoSoCu.wallet)

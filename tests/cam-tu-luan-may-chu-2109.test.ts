@@ -170,7 +170,8 @@ describe('B · Đoàn Hộ Tống (game-v2-doan.ts): câu cá nhân và câu chu
     // 3 câu phần I TỰ LUẬN cùng dạng (2 phương án): nếu lọt vào suất cá nhân, em sẽ thấy ở ô câu hỏi
     ...Array.from({ length: 3 }, (_, i) => ({ ...cauRieng(thoI(20 + i, { pa: { A: 'a', B: 'b' } }), 'DE1'), qid: `XTL${i + 1}`, group: `g-XTL${i + 1}`, correct: 'B' })),
   ]
-  const trum = (qid: string, o: Tho = {}) => ({ ...cauRieng(thoII(1), 'DE1'), qid, group: `g-${qid}`, correct: 'DSDS', mucDo: 'van_dung', ...o })
+  // Kiểm cấm tự luận: câu đối chứng phải vừa sức ở bậc Biết của fixture.
+  const trum = (qid: string, o: Tho = {}) => ({ ...cauRieng(thoII(1), 'DE1'), qid, group: `g-${qid}`, correct: 'DSDS', mucDo: 'biet', ...o })
   function dungDoan(cauTrum: ReturnType<typeof trum>[]): D1That {
     const d = taoD1That()
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('doan_ho_tong',?,'x')").run(JSON.stringify({ toanBo: true }))

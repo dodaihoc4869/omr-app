@@ -26,10 +26,10 @@
  */
 /*
  * ĐƯỜNG CẤP MỚI (thầy chốt 21/09/2026 13:36, Điều 1 của `DE-XUAT-THAN-THU-MOI-NGAY-2109.md`): lên cấp theo NGÀY HỌC ĐỀU.
- * Mỗi ngày thần thú hấp thụ tối đa 200 EXP (khi em đạt nhiệm vụ ngày; 120 khi chỉ có học; 0 khi không học — xem `src/lib/hap-thu-ngay.ts`), nên đường 240 000 EXP
- * = 1 200 ngày × 200: SỚM NHẤT cấp 10 là ngày 21 (4 200 EXP) và cấp 120 là ngày 1 200 (240 000 EXP), dù em kiếm EXP nhanh cỡ nào.
- * `thanhExp` tra BẢNG 119 số viết thẳng (không tính mũ) để máy chủ và máy em ra CÙNG một số, không lệch làm tròn. Chín thanh đầu: 160 · 200 · 250 · 320 · 400 ·
- * 500 · 620 · 780 · 970 (tổng 4 200); từ cấp 10 mỗi cấp ~5 ngày, cuối đường ~20 ngày một cấp; thanh không bao giờ ngắn lại.
+ * Mỗi ngày thần thú hấp thụ tối đa 200 EXP (khi em đạt nhiệm vụ ngày; 120 khi chỉ có học; 0 khi không học — xem `src/lib/hap-thu-ngay.ts`), nên đường 238 200 EXP
+ * = 1 191 ngày × 200: SỚM NHẤT cấp 10 là ngày 12 (2 400 EXP) và cấp 120 là ngày 1 191 (238 200 EXP), dù em kiếm EXP nhanh cỡ nào.
+ * `thanhExp` tra BẢNG 119 số viết thẳng (không tính mũ) để máy chủ và máy em ra CÙNG một số, không lệch làm tròn. Chín thanh đầu: 120 · 150 · 180 · 220 · 260 ·
+ * 300 · 350 · 390 · 430 (tổng 2 400); từ cấp 10 mỗi cấp ~5 ngày, cuối đường ~20 ngày một cấp; thanh không bao giờ ngắn lại.
  * Đường CŨ (ba đoạn 120 × 1,10 → dốc 1,55 → dài 1,037, tổng 1 286 590 EXP) giữ dưới tên `thanhExpCu`, CHỈ để chuyển đổi hồ sơ đã chơi (`chuyenDoiLuatCap`).
  * Chú thích "ĐƯỜNG EXP 120 CẤP — BA ĐOẠN" bên dưới là lịch sử của đường cũ.
  */
@@ -61,11 +61,12 @@ export const CAP_DOC = 10
 export const CAP_DAI = 13
 
 /**
- * BẢNG THANH EXP — 119 số viết thẳng: `BANG_THANH_EXP[c − 1]` là EXP để đi từ cấp `c` lên cấp `c + 1` (c = 1…119). Tổng đúng 240 000; 9 số đầu tổng 4 200; không giảm.
- * Đổi một số ở đây là đổi cả nhịp game (test khoá tổng, mốc ngày 21 / 1 200 và từng số).
+ * BẢNG THANH EXP — 119 số viết thẳng: `BANG_THANH_EXP[c − 1]` là EXP để đi từ cấp `c` lên cấp `c + 1` (c = 1…119). Tổng đúng 238 200; 9 số đầu tổng 2 400; không giảm.
+ * Đổi một số ở đây là đổi cả nhịp game (test khoá tổng, mốc ngày 12 / 1 191 và từng số).
  */
+export const BANG_THANH_EXP_V2_DAU = [160, 200, 250, 320, 400, 500, 620, 780, 970] as const
 export const BANG_THANH_EXP: readonly number[] = [
-  160, 200, 250, 320, 400, 500, 620, 780, 970, 1000,
+  120, 150, 180, 220, 260, 300, 350, 390, 430, 1000,
   1010, 1030, 1040, 1050, 1060, 1080, 1090, 1110, 1120, 1130,
   1150, 1160, 1180, 1190, 1210, 1220, 1240, 1250, 1270, 1290,
   1300, 1320, 1330, 1350, 1370, 1390, 1400, 1420, 1440, 1460,
@@ -89,7 +90,7 @@ export function thanhExp(cap: number): number {
   return BANG_THANH_EXP[c - 1] ?? 0
 }
 
-/** Tổng EXP phải có để ĐẠT tới cấp `cap` từ cấp 1 (cấp 1 = 0; cấp 10 = 4 200; cấp 120 = 240 000). */
+/** Tổng EXP phải có để ĐẠT tới cấp `cap` từ cấp 1 (cấp 1 = 0; cấp 10 = 2 400; cấp 120 = 238 200). */
 export function tongExpToiCap(cap: number): number {
   const c = Math.min(CAP_TOI_DA, Math.max(1, Math.round(cap)))
   let t = 0
@@ -128,7 +129,7 @@ export function thanhExpCu(cap: number): number {
  */
 export const SUC_CHUA_ONG = 50000
 
-/** Tổng EXP phải kiếm để đi từ cấp 1 tới cấp 120 (đường mới: 240 000). */
+/** Tổng EXP phải kiếm để đi từ cấp 1 tới cấp 120 (đường mới: 238 200). */
 export function tongExpToiDinh(): number {
   let t = 0
   for (let c = 1; c < CAP_TOI_DA; c++) t += thanhExp(c)

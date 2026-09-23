@@ -1,3 +1,4 @@
+import { daHocDang } from './_pham-vi-ca-nhan'
 // @vitest-environment node
 // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1; docs/hop-dong-thu-thach-rieng-2109.md): máy chủ CHỌN + CHỐT câu (không tự luận, chưa làm 14 ngày, không vượt bậc + 1, không đề bảo vệ, không đáp án),
 // nộp đi đường chấm của ôn lại (nguồn sổ thu_thach_rieng), số thật thần thú, cờ tắt, dòng mayDaLam.
@@ -45,8 +46,10 @@ const nop = (d: D1That, traLoi: unknown, token: string | null = 'token-S1') => g
 const themDieuChinh = (d: D1That, sbd: string, o: { thuThach?: unknown; loiMoi?: string; ap?: number; huy?: number; ngay?: string } = {}) =>
   d.sql.prepare("INSERT OR REPLACE INTO ai_dieu_chinh(sbd,ngay,json,ap_dung,het_han,huy,nop_luc,che_do) VALUES(?,?,?,?,'2999-01-01',?,'x','that')").run(
     sbd, o.ngay ?? HOM_NAY(), JSON.stringify({ thuThach: o.thuThach ?? { dang: ['D1'], soCau: 6, bac: 'dung_bac' }, loiMoi: o.loiMoi ?? LOI_MOI }), o.ap ?? 1, o.huy ?? 0)
-const dangHs = (d: D1That, sbd: string, ma: string, gap: number, bac: number) =>
+const dangHs = (d: D1That, sbd: string, ma: string, gap: number, bac: number) => {
   d.sql.prepare("INSERT OR REPLACE INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,cap_nhat_luc) VALUES(?,?,?,?,0,0,0,0,?,'x')").run(`${sbd}|${ma}`, sbd, ma, gap, bac)
+  daHocDang(d, sbd, ma)
+}
 const hoSoGame = (d: D1That, sbd: string, o: { pet?: string; cap?: number; exp?: number; manh?: number; choice?: boolean } = {}) =>
   d.sql.prepare('INSERT OR REPLACE INTO game_v2_profile(sbd,revision,json,created_at) VALUES(?,1,?,?)').run(sbd, JSON.stringify({ pet: o.pet ?? 'lua_phuong', choice: o.choice ?? false, cap: o.cap ?? 6, exp: o.exp ?? 50, nickname: 'Biệt danh riêng', khienRen: { manh: o.manh ?? 15, daRen: 0 } }), 'x')
 function truong(): D1That {
@@ -257,7 +260,7 @@ describe('/hs/thu-thach-hom-nay — số thật thần thú', () => {
     const lui = (n: number) => new Date(Date.parse(`${homNay}T00:00:00Z`) - n * D).toISOString().slice(0, 10)
     kh(homNay, null); kh(lui(1), 'dat'); kh(lui(2), 'dat'); kh(lui(3), null, 1); kh(lui(4), 'dat'); kh(lui(5), 'mot_phan'); kh(lui(6), 'dat') // hôm nay chưa xong (bỏ qua), 1+2 đạt, nghỉ bỏ qua, 4 đạt ⇒ 3, đứt ở "mot_phan"
     const r = (await thu(d)) as { thanThu?: Record<string, unknown> }
-    expect(r.thanThu).toEqual({ ten: 'Viêm Sư', cap: 6, expConThieu: thanhExp(6) - 50, manhKhien: 15, manhKhienTong: 36, chuoiNgay: 3 })
+    expect(r.thanThu).toEqual({ ten: 'Viêm Sư', cap: 6, expConThieu: thanhExp(6) - 50, manhKhien: 15, manhKhienTong: 21, chuoiNgay: 3 })
     expect(JSON.stringify(r.thanThu)).not.toContain('Biệt danh')
     const chuaChon = truong(); hoSoGame(chuaChon, 'S1', { choice: true })
     expect((await thu(chuaChon)) as never).not.toHaveProperty('thanThu')
@@ -272,9 +275,9 @@ describe('/hs/thu-thach-hom-nay — số thật thần thú', () => {
     hoSoGame(d, 'S2', { pet: 'nuoc_long', cap: 120, exp: 5, manh: 36 })
     const m = await docThanThuSoThat(d.env, ['S1', 'S2', 'S3'])
     expect([...m.keys()].sort()).toEqual(['S1', 'S2'])
-    expect(m.get('S2')).toMatchObject({ ten: 'Thuỷ Long', cap: 120, expConThieu: 0, manhKhien: 0, manhKhienTong: 36 })
+    expect(m.get('S2')).toMatchObject({ ten: 'Thuỷ Long', cap: 120, expConThieu: 0, manhKhien: 36, manhKhienTong: 21 })
     hoSoGame(d, 'S2', { pet: 'nuoc_long', cap: 6, exp: 99999, manh: 12 })
-    expect((await docThanThuSoThat(d.env, ['S2'])).get('S2')).toMatchObject({ manhKhien: 12, manhKhienTong: 36 }) // mảnh cũ 12 không còn đủ một khiên
+    expect((await docThanThuSoThat(d.env, ['S2'])).get('S2')).toMatchObject({ manhKhien: 12, manhKhienTong: 21 }) // mảnh cũ 12 không còn đủ một khiên
     expect((await docThanThuSoThat(d.env, ['S2'])).get('S2')!.expConThieu).toBe(0)
     expect((await docThanThuSoThat(d.env, [])).size).toBe(0)
   })
@@ -350,7 +353,7 @@ describe('thẻ /ai/ho-so-ngay có SỐ THẬT thần thú (ẩn danh)', () => {
     expect(r.ok).toBe(true)
     const s1 = r.cacEm.find((x) => x.sbd === 'S1')!
     const s2 = r.cacEm.find((x) => x.sbd === 'S2')!
-    expect(s1.the!.thanThu).toEqual({ ten: 'Viêm Sư', cap: 6, expConThieu: thanhExp(6) - 50, manhKhien: 15, manhKhienTong: 36, chuoiNgay: 0 })
+    expect(s1.the!.thanThu).toEqual({ ten: 'Viêm Sư', cap: 6, expConThieu: thanhExp(6) - 50, manhKhien: 15, manhKhienTong: 21, chuoiNgay: 0 })
     expect(s2.the).not.toHaveProperty('thanThu')
     expect(JSON.stringify(r)).not.toMatch(/Biệt danh|Em Một|Em Hai/)
     const luu = JSON.parse((d.sql.prepare("SELECT the_json FROM ai_ho_so_ngay WHERE sbd = 'S1'").get() as { the_json: string }).the_json)

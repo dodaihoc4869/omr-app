@@ -23,7 +23,7 @@ afterEach(() => vi.useRealTimers())
 
 const gio = (s: string) => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date(`${s}+07:00`)) }
 const NGAY = '2026-09-22'
-const hoSoMoi = (o: Record<string, unknown> = {}) => ({ pet: 'dat_quy', choice: false, legacy: null, cap: 1, exp: 0, wallet: 500, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2026-09-21T05:00:00.000Z', luatCap: 2, ...o })
+const hoSoMoi = (o: Record<string, unknown> = {}) => ({ pet: 'dat_quy', choice: false, legacy: null, cap: 1, exp: 0, wallet: 500, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2026-09-21T05:00:00.000Z', luatCap: 3, ...o })
 const themHoSo = (d: D1That, o: Record<string, unknown> = {}, sbd = 'S1') => d.sql.prepare('INSERT INTO game_v2_profile(sbd,revision,json,created_at) VALUES(?,0,?,?)').run(sbd, JSON.stringify(hoSoMoi(o)), 'x')
 const docHoSo = (d: D1That, sbd = 'S1') => JSON.parse((d.sql.prepare('SELECT json FROM game_v2_profile WHERE sbd=?').get(sbd) as { json: string }).json) as Record<string, any>
 const revision = (d: D1That, sbd = 'S1') => (d.sql.prepare('SELECT revision FROM game_v2_profile WHERE sbd=?').get(sbd) as { revision: number }).revision
@@ -51,11 +51,11 @@ describe('cổng hấp thụ `invest`', () => {
     lamCau(d, 4)
     const a = await invest(d)
     expect(a).toMatchObject({ daNap: 120, lyDo: 'no', conTran: 0 })
-    expect(docHoSo(d)).toMatchObject({ cap: 1, exp: 120, wallet: 380, hapThu: { ngay: NGAY, da: 120 } })
+    expect(docHoSo(d)).toMatchObject({ cap: 2, exp: 0, wallet: 380, hapThu: { ngay: NGAY, da: 120 } })
     themExp(d, 'dat_ngay')
     const b = await invest(d)
     expect(b).toMatchObject({ daNap: 80, lyDo: 'no', conTran: 0 })
-    expect(docHoSo(d)).toMatchObject({ cap: 2, exp: 40, wallet: 300, hapThu: { ngay: NGAY, da: 200 } }) // thanh cấp 1 = 160 ⇒ 200 = 1 cấp + 40
+    expect(docHoSo(d)).toMatchObject({ cap: 2, exp: 80, wallet: 300, hapThu: { ngay: NGAY, da: 200 } }) // thanh cấp 1 = 160 ⇒ 200 = 1 cấp + 40
     const c = await invest(d)
     expect(c).toMatchObject({ daNap: 0, lyDo: 'no' }); expect(docHoSo(d).wallet).toBe(300)
     expect((c.profile as any).hapThuHomNay).toEqual({ da: 200, tran: 200, lyDo: 'no', soCauHomNay: 4, canCau: 4 })
@@ -147,13 +147,13 @@ describe('CHUYỂN ĐỔI hồ sơ đã chơi (Điều 2): lười khi mở + cr
   }
   const tin = (d: D1That) => d.sql.prepare("SELECT id, sbd, body FROM student_notice WHERE id LIKE 'luat-cap|%' ORDER BY id").all() as { id: string; sbd: string; body: string }[]
 
-  it('mở hồ sơ ⇒ chuyển đổi: luatCap 2, giữ vết `truocSiet`, BẢO TOÀN tổng EXP (= tổng cũ − chênh nấc), không tăng cấp, thú ăn ≤ 200 × ngày có học, phần dư về ống; một tin cho em', async () => {
+  it('mở hồ sơ ⇒ chuyển đổi: luatCap 3, giữ vết `truocSiet`, BẢO TOÀN tổng EXP (= tổng cũ − chênh nấc), không tăng cấp, thú ăn ≤ 200 × ngày có học, phần dư về ống; một tin cho em', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That(); themEmCu(d, 'S1')
     themExp(d, 'cau', '2026-09-21'); themExp(d, 'dat_ngay', '2026-09-21') // 1 ngày có học (21/09), đã đạt trước bảng giá mới
     const tongCu = tongExpTheoDuongCu(4, 50, 100), chenh = chenhDinhGia([{ stage: 2 }, { stage: 1 }])
     const { profile, revision: rev } = await loadProfile(d.env, 'S1')
-    expect(rev).toBe(1); expect(profile.luatCap).toBe(2)
+    expect(rev).toBe(1); expect(profile.luatCap).toBe(3)
     const dc = docHoSo(d)
     const tongMoi = tongCu - chenh + 60 // bù 60 cho 1 ngày đạt trước 22/09
     expect(dc.cap).toBeLessThanOrEqual(4)
@@ -173,23 +173,23 @@ describe('CHUYỂN ĐỔI hồ sơ đã chơi (Điều 2): lười khi mở + cr
     const r = await loadProfile(d.env, 'S1'); expect(r.revision).toBe(0); expect(revision(d)).toBe(0)
   })
 
-  it('hồ sơ MÙA MỚI (tạo trắng theo mùa) sinh sẵn luatCap 2, không cần chuyển đổi', async () => {
+  it('hồ sơ MÙA MỚI (tạo trắng theo mùa) sinh sẵn luatCap 3, không cần chuyển đổi', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That()
     d.sql.exec("CREATE TABLE IF NOT EXISTS game_v2_settings (key TEXT PRIMARY KEY, json TEXT NOT NULL)")
     d.sql.prepare("INSERT INTO game_v2_settings(key,json) VALUES('season',?)").run(JSON.stringify({ id: 's2' }))
     const r = await loadProfile(d.env, 'S1')
-    expect(r.profile).toMatchObject({ cap: 1, exp: 0, wallet: 0, luatCap: 2, season: 's2' })
+    expect(r.profile).toMatchObject({ cap: 1, exp: 0, wallet: 0, luatCap: 3, season: 's2' })
   })
 
-  it('CRON: ≤ toiDa hồ sơ mỗi lượt cho tới hết; thua CAS (em đang chơi) không bị đè; hết việc ⇒ cờ `chuyen_doi_cap = xong` và lượt sau không làm gì', async () => {
+  it('CRON: ≤ toiDa hồ sơ mỗi lượt cho tới hết; thua CAS (em đang chơi) không bị đè; hết việc ⇒ cờ `chuyen_doi_cap_v3 = xong` và lượt sau không làm gì', async () => {
     gio(`${NGAY}T10:00:00`)
     const d = taoD1That()
     for (const s of ['E1', 'E2', 'E3', 'E4', 'E5']) themEmCu(d, s)
     themHoSo(d, {}, 'E6') // đã luật mới
     const t1 = await chuyenDoiLoCron(d.env, Date.now(), { toiDa: 2 })
     expect(t1).toMatchObject({ soDoc: 2, daDoi: 2, xong: false })
-    expect(docHoSo(d, 'E1').luatCap).toBe(2); expect(docHoSo(d, 'E2').luatCap).toBe(2); expect(docHoSo(d, 'E3').luatCap).toBeUndefined()
+    expect(docHoSo(d, 'E1').luatCap).toBe(3); expect(docHoSo(d, 'E2').luatCap).toBe(3); expect(docHoSo(d, 'E3').luatCap).toBeUndefined()
     // E3 vừa được em khác mở chơi ⇒ revision đổi giữa lúc cron đọc và ghi: mô phỏng bằng tăng revision trước câu UPDATE của cron
     const goc = d.env.DB.prepare.bind(d.env.DB)
     let daPha = false
@@ -200,15 +200,15 @@ describe('CHUYỂN ĐỔI hồ sơ đã chơi (Điều 2): lười khi mở + cr
     const t2 = await chuyenDoiLoCron(d.env, Date.now(), { toiDa: 2 })
     d.env.DB.prepare = goc as never
     expect(t2).toMatchObject({ soDoc: 2, daDoi: 1, thuaCas: 1, xong: false })
-    expect(docHoSo(d, 'E3').luatCap).toBeUndefined(); expect(docHoSo(d, 'E4').luatCap).toBe(2)
+    expect(docHoSo(d, 'E3').luatCap).toBeUndefined(); expect(docHoSo(d, 'E4').luatCap).toBe(3)
     const t3 = await chuyenDoiLoCron(d.env, Date.now(), { toiDa: 40 })
     expect(t3).toMatchObject({ soDoc: 2, daDoi: 2, xong: false }) // E3 (làm lại) + E5
     const t4 = await chuyenDoiLoCron(d.env, Date.now(), { toiDa: 40 })
     expect(t4).toMatchObject({ soDoc: 0, daDoi: 0, xong: true })
-    expect((d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='chuyen_doi_cap'").get() as { gia_tri: string }).gia_tri).toBe('xong')
+    expect((d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='chuyen_doi_cap_v3'").get() as { gia_tri: string }).gia_tri).toBe('xong')
     const truoc = d.chup('game_v2_profile')
     expect(await chuyenDoiLoCron(d.env, Date.now())).toMatchObject({ soDoc: 0, xong: true }); expect(d.chup('game_v2_profile')).toBe(truoc)
-    for (const s of ['E1', 'E2', 'E3', 'E4', 'E5']) expect(docHoSo(d, s).luatCap).toBe(2)
+    for (const s of ['E1', 'E2', 'E3', 'E4', 'E5']) expect(docHoSo(d, s).luatCap).toBe(3)
     expect(revision(d, 'E6')).toBe(0)
   })
 
@@ -226,10 +226,10 @@ describe('ĐIỀU 9 — trần 120 EXP/ngày VN cho EXP sinh trong game (MỘT c
     const p: any = { expGame: undefined }
     expect(nhanExpGame(p, NGAY, 100)).toBe(100)
     expect(nhanExpGame(p, NGAY, 30)).toBe(20)
-    expect(p.expGame).toEqual({ ngay: NGAY, da: 120 })
+    expect(p.expGame).toMatchObject({ ngay: NGAY, da: 120 })
     expect(nhanExpGame(p, NGAY, 10)).toBe(0)
     expect(nhanExpGame(p, '2026-09-23', 50)).toBe(50)
-    expect(p.expGame).toEqual({ ngay: '2026-09-23', da: 50 })
+    expect(p.expGame).toMatchObject({ ngay: '2026-09-23', da: 50 })
     expect(nhanExpGame(p, '2026-09-23', -5)).toBe(0)
     expect(nhanExpGame(p, '2026-09-23', Number.NaN)).toBe(0)
   })
@@ -273,7 +273,7 @@ describe('ĐIỀU 9 — trần 120 EXP/ngày VN cho EXP sinh trong game (MỘT c
     gio('2026-09-23T10:00:00')
     e.sql.prepare("UPDATE game_v2_session SET json = json_set(json,'$.created', ?)").run(Date.now())
     expect(await tra(e, 1)).toMatchObject({ reward: 10 })
-    expect(docHoSo(e).expGame).toEqual({ ngay: '2026-09-23', da: 10 })
+    expect(docHoSo(e).expGame).toMatchObject({ ngay: '2026-09-23', da: 10 })
   })
 })
 
@@ -297,13 +297,13 @@ describe('hồ sơ hiển thị cho máy em (chỉ-thêm)', () => {
 describe('ba con số cho Bảng nhiệm vụ (khối `exp`): expConThieu · ongNghiem · hapThuConLaiHomNay', () => {
   it('expConThieu = thanh cấp − EXP đã hấp thụ (KHÔNG trừ ống); ongNghiem = ví; hapThuConLaiHomNay = trần hôm nay − đã ăn hôm nay', async () => {
     gio(`${NGAY}T10:00:00`)
-    const d = taoD1That(); themHoSo(d, { cap: 2, exp: 40, wallet: 300, hapThu: { ngay: NGAY, da: 120 } })
+    const d = taoD1That(); themHoSo(d, { cap: 2, exp: 80, wallet: 300, hapThu: { ngay: NGAY, da: 120 } })
     lamCau(d, 4)
-    expect(await docHapThuChoEm(d.env, 'S1')).toEqual({ expConThieu: thanhExp(2) - 40, ongNghiem: 300, hapThuConLaiHomNay: 0 })
+    expect(await docHapThuChoEm(d.env, 'S1')).toEqual({ expConThieu: thanhExp(2) - 80, ongNghiem: 300, hapThuConLaiHomNay: 0 })
     themExp(d, 'dat_ngay')
     expect(await docHapThuChoEm(d.env, 'S1')).toMatchObject({ hapThuConLaiHomNay: 80 })
     const e = await docExpHomNay(d.env, 'S1', Date.now())
-    expect(e).toMatchObject({ expConThieu: thanhExp(2) - 40, ongNghiem: 300, hapThuConLaiHomNay: 80 })
+    expect(e).toMatchObject({ expConThieu: thanhExp(2) - 80, ongNghiem: 300, hapThuConLaiHomNay: 80 })
   })
   it('cấp 120 ⇒ expConThieu 0; chưa học hôm nay ⇒ hapThuConLaiHomNay 0', async () => {
     gio(`${NGAY}T10:00:00`)

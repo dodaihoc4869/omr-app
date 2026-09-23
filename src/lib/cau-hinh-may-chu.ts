@@ -41,13 +41,29 @@ export const MAC_DINH_MAY_CHU: CauHinhMayChu = {
   GIAN_VAO_THI_GIAY: 3,
 }
 
+/** Chỉ nhận địa chỉ HTTPS mà thiết bị khác có thể gọi. */
+export function diaChiMayChuHopLe(raw: unknown): string {
+  const s = String(raw ?? '').trim().replace(/\/+$/, '')
+  try {
+    const u = new URL(s)
+    const host = u.hostname.toLowerCase()
+    if (u.protocol !== 'https:' || u.username || u.password || u.search || u.hash ||
+      host === 'localhost' || host.endsWith('.localhost') || host === '[::1]' || host === '::1' ||
+      host === '0.0.0.0' || /^127\./.test(host) || host === 'google.com' ||
+      host.endsWith('.google.com') || host.includes('googleusercontent') || host === 'script.googleapis.com') return ''
+    return s
+  } catch {
+    return ''
+  }
+}
+
 function soDuong(v: unknown, macDinh: number): number {
   const n = Number(v)
   return Number.isFinite(n) && n > 0 ? n : macDinh
 }
 
 export function chuanHoaMayChu(c?: Partial<CauHinhMayChu> | null): CauHinhMayChu {
-  const url = String(c?.URL ?? '').trim()
+  const url = diaChiMayChuHopLe(c?.URL)
   return {
     // CÓ ĐỊA CHỈ LÀ BẬT. Không còn cờ tắt nữa.
     //

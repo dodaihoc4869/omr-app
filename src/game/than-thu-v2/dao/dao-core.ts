@@ -59,7 +59,7 @@ export function lyDoTranExpGame(reward:number|undefined,thuongGoc:number|undefin
 export interface MucTieu{loai:'cap'|'dang'|'khien'|'tien-hoa';tieuDe:string;phu:string;tiLe:number}
 /** Dạng gần thành thạo nhất: nhiều sao nhất trong các dạng chưa đủ 3 sao; hoà thì dạng tới hạn sớm hơn. */
 export function dangGanThanhThao(mastery:readonly Mastery[]){return [...mastery].filter(m=>m.stage<3).sort((a,b)=>b.stage-a.stage||a.due-b.due||a.key.localeCompare(b.key))[0]}
-export function manhKhien(profile:Pick<DaoProfile,'khienRen'>,exp?:DaoExp|null){const m=exp?.manhKhien??profile.khienRen;return m&&Number.isFinite(m.manh)&&m.moiKhien>0?{manh:Math.max(0,Math.floor(m.manh)),moiKhien:Math.floor(m.moiKhien)}:null}
+export function manhKhien(profile:Pick<DaoProfile,'khienRen'>,exp?:DaoExp|null){const m=profile.khienRen??exp?.manhKhien;return m&&Number.isFinite(m.manh)&&m.moiKhien>0?{manh:Math.max(0,Math.floor(m.manh)),moiKhien:Math.floor(m.moiKhien)}:null}
 /** 3 mục tiêu gần nhất: lên cấp · thành thạo một dạng · rèn khiên (không có số mảnh ⇒ thay bằng mốc tiến hoá kế, không bịa). */
 export function mucTieuGanNhat(profile:DaoProfile,exp?:DaoExp|null,tenDang:Readonly<Record<string,string>>={}):MucTieu[]{
  const ra:MucTieu[]=[],v=vongExp(profile.cap,profile.exp)
@@ -68,7 +68,7 @@ export function mucTieuGanNhat(profile:DaoProfile,exp?:DaoExp|null,tenDang:Reado
  ra.push(d?{loai:'dang',tieuDe:tenDang[d.key]?`Thành thạo dạng ${tenDang[d.key]}`:'Thành thạo thêm một dạng bài',phu:`${d.stage}/3 sao`,tiLe:d.stage/3}
   :{loai:'dang',tieuDe:profile.mastery.length?'Giữ phong độ các dạng đã thành thạo':'Gặp dạng bài đầu tiên',phu:profile.mastery.length?'đủ 3 sao':'0/3 sao',tiLe:profile.mastery.length?1:0})
  const k=manhKhien(profile,exp),buoc=tienHoaKe(profile.cap)
- if(k)ra.push({loai:'khien',tieuDe:'Rèn khiên',phu:`${k.manh%k.moiKhien}/${k.moiKhien} mảnh`,tiLe:(k.manh%k.moiKhien)/k.moiKhien})
+ if(k)ra.push({loai:'khien',tieuDe:'Rèn khiên',phu:`${k.manh}/${k.moiKhien} mảnh`,tiLe:Math.min(1,k.manh/k.moiKhien)})
  else if(buoc)ra.push({loai:'tien-hoa',tieuDe:`Tiến hoá dạng ${buoc.dang+1}`,phu:`còn ${buoc.conCap} cấp`,tiLe:buoc.tiLe})
  return ra
 }
@@ -151,4 +151,3 @@ export function chuMaiCho(tenThuCuaEm:string,m:MaiCho|null):string{
  const dau=`Mai ${tenThuCuaEm} chờ em`
  if(!m||(m.dangMoi===0&&m.toiHan===0))return `${dau}.`
  return `${dau}: ${[m.dangMoi>0?`${m.dangMoi} dạng mới`:'',m.toiHan>0?`${m.toiHan} câu tới hạn ôn`:''].filter(Boolean).join(' · ')}.`}
-

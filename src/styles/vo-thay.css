@@ -37,6 +37,9 @@
     min-height: 100vh;
   }
   .vo-thay .khung-noi-dung {
+    /* Grid tự trừ margin phải; width:100% trước đây chiếm cả track rồi
+     * cộng thêm 12 px margin, làm mất khoảng thở bên phải. */
+    width: auto;
     margin: 12px 12px 12px 0;
     border-radius: var(--m3-bo-28);
     min-height: calc(100vh - 24px);

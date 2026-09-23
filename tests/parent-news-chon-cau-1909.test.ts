@@ -112,18 +112,18 @@ describe('chọn câu: ôn tới hạn → câu mới cùng dạng yếu → bù
     const r = chonCauChoPhuHuynh(vao({ soCan: 2, ungVien: [u('T1', 'ES.A.X')], toiHan }))
     expect(r.map((c) => c.qid)).toEqual(['T1'])
   })
-  it('bù kho ưu tiên cùng chuyên đề với dạng yếu, rồi mới tới chuyên đề khác', () => {
+  it('bù kho chỉ trong dạng đã học, ưu tiên cùng chuyên đề trong phạm vi ấy', () => {
     // Không có câu nào ở dạng yếu ES.A.X → cả hai câu đều là bù. Chuyên đề ES đứng trước GL/AM dù mã hash có ra sao.
     const ung = [u('G1', 'GL.P.Q', 'biet'), u('A1', 'AM.P.Q', 'biet'), u('E1', 'ES.P.Q', 'biet')]
     for (const seed of [1, 2, 3, 99, 12345]) {
-      const r = chonCauChoPhuHuynh(vao({ seed, soCan: 1, ungVien: ung, dangYeu: [{ maDang: 'ES.A.X', bac: 0 }] }))
+      const r = chonCauChoPhuHuynh(vao({ seed, soCan: 1, ungVien: ung, dangDaHoc: new Set(['ES.P.Q', 'GL.P.Q', 'AM.P.Q']), dangYeu: [{ maDang: 'ES.A.X', bac: 0 }] }))
       expect(r).toEqual([{ qid: 'E1', nguon: 'bu_kho' }])
     }
     expect(chuyenDeCuaDang('ES.C.Z')).toBe('ES')
   })
-  it('bù kho bỏ câu mức "vận dụng" nhưng nhận câu chưa gắn mức', () => {
+  it('bù kho bỏ câu vận dụng và câu chưa có metadata', () => {
     const r = chonCauChoPhuHuynh(vao({ soCan: 10, ungVien: [u('V', 'A.B.C', 'van_dung'), u('Z', null, null)] }))
-    expect(r.map((c) => c.qid)).toEqual(['Z'])
+    expect(r.map((c) => c.qid)).toEqual([])
   })
   it('không trùng, không quá soCan, soCan = 0 hoặc âm thì rỗng', () => {
     const r = chonCauChoPhuHuynh(vao({ soCan: 5, ungVien: kho, toiHan, dangYeu: [{ maDang: 'ES.A.X', bac: 2 }] }))

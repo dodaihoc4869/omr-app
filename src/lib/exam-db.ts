@@ -6,7 +6,7 @@
 import { openDB, type IDBPDatabase } from 'idb'
 import type { PublicExamBank, SoCauMoiPhan, TeacherExamSource } from '../data/examContent'
 import type { BanGhiKhoa } from './khoa-app'
-import { chuanHoaMayChu, type CauHinhMayChu } from './cau-hinh-may-chu'
+import { chuanHoaMayChu, diaChiMayChuHopLe, type CauHinhMayChu } from './cau-hinh-may-chu'
 import type { SoSuaDang } from './sua-dang'
 import { themMau, type MauGiayThuc } from './hieu-chinh-giay-thuc'
 
@@ -297,7 +297,15 @@ export async function docSoCauCa(maCa: string): Promise<SoCauMoiPhan | undefined
 
 export async function saveScriptUrl(url: string): Promise<void> {
   const db = await getDb()
-  await db.put(STORE_SETTINGS, url, 'scriptUrl')
+  const diaChi = diaChiMayChuHopLe(url)
+  await db.put(STORE_SETTINGS, diaChi, 'scriptUrl')
+  // Ô cài đặt cũ vẫn nhận địa chỉ. Đồng bộ vào cấu hình của mọi lệnh ngay.
+  if (diaChi) {
+    const cu = chuanHoaMayChu((await db.get(STORE_SETTINGS, 'mayChuMoi')) as Partial<CauHinhMayChu> | undefined)
+    await db.put(STORE_SETTINGS, chuanHoaMayChu({ ...cu, URL: diaChi }), 'mayChuMoi')
+    const { quenCauHinhMayChu } = await import('./may-chu-moi')
+    quenCauHinhMayChu()
+  }
 }
 
 /** CẤU HÌNH MÁY CHỦ MỚI — cất cùng chỗ với `scriptUrl`, không thêm kho mới.
@@ -331,15 +339,16 @@ export async function saveCauHinhMayChu(c: Partial<CauHinhMayChu>): Promise<CauH
  * hình. Nên khi ô cũ trống mà máy chủ mới ĐÃ có địa chỉ, trả địa chỉ ấy: cổng
  * chặn giữ nguyên ý nghĩa, và thầy không phải nhập lại một cái link đã bỏ. */
 export async function loadScriptUrl(): Promise<string> {
-  // `getDb()` nằm NGOÀI try ở bản cũ: IndexedDB hỏng (máy em ở chế độ riêng tư,
-  // hết chỗ) là hàm này ném lỗi, chỗ gọi `.catch(() => '')` nuốt mất, và màn
-  // ngồi với một địa chỉ rỗng suốt phiên.
+  // Khoá `scriptUrl` cũ có thể trỏ Google/localhost từ máy đã dùng lâu.
+  // Mọi màn đọc cùng địa chỉ Worker đã kiểm tra của máy hiện tại.
+  const ch = await loadCauHinhMayChu()
+  if (ch.URL) return ch.URL
   try {
     const db = await getDb()
-    const cu = (await db.get(STORE_SETTINGS, 'scriptUrl')) || ''
-    if (cu) return cu
+    const daChon = diaChiMayChuHopLe(await db.get(STORE_SETTINGS, 'scriptUrl'))
+    if (daChon) return daChon
   } catch {
-    // còn đường địa chỉ chung bên dưới
+    // Máy sạch/IndexedDB hỏng vẫn có cấu hình công khai.
   }
   try {
     const { layDiaChiMayChu } = await import('./dia-chi-may-chu')

@@ -43,17 +43,17 @@ describe('hằng số một nguồn — hai bản không lệch', () => {
 })
 
 describe('chuyển trạng thái — nghiệm thu GĐ 1', () => {
-  it('sai 20/09, đúng 21/09, 22/09, 25/09 → da_khac_phuc (đúng ví dụ của đề xuất), từng bước đúng mốc', () => {
+  it('sai 20/09, đúng 21/09, 22/09, 25/09 → da_khac_phuc (đúng ví dụ của đề xuất), từng bước đúng mốc FSRS-6', () => {
     const buoc = (n: number) => cau([ev('Q1', 0, '2026-09-20'), ev('Q1', 1, '2026-09-21'), ev('Q1', 1, '2026-09-22'), ev('Q1', 1, '2026-09-25')].slice(0, n))
     expect(buoc(1)).toMatchObject({ trangThai: 'moi_sai', mocOnKe: '2026-09-21', lanSai: 1, dungLienTiep: 0 })
-    expect(buoc(2)).toMatchObject({ trangThai: 'dang_on', mocOnKe: '2026-09-22', dungLienTiep: 1, ngayDungKhacNhau: 1 })
-    expect(buoc(3)).toMatchObject({ trangThai: 'dang_on', mocOnKe: '2026-09-25', dungLienTiep: 2, ngayDungKhacNhau: 2 })
-    expect(buoc(4)).toMatchObject({ trangThai: 'da_khac_phuc', mocOnKe: '2026-10-02', dungLienTiep: 3, ngayDungKhacNhau: 3 })
+    expect(buoc(2)).toMatchObject({ trangThai: 'dang_on', mocOnKe: '2026-09-24', dungLienTiep: 1, ngayDungKhacNhau: 1 })
+    expect(buoc(3)).toMatchObject({ trangThai: 'dang_on', mocOnKe: '2026-09-26', dungLienTiep: 2, ngayDungKhacNhau: 2 })
+    expect(buoc(4)).toMatchObject({ trangThai: 'da_khac_phuc', mocOnKe: '2026-10-06', dungLienTiep: 3, ngayDungKhacNhau: 3 })
   })
 
   it('đúng 3 lần trong CÙNG ngày 21/09 → dung_lien_tiep = 1 (không thành 3 mốc), chưa khắc phục', () => {
     const c = cau([ev('Q1', 0, '2026-09-20'), ev('Q1', 1, '2026-09-21', { gio: '01:00:00.000' }), ev('Q1', 1, '2026-09-21', { gio: '05:00:00.000' }), ev('Q1', 1, '2026-09-21', { gio: '09:00:00.000' })])
-    expect(c).toMatchObject({ dungLienTiep: 1, ngayDungKhacNhau: 1, trangThai: 'dang_on', mocOnKe: '2026-09-22', lanGap: 4 })
+    expect(c).toMatchObject({ dungLienTiep: 1, ngayDungKhacNhau: 1, trangThai: 'dang_on', mocOnKe: '2026-09-24', lanGap: 4 })
   })
 
   it('ranh giới ngày: 23:30 và 00:30 giờ VN là HAI ngày khác nhau (tính theo ngay_vn, không theo UTC)', () => {
@@ -80,14 +80,14 @@ describe('chuyển trạng thái — nghiệm thu GĐ 1', () => {
 
   it('câu chưa từng sai mà làm đúng: chua_thay_sai (không bao giờ thành da_khac_phuc)', () => {
     const c = cau([ev('Q1', 1, '2026-09-20'), ev('Q1', 1, '2026-09-21'), ev('Q1', 1, '2026-09-24'), ev('Q1', 1, '2026-10-01')])
-    expect(c).toMatchObject({ trangThai: 'chua_thay_sai', lanSai: 0, dungLienTiep: 4, mocOnKe: '2026-10-08' })
+    expect(c).toMatchObject({ trangThai: 'chua_thay_sai', lanSai: 0, dungLienTiep: 4, mocOnKe: '2026-11-15' })
   })
 
   it('bỏ trống KHÔNG cộng lan_sai; chưa từng đúng → moi_sai; đã từng đúng thì giữ trạng thái', () => {
     const chua = cau([ev('Q1', null, '2026-09-20')])
     expect(chua).toMatchObject({ lanSai: 0, lanTrong: 1, trangThai: 'moi_sai', mocOnKe: '2026-09-21', ketQuaCuoi: null })
     const da = cau([ev('Q1', 0, '2026-09-19'), ev('Q1', 1, '2026-09-20'), ev('Q1', null, '2026-09-21')])
-    expect(da).toMatchObject({ lanSai: 1, lanTrong: 1, trangThai: 'dang_on', dungLienTiep: 1, mocOnKe: '2026-09-22' })
+    expect(da).toMatchObject({ lanSai: 1, lanTrong: 1, trangThai: 'dang_on', dungLienTiep: 1, mocOnKe: '2026-09-23' })
   })
 
   it('can_day_lai: sai 3 lần chưa đúng lại lần nào; đúng một lần là gỡ nhãn', () => {
@@ -152,10 +152,10 @@ describe('dạng: gom theo mã dạng, tra kho, rơi về chuyên đề và Đ�
       ev('A', 0, '2026-09-20'), ev('A', 1, '2026-09-21'), ev('A', 1, '2026-09-22'), ev('A', 1, '2026-09-25'), // da_khac_phuc
       ev('B', 0, '2026-09-24'), // moi_sai, mốc 25/09
       ev('C', 1, '2026-09-20'), // chua_thay_sai
-      ev('D', 0, '2026-09-20'), ev('D', 1, '2026-09-21'), // dang_on, mốc 22/09
+      ev('D', 0, '2026-09-20'), ev('D', 1, '2026-09-21'), // dang_on, FSRS mốc 24/09
     ])
     expect(r.dang).toHaveLength(1)
-    expect(r.dang[0]).toMatchObject({ maDang: 'AA.BB', soGap: 4, soSai: 3, soDaKhacPhuc: 1, soMoiSai: 1, soChuaThaySai: 1, mocOnKe: '2026-09-22', mocMoiSai: '2026-09-25' })
+    expect(r.dang[0]).toMatchObject({ maDang: 'AA.BB', soGap: 4, soSai: 3, soDaKhacPhuc: 1, soMoiSai: 1, soChuaThaySai: 1, mocOnKe: '2026-09-24', mocMoiSai: '2026-09-25' })
   })
 
   const dang = (o: Partial<NamKtDang>): NamKtDang => ({ sbd: 'S1', maDang: 'X', soGap: 0, soSai: 0, soDaKhacPhuc: 0, soMoiSai: 0, soChuaThaySai: 0, bac: 1, mocOnKe: null, mocMoiSai: null, ...o })
@@ -199,7 +199,7 @@ describe('dựng lại hồ sơ trên D1 thật', () => {
     expect(r.hoSo.get('S1')?.dang.length).toBe(2)
     const h = await docHoSoEm(d.env, 'S1')
     expect(h.cau.map((c) => [c.qid, c.maDang, c.trangThai, c.mocOnKe])).toEqual([
-      ['Q1', 'AA.BB.CC', 'dang_on', '2026-09-22'], ['Q2', 'CD:Este', 'chua_thay_sai', '2026-09-21'], ['Q3', null, 'moi_sai', '2026-09-23'],
+      ['Q1', 'AA.BB.CC', 'dang_on', '2026-09-24'], ['Q2', 'CD:Este', 'chua_thay_sai', '2026-09-23'], ['Q3', null, 'moi_sai', '2026-09-23'],
     ])
     expect(h.dang.map((x) => x.maDang)).toEqual(['AA.BB.CC', 'CD:Este'])
     expect((await docHoSoEm(d.env, 'S2')).cau).toHaveLength(0) // em khác chưa dựng: không bị đụng
@@ -208,14 +208,14 @@ describe('dựng lại hồ sơ trên D1 thật', () => {
   it('dựng hai lần → bảng giống hệt; sổ thêm sự kiện rồi dựng lại → hồ sơ theo sổ; em khác không bị đụng', async () => {
     const d = taoD1That()
     await seed(d)
-    await dungLaiHoSo(d.env, ['S1', 'S2'], 'x')
+    await dungLaiHoSo(d.env, ['S1', 'S2'], '2026-09-23T00:00:00Z')
     const mot = [d.chup('nam_kt_cau'), d.chup('nam_kt_dang')]
-    await dungLaiHoSo(d.env, ['S1', 'S2'], 'x')
+    await dungLaiHoSo(d.env, ['S1', 'S2'], '2026-09-23T00:00:00Z')
     expect([d.chup('nam_kt_cau'), d.chup('nam_kt_dang')]).toEqual(mot)
     const s2 = JSON.stringify((await docHoSoEm(d.env, 'S2')))
     await ghiSuKien(d.env, [{ nguon: 'game', maNguon: 'G', sbd: 'S1', qid: 'Q1', lan: 1, ketQua: 1, luc: '2026-09-22T03:00:00.000Z' }])
-    await dungLaiHoSo(d.env, ['S1'], 'x')
-    expect((await docHoSoEm(d.env, 'S1')).cau.find((c) => c.qid === 'Q1')).toMatchObject({ ngayDungKhacNhau: 2, dungLienTiep: 2, mocOnKe: '2026-09-25' })
+    await dungLaiHoSo(d.env, ['S1'], '2026-09-23T00:00:00Z')
+    expect((await docHoSoEm(d.env, 'S1')).cau.find((c) => c.qid === 'Q1')).toMatchObject({ ngayDungKhacNhau: 2, dungLienTiep: 2, mocOnKe: '2026-09-26' })
     expect(JSON.stringify(await docHoSoEm(d.env, 'S2'))).toBe(s2)
   })
 

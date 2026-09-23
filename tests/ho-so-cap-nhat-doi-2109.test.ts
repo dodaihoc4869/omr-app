@@ -6,7 +6,7 @@ import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { taoD1That, type D1That } from './_d1-that'
 
-const N1 = '2026-09-22T01:00:00.000Z', N2 = '2026-09-22T02:00:00.000Z', N3 = '2026-09-22T03:00:00.000Z'
+const N1 = '2026-09-22T01:00:00.000Z', N2 = '2026-09-22T15:00:00.000Z', N3 = '2026-09-23T15:00:00.000Z'
 const luc = (h: number, d = 20) => `2026-09-${d}T${String(h).padStart(2, '0')}:00:00.000Z`
 function truong(): D1That { const d = taoD1That(); for (const s of ['S1', 'S2']) d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,cap_nhat_luc) VALUES(?,?,'x')").run(s, s); return d }
 let lan = 0

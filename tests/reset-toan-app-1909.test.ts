@@ -508,12 +508,12 @@ describe('sau reset: tài khoản còn nguyên, mọi lệnh chạy khi hồ sơ
     expect((await goiWorker(worker, d.env, '/goi', { action: 'publish', ca: { maCa: 'CA-CU-1', tenCa: 'Cũ', trangThai: 'dong' }, keyBank: { phanI: [] } }, true)).maCaDaDung).toBeUndefined()
   })
 
-  it('bài Mẹ giao: mã cũ không phải UUID bị từ chối; mã mới tạo được', async () => {
+  it('bài Mẹ giao: mã cũ bị từ chối; mã mới vẫn cần câu có bằng chứng học', async () => {
     const d = dung()
     await chayHet(d)
     d.sql.prepare("UPDATE hoc_sinh SET mat_khau='mk-cu' WHERE sbd='12121212'").run()
     await expect(mom(d.env, 'create', { sbd: '12121212', id: 'daily_2026-09-20', dsCau: [{ id: 'Q1', dapAn: 'A' }] })).rejects.toThrow(/đã từng dùng/)
-    await expect(mom(d.env, 'create', { sbd: '12121212', id: 'daily_2026-09-21', dsCau: [{ id: 'Q1', dapAn: 'A' }] })).resolves.toMatchObject({ ok: true })
+    await expect(mom(d.env, 'create', { sbd: '12121212', id: 'daily_2026-09-21', dsCau: [{ id: 'Q1', dapAn: 'A' }] })).rejects.toThrow(/chưa thuộc phần em đã học/)
   })
 })
 

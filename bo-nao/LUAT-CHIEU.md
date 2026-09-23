@@ -21,7 +21,7 @@ Em nào chưa có gì đáng mời: BỎ QUA em đó. Ghi xong chỉ trả lại
 ## LỜI MỜI — BA Ý BẮT BUỘC, ĐỦ CẢ BA
 (1) ĐIỀU EM ĐÃ LÀM, bằng số thật trong thẻ (đúng lại N câu từng sai · đúng N trong M câu · chuỗi N ngày · tự làm thêm N câu…). Số "đúng" = số đã gặp − số đã sai của dạng (hoặc làm 7 ngày − sai 7 ngày).
 (2) Ý NGHĨA với chính em: MỘT mệnh đề ngắn nói điều đó CHO THẤY GÌ ở em, dựa dữ kiện ("đó là cách nhớ lâu nhất", "nghĩa là thói quen học đang thành hình", "nhịp đều như vậy là nền vững cho bài dài"). CẤM khen chung chung ("tuyệt vời", "xuất sắc", "làm tốt lắm", "rất tốt", "cố lên", "tiếp tục phát huy") và khen ngầm so với bạn khác ("hiếm có", "hiếm ai", "ít ai").
-(3) LỜI MỜI có lực: động từ mời mạnh ("Hôm nay em hãy…", "Thử ngay mấy câu…"). Nói về "cho {tên thú} ăn hôm nay"; được nêu số của LUẬT: 200 (thú ăn no khi em đạt nhiệm vụ ngày) · 120 · 4 (làm đủ 4 câu) · 36 ("36 ngày đạt nhiệm vụ ngày" mở khiên đầu). CẤM số cấp, "còn thiếu N EXP", "sẽ lên cấp", số mảnh khiên; nhắc khiên CHỈ kèm "36 ngày đạt nhiệm vụ ngày". Vẫn cần ≥ 1 số THẬT của thẻ.
+(3) LỜI MỜI có lực: động từ mời mạnh ("Hôm nay em hãy…", "Thử ngay mấy câu…"). Nói về "cho {tên thú} ăn hôm nay"; được nêu số của LUẬT: 200 (thú ăn no khi em đạt nhiệm vụ ngày) · 120 · 4 (làm đủ 4 câu) · 21 ("21 ngày đạt nhiệm vụ ngày" mở khiên đầu). CẤM số cấp, "còn thiếu N EXP", "sẽ lên cấp", số mảnh khiên; nhắc khiên CHỈ kèm "21 ngày đạt nhiệm vụ ngày". Vẫn cần ≥ 1 số THẬT của thẻ.
 THEO BẬC: `cao_hon_mot_bac` ⇒ lời PHẢI có "hôm nay thử câu khó hơn một bậc ở dạng X, vì em đã đúng N trong M câu dạng này" · `thap_hon_mot_bac` ⇒ "mình lùi một bậc để em lấy lại nhịp" (không chữ "yếu") · `dung_bac` ⇒ không nói "khó hơn" hay "lùi".
 ĐA DẠNG (trong tệp của bạn): ≥ 4 kiểu MỞ ĐẦU khác nhau; KHÔNG mở bằng "Hôm qua" quá 1/3, "Em vừa"/"Em đã" quá 1/4 số lời; mở bằng con số, tên thú, dạng bài hay nhịp; mỗi lời một ĐUÔI khác nhau; thay em khác vào mà lời vẫn đúng thì viết lại.
 Em CHƯA có thú (thẻ không có `thanThu`): không nhắc thú; NÊN đặt ở CÂU CUỐI một câu mời chọn thú: "chọn một thần thú để EXP của em có chỗ về" · "chọn một bạn đồng hành nhé" · "chọn thần thú của em nhé" (đổi cách nói giữa các em). Không nêu tên thú.
@@ -31,7 +31,7 @@ LUẬT CỨNG (máy thầy và máy chủ kiểm; sai là BỎ CẢ thử thách
 - Sai rồi sửa lại được 4 câu, đó là cách nhớ lâu nhất. Hôm nay em hãy thử mấy câu Thuỷ phân ester nhé, rồi cho Rồng Lửa ăn.
 - Chuỗi 4 ngày liền, hôm nay đến lúc nâng tầm: hãy thử câu khó hơn một bậc ở dạng Thuỷ phân ester, vì em đã đúng 8 trong 9 câu dạng này. Làm đủ 4 câu hôm nay để Rồng Lửa được ăn nhé.
 - Hôm qua em làm 8 câu, đúng 7 câu, nhịp đều như vậy là nền vững cho bài dài. Đạt nhiệm vụ ngày hôm nay thì Rồng Lửa ăn no 200 EXP, thử ngay vài câu Lipid béo nhé.
-- Em vừa đúng lại 4 câu từng sai. Khiên đầu tiên của Rồng Lửa chỉ mở sau 36 ngày đạt nhiệm vụ ngày, nên hôm nay hãy thử mấy câu Thuỷ phân ester nhé.
+- Em vừa đúng lại 4 câu từng sai. Khiên đầu tiên của Rồng Lửa chỉ mở sau 21 ngày đạt nhiệm vụ ngày, nên hôm nay hãy thử mấy câu Thuỷ phân ester nhé.
 - Hôm nay mình lùi một bậc ở dạng Carb phân loại để em lấy lại nhịp: làm chậm, kỹ từng câu. Rồng Lửa vẫn chờ em, chuỗi 4 ngày vẫn còn đó.
 - Em đã đạt 4 ngày liền, nghĩa là thói quen học đang thành hình. Hôm nay hãy thử mấy câu Carb phân loại, rồi chọn một thần thú để EXP của em có chỗ về.
 - Thuỷ phân ester em làm đều tay nên thử ngay câu khó hơn một bậc ở dạng này, vì em đã đúng 8 trong 9 câu dạng này. Rồi chọn một bạn đồng hành nhé.
@@ -41,7 +41,7 @@ LUẬT CỨNG (máy thầy và máy chủ kiểm; sai là BỎ CẢ thử thách
 ## MẪU CẤM (sẽ bị loại)
 - Em đã nắm chắc Thuỷ phân ester sau 4 ngày, thử mấy câu nữa nhé. ⇒ nhãn năng lực "nắm chắc".
 - Rồng Lửa còn thiếu 40 EXP để lên cấp 6, hôm nay thử mấy câu nhé. ⇒ nêu số cấp và EXP còn thiếu.
-- Rồng Lửa sắp có khiên đầu tiên, em chăm 4 ngày liền rồi, hôm nay hãy thử vài câu nhé. ⇒ nhắc khiên mà không nói luật "36 ngày đạt nhiệm vụ ngày".
+- Rồng Lửa sắp có khiên đầu tiên, em chăm 4 ngày liền rồi, hôm nay hãy thử vài câu nhé. ⇒ nhắc khiên mà không nói luật "21 ngày đạt nhiệm vụ ngày".
 - Hôm nay thử 6 câu Thuỷ phân ester, xong là Rồng Lửa lên cấp 6. ⇒ nêu số câu sẽ làm + hứa "xong là".
 - Em làm tuyệt vời lắm, 4 ngày liền rồi, hôm nay thử mấy câu nhé. ⇒ khen chung chung ("tuyệt vời").
 - Rồng Lửa đang có 3 mảnh khiên, hôm nay em hãy thử vài câu nhé. ⇒ nêu số mảnh khiên.

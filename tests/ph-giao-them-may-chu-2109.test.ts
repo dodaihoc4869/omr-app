@@ -1,3 +1,4 @@
+import { daHocDang } from './_pham-vi-ca-nhan'
 // @vitest-environment node
 // `POST /ph/giao-them` (Code 3, docs/hop-dong-ph-giao-them-2109.md mục 5) trên D1 GIẢ BẰNG SQLITE THẬT: máy chủ dựng đầu vào cho `tinhGiaoThem` (Code 1) rồi CHỌN qid — không tự luận, không câu bài tập chưa nộp, không câu làm 14 ngày
 // (trừ câu đến lịch), không vượt bậc + 1, các nhóm không trùng nhau; tạo `mom_bai`; trần 3 lượt THÀNH CÔNG/ngày VN; từ chối không mất lượt; bấm đúp cùng phút; con nhận MỘT tin; mayDaLam; không đáp án ra máy phụ huynh.
@@ -25,9 +26,11 @@ const themKho = (d: D1That, cau: ReturnType<typeof cauKho>[]) => {
   d.sql.prepare("INSERT OR IGNORE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE','v1','x')").run()
   for (const c of cau) d.sql.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').run('DE', c.qid, 'v', c.group, c.dang, JSON.stringify(c))
 }
-const dangHs = (d: D1That, ma: string, o: { gap?: number; sai?: number; khac?: number; moi?: number; chua?: number; bac?: number } = {}) =>
+const dangHs = (d: D1That, ma: string, o: { gap?: number; sai?: number; khac?: number; moi?: number; chua?: number; bac?: number } = {}) => {
   d.sql.prepare('INSERT OR REPLACE INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?)')
     .run(`S1|${ma}`, 'S1', ma, o.gap ?? 10, o.sai ?? 6, o.khac ?? 1, o.moi ?? 2, o.chua ?? 1, o.bac ?? 1, 'x')
+  daHocDang(d, 'S1', ma)
+}
 const cauHs = (d: D1That, qid: string, dang: string, trangThai: string, moc: string | null, lanSai = 1) =>
   d.sql.prepare(`INSERT INTO nam_kt_cau (khoa, sbd, qid, ma_dang, chuyen_de, lan_gap, lan_sai, lan_trong, dung_lien_tiep, ngay_dung_khac_nhau, ket_qua_cuoi, nguon_cuoi, luc_cuoi, moc_on_ke, trang_thai, can_day_lai, giay_tb, cap_nhat_luc)
      VALUES (?, 'S1', ?, ?, 'CĐ', 2, ?, 0, 0, 0, 0, 'btvn', '2026-09-10T02:00:00.000Z', ?, ?, 0, NULL, 'x')`).run(`S1|${qid}`, qid, dang, lanSai, moc, trangThai)

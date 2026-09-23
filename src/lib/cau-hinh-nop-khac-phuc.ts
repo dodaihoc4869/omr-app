@@ -55,7 +55,7 @@ export function chamKhacPhuc(
     const chon = String(daChon[qid] ?? '').trim()
     if (!chon) soBoTrong += 1
     const dung = String(c.dapAn ?? '').trim()
-    const khop = !chon ? false : c.phan === 'III' ? chuanIII(chon) === chuanIII(dung) : chon.toUpperCase() === dung.toUpperCase()
+    const khop = !chon ? false : c.phan === 'III' ? !!chuanIII(chon) && !!chuanIII(dung) && chuanIII(chon) === chuanIII(dung) : chon.toUpperCase() === dung.toUpperCase()
     if (khop) soDung += 1
     else qidSai.push(qid)
   }

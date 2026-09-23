@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react'
 import { NutChinh } from './DesignSystem'
 import { loadScriptUrl, loadTeacherSecret, saveScriptUrl, saveTeacherSecret } from '../lib/exam-db'
+import { diaChiMayChuHopLe } from '../lib/cau-hinh-may-chu'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const O_NHAP: React.CSSProperties = {
@@ -34,6 +35,10 @@ export default function KhoiKetNoiKhoDe({ showToast }: { showToast: (m: string, 
   }, [])
 
   const luu = async () => {
+    if (scriptUrl.trim() && !diaChiMayChuHopLe(scriptUrl)) {
+      showToast('Địa chỉ máy chủ chưa hợp lệ. Thầy nhập địa chỉ HTTPS dùng được trên máy khác.', 'error')
+      return
+    }
     await saveScriptUrl(scriptUrl.trim())
     await saveTeacherSecret(secret.trim())
     showToast('Đã lưu trên máy này', 'success')

@@ -253,12 +253,11 @@ describe('mỗi điểm ghi ghi ĐÚNG số dòng và idempotent', () => {
     d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,mat_khau,cap_nhat_luc) VALUES('S1','Em Một','mk','x')").run()
     const token = await gameToken(d.env, 'S1')
     const dsCau = [{ id: 'DE1-I-1', dapAn: 'A', chuyenDe: 'ES' }, { id: 'DE1-III-1', dapAn: '0.39', chuyenDe: 'Hoá học' }, { id: 'cau_3', dapAn: 'B' }]
-    await mom(d.env, 'create', { sbd: 'S1', id: 'M1', dsCau })
+    await mom(d.env, 'create', { sbd: 'S1', id: 'M1', dsCau }, {noiBo:true})
     await mom(d.env, 'start', { token, id: 'M1' })
     const r = await mom(d.env, 'submit', { token, id: 'M1', answers: { 'DE1-I-1': 'B', 'DE1-III-1': '0,39', cau_3: 'B' } })
-    // Điểm bài Mom KHÔNG đổi (gradeMom so chuỗi): '0,39' ≠ '0.39' nên chỉ cau_3 đúng → 1 câu.
-    // Còn SỔ dùng luật chung isAnswerCorrect nên III = đúng (dòng kiểm ở dưới) — đúng thiết kế mục 3.
-    expect((r.item as { soCauDung: number }).soCauDung).toBe(1)
+    // Điểm và sổ cùng nhận 0,39 = 0.39; câu cau_N được chấm nhưng không làm bằng chứng học.
+    expect((r.item as { soCauDung: number }).soCauDung).toBe(2)
     expect(hang(d, "nguon='mom'").map((x) => [x.qid, x.ket_qua, x.chuyen_de])).toEqual([['DE1-I-1', 0, 'ES'], ['DE1-III-1', 1, '']])
     await mom(d.env, 'submit', { token, id: 'M1', answers: {} }) // nộp lại: đã nộp rồi, không ghi thêm
     expect(d.dem('su_kien_hoc', "nguon='mom'")).toBe(2)

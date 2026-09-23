@@ -1,6 +1,6 @@
 // THUẬT TOÁN RÚT CÂU SAI & KHẮC PHỤC LỖI SAI — CHUẨN HOÁ CHO CẢ 3 APP
 // 1. Làm lại các câu sai: hiển thị lại toàn bộ câu sai và lời giải chuẩn để học sinh tự làm lại.
-// 2. Luyện thêm dạng câu sai: thanh rút tối đa số câu có cùng nhãn dán chia theo tỷ lệ tối đa, nếu lẻ thì làm tròn lên.
+// 2. Luyện thêm dạng câu sai: thanh rút tối đa số câu có cùng nhãn dán chia theo tỷ lệ, giữ đúng tổng số câu đã chọn.
 // 3. Lựa chọn luyện câu: 2 sao, 1 sao, 0 sao, lý thuyết, bài tập tính toán. Rút đúng nhãn dán, thanh trượt tối đa 100 câu.
 // 4. Luyện dạng bài: chọn lớp → tên bài sách giáo khoa → dạng toán trọng tâm, gom TẤT CẢ câu trong kho thuộc dạng ấy.
 // Tất cả câu rút hiển thị theo mẫu mới của HTML: chuẩn đề, chuẩn lời giải.
@@ -10,7 +10,7 @@ import { cauLuyenTuNguon, type CauLuyen } from './bai-tap-pdf'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
 import { dangCua } from './dang-cau'
 import { hopSao, type LocSaoMoRong } from './loc-sao'
-import { banDoDang, type DangCauKho } from './rut-de-chua'
+import type { DangCauKho } from './rut-de-chua'
 import { dungPhieu, type ThongTinPhieu } from './html-phieu'
 import { hopLeDeRut } from './loc-cau-rut'
 
@@ -36,6 +36,8 @@ export interface CauSaiDauVao {
   /** MÃ dạng do máy chủ trả kèm (`hsCauSai`). Khớp theo MÃ là khớp chắc; khớp
    * theo tên thì hai tờ đề viết lệch một dấu là trượt. */
   dangMa?: string
+  /** Kiến thức đã xuất hiện trong câu em làm; chỉ dùng để kiểm điều kiện nền. */
+  kienThuc?: string[]
   maCa?: string
   tenCa?: string
 }
@@ -125,10 +127,6 @@ export function chuyenCauSaiSangCauLuyen(it: CauSaiDauVao): CauLuyen {
 
 /** Lấy nhãn dán của câu sai */
 export function layNhanDanCauSai(c: CauSaiDauVao, banDo?: Map<string, DangCauKho>): { ma: string; ten: string } {
-  if (banDo && banDo.has(c.qid)) {
-    const d = banDo.get(c.qid)!
-    if (d.ma) return { ma: d.ma, ten: d.ten || d.ma }
-  }
   // MÃ do máy chủ trả kèm đứng trước tên: máy em không có kho nên không dựng
   // được `banDo`, mà `dang` trả về chỉ là TÊN dạng — khớp tên là khớp hớ.
   if (c.dangMa && String(c.dangMa).trim()) {
@@ -146,6 +144,10 @@ export function layNhanDanCauSai(c: CauSaiDauVao, banDo?: Map<string, DangCauKho
       if (ma) return { ma, ten }
     }
   }
+  if (banDo && banDo.has(c.qid)) {
+    const d = banDo.get(c.qid)!
+    if (d.ma) return { ma: d.ma, ten: d.ten || d.ma }
+  }
   try {
     const dAuto = dangCua({
       phan: c.phan,
@@ -160,6 +162,73 @@ export function layNhanDanCauSai(c: CauSaiDauVao, banDo?: Map<string, DangCauKho
   } catch {}
 
   return { ma: '', ten: c.chuyenDe || 'Chưa gắn dạng' }
+}
+
+type NhanKho = { ma: string; ten: string; kienThuc: string[] }
+/** Chỉ nhận mã trên đúng tờ đề chứa ứng viên. QID trùng ở hai tờ không cấp bằng chứng cho câu sai. */
+function nhanKho(khoDe: TeacherExamSource[]) {
+  const theoCau=new Map<string,NhanKho>(),duyNhat=new Map<string,NhanKho|null>()
+  for(const de of khoDe)for(const q of [...de.phanI,...de.phanII,...de.phanIII]){
+    const ma=String(q.dang?.ma??'').trim(),id=String(q.id??'')
+    if(!id||!ma)continue
+    const n={ma,ten:String(q.dang?.ten??'').trim()||ma,kienThuc:Array.isArray(q.kienThuc)?q.kienThuc.map(String):[]}
+    theoCau.set(`${de.maDe}|${id}`,n)
+    if(duyNhat.has(id))duyNhat.set(id,null)
+    else duyNhat.set(id,n)
+  }
+  const anToan=new Map<string,DangCauKho>()
+  for(const [id,n] of duyNhat)if(n)anToan.set(id,{ma:n.ma,ten:n.ten})
+  return {theoCau,duyNhat,anToan}
+}
+
+function kienThucDaHoc(dsCauSai:CauSaiDauVao[],duyNhat:Map<string,NhanKho|null>):Set<string>{
+  const known=new Set<string>()
+  for(const c of dsCauSai){
+    for(const k of c.kienThuc??[])known.add(String(k))
+    const tuKho=duyNhat.get(c.qid),ma=layNhanDanCauSai(c).ma
+    if(tuKho&&tuKho.ma===ma)for(const k of tuKho.kienThuc)known.add(k)
+  }
+  return known
+}
+
+function khoaNoiDung(c:CauLuyen):string{
+  const chuan=(v:unknown)=>String(v??'').normalize('NFKC').trim().replace(/\s+/g,' ')
+  return JSON.stringify([c.phan,chuan(c.text),(c.luaChon??[]).map(chuan),c.bang??null,c.anhThanCau??null,c.anhLuaChon??[],c.hinh??[]])
+}
+
+/** Phân bổ theo phần dư lớn nhất: tổng suất không vượt số em kéo. */
+function phanBoSuat(thongKe:ThongKeDangCauSai[],tongToiDa:number,tongSoCauRut:number):Map<string,number>{
+  const ra=new Map(thongKe.map(t=>[t.qid,0]))
+  const K=Math.max(0,Math.min(tongToiDa,Math.floor(Number(tongSoCauRut)||0)))
+  const tong=thongKe.reduce((n,t)=>n+t.soUngVienToiDa,0)
+  if(!K||!tong)return ra
+  const muc=thongKe.map((t,i)=>{const x=K*t.soUngVienToiDa/tong,nen=Math.min(t.soUngVienToiDa,Math.floor(x));ra.set(t.qid,nen);return {t,i,du:x-nen}})
+  let con=K-[...ra.values()].reduce((a,b)=>a+b,0)
+  muc.sort((a,b)=>b.du-a.du||a.i-b.i)
+  while(con>0){let them=false;for(const x of muc){if(con===0)break;const n=ra.get(x.t.qid)??0;if(n>=x.t.soUngVienToiDa)continue;ra.set(x.t.qid,n+1);con--;them=true}if(!them)break}
+  return ra
+}
+
+/** Rút trong hạn mức, khử cả qid lẫn nội dung. Suất trùng được bù từ cùng tập hợp lệ. */
+function rutTheoPhanBo(thongKe:ThongKeDangCauSai[],phanBo:Map<string,number>,gioiHan:number):CauLuyen[]{
+  const K=Math.max(0,Math.floor(Number(gioiHan)||0)),out:CauLuyen[]=[],ids=new Set<string>(),noiDung=new Set<string>()
+  const ds=thongKe.map(t=>({...t,ungVien:[...t.ungVien].sort((a,b)=>(a.sao??0)-(b.sao??0)||Number(b.dang==='ly_thuyet')-Number(a.dang==='ly_thuyet'))}))
+  const daLay=new Map<string,number>()
+  const lay=(t:ThongKeDangCauSai,n:number)=>{
+    let them=0
+    for(const q of t.ungVien){
+      if(them>=n||out.length>=K)break
+      const key=khoaNoiDung(q)
+      if(ids.has(q.id)||noiDung.has(key))continue
+      ids.add(q.id);noiDung.add(key);them++
+      const so=(daLay.get(t.qid)??0)+1;daLay.set(t.qid,so)
+      out.push({...q,chuaCho:{qid:t.qid,soCau:t.soCau,phan:t.phan,maDang:t.nhanDan,tenDang:t.tenDang,bac:Math.min(2,so) as 1|2}})
+    }
+    return them
+  }
+  for(const t of ds)lay(t,phanBo.get(t.qid)??0)
+  while(out.length<K){let them=0;for(const t of ds)them+=lay(t,1);if(!them)break}
+  return out
 }
 
 /** LỰA CHỌN 1: Làm lại toàn bộ câu sai */
@@ -209,29 +278,24 @@ export function phanTichTyLeDang(
       choices: c.choices || c.ideas,
     })
   )
-  const banDo = banDoDang(khoDe)
+  const {theoCau,duyNhat,anToan}=nhanKho(khoDe)
+  const known=kienThucDaHoc(dsCauSaiHopLe,duyNhat)
   const tatCaUngVien = cauLuyenTuNguon(khoDe)
   const qidSaiSet = new Set(dsCauSaiHopLe.map((c) => c.qid))
   const tapUngVienPhanBiet = new Set<string>()
 
   // Chuẩn bị danh sách ứng viên cho từng câu sai theo đúng nhãn dán
   const thongKe: ThongKeDangCauSai[] = dsCauSaiHopLe.map((cs) => {
-    const nhan = layNhanDanCauSai(cs, banDo)
+    const nhan = layNhanDanCauSai(cs, anToan)
     // Tìm các câu trong kho có cùng nhãn dán và khác câu sai
     const ungVienCungNhan = tatCaUngVien.filter((cand) => {
       if (qidSaiSet.has(cand.id) || cand.id === cs.qid) return false
-      const candDang = banDo.get(cand.id)
-      if (candDang && nhan.ma) {
-        if (candDang.ma === nhan.ma) return true
-      }
-      if (candDang && nhan.ten && nhan.ten !== 'Chưa gắn dạng' && candDang.ten === nhan.ten) {
-        return true
-      }
-      return false
+      const candDang=theoCau.get(`${cand.maDe}|${cand.id}`)
+      return !!candDang&&!!nhan.ma&&candDang.ma===nhan.ma&&candDang.kienThuc.every(k=>known.has(k))
     })
 
     for (const u of ungVienCungNhan) {
-      tapUngVienPhanBiet.add(u.id)
+      tapUngVienPhanBiet.add(khoaNoiDung(u))
     }
 
     return {
@@ -257,41 +321,8 @@ export function phanTichTyLeDang(
   // viên: rút quá số ấy là bắt đầu lặp lại chính những câu đã có.
   const tongToiDa = tapUngVienPhanBiet.size
 
-  // Hàm tính số câu rút cho mỗi câu sai theo tỷ lệ tối đa, nếu lẻ thì làm tròn lên
-  const tinhSoCauMoiDang = (tongSoCauRut: number): Map<string, number> => {
-    const ketQua = new Map<string, number>()
-    if (tongToiDa <= 0 || tongSoCauRut <= 0) {
-      for (const t of thongKe) ketQua.set(t.qid, 0)
-      return ketQua
-    }
-
-    const K = Math.min(tongSoCauRut, tongToiDa)
-    const tongUngVien = thongKe.reduce((a, c) => a + c.soUngVienToiDa, 0)
-    if (tongUngVien <= 0) {
-      for (const t of thongKe) ketQua.set(t.qid, 0)
-      return ketQua
-    }
-    for (const t of thongKe) {
-      if (t.soUngVienToiDa <= 0) {
-        ketQua.set(t.qid, 0)
-        continue
-      }
-      // TỶ LỆ TÍNH TRÊN TỔNG ỨNG VIÊN, không trên `tongToiDa`.
-      //
-      // `tongToiDa` là số câu PHÂN BIỆT, nhỏ hơn hẳn tổng ứng viên khi nhiều
-      // câu sai dùng chung một kho nhãn. Chia cho nó thì các tỷ lệ cộng lại
-      // vượt 100% và câu nào cũng ăn gần hết hạn mức. Mẫu số đúng là tổng ứng
-      // viên của mọi câu sai — khi ấy tổng các tỷ lệ đúng bằng 1.
-      const tyLe = t.soUngVienToiDa / tongUngVien
-      // Lẻ thì LÀM TRÒN LÊN, đúng luật thầy chốt.
-      const phanBo = Math.ceil(K * tyLe)
-      // Không được vượt quá số ứng viên tối đa của chính câu đó
-      const soCauChon = Math.min(t.soUngVienToiDa, Math.max(1, phanBo))
-      ketQua.set(t.qid, soCauChon)
-    }
-
-    return ketQua
-  }
+  // Phân bổ phần dư lớn nhất, không vượt tổng đã chọn
+  const tinhSoCauMoiDang = (tongSoCauRut: number): Map<string, number> => phanBoSuat(thongKe,tongToiDa,tongSoCauRut)
 
   return { thongKe, tongToiDa, tinhSoCauMoiDang }
 }
@@ -306,54 +337,7 @@ export function rutLuyenThemDangCauSai(
   const { thongKe, tongToiDa, tinhSoCauMoiDang } = phanTichTyLeDang(dsCauSai, khoDe)
   const phanBo = tinhSoCauMoiDang(soCauRut)
 
-  const dsCauRut: CauLuyen[] = []
-  const daLayId = new Set<string>()
-
-  for (const t of thongKe) {
-    const soLuong = phanBo.get(t.qid) ?? 0
-    if (soLuong <= 0) {
-      // Nếu kho không có câu tương ứng, lấy lại chính câu sai đó
-      const cauGoc = dsCauSai.find((c) => c.qid === t.qid)
-      if (cauGoc && !daLayId.has(cauGoc.qid)) {
-        daLayId.add(cauGoc.qid)
-        dsCauRut.push(chuyenCauSaiSangCauLuyen(cauGoc))
-      }
-      continue
-    }
-
-    // LỘ TRÌNH BẮC CẦU (Scaffold Step-Up): Sắp xếp câu từ cơ bản (0, 1 sao, lý thuyết) -> nâng cao (2 sao, bài tập)
-    const ungVienScaffold = [...t.ungVien].sort((a, b) => {
-      const sa = typeof a.sao === 'number' ? a.sao : 0
-      const sb = typeof b.sao === 'number' ? b.sao : 0
-      if (sa !== sb) return sa - sb
-      if (a.dang === 'ly_thuyet' && b.dang !== 'ly_thuyet') return -1
-      if (a.dang !== 'ly_thuyet' && b.dang === 'ly_thuyet') return 1
-      return 0
-    })
-
-    let dem = 0
-    for (const cand of ungVienScaffold) {
-      if (dem >= soLuong) break
-      if (!daLayId.has(cand.id)) {
-        daLayId.add(cand.id)
-        // Gắn nhãn chữa cho câu sai theo bậc tiến trình Scaffold
-        const bacTienTrinh = dem === 0 ? 1 : dem === 1 ? 2 : 3
-        const cauKemNhan: CauLuyen = {
-          ...cand,
-          chuaCho: {
-            qid: t.qid,
-            soCau: t.soCau,
-            phan: t.phan,
-            maDang: t.nhanDan,
-            tenDang: t.tenDang,
-            bac: bacTienTrinh as any,
-          },
-        }
-        dsCauRut.push(cauKemNhan)
-        dem++
-      }
-    }
-  }
+  const dsCauRut = rutTheoPhanBo(thongKe, phanBo, Math.min(soCauRut, tongToiDa))
 
   const tt: ThongTinPhieu = {
     hoTen: thongTin.hoTen,
@@ -379,85 +363,12 @@ export function phanTichBoLocCau(
   tongToiDa: number
   tinhSoCauMoiDang: (tongSoCauRut: number) => Map<string, number>
 } {
-  const dsCauSaiHopLe = dsCauSai.filter((c) =>
-    hopLeDeRut({
-      phan: c.phan,
-      maDe: c.maCa,
-      dapAnDung: c.dapAnDung,
-      text: c.text,
-      choices: c.choices || c.ideas,
-    })
-  )
-  const banDo = banDoDang(khoDe)
-  const tatCaUngVien = cauLuyenTuNguon(khoDe)
-  const qidSaiSet = new Set(dsCauSaiHopLe.map((c) => c.qid))
-  const tapUngVienPhanBiet = new Set<string>()
-
-  const thongKe: ThongKeDangCauSai[] = dsCauSaiHopLe.map((cs) => {
-    const nhan = layNhanDanCauSai(cs, banDo)
-    const ungVienLoc = tatCaUngVien.filter((cand) => {
-      if (qidSaiSet.has(cand.id) || cand.id === cs.qid) return false
-
-      // 1. Phải khớp nhãn dán chặt chẽ
-      const candDang = banDo.get(cand.id)
-      let khopNhan = false
-      if (candDang && nhan.ma && candDang.ma === nhan.ma) {
-        khopNhan = true
-      } else if (candDang && nhan.ten && nhan.ten !== 'Chưa gắn dạng' && candDang.ten === nhan.ten) {
-        khopNhan = true
-      }
-      if (!khopNhan) return false
-
-      // 2. Lọc theo sao
-      if (!hopSao(cand.sao, boLoc.sao)) return false
-
-      // 3. Lọc theo thể loại (lý thuyết / bài tập)
-      if (boLoc.dang === 'ly_thuyet' && cand.dang !== 'ly_thuyet') return false
-      if (boLoc.dang === 'bai_tap' && cand.dang !== 'bai_tap') return false
-
-      return true
-    })
-
-    for (const u of ungVienLoc) {
-      tapUngVienPhanBiet.add(u.id)
-    }
-
-    return {
-      qid: cs.qid,
-      soCau: cs.soCau,
-      phan: cs.phan,
-      nhanDan: nhan.ma || nhan.ten,
-      tenDang: nhan.ten || nhan.ma,
-      soUngVienToiDa: ungVienLoc.length,
-      ungVien: ungVienLoc,
-    }
+  const thongKe=phanTichTyLeDang(dsCauSai,khoDe).thongKe.map(t=>{
+    const ungVien=t.ungVien.filter(c=>hopSao(c.sao,boLoc.sao)&&(boLoc.dang==='tat_ca'||c.dang===boLoc.dang))
+    return {...t,ungVien,soUngVienToiDa:ungVien.length}
   })
-
-  // Tổng số câu khớp bộ lọc (tối đa 100 câu trên thanh trượt theo yêu cầu)
-  const tongCo = thongKe.reduce((acc, cur) => acc + cur.soUngVienToiDa, 0)
-  const tongToiDa = Math.min(100, Math.min(tongCo, tapUngVienPhanBiet.size))
-
-  const tinhSoCauMoiDang = (tongSoCauRut: number): Map<string, number> => {
-    const ketQua = new Map<string, number>()
-    if (tongToiDa <= 0 || tongSoCauRut <= 0) {
-      for (const t of thongKe) ketQua.set(t.qid, 0)
-      return ketQua
-    }
-
-    const K = Math.min(tongSoCauRut, tongToiDa)
-    for (const t of thongKe) {
-      if (t.soUngVienToiDa <= 0) {
-        ketQua.set(t.qid, 0)
-        continue
-      }
-      const tyLe = t.soUngVienToiDa / (tongCo || 1)
-      const phanBo = Math.ceil(K * tyLe)
-      const soCauChon = Math.min(t.soUngVienToiDa, Math.max(1, phanBo))
-      ketQua.set(t.qid, soCauChon)
-    }
-
-    return ketQua
-  }
+  const tongToiDa=Math.min(100,new Set(thongKe.flatMap(t=>t.ungVien.map(khoaNoiDung))).size)
+  const tinhSoCauMoiDang=(n:number)=>phanBoSuat(thongKe,tongToiDa,n)
 
   return { thongKe, tongToiDa, tinhSoCauMoiDang }
 }
@@ -473,41 +384,7 @@ export function rutLuyenTheoBoLoc(
   const { thongKe, tongToiDa, tinhSoCauMoiDang } = phanTichBoLocCau(dsCauSai, khoDe, boLoc)
   const phanBo = tinhSoCauMoiDang(soCauRut)
 
-  const dsCauRut: CauLuyen[] = []
-  const daLayId = new Set<string>()
-
-  for (const t of thongKe) {
-    const soLuong = phanBo.get(t.qid) ?? 0
-    const ungVienScaffold = [...t.ungVien].sort((a, b) => {
-      const sa = typeof a.sao === 'number' ? a.sao : 0
-      const sb = typeof b.sao === 'number' ? b.sao : 0
-      if (sa !== sb) return sa - sb
-      if (a.dang === 'ly_thuyet' && b.dang !== 'ly_thuyet') return -1
-      if (a.dang !== 'ly_thuyet' && b.dang === 'ly_thuyet') return 1
-      return 0
-    })
-
-    let dem = 0
-    for (const cand of ungVienScaffold) {
-      if (dem >= soLuong) break
-      if (!daLayId.has(cand.id)) {
-        daLayId.add(cand.id)
-        const bacTienTrinh = dem === 0 ? 1 : dem === 1 ? 2 : 3
-        dsCauRut.push({
-          ...cand,
-          chuaCho: {
-            qid: t.qid,
-            soCau: t.soCau,
-            phan: t.phan,
-            maDang: t.nhanDan,
-            tenDang: t.tenDang,
-            bac: bacTienTrinh as any,
-          },
-        })
-        dem++
-      }
-    }
-  }
+  const dsCauRut = rutTheoPhanBo(thongKe, phanBo, Math.min(soCauRut, tongToiDa))
 
   // Nhãn sao và dạng
   const nhanSao = boLoc.sao === 'sao_2' ? '2 sao' : boLoc.sao === 'sao_1' ? '1 sao' : boLoc.sao === 'sao_0' ? '0 sao' : 'mọi sao'
