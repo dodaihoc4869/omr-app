@@ -419,6 +419,23 @@ Luu y da ghi trong `evidence/p04-tom-tat-bang-chung.md`: sua code P04 lam **fing
 3. **Noi `khoaTriNho` vao kenh that**: can `content_group` tu kho — hien `docSuKienDoc` chua lay truong nay, nen tren duong that moi `qid` van mot khoa (tier ham thuan da dung).
 4. T17/T29 (phan thuong) thuoc P07; T07 thuoc P05.
 
+
+CHECKPOINT CNH-1.0
+Thời điểm, HEAD và source fingerprint thực tại thời điểm ghi: 23/09/2026 ~20:40 +07:00 · HEAD (chờ commit ngay sau checkpoint) · `sourceFingerprint = 0c3ad9d0ac426997fc247cc3237a2c24b54e48080a4a1f509f4af5acd8b90cdb`
+Yêu cầu/test đang xử lý: P04 (R08/R10 phần dữ liệu) + P05 (R13–R16) — nối DỮ LIỆU THẬT vào điểm §7.2 và luật lặp; T04/T08/T09/T41/T40 còn IN_PROGRESS.
+Hành vi vừa hoàn thành và đường gọi thật:
+ · `server/src/bo-chon-that.ts` (mới): `docHoSoCau` (đọc `nam_kt_cau` của câu ứng viên) · `mucTheoKyNangCuaEm` (bản dựng P03 `skill_snapshot`) · `xepLuotTheoChinhSach` (chấm §7.2 rồi sắp tất định) · `locTheoLuatLap` (chặn `content_group` đã làm hôm nay + trần câu/lượt).
+ · `server/src/game-v2.ts`: CẢ HAI đường phát câu (`startLuotMoi` mặc định và đường cũ) chạy: lọc luật lặp (P04) → chấm điểm §7.2 trên dữ liệu thật → cắt theo ngân sách còn lại (P05), tất cả sau cờ `cau_hinh.ngan_sach_luot` (MẶC ĐỊNH TẮT).
+ · Trả thêm `nganSach:{conLaiGiay,soCauBoQua}` và `lyDo:'het_ngan_sach_ngay'`.
+File đã sửa; thay đổi người dùng cần giữ: `server/src/bo-chon-that.ts`, `server/src/game-v2.ts`, `tests/cnh-1-0-bo-chon-that.test.ts`, `tests/cnh-1-0-ngan-sach-luot-t09.test.ts`, `docs/cline-ca-nhan-hoa-2309/{TIEN-DO.json,NHAT-KY.md,evidence/p04c-*,p05d-*}`. **KHÔNG đụng** `src/lib/day-ca-may-chu-moi.ts`, `src/lib/gui-ca-trinh-duyet.ts` (WIP của thầy).
+Lệnh kiểm đã chạy, exit code, đường dẫn log: xem bảng trong `evidence/p05d-tom-tat-bang-chung.md` và `evidence/p04c-tom-tat-bang-chung.md` (9 + 5 + 711 test xanh; tsc 0 lỗi; T05/T06/T32 chạy lại theo fingerprint mới).
+Phần chưa xong và blocker đã xác minh:
+ · Luật FAMILY của §4.2.6–4.2.7 KHÔNG áp được vì kho thật chưa gắn nhãn family (P02 ghi nhận) — cần thầy gắn nhãn; đã có test khoá hành vi hiện tại.
+ · P05 còn: pipeline hard filter §7.1 đầy đủ, giữ chỗ SQL uniqueness/CAS + race thua, một plan/ngày + rubric đóng băng + carry-over, ghép mẫu tốc độ theo part/mức.
+ · T14/T29/T47 (phần thưởng/receipt/ví) thuộc P07; P11 chưa có quyền deploy.
+Việc kế tiếp làm ngay, file/hàm cần mở, tiêu chí kiểm: mở `server/src/ke-hoach-ngay-d1.ts` + `server/src/ke-hoach-ngay.ts` để (a) đưa `xepLuotTheoChinhSach` + `locTheoLuatLap` vào bộ chọn KẾ HOẠCH NGÀY (câu tới hạn/ôn thi) và (b) thêm giữ chỗ có uniqueness/CAS (`UNIQUE(sbd, ngay, qid)` + INSERT … ON CONFLICT DO NOTHING rồi đếm số dòng thắng); tiêu chí: test D1 thật chứng minh hai lượt chốt đồng thời không chốt trùng và lượt thua chỉ chọn lại phần chưa chốt.
+Các phụ thuộc đã sẵn sàng; phần chờ gói khác: `nang-luc.ts`/`skill_snapshot` (P03) đã có ⇒ `fit` dùng được; `chong-lap.ts` + `uoc-luong-thoi-gian.ts` (P04/P05) đã có ⇒ pipeline chạy; chờ P06 để nhân ra các kênh Mom/BTVN/ôn; chờ P07 cho phần thưởng/idempotency tiền.
+
 Trang thai that sau luot nay: phases PASS **2/12** (P02, P03) · requirements PASS **2/42** (R05, R09) · tests PASS **9/50** (T01 T02 T03 T05 T06 T11 T32 T33 T34) · them T04/T41 = IN_PROGRESS.
 
 - Migration `migration-2309-cnh1-su-kien-chuan.sql` **CHUA ap** len D1 that; co `cau_hinh.nang_luc_v1` **MAC DINH TAT**; **chua deploy** (khong nhan DEPLOYMENT_VERIFIED).

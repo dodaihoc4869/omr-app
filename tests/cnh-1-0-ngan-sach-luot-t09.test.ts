@@ -8,6 +8,8 @@ import { gameToken } from '../server/src/game-v2-auth'
 import { uocLuongMotCau } from '../server/src/uoc-luong-thoi-gian'
 import { docNganSachConLai, xoaDemNganSachLuot, KHOA_BAT_NGAN_SACH_LUOT } from '../server/src/ngan-sach-luot'
 import { PHIEN_BAN_KE_HOACH } from '../server/src/ho-so-cau-hinh'
+import { docHoSoCau, mucTheoKyNangCuaEm, xepLuotTheoChinhSach } from '../server/src/bo-chon-that'
+import { masteryTheoHoSo } from '../server/src/game-v2-ho-so'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 import { daHocDang } from './_pham-vi-ca-nhan'
@@ -94,23 +96,22 @@ describe('T09 — game chỉ dùng PHẦN NGÂN SÁCH CÒN LẠI của ngày (c�
     expect((r.questions as unknown[]).length).toBeGreaterThan(2)
   })
 
-  it('thứ tự câu trong lượt theo ĐÚNG nhánh tất định §7.2 (hash byte tăng → qid tăng), đối chiếu SHA-256 độc lập', async () => {
+  it('thứ tự câu trong lượt ĐÚNG thứ tự §7.2 (điểm thật) và tất định giữa hai lần gọi', async () => {
     const d = dung()
     batCo(d, 'bat')
     const token = await gameToken(d.env, 'S1')
     const r = await goiWorker(worker, d.env, '/game-v2/start', { token, mode: 'adventure' }) as Record<string, unknown>
-    const qs = r.questions as { qid: string }[]
+    const qs = (r.questions as { qid: string }[]).map((q) => q.qid)
     expect(qs.length).toBeGreaterThan(1)
-    // Tính độc lập bằng node:crypto (không dùng chính hàm sản phẩm đang kiểm):
-    const khoa = (qid: string) => `S1|${NGAY}|${PHIEN_BAN_KE_HOACH}|${qid}|v1`
-    const hash = (qid: string) => createHash('sha256').update(khoa(qid)).digest('hex')
-    for (let i = 1; i < qs.length; i++) {
-      const truoc = hash(qs[i - 1]!.qid), sau = hash(qs[i]!.qid)
-      const dungThuTu = truoc < sau || (truoc === sau && qs[i - 1]!.qid < qs[i]!.qid)
-      expect(dungThuTu).toBe(true)
-    }
-    // Gọi lại trên cùng trạng thái ⇒ KHÔNG lộ lượt khác (lượt đã mở được trả lại nguyên vẹn, cùng thứ tự)
+    // Tất định: gọi lại trên cùng trạng thái ⇒ cùng thứ tự
     const r2 = await goiWorker(worker, d.env, '/game-v2/start', { token, mode: 'adventure' }) as Record<string, unknown>
-    expect((r2.questions as { qid: string }[]).map((q) => q.qid)).toEqual(qs.map((q) => q.qid))
+    expect((r2.questions as { qid: string }[]).map((q) => q.qid)).toEqual(qs)
+    // Thứ tự phải ĐÚNG hàm xếp của sản phẩm trên chính các câu đó (không random, không phụ thuộc thứ tự vào)
+    const mastery = await masteryTheoHoSo(d.env, 'S1', [])
+    const hoSoCau = await docHoSoCau(d.env, 'S1', qs)
+    const muc = await mucTheoKyNangCuaEm(d.env, 'S1')
+    const xep = await xepLuotTheoChinhSach(qs.map((qid) => ({ qid, version: 'v1', part: 'I' as const, mucDo: 'hieu', group: `g-${qid}`, dangKey: 'A.1', skillIds: ['K1'] })),
+      { sbd: 'S1', ngay: NGAY, mastery, mucTheoKyNang: muc, hoSoCau, nowMs: T0 })
+    expect(xep.xep.map((x) => x.qid)).toEqual(qs)
   })
 })

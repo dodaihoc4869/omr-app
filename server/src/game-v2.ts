@@ -11,10 +11,8 @@ import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
 import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
 import {nangLucBat} from './nang-luc-d1'
 import {nganSachLuotBat,docNganSachConLai} from './ngan-sach-luot'
-import {uocLuongMotCau,xepVuaNganSach} from './uoc-luong-thoi-gian'
-import {khoaHashSap,sapTheoDiem} from './bo-chon-diem'
-import {PHIEN_BAN_KE_HOACH} from './ho-so-cau-hinh'
-import {mucTuChu} from '../../src/lib/btvn-nang-do'
+import {xepVuaNganSach} from './uoc-luong-thoi-gian'
+import {docHoSoCau,locTheoLuatLap,mucTheoKyNangCuaEm,xepLuotTheoChinhSach} from './bo-chon-that'
 import {PETS,ALIASES,OLD_SIX,allowed,learnedQuestionFilter,chooseSessionWithRoles,chooseLuotMoi,luotHomNay,SO_CAU_MOI_LUOT,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
 import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
 import type {ShieldState} from '../../src/game/than-thu-v2/shields'
@@ -138,16 +136,23 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   // CNH-1.0 P05/T09 (02 §5.2 + §7.2): lượt này CHỈ lấy phần NGÂN SÁCH CÒN LẠI của ngày (mọi màn dùng chung
   // một ngân sách), và cắt theo thứ tự TẤT ĐỊNH (điểm §7.2 → hash `student|day|plan_version|qid|version`).
   // Cờ `cau_hinh.ngan_sach_luot` MẶC ĐỊNH TẮT ⇒ đường cũ nguyên vẹn.
-  let chon=chonGoc, nganSachThieu:{conLaiGiay:number;soCauBoQua:number}|undefined
+  let chon=chonGoc, nganSachThieu:{conLaiGiay:number;soCauBoQua:number}|undefined, diemLuot:Map<string,{taskSeconds:number}>|undefined
   if(await nganSachLuotBat(env)){
-    // Điểm §7.2 chưa được cấp ở đường này (repairNeed/reviewNeed/fit cần dữ liệu mục đích — P06 nối) nên
-    // hiện áp NHÁNH SẮP XẾP TẤT ĐỊNH trên cùng một điểm: hash tăng theo byte rồi qid — không random.
-    const sap=await sapTheoDiem(chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',difficulty:mucTuChu(x.q.mucDo) as 0|1|2,familyId:null})),new Map(),(c)=>khoaHashSap(sbd,ngay,PHIEN_BAN_KE_HOACH,c.qid,c.version))
-    const thuTu=new Map(sap.map((c,i)=>[c.qid,i]))
+    // §7.2 với DỮ LIỆU THẬT: hồ sơ per-câu (`nam_kt_cau`) + mức đang luyện (`skill_snapshot` P03) + mốc ôn (FSRS/hồ sơ).
+    const ungVien=chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',mucDo:x.q.mucDo,group:x.q.group,dangKey:x.q.dang??x.q.group,skillIds:Array.isArray(x.q.kienThuc)?x.q.kienThuc as string[]:[]}))
+    // P04: luật lặp (cùng content_group đã làm HÔM NAY) — chạy TRƯỚC khi chấm điểm; family chưa có nhãn (xem `locTheoLuatLap`).
+    const {giu}=await locTheoLuatLap(env,sbd,ngay,ungVien,SO_CAU_MOI_LUOT)
+    chon=chon.filter(x=>giu.has(x.q.qid))
+    const hoSoCau=await docHoSoCau(env,sbd,chon.map(x=>x.q.qid))
+    const mucTheoKyNang=await mucTheoKyNangCuaEm(env,sbd)
+    const xep=await xepLuotTheoChinhSach(chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',mucDo:x.q.mucDo,group:x.q.group,dangKey:x.q.dang??x.q.group,skillIds:Array.isArray(x.q.kienThuc)?x.q.kienThuc as string[]:[]})),
+      {sbd,ngay,mastery,mucTheoKyNang,hoSoCau,nowMs:tNow})
+    const thuTu=new Map(xep.xep.map((v,i)=>[v.qid,i]))
     chon=[...chon].sort((a,b)=>(thuTu.get(a.q.qid)??0)-(thuTu.get(b.q.qid)??0))
+    diemLuot=xep.theoQid
     const ns=await docNganSachConLai(env,sbd,ngay)
     if(ns&&ns.nganSachGiay>0){
-      const uoc=chon.map(x=>({qid:x.q.qid,taskSeconds:uocLuongMotCau({qid:x.q.qid,part:x.q.phan,difficulty:mucTuChu(x.q.mucDo)},{mau:ns.mau,nowMs:tNow}).taskSeconds}))
+      const uoc=chon.map(x=>({qid:x.q.qid,taskSeconds:diemLuot?.get(x.q.qid)?.taskSeconds ?? 0}))
       const vua=xepVuaNganSach(uoc,ns.conLaiGiay)
       const giu=new Set(vua.chon.map(y=>y.qid))
       chon=chon.filter(x=>giu.has(x.q.qid))
@@ -303,18 +308,27 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     const loaiTran:LoaiTran=laGoiNoiBoDoan(b)?'doan':'dao' // Đoàn gọi `start` nội bộ ⇒ trần Đoàn; Linh Tâm/võ đài/đường cũ ⇒ trần Đảo (36)
     const count={n:await demCauTrongNgay(env,sbd,dayStart.toISOString(),loaiTran)}
     const remaining=Math.max(0,tranCuaLoai(loaiTran)-count.n)
-    const chonGoc=chooseSessionWithRoles(eligible,scope.evidence,history,await masteryTheoHoSo(env,sbd,p.mastery),mode,tNow).slice(0,remaining)
+    const masteryLuot=await masteryTheoHoSo(env,sbd,p.mastery)
+    const chonGoc=chooseSessionWithRoles(eligible,scope.evidence,history,masteryLuot,mode,tNow).slice(0,remaining)
     // CNH-1.0 P05/T09 (02 §5.2): lượt này CHỈ được lấy phần NGÂN SÁCH CÒN LẠI của ngày — nhiều màn dùng
     // chung một ngân sách. Cờ `cau_hinh.ngan_sach_luot` MẶC ĐỊNH TẮT ⇒ hành vi cũ nguyên vẹn.
-    let chon=chonGoc, nganSachThieu: { conLaiGiay: number; soCauBoQua: number } | undefined
+    let chon=chonGoc, nganSachThieu: { conLaiGiay: number; soCauBoQua: number } | undefined, diemLuot: Map<string, { taskSeconds: number }> | undefined
     if(await nganSachLuotBat(env)){
-      // Sắp xếp TẤT ĐỊNH §7.2 (hash theo byte) rồi mới cắt theo ngân sách còn lại.
-      const sap=await sapTheoDiem(chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',difficulty:mucTuChu(x.q.mucDo) as 0|1|2,familyId:null})),new Map(),(c)=>khoaHashSap(sbd,academicDay(now()),PHIEN_BAN_KE_HOACH,c.qid,c.version))
-      const thuTu=new Map(sap.map((c,i)=>[c.qid,i]))
+      // §7.2 với DỮ LIỆU THẬT (hồ sơ per-câu + mức đang luyện + mốc ôn) rồi mới cắt theo ngân sách còn lại.
+      // P04: luật lặp (cùng content_group đã làm HÔM NAY) chạy TRƯỚC khi chấm điểm.
+      const ungVien=chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',mucDo:x.q.mucDo,group:x.q.group,dangKey:x.q.dang??x.q.group,skillIds:Array.isArray(x.q.kienThuc)?x.q.kienThuc as string[]:[]}))
+      const {giu:giuLap}=await locTheoLuatLap(env,sbd,academicDay(now()),ungVien,SO_CAU_MOI_LUOT)
+      chon=chon.filter(x=>giuLap.has(x.q.qid))
+      const hoSoCau=await docHoSoCau(env,sbd,chon.map(x=>x.q.qid))
+      const mucTheoKyNang=await mucTheoKyNangCuaEm(env,sbd)
+      const xep=await xepLuotTheoChinhSach(chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',mucDo:x.q.mucDo,group:x.q.group,dangKey:x.q.dang??x.q.group,skillIds:Array.isArray(x.q.kienThuc)?x.q.kienThuc as string[]:[]})),
+        {sbd,ngay:academicDay(now()),mastery:masteryLuot,mucTheoKyNang,hoSoCau,nowMs:tNow})
+      const thuTu=new Map(xep.xep.map((v,i)=>[v.qid,i]))
       chon=[...chon].sort((a,b)=>(thuTu.get(a.q.qid)??0)-(thuTu.get(b.q.qid)??0))
+      diemLuot=xep.theoQid
       const ns=await docNganSachConLai(env,sbd,academicDay(now()))
       if(ns&&ns.nganSachGiay>0){
-        const uoc=chon.map(x=>({qid:x.q.qid,taskSeconds:uocLuongMotCau({qid:x.q.qid,part:x.q.phan,difficulty:mucTuChu(x.q.mucDo)},{mau:ns.mau,nowMs:tNow}).taskSeconds}))
+        const uoc=chon.map(x=>({qid:x.q.qid,taskSeconds:diemLuot?.get(x.q.qid)?.taskSeconds ?? 0}))
         const vua=xepVuaNganSach(uoc,ns.conLaiGiay)
         const giu=new Set(vua.chon.map(y=>y.qid))
         chon=chon.filter(x=>giu.has(x.q.qid))
