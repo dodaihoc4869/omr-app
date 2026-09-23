@@ -151,8 +151,25 @@
         "P03"
       ],
       "status": "NOT_RUN",
-      "notes": "",
-      "evidence": []
+      "notes": "DANG LAM (lat cat loi da xong, ghi bang chung): (1) TRANG THAI FSRS DU: `LichOnFsrs` them `khoa` (content_group#memory_version), `phienBan` (PHIEN_BAN_FSRS = fsrs6-ts5.4.2-ret0.9-cfg1), `lucGoc`, `cursor`, `docLap`, `soLanHoTro`; state cua phien ban lich khac bi DUNG LAI, khong tron. (2) KHOÁ TRI NHO `khoaTriNho(contentGroup, version)`: hai qid cung content_group + cung version DUNG CHUNG mot card; doi version => memory_version moi => card moi. (3) MOT quan sat DOC LAP/card/ngay; Again thang trong ngay; BO TRONG khong cap nhat card. (4) LAN CO HO TRO (`assisted`/`unknown`) KHONG them Good va KHONG keo moc xa (chi dem + giu cursor), va tren duong ho so thi khong tang dung_lien_tiep/ngay_dung_khac_nhau, khong doi trang thai, khong nang bac dang, KHONG go nhan can_day_lai. Them duong lui khi D1 chua ap migration (thieu cot `assistance`). CON LAI cua P04: (a) MOT module repeat-eligibility theo thu tu uu tien 02 §4.2 (due khong bi cooldown 3/14/30 chan sai, cung content_group hom nay bi chan tru task repair_retry, toi da 6 cau/luot, moi family 1 cau thuong / repair 2 voi >=2 nhiem vu hoac >=300 giay, family vua lam nghi toi thieu 1 ngay VN voi ngoai le co `repeat_reason`); (b) family spacing + repair exception co ly do; (c) noi `khoaTriNho` vao cac kenh that (can content_group tu kho — hien `docSuKienDoc` chua lay content_group nen tren duong that moi card van theo qid). Vi con thieu (a)+(b) nen T41/T04/T07 chua PASS va P04 giu IN_PROGRESS; T17/T29 cua P07.",
+      "evidence": [
+        {
+          "path": "server/src/lich-on-fsrs.ts",
+          "note": "state du + khoa tri nho + ho tro khong day due"
+        },
+        {
+          "path": "server/src/ho-so-nam-kt.ts",
+          "note": "duong ho so: assistance-aware, khong tinh moc tu lam cho lan ho tro"
+        },
+        {
+          "path": "tests/cnh-1-0-fsrs-t41.test.ts",
+          "note": "T41 lat cat loi: 11 ca"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-nhom.log",
+          "note": "nhom lien quan 33 tep: 496 PASS, 1 do CO SAN trong nen"
+        }
+      ]
     },
     {
       "id": "P05",
@@ -375,13 +392,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T11:14:00.000Z",
+          "executedAt": "2026-09-23T11:25:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "b4a33d6293b80bf25951ed563b33a70aa4488faadaa0adf45f95ab64537ae382",
+          "sourceFingerprint": "24ed5c2bfd791a8d35937aeda7813054b825c27f4d99bc07361378463cc36eee",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p03-vitest-t05-t06.log",
-              "sha256": "e5e37a2af677374163b71e034c173a76e594f19cdd01bd73580607e0dc6f594d"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-t05-t06.log",
+              "sha256": "ef31f0a81b5d6d325fe69c37e077c6054b36ae5a547341f719e6d9951f8cd4f2"
             }
           ]
         }
@@ -930,7 +947,7 @@
       "phase": "P04",
       "level": "code",
       "title": "Bản sao và family",
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "evidence": []
     },
     {
@@ -942,13 +959,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T11:14:00.000Z",
+          "executedAt": "2026-09-23T11:25:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "b4a33d6293b80bf25951ed563b33a70aa4488faadaa0adf45f95ab64537ae382",
+          "sourceFingerprint": "24ed5c2bfd791a8d35937aeda7813054b825c27f4d99bc07361378463cc36eee",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p03-vitest-t05-t06.log",
-              "sha256": "e5e37a2af677374163b71e034c173a76e594f19cdd01bd73580607e0dc6f594d"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-t05-t06.log",
+              "sha256": "ef31f0a81b5d6d325fe69c37e077c6054b36ae5a547341f719e6d9951f8cd4f2"
             }
           ]
         }
@@ -963,13 +980,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T11:14:00.000Z",
+          "executedAt": "2026-09-23T11:25:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "b4a33d6293b80bf25951ed563b33a70aa4488faadaa0adf45f95ab64537ae382",
+          "sourceFingerprint": "24ed5c2bfd791a8d35937aeda7813054b825c27f4d99bc07361378463cc36eee",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p03-vitest-t05-t06.log",
-              "sha256": "e5e37a2af677374163b71e034c173a76e594f19cdd01bd73580607e0dc6f594d"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-t05-t06.log",
+              "sha256": "ef31f0a81b5d6d325fe69c37e077c6054b36ae5a547341f719e6d9951f8cd4f2"
             }
           ]
         }
@@ -1197,13 +1214,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-replay-t32.test.ts",
-          "executedAt": "2026-09-23T11:14:00.000Z",
+          "executedAt": "2026-09-23T11:25:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "b4a33d6293b80bf25951ed563b33a70aa4488faadaa0adf45f95ab64537ae382",
+          "sourceFingerprint": "24ed5c2bfd791a8d35937aeda7813054b825c27f4d99bc07361378463cc36eee",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p03-vitest-t32.log",
-              "sha256": "327de2f3735615fa428c3ce3dd5da1fc6f52509b306cf697fb3bbdcf975f8d79"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p04-vitest-t32.log",
+              "sha256": "378b01d882c50f093f3a5cb7d9e0383c4c2ee9f7e09291aa4fa9257e14225755"
             }
           ]
         }
@@ -1304,7 +1321,7 @@
       "phase": "P04",
       "level": "code",
       "title": "FSRS ngày/card",
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "evidence": []
     },
     {

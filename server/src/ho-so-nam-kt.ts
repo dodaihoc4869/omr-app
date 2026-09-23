@@ -33,6 +33,12 @@ export interface SuKienDoc {
   ngayVn: string
   maDang: string | null
   chuyenDe: string
+  /**
+   * CNH-1.0 (P04): lần làm này có được máy chủ CẤP HỖ TRỢ không (`assisted`/`unknown`).
+   * Thiếu cột trong D1 (chưa áp migration) ⇒ `'none'`, tức giữ nguyên hành vi cũ.
+   * Lần có hỗ trợ KHÔNG cập nhật lịch nhớ (02 §4.1: "Lần làm lại assisted không thêm Good và không kéo mốc xa").
+   */
+  assistance?: string
 }
 
 export interface NamKtCau {
@@ -157,6 +163,9 @@ export function phatLaiSuKien(ds: readonly SuKienDoc[], tra: TraCuuCau = KHONG_T
       }
       const c = t.c
       c.lanGap++
+      // CNH-1.0 P04: lần có HỖ TRỢ (`assisted`/`unknown`) KHÔNG được tính là bằng chứng tự làm —
+      // dùng chung cho cả lịch nhớ lẫn các mốc `dung_lien_tiep`/`ngay_dung_khac_nhau`/trạng thái/bậc dạng.
+      const docLapLanNay = e.assistance !== 'assisted' && e.assistance !== 'unknown'
       c.ketQuaCuoi = e.ketQua
       c.nguonCuoi = e.nguon
       c.lucCuoi = e.luc
@@ -180,6 +189,10 @@ export function phatLaiSuKien(ds: readonly SuKienDoc[], tra: TraCuuCau = KHONG_T
         if (!t.tungDung) c.trangThai = 'moi_sai'
       } else if (t.ngayDungCuoi === e.ngayVn) {
         // Đúng thêm lần nữa trong CÙNG ngày: chỉ ghi nhận giờ, không thành mốc mới.
+      } else if (!docLapLanNay) {
+        // CNH-1.0 P04: ĐÚNG nhưng CÓ HỖ TRỢ ⇒ giữ cho phần hỗ trợ, KHÔNG tính là mốc tự làm:
+        // không tăng `dung_lien_tiep`/`ngay_dung_khac_nhau`, không đổi trạng thái, không nâng bậc dạng.
+        // (Không làm gì thêm; `lan_gap`/`ket_qua_cuoi` đã được cập nhật ở trên.)
       } else {
         t.tungDung = true
         t.ngayDungCuoi = e.ngayVn
@@ -189,7 +202,8 @@ export function phatLaiSuKien(ds: readonly SuKienDoc[], tra: TraCuuCau = KHONG_T
         if (maDang) bac.set(maDang, Math.min(BAC_DANG_TOI_DA, bacCua(maDang) + 1))
       }
       if (e.ketQua !== null) {
-        t.lich = on(t.lich, Date.parse(e.luc), e.ketQua)
+        // CNH-1.0 P04: lần có HỖ TRỢ không cập nhật lịch nhớ (không thêm Good, không kéo mốc xa).
+        t.lich = on(t.lich, Date.parse(e.luc), e.ketQua, { docLap: docLapLanNay, cursor: e.khoa })
         c.mocOnKe = ngayVnFsrs(t.lich.card.due.getTime())
       }
       c.canDayLai = c.lanSai >= SO_LAN_SAI_DAY_LAI && c.dungLienTiep === 0
@@ -235,10 +249,25 @@ export function dangYeu(d: NamKtDang, homNay: string): boolean {
 
 const CHON_SO = `SELECT khoa, sbd, qid, nguon, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de
                    FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) ORDER BY sbd, luc, khoa`
+/** CNH-1.0 P04: đọc kèm `assistance`; D1 chưa áp migration thì tự lùi về `CHON_SO` (không làm hỏng hồ sơ). */
+const CHON_SO_MOI = `SELECT khoa, sbd, qid, nguon, ket_qua, giay, luc, ngay_vn, ma_dang, chuyen_de, assistance
+                   FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) ORDER BY sbd, luc, khoa`
+let coCotHoTro: boolean | null = null
+export function xoaBietCotHoTro(): void { coCotHoTro = null }
 
 export async function docSuKienDoc(env: Env, dsSbd: string[]): Promise<SuKienDoc[]> {
   if (dsSbd.length === 0) return []
-  const r = await env.DB.prepare(CHON_SO).bind(JSON.stringify(dsSbd)).all<Record<string, unknown>>()
+  const chay = (coMoi: boolean) => env.DB.prepare(coMoi ? CHON_SO_MOI : CHON_SO).bind(JSON.stringify(dsSbd)).all<Record<string, unknown>>()
+  let r: { results?: Record<string, unknown>[] }
+  try {
+    r = await chay(coCotHoTro !== false)
+    coCotHoTro = true
+  } catch (e) {
+    const loi = e instanceof Error ? e.message : String(e)
+    if (!/no such column|has no column named/i.test(loi)) throw e
+    coCotHoTro = false
+    r = await chay(false)
+  }
   return (r.results ?? []).map((x) => ({
     khoa: String(x.khoa),
     sbd: String(x.sbd),
@@ -250,6 +279,7 @@ export async function docSuKienDoc(env: Env, dsSbd: string[]): Promise<SuKienDoc
     ngayVn: String(x.ngay_vn),
     maDang: x.ma_dang ? String(x.ma_dang) : null,
     chuyenDe: String(x.chuyen_de ?? ''),
+    assistance: String(x.assistance ?? '').trim() || 'none',
   }))
 }
 

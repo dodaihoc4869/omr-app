@@ -269,6 +269,38 @@ Nhom lien quan khac: `tests/cnh-1-0 tests/su-kien tests/ho-so tests/reset-toan-a
 - **T29/T14/T47 moi xong PHAN DU LIEU** (su kien + ho so), nen GIU `IN_PROGRESS`; phan thuong (receipt, `raw core=2`, khong FSRS Good/transfer 10, vi, thong bao) thuoc **P07** => R08 va R10 cung chua PASS.
 - **Cach bieu dien DONG SUA DIEM trong so** (dong rieng + `correction_of`) do **lenh correction cua P07 (R04)** chot; P03 chi dinh nghia luat ap dung va kiem bang fixture.
 - **Kho that chua gan nhan `family`** => `familyId` luon `null`, nen tren du lieu THAT chua xac nhan duoc muc nao (dung nhu thiet ke: khong bia family). Can thay gan nhan (P02 `baoThieuNhan` da liet ke).
+
+## P04 (LAT CAT LOI) — lich nho FSRS: khoa tri nho, state du, ho tro khong day due
+
+Ngay: 23/09/2026 (buoi chieu, tiep P03). `sourceFingerprint`: `24ed5c2bfd791a8d35937aeda7813054b825c27f4d99bc07361378463cc36eee`.
+**GOI P04 CHUA PASS** — moi xong lat cat loi (ghi ro o muc "Con lai").
+
+### Da lam
+
+- `server/src/lich-on-fsrs.ts`: `PHIEN_BAN_FSRS = fsrs6-ts5.4.2-ret0.9-cfg1`; `khoaTriNho(contentGroup, version)` = `content_group#memory_version`; `LichOnFsrs` them `khoa/phienBan/lucGoc/cursor/docLap/soLanHoTro`; tham so quan sat `{docLap, khoa, cursor}`; state cua **phien ban lich khac bi DUNG LAI**; **ho tro (`docLap:false`) khong them Good, khong keo moc xa** (chi dem + giu cursor).
+- `server/src/ho-so-nam-kt.ts`: doc them cot `assistance` (co DUONG LUI khi D1 chua ap migration, khong lam hong ke hoach ngay); lan co HO TRO khong tang `dung_lien_tiep`/`ngay_dung_khac_nhau`, khong doi `trang_thai`, khong nang bac dang, **khong go nhan `can_day_lai`** (dung R21: tro giup khong gia bang chung doc lap).
+- `tests/cnh-1-0-fsrs-t41.test.ts` (11 ca moi): mot quan sat/card/ngay · Again thang (tinh tren state dau ngay) · ban sao chung mot card · doi version => card moi · bo trong khong cap nhat card · phien ban lich khac => dung lai · tat dinh · moc khop thu vien chinh thuc khi co su kien ho tro xen giua.
+
+### Bang chung
+
+| Lenh | Exit | Ket qua | Log |
+|---|---|---|---|
+| `vitest run tests/cnh-1-0-fsrs-t41.test.ts` | 0 | **11 PASS** | `p04-vitest-t41.log` |
+| nhom lien quan (cnh-1-0, ho-so, lich-on, ke-hoach, exp, dem-ke-hoach, cau-da-lam, game) | 1 | 33 tep · **496 PASS / 1 do CO SAN trong nen P00** (khong hoi quy moi) | `p04-vitest-nhom.log` |
+| `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 loi | — |
+| chay LAI 3 tep P03 (T05/T06/T32 + su kien) | 0 | 21 + 6 + 10 PASS — bang chung P03 cap nhat theo fingerprint MOI | `p04-vitest-t05-t06.log`, `p04-vitest-t32.log`, `p04-vitest-su-kien.log` |
+
+Luu y da ghi trong `evidence/p04-tom-tat-bang-chung.md`: sua code P04 lam **fingerprint doi**, nen bang chung P03 (T05/T06/T32/R09) da duoc chay lai va cap nhat; giu log cu se la "bang chung khac phien ban code".
+
+### Con lai cua P04 (ly do giu IN_PROGRESS)
+
+1. **Module chong lap** theo 02 §4.2: "due hop le khong bi 30 ngay chan"; cung `content_group` trong ngay bi chan tru `repair_retry`; toi da 6 cau/luot; moi family 1 cau thuong, repair toi da 2 cau khi >=2 nhiem vu hoac >=300 giay; family vua lam nghi toi thieu 1 ngay VN voi ngoai le co `repeat_reason`.
+2. **Family spacing + ngoai le repair co ly do**; thieu nguon thi giam luot (khong noi long bao ve).
+3. **Noi `khoaTriNho` vao kenh that**: can `content_group` tu kho — hien `docSuKienDoc` chua lay truong nay, nen tren duong that moi `qid` van mot khoa (tier ham thuan da dung).
+4. T17/T29 (phan thuong) thuoc P07; T07 thuoc P05.
+
+Trang thai that sau luot nay: phases PASS **2/12** (P02, P03) · requirements PASS **2/42** (R05, R09) · tests PASS **9/50** (T01 T02 T03 T05 T06 T11 T32 T33 T34) · them T04/T41 = IN_PROGRESS.
+
 - Migration `migration-2309-cnh1-su-kien-chuan.sql` **CHUA ap** len D1 that; co `cau_hinh.nang_luc_v1` **MAC DINH TAT**; **chua deploy** (khong nhan DEPLOYMENT_VERIFIED).
 
 ### Buoc tiep theo chinh xac
