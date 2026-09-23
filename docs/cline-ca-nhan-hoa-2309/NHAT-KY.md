@@ -217,3 +217,11 @@ Them 4 ca test chay readScope THAT (ham route game goi) tren D1 that: co TAT thi
 - Bang quyen_hoc_sinh (migration-2309-cnh1-quyen-hoc-sinh.sql) + choPhepToanChuongTrinh/coQuyen/capQuyen/thuHoiQuyen/quyenMayChuBat + baoThieuNhan.
 - luyen-de.ts: cong luyen de toan chuong trinh doi QUYEN MAY CHU khi co quyen_toan_chuong_trinh BAT; cu TAT thi giu cong cu (khuyen nghi: daHocXong do may em khai KHONG con gia tri khi BAT).
 - Bang chung: 32/32 test pham vi xanh tren D1 that (them 4 ca quyen + bao thieu nhan). Log p02f-vitest-quyen.log.
+
+### P02 chot - kiem full suite sau khi noi het
+
+Ket qua full suite 727 file: 82 do / 691 xanh / 1 bo qua - TONG SO DO DUNG BANG NEN P00 (82/35 file). Tap hop lech nhau o HAI test UI DAO DONG: escort-context-menu.test.tsx (do o luot nay) thay cho bang-tin-san-chong-chu-trinh-duyet-2109 (xanh o luot nay).
+
+Da kiem: escort-context-menu chay rieng 3 lan deu PASS 1/1 => la test dao dong (render bat dong bo), KHONG phai hoi quy cua thay doi P02. Ghi lai de nguoi nghiem thu khong hieu nham.
+
+Trang thai chot luot: P02 PASS, R05 PASS, T01/T02/T03/T11 PASS (32 test pham vi tren D1 that, gom 4 ca end-to-end qua readScope).
