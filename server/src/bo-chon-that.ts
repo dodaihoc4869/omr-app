@@ -14,6 +14,7 @@ import {
 import { uocLuongMotCau, type MauThoiGian } from './uoc-luong-thoi-gian'
 import { docNangLucEm } from './nang-luc-d1'
 import { docDaLamHomNay } from './chong-lap'
+import { docCho } from './giu-cho'
 import { mucTuChu } from '../../src/lib/btvn-nang-do'
 
 /** Câu ứng viên ở dạng bộ chọn thật dùng (khớp phần cần của `CauPool` trong `game-v2-bank`). */
@@ -80,15 +81,22 @@ export function mucDangLuyen(c: CauUngVien, mucTheoKyNang: ReadonlyMap<string, n
  */
 export async function locTheoLuatLap(
   env: Env, sbd: string, ngay: string, ds: readonly CauUngVien[], tranCau?: number,
+  dangGiu?: ReadonlySet<string>,
 ): Promise<{ giu: Set<string>; loai: Map<string, string> }> {
   const daLam = (await docDaLamHomNay(env, [sbd], ngay)).get(sbd) ?? new Set<string>()
   const loai = new Map<string, string>()
   const giu = new Set<string>()
-  // Ứng viên đã trả lời hôm nay (theo content_group) bị chặn — TRỪ khi có `repair_retry` do máy chủ tạo (rỗng ở đây).
+  // BƯỚC 5 của §7.1 (GIỮ CHỖ ĐANG HIỆU LỰC + lượt làm hôm nay) — chạy TRƯỚC khi chấm điểm, không phải sau.
   for (const c of ds) {
-    if (c.group && daLam.has(c.group)) { loai.set(c.qid, 'DA_LAM_HOM_NAY'); continue }
+    if (dangGiu?.has(c.qid)) { loai.set(c.qid, 'RESERVATION_CONFLICT'); continue }
+    // Ứng viên đã trả lời hôm nay (theo content_group) bị chặn — TRỪ khi có `repair_retry` do máy chủ tạo (rỗng ở đây).
+    if (c.group && daLam.has(c.group)) { loai.set(c.qid, 'REPEAT_LIMIT'); continue }
     giu.add(c.qid)
   }
+  // GHI RÕ PHẦN CHƯA ÁP ĐƯỢC: luật family của 02 §4.2.6–4.2.7 (mỗi family 1 câu thường, chưa gán family
+  // tối đa 1 câu, nghỉ 1 ngày VN, 4 ngoại lệ có `repeat_reason`) **KHÔNG áp** ở đây vì KHO THẬT CHƯA GẮN
+  // NHÃN FAMILY (P02 ghi nhận; thầy nhận danh sách thiếu qua `baoThieuNhan`) — áp nguyên văn sẽ hạ mọi lượt
+  // xuống 1 câu. Phần đó chờ dữ liệu nhãn; KHÔNG bịa family để lách.
   // Trần số câu của lượt: giữ đúng thứ tự nơi gọi đưa vào (bộ chọn đã sắp ở bước sau).
   const tran = Number.isFinite(tranCau) ? Math.max(0, Math.floor(tranCau as number)) : ds.length
   let dem = 0
@@ -116,6 +124,102 @@ export async function mucTheoKyNangCuaEm(env: Env, sbd: string): Promise<Map<str
   return ra
 }
 
+
+/** Số câu mặc định của một lượt khi nơi gọi không truyền trần (§7.2: gói ≤6 câu, có thể ít hơn). */
+export const SO_CAU_LUOT_MAC_DINH = 6
+
+export interface ChonCauInput {
+  sbd: string
+  ngay: string
+  nowMs: number
+  mastery: readonly { key: string; due: number }[]
+  /** Ngân sách còn lại của ngày (giây). Vắng = KHÔNG cắt theo ngân sách (hành vi cũ). */
+  conLaiGiay?: number | null
+  tranCau?: number
+  mucTheoKyNang?: ReadonlyMap<string, number>
+  hoSoCau?: ReadonlyMap<string, HangHoSoCau>
+  /** Probe hợp lệ do server cấp: cho phép khó hơn mức tối đa +1 và không quá 2 (§7.1). */
+  probeChoPhep?: boolean
+  mauTocDo?: readonly MauThoiGian[]
+}
+
+export interface ChonCauKetQua {
+  /** Câu ĐƯỢC CHỌN, đã sắp theo §7.2 và vừa ngân sách. */
+  chon: { qid: string; version: string; part: 'I' | 'II' | 'III'; diem: KetQuaDiem; solveSeconds: number; taskSeconds: number }[]
+  /** Đếm câu bị loại theo TỪNG nguyên nhân §7.1 (cho giáo viên; KHÔNG lộ qid đề bảo vệ). */
+  lyDo: Record<string, number>
+  /** Số câu hoãn vì hết ngân sách ngày. */
+  deferredCount: number
+  /** Tổng giây của các câu bị hoãn (thầy thấy mức vượt tải). */
+  overBudgetSeconds: number
+  /** Chỗ đang bị giữ (hiệu lực) trong ngày của em. */
+  dangGiu: Map<string, { taskId: string; leaseUntil: number }>
+}
+
+/**
+ * BỘ CHỌN CHUNG §7.1 cho MỘT lượt/nhiệm vụ: chạy ĐÚNG thứ tự hard filter của 02 §7.1
+ * (giữ chỗ hiệu lực + lượt làm hôm nay → trần độ khó theo mức đang luyện → điểm §7.2 →
+ * fit ngân sách greedy) rồi trả lý do bị loại theo nguyên nhân.
+ *
+ * KHÔNG bước nào nới quyền/nới mức để có thêm câu: hết ứng viên ⇒ lượt NGẮN (có thể 0 câu).
+ * Bước cuối `atomic reserve` do nơi gọi làm sau khi đã có danh sách (xem `giuCho`).
+ */
+export async function chonCauChoLuot(env: Env, ds: readonly CauUngVien[], inp: ChonCauInput): Promise<ChonCauKetQua> {
+  const lyDo: Record<string, number> = {}
+  const dem = (k: string) => { lyDo[k] = (lyDo[k] ?? 0) + 1 }
+  const dangGiu = await docCho(env, inp.sbd, inp.ngay)
+  const conHieuLuc = new Set([...dangGiu].filter(([, v]) => v.leaseUntil >= inp.nowMs).map(([k]) => k))
+
+  // §7.1 bước 5–7: giữ chỗ hiệu lực + lượt làm hôm nay + trần câu (family chờ nhãn — xem `locTheoLuatLap`).
+  const { giu, loai } = await locTheoLuatLap(env, inp.sbd, inp.ngay, ds, inp.tranCau ?? SO_CAU_LUOT_MAC_DINH, conHieuLuc)
+  for (const r of loai.values()) dem(r)
+  const qua1 = ds.filter((c) => giu.has(c.qid))
+
+  // §7.1 bước 6: trần độ khó theo MỨC ĐANG LUYỆN (min của các skill); probe hợp lệ = +1, không quá 2.
+  const muc = inp.mucTheoKyNang ?? await mucTheoKyNangCuaEm(env, inp.sbd)
+  const hoSoCau = inp.hoSoCau ?? await docHoSoCau(env, inp.sbd, qua1.map((c) => c.qid))
+  const qua2: CauUngVien[] = []
+  for (const c of qua1) {
+    const working = mucDangLuyen(c, muc)
+    const difficulty = typeof c.mucDo === 'string' ? mucTuChu(c.mucDo) : 0
+    const tran = inp.probeChoPhep ? Math.min(2, working + 1) : working
+    if (difficulty > tran) { dem('DIFFICULTY_LIMIT'); continue }
+    qua2.push(c)
+  }
+
+  // §7.2 bước 8–9: điểm tất định rồi chọn GREEDY từng câu vừa ngân sách còn lại; tính lại coverage/fatigue
+  // sau MỖI lựa chọn (đúng câu "kiểm lại coverage/family sau mỗi lựa chọn").
+  const conLaiCoTran = inp.conLaiGiay !== undefined && inp.conLaiGiay !== null
+  let conLai = conLaiCoTran ? Math.max(0, Math.floor(inp.conLaiGiay as number)) : 0
+  const chon: ChonCauKetQua['chon'] = []
+  const daChonSkill = new Map<string, readonly string[]>()
+  let ung = [...qua2]
+  while (ung.length) {
+    const xep = await xepLuotTheoChinhSach(ung, {
+      sbd: inp.sbd, ngay: inp.ngay, mastery: inp.mastery, mucTheoKyNang: muc, hoSoCau, nowMs: inp.nowMs,
+      mauTocDo: inp.mauTocDo,
+      daChon: chon.map((c) => ({ qid: c.qid, part: c.part, solveSeconds: c.solveSeconds, skillIds: daChonSkill.get(c.qid) ?? [] })),
+    })
+    const vua = xep.xep.find((v) => !conLaiCoTran || v.taskSeconds <= conLai)
+    if (!vua) break
+    const goc = ung.find((u) => u.qid === vua.qid)!
+    chon.push({ qid: vua.qid, version: goc.version, part: goc.part, diem: vua.diem, solveSeconds: vua.solveSeconds, taskSeconds: vua.taskSeconds })
+    daChonSkill.set(vua.qid, goc.skillIds)
+    if (conLaiCoTran) conLai -= vua.taskSeconds
+    ung = ung.filter((u) => u.qid !== vua.qid)
+  }
+  let deferredCount = 0
+  let overBudgetSeconds = 0
+  if (ung.length && conLaiCoTran) {
+    const cuoi = await xepLuotTheoChinhSach(ung, {
+      sbd: inp.sbd, ngay: inp.ngay, mastery: inp.mastery, mucTheoKyNang: muc, hoSoCau, nowMs: inp.nowMs, mauTocDo: inp.mauTocDo,
+    })
+    deferredCount = ung.length
+    overBudgetSeconds = cuoi.xep.reduce((s, v) => s + v.taskSeconds, 0)
+    dem('BUDGET_EXHAUSTED')
+  }
+  return { chon, lyDo, deferredCount, overBudgetSeconds, dangGiu }
+}
 
 export interface XepLuotInput {
   sbd: string

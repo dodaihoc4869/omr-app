@@ -11,6 +11,7 @@ import { PHIEN_BAN_KE_HOACH } from '../server/src/ho-so-cau-hinh'
 import { docHoSoCau, mucTheoKyNangCuaEm, xepLuotTheoChinhSach } from '../server/src/bo-chon-that'
 import { giuCho, nhaCho, docMotCho } from '../server/src/giu-cho'
 import { masteryTheoHoSo } from '../server/src/game-v2-ho-so'
+import { POLICY_VERSION } from '../server/src/nang-luc'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 import { daHocDang } from './_pham-vi-ca-nhan'
@@ -39,6 +40,13 @@ function dung(o: { phutNgay?: number; giayDaDung?: number } = {}) {
     pet: 'lua_phuong', choice: false, legacy: null, cap: 5, exp: 0, wallet: 0, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z',
   }), 'x')
   daHocDang(d, 'S1', 'A.1')
+  // MỨC ĐANG LUYỆN (bản dựng P03 `skill_snapshot`) = 2 cho skill K1: đây là dữ liệu mà TRẦN ĐỘ KHÓ §7.1 đọc.
+  // Không có dòng này thì mức = 0 (chưa có hồ sơ) ⇒ câu mức 'hieu' (difficulty 1) bị `DIFFICULTY_LIMIT` chặn
+  // — đúng luật T10 nhưng làm nhiễu phép đo NGÂN SÁCH của T09.
+  d.sql.prepare(
+    'INSERT OR REPLACE INTO skill_snapshot(sbd,skill_id,policy_version,working_level,validated_level,confidence,family_count,day_count,last_validated_at,can_kiem_lai,episode_state,episode_json,recent5_json,evidence_json,nhat_ky_json,cursor_received_at,cursor_event_id,revision,cap_nhat_luc)'
+    + ' VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+  ).run('S1', 'K1', POLICY_VERSION, 2, 2, 1, 0, 0, null, 0, null, 'null', '[]', '[]', '[]', 0, '', 1, 'x')
   d.sql.prepare("INSERT INTO ke_hoach_ngay(khoa,sbd,ngay,phien_ban,seed,ngan_sach_json,viec_json,canh_bao_json,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?)")
     .run(`S1|${NGAY}`, 'S1', NGAY, 2, 1, JSON.stringify({ mucTieuCau: 6, toiThieuCau: 4, phutNgay: o.phutNgay ?? 10, vanTocGiay: 90 }), '[]', '[]', 'x')
   return d

@@ -3,8 +3,9 @@
 // trạng thái đợt dạy lại, lấy mức đang luyện từ bản dựng P03, rồi SẮP theo điểm — không phải mọi câu cùng điểm.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  docHoSoCau, locTheoLuatLap, mucDangLuyen, mucTheoKyNangCuaEm, trangThaiDotTuHoSoCau, xepLuotTheoChinhSach, type CauUngVien,
+  chonCauChoLuot, docHoSoCau, locTheoLuatLap, mucDangLuyen, mucTheoKyNangCuaEm, trangThaiDotTuHoSoCau, xepLuotTheoChinhSach, type CauUngVien,
 } from '../server/src/bo-chon-that'
+import { giuCho } from '../server/src/giu-cho'
 import { taoD1That } from './_d1-that'
 import { dungLaiNangLuc, xoaBietCotChuanNL, xoaDemNangLuc } from '../server/src/nang-luc-d1'
 import { ghiSuKien, xoaBietCotChuan } from '../server/src/su-kien-hoc'
@@ -112,7 +113,8 @@ describe('P04/P05 — điểm §7.2 chạy trên DỮ LIỆU THẬT (không còn
     await ghiSuKien(d.env, [{ nguon: 'btvn', maNguon: 'M', sbd: 'S1', qid: 'Q3', lan: 1, ketQua: 1, luc: `${NGAY}T03:00:00.000Z` }])
     const sau = await locTheoLuatLap(d.env, 'S1', NGAY, [cau('Q4', { group: 'g-Q3' }), cau('Q5')], 6)
     expect(sau.giu.has('Q4')).toBe(false)
-    expect(sau.loai.get('Q4')).toBe('DA_LAM_HOM_NAY')
+    // Tên lý do theo §7.2: `REPEAT_LIMIT` (bộ lọc lặp), không dùng tên nội bộ cũ.
+    expect(sau.loai.get('Q4')).toBe('REPEAT_LIMIT')
     expect(sau.giu.has('Q5')).toBe(true)
   })
 
@@ -131,5 +133,70 @@ describe('P04/P05 — điểm §7.2 chạy trên DỮ LIỆU THẬT (không còn
     const r = await locTheoLuatLap(d.env, 'S1', NGAY, ds, 6)
     expect([...r.giu]).toHaveLength(6) // 6 câu "chưa gán family" VẪN qua được (đây là phần chờ dữ liệu nhãn)
     expect(r.loai.size).toBe(0)
+  })
+})
+
+describe('P05 §7.1/§7.2 trên ĐƯỜNG THẬT (T08 · T10 · T12/T13)', () => {
+  const muc2 = new Map([['K1', 2]])
+
+  it('T08: ngân sách 600 giây, mỗi câu 300 giây (solve 240 + feedback 60) ⇒ ĐÚNG 2 câu, tổng ≤ 600, KHÔNG sàn 4/8', async () => {
+    const d = dung()
+    // Phần III mức Vận dụng: base 240 ⇒ solve 240 + feedback 60 = 300 giây/câu (đúng số liệu T08).
+    const ds = Array.from({ length: 8 }, (_, i) => cau(`V${i}`, { part: 'III', mucDo: 'van_dung' }))
+    const kq = await chonCauChoLuot(d.env, ds, {
+      sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: muc2, conLaiGiay: 600,
+    })
+    expect(kq.chon).toHaveLength(2)
+    expect(kq.chon.every((c) => c.taskSeconds === 300)).toBe(true)
+    expect(kq.chon.reduce((s, c) => s + c.taskSeconds, 0)).toBe(600)
+    // Gói ≤6 câu (§7.2): 8 ứng viên ⇒ 2 câu bị loại vì TRẦN LƯỢT trước khi tính ngân sách.
+    expect(kq.lyDo.TRAN_LUOT).toBe(2)
+    // Còn 6 câu mà ngân sách chỉ chứa 2 ⇒ 4 câu bị hoãn, 1200 giây vượt tải được báo cho thầy.
+    expect(kq.deferredCount).toBe(4)
+    expect(kq.overBudgetSeconds).toBe(1200)
+    expect(kq.lyDo.BUDGET_EXHAUSTED).toBe(1)
+  })
+
+  it('T08: ngân sách 599 giây ⇒ chỉ 1 câu; hoãn 1 câu với `over_budget_seconds` đúng (thầy thấy mức vượt tải)', async () => {
+    const d = dung()
+    const ds = [cau('V1', { part: 'III', mucDo: 'van_dung' }), cau('V2', { part: 'III', mucDo: 'van_dung' })]
+    const kq = await chonCauChoLuot(d.env, ds, {
+      sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: muc2, conLaiGiay: 599,
+    })
+    expect(kq.chon.map((c) => c.qid)).toHaveLength(1)
+    expect(kq.deferredCount).toBe(1)
+    expect(kq.overBudgetSeconds).toBe(300)
+  })
+
+  it('T10: mức đang luyện 0 mà chỉ có câu difficulty 1, KHÔNG probe ⇒ 0 câu + lý do DIFFICULTY_LIMIT (không rút câu 1 để bù)', async () => {
+    const d = dung()
+    const ds = [cau('H1', { mucDo: 'hieu' })]
+    const kq = await chonCauChoLuot(d.env, ds, {
+      sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600,
+    })
+    expect(kq.chon).toEqual([])
+    expect(kq.lyDo.DIFFICULTY_LIMIT).toBe(1)
+  })
+
+  it('T10: probe HỢP LỆ mở đúng +1 (không quá 2); câu khó hơn vẫn bị chặn', async () => {
+    const d = dung()
+    const ds = [cau('H1', { mucDo: 'hieu' }), cau('V1', { mucDo: 'van_dung' })]
+    const co = await chonCauChoLuot(d.env, ds, {
+      sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600, probeChoPhep: true,
+    })
+    expect(co.chon.map((c) => c.qid)).toEqual(['H1']) // +1 = difficulty 1; difficulty 2 vượt trần
+    expect(co.lyDo.DIFFICULTY_LIMIT).toBe(1)
+  })
+
+  it('T12/T13: câu ĐANG BỊ GIỮ CHỖ (còn hạn) bị loại TRƯỚC khi chấm điểm; hết hạn thì không chặn', async () => {
+    const d = dung()
+    const ds = [cau('B1', { mucDo: 'biet' }), cau('B2', { mucDo: 'biet' })]
+    await giuCho(d.env, { sbd: 'S1', ngay: NGAY, taskId: 'T-KHAC', qids: ['B1'], nowMs: T0 })
+    const kq = await chonCauChoLuot(d.env, ds, { sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 })
+    expect(kq.chon.map((c) => c.qid)).toEqual(['B2'])
+    expect(kq.lyDo.RESERVATION_CONFLICT).toBe(1)
+    // Hết hạn giữ chỗ ⇒ câu trở lại ứng viên (vẫn KHÔNG phải "chiếm" của ai: giữ chỗ mới do bước atomic reserve làm).
+    const sau = await chonCauChoLuot(d.env, ds, { sbd: 'S1', ngay: NGAY, nowMs: T0 + 901_000, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 })
+    expect(sau.chon.map((c) => c.qid).sort()).toEqual(['B1', 'B2'])
   })
 })
