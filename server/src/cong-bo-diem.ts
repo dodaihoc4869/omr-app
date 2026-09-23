@@ -8,10 +8,19 @@ import type { Env } from './kieu'
 
 export type CheDoCongBo = 'khong' | 'ngay' | 'ca_lop_xong'
 
+/**
+ * CA ĐÃ XONG: thầy đã ĐÓNG ca, HOẶC cả lớp đã nộp — có ít nhất một lượt vào thi và số lượt `da_nop` ≥ số lượt.
+ * Ca chưa ai vào KHÔNG tính là xong. Đây là MỘT định nghĩa dùng chung: luật công bố (`laSanSangCongBo`) và
+ * cổng an toàn của đường CHẤM LẠI CA CŨ (`server/src/cham-lai-ca.ts`) cùng đọc hàm này — hai chỗ tự đếm
+ * là hai chỗ để lệch nhau.
+ */
+export function caDaXong(trangThaiCa: string, daVao: number, daNop: number): boolean {
+  return trangThaiCa === 'dong' || (daVao > 0 && daNop >= daVao)
+}
+
 /** Luật: ca đã được phép hiện điểm / đáp án cho em chưa. `daVao` = số lượt của ca, `daNop` = số lượt đã nộp (`da_nop`). */
 export function laSanSangCongBo(congBo: string, trangThaiCa: string, daVao: number, daNop: number): boolean {
-  const caXong = trangThaiCa === 'dong' || (daVao > 0 && daNop >= daVao)
-  return congBo === 'ngay' || (congBo === 'ca_lop_xong' && caXong)
+  return congBo === 'ngay' || (congBo === 'ca_lop_xong' && caDaXong(trangThaiCa, daVao, daNop))
 }
 
 /** Chuẩn hoá `ca.cong_bo` (thiếu / lạ ⇒ `khong`). */

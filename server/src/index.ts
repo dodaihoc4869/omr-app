@@ -40,6 +40,7 @@ import {homNayThay} from './hom-nay-thay'
 import {gvKeHoachEm} from './gv-ke-hoach-em'
 import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
 import {doiTenHocSinh} from './doi-ten-hoc-sinh'
+import {chuanBiChamLaiCa} from './cham-lai-ca'
 import { mom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
@@ -2487,6 +2488,52 @@ async function chamDiem(env: Env, b: Record<string, unknown>): Promise<Response>
   return ra({ ok: true, soBai: rieng.length, soCau: cau.length })
 }
 
+/** CHẤM LẠI MỘT CA CŨ (thầy chốt 23/09/2026 — việc còn lại của MỤC 3).
+ *
+ * Luật chấm Phần III đổi sang `so_hoc` (`src/lib/cham-so.ts`) nhưng điểm của ca đã nộp TRƯỚC đó còn
+ * nguyên con số cũ (chấm sai). Lệnh này chấm lại bằng ĐÚNG luật hiện hành rồi GHI LẠI D1 qua chính
+ * `chamDiem` — MỘT đường ghi duy nhất cho ca thi — và trả bảng đối chiếu từng em cũ → mới.
+ *
+ * LỆNH CỦA THẦY (nằm SAU cổng `laThay`): chấm lại ĐỔI ĐIỂM của em thật, học sinh không được gọi tới.
+ * Chỉ chạy trên ca ĐÃ XONG (`caDaXong`): ca đang mở thì chưa gọi là "ca cũ". */
+async function chamLaiCaRoute(env: Env, b: Record<string, unknown>): Promise<Response> {
+  const maCa = String(b.maCa ?? '').trim()
+  if (!maCa) return ra({ ok: false, error: 'Thiếu mã ca' })
+  const cb = await chuanBiChamLaiCa(env, maCa)
+  if (cb.ok !== true) return ra(cb)
+  const baoCao = {
+    maCa: cb.maCa,
+    tenCa: cb.tenCa,
+    soCau: cb.soCau,
+    soEmDaVao: cb.soEmDaVao,
+    soEmDaNop: cb.soEmDaNop,
+    em: cb.em,
+    soDoi: cb.soDoi,
+    tuChoi: cb.tuChoi,
+  }
+  // Không em nào nộp (hoặc chấm lỗi hết) ⇒ không ghi gì; vẫn trả bảng đối chiếu cho thầy thấy.
+  if (cb.bai.length === 0) return ra({ ok: true, ...baoCao, soGhi: 0 })
+  const ghi = await chamDiem(env, { maCa, bai: cb.bai })
+  const j = (await ghi.json()) as Record<string, unknown>
+  if (j?.ok === false) return ra({ ok: false, error: String(j.error ?? 'Không ghi được điểm chấm lại'), ...baoCao })
+
+  // DỌN `ban_do_sai` CỦA CÂU NAY ĐÃ ĐÚNG. `chamDiem` chỉ THÊM dòng cho câu SAI — chấm lại một câu
+  // từ sai thành đúng mà không dọn thì bản đồ câu sai còn nguyên một câu em đã làm đúng, và em bị
+  // hỏi lại đúng câu ấy. Xoá theo ĐÚNG (ca, sbd, qid) của lượt vừa chấm lại, không đụng ca khác.
+  const don: D1PreparedStatement[] = []
+  for (const b of cb.bai) {
+    const dung = [...new Set(b.cau.filter((c) => c.dungSai === true && c.qid).map((c) => c.qid))]
+    if (dung.length === 0) continue
+    don.push(
+      env.DB.prepare('DELETE FROM ban_do_sai WHERE ma_ca = ? AND sbd = ? AND qid IN (SELECT value FROM json_each(?))')
+        .bind(maCa, b.sbd, JSON.stringify(dung)),
+    )
+  }
+  for (let i = 0; i < don.length; i += 100) await env.DB.batch(don.slice(i, i + 100))
+
+  return ra({ ok: true, ...baoCao, soGhi: cb.bai.length, soCauGhi: Number(j?.soCau) || 0, soDonCauSai: don.length })
+}
+
 /** BẢNG MẠNH–YẾU CỦA MỘT EM — nguồn của rút câu sai và gọi lên bảng. */
 async function tienDoEm(env: Env, sbd: string): Promise<Response> {
   if (!sbd) return ra({ ok: false, error: 'Thiếu số báo danh' })
@@ -3272,6 +3319,8 @@ const boXuLy = {
       if (p === '/ca/nap-day-du') return napDayDuCa(env, b)
       if (p === '/doi-chieu') return doiChieuSo(env)
       if (p === '/cham-diem') return chamDiem(env, b)
+      // CHẤM LẠI MỘT CA CŨ bằng luật chấm hiện hành rồi ghi lại D1 (thầy chốt 23/09 — việc còn lại của MỤC 3).
+      if (p === '/ca/cham-lai') return chamLaiCaRoute(env, b)
       if (p === '/em/tien-do') return tienDoEm(env, String(b.sbd ?? ''))
       if (p === '/em/cau-sai') return cauSaiCuaEm(env, b)
       if (p === '/len-bang') return ghiLenBangMoi(env, b)
