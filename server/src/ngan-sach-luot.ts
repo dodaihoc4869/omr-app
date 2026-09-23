@@ -10,6 +10,7 @@
 // Cờ `cau_hinh.ngan_sach_luot` MẶC ĐỊNH TẮT: bật mới cắt lượt theo ngân sách (giữ nguyên hành vi đang chạy).
 import type { Env } from './kieu'
 import type { MauThoiGian } from './uoc-luong-thoi-gian'
+import { mucTuChu } from '../../src/lib/btvn-nang-do'
 
 /** Khoá cờ trong `cau_hinh`; `'bat'` mới cắt lượt theo ngân sách ngày. Chỉ ĐỌC. */
 export const KHOA_BAT_NGAN_SACH_LUOT = 'ngan_sach_luot'
@@ -36,9 +37,54 @@ export interface NganSachConLai {
   /** Đã dùng hôm nay theo sổ (`su_kien_hoc.giay`, tổng — có thể thấp hơn thực tế nếu thiếu số đo). */
   daDungGiay: number
   conLaiGiay: number
-  /** Mẫu tốc độ gửi cho bộ ước lượng. Hiện để RỖNG ⇒ hệ số 1 (đúng luật "n<5 ⇒ factor=1"), chưa ghép mẫu theo part/mức. */
+  /** Mẫu tốc độ THẬT theo part × mức (xem `docMauTocDo`). Rỗng ⇒ bộ ước lượng dùng hệ số 1 (đúng "n<5 ⇒ factor=1"). */
   mau: MauThoiGian[]
   ghiChu: string
+}
+
+/** Số ngày nhìn lại để lấy mẫu tốc độ (02 §5.1: 20 lần gần nhất trong 30 ngày). */
+export const NGAY_MAU_TOC_DO = 30
+/** Trần dòng thô đọc từ sổ cho mẫu tốc độ (bộ ước lượng chỉ lấy 20 mới nhất mỗi part × mức). */
+export const TRAN_DONG_MAU = 400
+
+/**
+ * MẪU TỐC ĐỘ THẬT theo part × mức (02 §5.1). Chỉ nhận mẫu ĐÚNG điều kiện:
+ *   · `giay` có số, 10–900 giây (lọc tiếp ở `mauHopLe`), trong `NGAY_MAU_TOC_DO` ngày;
+ *   · **ĐỘC LẬP**: `assistance = 'none'` (dòng cũ không có dấu này ⇒ KHÔNG coi là độc lập, không bịa);
+ *   · **ĐÃ CÔNG BỐ**: `visibility` không phải `embargoed` (không dùng điểm đang che làm số đo);
+ *   · `part` lấy từ CHÍNH kho câu đã phục vụ (`game_v2_question.json.phan`), mức lấy `muc_do` của sổ (thiếu ⇒ từ kho).
+ * Lỗi đọc ⇒ trả rỗng (bộ ước lượng lùi về hệ số 1 — KHÔNG bịa số đo).
+ */
+export async function docMauTocDo(env: Env, sbd: string, ngay: string, soNgay = NGAY_MAU_TOC_DO): Promise<MauThoiGian[]> {
+  const tu = new Date(Date.parse(`${ngay}T00:00:00Z`) - soNgay * 86_400_000).toISOString().slice(0, 10)
+  try {
+    const r = await env.DB.prepare(
+      `SELECT s.giay, s.luc, s.muc_do, q.json FROM su_kien_hoc s
+         JOIN game_v2_question q ON q.qid = s.qid
+         JOIN de_kho d ON d.ma_de = q.ma_de
+         JOIN game_v2_index gi ON gi.ma_de = d.ma_de AND gi.source_version = d.cap_nhat_luc
+        WHERE s.sbd = ? AND s.ngay_vn >= ? AND s.ngay_vn <= ? AND s.giay IS NOT NULL
+          AND COALESCE(s.assistance, '') = 'none' AND COALESCE(s.visibility, '') <> 'embargoed'
+        ORDER BY s.luc DESC LIMIT ${TRAN_DONG_MAU}`,
+    ).bind(sbd, tu, ngay).all<{ giay: number; luc: string; muc_do: string | null; json: string }>()
+    const ra: MauThoiGian[] = []
+    for (const x of r.results ?? []) {
+      let phan = '', muc = ''
+      try {
+        const j = JSON.parse(String(x.json ?? '{}')) as { phan?: unknown; mucDo?: unknown }
+        phan = typeof j.phan === 'string' ? j.phan : ''
+        muc = typeof j.mucDo === 'string' ? j.mucDo : ''
+      } catch { continue }
+      const part = phan === 'II' ? 'II' : phan === 'III' ? 'III' : phan === 'I' ? 'I' : null
+      if (!part) continue
+      const mucChu = String(x.muc_do ?? '').trim() || muc
+      const difficulty = mucTuChu(mucChu)
+      ra.push({ part, difficulty, activeSeconds: Number(x.giay), docLap: true, daNop: true, lucMs: Date.parse(String(x.luc)) })
+    }
+    return ra
+  } catch {
+    return []
+  }
 }
 
 /**
@@ -58,14 +104,16 @@ export async function docNganSachConLai(env: Env, sbd: string, ngay: string): Pr
     return null
   }
   let daDungGiay = 0
-  let ghiChu = ''
+  let ghiChuDocSoDo = ''
   try {
     const r = await env.DB.prepare('SELECT COALESCE(SUM(giay), 0) AS g FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND giay IS NOT NULL').bind(sbd, ngay).first<{ g: number }>()
     daDungGiay = Math.max(0, Number(r?.g ?? 0) || 0)
   } catch {
-    ghiChu = 'chưa đọc được số giây đã dùng hôm nay nên tính là 0'
+    ghiChuDocSoDo = 'chưa đọc được số giây đã dùng hôm nay nên tính là 0'
   }
+  const mau = await docMauTocDo(env, sbd, ngay)
   return {
-    nganSachGiay, daDungGiay, conLaiGiay: Math.max(0, nganSachGiay - daDungGiay), mau: [], ghiChu,
+    nganSachGiay, daDungGiay, conLaiGiay: Math.max(0, nganSachGiay - daDungGiay), mau,
+    ghiChu: ghiChuDocSoDo || (mau.length ? '' : 'chưa có mẫu tốc độ độc lập trong 30 ngày ⇒ bộ ước lượng dùng hệ số 1'),
   }
 }
