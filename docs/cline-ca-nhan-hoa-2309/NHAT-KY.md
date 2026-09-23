@@ -342,6 +342,32 @@ Trang thai that: phases PASS **2/12** (P02, P03) · IN_PROGRESS **P00, P01, P04,
 
 ### Vi sao GOI VAN IN_PROGRESS (khong to xanh)
 
+## P05 (LAT CAT 2) — NGAN SACH NGAY DA NOI VAO DUONG PHAT CAU THAT (T09)
+
+Ngay: 23/09/2026 (tiep lat cat 1). `sourceFingerprint`: `e0e863d22108e25901c73a5e04e5c2e7d3d0c9cfcaafe8d9fb88e34e2c7ac1b5`.
+
+### Da lam (day la lan dau tien NOI vao duong hoc that, khong con module roi)
+
+- `server/src/ngan-sach-luot.ts`: ngan sach ngay = `ke_hoach_ngay.ngan_sach_json.phutNgay` × 60, tru tong `su_kien_hoc.giay` da dung HOM NAY; co `cau_hinh.ngan_sach_luot` **MAC DINH TAT** (dem 30 giay trong isolate nhu cac co khac).
+- `server/src/game-v2.ts`: **CA HAI duong phat cau cua game** (duong moi `startLuotMoi` dang chay mac dinh + duong cu) deu cat luot theo phan CON LAI bang `uocLuongMotCau` + `xepVuaNganSach`; tra them `nganSach:{conLaiGiay,soCauBoQua}` va ly do `het_ngan_sach_ngay`.
+- **Chung minh END-TO-END qua Worker that** (`/game-v2/start`, D1 that): co TAT ⇒ 6 cau nhu cu, khong co truong `nganSach`; co BAT + ngan sach 600 giay, cau 135 giay ⇒ **dung 4 cau** (bo 2); da dung 500 giay ⇒ **0 cau** + `lyDo: het_ngan_sach_ngay`; chua co ke hoach ngay ⇒ khong bia ngan sach.
+
+### Bang chung
+
+| Lenh | Exit | Ket qua | Log |
+|---|---|---|---|
+| `vitest run tests/cnh-1-0-ngan-sach-luot-t09.test.ts` | 0 | **4 PASS** | `p05b-vitest-t09.log` |
+| nhom (cnh-1-0, game, tran-ngay, doan, ke-hoach, lich-on, ho-so, chong-lap) | 0 | 50 tep · **689 PASS / 0 do** | `p05b-vitest-nhom.log` |
+| `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 loi | — |
+| chay LAI T05/T06 + T32 theo fingerprint moi | 0 | 21 + 6 PASS | `p05b-vitest-t05-t06.log`, `p05b-vitest-t32.log` |
+
+### Vi sao P05 VAN IN_PROGRESS
+
+Con: pipeline hard filter + score tat dinh §7.2; giu cho bang SQL co uniqueness/CAS + race thua; mot plan/ngay + rubric dong bang + carry-over + assignment qua tai giu han goc; ghep mau toc do theo part/muc; va cho cac kenh khac (Mom/BTVN/on) dung chung ngan sach (P06). **T08/T09/T10/T13/T40 chua PASS.**
+
+Trang thai that: phases PASS **2/12** (P02, P03) · IN_PROGRESS **P00, P01, P04, P05** · requirements PASS **2/42** · tests PASS **9/50** (+ IN_PROGRESS: T04, T08, T09, T12, T19, T29, T41).
+
+
 - Module CHUA DUOC NOI VAO DUONG HOC NAO: theo `05-P05` muc 3, viec ghep pipeline hard-filter + family-spacing + ma ly do thieu thuoc **P05** (can `content_group`/`family` tu kho va danh sach task dang mo tu D1). API thuan + adapter da san sang nhung chua co noi goi ⇒ chuong trinh chua doi hanh vi that.
 - T41/T04 chua PASS; T07 (P05), T17/T29 (P07).
 - Chua ap migration len D1 that, co chua bat, chua deploy.
