@@ -1,0 +1,11 @@
+# CẤU HÌNH WRANGLER DÙNG RIÊNG CHO TEST RUNTIME (RV06) — KHÔNG phải cấu hình production.
+# Chỉ có MỘT binding D1 cục bộ (Miniflare/workerd) để chạy test trên RUNTIME D1 THẬT, dữ liệu TỔNG HỢP,
+# không deploy, không kết nối tài khoản Cloudflare, không dùng dữ liệu thật.
+name = "cnh1-d1-runtime-test"
+main = "tests/_d1-runtime-stub.ts"
+compatibility_date = "2026-08-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "cnh1-test"
+database_id = "cnh1-test-local"

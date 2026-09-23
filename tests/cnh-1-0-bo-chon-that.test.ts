@@ -135,6 +135,18 @@ describe('P04/P05 — điểm §7.2 chạy trên DỮ LIỆU THẬT (không còn
     expect(kq2.lyDo.TRAN_FAMILY).toBe(2)
   })
 
+  it('RV03b: kho ghi nhãn bằng `familyId` (không phải `family`) ⇒ lịch sử family VẪN được đọc và chặn đúng', async () => {
+    const d = dung()
+    // Kho dùng khoá `familyId`; câu Q9 khác content_group nhưng CÙNG family FX với câu đã làm hôm nay (Q3).
+    d.sql.prepare("INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('DE1','Q9','v1','g-Q9','A.1',?)")
+      .run(JSON.stringify({ qid: 'Q9', group: 'g-Q9', kienThuc: ['K1'], mucDo: 'biet', familyId: 'FX', version: 'v1' }))
+    d.sql.prepare("UPDATE game_v2_question SET json = json_set(json, '$.familyId', 'FX') WHERE qid = 'Q3'").run()
+    await ghiSuKien(d.env, [{ nguon: 'game', maNguon: 'S', sbd: 'S1', qid: 'Q3', lan: 1, ketQua: 1, luc: `${NGAY}T03:00:00.000Z` }])
+    const r = await locTheoLuatLap(d.env, 'S1', NGAY, [cau('Q9', { familyId: 'FX', group: 'g-Q9' })], 6, { nowMs: T0 })
+    expect(r.loai.get('Q9')).toBe('FAMILY_VUA_LAM') // đọc được lịch sử family từ khoá `familyId`
+    expect(r.duocPhep).toEqual([])
+  })
+
   it('RV03: LỊCH SỬ FAMILY THẬT từ sổ — family vừa làm HÔM NAY bị chặn (trừ khi đến hạn/repair)', async () => {
     const d = dung()
     // Q3 có nhãn family FX; em đã có kết quả HÔM NAY của chính Q3 ⇒ family vừa làm hôm nay.

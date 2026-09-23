@@ -36,6 +36,13 @@ export interface CauUngVien {
 }
 
 /**
+ * BIỂU THỨC SQL ĐỌC NHÃN FAMILY — DÙNG CHUNG cho mọi truy vấn (kho ghi `family` HOẶC `familyId`).
+ * Phải khớp ĐÚNG thứ tự ưu tiên của `familyTuNhan` (JS): `family` trước, thiếu thì `familyId`; rỗng coi như thiếu.
+ * Dùng alias `q` cho bảng câu (`game_v2_question`).
+ */
+export const SQL_NHAN_FAMILY = "COALESCE(NULLIF(json_extract(q.json, '$.family'), ''), NULLIF(json_extract(q.json, '$.familyId'), ''))"
+
+/**
  * NHÃN FAMILY của một câu, đọc từ CHÍNH bản ghi kho (`family` hoặc `familyId`) — KHO THẬT hiện CHƯA có nhãn
  * (P02) nên trả `null` ⇒ câu đi trần "chưa gán family" của 02 §4.2.6. Khi thầy gắn nhãn vào kho thì pipeline
  * dùng ngay, KHÔNG cần sửa thêm. KHÔNG suy nhãn từ qid/group (không bịa family).
@@ -127,11 +134,12 @@ export async function docNguCanhChongLap(
   if (families.length) {
     try {
       // MỘT truy vấn cho cả tập family của ứng viên; nguồn: SỔ (`su_kien_hoc`) ⋈ kho (nhãn family trong JSON).
+      // NHÃN đọc bằng CHÍNH biểu thức dùng chung (`SQL_NHAN_FAMILY`: `family` rồi `familyId`) để kho ghi kiểu nào cũng khớp.
       const r = await env.DB.prepare(
-        `SELECT json_extract(q.json, '$.family') AS family, MAX(k.ngay_vn) AS ngay
+        `SELECT ${SQL_NHAN_FAMILY} AS family, MAX(k.ngay_vn) AS ngay
            FROM su_kien_hoc k JOIN game_v2_question q ON q.qid = k.qid
           WHERE k.sbd = ? AND k.ket_qua IS NOT NULL
-            AND json_extract(q.json, '$.family') IN (SELECT value FROM json_each(?))
+            AND ${SQL_NHAN_FAMILY} IN (SELECT value FROM json_each(?))
           GROUP BY 1`,
       ).bind(sbd, JSON.stringify(families)).all<{ family: string; ngay: string }>()
       for (const x of r.results ?? []) if (x.family) familyLanCuoi.set(String(x.family), String(x.ngay))
