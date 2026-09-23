@@ -5,19 +5,14 @@
 // (`nam_kt_dang`). Không đọc đồng hồ, không Math.random: cùng sổ → cùng kết quả,
 // từng chữ. Đó là tính chất để dựng lại hồ sơ bất cứ lúc nào từ sổ.
 //
-// Bốn luật chuyển trạng thái (ngày = ngày lịch Việt Nam của sự kiện):
-//   SAI (0)     lan_sai+1 · đúng-liên-tiếp về 0 · mốc = ngày+1 · trạng thái `moi_sai` · dạng hạ 1 bậc
-//   TRỐNG(NULL) lan_trong+1 · mốc = ngày+1 · `moi_sai` nếu CHƯA TỪNG đúng · KHÔNG cộng lan_sai
-//   ĐÚNG cùng ngày với lần đúng trước → chỉ cập nhật giờ cuối (3 lần một tối KHÔNG là 3 mốc)
-//   ĐÚNG ngày khác → đúng-liên-tiếp+1 · mốc = ngày + MOC_ON[min(dl-1, 2)] · dạng nâng 1 bậc ·
-//                    `da_khac_phuc` khi từng sai và đã đúng ở ≥ SO_MOC_KHAC_PHUC ngày khác nhau
-//   nhãn `can_day_lai` khi sai ≥ SO_LAN_SAI_DAY_LAI lần mà chưa đúng lại lần nào.
+// Nhãn khắc phục/dạy lại giữ luật sư phạm; mốc ôn tính bằng FSRS từ lịch sử riêng
+// của từng em × câu. Một quan sát/ngày VN, sai ưu tiên; bỏ trống không chấm Again.
 import type { D1PreparedStatement, Env } from './kieu'
 import { DemTTL } from './dem-chung'
+import { ngayVnFsrs, taoLichOnFsrs, type LichOnFsrs } from './lich-on-fsrs'
 import {
   BAC_DANG_BAT_DAU,
   BAC_DANG_TOI_DA,
-  MOC_ON,
   NGUONG_DANG_YEU,
   SO_CAU_DU_TIN,
   SO_LAN_SAI_DAY_LAI,
@@ -92,6 +87,7 @@ const sosanh = (a: SuKienDoc, b: SuKienDoc): number => {
 
 interface TrongCau {
   c: NamKtCau
+  lich?: LichOnFsrs
   ngayDungCuoi: string | null
   tungDung: boolean
   giayTong: number
@@ -111,10 +107,18 @@ function dangCua(qid: string, ev: SuKienDoc[], tra: TraCuuCau): { maDang: string
   return { maDang: ma || (cd ? `CD:${cd}` : null), chuyenDe: cd }
 }
 
-export function phatLaiSuKien(ds: readonly SuKienDoc[], tra: TraCuuCau = KHONG_TRA): { cau: NamKtCau[]; dang: NamKtDang[] } {
+export function phatLaiSuKien(ds: readonly SuKienDoc[], tra: TraCuuCau = KHONG_TRA, tuyChon: { denLuc?: number; retention?: number } = {}): { cau: NamKtCau[]; dang: NamKtDang[] } {
   const theoEm = new Map<string, SuKienDoc[]>()
-  for (const e of ds) {
-    if (!e.sbd || !e.qid || !e.ngayVn) continue
+  const on = taoLichOnFsrs(tuyChon.retention)
+  const daDoc = new Set<string>()
+  // Sổ SQL đã có khoá duy nhất; vẫn khử trùng khi replay từ bản export/fixture.
+  for (const e0 of [...ds].sort(sosanh)) {
+    const ms = Date.parse(e0.luc)
+    if (!e0.sbd || !e0.qid || !e0.khoa || !Number.isFinite(ms) || ms > (tuyChon.denLuc ?? Infinity)) continue
+    const khoa = JSON.stringify([e0.sbd, e0.khoa])
+    if (daDoc.has(khoa)) continue
+    daDoc.add(khoa)
+    const e = { ...e0, ngayVn: ngayVnFsrs(ms) }
     const l = theoEm.get(e.sbd)
     if (l) l.push(e)
     else theoEm.set(e.sbd, [e])
@@ -167,12 +171,12 @@ export function phatLaiSuKien(ds: readonly SuKienDoc[], tra: TraCuuCau = KHONG_T
         c.dungLienTiep = 0
         c.ngayDungKhacNhau = 0
         t.ngayDungCuoi = null
-        c.mocOnKe = themNgay(e.ngayVn, 1)
         c.trangThai = 'moi_sai'
         if (maDang) bac.set(maDang, Math.max(0, bacCua(maDang) - 1))
       } else if (e.ketQua === null) {
         c.lanTrong++
-        c.mocOnKe = themNgay(e.ngayVn, 1)
+        // Chưa có quan sát được chấm: hẹn thử lại một lần, không dời xa mỗi lần bỏ trống.
+        if (c.mocOnKe === null) c.mocOnKe = themNgay(e.ngayVn, 1)
         if (!t.tungDung) c.trangThai = 'moi_sai'
       } else if (t.ngayDungCuoi === e.ngayVn) {
         // Đúng thêm lần nữa trong CÙNG ngày: chỉ ghi nhận giờ, không thành mốc mới.
@@ -181,9 +185,12 @@ export function phatLaiSuKien(ds: readonly SuKienDoc[], tra: TraCuuCau = KHONG_T
         t.ngayDungCuoi = e.ngayVn
         c.dungLienTiep++
         c.ngayDungKhacNhau++
-        c.mocOnKe = themNgay(e.ngayVn, MOC_ON[Math.min(c.dungLienTiep - 1, MOC_ON.length - 1)]!)
         c.trangThai = c.lanSai > 0 ? (c.ngayDungKhacNhau >= SO_MOC_KHAC_PHUC ? 'da_khac_phuc' : 'dang_on') : 'chua_thay_sai'
         if (maDang) bac.set(maDang, Math.min(BAC_DANG_TOI_DA, bacCua(maDang) + 1))
+      }
+      if (e.ketQua !== null) {
+        t.lich = on(t.lich, Date.parse(e.luc), e.ketQua)
+        c.mocOnKe = ngayVnFsrs(t.lich.card.due.getTime())
       }
       c.canDayLai = c.lanSai >= SO_LAN_SAI_DAY_LAI && c.dungLienTiep === 0
     }
@@ -344,7 +351,9 @@ export async function dungLaiHoSo(env: Env, dsSbd: string[], nay: string): Promi
   const em = [...new Set(dsSbd.map((x) => x.trim()).filter(Boolean))]
   const ds = await docSuKienDoc(env, em)
   const tra = await traCuuTheoQid(env, [...new Set(ds.filter((e) => !e.maDang || !e.chuyenDe).map((e) => e.qid))])
-  const { cau, dang } = phatLaiSuKien(ds, tra)
+  const denLuc = Date.parse(nay)
+  if (!Number.isFinite(denLuc)) throw new RangeError('Giờ dựng hồ sơ không hợp lệ')
+  const { cau, dang } = phatLaiSuKien(ds, tra, { denLuc })
   const arr = JSON.stringify(em)
 
   const [rcCu, rdCu] = await Promise.all([

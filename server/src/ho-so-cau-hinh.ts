@@ -7,7 +7,7 @@
 //   SO_CAU_DU_TIN  ↔ `SO_CAU_DU_TIN` của `src/components/HoSoEmView.tsx`
 //   NGUONG_DANG_YEU: ngưỡng MỚI, thay 5 định nghĩa "chuyên đề yếu" đang rải rác.
 
-/** Sau lần đúng thứ 1, 2, 3+ (ở NGÀY khác nhau) bấy nhiêu ngày nữa thì ôn lại. Sai thì về mốc đầu. */
+/** Dãy mốc cũ cho chẩn đoán theo buổi; hồ sơ lịch ngày dùng lich-on-fsrs.ts từ 23/09. */
 export const MOC_ON: readonly number[] = [1, 3, 7]
 
 /** Số ngày ĐÚNG khác nhau để một câu từng sai được coi là đã khắc phục. */
@@ -35,7 +35,7 @@ export const TEN_BAC_DANG = ['biet', 'hieu', 'van_dung'] as const
 // các hằng số của bộ điều phối bao quanh nó. Không viết lại hàm đó — chỉ sửa ĐẦU VÀO và hạ/nâng có trần.
 
 /** Đổi công thức xếp việc thì tăng số này: kế hoạch cũ trong D1 còn nhận ra là bản cũ. */
-export const PHIEN_BAN_KE_HOACH = 1
+export const PHIEN_BAN_KE_HOACH = 2
 
 export const NGAN_SACH_SAN = 8
 export const NGAN_SACH_TRAN = 16
