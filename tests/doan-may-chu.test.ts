@@ -290,7 +290,11 @@ describe('Đoàn Hộ Tống · máy chủ · trùm câu chung', () => {
   it('một câu Phần II chung, 180 giây; mỗi bạn giữ 2 ý; chỉ người giữ mới chốt được; ý của bạn chỉ hiện đã chốt / chưa', async () => {
     const { d, ma } = await toiTrum()
     const a = await goi(d, 'S1', 'xem', { ma }), b = await goi(d, 'S2', 'xem', { ma })
-    expect(a.doan.tran).toMatchObject({ hiep: 4, laTrum: true, giay: 180, conMs: 180_000 }); expect(a.doan.trum.qid).toBe(b.doan.trum.qid); expect(a.doan.trum.qid).toMatch(/^T/)
+    expect(a.doan.tran).toMatchObject({ hiep: 4, laTrum: true }); expect(a.doan.trum.qid).toBe(b.doan.trum.qid); expect(a.doan.trum.qid).toMatch(/^T/)
+    // CNH-1.0 (02 §8): hạn hiệp trùm = hạn mềm của câu chung (1,25 × giây gốc + thời gian đọc), kẹp trần đội 300.
+    expect(a.doan.tran.giay).toBeGreaterThan(180)
+    expect(a.doan.tran.giay).toBeLessThanOrEqual(300)
+    expect(a.doan.tran.conMs).toBe(a.doan.tran.giay * 1000)
     expect([...a.doan.trum.yCuaEm, ...b.doan.trum.yCuaEm].sort()).toEqual([0, 1, 2, 3]); expect(a.doan.trum.yCuaEm).toHaveLength(2); khongLo(a, ['S2']); khongLo(b, ['S1'])
     const yBan = b.doan.trum.yCuaEm[0] as number
     await expect(goi(d, 'S1', 'nop-y', { ma, hiep: 4, y: yBan, answer: 'D' })).rejects.toThrow('bạn khác giữ')

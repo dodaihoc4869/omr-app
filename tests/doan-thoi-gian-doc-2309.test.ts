@@ -8,7 +8,7 @@
 // y hệt bản cũ (mọi hạn đang chạy giữ nguyên).
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { giayCuaHiep, giayDocThem, GIAY_DOC_NEN, GIAY_MOI_TU, GIAY_CO_HINH, GIAY_DOC_TOI_DA } from '../src/game/than-thu-v2/doan-core'
+import { giayCuaHiep, giayDocThem, hanMemMotCau, GIAY_DOC_NEN, GIAY_MOI_TU, GIAY_CO_HINH, GIAY_DOC_TOI_DA } from '../src/game/than-thu-v2/doan-core'
 
 describe('giayDocThem — thời gian đọc theo độ dài đề', () => {
   it('KHÔNG có số đo ⇒ 0 (mọi hạn cũ giữ nguyên, kể cả dữ liệu cũ)', () => {
@@ -37,30 +37,37 @@ describe('giayDocThem — thời gian đọc theo độ dài đề', () => {
 })
 
 describe('giayCuaHiep — hạn hiệp có độ dài đề', () => {
-  it('KHÔNG kèm đo độ dài ⇒ y hệt bản cũ (90/120 + 30×bậc, sàn 90, trần 180)', () => {
-    // bậc biết = 0 → 90; hiểu (1) → 120; vận dụng (2) → 150
-    expect(giayCuaHiep(1, [{ phan: 'I', mucDo: 'biet' }])).toBe(90)
-    expect(giayCuaHiep(1, [{ phan: 'I', mucDo: 'hieu' }])).toBe(120)
-    expect(giayCuaHiep(1, [{ phan: 'I', mucDo: 'van_dung' }])).toBe(150)
-    expect(giayCuaHiep(1, [{ phan: 'III', mucDo: 'hieu' }])).toBe(150)
-    // lõi thuần gọi không kèm câu (test cũ, dữ liệu cũ)
+  // ⚠️ ĐỔI HÀNH VI THEO ĐẶC TẢ CNH-1.0 (02 §8): hạn mềm MỘT CÂU = `ceil(1,25 × solveSeconds)`, TỐI THIỂU 60 giây,
+  // và ĐỒNG HỒ ĐỘI = max hạn mềm của các nhiệm vụ đang mở, TỐI ĐA 300 giây/hiệp. Bản CŨ dùng `nền+bậc` (90/120/150)
+  // kẹp 60..180 — trái §8 (chặn cứng 180 và bỏ hệ số 1,25). Số mới dưới đây theo ĐÚNG công thức đặc tả.
+  it('KHÔNG kèm đo độ dài ⇒ 1,25 × giây gốc (phần × mức), sàn 60, KHÔNG trần 180', () => {
+    // giây gốc: I.biết 75 · I.hiểu 105 · I.vận dụng 150 · III.hiểu 180 (bảng dùng chung `src/lib/giay-co-so.ts`)
+    expect(giayCuaHiep(1, [{ phan: 'I', mucDo: 'biet' }])).toBe(94) // ceil(1,25 × 75)
+    expect(giayCuaHiep(1, [{ phan: 'I', mucDo: 'hieu' }])).toBe(132) // ceil(1,25 × 105)
+    expect(giayCuaHiep(1, [{ phan: 'I', mucDo: 'van_dung' }])).toBe(188) // ceil(1,25 × 150) — VƯỢT 180 theo §8
+    expect(giayCuaHiep(1, [{ phan: 'III', mucDo: 'hieu' }])).toBe(225) // ceil(1,25 × 180)
+    // lõi thuần gọi không kèm câu (test cũ, dữ liệu cũ) — giữ nguyên đường cũ
     expect(giayCuaHiep(3)).toBe(40)
     expect(giayCuaHiep(4)).toBe(60)
   })
 
-  it('câu dài/có hình được THÊM thời gian, nhưng không quá 180 s', () => {
-    expect(giayCuaHiep(1, [{ phan: 'II', mucDo: 'hieu', soTu: 60 }])).toBe(150) // 120 + 30
-    expect(giayCuaHiep(1, [{ phan: 'III', mucDo: 'van_dung', soTu: 120, coHinh: true }])).toBe(180) // 180 → trần
+  it('câu dài/có hình được THÊM thời gian; đồng hồ đội KẸP 300 giây/hiệp (§8)', () => {
+    const ngan = { phan: 'II', mucDo: 'hieu', soTu: 60 }
+    expect(giayCuaHiep(1, [ngan])).toBe(hanMemMotCau(ngan)) // = ceil(1,25 × (210 + thời gian đọc))
+    expect(giayCuaHiep(1, [ngan])).toBeGreaterThan(180) // KHÔNG còn trần 180
+    const ratDai = { phan: 'III', mucDo: 'van_dung', soTu: 400, coHinh: true }
+    expect(giayCuaHiep(1, [ratDai])).toBe(300) // chạm TRẦN ĐỘI 300
+    expect(hanMemMotCau(ratDai)).toBeGreaterThan(300) // hạn mềm của em vẫn dài hơn ⇒ vai cá nhân dài hoàn tất sau hiệp
   })
 
   it('cả đội một đồng hồ: lấy câu DÀI NHẤT, không lấy trung bình', () => {
     const cau = [{ phan: 'I', mucDo: 'biet' }, { phan: 'II', mucDo: 'hieu', soTu: 60 }]
-    expect(giayCuaHiep(1, cau)).toBe(150) // max(90; 120+30)
+    expect(giayCuaHiep(1, cau)).toBe(Math.min(300, Math.max(94, hanMemMotCau(cau[1]!))))
   })
 
-  it('hiệp trùm giữ 180 s bất kể độ dài', () => {
-    expect(giayCuaHiep(4, [{ phan: 'II', mucDo: 'biet' }])).toBe(180)
-    expect(giayCuaHiep(4, [])).toBe(180)
+  it('hiệp trùm dùng CÙNG công thức hạn mềm (không còn 180 cố định)', () => {
+    expect(giayCuaHiep(4, [{ phan: 'II', mucDo: 'biet' }])).toBe(188) // ceil(1,25 × 150)
+    expect(giayCuaHiep(4, [])).toBe(60) // không có câu: lõi thuần rơi về hằng số cũ
   })
 })
 
@@ -75,7 +82,9 @@ describe('máy chủ nối độ dài đề vào hạn hiệp', () => {
     }
   })
   it('hạn hiệp dùng chính `giayCuaHiep` của lõi (một nguồn), không tự tính lại', () => {
-    expect(SRV).toContain('const giayHiepPhong=(p:PhongDoan)=>giayCuaHiep(')
+    expect(SRV).toContain('const giayHiepPhong=(p:PhongDoan)=>{')
+    expect(SRV).toContain('return giayCuaHiep(hiep, trum?[...cau,trum]:cau)') // 02 §8: kèm CÂU TRÙM vào đồng hồ đội
+    expect(SRV).not.toMatch(/giayCuaHiep\([^)]*\)\s*\*\s*\d/) // không tự nhân/chia lại hạn
     expect(SRV).not.toMatch(/giayCuaHiep\([^)]*\)\s*[+*]/)
   })
 })

@@ -1,0 +1,196 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/Volumes/SSD NGOÀI/omr-app[39m
+
+ [32m✓[39m tests/doan-sanh-nut-khoa-2109.test.tsx [2m([22m[2m22 tests[22m[2m)[22m[33m 412[2mms[22m[39m
+ [32m✓[39m tests/doan-tran-cap-rieng-2109.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 440[2mms[22m[39m
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mem chọn A ở hiệp 3; gói CŨ (revision thấp hơn) tới trễ ⇒ lựa chọn giữ; sang hiệp 4 ⇒ ô trống, chọn C mới nhận và chốt gửi C ở hiệp 4
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m tests/doan-sanh-hep-2109.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 1738[2mms[22m[39m
+ [32m✓[39m tests/doan-cua-vao.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[33m 905[2mms[22m[39m
+     [33m[2m✓[22m[39m cờ TẮT (hoặc máy chủ cũ không trả cờ): vỏ Đảo nhận doanMo=false, ở tab Đảo KHÔNG có đầu trang/thanh mục cũ; ra Võ đài thì mục y hệt cũ, không chữ Đoàn, Võ đài mở MỌI ngày với tên cũ [33m 460[2mms[22m[39m
+     [33m[2m✓[22m[39m cờ TẮT mà cửa ngoài xin mở thẳng Đoàn → về Đảo thần thú, không màn trống, lớp phủ Đoàn KHÔNG được dựng dù một khung hình [33m 354[2mms[22m[39m
+[90mstdout[2m | tests/game-pham-vi-rut-cau-2309.test.ts[2m > [22m[2môn có khoảng cách và chi phí chọn[2m > [22m[2mlọc 15.000 câu bằng chỉ mục bằng chứng trong bộ nhớ, không truy vấn mỗi câu
+[22m[39mChọn 6/15000 câu trong 226 ms
+
+ [32m✓[39m tests/game-pham-vi-rut-cau-2309.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 425[2mms[22m[39m
+ [32m✓[39m tests/doan-mua.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 658[2mms[22m[39m
+ [32m✓[39m tests/doan-giao-dien.test.tsx [2m([22m[2m24 tests[22m[2m)[22m[33m 996[2mms[22m[39m
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mem chọn A ở hiệp 3; gói CŨ (revision thấp hơn) tới trễ ⇒ lựa chọn giữ; sang hiệp 4 ⇒ ô trống, chọn C mới nhận và chốt gửi C ở hiệp 4
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mem chọn A ở hiệp 3; gói CŨ (revision thấp hơn) tới trễ ⇒ lựa chọn giữ; sang hiệp 4 ⇒ ô trống, chọn C mới nhận và chốt gửi C ở hiệp 4
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m tests/doan-exp-may-chu-2109.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 240[2mms[22m[39m
+ [32m✓[39m tests/doan-kho-lop-2109.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 248[2mms[22m[39m
+ [32m✓[39m tests/doan-may-chu.test.ts [2m([22m[2m29 tests[22m[2m)[22m[33m 1162[2mms[22m[39m
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mem chọn A ở hiệp 3; gói CŨ (revision thấp hơn) tới trễ ⇒ lựa chọn giữ; sang hiệp 4 ⇒ ô trống, chọn C mới nhận và chốt gửi C ở hiệp 4
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m tests/doan-rut-cau-moi-2109.test.ts [2m([22m[2m19 tests[22m[2m)[22m[33m 412[2mms[22m[39m
+ [32m✓[39m tests/doan-cua-bang-nhiem-vu-1909.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 859[2mms[22m[39m
+     [33m[2m✓[22m[39m cờ mở: bấm thẻ ⇒ khoá `game-v2:man-dau` = "doan" đúng LÚC game dựng, game mở; "Về app học sinh" ⇒ đóng game, thấy lại Bảng nhiệm vụ, hỏi lại kế hoạch [33m 442[2mms[22m[39m
+ [32m✓[39m tests/doan-the-goi-y.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+ [32m✓[39m tests/doan-thoi-gian-doc-2309.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/doan-khoan-exp-2109.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 123[2mms[22m[39m
+ [32m✓[39m tests/doan-dao-hop-dong.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mem chọn A ở hiệp 3; gói CŨ (revision thấp hơn) tới trễ ⇒ lựa chọn giữ; sang hiệp 4 ⇒ ô trống, chọn C mới nhận và chốt gửi C ở hiệp 4
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m tests/doan-anh-san-sang-2109.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[32m 264[2mms[22m[39m
+ [32m✓[39m tests/cnh-1-0-doan-han-mem-p06.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m tests/doan-an-thach.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 193[2mms[22m[39m
+ [32m✓[39m tests/doan-thuong-va-mo-som-2109.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m tests/doan-core.test.ts [2m([22m[2m52 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mem chọn A ở hiệp 3; gói CŨ (revision thấp hơn) tới trễ ⇒ lựa chọn giữ; sang hiệp 4 ⇒ ô trống, chọn C mới nhận và chốt gửi C ở hiệp 4
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mhết giờ (đồng hồ về 0) KHÔNG tự chốt: máy chủ chỉ được hỏi trạng thái (doan-xem), không có doan-nop nào từ máy em
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mhết giờ (đồng hồ về 0) KHÔNG tự chốt: máy chủ chỉ được hỏi trạng thái (doan-xem), không có doan-nop nào từ máy em
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mhết giờ (đồng hồ về 0) KHÔNG tự chốt: máy chủ chỉ được hỏi trạng thái (doan-xem), không có doan-nop nào từ máy em
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mhết giờ (đồng hồ về 0) KHÔNG tự chốt: máy chủ chỉ được hỏi trạng thái (doan-xem), không có doan-nop nào từ máy em
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mhết giờ (đồng hồ về 0) KHÔNG tự chốt: máy chủ chỉ được hỏi trạng thái (doan-xem), không có doan-nop nào từ máy em
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+[90mstderr[2m | tests/doan-tran-chon-dap-an-2109.test.tsx[2m > [22m[2mHIỆP MỚI xoá lựa chọn cũ; gói tin CŨ tới trễ không xoá lựa chọn của em; không có đường tự chốt bằng lựa chọn cũ[2m > [22m[2mhết giờ (đồng hồ về 0) KHÔNG tự chốt: máy chủ chỉ được hỏi trạng thái (doan-xem), không có doan-nop nào từ máy em
+[22m[39mAn update to DoanHoTong inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+
+ [32m✓[39m tests/doan-tran-chon-dap-an-2109.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 5007[2mms[22m[39m
+     [33m[2m✓[22m[39m em chọn A ở hiệp 3; gói CŨ (revision thấp hơn) tới trễ ⇒ lựa chọn giữ; sang hiệp 4 ⇒ ô trống, chọn C mới nhận và chốt gửi C ở hiệp 4 [33m 3047[2mms[22m[39m
+     [33m[2m✓[22m[39m hết giờ (đồng hồ về 0) KHÔNG tự chốt: máy chủ chỉ được hỏi trạng thái (doan-xem), không có doan-nop nào từ máy em [33m 1231[2mms[22m[39m
+ [32m✓[39m tests/doan-tran-khong-nhay-2109.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 11715[2mms[22m[39m
+     [33m[2m✓[22m[39m Phần I: chọn A / D / đổi đòn (Chắn, Kỹ năng) ⇒ CẢ BỐN nút đáp án + thẻ câu đứng NGUYÊN vị trí và kích thước (CLS vùng đáp án = 0); không tràn ngang [33m 994[2mms[22m[39m
+     [33m[2m✓[22m[39m Phần II: chọn từng ý Đúng/Sai ⇒ các hàng ý đứng nguyên [33m 958[2mms[22m[39m
+     [33m[2m✓[22m[39m TRÙM: chọn Đúng/Sai ở ý của em (nút "Chốt ý này" có sẵn) ⇒ MỌI hàng ý đứng nguyên — trước đây nút chốt xuất hiện sau khi chọn làm hàng nở ra [33m 701[2mms[22m[39m
+     [33m[2m✓[22m[39m đội đổi trạng thái (đang làm → đã chốt → cần tiếp sức) + tín hiệu + tên dài + lỗi hiện ra ⇒ thẻ câu và lưới đáp án KHÔNG dịch [33m 1101[2mms[22m[39m
+     [33m[2m✓[22m[39m Phần I: chọn A / D / đổi đòn (Chắn, Kỹ năng) ⇒ CẢ BỐN nút đáp án + thẻ câu đứng NGUYÊN vị trí và kích thước (CLS vùng đáp án = 0); không tràn ngang [33m 894[2mms[22m[39m
+     [33m[2m✓[22m[39m Phần II: chọn từng ý Đúng/Sai ⇒ các hàng ý đứng nguyên [33m 866[2mms[22m[39m
+     [33m[2m✓[22m[39m TRÙM: chọn Đúng/Sai ở ý của em (nút "Chốt ý này" có sẵn) ⇒ MỌI hàng ý đứng nguyên — trước đây nút chốt xuất hiện sau khi chọn làm hàng nở ra [33m 676[2mms[22m[39m
+     [33m[2m✓[22m[39m đội đổi trạng thái (đang làm → đã chốt → cần tiếp sức) + tín hiệu + tên dài + lỗi hiện ra ⇒ thẻ câu và lưới đáp án KHÔNG dịch [33m 1149[2mms[22m[39m
+     [33m[2m✓[22m[39m Phần I: chọn A / D / đổi đòn (Chắn, Kỹ năng) ⇒ CẢ BỐN nút đáp án + thẻ câu đứng NGUYÊN vị trí và kích thước (CLS vùng đáp án = 0); không tràn ngang [33m 882[2mms[22m[39m
+     [33m[2m✓[22m[39m Phần II: chọn từng ý Đúng/Sai ⇒ các hàng ý đứng nguyên [33m 894[2mms[22m[39m
+     [33m[2m✓[22m[39m TRÙM: chọn Đúng/Sai ở ý của em (nút "Chốt ý này" có sẵn) ⇒ MỌI hàng ý đứng nguyên — trước đây nút chốt xuất hiện sau khi chọn làm hàng nở ra [33m 659[2mms[22m[39m
+     [33m[2m✓[22m[39m đội đổi trạng thái (đang làm → đã chốt → cần tiếp sức) + tín hiệu + tên dài + lỗi hiện ra ⇒ thẻ câu và lưới đáp án KHÔNG dịch [33m 1110[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m23 passed[39m[22m[90m (23)[39m
+[2m      Tests [22m [1m[32m307 passed[39m[22m[90m (307)[39m
+[2m   Start at [22m 22:03:32
+[2m   Duration [22m 12.74s[2m (transform 5.98s, setup 0ms, import 10.26s, tests 25.91s, environment 3.85s)[22m
+

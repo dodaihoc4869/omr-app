@@ -60,15 +60,16 @@ describe('kho game theo phần từng em đã học',()=>{
     expect(r.questions.every(q=>q.dang==='B')).toBe(true)
   })
   it('đồng hồ tăng theo loại câu và mức độ, cùng số giây dùng cho cả hiệp',async()=>{
-    expect(giayCuaHiep(1,[{phan:'I',mucDo:'biet'}])).toBe(90)
-    expect(giayCuaHiep(1,[{phan:'I',mucDo:'biet'},{phan:'III',mucDo:'van_dung'}])).toBe(180)
-    expect(giayCuaHiep(4,[])).toBe(180)
+    // CNH-1.0 (02 §8): hạn mềm = ceil(1,25 × giây gốc), sàn 60, KHÔNG trần 180; đồng hồ đội ≤ 300/hiệp.
+    expect(giayCuaHiep(1,[{phan:'I',mucDo:'biet'}])).toBe(94) // ceil(1,25 × 75)
+    expect(giayCuaHiep(1,[{phan:'I',mucDo:'biet'},{phan:'III',mucDo:'van_dung'}])).toBe(300) // câu dài nhất chạm trần đội 300
+    expect(giayCuaHiep(4,[])).toBe(60) // không kèm câu: hằng số cũ của hiệp trùm
     const d=dung()
     const r=await gameV2(d.env,'doan-mo',{token:await gameToken(d.env,'S1')}) as {doan:{tran:{giay:number;conMs:number}}}
     // MỤC 6 (23/09): hạn hiệp còn cộng THỜI GIAN ĐỌC theo độ dài đề ⇒ không còn hằng số 90 s;
     // máy chủ vẫn là nguồn hạn cuối và đồng hồ đếm đúng hạn ấy.
-    expect(r.doan.tran.giay).toBeGreaterThanOrEqual(90)
-    expect(r.doan.tran.giay).toBeLessThanOrEqual(180)
+    expect(r.doan.tran.giay).toBeGreaterThanOrEqual(60) // §8: sàn 60 giây
+    expect(r.doan.tran.giay).toBeLessThanOrEqual(300) // §8: trần ĐỒNG HỒ ĐỘI 300 giây/hiệp
     expect(r.doan.tran.conMs).toBe(r.doan.tran.giay*1000)
   })
 })

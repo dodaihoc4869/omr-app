@@ -102,7 +102,14 @@ export function tenGoi(hoTen: string, duPhong: string): string {
 }
 /** Câu cá nhân thứ mấy ứng với hiệp thường này (hiệp 1,2,3,5,6,7 → 0..5). */
 export const chiSoCau = (hiep: number) => hiep - 1 - (hiep > 4 ? 1 : 0)
-const giayHiepPhong=(p:PhongDoan)=>giayCuaHiep(p.chang!.hiep,p.nguoi.map(n=>n.cau[chiSoCau(p.chang!.hiep)]).filter((c):c is CauRef=>!!c))
+// ĐỒNG HỒ ĐỘI (02 §8): hạn hiệp = max hạn mềm của các NHIỆM VỤ ĐANG MỞ, tối đa 300 giây/hiệp.
+// Hiệp trùm: nhiệm vụ đang mở là CÂU CHUNG của cả đội ⇒ phải kèm câu trùm vào phép tính (trước đây hard-code 180).
+const giayHiepPhong=(p:PhongDoan)=>{
+  const hiep=p.chang!.hiep
+  const cau=p.nguoi.map(n=>n.cau[chiSoCau(hiep)]).filter((c):c is CauRef=>!!c)
+  const trum=p.trum?.[hiep]
+  return giayCuaHiep(hiep, trum?[...cau,trum]:cau)
+}
 const hanHiep = (p: PhongDoan) => p.hiepLuc + giayHiepPhong(p) * 1000
 
 // ───────────────────────── Đọc / ghi phòng ─────────────────────────
@@ -253,7 +260,7 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
   const soGhe = Math.max(2, nguoi.length)
   for (const [hiep, q] of [[4, mot], [8, hai]] as const) {
     if (!q) continue
-    trum[hiep] = { qid: q.qid, maDe: q.maDe, version: q.version, nhan: 'vua_suc', dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc }
+    trum[hiep] = { qid: q.qid, maDe: q.maDe, version: q.version, nhan: 'vua_suc', dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc, phan: q.phan, mucDo: q.mucDo, ...doDaiCau(q) }
     const xep = Array.from({ length: soGhe }, (_, ghe) => ({ ghe, bac: nguoi[ghe] ? bac.get(`${nguoi[ghe]!.sbd}|${q.dang}`) ?? 0 : 1 })).sort((a, b) => a.bac - b.bac || a.ghe - b.ghe)
     giaoY[hiep] = Array.from({ length: SO_Y_TRUM }, (_, y) => xep[Math.floor(y * soGhe / SO_Y_TRUM)]!.ghe)
   }

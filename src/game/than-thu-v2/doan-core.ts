@@ -10,6 +10,7 @@
 // Một chặng = 8 hiệp. Hiệp 1–3 và 5–7 là hiệp thường (mỗi em một câu riêng, 40 giây, làm ĐỒNG THỜI, rồi
 // cả đội ra đòn cùng lúc). Hiệp 4 và 8 là TRÙM: cả đội chung một câu Phần II, mỗi ghế giữ một số ý.
 import { hashSeed, mulberry32 } from '../../lib/exam-shuffle'
+import { giayGocCuaCau } from '../../lib/giay-co-so'
 import { BATTLE_SKINS } from './learning-battle'
 
 // ───────────────────────── Hằng số luật chơi (đổi một chỗ) ─────────────────────────
@@ -145,17 +146,30 @@ export function giayDocThem(q: { soTu?: number | null; coHinh?: boolean | null }
   return Math.max(0, Math.min(GIAY_DOC_TOI_DA, Math.round(g / 5) * 5))
 }
 
-/** Hạn của cả đội lấy câu cần nhiều thời gian nhất, để mọi ghế có cùng một đồng hồ.
- *  Hạn một câu = nền[phần] + 30×bậc + THỜI GIAN ĐỌC (M6), kẹp 60..180 s. */
-export const giayCuaHiep = (hiep: number, cau?: readonly { phan?: string; mucDo?: string | null; soTu?: number | null; coHinh?: boolean | null }[]) => {
-  if (!cau) return hiepLaTrum(hiep) ? GIAY_HIEP_TRUM : GIAY_MOI_HIEP // dữ liệu cũ gọi lõi thuần không kèm câu
-  if (hiepLaTrum(hiep)) return 180
-  const muc = (q: { phan?: string; mucDo?: string | null; soTu?: number | null; coHinh?: boolean | null }) => {
-    const bac = q.mucDo === 'van_dung' ? 2 : q.mucDo === 'hieu' ? 1 : 0
-    const nen = (q.phan === 'III' ? 120 : 90) + bac * 30 + giayDocThem(q)
-    return Math.max(60, Math.min(180, nen))
-  }
-  return Math.max(90, ...cau.map(muc))
+/** HẠN MỀM MỘT CÂU cho một em — 02 §8: `ceil(1,25 × solveSeconds)`, TỐI THIỂU 60 giây.
+ *  KHÔNG chặn cứng ở 180 giây: câu dài/nhiều bảng hình được giãn theo đúng công thức, và nơi gọi có dữ liệu
+ *  tốc độ riêng của em thì truyền `solveSeconds` đã đo để hạn mềm bám theo em đó.
+ *  `solveSeconds` vắng ⇒ lấy giây gốc (phần × mức) + THỜI GIAN ĐỌC (M6). */
+export function hanMemMotCau(
+  cau: { phan?: string; mucDo?: string | null; soTu?: number | null; coHinh?: boolean | null; solveSeconds?: number | null } = {},
+): number {
+  const do_ = typeof cau.solveSeconds === 'number' && Number.isFinite(cau.solveSeconds) && cau.solveSeconds > 0
+    ? cau.solveSeconds
+    : giayGocCuaCau(cau.phan, cau.mucDo) + giayDocThem(cau)
+  return Math.max(60, Math.ceil(do_ * 1.25))
+}
+
+/** TRẦN ĐỒNG HỒ ĐỘI: tối đa 300 giây một hiệp (02 §8) — task cần lâu hơn thì giao vai cá nhân dài, hoàn tất sau hiệp. */
+export const TRAN_GIAY_HIEP = 300
+
+/** Hạn của cả đội lấy câu cần nhiều thời gian nhất, để mọi ghế có cùng một đồng hồ:
+ *  `min(300, max(hạn mềm một câu của các nhiệm vụ đang mở))` (02 §8). */
+export const giayCuaHiep = (hiep: number, cau?: readonly { phan?: string; mucDo?: string | null; soTu?: number | null; coHinh?: boolean | null; solveSeconds?: number | null }[]) => {
+  // Không có câu (dữ liệu cũ / lõi thuần gọi trần) ⇒ giữ hằng số cũ, KHÔNG rơi vào `Math.max()` rỗng.
+  if (!cau || cau.length === 0) return hiepLaTrum(hiep) ? GIAY_HIEP_TRUM : GIAY_MOI_HIEP
+  const lonNhat = Math.max(...cau.map((q) => hanMemMotCau(q)))
+  if (!Number.isFinite(lonNhat)) return hiepLaTrum(hiep) ? GIAY_HIEP_TRUM : GIAY_MOI_HIEP
+  return Math.min(TRAN_GIAY_HIEP, lonNhat)
 }
 /** Đồng hồ do nơi gọi đưa vào (mili giây) — lõi không tự đọc giờ. */
 export const hetGioHiep = (batDauLuc: number, bayGio: number, hiep: number) => bayGio - batDauLuc >= giayCuaHiep(hiep) * 1000
