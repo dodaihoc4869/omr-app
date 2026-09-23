@@ -442,6 +442,26 @@ Trang thai that sau luot nay: phases PASS **2/12** (P02, P03) · requirements PA
 
 ### Buoc tiep theo chinh xac
 
+CHECKPOINT CNH-1.0 — RÀ SOÁT ĐỘC LẬP 01 (RV01–RV06)
+Thời điểm, HEAD và source fingerprint: 23/09/2026 (22:0x +07:00) · HEAD `66af333` (đã push) · `sourceFingerprint = 18f2299012454da4b63b5ec3e7297c0f85164e7171f577f756167d3d392c8d53`
+Yêu cầu/test đang xử lý: RV01–RV06 của `BAO-CAO-RA-SOAT-01.md` (giám sát độc lập) — ưu tiên trước khi công nhận P05/pipeline đạt.
+Hành vi vừa hoàn thành và đường gọi thật:
+ · RV01 giữ chỗ theo ĐƠN VỊ NỘI DUNG: `migration-2309-cnh1-giu-cho_nhom.sql` (content_group + het_han_task + UNIQUE(sbd,ngay,content_group), backfill `qid:<qid>`), `giu-cho.ts::giuCho(nhomTheoQid)`, `game-v2.ts` truyền nhóm thật.
+ · RV02 tách lifecycle: hết lease mà nhiệm vụ còn hiệu lực ⇒ KHÔNG sinh task mới, trả `dangMo`/`dungLaiTask`/`giuChoDangMo` để RESUME; tiếp quản chỉ khi `het_han_task <= now` (CAS).
+ · RV03 luật family THẬT: `locTheoLuatLap` gọi `chong-lap.ts::chonTheoLuatChongLap` (1 câu/family · 1 câu chưa nhãn/lượt · ngoại lệ có repeat_reason); nhãn đọc từ kho qua `familyTuNhan` + index/`CO_NHE`/`core.ts`.
+ · RV04 `mucDangLuyen` xét MỌI kỹ năng, thiếu hồ sơ = 0, dữ liệu hỏng = 0.
+ · RV05 bỏ cắt 6 trước lọc: hard filter + luật lặp trong vòng lặp greedy trên toàn bộ ứng viên; trần chỉ áp kết quả cuối; game đưa `eligible`.
+ · RV06 mô tả runtime trung thực (`_d1-that.ts` = node:sqlite, KHÔNG phải D1) + harness XEN KẼ luồng cho test giữ chỗ.
+File đã sửa; thay đổi người dùng cần giữ: `server/src/{bo-chon-that,giu-cho,game-v2,game-v2-bank,cau-theo-qid,hop-dong-chung}.ts`, `server/migration-2309-cnh1-giu-cho_nhom.sql`, `src/game/than-thu-v2/core.ts`, `tests/{_d1-that,cnh-1-0-giu-cho,cnh-1-0-bo-chon-that,cnh-1-0-ngan-sach-luot-t09}.ts`; **KHÔNG đụng** `src/lib/day-ca-may-chu-moi.ts`, `src/lib/gui-ca-trinh-duyet.ts` (WIP của thầy).
+Lệnh kiểm đã chạy, exit code, log: xem bảng trong `evidence/rasoat01-rv-fix.md` (giữ chỗ 9 ca · bộ chọn 16 ca · T09 7 ca · nhóm 59 tệp xanh · tsc 0/0 · toàn suite 706 xanh/35 đỏ nợ cũ + 1 UI flaky pass khi chạy riêng).
+Phần chưa xong và blocker đã xác minh:
+ · RV06 CHƯA có runtime Cloudflare (máy không có wrangler/miniflare/@cloudflare/vitest-pool-workers — đã kiểm package.json + node_modules) ⇒ cần thầy cho phép cài dev-dep hoặc môi trường có wrangler.
+ · RV01/RV02 chưa kiểm hai thiết bị thật (end-to-end) — đã kiểm tầng bảng + đường gọi + xen kẽ luồng.
+ · Kho thật chưa gắn nhãn `family` ⇒ theo luật §4.2.6 lượt rút còn 1 câu khi bật cờ; cần thầy gắn nhãn.
+Việc kế tiếp làm ngay: tiếp tục P06 (Mom/ôn/thử thách dùng chung tổng tải; Đoàn mức cá nhân + hạn mềm + continuing task), rồi P07 (EXP/ledger/receipt/outbox + idempotency + nhaCho khi lượt kết thúc), P08→P10; P11 chỉ chuẩn bị + ghi CHƯA XÁC MINH.
+Các phụ thuộc đã sẵn sàng; phần chờ gói khác: P07 cho nhaCho/receipt; P06 cho các kênh khác dùng chung ngân sách.
+
+
 1. **P04** (P03 da du dau ra): FSRS + chong lap — `server/src/lich-on-fsrs.ts` phai DU STATE (Card, state dau ngay, model/config version, cursor) va mot quan sat doc lap/ngay, Again thang, assisted retry khong day due; mot module repeat-eligibility de due khong bi cooldown 3/14/30 chan sai; gate T04, T06, T07, T17, T29, T41.
 2. Truoc P11: ap migration len D1 that theo canary 5% (07 §3), bat `nang_luc_v1` cho mot nhom nho, do p95 va chuan bi rollback.
 
