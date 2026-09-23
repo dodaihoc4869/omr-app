@@ -62,9 +62,12 @@ export const danhDau = <T extends object>(b: T): T => { noiBo.add(b); return b }
 
 export type NhanCau = 'toi_han_on' | 'dang_yeu' | 'cau_moi' | 'vua_suc'
 /** `an` = dạng của câu này em ĐÃ KHẮC PHỤC XONG (ấn thạch sáng) → kỹ năng ở hiệp này là biến thể ấn (×1,25). */
-interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; dang: string | null; tenDang: string; nhom: string; kt: string[]; an?: boolean }
+interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; dang: string | null; tenDang: string; nhom: string; kt: string[]; phan?: string; mucDo?: string | null; an?: boolean
+  /** M6 (23/09): số từ của đề + phương án/ý, và có hình/bảng hay không — nguồn cho THỜI GIAN ĐỌC
+   *  của hạn hiệp (`giayDocThem` trong doan-core). Thiếu ⇒ hạn y hệt bản cũ. */
+  soTu?: number; coHinh?: boolean }
 /** `cap` chỉ để VẼ đúng hình thái thần thú; không bao giờ vào lõi (cấp không cho chỉ số trong trận). */
-interface NguoiDoan { sbd: string; ten: string; pet: number; cap: number; lop: string; phien: string; cau: CauRef[]; /** Kho hết câu MỚI hôm nay ⇒ có câu lâu nhất chưa gặp trong bộ (báo thật cho em). */ hetCauMoi?: boolean }
+interface NguoiDoan { sbd: string; ten: string; pet: number; cap: number; lop: string; phien: string; cau: CauRef[]; soCauThieu?: number; /** Kho hết câu MỚI hôm nay ⇒ có câu lâu nhất chưa gặp trong bộ (báo thật cho em). */ hetCauMoi?: boolean }
 interface NopLuu { dung: boolean; hanhDong: HanhDong; tuLam: boolean; boTrong: boolean; tiepSucBoi?: number }
 /** Thẻ gợi ý một ghế đã nhận ở hiệp đang chạy: `tu` = ghế tiếp sức (có thể là bạn máy). Nội dung thẻ CHỈ xuống máy người nhận. */
 interface TheLuu extends TheGoiY { tu: number }
@@ -89,6 +92,8 @@ export interface PhongDoan {
 const TIN_HIEU = ['can_tiep_suc', 'chac_y', 'ban_them', 'doi_ti'] as const
 
 const iso = (ms: number) => new Date(ms).toISOString()
+/** Phần kết quả của `answer` được phép về máy em sau khi em chốt. */
+const ketQuaCau = (r: Row) => ({ correct: r.correct, answer: r.answer, solution: r.solution, solutionImages: r.solutionImages, reward: r.reward, stage: r.stage })
 const hex = (n: number) => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('').toUpperCase()
 /** Tên gọi trong đội: hai chữ cuối của họ tên ("Nguyễn Thu Hà" → "Thu Hà"). Không bao giờ dùng SBD. */
 export function tenGoi(hoTen: string, duPhong: string): string {
@@ -97,7 +102,8 @@ export function tenGoi(hoTen: string, duPhong: string): string {
 }
 /** Câu cá nhân thứ mấy ứng với hiệp thường này (hiệp 1,2,3,5,6,7 → 0..5). */
 export const chiSoCau = (hiep: number) => hiep - 1 - (hiep > 4 ? 1 : 0)
-const hanHiep = (p: PhongDoan) => p.hiepLuc + giayCuaHiep(p.chang!.hiep) * 1000
+const giayHiepPhong=(p:PhongDoan)=>giayCuaHiep(p.chang!.hiep,p.nguoi.map(n=>n.cau[chiSoCau(p.chang!.hiep)]).filter((c):c is CauRef=>!!c))
+const hanHiep = (p: PhongDoan) => p.hiepLuc + giayHiepPhong(p) * 1000
 
 // ───────────────────────── Đọc / ghi phòng ─────────────────────────
 async function docPhong(env: Env, ma: string): Promise<{ phong: PhongDoan; revision: number }> {
@@ -142,6 +148,16 @@ async function cauRieng(env: Env, ref: Pick<CauRef, 'qid' | 'maDe' | 'version'>)
   return laCauTuLuan(q) ? null : q
 }
 
+/** SỐ TỪ (đề + phương án/ý) và CÓ HÌNH/BẢNG của một câu — nguồn cho THỜI GIAN ĐỌC (M6, `giayDocThem`).
+ *  Đếm bằng Tiếng Việt có dấu (mỗi khoảng trắng một từ) — chỉ cần tương đối, và TẤT ĐỊNH. */
+function doDaiCau(q: Question): { soTu: number; coHinh: boolean } {
+  const soTuCua = (s: unknown) => String(s ?? '').trim().split(/\s+/).filter(Boolean).length
+  const soTu = soTuCua(q.text) + (q.choices ?? []).reduce((n, c) => n + soTuCua(c), 0) + (q.ideas ?? []).reduce((n, c) => n + soTuCua(c), 0)
+  const coHinh = (q.table?.length ?? 0) > 0 || !!q.thanCauImg || !!q.imageDataUrl
+    || (q.choiceImgs ?? []).some(Boolean) || (q.ideaImgs ?? []).some(Boolean) || (q.hinhAnh ?? []).length > 0
+  return { soTu, coHinh }
+}
+
 /** Xếp 6 câu máy chủ đã chọn: tới hạn ôn → dạng đang yếu → còn lại (giữ thứ tự của chooseSession trong từng nhóm). Thiếu bảng hồ sơ → nhãn trung tính. */
 async function ganNhan(env: Env, sbd: string, qs: Question[], now: number): Promise<CauRef[]> {
   const homNay = ngayVn(iso(now))
@@ -156,7 +172,7 @@ async function ganNhan(env: Env, sbd: string, qs: Question[], now: number): Prom
   } catch { coHoSo = false }
   const nhan = (q: Question): NhanCau => !coHoSo ? 'vua_suc' : toiHan.has(q.qid) ? 'toi_han_on' : q.dang && dangYeu.has(q.dang) ? 'dang_yeu' : daGap.has(q.qid) ? 'vua_suc' : 'cau_moi'
   const thuTu: NhanCau[] = ['toi_han_on', 'dang_yeu', 'cau_moi', 'vua_suc']
-  return qs.map((q, i) => ({ i, ref: { qid: q.qid, maDe: q.maDe, version: q.version, nhan: nhan(q), dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc } }))
+  return qs.map((q, i) => ({ i, ref: { qid: q.qid, maDe: q.maDe, version: q.version, nhan: nhan(q), dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc, phan:q.phan, mucDo:q.mucDo, ...doDaiCau(q) } }))
     .sort((a, b) => thuTu.indexOf(a.ref.nhan) - thuTu.indexOf(b.ref.nhan) || a.i - b.i).map(x => x.ref)
 }
 
@@ -172,13 +188,13 @@ async function taoNguoi(env: Env, sbd: string, p: Profile, b: Row, goiGame: GoiG
   // Ấn thạch SÁNG của em (dạng đã khắc phục xong theo hồ sơ thật) → đánh dấu câu thuộc dạng ấy; chụp MỘT lần lúc vào đoàn để cả chặng tất định.
   const anSang = new Set((await docAnThach(env, sbd, ngayVn(iso(now)))).filter(a => a.trangThai === 'sang').map(a => a.dang))
   const cau = (await ganNhan(env, sbd, qs.slice(0, SO_HIEP - 2), now)).map(c => ({ ...c, an: !!c.dang && anSang.has(c.dang) }))
-  return { sbd, ten: tenGoi(String(hs?.ho_ten ?? ''), p.nickname || PETS[pet]!.name), pet, cap: Math.max(1, Math.min(120, Number(p.cap) || 1)), lop: String(hs?.lop ?? ''), phien, cau, ...(start.hetCauMoi === true ? { hetCauMoi: true } : {}) }
+  return { sbd, ten: tenGoi(String(hs?.ho_ten ?? ''), p.nickname || PETS[pet]!.name), pet, cap: Math.max(1, Math.min(120, Number(p.cap) || 1)), lop: String(hs?.lop ?? ''), phien, cau, soCauThieu:Math.max(0,Number(start.soCauThieu)||0), ...(start.hetCauMoi === true ? { hetCauMoi: true } : {}) }
 }
 
 /**
  * CÂU CHUNG của hai trùm: một câu Phần II đã duyệt, đủ 4 ý. PHẠM VI không bao giờ đoán từ tên chương: câu chỉ hợp lệ khi thuộc một dạng mà
- * ÍT NHẤT MỘT bạn trong đội đang có câu cá nhân (tức máy chủ đã xác nhận bạn ấy học dạng đó) VÀ mọi kiến thức nền của câu nằm trong kiến thức
- * nền của chính các câu cá nhân ấy. Ưu tiên dạng cả lớp đang sai nhiều nhất. Loại: câu ca thi chưa công bố, câu thầy chặn riêng cho bất kỳ bạn nào,
+ * MỌI bạn trong đội có câu cá nhân ở dạng ấy, đủ mọi kiến thức nền và mức câu không vượt mức đã chọn vừa sức của bất kỳ bạn nào.
+ * Ưu tiên dạng các thành viên đang sai nhiều nhất. Loại: câu ca thi chưa công bố, câu thầy chặn riêng cho bất kỳ bạn nào,
  * câu ai đó đang/đã làm hôm nay ở chỗ khác, và chính các câu cá nhân của chặng. Không có câu hợp lệ → null (giáp vỡ theo phong độ).
  * Kèm theo: chia 4 ý theo BẬC của từng bạn ở dạng ấy (ý đầu cho bạn bậc thấp nhất; bạn máy coi như bậc giữa).
  */
@@ -196,26 +212,36 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
     for (const x of await docCauBtvnChuaNop(env, n.sbd)) chan.add(x)
     for (const c of n.cau) { chan.add(c.qid); chan.add(c.nhom) }
   }
-  const ktBiet = new Map<string, Set<string>>()
-  for (const c of nguoi.flatMap(n => n.cau)) if (c.dang) { const bo = ktBiet.get(c.dang) ?? new Set<string>(); for (const k of c.kt) bo.add(k); ktBiet.set(c.dang, bo) }
+  // Câu chung hiện cho mọi em: mỗi em phải có bằng chứng riêng về dạng và TẤT CẢ kiến thức nền.
+  const theoEm=nguoi.map(n=>{
+    const map=new Map<string,Set<string>>()
+    for(const c of n.cau)if(c.dang){const kt=map.get(c.dang)??new Set<string>();for(const k of c.kt)kt.add(k);map.set(c.dang,kt)}
+    return map
+  })
+  const ktBiet=new Map<string,Set<string>>()
+  for(const [dang,kt] of theoEm[0]??[]){
+    if(!theoEm.every(em=>em.has(dang)))continue
+    ktBiet.set(dang,new Set([...kt].filter(k=>theoEm.every(em=>em.get(dang)!.has(k)))))
+  }
   const ds = [...ktBiet.keys()].filter(d => !loaiDuocPhep || loaiDuocPhep.has(d)).slice(0, 80)
   if (!ds.length) return { trum, giaoY }
+  // Câu cá nhân đã được bộ chọn chặn theo bậc từng em. Lấy trần thấp nhất của đội,
+  // không lấy bậc thú hay độ khó của một bạn mạnh để nâng câu chung cho cả đội.
+  const cacMuc = ['biet','hieu','van_dung']
+  const tranMuc = new Map(ds.map(dang => [dang, Math.min(...nguoi.map(n =>
+    Math.max(0, ...n.cau.filter(c => c.dang === dang).map(c => cacMuc.indexOf(c.mucDo ?? ''))))) ]))
   const cho = (n: number) => Array.from({ length: n }, () => '?').join(',')
   const yeu = new Map<string, number>(), bac = new Map<string, number>()
   try {
-    const lop = [...new Set(nguoi.map(n => n.lop).filter(Boolean))]
-    if (lop.length) {
-      const l = await env.DB.prepare(`SELECT ma_dang, SUM(so_moi_sai)*1000+SUM(so_sai) diem FROM nam_kt_dang WHERE sbd IN (SELECT sbd FROM hoc_sinh WHERE lop IN (${cho(lop.length)})) GROUP BY ma_dang`).bind(...lop).all<Row>()
-      for (const x of l.results ?? []) yeu.set(String(x.ma_dang), Number(x.diem) || 0)
-    }
-    const r = await env.DB.prepare(`SELECT sbd,ma_dang,bac FROM nam_kt_dang WHERE sbd IN (${cho(nguoi.length)}) AND ma_dang IN (${cho(ds.length)})`).bind(...nguoi.map(n => n.sbd), ...ds).all<Row>()
-    for (const x of r.results ?? []) bac.set(`${x.sbd}|${x.ma_dang}`, Number(x.bac) || 0)
+    const r = await env.DB.prepare(`SELECT sbd,ma_dang,bac,so_moi_sai,so_sai FROM nam_kt_dang WHERE sbd IN (${cho(nguoi.length)}) AND ma_dang IN (${cho(ds.length)})`).bind(...nguoi.map(n => n.sbd), ...ds).all<Row>()
+    for (const x of r.results ?? []) {const dang=String(x.ma_dang);bac.set(`${x.sbd}|${dang}`,Number(x.bac)||0);yeu.set(dang,(yeu.get(dang)??0)+(Number(x.so_moi_sai)||0)*1000+(Number(x.so_sai)||0))}
   } catch { /* chưa có bảng hồ sơ: không xếp theo độ yếu của lớp, ai cũng bậc 0 */ }
   const r = await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc
     WHERE COALESCE(d.da_xoa,0)=0 AND q.dang IN (${cho(ds.length)}) AND json_extract(q.json,'$.phan')='II' LIMIT 400`).bind(...ds).all<{ json: string }>()
   const khoiDoi = await docKhoiThapNhat(env, nguoi.map(n => n.sbd)) // câu chung hiện cho CẢ đội ⇒ hợp khối với em thấp nhất (Boss 21/09)
   const ungVien = r.results.map(x => JSON.parse(x.json) as PrivateQuestion)
     .filter(q => cauHopKhoi(khoiDoi, q) && q.reviewed && !laCauTuLuan(q) && /^[DS]{4}$/.test(q.correct) && q.ideas.length === SO_Y_TRUM && !chan.has(q.qid) && !chan.has(q.group)
+      && cacMuc.includes(q.mucDo ?? '') && cacMuc.indexOf(q.mucDo!) <= (tranMuc.get(q.dang!) ?? 0)
       && q.kienThuc.length > 0 && q.kienThuc.every(k => ktBiet.get(q.dang!)!.has(k)))
     .sort((a, b) => (yeu.get(b.dang ?? '') ?? 0) - (yeu.get(a.dang ?? '') ?? 0) || hashSeed(`${ma}|${a.qid}`) - hashSeed(`${ma}|${b.qid}`) || a.qid.localeCompare(b.qid))
   // Trùm nhớ câu đã ra ở chặng trước của các em trong đoàn + câu các em đã làm ở mọi nguồn/mọi ngày: câu CHƯA AI thấy đứng trước (ổn định: giữ thứ tự cũ trong cùng nhóm)
@@ -307,13 +333,13 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
   }
   const ghe = (c ? c.ghe : p.nguoi.map(n => ({ ten: n.ten, pet: n.pet, laMay: false, roi: false }))).map((g, k) =>
     ({ ghe: k, ten: g.ten, pet: g.pet, cap: (p.nguoi[k] ?? p.nguoi[0]!).cap, laMay: g.laMay, roi: g.roi, laEm: k === i, trangThai: trangThai(k), tinHieu: laTrum && mo ? p.tinHieu[k] ?? null : null }))
-  const doan: Record<string, unknown> = { ma, revision, laChu: p.chu === sbd, batDau: !!c, ghe, gioMayChu: now }
+  const doan: Record<string, unknown> = { ma, revision, laChu: p.chu === sbd, batDau: !!c, ghe, gioMayChu: now, soCauThieu:p.nguoi[i]?.soCauThieu??0 }
   if (!c) return { ok: true, doan }
 
   const kb = kichBanChang(c.hatGiong)
   doan.tran = {
     tenChang: c.tenChang, hiep: c.hiep, soHiep: SO_HIEP, laTrum, ketThuc: c.ketThuc, thang: c.thang, linhTam: c.linhTam, quai: c.quai, trumVoGiap: c.trumVoGiap,
-    nangLuong: c.ghe[i]!.nangLuong, daNhanTiepSuc: c.ghe[i]!.daNhanTiepSuc, giay: giayCuaHiep(c.hiep), moSauMs: Math.max(0, p.hiepLuc - now), conMs: c.ketThuc ? 0 : Math.max(0, hanHiep(p) - Math.max(now, p.hiepLuc)),
+    nangLuong: c.ghe[i]!.nangLuong, daNhanTiepSuc: c.ghe[i]!.daNhanTiepSuc, giay: giayHiepPhong(p), moSauMs: Math.max(0, p.hiepLuc - now), conMs: c.ketThuc ? 0 : Math.max(0, hanHiep(p) - Math.max(now, p.hiepLuc)),
     tenQuai: kb.quai.map(q => q.ten), loaiQuai: kb.quai.map(q => q.id), tenTrum: kb.trum.map(t => t.ten), loaiTrum: kb.trum.map(t => t.id),
   }
   const vuaXong = c.lichSu.at(-1)
@@ -369,9 +395,6 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
   }
   return { ok: true, doan }
 }
-/** Phần kết quả của `answer` được phép về máy em SAU KHI em chốt. */
-const ketQuaCau = (r: Row) => ({ correct: r.correct, answer: r.answer, solution: r.solution, solutionImages: r.solutionImages, reward: r.reward, stage: r.stage })
-
 // ───────────────────────── Tiếp sức ─────────────────────────
 /** Ghế `tu` có được tiếp sức ghế `den` ngay lúc này không. Lời báo in thẳng cho em. */
 function kiemGiup(p: PhongDoan, tu: number, den: number, now: number) {

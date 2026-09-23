@@ -123,7 +123,40 @@ export interface KetQuaHiep {
 
 // ───────────────────────── Hàm nhỏ ─────────────────────────
 export const hiepLaTrum = (hiep: number) => HIEP_TRUM.includes(hiep)
-export const giayCuaHiep = (hiep: number) => (hiepLaTrum(hiep) ? GIAY_HIEP_TRUM : GIAY_MOI_HIEP)
+
+/** THỜI GIAN ĐỌC THÊM của một câu — M6 (23/09/2026), CÙNG CÔNG THỨC với tờ chiếu M1
+ *  (`src/lib/thoi-gian-len-bang.ts`: T_đọc = 8 + 0,35 × sốTừ + 10 nếu có hình/bảng).
+ *
+ *  VÌ SAO CÓ: hạn của hiệp trước đây CHỈ theo (phần, bậc) — câu Phần II dài 90 từ có bảng
+ *  ảnh được đúng hạn bằng câu Phần I ba dòng cùng bậc. Em đọc chưa xong đề đã hết giờ, và
+ *  đó là "phần thưởng/phạt" không do năng lực Hoá của em.
+ *
+ *  KẸP 0..60 s và LÀM TRÒN 5 s cho đồng hồ dễ đọc. Trả 0 khi KHÔNG có số đo độ dài (lõi thuần
+ *  gọi không kèm văn bản, test cũ, dữ liệu cũ) — nhờ vậy mọi hạn đang chạy KHÔNG đổi giá trị. */
+export const GIAY_DOC_NEN = 8
+export const GIAY_MOI_TU = 0.35
+export const GIAY_CO_HINH = 10
+export const GIAY_DOC_TOI_DA = 60
+export function giayDocThem(q: { soTu?: number | null; coHinh?: boolean | null }): number {
+  const tu = typeof q.soTu === 'number' && Number.isFinite(q.soTu) && q.soTu > 0 ? q.soTu : 0
+  const hinh = q.coHinh === true
+  if (tu === 0 && !hinh) return 0
+  const g = GIAY_DOC_NEN + GIAY_MOI_TU * tu + (hinh ? GIAY_CO_HINH : 0)
+  return Math.max(0, Math.min(GIAY_DOC_TOI_DA, Math.round(g / 5) * 5))
+}
+
+/** Hạn của cả đội lấy câu cần nhiều thời gian nhất, để mọi ghế có cùng một đồng hồ.
+ *  Hạn một câu = nền[phần] + 30×bậc + THỜI GIAN ĐỌC (M6), kẹp 60..180 s. */
+export const giayCuaHiep = (hiep: number, cau?: readonly { phan?: string; mucDo?: string | null; soTu?: number | null; coHinh?: boolean | null }[]) => {
+  if (!cau) return hiepLaTrum(hiep) ? GIAY_HIEP_TRUM : GIAY_MOI_HIEP // dữ liệu cũ gọi lõi thuần không kèm câu
+  if (hiepLaTrum(hiep)) return 180
+  const muc = (q: { phan?: string; mucDo?: string | null; soTu?: number | null; coHinh?: boolean | null }) => {
+    const bac = q.mucDo === 'van_dung' ? 2 : q.mucDo === 'hieu' ? 1 : 0
+    const nen = (q.phan === 'III' ? 120 : 90) + bac * 30 + giayDocThem(q)
+    return Math.max(60, Math.min(180, nen))
+  }
+  return Math.max(90, ...cau.map(muc))
+}
 /** Đồng hồ do nơi gọi đưa vào (mili giây) — lõi không tự đọc giờ. */
 export const hetGioHiep = (batDauLuc: number, bayGio: number, hiep: number) => bayGio - batDauLuc >= giayCuaHiep(hiep) * 1000
 const rut = (hatGiong: string, nhan: string) => mulberry32(hashSeed(`${hatGiong}|${nhan}`))()
