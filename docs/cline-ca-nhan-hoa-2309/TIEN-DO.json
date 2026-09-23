@@ -150,7 +150,7 @@
       "dependsOn": [
         "P03"
       ],
-      "status": "NOT_RUN",
+      "status": "IN_PROGRESS",
       "notes": "LAT CAT 1 (xong): trang thai FSRS du + khoa tri nho (content_group#memory_version) + ho tro khong day due  + Again thang trong ngay + bo trong khong cap nhat card; duong lui khi D1 chua co cot `assistance`. LAT CAT 2 (xong, 05-P04 muc 3-4): MODULE CHONG LAP `server/src/chong-lap.ts` (ham thuan) theo 02 §4.2:  (1) pham vi/quyen cong bo thang moi thu; (2) task DANG MO ⇒ tra lai CUNG task; (3) cung content_group  HOM NAY ⇒ chan, tru `repair_retry` (retry khong nhan lai EXP cau, khong nang FSRS); (4) DEN HAN duoc on —  module KHONG co cooldown 3/14/30 ngay; chua den han thi khong dung nguyen van de lap so, chi transfer/consolidation;  (5) giai family 1 ngay VN cho consolidation MOI voi 4 ngoai le co `repeat_reason` (DUE_REVIEW/REPAIR/TEACHER_ASSIGNMENT/PROBE);  (6) toi da 6 cau/luot, moi family 1 cau thuong, repair toi da 2 va phai cach >=2 nhiem vu khac HOAC >=300 giay,  cau chua gan family toi da 1/luot; (7) thieu cung thi RUT NGAN (bao `thieu`) chu khong noi bao ve;  (8) adapter doc D1 that `docDaLamHomNay` + `familyLanCuoiTuSuKien` (family tu SU KIEN vi kho that chua gan nhan). CON LAI: NOI module vao bo chon that — 05-P05 muc 3 chu trach nhiem \"pipeline hard filter ... family-spacing va ma ly do thieu\"  (can content_group/family tu kho va task dang mo tu D1). Vi chua noi nen P04 giu IN_PROGRESS; T41/T04 chua PASS; T07/T17/T29 thuoc P05/P07.",
       "evidence": [
         {
