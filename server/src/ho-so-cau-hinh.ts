@@ -120,3 +120,37 @@ export const GIAY_CACH_STABLE = 86_400_000
 /** Mỗi skill chỉ mở một đợt cần dạy lại tại một thời điểm (§3.3), và mỗi skill/ngày tối đa một probe (§3.2.3). */
 export const SO_DOT_MO_MOI_SKILL = 1
 export const SO_PROBE_MOI_SKILL_NGAY = 1
+
+// --- Ước lượng thời gian theo CNH-1.0 §5.1 (P05) --------------------------------
+// Nguồn: docs/cline-ca-nhan-hoa-2309/02-HOC-TAP-VA-RUT-CAU.md §5.1 + THAM-SO.json `planning`.
+// BẢN DUY NHẤT: `server/src/uoc-luong-thoi-gian.ts` KHÔNG tự khai lại các số này.
+// KHÁC bộ hằng số cũ (`VAN_TOC_*`, `GIAY_MOT_CAU_*` phía trên): bộ cũ là "trung vị giây/câu" cho ước
+// lượng thô đang chạy; bộ dưới là công thức theo PART × difficulty tính lại được (giữ cả hai, không trộn).
+
+/** Giây gốc cho một câu theo phần và mức độ (THAM-SO `baseSeconds`). */
+export const GIAY_CO_SO: Readonly<Record<'I' | 'II' | 'III', readonly [number, number, number]>> = Object.freeze({
+  I: Object.freeze([75, 105, 150] as const),
+  II: Object.freeze([150, 210, 300] as const),
+  III: Object.freeze([120, 180, 240] as const),
+})
+/** Đọc đề: quá `NGUONG_KY_TU_DOC` ký tự thì mỗi bước `BUOC_KY_TU_DOC` cộng `GIAY_MOI_BUOC_DOC`, trần `TRAN_DOC`. */
+export const NGUONG_KY_TU_DOC = 300
+export const BUOC_KY_TU_DOC = 120
+export const GIAY_MOI_BUOC_DOC = 10
+export const TRAN_DOC = 120
+/** Bảng/hình: mỗi cái `GIAY_MOI_HINH`, trần `TRAN_HINH`. */
+export const GIAY_MOI_HINH = 30
+export const TRAN_HINH = 90
+/** Hệ số theo tốc độ THẬT của em: cần `MAU_TOI_THIEU` mẫu hợp lệ, kẹp [`HE_SO_SAN`, `HE_SO_TRAN`]. */
+export const MAU_TOI_THIEU = 5
+export const MAU_TOI_DA = 20
+export const NGAY_MAU_TOI_DA = 30
+export const GIAY_MAU_TOI_THIEU = 10
+export const GIAY_MAU_TOI_DA = 900
+export const HE_SO_SAN = 0.75
+export const HE_SO_TRAN = 2
+/** Phản hồi mỗi câu: `TY_LE_PHAN_HOI` thời gian giải, sàn `GIAY_PHAN_HOI_TOI_THIEU`. */
+export const TY_LE_PHAN_HOI = 0.25
+export const GIAY_PHAN_HOI_TOI_THIEU = 30
+/** Chữa lỗi có bài mẫu: cộng thêm thời gian bài mẫu (02 §3.3 + §5.1). */
+export const GIAY_BAI_MAU = 90

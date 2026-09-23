@@ -310,6 +310,33 @@ Ngay: 23/09/2026 (tiep lat cat 1). `sourceFingerprint`: `c80eb18dafa3387faa4311c
 |---|---|---|---|
 | `vitest run tests/cnh-1-0-chong-lap-p04.test.ts` | 0 | **17 PASS** | `p04b-vitest-chong-lap.log` |
 | nhom (cnh-1-0, chong-lap, game, ke-hoach, lich-on, ho-so) | 0 | 26 tep · **370 PASS / 0 do** | `p04b-vitest-nhom.log` |
+
+## P05 (LAT CAT 1) — uoc luong thoi gian §5.1-5.2 + xep vua ngan sach (goi IN_PROGRESS)
+
+Ngay: 23/09/2026 (tiep P04). `sourceFingerprint`: `a5f0fd05d790ae2e0570f663ce4881de9fa4b2374087a07357b32fec599f3f62`.
+
+### Da lam
+
+- **`server/src/uoc-luong-thoi-gian.ts` (moi, HÀM THUẦN)** theo 02 §5.1: bang giay goc theo PART × muc do; cong thoi gian DOC de va BANG/HINH; **he so toc do ca nhan** = 1 khi <5 mau hop le, nguoc lai `clamp(trung vi(activeSeconds/base), 0,75, 2)` voi mau loc dung luat (cung part+muc, doc lap, da nop, khong gian doan, 10-900 giay, 20 mau moi nhat trong 30 ngay); `solve=ceil(base×factor)`, `feedback=max(30, ceil(solve×0,25))`, `task=solve+feedback`; chua loi co bai mau cong 90 giay va bien the kiem tu lam cong rieng.
+- **`xepVuaNganSach`** (§5.2): chon greedy theo dung thu tu uu tien, **khong san 4/8 cau**, het cho tra `BUDGET_EXHAUSTED`, khong cat thoi gian phan hoi de nhet them cau.
+- Hang so mot nguon trong `ho-so-cau-hinh.ts` (khong tron voi bo `VAN_TOC_*` cu dang chay).
+- `tests/cnh-1-0-thoi-gian-t08.test.ts`: **9 ca**, trong do dung vi du T08 (base 300, factor 0,8 ⇒ solve 240 + feedback 60; ngan sach 600 ⇒ dung 2 cau, tong 600).
+
+### Bang chung
+
+| Lenh | Exit | Ket qua | Log |
+|---|---|---|---|
+| `vitest run tests/cnh-1-0-thoi-gian-t08.test.ts` | 0 | **9 PASS** | `p05-vitest-t08.log` |
+| nhom (cnh-1-0, ke-hoach, lich-on, ho-so, game) | 0 | 27 tep · **379 PASS / 0 do** | `p05-vitest-nhom.log` |
+| `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 loi | — |
+| chay LAI T05/T06 + T32 theo fingerprint moi | 0 | 21 + 6 PASS | `p05-vitest-t05-t06.log`, `p05-vitest-t32.log` |
+
+### Vi sao goi VAN IN_PROGRESS
+
+Chua NOI cong thuc nay vao ke hoach ngay/bo chon that (duong dang chay van dung trung vi giay/cau; muon dung §5.1 phai co `part` + so ky tu nhin thay + so bang hinh tu kho cho tung ung vien). Con lai cua P05: pipeline hard filter + score tat dinh §7.2, giu cho bang SQL co uniqueness/CAS, mot plan/ngay + rubric dong bang + carry-over + assignment qua tai giu han goc. **T08/T10/T13/T40 chua PASS.**
+
+Trang thai that: phases PASS **2/12** (P02, P03) · IN_PROGRESS **P00, P01, P04, P05** · requirements PASS **2/42** (R05, R09) · tests PASS **9/50** (+ IN_PROGRESS: T04, T08, T12, T19, T29, T41).
+
 | `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 loi | — |
 | chay LAI T05/T06 + T32 (them tep moi lam fingerprint doi) | 0 | 21 + 6 PASS — bang chung P03 cap nhat theo fingerprint cuoi | `p04c-vitest-t05-t06.log`, `p04c-vitest-t32.log` |
 
