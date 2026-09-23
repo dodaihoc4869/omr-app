@@ -323,8 +323,33 @@
         "P05"
       ],
       "status": "NOT_RUN",
-      "notes": "",
-      "evidence": []
+      "notes": "LAT CAT 1 (xong): `server/src/hop-dong-chung.ts` — DANH SACH duong phat cau (engine / ke_hoach / ngoai_le CO TEN) + 5 co anh huong duong phat cau; test `tests/cnh-1-0-hop-dong-chung-p06.test.ts` doi chieu HAI CHIEU voi `server/src/index.ts` (moi duong khai phai co that; moi duong khop MAU_PHAT_CAU phai da khai hoac la ngoai le co ten) — 5 ca xanh. LAT CAT 2 (xong, SUA LO THAT): CONG PHAM VI CA NHAN (P02) da ap cho DUONG DOC CAU DUNG CHUNG (`layCauChoEm` ⇒ `/hs/cau-theo-qid` + `/hs/on-lai/nop`) khi co `pham_vi_hoc` BAT: cau phai qua `eligibleScope` cho CHINH em; quyen TOAN CHUONG TRINH (do thay cap, co bang chung) mo dung pham vi da cap; co TAT ⇒ hanh vi cu; loi doc ⇒ giu nguyen va KHONG ghi la da kiem. Test 4 ca (co TAT / chua taught / da taught + em khac / quyen). SUA HOI QUY THAT: ban dau toi them 1 truy van rieng trong `lapVaLuuKeHoach` lam test ngan sach truy van red (`ha-tai-ke-hoach-ngay-2209`: 26 > 25) ⇒ da GOP vao truy van `rk` CO SAN (khong them truy van) va test xanh lai. Toan suite: 34 tep do = DUNG bo no cu da ghi o P00–P03 (34 tep, cac tep nay do ca khi chay rieng). CON LAI cua P06: Mom/on/thu thach dung CHUNG tong tai theo tung buoc (hien thu thach/vo dai la ngoai le co ten, chua di bo chon chung); Doan dung muc ca nhan + han mem + continuing task (T29/T38/T39/T42-con-lai).",
+      "evidence": [
+        {
+          "path": "server/src/hop-dong-chung.ts",
+          "note": "danh sach duong phat cau + hop dong 6 phan + 5 co"
+        },
+        {
+          "path": "tests/cnh-1-0-hop-dong-chung-p06.test.ts",
+          "note": "5 ca: doi chieu index.ts hai chieu, ngoai le co ten"
+        },
+        {
+          "path": "server/src/cau-theo-qid.ts",
+          "note": "cong pham vi ca nhan cho duong doc cau dung chung"
+        },
+        {
+          "path": "tests/cnh-1-0-cong-pham-vi-doc-cau-p06.test.ts",
+          "note": "4 ca: co TAT/BAT, taught, quyen toan chuong trinh"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p06-vitest-full.log",
+          "note": "toan suite 742 tep: 34 do = no cu, 707 xanh, 1 skip"
+        },
+        {
+          "path": "docs/cline-ca-nhan-hoa-2309/evidence/p06-tom-tat-bang-chung.md",
+          "note": "tom tat bang chung P06 lat cat 1-2"
+        }
+      ]
     },
     {
       "id": "P07",
@@ -529,13 +554,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T14:22:00.000Z",
+          "executedAt": "2026-09-23T14:40:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "f0cac3799b8995db0890cda5d738b618e3275edd0886dd847741f0e10a204c57",
+          "sourceFingerprint": "7fd852fcdaa8d2db61c1e79f6f951df988dda64d561b21c55193d44223567925",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05j-vitest-t05-t06.log",
-              "sha256": "37be47296b18161ab954f8e475c365bfdc5c610650882b575bd8c85c02089541"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p06-vitest-t05-t06.log",
+              "sha256": "16ff8613138b0416c17a27e611feb32001fe081bc0d2eb4a688b8ed1b79dfc73"
             }
           ]
         }
@@ -1096,13 +1121,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T14:22:00.000Z",
+          "executedAt": "2026-09-23T14:40:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "f0cac3799b8995db0890cda5d738b618e3275edd0886dd847741f0e10a204c57",
+          "sourceFingerprint": "7fd852fcdaa8d2db61c1e79f6f951df988dda64d561b21c55193d44223567925",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05j-vitest-t05-t06.log",
-              "sha256": "37be47296b18161ab954f8e475c365bfdc5c610650882b575bd8c85c02089541"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p06-vitest-t05-t06.log",
+              "sha256": "16ff8613138b0416c17a27e611feb32001fe081bc0d2eb4a688b8ed1b79dfc73"
             }
           ]
         }
@@ -1117,13 +1142,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-nang-luc-t05-t06.test.ts",
-          "executedAt": "2026-09-23T14:22:00.000Z",
+          "executedAt": "2026-09-23T14:40:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "f0cac3799b8995db0890cda5d738b618e3275edd0886dd847741f0e10a204c57",
+          "sourceFingerprint": "7fd852fcdaa8d2db61c1e79f6f951df988dda64d561b21c55193d44223567925",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05j-vitest-t05-t06.log",
-              "sha256": "37be47296b18161ab954f8e475c365bfdc5c610650882b575bd8c85c02089541"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p06-vitest-t05-t06.log",
+              "sha256": "16ff8613138b0416c17a27e611feb32001fe081bc0d2eb4a688b8ed1b79dfc73"
             }
           ]
         }
@@ -1351,13 +1376,13 @@
       "evidence": [
         {
           "command": "npm exec -- vitest run tests/cnh-1-0-replay-t32.test.ts",
-          "executedAt": "2026-09-23T14:22:00.000Z",
+          "executedAt": "2026-09-23T14:40:00.000Z",
           "exitCode": 0,
-          "sourceFingerprint": "f0cac3799b8995db0890cda5d738b618e3275edd0886dd847741f0e10a204c57",
+          "sourceFingerprint": "7fd852fcdaa8d2db61c1e79f6f951df988dda64d561b21c55193d44223567925",
           "artifacts": [
             {
-              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p05j-vitest-t32.log",
-              "sha256": "f10c8f7f315b5a8021eb1e0e1a90453327caac9e49766ae831ef3346b2baa180"
+              "path": "docs/cline-ca-nhan-hoa-2309/evidence/p06-vitest-t32.log",
+              "sha256": "50ad3cb30f9b199a52235bf76b94cc14ec1d72aec3a4f940a21fef782f8a114e"
             }
           ]
         }

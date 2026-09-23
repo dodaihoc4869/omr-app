@@ -14,6 +14,10 @@ import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
 import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 import { ghiSnapshot, quyetDinhSnapshot } from './cau-snapshot'
+// CỔNG PHẠM VI CÁ NHÂN (CNH-1.0 P02) áp cho ĐƯỜNG ĐỌC CÂU DÙNG CHUNG (`/hs/cau-theo-qid` + `/hs/on-lai/nop`):
+// trước đây chỉ kế hoạch ngày lọc phạm vi; đường này phục vụ theo qid nên phải qua CÙNG cổng, nếu không thì
+// thử thách/ôn là "fallback" nới phạm vi. Cờ TẮT ⇒ không đổi hành vi.
+import { coQuyen, docPhamViNhieu, eligibleScope, QUYEN_TOAN_CHUONG_TRINH } from './pham-vi-hoc'
 
 export const TOI_DA_QID_MOT_LUOT = 20
 export const DAI_QID_TOI_DA = 120
@@ -132,8 +136,9 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepT
     `SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?) OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?)
                  THEN 1 ELSE 0 END AS co,
             (SELECT json_group_array(qid) FROM (SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)))) AS da_gap,
-            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'cau_snapshot') AS co_snapshot`,
-  ).bind(sbd, sbd, sbd, sbd, JSON.stringify(xin)).first<{ co: number; da_gap: string | null; co_snapshot: string | null }>()
+            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'cau_snapshot') AS co_snapshot,
+            (SELECT gia_tri FROM cau_hinh WHERE khoa = 'pham_vi_hoc') AS co_pham_vi`,
+  ).bind(sbd, sbd, sbd, sbd, JSON.stringify(xin)).first<{ co: number; da_gap: string | null; co_snapshot: string | null; co_pham_vi: string | null }>()
   // CỜ SNAPSHOT ĐỌC GỘP VÀO CHÍNH TRUY VẤN NÀY (P01/T34): thêm một cột chứ KHÔNG thêm một truy vấn, giữ đúng
   // ngân sách truy vấn mà `tests/cau-theo-qid-1909.test.ts` (mục "chi phí") đang khoá.
   const batSnapshot = String(r?.co_snapshot ?? '').trim() === 'bat'
@@ -169,8 +174,35 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepT
     const q = theoQid.get(qid)
     return q && khongBiBaoVe(q, baoVe) ? [q] : []
   })
-  const co = new Set(cau.map((c) => c.qid))
-  return { cau, khongCo: xin.filter((q) => !co.has(q)), snapshotBat: batSnapshot }
+  // CỔNG PHẠM VI CÁ NHÂN (P02/P06): cờ `pham_vi_hoc` BẬT ⇒ câu phải qua `eligibleScope` cho CHÍNH em này.
+  // Cờ đọc GỘP trong truy vấn 1 (không thêm truy vấn khi TẮT); BẬT thì thêm ĐÚNG một truy vấn đọc phạm vi.
+  // KHÔNG nới: thiếu nhãn/chưa duyệt/kỹ năng chưa `taught` ⇒ LOẠI (thiếu thì trả thiếu), không fallback sang kho chung.
+  let loc: PrivateQuestion[] = cau
+  if (String(r?.co_pham_vi ?? '').trim() === 'bat') {
+    try {
+      // Quyền TOÀN CHƯƠNG TRÌNH do THẦY cấp (có bằng chứng) mở đúng phạm vi đã cấp — không tự mở rộng.
+      const moHet = await coQuyen(env, sbd, QUYEN_TOAN_CHUONG_TRINH)
+      if (!moHet) {
+        const pv = (await docPhamViNhieu(env, [sbd])).get(sbd) ?? new Map()
+        loc = cau.filter((q) => {
+          const j = q as unknown as { kienThuc?: unknown; reviewed?: unknown; group?: unknown; version?: unknown }
+          const skillIds = Array.isArray(j.kienThuc) ? (j.kienThuc as string[]) : []
+          const kq = eligibleScope(
+            {
+              qid: q.qid, version: String(j.version ?? ''), contentGroup: String(j.group ?? ''),
+              skillIds, prerequisiteIds: [], qualityStatus: j.reviewed === true ? 'approved' : 'chua_duyet',
+            }, pv,
+          )
+          return kq.duoc
+        })
+      }
+    } catch {
+      // Không kiểm được phạm vi/quyền ⇒ giữ như cũ (một lỗi đọc tạm không làm trống việc ôn), không ghi là đã kiểm.
+      loc = cau
+    }
+  }
+  const co = new Set(loc.map((c) => c.qid))
+  return { cau: loc, khongCo: xin.filter((q) => !co.has(q)), snapshotBat: batSnapshot }
 }
 
 /** Dọn danh sách qid do máy em gửi: chỉ chữ, bỏ rỗng/trùng/quá dài, giữ thứ tự. */
