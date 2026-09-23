@@ -6,10 +6,12 @@
 //   · BTVN vượt tải GIỮ NGUYÊN assignment + HẠN GỐC; plan ghi số câu hoãn + số giây vượt.
 import { describe, expect, it } from 'vitest'
 import worker from '../server/src/index'
-import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
+import { chotNgayCu, lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
+import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { goiWorker, taoD1That } from './_d1-that'
 
 const NOW = Date.parse('2026-09-23T05:00:00.000Z') // 12:00 giờ VN, 23/09
+const NGAY_HOM_NAY = '2026-09-23'
 const H = 3_600_000
 const iso = (gio: number) => new Date(NOW + gio * H).toISOString()
 
@@ -76,15 +78,41 @@ describe('P05/T13·T40 — một plan/ngày, mục tiêu core đóng băng (D1 t
     expect(Number(row.over_budget_seconds)).toBe(kh.hoan.overBudgetSeconds)
   })
 
-  it('`/hs/ke-hoach-ngay` trả mục tiêu core đã đóng băng + số vượt tải cho giao diện', async () => {
+  it('chốt ngày theo MỤC TIÊU CORE: có câu ĐỘC LẬP đúng ⇒ `achieved`; chỉ có TRỢ GIÚP ⇒ `studied`; không có gì ⇒ `none`', async () => {
+    const HOM_QUA = '2026-09-22'
     const d = taoD1That()
-    seedBtvn(d, 'GAN', 30, -24, 48)
-    const r = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' })
-    expect(r.ok).toBe(true)
-    const mt = r.mucTieu as { role: string; policyVersion: string; revision: number; n: number }
-    expect(mt.policyVersion).toBe('cnh1-p05-v1')
-    expect(mt.role).toBe('homework_slice')
-    expect(mt.revision).toBeGreaterThanOrEqual(1)
-    expect(r.hoan).toMatchObject({ deferredCount: expect.any(Number), overBudgetSeconds: expect.any(Number) })
+    seedBtvn(d, 'GAN', 30, -48, 48)
+    // Kế hoạch của HÔM QUA (đã đóng băng mục tiêu role homework_slice).
+    const kh = (await lapVaLuuKeHoach(d.env, ['S1'], NOW - 24 * H)).get('S1')!
+    expect(kh.ngay).toBe(HOM_QUA)
+    const mt = d.sql.prepare("SELECT muc_tieu_json FROM ke_hoach_ngay WHERE ngay = ?").get(HOM_QUA) as { muc_tieu_json: string }
+    expect(JSON.parse(mt.muc_tieu_json).role).toBe('homework_slice')
+
+    // (a) KHÔNG có bằng chứng ⇒ none
+    await chotNgayCu(d.env, ['S1'], NGAY_HOM_NAY, new Date(NOW).toISOString())
+    const a = JSON.parse((d.sql.prepare("SELECT muc_tieu_ket_qua_json AS x FROM ke_hoach_ngay WHERE ngay = ?").get(HOM_QUA) as { x: string }).x)
+    expect(a.trangThai).toBe('none')
+
+    // (b) chỉ có câu làm CÓ TRỢ GIÚP ⇒ studied (hoàn tất việc, KHÔNG vào số độc lập đúng)
+    const d2 = taoD1That()
+    seedBtvn(d2, 'GAN', 30, -48, 48)
+    await lapVaLuuKeHoach(d2.env, ['S1'], NOW - 24 * H)
+    await ghiSuKien(d2.env, [{ nguon: 'btvn_lo', maNguon: 'GAN', sbd: 'S1', qid: 'Q1', lan: 1, ketQua: 1, giay: 60, luc: `${HOM_QUA}T05:00:00.000Z`, assistance: 'assisted' }])
+    await chotNgayCu(d2.env, ['S1'], NGAY_HOM_NAY, new Date(NOW).toISOString())
+    const b = JSON.parse((d2.sql.prepare("SELECT muc_tieu_ket_qua_json AS x FROM ke_hoach_ngay WHERE ngay = ?").get(HOM_QUA) as { x: string }).x)
+    expect(b.trangThai).toBe('studied')
+    expect(b.dung).toBe(0)
+
+    // (c) có câu ĐỘC LẬP đúng ⇒ achieved
+    const d3 = taoD1That()
+    seedBtvn(d3, 'GAN', 30, -48, 48)
+    await lapVaLuuKeHoach(d3.env, ['S1'], NOW - 24 * H)
+    await ghiSuKien(d3.env, [{ nguon: 'btvn_lo', maNguon: 'GAN', sbd: 'S1', qid: 'Q1', lan: 1, ketQua: 1, giay: 60, luc: `${HOM_QUA}T05:00:00.000Z`, assistance: 'none' }])
+    await chotNgayCu(d3.env, ['S1'], NGAY_HOM_NAY, new Date(NOW).toISOString())
+    const c = JSON.parse((d3.sql.prepare("SELECT muc_tieu_ket_qua_json AS x FROM ke_hoach_ngay WHERE ngay = ?").get(HOM_QUA) as { x: string }).x)
+    expect(c.trangThai).toBe('achieved')
+    expect(c.dung).toBeGreaterThanOrEqual(1)
+    expect(c.policyVersion).toBe(undefined) // kết quả chốt ngày không nhân bản policy (lấy từ mục tiêu đã đóng băng)
+    expect(c.luc).toBeTruthy()
   })
 })

@@ -10,3 +10,8 @@ ALTER TABLE ke_hoach_ngay ADD COLUMN muc_tieu_json TEXT NOT NULL DEFAULT '';
 -- Hai số này thuộc BẢN GHI PLAN nên để cạnh `ket_qua` (không nhét vào `viec_json` để thầy truy vấn thẳng).
 ALTER TABLE ke_hoach_ngay ADD COLUMN deferred_count INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE ke_hoach_ngay ADD COLUMN over_budget_seconds INTEGER NOT NULL DEFAULT 0;
+
+-- KẾT QUẢ CHỐT NGÀY THEO MỤC TIÊU CORE (02 §6): `achieved`/`studied`/`none` + số đúng/n/min_success + lý do
+-- (`NO_VALID_CORE_TASKS`) + cờ chờ giáo viên xác minh. Ghi lúc chốt ngày; CỘT RIÊNG để KHÔNG đổi nghĩa
+-- `ket_qua` cũ (đang nuôi chuỗi đạt/EXP/khiên).
+ALTER TABLE ke_hoach_ngay ADD COLUMN muc_tieu_ket_qua_json TEXT NOT NULL DEFAULT '';

@@ -11,6 +11,8 @@ import type { D1Result, Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { dungLaiHoSo } from './ho-so-nam-kt'
 import type { NamKtCau, NamKtDang } from './ho-so-nam-kt'
+// P05 (02 §6): đánh giá ngày theo MỤC TIÊU CORE đã đóng băng.
+import { danhGiaCore, type KetQuaTaskCore } from './muc-tieu-core'
 import {
   PHIEN_BAN_KE_HOACH, NGAY_LIET_KE_QUA_HAN, NGAY_ON_THI, NHIEM_VU_THAN_THU_MO_TOI_DA, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU,
 } from './ho-so-cau-hinh'
@@ -593,7 +595,7 @@ export async function lapVaLuuKeHoach(env: Env, dsSbd: string[], now: number, tu
 export async function chotNgayCu(env: Env, dsSbd: string[], homNay: string, nowIso: string): Promise<number> {
   const arr = json(dsSbd)
   const cho = await tat(() => env.DB.prepare(
-    `SELECT khoa, sbd, ngay, ngan_sach_json, viec_json FROM ke_hoach_ngay WHERE ${IN_EM} AND ngay < ? AND ket_qua IS NULL AND la_ngay_nghi = 0`,
+    `SELECT khoa, sbd, ngay, ngan_sach_json, viec_json, muc_tieu_json FROM ke_hoach_ngay WHERE ${IN_EM} AND ngay < ? AND ket_qua IS NULL AND la_ngay_nghi = 0`,
   ).bind(arr, homNay).all<Record<string, unknown>>(), trong())
   const rows = cho.results ?? []
   if (rows.length === 0) return 0
@@ -604,7 +606,8 @@ export async function chotNgayCu(env: Env, dsSbd: string[], homNay: string, nowI
     const r = await tat(() => env.DB.prepare(TIEN_BO_NGAY).bind(json(ds), ngay).all<Record<string, unknown>>(), trong())
     for (const x of r.results ?? []) tienBo.set(`${x.sbd}|${ngay}`, { da: Number(x.da_lam) || 0, len: Number(x.len_bac) || 0, tut: Number(x.tut_bac) || 0, dung: Number(x.dung) || 0 })
   }
-  const dong = rows.map((r) => {
+  const dong = []
+  for (const r of rows) {
     const tb = tienBo.get(`${r.sbd}|${r.ngay}`) ?? { da: 0, len: 0, tut: 0, dung: 0 }
     let toiThieu = 4, coToiHan = 0, treNhip = false
     try {
@@ -613,17 +616,83 @@ export async function chotNgayCu(env: Env, dsSbd: string[], homNay: string, nowI
       coToiHan = Number(v?.soCauToiHan) || 0
       treNhip = v?.treNhip === true
     } catch { /* kế hoạch hỏng: chốt theo số câu thô */ }
-    return { k: String(r.khoa), r: ketQuaChotNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan, ngayVn: String(r.ngay), soCauDungHomNay: tb.dung }), l: tb.da, u: tb.len, t: tb.tut }
-  })
+    // P05 (02 §6): chốt ngày theo MỤC TIÊU CORE đã đóng băng (nếu ngày đó có) — `null` ⇒ kế hoạch cũ, không bịa.
+    const core = await danhGiaMucTieuNgay(env, String(r.sbd), String(r.ngay), r.muc_tieu_json, r.viec_json)
+    dong.push({
+      k: String(r.khoa), r: ketQuaChotNgay({ daLam: tb.da, lenBac: tb.len, toiThieu, treNhip, soCauToiHan: coToiHan, ngayVn: String(r.ngay), soCauDungHomNay: tb.dung }),
+      l: tb.da, u: tb.len, t: tb.tut, m: core ? json({ ...core, luc: nowIso }) : '',
+    })
+  }
   for (const d of chunk(dong, 60)) {
     await env.DB.prepare(
-      `UPDATE ke_hoach_ngay SET ket_qua = j.r, so_cau_da_lam = j.l, so_cau_len_bac = j.u, so_cau_tut_bac = j.t, cap_nhat_luc = ?
+      `UPDATE ke_hoach_ngay SET ket_qua = j.r, so_cau_da_lam = j.l, so_cau_len_bac = j.u, so_cau_tut_bac = j.t, cap_nhat_luc = ?,
+              muc_tieu_ket_qua_json = CASE WHEN j.m = '' THEN ke_hoach_ngay.muc_tieu_ket_qua_json ELSE j.m END
          FROM (SELECT json_extract(value,'$.k') AS k, json_extract(value,'$.r') AS r, json_extract(value,'$.l') AS l,
-                      json_extract(value,'$.u') AS u, json_extract(value,'$.t') AS t FROM json_each(?)) j
+                      json_extract(value,'$.u') AS u, json_extract(value,'$.t') AS t, json_extract(value,'$.m') AS m FROM json_each(?)) j
         WHERE ke_hoach_ngay.khoa = j.k AND ke_hoach_ngay.ket_qua IS NULL`,
     ).bind(nowIso, json(d)).run()
   }
   return dong.length
+}
+
+/**
+ * ĐÁNH GIÁ NGÀY THEO MỤC TIÊU CORE ĐÃ CHỐT (`muc_tieu_json`) — CNH-1.0 P05 (02 §6).
+ *
+ * Ánh xạ kết quả TỪNG VIỆC BẮT BUỘC từ SỔ THẬT:
+ *   · việc có `chiTiet.qid` (ôn/ôn thi): `daNop` = mọi qid đã có câu trả lời; `docLapDung` = có câu ĐÚNG **độc lập**
+ *     (`ket_qua = 1` và `assistance = 'none'`);
+ *   · việc BTVN/Mom (không có qid trong kế hoạch): gộp theo `(nguon, ma_nguon)` trong ngày — `daNop` = có ≥ 1 câu
+ *     trả lời của bài đó, `docLapDung` = có ≥ 1 câu đúng độc lập của bài đó;
+ *   · việc không có bằng chứng nào ⇒ KHÔNG tính là xong (không cấp ngày miễn phí).
+ * Trả `null` khi ngày đó KHÔNG có mục tiêu core (kế hoạch cũ) — không bịa đánh giá.
+ */
+export async function danhGiaMucTieuNgay(
+  env: Env, sbd: string, ngay: string, mucTieuJson: unknown, viecJson: unknown,
+): Promise<ReturnType<typeof danhGiaCore> | null> {
+  let mt: import('./muc-tieu-core').MucTieuCore
+  let viec: { id?: unknown; nguon?: unknown; loai?: unknown; chiTiet?: Record<string, unknown> }[]
+  try {
+    const m = typeof mucTieuJson === 'string' ? JSON.parse(mucTieuJson) : mucTieuJson
+    if (!m || typeof m !== 'object' || !Array.isArray((m as { requiredTaskIds?: unknown }).requiredTaskIds)) return null
+    mt = m as import('./muc-tieu-core').MucTieuCore
+    const v = typeof viecJson === 'string' ? JSON.parse(viecJson) : viecJson
+    viec = ((v as { viec?: unknown })?.viec ?? []) as typeof viec
+    if (!Array.isArray(viec)) return null
+  } catch {
+    return null
+  }
+  const rows = await tat(() => env.DB.prepare(
+    "SELECT qid, nguon, ma_nguon, ket_qua, COALESCE(assistance,'') AS assistance FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ?",
+  ).bind(sbd, ngay).all<{ qid: string; nguon: string; ma_nguon: string; ket_qua: number | null; assistance: string }>(), trong())
+  const theoQid = new Map<string, { daTraLoi: boolean; docLapDung: boolean }>()
+  const theoNguon = new Map<string, { daTraLoi: number; docLapDung: number }>()
+  for (const x of rows.results ?? []) {
+    const docLapDung = Number(x.ket_qua) === 1 && String(x.assistance) === 'none'
+    const traLoi = x.ket_qua !== null
+    const q = theoQid.get(String(x.qid)) ?? { daTraLoi: false, docLapDung: false }
+    theoQid.set(String(x.qid), { daTraLoi: q.daTraLoi || traLoi, docLapDung: q.docLapDung || docLapDung })
+    const k = `${x.nguon}|${x.ma_nguon}`
+    const n = theoNguon.get(k) ?? { daTraLoi: 0, docLapDung: 0 }
+    theoNguon.set(k, { daTraLoi: n.daTraLoi + (traLoi ? 1 : 0), docLapDung: n.docLapDung + (docLapDung ? 1 : 0) })
+  }
+  const ketQua: KetQuaTaskCore[] = mt.requiredTaskIds.map((id) => {
+    const v = viec.find((x) => String(x.id) === id)
+    const qids = Array.isArray(v?.chiTiet?.qid) ? (v!.chiTiet!.qid as string[]) : []
+    if (qids.length) {
+      const c = qids.map((q) => theoQid.get(String(q)) ?? { daTraLoi: false, docLapDung: false })
+      return { taskId: id, docLap: true, daNop: c.every((x) => x.daTraLoi), docLapDung: c.some((x) => x.docLapDung) }
+    }
+    const ma = String(v?.chiTiet?.ma ?? '').trim() || String(v?.nguon ?? '').trim()
+    const loai = String(v?.loai ?? '')
+    const nguons = loai === 'mom' ? [`mom|${String(v?.chiTiet?.id ?? ma)}`] : [`btvn_lo|${ma}`, `btvn|${ma}`]
+    const gop = nguons.map((k) => theoNguon.get(k) ?? { daTraLoi: 0, docLapDung: 0 })
+    return {
+      taskId: id, docLap: true,
+      daNop: gop.some((x) => x.daTraLoi > 0),
+      docLapDung: gop.some((x) => x.docLapDung > 0),
+    }
+  })
+  return danhGiaCore(mt, ketQua)
 }
 
 /** Chạy qua cả lớp: chốt ngày cũ rồi lập kế hoạch hôm nay. Dùng cho cron 00:01 VN và lệnh thầy. */
