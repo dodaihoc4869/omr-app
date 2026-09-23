@@ -12,7 +12,7 @@ import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
 import {nangLucBat} from './nang-luc-d1'
 import {nganSachLuotBat,docNganSachConLai} from './ngan-sach-luot'
 import {chonCauChoLuot,familyTuNhan} from './bo-chon-that'
-import {giuCho} from './giu-cho'
+import {giuCho,nhaCho} from './giu-cho'
 import {PETS,ALIASES,OLD_SIX,allowed,learnedQuestionFilter,chooseSessionWithRoles,chooseLuotMoi,luotHomNay,SO_CAU_MOI_LUOT,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
 import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
 import type {ShieldState} from '../../src/game/than-thu-v2/shields'
@@ -421,6 +421,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
       if(res[1]?.meta.changes)p.tower=Math.min(999,p.tower+1)
     }
     for(const dang of new Set(session.questions.map(q=>done.find(a=>a.attempt.qid===q.qid)?.attempt.dang).filter(Boolean))){await env.DB.prepare('UPDATE game_v2_task SET completed_at=? WHERE sbd=? AND dang=? AND completed_at IS NULL').bind(now(),sbd,dang).run()}
+    // P05/P07: LƯỢT KẾT THÚC ⇒ NHẢ CHỖ ngay (không để chỗ treo tới hết lease). Chỉ nhả phần do CHÍNH phiên này giữ.
+    if(await nganSachLuotBat(env))await nhaCho(env,sbd,academicDay(now()),id)
     const fresh=await loadProfile(env,sbd)
     return {ok:true,profile:visible(fresh.profile),revision:fresh.revision,correct:done.filter(x=>x.attempt.correct).length,total:done.length}
   }

@@ -139,6 +139,22 @@ describe('T09 — game chỉ dùng PHẦN NGÂN SÁCH CÒN LẠI của ngày (c�
     expect((r.chonLyDo as Record<string, number>).TRAN_CAU_CHUA_FAMILY).toBeGreaterThan(0)
   })
 
+  it('P05/P07: LƯỢT KẾT THÚC ⇒ nhả chỗ ngay (không treo tới hết lease)', async () => {
+    const d = dung()
+    batCo(d, 'bat')
+    const token = await gameToken(d.env, 'S1')
+    const r = await goiWorker(worker, d.env, '/game-v2/start', { token, mode: 'adventure' }) as Record<string, unknown>
+    const id = String(r.id)
+    const qs = (r.questions as { qid: string }[]).map((q) => q.qid)
+    expect(Number((d.sql.prepare('SELECT COUNT(*) AS n FROM giu_cho').get() as { n: number }).n)).toBe(qs.length)
+    for (const qid of qs) {
+      await goiWorker(worker, d.env, '/game-v2/answer', { token, session: id, qid, answer: 'B' })
+    }
+    const xong = await goiWorker(worker, d.env, '/game-v2/complete', { token, session: id }) as Record<string, unknown>
+    expect(xong.ok).toBe(true)
+    expect(Number((d.sql.prepare('SELECT COUNT(*) AS n FROM giu_cho').get() as { n: number }).n)).toBe(0)
+  })
+
   it('câu đã bị LƯỢT KHÁC giữ chỗ ⇒ lượt này KHÔNG nhận (và chỗ giữ không bị chiếm)', async () => {
     const d = dung()
     batCo(d, 'bat')
