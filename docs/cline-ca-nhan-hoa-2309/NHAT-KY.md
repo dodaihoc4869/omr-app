@@ -466,3 +466,17 @@ Các phụ thuộc đã sẵn sàng; phần chờ gói khác: P07 cho nhaCho/rec
 2. Truoc P11: ap migration len D1 that theo canary 5% (07 §3), bat `nang_luc_v1` cho mot nhom nho, do p95 va chuan bi rollback.
 
 
+
+
+CHECKPOINT CNH-1.0 — RÀ SOÁT 01 BỔ SUNG (RV01/RV02-followup)
+Thời điểm/HEAD: 23/09/2026 (22:3x +07:00) · HEAD `9de7b11` (đã push). Bản sửa nối tiếp `207e9fe` (nhả chỗ khi lượt kết thúc).
+Yêu cầu/test đang xử lý: hai lỗi BỔ SUNG của RV01/RV02 do giám sát tái hiện trên snapshot WIP (`review-rv01-followup`, hash trong `SNAPSHOT.json`).
+Hành vi vừa hoàn thành và đường gọi thật:
+ · RV01-followup: `migration-2309-cnh1-giu-cho_z-donvi.sql` dựng lại bảng giữ chỗ — PK `(sbd, content_group)`, một dòng cho MỘT đơn vị nội dung, XUYÊN NGÀY; `ngay` chỉ là ngày hoạt động gần nhất; thêm `revision`; giữ dữ liệu cũ.
+ · RV02-followup: gia hạn là MỘT câu CAS có predicates (`task_id`, `het_han_task > now`, `revision` khi có), thắng ⇔ `changes = 1`; tiếp quản thêm `AND task_id <> ?` (không hồi sinh task hết hạn); gia hạn KHÔNG ghi `het_han_task` (hạn nộp đã chốt từ lúc phát không bị kéo dài).
+ · API bỏ `ngay`: `nhaCho(env,sbd,taskId,qids?)`, `docTheoNhom(env,sbd,nhom)`, `docCho(env,sbd,nowMs)`, `docMotCho(env,sbd,qid)`; `game-v2` gọi `nhaCho(env,sbd,id)` khi lượt kết thúc.
+File đã sửa; thay đổi người dùng cần giữ: `server/src/{giu-cho,bo-chon-that,game-v2}.ts`, `server/migration-2309-cnh1-giu-cho_z-donvi.sql`, `tests/cnh-1-0-giu-cho.test.ts`, `scripts/tai-hien-rv01-followup.mjs`, `docs/.../evidence/rasoat01-rv-fix.md`; KHÔNG đụng WIP thầy.
+Lệnh kiểm (exit code thật): `tsc -b` 0 · `tsc -p server` 0 · `vitest run tests/cnh-1-0-giu-cho.test.ts` 12 ca **exit 0** · `node --experimental-strip-types scripts/tai-hien-rv01-followup.mjs` **exit 0** (không còn tái hiện) · nhóm 58 tệp xanh · toàn suite 707 xanh / 34 đỏ (= bộ nợ cũ) / 1 skip. Log: `evidence/rasoat01b-*.log`.
+Phần chưa xong và blocker đã xác minh: RV06 (runtime Cloudflare) vẫn mở — máy không có wrangler/miniflare/@cloudflare/vitest-pool-workers; RV01/RV02 chưa kiểm hai thiết bị thật; kho thật chưa gắn nhãn `family` ⇒ lượt rút còn 1 câu theo §4.2.6 (cần thầy gắn nhãn).
+Việc kế tiếp làm ngay: tiếp P06 còn lại (Mom/ôn/thử thách dùng CHUNG tổng tải; Đoàn đúng mức cá nhân + hạn mềm + continuing task), rồi P07 (EXP/ledger/receipt/outbox + idempotency), P08→P10; P11 chỉ chuẩn bị + ghi CHƯA XÁC MINH.
+Các phụ thuộc đã sẵn sàng; phần chờ gói khác: P07 cho receipt/correction; P06 cho các kênh khác dùng chung ngân sách.
