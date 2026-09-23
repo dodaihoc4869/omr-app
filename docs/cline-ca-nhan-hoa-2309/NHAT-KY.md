@@ -513,3 +513,23 @@ RV01/RV02 chưa kiểm hai thiết bị thật; kho thật chưa gắn nhãn `fa
 P06 còn lại: continuing task + hạn session 24 giờ + `expired_unanswered` + không ghi timeout thành sai; hai lỗi chính liên tiếp ⇒ vai hỗ trợ.
 Việc kế tiếp: P07 (EXP/ledger/receipt/outbox nguyên tử + idempotency + correction) → P08 → P09 → P10 → P11 (chuẩn bị + ghi CHƯA XÁC MINH);
 bổ sung dần bằng chứng D1-runtime cho các nhóm CAS/đồng thời còn lại.
+
+
+CHECKPOINT CNH-1.0 — RV07 (nối DỮ LIỆU THẬT cho điểm chọn câu §7.2)
+HEAD `2e57bc9` (đã push). Ánh xạ đầy đủ: `evidence/rv07-anh-xa-dieu-khoan.md`.
+ĐÃ NỐI (kèm test): `intervalMs` thật từ sổ+hồ sơ (`docKhoangOnTheoNhom`; nhóm thiếu bằng chứng ⇒ fallback sàn 1 ngày, ghi rõ);
+`transferValue` với family em đã gặp (`docFamilyDaGap`, nhãn đọc bằng `SQL_NHAN_FAMILY`) + `transferChoPhep` đúng §7.2 (1/0,5/0);
+`plan_version` THẬT trong khoá hash (từ `ke_hoach_ngay.phien_ban`, hai đường game truyền vào — không còn 0 cứng);
+`coverage` tính CẢ PLAN (`docCoverageTheoPlan`: việc có `chiTiet.qid` + giữ chỗ + sổ hôm nay);
+`repairNeed` theo KỸ NĂNG (`docRepairTheoKyNang` đọc P03 `skill_snapshot.episode_state`, ưu tiên hơn `nam_kt_cau`).
+Test: `tests/cnh-1-0-bo-chon-that-rv07.test.ts` **13 ca xanh** (interval 1 vs 30 ngày · family đã gặp/mới/không cơ hội ·
+plan version + replay · coverage plan · repair kỹ năng · hai em khác hồ sơ qua pipeline §7.1 · 4 ca đọc nguồn thật trên D1).
+CÒN THIẾU (ghi rõ, KHÔNG tự nới luật): (a) nhãn “family đã DUYỆT” chưa có bảng/nguồn ⇒ hiện dùng nhãn kho;
+(b) nơi CẤP `transferChoPhep` chưa nối ⇒ mặc định rỗng ⇒ transferValue = 0 (đúng “0 nếu không có cơ hội”);
+(c) việc kế hoạch BTVN/Mom không mang qid ⇒ chưa vào `coverage`;
+(d) **bộ chọn KẾ HOẠCH NGÀY + đường ôn (`/hs/cau-theo-qid`) chưa đi qua `chonCauChoLuot`** ⇒ §7.1 chưa áp cho hai đường này;
+(e) RV06 mới có bằng chứng D1-runtime cho nhóm giữ chỗ, chưa cho bộ chọn/Đoàn trên workerd; chưa kiểm hai thiết bị thật.
+Lệnh kiểm lượt này: `tsc -b` 0 · `tsc -p server` 0 · nhóm 62 tệp xanh · `npm run test:d1` exit 0 (5 ca).
+Việc kế tiếp NGAY: (1) nối bộ chọn vào KẾ HOẠCH NGÀY (hai danh sách tự động) + đường ôn, giữ `qidPhucVuDuoc`/bảo vệ;
+(2) nối nguồn `transferChoPhep` + qid cho việc BTVN/Mom để coverage đủ; (3) tiếp P06 còn lại (continuing task · hạn session 24h · `expired_unanswered`);
+(4) P07 → P08 → P09 → P10; P11 chuẩn bị + ghi CHƯA XÁC MINH.
