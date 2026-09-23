@@ -7,12 +7,14 @@
 // Khiên: `shieldRemaining` cũ (`shields.ts`, KHÔNG sửa) = quà tiến hoá − đã dùng. Khiên RÈN cộng thêm: còn lại = quà + đã rèn − đã dùng.
 // Quy ước dùng: khiên quà tiến hoá dùng TRƯỚC, khiên rèn sau — nên "khiên rèn chưa dùng" = min(đã rèn, còn lại). Đó là con số chạm trần
 // `KHIEN_REN_TOI_DA` (5) để ngừng rèn thêm.
+import { EXP_DU_TRU, EXP_REN_KHIEN, MANH_REN_KHIEN, KHIEN_REN_GIU_TOI_DA } from '../../src/lib/kinh-te-game'
 import { shieldEntitlement } from '../../src/game/than-thu-v2/shields'
 import { congManh, type KhienRen } from './exp-hoc-tap'
 import { CAP_KHIEN_QUA_DAU, NGAY_DAT_MO_KHIEN_QUA } from './exp-cau-hinh'
 
 export interface HoSoGameExp {
   cap: number
+  luatCap?: number
   exp: number
   /** Ống nghiệm: EXP đã kiếm, chưa nạp vào thần thú. */
   wallet?: number
@@ -61,10 +63,24 @@ export function congTongSoVaoHoSo(p: HoSoGameExp, tongExp: number, tongManh: num
   let khienMoi = 0
   if (themManh > 0) {
     const truoc = p.khienRen ?? { manh: 0, daRen: 0 }
-    const sau = congManh(truoc, themManh, khienRenChuaDung(p))
+    const sau = (p.luatCap ?? 0) >= 3 ? { ...truoc, manh: truoc.manh + themManh } : congManh(truoc, themManh, khienRenChuaDung(p))
     khienMoi = sau.daRen - truoc.daRen
     p.khienRen = sau
   }
   p.expMoi = { daCong: Math.max(daCong, Math.floor(tongExp)), manhDaTinh: Math.max(manhDaTinh, Math.floor(tongManh)), ...(ngayDat === undefined ? (p.expMoi?.ngayDat === undefined ? {} : { ngayDat: p.expMoi.ngayDat }) : { ngayDat: Math.max(0, Math.floor(ngayDat)) }) }
   return { exp: them, manh: themManh, khienMoi }
+}
+
+/** Rèn theo số lần đã rèn để request cũ không trừ EXP thêm lần nữa. */
+export function renKhienBangExp(p: HoSoGameExp, soDaRen: number): boolean {
+  const cu = p.khienRen ?? { manh: 0, daRen: 0 }
+  if (!Number.isInteger(soDaRen) || soDaRen < 0 || soDaRen > cu.daRen) throw new Error('Em tải lại Túi đồ trước khi rèn.')
+  if (soDaRen < cu.daRen) return false
+  if ((p.luatCap ?? 0) < 3) throw new Error('Hồ sơ đang cập nhật. Em thử lại sau.')
+  if ((p.expMoi?.ngayDat ?? 0) < MANH_REN_KHIEN || cu.manh < MANH_REN_KHIEN) throw new Error(`Em cần ${MANH_REN_KHIEN} ngày đạt nhiệm vụ và ${MANH_REN_KHIEN} mảnh để rèn khiên.`)
+  if (khienRenChuaDung(p) >= KHIEN_REN_GIU_TOI_DA) throw new Error('Túi đã đủ khiên rèn. Em giữ mảnh cho lần sau.')
+  if ((p.wallet ?? 0) < EXP_REN_KHIEN + EXP_DU_TRU) throw new Error(`Rèn cần ${EXP_REN_KHIEN} EXP, giữ lại ${EXP_DU_TRU} EXP để thần thú ăn.`)
+  p.wallet = (p.wallet ?? 0) - EXP_REN_KHIEN
+  p.khienRen = { manh: cu.manh - MANH_REN_KHIEN, daRen: cu.daRen + 1 }
+  return true
 }

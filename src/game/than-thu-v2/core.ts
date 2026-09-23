@@ -35,16 +35,36 @@ export function grade(q:Pick<PrivateQuestion,'phan'|'correct'>, answer:string):b
 }
 export function allowed(q:Question, evidence:Evidence[], blocked:Set<string>):boolean {
   if(blocked.has(q.qid)||blocked.has(q.group)) return false
-  if(evidence.some(e=>e.qid===q.qid)) return true
+  if(evidence.some(e=>e.qid===q.qid&&e.group===q.group)) return true
   // Unknown prerequisite sets are never guessed from a chapter title.
   if(!q.dang||!q.mucDo||!q.kienThuc.length) return false
   const same=evidence.filter(e=>e.dang===q.dang)
   const known=new Set(same.flatMap(e=>e.kienThuc))
   return same.length>0 && q.kienThuc.every(k=>known.has(k))
 }
+/** Tạo bộ lọc một lần cho cả kho; bằng chứng chỉ thuộc đúng học sinh đang mở lượt. */
+export function learnedQuestionFilter(evidence:readonly Evidence[],blocked:ReadonlySet<string>):(q:Question)=>boolean {
+  const groupsByQid=new Map<string,Set<string>>(),knowledge=new Map<string,Set<string>>()
+  for(const e of evidence){
+    const groups=groupsByQid.get(e.qid)??new Set<string>();groups.add(e.group);groupsByQid.set(e.qid,groups)
+    if(!e.dang)continue
+    let known=knowledge.get(e.dang)
+    if(!known){known=new Set<string>();knowledge.set(e.dang,known)}
+    for(const k of e.kienThuc)known.add(k)
+  }
+  return q=>{
+    if(blocked.has(q.qid)||blocked.has(q.group))return false
+    if(groupsByQid.get(q.qid)?.has(q.group))return true
+    if(!q.dang||!q.mucDo||!q.kienThuc.length)return false
+    const known=knowledge.get(q.dang)
+    return !!known&&q.kienThuc.every(k=>known.has(k))
+  }
+}
 const LEVELS=['biet','hieu','van_dung']
 export function targetLevel(dang:string|null,evidence:Evidence[],attempts:Attempt[]):number {
-  const base=evidence.filter(e=>e.dang===dang).map(e=>LEVELS.indexOf(e.mucDo??'')).filter(n=>n>=0)
+  // Từng làm SAI câu khó chỉ chứng minh đã gặp dạng, không chứng minh đủ sức ở bậc đó.
+  // Bắt đầu từ Biết để em khắc phục; các lần tự làm đúng bên dưới vẫn mở bậc dần.
+  const base=evidence.filter(e=>e.dang===dang&&LEVELS.includes(e.mucDo??'')).map(e=>e.wrong?0:LEVELS.indexOf(e.mucDo!))
   let level=base.length?Math.min(...base):0
   for(let l=level;l<2;l++) {
     const recent=attempts.filter(a=>a.dang===dang&&a.mucDo===LEVELS[l]&&!a.assisted&&a.novel)
@@ -132,7 +152,7 @@ export const tranCauDaiTheoCap=(cap:number)=>cap>=30?3:cap>=10?2:1
 const GIO_VN=7*3600000
 const ngayVnChi=(ms:number)=>Math.floor((ms+GIO_VN)/DAY)
 const ngayVnChuoi=(ms:number)=>new Date(ms+GIO_VN).toISOString().slice(0,10)
-export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): khối của em — câu của tờ khối CAO hơn KHÔNG BAO GIỜ vào lượt, dù trùng mã dạng. Bỏ trống / không rõ ⇒ không lọc (máy chủ vẫn lọc kho ở `readScope`; đây là lớp bảo hiểm thứ hai, ở chính hàm chọn). */ khoiEm?:Khoi|null; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number }
+export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): khối của em — câu của tờ khối CAO hơn KHÔNG BAO GIỜ vào lượt, dù trùng mã dạng. Bỏ trống / không rõ ⇒ không lọc (máy chủ vẫn lọc kho ở `readScope`; đây là lớp bảo hiểm thứ hai, ở chính hàm chọn). */ khoiEm?:Khoi|null; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number; gentle?:boolean; dueQids?:ReadonlySet<string>; seenGroups?:ReadonlyMap<string,number> }
 export interface CauLuot { q:PrivateQuestion; role:QuestionRoleV2; dai:boolean; moi:boolean }
 interface ThongKeNhom { gap:number; sai:number; lucSaiCuoi:number; lucDungCuoi:number; lucCuoi:number }
 export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempts:Attempt[],mastery:Mastery[],opt:OptLuot):CauLuot[] {
@@ -141,7 +161,8 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
   const tk=new Map<string,ThongKeNhom>();const lay=(g:string)=>{let t=tk.get(g);if(!t){t={gap:0,sai:0,lucSaiCuoi:-1,lucDungCuoi:-1,lucCuoi:-1};tk.set(g,t)}return t}
   for(const a of [...attempts].sort((x,y)=>x.at-y.at)){const t=lay(a.group);t.gap++;t.lucCuoi=a.at;if(a.correct&&!a.assisted)t.lucDungCuoi=a.at;else t.lucSaiCuoi=a.at;if(!a.correct)t.sai++}
   const saiHomNayEv=new Set<string>()
-  for(const e of evidence){const t=lay(e.group);t.gap++;if(e.wrong){t.sai++;if(e.date>=homChuoi)saiHomNayEv.add(e.group)}}
+  for(const e of evidence){const t=lay(e.group),luc=Date.parse(e.date);t.gap++;if(Number.isFinite(luc)){t.lucCuoi=Math.max(t.lucCuoi,luc);if(e.wrong)t.lucSaiCuoi=Math.max(t.lucSaiCuoi,luc);else t.lucDungCuoi=Math.max(t.lucDungCuoi,luc)}if(e.wrong){t.sai++;if(e.date>=homChuoi)saiHomNayEv.add(e.group)}}
+  for(const [group,luc] of opt.seenGroups??[]){const t=lay(group);t.gap=Math.max(1,t.gap);t.lucCuoi=Math.max(t.lucCuoi,luc)}
   const daGapDang=new Set<string>();for(const q of pool)if(tk.has(q.group)&&q.dang)daGapDang.add(q.dang)
   const gapNhom=(q:Question)=>(tk.get(q.group)?.gap??0)>0
   const saiHomNay=(q:Question)=>{const t=tk.get(q.group);return saiHomNayEv.has(q.group)||(!!t&&t.lucSaiCuoi>=0&&ngayVnChi(t.lucSaiCuoi)>=hom&&t.lucSaiCuoi>=t.lucDungCuoi)}
@@ -156,7 +177,7 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
   const dai=(q:Question)=>q.phan!=='I'
   const rank=(q:Question)=>{let h=2166136261;for(const c of q.group)h=Math.imul(h^c.charCodeAt(0),16777619);return (h^(Math.floor(now/3600000)+attempts.length)*2654435761)>>>0}
   const kho=pool.filter(q=>q.reviewed&&!blocked.has(q.qid)&&!blocked.has(q.group)&&cauHopKhoi(opt.khoiEm,q)&&(q.phan==='I'||q.phan==='II'||q.phan==='III'))
-  const nhanCoYeu=kho.some(q=>weak.has(key(q))&&level(q)<=target(q.dang)&&!saiHomNay(q)),nhanCoTH=kho.some(q=>due.has(key(q))&&level(q)<=target(q.dang)&&!saiHomNay(q))
+  const nhanCoYeu=kho.some(q=>weak.has(key(q))&&level(q)<=target(q.dang)&&!saiHomNay(q)),nhanCoTH=kho.some(q=>(opt.dueQids?.has(q.qid)||due.has(key(q)))&&level(q)<=target(q.dang)&&!saiHomNay(q))
   const tranDai=opt.loai==='trum'?N:Math.min(opt.thuong?2:1,tranCauDaiTheoCap(opt.cap))
   const tranDaiToiDa=opt.loai==='trum'?N:tranCauDaiTheoCap(opt.cap)
   type Suat={role:QuestionRoleV2;mucCao:boolean;dai:boolean}
@@ -167,32 +188,35 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
     const goc:QuestionRoleV2[]=opt.loai==='khoi_dong'
       ?(nhanCoYeu?['yeu','yeu',...(nhanCoTH?['toi_han' as const]:[]),'moi','moi','moi','moi']:[...(nhanCoTH?['toi_han' as const]:[]),'moi','moi','moi','moi','moi','moi'])
       :(nhanCoYeu?['yeu','yeu',...(nhanCoTH?['toi_han' as const]:[]),'moi','moi','thu_thach','moi']:[...(nhanCoTH?['toi_han' as const]:[]),'moi','moi','moi','thu_thach','thu_thach','moi'])
+    if(opt.gentle)for(let i=0;i<goc.length;i++)if(goc[i]==='thu_thach')goc[i]='moi'
     let daiCon=opt.loai==='khoi_dong'?0:tranDai
     suat=goc.slice(0,N).map(r=>{const dsd=r==='moi'&&daiCon>0;if(dsd)daiCon--;return S(r,r==='thu_thach',dsd)})
   }
   // Thứ tự chọn: suất yếu / tới hạn (mục tiêu sư phạm) → thử thách → suất DÀI của khám phá → còn lại; Lượt trùm giữ nguyên (3 suất dài đứng đầu). Hạn mức câu dài tính CHUNG cho cả lượt.
   const uuTien=(x:Suat)=>opt.loai==='trum'?(x.dai?0:1):x.role==='yeu'||x.role==='toi_han'?0:x.role==='thu_thach'?1:x.dai?2:3
   suat=suat.map((x,i)=>({x,i})).sort((a,b)=>uuTien(a.x)-uuTien(b.x)||a.i-b.i).map(o=>o.x)
-  const dung=new Set<string>(),out:CauLuot[]=[];let soDai=0,soCu=0
-  // THANG NỚI (5 mức): 0 chặt · 1 bỏ đòi câu dài · 2 cho bậc + 1 (suất thường) · 3 cho câu sai ≥ 3 lần / đúng chưa đủ 30 ngày · 4 cho cả câu sai hôm nay và lấy quá hạn mức câu dài ("câu lâu nhất chưa gặp").
-  // Suất chuyên biệt (yếu, tới hạn) chỉ đi tới mức 1; hết câu thì đổi thành suất mới / lấp. KHÔNG BAO GIỜ vượt bậc + 1 ở mọi mức.
-  const thuTuNoi=[0,1,2,3,4] as const
-  const noiToiDa=(r:QuestionRoleV2)=>r==='yeu'||r==='toi_han'?1:4
+  const dung=new Set<string>(),qidDung=new Set<string>(),out:CauLuot[]=[];let soDai=0,soCu=0
+  // Chỉ nới yêu cầu câu dài và, với lượt không ở chế độ nhẹ, một bậc độ khó.
+  // Không lấy câu vừa đúng/chưa tới lịch hoặc sai trong hôm nay để lấp đủ suất.
+  const thuTuNoi=[0,1,2] as const
+  const noiToiDa=(r:QuestionRoleV2)=>r==='yeu'||r==='toi_han'||opt.gentle?1:2
   const hopLe=(q:PrivateQuestion,s:Suat,noi:number)=>{
-    if(dung.has(q.group))return false
+    if(dung.has(q.group)||qidDung.has(q.qid))return false
     const L=level(q),T=target(q.dang),T1=Math.min(2,T+1)
     if(s.mucCao){if(noi<=1?L!==T1:noi===2?!(L>=T&&L<=T1):(L>T1||L<0))return false}   // câu chưa rõ bậc (mucDo null) KHÔNG BAO GIỜ vào suất thử thách / Lượt trùm
     else if(!(L<=T||(noi>=2&&L===T+1)))return false
     if(opt.loai==='khoi_dong'&&noi<4&&dai(q))return false
     if(opt.loai!=='trum'&&dai(q)&&soDai>=Math.min(tranDai,tranDaiToiDa)&&noi<4)return false   // MỘT lượt thường: câu dài ≤ 1 (thưởng ≤ 2) VÀ ≤ trần theo cấp thú
     if(s.dai&&noi<1&&!dai(q))return false
-    if(noi<3&&(sai3(q)||dung30(q)))return false
-    if(noi<4&&saiHomNay(q))return false
+    if(sai3(q)||(dung30(q)&&!opt.dueQids?.has(q.qid)))return false
+    if(saiHomNay(q))return false
     if(s.role==='yeu'&&!weak.has(key(q)))return false
-    if(s.role==='toi_han'&&!due.has(key(q)))return false
+    if(s.role==='toi_han'&&!opt.dueQids?.has(q.qid)&&!due.has(key(q)))return false
     return true
   }
   const tot=(a:PrivateQuestion,b:PrivateQuestion,s:Suat)=>{
+    const da=opt.dueQids?.has(a.qid)?0:1,db=opt.dueQids?.has(b.qid)?0:1
+    if(da!==db)return da-db
     const ma=gapNhom(a)?1:0,mb=gapNhom(b)?1:0
     if(ma!==mb)return ma-mb                                  // câu CHƯA gặp trước
     if(s.role==='moi'&&opt.loai==='kham_pha'){const da=daGapDang.has(a.dang??'')?1:0,db=daGapDang.has(b.dang??'')?1:0;if(da!==db)return da-db}  // khám phá: dạng em chưa gặp trước
@@ -207,7 +231,7 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
       if(!ds.length)continue
       if(soCu>=2){const moi=ds.filter(q=>!gapNhom(q));if(moi.length)ds=moi}
       ds.sort((a,b)=>tot(a,b,s));const q=ds[0]!
-      dung.add(q.group);out.push({q,role:s.role,dai:dai(q),moi:!gapNhom(q)});if(dai(q))soDai++;if(gapNhom(q))soCu++
+      dung.add(q.group);qidDung.add(q.qid);out.push({q,role:s.role,dai:dai(q),moi:!gapNhom(q)});if(dai(q))soDai++;if(gapNhom(q))soCu++
       return true
     }
     return false

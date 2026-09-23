@@ -15,7 +15,7 @@ export const dauNgayVn = (ngay: string): number => Date.parse(`${ngay}T00:00:00+
 const ngayVnCua = (ms: number): string => new Date(ms + GIO_VN_MS).toISOString().slice(0, 10)
 
 /**
- * MỘT ĐỒNG HỒ ÔN: mốc ôn của dạng = `nam_kt_dang.moc_on_ke` (ngày VN, sớm nhất trong các câu chưa khắc phục), không phải `due` riêng của game.
+ * MỘT ĐỒNG HỒ ÔN: mốc ôn của dạng = `nam_kt_dang.moc_on_ke` (ngày VN, sớm nhất trong các câu đến lịch), không phải `due` riêng của game.
  * Dạng có mốc → `due` = 00:00 VN của ngày đó (dạng chưa có tiến trình game thì thêm một dòng mastery tổng hợp, chỉ `key` và `due` được
  * `chooseSession` đọc). Dạng KHÔNG có mốc (mọi câu đã khắc phục/chưa từng sai) giữ nguyên `due` của game — không tước lịch giãn cách của game.
  * Mã dạng thiếu (`CD:<chuyên đề>`) bỏ qua vì `key` của game là mã dạng thật hoặc nhóm nội dung. KHÔNG sửa mảng đầu vào.
@@ -36,6 +36,14 @@ export async function masteryTheoHoSo(env: Env, sbd: string, mastery: Mastery[])
   } catch {
     return mastery
   }
+}
+
+/** Câu của chính em đã tới lịch ôn; mốc lịch do hồ sơ học tập quyết định. */
+export async function qidToiHanOn(env: Env, sbd: string, ngay: string): Promise<Set<string>> {
+  try {
+    const r=await env.DB.prepare("SELECT qid FROM nam_kt_cau WHERE sbd=? AND moc_on_ke<=? AND COALESCE(can_day_lai,0)=0").bind(sbd,ngay).all<{qid:string}>()
+    return new Set((r.results??[]).map(x=>String(x.qid)))
+  } catch { return new Set() }
 }
 
 /**
