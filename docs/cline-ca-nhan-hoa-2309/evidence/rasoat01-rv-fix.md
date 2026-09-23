@@ -66,3 +66,44 @@ Cloudflare D1/workerd và không phải hai client thật ⇒ RV06 vẫn mở ph
 `game-v2` gọi `nhaCho(env, sbd, id)` khi lượt kết thúc.
 
 | `kiem-tra-bo-ban-giao.mjs` | 0 | — |
+
+
+---
+
+## BỔ SUNG LẦN 2 — RV05 (cắt pool trước khi chấm điểm) và RV03 (`familyLanCuoi` luôn rỗng)
+
+Kết luận đọc code của giám sát (đúng): `chonCauChoLuot` gọi `locTheoLuatLap(ung, tranCau + chon.length)` **trước** khi
+chấm điểm/ngân sách, mà `chonTheoLuatChongLap` chọn **tuần tự** và `xetChongLap` vẫn áp trần lượt ⇒ vòng đầu chỉ 6 câu
+đầu được chấm; và **đại diện family bị chọn theo thứ tự pool** (câu dài/điểm thấp đứng trước che câu tốt hơn cùng family).
+Ngoài ra `familyLanCuoi` luôn `new Map()` ⇒ luật giãn family không hoạt động dù kho đã có nhãn.
+
+**Sửa:**
+1. `chong-lap.ts`: thêm cờ `khongApTranLuot` cho ngữ cảnh + hàm mới **`lietKeUngVienHopLe`** — xét **từng ứng viên
+   ĐỘC LẬP** với tập `daChon` **THỰC**, **không cộng dồn** khi liệt kê, **không áp trần lượt**.
+2. `bo-chon-that.ts`: `locTheoLuatLap` dùng `lietKeUngVienHopLe` (bỏ chọn tuần tự) và trả thêm `ung` (ỨngVienLap đã hoá
+   family/purpose) để vòng lặp greedy dựng `daChon` bằng dữ liệu THẬT; vòng lặp chấm điểm **toàn bộ** ứng viên hợp lệ,
+   chọn 1 câu vừa ngân sách tốt nhất rồi mới cập nhật trạng thái; trần 6 do **vòng lặp** giữ trên kết quả cuối.
+3. `docNguCanhChongLap(env, sbd, ngay, nowMs, familyCuaUngVien)`: **nối lịch sử family THẬT** từ sổ
+   (`su_kien_hoc ⋈ game_v2_question."$.family"`, `MAX(ngay_vn)` theo family) cho đúng family của ứng viên —
+   chỉ chạy khi ứng viên CÓ nhãn (kho chưa nhãn ⇒ không thêm truy vấn).
+
+**Regression đúng các ca giám sát yêu cầu — `tests/cnh-1-0-bo-chon-that.test.ts` 20 ca xanh:**
+- `RV05a` **đảo thứ tự pool** ⇒ cùng tập, cùng thứ tự chọn (không phụ thuộc thứ tự vào).
+- `RV05b` **câu thứ 7**: 6 câu đầu hợp mức nhưng ~300 giây/câu, ngân sách 120 ⇒ **trả câu thứ 7** (không rỗng).
+- `RV05c` **cùng family**: câu điểm cao đứng SAU thắng câu đứng trước (đại diện family theo ĐIỂM, không theo pool).
+- `RV03` **lịch sử family thật**: family vừa có bằng chứng HÔM NAY ⇒ `FAMILY_VUA_LAM`.
+- Ca cũ “6 câu đầu quá khó, 2 câu cuối phù hợp” giữ lại (vẫn xanh).
+
+**Chứng minh test BẮT ĐƯỢC LỖI (red-before-fix):** tạm gọi lại `chonTheoLuatChongLap` (bản cũ: tuần tự + trần) ⇒
+**4/4 ca RV05 ĐỎ**; khôi phục bản sửa ⇒ **4/4 XANH**.
+
+| Lệnh | Exit | Kết quả |
+|---|---|---|
+| `vitest run tests/cnh-1-0-bo-chon-that.test.ts` | 0 | **20 ca xanh** |
+| nhóm (cnh-1-0, game, tran-ngay, doan, ke-hoach, ho-so, reset) | 0 | 58 tệp xanh |
+| `tsc -b` / `tsc -p server/tsconfig.json --noEmit` | 0 / 0 | 0 lỗi |
+| `node --experimental-strip-types scripts/tai-hien-rv01-followup.mjs` | 0 | RV01/RV02-followup vẫn KHÔNG tái hiện |
+| `vitest run` (toàn suite) | 1 | `rasoat01c-vitest-full.log`: **707 xanh · 34 đỏ · 1 skip** (34 = bộ nợ cũ P00–P03) |
+
+Trạng thái: **RV03 (phần `familyLanCuoi`) — FIXED_PENDING_REVIEW**; **RV05 — FIXED_PENDING_REVIEW** (gồm 3 ca bổ sung).
+Không tự nhận VERIFIED; **RV06 (runtime Cloudflare) vẫn mở**.

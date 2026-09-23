@@ -76,6 +76,11 @@ export interface NguCanhChongLap {
   cachRepair?: { nhiemVu: number; giay: number }
   /** Trần câu một lượt (THAM-SO `maxRoundQuestions`). */
   tranCau?: number
+  /**
+   * BƯỚC LIỆT KÊ ỨNG VIÊN (RV05): bỏ luật trần lượt ở đây — trần do VÒNG LẶP CHỌN giữ trên kết quả cuối.
+   * Dùng khi nơi gọi kiểm từng ứng viên ĐỘC LẬP với tập ĐÃ CHỌN THỰC để chấm điểm rồi mới chọn.
+   */
+  khongApTranLuot?: boolean
 }
 
 export interface KetQuaChongLap {
@@ -161,10 +166,31 @@ export function xetChongLap(u: UngVienLap, n: NguCanhChongLap): KetQuaChongLap {
     return { duoc: false, lyDo: 'TRAN_CAU_CHUA_FAMILY' }
   }
 
-  // (6) Trần số câu của lượt.
-  if (daChon.length >= tranCauCua(n)) return { duoc: false, lyDo: 'TRAN_LUOT' }
+  // (6) Trần số câu của lượt — BỎ QUA khi nơi gọi đang ở BƯỚC LIỆT KÊ (RV05: trần do vòng lặp chọn giữ).
+  if (n.khongApTranLuot !== true && daChon.length >= tranCauCua(n)) return { duoc: false, lyDo: 'TRAN_LUOT' }
 
   return repeatReason ? { duoc: true, repeatReason } : { duoc: true }
+}
+
+/**
+ * LIỆT KÊ ứng viên HỢP LỆ để chấm điểm (RV05): mỗi ứng viên được xét **ĐỘC LẬP** với tập `daChon` THỰC do nơi gọi
+ * truyền vào — KHÔNG cộng dồn trong lúc liệt kê, KHÔNG áp trần lượt. Nhờ vậy:
+ *   · trần 6 không cắt mất câu thứ 7 (vòng chọn sẽ tự dừng ở trần trên kết quả cuối);
+ *   · trần family không do THỨ TỰ POOL quyết định: cùng một family, mọi câu đều được chấm và câu tốt nhất thắng;
+ *   · hàng rào family/repeat vẫn đúng vì `daChon` là những câu ĐÃ CHỌN THẬT.
+ */
+export function lietKeUngVienHopLe(
+  ds: readonly UngVienLap[],
+  n: NguCanhChongLap,
+): { duocPhep: (UngVienLap & KetQuaChongLap)[]; loai: { qid: string; lyDo: LyDoChongLap }[] } {
+  const duocPhep: (UngVienLap & KetQuaChongLap)[] = []
+  const loai: { qid: string; lyDo: LyDoChongLap }[] = []
+  for (const u of ds) {
+    const kq = xetChongLap(u, { ...n, khongApTranLuot: true })
+    if (!kq.duoc) { loai.push({ qid: u.qid, lyDo: kq.lyDo as LyDoChongLap }); continue }
+    duocPhep.push({ ...u, ...kq })
+  }
+  return { duocPhep, loai }
 }
 
 /**

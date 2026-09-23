@@ -115,25 +115,40 @@ describe('P04/P05 — điểm §7.2 chạy trên DỮ LIỆU THẬT (không còn
     expect(kq.theoQid.get('Q3')!.diem.fit).toBe(0.6)
   })
 
-  it('P04/RV03: TRẦN FAMILY áp THẬT trên đường adapter — 3 câu CHƯA GẮN NHÃN ⇒ chỉ 1 câu được phát', async () => {
+  it('P04/RV03: TRẦN FAMILY áp THẬT trên đường phát câu — 3 câu CHƯA GẮN NHÃN ⇒ lượt chỉ 1 câu', async () => {
     const d = dung()
     const ds = Array.from({ length: 3 }, (_, i) => cau(`NO-FAMILY-${i}`, { familyId: null, group: `G${i}` }))
-    const r = await locTheoLuatLap(d.env, 'S1', NGAY, ds, 6, { nowMs: T0 })
-    expect(r.duocPhep.map((c) => c.qid)).toEqual(['NO-FAMILY-0']) // tối đa 1 câu chưa gán family mỗi lượt
-    expect(r.loai.get('NO-FAMILY-1')).toBe('TRAN_CAU_CHUA_FAMILY')
-    expect(r.loai.get('NO-FAMILY-2')).toBe('TRAN_CAU_CHUA_FAMILY')
+    const kq = await chonCauChoLuot(d.env, ds, { sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 })
+    expect(kq.chon).toHaveLength(1) // tối đa 1 câu chưa gán family mỗi lượt
+    expect(ds.map((c) => c.qid)).toContain(kq.chon[0]!.qid) // chọn câu nào do ĐIỂM/hash quyết định, không do thứ tự pool
+    expect(kq.lyDo.TRAN_CAU_CHUA_FAMILY).toBe(2)
   })
 
-  it('P04/RV03: 3 câu KHÁC family (đã gắn nhãn) ⇒ phát được cả 3; cùng MỘT family ⇒ chỉ 1 câu thường', async () => {
+  it('P04/RV03: 3 câu KHÁC family ⇒ phát được cả 3; cùng MỘT family ⇒ chỉ 1 câu thường', async () => {
     const d = dung()
     const khac = Array.from({ length: 3 }, (_, i) => cau(`L${i}`, { familyId: `F${i}`, group: `G${i}` }))
-    const r1 = await locTheoLuatLap(d.env, 'S1', NGAY, khac, 6, { nowMs: T0 })
-    expect(r1.duocPhep).toHaveLength(3)
+    const kq1 = await chonCauChoLuot(d.env, khac, { sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 })
+    expect(kq1.chon).toHaveLength(3)
     const cung = Array.from({ length: 3 }, (_, i) => cau(`S${i}`, { familyId: 'F-CHUNG', group: `GS${i}` }))
-    const r2 = await locTheoLuatLap(d.env, 'S1', NGAY, cung, 6, { nowMs: T0 })
-    expect(r2.duocPhep).toHaveLength(1)
-    expect(r2.loai.get('S1')).toBe('TRAN_FAMILY')
-    expect(r2.loai.get('S2')).toBe('TRAN_FAMILY')
+    const kq2 = await chonCauChoLuot(d.env, cung, { sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 })
+    expect(kq2.chon).toHaveLength(1)
+    expect(kq2.lyDo.TRAN_FAMILY).toBe(2)
+  })
+
+  it('RV03: LỊCH SỬ FAMILY THẬT từ sổ — family vừa làm HÔM NAY bị chặn (trừ khi đến hạn/repair)', async () => {
+    const d = dung()
+    // Q3 có nhãn family FX; em đã có kết quả HÔM NAY của chính Q3 ⇒ family vừa làm hôm nay.
+    await ghiSuKien(d.env, [{ nguon: 'game', maNguon: 'S', sbd: 'S1', qid: 'Q3', lan: 1, ketQua: 1, luc: `${NGAY}T03:00:00.000Z` }])
+    d.sql.prepare("UPDATE game_v2_question SET json = json_set(json, '$.family', 'FX') WHERE qid = 'Q3'").run()
+    const khongDenHan = await locTheoLuatLap(d.env, 'S1', NGAY, [cau('Q3', { familyId: 'FX', dangKey: 'KHAC' })], 6, { nowMs: T0 })
+    // Q3 đã làm hôm nay ⇒ bị chặn bởi luật lặp trước cả luật giãn family (vẫn là chặn, không phát lại).
+    expect(khongDenHan.duocPhep).toEqual([])
+    // Câu KHÁC cùng family FX (khác content_group, chưa làm hôm nay) ⇒ luật GIÃN FAMILY chặn vì family vừa làm hôm nay.
+    d.sql.prepare("INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('DE1','Q9','v1','g-Q9','A.1',?)")
+      .run(JSON.stringify({ qid: 'Q9', group: 'g-Q9', kienThuc: ['K1'], mucDo: 'biet', family: 'FX', version: 'v1' }))
+    const giangCach = await locTheoLuatLap(d.env, 'S1', NGAY, [cau('Q9', { familyId: 'FX', group: 'g-Q9' })], 6, { nowMs: T0 })
+    expect(giangCach.loai.get('Q9')).toBe('FAMILY_VUA_LAM')
+    expect(giangCach.duocPhep).toEqual([])
   })
 
   it('P04: chặn cả BẢN SAO cùng `content_group` đã làm hôm nay (khác qid, cùng nhóm)', async () => {
@@ -156,7 +171,52 @@ describe('P04/P05 — điểm §7.2 chạy trên DỮ LIỆU THẬT (không còn
     expect(r.dungLai.get('Q9')).toBe('TASK-DANG-MO')
   })
 
-  it('RV05: 6 câu ĐẦU quá khó, 2 câu CUỐI phù hợp ⇒ vẫn lấy được 2 câu phù hợp (không cắt pool trước khi lọc)', async () => {
+  it('RV05a — ĐẢO THỨ TỰ pool: cùng tập ứng viên ⇒ cùng tập được chọn (không phụ thuộc thứ tự vào)', async () => {
+    const d = dung()
+    const ds = [
+      cau('A1', { mucDo: 'biet', group: 'gA1', familyId: 'FA1' }),
+      cau('A2', { mucDo: 'biet', group: 'gA2', familyId: 'FA2' }),
+      cau('A3', { mucDo: 'biet', group: 'gA3', familyId: 'FA3' }),
+      cau('A4', { mucDo: 'biet', group: 'gA4', familyId: 'FA4' }),
+    ]
+    const inp = { sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map(), conLaiGiay: 600 } as const
+    const kq1 = await chonCauChoLuot(d.env, ds, { ...inp })
+    const kq2 = await chonCauChoLuot(d.env, [...ds].reverse(), { ...inp })
+    expect([...kq1.chon.map((c) => c.qid)].sort()).toEqual([...kq2.chon.map((c) => c.qid)].sort())
+    expect(kq1.chon.map((c) => c.qid)).toEqual(kq2.chon.map((c) => c.qid)) // cả THỨ TỰ (do điểm + hash quyết định)
+  })
+
+  it('RV05b — 6 câu đầu HỢP MỨC nhưng KHÔNG vừa ngân sách, câu thứ 7 vừa ⇒ PHẢI trả câu thứ 7 (không rỗng)', async () => {
+    const d = dung()
+    const ds = [
+      ...Array.from({ length: 6 }, (_, i) => cau(`DAI${i}`, { part: 'III', mucDo: 'van_dung', group: `gD${i}`, familyId: `FD${i}` })),
+      cau('NGAN', { part: 'I', mucDo: 'biet', group: 'gN', familyId: 'FN' }),
+    ]
+    // Mức đang luyện 2 ⇒ 6 câu Phần III mức Vận dụng HỢP MỨC; mỗi câu ~300 giây; ngân sách chỉ 120 giây.
+    const kq = await chonCauChoLuot(d.env, ds, {
+      sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [], mucTheoKyNang: new Map([['K1', 2]]), conLaiGiay: 120, tranCau: 6,
+    })
+    expect(kq.chon.map((c) => c.qid)).toEqual(['NGAN']) // KHÔNG rỗng: câu thứ 7 vừa ngân sách được chọn
+    expect(kq.chon[0]!.taskSeconds).toBeLessThanOrEqual(120)
+    expect(kq.lyDo.DIFFICULTY_LIMIT).toBeUndefined()
+  })
+
+  it('RV05c — trong CÙNG family, câu ĐIỂM CAO đứng SAU vẫn thắng câu đứng trước (không chọn theo thứ tự pool)', async () => {
+    const d = dung()
+    // Cùng family FS: câu ĐẦU không đến hạn (điểm thấp), câu SAU đến hạn (reviewNeed > 0 ⇒ điểm cao hơn) và ngắn hơn.
+    const ds = [
+      cau('TRUOC', { part: 'III', mucDo: 'hieu', group: 'gF1', familyId: 'FS' }),
+      cau('SAU', { part: 'I', mucDo: 'biet', group: 'gF2', familyId: 'FS' }),
+    ]
+    const kq = await chonCauChoLuot(d.env, ds, {
+      sbd: 'S1', ngay: NGAY, nowMs: T0, mastery: [{ key: 'A-SAU', due: T0 - 1000 }], mucTheoKyNang: new Map([['K1', 1]]), conLaiGiay: 600, tranCau: 6,
+    })
+    expect(kq.chon).toHaveLength(1) // một family chỉ 1 câu thường
+    expect(kq.chon[0]!.qid).toBe('SAU') // đại diện family là câu ĐIỂM CAO, không phải câu đứng trước trong pool
+    expect(kq.lyDo.TRAN_FAMILY).toBe(1)
+  })
+
+  it('RV05 (ca cũ giữ lại): 6 câu ĐẦU quá khó, 2 câu CUỐI phù hợp ⇒ vẫn lấy được 2 câu phù hợp', async () => {
     const d = dung()
     const ds = [
       ...Array.from({ length: 6 }, (_, i) => cau(`KHO${i}`, { mucDo: 'van_dung', group: `gK${i}`, familyId: `FK${i}` })),

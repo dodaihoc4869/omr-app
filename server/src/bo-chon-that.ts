@@ -9,7 +9,7 @@
 // Family: KHO THẬT CHƯA GẮN NHÃN (P02 ghi nhận) ⇒ `transferValue = 0` toàn bộ; KHÔNG bịa family.
 import type { Env } from './kieu'
 import { chamDiem, khoaHashSap, sapTheoDiem, type CauChonDiem, type KetQuaDiem, type TrangThaiDot } from './bo-chon-diem'
-import { chonTheoLuatChongLap, type DaChonTrongLuot, type LyDoNgoaiLe, type UngVienLap } from './chong-lap'
+import { lietKeUngVienHopLe, type DaChonTrongLuot, type LyDoNgoaiLe, type UngVienLap } from './chong-lap'
 import { uocLuongMotCau, type MauThoiGian } from './uoc-luong-thoi-gian'
 import { docNangLucEm } from './nang-luc-d1'
 import { docDaLamHomNay } from './chong-lap'
@@ -105,23 +105,41 @@ export function mucDangLuyen(c: CauUngVien, mucTheoKyNang: ReadonlyMap<string, n
 /**
  * NGỮ CẢNH CHỐNG LẶP của một lượt, đọc từ D1 THẬT (không bịa nhãn):
  *   · `daLamHomNay`   = `content_group` đã có kết quả hôm nay (chong-lap.ts).
- *   · `taskDangMo`    = `content_group` → taskId của chỗ ĐANG GIỮ còn hiệu lực (bảng `giu_cho`).
- *   · `familyLanCuoi` = family → ngày gần nhất có bằng chứng; kho chưa gắn nhãn ⇒ RỖNG (không bịa).
+ *   · `taskDangMo`    = `content_group` → taskId của chỗ ĐANG GIỮ, kể cả CÒN HIỆU LỰC QUA NGÀY (bảng `giu_cho`).
+ *   · `familyLanCuoi` = family → ngày VN gần nhất family có bằng chứng, đọc từ SỔ cho ĐÚNG các family của ứng viên
+ *     (RV03: trước đây để rỗng nên luật giãn family không hoạt động dù kho đã có nhãn). Kho chưa gắn nhãn ⇒ rỗng.
  */
 export async function docNguCanhChongLap(
-  env: Env, sbd: string, ngay: string, nowMs: number,
+  env: Env, sbd: string, ngay: string, nowMs: number, familyCuaUngVien: readonly string[] = [],
 ): Promise<{ daLamHomNay: Set<string>; taskDangMo: Map<string, string>; familyLanCuoi: Map<string, string> }> {
   const daLamHomNay = (await docDaLamHomNay(env, [sbd], ngay)).get(sbd) ?? new Set<string>()
   const taskDangMo = new Map<string, string>()
   try {
     const r = await env.DB.prepare(
-      "SELECT q.content_group, g.task_id FROM giu_cho g JOIN game_v2_question q ON q.qid = g.qid WHERE g.sbd = ? AND g.ngay = ? AND g.lease_until >= ? AND COALESCE(q.content_group, '') <> ''",
-    ).bind(sbd, ngay, nowMs).all<{ content_group: string; task_id: string }>()
+      "SELECT q.content_group, g.task_id FROM giu_cho g JOIN game_v2_question q ON q.qid = g.qid WHERE g.sbd = ? AND ((g.het_han_task > 0 AND g.het_han_task > ?) OR (g.het_han_task = 0 AND g.lease_until >= ?)) AND COALESCE(q.content_group, '') <> ''",
+    ).bind(sbd, nowMs, nowMs).all<{ content_group: string; task_id: string }>()
     for (const x of r.results ?? []) taskDangMo.set(String(x.content_group), String(x.task_id))
   } catch {
     /* chưa áp migration bảng giữ chỗ ⇒ coi như chưa có nhiệm vụ nào đang mở */
   }
-  return { daLamHomNay, taskDangMo, familyLanCuoi: new Map() }
+  const familyLanCuoi = new Map<string, string>()
+  const families = [...new Set(familyCuaUngVien.map((f) => String(f ?? '').trim()).filter(Boolean))]
+  if (families.length) {
+    try {
+      // MỘT truy vấn cho cả tập family của ứng viên; nguồn: SỔ (`su_kien_hoc`) ⋈ kho (nhãn family trong JSON).
+      const r = await env.DB.prepare(
+        `SELECT json_extract(q.json, '$.family') AS family, MAX(k.ngay_vn) AS ngay
+           FROM su_kien_hoc k JOIN game_v2_question q ON q.qid = k.qid
+          WHERE k.sbd = ? AND k.ket_qua IS NOT NULL
+            AND json_extract(q.json, '$.family') IN (SELECT value FROM json_each(?))
+          GROUP BY 1`,
+      ).bind(sbd, JSON.stringify(families)).all<{ family: string; ngay: string }>()
+      for (const x of r.results ?? []) if (x.family) familyLanCuoi.set(String(x.family), String(x.ngay))
+    } catch {
+      /* thiếu chỉ mục/cột ⇒ coi như chưa có lịch sử family (không chặn oan) */
+    }
+  }
+  return { daLamHomNay, taskDangMo, familyLanCuoi }
 }
 
 /** Ứng viên + `repeat_reason` khi được phát (ngoại lệ của luật giãn family phải giải thích được). */
@@ -143,9 +161,8 @@ export async function locTheoLuatLap(
     hoSoCau?: ReadonlyMap<string, HangHoSoCau>
     daChon?: readonly DaChonTrongLuot[]
   } = {},
-): Promise<{ duocPhep: CauDuocPhep[]; dungLai: Map<string, string>; loai: Map<string, string>; thieu: number }> {
+): Promise<{ duocPhep: CauDuocPhep[]; dungLai: Map<string, string>; loai: Map<string, string>; thieu: number; ung: Map<string, UngVienLap> }> {
   const nowMs = tuyChon.nowMs ?? Date.now()
-  const ctx = await docNguCanhChongLap(env, sbd, ngay, nowMs)
   const hoSoCau = tuyChon.hoSoCau ?? new Map<string, HangHoSoCau>()
   const mastery = tuyChon.mastery ?? []
   const ung: UngVienLap[] = ds.map((c) => {
@@ -161,18 +178,19 @@ export async function locTheoLuatLap(
       skillIds: c.skillIds, denHan, purpose,
     }
   })
+  const ctx = await docNguCanhChongLap(env, sbd, ngay, nowMs, ds.map((c) => c.familyId ?? ''))
   const theoQid = new Map(ds.map((c) => [c.qid, c]))
-  const kq = chonTheoLuatChongLap(ung, {
+  // RV05: LIỆT KÊ độc lập — mỗi ứng viên xét với `daChon` THỰC, không cộng dồn, không áp trần lượt.
+  const kq = lietKeUngVienHopLe(ung, {
     homNay: ngay,
     taskDangMo: ctx.taskDangMo,
     daLamHomNay: ctx.daLamHomNay,
     familyLanCuoi: ctx.familyLanCuoi,
     daChon: tuyChon.daChon,
-    tranCau: Number.isFinite(tranCau) ? tranCau : ds.length,
   })
   const duocPhep: CauDuocPhep[] = []
   const dungLai = new Map<string, string>()
-  for (const v of kq.chon) {
+  for (const v of kq.duocPhep) {
     if (v.dungLaiTask) { dungLai.set(v.qid, v.dungLaiTask); continue }
     const goc = theoQid.get(v.qid)
     if (!goc) continue
@@ -180,7 +198,8 @@ export async function locTheoLuatLap(
   }
   const loai = new Map<string, string>()
   for (const x of kq.loai) loai.set(x.qid, x.lyDo)
-  return { duocPhep, dungLai, loai, thieu: Math.max(0, (Number.isFinite(tranCau) ? (tranCau as number) : ds.length) - duocPhep.length) }
+  const tran = Number.isFinite(tranCau) ? Math.max(0, Math.floor(tranCau as number)) : duocPhep.length
+  return { duocPhep, dungLai, loai, thieu: Math.max(0, tran - duocPhep.length), ung: new Map(ung.map((u) => [u.qid, u])) }
 }
 
 /**
@@ -271,15 +290,25 @@ export async function chonCauChoLuot(env: Env, ds: readonly CauUngVien[], inp: C
   const dungLaiTask = new Map<string, string>()
   // Nhãn family theo qid (kho chưa gắn ⇒ `null` ⇒ trần "chưa gán family" của §4.2.6 áp đúng).
   const familyTheoQid = new Map(ds.map((c) => [c.qid, c.familyId ?? null]))
+  /** Ứng viên đã hoá (family/purpose thật) của những câu ĐÃ CHỌN — dùng cho luật family/repeat ở vòng sau. */
+  const ungTheoQidDaChon = new Map<string, UngVienLap>()
   let ung = [...quaKho]
   while (ung.length && chon.length < tranCau) {
-    // (a) LUẬT LẶP + FAMILY (02 §4.2.6–4.2.7). Trần lượt truyền = `tranCau + số đã chọn` để CHÍNH VÒNG LẶP này
-    // giữ trần (RV05: trần chỉ áp lên kết quả cuối); policy không được chặn oan khi pool còn ít câu.
-    const { duocPhep, dungLai, loai } = await locTheoLuatLap(env, inp.sbd, inp.ngay, ung, tranCau + chon.length, {
+    // (a) LIỆT KÊ ứng viên HỢP LỆ (RV05): mỗi ứng viên xét ĐỘC LẬP với tập ĐÃ CHỌN THỰC (`chon`), không cộng dồn,
+    // không áp trần lượt ở bước này ⇒ trần 6 không cắt mất câu thứ 7 và câu tốt hơn trong cùng family không bị
+    // che bởi câu đứng trước trong pool. Trần do CHÍNH vòng lặp này giữ trên kết quả cuối.
+    const { duocPhep, dungLai, loai, ung: ungTheoQid } = await locTheoLuatLap(env, inp.sbd, inp.ngay, ung, tranCau, {
       nowMs: inp.nowMs, mastery: inp.mastery, hoSoCau,
-      daChon: chon.map((c) => ({ qid: c.qid, familyId: familyTheoQid.get(c.qid) ?? null, purpose: 'maintenance', contentGroup: ung.find((u) => u.qid === c.qid)?.group ?? '' })),
+      daChon: chon.map((c) => {
+        const goc = ungTheoQidDaChon.get(c.qid)
+        return {
+          qid: c.qid, familyId: goc?.familyId ?? familyTheoQid.get(c.qid) ?? null,
+          purpose: goc?.purpose ?? 'maintenance', contentGroup: goc?.contentGroup ?? '',
+        }
+      }),
     })
     for (const [qid, taskId] of dungLai) dungLaiTask.set(qid, taskId)
+    for (const [qid, u] of ungTheoQid) ungTheoQidDaChon.set(qid, u)
     // `TRAN_LUOT` của policy là TRẦN LƯỢT (do chính vòng lặp này giữ theo RV05) — không đếm lại vào bản đồ lý do.
     for (const r of loai.values()) if (r !== 'TRAN_LUOT') dem(r)
     if (duocPhep.length === 0) break
