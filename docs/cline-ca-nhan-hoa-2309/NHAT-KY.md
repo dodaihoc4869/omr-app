@@ -191,3 +191,11 @@ Da noi locTheoPhamVi vao docKhoCau (game-v2-bank.ts): co pham_vi_hoc doc GOP mot
 Bang chung: tsc server 0 loi; nhom test game-v2/ke hoach/bo chon 16 file xanh, 3 file do deu CO SAN trong nen P00 (cau-da-lam 1, chon-luot 4, parent-news-d1 2) => 0 test moi do. Log: evidence/p02-vitest-game-plan.log.
 
 CON THIEU: ke-hoach-ngay*.ts (kem revisionPhamVi cho T12) va parent-news-nguon-cau.ts. Vi chua du moi kenh tu dong, T01/T02/T03/T11/T12 giu IN_PROGRESS va P02 CHUA PASS - khong to xanh.
+
+### P02 tiep - noi bo loc vao kenh 5 (parent-news-nguon-cau.ts)
+
+Chen hopPhamVi(q) vao diem loc  (da co cauHopKhoi + daHocCau) => kenhtu dong thu 2 duoc kiem pham vi.
+
+Bang chung: tsc server 0 loi; 3/4 file xanh, file parent-news-d1-1909 do DUNG 2 test DA CO trong nen P00 => 0 test moi do. Log: evidence/p02c-vitest-kenh5.log.
+
+Da noi 2/3 duong tu dong (game-v2-bank, parent-news-nguon-cau). Con thieu ke-hoach-ngay*.ts (kem revisionPhamVi cho T12).

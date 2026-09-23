@@ -17,6 +17,8 @@ import {
   chonCauChoPhuHuynh, SO_NGAY_KHONG_GIAO_LAI, type CauChon, type CauToiHan, type NguonCau, type UngVien,
 } from './parent-news-chon-cau'
 import { ngayVn } from './su-kien-hoc'
+// PHẠM VI HỌC CÁ NHÂN (CNH-1.0 P02): cờ `pham_vi_hoc` TẮT (mặc định) ⇒ đường cũ y nguyên, không đổi hành vi.
+import { docPhamVi, eligibleScope, phamViBat, type TrangThaiScope } from './pham-vi-hoc'
 
 type Row = Record<string, unknown>
 
@@ -111,6 +113,17 @@ export async function chonCauBaiHangNgay(env: Env, sbd: string, soCan: number, n
   const lop = LOP_HOP_LE.has(lopEm) ? lopEm : ''
   const [baoVe, phamVi] = await Promise.all([protectedQuestions(env), readScope(env, sbd)])
   const daHocCau = learnedQuestionFilter(phamVi.evidence, baoVe)
+  // PHẠM VI HỌC CÁ NHÂN (CNH-1.0 P02 — đặc tả 02 §2). Cờ TẮT ⇒ `phamViHoc` rỗng và `nap` không lọc thêm gì.
+  // Cờ BẬT mà kho chưa gắn nhãn `kienThuc` ⇒ câu thiếu nhãn bị loại `THIEU_NHAN` ⇒ kênh có thể trả THIẾU câu:
+  // đúng luật "thiếu kho phải trả thiếu, không nới lọc", và là lý do phải gắn nhãn trước khi bật.
+  const batPhamVi = await phamViBat(env)
+  const phamViHoc: Map<string, TrangThaiScope> = batPhamVi ? await docPhamVi(env, sbd) : new Map()
+  /** Câu này có được phát theo phạm vi không? (khi cờ TẮT luôn `true`). */
+  const hopPhamVi = (q: PrivateQuestion): boolean => !batPhamVi || eligibleScope({
+    qid: q.qid, version: q.version, contentGroup: q.group,
+    skillIds: Array.isArray(q.kienThuc) ? q.kienThuc : [], prerequisiteIds: [],
+    qualityStatus: q.reviewed ? 'approved' : 'chua_duyet',
+  }, phamViHoc).duoc
 
   const rc = await tat(
     () => env.DB.prepare(
@@ -145,7 +158,7 @@ export async function chonCauBaiHangNgay(env: Env, sbd: string, soCan: number, n
   const kho = new Map<string, PrivateQuestion>()
   // LUẬT KHỐI (Boss 21/09): câu nạp theo qid (tới hạn) nằm ngoài bộ lọc `d.lop` — câu khối CAO đã lọt vào sổ em từ trước vẫn không được phát lại. Khối em không rõ ⇒ không lọc.
   const khoiEm = khoiCuaEm({ lop: lopEm })
-  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && daHocCau(q) && !kho.has(q.qid)) kho.set(q.qid, q) }
+  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && daHocCau(q) && hopPhamVi(q) && !kho.has(q.qid)) kho.set(q.qid, q) }
   if (toiHan.length > 0) nap(await docCauKho(env, 'AND q.qid IN (SELECT value FROM json_each(?))', [JSON.stringify(toiHan.map((c) => c.qid))], baoVe, TRAN_DOC_TOI_HAN))
   if (dangYeuEm.length > 0) nap(await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [JSON.stringify(dangYeuEm.map((d) => d.maDang)), ...themLop], baoVe, TRAN_DOC_MOI_NHOM))
   // Chỉ bù trong dạng chính em đã học; thiếu câu thì giảm số lượng.
