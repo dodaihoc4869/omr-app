@@ -374,6 +374,38 @@ Trang thai that: phases PASS **2/12** (P02, P03) · IN_PROGRESS **P00, P01, P04,
 
 Trang thai that sau luot nay: phases PASS **2/12** (P02, P03) · requirements PASS **2/42** (R05, R09) · tests PASS **9/50** (T01 T02 T03 T05 T06 T11 T32 T33 T34) · them T04/T41 IN_PROGRESS.
 
+
+## P05 (LAT CAT 3) — DIEM CHON §7.2 + SAP XEP TAT DINH (da noi vao luot game)
+
+Ngay: 23/09/2026 (tiep lat cat 2). `sourceFingerprint`: `ea17abcc4da3f5388853831cc1a452c0e3b16375522787b86ae8d1c265ca96b4`.
+
+### Da lam
+
+- **`server/src/bo-chon-diem.ts` (moi, ham thuan)**: §7.2 tung so hang — `repairNeed` (1/0,5/0), `reviewNeed` (0 khi chua due; khi due thi `(clamp(tre/khoang,0,1)+0,5)/1,5` voi san khoang 1 ngay), `transferValue` (family la = 0, KHONG goi la chuyen giao), `fit` (1/0,8/0,6/probe 0,5), `coverage` = 1/(1+n), `fatigue` ≤ 0,4; trong so lay tu THAM-SO. Sap **TAT DINH**: diem giam dan → SHA-256 `student|day|plan_version|qid|question_version` tang theo byte → qid tang, **khong `Math.random`**.
+- **Da noi vao duong that**: khi co `cau_hinh.ngan_sach_luot` BAT, **CA HAI duong phat cau cua game** sap theo nhanh tat dinh §7.2 roi moi cat theo phan ngan sach con lai. Co TAT ⇒ hanh vi cu nguyen ven.
+- **Test doc lap**: `tests/cnh-1-0-ngan-sach-luot-t09.test.ts` (5 ca) kiem thu tu cau trong luot that bang SHA-256 cua `node:crypto` (khong dung chinh ham san pham dang kiem).
+
+### HAI LOI THAT cua san pham do test bat duoc va DA SUA (ghi ro theo .clinerules)
+
+1. **Cau chua den han bi cong nen 0,5** ⇒ `reviewNeed` = 0,333 thay vi 0. Yeu cau: 02 §7.2 "cau chua due = 0". Hanh vi cu: chi kep phan tre ve 0 roi van cong nen. Thay the: tra 0 ngay khi `now < due`.
+2. **Lan don vi giay/ms o san khoang on** ⇒ khoang on nho lam `reviewNeed` nhay len 1. Hanh vi cu: `max(intervalMs, 86400)` (so ms voi giay). Thay the: `max(intervalMs, 86400 × 1000)`, ghi ro don vi trong chu thich ham.
+
+### Bang chung
+
+| Lenh | Exit | Ket qua | Log |
+|---|---|---|---|
+| `vitest run tests/cnh-1-0-diem-chon-p05.test.ts` | 0 | **12 PASS** | `p05c-vitest-diem-chon.log` |
+| `vitest run tests/cnh-1-0-ngan-sach-luot-t09.test.ts` | 0 | **5 PASS** | `p05c-vitest-t09.log` |
+| nhom (cnh-1-0, game, tran-ngay, doan, ke-hoach, lich-on, ho-so, chong-lap) | 0 | 51 tep · **702 PASS / 0 do** | `p05c-vitest-nhom.log` |
+| `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 loi | — |
+| chay LAI T05/T06 + T32 theo fingerprint moi | 0 | 21 + 6 PASS | `p05c-vitest-t05-t06.log`, `p05c-vitest-t32.log` |
+
+### Vi sao P05 VAN IN_PROGRESS
+
+Duong that CHUA cap duoc cac dau vao diem §7.2 cho tung cau (muc dich/role, `working_level`, `due`) nen hien chi chay nhanh sap xep tat dinh; con pipeline hard filter §7.1 day du, giu cho SQL uniqueness/CAS + race thua, mot plan/ngay + rubric dong bang + carry-over + assignment qua tai, va ghep mau toc do theo part/muc. **T08/T09/T10/T13/T40 chua PASS.**
+
+Trang thai that: phases PASS **2/12** (P02, P03) · IN_PROGRESS **P00, P01, P04, P05** · requirements PASS **2/42** · tests PASS **9/50** (+ IN_PROGRESS: T04, T08, T09, T12, T19, T29, T41).
+
 | nhom lien quan (cnh-1-0, ho-so, lich-on, ke-hoach, exp, dem-ke-hoach, cau-da-lam, game) | 1 | 33 tep · **496 PASS / 1 do CO SAN trong nen P00** (khong hoi quy moi) | `p04-vitest-nhom.log` |
 | `tsc -b` + `tsc -p server/tsconfig.json` | 0 / 0 | 0 loi | — |
 | chay LAI 3 tep P03 (T05/T06/T32 + su kien) | 0 | 21 + 6 + 10 PASS — bang chung P03 cap nhat theo fingerprint MOI | `p04-vitest-t05-t06.log`, `p04-vitest-t32.log`, `p04-vitest-su-kien.log` |

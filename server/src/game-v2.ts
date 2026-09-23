@@ -12,6 +12,8 @@ import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
 import {nangLucBat} from './nang-luc-d1'
 import {nganSachLuotBat,docNganSachConLai} from './ngan-sach-luot'
 import {uocLuongMotCau,xepVuaNganSach} from './uoc-luong-thoi-gian'
+import {khoaHashSap,sapTheoDiem} from './bo-chon-diem'
+import {PHIEN_BAN_KE_HOACH} from './ho-so-cau-hinh'
 import {mucTuChu} from '../../src/lib/btvn-nang-do'
 import {PETS,ALIASES,OLD_SIX,allowed,learnedQuestionFilter,chooseSessionWithRoles,chooseLuotMoi,luotHomNay,SO_CAU_MOI_LUOT,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
 import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
@@ -133,10 +135,16 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   const eligible=poolDaHoc.filter(q=>!homNay.has(q.qid)&&!homNay.has(q.group))
   const lt=info.luotTiepTheo
   const chonGoc=chooseLuotMoi(eligible,scope.evidence,history,mastery,{loai:lt.loai,cap:p.cap,now:tNow,thuong:lt.thuong,blocked,soCau:Math.min(SO_CAU_MOI_LUOT,remaining),khoiEm,dueQids:await qidToiHanOn(env,sbd,ngay)})
-  // CNH-1.0 P05/T09 (02 §5.2): lượt này CHỈ lấy phần NGÂN SÁCH CÒN LẠI của ngày (mọi màn dùng chung một
-  // ngân sách). Cờ `cau_hinh.ngan_sach_luot` MẶC ĐỊNH TẮT ⇒ đường cũ nguyên vẹn.
+  // CNH-1.0 P05/T09 (02 §5.2 + §7.2): lượt này CHỈ lấy phần NGÂN SÁCH CÒN LẠI của ngày (mọi màn dùng chung
+  // một ngân sách), và cắt theo thứ tự TẤT ĐỊNH (điểm §7.2 → hash `student|day|plan_version|qid|version`).
+  // Cờ `cau_hinh.ngan_sach_luot` MẶC ĐỊNH TẮT ⇒ đường cũ nguyên vẹn.
   let chon=chonGoc, nganSachThieu:{conLaiGiay:number;soCauBoQua:number}|undefined
   if(await nganSachLuotBat(env)){
+    // Điểm §7.2 chưa được cấp ở đường này (repairNeed/reviewNeed/fit cần dữ liệu mục đích — P06 nối) nên
+    // hiện áp NHÁNH SẮP XẾP TẤT ĐỊNH trên cùng một điểm: hash tăng theo byte rồi qid — không random.
+    const sap=await sapTheoDiem(chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',difficulty:mucTuChu(x.q.mucDo) as 0|1|2,familyId:null})),new Map(),(c)=>khoaHashSap(sbd,ngay,PHIEN_BAN_KE_HOACH,c.qid,c.version))
+    const thuTu=new Map(sap.map((c,i)=>[c.qid,i]))
+    chon=[...chon].sort((a,b)=>(thuTu.get(a.q.qid)??0)-(thuTu.get(b.q.qid)??0))
     const ns=await docNganSachConLai(env,sbd,ngay)
     if(ns&&ns.nganSachGiay>0){
       const uoc=chon.map(x=>({qid:x.q.qid,taskSeconds:uocLuongMotCau({qid:x.q.qid,part:x.q.phan,difficulty:mucTuChu(x.q.mucDo)},{mau:ns.mau,nowMs:tNow}).taskSeconds}))
@@ -300,6 +308,10 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     // chung một ngân sách. Cờ `cau_hinh.ngan_sach_luot` MẶC ĐỊNH TẮT ⇒ hành vi cũ nguyên vẹn.
     let chon=chonGoc, nganSachThieu: { conLaiGiay: number; soCauBoQua: number } | undefined
     if(await nganSachLuotBat(env)){
+      // Sắp xếp TẤT ĐỊNH §7.2 (hash theo byte) rồi mới cắt theo ngân sách còn lại.
+      const sap=await sapTheoDiem(chon.map(x=>({qid:x.q.qid,version:x.q.version,part:x.q.phan as 'I'|'II'|'III',difficulty:mucTuChu(x.q.mucDo) as 0|1|2,familyId:null})),new Map(),(c)=>khoaHashSap(sbd,academicDay(now()),PHIEN_BAN_KE_HOACH,c.qid,c.version))
+      const thuTu=new Map(sap.map((c,i)=>[c.qid,i]))
+      chon=[...chon].sort((a,b)=>(thuTu.get(a.q.qid)??0)-(thuTu.get(b.q.qid)??0))
       const ns=await docNganSachConLai(env,sbd,academicDay(now()))
       if(ns&&ns.nganSachGiay>0){
         const uoc=chon.map(x=>({qid:x.q.qid,taskSeconds:uocLuongMotCau({qid:x.q.qid,part:x.q.phan,difficulty:mucTuChu(x.q.mucDo)},{mau:ns.mau,nowMs:tNow}).taskSeconds}))

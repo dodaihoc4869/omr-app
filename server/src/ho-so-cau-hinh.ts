@@ -121,6 +121,20 @@ export const GIAY_CACH_STABLE = 86_400_000
 export const SO_DOT_MO_MOI_SKILL = 1
 export const SO_PROBE_MOI_SKILL_NGAY = 1
 
+// --- Điểm chọn câu §7.2 (P05) ---------------------------------------------------
+// Nguồn: 02 §7.2 + THAM-SO.json `planning.scoreWeights`. BẢN DUY NHẤT — `bo-chon-diem.ts` không tự khai lại.
+/** Trọng số điểm chọn: repair 0,30 · review 0,25 · transfer 0,20 · fit 0,15 · coverage 0,10 (rồi TRỪ fatigue). */
+export const DIEM_CHON = Object.freeze({ repair: 0.3, review: 0.25, transfer: 0.2, fit: 0.15, coverage: 0.1 })
+/** `reviewNeed` cộng nền rồi chia cho hệ số này (§7.2: "cộng nền 0,5 rồi chia 1,5"). */
+export const NEN_REVIEW = 0.5
+export const CHIA_REVIEW = 1.5
+/** Khoảng ôn tối thiểu dùng khi tính `reviewNeed` (giây). */
+export const GIAY_TOI_THIEU_ON = 86_400
+/** `fatigue`: 0,2 nếu cùng part với hai task liền trước; +0,2 nếu solveSeconds>180 và task trước cũng >180; trần 0,4. */
+export const MOI_MET_MOI_LAN = 0.2
+export const MOI_MET_TRAN = 0.4
+export const GIAY_DAI = 180
+
 // --- Ước lượng thời gian theo CNH-1.0 §5.1 (P05) --------------------------------
 // Nguồn: docs/cline-ca-nhan-hoa-2309/02-HOC-TAP-VA-RUT-CAU.md §5.1 + THAM-SO.json `planning`.
 // BẢN DUY NHẤT: `server/src/uoc-luong-thoi-gian.ts` KHÔNG tự khai lại các số này.
