@@ -236,7 +236,7 @@ describe('mỗi điểm ghi ghi ĐÚNG số dòng và idempotent', () => {
   it('khắc phục KHÔNG có phiếu trên R2 (phiếu máy em tự sinh — cả 189 bài thật): chấm sổ bằng tờ kho theo qid', async () => {
     const d = taoD1That()
     d.objects.set('kho/DE1.json', TO_KHO)
-    const dapAn = { 'DE1-I-1': 'A', 'DE1-I-2': 'C', 'DE1-III-1': '0,39', 'KHAC-I-9': 'A' } // KHAC: tờ kho không tồn tại → bỏ, không đoán
+    const dapAn = { 'DE1-I-1': 'A', 'DE1-I-2': 'C', 'DE1-III-1': '0,39' } // valid fallback control; mixed missing-source reject/repair is covered by code2-independent-remediation-validation
     const r = await nopKhacPhuc(d.env, { ma: 'sua_loi_S1_1789794169079', sbd: 'S1', dapAn })
     expect(r).toMatchObject({ ok: true, soCau: 0, soDung: 0 }) // điểm nộp cũ KHÔNG đổi (vẫn 0/0 như trước)
     expect(hang(d, "nguon='khac_phuc'").map((x) => [x.qid, x.ket_qua, x.chuyen_de])).toEqual([['DE1-I-1', 1, 'ES'], ['DE1-I-2', 0, 'ES'], ['DE1-III-1', 1, 'AM']])

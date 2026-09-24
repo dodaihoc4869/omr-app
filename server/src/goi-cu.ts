@@ -1,7 +1,7 @@
 import { docKhoiEm, xoaDemCaBaoVe } from './game-v2-bank'
 import { cauHopKhoi } from '../../src/lib/khoi-cau'
 import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect,kiemTraDapAnBtvn,LoiChamBtvn} from './btvn-grading'
-import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,laBoTrong,type CauChamBai} from './su-kien-hoc'
+import {ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,laBoTrong,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
 import {docBoCuaCacEm,docTomTat,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
@@ -1036,31 +1036,62 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
   const recalled = await env.DB.prepare('SELECT ma_btvn FROM btvn WHERE ma_btvn = ? AND da_xoa <> 0').bind(ma).first()
   if (recalled) return {ok:false,error:'Bài tập đã được thầy thu hồi.'}
 
-  // ĐÁP ÁN LẤY TỪ GÓI PHIẾU trên R2 — không lấy từ gói máy em gửi lên.
-  let dapAnDung: Record<string, string> = {}
-  const cauPhieu: CauChamBai[] = []
+  // Prepare independent worksheet material before any submission/history/EXP write.
+  // A present worksheet is authoritative; corrupt material must not become a fallback.
+  const loiMaterial = () => new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Thiếu câu hoặc đáp án hợp lệ của phiếu. Bài làm chưa được ghi nhận.')
+  if (!lam || typeof lam !== 'object' || Array.isArray(lam)) throw new LoiChamBtvn('BTVN_GRADING_INPUT_INVALID', 'Đáp án gửi lên chưa đúng định dạng.')
+  const dapAnDung: Record<string, string> = Object.create(null)
+  const cauSo: CauChamBai[] = []
   let maCa = ''
-  if (env.DE) {
-    const o = await env.DE.get(`phieu/${ma}.json`)
-    if (o) {
-      try {
-        const goi = (await new Response(o.body).json()) as Record<string, unknown>
-        maCa = chuoi(goi.maCa)
-        const ph = (goi.phieu ?? {}) as Record<string, unknown>
-        const cau = Array.isArray(ph.cau) ? (ph.cau as Record<string, unknown>[]) : []
-        for (const c of cau) {
-          const qid = chuoi(c.id)
-          if (qid) {
-            dapAnDung[qid] = chuoi(c.dapAn).trim().toUpperCase()
-            if (dapAnDung[qid]) cauPhieu.push({ qid, dapAnDung: dapAnDung[qid], chuyenDe: chuoi(c.chuyenDe), mucDo: chuoi(c.mucDo) })
-          }
-        }
-      } catch {
-        dapAnDung = {}
-        cauPhieu.length = 0
+  const o = await env.DE?.get(`phieu/${ma}.json`)
+  if (o) {
+    let raw: unknown
+    try {
+      raw = await new Response(o.body).json()
+    } catch (e) {
+      if (e instanceof SyntaxError) throw loiMaterial()
+      throw e
+    }
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw loiMaterial()
+    const goi = raw as Record<string, unknown>
+    maCa = chuoi(goi.maCa)
+    const ph = goi.phieu as Record<string, unknown> | undefined
+    if (!ph || !Array.isArray(ph.cau) || ph.cau.length === 0) throw loiMaterial()
+    for (const c of ph.cau as Record<string, unknown>[]) {
+      if (!c || typeof c !== 'object' || Array.isArray(c)) throw loiMaterial()
+      const qid = chuoi(c.id)
+      const dung = chuoi(c.dapAn).trim().toUpperCase()
+      if (!qid.trim() || !dung || Object.hasOwn(dapAnDung, qid)) throw loiMaterial()
+      dapAnDung[qid] = dung
+      cauSo.push({ qid, dapAnDung: dung, chuyenDe: chuoi(c.chuyenDe), mucDo: chuoi(c.mucDo) })
+    }
+  } else {
+    // Client-generated worksheets have no assigned manifest. These are requested qids,
+    // not proof of past assignment: every syntactically accepted qid must resolve now.
+    const qids = Object.keys(lam).filter(q => /-(III|II|I)-\d+$/.test(q))
+    if (qids.length === 0) throw new LoiChamBtvn('BTVN_GRADING_INPUT_INVALID', 'Chưa có mã câu hợp lệ để chấm phiếu.')
+    const sources = new Map<string, string[]>()
+    for (const qid of qids) {
+      const goc = qid.replace(/-(III|II|I)-\d+$/, '')
+      sources.set(goc, [...(sources.get(goc) ?? []), qid])
+    }
+    for (const [goc, requested] of sources) {
+      // Opt in only to typed missing-source errors; unrelated source questions are not
+      // part of this request. Do not use the best-effort history reconstruction reader.
+      const tho = await homeworkQuestions(env, goc, {})
+      const theoQid = new Map(tho.map(c => [String(c.qid), c]))
+      const keys = homeworkKeys(tho)
+      for (const qid of requested) {
+        const c = theoQid.get(qid), dung = keys.get(qid)
+        if (!c || !dung) throw loiMaterial()
+        cauSo.push({ qid, dapAnDung: dung, chuyenDe: chuoi(c.chuyen_de ?? c.chuyenDe), mucDo: chuoi(c.muc_do ?? c.mucDo), phan: chuoi(c.phan) })
       }
     }
+    // Keep legacy fallback score 0/0; prepared bank material is for validated events.
   }
+  const keys = new Map(cauSo.map(c => [c.qid, c.dapAnDung]))
+  const preflight = Object.fromEntries(cauSo.map(c => [c.qid, laBoTrong(chuoi(lam[c.qid])) ? '' : lam[c.qid]]))
+  kiemTraDapAnBtvn(keys, preflight)
 
   const qidSai: string[] = []
   let soDung = 0
@@ -1078,6 +1109,19 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
   const nay = NAY()
   const khoa = `${ma}|${sbd}`
   const cu = await env.DB.prepare('SELECT so_cau, dap_an_json FROM nop_khac_phuc WHERE khoa = ?').bind(khoa).first<{ so_cau: number; dap_an_json?: string }>()
+  const daDoi = !cu || String(cu.dap_an_json ?? '') !== JSON.stringify(lam)
+  let lan = 1
+  if (daDoi && cu) {
+    try {
+      const r = await env.DB.prepare(
+        "SELECT COALESCE(MAX(lan), 0) + 1 AS n FROM su_kien_hoc WHERE nguon = 'khac_phuc' AND ma_nguon = ? AND sbd = ?",
+      ).bind(ma, sbd).first<{ n: number }>()
+      lan = Math.max(2, Number(r?.n) || 2)
+    } catch {
+      lan = 2
+    }
+  }
+  const prepared = daDoi ? suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauSo, lam) : []
   await env.DB.prepare(
     `INSERT INTO nop_khac_phuc (khoa, ma_phieu, sbd, ma_ca, dap_an_json, so_dung, so_cau, nop_luc)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -1088,22 +1132,8 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
     .run()
   // SỔ SỰ KIỆN HỌC (GĐ 0): bảng `nop_khac_phuc` chỉ giữ lượt cuối, sổ giữ MỌI lượt (`lan`).
   // Gửi lại y hệt (mất mạng) thì không ghi thêm; nộp lại đáp án khác thì lan = lượt kế tiếp.
-  if (!cu || String(cu.dap_an_json ?? '') !== JSON.stringify(lam)) {
-    let lan = 1
-    if (cu) {
-      try {
-        const r = await env.DB.prepare(
-          "SELECT COALESCE(MAX(lan), 0) + 1 AS n FROM su_kien_hoc WHERE nguon = 'khac_phuc' AND ma_nguon = ? AND sbd = ?",
-        ).bind(ma, sbd).first<{ n: number }>()
-        lan = Math.max(2, Number(r?.n) || 2)
-      } catch {
-        lan = 2
-      }
-    }
-    // Phiếu tự sinh của máy em không có trên R2 → chấm sổ bằng tờ kho theo qid (điểm nộp cũ giữ nguyên).
-    const cauSo = cauPhieu.length ? cauPhieu : await cauTuKhoTheoQid(env, Object.keys(lam))
-    await ghiSuKien(env, suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauSo, lam))
-  }
+  if (daDoi) await ghiSuKien(env, prepared)
+
   return { ok: true, lanThu: cu ? 2 : 1, soCau, soDung, qidSai, nopLuc: nay, ...(await expNhanSauNop(env, sbd, Date.now())) }
 }
 
