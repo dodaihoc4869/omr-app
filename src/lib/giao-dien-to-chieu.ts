@@ -208,8 +208,10 @@ body.mc-timing .mc-ray{padding-bottom:0}
 .mc-ray{box-sizing:border-box}
 
 /* ── MÀN GỌI TÊN (đầu mỗi đợt) ── */
-.mc-intro{position:fixed;inset:0;z-index:99999;display:flex;align-items:stretch;justify-content:center;background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);color:white;font-family:var(--mc-sans);pointer-events:auto;overflow:hidden;cursor:pointer;transition:background 0.6s ease,backdrop-filter 0.6s ease}
-.mc-intro.mc-shrink{background:transparent;backdrop-filter:blur(0px);pointer-events:none}
+.mc-intro{position:fixed;inset:0;z-index:99999;display:flex;align-items:stretch;justify-content:center;color:white;font-family:var(--mc-sans);pointer-events:auto;overflow:hidden;cursor:pointer}
+.mc-intro::before{content:"";position:absolute;inset:0;background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:-1;transition:opacity 0.6s ease}
+.mc-intro.mc-shrink{pointer-events:none}
+.mc-intro.mc-shrink::before{opacity:0}
 .mc-intro-card{flex:1;min-width:0;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(6px,1.1vh,14px);text-align:center;overflow:hidden;--aura:244,162,97}
 .mc-intro-card+.mc-intro-card{box-shadow:inset 2px 0 0 rgba(244,239,228,.12)}
 .mc-intro-card:before{content:"";position:absolute;left:50%;top:40%;width:min(50vw,80vh);height:min(50vw,80vh);margin:calc(min(50vw,80vh) / -2) 0 0 calc(min(50vw,80vh) / -2);border-radius:50%;z-index:-1;pointer-events:none;background:radial-gradient(circle,rgba(var(--aura),.6) 0%,rgba(var(--aura),.2) 40%,rgba(var(--aura),0) 68%);animation:mc-hao-quang 1.6s ease-in-out infinite alternate}
@@ -222,7 +224,7 @@ body.mc-timing .mc-ray{padding-bottom:0}
 .mc-intro-chips span{padding:clamp(6px,1vh,10px) clamp(14px,1.5vw,24px);border-radius:999px;background:rgba(0,0,0,0.5);border:1px solid rgba(var(--aura),0.4);box-shadow:0 4px 12px rgba(var(--aura),0.2);color:#fff;font:700 clamp(14px,1.6vw,28px) var(--mc-sans);text-shadow:0 1px 4px rgba(0,0,0,0.8)}
 .mc-intro-label{position:absolute;z-index:2;top:clamp(10px,2.5vh,26px);left:0;right:0;text-align:center;font:800 clamp(16px,1.8vw,32px) var(--mc-sans);letter-spacing:0.2em;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(var(--aura),0.8);animation:mc-text-wow 1s ease-out both}
 .mc-intro-close{display:none}
-.mc-intro.mc-shrink .mc-intro-card:before,.mc-intro.mc-shrink .mc-intro-card:after,.mc-intro.mc-shrink .mc-intro-bong,.mc-intro.mc-shrink .mc-intro-chips{display:none}
+.mc-intro.mc-shrink .mc-intro-card:before,.mc-intro.mc-shrink .mc-intro-card:after,.mc-intro.mc-shrink .mc-intro-bong,.mc-intro.mc-shrink .mc-intro-chips{opacity:0;visibility:hidden}
 @keyframes mc-hao-quang{from{transform:scale(.95);opacity:.8}to{transform:scale(1.05);opacity:1}}
 @keyframes mc-vong-quay{to{transform:rotate(360deg)}}
 @keyframes mc-thu-wow{0%{transform:scale(0.2) translateY(100px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
@@ -241,7 +243,8 @@ body.mc .mc-em.mc-em-dat .mc-lam-tot{display:block;grid-column:2;grid-row:2;font
 .mc-mung:before{left:clamp(30px,3.6vw,70px);top:-6px}
 .mc-mung:after{left:clamp(4px,.5vw,10px);bottom:-4px;animation-delay:.2s;width:clamp(10px,1.4vw,22px);height:clamp(10px,1.4vw,22px)}
 body.mc .mc-em{position:relative}
-.mc-mung-overlay{background:transparent!important;backdrop-filter:none!important;pointer-events:none!important}
+.mc-mung-overlay{pointer-events:none!important}
+.mc-mung-overlay::before{display:none!important}
 .mc-mung-card img{animation:mc-thu-wow 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) both!important}
 .mc-hoa{position:absolute;top:-10vh;left:var(--x);width:clamp(20px,3vw,50px);height:clamp(20px,3vw,50px);background:url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 C50 40 100 50 100 50 C100 50 50 60 50 100 C50 100 50 60 0 50 C0 50 50 40 50 0" fill="%23facc15"/></svg>') no-repeat center/contain;animation:mc-roi 2.5s ease-in forwards;animation-delay:var(--delay);z-index:999;pointer-events:none}
 @keyframes mc-nhay-mung{from{transform:translateY(0)}to{transform:translateY(-20px)}}

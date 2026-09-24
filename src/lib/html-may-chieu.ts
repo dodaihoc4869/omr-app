@@ -736,6 +736,7 @@ const JS_MAY_CHIEU = `
       if (intro !== overlay) return;
       pairs.forEach(function (p) {
         if (!p.img || !p.img.animate || !anhXong(p.target)) return;
+        p.img.style.animation = "none";
         var a = p.img.getBoundingClientRect(), b = p.target.getBoundingClientRect();
         if (!a.width || !b.width) return;
         p.img.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + (b.left + b.width / 2 - a.left - a.width / 2) + 'px,' + (b.top + b.height / 2 - a.top - a.height / 2) + 'px) scale(' + (b.width / a.width) + ')', opacity: 1 }], { duration: BAY_MS, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
@@ -942,6 +943,7 @@ const JS_MAY_CHIEU = `
       overlay.appendChild(card);
       document.body.appendChild(overlay);
       setTimeout(function () {
+        img.style.animation = "none";
         var a = img.getBoundingClientRect(), b = target.getBoundingClientRect();
         if (a.width && b.width) {
           img.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + (b.left + b.width / 2 - a.left - a.width / 2) + 'px,' + (b.top + b.height / 2 - a.top - a.height / 2) + 'px) scale(' + (b.width / a.width) + ')', opacity: 1 }], { duration: BAY_MS, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
