@@ -118,9 +118,9 @@ function DongHoNhe({ b, now }: { b: BaiVeDich; now: number }) {
 function TheMotBai({ b, no, now, onLam, soViecConLai, ngayVuaTra }: { b: BaiVeDich; no: VeDichView['no']; now: number; onLam: () => void; soViecConLai: number; ngayVuaTra: string | null }) {
   const soNo = b.chang.filter((c) => c.trangThai === 'no').length
   const soChuaXong = b.chang.filter((c) => c.trangThai !== 'xong').length
-  const coNo = soNo > 0 || no.theoNgay.length > 0
+  const coNo = soNo > 0
   const [mo, setMo] = useState(false)
-  const gap = laSauGioCuoi(b.hanNop, now) || nhomNoTheoNgay(no.theoNgay).length >= 2
+  const gap = laSauGioCuoi(b.hanNop, now)
   const changKe = b.chang.find((c) => c.trangThai === 'no') ?? b.chang.find((c) => c.trangThai === 'hom_nay')
   // "Xong N chặng tối nay là em về đúng nhịp" CHỈ khi còn chặng NỢ (nợ ôn/gói không nói "chặng").
   const hichVeNhip = !!b.toiNay && soNo > 0
