@@ -3,7 +3,7 @@ import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
 import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
 import {qidTuLuanCuaTo} from './cam-tu-luan'
-import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
+import {ghiSuKien,ghiSuKienThi,chuanBiSuKienLoBtvn,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsThoiGianHoc,chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
@@ -1816,6 +1816,14 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>, ctx?: ExecutionC
     return ra(await ND.nopChangCaNhan(env, btLo, sbd, chiSo, dapAnCn, Date.now()))
   }
 
+  const dapAn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
+  let prepared: Awaited<ReturnType<typeof chuanBiSuKienLoBtvn>> | null = null
+  if (dapAn && Object.keys(dapAn).length) {
+    // Preserve the unassigned response before reading/grading any key material.
+    const assigned = await env.DB.prepare('SELECT 1 FROM btvn_em WHERE khoa=?').bind(`${maBtvn}|${sbd}`).first()
+    if (!assigned) return ra({ok:false,error:'Em không có bài tập này.'})
+    prepared = await chuanBiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn)
+  }
   const loDaXongMoi = Math.floor(chiSo) + 1
   let r: { meta: { changes: number } }
   try {
@@ -1835,8 +1843,7 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>, ctx?: ExecutionC
     .first<{ lo_da_xong: number }>()
   // SỔ SỰ KIỆN HỌC (GĐ 0): máy em gửi kèm đáp án của lô thì máy chủ CHẤM và ghi sổ —
   // "xong lô" không còn là điền đủ ô. Không gửi đáp án thì hành vi y như cũ.
-  const dapAn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
-  const ghi = dapAn && Object.keys(dapAn).length ? await ghiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn) : null
+  const ghi = prepared !== null ? await ghiSuKienLoBtvn(env, prepared) : null
   // EXP HỌC TẬP MỚI (exp-d1.ts): xong lô đúng nhịp/trễ nhịp + EXP từng câu; cờ tắt thì không đính gì.
   // HẠ TẢI D1 (Boss 22/09, tốc độ tối đa): đường "bài THƯỜNG" này — client (src/lib/btvn-may-chu-moi.ts xongLoBtvn())
   // CHỈ đọc {ok, loDaXong, error}, không đọc expNhan/manhNhan/exp (khác bài CÁ NHÂN HOÁ ở nhánh trên, ND.nopChangCaNhan,

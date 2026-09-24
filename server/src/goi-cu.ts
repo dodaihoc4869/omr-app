@@ -1,7 +1,7 @@
 import { docKhoiEm, xoaDemCaBaoVe } from './game-v2-bank'
 import { cauHopKhoi } from '../../src/lib/khoi-cau'
-import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
-import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
+import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect,kiemTraDapAnBtvn,LoiChamBtvn} from './btvn-grading'
+import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,laBoTrong,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
 import {docBoCuaCacEm,docTomTat,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
@@ -891,8 +891,17 @@ export async function nopBtvnQuaPhieu(
   if (laBaiCaNhan(bt)) return nopBaiCaNhan(env, bt, sbd, lam, Date.now())
 
   let graded
-  try { graded=gradeHomework(homeworkKeys(await homeworkQuestions(env,chuoi(bt.ma_de))),lam,chuoi(bt.ma_de)) }
-  catch(e){return {ok:false,error:e instanceof Error?e.message:'Không chấm được bài.'}}
+  try {
+    const keys = homeworkKeys(await homeworkQuestions(env, chuoi(bt.ma_de)))
+    graded = gradeHomework(keys, lam, chuoi(bt.ma_de))
+    // Validate canonical effective answers before consuming a submission. Blank markers keep
+    // their existing grading/event semantics; this normalized view is not saved as the answer.
+    const preflight = Object.fromEntries(Object.entries(graded.answers).map(([q, v]) => [q, laBoTrong(v) ? '' : v]))
+    kiemTraDapAnBtvn(keys, preflight)
+  } catch(e) {
+    if (e instanceof LoiChamBtvn) throw e
+    return {ok:false,error:e instanceof Error?e.message:'Không chấm được bài.'}
+  }
   const {soDung,soCau,qidSai}=graded
   lam=graded.answers
 
