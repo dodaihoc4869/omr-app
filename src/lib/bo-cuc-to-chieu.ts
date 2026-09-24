@@ -110,16 +110,11 @@ export function leoBacBoCuc(vua: (bac: number, co: number, hinh: number) => bool
       if (thu(3, co0, h)) return ra(3, co0, h, true)
     }
   }
-  // bậc 4: co chữ từng buocCo px tới SÀN (hình đã ở mức nhỏ nhất của bậc 3)
+  // NẾU VẪN KHÔNG VỪA (Bậc 1, 2, 3 ở cỡ chuẩn đều tràn)
+  // Bỏ hẳn Bậc 4 (co chữ) và Bậc 5 co chữ — luôn giữ cỡ chuẩn!
+  // Đẩy sang Bậc 5 (toàn bảng) với cỡ chuẩn, chấp nhận không vừa để CSS xử lý cuộn.
   const hCo = cfg.coBac3 ? hMin : 1
-  for (let c = co0 - cfg.buocCo; c >= cfg.coSan - 1e-9 && !xong(); c -= cfg.buocCo) {
-    if (thu(4, c, hCo)) return ra(4, c, hCo, true)
-  }
-  // bậc 5: toàn bảng. Thử lại từ cỡ chuẩn (vùng rộng hơn nên chữ to có thể vừa) rồi xuống sàn, rồi xuống đáy tuyệt đối.
-  for (let d = co0; d >= cfg.coDay - 1e-9 && !xong(); d -= cfg.buocCo) {
-    if (thu(5, d, hCo)) return ra(5, d, hCo, true, d < cfg.coSan - 1e-9)
-  }
-  return ra(5, cfg.coDay, hCo, false, true)
+  return ra(5, co0, hCo, false, false)
 }
 
 /** Bản chữ của `leoBacBoCuc` để nhúng vào tờ chiếu (gán vào biến cùng tên). */
@@ -172,6 +167,26 @@ body.mc-bc .mc-b5 .mc-vung-de { grid-column: 1; grid-row: 2; }
 body.mc-bc .mc-b5 .mc-nut-hien-em { grid-column: 1; grid-row: 1; align-self: start; z-index: 3; }
 body.mc-bc .mc-b5 .mc-cot-lam-bai, body.mc-bc .mc-b5 .mc-trang, body.mc-bc .mc-b5 > .mc-trong { display: none; }
 body.mc-bc .mc-b5 .mc-giai-vung { grid-column: 1; grid-row: 1; justify-self: end; align-self: center; padding: 0 16px; z-index: 3; }
+body.mc-bc .mc-b5 .mc-vung-de { overflow-y: auto !important; }
+/* Khi bấm lên bảng (pha="goi"), mc-b5 biến thành 2/3 bảng y hệt mc-dot-don, VÀ cho phép cuộn */
+body[data-pha="goi"].mc-bc .mc-dot.mc-b5 { grid-template-columns: 2fr 1fr; grid-template-rows: auto minmax(0, 1fr); }
+body[data-pha="goi"].mc-bc .mc-b5 .mc-vung-de { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; overflow-y: auto !important; }
+body[data-pha="goi"].mc-bc .mc-b5 .mc-em { grid-column: 2; grid-row: 1; }
+body[data-pha="goi"].mc-bc .mc-b5 .mc-nut-hien-em { grid-column: 2; grid-row: 1; align-self: start; z-index: 3; }
+body[data-pha="goi"].mc-bc .mc-b5 .mc-cot-lam-bai { display: block; grid-column: 2; grid-row: 2; padding: 0; border: 0; border-radius: 16px; box-shadow: inset 0 0 0 2px var(--mc-vien); background: transparent; }
+body[data-pha="goi"].mc-bc .mc-b5 .mc-giai-vung { grid-column: 2; grid-row: 2; align-self: end; justify-self: stretch; padding: 12px; z-index: 3; }
+body[data-pha="goi"].mc-bc .mc-b5 .mc-trang { display: block; flex: 1 0 var(--mc-lam-bai-min, 30%); min-height: 0; margin: 0; border: 0; border-radius: 16px; box-shadow: inset 0 0 0 2px var(--mc-vien); }
+/* Nếu đợt Bậc 5 đang ở chế độ CHỜ (full board) và có hình/bảng -> Chia đôi bảng: chữ bên trái, hình/bảng bên phải */
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) { display: grid; grid-template-columns: 1fr 1fr; grid-auto-flow: row; column-gap: 32px; }
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) > .mc-de,
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) > .mc-ds-pa,
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) > .mc-ngan,
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) > .mc-pa { grid-column: 1; }
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) > .mc-anh,
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) > .q-bang-cuon,
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) > table,
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) > .ex-demo,
+body[data-pha="cho"].mc-bc .mc-b5 .mc-than:has(.mc-anh, .q-bang-cuon, table, .ex-demo) > .ex-original { grid-column: 2; margin-top: 0; }
 /* ghi chú cho thầy (đợt tự tách, chữ ở đáy, toàn bảng): nằm trong đợt làm NGUỒN, KHÔNG vẽ ở đó (không lấn đề, không đổi bề cao vùng đo);
    script chính chép nó lên dòng phụ của thanh trên khi đợt ấy đang hiện. */
 .mc-ghi-chu { display: none; }

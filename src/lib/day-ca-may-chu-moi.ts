@@ -388,7 +388,7 @@ export function diaChiGuiCa(server: string, origin: string): string {
   const base = server.replace(/\/+$/, '')
   // Trên app chính, điện thoại chỉ cần kết nối tên miền app đang mở.
   // Cấu hình máy chủ khác vẫn đi đúng nơi được cấu hình, không gửi nhầm mã.
-  if (base === 'https://omr.ttadodaihoc.workers.dev' && /^https:\/\/(?:[a-z0-9-]+\.)?omr-app-b3u\.pages\.dev$/.test(origin)) return `${origin}/api`
+  if (base === 'https://omr.ttadodaihoc.workers.dev' && !origin.startsWith('http://localhost') && !origin.startsWith('http://127.0.0.1')) return `${origin}/api`
   return base
 }
 
@@ -416,41 +416,60 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
   const cacDiaChi = base === directBase ? [directBase] : dungXhr ? [base, directBase] : [directBase, base]
   // MỖI ĐỊA CHỈ MỘT HẠN RIÊNG (không chia chung một hạn): một đường TREO tới hạn
   // không được nuốt mất lượt thử của đường kia — đúng lỗi làm nút mở ca đứng im.
-  const gui = async (path: string, payload: string, seconds: number) => {
-    let ketQua5xx: { ok: boolean; status: number; data: { ok?: boolean; error?: string; daLuu?: boolean } | null } | null = null
-    let loiCuoi: unknown = null
-    for (const goc of cacDiaChi) {
-      const controller = new AbortController()
-      try {
-        // fetch() kết thúc khi có HEADER, chưa chắc đã nhận đủ thân phản hồi.
-        // Giữ hạn chờ tới khi đọc xong JSON để tránh nút mở ca quay mãi.
-        const kq = await voiHanCho((async () => {
-          const res = dungXhr
-            ? await guiCaBangXhr(goc + path, payload, controller.signal, seconds * 1000)
-            : await (async () => {
-              const r = await fetch(goc + path, { method: 'POST', headers, body: payload, signal: controller.signal })
-              const data = await r.json().catch(() => null) as { ok?: boolean; error?: string; daLuu?: boolean } | null
-              return { ok: r.ok, status: r.status, data }
-            })()
-          const data = res.data
-          // 403 HTML có thể là trang chặn mạng/Cloudflare, không phải kết quả
-          // kiểm mật khẩu của Worker. Phải còn lượt thử qua tên miền app.
-          if ((res.status === 401 || res.status === 403) && data?.ok === false) throw new Error('AUTH')
-          if ((!data || typeof data !== 'object' || Array.isArray(data)) && res.status !== 413) {
-            throw new Error(`Đường kết nối trả về dữ liệu không hợp lệ (HTTP ${res.status}).`)
+  const gui = (path: string, payload: string, seconds: number): Promise<{ ok: boolean; status: number; data: { ok?: boolean; error?: string; daLuu?: boolean } | null }> => {
+    return new Promise((resolve, reject) => {
+      let ketQua5xx: { ok: boolean; status: number; data: { ok?: boolean; error?: string; daLuu?: boolean } | null } | null = null
+      let loiCuoi: unknown = null
+      let authLoi: Error | null = null
+      let soXong = 0
+      const controllers = cacDiaChi.map(() => new AbortController())
+
+      if (cacDiaChi.length === 0) return reject(new Error('Không có địa chỉ máy chủ.'))
+
+      cacDiaChi.forEach(async (goc, i) => {
+        const controller = controllers[i]
+        try {
+          const kq = await voiHanCho((async () => {
+            const res = dungXhr
+              ? await guiCaBangXhr(goc + path, payload, controller.signal, seconds * 1000)
+              : await (async () => {
+                const r = await fetch(goc + path, { method: 'POST', headers, body: payload, signal: controller.signal })
+                const data = await r.json().catch(() => null) as { ok?: boolean; error?: string; daLuu?: boolean } | null
+                return { ok: r.ok, status: r.status, data }
+              })()
+            const data = res.data
+            if ((res.status === 401 || res.status === 403) && data?.ok === false) throw new Error('AUTH')
+            if ((!data || typeof data !== 'object' || Array.isArray(data)) && res.status !== 413) {
+              throw new Error(`Đường kết nối trả về dữ liệu không hợp lệ (HTTP ${res.status}).`)
+            }
+            return { ok: res.ok, status: res.status, data }
+          })(), seconds * 1000, 'Máy chủ chưa phản hồi kịp.', () => controller.abort())
+
+          if (kq.status >= 500) {
+            if (!ketQua5xx) ketQua5xx = kq
+            throw new Error('5xx')
           }
-          return { ok: res.ok, status: res.status, data }
-        })(), seconds * 1000, 'Máy chủ chưa phản hồi kịp.', () => controller.abort())
-        if (kq.status >= 500) { ketQua5xx = kq; continue } // máy chủ lỗi: thử địa chỉ kế
-        return kq
-      } catch (e) {
-        if (e instanceof Error && e.message === 'AUTH') throw e
-        loiCuoi = e // mạng đứt / hết hạn: thử địa chỉ kế
-      }
-    }
-    // Hết đường mà chỉ gặp 5xx: trả kết quả ấy để vòng ngoài báo đúng chữ máy chủ.
-    if (ketQua5xx) return ketQua5xx
-    throw loiCuoi instanceof Error ? loiCuoi : new Error('Không kết nối được máy chủ.')
+
+          // Thành công: hủy các luồng khác
+          controllers.forEach((c, j) => { if (i !== j) c.abort() })
+          resolve(kq)
+        } catch (e) {
+          if (e instanceof Error && e.message === 'AUTH') {
+            authLoi = e
+            controllers.forEach(c => c.abort())
+            reject(e)
+            return
+          }
+          if (e instanceof Error && e.message !== '5xx') loiCuoi = e
+        } finally {
+          soXong++
+          if (soXong === cacDiaChi.length && !authLoi) {
+            if (ketQua5xx) resolve(ketQua5xx)
+            else reject(loiCuoi instanceof Error ? loiCuoi : new Error('Không kết nối được máy chủ.'))
+          }
+        }
+      })
+    })
   }
   let loi = 'Không kết nối được máy chủ.'
   for (let lan = 0; lan < 2; lan++) {

@@ -411,25 +411,26 @@ function trangDapAnHtml(ds: CauLuyen[], tu: number, tong: number): string {
 const CSS_MAY_CHIEU = `
 #mc-clock {padding:12px 24px;border-radius:20px;background:linear-gradient(120deg,#075985,#2563eb);color:white;font-size:clamp(22px,3vw,42px);font-weight:900;font-variant-numeric:tabular-nums;box-shadow:0 6px 24px #2563eb40;border:2px solid #7dd3fc;white-space:nowrap}
 #mc-clock.mc-sap-het {background:linear-gradient(120deg,#be123c,#ea580c);border-color:#fda4af}
-.mc-day-hoc .mc-em {padding:16px;border:1px solid #93c5fd;border-radius:22px;background:linear-gradient(125deg,#eff6ff,#e0f2fe,#ede9fe);box-shadow:0 8px 24px #2563eb18;color:#172554;margin-bottom:14px}
-.mc-day-hoc .mc-phai .mc-em {background:linear-gradient(125deg,#fdf2f8,#fae8ff,#ede9fe);border-color:#f0abfc;color:#701a75}
-.mc-day-hoc .mc-ten {font-weight:900;letter-spacing:-.025em}
-.mc-day-hoc .mc-thu {background:#ffffffb8;border-color:#ffffff;border-radius:18px}
-.mc-intro {position:fixed;inset:0;z-index:99999;display:flex;align-items:stretch;justify-content:center;background:transparent;color:white;font-family:system-ui,sans-serif;pointer-events:none;overflow:hidden}
+.mc-em {padding:16px;border:1px solid #93c5fd;border-radius:22px;background:linear-gradient(125deg,#eff6ff,#e0f2fe,#ede9fe);box-shadow:0 8px 24px #2563eb18;color:#172554;margin-bottom:14px}
+.mc-phai .mc-em {background:linear-gradient(125deg,#fdf2f8,#fae8ff,#ede9fe);border-color:#f0abfc;color:#701a75}
+.mc-intro {position:fixed;inset:0;z-index:99999;display:flex;align-items:stretch;justify-content:center;background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);color:white;font-family:system-ui,sans-serif;pointer-events:none;overflow:hidden;transition:background 0.6s ease,backdrop-filter 0.6s ease}
 .mc-intro-card {flex:1;min-width:0;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;--aura:#22d3ee;--spark:#fef08a}
 .mc-intro-card:nth-of-type(3) {--aura:#e879f9;--spark:#fde68a}
 .mc-intro-card:before,.mc-intro-card:after {content:'';position:absolute;inset:-20%;z-index:-1;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse,transparent 12%,color-mix(in srgb,var(--aura) 55%,transparent) 30%,transparent 68%);animation:mc-aura-bloom 1.8s ease-in-out infinite alternate}
 .mc-intro-card:after {background:conic-gradient(from 0deg,transparent 0deg,var(--aura) 12deg,transparent 25deg,transparent 70deg,var(--spark) 82deg,transparent 95deg,transparent 145deg,var(--aura) 157deg,transparent 172deg,transparent 230deg,var(--spark) 242deg,transparent 255deg,transparent 310deg,var(--aura) 322deg,transparent 340deg);opacity:.26;mask-image:radial-gradient(ellipse,transparent 8%,#000 32%,transparent 68%);animation:mc-aura-turn 12s linear infinite}
-.mc-intro-card img {width:min(47vw,68vh);height:min(47vw,68vh);object-fit:contain;background:transparent;border:0;filter:drop-shadow(0 0 18px var(--aura)) drop-shadow(0 0 45px var(--aura));z-index:1}
-.mc-intro-card h2 {color:white;text-shadow:0 2px 5px #172554,0 0 22px var(--aura);font-size:clamp(24px,4vw,60px);line-height:1.15;margin:12px 0 8px;z-index:1}
-.mc-intro-card p {color:white;text-shadow:0 2px 5px #172554,0 0 18px var(--aura);font-size:clamp(16px,2vw,28px);font-weight:700;z-index:1}
+.mc-intro-card img {width:min(47vw,68vh);height:min(47vw,68vh);object-fit:contain;background:transparent;border:0;filter:drop-shadow(0 0 18px var(--aura)) drop-shadow(0 0 45px var(--aura));z-index:1;animation:mc-thu-wow 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) both}
+.mc-intro-card h2 {color:white;text-shadow:0 2px 5px #172554,0 0 22px var(--aura);font-size:clamp(24px,4vw,60px);line-height:1.15;margin:12px 0 8px;z-index:1;animation:mc-text-wow 0.8s ease-out 0.2s both}
+.mc-intro-card p {color:white;text-shadow:0 2px 5px #172554,0 0 18px var(--aura);font-size:clamp(16px,2vw,28px);font-weight:700;z-index:1;animation:mc-text-wow 0.8s ease-out 0.3s both}
 .mc-spark {position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);background:var(--spark);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);filter:drop-shadow(0 0 7px var(--aura));animation:mc-spark-float 2s ease-in-out infinite;animation-delay:var(--delay);pointer-events:none}
 @keyframes mc-aura-bloom {from{transform:scale(.8);opacity:.55}to{transform:scale(1.15);opacity:.9}}
 @keyframes mc-aura-turn {to{transform:rotate(360deg)}}
 @keyframes mc-spark-float {0%,100%{transform:translateY(12px) scale(.5);opacity:.2}50%{transform:translateY(-24px) scale(1.3);opacity:1}}
+@keyframes mc-thu-wow {0%{transform:scale(0.3) translateY(50px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+@keyframes mc-text-wow {0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
+.mc-intro.mc-shrink {background:transparent;backdrop-filter:blur(0px)}
 .mc-intro.mc-shrink .mc-intro-card {overflow:visible}
 .mc-intro.mc-shrink .mc-intro-card:before,.mc-intro.mc-shrink .mc-intro-card:after,.mc-intro.mc-shrink .mc-spark {display:none}
-.mc-intro-label {position:absolute;z-index:2;top:3vh;left:0;right:0;text-align:center;letter-spacing:.2em;color:white;text-shadow:0 2px 6px #172554,0 0 20px #06b6d4;font-weight:800}
+.mc-intro-label {position:absolute;z-index:2;top:3vh;left:0;right:0;text-align:center;letter-spacing:.2em;color:white;text-shadow:0 2px 6px #172554,0 0 20px #06b6d4;font-weight:800;animation:mc-text-wow 0.8s ease-out both}
 .mc-intro-close {position:absolute;right:20px;bottom:20px;border:1px solid #94a3b8;border-radius:30px;padding:12px 22px;background:#ffffffe6;color:#172554;cursor:pointer;pointer-events:auto}
 @media(max-width:900px){.mc-intro{flex-direction:column}.mc-intro-card img{width:min(65vw,30vh);height:min(65vw,30vh)}.mc-intro-card h2{font-size:26px;margin:4px}.mc-intro-card p{margin:4px;font-size:16px}}
 @media print {#mc-clock,.mc-intro {display:none!important}}
@@ -588,7 +589,7 @@ body.mc-timing .mc-ray{box-sizing:border-box;padding-bottom:64px}
 /* Projector palette is explicit: never inherit the laptop's night mode. */
 :root[data-projector="soft"]{--mc-nen:#dedbd1;--mc-muc:#20272c;--mc-nhat:#4f585e;--mc-vien:#aaa99f;--mc-xanh:#214f7c;--mc-xanh-nen:#cbd6df;color-scheme:light}
 :root[data-projector="dark"]{--mc-nen:#18212b;--mc-muc:#e4e8e9;--mc-nhat:#b4c0ca;--mc-vien:#4b5a68;--mc-xanh:#b1cfff;--mc-xanh-nen:#293c51;color-scheme:dark}
-.mc-de,.mc-pa{font-size:calc(clamp(24px,2.05vw,34px) * var(--mc-scale,1));line-height:1.45}.mc-da-o{font-size:calc(25px * var(--mc-scale,1))}.mc-giai .sol-box{font-family:var(--mc-serif);font-size:calc(clamp(24px,2.05vw,34px) * var(--mc-scale,1));line-height:1.45;background:var(--mc-nen);color:var(--mc-muc)}.mc-giai .sol-box *{color:inherit;font-size:inherit!important;line-height:inherit}.mc-giai .sol-box .sol-cot-loi{font-weight:600}.mc-giai .sol-box sub,.mc-giai .sol-box sup{font-size:.75em!important;line-height:0}.mc-giai .sol-box p,.mc-giai .sol-box li{font-size:inherit}.mc-trang{min-height:30vh;flex:1 0 30vh;border-top:1px dashed var(--mc-vien);margin-top:18px}.mc-thanh{flex-wrap:wrap;gap:8px}.mc-dieu{flex-wrap:wrap}.mc-thanh select{padding:8px;border:1px solid var(--mc-vien);border-radius:10px;background:var(--mc-nen);color:var(--mc-muc)}.mc-day-hoc .mc-em,.mc-day-hoc .mc-phai .mc-em,.mc-day-hoc .mc-thu{background:var(--mc-nen);color:var(--mc-muc);box-shadow:none}.mc-anh,.mc-anh-pa{background:#dedbd1}.mc-giai .sol-box img{max-width:100%}:fullscreen .mc-thanh:focus-within{opacity:1}
+.mc-de,.mc-pa{font-size:calc(clamp(24px,2.05vw,34px) * var(--mc-scale,1));line-height:1.45}.mc-da-o{font-size:calc(25px * var(--mc-scale,1))}.mc-giai .sol-box{font-family:var(--mc-serif);font-size:calc(clamp(24px,2.05vw,34px) * var(--mc-scale,1));line-height:1.45;background:var(--mc-nen);color:var(--mc-muc)}.mc-giai .sol-box *{color:inherit;font-size:inherit!important;line-height:inherit}.mc-giai .sol-box .sol-cot-loi{font-weight:600}.mc-giai .sol-box sub,.mc-giai .sol-box sup{font-size:.75em!important;line-height:0}.mc-giai .sol-box p,.mc-giai .sol-box li{font-size:inherit}.mc-trang{min-height:30vh;flex:1 0 30vh;border-top:1px dashed var(--mc-vien);margin-top:18px}.mc-thanh{flex-wrap:wrap;gap:8px}.mc-dieu{flex-wrap:wrap}.mc-thanh select{padding:8px;border:1px solid var(--mc-vien);border-radius:10px;background:var(--mc-nen);color:var(--mc-muc)}.mc-em,.mc-phai .mc-em,.mc-thu{background:var(--mc-nen);color:var(--mc-muc);box-shadow:none}.mc-anh,.mc-anh-pa{background:#dedbd1}.mc-giai .sol-box img{max-width:100%}:fullscreen .mc-thanh:focus-within{opacity:1}
 .mc-de,.mc-pa,.mc-giai .sol-box{font-size:calc(clamp(24px,2.05vw,34px) * var(--mc-scale,1));line-height:1.5;font-family:var(--mc-serif)}
 .mc-de .katex,.mc-pa .katex,.mc-giai .sol-box .katex{font-size:1em!important}
 .mc-pa{display:grid;grid-template-columns:1.4em minmax(0,1fr);align-items:baseline;column-gap:.35em;min-width:0}
@@ -683,7 +684,7 @@ const JS_MAY_CHIEU = `
     intro = null;
   }
   function chuyenPha(pha) {
-    gd.pha = pha;
+    gd.pha = pha; document.body.setAttribute("data-pha", pha);
     veThanh();
   }
   /** Màn gọi tên xong (hết giờ, hoặc thầy bấm/chạm/gõ phím bỏ qua): thu về thẻ tên và sang pha kế. */
@@ -698,8 +699,8 @@ const JS_MAY_CHIEU = `
     gd.sau = sauDo;
     var heads = Array.prototype.slice.call(page.querySelectorAll('.mc-em'));
     var coThu = heads.some(function (h) { return anhXong(h.querySelector('img.mc-thu-anh')); });
-    if (giamChuyenDong() || !coThu) { gd.pha = 'goi'; chuyenPha(sauDo); return; }
-    gd.pha = 'goi';
+    if (giamChuyenDong() || !coThu) { chuyenPha(sauDo); return; } // chuyenPha sets gd.pha and body attribute correctly
+    gd.pha = 'goi'; document.body.setAttribute('data-pha', gd.pha);
     veThanh();
     var overlay = document.createElement('div');
     overlay.className = 'mc-intro';
@@ -795,7 +796,7 @@ const JS_MAY_CHIEU = `
   function lenBang() {
     var page = dots[i];
     if (!page || gd.pha !== 'cho') return;
-    gd.pha = 'goi';
+    gd.pha = 'goi'; document.body.setAttribute('data-pha', gd.pha);
     loThe(page);
     veThanh();
     choAnh(page, function () {
@@ -806,6 +807,7 @@ const JS_MAY_CHIEU = `
     var page = dots[i];
     huyGoi();
     gd.pha = page && page.querySelector('.mc-em[id]') ? 'cho' : '';
+    document.body.setAttribute('data-pha', gd.pha);
     if (page) {
       page.querySelectorAll('.mc-em[id]').forEach(function (e) { e.hidden = true; });
       page.querySelectorAll('.mc-nut-hien-em').forEach(function (e) { e.hidden = true; });
