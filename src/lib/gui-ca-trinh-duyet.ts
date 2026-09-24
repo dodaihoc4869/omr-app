@@ -10,7 +10,7 @@ export function laSamsungInternet(): boolean {
 }
 
 /** XHR có sự kiện kết thúc riêng; vẫn nhận tín hiệu hủy từ hạn chờ của toàn lượt. */
-export function guiCaBangXhr(url: string, body: string, signal: AbortSignal, hanMs: number): Promise<PhanHoiGuiCa> {
+export function guiCaBangXhr(url: string, body: string | Blob, signal: AbortSignal, hanMs: number, encoding?: string): Promise<PhanHoiGuiCa> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     let xong = false
@@ -38,6 +38,7 @@ export function guiCaBangXhr(url: string, body: string, signal: AbortSignal, han
       xhr.open('POST', url, true)
       xhr.timeout = hanMs
       xhr.setRequestHeader('content-type', 'text/plain;charset=utf-8')
+      if (encoding) xhr.setRequestHeader('content-encoding', encoding)
       xhr.send(body)
     } catch (e) {
       ketThuc(() => reject(e))
