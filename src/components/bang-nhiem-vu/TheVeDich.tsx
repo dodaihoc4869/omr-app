@@ -256,7 +256,7 @@ function KhoiNgayTruoc({ no, onLam, ngayVuaTra }: { no: VeDichView['no']; onLam:
   const nhom = nhomNoTheoNgay(no.theoNgay)
   if (nhom.length === 0 && !ngayVuaTra) return null
   return (
-    <section className="vd-khoi" aria-labelledby="vd-truoc-t" data-vung="ngay-truoc">
+    <section className="vd-khoi" aria-labelledby="vd-truoc-t" data-vung="ngay-truoc" style={{ display: 'none' }}>
       <div className="vd-muc" style={{ ['--vd-cham' as string]: 'var(--cam)' }}>
         <h2 id="vd-truoc-t">
           <i aria-hidden="true" />
