@@ -1,3 +1,4 @@
+import { gzipSync } from 'fflate'
 // ĐẨY CA, GÓI ĐỀ VÀ DANH SÁCH LỚP LÊN MÁY CHỦ MỚI — 11/09.
 //
 // VÌ SAO PHẢI CÓ TỆP NÀY: Worker có sẵn `/ca/day` từ đợt 2, nhưng KHÔNG tệp nào
@@ -397,10 +398,16 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
   if (!secret.trim()) throw new Error('Chưa có mã xác thực giáo viên. Thầy đăng nhập lại app giáo viên.')
   const bodyString = JSON.stringify({ ca, bank, keyBank, secret })
   let body: string | Blob = bodyString
-  if (typeof CompressionStream !== 'undefined' && bodyString.length > 512 * 1024) {
+  if (bodyString.length > 512 * 1024) {
     try {
-      const stream = new Response(bodyString).body!.pipeThrough(new CompressionStream('gzip'))
-      body = await new Response(stream).blob()
+      if (typeof CompressionStream !== 'undefined') {
+        const stream = new Response(bodyString).body!.pipeThrough(new CompressionStream('gzip'))
+        body = await new Response(stream).blob()
+      } else if (typeof TextEncoder !== 'undefined') {
+        const u8 = new TextEncoder().encode(bodyString)
+        const compressed = gzipSync(u8)
+        body = new Blob([compressed])
+      }
     } catch { }
   }
   const headers = { 'content-type': 'text/plain;charset=utf-8' }
