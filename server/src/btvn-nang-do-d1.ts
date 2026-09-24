@@ -9,7 +9,7 @@
 //   · Nộp chặng: đáp án ĐẦU khoá; đáp án + lời giải chỉ đi ra SAU khi ghi sổ thành công; câu chưa trả lời không chấm, không lời giải.
 //   · Câu THƯỞNG (`thu_thach`, `loi_cao`): đúng ⇒ vào cả tử và mẫu; sai ⇒ KHÔNG vào mẫu.
 import type { D1PreparedStatement, Env } from './kieu'
-import { answerText, gradeHomework, homeworkKeys, homeworkQuestions, isAnswerCorrect, kiemTraDapAnBtvn, LoiChamBtvn } from './btvn-grading'
+import { answerText, gradeHomework, homeworkKeys, homeworkQuestions, isAnswerCorrect, kiemTraDapAnBtvn, kiemTraDuMaterialBtvn, LoiChamBtvn } from './btvn-grading'
 import {
   chonBoCuaEm, chonLoi, maDangCua, mucTuChu, theTienBo, thichNghiChangSau,
   type BoCuaEm, type CauGiao, type DieuChinhEm, type HoSoEmRut, type Muc, type NganSachBai, type NhanCau, type PhanCau, type Sao, type TienBo, type TomTatBo,
@@ -725,8 +725,9 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
 
   let tho: Hang[]
   try {
-    tho = await homeworkQuestions(env, chuoi(bt.ma_de))
-  } catch {
+    tho = await homeworkQuestions(env, chuoi(bt.ma_de), { requiredQids: dsQid })
+  } catch (e) {
+    if (e instanceof LoiChamBtvn) throw e
     return { ok: false, error: 'Chưa tải đủ đề bài tập. Em thử lại.' }
   }
   const theoQid = new Map(tho.map((c) => [chuoi(c.qid), c]))
@@ -866,10 +867,14 @@ async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTh
   if (!bo || bo.thuSucThem.length === 0) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
   const moLuc = docLichDaLuu(em.chang_mo_json, soChang, { chotLuc: chuoi(em.chot_luc), hanNop: chuoi(bt.han_nop), nowMs: now })?.moLuc ?? moLucChang(chuoi(em.chot_luc), soChang)
   if (!(now >= Date.parse(moLuc[soChang - 1]))) return { ok: false, lyDo: 'chang_chua_mo', error: 'Chặng này chưa mở.' }
+  const co = dapAnTho && typeof dapAnTho === 'object' && !Array.isArray(dapAnTho) ? Object.keys(dapAnTho).length > 0 : false
+  const daLuu = docDapAnDaLuu(em.dap_an_json)
+  const canMaterial = co ? bo.thuSucThem : bo.thuSucThem.filter(q => daTraLoi(phanTuQid(q), daLuu[q] ?? ''))
   let tho: Hang[]
   try {
-    tho = await homeworkQuestions(env, chuoi(bt.ma_de))
-  } catch {
+    tho = await homeworkQuestions(env, chuoi(bt.ma_de), canMaterial.length > 0 ? { requiredQids: canMaterial } : undefined)
+  } catch (e) {
+    if (e instanceof LoiChamBtvn) throw e
     return { ok: false, error: 'Chưa tải đủ đề bài tập. Em thử lại.' }
   }
   const theoQid = new Map(tho.map((c) => [chuoi(c.qid), c]))
@@ -877,7 +882,6 @@ async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTh
   const phanCua = (c: Hang) => chuoi(c.phan) || phanTuQid(chuoi(c.qid))
   const dungCua = (c: Hang, v: string): boolean => isAnswerCorrect(v, answerText(c.dap_an ?? c.dapAn), phanTuQid(chuoi(c.qid), phanCua(c)))
   const loDaXong = Math.min(soChang, soHoac(em.lo_da_xong))
-  const co = dapAnTho && typeof dapAnTho === 'object' && !Array.isArray(dapAnTho) ? Object.keys(dapAnTho).length > 0 : false
 
   let gop: Record<string, string> = docDapAnDaLuu(em.dap_an_json)
   const moiDung: Hang[] = [] // câu ĐƯỢC KHOÁ ĐÚNG ở lượt gọi này (mỗi câu chỉ được cộng ĐÚNG MỘT lần)
@@ -980,6 +984,9 @@ function chuanBiNopBaiCaNhan(
   lam: Hang,
 ) {
   const dsQid = new Set(bo.chang.flat())
+  kiemTraDuMaterialBtvn(tho, dsQid)
+  // An unattempted bonus is optional; a saved answer must not vanish from grading.
+  kiemTraDuMaterialBtvn(tho, bo.thuSucThem.filter(q => daTraLoi(phanTuQid(q), luu[q] ?? '')))
   const chiCauCuaEm = tho.filter((c) => dsQid.has(chuoi(c.qid)))
   const keys = homeworkKeys(chiCauCuaEm)
   // Đáp án đã khoá ở chặng THẮNG đáp án gửi kèm; đáp án ngoài bộ bị bỏ (không lỗi).
@@ -1025,8 +1032,9 @@ export async function nopBaiCaNhan(env: Env, bt: Hang, sbd: string, lam: Hang, n
   if (!bo) return { ok: false, lyDo: 'bai_chua_san_sang', error: 'Bài này chưa sẵn sàng. Em thử lại sau ít phút.' }
   let tho: Hang[]
   try {
-    tho = await homeworkQuestions(env, chuoi(bt.ma_de))
+    tho = await homeworkQuestions(env, chuoi(bt.ma_de), { requiredQids: bo.chang.flat() })
   } catch (e) {
+    if (e instanceof LoiChamBtvn) throw e
     return { ok: false, error: e instanceof Error ? e.message : 'Không chấm được bài.' }
   }
   let prepared

@@ -373,7 +373,7 @@ export async function chuanBiSuKienLoBtvn(
     .bind(maBtvn)
     .first<{ ma_de: string }>()
   if (!bt) throw new Error('Không có bài tập này')
-  const cau = cauTuKho(await homeworkQuestions(env, String(bt.ma_de))).filter((c) => Object.hasOwn(dapAn, c.qid))
+  const cau = cauTuKho(await homeworkQuestions(env, String(bt.ma_de), { sourceMaterial: true })).filter((c) => Object.hasOwn(dapAn, c.qid))
   const keys = new Map(cau.map(c => [c.qid, c.dapAnDung]))
   const preflight = Object.fromEntries(cau.map(c => {
     const answer = answerText(dapAn[c.qid])

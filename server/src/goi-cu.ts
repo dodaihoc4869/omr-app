@@ -892,7 +892,7 @@ export async function nopBtvnQuaPhieu(
 
   let graded
   try {
-    const keys = homeworkKeys(await homeworkQuestions(env, chuoi(bt.ma_de)))
+    const keys = homeworkKeys(await homeworkQuestions(env, chuoi(bt.ma_de), { sourceMaterial: true }))
     graded = gradeHomework(keys, lam, chuoi(bt.ma_de))
     // Validate canonical effective answers before consuming a submission. Blank markers keep
     // their existing grading/event semantics; this normalized view is not saved as the answer.

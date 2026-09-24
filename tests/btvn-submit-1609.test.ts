@@ -22,7 +22,7 @@ it('đường nộp trực tiếp chấm ở máy chủ, bỏ điểm 0 hoặc �
 })
 it('mất kho đáp án không ghi điểm 0 đè bài',async()=>{
  const {env,writes}=setup();env.DE={get:async()=>null} as never
- expect(await nopKhacPhuc(env,{ma:'BT',sbd:'1',dapAn:answers})).toMatchObject({ok:false});expect(writes()).toBe(0)
+ await expect(nopKhacPhuc(env,{ma:'BT',sbd:'1',dapAn:answers})).rejects.toMatchObject({ma:'BTVN_GRADING_MATERIAL_INVALID'});expect(writes()).toBe(0)
 })
 it('chi tiết bài nộp yêu cầu xác thực giáo viên trước khi đọc',async()=>{
  const res=await worker.fetch(new Request('https://test/btvn/bai-lam',{method:'POST',headers:{'content-type':'application/json'},body:'{"maBtvn":"BT","sbd":"1"}'}),{MA_BI_MAT:'secret'} as Env)

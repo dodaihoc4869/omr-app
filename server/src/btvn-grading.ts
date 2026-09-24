@@ -126,25 +126,46 @@ export function gradeHomework(keys: Map<string, string>, raw: Record<string, unk
   }
   return { answers, soCau: keys.size, soDung: keys.size - qidSai.length, qidSai }
 }
-export async function homeworkQuestions(env: Env, maDe: string) {
+/** Submit-only completeness against qids issued by the server, never client input. */
+export function kiemTraDuMaterialBtvn(cau: Record<string, unknown>[], requiredQids: Iterable<string>): void {
+  const keys = homeworkKeys(cau)
+  for (const qid of requiredQids) {
+    if (!keys.has(qid)) throw new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Thiếu câu hoặc đáp án của bài đã giao. Bài làm chưa được chốt.')
+  }
+}
+
+export async function homeworkQuestions(env: Env, maDe: string, material?: { requiredQids?: readonly string[]; sourceMaterial?: boolean }) {
   const out: Record<string, unknown>[] = []; const seen = new Set<string>(); const cache = new Map<string, Record<string, unknown>[]>()
   for (const ma of maDe.split(',').map(x => x.trim()).filter(Boolean)) {
     if (laMaDeTuLuan(ma)) continue // -VD / -DT (mục dạy học) và -TL (tự luận): một định nghĩa dùng chung (src/lib/cau-tu-luan.ts)
     const match = ma.match(/-(TN|DS|TLN)$/), goc = match ? ma.slice(0, -match[0].length) : ma
     const phan = match ? ({ TN: 'I', DS: 'II', TLN: 'III' } as Record<string, string>)[match[1]] : null
     if (!cache.has(goc)) {
-      const o = await env.DE?.get(`kho/${goc}.json`); if (!o) throw new Error('Không tải đủ đề bài tập.')
+      const o = await env.DE?.get(`kho/${goc}.json`)
+      if (!o) {
+        if (material) throw new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Không tải đủ đề bài tập. Bài làm chưa được chốt.')
+        throw new Error('Không tải đủ đề bài tập.')
+      }
       const g = await new Response(o.body).json() as Record<string, unknown>
       cache.set(goc, Array.isArray(g.cau) ? g.cau as Record<string, unknown>[] : ['phanI', 'phanII', 'phanIII'].flatMap((k, i) => Array.isArray(g[k]) ? (g[k] as Record<string, unknown>[]).map(c => ({ ...c, phan: c.phan || ['I', 'II', 'III'][i] })) : []))
     }
     for (const c of cache.get(goc) || []) {
       if (phan && c.phan !== phan) continue
+      // Normal homework has source/part authority but no immutable qid manifest.
+      // Check raw material before the essay filter can hide an empty key. Exclusions
+      // independent of the key (explicit essay, open prompt, missing choices) remain.
+      if (material?.sourceMaterial && !answerText(c.dap_an ?? c.dapAn)) {
+        const withoutKey = { ...c }
+        for (const key of ['dap_an', 'dapAn', 'correct', 'dapAnDung']) delete withoutKey[key]
+        if (!laCauTuLuan(withoutKey)) throw new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Thiếu đáp án của đề bài tập. Bài làm chưa được chốt.')
+      }
       // CẤM RÚT TỰ LUẬN (21/09): luật cũ (phần III đáp án dài / nhiều dòng) nay là MỘT phần của định nghĩa dùng chung — thêm: phần III không đáp án hoặc hỏi mở,
       // phần I thiếu phương án, phần II thiếu ý. Trên 4 tờ kho thật (299 câu) hai luật bỏ đúng cùng những câu (test khoá).
       if (laCauTuLuan(c)) continue
       const qid = `${goc}-${c.phan}-${c.so}`; if (seen.has(qid)) continue; seen.add(qid); out.push({ ...c, qid })
     }
   }
+  if (material?.requiredQids) kiemTraDuMaterialBtvn(out, material.requiredQids)
   return out
 }
 export function homeworkKeys(cau: Record<string, unknown>[]) { return new Map(cau.flatMap(c => { const d = answerText(c.dap_an ?? c.dapAn); return d ? [[String(c.qid), d] as [string, string]] : [] })) }
