@@ -190,6 +190,27 @@ export async function demLuotHomNay(env: Env, sbd: string, ngay: string, nowMs: 
 }
 
 /** Lượt Đảo em vừa mở mà CHƯA trả lời câu nào (còn trong 2 giờ): `start` lần nữa trả lại CHÍNH lượt ấy — không bốc lại câu, không tốn lượt. null nếu không có. */
+/**
+ * MỞ PHIÊN LƯỢT MỚI — NGUYÊN TỬ (thầy 24/09, lát cắt 1 "chống lặp câu + cấp phát retry/cạnh tranh").
+ *
+ * `docLuotDangCho` ở trên đọc "em đang có lượt chờ" rồi mới chèn phiên; giữa HAI bước ấy hai yêu cầu SONG SONG cùng thấy "chưa có lượt chờ"
+ * ⇒ cả hai chèn hai phiên (id ngẫu nhiên) ⇒ PHÁT HAI BỘ CÂU cho một em (đã tái hiện bằng ca tích hợp đường thật `/game-v2/start`).
+ * Hàm này gộp lại thành MỘT câu lệnh: chèn phiên CHỈ KHI chưa có lượt chờ, dùng ĐÚNG vị từ của `docLuotDangCho`.
+ *
+ * Trả `true` = phiên NÀY được mở. Trả `false` = một yêu cầu khác vừa mở trước (hoặc trùng id) ⇒ nơi gọi quay lại `startLuotMoi`, đọc ĐÚNG lượt đã mở.
+ * KHÔNG đổi luật chọn câu/trần/lượt: câu lệnh chỉ chặn hai lần mở trùng trong cùng thời điểm.
+ */
+export async function moPhienLuotMoi(env: Env, id: string, sbd: string, json: string, nowMs: number): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at)
+     SELECT ?, ?, ?, ?
+      WHERE NOT EXISTS (SELECT 1 FROM game_v2_session s WHERE s.sbd = ? AND s.created_at > ?
+        AND json_extract(s.json, '$.mode') = 'adventure' AND json_extract(s.json, '$.doan') IS NULL AND json_extract(s.json, '$.guardian') IS NULL
+        AND NOT EXISTS (SELECT 1 FROM game_v2_attempt a WHERE a.session = s.id AND a.sbd = s.sbd))`,
+  ).bind(id, sbd, json, new Date(nowMs).toISOString(), sbd, new Date(nowMs - 2 * 3_600_000).toISOString()).run()
+  return Number(r.meta?.changes ?? 0) > 0
+}
+
 export async function docLuotDangCho(env: Env, sbd: string, nowMs: number): Promise<{ id: string; json: string } | null> {
   try {
     const r = await env.DB.prepare(

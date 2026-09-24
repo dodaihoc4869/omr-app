@@ -24,7 +24,7 @@ import {buCauLauNhat,docCauDaLamMoiNguon,docCauLamHomNay,tachMoiCu} from './game
 import {SO_HIEP} from '../../src/game/than-thu-v2/doan-core'
 import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay'
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
-import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot} from './game-v2-luot'
+import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame} from './exp-d1'
 import {LENH_SHOP,shopAction,shopBatCho} from './game-v2-shop'
 import {expMotCau} from './exp-hoc-tap'
@@ -133,8 +133,9 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   if(!chon.length){const lyDo=eligible.length?'chi_con_cau_qua_bac':poolDaHoc.length?'het_cau_moi_hom_nay':'kho_trong';return {ok:true,questions:[],lyDo,luot:tom,maiCho:cho,missing:scope.missing,message:lyDo==='het_cau_moi_hom_nay'?'Hôm nay em đã làm hết câu phù hợp trong kho. Mai em quay lại nhé.':lyDo==='chi_con_cau_qua_bac'?'Các câu còn lại cao hơn mức em đang làm ở dạng đó. Em làm thêm bài Thầy giao rồi quay lại nhé.':'Chưa có câu thuộc phần em đã học. Em hoàn thành bài Thầy giao rồi quay lại nhé.'}}
   const id=crypto.randomUUID(),groups=new Set(scope.evidence.map(e=>e.group))
   const session:Session={mode:'adventure',created:Date.now(),questions:chon.map(x=>({qid:x.q.qid,maDe:x.q.maDe,version:x.q.version,group:x.q.group,novel:!groups.has(x.q.group),role:x.role}))}
-  const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
-  if(!inserted.meta.changes)return startLuotMoi(env,sbd,p,b,action)
+  // CHỐNG PHÁT TRÙNG KHI RETRY/CẠNH TRANH (thầy 24/09, lát cắt 1): mở phiên CHỈ KHI em chưa có lượt chờ, trong MỘT câu lệnh
+  // (cùng vị từ `docLuotDangCho`). Hai yêu cầu song song ⇒ đúng MỘT bộ câu được phát; yêu cầu thua quay lại dưới đây và trả ĐÚNG lượt vừa mở.
+  if(!await moPhienLuotMoi(env,id,sbd,JSON.stringify(session),Date.now()))return startLuotMoi(env,sbd,p,b,action)
   const day=await doDayDu(env,chon.map(x=>x.q as CauPool)) // pool là bản NHẸ: chỉ các câu ĐƯỢC CHỌN mới nạp đầy đủ để đưa cho em
   return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
 }
