@@ -115,7 +115,7 @@ function DongHoNhe({ b, now }: { b: BaiVeDich; now: number }) {
   )
 }
 
-function TheMotBai({ b, no, now, onLam, soViecConLai, ngayVuaTra }: { b: BaiVeDich; no: VeDichView['no']; now: number; onLam: () => void; soViecConLai: number; ngayVuaTra: string | null }) {
+function TheMotBai({ b, now, onLam, soViecConLai, ngayVuaTra }: { b: BaiVeDich; now: number; onLam: () => void; soViecConLai: number; ngayVuaTra: string | null }) {
   const soNo = b.chang.filter((c) => c.trangThai === 'no').length
   const soChuaXong = b.chang.filter((c) => c.trangThai !== 'xong').length
   const coNo = soNo > 0
@@ -313,7 +313,7 @@ export default function TheVeDich({ v, now, onLam, soViecConLai = 0, ngayVuaTra 
   if (!chinh && v.no.theoNgay.length === 0 && !ngayVuaTra) return null
   return (
     <div className="vd" data-vung="ve-dich">
-      {chinh && <TheMotBai b={chinh} no={v.no} now={now} onLam={onLam} soViecConLai={soViecConLai} ngayVuaTra={ngayVuaTra} />}
+      {chinh && <TheMotBai b={chinh} now={now} onLam={onLam} soViecConLai={soViecConLai} ngayVuaTra={ngayVuaTra} />}
       {khac.length > 0 && (
         <ul className="vd-khac" aria-label="Các bài khác đang chạy" data-vung="bai-khac">
           {khac.map((b) => {

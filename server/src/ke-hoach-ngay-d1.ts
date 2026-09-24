@@ -18,9 +18,9 @@ import {
   PHIEN_BAN_KE_HOACH, NGAY_LIET_KE_QUA_HAN, NGAY_ON_THI, NHIEM_VU_THAN_THU_MO_TOI_DA, PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU,
 } from './ho-so-cau-hinh'
 import { lapKeHoachNgay, ngayHocMom, type DauVaoKeHoach, type KeHoachNgay } from './ke-hoach-ngay'
-import { baoVeMotLuot, qidPhucVuDuoc } from './cau-theo-qid'
+import { baoVeMotLuot, danhTinhChiMucKhop, qidPhucVuDuoc } from './cau-theo-qid'
 // PHẠM VI HỌC CÁ NHÂN (CNH-1.0 P02): cổng cho hai danh sách TỰ ĐỘNG của kế hoạch ngày. Cờ TẮT ⇒ không đổi gì.
-import { docPhamViNhieu, eligibleScope, phamViBat } from './pham-vi-hoc'
+import { docPhamViNhieu, eligibleScope, scopeQuestion, phamViBat, type CauXetDuyet } from './pham-vi-hoc'
 import { docCaSapMo, docKhoiVaLopCacEm } from './game-v2-bank'
 import { cauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
 import { ngayVn } from './su-kien-hoc'
@@ -117,11 +117,12 @@ async function tapQidPhucVu(
 /**
  * CỔNG PHẠM VI HỌC cho các danh sách TỰ ĐỘNG của kế hoạch ngày (CNH-1.0 P02 — đặc tả 02 §2).
  *
- * Trả TẬP "bị loại" theo khoá `sbd\u0000qid`; `null` = KHÔNG lọc (cờ TẮT, lô rỗng, hoặc lỗi đọc ⇒ giữ hành vi cũ).
+ * Trả TẬP "bị loại" theo khoá `sbd\u0000qid`; `null` = KHÔNG lọc (chỉ khi cờ TẮT hoặc lô rỗng).
+ * Cờ BẬT mà lỗi đọc ⇒ loại toàn bộ lô chưa kiểm chứng, không phát câu từ dữ liệu chưa xác minh.
  * Cờ TẮT ⇒ không truy vấn thêm nào (ngoài một lần đọc cờ đã có đệm 30 giây trong isolate).
  * Cờ BẬT ⇒ câu thiếu nhãn `kienThuc`, chưa duyệt, hoặc kỹ năng chưa `taught` BỊ LOẠI — thiếu thì TRẢ THIẾU,
  * KHÔNG nới lọc và KHÔNG fallback sang kho lớp/toàn ngân hàng.
- * ÁNH XẠ TẠM (cần thầy xác nhận nhãn): `kienThuc` → skill_ids; `reviewed` → approved; nền (prerequisite) rỗng.
+ * Metadata dùng scopeQuestion chung: thiếu nền hoặc duyệt rõ ràng bị loại.
  */
 export async function locPhamViChoKeHoach(
   env: Env, cap: readonly { sbd: string; qid: string }[], bat: boolean,
@@ -130,7 +131,7 @@ export async function locPhamViChoKeHoach(
   try {
     const phamViTheoEm = await docPhamViNhieu(env, [...new Set(cap.map((x) => x.sbd))])
     const qids = [...new Set(cap.map((x) => x.qid))]
-    const nhan = new Map<string, { skillIds: string[]; version: string; group: string; approved: boolean }>()
+    const nhan = new Map<string, CauXetDuyet>()
     for (let i = 0; i < qids.length; i += 400) {
       const r = await env.DB.prepare(
         `SELECT q.qid, q.version, q.content_group, q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
@@ -140,12 +141,9 @@ export async function locPhamViChoKeHoach(
       for (const x of r.results ?? []) {
         const qid = String(x.qid)
         if (nhan.has(qid)) continue
-        let json: Record<string, unknown> = {}
-        try { json = JSON.parse(String(x.json)) as Record<string, unknown> } catch { continue }
-        nhan.set(qid, {
-          skillIds: Array.isArray(json.kienThuc) ? (json.kienThuc as string[]) : [],
-          version: String(x.version ?? ''), group: String(x.content_group ?? ''), approved: json.reviewed === true,
-        })
+        const json = danhTinhChiMucKhop(x.json, x.qid, x.version, x.content_group)
+        if (!json) continue
+        nhan.set(qid, scopeQuestion(json))
       }
     }
     const loai = new Set<string>()
@@ -153,17 +151,14 @@ export async function locPhamViChoKeHoach(
       const m = phamViTheoEm.get(c.sbd) ?? new Map<string, never>()
       const n = nhan.get(c.qid)
       const kq = n
-        ? eligibleScope({
-            qid: c.qid, version: n.version, contentGroup: n.group, skillIds: n.skillIds,
-            prerequisiteIds: [], qualityStatus: n.approved ? 'approved' : 'chua_duyet',
-          }, m)
+        ? eligibleScope(n, m)
         : { duoc: false as const, lyDo: 'THIEU_NHAN' as const }
       if (!kq.duoc) loai.add(`${c.sbd}\u0000${c.qid}`)
     }
     return loai
   } catch (e) {
-    console.error('[ke-hoach] lọc phạm vi lỗi (giữ hành vi cũ, KHÔNG lọc):', e instanceof Error ? e.message : e)
-    return null
+    console.error('[ke-hoach] chưa kiểm được phạm vi, loại lô câu tự động:', e instanceof Error ? e.message : e)
+    return new Set(cap.map((c) => `${c.sbd}\u0000${c.qid}`))
   }
 }
 
@@ -256,7 +251,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const pCauHinh = chan(docCauHinhKeHoach(env))
   const pKhoiLop = chan(docKhoiVaLopCacEm(env, em).catch(() => ({ khoi: new Map<string, Khoi | null>(), lop: new Map<string, string>() })))
   const pRc = emCanDocHoSo.length === 0 ? Promise.resolve(trong<Record<string, unknown>>()) : chan(tat(() => env.DB.prepare(
-    `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai FROM nam_kt_cau
+    `SELECT sbd, qid, ma_dang, moc_on_ke, lan_sai, luc_cuoi FROM nam_kt_cau
       WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?`,
   ).bind(arrCanDoc, homNay).all<Record<string, unknown>>(), trong()))
   const pRd = emCanDocHoSo.length === 0 ? Promise.resolve(trong<Record<string, unknown>>()) : chan(tat(() => env.DB.prepare(`SELECT * FROM nam_kt_dang WHERE ${IN_EM}`).bind(arrCanDoc).all<Record<string, unknown>>(), trong()))
@@ -366,7 +361,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const denHanTuBoNho: Record<string, unknown>[] = hoSoSan
     ? [...hoSoSan.entries()].flatMap(([sbd, h]) => h.cau
         .filter((c) => (c.trangThai === 'moi_sai' || c.trangThai === 'dang_on' || c.trangThai === 'da_khac_phuc' || c.trangThai === 'chua_thay_sai') && !c.canDayLai && c.mocOnKe !== null && c.mocOnKe <= homNay)
-        .map((c) => ({ sbd, qid: c.qid, ma_dang: c.maDang, moc_on_ke: c.mocOnKe, lan_sai: c.lanSai })))
+        .map((c) => ({ sbd, qid: c.qid, ma_dang: c.maDang, moc_on_ke: c.mocOnKe, lan_sai: c.lanSai, luc_cuoi: c.lucCuoi })))
     : []
   const denHan = [...(rc.results ?? []), ...denHanTuBoNho]
   const phucVu = await tapQidPhucVu(env, denHan.map((x) => String(x.qid)), coChiMuc, baoVe)
@@ -374,6 +369,7 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const batPhamViHoc = await phamViBat(env)
   const phamViToiHan = await locPhamViChoKeHoach(env, denHan.map((x) => ({ sbd: String(x.sbd), qid: String(x.qid) })), batPhamViHoc)
   for (const x of denHan) {
+    if (x.luc_cuoi && ngayVn(Date.parse(String(x.luc_cuoi))) === homNay) continue // Đã làm/gặp hôm nay ⇒ không giao lại (tránh vòng lặp nộp lại on_lai vô tận)
     if (phucVu && !phucVu.has(String(x.qid))) continue
     if (!hopKhoi(x)) continue
     if (phamViToiHan?.has(`${String(x.sbd)}\u0000${String(x.qid)}`)) continue
@@ -491,7 +487,7 @@ async function sapDanhSachTuDongTheoBoChon(env: Env, map: Map<string, DauVaoKeHo
     const qids = [...new Set([...c.cauToiHan.map((x) => x.qid), ...(c.cauOnThi ?? []).map((x) => x.qid)])]
     if (qids.length === 0) continue
     // Nhãn cần cho bộ chọn (nhóm/dạng/mức/kỹ năng/family/version) đọc từ CHÍNH kho đã phục vụ.
-    const nhan = new Map<string, { version: string; group: string; dang: string | null; mucDo: string | null; skillIds: string[]; family: string | null }>()
+    const nhan = new Map<string, { version: string; group: string; dang: string | null; mucDo: string | null; phan: string | null; skillIds: string[]; family: string | null }>()
     for (let i = 0; i < qids.length; i += 400) {
       const r = await tat(() => env.DB.prepare(
         `SELECT q.qid, q.version, q.content_group, q.dang, q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
@@ -500,13 +496,16 @@ async function sapDanhSachTuDongTheoBoChon(env: Env, map: Map<string, DauVaoKeHo
       ).bind(json(qids.slice(i, i + 400))).all<{ qid: string; version: string; content_group: string; dang: string | null; json: string }>(), trong())
       for (const x of r.results ?? []) {
         if (nhan.has(String(x.qid))) continue
-        let j: { kienThuc?: unknown; mucDo?: unknown } = {}
-        try { j = JSON.parse(String(x.json)) as typeof j } catch { /* dòng hỏng: bỏ */ }
+        // Metadata được đọc sau bước kiểm khả phục vụ; kho có thể đổi ở giữa hai lần đọc.
+        // Chỉ dùng nhãn của JSON khớp cả ba cột danh tính tại chính lần đọc này.
+        const j = danhTinhChiMucKhop(x.json, x.qid, x.version, x.content_group)
+        if (!j) continue
         nhan.set(String(x.qid), {
           version: String(x.version ?? ''), group: String(x.content_group ?? ''), dang: x.dang ? String(x.dang) : null,
-          mucDo: typeof j.mucDo === 'string' ? j.mucDo : null,
-          skillIds: Array.isArray(j.kienThuc) ? (j.kienThuc as string[]) : [],
-          family: familyTuNhan(j),
+          mucDo: j && typeof j.mucDo === 'string' ? j.mucDo : null,
+          phan: j && typeof j.phan === 'string' ? j.phan : null,
+          skillIds: j && Array.isArray(j.kienThuc) ? (j.kienThuc as string[]) : [],
+          family: j ? familyTuNhan(j) : null,
         })
       }
     }
@@ -514,9 +513,16 @@ async function sapDanhSachTuDongTheoBoChon(env: Env, map: Map<string, DauVaoKeHo
     for (const qid of qids) {
       const n = nhan.get(qid)
       if (!n) continue // không đọc được nhãn ⇒ không đưa vào bộ chọn (KHÔNG đoán)
-      ungVien.push({ qid, version: n.version, part: 'I', mucDo: n.mucDo, group: n.group, dangKey: n.dang ?? n.group, skillIds: n.skillIds, familyId: n.family })
+      // `phan` phải là phần THẬT của câu (I/II/III); thiếu/không hợp lệ ⇒ LOẠI ứng viên, không đoán.
+      if (n.phan !== 'I' && n.phan !== 'II' && n.phan !== 'III') continue
+      ungVien.push({ qid, version: n.version, part: n.phan, mucDo: n.mucDo, group: n.group, dangKey: n.dang ?? n.group, skillIds: n.skillIds, familyId: n.family })
     }
-    if (ungVien.length === 0) continue
+    // Cờ BẬT mà KHÔNG còn ứng viên hợp lệ (thiếu/hỏng nhãn) ⇒ XOÁ CẢ HAI danh sách tự động, KHÔNG giữ câu cũ để lấp chỗ.
+    if (ungVien.length === 0) {
+      c.cauToiHan = []
+      if (c.cauOnThi) c.cauOnThi = []
+      continue
+    }
     const mastery = c.cauToiHan.map((x) => ({ key: x.maDang ?? (nhan.get(x.qid)?.group ?? x.qid), due: Date.parse(`${x.mocOnKe}T00:00:00+07:00`) })).filter((m) => Number.isFinite(m.due))
     const kq = await chonCauChoLuot(env, ungVien, { sbd: c.sbd, ngay: homNay, nowMs: now, mastery, tranCau: ungVien.length })
     // §7.1: GIỮ đúng câu bộ chọn cho phát; câu bị CHẶN CỨNG (độ khó/lặp/family…) bị LOẠI khỏi danh sách.
