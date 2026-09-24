@@ -15,7 +15,13 @@ async function lamHetChang(d: D1That, sai = 0, soChang = bai(d).so_chang) {
   let kq: any
   for (let k = 0; k < soChang; k++) {
     const qs = boCuaEm(d).filter((x) => x.chang === k).map((x) => x.qid)
-    kq = await nopChang(d, k, Object.fromEntries(qs.map((q, i) => [q, k === 0 && i < sai ? 'B' : DAP_AN_DUNG(q)])))
+    kq = await nopChang(d, k, Object.fromEntries(qs.map((q, i) => {
+      if (k !== 0 || i >= sai) return [q, DAP_AN_DUNG(q)]
+      // Sai giá trị, đúng grammar: giữ nguyên số câu sai để kiểm điểm và nộp trễ.
+      const dapAnSai = /-III-/.test(q) ? '99' : /-II-/.test(q) ? 'SDSD' : 'B'
+      expect(dapAnSai).not.toBe(DAP_AN_DUNG(q))
+      return [q, dapAnSai]
+    })))
     expect(kq.ok, JSON.stringify(kq)).toBe(true)
   }
   return kq

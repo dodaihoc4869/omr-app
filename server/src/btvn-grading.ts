@@ -1,6 +1,7 @@
 import type { Env } from './kieu'
 import { laCauTuLuan, laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { soKhopSo } from '../../src/lib/cham-so'
+import { chamTheoPolicy, ChamMaterialError, POLICY_MAC_DINH_PHAN_III } from '../../src/lib/cham-so-policy'
 
 export function answerText(v: unknown): string {
   if (v === null || v === undefined) return ''
@@ -50,6 +51,39 @@ export function isAnswerCorrect(v: string, d: string, phan: 'I' | 'II' | 'III' |
   if (phan === 'III') return soKhopSo(v, d, 'so_hoc') // MỘT bộ chuẩn hoá số dùng chung (src/lib/cham-so.ts); chính sách số học 1e-4 của bài về nhà / ôn lại giữ nguyên
 
   return cleanV === cleanD
+}
+
+/** Submit-only validation: boolean grading remains available for existing read/recompute callers. */
+export class LoiChamBtvn extends Error {
+  constructor(readonly ma: 'BTVN_GRADING_INPUT_INVALID' | 'BTVN_GRADING_MATERIAL_INVALID', message: string) {
+    super(message)
+    this.name = 'LoiChamBtvn'
+  }
+}
+
+/** Validate the effective answers after scope/alias/first-answer selection, before any write. */
+export function kiemTraDapAnBtvn(
+  keys: ReadonlyMap<string, string>,
+  answers: Readonly<Record<string, unknown>>,
+  parts?: ReadonlyMap<string, string>,
+): void {
+  for (const [qid, key] of keys) {
+    const phan = /-(III|II|I)-\d+$/.exec(qid)?.[1] || parts?.get(qid) || (qid.includes('-III-') ? 'III' : qid.includes('-II-') ? 'II' : 'I')
+    if (phan !== 'III') continue
+    try {
+      // The shared API requires a nonempty answer. For a blank, probe the key against
+      // itself only to validate server material; the existing grader still scores the blank.
+      const result = chamTheoPolicy({ policy: POLICY_MAC_DINH_PHAN_III, key, answer: answerText(answers[qid]) || key })
+      if (result.error === 'unsupported-format') {
+        throw new LoiChamBtvn('BTVN_GRADING_INPUT_INVALID', 'Đáp án số chưa đúng định dạng. Em kiểm tra rồi nộp lại.')
+      }
+    } catch (e) {
+      if (e instanceof ChamMaterialError) {
+        throw new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Đáp án số của đề chưa hợp lệ. Bài làm chưa được chốt.')
+      }
+      throw e
+    }
+  }
 }
 
 export function gradeHomework(keys: Map<string, string>, raw: Record<string, unknown>, maDe: string) {

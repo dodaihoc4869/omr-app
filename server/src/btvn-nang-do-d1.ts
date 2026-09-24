@@ -9,7 +9,7 @@
 //   · Nộp chặng: đáp án ĐẦU khoá; đáp án + lời giải chỉ đi ra SAU khi ghi sổ thành công; câu chưa trả lời không chấm, không lời giải.
 //   · Câu THƯỞNG (`thu_thach`, `loi_cao`): đúng ⇒ vào cả tử và mẫu; sai ⇒ KHÔNG vào mẫu.
 import type { D1PreparedStatement, Env } from './kieu'
-import { answerText, gradeHomework, homeworkKeys, homeworkQuestions, isAnswerCorrect } from './btvn-grading'
+import { answerText, gradeHomework, homeworkKeys, homeworkQuestions, isAnswerCorrect, kiemTraDapAnBtvn, LoiChamBtvn } from './btvn-grading'
 import {
   chonBoCuaEm, chonLoi, maDangCua, mucTuChu, theTienBo, thichNghiChangSau,
   type BoCuaEm, type CauGiao, type DieuChinhEm, type HoSoEmRut, type Muc, type NganSachBai, type NhanCau, type PhanCau, type Sao, type TienBo, type TomTatBo,
@@ -752,6 +752,19 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
     gop = { ...luu, ...moi }
     daDoi = Object.keys(moi).length > 0
     const xong = cauChang.length > 0 && cauChang.every((c) => daTraLoi(phanCua(c), gop[chuoi(c.qid)] ?? ''))
+    kiemTraDapAnBtvn(homeworkKeys(cauChang), gop, new Map(cauChang.map(c => [chuoi(c.qid), phanCua(c)])))
+    // Finalization normally runs after stage events. Validate its entire effective input now,
+    // before locking this batch; repeat after a failed CAS with the newly read saved answers.
+    if (xong && Math.max(loDaXong, chiSo + 1) >= soChang && !em.nop_luc) {
+      const bo = await docBoDaChot(env, maBtvn, sbd)
+      if (!bo) return { ok: false, lyDo: 'bai_chua_san_sang', error: 'Bài này chưa sẵn sàng. Em thử lại sau ít phút.' }
+      try {
+        chuanBiNopBaiCaNhan(bt, bo, tho, gop, {})
+      } catch (e) {
+        if (e instanceof LoiChamBtvn) throw e
+        return { ok: false, error: e instanceof Error ? e.message : 'Không chấm được bài.' }
+      }
+    }
     if (!daDoi) {
       if (xong && loDaXong <= chiSo) await env.DB.prepare('UPDATE btvn_em SET lo_da_xong = MAX(COALESCE(lo_da_xong, 0), ?) WHERE khoa = ? AND thu_hoi = 0').bind(chiSo + 1, khoa).run()
       break
@@ -879,6 +892,7 @@ async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTh
         if (v && daTraLoi(phanCua(c), v)) moi[q] = v
       }
       gop = { ...luu, ...moi }
+      kiemTraDapAnBtvn(homeworkKeys(cauThu), gop, new Map(cauThu.map(c => [chuoi(c.qid), phanCua(c)])))
       if (Object.keys(moi).length === 0) { moiDung.length = 0; break }
       const dungMoi = cauThu.filter((c) => moi[chuoi(c.qid)] !== undefined && dungCua(c, moi[chuoi(c.qid)]!))
       const daNop = !!em.nop_luc
@@ -894,6 +908,7 @@ async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTh
     }
   }
   const daLam = cauThu.filter((c) => daTraLoi(phanCua(c), gop[chuoi(c.qid)] ?? ''))
+  if (!co && daLam.length > 0) kiemTraDapAnBtvn(homeworkKeys(daLam), gop, new Map(daLam.map(c => [chuoi(c.qid), phanCua(c)])))
   const chuaLam = cauThu.filter((c) => !daTraLoi(phanCua(c), gop[chuoi(c.qid)] ?? '')).map((c) => chuoi(c.qid))
   const trangThai = { chiSo: soChang, soCau: cauThu.length, soDaLam: daLam.length, soDung: daLam.filter((c) => dungCua(c, gop[chuoi(c.qid)]!)).length, daNop: chuaLam.length === 0 && cauThu.length > 0 }
   if (daLam.length === 0) return { ok: true, loDaXong, changDangMo: null, chuaLam: cauThu.map((c) => chuoi(c.qid)), thuSucThem: trangThai }
@@ -956,6 +971,46 @@ async function docHoSoTheoCau(env: Env, sbd: string, cau: CauGiao[], now: number
 
 // ================================================================== NỘP CUỐI (/btvn/nop) cho bài ca_nhan ==================================================================
 
+/** Pure preparation shared by direct final submit and last-stage preflight before its CAS. */
+function chuanBiNopBaiCaNhan(
+  bt: Hang,
+  bo: NonNullable<Awaited<ReturnType<typeof docBoDaChot>>>,
+  tho: Hang[],
+  luu: Record<string, string>,
+  lam: Hang,
+) {
+  const dsQid = new Set(bo.chang.flat())
+  const chiCauCuaEm = tho.filter((c) => dsQid.has(chuoi(c.qid)))
+  const keys = homeworkKeys(chiCauCuaEm)
+  // Đáp án đã khoá ở chặng THẮNG đáp án gửi kèm; đáp án ngoài bộ bị bỏ (không lỗi).
+  const phanCua = new Map(chiCauCuaEm.map((c) => [chuoi(c.qid), chuoi(c.phan) || phanTuQid(chuoi(c.qid))]))
+  const gui: Hang = {}
+  for (const [q, v] of Object.entries(lam)) if (keys.has(q)) gui[q] = cat(answerText(v))
+  for (const [q, v] of Object.entries(luu)) if (keys.has(q) && v && daTraLoi(phanCua.get(q) ?? 'I', v)) gui[q] = v
+  const graded = gradeHomework(keys, gui, chuoi(bt.ma_de))
+  kiemTraDapAnBtvn(keys, graded.answers)
+  const soCauCuaEm = keys.size
+  const thuongSai = graded.qidSai.filter((q) => laCauThuong(bo.nhan[q]))
+  const mau = soCauCuaEm - thuongSai.length
+  // THỬ SỨC THÊM (bản 1.2, Boss chốt 21/09): chặng ẢO nộp RIÊNG (`nopThuSucThem`) — ở đây chỉ GỘP các đáp án thử sức ĐÃ LƯU (đã khoá) vào điểm theo luật câu THƯỞNG:
+  // ĐÚNG ⇒ +1 tử số +1 mẫu số; sai/bỏ trống ⇒ không đổi; không vào qidSai, không hẹn ôn.
+  const camThu = tho.filter((c) => bo.thuSucThem.includes(chuoi(c.qid)))
+  const keysThu = homeworkKeys(camThu)
+  const guiThu: Record<string, string> = {}
+  for (const c of camThu) {
+    const q = chuoi(c.qid)
+    const daKhoa = luu[q] ?? ''
+    if (keysThu.has(q) && daKhoa && daTraLoi(chuoi(c.phan) || phanTuQid(q), daKhoa)) guiThu[q] = daKhoa
+  }
+  kiemTraDapAnBtvn(new Map([...keysThu].filter(([q]) => Object.hasOwn(guiThu, q))), guiThu)
+  const soDungThu = Object.entries(guiThu).filter(([q, v]) => isAnswerCorrect(v, keysThu.get(q)!, phanTuQid(q))).length
+  const soDungCuoi = graded.soDung + soDungThu
+  const mauCuoi = mau + soDungThu
+  const luuLam = JSON.stringify({ ...graded.answers, ...guiThu })
+  const chung = { caNhan: true, soCauCuaEm, soCauThuongSai: thuongSai.length, ...(bo.thuSucThem.length > 0 ? { soThuSucThemDung: soDungThu } : {}) }
+  return { graded, soDungCuoi, mauCuoi, luuLam, chung }
+}
+
 /**
  * CHẤM VÀ GHI LƯỢT NỘP của bài `ca_nhan` — chỉ trên câu CỦA EM. Điểm = đúng / mẫu × 10, mẫu = |bộ| − câu thưởng SAI.
  * Đáp án đã khoá ở chặng thắng đáp án gửi kèm; đáp án ngoài bộ bị bỏ. Đã nộp thì KHÔNG làm lại (đáp án chặng đã khoá và đã hiện lời giải).
@@ -974,39 +1029,14 @@ export async function nopBaiCaNhan(env: Env, bt: Hang, sbd: string, lam: Hang, n
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Không chấm được bài.' }
   }
-  const dsQid = new Set(bo.chang.flat())
-  const chiCauCuaEm = tho.filter((c) => dsQid.has(chuoi(c.qid)))
-  const keys = homeworkKeys(chiCauCuaEm)
-  // Đáp án đã khoá ở chặng THẮNG đáp án gửi kèm; đáp án ngoài bộ bị bỏ (không lỗi).
-  const luu = docDapAnDaLuu(cu.dap_an_json)
-  const phanCua = new Map(chiCauCuaEm.map((c) => [chuoi(c.qid), chuoi(c.phan) || phanTuQid(chuoi(c.qid))]))
-  const gui: Hang = {}
-  for (const [q, v] of Object.entries(lam)) if (keys.has(q)) gui[q] = cat(answerText(v))
-  for (const [q, v] of Object.entries(luu)) if (keys.has(q) && v && daTraLoi(phanCua.get(q) ?? 'I', v)) gui[q] = v
-  let graded
+  let prepared
   try {
-    graded = gradeHomework(keys, gui, chuoi(bt.ma_de))
+    prepared = chuanBiNopBaiCaNhan(bt, bo, tho, docDapAnDaLuu(cu.dap_an_json), lam)
   } catch (e) {
+    if (e instanceof LoiChamBtvn) throw e
     return { ok: false, error: e instanceof Error ? e.message : 'Không chấm được bài.' }
   }
-  const soCauCuaEm = keys.size
-  const thuongSai = graded.qidSai.filter((q) => laCauThuong(bo.nhan[q]))
-  const mau = soCauCuaEm - thuongSai.length
-  // THỬ SỨC THÊM (bản 1.2, Boss chốt 21/09): chặng ẢO nộp RIÊNG (`nopThuSucThem`) — ở đây chỉ GỘP các đáp án thử sức ĐÃ LƯU (đã khoá) vào điểm theo luật câu THƯỞNG:
-  // ĐÚNG ⇒ +1 tử số +1 mẫu số; sai/bỏ trống ⇒ không đổi; không vào qidSai, không hẹn ôn.
-  const camThu = tho.filter((c) => bo.thuSucThem.includes(chuoi(c.qid)))
-  const keysThu = homeworkKeys(camThu)
-  const guiThu: Record<string, string> = {}
-  for (const c of camThu) {
-    const q = chuoi(c.qid)
-    const daKhoa = luu[q] ?? ''
-    if (keysThu.has(q) && daKhoa && daTraLoi(chuoi(c.phan) || phanTuQid(q), daKhoa)) guiThu[q] = daKhoa
-  }
-  const soDungThu = Object.entries(guiThu).filter(([q, v]) => isAnswerCorrect(v, keysThu.get(q)!, phanTuQid(q))).length
-  const soDungCuoi = graded.soDung + soDungThu
-  const mauCuoi = mau + soDungThu
-  const luuLam = JSON.stringify({ ...graded.answers, ...guiThu })
-  const chung = { caNhan: true, soCauCuaEm, soCauThuongSai: thuongSai.length, ...(bo.thuSucThem.length > 0 ? { soThuSucThemDung: soDungThu } : {}) }
+  const { graded, soDungCuoi, mauCuoi, luuLam, chung } = prepared
   if (cu.nop_luc) {
     if (String(cu.dap_an_json) === luuLam) return { ok: true, lanThu: soHoac(cu.so_lan_lam, 1), soCau: mauCuoi, soDung: soDungCuoi, qidSai: graded.qidSai, nopLuc: cu.nop_luc, daNhan: true, ...chung }
     return { ok: false, error: 'Bài cá nhân hoá đã nộp, không làm lại được.', daHetLuot: true }

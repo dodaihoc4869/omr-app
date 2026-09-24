@@ -455,7 +455,8 @@ describe('NỘP CUỐI (/btvn/nop) và LUẬT ĐIỂM', () => {
     await giao(d)
     await mo(d)
     const qs = boCuaEm(d).filter((x) => x.chang === 0).map((x) => x.qid)
-    await nopChang(d, 0, Object.fromEntries(qs.map((q) => [q, 'B']))) // chặng 0 khoá toàn đáp án sai (Phần I) ...
+    // Sai giá trị nhưng đúng grammar để chặng thực sự được nhận và khóa đáp án đầu.
+    expect((await nopChang(d, 0, Object.fromEntries(qs.map((q) => [q, /-III-/.test(q) ? '99' : /-II-/.test(q) ? 'SDSD' : 'B'])))).ok).toBe(true)
     const { r } = await lamHet(d, (q) => DAP_AN_DUNG(q))
     const ngoai = TAT_CA_QID.find((q) => !boCuaEm(d).some((x) => x.qid === q))
     const r2 = await goiWorker(worker, d.env, '/btvn/nop', { maBtvn: maBtvn(d), sbd: 'S1', dapAn: { ...(ngoai ? { [ngoai]: 'A' } : {}), 'DE1-I-1': 'A' } })
@@ -463,6 +464,7 @@ describe('NỘP CUỐI (/btvn/nop) và LUẬT ĐIỂM', () => {
     expect(r2.ok).toBe(true) // gửi lại: không lỗi
     // Các câu chặng 0 là Phần I: đáp án khoá 'B' (sai) ⇒ nằm trong qidSai dù nộp cuối gửi 'A'.
     const chang0PhanI = qs.filter((q) => /-I-/.test(q))
+    expect(chang0PhanI.length).toBeGreaterThan(0)
     for (const q of chang0PhanI) expect(r.qidSai).toContain(q)
   })
   it('đã nộp thì KHÔNG làm lại (đáp án khác ⇒ daHetLuot); gửi y hệt ⇒ daNhan', async () => {

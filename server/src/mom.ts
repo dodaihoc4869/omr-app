@@ -12,6 +12,12 @@ import {chiGiuCauRutDuoc} from './cam-tu-luan'
 import {readScope, doDayDu, protectedQuestions} from './game-v2-bank'
 import {learnedQuestionFilter} from '../../src/game/than-thu-v2/core'
 import {cauChoMom} from './parent-news-nguon-cau'
+import {chamTheoPolicy, ChamInputError, ChamMaterialError, POLICY_MAC_DINH_PHAN_III} from '../../src/lib/cham-so-policy'
+
+/** Submit validation only: callers map input to 422, server material to 500. */
+export class LoiChamMom extends Error {
+  constructor(readonly ma:'MOM_GRADING_INPUT_INVALID'|'MOM_GRADING_MATERIAL_INVALID', message:string){super(message)}
+}
 
 type Question = Record<string, unknown>
 type Row = {sbd:string;id:string;title:string;created_at:string;question_count:number;bank_key:string;started_at:string|null;submitted_at:string|null;answers:string;result:string|null}
@@ -153,7 +159,26 @@ export async function mom(env:Env,action:string,b:Record<string,unknown>,opts:{n
     if(loiKhoa>=0){
       // Giữ đáp án em vừa gửi, nhưng không chốt nộp khi đề thiếu khóa.
       await env.DB.prepare('UPDATE mom_bai SET answers=? WHERE sbd=? AND id=? AND submitted_at IS NULL').bind(JSON.stringify(final),sbd,id).run()
-      throw new Error('Câu '+(loiKhoa+1)+' thiếu đáp án đúng. Bài làm của em đã lưu, em báo Thầy kiểm tra.')
+      throw new LoiChamMom('MOM_GRADING_MATERIAL_INVALID','Câu '+(loiKhoa+1)+' thiếu đáp án đúng. Bài làm của em đã lưu, em báo Thầy kiểm tra.')
+    }
+    // Validate the whole final payload before submitted_at/result, learning events or EXP.
+    // Saving a draft is separate from accepting an attempt; retain it on validation failure.
+    // `final` already applies the existing timeout/grace rule, and blanks keep their old behavior.
+    for(let i=0;i<q.length;i++){
+      const c=q[i], answer=final[String(c.id||`cau_${i+1}`)]
+      if(phanMom(c)!=='III'||typeof answer!=='string'||!answer.trim())continue
+      let error:LoiChamMom|undefined
+      try{
+        const graded=chamTheoPolicy({policy:POLICY_MAC_DINH_PHAN_III,key:khoaMom(c),answer})
+        if(graded.error)error=new LoiChamMom('MOM_GRADING_INPUT_INVALID','Câu '+(i+1)+' chưa đọc được câu trả lời. Bài làm đã lưu, em sửa cách nhập rồi nộp lại.')
+      }catch(e){
+        if(!(e instanceof ChamMaterialError)&&!(e instanceof ChamInputError))throw e
+        error=new LoiChamMom('MOM_GRADING_MATERIAL_INVALID','Câu '+(i+1)+' thiếu đáp án đúng. Bài làm của em đã lưu, em báo Thầy kiểm tra.')
+      }
+      if(error){
+        await env.DB.prepare('UPDATE mom_bai SET answers=? WHERE sbd=? AND id=? AND submitted_at IS NULL').bind(JSON.stringify(final),sbd,id).run()
+        throw error
+      }
     }
     const result={...gradeMom(q,final),questionOutcomes:q.map((c,i)=>({qid:String(c.id||`cau_${i+1}`),correct:dungMom(c,final[String(c.id||`cau_${i+1}`)])}))}
     const nopLuc=new Date().toISOString()

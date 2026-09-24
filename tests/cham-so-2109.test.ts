@@ -2,6 +2,7 @@
 // CHUẨN HOÁ ĐÁP ÁN SỐ PHẦN III DÙNG CHUNG (Boss 21/09, P0 "0,54 chấm sai"): bảng 60+ cặp cho hai chính sách; Phần I/II không đổi; các kênh luyện tập cùng một bộ chuẩn hoá.
 import { describe, expect, it, vi } from 'vitest'
 import { chuanHoaSoNhap, soKhopSo } from '../src/lib/cham-so'
+import { chamTheoPolicy } from '../src/lib/cham-so-policy'
 import { isAnswerCorrect } from '../server/src/btvn-grading'
 import { grade } from '../src/game/than-thu-v2/core'
 import { gradeMom } from '../server/src/mom'
@@ -31,11 +32,18 @@ const BANG: [string, string, boolean, boolean][] = [
   ['-0,54', '0,54', false, false], ['1', '0', false, false], ['0', '0,0001', false, false],
   // rỗng
   ['', '0,54', false, false], ['0,54', '', false, false], ['   ', '0,54', false, false], ['.', '0,54', false, false],
-  // đáp án không phải số: chỉ khớp khi giống hệt (không bỏ "đơn vị" bừa)
-  ['A', 'A', true, true], ['B', 'A', false, false], ['SO3', 'SO3', true, true], ['SO2', 'SO3', false, false], ['12b', '12a', false, false], ['0,54abc', '0,54abc', true, true],
+  // CNH-1.0 docs/cline-ca-nhan-hoa-2309/02-HOC-TAP-VA-RUT-CAU.md §1.2:
+  // numeric parser must consume the whole string; identical text is not a numeric key.
+  // Literal matching requires the explicit policy tested below, never an implicit fallback.
+  ['A', 'A', false, false], ['B', 'A', false, false], ['SO3', 'SO3', false, false], ['SO2', 'SO3', false, false], ['12b', '12a', false, false], ['0,54abc', '0,54abc', false, false],
 ]
 
 describe('soKhopSo · bảng cặp', () => {
+  it('literal-v1 explicitly permits the text keys excluded from numeric wrappers', () => {
+    for (const key of ['A', 'SO3', '0,54abc']) {
+      expect(chamTheoPolicy({ policy: 'literal-v1', key, answer: key })).toEqual({ correct: true })
+    }
+  })
   it(`${BANG.length} cặp: chính sách 'chat' và 'so_hoc'`, () => {
     for (const [v, d, chat, soHoc] of BANG) {
       expect(soKhopSo(v, d, 'chat'), `chat: ${JSON.stringify(v)} vs ${JSON.stringify(d)}`).toBe(chat)

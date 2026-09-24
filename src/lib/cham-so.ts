@@ -10,35 +10,40 @@
 //   "0,540" ≠ "0,54" (chữ số 0 thừa ở cuối) · "2,5×10^-3" (kí hiệu khoa học) · "12 g/mol" (đơn vị) · "0,54." (dấu chấm cuối)
 //   · chữ số toàn phần "１２" (NFKC) · dấu "≈/=" ở đầu.
 // Từ nay MỌI kênh (ca thi · bài về nhà · ôn lại · phiếu khắc phục · phiếu HTML · chi tiết câu · thẻ câu) đi qua ĐÚNG MỘT hàm
-// `khopPhanIII` bên dưới. `normalizeNumericAnswer` của engine chỉ còn là lớp mỏng gọi lại `chuanHoaSoNhap` của tệp này.
-const KHOANG_TRANG = new RegExp('[\\s\\u00a0\\u1680\\u180e\\u2000-\\u200f\\u2028\\u2029\\u202f\\u205f\\u2060\\u3000\\ufeff]+', 'g')
-const DAU_TRU = new RegExp('[\\u2010-\\u2015\\u2212\\ufe63\\uff0d\\u207b]', 'g') // các kiểu gạch ngang / dấu trừ
-const SO_THUAN = /^[+-]?(?:\d+\.?\d*|\.\d+)$/
-const SO_VA_DON_VI = /^([+-]?(?:\d+\.?\d*|\.\d+))([a-zµμ°%(][a-zµμ°%/·.^()\-\d]{0,11})$/
-const KHOA_HOC_X10 = /^([+-]?(?:\d+\.?\d*|\.\d+))[x×*·]10\^?\(?([+-]?\d+)\)?$/
-const KHOA_HOC_E = /^([+-]?(?:\d+\.?\d*|\.\d+))e([+-]?\d+)$/
+// `khopPhanIII` bên dưới. `normalizeNumericAnswer` của engine chỉ còn là lớp mỏng gọi lại `chuanHoaSoNhap`.
+//
+// P01 (CNH-1.0, 23/09/2026): luật chuẩn hoá + bốn policy CÓ VERSION đã chuyển sang `cham-so-policy.ts`
+// để có kiểm tra kiểu lúc chạy và chặn ba lỗi đã đo (hậu tố chữ bất kỳ, biên 1e-4 dấu phẩy động, bỏ qua
+// đơn vị khác nhau). Tệp này giữ nguyên TÊN HÀM CŨ cho mọi nơi gọi.
+import { chamTheoPolicy, ChamMaterialError, chuanHoaSoNhap, tachSoVaDonVi, POLICY_MAC_DINH_PHAN_III } from './cham-so-policy'
 
-/** Chuỗi đã dọn nhiễu hình thức (chữ thường, dấu thập phân là "."); rỗng nếu không còn gì. Không đổi giá trị số. */
-export function chuanHoaSoNhap(raw: unknown): string {
-  let s = String(raw ?? '').normalize('NFKC')
-    .replace(KHOANG_TRANG, '').replace(DAU_TRU, '-').replace(/[٫‚،]/g, ',').toLowerCase()
-  s = s.replace(/^[+≈~=]+/, '').replace(/[.,;:!?]+$/, '').replace(/,/g, '.')
-  const x10 = KHOA_HOC_X10.exec(s) ?? KHOA_HOC_E.exec(s)
-  if (x10) { const n = Number(`${x10[1]}e${x10[2]}`); if (Number.isFinite(n)) return String(n) }
-  return s
-}
+export { POLICY_VERSION, POLICY_MAC_DINH_PHAN_III, chamTheoPolicy, chuanHoaSoNhap, tachSoVaDonVi } from './cham-so-policy'
+
+// `chuanHoaSoNhap` đã chuyển sang `cham-so-policy.ts` (P01) và được nhập lại bên dưới —
+// một định nghĩa duy nhất, không còn hai bản sao luật chuẩn hoá.
 /** Đáp án của em `v` có khớp đáp án `d` không? Rỗng ⇒ sai. Chỉ dùng cho câu Phần III (đáp án dạng số).
- *  Đơn vị viết theo được bỏ khi so số; nếu CẢ HAI bên đều ghi đơn vị thì đơn vị phải giống nhau ("12 g" ≠ "12 kg"). Đáp án không phải số ⇒ chỉ khớp khi giống hệt sau chuẩn hoá. */
+ *  'chat': số phải giống nhau TỪNG CHỮ SỐ sau chuẩn hoá; đơn vị viết theo được bỏ khi chỉ một bên ghi;
+ *  CẢ HAI bên ghi đơn vị thì đơn vị phải giống nhau ("12 g" ≠ "12 kg").
+ *  'so_hoc': đi qua policy CÓ VERSION `numeric-value-v1` của `cham-so-policy.ts` (CNH-1.0).
+ *  Hậu tố KHÔNG phải đơn vị đã biết (ví dụ "12abc") từ P01 là unsupported-format ⇒ KHÔNG tính đúng —
+ *  đây là bản vá lỗi đã đo: trước đó `parseFloat('12abc') → 12` làm câu SAI thành ĐÚNG. */
 export function soKhopSo(v: unknown, d: unknown, cheDo: 'chat' | 'so_hoc'): boolean {
   const a = chuanHoaSoNhap(v), b = chuanHoaSoNhap(d)
   if (!a || !b) return false
-  if (a === b) return true
-  const ma = SO_VA_DON_VI.exec(a), mb = SO_VA_DON_VI.exec(b)
-  const na = ma ? ma[1]! : a, nb = mb ? mb[1]! : b
-  if (!SO_THUAN.test(na) || !SO_THUAN.test(nb)) return false
-  if (ma && mb && ma[2] !== mb[2]) return false
-  if (na === nb) return true
-  return cheDo === 'so_hoc' && Math.abs(Number(na) - Number(nb)) < 1e-4
+  if (cheDo === 'so_hoc') {
+    try {
+      return chamTheoPolicy({ policy: POLICY_MAC_DINH_PHAN_III, key: String(d ?? ''), answer: String(v ?? '') }).correct
+    } catch (e) {
+      // Legacy callers consume a boolean; never award invalid numeric material or introduce
+      // a new uncaught error into score/HTML. Snapshot adapters retain the typed server error.
+      if (e instanceof ChamMaterialError) return false
+      throw e
+    }
+  }
+  const pa = tachSoVaDonVi(a, false), pb = tachSoVaDonVi(b, false)
+  if (!pa.ok || !pb.ok) return false
+  if (pa.so.unit && pb.so.unit && pa.so.unit !== pb.so.unit) return false
+  return pa.so.numText === pb.so.numText
 }
 
 /**

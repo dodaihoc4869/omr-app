@@ -1,6 +1,6 @@
 import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
-import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
+import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
 import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
 import {qidTuLuanCuaTo} from './cam-tu-luan'
 import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
@@ -41,7 +41,7 @@ import {gvKeHoachEm} from './gv-ke-hoach-em'
 import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
 import {doiTenHocSinh} from './doi-ten-hoc-sinh'
 import {chuanBiChamLaiCa} from './cham-lai-ca'
-import { mom } from './mom'
+import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2 } from './game-v2'
@@ -117,6 +117,14 @@ async function sauGhi<T>(env: Env, b: Record<string, unknown>, viec: Promise<T>)
 
 function ra(data: unknown, status = 200): Response {
   return new Response(JSON.stringify({ ...(data as object), serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
+}
+
+async function traLoiNopBtvn(nop:()=>Promise<Response>):Promise<Response> {
+  try { return await nop() }
+  catch (e) {
+    if (e instanceof LoiChamBtvn) return ra({ok:false,ma:e.ma,error:e.message},e.ma==='BTVN_GRADING_INPUT_INVALID'?422:500)
+    throw e
+  }
 }
 
 function laThay(req: Request, env: Env, body: Record<string, unknown>): boolean {
@@ -3162,7 +3170,13 @@ const boXuLy = {
         return ra(await parentNews(env,p.slice('/student-news/'.length),{sbd},'hs'))
       }
       if (p.startsWith('/parent-news/')) return ra(await parentNews(env,p.slice('/parent-news/'.length),b))
-      if (p.startsWith('/mom/')) return ra(await mom(env,p.slice('/mom/'.length),b))
+      if (p.startsWith('/mom/')) {
+        try { return ra(await mom(env,p.slice('/mom/'.length),b)) }
+        catch (e) {
+          if (e instanceof LoiChamMom) return ra({ ok:false, ma:e.ma, error:e.message }, e.ma==='MOM_GRADING_INPUT_INVALID'?422:500)
+          throw e
+        }
+      }
       if (p === '/game-v2-parent') return ra(await parentGame(env,b))
       // CỔNG PHỤ HUYNH — token giai đoạn mềm (docs/token-phu-huynh-1909.md): chỉ nhận `pass` (token do thầy cấp).
       if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b))
@@ -3193,10 +3207,13 @@ const boXuLy = {
       if (p === '/vo-dai/nop') return ra(await VD.voDaiNop(env, b))
       if (p === '/vo-dai/dong') return ra(await VD.voDaiDong(env, b))
       // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
-      if (p === '/goi') return goiCu(req, env, b)
+      if (p === '/goi') {
+        if (String(b.action??'').trim()==='nopKhacPhuc') return await traLoiNopBtvn(()=>goiCu(req,env,b))
+        return goiCu(req, env, b)
+      }
       if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
-      if (p === '/btvn/nop') return sauGhi(env, b, nopBtvn(env, b))
-      if (p === '/btvn/xong-lo') return sauGhi(env, b, xongLoBtvn(env, b, ctx))
+      if (p === '/btvn/nop') return await traLoiNopBtvn(()=>sauGhi(env, b, nopBtvn(env, b)))
+      if (p === '/btvn/xong-lo') return await traLoiNopBtvn(()=>sauGhi(env, b, xongLoBtvn(env, b, ctx)))
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
       // Ô "Thi đua hôm nay" (Điều 8, phương án 8A): ĐỌC-CHỈ, token của em (thi-dua-hom-nay.ts của Code 4).
       if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(envDoc, b))
