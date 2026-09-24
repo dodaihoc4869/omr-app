@@ -17,6 +17,7 @@ import {
   chonCauChoPhuHuynh, SO_NGAY_KHONG_GIAO_LAI, type CauChon, type CauToiHan, type NguonCau, type UngVien,
 } from './parent-news-chon-cau'
 import { ngayVn } from './su-kien-hoc'
+import type { BangChungCau } from '../../src/lib/uu-tien-nhan-kho'
 
 type Row = Record<string, unknown>
 
@@ -151,10 +152,31 @@ export async function chonCauBaiHangNgay(env: Env, sbd: string, soCan: number, n
   // Chỉ bù trong dạng chính em đã học; thiếu câu thì giảm số lượng.
   if (dangDaHoc.size > 0) nap(await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [JSON.stringify([...dangDaHoc]), ...themLop], baoVe, TRAN_DOC_BU))
 
+  // LỊCH SỬ NHÃN của CHÍNH em, CHỈ cho câu trong bể ứng viên (một truy vấn gọn, có chặn). Không suy diễn từ em khác.
+  const dsQid = [...kho.keys()]
+  const lichSuNhan = new Map<string, BangChungCau>()
+  if (dsQid.length > 0) {
+    const rh = await tat(
+      () => env.DB.prepare(
+        `SELECT qid, trang_thai, lan_sai, ngay_dung_khac_nhau FROM nam_kt_cau
+          WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))`,
+      ).bind(sbd, JSON.stringify(dsQid)).all<Row>(),
+      trong(),
+    )
+    for (const x of rh.results ?? []) {
+      const tt = String(x.trang_thai)
+      lichSuNhan.set(String(x.qid), {
+        sai: tt === 'moi_sai' || tt === 'dang_on' || (Number(x.lan_sai) > 0 && tt !== 'da_khac_phuc'),
+        dung: tt === 'da_khac_phuc' || tt === 'chua_thay_sai',
+        daDungLai: Number(x.ngay_dung_khac_nhau) >= 2,
+      })
+    }
+  }
+
   const chonTuKho = () => chonCauChoPhuHuynh({
-    soCan, seed, toiHan, suKienGanDay, dangDaHoc, nhomGanDay,
+    soCan, seed, toiHan, suKienGanDay, dangDaHoc, nhomGanDay, lichSuNhan,
     dangYeu: dangYeuEm.map((d) => ({ maDang: d.maDang, bac: d.bac })),
-    ungVien: [...kho.values()].map((q): UngVien => ({ qid: q.qid, dang: q.dang, mucDo: q.mucDo, group: q.group })),
+    ungVien: [...kho.values()].map((q): UngVien => ({ qid: q.qid, dang: q.dang, mucDo: q.mucDo, group: q.group, kienThuc: q.kienThuc })),
   })
   const chon = chonTuKho()
 

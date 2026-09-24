@@ -1424,7 +1424,8 @@ export async function thichNghiSauChang(env: Env, bt: Hang, em: Hang, sbd: strin
   const maBtvn = chuoi(bt.ma_btvn)
   const khoa = `${maBtvn}|${sbd}`
   if (laBoNopTre(em.ngan_sach_json)) return 0 // bộ NỘP TRỄ chỉ có lõi: KHÔNG thêm câu dễ / khắc phục Bộ não vào chặng chưa mở (em trễ không nhận nhiều câu hơn em đúng nhịp)
-  const [bai, da] = await Promise.all([docBaiNangDo(env, maBtvn), docBoDaChot(env, maBtvn, sbd)])
+  // LÀM GIÀU NHÃN cho đường THÍCH NGHI: `ungVien` của lõi cần nhãn kiến thức để xếp hạng phụ; nguồn = tờ đề của bài (đọc thêm MỘT lần, chỉ ở lượt thích nghi).
+  const [bai, da] = await Promise.all([docBaiNangDo(env, maBtvn, chuoi(bt.ma_de), true), docBoDaChot(env, maBtvn, sbd)])
   const tomTat = docTomTat(em.tom_tat_json)
   if (!bai || !da || !tomTat || !em.chot_luc) return 0
   const viTri = new Map(bai.cau.map((c, i) => [c.qid, i]))
