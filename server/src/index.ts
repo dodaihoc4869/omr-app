@@ -1,9 +1,11 @@
+import { doiLuotSnapshotBtvn } from './btvn-lifecycle'
+import { dungSnapshotBtvn } from './btvn-snapshot'
 import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
-import {homeworkQuestions,homeworkKeys,gradeHomework} from './btvn-grading'
+import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
 import {chuBaoBoTuLuan,laMaDeTuLuan,locCauRutDuoc} from '../../src/lib/cau-tu-luan'
 import {qidTuLuanCuaTo} from './cam-tu-luan'
-import {ghiSuKien,ghiSuKienThi,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
+import {ghiSuKien,ghiSuKienThi,chuanBiSuKienLoBtvn,ghiSuKienLoBtvn,ngayVn,type LuotThi} from './su-kien-hoc'
 import {napLaiSuKien,kiemCheoSuKien,type NguonNapLai} from './su-kien-nap-lai'
 import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {congBoSuKien,dungLaiNangLuc,nangLucBat} from './nang-luc-d1'
@@ -13,7 +15,7 @@ import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,m
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
 import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
-import {hsOnLaiNop} from './on-lai-nop'
+import {hsOnLaiNop, trangThaiNop} from './on-lai-nop'
 import {hoSoOnCa} from './ho-so-on-ca'
 import {notifications,deliverNotices} from './notifications'
 import {canhBaoChoEm,emXemCanhBao,guiCanhBao} from './canh-bao-thay'
@@ -43,7 +45,8 @@ import {gvKeHoachEm} from './gv-ke-hoach-em'
 import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
 import {doiTenHocSinh} from './doi-ten-hoc-sinh'
 import {chuanBiChamLaiCa} from './cham-lai-ca'
-import { mom } from './mom'
+import { rebuildScopeProjection } from './game-v2-scope-projection'
+import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
 import { gameV2 } from './game-v2'
@@ -119,6 +122,14 @@ async function sauGhi<T>(env: Env, b: Record<string, unknown>, viec: Promise<T>)
 
 function ra(data: unknown, status = 200): Response {
   return new Response(JSON.stringify({ ...(data as object), serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
+}
+
+async function traLoiNopBtvn(nop:()=>Promise<Response>):Promise<Response> {
+  try { return await nop() }
+  catch (e) {
+    if (e instanceof LoiChamBtvn) return ra({ok:false,ma:e.ma,error:e.message},e.ma==='BTVN_GRADING_INPUT_INVALID'?422:500)
+    throw e
+  }
 }
 
 function laThay(req: Request, env: Env, body: Record<string, unknown>): boolean {
@@ -1810,6 +1821,14 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>, ctx?: ExecutionC
     return ra(await ND.nopChangCaNhan(env, btLo, sbd, chiSo, dapAnCn, Date.now()))
   }
 
+  const dapAn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
+  let prepared: Awaited<ReturnType<typeof chuanBiSuKienLoBtvn>> | null = null
+  if (dapAn && Object.keys(dapAn).length) {
+    // Preserve the unassigned response before reading/grading any key material.
+    const assigned = await env.DB.prepare('SELECT 1 FROM btvn_em WHERE khoa=?').bind(`${maBtvn}|${sbd}`).first()
+    if (!assigned) return ra({ok:false,error:'Em không có bài tập này.'})
+    prepared = await chuanBiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn)
+  }
   const loDaXongMoi = Math.floor(chiSo) + 1
   let r: { meta: { changes: number } }
   try {
@@ -1829,8 +1848,7 @@ async function xongLoBtvn(env: Env, b: Record<string, unknown>, ctx?: ExecutionC
     .first<{ lo_da_xong: number }>()
   // SỔ SỰ KIỆN HỌC (GĐ 0): máy em gửi kèm đáp án của lô thì máy chủ CHẤM và ghi sổ —
   // "xong lô" không còn là điền đủ ô. Không gửi đáp án thì hành vi y như cũ.
-  const dapAn = b.dapAn && typeof b.dapAn === 'object' && !Array.isArray(b.dapAn) ? (b.dapAn as Record<string, unknown>) : null
-  const ghi = dapAn && Object.keys(dapAn).length ? await ghiSuKienLoBtvn(env, maBtvn, sbd, Math.floor(chiSo), dapAn) : null
+  const ghi = prepared !== null ? await ghiSuKienLoBtvn(env, prepared) : null
   // EXP HỌC TẬP MỚI (exp-d1.ts): xong lô đúng nhịp/trễ nhịp + EXP từng câu; cờ tắt thì không đính gì.
   // HẠ TẢI D1 (Boss 22/09, tốc độ tối đa): đường "bài THƯỜNG" này — client (src/lib/btvn-may-chu-moi.ts xongLoBtvn())
   // CHỈ đọc {ok, loDaXong, error}, không đọc expNhan/manhNhan/exp (khác bài CÁ NHÂN HOÁ ở nhánh trên, ND.nopChangCaNhan,
@@ -1909,6 +1927,7 @@ async function suaBtvn(env:Env,b:Record<string,unknown>):Promise<Response> {
      const han=await env.DB.prepare('SELECT han_nop FROM btvn WHERE ma_btvn=?').bind(id).first<{han_nop:string}>()
      if(!han||Date.parse(han.han_nop)<=Date.now())return ra({ok:false,error:'Thầy gia hạn nộp trước khi cho học sinh làm lại.'})
    }
+   if(dungSnapshotBtvn(em))return ra(await doiLuotSnapshotBtvn(env,em,b.hanhDong,Date.now()))
    await env.DB.batch([
      env.DB.prepare('INSERT INTO btvn_em_lich_su(id,khoa,luu_luc,hanh_dong,du_lieu) VALUES(?,?,?,?,?)').bind(crypto.randomUUID(),khoa,new Date().toISOString(),String(b.hanhDong),JSON.stringify(em)),
      b.hanhDong==='thu-hoi'?env.DB.prepare('UPDATE btvn_em SET thu_hoi=1 WHERE khoa=?').bind(khoa):env.DB.prepare('UPDATE btvn_em SET thu_hoi=0,nop_luc=NULL,so_dung=NULL,so_cau=NULL,dap_an_json=NULL,so_lan_lam=1,xong_vong1_luc=NULL,lo_da_xong=0 WHERE khoa=?').bind(khoa)
@@ -3138,7 +3157,12 @@ const boXuLy = {
     try {
       let b: Record<string, unknown>
       try {
-        b = (await req.json()) as Record<string, unknown>
+        if (req.headers.get('content-encoding') === 'gzip' && req.body) {
+          const ds = new DecompressionStream('gzip')
+          b = JSON.parse(await new Response(req.body.pipeThrough(ds)).text())
+        } else {
+          b = (await req.json()) as Record<string, unknown>
+        }
       } catch {
         return ra({ ok: false, error: 'Thân gói không phải JSON' }, 400)
       }
@@ -3164,7 +3188,13 @@ const boXuLy = {
         return ra(await parentNews(env,p.slice('/student-news/'.length),{sbd},'hs'))
       }
       if (p.startsWith('/parent-news/')) return ra(await parentNews(env,p.slice('/parent-news/'.length),b))
-      if (p.startsWith('/mom/')) return ra(await mom(env,p.slice('/mom/'.length),b))
+      if (p.startsWith('/mom/')) {
+        try { return ra(await mom(env,p.slice('/mom/'.length),b)) }
+        catch (e) {
+          if (e instanceof LoiChamMom) return ra({ ok:false, ma:e.ma, error:e.message }, e.ma==='MOM_GRADING_INPUT_INVALID'?422:500)
+          throw e
+        }
+      }
       if (p === '/game-v2-parent') return ra(await parentGame(env,b))
       // CỔNG PHỤ HUYNH — token giai đoạn mềm (docs/token-phu-huynh-1909.md): chỉ nhận `pass` (token do thầy cấp).
       if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b))
@@ -3195,10 +3225,13 @@ const boXuLy = {
       if (p === '/vo-dai/nop') return ra(await VD.voDaiNop(env, b))
       if (p === '/vo-dai/dong') return ra(await VD.voDaiDong(env, b))
       // CỔNG TƯƠNG THÍCH — tự phân quyền bên trong, nên đứng TRƯỚC cổng mã bí mật.
-      if (p === '/goi') return goiCu(req, env, b)
-      if (p === '/btvn/cua-em') return btvnCuaEm(env, b)
-      if (p === '/btvn/nop') return sauGhi(env, b, nopBtvn(env, b))
-      if (p === '/btvn/xong-lo') return sauGhi(env, b, xongLoBtvn(env, b, ctx))
+      if (p === '/goi') {
+        if (String(b.action??'').trim()==='nopKhacPhuc') return await traLoiNopBtvn(()=>goiCu(req,env,b))
+        return goiCu(req, env, b)
+      }
+      if (p === '/btvn/cua-em') return await btvnCuaEm(env, b)
+      if (p === '/btvn/nop') return await traLoiNopBtvn(()=>sauGhi(env, b, nopBtvn(env, b)))
+      if (p === '/btvn/xong-lo') return await traLoiNopBtvn(()=>sauGhi(env, b, xongLoBtvn(env, b, ctx)))
       // KẾ HOẠCH NGÀY (GĐ 2) — em đọc kế hoạch hôm nay; đặt số phút học mỗi ngày (cần token).
       // Ô "Thi đua hôm nay" (Điều 8, phương án 8A): ĐỌC-CHỈ, token của em (thi-dua-hom-nay.ts của Code 4).
       if (p === '/hs/thi-dua-hom-nay') return ra(await hsThiDuaHomNay(envDoc, b))
@@ -3221,16 +3254,17 @@ const boXuLy = {
       }
       if (p === '/hs/cau-theo-qid') return ra(await hsCauTheoQid(env, b))
       if (p === '/hs/canh-bao/xem') return ra(await emXemCanhBao(env, await gameIdentity(env, b), String(b.id ?? '')))
-      if (p === '/hs/on-lai/nop') return ra(await sauGhi(env, b, hsOnLaiNop(env, b, ctx)))
+      if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       if (p === '/hs/thu-thach-hom-nay') return ra(await hsThuThachHomNay(env, b))
-      if (p === '/hs/thu-thach-hom-nay/nop') return ra(await sauGhi(env, b, hsThuThachNop(env, b, Date.now(), ctx)))
+      if (p === '/hs/thu-thach-hom-nay/nop') { const r = await sauGhi(env, b, hsThuThachNop(env, b, Date.now(), ctx)); return ra(r, trangThaiNop(r)) }
       if (p === '/hs/thoi-gian-hoc') return ra(await sauGhi(env, b, hsThoiGianHoc(env, b)))
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
 
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
+      if (p === '/kho/cnh-scope-index') return ra({ok:true,...await rebuildScopeProjection(env)})
       if (p === '/teacher-news') return ra(await teacherNews(env,b))
       // Token phụ huynh: cấp liên kết theo danh sách/lớp, và đếm truy cập (token so với SBD trần) để quyết giai đoạn cứng.
       if (p === '/ph/cap-ma') return ra(await phCapMa(envDoc, b))

@@ -395,7 +395,14 @@ export function diaChiGuiCa(server: string, origin: string): string {
 export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDay, bank: unknown, keyBank?: unknown): Promise<boolean> {
   if (!ch.BAT || !ch.URL) throw new Error('Chưa có kết nối máy chủ. Thầy kiểm tra cấu hình kết nối.')
   if (!secret.trim()) throw new Error('Chưa có mã xác thực giáo viên. Thầy đăng nhập lại app giáo viên.')
-  const body = JSON.stringify({ ca, bank, keyBank, secret })
+  const bodyString = JSON.stringify({ ca, bank, keyBank, secret })
+  let body: string | Blob = bodyString
+  if (typeof CompressionStream !== 'undefined' && bodyString.length > 512 * 1024) {
+    try {
+      const stream = new Response(bodyString).body!.pipeThrough(new CompressionStream('gzip'))
+      body = await new Response(stream).blob()
+    } catch { }
+  }
   const headers = { 'content-type': 'text/plain;charset=utf-8' }
   const directBase = ch.URL.replace(/\/+$/, '')
   const base = diaChiGuiCa(ch.URL, typeof location === 'undefined' ? '' : location.origin)
@@ -416,7 +423,7 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
   const cacDiaChi = base === directBase ? [directBase] : dungXhr ? [base, directBase] : [directBase, base]
   // MỖI ĐỊA CHỈ MỘT HẠN RIÊNG (không chia chung một hạn): một đường TREO tới hạn
   // không được nuốt mất lượt thử của đường kia — đúng lỗi làm nút mở ca đứng im.
-  const gui = (path: string, payload: string, seconds: number): Promise<{ ok: boolean; status: number; data: { ok?: boolean; error?: string; daLuu?: boolean } | null }> => {
+  const gui = (path: string, payload: string | Blob, seconds: number): Promise<{ ok: boolean; status: number; data: { ok?: boolean; error?: string; daLuu?: boolean } | null }> => {
     return new Promise((resolve, reject) => {
       let ketQua5xx: { ok: boolean; status: number; data: { ok?: boolean; error?: string; daLuu?: boolean } | null } | null = null
       let loiCuoi: unknown = null
@@ -431,9 +438,10 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
         try {
           const kq = await voiHanCho((async () => {
             const res = dungXhr
-              ? await guiCaBangXhr(goc + path, payload, controller.signal, seconds * 1000)
+              ? await guiCaBangXhr(goc + path, payload, controller.signal, seconds * 1000, payload instanceof Blob ? 'gzip' : undefined)
               : await (async () => {
-                const r = await fetch(goc + path, { method: 'POST', headers, body: payload, signal: controller.signal })
+                const reqHeaders = payload instanceof Blob ? { ...headers, 'content-encoding': 'gzip' } : headers
+                const r = await fetch(goc + path, { method: 'POST', headers: reqHeaders, body: payload, signal: controller.signal })
                 const data = await r.json().catch(() => null) as { ok?: boolean; error?: string; daLuu?: boolean } | null
                 return { ok: r.ok, status: r.status, data }
               })()
@@ -475,7 +483,8 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
   for (let lan = 0; lan < 2; lan++) {
     let thuLai = true
     try {
-      const res = await gui('/ca/day', body, HAN_DAY_CA_GIAY)
+      const soGiay = Math.max(HAN_DAY_CA_GIAY, Math.ceil((body instanceof Blob ? body.size : body.length) / (1024 * 15)))
+      const res = await gui('/ca/day', body, soGiay)
       const j = res.data
       if (res.ok && j?.ok === true) return true
       if (res.status === 413) { loi = 'Gói đề quá lớn. Thầy chọn ít đề hơn rồi mở lại ca.'; thuLai = false }
@@ -484,7 +493,7 @@ export async function taoCaDaXacNhan(ch: CauHinhMayChu, secret: string, ca: CaDa
       if (e instanceof Error && e.message === 'AUTH') throw new Error('Mã xác thực giáo viên không hợp lệ. Thầy đăng nhập lại app giáo viên.')
       // Kèm lý do gốc (hết hạn? mạng đứt? cỡ gói?) để lần sau đọc là biết ngay,
       // không phải đoán — lỗi này đã từng tốn một buổi chỉ để hỏi "dừng ở đâu".
-      const them = e instanceof Error && e.message ? ` (${e.message}; gói ${Math.round(body.length / 1024)} KB)` : ''
+      const them = e instanceof Error && e.message ? ` (${e.message}; gói ${Math.round((body instanceof Blob ? body.size : body.length) / 1024)} KB)` : ''
       loi = `Mất kết nối hoặc máy chủ chưa phản hồi kịp.${them}`
       // Mạng đứt / hết hạn ở CẢ hai đường (proxy đã được thử trong `gui`): gửi
       // lại y hệt ngay lập tức cũng vô ích. Vẫn đọc xác nhận (ca có thể đã lưu),
