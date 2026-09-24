@@ -223,7 +223,7 @@ body.mc-timing .mc-ray{padding-bottom:0}
 .mc-intro-label{position:absolute;z-index:2;top:clamp(10px,2.5vh,26px);left:0;right:0;text-align:center;font:800 clamp(16px,1.8vw,32px) var(--mc-sans);letter-spacing:0.2em;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(var(--aura),0.8);animation:mc-text-wow 1s ease-out both}
 .mc-intro-close{display:none}
 .mc-intro.mc-shrink .mc-intro-card:before,.mc-intro.mc-shrink .mc-intro-card:after,.mc-intro.mc-shrink .mc-intro-bong,.mc-intro.mc-shrink .mc-intro-chips{display:none}
-@keyframes mc-hao-quang{from{transform:scale(.8);opacity:.5}to{transform:scale(1.2);opacity:1}}
+@keyframes mc-hao-quang{from{transform:scale(.95);opacity:.8}to{transform:scale(1.05);opacity:1}}
 @keyframes mc-vong-quay{to{transform:rotate(360deg)}}
 @keyframes mc-thu-wow{0%{transform:scale(0.2) translateY(100px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
 @keyframes mc-text-wow{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}
@@ -241,8 +241,8 @@ body.mc .mc-em.mc-em-dat .mc-lam-tot{display:block;grid-column:2;grid-row:2;font
 .mc-mung:before{left:clamp(30px,3.6vw,70px);top:-6px}
 .mc-mung:after{left:clamp(4px,.5vw,10px);bottom:-4px;animation-delay:.2s;width:clamp(10px,1.4vw,22px);height:clamp(10px,1.4vw,22px)}
 body.mc .mc-em{position:relative}
-.mc-mung-overlay{background:transparent!important;backdrop-filter:none!important}
-.mc-mung-card img{animation:mc-thu-wow 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, mc-nhay-mung 1.5s ease-in-out infinite alternate!important}
+.mc-mung-overlay{background:transparent!important;backdrop-filter:none!important;pointer-events:none!important}
+.mc-mung-card img{animation:mc-thu-wow 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) both!important}
 .mc-hoa{position:absolute;top:-10vh;left:var(--x);width:clamp(20px,3vw,50px);height:clamp(20px,3vw,50px);background:url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 C50 40 100 50 100 50 C100 50 50 60 50 100 C50 100 50 60 0 50 C0 50 50 40 50 0" fill="%23facc15"/></svg>') no-repeat center/contain;animation:mc-roi 2.5s ease-in forwards;animation-delay:var(--delay);z-index:999;pointer-events:none}
 @keyframes mc-nhay-mung{from{transform:translateY(0)}to{transform:translateY(-20px)}}
 @keyframes mc-roi{to{transform:translateY(120vh) rotate(720deg)}}

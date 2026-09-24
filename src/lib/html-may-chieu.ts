@@ -949,7 +949,7 @@ const JS_MAY_CHIEU = `
         overlay.classList.add('mc-shrink');
         Array.prototype.forEach.call(overlay.querySelectorAll('h2,p,.mc-hoa'), function (x) { x.style.visibility = 'hidden'; });
         setTimeout(function () { overlay.remove(); }, BAY_MS + 60);
-      }, MUNG_MS);
+      }, 3500);
     } else {
       the.classList.add('mc-mung');
       setTimeout(function () { the.classList.remove('mc-mung'); }, MUNG_MS);
