@@ -19,7 +19,7 @@
 
 export const GIAO_DIEN_TO_CHIEU = {
   /** Màn gọi tên đầu mỗi đợt: hiện bấy nhiêu ms rồi thu về thẻ tên (bấm phím/chạm để bỏ qua). */
-  GOI_TEN_MS: 2500,
+  GOI_TEN_MS: 10000,
   /** Thu màn gọi tên về thẻ tên nhỏ: bấy nhiêu ms bay. */
   BAY_VE_THE_MS: 850,
   /** Thần thú ăn mừng khi Đạt: bấy nhiêu ms rồi đứng yên. */
@@ -208,23 +208,25 @@ body.mc-timing .mc-ray{padding-bottom:0}
 .mc-ray{box-sizing:border-box}
 
 /* ── MÀN GỌI TÊN (đầu mỗi đợt) ── */
-.mc-intro{position:fixed;inset:0;z-index:99999;display:flex;align-items:stretch;justify-content:center;background:var(--mc-bang);color:var(--mc-bang-chu);font-family:var(--mc-sans);pointer-events:auto;overflow:hidden;cursor:pointer}
-.mc-intro.mc-shrink{background:transparent;pointer-events:none}
+.mc-intro{position:fixed;inset:0;z-index:99999;display:flex;align-items:stretch;justify-content:center;background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);color:white;font-family:var(--mc-sans);pointer-events:auto;overflow:hidden;cursor:pointer;transition:background 0.6s ease,backdrop-filter 0.6s ease}
+.mc-intro.mc-shrink{background:transparent;backdrop-filter:blur(0px);pointer-events:none}
 .mc-intro-card{flex:1;min-width:0;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(6px,1.1vh,14px);text-align:center;overflow:hidden;--aura:244,162,97}
 .mc-intro-card+.mc-intro-card{box-shadow:inset 2px 0 0 rgba(244,239,228,.12)}
-.mc-intro-card:before{content:"";position:absolute;left:50%;top:44%;width:min(46vw,78vh);height:min(46vw,78vh);margin:calc(min(46vw,78vh) / -2) 0 0 calc(min(46vw,78vh) / -2);border-radius:50%;z-index:-1;pointer-events:none;
-  background:radial-gradient(circle,rgba(var(--aura),.42) 0%,rgba(var(--aura),.12) 40%,rgba(var(--aura),0) 68%);animation:mc-hao-quang 1.6s ease-in-out infinite alternate}
-.mc-intro-card:after{content:"";position:absolute;left:50%;top:44%;width:min(27vw,46vh);height:min(27vw,46vh);margin:calc(min(27vw,46vh) / -2) 0 0 calc(min(27vw,46vh) / -2);border-radius:50%;z-index:-1;pointer-events:none;box-shadow:inset 0 0 0 2px rgba(var(--aura),.4)}
-.mc-intro-card img{width:min(24vw,40vh);height:min(24vw,40vh);object-fit:contain;background:transparent;border:0;filter:none;z-index:1}
-.mc-intro-bong{width:min(12vw,20vh);height:clamp(8px,2.2vh,20px);border-radius:50%;background:rgba(0,0,0,.45);margin-top:calc(min(2.4vh,-10px) * -1)}
-.mc-intro-card h2{margin:clamp(4px,1vh,12px) 0 0;padding:clamp(8px,1.6vh,16px) clamp(16px,2.7vw,44px);border-radius:clamp(16px,2.2vw,32px);background:var(--mc-giay);color:var(--mc-chu);font:700 clamp(26px,3.44vw,64px)/1.1 var(--mc-sans);text-shadow:none;max-width:92%}
-.mc-intro-card p{margin:0;font:500 clamp(14px,1.56vw,30px) var(--mc-sans);color:rgba(244,239,228,.75);text-shadow:none}
-.mc-intro-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:clamp(2px,.8vh,10px)}
-.mc-intro-chips span{padding:clamp(4px,.8vh,8px) clamp(10px,1.25vw,20px);border-radius:999px;background:var(--mc-bang-nut);font:600 clamp(12px,1.4vw,26px) var(--mc-sans)}
-.mc-intro-label{position:absolute;z-index:2;top:clamp(10px,2.5vh,26px);left:0;right:0;text-align:center;font:600 clamp(14px,1.56vw,28px) var(--mc-sans);letter-spacing:0;color:rgba(244,239,228,.65);text-shadow:none}
+.mc-intro-card:before{content:"";position:absolute;left:50%;top:40%;width:min(50vw,80vh);height:min(50vw,80vh);margin:calc(min(50vw,80vh) / -2) 0 0 calc(min(50vw,80vh) / -2);border-radius:50%;z-index:-1;pointer-events:none;background:radial-gradient(circle,rgba(var(--aura),.6) 0%,rgba(var(--aura),.2) 40%,rgba(var(--aura),0) 68%);animation:mc-hao-quang 1.6s ease-in-out infinite alternate}
+.mc-intro-card:after{content:"";position:absolute;left:50%;top:40%;width:min(35vw,55vh);height:min(35vw,55vh);margin:calc(min(35vw,55vh) / -2) 0 0 calc(min(35vw,55vh) / -2);border-radius:50%;z-index:-1;pointer-events:none;box-shadow:inset 0 0 0 2px rgba(var(--aura),.5);animation:mc-vong-quay 12s linear infinite}
+.mc-intro-card img{width:min(32vw,50vh);height:min(32vw,50vh);object-fit:contain;background:transparent;border:0;filter:drop-shadow(0 0 25px rgba(var(--aura),0.8)) drop-shadow(0 0 60px rgba(var(--aura),0.5));z-index:1;animation:mc-thu-wow 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) both}
+.mc-intro-bong{width:min(16vw,24vh);height:clamp(12px,3vh,24px);border-radius:50%;background:rgba(0,0,0,.6);margin-top:calc(min(3vh,-12px) * -1);filter:blur(4px)}
+.mc-intro-card h2{margin:clamp(8px,2vh,20px) 0 0;padding:clamp(12px,2vh,20px) clamp(24px,4vw,60px);border-radius:clamp(16px,2.2vw,32px);background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.0));border:1px solid rgba(var(--aura),0.5);box-shadow:0 8px 32px rgba(var(--aura),0.3), inset 0 0 20px rgba(var(--aura),0.2);backdrop-filter:blur(8px);color:#fff;font:900 clamp(32px,5vw,80px)/1.1 var(--mc-sans);text-transform:uppercase;letter-spacing:2px;text-shadow:0 2px 10px rgba(0,0,0,0.8), 0 0 30px rgba(var(--aura),1);max-width:92%;z-index:1;animation:mc-text-wow 1s ease-out 0.3s both}
+.mc-intro-card p{margin:0;font:700 clamp(18px,2vw,36px) var(--mc-sans);color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(var(--aura),0.8);z-index:1;animation:mc-text-wow 1s ease-out 0.5s both}
+.mc-intro-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:clamp(4px,1vh,12px);z-index:1;animation:mc-text-wow 1s ease-out 0.7s both}
+.mc-intro-chips span{padding:clamp(6px,1vh,10px) clamp(14px,1.5vw,24px);border-radius:999px;background:rgba(0,0,0,0.5);border:1px solid rgba(var(--aura),0.4);box-shadow:0 4px 12px rgba(var(--aura),0.2);color:#fff;font:700 clamp(14px,1.6vw,28px) var(--mc-sans);text-shadow:0 1px 4px rgba(0,0,0,0.8)}
+.mc-intro-label{position:absolute;z-index:2;top:clamp(10px,2.5vh,26px);left:0;right:0;text-align:center;font:800 clamp(16px,1.8vw,32px) var(--mc-sans);letter-spacing:0.2em;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8), 0 0 20px rgba(var(--aura),0.8);animation:mc-text-wow 1s ease-out both}
 .mc-intro-close{display:none}
 .mc-intro.mc-shrink .mc-intro-card:before,.mc-intro.mc-shrink .mc-intro-card:after,.mc-intro.mc-shrink .mc-intro-bong,.mc-intro.mc-shrink .mc-intro-chips{display:none}
-@keyframes mc-hao-quang{from{transform:scale(.94);opacity:.7}to{transform:scale(1.05);opacity:1}}
+@keyframes mc-hao-quang{from{transform:scale(.8);opacity:.5}to{transform:scale(1.2);opacity:1}}
+@keyframes mc-vong-quay{to{transform:rotate(360deg)}}
+@keyframes mc-thu-wow{0%{transform:scale(0.2) translateY(100px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+@keyframes mc-text-wow{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}
 
 /* ── ĂN MỪNG KHI ĐẠT: thẻ tên xanh "Làm tốt lắm", thần thú nhảy 1,5 s rồi đứng yên ── */
 body.mc .mc-em.mc-em-dat{background:var(--mc-mung-nen);color:var(--mc-mung-chu)}
@@ -239,6 +241,11 @@ body.mc .mc-em.mc-em-dat .mc-lam-tot{display:block;grid-column:2;grid-row:2;font
 .mc-mung:before{left:clamp(30px,3.6vw,70px);top:-6px}
 .mc-mung:after{left:clamp(4px,.5vw,10px);bottom:-4px;animation-delay:.2s;width:clamp(10px,1.4vw,22px);height:clamp(10px,1.4vw,22px)}
 body.mc .mc-em{position:relative}
+.mc-mung-overlay{background:transparent!important;backdrop-filter:none!important}
+.mc-mung-card img{animation:mc-thu-wow 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, mc-nhay-mung 1.5s ease-in-out infinite alternate!important}
+.mc-hoa{position:absolute;top:-10vh;left:var(--x);width:clamp(20px,3vw,50px);height:clamp(20px,3vw,50px);background:url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50 0 C50 40 100 50 100 50 C100 50 50 60 50 100 C50 100 50 60 0 50 C0 50 50 40 50 0" fill="%23facc15"/></svg>') no-repeat center/contain;animation:mc-roi 2.5s ease-in forwards;animation-delay:var(--delay);z-index:999;pointer-events:none}
+@keyframes mc-nhay-mung{from{transform:translateY(0)}to{transform:translateY(-20px)}}
+@keyframes mc-roi{to{transform:translateY(120vh) rotate(720deg)}}
 @keyframes mc-nhay{0%,100%{transform:translateY(0) rotate(0)}18%{transform:translateY(-16%) rotate(-5deg)}36%{transform:translateY(0)}54%{transform:translateY(-11%) rotate(5deg)}72%{transform:translateY(0)}}
 @keyframes mc-lap-lanh{0%{opacity:0;transform:scale(.3)}30%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.25)}}
 

@@ -271,9 +271,9 @@ export const NHAN_LAM_BAI_KHONG_TEN = 'Phần làm bài của học sinh'
  * Thuộc tính nhãn vùng làm bài. Chế độ dạy học: thẻ tên ẩn tới khi hết giờ / thầy bấm ⇒ `data-nhan` (thứ CSS in ra) là nhãn KHÔNG tên; tên thật chỉ nằm ở `data-nhan-em`, script (`dongBoNhan`) đổi sang khi thẻ hiện và đổi về khi thẻ ẩn lại.
  * Chế độ thường: thẻ tên hiện sẵn nên nhãn có tên như trước (không đổi một byte).
  */
-function thuocTinhNhan(o: OBang, dayHoc: boolean): string {
+function thuocTinhNhan(o: OBang): string {
   const co = `Phần làm bài của ${thoat(tenGoi(o))}`
-  return dayHoc ? `data-nhan="${NHAN_LAM_BAI_KHONG_TEN}" data-nhan-em="${co}"` : `data-nhan="${co}"`
+  return `data-nhan="${NHAN_LAM_BAI_KHONG_TEN}" data-nhan-em="${co}"`
 }
 
 /** THẺ TÊN (M3): giấy ấm; thần thú có hào quang theo hệ (`--mc-he`); tên; "thú · cấp · lần lên bảng thứ N"; chip số câu.
@@ -289,7 +289,7 @@ function lichSuHtml(o: OBang): string {
 
 function headerEmHtml(o: OBang, ma: string): string {
   const lanRieng = o.thanThu ? '' : lanHtml(o, 'mc-em-phu')
-  return `<header class="mc-em" id="em-${ma}" style="--mc-he:${mauHaoQuang(o.thanThu?.he)}">
+  return `<header class="mc-em" id="em-${ma}" style="--mc-he:${mauHaoQuang(o.thanThu?.he)}" hidden>
     <div class="mc-em-trai">
       <div class="mc-em-hang1">
         <span class="mc-ten">${thoat(o.hoTen || o.sbd)}</span>
@@ -350,7 +350,7 @@ function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number, ca
       <span class="mc-nut-chu">Hiện lời giải</span>
     </button>${chamHtml(o, cauNoi)}
   </div>
-  <div class="mc-trang" aria-hidden="true" ${thuocTinhNhan(o, dayHoc)}></div>
+  <div class="mc-trang" aria-hidden="true" ${thuocTinhNhan(o)}></div>
 </section>`
 }
 
@@ -378,9 +378,9 @@ function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string
         <span class="mc-nut-chu">Hiện lời giải</span>
       </button>${chamHtml(o, Boolean(tuyChon.cauNoi?.maPhien))}
     </div>
-    <div class="mc-trang" aria-hidden="true" ${thuocTinhNhan(o, Boolean(tuyChon.dayHoc))}></div>
+    <div class="mc-trang" aria-hidden="true" ${thuocTinhNhan(o)}></div>
   </section>
-  <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm" ${thuocTinhNhan(o, Boolean(tuyChon.dayHoc))}></section>
+  <section class="mc-cot-lam-bai" aria-label="Bảng để học sinh lên làm" ${thuocTinhNhan(o)}></section>
 </div>`
 }
 
@@ -413,27 +413,7 @@ const CSS_MAY_CHIEU = `
 #mc-clock.mc-sap-het {background:linear-gradient(120deg,#be123c,#ea580c);border-color:#fda4af}
 .mc-em {padding:16px;border:1px solid #93c5fd;border-radius:22px;background:linear-gradient(125deg,#eff6ff,#e0f2fe,#ede9fe);box-shadow:0 8px 24px #2563eb18;color:#172554;margin-bottom:14px}
 .mc-phai .mc-em {background:linear-gradient(125deg,#fdf2f8,#fae8ff,#ede9fe);border-color:#f0abfc;color:#701a75}
-.mc-intro {position:fixed;inset:0;z-index:99999;display:flex;align-items:stretch;justify-content:center;background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);color:white;font-family:system-ui,sans-serif;pointer-events:none;overflow:hidden;transition:background 0.6s ease,backdrop-filter 0.6s ease}
-.mc-intro-card {flex:1;min-width:0;position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;--aura:#22d3ee;--spark:#fef08a}
-.mc-intro-card:nth-of-type(3) {--aura:#e879f9;--spark:#fde68a}
-.mc-intro-card:before,.mc-intro-card:after {content:'';position:absolute;inset:-20%;z-index:-1;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse,transparent 12%,color-mix(in srgb,var(--aura) 55%,transparent) 30%,transparent 68%);animation:mc-aura-bloom 1.8s ease-in-out infinite alternate}
-.mc-intro-card:after {background:conic-gradient(from 0deg,transparent 0deg,var(--aura) 12deg,transparent 25deg,transparent 70deg,var(--spark) 82deg,transparent 95deg,transparent 145deg,var(--aura) 157deg,transparent 172deg,transparent 230deg,var(--spark) 242deg,transparent 255deg,transparent 310deg,var(--aura) 322deg,transparent 340deg);opacity:.26;mask-image:radial-gradient(ellipse,transparent 8%,#000 32%,transparent 68%);animation:mc-aura-turn 12s linear infinite}
-.mc-intro-card img {width:min(47vw,68vh);height:min(47vw,68vh);object-fit:contain;background:transparent;border:0;filter:drop-shadow(0 0 18px var(--aura)) drop-shadow(0 0 45px var(--aura));z-index:1;animation:mc-thu-wow 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) both}
-.mc-intro-card h2 {color:white;text-shadow:0 2px 5px #172554,0 0 22px var(--aura);font-size:clamp(24px,4vw,60px);line-height:1.15;margin:12px 0 8px;z-index:1;animation:mc-text-wow 0.8s ease-out 0.2s both}
-.mc-intro-card p {color:white;text-shadow:0 2px 5px #172554,0 0 18px var(--aura);font-size:clamp(16px,2vw,28px);font-weight:700;z-index:1;animation:mc-text-wow 0.8s ease-out 0.3s both}
-.mc-spark {position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);background:var(--spark);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);filter:drop-shadow(0 0 7px var(--aura));animation:mc-spark-float 2s ease-in-out infinite;animation-delay:var(--delay);pointer-events:none}
-@keyframes mc-aura-bloom {from{transform:scale(.8);opacity:.55}to{transform:scale(1.15);opacity:.9}}
-@keyframes mc-aura-turn {to{transform:rotate(360deg)}}
-@keyframes mc-spark-float {0%,100%{transform:translateY(12px) scale(.5);opacity:.2}50%{transform:translateY(-24px) scale(1.3);opacity:1}}
-@keyframes mc-thu-wow {0%{transform:scale(0.3) translateY(50px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
-@keyframes mc-text-wow {0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
-.mc-intro.mc-shrink {background:transparent;backdrop-filter:blur(0px)}
-.mc-intro.mc-shrink .mc-intro-card {overflow:visible}
-.mc-intro.mc-shrink .mc-intro-card:before,.mc-intro.mc-shrink .mc-intro-card:after,.mc-intro.mc-shrink .mc-spark {display:none}
-.mc-intro-label {position:absolute;z-index:2;top:3vh;left:0;right:0;text-align:center;letter-spacing:.2em;color:white;text-shadow:0 2px 6px #172554,0 0 20px #06b6d4;font-weight:800;animation:mc-text-wow 0.8s ease-out both}
-.mc-intro-close {position:absolute;right:20px;bottom:20px;border:1px solid #94a3b8;border-radius:30px;padding:12px 22px;background:#ffffffe6;color:#172554;cursor:pointer;pointer-events:auto}
-@media(max-width:900px){.mc-intro{flex-direction:column}.mc-intro-card img{width:min(65vw,30vh);height:min(65vw,30vh)}.mc-intro-card h2{font-size:26px;margin:4px}.mc-intro-card p{margin:4px;font-size:16px}}
-@media print {#mc-clock,.mc-intro {display:none!important}}
+@media print {#mc-clock {display:none!important}}
 
 :root { --mc-serif: "Times New Roman", Palatino, Charter, Georgia, serif; --mc-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; --mc-vien: rgb(226, 232, 240); --mc-nen: rgb(255, 255, 255); --mc-muc: rgb(15, 23, 42); --mc-nhat: rgb(100, 116, 139); --mc-xanh: rgb(26, 115, 232); --mc-xanh-nen: rgb(232, 240, 254); --mc-do: rgb(197, 34, 31); --mc-do-nen: rgb(252, 232, 230); --mc-cam: rgb(169, 94, 0); --mc-cam-nen: rgb(254, 239, 195); --mc-luc: rgb(20, 108, 67); --mc-luc-nen: rgb(230, 244, 234); }
 @media (prefers-color-scheme: dark) {
@@ -933,8 +913,47 @@ const JS_MAY_CHIEU = `
     the.appendChild(loi);
     the.classList.add('mc-em-dat');
     if (giamChuyenDong()) return;
-    the.classList.add('mc-mung');
-    setTimeout(function () { the.classList.remove('mc-mung'); }, MUNG_MS);
+    var target = the.querySelector('img.mc-thu-anh');
+    if (target && anhXong(target)) {
+      var overlay = document.createElement('div');
+      overlay.className = 'mc-intro mc-mung-overlay';
+      var card = document.createElement('div');
+      card.className = 'mc-intro-card mc-mung-card';
+      var he = the.style.getPropertyValue('--mc-he') || '244,162,97';
+      card.style.setProperty('--aura', he);
+      var img = document.createElement('img');
+      img.src = target.src;
+      img.className = 'mc-thu-anh';
+      card.appendChild(img);
+      var ten = the.querySelector('.mc-ten');
+      var name = document.createElement('h2');
+      name.textContent = ten ? ten.textContent : '';
+      card.appendChild(name);
+      var loiKhen = document.createElement('p');
+      loiKhen.textContent = 'Làm tốt lắm! +1 sao';
+      card.appendChild(loiKhen);
+      for (var j = 0; j < 15; j++) {
+        var hoa = document.createElement('div');
+        hoa.className = 'mc-hoa';
+        hoa.style.setProperty('--x', (Math.random() * 100) + 'vw');
+        hoa.style.setProperty('--delay', (Math.random() * 0.5) + 's');
+        overlay.appendChild(hoa);
+      }
+      overlay.appendChild(card);
+      document.body.appendChild(overlay);
+      setTimeout(function () {
+        var a = img.getBoundingClientRect(), b = target.getBoundingClientRect();
+        if (a.width && b.width) {
+          img.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + (b.left + b.width / 2 - a.left - a.width / 2) + 'px,' + (b.top + b.height / 2 - a.top - a.height / 2) + 'px) scale(' + (b.width / a.width) + ')', opacity: 1 }], { duration: BAY_MS, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' });
+        }
+        overlay.classList.add('mc-shrink');
+        Array.prototype.forEach.call(overlay.querySelectorAll('h2,p,.mc-hoa'), function (x) { x.style.visibility = 'hidden'; });
+        setTimeout(function () { overlay.remove(); }, BAY_MS + 60);
+      }, MUNG_MS);
+    } else {
+      the.classList.add('mc-mung');
+      setTimeout(function () { the.classList.remove('mc-mung'); }, MUNG_MS);
+    }
   });
 
   // CÀI ĐẶT (nền giấy, cỡ chữ, toàn màn hình) gọn trong một hộp nhỏ để thanh dưới không chật; bấm ra ngoài là đóng.
