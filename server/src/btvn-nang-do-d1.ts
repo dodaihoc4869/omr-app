@@ -39,6 +39,9 @@ const GIOI_HAN_DAP_AN = 40
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v))
 const soHoac = (v: unknown, dpr = 0): number => (Number.isFinite(Number(v)) && v !== null && v !== '' ? Number(v) : dpr)
 const json = (v: unknown): string => JSON.stringify(v)
+/** Nhãn kiến thức: chỉ nhận chuỗi, cắt khoảng trắng, bỏ rỗng, khử trùng — DÙNG CHUNG cho `chuanHoaCauGiao` và phần làm giàu của `docBaiNangDo` (một cách chuẩn hoá duy nhất). */
+const chuanHoaKienThuc = (v: unknown): string[] =>
+  [...new Set((Array.isArray(v) ? v : []).filter((x): x is string => typeof x === 'string' && x.trim().length > 0).map((x) => x.trim()))]
 /** Câu thưởng: nhãn `thu_thach` hoặc `loi_cao` — đúng thì tính, sai thì KHÔNG vào mẫu điểm. */
 export const laCauThuong = (nhan: unknown): boolean => nhan === 'thu_thach' || nhan === 'loi_cao'
 
@@ -153,6 +156,7 @@ export function chuanHoaCauGiao(tho: Hang[], raw: unknown): { cau: CauGiao[]; bo
       mucDo: m && m.mucDo !== undefined && m.mucDo !== null ? kepMuc(m.mucDo) : kepMuc(c.muc_do ?? c.mucDo),
       sao: m && m.sao !== undefined && m.sao !== null ? kepSao(m.sao) : kepSao(canChua?.sao),
       phan: (phanTho === 'I' || phanTho === 'II' || phanTho === 'III' ? phanTho : phanTuQid(qid)) as PhanCau,
+      kienThuc: chuanHoaKienThuc(c.kienThuc),
     }
   })
   return { cau, boQuaQid, thieuMeta }
@@ -213,12 +217,41 @@ const docCauGiaoTuHang = (x: Hang): CauGiao => ({
   phan: (['I', 'II', 'III'].includes(chuoi(x.phan)) ? chuoi(x.phan) : phanTuQid(chuoi(x.qid))) as PhanCau,
 })
 
-/** Câu + lõi + ghim của một lượt giao, theo thứ tự đề. `null` = không có dòng nào (bài chưa sẵn sàng). */
-export async function docBaiNangDo(env: Env, maBtvn: string): Promise<BaiNangDo | null> {
+/**
+ * Câu + lõi + ghim của một lượt giao, theo thứ tự đề. `null` = không có dòng nào (bài chưa sẵn sàng).
+ * `maDe` (tuỳ chọn): người gọi ĐÃ có `bt` thì truyền vào để BỎ truy vấn `SELECT ma_de` thừa; vắng ⇒ tự đọc.
+ * `enrich` (tuỳ chọn, MẶC ĐỊNH TẮT): chỉ BẬT ở xem trước + chốt bộ đầu (nơi có `bt`), để đường nộp/thích nghi GIỮ NGUYÊN số truy vấn như trước.
+ *   Khi bật, nhãn kiến thức lấy từ CHÍNH tờ đề của bài (nguồn được phép), chuẩn hoá bằng `chuanHoaKienThuc`; đọc lỗi ⇒ bỏ nhãn (không bịa, không mở rộng nguồn).
+ */
+export async function docBaiNangDo(env: Env, maBtvn: string, maDe?: string, enrich = false): Promise<BaiNangDo | null> {
   const r = await env.DB.prepare('SELECT qid, dang, chuyen_de, muc_do, sao, phan, loi, ghim FROM btvn_cau WHERE ma_btvn = ? ORDER BY thu_tu').bind(maBtvn).all<Hang>()
   const ds = r.results ?? []
   if (ds.length === 0) return null
-  return { cau: ds.map(docCauGiaoTuHang), loi: ds.filter((x) => Number(x.loi) === 1).map((x) => chuoi(x.qid)), ghim: ds.filter((x) => Number(x.ghim) === 1).map((x) => chuoi(x.qid)) }
+
+  let qKienThuc = new Map<string, string[]>()
+  if (enrich) {
+    // Chỉ khi LÀM GIÀU mới cần nguồn tờ đề: `maDe` thầy/người gọi đã có, vắng thì tra từ chính lượt giao (nguồn được phép).
+    let maDeNguon = maDe
+    if (maDeNguon === undefined) {
+      const bt = await env.DB.prepare('SELECT ma_de FROM btvn WHERE ma_btvn = ?').bind(maBtvn).first<{ ma_de: string }>()
+      if (!bt) return null
+      maDeNguon = chuoi(bt.ma_de)
+    }
+    try {
+      const raw = await homeworkQuestions(env, maDeNguon)
+      for (const x of raw) {
+        if (x && x.qid) qKienThuc.set(chuoi(x.qid), chuanHoaKienThuc(x.kienThuc))
+      }
+    } catch {
+      /* không đọc được tờ: bỏ nhãn (không bịa) */
+    }
+  }
+
+  const cau = ds.map((c) => {
+    const qid = chuoi(c.qid)
+    return { ...docCauGiaoTuHang(c), kienThuc: qKienThuc.get(qid) ?? [] }
+  })
+  return { cau, loi: ds.filter((x) => Number(x.loi) === 1).map((x) => chuoi(x.qid)), ghim: ds.filter((x) => Number(x.ghim) === 1).map((x) => chuoi(x.qid)) }
 }
 
 /** Hạt giống của bài: máy thầy gửi (chung với xem trước) hoặc mã bài. Hạt của EM = `<hạt bài>|<sbd>`. */
@@ -435,9 +468,11 @@ export async function chotBoChoEm(env: Env, bt: Hang, sbd: string, now: number, 
   const maBtvn = chuoi(bt.ma_btvn)
   const khoa = `${maBtvn}|${sbd}`
   const hanMs = Date.parse(chuoi(bt.han_nop))
-  const [bai, hs, dvAll, dcAll] = await Promise.all([docBaiNangDo(env, maBtvn), docHoSoRutSauKhiCoBai(env, maBtvn, sbd, now), docDauVaoNganSach(env, [sbd], now), docDieuChinhHieuLuc(env, [sbd], ngayVn(now))])
+  const baiP = docBaiNangDo(env, maBtvn, chuoi(bt.ma_de), true) // chốt bộ đầu: BẬT làm giàu nhãn (nguồn = tờ đề của bài)
+  const [bai, hs, dvAll, dcAll] = await Promise.all([baiP, baiP.then(b => b ? docHoSoRut(env, [sbd], b.cau, now) : null), docDauVaoNganSach(env, [sbd], now), docDieuChinhHieuLuc(env, [sbd], ngayVn(now))])
   if (!bai || !hs) return null
   const dv = dvAll.get(sbd)!
+
   const dc = dcAll.get(sbd)
   // NỘP TRỄ (Điều 4 = B, Boss chốt 21/09): em CHƯA TỪNG MỞ bài mà hạn đã qua VẪN phải làm — bộ CHỈ PHẦN LÕI (kể cả lõi đúng bậc), KHÔNG làm thêm/thử sức; chia chặng theo trần buổi (≤ 30 câu / 60 phút, ≤ 2 chặng/ngày;
   // hai chặng đầu mở NGAY, các chặng sau 00:00 những ngày kế) bằng `chiaChangNopTre` (Code 1). Dựng bộ như thường (hạn giả = mai) rồi tước phần làm thêm.
@@ -529,13 +564,6 @@ async function moSomChangKe(env: Env, khoa: string, soChang: number, chiSoXong: 
     console.error('[mo-som] lỗi (không mở sớm):', e instanceof Error ? e.message : e)
     return null
   }
-}
-
-/** `docHoSoRut` cần danh sách câu của bài; ở đường chốt đã có `bai` nên chỉ cần một lượt đọc — bọc lại để chạy song song với `docBaiNangDo`. */
-async function docHoSoRutSauKhiCoBai(env: Env, maBtvn: string, sbd: string, now: number): Promise<Map<string, HoSoRutCuaEm> | null> {
-  const bai = await docBaiNangDo(env, maBtvn)
-  if (!bai) return null
-  return docHoSoRut(env, [sbd], bai.cau, now)
 }
 
 /** Bộ này là bộ NỘP TRỄ (chốt sau hạn, chỉ phần lõi)? Cờ `nopTre` nằm trong `btvn_em.ngan_sach_json` (không đổi lược đồ); hỏng / vắng ⇒ không phải. */
@@ -1088,7 +1116,7 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
     const bt = await env.DB.prepare('SELECT * FROM btvn WHERE ma_btvn = ? AND da_xoa = 0').bind(maBtvn).first<Hang>()
     if (!bt) return { ok: false, error: 'Bài không còn được giao.' }
     if (!laBaiCaNhan(bt)) return { ok: false, error: 'Bài này không cá nhân hoá.' }
-    bai = await docBaiNangDo(env, maBtvn)
+    bai = await docBaiNangDo(env, maBtvn, chuoi(bt.ma_de), true) // xem trước: BẬT làm giàu nhãn (nguồn = tờ đề của bài)
     if (!bai) return { ok: false, lyDo: 'bai_chua_san_sang', error: 'Bài này chưa có danh sách câu.' }
     hatGiong = hatGiongCuaBai(bt)
     hanMs = Date.parse(chuoi(bt.han_nop))
@@ -1224,7 +1252,7 @@ export async function docBoCuaCacEm(env: Env, dsMaBtvn: string[], dsSbd: string[
 export async function docChang1ChoEm(env: Env, bt: Hang, dsSbd: string[], now: number): Promise<Map<string, { soCau: number; phut: number }>> {
   const ra = new Map<string, { soCau: number; phut: number }>()
   if (!laBaiCaNhan(bt) || dsSbd.length === 0) return ra
-  const bai = await docBaiNangDo(env, chuoi(bt.ma_btvn))
+  const bai = await docBaiNangDo(env, chuoi(bt.ma_btvn), chuoi(bt.ma_de), true) // ước lượng chặng 1: BẬT làm giàu nhãn (nguồn = tờ đề của bài)
   if (!bai) return ra
   const hanMs = Date.parse(chuoi(bt.han_nop))
   const [hs, dv, dc] = await Promise.all([docHoSoRut(env, dsSbd, bai.cau, now), docDauVaoNganSach(env, dsSbd, now), docDieuChinhHieuLuc(env, dsSbd, ngayVn(now))])

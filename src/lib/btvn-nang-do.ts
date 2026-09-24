@@ -83,6 +83,7 @@ export interface CauGiao {
   dang: string | null
   chuyenDe: string
   mucDo: Muc
+  kienThuc?: string[]
   sao: Sao
   phan: PhanCau
   /** Câu GHIM của thầy: LUÔN bắt buộc với mọi em (thầy chủ động chọn), kể cả khi cao hơn bậc đích + 1 của em. (Có thể truyền qua `tuyChon.ghim` thay vì cờ này.) */
@@ -598,7 +599,56 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
     if (c.mucDo <= t.bacDich) ungRieng.push(i)
     else if (c.mucDo === t.bacDich + 1 && !t.yeu && !(t.nutLen && c.mucDo > t.bacHoSo + 1)) ungThu.push(i)
   })
-  const diem = (i: number, daChonCungDang: number): number => {
+
+  // NHÃN KIẾN THỨC: chuẩn hoá MỘT LẦN cho từng câu (Array.isArray, chỉ chuỗi, trim, bỏ rỗng, khử trùng) — dùng chung cho gom nhóm, thưởng, trùng lặp.
+  // Không sửa `CauGiao` gốc; nhãn trùng/đệm không thể tăng điểm.
+  const nhanKienThuc = new Map<string, string[]>()
+  for (const c of ds) {
+    const tho = Array.isArray(c.kienThuc) ? c.kienThuc : []
+    const sach: string[] = []
+    const thay = new Set<string>()
+    for (const x of tho) {
+      if (typeof x !== 'string') continue
+      const kt = x.trim()
+      if (kt === '' || thay.has(kt)) continue
+      thay.add(kt)
+      sach.push(kt)
+    }
+    nhanKienThuc.set(c.qid, sach)
+  }
+
+  const ktSai = new Map<string, number>()
+  const ktDung = new Map<string, number>()
+  for (const c of ds) {
+    const dq = hoSoAnToan.cau[c.qid]
+    if (!dq) continue
+    const kts = nhanKienThuc.get(c.qid)!
+    if (kts.length === 0) continue
+    if (dq.trangThai === 'moi_sai' || dq.trangThai === 'dang_on' || (dq.lanSai > 0 && dq.trangThai !== 'da_khac_phuc')) {
+      for (const kt of kts) ktSai.set(kt, (ktSai.get(kt) || 0) + 1)
+    }
+    if (dq.trangThai === 'da_khac_phuc' || dq.trangThai === 'chua_thay_sai') {
+      for (const kt of kts) ktDung.set(kt, (ktDung.get(kt) || 0) + 1)
+    }
+  }
+  const kienThucYeu = new Map<string, number>()
+  for (const [kt, sai] of ktSai) {
+    const dung = ktDung.get(kt) || 0
+    kienThucYeu.set(kt, Math.max(0, sai - 2 * dung)) // kẹp SAU khi đã cộng đủ tổng (không phụ thuộc thứ tự)
+  }
+
+  const cungKienThuc = (c: CauGiao) => {
+    const kts = nhanKienThuc.get(c.qid)!
+    if (kts.length === 0) return 0
+    let count = 0
+    for (const j of chonRieng) {
+      const kts2 = nhanKienThuc.get(ds[j].qid)!
+      if (kts2.some((kt) => kts.includes(kt))) count++
+    }
+    return count
+  }
+
+  const diem = (i: number, daChonCungDang: number, daChonCungKienThuc: number = 0): number => {
     const c = ds[i]
     const t = dangCua[i]
     const dq = hoSoAnToan.cau[c.qid]
@@ -611,7 +661,21 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
     else if (dq.trangThai === 'moi_sai' || dq.trangThai === 'dang_on' || (dq.lanSai > 0 && dq.trangThai !== 'da_khac_phuc')) d += D.DIEM.saiChuaDungLai
     if (dq && dq.ngayDungKhacNhau >= D.NGAY_DUNG_LAI_BO) d += D.DIEM.daDungLai
     d += D.DIEM.saoCao * c.sao
-    return d - D.DIEM.trungDang * daChonCungDang
+
+    // ĐIỂM GỐC (trước mọi thưởng nhãn): quyết định câu có ĐỦ TƯ CÁCH hay không. ≤ 0 ⇒ trả NGUYÊN giá trị gốc (nhãn không "hồi sinh" câu đã bị lịch sử/trùng dạng loại).
+    const goc = d - D.DIEM.trungDang * daChonCungDang
+    if (goc <= 0) return goc
+
+    // THƯỞNG NHÃN YẾU: chỉ cho câu gốc > 0; câu đã đúng lại ≥ 2 ngày khác nhau ⇒ 0 thưởng. Kẹp ≤ 4.
+    let diemKienThuc = 0
+    const isHistoricalRepeat = dq && dq.ngayDungKhacNhau >= D.NGAY_DUNG_LAI_BO
+    if (!isHistoricalRepeat) {
+      for (const kt of nhanKienThuc.get(c.qid)!) diemKienThuc += kienThucYeu.get(kt) || 0
+    }
+    const thuong = Math.min(4, diemKienThuc)
+    // TRÙNG KỸ NĂNG: chỉ là xếp hạng MỀM; giữ SÀN DƯƠNG nhỏ cho câu gốc > 0 để một kỹ năng chung không làm rỗng phần chọn.
+    const sau = goc + thuong - 5 * daChonCungKienThuc
+    return sau > 0 ? sau : 0.1
   }
   const hon = (a: { i: number; d: number }, b: { i: number; d: number }) => b.d - a.d || nhieu(a.i) - nhieu(b.i) || a.i - b.i
 
@@ -625,6 +689,7 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
   const choRieng = Math.max(0, conCho - soThu)
 
   // ── PHẦN RIÊNG: trước hết mỗi dạng YẾU đủ ≥ 2 câu (dạng yếu nhất trước), rồi lấp theo điểm (chỉ câu điểm > 0) ──
+
   const chonRieng: number[] = []
   const daChon = new Set<number>(batBuocIdx) // chỉ lõi BẮT BUỘC tính vào "dạng yếu đủ ≥ 2 câu": câu lõi quá cao không phải câu luyện đúng bậc
   const dem = (ma: string) => [...daChon].filter((j) => maDangCua(ds[j]) === ma).length
@@ -634,7 +699,7 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
     while (chonRieng.length < choRieng && dem(ma) < D.DANG_YEU_TOI_THIEU_CAU) {
       const tot = ungRieng
         .filter((i) => !daChon.has(i) && maDangCua(ds[i]) === ma)
-        .map((i) => ({ i, d: diem(i, cungDang(ma)) }))
+        .map((i) => ({ i, d: diem(i, cungDang(ma), cungKienThuc(ds[i])) }))
         .sort(hon)[0]
       if (!tot) break
       chonRieng.push(tot.i)
@@ -644,7 +709,7 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
   while (chonRieng.length < choRieng) {
     const tot = ungRieng
       .filter((i) => !daChon.has(i))
-      .map((i) => ({ i, d: diem(i, cungDang(maDangCua(ds[i]))) }))
+      .map((i) => ({ i, d: diem(i, cungDang(maDangCua(ds[i])), cungKienThuc(ds[i])) }))
       .filter((x) => x.d > 0)
       .sort(hon)[0]
     if (!tot) break
