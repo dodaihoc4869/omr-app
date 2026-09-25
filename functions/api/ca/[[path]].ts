@@ -17,14 +17,14 @@ export async function onRequest({ request, env }: { request: Request; env?: { OM
     const ce = request.headers.get('content-encoding')
     if (ce) headers['content-encoding'] = ce
 
-    const bodyBuf = await request.arrayBuffer()
     const response = await fetchFn(`https://omr.ttadodaihoc.workers.dev${path.slice(4)}`, {
       method: 'POST',
       headers,
-      body: bodyBuf,
+      body: request.body,
       signal: controller.signal,
       redirect: 'manual',
-    })
+      duplex: 'half' // required when passing readable stream to fetch
+    } as RequestInit)
     return new Response(response.body, { status: response.status, headers: {
       'content-type': 'application/json;charset=utf-8', 'cache-control': 'no-store',
     } })

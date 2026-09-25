@@ -3157,14 +3157,20 @@ const boXuLy = {
     try {
       let b: Record<string, unknown>
       try {
-        if (req.headers.get('content-encoding') === 'gzip' && req.body) {
-          const ds = new DecompressionStream('gzip')
-          b = JSON.parse(await new Response(req.body.pipeThrough(ds)).text())
+        if (req.body) {
+          const buf = await req.arrayBuffer()
+          const u8 = new Uint8Array(buf)
+          if ((u8.length >= 2 && u8[0] === 0x1f && u8[1] === 0x8b) || req.headers.get('content-encoding') === 'gzip') {
+            const ds = new DecompressionStream('gzip')
+            b = await new Response(new Response(buf).body!.pipeThrough(ds)).json() as Record<string, unknown>
+          } else {
+            b = JSON.parse(new TextDecoder().decode(buf)) as Record<string, unknown>
+          }
         } else {
-          b = (await req.json()) as Record<string, unknown>
+          b = {}
         }
-      } catch {
-        return ra({ ok: false, error: 'Thân gói không phải JSON' }, 400)
+      } catch (e: any) {
+        return ra({ ok: false, error: `Thân gói không phải JSON. Lỗi: ${e.message}` }, 400)
       }
 
       // Lệnh của HỌC SINH — không đòi mã bí mật, giống Apps Script hiện nay.
