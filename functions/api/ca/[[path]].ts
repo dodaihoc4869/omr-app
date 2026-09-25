@@ -10,11 +10,17 @@ export async function onRequest({ request, env }: { request: Request; env?: { OM
     const fetchFn = (env?.OMR && typeof env.OMR.fetch === 'function')
       ? env.OMR.fetch.bind(env.OMR)
       : fetch
-    const body = await request.text()
+    const headers: Record<string, string> = {}
+    const ct = request.headers.get('content-type')
+    if (ct) headers['content-type'] = ct
+    else headers['content-type'] = 'application/octet-stream' // fallback
+    const ce = request.headers.get('content-encoding')
+    if (ce) headers['content-encoding'] = ce
+
     const response = await fetchFn(`https://omr.ttadodaihoc.workers.dev${path.slice(4)}`, {
       method: 'POST',
-      headers: { 'content-type': 'text/plain;charset=utf-8' },
-      body,
+      headers,
+      body: request.body,
       signal: controller.signal,
       redirect: 'manual',
     })
