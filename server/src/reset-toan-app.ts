@@ -56,6 +56,15 @@ export const BANG_XOA: readonly string[] = [
   'game_v2_profile', 'game_v2_attempt', 'game_v2_reward', 'game_v2_room', 'game_v2_session', 'game_v2_task', 'than_thu', 'vo_dai_phong', 'vo_dai_moi', 'exp_so', 'manh_khien_so', 'khien_mat_so', 'ph_giao_them', 'lop_da_hoc',
   // Đoàn Hộ Tống (bảng của Code 5; mùa 1 tính từ ngày reset). `doan_ve_so` = vé sinh từ sổ EXP (exp_so bị xoá thì vé cũng phải xoá); `doan_trum_lop` = đóng góp trùm lớp; `doan_trum_cau` = sổ kết quả câu chung của trùm theo lớp (bước 6, migration 2109-game-doan-trum-cau; bảng chưa tồn tại thì bỏ qua).
   'doan_chang', 'doan_luot', 'doan_tiep_suc', 'doan_ve_so', 'doan_trum_lop', 'doan_trum_cau',
+  // CNH-1.0 CÁ NHÂN HOÁ (Cline 2409, migration-2309-cnh-exp-{ledger,submit,task,p08}.sql): ví, khoản cộng/chi,
+  // sổ mảnh, khiên, nhiệm vụ, cổng gác, sổ chuyển đổi. Đây là bản KẾ NHIỆM của `exp_so` + `manh_khien_so` +
+  // `khien_mat_so` (ba bảng đều XOÁ ở trên) nên PHẢI XOÁ cùng: reset = MÙA MỚI, mọi ví bắt đầu lại từ 0.
+  // `cnh_exp_p08_state`/`cnh_exp_p08_*` (sổ chuyển đổi) XOÁ cùng ví — giữ lại thì chuyển đổi tưởng đã xong
+  // trong khi ví đã bị xoá, khoá cứng ở trạng thái nửa vời.
+  'cnh_exp_account', 'cnh_exp_grant_ledger', 'cnh_exp_spend_ledger', 'cnh_exp_fragment_ledger', 'cnh_exp_day',
+  'cnh_exp_command', 'cnh_exp_task', 'cnh_exp_accepted', 'cnh_exp_attempt_control', 'cnh_exp_guard',
+  'cnh_exp_exposure_lock', 'cnh_exp_academic_lock', 'cnh_exp_submit_guard', 'cnh_exp_assistance_guard', 'cnh_exp_assistance_receipt',
+  'cnh_exp_p08_state', 'cnh_exp_p08_guard', 'cnh_exp_p08_chuyen_doi', 'cnh_exp_p08_giai_quyet',
   // Vinh danh, tin phụ huynh
   'daily_honors', 'parent_daily_news',
 ]
