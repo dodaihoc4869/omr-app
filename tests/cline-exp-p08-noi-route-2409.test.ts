@@ -81,22 +81,34 @@ describe('P08 nối route · SHOP `vang-doi` (§8)', () => {
 })
 
 describe('P08 nối route · `shield-use` (§7.2)', () => {
-  const goi = async (d: D1That, useId: string) =>
-    (await gameV2(d.env, 'shield-use', { token: await gameToken(d.env, 'S1'), useId })) as Record<string, unknown>
+  // ⚠️ TỪ 25/09: nhánh P08 đòi CẢ `khoaYeuCau` (không chỉ cửa mở) — nút "dùng khiên" hiện có đã gửi `useId`,
+  // nếu chỉ kiểm cửa thì vừa mở cổng là em bấm khiên rơi ngay vào P08 (nhận `{ok,p08}` không có `profile`).
+  const goi = async (d: D1That, useId: string, khoaYeuCau?: string) =>
+    (await gameV2(d.env, 'shield-use', { token: await gameToken(d.env, 'S1'), useId, ...(khoaYeuCau ? { khoaYeuCau } : {}) })) as Record<string, unknown>
   const gieoEm = (d1: D1That) => {
     d1.sql.prepare("INSERT INTO hoc_sinh (sbd, ho_ten, lop, mat_khau, cap_nhat_luc) VALUES ('S1','Em S1','12','mk','x')").run()
     gieoHoSo(d1, 'S1')
   }
 
-  it('cửa MỞ ⇒ chuyển 1 khiên CHƯA DÙNG → ĐÃ DÙNG kèm usage receipt', async () => {
+  it('cửa MỞ + CÓ `khoaYeuCau` ⇒ chuyển 1 khiên CHƯA DÙNG → ĐÃ DÙNG kèm usage receipt', async () => {
     const d1 = taoD1That()
     gieoEm(d1)
     gieoP07(d1, 'S1', { unused: 2, used: 0 })
     datCua(d1, CUA_MO)
-    const kq = await goi(d1, 'use-abcdefghijklmnop')
+    const kq = await goi(d1, 'use-abcdefghijklmnop', 'khoa-dung-khien-01')
     expect(kq).toMatchObject({ ok: true, p08: { unusedAfter: 1, usedAfter: 1 } })
     expect(dem(d1, 'cnh_exp_spend_ledger', "command_type = 'dung_khien'")).toBe(1)
     expect(Number((d1.sql.prepare("SELECT unused_shields AS u FROM cnh_exp_p08_state WHERE student_id='S1'").get() as { u: number }).u)).toBe(1)
+  })
+
+  it('🔴 cửa MỞ nhưng KHÔNG gửi `khoaYeuCau` ⇒ vẫn đi đường CŨ (nút khiên hiện có không tự rơi vào P08)', async () => {
+    const d1 = taoD1That()
+    gieoEm(d1)
+    gieoP07(d1, 'S1', { unused: 2, used: 0 })
+    datCua(d1, CUA_MO)
+    await expect(goi(d1, 'use-abcdefghijklmnop')).rejects.toThrow(/Em chưa có khiên/)
+    expect(dem(d1, 'cnh_exp_spend_ledger')).toBe(0)
+    expect(Number((d1.sql.prepare("SELECT unused_shields AS u FROM cnh_exp_p08_state WHERE student_id='S1'").get() as { u: number }).u)).toBe(2)
   })
 
   it('cửa ĐÓNG (mặc định) ⇒ đường CŨ (ném đúng lời cũ), KHÔNG chạm substrate P08', async () => {
@@ -104,16 +116,16 @@ describe('P08 nối route · `shield-use` (§7.2)', () => {
     gieoEm(d1)
     gieoP07(d1, 'S1', { unused: 2, used: 0 })
     // Hồ sơ CŨ không có khiên ⇒ đường CŨ ném đúng lời cũ ⇒ chứng minh KHÔNG đi nhánh P08.
-    await expect(goi(d1, 'use-abcdefghijklmnop')).rejects.toThrow(/Em chưa có khiên/)
+    await expect(goi(d1, 'use-abcdefghijklmnop', 'khoa-dung-khien-01')).rejects.toThrow(/Em chưa có khiên/)
     expect(dem(d1, 'cnh_exp_spend_ledger')).toBe(0)
     expect(Number((d1.sql.prepare("SELECT unused_shields AS u FROM cnh_exp_p08_state WHERE student_id='S1'").get() as { u: number }).u)).toBe(2)
   })
 
-  it('cửa MỞ + hết khiên chưa dùng ⇒ NÉM `KHONG_DU_DIEU_KIEN`', async () => {
+  it('cửa MỞ + có `khoaYeuCau` + hết khiên chưa dùng ⇒ NÉM `KHONG_DU_DIEU_KIEN`', async () => {
     const d1 = taoD1That()
     gieoEm(d1)
     gieoP07(d1, 'S1', { unused: 0, used: 0 })
     datCua(d1, CUA_MO)
-    await expect(goi(d1, 'use-abcdefghijklmnop')).rejects.toMatchObject({ ma: 'KHONG_DU_DIEU_KIEN' })
+    await expect(goi(d1, 'use-abcdefghijklmnop', 'khoa-dung-khien-01')).rejects.toMatchObject({ ma: 'KHONG_DU_DIEU_KIEN' })
   })
 })

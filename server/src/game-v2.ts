@@ -237,9 +237,13 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
   }
   if(action==='shield-use'){
     const id=String(b.useId??'');if(!/^[a-zA-Z0-9-]{16,80}$/.test(id))throw new Error('Lượt dùng khiên không hợp lệ.')
-    // CNH-1.0 P08 (§7.2): CỬA MỞ ⇒ đi lệnh `dungKhienCore` (chuyển 1 khiên CHƯA DÙNG → ĐÃ DÙNG, kèm
-    // usage receipt; `useId` chính là khoá idempotency). Cửa ĐÓNG (mặc định) ⇒ nguyên đường cũ bên dưới.
-    if(id){
+    // CNH-1.0 P08 (§7.2): CHỈ khi khách gửi `khoaYeuCau` VÀ cửa MỞ ⇒ đi lệnh `dungKhienCore` (chuyển 1 khiên
+    // CHƯA DÙNG → ĐÃ DÙNG, kèm usage receipt; `useId` vẫn là khoá idempotency). Cửa ĐÓNG (mặc định) ⇒ đường cũ.
+    // ⚠️ VÌ SAO ĐÒI `khoaYeuCau` (sửa 25/09): nút "dùng khiên" HIỆN CÓ đã gửi `useId`; nếu CHỈ kiểm cửa thì vừa
+    // mở cổng là em bấm khiên rơi NGAY vào P08, nhận `{ok:true,p08}` (KHÔNG có `profile`) ⇒ vỡ màn + mất khiên
+    // vô hình (khiên trừ ở `cnh_exp_p08_state` mà màn em vẫn đọc sổ cũ). Đòi thêm `khoaYeuCau` để việc chuyển
+    // sang P08 là quyết định RÕ RÀNG của máy khách, không phải tác dụng phụ của việc mở cổng.
+    if(typeof b.khoaYeuCau==='string'&&b.khoaYeuCau){
       const cuaP08=await cuaP08Mo(env)
       if(cuaP08.choPhep){
         const ngayP08=academicDay(now())
