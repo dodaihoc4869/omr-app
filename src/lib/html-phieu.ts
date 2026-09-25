@@ -2830,6 +2830,7 @@ html.gd-m3 body .q-nut-giai {
   min-height: 48px; border: 0; border-top: 0; background: transparent; color: var(--gm-primary); font-size: 14px; font-weight: 700;
 }
 /* Khung nằm ở .sol-box (không ở .sol-inner: ô lưới đang đóng 0fr mà .sol-inner có đệm thì vẫn chừa khoảng trống). */
+/* Giữ nguyên bản màu vàng chuẩn cho M3 như yêu cầu
 html.gd-m3 body .sol-box {
   margin: 0 16px 16px; padding: 16px; border: 0; border-radius: 16px; box-shadow: none;
   background: var(--gm-sc-high); color: var(--gm-on-surface);
@@ -2840,6 +2841,7 @@ html.gd-m3 body .sol-cot-loi, html.gd-m3 body .sol-pa, html.gd-m3 body .sol-pa s
 html.gd-m3 body .sol-ket { color: var(--gm-on-surface); }
 html.gd-m3 body .sol-pa + .sol-pa { border-top-color: var(--gm-outline-v); }
 html.gd-m3 body .sol-pa.chon { color: var(--gm-tertiary); }
+*/
 html.gd-m3 body .sol-anh img { border: 0; }
 
 /* --- hộp xác nhận nộp bài (thay window.confirm; mã lệnh chỉ hiện khi còn câu chưa làm) --- */
