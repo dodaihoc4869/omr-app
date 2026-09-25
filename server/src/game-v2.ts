@@ -1,4 +1,5 @@
 import {EXP_DU_TRU,EXP_REN_KHIEN} from '../../src/lib/kinh-te-game'
+import {moCuaRoute,cuaP08Mo,hapThuQuaP08,renKhienQuaP08,dungKhienQuaP08} from './cnh-exp-adapter'
 import {renKhienBangExp} from './exp-ho-so-game'
 import {normalizePetName} from '../../src/game/than-thu-v2/pet-name'
 import {escortAction,escortContext} from './game-v2-escort'
@@ -221,11 +222,31 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
   if(action==='profile'){const tasks=await env.DB.prepare('SELECT id,dang FROM game_v2_task WHERE sbd=? AND completed_at IS NULL ORDER BY created_at LIMIT 20').bind(sbd).all<{id:string;dang:string}>();const tranHapThu=await docTranHapThu(env,sbd,academicDay(now()));const dauVaoLuot=await docDauVaoLuot(env,sbd,academicDay(now()),Date.now(),tranHapThu.dat);return {ok:true,profile:visible(p,{tran:tranHapThu.tran,soCauHomNay:tranHapThu.soCauHomNay,canCau:tranHapThu.canCau}),revision,luot:tomTatLuot(luotHomNay(dauVaoLuot),dauVaoLuot.soLuotDaLam),tasks:tasks.results,doanMo:await doanMoCho(env,sbd)}}
   if(action==='khien-ren'){
     if(p.choice)throw new Error('Em chọn thần thú trước khi rèn khiên.')
+    // CNH-1.0 P08 (§7.1): CHỈ khi khách gửi `khoaYeuCau` VÀ cửa `/game-v2/khien-ren` MỞ ⇒ đi lệnh `claim_shield`.
+    // Client hiện tại KHÔNG gửi khoá ⇒ nhánh này không chạy; cửa mặc định ĐÓNG ⇒ nguyên đường cũ bên dưới.
+    if(typeof b.khoaYeuCau==='string'&&b.khoaYeuCau){
+      const cua=await moCuaRoute(env,'/game-v2/khien-ren')
+      if(cua.choPhep){
+        const ngayP08=academicDay(now())
+        const kq=await renKhienQuaP08(env,'/game-v2/khien-ren',{studentId:sbd,learningDay:ngayP08,requestId:b.khoaYeuCau,requestHash:`ren-khien|${sbd}|${ngayP08}|${b.khoaYeuCau}`})
+        return {ok:true,p08:kq}
+      }
+    }
     const daRen=renKhienBangExp(p,Number(b.soDaRen))
     return {ok:true,profile:visible(p),revision:daRen?await save(env,sbd,p,revision):revision,daRen}
   }
   if(action==='shield-use'){
     const id=String(b.useId??'');if(!/^[a-zA-Z0-9-]{16,80}$/.test(id))throw new Error('Lượt dùng khiên không hợp lệ.')
+    // CNH-1.0 P08 (§7.2): CỬA MỞ ⇒ đi lệnh `dungKhienCore` (chuyển 1 khiên CHƯA DÙNG → ĐÃ DÙNG, kèm
+    // usage receipt; `useId` chính là khoá idempotency). Cửa ĐÓNG (mặc định) ⇒ nguyên đường cũ bên dưới.
+    if(id){
+      const cuaP08=await cuaP08Mo(env)
+      if(cuaP08.choPhep){
+        const ngayP08=academicDay(now())
+        const kq=await dungKhienQuaP08(env,'/game-v2/shield-use',{studentId:sbd,learningDay:ngayP08,requestId:id,requestHash:`dung-khien|${sbd}|${id}`})
+        return {ok:true,p08:kq}
+      }
+    }
     if(p.shields?.lastUse===id||Number(p.shields?.activeUntil)>Date.now())return {ok:true,profile:visible(p),revision}
     if(p.choice||khienConLai(p)<1){
       // Câu báo ĐÚNG luật khiên mới (thầy lệnh 21/09): khiên quà tiến hoá đầu (cấp 10) chỉ mở khi đủ 21 ngày đạt nhiệm vụ ngày từ mốc; rèn thêm cần 21 mảnh và EXP dư.
@@ -241,6 +262,16 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     p.pet=pet.id;p.choice=false;return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}
   }
   if(action==='invest'){
+    // CNH-1.0 P08 (§6): CHỈ khi khách gửi `khoaYeuCau` VÀ cửa `/game-v2/invest` MỞ ⇒ đi lệnh `hapThuCore`.
+    // ⚠️ THỨ TỰ: phải CHUYỂN ĐỔI hồ sơ (`chuyenDoiP08`) cho em TRƯỚC khi bật cờ, nếu không lệnh P08 ném NOT_FOUND.
+    if(typeof b.khoaYeuCau==='string'&&b.khoaYeuCau){
+      const cua=await moCuaRoute(env,'/game-v2/invest')
+      if(cua.choPhep){
+        const ngayP08=academicDay(now())
+        const kq=await hapThuQuaP08(env,'/game-v2/invest',{studentId:sbd,learningDay:ngayP08,requestId:b.khoaYeuCau,requestHash:`hap-thu|${sbd}|${ngayP08}|${b.khoaYeuCau}`})
+        return {ok:true,p08:kq,daNap:kq.take,conTran:kq.conLaiTranNgay,lyDo:kq.chamTranCap?'cham_cap_120':kq.take>0?null:'het_tran_ngay'}
+      }
+    }
     if(p.cap>=120)throw new Error('Thần thú đã đạt cấp 120. EXP tiếp tục được giữ trong kho.')
     // MỘT CỔNG HẤP THỤ (Đợt 1 thần thú mỗi ngày): mỗi ngày VN thần thú ăn tối đa 200 EXP khi em đạt nhiệm vụ ngày, 120 khi có học chưa đạt, 0 khi chưa học; phần dư ở lại ống nghiệm.
     if(p.luatCap!==LUAT_CAP_MOI)throw new Error('Hồ sơ thần thú đang được cập nhật sang cách lên cấp mới. Em thử lại sau ít phút.')

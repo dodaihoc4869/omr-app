@@ -388,6 +388,37 @@ describe('đạt nhiệm vụ ngày + chuỗi + mảnh khiên', () => {
     expect(dongManh(d).map((x) => [x.khoa.slice(3), x.so])).toEqual([[`manh|dat|${HOM_NAY}`, 1]])
     expect(docHoSoGame(d).khienRen).toEqual({ manh: 1, daRen: 0 })
   })
+
+  it('CNH-1.0 P08: CỬA ĐÓNG (mặc định) ⇒ ngày đạt KHÔNG chạm substrate P08', async () => {
+    const d = await dung()
+    luuKeHoach(d, { toiThieu: 4 })
+    await lamBonCau(d)
+    d.sql.prepare("INSERT INTO cnh_exp_account (student_id, wallet_exp, earned_exp, revision) VALUES ('S1', 0, 0, 0)").run()
+    d.sql.prepare("INSERT INTO cnh_exp_p08_state (student_id, absorbed_day, invested_exp, level) VALUES ('S1', ?, 0, 1)").run(HOM_NAY)
+    await capNhatExp(d.env, 'S1', NOW)
+    expect(dongManh(d).length).toBe(1) // đường CŨ vẫn ghi sổ mảnh cũ
+    expect(Number((d.sql.prepare('SELECT COUNT(*) AS n FROM cnh_exp_fragment_ledger').get() as { n: number }).n)).toBe(0)
+  })
+
+  it('CNH-1.0 P08: CỬA MỞ ⇒ ngày đạt GHI THÊM sổ mảnh v1 + `fragment_balance` (§7.1)', async () => {
+    // Móc quan trọng nhất: không có nó thì `fragment_balance` mãi = 0 ⇒ không bao giờ đủ 21 mảnh đổi khiên.
+    const d = await dung()
+    luuKeHoach(d, { toiThieu: 4 })
+    await lamBonCau(d)
+    d.sql.prepare("INSERT INTO cnh_exp_account (student_id, wallet_exp, earned_exp, revision) VALUES ('S1', 0, 0, 0)").run()
+    d.sql.prepare("INSERT INTO cnh_exp_p08_state (student_id, absorbed_day, invested_exp, level) VALUES ('S1', ?, 0, 1)").run(HOM_NAY)
+    d.sql
+      .prepare("INSERT OR REPLACE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('cnh_exp_kich_hoat',?,'x')")
+      .run(JSON.stringify({ bangDaChay: true, phienBanChinhSach: 'CNH-1.0', duongCuConBat: false, viMoiLaChu: true, anhChupDaNoi: true }))
+    await capNhatExp(d.env, 'S1', NOW)
+    // Đường CŨ nguyên vẹn + P08 ghi THÊM đúng ngày đạt.
+    expect(dongManh(d).length).toBe(1)
+    const soP08 = d.sql.prepare('SELECT learning_day AS ngay, delta AS d FROM cnh_exp_fragment_ledger WHERE student_id = ?').all('S1') as { ngay: string; d: number }[]
+    expect(soP08).toHaveLength(1)
+    expect(soP08[0]).toMatchObject({ ngay: HOM_NAY, d: 1 })
+    const st = d.sql.prepare("SELECT fragment_balance AS f, achieved_days AS a FROM cnh_exp_p08_state WHERE student_id = 'S1'").get() as { f: number; a: number }
+    expect(st).toMatchObject({ f: 1, a: 1 })
+  })
   it('chuỗi 6 ngày trước đều đạt → hôm nay là ngày thứ 7: +14 EXP; khoá `chuoi7` giữ sổ với 0 mảnh (thầy lệnh 21/09), mảnh chỉ +1 của ngày đạt', async () => {
     const d = await dung()
     luuKeHoach(d, { toiThieu: 4 })

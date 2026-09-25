@@ -157,8 +157,60 @@ export const giayCuaHiep = (hiep: number, cau?: readonly { phan?: string; mucDo?
   }
   return Math.max(90, ...cau.map(muc))
 }
-/** Đồng hồ do nơi gọi đưa vào (mili giây) — lõi không tự đọc giờ. */
-export const hetGioHiep = (batDauLuc: number, bayGio: number, hiep: number) => bayGio - batDauLuc >= giayCuaHiep(hiep) * 1000
+
+// ───────── `02` §8 (CNH-1.0): HẠN MỀM THEO DỰ BÁO CÁ NHÂN + ĐỒNG HỒ ĐỘI THEO TASK ĐANG MỞ ─────────
+//
+// §8 nguyên văn: *"Bình thường dùng hạn mềm = ceil(1,25 × solveSeconds), tối thiểu 60 giây; KHÔNG
+// chặn cứng ở 180 giây nếu dự báo cá nhân cần lâu hơn. … Đồng hồ đội dùng max soft time của các
+// nhiệm vụ ĐANG MỞ, tối đa 300 giây/hiệp."*
+//
+// ⚠️ CỜ MẶC ĐỊNH TẮT: `giayCuaHiep` ở trên (kẹp 60..180, theo CÂU) vẫn là đường ĐANG CHẠY. Ba hàm
+// dưới đây là đường MỚI (theo `solveSeconds` §5.1 + danh sách task ĐANG MỞ); chỉ bật khi Boss quyết,
+// vì đổi chúng là đổi NHỊP GAME ĐANG SỐNG. Gọi đến chúng là việc của nơi nối (cùng lúc với mô hình
+// vòng đời task `TaskDoan`).
+export const DUNG_DONG_HO_MEM_THEO_8 = false
+/** Hạn mềm tối thiểu 60 giây (§8). */
+export const GIAY_MEM_TOI_THIEU = 60
+/** Trần đồng hồ đội 300 giây/hiệp (§8). */
+export const GIAY_DONG_HOI_TOI_DA = 300
+
+/** HẠN MỀM một task = `max(60, ceil(1,25 × solveSeconds))` (§8). KHÔNG kẹp ở 180. */
+export const giayMemMotTask = (solve: number): number => {
+  if (!Number.isFinite(solve) || solve < 0) throw new Error(`solveSeconds phải >= 0, nhận ${String(solve)}`)
+  return Math.max(GIAY_MEM_TOI_THIEU, Math.ceil(1.25 * solve))
+}
+
+/** ĐỒNG HỒ ĐỘI = `min(300, max(hạn mềm của các task ĐANG MỞ))`; không có task mở ⇒ `0` (§8). */
+export const giayDongHoiMoCua = (giayMemCacTaskMo: readonly number[]): number =>
+  giayMemCacTaskMo.length === 0 ? 0 : Math.min(GIAY_DONG_HOI_TOI_DA, Math.max(...giayMemCacTaskMo))
+
+/**
+ * CHỌN ĐƯỜNG THEO CỜ — nơi nối gọi hàm này thay cho việc tự rẽ nhánh:
+ *   * Cờ TẮT (mặc định) ⇒ `giayCuaHiep(hiep, cau)` — NGUYÊN nhịp cũ.
+ *   * Cờ BẬT **và** có danh sách hạn mềm của task đang mở ⇒ §8: `min(300, max(hạn mềm))`.
+ *   * Cờ BẬT nhưng danh sách RỖNG (chưa có mô hình task đang mở) ⇒ **quay về nhịp CŨ**, KHÔNG trả `0`
+ *     (§8 không cho phép hết giờ tức thì; trả 0 sẽ làm mọi hiệp hết giờ ngay — đó là lý do cờ còn TẮT).
+ */
+export const giayHiepTheoCo = (
+  hiep: number,
+  cau: readonly { phan?: string; mucDo?: string | null; soTu?: number | null; coHinh?: boolean | null }[] | undefined,
+  giayMemCacTaskMo: readonly number[],
+  /** Cờ — mặc định hằng số trên; tham số hoá để TEST được cả hai đường (cờ BẬT vẫn không bật trên thật). */
+  co: boolean = DUNG_DONG_HO_MEM_THEO_8,
+): number => (co && giayMemCacTaskMo.length > 0 ? giayDongHoiMoCua(giayMemCacTaskMo) : giayCuaHiep(hiep, cau))
+
+/**
+ * Đồng hồ do nơi gọi đưa vào (mili giây) — lõi không tự đọc giờ.
+ * `cau` và `giayMemCacTaskMo` là TUỲ CHỌN: chỉ có tác dụng khi cờ §8 BẬT **và** có task đang mở
+ * (xem `giayHiepTheoCo`). Không truyền gì ⇒ NGUYÊN hành vi cũ (nhịp theo CÂU).
+ */
+export const hetGioHiep = (
+  batDauLuc: number,
+  bayGio: number,
+  hiep: number,
+  cau?: readonly { phan?: string; mucDo?: string | null; soTu?: number | null; coHinh?: boolean | null }[],
+  giayMemCacTaskMo: readonly number[] = [],
+) => bayGio - batDauLuc >= giayHiepTheoCo(hiep, cau, giayMemCacTaskMo) * 1000
 const rut = (hatGiong: string, nhan: string) => mulberry32(hashSeed(`${hatGiong}|${nhan}`))()
 const saoChep = <T>(x: T): T => JSON.parse(JSON.stringify(x))
 const gheDoMay = (g: GheDoan) => g.laMay || g.roi

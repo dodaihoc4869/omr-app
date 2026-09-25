@@ -1,0 +1,181 @@
+{
+  "policyVersion": "CNH-1.0",
+  "date": "2026-09-23",
+  "timezone": "Asia/Ho_Chi_Minh",
+  "utcOffsetMinutes": 420,
+  "economy": {
+    "coreCap": 220,
+    "optionalCap": 120,
+    "achievedAbsorbCap": 200,
+    "studiedAbsorbCap": 120,
+    "noneAbsorbCap": 0,
+    "reserveExp": 400,
+    "expToGold": 1,
+    "fragmentPerAchievedDay": 1,
+    "fragmentsPerShield": 21,
+    "firstShieldMinAchievedDays": 21,
+    "shieldMinLevel": 10,
+    "firstShieldExpCost": 0,
+    "laterShieldExpCost": 300,
+    "maxUnusedShields": 5,
+    "maxLevel": 120,
+    "firstNineBars": [
+      120,
+      150,
+      180,
+      220,
+      260,
+      300,
+      350,
+      390,
+      430
+    ],
+    "postLevel10Curve": "existing-versioned-table",
+    "enable365DayCurve": false,
+    "absenceAssetPenalty": false,
+    "autoAbsorbDefault": false,
+    "baseValidCoreAttempt": 2,
+    "correctCorePrice": {
+      "I": [
+        2,
+        3,
+        5
+      ],
+      "II": [
+        3,
+        5,
+        8
+      ],
+      "III": [
+        4,
+        6,
+        10
+      ]
+    },
+    "optionalPrice": {
+      "due_review": 6,
+      "transfer": 10,
+      "repair_complete": 20,
+      "peer_help": 5
+    },
+    "helpDailyCountCap": 5
+  },
+  "learning": {
+    "difficultyValues": [
+      0,
+      1,
+      2
+    ],
+    "initialWorkingLevel": 0,
+    "evidenceWindowDays": 30,
+    "minFamilies": 5,
+    "minEvidenceDays": 2,
+    "minCorrectInLatestFiveFamilies": 4,
+    "probePerSkillPerDay": 1,
+    "independentUnit": "skill+difficulty+family+VN-day:first-independent",
+    "repairWindowDays": 7,
+    "repairErrors": 3,
+    "repairMinFamilies": 2,
+    "consecutiveWrongForSupport": 2,
+    "recoveryInterveningTasks": 2,
+    "recoveryActiveGapSeconds": 300,
+    "stableGapSeconds": 86400,
+    "maintenanceSuccessFraction": 0.8,
+    "consolidationSuccessFraction": 0.6,
+    "returnGapDays": 3,
+    "weeklyStudyTarget": 5,
+    "weeklyWindowDays": 7
+  },
+  "memory": {
+    "library": "ts-fsrs",
+    "libraryVersion": "5.4.2",
+    "model": "FSRS-6",
+    "retention": 0.9,
+    "fuzz": false,
+    "shortTerm": false,
+    "enableFSRS7": false,
+    "dailyIndependentObservationCap": 1,
+    "wrongWinsWithinDay": true
+  },
+  "planning": {
+    "defaultSeconds": 1200,
+    "choicesSeconds": [
+      300,
+      480,
+      600,
+      900,
+      1200,
+      1800
+    ],
+    "returnSeconds": 480,
+    "maxRoundQuestions": 6,
+    "maxRegularPerFamilyPerRound": 1,
+    "maxRepairPerFamilyPerRound": 2,
+    "maxUnknownFamilyPerRound": 1,
+    "baseSeconds": {
+      "I": [
+        75,
+        105,
+        150
+      ],
+      "II": [
+        150,
+        210,
+        300
+      ],
+      "III": [
+        120,
+        180,
+        240
+      ]
+    },
+    "readingCharThreshold": 300,
+    "readingCharStep": 120,
+    "readingSecondsPerStep": 10,
+    "readingExtraCap": 120,
+    "mediaSecondsEach": 30,
+    "mediaExtraCap": 90,
+    "tempoMinSamples": 5,
+    "tempoMaxSamples": 20,
+    "tempoWindowDays": 30,
+    "tempoMinActiveSeconds": 10,
+    "tempoMaxActiveSeconds": 900,
+    "tempoFactorMin": 0.75,
+    "tempoFactorMax": 2,
+    "feedbackMinSeconds": 30,
+    "feedbackFraction": 0.25,
+    "workedExampleSeconds": 90,
+    "scoreWeights": {
+      "repair": 0.3,
+      "review": 0.25,
+      "transfer": 0.2,
+      "fit": 0.15,
+      "coverage": 0.1
+    }
+  },
+  "escort": {
+    "softTimeFactor": 1.25,
+    "minSoftSeconds": 60,
+    "maxTeamRoundSeconds": 300,
+    "sessionSeconds": 86400,
+    "timeoutMeansIncorrect": false
+  },
+  "technical": {
+    "reservationLeaseSeconds": 900,
+    "maxCasTries": 5,
+    "casBackoffMs": [
+      20,
+      40,
+      80,
+      160,
+      320
+    ],
+    "cutover": "next-VN-midnight",
+    "boardTrigger": "manual-only",
+    "numericalAbsoluteToleranceExclusive": 0.0001,
+    "planWarmP95Ms": 300,
+    "planColdP95Ms": 1000,
+    "submitP95Ms": 500
+  }
+}
+

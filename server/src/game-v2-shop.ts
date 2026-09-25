@@ -9,6 +9,7 @@
 //   shop-mua: (a) INSERT sở hữu NẾU chưa có dòng sổ mang khoá này, đủ vàng, và số cái đã bán < giới hạn; (b) INSERT sổ vàng (−giá) và (c) mặc món NẾU dòng sở hữu của CHÍNH lượt này có mặt. Hai em cùng mua cái cuối ⇒ lô sau thấy đủ số cái ⇒ het_suat.
 // Bấm lặp (cùng khoaYeuCau) ⇒ đọc sổ trước: đã có ⇒ trả kết quả cũ `lapLai:true`, không ghi thêm.
 import { EXP_DU_TRU } from '../../src/lib/kinh-te-game'
+import { cuaP08Mo, doiVangQuaP08 } from './cnh-exp-adapter'
 import type { Env } from './kieu'
 import type { Profile } from './game-v2'
 import { DemTTL } from './dem-chung'
@@ -135,6 +136,21 @@ async function vangXem(env: Env, sbd: string, p: Profile, nowMs: number): Promis
 async function vangDoi(env: Env, sbd: string, p0: Profile, revision0: number, b: Record<string, unknown>, docLai: () => Promise<{ profile: Profile; revision: number }>): Promise<Kq> {
   const khoa = String(b.khoaYeuCau ?? ''), soExp = b.soExp
   if (!KHOA_YEU_CAU.test(khoa) || typeof soExp !== 'number' || !Number.isInteger(soExp) || soExp < 1) return loi('sai_dau_vao')
+  // CNH-1.0 P08 (§8): CỬA P08 MỞ ⇒ đi lệnh `doiVangCore` (ghi sổ tiêu P08 + `vang_so` trong CÙNG giao dịch,
+  // dự trữ 400 do hàm thuần giữ). Cửa ĐÓNG (mặc định) ⇒ nguyên đường cũ bên dưới, KHÔNG đổi hành vi.
+  {
+    const cua = await cuaP08Mo(env)
+    if (cua.choPhep) {
+      const kq = await doiVangQuaP08(env, '/game-v2/vang-doi', {
+        studentId: sbd,
+        learningDay: ngayVn(Date.now()),
+        requestId: khoa,
+        requestHash: `doi-vang|${sbd}|${khoa}`,
+        soExp,
+      })
+      return { ok: true, daDoi: kq.soExp, vang: kq.goldAfter, ongNghiem: kq.walletAfter, ngayAn: conNgayAn(kq.walletAfter), lapLai: false }
+    }
+  }
   if (!(await moCua(env, sbd))) return loi('tam_dong')
   const ketQua = async (daDoi: number, wallet: number, lapLai: boolean): Promise<Kq> => ({ ok: true, daDoi, vang: await docVang(env, sbd), ongNghiem: wallet, ngayAn: conNgayAn(wallet), lapLai })
   const cu = await docSoKhoa(env, sbd, khoa)

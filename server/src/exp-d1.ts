@@ -25,6 +25,7 @@ import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
 import { docHapThuChoEm, nhanExpGame } from './game-v2-hap-thu'
 import type { Profile } from './game-v2'
 import { tinhDatNhiemVuNgay } from '../../src/lib/dat-nhiem-vu-ngay'
+import { cuaP08Mo, ghiManhQuaP08 } from './cnh-exp-adapter'
 import type { ThieuDat } from '../../src/lib/dat-nhiem-vu-ngay'
 import { ngayVn } from './su-kien-hoc'
 
@@ -515,6 +516,25 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
     lenh.push(env.DB.prepare(CHEN_MANH).bind(json(g.map((k) => ({ k: `${sbd}|${k.khoa}`, s: sbd, n: k.ngay, l: k.loai, o: k.so, t: k.luc, c: k.ghiChu })))))
   }
   for (const g of chunk(lenh, 25)) await env.DB.batch(g)
+
+  // CNH-1.0 P08 (§7.1): CỬA P08 MỞ ⇒ ghi CÙNG các NGÀY ĐẠT sang SỔ MẢNH v1 (`cnh_exp_fragment_ledger`).
+  // ⚠️ KHÔNG có bước này thì `cnh_exp_p08_state.fragment_balance` MÃI = 0 ⇒ KHÔNG BAO GIỜ đủ 21 mảnh đổi khiên.
+  // Cửa ĐÓNG (mặc định) ⇒ KHÔNG chạm substrate P08. Lỗi ở nhánh này KHÔNG được làm hỏng đường EXP cũ
+  // (em chưa chuyển đổi ⇒ `NOT_FOUND` là BÌNH THƯỜNG, bỏ qua im lặng).
+  {
+    const cuaP08 = await cuaP08Mo(env)
+    if (cuaP08.choPhep) {
+      for (const m of cacManh) {
+        if (m.loai !== 'dat') continue // mảnh chỉ sinh từ NGÀY ĐẠT (§7.1). `dang`/`chuoi7` cũ KHÔNG cấp mảnh.
+        try {
+          await ghiManhQuaP08(env, '/game-v2/invest', { studentId: sbd, learningDay: m.ngay, requestId: `manh|${sbd}|${m.ngay}`, requestHash: `manh|${sbd}|${m.ngay}`, daDat: true })
+        } catch (e) {
+          const ma = (e as { ma?: string }).ma
+          if (ma !== 'NOT_FOUND') console.error('[cnh-exp-p08] ghi mảnh P08 lỗi (bỏ qua, đường cũ vẫn đúng):', e instanceof Error ? e.message : e)
+        }
+      }
+    }
+  }
 
   const daCong = await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
   const trangThaiDat: TrangThaiDatNgay | null = chiTietDat

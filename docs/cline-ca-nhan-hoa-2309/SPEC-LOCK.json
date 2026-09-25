@@ -1,0 +1,825 @@
+{
+  "specVersion": "CNH-1.0",
+  "purpose": "Phát hiện thay đổi đặc tả/danh mục vô ý; không là bảo đảm tính đúng code.",
+  "files": {
+    "CLINE-BAT-DAU-CA-NHAN-HOA-2309.md": "1736597aa5d3df38148c758304b91bc90b3528a8403632c508b8da5ff0624a03",
+    ".clinerules/omr-cnh-1.md": "58c2897cd08142326b2a6df946c2821be67c0b960b5e5e8a00e8f2ee46df8730",
+    "docs/cline-ca-nhan-hoa-2309/00-HUONG-DAN.md": "218bc93f3971aa229a46b590e54f78c6a4e15d105d9631b55cfaca5424cd9a58",
+    "docs/cline-ca-nhan-hoa-2309/01-QUYET-DINH-DA-CHOT.md": "6d448371718c8c56d9067a082d8585d11b713b0b3f6b3e42fd5ef5daabfaabbf",
+    "docs/cline-ca-nhan-hoa-2309/02-HOC-TAP-VA-RUT-CAU.md": "54f722aa3cd51791f88160c6e698f665cbf4c07bd04f9f2d48ddd0f8f345d509",
+    "docs/cline-ca-nhan-hoa-2309/03-EXP-CAP-KHIEN.md": "86f1cc54e1cbdff8ec1a3e2924de4db9e2eb23924e7b392483f9e3e66bae662f",
+    "docs/cline-ca-nhan-hoa-2309/04-DU-LIEU-API-DONG-THOI.md": "d8dfded9ecd1166b1f944f299859068e57c1d0096ac9e5197f18e621a0e575f8",
+    "docs/cline-ca-nhan-hoa-2309/05-GOI-THI-CONG.md": "404547d522891c452f219a2c3ddf2851c0c54bdecdcd16a10f66a6c927822864",
+    "docs/cline-ca-nhan-hoa-2309/06-NGHIEM-THU.md": "e3406c69d3c030307961ca1a0b005b3b14f84d88aabfee187e4209f9ab8dac01",
+    "docs/cline-ca-nhan-hoa-2309/07-PHAT-HANH-VA-DO-LUONG.md": "9e38fa1b6335c5253ce527f2da404217a9fbbab452446d9c10dbb74e8a27fdc1",
+    "docs/cline-ca-nhan-hoa-2309/THAM-SO.json": "81a8bbc70a9f8b2a79fdc82beac86f3ebceb86e67dbf1d04ddb13a43ca5f2bfc",
+    "docs/cline-ca-nhan-hoa-2309/MAU-KET-QUA.json": "f396f98601957fab50f0db66376ef22050a1d52c55c2b1b9a5f7b9e1a76b18d3",
+    "docs/cline-ca-nhan-hoa-2309/kiem-tra-bo-ban-giao.mjs": "39069a9253f5c078c1ca332860aaa3f9260c3508a07c219b17bf69060dc3f0fc"
+  },
+  "requirements": [
+    {
+      "id": "R01",
+      "phase": "P00",
+      "level": "code",
+      "title": "Baseline và bản đồ tất cả đường gọi",
+      "tests": [
+        "T48"
+      ]
+    },
+    {
+      "id": "R02",
+      "phase": "P01",
+      "level": "code",
+      "title": "Hợp đồng có version, runtime validation, tham số thống nhất",
+      "tests": [
+        "T34",
+        "T40",
+        "T50"
+      ]
+    },
+    {
+      "id": "R03",
+      "phase": "P01",
+      "level": "code",
+      "title": "Chấm tương đương số và từng ý đúng chính sách",
+      "tests": [
+        "T19",
+        "T33"
+      ]
+    },
+    {
+      "id": "R04",
+      "phase": "P07",
+      "level": "code",
+      "title": "Sửa điểm, hồ sơ và bù quyền đúng một lần",
+      "tests": [
+        "T20",
+        "T32"
+      ]
+    },
+    {
+      "id": "R05",
+      "phase": "P02",
+      "level": "code",
+      "title": "Phạm vi cá nhân và toàn bộ kiến thức nền",
+      "tests": [
+        "T01",
+        "T02"
+      ]
+    },
+    {
+      "id": "R06",
+      "phase": "P02",
+      "level": "code",
+      "title": "Chất lượng kho, bản sao và family trung thực",
+      "tests": [
+        "T03",
+        "T04",
+        "T40"
+      ]
+    },
+    {
+      "id": "R07",
+      "phase": "P02",
+      "level": "code",
+      "title": "Bảo vệ đề/bản sao/cache và quyền công bố",
+      "tests": [
+        "T11",
+        "T12",
+        "T47"
+      ]
+    },
+    {
+      "id": "R08",
+      "phase": "P03",
+      "level": "code",
+      "title": "Sổ học chuẩn, độc lập với thiết bị và nguồn",
+      "tests": [
+        "T14",
+        "T29",
+        "T32"
+      ]
+    },
+    {
+      "id": "R09",
+      "phase": "P03",
+      "level": "code",
+      "title": "Năng lực theo mức/family/ngày, không theo cấp thú",
+      "tests": [
+        "T05",
+        "T06"
+      ]
+    },
+    {
+      "id": "R10",
+      "phase": "P03",
+      "level": "code",
+      "title": "Đợt cần dạy lại có đường phục hồi",
+      "tests": [
+        "T06",
+        "T17"
+      ]
+    },
+    {
+      "id": "R11",
+      "phase": "P04",
+      "level": "code",
+      "title": "FSRS-6 state đủ, một quan sát độc lập/ngày",
+      "tests": [
+        "T29",
+        "T41"
+      ]
+    },
+    {
+      "id": "R12",
+      "phase": "P04",
+      "level": "code",
+      "title": "Lặp có mục đích và không thưởng lại lỗi cũ",
+      "tests": [
+        "T04",
+        "T07",
+        "T17",
+        "T41"
+      ]
+    },
+    {
+      "id": "R13",
+      "phase": "P05",
+      "level": "code",
+      "title": "Ngân sách thời gian gồm phản hồi, không sàn số câu",
+      "tests": [
+        "T08",
+        "T09"
+      ]
+    },
+    {
+      "id": "R14",
+      "phase": "P05",
+      "level": "code",
+      "title": "Một kế hoạch ngày, mục tiêu không tăng ngầm",
+      "tests": [
+        "T13",
+        "T27",
+        "T40"
+      ]
+    },
+    {
+      "id": "R15",
+      "phase": "P05",
+      "level": "code",
+      "title": "Đạt/có học/chưa học theo rubric đã chốt",
+      "tests": [
+        "T07",
+        "T22",
+        "T40"
+      ]
+    },
+    {
+      "id": "R16",
+      "phase": "P05",
+      "level": "code",
+      "title": "Bộ chọn tất định, fallback không nới quyền/mức",
+      "tests": [
+        "T10",
+        "T12",
+        "T42"
+      ]
+    },
+    {
+      "id": "R17",
+      "phase": "P05",
+      "level": "code",
+      "title": "Giữ chỗ, resume và nộp qua hai client",
+      "tests": [
+        "T13",
+        "T28",
+        "T43"
+      ]
+    },
+    {
+      "id": "R18",
+      "phase": "P06",
+      "level": "code",
+      "title": "Mọi kênh và cờ lùi đang chạy được nối",
+      "tests": [
+        "T42"
+      ]
+    },
+    {
+      "id": "R19",
+      "phase": "P06",
+      "level": "code",
+      "title": "Ngoại lệ bài thầy giao/thi thật không mở kho tự động",
+      "tests": [
+        "T01",
+        "T02",
+        "T42"
+      ]
+    },
+    {
+      "id": "R20",
+      "phase": "P06",
+      "level": "code",
+      "title": "Đoàn theo cá nhân, hạn mềm, không phạt timeout như sai",
+      "tests": [
+        "T38"
+      ]
+    },
+    {
+      "id": "R21",
+      "phase": "P06",
+      "level": "code",
+      "title": "Trợ giúp qua server, không giả bằng chứng độc lập",
+      "tests": [
+        "T29",
+        "T39"
+      ]
+    },
+    {
+      "id": "R22",
+      "phase": "P07",
+      "level": "code",
+      "title": "Quỹ core tới tổng220, giá từng loại rõ",
+      "tests": [
+        "T15",
+        "T16",
+        "T19"
+      ]
+    },
+    {
+      "id": "R23",
+      "phase": "P07",
+      "level": "code",
+      "title": "Optional120, một purpose, chống cày liên màn",
+      "tests": [
+        "T16",
+        "T17",
+        "T18",
+        "T39"
+      ]
+    },
+    {
+      "id": "R24",
+      "phase": "P07",
+      "level": "code",
+      "title": "Ledger/ví/caps/receipt nguyên tử và retry an toàn",
+      "tests": [
+        "T14",
+        "T15",
+        "T28",
+        "T43"
+      ]
+    },
+    {
+      "id": "R25",
+      "phase": "P07",
+      "level": "code",
+      "title": "Ngày VN, sự kiện muộn và embargo",
+      "tests": [
+        "T27",
+        "T47"
+      ]
+    },
+    {
+      "id": "R26",
+      "phase": "P08",
+      "level": "code",
+      "title": "Hấp thụ200/120/0, cấp10 sớm nhất ngày12",
+      "tests": [
+        "T21",
+        "T22"
+      ]
+    },
+    {
+      "id": "R27",
+      "phase": "P08",
+      "level": "code",
+      "title": "Một quyền khiên mỗi21mảnh, first từ21ngày",
+      "tests": [
+        "T23",
+        "T24",
+        "T25"
+      ]
+    },
+    {
+      "id": "R28",
+      "phase": "P08",
+      "level": "code",
+      "title": "Dự trữ400, rèn300, đổi vàng/mua nguyên tử",
+      "tests": [
+        "T25",
+        "T26"
+      ]
+    },
+    {
+      "id": "R29",
+      "phase": "P08",
+      "level": "code",
+      "title": "Không phạt vắng bằng mất tài sản, giữ kho cũ",
+      "tests": [
+        "T30",
+        "T31"
+      ]
+    },
+    {
+      "id": "R30",
+      "phase": "P08",
+      "level": "code",
+      "title": "Migration mọi nhánh legacy, rerun và CAS",
+      "tests": [
+        "T31",
+        "T45"
+      ]
+    },
+    {
+      "id": "R31",
+      "phase": "P10",
+      "level": "code",
+      "title": "Snapshot/correction bằng full replay",
+      "tests": [
+        "T32",
+        "T41"
+      ]
+    },
+    {
+      "id": "R32",
+      "phase": "P09",
+      "level": "code",
+      "title": "Trải nghiệm ba app, quay lại, tuần và nhắc có điều kiện",
+      "tests": [
+        "T30",
+        "T46"
+      ]
+    },
+    {
+      "id": "R33",
+      "phase": "P09",
+      "level": "code",
+      "title": "Nút gọi lên bảng, không timer tự gọi",
+      "tests": [
+        "T35"
+      ]
+    },
+    {
+      "id": "R34",
+      "phase": "P09",
+      "level": "code",
+      "title": "Giao diện không tràn trên ba app",
+      "tests": [
+        "T36"
+      ]
+    },
+    {
+      "id": "R35",
+      "phase": "P09",
+      "level": "code",
+      "title": "Ca/API server chung, cấu hình production hợp lệ",
+      "tests": [
+        "T13",
+        "T48"
+      ]
+    },
+    {
+      "id": "R36",
+      "phase": "P10",
+      "level": "code",
+      "title": "Hiệu năng có số đo và không đổi tính đúng",
+      "tests": [
+        "T44"
+      ]
+    },
+    {
+      "id": "R37",
+      "phase": "P10",
+      "level": "code",
+      "title": "Restore và rollback tương thích bảo toàn giao dịch",
+      "tests": [
+        "T45"
+      ]
+    },
+    {
+      "id": "R38",
+      "phase": "P10",
+      "level": "code",
+      "title": "Tích hợp, build, typecheck và kiểm thử không bỏ sót",
+      "tests": [
+        "T42",
+        "T48",
+        "T50"
+      ]
+    },
+    {
+      "id": "R39",
+      "phase": "P11",
+      "level": "deployment",
+      "title": "Mở/nộp ca trên hai thiết bị và mạng khác thật",
+      "tests": [
+        "T37"
+      ]
+    },
+    {
+      "id": "R40",
+      "phase": "P11",
+      "level": "deployment",
+      "title": "Version triển khai và dữ liệu cũ đối chiếu thật",
+      "tests": [
+        "T31",
+        "T45"
+      ]
+    },
+    {
+      "id": "R41",
+      "phase": "P11",
+      "level": "deployment",
+      "title": "Ba app, hiệu năng/canary/rollback bản phát hành đã xác minh",
+      "tests": [
+        "T37",
+        "T44",
+        "T46"
+      ]
+    },
+    {
+      "id": "R42",
+      "phase": "P11",
+      "level": "learning",
+      "title": "Hiệu quả học tập được đánh giá đúng dữ liệu và giới hạn",
+      "tests": [
+        "T49"
+      ]
+    }
+  ],
+  "tests": [
+    {
+      "id": "T01",
+      "phase": "P02",
+      "level": "code",
+      "title": "Phạm vi từng em"
+    },
+    {
+      "id": "T02",
+      "phase": "P02",
+      "level": "code",
+      "title": "Đủ tất cả nền"
+    },
+    {
+      "id": "T03",
+      "phase": "P02",
+      "level": "code",
+      "title": "Kho thiếu nhãn/thu hồi"
+    },
+    {
+      "id": "T04",
+      "phase": "P04",
+      "level": "code",
+      "title": "Bản sao và family"
+    },
+    {
+      "id": "T05",
+      "phase": "P03",
+      "level": "code",
+      "title": "Không nhảy bậc từ câu dễ"
+    },
+    {
+      "id": "T06",
+      "phase": "P03",
+      "level": "code",
+      "title": "Phục hồi sau ba lỗi"
+    },
+    {
+      "id": "T07",
+      "phase": "P05",
+      "level": "code",
+      "title": "Ôn duy trì được đạt"
+    },
+    {
+      "id": "T08",
+      "phase": "P05",
+      "level": "code",
+      "title": "600 giây không thành 32 phút"
+    },
+    {
+      "id": "T09",
+      "phase": "P06",
+      "level": "code",
+      "title": "Game dùng phần còn lại"
+    },
+    {
+      "id": "T10",
+      "phase": "P05",
+      "level": "code",
+      "title": "Fallback không tăng khó"
+    },
+    {
+      "id": "T11",
+      "phase": "P02",
+      "level": "code",
+      "title": "Bảo vệ bản sao BTVN"
+    },
+    {
+      "id": "T12",
+      "phase": "P05",
+      "level": "code",
+      "title": "Cache cũ"
+    },
+    {
+      "id": "T13",
+      "phase": "P05",
+      "level": "code",
+      "title": "Hai app đồng thời"
+    },
+    {
+      "id": "T14",
+      "phase": "P07",
+      "level": "code",
+      "title": "Idempotency ngữ nghĩa"
+    },
+    {
+      "id": "T15",
+      "phase": "P07",
+      "level": "code",
+      "title": "Bù core đồng thời"
+    },
+    {
+      "id": "T16",
+      "phase": "P07",
+      "level": "code",
+      "title": "Trần hai quỹ"
+    },
+    {
+      "id": "T17",
+      "phase": "P07",
+      "level": "code",
+      "title": "Không thưởng vì lỗi cũ"
+    },
+    {
+      "id": "T18",
+      "phase": "P07",
+      "level": "code",
+      "title": "Một purpose"
+    },
+    {
+      "id": "T19",
+      "phase": "P01",
+      "level": "code",
+      "title": "Phần II từng ý"
+    },
+    {
+      "id": "T20",
+      "phase": "P07",
+      "level": "code",
+      "title": "Sửa đáp án"
+    },
+    {
+      "id": "T21",
+      "phase": "P08",
+      "level": "code",
+      "title": "Cấp 10 không sớm"
+    },
+    {
+      "id": "T22",
+      "phase": "P08",
+      "level": "code",
+      "title": "Studied rồi achieved"
+    },
+    {
+      "id": "T23",
+      "phase": "P08",
+      "level": "code",
+      "title": "Mốc 21 ngày"
+    },
+    {
+      "id": "T24",
+      "phase": "P08",
+      "level": "code",
+      "title": "Quà và rèn cùng quyền"
+    },
+    {
+      "id": "T25",
+      "phase": "P08",
+      "level": "code",
+      "title": "Khiên tiếp theo"
+    },
+    {
+      "id": "T26",
+      "phase": "P08",
+      "level": "code",
+      "title": "Dự trữ và loại tiền"
+    },
+    {
+      "id": "T27",
+      "phase": "P07",
+      "level": "code",
+      "title": "0 giờ và sự kiện muộn"
+    },
+    {
+      "id": "T28",
+      "phase": "P07",
+      "level": "code",
+      "title": "Mất mạng sau commit"
+    },
+    {
+      "id": "T29",
+      "phase": "P03",
+      "level": "code",
+      "title": "Gợi ý qua màn khác"
+    },
+    {
+      "id": "T30",
+      "phase": "P09",
+      "level": "code",
+      "title": "Quay lại không mất tài sản"
+    },
+    {
+      "id": "T31",
+      "phase": "P08",
+      "level": "code",
+      "title": "Migration đầy đủ các nhánh"
+    },
+    {
+      "id": "T32",
+      "phase": "P03",
+      "level": "code",
+      "title": "Replay và correction"
+    },
+    {
+      "id": "T33",
+      "phase": "P01",
+      "level": "code",
+      "title": "Số/đơn vị/biên chấm"
+    },
+    {
+      "id": "T34",
+      "phase": "P01",
+      "level": "code",
+      "title": "Snapshot và version"
+    },
+    {
+      "id": "T35",
+      "phase": "P09",
+      "level": "code",
+      "title": "Gọi lên bảng thủ công"
+    },
+    {
+      "id": "T36",
+      "phase": "P09",
+      "level": "code",
+      "title": "Không tràn ba app"
+    },
+    {
+      "id": "T37",
+      "phase": "P11",
+      "level": "deployment",
+      "title": "Ca thi mạng khác"
+    },
+    {
+      "id": "T38",
+      "phase": "P06",
+      "level": "code",
+      "title": "Đoàn vừa mức/vừa thời gian"
+    },
+    {
+      "id": "T39",
+      "phase": "P07",
+      "level": "code",
+      "title": "Giúp bạn và farm nhiều màn"
+    },
+    {
+      "id": "T40",
+      "phase": "P05",
+      "level": "code",
+      "title": "Kho nhỏ/mục tiêu không tăng"
+    },
+    {
+      "id": "T41",
+      "phase": "P04",
+      "level": "code",
+      "title": "FSRS ngày/card"
+    },
+    {
+      "id": "T42",
+      "phase": "P06",
+      "level": "code",
+      "title": "Không sót đường gọi"
+    },
+    {
+      "id": "T43",
+      "phase": "P07",
+      "level": "code",
+      "title": "D1 thất bại từng bước"
+    },
+    {
+      "id": "T44",
+      "phase": "P10",
+      "level": "code",
+      "title": "Tải và chi phí"
+    },
+    {
+      "id": "T45",
+      "phase": "P10",
+      "level": "code",
+      "title": "Restore/rollback"
+    },
+    {
+      "id": "T46",
+      "phase": "P09",
+      "level": "code",
+      "title": "Động lực có công học"
+    },
+    {
+      "id": "T47",
+      "phase": "P07",
+      "level": "code",
+      "title": "Không lộ điểm trước công bố"
+    },
+    {
+      "id": "T48",
+      "phase": "P10",
+      "level": "code",
+      "title": "Toàn dự án và cấu hình"
+    },
+    {
+      "id": "T49",
+      "phase": "P11",
+      "level": "learning",
+      "title": "Đánh giá học tập thật"
+    },
+    {
+      "id": "T50",
+      "phase": "P10",
+      "level": "code",
+      "title": "Version và phương án chưa bật"
+    }
+  ],
+  "phases": [
+    {
+      "id": "P00",
+      "dependsOn": []
+    },
+    {
+      "id": "P01",
+      "dependsOn": [
+        "P00"
+      ]
+    },
+    {
+      "id": "P02",
+      "dependsOn": [
+        "P01"
+      ]
+    },
+    {
+      "id": "P03",
+      "dependsOn": [
+        "P02"
+      ]
+    },
+    {
+      "id": "P04",
+      "dependsOn": [
+        "P03"
+      ]
+    },
+    {
+      "id": "P05",
+      "dependsOn": [
+        "P04"
+      ]
+    },
+    {
+      "id": "P06",
+      "dependsOn": [
+        "P05"
+      ]
+    },
+    {
+      "id": "P07",
+      "dependsOn": [
+        "P06"
+      ]
+    },
+    {
+      "id": "P08",
+      "dependsOn": [
+        "P07"
+      ]
+    },
+    {
+      "id": "P09",
+      "dependsOn": [
+        "P08"
+      ]
+    },
+    {
+      "id": "P10",
+      "dependsOn": [
+        "P09"
+      ]
+    },
+    {
+      "id": "P11",
+      "dependsOn": [
+        "P10"
+      ]
+    }
+  ]
+}
