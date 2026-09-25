@@ -9,6 +9,8 @@ import {dungLaiHoSo,docHoSoEm,docDoPhuDang} from './ho-so-nam-kt'
 import {hsThoiGianHoc,chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
 import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
+import {chaySetupP08NeuDuoc} from './cnh-exp-p08-setup'
+
 import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
 import {hsOnLaiNop} from './on-lai-nop'
@@ -3092,6 +3094,10 @@ const boXuLy = {
       // CHỐT "ĐẠT NGÀY" còn lại + MẤT KHIÊN KHI VẮNG (khung 00:02–05:00 giờ VN; ngoài khung trả về ngay, không truy vấn). Trừ khiên CHỈ chạy khi chốt ngày đã xong cho mọi em.
       // ĐỢT 1 thần thú mỗi ngày: chuyển đổi hồ sơ đã chơi sang luật cấp mới, ≤ 40 hồ sơ/phút cho tới hết (rồi cờ chuyen_doi_cap = xong, phút sau không truy vấn). Lỗi chỉ ghi nhật ký máy.
       await chuyenDoiLoCron(env,Date.now()).then(r=>{if(r.soDoc>0)console.log('[hap-thu] cron chuyển đổi',JSON.stringify(r))}).catch(async e=>{console.error('[hap-thu] cron lỗi:',e);await ghiLoiMay(env,'hap_thu_chuyen_doi')})
+      // LẮP ĐẶT CNH-1.0 P08 (Cline 2409): (1) khởi tạo ví `cnh_exp_account` → (2) chuyển đổi hồ sơ (`cnh_exp_p08_state`).
+      // CÓ CỜ `cau_hinh.p08_setup_cho_phep`; KHÔNG cờ ⇒ trả về ngay (không truy vấn). Mỗi phút MỘT lô 25 em.
+      // KHÔNG tự bật cờ kích hoạt `cnh_exp_kich_hoat` — đó là quyết định riêng, sau khi job báo `xong`.
+      await chaySetupP08NeuDuoc(env,Date.now()).then(r=>{if(r.chay)console.log('[p08-setup] cron',JSON.stringify({lyDo:r.lyDo,buoc:r.trangThai?.buoc,conTro:r.trangThai?.conTro,khoiTao:r.trangThai?.khoiTao,chuyenDoi:r.trangThai?.chuyenDoi}))}).catch(async e=>{console.error('[p08-setup] cron lỗi:',e);await ghiLoiMay(env,'p08_setup')})
       await chotNgayRoiTruKhien(env,Date.now()).then(r=>{if(r.truKhien?.chay)console.log('[khien-mat] cron',JSON.stringify(r))}).catch(async e=>{console.error('[khien-mat] cron lỗi:',e);await ghiLoiMay(env,'khien_mat')})
       // SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy: tính lại mỗi 10 phút vào bản đệm `cau_hinh.sai_nhanh_gv` (bản còn mới ⇒ chỉ 1 truy vấn đọc); lỗi chỉ ghi log.
       await capNhatSaiNhanhNeuCu(env,Date.now())

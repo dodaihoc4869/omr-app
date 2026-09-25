@@ -494,6 +494,12 @@ export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChay
       // EXP mới cho MỌI em từ đúng lúc bắt đầu (bỏ cờ riêng dsSbd/tuDsSbd): sổ cũ nằm TRƯỚC `tu` nên không sinh EXP; câu cũ từng sai nay làm đúng vẫn lên bậc.
       await env.DB.prepare('INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
         .bind('exp_moi', json({ tu: st.batDauLuc, toanBo: true }), new Date(nowMs).toISOString()).run()
+      // CNH-1.0 P08 (Cline 2409): reset XOÁ `cnh_exp_account` + MỌI bảng `cnh_exp_p08_*` (xem BANG_XOA) ⇒ **trạng thái
+      // lắp đặt P08 PHẢI bị xoá theo**. Giữ `p08_setup = 'xong'` trong khi ví đã mất ⇒ job không chạy lại ⇒ mọi lệnh P08
+      // ném `NOT_FOUND`. Xoá cả ba khoá (`KHOA_TRANG_THAI`/`KHOA_CHO_PHEP`/`KHOA_HUY` của `cnh-exp-p08-setup.ts`) để đợt
+      // lắp đặt sau chạy lại từ đầu. KHÔNG tự bật lại cờ kích hoạt `cnh_exp_kich_hoat` — đó là quyết định riêng.
+      await env.DB.prepare('DELETE FROM cau_hinh WHERE khoa IN (?, ?, ?)')
+        .bind('p08_setup', 'p08_setup_cho_phep', 'p08_setup_huy').run()
       st.demSau = await demCacBang(env, await docBangHienCo(env))
       const conDu: Record<string, number> = {}
       for (const t of BANG_XOA) if ((st.demSau[t] ?? 0) > 0) conDu[t] = st.demSau[t] as number
