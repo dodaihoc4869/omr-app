@@ -10,6 +10,8 @@
 // Bấm lặp (cùng khoaYeuCau) ⇒ đọc sổ trước: đã có ⇒ trả kết quả cũ `lapLai:true`, không ghi thêm.
 import { EXP_DU_TRU } from '../../src/lib/kinh-te-game'
 import { cuaP08Mo, doiVangQuaP08 } from './cnh-exp-adapter'
+import { tramP08LenHienThi } from './cnh-exp-p08-hien-thi'
+
 import type { Env } from './kieu'
 import type { Profile } from './game-v2'
 import { DemTTL } from './dem-chung'
@@ -128,7 +130,10 @@ export async function shopAction(
 
 async function vangXem(env: Env, sbd: string, p: Profile, nowMs: number): Promise<Kq> {
   if (!(await moCua(env, sbd))) return { ok: true, bat: false }
-  const ongNghiem = nguyen(p.wallet)
+  // CNH-1.0 P08 (Cline 25/09): cửa P08 MỞ ⇒ "ống nghiệm" hiển thị là ví P08 (`cnh_exp_account`) — CÙNG nguồn với
+  // lệnh `doiVangCore`, không thì màn đổi vàng nói một số còn lệnh tiêu một số khác.
+  const p08 = await tramP08LenHienThi(env, sbd)
+  const ongNghiem = nguyen(p08 ? p08.wallet : p.wallet)
   const [vang, co] = await Promise.all([docVang(env, sbd), docEmCo(env, sbd, nowMs)])
   return { ok: true, bat: true, vang, ongNghiem, giuLai: GIU_LAI_EXP, doiToiDa: Math.max(0, ongNghiem - GIU_LAI_EXP), ngayAn: conNgayAn(ongNghiem), chuoiNgay: co.chuoiNgay, anThachSang: co.anThachSang, mua: MUA_BAN }
 }

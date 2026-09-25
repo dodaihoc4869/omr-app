@@ -1,5 +1,7 @@
 import {EXP_DU_TRU,EXP_REN_KHIEN} from '../../src/lib/kinh-te-game'
 import {moCuaRoute,cuaP08Mo,hapThuQuaP08,renKhienQuaP08,dungKhienQuaP08} from './cnh-exp-adapter'
+import {tramP08LenHienThi} from './cnh-exp-p08-hien-thi'
+
 import {renKhienBangExp} from './exp-ho-so-game'
 import {normalizePetName} from '../../src/game/than-thu-v2/pet-name'
 import {escortAction,escortContext} from './game-v2-escort'
@@ -193,6 +195,14 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
   const r=await gameV2Tho(env,action,b)
   if(action==='recommendations'&&r&&r.ok===true)r.shopBat=await shopBatCho(env,await gameIdentity(env,b))
+  // CNH-1.0 P08 (Cline 25/09): TRÁM số ví/trạng thái P08 lên MỌI bản hiển thị có `profile` — MỘT chỗ phủ hết
+  // các nhánh trả `visible(p)` bên dưới. CHỈ sửa bản hiển thị (không đụng hồ sơ đã lưu). Cửa ĐÓNG (mặc định)
+  // hoặc em chưa chuyển đổi ⇒ `tram` = null ⇒ giữ nguyên bản cũ. Phản hồi của lệnh P08 đã có `p08` ⇒ bỏ qua
+  // (số đã đúng, và đọc lại ngay sau ghi có thể lệch bản sao).
+  if(r&&r.ok===true&&r.profile&&!r.p08){
+    const tram=await tramP08LenHienThi(env,await gameIdentity(env,b)).catch(()=>null)
+    if(tram)Object.assign(r.profile as Record<string,unknown>,tram)
+  }
   return r
 }
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {

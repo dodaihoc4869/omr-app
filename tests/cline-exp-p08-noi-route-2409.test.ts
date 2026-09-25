@@ -129,3 +129,45 @@ describe('P08 nối route · `shield-use` (§7.2)', () => {
     await expect(goi(d1, 'use-abcdefghijklmnop', 'khoa-dung-khien-01')).rejects.toMatchObject({ ma: 'KHONG_DU_DIEU_KIEN' })
   })
 })
+
+describe('P08 nối route · ĐƯỜNG ĐỌC (trám số P08 lên bản hiển thị)', () => {
+  // ⚠️ Chỉ sửa BẢN HIỂN THỊ. Cửa ĐÓNG (mặc định) hoặc em chưa chuyển đổi ⇒ giữ nguyên số sổ cũ.
+  const lay = async (d: D1That) =>
+    (await gameV2(d.env, 'profile', { token: await gameToken(d.env, 'S1') })) as { profile: Record<string, unknown> }
+  const gieoEm = (d1: D1That, walletCu = 500) => {
+    d1.sql.prepare("INSERT INTO hoc_sinh (sbd, ho_ten, lop, mat_khau, cap_nhat_luc) VALUES ('S1','Em S1','12','mk','x')").run()
+    gieoHoSo(d1, 'S1', walletCu)
+  }
+
+  it('cửa ĐÓNG (mặc định) ⇒ hiển thị ví SỔ CŨ (hành vi y như trước bản vá)', async () => {
+    const d1 = taoD1That()
+    gieoEm(d1, 500)
+    gieoP07(d1, 'S1', { wallet: 900, unused: 3 })
+    const r = await lay(d1)
+    expect(r.profile.wallet).toBe(500)
+    expect(r.profile.ongNghiem).toBe(500)
+    expect(r.profile.khienConLai).toBe(0)
+  })
+
+  it('cửa MỞ ⇒ hiển thị ví P08 (CÙNG nguồn với lệnh P08, không lệch)', async () => {
+    const d1 = taoD1That()
+    gieoEm(d1, 500)
+    gieoP07(d1, 'S1', { wallet: 900, unused: 3, used: 1 })
+    datCua(d1, CUA_MO)
+    const r = await lay(d1)
+    expect(r.profile.wallet).toBe(900)
+    expect(r.profile.ongNghiem).toBe(900)
+    expect(r.profile.cap).toBe(1)
+    expect(r.profile.exp).toBe(0)
+    expect(r.profile.khienConLai).toBe(3)
+    expect(r.profile.khienRen).toMatchObject({ manh: 0, conLai: 3, chuaDung: 3 })
+  })
+
+  it('cửa MỞ nhưng em CHƯA có hàng ví/trạng thái ⇒ giữ nguyên số sổ cũ (chuyển tiếp êm)', async () => {
+    const d1 = taoD1That()
+    gieoEm(d1, 500)
+    datCua(d1, CUA_MO)
+    const r = await lay(d1)
+    expect(r.profile.wallet).toBe(500)
+  })
+})
