@@ -548,6 +548,11 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
  * `since` = ngày bắt đầu mùa game (hồ sơ mùa mới không nhận khoản của mùa cũ).
  */
 export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Promise<DaCong | null> {
+  // CNH-1.0 P08 (Cline 25/09): CỔNG P08 MỞ ⇒ phần EXP vừa cộng vào ví hồ sơ cũng phải GƯƠNG sang
+  // `cnh_exp_account.wallet_exp`. KHÔNG có bước này thì ví P08 ĐỨNG YÊN ở số của đợt cutover trong khi em
+  // kiếm EXP mỗi ngày vào sổ cũ ⇒ bật cờ là màn em đọc ví P08 SAI (EXP em vừa kiếm không hiện ra).
+  // Kiểm cờ MỘT lần cho cả vòng (không đệm: tắt cờ là ngừng gương ngay). Cờ TẮT (mặc định) ⇒ không truy vấn thêm.
+  const moP08 = (await cuaP08Mo(env).catch(() => ({ choPhep: false }))).choPhep
   for (let lan = 0; lan < 3; lan++) {
     const row = await an(() => env.DB.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ revision: number; json: string }>(), null)
     if (!row) return null
@@ -567,8 +572,29 @@ export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Pro
     const ngayDat = Number(t.d) || 0
     if (tongExp === (p.expMoi?.daCong ?? 0) && tongManh === (p.expMoi?.manhDaTinh ?? 0) && ngayDat === (p.expMoi?.ngayDat ?? 0)) return { exp: 0, manh: 0, khienMoi: 0 }
     const ra = congTongSoVaoHoSo(p, tongExp, tongManh, ngayDat)
-    const r = await env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(json(p), sbd, row.revision).run()
-    if (r.meta.changes) return ra
+    const lenh: D1PreparedStatement[] = [
+      env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(json(p), sbd, row.revision),
+    ]
+    // GƯƠNG ví P08: `changes() = 1` buộc câu này CHỈ chạy khi câu trên vừa thắng CAS ⇒ hai sổ cùng đổi hoặc
+    // cùng không. Hàng ví chưa có (em chưa chuyển đổi) ⇒ 0 dòng, vô hại.
+    if (moP08 && ra.exp > 0) {
+      lenh.push(
+        env.DB.prepare(
+          `UPDATE cnh_exp_account
+              SET wallet_exp = wallet_exp + ?, earned_exp = earned_exp + ?, revision = revision + 1, cap_nhat_luc = datetime('now')
+            WHERE student_id = ? AND changes() = 1`,
+        ).bind(ra.exp, ra.exp, sbd),
+      )
+    }
+    let daDoi = 0
+    if (lenh.length > 1) {
+      const r = await env.DB.batch(lenh)
+      daDoi = Number(r[0]?.meta.changes ?? 0)
+    } else {
+      const r = await lenh[0]!.run()
+      daDoi = Number(r.meta.changes ?? 0)
+    }
+    if (daDoi) return ra
   }
   return null
 }
