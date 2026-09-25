@@ -64,6 +64,28 @@ describe('kho CÁ NHÂN cho câu Đoàn', () => {
     expect([...qs].sort()).toEqual(['A-0', 'A-1', 'A-2', 'A-3'])
   })
 
+  it('HỒI QUY 25/09 · em đã làm gần HẾT kho, câu cũ "VỪA ĐÚNG chưa tới 30 ngày": vòng bù VẪN lấy ⇒ phiên đủ 6 câu (hết cảnh "1 câu rồi lặp")', async () => {
+    // LỖI THẬT (thầy báo 25/09): phiên Đoàn của SBD thật chỉ có 1 câu rồi client lặp mãi câu ấy.
+    // Nguyên nhân: em đã làm gần hết kho ⇒ `moi` gần cạn; câu cũ thì "vừa đúng chưa tới 30 ngày" (chưa tới hạn FSRS)
+    // nên `chooseLuotMoi` chặn ở vòng bù ⇒ bù trả 0. Vá: vòng bù bỏ chặn `dung30` (`boQuaDung30`).
+    const d = dung({ soA: 30 })
+    // Em đã làm A-0…A-27 ở NGÀY TRƯỚC (sổ học `su_kien_hoc`) ⇒ `daLam` giữ chúng ⇒ chỉ A-28, A-29 còn là câu MỚI.
+    const ngayTruoc = new Date(T0 - 5 * 86_400_000)
+    const ngayTruocVn = new Date(ngayTruoc.getTime() + 7 * 3600_000).toISOString().slice(0, 10)
+    const skh = d.sql.prepare('INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn, ma_dang) VALUES (?,?,?,?,?,?,?,?,?,?,?)')
+    // … và cả 28 câu ấy VỪA ĐÚNG cách đây 5 ngày (lịch sử game) ⇒ `dung30` = true.
+    const att = d.sql.prepare('INSERT INTO game_v2_attempt(id,sbd,session,qid,content_group,json,created_at) VALUES(?,?,?,?,?,?,?)')
+    for (let i = 0; i < 28; i++) {
+      skh.run(`k${i}`, 'S1', `A-${i}`, 'luyen', 'm', 1, 1, 40, ngayTruoc.toISOString(), ngayTruocVn, 'A.1')
+      att.run(`a${i}`, 'S1', 'sd', `A-${i}`, `g-A-${i}`, JSON.stringify({ attempt: { qid: `A-${i}`, group: `g-A-${i}`, correct: true, at: ngayTruoc.getTime(), assisted: false } }), ngayTruoc.toISOString())
+    }
+    const qs = await caNhanCua(d)
+    // Trước 25/09: chỉ 2 câu MỚI (A-28, A-29) + vòng bù trả 0 (toàn `dung30`) ⇒ phiên 2 câu, tệ hơn nữa là 1 câu khi chỉ còn 1 câu mới.
+    expect(qs).toHaveLength(6)
+    expect(new Set(qs).size).toBe(6)
+    expect([...qs].filter((q) => /^A-(28|29)$/.test(q))).toHaveLength(2) // 2 câu MỚI + 4 câu bù "vừa đúng"
+  })
+
   it('cờ lùi cau_hinh.game_luot_moi = tat ⇒ đường CŨ: em mới báo "Chưa có câu đã chấm, đã công bố…" (không bằng chứng nào)', async () => {
     const d = dung({daHoc:false})
     d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('game_luot_moi','tat','x')").run()

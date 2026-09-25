@@ -175,8 +175,9 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
   let chon=[...uuTienOn,...chooseLuotMoi(moi.filter(q=>!nhomDaChon.has(q.group)),scope.evidence,history,mastery,{...opt,soCau:Math.max(1,soCau-uuTienOn.length)}).slice(0,soCau-uuTienOn.length)],hetCauMoi=false
   if(chon.length<soCau){
     // Bù bằng câu LÂU NHẤT chưa gặp (buCauLauNhat: nới `k` theo luật bậc/đổi câu của chooseLuotMoi, TỐI ĐA TOI_DA_VONG_BU vòng — không lặp theo cỡ kho lớp).
+    // `boQuaDung30:true` (thầy lệnh 25/09, "Đoàn 1 câu rồi lặp"): vòng bù ĐƯỢC lấy câu "vừa đúng chưa tới 30 ngày" (chưa tới hạn FSRS) — chọn LÂU NHẤT chưa gặp — để Đoàn luôn đủ suất; chặn `sai3` vẫn giữ.
     const daChon=new Set(chon.map(x=>x.q.group)),thieu=soCau-chon.length,cuCon=cu.filter(q=>!daChon.has(q.group)&&!opt.dueQids.has(q.qid))
-    const {bu}=buCauLauNhat(cuCon,daLam,lucGame,thieu,ds=>chooseLuotMoi(ds,scope.evidence,history,mastery,{...opt,soCau:thieu}))
+    const {bu}=buCauLauNhat(cuCon,daLam,lucGame,thieu,ds=>chooseLuotMoi(ds,scope.evidence,history,mastery,{...opt,soCau:thieu,boQuaDung30:true}))
     if(bu.length){hetCauMoi=true;chon=[...chon,...bu]}
   }
   if(!chon.length){

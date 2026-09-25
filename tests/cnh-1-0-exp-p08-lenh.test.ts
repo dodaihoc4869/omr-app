@@ -10,6 +10,8 @@ import { doiVangCore, dungKhienCore, ghiManhNgayDat, giaiQuyetKhiendau, hapThuCo
 
 const PHIEN_BAN = 'CNH-1.0'
 const NGAY = '2026-09-24'
+/** `luc` (ISO) của mọi hàng gieo — cột NOT NULL, giá trị chỉ cần hợp lệ. */
+const LUC = '2026-09-24T05:00:00.000Z'
 
 interface Gieo {
   sbd?: string
@@ -24,8 +26,10 @@ interface Gieo {
   gold?: number
   absorbedDay?: string
   absorbedToday?: number
-  /** Ngày VN trong `cnh_exp_day`: `null` = KHÔNG có hàng (chưa học). */
+  /** TRẠNG THÁI NGÀY — nguồn SỔ CŨ: `1` đạt ngày (`exp_so.loai='dat_ngay'`) · `0` có học (`su_kien_hoc` ≥ 4 câu) · `null` chưa học (không gieo gì). */
   achieved?: 0 | 1 | null
+  /** Số câu KHÁC NHAU gieo vào `su_kien_hoc` khi `achieved=0` (mặc định 4 = ngưỡng "có học"). */
+  soCauHoc?: number
 }
 
 /** Gieo ví P07 + trạng thái P08 + hàng ngày. Dùng SQL THẬT để đúng ràng buộc CHECK. */
@@ -58,11 +62,20 @@ function gieo(d1: D1That, o: Gieo = {}): string {
       o.achievedDays ?? 0,
       o.gold ?? 0,
     )
+  // TRẠNG THÁI NGÀY — nguồn THẬT là SỔ CŨ (`exp_so` + `su_kien_hoc`), KHÔNG phải `cnh_exp_day` (bảng P07 LUÔN RỖNG
+  // vì đường nộp-bài/quyết-toán P07 chưa nối) — đúng như `docTranHapThu` (game-v2-hap-thu.ts). Gieo `cnh_exp_day`
+  // ở đây sẽ là GIEO SAI và che mất lỗi "thú không cho ăn" (xem test hồi quy §HẤP THỤ).
   const achieved = o.achieved === undefined ? 1 : o.achieved
-  if (achieved !== null) {
+  if (achieved === 1) {
     d1.sql
-      .prepare('INSERT INTO cnh_exp_day (student_id, learning_day, policy_version, raw_core, achieved) VALUES (?, ?, ?, 0, ?)')
-      .run(sbd, NGAY, PHIEN_BAN, achieved)
+      .prepare("INSERT INTO exp_so (khoa, sbd, ngay_vn, loai, qid, ma_nguon, exp, luc, ghi_chu) VALUES (?, ?, ?, 'dat_ngay', NULL, NULL, 80, ?, 'seed')")
+      .run(`seed:${sbd}:dat`, sbd, NGAY, LUC)
+  } else if (achieved === 0) {
+    for (let i = 0; i < (o.soCauHoc ?? 4); i++) {
+      d1.sql
+        .prepare("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, luc, ngay_vn) VALUES (?, ?, ?, 'game', 'seed', 1, 1, ?, ?)")
+        .run(`seed:${sbd}:hoc:${i}`, sbd, `SEED-${i}`, LUC, NGAY)
+    }
   }
   return sbd
 }
@@ -129,10 +142,38 @@ describe('P08 lệnh · HẤP THỤ (`03` §6)', () => {
     expect(String(bang(d1).absorbed_day)).toBe(NGAY)
   })
 
-  it('trần theo NGÀY ĐẠT: có hàng ngày nhưng `achieved = 0` ⇒ chỉ 120', async () => {
+  it('trần theo NGÀY ĐẠT: `su_kien_hoc` đủ 4 câu nhưng CHƯA đạt ngày ⇒ chỉ 120', async () => {
     const d1 = taoD1That()
     gieo(d1, { wallet: 400, achieved: 0 })
     expect((await hapThuCore(d1.env, yeuCau('S1', 'R1', 'h1'), phuThuoc)).take).toBe(120)
+  })
+
+  it('HỒI QUY 25/09 · `cnh_exp_day` (bảng P07 LUÔN RỖNG) KHÔNG còn là nguồn: hàng `achieved=1` mà SỔ CŨ trống ⇒ take 0', async () => {
+    // ĐÂY CHÍNH LÀ LỖI "THÚ KHÔNG CHO ĂN": trước 25/09 hàm đọc `cnh_exp_day` (đường P07 chưa nối ⇒ luôn rỗng)
+    // ⇒ luôn trả `chua_hoc` ⇒ trần 0 ⇒ take 0. Test này khoá lại: hàng P07 "đạt" một mình KHÔNG đủ.
+    const d1 = taoD1That()
+    gieo(d1, { wallet: 400, achieved: null })
+    d1.sql
+      .prepare('INSERT INTO cnh_exp_day (student_id, learning_day, policy_version, raw_core, achieved) VALUES (?, ?, ?, 0, 1)')
+      .run('S1', NGAY, PHIEN_BAN)
+    expect((await hapThuCore(d1.env, yeuCau('S1', 'R1', 'h1'), phuThuoc)).take).toBe(0)
+    expect(vi(d1).w).toBe(400)
+  })
+
+  it('ngày ĐẠT (`exp_so.loai=\'dat_ngay\'`) ⇒ trần 200, KHÔNG cần hàng `cnh_exp_day` nào', async () => {
+    const d1 = taoD1That()
+    gieo(d1, { wallet: 400 }) // `achieved` mặc định = 1 ⇒ một hàng `dat_ngay` trong `exp_so`
+    expect(dem(d1, 'cnh_exp_day')).toBe(0) // chứng minh nguồn KHÔNG phải bảng P07
+    expect((await hapThuCore(d1.env, yeuCau('S1', 'R1', 'h1'), phuThuoc)).take).toBe(200)
+  })
+
+  it('"CÓ HỌC" đếm câu KHÁC NHAU trong `su_kien_hoc`: 3 câu ⇒ 0 · 4 câu ⇒ 120 (ngưỡng `CO_HOC_TOI_THIEU_CAU`)', async () => {
+    const d1 = taoD1That()
+    gieo(d1, { wallet: 400, achieved: 0, soCauHoc: 3 })
+    expect((await hapThuCore(d1.env, yeuCau('S1', 'R1', 'h1'), phuThuoc)).take).toBe(0)
+    const d2 = taoD1That()
+    gieo(d2, { wallet: 400, achieved: 0, soCauHoc: 4 })
+    expect((await hapThuCore(d2.env, yeuCau('S1', 'R1', 'h1'), phuThuoc)).take).toBe(120)
   })
 
   it('ĐỌC ĐÚNG `invested_exp` ĐANG CÓ: thâm nhập 100 rồi hấp thụ 200 ⇒ cấp 3, tiến độ 30', async () => {

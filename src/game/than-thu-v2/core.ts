@@ -193,7 +193,11 @@ export const tranCauDaiTheoCap=(cap:number)=>cap>=30?3:cap>=10?2:1
 const GIO_VN=7*3600000
 const ngayVnChi=(ms:number)=>Math.floor((ms+GIO_VN)/DAY)
 const ngayVnChuoi=(ms:number)=>new Date(ms+GIO_VN).toISOString().slice(0,10)
-export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): khối của em — câu của tờ khối CAO hơn KHÔNG BAO GIỜ vào lượt, dù trùng mã dạng. Bỏ trống / không rõ ⇒ không lọc (máy chủ vẫn lọc kho ở `readScope`; đây là lớp bảo hiểm thứ hai, ở chính hàm chọn). */ khoiEm?:Khoi|null; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number; gentle?:boolean; dueQids?:ReadonlySet<string>; seenGroups?:ReadonlyMap<string,number> }
+export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): khối của em — câu của tờ khối CAO hơn KHÔNG BAO GIỜ vào lượt, dù trùng mã dạng. Bỏ trống / không rõ ⇒ không lọc (máy chủ vẫn lọc kho ở `readScope`; đây là lớp bảo hiểm thứ hai, ở chính hàm chọn). */ khoiEm?:Khoi|null; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number; gentle?:boolean; dueQids?:ReadonlySet<string>; seenGroups?:ReadonlyMap<string,number>
+  /** VÒNG BÙ (thầy lệnh 25/09, "Đoàn chỉ 1 câu rồi lặp"): khi đang BÙ đủ suất bằng câu CŨ, cho phép lấy câu
+   * "vừa đúng chưa tới 30 ngày" (bỏ chặn `dung30`) — chọn câu LÂU NHẤT chưa gặp; KHÔNG bỏ chặn `sai3`.
+   * Mặc định `false`: đường chọn bình thường KHÔNG đổi một byte. */
+  boQuaDung30?:boolean }
 export interface CauLuot { q:PrivateQuestion; role:QuestionRoleV2; dai:boolean; moi:boolean }
 interface ThongKeNhom { gap:number; sai:number; lucSaiCuoi:number; lucDungCuoi:number; lucCuoi:number }
 export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempts:Attempt[],mastery:Mastery[],opt:OptLuot):CauLuot[] {
@@ -250,7 +254,8 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
     if(opt.loai==='khoi_dong'&&noi<4&&dai(q))return false
     if(opt.loai!=='trum'&&dai(q)&&soDai>=Math.min(tranDai,tranDaiToiDa)&&noi<4)return false   // MỘT lượt thường: câu dài ≤ 1 (thưởng ≤ 2) VÀ ≤ trần theo cấp thú
     if(s.dai&&noi<1&&!dai(q))return false
-    if(sai3(q)||(dung30(q)&&!opt.dueQids?.has(q.qid)))return false
+    // VÒNG BÙ (`opt.boQuaDung30`): bỏ chặn "vừa đúng chưa tới 30 ngày" để bù đủ suất Đoàn; chặn `sai3` LUÔN giữ.
+    if(sai3(q)||(!opt.boQuaDung30&&dung30(q)&&!opt.dueQids?.has(q.qid)))return false
     if(saiHomNay(q))return false
     if(s.role==='yeu'&&!weak.has(key(q)))return false
     if(s.role==='toi_han'&&!opt.dueQids?.has(q.qid)&&!due.has(key(q)))return false

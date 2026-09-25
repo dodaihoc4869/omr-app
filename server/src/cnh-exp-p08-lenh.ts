@@ -12,6 +12,8 @@
 // Mọi cột còn lại (invested/level/mảnh/kho khiên/vàng) ở `cnh_exp_p08_state`.
 import type { D1Database, D1DatabaseSession, Env } from './kieu'
 import { PHIEN_BAN_CHINH_SACH, SO_LAN_THU_LAI } from './cnh-exp-ledger'
+// Ngưỡng "có học" (số câu KHÁC NHAU trong ngày) — MỘT nguồn, dùng chung với `docTranHapThu` (đường cũ).
+import { CO_HOC_TOI_THIEU_CAU } from '../../src/lib/hap-thu-ngay'
 import {
   KINH_TE,
   TRAN_INVESTED_EXP,
@@ -125,14 +127,36 @@ async function docBangP08(db: DbDoc, studentId: string): Promise<DongBangP08 | n
   return r == null ? null : kiemTraBangP08(r)
 }
 
-/** Trần hấp thụ theo NGÀY VN: có hàng + `achieved=1` ⇒ đạt; có hàng ⇒ có học; chưa có ⇒ chưa học. */
+/** Trần hấp thụ theo NGÀY VN — NGUỒN THẬT là SỔ CŨ (`exp_so` + `su_kien_hoc`), KHÔNG phải `cnh_exp_day`.
+ * ⚠️ VÌ SAO (25/09 — lỗi "thú không cho ăn được"): `cnh_exp_day` là bảng P07 do đường nộp-bài/quyết-toán P07
+ * ghi — đường đó CHƯA nối (`cnh-exp-adapter.ts` tự khai "chưa route nào được nối") ⇒ bảng LUÔN RỖNG ⇒ hàm này
+ * luôn trả `chua_hoc` ⇒ trần hấp thụ = 0 ⇒ `take = 0` ⇒ THÚ KHÔNG ĂN ĐƯỢC. Nay đọc đúng nguồn "đạt ngày" đang
+ * sống (`exp_so.loai='dat_ngay'`) + "có học" (`su_kien_hoc` ≥ `CO_HOC_TOI_THIEU_CAU` câu KHÁC NHAU) — ĐỒNG BỘ
+ * với `docTranHapThu` (`game-v2-hap-thu.ts`), nguồn mà đường `hapThu` CŨ vẫn dùng.
+ * Đọc qua `db` (phiên `first-primary` khi có) để không lệch bản sao. Lỗi đọc ⇒ coi như chưa học (trần 0: an toàn). */
 async function docTrangThaiNgay(db: DbDoc, studentId: string, learningDay: string): Promise<TrangThaiNgay> {
-  const r = await db
-    .prepare('SELECT achieved FROM cnh_exp_day WHERE student_id = ? AND learning_day = ? AND policy_version = ?')
-    .bind(studentId, learningDay, PHIEN_BAN_CHINH_SACH)
-    .first<{ achieved: number }>()
-  if (r == null) return 'chua_hoc'
-  return r.achieved === 1 ? 'achieved' : 'studied'
+  let dat = 0
+  try {
+    const r = await db
+      .prepare("SELECT COUNT(*) AS n FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'dat_ngay'")
+      .bind(studentId, learningDay)
+      .first<{ n: number }>()
+    dat = Math.max(0, Math.floor(Number(r?.n) || 0))
+  } catch {
+    dat = 0
+  }
+  if (dat > 0) return 'achieved'
+  let hoc = 0
+  try {
+    const r = await db
+      .prepare('SELECT COUNT(DISTINCT qid) AS n FROM su_kien_hoc WHERE sbd = ? AND ngay_vn = ? AND ket_qua IS NOT NULL')
+      .bind(studentId, learningDay)
+      .first<{ n: number }>()
+    hoc = Math.max(0, Math.floor(Number(r?.n) || 0))
+  } catch {
+    hoc = 0
+  }
+  return hoc >= CO_HOC_TOI_THIEU_CAU ? 'studied' : 'chua_hoc'
 }
 
 async function docLenh(db: DbDoc, studentId: string, commandType: string, requestId: string): Promise<DongLenh | null> {
