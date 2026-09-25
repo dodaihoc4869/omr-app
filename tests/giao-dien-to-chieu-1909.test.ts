@@ -126,6 +126,12 @@ describe('thẻ tên: "thú · cấp · lần lên bảng thứ N", nhãn vùng 
     expect(don).toMatch(/class="mc-cot-lam-bai"[^>]*data-nhan="Phần làm bài của Nam"/)
   })
 
+  it('🔴 thầy lệnh 25/09: KHÔNG in nhãn "Phần làm bài của …" ở CẢ hai chế độ — CSS không còn `content:attr(data-nhan)`', () => {
+    // Thuộc tính `data-nhan` VẪN CÒN (JS đồng bộ tên + test trên), nhưng KHÔNG tạo chữ nào trên bảng.
+    expect(CSS_GIAO_DIEN_TO_CHIEU).not.toContain('attr(data-nhan)')
+    expect(CSS_GIAO_DIEN_TO_CHIEU).not.toMatch(/mc-(trang|cot-lam-bai):before/)
+  })
+
   it('đợt đơn có DÒNG ĐẦU thẻ đề: chip "Câu N" + chip phần ("Phần II · Đúng / Sai"); CSS chỉ hiện nó ở đợt đơn', () => {
     const h = taoHtmlMayChieu([o('A', 'An', { cau: cauI('d', 'từ '.repeat(400), 'II'), soCau: 19, bacUoc: 2 })], {})
     expect(h).toContain('<div class="mc-de-dau"><span class="mc-de-so">Câu 19</span><span class="mc-de-phan">Phần II · Đúng / Sai</span></div>')

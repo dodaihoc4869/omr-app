@@ -143,10 +143,9 @@ body.mc-bc .mc-dot:not(.mc-dot-don) .mc-nua.mc-giai-mo .mc-trang{display:none}
 body.mc-bc .mc-nua.mc-giai-mo .mc-giai-vung .mc-nut-giai{background:var(--mc-chu);color:var(--mc-giay)}
 body.mc .mc-giai .sol-box{background:transparent;color:var(--mc-chu)}
 
-/* ── VÙNG LÀM BÀI: TẮT SÁNG. Nhãn mờ ở góc, KHÔNG chữ sáng lớn. Nút nhỏ ở đáy. ── */
+/* ── VÙNG LÀM BÀI: TẮT SÁNG. (BỎ NHÃN "Phần làm bài của …" — thầy lệnh 25/09: KHÔNG in nhãn ở CẢ hai
+   chế độ BTVN lẫn dạy học. Vùng 1/3 bảng VẪN GIỮ để học sinh lên làm; chỉ bỏ dòng chữ ở góc.) ── */
 body.mc-bc .mc-trang,body.mc-bc .mc-cot-lam-bai{position:relative;border:0;border-radius:clamp(14px,1.72vw,30px);background:transparent;box-shadow:inset 0 0 0 2px var(--mc-bang-vien);margin:0;overflow:hidden}
-body.mc-bc .mc-trang:before,body.mc-bc .mc-cot-lam-bai:before{content:attr(data-nhan);position:absolute;left:clamp(10px,1.4vw,26px);right:40%;bottom:clamp(10px,1.3vw,22px);font:600 clamp(11px,1.25vw,20px)/1.3 var(--mc-sans);color:var(--mc-bang-phu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-body.mc-bc .mc-dot-don .mc-cot-lam-bai:before{right:clamp(10px,1.4vw,26px);bottom:clamp(60px,6.2vw,100px)}
 body.mc-bc .mc-dot:not(.mc-dot-don) .mc-giai-vung{position:absolute;right:clamp(8px,1.1vw,18px);bottom:clamp(8px,1vw,16px);z-index:8;margin:0;padding:0}
 body.mc-bc .mc-dot-don .mc-giai-vung{padding:clamp(8px,1vw,16px)}
 body.mc .mc-giai-vung{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:clamp(6px,.62vw,12px)}
