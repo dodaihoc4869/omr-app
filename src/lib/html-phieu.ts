@@ -935,30 +935,34 @@ body.co-lam .thanh:not(#thanh-nop) { position: static; }
 .q-card.mo .sol-wrap { grid-template-rows: 1fr; }
 .sol-inner { overflow: hidden; min-height: 0; }
 .sol-box {
-  margin: 0 16px 20px; padding: 22px 24px;
-  background: #fffdf5; border: 1.5px solid #fde68a; border-radius: 20px;
-  box-shadow: 0 4px 16px rgba(217,119,6,0.06);
+  margin: 0 16px 16px; padding: 16px;
+  background: rgba(255, 251, 235, 0.8); border: 1px solid #fde68a; border-radius: 16px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  color: #451a03;
   opacity: 0; transform: translateY(-6px);
   transition: opacity var(--muot), transform var(--muot);
 }
 .q-card.mo .sol-box { opacity: 1; transform: none; }
 .sol-label {
-  font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
-  color: #92400e; margin-bottom: 6px;
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
+  color: #92400e; margin-bottom: 4px;
 }
-.sol-label + .sol-label, .sol-text + .sol-label, .sol-step + .sol-label, .sol-dap + .sol-label { margin-top: 14px; }
-/* Đáp án nổi bật rõ ràng chuẩn theo ảnh */
-.sol-dap { font-size: 16px; color: #78350f; font-weight: 700; margin-bottom: 12px; }
-.sol-dap b { font-size: 18px; font-weight: 900; color: #78350f; letter-spacing: .04em; }
-.sol-text { font-size: 14.5px; line-height: 1.65; color: #78350f; overflow-wrap: break-word; }
-.sol-text strong { color: #5b2a06; }
-.sol-cot-loi { font-weight: 800; font-size: 15px; line-height: 1.65; color: #3b1d05; margin-bottom: 14px; }
-.sol-pa { padding: 6px 0; font-size: 14px; line-height: 1.65; color: #78350f; }
-.sol-pa + .sol-pa { border-top: 1px dashed rgba(146, 64, 14, .18); }
-.sol-pa strong { color: #78350f; }
-.sol-pa.chon { font-weight: 700; color: #14532d; }
-.sol-step { font-size: 14.5px; line-height: 1.65; color: #78350f; padding-left: 18px; text-indent: -18px; }
-.sol-ket { font-size: 15px; font-weight: 800; color: #451a03; }
+.sol-label + .sol-label, .sol-text + .sol-label, .sol-step + .sol-label, .sol-dap + .sol-label { margin-top: 12px; }
+.sol-dap { font-size: 14px; font-weight: 600; color: #92400e; margin-bottom: 12px; }
+.sol-dap b { font-size: 16px; font-weight: 900; color: #451a03; letter-spacing: normal; }
+.sol-text { font-size: 12px; line-height: 1.625; color: #78350f; overflow-wrap: break-word; }
+.sol-text strong { color: #78350f; }
+.sol-cot-loi { font-weight: 700; font-size: 14px; line-height: 1.625; color: #451a03; margin-bottom: 12px; }
+.sol-pa { padding: 4px 0; font-size: 12px; line-height: 1.625; color: #78350f; display: flex; align-items: flex-start; gap: 6px; }
+.sol-pa + .sol-pa { border-top: 1px solid rgba(253, 230, 138, 0.4); }
+.sol-pa strong { color: #78350f; flex-shrink: 0; }
+.sol-pa.chon { font-weight: 700; }
+.sol-dau { font-weight: 700; flex-shrink: 0; }
+.sol-dau.dung { color: #047857; }
+.sol-dau.sai { color: #be123c; }
+.sol-ly { flex: 1; min-width: 0; }
+.sol-step { font-size: 12px; line-height: 1.625; color: #78350f; padding-left: 18px; text-indent: -18px; }
+.sol-ket { font-size: 14px; font-weight: 800; color: #451a03; }
 /* Ảnh lời giải gốc chụp từ đề của tác giả. Nền trắng vì ảnh cắt ra là giấy
    trắng mực đen; đặt trên nền kem của ô lời giải sẽ thấy một vệt lệch màu. */
 .sol-anh { margin-top: 8px; }
@@ -1399,7 +1403,10 @@ export function oGiaiHtml(c: CauLuyen): string {
   }
   if (lyDo && lyDo.length > 0) {
     const dong = lyDo
-      .map((l) => `<div class="sol-pa${dungKhoa.includes(l.khoa) ? ' chon' : ''}"><strong>${thoat(l.khoa)}.</strong> ${dungKhoa.includes(l.khoa) ? '✓ ' : '✗ '}${chuHtml(l.ly)}</div>`)
+      .map((l) => {
+        const laDung = dungKhoa.includes(l.khoa)
+        return `<div class="sol-pa${laDung ? ' chon' : ''}"><strong>${thoat(l.khoa)}.</strong><span class="sol-dau ${laDung ? 'dung' : 'sai'}">${laDung ? '✓' : '✗'}</span><span class="sol-ly">${chuHtml(l.ly)}</span></div>`
+      })
       .join('')
     khoi.push(`<div class="sol-label">${c.phan === 'II' ? 'Vì sao từng ý đúng / sai' : 'Vì sao chọn / không chọn từng phương án'}</div><div class="sol-text">${dong}</div>`)
     coGiai = true
