@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Check, ChevronDown, ChevronRight, Clock, Flag, Moon, Sparkles } from 'lucide-react'
 import './m3-theme.css'
 import './ve-dich.css'
-import { chuHanNop, conLaiToiHan, laSauGioCuoi, nhanCoHan, nhomNoTheoNgay, tenMonNo, thuCuaNgay, thuNgayNgan, type BaiVeDich, type VeDichView } from '../../lib/ve-dich-hien-thi'
+import { chuHanNop, conLaiToiHan, laSauGioCuoi, nhanCoHan, thuCuaNgay, type BaiVeDich, type VeDichView } from '../../lib/ve-dich-hien-thi'
 import { gioVn } from '../../lib/ph-moi/dinh-dang'
 
 export interface TheVeDichProps {
@@ -252,6 +252,7 @@ function TheMotBai({ b, now, onLam, soViecConLai, ngayVuaTra }: { b: BaiVeDich; 
   )
 }
 
+/*
 function KhoiNgayTruoc({ no, onLam, ngayVuaTra }: { no: VeDichView['no']; onLam: () => void; ngayVuaTra: string | null }) {
   const nhom = nhomNoTheoNgay(no.theoNgay)
   if (nhom.length === 0 && !ngayVuaTra) return null
@@ -304,6 +305,7 @@ function KhoiNgayTruoc({ no, onLam, ngayVuaTra }: { no: VeDichView['no']; onLam:
     </section>
   )
 }
+*/
 
 export default function TheVeDich({ v, now, onLam, soViecConLai = 0, ngayVuaTra = null }: TheVeDichProps) {
   // Bài KHẨN NHẤT (hạn sớm nhất) là thẻ đầy đủ; các bài khác một dòng.
