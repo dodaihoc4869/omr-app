@@ -154,7 +154,9 @@ describe('thẻ HIỆN với số thật', () => {
     expect(t.textContent).toContain('2 câu để chữa')
     expect(t.textContent).toMatch(/khoảng \d+ phút/)
     expect(t.textContent).toContain('2 em cần chú ý')
-    expect(t.textContent).toContain('Dạng em đang yếu: Thuỷ phân ester — 9/24 em')
+    // 25/09 — LUẬT MỚI: lý do đổi từ "Dạng em đang yếu: …" sang "Câu cả lớp sai: N/M câu · … lượt sai" + "Chữa X % câu lọc ra (sàn 80 %)".
+    expect(t.textContent).toContain('Câu cả lớp sai: 2/2 câu — 17 lượt sai')
+    expect(t.textContent).toContain('Chữa 100 % câu lọc ra (sàn 80 %)')
     expect(t.textContent).toContain('Em cần chú ý: Em Một, Em Hai')
     // đứng TRƯỚC tiêu đề mục 2
     const thuTuThe = (container.textContent ?? '').indexOf('Buổi chữa tối nay (đã xếp sẵn)')

@@ -2,7 +2,7 @@
 // Khoá: ẩn khi thiếu dữ liệu; chọn câu theo ngưỡng + điểm; tự luận / câu thiếu trong kho bị bỏ và đếm; vừa ngân sách giờ; em từ gợi ý Bộ não + em sai; tất định; đầu vào hỏng không làm sập.
 import { describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { DE_XUAT_BUOI_CHUA, deXuatBuoiChua, docDauVao, type CauKho, type DauVaoDeXuat } from '../src/lib/buoi-chua-de-xuat'
+import { DE_XUAT_BUOI_CHUA, deXuatBuoiChua, deXuatBuoiChuaPhuKienThuc, docDauVao, type CauKho, type DauVaoDeXuat } from '../src/lib/buoi-chua-de-xuat'
 import { CAU_HINH_LEN_BANG_MAC_DINH } from '../src/lib/len-bang-cau-hinh'
 import { laCauRutDuoc } from '../src/lib/cau-tu-luan'
 import { mulberry32 } from '../src/lib/exam-shuffle'
@@ -424,10 +424,78 @@ describe('tính chất: tất định, biên, không sửa đầu vào', () => {
 })
 
 describe('khoá nguồn', () => {
-  it('thuần: chỉ import lõi thuần (cau-tu-luan, len-bang-cau-hinh, thoi-gian-len-bang); không đồng hồ/ngẫu nhiên/IO', () => {
+  it('thuần: chỉ import lõi thuần (cau-tu-luan, len-bang-cau-hinh, thoi-gian-len-bang, rui-cau-btvn-len-bang); không đồng hồ/ngẫu nhiên/IO', () => {
+    // 25/09: thêm `./rui-cau-btvn-len-bang` — LUẬT MỚI của thầy (phủ hết + sàn 80 % + lượt thêm) là lõi thuần thứ tư.
     const goc = readFileSync('src/lib/buoi-chua-de-xuat.ts', 'utf8')
     const ma = goc.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '')
     for (const cam of ['Math.random', 'Date.now', 'new Date', 'fetch(', 'localStorage', 'indexedDB', 'process.']) expect(ma, cam).not.toContain(cam)
-    expect([...goc.matchAll(/^import (?:type )?.* from '([^']+)'/gm)].map((m) => m[1]).sort()).toEqual(['./cau-tu-luan', './len-bang-cau-hinh', './thoi-gian-len-bang'])
+    expect([...goc.matchAll(/^import (?:type )?.* from '([^']+)'/gm)].map((m) => m[1]).sort()).toEqual(['./cau-tu-luan', './len-bang-cau-hinh', './rui-cau-btvn-len-bang', './thoi-gian-len-bang'])
   })
 })
+
+// ══════════════════ LUẬT MỚI 25/09 · `deXuatBuoiChuaPhuKienThuc` (phủ hết + sàn 80 % + lượt thêm) ══════════════════
+
+describe('LUẬT MỚI 25/09 — phủ hết + sàn 80 % + lượt thêm', () => {
+  const GOI = () => deXuatBuoiChuaPhuKienThuc(dauVao(), KHO)
+
+  it('PHỦ HẾT: MỌI câu cả lớp sai vào buổi (bản cũ cắt còn 10 câu / 3 dạng)', () => {
+    const r = GOI()
+    expect(r.co).toBe(true)
+    expect(r.soCau).toBe(5) // đúng 5 câu sai của đầu vào, không cắt
+    expect(r.cau.map((c) => c.qid).sort()).toEqual([qidCua(0, 0), qidCua(0, 1), qidCua(0, 2), qidCua(1, 0), qidCua(2, 0)].sort())
+    expect(r.soCau).toBe(r.cau.length)
+  })
+
+  it('thứ tự ưu tiên: câu SAI NHIỀU NHẤT đứng trước', () => {
+    const r = GOI()
+    expect(r.cau[0]!.qid).toBe(qidCua(0, 0)) // 9/20 em sai — nhiều nhất
+    expect(r.cau[1]!.qid).toBe(qidCua(1, 0)) // 8/18
+  })
+
+  it('SÀN 80 %: ngân sách đủ ⇒ chữa hết, `dat80` bật, KHÔNG bỏ lại câu sai nào', () => {
+    const r = GOI()
+    expect(r.tiLeChua).toBe(1)
+    expect(r.dat80).toBe(true)
+    // Không câu SAI nào bị bỏ lại (cảnh báo "em chưa có lượt" là chuyện khác — 5 câu thì không đủ cho mọi em).
+    expect(r.canhBao.some((c) => c.includes('câu cả lớp SAI chưa chữa được'))).toBe(false)
+  })
+
+  it('ngân sách HẸP ⇒ BÁO câu cả lớp sai chưa chữa kịp (kèm số phút), không im lặng bỏ', () => {
+    const r = deXuatBuoiChuaPhuKienThuc(dauVao(), KHO, { ...CAU_HINH_LEN_BANG_MAC_DINH, NGAN_SACH_PHUT: 1 })
+    expect(r.canhBao.some((c) => c.includes('câu cả lớp SAI chưa chữa được'))).toBe(true)
+    expect(r.canhBao.some((c) => c.includes('cần thêm'))).toBe(true)
+  })
+
+  it('LƯỢT EM: mọi em có mặt trong dữ liệu được ≥ 1 lượt; em nhiều lượt được đếm', () => {
+    const r = GOI()
+    expect(r.em.length).toBeGreaterThan(0)
+    expect(r.em.every((e) => e.lyDo.includes('lên bảng'))).toBe(true)
+    expect(typeof r.soEmNhieuLuot).toBe('number')
+    expect(r.soEm).toBe(r.em.length)
+  })
+
+  it('lý do bằng SỐ THẬT (không nhãn năng lực, không bịa): có "Câu cả lớp sai" + "sàn 80 %"', () => {
+    const r = GOI()
+    expect(r.cacLyDo.some((l) => l.includes('Câu cả lớp sai:'))).toBe(true)
+    expect(r.cacLyDo.some((l) => l.includes('sàn 80 %'))).toBe(true)
+  })
+
+  it('tất định: gọi hai lần ra y hệt', () => {
+    expect(JSON.stringify(GOI())).toBe(JSON.stringify(GOI()))
+  })
+
+  it('ẩn khi thiếu dữ liệu (< 5 em có sổ); câu tự luận / câu thiếu kho vẫn bị đếm', () => {
+    expect(deXuatBuoiChuaPhuKienThuc(dauVao({ soEmCoSo: 4 }), KHO)).toMatchObject({ co: false, lyDoAn: 'it_du_lieu' })
+    const r = deXuatBuoiChuaPhuKienThuc(
+      dauVao({
+        cauSaiNhieu: [
+          { qid: 'T-III-1', dang: 'D0', loi: false, soEmLam: 20, soEmSai: 9, emSai: [] }, // tự luận
+          { qid: 'KHONG-CO', dang: 'D0', loi: false, soEmLam: 20, soEmSai: 8, emSai: [] }, // thiếu trong kho
+        ],
+      }),
+      KHO,
+    )
+    expect(r.boQua).toMatchObject({ tuLuan: 1, khongCoTrongKho: 1 })
+  })
+})
+

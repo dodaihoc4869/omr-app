@@ -9,6 +9,8 @@
 import { laCauRutDuoc } from './cau-tu-luan'
 import { CAU_HINH_LEN_BANG_MAC_DINH, haoPhiGiay, type CauHinhLenBang } from './len-bang-cau-hinh'
 import { giayBienGhepDoi, noiDungTuCauGoc, thoiGianCau } from './thoi-gian-len-bang'
+// LUẬT MỚI (thầy chốt 25/09): rút câu PHỦ HẾT + sàn 80 % + phân LƯỢT THÊM cho em (`rui-cau-btvn-len-bang.ts`).
+import { phanBoLuotEm, ruiCauLenBang, type CauVaoRui, type ChamEm } from './rui-cau-btvn-len-bang'
 
 export const DE_XUAT_BUOI_CHUA = {
   /** Ít hơn bấy nhiêu em có sổ trong 3 ngày ⇒ không đủ dữ liệu, ẩn thẻ (không bịa). */
@@ -114,6 +116,15 @@ export interface DeXuatBuoiChua {
   cacLyDo: string[]
   /** Câu đã bỏ và vì sao — để thẻ nói thật ("2 câu chưa có trên máy này"). */
   boQua: { khongCoTrongKho: number; tuLuan: number }
+  // ── LUẬT MỚI (thầy chốt 25/09) — CHỈ có ở `deXuatBuoiChuaPhuKienThuc`; bản cũ để trống ──
+  /** Số câu CHỮA / số câu LỌC RA (sàn 80 %). */
+  tiLeChua?: number
+  /** Đạt sàn: nhóm CHỮA ≥ `TI_LE_CHUA_TOI_THIEU` (80 %) số câu LỌC RA. */
+  dat80?: boolean
+  /** Số em được gọi NHIỀU HƠN 1 lượt. */
+  soEmNhieuLuot?: number
+  /** Lời thật cần hành động: câu cả lớp SAI chưa chữa kịp (kèm số phút cần thêm), em chưa có lượt… */
+  canhBao?: string[]
 }
 
 // ══════════════════════════════ ĐỌC ĐẦU VÀO (không tin dữ liệu từ ngoài) ══════════════════════════════
@@ -295,3 +306,122 @@ export function deXuatBuoiChua(dv: DauVaoDeXuat, kho: readonly CauKho[], ch: Cau
 function giayCau(k: CauKho, tiLeLopSai: number, ch: CauHinhLenBang): number {
   return giayBienGhepDoi(thoiGianCau({ phan: k.phan, sao: k.sao, noiDung: noiDungTuCauGoc(k.phan, k.q), tiLeLopSai }, ch))
 }
+
+// ══════════════════ LUẬT MỚI 25/09 · RÚT CÂU BTVN PHỦ HẾT + SÀN 80 % + LƯỢT THÊM ══════════════════
+
+/** Chuyên đề của câu lấy từ chính kho trên máy thầy (`q.chuyenDe`), thiếu thì lấy mã dạng. */
+const chuyenDeCuaKho = (k: CauKho): string => {
+  const cd = (k.q as { chuyenDe?: unknown } | null | undefined)?.chuyenDe
+  return typeof cd === 'string' && cd.trim() ? cd.trim() : k.dang ?? ''
+}
+
+/**
+ * ĐỀ XUẤT BUỔI CHỮA THEO **LUẬT MỚI** (thầy chốt 25/09/2026) — thay cách chọn câu của `deXuatBuoiChua`:
+ *   · **PHỦ HẾT**: mọi câu cả lớp SAI đều vào bước xếp (bản cũ chỉ lấy ≥ 3 em sai và cắt còn 10 câu / 3 dạng).
+ *   · **Thứ tự**: sai nhiều nhất → sai ít dần → khó ít em làm được → cốt tủy (`xepUuTienCau`).
+ *   · **SÀN 80 %**: nhóm CHỮA ≥ 80 % số câu LỌC RA (`ruiCauLenBang`); câu SAI không chữa kịp thì **BÁO**
+ *     (`canhBao` + số phút cần thêm), không im lặng bỏ.
+ *   · **LƯỢT EM**: mọi em ≥ 1 lượt rồi mới phát LƯỢT THÊM cho em ít lượt nhất, cân bằng, seed tất định
+ *     (`phanBoLuotEm`) — "có em nhiều lượt, có em 1 lượt".
+ * Đầu vào `emSai`/`dongBoNao` vẫn là của `/gv/buoi-chua-de-xuat` (dạng máy chủ đang trả). Mọi chỗ khác
+ * của `DeXuatBuoiChua` giữ nguyên để thẻ `TheBuoiChuaXepSan` không phải đổi.
+ */
+export function deXuatBuoiChuaPhuKienThuc(dv: DauVaoDeXuat, kho: readonly CauKho[], ch: CauHinhLenBang = CAU_HINH_LEN_BANG_MAC_DINH): DeXuatBuoiChua {
+  if (dv.soEmCoSo < D.SO_EM_TOI_THIEU_CO_SO) return AN('it_du_lieu')
+  const theoQid = new Map<string, CauKho>()
+  for (const c of kho) if (!theoQid.has(c.qid)) theoQid.set(c.qid, c)
+
+  // 1 — dựng danh sách câu ứng viên: MỌI câu cả lớp sai (không cắt theo ngưỡng như bản cũ).
+  const boQua = { khongCoTrongKho: 0, tuLuan: 0 }
+  const vao: CauVaoRui[] = []
+  const emSaiCua = new Map<string, { sbd: string; hoTen: string }[]>()
+  const daXet = new Set<string>()
+  for (const c of dv.cauSaiNhieu) {
+    if (daXet.has(c.qid)) continue
+    daXet.add(c.qid)
+    if (c.soEmSai <= 0) continue
+    const k = theoQid.get(c.qid)
+    if (!k) {
+      boQua.khongCoTrongKho++
+      continue
+    }
+    if (!laCauRutDuoc(k.q, k.phan)) {
+      boQua.tuLuan++
+      continue
+    }
+    emSaiCua.set(c.qid, c.emSai)
+    vao.push({
+      qid: c.qid,
+      dang: c.dang || k.dang || '',
+      chuyenDe: chuyenDeCuaKho(k),
+      phan: k.phan,
+      sao: k.sao,
+      loi: c.loi,
+      soEmLam: c.soEmLam,
+      soEmSai: c.soEmSai,
+      soEmDung: Math.max(0, c.soEmLam - c.soEmSai),
+      noiDung: noiDungTuCauGoc(k.phan, k.q),
+    })
+  }
+  if (vao.length === 0) return AN('khong_co_gi', boQua)
+
+  // 2 — rút câu: phủ hết + ưu tiên + ngân sách + sàn 80 %.
+  const kq = ruiCauLenBang(vao, ch)
+  const cau: CauDeXuat[] = [...kq.chua, ...kq.docDapAn].map((c) => ({
+    qid: c.qid,
+    dang: c.dang,
+    phan: c.phan,
+    nguon: c.nguon === 'sai_nhieu' ? 'sai_nhieu' : 'dang_yeu',
+    loi: c.loi,
+    soEmLam: c.soEmLam,
+    soEmSai: c.soEmSai,
+    giay: c.giay,
+    lyDo: c.lyDo,
+  }))
+
+  // 3 — phân LƯỢT em theo hồ sơ có trong tay (em sai câu nào + gợi ý Bộ não).
+  const dsEm = new Map<string, { sbd: string; hoTen: string }>()
+  for (const es of emSaiCua.values()) for (const e of es) if (e.sbd && !dsEm.has(e.sbd)) dsEm.set(e.sbd, e)
+  for (const g of dv.goiY) if (g.sbd && !dsEm.has(g.sbd)) dsEm.set(g.sbd, { sbd: g.sbd, hoTen: g.hoTen })
+  const goiYDang = new Set(dv.goiY.map((g) => `${g.sbd}|${g.dang}`))
+  const saiCau = (sbd: string, qid: string) => (emSaiCua.get(qid) ?? []).some((e) => e.sbd === sbd)
+  const cham: ChamEm = (sbd, c) => {
+    const sai = saiCau(sbd, c.qid)
+    const bn = goiYDang.has(`${sbd}|${c.dang}`)
+    const soSai = kq.chua.reduce((n, x) => n + (saiCau(sbd, x.qid) ? 1 : 0), 0)
+    const phan = [...(sai ? ['sai câu này'] : []), ...(bn ? ['Bộ não A.I gợi ý'] : [])]
+    if (soSai > 1) phan.push(`sai ${soSai} câu trong buổi`)
+    return { diem: (sai ? 0.6 : 0) + (bn ? 0.25 : 0) + Math.min(0.15, soSai * 0.03), viSao: phan.join(' · ') }
+  }
+  const pb = phanBoLuotEm(kq.chua, [...dsEm.values()], cham)
+  const em: EmDeXuat[] = [...pb.soLuot.entries()]
+    .filter(([, n]) => n > 0)
+    .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
+    .slice(0, D.SO_EM_TOI_DA)
+    .map(([sbd, n]) => ({ sbd, hoTen: dsEm.get(sbd)?.hoTen ?? '', lyDo: n > 1 ? `lên bảng ${n} lượt` : 'lên bảng 1 lượt' }))
+
+  // 4 — lý do bằng SỐ THẬT cho thầy.
+  const cacLyDo: string[] = []
+  const soLoi = kq.chua.filter((c) => c.loi).length
+  const soSai = kq.chua.reduce((n, c) => n + c.soEmSai, 0)
+  if (kq.chua.length > 0) cacLyDo.push(`Câu cả lớp sai: ${kq.chua.filter((c) => c.soEmSai > 0).length}/${kq.chua.length} câu — ${soSai} lượt sai`)
+  if (soLoi > 0) cacLyDo.push(`Câu cốt tủy: ${soLoi} câu`)
+  cacLyDo.push(`Chữa ${Math.round(kq.tiLeChua * 100)} % câu lọc ra (sàn 80 %)`)
+
+  return {
+    co: true,
+    lyDoAn: '',
+    cau,
+    em,
+    soCau: kq.chua.length,
+    soEm: em.length,
+    phut: Math.ceil((kq.tongGiay + haoPhiGiay(ch)) / 60),
+    cacLyDo: cacLyDo.slice(0, 3),
+    boQua,
+    tiLeChua: kq.tiLeChua,
+    dat80: kq.dat80,
+    soEmNhieuLuot: pb.soEmNhieuLuot,
+    canhBao: [...kq.canhBao, ...pb.canhBao],
+  }
+}
+

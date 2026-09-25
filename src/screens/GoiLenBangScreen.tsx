@@ -45,7 +45,7 @@ import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
 import { CAU_HINH_LEN_BANG_MAC_DINH, TEN_LANE, dongHo, nganSachGiay } from '../lib/len-bang-cau-hinh'
 import { dungDoKho, vapCuaLop } from '../lib/do-kho-cau'
 import { doiEmChoDong, xepGioLenBang, type KetQuaXep } from '../lib/xep-gio-len-bang'
-import { deXuatBuoiChua, type DauVaoDeXuat } from '../lib/buoi-chua-de-xuat'
+import { deXuatBuoiChuaPhuKienThuc, type DauVaoDeXuat } from '../lib/buoi-chua-de-xuat'
 import { khoTuNguon, layDeXuatBuoiChua } from '../lib/buoi-chua-de-xuat-lenh'
 import TheBuoiChuaXepSan from '../components/TheBuoiChuaXepSan'
 import { chuThieuNoiDung, demCauThieuNoiDung, timCauTheoId } from '../lib/tra-cau-chieu'
@@ -280,7 +280,7 @@ export default function GoiLenBangScreen() {
     }
   }, [])
   const khoCauDeXuat = useMemo(() => khoTuNguon(khoDe), [khoDe])
-  const deXuat = useMemo(() => (deXuatDv && khoCauDeXuat.length > 0 ? deXuatBuoiChua(deXuatDv, khoCauDeXuat) : null), [deXuatDv, khoCauDeXuat])
+  const deXuat = useMemo(() => (deXuatDv && khoCauDeXuat.length > 0 ? deXuatBuoiChuaPhuKienThuc(deXuatDv, khoCauDeXuat) : null), [deXuatDv, khoCauDeXuat])
   const [timEm, setTimEm] = useState('')
 
   const [soLuot, setSoLuot] = useState(1)

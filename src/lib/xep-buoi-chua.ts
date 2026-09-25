@@ -134,37 +134,52 @@ export function xepThuTuChua(ds: CauVaoXep[]): CauVaoXep[] {
   })
 }
 
-/** Chọn em hợp nhất còn rảnh cho một câu. Trả null khi không còn ai NHẬN được.
+/** Chọn em hợp nhất cho một câu. Trả null khi KHÔNG còn ai NHẬN được.
  *
- * Em bị CHẶN CỨNG (`chan` — bậc "biết" ở dạng của câu 2 sao) không bao giờ được
- * chọn, dù điểm cao đến đâu. Điểm bằng nhau thì em mà câu này là câu CẦN DẠY LẠI
- * của chính em ấy đứng trước; còn bằng nữa thì em đứng trước trong danh sách
- * (tất định — không bốc thăm). */
+ * THỨ TỰ LƯỢT (thầy chốt 25/09): em CHƯA có lượt nào đứng trước — MỌI em có mặt được ≥ 1 lượt trước khi ai được
+ * lượt thứ hai. Khi mọi em đều đã có lượt mà buổi còn câu (và còn giờ), câu tiếp theo gọi em ÍT LƯỢT NHẤT ⇒ tự
+ * nhiên "có em nhiều lượt, có em 1 lượt". Điểm bằng nhau: câu CẦN DẠY LẠI của chính em đứng trước; còn bằng nữa
+ * thì em đứng trước trong danh sách (tất định — không bốc thăm). Em bị CHẶN CỨNG (`chan` — bậc "biết" ở dạng của
+ * câu 2 sao) KHÔNG BAO GIỜ được chọn, dù điểm cao đến đâu. */
 function chonEm(
   c: CauVaoXep,
   dsEm: HoSoEmDayDu[],
-  daGoi: Set<string>,
+  soLuot: ReadonlyMap<string, number>,
   emDaDinh?: string,
 ): { em: HoSoEmDayDu; hop: number; viSao: string } | null {
+  const luot = (sbd: string) => soLuot.get(sbd) ?? 0
   if (emDaDinh) {
     const e = dsEm.find((x) => x.sbd === emDaDinh)
-    if (e && !daGoi.has(e.sbd)) {
+    if (e && luot(e.sbd) === 0) {
       const d = diemHopCau(e, c.cau)
       if (!d.chan) return { em: e, hop: d.diem, viSao: d.viSao }
     }
   }
-  let tot: { em: HoSoEmDayDu; hop: number; viSao: string; dayLai: boolean } | null = null
-  for (const e of dsEm) {
-    if (daGoi.has(e.sbd)) continue
-    const d = diemHopCau(e, c.cau)
-    if (d.chan) continue
-    const dayLai = d.dayLai === true
-    if (!tot || d.diem > tot.hop + 1e-9 || (Math.abs(d.diem - tot.hop) <= 1e-9 && dayLai && !tot.dayLai)) {
-      tot = { em: e, hop: d.diem, viSao: d.viSao, dayLai }
+  /** Điểm hợp cao nhất trong một nhóm; PHÁ HOÀ: ít lượt hơn → cần dạy lại → đứng trước. */
+  const chonTrong = (ds: readonly HoSoEmDayDu[]) => {
+    let tot: { em: HoSoEmDayDu; hop: number; viSao: string; dayLai: boolean; luot: number } | null = null
+    for (const e of ds) {
+      const d = diemHopCau(e, c.cau)
+      if (d.chan) continue
+      const dayLai = d.dayLai === true
+      const l = luot(e.sbd)
+      if (!tot || d.diem > tot.hop + 1e-9 || (Math.abs(d.diem - tot.hop) <= 1e-9 && (l < tot.luot || (l === tot.luot && dayLai && !tot.dayLai)))) {
+        tot = { em: e, hop: d.diem, viSao: d.viSao, dayLai, luot: l }
+      }
     }
+    return tot
   }
-  return tot ? { em: tot.em, hop: tot.hop, viSao: tot.viSao } : null
+  // 1. Em CHƯA có lượt nào — bảo đảm "mọi em ≥ 1 lượt".
+  const chua = chonTrong(dsEm.filter((e) => luot(e.sbd) === 0))
+  if (chua) return { em: chua.em, hop: chua.hop, viSao: chua.viSao }
+  // 2. Mọi em đều đã có lượt — phát LƯỢT THÊM cho em ít lượt nhất (cân bằng), TỚI TRẦN `TRAN_LUOT_MOI_EM`.
+  const them = chonTrong(dsEm.filter((e) => luot(e.sbd) < TRAN_LUOT_MOI_EM))
+  return them ? { em: them.em, hop: them.hop, viSao: them.viSao } : null
 }
+
+/** TRẦN LƯỢT của MỘT em trong buổi (thầy chốt 25/09: cho LƯỢT THÊM nhưng KHÔNG để một em lên bốn lượt).
+ * Mọi em có mặt vẫn được ≥ 1 lượt trước; lượt thêm phát cho em ít lượt nhất, tới trần này. */
+export const TRAN_LUOT_MOI_EM = 3
 
 /** Một chữ số thập phân, dấu phẩy kiểu Việt ("12,4") — dùng chung cho dòng tóm tắt và màn hình để hai nơi không lệch chữ. */
 export const chuSoGiaTri = (n: number): string => (Math.round(n * 10) / 10).toString().replace('.', ',')
@@ -202,6 +217,8 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
 
   const dong: DongChua[] = []
   const daGoi = new Set<string>()
+  /** Số lượt ĐÃ PHÁT của mỗi em (thầy 25/09): mọi em có mặt được ≥ 1 lượt RỒI mới phát lượt thêm cho em ít lượt nhất. */
+  const soLuot = new Map<string, number>()
   const daChua = new Set<string>()
   let dung = 0
   let tongGiaTri = 0
@@ -372,7 +389,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
   const thuXep = (c: CauVaoXep, giuChoSan: boolean): boolean => {
     // Chọn em TRƯỚC rồi mới kiểm giờ: chi phí phụ thuộc bậc của em đứng lên.
     // Null = không em còn lại nào NHẬN được câu này (bị chặn bậc "biết"), chứ không hẳn hết em: câu khác vẫn còn em nhận được.
-    const chon = chonEm(c, em, daGoi, c.emDaDinh)
+    const chon = chonEm(c, em, soLuot, c.emDaDinh)
     if (!chon || !duCho(c, chon.em, giuChoSan)) return false
     dung += themGiayThat(c, chon.em)
     chotGhep(c, chon.em)
@@ -380,6 +397,7 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
     const d = dangYeuCua(c)
     if (d) dangDaPhu.add(d)
     daGoi.add(chon.em.sbd)
+    soLuot.set(chon.em.sbd, (soLuot.get(chon.em.sbd) ?? 0) + 1)
     daChua.add(c.cau.id)
     dong.push({ tang: 'len_bang', cau: c.cau, giay: 0, em: chon.em, viSao: lyDoGoi(c, chon.viSao), hop: chon.hop })
     return true
@@ -388,7 +406,9 @@ export function xepBuoiChua(dsCau: CauVaoXep[], dsEm: HoSoEmDayDu[], yc: YeuCauB
   // Tầng ưu tiên đã chốt: bắt buộc (2→1→0 sao) rồi câu thường (2→1→0 sao). TRONG từng tầng chọn theo mật độ giá trị/giây + phủ dạng.
   const CAC_TANG: readonly (readonly [boolean, 0 | 1 | 2])[] = [[true, 2], [true, 1], [true, 0], [false, 2], [false, 1], [false, 0]]
   const chayVong = (vong: 1 | 2 | 3) => {
-    const gioiHan = vong === 2 ? Math.min(san, tran) : tran
+    // Vòng 3 = LẤP CÂU CÒN LẠI: KHÔNG chặn theo số em KHÁC NHAU nữa (thầy chốt 25/09) — mọi em đã có ≥ 1 lượt
+    // rồi thì phát LƯỢT THÊM cho em ít lượt nhất (trần `TRAN_LUOT_MOI_EM`/em) cho tới hết câu hoặc hết ngân sách.
+    const gioiHan = vong === 2 ? Math.min(san, tran) : vong === 1 ? tran : Number.POSITIVE_INFINITY
     for (const [batBuoc, sao] of CAC_TANG) {
       if (vong === 1 && !batBuoc) return
       const daThu = new Set<string>() // đã thử mà không xếp được trong vòng này — không thử lại
