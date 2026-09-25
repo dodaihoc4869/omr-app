@@ -88,7 +88,11 @@ export default class ChanLoi extends Component<Props, State> {
                 Về màn chính
               </button>
             )}
-            <button type="button" style={{ ...nut, background: 'var(--the-2)', color: 'var(--muc)' }} onClick={() => window.location.reload()}>
+            <button type="button" style={{ ...nut, background: 'var(--the-2)', color: 'var(--muc)' }} onClick={() => {
+              const u = new URL(window.location.href)
+              u.searchParams.set('_moi', String(Date.now()))
+              window.location.replace(u.toString())
+            }}>
               Tải lại app
             </button>
           </div>

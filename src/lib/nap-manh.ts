@@ -42,7 +42,11 @@ export function taiLaiMotLan(nay: number = Date.now(), kho: Storage | null = lay
   const truoc = Number(kho.getItem(KHOA) || 0)
   if (truoc && nay - truoc < KHOANG_CHO) return false
   kho.setItem(KHOA, String(nay))
-  if (typeof location !== 'undefined') location.reload()
+  if (typeof location !== 'undefined') {
+    const u = new URL(location.href)
+    u.searchParams.set('_moi', String(nay))
+    location.replace(u.toString())
+  }
   return true
 }
 
@@ -72,8 +76,9 @@ export async function napDong<T>(nap: () => Promise<T>): Promise<T> {
  * hỏng, kể cả ở chỗ chưa kịp bọc `napDong`. Gọi một lần lúc khởi động. */
 export function batLoiThieuManh(cua: Window = window): void {
   cua.addEventListener('vite:preloadError', (e) => {
-    // Chặn Vite ném tiếp ra ngoài — mình xử lý bằng cách tải lại.
-    e.preventDefault()
-    taiLaiMotLan()
+    if (taiLaiMotLan()) {
+      // Chặn Vite ném tiếp ra ngoài — mình xử lý bằng cách tải lại.
+      e.preventDefault()
+    }
   })
 }
