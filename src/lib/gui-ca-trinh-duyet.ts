@@ -37,7 +37,7 @@ export function guiCaBangXhr(url: string, body: string | Uint8Array, signal: Abo
     try {
       xhr.open('POST', url, true)
       xhr.timeout = hanMs
-      xhr.setRequestHeader('content-type', 'text/plain;charset=utf-8')
+      xhr.setRequestHeader('content-type', typeof body === 'string' ? 'text/plain;charset=utf-8' : 'application/octet-stream')
       if (encoding) xhr.setRequestHeader('content-encoding', encoding)
       xhr.send(body as any)
     } catch (e) {

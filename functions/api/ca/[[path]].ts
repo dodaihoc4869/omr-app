@@ -17,10 +17,11 @@ export async function onRequest({ request, env }: { request: Request; env?: { OM
     const ce = request.headers.get('content-encoding')
     if (ce) headers['content-encoding'] = ce
 
+    const bodyBuf = await request.arrayBuffer()
     const response = await fetchFn(`https://omr.ttadodaihoc.workers.dev${path.slice(4)}`, {
       method: 'POST',
       headers,
-      body: request.body,
+      body: bodyBuf,
       signal: controller.signal,
       redirect: 'manual',
     })
