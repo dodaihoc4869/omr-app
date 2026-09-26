@@ -8,7 +8,7 @@ import { goiLenh } from '../lib/goi-lenh-thay'
 
 interface Em { sbd: string; hoTen: string; lop: string; tenLop: string }
 interface De { maDe: string; ten: string; lop: string; soCau: number }
-interface Cfg { bat?: boolean; khoi?: number | null; sbd?: string[]; maDe?: string[]; giaoLuc?: string; deadline?: string }
+interface Cfg { bat?: boolean; khoi?: number | null; lop?: string; sbd?: string[]; maDe?: string[]; giaoLuc?: string; deadline?: string }
 const KHOI: readonly number[] = [10, 11, 12]
 const khoiCua = (lop: string): number | null => { const m = /^(10|11|12)/.exec(lop.trim()); return m ? Number(m[1]) : null }
 
@@ -31,6 +31,7 @@ export default function GiaoDeTheoTuanScreen() {
   const [em, setEm] = useState<Em[]>([])
   const [de, setDe] = useState<De[]>([])
   const [khoi, setKhoi] = useState<number>(12)
+  const [lop, setLop] = useState('')
   const [chonEm, setChonEm] = useState<Set<string>>(new Set())
   const [chonDe, setChonDe] = useState<Set<string>>(new Set())
   const [bat, setBat] = useState(true)
@@ -47,6 +48,7 @@ export default function GiaoDeTheoTuanScreen() {
     if (cfg) {
       setBat(cfg.bat !== false)
       if (typeof cfg.khoi === 'number') setKhoi(cfg.khoi)
+      if (typeof cfg.lop === 'string' && cfg.lop && !cfg.lop.startsWith('Khối')) setLop(cfg.lop)
       setChonEm(new Set(cfg.sbd ?? []))
       setChonDe(new Set(cfg.maDe ?? []))
       setGiaoLuc(typeof cfg.giaoLuc === 'string' ? cfg.giaoLuc : '')
@@ -54,13 +56,15 @@ export default function GiaoDeTheoTuanScreen() {
     }
   }, [showToast])
   useEffect(() => { void nap() }, [nap])
-  const emThay = useMemo(() => em.filter((e) => khoiCua(e.lop) === khoi), [em, khoi])
+  const emTheoKhoi = useMemo(() => em.filter((e) => khoiCua(e.lop) === khoi), [em, khoi])
+  const dsLop = useMemo(() => [...new Set(emTheoKhoi.map((e) => e.tenLop).filter((x) => x !== ''))], [emTheoKhoi])
+  const emThay = useMemo(() => (lop ? emTheoKhoi.filter((e) => e.tenLop === lop) : emTheoKhoi), [emTheoKhoi, lop])
   const deThay = useMemo(() => de.filter((d) => khoiCua(d.lop) === khoi), [de, khoi])
 
   const luu = async () => {
     setDangLuu(true)
     const gl = giaoLuc || new Date().toISOString()
-    const cfg = { bat, khoi, lop: `Khối ${khoi}`, sbd: [...chonEm], maDe: [...chonDe], giaoLuc: gl, deadline: han ? `${han}T23:59:59+07:00` : '' }
+    const cfg = { bat, khoi, lop: lop || `Khối ${khoi}`, sbd: [...chonEm], maDe: [...chonDe], giaoLuc: gl, deadline: han ? `${han}T23:59:59+07:00` : '' }
     const r = await goiLenh('/gv/kho-de-giao', { action: 'luu', cfg }, 'Máy chủ chưa có lệnh giao đề theo tuần.')
     setDangLuu(false)
     if (!r.ok) { showToast(r.chu); return }
@@ -82,7 +86,16 @@ export default function GiaoDeTheoTuanScreen() {
         </label>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
           {KHOI.map((k) => (
-            <button key={k} type="button" className={`m3-nut-chu${khoi === k ? ' m3-nut-tonal' : ' m3-nut-vien'}`} onClick={() => setKhoi(k)}>Khối {k}</button>
+            <button key={k} type="button" className={`m3-nut-chu${khoi === k ? ' m3-nut-tonal' : ' m3-nut-vien'}`} onClick={() => { setKhoi(k); setLop('') }}>Khối {k}</button>
+          ))}
+        </div>
+      </TheNoiDung>
+      <TheNoiDung>
+        <h2 style={{ fontSize: 'var(--cx-3)', fontWeight: 700, marginBottom: 'var(--k2)' }}>Lớp (khối {khoi})</h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--k2)' }}>
+          <button type="button" className={`m3-nut-chu${lop === '' ? ' m3-nut-tonal' : ' m3-nut-vien'}`} onClick={() => setLop('')}>Tất cả</button>
+          {dsLop.map((t) => (
+            <button key={t} type="button" className={`m3-nut-chu${lop === t ? ' m3-nut-tonal' : ' m3-nut-vien'}`} onClick={() => setLop(t)}>{t}</button>
           ))}
         </div>
       </TheNoiDung>
