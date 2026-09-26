@@ -5,7 +5,7 @@
 //   880–1100   thanh rail 88 px (chỉ biểu tượng + nhãn ngắn dưới biểu tượng);
 //   < 880      không hiện thanh này — `BottomNav` (thanh đáy) dùng chính danh sách ấy.
 // Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
-import { CalendarDays, ClipboardCheck, Home, Library, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
+import { CalendarDays, ClipboardCheck, FileText, Home, Library, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import LogoGiaoVien from './LogoGiaoVien'
 
@@ -31,6 +31,7 @@ export const MUC_DIEU_HUONG: MucDieuHuong[] = [
   { id: 'giaobtvn', ten: 'Giao bài tập về nhà', ngan: 'Bài tập', icon: ClipboardCheck },
   { id: 'goilenbang', ten: 'Gọi lên bảng', ngan: 'Lên bảng', icon: Presentation },
   { id: 'cauhoi', ten: 'Học sinh hỏi', ngan: 'Hỏi', icon: MessageCircleQuestion },
+  { id: 'khodegiao', ten: 'Giao đề theo tuần', ngan: 'Giao đề', icon: FileText },
   { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
 

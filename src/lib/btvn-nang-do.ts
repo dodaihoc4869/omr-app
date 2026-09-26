@@ -13,6 +13,7 @@
 // BẢN 1.2 (Boss 21/09, bài thật đầu tiên: bài 29 dạng, em yếu nhận 29 câu toàn lõi, 14 câu `loi_cao`, phần riêng 0): LÕI BẮT BUỘC của từng em = câu lõi mức ≤ bậc đích + 1 (hoặc câu GHIM);
 // lõi cao hơn ⇒ `thuSucThem[]` ("thử sức thêm — không bắt buộc": không nằm trong `chang`, không tính vào ngân sách/xong chặng/xong bài); ngân sách so với LÕI BẮT BUỘC ⇒ em yếu còn chỗ cho phần riêng đúng bậc. ───
 import { hashSeed } from './exam-shuffle'
+import { gomDiemNhan, thuongNhan, trungNhan, type CauCoNhan } from './uu-tien-nhan-kho'
 
 // ══════════════════════════════ HẰNG SỐ (đổi một chỗ; test khoá) ══════════════════════════════
 
@@ -83,6 +84,7 @@ export interface CauGiao {
   dang: string | null
   chuyenDe: string
   mucDo: Muc
+  kienThuc?: string[]
   sao: Sao
   phan: PhanCau
   /** Câu GHIM của thầy: LUÔN bắt buộc với mọi em (thầy chủ động chọn), kể cả khi cao hơn bậc đích + 1 của em. (Có thể truyền qua `tuyChon.ghim` thay vì cờ này.) */
@@ -598,7 +600,25 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
     if (c.mucDo <= t.bacDich) ungRieng.push(i)
     else if (c.mucDo === t.bacDich + 1 && !t.yeu && !(t.nutLen && c.mucDo > t.bacHoSo + 1)) ungThu.push(i)
   })
-  const diem = (i: number, daChonCungDang: number): number => {
+
+  // NHÃN KIẾN THỨC: chuẩn hoá + gom bằng chứng qua lõi dùng chung `uu-tien-nhan-kho` (một định nghĩa cho cả BTVN và bài hằng ngày).
+  // Không sửa `CauGiao` gốc; nhãn trùng/đệm không thể tăng điểm.
+  const cauCoNhan: CauCoNhan[] = ds.map((c) => ({ qid: c.qid, kienThuc: c.kienThuc }))
+  const lichSuNhan: Map<string, { sai: boolean; dung: boolean; daDungLai: boolean }> = new Map()
+  for (const c of ds) {
+    const dq = hoSoAnToan.cau[c.qid]
+    if (!dq) continue
+    lichSuNhan.set(c.qid, {
+      sai: dq.trangThai === 'moi_sai' || dq.trangThai === 'dang_on' || (dq.lanSai > 0 && dq.trangThai !== 'da_khac_phuc'),
+      dung: dq.trangThai === 'da_khac_phuc' || dq.trangThai === 'chua_thay_sai',
+      daDungLai: dq.ngayDungKhacNhau >= D.NGAY_DUNG_LAI_BO,
+    })
+  }
+  const kienThucYeu = gomDiemNhan(cauCoNhan, lichSuNhan)
+
+  const cungKienThuc = (c: CauGiao) => trungNhan({ qid: c.qid, kienThuc: c.kienThuc }, chonRieng.map((j) => cauCoNhan[j]))
+
+  const diem = (i: number, daChonCungDang: number, daChonCungKienThuc: number = 0): number => {
     const c = ds[i]
     const t = dangCua[i]
     const dq = hoSoAnToan.cau[c.qid]
@@ -611,7 +631,16 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
     else if (dq.trangThai === 'moi_sai' || dq.trangThai === 'dang_on' || (dq.lanSai > 0 && dq.trangThai !== 'da_khac_phuc')) d += D.DIEM.saiChuaDungLai
     if (dq && dq.ngayDungKhacNhau >= D.NGAY_DUNG_LAI_BO) d += D.DIEM.daDungLai
     d += D.DIEM.saoCao * c.sao
-    return d - D.DIEM.trungDang * daChonCungDang
+
+    // ĐIỂM GỐC (trước mọi thưởng nhãn): quyết định câu có ĐỦ TƯ CÁCH hay không. ≤ 0 ⇒ trả NGUYÊN giá trị gốc (nhãn không "hồi sinh" câu đã bị lịch sử/trùng dạng loại).
+    const goc = d - D.DIEM.trungDang * daChonCungDang
+    if (goc <= 0) return goc
+
+    // THƯỞNG NHÃN YẾU: chỉ cho câu gốc > 0; câu đã đúng lại ≥ 2 ngày khác nhau ⇒ 0 thưởng. Kẹp ≤ 4 (qua lõi dùng chung).
+    const thuong = thuongNhan({ qid: c.qid, kienThuc: c.kienThuc }, kienThucYeu, !!dq && dq.ngayDungKhacNhau >= D.NGAY_DUNG_LAI_BO)
+    // TRÙNG KỸ NĂNG: chỉ là xếp hạng MỀM; giữ SÀN DƯƠNG nhỏ cho câu gốc > 0 để một kỹ năng chung không làm rỗng phần chọn.
+    const sau = goc + thuong - 5 * daChonCungKienThuc
+    return sau > 0 ? sau : 0.1
   }
   const hon = (a: { i: number; d: number }, b: { i: number; d: number }) => b.d - a.d || nhieu(a.i) - nhieu(b.i) || a.i - b.i
 
@@ -625,6 +654,7 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
   const choRieng = Math.max(0, conCho - soThu)
 
   // ── PHẦN RIÊNG: trước hết mỗi dạng YẾU đủ ≥ 2 câu (dạng yếu nhất trước), rồi lấp theo điểm (chỉ câu điểm > 0) ──
+
   const chonRieng: number[] = []
   const daChon = new Set<number>(batBuocIdx) // chỉ lõi BẮT BUỘC tính vào "dạng yếu đủ ≥ 2 câu": câu lõi quá cao không phải câu luyện đúng bậc
   const dem = (ma: string) => [...daChon].filter((j) => maDangCua(ds[j]) === ma).length
@@ -634,7 +664,7 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
     while (chonRieng.length < choRieng && dem(ma) < D.DANG_YEU_TOI_THIEU_CAU) {
       const tot = ungRieng
         .filter((i) => !daChon.has(i) && maDangCua(ds[i]) === ma)
-        .map((i) => ({ i, d: diem(i, cungDang(ma)) }))
+        .map((i) => ({ i, d: diem(i, cungDang(ma), cungKienThuc(ds[i])) }))
         .sort(hon)[0]
       if (!tot) break
       chonRieng.push(tot.i)
@@ -644,7 +674,7 @@ export function chonBoCuaEm(cau: CauGiao[], loi: string[], hoSo: HoSoEmRut, ngan
   while (chonRieng.length < choRieng) {
     const tot = ungRieng
       .filter((i) => !daChon.has(i))
-      .map((i) => ({ i, d: diem(i, cungDang(maDangCua(ds[i]))) }))
+      .map((i) => ({ i, d: diem(i, cungDang(maDangCua(ds[i])), cungKienThuc(ds[i])) }))
       .filter((x) => x.d > 0)
       .sort(hon)[0]
     if (!tot) break
@@ -837,11 +867,27 @@ function thichNghiTheoMau(
     while (k < dich.length && (nhan[dich[k]] === 'khoi_dong' || nhan[dich[k]] === 'loi' || nhan[dich[k]] === 'dang_yeu')) k++
     return k
   }
+  // THƯỞNG NHÃN (chỉ là XẾP HẠNG PHỤ): gom bằng chứng theo nhãn qua lõi dùng chung `uu-tien-nhan-kho` — cùng định nghĩa với BTVN/bài hằng ngày.
+  // Đứng SAU ưu tiên lịch sử + sao, TRƯỚC chỉ số đề; không đổi tập ứng viên, không nới bậc/ngân sách/chặng đã mở.
+  const cauCoNhan: CauCoNhan[] = ds.map((c) => ({ qid: c.qid, kienThuc: c.kienThuc }))
+  const lichSuNhan: Map<string, { sai: boolean; dung: boolean; daDungLai: boolean }> = new Map()
+  for (const c of ds) {
+    const dq = hs.cau[c.qid]
+    if (!dq) continue
+    lichSuNhan.set(c.qid, {
+      sai: dq.trangThai === 'moi_sai' || dq.trangThai === 'dang_on' || (dq.lanSai > 0 && dq.trangThai !== 'da_khac_phuc'),
+      dung: dq.trangThai === 'da_khac_phuc' || dq.trangThai === 'chua_thay_sai',
+      daDungLai: dq.ngayDungKhacNhau >= D.NGAY_DUNG_LAI_BO,
+    })
+  }
+  const kienThucYeu = gomDiemNhan(cauCoNhan, lichSuNhan)
+  const thuongNhanQid = (qid: string, kienThuc: unknown): number =>
+    thuongNhan({ qid, kienThuc }, kienThucYeu, lichSuNhan.get(qid)?.daDungLai ?? false)
   const ungVien = (ma: string, loc: (m: Muc) => boolean, uuTien: (dq: CauCuaEm | undefined) => number) =>
     ds
       .map((c, i) => ({ c, i }))
       .filter(({ c }) => maDangCua(c) === ma && !daCo.has(c.qid) && loc(c.mucDo))
-      .sort((a, b) => uuTien(hs.cau[a.c.qid]) - uuTien(hs.cau[b.c.qid]) || b.c.sao - a.c.sao || a.i - b.i)
+      .sort((a, b) => uuTien(hs.cau[a.c.qid]) - uuTien(hs.cau[b.c.qid]) || b.c.sao - a.c.sao || thuongNhanQid(b.c.qid, b.c.kienThuc) - thuongNhanQid(a.c.qid, a.c.kienThuc) || a.i - b.i)
 
   for (const ma of [...mau.keys()].sort()) {
     if (doi.length >= D.DOI_TOI_DA_MOI_CHANG) break

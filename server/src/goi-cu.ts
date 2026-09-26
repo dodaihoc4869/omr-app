@@ -1,13 +1,15 @@
 import { docKhoiEm, xoaDemCaBaoVe } from './game-v2-bank'
+import { docKhoDeGiaoCuaEm } from './kho-de-giao'
 import { cauHopKhoi } from '../../src/lib/khoi-cau'
-import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect} from './btvn-grading'
-import {cauTuKhoTheoQid,ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,type CauChamBai} from './su-kien-hoc'
+import {gradeHomework,homeworkQuestions,homeworkKeys,isAnswerCorrect,kiemTraDapAnBtvn,LoiChamBtvn} from './btvn-grading'
+import {ghiSuKien,ghiSuKienThi,suKienChamBai,suKienTuKetQuaCham,laBoTrong,type CauChamBai} from './su-kien-hoc'
 import {expNhanSauNop} from './exp-d1'
 import {maDaDung} from './reset-toan-app'
 import {docBoCuaCacEm,docTomTat,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d1'
 import {btvnNopTreBat,ghiNopTre} from './btvn-nang-do-chang'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 import { goTuLuanKhoiGoi, laCauTuLuan, locPhieuBaiTap, type PhanCau } from './cam-tu-luan'
+import { chuanNhanKienThuc, gomDiemNhan, thuongNhan, type BangChungCau, type CauCoNhan } from '../../src/lib/uu-tien-nhan-kho'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
 // Thầy chốt 12/09 rạng sáng: "gỡ sạch google, toàn bộ app phải được chạy trên
@@ -891,8 +893,17 @@ export async function nopBtvnQuaPhieu(
   if (laBaiCaNhan(bt)) return nopBaiCaNhan(env, bt, sbd, lam, Date.now())
 
   let graded
-  try { graded=gradeHomework(homeworkKeys(await homeworkQuestions(env,chuoi(bt.ma_de))),lam,chuoi(bt.ma_de)) }
-  catch(e){return {ok:false,error:e instanceof Error?e.message:'Không chấm được bài.'}}
+  try {
+    const keys = homeworkKeys(await homeworkQuestions(env, chuoi(bt.ma_de), { sourceMaterial: true }))
+    graded = gradeHomework(keys, lam, chuoi(bt.ma_de))
+    // Validate canonical effective answers before consuming a submission. Blank markers keep
+    // their existing grading/event semantics; this normalized view is not saved as the answer.
+    const preflight = Object.fromEntries(Object.entries(graded.answers).map(([q, v]) => [q, laBoTrong(v) ? '' : v]))
+    kiemTraDapAnBtvn(keys, preflight)
+  } catch(e) {
+    if (e instanceof LoiChamBtvn) throw e
+    return {ok:false,error:e instanceof Error?e.message:'Không chấm được bài.'}
+  }
   const {soDung,soCau,qidSai}=graded
   lam=graded.answers
 
@@ -1027,31 +1038,62 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
   const recalled = await env.DB.prepare('SELECT ma_btvn FROM btvn WHERE ma_btvn = ? AND da_xoa <> 0').bind(ma).first()
   if (recalled) return {ok:false,error:'Bài tập đã được thầy thu hồi.'}
 
-  // ĐÁP ÁN LẤY TỪ GÓI PHIẾU trên R2 — không lấy từ gói máy em gửi lên.
-  let dapAnDung: Record<string, string> = {}
-  const cauPhieu: CauChamBai[] = []
+  // Prepare independent worksheet material before any submission/history/EXP write.
+  // A present worksheet is authoritative; corrupt material must not become a fallback.
+  const loiMaterial = () => new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Thiếu câu hoặc đáp án hợp lệ của phiếu. Bài làm chưa được ghi nhận.')
+  if (!lam || typeof lam !== 'object' || Array.isArray(lam)) throw new LoiChamBtvn('BTVN_GRADING_INPUT_INVALID', 'Đáp án gửi lên chưa đúng định dạng.')
+  const dapAnDung: Record<string, string> = Object.create(null)
+  const cauSo: CauChamBai[] = []
   let maCa = ''
-  if (env.DE) {
-    const o = await env.DE.get(`phieu/${ma}.json`)
-    if (o) {
-      try {
-        const goi = (await new Response(o.body).json()) as Record<string, unknown>
-        maCa = chuoi(goi.maCa)
-        const ph = (goi.phieu ?? {}) as Record<string, unknown>
-        const cau = Array.isArray(ph.cau) ? (ph.cau as Record<string, unknown>[]) : []
-        for (const c of cau) {
-          const qid = chuoi(c.id)
-          if (qid) {
-            dapAnDung[qid] = chuoi(c.dapAn).trim().toUpperCase()
-            if (dapAnDung[qid]) cauPhieu.push({ qid, dapAnDung: dapAnDung[qid], chuyenDe: chuoi(c.chuyenDe), mucDo: chuoi(c.mucDo) })
-          }
-        }
-      } catch {
-        dapAnDung = {}
-        cauPhieu.length = 0
+  const o = await env.DE?.get(`phieu/${ma}.json`)
+  if (o) {
+    let raw: unknown
+    try {
+      raw = await new Response(o.body).json()
+    } catch (e) {
+      if (e instanceof SyntaxError) throw loiMaterial()
+      throw e
+    }
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw loiMaterial()
+    const goi = raw as Record<string, unknown>
+    maCa = chuoi(goi.maCa)
+    const ph = goi.phieu as Record<string, unknown> | undefined
+    if (!ph || !Array.isArray(ph.cau) || ph.cau.length === 0) throw loiMaterial()
+    for (const c of ph.cau as Record<string, unknown>[]) {
+      if (!c || typeof c !== 'object' || Array.isArray(c)) throw loiMaterial()
+      const qid = chuoi(c.id)
+      const dung = chuoi(c.dapAn).trim().toUpperCase()
+      if (!qid.trim() || !dung || Object.hasOwn(dapAnDung, qid)) throw loiMaterial()
+      dapAnDung[qid] = dung
+      cauSo.push({ qid, dapAnDung: dung, chuyenDe: chuoi(c.chuyenDe), mucDo: chuoi(c.mucDo) })
+    }
+  } else {
+    // Client-generated worksheets have no assigned manifest. These are requested qids,
+    // not proof of past assignment: every syntactically accepted qid must resolve now.
+    const qids = Object.keys(lam).filter(q => /-(III|II|I)-\d+$/.test(q))
+    if (qids.length === 0) throw new LoiChamBtvn('BTVN_GRADING_INPUT_INVALID', 'Chưa có mã câu hợp lệ để chấm phiếu.')
+    const sources = new Map<string, string[]>()
+    for (const qid of qids) {
+      const goc = qid.replace(/-(III|II|I)-\d+$/, '')
+      sources.set(goc, [...(sources.get(goc) ?? []), qid])
+    }
+    for (const [goc, requested] of sources) {
+      // Opt in only to typed missing-source errors; unrelated source questions are not
+      // part of this request. Do not use the best-effort history reconstruction reader.
+      const tho = await homeworkQuestions(env, goc, {})
+      const theoQid = new Map(tho.map(c => [String(c.qid), c]))
+      const keys = homeworkKeys(tho)
+      for (const qid of requested) {
+        const c = theoQid.get(qid), dung = keys.get(qid)
+        if (!c || !dung) throw loiMaterial()
+        cauSo.push({ qid, dapAnDung: dung, chuyenDe: chuoi(c.chuyen_de ?? c.chuyenDe), mucDo: chuoi(c.muc_do ?? c.mucDo), phan: chuoi(c.phan) })
       }
     }
+    // Keep legacy fallback score 0/0; prepared bank material is for validated events.
   }
+  const keys = new Map(cauSo.map(c => [c.qid, c.dapAnDung]))
+  const preflight = Object.fromEntries(cauSo.map(c => [c.qid, laBoTrong(chuoi(lam[c.qid])) ? '' : lam[c.qid]]))
+  kiemTraDapAnBtvn(keys, preflight)
 
   const qidSai: string[] = []
   let soDung = 0
@@ -1069,6 +1111,19 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
   const nay = NAY()
   const khoa = `${ma}|${sbd}`
   const cu = await env.DB.prepare('SELECT so_cau, dap_an_json FROM nop_khac_phuc WHERE khoa = ?').bind(khoa).first<{ so_cau: number; dap_an_json?: string }>()
+  const daDoi = !cu || String(cu.dap_an_json ?? '') !== JSON.stringify(lam)
+  let lan = 1
+  if (daDoi && cu) {
+    try {
+      const r = await env.DB.prepare(
+        "SELECT COALESCE(MAX(lan), 0) + 1 AS n FROM su_kien_hoc WHERE nguon = 'khac_phuc' AND ma_nguon = ? AND sbd = ?",
+      ).bind(ma, sbd).first<{ n: number }>()
+      lan = Math.max(2, Number(r?.n) || 2)
+    } catch {
+      lan = 2
+    }
+  }
+  const prepared = daDoi ? suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauSo, lam) : []
   await env.DB.prepare(
     `INSERT INTO nop_khac_phuc (khoa, ma_phieu, sbd, ma_ca, dap_an_json, so_dung, so_cau, nop_luc)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -1079,22 +1134,8 @@ export async function nopKhacPhuc(env: Env, b: Record<string, unknown>): Promise
     .run()
   // SỔ SỰ KIỆN HỌC (GĐ 0): bảng `nop_khac_phuc` chỉ giữ lượt cuối, sổ giữ MỌI lượt (`lan`).
   // Gửi lại y hệt (mất mạng) thì không ghi thêm; nộp lại đáp án khác thì lan = lượt kế tiếp.
-  if (!cu || String(cu.dap_an_json ?? '') !== JSON.stringify(lam)) {
-    let lan = 1
-    if (cu) {
-      try {
-        const r = await env.DB.prepare(
-          "SELECT COALESCE(MAX(lan), 0) + 1 AS n FROM su_kien_hoc WHERE nguon = 'khac_phuc' AND ma_nguon = ? AND sbd = ?",
-        ).bind(ma, sbd).first<{ n: number }>()
-        lan = Math.max(2, Number(r?.n) || 2)
-      } catch {
-        lan = 2
-      }
-    }
-    // Phiếu tự sinh của máy em không có trên R2 → chấm sổ bằng tờ kho theo qid (điểm nộp cũ giữ nguyên).
-    const cauSo = cauPhieu.length ? cauPhieu : await cauTuKhoTheoQid(env, Object.keys(lam))
-    await ghiSuKien(env, suKienChamBai('khac_phuc', ma, sbd, lan, nay, cauSo, lam))
-  }
+  if (daDoi) await ghiSuKien(env, prepared)
+
   return { ok: true, lanThu: cu ? 2 : 1, soCau, soDung, qidSai, nopLuc: nay, ...(await expNhanSauNop(env, sbd, Date.now())) }
 }
 
@@ -2242,6 +2283,148 @@ export async function guiNhanXetCoQuyen(env: Env, b: Record<string, unknown>, la
 // Đo thật 14/09 với ca Test6: 14 tờ ⇒ 175 câu · 395 KB · 0,44 giây.
 const TRAN_TO_DE_THEO_DANG = 40
 
+/** TRẦN SỐ DÒNG HỒ SƠ NẮM KIẾN THỨC đọc cho một lượt xếp hạng. Một em × vài
+ * chục dạng là vài trăm dòng; 1200 là chỗ rộng rãi mà vẫn chặn được một máy em
+ * bị sửa gửi lên danh sách dạng khổng lồ. */
+const TRAN_DONG_NKC = 1200
+
+/** Mã dạng của một câu thô trong kho: nhận cả `dang` dạng chuỗi lẫn dạng
+ * `{ma}`. Không có mã thì trả rỗng — KHÔNG bịa mã từ chuyên đề. */
+function maDangCuaCau(raw: unknown): string {
+  if (typeof raw === 'string') return raw.trim()
+  return maDang(raw)
+}
+
+/** Câu trong một gói đề, tra theo qid — đọc cả ba dáng (`cau`, `phanI/II/III`).
+ * Dùng để lấy nhãn THẬT của câu ứng viên mà không phải đọc lại kho. */
+function cauTrongGoi(goi: unknown, maDe: string): Map<string, Record<string, unknown>> {
+  const ra = new Map<string, Record<string, unknown>>()
+  if (!goi || typeof goi !== 'object') return ra
+  const o = goi as Record<string, unknown>
+  const them = (a: unknown, phanMacDinh = '') => {
+    if (!Array.isArray(a)) return
+    for (const c of a) {
+      if (!c || typeof c !== 'object') continue
+      const x = c as Record<string, unknown>
+      const q = chuoi(x.qid ?? x.id).trim() || (x.so != null ? `${maDe}-${chuoi(x.phan) || phanMacDinh}-${chuoi(x.so)}` : '')
+      if (q && !ra.has(q)) ra.set(q, c as Record<string, unknown>)
+    }
+  }
+  them(o.cau)
+  them(o.phanI, 'I')
+  them(o.phanII, 'II')
+  them(o.phanIII, 'III')
+  return ra
+}
+
+/**
+ * ĐIỂM THƯỞNG NHÃN cho các câu ỨNG VIÊN ĐÃ NẰM TRONG BỘ NHỚ.
+ *
+ * Đây KHÔNG phải lược đồ mới và KHÔNG phải luật của thầy: chỉ là một lượt đọc
+ * `nam_kt_cau` (hồ sơ nắm kiến thức của CHÍNH em) ghép với `game_v2_question`
+ * ở ĐÚNG phiên bản chỉ mục đang chạy, rồi chấm bằng `uu-tien-nhan-kho` — cùng
+ * định nghĩa mà BTVN nâng đỡ và bài hằng ngày của phụ huynh đang dùng.
+ *
+ * BA LUẬT:
+ *   1. Lịch sử có thể trỏ tới qid em ĐÃ LÀM mà KHÔNG nằm trong ứng viên. Nó chỉ
+ *      cấp ĐIỂM cho ứng viên trùng qid; KHÔNG BAO GIỜ thêm câu vào vùng chọn.
+ *   2. Nhãn lấy từ `kienThuc` THẬT của câu trong kho, chuẩn hoá bằng
+ *      `chuanNhanKienThuc`. Không có nhãn thì câu ấy không được thưởng — không
+ *      bịa nhãn từ `dang`/`chuyenDe`.
+ *   3. Bảng `nam_kt_cau` chưa chạy migration ⇒ trả map RỖNG (không thưởng ai).
+ *      Lỗi D1 khác thì NÉM RA, không nuốt.
+ *
+ * Không có `sbd` ⇒ không có thưởng: hồ sơ là của một em, không có em thì không
+ * có gì để đọc.
+ */
+async function thuongNhanTheoQid(
+  env: Env,
+  sbd: string,
+  cauTheoQid: ReadonlyMap<string, { cau: Record<string, unknown> }>,
+): Promise<Map<string, number>> {
+  const ra = new Map<string, number>()
+  if (!sbd || cauTheoQid.size === 0) return ra
+
+  // ỨNG VIÊN: qid → nhãn THẬT của câu (đã chuẩn hoá). Câu không nhãn bị bỏ —
+  // không có nhãn thì không có gì để cộng.
+  const nhanTheoQid = new Map<string, string[]>()
+  const dsDang = new Set<string>()
+  for (const [qid, v] of cauTheoQid) {
+    const nhan = chuanNhanKienThuc(v.cau.kienThuc)
+    if (nhan.length > 0) nhanTheoQid.set(qid, nhan)
+    const ma = maDangCuaCau(v.cau.dang)
+    if (ma) dsDang.add(ma)
+  }
+  if (nhanTheoQid.size === 0 || dsDang.size === 0) return ra
+
+  const dsDangLoc = [...dsDang].slice(0, 200)
+
+  let r: { results?: Record<string, unknown>[] }
+  try {
+    r = await env.DB.prepare(
+      `SELECT n.qid, n.trang_thai, n.lan_sai, n.ngay_dung_khac_nhau, q.json
+         FROM nam_kt_cau n
+         JOIN game_v2_question q ON q.qid = n.qid
+         JOIN game_v2_index i ON i.ma_de = q.ma_de
+         JOIN de_kho d ON d.ma_de = q.ma_de
+        WHERE n.sbd = ?
+          AND n.ma_dang IN (SELECT value FROM json_each(?))
+          AND i.source_version = d.cap_nhat_luc AND COALESCE(d.da_xoa,0) = 0
+        ORDER BY n.luc_cuoi DESC, n.qid, q.ma_de
+        LIMIT ${TRAN_DONG_NKC}`,
+    )
+      .bind(sbd, JSON.stringify(dsDangLoc))
+      .all<Record<string, unknown>>()
+  } catch (e) {
+    // Bảng chưa có (migration-1909 chưa chạy) ⇒ không thưởng ai. Lỗi khác thì
+    // để nó nổi lên: nuốt lỗi D1 ở đây là giấu một sự cố thật.
+    if (e instanceof Error && /no such (table|column)/i.test(e.message)) return ra
+    throw e
+  }
+  const dong = r.results ?? []
+  if (dong.length === 0) return ra
+
+  // LỊCH SỬ: qid → bằng chứng + nhãn THẬT (từ JSON của câu trong kho game).
+  // Khử trùng theo qid: một câu có thể có nhiều dòng nếu lịch sử ghi lẫn.
+  const bangChung = new Map<string, BangChungCau>()
+  const cauCoNhan: CauCoNhan[] = []
+  const daCoQid = new Set<string>()
+  for (const x of dong) {
+    const qid = chuoi(x.qid).trim()
+    if (!qid || daCoQid.has(qid)) continue
+    let cau: Record<string, unknown> | null = null
+    try {
+      const o = JSON.parse(chuoi(x.json))
+      if (o && typeof o === 'object' && !Array.isArray(o)) cau = o as Record<string, unknown>
+    } catch {
+      cau = null
+    }
+    if (!cau) continue
+    const nhan = chuanNhanKienThuc(cau.kienThuc)
+    if (nhan.length === 0) continue
+    daCoQid.add(qid)
+    const tt = chuoi(x.trang_thai)
+    bangChung.set(qid, {
+      sai: tt === 'moi_sai' || tt === 'dang_on',
+      dung: tt === 'da_khac_phuc' || tt === 'chua_thay_sai',
+      daDungLai: (Number(x.ngay_dung_khac_nhau) || 0) >= 2,
+    })
+    cauCoNhan.push({ qid, kienThuc: nhan })
+  }
+  if (cauCoNhan.length === 0) return ra
+
+  // GOM ĐIỂM NHÃN bằng chính hàm dùng chung: `sai - 2 * dung`, kẹp ≥ 0.
+  const diemNhan = gomDiemNhan(cauCoNhan, bangChung)
+
+  // ĐIỂM THƯỞNG CỦA TỪNG ỨNG VIÊN — chỉ ứng viên có nhãn mới có điểm.
+  for (const [qid, nhan] of nhanTheoQid) {
+    const bc = bangChung.get(qid)
+    const t = thuongNhan({ qid, kienThuc: nhan }, diemNhan, bc?.daDungLai ?? false)
+    if (t > 0) ra.set(qid, t)
+  }
+  return ra
+}
+
 /** Gom câu CÙNG MÃ DẠNG từ nhiều tờ đề, mỗi tờ cắt còn đúng phần cần.
  *
  * CHIA ĐỀU THEO DẠNG, không để một dạng nuốt hết chỗ: đi vòng tròn qua các mã
@@ -2325,6 +2508,35 @@ async function goiTheoDang(
     }
   }
 
+  // XẾP LẠI TRONG TỪNG DẠNG THEO ĐIỂM THƯỞNG NHÃN — CHỈ GIỮA CÙNG MỘT MỨC ĐỘ.
+  //
+  // Thầy chốt: câu em còn yếu thì đáng chọn hơn. Nhưng đổi thứ tự giữa các mức
+  // độ là đổi luật của thầy (dễ trước, khó sau), nên ở đây chỉ ĐỔI CHỖ giữa
+  // những câu CÙNG `mucDo`: vị trí cũ của mỗi mức giữ nguyên, chỉ hoán vị các
+  // qid trong mức ấy theo điểm thưởng giảm dần. Mức độ chưa gắn (`''`) giữ
+  // nguyên thứ tự cũ — không ưu tiên câu chưa rõ độ khó.
+  const thuong = await thuongNhanTheoQid(env, x.sbd, cauTheoQid)
+  if (thuong.size > 0) {
+    for (const [ma, ds] of qidTheoDang) {
+      const viTriTheoMuc = new Map<string, number[]>()
+      for (let i = 0; i < ds.length; i++) {
+        const muc = chuoi(cauTheoQid.get(ds[i])?.cau.mucDo ?? cauTheoQid.get(ds[i])?.cau.muc_do)
+        if (!viTriTheoMuc.has(muc)) viTriTheoMuc.set(muc, [])
+        viTriTheoMuc.get(muc)!.push(i)
+      }
+      const moi = ds.slice()
+      for (const [muc, viTri] of viTriTheoMuc) {
+        if (viTri.length < 2 || !['biet', 'hieu', 'van_dung'].includes(muc)) continue
+        const qidTheoViTri = viTri.map((i) => ds[i])
+        const xep = qidTheoViTri
+          .map((q, k) => ({ q, k, t: thuong.get(q) ?? 0 }))
+          .sort((a, b) => b.t - a.t || a.k - b.k)
+        for (let k = 0; k < viTri.length; k++) moi[viTri[k]] = xep[k].q
+      }
+      qidTheoDang.set(ma, moi)
+    }
+  }
+
   // Vòng tròn qua từng dạng cho tới khi đủ số câu hoặc hết ứng viên.
   const thuTu: string[] = []
   const dsDangCo = [...qidTheoDang.keys()]
@@ -2395,6 +2607,9 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
   // LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): chuyên đề/dạng trùng tên giữa các khối ⇒ chỉ giữ câu của tờ khối em hoặc THẤP hơn (máy em gửi `sbd`; không có `sbd` ⇒ không lọc).
   const khoiEm = sbd ? await docKhoiEm(env, sbd) : null
   const rCau = { results: (rCauTho.results ?? []).filter((x) => cauHopKhoi(khoiEm, { qid: x.qid, ma_de: x.ma_de })) }
+  // LUẬT "KHO ĐỀ GIAO THEO TUẦN": em có giao đang hiệu lực ⇒ CHỈ giữ câu thuộc đề đã tick (không rút ngoài kho).
+  const giaoKP = sbd ? await docKhoDeGiaoCuaEm(env, sbd, Date.now()) : null
+  if (giaoKP) rCau.results = rCau.results.filter((x) => giaoKP.maDe.has(chuoi(x.ma_de).trim()))
 
   // ĐƯỜNG RIÊNG CHO MÀN KHẮC PHỤC: LỌC THEO MÃ DẠNG.
   //
@@ -2461,10 +2676,42 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
       }
     }
     const bo = goi ? goTuLuanKhoiGoi(goi, maDe).qidBo : new Set<string>()
+    // Lọc câu tự luận TRƯỚC, giữ nguyên thứ tự cũ của tờ.
+    const con = qids.filter((q) => !bo.has(q))
+    // XẾP LẠI TRONG CÙNG MỘT MỨC ĐỘ: câu em còn yếu đáng chọn trước. Mức độ
+    // chưa gắn thì KHÔNG ưu tiên — giữ nguyên thứ tự cũ. Không đổi thứ tự giữa
+    // các mức độ (dễ trước, khó sau là luật của thầy).
+    let xep = con
+    if (goi && con.length > 1) {
+      const cauMap = cauTrongGoi(goi, maDe)
+      const ungVien = new Map<string, { cau: Record<string, unknown> }>()
+      for (const q of con) {
+        const c = cauMap.get(q)
+        if (c) ungVien.set(q, { cau: c })
+      }
+      const thuong = await thuongNhanTheoQid(env, sbd, ungVien)
+      if (thuong.size > 0) {
+        const viTriTheoMuc = new Map<string, number[]>()
+        for (let i = 0; i < con.length; i++) {
+          const muc = chuoi(cauMap.get(con[i])?.mucDo ?? cauMap.get(con[i])?.muc_do)
+          if (!viTriTheoMuc.has(muc)) viTriTheoMuc.set(muc, [])
+          viTriTheoMuc.get(muc)!.push(i)
+        }
+        const moi = con.slice()
+        for (const [muc, viTri] of viTriTheoMuc) {
+          if (viTri.length < 2 || !['biet', 'hieu', 'van_dung'].includes(muc)) continue
+          const qidTheoViTri = viTri.map((i) => con[i])
+          const xep2 = qidTheoViTri
+            .map((q, k) => ({ q, k, t: thuong.get(q) ?? 0 }))
+            .sort((a, b) => b.t - a.t || a.k - b.k)
+          for (let k = 0; k < viTri.length; k++) moi[viTri[k]] = xep2[k].q
+        }
+        xep = moi
+      }
+    }
     let lay = 0
-    for (const q of qids) {
+    for (const q of xep) {
       if (thuTu.length >= soCau) break
-      if (bo.has(q)) continue
       thuTu.push(q)
       lay++
     }

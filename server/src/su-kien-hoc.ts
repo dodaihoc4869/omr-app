@@ -15,7 +15,7 @@
 //   - Hàm thuần (`suKien*`) không đọc đồng hồ: `luc` do nơi gọi truyền vào.
 import { emCoGhi } from './dem-ke-hoach'
 import type { D1PreparedStatement, Env } from './kieu'
-import { answerText, homeworkQuestions, isAnswerCorrect } from './btvn-grading'
+import { answerText, homeworkQuestions, isAnswerCorrect, kiemTraDapAnBtvn } from './btvn-grading'
 import { POLICY_VERSION } from './ho-so-cau-hinh'
 
 export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng'
@@ -468,24 +468,34 @@ export async function ghiSuKienThi(env: Env, maCa: string, ds: LuotThi[], lucDuP
 // --- Lô BTVN: máy em gửi kèm đáp án của lô khi báo "xong lô" ---------------------
 
 /**
- * Chấm và ghi sổ đáp án của MỘT lô. Chỉ chấm những câu máy em gửi lên (đúng
- * là các câu của lô — máy chủ chưa cắt lô ở GĐ 0). Không đọc được tờ kho thì
- * ghi nhận lỗi, KHÔNG làm hỏng việc báo xong lô.
+ * Prepare only the supplied questions (legacy lots are not partitioned on the server).
+ * Read/validation errors propagate before lo_da_xong changes; persistence remains separate.
  */
-export async function ghiSuKienLoBtvn(
+export async function chuanBiSuKienLoBtvn(
   env: Env,
   maBtvn: string,
   sbd: string,
   chiSoLo: number,
   dapAn: Record<string, unknown>,
-): Promise<KetQuaGhi> {
+): Promise<SuKien[]> {
+  const bt = await env.DB.prepare('SELECT ma_de FROM btvn WHERE ma_btvn = ? AND da_xoa = 0')
+    .bind(maBtvn)
+    .first<{ ma_de: string }>()
+  if (!bt) throw new Error('Không có bài tập này')
+  const cau = cauTuKho(await homeworkQuestions(env, String(bt.ma_de), { sourceMaterial: true })).filter((c) => Object.hasOwn(dapAn, c.qid))
+  const keys = new Map(cau.map(c => [c.qid, c.dapAnDung]))
+  const preflight = Object.fromEntries(cau.map(c => {
+    const answer = answerText(dapAn[c.qid])
+    return [c.qid, laBoTrong(answer) ? '' : answer]
+  }))
+  kiemTraDapAnBtvn(keys, preflight, new Map(cau.map(c => [c.qid, phanTuQid(c.qid, c.phan ?? 'I')])))
+  return suKienChamBai('btvn_lo', maBtvn, sbd, chiSoLo, new Date().toISOString(), cau, dapAn)
+}
+
+/** Persist precisely the prepared events; never fetch/regrade R2 after the progress write. */
+export async function ghiSuKienLoBtvn(env: Env, prepared: SuKien[]): Promise<KetQuaGhi> {
   try {
-    const bt = await env.DB.prepare('SELECT ma_de FROM btvn WHERE ma_btvn = ? AND da_xoa = 0')
-      .bind(maBtvn)
-      .first<{ ma_de: string }>()
-    if (!bt) return { ok: false, soGui: 0, boQua: 0, loi: 'Không có bài tập này' }
-    const cau = cauTuKho(await homeworkQuestions(env, String(bt.ma_de))).filter((c) => Object.hasOwn(dapAn, c.qid))
-    return await ghiSuKien(env, suKienChamBai('btvn_lo', maBtvn, sbd, chiSoLo, new Date().toISOString(), cau, dapAn))
+    return await ghiSuKien(env, prepared)
   } catch (e) {
     const loi = e instanceof Error ? e.message : String(e)
     console.error('[su-kien-hoc] không ghi được sổ lô BTVN:', loi)

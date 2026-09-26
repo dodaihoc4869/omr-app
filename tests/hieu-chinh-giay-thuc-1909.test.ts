@@ -263,7 +263,7 @@ describe('khoá nguồn', () => {
     expect(man).toContain('...(giayThuc ? { giayThuc: giayThuc.giay } : {})')
     expect(man.indexOf('await ghiLenBang(cauHinh.url')).toBeLessThan(man.indexOf('void ghiMauGiayThuc(p.cau, giayThuc)'))
     expect(man).toContain('ghiTheoKhoaRef.current?.(o, tin.dat, tin.giayThuc)')
-    expect(man).toContain('const kq = xepBuoiChua(cauVaoXep, hoSo)') // dòng gọi Engine E mà test cũ khoá — không đổi
+    expect(man).toContain('xepBuoiChuaMoi(cauVaoXep, hoSo, CAU_HINH_LEN_BANG_MAC_DINH') // LUẬT MỚI 25/09: thay Engine E
   })
   it('exam-api gửi `giayThuc` chỉ khi có; cầu nối đo qua `__mcGiayDot`', () => {
     expect(readFileSync('src/lib/exam-api.ts', 'utf8')).toContain('...(d.giayThuc !== undefined ? { giayThuc: d.giayThuc } : {})')

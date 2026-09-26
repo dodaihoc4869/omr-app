@@ -4,7 +4,7 @@
 // "ưu tiên phân công câu 2 sao trước rồi đến 1 sao", "số câu khó và quan trọng
 // nhất phải được chữa hết, số câu còn lại chỉ cần đọc đáp án".
 import { describe, it, expect } from 'vitest'
-import { xepBuoiChua, xepThuTuChua, bangChuBuoiChua, type CauVaoXep } from '../src/lib/xep-buoi-chua'
+import { xepBuoiChua, xepThuTuChua, bangChuBuoiChua, TRAN_LUOT_MOI_EM, type CauVaoXep } from '../src/lib/xep-buoi-chua'
 import { BTVN_RONG, diemHopCau, gopHoSo, TRONG_SO, type HoSoEmDayDu } from '../src/lib/ho-so-lop'
 import { CAU_HINH_LEN_BANG_MAC_DINH, giayLenBang, nganSachGiay } from '../src/lib/len-bang-cau-hinh'
 import type { CauChua } from '../src/lib/phan-cong'
@@ -93,12 +93,28 @@ describe('SÀN 20 EM TRONG 90 PHÚT', () => {
     expect(kq.tongGiay).toBeLessThanOrEqual(kq.nganSach)
   })
 
-  it('20 em là 20 em KHÁC NHAU, không phải một em lên nhiều lượt', () => {
+  it('ngân sách hết TRƯỚC khi hết em ⇒ mỗi em đúng MỘT lượt (chưa tới lúc phát lượt thêm)', () => {
     const ds = Array.from({ length: 40 }, (_, i) => cau(i + 1, (i % 3) as 0 | 1 | 2))
     const kq = xepBuoiChua(ds, LOP(30))
     const sbd = kq.dong.filter((d) => d.tang === 'len_bang').map((d) => d.em?.sbd)
     expect(new Set(sbd).size).toBe(sbd.length)
     expect(kq.soEmLenBang).toBeGreaterThanOrEqual(20)
+  })
+
+  it('LUẬT MỚI (thầy chốt 25/09): 40 câu 0 sao (vừa 4.920 s) / 30 em ⇒ MỌI em có mặt 1 lượt RỒI mới phát LƯỢT THÊM, cân bằng, không quá trần', () => {
+    const ds = Array.from({ length: 40 }, (_, i) => cau(i + 1, 0))
+    const kq = xepBuoiChua(ds, LOP(30))
+    const sbd = kq.dong.filter((d) => d.tang === 'len_bang').map((d) => d.em?.sbd)
+    expect(kq.soEmLenBang).toBe(30) // MỌI em có mặt đều lên bảng
+    expect(sbd.length).toBeGreaterThan(30) // CÓ em được gọi lượt thứ hai
+    expect(kq.tongGiay).toBeLessThanOrEqual(kq.nganSach)
+    const dem = new Map<string, number>()
+    for (const s of sbd) dem.set(s!, (dem.get(s!) ?? 0) + 1)
+    const so = [...dem.values()].sort((a, b) => a - b)
+    expect(so[so.length - 1]! - so[0]!).toBeLessThanOrEqual(1) // CÂN BẰNG: chênh ≤ 1 lượt
+    expect(so[so.length - 1]!).toBeLessThanOrEqual(TRAN_LUOT_MOI_EM) // không em nào quá trần
+    const lanThuHai = sbd.findIndex((s, i) => sbd.slice(0, i).includes(s!))
+    expect(lanThuHai).toBeGreaterThanOrEqual(30) // lượt thêm CHỈ tới sau khi đủ 30 em đã có lượt
   })
 
   it('lớp 40 em, đề 36 câu — vẫn đạt sàn', () => {
@@ -282,7 +298,17 @@ describe('QUÉT DIỆN RỘNG — sàn 20 em phải đứng vững', () => {
             }
             if (!kq.datSan && !kq.thieu) truot.push(`IM LẶNG: chưa đạt sàn mà không nói lý do (${soEm} em · ${soCau} câu)`)
             const sbdLen = kq.dong.filter((d) => d.tang === 'len_bang').map((d) => d.em?.sbd)
-            if (new Set(sbdLen).size !== sbdLen.length) truot.push(`TRÙNG EM: ${soEm} em · ${soCau} câu`)
+            // LUẬT MỚI (thầy chốt 25/09): CHO LƯỢT THÊM, nhưng (a) không em nào quá `TRAN_LUOT_MOI_EM` lượt,
+            // (b) KHÔNG ai được lượt thứ hai khi còn một em có mặt CHƯA có lượt nào (không "một em lên bốn lượt").
+            const demLen = new Map<string, number>()
+            for (const s of sbdLen) demLen.set(s!, (demLen.get(s!) ?? 0) + 1)
+            const quaTran = [...demLen.entries()].find(([, n]) => n > TRAN_LUOT_MOI_EM)
+            if (quaTran) truot.push(`QUÁ TRẦN LƯỢT: ${soEm} em · ${soCau} câu · ${quaTran[0]} ${quaTran[1]} lượt`)
+            const lanThuHai = sbdLen.findIndex((s, i) => sbdLen.slice(0, i).includes(s!))
+            if (lanThuHai >= 0) {
+              const daCoLuot = new Set(sbdLen.slice(0, lanThuHai)).size
+              if (daCoLuot < Math.min(soEm, soCau)) truot.push(`LƯỢT THÊM QUÁ SỚM: ${soEm} em · ${soCau} câu · mới ${daCoLuot} em có lượt`)
+            }
           }
         }
       }

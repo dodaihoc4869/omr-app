@@ -12,6 +12,7 @@ import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
+import { docKhoDeGiaoCuaEm } from './kho-de-giao'
 import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 import { ghiSnapshot, quyetDinhSnapshot } from './cau-snapshot'
 // CỔNG PHẠM VI CÁ NHÂN (CNH-1.0 P02) áp cho ĐƯỜNG ĐỌC CÂU DÙNG CHUNG (`/hs/cau-theo-qid` + `/hs/on-lai/nop`):
@@ -179,17 +180,23 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepT
     const q = theoQid.get(qid)
     return q && khongBiBaoVe(q, baoVe) ? [q] : []
   })
+
+  // LUẬT "KHO ĐỀ GIAO THEO TUẦN": em có giao đang hiệu lực ⇒ CHỈ trả câu thuộc đề đã tick (không rút ngoài kho).
+  const giao = await docKhoDeGiaoCuaEm(env, sbd, Date.now())
+  const cauTra = giao ? cau.filter((c) => {
+    const md = String((c as { maDe?: string }).maDe ?? '')
+    return md !== '' && giao.maDe.has(md)
+  }) : cau
+
   // CỔNG PHẠM VI CÁ NHÂN (P02/P06): cờ `pham_vi_hoc` BẬT ⇒ câu phải qua `eligibleScope` cho CHÍNH em này.
-  // Cờ đọc GỘP trong truy vấn 1 (không thêm truy vấn khi TẮT); BẬT thì thêm ĐÚNG một truy vấn đọc phạm vi.
-  // KHÔNG nới: thiếu nhãn/chưa duyệt/kỹ năng chưa `taught` ⇒ LOẠI (thiếu thì trả thiếu), không fallback sang kho chung.
-  let loc: PrivateQuestion[] = cau
+  let loc: PrivateQuestion[] = cauTra
   if (String(r?.co_pham_vi ?? '').trim() === 'bat') {
     try {
       // Quyền TOÀN CHƯƠNG TRÌNH do THẦY cấp (có bằng chứng) mở đúng phạm vi đã cấp — không tự mở rộng.
       const moHet = await coQuyen(env, sbd, QUYEN_TOAN_CHUONG_TRINH)
       if (!moHet) {
         const pv = (await docPhamViNhieu(env, [sbd])).get(sbd) ?? new Map()
-        loc = cau.filter((q) => {
+        loc = cauTra.filter((q) => {
           const j = q as unknown as { kienThuc?: unknown; reviewed?: unknown; group?: unknown; version?: unknown }
           const skillIds = Array.isArray(j.kienThuc) ? (j.kienThuc as string[]) : []
           const kq = eligibleScope(
@@ -203,16 +210,17 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepT
       }
     } catch {
       // Không kiểm được phạm vi/quyền ⇒ giữ như cũ (một lỗi đọc tạm không làm trống việc ôn), không ghi là đã kiểm.
-      loc = cau
+      loc = cauTra
     }
   }
+
   // BỘ CHỌN CHUNG (RV07 mục 7): cờ `ngan_sach_luot` BẬT ⇒ câu xin còn phải QUA §7.1 như mọi kênh khác.
-  // Lỗi đọc/lỗi chọn ⇒ giữ nguyên (null = không lọc), KHÔNG bao giờ nới luật để lấp chỗ.
   let loc2 = loc
   if (loc.length > 0 && String(r?.co_ngan_sach ?? '').trim() === 'bat') {
     const cho = await locTheoBoChonChung(env, sbd, loc, Date.now())
     if (cho) loc2 = loc.filter((q) => cho.has(q.qid))
   }
+
   // `khongCo` tính SAU mọi cửa (kể cả bộ chọn) ⇒ máy em biết đúng câu nào KHÔNG nhận được trong lượt này.
   const co = new Set(loc2.map((c) => c.qid))
   return { cau: loc2, khongCo: xin.filter((q) => !co.has(q)), snapshotBat: batSnapshot }

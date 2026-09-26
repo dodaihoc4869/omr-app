@@ -18,7 +18,7 @@
 // nguyên hành vi cũ (đúng 07 §3 "bật tính năng theo lớp rủi ro" — không tự bật).
 import type { Env } from './kieu'
 import { isAnswerCorrect } from './btvn-grading'
-import { POLICY_MAC_DINH_PHAN_III, POLICY_VERSION, type GradingPolicyId } from '../../src/lib/cham-so-policy'
+import { chamTheoPolicy, ChamInputError, ChamMaterialError, POLICY_MAC_DINH_PHAN_III, POLICY_VERSION, type GradingPolicyId } from '../../src/lib/cham-so-policy'
 
 /** Khoá trong `cau_hinh`; giá trị `'bat'` mới bật. Chỉ ĐỌC, không tự ghi. */
 export const KHOA_BAT_SNAPSHOT = 'cau_snapshot'
@@ -113,13 +113,35 @@ export function quyetDinhSnapshot(
   return { kieu: 'dung-snapshot', snapshot: daCo }
 }
 
+/** Metadata phía server không đủ để chấm; KHÔNG phải lỗi nhập của học sinh. */
+export class LoiChinhSachSnapshot extends Error {
+  readonly ma = 'SNAPSHOT_GRADING_POLICY_INVALID'
+}
+
 /**
- * CHẤM BẰNG SNAPSHOT — dùng đáp án trong ảnh chụp lúc giao, không đọc kho sống.
- * MỘT luật chấm duy nhất (`isAnswerCorrect`, đi tiếp qua policy CNH-1.0 cho Phần III) như mọi kênh khác;
- * snapshot chỉ đổi NGUỒN ĐÁP ÁN.
+ * Chấm đáp án VÀ policy đã lưu. Legacy snapshot chỉ lưu policy ID/version, không có
+ * decimals/requiredUnit: policy cần các trường đó phải chặn, không suy từ kho sống.
+ * Giữ boolean cho caller; input unsupported ném ChamInputError trước khi ghi event.
+ * Cấu hình snapshot lỗi ném LoiChinhSachSnapshot để caller phân biệt lỗi phía server.
  */
 export function chamTheoSnapshot(snapshot: CauSnapshot, emTraLoi: string): boolean {
-  return isAnswerCorrect(emTraLoi, snapshot.dapAn, snapshot.phan)
+  if (snapshot.phan !== 'III') return isAnswerCorrect(emTraLoi, snapshot.dapAn, snapshot.phan)
+  if (typeof emTraLoi !== 'string' || emTraLoi.length === 0) throw new ChamInputError('answer phải là chuỗi không rỗng')
+  if (snapshot.policyVersion !== POLICY_VERSION) throw new LoiChinhSachSnapshot('Phiên bản chính sách chấm chưa được hỗ trợ')
+  let result
+  try {
+    result = chamTheoPolicy({
+      policy: snapshot.gradingPolicy,
+      policyVersion: snapshot.policyVersion,
+      key: snapshot.dapAn,
+      answer: emTraLoi,
+    })
+  } catch (e) {
+    if (e instanceof ChamInputError || e instanceof ChamMaterialError) throw new LoiChinhSachSnapshot('Bản ghi lúc giao thiếu chính sách chấm hợp lệ')
+    throw e
+  }
+  if (result.error) throw new ChamInputError(result.error)
+  return result.correct
 }
 
 /** Đọc cờ bật. LỖI ĐỌC ⇒ `false` (giữ đường cũ) — không để một lỗi tạm làm hỏng việc nộp bài. */
@@ -188,4 +210,3 @@ export async function ghiSnapshot(env: Env, s: CauSnapshot): Promise<void> {
        issued_at = excluded.issued_at`,
   ).bind(s.sbd, s.qid, s.snapshotId, s.questionVersion, s.contentGroup, s.phan, s.dapAn, s.gradingPolicy, s.policyVersion, s.issuedAt).run()
 }
-

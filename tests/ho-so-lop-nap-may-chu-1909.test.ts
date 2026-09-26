@@ -90,7 +90,7 @@ describe('Màn Gọi lên bảng xin hồ sơ đúng cho câu của buổi', () 
     expect(man).toContain("napHoSoLop(cauHinh?.url ?? '', cauHinh?.mat ?? '', coMat, qidBuoi)")
     expect(man).toContain('if (loiHoSo || khoaHoSo !== khoaHoSoDaNap.current)')
     expect(man).toContain('khoaHoSoDaNap.current = r.loi ? \'\' : khoaHoSo')
-    // Đường xếp buổi không đổi: vẫn xếp bằng hồ sơ vừa nạp.
-    expect(man).toContain('const kq = xepBuoiChua(cauVaoXep, hoSo)')
+    // Đường xếp buổi dùng LUẬT MỚI (25/09 — thay Engine E): vẫn xếp bằng hồ sơ vừa nạp để lấy em cho `dong`.
+    expect(man).toContain('xepBuoiChuaMoi(cauVaoXep, hoSo, CAU_HINH_LEN_BANG_MAC_DINH')
   })
 })

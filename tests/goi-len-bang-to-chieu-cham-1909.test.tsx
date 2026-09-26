@@ -357,7 +357,8 @@ describe('GIÂY THẬT (M6): tờ chiếu báo giây → màn gửi kèm lệnh 
   }
   const phutBuoi = (r: ReturnType<typeof render>) => {
     const t = r.container.querySelector('[data-khoi="buoi-chua"]')!.textContent ?? ''
-    return Number(/(\d+)\/\d+ phút/.exec(t)![1])
+    // Chế độ HẾT bỏ ngân sách ⇒ bảng hiện "~X phút" (không còn "X/Y phút").
+    return Number(/(\d+) phút/.exec(t)![1])
   }
 
   it('tin CHAM kèm giây thật hợp lệ ⇒ `ghiLenBang` nhận `giayThuc`, và MẪU (phần, sao, giây, T dự tính) được lưu sau khi máy chủ nhận', async () => {

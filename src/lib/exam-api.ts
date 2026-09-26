@@ -3085,11 +3085,11 @@ export async function hsDangNhapApi(scriptUrl: string, sbd: string, matKhau?: st
   const base = await layDiaChiMayChu(scriptUrl)
   if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
-    const res = await fetch(`${base}/hs/dang-nhap`, {
+    const res = await fetchCoHan(`${base}/hs/dang-nhap`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ sbd: sbd.trim(), matKhau: (matKhau ?? '').trim() }),
-    })
+    }, HAN_GIAY)
     return (await res.json()) as any
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
@@ -3105,11 +3105,11 @@ export async function hsDatMatKhauApi(scriptUrl: string, sbd: string, matKhauMoi
   const base = await layDiaChiMayChu(scriptUrl)
   if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
-    const res = await fetch(`${base}/hs/dat-mat-khau`, {
+    const res = await fetchCoHan(`${base}/hs/dat-mat-khau`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ sbd: sbd.trim(), matKhauMoi: matKhauMoi.trim(), matKhauCu: (matKhauCu ?? '').trim() }),
-    })
+    }, HAN_GIAY)
     return (await res.json()) as any
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }
@@ -3126,11 +3126,11 @@ export async function resetMatKhauHsApi(scriptUrl: string, secret: string, sbd: 
   const base = await layDiaChiMayChu(scriptUrl)
   if (!base) return { ok: false, error: 'Chưa lấy được địa chỉ máy chủ. Em tải lại trang rồi thử lại.' } as any
   try {
-    const res = await fetch(`${base}/goi`, {
+    const res = await fetchCoHan(`${base}/goi`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret.trim() },
       body: JSON.stringify({ action: 'resetMatKhauHs', secret: secret.trim(), sbd: sbd.trim() }),
-    })
+    }, HAN_GIAY)
     return (await res.json()) as any
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Không kết nối được máy chủ' }

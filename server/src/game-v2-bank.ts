@@ -1,6 +1,7 @@
 import {laCauTuLuan} from '../../src/lib/cau-tu-luan'
 import {DemTTL} from './dem-chung'
 import { khoiCuaEm, locCauHopKhoi, type Khoi } from '../../src/lib/khoi-cau'
+import { docKhoDeGiaoCuaEm, locTheoKhoDeGiao } from './kho-de-giao'
 import type { Env } from './kieu'
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../../src/lib/exam-kho-de-import'
 import {grade} from '../../src/game/than-thu-v2/core'
@@ -241,7 +242,8 @@ export async function readScope(env:Env,sbd:string,dangLop:readonly string[]=[])
     pool.push(...gop.map(x=>x.q))
   }
   // LUẬT KHỐI (Boss 21/09): kho ứng viên chỉ gồm câu khối em hoặc thấp hơn — dạng dùng chung nhiều khối nên lọc theo DẠNG không đủ. Bằng chứng (`evidence`) là lịch sử THẬT của em, giữ nguyên. Lọc đứng SAU đệm kho theo dạng (đệm chung mọi em), riêng từng em.
-  const poolSach=locCauHopKhoi(await docKhoiEm(env,sbd),[...pool.reduce((m,q)=>{const c=q as CauPool,cu=m.get(c.qid);if(!(cu&&!cu.nhe&&c.nhe))m.set(c.qid,c);return m},new Map<string,CauPool>()).values()] /* qid trùng: bản SAU thắng như cũ, TRỪ khi bản đang giữ là câu đầy đủ và bản mới là bản nhẹ */)
+
+  const poolSach=locCauHopKhoi(await docKhoiEm(env,sbd),[...locTheoKhoDeGiao(pool,await docKhoDeGiaoCuaEm(env,sbd,bayGio),laTuLuanPool).reduce((m,q)=>{const c=q as CauPool,cu=m.get(c.qid);if(!(cu&&!cu.nhe&&c.nhe))m.set(c.qid,c);return m},new Map<string,CauPool>()).values()] /* qid trùng: bản SAU thắng như cũ, TRỪ khi bản đang giữ là câu đầy đủ và bản mới là bản nhẹ */)
   // PHẠM VI HỌC CÁ NHÂN (CNH-1.0 P02 — đặc tả 02 §2). Cờ `pham_vi_hoc` TẮT (mặc định) ⇒ đường cũ y nguyên.
   // Cờ BẬT ⇒ lọc theo `eligibleScope`. THIẾU câu vì thiếu `taught` thì TRẢ THIẾU, KHÔNG nới lọc và KHÔNG
   // fallback sang kho lớp/toàn ngân hàng. ÁNH XẠ TẠM (ghi rõ để thầy xác nhận nhãn): `kienThuc`→skill_ids;

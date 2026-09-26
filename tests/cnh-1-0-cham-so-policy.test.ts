@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
 import {
-  chamTheoPolicy, parseChamInput, ChamInputError, chuanHoaSoNhap, tachSoVaDonVi,
+  chamTheoPolicy, parseChamInput, ChamInputError, ChamMaterialError, chuanHoaSoNhap, tachSoVaDonVi,
   POLICY_VERSION, POLICY_MAC_DINH_PHAN_III, THAM_SO_CHAM_CNH_1_0,
 } from '../src/lib/cham-so-policy'
 import { khopPhanIII } from '../src/lib/cham-so'
@@ -47,7 +47,7 @@ describe('T33 — bốn adapter chấm đi CÙNG một policy, không lệch nha
     ['0,540', '0,54'], ['0,80', '0,8'], ['0,5', '0,54'], ['0,55', '0,54'],
     ['12abc', '12'], ['12 g', '12'], ['12 g', '12 kg'], ['0,54 M', '0,54 mol/L'],
     ['1.0001', '1'], ['1.00009', '1'], ['0', '0.0001'], ['', '0,54'], ['.', '0,54'],
-    ['1/2', '0.5'], ['SO3', 'SO3'], ['SO2', 'SO3'],
+    ['1/2', '0.5'],
   ]
   it('khopPhanIII (ca thi + mọi màn), isAnswerCorrect (BTVN/ôn lại), chamMotCau, gradeMom cùng kết quả', () => {
     for (const [em, dapAn] of CAP) {
@@ -63,6 +63,16 @@ describe('T33 — bốn adapter chấm đi CÙNG một policy, không lệch nha
         expect(diem, `gradeMom ${JSON.stringify(em)} vs ${JSON.stringify(dapAn)}`).toBe(mongDoi ? 1 : 0)
       }
     }
+  })
+  it('numeric server keys outside grammar throw material errors; boolean legacy adapters fail closed', () => {
+    // 02 §1.2: SO3 requires an explicit literal policy; equal text cannot bypass numeric parsing.
+    for (const em of ['SO3', 'SO2']) {
+      expect(() => chamTheoPolicy({ policy: POLICY_MAC_DINH_PHAN_III, key: 'SO3', answer: em })).toThrow(ChamMaterialError)
+      expect(khopPhanIII(em, 'SO3')).toBe(false)
+      expect(isAnswerCorrect(em, 'SO3', 'III')).toBe(false)
+      expect(chamMotCau({ qid: 'SYN-CNH-III-1', dapAn: 'SO3' }, { correct: em, phan: 'III' })).toBe(false)
+    }
+    expect(chamTheoPolicy({ policy: 'literal-v1', key: 'SO3', answer: 'SO3' })).toEqual({ correct: true })
   })
   it('game Đảo/Đoàn GIỮ chính sách chặt \'chat\': 0,540 KHÁC 0,54 (không bị CNH-1.0 làm lỏng)', () => {
     const q = (correct: string) => ({ phan: 'III', correct }) as never
@@ -176,4 +186,7 @@ describe('T19 — Phần II: lưu kết quả TỪNG Ý, không hạ cả câu v
     expect(kq.total).toBe(10)
   })
 })
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/cnh-exp-p08-2409

@@ -1,4 +1,7 @@
 import {EXP_DU_TRU,EXP_REN_KHIEN} from '../../src/lib/kinh-te-game'
+import {moCuaRoute,cuaP08Mo,hapThuQuaP08,renKhienQuaP08,dungKhienQuaP08} from './cnh-exp-adapter'
+import {tramP08LenHienThi} from './cnh-exp-p08-hien-thi'
+
 import {renKhienBangExp} from './exp-ho-so-game'
 import {normalizePetName} from '../../src/game/than-thu-v2/pet-name'
 import {escortAction,escortContext} from './game-v2-escort'
@@ -28,7 +31,7 @@ import {buCauLauNhat,docCauDaLamMoiNguon,docCauLamHomNay,tachMoiCu} from './game
 import {SO_HIEP} from '../../src/game/than-thu-v2/doan-core'
 import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay'
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
-import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot} from './game-v2-luot'
+import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame} from './exp-d1'
 import {LENH_SHOP,shopAction,shopBatCho} from './game-v2-shop'
 import {expMotCau} from './exp-hoc-tap'
@@ -171,8 +174,9 @@ async function startLuotMoi(env:Env,sbd:string,p:Profile,b:Record<string,unknown
   }
   const id=idLuot,groups=new Set(scope.evidence.map(e=>e.group))
   const session:Session={mode:'adventure',created:Date.now(),questions:chon.map(x=>({qid:x.q.qid,maDe:x.q.maDe,version:x.q.version,group:x.q.group,novel:!groups.has(x.q.group),role:x.role}))}
-  const inserted=await env.DB.prepare('INSERT OR IGNORE INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').bind(id,sbd,JSON.stringify(session),now()).run()
-  if(!inserted.meta.changes)return startLuotMoi(env,sbd,p,b,action)
+  // CHỐNG PHÁT TRÙNG KHI RETRY/CẠNH TRANH (thầy 24/09, lát cắt 1): mở phiên CHỈ KHI em chưa có lượt chờ, trong MỘT câu lệnh
+  // (cùng vị từ `docLuotDangCho`). Hai yêu cầu song song ⇒ đúng MỘT bộ câu được phát; yêu cầu thua quay lại dưới đây và trả ĐÚNG lượt vừa mở.
+  if(!await moPhienLuotMoi(env,id,sbd,JSON.stringify(session),Date.now()))return startLuotMoi(env,sbd,p,b,action)
   const day=await doDayDu(env,chon.map(x=>x.q as CauPool)) // pool là bản NHẸ: chỉ các câu ĐƯỢC CHỌN mới nạp đầy đủ để đưa cho em
   return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),...vaiChoMay(x.role)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),...(giuMat.length?{giuChoThua:giuMat}:{}),...(giuDangMo?{giuChoDangMo:giuDangMo}:{}),...(lyDoLuot?{chonLyDo:lyDoLuot}:{}),...(hoanLuot?{hoanLuot}:{}),luot:{...tomTatLuot({...info,conLai:Math.max(0,info.conLai-1)},dauVao.soLuotDaLam+1),luotDangMo:lt},maiCho:cho}
 }
@@ -209,8 +213,9 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
   let chon=[...uuTienOn,...chooseLuotMoi(moi.filter(q=>!nhomDaChon.has(q.group)),scope.evidence,history,mastery,{...opt,soCau:Math.max(1,soCau-uuTienOn.length)}).slice(0,soCau-uuTienOn.length)],hetCauMoi=false
   if(chon.length<soCau){
     // Bù bằng câu LÂU NHẤT chưa gặp (buCauLauNhat: nới `k` theo luật bậc/đổi câu của chooseLuotMoi, TỐI ĐA TOI_DA_VONG_BU vòng — không lặp theo cỡ kho lớp).
+    // `boQuaDung30:true` (thầy lệnh 25/09, "Đoàn 1 câu rồi lặp"): vòng bù ĐƯỢC lấy câu "vừa đúng chưa tới 30 ngày" (chưa tới hạn FSRS) — chọn LÂU NHẤT chưa gặp — để Đoàn luôn đủ suất; chặn `sai3` vẫn giữ.
     const daChon=new Set(chon.map(x=>x.q.group)),thieu=soCau-chon.length,cuCon=cu.filter(q=>!daChon.has(q.group)&&!opt.dueQids.has(q.qid))
-    const {bu}=buCauLauNhat(cuCon,daLam,lucGame,thieu,ds=>chooseLuotMoi(ds,scope.evidence,history,mastery,{...opt,soCau:thieu}))
+    const {bu}=buCauLauNhat(cuCon,daLam,lucGame,thieu,ds=>chooseLuotMoi(ds,scope.evidence,history,mastery,{...opt,soCau:thieu,boQuaDung30:true}))
     if(bu.length){hetCauMoi=true;chon=[...chon,...bu]}
   }
   if(!chon.length){
@@ -229,6 +234,14 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
   const r=await gameV2Tho(env,action,b)
   if(action==='recommendations'&&r&&r.ok===true)r.shopBat=await shopBatCho(env,await gameIdentity(env,b))
+  // CNH-1.0 P08 (Cline 25/09): TRÁM số ví/trạng thái P08 lên MỌI bản hiển thị có `profile` — MỘT chỗ phủ hết
+  // các nhánh trả `visible(p)` bên dưới. CHỈ sửa bản hiển thị (không đụng hồ sơ đã lưu). Cửa ĐÓNG (mặc định)
+  // hoặc em chưa chuyển đổi ⇒ `tram` = null ⇒ giữ nguyên bản cũ. Phản hồi của lệnh P08 đã có `p08` ⇒ bỏ qua
+  // (số đã đúng, và đọc lại ngay sau ghi có thể lệch bản sao).
+  if(r&&r.ok===true&&r.profile&&!r.p08){
+    const tram=await tramP08LenHienThi(env,await gameIdentity(env,b)).catch(()=>null)
+    if(tram)Object.assign(r.profile as Record<string,unknown>,tram)
+  }
   return r
 }
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
@@ -258,11 +271,35 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
   if(action==='profile'){const tasks=await env.DB.prepare('SELECT id,dang FROM game_v2_task WHERE sbd=? AND completed_at IS NULL ORDER BY created_at LIMIT 20').bind(sbd).all<{id:string;dang:string}>();const tranHapThu=await docTranHapThu(env,sbd,academicDay(now()));const dauVaoLuot=await docDauVaoLuot(env,sbd,academicDay(now()),Date.now(),tranHapThu.dat);return {ok:true,profile:visible(p,{tran:tranHapThu.tran,soCauHomNay:tranHapThu.soCauHomNay,canCau:tranHapThu.canCau}),revision,luot:tomTatLuot(luotHomNay(dauVaoLuot),dauVaoLuot.soLuotDaLam),tasks:tasks.results,doanMo:await doanMoCho(env,sbd)}}
   if(action==='khien-ren'){
     if(p.choice)throw new Error('Em chọn thần thú trước khi rèn khiên.')
+    // CNH-1.0 P08 (§7.1): CHỈ khi khách gửi `khoaYeuCau` VÀ cửa `/game-v2/khien-ren` MỞ ⇒ đi lệnh `claim_shield`.
+    // Client hiện tại KHÔNG gửi khoá ⇒ nhánh này không chạy; cửa mặc định ĐÓNG ⇒ nguyên đường cũ bên dưới.
+    if(typeof b.khoaYeuCau==='string'&&b.khoaYeuCau){
+      const cua=await moCuaRoute(env,'/game-v2/khien-ren')
+      if(cua.choPhep){
+        const ngayP08=academicDay(now())
+        const kq=await renKhienQuaP08(env,'/game-v2/khien-ren',{studentId:sbd,learningDay:ngayP08,requestId:b.khoaYeuCau,requestHash:`ren-khien|${sbd}|${ngayP08}|${b.khoaYeuCau}`})
+        return {ok:true,p08:kq}
+      }
+    }
     const daRen=renKhienBangExp(p,Number(b.soDaRen))
     return {ok:true,profile:visible(p),revision:daRen?await save(env,sbd,p,revision):revision,daRen}
   }
   if(action==='shield-use'){
     const id=String(b.useId??'');if(!/^[a-zA-Z0-9-]{16,80}$/.test(id))throw new Error('Lượt dùng khiên không hợp lệ.')
+    // CNH-1.0 P08 (§7.2): CHỈ khi khách gửi `khoaYeuCau` VÀ cửa MỞ ⇒ đi lệnh `dungKhienCore` (chuyển 1 khiên
+    // CHƯA DÙNG → ĐÃ DÙNG, kèm usage receipt; `useId` vẫn là khoá idempotency). Cửa ĐÓNG (mặc định) ⇒ đường cũ.
+    // ⚠️ VÌ SAO ĐÒI `khoaYeuCau` (sửa 25/09): nút "dùng khiên" HIỆN CÓ đã gửi `useId`; nếu CHỈ kiểm cửa thì vừa
+    // mở cổng là em bấm khiên rơi NGAY vào P08, nhận `{ok:true,p08}` (KHÔNG có `profile`) ⇒ vỡ màn + mất khiên
+    // vô hình (khiên trừ ở `cnh_exp_p08_state` mà màn em vẫn đọc sổ cũ). Đòi thêm `khoaYeuCau` để việc chuyển
+    // sang P08 là quyết định RÕ RÀNG của máy khách, không phải tác dụng phụ của việc mở cổng.
+    if(typeof b.khoaYeuCau==='string'&&b.khoaYeuCau){
+      const cuaP08=await cuaP08Mo(env)
+      if(cuaP08.choPhep){
+        const ngayP08=academicDay(now())
+        const kq=await dungKhienQuaP08(env,'/game-v2/shield-use',{studentId:sbd,learningDay:ngayP08,requestId:id,requestHash:`dung-khien|${sbd}|${id}`})
+        return {ok:true,p08:kq}
+      }
+    }
     if(p.shields?.lastUse===id||Number(p.shields?.activeUntil)>Date.now())return {ok:true,profile:visible(p),revision}
     if(p.choice||khienConLai(p)<1){
       // Câu báo ĐÚNG luật khiên mới (thầy lệnh 21/09): khiên quà tiến hoá đầu (cấp 10) chỉ mở khi đủ 21 ngày đạt nhiệm vụ ngày từ mốc; rèn thêm cần 21 mảnh và EXP dư.
@@ -278,6 +315,16 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     p.pet=pet.id;p.choice=false;return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}
   }
   if(action==='invest'){
+    // CNH-1.0 P08 (§6): CHỈ khi khách gửi `khoaYeuCau` VÀ cửa `/game-v2/invest` MỞ ⇒ đi lệnh `hapThuCore`.
+    // ⚠️ THỨ TỰ: phải CHUYỂN ĐỔI hồ sơ (`chuyenDoiP08`) cho em TRƯỚC khi bật cờ, nếu không lệnh P08 ném NOT_FOUND.
+    if(typeof b.khoaYeuCau==='string'&&b.khoaYeuCau){
+      const cua=await moCuaRoute(env,'/game-v2/invest')
+      if(cua.choPhep){
+        const ngayP08=academicDay(now())
+        const kq=await hapThuQuaP08(env,'/game-v2/invest',{studentId:sbd,learningDay:ngayP08,requestId:b.khoaYeuCau,requestHash:`hap-thu|${sbd}|${ngayP08}|${b.khoaYeuCau}`})
+        return {ok:true,p08:kq,daNap:kq.take,conTran:kq.conLaiTranNgay,lyDo:kq.chamTranCap?'cham_cap_120':kq.take>0?null:'het_tran_ngay'}
+      }
+    }
     if(p.cap>=120)throw new Error('Thần thú đã đạt cấp 120. EXP tiếp tục được giữ trong kho.')
     // MỘT CỔNG HẤP THỤ (Đợt 1 thần thú mỗi ngày): mỗi ngày VN thần thú ăn tối đa 200 EXP khi em đạt nhiệm vụ ngày, 120 khi có học chưa đạt, 0 khi chưa học; phần dư ở lại ống nghiệm.
     if(p.luatCap!==LUAT_CAP_MOI)throw new Error('Hồ sơ thần thú đang được cập nhật sang cách lên cấp mới. Em thử lại sau ít phút.')

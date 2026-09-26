@@ -6,6 +6,7 @@ import type { Env } from './kieu'
 import { GIAO_THEM, tinhGiaoThem, type DangCuaCon, type DauVaoGiaoThem, type KetQuaGiaoThem, type ThanhPhanGiaoThem, type ViecBatBuoc } from '../../src/lib/giao-them-cho-con'
 import { phutUocTinhChang } from '../../src/lib/btvn-nang-do-lich'
 import { learnedQuestionFilter, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
+import { gomDiemNhan, thuongNhan, type BangChungCau, type LichSuCuaEm } from '../../src/lib/uu-tien-nhan-kho'
 import { chuHan } from './canh-bao-thay'
 import { protectedQuestions, readScope } from './game-v2-bank'
 import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
@@ -70,6 +71,8 @@ interface Nguon {
   saiChuaKhacPhuc: PrivateQuestion[]
   /** Câu mới theo dạng: `theoDang[ma][mức]` = câu khả dụng (đã loại câu đã làm 14 ngày, câu bài tập chưa nộp, câu thuộc hai nhóm trên). */
   theoDang: Map<string, Map<number, PrivateQuestion[]>>
+  /** ĐIỂM THƯỞNG NHÃN KIẾN THỨC theo qid (nhãn em còn yếu) — chỉ để XẾP trong cùng dạng + cùng mức; vắng ⇒ 0. */
+  thuongNhanTheoQid: Map<string, number>
   ten: Map<string, string>
   goiTruocMom?: string
 }
@@ -84,7 +87,7 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
   const [rDang, rCau, rGan, rHomNay, rGiay, rBtvn, baoVe, phamVi] = await Promise.all([
     tat(() => env.DB.prepare('SELECT * FROM nam_kt_dang WHERE sbd = ?').bind(sbd).all<Row>(), rong),
     tat(() => env.DB.prepare(
-      `SELECT qid, ma_dang, trang_thai, moc_on_ke, lan_sai FROM nam_kt_cau
+      `SELECT qid, ma_dang, trang_thai, moc_on_ke, lan_sai, ngay_dung_khac_nhau FROM nam_kt_cau
         WHERE sbd = ? AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc') AND can_day_lai = 0 ORDER BY moc_on_ke, lan_sai DESC, qid LIMIT 1200`,
     ).bind(sbd).all<Row>(), rong),
     tat(() => env.DB.prepare('SELECT e.qid, MAX(e.ngay_vn) AS ngay, q.content_group FROM su_kien_hoc e LEFT JOIN game_v2_question q ON q.qid = e.qid WHERE e.sbd = ? AND e.ngay_vn >= ? GROUP BY e.qid, q.content_group').bind(sbd, themNgay(homNay, -(SO_NGAY_KHONG_LAI - 1))).all<Row>(), rong),
@@ -146,6 +149,42 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
     .filter((q): q is PrivateQuestion => !!q && !btvnChuaNop.has(q.qid) && !nhom14.has(q.group) && !nhomHomNay.has(q.group) && !nhomDangGiao.has(q.group))
   const daLayNhom = new Set([...daLayDen, ...saiChuaKhacPhuc.map((q) => q.qid), ...denLichQid, ...saiQid])
 
+  // ĐIỂM THƯỞNG NHÃN KIẾN THỨC (thuần, dùng chung `uu-tien-nhan-kho`): lịch sử của CHÍNH em từ `nam_kt_cau` (đã đọc ở trên),
+  // nhãn lấy từ `q.kienThuc` THẬT của câu trong kho đã nạp. Vắng nhãn / vắng lịch sử ⇒ 0 (giữ nguyên thứ tự cũ).
+  const lichSuEm = new Map<string, BangChungCau>()
+  // Selection rows above intentionally exclude never-wrong questions. Ranking also needs
+  // successful evidence, otherwise weak labels never decay after successful work.
+  const historyQids = [...new Set([...kho.keys(), ...khoDang.keys()])]
+  const labelHistory = historyQids.length ? await tat(() => env.DB.prepare(
+    'SELECT qid,trang_thai,lan_sai,ngay_dung_khac_nhau FROM nam_kt_cau WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))',
+  ).bind(sbd, json(historyQids)).all<Row>(), rong) : rong
+  for (const x of labelHistory.results ?? []) {
+    const qid = chuoi(x.qid)
+    if (!qid) continue
+    const tt = chuoi(x.trang_thai)
+    const lanSai = so(x.lan_sai)
+    const daKhacPhuc = tt === 'da_khac_phuc'
+    const chuaThaySai = tt === 'chua_thay_sai'
+    const sai = !daKhacPhuc && !chuaThaySai && (tt === 'moi_sai' || tt === 'dang_on' || lanSai > 0)
+    const dung = daKhacPhuc || chuaThaySai
+    const daDungLai = so(x.ngay_dung_khac_nhau) >= 2
+    lichSuEm.set(qid, { sai, dung, daDungLai })
+  }
+  const cauCoNhan: { qid: string; kienThuc?: unknown }[] = []
+  const daThemQid = new Set<string>()
+  for (const q of [...kho.values(), ...khoDang.values()]) {
+    if (daThemQid.has(q.qid)) continue
+    daThemQid.add(q.qid)
+    cauCoNhan.push({ qid: q.qid, kienThuc: q.kienThuc })
+  }
+  const diemNhan = gomDiemNhan(cauCoNhan, lichSuEm as LichSuCuaEm)
+  const thuongNhanTheoQid = new Map<string, number>()
+  for (const c of cauCoNhan) {
+    const bc = lichSuEm.get(c.qid)
+    const t = thuongNhan(c, diemNhan, bc?.daDungLai ?? false)
+    if (t > 0) thuongNhanTheoQid.set(c.qid, t)
+  }
+
   const theoDang = new Map<string, Map<number, PrivateQuestion[]>>()
   for (const q of khoDang.values()) {
     if (!q.dang || nhomDangGiao.has(q.group) || nhom14.has(q.group) || nhomHomNay.has(q.group) || daLam14.has(q.qid) || khongGiaoLai.has(q.qid) || btvnChuaNop.has(q.qid) || daLayNhom.has(q.qid)) continue
@@ -155,6 +194,8 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
     m.set(muc, [...(m.get(muc) ?? []), q])
     theoDang.set(q.dang, m)
   }
+  // Xếp lại TỪNG nhóm cùng dạng + cùng mức theo điểm thưởng nhãn GIẢM DẦN; bằng điểm ⇒ giữ nguyên thứ tự cũ (sort ổn định).
+  for (const m of theoDang.values()) for (const [muc, ds] of m) m.set(muc, [...ds].sort((a, b) => (thuongNhanTheoQid.get(b.qid) ?? 0) - (thuongNhanTheoQid.get(a.qid) ?? 0)))
   const ten = await tenCuaCacDang(env, maDangLay)
 
   const dang: DangCuaCon[] = dangEm.filter((d) => maDangLay.includes(d.maDang)).map((d) => {
@@ -194,7 +235,7 @@ async function dungNguon(env: Env, sbd: string, nowMs: number, cacHang: HangLuot
       nganSach: { mucTieuCau: kh.nganSach.mucTieuCau, daLam: so(rHomNay?.n), dung: so(rHomNay?.d), batBuocConLai },
       bayGioMs: nowMs, luot: cacHang.length + 1, tongDaGiaoHomNay: cacHang.reduce((t, h) => t + h.soCau, 0), goiTruoc, ...(giayMoiCau ? { giayMoiCau } : {}),
     },
-    denLichOn, saiChuaKhacPhuc, theoDang, ten,
+    denLichOn, saiChuaKhacPhuc, theoDang, thuongNhanTheoQid, ten,
   }
 }
 

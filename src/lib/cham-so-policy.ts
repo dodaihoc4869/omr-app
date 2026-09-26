@@ -39,6 +39,11 @@ export const THAM_SO_CHAM_CNH_1_0 = Object.freeze({
 
 export class ChamInputError extends Error {}
 
+/** Invalid server grading material; distinct from learner answer validation (422). */
+export class ChamMaterialError extends Error {
+  readonly ma = 'GRADING_MATERIAL_INVALID'
+}
+
 // ---------------------------------------------------------------------------
 // 1. Chuẩn hoá hình thức (giữ NGUYÊN hành vi đã chốt 21/09 + 23/09, có test khoá)
 // ---------------------------------------------------------------------------
@@ -252,43 +257,48 @@ export function parseChamInput(raw: unknown): ChamInput {
 // 5. Bốn chính sách v1
 // ---------------------------------------------------------------------------
 
-function chamSoHoc(key: string, answer: string, allowFraction: boolean, baoLoi: boolean): GradingResult {
+/** Parse the server key independently, before inspecting or comparing the learner's answer. */
+function docKhoaSo(key: string, allowFraction: boolean): TachSo {
+  const parsed = tachSoVaDonVi(chuanHoaSoNhap(key), allowFraction)
+  if (!parsed.ok) throw new ChamMaterialError('Đáp án số phía server không đúng định dạng của chính sách')
+  return parsed.so
+}
+
+function chamSoHoc(key: string, answer: string, allowFraction: boolean): GradingResult {
+  const k = docKhoaSo(key, allowFraction)
   const a = chuanHoaSoNhap(answer)
-  const k = chuanHoaSoNhap(key)
-  if (!a || !k) return { correct: false } // bỏ trống ⇒ sai, KHÔNG phải lỗi định dạng
-  if (a === k) return { correct: true }
+  if (!a) return { correct: false } // giữ hợp đồng bỏ trống hiện có
   const pa = tachSoVaDonVi(a, allowFraction)
-  const pk = tachSoVaDonVi(k, allowFraction)
-  if (!pa.ok || !pk.ok) return baoLoi ? { correct: false, error: 'unsupported-format' } : { correct: false }
-  if (!donViTuongThich(pa.so, pk.so)) return { correct: false }
-  if (bangNhau(pa.so.gia, pk.so.gia) || lechNhoHon(pa.so.gia, pk.so.gia)) return { correct: true }
+  if (!pa.ok) return { correct: false, error: 'unsupported-format' }
+  if (!donViTuongThich(pa.so, k)) return { correct: false }
+  if (bangNhau(pa.so.gia, k.gia) || lechNhoHon(pa.so.gia, k.gia)) return { correct: true }
   return { correct: false }
 }
 
 function chamLamTron(key: string, answer: string, decimals: number): GradingResult {
+  const k = docKhoaSo(key, false)
   const a = chuanHoaSoNhap(answer)
-  const k = chuanHoaSoNhap(key)
-  if (!a || !k) return { correct: false }
+  if (!a) return { correct: false }
   const pa = tachSoVaDonVi(a, false)
-  const pk = tachSoVaDonVi(k, false)
-  if (!pa.ok || !pk.ok) return { correct: false, error: 'unsupported-format' }
-  if (!donViTuongThich(pa.so, pk.so)) return { correct: false }
-  return { correct: bangNhau(lamTron(pa.so.gia, decimals), lamTron(pk.so.gia, decimals)) }
+  if (!pa.ok) return { correct: false, error: 'unsupported-format' }
+  if (!donViTuongThich(pa.so, k)) return { correct: false }
+  return { correct: bangNhau(lamTron(pa.so.gia, decimals), lamTron(k.gia, decimals)) }
 }
 
 function chamDonVi(key: string, answer: string, requiredUnit: string, allowedConversions: string[]): GradingResult {
-  const a = chuanHoaSoNhap(answer)
-  const k = chuanHoaSoNhap(key)
-  if (!a || !k) return { correct: false }
-  const pa = tachSoVaDonVi(a, false)
-  const pk = tachSoVaDonVi(k, false)
-  if (!pa.ok || !pk.ok) return { correct: false, error: 'unsupported-format' }
+  const k = docKhoaSo(key, false)
   const dich = chuanHoaDonVi(requiredUnit)
+  if (!DON_VI_DA_BIET.has(dich) || (k.unit !== null && k.unit !== dich)) {
+    throw new ChamMaterialError('Đơn vị của đáp án server không khớp chính sách')
+  }
+  const a = chuanHoaSoNhap(answer)
+  if (!a) return { correct: false }
+  const pa = tachSoVaDonVi(a, false)
+  if (!pa.ok) return { correct: false, error: 'unsupported-format' }
   const dungDonVi = pa.so.unit === dich
     || (pa.so.unit !== null && allowedConversions.map(chuanHoaDonVi).includes(pa.so.unit))
   if (!dungDonVi) return { correct: false }
-  if (pk.so.unit !== null && pk.so.unit !== dich) return { correct: false }
-  return { correct: bangNhau(pa.so.gia, pk.so.gia) || lechNhoHon(pa.so.gia, pk.so.gia) }
+  return { correct: bangNhau(pa.so.gia, k.gia) || lechNhoHon(pa.so.gia, k.gia) }
 }
 
 function chamLiteral(key: string, answer: string, accepted: string[] | undefined): GradingResult {
@@ -305,12 +315,13 @@ function chamLiteral(key: string, answer: string, accepted: string[] | undefined
  * Quyết định ĐÚNG/SAI cho một câu theo policy có version.
  * Đầu vào sai KIỂU ⇒ ném `ChamInputError` (422, chưa tiêu attempt).
  * Đầu vào hợp lệ nhưng chuỗi không đọc được ⇒ `{ correct: false, error: 'unsupported-format' }`.
+ * Numeric key ngoài grammar ⇒ ChamMaterialError (lỗi vật liệu server, không phải lỗi nhập của em).
  */
 export function chamTheoPolicy(raw: unknown): GradingResult {
   const input = parseChamInput(raw)
   switch (input.policy) {
     case 'numeric-value-v1':
-      return chamSoHoc(input.key, input.answer, input.allowFraction === true, true)
+      return chamSoHoc(input.key, input.answer, input.allowFraction === true)
     case 'numeric-rounded-v1':
       return chamLamTron(input.key, input.answer, input.decimals as number)
     case 'numeric-unit-v1':
@@ -322,4 +333,3 @@ export function chamTheoPolicy(raw: unknown): GradingResult {
 
 /** Policy của mọi câu Phần III chưa gắn metadata riêng (quyết định v1: `numeric-value-v1`). */
 export const POLICY_MAC_DINH_PHAN_III: GradingPolicyId = 'numeric-value-v1'
-

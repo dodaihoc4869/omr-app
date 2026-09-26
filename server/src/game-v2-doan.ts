@@ -29,8 +29,9 @@ import { ghiTiepSuc } from './exp-d1'
 import { docExpKetChang, traoExpKetChang } from './game-v2-doan-exp'
 import { docCauBtvnChuaNop } from './game-v2-luot'
 import { docSanh, quaCongVe, hoanVe, ketChangChoLop, changDaDiHomNay, TOI_DA_CHANG_NGAY } from './game-v2-doan-mua'
-import { TRAN_CAU_DOAN_NGAY, demCauTrongNgay } from './game-v2-luot'
+import { TRAN_CAU_DOAN_NGAY, demCauTrongNgay, docLuotDangCho } from './game-v2-luot'
 import { chonMotHaiTrum, demEmDaThayTrum, docCauLamHomNay, docTrumRaHomNay } from './game-v2-cau-moi'
+import { gomDiemNhan, thuongNhan, type BangChungCau, type CauCoNhan, type LichSuCuaEm } from '../../src/lib/uu-tien-nhan-kho'
 import { docAnThach, anChoSanh, goiYBanDongHanh, docHienThi } from './game-v2-doan-an'
 
 type Row = Record<string, unknown>
@@ -68,7 +69,7 @@ interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; da
    *  của hạn hiệp (`giayDocThem` trong doan-core). Thiếu ⇒ hạn y hệt bản cũ. */
   soTu?: number; coHinh?: boolean }
 /** `cap` chỉ để VẼ đúng hình thái thần thú; không bao giờ vào lõi (cấp không cho chỉ số trong trận). */
-interface NguoiDoan { sbd: string; ten: string; pet: number; cap: number; lop: string; phien: string; cau: CauRef[]; soCauThieu?: number; /** Kho hết câu MỚI hôm nay ⇒ có câu lâu nhất chưa gặp trong bộ (báo thật cho em). */ hetCauMoi?: boolean }
+interface NguoiDoan { sbd: string; ten: string; pet: number; cap: number; lop: string; phien: string; cau: CauRef[]; soCauThieu?: number; /** Phiên câu vừa mở ở CHÍNH lượt này (thua cuộc đua mở chặng thì được thu hồi). */ phienMoi?: boolean; /** Kho hết câu MỚI hôm nay ⇒ có câu lâu nhất chưa gặp trong bộ (báo thật cho em). */ hetCauMoi?: boolean }
 interface NopLuu { dung: boolean; hanhDong: HanhDong; tuLam: boolean; boTrong: boolean; tiepSucBoi?: number }
 /** Thẻ gợi ý một ghế đã nhận ở hiệp đang chạy: `tu` = ghế tiếp sức (có thể là bạn máy). Nội dung thẻ CHỈ xuống máy người nhận. */
 interface TheLuu extends TheGoiY { tu: number }
@@ -228,6 +229,9 @@ async function ganNhan(env: Env, sbd: string, qs: Question[], now: number): Prom
 
 /** Mở phiên câu cá nhân của em bằng đường `start` sẵn có, rồi đóng dấu phiên để chỉ chấm được qua chặng. */
 async function taoNguoi(env: Env, sbd: string, p: Profile, b: Row, goiGame: GoiGame, now: number): Promise<NguoiDoan> {
+  // Có phải phiên MỚI không: `start` lượt Đảo trả lại PHIÊN ĐANG CHỜ của em nếu có (không bốc lại câu).
+  // Thua cuộc đua mở chặng ⇒ chỉ được thu hồi phiên do CHÍNH lượt này tạo; phiên cũ thì gỡ dấu `doan`.
+  const truoc = await docLuotDangCho(env, sbd, now)
   const start = await goiGame(env, 'start', danhDau({ token: b.token, mode: 'adventure' }))
   const qs = (start.questions ?? []) as Question[]
   if (!qs.length) throw new Error(String(start.message ?? 'Chưa có câu vừa sức trong kho cho em. Em hoàn thành bài Thầy giao rồi quay lại lên đường nhé.'))
@@ -238,7 +242,33 @@ async function taoNguoi(env: Env, sbd: string, p: Profile, b: Row, goiGame: GoiG
   // Ấn thạch SÁNG của em (dạng đã khắc phục xong theo hồ sơ thật) → đánh dấu câu thuộc dạng ấy; chụp MỘT lần lúc vào đoàn để cả chặng tất định.
   const anSang = new Set((await docAnThach(env, sbd, ngayVn(iso(now)))).filter(a => a.trangThai === 'sang').map(a => a.dang))
   const cau = (await ganNhan(env, sbd, qs.slice(0, SO_HIEP - 2), now)).map(c => ({ ...c, an: !!c.dang && anSang.has(c.dang) }))
-  return { sbd, ten: tenGoi(String(hs?.ho_ten ?? ''), p.nickname || PETS[pet]!.name), pet, cap: Math.max(1, Math.min(120, Number(p.cap) || 1)), lop: String(hs?.lop ?? ''), phien, cau, soCauThieu:Math.max(0,Number(start.soCauThieu)||0), ...(start.hetCauMoi === true ? { hetCauMoi: true } : {}) }
+  return { sbd, ten: tenGoi(String(hs?.ho_ten ?? ''), p.nickname || PETS[pet]!.name), pet, cap: Math.max(1, Math.min(120, Number(p.cap) || 1)), lop: String(hs?.lop ?? ''), phien, cau, soCauThieu:Math.max(0,Number(start.soCauThieu)||0), ...(start.hetCauMoi === true ? { hetCauMoi: true } : {}), phienMoi: !truoc }
+}
+
+/**
+ * GIÀNH CHẶNG ĐOÀN — NGUYÊN TỬ (thầy 24/09, lát cắt 2 "game Đoàn": không phát trùng khi retry/cạnh tranh).
+ *
+ * `timDangDo()` đọc "em đang có chặng mở" rồi mới `INSERT doan_chang`; hai yêu cầu SONG SONG cùng thấy "chưa có chặng"
+ * ⇒ mở HAI chặng và phát HAI bộ câu cá nhân cho một em (đã tái hiện bằng ca tích hợp đường thật `/game-v2/doan-mo`).
+ * Hàm này gộp thành MỘT `batch` (một giao dịch): chèn chặng CHỈ KHI em chưa có chặng mở, và chèn sổ lượt CHỈ KHI chặng đã vào.
+ *
+ * Trả `true` = lượt này mở được chặng. `false` = lượt khác mở trước ⇒ nơi gọi thu hồi phiên câu/vé của lượt này rồi ĐỌC chặng đang mở.
+ * KHÔNG đổi luật chơi, cấu trúc chặng, số ghế, vé hay nội dung câu.
+ */
+export async function gianhChangDoan(env: Env, ma: string, phong: PhongDoan, sbd: string, lop: string, now: number): Promise<boolean> {
+  const tu = iso(now - PHONG_HET_HAN_MS)
+  const kq = await env.DB.batch([
+    env.DB.prepare(
+      `INSERT OR IGNORE INTO doan_chang(ma,json,chu,trang_thai,tao_luc)
+       SELECT ?, ?, ?, ?, ?
+        WHERE NOT EXISTS (SELECT 1 FROM doan_luot l JOIN doan_chang c ON c.ma = l.ma_chang
+               WHERE l.sbd = ? AND l.ket_luc IS NULL AND c.trang_thai IN ('sanh','dang_di') AND c.tao_luc > ?)
+          AND NOT EXISTS (SELECT 1 FROM doan_chang c2 WHERE c2.chu = ? AND c2.trang_thai IN ('sanh','dang_di') AND c2.tao_luc > ?)`,
+    ).bind(ma, JSON.stringify(phong), sbd, phong.chang ? 'dang_di' : 'sanh', iso(now), sbd, tu, sbd, tu),
+    env.DB.prepare('INSERT INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) SELECT ?,?,?,?,0,? WHERE EXISTS (SELECT 1 FROM doan_chang WHERE ma = ?)')
+      .bind(ma, sbd, ngayVn(iso(now)), lop, iso(now), ma),
+  ])
+  return Number((kq?.[0] as { meta?: { changes?: number } } | undefined)?.meta?.changes ?? 0) > 0
 }
 
 /**
@@ -296,7 +326,15 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
     .sort((a, b) => (yeu.get(b.dang ?? '') ?? 0) - (yeu.get(a.dang ?? '') ?? 0) || hashSeed(`${ma}|${a.qid}`) - hashSeed(`${ma}|${b.qid}`) || a.qid.localeCompare(b.qid))
   // Trùm nhớ câu đã ra ở chặng trước của các em trong đoàn + câu các em đã làm ở mọi nguồn/mọi ngày: câu CHƯA AI thấy đứng trước (ổn định: giữ thứ tự cũ trong cùng nhóm)
   const daThay = await demEmDaThayTrum(env, nguoi.map(n => n.sbd), ungVien.map(q => q.qid))
-  ungVien.sort((a, b) => (daThay.get(a.qid) ?? 0) - (daThay.get(b.qid) ?? 0))
+  // THƯỞNG NHÃN KIẾN THỨC (chỉ là XẾP HẠNG PHỤ, sau độ yếu của đội và số em đã thấy, trước hạt giống): mỗi em gom bằng chứng RIÊNG theo nhãn
+  // (không trộn phạm vi em này sang em kia), rồi cộng điểm thưởng của câu cho từng em. Câu em đã đúng lại ≥ 2 ngày khác nhau ⇒ 0 với em ấy.
+  const diemNhanTheoEm = await diemNhanCuaDoi(env, nguoi.map(n => n.sbd), ungVien)
+  const thuongNhanDoi = (q: PrivateQuestion): number => {
+    let t = 0
+    for (const n of nguoi) t += (diemNhanTheoEm.get(n.sbd)?.get(q.qid) ?? 0)
+    return t
+  }
+  ungVien.sort((a, b) => (daThay.get(a.qid) ?? 0) - (daThay.get(b.qid) ?? 0) || (yeu.get(b.dang ?? '') ?? 0) - (yeu.get(a.dang ?? '') ?? 0) || thuongNhanDoi(b) - thuongNhanDoi(a))
   // Câu trùm đã ra HÔM NAY ở chặng của các em trong đoàn: chặn hẳn khi kho còn câu khác; hết mới dùng lại, câu ra lâu nhất trước.
   const { mot, hai } = chonMotHaiTrum(ungVien, await docTrumRaHomNay(env, nguoi.map(n => n.sbd), ngayVn(iso(now))))
   if (!mot) return { trum, giaoY }
@@ -308,6 +346,48 @@ async function chonCauTrum(env: Env, ma: string, nguoi: NguoiDoan[], now: number
     giaoY[hiep] = Array.from({ length: SO_Y_TRUM }, (_, y) => xep[Math.floor(y * soGhe / SO_Y_TRUM)]!.ghe)
   }
   return { trum, giaoY }
+}
+
+/**
+ * ĐIỂM NHÃN KIẾN THỨC của TỪNG em trong đội cho các câu ứng viên — mỗi em gom bằng chứng RIÊNG (không trộn phạm vi), dùng lõi dùng chung `uu-tien-nhan-kho`.
+ * Đọc `nam_kt_cau` của đúng các sbd trong đội và đúng các qid ứng viên (một truy vấn có chặn). Bảng/cột thiếu ⇒ trả rỗng (không thưởng); lỗi DB khác ⇒ ném ra.
+ */
+async function diemNhanCuaDoi(env: Env, dsSbd: string[], ungVien: readonly PrivateQuestion[]): Promise<Map<string, Map<string, number>>> {
+  const ra = new Map<string, Map<string, number>>(dsSbd.map(s => [s, new Map<string, number>()]))
+  if (dsSbd.length === 0 || ungVien.length === 0) return ra
+  const dsQid = [...new Set(ungVien.map(q => q.qid))]
+  let r: { results?: Row[] }
+  try {
+    r = await env.DB.prepare(`SELECT sbd,qid,trang_thai,ngay_dung_khac_nhau,lan_sai FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`)
+      .bind(JSON.stringify(dsSbd), JSON.stringify(dsQid)).all<Row>()
+  } catch (e) {
+    if (e instanceof Error && /no such (table|column)/i.test(e.message)) return ra
+    throw e
+  }
+  const nhanTheoQid = new Map<string, unknown>()
+  for (const q of ungVien) if (!nhanTheoQid.has(q.qid)) nhanTheoQid.set(q.qid, q.kienThuc)
+  const lichSuTheoEm = new Map<string, Map<string, BangChungCau>>(dsSbd.map(s => [s, new Map<string, BangChungCau>()]))
+  for (const x of r.results ?? []) {
+    const sbd = String(x.sbd), qid = String(x.qid)
+    const ls = lichSuTheoEm.get(sbd)
+    if (!ls) continue
+    const tt = String(x.trang_thai ?? '')
+    const lanSai = Number(x.lan_sai) || 0
+    ls.set(qid, {
+      sai: tt === 'moi_sai' || tt === 'dang_on' || (lanSai > 0 && tt !== 'da_khac_phuc'),
+      dung: tt === 'da_khac_phuc' || tt === 'chua_thay_sai',
+      daDungLai: (Number(x.ngay_dung_khac_nhau) || 0) >= 2,
+    })
+  }
+  const cauCoNhan: CauCoNhan[] = [...nhanTheoQid].map(([qid, kienThuc]) => ({ qid, kienThuc }))
+  for (const sbd of dsSbd) {
+    const ls = lichSuTheoEm.get(sbd)!
+    const diem = gomDiemNhan(cauCoNhan, ls as LichSuCuaEm)
+    const m = new Map<string, number>()
+    for (const c of cauCoNhan) { const t = thuongNhan(c, diem, ls.get(c.qid)?.daDungLai ?? false); if (t > 0) m.set(c.qid, t) }
+    ra.set(sbd, m)
+  }
+  return ra
 }
 
 // ───────────────────────── Tiến trình hiệp ─────────────────────────
@@ -509,10 +589,23 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     await quaCongVe(env, sbd, ma, now) // chặng đầu ngày miễn phí; chặng thêm trừ 1 vé; hết vé → lời chỉ cách kiếm vé
     const phong: PhongDoan = { kind: 'doan-phong', chu: sbd, taoLuc: now, nguoi: [toi], chang: null, hiepLuc: 0, nop: {}, nopY: {}, tinHieu: {}, the: {}, daGiup: [], choGhi: [], trum: {}, giaoY: {}, ketLuc: null }
     if (b.cheDo !== 'phong') { Object.assign(phong, await chonCauTrum(env, ma, phong.nguoi, now)); batDau(phong, ma, now) }
-    await env.DB.batch([
-      env.DB.prepare('INSERT INTO doan_chang(ma,json,chu,trang_thai,tao_luc) VALUES(?,?,?,?,?)').bind(ma, JSON.stringify(phong), sbd, phong.chang ? 'dang_di' : 'sanh', iso(now)),
-      env.DB.prepare('INSERT INTO doan_luot(ma_chang,sbd,ngay_vn,lop,ghe,vao_luc) VALUES(?,?,?,?,0,?)').bind(ma, sbd, ngayVn(iso(now)), toi.lop, iso(now)),
-    ])
+    // GIÀNH CHẶNG NGUYÊN TỬ (thầy 24/09, lát cắt 2): hai yêu cầu SONG SONG chỉ mở MỘT chặng ⇒ không phát hai bộ câu cá nhân cho một em.
+    if (!await gianhChangDoan(env, ma, phong, sbd, toi.lop, now)) {
+      // Thua cuộc đua: THU HỒI đúng những gì lượt này vừa tạo — phiên câu (chỉ khi chính lượt này mở) và vé — rồi xem chặng đang mở.
+      // Hai lượt start có thể nhận cùng phiên. Không được xoá hoặc gỡ dấu phiên
+      // đã được chặng thắng giữ lại; kiểm tham chiếu ngay trong câu ghi để tránh race.
+      const chuaCoChangDung = `NOT EXISTS (
+        SELECT 1 FROM doan_chang c, json_each(c.json, '$.nguoi') n
+         WHERE json_extract(n.value, '$.phien') = game_v2_session.id
+           AND json_extract(n.value, '$.sbd') = game_v2_session.sbd
+      )`
+      if (toi.phienMoi) await env.DB.prepare(`DELETE FROM game_v2_session WHERE id = ? AND sbd = ? AND ${chuaCoChangDung}`).bind(toi.phien, sbd).run()
+      else await env.DB.prepare(`UPDATE game_v2_session SET json = json_remove(json, '$.doan') WHERE id = ? AND sbd = ? AND ${chuaCoChangDung}`).bind(toi.phien, sbd).run()
+      await hoanVe(env, sbd, ma)
+      const cua = await timDangDo()
+      if (cua) return chay(env, sbd, hoSo, 'doan-xem', { ...b, ma: cua.ma_chang }, goiGame)
+      throw new Error('Đoàn vừa đổi. Em mở lại chặng nhé.')
+    }
     return { ...(await khungNhin(env, ma, phong, 0, sbd, now, b)), ...(toi.hetCauMoi ? { hetCauMoi: true } : {}) } // hetCauMoi (chỉ-thêm): hôm nay hết câu MỚI, bộ có câu lâu nhất chưa gặp — máy nói thật với em
   }
 

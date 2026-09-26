@@ -15,7 +15,7 @@
 // P01 (CNH-1.0, 23/09/2026): luật chuẩn hoá + bốn policy CÓ VERSION đã chuyển sang `cham-so-policy.ts`
 // để có kiểm tra kiểu lúc chạy và chặn ba lỗi đã đo (hậu tố chữ bất kỳ, biên 1e-4 dấu phẩy động, bỏ qua
 // đơn vị khác nhau). Tệp này giữ nguyên TÊN HÀM CŨ cho mọi nơi gọi.
-import { chamTheoPolicy, chuanHoaSoNhap, tachSoVaDonVi, POLICY_MAC_DINH_PHAN_III } from './cham-so-policy'
+import { chamTheoPolicy, ChamMaterialError, chuanHoaSoNhap, tachSoVaDonVi, POLICY_MAC_DINH_PHAN_III } from './cham-so-policy'
 
 export { POLICY_VERSION, POLICY_MAC_DINH_PHAN_III, chamTheoPolicy, chuanHoaSoNhap, tachSoVaDonVi } from './cham-so-policy'
 
@@ -30,9 +30,15 @@ export { POLICY_VERSION, POLICY_MAC_DINH_PHAN_III, chamTheoPolicy, chuanHoaSoNha
 export function soKhopSo(v: unknown, d: unknown, cheDo: 'chat' | 'so_hoc'): boolean {
   const a = chuanHoaSoNhap(v), b = chuanHoaSoNhap(d)
   if (!a || !b) return false
-  if (a === b) return true
   if (cheDo === 'so_hoc') {
-    return chamTheoPolicy({ policy: POLICY_MAC_DINH_PHAN_III, key: String(d ?? ''), answer: String(v ?? '') }).correct
+    try {
+      return chamTheoPolicy({ policy: POLICY_MAC_DINH_PHAN_III, key: String(d ?? ''), answer: String(v ?? '') }).correct
+    } catch (e) {
+      // Legacy callers consume a boolean; never award invalid numeric material or introduce
+      // a new uncaught error into score/HTML. Snapshot adapters retain the typed server error.
+      if (e instanceof ChamMaterialError) return false
+      throw e
+    }
   }
   const pa = tachSoVaDonVi(a, false), pb = tachSoVaDonVi(b, false)
   if (!pa.ok || !pb.ok) return false

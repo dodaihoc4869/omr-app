@@ -6,6 +6,7 @@
 //
 // Chỉ nhận ID câu và nhãn, KHÔNG có nội dung/đáp án — lớp D1 (`parent-news.ts`) đọc nội dung sau khi đã chọn.
 import { hashSeed } from '../../src/lib/exam-shuffle'
+import { gomDiemNhan, thuongNhan, type BangChungCau, type CauCoNhan, type LichSuCuaEm } from '../../src/lib/uu-tien-nhan-kho'
 import type { KeHoachNgay } from './ke-hoach-ngay'
 
 /** Bậc dạng theo thứ tự tăng dần; trùng `LEVELS` của game v2 (`src/game/than-thu-v2/core.ts`). */
@@ -67,6 +68,8 @@ export interface UngVien {
   dang: string | null
   mucDo: string | null
   group?: string
+  /** Nhãn kiến thức thô của câu (`game_v2_question.kienThuc`); vắng ⇒ không có nhãn, không thưởng. */
+  kienThuc?: unknown
 }
 
 export interface CauToiHan {
@@ -98,6 +101,8 @@ export interface ChonCauVao {
   nhomGanDay?: ReadonlySet<string>
   /** qid có sự kiện trong `SO_NGAY_KHONG_GIAO_LAI` ngày qua (gồm hôm nay): không giao lại làm câu mới/bù. */
   suKienGanDay: ReadonlySet<string>
+  /** Lịch sử nhãn của CHÍNH em, tra theo qid (chỉ câu trong bể ứng viên). Vắng ⇒ không thưởng nhãn (giữ nguyên thứ tự cũ). */
+  lichSuNhan?: LichSuCuaEm
 }
 
 export interface CauChon {
@@ -145,12 +150,21 @@ export function chonCauChoPhuHuynh(v: ChonCauVao): CauChon[] {
     ra.push({ qid, nguon })
   }
   const bam = (qid: string) => hashSeed(`${v.seed}|${qid}`)
+  // ĐIỂM THƯỞNG NHÃN (lõi dùng chung): chỉ là khoá XẾP HẠNG PHỤ trong cùng dải ưu tiên, đứng TRƯỚC seed.
+  // Vắng `lichSuNhan` ⇒ mọi thưởng = 0 ⇒ thứ tự Y HỆT bản cũ.
+  const diemNhan = v.lichSuNhan ? gomDiemNhan(v.ungVien.map((u): CauCoNhan => ({ qid: u.qid, kienThuc: u.kienThuc })), v.lichSuNhan) : null
+  const thuong = (qid: string) => {
+    if (!diemNhan) return 0
+    const u = coNoiDung.get(qid)
+    const bc: BangChungCau | undefined = v.lichSuNhan!.get(qid)
+    return thuongNhan({ qid, kienThuc: u?.kienThuc }, diemNhan, !!bc?.daDungLai)
+  }
 
   // 1. Ôn tới hạn.
   const toiHan = v.toiHan
     .filter((c) => coNoiDung.has(c.qid))
-    .map((c) => ({ c, h: bam(c.qid) }))
-    .sort((a, b) => a.c.mocOnKe.localeCompare(b.c.mocOnKe) || b.c.lanSai - a.c.lanSai || a.h - b.h || a.c.qid.localeCompare(b.c.qid))
+    .map((c) => ({ c, h: bam(c.qid), t: thuong(c.qid) }))
+    .sort((a, b) => a.c.mocOnKe.localeCompare(b.c.mocOnKe) || b.c.lanSai - a.c.lanSai || b.t - a.t || a.h - b.h || a.c.qid.localeCompare(b.c.qid))
   for (const { c } of toiHan) {
     if (ra.length >= soCan) break
     if (!ban.has(c.qid) && !nhomDaChon.has(nhom(c.qid))) lay(c.qid, 'on_toi_han')
@@ -158,7 +172,7 @@ export function chonCauChoPhuHuynh(v: ChonCauVao): CauChon[] {
 
   const duocPhep = (u: UngVien) => !!u.dang && daHoc.has(u.dang) && !ban.has(u.qid) && !nhomDaChon.has(nhom(u.qid)) && !v.suKienGanDay.has(u.qid) && !v.nhomGanDay?.has(nhom(u.qid))
   const sapXep = (a: UngVien, b: UngVien, uuTien: (u: UngVien) => number) =>
-    uuTien(a) - uuTien(b) || bam(a.qid) - bam(b.qid) || a.qid.localeCompare(b.qid)
+    uuTien(a) - uuTien(b) || thuong(b.qid) - thuong(a.qid) || bam(a.qid) - bam(b.qid) || a.qid.localeCompare(b.qid)
 
   // 2. Câu mới cùng dạng yếu, ở bậc của dạng (đúng bậc trước, thấp hơn sau), xoay vòng qua các dạng.
   if (ra.length < soCan) {

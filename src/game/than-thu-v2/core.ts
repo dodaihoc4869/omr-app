@@ -1,5 +1,6 @@
 import { soKhopSo } from '../../lib/cham-so'
 import { cauHopKhoi, type Khoi } from '../../lib/khoi-cau'
+import { gomDiemNhan, thuongNhan, type BangChungCau, type LichSuCuaEm } from '../../lib/uu-tien-nhan-kho'
 
 export const PETS = [
   { id:'dat_quy', name:'Thạch Quy', element:'Đất', shape:'quy', color:'rgb(180,130,62)', accent:'rgb(86,180,136)', skill:'Chia bài thành từng bước' },
@@ -63,6 +64,14 @@ export function learnedQuestionFilter(evidence:readonly Evidence[],blocked:Reado
   }
 }
 const LEVELS=['biet','hieu','van_dung']
+/** Ngày VN (UTC+7) của một mốc thời gian: nhận chuỗi ngày `YYYY-MM-DD` hoặc ISO; mốc không đọc được ⇒ chuỗi rỗng (không ném lỗi). */
+function ngayVnCua(v:string|number):string{
+  if(typeof v==='number')return Number.isFinite(v)?new Date(v+7*3600000).toISOString().slice(0,10):''
+  const s=String(v??'').trim()
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s
+  const t=Date.parse(s)
+  return Number.isFinite(t)?new Date(t+7*3600000).toISOString().slice(0,10):''
+}
 export function targetLevel(dang:string|null,evidence:Evidence[],attempts:Attempt[]):number {
   // Từng làm SAI câu khó chỉ chứng minh đã gặp dạng, không chứng minh đủ sức ở bậc đó.
   // Bắt đầu từ Biết để em khắc phục; các lần tự làm đúng bên dưới vẫn mở bậc dần.
@@ -77,6 +86,37 @@ export function targetLevel(dang:string|null,evidence:Evidence[],attempts:Attemp
   const last=attempts.filter(a=>a.dang===dang&&!a.correct).slice(-2)
   if(last.length===2&&last[0]!.group!==last[1]!.group&&attempts.slice(-2).every(a=>!a.correct)) level=Math.max(0,level-1)
   return level
+}
+/**
+ * ĐIỂM THƯỞNG NHÃN KIẾN THỨC theo qid cho MỘT em — THUẦN, chỉ từ `evidence` + `attempts` (không trạng thái toàn cục).
+ * Lịch sử theo qid: SỰ KIỆN MỚI NHẤT quyết định `sai`/`dung` (đúng sau sai KHÔNG còn bị coi là yếu); số NGÀY ĐÚNG KHÁC NHAU (giờ VN, UTC+7) gom ĐỘC LẬP theo thứ tự đầu vào.
+ * Nhãn lấy từ chính kho câu (khử trùng qid); qid chỉ có trong lịch sử mà vắng kho vẫn dùng nhãn THẬT của bằng chứng (không suy diễn). Vắng nhãn / vắng lịch sử ⇒ 0.
+ */
+function diemThuongNhanTheoQid(pool:readonly Question[],evidence:readonly Evidence[],attempts:readonly Attempt[]):Map<string,number>{
+  const nhanTheoQid=new Map<string,unknown>()
+  for(const q of pool)if(!nhanTheoQid.has(q.qid))nhanTheoQid.set(q.qid,q.kienThuc)
+  for(const e of evidence)if(!nhanTheoQid.has(e.qid))nhanTheoQid.set(e.qid,e.kienThuc)
+  const moc=new Map<string,number>(),moiNhat=new Map<string,boolean>()
+  const ngayDung=new Map<string,Set<string>>()
+  const ghi=(qid:string,correct:boolean,assisted:boolean,at:number,ngay:string)=>{
+    const dung=correct&&!assisted
+    const cu=moc.get(qid)
+    if(cu===undefined||at>=cu){moc.set(qid,at);moiNhat.set(qid,dung)}
+    if(dung){const s=new Set(ngayDung.get(qid)??[]);s.add(ngay);ngayDung.set(qid,s)}
+  }
+  for(const e of evidence){const at=Date.parse(e.date);ghi(e.qid,!e.wrong,false,Number.isFinite(at)?at:0,ngayVnCua(e.date))}
+  for(const a of attempts)ghi(a.qid,a.correct,a.assisted,a.at,ngayVnCua(a.at))
+  const lichSu=new Map<string,BangChungCau>()
+  for(const qid of nhanTheoQid.keys()){
+    if(!moiNhat.has(qid))continue // No event is not evidence of a wrong answer.
+    const dung=moiNhat.get(qid)!
+    lichSu.set(qid,{sai:!dung,dung,daDungLai:(ngayDung.get(qid)?.size??0)>=2})
+  }
+  const cauCoNhan=[...nhanTheoQid].map(([qid,kienThuc])=>({qid,kienThuc}))
+  const diemNhan=gomDiemNhan(cauCoNhan,lichSu as LichSuCuaEm)
+  const ra=new Map<string,number>()
+  for(const c of cauCoNhan){const t=thuongNhan(c,diemNhan,lichSu.get(c.qid)?.daDungLai??false);if(t>0)ra.set(c.qid,t)}
+  return ra
 }
 /** Vai của một câu trong lượt 6 câu — đúng bốn suất của công thức chọn câu: 2 yếu · 1 tới hạn · lấp · 1 thử thách. Chỉ để KỂ cho em nghe, không đổi cách chọn. */
 export type QuestionRole='yeu'|'toi_han'|'lap'|'thu_thach'
@@ -100,7 +140,8 @@ export function chooseSessionWithRoles(pool:PrivateQuestion[],evidence:Evidence[
     if(now-a.at>=gap&&!recent.has(q.group))return 1
     return recent.has(q.group)?3:2}
   const rank=(q:Question)=>{let h=2166136261;for(const c of q.group)h=Math.imul(h^c.charCodeAt(0),16777619);return (h^(Math.floor(now/3600000)+attempts.length)*2654435761)>>>0}
-  const sorted=pool.filter(q=>q.reviewed).sort((a,b)=>tier(a)-tier(b)||(latest.get(a.group)?.at??0)-(latest.get(b.group)?.at??0)||(counts.get(a.group)??0)-(counts.get(b.group)??0)||rank(a)-rank(b)||a.qid.localeCompare(b.qid))
+  const thuongNhanQid=diemThuongNhanTheoQid(pool,evidence,attempts)
+  const sorted=pool.filter(q=>q.reviewed).sort((a,b)=>tier(a)-tier(b)||(latest.get(a.group)?.at??0)-(latest.get(b.group)?.at??0)||(counts.get(a.group)??0)-(counts.get(b.group)??0)||(thuongNhanQid.get(b.qid)??0)-(thuongNhanQid.get(a.qid)??0)||rank(a)-rank(b)||a.qid.localeCompare(b.qid))
   const used=new Set<string>(),out:PrivateQuestion[]=[],roles=new Map<string,QuestionRole>()
   const withRoles=()=>out.slice(0,6).map(q=>({q,role:roles.get(q.qid)??'lap'}))
   const topics=new Map<string,number>()
@@ -154,7 +195,11 @@ export const tranCauDaiTheoCap=(cap:number)=>cap>=30?3:cap>=10?2:1
 const GIO_VN=7*3600000
 const ngayVnChi=(ms:number)=>Math.floor((ms+GIO_VN)/DAY)
 const ngayVnChuoi=(ms:number)=>new Date(ms+GIO_VN).toISOString().slice(0,10)
-export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): khối của em — câu của tờ khối CAO hơn KHÔNG BAO GIỜ vào lượt, dù trùng mã dạng. Bỏ trống / không rõ ⇒ không lọc (máy chủ vẫn lọc kho ở `readScope`; đây là lớp bảo hiểm thứ hai, ở chính hàm chọn). */ khoiEm?:Khoi|null; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number; gentle?:boolean; dueQids?:ReadonlySet<string>; seenGroups?:ReadonlyMap<string,number> }
+export interface OptLuot { loai:LoaiLuot; cap:number; now:number; /** LUẬT KHỐI (Boss 21/09, P0 khối 11 nhận câu khối 12): khối của em — câu của tờ khối CAO hơn KHÔNG BAO GIỜ vào lượt, dù trùng mã dạng. Bỏ trống / không rõ ⇒ không lọc (máy chủ vẫn lọc kho ở `readScope`; đây là lớp bảo hiểm thứ hai, ở chính hàm chọn). */ khoiEm?:Khoi|null; /** Lượt thưởng: lượt khám phá có 2 câu dài (thay vì 1). */ thuong?:boolean; blocked?:ReadonlySet<string>; soCau?:number; gentle?:boolean; dueQids?:ReadonlySet<string>; seenGroups?:ReadonlyMap<string,number>
+  /** VÒNG BÙ (thầy lệnh 25/09, "Đoàn chỉ 1 câu rồi lặp"): khi đang BÙ đủ suất bằng câu CŨ, cho phép lấy câu
+   * "vừa đúng chưa tới 30 ngày" (bỏ chặn `dung30`) — chọn câu LÂU NHẤT chưa gặp; KHÔNG bỏ chặn `sai3`.
+   * Mặc định `false`: đường chọn bình thường KHÔNG đổi một byte. */
+  boQuaDung30?:boolean }
 export interface CauLuot { q:PrivateQuestion; role:QuestionRoleV2; dai:boolean; moi:boolean }
 interface ThongKeNhom { gap:number; sai:number; lucSaiCuoi:number; lucDungCuoi:number; lucCuoi:number }
 export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempts:Attempt[],mastery:Mastery[],opt:OptLuot):CauLuot[] {
@@ -178,6 +223,7 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
   const level=(q:Question)=>q.mucDo===null?-1:LEVELS.indexOf(q.mucDo)
   const dai=(q:Question)=>q.phan!=='I'
   const rank=(q:Question)=>{let h=2166136261;for(const c of q.group)h=Math.imul(h^c.charCodeAt(0),16777619);return (h^(Math.floor(now/3600000)+attempts.length)*2654435761)>>>0}
+  const thuongNhanQid=diemThuongNhanTheoQid(pool,evidence,attempts)
   const kho=pool.filter(q=>q.reviewed&&!blocked.has(q.qid)&&!blocked.has(q.group)&&cauHopKhoi(opt.khoiEm,q)&&(q.phan==='I'||q.phan==='II'||q.phan==='III'))
   const nhanCoYeu=kho.some(q=>weak.has(key(q))&&level(q)<=target(q.dang)&&!saiHomNay(q)),nhanCoTH=kho.some(q=>(opt.dueQids?.has(q.qid)||due.has(key(q)))&&level(q)<=target(q.dang)&&!saiHomNay(q))
   const tranDai=opt.loai==='trum'?N:Math.min(opt.thuong?2:1,tranCauDaiTheoCap(opt.cap))
@@ -210,7 +256,8 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
     if(opt.loai==='khoi_dong'&&noi<4&&dai(q))return false
     if(opt.loai!=='trum'&&dai(q)&&soDai>=Math.min(tranDai,tranDaiToiDa)&&noi<4)return false   // MỘT lượt thường: câu dài ≤ 1 (thưởng ≤ 2) VÀ ≤ trần theo cấp thú
     if(s.dai&&noi<1&&!dai(q))return false
-    if(sai3(q)||(dung30(q)&&!opt.dueQids?.has(q.qid)))return false
+    // VÒNG BÙ (`opt.boQuaDung30`): bỏ chặn "vừa đúng chưa tới 30 ngày" để bù đủ suất Đoàn; chặn `sai3` LUÔN giữ.
+    if(sai3(q)||(!opt.boQuaDung30&&dung30(q)&&!opt.dueQids?.has(q.qid)))return false
     if(saiHomNay(q))return false
     if(s.role==='yeu'&&!weak.has(key(q)))return false
     if(s.role==='toi_han'&&!opt.dueQids?.has(q.qid)&&!due.has(key(q)))return false
@@ -224,6 +271,8 @@ export function chooseLuotMoi(pool:PrivateQuestion[],evidence:Evidence[],attempt
     if(s.role==='moi'&&opt.loai==='kham_pha'){const da=daGapDang.has(a.dang??'')?1:0,db=daGapDang.has(b.dang??'')?1:0;if(da!==db)return da-db}  // khám phá: dạng em chưa gặp trước
     const la=tk.get(a.group)?.lucCuoi??-1,lb=tk.get(b.group)?.lucCuoi??-1
     if(la!==lb)return la-lb                                   // lâu chưa gặp trước
+    const ta=thuongNhanQid.get(a.qid)??0,tb=thuongNhanQid.get(b.qid)??0
+    if(ta!==tb)return tb-ta                                   // nhãn em còn yếu trước (chỉ sau mọi luật lặp/tươi/bậc)
     return rank(a)-rank(b)||a.qid.localeCompare(b.qid)
   }
   const datSuat=(s:Suat):boolean=>{

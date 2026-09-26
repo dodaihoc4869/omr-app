@@ -25,6 +25,7 @@ import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
 import { docHapThuChoEm, nhanExpGame } from './game-v2-hap-thu'
 import type { Profile } from './game-v2'
 import { tinhDatNhiemVuNgay } from '../../src/lib/dat-nhiem-vu-ngay'
+import { cuaP08Mo, ghiManhQuaP08 } from './cnh-exp-adapter'
 import type { ThieuDat } from '../../src/lib/dat-nhiem-vu-ngay'
 import { ngayVn } from './su-kien-hoc'
 
@@ -516,6 +517,25 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   }
   for (const g of chunk(lenh, 25)) await env.DB.batch(g)
 
+  // CNH-1.0 P08 (§7.1): CỬA P08 MỞ ⇒ ghi CÙNG các NGÀY ĐẠT sang SỔ MẢNH v1 (`cnh_exp_fragment_ledger`).
+  // ⚠️ KHÔNG có bước này thì `cnh_exp_p08_state.fragment_balance` MÃI = 0 ⇒ KHÔNG BAO GIỜ đủ 21 mảnh đổi khiên.
+  // Cửa ĐÓNG (mặc định) ⇒ KHÔNG chạm substrate P08. Lỗi ở nhánh này KHÔNG được làm hỏng đường EXP cũ
+  // (em chưa chuyển đổi ⇒ `NOT_FOUND` là BÌNH THƯỜNG, bỏ qua im lặng).
+  {
+    const cuaP08 = await cuaP08Mo(env)
+    if (cuaP08.choPhep) {
+      for (const m of cacManh) {
+        if (m.loai !== 'dat') continue // mảnh chỉ sinh từ NGÀY ĐẠT (§7.1). `dang`/`chuoi7` cũ KHÔNG cấp mảnh.
+        try {
+          await ghiManhQuaP08(env, '/game-v2/invest', { studentId: sbd, learningDay: m.ngay, requestId: `manh|${sbd}|${m.ngay}`, requestHash: `manh|${sbd}|${m.ngay}`, daDat: true })
+        } catch (e) {
+          const ma = (e as { ma?: string }).ma
+          if (ma !== 'NOT_FOUND') console.error('[cnh-exp-p08] ghi mảnh P08 lỗi (bỏ qua, đường cũ vẫn đúng):', e instanceof Error ? e.message : e)
+        }
+      }
+    }
+  }
+
   const daCong = await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
   const trangThaiDat: TrangThaiDatNgay | null = chiTietDat
     ? { dat: chiTietDat.dat, thieu: chiTietDat.thieu, daLam: chiTietDat.daLam, toiThieu: chiTietDat.toiThieu, daTrao: daCo.has(`dat|${homNay}`), laNghi: chiTietDat.laNghi }
@@ -528,6 +548,11 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
  * `since` = ngày bắt đầu mùa game (hồ sơ mùa mới không nhận khoản của mùa cũ).
  */
 export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Promise<DaCong | null> {
+  // CNH-1.0 P08 (Cline 25/09): CỔNG P08 MỞ ⇒ phần EXP vừa cộng vào ví hồ sơ cũng phải GƯƠNG sang
+  // `cnh_exp_account.wallet_exp`. KHÔNG có bước này thì ví P08 ĐỨNG YÊN ở số của đợt cutover trong khi em
+  // kiếm EXP mỗi ngày vào sổ cũ ⇒ bật cờ là màn em đọc ví P08 SAI (EXP em vừa kiếm không hiện ra).
+  // Kiểm cờ MỘT lần cho cả vòng (không đệm: tắt cờ là ngừng gương ngay). Cờ TẮT (mặc định) ⇒ không truy vấn thêm.
+  const moP08 = (await cuaP08Mo(env).catch(() => ({ choPhep: false }))).choPhep
   for (let lan = 0; lan < 3; lan++) {
     const row = await an(() => env.DB.prepare('SELECT revision, json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ revision: number; json: string }>(), null)
     if (!row) return null
@@ -547,8 +572,29 @@ export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Pro
     const ngayDat = Number(t.d) || 0
     if (tongExp === (p.expMoi?.daCong ?? 0) && tongManh === (p.expMoi?.manhDaTinh ?? 0) && ngayDat === (p.expMoi?.ngayDat ?? 0)) return { exp: 0, manh: 0, khienMoi: 0 }
     const ra = congTongSoVaoHoSo(p, tongExp, tongManh, ngayDat)
-    const r = await env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(json(p), sbd, row.revision).run()
-    if (r.meta.changes) return ra
+    const lenh: D1PreparedStatement[] = [
+      env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(json(p), sbd, row.revision),
+    ]
+    // GƯƠNG ví P08: `changes() = 1` buộc câu này CHỈ chạy khi câu trên vừa thắng CAS ⇒ hai sổ cùng đổi hoặc
+    // cùng không. Hàng ví chưa có (em chưa chuyển đổi) ⇒ 0 dòng, vô hại.
+    if (moP08 && ra.exp > 0) {
+      lenh.push(
+        env.DB.prepare(
+          `UPDATE cnh_exp_account
+              SET wallet_exp = wallet_exp + ?, earned_exp = earned_exp + ?, revision = revision + 1, cap_nhat_luc = datetime('now')
+            WHERE student_id = ? AND changes() = 1`,
+        ).bind(ra.exp, ra.exp, sbd),
+      )
+    }
+    let daDoi = 0
+    if (lenh.length > 1) {
+      const r = await env.DB.batch(lenh)
+      daDoi = Number(r[0]?.meta.changes ?? 0)
+    } else {
+      const r = await lenh[0]!.run()
+      daDoi = Number(r.meta.changes ?? 0)
+    }
+    if (daDoi) return ra
   }
   return null
 }

@@ -35,6 +35,15 @@ export default function DaoThanThu({sbd,token,moShopLucDau,profile,doanMo,call:c
  // `call` của nơi nối có thể đổi danh tính mỗi lần vẽ ⇒ giữ qua ref, hiệu ứng nạp dữ liệu KHÔNG phụ thuộc vào nó (tránh vòng lặp vẽ lại)
  const callRef=useRef(callProp);callRef.current=callProp
  const call=useCallback<DaoThanThuProps['call']>((action,data)=>callRef.current(action,data),[])
+ // CNH-1.0 P08 (Cline 25/09): lệnh TIỀN (nạp / đổi khiên / dùng khiên) gửi kèm `khoaYeuCau` — MÁY KHÁCH quyết định
+ // chuyển sang quỹ ví mới. Cửa P08 ĐÓNG (mặc định) ⇒ máy chủ tự đi đường CŨ, hành vi KHÔNG đổi.
+ // Phản hồi của lệnh P08 là `{ok,p08}` — KHÔNG kèm `profile` như đường cũ ⇒ nạp lại hồ sơ để màn hiện đúng số.
+ const sinhKhoaYeuCau=(tienTo:string):string=>{const c=(globalThis as {crypto?:{randomUUID?:()=>string}}).crypto;const rnd=c?.randomUUID?c.randomUUID().replace(/-/g,'').slice(0,10):Math.random().toString(36).slice(2,12).padEnd(10,'0');return `${tienTo}-${rnd}`}
+ const goiTien=useCallback(async(action:string,data:Record<string,unknown>={})=>{
+   const kq=await call(action,{...data,khoaYeuCau:sinhKhoaYeuCau(action)})
+   if(kq&&(kq as {p08?:unknown}).p08)await call('profile')
+   return kq
+ },[call])
  const [man,setMan]=useState<ManDao>('dao'),[dangTham,setDangTham]=useState(false)
  // Cửa hàng phụ kiện: CHỈ khi máy chủ báo `shopBat` (kèm `recommendations`, không thêm lượt gọi). Cờ tắt / Worker cũ ⇒ false ⇒ không nút, không tải mã cửa hàng.
  const [shopBat,setShopBat]=useState(false),[dangShop,setDangShop]=useState(false),daMoShopLucDau=useRef(false)
@@ -95,9 +104,9 @@ export default function DaoThanThu({sbd,token,moShopLucDau,profile,doanMo,call:c
  const muc:[ManDao|'doan'|'cua-hang',string][]=[['dao','Đảo'],...(doanMo?[['doan','Đoàn Hộ Tống']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ'],...(shopBat&&token?[['cua-hang',chuCuaHang]] as [ManDao|'doan'|'cua-hang',string][]:[])]
  return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}>
   {man==='dao'&&<DaoCuaEm profile={profile} exp={exp} chuoiNgay={chuoiNgay} goiY={goiY} conLai={conLai} luotCau={luotCau} luotNgay={luotNgay} maiCho={maiCho} tenDang={tenDang} tasks={tasks} busy={busy} loi={loi||loiChon} thongBao={bao||(luot&&!xong?'Em đang đi dở một chuyến — bấm LÊN ĐƯỜNG để đi tiếp.':'')}
-   onLenDuong={()=>void lenDuong()} onOnTheoNhac={dang=>void lenDuong('repair',dang)} onNap={()=>void chay(async()=>{await call('invest')})} onDoiTen={ten=>void chay(async()=>{await call('rename',{name:ten});setLoiChon('')})}/>}
+   onLenDuong={()=>void lenDuong()} onOnTheoNhac={dang=>void lenDuong('repair',dang)} onNap={()=>void chay(async()=>{await goiTien('invest')})} onDoiTen={ten=>void chay(async()=>{await call('rename',{name:ten});setLoiChon('')})}/>}
   {man==='so-tay'&&<SoTay profile={profile} danhMuc={danhMuc} tenDang={tenDang}/>}
-  {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onRenKhien={n=>chay(async()=>{await call('khien-ren',{soDaRen:n})})} onDungKhien={id=>chay(async()=>{await call('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}
+  {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onRenKhien={n=>chay(async()=>{await goiTien('khien-ren',{soDaRen:n})})} onDungKhien={id=>chay(async()=>{await goiTien('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}
   <button type="button" className="dao-ve-app" onClick={onDong}>Về app học sinh</button>
   <nav className="dao-nav" aria-label="Mục của đảo">{muc.map(([id,nhan])=><button type="button" key={id} aria-current={id===man?'page':undefined} onClick={()=>{if(id==='doan')onMoDoan();else if(id==='cua-hang')setDangShop(true);else setMan(id)}}><span>{ICON[id]}</span>{nhan}</button>)}</nav>
  </div>

@@ -54,6 +54,7 @@ const GoiLenBangScreen = lazy(() => import('./screens/GoiLenBangScreen'))
 const GiaoBtvnScreen = lazy(() => import('./screens/PhanCongScreen'))
 const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
 const CaiDatScreen = lazy(() => import('./screens/CaiDatScreen'))
+const GiaoDeTheoTuanScreen = lazy(() => import('./screens/GiaoDeTheoTuanScreen'))
 // CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
 // nó nhập thẳng là em học sinh nào cũng phải tải kèm.
@@ -82,6 +83,7 @@ const TEN_MAN: Record<string, string> = {
   goilenbang: 'Gọi lên bảng',
   giaobtvn: 'Giao bài tập về nhà',
   cauhoi: 'Học sinh hỏi',
+  khodegiao: 'Giao đề theo tuần',
   caidat: 'Cài đặt',
 }
 
@@ -347,6 +349,7 @@ function App() {
         {screen === 'goilenbang' && <GoiLenBangScreen />}
         {screen === 'cauhoi' && <CauHoiScreen />}
         {screen === 'caidat' && <CaiDatScreen />}
+        {screen === 'khodegiao' && <GiaoDeTheoTuanScreen />}
         </Suspense>
       </ChanLoi>
         </div>

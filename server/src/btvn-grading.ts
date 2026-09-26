@@ -1,6 +1,7 @@
 import type { Env } from './kieu'
 import { laCauTuLuan, laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { soKhopSo } from '../../src/lib/cham-so'
+import { chamTheoPolicy, ChamMaterialError, POLICY_MAC_DINH_PHAN_III } from '../../src/lib/cham-so-policy'
 
 export function answerText(v: unknown): string {
   if (v === null || v === undefined) return ''
@@ -52,6 +53,39 @@ export function isAnswerCorrect(v: string, d: string, phan: 'I' | 'II' | 'III' |
   return cleanV === cleanD
 }
 
+/** Submit-only validation: boolean grading remains available for existing read/recompute callers. */
+export class LoiChamBtvn extends Error {
+  constructor(readonly ma: 'BTVN_GRADING_INPUT_INVALID' | 'BTVN_GRADING_MATERIAL_INVALID', message: string) {
+    super(message)
+    this.name = 'LoiChamBtvn'
+  }
+}
+
+/** Validate the effective answers after scope/alias/first-answer selection, before any write. */
+export function kiemTraDapAnBtvn(
+  keys: ReadonlyMap<string, string>,
+  answers: Readonly<Record<string, unknown>>,
+  parts?: ReadonlyMap<string, string>,
+): void {
+  for (const [qid, key] of keys) {
+    const phan = /-(III|II|I)-\d+$/.exec(qid)?.[1] || parts?.get(qid) || (qid.includes('-III-') ? 'III' : qid.includes('-II-') ? 'II' : 'I')
+    if (phan !== 'III') continue
+    try {
+      // The shared API requires a nonempty answer. For a blank, probe the key against
+      // itself only to validate server material; the existing grader still scores the blank.
+      const result = chamTheoPolicy({ policy: POLICY_MAC_DINH_PHAN_III, key, answer: answerText(answers[qid]) || key })
+      if (result.error === 'unsupported-format') {
+        throw new LoiChamBtvn('BTVN_GRADING_INPUT_INVALID', 'Đáp án số chưa đúng định dạng. Em kiểm tra rồi nộp lại.')
+      }
+    } catch (e) {
+      if (e instanceof ChamMaterialError) {
+        throw new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Đáp án số của đề chưa hợp lệ. Bài làm chưa được chốt.')
+      }
+      throw e
+    }
+  }
+}
+
 export function gradeHomework(keys: Map<string, string>, raw: Record<string, unknown>, maDe: string) {
   if (!keys.size) throw new Error('Chưa tải được đáp án. Bài làm vẫn được giữ, em thử nộp lại.')
   const answers: Record<string, string> = {}, ambiguous: string[] = []
@@ -92,25 +126,46 @@ export function gradeHomework(keys: Map<string, string>, raw: Record<string, unk
   }
   return { answers, soCau: keys.size, soDung: keys.size - qidSai.length, qidSai }
 }
-export async function homeworkQuestions(env: Env, maDe: string) {
+/** Submit-only completeness against qids issued by the server, never client input. */
+export function kiemTraDuMaterialBtvn(cau: Record<string, unknown>[], requiredQids: Iterable<string>): void {
+  const keys = homeworkKeys(cau)
+  for (const qid of requiredQids) {
+    if (!keys.has(qid)) throw new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Thiếu câu hoặc đáp án của bài đã giao. Bài làm chưa được chốt.')
+  }
+}
+
+export async function homeworkQuestions(env: Env, maDe: string, material?: { requiredQids?: readonly string[]; sourceMaterial?: boolean }) {
   const out: Record<string, unknown>[] = []; const seen = new Set<string>(); const cache = new Map<string, Record<string, unknown>[]>()
   for (const ma of maDe.split(',').map(x => x.trim()).filter(Boolean)) {
     if (laMaDeTuLuan(ma)) continue // -VD / -DT (mục dạy học) và -TL (tự luận): một định nghĩa dùng chung (src/lib/cau-tu-luan.ts)
     const match = ma.match(/-(TN|DS|TLN)$/), goc = match ? ma.slice(0, -match[0].length) : ma
     const phan = match ? ({ TN: 'I', DS: 'II', TLN: 'III' } as Record<string, string>)[match[1]] : null
     if (!cache.has(goc)) {
-      const o = await env.DE?.get(`kho/${goc}.json`); if (!o) throw new Error('Không tải đủ đề bài tập.')
+      const o = await env.DE?.get(`kho/${goc}.json`)
+      if (!o) {
+        if (material) throw new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Không tải đủ đề bài tập. Bài làm chưa được chốt.')
+        throw new Error('Không tải đủ đề bài tập.')
+      }
       const g = await new Response(o.body).json() as Record<string, unknown>
       cache.set(goc, Array.isArray(g.cau) ? g.cau as Record<string, unknown>[] : ['phanI', 'phanII', 'phanIII'].flatMap((k, i) => Array.isArray(g[k]) ? (g[k] as Record<string, unknown>[]).map(c => ({ ...c, phan: c.phan || ['I', 'II', 'III'][i] })) : []))
     }
     for (const c of cache.get(goc) || []) {
       if (phan && c.phan !== phan) continue
+      // Normal homework has source/part authority but no immutable qid manifest.
+      // Check raw material before the essay filter can hide an empty key. Exclusions
+      // independent of the key (explicit essay, open prompt, missing choices) remain.
+      if (material?.sourceMaterial && !answerText(c.dap_an ?? c.dapAn)) {
+        const withoutKey = { ...c }
+        for (const key of ['dap_an', 'dapAn', 'correct', 'dapAnDung']) delete withoutKey[key]
+        if (!laCauTuLuan(withoutKey)) throw new LoiChamBtvn('BTVN_GRADING_MATERIAL_INVALID', 'Thiếu đáp án của đề bài tập. Bài làm chưa được chốt.')
+      }
       // CẤM RÚT TỰ LUẬN (21/09): luật cũ (phần III đáp án dài / nhiều dòng) nay là MỘT phần của định nghĩa dùng chung — thêm: phần III không đáp án hoặc hỏi mở,
       // phần I thiếu phương án, phần II thiếu ý. Trên 4 tờ kho thật (299 câu) hai luật bỏ đúng cùng những câu (test khoá).
       if (laCauTuLuan(c)) continue
       const qid = `${goc}-${c.phan}-${c.so}`; if (seen.has(qid)) continue; seen.add(qid); out.push({ ...c, qid })
     }
   }
+  if (material?.requiredQids) kiemTraDuMaterialBtvn(out, material.requiredQids)
   return out
 }
 export function homeworkKeys(cau: Record<string, unknown>[]) { return new Map(cau.flatMap(c => { const d = answerText(c.dap_an ?? c.dapAn); return d ? [[String(c.qid), d] as [string, string]] : [] })) }

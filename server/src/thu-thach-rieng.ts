@@ -24,6 +24,7 @@ import { tenCuaCacDang } from './ten-dang-bo-nao'
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { PETS, learnedQuestionFilter, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { mucTuChu } from '../../src/lib/btvn-nang-do'
+import { gomDiemNhan, thuongNhan, type BangChungCau, type LichSuCuaEm } from '../../src/lib/uu-tien-nhan-kho'
 
 type Dong = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -84,17 +85,23 @@ export interface UngVien {
   dang: string
   muc: 0 | 1 | 2
   group?: string
+  /** Nhãn kiến thức THẬT của câu (tuỳ chọn) — chỉ để tính điểm thưởng nhãn trong CÙNG dạng + CÙNG mức nhắm. */
+  kienThuc?: unknown
 }
 
 /**
  * XẾP CÂU (THUẦN, tất định): mỗi dạng nhận phần chia đều (dạng đầu nhận phần dư); trong dạng ưu tiên câu ĐÚNG mức nhắm, thiếu thì lấy mức thấp hơn liền kề (không bao giờ CAO hơn mức nhắm);
  * thứ tự trong cùng mức xáo tất định theo `<sbd>|<ngày>|<qid>`. Dạng thiếu câu thì phần thiếu nhường dạng còn lại (nếu có). Kết quả xen kẽ giữa các dạng.
  */
-export function chonCauThuThach(p: { sbd: string; ngay: string; dang: string[]; soCau: number; mucNhamTheoDang: ReadonlyMap<string, number>; ungVien: readonly UngVien[]; loaiTru: ReadonlySet<string> }): { qid: string[]; thieu: number } {
+export function chonCauThuThach(p: { sbd: string; ngay: string; dang: string[]; soCau: number; mucNhamTheoDang: ReadonlyMap<string, number>; ungVien: readonly UngVien[]; loaiTru: ReadonlySet<string>; lichSu?: LichSuCuaEm }): { qid: string[]; thieu: number } {
+  // ĐIỂM THƯỞNG NHÃN (thuần, dùng chung `uu-tien-nhan-kho`): chỉ tính khi có lịch sử; vắng ⇒ 0 và giữ nguyên thứ tự cũ.
+  const diemNhan = p.lichSu ? gomDiemNhan(p.ungVien.map((u) => ({ qid: u.qid, kienThuc: u.kienThuc })), p.lichSu) : null
+  const thuong = (u: UngVien): number => (diemNhan ? thuongNhan({ qid: u.qid, kienThuc: u.kienThuc }, diemNhan, p.lichSu?.get(u.qid)?.daDungLai ?? false) : 0)
   const xepHang = (d: string): string[] => {
     const nham = p.mucNhamTheoDang.get(d) ?? 0
     const cua = p.ungVien.filter((u) => u.dang === d && u.muc <= nham && !p.loaiTru.has(u.qid))
-    return [...cua].sort((a, c) => c.muc - a.muc || bamChuoi(`${p.sbd}|${p.ngay}|${a.qid}`) - bamChuoi(`${p.sbd}|${p.ngay}|${c.qid}`) || (a.qid < c.qid ? -1 : 1)).map((u) => u.qid)
+    // Thưởng nhãn chỉ so trong CÙNG mức (đứng sau `c.muc - a.muc`), TRƯỚC băm tất định; bằng điểm ⇒ giữ nguyên thứ tự cũ.
+    return [...cua].sort((a, c) => c.muc - a.muc || thuong(c) - thuong(a) || bamChuoi(`${p.sbd}|${p.ngay}|${a.qid}`) - bamChuoi(`${p.sbd}|${p.ngay}|${c.qid}`) || (a.qid < c.qid ? -1 : 1)).map((u) => u.qid)
   }
   const hang = new Map(p.dang.map((d) => [d, xepHang(d)] as const))
   const chon = new Map<string, string[]>(p.dang.map((d) => [d, []]))
@@ -152,7 +159,7 @@ export async function docThanThuSoThat(env: Env, dsSbd: string[]): Promise<Map<s
     if (coThu.length > 0) {
       const homNay = ngayVn(Date.now())
       const kh = await env.DB.prepare('SELECT sbd, ket_qua, la_ngay_nghi FROM ke_hoach_ngay WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay >= ? ORDER BY sbd, ngay DESC')
-        .bind(json(coThu.map((x) => chuoi(x.sbd))), themNgay(homNay, -60)).all<Dong>().catch(() => ({ results: [] as Dong[] }))
+        .bind(json(coThu.map((x) => chuoi(x.sbd))), themNgay(homNay, -60)).all<Dong>().catch((e: unknown) => { if (e instanceof Error && /no such (table|column)/i.test(e.message)) return { results: [] as Dong[] }; throw e })
       for (const x of kh.results ?? []) {
         const k = so(x.la_ngay_nghi) === 1 ? null : (chuoi(x.ket_qua) as 'dat' | 'mot_phan' | 'khong')
         lichSu.set(chuoi(x.sbd), [...(lichSu.get(chuoi(x.sbd)) ?? []), { ketQua: k || null }])
@@ -271,7 +278,7 @@ export async function chotThuThach(env: Env, sbd: string, ngay: string, nowMs: n
     const rLoai = await env.DB.prepare(
       `SELECT qid FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ?
        UNION SELECT qid FROM btvn_em_cau WHERE sbd = ? AND ma_btvn IN (SELECT ma_btvn FROM btvn_em WHERE sbd = ? AND nop_luc IS NULL AND thu_hoi = 0)`,
-    ).bind(sbd, tu, sbd, sbd).all<Dong>().catch(() => ({ results: [] as Dong[] }))
+    ).bind(sbd, tu, sbd, sbd).all<Dong>().catch((e: unknown) => { if (e instanceof Error && /no such (table|column)/i.test(e.message)) return { results: [] as Dong[] }; throw e })
     const loaiTru = new Set((rLoai.results ?? []).map((x) => chuoi(x.qid)))
     // Một bản sao ở tờ khác vẫn là câu đã làm/được giao, dù qid khác.
     if (loaiTru.size > 0) {
@@ -293,17 +300,41 @@ export async function chotThuThach(env: Env, sbd: string, ngay: string, nowMs: n
         if (jsonLaTuLuan(x.json)) continue
         if (!cauHopKhoi(khoiEm, { qid: x.qid, ma_de: x.ma_de, lop: x.lop_to })) continue
         let muc: 0 | 1 | 2 = 0
+        let kienThuc: unknown
         try {
           const q = JSON.parse(chuoi(x.json)) as PrivateQuestion
           if (!q.reviewed || !daHocCau(q)) continue
           muc = mucTuChu(q.mucDo ?? '')
+          kienThuc = q.kienThuc
         } catch { continue }
-        if (!nhomCua.has(chuoi(x.qid))) { nhomCua.set(chuoi(x.qid), chuoi(x.content_group)); ungVien.push({ qid: chuoi(x.qid), dang: d, muc, group: chuoi(x.content_group) }) }
+        if (!nhomCua.has(chuoi(x.qid))) { nhomCua.set(chuoi(x.qid), chuoi(x.content_group)); ungVien.push({ qid: chuoi(x.qid), dang: d, muc, group: chuoi(x.content_group), kienThuc }) }
       }
     }
     const duoc = ungVien.filter((u) => khongBiBaoVe({ qid: u.qid, group: nhomCua.get(u.qid) ?? '' }, baoVe))
 
-    const kq = chonCauThuThach({ sbd, ngay, dang: tt.dang, soCau: tt.soCau, mucNhamTheoDang, ungVien: duoc, loaiTru })
+    // LỊCH SỬ NHÃN của CHÍNH em cho các câu ứng viên (một truy vấn, giới hạn theo qid ứng viên): sai = moi_sai/dang_on hoặc lan_sai>0 và chưa khắc phục;
+    // đúng = da_khac_phuc/chua_thay_sai; đã đúng lại ≥ 2 NGÀY KHÁC NHAU ⇒ không thưởng. Vắng hàng ⇒ không có bằng chứng (0).
+    const lichSu = new Map<string, BangChungCau>()
+    const qidUng = [...new Set(duoc.map((u) => u.qid))]
+    if (qidUng.length > 0) {
+      const rLs = await env.DB.prepare(
+        `SELECT qid, trang_thai, lan_sai, ngay_dung_khac_nhau FROM nam_kt_cau WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?))`,
+      ).bind(sbd, json(qidUng)).all<Dong>().catch((e: unknown) => { if (e instanceof Error && /no such (table|column)/i.test(e.message)) return { results: [] as Dong[] }; throw e })
+      for (const x of rLs.results ?? []) {
+        const qid = chuoi(x.qid)
+        if (!qid) continue
+        const tt = chuoi(x.trang_thai)
+        const daKhacPhuc = tt === 'da_khac_phuc'
+        const chuaThaySai = tt === 'chua_thay_sai'
+        lichSu.set(qid, {
+          sai: !daKhacPhuc && !chuaThaySai && (tt === 'moi_sai' || tt === 'dang_on' || so(x.lan_sai) > 0),
+          dung: daKhacPhuc || chuaThaySai,
+          daDungLai: so(x.ngay_dung_khac_nhau) >= 2,
+        })
+      }
+    }
+
+    const kq = chonCauThuThach({ sbd, ngay, dang: tt.dang, soCau: tt.soCau, mucNhamTheoDang, ungVien: duoc, loaiTru, lichSu })
     if (kq.qid.length === 0) return null
     await env.DB.prepare('INSERT OR IGNORE INTO thu_thach_rieng (sbd, ngay, dang_json, bac, so_cau, so_cau_muon, qid_json, loi_moi, tao_luc) VALUES (?,?,?,?,?,?,?,?,?)')
       .bind(sbd, ngay, json(tt.dang), tt.bac, kq.qid.length, tt.soCau, json(kq.qid), loiMoi, new Date(nowMs).toISOString()).run()
@@ -318,7 +349,7 @@ export async function chotThuThach(env: Env, sbd: string, ngay: string, nowMs: n
 
 async function ketQuaDaNop(env: Env, sbd: string, ngay: string, qid: string[]): Promise<Map<string, boolean>> {
   const r = await env.DB.prepare(`SELECT qid, ket_qua FROM su_kien_hoc WHERE sbd = ? AND nguon = ? AND ma_nguon = ? AND lan = 1 AND ket_qua IS NOT NULL AND qid IN (SELECT value FROM json_each(?))`)
-    .bind(sbd, NGUON_THU_THACH, maNguonThuThach(ngay), json(qid)).all<Dong>().catch(() => ({ results: [] as Dong[] }))
+    .bind(sbd, NGUON_THU_THACH, maNguonThuThach(ngay), json(qid)).all<Dong>().catch((e: unknown) => { if (e instanceof Error && /no such (table|column)/i.test(e.message)) return { results: [] as Dong[] }; throw e })
   return new Map((r.results ?? []).map((x) => [chuoi(x.qid), so(x.ket_qua) === 1]))
 }
 
