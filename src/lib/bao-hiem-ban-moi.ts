@@ -131,13 +131,17 @@ export function moiTruongThat(): MoiTruongBaoHiem {
   return {
     banDangChay: BAN_DUNG_LUC_GIAY,
     layBanMayChu: async () => {
+      const bo = new AbortController()
+      const hen = setTimeout(() => bo.abort(), 8000)
       try {
-        const r = await fetch(`${goc}sw-version.json?t=${Date.now()}`, { cache: 'no-store' })
+        const r = await fetch(`${goc}sw-version.json?t=${Date.now()}`, { cache: 'no-store', signal: bo.signal })
         if (!r.ok) return null
         const n = Number(((await r.json()) as { builtAt?: unknown })?.builtAt)
         return Number.isFinite(n) && n > 0 ? n : null
       } catch {
         return null
+      } finally {
+        clearTimeout(hen)
       }
     },
     capNhatSW: async () => (await navigator.serviceWorker?.getRegistration())?.update(),

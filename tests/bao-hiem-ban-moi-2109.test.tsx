@@ -176,7 +176,8 @@ describe('dây nối với rào có sẵn (moiTruongThat)', () => {
       expect(await moiTruongThat().layBanMayChu()).toBe(mong)
     }
     expect(goi[0][0]).toMatch(/^\/sw-version\.json\?t=\d+$/)
-    expect(goi[0][1]).toEqual({ cache: 'no-store' })
+    expect(goi[0][1]).toMatchObject({ cache: 'no-store' })
+    expect(goi[0][1]?.signal).toBeInstanceOf(AbortSignal)
     vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, json: async () => ({ builtAt: 9 }) })))
     expect(await moiTruongThat().layBanMayChu()).toBeNull()
     vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('offline') }))
