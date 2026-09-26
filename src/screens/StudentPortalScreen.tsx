@@ -1,12 +1,25 @@
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
+import Game from '../game/than-thu-v2/Game';
+
+import Spirit2D from '../game/than-thu-v2/Spirit2D';
 import { Shield, Map, Zap, Star, ChevronRight, CheckCircle2, XCircle, Lightbulb, Beaker } from 'lucide-react';
 import '../styles/game-ui.css'; // We will create this
 
 export default function StudentPortalScreen() {
-  const [showDemoQuestion, setShowDemoQuestion] = useState(false);
+  const [activeMode, setActiveMode] = useState<'portal' | 'home' | 'doan' | 'demo'>('portal');
 
-  if (showDemoQuestion) {
-    return <GameQuestionDemo onBack={() => setShowDemoQuestion(false)} />;
+  if (false) {
+    return <GameQuestionDemo onBack={() => setActiveMode('portal')} />;
+  }
+  if (activeMode === 'home' || activeMode === 'doan') {
+    return (
+      <Suspense fallback={<div className="p-10 text-center">Đang tải game...</div>}>
+        <Game sbd="SBD_TEST" token="" manDau={activeMode} onDong={() => setActiveMode('portal')} />
+      </Suspense>
+    );
+  }
+  if (false) {
+    return <GameQuestionDemo onBack={() => setActiveMode('portal')} />;
   }
 
   return (
@@ -18,10 +31,8 @@ export default function StudentPortalScreen() {
         
         <div className="relative z-10 flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 p-1 shadow-md">
-              <div className="w-full h-full rounded-full bg-white border-2 border-white overflow-hidden">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&backgroundColor=b6e3f4" alt="Avatar" className="w-full h-full object-cover" />
-              </div>
+            <div className="w-24 h-24 relative flex items-center justify-center shrink-0">
+              <Spirit2D index={2} level={12} compact={true} motion="idle" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Nguyễn Văn A</h1>
@@ -66,7 +77,7 @@ export default function StudentPortalScreen() {
         
         {/* CARD 1: Bát Linh Đảo */}
         <button 
-          onClick={() => setShowDemoQuestion(true)}
+          onClick={() => setActiveMode('home')}
           className="group relative w-full text-left bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 shadow-lg shadow-emerald-200 overflow-hidden hover:scale-[1.02] transition-transform duration-300 active:scale-95"
         >
           <div className="absolute right-0 bottom-0 opacity-20 transform translate-x-4 translate-y-4 group-hover:scale-110 transition-transform duration-500">
@@ -89,7 +100,7 @@ export default function StudentPortalScreen() {
 
         {/* CARD 2: Đoàn Hộ Tống */}
         <button 
-          onClick={() => setShowDemoQuestion(true)}
+          onClick={() => setActiveMode('doan')}
           className="group relative w-full text-left bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl p-6 shadow-lg shadow-amber-200 overflow-hidden hover:scale-[1.02] transition-transform duration-300 active:scale-95"
         >
           <div className="absolute right-0 bottom-0 opacity-20 transform translate-x-4 translate-y-4 group-hover:scale-110 transition-transform duration-500">
