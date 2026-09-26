@@ -182,3 +182,14 @@ describe('keHoachCoXat — chịu đầu vào rỗng/hỏng, không bịa', () =
     expect(kq.canhBao.some((c) => c.includes('dưới hạn tối thiểu'))).toBe(true)
   })
 })
+
+describe('keHoachCoXat — câu NẶNG thời gian: 30 phút/ngày không đủ vẫn phải xếp ĐỦ', () => {
+  it('60 câu × 600 giây: trần phút không đủ ⇒ DỒN (không báo lười), xếp đủ mọi lượt', () => {
+    const kq = keHoachCoXat({ now: NAY, deadline: HAN, cau: dsCau(60, 600), hoSo: new Map<string, HoSoCauGiao>() })
+    expect(kq.tongLuot).toBe(120)
+    expect(kq.luoi).toBe(false)
+    expect(kq.luotXepDuoc).toBe(120)
+    expect(kq.canhBao.some((c) => c.includes('DỒN'))).toBe(true)
+    expect(kq.canhBao.some((c) => c.includes('lười biếng'))).toBe(false)
+  })
+})

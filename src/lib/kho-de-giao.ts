@@ -346,7 +346,10 @@ export function keHoachCoXat(v: DauVaoCoXat): KetQuaCoXat {
   }
   const cap = Array.from({ length: soNgay }, (_, i) => tranNen(i))
   const sucNen = cap.reduce((s, x) => s + x, 0)
-  const cram = tongLuot > sucNen
+  const giayTongLuot = luot.reduce((s, l) => s + (giayTheoQid.get(l.qid) ?? macDinh), 0)
+  const sucGiayNen = soNgay * KHO_DE_GIAO.PHUT_NGAY_TOI_DA * 60
+  // DỒN khi trần CÂU không đủ HOẶC trần PHÚT (mềm) không đủ — phút là mềm nên khi thiếu thì VƯỢT, KHÔNG bỏ lượt.
+  const cram = tongLuot > sucNen || giayTongLuot > sucGiayNen
   let thieu = tongLuot - sucNen
   for (let i = 0; i < soNgay && thieu > 0; i++) {
     const cu = cap[i] ?? 0
@@ -400,7 +403,7 @@ export function keHoachCoXat(v: DauVaoCoXat): KetQuaCoXat {
     ngay.push({ ngay: ng, cau: thuTu.map((l) => l.qid), moi: chonMoi.length, on: chonOn.length, giay: chon.reduce((s, l) => s + (giayTheoQid.get(l.qid) ?? macDinh), 0) })
   }
   const luotXepDuoc = tongLuot - conLuot.length
-  if (cram && !luoi) canhBao.push(`Phải DỒN: trần thường không đủ, đã nâng tới tối đa ${KHO_DE_GIAO.TRAN_CAU_NGAY_CUNG} câu/ngày để kịp hạn`)
+  if (cram && !luoi) canhBao.push(`Phải DỒN để kịp hạn: trần thường (${KHO_DE_GIAO.NEN_CAU_NGAY}–${KHO_DE_GIAO.TRAN_CAU_NGAY_GAN_HAN} câu · ~${KHO_DE_GIAO.PHUT_NGAY_TOI_DA} phút/ngày) không đủ`)
 
   return { trangThai: trangThaiEm({ tyLe, luoi }), tyLe, tongCau, daThongThao, soNgay, ngay, canhBao, luoi, tongLuot, luotXepDuoc }
 }
