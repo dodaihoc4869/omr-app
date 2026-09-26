@@ -44,9 +44,6 @@ import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChu
 import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
 import { CAU_HINH_LEN_BANG_MAC_DINH, nganSachGiay } from '../lib/len-bang-cau-hinh'
 import { dungDoKho } from '../lib/do-kho-cau'
-import { deXuatBuoiChuaPhuKienThuc, type DauVaoDeXuat } from '../lib/buoi-chua-de-xuat'
-import { khoTuNguon, layDeXuatBuoiChua } from '../lib/buoi-chua-de-xuat-lenh'
-import TheBuoiChuaXepSan from '../components/TheBuoiChuaXepSan'
 import { chuThieuNoiDung, demCauThieuNoiDung, timCauTheoId } from '../lib/tra-cau-chieu'
 import { noiDungTuCauGoc } from '../lib/thoi-gian-len-bang'
 import { uocLuongBacCau, uocLuongBacCauGoc } from '../lib/uoc-luong-bo-cuc'
@@ -260,24 +257,6 @@ export default function GoiLenBangScreen() {
   useEffect(() => {
     void loadExamSources().then((ds) => setKhoDe(khuTrungNguon(ds).nguon))
   }, [])
-  // BUỔI CHỮA XẾP SẴN (B6, Boss duyệt 21/09): máy chủ gom số liệu 3 ngày qua khi thầy mở màn; hàm thuần
-  // `deXuatBuoiChuaPhuKienThuc` chọn câu/em trên kho của máy thầy (lọc tự luận). Lệnh chưa có / lỗi / thiếu kho
-  // ⇒ thẻ ẨN, không báo lỗi đỏ. Thẻ chỉ ĐỌC (máy chuẩn bị sẵn); thầy muốn tự làm thì bấm "Tự chọn lại".
-  const [deXuatDv, setDeXuatDv] = useState<DauVaoDeXuat | null>(null)
-  const [anDeXuat, setAnDeXuat] = useState(false)
-  useEffect(() => {
-    let huy = false
-    void layDeXuatBuoiChua()
-      .then((r) => {
-        if (!huy) setDeXuatDv(r.ok ? r.du : null)
-      })
-      .catch(() => {})
-    return () => {
-      huy = true
-    }
-  }, [])
-  const khoCauDeXuat = useMemo(() => khoTuNguon(khoDe), [khoDe])
-  const deXuat = useMemo(() => (deXuatDv && khoCauDeXuat.length > 0 ? deXuatBuoiChuaPhuKienThuc(deXuatDv, khoCauDeXuat) : null), [deXuatDv, khoCauDeXuat])
   const [timEm, setTimEm] = useState('')
 
   const [soLuot, setSoLuot] = useState(1)
@@ -1607,9 +1586,6 @@ export default function GoiLenBangScreen() {
 
       {/* 2 — THÊM CÂU NGOÀI CA */}
       <TheNoiDung className="h-full">
-        {!dayHoc && !anDeXuat && (
-          <TheBuoiChuaXepSan deXuat={deXuat} onTuChon={() => setAnDeXuat(true)} />
-        )}
         <div style={TIEU_DE_MUC}>2. Câu để chữa lấy ở đâu</div>
         <div style={{ ...NHAN_NHO, marginTop: 4, marginBottom: 'var(--k3)' }}>
           Bài làm của em ở mục 1 luôn được dùng để tính câu nào cả lớp cùng sai. Mục này chỉ quyết định LẤY CÂU NÀO RA CHỮA.
