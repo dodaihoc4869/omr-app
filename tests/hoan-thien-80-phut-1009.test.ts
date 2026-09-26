@@ -116,19 +116,10 @@ describe('1 — GIỜ CHẾT: đổ nốt giờ thừa vào câu ngoài danh sá
   })
 })
 
-describe('2 — BA LỰA CHỌN THỪA GIỜ phải CHẠM ĐƯỢC', () => {
-  it('màn vẽ chúng bằng NÚT, không phải dòng chữ chết', () => {
-    const khoi = MAN.slice(MAN.indexOf('kqXep?.thuaGio && ('), MAN.indexOf('kqXep?.canhBao.map'))
-    expect(khoi).toContain('onClick={() => chamLuaChon(l.ma)}')
-    expect(khoi).toContain('tap-target')
-    expect(khoi).toContain('minHeight: 44')
-    expect(MAN).toContain('Chạm một dòng là áp ngay và xếp lại. Không chạm thì không đổi gì.')
-  })
-
-  it('chạm xong là XẾP LẠI ngay, không bắt thầy bấm nút thứ hai', () => {
-    const than = MAN.slice(MAN.indexOf('const chamLuaChon ='), MAN.indexOf('/** Đổi em cho ĐÚNG một dòng'))
-    expect(than).toContain('setKqXep(')
-    expect(than).toContain('xepGioLenBang(doKhoCau, emLenBang, baiLamGiay, vapCa.theoEm, {')
+describe('2 — BA LỰA CHỌN THỪA GIỜ (engine `xepGioLenBang` — KHÔNG còn dùng ở màn luật mới)', () => {
+  it('màn luật mới KHÔNG còn 3 lựa chọn thừa giờ lẫn `chamLuaChon` (Engine C đã bỏ khỏi màn)', () => {
+    expect(MAN).not.toContain('kqXep?.thuaGio && (')
+    expect(MAN).not.toContain('onClick={() => chamLuaChon')
   })
 
   it('lựa chọn ① bỏ ĐÚNG số câu điểm thấp nhất và xếp được ngay', () => {
@@ -214,10 +205,9 @@ describe('3 — ĐỔI EM: đúng một dòng đổi, phần còn lại đứng 
     expect(doiEmChoDong(goc, 'KHONG-CO', doKho, em, vap)).toBe(goc)
   })
 
-  it('màn có nút đổi em cho từng dòng, và nói rõ em vấp câu nào', () => {
-    expect(MAN).toContain('onClick={() => doiEm(d.cau.id)}')
-    expect(MAN).toContain('Đổi em này')
-    expect(MAN).toContain('chưa vấp câu nào cùng chuyên đề')
+  it('màn luật mới KHÔNG còn nút "Đổi em này" (Engine C đã bỏ khỏi màn)', () => {
+    expect(MAN).not.toContain('onClick={() => doiEm(')
+    expect(MAN).not.toContain('Đổi em này')
   })
 })
 
@@ -251,14 +241,10 @@ describe('4 — XẾP LẠI LẦN HAI trong buổi: em vừa lên bảng phải 
   // theo sự thật chứ không cắm cứng. Hợp đồng đầy đủ của phần ấy khoá ở
   // `lich-su-len-bang-1009.test.ts`; ở đây chỉ giữ đúng vế "xếp lại lần hai
   // không gọi lại em vừa lên bảng", vế mà đợt này sinh ra để giải quyết.
-  it('màn cộng CẢ lịch sử thật LẪN số lần đã gọi trong buổi', () => {
-    expect(MAN).toContain('soLanLenBang: (lichSu?.theoEm[e.sbd]?.soLan ?? 0) + (daGoiCau[e.sbd] ?? []).length,')
-    expect(MAN).toContain('[dsEmCa, daGoiCau, lichSu]')
-  })
-
-  it('cờ "chưa có lịch sử" nay theo SỰ THẬT, không cắm cứng nữa', () => {
-    expect(MAN).not.toContain('chuaCoLichSuLenBang: true')
-    expect(MAN).toContain('chuaCoLichSuLenBang: !lichSu || Object.keys(lichSu.theoEm).length === 0,')
+  it('màn luật mới gọi engine mới; KHÔNG còn `emLenBang`/`chuaCoLichSuLenBang` của Engine C', () => {
+    expect(MAN).toContain('xepBuoiChuaMoi(cauVaoXep, hoSo, CAU_HINH_LEN_BANG_MAC_DINH')
+    expect(MAN).not.toContain('const emLenBang = useMemo')
+    expect(MAN).not.toContain('chuaCoLichSuLenBang:')
   })
 })
 

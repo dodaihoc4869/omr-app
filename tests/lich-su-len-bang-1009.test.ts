@@ -73,8 +73,9 @@ describe('MÁY THẦY — đọc được thì dùng, không đọc được th�
     expect(API).toContain("postJson(scriptUrl, { action: 'lichSuLenBang', secret, soNgay: soNgay ?? 0 })")
   })
 
-  it('màn cộng CẢ lịch sử THẬT lẫn số lần đã gọi trong buổi', () => {
-    expect(MAN).toContain('soLanLenBang: (lichSu?.theoEm[e.sbd]?.soLan ?? 0) + (daGoiCau[e.sbd] ?? []).length,')
+  it('màn luật mới KHÔNG còn `emLenBang` (Engine C đã bỏ); lịch sử vẫn đọc cho nối buổi', () => {
+    expect(MAN).not.toContain('const emLenBang = useMemo')
+    expect(MAN).toContain('lichSuLenBang')
   })
 
   it('máy chủ bản cũ chưa có lệnh ⇒ coi là CHƯA CÓ, không phải hỏng', () => {
@@ -83,9 +84,8 @@ describe('MÁY THẦY — đọc được thì dùng, không đọc được th�
     expect(than).toContain('setLichSu(null)')
   })
 
-  it('cờ "chưa có lịch sử" nay theo SỰ THẬT, không cắm cứng', () => {
-    expect(MAN).not.toContain('chuaCoLichSuLenBang: true')
-    expect(MAN).toContain('chuaCoLichSuLenBang: !lichSu || Object.keys(lichSu.theoEm).length === 0,')
+  it('màn luật mới KHÔNG còn cờ `chuaCoLichSuLenBang` (Engine C đã bỏ khỏi màn)', () => {
+    expect(MAN).not.toContain('chuaCoLichSuLenBang:')
   })
 
   it('chấm xong một em thì cộng ngay, khỏi tải lại cả bảng', () => {
@@ -119,7 +119,8 @@ describe('RÀ SOÁT — hai chỗ tự tìm ra khi soi lại phần vừa dựng
     expect(than).not.toContain('danhSachCa(cauHinh.url, cauHinh.mat, true)')
   })
 
-  it('hộp THỪA GIỜ nói luôn GIÁ PHẢI TRẢ, không chỉ nêu con số phút', () => {
-    expect(MAN).toContain('Giá phải trả: chỉ <b style={SO}>{kqXep.soEmLenBang}</b>/<b style={SO}>{tranEm}</b> em được lên bảng.')
+  it('màn luật mới KHÔNG còn hộp THỪA GIỜ (Engine C đã bỏ khỏi màn)', () => {
+    expect(MAN).not.toContain('Giá phải trả:')
+    expect(MAN).not.toContain('kqXep?.thuaGio')
   })
 })
