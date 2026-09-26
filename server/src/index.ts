@@ -13,6 +13,7 @@ import {chaySetupP08NeuDuoc} from './cnh-exp-p08-setup'
 
 import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
+import { gvKhoDeGiao } from './gv-kho-de-giao'
 import {hsOnLaiNop} from './on-lai-nop'
 import {hoSoOnCa} from './ho-so-on-ca'
 import {notifications,deliverNotices} from './notifications'
@@ -3327,6 +3328,7 @@ const boXuLy = {
       if (p === '/gv/bang-tin') { const r = await gvBangTin(envDoc, b); if (r.ok !== false) { try { r.chuaHocHomNay = await gvChuaHocHomNay(envDoc) } catch (e) { console.error('[bang-tin] chưa học hôm nay lỗi:', e) } } return ra(r) }
       // CỜ TẮT chung của các việc máy tự làm B7–B11 (thầy chỉ tắt/bật): đọc-ghi khoá `cau_hinh.tu_dong_cac_viec`.
       if (p === '/gv/tu-dong-cac-viec') return ra(await gvTuDongCacViec(env, b))
+      if (p === '/gv/kho-de-giao') return ra(await gvKhoDeGiao(envDoc, b))
       if (p === '/ke-hoach/chay-ca-lop') return ra({ ok: true, ...(await chayCaLop(env, Date.now())) })
       if (p === '/game-v2-admin') return ra(await adminGame(env,b))
       if (p === '/ca/day') return dayCa(env, b)
