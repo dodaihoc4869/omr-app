@@ -121,8 +121,17 @@ const STORE_ATTEMPTS = 'attempts'
 const STORE_SESSION_CACHE = 'sessionCache'
 const STORE_SESSION_BANK_TEACHER = 'sessionBankTeacher'
 
+/** ĐUA một promise với hạn chờ — hết hạn thì NÉM lỗi. IndexedDB trên Xiaomi/MIUI có thể TREO vĩnh viễn
+ * ở `indexedDB.open` (không bắn onsuccess/onerror) ⇒ `await` treo, `try/catch` KHÔNG bắt được treo. */
+function choHan<T>(p: Promise<T>, ms: number): Promise<T> {
+  return new Promise((ok, ko) => {
+    const h = setTimeout(() => ko(new Error('Bộ nhớ máy không mở được (quá hạn)')), ms)
+    p.then((v) => { clearTimeout(h); ok(v) }, (e) => { clearTimeout(h); ko(e) })
+  })
+}
+
 async function getDb(): Promise<IDBPDatabase> {
-  return openDB(DB_NAME, DB_VERSION, {
+  return choHan(openDB(DB_NAME, DB_VERSION, {
     upgrade(db, oldVersion) {
       if (oldVersion < 1) {
         if (!db.objectStoreNames.contains(STORE_SETTINGS)) db.createObjectStore(STORE_SETTINGS)
@@ -136,7 +145,7 @@ async function getDb(): Promise<IDBPDatabase> {
       if (!db.objectStoreNames.contains(STORE_SESSION_CACHE)) db.createObjectStore(STORE_SESSION_CACHE)
       if (!db.objectStoreNames.contains(STORE_SESSION_BANK_TEACHER)) db.createObjectStore(STORE_SESSION_BANK_TEACHER)
     },
-  })
+  }), 5000)
 }
 
 export interface CachedSession {
