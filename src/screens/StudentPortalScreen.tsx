@@ -61,7 +61,8 @@ import {
   voDaiTaoApi, voDaiMoiApi, voDaiLoiMoiApi, voDaiVaoApi,
   voDaiBatDauApi, voDaiXemApi, voDaiNopApi, voDaiDongApi,
 } from '../lib/exam-api'
-import { khongTreo, loadScriptUrlHoacMacDinh } from '../lib/exam-db'
+import { loadScriptUrlHoacMacDinh } from '../lib/exam-db'
+import { voiHanCho } from '../lib/han-cho'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import { tenBaiTapTrenThe, type TheChangView } from '../lib/btvn-ca-nhan-kieu'
 import { nhoVaiDaDung } from '../lib/vai-tro'
@@ -866,8 +867,8 @@ export default function StudentPortalScreen() {
     setDangXuLyDangNhap(true)
     setLoiDangNhap('')
     try {
-      const url = await khongTreo(loadScriptUrlHoacMacDinh(), 8000, '')
-      const res = await khongTreo(hsDangNhapApi(url, sbd, matKhauInput.trim()), 15000, { ok: false, error: 'Máy chủ không trả lời — em thử lại sau ít phút.' })
+      const url = await voiHanCho(loadScriptUrlHoacMacDinh(), 8000, 'timeout').catch(() => '')
+      const res = await voiHanCho(hsDangNhapApi(url, sbd, matKhauInput.trim()), 15000, 'Máy chủ không trả lời — em thử lại sau ít phút.').catch(e => ({ ok: false, error: e.message }))
       if (res.chuaCoMatKhau) {
         setChuaCoMatKhau(true)
         setDangXuLyDangNhap(false)
