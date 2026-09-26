@@ -385,14 +385,20 @@ export async function loadScriptUrl(): Promise<string> {
  *
  * CẤM đưa `MA_BI_MAT` vào tệp này. Lệnh của em vốn không đòi mã bí mật. */
 export async function loadDiaChiMayChuMoiChoEm(): Promise<string> {
+  // HẠN CHỜ (lỗi "HS đăng nhập quay mãi"): fetch trần không hạn ⇒ mạng treo là kẹt cả chuỗi nạp địa chỉ
+  // (chạy TRƯỚC /hs/dang-nhap). Hết hạn ⇒ trả '' như mọi lỗi khác, chỗ gọi rơi tiếp đường lùi.
+  const bo = new AbortController()
+  const hen = setTimeout(() => bo.abort(), 8000)
   try {
-    const res = await fetch(`${import.meta.env.BASE_URL}cau-hinh.json`, { cache: 'no-cache' })
+    const res = await fetch(`${import.meta.env.BASE_URL}cau-hinh.json`, { cache: 'no-cache', signal: bo.signal })
     if (!res.ok) return ''
     const cfg = (await res.json()) as { mayChuMoi?: string }
     const url = (cfg.mayChuMoi || '').trim()
     return url.startsWith('https://') ? url.replace(/\/+$/, '') : ''
   } catch {
     return ''
+  } finally {
+    clearTimeout(hen)
   }
 }
 
