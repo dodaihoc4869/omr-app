@@ -56,6 +56,9 @@ export interface CauVaoRui {
   soEmDung: number
   /** Bậc của câu trong kho (0 = dễ … 2 = vận dụng). Dùng khi thiếu `sao`. */
   noiDung?: NoiDungCau
+  /** HỆ SỐ HIỆU CHỈNH giờ theo mẫu giây THẬT (M6, `hieu-chinh-giay-thuc.ts`) — nhân cả ba thành phần thời gian.
+   * Thiếu / không hợp lệ ⇒ 1. Luật mới KHÔNG bỏ M6: đường CA truyền vào, đường BTVN bỏ trống. */
+  heSo?: number
 }
 
 /** Một câu đã xếp vào buổi, kèm số giây và lý do đọc được cho thầy. */
@@ -139,7 +142,7 @@ export interface KetQuaRuiCau {
 /** Giây một câu tốn trong buổi — CÙNG công thức với `buoi-chua-de-xuat.ts` và Engine E. */
 function giayCau(c: CauVaoRui, ch: CauHinhLenBang): number {
   const tiLeLopSai = c.soEmLam > 0 ? c.soEmSai / c.soEmLam : 0
-  return giayBienGhepDoi(thoiGianCau({ phan: c.phan, sao: c.sao, noiDung: c.noiDung, tiLeLopSai }, ch))
+  return giayBienGhepDoi(thoiGianCau({ phan: c.phan, sao: c.sao, noiDung: c.noiDung, tiLeLopSai, heSo: c.heSo }, ch))
 }
 
 function lyDoCau(c: CauVaoRui): string {

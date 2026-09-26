@@ -52,7 +52,8 @@ import { chuThieuNoiDung, demCauThieuNoiDung, timCauTheoId } from '../lib/tra-ca
 import { noiDungTuCauGoc } from '../lib/thoi-gian-len-bang'
 import { uocLuongBacCau, uocLuongBacCauGoc } from '../lib/uoc-luong-bo-cuc'
 import { heSoCua, heSoHieuChinh } from '../lib/hieu-chinh-giay-thuc'
-import { xepBuoiChua, bangChuBuoiChua, chuSoGiaTri, type CauVaoXep, type DongChua, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
+import { type CauVaoXep, type DongChua, type KetQuaBuoiChua } from '../lib/xep-buoi-chua'
+import { bangChuBuoiChuaMoi, xepBuoiChuaMoi } from '../lib/xep-buoi-chua-moi'
 import { btvnCuaCau, napHoSoLop, type HoSoEmDayDu, type KetQuaBtvn } from '../lib/ho-so-lop'
 import { dungGiaoAn } from '../lib/giao-an-len-bang'
 import { KHO_DO_KHO_RONG, gopCaVaoKho, thongKeKho, type KhoDoKhoLuu } from '../lib/kho-do-kho'
@@ -615,6 +616,17 @@ export default function GoiLenBangScreen() {
     return demCauThieuNoiDung(ids, traCau)
   }, [kqBuoi, kq, traCau])
   const dongBaoThieuNoiDung = chuThieuNoiDung(soCauThieuNoiDung)
+  /** Thống kê buổi chữa theo LUẬT MỚI: số câu CHỮA + số em NHIỀU LƯỢT (suy từ `dong`, không cần thêm trường). */
+  const thongKeBuoi = useMemo(() => {
+    const dem = new Map<string, number>()
+    for (const d of kqBuoi?.dong ?? []) if (d.tang === 'len_bang' && d.em) dem.set(d.em.sbd, (dem.get(d.em.sbd) ?? 0) + 1)
+    return {
+      soCauChua: kqBuoi ? kqBuoi.dong.filter((d) => d.tang === 'len_bang').length : 0,
+      soEmNhieuLuot: [...dem.values()].filter((n) => n > 1).length,
+    }
+  }, [kqBuoi])
+
+
 
   // ------------------------------------------------ GIÁO ÁN 80 PHÚT: dữ liệu
   //
@@ -899,9 +911,15 @@ export default function GoiLenBangScreen() {
       if (r.loi) showToast(`Chưa lấy được hồ sơ lớp (${r.loi}) — xếp bằng dữ liệu ca này`, 'warn')
     }
 
-    const kq = xepBuoiChua(cauVaoXep, hoSo)
+    // LUẬT MỚI (thầy chốt 25/09): chọn câu "sai nhiều → … → cốt tủy" + khoá sàn 80 %, gán em mọi em ≥ 1 lượt
+    // (lượt thêm cân bằng, seed tất định). `cham` = em SAI CHÍNH câu này được ưu tiên lên chữa — KHÔNG còn ZPD.
+    const saiSet = new Set<string>()
+    for (const b of baiLamGiay) if (b.sbd && b.idCau && !b.dung) saiSet.add(`${b.sbd}|${b.idCau}`)
+    const kq = xepBuoiChuaMoi(cauVaoXep, hoSo, CAU_HINH_LEN_BANG_MAC_DINH, (sbd, c) =>
+      saiSet.has(`${sbd}|${c.qid}`) ? { diem: 0.6, viSao: 'sai câu này' } : { diem: 0 },
+    )
     setKqBuoi(kq)
-    if (!kq.datSan && kq.thieu) showToast(`Mới ${kq.soEmLenBang}/${kq.soEmToiThieu} em lên bảng — ${kq.thieu.viSao}`, 'warn')
+    if (!kq.datSan && kq.thieu) showToast(kq.thieu.viSao, 'warn')
   }
 
   /** NỐI BUỔI (M4): tình trạng buổi dở đã lưu — câu còn lại / đã chữa (đối chiếu cả lịch sử lên bảng của máy chủ khi đã đọc được). */
@@ -2054,25 +2072,23 @@ export default function GoiLenBangScreen() {
           )}
           </div>
 
-          {/* BUỔI CHỮA 90 PHÚT — thuật toán viết lại 14/09. Hai con số thầy cần
-              nhìn đầu tiên: bao nhiêu em lên bảng, và hết bao nhiêu phút. */}
+          {/* BUỔI CHỮA — LUẬT MỚI 25/09 (thay Engine E 14/09): chọn câu "sai nhiều → khó → cốt tủy" + khoá
+              sàn 80 %, gán em mọi em ≥ 1 lượt. Hai con số thầy cần nhìn đầu tiên: bao nhiêu CÂU CHỮA, và
+              đã ĐẠT SÀN 80 % chưa; rồi bao nhiêu em lên bảng (kèm số em nhiều lượt). */}
           {kqBuoi && (
             <div style={{ marginTop: 'var(--k4)', padding: 'var(--k3)', borderRadius: 'var(--bo-2)', background: kqBuoi.datSan ? 'var(--gg-luc-nen)' : 'var(--cam-nen)' }} data-khoi="buoi-chua">
               <div className="flex items-center flex-wrap" style={{ gap: 'var(--k3)' }}>
                 <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: kqBuoi.datSan ? 'var(--gg-luc)' : 'var(--cam)' }}>
+                  <span style={SO}>{thongKeBuoi.soCauChua}</span> câu chữa · {kqBuoi.datSan ? 'đạt sàn 80 %' : 'chưa đạt sàn 80 %'}
+                </span>
+                <span style={{ ...NHAN_NHO, ...SO }}>
                   <span style={SO}>{kqBuoi.soEmLenBang}</span>/<span style={SO}>{kqBuoi.soEmToiThieu}</span> em lên bảng
+                  {thongKeBuoi.soEmNhieuLuot > 0 ? ` · ${thongKeBuoi.soEmNhieuLuot} em nhiều lượt` : ''}
                 </span>
                 <span style={{ ...NHAN_NHO, ...SO }}>
                   {Math.round(kqBuoi.tongGiay / 60)}/{Math.round(kqBuoi.nganSach / 60)} phút
                 </span>
                 <span style={{ ...NHAN_NHO, ...SO }}>{kqBuoi.cauDocDapAn.length} câu chỉ đọc đáp án</span>
-                {/* M5: con số ĐO ĐƯỢC của buổi — không có chữ "nắm chắc". Dạng lớp yếu chỉ hiện khi lớp có dạng yếu. */}
-                <span style={{ ...NHAN_NHO, ...SO }} data-mot="gia-tri-buoi">giá trị chữa {chuSoGiaTri(kqBuoi.hocNhieu.tongGiaTri)}</span>
-                {kqBuoi.hocNhieu.soDangYeu > 0 && (
-                  <span style={{ ...NHAN_NHO, ...SO }} data-mot="dang-yeu-phu">
-                    phủ {kqBuoi.hocNhieu.soDangYeuDaPhu}/{kqBuoi.hocNhieu.soDangYeu} dạng lớp yếu
-                  </span>
-                )}
               </div>
               {tomBtvnLop && (
                 <div style={{ ...NHAN_NHO, ...SO, marginTop: 6 }}>
@@ -2145,7 +2161,7 @@ export default function GoiLenBangScreen() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => void navigator.clipboard.writeText(bangChuBuoiChua(kqBuoi, du ? `Ca ${du.maCa}` : 'Buổi chữa')).then(() => showToast('Đã copy bảng buổi chữa', 'success'))}
+                  onClick={() => void navigator.clipboard.writeText(bangChuBuoiChuaMoi(kqBuoi, du ? `Ca ${du.maCa}` : 'Buổi chữa')).then(() => showToast('Đã copy bảng buổi chữa', 'success'))}
                   className="tap-target inline-flex items-center font-bold"
                   style={{ gap: 6, minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--the)', color: 'var(--muc)', border: '1px solid var(--vien)', fontSize: 'var(--cx-1)' }}
                 >

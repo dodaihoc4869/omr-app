@@ -249,10 +249,9 @@ describe('khoá nguồn — hằng số một nguồn, số đo hiện trên mà
     expect(engine).toContain('emYeuDang(')
     expect(engine).toContain("from './ho-so-lop'")
   })
-  it('màn Gọi lên bảng hiện "giá trị chữa" và "phủ a/b dạng lớp yếu" từ `hocNhieu`', () => {
-    expect(man).toContain('data-mot="gia-tri-buoi"')
-    expect(man).toContain('data-mot="dang-yeu-phu"')
-    expect(man).toContain('kqBuoi.hocNhieu.soDangYeu > 0')
-    expect(man).toContain('const kq = xepBuoiChua(cauVaoXep, hoSo)') // dòng gọi Engine E mà test cũ khoá — không đổi
+  it('màn Gọi lên bảng dùng LUẬT MỚI (thay Engine E): bỏ "giá trị chữa"/"phủ dạng yếu" của M5', () => {
+    expect(man).toContain('xepBuoiChuaMoi(cauVaoXep, hoSo, CAU_HINH_LEN_BANG_MAC_DINH')
+    expect(man).not.toContain('data-mot="gia-tri-buoi"')
+    expect(man).not.toContain('data-mot="dang-yeu-phu"')
   })
 })

@@ -141,11 +141,13 @@ async function chuaMotEmRoiTat() {
 }
 
 describe('lưu buổi chữa', () => {
-  it('M5: khối buổi chữa hiện "giá trị chữa N" (số đo được); không có hồ sơ dạng thì KHÔNG hiện dòng dạng lớp yếu', async () => {
+  it('LUẬT MỚI 25/09: khối buổi chữa hiện "N câu chữa · sàn 80 %" + số em lên bảng (bỏ "giá trị chữa" của Engine E)', async () => {
     const r = await buoiDau()
-    const gt = r.container.querySelector('[data-khoi="buoi-chua"] [data-mot="gia-tri-buoi"]')
-    expect(gt?.textContent ?? '').toMatch(/^giá trị chữa \d+(,\d)?$/)
-    expect(r.container.querySelector('[data-mot="dang-yeu-phu"]')).toBeNull()
+    const khoi = r.container.querySelector('[data-khoi="buoi-chua"]')
+    expect(khoi?.textContent ?? '').toContain('câu chữa')
+    expect(khoi?.textContent ?? '').toMatch(/sàn 80 %/)
+    expect(khoi?.textContent ?? '').toContain('em lên bảng')
+    expect(r.container.querySelector('[data-mot="gia-tri-buoi"]')).toBeNull()
     expect(r.container.textContent ?? '').not.toMatch(/nắm chắc/i)
   }, 90000)
 
@@ -218,9 +220,7 @@ describe('tắt app → mở lại: "Tiếp tục buổi trước"', () => {
     // mọi câu xếp đều thuộc phần còn lại
     const conLai = new Set(truoc.cauBuoi.filter((q) => q !== qid))
     for (const [, q] of dong) expect(conLai.has(q)).toBe(true)
-    // em đã định ở lần xếp trước, còn có mặt ⇒ vẫn đứng đúng câu ấy
-    const daDinh = new Map(truoc.kehoach.map((o) => [o.qid, o.sbd]))
-    for (const [s, q] of dong) if (daDinh.has(q)) expect(s, `câu ${q} phải giữ em ${daDinh.get(q)}`).toBe(daDinh.get(q))
+    // LUẬT MỚI 25/09: bỏ "giữ em" của lần xếp trước — em được gán lại theo lượt, không khoá theo `emDaDinh`.
     // thẻ tiếp tục biến mất; bản lưu vẫn nhớ ô đã ghi và giờ bắt đầu cũ
     expect(theTiepTuc(r)).toBeNull()
     await waitFor(() => expect(luu()!.kehoach.every((o) => o.qid !== qid)).toBe(true), CHO)
@@ -243,10 +243,8 @@ describe('tắt app → mở lại: "Tiếp tục buổi trước"', () => {
     await waitFor(() => expect(r.container.querySelector('[data-khoi="buoi-chua"]')).toBeTruthy(), CHO)
     const dong = dongBuoi(r).map((d) => (d.getAttribute('data-dong-buoi') ?? '').split('|'))
     expect(dong.map(([s]) => s)).not.toContain(vang.sbd)
-    // câu của em vắng vẫn được chữa (giao em khác)
+    // câu của em vắng vẫn được chữa (giao em khác có mặt)
     expect(dong.map(([, q]) => q)).toContain(vang.qid)
-    // em khác còn có mặt vẫn giữ nguyên câu cũ
-    for (const o of conLaiKehoach.filter((x) => x.sbd !== vang.sbd)) expect(dong.some(([s, q]) => s === o.sbd && q === o.qid), `${o.sbd}|${o.qid}`).toBe(true)
   }, 120000)
 
   it('BẮT ĐẦU BUỔI MỚI: xoá bản lưu, thẻ biến mất, Xếp giờ chạy được và lưu buổi mới (giờ bắt đầu mới)', async () => {

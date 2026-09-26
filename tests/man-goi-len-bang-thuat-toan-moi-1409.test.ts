@@ -31,9 +31,9 @@ describe('Hộp chọn bài hiện ĐỦ số câu trong kho', () => {
 describe('Màn hình chạy thuật toán mới', () => {
   const s = than('src/screens/GoiLenBangScreen.tsx')
 
-  it('nút gộp chạy luôn xếp buổi chữa', () => {
+  it('nút gộp chạy luôn xếp buổi chữa (LUẬT MỚI 25/09 — thay Engine E)', () => {
     expect(s).toContain('void chayBuoiChua()')
-    expect(s).toContain('const kq = xepBuoiChua(cauVaoXep, hoSo)')
+    expect(s).toContain('xepBuoiChuaMoi(cauVaoXep, hoSo, CAU_HINH_LEN_BANG_MAC_DINH')
   })
 
   it('xin HỒ SƠ ĐẦY ĐỦ của lớp trước khi xếp', () => {
