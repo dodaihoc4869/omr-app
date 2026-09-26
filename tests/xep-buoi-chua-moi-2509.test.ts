@@ -62,32 +62,40 @@ describe('thứ tự chọn câu theo LUẬT MỚI (sai nhiều, KHÔNG theo sao
   })
 })
 
-describe('ngân sách + sàn 80 %', () => {
-  it('câu vượt ngân sách dồn về "chỉ đọc đáp án"; còn lại là "bỏ qua"', () => {
-    // Ngân sách 16 phút = 960 − 480 hao phí = 480 giây ⇒ đúng 4 câu 0 sao (120 giây) vào nhóm CHỮA.
-    const ch = { ...CAU_HINH_LEN_BANG_MAC_DINH, NGAN_SACH_PHUT: 16 }
-    const ds = ['a', 'b', 'c', 'd', 'e', 'f'].map((x, i) => cau(`Q${i}`, 0, 0.5))
-    const kq = xepBuoiChuaMoi(ds, LOP(5), ch)
-    expect(kq.dong.filter((d) => d.tang === 'len_bang').length).toBe(4)
-    expect(kq.cauDocDapAn.length).toBe(1) // lọc ra = 5 (≤ 4/0,8) ⇒ 1 câu chỉ đọc đáp án
-    expect(kq.datSan).toBe(true)
-    expect(kq.thieu).toBeNull()
+describe('CHẾ ĐỘ HẾT (bỏ trần 60 câu + bỏ ngân sách)', () => {
+  it('mọi câu ưu tiên (sai / khó / cốt tủy) vào CHỮA; câu "còn lại" chỉ đọc đáp án', () => {
+    const ds = [
+      cau('SAI', 0, 0.5), // tầng 0 — cả lớp sai
+      { ...cau('KHO', 2, 0.5), soEmLam: 0, tiLeDung: null }, // tầng 1 — chưa em nào làm
+      cau('COT TUY', 0, 1, 20, true), // tầng 2 — cốt tủy
+      cau('CON LAI', 0, 1, 20, false), // tầng 3 — dễ, cả lớp đúng
+    ]
+    const kq = xepBuoiChuaMoi(ds, LOP(5))
+    const chua = kq.dong.filter((d) => d.tang === 'len_bang').map((d) => d.cau.id)
+    expect(chua).toEqual(expect.arrayContaining(['SAI', 'KHO', 'COT TUY']))
+    expect(chua).not.toContain('CON LAI')
+    expect(kq.cauDocDapAn.map((c) => c.id)).toEqual(['CON LAI'])
   })
 
-  it('ngân sách quá hẹp (không câu nào vừa) ⇒ CHƯA đạt sàn + nói thiếu vì đâu', () => {
-    const ch = { ...CAU_HINH_LEN_BANG_MAC_DINH, NGAN_SACH_PHUT: 8 } // 480 − 480 = 0 giây
-    const kq = xepBuoiChuaMoi([cau('Q1', 2, 0.5)], LOP(5), ch)
-    expect(kq.dong.filter((d) => d.tang === 'len_bang').length).toBe(0)
-    expect(kq.datSan).toBe(false)
-    expect(kq.thieu).not.toBeNull()
+  it('BỎ trần 60 câu: 70 câu SAI đều vào CHỮA, không cắt, không cảnh báo "vượt trần"', () => {
+    const ds = Array.from({ length: 70 }, (_, i) => cau(`Q${i}`, 0, 0.5))
+    const kq = xepBuoiChuaMoi(ds, LOP(5))
+    expect(kq.dong.filter((d) => d.tang === 'len_bang').length).toBe(70)
+    expect(kq.canhBao.join(' ')).not.toMatch(/vượt trần/)
   })
 
-  it('câu CẢ LỚP SAI không chữa kịp ⇒ BÁO cần thêm phút (không im lặng bỏ)', () => {
-    const ch = { ...CAU_HINH_LEN_BANG_MAC_DINH, NGAN_SACH_PHUT: 16 }
-    const ds = Array.from({ length: 10 }, (_, i) => cau(`Q${i}`, 0, 0.2)) // mọi câu đều 16 em sai
+  it('BỎ ngân sách: dù "hết giờ" câu SAI vẫn được chữa (không dồn sang đọc đáp án)', () => {
+    const ch = { ...CAU_HINH_LEN_BANG_MAC_DINH, NGAN_SACH_PHUT: 5 } // 5 phút — 3 câu 2 sao vượt xa
+    const ds = ['a', 'b', 'c'].map((x, i) => cau(`Q${i}`, 2, 0.5))
     const kq = xepBuoiChuaMoi(ds, LOP(5), ch)
-    expect(kq.canhBao.join(' ')).toMatch(/câu cả lớp SAI chưa chữa được/)
-    expect(kq.canhBao.join(' ')).toMatch(/cần thêm \d+ phút/)
+    expect(kq.dong.filter((d) => d.tang === 'len_bang').length).toBe(3)
+    expect(kq.cauDocDapAn.length).toBe(0)
+  })
+
+  it('không còn cảnh báo "câu sai chưa chữa kịp" — mọi câu sai đều được chữa', () => {
+    const ds = Array.from({ length: 20 }, (_, i) => cau(`Q${i}`, 2, 0.2))
+    const kq = xepBuoiChuaMoi(ds, LOP(5))
+    expect(kq.canhBao.join(' ')).not.toMatch(/chưa chữa được/)
   })
 })
 

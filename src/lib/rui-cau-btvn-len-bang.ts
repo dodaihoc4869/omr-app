@@ -154,13 +154,26 @@ function lyDoCau(c: CauVaoRui): string {
   return phan.join(' · ')
 }
 
+/** Tuỳ chọn cho `ruiCauLenBang`. */
+export interface TuyChonRuiCau {
+  /** BỎ trần `SO_CAU_TOI_DA` + BỎ ngân sách: CHỮA HẾT mọi câu ưu tiên (sai-nhiều → khó → cốt-tủy);
+   *  câu "còn lại" (dễ, cả lớp làm đúng) chỉ ĐỌC ĐÁP ÁN. Dùng cho nút "Xếp giờ & phân công" của thầy —
+   *  gọi liên tục tới hết, không cắt câu nào. Thẻ "Buổi chữa tối nay" KHÔNG bật cờ này. */
+  het?: boolean
+}
+
 /**
  * RÚT CÂU BTVN LÊN BẢNG. Tất định; mọi câu SAI đều vào `xepUuTienCau` trước, không bỏ ở bước xếp.
  *   · Nhóm CHỮA = nhét theo thứ tự ưu tiên tới khi đầy ngân sách (`nganSachGiay`).
  *   · Nhóm LỌC RA = chữa + đọc-đáp-án, và nhỏ sao cho `chữa ≥ 80 %` số lọc ra (sàn của thầy).
  *   · Câu SAI không chữa được trong ngân sách ⇒ VÀO `docDapAn`/`boQua` và BÁO `thieuGiay` — không im lặng.
+ *   · `tuyChon.het` ⇒ BỎ trần + ngân sách: mọi câu ưu tiên vào CHỮA, "còn lại" chỉ đọc đáp án.
  */
-export function ruiCauLenBang(cau: readonly CauVaoRui[], ch: CauHinhLenBang = CAU_HINH_LEN_BANG_MAC_DINH): KetQuaRuiCau {
+export function ruiCauLenBang(
+  cau: readonly CauVaoRui[],
+  ch: CauHinhLenBang = CAU_HINH_LEN_BANG_MAC_DINH,
+  tuyChon: TuyChonRuiCau = {},
+): KetQuaRuiCau {
   const D = RUI_CAU_BTVN
   const nganSach = nganSachGiay(ch)
   const canhBao: string[] = []
@@ -178,6 +191,28 @@ export function ruiCauLenBang(cau: readonly CauVaoRui[], ch: CauHinhLenBang = CA
     lyDo: lyDoCau(c),
     nguon: nguonCau(c),
   }))
+
+  // ── CHẾ ĐỘ "HẾT" (bỏ trần 60 câu + bỏ ngân sách): MỌI câu ưu tiên (sai / khó / cốt tủy) vào CHỮA;
+  //    câu "còn lại" (dễ, cả lớp làm đúng) chỉ ĐỌC ĐÁP ÁN. Không cắt câu nào ⇒ thầy gọi liên tục tới hết. ──
+  if (tuyChon.het) {
+    const chua = xep.filter((c) => c.nguon !== 'con_lai')
+    const docDapAn = xep.filter((c) => c.nguon === 'con_lai')
+    if (xep.length === 0) canhBao.push('Không có câu nào để rút — kiểm lại bài giao về nhà')
+    else if (chua.length === 0) canhBao.push('Không có câu cả lớp sai / khó / cốt tủy — chỉ còn câu dễ để đọc đáp án')
+    return {
+      chua,
+      docDapAn,
+      boQua: [],
+      soCauLocRa: xep.length,
+      tiLeChua: xep.length > 0 ? chua.length / xep.length : 0,
+      dat80: chua.length > 0,
+      thieuGiay: 0,
+      tongGiay: chua.reduce((n, c) => n + c.giay, 0),
+      nganSach,
+      cauBiCat: 0,
+      canhBao,
+    }
+  }
 
   const cauBiCat = Math.max(0, xep.length - D.SO_CAU_TOI_DA)
   if (cauBiCat > 0) canhBao.push(`${cauBiCat} câu vượt trần ${D.SO_CAU_TOI_DA} câu/buổi — chưa đưa vào buổi này`)

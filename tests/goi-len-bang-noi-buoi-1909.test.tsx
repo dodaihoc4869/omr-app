@@ -141,12 +141,13 @@ async function chuaMotEmRoiTat() {
 }
 
 describe('lưu buổi chữa', () => {
-  it('LUẬT MỚI 25/09: khối buổi chữa hiện "N câu chữa · sàn 80 %" + số em lên bảng (bỏ "giá trị chữa" của Engine E)', async () => {
+  it('CHẾ ĐỘ HẾT 25/09: khối buổi chữa hiện "N câu chữa · hết câu sai-nhiều/khó/cốt-tủy" + số em lên bảng', async () => {
     const r = await buoiDau()
     const khoi = r.container.querySelector('[data-khoi="buoi-chua"]')
     expect(khoi?.textContent ?? '').toContain('câu chữa')
-    expect(khoi?.textContent ?? '').toMatch(/sàn 80 %/)
+    expect(khoi?.textContent ?? '').toContain('hết câu sai-nhiều/khó/cốt-tủy')
     expect(khoi?.textContent ?? '').toContain('em lên bảng')
+    expect(khoi?.textContent ?? '').not.toMatch(/sàn 80 %/)
     expect(r.container.querySelector('[data-mot="gia-tri-buoi"]')).toBeNull()
     expect(r.container.textContent ?? '').not.toMatch(/nắm chắc/i)
   }, 90000)
@@ -164,6 +165,15 @@ describe('lưu buổi chữa', () => {
     expect(b.daGhi).toEqual({})
     expect(b.daChua).toEqual([])
     expect(Date.parse(b.hetHan) - Date.parse(b.luuLuc)).toBe(14 * 86_400_000)
+  }, 60000)
+
+  it('nút "Lưu lại" (đường chủ động của thầy): bấm ⇒ lưu buổi NGAY + hiện "Đã lưu HH:MM"', async () => {
+    const r = await buoiDau()
+    const truoc = luu()!
+    fireEvent.click(nutChu(r, 'Lưu lại')!)
+    await waitFor(() => expect(r.container.textContent ?? '').toMatch(/Đã lưu \d{2}:\d{2}/), CHO)
+    expect(luu()!.khoa).toBe(truoc.khoa)
+    expect(luu()!.batDauLuc).toBe(truoc.batDauLuc)
   }, 60000)
 
   it('bấm Đạt ⇒ bản lưu có ô đó và câu đó là đã chữa; bản lưu dùng CHUNG một giờ bắt đầu qua các lần lưu', async () => {

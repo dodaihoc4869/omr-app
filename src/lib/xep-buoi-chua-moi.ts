@@ -63,8 +63,9 @@ export function xepBuoiChuaMoi(
   const theoQid = new Map<string, CauChua>()
   for (const d of dsCau) theoQid.set(d.cau.id, d.cau)
 
-  // 1 — CHỌN CÂU theo luật mới (sai nhiều → … → cốt tủy) + rút vào ngân sách, khoá sàn 80 %.
-  const kq = ruiCauLenBang(dsCau.map(cauRuiTuCauVaoXep), ch)
+  // 1 — CHỌN CÂU theo luật mới: CHỮA HẾT mọi câu ưu tiên (sai nhiều → khó → cốt tủy), BỎ trần 60 câu + ngân sách;
+  //     "còn lại" (dễ, cả lớp làm đúng) chỉ đọc đáp án ⇒ danh sách CHỮA đủ dài để gọi liên tục.
+  const kq = ruiCauLenBang(dsCau.map(cauRuiTuCauVaoXep), ch, { het: true })
 
   // 2 — GÁN EM: mọi em CÓ MẶT ≥ 1 lượt, lượt thêm cân bằng, seed tất định.
   const hoSoTheoSbd = new Map<string, HoSoEmDayDu>()
