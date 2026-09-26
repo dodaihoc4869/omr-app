@@ -9,6 +9,7 @@ import { learnedQuestionFilter, type PrivateQuestion } from '../../src/game/than
 import { hashSeed } from '../../src/lib/exam-shuffle'
 import { chuoiLoiGiai } from './goi-cu'
 import { protectedQuestions, readScope } from './game-v2-bank'
+import { docKhoDeGiaoCuaEm } from './kho-de-giao'
 import { cauHopKhoi, khoiCuaEm } from '../../src/lib/khoi-cau'
 import { dangYeu, type NamKtDang } from './ho-so-nam-kt'
 import { hopLe3DangChuan } from './loc-cau-chuan'
@@ -146,7 +147,9 @@ export async function chonCauBaiHangNgay(env: Env, sbd: string, soCan: number, n
   const kho = new Map<string, PrivateQuestion>()
   // LUẬT KHỐI (Boss 21/09): câu nạp theo qid (tới hạn) nằm ngoài bộ lọc `d.lop` — câu khối CAO đã lọt vào sổ em từ trước vẫn không được phát lại. Khối em không rõ ⇒ không lọc.
   const khoiEm = khoiCuaEm({ lop: lopEm })
-  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && daHocCau(q) && !kho.has(q.qid)) kho.set(q.qid, q) }
+  // LUẬT "KHO ĐỀ GIAO THEO TUẦN": em có giao đang hiệu lực ⇒ kho chỉ còn câu thuộc đề đã tick (không rút ngoài kho).
+  const giaoKHD = await docKhoDeGiaoCuaEm(env, sbd, now)
+  const nap = (ds: PrivateQuestion[]) => { for (const q of ds) if (cauHopKhoi(khoiEm, q) && (!giaoKHD || giaoKHD.maDe.has(q.maDe)) && daHocCau(q) && !kho.has(q.qid)) kho.set(q.qid, q) }
   if (toiHan.length > 0) nap(await docCauKho(env, 'AND q.qid IN (SELECT value FROM json_each(?))', [JSON.stringify(toiHan.map((c) => c.qid))], baoVe, TRAN_DOC_TOI_HAN))
   if (dangYeuEm.length > 0) nap(await docCauKho(env, `AND q.dang IN (SELECT value FROM json_each(?))${loLop}`, [JSON.stringify(dangYeuEm.map((d) => d.maDang)), ...themLop], baoVe, TRAN_DOC_MOI_NHOM))
   // Chỉ bù trong dạng chính em đã học; thiếu câu thì giảm số lượng.

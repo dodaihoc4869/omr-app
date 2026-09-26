@@ -12,6 +12,7 @@ import type { Env } from './kieu'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { gameIdentity } from './game-v2-auth'
 import { protectedQuestions } from './game-v2-bank'
+import { docKhoDeGiaoCuaEm } from './kho-de-giao'
 import { jsonLaTuLuan, laCauTuLuan } from './cam-tu-luan'
 
 export const TOI_DA_QID_MOT_LUOT = 20
@@ -164,8 +165,14 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepT
     const q = theoQid.get(qid)
     return q && khongBiBaoVe(q, baoVe) ? [q] : []
   })
-  const co = new Set(cau.map((c) => c.qid))
-  return { cau, khongCo: xin.filter((q) => !co.has(q)) }
+  // LUẬT "KHO ĐỀ GIAO THEO TUẦN": em có giao đang hiệu lực ⇒ CHỈ trả câu thuộc đề đã tick (không rút ngoài kho).
+  const giao = await docKhoDeGiaoCuaEm(env, sbd, Date.now())
+  const cauTra = giao ? cau.filter((c) => {
+    const md = String((c as { maDe?: string }).maDe ?? '')
+    return md !== '' && giao.maDe.has(md)
+  }) : cau
+  const co = new Set(cauTra.map((c) => c.qid))
+  return { cau: cauTra, khongCo: xin.filter((q) => !co.has(q)) }
 }
 
 /** Dọn danh sách qid do máy em gửi: chỉ chữ, bỏ rỗng/trùng/quá dài, giữ thứ tự. */
