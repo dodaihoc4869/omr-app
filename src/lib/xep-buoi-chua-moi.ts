@@ -19,7 +19,7 @@
 // THUẦN + TẤT ĐỊNH: không IO, không đồng hồ, không `Math.random` (seed đi qua `phanBoLuotEm`).
 import { CAU_HINH_LEN_BANG_MAC_DINH, type CauHinhLenBang } from './len-bang-cau-hinh'
 import type { CauChua } from './phan-cong'
-import { phanBoLuotEm, ruiCauLenBang, type CauVaoRui, type ChamEm } from './rui-cau-btvn-len-bang'
+import { phanBoLuotEm, ruiCauLenBang, xenKeNgauNhien, type CauVaoRui, type ChamEm } from './rui-cau-btvn-len-bang'
 import type { HoSoEmDayDu } from './ho-so-lop'
 import type { CauVaoXep, DongChua, KetQuaBuoiChua } from './xep-buoi-chua'
 
@@ -67,11 +67,12 @@ export function xepBuoiChuaMoi(
   //     "còn lại" (dễ, cả lớp làm đúng) chỉ đọc đáp án ⇒ danh sách CHỮA đủ dài để gọi liên tục.
   const kq = ruiCauLenBang(dsCau.map(cauRuiTuCauVaoXep), ch, { het: true })
 
-  // 2 — GÁN EM: mọi em CÓ MẶT ≥ 1 lượt, lượt thêm cân bằng, seed tất định.
+  // 2 — ĐAN XEN LUÂN PHIÊN 3 nhóm sai/khó/cốt tủy (thứ tự nhóm bốc thăm bằng seed) RỒI mới gán em — buổi học
+  //     xen kẽ 3 loại câu thay vì "sai hết → khó → cốt tủy". Rồi GÁN EM: mọi em CÓ MẶT ≥ 1 lượt, cân bằng, seed.
   const hoSoTheoSbd = new Map<string, HoSoEmDayDu>()
   for (const e of hoSo) if (e.sbd && e.coMat) hoSoTheoSbd.set(e.sbd, e)
   const em = [...hoSoTheoSbd.values()].map((e) => ({ sbd: e.sbd, hoTen: e.hoTen }))
-  const pb = phanBoLuotEm(kq.chua, em, cham ?? (() => ({ diem: 0 })))
+  const pb = phanBoLuotEm(xenKeNgauNhien(kq.chua), em, cham ?? (() => ({ diem: 0 })))
 
   // 3 — DỰNG `dong`: nhóm CHỮA (kèm em được gọi) rồi nhóm CHỈ ĐỌC ĐÁP ÁN, đúng thứ tự ưu tiên.
   const dong: DongChua[] = []

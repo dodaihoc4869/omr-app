@@ -11,9 +11,11 @@ import {
   phanBoLuotEm,
   ruiCauLenBang,
   tangUuTien,
+  xenKeNgauNhien,
   xepUuTienCau,
   RUI_CAU_BTVN,
   type CauVaoRui,
+  type CauXep,
   type ChamEm,
 } from '../src/lib/rui-cau-btvn-len-bang'
 import { CAU_HINH_LEN_BANG_MAC_DINH } from '../src/lib/len-bang-cau-hinh'
@@ -192,5 +194,42 @@ describe('bảng chữ cho thầy', () => {
     expect(chu).toContain('CHỈ ĐỌC ĐÁP ÁN')
     expect(chu).toContain('⚠')
   })
+
+describe('ĐAN XEN LUÂN PHIÊN 3 nhóm (sai · khó · cốt tủy)', () => {
+  /** Câu đã xếp — chỉ cần `nguon` + `qid` cho việc đan xen. */
+  const x = (qid: string, nguon: CauXep['nguon']): CauXep => ({
+    qid, dang: '', phan: 'I', sao: 0, loi: nguon === 'cot_tuy', soEmLam: 10, soEmSai: 0, soEmDung: 10, giay: 120, lyDo: '', nguon,
+  })
+  const ds: CauXep[] = [
+    x('S1', 'sai_nhieu'), x('S2', 'sai_nhieu'), x('S3', 'sai_nhieu'),
+    x('K1', 'kho_it_lam_duoc'), x('K2', 'kho_it_lam_duoc'),
+    x('C1', 'cot_tuy'),
+    x('L1', 'con_lai'), x('L2', 'con_lai'),
+  ]
+
+  it('vòng đầu lấy MỘT câu từ MỖI nhóm; "còn lại" luôn nằm CUỐI', () => {
+    const ra = xenKeNgauNhien(ds)
+    expect(new Set(ra.slice(0, 3).map((c) => c.nguon)).size).toBe(3)
+    expect(ra.slice(-2).map((c) => c.nguon)).toEqual(['con_lai', 'con_lai'])
+  })
+
+  it('giữ nguyên thứ tự TRONG mỗi nhóm (S1→S2→S3, K1→K2)', () => {
+    const ra = xenKeNgauNhien(ds)
+    const chua = ra.filter((c) => c.nguon !== 'con_lai').map((c) => c.qid)
+    expect(chua.filter((q) => q.startsWith('S'))).toEqual(['S1', 'S2', 'S3'])
+    expect(chua.filter((q) => q.startsWith('K'))).toEqual(['K1', 'K2'])
+  })
+
+  it('không mất câu nào + TẤT ĐỊNH (gọi hai lần ra y nhau)', () => {
+    expect(xenKeNgauNhien(ds).map((c) => c.qid).sort()).toEqual(ds.map((c) => c.qid).sort())
+    expect(xenKeNgauNhien(ds).map((c) => c.qid)).toEqual(xenKeNgauNhien(ds).map((c) => c.qid))
+  })
+
+  it('thiếu nhóm thì vẫn chạy (chỉ một nhóm ⇒ giữ nguyên thứ tự)', () => {
+    const chiSai = [x('S1', 'sai_nhieu'), x('S2', 'sai_nhieu')]
+    expect(xenKeNgauNhien(chiSai).map((c) => c.qid)).toEqual(['S1', 'S2'])
+  })
+})
+
 })
 

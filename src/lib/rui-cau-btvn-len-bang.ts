@@ -274,10 +274,46 @@ export type ChamEm = (sbd: string, cau: CauXep) => { diem: number; chan?: boolea
 export type NguonBocTham = (() => number) | number | string
 
 const SEED_MAC_DINH = 'rui-cau-btvn-len-bang'
+/** Seed RIÊNG cho việc ĐAN XEN 3 nhóm — tách khỏi seed gán em để hai việc độc lập nhau. */
+const SEED_XEN_KE = 'xen-ke-sai-kho-cot-tuy'
 
 function taoBocTham(nguon: NguonBocTham): () => number {
   if (typeof nguon === 'function') return nguon
   return mulberry32(typeof nguon === 'number' ? nguon : hashSeed(nguon))
+}
+
+/**
+ * ĐAN XEN LUÂN PHIÊN (round-robin) 3 nhóm theo TẦNG ưu tiên — `sai` (tầng 0) · `khó` (tầng 1) · `cốt tủy` (tầng 2).
+ *
+ * Thầy chốt: "phân công ngẫu nhiên giữa câu sai và câu khó và câu cốt tủy" — thay vì xếp "sai hết → khó → cốt tủy".
+ * · THỨ TỰ 3 NHÓM bốc thăm bằng SEED (Fisher–Yates) ⇒ hai lần xếp ra ĐÚNG một bảng, mở lại buổi cũ y nguyên.
+ * · TRONG mỗi nhóm giữ nguyên thứ tự ưu tiên sẵn có (sai nhiều nhất trước, …) — đan xen chỉ đổi VỊ TRÍ nhóm.
+ * · Nhóm "còn lại" (tầng 3) KHÔNG tham gia đan xen — luôn nằm CUỐI (chỉ đọc đáp án, không gọi).
+ *
+ * Đầu vào nên ĐÃ sắp theo `xepUuTienCau` (để thứ tự trong nhóm đúng). Hàm THUẦN + TẤT ĐỊNH.
+ */
+export function xenKeNgauNhien(ds: readonly CauXep[], nguon: NguonBocTham = SEED_XEN_KE): CauXep[] {
+  const tang = (c: CauXep): 0 | 1 | 2 | 3 =>
+    c.nguon === 'sai_nhieu' ? 0 : c.nguon === 'kho_it_lam_duoc' ? 1 : c.nguon === 'cot_tuy' ? 2 : 3
+  const nhom: CauXep[][] = [[], [], [], []]
+  for (const c of ds) nhom[tang(c)].push(c)
+  const random = taoBocTham(nguon)
+  const thuTu = [0, 1, 2]
+  for (let i = thuTu.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1))
+    ;[thuTu[i], thuTu[j]] = [thuTu[j], thuTu[i]]
+  }
+  const ra: CauXep[] = []
+  for (let k = 0; ; k++) {
+    let co = false
+    for (const g of thuTu)
+      if (k < nhom[g].length) {
+        ra.push(nhom[g][k])
+        co = true
+      }
+    if (!co) break
+  }
+  return [...ra, ...nhom[3]]
 }
 
 export interface LuotEm {
