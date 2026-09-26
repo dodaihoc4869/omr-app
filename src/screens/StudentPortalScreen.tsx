@@ -868,7 +868,7 @@ export default function StudentPortalScreen() {
     setLoiDangNhap('')
     try {
       const url = await voiHanCho(loadScriptUrlHoacMacDinh(), 8000, 'timeout').catch(() => '')
-      const res = await voiHanCho(hsDangNhapApi(url, sbd, matKhauInput.trim()), 15000, 'Máy chủ không trả lời — em thử lại sau ít phút.').catch(e => ({ ok: false, error: e.message }))
+      const res = await voiHanCho(hsDangNhapApi(url, sbd, matKhauInput.trim()), 15000, 'Máy chủ không trả lời — em thử lại sau ít phút.').catch(e => ({ ok: false, error: e.message } as any))
       if (res.chuaCoMatKhau) {
         setChuaCoMatKhau(true)
         setDangXuLyDangNhap(false)
