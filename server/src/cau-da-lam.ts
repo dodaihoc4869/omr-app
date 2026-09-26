@@ -8,9 +8,9 @@
 //
 // KHÔNG ĐỔI (luật, không phải hiển thị): `TIEN_BO_NGAY` (ke-hoach-ngay-d1.ts) vẫn nuôi đạt nhiệm vụ ngày / EXP / khiên / `laDatNgay`; cổng "có học ≥ 4 câu" của thú ăn; trần 60 câu game.
 // Chi phí: một truy vấn theo danh sách em (đi chỉ mục idx_skh_em_ngay_qid) hoặc cả lớp (đi chỉ mục idx_skh_luc nhờ bọc `LIMIT -1`, xem ghi chú ở `SQL_CAU_DA_LAM_CA_LOP`); chỉ ĐỌC.
-import type { Env } from './kieu'
-import { docMocHienThi, type MocHienThi } from './moc-no'
-import { ngayVn } from './su-kien-hoc'
+// import type { Env } from './kieu'
+// import { docMocHienThi, type MocHienThi } from './moc-no'
+// import { ngayVn } from './su-kien-hoc'
 
 export interface CauDaLam { soCau: number; soCauDung: number }
 
@@ -24,7 +24,7 @@ export function tuLucTuNgay(mocIso: string, ngay: string): string {
 }
 
 /** `tuLucTuNgay` cho "hôm nay" theo đồng hồ `nowMs`. */
-export const tuLucHomNay = (moc: Pick<MocHienThi, 'iso'>, nowMs: number): string => tuLucTuNgay(moc.iso, ngayVn(nowMs))
+// export const tuLucHomNay = (moc: Pick<MocHienThi, 'iso'>, nowMs: number): string => tuLucTuNgay(moc.iso, ngayVn(nowMs))
 
 /** Theo DANH SÁCH em: `bind(JSON.stringify(sbd[]), ngay VN, tuLuc)`. */
 export const SQL_CAU_DA_LAM_THEO_EM =
@@ -37,7 +37,7 @@ export const SQL_CAU_DA_LAM_THEO_EM =
 export const SQL_CAU_DA_LAM_CA_LOP =
   'SELECT sbd, COUNT(DISTINCT qid) AS so_cau, COUNT(DISTINCT CASE WHEN ket_qua = 1 THEN qid END) AS so_dung FROM (SELECT sbd, qid, ket_qua, ngay_vn FROM su_kien_hoc WHERE luc >= ? AND ket_qua IS NOT NULL LIMIT -1) WHERE ngay_vn = ? GROUP BY sbd'
 
-const so = (v: unknown): number => Number(v) || 0
+// const so = (v: unknown): number => Number(v) || 0
 
 /**
  * Bản THUẦN cho nơi đã có sẵn danh sách sự kiện hôm nay trong bộ nhớ (Bảng tin sống): số câu khác nhau + số câu có ít nhất một lần đúng theo em. Sự kiện chưa chấm (`ketQua === null`) bị bỏ.
@@ -57,17 +57,17 @@ export function demCauKhacNhau(ds: readonly { sbd: string; qid: string; ketQua: 
 }
 
 /** Số câu đã làm hôm nay (định nghĩa chuẩn) của một danh sách em. Em chưa làm câu nào KHÔNG có mặt trong kết quả. Lỗi đọc ⇒ `null` (nơi gọi bỏ khoá hiển thị, không bịa 0). */
-export async function docCauDaLamHomNay(env: Env, dsSbd: readonly string[], nowMs: number, moc?: MocHienThi): Promise<Map<string, CauDaLam> | null> {
-  const em = [...new Set(dsSbd)]
-  const ra = new Map<string, CauDaLam>()
-  if (em.length === 0) return ra
+// export async function docCauDaLamHomNay(env: Env, dsSbd: readonly string[], nowMs: number, moc?: MocHienThi): Promise<Map<string, CauDaLam> | null> {
+//   const em = [...new Set(dsSbd)]
+//   const ra = new Map<string, CauDaLam>()
+//   if (em.length === 0) return ra
   try {
-    const m = moc ?? (await docMocHienThi(env))
-    const r = await env.DB.prepare(SQL_CAU_DA_LAM_THEO_EM).bind(JSON.stringify(em), ngayVn(nowMs), tuLucHomNay(m, nowMs)).all<Record<string, unknown>>()
-    for (const x of r.results ?? []) ra.set(String(x.sbd), { soCau: so(x.so_cau), soCauDung: so(x.so_dung) })
-    return ra
+//     const m = moc ?? (await docMocHienThi(env))
+//     const r = await env.DB.prepare(SQL_CAU_DA_LAM_THEO_EM).bind(JSON.stringify(em), ngayVn(nowMs), tuLucHomNay(m, nowMs)).all<Record<string, unknown>>()
+//     for (const x of r.results ?? []) ra.set(String(x.sbd), { soCau: so(x.so_cau), soCauDung: so(x.so_dung) })
+//     return ra
   } catch (e) {
     console.error('[cau-da-lam] không đọc được số câu đã làm hôm nay (bỏ khoá hiển thị):', e instanceof Error ? e.message : e)
-    return null
+//     return null
   }
-}
+// }

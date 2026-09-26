@@ -1,0 +1,15 @@
+const fs = require('fs');
+let code = fs.readFileSync('src/App.tsx', 'utf8');
+code = code.replace(/import PhieuScreen from '\.\/screens\/PhieuScreen'.*\n/g, '');
+code = code.replace(/const HocSinhScreen = lazy\(.*\n/g, '');
+code = code.replace(/const ToanCanhEmScreen = lazy\(.*\n/g, '');
+code = code.replace(/const GiaoBtvnScreen = lazy\(.*\n/g, '');
+code = code.replace(/const GiaoDeTheoTuanScreen = lazy\(.*\n/g, '');
+code = code.replace(/const ParentPortalScreen = lazy\(.*\n/g, '');
+code = code.replace(/if \(laPhieu\) \{[\s\S]*?\}\n/g, '');
+code = code.replace(/if \(laPhuHuynh\) \{[\s\S]*?\}\n/g, '');
+code = code.replace(/\{screen === 'hocsinh' && <HocSinhScreen \/>\}\n/g, '');
+code = code.replace(/\{screen === 'toancanh' && <ToanCanhEmScreen \/>\}\n/g, '');
+code = code.replace(/\{screen === 'giaobtvn' && <GiaoBtvnScreen \/>\}\n/g, '');
+code = code.replace(/\{screen === 'khodegiao' && <GiaoDeTheoTuanScreen \/>\}\n/g, '');
+fs.writeFileSync('src/App.tsx', code);

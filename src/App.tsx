@@ -17,7 +17,6 @@ import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
 import ExamTakeScreen from './screens/ExamTakeScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
-import PhieuScreen from './screens/PhieuScreen'
 import StudentPortalScreen from './screens/StudentPortalScreen'
 
 
@@ -48,17 +47,12 @@ const ExamSetupScreen = lazy(() => import('./screens/ExamSetupScreen'))
 const NganHangDeScreen = lazy(() => import('./screens/NganHangDeScreen'))
 const ExamMonitorScreen = lazy(() => import('./screens/ExamMonitorScreen'))
 const LichSuCaScreen = lazy(() => import('./screens/LichSuCaScreen'))
-const HocSinhScreen = lazy(() => import('./screens/HocSinhScreen'))
-const ToanCanhEmScreen = lazy(() => import('./screens/ToanCanhEmScreen'))
 const GoiLenBangScreen = lazy(() => import('./screens/GoiLenBangScreen'))
-const GiaoBtvnScreen = lazy(() => import('./screens/PhanCongScreen'))
 const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
 const CaiDatScreen = lazy(() => import('./screens/CaiDatScreen'))
-const GiaoDeTheoTuanScreen = lazy(() => import('./screens/GiaoDeTheoTuanScreen'))
 // CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
 // nó nhập thẳng là em học sinh nào cũng phải tải kèm.
-const ParentPortalScreen = lazy(() => import('./screens/ParentPortalScreen'))
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
 
@@ -238,14 +232,7 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkCu, laPhieu, laHocSinh, laPhuHuynh])
 
-  if (laPhieu) {
-    return (
-      <ChanLoi o="Phiếu kết quả">
-        <PhieuScreen />
-      </ChanLoi>
-    )
-  }
-  if (linkCu) return <AppDaChuyenScreen />
+    if (linkCu) return <AppDaChuyenScreen />
   if (laHocSinh) {
     return (
       <ChanLoi o="Cổng học sinh">
@@ -253,16 +240,7 @@ function App() {
       </ChanLoi>
     )
   }
-  if (laPhuHuynh) {
-    return (
-      <ChanLoi o="Cổng phụ huynh">
-        <Suspense fallback={<div className="min-h-screen" style={{ background: 'var(--nen)' }} />}>
-          <ParentPortalScreen />
-        </Suspense>
-      </ChanLoi>
-    )
-  }
-
+  
   // Chưa biết có mật khẩu hay chưa: dựng một màn trống, KHÔNG dựng app. Vài
   // chục mili giây, nhưng đây là chỗ mục 5 đòi — không được thấy loáng thoáng
   // danh sách lớp rồi mới bị che.
@@ -343,14 +321,10 @@ function App() {
         {screen === 'examtake' && <ExamTakeScreen />}
         {screen === 'exammonitor' && <ExamMonitorScreen />}
         {screen === 'lichsuca' && <LichSuCaScreen />}
-        {screen === 'hocsinh' && <HocSinhScreen />}
-        {screen === 'toancanh' && <ToanCanhEmScreen />}
-        {screen === 'giaobtvn' && <GiaoBtvnScreen />}
-        {screen === 'goilenbang' && <GoiLenBangScreen />}
+                                {screen === 'goilenbang' && <GoiLenBangScreen />}
         {screen === 'cauhoi' && <CauHoiScreen />}
         {screen === 'caidat' && <CaiDatScreen />}
-        {screen === 'khodegiao' && <GiaoDeTheoTuanScreen />}
-        </Suspense>
+                </Suspense>
       </ChanLoi>
         </div>
       </div>
