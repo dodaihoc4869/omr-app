@@ -130,6 +130,15 @@ function choHan<T>(p: Promise<T>, ms: number): Promise<T> {
   })
 }
 
+/** ĐUA với hạn chờ — hết hạn (hoặc lỗi) thì trả `fallback`. Lối đi KHÔNG ĐƯỢC KẸT (đăng nhập): dù bên
+ * trong treo ở đâu (IndexedDB đọc/ghi, mạng…) vẫn trả fallback, không quay vô hạn. */
+export function khongTreo<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise((ok) => {
+    const h = setTimeout(() => ok(fallback), ms)
+    p.then((v) => { clearTimeout(h); ok(v) }, () => { clearTimeout(h); ok(fallback) })
+  })
+}
+
 async function getDb(): Promise<IDBPDatabase> {
   return choHan(openDB(DB_NAME, DB_VERSION, {
     upgrade(db, oldVersion) {
@@ -322,12 +331,14 @@ export async function saveScriptUrl(url: string): Promise<void> {
  * Đọc qua `chuanHoaMayChu` nên bản ghi hỏng hoặc thiếu trường vẫn ra cấu hình
  * AN TOÀN (BAT=false, có đường lùi), thay vì làm vỡ màn vào thi. */
 export async function loadCauHinhMayChu(): Promise<CauHinhMayChu> {
-  try {
-    const db = await getDb()
-    return chuanHoaMayChu((await db.get(STORE_SETTINGS, 'mayChuMoi')) as Partial<CauHinhMayChu> | undefined)
-  } catch {
-    return chuanHoaMayChu(null)
-  }
+  return khongTreo((async () => {
+    try {
+      const db = await getDb()
+      return chuanHoaMayChu((await db.get(STORE_SETTINGS, 'mayChuMoi')) as Partial<CauHinhMayChu> | undefined)
+    } catch {
+      return chuanHoaMayChu(null)
+    }
+  })(), 5000, chuanHoaMayChu(null))
 }
 
 export async function saveCauHinhMayChu(c: Partial<CauHinhMayChu>): Promise<CauHinhMayChu> {
@@ -354,7 +365,7 @@ export async function loadScriptUrl(): Promise<string> {
   if (ch.URL) return ch.URL
   try {
     const db = await getDb()
-    const daChon = diaChiMayChuHopLe(await db.get(STORE_SETTINGS, 'scriptUrl'))
+    const daChon = diaChiMayChuHopLe(await khongTreo(db.get(STORE_SETTINGS, 'scriptUrl'), 5000, undefined))
     if (daChon) return daChon
   } catch {
     // Máy sạch/IndexedDB hỏng vẫn có cấu hình công khai.
