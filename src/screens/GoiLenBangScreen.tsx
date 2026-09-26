@@ -1497,7 +1497,7 @@ export default function GoiLenBangScreen() {
         </p>
       ) : (
         <p className="text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800/60 -mt-2 leading-relaxed">
-          ✨ <strong>Thuật toán Chữa BTVN 3 Luồng & Vùng phát triển gần (ZPD)</strong>: Lọc câu dễ (≥ 85% đúng) vào Chiếu đáp án · Lọc câu bẫy tập thể (≥ 35% độ chụm) Thầy giảng cả lớp · Gọi 12–20 em lên bảng cho các câu trọng điểm theo đúng tầm với ZPD của em để cả lớp cùng tiến bộ.
+          <strong>Thuật toán Rút câu BTVN lên bảng (luật mới 25/09)</strong>: chọn câu theo thứ tự cả lớp <strong>sai nhiều nhất → sai ít dần → câu khó ít em làm được → câu cốt tủy</strong>; chữa đủ <strong>sàn 80 %</strong> số câu lọc ra (câu còn lại chỉ đọc đáp án); gọi <strong>mọi em ít nhất một lượt</strong>, em còn dư thì thêm lượt cân bằng — cả lớp đều được cọ sát.
         </p>
       )}
       {loi && <OThongBao tone="do">{loi}</OThongBao>}
