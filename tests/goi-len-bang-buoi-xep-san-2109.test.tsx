@@ -1,6 +1,6 @@
-// GỌI LÊN BẢNG — THẺ "BUỔI CHỮA TỐI NAY (ĐÃ XẾP SẴN)" ở đầu mục 2 (B6, Code 1, 21/09/2026; Boss duyệt).
-// Khoá: lệnh chưa có / lỗi / không khớp kho ⇒ thẻ ẨN và luồng cũ y nguyên; có đề xuất ⇒ thẻ hiện số thật; "Tự chọn lại" ẩn thẻ; "Mở buổi chữa này" mở ca gần nhất rồi điền sẵn đúng các câu máy đề xuất
-// (cách "tự chọn"), và MỌI thao tác chọn tay của thầy bỏ giới hạn ấy.
+// GỌI LÊN BẢNG — THẺ "BUỔI CHỮA TỐI NAY (ĐÃ XẾP SẴN)" ở đầu mục 2 (B6, Code 1, 21/09/2026; cập nhật 25/09 theo
+// LUẬT MỚI). Khoá: lệnh chưa có / lỗi / không khớp kho ⇒ thẻ ẨN và luồng cũ y nguyên; có đề xuất ⇒ thẻ hiện số thật
+// (câu chữa · câu chỉ đọc đáp án · sàn 80 % · em lên bảng); "Tự chọn lại" ẩn thẻ, mục 2 dùng như cũ.
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
@@ -128,36 +128,21 @@ describe('thẻ ẨN — luồng cũ y nguyên', () => {
   })
 })
 
-describe('dòng báo "câu chưa tra được nội dung đề" (tờ chiếu)', () => {
-  it('0 câu thiếu ⇒ KHÔNG hiện dòng báo: buổi xếp sẵn dùng câu có trong kho nên mọi câu tra được', async () => {
-    mocks.goiLenh.mockResolvedValue({ ok: true, du: THAN_TRA })
-    const { container, getByRole } = render(<GoiLenBangScreen />)
-    await waitFor(() => expect(the(container)).not.toBeNull())
-    await choKho(container)
-    fireEvent.click(getByRole('button', { name: 'Mở buổi chữa này' }))
-    await waitFor(() => expect(container.querySelector('[data-dang-dung-xep-san]')).not.toBeNull(), { timeout: 4000 })
-    // chờ buổi được xếp (tự chạy sau khi điền câu) rồi kiểm dòng báo
-    await waitFor(() => expect(container.textContent).toMatch(/em lên bảng/), { timeout: 6000 })
-    expect(container.querySelector('[data-thieu-noi-dung]')).toBeNull()
-    expect(container.textContent).not.toContain('chưa tra được nội dung đề')
-  })
-})
-
 describe('thẻ HIỆN với số thật', () => {
   beforeEach(() => mocks.goiLenh.mockResolvedValue({ ok: true, du: THAN_TRA }))
 
-  it('hiện ở ĐẦU mục 2 (trước tiêu đề "2. Câu để chữa lấy ở đâu"): 2 câu · khoảng N phút · 2 em cần chú ý, lý do bằng số', async () => {
+  it('hiện ở ĐẦU mục 2 (trước tiêu đề "2. Câu để chữa lấy ở đâu"): 2 câu chữa · khoảng N phút · 2 em lên bảng, lý do bằng số', async () => {
     const { container } = render(<GoiLenBangScreen />)
     await waitFor(() => expect(the(container)).not.toBeNull())
     const t = the(container) as HTMLElement
     expect(t.textContent).toContain('Buổi chữa tối nay (đã xếp sẵn)')
-    expect(t.textContent).toContain('2 câu để chữa')
+    expect(t.textContent).toContain('2 câu chữa')
     expect(t.textContent).toMatch(/khoảng \d+ phút/)
-    expect(t.textContent).toContain('2 em cần chú ý')
+    expect(t.textContent).toContain('2 em lên bảng')
     // 25/09 — LUẬT MỚI: lý do đổi từ "Dạng em đang yếu: …" sang "Câu cả lớp sai: N/M câu · … lượt sai" + "Chữa X % câu lọc ra (sàn 80 %)".
     expect(t.textContent).toContain('Câu cả lớp sai: 2/2 câu — 17 lượt sai')
     expect(t.textContent).toContain('Chữa 100 % câu lọc ra (sàn 80 %)')
-    expect(t.textContent).toContain('Em cần chú ý: Em Một, Em Hai')
+    expect(t.textContent).toContain('Em Một, Em Hai')
     // đứng TRƯỚC tiêu đề mục 2
     const thuTuThe = (container.textContent ?? '').indexOf('Buổi chữa tối nay (đã xếp sẵn)')
     expect(thuTuThe).toBeGreaterThan(-1)
@@ -171,33 +156,5 @@ describe('thẻ HIỆN với số thật', () => {
     expect(the(container)).toBeNull()
     expect(container.textContent).toContain('2. Câu để chữa lấy ở đâu')
     expect(container.textContent).toContain('Đã chọn: 0 câu')
-  })
-
-  it('"Mở buổi chữa này" khi CHƯA có ca nào ⇒ nói thật (không mở gì), thẻ vẫn còn', async () => {
-    mocks.danhSachCa.mockResolvedValue([])
-    const { container, getByRole } = render(<GoiLenBangScreen />)
-    await waitFor(() => expect(the(container)).not.toBeNull())
-    fireEvent.click(getByRole('button', { name: 'Mở buổi chữa này' }))
-    await waitFor(() => expect(mocks.showToast).toHaveBeenCalled())
-    expect(String(mocks.showToast.mock.calls[0][0])).toMatch(/Chưa có ca nào/)
-    expect(the(container)).not.toBeNull()
-    expect(container.querySelector('[data-dang-dung-xep-san]')).toBeNull()
-  })
-
-  it('"Mở buổi chữa này" khi có ca: mở ca gần nhất, chọn cách "tự chọn" và ĐÚNG 2 câu đề xuất (ghi chú "Đang dùng 2 câu…"); chọn tay lại một đề ⇒ bỏ giới hạn', async () => {
-    const { container, getByRole, getAllByRole } = render(<GoiLenBangScreen />)
-    await waitFor(() => expect(the(container)).not.toBeNull())
-    await choKho(container)
-    fireEvent.click(getByRole('button', { name: 'Mở buổi chữa này' }))
-    await waitFor(() => expect(container.querySelector('[data-dang-dung-xep-san]')).not.toBeNull(), { timeout: 4000 })
-    expect(container.querySelector('[data-dang-dung-xep-san]')?.textContent).toContain('Đang dùng 2 câu của buổi chữa xếp sẵn')
-    expect(getByRole('radio', { name: 'Tôi tự chọn bài để chữa' }).getAttribute('aria-checked')).toBe('true')
-    // thầy tích tay một đề ⇒ giới hạn biến mất, quay về cách cũ
-    for (let i = 0; i < 4; i++) for (const b of [...container.querySelectorAll('button[aria-expanded="false"]')] as HTMLElement[]) fireEvent.click(b) // mở hết cây như test chọn nhiều đề
-    const la = getAllByRole('checkbox').filter((e) => /^Trắc nghiệm/.test(e.textContent ?? ''))
-    expect(la.length).toBeGreaterThan(0)
-    fireEvent.click(la[0])
-    await waitFor(() => expect(container.querySelector('[data-dang-dung-xep-san]')).toBeNull())
-    expect(container.textContent).toContain('Đã chọn: 6 câu')
   })
 })

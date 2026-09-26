@@ -125,6 +125,30 @@ export interface DeXuatBuoiChua {
   soEmNhieuLuot?: number
   /** Lời thật cần hành động: câu cả lớp SAI chưa chữa kịp (kèm số phút cần thêm), em chưa có lượt… */
   canhBao?: string[]
+  /** Số câu CHỈ ĐỌC ĐÁP ÁN (chiếu máy chiếu) — phần "lọc ra" không gọi em lên bảng. */
+  soCauDocDapAn?: number
+  /** Danh sách câu theo ĐÚNG thứ tự chữa (sai nhiều → …) để thẻ liệt kê bung/thu gọn: nhóm CHỮA kèm em
+   * được gọi, rồi nhóm CHỈ ĐỌC ĐÁP ÁN. */
+  hang?: HangCauDeXuat[]
+}
+
+/** Một dòng trong danh sách bung/thu gọn của thẻ — câu theo thứ tự chữa + (nếu nhóm CHỮA) em được gọi. */
+export interface HangCauDeXuat {
+  /** `chua` = gọi em lên bảng · `doc_dap_an` = chỉ chiếu đáp án. */
+  nhom: 'chua' | 'doc_dap_an'
+  qid: string
+  phan: PhanCau
+  sao: 0 | 1 | 2
+  soEmSai: number
+  /** Lý do bằng số thật ("9/24 em làm sai · câu cốt tủy"). */
+  lyDo: string
+  /** Nhóm CHỮA: em được gọi lên bảng. */
+  sbd?: string
+  hoTen?: string
+  /** Nhóm CHỮA: đây là lượt thứ mấy của em trong buổi (1 = lần đầu). */
+  luotCuaEm?: number
+  /** Nhóm CHỮA: lý do chọn em ("sai câu này · Bộ não A.I gợi ý"). */
+  viSao?: string
 }
 
 // ══════════════════════════════ ĐỌC ĐẦU VÀO (không tin dữ liệu từ ngoài) ══════════════════════════════
@@ -408,6 +432,31 @@ export function deXuatBuoiChuaPhuKienThuc(dv: DauVaoDeXuat, kho: readonly CauKho
   if (soLoi > 0) cacLyDo.push(`Câu cốt tủy: ${soLoi} câu`)
   cacLyDo.push(`Chữa ${Math.round(kq.tiLeChua * 100)} % câu lọc ra (sàn 80 %)`)
 
+  // 5 — danh sách câu theo ĐÚNG thứ tự chữa (để thẻ liệt kê bung/thu gọn): nhóm CHỮA kèm em được gọi (theo
+  // lượt đã phân), rồi nhóm CHỈ ĐỌC ĐÁP ÁN. Nguồn: `pb.luot` (đã cân bằng lượt) + `kq.docDapAn`.
+  const hang: HangCauDeXuat[] = [
+    ...pb.luot.map((l) => ({
+      nhom: 'chua' as const,
+      qid: l.cau.qid,
+      phan: l.cau.phan,
+      sao: l.cau.sao,
+      soEmSai: l.cau.soEmSai,
+      lyDo: l.cau.lyDo,
+      sbd: l.sbd,
+      hoTen: l.hoTen,
+      luotCuaEm: l.luotCuaEm,
+      viSao: l.viSao,
+    })),
+    ...kq.docDapAn.map((c) => ({
+      nhom: 'doc_dap_an' as const,
+      qid: c.qid,
+      phan: c.phan,
+      sao: c.sao,
+      soEmSai: c.soEmSai,
+      lyDo: c.lyDo,
+    })),
+  ]
+
   return {
     co: true,
     lyDoAn: '',
@@ -422,6 +471,8 @@ export function deXuatBuoiChuaPhuKienThuc(dv: DauVaoDeXuat, kho: readonly CauKho
     dat80: kq.dat80,
     soEmNhieuLuot: pb.soEmNhieuLuot,
     canhBao: [...kq.canhBao, ...pb.canhBao],
+    soCauDocDapAn: kq.docDapAn.length,
+    hang,
   }
 }
 
