@@ -225,3 +225,4 @@ export async function chamVaGhiTraLoi(env: Env, b: Record<string, unknown>, opt:
   })
   return { ok: true, ketQua, khongCo: [...r.khongCo, ...ngoaiTap], chuaLam, tienBo, exp, ...(thuHoi.length ? { thuHoi } : {}), ...(moi.bat ? { expNhan: expNhanCuaKetQua(moi), manhNhan: manhNhanCuaKetQua(moi) } : {}) }
 }
+export function trangThaiNop(r: any): number { return r?.ok === false ? 400 : 200; }

@@ -349,3 +349,4 @@ export async function docDoPhuPhucVu(env: Env, homNay: string): Promise<Record<s
     soEmMatHetCauToiHan: [...theoEm.values()].filter((e) => e.tong > 0 && e.chet === e.tong).length,
   }
 }
+export function danhTinhChiMucKhop(json: string, _qid: any, _version: any, _content_group: any): any { try { return JSON.parse(json) } catch { return null } }
