@@ -139,7 +139,7 @@ export interface TuyChonKeHoach {
 }
 
 export interface KeHoachNgay {
-  /** Câu cho Bát Linh Đảo: câu mới + câu ôn Đúng–sai. Đúng thứ tự phục vụ. */
+  /** Câu cho Bát Linh Đảo: câu ôn Đúng–sai trước, rồi câu mới. Đúng thứ tự phục vụ. */
   dao: string[]
   /** Câu cho Đoàn Hộ Tống: câu ôn Trắc nghiệm, Trả lời ngắn. */
   doan: string[]
@@ -242,7 +242,8 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const chonOn = [...on.slice(0, layOn), ...duyTri.slice(0, layDuyTri)]
 
   return {
-    dao: [...chonMoi.map((c) => c.qid), ...chonOn.filter((c) => c.phan === 'II').map((c) => c.qid)],
+    // Câu ôn Đúng–sai đứng TRƯỚC câu mới: dọn nợ cũ trước (cùng tinh thần khoá Đảo khi Đoàn còn câu ôn).
+    dao: [...chonOn.filter((c) => c.phan === 'II').map((c) => c.qid), ...chonMoi.map((c) => c.qid)],
     doan: chonOn.filter((c) => c.phan !== 'II').map((c) => c.qid),
     huyetChien,
     khoiLuong,
