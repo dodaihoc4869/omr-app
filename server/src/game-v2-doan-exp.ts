@@ -1,6 +1,9 @@
 // EXP KẾT CHẶNG ĐOÀN HỘ TỐNG (Điều 9, thầy lệnh 21/09 13:43; prompt-than-thu-moi-ngay-2109.md — vào ĐỢT 2): thắng chặng 5/10/15 EXP theo 1/2/3 sao (chặng thắng ĐẦU ngày VN đủ, các chặng sau một nửa làm tròn lên),
 // cả đội làm vỡ giáp trùm +3 EXP mỗi trùm cho TỪNG bạn (kể cả chặng thua). Số tiền do hàm thuần của Code 1 (`khoanKetChang`, src/game/than-thu-v2/doan-core.ts). Ghi sổ `exp_so` loại `doan_chang` / `doan_giap`,
 // khoá `<sbd>|doan_chang|<mã chặng>` và `<sbd>|doan_giap|<mã chặng>` (gọi lại không cộng đôi), qua cửa trần 120 EXP game/ngày (`ghiKhoanExpGame`). Bạn máy không có sổ. Lỗi từng em chỉ ghi log, KHÔNG làm hỏng việc chốt chặng.
+import { cheDo2 } from './srs2-d1'
+import { soCauGameHomNay } from './srs2-game'
+import { duocThuongCauThu } from './srs2-loi'
 import type { Env } from './kieu'
 import { khoanKetChang, type TomTatChang } from '../../src/game/than-thu-v2/doan-core'
 import { ghiKhoanExpGame } from './exp-d1'
@@ -20,6 +23,8 @@ export async function traoExpKetChang(env: Env, ma: string, ketLucMs: number, tt
   for (const g of tt.ghe) {
     if (g.laMay || !g.id) continue
     try {
+      // GAME HÓA 2.0 (Huyết Chiến): em đã làm quá 40 câu hôm nay ⇒ chặng này không rơi EXP.
+      if (await cheDo2(env, g.id) && !duocThuongCauThu(await soCauGameHomNay(env, g.id, ketLucMs))) continue
       const k = khoanKetChang(tt, tt.thang ? await laChangThangDauNgay(env, g.id, ngay, ma) : false)
       if (k.chang > 0) await ghiKhoanExpGame(env, g.id, { khoa: `doan_chang|${ma}`, loai: 'doan_chang', exp: k.chang, ngay, luc, ghiChu: `Thắng chặng ${tt.sao} sao +${k.chang} EXP`, maNguon: ma }, nowMs)
       if (k.voGiap > 0) await ghiKhoanExpGame(env, g.id, { khoa: `doan_giap|${ma}`, loai: 'doan_giap', exp: k.voGiap, ngay, luc, ghiChu: `Vỡ giáp ${soTrum} trùm +${k.voGiap} EXP`, maNguon: ma }, nowMs)

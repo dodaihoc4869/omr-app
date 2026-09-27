@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Thiết kế mới — Xong chuyến, sương mù tan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Be Vietnam Pro',system-ui,sans-serif;background:#071229;color:#F2F6FF}
+button{font-family:inherit}
+.kinh{background:rgba(12,26,58,0.72);border:1px solid rgba(160,200,255,0.18);backdrop-filter:blur(10px)}
+.baloo{font-family:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 900px; overflow: hidden; background: #071229; color: #F2F6FF; font-family: 'Be Vietnam Pro', system-ui, sans-serif">
+
+  <svg style="position: absolute; left: 0; top: 0" width="390" height="400" viewBox="0 0 390 400" aria-hidden="true">
+    <defs>
+      <radialGradient id="haoX" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#1F8C8A"></stop><stop offset="0.55" stop-color="#123066"></stop><stop offset="1" stop-color="#071229"></stop></radialGradient>
+      <filter id="suongX" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"></feGaussianBlur></filter>
+      <filter id="sangX" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+    </defs>
+    <rect width="390" height="400" fill="url(#haoX)"></rect>
+    <g transform="translate(195 200)">
+      <g fill="#22946B" stroke="#E9CF94" stroke-width="2">
+        <polygon points="-36,-62 -18,-62 -9,-46 -18,-31 -36,-31 -45,-46"></polygon>
+        <polygon points="0,-62 18,-62 27,-46 18,-31 0,-31 -9,-46"></polygon>
+        <polygon points="36,-62 54,-62 63,-46 54,-31 36,-31 27,-46"></polygon>
+        <polygon points="-54,-31 -36,-31 -27,-15 -36,0 -54,0 -63,-15"></polygon>
+        <polygon points="54,-31 72,-31 81,-15 72,0 54,0 45,-15"></polygon>
+        <polygon points="-36,0 -18,0 -9,15 -18,31 -36,31 -45,15"></polygon>
+        <polygon points="36,0 54,0 63,15 54,31 36,31 27,15"></polygon>
+      </g>
+      <g fill="#5BE0A8" stroke="#FFF3C4" stroke-width="3">
+        <polygon points="-18,-31 0,-31 9,-15 0,0 -18,0 -27,-15"></polygon>
+        <polygon points="18,-31 36,-31 45,-15 36,0 18,0 9,-15"></polygon>
+        <polygon points="0,0 18,0 27,15 18,31 0,31 -9,15"></polygon>
+        <polygon points="-18,31 0,31 9,46 0,62 -18,62 -27,46"></polygon>
+        <polygon points="18,31 36,31 45,46 36,62 18,62 9,46"></polygon>
+      </g>
+      <circle cx="0" cy="0" r="80" fill="#9FF6EE" opacity="0.18" filter="url(#sangX)"></circle>
+      <g filter="url(#suongX)" fill="#DDE8F4" opacity="0.8"><circle cx="-120" cy="-40" r="40"></circle><circle cx="120" cy="40" r="44"></circle><circle cx="-100" cy="70" r="30"></circle><circle cx="110" cy="-70" r="30"></circle></g>
+    </g>
+    <g fill="#FFD66B"><path d="M60 60 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"></path><path d="M330 90 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z"></path><path d="M300 320 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z"></path></g>
+  </svg>
+
+  <div class="baloo" style="position: absolute; left: 0; right: 0; top: 28px; text-align: center; font-size: 32px; font-weight: 800; line-height: 1; color: #9FF6EE; text-shadow: 0 3px 0 #0B4A48, 0 0 22px rgba(55,226,213,0.55)">SƯƠNG MÙ ĐÃ TAN</div>
+  <div style="position: absolute; left: 0; right: 0; top: 70px; text-align: center; font-size: 14px; color: #DCE8FF">Chuyến thám hiểm 1/5 · đã hạ Quái Sương Mù</div>
+  <span class="kinh" style="position: absolute; left: 136px; top: 330px; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 800; color: #9FF6EE">+5 ô đất mới</span>
+
+  <div style="position: absolute; left: 12px; right: 12px; top: 376px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <div class="kinh" style="padding: 12px 6px; border-radius: 18px; display: flex; flex-direction: column; align-items: center; gap: 2px"><span class="baloo" style="font-size: 26px; font-weight: 800; color: #FFC940">5/6</span><span style="font-size: 12px; color: #BCCBEB">ải đúng</span></div>
+      <div class="kinh" style="padding: 12px 6px; border-radius: 18px; display: flex; flex-direction: column; align-items: center; gap: 2px"><span class="baloo" style="font-size: 26px; font-weight: 800; color: #FFC940">+24</span><span style="font-size: 12px; color: #BCCBEB">EXP</span></div>
+      <div class="kinh" style="padding: 12px 6px; border-radius: 18px; display: flex; flex-direction: column; align-items: center; gap: 2px"><span class="baloo" style="font-size: 26px; font-weight: 800; color: #9FF6EE">72/120</span><span style="font-size: 12px; color: #BCCBEB">ô đã khai phá</span></div>
+    </div>
+
+    <div class="kinh" style="display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 18px">
+      <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700"><span>Hôm nay: chuyến 1/5 xong</span><span style="color: #7FF3FF">còn 22 câu</span></div>
+      <div style="display: flex; gap: 6px"><span style="flex-grow: 1; height: 8px; border-radius: 4px; background: #37E2D5"></span><span style="flex-grow: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.15)"></span><span style="flex-grow: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.15)"></span><span style="flex-grow: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.15)"></span><span style="flex-grow: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.15)"></span></div>
+      <div style="font-size: 12px; line-height: 1.5; color: #BCCBEB">Ải 2 em chưa đúng: câu này đến lịch ôn lại ngày mai.</div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: rgba(255,201,64,0.12); border: 1px solid rgba(255,201,64,0.45)">
+      <svg width="40" height="34" viewBox="0 0 28 24" aria-hidden="true" style="flex-shrink: 0"><rect x="2" y="9" width="24" height="13" rx="2" fill="#B8650A"></rect><path d="M2 11 C2 4 26 4 26 11 Z" fill="#FF9F1C"></path><rect x="12" y="9" width="4" height="7" rx="1" fill="#FFE08A"></rect></svg>
+      <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 5px"><span style="font-size: 13px; font-weight: 800; color: #FFE08A">Rương Bát Linh · 18/40 câu hôm nay</span><span style="height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12)"><span style="display: block; width: 45%; height: 6px; border-radius: 3px; background: #FFC940"></span></span><span style="font-size: 12px; color: #F5D58A">Xong 40/40 câu → mở rương phụ kiện cho thần thú</span></span>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 12px; right: 12px; bottom: 18px; display: flex; flex-direction: column; gap: 10px">
+    <button style="height: 64px; border-radius: 22px; border: 0; background: linear-gradient(180deg, #FFD66B 0%, #FF9F1C 100%); color: #3A1D00; box-shadow: 0 6px 0 #B8650A, 0 10px 24px rgba(255,159,28,0.35)"><span class="baloo" style="font-size: 21px; font-weight: 800; letter-spacing: 0.5px">ĐI CHUYẾN 2/5</span></button>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <button style="height: 48px; border-radius: 18px; border: 1px solid rgba(160,200,255,0.3); background: transparent; color: #DCE8FF; font-size: 15px; font-weight: 700">Về bản đồ</button>
+      <button style="height: 48px; border-radius: 18px; border: 1px solid rgba(160,200,255,0.3); background: transparent; color: #DCE8FF; font-size: 15px; font-weight: 700">Câu đã làm</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

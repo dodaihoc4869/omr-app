@@ -9,6 +9,7 @@
 //   4. DỰNG KHUNG NHÌN cho từng em: đáp án không bao giờ xuống máy em trước khi em chốt; không ai thấy bạn sai gì / chọn gì.
 //
 // Câu chung của TRÙM không tạo bằng chứng cá nhân: không ghi attempt, không ghi sổ, không tính vào trần câu của Đoàn (60).
+import { cheDo2 } from './srs2-d1'
 import type { Env, D1PreparedStatement } from './kieu'
 import type { Profile } from './game-v2'
 import { PETS, publicQuestion, type PrivateQuestion, type Question } from '../../src/game/than-thu-v2/core'
@@ -64,7 +65,7 @@ export const danhDau = <T extends object>(b: T): T => { noiBo.add(b); return b }
 
 export type NhanCau = 'toi_han_on' | 'dang_yeu' | 'cau_moi' | 'vua_suc'
 /** `an` = dạng của câu này em ĐÃ KHẮC PHỤC XONG (ấn thạch sáng) → kỹ năng ở hiệp này là biến thể ấn (×1,25). */
-interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; dang: string | null; tenDang: string; nhom: string; kt: string[]; phan?: string; mucDo?: string | null; an?: boolean
+interface CauRef { qid: string; maDe: string; version: string; nhan: NhanCau; dang: string | null; tenDang: string; nhom: string; kt: string[]; phan?: string; mucDo?: string | null; an?: boolean; goiY?: { gach?: string[]; cotLoi?: string }
   /** M6 (23/09): số từ của đề + phương án/ý, và có hình/bảng hay không — nguồn cho THỜI GIAN ĐỌC
    *  của hạn hiệp (`giayDocThem` trong doan-core). Thiếu ⇒ hạn y hệt bản cũ. */
   soTu?: number; coHinh?: boolean }
@@ -223,7 +224,7 @@ async function ganNhan(env: Env, sbd: string, qs: Question[], now: number): Prom
   } catch { coHoSo = false }
   const nhan = (q: Question): NhanCau => !coHoSo ? 'vua_suc' : toiHan.has(q.qid) ? 'toi_han_on' : q.dang && dangYeu.has(q.dang) ? 'dang_yeu' : daGap.has(q.qid) ? 'vua_suc' : 'cau_moi'
   const thuTu: NhanCau[] = ['toi_han_on', 'dang_yeu', 'cau_moi', 'vua_suc']
-  return qs.map((q, i) => ({ i, ref: { qid: q.qid, maDe: q.maDe, version: q.version, nhan: nhan(q), dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc, phan:q.phan, mucDo:q.mucDo, ...doDaiCau(q) } }))
+  return qs.map((q, i) => ({ i, ref: { qid: q.qid, maDe: q.maDe, version: q.version, nhan: nhan(q), dang: q.dang, tenDang: q.tenDang, nhom: q.group, kt: q.kienThuc, phan:q.phan, mucDo:q.mucDo, ...doDaiCau(q), ...((q as { goiY?: CauRef['goiY'] }).goiY ? { goiY: (q as { goiY?: CauRef['goiY'] }).goiY } : {}) } }))
     .sort((a, b) => thuTu.indexOf(a.ref.nhan) - thuTu.indexOf(b.ref.nhan) || a.i - b.i).map(x => x.ref)
 }
 
@@ -493,10 +494,10 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
       const a = da.boTrong ? null : await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE id=? AND sbd=?').bind(`${p.nguoi[i]!.phien}|${ref.qid}`, sbd).first<{ json: string }>()
       const q = b.coCau === ref.qid ? null : await cauRieng(env, ref) // tải lại trang sau khi chốt: máy em mất đề → gửi lại đề (vẫn là bản công khai)
       doan.cau = { qid: ref.qid, nhan: ref.nhan, daChot: true, hanhDong: da.hanhDong, boTrong: da.boTrong, ketQua: a ? ketQuaCau(JSON.parse(a.json)) : null, ...(q ? { de: publicQuestion(q) } : {}) }
-    } else if (b.coCau === ref.qid) doan.cau = { qid: ref.qid, giuNguyen: true, nhan: ref.nhan, an: !!ref.an }
+    } else if (b.coCau === ref.qid) doan.cau = { qid: ref.qid, giuNguyen: true, nhan: ref.nhan, an: !!ref.an, ...(ref.goiY ? { goiY: ref.goiY } : {}) }
     else {
       const q = await cauRieng(env, ref)
-      doan.cau = q ? { qid: ref.qid, nhan: ref.nhan, an: !!ref.an, de: publicQuestion(q) } : { qid: ref.qid, rut: true, loiNhan: 'Câu này vừa được rút khỏi kho. Em chọn Chắn rồi chốt — hiệp này không bị tính sai.' }
+      doan.cau = q ? { qid: ref.qid, nhan: ref.nhan, an: !!ref.an, de: publicQuestion(q), ...(ref.goiY ? { goiY: ref.goiY } : {}) } : { qid: ref.qid, rut: true, loiNhan: 'Câu này vừa được rút khỏi kho. Em chọn Chắn rồi chốt — hiệp này không bị tính sai.' }
     }
   }
   if (mo && !laTrum) {
@@ -586,7 +587,8 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     const dangDo = await timDangDo()
     if (dangDo) return chay(env, sbd, hoSo, 'doan-xem', { ...b, ma: dangDo.ma_chang }, goiGame)
     const toi = await taoNguoi(env, sbd, hoSo, b, goiGame, now), ma = 'DH' + hex(4)
-    await quaCongVe(env, sbd, ma, now) // chặng đầu ngày miễn phí; chặng thêm trừ 1 vé; hết vé → lời chỉ cách kiếm vé
+    // GAME HÓA 2.0: mọi chặng đều chở câu ôn của kế hoạch ngày ⇒ miễn phí, không trần số chặng (hết câu ôn thì không có chặng).
+    if (!await cheDo2(env, sbd)) await quaCongVe(env, sbd, ma, now) // chặng đầu ngày miễn phí; chặng thêm trừ 1 vé; hết vé → lời chỉ cách kiếm vé
     const phong: PhongDoan = { kind: 'doan-phong', chu: sbd, taoLuc: now, nguoi: [toi], chang: null, hiepLuc: 0, nop: {}, nopY: {}, tinHieu: {}, the: {}, daGiup: [], choGhi: [], trum: {}, giaoY: {}, ketLuc: null }
     if (b.cheDo !== 'phong') { Object.assign(phong, await chonCauTrum(env, ma, phong.nguoi, now)); batDau(phong, ma, now) }
     // GIÀNH CHẶNG NGUYÊN TỬ (thầy 24/09, lát cắt 2): hai yêu cầu SONG SONG chỉ mở MỘT chặng ⇒ không phát hai bộ câu cá nhân cho một em.
