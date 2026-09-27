@@ -9,6 +9,7 @@ import type { HinhAnh } from '../../data/examContent'
 import type { Question } from './core'
 import type { KetQuaCau } from './doan-kieu'
 import ONhapDapSo from '../../components/ONhapDapSo'
+import XemLaiChuan from './doan2/XemLaiChuan'
 
 const CHU = ['A', 'B', 'C', 'D'] as const
 
@@ -32,24 +33,42 @@ export function duDapAn(q: Question, chon: string): boolean {
   return q.phan === 'I' ? /^[ABCD]$/.test(chon) : q.phan === 'II' ? /^[DS]{4}$/.test(chon) : chon.trim().length > 0 && chon.trim().length <= 40
 }
 
-export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode }) {
+/** Chỉ-thêm cho GAME HÓA 2.0 (vắng ⇒ thẻ câu y hệt bản cũ):
+ *  - `gach`: phương án SAI máy chủ đã gạch (Bùa Trợ giảng) — ô tối "cháy thành tro", KHÔNG bấm được;
+ *  - `bua`: dải Bùa Trợ giảng đặt ngay dưới đầu thẻ, trước đề;
+ *  - `xemLaiChuan`: đã có kết quả ⇒ thay cả thẻ bằng khối xem lại CHUẨN của app (`TheCau` xem_lai + `chuanHoaLoiGiaiCau`), số trên đầu thẻ = `stt`. */
+export interface DoanCau2 { gach?: readonly string[]; bua?: ReactNode; xemLaiChuan?: { stt: number } }
+
+export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, gach, bua, xemLaiChuan }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode } & DoanCau2) {
   const hinh = q.hinhAnh as HinhAnh[]
+  if (xemLaiChuan && ketQua) return (
+    <section className="dh-giay dh2-giay-ket" aria-label="Kết quả câu của em">
+      <div className="dh-giay-dau">{dau}</div>
+      <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status"><b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b></div>
+      <XemLaiChuan q={q} chon={chon} dapAn={ketQua.answer} solution={ketQua.solution} solutionImages={ketQua.solutionImages} stt={xemLaiChuan.stt} onZoom={onZoom} />
+    </section>
+  )
   // Phương án dài hoặc có ảnh → một cột cho dễ đọc; ngắn → lưới 2×2 như bản vẽ.
   const motCot = q.phan === 'I' && (q.choices.some(c => c.length > 34) || (q.choiceImgs ?? []).some(Boolean) || hinh.some(h => /^sau_pa_/.test(h.viTri)))
   const kq = (chu: string) => !ketQua ? undefined : ketQua.answer === chu ? 'dung' : chon === chu ? 'sai' : undefined
   return (
     <section className="dh-giay" aria-label="Câu của em">
       <div className="dh-giay-dau">{dau}</div>
+      {bua}
       <DeBai q={q} onZoom={onZoom} />
       {q.phan === 'I' && (
         <div className={`dh-pa ${motCot ? 'dh-pa-mot-cot' : ''}`} role="group" aria-label="Phương án">
-          {CHU.map((chu, i) => (
-            <button key={chu} type="button" disabled={khoa} aria-pressed={chon === chu} data-kq={kq(chu)} onClick={() => onChon(chu)}>
-              <i>{chu}</i>
-              <span>{q.choiceImgs?.[i] ? <img src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={q.choices[i] ?? ''} />}
-                <HinhTaiViTri hinhAnh={hinh} viTri={`sau_pa_${chu}`} onZoom={onZoom} nhan={`phương án ${chu}`} /></span>
-            </button>
-          ))}
+          {CHU.map((chu, i) => {
+            const chay = !!gach?.includes(chu) // Bùa Trợ giảng đã gạch: tro tàn, không chọn được
+            return (
+              <button key={chu} type="button" disabled={khoa || chay} aria-pressed={chon === chu} data-kq={kq(chu)} className={chay ? 'dh2-chay' : undefined} onClick={() => { if (!chay) onChon(chu) }}>
+                <i>{chu}</i>
+                <span>{q.choiceImgs?.[i] ? <img src={q.choiceImgs[i]} alt={`Phương án ${chu}`} /> : <ChemText text={q.choices[i] ?? ''} />}
+                  <HinhTaiViTri hinhAnh={hinh} viTri={`sau_pa_${chu}`} onZoom={onZoom} nhan={`phương án ${chu}`} /></span>
+                {chay && <span className="dh2-an"> (đã cháy thành tro — phương án sai, không chọn được)</span>}
+              </button>
+            )
+          })}
         </div>
       )}
       {q.phan === 'II' && (
