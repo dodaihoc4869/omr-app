@@ -12,7 +12,9 @@ T_DONG=$(sach "${T:-}")
 A_DONG=$(sach "${A:-}")
 echo "Khoá API: $(printf '%s\n' "$T_DONG" | grep -c . || true) dòng, độ dài: $(printf '%s\n' "$T_DONG" | awk '{printf "%s%d", (NR>1?", ":""), length($0)}')"
 echo "Mã tài khoản: $(printf '%s\n' "$A_DONG" | grep -c . || true) dòng, độ dài: $(printf '%s\n' "$A_DONG" | awk '{printf "%s%d", (NR>1?", ":""), length($0)}')"
-TOKEN=$(printf '%s\n' "$T_DONG" | grep -Ev '^[0-9a-fA-F]{32}$' | grep -Ev '^[A-Z_]+$' | grep -v '[[:space:]]' | head -n1 || true)
+# Dán cả câu kiểm tra khoá của Cloudflare (curl …/user/tokens/verify \ ⏎ -H "Authorization: Bearer <khoá>") — gặp thật ở run 500: lấy phần sau "Bearer".
+TOKEN=$(printf '%s\n' "${T:-}" | tr -d '\r' | grep -oE 'Bearer[[:space:]]+[A-Za-z0-9_.-]+' | head -n1 | sed -E 's/^Bearer[[:space:]]+//' || true)
+[ -n "$TOKEN" ] || TOKEN=$(printf '%s\n' "$T_DONG" | grep -Ev '^[0-9a-fA-F]{32}$' | grep -Ev '^[A-Z_]+$' | grep -v '[[:space:]]' | head -n1 || true)
 ACC=$(printf '%s\n' "$A_DONG" | grep -oE '[0-9a-fA-F]{32}' | head -n1 || true)
 [ -n "$ACC" ] || ACC=$(printf '%s\n' "$T_DONG" | grep -E '^[0-9a-fA-F]{32}$' | head -n1 || true)
 if [ -z "$TOKEN" ]; then echo "::error::Không tìm thấy khoá API hợp lệ trong secret CLOUDFLARE_API_TOKEN"; exit 1; fi
