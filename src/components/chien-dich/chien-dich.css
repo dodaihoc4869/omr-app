@@ -1,0 +1,534 @@
+/* MÀN CHIẾN DỊCH (Game Hóa 2.0) của app thầy — mọi lớp bắt đầu bằng `cd-`. Màu CHỈ qua token (`--bts-*` sáng + tối của app thầy,
+ * `--m3-*`), không mã màu thô (npm run check:mau). Khoảng cách theo thang 4/8/12/16/24; đích chạm ≥ 44 px; số dùng tabular-nums.
+ * Bản vẽ: docs/ban-ve-game-hoa-2-2709/GV-GiaoChienDich · GV-BangChienDich · GV-BuoiChua. */
+.cd-trang {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 16px 12px 112px;
+  color: var(--bts-chu);
+  font-family: var(--sans);
+}
+@media (min-width: 640px) {
+  .cd-trang {
+    padding: 20px 16px 112px;
+  }
+}
+.cd-trang *,
+.cd-the * {
+  box-sizing: border-box;
+}
+.cd-so {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- đầu màn ---- */
+.cd-dau {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+.cd-dau > div {
+  min-width: 0;
+  flex: 1 1 320px;
+}
+.cd-dau h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.cd-dau p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--bts-chu-phu);
+  overflow-wrap: anywhere;
+}
+.cd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bts-chu);
+  background: var(--bts-duong-nhat);
+  white-space: nowrap;
+}
+.cd-chip--vang {
+  background: var(--bts-vang-nhat);
+  color: var(--bts-vang-chu);
+}
+.cd-chip--xam {
+  background: var(--bts-xam-o);
+}
+
+/* ---- chọn chiến dịch ---- */
+.cd-chon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.cd-chon label {
+  font-size: 14px;
+  color: var(--bts-chu-phu);
+}
+.cd-chon select {
+  min-height: 44px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 12px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 12px;
+  background: var(--bts-mat);
+  color: var(--bts-chu);
+  font: inherit;
+  font-size: 15px;
+}
+
+/* ---- 4 ô số ---- */
+.cd-o-so-hang {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (min-width: 900px) {
+  .cd-o-so-hang {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.cd-o-so {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--bts-mat-2);
+}
+.cd-o-so span:first-child {
+  font-size: 13px;
+  color: var(--bts-chu-phu);
+}
+.cd-o-so strong {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.cd-o-so--do {
+  background: var(--bts-do-nhat);
+}
+.cd-o-so--vang {
+  background: var(--bts-vang-nhat);
+}
+
+/* ---- thẻ ---- */
+.cd-the {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 20px;
+  background: var(--bts-mat);
+  color: var(--bts-chu);
+  font-family: var(--sans);
+}
+.cd-the h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.cd-the-dau {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.cd-the-dau span {
+  font-size: 13px;
+  color: var(--bts-chu-phu);
+}
+.cd-nhan-buoc {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--m3-primary);
+}
+.cd-phu {
+  margin: 0;
+  font-size: 14px;
+  color: var(--bts-chu-phu);
+}
+.cd-loi {
+  margin: 0;
+  font-size: 14px;
+  color: var(--bts-do);
+}
+.cd-bo-cuc {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+@media (min-width: 1100px) {
+  .cd-bo-cuc {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+  }
+}
+
+/* ---- bảng từng em ---- */
+.cd-cuon-ngang {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  min-width: 0;
+}
+.cd-bang {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  font-size: 14px;
+}
+.cd-bang th {
+  padding: 4px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--bts-chu-phu);
+  text-align: center;
+  vertical-align: bottom;
+  line-height: 1.2;
+}
+.cd-bang th:first-child,
+.cd-bang td:first-child {
+  text-align: left;
+}
+.cd-bang td {
+  padding: 4px 6px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.cd-bang td:first-child {
+  white-space: normal;
+  min-width: 140px;
+}
+.cd-ten-dang {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 88px;
+  margin: 0 auto;
+}
+.cd-o {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--bts-chu);
+}
+.cd-o--xd {
+  background: var(--bts-la);
+  color: var(--bts-tren-la);
+}
+.cd-o--xg {
+  background: var(--bts-la-nhat);
+}
+.cd-o--xv {
+  background: var(--bts-vang-nhat);
+}
+.cd-o--xr {
+  background: var(--bts-do-nhat);
+}
+.cd-o--trong {
+  background: var(--bts-xam-o);
+  color: var(--bts-chu-mo);
+}
+.cd-o--mau {
+  min-width: 20px;
+  width: 20px;
+  height: 14px;
+  padding: 0;
+  border-radius: 4px;
+}
+.cd-nhan-hc {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--bts-do-nhat);
+  color: var(--bts-chu);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.cd-chu-giai {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  font-size: 13px;
+  color: var(--bts-chu-phu);
+}
+.cd-chu-giai > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ---- tấm "Cần thầy dạy lại" ---- */
+.cd-ds-cau {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.cd-ds-cau li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bts-luoi);
+  font-size: 14px;
+}
+.cd-ds-cau li span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.cd-ds-cau li b:last-child {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- buổi chữa ---- */
+.cd-hang-chua {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 4px 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--bts-luoi);
+  font-size: 14px;
+}
+.cd-hang-chua > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.cd-hang-chua .cd-hang-so {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.cd-hang-chua--dau {
+  display: none;
+}
+@media (min-width: 1000px) {
+  .cd-hang-chua {
+    grid-template-columns: 32px minmax(0, 1.4fr) minmax(0, 1.2fr) 72px minmax(0, 1.6fr) 80px;
+    align-items: baseline;
+  }
+  .cd-hang-chua--dau {
+    display: grid;
+    padding-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--bts-chu-phu);
+  }
+  .cd-nhan-hep {
+    display: none;
+  }
+}
+.cd-nhan-hep {
+  color: var(--bts-chu-phu);
+}
+.cd-thanh-hanh-dong {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 12px;
+}
+.cd-thanh-hanh-dong .cd-phu {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+/* ---- giao chiến dịch ---- */
+.cd-truong {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  font-size: 14px;
+  color: var(--bts-chu-phu);
+}
+.cd-truong input[type='text'],
+.cd-truong input[type='date'],
+.cd-truong input[type='number'],
+.cd-truong input:not([type]) {
+  min-height: 44px;
+  width: 100%;
+  min-width: 0;
+  padding: 0 12px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 12px;
+  background: var(--bts-mat);
+  color: var(--bts-chu);
+  font: inherit;
+  font-size: 15px;
+  color-scheme: light dark;
+}
+.cd-truong small {
+  font-size: 13px;
+  color: var(--bts-chu-phu);
+}
+.cd-luoi-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .cd-luoi-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.cd-tich {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 0;
+  font-size: 15px;
+  color: var(--bts-chu);
+  cursor: pointer;
+}
+.cd-tich input {
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  flex: 0 0 auto;
+  accent-color: var(--m3-primary);
+}
+.cd-tich span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* đồng hồ sức chứa */
+.cd-dong-ho {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--bts-mat-2);
+}
+.cd-dong-ho-dau {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  font-size: 14px;
+}
+.cd-dong-ho-dau strong {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+.cd-dong-ho[data-muc='xanh'] strong {
+  color: var(--bts-la);
+}
+.cd-dong-ho[data-muc='vang'] strong {
+  color: var(--bts-vang-chu);
+}
+.cd-dong-ho[data-muc='do'] strong {
+  color: var(--bts-do);
+}
+.cd-ray {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--bts-xam-o);
+  overflow: hidden;
+}
+.cd-ray > div {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 5px;
+  transform-origin: left center;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cd-ray > div {
+    transition: width 200ms var(--motion-standard, ease);
+  }
+}
+.cd-ray--xanh {
+  background: var(--bts-la);
+}
+.cd-ray--vang {
+  background: var(--bts-vang);
+}
+.cd-ray--do {
+  background: var(--bts-do);
+}
+.cd-goi-y {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cd-hang-nut {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 12px;
+}
+.cd-trang button,
+.cd-the button {
+  touch-action: manipulation;
+}
+.cd-trang button:focus-visible,
+.cd-the button:focus-visible,
+.cd-the input:focus-visible,
+.cd-trang select:focus-visible {
+  outline: 2px solid var(--m3-primary);
+  outline-offset: 2px;
+}
+.cd-nut-nho {
+  min-height: 44px;
+}
+
+/* hộp chọn (em có mặt, thêm tờ đề) */
+.cd-hop-ds {
+  display: flex;
+  flex-direction: column;
+  max-height: 50vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 8px 0;
+}
+
+/* công tắc ở Cài đặt */
+.cd-cong-tac {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

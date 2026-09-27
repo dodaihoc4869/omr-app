@@ -8,6 +8,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BANG_NHIP_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
 import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
+import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
+import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
+import { maDeTuBoCau } from '../components/chien-dich/tinh'
 import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
@@ -204,6 +207,9 @@ export default function ExamMonitorScreen() {
   const maCaTheoDoi = useAppStore((s) => s.maCaTheoDoi)
   const moToanCanh = useAppStore((s) => s.moToanCanh)
   const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
+  // GAME HÓA 2.0: ca đã kết thúc ⇒ thẻ "BƯỚC TIẾP THEO · Giao chiến dịch luyện" (chỉ khi cờ bật; tắt thì màn như cũ).
+  const hoa2 = useHoa2Bat()
+  const [thuGonGiao, setThuGonGiao] = useState(false)
 
   const [scriptUrl, setScriptUrl] = useState('')
   const [secret, setSecret] = useState('')
@@ -1205,6 +1211,26 @@ export default function ExamMonitorScreen() {
 
       {chiTiet && tk && tt && (
         <>
+          {hoa2 && chiTiet.ca.loai !== 'baitap' && (chiTiet.ca.trangThai === 'dong' || tt.ten === 'Xong' || tt.ten === 'Hết giờ vào') && (() => {
+            const maDeCa = maDeTuBoCau((teacherBank ?? []).flatMap((b) => [...(b.phanI ?? []), ...(b.phanII ?? []), ...(b.phanIII ?? [])].map((q) => q.id)))
+            return thuGonGiao ? (
+              <section className="cd-the" data-khoi="giao-chien-dich-thu-gon" style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span className="cd-nhan-buoc">BƯỚC TIẾP THEO · Giao chiến dịch luyện</span>
+                <button type="button" className="m3-nut-vien" onClick={() => setThuGonGiao(false)}>
+                  Giao chiến dịch luyện
+                </button>
+              </section>
+            ) : (
+              <GiaoChienDich
+                key={`${chiTiet.ca.maCa}|${maDeCa.join(',')}`}
+                maCa={chiTiet.ca.maCa}
+                lop={chiTiet.ca.lop}
+                maDeCa={maDeCa}
+                tenGoiY={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
+                onDeSau={() => setThuGonGiao(true)}
+              />
+            )
+          })()}
           <div className="ca-luoi">
           <div className="ca-cot ca-cot-phai">
           <KhoiThoiGianCa

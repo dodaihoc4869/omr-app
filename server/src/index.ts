@@ -10,6 +10,7 @@ import {congBoSuKien,dungLaiNangLuc,nangLucBat} from './nang-luc-d1'
 import {dtoNangLuc} from './ho-so-dto'
 import {hsThoiGianHoc,chayCaLop,docThanThu} from './ke-hoach-ngay-d1'
 import {chayResetNeuDenGio,chayTiepTay,dangLamMoi,docMocReset,doGioiHanTruyVan,maDaDung,maDaDungTrong,resetDryRun,LOI_DANG_LAM_MOI} from './reset-toan-app'
+import {cronResetHoa2,lenhGhiResetHoa2,xuLyLenhResetHoa2} from './reset-hoa2'
 import {hsKeHoachNgayCoExp,expNhanSauNop,chotExpNgayQuaDayDu} from './exp-d1'
 import {doanMoCho} from './game-v2-doan'
 import {hsCauTheoQid,docDoPhuPhucVu} from './cau-theo-qid'
@@ -3081,6 +3082,8 @@ const boXuLy = {
     // Job chia bước (≤ 40 truy vấn D1 mỗi lượt): đang làm/nhường thì các việc cron khác nghỉ lượt này (kế hoạch, tin PH, vinh danh đều dựng lại theo yêu cầu khi có người mở).
     const dangReset=await chayResetNeuDenGio(env,Date.now()).then(r=>{if(r.chay||r.lyDo==='loi'||r.lyDo==='qua_gio')console.log('[reset] cron',JSON.stringify({chay:r.chay,lyDo:r.lyDo,trangThai:r.trangThai?.trangThai,buoc:r.trangThai?.buoc,soTruyVan:r.soTruyVan,loi:r.trangThai?.loi}));return r.chay||r.lyDo==='dang_chay'||r.lyDo==='cho_tiep'}).catch(e=>{console.error('[reset] cron lỗi:',e);return false})
     if(dangReset)return
+    // RESET LẦN 2 (Game Hóa 2.0, reset-hoa2.ts): chỉ chạy khi có cờ reset_hoa2_cho_phep; HOÃN khi có ca thi mở. Đang làm thì các việc cron khác nghỉ lượt này.
+    if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
     if(event.cron==='1 17 * * *'){
       // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
@@ -3204,6 +3207,8 @@ const boXuLy = {
       }
       if (p === '/game-v2-parent') return ra(await parentGame(env,b))
       // CỔNG PHỤ HUYNH — token giai đoạn mềm (docs/token-phu-huynh-1909.md): chỉ nhận `pass` (token do thầy cấp).
+      // GAME HÓA 2.0: app phụ huynh ngừng khi công tắc bật CẢ TRUNG TÂM (thầy chốt 27/09 "bỏ hẳn app phụ huynh"). Công khai, chỉ trả đúng/sai.
+      if (p === '/hoa2/ph-ngung') return ra({ ok: true, ngung: await docCoHoa2(env).then((c) => c.bat && !c.lop.length && !c.sbd.length).catch(() => false) })
       if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b))
       if (p === '/ph/ke-hoach') return ra(await phKeHoach(env, b, envDoc, ctx))
       if (p === '/ph/canh-bao/xem') return ra(await phCanhBaoXem(env, b))
@@ -3306,6 +3311,10 @@ const boXuLy = {
       if (p === '/reset/chay-tiep') return ra({ ok: true, ...(await chayTiepTay(env, Date.now())) })
       // Đo giới hạn truy vấn D1 mỗi lượt gọi của gói đang dùng (chỉ đọc).
       if (p === '/reset/do-gioi-han') return ra(await doGioiHanTruyVan(env))
+      // RESET LẦN 2 (reset-hoa2.ts): chạy thử (chỉ đếm) và trạng thái (cờ, hạn, khoá, ca đang mở) — CHỈ ĐỌC.
+      // LÊN ĐẠN / HUỶ qua API (thay câu wrangler): lên đạn tự chạy thử lại và TỪ CHỐI khi có ca mở, chưa sẵn sàng, bảng chưa phân loại.
+      if (p === '/reset-hoa2/len-dan' || p === '/reset-hoa2/huy') return ra(await lenhGhiResetHoa2(env, p, b, Date.now()))
+      if (p.startsWith('/reset-hoa2/')) return ra(await xuLyLenhResetHoa2(env, p, Date.now()))
       if (p === '/ke-hoach/do-phu-phuc-vu') return ra(await docDoPhuPhucVu(env, ngayVn(Date.now())))
       // Màn HÔM NAY của app giáo viên (docs/hop-dong-gv-hom-nay-2109.md): chỉ đọc, ≤ 8 truy vấn, khối nào không tính được thì null + lyDoThieu.
       if (p === '/ke-hoach/hom-nay-thay') return ra(await homNayThay(env, b))

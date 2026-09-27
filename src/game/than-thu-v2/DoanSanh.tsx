@@ -21,6 +21,11 @@ interface Props {
   phong: DoanXem | null; ban: boolean; loi: string
   onLenDuong: () => void; onMoPhong: () => void; onVaoPhong: (ma: string) => void; onBatDau: () => void; onRoi: () => void; onDong: () => void
   khoiThem?: ReactNode
+  /** GAME HÓA 2.0 (`hoa2-sanh`): số ổ phục kích (câu ôn) còn lại hôm nay + số câu Đảo đang chờ. Có ⇒ chặng câu ôn MIỄN VÉ (máy chủ bỏ cổng vé),
+   *  hết câu ôn thì cầu sang Bát Linh Đảo đã hạ. Vắng ⇒ Sảnh y hệt bản cũ. */
+  hoa2?: { con: number; daoCon: number } | null
+  /** 2.0 · hết câu ôn: "QUA CẦU · KHÁM PHÁ ĐẢO". Vắng ⇒ dùng `onDong` (về Đảo). */
+  onRaDao?: () => void
 }
 
 // Bỏ vế bằng 0 ("còn 6 ngày", không "còn 6 ngày 0 giờ") và giữ số dính đơn vị (NBSP) để dòng hẹp không rớt "0" / "giờ" xuống dòng riêng.
@@ -40,12 +45,17 @@ export default function DoanSanh(p: Props) {
   // Lỗi của nút ở CUỐI màn (mở đoàn / vào đoàn) hiện cạnh nút; cuộn tới cho em thấy ngay.
   useEffect(() => { if (p.loi && (nut === 'mo' || nut === 'vao')) loiRef.current?.scrollIntoView?.({ block: 'nearest' }) }, [p.loi, nut])
   const loiO = (n: NutBam) => (p.loi && (nut === n || (nut === null && n === 'len')) ? <div className="dh-loi" role="alert" ref={loiRef}>{p.loi}</div> : null)
-  const s = p.sanh, lop = s?.doanLop, hetVe = !!s && !s.mienPhiHomNay && !s.ve, an = p.anThach && p.anThach.ds.length ? p.anThach : null, bdh = p.banDongHanh
+  const v2 = p.hoa2 ?? null
+  // 2.0: máy chủ bỏ cổng vé cho chặng câu ôn ⇒ KHÔNG khoá theo vé (khoá theo vé ở đây sẽ chặn oan em hết vé).
+  const s = p.sanh, lop = s?.doanLop, hetVe = !v2 && !!s && !s.mienPhiHomNay && !s.ve, an = p.anThach && p.anThach.ds.length ? p.anThach : null, bdh = p.banDongHanh
+  // 2.0 · hết câu ôn: lời của máy chủ (srs2-game `startDoan2`) nói trước khi em bấm, thay vì để `doan-mo` từ chối.
+  const hetOn = !!v2 && v2.con === 0, raDao = hetOn && !!v2 && v2.daoCon > 0
+  const chuHetOn = !v2 ? '' : v2.daoCon > 0 ? 'Em đã phá hết ổ phục kích hôm nay. Cầu sang Bát Linh Đảo đã hạ — ra đảo khám phá nhé.' : 'Hôm nay em không còn câu ôn nào. Mai quay lại hộ tống nhé.'
   // Nút "Mở đoàn mới": khoá thì nói LÝ DO ngay dưới nút. Máy chủ (`doan-mo`, cả cheDo phong) cũng qua cổng vé (`quaCongVe`) nên hết vé thì mở đoàn bị từ chối — khoá cùng luật với nút LÊN ĐƯỜNG, không đổi luật.
   const chuHetLuot = chuHetLuotDoan(p.goiY) // trần do máy chủ nói, không viết cứng số
   const hetChang = daHetChang(p.chang) // `doan-mo` (cả cheDo phong) ném lỗi khi đủ chặng/ngày — khoá đúng chỗ máy chủ sẽ từ chối, số chặng do máy chủ nói
   const chuHetChangNay = p.chang ? chuHetChang(p.chang) : ''
-  const khoaMo = p.goiY?.hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : hetVe ? CHU_HET_VE : p.ban ? 'Đang xử lý, em đợi một chút…' : null
+  const khoaMo = hetOn ? chuHetOn : p.goiY?.hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : hetVe ? CHU_HET_VE : p.ban ? 'Đang xử lý, em đợi một chút…' : null
   const sao = Array.from({ length: 26 }, (_, i) => <i key={i} style={{ left: `${(i * 53 + 17) % 100}%`, top: `${(i * 29 + 7) % 60}%`, animationDelay: `${(i % 7) * .4}s` }} />)
   return (
     <div className="dh-khung">
@@ -58,7 +68,7 @@ export default function DoanSanh(p: Props) {
       </header>
       {((s && ((s.ve !== null) || s.chuoi.ngay > 0)) || p.chang) && (
         <div className="dh-hang-the">
-          {s && s.ve !== null && <span className="dh-the-so dh-the-ve" aria-label={`Em có ${s.ve} vé hộ tống`}><Ticket size={16} aria-hidden="true" />Vé hộ tống: {s.ve}</span>}
+          {s && s.ve !== null && !v2 && <span className="dh-the-so dh-the-ve" aria-label={`Em có ${s.ve} vé hộ tống`}><Ticket size={16} aria-hidden="true" />Vé hộ tống: {s.ve}</span>}
           {s && s.chuoi.ngay > 0 && <span className="dh-the-so dh-the-chuoi" aria-label={`Chuỗi ${s.chuoi.ngay} ngày`}><Flame size={16} aria-hidden="true" />Chuỗi {s.chuoi.ngay} ngày</span>}
           {p.chang && <span className="dh-the-so dh-the-chang" data-vung="chang-hom-nay"><Flag size={16} aria-hidden="true" />{chuChangHomNay(p.chang)}</span>}
         </div>
@@ -94,19 +104,24 @@ export default function DoanSanh(p: Props) {
       ) : (
         <>
           <section className="dh-chang" aria-label="Chuyến hôm nay">
-            <span className="dh-chang-nhan">{!s ? 'CHUYẾN HÔM NAY' : s.mienPhiHomNay ? 'CHUYẾN HÔM NAY · MIỄN PHÍ' : 'CHUYẾN THÊM · 1 VÉ'}</span>
+            <span className="dh-chang-nhan">{v2 ? 'CHUYẾN CÂU ÔN · MIỄN PHÍ' : !s ? 'CHUYẾN HÔM NAY' : s.mienPhiHomNay ? 'CHUYẾN HÔM NAY · MIỄN PHÍ' : 'CHUYẾN THÊM · 1 VÉ'}</span>
             <h2>Hộ tống Linh Tâm qua 8 hiệp</h2>
             <div className="dh-quai-goc" aria-hidden="true"><QuaiHinh loai="bun_acid" size={76} /></div>
             <p>
-              {p.goiY?.hetLuot ? <>{chuHetLuot}</>
+              {v2 ? (hetOn ? <>{chuHetOn}</> : <>Câu ôn của riêng em hôm nay còn <b>{v2.con} câu</b> = {v2.con} ổ phục kích chặn cầu sang Bát Linh Đảo. 8 hiệp · 5–6 phút.</>)
+                : p.goiY?.hetLuot ? <>{chuHetLuot}</>
                 : p.goiY?.tong ? <>Câu của riêng em hôm nay: {p.goiY.nhom.map((n, i) => <span key={n.ten}>{i > 0 && ' · '}<b>{n.so} câu {n.ten}</b></span>)}. 8 hiệp · 5–6 phút.</>
                   : <>Mỗi hiệp em nhận MỘT câu vừa sức từ hồ sơ của chính em. Làm đúng thì ra đòn, làm sai thì thần thú tự chắn cho Linh Tâm. 8 hiệp · 5–6 phút.</>}
             </p>
             <div className="dh-chang-qua"><span className="dh-vien-thuoc">EXP thần thú</span><span className="dh-vien-thuoc">Liên Kích ×2 khi tiếp sức</span></div>
             {s?.quaMoi.map((q, i) => <div key={i} className="dh-qua-moi" role="status">＋{q.ve} vé · {q.ghiChu}</div>)}
             {loiO('len')}
-            <button type="button" className="dh-nut-vang" disabled={p.ban || !!p.goiY?.hetLuot || hetChang || hetVe} onClick={() => { setNut('len'); p.onLenDuong() }}>{BieuTuong.choi}<span>{p.ban ? 'ĐANG MỞ ĐƯỜNG…' : hetChang ? 'ĐÃ ĐI ĐỦ CHẶNG HÔM NAY' : hetVe ? 'HẾT VÉ HÔM NAY' : 'LÊN ĐƯỜNG'}</span></button>
-            <small>{p.goiY?.hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : hetVe ? CHU_HET_VE : s ? 'Chuyến thêm tốn 1 vé · vé chỉ kiếm được bằng làm bài tập · thua không mất gì' : 'Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì'}</small>
+            {raDao
+              ? <button type="button" className="dh-nut-vang" onClick={() => (p.onRaDao ?? p.onDong)()}><span>QUA CẦU · KHÁM PHÁ ĐẢO</span></button>
+              : <button type="button" className="dh-nut-vang" disabled={p.ban || hetOn || !!p.goiY?.hetLuot || hetChang || hetVe} onClick={() => { setNut('len'); p.onLenDuong() }}>{BieuTuong.choi}<span>{p.ban ? 'ĐANG MỞ ĐƯỜNG…' : hetOn ? 'HẾT CÂU ÔN HÔM NAY' : hetChang ? 'ĐÃ ĐI ĐỦ CHẶNG HÔM NAY' : hetVe ? 'HẾT VÉ HÔM NAY' : 'LÊN ĐƯỜNG'}</span></button>}
+            <small>{hetOn ? 'Câu em chưa đúng hôm nay sẽ quay lại thành ổ phục kích theo lịch ôn lại.'
+              : p.goiY?.hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : v2 ? 'Chuyến chở câu ôn của em: miễn phí · phá hết ổ phục kích hôm nay là cầu sang Bát Linh Đảo hạ · thua không mất gì'
+              : hetVe ? CHU_HET_VE : s ? 'Chuyến thêm tốn 1 vé · vé chỉ kiếm được bằng làm bài tập · thua không mất gì' : 'Đi một mình vẫn có bạn đồng hành do máy điều khiển · thua không mất gì'}</small>
           </section>
           {p.khoiThem}
           {s && (

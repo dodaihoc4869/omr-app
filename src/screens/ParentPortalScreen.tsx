@@ -1,3 +1,5 @@
+// GAME HÓA 2.0 (thầy chốt 27/09 "bỏ hẳn app phụ huynh"): app này NGỪNG THEO CÔNG TẮC — máy chủ `/hoa2/ph-ngung` báo `ngung:true` khi Game Hóa 2.0
+// bật CẢ TRUNG TÂM ⇒ chỉ một màn M3 báo đã ngừng (`PhDaNgung`, cuối tệp). Chưa bật / lỗi mạng ⇒ app phụ huynh dưới đây chạy nguyên vẹn (tắt công tắc là lùi).
 // APP PHỤ HUYNH MỚI (thầy chốt mẫu 21/09; docs/ban-ve-ph-moi-thu-ve-con-2109/; đề bài prompt-ph-moi-thu-ve-con-2109.md): đăng nhập bằng SBD/liên kết riêng của con → MÀN CHÍNH (lời chào, "Hôm nay của con", "Ca kiểm tra gần nhất",
 // dải cảnh báo của thầy, MỘT nút "Giao thêm bài cho con" dính đáy, chân "Đổi số báo danh") → bảng "MỌI THỨ VỀ CON" (gói tải lười). Dữ liệu: hai lệnh /ph/tat-ca-ve-con + /ph/chi-tiet-cau-ve-con (src/lib/ph-moi/) + /ph/giao-them.
 // Không menu, không tab, không thần thú/EXP/game. Danh sách đã gỡ ở lượt trước: docs/ph-toi-gian-2109.md.
@@ -19,6 +21,7 @@ import { useTatCaVeCon } from '../lib/ph-moi/use-tat-ca-ve-con'
 import { loadScriptUrl } from '../lib/exam-db'
 import { nhoVaiDaDung } from '../lib/vai-tro'
 import { datManifestTheoVai } from '../lib/pwa-install'
+import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
 import '../components/m3'
 
 // Bảng "Mọi thứ về con" nặng (ChemText + 9 khối): gói tải lười riêng, KHÔNG vào gói vào app / precache gói vào.
@@ -26,7 +29,8 @@ const BangMoiThu = lazy(() => import('../components/ph-moi/BangMoiThu'))
 
 const SBD_STORAGE_KEY = 'omr_ph_sbd'
 
-export default function ParentPortalScreen() {
+/** App phụ huynh bản đầy đủ (trước Game Hóa 2.0). `ParentPortalScreen` (cuối tệp) chỉ còn hiện nó khi Game Hóa 2.0 CHƯA bật cho cả trung tâm. */
+function ParentPortalCu() {
   const [sbdInput, setSbdInput] = useState('')
   const [sbdHienTai, setSbdHienTai] = useState<string | null>(null)
   const [hoTenCon, setHoTenCon] = useState('')
@@ -261,4 +265,84 @@ export default function ParentPortalScreen() {
       </div>
     </div>
   )
+}
+
+// ---------------------------------------------------------------- Game Hóa 2.0: ngừng theo công tắc
+export const CHU_PH_DA_NGUNG = 'Ứng dụng phụ huynh đã ngừng. Thầy gửi tiến độ của con trực tiếp cho phụ huynh.'
+
+/** Màn báo app phụ huynh đã ngừng. */
+export function PhDaNgung() {
+  useEffect(() => {
+    nhoVaiDaDung('ph')
+    try {
+      datManifestTheoVai('ph')
+      document.title = 'ĐĐH Phụ Huynh'
+    } catch {
+      // máy chặn đổi tiêu đề: màn vẫn hiện đúng
+    }
+  }, [])
+
+  return (
+    <div className="m3" data-man="ph-da-ngung">
+      <main
+        style={{
+          minHeight: '100dvh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 'max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom))',
+          background: 'var(--m3-surface)',
+          color: 'var(--m3-on-surface)',
+        }}
+      >
+        <section
+          aria-labelledby="ph-da-ngung-tieu-de"
+          style={{
+            width: '100%',
+            maxWidth: 440,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            padding: 24,
+            borderRadius: 28,
+            background: 'var(--m3-surface-container)',
+          }}
+        >
+          <LogoDoc vai="ph" size={64} tieuDe />
+          <h1 id="ph-da-ngung-tieu-de" style={{ margin: 0, fontSize: 22, fontWeight: 700, lineHeight: 1.3 }}>
+            Ứng dụng phụ huynh đã ngừng
+          </h1>
+          <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: 'var(--m3-on-surface-variant)' }}>{CHU_PH_DA_NGUNG}</p>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'var(--m3-on-surface-variant)' }}>
+            Phụ huynh cần hỏi thêm về việc học của con, xin nhắn trực tiếp cho thầy Đỗ Đại Học.
+          </p>
+        </section>
+      </main>
+    </div>
+  )
+}
+
+/** Hỏi máy chủ app phụ huynh đã ngừng chưa. Lỗi mạng / máy chủ cũ không có lệnh ⇒ `false` (giữ app cũ). */
+export async function hoiPhDaNgung(): Promise<boolean> {
+  try {
+    const url = await layDiaChiMayChu()
+    if (!url) return false
+    const r = await fetch(`${url}/hoa2/ph-ngung`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
+    const j = (await r.json()) as { ngung?: unknown }
+    return j?.ngung === true
+  } catch {
+    return false
+  }
+}
+
+export default function ParentPortalScreen({ ngungSan }: { ngungSan?: boolean } = {}) {
+  const [ngung, setNgung] = useState<boolean>(ngungSan === true)
+  useEffect(() => {
+    if (ngungSan !== undefined) return
+    let conSong = true
+    // Lùi MỘT nhịp: không chen trước lệnh đăng nhập của app phụ huynh (/ph/xac-dinh luôn là lệnh đầu tiên gửi đi).
+    const hen = setTimeout(() => { void hoiPhDaNgung().then((x) => { if (conSong && x) setNgung(true) }) }, 0)
+    return () => { conSong = false; clearTimeout(hen) }
+  }, [ngungSan])
+  return ngung ? <PhDaNgung /> : <ParentPortalCu />
 }

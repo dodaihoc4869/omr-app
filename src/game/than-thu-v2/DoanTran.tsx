@@ -10,6 +10,10 @@ import { CHU_HET_CAU_MOI } from './chu-het-luot'
 import { BieuTuong, LinhTamCau, QuaiHinh, ThuHinh, TrumHinh } from './DoanHinh'
 import { ChemText } from '../../lib/chem-format'
 import { LoiGiaiCauSai } from '../../components/KhoiCauSai'
+import Canh2 from './doan2/Canh2'
+import BuaTroGiang from './doan2/BuaTroGiang'
+import XemLaiChuan from './doan2/XemLaiChuan'
+import type { GoiYM3 } from './doan2/kieu2'
 
 export interface CauVuaLam { q: Question; chon: string; ketQua: KetQuaCau | null }
 export interface LoiGiaiTrum { hiep: number; de: Question; answer: string; solution: unknown }
@@ -22,6 +26,8 @@ interface Props {
   ban: boolean; dangChot?: boolean; /** Máy chủ báo hôm nay hết câu MỚI (bộ có câu em từng làm lâu rồi) — máy nói thật ở quãng chuẩn bị hiệp 1. */ hetCauMoi?: boolean; loi: string; ketQuaCau?: KetQuaCau | null; cauVuaLam?: CauVuaLam | null; loiGiaiTrum?: LoiGiaiTrum | null
   /** Tiếp sức: xin (khi em chưa chốt) và mở tấm trượt giúp bạn (khi em đã chốt). */
   onXinTiepSuc: (bat: boolean) => void; onMoTiepSuc: (ghe: number) => void; expTiepSuc?: number
+  /** GAME HÓA 2.0 (`hoa2-sanh` báo `cheDo2`): giao diện mới theo bản vẽ Moi-DoanTran — cùng lệnh, cùng luồng; vắng ⇒ y hệt bản cũ. */
+  cheDo2?: boolean; /** Gợi ý M3 (Bùa Trợ giảng) của câu đang chơi. */ goiY?: GoiYM3 | null; /** Ổ phục kích (câu ôn) còn lại hôm nay; null = chưa biết. */ oPhucKich?: number | null
 }
 
 const phut = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
@@ -105,11 +111,17 @@ export default function DoanTran(p: Props) {
     </div>
   )
 
+  const v2 = !!p.cheDo2
   let than: ReactNode
   if (!mo) {
     // Quãng nghỉ giữa hai hiệp: em đọc lại câu vừa làm + lời giải; sau hiệp trùm thì đáp án câu chung.
     const lg = p.loiGiaiTrum
-    than = lg ? (
+    than = lg && v2 ? (
+      <section className="dh-giay dh2-giay-ket" aria-label="Đáp án câu chung">
+        <div className="dh-giay-dau"><b className="dh-vien-thuoc dh-tim">ĐÁP ÁN CÂU CHUNG</b><span>hiệp {lg.hiep}</span></div>
+        <XemLaiChuan q={lg.de} chon="" dapAn={lg.answer} solution={lg.solution} stt={lg.hiep} onZoom={p.onZoom} />
+      </section>
+    ) : lg ? (
       <section className="dh-giay" aria-label="Đáp án câu chung">
         <div className="dh-giay-dau"><b className="dh-vien-thuoc dh-tim">ĐÁP ÁN CÂU CHUNG</b><span>hiệp {lg.hiep}</span></div>
         <DeBai q={lg.de} onZoom={p.onZoom} />
@@ -117,7 +129,8 @@ export default function DoanTran(p: Props) {
         <div className="dh-ket-qua-cau dh-dung"><details><summary>Lời giải</summary><LoiGiaiCauSai hoaHoc c={{ text: lg.de.text, phan: 'II', dapAnDung: lg.answer, loiGiai: lg.solution }} /></details></div>
       </section>
     ) : p.cauVuaLam ? (
-      <DoanCau q={p.cauVuaLam.q} chon={p.cauVuaLam.chon} onChon={() => {}} khoa ketQua={p.cauVuaLam.ketQua} onZoom={p.onZoom} dau={<><b className="dh-vien-thuoc">CÂU EM VỪA LÀM</b><span>đọc lại trước khi sang hiệp mới</span></>} />
+      <DoanCau q={p.cauVuaLam.q} chon={p.cauVuaLam.chon} onChon={() => {}} khoa ketQua={p.cauVuaLam.ketQua} onZoom={p.onZoom} dau={<><b className="dh-vien-thuoc">{v2 ? 'CÂU ÔN EM VỪA LÀM' : 'CÂU EM VỪA LÀM'}</b><span>đọc lại trước khi sang hiệp mới</span></>}
+        xemLaiChuan={v2 ? { stt: Math.max(1, tran.hiep - 1) } : undefined} />
     ) : (
       <section className="dh-giay"><div className="dh-de">{tran.hiep === 1 ? 'Cả đội vào vị trí. Mỗi bạn sẽ nhận MỘT câu của riêng mình — làm đúng thì ra đòn, làm sai thì thần thú tự chắn cho Linh Tâm.' : 'Hiệp mới sắp mở.'}</div></section>
     )
@@ -154,14 +167,17 @@ export default function DoanTran(p: Props) {
       </section>
     )
   } else {
-    const cau = xem.cau
+    const cau = xem.cau, nhanThe = v2 ? 'CÂU ÔN CỦA EM' : 'CÂU CỦA EM'
+    // 2.0: gạch CHỈ áp cho Phần I (máy chủ chỉ gửi gạch khi câu là trắc nghiệm); dải bùa hiện cả khi gợi ý là Kiến thức cốt lõi.
+    const gach = v2 && p.de?.phan === 'I' ? p.goiY?.gach : undefined, bua = v2 && p.goiY ? <BuaTroGiang goiY={p.goiY} /> : undefined
     than = !(cau?.het || cau?.rut) && p.de && !anhCauXong ? (
-      <section className="dh-giay" aria-label="Câu của em"><div className="dh-giay-dau"><b className="dh-vien-thuoc">CÂU CỦA EM</b></div><div className="dh-de" role="status">Đang tải hình của câu…</div></section>
+      <section className="dh-giay" aria-label="Câu của em"><div className="dh-giay-dau"><b className="dh-vien-thuoc">{nhanThe}</b></div><div className="dh-de" role="status">Đang tải hình của câu…</div></section>
     ) : cau?.het || cau?.rut || !p.de ? (
-      <section className="dh-giay"><div className="dh-giay-dau"><b className="dh-vien-thuoc">CÂU CỦA EM</b></div><div className="dh-de">{cau?.loiNhan ?? 'Đang tải câu của em…'}</div></section>
+      <section className="dh-giay"><div className="dh-giay-dau"><b className="dh-vien-thuoc">{nhanThe}</b></div><div className="dh-de">{cau?.loiNhan ?? 'Đang tải câu của em…'}</div></section>
     ) : (
       <DoanCau q={p.de} chon={p.chon} onChon={p.onChon} khoa={!!p.dangChot || !!cau?.daChot} ketQua={cau?.daChot ? p.ketQuaCau ?? cau.ketQua ?? null : null} onZoom={p.onZoom}
-        dau={<><b className="dh-vien-thuoc">CÂU CỦA EM</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}{cau?.an ? ' · ấn đã sáng' : ''}</span></>} />
+        dau={<><b className="dh-vien-thuoc">{nhanThe}</b><span>{p.de.tenDang || 'Hoá học'}{cau?.nhan ? ` · ${NHAN_CAU[cau.nhan]}` : ''}{cau?.an ? ' · ấn đã sáng' : ''}</span></>}
+        gach={gach} bua={bua} xemLaiChuan={v2 ? { stt: tran.hiep } : undefined} />
     )
   }
 
@@ -190,17 +206,21 @@ export default function DoanTran(p: Props) {
       {ts && !ts.theNhan && !cau?.rut && (ts.conLuotNhan > 0
         ? <button type="button" className="dh-xin" aria-pressed={ts.daXin} disabled={p.ban} onClick={() => p.onXinTiepSuc(!ts.daXin)}>{ts.daXin ? 'Đang chờ bạn tiếp sức… (chạm để thôi)' : `Cần tiếp sức · còn ${ts.conLuotNhan} lần được tiếp sức`}</button>
         : <div className="dh-cho" style={{ fontSize: 12 }}>Em đã dùng hết 2 lần được tiếp sức của chuyến này — câu này em tự làm nhé.</div>)}
-      <button type="button" className="dh-nut-lam" disabled={p.ban || !(du || boTrong) || !!cau?.rut && !boTrong} onClick={() => p.onChot(boTrong)}>
-        {p.dangChot ? 'Đang chốt…' : p.ban ? 'Chờ một chút…' : du ? `Chốt đòn · ${p.de!.phan === 'I' ? p.chon + ' + ' : ''}${tenDon}` : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt đòn'}
+      <button type="button" className={v2 ? 'dh-nut-lam dh2-nut-chinh dh2-baloo' : 'dh-nut-lam'} disabled={p.ban || !(du || boTrong) || !!cau?.rut && !boTrong} onClick={() => p.onChot(boTrong)}>
+        {v2
+          ? (p.dangChot ? 'ĐANG CHỐT…' : p.ban ? 'CHỜ MỘT CHÚT…' : du ? `CHỐT ĐÒN ${tenDon.toUpperCase()}${p.de!.phan === 'I' ? ` · ${p.chon}` : ''}` : boTrong ? 'CHỐT · BỎ TRỐNG + CHẮN' : 'CHỌN ĐÁP ÁN ĐỂ CHỐT ĐÒN')
+          : (p.dangChot ? 'Đang chốt…' : p.ban ? 'Chờ một chút…' : du ? `Chốt đòn · ${p.de!.phan === 'I' ? p.chon + ' + ' : ''}${tenDon}` : boTrong ? 'Chốt · bỏ trống + Chắn' : 'Chọn đáp án để chốt đòn')}
       </button>
     </>
   )
 
   return (
-    <div className="dh-khung">
-      <ThanhHiep hiep={tran.hiep} soHiep={tran.soHiep} ketThuc={tran.ketThuc} con={p.conGiay} giay={tran.giay} hien={mo} onRoi={p.onRoi} />
-      {canh}
-      {daiDoi}
+    <div className={v2 ? 'dh-khung dh2-tran' : 'dh-khung'}>
+      {v2 ? <Canh2 xem={xem} tran={tran} con={p.conGiay} mo={mo} oPhucKich={p.oPhucKich ?? null} onRoi={p.onRoi} /> : <>
+        <ThanhHiep hiep={tran.hiep} soHiep={tran.soHiep} ketThuc={tran.ketThuc} con={p.conGiay} giay={tran.giay} hien={mo} onRoi={p.onRoi} />
+        {canh}
+        {daiDoi}
+      </>}
       {than}
       {/* Thẻ tiếp sức của bạn nằm DƯỚI câu: đặt trên câu thì mỗi lần bạn gửi thẻ (nhịp hỏi 1,5 s) cả lưới đáp án bị đẩy xuống dưới ngón tay em (P0 "đáp án bị nhảy"). */}
       {mo && ts?.theNhan && <div className="dh-the-nhan" role="status"><small>{ts.theNhan.tuLaMay ? 'BẠN ĐỒNG HÀNH' : ts.theNhan.tuTen.toUpperCase()} TIẾP SỨC · {ts.theNhan.tieuDe.toUpperCase()}</small>{ts.theNhan.noiDung}</div>}

@@ -17,14 +17,28 @@ import DoanTiepSuc from './DoanTiepSuc'
 import { ManHinhAnh } from '../../components/QuestionMedia'
 import { unlockBattleAudio } from './battle-audio'
 import { batVongTrucTiep } from '../../lib/nhip-ben-vung'
+import { docHoa2, goiYCuaCau, type GoiYM3, type Hoa2Xem } from './doan2/kieu2'
+import KetChang2 from './doan2/KetChang2'
 import './doan.css'
+import './doan2/doan2.css'
 
 export const NHIP_HOI_MS = 1500
 const khoaLuu = (sbd: string) => `doan:${sbd}`
 const loiCua = (e: unknown) => (e instanceof Error ? e.message : 'Chưa kết nối được. Em thử lại nhé.')
 
-export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemVu }: { call: GoiDoan; sbd: string; pet: number; cap: number; onDong: () => void; onVeBangNhiemVu: () => void }) {
+/** `onRaDao` (chỉ-thêm, GAME HÓA 2.0): nút "QUA CẦU · KHÁM PHÁ ĐẢO" khi hết câu ôn. Nơi gọi chưa truyền ⇒ dùng `onDong` (về Đảo thần thú). */
+export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemVu, onRaDao }: { call: GoiDoan; sbd: string; pet: number; cap: number; onDong: () => void; onVeBangNhiemVu: () => void; onRaDao?: () => void }) {
   const [xem, setXem] = useState<DoanXem | null>(null)
+  // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): `hoa2-sanh` nói chế độ + số "ổ phục kích" (câu ôn còn lại hôm nay). null = cờ tắt / máy chủ cũ
+  // chưa có lệnh ⇒ MỌI màn giữ giao diện cũ. `hoa2SauChang`: đọc lại SAU khi chặng kết thúc (undefined = đang đọc, null = không đọc được).
+  const [hoa2, setHoa2] = useState<Hoa2Xem | null>(null), [hoa2SauChang, setHoa2SauChang] = useState<Hoa2Xem | null | undefined>(undefined)
+  const goiYCau = useRef(new Map<string, GoiYM3>()), laHoa2 = hoa2 !== null, hoa2Ref = useRef<Hoa2Xem | null>(null)
+  // Chỉ đặt lại khi SỐ đổi: cờ tắt thì `hoa2-sanh` trả về null mãi — không làm Đoàn cũ vẽ lại thêm lần nào.
+  const datHoa2 = useCallback((h: Hoa2Xem | null) => {
+    const cu = hoa2Ref.current
+    if (cu === h || (cu && h && cu.doanCon === h.doanCon && cu.daoCon === h.daoCon)) return
+    hoa2Ref.current = h; setHoa2(h)
+  }, [])
   const [goiY, setGoiY] = useState<GoiYHomNay | null>(null), [sanh, setSanh] = useState<SanhXem | null>(null)
   // Trần TÁCH RIÊNG (thầy 19:30): số lượt câu + chặng của ĐOÀN lấy từ `doan-sanh`, KHÔNG từ `recommendations` (đó là số của Đảo). Máy chủ cũ không gửi ⇒ null.
   const [luotDoan, setLuotDoan] = useState<LuotCauNgay | null>(null), [chang, setChang] = useState<ChangHomNay | null>(null), [hetCauMoi, setHetCauMoi] = useState(false)
@@ -54,6 +68,9 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     // Chốt chặn cuối (thầy lệnh 21/09 cấm rút câu tự luận): câu tự luận KHÔNG vào bộ nhớ đề ⇒ màn không dựng ô nhập cho nó.
     if (d.cau?.de && d.cau.qid && choPhepCauChoEm(d.cau.de, 'game-v2/doan')) de.current.set(d.cau.qid, d.cau.de)
     if (d.trum?.de && d.trum.qid && choPhepCauChoEm(d.trum.de, 'game-v2/doan-trum')) de.current.set(d.trum.qid, d.trum.de)
+    // 2.0: gợi ý M3 (Bùa Trợ giảng) của câu — máy chủ gửi cả ở gói "giữ nguyên"; giữ theo qid để dải bùa không chớp tắt giữa hai nhịp hỏi.
+    const goiYNay = goiYCuaCau(d.cau)
+    if (d.cau?.qid && goiYNay) goiYCau.current.set(d.cau.qid, goiYNay)
     moc.current = { luc: performance.now(), conMs: d.tran?.conMs ?? 0, moSauMs: d.tran?.moSauMs ?? 0 }
     const hiep = d.tran?.hiep ?? 0
     if (hiep !== hiepDangLam.current) { hiepDangLam.current = hiep; setChon(''); setHanhDong('danh'); setYChon({}); setKetQuaCau(null); setChoRoi(false); setGoiYTiepSuc(null); setExpTiepSuc(0) }
@@ -61,6 +78,9 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (vua && vua.hiep > hiepDaChieu.current) { hiepDaChieu.current = vua.hiep; setTungChuong(vua); setLoiGiaiTrum(null) }
     setXem(d)
   }, [sbd])
+
+  // Đọc `hoa2-sanh` KHÔNG qua `goi` (không khoá nút, không hiện lỗi): lỗi / máy chủ cũ ⇒ giữ nguyên chế độ đang có.
+  const docLaiHoa2 = useCallback(() => call('hoa2-sanh').then(r => { const h = docHoa2(r); if (song.current) datHoa2(h); return h }).catch(() => undefined), [call, datHoa2])
 
   const goi = useCallback(async (lenh: string, data: Record<string, unknown> = {}) => {
     if (khoa.current) return null
@@ -80,7 +100,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
       // `remaining`/`dailyUsed`/`tranNgay` ở đây là của ĐẢO: KHÔNG dùng cho hết-lượt của Đoàn (chỉ lấy danh sách gợi ý).
       if (song.current) setGoiY({ tong: x.suggestions?.length ?? 0, nhom: [...dem].map(([ten, so]) => ({ ten, so })).slice(0, 3), hetLuot: false })
     }).catch(() => { /* không có gợi ý: thẻ dùng lời chung */ })
-  }, [sbd, call, apDung, apSanh])
+    void docLaiHoa2()
+  }, [sbd, call, apDung, apSanh, docLaiHoa2])
 
   const dangDi = !!xem && (!xem.batDau || !xem.tran?.ketThuc)
   // Hỏi-đáp ngắn: chỉ khi đang có đoàn, tab đang hiện, không có lệnh khác đang bay.
@@ -128,6 +149,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (r.doan?.tran?.hiep === tran.hiep) setKetQuaCau(kq)
     if (kq?.reward) setExpNhan(n => n + (kq.reward ?? 0))
     setCauVuaLam(deHienTai ? { q: deHienTai, chon: boTrong ? '' : chon, ketQua: kq } : null)
+    if (laHoa2) void docLaiHoa2() // 2.0: một ổ phục kích vừa bị phá ⇒ số "Ổ phục kích còn N" đọc lại từ máy chủ, không tự trừ
   }
   const moTiepSuc = async (ghe: number) => { if (!xem) return; const r = await goi('doan-the-goi-y', { ma: xem.ma, den: ghe }); if (r?.goiY) setGoiYTiepSuc(r.goiY) }
   const guiThe = async (loai: string) => {
@@ -145,8 +167,9 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const veSanh = () => {
     try { sessionStorage.removeItem(khoaLuu(sbd)) } catch { /* bỏ qua */ }
     phienBan.current = { ma: '', revision: -1 }; hiepDaChieu.current = 0; hiepDangLam.current = 0
-    setXem(null); setTungChuong(null); setCauVuaLam(null); setLoiGiaiTrum(null); setExpNhan(0); setLoi(''); setHetCauMoi(false)
+    setXem(null); setTungChuong(null); setCauVuaLam(null); setLoiGiaiTrum(null); setExpNhan(0); setLoi(''); setHetCauMoi(false); goiYCau.current.clear(); setHoa2SauChang(undefined)
     void call('doan-sanh').then(r => { if (song.current) apSanh(r as PhanHoiDoan) }).catch(() => {})
+    if (laHoa2) void docLaiHoa2()
   }
   const xongChuong = () => {
     const kq = tungChuong; setTungChuong(null)
@@ -158,23 +181,32 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const daKet = !!xem?.tran?.ketThuc
   const [veSauChang, setVeSauChang] = useState<number | null | undefined>(undefined)
   useEffect(() => { if (!daKet) { setVeSauChang(undefined); return } void call('doan-sanh').then(r => { if (song.current) { const x = (r as PhanHoiDoan).sanh; apSanh(r as PhanHoiDoan); setVeSauChang(x ? x.ve : undefined) } }).catch(() => {}) }, [daKet, call, apSanh])
+  // 2.0: chặng vừa kết thúc ⇒ đọc lại số ổ phục kích để màn thắng nói THẬT cầu đã hạ chưa (không đoán từ số câu của chặng).
+  useEffect(() => {
+    if (!daKet || !laHoa2) return // `hoa2SauChang` về undefined (đang đọc) ở `veSanh` — không đặt state đồng bộ trong hiệu ứng
+    void call('hoa2-sanh').then(r => { if (!song.current) return; const h = docHoa2(r); setHoa2SauChang(h); if (h) datHoa2(h) }).catch(() => { if (song.current) setHoa2SauChang(null) })
+  }, [daKet, laHoa2, call, datHoa2])
   const trongTran = !!xem?.batDau && !!tran && !(tran.ketThuc && !tungChuong)
   const loaiQuaiVuaDanh = tungChuong && !tungChuong.laTrum ? (tungChuong.hiep < HIEP_TRUM[0]! ? 0 : 1) : 0
   const than = !xem || !xem.batDau || !tran ? (
     <DoanSanh pet={pet} cap={cap} tenDoan="Đoàn Hộ Tống" goiY={goiYSanh} chang={chang} sanh={sanh} anThach={anThach} banDongHanh={banDongHanh} phong={xem} ban={ban} loi={loi}
+      hoa2={hoa2 ? { con: hoa2.doanCon, daoCon: hoa2.daoCon } : null} onRaDao={onRaDao}
       onLenDuong={() => { unlockBattleAudio(); void goi('doan-mo') }} onMoPhong={() => { unlockBattleAudio(); void goi('doan-mo', { cheDo: 'phong' }) }}
       onVaoPhong={ma => { unlockBattleAudio(); void goi('doan-vao', { ma }) }} onBatDau={() => xem && void goi('doan-bat-dau', { ma: xem.ma })} onRoi={() => void roi()} onDong={onDong} />
+  ) : tran.ketThuc && !tungChuong && xem.ketChang && hoa2 ? (
+    <KetChang2 xem={xem} expNhan={expNhan} cau={hoa2SauChang} ban={ban} onRaDao={() => { veSanh(); (onRaDao ?? onDong)() }} onVeBanDo={() => { veSanh(); onDong() }} onDiTiep={veSanh} />
   ) : tran.ketThuc && !tungChuong && xem.ketChang ? (
     <DoanKetChang xem={xem} expNhan={expNhan} ve={veSauChang} ban={ban} onVe={() => { veSanh(); onVeBangNhiemVu() }} onDiTiep={veSanh} />
   ) : (
     <DoanTran xem={xem} de={deHienTai} deTrum={deTrum} conGiay={conGiay} moSauGiay={moSauGiay} chon={chon} onChon={setChon} hanhDong={hanhDong} onHanhDong={setHanhDong}
       yChon={yChon} onYChon={(y, v) => setYChon(o => ({ ...o, [y]: v }))} onChot={b => void chot(b)} onChotY={chotY} onTinHieu={t => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: t })}
       onXinTiepSuc={bat => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: bat ? 'can_tiep_suc' : '' })} onMoTiepSuc={g => void moTiepSuc(g)} expTiepSuc={expTiepSuc}
-      onRoi={() => void roi()} onZoom={setZoom} ban={ban} dangChot={dangChot} hetCauMoi={hetCauMoi} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum} />
+      onRoi={() => void roi()} onZoom={setZoom} ban={ban} dangChot={dangChot} hetCauMoi={hetCauMoi} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum}
+      cheDo2={laHoa2} goiY={xem.cau?.qid ? goiYCau.current.get(xem.cau.qid) ?? null : null} oPhucKich={hoa2?.doanCon ?? null} />
   )
 
   return createPortal(
-    <div className={`dh ${tinh ? 'dh-tinh' : ''} ${trongTran ? 'dh-tran' : ''}`} data-man={!xem?.batDau ? 'sanh' : tran?.ketThuc && !tungChuong ? 'ket-chang' : tran?.laTrum ? 'trum' : 'tran'}>
+    <div className={`dh ${laHoa2 ? 'dh2' : ''} ${tinh ? 'dh-tinh' : ''} ${trongTran ? 'dh-tran' : ''}`} data-che-do={laHoa2 ? '2' : undefined} data-man={!xem?.batDau ? 'sanh' : tran?.ketThuc && !tungChuong ? 'ket-chang' : tran?.laTrum ? 'trum' : 'tran'}>
       {than}
       {tungChuong && xem && tran && <DoanTungChuong kq={tungChuong} ghe={xem.ghe} loaiQuai={tran.loaiQuai[loaiQuaiVuaDanh] ?? 'bun_acid'} tenQuai={tran.tenQuai[loaiQuaiVuaDanh] ?? 'Tạp Chất'} tinh={tinh} onXong={xongChuong} />}
       {goiYThe && trongTran && !tungChuong && <DoanTiepSuc goiY={goiYThe} ban={ban} loi={loi} onChon={l => void guiThe(l)} onDong={() => { setGoiYTiepSuc(null); setLoi('') }} />}

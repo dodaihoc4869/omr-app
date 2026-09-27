@@ -14,15 +14,18 @@ const DoanHoTong=lazy(()=>import('./DoanHoTong'))
 const DaoThanThu=lazy(()=>import('./dao/DaoThanThu'))
 /** Võ đài 2 đấu 2 cũ giữ nguyên mã, chỉ đổi cửa vào: sự kiện tuần, mở thứ Bảy (giờ Việt Nam). */
 export const laThuBayVn=(now=Date.now())=>new Date(now+7*3600000).getUTCDay()===6
-/** CỬA VÀO TỪ NGOÀI (Bảng nhiệm vụ…): truyền prop `manDau="doan"`, hoặc đặt sessionStorage `game-v2:man-dau`=`doan` trước khi mở tab thần thú. */
+/** CỬA VÀO TỪ NGOÀI (Bảng nhiệm vụ, Sảnh bản đồ 2.0…): truyền prop `manDau="doan"`, hoặc đặt sessionStorage `game-v2:man-dau`=`doan` trước khi mở tab thần thú.
+ *  Giá trị: `doan` (Đoàn Hộ Tống) · `shop` (Cửa hàng phụ kiện, khi máy chủ báo shopBat) · `tui-do` (Túi đồ trong Đảo thần thú). */
 export const KHOA_MAN_DAU='game-v2:man-dau'
 type Tab='home'|'doan'|'learn'|'arena'|'progress'|'coming'
-/** CỜ MỞ GAME (`doanMo` do máy chủ trả ở lệnh profile). TẮT ⇒ các mục game Y HỆT trước khi có Đoàn: không tab Đoàn, Võ đài cũ mở mọi ngày, tên tab cũ. */
-export function cuaGame(doanMo:boolean,now=Date.now()):{nav:readonly (readonly [Tab,string])[];voDaiMo:boolean}{
+/** CỜ MỞ GAME (`doanMo` do máy chủ trả ở lệnh profile). TẮT ⇒ các mục game Y HỆT trước khi có Đoàn: không tab Đoàn, Võ đài cũ mở mọi ngày, tên tab cũ.
+ *  GAME HÓA 2.0 (`cheDo2`, cờ `game_hoa_2` — `hoa2-sanh` trả `cheDo2:true`): thanh chọn chỉ còn Đảo thần thú (+ Đoàn Hộ Tống khi `doanMo`) — bỏ Võ đài, Tiến bộ, Sắp ra mắt. Cờ tắt ⇒ như cũ. */
+export function cuaGame(doanMo:boolean,now=Date.now(),cheDo2=false):{nav:readonly (readonly [Tab,string])[];voDaiMo:boolean}{
+ if(cheDo2)return {nav:[['home','Đảo thần thú'],...(doanMo?[['doan','Đoàn Hộ Tống'] as const]:[])],voDaiMo:false}
  return doanMo?{nav:[['home','Đảo thần thú'],['doan','Đoàn Hộ Tống'],['arena','Võ đài thứ Bảy'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:laThuBayVn(now)}
   :{nav:[['home','Đảo thần thú'],['arena','Hộ Tống Linh Tâm'],['progress','Tiến bộ của em'],['coming','Game mới · Sắp ra mắt']],voDaiMo:true}
 }
-function docManDau(prop:unknown):{tab:Tab;shop:boolean}{let luu='';try{luu=sessionStorage.getItem(KHOA_MAN_DAU)??'';sessionStorage.removeItem(KHOA_MAN_DAU)}catch{/* Storage may be disabled. */}return {tab:prop==='doan'||luu==='doan'?'doan':'home',shop:prop==='shop'||luu==='shop'}} // 'shop' = mở thẳng Cửa hàng phụ kiện (chỉ khi máy chủ báo shopBat)
+function docManDau(prop:unknown):{tab:Tab;shop:boolean;tuiDo:boolean}{let luu='';try{luu=sessionStorage.getItem(KHOA_MAN_DAU)??'';sessionStorage.removeItem(KHOA_MAN_DAU)}catch{/* Storage may be disabled. */}return {tab:prop==='doan'||luu==='doan'?'doan':'home',shop:prop==='shop'||luu==='shop',tuiDo:prop==='tui-do'||luu==='tui-do'}} // 'shop' = mở thẳng Cửa hàng phụ kiện (chỉ khi máy chủ báo shopBat)
 import ProgressChart from './ProgressChart'
 import TheCau from '../../components/TheCau'
 import type {TheCauProps} from '../../components/TheCau'
@@ -36,9 +39,11 @@ import type {ShieldState} from './shields'
 interface Profile {nickname?:string;academic?:{total:number;today:number;lastGain:number;dailyLimit:number};shields?:ShieldState;pet:string;choice:boolean;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null}
 interface Feedback {correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}
 interface Result {ok:boolean;doanMo?:boolean;dailyUsed?:number;suggestions?:{title:string;source:string;part:string}[];history?:{day:string;total:number;correct:number}[];mode?:Mode;answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[];pass?:string;tasks?:{id:string;dang:string}[];error?:string;profile?:Profile;revision?:number;remaining?:number;questions?:Question[];id?:string;message?:string;missing?:number;correct?:boolean;answer?:string;solution?:unknown;reward?:number;stage?:number;solutionImages?:HinhAnh[]}
-interface Props {sbd:string;token?:string;manDau?:'home'|'doan'|'shop';onDong:()=>void;[key:string]:unknown}
+interface Props {sbd:string;token?:string;manDau?:'home'|'doan'|'shop'|'tui-do';onDong:()=>void;[key:string]:unknown}
 export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  const [doanMo,setDoanMo]=useState(false)
+ // GAME HÓA 2.0: null = chưa biết (đang hỏi `hoa2-sanh`), true/false = đã biết. `sanh2` = phản hồi ấy, đưa cho Đảo dùng lần vẽ đầu.
+ const [cheDo2,setCheDo2]=useState<boolean|null>(null),[sanh2,setSanh2]=useState<unknown>(null)
  const [,setExpPending]=useState(0)
  const latestRevision=useRef(0)
  useEffect(()=>{latestRevision.current=0},[sbd])
@@ -52,6 +57,10 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  const [session,setSession]=useState('');const [questions,setQuestions]=useState<Question[]>([]);const [position,setPosition]=useState(0);const [mode,setMode]=useState<Mode>('adventure');const [answer,setAnswer]=useState('');const [assisted,setAssisted]=useState(false);const [feedback,setFeedback]=useState<Feedback|null>(null);const [done,setDone]=useState(false)
  // Cửa vào từ ngoài xin mở thẳng Đoàn nhưng máy chủ báo em chưa được mở → về Đảo thần thú như cũ, không để màn trống.
  useEffect(()=>{if(profile&&!doanMo&&tab==='doan')setTab('home')},[profile,doanMo,tab])
+ // 2.0 không còn Võ đài / Tiến bộ / Sắp ra mắt ⇒ lỡ đứng ở các mục ấy thì về Đảo.
+ useEffect(()=>{if(cheDo2&&(tab==='arena'||tab==='progress'||tab==='coming'))setTab('home')},[cheDo2,tab])
+ // Rời tab Đảo ⇒ bỏ số bản đồ đã đọc (quay lại thì Đảo tự đọc mới — vd vừa phá xong ổ phục kích ở Đoàn).
+ useEffect(()=>{if(tab!=='home')setSanh2(null)},[tab])
  const mounted=useRef(true);const running=useRef(false)
  useEffect(()=>()=>{mounted.current=false},[])
  const request=useCallback(async(action:string,data:Record<string,unknown>={},sessionToken=token):Promise<Result>=>{
@@ -61,6 +70,11 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
  },[token,sbd])
  useEffect(()=>{const update=(event:Event)=>{const d=(event as CustomEvent).detail;if(d.sbd===sbd&&d.profile&&d.revision>=latestRevision.current){latestRevision.current=d.revision;setExpPending(d.pending??0);setProfile(d.profile);setRevision(d.revision)}};window.addEventListener('spirit-academic-synced',update);return()=>window.removeEventListener('spirit-academic-synced',update)},[sbd])
  const run=async(fn:()=>Promise<unknown>)=>{if(running.current)return;running.current=true;setBusy(true);setError('');setMaLoi('');try{await fn()}catch(e){setError(e instanceof Error?e.message:'Không kết nối được. Em thử lại.');setMaLoi(maCuaLoi(e))}finally{running.current=false;if(mounted.current)setBusy(false)}}
+ // Hỏi MỘT lần mỗi phiên game: chế độ 2.0 bật cho em này chưa. Máy chủ cũ / lỗi ⇒ false (Đảo cũ nguyên vẹn).
+ const coHoSo=!!profile
+ useEffect(()=>{if(!token||!coHoSo)return;let huy=false
+  request('hoa2-sanh').then(r=>{if(huy)return;const bat=(r as {cheDo2?:unknown}).cheDo2===true;setCheDo2(bat);setSanh2(bat?r:null)}).catch(()=>{if(!huy)setCheDo2(false)})
+  return()=>{huy=true}},[token,coHoSo,request])
  useEffect(()=>{mounted.current=true;if(!token){setBusy(false);return}let cancelled=false;setBusy(true);request('profile').catch(e=>{if(!cancelled)setError(String(e.message))}).finally(()=>{if(!cancelled)setBusy(false)});return()=>{cancelled=true}},[token,request])
  useEffect(()=>{if(!token)return;let pending=false;const refresh=async():Promise<boolean>=>{if(document.hidden||pending||running.current)return true;pending=true;try{await request('profile');return true}catch{/* The next user action reports authentication errors. */return false}finally{pending=false}};
  // Nhịp nền CHẬM (180 s ± 30 s, không chồng, lỗi ⇒ lùi 30→60→120 s; sự cố D1 21/09: 20 giây × mọi máy em); vào game đã nạp hồ sơ nên KHÔNG gọi ngay; quay lại tab vẫn nạp nhưng dội ≥ 20 giây.
@@ -94,7 +108,7 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
   {!token||(!profile&&!busy)?<div className="spirit-panel"><h2>Mở hồ sơ game của em</h2><p>Nhập mật khẩu học sinh để giữ tiến độ giữa các thiết bị.</p><input type="password" autoComplete="current-password" aria-label="Mật khẩu học sinh" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')void login()}}/><button disabled={busy||!password} onClick={()=>void login()}>Mở game</button></div>:null}
   {busy&&!voDao&&<p role="status" className="spirit-status">{syncLeft!==null?`Đang nối kho bài tập, còn ${syncLeft} tờ đề…`:'Đang lưu và kiểm tra…'}</p>}
   {profile&&<>
-   {!voDao&&<nav className="spirit-nav" aria-label="Mục game">{cuaGame(doanMo).nav.map(([id,label])=><button key={id} aria-current={tab===id?'page':undefined} onClick={()=>setTab(id)}>{label}</button>)}</nav>}
+   {!voDao&&<nav className="spirit-nav" aria-label="Mục game">{cuaGame(doanMo,Date.now(),!!cheDo2).nav.map(([id,label])=><button key={id} aria-current={tab===id?'page':undefined} onClick={()=>setTab(id)}>{label}</button>)}</nav>}
    {!profile.choice&&<>
    {tab==='learn'&&<div className="spirit-panel">
     <header className="spirit-row"><h2>{mode==='arena'?'Luyện Hoá tiếp sức đội':'Nhiệm vụ của em'}</h2><span>{questions.length?`${Math.min(position+1,questions.length)} / ${questions.length} câu`:''}</span></header>
@@ -109,10 +123,10 @@ export default function Game({sbd,token:initialToken,manDau,onDong}:Props){
    </div>}
    </>}
    {/* ĐẢO THẦN THÚ bản mới (Code 6, docs/hop-dong-dao-than-thu-prop-2109.md): MỘT vỏ lo trọn chọn thú → đảo → thám hiểm → sổ tay → túi đồ + thanh dưới. Vỏ tự gọi choose/rename/recommendations/so-tay/resume/sync/start/answer/complete/shield-use/invest qua `request`. Lượt Võ đài (arena) vẫn ở tab learn cũ. */}
-   {(profile.choice||tab==='home')&&<Suspense fallback={<p role="status" className="spirit-status">Đang mở đảo…</p>}><DaoThanThu sbd={sbd} token={token} moShopLucDau={manDauDoc.shop} profile={profile} doanMo={doanMo} call={request} tasks={tasks} moiDoan={doanMo&&tab==='doan'} onMoDoan={()=>setTab('doan')} onMoVoDai={()=>setTab('arena')} onMoTienBo={()=>setTab('progress')} onDong={onDong}/></Suspense>}
+   {(profile.choice||tab==='home')&&(cheDo2===null?<p role="status" className="spirit-status">Đang mở đảo…</p>:<Suspense fallback={<p role="status" className="spirit-status">Đang mở đảo…</p>}><DaoThanThu sbd={sbd} token={token} moShopLucDau={manDauDoc.shop} moTuiDoLucDau={manDauDoc.tuiDo} profile={profile} doanMo={doanMo} call={request} tasks={tasks} moiDoan={doanMo&&tab==='doan'} onMoDoan={()=>setTab('doan')} onMoVoDai={cheDo2?undefined:()=>setTab('arena')} onMoTienBo={cheDo2?undefined:()=>setTab('progress')} onDong={onDong} cheDo2={cheDo2} sanh2={sanh2}/></Suspense>)}
    {!profile.choice&&<>
    {doanMo&&tab==='doan'&&<Suspense fallback={<p role="status" className="spirit-status">Đang mở đường cho Đoàn Hộ Tống…</p>}><DoanHoTong call={request} sbd={sbd} pet={petIndex} cap={profile.cap} onDong={()=>setTab('home')} onVeBangNhiemVu={onDong}/></Suspense>}
-   {cuaGame(doanMo).voDaiMo?<div hidden={tab!=='arena'}><EscortRoom storageKey={sbd} call={request} active={tab==='arena'}/></div>:tab==='arena'&&<div className="spirit-panel"><small>SỰ KIỆN TUẦN</small><h2>Võ đài thứ Bảy</h2><p>Đấu đội 2 đấu 2 mở vào <strong>thứ Bảy hằng tuần</strong>. Các ngày còn lại, cả lớp cùng đi <strong>Đoàn Hộ Tống</strong>: mỗi ngày một chặng 5–6 phút, làm đúng câu vừa sức của mình là góp sức cho cả đoàn.</p><button className="spirit-primary" onClick={()=>setTab('doan')}>Vào Đoàn Hộ Tống</button></div>}
+   {cheDo2===false&&cuaGame(doanMo).voDaiMo?<div hidden={tab!=='arena'}><EscortRoom storageKey={sbd} call={request} active={tab==='arena'}/></div>:tab==='arena'&&<div className="spirit-panel"><small>SỰ KIỆN TUẦN</small><h2>Võ đài thứ Bảy</h2><p>Đấu đội 2 đấu 2 mở vào <strong>thứ Bảy hằng tuần</strong>. Các ngày còn lại, cả lớp cùng đi <strong>Đoàn Hộ Tống</strong>: mỗi ngày một chặng 5–6 phút, làm đúng câu vừa sức của mình là góp sức cho cả đoàn.</p><button className="spirit-primary" onClick={()=>setTab('doan')}>Vào Đoàn Hộ Tống</button></div>}
    {tab==='coming'&&<div className="spirit-panel mission-coming"><span aria-hidden="true">✦</span><small>CHUẨN BỊ PHÁT HÀNH</small><h2>Một hành trình mới đang đến</h2><p>Game mới đang được chuẩn bị. Em tiếp tục làm nhiệm vụ để nuôi thần thú nhé.</p></div>}
    {tab==='progress'&&<ProgressChart request={request}/>}
    </>}

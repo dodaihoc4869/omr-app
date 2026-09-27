@@ -1,0 +1,276 @@
+// BUỔI CHỮA khi chiến dịch hết hạn nộp (bản vẽ docs/ban-ve-game-hoa-2-2709/GV-BuoiChua.dc.html) — dữ liệu từ `buoi-chua`.
+// Bảng câu xếp sẵn (điểm chữa = chưa thành thạo + 2 × cần dạy lại, mỗi dạng một câu), người lên bảng (giải mẫu + sửa),
+// thời gian ước lượng bằng CÙNG công thức của Gọi lên bảng (`thoiGianCau`), tổng ≤ 90 phút, mỗi em có mặt ≥ 1 lượt (`xepBuoiChua`).
+// Nút chính "Mở tờ máy chiếu" (luồng tờ chiếu có sẵn), "Chữa xong" (hỏi lại, nói rõ hậu quả) ⇒ `chua-xong`, "Mở ca chốt".
+import { useMemo, useState } from 'react'
+import { useAppStore } from '../../store/appStore'
+import { thoiGianCau } from '../../lib/thoi-gian-len-bang'
+import HopXacNhan from '../HopXacNhan'
+import { chuaXong, type BuoiChuaMayChu, type CauCanDayLai, type EmTen } from './api'
+import HopChon from './HopChon'
+import { congNgay, hienHanNop, hienNgay, phanTram } from './ngay'
+import { noiDungCua, type CauGoc, type OChieu } from './to-chieu'
+import { cauCaChot, chuNguoiSua, sapTheoTen, saoTuMucDo, xepBuoiChua, type DongBuoiChua } from './tinh'
+import './chien-dich.css'
+
+/** Khoá phiên (sessionStorage) màn Mở ca kiểm tra đọc để chọn sẵn câu của ca chốt. */
+export const KHOA_CA_CHOT = 'ddh.caChotChienDich'
+
+export function oChieuTuDong(dong: readonly DongBuoiChua[]): OChieu[] {
+  return dong.map((d) => {
+    const nguoi = d.giaiMau ?? d.sua[0] ?? null
+    return {
+      qid: d.cau.qid,
+      stt: d.cau.stt,
+      phan: d.cau.phan,
+      mucDo: d.cau.mucDo,
+      sbd: nguoi?.sbd ?? '',
+      ten: nguoi?.ten ?? 'Cả lớp',
+      viSao: d.giaiMau ? 'Giải mẫu' : 'Chưa em nào thành thạo — thầy giải mẫu cùng em',
+    }
+  })
+}
+
+export default function BuoiChua({
+  du,
+  dsEm,
+  coMat,
+  canDayLai,
+  homNay,
+  tra,
+  dangChieu,
+  onChieu,
+  onDoiCoMat,
+  onDaChua,
+}: {
+  du: BuoiChuaMayChu
+  /** Mọi em của chiến dịch (để chọn em có mặt). */
+  dsEm: EmTen[]
+  /** SBD em có mặt; rỗng = cả lớp. */
+  coMat: string[]
+  canDayLai: CauCanDayLai[]
+  homNay: string
+  tra: ReadonlyMap<string, CauGoc>
+  dangChieu: boolean
+  onChieu: (ds: OChieu[], tenBuoi: string) => Promise<boolean>
+  onDoiCoMat: (sbd: string[]) => void
+  onDaChua: () => void
+}) {
+  const showToast = useAppStore((s) => s.showToast)
+  const setScreen = useAppStore((s) => s.setScreen)
+  const [hoiChua, setHoiChua] = useState(false)
+  const [dangChua, setDangChua] = useState(false)
+  const [daChua, setDaChua] = useState<{ soLuot: number; ngayOnLai: string } | null>(null)
+  const [moCoMat, setMoCoMat] = useState(false)
+  const [chonCoMat, setChonCoMat] = useState<Set<string>>(new Set())
+
+  const emCoMat = useMemo(() => (coMat.length ? dsEm.filter((e) => coMat.includes(e.sbd)) : dsEm), [dsEm, coMat])
+  const kq = useMemo(
+    () =>
+      xepBuoiChua(du.cau, emCoMat, (c) =>
+        thoiGianCau({ phan: c.phan, sao: saoTuMucDo(c.mucDo), noiDung: noiDungCua(tra, c.qid), tiLeLopSai: du.soEm ? c.soChuaThanhThao / du.soEm : 0 }).tong,
+      ),
+    [du, emCoMat, tra],
+  )
+  const phut = (giay: number) => Math.ceil(giay / 60)
+  const luotDayLai = kq.dong.reduce((s, d) => s + d.cau.soCanDayLai, 0)
+  const ngayMai = congNgay(homNay, 1)
+  const caChot = cauCaChot(
+    kq.dong.map((d) => d.cau),
+    canDayLai,
+  )
+
+  const chua = async () => {
+    setDangChua(true)
+    const r = await chuaXong(du.chienDich.id, kq.dong.map((d) => d.cau.qid))
+    setDangChua(false)
+    setHoiChua(false)
+    if (!r.ok) {
+      showToast(r.chu, 'warn')
+      return
+    }
+    setDaChua(r.du)
+    showToast(`Đã ghi chữa xong: ${r.du.soLuot} lượt em, ôn lại từ ${hienNgay(r.du.ngayOnLai)}`, 'success')
+    onDaChua()
+  }
+
+  const moCaChot = () => {
+    // TODO(ExamSetupScreen — làn khác): đọc sessionStorage[KHOA_CA_CHOT] để CHỌN SẴN các câu này khi mở ca chốt.
+    // Hiện màn Mở ca kiểm tra chưa nhận danh sách câu từ ngoài, nên thầy vẫn tự chọn tờ đề của chiến dịch.
+    try {
+      sessionStorage.setItem(KHOA_CA_CHOT, JSON.stringify({ chienDichId: du.chienDich.id, ten: du.chienDich.ten, lop: du.chienDich.lop, qids: caChot }))
+    } catch {
+      /* chặn bộ nhớ phiên: chỉ mất phần điền sẵn */
+    }
+    showToast(`Ca chốt ${caChot.length} câu: màn Mở ca chưa tự chọn sẵn câu — thầy chọn tờ đề của chiến dịch ${du.chienDich.ten}`, 'warn')
+    setScreen('examsetup')
+  }
+
+  return (
+    <>
+      <div className="cd-dau">
+        <div>
+          <h1>Lên bảng · Buổi chữa {du.chienDich.ten}</h1>
+          <p className="cd-so">
+            Chiến dịch đã hết hạn nộp lúc {hienHanNop(du.chienDich.hanNop, false).replace(' · ', ' ')}
+            {du.chienDich.lop ? ` · Lớp ${du.chienDich.lop}` : ''} · có mặt {emCoMat.length}/{dsEm.length || emCoMat.length} em ·{' '}
+            <button
+              type="button"
+              className="m3-nut-chu cd-nut-nho"
+              style={{ padding: '0 8px', display: 'inline-flex', verticalAlign: 'baseline' }}
+              onClick={() => {
+                setChonCoMat(new Set(emCoMat.map((e) => e.sbd)))
+                setMoCoMat(true)
+              }}
+            >
+              Đổi em có mặt
+            </button>
+          </p>
+        </div>
+        <span className="cd-chip cd-chip--vang">Hết hạn nộp · buổi chữa xếp sẵn</span>
+      </div>
+
+      <div className="cd-o-so-hang" data-khoi="o-so-buoi-chua">
+        <div className="cd-o-so">
+          <span>Cọ xát cuối kỳ (lớp)</span>
+          <strong>{phanTram(du.lop.coXat)}</strong>
+        </div>
+        <div className="cd-o-so">
+          <span>Thành thạo cuối kỳ (lớp)</span>
+          <strong>{phanTram(du.lop.thanhThao)}</strong>
+        </div>
+        <div className="cd-o-so">
+          <span>Buổi chữa</span>
+          <strong data-so="buoi-chua">
+            {kq.dong.length} câu · {phut(kq.tongGiay)}/{phut(kq.nganSachGiay)} phút
+          </strong>
+        </div>
+        <div className="cd-o-so">
+          <span>Em có lượt lên bảng</span>
+          <strong data-so="co-luot">
+            {kq.soEmCoLuot}/{kq.soEmCoMat} em
+          </strong>
+        </div>
+      </div>
+
+      <section className="cd-the" aria-label="Bảng câu buổi chữa">
+        {kq.dong.length === 0 ? (
+          <p className="cd-phu">Không còn câu nào cần chữa: mọi em có mặt đã thành thạo các câu của chiến dịch.</p>
+        ) : (
+          <div role="table" aria-label="Câu chữa xếp sẵn">
+            <div className="cd-hang-chua cd-hang-chua--dau" role="row">
+              <span role="columnheader">#</span>
+              <span role="columnheader">Câu · dạng</span>
+              <span role="columnheader">Vì sao chữa</span>
+              <span role="columnheader">Điểm chữa</span>
+              <span role="columnheader">Người lên bảng</span>
+              <span role="columnheader">Thời gian</span>
+            </div>
+            {kq.dong.map((d, i) => (
+              <div key={d.cau.qid} className="cd-hang-chua" role="row" data-hang-chua={d.cau.qid}>
+                <span className="cd-hang-so" role="cell">
+                  {i + 1}
+                </span>
+                <span role="cell">
+                  <b>Câu {d.cau.stt}</b> · {d.cau.dang}
+                </span>
+                <span role="cell">
+                  {d.cau.soChuaThanhThao} em chưa thành thạo
+                  {d.cau.soCanDayLai > 0 && (
+                    <>
+                      {' · '}
+                      <b>{d.cau.soCanDayLai} cần dạy lại</b>
+                    </>
+                  )}
+                </span>
+                <span className="cd-so" role="cell">
+                  <span className="cd-nhan-hep">Điểm chữa: </span>
+                  {d.cau.diemChua}
+                </span>
+                <span role="cell">
+                  {d.giaiMau ? `Giải mẫu: ${d.giaiMau.ten}` : 'Thầy giải mẫu'}
+                  {d.sua.length > 0 ? ` · ${chuNguoiSua(d.sua)}` : ''}
+                </span>
+                <span className="cd-so" role="cell">
+                  {phut(d.giay)} phút
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="cd-phu">
+          Cách xếp: điểm chữa = số em chưa thành thạo + 2 × số em cần thầy dạy lại · mỗi dạng 1 câu đại diện · tổng ≤ {phut(kq.nganSachGiay)} phút · mỗi em có mặt ≥ 1 lượt.
+          {kq.boCau.length > 0 && ` Đã bỏ bớt ${kq.boCau.length} câu điểm chữa thấp cho vừa giờ (Câu ${kq.boCau.map((c) => c.stt).join(', ')}).`}
+        </p>
+        {kq.vuotNganSach && <p className="cd-loi">Lớp đông: cho mỗi em một lượt thì buổi chữa cần {phut(kq.tongGiay)} phút, vượt {phut(kq.nganSachGiay)} phút.</p>}
+      </section>
+
+      <div className="cd-thanh-hanh-dong">
+        <p className="cd-phu" aria-live="polite">
+          {daChua
+            ? `Đã chữa xong: ${daChua.soLuot} lượt em được mở khoá, vào Đoàn Hộ Tống từ ${hienNgay(daChua.ngayOnLai)}.`
+            : `Bấm “Chữa xong” khi chữa hết: ${luotDayLai} lượt em cần dạy lại được mở khoá, vào Đoàn Hộ Tống từ ${hienNgay(ngayMai, false)}.`}
+        </p>
+        <button type="button" className="m3-nut-chu cd-nut-nho" disabled={caChot.length === 0} onClick={moCaChot}>
+          Mở ca chốt · {caChot.length} câu
+        </button>
+        <button type="button" className="m3-nut-vien cd-nut-nho" disabled={!!daChua || kq.dong.length === 0} onClick={() => setHoiChua(true)}>
+          {daChua ? 'Đã chữa xong' : 'Chữa xong'}
+        </button>
+        <button type="button" className="m3-nut-chinh" disabled={kq.dong.length === 0 || dangChieu} onClick={() => void onChieu(oChieuTuDong(kq.dong), `Buổi chữa · ${du.chienDich.ten}`)}>
+          {dangChieu ? 'Đang mở tờ chiếu…' : 'Mở tờ máy chiếu'}
+        </button>
+      </div>
+
+      {hoiChua && (
+        <HopXacNhan
+          tieuDe="Chữa xong buổi này?"
+          noiDung={
+            <p>
+              Ghi {kq.dong.length} câu vừa chữa (Câu {kq.dong.map((d) => d.cau.stt).join(', ')}) là đã chữa trên lớp: khoảng {luotDayLai} lượt em đang “Cần thầy dạy lại” được mở khoá và các câu này quay lại Đoàn Hộ Tống của các em từ {hienNgay(ngayMai)}. Việc này không hoàn tác được.
+            </p>
+          }
+          nhanXacNhan="Chữa xong"
+          nhanDangLam="Đang ghi…"
+          dangLam={dangChua}
+          onXacNhan={() => void chua()}
+          onHuy={() => setHoiChua(false)}
+        />
+      )}
+
+      {moCoMat && (
+        <HopChon
+          tieuDe="Em có mặt hôm nay"
+          moTa="Bỏ tích em vắng: buổi chữa xếp lại để mỗi em có mặt có ít nhất một lượt lên bảng."
+          nhanXacNhan={`Xếp lại cho ${chonCoMat.size} em`}
+          xacNhanDuoc={chonCoMat.size > 0}
+          onXacNhan={() => {
+            setMoCoMat(false)
+            onDoiCoMat(chonCoMat.size === dsEm.length ? [] : [...chonCoMat])
+          }}
+          onDong={() => setMoCoMat(false)}
+        >
+          <div className="cd-hop-ds">
+            {sapTheoTen(dsEm).map((e) => (
+              <label key={e.sbd} className="cd-tich">
+                <input
+                  type="checkbox"
+                  checked={chonCoMat.has(e.sbd)}
+                  onChange={() =>
+                    setChonCoMat((cu) => {
+                      const s = new Set(cu)
+                      if (s.has(e.sbd)) s.delete(e.sbd)
+                      else s.add(e.sbd)
+                      return s
+                    })
+                  }
+                />
+                <span>{e.ten}</span>
+              </label>
+            ))}
+          </div>
+        </HopChon>
+      )}
+    </>
+  )
+}
