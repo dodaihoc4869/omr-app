@@ -346,3 +346,4 @@ export async function baoThieuNhan(env: Env, sbd: string, cau: readonly CauXetDu
   return { tong: cau.length, lyDo: tomTatLyDo(loai), kyNangThieu: [...kyNangThieu].sort(), cauThieuNhan }
 }
 
+export function scopeQuestion(json: any): any { return {}; }
