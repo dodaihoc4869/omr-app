@@ -1,5 +1,3 @@
-import { doiLuotSnapshotBtvn } from './btvn-lifecycle'
-import { dungSnapshotBtvn } from './btvn-snapshot'
 import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
@@ -45,7 +43,6 @@ import {gvKeHoachEm} from './gv-ke-hoach-em'
 import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
 import {doiTenHocSinh} from './doi-ten-hoc-sinh'
 import {chuanBiChamLaiCa} from './cham-lai-ca'
-import { rebuildScopeProjection } from './game-v2-scope-projection'
 import { mom, LoiChamMom } from './mom'
 import { luyenDe } from './luyen-de'
 import {adminGame,parentGame} from './game-v2-reports'
@@ -1927,8 +1924,7 @@ async function suaBtvn(env:Env,b:Record<string,unknown>):Promise<Response> {
      const han=await env.DB.prepare('SELECT han_nop FROM btvn WHERE ma_btvn=?').bind(id).first<{han_nop:string}>()
      if(!han||Date.parse(han.han_nop)<=Date.now())return ra({ok:false,error:'Thầy gia hạn nộp trước khi cho học sinh làm lại.'})
    }
-   if(dungSnapshotBtvn(em))return ra(await doiLuotSnapshotBtvn(env,em,b.hanhDong,Date.now()))
-   await env.DB.batch([
+      await env.DB.batch([
      env.DB.prepare('INSERT INTO btvn_em_lich_su(id,khoa,luu_luc,hanh_dong,du_lieu) VALUES(?,?,?,?,?)').bind(crypto.randomUUID(),khoa,new Date().toISOString(),String(b.hanhDong),JSON.stringify(em)),
      b.hanhDong==='thu-hoi'?env.DB.prepare('UPDATE btvn_em SET thu_hoi=1 WHERE khoa=?').bind(khoa):env.DB.prepare('UPDATE btvn_em SET thu_hoi=0,nop_luc=NULL,so_dung=NULL,so_cau=NULL,dap_an_json=NULL,so_lan_lam=1,xong_vong1_luc=NULL,lo_da_xong=0 WHERE khoa=?').bind(khoa)
    ])
@@ -3270,8 +3266,7 @@ const boXuLy = {
 
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
-      if (p === '/kho/cnh-scope-index') return ra({ok:true,...await rebuildScopeProjection(env)})
-      if (p === '/teacher-news') return ra(await teacherNews(env,b))
+            if (p === '/teacher-news') return ra(await teacherNews(env,b))
       // Token phụ huynh: cấp liên kết theo danh sách/lớp, và đếm truy cập (token so với SBD trần) để quyết giai đoạn cứng.
       if (p === '/ph/cap-ma') return ra(await phCapMa(envDoc, b))
       if (p === '/ph/dem-truy-cap') return ra(await phDemTruyCap(envDoc, b))
