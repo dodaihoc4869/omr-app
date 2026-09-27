@@ -3,6 +3,7 @@
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { TheNoiDung } from '../components/DesignSystem'
 import KhoiBoNaoCaiDat from '../components/KhoiBoNaoCaiDat'
+import CongTacHoa2 from '../components/chien-dich/CongTacHoa2'
 import KhoiKetNoiKhoDe from '../components/KhoiKetNoiKhoDe'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
 import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
@@ -49,6 +50,9 @@ export default function CaiDatScreen() {
         </div>
         <p style={{ marginTop: 'var(--k3)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>"Theo máy" đi theo chế độ sáng/tối của điện thoại hoặc máy tính. Lựa chọn nhớ trên máy này.</p>
       </TheNoiDung>
+
+      {/* GAME HÓA 2.0 — công tắc cả trung tâm / theo lớp (`/gv/chien-dich` co-luu), có hộp xác nhận nói rõ hậu quả. */}
+      <CongTacHoa2 />
 
       <KhoiBoNaoCaiDat />
 

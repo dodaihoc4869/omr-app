@@ -2,7 +2,8 @@ import './styles/teacher-layout.css'
 import './styles/vo-thay.css'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import BottomNav from './components/BottomNav'
-import ThanhBenTrai from './components/ThanhBenTrai'
+import ThanhBenTrai, { MAN_AN_KHI_HOA2, MAN_DAU_HOA2 } from './components/ThanhBenTrai'
+import { chonBat, useCoHoa2 } from './components/chien-dich/co-hoa2'
 import Toast from './components/Toast'
 import { useAppStore } from './store/appStore'
 import './components/m3'
@@ -134,6 +135,20 @@ function App() {
   }, [canHoi])
   const setClassList = useAppStore((s) => s.setClassList)
   const setScreen = useAppStore((s) => s.setScreen)
+
+  // GAME HÓA 2.0 (cờ máy chủ `/gv/chien-dich` co-doc): app thầy chỉ còn Ca kiểm tra + Lên bảng (+ "Thêm…").
+  // Chỉ đọc cờ ở app thầy ĐÃ MỞ KHOÁ — máy em, phụ huynh, link thi/phiếu không gọi lệnh thầy. Cờ tắt ⇒ app như cũ.
+  const hoa2 = useCoHoa2(chonBat)
+  const docCoHoa2 = useCoHoa2((s) => s.doc)
+  const laVoThay = canHoi && !linkCu && !laPhieu && !laXemDiem && !laHocSinh && !laPhuHuynh && khoa === 'da_mo'
+  useEffect(() => {
+    if (laVoThay) void docCoHoa2()
+  }, [laVoThay, docCoHoa2])
+  // Màn đã bỏ khi 2.0 bật (Hôm nay, Giao BTVN, Học sinh hỏi, Giao đề theo tuần) ⇒ về Ca kiểm tra, không dựng màn cũ lấy một nhịp.
+  const anKhiHoa2 = laVoThay && hoa2 && MAN_AN_KHI_HOA2.includes(screen)
+  useEffect(() => {
+    if (anKhiHoa2) setScreen(MAN_DAU_HOA2)
+  }, [anKhiHoa2, setScreen])
 
   // Máy này đã đặt mật khẩu chưa. Đọc một lần lúc nạp.
   useEffect(() => {
@@ -333,8 +348,10 @@ function App() {
       <div className="khung-noi-dung">
         <div className="giua-noi-dung" data-teacher-screen={laManThi ? undefined : screen}>
       {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
-          `screen` để lỗi cũ không dính lại khi thầy sang màn khác. */}
-      <ChanLoi key={screen} o={TEN_MAN[screen]} veManChinh={() => setScreen('examhub')}>
+          `screen` để lỗi cũ không dính lại khi thầy sang màn khác.
+          GAME HÓA 2.0: màn đã bỏ thì KHÔNG dựng (kể cả một nhịp) — hiệu ứng ở trên đưa về Ca kiểm tra ngay. */}
+      {!anKhiHoa2 && (
+      <ChanLoi key={screen} o={TEN_MAN[screen]} veManChinh={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')}>
         <Suspense fallback={<div style={{ padding: 24, fontFamily: 'var(--sans)', color: 'var(--nhat)' }}>Đang mở…</div>}>
         {screen === 'classlist' && <ClassListScreen />}
         {screen === 'examhub' && <ExamHubScreen />}
@@ -352,6 +369,7 @@ function App() {
         {screen === 'khodegiao' && <GiaoDeTheoTuanScreen />}
         </Suspense>
       </ChanLoi>
+      )}
         </div>
       </div>
       {!HIDE_BOTTOMNAV_ON.includes(screen) && <BottomNav />}

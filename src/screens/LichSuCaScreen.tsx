@@ -14,6 +14,8 @@ import { useAppStore } from '../store/appStore'
 import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
 import './lich-su-ca-m3.css'
 import { gioPhutVN } from '../lib/em-toan-canh'
+import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
+import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -57,6 +59,9 @@ export default function LichSuCaScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const showToast = useAppStore((s) => s.showToast)
+  // GAME HÓA 2.0: đường "Giao chiến dịch mới" không cần đi qua một ca (chỉ khi cờ bật).
+  const hoa2 = useHoa2Bat()
+  const [moGiaoMoi, setMoGiaoMoi] = useState(false)
 
   const [dsCa, setDsCa] = useState<CaTomTat[] | null>(null)
   const [dangTai, setDangTai] = useState(false)
@@ -209,7 +214,14 @@ export default function LichSuCaScreen() {
             </p>
           </div>
         </div>
+        {hoa2 && !xemDaXoa && !moGiaoMoi && (
+          <button type="button" className="m3-nut-vien" onClick={() => setMoGiaoMoi(true)}>
+            Giao chiến dịch mới
+          </button>
+        )}
       </div>
+
+      {hoa2 && !xemDaXoa && moGiaoMoi && <GiaoChienDich onDeSau={() => setMoGiaoMoi(false)} />}
 
       <TheNoiDung className="gv-directory">
         <div className="gv-filterbar flex items-center gap-2 sm:gap-2.5 mb-3">

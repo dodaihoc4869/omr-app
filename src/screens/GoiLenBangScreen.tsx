@@ -56,6 +56,8 @@ import { docKhoDoKho, luuKhoDoKho } from '../lib/exam-db'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
 import { gioDayDu } from '../lib/ngay-gio-24'
+import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
+import LenBangChienDich from '../components/chien-dich/LenBangChienDich'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -212,7 +214,18 @@ async function songSong<T, R>(ds: T[], soLuong: number, viec: (x: T) => Promise<
   return ra
 }
 
+/** LÊN BẢNG — hai chế độ.
+ *  · Game Hóa 2.0 BẬT (cờ `/gv/chien-dich` co-doc): chọn chiến dịch → Bảng chiến dịch khi đang chạy / Buổi chữa khi hết hạn nộp
+ *    (`src/components/chien-dich/LenBangChienDich.tsx`). Thầy vẫn vào được cách cũ bằng nút chữ cuối màn.
+ *  · Cờ TẮT: đúng màn Gọi lên bảng cũ (`GoiLenBangCu` dưới đây), không đổi gì. */
 export default function GoiLenBangScreen() {
+  const hoa2 = useHoa2Bat()
+  const [cachCu, setCachCu] = useState(false)
+  if (hoa2 && !cachCu) return <LenBangChienDich onCheDoCu={() => setCachCu(true)} />
+  return <GoiLenBangCu />
+}
+
+function GoiLenBangCu() {
   const showToast = useAppStore((s) => s.showToast)
 
   const [cauHinh, setCauHinh] = useState<{ url: string; mat: string } | null>(null)
