@@ -76,6 +76,7 @@ import {docLoiNhanHlv} from './bo-nao-doc'
 import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
 import { gvChienDich } from './srs2-gv'
+import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
@@ -3089,11 +3090,13 @@ const boXuLy = {
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
       // THỨ TỰ: kế hoạch ngày TRƯỚC, tin phụ huynh SAU — tin phụ huynh (GĐ 5) đọc số câu từ kế hoạch vừa lập; chạy song song
       // thì tin có thể đọc kế hoạch của ngày cũ hoặc thiếu.
-      await chayCaLop(env,Date.now()).then(r=>console.log('[ke-hoach] cron',JSON.stringify(r))).catch(async e=>{console.error('[ke-hoach] cron lỗi:',e);await ghiLoiMay(env,'ke_hoach_ngay')})
+      // GAME HÓA 2.0 bật CẢ TRUNG TÂM ⇒ kế hoạch ngày cũ, tin phụ huynh, vinh danh (app phụ huynh + bảng tin đã bỏ) nghỉ; bật theo lớp thì vẫn chạy cho lớp chưa chuyển.
+      const hoa2CaTruong=await docCoHoa2(env).then(c=>c.bat&&!c.lop.length&&!c.sbd.length).catch(()=>false)
+      if(!hoa2CaTruong)await chayCaLop(env,Date.now()).then(r=>console.log('[ke-hoach] cron',JSON.stringify(r))).catch(async e=>{console.error('[ke-hoach] cron lỗi:',e);await ghiLoiMay(env,'ke_hoach_ngay')})
       // EXP học tập mới: chốt "đạt ngày/chuỗi" của ngày vừa qua cho em nào chưa được trao (chỉ em đang bật cờ). Lỗi chỉ ghi log.
       // Lô ĐẦU của chốt "đạt ngày" (con trỏ theo lô 40 em; cron mỗi phút ở nhánh dưới chạy tiếp cho tới khi xong). Lỗ cũ: chỉ MỘT lô 40 em/đêm ⇒ em đạt mà chưa được ghi mất mảnh ngày ấy.
       await chotExpNgayQuaDayDu(env,Date.now()).then(r=>console.log('[exp] cron',JSON.stringify(r))).catch(async e=>{console.error('[exp] cron lỗi:',e);await ghiLoiMay(env,'exp_ngay')})
-      await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]).catch(async e=>{console.error('[tin-ph] cron lỗi:',e);await ghiLoiMay(env,'tin_phu_huynh')}) // lỗi ghi vào nhật ký máy (B11) thay vì làm hỏng cả lượt cron
+      if(!hoa2CaTruong)await Promise.all([refreshDailyNews(env),dailyHonors(env,false)]).catch(async e=>{console.error('[tin-ph] cron lỗi:',e);await ghiLoiMay(env,'tin_phu_huynh')}) // lỗi ghi vào nhật ký máy (B11) thay vì làm hỏng cả lượt cron
     }else{
       // NHẮC TỰ ĐỘNG bài tập về nhà (luật Boss 21/09): mỗi phút gọi nhưng chỉ chạy MỘT lần/30 phút, trong khung 07:00–21:30 giờ VN, khoá idempotent. Lỗi chỉ ghi log — không kéo `deliverNotices` đổ theo.
       // CHỐT "ĐẠT NGÀY" còn lại + MẤT KHIÊN KHI VẮNG (khung 00:02–05:00 giờ VN; ngoài khung trả về ngay, không truy vấn). Trừ khiên CHỈ chạy khi chốt ngày đã xong cho mọi em.
@@ -3102,7 +3105,8 @@ const boXuLy = {
       await chotNgayRoiTruKhien(env,Date.now()).then(r=>{if(r.truKhien?.chay)console.log('[khien-mat] cron',JSON.stringify(r))}).catch(async e=>{console.error('[khien-mat] cron lỗi:',e);await ghiLoiMay(env,'khien_mat')})
       // SAI RẤT NHANH RỒI ĐÚNG LẠI cho Bảng tin của thầy: tính lại mỗi 10 phút vào bản đệm `cau_hinh.sai_nhanh_gv` (bản còn mới ⇒ chỉ 1 truy vấn đọc); lỗi chỉ ghi log.
       await capNhatSaiNhanhNeuCu(env,Date.now())
-      await nhacTuDong(env,Date.now()).then(async r=>{if(r.chay)console.log('[nhac-tu-dong] cron',JSON.stringify(r));if(r.lyDo==='loi')await ghiLoiMay(env,'nhac_nop_bai')}).catch(async e=>{console.error('[nhac-tu-dong] cron lỗi:',e);await ghiLoiMay(env,'nhac_nop_bai')})
+      // GAME HÓA 2.0 bật cả trung tâm ⇒ BTVN đã bỏ: không nhắc nộp BTVN.
+      if(!await docCoHoa2(env).then(c=>c.bat&&!c.lop.length&&!c.sbd.length).catch(()=>false))await nhacTuDong(env,Date.now()).then(async r=>{if(r.chay)console.log('[nhac-tu-dong] cron',JSON.stringify(r));if(r.lyDo==='loi')await ghiLoiMay(env,'nhac_nop_bai')}).catch(async e=>{console.error('[nhac-tu-dong] cron lỗi:',e);await ghiLoiMay(env,'nhac_nop_bai')})
       await deliverNotices(env).catch(async e=>{console.error('[thong-bao] cron lỗi:',e);await ghiLoiMay(env,'gui_thong_bao')})
     }
   },

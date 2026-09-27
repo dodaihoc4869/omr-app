@@ -41,3 +41,19 @@ Chỉ GHI THÊM ở cuối. Mỗi dòng: `- [ ]` chưa · `- [x]` xong + bằng 
 - [ ] N5. "Tải PDF" Câu đã làm có công thức mhchem ra đúng (ảnh chụp)
 - [ ] N6. Hết hạn chiến dịch: Lên bảng tự mở Buổi chữa, mỗi em có mặt ≥ 1 lượt, tổng ≤ 90 phút
 - [ ] N7. Mỗi luật ở mục B của prompt có ≥ 1 test tự động
+
+## Nhật ký 27/09 (phiên cloud)
+
+- [x] GĐ1 lõi thuật toán 2.0 | bằng chứng: ee997a1 — `npx vitest run tests/srs2-loi-2709.test.ts` 29/29; N2: cọ xát 100% mọi lần, thành thạo thật 60,8% vs gốc 45,2%
+- [x] GĐ1 máy chủ: chiến dịch, kế hoạch chốt, nối Đảo/Đoàn, gợi ý M3, Câu đã làm, Rương, /gv/chien-dich | bằng chứng: c681f33 — tests/srs2-d1-2709 10/10; bộ test game cũ 25 đỏ = 25 đỏ bản sạch 363479d (so tên, mới đỏ 0)
+- [x] Sửa lỗi phát hiện khi test: câu ôn Đúng–sai xếp sau mọi câu mới nên có thể không vào chuyến đầu | nguyên nhân gốc: `dao` nối câu mới trước câu ôn; sửa: câu ôn trước | bằng chứng: test "câu Đúng–sai … gợi ý Kiến thức cốt lõi" đỏ → xanh
+- [x] Hợp đồng API + bản vẽ vào repo | bằng chứng: 0f7790c (docs/hop-dong-game-hoa-2.md, docs/ban-ve-game-hoa-2-2709/)
+- [x] Cron: bật 2.0 cả trung tâm ⇒ nghỉ kế hoạch ngày cũ, tin phụ huynh, vinh danh, nhắc nộp BTVN | bằng chứng: tsc không thêm lỗi
+- [!] LỖI CÓ SẴN trên nhánh chính: server/src/index.ts import 3 tệp chưa từng commit (btvn-lifecycle, btvn-snapshot, game-v2-scope-projection) + 3 tên không tồn tại | KẸT: không có tệp gốc — cần phiên máy thầy commit trước khi đóng gói Worker từ git
+- [x] Giả định đổi: vé Đoàn KHÔNG cần ở chế độ 2.0 (mọi chặng chở câu ôn kế hoạch ⇒ miễn phí, hết câu ôn thì hết chặng) — thay cho đề xuất "+1 vé/ngày"
+- [x] Giả định: quà Rương Bát Linh = 20 vàng/ngày (mua phụ kiện), ghi sổ vàng dạng `doi` exp_tru 0 vì CHECK loai có sẵn không nhận loại mới (đổi CHECK = đổi lược đồ, không làm)
+- [ ] GĐ2 app HS (Sảnh bản đồ, Câu đã làm/PDF, gỡ app PH) — trợ lý A đang làm
+- [ ] GĐ2 game Bát Linh Đảo thiết kế mới — trợ lý B đang làm
+- [ ] GĐ2 game Đoàn Hộ Tống thiết kế mới — trợ lý C đang làm
+- [ ] GĐ3 app giáo viên (thanh bên, giao chiến dịch + sức chứa, bảng chiến dịch, buổi chữa, công tắc) — trợ lý D đang làm
+- [ ] Job reset lần 2 (dryRun, danh sách XOÁ/GIỮ chờ thầy duyệt) — trợ lý E đang làm
