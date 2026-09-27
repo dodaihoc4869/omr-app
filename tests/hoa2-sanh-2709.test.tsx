@@ -234,9 +234,9 @@ describe('StudentPortalScreen thật: cờ Game Hóa 2.0', () => {
   })
 })
 
-describe('ParentPortalScreen: app phụ huynh đã ngừng', () => {
+describe('ParentPortalScreen: app phụ huynh đã ngừng (khi Game Hóa 2.0 bật cả trung tâm)', () => {
   it('một màn M3 báo đã ngừng; không gọi máy chủ, không ô đăng nhập', async () => {
-    const { container } = render(<ParentPortalScreen />)
+    const { container } = render(<ParentPortalScreen ngungSan />)
     expect(container.querySelector('.m3')).not.toBeNull()
     expect(container.textContent).toContain(CHU_PH_DA_NGUNG)
     expect(container.querySelector('input')).toBeNull()

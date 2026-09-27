@@ -3204,6 +3204,8 @@ const boXuLy = {
       }
       if (p === '/game-v2-parent') return ra(await parentGame(env,b))
       // CỔNG PHỤ HUYNH — token giai đoạn mềm (docs/token-phu-huynh-1909.md): chỉ nhận `pass` (token do thầy cấp).
+      // GAME HÓA 2.0: app phụ huynh ngừng khi công tắc bật CẢ TRUNG TÂM (thầy chốt 27/09 "bỏ hẳn app phụ huynh"). Công khai, chỉ trả đúng/sai.
+      if (p === '/hoa2/ph-ngung') return ra({ ok: true, ngung: await docCoHoa2(env).then((c) => c.bat && !c.lop.length && !c.sbd.length).catch(() => false) })
       if (p === '/ph/xac-dinh') return ra(await phXacDinh(env, b))
       if (p === '/ph/ke-hoach') return ra(await phKeHoach(env, b, envDoc, ctx))
       if (p === '/ph/canh-bao/xem') return ra(await phCanhBaoXem(env, b))
