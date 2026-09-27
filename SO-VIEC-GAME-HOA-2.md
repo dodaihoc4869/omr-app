@@ -57,3 +57,5 @@ Chỉ GHI THÊM ở cuối. Mỗi dòng: `- [ ]` chưa · `- [x]` xong + bằng 
 - [ ] GĐ2 game Đoàn Hộ Tống thiết kế mới — trợ lý C đang làm
 - [ ] GĐ3 app giáo viên (thanh bên, giao chiến dịch + sức chứa, bảng chiến dịch, buổi chữa, công tắc) — trợ lý D đang làm
 - [ ] Job reset lần 2 (dryRun, danh sách XOÁ/GIỮ chờ thầy duyệt) — trợ lý E đang làm
+- [ ] Thầy nhắn: "bạn deploy và reset luôn đi nhé" | KẸT một phần: phiên cloud không có khoá Cloudflare; build giao diện chưa xong; máy chủ nhánh chính thiếu 3 tệp — đã báo thầy 2 cách (thêm khoá vào môi trường / phiên máy thầy deploy)
+- [x] Thầy chốt: "về 0 là xoá cả vàng và phụ kiện luôn nhé vì cho chọn lại thần thú từ đầu chơi cho công bằng" | bằng chứng: đã nhắn trợ lý reset chuyển vang_so, phu_kien_so_huu, phu_kien_dang_mac sang XOÁ
