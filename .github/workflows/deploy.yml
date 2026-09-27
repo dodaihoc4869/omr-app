@@ -45,17 +45,25 @@ jobs:
       # ra trang trắng.
       - run: npm run build
 
+      # Secret dán thừa dòng/khoảng trắng làm wrangler hỏng ("invalid header value", run 499):
+      # làm sạch một lần rồi mới đưa cho hai bước đẩy. Không in giá trị khoá.
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+
       - name: Đẩy lên Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ env.CF_TOKEN_SACH }}
+          accountId: ${{ env.CF_ACC_SACH }}
           command: pages deploy dist --project-name=omr-app --branch=main
 
       - name: Đẩy lên Cloudflare Worker (Máy chủ)
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ env.CF_TOKEN_SACH }}
+          accountId: ${{ env.CF_ACC_SACH }}
           command: deploy
           workingDirectory: server
