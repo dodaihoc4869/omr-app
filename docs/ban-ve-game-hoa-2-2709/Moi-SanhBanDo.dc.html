@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Thiết kế mới — Sảnh bản đồ Bát Linh</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;font-family:'Be Vietnam Pro',system-ui,sans-serif;background:#071229;color:#F2F6FF}
+button{font-family:inherit}
+.kinh{background:rgba(12,26,58,0.72);border:1px solid rgba(160,200,255,0.18);backdrop-filter:blur(10px)}
+.baloo{font-family:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #071229; color: #F2F6FF; font-family: 'Be Vietnam Pro', system-ui, sans-serif">
+
+  <svg style="position: absolute; left: 0; top: 0" width="390" height="600" viewBox="0 0 390 600" aria-hidden="true">
+    <defs>
+      <linearGradient id="bien" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0D2A5E"></stop><stop offset="0.6" stop-color="#0A1F4A"></stop><stop offset="1" stop-color="#071229"></stop></linearGradient>
+      <radialGradient id="dat" cx="40%" cy="35%"><stop offset="0" stop-color="#46D19A"></stop><stop offset="0.6" stop-color="#1F8C66"></stop><stop offset="1" stop-color="#136048"></stop></radialGradient>
+      <radialGradient id="datMo" cx="40%" cy="35%"><stop offset="0" stop-color="#3A6E7E"></stop><stop offset="1" stop-color="#1C3F52"></stop></radialGradient>
+      <radialGradient id="linhTam" cx="40%" cy="35%"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="0.35" stop-color="#BFF4FF"></stop><stop offset="1" stop-color="#2FA8E0"></stop></radialGradient>
+      <pattern id="luoiLuc" width="14" height="12" patternUnits="userSpaceOnUse"><path d="M3.5 0 L10.5 0 L14 6 L10.5 12 L3.5 12 L0 6 Z" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.8"></path></pattern>
+      <clipPath id="catDao"><path d="M150,200 C150,140 200,110 250,118 C300,124 330,160 322,205 C316,250 280,275 235,272 C190,270 150,255 150,200 Z"></path></clipPath>
+      <filter id="mo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+      <filter id="saNg" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+    </defs>
+    <rect width="390" height="600" fill="url(#bien)"></rect>
+    <path d="M0 150 q20 -6 40 0 t40 0 t40 0 M220 330 q20 -6 40 0 t40 0 t40 0 t40 0 M0 400 q20 -6 40 0 t40 0 M260 470 q20 -6 40 0 t40 0 t40 0 M120 540 q20 -6 40 0 t40 0 t40 0" stroke="rgba(140,200,255,0.14)" stroke-width="2" fill="none"></path>
+
+    <g opacity="0.55"><path d="M26,106 C28,86 52,76 74,82 C98,88 108,108 100,126 C92,144 64,150 44,142 C28,136 24,122 26,106 Z" fill="url(#datMo)" stroke="#8FB7C4" stroke-width="4"></path></g>
+    <path d="M26,106 C28,86 52,76 74,82 C98,88 108,108 100,126 C92,144 64,150 44,142 C28,136 24,122 26,106 Z" fill="url(#dat)" stroke="#E9CF94" stroke-width="5"></path>
+    <path d="M58 96 l8 -10 l8 10 z M52 108 h28 v4 h-28 z M56 100 h20 v8 h-20 z" fill="#FFC940"></path>
+    <g opacity="0.45"><path d="M266,98 C268,86 282,80 294,84 C306,88 310,100 304,110 C298,118 280,120 272,114 C266,110 265,104 266,98 Z" fill="url(#datMo)" stroke="#8FB7C4" stroke-width="3"></path></g>
+    <g opacity="0.4"><path d="M326,330 C328,316 344,310 356,316 C368,322 370,336 362,344 C352,352 334,350 328,344 C324,340 325,336 326,330 Z" fill="url(#datMo)" stroke="#8FB7C4" stroke-width="3"></path></g>
+    <g opacity="0.3"><circle cx="30" cy="262" r="12" fill="url(#datMo)"></circle><circle cx="350" cy="420" r="9" fill="url(#datMo)"></circle><circle cx="240" cy="420" r="8" fill="url(#datMo)"></circle></g>
+
+    <path d="M150,200 C150,140 200,110 250,118 C300,124 330,160 322,205 C316,250 280,275 235,272 C190,270 150,255 150,200 Z" fill="none" stroke="#E9CF94" stroke-width="10"></path>
+    <path d="M150,200 C150,140 200,110 250,118 C300,124 330,160 322,205 C316,250 280,275 235,272 C190,270 150,255 150,200 Z" fill="url(#dat)"></path>
+    <g clip-path="url(#catDao)">
+      <rect x="140" y="100" width="200" height="190" fill="url(#luoiLuc)"></rect>
+      <ellipse cx="205" cy="170" rx="30" ry="16" fill="#2AA877" opacity="0.8"></ellipse>
+      <ellipse cx="190" cy="228" rx="26" ry="12" fill="#177356" opacity="0.8"></ellipse>
+      <circle cx="176" cy="190" r="6" fill="#0F5A40"></circle><circle cx="222" cy="206" r="5" fill="#0F5A40"></circle><circle cx="200" cy="150" r="5" fill="#0F5A40"></circle>
+      <g filter="url(#mo)" fill="#DCE8F5" opacity="0.92"><circle cx="290" cy="165" r="44"></circle><circle cx="305" cy="215" r="40"></circle><circle cx="262" cy="246" r="34"></circle><circle cx="268" cy="132" r="30"></circle><circle cx="248" cy="195" r="22"></circle></g>
+    </g>
+
+    <path d="M84,470 C120,430 104,370 146,334 C168,314 176,296 186,272" stroke="#FFC940" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round" fill="none"></path>
+    <g><circle cx="100" cy="440" r="15" fill="#FF5C8A" opacity="0.35" filter="url(#saNg)"></circle><circle cx="100" cy="440" r="11" fill="#E83D6D" stroke="#3A0A1A" stroke-width="2"></circle><circle cx="96" cy="438" r="2" fill="#FFFFFF"></circle><circle cx="104" cy="438" r="2" fill="#FFFFFF"></circle></g>
+    <g><circle cx="116" cy="392" r="15" fill="#FF5C8A" opacity="0.35" filter="url(#saNg)"></circle><circle cx="116" cy="392" r="11" fill="#E83D6D" stroke="#3A0A1A" stroke-width="2"></circle><circle cx="112" cy="390" r="2" fill="#FFFFFF"></circle><circle cx="120" cy="390" r="2" fill="#FFFFFF"></circle></g>
+    <g><circle cx="144" cy="338" r="15" fill="#FF5C8A" opacity="0.35" filter="url(#saNg)"></circle><circle cx="144" cy="338" r="11" fill="#E83D6D" stroke="#3A0A1A" stroke-width="2"></circle><circle cx="140" cy="336" r="2" fill="#FFFFFF"></circle><circle cx="148" cy="336" r="2" fill="#FFFFFF"></circle></g>
+    <g><circle cx="172" cy="302" r="15" fill="#FF5C8A" opacity="0.35" filter="url(#saNg)"></circle><circle cx="172" cy="302" r="11" fill="#E83D6D" stroke="#3A0A1A" stroke-width="2"></circle><circle cx="168" cy="300" r="2" fill="#FFFFFF"></circle><circle cx="176" cy="300" r="2" fill="#FFFFFF"></circle></g>
+
+    <rect x="180" y="258" width="5" height="22" rx="2" fill="#8B5A2B"></rect><rect x="196" y="252" width="5" height="22" rx="2" fill="#8B5A2B"></rect>
+    <rect x="182" y="238" width="16" height="26" rx="2" fill="#B07A3E" stroke="#5A3514" stroke-width="2" transform="rotate(-22 190 262)"></rect>
+    <circle cx="206" cy="284" r="9" fill="#1A2A55" stroke="#FFC940" stroke-width="2"></circle><path d="M202 284 h8 v6 h-8 z M204 284 v-3 a2 2 0 0 1 4 0 v3" stroke="#FFC940" stroke-width="1.6" fill="none"></path>
+
+    <rect x="30" y="486" width="70" height="10" rx="3" fill="#8B5A2B"></rect><rect x="36" y="496" width="4" height="14" fill="#5A3514"></rect><rect x="88" y="496" width="4" height="14" fill="#5A3514"></rect>
+    <path d="M44 480 h40 l6 -12 h-50 z" fill="#C98A3E" stroke="#5A3514" stroke-width="2"></path><circle cx="52" cy="484" r="5" fill="#3A2A1A"></circle><circle cx="80" cy="484" r="5" fill="#3A2A1A"></circle>
+    <circle cx="64" cy="456" r="16" fill="#6FE3FF" opacity="0.35" filter="url(#saNg)"></circle><circle cx="64" cy="456" r="9" fill="url(#linhTam)"></circle>
+  </svg>
+
+  <span class="kinh" style="position: absolute; left: 20px; top: 150px; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; color: #FFE08A">Carbohydrate · đã chinh phục</span>
+  <span class="kinh" style="position: absolute; left: 186px; top: 94px; padding: 5px 10px; border-radius: 12px; font-size: 12px; font-weight: 800">Đảo Ester – Lipid · 56% đã khai phá</span>
+  <span class="kinh" style="position: absolute; left: 196px; top: 286px; padding: 5px 10px; border-radius: 12px; font-size: 12px; font-weight: 800; color: #FFB3C8; border-color: rgba(255,92,138,0.5)">4 ổ phục kích chặn cầu</span>
+  <span class="kinh" style="position: absolute; left: 108px; top: 470px; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; color: #BFF4FF">Bến Hộ Tống · Linh Tâm của lớp</span>
+  <span style="position: absolute; left: 226px; top: 440px; display: flex; align-items: center; gap: 6px"><img src="/_blob/e6bd22954848099f8e3f0ed6f4149d48" alt="" style="width: 26px; height: 26px; object-fit: contain; border-radius: 13px; background: rgba(255,255,255,0.1)"><img src="/_blob/3f498d319ef665b8c30e8dbd57337833" alt="" style="width: 26px; height: 26px; object-fit: contain; margin-left: -12px; border-radius: 13px; background: rgba(255,255,255,0.1)"><span style="font-size: 11px; font-weight: 700; color: #DCE8FF">9 bạn đang hộ tống</span></span>
+
+  <div class="kinh" style="position: absolute; left: 12px; right: 12px; top: 12px; height: 64px; box-sizing: border-box; padding: 8px 10px; border-radius: 22px; display: flex; align-items: center; gap: 10px">
+    <span style="position: relative; width: 48px; height: 48px; flex-shrink: 0">
+      <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#1B2F66" stroke="#FFC940" stroke-width="2.5"></polygon></svg>
+      <img src="/_blob/0f35e3edbe7e0cc5866a68e1f0eb3649" alt="Thần thú Lửa Nhỏ" style="position: absolute; left: 6px; top: 6px; width: 36px; height: 36px; object-fit: contain">
+      <span class="baloo" style="position: absolute; right: -4px; bottom: -4px; width: 22px; height: 22px; border-radius: 11px; background: #FFC940; color: #3A2400; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; line-height: 1">7</span>
+    </span>
+    <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0">
+      <span style="font-size: 14px; font-weight: 800">Lửa Nhỏ · Cấp 7</span>
+      <span style="height: 6px; border-radius: 3px; background: rgba(255,255,255,0.12)"><span style="display: block; width: 68%; height: 6px; border-radius: 3px; background: linear-gradient(90deg, #FF9F1C, #FFC940)"></span></span>
+      <span style="font-size: 11px; color: #BCCBEB">340/500 EXP · +22 hôm nay</span>
+    </span>
+    <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+      <span style="display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 800; color: #7FF3FF"><svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><polygon points="7,0 14,5 11,16 3,16 0,5" fill="#37E2D5"></polygon></svg>32/40</span>
+      <span style="display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 800; color: #FFB08A"><svg width="14" height="16" viewBox="0 0 24 24" fill="#FF7A45" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path></svg>5 ngày</span>
+    </span>
+  </div>
+
+  <div style="position: absolute; right: 12px; top: 112px; display: flex; flex-direction: column; gap: 10px">
+    <button aria-label="Câu đã làm" class="kinh" style="width: 48px; height: 48px; border-radius: 16px; color: #F2F6FF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"></path><path d="M4 21V5"></path><path d="M9 8h6M9 12h6"></path></svg></button>
+    <button aria-label="Túi đồ" class="kinh" style="width: 48px; height: 48px; border-radius: 16px; color: #F2F6FF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></button>
+    <button aria-label="Cửa hàng" class="kinh" style="width: 48px; height: 48px; border-radius: 16px; color: #F2F6FF; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h16l-1-5H5z"></path><path d="M5 10v10h14V10M10 20v-6h4v6"></path></svg></button>
+  </div>
+
+  <div class="kinh" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 16px 16px 20px; border-radius: 28px 28px 0 0; display: flex; flex-direction: column; gap: 12px; background: rgba(8,18,44,0.94)">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="position: relative; width: 58px; height: 58px; flex-shrink: 0">
+        <svg width="58" height="58" viewBox="0 0 58 58" aria-hidden="true"><circle cx="29" cy="29" r="25" stroke="rgba(255,255,255,0.12)" stroke-width="6" fill="none"></circle><circle cx="29" cy="29" r="25" stroke="#37E2D5" stroke-width="6" fill="none" stroke-dasharray="88 157" stroke-linecap="round" transform="rotate(-90 29 29)"></circle><circle cx="29" cy="29" r="16" stroke="rgba(255,255,255,0.12)" stroke-width="5" fill="none"></circle></svg>
+        <span class="baloo" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">56%</span>
+      </span>
+      <span style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="baloo" style="font-size: 19px; font-weight: 800; line-height: 1.1">Chiến dịch Ester – Lipid</span>
+        <span style="font-size: 12px; color: #BCCBEB">Hạn nộp: còn 4 ngày 9 giờ (tới 23:59 Chủ Nhật 04/10)</span>
+        <span style="font-size: 12px"><span style="color: #37E2D5; font-weight: 700">Cọ xát 67/120</span> · <span style="color: #FFC940; font-weight: 700">Thành thạo 0/120</span> <span style="color: #BCCBEB">(tăng từ 02/10)</span></span>
+      </span>
+    </div>
+    <button style="position: relative; height: 66px; border-radius: 22px; border: 0; background: linear-gradient(180deg, #FFD66B 0%, #FF9F1C 100%); color: #3A1D00; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; box-shadow: 0 6px 0 #B8650A, 0 10px 24px rgba(255,159,28,0.35)">
+      <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 0">
+        <span class="baloo" style="font-size: 21px; font-weight: 800; letter-spacing: 0.5px; line-height: 1.1">PHÁ 4 Ổ PHỤC KÍCH</span>
+        <span style="font-size: 12px; font-weight: 700">Đoàn Hộ Tống · 4 câu ôn · 1 chặng</span>
+      </span>
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"></path></svg>
+    </button>
+    <button disabled="" style="height: 58px; border-radius: 20px; border: 1px dashed rgba(160,200,255,0.35); background: rgba(255,255,255,0.04); color: #93A6CF; display: flex; align-items: center; gap: 12px; padding: 0 16px; text-align: left">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex-shrink: 0"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+      <span style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 15px; font-weight: 800">Khám phá Bát Linh Đảo · 28 câu</span><span style="font-size: 12px; color: #FFD98A">Có xe hàng đang bị phục kích, hãy hoàn thành Hộ Tống trước khi ra Đảo nhé!</span></span>
+    </button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
