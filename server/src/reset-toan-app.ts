@@ -23,12 +23,64 @@
 //     Ca thi được GIỮ nên luật "ca chưa công bố thì ẩn câu thi" giữ nguyên; luật "ca không còn trong bảng `ca` thì coi là đã công bố" (`exp-d1.ts`, `game-v2-bank.ts`) chỉ còn dùng khi thầy xoá cứng ca.
 //   · MÃ ĐÃ DÙNG: chỉ nạp BTVN và bài Mẹ giao (đã xoá nên máy em còn nháp theo mã cũ). KHÔNG nạp mã ca: ca còn nguyên trong bảng `ca`, không có mã ca nào "đã dùng mà biến mất".
 //   · KHÔNG đụng: tài khoản/mật khẩu/token (`hoc_sinh`), danh sách lớp, kho đề/câu hỏi, chỉ mục game, cấu hình thầy, cài đặt em, đăng ký push, thống kê dùng app, sổ + hồ sơ mạnh yếu, R2.
+//
+// TỔNG QUÁT HOÁ (27/09, reset LẦN 2 "Game Hóa 2.0" — `reset-hoa2.ts`): MÁY MÓC ở tệp này (cờ lên đạn/huỷ, khoá một lần, cửa sổ 60 phút, ngân sách 40 truy vấn,
+// chạy thử, nạp `ma_da_dung`, chốt `exp_moi.tu` + mùa game) nay nhận CẤU HÌNH `CauHinhReset` (khoá riêng, danh sách XOÁ/GIỮ riêng, loại mã cần nạp, điều kiện HOÃN).
+// Lần 21/09 = `RESET_2109`, mọi export cũ giữ NGUYÊN tên, chữ ký và hành vi (test `tests/reset-toan-app-1909.test.ts`). Cổng đóng băng `dangLamMoi` và `docMocReset`
+// xét MỌI job trong `CAC_JOB_RESET` bằng MỘT truy vấn (như cũ); job 21/09 đã `xong` nên không bao giờ đóng băng lại.
 import type { D1PreparedStatement, Env } from './kieu'
 
 export const MA_RESET = 'reset_toan_app'
 export const KHOA_HUY = 'reset_toan_app_huy'
 /** CỜ LÊN ĐẠN: không có cờ này = true thì job không chạy và không đóng băng. `cap_nhat_luc` của dòng = lúc lên đạn. */
 export const KHOA_CHO_PHEP = 'reset_toan_app_cho_phep'
+
+/** KHOÁ của MỘT job reset trong `cau_hinh` + kiểu đóng băng. Đủ để cổng đóng băng và `mocReset` đọc (không cần danh sách bảng). */
+export interface KhoaJobReset {
+  /** Khoá trạng thái (JSON `TrangThaiReset`) — giành bằng INSERT OR IGNORE, `xong` thì không bao giờ chạy lại. */
+  maReset: string
+  /** Cờ HUỶ: thắng cờ lên đạn. */
+  khoaHuy: string
+  /** Cờ LÊN ĐẠN: `cap_nhat_luc` của dòng = lúc lên đạn. */
+  khoaChoPhep: string
+  /**
+   * true (lần 21/09): ĐÓNG BĂNG GHI ngay từ lúc lên đạn tới khi xong/hết 60 phút.
+   * false (lần 2): chỉ đóng băng khi job ĐÃ GIÀNH KHOÁ và đang làm (`dang_chay`/`cho_tiep`) — lên đạn mà job đang HOÃN (có ca thi mở) thì KHÔNG đóng băng,
+   * em đang thi không bị chặn nộp bài.
+   */
+  dongBangTuLenDan: boolean
+}
+
+export const KHOA_JOB_2109: KhoaJobReset = { maReset: MA_RESET, khoaHuy: KHOA_HUY, khoaChoPhep: KHOA_CHO_PHEP, dongBangTuLenDan: true }
+/** Khoá của reset LẦN 2 (Game Hóa 2.0, 27/09). Cấu hình đầy đủ (danh sách bảng, điều kiện hoãn) ở `reset-hoa2.ts`; khai khoá Ở ĐÂY để cổng đóng băng không phải nạp vòng. */
+export const KHOA_JOB_HOA2: KhoaJobReset = { maReset: 'reset_hoa2', khoaHuy: 'reset_hoa2_huy', khoaChoPhep: 'reset_hoa2_cho_phep', dongBangTuLenDan: false }
+/** MỌI job reset mà cổng đóng băng (`dangLamMoi`) và `docMocReset` phải xét — MỘT truy vấn đọc gộp. */
+export const CAC_JOB_RESET: readonly KhoaJobReset[] = [KHOA_JOB_2109, KHOA_JOB_HOA2]
+
+export type LoaiMa = 'ca' | 'btvn' | 'mom'
+
+/** Lý do HOÃN job (chưa được chạy): ví dụ còn ca thi đang mở. */
+export interface LyDoHoan {
+  lyDo: string
+  /** Mã các ca đang mở (nếu lý do là ca thi mở). */
+  caDangMo?: string[]
+}
+
+/** CẤU HÌNH một job reset: khoá + danh sách XOÁ/GIỮ + mã cần nạp + điều kiện hoãn. */
+export interface CauHinhReset extends KhoaJobReset {
+  /** Nhãn trong log (`[reset]`, `[reset-hoa2]`). */
+  ten: string
+  /** Bảng XOÁ, theo THỨ TỰ xoá. Tên đi vào SQL CHỈ từ danh sách này (có kiểm định dạng). */
+  bangXoa: readonly string[]
+  /** Bảng GIỮ (không bao giờ vào SQL xoá). */
+  bangGiu: readonly string[]
+  /** Loại mã nạp vào `ma_da_dung` TRƯỚC khi xoá (máy em/thầy còn nháp, bộ nhớ đệm theo mã cũ). */
+  loaiMaNap: readonly LoaiMa[]
+  /** > 0: sau khi giành khoá, CHỜ ngần này (để mọi isolate hết bộ nhớ đệm của cổng đóng băng, `HAN_DEM_MS`) rồi kiểm HOÃN lần nữa mới xoá. 0 = xoá ngay (lần 21/09). */
+  choBangMs: number
+  /** Điều kiện HOÃN (≤ 1 truy vấn): kiểm TRƯỚC khi giành khoá và lần nữa ngay trước khi xoá. null = được chạy. Vắng = không bao giờ hoãn (lần 21/09). */
+  kiemHoan?: (env: Env) => Promise<LyDoHoan | null>
+}
 /** Cửa sổ tự chạy + đóng băng kể từ lúc lên đạn. */
 export const CUA_SO_MS = 60 * 60_000
 /** Job coi là chết nếu quá ngần này không có nhịp tim (trạng thái `dang_chay`). Trạng thái `cho_tiep` (nhường) được tiếp tục ngay. */
@@ -37,12 +89,11 @@ export const QUA_HAN_DANG_CHAY_MS = 3 * 60_000
 export const TOI_DA_TRUY_VAN_MOI_LUOT = 40
 const DU_TRU_GHI_KHOA = 1
 const CHI_PHI_NAP_MA = 12
-const CHI_PHI_CHOT = 6
 const XOA_MOI_LENH = 4000
 const COT_MOI_TRUY_VAN_DEM = 60
 /** Bộ nhớ đệm đọc cờ/khoá trong isolate (mở băng sớm: không lâu hơn ngần này). */
 /** 30 giây (Boss 21/09: truy vấn 3 cờ này 23 nghìn lượt/giờ khi D1 nghẽn; bản cũ 3 giây × nhiều isolate). Hệ quả: lên đạn / huỷ reset có hiệu lực ở cổng đóng băng chậm nhất 30 giây (job reset vẫn đọc TƯƠI). Reset toàn app 21/09 đã chạy xong, không lên đạn lại. */
-const HAN_DEM_MS = 30_000
+export const HAN_DEM_MS = 30_000
 
 /** XOÁ — theo lệnh thầy. */
 export const BANG_XOA: readonly string[] = [
@@ -105,19 +156,37 @@ export const BANG_GIU: readonly string[] = [
   'thu_thach_rieng',
   // CỬA HÀNG PHỤ KIỆN (migration-2109-shop-phu-kien.sql): sổ vàng, đồ đã mua, đồ đang mặc — tài sản em đã kiếm bằng việc học, GIỮ (EXP đã trừ khỏi ống nghiệm lúc đổi nên hồ sơ game bị xoá không ảnh hưởng số vàng).
   'vang_so', 'phu_kien_so_huu', 'phu_kien_dang_mac',
+  // GAME HÓA 2.0 (migration-2709-game-hoa-2.sql) — bảng SINH SAU lần 21/09. Job 21/09 đã `xong` (không bao giờ chạy lại); xếp GIỮ cho job ấy = KHÔNG đụng,
+  // y hệt "chưa phân loại" (chỉ khác là không bị báo). Phân loại THẬT cho lần 2 nằm ở `reset-hoa2.ts` (`srs2_ke_hoach`, `ruong_bat_linh` XOÁ; `chien_dich`, `srs2_day_lai` GIỮ).
+  'chien_dich', 'srs2_ke_hoach', 'srs2_day_lai', 'ruong_bat_linh',
 ]
+
+/** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */
+export const RESET_2109: CauHinhReset = {
+  ...KHOA_JOB_2109,
+  ten: 'reset',
+  bangXoa: BANG_XOA,
+  bangGiu: BANG_GIU,
+  loaiMaNap: ['btvn', 'mom'],
+  choBangMs: 0,
+}
 
 const TEN_HOP_LE = /^[a-z][a-z0-9_]*$/
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const json = (v: unknown) => JSON.stringify(v)
 const ms = (iso: string): number => Date.parse(iso) || 0
 
-export type TrangThaiKhoa = 'dang_chay' | 'cho_tiep' | 'xong' | 'qua_gio'
+/** `hoan` (chỉ job có `kiemHoan`): đã từng xoá dở rồi gặp ca thi mở ⇒ DỪNG, KHÔNG đóng băng; hết ca mở thì cron tự làm tiếp (trong cửa sổ). */
+export type TrangThaiKhoa = 'dang_chay' | 'cho_tiep' | 'xong' | 'qua_gio' | 'hoan'
 
 export interface TrangThaiReset {
   trangThai: TrangThaiKhoa
-  /** Bước đang làm: nạp mã đã dùng → xoá bảng → chốt. */
-  buoc: 'nap_ma' | 'xoa' | 'chot'
+  /** Bước đang làm: (chờ băng →) nạp mã đã dùng → xoá bảng → chốt. `cho_bang` chỉ có ở job `choBangMs > 0`. */
+  buoc: 'cho_bang' | 'nap_ma' | 'xoa' | 'chot'
+  /** Mốc bắt đầu chờ băng (ISO) — lần đầu = `batDauLuc`, làm tiếp sau `qua_gio`/`hoan` = lúc làm tiếp. */
+  choBangTu?: string
+  /** Lần hoãn gần nhất (có ca thi mở) sau khi đã giành khoá. */
+  hoan?: LyDoHoan & { luc: string }
   /** Chỉ số (trong BANG_XOA) bảng sẽ xoá tiếp. */
   bangTiep: number
   batDauLuc: string
@@ -199,31 +268,40 @@ export interface TrangThaiChung {
   khoa: TrangThaiReset | null
 }
 
-/** MỘT truy vấn đọc cả ba dòng (cờ cho phép, cờ huỷ, khoá). Lỗi/thiếu bảng → coi như KHÔNG lên đạn. */
-async function docTrangThaiChung(env: Env): Promise<TrangThaiChung> {
-  const ra: TrangThaiChung = { choPhep: false, huy: false, lenDanMs: null, khoa: null }
+/** MỘT truy vấn đọc ba dòng (cờ cho phép, cờ huỷ, khoá) của MỖI job trong `ds`. Lỗi/thiếu bảng → coi như KHÔNG lên đạn. Một job ⇒ đúng câu `IN (?, ?, ?)` như cũ. */
+async function docTrangThaiNhieu(env: Env, ds: readonly KhoaJobReset[]): Promise<TrangThaiChung[]> {
+  const ra: TrangThaiChung[] = ds.map(() => ({ choPhep: false, huy: false, lenDanMs: null, khoa: null }))
   try {
-    const r = await env.DB.prepare('SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (?, ?, ?)').bind(KHOA_CHO_PHEP, KHOA_HUY, MA_RESET).all<{ khoa: string; gia_tri: string | null; cap_nhat_luc: string | null }>()
+    const khoa = ds.flatMap((j) => [j.khoaChoPhep, j.khoaHuy, j.maReset])
+    const r = await env.DB.prepare(`SELECT khoa, gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa IN (${khoa.map(() => '?').join(', ')})`).bind(...khoa).all<{ khoa: string; gia_tri: string | null; cap_nhat_luc: string | null }>()
     for (const x of r.results ?? []) {
-      if (x.khoa === KHOA_CHO_PHEP) { ra.choPhep = laCoBat(x.gia_tri, 'choPhep'); ra.lenDanMs = docMocCauHinh(x.cap_nhat_luc) }
-      else if (x.khoa === KHOA_HUY) ra.huy = laCoBat(x.gia_tri, 'huy')
-      else if (x.khoa === MA_RESET && x.gia_tri) {
-        try { const o = JSON.parse(x.gia_tri) as TrangThaiReset; if (o && typeof o === 'object') ra.khoa = o } catch { /* khoá hỏng: coi như chưa có */ }
-      }
+      ds.forEach((j, i) => {
+        const o = ra[i]!
+        if (x.khoa === j.khoaChoPhep) { o.choPhep = laCoBat(x.gia_tri, 'choPhep'); o.lenDanMs = docMocCauHinh(x.cap_nhat_luc) }
+        else if (x.khoa === j.khoaHuy) o.huy = laCoBat(x.gia_tri, 'huy')
+        else if (x.khoa === j.maReset && x.gia_tri) {
+          try { const v = JSON.parse(x.gia_tri) as TrangThaiReset; if (v && typeof v === 'object') o.khoa = v } catch { /* khoá hỏng: coi như chưa có */ }
+        }
+      })
     }
   } catch { /* chưa có bảng cau_hinh */ }
   return ra
 }
 
-const boNhoChung = new WeakMap<object, { at: number; v: TrangThaiChung }>()
+/** MỘT truy vấn đọc cờ cho phép + cờ huỷ + khoá của MỘT job (mặc định lần 21/09). */
+export async function docTrangThaiChung(env: Env, j: KhoaJobReset = KHOA_JOB_2109): Promise<TrangThaiChung> {
+  return (await docTrangThaiNhieu(env, [j]))[0]!
+}
 
-/** Bản đọc ĐỆM HAN_DEM_MS trong isolate cho cổng đóng băng và `mocReset` (mỗi request một truy vấn quá tốn). */
-async function docTrangThaiChungDem(env: Env, nowMs: number): Promise<TrangThaiChung> {
+const boNhoChung = new WeakMap<object, { at: number; v: TrangThaiChung[] }>()
+
+/** Bản đọc ĐỆM HAN_DEM_MS trong isolate cho cổng đóng băng và `mocReset` (mỗi request một truy vấn quá tốn): MỌI job của `CAC_JOB_RESET`, cùng thứ tự. */
+async function docTrangThaiChungDem(env: Env, nowMs: number): Promise<TrangThaiChung[]> {
   // `env.DB` có thể là đối tượng D1 giả thô trong test (không phải object): chỉ đệm khi làm khoá WeakMap được.
   const dungDem = !!env.DB && (typeof env.DB === 'object' || typeof env.DB === 'function')
   const c = dungDem ? boNhoChung.get(env.DB) : undefined
   if (c && nowMs >= c.at && nowMs - c.at < HAN_DEM_MS) return c.v
-  const v = await docTrangThaiChung(env)
+  const v = await docTrangThaiNhieu(env, CAC_JOB_RESET)
   if (dungDem) boNhoChung.set(env.DB, { at: nowMs, v })
   return v
 }
@@ -236,8 +314,8 @@ export async function laChoPhep(env: Env): Promise<boolean> {
   return (await docTrangThaiChung(env)).choPhep
 }
 
-export async function docTrangThaiReset(env: Env): Promise<TrangThaiReset | null> {
-  return (await docTrangThaiChung(env)).khoa
+export async function docTrangThaiReset(env: Env, j: KhoaJobReset = KHOA_JOB_2109): Promise<TrangThaiReset | null> {
+  return (await docTrangThaiChung(env, j)).khoa
 }
 
 interface ThongTinBang {
@@ -252,10 +330,10 @@ async function docBangHienCo(env: Env): Promise<Map<string, ThongTinBang>> {
 }
 
 /** Số dòng từng bảng đã phân loại (bảng chưa tồn tại → null): GỘP bằng truy vấn scalar (D1 không cho compound SELECT dài), ≤ 60 bảng một truy vấn. */
-export async function demCacBang(env: Env, hienCo: ReadonlyMap<string, unknown>): Promise<Record<string, number | null>> {
+export async function demCacBang(env: Env, hienCo: ReadonlyMap<string, unknown>, ds: readonly string[] = [...BANG_XOA, ...BANG_GIU]): Promise<Record<string, number | null>> {
   const ra: Record<string, number | null> = {}
   const co: string[] = []
-  for (const t of [...BANG_XOA, ...BANG_GIU]) {
+  for (const t of new Set(ds)) {
     if (hienCo.has(t) && TEN_HOP_LE.test(t)) co.push(t)
     else ra[t] = null
   }
@@ -274,21 +352,26 @@ export async function demCacBang(env: Env, hienCo: ReadonlyMap<string, unknown>)
 // --- Tập mã đã dùng ---------------------------------------------------------------------------------
 
 /**
- * Tập mã đã dùng nạp lúc reset: BTVN và bài Mẹ giao (đã xoá). KHÔNG có mã ca: mọi ca thi được GIỮ trong bảng `ca`. Trường `ca` của kết quả luôn rỗng, giữ lại cho đúng hình dạng cũ
- * của `maSeGiuLai` và để các nơi chặn "mã ca đã dùng mà không còn trong ca" (publish, capNhatKeyBank, noiKhoCa, /ca/nhieu) vẫn hoạt động nếu sau này có mã ca được nạp tay.
+ * Tập mã đã dùng nạp lúc reset, theo `loai` của cấu hình. Lần 21/09: BTVN và bài Mẹ giao (đã xoá) — KHÔNG có mã ca (mọi ca thi được GIỮ), trường `ca` rỗng.
+ * Lần 2 (Game Hóa 2.0): THÊM mã ca (bảng `ca` bị xoá) ⇒ các nơi chặn "mã ca đã dùng mà không còn trong ca" (publish, capNhatKeyBank, noiKhoCa, /ca/nhieu) chặn máy thầy đẩy lại ca cũ.
  */
-async function docMaDaDung(env: Env, hienCo: ReadonlyMap<string, unknown>): Promise<{ ca: string[]; btvn: string[]; mom: string[] }> {
+async function docMaDaDung(env: Env, hienCo: ReadonlyMap<string, unknown>, loai: readonly LoaiMa[] = RESET_2109.loaiMaNap): Promise<{ ca: string[]; btvn: string[]; mom: string[] }> {
+  const ca: string[] = []
+  if (loai.includes('ca') && hienCo.has('ca')) {
+    const r = await env.DB.prepare("SELECT DISTINCT ma_ca AS ma FROM ca WHERE ma_ca IS NOT NULL AND ma_ca <> ''").all<{ ma: string }>()
+    for (const x of r.results ?? []) ca.push(String(x.ma))
+  }
   const btvn: string[] = []
-  if (hienCo.has('btvn')) {
+  if (loai.includes('btvn') && hienCo.has('btvn')) {
     const r = await env.DB.prepare("SELECT DISTINCT ma_btvn AS ma FROM btvn WHERE ma_btvn IS NOT NULL AND ma_btvn <> ''").all<{ ma: string }>()
     for (const x of r.results ?? []) btvn.push(String(x.ma))
   }
   const mom: string[] = []
-  if (hienCo.has('mom_bai')) {
+  if (loai.includes('mom') && hienCo.has('mom_bai')) {
     const r = await env.DB.prepare("SELECT DISTINCT id AS ma FROM mom_bai WHERE id IS NOT NULL AND id <> ''").all<{ ma: string }>()
     for (const x of r.results ?? []) if (!UUID.test(String(x.ma))) mom.push(String(x.ma)) // id UUID không bao giờ trùng nên khỏi giữ
   }
-  return { ca: [], btvn: btvn.sort(), mom: mom.sort() }
+  return { ca: ca.sort(), btvn: btvn.sort(), mom: mom.sort() }
 }
 
 const CHEN_MA = `INSERT OR IGNORE INTO ma_da_dung (loai, ma, xoa_luc)
@@ -346,24 +429,32 @@ export interface KetQuaDryRun {
   tongDongSeXoa: number
   tongDongGiu: number
   maSeGiuLai: { ca: number; btvn: number; mom: number }
+  /** Chỉ job có điều kiện hoãn (lần 2): lý do job SẼ HOÃN nếu chạy lúc này (ví dụ ca thi đang mở), null = không hoãn. Vắng ở lần 21/09. */
+  hoan?: LyDoHoan | null
   /** Số truy vấn D1 dryRun đã dùng (phải ≤ TOI_DA_TRUY_VAN_MOI_LUOT). */
   soTruyVan: number
 }
 
 /** CHẠY THỬ: chỉ ĐẾM, không ghi gì, ≤ 40 truy vấn. Cho biết job sẽ xoá bảng nào, bao nhiêu dòng, giữ bảng nào, bảng nào chưa phân loại, và job đã sẵn sàng chưa. */
 export async function resetDryRun(envGoc: Env): Promise<KetQuaDryRun> {
+  return resetDryRunTheo(RESET_2109, envGoc)
+}
+
+/** CHẠY THỬ theo cấu hình `ch` (xem `resetDryRun`). */
+export async function resetDryRunTheo(ch: CauHinhReset, envGoc: Env): Promise<KetQuaDryRun> {
   const { env, dem } = boDemTruyVan(envGoc)
   const hienCo = await docBangHienCo(env)
-  const demBang = await demCacBang(env, hienCo)
-  const phanLoai = new Set([...BANG_XOA, ...BANG_GIU])
-  const ma = await docMaDaDung(env, hienCo)
-  const chung = await docTrangThaiChung(env)
+  const demBang = await demCacBang(env, hienCo, [...ch.bangXoa, ...ch.bangGiu])
+  const phanLoai = new Set([...ch.bangXoa, ...ch.bangGiu])
+  const ma = await docMaDaDung(env, hienCo, ch.loaiMaNap)
+  const chung = await docTrangThaiChung(env, ch)
+  const hoan = ch.kiemHoan ? await ch.kiemHoan(env) : undefined
   const khoa = chung.khoa
   const lyDo: string[] = []
   if (!hienCo.has('ma_da_dung')) lyDo.push('Chưa chạy migration-1909-ma-da-dung.sql (bảng ma_da_dung): job sẽ DỪNG, không xoá gì')
   if (!hienCo.has('cau_hinh')) lyDo.push('Thiếu bảng cau_hinh (khoá, cờ)')
-  const xoa = BANG_XOA.map((bang) => ({ bang, dong: demBang[bang] ?? null }))
-  const giu = BANG_GIU.map((bang) => ({ bang, dong: demBang[bang] ?? null }))
+  const xoa = ch.bangXoa.map((bang) => ({ bang, dong: demBang[bang] ?? null }))
+  const giu = ch.bangGiu.map((bang) => ({ bang, dong: demBang[bang] ?? null }))
   const ra: KetQuaDryRun = {
     ok: true,
     dryRun: true,
@@ -384,6 +475,7 @@ export async function resetDryRun(envGoc: Env): Promise<KetQuaDryRun> {
     maSeGiuLai: { ca: ma.ca.length, btvn: ma.btvn.length, mom: ma.mom.length },
     soTruyVan: 0,
   }
+  if (hoan !== undefined) ra.hoan = hoan
   ra.soTruyVan = dem()
   return ra
 }
@@ -391,22 +483,25 @@ export async function resetDryRun(envGoc: Env): Promise<KetQuaDryRun> {
 // --- Chạy thật ------------------------------------------------------------------------------------------
 
 /** Xoá MỘT lô của một bảng (một truy vấn). Bảng WITHOUT ROWID: xoá thẳng cả bảng. */
-async function xoaMotLo(env: Env, ten: string, khongRowid: boolean): Promise<number> {
-  // Phòng thủ hai lớp: tên phải nằm trong danh sách XOÁ và đúng định dạng — không bao giờ ghép tên từ nguồn khác vào SQL.
-  if (!BANG_XOA.includes(ten) || !TEN_HOP_LE.test(ten)) throw new Error(`Bảng "${ten}" không nằm trong danh sách XOÁ`)
+async function xoaMotLo(env: Env, ch: CauHinhReset, ten: string, khongRowid: boolean): Promise<number> {
+  // Phòng thủ hai lớp: tên phải nằm trong danh sách XOÁ (của CHÍNH job này) và đúng định dạng — không bao giờ ghép tên từ nguồn khác vào SQL.
+  if (!ch.bangXoa.includes(ten) || !TEN_HOP_LE.test(ten)) throw new Error(`Bảng "${ten}" không nằm trong danh sách XOÁ`)
   const sql = khongRowid ? `DELETE FROM "${ten}"` : `DELETE FROM "${ten}" WHERE rowid IN (SELECT rowid FROM "${ten}" LIMIT ${XOA_MOI_LENH})`
   const r = await env.DB.prepare(sql).run()
   return Number(r.meta?.changes) || 0
 }
 
-async function ghiKhoa(env: Env, st: TrangThaiReset): Promise<void> {
-  await env.DB.prepare('UPDATE cau_hinh SET gia_tri = ?, cap_nhat_luc = ? WHERE khoa = ?').bind(json(st), new Date().toISOString(), MA_RESET).run()
+async function ghiKhoa(env: Env, ch: KhoaJobReset, st: TrangThaiReset): Promise<void> {
+  await env.DB.prepare('UPDATE cau_hinh SET gia_tri = ?, cap_nhat_luc = ? WHERE khoa = ?').bind(json(st), new Date().toISOString(), ch.maReset).run()
 }
 
 export interface KetQuaChayReset {
   chay: boolean
-  lyDo?: 'huy' | 'khong_cho_phep' | 'chua_toi_gio' | 'da_xong' | 'dang_chay' | 'cho_tiep' | 'qua_gio' | 'loi'
+  /** `hoan` (chỉ job có điều kiện hoãn): có ca thi mở ⇒ KHÔNG làm gì, không đóng băng; cron phút sau kiểm lại. */
+  lyDo?: 'huy' | 'khong_cho_phep' | 'chua_toi_gio' | 'da_xong' | 'dang_chay' | 'cho_tiep' | 'qua_gio' | 'loi' | 'hoan'
   trangThai?: TrangThaiReset
+  /** Khi `lyDo === 'hoan'`: vì sao (ca nào đang mở). */
+  hoan?: LyDoHoan
   /** Số truy vấn D1 lượt này đã dùng (≤ TOI_DA_TRUY_VAN_MOI_LUOT). */
   soTruyVan: number
 }
@@ -426,10 +521,20 @@ function boNhoLai(envGoc: Env): void {
  * Chỉ chạy khi: có cờ cho phép, không huỷ, đã tới mốc, còn trong hạn 01:00 (trừ lệnh tay), chưa xong, và giành/nhận được khoá. Không ném lỗi ra ngoài.
  */
 export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChayReset = {}): Promise<KetQuaChayReset> {
+  return chayResetTheo(RESET_2109, envGoc, nowMs, tuyChon)
+}
+
+/**
+ * CHẠY JOB theo cấu hình `ch` (xem `chayReset`). Thêm so với lần 21/09, CHỈ khi cấu hình có:
+ *   · `kiemHoan`: job CHƯA giành khoá, hoặc đang dừng (`qua_gio`/`hoan`), mà có ca thi mở ⇒ trả `hoan`, KHÔNG ghi gì (không đóng băng).
+ *   · `choBangMs > 0`: giành khoá xong thì bước `cho_bang` CHỜ cho mọi isolate hết đệm cổng đóng băng (không còn máy nào nhận lệnh mở ca), rồi kiểm hoãn LẦN NỮA
+ *     ngay trước khi xoá. Có ca mở lọt qua khe đệm ⇒ chưa xoá gì thì TRẢ KHOÁ (về "đã lên đạn, chưa bắt đầu"); đã xoá dở thì ghi `hoan` (mở băng).
+ */
+export async function chayResetTheo(ch: CauHinhReset, envGoc: Env, nowMs: number, tuyChon: TuyChonChayReset = {}): Promise<KetQuaChayReset> {
   const { env, dem } = boDemTruyVan(envGoc)
   const kq = (r: Omit<KetQuaChayReset, 'soTruyVan'>): KetQuaChayReset => ({ ...r, soTruyVan: dem() })
   const tay = tuyChon.tay === true
-  const chung = await docTrangThaiChung(env) // MỘT truy vấn đọc cờ cho phép + cờ huỷ + khoá (bỏ qua bộ nhớ đệm)
+  const chung = await docTrangThaiChung(env, ch) // MỘT truy vấn đọc cờ cho phép + cờ huỷ + khoá (bỏ qua bộ nhớ đệm)
   if (chung.huy) return kq({ chay: false, lyDo: 'huy' })
   if (!chung.choPhep || chung.lenDanMs === null) return kq({ chay: false, lyDo: 'khong_cho_phep' })
   const cu = chung.khoa
@@ -440,31 +545,41 @@ export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChay
     // Quá 60 phút kể từ lúc lên đạn mà chưa xong: KHÔNG tự chạy nữa (chạy muộn là xoá bài các em vừa làm). Ghi `qua_gio` một lần, mở băng.
     if (cu && cu.trangThai !== 'qua_gio') {
       const st: TrangThaiReset = { ...cu, trangThai: 'qua_gio', quaGioLuc: new Date(nowMs).toISOString() }
-      await ghiKhoa(env, st)
+      await ghiKhoa(env, ch, st)
       boNhoLai(envGoc)
       return kq({ chay: false, lyDo: 'qua_gio', trangThai: st })
     }
     return kq({ chay: false, lyDo: 'qua_gio', trangThai: cu ?? undefined })
   }
+  // HOÃN: job chưa bắt đầu hoặc đang dừng (không đóng băng) mà có ca thi mở ⇒ không ghi gì. Job đang giữ khoá (`dang_chay`/`cho_tiep`) thì cổng đã đóng băng, không cần kiểm.
+  const dangGiuKhoa = cu?.trangThai === 'dang_chay' || cu?.trangThai === 'cho_tiep'
+  if (ch.kiemHoan && !dangGiuKhoa) {
+    const h = await ch.kiemHoan(env)
+    if (h) return kq({ chay: false, lyDo: 'hoan', hoan: h, trangThai: cu ?? undefined })
+  }
 
   const hienCo = await docBangHienCo(env)
+  const tatCa = [...ch.bangXoa, ...ch.bangGiu]
   let st: TrangThaiReset
   if (!cu) {
     // Giành khoá: chỉ MỘT lượt chạy nhận được `changes = 1`.
-    const demTruoc = await demCacBang(env, hienCo)
+    const demTruoc = await demCacBang(env, hienCo, tatCa)
     const muaCu = hienCo.has('game_v2_settings') ? await env.DB.prepare("SELECT json FROM game_v2_settings WHERE key = 'season'").first<{ json: string }>().then((r) => r?.json ?? null).catch(() => null) : null
     const expMoiCu = await docGiaTri(env, 'exp_moi')
     const luc = new Date(nowMs).toISOString()
     st = { trangThai: 'dang_chay', buoc: 'nap_ma', bangTiep: 0, batDauLuc: luc, lenDanLuc: new Date(chung.lenDanMs).toISOString(), tiepTucLuc: luc, soLanChay: 1, demTruoc, muaCu, expMoiCu }
-    const g = await env.DB.prepare('INSERT OR IGNORE INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?)').bind(MA_RESET, json(st), luc).run()
+    if (ch.choBangMs > 0) { st.buoc = 'cho_bang'; st.choBangTu = luc }
+    const g = await env.DB.prepare('INSERT OR IGNORE INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?)').bind(ch.maReset, json(st), luc).run()
     if (!g.meta?.changes) return kq({ chay: false, lyDo: 'dang_chay' })
   } else {
     // `cho_tiep` (đã nhường) và `qua_gio` (lệnh tay) tiếp tục NGAY; `dang_chay` chỉ khi nhịp tim đã cũ (chết). Giành bằng CAS trên đúng chuỗi cũ.
     const nhip = ms(cu.tiepTucLuc ?? cu.batDauLuc)
     if (cu.trangThai === 'dang_chay' && nowMs - nhip < QUA_HAN_DANG_CHAY_MS) return kq({ chay: false, lyDo: 'dang_chay', trangThai: cu })
-    const giaTriCu = await docGiaTri(env, MA_RESET)
+    const giaTriCu = await docGiaTri(env, ch.maReset)
     st = { ...cu, trangThai: 'dang_chay', tiepTucLuc: new Date(nowMs).toISOString(), soLanChay: (cu.soLanChay || 1) + 1, loi: undefined }
-    const g = await env.DB.prepare('UPDATE cau_hinh SET gia_tri = ?, cap_nhat_luc = ? WHERE khoa = ? AND gia_tri = ?').bind(json(st), st.tiepTucLuc, MA_RESET, giaTriCu).run()
+    // Làm tiếp sau khi đã DỪNG (không đóng băng) ⇒ lại chờ băng + kiểm hoãn trước khi xoá tiếp (bước nạp mã/xoá lặp lại được).
+    if (ch.choBangMs > 0 && (cu.trangThai === 'qua_gio' || cu.trangThai === 'hoan')) { st.buoc = 'cho_bang'; st.choBangTu = st.tiepTucLuc }
+    const g = await env.DB.prepare('UPDATE cau_hinh SET gia_tri = ?, cap_nhat_luc = ? WHERE khoa = ? AND gia_tri = ?').bind(json(st), st.tiepTucLuc, ch.maReset, giaTriCu).run()
     if (!g.meta?.changes) return kq({ chay: false, lyDo: 'dang_chay' })
   }
 
@@ -472,36 +587,60 @@ export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChay
   const nhuong = async (): Promise<KetQuaChayReset> => {
     st.trangThai = 'cho_tiep'
     st.tiepTucLuc = new Date(nowMs).toISOString()
-    await ghiKhoa(env, st)
+    await ghiKhoa(env, ch, st)
     return kq({ chay: true, lyDo: 'cho_tiep', trangThai: st })
   }
+  // Chốt: mùa game + exp_moi + khoá P08 + đọc bảng + đếm lại (mỗi 60 bảng một truy vấn). Lần 21/09 (≤ 120 bảng) = 6 như cũ.
+  const chiPhiChot = 4 + Math.ceil(new Set(tatCa).size / COT_MOI_TRUY_VAN_DEM)
   try {
-    const phanLoai = new Set([...BANG_XOA, ...BANG_GIU])
+    const phanLoai = new Set(tatCa)
     st.chuaPhanLoai = [...hienCo.keys()].filter((t) => !phanLoai.has(t)).sort()
     for (;;) {
+      if (st.buoc === 'cho_bang') {
+        if (nowMs - ms(st.choBangTu ?? st.batDauLuc) < ch.choBangMs) return await nhuong()
+        const h = ch.kiemHoan ? await ch.kiemHoan(env) : null
+        if (h) {
+          if (!st.maDaDung) {
+            // Chưa nạp mã, chưa xoá gì: TRẢ KHOÁ — job về trạng thái "đã lên đạn, chưa bắt đầu", cổng mở băng, cron kiểm lại mỗi phút.
+            await env.DB.prepare('DELETE FROM cau_hinh WHERE khoa = ?').bind(ch.maReset).run()
+            boNhoLai(envGoc)
+            return kq({ chay: false, lyDo: 'hoan', hoan: h })
+          }
+          // Đã xoá dở (làm tiếp sau qua_gio/hoan): DỪNG ở `hoan`, mở băng; hết ca mở thì cron làm tiếp (trong cửa sổ).
+          st.trangThai = 'hoan'
+          st.hoan = { ...h, luc: new Date(nowMs).toISOString() }
+          await ghiKhoa(env, ch, st)
+          boNhoLai(envGoc)
+          return kq({ chay: false, lyDo: 'hoan', hoan: h, trangThai: st })
+        }
+        st.buoc = 'nap_ma'
+        continue
+      }
       if (st.buoc === 'nap_ma') {
-        // Nạp tập MÃ ĐÃ DÙNG trước khi xoá `btvn`/`mom_bai` (lặp lại được: INSERT OR IGNORE). Chưa có bảng `ma_da_dung` thì DỪNG — không xoá khi chưa giữ được mã.
+        // Nạp tập MÃ ĐÃ DÙNG trước khi xoá `btvn`/`mom_bai` (lần 2: cả `ca`) — lặp lại được: INSERT OR IGNORE. Chưa có bảng `ma_da_dung` thì DỪNG — không xoá khi chưa giữ được mã.
         if (!hienCo.has('ma_da_dung')) throw new Error('Chưa chạy migration-1909-ma-da-dung.sql — DỪNG, chưa xoá gì')
         if (!conNganSach(CHI_PHI_NAP_MA)) return await nhuong()
-        const ma = await docMaDaDung(env, hienCo)
+        const ma = await docMaDaDung(env, hienCo, ch.loaiMaNap)
         await napMaDaDung(env, ma, st.batDauLuc)
-        st.maDaDung = { ca: ma.ca.length, btvn: ma.btvn.length, mom: ma.mom.length }
+        // Làm tiếp sau khi đã xoá dở thì bảng nguồn đã vơi: giữ số LỚN hơn (lần nạp đầu).
+        const cuMa = st.maDaDung
+        st.maDaDung = { ca: Math.max(ma.ca.length, cuMa?.ca ?? 0), btvn: Math.max(ma.btvn.length, cuMa?.btvn ?? 0), mom: Math.max(ma.mom.length, cuMa?.mom ?? 0) }
         st.buoc = 'xoa'
         st.bangTiep = 0
         continue
       }
       if (st.buoc === 'xoa') {
-        while (st.bangTiep < BANG_XOA.length && !hienCo.has(BANG_XOA[st.bangTiep]!)) st.bangTiep++
-        if (st.bangTiep >= BANG_XOA.length) { st.buoc = 'chot'; continue }
+        while (st.bangTiep < ch.bangXoa.length && !hienCo.has(ch.bangXoa[st.bangTiep]!)) st.bangTiep++
+        if (st.bangTiep >= ch.bangXoa.length) { st.buoc = 'chot'; continue }
         if (!conNganSach(1)) return await nhuong()
-        const ten = BANG_XOA[st.bangTiep]!
+        const ten = ch.bangXoa[st.bangTiep]!
         const khongRowid = hienCo.get(ten)!.khongRowid
-        const n = await xoaMotLo(env, ten, khongRowid)
+        const n = await xoaMotLo(env, ch, ten, khongRowid)
         if (khongRowid || n < XOA_MOI_LENH) st.bangTiep++ // lô cuối (ít hơn một lô) = bảng đã sạch
         continue
       }
       // Chốt: mùa game mới + EXP mới cho MỌI em từ đúng mốc (bỏ cờ riêng dsSbd/tuDsSbd), đếm lại, ghi `xong`.
-      if (!conNganSach(CHI_PHI_CHOT)) return await nhuong()
+      if (!conNganSach(chiPhiChot)) return await nhuong()
       const ngayVn = new Date(ms(st.batDauLuc) + 7 * 3_600_000).toISOString().slice(0, 10)
       st.mua = `${ngayVn}-mua-1`
       if (hienCo.has('game_v2_settings')) {
@@ -516,22 +655,22 @@ export async function chayReset(envGoc: Env, nowMs: number, tuyChon: TuyChonChay
       // lắp đặt sau chạy lại từ đầu. KHÔNG tự bật lại cờ kích hoạt `cnh_exp_kich_hoat` — đó là quyết định riêng.
       await env.DB.prepare('DELETE FROM cau_hinh WHERE khoa IN (?, ?, ?)')
         .bind('p08_setup', 'p08_setup_cho_phep', 'p08_setup_huy').run()
-      st.demSau = await demCacBang(env, await docBangHienCo(env))
+      st.demSau = await demCacBang(env, await docBangHienCo(env), tatCa)
       const conDu: Record<string, number> = {}
-      for (const t of BANG_XOA) if ((st.demSau[t] ?? 0) > 0) conDu[t] = st.demSau[t] as number
+      for (const t of ch.bangXoa) if ((st.demSau[t] ?? 0) > 0) conDu[t] = st.demSau[t] as number
       if (Object.keys(conDu).length) st.xoaConDu = conDu // bảng XOÁ còn dòng do em/thầy ghi trong lúc chạy; báo, không coi là lỗi
       st.soEm = st.demTruoc.hoc_sinh ?? 0
       st.xongLuc = new Date(nowMs).toISOString()
       st.mocReset = new Date(nowMs + 7 * 3_600_000).toISOString().slice(0, 10) // ngày VN lúc XONG
       st.trangThai = 'xong'
-      await ghiKhoa(env, st)
+      await ghiKhoa(env, ch, st)
       boNhoLai(envGoc)
       return kq({ chay: true, trangThai: st })
     }
   } catch (e) {
     st.loi = e instanceof Error ? e.message : String(e)
-    console.error('[reset] LỖI (lần cron sau sẽ tiếp tục):', st.loi)
-    try { await ghiKhoa(env, st) } catch { /* khoá không ghi được thì thôi */ }
+    console.error(`[${ch.ten}] LỖI (lần cron sau sẽ tiếp tục):`, st.loi)
+    try { await ghiKhoa(env, ch, st) } catch { /* khoá không ghi được thì thôi */ }
     return kq({ chay: false, lyDo: 'loi', trangThai: st })
   }
 }
@@ -559,18 +698,25 @@ export async function chayTiepTay(env: Env, nowMs: number): Promise<KetQuaChayRe
 
 /**
  * Đang ĐÓNG BĂNG GHI? Khi CÓ cờ lên đạn, KHÔNG huỷ, đã tới lúc lên đạn, trong 60 phút kể từ lúc lên đạn, và job CHƯA `xong` (xong sớm thì mở ngay; đang xoá dở thì KHÔNG mở
- * giữa chừng). Không có cờ ⇒ không bao giờ đóng băng. Một truy vấn đọc gộp có bộ nhớ đệm 3 giây trong isolate. Lỗi đọc → không đóng băng.
+ * giữa chừng). Không có cờ ⇒ không bao giờ đóng băng. Một truy vấn đọc gộp (MỌI job của `CAC_JOB_RESET`) có bộ nhớ đệm HAN_DEM_MS trong isolate. Lỗi đọc → không đóng băng.
  */
 export async function dangLamMoi(env: Env, nowMs: number): Promise<boolean> {
   try {
-    const c = await docTrangThaiChungDem(env, nowMs)
-    if (!c.choPhep || c.huy || c.lenDanMs === null) return false
-    if (nowMs < c.lenDanMs || nowMs > c.lenDanMs + CUA_SO_MS) return false
-    // `qua_gio` chỉ được ghi SAU khi cửa sổ đã hết; lên đạn LẠI (cờ mới) mở cửa sổ mới và cron tiếp tục job, nên trong cửa sổ mới vẫn phải đóng băng. Chỉ `xong` mới mở.
-    return c.khoa?.trangThai !== 'xong'
+    const ds = await docTrangThaiChungDem(env, nowMs)
+    return CAC_JOB_RESET.some((j, i) => dongBangJob(j, ds[i], nowMs))
   } catch {
     return false
   }
+}
+
+/** Một job có đang đóng băng ghi không (xem `dangLamMoi`, `KhoaJobReset.dongBangTuLenDan`). */
+function dongBangJob(j: KhoaJobReset, c: TrangThaiChung | undefined, nowMs: number): boolean {
+  if (!c || !c.choPhep || c.huy || c.lenDanMs === null) return false
+  if (nowMs < c.lenDanMs || nowMs > c.lenDanMs + CUA_SO_MS) return false
+  // Lần 21/09: `qua_gio` chỉ được ghi SAU khi cửa sổ đã hết; lên đạn LẠI (cờ mới) mở cửa sổ mới và cron tiếp tục job, nên trong cửa sổ mới vẫn phải đóng băng. Chỉ `xong` mới mở.
+  if (j.dongBangTuLenDan) return c.khoa?.trangThai !== 'xong'
+  // Lần 2: chỉ khi job ĐANG GIỮ KHOÁ (đã qua kiểm "không có ca thi mở"). Đã lên đạn mà còn hoãn/dừng (`hoan`, `qua_gio`) thì KHÔNG đóng băng.
+  return c.khoa?.trangThai === 'dang_chay' || c.khoa?.trangThai === 'cho_tiep'
 }
 
 export const LOI_DANG_LAM_MOI = { ok: false, error: 'Hệ thống đang làm mới, thử lại sau 1 phút', dangLamMoi: true } as const
@@ -581,8 +727,13 @@ export const LOI_DANG_LAM_MOI = { ok: false, error: 'Hệ thống đang làm m�
  */
 export async function docMocReset(env: Env, nowMs: number = Date.now()): Promise<string | null> {
   try {
-    const st = (await docTrangThaiChungDem(env, nowMs)).khoa
-    return st?.trangThai === 'xong' && st.xongLuc ? st.mocReset ?? null : null
+    // Nhiều job đã xong (21/09 rồi lần 2): mốc của job XONG MUỘN NHẤT — máy khách thấy mốc KHÁC mốc đã lưu thì dọn lại một lần nữa.
+    let moi: TrangThaiReset | null = null
+    for (const c of await docTrangThaiChungDem(env, nowMs)) {
+      const st = c.khoa
+      if (st?.trangThai === 'xong' && st.xongLuc && st.mocReset && (!moi || ms(st.xongLuc) >= ms(moi.xongLuc ?? ''))) moi = st
+    }
+    return moi?.mocReset ?? null
   } catch {
     return null
   }
