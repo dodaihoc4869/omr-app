@@ -61,3 +61,16 @@ Chỉ GHI THÊM ở cuối. Mỗi dòng: `- [ ]` chưa · `- [x]` xong + bằng 
 - [x] Thầy chốt: "về 0 là xoá cả vàng và phụ kiện luôn nhé vì cho chọn lại thần thú từ đầu chơi cho công bằng" | bằng chứng: đã nhắn trợ lý reset chuyển vang_so, phu_kien_so_huu, phu_kien_dang_mac sang XOÁ
 - [x] Thầy nhắn (28/09): "bật chế độ Auto-Deploy tự động 100% … bất cứ khi nào bạn … gộp (merge) nhánh vào main, máy của tôi sẽ tự động … deploy lên Cloudflare Worker … Bạn cứ tập trung code cho xong và tự theo dõi kết quả tự động nhé, không cần hỏi tôi bước deploy nữa!" | ghi nhận: được phép merge PR #1 vào main; mỗi lần merge = phát hành thật (Pages qua GitHub Actions + Worker qua máy thầy) ⇒ CHỈ merge khi toàn bộ vitest không thêm đỏ + build xanh + check:mau xanh; gộp các phần giao diện thành MỘT lần phát hành đã kiểm, công tắc game_hoa_2 vẫn tắt
 - [ ] Reset thật vẫn cần mã bí mật thầy / quyền D1 (phiên cloud không có) — khi job gộp xong em gửi đúng lệnh chạy thử khô
+
+## Nhật ký 27/09 tối (phiên cloud, sau khi nén ngữ cảnh)
+
+- [x] Thầy nhắn: "Tôi không muốn phải tự tay gõ hay chạy bất cứ cái lệnh nào cả! Bạn làm tự động 100% cho tôi." | ghi nhận: mọi bước (chạy thử khô, đối chiếu, lên đạn, theo dõi, bật 2.0) do phiên cloud tự gọi API; mã bí mật cất ở tệp riêng của phiên (chmod 600), KHÔNG vào repo (repo CÔNG KHAI)
+- [ ] "tự gọi API chạy thử, tự động đọc kết quả trả về, và tự đối chiếu với danh sách XÓA/GIỮ" | bằng chứng: (chưa có — chờ bản có /reset-hoa2/* lên mạng)
+- [ ] "Nếu bạn thấy mọi thứ chính xác 100%, hãy TỰ ĐỘNG gọi luôn lệnh Reset Thật để chốt hạ" | bằng chứng: (chưa có) — điều kiện: chạy thử sanSang, chuaPhanLoai [], hoan null, danh sách XOÁ/GIỮ khớp đúng tên bảng, su_kien_hoc ở GIỮ; UI 2.0 đã lên mạng
+- [ ] "chỉ báo cáo kết quả cuối cùng cho tôi" | bằng chứng: (chưa có)
+- [!] Phiên cloud bị chặn gọi omr.ttadodaihoc.workers.dev (chính sách mạng) | ĐÃ GỠ: thầy mở Custom allowed domain ("đã mở"); /khoe trả ok:true
+- [x] Thầy hỏi "hướng dẫn chi tiết từng bước click chuột" + "tôi chưa thấy hướng dẫn" | bằng chứng: gửi 7 bước (nút đám mây trên ô nhập → bánh răng → Network access Custom → Allowed domains → tích danh sách mặc định → Save changes)
+- [x] Gộp job reset lần 2 (trợ lý E) + thêm /reset-hoa2/len-dan (xacNhan, tự chạy thử lại, từ chối khi ca mở/chưa phân loại/đã xong/cờ huỷ) và /reset-hoa2/huy | bằng chứng: e4e5e34 — tests/reset-hoa2-2709 22/22, reset-toan-app-1909 45/45
+- [x] Gộp main (610f5cd…920ae01) vào nhánh | bằng chứng: da4f98f — tsc máy chủ exit 0
+- [x] Gộp giao diện: Đảo mới (d8f43fe), Đoàn mới (2368747), app thầy chiến dịch (7a415da) | bằng chứng: cherry-pick không xung đột
+- [x] Build Cloudflare đỏ vì precache 181 tệp > trần 170 | nguyên nhân gốc: mảnh game/app thầy mới (Dao2, DoanHinh, chien-dich, CauDaLam, 32 hình phụ kiện pk-*) lọt precache; sửa: thêm vào globIgnores | bằng chứng: `npm run build:cf` exit 0, kiểm SW 13/13 (143 tệp / 2897 KB)
