@@ -1,4 +1,8 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
+// GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
+import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
+import { useSanhHoa2 } from '../components/hoa2/api'
+import { PETS } from '../game/than-thu-v2/core'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
 import { taiKeHoachNgay, useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong, useThuThachHomNay } from '../components/bang-nhiem-vu/may-chu'
 import { taiThuThachHomNay, DUONG_NOP_THU_THACH, type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
@@ -73,6 +77,8 @@ import { LogoDoc } from '../components/LogoVai'
 // huynh chỉ mở một trang báo cáo trên điện thoại. Em nào mở tab game mới tải,
 // và service worker cất lại ngay nên lần sau tức thì.
 const ThanThuHoaHocGame = lazy(() => import('../game/than-thu-v2/Game'))
+/** Màn "Câu đã làm" của Game Hóa 2.0 (kéo TheCau + phiếu in): nạp lười, chỉ em mở mới tải. */
+const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
 /** = KHOA_MAN_DAU của Game.tsx (test khoá khớp). KHÔNG import hằng ấy từ Game.tsx: sẽ kéo cả game vào gói chính, mất nạp lười. */
 const KHOA_MAN_DAU_GAME = 'game-v2:man-dau'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
@@ -180,7 +186,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon'
+type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -958,11 +964,15 @@ export default function StudentPortalScreen() {
   const dangMoManCon =
     tab !== null || dangLamMom !== null || manThi || boVaoThi !== null || !!phieuHtml || !!xemDeHtml || caXemBaoCaoModal !== null || dsCauSaiKhacPhucModal !== null
   const lamMoiSheet = useLamMoiKhiDong(dangMoManCon)
+  // GAME HÓA 2.0: hỏi `hoa2-sanh` sau đăng nhập và mỗi lần vừa đóng một màn con (game, Câu đã làm…). `cheDo2` = máy chủ bật cờ cho em
+  // (hoặc NHỚ từ lần trước khi đang chờ, để không nháy Bảng nhiệm vụ cũ). Cờ tắt ⇒ mọi thứ dưới đây chạy như cũ.
+  const hoa2 = useSanhHoa2(auth?.token, auth?.sbd, lamMoiSheet + lamMoiHang)
+  const cheDo2 = !!auth?.token && hoa2.cheDo2
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
   // "Thử thách riêng hôm nay" của Bộ não A.I (lệnh riêng, hợp đồng docs/hop-dong-thu-thach-rieng-2109.md): co:false/lỗi/404 ⇒ null ⇒ không thẻ. "Để sau" ẩn tới ngày mai.
   const thuThachMayChu = useThuThachHomNay(auth?.token, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
-  const thiDua = useThiDua(auth?.token, !!auth?.token && tab === null)
+  const thiDua = useThiDua(auth?.token, !!auth?.token && tab === null && !cheDo2)
   const [deSauThuThach, setDeSauThuThach] = useState('')
   const homNayVn = ngayVietNam(nowHocTap) ?? ''
   const thuThachRieng = useMemo(() => {
@@ -996,6 +1006,14 @@ export default function StudentPortalScreen() {
   const banNho = useBanNho(auth?.sbd, sanSangBang && !keHoachNgay.cu && duLieuNhiemVu.nguon === 'ke_hoach_ngay' ? duLieuNhiemVu : null)
   const dungBanNho = !!banNho && !sanSangBang
   const duLieuBang = useMemo(() => ({ ...(dungBanNho ? banNho! : duLieuNhiemVu), thuThachRieng }), [dungBanNho, banNho, duLieuNhiemVu, thuThachRieng])
+  // HUD của Sảnh (Game Hóa 2.0): thần thú / EXP / chuỗi ngày lấy ĐÚNG nguồn Bảng nhiệm vụ đang dùng (/hs/ke-hoach-ngay, kể cả bản nhớ cùng ngày).
+  const thuSanh = useMemo((): ThuTrenHud | null => {
+    const t = duLieuBang.thanThu
+    if (t.kieu !== 'co') return null
+    const index = PETS.findIndex((p) => p.id === t.pet)
+    return index < 0 ? null : { index, cap: t.cap, ten: t.ten || PETS[index].name }
+  }, [duLieuBang.thanThu])
+  const expSanh = duLieuBang.exp ? { homNay: duLieuBang.exp.homNay, conThieu: duLieuBang.exp.thu?.expConThieu ?? null } : null
 
   // Rút đề khắc phục câu sai
   /**
@@ -1277,6 +1295,21 @@ export default function StudentPortalScreen() {
 
   // Vỏ M3 của sheet toàn màn: chỉ ở cổng học sinh (dungM3) và không phải game (game thần thú giữ nguyên, test khoá).
   const vaoM3 = dungM3() && tab !== 'thanthu'
+  /** Mở game thần thú ở đúng màn đầu (hợp đồng docs/hop-dong-mo-game-doan-ho-tong-1909.md: game đọc khoá MỘT lần rồi tự xoá). Rỗng = màn Đảo. */
+  const moGameTai = (manDau: '' | 'doan' | 'shop' | 'tui-do') => {
+    try {
+      if (manDau) sessionStorage.setItem(KHOA_MAN_DAU_GAME, manDau)
+      else sessionStorage.removeItem(KHOA_MAN_DAU_GAME)
+    } catch {
+      /* máy chặn lưu: game vẫn mở ở màn Đảo */
+    }
+    moGame()
+  }
+  const hoiDangXuat = () => {
+    void hoi({ tieuDe: 'Đăng xuất khỏi máy này?', noiDung: 'Lần sau em nhập lại số báo danh và mật khẩu để vào app.', nutDongY: 'Đăng xuất', nutHuy: 'Ở lại' }).then((dongY) => {
+      if (dongY) void dangXuat()
+    })
+  }
   const tieuSheet =
     tab === 'diem' ? 'Xem điểm & lịch sử ca kiểm tra'
     : tab === 'btvn' ? 'Bài tập về nhà'
@@ -1296,7 +1329,31 @@ export default function StudentPortalScreen() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {hop}
-      {auth.token && !(tab === 'mom' && dangLamMom) && !manThi && (
+      {auth.token && cheDo2 && !manThi && (
+        <SanhBanDo
+          ketQua={hoa2.ketQua}
+          loi={hoa2.loi}
+          dangTai={hoa2.dangTai}
+          thu={thuSanh}
+          exp={expSanh}
+          chuoiNgay={duLieuBang.chuoiNgay.soNgay}
+          caDangMo={caDangMo}
+          now={nowHocTap}
+          token={auth.token}
+          shopBat={duLieuBang.thanThu.kieu === 'co' && duLieuBang.thanThu.shopBat === true}
+          onVaoThi={() => setTab('vaothi')}
+          onPhaPhucKich={() => moGameTai('doan')}
+          onKhamPhaDao={() => moGameTai('')}
+          onCauDaLam={() => setTab('caudalam')}
+          onTuiDo={() => moGameTai('tui-do')}
+          onCuaHang={() => moGameTai('shop')}
+          onMoThanThu={() => moGameTai('')}
+          onChonThu={() => moGameTai('')}
+          onDangXuat={hoiDangXuat}
+          onTaiLai={hoa2.taiLai}
+        />
+      )}
+      {auth.token && !cheDo2 && !(tab === 'mom' && dangLamMom) && !manThi && (
         <BangNhiemVu
           vaiTro="hocsinh"
           hoTen={auth.hoTen}
@@ -1360,7 +1417,16 @@ export default function StudentPortalScreen() {
       )}
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
-      {tab !== null && (
+      {/* CÂU ĐÃ LÀM (Game Hóa 2.0): màn riêng toàn màn hình, có nút "Về Sảnh" của chính nó. */}
+      {tab === 'caudalam' && auth.token && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
+          <Suspense fallback={<ChoNapGame />}>
+            <CauDaLam token={auth.token} hoTen={auth.hoTen} sbd={auth.sbd} onVe={() => setTab(null)} />
+          </Suspense>
+        </div>
+      )}
+
+      {tab !== null && tab !== 'caudalam' && (
         <div
           className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade`}
         >
@@ -1369,7 +1435,7 @@ export default function StudentPortalScreen() {
             <ThanhTren
               tieuDe={tieuSheet}
               onQuayLai={() => setTab(null)}
-              nhanQuayLai="Quay lại Bảng tin"
+              nhanQuayLai={cheDo2 ? 'Về Sảnh' : 'Quay lại Bảng tin'}
               phai={
                 <button type="button" onClick={() => setTab(null)} className="m3-nut-chu" title="Đóng toàn màn hình">
                   <X size={18} aria-hidden="true" />
@@ -2148,7 +2214,7 @@ export default function StudentPortalScreen() {
 
         {/* TAB 4: VÀO PHÒNG THI */}
         {tab === 'vaothi' && !manThi && (
-          <PhongVaoThi onClose={() => setTab('diem')}>
+          <PhongVaoThi onClose={() => setTab(cheDo2 ? null : 'diem')}>
           {vaoM3 && (
             <VaoThiForm maCa={maCaVaoThi} onMaCa={setMaCaVaoThi} matKhau={matKhauCaVaoThi} onMatKhau={setMatKhauCaVaoThi} loi={loiVaoThi} onSubmit={vaoThi} sbd={auth.sbd} hoTen={auth.hoTen} />
           )}
@@ -2238,8 +2304,8 @@ export default function StudentPortalScreen() {
               ketThucLuotToanManHinh() // Về app học sinh: thoát toàn màn hình rồi về app
               setTab(null)
             }}
-            onChuyenSangKhacPhuc={() => setTab('khacphuc')}
-            onChuyenSangBtvn={() => setTab('btvn')}
+            onChuyenSangKhacPhuc={() => setTab(cheDo2 ? null : 'khacphuc')}
+            onChuyenSangBtvn={() => setTab(cheDo2 ? null : 'btvn')}
             onChuyenSangVaoThi={() => setTab('vaothi')}
           />
           </Suspense>
