@@ -90,3 +90,19 @@ describe('ds-em trả KHỐI + LỚP ĐÃ PHÂN (thầy 28/09: "học sinh đã 
     expect(k.K2).toMatchObject({ khoi: '12', tenLop: '12 - Lớp Thường' })
   })
 })
+
+describe('ds-em dùng đúng nguồn bộ lọc lớp /gv/lop (thầy 28/09: "lọc theo lớp ở đây nhé", tài khoản test Đỗ Đại Học bị thiếu)', () => {
+  it('em CHƯA ghi khối nhưng đã phân lớp (tài khoản test) vẫn có, nhận khối của lớp; em chỉ có trong danh_sach cũng có; số em mỗi lớp khớp /gv/lop', async () => {
+    const { d, env } = dung()
+    d.sql.exec(`INSERT INTO hoc_sinh(sbd,ho_ten,lop,ten_lop,cap_nhat_luc) VALUES
+      ('T1','Tú','12','12 - Tinh Hoa','x'),('12121212','Đỗ Đại Học','','12 - Tinh Hoa','x')`)
+    d.sql.exec("INSERT INTO danh_sach(sbd,ho_ten,lop,cap_nhat_luc) VALUES('DS1','Mai','11','x')")
+    const ds = await gvChienDich(env, { action: 'ds-em' }, T0) as { em: { sbd: string; hoTen: string; khoi: string; tenLop: string }[] }
+    const k = Object.fromEntries(ds.em.map((e) => [e.sbd, e]))
+    expect(k['12121212']).toMatchObject({ hoTen: 'Đỗ Đại Học', khoi: '12', tenLop: '12 - Tinh Hoa' })
+    expect(k.DS1).toMatchObject({ hoTen: 'Mai', khoi: '11' })
+    const { gvLop } = await import('../server/src/ten-lop')
+    const lop = (await gvLop(env)).lop as { tenLop: string; soEm: number }[]
+    for (const l of lop) expect(ds.em.filter((e) => e.tenLop === l.tenLop).length).toBe(l.soEm)
+  })
+})
