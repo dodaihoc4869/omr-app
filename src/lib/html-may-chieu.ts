@@ -26,6 +26,10 @@ import { CSS_GIAO_DIEN_NUT_CHAM, CSS_GIAO_DIEN_TO_CHIEU, GIAO_DIEN_TO_CHIEU, mau
 import type { NhanLichSuCau } from './lich-su-cau-len-bang'
 import { CSS_CAU_NOI_TO_CHIEU, chuanMaPhien, jsCauNoiToChieu, khoaToChieu, mangNutChamToChieu } from './to-chieu-cau-noi'
 import { CSS_LEN_BANG_MOI, jsLenBangMoi, thongKeHtml, type ThongKeLopCau } from './len-bang-moi-to-chieu'
+import { laCauTuLuan } from './cau-tu-luan'
+
+/** Câu phần III TỰ LUẬN theo nội dung (bảng Dạy học 28/09: thầy chọn câu tự luận thì tờ ghi đúng "Tự luận", không ghi "Trả lời ngắn"). Không xét mã đề. */
+const laTuLuanChieu = (c: CauLuyen): boolean => c.phan === 'III' && laCauTuLuan({ phan: 'III', text: c.text, dapAn: c.dapAn }, 'III')
 
 /** Một ô bảng: một em, một câu. */
 export interface OBang {
@@ -201,7 +205,7 @@ function thanCauHtml(c: CauLuyen): string {
     })
     khoi.push(`<div class="mc-ds-pa">${o.join('')}</div>`)
   } else if (c.phan === 'III') {
-    khoi.push('<div class="mc-ngan">Trả lời ngắn — em viết kết quả và trình bày các bước lên bảng.</div>')
+    khoi.push(laTuLuanChieu(c) ? '<div class="mc-ngan">Tự luận — em trình bày lời giải đầy đủ lên bảng.</div>' : '<div class="mc-ngan">Trả lời ngắn — em viết kết quả và trình bày các bước lên bảng.</div>')
   }
 
   khoi.push(hinhTaiViTri(c, 'cuoi_cau'))
@@ -258,7 +262,7 @@ const TEN_PHAN_CAU: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng
 /** Dòng đầu của thẻ đề khi câu chiếm 2/3 bảng (bản vẽ "câu dài"): chip số câu + chip phần. Ở đợt đôi (mỗi em nửa bảng) dòng này
  * ẨN — số câu đã nằm trên thẻ tên. Hai bản cùng một chữ, CSS chọn bản nào hiện theo bố cục. */
 function dauDeHtml(o: OBang): string {
-  return `<div class="mc-de-dau"><span class="mc-de-so">Câu ${o.soCau}</span><span class="mc-de-phan">Phần ${o.cau.phan}${TEN_PHAN_CAU[o.cau.phan] ? ` · ${TEN_PHAN_CAU[o.cau.phan]}` : ''}</span></div>`
+  return `<div class="mc-de-dau"><span class="mc-de-so">Câu ${o.soCau}</span><span class="mc-de-phan">Phần ${o.cau.phan}${laTuLuanChieu(o.cau) ? ' · Tự luận' : TEN_PHAN_CAU[o.cau.phan] ? ` · ${TEN_PHAN_CAU[o.cau.phan]}` : ''}</span></div>`
 }
 
 /** Tên gọi ở nhãn vùng làm bài: từ cuối của họ tên ("Nguyễn Văn Minh" → "Minh"). */

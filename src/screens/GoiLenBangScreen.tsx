@@ -60,6 +60,7 @@ import { useAppStore } from '../store/appStore'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import LenBangChienDich from '../components/chien-dich/LenBangChienDich'
+import DayHocLenBang from '../components/day-hoc/DayHocLenBang'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -216,15 +217,33 @@ async function songSong<T, R>(ds: T[], soLuong: number, viec: (x: T) => Promise<
   return ra
 }
 
-/** LÊN BẢNG — hai chế độ.
- *  · Game Hóa 2.0 BẬT (cờ `/gv/chien-dich` co-doc): chọn chiến dịch → Bảng chiến dịch khi đang chạy / Buổi chữa khi hết hạn nộp
- *    (`src/components/chien-dich/LenBangChienDich.tsx`). Thầy vẫn vào được cách cũ bằng nút chữ cuối màn.
- *  · Cờ TẮT: đúng màn Gọi lên bảng cũ (`GoiLenBangCu` dưới đây), không đổi gì. */
+/** LÊN BẢNG — HAI THẺ ở đầu mục (thầy 28/09):
+ *  · Thẻ thứ nhất: Game Hóa 2.0 BẬT (cờ `/gv/chien-dich` co-doc) ⇒ Chiến dịch (`LenBangChienDich`: Bảng chiến dịch / Buổi chữa); cờ TẮT ⇒ màn Gọi lên
+ *    bảng theo ca kiểm tra (`GoiLenBangCu` dưới đây, giữ cho app thầy khi chưa bật 2.0). ĐÃ XOÁ nút "Gọi lên bảng theo một ca kiểm tra (cách cũ)" ở
+ *    chế độ Chiến dịch (thầy lệnh 28/09) — cờ bật thì không còn lối vào màn cũ.
+ *  · Thẻ DẠY HỌC (thủ công): điểm danh → chọn câu kho Dạy học → chiếu, app chọn em (`src/components/day-hoc/DayHocLenBang.tsx`). */
 export default function GoiLenBangScreen() {
   const hoa2 = useHoa2Bat()
-  const [cachCu, setCachCu] = useState(false)
-  if (hoa2 && !cachCu) return <LenBangChienDich onCheDoCu={() => setCachCu(true)} />
-  return <GoiLenBangCu />
+  // Mỗi lần mở mục là thẻ thứ nhất (không nhớ qua lần tải lại — tránh thầy mở ra màn khác với lần trước mà không để ý).
+  const [the, chon] = useState<'chinh' | 'day_hoc'>('chinh')
+  const DS_THE = [
+    { id: 'chinh' as const, ten: hoa2 ? 'Chiến dịch' : 'Theo ca kiểm tra' },
+    { id: 'day_hoc' as const, ten: 'Dạy học' },
+  ]
+  return (
+    <>
+      <div className="dh-the-ds" role="tablist" aria-label="Cách lên bảng">
+        {DS_THE.map((t) => (
+          <button key={t.id} type="button" role="tab" id={`the-len-bang-${t.id}`} aria-selected={the === t.id} className="dh-the" onClick={() => chon(t.id)}>
+            {t.ten}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" aria-labelledby={`the-len-bang-${the}`}>
+        {the === 'day_hoc' ? <DayHocLenBang /> : hoa2 ? <LenBangChienDich /> : <GoiLenBangCu />}
+      </div>
+    </>
+  )
 }
 
 function GoiLenBangCu() {

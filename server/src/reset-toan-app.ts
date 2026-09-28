@@ -101,6 +101,8 @@ export const BANG_XOA: readonly string[] = [
   'btvn', 'btvn_em', 'btvn_em_lich_su', 'btvn_cau', 'btvn_em_cau', 'mom_bai', 'luyen_de_2026', 'yeu_cau_giao_bai', 'study_drafts',
   // Kế hoạch ngày và lên bảng (SỔ + HỒ SƠ MẠNH YẾU và CA THI được GIỮ, xem BANG_GIU)
   'ke_hoach_ngay', 'len_bang',
+  // Buổi học + điểm danh (bảng DẠY HỌC của Lên bảng, 28/09 — buoi-hoc.ts): danh sách có mặt từng buổi, cùng họ với `len_bang`.
+  'buoi_hoc', 'buoi_hoc_diem_danh',
   // GIỮ CHỖ CÂU THEO LƯỢT (migration-2309-cnh1-giu-cho.sql, CNH-1.0 P05 mục 4): trạng thái ĐANG CHẠY của
   // ngày — lượt mới phải giành lại chỗ, nên reset XOÁ (không phải quyền học/không phải bằng chứng).
   'giu_cho',

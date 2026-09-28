@@ -178,5 +178,6 @@ export function useGhiToChieu(chienDichId: string) {
     return () => window.removeEventListener('message', nghe)
   }, [maDangMo])
 
-  return { ketQua, moPhien, ganO, dongPhien }
+  // `ghi`: nút Đúng / Sai NGAY TRÊN MÀN THẦY (bảng Dạy học, 28/09) — cùng khoá `sbd|qid`, cùng chống ghi đôi, cùng lệnh `ghiLenBang` như nút trên tờ.
+  return { ketQua, moPhien, ganO, dongPhien, ghi: ghiTheoKhoa }
 }
