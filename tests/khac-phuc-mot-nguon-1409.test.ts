@@ -57,7 +57,8 @@ describe('Một nguồn duy nhất', () => {
 
   it('modal chỉ dùng ở màn của EM và PHỤ HUYNH — không cướp kho màn của thầy', () => {
     // ParentPortalScreen không gọi trực tiếp nữa (app PH một màn một nút, 21/09): hộp báo cáo PH vẫn giữ modal cho chế độ có giao bài.
-    const dung = ['src/screens/StudentPortalScreen.tsx', 'src/components/BaoCaoCaThiHocSinhModal.tsx', 'src/components/BaoCaoCaThiPhuHuynhModal.tsx']
+    // 28/09: modal báo cáo học sinh cũ đã xoá khỏi danh sách (báo cáo em bản mới không mở modal này).
+    const dung = ['src/screens/StudentPortalScreen.tsx', 'src/components/BaoCaoCaThiPhuHuynhModal.tsx']
     for (const f of dung) expect(doc(f), f).toContain('ModalKhacPhucCauSai')
   })
 })

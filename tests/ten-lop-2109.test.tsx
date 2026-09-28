@@ -64,7 +64,6 @@ vi.mock('../src/components/NutDongBoDanhSach', () => ({ default: () => null }))
 vi.mock('../src/components/NutThemHocSinh', () => ({ default: () => null }))
 vi.mock('../src/components/NutBaiTapPdf', () => ({ default: () => null }))
 vi.mock('../src/components/KhoiTienBo', () => ({ default: () => null }))
-vi.mock('../src/components/BaoCaoCaThiHocSinhModal', () => ({ default: () => null }))
 vi.mock('../src/store/appStore', async (goc) => {
   const that = await goc<typeof import('../src/store/appStore')>()
   const dung = (sel: (s: Record<string, unknown>) => unknown) => sel({ sbdDangXem: m.sbd.v, moHoSoEm: m.moHoSoEm, showToast: m.showToast, setScreen: m.setScreen, moChiTietCa: vi.fn(), datSbdGiaoRieng: vi.fn(), sbdGiaoRieng: '', classList: [] })

@@ -10,10 +10,10 @@
 // từng trường rồi truyền vào — mỗi chỗ nhặt thiếu một kiểu, có chỗ còn tự tính
 // `soCauSai = tongCau - soCauDung`.
 import { describe, expect, it } from 'vitest'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { goiBaiThi } from '../src/lib/goi-bao-cao'
-import { docSoDem } from '../src/components/DongDemCau'
+import { baoCaoCuaEm } from '../src/lib/bao-cao-cua-em'
+import { nguonBaoCaoEmMoi } from './_bao-cao-em-moi'
 import { demKetQua, type CauDeDem } from '../src/lib/dem-ket-qua'
 import { anhCuaCau, anhPhuongAn } from '../src/components/KhoiCauSai'
 import { danhGiaBai } from '../src/lib/danh-gia-bai'
@@ -50,40 +50,38 @@ const TEST4_BANG_CHAM: CauDeDem[] = [
   { phan: 'III', dapAnChon: '3', dapAnDung: '9', dungSai: false },
 ]
 
+// 28/09: hộp báo cáo cũ `BaoCaoCaThiHocSinhModal` + hàm gói `goiBaiThi` (lib/goi-bao-cao) ĐÃ XOÁ (thầy cho phép) — mọi lối
+// mở báo cáo của em đi qua BẢN MỚI (BaoCaoCaCuaEm → baoCaoCuaEm → BaoCaoChiTiet chế độ em). LUẬT "một ca một bộ số ở mọi app"
+// giữ nguyên, kiểm trên bản mới: số từ gói máy chủ của em PHẢI khớp số đếm từ bảng chấm bên máy thầy (`demKetQua`).
+/** Bảng chấm Test4 dưới dạng `/hs/cau-da-thi` của em. */
+const TEST4_CAU_EM = TEST4_BANG_CHAM.map((c, i) => ({ ...c, maCa: '814335', qid: `q${i}`, soCau: i + 1 }))
+
 describe('một gói, một con số — ba app phải khớp', () => {
-  it('gói máy chủ và bảng chấm máy thầy ra ĐÚNG cùng bộ số', () => {
-    const tuMayChu = docSoDem(goiBaiThi(TEST4_MAY_CHU))!
-    const tuBangCham = demKetQua(TEST4_BANG_CHAM)
-    for (const k of ['tongCau', 'soDung', 'soDungMotPhan', 'soSai', 'soBoTrong', 'soCanKhacPhuc'] as const) {
-      expect(tuMayChu[k], k).toBe(tuBangCham[k])
-    }
-    expect(tuMayChu.yPhanII).toEqual(tuBangCham.yPhanII)
+  it('gói máy chủ của em và bảng chấm máy thầy ra ĐÚNG cùng bộ số', () => {
+    const em = baoCaoCuaEm(TEST4_MAY_CHU, TEST4_CAU_EM)
+    const thay = demKetQua(TEST4_BANG_CHAM)
+    expect(em.tongCau).toBe(thay.tongCau)
+    expect(em.dung).toBe(thay.soDung)
+    expect(em.motPhan).toBe(thay.soDungMotPhan)
+    expect(em.cauXemLai.length).toBe(thay.soCanKhacPhuc)
   })
 
   it('ca Test4: 12 câu cần khắc phục, KHÔNG phải 10', () => {
-    expect(docSoDem(goiBaiThi(TEST4_MAY_CHU))!.soCanKhacPhuc).toBe(12)
+    expect(baoCaoCuaEm(TEST4_MAY_CHU, TEST4_CAU_EM).cauXemLai).toHaveLength(12)
   })
 
-  it('`goiBaiThi` chép nguyên bảy con số, không tự tính cái nào', () => {
-    const g = goiBaiThi(TEST4_MAY_CHU)
+  it('chưa tải được câu thì vẫn chép NGUYÊN số máy chủ, không tự tính cái nào', () => {
+    const g = baoCaoCuaEm(TEST4_MAY_CHU, null)
     expect(g.tongCau).toBe(12)
-    expect(g.soCauDung).toBe(0)
-    expect(g.soCauSai).toBe(10)
-    expect(g.soCauDungMotPhan).toBe(2)
-    expect(g.soCauBoTrong).toBe(0)
-    expect(g.soYDungII).toBe(6)
-    expect(g.soYTongII).toBe(8)
+    expect(g.dung).toBe(0)
+    expect(g.motPhan).toBe(2)
+    expect(g.tong).toBe(2)
   })
 
-  it('gói của cổng phụ huynh (tongSoCau) cũng ra đúng con số ấy', () => {
-    const { tongCau, ...conLai } = TEST4_MAY_CHU
-    const g = goiBaiThi({ ...conLai, tongSoCau: tongCau })
-    expect(docSoDem(g)!.soCanKhacPhuc).toBe(12)
-  })
-
-  it('ca CHƯA CHẤM thì mọi chỗ đều GIẤU dòng đếm, không chỗ nào in 0/0', () => {
-    const g = goiBaiThi({ maCa: '1', tenCa: 'x', tong: null })
-    expect(docSoDem(g)).toBeNull()
+  it('ca CHƯA CHẤM thì GIẤU số đếm, không in 0/0', () => {
+    const g = baoCaoCuaEm({ maCa: '1', tong: null }, null)
+    expect(g.dung).toBeNull()
+    expect(g.tongCau).toBeNull()
   })
 })
 
@@ -103,6 +101,9 @@ describe('không chỗ gọi nào được tự nhặt trường nữa', () => {
     }
     expect(doc('src/components/ca-thi/BaoCaoCaCuaEm.tsx')).toContain('cheDo="hs"')
     expect(doc('src/screens/HocSinhScreen.tsx')).not.toContain('BaoCaoCaThiHocSinhModal')
+    // 28/09 (thầy cho xoá): bản cũ và hàm gói tay của nó không còn tồn tại — không ai lỡ nối lại được.
+    expect(existsSync(resolve(__dirname, '..', 'src/components/BaoCaoCaThiHocSinhModal.tsx'))).toBe(false)
+    expect(existsSync(resolve(__dirname, '..', 'src/lib/goi-bao-cao.ts'))).toBe(false)
     expect(doc('src/screens/HocSinhScreen.tsx')).toContain('moChiTietCa(caBaoCao.maCa, hoSo.em.sbd)')
   })
 
@@ -122,13 +123,12 @@ describe('không chỗ gọi nào được tự nhặt trường nữa', () => {
 })
 
 describe('khắc phục gộp cả bỏ trống lẫn phần II chưa trọn ý', () => {
-  const HS = doc('src/components/BaoCaoCaThiHocSinhModal.tsx')
+  const HS = nguonBaoCaoEmMoi()
   const PH = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
 
-  it('nút và tab của cổng học sinh đếm theo `soCanKhacPhuc`', () => {
-    expect(HS).toContain('const soKhacPhuc = dem ? dem.soCanKhacPhuc : dsCauSai.length')
-    expect(HS).toContain('KHẮC PHỤC NGAY ${soKhacPhuc} CÂU SAI')
-    expect(HS).toContain('Câu sai cần chữa ({soKhacPhuc})')
+  it('nút "Làm lại … câu cần chữa" của em đếm MỌI câu không đúng trọn (sai · đúng một phần · bỏ trống)', () => {
+    expect(HS).toContain('Làm lại {b.cauXemLai.length} câu cần chữa')
+    expect(HS).toContain(".filter((r) => r.dungSai !== true)")
     expect(HS).not.toContain('${soSai} CÂU SAI')
   })
 
@@ -160,10 +160,9 @@ describe('ghi rõ tính điểm cho mấy ý', () => {
     const k = doc('src/components/KhoiCauSai.tsx')
     expect(k).toContain('chuDiemTheoY(')
     expect(k).toContain('soYDungPhanII(')
-    // Và cả hai cổng vẽ danh sách câu sai bằng đúng khối ấy.
-    for (const f of ['src/components/BaoCaoCaThiHocSinhModal.tsx', 'src/components/BaoCaoCaThiPhuHuynhModal.tsx']) {
-      expect(doc(f), f).toContain('<DongCauSai key=')
-    }
+    // Cổng phụ huynh vẽ danh sách câu sai bằng đúng khối ấy. (Báo cáo em bản mới 28/09 vẽ câu cần chữa bằng khuôn
+    // Câu đã làm `CauCanChua`/TheCau — kiểm ở tests/hs-lich-su-ca-2809.)
+    expect(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')).toContain('<DongCauSai key=')
   })
 })
 
@@ -172,12 +171,15 @@ describe('THẺ MỨC TIẾN BỘ — đúng một thẻ, đúng một biểu đ
   // thành hai thẻ "Mức tiến bộ" / "Mức độ tiến bộ" nằm sát nhau. Sau đó thầy
   // chốt lại: giữ ĐÚNG MỘT thẻ, vẽ biểu đồ điểm các ca và đánh giá mức tiến bộ,
   // đồng bộ vào mọi báo cáo. Phép kiểm này khoá cả hai vế: có thẻ, và chỉ một.
-  const HS = doc('src/components/BaoCaoCaThiHocSinhModal.tsx')
+  // 28/09: báo cáo em bản mới (bản vẽ thầy chốt) thay thẻ tiến bộ bằng dòng "± điểm so với ca trước" — phần thẻ chỉ còn ở cổng phụ huynh.
+  const HS = nguonBaoCaoEmMoi()
   const PH = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
   const MON = doc('src/screens/ExamMonitorScreen.tsx')
 
-  it('cả hai cổng đều có thẻ, và vẽ bằng CÙNG một khối', () => {
-    for (const [t, ten] of [[HS, 'HS'], [PH, 'PH']] as const) {
+  it('cổng phụ huynh có thẻ, vẽ bằng khối dùng chung; báo cáo em không tự vẽ biểu đồ/tự tính tiến bộ', () => {
+    expect(HS).not.toContain('BieuDoTienBoGoogle')
+    expect(HS).not.toContain('phanTichTienBo')
+    for (const [t, ten] of [[PH, 'PH']] as const) {
       expect(t, ten).toContain("'tien_bo'")
       expect(t, ten).toContain('<span>Mức tiến bộ</span>')
       expect(t, ten).toContain('<TheTienBo')
@@ -199,8 +201,8 @@ describe('THẺ MỨC TIẾN BỘ — đúng một thẻ, đúng một biểu đ
     expect(HS).not.toContain('ExtraTabItem')
   })
 
-  it('BỐN THẺ BÁO CÁO giống hệt nhau ở cả hai cổng', () => {
-    for (const t of [HS, PH]) {
+  it('BỐN THẺ BÁO CÁO của cổng phụ huynh', () => {
+    for (const t of [PH]) {
       expect(t).toContain('Câu sai cần chữa')
       expect(t).toContain('Mức độ nhận thức')
       expect(t).toContain('Mức tiến bộ')
@@ -255,14 +257,14 @@ describe('ẢNH TRONG CÂU SAI vẽ đúng chuẩn của phiếu HTML', () => {
 })
 
 describe('câu sai hiện đủ đề, ảnh, bốn ý phần II và lời giải chuẩn', () => {
-  const HS = doc('src/components/BaoCaoCaThiHocSinhModal.tsx')
+  const HS = nguonBaoCaoEmMoi()
   const PH = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
   const KHOI = doc('src/components/KhoiCauSai.tsx')
 
-  it('cả hai cổng vẽ câu sai bằng CÙNG một khối, cả đầu dòng lẫn thân dòng', () => {
-    expect(HS).toContain('<DongCauSai key={c.qid || idx} c={c} stt={c.soCau || idx + 1} />')
+  it('mỗi cổng vẽ câu sai bằng khối DÙNG CHUNG, không tự dựng lời giải', () => {
     expect(PH).toContain('<DongCauSai key={c.qid || i} c={c} stt={c.soCau || i + 1} />')
-    // Không cổng nào còn tự dựng đầu dòng hay lời giải nữa.
+    // báo cáo em bản mới: khuôn Câu đã làm (CauCanChua → TheCau)
+    expect(HS).toContain('<CauCanChua c={c.cau} stt={c.soCau} />')
     expect(HS).not.toContain('chuanHoaLoiGiaiCau')
     expect(PH).not.toContain('chuanHoaLoiGiaiCau')
     expect(HS).not.toContain('cauSaiMoRong')
@@ -272,7 +274,7 @@ describe('câu sai hiện đủ đề, ảnh, bốn ý phần II và lời giả
     // Trên điện thoại nó rơi thành mỗi dòng một chữ, cao gần hết màn hình.
     expect(HS).not.toContain('Mở lại đề thi gốc để xem lại bài làm')
     expect(HS).not.toContain('các đáp án đã chọn và thời gian làm từng câu')
-    expect(HS).toContain('Xem đề và lời giải kèm lỗi sai')
+    expect(HS).toContain('Xem đề và lời giải cả ca')
   })
 
   it('khối ấy vẽ đủ ảnh, bảng, bốn ý phần II và trả lời ngắn', () => {
@@ -321,10 +323,9 @@ describe('nhận xét phải đúng với con số của chính bài đó', () =
     expect(danhGiaBai(7, 3, null).thongDiep).not.toContain('trên')
   })
 
-  it('hai cổng dùng chung một hàm xếp loại', () => {
-    for (const f of ['src/components/BaoCaoCaThiHocSinhModal.tsx', 'src/components/BaoCaoCaThiPhuHuynhModal.tsx']) {
-      expect(doc(f), f).toContain('danhGiaBai(diem, soKhacPhuc, tongCau)')
-    }
+  it('cổng phụ huynh dùng hàm xếp loại chung; báo cáo em bản mới KHÔNG tự viết nhận xét/xếp loại riêng', () => {
+    expect(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')).toContain('danhGiaBai(diem, soKhacPhuc, tongCau)')
+    expect(nguonBaoCaoEmMoi()).not.toMatch(/xepLoai|thongDiep|classify\(/)
   })
 })
 

@@ -29,10 +29,29 @@ export interface BaoCaoCaCuaEmProps {
   onMoLaiBaiThi?: (maCa: string) => void
 }
 
+/** Lý do máy chủ trả (`{ ok: false, error }`) — bọc riêng để phân biệt với lỗi mạng của trình duyệt (chữ tiếng Anh, không hiện). */
+class LoiMayChu {
+  chu: string
+  constructor(chu: string) {
+    this.chu = chu
+  }
+}
+/** Lý do đọc được cho em — mã nội bộ của máy chủ (VD `MAY_CHU_CHUA_CO_LENH`) KHÔNG hiện lên màn học sinh. */
+function chuLoi(x: unknown, macDinh: string): string {
+  const t = x instanceof LoiMayChu ? x.chu.trim() : ''
+  return t && !/^[A-Z0-9_]+$/.test(t) ? `${macDinh} ${t}` : `${macDinh} Em kiểm tra mạng rồi mở lại báo cáo.`
+}
+
 export default function BaoCaoCaCuaEm({ maCa, tenCa, sbd, scriptUrl = '', lichSu: lsSan = null, onDong, onKhacPhuc, onMoLaiBaiThi }: BaoCaoCaCuaEmProps) {
   const [ls, setLs] = useState<LichSuCuaEm | null>(lsSan)
   const [cau, setCau] = useState<unknown[] | null>(null)
   const [dangTai, setDangTai] = useState(true)
+  // CẤM NUỐT LỖI IM LẶNG (luật 15/09, chuyển từ báo cáo cũ): gọi hỏng thì giữ lý do và HIỆN RA — không được rơi thành
+  // "Ca này chưa có điểm đã công bố" hay "Em đúng trọn mọi câu" (sai sự thật).
+  const [loiLs, setLoiLs] = useState<string | null>(null)
+  const [loiCau, setLoiCau] = useState<string | null>(null)
+  // Bấm "Thử lại" ⇒ tăng số lượt để hỏi lại máy chủ.
+  const [luot, setLuot] = useState(0)
   // Lịch sử có sẵn chỉ đọc LÚC MỞ (màn cha dựng object mới mỗi lần vẽ — đưa vào phụ thuộc là hỏi máy chủ liên tục).
   const lsSanRef = useRef(lsSan)
 
@@ -40,20 +59,28 @@ export default function BaoCaoCaCuaEm({ maCa, tenCa, sbd, scriptUrl = '', lichSu
     let huy = false
     setDangTai(true)
     const san = lsSanRef.current
-    const hoiLs = san
+    const hoiLs: Promise<LichSuCuaEm> = san
       ? Promise.resolve(san)
-      : hsLichSuCaApi(scriptUrl, sbd).then((r) => (r.ok ? { items: (r.items ?? []) as DongCaCuaEm[], chuaCongBo: r.chuaCongBo ?? [] } : null))
-    const hoiCau = hsCauDaThiApi(scriptUrl, sbd, [maCa]).then((r) => (r.ok && Array.isArray(r.items) ? r.items : null))
+      : hsLichSuCaApi(scriptUrl, sbd).then((r) => {
+          if (!r.ok) throw new LoiMayChu(String((r as { error?: unknown }).error ?? ''))
+          return { items: (r.items ?? []) as DongCaCuaEm[], chuaCongBo: r.chuaCongBo ?? [] }
+        })
+    const hoiCau = hsCauDaThiApi(scriptUrl, sbd, [maCa]).then((r) => {
+      if (!r.ok || !Array.isArray(r.items)) throw new LoiMayChu(r.error ?? '')
+      return r.items
+    })
     void Promise.allSettled([hoiLs, hoiCau]).then(([a, b]) => {
       if (huy) return
       setLs(a.status === 'fulfilled' ? a.value : null)
+      setLoiLs(a.status === 'fulfilled' ? null : chuLoi(a.reason, 'Chưa tải được kết quả của em.'))
       setCau(b.status === 'fulfilled' ? b.value : null)
+      setLoiCau(b.status === 'fulfilled' ? null : chuLoi(b.reason, 'Chưa tải được từng câu của ca này.'))
       setDangTai(false)
     })
     return () => {
       huy = true
     }
-  }, [maCa, sbd, scriptUrl])
+  }, [maCa, sbd, scriptUrl, luot])
 
   // Chỉ dòng ĐÃ CÔNG BỐ của đúng ca này; lượt nộp muộn nhất.
   const dong = useMemo(() => dungLichSuCa(ls?.items, ls?.chuaCongBo).find((d) => d.maCa === maCa) ?? null, [ls, maCa])
@@ -83,6 +110,9 @@ export default function BaoCaoCaCuaEm({ maCa, tenCa, sbd, scriptUrl = '', lichSu
       emBc={bc}
       xuHuongEm={daCongBo && daCongBo.xuHuong !== null ? { doi: daCongBo.xuHuong, diemTruoc: Math.round((daCongBo.diem - daCongBo.xuHuong) * 100) / 100 } : null}
       mucDo={mucDo}
+      loiEm={loiLs}
+      loiCauEm={loiCau}
+      onThuLaiEm={() => setLuot((x) => x + 1)}
       onDong={onDong}
       onKhacPhuc={onKhacPhuc ? () => onKhacPhuc(maCa) : undefined}
       // Tờ đề mở ở lớp phủ của màn cha ⇒ đóng báo cáo trước để tờ đề không nằm dưới.

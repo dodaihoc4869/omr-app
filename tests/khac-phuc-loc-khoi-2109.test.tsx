@@ -170,10 +170,11 @@ describe('mã chạy: không còn mặc định cố định lớp 12; nguồn �
     expect(MODAL).toContain('lopEmDuocChon(khoiEm, dmDangBaiTho)')
     expect(MODAL).toContain('lopMacDinhCuaEm(khoiEm, dmDangBai)')
   })
-  it('nơi gọi truyền lớp của em: cổng học sinh (2 chỗ), báo cáo ca của học sinh, báo cáo ca của phụ huynh', () => {
+  // 28/09: báo cáo em bản mới không mở ModalKhacPhucCauSai — nút "Làm lại" trả về cổng học sinh (đã kiểm `lop={auth.lop}` ở đây); modal cũ đã xoá.
+  it('nơi gọi truyền lớp của em: cổng học sinh (2 chỗ), báo cáo ca của phụ huynh', () => {
     const cong = doc('src/screens/StudentPortalScreen.tsx')
     expect(cong.match(/<KhoiKhacPhuc3CheDo[\s\S]*?lop=\{auth\.lop\}[\s\S]*?\/>/g)).toHaveLength(1)
     expect(cong.match(/<ModalKhacPhucCauSai[\s\S]*?lop=\{auth\.lop\}[\s\S]*?onTaoPhieuXong/g)).toHaveLength(1)
-    for (const f of ['src/components/BaoCaoCaThiHocSinhModal.tsx', 'src/components/BaoCaoCaThiPhuHuynhModal.tsx']) expect(doc(f).match(/<ModalKhacPhucCauSai[\s\S]*?lop=\{lop\}[\s\S]*?\/?>/g), f).toHaveLength(1)
+    for (const f of ['src/components/BaoCaoCaThiPhuHuynhModal.tsx']) expect(doc(f).match(/<ModalKhacPhucCauSai[\s\S]*?lop=\{lop\}[\s\S]*?\/?>/g), f).toHaveLength(1)
   })
 })

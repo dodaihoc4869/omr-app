@@ -147,7 +147,7 @@ export default function BaoCaoCaThiPhuHuynhModal({
 
   // Chỉ số cơ bản: không bao giờ rơi về 40 giả! Chuẩn đề là 28 câu hoặc số câu thực tế
   const diem = Number(baiThi.diem.toFixed(2))
-  // ĐẾM CÂU: CHỈ SỐ THẬT. Xem ghi chú dài trong `BaoCaoCaThiHocSinhModal`.
+  // ĐẾM CÂU: CHỈ SỐ THẬT. Xem ghi chú trong `ca-thi/BaoCaoChiTiet.tsx` (bản báo cáo mới).
   // Đây là báo cáo phụ huynh đọc, nên càng không được có con số suy ra từ điểm.
   const tongCau = baiThi.tongSoCau && baiThi.tongSoCau > 0 ? baiThi.tongSoCau : null
   const soDung = typeof baiThi.soCauDung === 'number' ? baiThi.soCauDung : null
