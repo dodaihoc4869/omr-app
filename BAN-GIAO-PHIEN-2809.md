@@ -86,3 +86,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 19:11 · Deploy #540 THÀNH CÔNG: PR #42 lượt 3 gỡ Bộ não AI · main 0afe3de · lùi: git revert -m 1 0afe3de. Trước đó #539 THÀNH CÔNG PR #41 sửa cụm Nộp/đồng hồ (8a9067a).
 - (chép hộ Code 1) Bi-a claude/fervent-edison-otwz9p @ 1fa3634: đủ 4 điểm (gộp main, precache 13/13, bảng tự dựng, đối thủ 'A.I'); Code app gộp main 0afe3de ⇒ nhánh gop-bia-2809 c69fa49, build 13/13 (167/2910 KB), đang chạy toàn bộ vitest.
 - 19:24 · Deploy #541 THÀNH CÔNG: PR #43 lượt 4 Bi-a GĐ1 · main bfc5ddf · lùi: git revert -m 1 bfc5ddf. 19:29 thầy lệnh bật cả trung tâm ⇒ bia-co-luu {bat:true, lop:[], sbd:[]}, đọc lại bat:true (tắt: cùng lệnh bat:false). 0 ca mở lúc bật.
+- 19:50 · Deploy #542 THÀNH CÔNG: PR #44 nút Dịu mắt màn thi · main 91dea91 · lùi: git revert -m 1 91dea91. Đang: hop-thoai-app (thay nốt 2 confirm html-phieu), hs-lich-su-ca (thay báo cáo cũ bằng bản mới), thanh-thao-chot.
