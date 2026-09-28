@@ -98,13 +98,17 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 
             <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true" focusable="false">
               <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(0 170 175)" />
             </svg>
-            <span className="h2-nhan-nho">Thể lực</span> {theLuc.con}/{theLuc.tong}
+            <span className="h2-chip-chu">
+              <span className="h2-nhan-nho">Thể lực</span> <b>{theLuc.con}/{theLuc.tong}</b>
+            </span>
           </span>
         )}
         {chuoiNgay !== null && (
           <span className="h2-hud-so h2-chuoi" aria-label={`Chuỗi ${chuoiNgay} ngày`}>
             <IconChuoi />
-            Chuỗi {chuoiNgay} ngày
+            <span className="h2-chip-chu">
+              <span className="h2-nhan-nho">Chuỗi</span> <b>{chuoiNgay} ngày</b>
+            </span>
           </span>
         )}
       </span>
@@ -466,7 +470,9 @@ function NutViec({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
       ) : s.dao.con > 0 ? (
         <button type="button" className="h2-nut-chinh" onClick={p.onKhamPhaDao}>
           <span className="h2-nut-chinh-chu">
-            <span className="h2-nut-chinh-lon baloo">KHÁM PHÁ BÁT LINH ĐẢO · {s.dao.con} câu</span>
+            <span className="h2-nut-chinh-lon baloo">
+              KHÁM PHÁ BÁT LINH ĐẢO <span className="h2-nw">· {s.dao.con} câu</span>
+            </span>
             <span className="h2-nut-chinh-nho">Đã phá hết ổ phục kích · cầu sang đảo đã hạ</span>
           </span>
           <IconKiem />

@@ -184,26 +184,26 @@ export default function CanhSanh3D({ s, ngang = false, moMan = false }: CanhSanh
     if (!bd || !svg) return
     const W = bd.clientWidth, H = bd.clientHeight
     if (!W || !H) return
-    const r = bd.getBoundingClientRect()
-    const k = r.width > 0 ? W / r.width : 1 // bản ngang thấp dùng zoom
+    // Đo bằng offset* (bỏ qua transform của cảnh mở màn đang trượt vào; không bị zoom bản ngang thấp làm lệch).
+    // Bản đồ nằm phủ kín khung cha (.h2-khung / .h2-ng-trai) nên toạ độ offset của HUD/tấm/tiêu đề cùng gốc với bản đồ.
     let tren = 12, duoi = 20, trai = 6, phai = 12
     if (ngang) {
-      const dau = bd.closest('.h2-ng-trai')?.querySelector('.h2-ng-bd-dau')
-      if (dau) tren = Math.max(12, (dau.getBoundingClientRect().bottom - r.top) * k + 14)
+      const dau = bd.closest('.h2-ng-trai')?.querySelector<HTMLElement>('.h2-ng-bd-dau')
+      if (dau) tren = Math.max(12, dau.offsetTop + dau.offsetHeight + 14)
       trai = 16
       phai = 16
     } else {
       const khung = bd.closest('.h2-khung')
-      const hud = khung?.querySelector('.h2-hud')
-      const ray = khung?.querySelector('.h2-ray') as HTMLElement | null
-      const tam = khung?.querySelector('.h2-tam')
+      const hud = khung?.querySelector<HTMLElement>('.h2-hud')
+      const ray = khung?.querySelector<HTMLElement>('.h2-ray')
+      const tam = khung?.querySelector<HTMLElement>('.h2-tam')
       if (hud) {
-        const hb = (hud.getBoundingClientRect().bottom - r.top) * k
+        const hb = hud.offsetTop + hud.offsetHeight
         if (ray) ray.style.top = `${Math.round(hb + 10)}px`
         tren = hb + 26
       }
-      if (ray) phai = Math.max(12, (r.right - ray.getBoundingClientRect().left) * k + 2)
-      if (tam) duoi = Math.max(12, (r.bottom - tam.getBoundingClientRect().top) * k + 22)
+      if (ray) phai = Math.max(12, W - ray.offsetLeft + 2)
+      if (tam) duoi = Math.max(12, H - tam.offsetTop + 22)
     }
     const aw = Math.max(40, W - trai - phai), ah = Math.max(40, H - tren - duoi)
     const sc = Math.min(aw / HOP_CANH.w, ah / HOP_CANH.h)
@@ -214,6 +214,7 @@ export default function CanhSanh3D({ s, ngang = false, moMan = false }: CanhSanh
     for (const n of Array.from(bd.querySelectorAll<HTMLElement>('.h2-nhan-bd[data-x]'))) {
       const sx = (Number(n.dataset.x) - x) * sc
       const sy = (Number(n.dataset.y) - y) * sc
+      n.style.maxWidth = `${Math.max(120, W - phai - 16)}px` // nhãn dài hơn chỗ trống ⇒ xuống dòng, không chui dưới lối tắt
       const w = n.offsetWidth, h = n.offsetHeight
       const l = Math.min(Math.max(8, sx - w / 2), W - phai - w - 4)
       const t = n.dataset.neo === 'tren' ? sy - h : sy
