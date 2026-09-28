@@ -25,9 +25,10 @@ import {
   moBuoiHoc,
   themEmBuoi,
   xemBuoiHoc,
+  locEmThem,
   type TrangThaiBuoi,
 } from '../../lib/buoi-hoc-api'
-import { cauTuDeChon, demCau, dungToChieuDayHoc, locDeDayHoc, tomTatDe, type CauDayHoc, type EmLenCau } from '../../lib/day-hoc-len-bang'
+import { cauTuDeChon, demCau, dungToChieuDayHoc, khoDayHoc, tomTatDe, type CauDayHoc, type EmLenCau } from '../../lib/day-hoc-len-bang'
 import { chonEmChoCau, mucCauSo, TEN_MUC_CAU, xepEmChoDanhSach, type KetQuaChon, type SucHocEm } from '../../lib/chon-em-day-hoc'
 import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import './day-hoc.css'
@@ -90,6 +91,8 @@ export default function DayHocLenBang() {
   const [themMo, setThemMo] = useState(false)
   const [timEm, setTimEm] = useState('')
   const [emThem, setEmThem] = useState<Set<string>>(new Set())
+  const [lopThem, setLopThem] = useState<string | null>(null)
+  const [dangThem, setDangThem] = useState(false)
   // QR mở APP HỌC SINH trên cùng gốc Pages với app thầy (`<gốc>/hs?diem-danh=<mã>`).
   const goc = typeof window !== 'undefined' ? window.location.origin : ''
   const idBuoi = tt?.buoi.id ?? ''
@@ -174,14 +177,15 @@ export default function DayHocLenBang() {
     else capNhat(r.du)
   }
   const themEm = async () => {
-    if (!idBuoi || !emThem.size) return
+    if (!idBuoi || !emThem.size || dangThem) return
+    setDangThem(true)
     const r = await themEmBuoi(idBuoi, [...emThem])
+    setDangThem(false)
     if (!r.ok) showToast(r.chu, 'error')
     else {
       capNhat(r.du)
       showToast(`Đã thêm ${emThem.size} em vào danh sách có mặt`, 'success')
       setEmThem(new Set())
-      setThemMo(false)
     }
   }
   const moThem = async () => {
@@ -193,11 +197,12 @@ export default function DayHocLenBang() {
   }
   const coMat = useMemo(() => tt?.coMat ?? [], [tt])
   const lopCuaEm = useMemo(() => new Map((tt?.lopEm ?? []).map((e) => [e.sbd, e.tenLop])), [tt])
-  const emChuaCo = useMemo(() => {
-    const co = new Set(coMat.map((e) => e.sbd))
-    const q = timEm.trim().toLowerCase()
-    return (tt?.lopEm ?? []).filter((e) => !co.has(e.sbd) && (!q || e.hoTen.toLowerCase().includes(q) || e.sbd.includes(q)))
-  }, [tt, coMat, timEm])
+  const coMatMap = useMemo(() => new Map(coMat.map((e) => [e.sbd, e])), [coMat])
+  const dsLopThem = useMemo(() => [...new Set((tt?.lopEm ?? []).map((e) => e.tenLop).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'vi')), [tt])
+  // Mặc định lọc theo lớp của buổi; thầy đổi sang "Mọi lớp" khi em học ghép.
+  const lopLoc = lopThem ?? tt?.buoi.lop ?? ''
+  const emLoc = useMemo(() => locEmThem(tt?.lopEm ?? [], lopLoc, timEm), [tt, lopLoc, timEm])
+  const TOI_DA_HIEN = 150
 
   // ───── 2 · CHỌN CÂU ─────
   const [kho, setKho] = useState<TeacherExamSource[] | null>(null)
@@ -229,7 +234,7 @@ export default function DayHocLenBang() {
         import('../../lib/khu-trung-cau'),
         import('../../lib/tach-phan-de'),
       ])
-      const ds = locDeDayHoc(tachNhieuTheoPhan(khuTrungNguon(await loadExamSources()).nguon))
+      const ds = khoDayHoc(await loadExamSources(), khuTrungNguon, tachNhieuTheoPhan)
       setKho(ds)
       return ds
     } catch {
@@ -398,8 +403,8 @@ export default function DayHocLenBang() {
                   <button type="button" className="m3-nut-tonal dh-nut" onClick={() => setChieuMa(true)}>
                     <MonitorPlay size={18} aria-hidden="true" /> Chiếu mã điểm danh
                   </button>
-                  <button type="button" className="m3-nut-vien dh-nut" onClick={() => void moThem()}>
-                    <Plus size={18} aria-hidden="true" /> Thêm em
+                  <button type="button" className="m3-nut-vien dh-nut" onClick={() => (themMo ? setThemMo(false) : void moThem())} aria-expanded={themMo}>
+                    <Plus size={18} aria-hidden="true" /> Thêm em chưa điểm danh được
                   </button>
                   <button type="button" className="m3-nut-chu dh-nut" onClick={() => void ketThuc()}>
                     Kết thúc buổi
@@ -425,48 +430,88 @@ export default function DayHocLenBang() {
                 ))}
               </ul>
             )}
-            {themMo && (
-              <div className="dh-them" role="group" aria-label="Thêm em vào danh sách có mặt">
-                <div className="dh-hang">
-                  <input className="dh-tim" value={timEm} onChange={(e) => setTimEm(e.target.value)} placeholder="Tìm tên hoặc SBD…" aria-label="Tìm em để thêm" />
-                  <button type="button" className="m3-nut-chinh dh-nut" disabled={!emThem.size} onClick={() => void themEm()}>
-                    Thêm {emThem.size || ''} em
-                  </button>
+            {themMo && !buoiXong && (
+              <div className="dh-them" role="group" aria-labelledby="dh-them-ten">
+                <div className="dh-them-dau">
+                  <h3 id="dh-them-ten">Thêm em chưa điểm danh được</h3>
                   <button type="button" className="m3-nut-chu dh-nut" onClick={() => setThemMo(false)}>
                     Đóng
                   </button>
                 </div>
+                <p className="dh-phu">Em quên điện thoại hoặc không quét được mã: tích tên em rồi thêm vào danh sách có mặt (ghi là “thầy thêm”).</p>
+                <div className="dh-hang">
+                  <label className="dh-chon-lop dh-chon-lop--hep">
+                    <span>Lớp</span>
+                    <select value={lopLoc} onChange={(e) => setLopThem(e.target.value)}>
+                      <option value="">Mọi lớp</option>
+                      {dsLopThem.map((l) => (
+                        <option key={l} value={l}>
+                          {l}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="dh-chon-lop">
+                    <span>Tìm theo SBD hoặc tên</span>
+                    <input className="dh-tim" type="search" value={timEm} onChange={(e) => setTimEm(e.target.value)} placeholder="vd: 1203 hoặc minh anh" autoComplete="off" />
+                  </label>
+                </div>
                 {!tt.lopEm ? (
-                  <p className="dh-phu">Đang tải danh sách lớp…</p>
-                ) : emChuaCo.length === 0 ? (
-                  <p className="dh-phu">{timEm.trim() ? 'Không có em nào khớp.' : 'Cả lớp đã có mặt.'}</p>
+                  <p className="dh-phu" aria-busy="true">
+                    Đang tải danh sách lớp…
+                  </p>
+                ) : emLoc.length === 0 ? (
+                  <p className="dh-phu">{timEm.trim() ? `Không có em nào khớp “${timEm.trim()}”${lopLoc ? ` trong lớp ${lopLoc} — thử chọn “Mọi lớp”` : ''}.` : 'Lớp này chưa có học sinh.'}</p>
                 ) : (
-                  <ul className="dh-them-ds">
-                    {emChuaCo.slice(0, 120).map((e) => (
-                      <li key={e.sbd}>
-                        <label className="dh-them-o">
-                          <input
-                            type="checkbox"
-                            checked={emThem.has(e.sbd)}
-                            onChange={() =>
-                              setEmThem((cu) => {
-                                const m = new Set(cu)
-                                if (m.has(e.sbd)) m.delete(e.sbd)
-                                else m.add(e.sbd)
-                                return m
-                              })
-                            }
-                          />
-                          <span>{e.hoTen || e.sbd}</span>
-                          <small>
-                            {e.sbd}
-                            {e.tenLop ? ` · ${e.tenLop}` : ''}
-                          </small>
-                        </label>
-                      </li>
-                    ))}
-                  </ul>
+                  <>
+                    <ul className="dh-them-ds" aria-label="Danh sách học sinh để thêm">
+                      {emLoc.slice(0, TOI_DA_HIEN).map((e) => {
+                        const co = coMatMap.get(e.sbd)
+                        return (
+                          <li key={e.sbd} className="dh-them-dong">
+                            <label className={`dh-them-o${co ? ' dh-them-o--co' : ''}`}>
+                              <input
+                                type="checkbox"
+                                checked={!!co || emThem.has(e.sbd)}
+                                disabled={!!co}
+                                onChange={() =>
+                                  setEmThem((cu) => {
+                                    const m = new Set(cu)
+                                    if (m.has(e.sbd)) m.delete(e.sbd)
+                                    else m.add(e.sbd)
+                                    return m
+                                  })
+                                }
+                              />
+                              <span className="dh-them-ten">{e.hoTen || e.sbd}</span>
+                              <small>
+                                {e.sbd}
+                                {e.tenLop ? ` · ${e.tenLop}` : ''}
+                              </small>
+                            </label>
+                            {co && <span className={`dh-chip ${co.cach === 'thay' ? 'dh-chip--vang' : 'dh-chip--xanh'}`}>{co.cach === 'thay' ? 'thầy thêm' : 'đã điểm danh'}</span>}
+                            {co?.cach === 'thay' && (
+                              <button type="button" className="m3-nut-chu dh-nut-nho" onClick={() => void botEm(e.sbd)} aria-label={`Bỏ ${e.hoTen || e.sbd} khỏi danh sách có mặt`}>
+                                Bỏ
+                              </button>
+                            )}
+                          </li>
+                        )
+                      })}
+                    </ul>
+                    {emLoc.length > TOI_DA_HIEN && <p className="dh-phu">Đang hiện {TOI_DA_HIEN} trong {emLoc.length} em — gõ tên hoặc SBD để lọc.</p>}
+                  </>
                 )}
+                <div className="dh-hang">
+                  <button type="button" className="m3-nut-chinh dh-nut" disabled={!emThem.size || dangThem} aria-busy={dangThem} onClick={() => void themEm()}>
+                    Thêm {emThem.size} em vào danh sách có mặt
+                  </button>
+                  {emThem.size > 0 && (
+                    <button type="button" className="m3-nut-chu dh-nut" onClick={() => setEmThem(new Set())}>
+                      Bỏ chọn
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </>

@@ -18,6 +18,14 @@ export function locDeDayHoc<T extends Pick<TeacherExamSource, 'nhom'>>(ds: reado
   return ds.filter(laDeDayHoc)
 }
 
+/** KHO CỦA BẢNG DẠY HỌC: LỌC nhánh DẠY HỌC TRƯỚC, rồi mới khử trùng câu TRONG nhánh ấy, rồi tách theo phần.
+ *  LỖI 28/09 (thầy báo "cây thiếu lớp 10"): bản đầu khử trùng trên CẢ KHO rồi mới lọc — câu Dạy học trùng với "Bộ đề" (hạng ưu tiên cao hơn) hoặc
+ *  với cây bài `10-…/11-…/12-…` (cùng hạng nhưng đứng trước theo mã đề) bị nhánh kia giành, nên kho thật 845 / 972 / 1542 câu (khối 10 / 11 / 12)
+ *  chỉ còn 0 / 80 / 120 và cả Khối 10 biến mất. Bảng Dạy học chỉ chiếu nhánh này nên không có gì để "nhường" cho nhánh khác. */
+export function khoDayHoc(ds: readonly TeacherExamSource[], khuTrung: (x: TeacherExamSource[]) => { nguon: TeacherExamSource[] }, tach: (x: TeacherExamSource[]) => TeacherExamSource[]): TeacherExamSource[] {
+  return locDeDayHoc(tach(khuTrung(locDeDayHoc(ds)).nguon))
+}
+
 export type CauGocDayHoc = TeacherMcqQuestion | TeacherTrueFalseQuestion | TeacherShortAnswerQuestion
 export interface CauDayHoc {
   /** Khoá duy nhất trong buổi (id câu trong kho). */
