@@ -380,8 +380,10 @@ export default function TheCau(props: TheCauProps) {
       // dấu phẩy, em không gõ nổi `1,5`.
       // 21/09 (thầy: "quét mọi chỗ mọi app"): hai nút nay là THÀNH PHẦN DÙNG CHUNG `ONhapDapSo` — bấm nút KHÔNG làm mất tiêu điểm (bàn phím không đóng),
       // "," chèn TẠI CON TRỎ; bố cục cũ giữ nguyên (− , rồi ô), aria-label cũ giữ nguyên. Giá trị gửi lên vẫn là chuỗi em gõ (`onChange(chuỗi)`), không chuẩn hoá.
+      // 28/09 (thầy): ô gọn — "." tự thành "," (chuẩn Việt Nam "7,44"; hàm chấm vốn coi như nhau), bỏ nút "," và nút xoá; nút "−" nhỏ trong ô, chỉ ở iPhone/iPad.
       <ONhapDapSo
         nutTruoc
+        chuanViet
         value={selected ?? ''}
         onChange={(v) => onChange?.(v)}
         placeholder="Nhập đáp án"

@@ -71,3 +71,34 @@ export function suaChenPhay(v: string, tu: number, den: number, maxLength?: numb
 export function choPhepPhay(v: string, tu: number, den: number, maxLength?: number): boolean {
   return suaChenPhay(v, tu, den, maxLength) !== null
 }
+
+// ---------------------------------------------------------------------------
+// MÀN THI (thầy 28/09, ảnh phiếu Phần III có câu điền "12.3"): ô đáp số của màn thi đổi "." thành ","
+// ngay khi gõ (chuẩn Việt Nam, như "7,44"); ô gọn, chỉ còn nút "−" ở iPhone/iPad. Chỉ bật ở nơi truyền `chuanViet` cho
+// `ONhapDapSo` — các nơi khác vẫn "em gõ gì gửi nấy". Hàm chấm (`normalizeNumericAnswer`) vốn coi
+// "12.3" = "12,3" và "−0,5" = "-0,5" (test chứng minh), nên đây là việc HIỂN THỊ cho đúng chuẩn, không đổi điểm.
+
+/** Mọi kiểu gạch ngang/dấu trừ Unicode em có thể dán vào. */
+const MOI_DAU_TRU_GO = /[‐‑‒–—―−－]/g
+
+/** Chuẩn hoá chuỗi vừa gõ: "." ⇒ ","; dấu trừ Unicode ⇒ "-"; chỉ giữ dấu thập phân ĐẦU TIÊN. */
+export function chuanDauGo(v: string): string {
+  const s = String(v ?? '').replace(MOI_DAU_TRU_GO, DAU_AM).replace(/\./g, DAU_PHAY)
+  const dau = s.indexOf(DAU_PHAY)
+  if (dau < 0) return s
+  return s.slice(0, dau + 1) + s.slice(dau + 1).split(DAU_PHAY).join('')
+}
+
+/**
+ * Bàn phím ảo của máy này THIẾU dấu trừ khi ô dùng `inputMode="decimal"`?
+ *  · iPhone / iPad (iPadOS 13+ khai "Macintosh" — nhận bằng `maxTouchPoints > 1`): bàn phím thập phân của iOS chỉ có 0–9 và dấu thập phân,
+ *    KHÔNG có "−" (thầy báo 06/09) ⇒ cần nút "−".
+ *  · Android: Gboard / bàn phím Samsung với `inputmode="decimal"` hiện bàn phím số CÓ "-" (và "," / ".") ⇒ không cần nút.
+ *  · Máy tính: bàn phím thật có "-" ⇒ không cần nút.
+ */
+export function banPhimThieuDauTru(nav: { userAgent?: string; maxTouchPoints?: number } | undefined = typeof navigator === 'undefined' ? undefined : navigator): boolean {
+  if (!nav) return false
+  const ua = String(nav.userAgent || '')
+  if (/iPhone|iPad|iPod/i.test(ua)) return true
+  return /Macintosh/i.test(ua) && (nav.maxTouchPoints ?? 0) > 1
+}

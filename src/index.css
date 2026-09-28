@@ -196,7 +196,7 @@ body {
 /* MÀN LÀM BÀI (MANCUAVAOVANENTOI — ẩn thanh trình duyệt, việc 3): không chọn
  * chữ/không menu giữ-chạm (chống copy đề), không kéo-xuống-làm-mới trang.
  * Ô nhập Phần III vẫn chọn/sửa được chữ. Khoá xoay ngang nằm ở manifest
- * (orientation: portrait — chỉ có tác dụng khi đã thêm vào màn hình chính). */
+ * (28/09: đổi sang "any" — xoay ngang tự đổi bố cục làm bài ngang). */
 .man-lam-bai {
   user-select: none;
   -webkit-user-select: none;
