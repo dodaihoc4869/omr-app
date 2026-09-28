@@ -26,10 +26,13 @@ beforeEach(() => {
       if (b.action === 'ds-em') return { ok: true, du: { ok: true, em: EM } }
     }
     if (duong === '/gv/chien-dich/sua') {
-      if (b.action === 'doc') return { ok: true, du: { ok: true, homNay: '2026-09-28', chienDich: { ...CD, sbd: ['S1', 'S2'] }, nhatKy: [] } }
+      if (b.action === 'doc') return { ok: true, du: { ok: true, homNay: '2026-09-28', chienDich: { ...CD, sbd: ['S1', 'S2'], theLucNgay: 12 }, nhatKy: [] } }
       const kq = {
         ok: true, tomTat: 'x', themMaDe: [], toKhongCoCauMoi: [], soCauTheoTo: {}, soCauCu: 6, soCauThem: 0, soCauSau: 6,
         themSbd: (b.themSbd as string[]) ?? [], botSbd: (b.botSbd as string[]) ?? [], soEmSau: 3, hanCu: '2026-10-05', hanNop: String(b.hanNop ?? '2026-10-05'), moLai: false,
+        ...(b.hanNop === '2026-10-02'
+          ? { theLucCu: 12, theLucNgay: (b.theLucNgay as number) ?? 15, theLucCan: 15, tuNang: b.theLucNgay == null, chuaKipHan: ((b.theLucNgay as number) ?? 15) < 15 }
+          : { theLucCu: 12, theLucNgay: 12, theLucCan: 3, tuNang: false, chuaKipHan: false }),
       }
       if (b.action === 'xem-truoc') return { ok: true, du: kq }
       if (b.action === 'luu') return new Promise((r) => { choLuu = r }).then(() => ({ ok: true, du: { ...kq, id: 'cd-1', tomTat: '+1 em, hạn 05/10 → 07/10' } }))
@@ -101,6 +104,25 @@ describe('nút Chỉnh sửa chiến dịch đang mở', () => {
     const han = await oHan()
     fireEvent.change(han, { target: { value: '2026-09-20' } })
     expect(screen.getByText('Hạn nộp mới phải từ hôm nay trở đi')).toBeTruthy()
+    expect((screen.getByRole('button', { name: 'Lưu' }) as HTMLButtonElement).disabled).toBe(true)
+  })
+
+  it('rút hạn phải nâng số câu/ngày ⇒ hiện "Số câu/ngày: 12 → 15 (để kịp hạn 02/10)"; thầy nhập tay thấp hơn ⇒ cảnh báo vàng, vẫn cho lưu', async () => {
+    render(<DsChienDichDaGiao />)
+    await screen.findByText('Chiến dịch luyện')
+    fireEvent.click(screen.getByRole('button', { name: 'Chỉnh sửa' }))
+    const han = await oHan()
+    fireEvent.change(han, { target: { value: '2026-10-02' } })
+    await waitFor(() => expect(document.querySelector('[data-khoi="so-cau-ngay"]')?.textContent).toBe('Số câu/ngày: 12 → 15 (để kịp hạn 02/10)'), { timeout: 2000 })
+    expect(document.querySelector('[data-khoi="tom-tat-sua"]')!.textContent).toContain('hạn 05/10 → 02/10, số câu/ngày 12 → 15')
+    const o = screen.getByLabelText('Số câu mỗi ngày (một em)') as HTMLInputElement
+    expect(o.value).toBe('15')
+    fireEvent.change(o, { target: { value: '10' } })
+    await waitFor(() => expect(screen.getByText(/Chưa kịp hạn: cần ít nhất 15 câu\/ngày/)).toBeTruthy(), { timeout: 2000 })
+    expect(goi.mock.calls.some(([d, b]) => d === '/gv/chien-dich/sua' && b.action === 'xem-truoc' && b.theLucNgay === 10)).toBe(true)
+    await waitFor(() => expect((screen.getByRole('button', { name: 'Lưu' }) as HTMLButtonElement).disabled).toBe(false))
+    fireEvent.change(o, { target: { value: '0' } })
+    expect(screen.getByText('Số câu mỗi ngày phải là số nguyên từ 1 trở lên')).toBeTruthy()
     expect((screen.getByRole('button', { name: 'Lưu' }) as HTMLButtonElement).disabled).toBe(true)
   })
 })

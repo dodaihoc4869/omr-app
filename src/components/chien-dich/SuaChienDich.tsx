@@ -3,9 +3,11 @@
 // Máy chủ `/gv/chien-dich/sua`: `doc` (em + tờ + hạn hiện tại) · `xem-truoc` (không ghi — số câu sau khi thêm) · `luu`.
 // Tóm tắt thay đổi trước khi lưu: "+2 đề, +3 em, −1 em, hạn 30/09 → 05/10" (`chuTomTatSua`, một nguồn với nhật ký máy chủ).
 // Nút "Lưu" mờ đi khi đang lưu, GIỮ NGUYÊN chữ.
+// Số câu/ngày (Boss chốt 28/09): thêm đề / rút hạn mà không kịp ⇒ máy tự NÂNG (không tự hạ), hiện "Số câu/ngày: 12 → 15 (để kịp hạn 05/10)";
+// thầy sửa tay được (số nguyên ≥ 1); thấp hơn mức cần ⇒ cảnh báo vàng "chưa kịp hạn", vẫn cho lưu.
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { chuTomTatSua } from '../../lib/tom-tat-sua-chien-dich'
+import { chuTomTatSua, ngayNgan } from '../../lib/tom-tat-sua-chien-dich'
 import HopChonDe from '../HopChonDe'
 import { docChienDichDeSua, luuSuaChienDich, xemTruocSua, type ChienDichDeSua, type KetQuaSua, type ThayDoiGui } from './api'
 import ChonEmGiao from './ChonEmGiao'
@@ -15,6 +17,8 @@ import { hienHanNop, laNgay } from './ngay'
 import './chien-dich.css'
 import './sua-chien-dich.css'
 
+/** Chặn số vô nghĩa (giống máy chủ `THE_LUC_TOI_DA`). */
+const THE_LUC_TOI_DA = 500
 /** Chờ thầy chọn xong rồi mới hỏi máy chủ (ms). */
 const CHO_XEM_MS = 350
 
@@ -26,6 +30,8 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
   const [moCay, setMoCay] = useState(false)
   const [chonEm, setChonEm] = useState<Set<string>>(new Set())
   const [hanNop, setHanNop] = useState('')
+  /** Chữ thầy gõ ở ô số câu/ngày; rỗng = để máy tự tính. */
+  const [theLucTay, setTheLucTay] = useState('')
   const [xem, setXem] = useState<KetQuaSua | null>(null)
   const [dangXem, setDangXem] = useState(false)
   const [loiXem, setLoiXem] = useState('')
@@ -63,19 +69,24 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
   const homNay = goc?.homNay ?? ''
   const hanMoi = goc && hanNop !== goc.cd.hanNop ? hanNop : null
   const hanHopLe = !hanMoi || (laNgay(hanMoi) && hanMoi >= homNay)
-  const tomTat = goc ? chuTomTatSua({ themDe: themDe.length, themEm: themSbd.length, botEm: botSbd.length, hanCu: goc.cd.hanNop, hanMoi }) : ''
-  const coThayDoi = tomTat !== ''
+  const soTay = theLucTay.trim() === '' ? null : Number(theLucTay)
+  const theLucGui = soTay != null && Number.isInteger(soTay) && soTay >= 1 ? Math.min(THE_LUC_TOI_DA, soTay) : null
+  const theLucHopLe = theLucTay.trim() === '' || theLucGui != null
+  const tt = { themDe: themDe.length, themEm: themSbd.length, botEm: botSbd.length, hanCu: goc?.cd.hanNop ?? '', hanMoi, theLucCu: goc?.cd.theLucNgay }
+  // Có thay đổi do THẦY làm (chưa tính phần máy tự nâng — phần đó chỉ có sau khi xem trước).
+  const coThayDoi = !!goc && chuTomTatSua({ ...tt, theLucMoi: theLucGui }) !== ''
+  const tomTat = goc ? chuTomTatSua({ ...tt, theLucMoi: theLucGui ?? xem?.theLucNgay ?? null }) : ''
   const daDung = !!goc && (goc.cd.hetHan || goc.cd.trangThai === 'da_dong')
   const thayDoi: ThayDoiGui = useMemo(
-    () => ({ ...(themDe.length ? { themMaDe: themDe } : {}), ...(themSbd.length ? { themSbd } : {}), ...(botSbd.length ? { botSbd } : {}), ...(hanMoi ? { hanNop: hanMoi } : {}) }),
-    [themDe, themSbd, botSbd, hanMoi],
+    () => ({ ...(themDe.length ? { themMaDe: themDe } : {}), ...(themSbd.length ? { themSbd } : {}), ...(botSbd.length ? { botSbd } : {}), ...(hanMoi ? { hanNop: hanMoi } : {}), ...(theLucGui != null ? { theLucNgay: theLucGui } : {}) }),
+    [themDe, themSbd, botSbd, hanMoi, theLucGui],
   )
   const khoaThayDoi = JSON.stringify(thayDoi)
 
   // ---- xem trước ở máy chủ (số câu sau khi thêm đề, tờ không có câu mới, mở lại); câu trả lời cũ về muộn thì bỏ
   const luot = useRef(0)
   useEffect(() => {
-    if (!goc || !coThayDoi || !hanHopLe) {
+    if (!goc || !coThayDoi || !hanHopLe || !theLucHopLe) {
       luot.current++
       setXem(null)
       setLoiXem('')
@@ -99,13 +110,13 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
     }, CHO_XEM_MS)
     return () => clearTimeout(hen)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [khoaThayDoi, goc, coThayDoi, hanHopLe, id])
+  }, [khoaThayDoi, goc, coThayDoi, hanHopLe, theLucHopLe, id])
 
   const tichTuCay = (m: string) => setThemDe((cu) => (cu.includes(m) ? cu.filter((x) => x !== m) : [...cu, m]))
   const datChonTuCay = (ma: string[]) => setThemDe([...new Set(ma)])
 
   const luu = async () => {
-    if (dangLuu || !coThayDoi || !hanHopLe || !goc) return
+    if (dangLuu || !coThayDoi || !hanHopLe || !theLucHopLe || !goc) return
     setDangLuu(true)
     setLoiLuu('')
     const r = await luuSuaChienDich(id, thayDoi)
@@ -117,7 +128,7 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
     onDaLuu(r.du)
   }
 
-  const luuDuoc = !!goc && coThayDoi && hanHopLe && !dangLuu && !dangXem && !loiXem
+  const luuDuoc = !!goc && coThayDoi && hanHopLe && theLucHopLe && !dangLuu && !dangXem && !loiXem
   const daChonDe = useMemo(() => new Set(themDe), [themDe])
 
   return createPortal(
@@ -196,6 +207,33 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
                   {!hanHopLe ? 'Hạn nộp mới phải từ hôm nay trở đi' : daDung && !hanMoi ? 'Chiến dịch đã hết hạn — chọn hạn mới để mở lại' : laNgay(hanNop) ? hienHanNop(hanNop) : ''}
                 </small>
               </label>
+              <div className="cd-truong">
+                <label htmlFor="scd-the-luc">Số câu mỗi ngày (một em)</label>
+                <div className="cd-hang-o">
+                  <input
+                    id="scd-the-luc"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    max={THE_LUC_TOI_DA}
+                    step={1}
+                    value={theLucTay !== '' ? theLucTay : String(xem?.theLucNgay ?? goc.cd.theLucNgay)}
+                    onChange={(e) => setTheLucTay(e.target.value)}
+                  />
+                  {theLucTay !== '' && (
+                    <button type="button" className="m3-nut-chu cd-nut-nho" onClick={() => setTheLucTay('')}>
+                      Tự tính
+                    </button>
+                  )}
+                </div>
+                <small className="cd-so cd-phu">
+                  {!theLucHopLe
+                    ? 'Số câu mỗi ngày phải là số nguyên từ 1 trở lên'
+                    : theLucTay !== ''
+                      ? 'Thầy đặt tay — bấm Tự tính để máy tính lại'
+                      : 'Máy tự nâng khi thêm đề hoặc rút hạn mà không kịp; không tự hạ'}
+                </small>
+              </div>
             </section>
 
             {/* ---- Tóm tắt trước khi lưu ---- */}
@@ -215,6 +253,17 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
                     <p className="cd-so">
                       Số em {goc.cd.soEm} → {xem.soEmSau}
                       {xem.themSbd.length > 0 ? '. Em mới được chia câu như em giao từ đầu.' : '.'}
+                    </p>
+                  )}
+                  {xem.theLucNgay != null && xem.theLucCu != null && xem.theLucNgay !== xem.theLucCu && (
+                    <p className="cd-so" data-khoi="so-cau-ngay">
+                      Số câu/ngày: {xem.theLucCu} → {xem.theLucNgay}
+                      {xem.tuNang ? ` (để kịp hạn ${ngayNgan(xem.hanNop)})` : ''}
+                    </p>
+                  )}
+                  {xem.chuaKipHan && (
+                    <p className="scd-canh-bao" role="status">
+                      Chưa kịp hạn: cần ít nhất {xem.theLucCan} câu/ngày để em nhiều câu chưa làm nhất xong trước {ngayNgan(xem.hanNop)}. Vẫn lưu được.
                     </p>
                   )}
                   {xem.moLai && <p>Chiến dịch được mở lại tới hạn nộp mới.</p>}

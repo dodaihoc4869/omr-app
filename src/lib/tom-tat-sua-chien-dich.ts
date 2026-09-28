@@ -10,6 +10,9 @@ export interface ThayDoiChienDich {
   hanCu: string
   /** Hạn mới (`null` = giữ hạn cũ). */
   hanMoi: string | null
+  /** Số câu/ngày (thể lực) cũ → mới; vắng hoặc bằng nhau = không đổi. */
+  theLucCu?: number
+  theLucMoi?: number | null
 }
 
 const NGAY = /^(\d{4})-(\d{2})-(\d{2})$/
@@ -25,5 +28,6 @@ export function chuTomTatSua(t: ThayDoiChienDich): string {
   if (t.themEm > 0) phan.push(`+${t.themEm} em`)
   if (t.botEm > 0) phan.push(`−${t.botEm} em`)
   if (t.hanMoi && t.hanMoi !== t.hanCu) phan.push(`hạn ${ngayNgan(t.hanCu)} → ${ngayNgan(t.hanMoi)}`)
+  if (t.theLucMoi != null && t.theLucCu != null && t.theLucMoi !== t.theLucCu) phan.push(`số câu/ngày ${t.theLucCu} → ${t.theLucMoi}`)
   return phan.join(', ')
 }

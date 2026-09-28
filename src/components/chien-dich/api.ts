@@ -226,6 +226,8 @@ export interface ChienDichDeSua {
   maDe: string[]
   sbd: string[]
   hanNop: string
+  /** Số câu/ngày (một em) hiện tại. */
+  theLucNgay: number
   trangThai: TrangThaiChienDich
   soCau: number
   soEm: number
@@ -242,6 +244,8 @@ export interface ThayDoiGui {
   themSbd?: string[]
   botSbd?: string[]
   hanNop?: string
+  /** Thầy nhập tay số câu/ngày (vắng = máy tự nâng khi cần, không tự hạ). */
+  theLucNgay?: number
 }
 /** Kết quả `xem-truoc` / `luu` (máy chủ tính, cùng một hàm). */
 export interface KetQuaSua {
@@ -260,6 +264,12 @@ export interface KetQuaSua {
   hanNop: string
   /** Chiến dịch đã hết hạn / đã kết thúc được mở lại. */
   moLai: boolean
+  /** Số câu/ngày cũ → sau khi lưu; mức cần để em nhiều câu chưa làm nhất kịp hạn. Máy chủ cũ không gửi. */
+  theLucCu?: number
+  theLucNgay?: number
+  theLucCan?: number
+  tuNang?: boolean
+  chuaKipHan?: boolean
 }
 
 async function goiSua<T>(action: string, body: Record<string, unknown>): Promise<KetQuaLenh<T>> {

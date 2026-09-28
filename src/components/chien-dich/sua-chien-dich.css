@@ -62,3 +62,10 @@
 .scd-tom-tat .cd-nhan-nhom {
   color: var(--m3-on-primary-container);
 }
+.scd-canh-bao {
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--bts-vang-nhat);
+  color: var(--bts-vang-chu);
+  font-weight: 600;
+}

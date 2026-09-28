@@ -109,7 +109,7 @@ async function cauCuaTo(env: Env, maDe: readonly string[]): Promise<string[]> {
   return (await cauCuaToChiTiet(env, maDe)).qids
 }
 /** Lần làm của CẢ LỚP với các câu (một truy vấn), nhóm theo em. */
-async function lanLamCaLop(env: Env, sbd: readonly string[], qids: readonly string[]): Promise<Map<string, LanLam[]>> {
+export async function lanLamCaLop(env: Env, sbd: readonly string[], qids: readonly string[]): Promise<Map<string, LanLam[]>> {
   const ra = new Map<string, LanLam[]>()
   if (!sbd.length || !qids.length) return ra
   let rows: Row[]
