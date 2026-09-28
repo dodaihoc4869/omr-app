@@ -98,8 +98,10 @@ describe('màn Theo dõi ca', () => {
   })
 
   it('HIỆN TRƯỚC ai đang chờ, không bắt thầy bấm rồi mới biết', () => {
-    expect(THEO_DOI).toContain('em đang chờ')
-    expect(THEO_DOI).toContain('chưa em nào vào.')
+    // Làm lại 28/09: khối phòng chờ ở src/components/ca-thi/PhongChoCa.tsx, màn truyền dsCho vào.
+    expect(THEO_DOI).toContain('em={gopEmDaVao(chiTiet.dsCho, [])}')
+    expect(doc('src/components/ca-thi/PhongChoCa.tsx')).toContain('em đang chờ')
+    expect(doc('src/components/ca-thi/PhongChoCa.tsx')).toContain('Chưa em nào vào — mở Chiếu mã để lớp quét QR')
   })
 
   it('CA THƯỜNG vẫn bắt đầu như cũ, không đòi phòng chờ có người', () => {
