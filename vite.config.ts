@@ -153,6 +153,10 @@ export default defineConfig({
           // cùng nhập; trước đó chúng nằm trong mảnh Dao2 (đã ngoài precache). `chu-het-luot` (1 KB) bị tách theo, chỉ DaoThanThu/DoanHoTong/Game
           // (đều ngoài precache) nhập. Chỉ máy mở game mới tải, cất ở kho chạy-lúc.
           '**/{BiaGame,TrongAi,ngang,chu-het-luot}-*.{js,css}',
+          // CHỐNG TRÙNG (28/09): 14 biểu tượng nhỏ dưới đây đã có trong `includeAssets` (precache đích danh) — để globPatterns bắt lại lần nữa
+          // thì dist/sw.js ghi mỗi tệp HAI lần (178 mục cho 164 tệp). Bỏ ở phía glob, giữ ở phía includeAssets.
+          '{favicon.svg,apple-touch-icon.png,icon-192.png,logo-huy-hieu-96-v3.png}',
+          'logo-{hs,ph}-{v3.svg,nho-v3.svg,64-v3.png,180-v3.png,192-v3.png}',
         ],
         // ĐƯỜNG LUI CHO MỌI LƯỢT ĐIỀU HƯỚNG — khai TƯỜNG MINH.
         //
