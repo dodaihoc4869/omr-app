@@ -122,30 +122,62 @@
 .h2-cdl-chon select:focus-visible {
   outline: none;
 }
+/* Thẻ lọc (thầy 28/09: "tinh tế gọn gàng đẹp hơn"): MỘT hàng cuộn ngang, viên mảnh 34 px (vùng chạm vẫn 44 px nhờ ::after),
+   số đếm là huy hiệu nhỏ bên phải; thẻ đang chọn nền tông + dấu ✓ nhỏ. */
 .h2-cdl-loc {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 5px 2px;
+  margin: 0 -2px;
 }
+.h2-cdl-loc::-webkit-scrollbar { display: none; }
 .h2-cdl-chip {
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 22px;
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 6px 0 12px;
+  border-radius: 17px;
   border: 1px solid var(--h2c-vien);
   background: transparent;
   color: var(--h2c-chu-nhat);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
+.h2-cdl-chip::after { content: ""; position: absolute; inset: -5px 0; }
 .h2-cdl-chip[aria-pressed='true'] {
-  border-color: var(--h2c-xanh);
+  border-color: transparent;
   background: var(--h2c-xanh);
   color: var(--h2c-xanh-chu);
+  font-weight: 700;
+  padding-left: 8px;
+}
+.h2-cdl-chip[aria-pressed='true']::before {
+  content: "✓";
+  font-size: 12px;
   font-weight: 800;
 }
+.h2-cdl-chip:focus-visible { outline: 2px solid var(--h2c-xanh); outline-offset: 2px; }
 .h2-cdl-dem {
   font-variant-numeric: tabular-nums;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: color-mix(in srgb, currentColor 14%, transparent);
 }
+@media (prefers-reduced-motion: reduce) { .h2-cdl-chip { transition: none; } }
 .h2-cdl-tom {
   margin: 0;
   font-size: 13px;

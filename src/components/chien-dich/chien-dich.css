@@ -538,23 +538,28 @@
   gap: 8px;
 }
 .cd-chip {
-  min-height: 44px;
-  padding: 0 16px;
+  position: relative; /* thẻ lọc gọn 34 px (thầy 28/09); vùng chạm 44 px nhờ ::after */
+  min-height: 34px;
+  padding: 0 14px;
   border: 1px solid var(--bts-vien);
   border-radius: 999px;
   background: transparent;
   color: inherit;
   font: inherit;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
+.cd-chip::after { content: ""; position: absolute; inset: -5px 0; }
 .cd-chip[aria-pressed='true'] {
   border-color: var(--m3-primary, currentColor);
   background: var(--m3-primary-container, transparent);
   color: var(--m3-on-primary-container, inherit);
 }
 .cd-chip-tich {
-  min-height: 44px;
+  position: relative;
+  min-height: 36px;
+  font-size: 13px;
   align-items: center;
   padding: 0 12px;
   border: 1px solid var(--bts-vien);
@@ -1403,3 +1408,5 @@ tr.cd-muc-cd {
 .cd-hang-nut .cd-tim-em {
   width: min(260px, 100%);
 }
+
+.cd-chip-tich::after { content: ""; position: absolute; inset: -4px 0; pointer-events: none; }

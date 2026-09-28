@@ -762,17 +762,19 @@
   --nut-nen: var(--ch-kinh);
   --nut-chu: var(--ch-chu-mo);
   --nut-bong: inset 0 0 0 1px var(--ch-kinh-vien);
+  position: relative;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 48px;
-  padding: 0 16px;
-  border-radius: 24px;
-  font-size: 14px;
+  min-height: 36px; /* thẻ lọc gọn (thầy 28/09); vùng chạm 44 px nhờ ::after */
+  padding: 0 14px;
+  border-radius: 18px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
 }
+.ps .ps-loc button::after { content: ""; position: absolute; inset: -4px 0; }
 .ps .ps-loc button[aria-pressed='true'] {
   --nut-nen: linear-gradient(180deg, rgb(56, 104, 224), rgb(34, 72, 184));
   --nut-chu: rgb(255, 255, 255);
