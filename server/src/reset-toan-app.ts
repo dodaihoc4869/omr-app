@@ -161,6 +161,8 @@ export const BANG_GIU: readonly string[] = [
   // GAME HÓA 2.0 (migration-2709-game-hoa-2.sql) — bảng SINH SAU lần 21/09. Job 21/09 đã `xong` (không bao giờ chạy lại); xếp GIỮ cho job ấy = KHÔNG đụng,
   // y hệt "chưa phân loại" (chỉ khác là không bị báo). Phân loại THẬT cho lần 2 nằm ở `reset-hoa2.ts` (`srs2_ke_hoach`, `ruong_bat_linh` XOÁ; `chien_dich`, `srs2_day_lai` GIỮ).
   'chien_dich', 'srs2_ke_hoach', 'srs2_day_lai', 'ruong_bat_linh',
+  // BI-A PHẢN ỨNG (migration-2809-bi-a.sql) — cũng sinh sau lần 21/09: GIỮ cho job ấy = không đụng. Phân loại thật ở `reset-hoa2.ts` (XOÁ).
+  'bi_a_van', 'bi_a_ghe', 'bi_a_diem_ban', 'bi_a_moi', 'bi_a_co_mat',
 ]
 
 /** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */

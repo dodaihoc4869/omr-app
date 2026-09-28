@@ -21,6 +21,8 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/bang-tin-san/hooks.ts': 1,
   'src/game/than-thu-v2/DoanHoTong.tsx': 1, // 250 ms vẽ lại đồng hồ trận (vòng HỎI trận đã chuyển sang batVongTrucTiep)
   'src/game/than-thu-v2/ImmortalShield.tsx': 1,
+  'src/game/bi-a/TamCauBia.tsx': 1, // 1 s đồng hồ câu Bi-a (chấm qua `answer` một lần khi em chốt, không có vòng hỏi)
+  'src/game/bi-a/ManChoi.tsx': 1, // 45 ms khi GIỮ nút xoay hướng nhắm (chỉ đổi hướng cục bộ)
   'src/hooks/useGioHocTap.ts': 1,
   'src/lib/html-may-chieu.ts': 0,
   'src/lib/html-phieu.ts': 1,

@@ -1,5 +1,5 @@
 // THUẬT TOÁN 2.0 — LỆNH CỦA THẦY `/gv/chien-dich` (nằm SAU cổng `laThay`).
-//   action: co-doc | co-luu | danh-sach | suc-chua | tao | dong | huy | bang | buoi-chua | chua-xong
+//   action: co-doc | co-luu | bia-co-doc | bia-co-luu | danh-sach | suc-chua | tao | dong | huy | bang | buoi-chua | chua-xong
 // Vòng khép kín: Kết thúc ca kiểm tra → Giao chiến dịch (có đồng hồ sức chứa) → Bảng chiến dịch khi đang chạy →
 // Buổi chữa khi hết hạn nộp → "Chữa xong" (câu cần dạy lại quay về Đoàn Hộ Tống hôm sau).
 import type { Env } from './kieu'
@@ -7,6 +7,7 @@ import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { hangTuTiLe, khoiLuongCan, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
+import { KHOA_CO_BIA } from './bi-a'
 import { chanDoanEm, docChienDichTuDong, docCoHoa2Tu, docHoSoDangCaLop, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, mocTinhCua, ngayVnCua, type ChienDich } from './srs2-d1'
 
 type Row = Record<string, unknown>
@@ -19,6 +20,8 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
   try {
     if (action === 'co-doc') return coDoc(env)
     if (action === 'co-luu') return coLuu(env, b, nowMs)
+    if (action === 'bia-co-doc') return coDoc(env, KHOA_CO_BIA)
+    if (action === 'bia-co-luu') return coLuu(env, b, nowMs, KHOA_CO_BIA)
     if (action === 'danh-sach') return danhSach(env, nowMs, b.thongKe === true)
     if (action === 'suc-chua') return tinhSucChua(env, b, nowMs)
     if (action === 'ds-em') return dsEm(env)
@@ -35,14 +38,15 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
 }
 
 // ---------------------------------------------------------------- công tắc
-async function coDoc(env: Env) {
-  const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CO_HOA2).first<{ gia_tri: string }>().catch(() => null)
+// Công tắc Bi-a Phản Ứng (khoá riêng `bi_a`, cùng hình `{bat, lop, sbd}`): cùng hai hàm, khác khoá.
+async function coDoc(env: Env, khoa = KHOA_CO_HOA2) {
+  const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(khoa).first<{ gia_tri: string }>().catch(() => null)
   return { ok: true, co: docCoHoa2Tu(r?.gia_tri) }
 }
-async function coLuu(env: Env, b: Row, nowMs: number) {
+async function coLuu(env: Env, b: Row, nowMs: number, khoa = KHOA_CO_HOA2) {
   const co = { bat: b.bat === true, lop: mangChuoi(b.lop), sbd: mangChuoi(b.sbd) }
   await env.DB.prepare('INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?,?,?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
-    .bind(KHOA_CO_HOA2, JSON.stringify(co), new Date(nowMs).toISOString()).run()
+    .bind(khoa, JSON.stringify(co), new Date(nowMs).toISOString()).run()
   return { ok: true, co }
 }
 

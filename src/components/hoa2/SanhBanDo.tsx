@@ -48,6 +48,8 @@ export interface SanhBanDoProps {
   onPhaPhucKich: () => void
   onKhamPhaDao: () => void
   onCauDaLam: () => void
+  /** Cửa thứ ba: Bi-a Phản Ứng (chỉ vẽ khi máy chủ gửi `bia`). */
+  onChoiBia?: () => void
   onTuiDo: () => void
   onCuaHang: () => void
   onMoThanThu: () => void
@@ -448,7 +450,10 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
         <p className="h2-tam-chu">Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.</p>
       )}
       {xong ? (
-        <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} />
+        <>
+          <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} />
+          <NutBia p={p} s={s} />
+        </>
       ) : trong ? (
         s.chienDich ? <p className="h2-tam-chu">Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.</p> : null
       ) : (
@@ -459,7 +464,29 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
 }
 
 /** Nút việc hôm nay (còn ổ phục kích ⇒ PHÁ N Ổ; hết ổ ⇒ KHÁM PHÁ ĐẢO) — dùng chung bản dọc và bản ngang. */
+/** Cửa Bi-a Phản Ứng (đặc tả Bi-a mục 8.1): còn câu ⇒ "Bi-a Phản Ứng · còn c/t câu"; hết trần ⇒ mờ; xong kế hoạch ⇒ Bàn giao hữu; có ca ⇒ mờ. */
+function NutBia({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
+  const b = s.bia
+  if (!b || !p.onChoiBia) return null
+  const coCa = b.lyDoKhoa === 'dang_co_ca'
+  const giaoHuu = b.giaoHuu.mo
+  const mo = !coCa && (b.con > 0 || giaoHuu)
+  const lon = coCa ? 'Bi-a Phản Ứng · đang có ca kiểm tra' : giaoHuu ? `Bàn giao hữu Bi-a · còn ${b.giaoHuu.con}/2 ván` : b.con > 0 ? `Bi-a Phản Ứng · còn ${b.con}/${b.tong} câu` : 'Hết câu Bi-a hôm nay'
+  const nho = coCa ? 'Bi-a mở lại khi ca kết thúc' : giaoHuu ? 'Không câu, không EXP · em đã xong kế hoạch' : b.con > 0 ? 'Kim loại đấu Phi kim · mỗi bi một câu' : `Đoàn còn ${s.doan.con} câu · Đảo còn ${s.dao.con} câu`
+  return (
+    <button type="button" className="h2-nut-dao h2-nut-bia" disabled={!mo} onClick={mo ? p.onChoiBia : undefined}>
+      <span className="h2-nut-dao-chu">
+        <span className="h2-nut-dao-lon">{lon}</span>
+        <span className="h2-nut-dao-khoa">{nho}</span>
+      </span>
+    </button>
+  )
+}
+
 function NutViec({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
+  return <><NutViecChinh p={p} s={s} /><NutBia p={p} s={s} /></>
+}
+function NutViecChinh({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
   return s.doan.con > 0 ? (
         <>
           <button type="button" className="h2-nut-chinh" onClick={p.onPhaPhucKich}>
@@ -629,12 +656,15 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
       )}
       {!trong && <TheTheLucNgang s={s} />}
       {xong ? (
-        mai && (
-          <section className="h2-ng-the h2-ng-mai" aria-label="Kế hoạch ngày mai">
-            <b>Kế hoạch ngày mai</b>
-            <span className="h2-ng-phu">Sẵn lúc 00:00 {thuNgayThang(mai)}: câu đến lịch ôn lại và câu mới.</span>
-          </section>
-        )
+        <>
+          {mai && (
+            <section className="h2-ng-the h2-ng-mai" aria-label="Kế hoạch ngày mai">
+              <b>Kế hoạch ngày mai</b>
+              <span className="h2-ng-phu">Sẵn lúc 00:00 {thuNgayThang(mai)}: câu đến lịch ôn lại và câu mới.</span>
+            </section>
+          )}
+          <NutBia p={p} s={s} />
+        </>
       ) : trong ? (
         s.chienDich ? <p className="h2-ng-the h2-tam-chu">Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.</p> : null
       ) : (
