@@ -27,6 +27,7 @@ import { tachDongTheoY } from './tach-dong-cau'
 import type { CauLuyen } from './bai-tap-pdf'
 import { cauHinhNop, type CauHinhNopKhacPhuc } from './cau-hinh-nop-khac-phuc'
 import { doanCongThuc, type DoanChu } from './chu-hoa-hoc-pdf'
+import { gomTuCongThuc, tachDongSoDo } from './chem-format-so-do'
 import { goKyTuLa } from './chu-la-pdf'
 import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
 import { nhanChipHtml, ghiThuongHtml, heroCaNhanHtml, ghiChoHtml, chipThuSucHtml, ghiThuSucHtml, nhomThuSucHtml, nopThuSucHtml, CSS_PHIEU_CA_NHAN, type DauBaiCaNhanVao } from './html-phieu-ca-nhan'
@@ -121,7 +122,27 @@ export function chuHtml(s: unknown): string {
       if (inner) return chuHtml(inner)
     } catch {}
   }
-  return doanHtml(doanCongThuc(goKyTuLa(str)))
+  // Sơ đồ/phương trình dính trong câu chữ được tách ra đứng riêng một dòng
+  // (`tachDongSoDo`, cùng luật với ChemText trên màn hình).
+  return tachDongSoDo(goKyTuLa(str))
+    .map((k) => {
+      const noi = doanHtmlLien(doanCongThuc(k.v))
+      return k.t === 'sodo' ? `<span class="so-do" style="display:block;margin:.25em 0">${noi}</span>` : noi
+    })
+    .join('')
+}
+
+/** Như `doanHtml` nhưng bọc LIỀN công thức và "mũi tên + chất sau" (`ct-lien`,
+ * nowrap) để phiếu/tờ chiếu không ngắt dòng giữa (C₆H₁₀O₅ và ₙ. */
+function doanHtmlLien(ds: DoanChu[]): string {
+  return gomTuCongThuc<DoanChu>(
+    ds,
+    (d) => (d.t === 'chu' && !/^[→←⇌]$/.test(d.v) ? d.v : null),
+    (v) => ({ t: 'chu', v }),
+    (d) => d.t === 'mui' || /^[→←⇌]$/.test(d.v),
+  )
+    .map((g) => (g.lien ? `<span class="ct-lien" style="white-space:nowrap">${doanHtml(g.ds)}</span>` : doanHtml([g.x])))
+    .join('')
 }
 
 /** Hướng thân mũi tên: một chiều sang phải, sang trái, hay hai chiều. */
