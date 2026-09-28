@@ -60,3 +60,6 @@ Xếp ghế phòng chờ qua WebSocket (gói `ghe`) thay lệnh HTTP; có mặt 
 ### Phát hành / lùi
 - Code app đẩy Worker như thường (CI `wrangler deploy` tự áp migration DO `bia-v1`). Bảng `bi_a_*` đã tự dựng lúc chạy từ GĐ1.
 - Lùi: `git revert` các commit GĐ2; Worker không có binding `BAN_BIA` ⇒ Sảnh tự về nút "Sắp mở".
+
+## Sửa 28/09: câu làm trong Bi-a hiện ở "Câu đã làm"
+Gốc: Bi-a/Đoàn phát câu ôn nguồn `ca_sai` (ngoài chiến dịch), `hoa2-cau-da-lam` chỉ liệt kê câu chiến dịch. Sửa 5229bbf (nhóm "Câu sai trong ca kiểm tra" + nguồn từng lần làm). **Đã lên**: PR #52, deploy #550 (main 87ce9bb). Lùi: `git revert 5229bbf`.
