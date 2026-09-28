@@ -293,6 +293,8 @@
  .dao2 .dao2-ket-qua{flex:0 0 auto}
  /* cột phải: thẻ đề / thẻ lời giải chiếm hết chỗ còn lại và tự cuộn; nút chính luôn ở đáy, không dính trôi */
  .dao2 .dao2-giay,.dao2 .dao2-the-giai{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;box-shadow:none}
+ /* con của thẻ cuộn KHÔNG được co (thẻ câu có overflow:hidden ⇒ min-height 0 ⇒ bị ép lùn và cắt mất lời giải, không cuộn được — thầy báo 28/09) */
+ .dao2 .dao2-giay>*,.dao2 .dao2-the-giai>*{flex-shrink:0}
  .dao2 .dao2-tro{flex:0 0 auto}
  .dao2 .dao2-chan,.dao2 .dao2-chan[data-noi]{position:static;margin-top:auto;padding-top:0}
  .dao.dao2 button.dao2-nut-chot,.dao.dao2 button.dao2-nut-xanh{min-height:68px;font-size:19px}
