@@ -22,7 +22,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Câu cả lớp cùng làm | **Câu cốt lõi** | lõi, core |
 | Câu chọn riêng cho em | **Câu dành riêng cho em** | riêng, cá nhân hoá |
 | Câu cao hơn bậc của em | **Câu thử thách (sai không sao)** · **Thử sức thêm (không bắt buộc)** | loi_cao, bonus |
-| Ba mức của một dạng | Bậc thang của em (BTVN nâng đỡ, Bộ não A.I): **bậc Biết · Hiểu · Vận dụng**. Nhãn mức độ của CÂU trên phiếu/đề: **Nhận biết · Thông hiểu · Vận dụng** (chữ quen của chương trình) | NB/TH/VD, bậc 0/1/2 |
+| Ba mức của một dạng | Bậc thang của em (BTVN nâng đỡ): **bậc Biết · Hiểu · Vận dụng**. Nhãn mức độ của CÂU trên phiếu/đề: **Nhận biết · Thông hiểu · Vận dụng** (chữ quen của chương trình) | NB/TH/VD, bậc 0/1/2 |
 | Làm lại câu từng sai theo lịch | **Ôn lại** | on_lai, khắc phục (trừ phiếu "Khắc phục sau ca" đã quen) |
 | Con vật đồng hành | **Thần thú** ("Thần thú của em: <biệt danh>") | pet, spirit, linh thú |
 | Thanh sức của thần thú / quái | **Máu** ("Máu 83/100") | HP, số trơn |
@@ -34,7 +34,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Đấu cuối tuần (nếu còn đường vào) | **Võ đài thứ Bảy** | arena |
 | Bài phụ huynh giao cho con | **Bài gia đình giao** (tiêu đề ĐÃ LƯU trong dữ liệu cũ giữ nguyên) | Mom, Mẹ giao, bài của Mom |
 | Lịch làm lại câu sai (màn HS/PH) | **đến lịch ôn lại** · **chuyển sang lịch ôn xa hơn** | hạn ôn, lên bậc ôn, tụt bậc (chỉ app thầy) |
-| Trợ lý AI của từng em | **Bộ não A.I hỗ trợ riêng em <họ tên>** | bộ não (trơn), HLV, AI coach |
+| Tác giả mọi mục NHẬN XÉT / lời gửi em, phụ huynh (báo cáo, phiếu, PDF, kết quả, tin nhắn) | **Thầy Đỗ Đại Học** — thầy lệnh 28/09: gỡ chức năng "Bộ não A.I Đỗ Đại Học", nhận xét ghi "Thầy Đỗ Đại Học" | Bộ não A.I, A.I Đỗ Đại Học, Trợ lý AI, máy nhận xét, HLV, AI coach |
 | Chế độ chưa tác động học sinh | **Chạy thử** | chạy bóng, shadow |
 | Thầy nhắc em chưa nộp | **Cảnh báo của thầy** | push, notice |
 | Câu từng sai nay đã đúng lại đủ lịch | **Đã khắc phục** (trạng thái) — hoạt động làm lại gọi là **Ôn lại** | fixed, done |
@@ -44,7 +44,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Dạng em sai nhiều | App thầy: **Dạng em đang yếu**. Màn học sinh/phụ huynh: **Dạng em đang luyện thêm** | yếu kém, hổng |
 | Bảng mỗi em nhận câu nào | **Xem trước phân bổ** (app thầy) | — |
 
-| Hệ thống tự động của app khi là CHỦ NGỮ làm việc thay thầy (nhắc nộp, xếp ôn, khắc phục, rút bộ câu, vinh danh…) | **A.I Đỗ Đại Học** — thầy lệnh 21/09: "Thay toàn bộ từ Máy bằng A.I Đỗ Đại Học". Ví dụ: "A.I Đỗ Đại Học đã tự làm hôm nay", "A.I Đỗ Đại Học đã lo", "A.I Đỗ Đại Học đã nhắc 9 em". Lời RIÊNG cho từng em vẫn ký "Bộ não A.I hỗ trợ riêng em <họ tên>". KHÔNG đổi chữ "máy" chỉ THIẾT BỊ: máy chủ, máy này, máy em, máy chiếu, máy tính | Máy (làm chủ ngữ), hệ thống, app tự… |
+| Hệ thống tự động của app khi là CHỦ NGỮ làm việc thay thầy (nhắc nộp, xếp ôn, khắc phục, rút bộ câu, vinh danh…) | Màn HỌC SINH / PHỤ HUYNH: **Thầy Đỗ Đại Học** ("Thầy Đỗ Đại Học đã lo cho em", "Thầy Đỗ Đại Học chọn câu hợp với con"). Màn THẦY (thầy tự đọc): **App** ("App đã tự làm hôm nay", "App đã nhắc 9 em", "app tự giải"). Lịch sử: 21/09 thầy đổi "Máy" → "A.I Đỗ Đại Học"; 28/09 thầy gỡ Bộ não A.I ⇒ bỏ chữ A.I. KHÔNG đổi chữ "máy" chỉ THIẾT BỊ: máy chủ, máy này, máy em, máy chiếu, máy tính | A.I Đỗ Đại Học, Máy (làm chủ ngữ), hệ thống |
 
 ### A3. Cách làm đợt chuẩn hoá (KHÔNG sửa bừa — nhiều test đang khoá chuỗi)
 Mỗi phiên rà làn của mình, lập BẢNG trong `docs/ra-soat-tu-ngu-2109-<phiên>.md`: `màn · chữ hiện tại · vấn đề (luật số mấy) · chữ đề nghị · tệp:dòng · test nào khoá`. Boss duyệt bảng ⇒ phiên sửa chữ + sửa test CÓ CHỦ Ý theo từng cụm màn, commit nhỏ, ảnh trước/sau. Ưu tiên: màn học sinh nhìn mỗi ngày (bảng nhiệm vụ, phiếu, game Đảo thần thú, Đoàn) → phụ huynh → thầy. KHÔNG đổi: câu chữ cảnh báo của MÀN THI THẬT (đã khoá), tên bảng/cột/mã nội bộ.
