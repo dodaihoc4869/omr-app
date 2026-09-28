@@ -64,8 +64,19 @@ Hiển thị lời giải: **bắt buộc dùng khối LỜI GIẢI chuẩn củ
 | `suc-chua` | `lop` hoặc `sbd[]`, `maDe[]`, `hanNop`, `theLucNgay?` | `{ soCau, soEm, D, sucChua, khoiLuongTrungVi, tiLe, muc: xanh/vang/do, soEmQuaTai, goiY: { rutCon: {soCau, tiLe} \| null, luiHan: {hanNop, tiLe} \| null } \| null }` |
 | `tao` | như `suc-chua` + `ten`, `huyetChien?`, `maCa?`, `rutCon?` | `{ id, soCau, soEm }` (câu tự luận, câu chưa duyệt tự bỏ) |
 | `dong` / `huy` | `id` | `{ ok }` |
-| `bang` | `id` | `{ chienDich, homNay, hetHan, lop: { coXat, thanhThao, huyetChien, canDayLaiCau, canDayLaiLuot }, dang[], em: [ { sbd, ten, coXat, thanhThao, canDayLai, treNhip, huyetChien, theoDang: { <dạng>: tỉ lệ 0–1 \| null } } ], canDayLai: [ { qid, stt, dang, soEm } ] }` |
+| `bang` | `id` | `{ chienDich, homNay, hetHan, lop: { coXat, thanhThao, huyetChien, canDayLaiCau, canDayLaiLuot }, dang[], em: [ { sbd, ten, coXat, thanhThao, canDayLai, treNhip, huyetChien, theoDang: { <dạng>: tỉ lệ 0–1 \| null }, hangTheoDang: { <dạng>: "L1"\|"L2"\|"L3"\|"L4" } } ], canDayLai: [ { qid, stt, dang, soEm } ] }` |
 | `buoi-chua` | `id`, `coMat[]?` | `{ chienDich, hetHan, soEm, lop: { coXat, thanhThao }, cau: [ { qid, stt, dang, phan, mucDo, soChuaThanhThao, soCanDayLai, diemChua, giaiMau: {sbd, ten} \| null, emSua: [ {sbd, ten} ] } ] }` — mỗi dạng 1 câu, giảm dần theo điểm chữa = chưa thành thạo + 2 × cần dạy lại |
 | `chua-xong` | `id`, `qids[]?` | `{ soLuot, ngayOnLai }` — câu cần dạy lại về Đoàn Hộ Tống từ hôm sau |
 
 Lỗi: `{ ok:false, error:"<tiếng Việt>" }`.
+
+## C. Bốc câu mới cá nhân hoá (thầy chốt 28/09) — lõi `srs2-loi.ts`
+
+- **Hạng theo dạng** (`tinhHangTheoDang`, `gopThongKeDang`): p = (đúng + 2)/(gặp + 4); gặp/đúng = `nam_kt_dang` của em (đúng = `so_gap − so_sai`, bỏ dòng `CD:…`) + lần làm câu chiến dịch đang chạy TỪ LÚC GIAO, bỏ lượt có gợi ý, chỉ lượt sau `cap_nhat_luc` của dạng (không đếm đôi). p < 0,40 → L1 (Yếu); < 0,65 → L2 (Trung bình); ≤ 0,85 → L3 (Khá); > 0,85 → L4 (Giỏi). Dạng chưa có dữ liệu ⇒ p gộp mọi dạng; em không có gì ⇒ L2. Lịch sử CHỈ để xếp hạng, không sinh câu ôn. Tính lại mỗi lần lập kế hoạch (kế hoạch chốt đầu ngày ⇒ cập nhật mỗi sáng).
+- **Số câu mới/ngày giữ nguyên** (quota = ⌈câu mới còn / (D − 3)⌉). `TuyChonKeHoach.hangTheoDang`/`hangChung` (chỉ-thêm; vắng ⇒ y hệt cũ). Chia quota cho 3 nhóm (L1+L2 · L3 · L4) theo tỉ lệ câu mới còn lại (`bocCauMoiCaNhan`):
+  - L1, L2: dễ trước (Nhận biết → Vận dụng cao, như cũ).
+  - L3 — bậc thang (`chiaBacThang`): số câu mức m ∝ N_m·max(0, 1 + t(μ − m)), μ = mức trung bình phần còn lại, t = min(0,6; 0,3(K − 2)), K = số ngày giao câu mới còn lại. Kho 24/62/84, 5 × 34 ⇒ 9/15/10 · 7/15/12 · 4/12/18 · 2/10/22 · 2/10/22.
+  - L4 — vừa sức trước: mức cao nhất của nhóm trong chiến dịch trước, giữ round(quota/6) câu mức ngay dưới làm khởi động. Kho trên ⇒ 28 VD + 6 TH (ngày 1–3) · 34 TH · 10 TH + 24 NB.
+  - Mọi câu mới giao hết trước ngày D − 3 (ép chín giữ nguyên). Mức câu: NB/Nhận biết/biet = 0 … VDC/Vận dụng cao/van_dung_cao = 3.
+- **Thứ tự trong ngày**: có nhóm L3/L4 ⇒ rải đều các mức (mỗi chuyến 6 câu có câu dễ và câu khó). **Trong chuyến Đảo** (`xepChuyenDao`): câu ôn Đúng–sai trước; câu mới dễ → khó ⇒ ải 1–2 dễ nhất, ải 6 (`vai:"trum"`) khó nhất.
+- `chan-doan-em` trả thêm `hangTheoDang`, `hangChung`.

@@ -15,6 +15,14 @@ export const SO_EM_THU_GON = 12
 
 const chuTreNhip = (n: number | null): string => (n == null ? 'Chưa làm' : n <= 0 ? '—' : `${n} ngày`)
 
+/** Sức học theo dạng (hạng máy dùng để bốc câu mới) — chữ chuẩn app thầy. */
+export const CHU_HANG: Record<'L1' | 'L2' | 'L3' | 'L4', string> = { L1: 'Yếu', L2: 'Trung bình', L3: 'Khá', L4: 'Giỏi' }
+/** "Cấu tạo: Khá · Lên men: Yếu" — theo đúng thứ tự cột dạng của bảng; vắng ⇒ chuỗi rỗng. */
+export function chuHangTheoDang(hang: EmBang['hangTheoDang'], dang: readonly string[]): string {
+  if (!hang) return ''
+  return dang.filter((d) => hang[d]).map((d) => `${d}: ${CHU_HANG[hang[d]!]}`).join(' · ')
+}
+
 /** Người lên bảng cho mỗi câu cần dạy lại: em thành thạo dạng ấy nhiều nhất, không lặp em nếu còn em khác. */
 export function nguoiGiaiMau(cau: readonly CauCanDayLai[], em: readonly EmBang[]): OChieu[] {
   const daGoi = new Set<string>()
@@ -137,6 +145,11 @@ export default function BangChienDich({
                       <th scope="row" style={{ fontWeight: 500, color: 'var(--bts-chu)', textAlign: 'left', fontSize: 14 }}>
                         {e.ten}
                         {e.huyetChien && <span className="cd-nhan-hc">Huyết Chiến</span>}
+                        {chuHangTheoDang(e.hangTheoDang, du.dang) && (
+                          <span className="cd-hang-dong" data-khoi="hang-theo-dang">
+                            {chuHangTheoDang(e.hangTheoDang, du.dang)}
+                          </span>
+                        )}
                       </th>
                       <td>{phanTram(e.coXat / soCau)}</td>
                       <td>{phanTram(e.thanhThao / soCau)}</td>
@@ -166,6 +179,9 @@ export default function BangChienDich({
                 {g.chu}
               </span>
             ))}
+            {du.em.some((e) => e.hangTheoDang && Object.keys(e.hangTheoDang).length) && (
+              <span>Dòng dưới tên em = sức học theo dạng (Yếu · Trung bình · Khá · Giỏi) — máy bốc câu mới theo đó.</span>
+            )}
             {dsEm.length > SO_EM_THU_GON && (
               <button type="button" className="m3-nut-chu cd-nut-nho" aria-expanded={caLop} onClick={() => setCaLop((x) => !x)}>
                 {caLop ? 'Thu gọn' : 'Xem cả lớp'}

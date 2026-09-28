@@ -138,6 +138,13 @@ export interface TuyChonKeHoach {
   hanNop: string | null
   tranNgay?: number
   tranHuyetChien?: number
+  /**
+   * BỐC CÂU MỚI CÁ NHÂN HOÁ (thầy chốt 28/09) — hạng của em THEO TỪNG DẠNG (khoá = `dang` của câu). Vắng ⇒ hành vi cũ
+   * (Nhận biết → Vận dụng cao cho mọi em). Dạng không có trong bảng ⇒ `hangChung`.
+   */
+  hangTheoDang?: Readonly<Record<string, HangEm>>
+  /** Hạng chung của em (gộp mọi dạng) cho dạng chưa có dữ liệu. Vắng ⇒ L2. */
+  hangChung?: HangEm
 }
 
 export interface KeHoachNgay {
@@ -165,7 +172,9 @@ export function bam(s: string): number {
   return h >>> 0
 }
 
-const HANG_MUC_DO: Record<string, number> = { NB: 0, 'Nhận biết': 0, TH: 1, 'Thông hiểu': 1, VD: 2, 'Vận dụng': 2, VDC: 3, 'Vận dụng cao': 3 }
+export const HANG_MUC_DO: Record<string, number> = {
+  NB: 0, 'Nhận biết': 0, biet: 0, TH: 1, 'Thông hiểu': 1, hieu: 1, VD: 2, 'Vận dụng': 2, van_dung: 2, VDC: 3, 'Vận dụng cao': 3, van_dung_cao: 3,
+}
 const hangMucDo = (m: string | null): number => (m != null && m in HANG_MUC_DO ? HANG_MUC_DO[m]! : 9)
 
 /** Trọng số câu ôn đến lịch: 50 + 20 × số ngày trễ + 80 nếu sắp chín (cc = 1) hoặc + 60 nếu vừa sai (cc = 0). */
@@ -208,6 +217,211 @@ function xepCauMoi(ds: readonly CauSrs[], homNay: string): CauSrs[] {
   return ra
 }
 
+// ---------------------------------------------------------------- BỐC CÂU MỚI CÁ NHÂN HOÁ (thầy chốt 28/09)
+/** Hạng của em ở một dạng: L1 Yếu · L2 Trung bình · L3 Khá · L4 Giỏi. */
+export type HangEm = 'L1' | 'L2' | 'L3' | 'L4'
+/** Thống kê một dạng: số lần gặp và số lần đúng (hồ sơ `nam_kt_dang` + lần làm trong chiến dịch, bỏ lượt có gợi ý). */
+export interface ThongKeDang { gap: number; dung: number }
+
+/** Tỉ lệ đúng đã làm trơn: p = (đúng + 2) / (gặp + 4) — ít dữ liệu thì kéo về 0,5. */
+export const tiLeLamTron = (dung: number, gap: number): number => (Math.max(0, dung) + 2) / (Math.max(0, gap) + 4)
+/** Ngưỡng hạng: p < 0,40 → L1; < 0,65 → L2; ≤ 0,85 → L3; > 0,85 → L4. */
+export const hangTuTiLe = (p: number): HangEm => (p < 0.4 ? 'L1' : p < 0.65 ? 'L2' : p <= 0.85 ? 'L3' : 'L4')
+
+/**
+ * Hạng theo từng dạng của em. Dạng có dữ liệu (gặp > 0) ⇒ hạng từ p của dạng; dạng chưa có ⇒ `hangChung` (p gộp mọi dạng);
+ * em không có dữ liệu gì ⇒ L2.
+ */
+export function tinhHangTheoDang(thongKe: ReadonlyMap<string, ThongKeDang>, dangCan: readonly string[] = []): { hangTheoDang: Record<string, HangEm>; hangChung: HangEm } {
+  let gap = 0, dung = 0
+  for (const t of thongKe.values()) { gap += Math.max(0, t.gap); dung += Math.max(0, t.dung) }
+  const hangChung: HangEm = gap > 0 ? hangTuTiLe(tiLeLamTron(dung, gap)) : 'L2'
+  const hangTheoDang: Record<string, HangEm> = {}
+  for (const d of new Set([...thongKe.keys(), ...dangCan])) {
+    const t = thongKe.get(d)
+    hangTheoDang[d] = t && t.gap > 0 ? hangTuTiLe(tiLeLamTron(t.dung, t.gap)) : hangChung
+  }
+  return { hangTheoDang, hangChung }
+}
+
+/** Một dòng hồ sơ dạng (`nam_kt_dang`): `soGap` câu đã gặp, `soSai` câu từng sai; `capNhatLuc` = lúc dựng hồ sơ (ISO). */
+export interface HoSoDangTho { maDang: string; soGap: number; soSai: number; capNhatLuc: string | null }
+
+/**
+ * Gộp thống kê theo dạng để XẾP HẠNG: hồ sơ `nam_kt_dang` (đúng = gặp − sai) + lần làm TRONG chiến dịch (sau lúc giao,
+ * bỏ lượt có gợi ý). Lần làm trước lúc dựng hồ sơ của dạng đã nằm trong hồ sơ ⇒ không cộng lại (tránh đếm đôi).
+ * Bỏ dòng tổng chuyên đề `CD:…`.
+ */
+export function gopThongKeDang(
+  hoSo: readonly HoSoDangTho[],
+  lanLam: readonly { dang: string | null; luc: string; dung: boolean; coGoiY: boolean }[],
+  tuLuc = '',
+): Map<string, ThongKeDang> {
+  const ra = new Map<string, ThongKeDang>()
+  const moc = new Map<string, string>()
+  for (const d of hoSo) {
+    if (!d.maDang || d.maDang.startsWith('CD:')) continue
+    const gap = Math.max(0, Number(d.soGap) || 0)
+    ra.set(d.maDang, { gap, dung: Math.max(0, gap - Math.max(0, Number(d.soSai) || 0)) })
+    if (d.capNhatLuc) moc.set(d.maDang, d.capNhatLuc)
+  }
+  for (const x of lanLam) {
+    if (!x.dang || x.coGoiY || x.luc < tuLuc) continue
+    const m = moc.get(x.dang)
+    if (m && x.luc <= m) continue
+    const t = ra.get(x.dang) ?? { gap: 0, dung: 0 }
+    ra.set(x.dang, { gap: t.gap + 1, dung: t.dung + (x.dung ? 1 : 0) })
+  }
+  return ra
+}
+
+/** Mức câu cho bốc cá nhân: NB 0 … VDC 3; nhãn lạ/thiếu coi là Thông hiểu (không để câu không nhãn nhảy lên đầu nhóm "khó trước"). */
+const mucCaNhan = (m: string | null): number => (m != null && m in HANG_MUC_DO ? HANG_MUC_DO[m]! : 1)
+
+/** Chia `n` theo trọng số (phần dư lớn nhất), mỗi phần không vượt `tran[i]`; phần thừa dồn sang phần còn chỗ theo trọng số. */
+function chiaTheoTrongSo(n: number, trongSo: readonly number[], tran: readonly number[]): number[] {
+  const ra = trongSo.map(() => 0)
+  let con = Math.min(n, tran.reduce((s, x) => s + x, 0))
+  while (con > 0) {
+    const mo = trongSo.map((w, i) => (ra[i]! < tran[i]! ? Math.max(0, w) : 0))
+    const dung = mo.some((w) => w > 0) ? mo : tran.map((t, i) => (ra[i]! < t ? 1 : 0))
+    const tong = dung.reduce((s, x) => s + x, 0)
+    const thuc = dung.map((w) => (con * w) / tong)
+    const phan = thuc.map((x, i) => Math.min(Math.floor(x), tran[i]! - ra[i]!))
+    let da = phan.reduce((s, x) => s + x, 0)
+    const du = thuc
+      .map((x, i) => [x - Math.floor(x), i] as const)
+      .filter(([, i]) => dung[i]! > 0 && ra[i]! + phan[i]! < tran[i]!)
+      .sort((a, b) => b[0] - a[0] || a[1] - b[1])
+    for (const [, i] of du) {
+      if (da >= con) break
+      phan[i]!++
+      da++
+    }
+    phan.forEach((x, i) => { ra[i]! += x })
+    if (da === 0) break
+    con -= da
+  }
+  return ra
+}
+
+/**
+ * Hạng L3 — BẬC THANG: số câu mức m hôm nay ∝ N_m × max(0, 1 + t·(μ − m)), μ = mức trung bình của phần còn lại,
+ * t = min(0,6; 0,3·(K − 2)) với K = số ngày giao câu mới còn lại (kể cả hôm nay). Đầu kỳ nghiêng về câu dễ, t giảm dần
+ * về 0 ở hai ngày giao cuối (chia đều phần còn lại) ⇒ câu khó tăng dần và HẾT mọi mức đúng ngày giao cuối (ngày cuối lấy hết).
+ * Ví dụ kho 24/62/84, 5 ngày × 34: 9/15/10 · 7/15/12 · 4/12/18 · 2/10/22 · 2/10/22.
+ */
+export function chiaBacThang(soTheoMuc: ReadonlyMap<number, number>, n: number, K: number): Map<number, number> {
+  const muc = [...soTheoMuc.keys()].sort((a, b) => a - b)
+  const N = muc.map((m) => soTheoMuc.get(m)!)
+  const tong = N.reduce((s, x) => s + x, 0)
+  if (n >= tong) return new Map(muc.map((m, i) => [m, N[i]!]))
+  const t = Math.min(0.6, Math.max(0, 0.3 * (K - 2)))
+  const mu = muc.reduce((s, m, i) => s + m * N[i]!, 0) / tong
+  const w = muc.map((m, i) => N[i]! * Math.max(0, 1 + t * (mu - m)))
+  const ra = chiaTheoTrongSo(n, w, N)
+  return new Map(muc.map((m, i) => [m, ra[i]!]))
+}
+
+/** Số câu khởi động (dễ hơn 1 bậc) mỗi ngày của hạng L4: ~1/6 lượng câu mới trong ngày. */
+export const soCauKhoiDong = (n: number): number => Math.round(n / 6)
+
+/** Xếp câu đã chọn trong ngày: rải đều các mức (mỗi chuyến 6 câu có đủ dễ/khó theo đúng tỉ lệ ngày); hoà ⇒ mức dễ trước, rồi thứ tự gốc. */
+function raiDeuTheoMuc(ds: readonly CauSrs[], viTri: ReadonlyMap<string, number>): CauSrs[] {
+  const theoMuc = new Map<number, CauSrs[]>()
+  for (const c of ds) {
+    const m = mucCaNhan(c.mucDo)
+    if (!theoMuc.has(m)) theoMuc.set(m, [])
+    theoMuc.get(m)!.push(c)
+  }
+  const khoa = new Map<string, number>()
+  for (const cs of theoMuc.values()) {
+    cs.sort((a, b) => viTri.get(a.qid)! - viTri.get(b.qid)!)
+    cs.forEach((c, i) => khoa.set(c.qid, (i + 0.5) / cs.length))
+  }
+  return [...ds].sort((a, b) => khoa.get(a.qid)! - khoa.get(b.qid)! || mucCaNhan(a.mucDo) - mucCaNhan(b.mucDo) || viTri.get(a.qid)! - viTri.get(b.qid)!)
+}
+
+/**
+ * Chọn `soLay` câu mới HÔM NAY theo hạng của em ở dạng của từng câu, rồi nối phần còn lại (thứ tự cũ, dễ trước) để lấp chỗ trống.
+ * - `moi`: câu mới đã xếp kiểu cũ (`xepCauMoi` — dễ trước, xen dạng). `tatCa`: mọi câu chiến dịch (để biết mức "vừa sức" của nhóm L4).
+ * - `K`: số ngày giao câu mới còn lại, kể cả hôm nay (D − 3; sát hạn = 1).
+ * - Chia `soLay` cho ba nhóm (L1+L2 · L3 · L4) theo tỉ lệ câu mới còn lại ⇒ mọi nhóm cùng giao hết vào ngày giao cuối.
+ * - L1, L2: dễ trước. L3: bậc thang (`chiaBacThang`). L4: vừa sức (mức cao nhất của nhóm) trước, giữ `soCauKhoiDong` câu
+ *   ở mức ngay dưới làm khởi động; hết câu mức ấy thì lấy tiếp theo thứ tự khó → dễ.
+ */
+export function bocCauMoiCaNhan(
+  moi: readonly CauSrs[],
+  soLay: number,
+  K: number,
+  hangCua: (c: CauSrs) => HangEm,
+  tatCa: readonly CauSrs[] = moi,
+): CauSrs[] {
+  const viTri = new Map(moi.map((c, i) => [c.qid, i]))
+  const nhomCua = (c: CauSrs): 0 | 1 | 2 => {
+    const h = hangCua(c)
+    return h === 'L4' ? 2 : h === 'L3' ? 1 : 0
+  }
+  const nhom: CauSrs[][] = [[], [], []]
+  for (const c of moi) nhom[nhomCua(c)]!.push(c)
+  const soNhom = chiaTheoTrongSo(Math.max(0, Math.min(soLay, moi.length)), nhom.map((g) => g.length), nhom.map((g) => g.length))
+  const chon: CauSrs[] = []
+  // Nhóm L1 + L2: dễ trước (đúng thứ tự cũ).
+  chon.push(...nhom[0]!.slice(0, soNhom[0]))
+  // Nhóm L3: bậc thang theo mức.
+  if (soNhom[1]! > 0) {
+    const theoMuc = new Map<number, CauSrs[]>()
+    for (const c of nhom[1]!) {
+      const m = mucCaNhan(c.mucDo)
+      if (!theoMuc.has(m)) theoMuc.set(m, [])
+      theoMuc.get(m)!.push(c)
+    }
+    const so = chiaBacThang(new Map([...theoMuc].map(([m, cs]) => [m, cs.length])), soNhom[1]!, K)
+    for (const [m, cs] of theoMuc) chon.push(...cs.slice(0, so.get(m) ?? 0))
+  }
+  // Nhóm L4: vừa sức trước + câu khởi động.
+  if (soNhom[2]! > 0) {
+    const n = soNhom[2]!
+    const nhomTatCa = tatCa.filter((c) => nhomCua(c) === 2)
+    const mucCo = [...new Set((nhomTatCa.length ? nhomTatCa : nhom[2]!).map((c) => mucCaNhan(c.mucDo)))].sort((a, b) => b - a)
+    const mucKhoiDong = mucCo[1] // mức ngay dưới mức vừa sức (mức cao nhất của nhóm trong chiến dịch)
+    const khoTruoc = [...nhom[2]!].sort((a, b) => mucCaNhan(b.mucDo) - mucCaNhan(a.mucDo) || viTri.get(a.qid)! - viTri.get(b.qid)!)
+    const daLay = new Set<string>()
+    const kd = mucKhoiDong == null ? 0 : soCauKhoiDong(n)
+    for (const c of khoTruoc) {
+      if (daLay.size >= n - kd) break
+      daLay.add(c.qid)
+    }
+    for (const c of khoTruoc) {
+      if (daLay.size >= n) break
+      if (mucCaNhan(c.mucDo) === mucKhoiDong) daLay.add(c.qid)
+    }
+    for (const c of khoTruoc) {
+      if (daLay.size >= n) break
+      daLay.add(c.qid)
+    }
+    chon.push(...khoTruoc.filter((c) => daLay.has(c.qid)))
+  }
+  const daChon = new Set(chon.map((c) => c.qid))
+  // Chỉ có câu nhóm L1/L2 ⇒ giữ đúng thứ tự cũ (dễ trước); có nhóm L3/L4 ⇒ rải đều mức để mỗi chuyến có câu khởi động và câu trùm.
+  const ngay = chon.every((c) => nhomCua(c) === 0) ? moi.filter((c) => daChon.has(c.qid)) : raiDeuTheoMuc(chon, viTri)
+  return [...ngay, ...moi.filter((c) => !daChon.has(c.qid))]
+}
+
+/**
+ * Thứ tự câu trong MỘT chuyến Bát Linh Đảo: câu ôn (Đúng–sai) đi trước như cũ; câu mới xếp dễ → khó ⇒ ải 1–2 là câu mới dễ
+ * nhất, ải cuối (Trùm, chuyến đủ 6 ải) là câu mới khó nhất, giữa là phần còn lại. Hoà mức ⇒ giữ thứ tự kế hoạch.
+ */
+export function xepChuyenDao<T>(ds: readonly T[], laMoi: (x: T) => boolean, mucDo: (x: T) => string | null): T[] {
+  const on = ds.filter((x) => !laMoi(x))
+  const moi = ds
+    .map((x, i) => [x, i] as const)
+    .filter(([x]) => laMoi(x))
+    .sort((a, b) => hangMucDo(mucDo(a[0])) - hangMucDo(mucDo(b[0])) || a[1] - b[1])
+    .map(([x]) => x)
+  return [...on, ...moi]
+}
+
 /**
  * Lập kế hoạch MỘT ngày cho một em. `trangThai` phải có đủ mọi câu trong `cau` (câu chưa làm ⇒ trạng thái mới).
  * `daLamHomNay`: số câu của kế hoạch hôm nay em đã làm (trừ vào trần).
@@ -240,7 +454,10 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const layOn = Math.min(on.length, tran - layMoi)
   const layDuyTri = Math.min(duyTri.length, Math.floor(tran * TI_LE_DUY_TRI), tran - layMoi - layOn)
   const conDu = tran - layMoi - layOn - layDuyTri
-  const chonMoi = moi.slice(0, layMoi + Math.max(0, conDu))
+  // Bốc câu mới cá nhân hoá (thầy 28/09): chỉ khi có `hangTheoDang`; số câu mới/ngày giữ nguyên quota.
+  const hangCua = (c: CauSrs): HangEm => tc.hangTheoDang?.[c.dang ?? ''] ?? tc.hangChung ?? 'L2'
+  const thuTuMoi = tc.hangTheoDang ? bocCauMoiCaNhan(moi, layMoi, D > NGAY_DEM ? D - NGAY_DEM : 1, hangCua, cauChienDich) : moi
+  const chonMoi = thuTuMoi.slice(0, layMoi + Math.max(0, conDu))
   const chonOn = [...on.slice(0, layOn), ...duyTri.slice(0, layDuyTri)]
 
   return {
