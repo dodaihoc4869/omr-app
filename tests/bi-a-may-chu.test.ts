@@ -5,7 +5,8 @@ import { taoD1That } from './_d1-that'
 import { gvChienDich } from '../server/src/srs2-gv'
 import { layKeHoachHomNay } from '../server/src/srs2-d1'
 import { startDao2, startDoan2 } from '../server/src/srs2-game'
-import { biaAction, tinhTranBia, xepUngVienChot } from '../server/src/bi-a'
+import { readFileSync } from 'node:fs'
+import { biaAction, SQL_BANG_BIA, tinhTranBia, xepUngVienChot } from '../server/src/bi-a'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import { dieuKienLoaiPhien } from '../server/src/game-v2-luot'
@@ -195,6 +196,24 @@ describe('Bi-a — máy chủ trên D1 thật', () => {
     expect(d.dem('game_v2_session', `id='${r.session}' AND json_extract(json,'$.dong')=1`)).toBe(1)
     // gọi lại không ghi đè
     expect(await biaAction(env, 'S1', 'bia-ket-van', { van: r.van, ketQua: { lyDo: 'bo' } }, Date.now())).toMatchObject({ daGhiTruoc: true })
+  })
+
+  it('CI không chạy migration: CSDL chưa có bảng bi_a_* ⇒ lệnh bia-* tự dựng bảng (chỉ thêm), xếp bàn + kết ván chạy được; bảng khớp migration', async () => {
+    const { d, env } = fixture()
+    for (const t of ['bi_a_ghe', 'bi_a_van', 'bi_a_diem_ban', 'bi_a_moi', 'bi_a_co_mat']) d.sql.exec(`DROP TABLE ${t}`)
+    expect(d.dem('sqlite_master', "type='table' AND name LIKE 'bi_a_%'")).toBe(0)
+    await giao(env)
+    const r = await biaAction(env, 'S1', 'bia-xep-ban', { loai: 'ai', cheDo: 'don', soBi: 7 }, Date.now())
+    expect(typeof r.van).toBe('string')
+    expect(d.dem('sqlite_master', "type='table' AND name LIKE 'bi_a_%'")).toBe(5)
+    expect(d.dem('sqlite_master', "type='index' AND name LIKE 'bi_a_%'")).toBe(4)
+    const k = await biaAction(env, 'S1', 'bia-ket-van', { van: r.van, ketQua: { doiThang: 0, diem: [90, 20], lyDo: 'thang' }, ghe: [{ ghe: 1, doi: 0, ai: false, an: 3, vang: 0 }, { ghe: 2, doi: 1, ai: true, dung: 2, sai: 1, an: 1, vang: 0 }] }, Date.now())
+    expect(k.ok).toBe(true)
+    expect(d.dem('bi_a_ghe', `van='${r.van}'`)).toBe(2)
+    // danh sách dựng tại chỗ = đúng các bảng/chỉ mục của migration
+    const mig = readFileSync('server/migration-2809-bi-a.sql', 'utf8')
+    const ten = (s: string) => /(?:TABLE|INDEX) IF NOT EXISTS (\w+)/.exec(s)![1]
+    expect(SQL_BANG_BIA.map(ten).sort()).toEqual([...mig.matchAll(/(?:TABLE|INDEX) IF NOT EXISTS (\w+)/g)].map((m) => m[1]).sort())
   })
 
   it('vào ván mới là bỏ ván cũ (G8): ván cũ thành "bo", câu cũ nhả ra', async () => {

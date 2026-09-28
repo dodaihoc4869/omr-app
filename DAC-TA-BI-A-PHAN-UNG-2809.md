@@ -14,7 +14,7 @@ Bản vẽ chơi được (phiên bản 5): `docs/ban-ve-bi-a-2809/bi-a-phan-ung
 - **Không phá kinh tế đang có**: dùng chung kế hoạch ngày, chung lệnh chấm, chung EXP (trần 120/ngày), chung Thể lực. Bi-a chỉ được lấy **tối đa 40% phần của Đoàn và 40% phần của Đảo** mỗi ngày.
 - **Sau khi xong kế hoạch ngày**: mở **Bàn giao hữu** (không câu, không EXP, tối đa 2 ván/ngày).
 - **Vật lý thật**: trượt rồi lăn, xoáy trên/dưới/ngang, ma sát băng và bi–bi, bi 3D xoay; tất định để đấu online chỉ gửi 1 gói tin mỗi cú. **Âm thanh mô phỏng** theo lực va chạm thật.
-- **Chơi với nhau, tối đa 4 người**: luật 8 bi có 2 phe, nên **đấu đơn** (1–1) hoặc **đánh đôi** (2–2). Ghế trống do A.I Đỗ Đại Học ngồi; tự chơi một mình với A.I được. Mỗi em một máy; không có "hai người một máy".
+- **Chơi với nhau, tối đa 4 người**: luật 8 bi có 2 phe, nên **đấu đơn** (1–1) hoặc **đánh đôi** (2–2). Ghế trống do A.I ngồi; tự chơi một mình với A.I được. Mỗi em một máy; không có "hai người một máy".
 - **Màn hình**: điện thoại dọc, điện thoại xoay ngang, máy tính; bàn tự nằm ngang khi khung rộng. Nút **toàn màn hình** chỉ còn bàn bi-a và điều khiển nổi.
 
 ## 1. Quyết định của thầy và giả định
@@ -43,7 +43,7 @@ Bản vẽ chơi được (phiên bản 5): `docs/ban-ve-bi-a-2809/bi-a-phan-ung
 | G2 | Bàn giao hữu chỉ đấu với A.I hoặc với bạn **cũng đã xong kế hoạch ngày**; không tính Điểm bàn. | Không để bạn chưa học xong bị kéo đi chơi. |
 | G3 | Điểm ván: Nhận biết 10, Thông hiểu 20, Vận dụng 30, hạ Bi chốt 50, bi trống 5. | Đã dùng trong bản vẽ. |
 | G4 | Mắt thần tối đa 3; mỗi cú đánh của em tự dùng 1 nếu có. | Đơn giản cho học sinh, đã dùng trong bản vẽ. |
-| G5 | A.I Đỗ Đại Học đúng Nhận biết 85%, Thông hiểu 75%, Vận dụng 60%, Câu chốt 70%; giải trước 1 bi mỗi 12 giây trong lượt em. | Số đang dùng trong bản vẽ; chỉnh sau khi xem 1 tuần dữ liệu thắng thua thật. |
+| G5 | A.I đúng Nhận biết 85%, Thông hiểu 75%, Vận dụng 60%, Câu chốt 70%; giải trước 1 bi mỗi 12 giây trong lượt em. | Số đang dùng trong bản vẽ; chỉnh sau khi xem 1 tuần dữ liệu thắng thua thật. |
 | G6 | Đấu với A.I **có** câu thật và tính vào trần Bi-a như đấu với bạn. | A.I là cách chơi khi không ai rảnh; học vẫn phải thật. |
 | G7 | Điểm bàn chỉ tính ở ván online với bạn (không tính ván A.I, không tính giao hữu). Elo K = 24, khởi đầu 1000. | Xếp hạng công bằng giữa người với người. |
 | G8 | Mỗi em chỉ có 1 ván Bi-a đang mở; ván mở quá 2 giờ không ai đánh thì tự đóng. | Khớp cách Đảo/Đoàn giữ phiên 2 giờ. |
@@ -52,7 +52,7 @@ Bản vẽ chơi được (phiên bản 5): `docs/ban-ve-bi-a-2809/bi-a-phan-ung
 | G11 | Đánh đôi: người 1 của phe giữ bi thứ 1, 3, 5, 7 của phe (4 bi), người 2 giữ bi thứ 2, 4, 6 (3 bi). **Người giữ bi trả lời câu của bi**, ai đánh vào cũng vậy; Câu chốt do người hạ Bi chốt trả lời (câu của chính người đó). | Mỗi em chỉ trả lời câu của mình, giữ đúng kế hoạch cá nhân. |
 | G12 | Màu bi theo bảng màu nguyên tử Jmol (quy ước trong mô hình phân tử); riêng C của Bi chốt màu đen (truyền thống bi số 8), không xám như Jmol. Tên nguyên tố theo IUPAC như chương trình 2018. | Học sinh gặp lại đúng màu này ở mô hình phân tử trong sách. |
 | G13 | Cùng một cú rơi nhiều bi thường: trả lời lần lượt; **một câu sai là dừng**: các bi còn chờ về chân bàn, không mở câu (câu đó không tính, về lại kế hoạch), lượt sang ngay. | Thầy yêu cầu sai là sang lượt ngay (Q11). |
-| G14 | Đánh đôi online có người rớt mạng > 60 giây: ghế đó chuyển cho A.I Đỗ Đại Học (bi của người đó thành bi A.I, câu chưa trả lời về lại kế hoạch của người đó); ván không tính Điểm bàn. | Ba bạn còn lại không phải bỏ ván. |
+| G14 | Đánh đôi online có người rớt mạng > 60 giây: ghế đó chuyển cho A.I (bi của người đó thành bi A.I, câu chưa trả lời về lại kế hoạch của người đó); ván không tính Điểm bàn. | Ba bạn còn lại không phải bỏ ván. |
 
 ## 2. Từ ngữ (thêm vào `docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md`, mục A2)
 
@@ -255,14 +255,15 @@ Các hàm `luot.ts` (`demLuotHomNay`, `moPhienLuotMoi`, `docLuotDangCho`, `docDa
 
 - **Mở khi**: kế hoạch ngày của em đã xong (Thể lực còn 0 và tổng > 0) và em không có ca kiểm tra mở.
 - **Giới hạn**: tối đa 2 ván/ngày/em, đếm lúc **bắt đầu** ván (vào ván là tính, bỏ giữa chừng vẫn tính).
-- **Người chơi**: đấu đơn hoặc đánh đôi; ghế trống là A.I Đỗ Đại Học; bạn mời vào phải cũng đã xong kế hoạch ngày và còn lượt giao hữu. Lời mời tới bạn chưa xong kế hoạch thì không gửi được: "Minh Châu chưa xong kế hoạch hôm nay".
+- **Người chơi**: đấu đơn hoặc đánh đôi; ghế trống là A.I; bạn mời vào phải cũng đã xong kế hoạch ngày và còn lượt giao hữu. Lời mời tới bạn chưa xong kế hoạch thì không gửi được: "Minh Châu chưa xong kế hoạch hôm nay".
 - **Luật**: như mục 3 nhưng mọi bi là bi trống (vào lỗ là ăn, 5 điểm), không Mắt thần (đường ngắm cơ bản), không Câu chốt (hạ Bi chốt hợp lệ là thắng).
 - **Thưởng**: không EXP, không Vàng, không Điểm bàn, không trừ Thể lực.
 - **Sảnh**: màn "Hôm nay em xong rồi" của Sảnh Bát Linh thêm thẻ "Bàn giao hữu · còn 2/2 ván hôm nay".
 
 ## 6. Chơi với nhau
 
-### 6.1 Tự chơi với A.I Đỗ Đại Học (GĐ1)
+### 6.1 Tự chơi với A.I (GĐ1)
+- *(28/09)* Tên đối thủ máy: **"A.I"** (đấu đơn), **"A.I 1 / A.I 2 / A.I 3"** (đánh đôi) — không dùng "A.I Đỗ Đại Học" vì thầy đã đổi chữ này thành "Thầy Đỗ Đại Học" ở app học sinh (`tests/chu-thay-hoc-sinh-2809.test.ts` khoá mọi tệp `src/game`).
 - **Đấu đơn**: em (Phe Kim loại) + 1 A.I (Phe Phi kim). **Đánh đôi**: em + A.I 2 (đồng đội, giữ 3 bi của phe em) + A.I 1 và A.I 3 (Phe Phi kim). Chọn ở Sảnh Bi-a: "Tự chơi với A.I" → "Đấu đơn" / "Đánh đôi".
 - Chạy hoàn toàn trên máy em. A.I dùng chính lõi vật lý: thử tối đa 60 cú ứng viên (bóng bi ma theo từng bi của phe A.I × 6 lỗ × 3 lực, cộng 5 cú nhắm thẳng), chấm điểm từng cú (ăn bi của phe +110, bi vàng +200, bi phe đối thủ rơi −90, phạm luật −250 đến −300, Bi chốt hợp lệ +1500), nhiễu góc ±0,7°. Đặt bi cái: thử 2 khoảng cách sau bóng bi ma của từng bi × lỗ.
 - Bi của A.I không mang câu thật; A.I "trả lời" và "giải trước" theo tỉ lệ ở giả định G5. A.I giải trước mỗi 12 giây một bi, chọn ngẫu nhiên một ghế A.I không đang đánh.
@@ -346,7 +347,7 @@ Như 6.2 (đấu đơn hoặc đánh đôi), `loai = 'giao_huu'`, mọi em trong
 
 ### 8.2 Sảnh Bi-a
 - Thẻ chiến dịch (tên, số câu, hạn nộp), Thể lực, Trần Bi-a, số câu Đoàn/Đảo còn.
-- Nút chính vàng "Đấu đơn với bạn"; nút phụ "Đánh đôi 2 đấu 2", "Nhập mã bàn", "Tự chơi với A.I Đỗ Đại Học" (hỏi tiếp: đấu đơn / đánh đôi).
+- Nút chính vàng "Đấu đơn với bạn"; nút phụ "Đánh đôi 2 đấu 2", "Nhập mã bàn", "Tự chơi với A.I" (hỏi tiếp: đấu đơn / đánh đôi).
 - Danh sách bạn cùng lớp đang ở Sảnh Bi-a (tên, "Trần Bi-a còn n câu" hoặc "Đang đấu"), nút "Mời" / "Xem" (xem là GĐ3).
 - Lời mời đến: tấm dưới "Minh Châu mời em đấu Bi-a · Nhận / Từ chối" (tự đóng sau 60 giây).
 
@@ -449,7 +450,7 @@ CREATE INDEX IF NOT EXISTS bi_a_van_chu_ngay ON bi_a_van(chu_ban, ngay);
 CREATE TABLE IF NOT EXISTS bi_a_ghe (
   van TEXT NOT NULL, ghe INTEGER NOT NULL,  -- ghế 1..4, thứ tự đánh
   doi INTEGER NOT NULL,                     -- 0 Kim loại | 1 Phi kim
-  sbd TEXT,                                 -- NULL = A.I Đỗ Đại Học
+  sbd TEXT,                                 -- NULL = A.I
   session TEXT,                             -- phiên game_v2_session của em (NULL ở A.I, giao hữu)
   dung INTEGER NOT NULL DEFAULT 0, sai INTEGER NOT NULL DEFAULT 0, an INTEGER NOT NULL DEFAULT 0, vang INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (van, ghe)

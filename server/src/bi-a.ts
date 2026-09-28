@@ -34,6 +34,34 @@ export const LOI_BIA = {
 } as const
 export type LyDoKhoaBia = keyof typeof LOI_BIA
 
+// ---------------------------------------------------------------- bảng (dựng tại chỗ)
+/**
+ * CI deploy KHÔNG tự chạy migration ⇒ dựng bảng CHỈ-THÊM ngay tại chỗ, y hệt `server/migration-2809-bi-a.sql`
+ * (mẫu `ca-thi-them.ts`). `IF NOT EXISTS` nên chạy lại vô hại; không đụng bảng có sẵn. Mỗi CSDL một lần mỗi isolate.
+ */
+export const SQL_BANG_BIA: readonly string[] = [
+  'CREATE TABLE IF NOT EXISTS bi_a_van (id TEXT PRIMARY KEY, loai TEXT NOT NULL, che_do TEXT NOT NULL, ngay TEXT NOT NULL, chu_ban TEXT NOT NULL, trang_thai TEXT NOT NULL, doi_thang INTEGER, diem_0 INTEGER, diem_1 INTEGER, json TEXT, tao_luc TEXT NOT NULL, xong_luc TEXT)',
+  'CREATE INDEX IF NOT EXISTS bi_a_van_chu_ngay ON bi_a_van(chu_ban, ngay)',
+  'CREATE TABLE IF NOT EXISTS bi_a_ghe (van TEXT NOT NULL, ghe INTEGER NOT NULL, doi INTEGER NOT NULL, sbd TEXT, session TEXT, dung INTEGER NOT NULL DEFAULT 0, sai INTEGER NOT NULL DEFAULT 0, an INTEGER NOT NULL DEFAULT 0, vang INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (van, ghe))',
+  'CREATE INDEX IF NOT EXISTS bi_a_ghe_sbd ON bi_a_ghe(sbd)',
+  'CREATE TABLE IF NOT EXISTS bi_a_diem_ban (sbd TEXT PRIMARY KEY, diem INTEGER NOT NULL DEFAULT 1000, so_van INTEGER NOT NULL DEFAULT 0, cap_nhat TEXT)',
+  'CREATE TABLE IF NOT EXISTS bi_a_moi (id TEXT PRIMARY KEY, tu_sbd TEXT NOT NULL, den_sbd TEXT NOT NULL, loai TEXT NOT NULL, van TEXT, ghe INTEGER, trang_thai TEXT NOT NULL, tao_luc TEXT NOT NULL)',
+  'CREATE INDEX IF NOT EXISTS bi_a_moi_den ON bi_a_moi(den_sbd, trang_thai)',
+  'CREATE TABLE IF NOT EXISTS bi_a_co_mat (sbd TEXT PRIMARY KEY, ten_lop TEXT, last_seen TEXT NOT NULL)',
+  'CREATE INDEX IF NOT EXISTS bi_a_co_mat_lop ON bi_a_co_mat(ten_lop, last_seen)',
+]
+const bangDaDung = new WeakMap<object, Promise<void>>()
+export function damBaoBangBia(env: Env): Promise<void> {
+  const db = env.DB as unknown as object
+  let p = bangDaDung.get(db)
+  if (!p) {
+    p = env.DB.batch(SQL_BANG_BIA.map((s) => env.DB.prepare(s))).then(() => undefined)
+    p.catch(() => bangDaDung.delete(db)) // lỗi ⇒ lượt sau thử lại
+    bangDaDung.set(db, p)
+  }
+  return p
+}
+
 // ---------------------------------------------------------------- cờ + khoá
 export async function docCoBia(env: Env) {
   const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CO_BIA).first<{ gia_tri: string }>().catch(() => null)
@@ -153,6 +181,7 @@ async function napMot(env: Env, hs: HoSo2, khoa: readonly string[], chan: Readon
 export async function biaAction(env: Env, sbd: string, action: string, b: Row, nowMs = Date.now()): Promise<Record<string, unknown>> {
   if (!(await biaMoCho(env, sbd))) return { ok: true, bat: false, lyDoKhoa: 'chua_bat', message: LOI_BIA.chua_bat }
   if (await coCaDangMo(env, sbd, nowMs)) return { ok: true, bat: true, lyDoKhoa: 'dang_co_ca', message: LOI_BIA.dang_co_ca }
+  await damBaoBangBia(env)
   if (action === 'bia-sanh') return sanhBia(env, sbd, nowMs)
   if (action === 'bia-xep-ban') return xepBan(env, sbd, b, nowMs)
   if (action === 'bia-doi-cau') return doiCau(env, sbd, b, nowMs)

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS bi_a_van (
 );
 CREATE INDEX IF NOT EXISTS bi_a_van_chu_ngay ON bi_a_van(chu_ban, ngay);
 
--- Ghế trong ván (1..4, theo thứ tự đánh). sbd NULL = A.I Đỗ Đại Học.
+-- Ghế trong ván (1..4, theo thứ tự đánh). sbd NULL = ghế máy A.I.
 CREATE TABLE IF NOT EXISTS bi_a_ghe (
   van      TEXT NOT NULL,
   ghe      INTEGER NOT NULL,

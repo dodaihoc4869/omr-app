@@ -399,7 +399,7 @@ export class VanBia {
     this.doi()
   }
 
-  // ───────────── A.I Đỗ Đại Học ─────────────
+  // ───────────── đối thủ máy A.I ─────────────
   private aiTraLoi(laChot: boolean, id: KiHieu, s: number, tiep: (d: boolean) => void): void {
     this.pha = 'cau'
     const hang = laChot ? 2 : hangMuc(this.mucBi(id))

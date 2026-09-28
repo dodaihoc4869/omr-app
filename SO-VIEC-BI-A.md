@@ -16,8 +16,9 @@ Phiên: cloud, nhánh `claude/fervent-edison-otwz9p`. Không có khoá Cloudflar
 - [x] Sửa sau chạy thật: (1) đang mở Xem lại câu sai mà đồng đội A.I đánh bi của em vào lỗ ⇒ tấm xem lại che tấm câu, em không bấm được — nay tự đóng; (2) câu hết giờ chưa chọn đủ (không gửi máy chủ) bị đếm là câu sai "đã vào lịch ôn" — nay không đếm; (3) lớp phủ tấm câu lộ chữ màn chơi — nền mờ + thanh đầu đặc; (4) chip toàn màn hình dọc bị cắt chữ — rút gọn khi hẹp.
 - [x] Cập nhật đặc tả theo chỗ làm khác (bia-xep-ban trả danh sách câu, bia-doi-cau nhận `qidCu`+`chot`, luật hết giờ, cách xét ca) + `docs/hop-dong-bi-a.md`.
 - [x] Precache PWA về lại 146 tệp / 2 901 KB (kiem-sw ĐẠT): loại `BiaGame`, `TrongAi`, `ngang` khỏi precache (`vite.config.ts` globIgnores) — phiên Code app nhắc trần 3 000 KB lúc 11:25 UTC.
-- [ ] Code 3: đẩy Worker + chạy `server/migration-2809-bi-a.sql --remote` (chỉ thêm). Lưu ý: Nhật ký 25/09 ghi Worker sống có thể build từ `omr-hotfix-2409` — kiểm trước khi đẩy.
-- [ ] Code 2: đẩy Pages.
+- [x] Phiên Code app kiểm thử gộp (11:29 UTC) ⇒ đã: gộp `origin/main` 441cc5e (gỡ 3 xung đột), precache 169 / 2 941 KB (`build:cf` 13/13), bảng `bi_a_*` tự dựng lúc chạy (CI không chạy migration), tên đối thủ "A.I" thay "A.I Đỗ Đại Học" (test khoá `chu-thay-hoc-sinh-2809`).
+- [x] Thầy lệnh 28/09: bỏ hẳn tiếng bi lăn trên nỉ.
+- [ ] Phát hành: xếp hàng deploy của phiên Code app (không tự gộp main).
 - [ ] Thầy bật thử cho một lớp ở Cài đặt → Bi-a Phản Ứng.
 
 ## GĐ2 (chưa làm)

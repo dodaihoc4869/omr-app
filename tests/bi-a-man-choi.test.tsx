@@ -63,7 +63,7 @@ describe('Sảnh Bi-a', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Tự chơi với A.I · đấu đơn' }))
     await screen.findByRole('region', { name: 'Hai phe' })
     expect(lenh('bia-xep-ban')[0]).toEqual({ loai: 'ai', cheDo: 'don', soBi: 7 })
-    expect(screen.getByText('Đấu với A.I Đỗ Đại Học')).toBeTruthy()
+    expect(screen.getByText('Đấu với A.I')).toBeTruthy()
     expect(screen.getAllByRole('button', { name: /^Bi (Na|Mg|Al|Fe|Cu|Ag|Au) / })).toHaveLength(7)
   })
   it('máy chủ từ chối xếp bàn ⇒ ở lại Sảnh, hiện lời máy chủ', async () => {

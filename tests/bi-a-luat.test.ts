@@ -112,7 +112,7 @@ describe('Bi-a — bảng quyết định cuối cú', () => {
   })
 })
 
-describe('Bi-a — A.I Đỗ Đại Học', () => {
+describe('Bi-a — đối thủ máy A.I', () => {
   it('chỉ nhắm bi của phe mình; ăn hết thì nhắm Bi chốt; cú phá bàn có lực', () => {
     const st = xepBan(() => 0.5), b = chiaBi('don')
     expect(dichCua(st, b, 1).map((x) => x.id).sort()).toEqual([...PK].sort())

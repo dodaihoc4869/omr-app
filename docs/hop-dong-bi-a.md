@@ -61,4 +61,5 @@ Ra: `{ ok, van, dung, sai, theLuc:{ con, tong } }`; gọi lại lần hai ⇒ `{
 - Trần: đã dùng = câu Bi-a đã trả lời hôm nay (theo phần) + câu đang giữ trong ván mở.
 
 ## Bảng mới (`server/migration-2809-bi-a.sql`, CHỈ THÊM)
+CI deploy không chạy migration ⇒ lệnh `bia-*` (khi cờ bật cho em) tự dựng đủ bảng + chỉ mục bằng `CREATE … IF NOT EXISTS` (`damBaoBangBia`, `SQL_BANG_BIA` = đúng nội dung tệp migration, test khoá). Không cần ai chạy wrangler tay.
 `bi_a_van`, `bi_a_ghe` (GĐ1) · `bi_a_diem_ban`, `bi_a_moi`, `bi_a_co_mat` (dựng sẵn cho GĐ2). Reset Game Hóa 2.0 xoá cả 5 bảng; reset toàn app GIỮ.

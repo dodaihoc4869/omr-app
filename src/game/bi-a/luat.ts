@@ -29,7 +29,7 @@ const HANG: Readonly<Record<string, number>> = { NB: 0, 'Nhận biết': 0, biet
 export const hangMuc = (m: string | null | undefined): 0 | 1 | 2 => ((m != null && m in HANG ? HANG[m] : 0) as 0 | 1 | 2)
 export const diemMuc = (m: string | null | undefined): number => DIEM_MUC[hangMuc(m)]
 export const TEN_MUC = ['Nhận biết', 'Thông hiểu', 'Vận dụng'] as const
-/** Tỉ lệ đúng của A.I Đỗ Đại Học (G5): theo hạng mức độ; Câu chốt 70%. */
+/** Tỉ lệ đúng của đối thủ máy A.I (G5): theo hạng mức độ; Câu chốt 70%. */
 export const AI_DUNG = [0.85, 0.75, 0.6] as const
 export const AI_DUNG_CHOT = 0.7
 export const MAT_THAN_TOI_DA = 3
@@ -40,12 +40,12 @@ export const giayCau = (phan: string): number => (phan === 'I' ? 90 : 180)
 export function taoGhe(cheDo: CheDo, tenEm: string): Ghe[] {
   const ngan = tenEm.trim().split(/\s+/).pop() || 'Em'
   const tat = tenEm.trim().split(/\s+/).filter(Boolean).slice(-2).map((x) => x[0]!.toLocaleUpperCase('vi')).join('') || 'EM'
-  if (cheDo === 'don') return [{ ten: tenEm, ngan: tenEm, tat, ai: false, doi: 0 }, { ten: 'A.I Đỗ Đại Học', ngan: 'A.I Đỗ Đại Học', tat: 'A.I', ai: true, doi: 1 }]
+  if (cheDo === 'don') return [{ ten: tenEm, ngan: tenEm, tat, ai: false, doi: 0 }, { ten: 'A.I', ngan: 'A.I', tat: 'A.I', ai: true, doi: 1 }]
   return [
     { ten: tenEm, ngan, tat, ai: false, doi: 0 },
-    { ten: 'A.I Đỗ Đại Học 1', ngan: 'A.I 1', tat: 'A1', ai: true, doi: 1 },
-    { ten: 'A.I Đỗ Đại Học 2', ngan: 'A.I 2', tat: 'A2', ai: true, doi: 0 },
-    { ten: 'A.I Đỗ Đại Học 3', ngan: 'A.I 3', tat: 'A3', ai: true, doi: 1 },
+    { ten: 'A.I 1', ngan: 'A.I 1', tat: 'A1', ai: true, doi: 1 },
+    { ten: 'A.I 2', ngan: 'A.I 2', tat: 'A2', ai: true, doi: 0 },
+    { ten: 'A.I 3', ngan: 'A.I 3', tat: 'A3', ai: true, doi: 1 },
   ]
 }
 /** Chia bi (G11): đấu đơn — ghế 1 giữ 7 bi Kim loại, ghế 2 giữ 7 bi Phi kim; đánh đôi — người 1 của phe giữ bi thứ 1, 3, 5, 7 (4 bi), người 2 giữ bi 2, 4, 6. */

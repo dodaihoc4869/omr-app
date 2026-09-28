@@ -372,7 +372,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       <div className="bia-man">
         <header className="bia-dau">
           <button type="button" className="bia-nut-kinh" onClick={() => (ket ? onVeSanh() : setHoiRoi(true))} aria-label="Về Sảnh Bi-a">{ICON.sau}<span className="bia-chu-nut">Sảnh</span></button>
-          <div className="bia-ten"><b>Bi-a Phản Ứng</b><span>{loai === 'giao_huu' ? 'Bàn giao hữu · không câu' : doi ? 'Đánh đôi với A.I' : 'Đấu với A.I Đỗ Đại Học'}</span></div>
+          <div className="bia-ten"><b>Bi-a Phản Ứng</b><span>{loai === 'giao_huu' ? 'Bàn giao hữu · không câu' : doi ? 'Đánh đôi với A.I' : 'Đấu với A.I'}</span></div>
           <button type="button" className="bia-nut-kinh" onClick={() => datToan(true)} aria-label="Toàn màn hình: chỉ hiện bàn bi-a" title="Toàn màn hình (phím F)">{ICON.toan}</button>
           <button type="button" className="bia-nut-kinh" aria-pressed={!tat} aria-label={tat ? 'Bật âm thanh' : 'Tắt âm thanh'} title="Âm thanh (phím M)" onClick={() => { am.datTat(!tat); setTat(!tat) }}><IconAm tat={tat} /></button>
         </header>

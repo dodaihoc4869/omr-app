@@ -1,4 +1,4 @@
-// BI-A PHẢN ỨNG · A.I ĐỖ ĐẠI HỌC (đặc tả 6.1). Dùng chính lõi vật lý: thử tối đa ~60 cú ứng viên (bóng bi ma theo từng bi của phe × 6 lỗ × 3 lực,
+// BI-A PHẢN ỨNG · ĐỐI THỦ MÁY A.I (đặc tả 6.1). Dùng chính lõi vật lý: thử tối đa ~60 cú ứng viên (bóng bi ma theo từng bi của phe × 6 lỗ × 3 lực,
 // cộng 5 cú nhắm thẳng), chấm điểm từng cú bằng mô phỏng thật, rồi nhiễu góc ±0,7°. Thuần (nhận `rand`) để test được.
 import { CHOT, NHOM, doiCuaBi, type KiHieu } from './nguyen-to'
 import { conLaiDoi, type BangBi, type Doi } from './luat'

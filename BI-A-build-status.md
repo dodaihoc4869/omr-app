@@ -27,10 +27,13 @@
 3. Hết giờ mà chưa chọn đủ ⇒ không gửi máy chủ, câu chưa tính, bi giữ câu cũ.
 4. Khoá khi có ca: xét ca `mo` của lớp em, không xét phạm vi khối (chặt hơn một chút).
 5. Bi của A.I có mức độ giả lập để tính điểm ván (A.I không rút câu thật).
+6. Tên đối thủ máy là "A.I" / "A.I 1–3" (không dùng "A.I Đỗ Đại Học": thầy đã đổi chữ đó thành "Thầy Đỗ Đại Học" bên học sinh).
+7. Không có tiếng bi lăn trên nỉ (thầy bỏ 28/09).
+8. Bảng `bi_a_*` tự dựng lúc chạy (CI không chạy migration).
 
 ## Việc còn lại (người khác)
-- **Code 3**: đẩy Worker từ worktree sạch tại commit của phiên này; chạy `wrangler d1 execute … --remote --file=server/migration-2809-bi-a.sql` (CHỈ THÊM 5 bảng). Kiểm trước: Nhật ký 25/09 ghi Worker sống có thể build từ `omr-hotfix-2409` chứ không phải `omr-app` — đẩy từ `omr-app` có thể ghi đè bản vá của nhánh kia.
-- **Code 2**: đẩy Pages.
+- **Phát hành**: theo hàng đợi deploy của phiên Code app (CI `deploy.yml` khi gộp main). Bảng `bi_a_*` tự dựng lúc chạy (`CREATE TABLE IF NOT EXISTS`), KHÔNG cần chạy migration tay. Kiểm trước: Nhật ký 25/09 ghi Worker sống có thể build từ `omr-hotfix-2409`.
+- Đã gộp `origin/main` (441cc5e) vào nhánh: 3 xung đột thêm song song đã gỡ; precache sau gộp 169 tệp / 2 941 KB (main 169 / 2 940), `build:cf` ĐẠT 13/13.
 - **Thầy**: Cài đặt → Bi-a Phản Ứng → Bật theo lớp (thử một lớp trước).
 
 ## GĐ2 (chưa làm)
