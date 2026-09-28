@@ -2,7 +2,7 @@
 // chỉ riêng thẻ câu được cuộn BÊN TRONG khi đề quá dài.
 import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { Question } from './core'
-import { CHIEU, HIEP_TRUM, NL_KY_NANG, CHAN, satThuongDon, type HanhDong } from './doan-core'
+import { CHIEU, HIEP_TRUM, NL_KY_NANG, CHAN, SO_CAU_RIENG_CHANG, satThuongDon, type HanhDong } from './doan-core'
 import { CHU_TRANG_THAI, NHAN_CAU, TIN_HIEU_TRUM, type DoanXem, type GheXem, type KetQuaCau } from './doan-kieu'
 import DoanCau, { DeBai, duDapAn } from './DoanCau'
 import { cacAnhCuaCau, useAnhSanSang } from './anh-san-sang'
@@ -211,7 +211,13 @@ export default function DoanTran(p: Props) {
       {xem.trum?.coCau && <div className="dh-tin-hieu" role="group" aria-label="Tín hiệu cho đồng đội">{TIN_HIEU_TRUM.map(([ma, chu]) => <button key={ma} type="button" aria-pressed={em.tinHieu === ma} onClick={() => p.onTinHieu(em.tinHieu === ma ? '' : ma)}>{chu}</button>)}</div>}
       <div className="dh-chan-trang">Đúng từ <b>3/4 ý</b> → <span className="dh-chu-vang">VỠ GIÁP TRÙM</span> · cả đội cùng thắng</div>
     </>
-  ) : cau?.het ? <div className="dh-cho">Hiệp này em cổ vũ đồng đội · còn {phut(p.conGiay)}</div> : daChot ? (
+  ) : cau?.het ? (
+    // 28/09 · HẾT CÂU RIÊNG: máy đã tính em chốt vai giữ khiên — em không phải chờ, vẫn tiếp sức được bạn đang cần.
+    <>
+      <div className="dh-cho" role="status" data-vung="giu-khien">Em giữ khiên · +{cau.chan ?? CHAN} giáp cho Linh Tâm · máy đã tính em chốt · còn {phut(p.conGiay)}</div>
+      {(ts?.banCan ?? []).map(k => <button key={k} type="button" className="dh-nut-vang" style={{ minHeight: 50, fontSize: 15 }} disabled={p.ban} onClick={() => p.onMoTiepSuc(k)}>Tiếp sức cho {xem.ghe[k]?.ten} · bạn ấy đang cần</button>)}
+    </>
+  ) : daChot ? (
     <>
       <div className="dh-cho">Em đã chốt · còn {phut(p.conGiay)} · {ts?.daGiup ? `em đã tiếp sức${p.expTiepSuc ? ` · +${p.expTiepSuc} EXP tiếp sức` : ''} — bạn làm lại đúng là LIÊN KÍCH ×2` : 'chờ đồng đội ra đòn cùng lúc'}</div>
       {(ts?.banCan ?? []).map(k => <button key={k} type="button" className="dh-nut-vang" style={{ minHeight: 50, fontSize: 15 }} disabled={p.ban} onClick={() => p.onMoTiepSuc(k)}>Tiếp sức cho {xem.ghe[k]?.ten} · bạn ấy đang cần</button>)}
@@ -259,7 +265,7 @@ export default function DoanTran(p: Props) {
       {choTiep && <button type="button" className="dh-nut-lam dh2-nut-chinh dh2-baloo" data-vung="danh-tiep" style={{ minHeight: 54 }} disabled={p.ban} onClick={p.onDanhTiep}>{p.ban ? 'CHỜ MỘT CHÚT…' : p.nhanTiep ?? 'ĐÁNH TIẾP'}</button>}
       {!mo && !tran.ketThuc && !choTiep && <div className="dh-cho" role="status">{tran.hiep === 1 && !xem.hiepVuaXong ? 'Chuẩn bị lên đường' : `Hiệp ${tran.hiep}${tran.laTrum ? ' · TRÙM' : ''} mở sau`} {Math.max(1, p.moSauGiay)} giây</div>}
       {!mo && !tran.ketThuc && p.hetCauMoi && tran.hiep === 1 && <div className="dh-cho" role="status" data-vung="het-cau-moi">{CHU_HET_CAU_MOI}</div>}
-      {!mo && !tran.ketThuc && tran.hiep === 1 && !!xem.soCauThieu && <div className="dh-cho" role="status">Kho của em còn thiếu {xem.soCauThieu} câu phù hợp. Hiệp không có câu, em cổ vũ đồng đội nhé.</div>}
+      {!mo && !tran.ketThuc && tran.hiep === 1 && !!xem.soCauThieu && <div className="dh-cho" role="status">Chặng này em có {Math.max(0, SO_CAU_RIENG_CHANG - xem.soCauThieu)} câu ôn. Hiệp nào em đã ôn xong, em giữ khiên cho đoàn và tiếp sức bạn.</div>}
       </>)}
     </div>
   )

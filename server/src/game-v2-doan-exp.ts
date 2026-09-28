@@ -5,7 +5,7 @@ import { cheDo2 } from './srs2-d1'
 import { soCauGameHomNay } from './srs2-game'
 import { duocThuongCauThu } from './srs2-loi'
 import type { Env } from './kieu'
-import { khoanKetChang, type TomTatChang } from '../../src/game/than-thu-v2/doan-core'
+import { khoanKetChang, SO_CAU_RIENG_CHANG, type TomTatChang } from '../../src/game/than-thu-v2/doan-core'
 import { ghiKhoanExpGame } from './exp-d1'
 import { ngayVn } from './su-kien-hoc'
 
@@ -16,7 +16,9 @@ async function laChangThangDauNgay(env: Env, sbd: string, ngay: string, ma: stri
 }
 
 /** Trao EXP kết chặng cho từng bạn THẬT (bỏ bạn máy). `ghe[].id` = SBD. Không ném lỗi. */
-export async function traoExpKetChang(env: Env, ma: string, ketLucMs: number, tt: TomTatChang, nowMs: number = Date.now()): Promise<void> {
+export async function traoExpKetChang(env: Env, ma: string, ketLucMs: number, tt: TomTatChang, nowMs: number = Date.now(),
+  /** 28/09: sbd → số câu riêng THẬT của em (chỉ có với em vào đoàn khi kế hoạch ngày còn < 6 câu). Vắng ⇒ như cũ. */
+  soCauRieng: ReadonlyMap<string, number> = new Map()): Promise<void> {
   const luc = new Date(ketLucMs).toISOString()
   const ngay = ngayVn(luc)
   const soTrum = tt.trumVoGiap.filter(Boolean).length
@@ -25,8 +27,10 @@ export async function traoExpKetChang(env: Env, ma: string, ketLucMs: number, tt
     try {
       // GAME HÓA 2.0 (Huyết Chiến): em đã làm quá 40 câu hôm nay ⇒ chặng này không rơi EXP.
       if (await cheDo2(env, g.id) && !duocThuongCauThu(await soCauGameHomNay(env, g.id, ketLucMs))) continue
-      const k = khoanKetChang(tt, tt.thang ? await laChangThangDauNgay(env, g.id, ngay, ma) : false)
-      if (k.chang > 0) await ghiKhoanExpGame(env, g.id, { khoa: `doan_chang|${ma}`, loai: 'doan_chang', exp: k.chang, ngay, luc, ghiChu: `Thắng chặng ${tt.sao} sao +${k.chang} EXP`, maNguon: ma }, nowMs)
+      const rieng = soCauRieng.get(g.id)
+      const k = khoanKetChang(tt, tt.thang ? await laChangThangDauNgay(env, g.id, ngay, ma) : false, rieng)
+      const theoCau = typeof rieng === 'number' && rieng < SO_CAU_RIENG_CHANG ? ` (${rieng}/${SO_CAU_RIENG_CHANG} câu ôn)` : ''
+      if (k.chang > 0) await ghiKhoanExpGame(env, g.id, { khoa: `doan_chang|${ma}`, loai: 'doan_chang', exp: k.chang, ngay, luc, ghiChu: `Thắng chặng ${tt.sao} sao +${k.chang} EXP${theoCau}`, maNguon: ma }, nowMs)
       if (k.voGiap > 0) await ghiKhoanExpGame(env, g.id, { khoa: `doan_giap|${ma}`, loai: 'doan_giap', exp: k.voGiap, ngay, luc, ghiChu: `Vỡ giáp ${soTrum} trùm +${k.voGiap} EXP`, maNguon: ma }, nowMs)
     } catch (e) {
       console.error('[doan-exp] trao EXP kết chặng lỗi (bỏ qua):', e instanceof Error ? e.message : e)
