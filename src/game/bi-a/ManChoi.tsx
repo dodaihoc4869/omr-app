@@ -3,10 +3,11 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import type { KeyboardEvent as KE, PointerEvent as PE } from 'react'
 import { AmThanhBia } from './am-thanh'
-import { doiCauBia, ketVanBia } from './api'
+import { doiCauBia, doiCauBiaMang, ketVanBia } from './api'
 import { chonBoCuc, panTheoMan, raMan, tinhKhungBan, toaDoBan, type BoCuc, type KhungBan } from './bo-cuc'
 import { VanBia, type CauBia, type KetThucVan, type LoaiVan, type YeuCauCau } from './dieu-khien'
-import { EM, GIAY_CU, TEN_MUC, hangMuc, quanHe, tiepTheo, type CheDo } from './luat'
+import { CAU_NHAN, VanMang, type GoiTT, type KenhVan, type LoaiMang } from './dieu-khien-mang'
+import { GIAY_CU, TEN_MUC, hangMuc, quanHe, tiepTheo, type CheDo } from './luat'
 import { CHOT, KL, MAU_QH, NHOM, NT, PK, TEN_PHE, mauCss, type KiHieu } from './nguyen-to'
 import TamCauBia from './TamCauBia'
 import XemLaiCauSai, { type CauSai } from './XemLaiCauSai'
@@ -25,7 +26,10 @@ export interface ManChoiProps {
   chot: CauBia | null
   onVeSanh: () => void
   onChoiLai: () => void
+  /** Ván online (GĐ2): phòng đấu là quyền quyết; màn chơi nhận `VanMang` qua `onVan` để nguồn tin phòng đẩy gói vào. */
+  mang?: MangManChoi
 }
+export interface MangManChoi { kenh: KenhVan; em: number; dau: GoiTT; cauTheoBi: Partial<Record<KiHieu, CauBia>>; loaiMang: LoaiMang; onVan: (v: VanMang) => void; noiLai?: () => void }
 const ICON = {
   sau: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6" /></svg>,
   truoc: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6" /></svg>,
@@ -40,16 +44,16 @@ const DK_TOA = 2 * Math.PI * 21
 
 /** Nhãn chỉ bi (đặc tả 3.11): kí hiệu, tên, Z; quan hệ với em; một dòng phụ. Bi người khác KHÔNG lộ dạng câu. */
 export function noiDungNhan(v: VanBia, id: KiHieu): { qh: ReturnType<typeof quanHe>; tieuDe: string; chinh: string; nho: string } {
-  const n = NT[id], qh = quanHe(id, EM, v.ghe, v.bi), s = v.bi[id]
+  const n = NT[id], qh = quanHe(id, v.em, v.ghe, v.bi), s = v.bi[id]
   let chinh = '', nho = ''
-  if (qh === 'chot') { chinh = 'Bi chốt'; nho = v.conLai(v.ghe[EM]!.doi) ? 'Phe em ăn đủ 7 bi mới được đánh' : 'Phe em đánh Bi chốt được rồi' }
+  if (qh === 'chot') { chinh = 'Bi chốt'; nho = v.conLai(v.ghe[v.em]!.doi) ? 'Phe em ăn đủ 7 bi mới được đánh' : 'Phe em đánh Bi chốt được rồi' }
   else if (qh === 'em') { const q = v.cauCua[id]; chinh = s.an ? 'Bi của em · đã ăn' : s.vang ? 'Bi của em · bi vàng' : 'Bi của em'; nho = s.trong || !q ? 'Bi trống · vào lỗ là ăn' : `${q.tenDang} · ${TEN_MUC[hangMuc(q.mucDo)]} · ${v.diemBi(id)} điểm` }
   else if (qh === 'dong-doi') { chinh = `Bi của đồng đội ${v.ghe[s.chu]!.ngan}`; nho = 'Cùng phe · vào lỗ thì đồng đội trả lời' }
   else { chinh = v.cheDo === 'doi' ? `Bi của đối thủ ${v.ghe[s.chu]!.ngan}` : 'Bi của đối thủ'; nho = v.isBreak ? 'Phá bàn: chạm bi nào trước cũng được' : 'Chạm bi này trước là phạm luật' }
   return { qh, tieuDe: `${n.ten} · Z = ${n.z}`, chinh, nho }
 }
 
-export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm, chot, onVeSanh, onChoiLai }: ManChoiProps) {
+export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm, chot, onVeSanh, onChoiLai, mang }: ManChoiProps) {
   const rootRef = useRef<HTMLDivElement>(null), banRef = useRef<HTMLDivElement>(null), cvRef = useRef<HTMLCanvasElement>(null)
   const nhanRef = useRef<HTMLDivElement>(null), nhamRef = useRef<HTMLDivElement>(null), chipRef = useRef<HTMLSpanElement>(null), lucRef = useRef<HTMLDivElement>(null)
   const amRef = useRef<AmThanhBia | null>(null)
@@ -60,12 +64,18 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const [sheet, setSheet] = useState<YeuCauCau | null>(null)
   const [ket, setKet] = useState<KetThucVan | null>(null)
   const pan = (x?: number, y?: number) => (x == null || y == null || !khungRef.current ? 0 : panTheoMan(khungRef.current, x, y))
-  const [v] = useState(() => new VanBia({ cheDo, loai, tenEm, cauEm, chot }, {
-    moCau: (y) => setSheet(y),
-    am: (k, sp, x, y) => am.phat(k, sp ?? 0, pan(x, y)),
-    gomVa: (k, sp, x, y, kho) => am.gom(k, sp, pan(x, y), kho),
-    ketThuc: (k) => setKet(k),
-  }))
+  const [v] = useState<VanBia>(() => {
+    const sk = {
+      moCau: (y: YeuCauCau) => setSheet(y),
+      am: (k: Parameters<VanBia['sk']['am']>[0], sp?: number, x?: number, y?: number) => am.phat(k, sp ?? 0, pan(x, y)),
+      gomVa: (k: 'bi' | 'bang', sp: number, x: number, y: number, kho?: boolean) => am.gom(k, sp, pan(x, y), kho),
+      ketThuc: (k: KetThucVan) => setKet(k),
+    }
+    return mang ? new VanMang({ cheDo, loaiMang: mang.loaiMang, tenEm, chot, em: mang.em, cauTheoBi: mang.cauTheoBi }, sk, mang.kenh, mang.dau) : new VanBia({ cheDo, loai, tenEm, cauEm, chot }, sk)
+  })
+  const vm = v instanceof VanMang ? v : null
+  useEffect(() => { if (vm && mang) mang.onVan(vm) }, [vm]) // eslint-disable-line react-hooks/exhaustive-deps
+  const [moNhan, setMoNhan] = useState(false)
   useSyncExternalStore(useCallback((fn: () => void) => v.dangKy(fn), [v]), () => v.phienBan)
   const [boCuc, setBoCuc] = useState<BoCuc>('doc')
   const [toan, setToan] = useState(false)
@@ -95,7 +105,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       const cv = cvRef.current, ctx = cv?.getContext('2d'), k = khungRef.current, bv = boVeRef.current
       const c = chiRef.current, conChi = c && (!c.den || now < c.den) ? c : null
       if (c && c.den && now >= c.den) chiRef.current = null
-      if (ctx && k && bv) bv.ve(ctx, v, conChi && !v.sheet && !xemRef.current ? { id: conChi.id, qh: quanHe(conChi.id, EM, v.ghe, v.bi) } : null, loai !== 'giao_huu', keoRef.current.bi)
+      if (ctx && k && bv) bv.ve(ctx, v, conChi && !v.sheet && !xemRef.current ? { id: conChi.id, qh: quanHe(conChi.id, v.em, v.ghe, v.bi) } : null, loai !== 'giao_huu', keoRef.current.bi)
       // vòng đồng hồ quanh ảnh ghế đang đánh
       const goc = rootRef.current
       if (goc) {
@@ -138,7 +148,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
         const info = nguoi ? v.nham() : null
         let key = '', chu = '', hl = '', dep = false, mau = '', soc = false
         if (nguoi && info && info.loai === 'bi') {
-          const id = info.b.id, ok = v.hopLe(id), qh = quanHe(id, EM, v.ghe, v.bi)
+          const id = info.b.id, ok = v.hopLe(id), qh = quanHe(id, v.em, v.ghe, v.bi)
           key = `${id}|${ok}|${v.matThan}|${v.bi[id].vang}`; mau = mauCss(id); soc = NT[id].nhom === 'pk'; dep = ok
           if (id === CHOT) { chu = 'Đang nhắm: Bi chốt C · carbon'; hl = ok ? 'đánh được' : 'chưa được chạm' }
           else if (qh === 'em') { const q = v.cauCua[id]; chu = q ? `${id} · ${q.tenDang} · ${TEN_MUC[hangMuc(q.mucDo)]} · ${v.diemBi(id)} điểm` : `${id} · ${NT[id].ten} · bi trống`; hl = v.bi[id].vang ? 'bi vàng của em' : 'bi của em' }
@@ -227,17 +237,18 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   // ───────── tới lượt em, hoặc có câu em phải trả lời (đồng đội đánh bi của em vào lỗ) ⇒ tự đóng Xem lại câu sai ─────────
   useEffect(() => {
     if (xem && sheet) { setXem(false); v.datXemMo(false); return }
-    if (xem && v.cur === EM && v.pha === 'aim') { setXem(false); v.datXemMo(false); v.nhac('Tới lượt em', 'Câu sai vẫn xem lại được khi chờ lượt', 1500) }
+    if (xem && v.cur === v.em && v.pha === 'aim') { setXem(false); v.datXemMo(false); v.nhac('Tới lượt em', 'Câu sai vẫn xem lại được khi chờ lượt', 1500) }
   })
 
   // ───────── kết thúc ván: ghi máy chủ ─────────
   useEffect(() => {
-    if (!ket) return
-    const emDoi = v.ghe[EM]!.doi
+    if (!ket || vm) return // ván online: phòng đấu tự ghi kết thúc + Điểm bàn
+    const emDoi = v.ghe[v.em]!.doi
     void ketVanBia(token, van, { doiThang: ket.doiThang, diem: ket.diem, lyDo: ket.doiThang === emDoi ? 'thang' : 'thua' }, v.tomTatGhe().map((g) => ({ ghe: g.ghe, doi: g.doi, ai: g.ai, dung: g.dung, sai: g.sai, an: g.an, vang: g.vang })), v.soCu)
       .then((r) => setTheLucSau(r.theLuc)).catch(() => {})
   }, [ket]) // eslint-disable-line react-hooks/exhaustive-deps
   const roiVan = () => {
+    if (vm) { vm.boVan(); if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}); onVeSanh(); return }
     void ketVanBia(token, van, { doiThang: null, diem: v.diem, lyDo: 'bo' }, v.tomTatGhe().map((g) => ({ ghe: g.ghe, doi: g.doi, ai: g.ai, dung: g.dung, sai: g.sai, an: g.an, vang: g.vang })), v.soCu).catch(() => {})
     if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {})
     onVeSanh()
@@ -327,7 +338,9 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
     v.xongCau(y.ma, dung, false, dung || ph !== null)
     if (!dung && ph) {
       setCauSai((ds) => [...ds, { y, phanHoi: ph, traLoi }])
-      if (session) void doiCauBia(token, session, y.cau.qid, y.mode === 'chot').then((c) => v.doiCau(y.mode === 'chot' ? CHOT : y.id, c)).catch(() => {})
+      const ki = y.mode === 'chot' ? CHOT : y.id
+      if (session && vm) void doiCauBiaMang(token, session, y.cau.qid, y.mode === 'chot', ki).then((r) => vm.doiCauMang(ki, r.cau, r.ve)).catch(() => {})
+      else if (session) void doiCauBia(token, session, y.cau.qid, y.mode === 'chot').then((c) => v.doiCau(ki, c)).catch(() => {})
     }
   }
   const onDongCau = (y: YeuCauCau, dung: boolean) => { v.xongCau(y.ma, dung, true); setSheet(null) }
@@ -343,7 +356,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   // ───────── dữ liệu vẽ HUD ─────────
   const biEm = v.biEm()
   const moGiai = v.coTheGiaiTruoc()
-  const hienXemSai = cauSai.length > 0 && !sheet && !xem && v.pha !== 'over' && (v.cur !== EM || v.pha === 'cho')
+  const hienXemSai = cauSai.length > 0 && !sheet && !xem && v.pha !== 'over' && (v.cur !== v.em || v.pha === 'cho')
   const doi = cheDo === 'doi'
   const theGhe = (t: 0 | 1) => {
     const ds = v.ghe.map((g, i) => ({ g, i })).filter((o) => o.g.doi === t)
@@ -352,9 +365,10 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
         {doi && <span className="bia-ten-phe">{TEN_PHE[t]}</span>}
         <div className="bia-ghe-hang">
           {ds.map((o) => (
-            <div className="bia-ghe" key={o.i} data-ghe={o.i}>
+            <div className="bia-ghe" key={o.i} data-ghe={o.i} data-roi={vm?.roiGhe[o.i] ? '' : undefined}>
+              {vm && vm.nhanDen.filter((n) => n.tu === o.i).slice(-1).map((n) => <span key={n.ma} className="bia-bong-nhan" role="status">{CAU_NHAN[n.id - 1]}</span>)}
               <span className="bia-anh"><svg viewBox="0 0 46 46" aria-hidden="true"><circle className="nen-vong" cx="23" cy="23" r="21" /><circle className="vong" cx="23" cy="23" r="21" /></svg><span>{o.g.tat}</span></span>
-              {doi ? <span className="bia-ghe-ten">{o.g.ngan}</span> : <span className="bia-ghe-chu"><span className="bia-ghe-ten">{o.g.ten}</span><span className="bia-ten-phe">{TEN_PHE[t]}</span></span>}
+              {doi ? <span className="bia-ghe-ten">{o.g.ngan}{vm?.roiGhe[o.i] ? ' · đang nối lại' : ''}</span> : <span className="bia-ghe-chu"><span className="bia-ghe-ten">{o.g.ten}</span><span className="bia-ten-phe">{vm?.roiGhe[o.i] ? 'Đang nối lại…' : TEN_PHE[t]}</span></span>}
             </div>
           ))}
         </div>
@@ -372,7 +386,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       <div className="bia-man">
         <header className="bia-dau">
           <button type="button" className="bia-nut-kinh" onClick={() => (ket ? onVeSanh() : setHoiRoi(true))} aria-label="Về Sảnh Bi-a">{ICON.sau}<span className="bia-chu-nut">Sảnh</span></button>
-          <div className="bia-ten"><b>Bi-a Phản Ứng</b><span>{loai === 'giao_huu' ? 'Bàn giao hữu · không câu' : doi ? 'Đánh đôi với A.I' : 'Đấu với A.I'}</span></div>
+          <div className="bia-ten"><b>Bi-a Phản Ứng</b><span>{vm ? (vm.loaiMang === 'giao_huu' ? 'Bàn giao hữu với bạn · không câu' : doi ? 'Đánh đôi với bạn' : 'Đấu với bạn') : loai === 'giao_huu' ? 'Bàn giao hữu · không câu' : doi ? 'Đánh đôi với A.I' : 'Đấu với A.I'}</span></div>
           <button type="button" className="bia-nut-kinh" onClick={() => datToan(true)} aria-label="Toàn màn hình: chỉ hiện bàn bi-a" title="Toàn màn hình (phím F)">{ICON.toan}</button>
           <button type="button" className="bia-nut-kinh" aria-pressed={!tat} aria-label={tat ? 'Bật âm thanh' : 'Tắt âm thanh'} title="Âm thanh (phím M)" onClick={() => { am.datTat(!tat); setTat(!tat) }}><IconAm tat={tat} /></button>
         </header>
@@ -408,6 +422,11 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
           <div className="bia-tin" role="status" data-hien={tbHien ? '' : undefined} data-loai={tb?.loai || undefined}>{tb?.chu}{tb?.phu && <small>{tb.phu}</small>}</div>
           <div className="bia-nhan" ref={nhanRef} hidden />
           {hienXemSai && <button type="button" className="bia-xem-sai" onClick={moXem}>Xem lại câu sai <b>{cauSai.length}</b></button>}
+          {vm && vm.trangThaiNoi !== 'noi' && vm.trangThaiNoi !== 'dong' && <div className="bia-mat-noi" role="alert">{vm.trangThaiNoi === 'mat' ? 'Mất kết nối quá 60 giây' : 'Mất kết nối · đang nối lại…'}{vm.trangThaiNoi === 'mat' && mang?.noiLai && <button type="button" className="bia-nut-chu" onClick={mang.noiLai}>Nối lại</button>}</div>}
+          {vm && !ket && <div className="bia-nhan-nhanh">
+            <button type="button" className="bia-nut-kinh" aria-expanded={moNhan} onClick={() => setMoNhan(!moNhan)}>Nhắn</button>
+            {moNhan && <div className="bia-pop-nhan" role="menu" aria-label="Câu nhắn soạn sẵn">{CAU_NHAN.map((c, i) => <button key={c} type="button" role="menuitem" className="bia-nut-chu" onClick={() => { vm.guiNhan(i + 1); setMoNhan(false) }}>{c}</button>)}</div>}
+          </div>}
         </section>
         <section className="bia-dk" aria-label="Điều khiển cú đánh">
           <div className="bia-nham" ref={nhamRef}><span className="bi-nho" /><span className="chu">Chạm hoặc kéo trên bàn để nhắm</span><span className="hl" /></div>
@@ -427,25 +446,27 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
             <button type="button" className="bia-nut-chu" onClick={() => v.datXoay(0, 0)}>Bỏ xoáy</button>
           </div>}
         </section>
-        {sheet && session && <TamCauBia key={sheet.ma} y={sheet} token={token} session={session} laEmDanh={sheet.nguoiDanh === EM} tenNguoiDanh={v.ghe[sheet.nguoiDanh]!.ngan} tenLuotNay={tenLuot} tenKeTiep={v.ghe[tiepTheo(sheet.nguoiDanh, v.ghe.length)]!.ten}
+        {sheet && session && <TamCauBia key={sheet.ma} y={sheet} token={token} session={session} laEmDanh={sheet.nguoiDanh === v.em} tenNguoiDanh={v.ghe[sheet.nguoiDanh]!.ngan} tenLuotNay={tenLuot} tenKeTiep={v.ghe[tiepTheo(sheet.nguoiDanh, v.ghe.length)]!.ten}
           onCham={(d, ph, t) => onCham(sheet, d, ph, t)} onDong={(d) => onDongCau(sheet, d)} onAm={(k) => am.phat(k)} />}
         {xem && !sheet && cauSai.length > 0 && <XemLaiCauSai ds={cauSai} dongTt={v.pha === 'over' ? 'Ván đã kết thúc' : `Đang lượt ${tenLuot} · tới lượt em thì tấm này tự đóng`} onDong={() => { setXem(false); v.datXemMo(false) }} />}
         {hoiRoi && !ket && <div className="bia-che"><div className="bia-ket" role="dialog" aria-modal="true" aria-label="Rời ván">
           <h3>Rời ván?</h3>
-          <p className="bia-chu-nho">Ván này dừng lại. Câu em đã trả lời vẫn được tính; câu chưa trả lời trả lại kế hoạch hôm nay.</p>
+          <p className="bia-chu-nho">{vm ? (doi ? 'A.I sẽ đánh thay ghế em; ván thôi tính Điểm bàn. ' : 'Bạn thắng ván này. ') : 'Ván này dừng lại. '}Câu em đã trả lời vẫn được tính; câu chưa trả lời trả lại kế hoạch hôm nay.</p>
           <div className="bia-hang-nut"><button type="button" className="bia-nut-chu" onClick={() => setHoiRoi(false)}>Chơi tiếp</button><button type="button" className="bia-nut-vang" onClick={roiVan}>Rời ván</button></div>
         </div></div>}
         {ket && <div className="bia-che"><div className="bia-ket" role="dialog" aria-modal="true" aria-labelledby="bia-ket-ten">
           <div className="bia-nhan-tam"><span>Kết thúc ván</span><span>{Math.floor(ket.giay / 60)} phút {ket.giay % 60} giây · {doi ? 'đánh đôi' : 'đấu đơn'}</span></div>
-          <h3 id="bia-ket-ten">{doi ? `${TEN_PHE[ket.doiThang]} thắng ván` : `${v.ghe.find((g) => g.doi === ket.doiThang)!.ten} thắng ván`}</h3>
+          <h3 id="bia-ket-ten">{vm?.ketMang && vm.ketMang.doiThang === null ? 'Ván quá 2 giờ · không ai thắng' : doi ? `${TEN_PHE[ket.doiThang]} thắng ván` : `${v.ghe.find((g) => g.doi === ket.doiThang)!.ten} thắng ván`}</h3>
+          {vm?.ketMang && vm.ketMang.lyDo !== 'thang' && vm.ketMang.doiThang !== null && <p className="bia-chu-nho">{vm.ketMang.lyDo === 'bo' ? 'Bạn đã rời ván.' : 'Bạn mất kết nối quá 60 giây.'}</p>}
           <table className="bia-bang-diem">
             <thead><tr><th>Người</th><th>Câu đúng</th><th>Bi ăn</th><th>Bi vàng</th></tr></thead>
             <tbody>{tk.map((g) => <tr key={g.ghe}><td>{g.ten}<small>{TEN_PHE[g.doi]}</small></td><td>{loai === 'giao_huu' ? '—' : `${g.dung}/${g.dung + g.sai}`}</td><td>{g.an}</td><td>{g.vang}</td></tr>)}</tbody>
             <tfoot><tr><td>Điểm ván</td><td colSpan={3}>Kim loại {ket.diem[0]} · Phi kim {ket.diem[1]}</td></tr></tfoot>
           </table>
-          {loai !== 'giao_huu' && <p className="bia-chu-nho">{tk[EM]!.caiSai.length ? `Câu sai của em đã vào lịch ôn: ${[...new Set(tk[EM]!.caiSai.filter(Boolean))].join(', ')}.` : 'Em không sai câu nào trong ván này.'}{theLucSau ? ` Thể lực hôm nay còn ${theLucSau.con}/${theLucSau.tong} câu.` : ''}</p>}
+          {loai !== 'giao_huu' && <p className="bia-chu-nho">{tk[v.em]!.caiSai.length ? `Câu sai của em đã vào lịch ôn: ${[...new Set(tk[v.em]!.caiSai.filter(Boolean))].join(', ')}.` : 'Em không sai câu nào trong ván này.'}{theLucSau ? ` Thể lực hôm nay còn ${theLucSau.con}/${theLucSau.tong} câu.` : ''}</p>}
           {cauSai.length > 0 && <button type="button" className="bia-nut-chu" onClick={moXem}>Xem lại câu sai ({cauSai.length})</button>}
-          <div className="bia-hang-nut"><button type="button" className="bia-nut-chu" onClick={onVeSanh}>Về Sảnh</button><button type="button" className="bia-nut-vang" onClick={onChoiLai}>Chơi ván mới</button></div>
+          {vm && vm.loaiMang === 'ban' && <p className="bia-chu-nho">{vm.S.khongElo ? 'Ván có A.I nên không tính Điểm bàn.' : 'Ván này tính Điểm bàn; điểm mới hiện ở Sảnh Bi-a.'}</p>}
+          <div className="bia-hang-nut"><button type="button" className={vm ? 'bia-nut-vang' : 'bia-nut-chu'} onClick={onVeSanh}>Về Sảnh</button>{!vm && <button type="button" className="bia-nut-vang" onClick={onChoiLai}>Chơi ván mới</button>}</div>
         </div></div>}
       </div>
     </div>
