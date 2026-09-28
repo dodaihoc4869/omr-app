@@ -78,3 +78,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 13:57 PR #32 thẻ lọc SUCCESS. 14:06 PR #33 Đảo 3D merge `63188d6` (deploy chạy). build-ca-thi `26faa44` đã gộp main + build:cf đạt (146 tệp/2945 KB) — chờ merge 14:20. nhan_xet_ca_em tự tạo bảng ở máy chủ (CI không chạy migration).
 - hien-thi-de `da3429f` đã đẩy: bộ hiển thị sơ đồ/công thức (chem-format-so-do.ts) — chờ merge sau ca-thi. Rà 15.359 câu: 882 trường/799 câu cần sửa trình bày; 88 mục cần thầy xem. GHI KHO ĐỀ BỊ HỆ THỐNG QUYỀN CHẶN (Modify Shared Resources) ⇒ 0 câu đã sửa; chờ thầy xác nhận trực tiếp. Sao lưu + lệnh áp/lùi: docs/ra-soat-hien-thi-de-2809/ap-dung.md.
 - 14:16 PR #33 Đảo 3D SUCCESS. 14:23 PR #34 ca thi merge `240e021`, 14:24 PR #35 hiển thị đề merge `81f95f5` (một lượt deploy gồm cả hai; hẹn kiểm 14:38 rồi gửi BÁO CÁO TỔNG).
+- 14:36 PR #35 deploy SUCCESS (gồm #34 ca thi). Máy chủ trả 200. ĐÃ GỬI BÁO CÁO TỔNG. Chờ thầy: xác nhận trực tiếp ghi sửa 799 câu kho đề.
