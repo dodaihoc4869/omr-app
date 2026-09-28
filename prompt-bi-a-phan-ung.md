@@ -1,6 +1,6 @@
 # Prompt — Bi-a Phản Ứng: game bi-a gắn kho đề chiến dịch, cửa thứ ba trên Sảnh Bát Linh
 
-Soạn 28/09/2026, **bản 3**: thêm vật lý bi-a thật và trần câu riêng của Bi-a (bản 2 bỏ bi ion và vé; bản 3 giữ luật bản 2). Bản vẽ chơi được: `docs/ban-ve-bi-a-2809/bi-a-phan-ung.html` (artifact https://claude.ai/artifact/7FjPu2CSL4QtnigCD4gdQg, phiên bản 3). Chưa build. Thầy gõ **HÃY THỰC THI PROMPT NÀY** thì mới làm.
+Soạn 28/09/2026, **bản 4 — thầy đã chốt**: trần Bi-a 40%, Đúng–sai đúng đủ 4 ý mới ăn bi, mở Bàn giao hữu. **Đặc tả đầy đủ: `DAC-TA-BI-A-PHAN-UNG-2809.md`** — khi hai tệp khác nhau, tệp đặc tả thắng. Bản vẽ chơi được: `docs/ban-ve-bi-a-2809/bi-a-phan-ung.html` (artifact https://claude.ai/artifact/7FjPu2CSL4QtnigCD4gdQg, phiên bản 3). Chưa build. Thầy gõ **HÃY THỰC THI PROMPT NÀY** thì mới làm.
 
 ## Góc nhìn khác
 
@@ -32,11 +32,12 @@ BỐI CẢNH
 - Lời giải chuẩn: TheCau/LoiGiai (src/components/TheCau.tsx:169–237), bộ nối game src/game/than-thu-v2/doan2/XemLaiChuan.tsx và dao2/dao2-core.ts loiGiaiChoTheCau. Công thức: ChemText (src/lib/chem-format.tsx). Ảnh: HinhTaiViTri. Không rút câu tự luận (src/lib/cau-tu-luan.ts).
 - Hạ tầng: Worker chưa có Durable Object hay WebSocket; Đoàn hỏi vòng 1,5 giây vào D1 (doan_chang). D1 từng nghẽn ngày 21/09 nên trong trận không đọc D1.
 - Giao diện: token màu src/styles/tokens.css + m3-theme.css; game dùng Baloo 2 + Be Vietnam Pro, nút vàng 3D, nút xanh "Đã đọc lời giải"; `npm run check:mau`; chữ theo docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md.
+- ĐẶC TẢ CHỐT (đọc hết trước khi sửa mã, khác nhau thì đặc tả thắng): DAC-TA-BI-A-PHAN-UNG-2809.md — luật đầy đủ, nguồn câu, trần 40%, Bàn giao hữu, vật lý, giao diện, lệnh máy chủ, bảng mới, làn tệp, lộ trình, 15 tiêu chí hoàn thành GĐ1.
 - Bản vẽ thầy duyệt, chơi được: docs/ban-ve-bi-a-2809/bi-a-phan-ung.html. Chép lõi vật lý, luật, bố cục màn chơi, hàng "Bi của em", tấm câu hỏi 3 kiểu, Sảnh Bi-a, Kết thúc ván từ tệp này.
 - Phát hành: Worker chỉ phiên Code 3 đẩy, Pages do Code 2 đẩy, luôn từ worktree sạch. Phiên cloud không có khoá Cloudflare.
 
 NHIỆM VỤ
-Build "Bi-a Phản Ứng" thành cửa thứ ba trên Sảnh Bát Linh, mỗi viên bi của em là một câu trong kế hoạch hôm nay của chính em. Làm theo 3 giai đoạn. GĐ1: bàn chơi + A.I Đỗ Đại Học + câu thật + bi vàng + Mắt thần + Câu chốt. GĐ2: đấu online 1–1 (mời bạn đang mở app, mã bàn 4 số). GĐ3: Điểm bàn, bảng tuần của lớp, gậy và mặt bàn đổi bằng Vàng. Mỗi giai đoạn kết thúc bằng commit, test xanh và bản chạy được.
+Build "Bi-a Phản Ứng" thành cửa thứ ba trên Sảnh Bát Linh, mỗi viên bi của em là một câu trong kế hoạch hôm nay của chính em. Làm theo 3 giai đoạn. GĐ1: bàn chơi + A.I Đỗ Đại Học + câu thật + bi vàng + Mắt thần + Câu chốt + trần 40% + Bàn giao hữu với A.I + cờ bật cho từng lớp. GĐ2: đấu online 1–1 (mời bạn đang ở Sảnh Bi-a, mã bàn 4 số), Bàn giao hữu với bạn, Điểm bàn. GĐ3: bảng tuần của lớp, xem bạn đấu, gậy và mặt bàn đổi bằng Vàng, 3 mức A.I. Mỗi giai đoạn kết thúc bằng commit, test xanh và bản chạy được.
 
 NGUYÊN TẮC BẮT BUỘC
 - Luật bàn: 7 bi trơn 1–7 (người mời), 7 bi sọc 9–15 (người được mời), Bi chốt số 8. Mỗi bi thường là 1 câu của chủ bi; điểm ván theo mức độ: Nhận biết 10, Thông hiểu 20, Vận dụng 30; hạ Bi chốt +50. Phải chạm bi của mình trước. Bi vàng rơi lỗ thì ăn ngay; bi thường rơi lỗ thì mở câu của bi đó (rơi 2 bi thì trả lời lần lượt). Đúng: ăn bi, đánh tiếp, +1 Mắt thần. Sai: bi quay lại chân bàn và đổi sang câu khác cùng dạng trong kế hoạch, hiện lời giải, mất lượt. Bi của đối thủ rơi: quay lại chân bàn, mất lượt. Phạm luật (bi cái rơi lỗ, không chạm bi nào, chạm bi đối thủ trước, Bi chốt rơi khi chưa ăn đủ 7 bi): mọi bi rơi trong cú đó quay lại bàn, đối thủ được đặt bi cái. Ăn đủ 7 bi rồi hạ Bi chốt thì trả lời Câu chốt: đúng thắng ván, sai thì Bi chốt quay lại và mất lượt.
@@ -54,6 +55,7 @@ GIẢ ĐỊNH ĐÃ DÙNG
 - A.I Đỗ Đại Học giải câu theo tỉ lệ đúng Nhận biết 85%, Thông hiểu 75%, Vận dụng 60%, Câu chốt 70%; cứ 12 giây trong lượt em thì A.I giải trước 1 bi của nó.
 - Một ván dùng 8 câu mỗi em (7 bi + Câu chốt), thêm 1 câu cho mỗi lần sai.
 - Không có vé. Bi-a mở khi em có chiến dịch đang chạy; không có chiến dịch thì cửa Bi-a mờ và ghi lý do.
+- Bàn giao hữu (thầy chốt): mở khi xong kế hoạch ngày; không câu, không EXP, không Điểm bàn; tối đa 2 ván/ngày tính lúc bắt đầu; đối thủ là A.I hoặc bạn cũng đã xong kế hoạch.
 - Tệp prompt-game-hoa-2-0.md có dòng "Không thêm màn nào vào app học sinh ngoài Sảnh, 2 game…": sửa thành 3 game, nhắn Boss ghi Nhật ký.
 
 KHÔNG ĐƯỢC LÀM
@@ -80,8 +82,10 @@ NGHIỆM THU
 8. Chia câu: test với kế hoạch 14 + 26 câu: Bi-a lấy tối đa 5 + 10; Đoàn, Đảo vẫn làm được toàn bộ phần còn lại; tổng câu cả ngày không đổi; hết trần thì bia-xep-ban trả lý do và số câu còn của Đoàn, Đảo.
 ```
 
-## Ba câu hỏi làm prompt sắc hơn
+## Thầy đã trả lời (28/09/2026)
 
-1. Trần Bi-a: giữ 40% phần của mỗi game (ngày 40 câu ≈ 15–16 câu, tức 2 ván), hay thầy muốn tăng hoặc giảm?
-2. Câu Đúng–sai: giữ "đúng đủ 4 ý mới ăn bi" theo cách chấm hiện có, hay đúng 3/4 ý cũng ăn bi nhưng không được Mắt thần?
-3. Sau khi em xong cả kế hoạch ngày: có mở "Bàn giao hữu" (không câu, không EXP, tối đa 2 ván) làm phần thưởng không, hay Bi-a nghỉ như Đảo, Đoàn?
+1. Trần Bi-a: **giữ 40%** phần của mỗi game.
+2. Câu Đúng–sai: **đúng đủ 4 ý mới ăn bi**.
+3. **Mở Bàn giao hữu** sau khi xong kế hoạch ngày.
+
+Chi tiết đã đưa vào `DAC-TA-BI-A-PHAN-UNG-2809.md`. Chưa build — chờ thầy gõ **HÃY THỰC THI PROMPT NÀY**.
