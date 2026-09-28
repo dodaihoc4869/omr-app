@@ -96,3 +96,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 22:09 · Deploy #549 THÀNH CÔNG: PR #51 Bi-a GĐ2 Đấu với bạn (DO BanBiA) · main abea3ea · lùi: git revert -m 1 abea3ea. Còn: Code 1 chưa làm Bi-a → Câu đã làm.
 - 22:38 · Deploy #550 THÀNH CÔNG: PR #52 Câu đã làm hiện câu ôn từ ca (Bi-a/Đoàn) + nguồn từng lần · main 87ce9bb · lùi: git revert -m 1 87ce9bb. Chờ: len-bang-day-hoc; tối ưu FE/BE (scratchpad/toi-uu).
 - 23:30 · Deploy #551 THÀNH CÔNG: PR #53 bảng DẠY HỌC (điểm danh, cây DẠY HỌC, chiếu đủ, chọn em) · main f1c0704 · lùi: git revert -m 1 f1c0704. Đang: toi-uu-man-thi, toi-uu-may-chu; FE còn lại chờ.
+- 00:30 · Deploy #552 THÀNH CÔNG: PR #54 màn thi hết đứng máy · main 25042c8 · lùi: git revert -m 1 25042c8.
