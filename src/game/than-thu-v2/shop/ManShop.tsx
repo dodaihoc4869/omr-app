@@ -18,7 +18,9 @@ import ThuDo from './ThuDo'
 import TuDo from './TuDo'
 import XacNhanMua from './XacNhanMua'
 import type { ViecXacNhan } from './XacNhanMua'
+import { useNgang } from '../dao2/ngang'
 import './shop.css'
+import './shop-ngang.css'
 
 export type ManShopMan = 'cua-hang' | 'thu-do' | 'tu-do'
 
@@ -273,8 +275,10 @@ export default function ManShop({ api, pet, cap, tenThu, onDong, veThu, veHinhMo
   const dangTai = tai.buoc === 'dang' || (tai.buoc === 'xong' && !xong)
   const mucLoiTai = tai.buoc === 'loi' || tai.buoc === 'mat-mang' || tai.buoc === 'dong'
 
+  // Bố cục NGANG (máy tính / xoay ngang — cùng điểm ngắt dao2/ngang.ts): shop-ngang.css. Dọc giữ nguyên.
+  const ngang = useNgang()
   return (
-    <div ref={goc} className="ps" data-man={man} data-co-phu={phu ? '1' : '0'} tabIndex={-1}>
+    <div ref={goc} className="ps" data-man={man} data-co-phu={phu ? '1' : '0'} data-ngang={ngang ? '' : undefined} tabIndex={-1}>
       <div className="ps-man" inert={phu || undefined}>
         {man === 'cua-hang' &&
           (mucLoiTai ? (
@@ -284,6 +288,7 @@ export default function ManShop({ api, pet, cap, tenThu, onDong, veThu, veHinhMo
             </>
           ) : (
             <CuaHang
+              ngang={ngang}
               dangTai={dangTai}
               vi={vi}
               vang={vang}
