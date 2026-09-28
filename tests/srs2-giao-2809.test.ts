@@ -53,3 +53,29 @@ describe('giao chiến dịch theo tờ đã tách + chọn em', () => {
     expect(b.dang).toEqual(['Dạng 1'])
   })
 })
+
+describe('thể lực tự do + tự động (thầy 28/09)', () => {
+  it('thể lực đề xuất = số nhỏ nhất để em giữa lớp ≤ 70% và em nặng nhất ≤ 100%; tối thiểu 10', async () => {
+    const { theLucDeXuat } = await import('../server/src/srs2-gv')
+    expect(theLucDeXuat(340, 340, 8)).toBe(61) // ceil(340 / 5,6)
+    expect(theLucDeXuat(100, 400, 8)).toBe(50) // em nặng nhất quyết định
+    expect(theLucDeXuat(0, 0, 8)).toBe(10)
+  })
+  it('máy chủ nhận thể lực bất kì (135) và trả theLucDeXuat; ds-em trả danh sách học sinh', async () => {
+    const { env } = dung()
+    const r = await gvChienDich(env, { action: 'suc-chua', lop: '12A1', maDe: ['DE1'], hanNop: '2026-10-04', theLucNgay: 135 }, T0) as Record<string, number>
+    expect(r.sucChua).toBe(r.D * 135)
+    expect(r.theLucDeXuat).toBe(Math.max(10, Math.ceil(r.khoiLuongTrungVi / (0.7 * r.D))))
+    const ds = await gvChienDich(env, { action: 'ds-em' }, T0) as { em: { sbd: string; lop: string }[] }
+    expect(ds.em.map((e) => e.sbd)).toEqual(['S1', 'S2', 'S3'])
+  })
+})
+
+describe('trần Huyết Chiến tự tính (thầy 28/09)', () => {
+  it('= gấp đôi thể lực/ngày của chiến dịch, không cố định 80', async () => {
+    const { tranHuyetChienTheo } = await import('../server/src/srs2-loi')
+    expect(tranHuyetChienTheo(40)).toBe(80)
+    expect(tranHuyetChienTheo(61)).toBe(122)
+    expect(tranHuyetChienTheo(25)).toBe(50)
+  })
+})

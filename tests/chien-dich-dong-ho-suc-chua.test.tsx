@@ -1,5 +1,5 @@
 // GAME HÓA 2.0 · ĐỒNG HỒ SỨC CHỨA (bản vẽ GV-GiaoChienDich): xanh ≤ 70% · vàng 70–90% · đỏ > 90%, câu "Em ở giữa lớp…",
-// hai nút gợi ý (Rút còn N câu → %; Lùi hạn nộp tới … → %) và lựa chọn "rút còn" đổi màu theo tỉ lệ gợi ý.
+// thầy 28/09 bỏ hai nút gợi ý "Rút còn" / "Lùi hạn nộp" (thay bằng nút gạt thể lực Tự động ở màn giao).
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import DongHoSucChua from '../src/components/chien-dich/DongHoSucChua'
@@ -22,9 +22,9 @@ const sc = (tiLe: number, them: Partial<SucChua> = {}): SucChua => ({
   ...them,
 })
 
-const ve = (s: SucChua | null, rutCon: { soCau: number; tiLe: number } | null = null) => {
-  const f = { onRut: vi.fn(), onLuiHan: vi.fn(), onBoRut: vi.fn(), onTinhLai: vi.fn() }
-  const r = render(<DongHoSucChua sc={s} dangTinh={false} loi="" theLuc={40} rutCon={rutCon} {...f} />)
+const ve = (s: SucChua | null) => {
+  const f = { onTinhLai: vi.fn() }
+  const r = render(<DongHoSucChua sc={s} dangTinh={false} loi="" theLuc={40} {...f} />)
   return { ...r, ...f }
 }
 const khoi = (c: HTMLElement) => c.querySelector('[data-khoi="dong-ho-suc-chua"]') as HTMLElement
@@ -68,26 +68,12 @@ describe('đồng hồ đổi màu theo tỉ lệ', () => {
   })
 })
 
-describe('hai nút gợi ý', () => {
-  it('Rút còn N câu → % và Lùi hạn nộp tới … → % gọi đúng tham số mới', () => {
-    const { onRut, onLuiHan } = ve(sc(0.85, { goiY: { rutCon: { soCau: 101, tiLe: 0.7 }, luiHan: { hanNop: '2026-10-06', tiLe: 0.64 } } }))
-    fireEvent.click(screen.getByRole('button', { name: 'Rút còn 101 câu → 70%' }))
-    expect(onRut).toHaveBeenCalledWith({ soCau: 101, tiLe: 0.7 })
-    fireEvent.click(screen.getByRole('button', { name: 'Lùi hạn nộp tới Thứ Ba 06/10 → 64%' }))
-    expect(onLuiHan).toHaveBeenCalledWith('2026-10-06')
+describe('không còn nút gợi ý', () => {
+  it('máy chủ vẫn gửi goiY thì đồng hồ cũng KHÔNG hiện nút "Rút còn" / "Lùi hạn nộp" (thầy 28/09)', () => {
+    ve(sc(1.2, { goiY: { rutCon: { soCau: 101, tiLe: 0.7 }, luiHan: { hanNop: '2026-10-06', tiLe: 0.64 } } }))
+    expect(screen.queryByRole('button', { name: /Rút còn/ })).toBeNull()
+    expect(screen.queryByRole('button', { name: /Lùi hạn nộp/ })).toBeNull()
   })
-
-  it('đã chọn "rút còn" mà máy chủ chưa áp ⇒ đồng hồ hiện tỉ lệ gợi ý (vàng → xanh) và có nút bỏ rút', () => {
-    const { container, onBoRut } = ve(sc(0.85, { goiY: { rutCon: { soCau: 101, tiLe: 0.7 }, luiHan: null } }), { soCau: 101, tiLe: 0.7 })
-    const k = khoi(container)
-    expect(k.getAttribute('data-muc')).toBe('xanh')
-    expect(k.textContent).toContain('70%')
-    expect(k.textContent).toContain('Rút còn 101 câu')
-    expect(screen.queryByRole('button', { name: /Rút còn 101 câu →/ })).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: /Bỏ rút câu/ }))
-    expect(onBoRut).toHaveBeenCalled()
-  })
-
   it('không có dữ liệu: nói việc cần làm; lỗi: nói lý do thật + nút tính lại', () => {
     const { container } = ve(null)
     expect(khoi(container).textContent).toContain('Chọn tờ đề, lớp và hạn nộp để tính sức chứa.')

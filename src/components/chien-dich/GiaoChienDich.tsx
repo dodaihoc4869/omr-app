@@ -1,20 +1,23 @@
 // BƯỚC TIẾP THEO · GIAO CHIẾN DỊCH LUYỆN (bản vẽ docs/ban-ve-game-hoa-2-2709/GV-GiaoChienDich.dc.html).
 // Hiện ở màn ca đã kết thúc (điền sẵn tờ đề + lớp của ca) và ở màn Ca kiểm tra ("Giao chiến dịch mới", chưa điền gì).
-// Mỗi lần đổi đầu vào ⇒ gọi `suc-chua` (đồng hồ sức chứa); nút chính "Giao chiến dịch cho N em" ⇒ `tao` (kèm `rutCon` nếu thầy chọn rút).
+// Mỗi lần đổi đầu vào ⇒ gọi `suc-chua` (đồng hồ sức chứa); nút chính "Giao chiến dịch cho N em" ⇒ `tao`.
+// Thầy 28/09: thể lực/ngày điền số bất kì + nút gạt "Tự động" (máy chủ tính thể lực nhỏ nhất bảo đảm mục tiêu); bỏ "rút còn" và "lùi hạn nộp".
 // Giao xong cho HOÀN TÁC ("Huỷ giao" ⇒ `huy`) thay vì hỏi lại trước (luật C8).
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TeacherExamSource } from '../../data/examContent'
 import { useAppStore } from '../../store/appStore'
 import HopChonDe from '../HopChonDe'
-import { huyChienDich, taoChienDich, tinhSucChua, type SucChua } from './api'
+import { docDsEm, huyChienDich, taoChienDich, tinhSucChua, type SucChua } from './api'
 import ChonEmGiao, { type EmLop } from './ChonEmGiao'
-import DongHoSucChua, { type RutCon } from './DongHoSucChua'
+import DongHoSucChua from './DongHoSucChua'
 import HopChon from './HopChon'
 import { congNgay, hienHanNop, laNgay, ngayVn } from './ngay'
 import './chien-dich.css'
 
 export const THE_LUC_MAC_DINH = 40
 export const TRAN_HUYET_CHIEN = 80
+/** Chặn số vô nghĩa (giống máy chủ `THE_LUC_TOI_DA`). */
+export const THE_LUC_TOI_DA = 500
 /** Chờ thầy gõ xong rồi mới hỏi máy chủ (ms). */
 const CHO_TINH_MS = 350
 
@@ -56,12 +59,14 @@ export default function GiaoChienDich({
   const [boEm, setBoEm] = useState<Set<string>>(new Set())
   const [hanNop, setHanNop] = useState(() => congNgay(homNay, 7))
   const [theLuc, setTheLuc] = useState(THE_LUC_MAC_DINH)
+  // Ô thể lực giữ CHỮ thầy đang gõ (xoá trắng để gõ lại được); số hợp lệ mới đổi `theLuc`.
+  const [theLucChu, setTheLucChu] = useState(String(THE_LUC_MAC_DINH))
+  const [tuDong, setTuDong] = useState(true)
   const [huyetChien, setHuyetChien] = useState(true)
 
   const [sc, setSc] = useState<SucChua | null>(null)
   const [dangTinh, setDangTinh] = useState(false)
   const [loiTinh, setLoiTinh] = useState('')
-  const [rutCon, setRutCon] = useState<RutCon | null>(null)
   const [lanTinh, setLanTinh] = useState(0)
 
   const [dangGiao, setDangGiao] = useState(false)
@@ -89,9 +94,23 @@ export default function GiaoChienDich({
       huy = true
     }
   }, [])
+  // Danh sách học sinh: ƯU TIÊN máy chủ (cùng bảng máy chủ dùng khi giao) — máy thầy chưa nạp "Danh sách lớp" vẫn chọn được khối/lớp/em.
+  // Máy chủ không trả lời ⇒ dùng danh sách trên máy; cả hai rỗng ⇒ lùi về ô gõ tên lớp.
+  const [emMayChu, setEmMayChu] = useState<EmLop[] | null>(null)
+  useEffect(() => {
+    let huy = false
+    void docDsEm().then((r) => {
+      if (!huy && r.ok && Array.isArray(r.du.em) && r.du.em.length > 0) setEmMayChu(r.du.em)
+    }).catch(() => {})
+    return () => {
+      huy = true
+    }
+  }, [])
   const dsEm = useMemo<EmLop[]>(
-    () => (classList ?? []).map((r) => ({ sbd: String(r.sbd ?? '').trim(), hoTen: String(r.hoTen ?? '').trim(), lop: String(r.lop ?? '').trim() })).filter((e) => e.sbd && e.lop),
-    [classList],
+    () =>
+      emMayChu ??
+      (classList ?? []).map((r) => ({ sbd: String(r.sbd ?? '').trim(), hoTen: String(r.hoTen ?? '').trim(), lop: String(r.lop ?? '').trim() })).filter((e) => e.sbd && e.lop),
+    [emMayChu, classList],
   )
   const coDanhSach = dsEm.length > 0
   const dsLop = useMemo(() => [...new Set(dsEm.map((e) => e.lop))].sort((a, b) => a.localeCompare(b, 'vi')), [dsEm])
@@ -104,14 +123,6 @@ export default function GiaoChienDich({
   const hanHopLe = laNgay(hanNop) && hanNop >= homNay
   const duDauVao = maDeChon.length > 0 && (coDanhSach ? sbdChon.length > 0 : lop.trim() !== '') && hanHopLe
   const khoaDauVao = JSON.stringify([maDeChon, doiTuong, hanNop, theLuc])
-
-  // Đổi đầu vào ⇒ gợi ý "rút còn" cũ hết đúng.
-  const khoaTruoc = useRef(khoaDauVao)
-  useEffect(() => {
-    if (khoaTruoc.current === khoaDauVao) return
-    khoaTruoc.current = khoaDauVao
-    setRutCon(null)
-  }, [khoaDauVao])
 
   // ĐỒNG HỒ SỨC CHỨA: gọi lại mỗi khi đổi đầu vào (chờ thầy gõ xong); câu trả lời cũ về muộn thì bỏ.
   const luotTinh = useRef(0)
@@ -126,7 +137,7 @@ export default function GiaoChienDich({
     const luot = ++luotTinh.current
     setDangTinh(true)
     const hen = setTimeout(() => {
-      void tinhSucChua({ ...doiTuong, maDe: maDeChon, hanNop, theLucNgay: theLuc, ...(rutCon ? { rutCon: rutCon.soCau } : {}) }).then((r) => {
+      void tinhSucChua({ ...doiTuong, maDe: maDeChon, hanNop, theLucNgay: theLuc }).then((r) => {
         if (luot !== luotTinh.current) return
         setDangTinh(false)
         if (r.ok) {
@@ -140,7 +151,14 @@ export default function GiaoChienDich({
     }, CHO_TINH_MS)
     return () => clearTimeout(hen)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [khoaDauVao, rutCon?.soCau, lanTinh, duDauVao, daGiao])
+  }, [khoaDauVao, lanTinh, duDauVao, daGiao])
+
+  // TỰ ĐỘNG: đặt thể lực = số máy chủ đề xuất (khối lượng lượt không phụ thuộc thể lực ⇒ một vòng là đứng).
+  useEffect(() => {
+    if (!tuDong || !sc?.theLucDeXuat || sc.theLucDeXuat === theLuc) return
+    setTheLuc(sc.theLucDeXuat)
+    setTheLucChu(String(sc.theLucDeXuat))
+  }, [tuDong, sc?.theLucDeXuat, theLuc])
 
   const giao = async () => {
     if (!duDauVao || dangGiao) return
@@ -154,7 +172,6 @@ export default function GiaoChienDich({
       theLucNgay: theLuc,
       huyetChien,
       ...(maCa ? { maCa } : {}),
-      ...(rutCon ? { rutCon: rutCon.soCau } : {}),
     })
     setDangGiao(false)
     if (!r.ok) {
@@ -215,7 +232,7 @@ export default function GiaoChienDich({
   }
 
   const soEm = sc?.soEm ?? 0
-  const tongCau = sc ? (rutCon && sc.soCau > rutCon.soCau ? `Tổng ${sc.soCau} câu → rút còn ${rutCon.soCau} câu` : `Tổng ${sc.soCau} câu`) : ''
+  const tongCau = sc ? `Tổng ${sc.soCau} câu` : ''
 
   return (
     <section className="cd-the" data-khoi="giao-chien-dich" aria-labelledby="cd-giao-tieu-de">
@@ -283,20 +300,33 @@ export default function GiaoChienDich({
       </div>
 
       <div className="cd-luoi-2">
-        <label className="cd-truong">
-          Thể lực mỗi ngày (câu)
+        <div className="cd-truong">
+          <label htmlFor="cd-the-luc">Thể lực mỗi ngày (lượt câu)</label>
           <input
+            id="cd-the-luc"
             type="number"
             inputMode="numeric"
-            min={10}
-            max={TRAN_HUYET_CHIEN}
-            value={theLuc}
-            onChange={(e) => setTheLuc(Math.max(10, Math.min(TRAN_HUYET_CHIEN, Math.floor(Number(e.target.value) || THE_LUC_MAC_DINH))))}
+            min={1}
+            max={THE_LUC_TOI_DA}
+            value={theLucChu}
+            disabled={tuDong}
+            onChange={(e) => {
+              setTheLucChu(e.target.value)
+              const n = Math.floor(Number(e.target.value))
+              if (Number.isFinite(n) && n >= 1) setTheLuc(Math.min(THE_LUC_TOI_DA, n))
+            }}
           />
-        </label>
+          <label className="cd-tich cd-gat">
+            <input type="checkbox" role="switch" checked={tuDong} onChange={(e) => setTuDong(e.target.checked)} />
+            <span>Tự động: máy tính số lượt/ngày nhỏ nhất đủ để cả lớp kịp hạn nộp</span>
+          </label>
+          <small className="cd-so">
+            {tuDong ? (sc?.theLucDeXuat ? `Máy đề xuất ${sc.theLucDeXuat} lượt/ngày · em ở giữa lớp ≤ 70% sức chứa, không em nào quá tải` : 'Đang tính…') : 'Gõ số bất kì; gạt Tự động để máy tính'}
+          </small>
+        </div>
         <label className="cd-tich" style={{ alignSelf: 'end' }}>
           <input type="checkbox" checked={huyetChien} onChange={(e) => setHuyetChien(e.target.checked)} />
-          <span>Cho Huyết Chiến tới {TRAN_HUYET_CHIEN} câu/ngày khi em chậm nhịp</span>
+          <span>Cho Huyết Chiến tới {2 * theLuc} câu/ngày khi em chậm nhịp (tự tính: gấp đôi thể lực)</span>
         </label>
       </div>
 
@@ -305,10 +335,6 @@ export default function GiaoChienDich({
         dangTinh={dangTinh}
         loi={loiTinh}
         theLuc={theLuc}
-        rutCon={rutCon}
-        onRut={setRutCon}
-        onLuiHan={setHanNop}
-        onBoRut={() => setRutCon(null)}
         onTinhLai={() => setLanTinh((x) => x + 1)}
       />
 
