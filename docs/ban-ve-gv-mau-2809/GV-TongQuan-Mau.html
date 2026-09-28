@@ -1,0 +1,220 @@
+<title>Tổng quan giáo viên · bản màu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;700&display=swap">
+<style>
+/* Bản vẽ app giáo viên theo Material 3 Expressive: mỗi nhóm số liệu một màu tông riêng (xanh dương · xanh lục · hổ phách · hồng), bo tròn lớn, nền tông nhạt. */
+:root{
+  --nen:#f6f7fc; --mat:#ffffff; --mat-2:#eef1fa; --vien:#dde2f0;
+  --chu:#1a1c24; --chu-2:#454a5c; --chu-3:#6b7187;
+  --xd:#1f5fd6; --xd-nen:#dbe6ff; --xd-dam:#0b2f75;
+  --xl:#0f8a5f; --xl-nen:#c9f2de; --xl-dam:#04402a;
+  --hp:#b86a00; --hp-nen:#ffe2b3; --hp-dam:#4d2c00;
+  --ho:#c42a5c; --ho-nen:#ffd9e3; --ho-dam:#5c0a27;
+  --tim:#6a4fd8; --tim-nen:#e7defe; --tren-xd:#ffffff;
+  --bong:0 1px 2px rgb(30 40 80/.06),0 4px 14px rgb(30 40 80/.06);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --nen:#10131c; --mat:#181c27; --mat-2:#1f2433; --vien:#2c3245;
+  --chu:#e8eaf3; --chu-2:#b9bed1; --chu-3:#8c92a8;
+  --xd:#9cbcff; --xd-nen:#1d3363; --xd-dam:#dbe6ff;
+  --xl:#6fdcab; --xl-nen:#0f3d2b; --xl-dam:#c9f2de;
+  --hp:#ffc164; --hp-nen:#43290a; --hp-dam:#ffe2b3;
+  --ho:#ff8fb0; --ho-nen:#4d1428; --ho-dam:#ffd9e3;
+  --tim:#c3b3ff; --tim-nen:#2d2352; --tren-xd:#0b1a3a;
+  --bong:0 1px 2px rgb(0 0 0/.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --nen:#10131c; --mat:#181c27; --mat-2:#1f2433; --vien:#2c3245;
+  --chu:#e8eaf3; --chu-2:#b9bed1; --chu-3:#8c92a8;
+  --xd:#9cbcff; --xd-nen:#1d3363; --xd-dam:#dbe6ff;
+  --xl:#6fdcab; --xl-nen:#0f3d2b; --xl-dam:#c9f2de;
+  --hp:#ffc164; --hp-nen:#43290a; --hp-dam:#ffe2b3;
+  --ho:#ff8fb0; --ho-nen:#4d1428; --ho-dam:#ffd9e3;
+  --tim:#c3b3ff; --tim-nen:#2d2352; --tren-xd:#0b1a3a;
+  --bong:0 1px 2px rgb(0 0 0/.3); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--nen);color:var(--chu);font:15px/1.5 'Be Vietnam Pro',system-ui,sans-serif}
+.so,.mono{font-variant-numeric:tabular-nums}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace}
+h1,h2,h3{margin:0;text-wrap:balance}
+.app{display:grid;grid-template-columns:96px minmax(0,1fr);min-height:100vh}
+/* thanh điều hướng M3 */
+.ray{display:flex;flex-direction:column;align-items:center;gap:6px;padding-block:20px;background:var(--mat);border-right:1px solid var(--vien);position:sticky;top:0;height:100vh}
+.logo{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;margin-bottom:14px;background:conic-gradient(from 200deg,var(--xd),var(--tim),var(--ho),var(--hp),var(--xl),var(--xd));color:#fff;font-weight:800;font-size:18px}
+.muc{display:flex;flex-direction:column;align-items:center;gap:4px;width:84px;padding:4px 0 8px;border:0;background:none;color:var(--chu-2);font:600 12px/1.2 inherit;cursor:pointer;text-align:center}
+.muc .pill{width:56px;height:32px;border-radius:16px;display:grid;place-items:center;transition:background .2s}
+.muc:hover .pill{background:var(--mat-2)}
+.muc[aria-current] .pill{background:var(--xd-nen);color:var(--xd-dam)}
+.muc[aria-current]{color:var(--chu)}
+.muc svg{width:22px;height:22px}
+.muc .dem{position:absolute;margin:-22px 0 0 34px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--ho);color:var(--mat);font-size:11px;font-weight:700;line-height:18px}
+.muc-o{position:relative}
+.ray .day{margin-top:auto}
+main{padding-block:28px 40px;padding-inline:clamp(16px,3vw,40px);display:flex;flex-direction:column;gap:22px;min-width:0}
+.dau{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;justify-content:space-between}
+.dau h1{font-size:34px;font-weight:800;letter-spacing:-.02em}
+.dau p{margin:4px 0 0;color:var(--chu-3)}
+.nut{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 22px;border-radius:24px;border:0;font:700 15px inherit;cursor:pointer}
+.nut svg{width:20px;height:20px}
+.nut-chinh{background:var(--xd);color:var(--tren-xd);box-shadow:0 2px 8px rgb(31 95 214/.35)}
+.nut-to{background:var(--xd-nen);color:var(--xd-dam);width:48px;padding:0;justify-content:center}
+.nut:focus-visible,.muc:focus-visible{outline:3px solid var(--tim);outline-offset:2px}
+.nhom-nut{display:flex;gap:10px}
+/* 4 thẻ số */
+.the-so{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.so-o{position:relative;overflow:hidden;border-radius:28px;padding:20px 22px 18px;background:var(--c-nen);color:var(--c-dam);display:flex;flex-direction:column;gap:6px;min-height:168px}
+.so-o::after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:44px;background:var(--c);opacity:.12;transform:rotate(18deg)}
+.so-o .hang{display:flex;align-items:center;gap:10px;font-weight:700;font-size:14px}
+.so-o .bt{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--c);color:var(--mat)}
+.so-o .bt svg{width:20px;height:20px}
+.so-o .lon{font-size:44px;font-weight:800;line-height:1.05;letter-spacing:-.02em}
+.so-o .lon small{font-size:17px;font-weight:600;margin-left:4px;letter-spacing:0}
+.so-o .phu{font-size:13.5px;font-weight:500;opacity:.85}
+.so-o .chip{align-self:flex-start;margin-top:auto;padding:4px 12px;border-radius:10px;background:var(--mat);color:var(--c);font-size:12.5px;font-weight:700}
+.c-xd{--c:var(--xd);--c-nen:var(--xd-nen);--c-dam:var(--xd-dam)}
+.c-xl{--c:var(--xl);--c-nen:var(--xl-nen);--c-dam:var(--xl-dam)}
+.c-hp{--c:var(--hp);--c-nen:var(--hp-nen);--c-dam:var(--hp-dam)}
+.c-ho{--c:var(--ho);--c-nen:var(--ho-nen);--c-dam:var(--ho-dam)}
+/* lưới dưới */
+.luoi{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(300px,1fr);gap:16px;align-items:start}
+.cot{display:flex;flex-direction:column;gap:16px;min-width:0}
+.tam{background:var(--mat);border-radius:28px;padding:22px 24px;box-shadow:var(--bong)}
+.tam-dau{display:flex;align-items:center;gap:12px;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap}
+.tam-dau h2{font-size:19px;font-weight:800}
+.tam-dau .lk{color:var(--xd);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;min-height:44px}
+.tam-dau .ghi{color:var(--chu-3);font-size:13.5px}
+/* dòng chiến dịch: thẻ ngang thay bảng hẹp */
+.cd{display:grid;grid-template-columns:minmax(180px,1.1fr) minmax(220px,1.6fr) 110px minmax(160px,1fr);gap:18px;align-items:center;padding:16px 18px;border-radius:20px;background:var(--mat-2)}
+.cd-ten b{display:block;font-size:16px;font-weight:800}
+.cd-ten span{font-size:13px;color:var(--chu-3)}
+.pill-tt{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 12px;border-radius:12px;font-size:12.5px;font-weight:700;background:var(--ho-nen);color:var(--ho-dam)}
+.pill-tt i{width:8px;height:8px;border-radius:50%;background:var(--ho)}
+.nho{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--chu-3)}
+.thanh{position:relative;height:14px;border-radius:7px;background:var(--mat);margin-top:8px;box-shadow:inset 0 0 0 1px var(--vien)}
+.thanh .dat{position:absolute;inset:0 auto 0 0;width:var(--w);border-radius:7px;background:linear-gradient(90deg,var(--xl),#34c38a)}
+.thanh .vach{position:absolute;top:-5px;bottom:-5px;left:var(--v);width:3px;border-radius:2px;background:var(--hp)}
+.thanh-chu{display:flex;justify-content:space-between;font-size:13px;margin-top:6px;color:var(--chu-2)}
+.thanh-chu b{color:var(--chu)}
+.thanh-chu .can{color:var(--hp);font-weight:700}
+.nhip{display:flex;align-items:center;gap:10px}
+.nhip svg{width:52px;height:52px;flex:none}
+.nhip b{font-size:18px}
+.dang{display:flex;flex-direction:column;gap:6px}
+.dang .chip-d{align-self:flex-start;padding:5px 12px;border-radius:12px;background:var(--tim-nen);color:var(--tim);font-weight:700;font-size:13px}
+.dang small{color:var(--chu-3)}
+/* biểu đồ bài nộp */
+.bieu{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:8px;align-items:end;height:120px;padding-top:6px}
+.cotb{border-radius:10px 10px 4px 4px;background:repeating-linear-gradient(-45deg,var(--mat-2) 0 6px,transparent 6px 12px);box-shadow:inset 0 0 0 1px var(--vien);height:var(--h)}
+.truc{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:8px;margin-top:6px;font-size:11px;color:var(--chu-3);text-align:center}
+.rong{display:flex;align-items:center;gap:14px;margin-top:14px;padding:12px 16px;border-radius:16px;background:var(--mat-2);color:var(--chu-2);font-size:14px}
+/* cột phải */
+.trong{display:flex;gap:16px;align-items:center}
+.trong .minh{flex:none;width:72px;height:72px;border-radius:24px;display:grid;place-items:center;background:var(--c-nen);color:var(--c)}
+.trong .minh svg{width:34px;height:34px}
+.trong b{display:block;font-size:15.5px}
+.trong span{color:var(--chu-3);font-size:13.5px}
+.viec{display:flex;flex-direction:column;gap:10px}
+.viec li{list-style:none;display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:16px;background:var(--c-nen);color:var(--c-dam);font-weight:600;font-size:14px}
+.viec ul{margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.viec li i{flex:none;width:10px;height:10px;border-radius:50%;background:var(--c)}
+.ghi-ve{font-size:12.5px;color:var(--chu-3);border:1px dashed var(--vien);border-radius:16px;padding:10px 14px}
+@media (max-width:1100px){.the-so{grid-template-columns:repeat(2,minmax(0,1fr))}.luoi{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:820px){.cd{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+@media (max-width:640px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .ray{position:fixed;inset:auto 0 0 0;height:auto;flex-direction:row;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom,0px));border-right:0;border-top:1px solid var(--vien);z-index:5}
+  .ray .logo,.ray .day{display:none}
+  .muc{width:auto;flex:1}
+  main{padding-bottom:110px}
+  .the-so{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+  .so-o{min-height:0;padding:16px;border-radius:22px}
+  .so-o .lon{font-size:34px}
+  .cd{grid-template-columns:minmax(0,1fr)}
+  .dau h1{font-size:28px}
+  .bieu,.truc{gap:4px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .so-o,.tam{animation:len .5s cubic-bezier(.2,.8,.2,1) both}
+  .so-o:nth-child(2){animation-delay:.05s}.so-o:nth-child(3){animation-delay:.1s}.so-o:nth-child(4){animation-delay:.15s}
+  @keyframes len{from{transform:translateY(10px)}}
+}
+</style>
+
+<div class="app">
+  <nav class="ray" aria-label="Điều hướng">
+    <div class="logo" aria-hidden="true">H</div>
+    <button class="muc" aria-current="page"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg></span>Tổng quan</button>
+    <button class="muc"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 4h6M8 4h8v3H8zM6 6H5a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-1M8 13l3 3 5-6"/></svg></span>Ca kiểm tra</button>
+    <button class="muc muc-o"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></span><span class="dem so">1</span>Chiến dịch luyện</button>
+    <button class="muc"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>Chữa trên lớp</button>
+    <button class="muc"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></svg></span>Học sinh</button>
+    <button class="muc day"><span class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span>Cài đặt</button>
+  </nav>
+
+  <main>
+    <header class="dau">
+      <div><h1>Tổng quan</h1><p>Thứ Hai 28/09/2026 · 12:11</p></div>
+      <div class="nhom-nut">
+        <button class="nut nut-to" aria-label="Tải lại số liệu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4"/></svg></button>
+        <button class="nut nut-chinh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Giao chiến dịch</button>
+      </div>
+    </header>
+
+    <section class="the-so" aria-label="Số liệu chính">
+      <div class="so-o c-xd"><div class="hang"><span class="bt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/></svg></span>Em được giao chiến dịch</div><div class="lon so">1<small>em</small></div><div class="phu">trong 1 chiến dịch đang chạy</div></div>
+      <div class="so-o c-xl"><div class="hang"><span class="bt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></span>Thành thạo trung bình</div><div class="lon so">0<small>% câu</small></div><div class="phu">so với mức cần hôm nay</div><span class="chip">Cần 2% hôm nay</span></div>
+      <div class="so-o c-hp"><div class="hang"><span class="bt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span>Em trễ nhịp từ 2 ngày</div><div class="lon so">0<small>em</small></div><div class="phu">trên 1 em được giao</div><span class="chip">Đúng nhịp cả lớp</span></div>
+      <div class="so-o c-ho"><div class="hang"><span class="bt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 19V6a2 2 0 0 1 2-2h12v15H6a2 2 0 0 0-2 2zM9 9h6M9 13h4"/></svg></span>Câu cần thầy dạy lại</div><div class="lon so">0<small>câu</small></div><div class="phu">0 lượt em cần chữa</div></div>
+    </section>
+
+    <div class="luoi">
+      <div class="cot">
+        <section class="tam" aria-labelledby="t-cd">
+          <div class="tam-dau"><h2 id="t-cd">Chiến dịch luyện đang chạy</h2><a class="lk" href="#">Xem tất cả <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></a></div>
+          <article class="cd">
+            <div class="cd-ten"><b>Chiến dịch luyện</b><span>Chưa xếp lớp · 1 em</span><br><span class="pill-tt"><i></i>Chậm nhịp</span></div>
+            <div>
+              <div class="nho">Thành thạo · vạch = mức cần hôm nay</div>
+              <div class="thanh" style="--w:0%;--v:2%"><span class="dat"></span><span class="vach" title="Mức cần hôm nay 2%"></span></div>
+              <div class="thanh-chu"><span><b class="so">0%</b> thành thạo</span><span class="can so">cần 2%</span></div>
+            </div>
+            <div>
+              <div class="nho">Chậm nhịp</div>
+              <div class="nhip"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="14" fill="none" stroke="var(--vien)" stroke-width="5"/><circle cx="18" cy="18" r="14" fill="none" stroke="var(--xl)" stroke-width="5" stroke-dasharray="88 88" transform="rotate(-90 18 18)" stroke-linecap="round"/></svg><span><b class="so">0</b><span class="so"> / 1 em</span></span></div>
+            </div>
+            <div class="dang">
+              <div class="nho">Dạng yếu nhất</div>
+              <span class="chip-d">Cấu tạo – dạng</span>
+              <small class="so">0% câu thành thạo</small>
+            </div>
+          </article>
+        </section>
+
+        <section class="tam" aria-labelledby="t-bn">
+          <div class="tam-dau"><h2 id="t-bn">Bài nộp ca kiểm tra mỗi ngày</h2><span class="ghi">14 ngày qua · đơn vị: bài</span></div>
+          <div class="bieu" aria-hidden="true">
+            <i class="cotb" style="--h:22%"></i><i class="cotb" style="--h:38%"></i><i class="cotb" style="--h:30%"></i><i class="cotb" style="--h:55%"></i><i class="cotb" style="--h:42%"></i><i class="cotb" style="--h:18%"></i><i class="cotb" style="--h:12%"></i><i class="cotb" style="--h:48%"></i><i class="cotb" style="--h:60%"></i><i class="cotb" style="--h:35%"></i><i class="cotb" style="--h:52%"></i><i class="cotb" style="--h:26%"></i><i class="cotb" style="--h:15%"></i><i class="cotb" style="--h:40%"></i>
+          </div>
+          <div class="truc so" aria-hidden="true"><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span></div>
+          <div class="rong">Chưa có bài nộp nào trong 14 ngày qua. Cột gạch chéo là khung chờ, sẽ tô màu khi có bài.</div>
+        </section>
+      </div>
+
+      <div class="cot">
+        <section class="tam c-xl" aria-labelledby="t-ca">
+          <div class="tam-dau"><h2 id="t-ca">Ca đang mở</h2></div>
+          <div class="trong"><span class="minh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="4" width="16" height="17" rx="3"/><path d="M8 2v4M16 2v4M4 10h16M9 15l2 2 4-4"/></svg></span><div><b>Không có ca nào đang mở</b><span>Mở ca mới ở mục Ca kiểm tra.</span></div></div>
+        </section>
+        <section class="tam viec" aria-labelledby="t-vc">
+          <div class="tam-dau"><h2 id="t-vc">Việc cần làm</h2></div>
+          <ul>
+            <li class="c-hp"><i></i>1 chiến dịch đang chậm nhịp — xem em nào cần nhắc</li>
+            <li class="c-xd"><i></i>1 em chưa xếp lớp — xếp lớp để lọc theo lớp</li>
+          </ul>
+        </section>
+        <p class="ghi-ve">Bản vẽ: số liệu lấy đúng như màn thầy chụp lúc 12:11. Hai dòng "Việc cần làm" là ví dụ cách hiện khi có việc.</p>
+      </div>
+    </div>
+  </main>
+</div>
