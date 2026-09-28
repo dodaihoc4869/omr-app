@@ -161,9 +161,16 @@
   }
   .vo-thay[data-hoa2] .day-thay-muc {
     font-size: 11.5px;
+    padding-inline: 0;
+    white-space: nowrap; /* "Ca kiểm tra" đậm không tách 2 dòng ở 360 px */
   }
   .vo-thay[data-hoa2] .day-thay-bieu-tuong {
     width: 56px;
+  }
+}
+@media (max-width: 379px) {
+  .vo-thay[data-hoa2] .day-thay-muc {
+    font-size: 11px;
   }
 }
 

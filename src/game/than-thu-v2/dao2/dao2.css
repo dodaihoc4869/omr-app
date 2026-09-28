@@ -54,7 +54,7 @@
 /* ───── 1. BẢN ĐỒ ───── */
 .dao2 .dao2-bd{display:flex;flex-direction:column;gap:12px}
 .dao2 .dao2-bd-dau{display:flex;align-items:center;gap:10px}
-.dao2 .dao2-bd-dau h2{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;font-size:clamp(18px,5.4vw,22px);font-weight:800;line-height:1.15;overflow-wrap:anywhere}
+.dao2 .dao2-bd-dau h2{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;font-size:clamp(17px,5vw,22px);font-weight:800;line-height:1.15;overflow-wrap:break-word}
 .dao2 .dao2-the-luc{display:flex;align-items:center;gap:6px;flex:0 0 auto;margin:0;padding:6px 10px;border-radius:14px;font-weight:800;color:var(--d2-ngoc-chu);font-variant-numeric:tabular-nums}
 .dao2 .dao2-the-luc polygon{fill:var(--d2-xanh)}
 .dao2 .dao2-the-luc span{display:flex;flex-direction:column;line-height:1.1;font-size:14px}
