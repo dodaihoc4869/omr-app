@@ -1,6 +1,6 @@
 // ĐOÀN HỘ TỐNG — màn TRONG TRẬN (bản vẽ 2) và TRÙM CÂU CHUNG (bản vẽ 5). Không cuộn từ 360×740: mọi khối cố định chiều cao,
 // chỉ riêng thẻ câu được cuộn BÊN TRONG khi đề quá dài.
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { Question } from './core'
 import { CHIEU, HIEP_TRUM, NL_KY_NANG, CHAN, satThuongDon, type HanhDong } from './doan-core'
 import { CHU_TRANG_THAI, NHAN_CAU, TIN_HIEU_TRUM, type DoanXem, type GheXem, type KetQuaCau } from './doan-kieu'
@@ -62,7 +62,12 @@ function DoiHinh({ ghe }: { ghe: GheXem[] }) {
   )
 }
 
+const KHOA_TI = 'ddh.doan2.tiCot', TI_MIN = 30, TI_MAX = 75, TI_MAC_DINH = 58
+function docTi(): number { try { const v = Number(localStorage.getItem(KHOA_TI)); return v >= TI_MIN && v <= TI_MAX ? v : TI_MAC_DINH } catch { return TI_MAC_DINH } }
+
 export default function DoanTran(p: Props) {
+  const khungRef = useRef<HTMLDivElement>(null), [ti, setTi] = useState(docTi)
+  const datTi = (v: number) => { const x = Math.min(TI_MAX, Math.max(TI_MIN, v)); setTi(x); try { localStorage.setItem(KHOA_TI, String(Math.round(x))) } catch { /* máy chặn lưu: bỏ qua */ } }
   const { xem } = p, tran = xem.tran!, em = xem.ghe.find(g => g.laEm)!
   // Ảnh của câu tải xong rồi mới dựng thẻ câu (ảnh nạp trễ đẩy lưới đáp án xuống dưới ngón tay — P0 "đáp án bị nhảy"); câu không ảnh ⇒ sẵn sàng ngay.
   const anhCauXong = useAnhSanSang(cacAnhCuaCau(p.de)), anhTrumXong = useAnhSanSang(cacAnhCuaCau(p.deTrum))
@@ -229,14 +234,19 @@ export default function DoanTran(p: Props) {
 
   // Hóa 2.0 · bố cục NGANG (docs/ban-ve-ngang-2809, doan2-ngang.css): hai cột bọc `display:contents` ⇒ màn dọc y nguyên; màn ngang thành lưới 7/5
   // (chiến trường trái · câu + đòn + CHỐT ĐÒN phải; hiệp trùm 4 ý dài thì đảo: câu trái, trùm phải). Cờ tắt: không bọc gì.
+  // Thanh kéo đổi độ rộng hai cột (thầy 28/09): `--dh2-ti` = % bề rộng cột ĐỨNG ĐẦU (hiệp trùm là cột câu), lưu trên máy em.
+  const keoTi = (x: number) => { const r = khungRef.current?.getBoundingClientRect(); if (r && r.width > 0) datTi((x - r.left) / r.width * 100) }
   const bocPhai = (x: ReactNode) => v2 ? <div className="dh2-cot dh2-cot-phai" data-vung="cot-phai">{x}</div> : x
   return (
-    <div className={v2 ? `dh-khung dh2-tran${tran.laTrum ? ' dh2-tran-trum' : ''}` : 'dh-khung'}>
+    <div ref={khungRef} className={v2 ? `dh-khung dh2-tran${tran.laTrum ? ' dh2-tran-trum' : ''}` : 'dh-khung'} style={v2 ? { '--dh2-ti': ti } as CSSProperties : undefined}>
       {v2 ? <div className="dh2-cot dh2-cot-trai" data-vung="cot-trai"><Canh2 xem={xem} tran={tran} con={p.conGiay} mo={mo} oPhucKich={p.oPhucKich ?? null} onRoi={p.onRoi} /></div> : <>
         <ThanhHiep hiep={tran.hiep} soHiep={tran.soHiep} ketThuc={tran.ketThuc} con={p.conGiay} giay={tran.giay} hien={mo} onRoi={p.onRoi} />
         {canh}
         {daiDoi}
       </>}
+      {v2 && <div className="dh2-keo" role="separator" aria-orientation="vertical" aria-label="Kéo để đổi độ rộng hai cột" aria-valuemin={TI_MIN} aria-valuemax={TI_MAX} aria-valuenow={Math.round(ti)} tabIndex={0}
+        onPointerDown={e => e.currentTarget.setPointerCapture(e.pointerId)} onPointerMove={e => { if (e.currentTarget.hasPointerCapture(e.pointerId)) keoTi(e.clientX) }}
+        onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); datTi(ti + (e.key === 'ArrowLeft' ? -5 : 5)) } }}><i /></div>}
       {bocPhai(<>
       {than}
       {/* Thẻ tiếp sức của bạn nằm DƯỚI câu: đặt trên câu thì mỗi lần bạn gửi thẻ (nhịp hỏi 1,5 s) cả lưới đáp án bị đẩy xuống dưới ngón tay em (P0 "đáp án bị nhảy"). */}
