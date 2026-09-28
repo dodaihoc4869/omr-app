@@ -180,6 +180,15 @@ export default defineConfig({
   build: {
     target: ['es2020', 'safari14', 'ios14'],
     cssTarget: ['safari14', 'ios14'],
+    rolldownOptions: {
+      output: {
+        // GOM MẢNH NHỎ (28/09). Tách màn thi + cổng HS khỏi mảnh chính làm Rolldown cắt ra hàng chục mảnh 100–500 byte (mỗi biểu tượng lucide một tệp),
+        // đẩy precache vượt trần 170 tệp của scripts/kiem-sw.mjs. Gom mọi biểu tượng vào MỘT mảnh (≈ 10 KB) — ít tệp, ít vòng mạng, cache một lần.
+        codeSplitting: {
+          groups: [{ name: 'bieu-tuong', test: /node_modules[\\/]lucide-react[\\/]/ }],
+        },
+      },
+    },
   },
   worker: {
     format: 'es',
