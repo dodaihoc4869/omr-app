@@ -146,6 +146,8 @@ export const BANG_GIU: readonly string[] = [
   'skill_snapshot', 'nang_luc_cursor',
   // MỌI CA THI đã thi (thầy chốt 21/09 ~01:30: khi reset giữ lại toàn bộ ca thi đã thi): ca, lượt, điểm từng câu, bản đồ sai, phòng chờ, chặn vào, trạng thái, phiếu, kho ca thêm, nhận xét, đề riêng, đồng bộ Sheet, nộp khắc phục, tiến độ theo ca
   'ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'dong_bo', 'nop_khac_phuc', 'tien_do_ca',
+  // NHẬN XÉT CỦA THẦY theo em + ca (migration-2809-nhan-xet-ca-em.sql): đi cùng ca thi ⇒ GIỮ.
+  'nhan_xet_ca_em',
   // BỘ NÃO A.I (Code 1, migration-2109-bo-nao.sql): hồ sơ ngày, nhật ký điều chỉnh, bản tin — chỉ số tổng hợp + nhật ký điều chỉnh, GIỮ (Code 3 quyết 21/09 theo đề nghị của Code 1).
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin',
   // BẢNG LƯU khi gỡ em khỏi danh sách (migration-2109-hoc-sinh-da-go.sql): để KHÔI PHỤC được, không bao giờ xoá.

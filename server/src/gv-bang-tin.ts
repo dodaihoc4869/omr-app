@@ -268,7 +268,7 @@ export async function gvBangTin(env: Env, _b: Dong = {}, nowMs: number = Date.no
   if (!rVd) rVd = await Q.hoi("SELECT 'vd' AS k, body AS v FROM daily_honors WHERE day = ? UNION ALL SELECT 'tt', COUNT(DISTINCT sbd) FROM su_kien_hoc WHERE nguon = ? AND ngay_vn = ? AND luc >= ?", homQua, NGUON_THU_THACH, ngay, tuHomNay)
   if (!rVd) rVd = await Q.hoi("SELECT 'tt' AS k, COUNT(DISTINCT sbd) AS v FROM su_kien_hoc WHERE nguon = ? AND ngay_vn = ? AND luc >= ?", NGUON_THU_THACH, ngay, tuHomNay)
   // 10 · lỗi của các việc nền trong 24 giờ (B11; bảng `nhat_ky_may`)
-  const rLoiMay = await Q.hoi('SELECT nguon, COUNT(*) AS n, MAX(luc) AS cuoi FROM nhat_ky_may WHERE luc >= ? GROUP BY nguon', iso(nowMs - LOI_MAY_SO_GIO * 3_600_000))
+  const rLoiMay = await Q.hoi("SELECT nguon, COUNT(*) AS n, MAX(luc) AS cuoi FROM nhat_ky_may WHERE luc >= ? AND muc = 'loi' GROUP BY nguon", iso(nowMs - LOI_MAY_SO_GIO * 3_600_000))
   if (!rLoiMay) lyDoThieu.nhatKyMay = 'Chưa có bảng nhật ký lỗi của máy'
 
   // ---------------------------------------------------------------- baiTap[]

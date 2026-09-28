@@ -22,6 +22,7 @@ import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
 import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-nay-v2'
 import {gvLichSuCauCuaEm} from './gv-lich-su-cau'
 import {gvBaoCaoCa,gvBaoCaoCaEm} from './bao-cao-ca'
+import {gvCongBoCa,gvNhanXetCaEm} from './ca-thi-them'
 import {gvBangTinSong} from './gv-bang-tin-song'
 import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
 import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
@@ -3336,6 +3337,9 @@ const boXuLy = {
       // BÁO CÁO CA cho THẦY (docs/hop-dong-xem-diem-v2-2109.md mục 2 + 4): ĐỌC-CHỈ, không bị chặn công bố (trả `congBo`); `phan[].toiDa` / `phanTb[].toiDa` = trần điểm từng phần từ `quotaPhan` (một nguồn với chấm điểm). Lỗi đọc ⇒ {ok:false, lyDo:'loi_doc'}.
       if (p === '/gv/bao-cao-ca') return ra(await gvBaoCaoCa(envDoc, b))
       if (p === '/gv/bao-cao-ca-em') return ra(await gvBaoCaoCaEm(envDoc, b))
+      // CA THI 28/09 (server/src/ca-thi-them.ts): công bố điểm ca ĐÃ ĐÓNG (đổi cong_bo sang 'ngay', ghi nhat_ky_may) và lưu nhận xét của thầy theo em + ca. GHI — dùng env (không bản đọc).
+      if (p === '/gv/cong-bo-ca') return ra(await gvCongBoCa(env, b))
+      if (p === '/gv/nhan-xet-ca-em') return ra(await gvNhanXetCaEm(env, b))
       if (p === '/gv/suc-khoe-may-chu') return ra({ ok: true, ...sucKhoeMay(), nguong: { banMs: 1500, nghenMs: 3500, toiThieuMau: 20 }, ghiChu: 'Số đo của chính isolate đang trả lời (mỗi lượt có thể rơi vào isolate khác): lấy MAX của vài lượt gần nhất.' })
       if (p === '/gv/bang-tin-song') {
         const co = await envDoc.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('bang_tin_san').first<{ gia_tri: unknown }>().catch(() => null)

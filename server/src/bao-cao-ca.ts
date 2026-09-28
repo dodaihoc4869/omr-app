@@ -27,6 +27,7 @@ import { BAC_DANG_BAT_DAU } from './ho-so-cau-hinh'
 import { dangYeu, docSuKienDoc, phatLaiSuKien, themNgay, type NamKtDang, type SuKienDoc, type TraCuuCau } from './ho-so-nam-kt'
 import { chuyenDeThat, laBoTrong } from './su-kien-hoc'
 import { tenCuaCacDang } from './ten-dang-bo-nao'
+import { docNhanXet, docTbCaTruoc, maTranCa } from './ca-thi-them'
 import { quotaPhan, type SoCauBaPhan } from '../../src/engine/score'
 
 type Hang = Record<string, unknown>
@@ -651,7 +652,13 @@ export async function gvBaoCaoCaEm(env: Env, b: Record<string, unknown>, nowMs: 
   const sbd = chuoi(b.sbd)
   if (!maCa) return { ok: false, lyDo: 'thieu', error: 'Thiếu mã ca.' }
   if (!sbd) return { ok: false, lyDo: 'thieu', error: 'Thiếu số báo danh.' }
-  return baoCaoMotEm(env, { maCa, sbd, nowMs, chanCongBo: false, coExp: true, choThay: true })
+  const ra = await baoCaoMotEm(env, { maCa, sbd, nowMs, chanCongBo: false, coExp: true, choThay: true })
+  // Nhận xét của thầy (CA THI 28/09) — chỉ lệnh thầy; vắng ⇒ không khoá.
+  if (ra.ok === true) {
+    const nx = await docNhanXet(env, maCa, sbd)
+    if (nx) ra.nhanXet = nx
+  }
+  return ra
 }
 
 interface ThongKeCau {
@@ -840,6 +847,15 @@ async function dungBaoCaoCa(env: Env, maCa: string, nowMs: number): Promise<Hang
     .map((h) => ({ sbd: h.sbd, ...(h.hoTen !== undefined ? { hoTen: h.hoTen } : {}), tong: h.tong, ...(h.diemTruoc !== undefined ? { diemTruoc: h.diemTruoc, doi: h.doi } : {}) }))
   if (emCanYY.length > 0) ra.emCanYY = emCanYY
   ra.hocSinh = hocSinh
+  // CA THI 28/09: bảng em × câu (điểm cao ở trên) + TB lớp ca trước cùng lớp. Câu tự luận không vào bảng.
+  const dongMa = new Map([...dongTheoEm].map(([s, ds]) => [s, ds.filter((d) => !tuLuanTheoDong(d)).map((d) => ({ phan: d.phan, soCau: d.soCau, chon: d.chon, dapAnDung: d.dapAnDung, dungSai: d.dungSai }))]))
+  const maTran = maTranCa(dongMa, hocSinh.map((h) => h.sbd))
+  if (maTran) ra.maTran = maTran
+  const truocCa = await docTbCaTruoc(env, maCa)
+  if (truocCa) {
+    tongQuan.tbCaTruoc = truocCa.tb
+    tongQuan.caTruoc = { maCa: truocCa.maCa, tenCa: truocCa.tenCa, ngay: truocCa.ngay }
+  }
 
   // ---- aiDaLo (lớp): điều chắc chắn ----
   const soCauSaiVaoLichOn = emCoLichOn.length
