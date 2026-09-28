@@ -1,24 +1,27 @@
 // GAME HÓA 2.0 — SẢNH BẢN ĐỒ BÁT LINH (bản vẽ đã chốt: docs/ban-ve-game-hoa-2-2709/Moi-SanhBanDo.dc.html;
 // Huyết Chiến theo HS-HuyetChien.dc.html; hết kế hoạch theo HS-XongHomNay.dc.html).
+// LỚP HÌNH 28/09: bản vẽ động "tươi sáng, 3D" (docs/ban-ve-sanh-dong-2809/Sanh-Dong.html) — cảnh ở CanhSanh3D.tsx,
+// hiệu ứng (hạt sáng, pháo sáng, mở màn một lần mỗi phiên) ở hieu-ung-sanh.ts. Dữ liệu, nút, luồng giữ nguyên.
 // Màn chính DUY NHẤT của app học sinh khi máy chủ bật `cheDo2`. Trả lời một câu: "hôm nay em làm gì?" — đúng MỘT nút chính (vàng):
 //   · còn ổ phục kích (câu ôn ở Đoàn)  → "PHÁ N Ổ PHỤC KÍCH" (mở Đoàn Hộ Tống); nút Đảo khoá kèm đúng câu `loiKhoaDao` của máy chủ;
 //   · hết ổ phục kích, còn câu ở Đảo   → "KHÁM PHÁ BÁT LINH ĐẢO · N câu";
 //   · hết kế hoạch                     → "Hôm nay em xong rồi" + nút Rương Bát Linh (khi mở được và chưa mở).
 // Mọi con số lấy từ máy chủ (`hoa2-sanh`, thần thú/EXP/chuỗi ngày từ /hs/ke-hoach-ngay) — không tự tính, không bịa.
 // Dải "Vào thi" chỉ hiện khi có ca kiểm tra đang mở; bấm là vào đúng luồng PhongVaoThi → ExamTakeScreen có sẵn.
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent as SuKienTro, type ReactNode } from 'react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 import { thanhExp } from '../../game/than-thu-hoa-hoc/kinh-nghiem'
 import { moRuong, type KetQuaSanh, type SanhHoa2 } from './api'
 import { useBoCucNgang, type BoCucNgang } from './bo-cuc-ngang'
 import { chuHanNop, ngaySau, ngayThang, thuNgayThang } from './thoi-gian'
+import CanhSanh3D from './CanhSanh3D'
+import { hat, hatBay, loatPhao, MAU_PHAO, nhanLuotMoMan, timFx, veToaDoFx } from './hieu-ung-sanh'
 import './sanh-ban-do.css'
 import './phong-baloo'
 
 /** Câu thứ mấy trở đi em không nhận EXP ở ngày Huyết Chiến = trần EXP ngày thường (40 câu, srs2-loi.ts TRAN_NGAY) + 1. */
 export const CAU_HET_EXP_HUYET_CHIEN = 41
-/** Hiện tối đa bấy nhiêu ổ phục kích trên đường (chữ vẫn nói đủ số thật). */
-const TOI_DA_O_VE = 6
+export { diemTrenDuong, viTriOPhucKich, TOI_DA_O_VE } from './CanhSanh3D'
 
 export interface ThuTrenHud {
   /** Chỉ số thú trong PETS (0..7). */
@@ -53,195 +56,7 @@ export interface SanhBanDoProps {
   onTaiLai: () => void
 }
 
-// ─── đường hộ tống: hai đoạn Bézier của bản vẽ (bến → cầu) ─────────────────────────────────────────
-type Diem = [number, number]
-const DOAN_1: [Diem, Diem, Diem, Diem] = [[84, 470], [120, 430], [104, 370], [146, 334]]
-const DOAN_2: [Diem, Diem, Diem, Diem] = [[146, 334], [168, 314], [176, 296], [186, 272]]
-function bezier([p0, p1, p2, p3]: [Diem, Diem, Diem, Diem], t: number): Diem {
-  const u = 1 - t
-  const a = u * u * u, b = 3 * u * u * t, c = 3 * u * t * t, d = t * t * t
-  return [a * p0[0] + b * p1[0] + c * p2[0] + d * p3[0], a * p0[1] + b * p1[1] + c * p2[1] + d * p3[1]]
-}
-/** Điểm trên đường ở tỉ lệ t (0 = bến, 1 = chân cầu). Đoạn 1 dài hơn nên chiếm 70%. */
-export function diemTrenDuong(t: number): Diem {
-  const k = Math.max(0, Math.min(1, t))
-  return k < 0.7 ? bezier(DOAN_1, k / 0.7) : bezier(DOAN_2, (k - 0.7) / 0.3)
-}
-/** Vị trí n ổ phục kích rải đều trên đường (bỏ đoạn sát bến và sát cầu). */
-export function viTriOPhucKich(n: number): Diem[] {
-  const so = Math.max(0, Math.min(TOI_DA_O_VE, Math.floor(n)))
-  if (so === 0) return []
-  if (so === 1) return [diemTrenDuong(0.55)]
-  return Array.from({ length: so }, (_, i) => diemTrenDuong(0.14 + (0.8 * i) / (so - 1)))
-}
-
 const phanTram = (a: number, b: number) => (b > 0 ? Math.round((100 * Math.min(a, b)) / b) : 0)
-const pct = (x: number, tong: number) => `${(100 * x) / tong}%`
-
-// 8 đảo mờ của quần đảo Bát Linh (tranh nền, không mang số liệu).
-const DAO_MO: { d?: string; cx?: number; cy?: number; r?: number; mo: number }[] = [
-  { d: 'M26,106 C28,86 52,76 74,82 C98,88 108,108 100,126 C92,144 64,150 44,142 C28,136 24,122 26,106 Z', mo: 0.55 },
-  { d: 'M266,98 C268,86 282,80 294,84 C306,88 310,100 304,110 C298,118 280,120 272,114 C266,110 265,104 266,98 Z', mo: 0.45 },
-  { d: 'M326,330 C328,316 344,310 356,316 C368,322 370,336 362,344 C352,352 334,350 328,344 C324,340 325,336 326,330 Z', mo: 0.4 },
-  { cx: 30, cy: 262, r: 12, mo: 0.3 },
-  { cx: 350, cy: 420, r: 9, mo: 0.3 },
-  { cx: 240, cy: 420, r: 8, mo: 0.3 },
-  { cx: 362, cy: 232, r: 10, mo: 0.3 },
-  { cx: 318, cy: 520, r: 11, mo: 0.3 },
-]
-/** Bản ngang: nới biển sang TRÁI (chừa chỗ cho tiêu đề + chú giải ở cột bản đồ), khung 700 × 600; tranh cũ giữ nguyên toạ độ. */
-export const BD_NGANG = { x0: -190, rong: 600, cao: 600 } as const
-const VIEN_DAO = 'M150,200 C150,140 200,110 250,118 C300,124 330,160 322,205 C316,250 280,275 235,272 C190,270 150,255 150,200 Z'
-
-function BanDo({ s, ngang = false }: { s: SanhHoa2 | null; ngang?: boolean }) {
-  const x0 = ngang ? BD_NGANG.x0 : 0
-  const rong = ngang ? BD_NGANG.rong : 390
-  const px = (x: number) => pct(x - x0, rong)
-  const cd = s?.chienDich ?? null
-  const p = cd ? phanTram(cd.coXat, cd.tong) : 0
-  // Sương mù trên đảo chiến dịch: càng cọ xát nhiều câu, sương càng tan.
-  const suong = cd ? Math.max(0, 0.92 * (1 - p / 100)) : 0.92
-  const oPk = s ? viTriOPhucKich(s.doan.con) : []
-  const khoa = !!s?.khoaDao
-  return (
-    <div className="h2-ban-do" data-khoa-dao={khoa ? 'true' : 'false'}>
-      <svg viewBox={`${x0} 0 ${rong} 600`} preserveAspectRatio={ngang ? 'xMidYMid meet' : 'xMidYMin meet'} aria-hidden="true" focusable="false">
-        <defs>
-          <linearGradient id="h2sb-bien" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="rgb(13 42 94)" />
-            <stop offset="0.6" stopColor="rgb(10 31 74)" />
-            <stop offset="1" stopColor="rgb(7 18 41)" />
-          </linearGradient>
-          <radialGradient id="h2sb-dat" cx="40%" cy="35%">
-            <stop offset="0" stopColor="rgb(70 209 154)" />
-            <stop offset="0.6" stopColor="rgb(31 140 102)" />
-            <stop offset="1" stopColor="rgb(19 96 72)" />
-          </radialGradient>
-          <radialGradient id="h2sb-mo" cx="40%" cy="35%">
-            <stop offset="0" stopColor="rgb(58 110 126)" />
-            <stop offset="1" stopColor="rgb(28 63 82)" />
-          </radialGradient>
-          <radialGradient id="h2sb-linh-tam" cx="40%" cy="35%">
-            <stop offset="0" stopColor="rgb(255 255 255)" />
-            <stop offset="0.35" stopColor="rgb(191 244 255)" />
-            <stop offset="1" stopColor="rgb(47 168 224)" />
-          </radialGradient>
-          <pattern id="h2sb-luoi" width="14" height="12" patternUnits="userSpaceOnUse">
-            <path d="M3.5 0 L10.5 0 L14 6 L10.5 12 L3.5 12 L0 6 Z" fill="none" stroke="rgb(255 255 255 / 0.18)" strokeWidth="0.8" />
-          </pattern>
-          <clipPath id="h2sb-cat-dao">
-            <path d={VIEN_DAO} />
-          </clipPath>
-          <filter id="h2sb-nhoe" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="9" />
-          </filter>
-          <filter id="h2sb-sang" x="-80%" y="-80%" width="260%" height="260%">
-            <feGaussianBlur stdDeviation="5" />
-          </filter>
-        </defs>
-        <rect x={x0} width={rong} height="600" fill="url(#h2sb-bien)" />
-        {ngang && (
-          <g data-ve="bien-ngang">
-            <path d="M-240 250 q20 -6 40 0 t40 0 t40 0 M-200 470 q20 -6 40 0 t40 0 t40 0 M-130 560 q20 -6 40 0 t40 0" stroke="rgb(140 200 255 / 0.14)" strokeWidth="2" fill="none" />
-            <circle cx="-150" cy="380" r="13" opacity="0.3" fill="url(#h2sb-mo)" />
-            <circle cx="-60" cy="300" r="9" opacity="0.3" fill="url(#h2sb-mo)" />
-          </g>
-        )}
-        <path
-          d="M0 150 q20 -6 40 0 t40 0 t40 0 M220 330 q20 -6 40 0 t40 0 t40 0 t40 0 M0 400 q20 -6 40 0 t40 0 M260 470 q20 -6 40 0 t40 0 t40 0 M120 540 q20 -6 40 0 t40 0 t40 0"
-          stroke="rgb(140 200 255 / 0.14)"
-          strokeWidth="2"
-          fill="none"
-        />
-        <g data-ve="dao-mo">
-          {DAO_MO.map((d, i) =>
-            ngang && i === 0 ? null : d.d ? (
-              <path key={i} d={d.d} opacity={d.mo} fill="url(#h2sb-mo)" stroke="rgb(143 183 196)" strokeWidth="3" />
-            ) : (
-              <circle key={i} cx={d.cx} cy={d.cy} r={d.r} opacity={d.mo} fill="url(#h2sb-mo)" />
-            ),
-          )}
-        </g>
-
-        {/* Đảo chiến dịch: viền cát, đất, lưới lục giác, sương mù theo % cọ xát */}
-        <path d={VIEN_DAO} fill="none" stroke="rgb(233 207 148)" strokeWidth="10" />
-        <path d={VIEN_DAO} fill="url(#h2sb-dat)" />
-        <g clipPath="url(#h2sb-cat-dao)">
-          <rect x="140" y="100" width="200" height="190" fill="url(#h2sb-luoi)" />
-          <ellipse cx="205" cy="170" rx="30" ry="16" fill="rgb(42 168 119)" opacity="0.8" />
-          <ellipse cx="190" cy="228" rx="26" ry="12" fill="rgb(23 115 86)" opacity="0.8" />
-          <circle cx="176" cy="190" r="6" fill="rgb(15 90 64)" />
-          <circle cx="222" cy="206" r="5" fill="rgb(15 90 64)" />
-          <circle cx="200" cy="150" r="5" fill="rgb(15 90 64)" />
-          <g data-ve="suong" filter="url(#h2sb-nhoe)" fill="rgb(220 232 245)" opacity={suong.toFixed(2)}>
-            <circle cx="290" cy="165" r="44" />
-            <circle cx="305" cy="215" r="40" />
-            <circle cx="262" cy="246" r="34" />
-            <circle cx="268" cy="132" r="30" />
-            <circle cx="248" cy="195" r="22" />
-          </g>
-        </g>
-
-        {/* Đường hộ tống + ổ phục kích (= câu ôn còn ở Đoàn) */}
-        <path d="M84,470 C120,430 104,370 146,334 C168,314 176,296 186,272" stroke="rgb(255 201 64)" strokeWidth="3" strokeDasharray="2 9" strokeLinecap="round" fill="none" />
-        <g data-ve="o-phuc-kich" data-so={oPk.length}>
-          {oPk.map(([x, y], i) => (
-            <g key={i}>
-              <circle cx={x} cy={y} r="15" fill="rgb(255 92 138)" opacity="0.35" filter="url(#h2sb-sang)" />
-              <circle cx={x} cy={y} r="11" fill="rgb(232 61 109)" stroke="rgb(58 10 26)" strokeWidth="2" />
-              <circle cx={x - 4} cy={y - 2} r="2" fill="rgb(255 255 255)" />
-              <circle cx={x + 4} cy={y - 2} r="2" fill="rgb(255 255 255)" />
-            </g>
-          ))}
-        </g>
-
-        {/* Cầu sang đảo: kéo lên + ổ khoá khi khoaDao; hạ xuống khi đã phá hết ổ phục kích */}
-        <rect x="180" y="258" width="5" height="22" rx="2" fill="rgb(139 90 43)" />
-        <rect x="196" y="252" width="5" height="22" rx="2" fill="rgb(139 90 43)" />
-        {khoa ? (
-          <g data-ve="cau-keo-len">
-            <rect x="182" y="238" width="16" height="26" rx="2" fill="rgb(176 122 62)" stroke="rgb(90 53 20)" strokeWidth="2" transform="rotate(-22 190 262)" />
-            <circle cx="206" cy="284" r="9" fill="rgb(26 42 85)" stroke="rgb(255 201 64)" strokeWidth="2" />
-            <path d="M202 284 h8 v6 h-8 z M204 284 v-3 a2 2 0 0 1 4 0 v3" stroke="rgb(255 201 64)" strokeWidth="1.6" fill="none" />
-          </g>
-        ) : (
-          <g data-ve="cau-ha">
-            <rect x="176" y="262" width="30" height="10" rx="2" fill="rgb(176 122 62)" stroke="rgb(90 53 20)" strokeWidth="2" transform="rotate(-24 190 267)" />
-          </g>
-        )}
-
-        {/* Bến Hộ Tống: xe hàng + Linh Tâm của lớp */}
-        <rect x="30" y="486" width="70" height="10" rx="3" fill="rgb(139 90 43)" />
-        <rect x="36" y="496" width="4" height="14" fill="rgb(90 53 20)" />
-        <rect x="88" y="496" width="4" height="14" fill="rgb(90 53 20)" />
-        <path d="M44 480 h40 l6 -12 h-50 z" fill="rgb(201 138 62)" stroke="rgb(90 53 20)" strokeWidth="2" />
-        <circle cx="52" cy="484" r="5" fill="rgb(58 42 26)" />
-        <circle cx="80" cy="484" r="5" fill="rgb(58 42 26)" />
-        <circle cx="64" cy="456" r="16" fill="rgb(111 227 255)" opacity="0.35" filter="url(#h2sb-sang)" />
-        <circle cx="64" cy="456" r="9" fill="url(#h2sb-linh-tam)" />
-      </svg>
-
-      {cd && (
-        <span className="h2-nhan-bd h2-kinh h2-nhan-dao" style={{ left: px(148), top: pct(88, 600) }}>
-          Đảo {cd.ten} · {p}% đã khai phá
-        </span>
-      )}
-      {s && s.doan.con > 0 && (
-        <span className="h2-nhan-bd h2-kinh h2-nhan-phuc-kich" style={{ left: px(196), top: pct(290, 600) }}>
-          {s.doan.con} ổ phục kích chặn cầu
-        </span>
-      )}
-      {s && s.doan.con === 0 && s.dao.con > 0 && (
-        <span className="h2-nhan-bd h2-kinh h2-nhan-cau-ha" style={{ left: px(196), top: pct(290, 600) }}>
-          Cầu sang đảo đã hạ
-        </span>
-      )}
-      <span className="h2-nhan-bd h2-kinh h2-nhan-ben" style={{ left: px(108), top: pct(470, 600) }}>
-        Bến Hộ Tống · Linh Tâm của lớp
-      </span>
-    </div>
-  )
-}
 
 /** HUD thần thú. Bản ngang: `theLuc` và `chuoiNgay` = null (Thể lực có thẻ riêng ở cột phải, Chuỗi ngày ở hàng trên — một thông tin một chỗ). */
 function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 'thu' | 'exp' | 'onMoThanThu'> & { chuoiNgay: number | null; theLuc: { con: number; tong: number } | null }) {
@@ -253,10 +68,10 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 
     <header className="h2-hud h2-kinh">
       <button type="button" className="h2-hud-thu" onClick={onMoThanThu} aria-label={thu ? `Mở thần thú của em: ${nhanThu}` : 'Mở thần thú của em'}>
         <span className="h2-luc-giac">
-          <svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
-            <polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="rgb(27 47 102)" stroke="rgb(255 201 64)" strokeWidth="2.5" />
-          </svg>
-          {thu && <img src={anhThu(thu.index, thu.cap, true)} alt="" width={36} height={36} />}
+          <span className="h2-vong-hao-sang" aria-hidden="true" />
+          <span className="h2-vong-hao" aria-hidden="true" />
+          <span className="h2-mat-thu" aria-hidden="true" />
+          {thu && <img src={anhThu(thu.index, thu.cap, true)} alt="" width={44} height={44} />}
           {thu && (
             <span className="h2-cap baloo" aria-hidden="true">
               {thu.cap}
@@ -268,6 +83,7 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 
           {co !== null && (
             <span className="h2-thanh-exp" role="progressbar" aria-label="EXP của thần thú tới cấp sau" aria-valuemin={0} aria-valuemax={can} aria-valuenow={co}>
               <span style={{ width: `${Math.round(tiLe * 100)}%` }} />
+              <i className="h2-exp-luot" aria-hidden="true" />
             </span>
           )}
           {exp && (
@@ -280,15 +96,19 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 
         {theLuc && (
           <span className="h2-hud-so h2-the-luc" aria-label={`Thể lực hôm nay: còn ${theLuc.con}/${theLuc.tong} câu`}>
             <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true" focusable="false">
-              <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(55 226 213)" />
+              <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(0 170 175)" />
             </svg>
-            <span className="h2-nhan-nho">Thể lực</span> {theLuc.con}/{theLuc.tong}
+            <span className="h2-chip-chu">
+              <span className="h2-nhan-nho">Thể lực</span> <b>{theLuc.con}/{theLuc.tong}</b>
+            </span>
           </span>
         )}
         {chuoiNgay !== null && (
           <span className="h2-hud-so h2-chuoi" aria-label={`Chuỗi ${chuoiNgay} ngày`}>
             <IconChuoi />
-            Chuỗi {chuoiNgay} ngày
+            <span className="h2-chip-chu">
+              <span className="h2-nhan-nho">Chuỗi</span> <b>{chuoiNgay} ngày</b>
+            </span>
           </span>
         )}
       </span>
@@ -382,9 +202,9 @@ function DongChienDich({ s, now }: { s: SanhHoa2; now: number }) {
     <div className="h2-cd">
       <span className="h2-vong" role="img" aria-label={`Cọ xát ${p}%`}>
         <svg width="58" height="58" viewBox="0 0 58 58" aria-hidden="true" focusable="false">
-          <circle cx="29" cy="29" r="25" stroke="rgb(255 255 255 / 0.12)" strokeWidth="6" fill="none" />
-          <circle cx="29" cy="29" r="25" stroke="rgb(55 226 213)" strokeWidth="6" fill="none" strokeDasharray={`${((chuVi * p) / 100).toFixed(1)} ${chuVi.toFixed(1)}`} strokeLinecap="round" transform="rotate(-90 29 29)" />
-          <circle cx="29" cy="29" r="16" stroke="rgb(255 255 255 / 0.12)" strokeWidth="5" fill="none" />
+          <circle cx="29" cy="29" r="25" stroke="rgb(40 50 110 / 0.1)" strokeWidth="6" fill="none" />
+          <circle cx="29" cy="29" r="25" stroke="rgb(0 170 175)" strokeWidth="6" fill="none" strokeDasharray={`${((chuVi * p) / 100).toFixed(1)} ${chuVi.toFixed(1)}`} strokeLinecap="round" transform="rotate(-90 29 29)" />
+          <circle cx="29" cy="29" r="16" stroke="rgb(40 50 110 / 0.1)" strokeWidth="5" fill="none" />
         </svg>
         <span className="baloo">{p}%</span>
       </span>
@@ -479,6 +299,20 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
   const [dangMo, setDangMo] = useState(false)
   const [loi, setLoi] = useState('')
   const [vangVuaNhan, setVangVuaNhan] = useState<number | null>(null)
+  const refRuong = useRef<HTMLSpanElement | SVGSVGElement | null>(null)
+  const huyPhao = useRef<() => void>(() => {})
+  useEffect(() => () => huyPhao.current(), [])
+  /** Pháo sáng khi mở rương: hạt nổ ở rương + loạt pháo (không có ở máy giảm chuyển động). */
+  const phaoMoRuong = () => {
+    const el = refRuong.current
+    const fx = timFx(el)
+    if (!el || !fx) return
+    const r = el.getBoundingClientRect()
+    const [x, y] = veToaDoFx(fx, r.left + r.width / 2, r.top + r.height / 2)
+    hat(fx, x, y, 40, MAU_PHAO[0], 90, 7, 1.2, 20)
+    huyPhao.current()
+    huyPhao.current = loatPhao(fx)
+  }
   const r = s.ruong
   const moDuoc = r.moDuoc && !r.daMo && vangVuaNhan === null
   const vangDaCo = vangVuaNhan ?? r.qua?.vang ?? null
@@ -489,6 +323,7 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
     try {
       const kq = await moRuong(token)
       setVangVuaNhan(kq.vang)
+      phaoMoRuong()
       onTaiLai()
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Chưa mở được rương. Em thử lại.')
@@ -527,7 +362,7 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
         <p className="h2-ng-xong-chu">{moDuoc ? 'Em làm trọn kế hoạch — Rương Bát Linh đã sẵn sàng mở' : 'Em làm trọn kế hoạch hôm nay'}</p>
         <div className="h2-ng-xong-tranh" aria-hidden="true">
           {thu && <img className="h2-ng-xong-thu" src={anhThu(thu.index, thu.cap)} alt="" width={200} height={200} />}
-          <svg className="h2-ng-xong-ruong" width="190" height="170" viewBox="0 0 190 170" focusable="false">
+          <svg className="h2-ng-xong-ruong" ref={(e) => { refRuong.current = e }} data-mo={vangDaCo !== null ? 'true' : 'false'} width="190" height="170" viewBox="0 0 190 170" focusable="false">
             <path d="M16 70 a79 56 0 0 1 158 0 v14 h-158 z" fill="rgb(176 122 62)" stroke="rgb(90 53 20)" strokeWidth="6" />
             <rect x="16" y="80" width="158" height="80" rx="10" fill="rgb(150 98 46)" stroke="rgb(90 53 20)" strokeWidth="6" />
             <rect x="10" y="74" width="170" height="16" rx="4" fill="rgb(255 201 64)" />
@@ -561,9 +396,20 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
     <>
       <section className="h2-xong" aria-label="Hôm nay em xong rồi">
         <div className="h2-xong-dau">
-          <span className="h2-xong-o" aria-hidden="true">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" focusable="false">
-              <path d="M5 12l5 5L20 7" />
+          <span className="h2-ruong-3d" ref={(e) => { refRuong.current = e }} data-mo={vangDaCo !== null ? 'true' : 'false'} aria-hidden="true">
+            <span className="h2-tia-ruong" />
+            <svg viewBox="0 0 64 64" focusable="false">
+              <g className="h2-than-ruong">
+                <ellipse cx="32" cy="58" rx="24" ry="4" fill="rgb(30 90 60 / .25)" />
+                <rect x="8" y="30" width="48" height="26" rx="4" fill="rgb(206 130 50)" stroke="rgb(120 66 20)" strokeWidth="2.5" />
+                <rect x="8" y="38" width="48" height="5" fill="rgb(255 200 60)" />
+                <rect x="28" y="34" width="8" height="12" rx="2" fill="rgb(255 226 120)" stroke="rgb(150 90 10)" strokeWidth="1.5" />
+                <g className="h2-nap-ruong">
+                  <path d="M8 32 V26 a24 12 0 0 1 48 0 V32 Z" fill="rgb(230 160 80)" stroke="rgb(120 66 20)" strokeWidth="2.5" />
+                  <path d="M8 29 h48" stroke="rgb(255 200 60)" strokeWidth="4" />
+                  <path d="M14 22 q18 -12 36 0" stroke="rgb(255 240 200 / .8)" strokeWidth="2" fill="none" />
+                </g>
+              </g>
             </svg>
           </span>
           <span className="h2-xong-lon baloo">Hôm nay em xong rồi</span>
@@ -624,7 +470,9 @@ function NutViec({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
       ) : s.dao.con > 0 ? (
         <button type="button" className="h2-nut-chinh" onClick={p.onKhamPhaDao}>
           <span className="h2-nut-chinh-chu">
-            <span className="h2-nut-chinh-lon baloo">KHÁM PHÁ BÁT LINH ĐẢO · {s.dao.con} câu</span>
+            <span className="h2-nut-chinh-lon baloo">
+              KHÁM PHÁ BÁT LINH ĐẢO <span className="h2-nw">· {s.dao.con} câu</span>
+            </span>
             <span className="h2-nut-chinh-nho">Đã phá hết ổ phục kích · cầu sang đảo đã hạ</span>
           </span>
           <IconKiem />
@@ -660,8 +508,8 @@ function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
     <section className="h2-ng-the h2-ng-cd" aria-label="Chiến dịch đang mở">
       <span className="h2-ng-vong" role="img" aria-label={`Cọ xát ${p}%`}>
         <svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
-          <circle cx="48" cy="48" r="40" stroke="rgb(255 255 255 / 0.12)" strokeWidth="9" fill="none" />
-          <circle cx="48" cy="48" r="40" stroke="rgb(55 226 213)" strokeWidth="9" fill="none" strokeDasharray={`${((chuVi * p) / 100).toFixed(1)} ${chuVi.toFixed(1)}`} strokeLinecap="round" transform="rotate(-90 48 48)" />
+          <circle cx="48" cy="48" r="40" stroke="rgb(40 50 110 / 0.1)" strokeWidth="9" fill="none" />
+          <circle cx="48" cy="48" r="40" stroke="rgb(0 170 175)" strokeWidth="9" fill="none" strokeDasharray={`${((chuVi * p) / 100).toFixed(1)} ${chuVi.toFixed(1)}`} strokeLinecap="round" transform="rotate(-90 48 48)" />
         </svg>
         <span className="h2-ng-vong-chu">
           <b className="baloo">{p}%</b>
@@ -688,7 +536,7 @@ function TheTheLucNgang({ s }: { s: SanhHoa2 }) {
     <section className="h2-ng-the h2-ng-tl" aria-label="Thể lực hôm nay">
       <span className="h2-ng-tl-o" aria-hidden="true">
         <svg width="24" height="26" viewBox="0 0 14 16" focusable="false">
-          <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(55 226 213)" />
+          <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(0 170 175)" />
         </svg>
       </span>
       <span className="h2-ng-tl-chu">
@@ -813,7 +661,44 @@ function ChuGiai() {
   )
 }
 
-function SanhNgang({ p, bc }: { p: SanhBanDoProps; bc: BoCucNgang }) {
+/** Cảnh mở màn ~2 giây: chỉ LẦN ĐẦU Sảnh có dữ liệu trong phiên (sessionStorage), không chạy ở máy giảm chuyển động. */
+function useMoMan(coDuLieu: boolean): boolean {
+  const [dang, setDang] = useState(false)
+  const daXet = useRef(false)
+  const hen = useRef(0)
+  useLayoutEffect(() => {
+    if (!coDuLieu || daXet.current) return
+    daXet.current = true
+    if (!nhanLuotMoMan()) return
+    setDang(true)
+    hen.current = window.setTimeout(() => setDang(false), 2600)
+  }, [coDuLieu])
+  useEffect(() => () => clearTimeout(hen.current), [])
+  return dang
+}
+
+/** Hạt sáng bay lên khi rê / chạm nút chính vàng (một bộ nghe ở gốc Sảnh cho mọi `.h2-nut-chinh`). */
+let lanReCuoi = 0
+function phunHatNut(e: SuKienTro<HTMLDivElement>, n: number) {
+  const nut = (e.target as Element | null)?.closest?.('.h2-nut-chinh')
+  if (!nut || (nut as HTMLButtonElement).disabled) return
+  if (n < 5) {
+    if (e.pointerType !== 'mouse') return
+    const bay = performance.now()
+    if (bay - lanReCuoi < 70) return
+    lanReCuoi = bay
+  }
+  const fx = timFx(nut)
+  if (!fx) return
+  const [x, y] = veToaDoFx(fx, e.clientX, e.clientY)
+  for (let i = 0; i < n; i++) hatBay(fx, x + (Math.random() - 0.5) * 40, y)
+}
+const nghePhun = {
+  onPointerMove: (e: SuKienTro<HTMLDivElement>) => phunHatNut(e, 2),
+  onPointerDown: (e: SuKienTro<HTMLDivElement>) => phunHatNut(e, 12),
+}
+
+function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan: boolean }) {
   const kq = p.ketQua
   const s = kq && kq.cheDo2 && !kq.canChonThu ? kq.sanh : null
   const chonThu = !!kq && kq.cheDo2 && kq.canChonThu === true
@@ -821,7 +706,8 @@ function SanhNgang({ p, bc }: { p: SanhBanDoProps; bc: BoCucNgang }) {
   const coThu = !chonThu
   const kieu = bc.thap ? ({ '--h2-ti-le': String(bc.tiLe) } as CSSProperties) : undefined
   return (
-    <div className="h2-sanh h2-ngang" data-bo-cuc="ngang" data-thap={bc.thap ? 'true' : 'false'} data-trang-thai={s ? 'co' : chonThu ? 'chon-thu' : p.loi ? 'loi' : 'dang-tai'} style={kieu}>
+    <div className="h2-sanh h2-ngang" data-bo-cuc="ngang" data-thap={bc.thap ? 'true' : 'false'} data-mo-man={moMan ? 'true' : 'false'} data-trang-thai={s ? 'co' : chonThu ? 'chon-thu' : p.loi ? 'loi' : 'dang-tai'} style={kieu} {...nghePhun}>
+      <div className="h2-fx" aria-hidden="true" />
       <div className="h2-ng-khung">
         <div className="h2-ng-tren">
           <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={null} theLuc={null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} />
@@ -851,7 +737,7 @@ function SanhNgang({ p, bc }: { p: SanhBanDoProps; bc: BoCucNgang }) {
           ) : (
             <>
               <div className="h2-ng-bd-vung">
-                <BanDo s={s} ngang />
+                <CanhSanh3D s={s} ngang moMan={moMan} />
               </div>
               <TieuDeBanDo s={s} />
               {s && <ChuGiai />}
@@ -900,19 +786,22 @@ function SanhNgang({ p, bc }: { p: SanhBanDoProps; bc: BoCucNgang }) {
 
 export default function SanhBanDo(p: SanhBanDoProps) {
   const bc = useBoCucNgang()
-  if (bc.ngang) return <SanhNgang p={p} bc={bc} />
-  return <SanhDoc {...p} />
+  const kq = p.ketQua
+  const moMan = useMoMan(!!kq && kq.cheDo2 && !kq.canChonThu && !!kq.sanh)
+  if (bc.ngang) return <SanhNgang p={p} bc={bc} moMan={moMan} />
+  return <SanhDoc p={p} moMan={moMan} />
 }
 
-/** Bản dọc (điện thoại) — giữ nguyên như trước bản ngang. */
-function SanhDoc(p: SanhBanDoProps) {
+/** Bản dọc (điện thoại): bản đồ 3D phủ cả khung, HUD trên, lối tắt phải, tấm kính dưới. */
+function SanhDoc({ p, moMan }: { p: SanhBanDoProps; moMan: boolean }) {
   const kq = p.ketQua
   const s = kq && kq.cheDo2 && !kq.canChonThu ? kq.sanh : null
   const chonThu = !!kq && kq.cheDo2 && kq.canChonThu === true
   return (
-    <div className="h2-sanh" data-trang-thai={s ? 'co' : chonThu ? 'chon-thu' : p.loi ? 'loi' : 'dang-tai'}>
+    <div className="h2-sanh" data-mo-man={moMan ? 'true' : 'false'} data-trang-thai={s ? 'co' : chonThu ? 'chon-thu' : p.loi ? 'loi' : 'dang-tai'} {...nghePhun}>
+      <div className="h2-fx" aria-hidden="true" />
       <div className="h2-khung">
-        <BanDo s={s} />
+        <CanhSanh3D s={s} moMan={moMan} />
         <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={p.chuoiNgay} theLuc={s ? s.theLuc : null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} />
         <Ray onCauDaLam={p.onCauDaLam} onTuiDo={p.onTuiDo} onCuaHang={p.onCuaHang} onDangXuat={p.onDangXuat} shopBat={p.shopBat} coThu={!chonThu} />
         <div className="h2-dem" aria-hidden="true" />

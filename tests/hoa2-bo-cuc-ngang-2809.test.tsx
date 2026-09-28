@@ -122,7 +122,8 @@ describe('Sảnh ngang (Ngang-Sanh)', () => {
     const goc = container.querySelector('[data-bo-cuc="ngang"]')!
     expect(goc).not.toBeNull()
     expect(goc.getAttribute('data-thap')).toBe('false')
-    expect(container.querySelector('.h2-ng-trai .h2-ban-do svg')!.getAttribute('viewBox')).toBe('-190 0 600 600')
+    // 28/09 lớp hình Sảnh 3D: cảnh tự khớp khung (đo DOM); jsdom không có kích thước ⇒ viewBox mặc định của vùng cảnh (thay '-190 0 600 600' cũ có chủ ý).
+    expect(container.querySelector('.h2-ng-trai .h2-ban-do svg')!.getAttribute('viewBox')).toBe('-12 -14 424 522')
     expect(container.querySelector('.h2-ng-trai')!.textContent).toContain('Đảo Carbohydrate')
     expect(container.querySelector('[data-ve="o-phuc-kich"]')!.getAttribute('data-so')).toBe('4')
     // bản dọc không còn: không thanh lối tắt dọc, không tấm dưới
