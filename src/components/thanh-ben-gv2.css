@@ -164,3 +164,19 @@
     width: 56px;
   }
 }
+
+/* ba màn 2.0 dạng bảng số liệu dùng hết bề ngang (bản vẽ: lưới 1440 − thanh bên 240); màn cũ giữ 1100 px */
+.vo-thay[data-hoa2] .giua-noi-dung:is([data-teacher-screen='tongquan'], [data-teacher-screen='lichsuca'], [data-teacher-screen='chiendich']) {
+  max-width: 1400px;
+}
+@media (max-width: 879px) {
+  /* điện thoại: thanh trên đã ghi tên màn — tiêu đề trang chỉ còn cho trình đọc màn hình (không lặp chữ) */
+  .vo-thay[data-hoa2] .gv2-tieu-de {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

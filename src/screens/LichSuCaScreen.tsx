@@ -20,6 +20,7 @@ import './lich-su-ca-m3.css'
 import { gioPhutVN } from '../lib/em-toan-canh'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { useSoDemGv } from '../lib/so-dem-gv'
+import { ngayVn } from '../components/chien-dich/ngay'
 import { demEmTheoLop, soVi, thongKeThang } from '../lib/tong-quan-gv'
 import './gv-hoa2.css'
 
@@ -66,6 +67,14 @@ function ngayGio(iso: string): string {
   const d = new Date(iso)
   if (!Number.isFinite(d.getTime())) return ''
   return `${d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })} ${gioPhutVN(iso)}`
+}
+
+/** Bảng 2.0: "19:15 · 28/09" (giờ Việt Nam, 24 giờ — bản vẽ GV-CaKiemTra). */
+function gioNgayHoa2(iso: string): string {
+  const t = new Date(iso).getTime()
+  if (!Number.isFinite(t)) return ''
+  const n = ngayVn(t)
+  return `${gioPhutVN(iso)} · ${n.slice(8, 10)}/${n.slice(5, 7)}`
 }
 
 export default function LichSuCaScreen() {
@@ -576,7 +585,7 @@ export default function LichSuCaScreen() {
                         <div className="gv2-phu">Mã ca {c.maCa}</div>
                       </td>
                       <td>{c.lop || '—'}</td>
-                      <td className="gv2-so gv2-khong-xuong">{ngayGio(c.batDau || c.moLuc)}</td>
+                      <td className="gv2-so gv2-khong-xuong">{gioNgayHoa2(c.batDau || c.moLuc)}</td>
                       <td className="gv2-so gv2-phai">
                         <b>{c.daVao}</b>
                         {moi > 0 && <span className="gv2-phu"> / {moi}</span>}
