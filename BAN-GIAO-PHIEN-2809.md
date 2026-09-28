@@ -60,3 +60,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - ĐÃ PHÁT HÀNH PR #24 (`d56a32d`): bỏ tự toàn màn hình khi vào game; nút toàn màn hình kính tròn góc dưới phải (NutToanManHinh).
 - ĐANG CHẠY: (1) màu M3 toàn app GV — nhánh `gv-mau-m3`; (2) game sáng/tối theo hệ thống — nhánh `game-sang-toi`; (3) rà soát màn chiếu Gọi lên bảng + đề xuất — nhánh `ra-soat-len-bang` (`docs/ra-soat-len-bang-2809/DE-XUAT.md`), CHỈ đề xuất, chờ thầy chốt.
 - ĐÃ PHÁT HÀNH PR #25 ô "có trợ giúp" thẻ công tắc. RÀ SOÁT lên bảng xong: `docs/ra-soat-len-bang-2809/DE-XUAT.md` (16 hạn chế, 10 đề xuất P1–P10) — CHỜ THẦY CHỐT.
+- ĐÃ PHÁT HÀNH PR #26 PDF chỉ đề + nét hơn (`a3f6521`); PR #27 màu M3 toàn app GV (`4232ea5`). Còn chạy: game sáng/tối (`game-sang-toi`). Chờ thầy chốt: đề xuất màn chiếu lên bảng P1–P10.
