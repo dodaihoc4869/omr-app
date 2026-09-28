@@ -47,3 +47,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - BƯỚC TIẾP: gộp 5 nhánh vào `gop-ngang-gv-2809` (từ origin/main) → sửa việc tồn → test → PR → merge.
 - THẦY ĐÃ CHỐT Sảnh 3D tươi sáng (bản vẽ `9cc4be1`). Đang build ở nhánh `sanh-3d` (tách từ `gop-ngang-gv-2809` @ `d25724e`). Nhánh gộp 5 phần: `gop-ngang-gv-2809` (đã đẩy), đang chạy toàn bộ vitest so nền main.
 - Kế hoạch phát hành: gộp `sanh-3d` vào `gop-ngang-gv-2809` → test → PR vào main → merge (một lượt phát hành).
+- ĐÃ PHÁT HÀNH 5 phần: PR #16 merge → main `8906461` (CI tự đẩy Pages + Worker ~12 phút). Lùi: `git revert -m 1 8906461`. Lúc phát hành 0 ca thi.
+- CÒN: Sảnh 3D (nhánh `sanh-3d`, trợ lý đang làm; nếu phiên chết thì làm lại theo bản vẽ `9cc4be1:docs/ban-ve-sanh-dong-2809/Sanh-Dong.html`, giữ số thật + `anhThu`). Xong ⇒ PR riêng vào main.
