@@ -11,6 +11,9 @@
 //   · `dang`    — sức học theo dạng 30 ngày (tỉ lệ đúng; hạng L1–L4 mốc 40/65/85, cùng mốc bản vẽ);
 //   · `chienDich` — chiến dịch đang theo (% cọ xát / thành thạo, nhịp) — tái dùng `docHoSo2` + `tiLeChienDich` + `nhipEm`;
 //   · `em`      — đầu thẻ: tên, lớp, thần thú + cấp, EXP, chuỗi ngày (tái dùng `gvEmToanCanh`).
+//   · `tienDoCap` — (hoàn thiện bản vẽ 28/09) thanh tiến độ EXP của thần thú: `{cap, exp, moc, toiDa}` = cấp hiện tại, EXP đã có TRONG thanh
+//                 cấp này (`game_v2_profile.exp`) / mốc lên cấp sau (`thanhExp(cap)`, cùng đường cấp của game); cấp 120 ⇒ `moc: null`, `toiDa: true`.
+//                 Em chưa chọn thú / chưa có hồ sơ game ⇒ VẮNG khoá. CHỈ ĐỌC.
 // Khối nào đọc lỗi thì VẮNG khoá (màn hiện "—"), không bịa số, không làm hỏng cả lệnh.
 //
 // ĐÁP ÁN EM CHỌN: sổ `su_kien_hoc` có cột `raw_json` (migration-2309-cnh1-su-kien-chuan.sql, "JSON đáp án máy em gửi") nhưng
@@ -21,6 +24,21 @@ import { gvEmToanCanh } from './gv-hom-nay-v2'
 import { docHoSo2, ngayVnCua } from './srs2-d1'
 import { tiLeChienDich, soNgayGiua } from './srs2-loi'
 import { mocNhip, nhipEm } from './srs2-gv'
+import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
+
+/** Tiến độ EXP trong cấp hiện tại từ JSON hồ sơ game (`game_v2_profile.json`). Chưa chọn thú / JSON hỏng ⇒ null. */
+export function tienDoCapTuHoSo(json: unknown): { cap: number; exp: number; moc: number | null; toiDa: boolean } | null {
+  try {
+    const p = JSON.parse(str(json)) as { pet?: string; cap?: unknown; exp?: unknown; choice?: boolean }
+    if (!p || p.choice === true || !p.pet) return null
+    const cap = Math.max(1, Math.min(120, Math.floor(num(p.cap)) || 1))
+    const exp = Math.max(0, Math.floor(num(p.exp)))
+    if (cap >= 120) return { cap, exp, moc: null, toiDa: true }
+    return { cap, exp, moc: thanhExp(cap), toiDa: false }
+  } catch {
+    return null
+  }
+}
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x))
@@ -133,6 +151,10 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
   const rLb = await hoi(env, 'SELECT qid, dat, luc FROM len_bang WHERE sbd = ? ORDER BY luc DESC LIMIT 8', sbd)
   const rCa = await hoi(env, "SELECT l.tong, l.ma_ca, l.nop_luc, COALESCE(c.ten_ca, '') AS ten_ca FROM luot l LEFT JOIN ca c ON c.ma_ca = l.ma_ca WHERE l.sbd = ? AND l.nop_luc IS NOT NULL AND l.tong IS NOT NULL AND l.ma_ca NOT LIKE 'BTVN%' ORDER BY l.nop_luc DESC LIMIT 2", sbd)
 
+  // 7b · thanh tiến độ EXP của thần thú (cấp · EXP trong thanh / mốc cấp sau)
+  const rHoSoGame = await hoi(env, 'SELECT json FROM game_v2_profile WHERE sbd = ?', sbd)
+  const tienDoCap = rHoSoGame?.[0] ? tienDoCapTuHoSo(rHoSoGame[0].json) : null
+
   // 8 · chiến dịch đang theo
   let chienDich: Row | null = null
   try {
@@ -159,6 +181,7 @@ export async function gvHoSoLenBang(env: Env, b: Record<string, unknown>, nowMs:
     ...(rDang ? { dang: rDang.map((x) => { const n = num(x.n), p = n ? num(x.d) / n : 0; return { ten: tenCua(str(x.ma_dang)), soLan: n, tiLe: p, hang: hangTuTiLeDung(p) } }) } : {}),
     ...(rLb ? { lenBang: rLb.map((x) => ({ qid: str(x.qid), dat: num(x.dat) === 1, luc: str(x.luc) })) } : {}),
     ...(rCa && rCa[0] ? { caGanNhat: { diem: num(rCa[0].tong), tenCa: str(rCa[0].ten_ca) || `Ca ${str(rCa[0].ma_ca)}`, luc: str(rCa[0].nop_luc), ...(rCa[1] ? { diemTruoc: num(rCa[1].tong) } : {}) } } : {}),
+    ...(tienDoCap ? { tienDoCap } : {}),
     chienDich,
   }
 }

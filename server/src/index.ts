@@ -22,7 +22,7 @@ import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
 import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-nay-v2'
 import {gvLichSuCauCuaEm} from './gv-lich-su-cau'
 import {gvBaoCaoCa,gvBaoCaoCaEm} from './bao-cao-ca'
-import {gvCongBoCa,gvNhanXetCaEm} from './ca-thi-them'
+import {gvCongBoCa,gvDongCuaVao,gvNhanXetCaEm} from './ca-thi-them'
 import {gvBangTinSong} from './gv-bang-tin-song'
 import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
 import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
@@ -76,6 +76,7 @@ import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
 import { gvChienDich } from './srs2-gv'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
+import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
@@ -3341,6 +3342,8 @@ const boXuLy = {
       // CA THI 28/09 (server/src/ca-thi-them.ts): công bố điểm ca ĐÃ ĐÓNG (đổi cong_bo sang 'ngay', ghi nhat_ky_may) và lưu nhận xét của thầy theo em + ca. GHI — dùng env (không bản đọc).
       if (p === '/gv/cong-bo-ca') return ra(await gvCongBoCa(env, b))
       if (p === '/gv/nhan-xet-ca-em') return ra(await gvNhanXetCaEm(env, b))
+      // ĐÓNG CỬA VÀO (bản vẽ ca thi 28/09, màn b): đặt hạn vào phòng = bây giờ cho ca đang mở — em đã vào vẫn làm tiếp. GHI, chỉ-thêm.
+      if (p === '/gv/dong-cua-vao') return ra(await gvDongCuaVao(env, b))
       if (p === '/gv/suc-khoe-may-chu') return ra({ ok: true, ...sucKhoeMay(), nguong: { banMs: 1500, nghenMs: 3500, toiThieuMau: 20 }, ghiChu: 'Số đo của chính isolate đang trả lời (mỗi lượt có thể rơi vào isolate khác): lấy MAX của vài lượt gần nhất.' })
       if (p === '/gv/bang-tin-song') {
         const co = await envDoc.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('bang_tin_san').first<{ gia_tri: unknown }>().catch(() => null)
@@ -3352,6 +3355,8 @@ const boXuLy = {
       if (p === '/gv/chien-dich') return ra(await gvChienDich(env, b))
       // GỌI LÊN BẢNG — bảng chi tiết em trên tờ chiếu (bản vẽ LenBang-Moi 28/09): ĐỌC-CHỈ, số thật từ sổ (`ho-so-em-chieu.ts`).
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
+      // DẢI THỐNG KÊ LỚP (phím T) cho buổi chữa KHÔNG từ ca (hoàn thiện bản vẽ 28/09): chỉ số GỘP theo câu từ sổ su_kien_hoc, không tên em. ĐỌC-CHỈ.
+      if (p === '/gv/thong-ke-lop-cau') return ra(await gvThongKeLopCau(envDoc, b))
       if (p === '/gv/lop') return ra(await gvLop(envDoc))
       if (p === '/gv/doi-lop-em') return ra(await gvDoiLopEm(env, b))
       // BUỔI CHỮA TỐI NAY (B6, docs/hop-dong-buoi-chua-de-xuat-2109.md): số liệu thô ĐỌC-CHỈ, ≤ 12 truy vấn.

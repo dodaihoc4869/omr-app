@@ -258,9 +258,10 @@ describe('ExamMonitorScreen', () => {
     expect(m.detail.mock.calls.length).toBe(truoc)
   })
 
-  it('luồng thi thật còn nguyên: Mở ca · Khoá ca · Link vào thi · Link xem điểm · Xoá ca này · Lịch sử ca', async () => {
+  // SỬA CÓ CHỦ Ý 28/09 (bản vẽ ca thi): ca đang mở ⇒ Kết thúc ca ở Việc nhanh thay cặp Mở ca / Khoá ca cũ (Mở ca chỉ hiện khi ca đang khoá).
+  it('luồng thi thật còn nguyên: Kết thúc ca · Link vào thi · Link xem điểm · Xoá ca này · Lịch sử ca', async () => {
     await mo()
-    for (const ten of [/Mở ca/, /Khoá ca/, /Link vào thi/, /Link xem điểm/, /Xoá ca này/, /Quay lại Lịch sử ca/]) expect(screen.getAllByRole('button', { name: ten }).length).toBeGreaterThan(0)
+    for (const ten of [/Kết thúc ca/, /Link vào thi/, /Link xem điểm/, /Xoá ca này/, /Quay lại Lịch sử ca/]) expect(screen.getAllByRole('button', { name: ten }).length).toBeGreaterThan(0)
   })
 })
 

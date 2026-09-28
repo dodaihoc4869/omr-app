@@ -291,10 +291,14 @@ describe('ExamMonitorScreen: khung + tab + bảng (chỉ đổi phần nhìn)', 
     expect(khoi.querySelector('.ca-o-em button')?.textContent).toContain('Nguyễn Minh Khôi')
   })
 
-  it('thẻ thông tin ca còn nguyên các khối thao tác của luồng thi thật (Mở ca · Khoá ca · link · Xoá ca)', async () => {
+  // SỬA CÓ CHỦ Ý 28/09 (hoàn thiện bản vẽ ca thi): nút "Khoá ca" cũ trùng việc với "Kết thúc ca ngay" (Việc nhanh) ⇒ GỠ; ca đang mở chỉ còn MỘT nút Kết thúc ca
+  // (cùng lệnh khoaCa, hỏi lại). Nút Mở ca chỉ hiện khi ca đang khoá.
+  it('thẻ thông tin ca còn nguyên các khối thao tác của luồng thi thật (link · Xoá ca) + đúng MỘT nút Kết thúc ca', async () => {
     const { container } = await mo()
     const phai = container.querySelector('.ca-cot-phai') as HTMLElement
-    for (const ten of [/Mở ca/, /Khoá ca/, /Link vào thi/, /Link xem điểm/, /Xoá ca này/]) expect(within(phai).getAllByRole('button', { name: ten }).length).toBeGreaterThan(0)
+    for (const ten of [/Link vào thi/, /Link xem điểm/, /Xoá ca này/]) expect(within(phai).getAllByRole('button', { name: ten }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('button', { name: /Kết thúc ca/ })).toHaveLength(1)
+    expect(screen.queryByRole('button', { name: 'Khoá ca' })).toBeNull()
   })
 
   it('dữ liệu tab lọc là ĐỔI CÁI HIỆN — không gọi thêm lệnh máy chủ nào khi đổi tab', async () => {
@@ -317,7 +321,7 @@ describe('nguồn màn theo dõi ca', () => {
   })
   it('các câu cảnh báo của luồng thi thật còn nguyên trong nguồn', () => {
     for (const cau of [
-      'Khoá ca: em đang làm bị nộp ngay theo phần đã làm, em chưa vào thì không vào được nữa.',
+      'Kết thúc ca: bấm "Kết thúc ca ngay" ở Việc nhanh phía trên — máy hỏi lại trước khi làm.', // sửa có chủ ý 28/09: gỡ nút Khoá ca cũ
       'Mở ca lại được, nhưng em đã bị nộp thì phải duyệt thi lại từng em.',
       'rời màn {l.soLanRoiMan} lần / {l.tongGiayRoiMan}s',
       'Đồng ý mở khoá',

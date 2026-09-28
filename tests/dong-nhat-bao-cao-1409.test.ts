@@ -90,14 +90,14 @@ describe('một gói, một con số — ba app phải khớp', () => {
 describe('không chỗ gọi nào được tự nhặt trường nữa', () => {
   // Xem điểm bản 2 (thầy chốt 21/09): màn Theo dõi ca của THẦY đổi sang trang báo cáo một em mới (`BaoCaoMotEm`), không còn dùng hộp báo cáo
   // chung nên không còn gọi `goiBaiThi`. Nó vẫn đếm bằng ĐÚNG luật chung `demKetQua` (kiểm ở test dưới), không đếm kiểu khác.
-  const goi = [
-    'src/screens/StudentPortalScreen.tsx',
-    'src/screens/HocSinhScreen.tsx',
-  ]
+  // SỬA CÓ CHỦ Ý 28/09 (bản vẽ ca thi): màn Học sinh của THẦY không mở hộp báo cáo chung nữa — trỏ về Báo cáo chi tiết › Từng em (moChiTietCa(maCa, sbd)).
+  const goi = ['src/screens/StudentPortalScreen.tsx']
   const chiaSe = ['src/screens/ExamMonitorScreen.tsx', 'src/lib/bao-cao-mot-em.ts']
 
   it('hai chỗ còn mở hộp báo cáo chung (học sinh, hồ sơ em) đều đi qua `goiBaiThi`', () => {
     for (const f of goi) expect(doc(f), f).toContain('goiBaiThi(')
+    expect(doc('src/screens/HocSinhScreen.tsx')).not.toContain('BaoCaoCaThiHocSinhModal')
+    expect(doc('src/screens/HocSinhScreen.tsx')).toContain('moChiTietCa(caBaoCao.maCa, hoSo.em.sbd)')
   })
 
   it('trang báo cáo một em của thầy đếm câu bằng `demKetQua` dùng chung, và màn Theo dõi ca không tự đếm', () => {
