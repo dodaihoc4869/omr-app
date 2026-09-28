@@ -31,7 +31,7 @@ describe('Game: không còn nút / mã toàn màn hình', () => {
   })
 })
 
-describe('Game TỰ vào toàn màn hình (thầy lệnh 21/09) — vẫn KHÔNG có nút, chỉ có mã tự xin', () => {
+describe('Toàn màn hình của game: mã ở lib + hook + nút của cổng (28/09: bỏ tự vào, có nút)', () => {
   it('mã tự xin nằm ở lib + hook của cổng (không trong tệp game), không JSX/nút; cổng dùng hook + moGame', () => {
     const lib = doc('src/lib/toan-man-hinh-game.ts')
     expect(lib).toContain('requestFullscreen')
@@ -39,7 +39,9 @@ describe('Game TỰ vào toàn màn hình (thầy lệnh 21/09) — vẫn KHÔNG
     expect(doc('src/components/useToanManHinhGame.ts')).not.toMatch(/<button|<\/[a-z]/i)
     const cong = doc('src/screens/StudentPortalScreen.tsx')
     expect(cong).toContain("useToanManHinhGame(tab === 'thanthu')")
-    expect(cong).toContain("xinToanManHinh('cu-cham-vao')")
+    // 28/09 thầy đổi luật: bỏ tự vào toàn màn hình; có MỘT nút toàn màn hình (src/components/NutToanManHinh.tsx) ở cổng, không nằm trong tệp game
+    expect(cong).not.toContain("xinToanManHinh('cu-cham-vao')")
+    expect(cong).toContain('<NutToanManHinh />')
     // toàn bộ khoá hành vi (xin trong cú chạm, một lần/lượt, từ chối im lặng, em thoát không ép lại, Về app thoát): tests/toan-man-hinh-game-2109.test.tsx
   })
 })

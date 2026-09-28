@@ -1,4 +1,5 @@
-// GAME TỰ VÀO TOÀN MÀN HÌNH (thầy lệnh 21/09: "vào bất kì màn game nào đều TỰ ra full màn hình và GIỮ nút Về app học sinh"; KHÔNG có nút bật/thoát).
+// TOÀN MÀN HÌNH CỦA GAME. 28/09 thầy đổi luật: "bỏ chế độ tự full màn hình khi vào game, có nút toàn màn hình tinh tế đẹp mắt" ⇒ KHÔNG tự xin nữa;
+// em bấm nút (src/components/NutToanManHinh.tsx → `batTatToanManHinh`). Rời game vẫn thoát. Luật cũ 21/09 (tự xin) giữ hàm `xinToanManHinh` cho tương thích, không còn nơi gọi.
 // Luật (Boss chốt):
 //  1. Xin toàn màn hình NGAY TRONG cú chạm mở game (`xinToanManHinh('cu-cham-vao')`) — còn cử chỉ người dùng.
 //  2. Vào thẳng bằng link / tải lại / lazy-load làm mất cử chỉ ⇒ xin lại ở lần chạm ĐẦU TIÊN trong game, đúng MỘT lần mỗi lượt vào
@@ -94,4 +95,26 @@ export function theoDoiToanManHinh(): () => void {
 /** Dùng cho test: đặt lại mọi trạng thái của lượt. */
 export function datLaiLuotToanManHinh(): void {
   luot = luotMoi()
+}
+
+/** Máy có API toàn màn hình không (iPhone Safari: không ⇒ ẩn nút). */
+export function coTheToanManHinh(): boolean {
+  if (typeof document === 'undefined') return false
+  const goc = document.documentElement as PhanTuToanMan
+  return typeof goc.requestFullscreen === 'function' || typeof goc.webkitRequestFullscreen === 'function'
+}
+
+/** Nút toàn màn hình (thầy 28/09): đang toàn màn hình ⇒ thoát; chưa ⇒ xin (gọi TRONG cú bấm). Em chủ động bấm nên bỏ cờ "em đã tự thoát". Im lặng khi lỗi. */
+export function batTatToanManHinh(): void {
+  if (typeof document === 'undefined') return
+  const d = document as TaiLieuToanMan
+  if (dangToanManHinh()) {
+    if (typeof d.exitFullscreen === 'function') goiIm(() => d.exitFullscreen())
+    else if (typeof d.webkitExitFullscreen === 'function') goiIm(() => d.webkitExitFullscreen!())
+    return
+  }
+  luot.emThoat = false
+  const goc = document.documentElement as PhanTuToanMan
+  if (typeof goc.requestFullscreen === 'function') goiIm(() => goc.requestFullscreen({ navigationUI: 'hide' } as FullscreenOptions))
+  else if (typeof goc.webkitRequestFullscreen === 'function') goiIm(() => goc.webkitRequestFullscreen!())
 }

@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 import { useToanManHinhGame } from '../src/components/useToanManHinhGame'
-import { datLaiLuotToanManHinh, dangToanManHinh, ketThucLuotToanManHinh, theoDoiToanManHinh, xinToanManHinh } from '../src/lib/toan-man-hinh-game'
+import { batTatToanManHinh, datLaiLuotToanManHinh, dangToanManHinh, ketThucLuotToanManHinh, theoDoiToanManHinh, xinToanManHinh } from '../src/lib/toan-man-hinh-game'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => <div data-testid="thu" /> }))
@@ -186,49 +186,44 @@ describe('hook useToanManHinhGame', () => {
     return <button data-testid="cham">chạm</button>
   }
   const chamNhe = () => document.dispatchEvent(new Event('pointerup', { bubbles: true }))
-  it('game mở: lần chạm ĐẦU TIÊN xin toàn màn hình, các lần sau không', () => {
+  // 28/09 thầy đổi luật: "bỏ chế độ tự full màn hình khi vào game, có nút toàn màn hình" ⇒ hook KHÔNG tự xin khi chạm nữa.
+  it('game mở: chạm KHÔNG tự xin toàn màn hình (bỏ chế độ tự vào 28/09)', () => {
     render(<Khung mo />)
     chamNhe()
-    expect(xin).toHaveBeenCalledTimes(1)
-    datToanMan(null)
     chamNhe()
-    expect(xin).toHaveBeenCalledTimes(1)
+    expect(xin).not.toHaveBeenCalled()
   })
-  it('đã toàn màn hình từ cú chạm mở game ⇒ lần chạm đầu KHÔNG xin lại', () => {
-    xinToanManHinh('cu-cham-vao')
-    render(<Khung mo />)
-    chamNhe()
-    expect(xin).toHaveBeenCalledTimes(1)
-  })
-  it('gỡ ra là gỡ hết: hết nghe pointerup VÀ fullscreenchange', () => {
+  it('gỡ ra là gỡ hết: hết nghe fullscreenchange; không còn nghe pointerup', () => {
+    const them = vi.spyOn(document, 'addEventListener')
     const bo = vi.spyOn(document, 'removeEventListener')
     const { unmount } = render(<Khung mo />)
+    expect(them.mock.calls.filter((c) => c[0] === 'pointerup')).toHaveLength(0)
     unmount()
-    expect(bo.mock.calls.filter((c) => c[0] === 'pointerup')).toHaveLength(1)
     expect(bo.mock.calls.filter((c) => c[0] === 'fullscreenchange')).toHaveLength(1)
+    them.mockRestore()
     bo.mockRestore()
   })
-  it('game chưa mở (mo=false): không nghe chạm, không xin', () => {
+  it('game chưa mở (mo=false): không xin', () => {
     render(<Khung mo={false} />)
     chamNhe()
     expect(xin).not.toHaveBeenCalled()
   })
-  it('rời game (gỡ / mo→false) ⇒ thoát toàn màn hình và gỡ lắng nghe', () => {
+  it('rời game (mo→false) khi em đã bật toàn màn hình bằng nút ⇒ thoát toàn màn hình', () => {
     const { rerender, unmount } = render(<Khung mo />)
-    chamNhe()
+    batTatToanManHinh()
     expect(dangToanManHinh()).toBe(true)
     rerender(<Khung mo={false} />)
     expect(thoat).toHaveBeenCalledTimes(1)
-    chamNhe()
-    expect(xin).toHaveBeenCalledTimes(1)
     unmount()
   })
-  it('em tự thoát rồi chạm ⇒ không ép lại trong lượt', () => {
+  it('nút bật/tắt: đang toàn màn hình ⇒ thoát; em đã tự thoát vẫn bật lại được bằng nút', () => {
     render(<Khung mo />)
-    chamNhe() // xin được, vào toàn màn hình
-    datToanMan(null) // em thoát
-    xinToanManHinh('cham-dau')
+    batTatToanManHinh()
     expect(xin).toHaveBeenCalledTimes(1)
+    batTatToanManHinh()
+    expect(thoat).toHaveBeenCalledTimes(1)
+    batTatToanManHinh()
+    expect(xin).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -246,30 +241,31 @@ describe('StudentPortalScreen: mở game từ Bảng nhiệm vụ', () => {
       return { ok: true, status: 200, json: async () => (duong === '/hs/ke-hoach-ngay' ? KE_HOACH : { ok: true, items: [] }) }
     }))
   })
-  it('chạm thẻ thần thú ⇒ requestFullscreen được gọi NGAY trong cú chạm (đồng bộ, trước khi game nạp); không có nút toàn màn hình nào', async () => {
-    render(<StudentPortalScreen />)
-    const nut = await screen.findByRole('button', { name: 'Mở thần thú Bông · Cấp 37' })
-    expect(xin).not.toHaveBeenCalled()
-    fireEvent.click(nut)
-    expect(xin).toHaveBeenCalledTimes(1) // ngay sau click, chưa cần chờ lazy-load
-    await screen.findByTestId('game')
-    expect(screen.queryByRole('button', { name: /toàn màn hình/i })).toBeNull()
-  })
-  it('"Về app học sinh": thoát toàn màn hình rồi về Bảng nhiệm vụ', async () => {
+  it('chạm thẻ thần thú ⇒ KHÔNG tự toàn màn hình; có nút "Mở toàn màn hình", bấm mới xin', async () => {
     render(<StudentPortalScreen />)
     fireEvent.click(await screen.findByRole('button', { name: 'Mở thần thú Bông · Cấp 37' }))
+    await screen.findByTestId('game')
+    expect(xin).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Mở toàn màn hình' }))
+    expect(xin).toHaveBeenCalledTimes(1)
+  })
+  it('"Về app học sinh": thoát toàn màn hình (nếu em đã bật) rồi về Bảng nhiệm vụ', async () => {
+    render(<StudentPortalScreen />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Mở thần thú Bông · Cấp 37' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Mở toàn màn hình' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Về app học sinh' }))
     await waitFor(() => expect(screen.queryByTestId('game')).toBeNull())
     expect(thoat).toHaveBeenCalled()
     expect(dangToanManHinh()).toBe(false)
-    expect(screen.getByRole('button', { name: 'Mở thần thú Bông · Cấp 37' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /toàn màn hình/i })).toBeNull()
   })
-  it('trình duyệt không có API (iPhone Safari): mở game vẫn chạy, im lặng, vẫn có nút Về app học sinh', async () => {
+  it('trình duyệt không có API (iPhone Safari): mở game vẫn chạy, KHÔNG hiện nút toàn màn hình, vẫn có Về app học sinh', async () => {
     giaApi('khongApi')
     const loi = vi.spyOn(console, 'error').mockImplementation(() => {})
     render(<StudentPortalScreen />)
     fireEvent.click(await screen.findByRole('button', { name: 'Mở thần thú Bông · Cấp 37' }))
     expect(await screen.findByRole('button', { name: 'Về app học sinh' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /toàn màn hình/i })).toBeNull()
     expect(screen.queryByRole('alert')).toBeNull()
     expect(loi).not.toHaveBeenCalled()
   })
@@ -278,10 +274,11 @@ describe('StudentPortalScreen: mở game từ Bảng nhiệm vụ', () => {
 // ─── khoá nguồn: mọi cửa vào game đều đi qua moGame / xin trong cú chạm ───
 describe('khoá nguồn StudentPortalScreen', () => {
   const nguon = doc('src/screens/StudentPortalScreen.tsx')
-  it("không còn `setTab('thanthu')` trần ngoài hàm moGame (mọi cửa vào xin toàn màn hình trong cú chạm)", () => {
+  it("không còn `setTab('thanthu')` trần ngoài hàm moGame", () => {
     const con = nguon.split('\n').filter((l) => /setTab\('thanthu'\)/.test(l) && !/^\s*(\/\/|\*)/.test(l))
     expect(con).toHaveLength(1) // chỉ bên trong moGame
-    expect(nguon).toMatch(/const moGame = \(\) => \{\s*xinToanManHinh\('cu-cham-vao'\)\s*setTab\('thanthu'\)\s*\}/)
+    expect(nguon).toMatch(/const moGame = \(\) => \{\s*setTab\('thanthu'\)\s*\}/) // 28/09: không tự xin toàn màn hình nữa
+    expect(nguon).not.toContain("xinToanManHinh('cu-cham-vao')")
     expect((nguon.match(/moGame\(\)|onMoThanThu=\{moGame\}/g) ?? []).length).toBeGreaterThanOrEqual(3)
   })
   it('Về app học sinh gọi ketThucLuot; hook gắn theo tab game; thông báo chỉ mở bài Gia đình/BTVN (không phải cửa vào game)', () => {

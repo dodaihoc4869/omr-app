@@ -96,7 +96,8 @@ import { chuanHoaLoiGiaiCau } from '../lib/chuan-hoa-loi-giai'
 import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import { useToanManHinhGame } from '../components/useToanManHinhGame'
-import { ketThucLuotToanManHinh, xinToanManHinh } from '../lib/toan-man-hinh-game'
+import { ketThucLuotToanManHinh } from '../lib/toan-man-hinh-game'
+import NutToanManHinh from '../components/NutToanManHinh'
 import ONhapDapSo from '../components/ONhapDapSo'
 import { batNhipBenVung } from '../lib/nhip-ben-vung'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, TOI_DA_LAN_THU, khoaChang } from '../lib/hang-doi-nop'
@@ -240,10 +241,9 @@ export default function StudentPortalScreen() {
 
   // Tab
   const [tab, setTab] = useState<TabType | null>(null)
-  // GAME TỰ VÀO TOÀN MÀN HÌNH (thầy lệnh 21/09): mọi cửa vào game gọi `moGame()` để xin toàn màn hình NGAY TRONG cú chạm; vào thẳng bằng link/tải lại thì
-  // hook xin ở lần chạm đầu tiên; rời game ⇒ thoát. Không nút bật/thoát. Xem lib/toan-man-hinh-game.ts.
+  // Mọi cửa vào game đi qua `moGame()`. 28/09 thầy bỏ chế độ TỰ vào toàn màn hình: em bấm nút toàn màn hình (NutToanManHinh) ở góc màn game;
+  // rời game ⇒ thoát toàn màn hình. Xem lib/toan-man-hinh-game.ts.
   const moGame = () => {
-    xinToanManHinh('cu-cham-vao')
     setTab('thanthu')
   }
   useToanManHinhGame(tab === 'thanthu')
@@ -2288,6 +2288,7 @@ export default function StudentPortalScreen() {
 
         {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) — Nuôi thú, leo tháp & săn boss câu sai.
             Gắn kết chặt chẽ với nhiệm vụ làm BTVN, sửa câu sai và vào phòng thi. */}
+        {tab === 'thanthu' && <NutToanManHinh />}
         {tab === 'thanthu' && (
           <Suspense fallback={<ChoNapGame />}>
           <ThanThuHoaHocGame

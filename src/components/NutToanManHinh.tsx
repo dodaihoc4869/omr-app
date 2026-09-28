@@ -1,0 +1,29 @@
+// Nút TOÀN MÀN HÌNH của game (thầy 28/09: "bỏ chế độ tự full màn hình khi vào game, có nút toàn màn hình tinh tế đẹp mắt").
+// Viên kính tròn nhỏ ở góc trên phải, biểu tượng 4 góc mở/thu; máy không có API (iPhone Safari) ⇒ không hiện.
+import { useEffect, useState } from 'react'
+import { batTatToanManHinh, coTheToanManHinh, dangToanManHinh } from '../lib/toan-man-hinh-game'
+import './nut-toan-man-hinh.css'
+
+export default function NutToanManHinh() {
+  const [dang, setDang] = useState(dangToanManHinh)
+  useEffect(() => {
+    const doi = () => setDang(dangToanManHinh())
+    document.addEventListener('fullscreenchange', doi)
+    document.addEventListener('webkitfullscreenchange', doi)
+    return () => {
+      document.removeEventListener('fullscreenchange', doi)
+      document.removeEventListener('webkitfullscreenchange', doi)
+    }
+  }, [])
+  if (!coTheToanManHinh()) return null
+  const nhan = dang ? 'Thoát toàn màn hình' : 'Mở toàn màn hình'
+  return (
+    <button type="button" className="nut-toan-man" data-dang={dang ? '' : undefined} aria-label={nhan} title={nhan} onClick={batTatToanManHinh}>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        {dang
+          ? <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
+          : <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />}
+      </svg>
+    </button>
+  )
+}
