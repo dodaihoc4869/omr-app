@@ -23,7 +23,7 @@ type Row = Record<string, unknown>
 const MOT_NGAY_MS = 86_400_000
 const SO_NGAY_KHONG_LAI = 14
 const LOP_HOP_LE = new Set(['10', '11', '12'])
-const TIEU_DE_TIN = 'A.I Đỗ Đại Học · Bài gia đình giao'
+const TIEU_DE_TIN = 'Thầy Đỗ Đại Học · Bài gia đình giao'
 const so = (v: unknown): number => Number(v) || 0
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
 const json = (v: unknown): string => JSON.stringify(v)
@@ -367,7 +367,7 @@ export async function phGiaoThem(env: Env, b: Record<string, unknown>, nowMs: nu
   }
   // MỘT tin cho con: đặt ĐÚNG mã tin của bài mom (`mom:<sbd>:<id>`) để đường đồng bộ thông báo không tạo thêm tin chung chung.
   await env.DB.prepare('INSERT OR IGNORE INTO student_notice (id, sbd, title, body, target, created_at) VALUES (?, ?, ?, ?, ?, ?)')
-    .bind(`mom:${sbd}:${cua.maMom}`, sbd, TIEU_DE_TIN, `Gia đình vừa giao cho em ${tong} câu, khoảng ${phut} phút. A.I Đỗ Đại Học đã chọn các câu hợp với em hôm nay.`, 'mom', luc)
+    .bind(`mom:${sbd}:${cua.maMom}`, sbd, TIEU_DE_TIN, `Gia đình vừa giao cho em ${tong} câu, khoảng ${phut} phút. Thầy Đỗ Đại Học đã chọn các câu hợp với em hôm nay.`, 'mom', luc)
     .run()
   return { ...base, conLaiHomNay: conLai(sau), goiGanNhat: await goiGanNhat(env, sbd, sau[sau.length - 1]), daGiao: daGiaoTuHang(cua, false) }
 }

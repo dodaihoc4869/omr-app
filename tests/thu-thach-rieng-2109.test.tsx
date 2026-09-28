@@ -141,7 +141,7 @@ describe('TheThuThachRieng — thẻ', () => {
   it('mời: nhãn "Bộ não A.I hỗ trợ riêng em <họ tên>", tiêu đề, lời mời nguyên văn, số câu + "không bắt buộc, không có hạn", MỘT nút chính + "Để sau"', () => {
     const { onLam, onDeSau } = dung()
     const the = screen.getByRole('region', { name: 'Thử thách riêng hôm nay' })
-    expect(the.textContent).toContain('Bộ não A.I hỗ trợ riêng em Minh Anh')
+    expect(the.textContent).toContain('Thầy Đỗ Đại Học hỗ trợ riêng em Minh Anh')
     expect(the.textContent).toContain('Rồng Lửa còn thiếu 40 EXP để lên cấp 7. Hôm nay thử 2 câu Thuỷ phân ester, xong là đủ.')
     expect(within(the).getByText('2 câu')).toBeTruthy(); expect(within(the).getByText('Không bắt buộc, không có hạn')).toBeTruthy()
     expect(within(the).getByText('Mảnh khiên 3/12')).toBeTruthy(); expect(the.textContent).not.toContain('Chuỗi') // chuỗi ngày đã có ở đầu trang, không lặp

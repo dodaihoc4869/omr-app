@@ -5,6 +5,7 @@
 // Không emoji. Màu chỉ đọc biến --m3-* (thu-thach-rieng.css).
 import { CheckCircle2, Shield, Sparkles } from 'lucide-react'
 import { CHU_KHONG_BAT_BUOC, chuDaXong, chuDangLam, chuExpThanThu, chuManhKhien, chuSoCau, soCauConLai, type ThuThachRieng } from '../../lib/thu-thach-rieng'
+import { chuThay } from '../../lib/chu-thay'
 import './m3-theme.css'
 import './thu-thach-rieng.css'
 
@@ -19,7 +20,7 @@ export default function TheThuThachRieng({
   onLam: (t: ThuThachRieng) => void
   onDeSau: (t: ThuThachRieng) => void
 }) {
-  const nhan = `Bộ não A.I hỗ trợ riêng em ${hoTen}`.trim()
+  const nhan = `Thầy Đỗ Đại Học hỗ trợ riêng em ${hoTen}`.trim()
   const xong = thuThach.trangThai === 'xong'
   const dangLam = thuThach.trangThai === 'dang_lam'
   const dongExp = chuExpThanThu(thuThach)
@@ -42,7 +43,7 @@ export default function TheThuThachRieng({
           {chuDaXong(thuThach)}
         </p>
       ) : (
-        <p className="bnv-tt-loi">{thuThach.loiMoi}</p>
+        <p className="bnv-tt-loi">{chuThay(thuThach.loiMoi)}</p>
       )}
 
       {dongExp && (

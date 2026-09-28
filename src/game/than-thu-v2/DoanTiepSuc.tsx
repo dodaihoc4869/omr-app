@@ -7,7 +7,7 @@ import { ThuHinh } from './DoanHinh'
 
 const HINH: Record<string, ReactElement> = { nhac_cong_thuc: <BookOpen size={22} />, loai_phuong_an: <Ban size={22} />, buoc_dau: <ArrowUpRight size={22} /> }
 const THU_TU = ['nhac_cong_thuc', 'loai_phuong_an', 'buoc_dau'] as const
-const MAC_DINH: Record<string, [string, string]> = { nhac_cong_thuc: ['Nhắc công thức', 'Gửi bạn kiến thức gốc của câu'], loai_phuong_an: ['Loại 1 phương án', 'A.I Đỗ Đại Học gạch một đáp án sai'], buoc_dau: ['Chỉ bước đầu', 'Hé bước đầu của lời giải'] }
+const MAC_DINH: Record<string, [string, string]> = { nhac_cong_thuc: ['Nhắc công thức', 'Gửi bạn kiến thức gốc của câu'], loai_phuong_an: ['Loại 1 phương án', 'Thầy Đỗ Đại Học gạch một đáp án sai'], buoc_dau: ['Chỉ bước đầu', 'Hé bước đầu của lời giải'] }
 
 /** `cheDo2` (chỉ-thêm, GAME HÓA 2.0): cùng ba thẻ, cùng lệnh — chỉ đổi TRÌNH BÀY sang hệ doan2.css (tấm kính biển đêm, khung câu giấy da,
  *  thẻ màu 2.0, tiêu đề Baloo) + Esc đóng tấm. Vắng/false ⇒ giao diện cũ y nguyên. */
@@ -40,7 +40,7 @@ export default function DoanTiepSuc({ goiY, ban, loi, onChon, onDong, cheDo2 = f
         </div>
         {loi && <div className="dh-loi" role="alert">{loi}</div>}
         <div className="dh-tam-chan">
-          <span>Thẻ do A.I Đỗ Đại Học soạn từ lời giải — <b>không bao giờ là đáp án</b>. Câu được giúp hôm nay sẽ quay lại để {goiY.ten} tự làm vào ngày mai.</span>
+          <span>Thẻ do Thầy Đỗ Đại Học soạn từ lời giải — <b>không bao giờ là đáp án</b>. Câu được giúp hôm nay sẽ quay lại để {goiY.ten} tự làm vào ngày mai.</span>
           <button type="button" className="dh-nut-mo" onClick={onDong}>Để sau</button>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import type {Env} from './kieu'
 import {gameIdentity} from './game-v2-auth'
 import {buildPushPayload} from '@block65/webcrypto-web-push'
+import {chuThay} from '../../src/lib/chu-thay'
 export function validPushEndpoint(value:string){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password&&(!u.port||u.port==='443')&&(u.hostname==='fcm.googleapis.com'||u.hostname==='web.push.apple.com'||u.hostname.endsWith('.push.apple.com')||u.hostname==='updates.push.services.mozilla.com'||u.hostname.endsWith('.notify.windows.com'))}catch{return false}}
 export async function syncNotices(env:Env,sbd?:string){
  // Stable IDs make polling and scheduled execution idempotent.
@@ -28,7 +29,7 @@ export async function syncNotices(env:Env,sbd?:string){
 }
 export async function notifications(env:Env,action:string,b:Record<string,unknown>){
  const sbd=await gameIdentity(env,b)
- if(action==='list'){await syncNotices(env,sbd);const rows=await env.DB.prepare('SELECT id,title,body,target,created_at,read_at FROM student_notice WHERE sbd=? ORDER BY created_at DESC LIMIT 60').bind(sbd).all();return {ok:true,items:rows.results,publicKey:env.PUSH_PUBLIC_KEY||''}}
+ if(action==='list'){await syncNotices(env,sbd);const rows=await env.DB.prepare('SELECT id,title,body,target,created_at,read_at FROM student_notice WHERE sbd=? ORDER BY created_at DESC LIMIT 60').bind(sbd).all<{id:string;title:string|null;body:string|null;target:string|null;created_at:string;read_at:string|null}>();return {ok:true,items:rows.results.map(r=>({...r,title:chuThay(r.title??''),body:chuThay(r.body??'')})),publicKey:env.PUSH_PUBLIC_KEY||''}}
  if(action==='status'){const row=await env.DB.prepare('SELECT endpoint FROM student_push WHERE endpoint=? AND sbd=?').bind(String(b.endpoint||''),sbd).first();return {ok:true,enabled:!!row}}
  if(action==='read'){await env.DB.prepare('UPDATE student_notice SET read_at=? WHERE sbd=? AND id=?').bind(new Date().toISOString(),sbd,String(b.id||'')).run();return {ok:true}}
  if(action==='unsubscribe'){await env.DB.prepare('DELETE FROM student_push WHERE endpoint=? AND sbd=?').bind(String(b.endpoint||''),sbd).run();return {ok:true}}

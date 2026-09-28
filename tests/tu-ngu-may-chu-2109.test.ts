@@ -11,7 +11,7 @@ describe('từ ngữ máy chủ: chủ ngữ tự động là A.I Đỗ Đại H
     expect(chuLoiMay('nhac_nop_bai')).not.toMatch(/\bmáy\b/i)
   })
   it('thẻ Tiếp sức "Loại 1 phương án"', () => {
-    expect(MO_TA_THE.loai_phuong_an.moTa).toBe('A.I Đỗ Đại Học gạch một đáp án sai')
+    expect(MO_TA_THE.loai_phuong_an.moTa).toBe('Thầy Đỗ Đại Học gạch một đáp án sai')
   })
   it('gv-bang-tin: câu cảnh báo không còn "máy sẽ thử lại"', () => {
     const src = readFileSync('server/src/gv-bang-tin.ts', 'utf8')

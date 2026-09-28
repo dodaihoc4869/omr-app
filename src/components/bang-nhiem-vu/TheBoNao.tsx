@@ -1,4 +1,4 @@
-// THẺ "BỘ NÃO A.I HỖ TRỢ RIÊNG EM <họ tên>" trên Bảng nhiệm vụ.
+// THẺ "THẦY ĐỖ ĐẠI HỌC HỖ TRỢ RIÊNG EM <họ tên>" trên Bảng nhiệm vụ (thầy 28/09: bỏ chữ "Bộ não A.I"; lời máy soạn đi qua chuThay).
 //  · HỌC SINH: lời hôm nay; bấm "Xem N lời gần nhất" mở tờ trượt (tối đa 7 lời); "Ẩn hôm nay" cất thẻ tới ngày mai.
 //  · PHỤ HUYNH: lời cho phụ huynh + thư tuần (gập/mở).
 // Không có lời ⇒ KHÔNG dựng thẻ (không khung rỗng, không "chưa có lời"). Không emoji. Chữ do máy chủ gửi luôn được vẽ như CHỮ.
@@ -6,6 +6,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { ChevronDown, ChevronRight, Sparkles, X } from 'lucide-react'
 import { nhanNgayLoi, nhanTuan, ngayHomNay, ngayNganVi, type BoNaoHocSinh, type BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
+import { chuThay } from '../../lib/chu-thay'
 import './m3-theme.css'
 import './bo-nao.css'
 
@@ -64,7 +65,7 @@ export default function TheBoNao({
   const co = laPh ? !!ph : !!hs
   if (!co || anLuc === ngayLoi) return null
 
-  const tieuDe = `Bộ não A.I hỗ trợ riêng em ${hoTen}`.trim()
+  const tieuDe = `Thầy Đỗ Đại Học hỗ trợ riêng em ${hoTen}`.trim()
   const loiChinh = laPh ? ph!.loiNhan : hs!.loi
   const nhanPhu = laPh ? nhanNgayLoi(ph!.ngay, now, 'Lời cho anh chị') : nhanNgayLoi(hs!.ngay, now)
   const gan = hs?.gan ?? []
@@ -87,7 +88,7 @@ export default function TheBoNao({
         </div>
       </div>
 
-      {loiChinh && <p className="bnv-bn-loi">{loiChinh}</p>}
+      {loiChinh && <p className="bnv-bn-loi">{chuThay(loiChinh)}</p>}
 
       {laPh && ph!.thuTuan && (
         <div className="bnv-bn-thu">
@@ -147,7 +148,7 @@ export default function TheBoNao({
               {gan.map((g, i) => (
                 <li key={`${g.ngay}-${i}`}>
                   <time dateTime={g.ngay || undefined}>{g.ngay === homNay ? `Hôm nay · ${ngayNganVi(g.ngay)}` : ngayNganVi(g.ngay) || 'Lời trước'}</time>
-                  <p>{g.loi}</p>
+                  <p>{chuThay(g.loi)}</p>
                 </li>
               ))}
             </ol>
