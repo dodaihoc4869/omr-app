@@ -1295,7 +1295,11 @@ export default function ExamMonitorScreen() {
               onMoKhoa={(sbd) => setXacNhanMoKhoa(sbd)}
               onXemEm={(sbd) => setSbdHoSo(sbd)}
               onChieuMa={() => setChieuMa(true)}
-              onKetThuc={() => setHoiKhoa(true)}
+              onKetThuc={() => {
+                setHoiKhoa(true)
+                // Hộp hỏi lại nằm ở cột dưới: kéo tới cho thầy thấy ngay (không khoá khi chưa bấm xác nhận).
+                setTimeout(() => document.querySelector('[data-hop="khoa-ca"]')?.scrollIntoView?.({ behavior: 'smooth', block: 'center' }), 60)
+              }}
               dangLamNgay={dangLamNgay}
             />
           ) : (
@@ -1701,7 +1705,7 @@ export default function ExamMonitorScreen() {
               Thầy phải biết mình đang cắt bài của mấy em trước khi bấm. */}
           {hoiKhoa && (
             <TheNoiDung>
-              <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Khoá ca {chiTiet.ca.maCa}?</div>
+              <div data-hop="khoa-ca" style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Kết thúc ca {chiTiet.ca.maCa}?</div>
               <OThongBao tone="do">
                 <b style={SO}>{dangLamNgay}</b> em đang làm bài sẽ bị nộp bài ngay, chấm theo phần đã làm.{' '}
                 {chuaVao === null ? 'Em nào chưa vào sẽ không vào được nữa.' : <>
