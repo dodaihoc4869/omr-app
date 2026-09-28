@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Hiệp trùm Đoàn</title>
+<meta name="description" content="Hiệp trùm Đoàn Hộ Tống bản ngang: 4 ý đúng–sai bên trái, trùm có 4 mảnh giáp bên phải.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+:root{--nen:#071229;--nen2:#0A1F4A;--bien:#0D2A5E;--chu:#F2F6FF;--mo:#BCCBEB;--mo2:#9FB1D8;--vang:#FFC940;--cam:#FF9F1C;--ngoc:#37E2D5;--lam:#7FF3FF;--hong:#FF6F97;--do:#E83D6D;--xanh:#46D19A;--tim:#A98BFF;--vien:rgba(160,200,255,.18);--kinh:rgba(12,26,58,.74)}
+html,body{margin:0;background:#030914;color:var(--chu);font-family:'Be Vietnam Pro',system-ui,sans-serif;font-variant-numeric:tabular-nums}
+button{font-family:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--lam);outline-offset:3px}
+.khung{position:relative;width:1440px;height:900px;overflow:hidden;background:
+ radial-gradient(900px 600px at 18% 0%,rgba(30,80,160,.55),rgba(30,80,160,0) 70%),
+ radial-gradient(800px 600px at 100% 100%,rgba(70,40,140,.45),rgba(70,40,140,0) 70%),var(--nen)}
+.khung+.khung{margin-top:0}
+.baloo{font-family:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif}
+.kinh{background:var(--kinh);border:1px solid var(--vien);backdrop-filter:blur(12px);border-radius:24px}
+.dac{background:rgba(8,18,44,.94)}
+.nhan{font-size:12px;font-weight:800;letter-spacing:1.4px;color:var(--mo)}
+.mo{color:var(--mo)} .vang{color:var(--vang)} .ngoc{color:var(--ngoc)} .xanh{color:var(--xanh)} .hong{color:var(--hong)} .lam{color:var(--lam)}
+.tren{position:absolute;left:32px;right:32px;top:16px;height:64px;display:flex;align-items:center;gap:14px}
+.luoi{position:absolute;left:32px;right:32px;top:96px;bottom:54px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.c7{grid-column:span 7;min-width:0;min-height:0} .c5{grid-column:span 5;min-width:0;min-height:0} .c4{grid-column:span 4;min-width:0} .c8{grid-column:span 8;min-width:0} .c6{grid-column:span 6;min-width:0}
+.cot{display:flex;flex-direction:column;gap:16px;min-height:0}
+.ghichu{position:absolute;right:16px;bottom:12px;font-size:12px;font-weight:600;color:var(--mo2);background:rgba(3,9,20,.7);border:1px solid var(--vien);border-radius:12px;padding:5px 12px;z-index:50}
+.ghichu b{color:var(--vang)}
+.nut-chinh{width:100%;min-height:76px;border-radius:24px;border:0;background:linear-gradient(180deg,#FFD66B 0%,#FF9F1C 100%);color:#3A1D00;box-shadow:0 6px 0 #B8650A,0 14px 30px rgba(255,159,28,.32);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 26px;text-align:left}
+.nut-chinh .t{font-family:'Baloo 2',sans-serif;font-size:26px;font-weight:800;line-height:1.05;letter-spacing:.4px}
+.nut-chinh .p{display:block;font-size:13px;font-weight:700;margin-top:2px}
+.nut-chinh .t{display:block}
+.nut-chinh.cho{background:rgba(255,201,64,.14);color:#FFD98A;box-shadow:none;border:2px dashed rgba(255,201,64,.55)}
+.nut-khoa{width:100%;min-height:64px;border-radius:20px;border:1px dashed rgba(160,200,255,.35);background:rgba(255,255,255,.04);color:var(--mo2);display:flex;align-items:center;gap:14px;padding:10px 18px;text-align:left}
+.nut-phu{min-height:48px;border-radius:16px;border:1px solid var(--vien);background:rgba(255,255,255,.07);font-weight:700;font-size:15px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.nut-tron{width:48px;height:48px;border-radius:16px;border:1px solid var(--vien);background:var(--kinh);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;border-radius:16px;font-size:13px;font-weight:700;background:rgba(255,255,255,.07);border:1px solid var(--vien);white-space:nowrap}
+.the{padding:20px 22px}
+.thanh{height:8px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
+.thanh>i{display:block;height:100%;border-radius:4px}
+.pa{display:flex;align-items:center;gap:14px;min-height:60px;padding:9px 16px;border-radius:18px;background:rgba(255,255,255,.05);border:2px solid rgba(160,200,255,.16);font-size:18px;font-weight:600;line-height:1.35;width:100%;text-align:left}
+.pa .ch{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;flex-shrink:0}
+.pa.chon{border-color:var(--vang);background:rgba(255,201,64,.12)} .pa.chon .ch{background:var(--vang);color:#3A2400}
+.pa.dung{border-color:var(--xanh);background:rgba(70,209,154,.14)} .pa.dung .ch{background:var(--xanh);color:#04291B}
+.pa.sai{border-color:var(--hong);background:rgba(255,92,138,.12)} .pa.sai .ch{background:var(--hong);color:#3A0A1A}
+.pa.chay{opacity:.42;border-style:dashed} .pa.chay .nd{text-decoration:line-through}
+.pa .dau{margin-left:auto;font-size:13px;font-weight:800;white-space:nowrap;padding:4px 10px;border-radius:10px}
+.de{font-size:20px;line-height:1.55;font-weight:600}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:1.2px;padding:6px 12px;border-radius:12px;background:rgba(55,226,213,.12);color:var(--lam);border:1px solid rgba(55,226,213,.3)}
+.ds{display:grid;grid-template-columns:36px 1fr 104px 104px;align-items:center;gap:12px;min-height:84px;padding:12px 16px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(160,200,255,.12)}
+.ds .y{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:var(--vang)}
+.ds .nd{font-size:18px;line-height:1.45;font-weight:600}
+.ds button{height:56px;border-radius:14px;border:2px solid rgba(160,200,255,.22);background:rgba(255,255,255,.05);font-weight:800;font-size:16px}
+.ds button.bat{background:var(--vang);color:#3A2400;border-color:var(--vang)}
+.lg{display:flex;flex-direction:column;gap:12px}
+.lg-dau{display:flex;align-items:center;gap:10px;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;color:var(--vang);letter-spacing:.6px}
+.kt{border-radius:16px;background:rgba(55,226,213,.08);border:1px solid rgba(55,226,213,.28);padding:12px 16px}
+.kt .nhan{color:var(--lam)}
+.kt p{margin:6px 0 0;font-size:15px;line-height:1.6}
+.lgh{display:grid;grid-template-columns:28px 30px 1fr;gap:8px;align-items:start;font-size:16px;line-height:1.55;padding:8px 10px;border-radius:12px}
+.lgh .dk{width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;margin-top:0}
+.lgh.d{background:rgba(70,209,154,.10)} .lgh.d .dk{background:var(--xanh);color:#04291B}
+.lgh.s .dk{background:rgba(255,111,151,.2);color:var(--hong);border:1px solid rgba(255,111,151,.5)}
+.lgh .ch{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:17px;line-height:1.4}
+.o-so{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:14px 8px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--vien);text-align:center}
+.o-so .so{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:34px;line-height:1}
+.o-so .nh{font-size:13px;font-weight:600;color:var(--mo)}
+.hang{display:flex;align-items:center;gap:12px;min-width:0}
+.gian{flex:1;min-width:0}
+.nho{font-size:13px;color:var(--mo)}
+.an{position:absolute;width:0;height:0}
+</style>
+</head>
+<body>
+<svg class="an" aria-hidden="true" focusable="false"><defs>
+<linearGradient id="gBien" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0F3270"/><stop offset=".6" stop-color="#0A1F4A"/><stop offset="1" stop-color="#071229"/></linearGradient>
+<radialGradient id="gDat" cx="40%" cy="35%"><stop offset="0" stop-color="#46D19A"/><stop offset=".6" stop-color="#1F8C66"/><stop offset="1" stop-color="#136048"/></radialGradient>
+<radialGradient id="gDatMo" cx="40%" cy="35%"><stop offset="0" stop-color="#3A6E7E"/><stop offset="1" stop-color="#1C3F52"/></radialGradient>
+<radialGradient id="gLinh" cx="40%" cy="35%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".35" stop-color="#BFF4FF"/><stop offset="1" stop-color="#2FA8E0"/></radialGradient>
+<radialGradient id="gThan" cx="40%" cy="30%"><stop offset="0" stop-color="#FFB25C"/><stop offset=".7" stop-color="#FF7A2E"/><stop offset="1" stop-color="#D9531A"/></radialGradient>
+<linearGradient id="gLua" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF7A2E"/><stop offset=".6" stop-color="#FFC940"/><stop offset="1" stop-color="#FFF1A8"/></linearGradient>
+<radialGradient id="gSuong" cx="40%" cy="30%"><stop offset="0" stop-color="#E4E9FF"/><stop offset=".6" stop-color="#9AA6D6"/><stop offset="1" stop-color="#5E6A9E"/></radialGradient>
+<radialGradient id="gTrum" cx="40%" cy="30%"><stop offset="0" stop-color="#C9A7FF"/><stop offset=".6" stop-color="#7B4FE0"/><stop offset="1" stop-color="#3E1F8F"/></radialGradient>
+<radialGradient id="gTap" cx="40%" cy="30%"><stop offset="0" stop-color="#FF8FB0"/><stop offset="1" stop-color="#C92A5A"/></radialGradient>
+<linearGradient id="gGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C98A45"/><stop offset="1" stop-color="#7A4A1E"/></linearGradient>
+<linearGradient id="gVang" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE08A"/><stop offset="1" stop-color="#E0A21C"/></linearGradient>
+<radialGradient id="gHao" cx="50%" cy="50%"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset=".5" stop-color="#FFC940" stop-opacity=".35"/><stop offset="1" stop-color="#FFC940" stop-opacity="0"/></radialGradient>
+<radialGradient id="gHaoLam" cx="50%" cy="50%"><stop offset="0" stop-color="#BFF4FF" stop-opacity=".8"/><stop offset="1" stop-color="#37E2D5" stop-opacity="0"/></radialGradient>
+<pattern id="pLuc" width="14" height="12" patternUnits="userSpaceOnUse"><path d="M3.5 0 L10.5 0 L14 6 L10.5 12 L3.5 12 L0 6 Z" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="0.8"/></pattern>
+<filter id="fMo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<filter id="fSang" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6"/></filter>
+</defs></svg>
+<main class="khung">
+<header class="tren">
+  <button class="nut-phu" style="min-height:48px" aria-label="Rời trận"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg> Rời trận</button>
+  <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+    <div class="baloo" style="font-weight:800;font-size:24px;line-height:1.1">Đoàn Hộ Tống · Hiệp trùm</div>
+    <div class="nho">Hộ tống Linh Tâm qua 8 hiệp · lớp 12A1</div>
+  </div>
+  <div style="flex:1"></div>
+  <div class="kinh hang" style="padding:8px 16px;border-radius:16px;width:500px;gap:12px"><span class="baloo" style="font-weight:800;font-size:16px;white-space:nowrap">Hiệp 4/8</span><div class="gian"><div style="display:flex;align-items:center;gap:4px"><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:#46D19A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#04291B;line-height:1">1</span></span><span style="flex:1;height:3px;min-width:8px;background:#46D19A"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:#46D19A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#04291B;line-height:1">2</span></span><span style="flex:1;height:3px;min-width:8px;background:#46D19A"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:#46D19A;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#04291B;line-height:1">3</span></span><span style="flex:1;height:3px;min-width:8px;background:#46D19A"></span><span style="transform:rotate(45deg);border-radius:8px;width:28px;height:28px;border:2px solid #FFC940;box-shadow:0 0 0 5px rgba(255,201,64,.22);background:#FFC940;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="transform:rotate(-45deg);font-weight:800;font-size:14px;color:#3A2400;line-height:1">4</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">5</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">6</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">7</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="transform:rotate(45deg);border-radius:8px;width:28px;height:28px;border:2px solid #FFC940;background:linear-gradient(135deg,#8B5CF6,#3E1F8F);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="transform:rotate(-45deg);font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">8</span></span></div></div></div>
+</header>
+<div class="luoi">
+  <section class="c7 kinh" style="padding:24px 28px;display:flex;flex-direction:column;gap:14px;border-radius:28px;border-color:rgba(169,139,255,.5)">
+    <div class="hang" style="gap:8px"><span class="tag" style="background:rgba(139,92,246,.2);color:#D9C6FF;border-color:rgba(169,139,255,.5)">◆ HIỆP TRÙM · 4 Ý ĐÚNG–SAI</span><span class="chip">Tinh bột và cellulose · Thông hiểu</span></div>
+    <div class="de">Cho các phát biểu sau về tinh bột và cellulose. Mỗi phát biểu đúng hay sai?</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="ds"><span class="y">a)</span><span class="nd">Tinh bột và cellulose đều có công thức (C₆H₁₀O₅)ₙ nhưng không phải đồng phân của nhau.</span><button class="bat" aria-pressed="true">Đúng</button><button>Sai</button></div>
+      <div class="ds"><span class="y">b)</span><span class="nd">Amylopectin trong tinh bột có mạch phân nhánh.</span><button class="bat" aria-pressed="true">Đúng</button><button>Sai</button></div>
+      <div class="ds"><span class="y">c)</span><span class="nd">Cellulose tan tốt trong nước lạnh.</span><button>Đúng</button><button class="bat" aria-pressed="true">Sai</button></div>
+      <div class="ds"><span class="y">d)</span><span class="nd">Nhỏ dung dịch iodine vào hồ tinh bột thấy xuất hiện màu xanh tím.</span><button>Đúng</button><button>Sai</button></div>
+    </div>
+    <div style="flex:1"></div>
+    <div class="hang" style="gap:16px">
+      <span class="nho" style="font-size:14px;width:190px">Đã chọn 3/4 ý · chọn đủ 4 ý để chốt đòn</span>
+      <button class="nut-chinh cho" style="flex:1" disabled><span><span class="t">CHỐT ĐÒN TRÙM</span><span class="p">Còn ý d) chưa chọn</span></span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></button>
+    </div>
+  </section>
+  <aside class="c5 cot">
+    <div class="kinh" style="position:relative;overflow:hidden;border-radius:28px;flex:1;min-height:0;background:radial-gradient(420px 320px at 60% 45%,rgba(139,92,246,.5),rgba(139,92,246,0) 70%),var(--kinh)">
+      <svg width="100%" height="100%" viewBox="0 0 560 560" preserveAspectRatio="xMidYMax slice" aria-hidden="true" style="position:absolute;inset:0;display:block"><ellipse cx="280" cy="560" rx="340" ry="130" fill="url(#gDat)"/><rect x="0" y="440" width="560" height="140" fill="url(#pLuc)" opacity=".5"/></svg>
+      <div style="position:absolute;left:18px;right:18px;top:16px">
+        <div class="hang" style="justify-content:space-between"><span style="font-weight:800;font-size:15px;color:#D9C6FF">Trùm Kết Tủa</span><span class="baloo" style="font-weight:800;font-size:18px;color:var(--vang)">Giáp 4/4 mảnh</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px"><span style="height:12px;border-radius:4px;background:linear-gradient(180deg,#FFE08A,#E0A21C);border:1px solid #6B3E00"></span><span style="height:12px;border-radius:4px;background:linear-gradient(180deg,#FFE08A,#E0A21C);border:1px solid #6B3E00"></span><span style="height:12px;border-radius:4px;background:linear-gradient(180deg,#FFE08A,#E0A21C);border:1px solid #6B3E00"></span><span style="height:12px;border-radius:4px;background:linear-gradient(180deg,#FFE08A,#E0A21C);border:1px solid #6B3E00"></span></div>
+        <div class="nho" style="font-size:13px;margin-top:8px;line-height:1.5">Mỗi ý đúng phá 1 mảnh giáp. Đúng đủ 4 ý = <b class="vang">VỠ GIÁP</b>: trùm gục, sóng xung kích quét sạch quái tồn, Linh Tâm không mất máu hiệp này.</div>
+      </div>
+      <div style="position:absolute;left:50%;bottom:70px;transform:translateX(-50%)"><svg width="260" height="260" viewBox="0 0 120 130" aria-hidden="true">
+<ellipse cx="60" cy="124" rx="44" ry="6" fill="rgba(0,0,0,.35)"/>
+<path d="M30 30 L20 4 L44 22Z M90 30 L100 4 L76 22Z" fill="#FFC940" stroke="#6B3E00" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M14 110 C4 80 10 36 36 24 C52 16 68 16 84 24 C110 36 116 80 106 110 C96 122 24 122 14 110Z" fill="url(#gTrum)" stroke="#1E0B4F" stroke-width="3"/>
+<path d="M40 44 l14 7 M80 44 l-14 7" stroke="#1E0B4F" stroke-width="4.5" stroke-linecap="round"/>
+<ellipse cx="47" cy="58" rx="7" ry="6" fill="#FFE34D"/><ellipse cx="73" cy="58" rx="7" ry="6" fill="#FFE34D"/>
+<circle cx="47" cy="58" r="3" fill="#1E0B4F"/><circle cx="73" cy="58" r="3" fill="#1E0B4F"/>
+<path d="M44 78 l6 -5 l5 5 l5 -5 l5 5 l5 -5 l6 5" stroke="#fff" stroke-width="3" fill="none" stroke-linejoin="round"/>
+<path d="M30 44 L43 52 L41 67 L30 73 L19 67 L17 52Z" fill="url(#gVang)" stroke="#6B3E00" stroke-width="2.5"/><path d="M30 51 v14" stroke="#6B3E00" stroke-width="2"/><path d="M90 44 L103 52 L101 67 L90 73 L79 67 L77 52Z" fill="url(#gVang)" stroke="#6B3E00" stroke-width="2.5"/><path d="M90 51 v14" stroke="#6B3E00" stroke-width="2"/><path d="M38 84 L51 92 L49 107 L38 113 L27 107 L25 92Z" fill="url(#gVang)" stroke="#6B3E00" stroke-width="2.5"/><path d="M38 91 v14" stroke="#6B3E00" stroke-width="2"/><path d="M82 84 L95 92 L93 107 L82 113 L71 107 L69 92Z" fill="url(#gVang)" stroke="#6B3E00" stroke-width="2.5"/><path d="M82 91 v14" stroke="#6B3E00" stroke-width="2"/>
+</svg></div>
+      <div style="position:absolute;left:14px;bottom:14px"><svg width="96" height="96" viewBox="0 0 120 120" aria-hidden="true" >
+<ellipse cx="60" cy="112" rx="34" ry="6" fill="rgba(0,0,0,.35)"/>
+<path d="M60 6 C70 24 84 28 81 48 C92 42 96 32 94 24 C108 42 106 62 98 74 L22 74 C14 58 16 40 30 28 C30 40 36 46 42 48 C38 30 50 20 60 6Z" fill="url(#gLua)"/>
+<ellipse cx="60" cy="80" rx="38" ry="31" fill="url(#gThan)"/>
+<ellipse cx="60" cy="90" rx="21" ry="15" fill="#FFE3B0"/>
+<ellipse cx="46" cy="74" rx="6" ry="8" fill="#1A0F2E"/><circle cx="48" cy="71" r="2.4" fill="#fff"/>
+<ellipse cx="74" cy="74" rx="6" ry="8" fill="#1A0F2E"/><circle cx="76" cy="71" r="2.4" fill="#fff"/>
+<ellipse cx="36" cy="86" rx="5" ry="3" fill="#FF6F8A" opacity=".75"/><ellipse cx="84" cy="86" rx="5" ry="3" fill="#FF6F8A" opacity=".75"/>
+<path d="M54 85 q6 6 12 0" stroke="#1A0F2E" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<ellipse cx="40" cy="108" rx="11" ry="6" fill="#D9531A"/><ellipse cx="80" cy="108" rx="11" ry="6" fill="#D9531A"/>
+</svg></div>
+      <div style="position:absolute;right:14px;bottom:20px"><svg width="96" height="76" viewBox="0 0 120 96" aria-hidden="true">
+<circle cx="60" cy="30" r="34" fill="url(#gHaoLam)"/>
+<rect x="18" y="46" width="84" height="30" rx="6" fill="url(#gGo)" stroke="#4A2A0E" stroke-width="3"/>
+<path d="M18 58 h84" stroke="#4A2A0E" stroke-width="2"/>
+<circle cx="60" cy="32" r="18" fill="url(#gLinh)" stroke="#E8FDFF" stroke-width="2"/>
+<path d="M54 26 q6 -6 10 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<circle cx="36" cy="80" r="11" fill="#3A2310" stroke="#FFC940" stroke-width="3"/><circle cx="84" cy="80" r="11" fill="#3A2310" stroke="#FFC940" stroke-width="3"/>
+<circle cx="36" cy="80" r="3" fill="#FFC940"/><circle cx="84" cy="80" r="3" fill="#FFC940"/>
+</svg></div>
+    </div>
+    <div class="kinh the" style="padding:12px 16px;display:flex;gap:10px;align-items:center">
+      <div class="hang" style="gap:10px;padding:8px 12px 8px 8px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--vien)"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#2F5FD0" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">T</span></span><div style="min-width:0"><div style="font-weight:800;font-size:14px;white-space:nowrap">Thu Hà</div><div style="font-size:12px;color:var(--xanh);white-space:nowrap">Đã chốt đòn</div></div></div>
+      <div class="hang" style="gap:10px;padding:8px 12px 8px 8px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--vien)"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#6A3FD0" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">N</span></span><div style="min-width:0"><div style="font-weight:800;font-size:14px;white-space:nowrap">Nam</div><div style="font-size:12px;color:var(--mo);white-space:nowrap">Đang làm</div></div></div>
+      <span class="nho" style="margin-left:auto;font-size:13px;text-align:right">Linh Tâm<br><b style="color:var(--lam)">Máu 80/100</b></span>
+    </div>
+  </aside>
+</div>
+<div class="ghichu">Màn ngang · dùng khi màn rộng <b>≥ 1024 px</b> hoặc điện thoại xoay ngang <b>≥ 700 px</b></div>
+</main>
+</body>
+</html>

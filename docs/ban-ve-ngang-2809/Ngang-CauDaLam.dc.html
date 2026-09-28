@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Câu đã làm ngang</title>
+<meta name="description" content="Câu đã làm bản ngang: bộ lọc và danh sách bên trái, chi tiết câu với lời giải chuẩn bên phải, nút Tải PDF.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+:root{--nen:#071229;--nen2:#0A1F4A;--bien:#0D2A5E;--chu:#F2F6FF;--mo:#BCCBEB;--mo2:#9FB1D8;--vang:#FFC940;--cam:#FF9F1C;--ngoc:#37E2D5;--lam:#7FF3FF;--hong:#FF6F97;--do:#E83D6D;--xanh:#46D19A;--tim:#A98BFF;--vien:rgba(160,200,255,.18);--kinh:rgba(12,26,58,.74)}
+html,body{margin:0;background:#030914;color:var(--chu);font-family:'Be Vietnam Pro',system-ui,sans-serif;font-variant-numeric:tabular-nums}
+button{font-family:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--lam);outline-offset:3px}
+.khung{position:relative;width:1440px;height:900px;overflow:hidden;background:
+ radial-gradient(900px 600px at 18% 0%,rgba(30,80,160,.55),rgba(30,80,160,0) 70%),
+ radial-gradient(800px 600px at 100% 100%,rgba(70,40,140,.45),rgba(70,40,140,0) 70%),var(--nen)}
+.khung+.khung{margin-top:0}
+.baloo{font-family:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif}
+.kinh{background:var(--kinh);border:1px solid var(--vien);backdrop-filter:blur(12px);border-radius:24px}
+.dac{background:rgba(8,18,44,.94)}
+.nhan{font-size:12px;font-weight:800;letter-spacing:1.4px;color:var(--mo)}
+.mo{color:var(--mo)} .vang{color:var(--vang)} .ngoc{color:var(--ngoc)} .xanh{color:var(--xanh)} .hong{color:var(--hong)} .lam{color:var(--lam)}
+.tren{position:absolute;left:32px;right:32px;top:16px;height:64px;display:flex;align-items:center;gap:14px}
+.luoi{position:absolute;left:32px;right:32px;top:96px;bottom:54px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.c7{grid-column:span 7;min-width:0;min-height:0} .c5{grid-column:span 5;min-width:0;min-height:0} .c4{grid-column:span 4;min-width:0} .c8{grid-column:span 8;min-width:0} .c6{grid-column:span 6;min-width:0}
+.cot{display:flex;flex-direction:column;gap:16px;min-height:0}
+.ghichu{position:absolute;right:16px;bottom:12px;font-size:12px;font-weight:600;color:var(--mo2);background:rgba(3,9,20,.7);border:1px solid var(--vien);border-radius:12px;padding:5px 12px;z-index:50}
+.ghichu b{color:var(--vang)}
+.nut-chinh{width:100%;min-height:76px;border-radius:24px;border:0;background:linear-gradient(180deg,#FFD66B 0%,#FF9F1C 100%);color:#3A1D00;box-shadow:0 6px 0 #B8650A,0 14px 30px rgba(255,159,28,.32);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 26px;text-align:left}
+.nut-chinh .t{font-family:'Baloo 2',sans-serif;font-size:26px;font-weight:800;line-height:1.05;letter-spacing:.4px}
+.nut-chinh .p{display:block;font-size:13px;font-weight:700;margin-top:2px}
+.nut-chinh .t{display:block}
+.nut-chinh.cho{background:rgba(255,201,64,.14);color:#FFD98A;box-shadow:none;border:2px dashed rgba(255,201,64,.55)}
+.nut-khoa{width:100%;min-height:64px;border-radius:20px;border:1px dashed rgba(160,200,255,.35);background:rgba(255,255,255,.04);color:var(--mo2);display:flex;align-items:center;gap:14px;padding:10px 18px;text-align:left}
+.nut-phu{min-height:48px;border-radius:16px;border:1px solid var(--vien);background:rgba(255,255,255,.07);font-weight:700;font-size:15px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.nut-tron{width:48px;height:48px;border-radius:16px;border:1px solid var(--vien);background:var(--kinh);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;border-radius:16px;font-size:13px;font-weight:700;background:rgba(255,255,255,.07);border:1px solid var(--vien);white-space:nowrap}
+.the{padding:20px 22px}
+.thanh{height:8px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
+.thanh>i{display:block;height:100%;border-radius:4px}
+.pa{display:flex;align-items:center;gap:14px;min-height:60px;padding:9px 16px;border-radius:18px;background:rgba(255,255,255,.05);border:2px solid rgba(160,200,255,.16);font-size:18px;font-weight:600;line-height:1.35;width:100%;text-align:left}
+.pa .ch{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;flex-shrink:0}
+.pa.chon{border-color:var(--vang);background:rgba(255,201,64,.12)} .pa.chon .ch{background:var(--vang);color:#3A2400}
+.pa.dung{border-color:var(--xanh);background:rgba(70,209,154,.14)} .pa.dung .ch{background:var(--xanh);color:#04291B}
+.pa.sai{border-color:var(--hong);background:rgba(255,92,138,.12)} .pa.sai .ch{background:var(--hong);color:#3A0A1A}
+.pa.chay{opacity:.42;border-style:dashed} .pa.chay .nd{text-decoration:line-through}
+.pa .dau{margin-left:auto;font-size:13px;font-weight:800;white-space:nowrap;padding:4px 10px;border-radius:10px}
+.de{font-size:20px;line-height:1.55;font-weight:600}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:1.2px;padding:6px 12px;border-radius:12px;background:rgba(55,226,213,.12);color:var(--lam);border:1px solid rgba(55,226,213,.3)}
+.ds{display:grid;grid-template-columns:36px 1fr 104px 104px;align-items:center;gap:12px;min-height:84px;padding:12px 16px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(160,200,255,.12)}
+.ds .y{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:var(--vang)}
+.ds .nd{font-size:18px;line-height:1.45;font-weight:600}
+.ds button{height:56px;border-radius:14px;border:2px solid rgba(160,200,255,.22);background:rgba(255,255,255,.05);font-weight:800;font-size:16px}
+.ds button.bat{background:var(--vang);color:#3A2400;border-color:var(--vang)}
+.lg{display:flex;flex-direction:column;gap:12px}
+.lg-dau{display:flex;align-items:center;gap:10px;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;color:var(--vang);letter-spacing:.6px}
+.kt{border-radius:16px;background:rgba(55,226,213,.08);border:1px solid rgba(55,226,213,.28);padding:12px 16px}
+.kt .nhan{color:var(--lam)}
+.kt p{margin:6px 0 0;font-size:15px;line-height:1.6}
+.lgh{display:grid;grid-template-columns:28px 30px 1fr;gap:8px;align-items:start;font-size:16px;line-height:1.55;padding:8px 10px;border-radius:12px}
+.lgh .dk{width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;margin-top:0}
+.lgh.d{background:rgba(70,209,154,.10)} .lgh.d .dk{background:var(--xanh);color:#04291B}
+.lgh.s .dk{background:rgba(255,111,151,.2);color:var(--hong);border:1px solid rgba(255,111,151,.5)}
+.lgh .ch{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:17px;line-height:1.4}
+.o-so{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:14px 8px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--vien);text-align:center}
+.o-so .so{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:34px;line-height:1}
+.o-so .nh{font-size:13px;font-weight:600;color:var(--mo)}
+.hang{display:flex;align-items:center;gap:12px;min-width:0}
+.gian{flex:1;min-width:0}
+.nho{font-size:13px;color:var(--mo)}
+.an{position:absolute;width:0;height:0}
+</style>
+</head>
+<body>
+<svg class="an" aria-hidden="true" focusable="false"><defs>
+<linearGradient id="gBien" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0F3270"/><stop offset=".6" stop-color="#0A1F4A"/><stop offset="1" stop-color="#071229"/></linearGradient>
+<radialGradient id="gDat" cx="40%" cy="35%"><stop offset="0" stop-color="#46D19A"/><stop offset=".6" stop-color="#1F8C66"/><stop offset="1" stop-color="#136048"/></radialGradient>
+<radialGradient id="gDatMo" cx="40%" cy="35%"><stop offset="0" stop-color="#3A6E7E"/><stop offset="1" stop-color="#1C3F52"/></radialGradient>
+<radialGradient id="gLinh" cx="40%" cy="35%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".35" stop-color="#BFF4FF"/><stop offset="1" stop-color="#2FA8E0"/></radialGradient>
+<radialGradient id="gThan" cx="40%" cy="30%"><stop offset="0" stop-color="#FFB25C"/><stop offset=".7" stop-color="#FF7A2E"/><stop offset="1" stop-color="#D9531A"/></radialGradient>
+<linearGradient id="gLua" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF7A2E"/><stop offset=".6" stop-color="#FFC940"/><stop offset="1" stop-color="#FFF1A8"/></linearGradient>
+<radialGradient id="gSuong" cx="40%" cy="30%"><stop offset="0" stop-color="#E4E9FF"/><stop offset=".6" stop-color="#9AA6D6"/><stop offset="1" stop-color="#5E6A9E"/></radialGradient>
+<radialGradient id="gTrum" cx="40%" cy="30%"><stop offset="0" stop-color="#C9A7FF"/><stop offset=".6" stop-color="#7B4FE0"/><stop offset="1" stop-color="#3E1F8F"/></radialGradient>
+<radialGradient id="gTap" cx="40%" cy="30%"><stop offset="0" stop-color="#FF8FB0"/><stop offset="1" stop-color="#C92A5A"/></radialGradient>
+<linearGradient id="gGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C98A45"/><stop offset="1" stop-color="#7A4A1E"/></linearGradient>
+<linearGradient id="gVang" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE08A"/><stop offset="1" stop-color="#E0A21C"/></linearGradient>
+<radialGradient id="gHao" cx="50%" cy="50%"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset=".5" stop-color="#FFC940" stop-opacity=".35"/><stop offset="1" stop-color="#FFC940" stop-opacity="0"/></radialGradient>
+<radialGradient id="gHaoLam" cx="50%" cy="50%"><stop offset="0" stop-color="#BFF4FF" stop-opacity=".8"/><stop offset="1" stop-color="#37E2D5" stop-opacity="0"/></radialGradient>
+<pattern id="pLuc" width="14" height="12" patternUnits="userSpaceOnUse"><path d="M3.5 0 L10.5 0 L14 6 L10.5 12 L3.5 12 L0 6 Z" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="0.8"/></pattern>
+<filter id="fMo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<filter id="fSang" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6"/></filter>
+</defs></svg>
+<main class="khung">
+<header class="tren">
+  <button class="nut-phu" style="min-height:48px" aria-label="Về Sảnh"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg> Về Sảnh</button>
+  <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+    <div class="baloo" style="font-weight:800;font-size:24px;line-height:1.1">Câu đã làm</div>
+    <div class="nho">Cập nhật 20:12 Chủ Nhật 04/10/2026</div>
+  </div>
+  <div style="flex:1"></div>
+  <button class="nut-phu">Chiến dịch: Carbohydrate · 120 câu ▾</button><button class="nut-phu" style="border-color:rgba(255,201,64,.6);color:var(--vang)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg> Tải PDF · 14 câu đang lọc</button>
+</header>
+<div class="luoi">
+  <section class="c5 cot">
+    <div style="display:flex;flex-wrap:wrap;gap:8px"><button class="chip" style="min-height:44px;padding:0 14px;font-size:14px;" aria-pressed="false">Tất cả · 120 câu</button><button class="chip" style="min-height:44px;padding:0 14px;font-size:14px;background:var(--vang);color:#3A2400;border-color:var(--vang)" aria-pressed="true">Sai lần gần nhất · 14 câu</button><button class="chip" style="min-height:44px;padding:0 14px;font-size:14px;" aria-pressed="false">Đang ôn · 64 câu</button><button class="chip" style="min-height:44px;padding:0 14px;font-size:14px;" aria-pressed="false">Thành thạo · 52 câu</button><button class="chip" style="min-height:44px;padding:0 14px;font-size:14px;" aria-pressed="false">Cần thầy dạy lại · 4 câu</button></div>
+    <div class="nho">14 câu · xếp theo lần làm gần nhất</div>
+    <div style="display:flex;flex-direction:column;gap:10px;overflow:hidden;flex:1;min-height:0;-webkit-mask-image:linear-gradient(180deg,#000 88%,transparent)">
+      <button style="text-align:left;width:100%;padding:14px 16px;border-radius:18px;border:2px solid var(--vang);background:rgba(255,201,64,.08);background-color:rgba(12,26,58,.74);display:flex;flex-direction:column;gap:6px">
+  <span class="hang" style="justify-content:space-between;width:100%"><span style="font-size:13px;font-weight:700;color:var(--mo)">Câu 17 · Trắc nghiệm · Vận dụng</span><span class="chip" style="min-height:26px;font-size:12px;color:#FFB3C8">Cần thầy dạy lại</span></span>
+  <span style="font-size:15px;font-weight:600;line-height:1.45">Cho 18 gam glucose tác dụng với lượng dư dung dịch AgNO₃ trong NH₃, đun nóng…</span>
+  <span style="font-size:13px;color:var(--mo)">Sai 4 lần · lần gần nhất 02/10</span>
+</button>
+      <button style="text-align:left;width:100%;padding:14px 16px;border-radius:18px;border:1px solid var(--vien);background-color:rgba(12,26,58,.74);display:flex;flex-direction:column;gap:6px">
+  <span class="hang" style="justify-content:space-between;width:100%"><span style="font-size:13px;font-weight:700;color:var(--mo)">Câu 5 · Đúng–sai · Thông hiểu · sai 1/4 ý</span><span class="chip" style="min-height:26px;font-size:12px;color:var(--lam)">Đang ôn</span></span>
+  <span style="font-size:15px;font-weight:600;line-height:1.45">a) Saccharose tham gia phản ứng tráng bạc.</span>
+  <span style="font-size:13px;color:var(--mo)">Em chọn: Đúng · Đáp án: Sai · Đến lịch ôn lại: Thứ Hai 05/10</span>
+</button>
+      <button style="text-align:left;width:100%;padding:14px 16px;border-radius:18px;border:1px solid var(--vien);background-color:rgba(12,26,58,.74);display:flex;flex-direction:column;gap:6px">
+  <span class="hang" style="justify-content:space-between;width:100%"><span style="font-size:13px;font-weight:700;color:var(--mo)">Câu 31 · Trả lời ngắn · Thông hiểu</span><span class="chip" style="min-height:26px;font-size:12px;color:var(--lam)">Đang ôn</span></span>
+  <span style="font-size:15px;font-weight:600;line-height:1.45">Số nhóm –OH trong một phân tử glucose dạng mạch hở là</span>
+  <span style="font-size:13px;color:var(--mo)">Em trả lời: 6 · Đáp án: 5 · Đến lịch ôn lại: Thứ Hai 05/10</span>
+</button>
+      <button style="text-align:left;width:100%;padding:14px 16px;border-radius:18px;border:1px solid var(--vien);background-color:rgba(12,26,58,.74);display:flex;flex-direction:column;gap:6px">
+  <span class="hang" style="justify-content:space-between;width:100%"><span style="font-size:13px;font-weight:700;color:var(--mo)">Câu 22 · Trắc nghiệm · Nhận biết</span><span class="chip" style="min-height:26px;font-size:12px;color:var(--lam)">Đang ôn</span></span>
+  <span style="font-size:15px;font-weight:600;line-height:1.45">Chất nào sau đây thuộc loại disaccharide?</span>
+  <span style="font-size:13px;color:var(--mo)">Em chọn: A. Glucose · Đáp án: C. Saccharose</span>
+</button>
+      <button style="text-align:left;width:100%;padding:14px 16px;border-radius:18px;border:1px solid var(--vien);background-color:rgba(12,26,58,.74);display:flex;flex-direction:column;gap:6px">
+  <span class="hang" style="justify-content:space-between;width:100%"><span style="font-size:13px;font-weight:700;color:var(--mo)">Câu 9 · Trắc nghiệm · Nhận biết</span><span class="chip" style="min-height:26px;font-size:12px;color:var(--lam)">Đang ôn</span></span>
+  <span style="font-size:15px;font-weight:600;line-height:1.45">Thuốc thử dùng để nhận biết hồ tinh bột là</span>
+  <span style="font-size:13px;color:var(--mo)">Em chọn: B. Cu(OH)₂ · Đáp án: A. Dung dịch iodine</span>
+</button>
+    </div>
+  </section>
+  <section class="c7 kinh" style="padding:20px 26px;border-radius:28px;display:flex;flex-direction:column;gap:12px;overflow:auto">
+    <div class="hang" style="justify-content:space-between"><span class="baloo" style="font-weight:800;font-size:24px">Câu 17 · Trắc nghiệm · Vận dụng</span><span class="chip" style="color:#FFB3C8;border-color:rgba(255,111,151,.5)">Cần thầy dạy lại</span></div>
+    <div class="de" style="font-size:18px">Cho 18 gam glucose (C₆H₁₂O₆) tác dụng với lượng dư dung dịch AgNO₃ trong NH₃, đun nóng. Khối lượng Ag tối đa thu được là</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="pa" style="min-height:48px;font-size:16px;padding:6px 14px"><span class="ch" style="width:34px;height:34px">A</span>10,8 gam</div>
+      <div class="pa dung" style="min-height:48px;font-size:16px;padding:6px 14px"><span class="ch" style="width:34px;height:34px">B</span>21,6 gam<span class="dau" style="color:var(--xanh)">✓ Đáp án</span></div>
+      <div class="pa sai" style="min-height:48px;font-size:16px;padding:6px 14px"><span class="ch" style="width:34px;height:34px">C</span>43,2 gam<span class="dau" style="color:var(--hong)">✗ Em chọn</span></div>
+      <div class="pa" style="min-height:48px;font-size:16px;padding:6px 14px"><span class="ch" style="width:34px;height:34px">D</span>32,4 gam</div>
+    </div>
+    <div class="lg">
+  <div class="lg-dau"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z"/></svg> LỜI GIẢI</div>
+  <div class="kt"><div class="nhan">KIẾN THỨC CỐT LÕI</div><p>Glucose có một nhóm –CHO: 1 mol C₆H₁₂O₆ tráng bạc cho 2 mol Ag. M(C₆H₁₂O₆) = 180; M(Ag) = 108.</p></div>
+  <div style="display:flex;flex-direction:column;gap:4px"><div style="font-size:15px" class="lgh s"><span class="dk">✗</span><span class="ch">A.</span><span>10,8 gam: lấy n(Ag) = n(glucose), quên tỉ lệ 1 : 2.</span></div><div style="font-size:15px" class="lgh d"><span class="dk">✓</span><span class="ch">B.</span><span>n(glucose) = 18 : 180 = 0,1 mol → n(Ag) = 0,2 mol → m(Ag) = 0,2 × 108 = 21,6 gam.</span></div><div style="font-size:15px" class="lgh s"><span class="dk">✗</span><span class="ch">C.</span><span>43,2 gam: tính 1 mol glucose cho 4 mol Ag (nhầm với HCHO).</span></div><div style="font-size:15px" class="lgh s"><span class="dk">✗</span><span class="ch">D.</span><span>32,4 gam: lấy nhầm M(glucose) = 120 nên ra 0,15 mol → 0,3 mol Ag.</span></div></div>
+</div>
+    <div style="border-top:1px solid var(--vien);padding-top:10px;display:flex;flex-direction:column;gap:6px">
+      <div class="hang" style="gap:8px;flex-wrap:wrap"><span class="nhan" style="margin-right:4px">LỊCH SỬ</span>
+        <span class="chip hong" style="min-height:28px;font-size:12px">Sai 29/09 · ca kiểm tra</span><span class="chip hong" style="min-height:28px;font-size:12px">Sai 30/09</span><span class="chip hong" style="min-height:28px;font-size:12px">Sai 01/10 · có gợi ý</span><span class="chip hong" style="min-height:28px;font-size:12px">Sai 02/10 · có gợi ý</span></div>
+      <div style="font-size:14px;color:#FFD98A">Thầy chữa câu này trên lớp Thứ Hai 05/10. Chữa xong, câu quay lại Đoàn Hộ Tống từ hôm sau.</div>
+    </div>
+  </section>
+</div>
+<div class="ghichu">Màn ngang · dùng khi màn rộng <b>≥ 1024 px</b> hoặc điện thoại xoay ngang <b>≥ 700 px</b></div>
+</main>
+</body>
+</html>

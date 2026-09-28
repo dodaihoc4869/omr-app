@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Sảnh Đoàn Hộ Tống</title>
+<meta name="description" content="Sảnh Đoàn Hộ Tống bản ngang: đường 30 trạm của lớp và đồng đội bên trái, chặng câu ôn và nút Lên đường bên phải.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+:root{--nen:#071229;--nen2:#0A1F4A;--bien:#0D2A5E;--chu:#F2F6FF;--mo:#BCCBEB;--mo2:#9FB1D8;--vang:#FFC940;--cam:#FF9F1C;--ngoc:#37E2D5;--lam:#7FF3FF;--hong:#FF6F97;--do:#E83D6D;--xanh:#46D19A;--tim:#A98BFF;--vien:rgba(160,200,255,.18);--kinh:rgba(12,26,58,.74)}
+html,body{margin:0;background:#030914;color:var(--chu);font-family:'Be Vietnam Pro',system-ui,sans-serif;font-variant-numeric:tabular-nums}
+button{font-family:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:3px solid var(--lam);outline-offset:3px}
+.khung{position:relative;width:1440px;height:900px;overflow:hidden;background:
+ radial-gradient(900px 600px at 18% 0%,rgba(30,80,160,.55),rgba(30,80,160,0) 70%),
+ radial-gradient(800px 600px at 100% 100%,rgba(70,40,140,.45),rgba(70,40,140,0) 70%),var(--nen)}
+.khung+.khung{margin-top:0}
+.baloo{font-family:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif}
+.kinh{background:var(--kinh);border:1px solid var(--vien);backdrop-filter:blur(12px);border-radius:24px}
+.dac{background:rgba(8,18,44,.94)}
+.nhan{font-size:12px;font-weight:800;letter-spacing:1.4px;color:var(--mo)}
+.mo{color:var(--mo)} .vang{color:var(--vang)} .ngoc{color:var(--ngoc)} .xanh{color:var(--xanh)} .hong{color:var(--hong)} .lam{color:var(--lam)}
+.tren{position:absolute;left:32px;right:32px;top:16px;height:64px;display:flex;align-items:center;gap:14px}
+.luoi{position:absolute;left:32px;right:32px;top:96px;bottom:54px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px}
+.c7{grid-column:span 7;min-width:0;min-height:0} .c5{grid-column:span 5;min-width:0;min-height:0} .c4{grid-column:span 4;min-width:0} .c8{grid-column:span 8;min-width:0} .c6{grid-column:span 6;min-width:0}
+.cot{display:flex;flex-direction:column;gap:16px;min-height:0}
+.ghichu{position:absolute;right:16px;bottom:12px;font-size:12px;font-weight:600;color:var(--mo2);background:rgba(3,9,20,.7);border:1px solid var(--vien);border-radius:12px;padding:5px 12px;z-index:50}
+.ghichu b{color:var(--vang)}
+.nut-chinh{width:100%;min-height:76px;border-radius:24px;border:0;background:linear-gradient(180deg,#FFD66B 0%,#FF9F1C 100%);color:#3A1D00;box-shadow:0 6px 0 #B8650A,0 14px 30px rgba(255,159,28,.32);display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 26px;text-align:left}
+.nut-chinh .t{font-family:'Baloo 2',sans-serif;font-size:26px;font-weight:800;line-height:1.05;letter-spacing:.4px}
+.nut-chinh .p{display:block;font-size:13px;font-weight:700;margin-top:2px}
+.nut-chinh .t{display:block}
+.nut-chinh.cho{background:rgba(255,201,64,.14);color:#FFD98A;box-shadow:none;border:2px dashed rgba(255,201,64,.55)}
+.nut-khoa{width:100%;min-height:64px;border-radius:20px;border:1px dashed rgba(160,200,255,.35);background:rgba(255,255,255,.04);color:var(--mo2);display:flex;align-items:center;gap:14px;padding:10px 18px;text-align:left}
+.nut-phu{min-height:48px;border-radius:16px;border:1px solid var(--vien);background:rgba(255,255,255,.07);font-weight:700;font-size:15px;padding:0 18px;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.nut-tron{width:48px;height:48px;border-radius:16px;border:1px solid var(--vien);background:var(--kinh);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;border-radius:16px;font-size:13px;font-weight:700;background:rgba(255,255,255,.07);border:1px solid var(--vien);white-space:nowrap}
+.the{padding:20px 22px}
+.thanh{height:8px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}
+.thanh>i{display:block;height:100%;border-radius:4px}
+.pa{display:flex;align-items:center;gap:14px;min-height:60px;padding:9px 16px;border-radius:18px;background:rgba(255,255,255,.05);border:2px solid rgba(160,200,255,.16);font-size:18px;font-weight:600;line-height:1.35;width:100%;text-align:left}
+.pa .ch{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;flex-shrink:0}
+.pa.chon{border-color:var(--vang);background:rgba(255,201,64,.12)} .pa.chon .ch{background:var(--vang);color:#3A2400}
+.pa.dung{border-color:var(--xanh);background:rgba(70,209,154,.14)} .pa.dung .ch{background:var(--xanh);color:#04291B}
+.pa.sai{border-color:var(--hong);background:rgba(255,92,138,.12)} .pa.sai .ch{background:var(--hong);color:#3A0A1A}
+.pa.chay{opacity:.42;border-style:dashed} .pa.chay .nd{text-decoration:line-through}
+.pa .dau{margin-left:auto;font-size:13px;font-weight:800;white-space:nowrap;padding:4px 10px;border-radius:10px}
+.de{font-size:20px;line-height:1.55;font-weight:600}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;letter-spacing:1.2px;padding:6px 12px;border-radius:12px;background:rgba(55,226,213,.12);color:var(--lam);border:1px solid rgba(55,226,213,.3)}
+.ds{display:grid;grid-template-columns:36px 1fr 104px 104px;align-items:center;gap:12px;min-height:84px;padding:12px 16px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(160,200,255,.12)}
+.ds .y{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:var(--vang)}
+.ds .nd{font-size:18px;line-height:1.45;font-weight:600}
+.ds button{height:56px;border-radius:14px;border:2px solid rgba(160,200,255,.22);background:rgba(255,255,255,.05);font-weight:800;font-size:16px}
+.ds button.bat{background:var(--vang);color:#3A2400;border-color:var(--vang)}
+.lg{display:flex;flex-direction:column;gap:12px}
+.lg-dau{display:flex;align-items:center;gap:10px;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;color:var(--vang);letter-spacing:.6px}
+.kt{border-radius:16px;background:rgba(55,226,213,.08);border:1px solid rgba(55,226,213,.28);padding:12px 16px}
+.kt .nhan{color:var(--lam)}
+.kt p{margin:6px 0 0;font-size:15px;line-height:1.6}
+.lgh{display:grid;grid-template-columns:28px 30px 1fr;gap:8px;align-items:start;font-size:16px;line-height:1.55;padding:8px 10px;border-radius:12px}
+.lgh .dk{width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;margin-top:0}
+.lgh.d{background:rgba(70,209,154,.10)} .lgh.d .dk{background:var(--xanh);color:#04291B}
+.lgh.s .dk{background:rgba(255,111,151,.2);color:var(--hong);border:1px solid rgba(255,111,151,.5)}
+.lgh .ch{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:17px;line-height:1.4}
+.o-so{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:14px 8px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid var(--vien);text-align:center}
+.o-so .so{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:34px;line-height:1}
+.o-so .nh{font-size:13px;font-weight:600;color:var(--mo)}
+.hang{display:flex;align-items:center;gap:12px;min-width:0}
+.gian{flex:1;min-width:0}
+.nho{font-size:13px;color:var(--mo)}
+.an{position:absolute;width:0;height:0}
+</style>
+</head>
+<body>
+<svg class="an" aria-hidden="true" focusable="false"><defs>
+<linearGradient id="gBien" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0F3270"/><stop offset=".6" stop-color="#0A1F4A"/><stop offset="1" stop-color="#071229"/></linearGradient>
+<radialGradient id="gDat" cx="40%" cy="35%"><stop offset="0" stop-color="#46D19A"/><stop offset=".6" stop-color="#1F8C66"/><stop offset="1" stop-color="#136048"/></radialGradient>
+<radialGradient id="gDatMo" cx="40%" cy="35%"><stop offset="0" stop-color="#3A6E7E"/><stop offset="1" stop-color="#1C3F52"/></radialGradient>
+<radialGradient id="gLinh" cx="40%" cy="35%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".35" stop-color="#BFF4FF"/><stop offset="1" stop-color="#2FA8E0"/></radialGradient>
+<radialGradient id="gThan" cx="40%" cy="30%"><stop offset="0" stop-color="#FFB25C"/><stop offset=".7" stop-color="#FF7A2E"/><stop offset="1" stop-color="#D9531A"/></radialGradient>
+<linearGradient id="gLua" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF7A2E"/><stop offset=".6" stop-color="#FFC940"/><stop offset="1" stop-color="#FFF1A8"/></linearGradient>
+<radialGradient id="gSuong" cx="40%" cy="30%"><stop offset="0" stop-color="#E4E9FF"/><stop offset=".6" stop-color="#9AA6D6"/><stop offset="1" stop-color="#5E6A9E"/></radialGradient>
+<radialGradient id="gTrum" cx="40%" cy="30%"><stop offset="0" stop-color="#C9A7FF"/><stop offset=".6" stop-color="#7B4FE0"/><stop offset="1" stop-color="#3E1F8F"/></radialGradient>
+<radialGradient id="gTap" cx="40%" cy="30%"><stop offset="0" stop-color="#FF8FB0"/><stop offset="1" stop-color="#C92A5A"/></radialGradient>
+<linearGradient id="gGo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C98A45"/><stop offset="1" stop-color="#7A4A1E"/></linearGradient>
+<linearGradient id="gVang" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE08A"/><stop offset="1" stop-color="#E0A21C"/></linearGradient>
+<radialGradient id="gHao" cx="50%" cy="50%"><stop offset="0" stop-color="#FFE9A8" stop-opacity=".9"/><stop offset=".5" stop-color="#FFC940" stop-opacity=".35"/><stop offset="1" stop-color="#FFC940" stop-opacity="0"/></radialGradient>
+<radialGradient id="gHaoLam" cx="50%" cy="50%"><stop offset="0" stop-color="#BFF4FF" stop-opacity=".8"/><stop offset="1" stop-color="#37E2D5" stop-opacity="0"/></radialGradient>
+<pattern id="pLuc" width="14" height="12" patternUnits="userSpaceOnUse"><path d="M3.5 0 L10.5 0 L14 6 L10.5 12 L3.5 12 L0 6 Z" fill="none" stroke="rgba(255,255,255,0.16)" stroke-width="0.8"/></pattern>
+<filter id="fMo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+<filter id="fSang" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6"/></filter>
+</defs></svg>
+<main class="khung">
+<header class="tren">
+  <div class="kinh hang" style="padding:6px 18px 6px 8px;border-radius:20px;height:64px;min-width:340px">
+    <span style="position:relative;width:52px;height:52px;flex-shrink:0"><svg width="52" height="52" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#1B2F66" stroke="#FFC940" stroke-width="2.5"/></svg><span style="position:absolute;left:5px;top:4px"><svg width="42" height="42" viewBox="0 0 120 120" aria-hidden="true" >
+<ellipse cx="60" cy="112" rx="34" ry="6" fill="rgba(0,0,0,.35)"/>
+<path d="M60 6 C70 24 84 28 81 48 C92 42 96 32 94 24 C108 42 106 62 98 74 L22 74 C14 58 16 40 30 28 C30 40 36 46 42 48 C38 30 50 20 60 6Z" fill="url(#gLua)"/>
+<ellipse cx="60" cy="80" rx="38" ry="31" fill="url(#gThan)"/>
+<ellipse cx="60" cy="90" rx="21" ry="15" fill="#FFE3B0"/>
+<ellipse cx="46" cy="74" rx="6" ry="8" fill="#1A0F2E"/><circle cx="48" cy="71" r="2.4" fill="#fff"/>
+<ellipse cx="74" cy="74" rx="6" ry="8" fill="#1A0F2E"/><circle cx="76" cy="71" r="2.4" fill="#fff"/>
+<ellipse cx="36" cy="86" rx="5" ry="3" fill="#FF6F8A" opacity=".75"/><ellipse cx="84" cy="86" rx="5" ry="3" fill="#FF6F8A" opacity=".75"/>
+<path d="M54 85 q6 6 12 0" stroke="#1A0F2E" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+<ellipse cx="40" cy="108" rx="11" ry="6" fill="#D9531A"/><ellipse cx="80" cy="108" rx="11" ry="6" fill="#D9531A"/>
+</svg></span></span>
+    <div class="gian" style="display:flex;flex-direction:column;gap:5px">
+      <div style="font-size:14px;font-weight:800">Thần thú của em: Lửa Nhỏ · Cấp 7</div>
+      <div class="thanh" style="height:7px"><i style="width:68%;background:linear-gradient(90deg,#FF9F1C,#FFC940)"></i></div>
+      <div class="nho" style="font-size:12px">EXP 340/500 tới cấp 8 · +22 EXP hôm nay</div>
+    </div>
+  </div>
+  <div style="flex:1"></div>
+  
+  <span class="chip" style="min-height:44px;padding:0 16px;color:var(--lam)"><svg width="16" height="18" viewBox="0 0 14 16" aria-hidden="true"><polygon points="7,0 14,5 11,16 3,16 0,5" fill="#37E2D5"/></svg> Thể lực hôm nay: còn 28/40 câu</span>
+  <span class="chip" style="min-height:44px;padding:0 16px;color:#FFB08A"><svg width="16" height="18" viewBox="0 0 24 24" fill="#FF7A45" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Chuỗi 5 ngày</span>
+  <button class="nut-tron" aria-label="Túi đồ"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></button>
+  <button class="nut-tron" aria-label="Cửa hàng"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h16l-1-5H5z"/><path d="M5 10v10h14V10M10 20v-6h4v6"/></svg></button>
+</header>
+<div class="luoi">
+  <section class="c7 kinh" style="position:relative;overflow:hidden;border-radius:28px;padding:0">
+    <svg width="100%" height="100%" viewBox="0 0 792 750" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position:absolute;inset:0;display:block">
+      <rect width="792" height="750" fill="url(#gBien)"/><path d="M331 174 q20 -7 40 0 t40 0 t40 0 M404 686 q20 -7 40 0 t40 0 t40 0 M49 94 q20 -7 40 0 t40 0 t40 0 M548 116 q20 -7 40 0 t40 0 t40 0 M374 616 q20 -7 40 0 t40 0 t40 0 M59 539 q20 -7 40 0 t40 0 t40 0 M219 58 q20 -7 40 0 t40 0 t40 0 M88 464 q20 -7 40 0 t40 0 t40 0 M428 91 q20 -7 40 0 t40 0 t40 0 M246 112 q20 -7 40 0 t40 0 t40 0 M564 454 q20 -7 40 0 t40 0 t40 0 M60 599 q20 -7 40 0 t40 0 t40 0 M126 248 q20 -7 40 0 t40 0 t40 0 M596 83 q20 -7 40 0 t40 0 t40 0 " stroke="rgba(140,200,255,.13)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M-20 290 C160 240 300 300 480 250 C620 200 700 220 820 190 L820 750 L-20 750Z" fill="url(#gDat)" opacity=".9"/>
+      <path d="M-20 290 C160 240 300 300 480 250 C620 200 700 220 820 190 L820 750 L-20 750Z" fill="url(#pLuc)" opacity=".6"/>
+      <ellipse cx="489" cy="343" rx="70" ry="30" fill="#2FA8E0" opacity=".5"/>
+      <path d="M70 640 L92 637 L114 633 L136 629 L158 623 L180 615 L202 605 L224 593 L247 579 L269 562 L291 543 L313 523 L335 500 L357 477 L379 452 L401 428 L423 403 L445 380 L467 357 L489 337 L511 318 L533 301 L556 287 L578 275 L600 265 L622 257 L644 251 L666 247 L688 243 L710 240" stroke="#E9CF94" stroke-width="30" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
+      <path d="M70 640 L92 637 L114 633 L136 629 L158 623 L180 615 L202 605 L224 593 L247 579 L269 562 L291 543 L313 523 L335 500 L357 477 L379 452 L401 428 L423 403 L445 380 L467 357 L489 337 L511 318 L533 301 L556 287 L578 275 L600 265 L622 257 L644 251 L666 247 L688 243 L710 240" stroke="#FFC940" stroke-width="3" stroke-dasharray="3 10" fill="none"/>
+      <circle cx="70" cy="640" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="92" cy="637" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="114" cy="633" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="136" cy="629" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="158" cy="623" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="180" cy="615" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="202" cy="605" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="224" cy="593" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="247" cy="579" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="269" cy="562" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="291" cy="543" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="313" cy="523" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="335" cy="500" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="357" cy="477" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="379" cy="452" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="401" cy="428" r="7" fill="#46D19A" stroke="#04291B" stroke-width="2"/><circle cx="445" cy="380" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="467" cy="357" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="489" cy="337" r="16" fill="#2FA8E0" stroke="#BFF4FF" stroke-width="3"/><circle cx="511" cy="318" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="533" cy="301" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="556" cy="287" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="578" cy="275" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="600" cy="265" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="622" cy="257" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="644" cy="251" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="666" cy="247" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><circle cx="688" cy="243" r="6" fill="rgba(7,18,41,.9)" stroke="rgba(160,200,255,.5)" stroke-width="2"/><g transform="translate(710 240)"><rect x="-4" y="-40" width="4" height="40" fill="#FFE9A8"/><path d="M0 -40 l26 8 l-26 8z" fill="#FFC940"/><circle r="10" fill="#FFC940" stroke="#6B3E00" stroke-width="2.5"/></g>
+      <svg x="375" y="333" width="96" height="76" viewBox="0 0 120 96" aria-hidden="true">
+<circle cx="60" cy="30" r="34" fill="url(#gHaoLam)"/>
+<rect x="18" y="46" width="84" height="30" rx="6" fill="url(#gGo)" stroke="#4A2A0E" stroke-width="3"/>
+<path d="M18 58 h84" stroke="#4A2A0E" stroke-width="2"/>
+<circle cx="60" cy="32" r="18" fill="url(#gLinh)" stroke="#E8FDFF" stroke-width="2"/>
+<path d="M54 26 q6 -6 10 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<circle cx="36" cy="80" r="11" fill="#3A2310" stroke="#FFC940" stroke-width="3"/><circle cx="84" cy="80" r="11" fill="#3A2310" stroke="#FFC940" stroke-width="3"/>
+<circle cx="36" cy="80" r="3" fill="#FFC940"/><circle cx="84" cy="80" r="3" fill="#FFC940"/>
+</svg>
+      <g transform="translate(363 437)"><rect x="-117.5" y="-16" width="235" height="30" rx="15" fill="rgba(7,18,41,.82)" stroke="rgba(160,200,255,.28)"/><text x="0" y="4" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="13" font-weight="800" fill="#BFF4FF">Trạm 17/30 · Linh Tâm của lớp</text></g>
+      <g transform="translate(569 292)"><rect x="-99.0" y="-16" width="198" height="30" rx="15" fill="rgba(7,18,41,.82)" stroke="rgba(160,200,255,.28)"/><text x="0" y="4" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="13" font-weight="800" fill="#BFF4FF">Hồ Cân Bằng · còn 3 trạm</text></g>
+      <g transform="translate(560 214)"><rect x="-95.5" y="-16" width="191" height="30" rx="15" fill="rgba(7,18,41,.82)" stroke="rgba(160,200,255,.28)"/><text x="0" y="4" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="13" font-weight="800" fill="#FFE9A8">Trạm 30 · về đích mùa 1</text></g>
+    </svg>
+    <div style="position:absolute;left:24px;top:20px;right:24px;display:flex;justify-content:space-between;align-items:flex-start">
+      <div><span class="nhan" style="color:var(--vang)">MÙA 1 · CÒN 19 NGÀY</span><div class="baloo" style="font-size:38px;font-weight:800;line-height:1.05">Đoàn Hộ Tống · 12A1</div><div class="nho" style="font-size:14px">Cả lớp hộ tống Linh Tâm qua 30 trạm · mỗi 5 chặng thắng lớp tiến 1 trạm</div></div>
+    </div>
+    <div class="kinh" style="position:absolute;left:20px;right:20px;bottom:18px;padding:14px 18px;border-radius:18px;display:flex;align-items:center;gap:16px">
+      <div style="min-width:0"><div style="font-weight:800;font-size:15px">9/32 bạn góp sức hôm nay</div><div class="nho" style="font-size:12px">Còn 4 chặng thắng nữa là lớp tiến một trạm</div></div>
+      <div style="display:flex;gap:4px;margin-left:auto"><span title="Thu Hà"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#2F5FD0" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">T</span></span></span><span title="Nam"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#6A3FD0" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">N</span></span></span><span title="Minh Anh"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#1F8C66" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">M</span></span></span><span title="Khánh Linh"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#C9408A" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">K</span></span></span><span title="Đức Huy"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#D9831A" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">Đ</span></span></span><span title="Bảo Ngọc"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#2A9BB8" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">B</span></span></span><span title="Gia Hân"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#8B5CF6" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">G</span></span></span><span title="Quốc Bảo"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#B8650A" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">Q</span></span></span><span title="Phương Vy"><span style="position:relative;width:40px;height:40px;flex-shrink:0;display:inline-block"><svg width="40" height="40" viewBox="0 0 48 48" aria-hidden="true"><polygon points="24,2 44,13 44,35 24,46 4,35 4,13" fill="#E83D6D" stroke="#FFC940" stroke-width="2.5"/></svg><span class="baloo" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff">P</span></span></span></div>
+    </div>
+  </section>
+  <aside class="c5 cot">
+    <div class="kinh the" style="display:flex;flex-direction:column;gap:12px;border-color:rgba(255,201,64,.45)">
+      <div class="hang" style="justify-content:space-between"><span class="tag" style="background:rgba(255,201,64,.14);color:var(--vang);border-color:rgba(255,201,64,.4)">CHẶNG CÂU ÔN · MIỄN PHÍ</span><span class="nho">8 hiệp · 5–6 phút</span></div>
+      <div class="baloo" style="font-weight:800;font-size:28px;line-height:1.1">Hộ tống Linh Tâm qua 8 hiệp</div>
+      <div style="font-size:15px;line-height:1.55">Câu ôn của riêng em hôm nay: <b>12 câu</b> · đã xong 8 · <b class="vang">còn 4 câu = 1 chặng</b>.</div>
+      <div class="hang" style="gap:8px;flex-wrap:wrap"><span class="chip">Glucose</span><span class="chip">Saccharose</span><span class="chip">Lên men glucose</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="o-so" style="padding:10px"><span class="so vang" style="font-size:26px">EXP</span><span class="nh">cho thần thú mỗi câu đúng</span></div>
+        <div class="o-so" style="padding:10px"><span class="so" style="font-size:26px;color:#FFB3C8">Liên Kích ×2</span><span class="nh">khi em tiếp sức bạn</span></div>
+      </div>
+      <div class="nho" style="font-size:13px">Đồng đội chặng này: Thu Hà · Nam · em — ghép ngẫu nhiên trong lớp 12A1.</div>
+    </div>
+    <button class="nut-chinh" style="min-height:92px"><span><span class="t" style="font-size:32px">LÊN ĐƯỜNG</span><span class="p">Xong câu ôn hôm nay là Bát Linh Đảo mở · thua không mất gì</span></span><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="kinh the" style="padding:14px 16px;display:flex;gap:12px;align-items:center"><svg width="52" height="52" viewBox="0 0 160 160" aria-hidden="true">
+<circle cx="80" cy="88" r="70" fill="url(#gHao)" opacity=".7"/>
+<path d="M26 74 C26 44 50 34 80 34 C110 34 134 44 134 74Z" fill="url(#gGo)" stroke="#4A2A0E" stroke-width="4"/>
+<path d="M40 44 C54 38 106 38 120 44" stroke="#FFC940" stroke-width="5" fill="none"/>
+<rect x="26" y="74" width="108" height="64" rx="10" fill="url(#gGo)" stroke="#4A2A0E" stroke-width="4"/>
+<rect x="26" y="70" width="108" height="12" fill="url(#gVang)" stroke="#6B3E00" stroke-width="2"/>
+<rect x="68" y="66" width="24" height="30" rx="5" fill="url(#gVang)" stroke="#6B3E00" stroke-width="3"/>
+<circle cx="80" cy="80" r="4" fill="#6B3E00"/>
+<path d="M26 74 v60 M134 74 v60" stroke="#FFC940" stroke-width="6"/>
+</svg><div style="min-width:0"><div class="nhan">RƯƠNG CHUỖI NGÀY</div><div style="font-weight:800;font-size:15px;margin-top:2px">Còn 2 ngày</div><div class="nho" style="font-size:12px">mở rương 7 ngày · giữ chuỗi bằng câu ôn hôm nay</div></div></div>
+      <div class="kinh the" style="padding:14px 16px;display:flex;gap:12px;align-items:center"><svg width="52" height="52" viewBox="0 0 120 130" aria-hidden="true">
+<ellipse cx="60" cy="124" rx="44" ry="6" fill="rgba(0,0,0,.35)"/>
+<path d="M30 30 L20 4 L44 22Z M90 30 L100 4 L76 22Z" fill="#FFC940" stroke="#6B3E00" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M14 110 C4 80 10 36 36 24 C52 16 68 16 84 24 C110 36 116 80 106 110 C96 122 24 122 14 110Z" fill="url(#gTrum)" stroke="#1E0B4F" stroke-width="3"/>
+<path d="M40 44 l14 7 M80 44 l-14 7" stroke="#1E0B4F" stroke-width="4.5" stroke-linecap="round"/>
+<ellipse cx="47" cy="58" rx="7" ry="6" fill="#FFE34D"/><ellipse cx="73" cy="58" rx="7" ry="6" fill="#FFE34D"/>
+<circle cx="47" cy="58" r="3" fill="#1E0B4F"/><circle cx="73" cy="58" r="3" fill="#1E0B4F"/>
+<path d="M44 78 l6 -5 l5 5 l5 -5 l5 5 l5 -5 l6 5" stroke="#fff" stroke-width="3" fill="none" stroke-linejoin="round"/>
+<path d="M30 44 L43 52 L41 67 L30 73 L19 67 L17 52Z" fill="url(#gVang)" stroke="#6B3E00" stroke-width="2.5"/><path d="M30 51 v14" stroke="#6B3E00" stroke-width="2"/><path d="M90 44 L103 52 L101 67 L90 73 L79 67 L77 52Z" fill="url(#gVang)" stroke="#6B3E00" stroke-width="2.5"/><path d="M90 51 v14" stroke="#6B3E00" stroke-width="2"/><path d="M38 84 L51 92 L49 107 L38 113 L27 107 L25 92Z" fill="url(#gVang)" stroke="#6B3E00" stroke-width="2.5"/><path d="M38 91 v14" stroke="#6B3E00" stroke-width="2"/><path d="M82 84 L95 92 L93 107 L82 113 L71 107 L69 92Z" fill="url(#gVang)" stroke="#6B3E00" stroke-width="2.5"/><path d="M82 91 v14" stroke="#6B3E00" stroke-width="2"/>
+</svg><div style="min-width:0"><div class="nhan">TRÙM LỚP</div><div style="font-weight:800;font-size:15px;margin-top:2px">Chủ Nhật 20:00</div><div class="nho" style="font-size:12px">Cả lớp cùng đánh 20 phút · còn 4 ngày 5 giờ</div></div></div>
+    </div>
+    <div class="kinh the" style="padding:14px 20px;display:flex;flex-direction:column;gap:10px">
+      <div class="hang" style="justify-content:space-between"><span style="font-weight:800;font-size:15px">8 hiệp của một chặng</span><span class="nho">◆ = hiệp trùm (4 ý đúng–sai)</span></div>
+      <div style="display:flex;align-items:center;gap:4px"><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);box-shadow:0 0 0 5px rgba(255,201,64,.22);background:#FFC940;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#3A2400;line-height:1">1</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">2</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">3</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="transform:rotate(45deg);border-radius:8px;width:28px;height:28px;border:2px solid #FFC940;background:linear-gradient(135deg,#8B5CF6,#3E1F8F);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="transform:rotate(-45deg);font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">4</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">5</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">6</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="border-radius:50%;width:32px;height:32px;border:2px solid rgba(160,200,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">7</span></span><span style="flex:1;height:3px;min-width:8px;background:rgba(160,200,255,.22)"></span><span style="transform:rotate(45deg);border-radius:8px;width:28px;height:28px;border:2px solid #FFC940;background:linear-gradient(135deg,#8B5CF6,#3E1F8F);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="baloo" style="transform:rotate(-45deg);font-weight:800;font-size:14px;color:#F2F6FF;line-height:1">8</span></span></div>
+    </div>
+    <div style="flex:1"></div>
+  </aside>
+</div>
+<div class="ghichu">Màn ngang · dùng khi màn rộng <b>≥ 1024 px</b> hoặc điện thoại xoay ngang <b>≥ 700 px</b></div>
+</main>
+</body>
+</html>
