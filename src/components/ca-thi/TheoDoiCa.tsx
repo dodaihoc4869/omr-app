@@ -1,8 +1,8 @@
 // (b) THEO DÕI CA — đầu màn theo bản vẽ thầy chốt 28/09/2026 (docs/ban-ve-ca-thi-2809, màn b): tên ca + link + Chép link + đồng hồ vòng; 4 thẻ số màu theo nghĩa
 // (Đang làm xanh dương · Đã nộp xanh lục · Chưa vào hổ phách · Cảnh báo hồng) + thanh cả lớp; lưới thẻ từng em có lọc; "Cần thầy xử lý" (khoá bài → Mở khoá sẵn có;
-// rời màn; chưa vào); Việc nhanh (Chiếu mã, Kết thúc ca — HỎI LẠI ở hộp xác nhận sẵn có của màn cha). Chỉ VẼ số màn cha đã đếm; mọi lệnh đi qua hàm sẵn có của màn cha.
+// rời màn; chưa vào); Việc nhanh (Chiếu mã, Đóng cửa vào, Kết thúc ca — cả hai HỎI LẠI ở hộp xác nhận của màn cha). Chỉ VẼ số màn cha đã đếm; mọi lệnh đi qua hàm sẵn có của màn cha.
 import { useMemo, useState } from 'react'
-import { AlertTriangle, Copy, Lock, MonitorPlay, RefreshCw, Users } from 'lucide-react'
+import { AlertTriangle, Copy, DoorClosed, Lock, MonitorPlay, RefreshCw, Users } from 'lucide-react'
 import { soVn } from '../../lib/ket-qua-sau-nop'
 import './ca-thi.css'
 
@@ -42,6 +42,10 @@ export interface TheoDoiCaProps {
   onXemEm: (sbd: string) => void
   onChieuMa: () => void
   onKetThuc: () => void
+  /** Đóng cửa vào (máy chủ `/gv/dong-cua-vao`); vắng ⇒ không vẽ nút. Màn cha HỎI LẠI trước khi gọi. */
+  onDongCuaVao?: () => void
+  /** Cửa vào đã đóng (hạn vào phòng đã qua) ⇒ nút chìm, ghi "Đã đóng cửa vào". */
+  daDongCua?: boolean
   dangLamNgay: number
 }
 
@@ -316,10 +320,17 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
                 <MonitorPlay size={18} aria-hidden="true" />
                 Chiếu mã lên bảng
               </button>
-              <button type="button" className="ct-nut ct-nut-tong" onClick={p.onChepLink}>
-                <Copy size={18} aria-hidden="true" />
-                Chép link vào thi
-              </button>
+              {p.onDongCuaVao ? (
+                <button type="button" className="ct-nut ct-nut-tong" onClick={p.onDongCuaVao} disabled={!!p.daDongCua} aria-label={p.daDongCua ? 'Đã đóng cửa vào' : 'Đóng cửa vào'}>
+                  <DoorClosed size={18} aria-hidden="true" />
+                  {p.daDongCua ? 'Đã đóng cửa vào' : 'Đóng cửa vào'}
+                </button>
+              ) : (
+                <button type="button" className="ct-nut ct-nut-tong" onClick={p.onChepLink}>
+                  <Copy size={18} aria-hidden="true" />
+                  Chép link vào thi
+                </button>
+              )}
             </div>
             <button type="button" className="ct-nut ct-nut-do" style={{ width: '100%', marginTop: 10 }} onClick={p.onKetThuc}>
               <Lock size={18} aria-hidden="true" />

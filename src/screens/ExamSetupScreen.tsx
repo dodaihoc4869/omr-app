@@ -10,8 +10,6 @@ import {
   CheckSquare,
   Square,
   Library,
-  Copy,
-  Check,
   Settings2,
   Users,
   X,
@@ -35,12 +33,14 @@ import { randomSessionCode, taoLinkMoiTrucTiep } from '../lib/ca-link'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
 import { voiHanCho } from '../lib/han-cho'
 import NutDongBo from '../components/NutDongBo'
-import { chuoi, danhSachEm, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
+import { chiTietCa, chuoi, danhSachEm, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
 import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadTeacherSecret, luuCheDoDeRieng, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
 import { AN_HAN_CHON_GIAY, BAT_MAC_DINH_CA_THI, MS_AN_HAN_NHA_TAY } from '../lib/giu-de-doc'
 import { dongBoNganHang } from '../lib/exam-sync'
 import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
 import { canhBaoThieuSauLoc, chuBoTuLuanChiTiet, demCauTheoPhan, locTuLuanKhiMoCa } from '../lib/loc-tu-luan-mo-ca'
+import CaDaMo from '../components/ca-thi/CaDaMo'
+import TamPhuChieuMa, { gopEmDaVao } from '../components/TamPhuChieuMa'
 import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
 import { chonSanCaChot, chuBaoCaChot, docGoiCaChot, xoaGoiCaChot, type ChonSanCaChot } from '../lib/ca-chot-chien-dich'
@@ -165,6 +165,7 @@ export default function ExamSetupScreen() {
   const [qidCaTruoc, setQidCaTruoc] = useState<string[]>([])
   const [opening, setOpening] = useState(false)
   const [buocMoCa, setBuocMoCa] = useState('')
+  const [chieuMaMo, setChieuMaMo] = useState(false)
   const [loiMoCa, setLoiMoCa] = useState('')
   const [opened, setOpened] = useState<{ maCa: string; joinLink: string; batDau: string; hetHanVao: string } | null>(null)
   const [daCopy, setDaCopy] = useState(false)
@@ -409,71 +410,49 @@ export default function ExamSetupScreen() {
     })
   }
 
-  // ------------------------------------------------------------ CA ĐÃ MỞ (bản vẽ ca thi 28/09: link + mã ca để chép)
+  // ------------------------------------------------------------ CA ĐÃ MỞ — màn app mới (CaDaMo, thầy 28/09): tên ca, mã ca chữ to, link + Chép link,
+  // Chiếu mã lên bảng (TamPhuChieuMa dùng chung với Theo dõi ca), Sang Theo dõi ca.
   if (opened) {
+    const tenMo = tenCa.trim() || `${selectedSources.length === 1 ? selectedSources[0]!.maDe : 'Ca kiểm tra'}${lop.trim() ? ` · ${lop.trim()}` : ''}`
     return (
-      <div className="gv-page ct" style={{ background: 'var(--gvm-nen)', minHeight: '100vh', padding: '16px clamp(12px, 3vw, 32px) 96px' }}>
-        <div className="ct-khung ct-da-mo" style={{ maxWidth: 640, margin: '0 auto' }}>
-          <div className="ct-dau">
-            <div>
-              <div className="ct-duong">Ca kiểm tra › Mở ca mới</div>
-              <h1>Ca kiểm tra đã mở</h1>
-            </div>
-          </div>
-          <div className="ct-ve">
-            <div className="ct-ve-dau">
-              <div className="nho">Mã ca</div>
-              <h3 className="so" style={{ fontSize: 44, letterSpacing: '.18em' }}>
-                {opened.maCa}
-              </h3>
-            </div>
-            <dl>
-              <dt>Lớp</dt>
-              <dd>{lop.trim() || '—'}</dd>
-              <dt>Số câu</dt>
-              <dd className="so">
-                {tongCauDaChon} câu · {chuan2026 ? 50 : thoiGianPhut} phút
-              </dd>
-              <dt>Công bố điểm</dt>
-              <dd>{CACH_CONG_BO.find((c) => c.id === congBoDiem)?.ten}</dd>
-              <dt>Giờ</dt>
-              <dd className="so">
-                Bắt đầu {gioHienThi(opened.batDau) || 'ngay'} · vào phòng đến {opened.hetHanVao ? gioHienThi(opened.hetHanVao) : 'không giới hạn'}
-              </dd>
-              <dt>Ai làm</dt>
-              <dd>{phamVi === 'chon' ? `${chonSbd.size} em được mời` : phamVi === 'sbd' ? 'Chỉ em trong danh sách lớp' : 'Mọi em có link'}</dd>
-            </dl>
-          </div>
-          <div className="ct-tam">
-            <p className="ct-ghi">Gửi link này vào nhóm Zalo lớp — em mở link, gõ số báo danh là vào thi:</p>
-            <div className="ct-link" style={{ marginTop: 10, background: 'var(--gvm-mat-2)' }}>
-              <span className="mono" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
-                {opened.joinLink}
-              </span>
-            </div>
-            <div className="ct-hang-nut" style={{ marginTop: 12 }}>
-              <button type="button" className="ct-nut ct-nut-chinh" onClick={copyLink}>
-                {daCopy ? <Check size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />}
-                {daCopy ? 'Đã chép' : 'Chép link vào thi'}
-              </button>
-              <button
-                type="button"
-                className="ct-nut ct-nut-tong"
-                onClick={() => {
-                  void navigator.clipboard?.writeText(opened.maCa).then(() => showToast('Đã chép mã ca', 'success'))
-                }}
-              >
-                <Copy size={18} aria-hidden="true" />
-                Chép mã ca
-              </button>
-            </div>
-          </div>
-          <button type="button" className="ct-nut ct-nut-chinh" onClick={() => moChiTietCa(opened.maCa)}>
-            Theo dõi bài nộp của ca này →
-          </button>
-          <NutQuayLai onClick={() => setOpened(null)} label="Mở ca khác" />
-        </div>
-      </div>
+      <>
+        <CaDaMo
+          maCa={opened.maCa}
+          tenCa={tenMo}
+          joinLink={opened.joinLink}
+          lop={lop.trim()}
+          soCau={tongCauDaChon}
+          phut={chuan2026 ? 50 : thoiGianPhut}
+          congBo={CACH_CONG_BO.find((c) => c.id === congBoDiem)?.ten ?? ''}
+          gio={`Bắt đầu ${gioHienThi(opened.batDau) || 'ngay'} · vào phòng đến ${opened.hetHanVao ? gioHienThi(opened.hetHanVao) : 'không giới hạn'}`}
+          aiLam={phamVi === 'chon' ? `${chonSbd.size} em được mời` : phamVi === 'sbd' ? 'Chỉ em trong danh sách lớp' : 'Mọi em có link'}
+          daCopy={daCopy}
+          onChepLink={copyLink}
+          onChepMa={() => {
+            void navigator.clipboard?.writeText(opened.maCa).then(() => showToast('Đã chép mã ca', 'success'))
+          }}
+          onChieuMa={() => setChieuMaMo(true)}
+          onTheoDoi={() => moChiTietCa(opened.maCa)}
+          onMoCaKhac={() => setOpened(null)}
+        />
+        {chieuMaMo && (
+          <TamPhuChieuMa
+            maCa={opened.maCa}
+            tenCa={tenMo}
+            lop={lop.trim()}
+            link={opened.joinLink}
+            diaChi={opened.joinLink.replace(/^https?:\/\//, '').split('?')[0]!}
+            soEmCho={null}
+            onDong={() => setChieuMaMo(false)}
+            hoiPhongCho={async () => {
+              // Cùng lệnh danh sách em của ca mà màn Theo dõi ca gọi (chiTietCa) — chỉ lấy TÊN em đã vào, không điểm.
+              const ct = await chiTietCa((await layDiaChiMayChu(scriptUrl)) || scriptUrl.trim(), maBiMat.trim(), opened.maCa)
+              const siSo = phamVi === 'chon' ? chonSbd.size : phamVi === 'sbd' && lop.trim() ? classList.filter((r) => chuoi(r.lop).trim() === lop.trim()).length || null : null
+              return { em: gopEmDaVao(ct.dsCho, ct.luot), siSo }
+            }}
+          />
+        )}
+      </>
     )
   }
 
@@ -792,19 +771,15 @@ export default function ExamSetupScreen() {
                 </div>
               </div>
               <div className="cuoi">
-                <button type="button" className="ct-nut ct-nut-chinh" disabled={opening || selectedSources.length === 0} onClick={handleOpenSession}>
-                  {opening ? (
-                    <>
-                      <RefreshCw size={18} className="animate-spin" aria-hidden="true" />
-                      <span role="status">{buocMoCa}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Rocket size={18} aria-hidden="true" />
-                      Mở ca kiểm tra ngay
-                    </>
-                  )}
+                {/* Thầy 28/09: đang gửi thì GIỮ đúng chữ nút, chỉ mờ đi (aria-busy) + vòng quay nhỏ thay biểu tượng — không đổi sang câu dài,
+                    không đổi độ rộng. Bước đang làm vẫn báo cho máy đọc màn hình qua dòng ẩn. */}
+                <button type="button" className="ct-nut ct-nut-chinh" disabled={opening || selectedSources.length === 0} aria-busy={opening || undefined} onClick={handleOpenSession}>
+                  {opening ? <RefreshCw size={18} className="animate-spin" aria-hidden="true" /> : <Rocket size={18} aria-hidden="true" />}
+                  Mở ca kiểm tra ngay
                 </button>
+                <span className="sr-only" role="status">
+                  {opening ? buocMoCa : ''}
+                </span>
                 {loiMoCa && (
                   <p role="alert" style={{ borderRadius: 14, background: 'var(--gvm-ho-nen)', color: 'var(--gvm-ho-dam)', padding: 12, fontSize: 14 }}>
                     {loiMoCa}

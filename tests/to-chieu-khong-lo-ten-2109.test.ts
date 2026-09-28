@@ -36,12 +36,15 @@ function chuNhinThay(dom: JSDOM): string {
 const nhan = (doc: Document, sel: string) => [...doc.querySelectorAll(sel)].map((e) => e.getAttribute('data-nhan'))
 
 describe('tờ máy chiếu · chế độ dạy học · trước khi hiện thẻ tên', () => {
-  it('ĐỢT ĐÔI: không tên gọi / họ tên / số báo danh ở bất kỳ chỗ nhìn thấy nào; nhãn vùng làm bài là "Phần làm bài của học sinh"', () => {
+  // SỬA CÓ CHỦ Ý 28/09 (bản vẽ Lên bảng): bỏ đợt đôi ⇒ hai câu ngắn thành HAI đợt đơn; luật không lộ tên giữ nguyên.
+  it('HAI CÂU NGẮN (hai đợt đơn): không tên gọi / họ tên / số báo danh ở bất kỳ chỗ nhìn thấy nào; nhãn vùng làm bài là "Phần làm bài của học sinh"', () => {
     const { dom, doc } = dung([HUY, LAN])
-    expect(doc.querySelectorAll('.mc-dot:not(.mc-dot-don) .mc-trang').length).toBeGreaterThanOrEqual(2)
+    expect(doc.querySelectorAll('.mc-dot-don .mc-trang').length).toBe(2)
+    expect(doc.querySelectorAll('.mc-dot:not(.mc-dot-don):not(.mc-dot-da)').length).toBe(0)
     const thay = chuNhinThay(dom)
     for (const s of CAC_CHUOI_LO) expect(thay, s).not.toContain(s)
     expect(nhan(doc, '.mc-trang')).toEqual([NHAN_LAM_BAI_KHONG_TEN, NHAN_LAM_BAI_KHONG_TEN])
+    expect(nhan(doc, '.mc-cot-lam-bai')).toEqual([NHAN_LAM_BAI_KHONG_TEN, NHAN_LAM_BAI_KHONG_TEN])
     expect(NHAN_LAM_BAI_KHONG_TEN).toBe('Phần làm bài của học sinh')
     expect(doc.body.classList.contains('mc-san-sang')).toBe(true)
     dom.window.close()
@@ -71,19 +74,21 @@ describe('tờ máy chiếu · chế độ dạy học · trước khi hiện th
 describe('tờ máy chiếu · sau khi hiện thẻ tên', () => {
   it('bấm "Hiện học sinh và thần thú" của Huy ⇒ nhãn của Huy có tên Huy, nhãn của Lan vẫn không tên; ẩn lại (sang đợt khác rồi về) ⇒ không tên', () => {
     const { dom, doc } = dung([HUY, LAN, em('Lê Minh Tú', 'HS11111'), em('Phạm Quốc Bảo', 'HS22222')])
-    const nut = doc.querySelector<HTMLButtonElement>('.mc-dot:first-child .mc-nua.mc-trai .mc-nut-hien-em')!
+    const nut = doc.querySelector<HTMLButtonElement>('.mc-dot:first-child .mc-nut-hien-em')!
     nut.click()
     const dot0 = doc.querySelector('.mc-dot:first-child')!
-    expect([...dot0.querySelectorAll('.mc-trang')].map((e) => e.getAttribute('data-nhan'))).toEqual(['Phần làm bài của Huy', NHAN_LAM_BAI_KHONG_TEN])
+    // mỗi đợt một em (28/09): đợt 1 chỉ có Huy; Lan ở đợt 2 vẫn không tên
+    expect([...dot0.querySelectorAll('.mc-trang')].map((e) => e.getAttribute('data-nhan'))).toEqual(['Phần làm bài của Huy'])
+    expect(nhan(doc, '.mc-dot:nth-child(2) .mc-trang')).toEqual([NHAN_LAM_BAI_KHONG_TEN])
     expect(chuNhinThay(dom)).toContain('Nguyễn Văn Huy') // thẻ tên đã hiện
     expect(chuNhinThay(dom)).not.toContain('Trần Thị Lan')
     doc.getElementById('mc-sau')!.click()
     doc.getElementById('mc-truoc')!.click() // vào lại đợt 1: thẻ ẩn lại
-    expect([...doc.querySelectorAll('.mc-dot:first-child .mc-trang')].map((e) => e.getAttribute('data-nhan'))).toEqual([NHAN_LAM_BAI_KHONG_TEN, NHAN_LAM_BAI_KHONG_TEN])
+    expect([...doc.querySelectorAll('.mc-dot:first-child .mc-trang')].map((e) => e.getAttribute('data-nhan'))).toEqual([NHAN_LAM_BAI_KHONG_TEN])
     for (const s of CAC_CHUOI_LO) expect(chuNhinThay(dom), s).not.toContain(s)
     dom.window.close()
   })
-  it('bấm Lên bảng ⇒ hiện cả hai thẻ ⇒ cả hai nhãn có tên đúng em; đợt đơn: cả hai ô nhãn đều đổi', () => {
+  it('bấm Lên bảng ⇒ hiện thẻ của em đợt này ⇒ nhãn có tên đúng em; em đợt sau vẫn không tên; đợt đơn: cả hai ô nhãn đều đổi', () => {
     let now = 0
     let tick = () => {}
     const dom = new JSDOM(taoHtmlMayChieu([HUY, LAN], { dayHoc: true }), { runScripts: 'dangerously', beforeParse(w) { w.Date.now = () => now; w.setInterval = ((f: () => void) => { tick = f; return 1 }) as never; w.clearInterval = () => {}; w.HTMLElement.prototype.scrollTo = () => {} } })
@@ -91,7 +96,8 @@ describe('tờ máy chiếu · sau khi hiện thẻ tên', () => {
     now = 61000
     tick()
     doc.getElementById('mc-len-bang')!.click()
-    expect(nhan(doc, '.mc-dot:first-child .mc-trang')).toEqual(['Phần làm bài của Huy', 'Phần làm bài của Lan'])
+    expect(nhan(doc, '.mc-dot:first-child .mc-trang')).toEqual(['Phần làm bài của Huy'])
+    expect(nhan(doc, '.mc-dot:nth-child(2) .mc-trang')).toEqual([NHAN_LAM_BAI_KHONG_TEN])
     dom.window.close()
     const don = dung([HUY_DAI])
     don.doc.querySelector<HTMLButtonElement>('.mc-dot-don .mc-nut-hien-em')!.click()

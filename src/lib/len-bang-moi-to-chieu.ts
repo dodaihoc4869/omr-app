@@ -23,9 +23,10 @@ export { thongKeLopCau, type ThongKeLopCau } from './thong-ke-lop-cau'
 
 // ───────────────────────── THỐNG KÊ LỚP (phím T) ─────────────────────────
 
-/** Dải thống kê (ẩn cho tới khi thầy bấm T). Nằm đầu vùng đề 2/3, cao một dòng. */
+/** Dải thống kê (ẩn cho tới khi thầy bấm T). Nằm đầu vùng đề 2/3, cao một dòng. Có ở MỌI buổi chữa (từ ca: bài làm của ca; không từ ca: sổ
+ * su_kien_hoc của cả lớp — `thongKeTuSoGop`). KHÔNG có số ⇒ KHÔNG vẽ dải; bấm T thì tờ báo "Chưa có số liệu lớp" (hoàn thiện bản vẽ 28/09). */
 export function thongKeHtml(t: ThongKeLopCau | null | undefined): string {
-  if (!t) return '<div class="mc-tk" aria-label="Thống kê cả lớp"><span class="mc-tk-nhan">Cả lớp</span><span class="mc-tk-rong">Chưa có bài làm của lớp cho câu này</span></div>'
+  if (!t) return ''
   let h = '<span class="mc-tk-nhan">Cả lớp</span>'
   if (t.kieu === 'pa') h += Object.entries(t.tiLe).map(([k, v]) => `<span class="mc-tk-o${k === t.dung ? ' mc-tk-dung' : ''}"><b>${thoat(k)}</b><span class="mc-tk-thanh"><i style="width:${v}%"></i></span>${v}%</span>`).join('')
   if (t.kieu === 'y') h += Object.entries(t.tiLe).map(([k, v]) => `<span class="mc-tk-o${v >= 60 ? ' mc-tk-dung' : ''}"><b>${thoat(k)})</b> đúng ${v}%</span>`).join('')
@@ -196,6 +197,12 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 .mc-ct-anh img{width:88%;height:88%;object-fit:contain}
 .mc-ct-dau h2{margin:0;font-size:calc(var(--u)*1.9);font-weight:800;line-height:1.1}
 .mc-ct-chips{display:flex;flex-wrap:wrap;gap:.5em;margin:.35em 0 0;font-size:.95em;color:rgb(201,208,224)}
+/* thanh tiến độ EXP trong bảng chi tiết học sinh (hoàn thiện bản vẽ 28/09) */
+.mc-exp-cap{margin-top:calc(var(--u)*.6);max-width:calc(var(--u)*30)}
+.mc-exp-dong{display:flex;justify-content:space-between;gap:1em;font:600 calc(var(--u)*.9) var(--mc-sans)}
+.mc-exp-dong span{color:rgb(154,163,184)}
+.mc-exp-ray{height:calc(var(--u)*.55);border-radius:1em;background:rgba(255,255,255,.1);overflow:hidden;margin-top:.3em}
+.mc-exp-ray i{display:block;height:100%;border-radius:inherit;background:var(--mc-vang-noi)}
 .mc-chip{display:inline-flex;align-items:center;gap:.35em;border-radius:2em;padding:.15em .7em;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.1);font-weight:600;white-space:nowrap}
 .mc-chip.mc-vuot{background:rgba(76,179,95,.25);border-color:rgba(76,179,95,.6)}
 .mc-chip.mc-dung{background:rgba(53,182,164,.22);border-color:rgba(53,182,164,.5)}
@@ -490,7 +497,11 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   if (CHAM) document.addEventListener('click', function (e) { var n = e.target.closest && e.target.closest(CHAM + '-nut'); if (n) { var v = n.closest(CHAM); if (v) S.choGhi = { khoa: v.getAttribute('data-khoa'), dat: n.getAttribute('data-kq') === '1' }; } }, true);
 
   // ── T · thống kê ──
-  function batTk() { S.tk = !S.tk; body.classList.toggle('mc-co-tk', S.tk); xep(); veThanh(); }
+  function batTk() {
+    S.tk = !S.tk; body.classList.toggle('mc-co-tk', S.tk); xep(); veThanh();
+    var d = dot();
+    if (S.tk && d && !d.querySelector('.mc-tk')) baoNhanh('Chưa có số liệu lớp cho câu này', 1800);
+  }
 
   // ── B · bút ──
   var cv = tao('canvas', 'mc-but', body), g2 = cv.getContext ? cv.getContext('2d') : null, butCu = tao('div', 'mc-but-cu', body);
@@ -563,13 +574,20 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function tenCau(qid) { var m = /-(III|II|I)-(\\d+)$/.exec(String(qid || '')); return m ? 'Câu ' + m[2] + ' · Phần ' + m[1] : String(qid || '—'); }
   function vongSo(p, mau, chu) { var R = 42, C = 2 * Math.PI * R; return '<div class="mc-vong-so"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="' + R + '" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="10"/><circle cx="50" cy="50" r="' + R + '" fill="none" stroke="' + mau + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + (C * p).toFixed(1) + ' ' + C.toFixed(1) + '"/></svg><div><b>' + Math.round(p * 100) + '%</b><span>' + chu + '</span></div></div>'; }
   var RONG = '<div class="mc-rong">—</div>';
+  /** THANH TIẾN ĐỘ EXP (hoàn thiện bản vẽ 28/09): cấp · EXP trong thanh / mốc cấp sau — số thật từ \`/gv/ho-so-len-bang\` \`tienDoCap\`. Vắng ⇒ không vẽ. */
+  function thanhCap(t) {
+    if (!t || typeof t.cap !== 'number') return '';
+    if (t.toiDa || !t.moc) return '<div class="mc-exp-cap" aria-label="Cấp ' + t.cap + ', đã tối đa"><div class="mc-exp-dong"><b>Cấp ' + t.cap + '</b><span>Đã đạt cấp tối đa</span></div><div class="mc-exp-ray"><i style="width:100%"></i></div></div>';
+    var p = Math.max(0, Math.min(100, Math.round(t.exp / t.moc * 100)));
+    return '<div class="mc-exp-cap" aria-label="Cấp ' + t.cap + ': ' + t.exp + ' trên ' + t.moc + ' EXP để lên cấp ' + (t.cap + 1) + '"><div class="mc-exp-dong"><b>Cấp ' + t.cap + '</b><span>' + t.exp.toLocaleString('vi-VN') + ' / ' + t.moc.toLocaleString('vi-VN') + ' EXP · lên cấp ' + (t.cap + 1) + '</span></div><div class="mc-exp-ray"><i style="width:' + p + '%"></i></div></div>';
+  }
   function veCt(nua, hs, loi) {
     var anh = nua.querySelector('img.mc-thu-anh'), ten = nua.querySelector('.mc-ten'), thuTen = nua.querySelector('.mc-thu-ten'), cap = nua.querySelector('.mc-thu-cap b'), cauSo = nua.querySelector('.mc-cau-so');
     var the = nua.querySelector('.mc-em'), em = (hs && hs.em) || {}, lop = (the && the.getAttribute('data-lop')) || em.tenLop || em.lop || '';
     var h = '<button type="button" class="mc-ct-dong" aria-label="Đóng">✕</button><div class="mc-ct-dau"><div class="mc-ct-anh">' + (anh ? '<img alt="" src="' + thoat(anh.src) + '">' : '') + '</div><div><h2>' + thoat(ten ? ten.textContent : em.hoTen || '') + '</h2><div class="mc-ct-chips">' +
       (lop ? '<span class="mc-chip">Lớp ' + thoat(lop) + '</span>' : '') + (thuTen ? '<span class="mc-chip">' + thoat(thuTen.textContent) + (cap ? ' · ' + thoat(cap.textContent.split('/')[0]) : '') + '</span>' : '') +
       (typeof em.expTong === 'number' ? '<span class="mc-chip">' + em.expTong.toLocaleString('vi-VN') + ' EXP' + (typeof em.expHomNay === 'number' ? ' · hôm nay +' + em.expHomNay : '') + '</span>' : '') +
-      (typeof em.chuoiNgay === 'number' ? '<span class="mc-chip">Chuỗi ' + em.chuoiNgay + ' ngày liền</span>' : '') + '</div></div></div>';
+      (typeof em.chuoiNgay === 'number' ? '<span class="mc-chip">Chuỗi ' + em.chuoiNgay + ' ngày liền</span>' : '') + '</div>' + thanhCap(hs && hs.tienDoCap) + '</div></div>';
     if (!hs) {
       h += '<section class="mc-cau-nay"><h4>Câu này</h4><div class="mc-rong" style="grid-column:1/-1">' + thoat(loi === 'khong_noi' ? 'Chỉ xem được khi mở tờ chiếu từ app thầy (tờ đang mở riêng).' : loi === 'dang' ? 'Đang lấy số liệu từ máy chủ…' : 'Chưa lấy được số liệu từ máy chủ.') + '</div></section><div></div>';
     } else {

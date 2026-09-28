@@ -5,12 +5,17 @@
 //   · `docNhanXet` — đọc nhận xét để `/gv/bao-cao-ca-em` trả `nhanXet`.
 //   · `maTranCa`   — bảng em × câu cho `/gv/bao-cao-ca` (`maTran`): mỗi ô một chữ D đúng · P đúng một phần (Phần II) · S sai · B bỏ trống · N chưa chấm.
 //   · `docTbCaTruoc` — TB lớp của ca ĐÃ CÔNG BỐ liền trước cùng lớp (`tongQuan.tbCaTruoc`).
+//   · `POST /gv/dong-cua-vao {maCa}`   — ĐÓNG CỬA VÀO (bản vẽ màn b, Việc nhanh): ca ĐANG MỞ ⇒ đặt `ca.het_han_vao` = bây giờ. Dùng ĐÚNG luật hạn vào phòng sẵn có
+//                                         (`luat-vao-thi.ts`: em đang làm vẫn khôi phục được, em được duyệt thi lại không bị hạn chặn, em chưa vào ⇒ `het_han_vao`).
+//                                         Không đụng lượt, không đụng chống gian lận. Hạn cũ đã qua ⇒ giữ nguyên (không nới). Ca đóng/xoá ⇒ TỪ CHỐI.
+//   · `expCuaEmTrongCa` — tổng EXP em đã nhận từ MỘT ca (sổ `exp_so`, `ma_nguon = maCa`) cho `ketQua` sau công bố (chỉ-đọc).
 // Cổng mã bí mật của thầy do `index.ts` chặn (sau `laThay`).
 import type { Env } from './kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { SBD_THU } from './gv-bang-tin'
 import { laBoTrong } from './su-kien-hoc'
 import { congBoSuKien } from './nang-luc-d1'
+import { xoaDemCaBaoVe } from './game-v2-bank'
 
 type Hang = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -139,4 +144,37 @@ export async function docTbCaTruoc(env: Env, maCa: string): Promise<{ maCa: stri
   const tb = Number(x.tb)
   if (!Number.isFinite(tb)) return null
   return { maCa: chuoi(x.ma_ca), tenCa: chuoi(x.ten_ca), tb: Math.round(tb * 100) / 100, ngay: chuoi(x.luc).slice(0, 10) }
+}
+
+// ---------------------------------------------------------------- đóng cửa vào ----------------------------------------------------------------
+export async function gvDongCuaVao(env: Env, b: Hang, nowMs: number = Date.now()): Promise<Hang> {
+  const maCa = chuoi(b.maCa)
+  if (!maCa) return { ok: false, lyDo: 'thieu', error: 'Thiếu mã ca.' }
+  const ca = await env.DB.prepare('SELECT ma_ca, ten_ca, trang_thai, het_han_vao FROM ca WHERE ma_ca = ?').bind(maCa).first<Hang>()
+  if (!ca || chuoi(ca.trang_thai) === 'da_xoa') return { ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca này.' }
+  if (chuoi(ca.trang_thai) !== 'mo') return { ok: false, lyDo: 'ca_khong_mo', error: 'Ca không còn mở — không cần đóng cửa vào.' }
+  const hanCu = Date.parse(chuoi(ca.het_han_vao))
+  if (Number.isFinite(hanCu) && hanCu <= nowMs) return { ok: true, maCa, hetHanVao: new Date(hanCu).toISOString(), daDongTruoc: true }
+  const nay = new Date(nowMs).toISOString()
+  await env.DB.prepare("UPDATE ca SET het_han_vao = ?, cap_nhat_luc = ? WHERE ma_ca = ? AND trang_thai = 'mo'").bind(nay, nay, maCa).run()
+  xoaDemCaBaoVe() // mọi câu ghi bảng `ca` phải bỏ đệm ca đang bảo vệ (game-v2-bank.ts)
+  try {
+    await env.DB.prepare("INSERT INTO nhat_ky_may (luc, nguon, muc, chu) VALUES (?, 'dong_cua_vao', 'tin', ?)").bind(nay, `Thầy đóng cửa vào ca ${chuoi(ca.ten_ca) || maCa} (${maCa})`).run()
+  } catch {
+    /* nhật ký không được kéo việc chính đổ theo */
+  }
+  return { ok: true, maCa, hetHanVao: nay, daDongTruoc: false }
+}
+
+// ---------------------------------------------------------------- EXP em nhận từ ca ----------------------------------------------------------------
+/** Tổng EXP đã ghi sổ cho em từ ca này (null khi bảng chưa có / lỗi đọc). EXP câu thi chỉ ghi SAU công bố (exp-d1.ts lọc theo công bố) nên không lộ gì trước. */
+export async function expCuaEmTrongCa(env: Env, maCa: string, sbd: string): Promise<number | null> {
+  if (!maCa || !sbd) return null
+  try {
+    const x = await env.DB.prepare('SELECT COALESCE(SUM(exp), 0) AS tong FROM exp_so WHERE sbd = ? AND ma_nguon = ?').bind(sbd, maCa).first<Hang>()
+    const n = Number(x?.tong)
+    return Number.isFinite(n) ? n : null
+  } catch {
+    return null
+  }
 }

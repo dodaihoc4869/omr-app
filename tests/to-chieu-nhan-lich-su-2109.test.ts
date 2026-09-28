@@ -12,7 +12,8 @@ function dung(dsO: OBang[]) {
   const dom = new JSDOM(taoHtmlMayChieu(dsO, { dayHoc: true }), { runScripts: 'dangerously', beforeParse(w) { w.setInterval = (() => 1) as never; w.clearInterval = () => {}; w.HTMLElement.prototype.scrollTo = () => {} } })
   return { dom, doc: dom.window.document }
 }
-const chuMoi = (doc: Document) => [...doc.querySelectorAll('.mc-dot:first-child .mc-nua')].map((n) => n.querySelector('.mc-em .mc-ls')?.textContent ?? null)
+// Bỏ đợt đôi (28/09): mỗi đợt MỘT em ⇒ đọc nhãn theo thứ tự đợt, không chỉ đợt đầu.
+const chuMoi = (doc: Document) => [...doc.querySelectorAll('.mc-dot:not(.mc-dot-da) .mc-nua')].map((n) => n.querySelector('.mc-em .mc-ls')?.textContent ?? null)
 
 describe('nhãn "đã làm câu này chưa" trong thẻ tên', () => {
   const CHUA = ls({ daLam: false, soLan: 0, soDung: 0, soSai: 0, lanCuoi: null })
@@ -34,7 +35,7 @@ describe('nhãn "đã làm câu này chưa" trong thẻ tên', () => {
     const { dom, doc } = dung([em('Nguyễn Văn Huy', 'HS1', DUNG), em('Trần Thị Lan', 'HS2', SAI)])
     const nhinThay = () => [...doc.querySelectorAll('.mc-nua .mc-ls')].filter((e) => !e.closest('[hidden]')).map((e) => e.querySelector('.mc-ls-chu')!.textContent)
     expect(nhinThay()).toEqual([])
-    doc.querySelector<HTMLButtonElement>('.mc-dot:first-child .mc-nua.mc-trai .mc-nut-hien-em')!.click()
+    doc.querySelector<HTMLButtonElement>('.mc-dot:first-child .mc-nut-hien-em')!.click()
     expect(nhinThay()).toEqual(['Đã làm · lần gần nhất đúng'])
     dom.window.close()
   })

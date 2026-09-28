@@ -52,14 +52,14 @@ describe('Thuật toán laCauDai và chia đợt máy chiếu', () => {
     expect(laCauDai(cauAnh)).toBe(true)
   })
 
-  it('hai câu ngắn thì chia đôi bảng 50% - 50%', () => {
+  // SỬA CÓ CHỦ Ý 28/09 (bản vẽ Lên bảng): BỎ ĐỢT ĐÔI — hai câu ngắn cũng mỗi câu một đợt (2/3 đề + 1/3 cột em).
+  it('hai câu ngắn ⇒ HAI đợt đơn (không còn chia đôi bảng 50% - 50%)', () => {
     const o1 = taoO('HS01', taoCau({ text: 'Câu ngắn 1' }))
     const o2 = taoO('HS02', taoCau({ text: 'Câu ngắn 2' }))
     const html = taoHtmlMayChieu([o1, o2])
 
-    // Không có thẻ div class="mc-dot mc-dot-don"
-    expect(html).not.toContain('class="mc-dot mc-dot-don"')
-    // Có chứa cả 2 em trên cùng đợt
+    expect(html.match(/class="mc-dot mc-dot-don"/g)).toHaveLength(2)
+    expect(html).not.toContain('class="mc-dot"')
     expect(html).toContain('Học sinh HS01')
     expect(html).toContain('Học sinh HS02')
   })
