@@ -10,6 +10,7 @@ import type { Env } from './kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { SBD_THU } from './gv-bang-tin'
 import { laBoTrong } from './su-kien-hoc'
+import { congBoSuKien } from './nang-luc-d1'
 
 type Hang = Record<string, unknown>
 const chuoi = (v: unknown): string => (v === null || v === undefined ? '' : String(v)).trim()
@@ -27,6 +28,8 @@ export async function gvCongBoCa(env: Env, b: Hang, nowMs: number = Date.now()):
   const r = await env.DB.prepare("UPDATE ca SET cong_bo = 'ngay', cap_nhat_luc = ? WHERE ma_ca = ? AND trang_thai = 'dong' AND COALESCE(cong_bo, 'khong') NOT IN ('ngay', 'ca_lop_xong')")
     .bind(nay, maCa)
     .run()
+  // Sổ học của ca (nguồn 'thi') bị che thì mở che — cùng việc `/ho-so/cong-bo` (câu sai vào hàng ôn Đoàn, hồ sơ năng lực).
+  await congBoSuKien(env, 'thi', maCa).catch(() => 0)
   try {
     await env.DB.prepare("INSERT INTO nhat_ky_may (luc, nguon, muc, chu) VALUES (?, 'cong_bo_ca', 'tin', ?)").bind(nay, `Thầy công bố điểm ca ${chuoi(ca.ten_ca) || maCa} (${maCa})`).run()
   } catch {
