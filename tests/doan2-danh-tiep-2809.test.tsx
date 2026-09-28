@@ -74,13 +74,13 @@ describe('Đoàn 2.0 · phòng một người thật: lời giải đứng yên 
     expect(screen.queryByRole('button', { name: 'ĐÁNH TIẾP' })).toBeNull()
   })
 
-  it('câu cuối làm chặng kết thúc: giữ lời giải, bấm XEM KẾT QUẢ CHẶNG mới sang màn kết chặng', async () => {
+  it('câu cuối làm chặng kết thúc: giữ lời giải, bấm XEM KẾT QUẢ CHUYẾN mới sang màn kết chặng', async () => {
     const ketChang = { thang: false, sao: 0, linhTam: { hp: 0, toiDa: 100 }, trumVoGiap: [false, false], quaiHaGuc: 1, soLienKich: 0, cuaEm: { ghe: 0, soCau: 2, soDung: 1, soTuLamDung: 1, satThuong: 24, soLanGiup: 0, soLanGiupThanhCong: 0, soLanDuocGiup: 0 }, tienBo: { soCau: 2, tuLamDung: 1, lenBac: 0, giup: 0, giupThanhCong: 0, duocGiup: 0 }, ban: [] }
     const het = xem({ revision: 6, tran: tran({ hiep: 2, ketThuc: true, thang: false, moSauMs: 0, conMs: 0 }), cau: undefined, ketChang, hiepVuaXong: vuaXong(2) } as unknown as Partial<DoanXem>)
     const call = dung({ sauNop: het })
     await waitFor(() => expect(man().className).toContain('dh2'))
     await chotB(); await boQuaChuong()
-    const nut = await screen.findByRole('button', { name: 'XEM KẾT QUẢ CHẶNG' })
+    const nut = await screen.findByRole('button', { name: 'XEM KẾT QUẢ CHUYẾN' })
     expect(document.querySelector('[data-vung="loi-giai-chuan"]')).toBeTruthy()
     fireEvent.click(nut)
     await waitFor(() => expect(man().dataset.man).toBe('ket-chang'))

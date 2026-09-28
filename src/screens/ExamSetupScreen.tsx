@@ -46,6 +46,7 @@ import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
 import { canhBaoThieuSauLoc, chuBoTuLuanChiTiet, demCauTheoPhan, locTuLuanKhiMoCa } from '../lib/loc-tu-luan-mo-ca'
 import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
+import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { chonSanCaChot, chuBaoCaChot, docGoiCaChot, xoaGoiCaChot, type ChonSanCaChot } from '../lib/ca-chot-chien-dich'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -125,6 +126,8 @@ export default function ExamSetupScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const classList = useAppStore((s) => s.classList)
+  // GAME HÓA 2.0 (RA-SOAT 28/09 mục 3): chỉ ĐỔI CHỮ cho dễ hiểu — luồng mở ca, phạm vi, link giữ nguyên.
+  const hoa2 = useHoa2Bat()
 
   const [scriptUrl, setScriptUrl] = useState('')
   const [savedSources, setSavedSources] = useState<TeacherExamSource[]>([])
@@ -441,7 +444,7 @@ export default function ExamSetupScreen() {
           </div>
           <NutChinh onClick={copyLink}>
             <span className="inline-flex items-center gap-2">
-              {daCopy ? <Check size={18} /> : <Copy size={18} />} {daCopy ? 'Đã copy' : 'Copy link mời vào thi'}
+              {daCopy ? <Check size={18} /> : <Copy size={18} />} {daCopy ? (hoa2 ? 'Đã chép' : 'Đã copy') : hoa2 ? 'Chép link vào thi' : 'Copy link mời vào thi'}
             </span>
           </NutChinh>
         </TheNoiDung>
@@ -668,13 +671,13 @@ export default function ExamSetupScreen() {
             <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
               Phạm vi học sinh tham gia:
             </span>
-            <span className="text-[11px] text-slate-400">Quy định quyền truy cập</span>
+            <span className="text-[11px] text-slate-400">{hoa2 ? 'Ai được vào' : 'Quy định quyền truy cập'}</span>
           </div>
 
           <div className="grid grid-cols-3 gap-2">
             {[
-              { id: 'tu_do', Icon: Globe, label: 'Tự do' },
-              { id: 'sbd', Icon: Users, label: 'SBD cả lớp' },
+              { id: 'tu_do', Icon: Globe, label: hoa2 ? 'Mọi em có link' : 'Tự do' },
+              { id: 'sbd', Icon: Users, label: hoa2 ? 'Chỉ em trong danh sách lớp' : 'SBD cả lớp' },
               { id: 'chon', Icon: Target, label: `Chọn em${chonSbd.size > 0 ? ` (${chonSbd.size})` : ''}` },
             ].map((p) => {
               const chon = phamVi === p.id

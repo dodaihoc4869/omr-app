@@ -6,7 +6,7 @@ import type { Env } from './kieu'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
-import { khoiLuongCan, phatLaiCau, soNgayConLai, sucChua, congNgay, TRAN_NGAY, type LanLam, type TrangThaiCau } from './srs2-loi'
+import { hangTuTiLe, khoiLuongCan, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { chanDoanEm, docChienDichTuDong, docCoHoa2Tu, docHoSoDangCaLop, docMetaCau, hangTuHoSo, KHOA_CO_HOA2, ngayVnCua, type ChienDich } from './srs2-d1'
 
 type Row = Record<string, unknown>
@@ -19,7 +19,7 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
   try {
     if (action === 'co-doc') return coDoc(env)
     if (action === 'co-luu') return coLuu(env, b, nowMs)
-    if (action === 'danh-sach') return danhSach(env, nowMs)
+    if (action === 'danh-sach') return danhSach(env, nowMs, b.thongKe === true)
     if (action === 'suc-chua') return tinhSucChua(env, b, nowMs)
     if (action === 'ds-em') return dsEm(env)
     if (action === 'chan-doan-em') return chanDoanEm(env, str(b.sbd).trim(), nowMs)
@@ -86,24 +86,24 @@ export const maGocCuaTo = (maDe: readonly string[]): string[] => [...new Set(maD
  * Câu hợp lệ của các tờ đề (đã duyệt, bỏ tự luận), theo thứ tự tờ rồi thứ tự câu trong tờ; câu trùng giữa các tờ chỉ tính MỘT lần (tờ đứng trước giữ).
  * `theoTo`: số câu dùng được mà MỖI tờ góp vào (sau khi bỏ trùng) — cộng lại đúng bằng `qids.length`, để màn giao hiện số từng tờ khớp tổng.
  */
-async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promise<{ qids: string[]; theoTo: Record<string, number> }> {
+async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promise<{ qids: string[]; theoTo: Record<string, number>; theoMucDo: Record<string, number> }> {
   const r = await env.DB.prepare('SELECT ma_de, qid, json FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) ORDER BY rowid').bind(JSON.stringify(maGocCuaTo(maDe))).all<Row>()
-  const theoGoc = new Map<string, { qid: string; phan: string }[]>()
+  const theoGoc = new Map<string, { qid: string; phan: string; mucDo: string }[]>()
   for (const x of r.results ?? []) {
     let q: PrivateQuestion
     try { q = JSON.parse(str(x.json)) as PrivateQuestion } catch { continue }
     if (!q.reviewed || laCauTuLuan(q)) continue
     const k = str(x.ma_de)
-    theoGoc.set(k, [...(theoGoc.get(k) ?? []), { qid: str(x.qid), phan: str(q.phan) }])
+    theoGoc.set(k, [...(theoGoc.get(k) ?? []), { qid: str(x.qid), phan: str(q.phan), mucDo: str((q as { mucDo?: unknown }).mucDo).trim() }])
   }
-  const qids: string[] = [], da = new Set<string>(), theoTo: Record<string, number> = {}
+  const qids: string[] = [], da = new Set<string>(), theoTo: Record<string, number> = {}, theoMucDo: Record<string, number> = {}
   for (const m of maDe) {
     const { goc, phan } = tachMaTo(m)
     let n = 0
-    for (const c of theoGoc.get(goc) ?? []) if ((!phan || c.phan === phan) && !da.has(c.qid)) { da.add(c.qid); qids.push(c.qid); n++ }
+    for (const c of theoGoc.get(goc) ?? []) if ((!phan || c.phan === phan) && !da.has(c.qid)) { da.add(c.qid); qids.push(c.qid); n++; const md = c.mucDo || 'Chưa gắn mức độ'; theoMucDo[md] = (theoMucDo[md] ?? 0) + 1 }
     theoTo[m] = (theoTo[m] ?? 0) + n
   }
-  return { qids, theoTo }
+  return { qids, theoTo, theoMucDo }
 }
 async function cauCuaTo(env: Env, maDe: readonly string[]): Promise<string[]> {
   return (await cauCuaToChiTiet(env, maDe)).qids
@@ -159,10 +159,71 @@ const trungVi = (ds: number[]): number => {
 }
 
 // ---------------------------------------------------------------- danh sách, sức chứa, tạo
-async function danhSach(env: Env, nowMs: number) {
+async function danhSach(env: Env, nowMs: number, coThongKe = false) {
   const r = await env.DB.prepare("SELECT * FROM chien_dich WHERE trang_thai <> 'da_huy' ORDER BY tao_luc DESC LIMIT 100").all<Row>()
   const homNay = ngayVnCua(nowMs)
-  return { ok: true, homNay, chienDich: (r.results ?? []).map(docChienDichTuDong).map(({ qids, sbd, ...c }) => ({ ...c, soCau: qids.length, soEm: sbd.length, hetHan: c.hanNop < homNay })) }
+  const ds = (r.results ?? []).map(docChienDichTuDong)
+  // Chỉ-thêm (bản vẽ GV-ChienDichDaGiao 28/09): `thongKe: true` ⇒ số liệu lớp của TỐI ĐA 20 chiến dịch mới nhất (đã làm qua, thành thạo,
+  // đúng nhịp, quá tải hôm nay, cần dạy lại). Lỗi đọc một chiến dịch ⇒ `thongKe: null` cho riêng chiến dịch đó. Màn Chữa trên lớp không xin ⇒ nhẹ như cũ.
+  const tk = coThongKe ? await Promise.all(ds.slice(0, SO_CD_THONG_KE).map((cd) => thongKeLop(env, cd, homNay).catch(() => null))) : []
+  return {
+    ok: true, homNay,
+    chienDich: ds.map(({ qids, sbd, ...c }, i) => ({ ...c, soCau: qids.length, soEm: sbd.length, hetHan: c.hanNop < homNay, ...(coThongKe ? { thongKe: tk[i] ?? null } : {}) })),
+  }
+}
+/** Số chiến dịch (mới nhất) được tính số liệu lớp trong `danh-sach` có `thongKe`. */
+export const SO_CD_THONG_KE = 20
+
+// ---------------------------------------------------------------- nhịp của em (bản vẽ GV-BangChienDich 28/09)
+export type NhipEm = 'vuot' | 'dung' | 'tre12' | 'tre3'
+/**
+ * Nhịp của một em: trễ = số ngày liền KHÔNG làm câu nào (chưa làm câu nào ⇒ tính từ ngày giao).
+ * Trễ ≥ 3 ngày ⇒ `tre3`; 1–2 ngày ⇒ `tre12`; không trễ ⇒ `vuot` khi đã làm qua ≥ mức cần hôm nay + 10 điểm %, còn lại `dung`.
+ */
+export function nhipEm(tre: number, tiLeLamQua: number, mucCanHomNay: number): NhipEm {
+  if (tre >= 3) return 'tre3'
+  if (tre >= 1) return 'tre12'
+  return tiLeLamQua >= Math.min(1, mucCanHomNay + 0.1) && tiLeLamQua > 0 ? 'vuot' : 'dung'
+}
+/** Ngày thứ mấy của chiến dịch (tính cả ngày giao) / tổng số ngày tới hạn nộp; mức "đã làm qua" cần đạt hết hôm nay = ngàyThứ / tổngNgày. */
+export function mocNhip(taoLuc: string, hanNop: string, homNay: string): { ngayGiao: string; ngayThu: number; tongNgay: number; mucCanHomNay: number } {
+  const ms = Date.parse(taoLuc)
+  const ngayGiao = Number.isFinite(ms) ? ngayVnCua(ms) : homNay
+  const tongNgay = Math.max(1, soNgayGiua(ngayGiao, hanNop) + 1)
+  const ngayThu = Math.max(1, Math.min(tongNgay, soNgayGiua(ngayGiao, homNay) + 1))
+  return { ngayGiao, ngayThu, tongNgay, mucCanHomNay: ngayThu / tongNgay }
+}
+/** Số ngày liền em không làm câu nào: `ngayCuoi` = ngày làm gần nhất (null ⇒ tính từ ngày giao). */
+const soNgayTre = (ngayCuoi: string | null, ngayGiao: string, homNay: string): number =>
+  Math.max(0, soNgayGiua(ngayCuoi ?? ngayGiao, homNay) - 1)
+
+/** Số liệu LỚP gọn của một chiến dịch (dùng cho danh sách chiến dịch đã giao). */
+async function thongKeLop(env: Env, cd: ChienDich, homNay: string) {
+  const [tt, kh] = await Promise.all([
+    trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.taoLuc),
+    env.DB.prepare('SELECT sbd, huyet_chien FROM srs2_ke_hoach WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))').bind(homNay, JSON.stringify(cd.sbd)).all<Row>().catch(() => ({ results: [] as Row[] })),
+  ])
+  const moc = mocNhip(cd.taoLuc, cd.hanNop, homNay)
+  const soCau = Math.max(1, cd.qids.length)
+  let coXat = 0, thanhThao = 0, dungNhip = 0, emLamQuaDu = 0
+  const canDayLai = new Map<string, number>()
+  for (const s of cd.sbd) {
+    const ds = [...tt.get(s)!.values()]
+    const cx = ds.filter((t) => !t.laMoi).length
+    coXat += cx
+    thanhThao += ds.filter((t) => t.thanhThao).length
+    if (cx >= cd.qids.length && cd.qids.length > 0) emLamQuaDu++
+    for (const t of ds) if (t.catTia) canDayLai.set(t.qid, (canDayLai.get(t.qid) ?? 0) + 1)
+    const ngayCuoi = ds.flatMap((t) => t.lichSu.map((l) => l.ngay)).sort().pop() ?? null
+    const n = nhipEm(soNgayTre(ngayCuoi, moc.ngayGiao, homNay), cx / soCau, moc.mucCanHomNay)
+    if (n === 'vuot' || n === 'dung') dungNhip++
+  }
+  const tong = soCau * Math.max(1, cd.sbd.length)
+  return {
+    coXat: coXat / tong, thanhThao: thanhThao / tong, dungNhip, emLamQuaDu,
+    quaTai: (kh.results ?? []).filter((x) => Number(x.huyet_chien) === 1).length,
+    canDayLaiCau: canDayLai.size, canDayLaiLuot: [...canDayLai.values()].reduce((a, b) => a + b, 0), mucCanHomNay: moc.mucCanHomNay,
+  }
 }
 
 export const THE_LUC_TOI_DA = 500
@@ -192,7 +253,7 @@ async function docDauVao(env: Env, b: Row): Promise<DauVaoGiao> {
 /** Đồng hồ sức chứa: khối lượng lượt cần của em ở giữa lớp so với D × thể lực/ngày; kèm hai gợi ý đưa về ≤ 70%. */
 async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   const dv = await docDauVao(env, b)
-  const { qids, theoTo } = await cauCuaToChiTiet(env, dv.maDe)
+  const { qids, theoTo, theoMucDo } = await cauCuaToChiTiet(env, dv.maDe)
   const homNay = ngayVnCua(nowMs)
   if (dv.hanNop < homNay) throw new Error('Hạn nộp đã qua.')
   const D = soNgayConLai(homNay, dv.hanNop)
@@ -211,7 +272,7 @@ async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   const soBo = Math.max(0, Math.ceil((kl - 0.7 * tran) / 2))
   const Dmoi = Math.ceil(kl / (0.7 * dv.theLucNgay))
   return {
-    ok: true, soCau: qids.length, theLucDeXuat: theLucDeXuat(kl, Math.max(0, ...khoiLuong), D), soCauTheoTo: theoTo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
+    ok: true, soCau: qids.length, theLucDeXuat: theLucDeXuat(kl, Math.max(0, ...khoiLuong), D), soCauTheoTo: theoTo, soCauTheoMucDo: theoMucDo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
     soEmQuaTai: khoiLuong.filter((x) => x > tran).length,
     goiY: sc.muc === 'xanh' ? null : {
       rutCon: soBo > 0 && soBo < qids.length ? { soCau: qids.length - soBo, tiLe: (kl - 2 * soBo) / tran } : null,
@@ -261,28 +322,60 @@ async function bang(env: Env, id: string, nowMs: number) {
   const dang = [...new Set(dangTheoQid.values())]
   const kh = await env.DB.prepare('SELECT sbd, huyet_chien FROM srs2_ke_hoach WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))').bind(homNay, JSON.stringify(cd.sbd)).all<Row>().catch(() => ({ results: [] as Row[] }))
   const huyet = new Set((kh.results ?? []).filter((x) => Number(x.huyet_chien) === 1).map((x) => str(x.sbd)))
+  const moc = mocNhip(cd.taoLuc, cd.hanNop, homNay)
+  const soCau = Math.max(1, cd.qids.length)
+  const qidTheoDang = new Map(dang.map((d) => [d, cd.qids.filter((q) => dangTheoQid.get(q) === d)]))
   const em = cd.sbd.map((s) => {
     const m = tt.get(s)!
     const ds = [...m.values()]
     const ngayCuoi = ds.flatMap((t) => t.lichSu.map((l) => l.ngay)).sort().pop() ?? null
     const theoDang = Object.fromEntries(dang.map((d) => {
-      const cua = cd.qids.filter((q) => dangTheoQid.get(q) === d).map((q) => m.get(q)!)
+      const cua = qidTheoDang.get(d)!.map((q) => m.get(q)!)
       return [d, cua.length ? cua.filter((t) => t.thanhThao).length / cua.length : null]
     }))
+    // Chỉ-thêm 28/09: % câu ĐÃ LÀM QUA theo dạng (0 ⇒ ô heatmap "Chưa làm") và nhịp của em.
+    const daLamTheoDang = Object.fromEntries(dang.map((d) => {
+      const cua = qidTheoDang.get(d)!.map((q) => m.get(q)!)
+      return [d, cua.length ? cua.filter((t) => !t.laMoi).length / cua.length : null]
+    }))
+    const coXat = ds.filter((t) => !t.laMoi).length
+    const tre = soNgayTre(ngayCuoi, moc.ngayGiao, homNay)
     return {
-      sbd: s, ten: ten.get(s) ?? s, coXat: ds.filter((t) => !t.laMoi).length, thanhThao: ds.filter((t) => t.thanhThao).length, canDayLai: ds.filter((t) => t.catTia).length,
+      sbd: s, ten: ten.get(s) ?? s, coXat, thanhThao: ds.filter((t) => t.thanhThao).length, canDayLai: ds.filter((t) => t.catTia).length,
       treNhip: ngayCuoi ? Math.max(0, Math.round((Date.parse(homNay) - Date.parse(ngayCuoi)) / 86_400_000) - 1) : null, huyetChien: huyet.has(s), theoDang,
       // Thầy 28/09 (chỉ-thêm): hạng của em theo từng dạng — cùng cách máy dùng để bốc câu mới (L1 Yếu · L2 Trung bình · L3 Khá · L4 Giỏi).
       hangTheoDang: Object.fromEntries(Object.entries(hangTuHoSo(hoSoDang.get(s) ?? [], lanTho.get(s) ?? [], meta, cd.qids, cd.taoLuc).hangTheoDang)
         .filter(([ma]) => tenCuaMa.has(ma)).map(([ma, h]) => [tenCuaMa.get(ma)!, h])),
+      daLamTheoDang, nhip: nhipEm(tre, coXat / soCau, moc.mucCanHomNay), soNgayTre: tre,
     }
   })
-  const canDayLai = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length }))
+  const canDayLai = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), mucDo: meta.get(q)?.mucDo ?? null, soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length }))
     .filter((x) => x.soEm > 0).sort((a, b) => b.soEm - a.soEm)
   const tong = cd.qids.length * Math.max(1, cd.sbd.length)
+  // So với hôm qua (chỉ-thêm): phát lại trạng thái chỉ với lần làm TRƯỚC hôm nay.
+  const lanHomQua = new Map([...lanTho].map(([k, v]) => [k, v.filter((x) => x.ngay < homNay)] as const))
+  const ttHomQua = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.taoLuc, lanHomQua)
+  let cxHq = 0, ttHq = 0
+  for (const s of cd.sbd) for (const t of ttHomQua.get(s)!.values()) { if (!t.laMoi) cxHq++; if (t.thanhThao) ttHq++ }
+  const nhip = { vuot: 0, dung: 0, tre12: 0, tre3: 0 }
+  for (const e of em) nhip[e.nhip]++
+  // % thành thạo trung bình lớp theo dạng + hạng lớp theo dạng (cùng ngưỡng thuật toán: Yếu < 40 · TB 40–65 · Khá 65–85 · Giỏi > 85).
+  const theoDangLop: Record<string, number | null> = {}
+  const hangLopTheoDang: Record<string, HangEm> = {}
+  for (const d of dang) {
+    const n = qidTheoDang.get(d)!.length * cd.sbd.length
+    const dat = cd.sbd.reduce((sum, s) => sum + qidTheoDang.get(d)!.filter((q) => tt.get(s)!.get(q)!.thanhThao).length, 0)
+    theoDangLop[d] = n ? dat / n : null
+    if (n) hangLopTheoDang[d] = hangTuTiLe(dat / n)
+  }
   return {
     ok: true, chienDich: { ...cd, qids: undefined, sbd: undefined, soCau: cd.qids.length, soEm: cd.sbd.length }, homNay, hetHan: cd.hanNop < homNay,
-    lop: { coXat: em.reduce((s, x) => s + x.coXat, 0) / tong, thanhThao: em.reduce((s, x) => s + x.thanhThao, 0) / tong, huyetChien: huyet.size, canDayLaiCau: canDayLai.length, canDayLaiLuot: canDayLai.reduce((s, x) => s + x.soEm, 0) },
+    lop: {
+      coXat: em.reduce((s, x) => s + x.coXat, 0) / tong, thanhThao: em.reduce((s, x) => s + x.thanhThao, 0) / tong, huyetChien: huyet.size, canDayLaiCau: canDayLai.length, canDayLaiLuot: canDayLai.reduce((s, x) => s + x.soEm, 0),
+      homQua: { coXat: cxHq / tong, thanhThao: ttHq / tong },
+      nhip, dungNhip: nhip.vuot + nhip.dung, mucCanHomNay: moc.mucCanHomNay, ngayThu: moc.ngayThu, tongNgay: moc.tongNgay,
+      theoDang: theoDangLop, hangTheoDang: hangLopTheoDang,
+    },
     dang, em, canDayLai,
   }
 }

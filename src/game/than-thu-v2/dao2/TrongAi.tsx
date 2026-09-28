@@ -16,10 +16,11 @@ import {CHU_HET_TRAN_DAO,laLoiHetTran} from '../loi-het-tran'
 import {anhThu} from '../dao/anh'
 import {chiSoThu,tenThu} from '../dao/dao-core'
 import type {DaoProfile,LyDoThuong} from '../dao/kieu'
-import {TEN_VAI,chuGach,dapAnDungSai,docGoiY,docVai,loiGiaiChoTheCau} from './dao2-core'
+import {NHAN_O_VAI,TEN_VAI,chuGach,dapAnDungSai,docGoiY,docVai,loiGiaiChoTheCau} from './dao2-core'
 import type {CauDao2} from './dao2-core'
 import '../../../components/bang-nhiem-vu/m3-theme.css'
 import '../../../components/m3/m3.css'
+import {useNgang} from './ngang'
 import './dao2.css'
 
 export const TEN_QUAI='Quái Sương Mù'
@@ -33,6 +34,16 @@ export function ThanhAi({cau,viTri,ketQua,xong=false}:{cau:readonly CauDao2[];vi
   const kq=ketQua.find(k=>k.qid===c.qid),trang=kq?(kq.correct?'dung':'sai'):i===viTri&&!xong?'dang':'cho',vai=docVai(c.vai)
   return <li key={c.qid} data-trang={trang} data-vai={vai??undefined} aria-current={trang==='dang'?'step':undefined}
    aria-label={`Ải ${i+1}${vai?` · ${TEN_VAI[vai]}`:''} · ${trang==='dung'?'đã qua, đúng':trang==='sai'?'đã qua, chưa đúng':trang==='dang'?'đang làm':'chưa tới'}`}><i/></li>})}</ol>
+}
+
+/** Bố cục NGANG: thẻ tiến độ chuyến dưới cảnh trận (bản vẽ Ngang-DaoAi) — 6 nút ải có nhãn vai (Mới / Ôn lại / Trùm) + số ải đúng / chưa đúng. */
+export function TienDoChuyen({cau,viTri,ketQua}:{cau:readonly CauDao2[];viTri:number;ketQua:readonly BattleAnswer[]}){
+ const dung=ketQua.filter(k=>k.correct).length,sai=ketQua.length-dung
+ return <section className="dao2-kinh dao2-tien-do" aria-label="Tiến độ chuyến thám hiểm">
+  <p><b>CHUYẾN THÁM HIỂM · {cau.length} ẢI</b><span>Đúng {dung} ải · Chưa đúng {sai} ải</span></p>
+  <ThanhAi cau={cau} viTri={viTri} ketQua={ketQua}/>
+  <ol className="dao2-tien-do-nhan" aria-hidden="true">{cau.map((c,i)=>{const vai=docVai(c.vai);return <li key={c.qid} data-vai={vai??undefined}>{vai?NHAN_O_VAI[vai]:`Ải ${i+1}`}</li>})}</ol>
+ </section>
 }
 
 // ───────────── cảnh rừng sương + quái + thần thú ─────────────
@@ -146,34 +157,40 @@ export interface TrongAiProps{
  onTraLoi:(v:string)=>void;onAssisted:(v:boolean)=>void;onNop:()=>void;onTiep:()=>void;onRoi:()=>void
 }
 export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi,busy=false,loi='',maLoi='',onTraLoi,onAssisted,onNop,onTiep,onRoi}:TrongAiProps){
- const [zoom,setZoom]=useState(''),[hinhLoi,setHinhLoi]=useState(false),q=cau[viTri],hetTran=!!loi&&laLoiHetTran(loi,maLoi),loiRef=useRef<HTMLParagraphElement>(null)
+ const ngang=useNgang(),[zoom,setZoom]=useState(''),[hinhLoi,setHinhLoi]=useState(false),q=cau[viTri],hetTran=!!loi&&laLoiHetTran(loi,maLoi),loiRef=useRef<HTMLParagraphElement>(null)
  useEffect(()=>{setHinhLoi(false)},[viTri])
  useEffect(()=>{if(loi)loiRef.current?.scrollIntoView?.({block:'nearest'})},[loi])
  if(!q)return null
  const vai=docVai(q.vai),goiY=docGoiY(q.goiY,q.phan),cuoi=viTri+1>=cau.length
+ const nhan=<p className="dao2-ai-nhan">ẢI {viTri+1}/{cau.length}{vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}{q.tenDang?<span> · {q.tenDang}</span>:null}</p>
  const thieu=!traLoi.trim()||(q.phan==='II'&&!/^[DS]{4}$/.test(traLoi))
  const chuNutThieu=q.phan==='I'?'Chọn một phương án để tung chiêu':q.phan==='II'?'Chọn đủ 4 ý để tung chiêu':'Nhập đáp án để tung chiêu'
- return <div className="dao2-ai">
+ // Dọc: một cột như cũ (hai lớp bọc `display:contents`). Ngang: cột TRÁI = thế giới game (thanh ải, cảnh trận, dải kết quả) · cột PHẢI = phần học
+ // (đề + phương án tự cuộn trong cột, lời giải, nút chính ở đáy). Lúc đọc lời giải bố cục ngang GIỮ cảnh trận (đòn vừa đánh) ở cột trái.
+ return <div className="dao2-ai" data-pha={phanHoi?'giai':'lam'}>
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi / lời giải" onClose={()=>setZoom('')}/>}
-  <div className="dao2-ai-dau">
-   <button type="button" className="dao2-nut-tron" onClick={onRoi} aria-label="Rời chuyến về bản đồ (chuyến đang làm được giữ lại)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
-   <div className="dao2-kinh dao2-thanh-khung"><ThanhAi cau={cau} viTri={viTri} ketQua={ketQua}/></div>
+  <div className="dao2-ai-trai">
+   <div className="dao2-ai-dau">
+    <button type="button" className="dao2-nut-tron" onClick={onRoi} aria-label="Rời chuyến về bản đồ (chuyến đang làm được giữ lại)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    {ngang?nhan:<div className="dao2-kinh dao2-thanh-khung"><ThanhAi cau={cau} viTri={viTri} ketQua={ketQua}/></div>}
+   </div>
+   {!ngang&&!phanHoi&&nhan}
+   {(!phanHoi||ngang)&&<CanhRung profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length}/>}
+   {phanHoi&&<DaiKetQua profile={profile} cau={q} phanHoi={phanHoi} ketQua={ketQua} tong={cau.length}/>}
+   {ngang&&<TienDoChuyen cau={cau} viTri={viTri} ketQua={ketQua}/>}
   </div>
+  <div className="dao2-ai-phai">
   {!phanHoi?<>
-   <p className="dao2-ai-nhan">ẢI {viTri+1}/{cau.length}{vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}{q.tenDang?<span> · {q.tenDang}</span>:null}</p>
-   <CanhRung profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length}/>
    <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)}/>
    {hinhLoi&&<p role="alert" className="dao2-loi">Hình của câu chưa tải được. Em về bản đồ rồi bấm LÊN ĐƯỜNG để mở lại; câu này chưa bị tính sai.</p>}
    {!goiY&&<label className="dao2-tro"><input type="checkbox" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/> Em có dùng tài liệu hoặc được trợ giúp ở câu này</label>}
-  </>:<>
-   <DaiKetQua profile={profile} cau={q} phanHoi={phanHoi} ketQua={ketQua} tong={cau.length}/>
-   <KhoiLoiGiai cau={q} stt={viTri+1} phanHoi={phanHoi} traLoiMay={traLoi} onZoom={setZoom}/>
-  </>}
+  </>:<KhoiLoiGiai cau={q} stt={viTri+1} phanHoi={phanHoi} traLoiMay={traLoi} onZoom={setZoom}/>}
   <div className="dao2-chan" data-noi={phanHoi||!thieu||loi?'':undefined}>
    {hetTran&&!phanHoi?<div className="dao2-kinh dao2-het-tran" role="alert"><p ref={loiRef}>{CHU_HET_TRAN_DAO}</p><button type="button" className="dao2-nut-vang" onClick={onRoi}>VỀ BẢN ĐỒ</button></div>
    :<>{loi&&<p className="dao2-loi" role="alert" ref={loiRef}>{loi}</p>}
     {!phanHoi?<button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN · TUNG CHIÊU'}</button>
     :<button type="button" className="dao2-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN':`ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${viTri+2}`}</button>}</>}
+  </div>
   </div>
  </div>
 }

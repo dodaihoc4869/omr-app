@@ -57,6 +57,9 @@ export default function KetChang2({ xem, expNhan, cau, ban, onRaDao, onVeBanDo, 
   return (
     <div className="dh-khung dh2-thang" data-vung="ket-chang-2">
       {/* Tranh 390×360 theo đúng toạ độ bản vẽ (khung giữ tỉ lệ ⇒ % trong khung = toạ độ bản vẽ); tiêu đề + dòng phụ nằm TRÊN tranh như bản vẽ. */}
+      {/* Bố cục NGANG (Ngang-DoanKetChang, doan2-ngang.css): cột trái = tranh thắng; cột phải = cầu · phần thưởng · Linh Tâm lớp · nút chính.
+          Hai cột bọc `display:contents` ⇒ màn dọc y nguyên. */}
+      <div className="dh2-cot dh2-cot-trai" data-vung="cot-trai">
       <div className="dh2-thang-canh">
         <TranhThang thang={k.thang} ha={ha} />
         {banBe[0] && <ThuHinh pet={banBe[0].pet} cap={banBe[0].cap} className="dh-noi-2" style={{ left: '5.6%', top: '35.6%', width: '20.5%', aspectRatio: '1' } as CSSProperties} />}
@@ -73,7 +76,9 @@ export default function KetChang2({ xem, expNhan, cau, ban, onRaDao, onVeBanDo, 
           </p>
         </div>
       </div>
+      </div>
 
+      <div className="dh2-cot dh2-cot-phai" data-vung="cot-phai">
       {cau === undefined ? (
         <div className="dh2-kinh dh2-cau-the" role="status" data-vung="cau-dang-doc"><span>Đang kiểm tra số ổ phục kích còn lại hôm nay…</span></div>
       ) : ha ? (
@@ -130,6 +135,7 @@ export default function KetChang2({ xem, expNhan, cau, ban, onRaDao, onVeBanDo, 
           ? <button type="button" className="dh2-nut-chinh dh2-baloo" onClick={onRaDao}>QUA CẦU · KHÁM PHÁ ĐẢO</button>
           : <button type="button" className="dh2-nut-chinh dh2-baloo" disabled={ban} onClick={onDiTiep}>{cau && cau.doanCon > 0 ? `PHÁ TIẾP · CÒN ${cau.doanCon} Ổ PHỤC KÍCH` : 'PHÁ TIẾP Ổ PHỤC KÍCH'}</button>}
         <button type="button" className="dh2-nut-phu" onClick={onVeBanDo}>Về bản đồ</button>
+      </div>
       </div>
     </div>
   )

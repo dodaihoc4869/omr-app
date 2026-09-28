@@ -96,9 +96,10 @@ describe('màn Buổi chữa', () => {
     return { ...render(<BuoiChua {...p} />), p }
   }
 
-  it('bảng câu xếp sẵn đủ cột: #, câu · dạng, vì sao chữa, điểm chữa, người lên bảng, thời gian; ô số đúng', () => {
+  it('bảng câu xếp sẵn đủ cột: #, câu · dạng · mức độ, vì sao chữa, điểm chữa, người lên bảng, thời gian, kết quả; 5 thẻ số đúng (bản vẽ 28/09)', () => {
     const { container } = ve()
-    expect(screen.getByRole('heading', { name: 'Lên bảng · Buổi chữa Ester – Lipid' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'Buổi chữa · Ester – Lipid · 12A1' })).toBeTruthy()
+    expect(container.textContent).toContain('Chữa trên lớp › Buổi chữa')
     expect(container.textContent).toContain('hết hạn nộp lúc 23:59 Chủ Nhật 04/10')
     expect(container.textContent).toContain('có mặt 6/6 em')
     const hang = [...container.querySelectorAll('[data-hang-chua]')].map((x) => x.getAttribute('data-hang-chua'))
@@ -109,8 +110,12 @@ describe('màn Buổi chữa', () => {
     expect(dau.textContent).toContain('Giải mẫu: Em 01')
     expect(dau.textContent).toContain('Sửa: Em 02, Em 03')
     expect(dau.textContent).toMatch(/\d+ phút/)
-    expect(container.querySelector('[data-so="co-luot"]')?.textContent).toBe('6/6 em')
-    expect(container.querySelector('[data-so="buoi-chua"]')?.textContent).toMatch(/^3 câu · \d+\/90 phút$/)
+    expect(container.querySelector('[data-so="co-luot"]')?.textContent).toBe('6/6 em có lượt lên bảng')
+    expect(container.querySelector('[data-so="buoi-chua"]')?.textContent).toBe('3câu')
+    expect(container.querySelector('[data-so="thoi-gian"]')?.textContent).toMatch(/^\d+\/ 90 phút$/)
+    expect(container.querySelector('[data-so="tien-do"]')?.textContent).toBe('0/ 3 câu')
+    expect([...container.querySelectorAll('[data-ket-qua-cau]')].map((x) => x.textContent)).toEqual(['Chưa chữa', 'Chưa chữa', 'Chưa chữa'])
+    expect(container.textContent).not.toMatch(/Cọ xát/)
     expect(container.textContent).toContain('điểm chữa = số em chưa thành thạo + 2 × số em cần thầy dạy lại')
     expect(screen.getByRole('button', { name: 'Mở ca chốt · 4 câu' })).toBeTruthy()
   })

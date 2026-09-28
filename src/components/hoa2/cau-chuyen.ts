@@ -72,6 +72,25 @@ export function loiGiaiChoTheCau(tho: unknown, phan: 'I' | 'II' | 'III', dapAn: 
   return ra
 }
 
+const CHI_SO_UNICODE = '₀₁₂₃₄₅₆₇₈₉'
+/** Chỉ số dưới Unicode của kho (C₆H₁₂O₆) → cú pháp `_{6}` mà ChemText vẽ bằng <sub> CÙNG phông chữ quanh nó. Be Vietnam Pro không có
+ * glyph ₀–₉ nên máy lấy phông dự phòng — chữ bé, lệch dòng, khó đọc (thầy nhắc 28/09). Chỉ đổi cách vẽ, không đổi nội dung. */
+export function chiSoDuoiRo(s: string): string {
+  return s.replace(/[₀-₉]+/g, (d) => `_{${[...d].map((c) => CHI_SO_UNICODE.indexOf(c)).join('')}}`)
+}
+function loiGiaiRo(lg: LoiGiaiCauTruc | undefined): LoiGiaiCauTruc | undefined {
+  if (!lg) return lg
+  const ly = <T extends object>(m: T): T =>
+    Object.fromEntries(Object.entries(m).map(([k, v]) => [k, v && typeof v.viSao === 'string' ? { ...v, viSao: chiSoDuoiRo(v.viSao) } : v])) as T
+  const ra: LoiGiaiCauTruc = { ...lg }
+  if (typeof lg.chot === 'string') ra.chot = chiSoDuoiRo(lg.chot)
+  if (lg.tungPa) ra.tungPa = ly(lg.tungPa)
+  if (lg.tungY) ra.tungY = ly(lg.tungY)
+  if (lg.buoc) ra.buoc = lg.buoc.map((b) => (typeof b === 'string' ? chiSoDuoiRo(b) : b))
+  if (typeof lg.ketQua === 'string') ra.ketQua = chiSoDuoiRo(lg.ketQua)
+  return ra
+}
+
 const bon = <T,>(a: T[] | undefined, lap: T): [T, T, T, T] => [a?.[0] ?? lap, a?.[1] ?? lap, a?.[2] ?? lap, a?.[3] ?? lap]
 
 /** Props `TheCau` (xem_lai) cho một câu em đã làm: đáp án đúng tô xanh, lựa chọn sai của em tô đỏ, ô LỜI GIẢI chuẩn. */
@@ -81,12 +100,12 @@ export function propsTheCau(ct: ChiTietCau, stt: number): TheCauProps {
     cheDo: 'xem_lai' as const,
     stt: Math.max(1, stt),
     tieuDe: de.tenDang || undefined,
-    text: de.text,
+    text: chiSoDuoiRo(de.text),
     thanCauImg: de.thanCauImg,
     table: de.table,
     imageDataUrl: de.imageDataUrl,
     hinhAnh: de.hinhAnh as HinhAnh[],
-    loiGiai: loiGiaiChoTheCau(ct.loiGiai, de.phan, ct.dapAn),
+    loiGiai: loiGiaiRo(loiGiaiChoTheCau(ct.loiGiai, de.phan, ct.dapAn)),
   }
   if (de.phan === 'I') {
     const chon = String(ct.emTraLoi ?? '').trim().toUpperCase()
@@ -94,7 +113,7 @@ export function propsTheCau(ct: ChiTietCau, stt: number): TheCauProps {
     return {
       ...chung,
       phan: 'I',
-      choices: bon(de.choices, ''),
+      choices: bon(de.choices, '').map(chiSoDuoiRo) as [string, string, string, string],
       choiceImgs: de.choiceImgs ? (bon(de.choiceImgs.map((x) => x || undefined), undefined) as [string?, string?, string?, string?]) : undefined,
       choicePerm: [0, 1, 2, 3],
       selected: /^[A-D]$/.test(chon) ? (chon as Chu) : null,
@@ -106,7 +125,7 @@ export function propsTheCau(ct: ChiTietCau, stt: number): TheCauProps {
     return {
       ...chung,
       phan: 'II',
-      ideas: bon(de.ideas, ''),
+      ideas: bon(de.ideas, '').map(chiSoDuoiRo) as [string, string, string, string],
       ideaImgs: de.ideaImgs ? (bon(de.ideaImgs.map((x) => x || undefined), undefined) as [string?, string?, string?, string?]) : undefined,
       selected: tachDungSai(ct.emTraLoi) ?? [null, null, null, null],
       correct: dung && dung.every((x) => x !== null) ? (dung as [DS, DS, DS, DS]) : undefined,

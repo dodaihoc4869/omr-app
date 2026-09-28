@@ -1133,10 +1133,11 @@ export default function ExamMonitorScreen() {
               type="button"
               onClick={() => setScreen('lichsuca')}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 shadow-2xs font-semibold text-xs transition cursor-pointer active:scale-95 shrink-0"
-              aria-label="Quay lại Lịch sử ca"
+              aria-label={hoa2 ? 'Quay lại Ca kiểm tra' : 'Quay lại Lịch sử ca'}
             >
               <ArrowLeft size={15} className="text-slate-600 dark:text-slate-300" />
-              <span>Lịch sử ca</span>
+              {/* GAME HÓA 2.0 (RA-SOAT 28/09 mục 3): một khái niệm một từ — "Ca kiểm tra". */}
+              <span>{hoa2 ? 'Ca kiểm tra' : 'Lịch sử ca'}</span>
             </button>
             </span>
           </>
@@ -1217,7 +1218,7 @@ export default function ExamMonitorScreen() {
               <section className="cd-the" data-khoi="giao-chien-dich-thu-gon" style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span className="cd-nhan-buoc">BƯỚC TIẾP THEO · Giao chiến dịch luyện</span>
                 <button type="button" className="m3-nut-vien" onClick={() => setThuGonGiao(false)}>
-                  Giao chiến dịch luyện
+                  Giao chiến dịch luyện từ ca này
                 </button>
               </section>
             ) : (
@@ -1375,7 +1376,7 @@ export default function ExamMonitorScreen() {
                 </div>
                 {hoiHuy && (
                   <div style={{ marginTop: 'var(--k3)' }}>
-                    <OThongBao tone="do">Huỷ ca <b style={SO}>{chiTiet.ca.maCa}</b>? Em đang chờ sẽ thấy báo ca đã huỷ. Ca vào Lịch sử ca, khôi phục lại được.</OThongBao>
+                    <OThongBao tone="do">Huỷ ca <b style={SO}>{chiTiet.ca.maCa}</b>? Em đang chờ sẽ thấy báo ca đã huỷ. {hoa2 ? 'Ca vào Ca kiểm tra › Ca đã xoá, khôi phục lại được.' : 'Ca vào Lịch sử ca, khôi phục lại được.'}</OThongBao>
                     <div className="flex" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
                       <button type="button" onClick={() => setHoiHuy(false)} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)', border: 'none' }}>
                         Không huỷ
@@ -1793,7 +1794,7 @@ export default function ExamMonitorScreen() {
                   <span>HỌC SINH</span>
                   <span>TRẠNG THÁI</span>
                   <span>TIẾN ĐỘ</span>
-                  <span>CHỐNG GIAN LẬN</span>
+                  <span>{hoa2 ? 'RỜI MÀN' : 'CHỐNG GIAN LẬN'}</span>
                   <span>ĐIỂM</span>
                 </div>
                 {dsHienThi.map((e) => {
@@ -1858,7 +1859,8 @@ export default function ExamMonitorScreen() {
                           {l.soLanRoiMan === 0 && !chuTatDe(l.integrity) && <span className="ca-khong" aria-label="Không có cảnh báo">—</span>}
                       </span>
                       <span className="ca-hd">
-                          {(l.trangThai === 'khoa' || l.soLanRoiMan > 0) && (
+                          {/* GAME HÓA 2.0: app phụ huynh tắt ⇒ tin báo không tới ai — bỏ nút (RA-SOAT mục 3). */}
+                          {!hoa2 && (l.trangThai === 'khoa' || l.soLanRoiMan > 0) && (
                             <button type="button" onClick={() => moBaoPhuHuynh(e.sbd, l.hoTen, l)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--cam)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--cam)' }}>
                               Báo phụ huynh
                             </button>

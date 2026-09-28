@@ -2,7 +2,7 @@ import './styles/teacher-layout.css'
 import './styles/vo-thay.css'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import BottomNav from './components/BottomNav'
-import ThanhBenTrai, { MAN_AN_KHI_HOA2, MAN_DAU_HOA2 } from './components/ThanhBenTrai'
+import ThanhBenTrai, { MAN_AN_KHI_HOA2, MAN_CHI_HOA2, MAN_DAU_HOA2 } from './components/ThanhBenTrai'
 import { chonBat, useCoHoa2 } from './components/chien-dich/co-hoa2'
 import Toast from './components/Toast'
 import { useAppStore } from './store/appStore'
@@ -56,6 +56,9 @@ const GiaoBtvnScreen = lazy(() => import('./screens/PhanCongScreen'))
 const CauHoiScreen = lazy(() => import('./screens/CauHoiScreen'))
 const CaiDatScreen = lazy(() => import('./screens/CaiDatScreen'))
 const GiaoDeTheoTuanScreen = lazy(() => import('./screens/GiaoDeTheoTuanScreen'))
+// GAME HÓA 2.0 (bản vẽ docs/ban-ve-gv-2809): trang đầu Tổng quan + màn riêng Chiến dịch luyện — chỉ vào được khi cờ bật.
+const TongQuanScreen = lazy(() => import('./screens/TongQuanScreen'))
+const ChienDichScreen = lazy(() => import('./screens/ChienDichScreen'))
 // CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
 // nó nhập thẳng là em học sinh nào cũng phải tải kèm.
@@ -86,7 +89,12 @@ const TEN_MAN: Record<string, string> = {
   cauhoi: 'Học sinh hỏi',
   khodegiao: 'Giao đề theo tuần',
   caidat: 'Cài đặt',
+  tongquan: 'Tổng quan',
+  chiendich: 'Chiến dịch luyện',
 }
+
+/** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Lên bảng" → "Chữa trên lớp", "Ngân hàng" → "Kho đề". */
+const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Chữa trên lớp', nganhangde: 'Kho đề' }
 
 const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
 
@@ -136,7 +144,8 @@ function App() {
   const setClassList = useAppStore((s) => s.setClassList)
   const setScreen = useAppStore((s) => s.setScreen)
 
-  // GAME HÓA 2.0 (cờ máy chủ `/gv/chien-dich` co-doc): app thầy chỉ còn Ca kiểm tra + Lên bảng (+ "Thêm…").
+  // GAME HÓA 2.0 (cờ máy chủ `/gv/chien-dich` co-doc): app thầy = Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh
+  // (+ Kho đề, Cài đặt ở đáy) — bản vẽ docs/ban-ve-gv-2809.
   // Chỉ đọc cờ ở app thầy ĐÃ MỞ KHOÁ — máy em, phụ huynh, link thi/phiếu không gọi lệnh thầy. Cờ tắt ⇒ app như cũ.
   const hoa2 = useCoHoa2(chonBat)
   const docCoHoa2 = useCoHoa2((s) => s.doc)
@@ -144,11 +153,12 @@ function App() {
   useEffect(() => {
     if (laVoThay) void docCoHoa2()
   }, [laVoThay, docCoHoa2])
-  // Màn đã bỏ khi 2.0 bật (Hôm nay, Giao BTVN, Học sinh hỏi, Giao đề theo tuần) ⇒ về Ca kiểm tra, không dựng màn cũ lấy một nhịp.
-  const anKhiHoa2 = laVoThay && hoa2 && MAN_AN_KHI_HOA2.includes(screen)
+  // Màn đã bỏ khi 2.0 bật (Hôm nay, Giao BTVN, Học sinh hỏi, Giao đề theo tuần) ⇒ về Tổng quan, không dựng màn cũ lấy một nhịp.
+  // Ngược lại: cờ TẮT mà đang ở màn chỉ 2.0 mới có (Tổng quan, Chiến dịch luyện) ⇒ về Hôm nay như app cũ.
+  const anKhiHoa2 = laVoThay && ((hoa2 && MAN_AN_KHI_HOA2.includes(screen)) || (!hoa2 && MAN_CHI_HOA2.includes(screen)))
   useEffect(() => {
-    if (anKhiHoa2) setScreen(MAN_DAU_HOA2)
-  }, [anKhiHoa2, setScreen])
+    if (anKhiHoa2) setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')
+  }, [anKhiHoa2, hoa2, setScreen])
 
   // Máy này đã đặt mật khẩu chưa. Đọc một lần lúc nạp.
   useEffect(() => {
@@ -342,16 +352,16 @@ function App() {
   const laManThi = screen === 'examtake'
 
   return (
-    <div className={`min-h-screen m3 m3-thay${laManThi ? '' : ' vo-thay'}`}>
+    <div className={`min-h-screen m3 m3-thay${laManThi ? '' : ' vo-thay'}`} data-hoa2={hoa2 && !laManThi ? '' : undefined}>
       <Toast />
       {!laManThi && <ThanhBenTrai />}
       <div className="khung-noi-dung">
         <div className="giua-noi-dung" data-teacher-screen={laManThi ? undefined : screen}>
       {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
           `screen` để lỗi cũ không dính lại khi thầy sang màn khác.
-          GAME HÓA 2.0: màn đã bỏ thì KHÔNG dựng (kể cả một nhịp) — hiệu ứng ở trên đưa về Ca kiểm tra ngay. */}
+          GAME HÓA 2.0: màn đã bỏ thì KHÔNG dựng (kể cả một nhịp) — hiệu ứng ở trên đưa về Tổng quan ngay. */}
       {!anKhiHoa2 && (
-      <ChanLoi key={screen} o={TEN_MAN[screen]} veManChinh={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')}>
+      <ChanLoi key={screen} o={(hoa2 && TEN_MAN_HOA2[screen]) || TEN_MAN[screen]} veManChinh={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')}>
         <Suspense fallback={<div style={{ padding: 24, fontFamily: 'var(--sans)', color: 'var(--nhat)' }}>Đang mở…</div>}>
         {screen === 'classlist' && <ClassListScreen />}
         {screen === 'examhub' && <ExamHubScreen />}
@@ -367,6 +377,8 @@ function App() {
         {screen === 'cauhoi' && <CauHoiScreen />}
         {screen === 'caidat' && <CaiDatScreen />}
         {screen === 'khodegiao' && <GiaoDeTheoTuanScreen />}
+        {screen === 'tongquan' && <TongQuanScreen />}
+        {screen === 'chiendich' && <ChienDichScreen />}
         </Suspense>
       </ChanLoi>
       )}

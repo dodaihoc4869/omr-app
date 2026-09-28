@@ -1,0 +1,107 @@
+/* ĐOÀN HỘ TỐNG · GAME HÓA 2.0 — BỐ CỤC NGANG (thầy chốt bản vẽ docs/ban-ve-ngang-2809: Ngang-DoanSanh, Ngang-DoanTran, Ngang-DoanLoiGiai,
+   Ngang-DoanTrum, Ngang-DoanKetChang, Ngang-TungChuong-TiepSuc). Áp khi màn ≥ 1024 px HOẶC xoay ngang ≥ 700 px; dọc giữ nguyên.
+   Lưới 7/5 (lề 32 px, khe 24 px): cột trái = thứ cần NHÌN (chiến trường, bản đồ, tranh thắng); cột phải = câu + đòn + nút chính ở ĐÁY.
+   Hiệp trùm (4 ý đúng–sai dài) đảo: câu cột trái rộng, trùm cột phải. Màn chơi không cuộn trong 900 px — chỉ thẻ câu cuộn bên trong.
+   Hai cột là `.dh2-cot` (ở màn dọc `display:contents` ⇒ không đổi gì). MỌI bộ chọn nằm dưới `.dh2` ⇒ cờ 2.0 tắt thì tệp này không có hiệu lực.
+   Màu rgb()/rgba() (npm run check:mau). Chuyển động ≤ 300 ms, chỉ transform/opacity. */
+@media (min-width:1024px),(orientation:landscape) and (min-width:700px){
+  /* ───── Khung chung: lưới 7/5, tối đa 1440 ở giữa ───── */
+  .dh2 .dh-khung.dh2-tran,.dh2 .dh-khung.dh2-sanh,.dh2 .dh-khung.dh2-thang{
+    max-width:1440px;height:100%;min-height:0;display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);grid-template-rows:minmax(0,1fr);
+    gap:24px;padding:max(16px,env(safe-area-inset-top)) max(32px,env(safe-area-inset-right)) max(16px,env(safe-area-inset-bottom)) max(32px,env(safe-area-inset-left))}
+  .dh2 .dh-khung>.dh2-cot{display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0}
+
+  /* ───── Trong trận ───── */
+  .dh2 .dh2-tran.dh2-tran-trum>.dh2-cot-phai{order:-1} /* hiệp trùm: câu 4 ý sang cột trái rộng */
+  .dh2 .dh2-tran .dh2-cot-trai>.dh2-canh{flex:1 1 auto;height:auto;min-height:0;margin:0;border-radius:28px;container-type:size;
+    background:rgb(27,21,84);box-shadow:inset 0 0 0 1px rgba(160,200,255,.18),0 14px 30px rgba(0,0,0,.35)}
+  .dh2 .dh2-tran .dh2-cot-trai>.dh2-canh.dh2-canh-trum{background:rgb(27,12,64)} /* nền = màu trời đỉnh tranh ⇒ phần trời phía trên liền mạch */
+  /* (nền khung = màu trời ở đỉnh tranh) Tranh giữ đúng tỉ lệ 390×340 (toạ độ thú/quái theo % tranh), co theo chiều nào chật hơn, đứng giữa đáy khung. */
+  .dh2 .dh2-tran .dh2-cot-trai .dh2-ve{left:50%;right:auto;width:min(100cqw,calc(100cqh * 390 / 340));translate:-50% 0}
+  .dh2 .dh2-tran .dh2-hud{top:16px;left:16px;right:16px}
+  .dh2 .dh2-tran .dh2-hang{top:78px;left:16px;right:16px}
+  .dh2 .dh2-tran .dh2-hud-hiep{height:56px}
+  .dh2 .dh2-tran .dh2-hud-dong{font-size:13px}
+  .dh2 .dh2-tran .dh2-hud-dong b{font-size:18px}
+  .dh2 .dh2-tran .dh2-chip{height:40px;max-width:180px}
+  .dh2 .dh2-tran .dh2-chip b{font-size:13px}
+  .dh2 .dh2-tran .dh2-chip small{font-size:12px}
+  .dh2 .dh2-tran .dh2-nhan-canh{font-size:13px;padding:4px 12px}
+  /* Nhãn Máu từng quái: cột ở khoảng trời trống phía trên bầy quái (thanh Máu vẽ ở 62 % tranh) — nằm trên mọi hình, không bị che. */
+  .dh2 .dh2-nhan-quai{position:absolute;right:3%;top:33%;z-index:4;display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin:0;padding:0;list-style:none;pointer-events:none}
+  .dh2 .dh2-nhan-quai li{padding:4px 12px;border-radius:12px;font-size:13px;font-weight:800;line-height:1.35;white-space:nowrap;color:rgb(255,179,200);font-variant-numeric:tabular-nums}
+
+  .dh2 .dh2-tran .dh2-cot-phai>.dh-giay{flex:1 1 0;min-height:0}
+  .dh2 .dh2-tran .dh2-cot-trai+.dh2-cot-phai>.dh-giay:first-child{margin-top:0;box-shadow:0 14px 30px rgba(0,0,0,.35)}
+  .dh2 .dh2-tran .dh-de{font-size:19px;line-height:1.55}
+  .dh2 .dh2-tran .dh-pa{grid-template-columns:minmax(0,1fr)} /* phương án một cột cho dễ đọc */
+  .dh2 .dh2-tran .dh-pa button{min-height:56px;font-size:17px}
+  .dh2 .dh2-tran .dh-don button{min-height:78px;padding:8px 6px}
+  .dh2 .dh2-tran .dh-don button b{font-size:18px}
+  .dh2 .dh2-tran .dh-don button small{font-size:13px;line-height:1.3;color:rgb(214,226,250)} /* số đòn dưới tên đòn: đọc rõ */
+  .dh2 .dh2-tran .dh-don button[aria-pressed=true] small{color:rgb(255,224,138)}
+  .dh2 .dh2-tran .dh2-nut-chinh{min-height:72px;font-size:24px;border-radius:24px;flex-shrink:0}
+  .dh2 .dh2-tran .dh-cho{font-size:14px}
+  /* Chỉ số dưới trong công thức (C₆H₁₂O₆…): đủ to, không đẩy giãn dòng, không bị cắt. */
+  .dh2 .dh-giay sub,.dh2 .dh2-xem-lai sub,.dh2 .dh2-tam sub{font-size:.8em;line-height:0;vertical-align:-.3em}
+  /* Hiệp trùm: 4 ý đúng–sai, nút Đúng/Sai 104×56 ở mép phải */
+  .dh2 .dh2-tran-trum .dh-y{gap:10px}
+  .dh2 .dh2-tran-trum .dh-y>div{padding:12px 14px;gap:14px}
+  .dh2 .dh2-tran-trum .dh-y>div>span{font-size:17px;line-height:1.45}
+  .dh2 .dh2-tran-trum .dh-y>div>span small{font-size:12px}
+  .dh2 .dh2-tran-trum .dh-ds{gap:8px}
+  .dh2 .dh2-tran-trum .dh-ds button{min-width:104px;height:56px;border-radius:16px;font-size:16px}
+  .dh2 .dh2-tran-trum .dh-ds button.dh-chot-y{min-width:112px}
+  .dh2 .dh2-tran .dh-tin-hieu{flex-shrink:0}
+
+  /* ───── Sảnh: bản đồ đoàn trái, thẻ chặng + LÊN ĐƯỜNG + thẻ phụ phải (cột phải tự cuộn nếu nhiều thẻ) ───── */
+  .dh2 .dh2-sanh>.dh2-cot-trai{gap:14px}
+  .dh2 .dh2-sanh>.dh2-cot-phai{overflow-y:auto;overscroll-behavior:contain;padding:2px 4px 4px 2px;gap:14px}
+  .dh2 .dh2-sanh .dh-ban-do{flex:1 1 auto;height:auto;min-height:300px}
+  .dh2 .dh2-sanh .dh-ban-do-nhan{left:20px;top:20px;height:34px;padding:0 16px;border-radius:17px;font-size:14px}
+  .dh2 .dh2-sanh .dh-ban-do-gop{left:20px;right:20px;bottom:18px;padding:10px 14px;font-size:14px}
+  .dh2 .dh2-sanh .dh-ban-do .dh-thu-chinh{left:24px;bottom:64px}
+  .dh2 .dh2-sanh .dh-chang,.dh2 .dh2-sanh .dh-muc,.dh2 .dh2-sanh .dh-hai-the{flex-shrink:0}
+
+  /* ───── Kết chặng: tranh thắng trái, cầu + phần thưởng + nút chính phải ───── */
+  .dh2 .dh2-thang>.dh2-cot-trai{align-items:center;justify-content:center}
+  .dh2 .dh2-thang .dh2-thang-canh{margin:0;width:min(100%,calc((100dvh - 32px) * 390 / 360));border-radius:28px;box-shadow:inset 0 0 0 1px rgba(160,200,255,.18),0 14px 30px rgba(0,0,0,.35)}
+  .dh2 .dh2-thang .dh2-sao{top:16px}
+  .dh2 .dh2-thang>.dh2-cot-phai{overflow-y:auto;overscroll-behavior:contain;padding:2px}
+  .dh2 .dh2-thang .dh2-nut-cuoi{position:static;margin:auto 0 0;padding:12px 0 0;background:none}
+  .dh2 .dh2-thang .dh2-nut-cuoi .dh2-nut-chinh{min-height:72px;font-size:22px}
+
+  /* ───── Tấm phủ TIẾP SỨC: tấm bên phải rộng 5 cột, không trượt từ đáy ───── */
+  .dh2 .dh2-tam{left:auto;right:0;top:0;bottom:0;width:min(560px,42vw);max-width:none;max-height:none;margin:0;border-radius:28px 0 0 28px;
+    padding:max(24px,env(safe-area-inset-top)) max(28px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) 28px;animation-name:dh2-vao-phai}
+  .dh2 .dh2-tam::before{display:none}
+  .dh2 .dh2-tam .dh-tam-chan{margin-top:auto}
+  .dh2 .dh2-tam .dh-tam-cau{font-size:16px}
+
+  /* ───── Tấm phủ TUNG CHƯỞNG: bảng "Vì sao" gọn giữa đáy (không kéo dài hết màn rộng) ───── */
+  .dh2 .dh2-chuong .dh-chuong-vi-sao{left:0;right:0;width:min(720px,calc(100% - 64px));margin:0 auto;max-height:22%}
+  .dh2 .dh2-chuong .dh-chuong-vi-sao>div{font-size:14px}
+  .dh2 .dh2-chuong .dh-chuong-san{left:32px;font-size:13px;max-width:260px}
+}
+/* Điện thoại xoay ngang (thấp ≤ 500 px): cùng lưới 7/5 nhưng thu khoảng cách + chữ, ẩn dòng phụ. */
+@media (orientation:landscape) and (min-width:700px) and (max-height:500px){
+  .dh2 .dh-khung.dh2-tran,.dh2 .dh-khung.dh2-sanh,.dh2 .dh-khung.dh2-thang{gap:12px;padding:max(8px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+  .dh2 .dh-khung>.dh2-cot{gap:8px}
+  .dh2 .dh2-tran .dh2-hud{top:8px;left:8px;right:8px}
+  .dh2 .dh2-tran .dh2-hang{top:68px;left:8px;right:8px}
+  .dh2 .dh2-tran .dh-de{font-size:15px}
+  .dh2 .dh2-tran .dh-pa button{min-height:44px;font-size:14px}
+  .dh2 .dh2-tran .dh-don button{min-height:52px}
+  .dh2 .dh2-tran .dh-don button small{display:none}
+  .dh2 .dh2-tran .dh2-nut-chinh{min-height:48px;font-size:17px}
+  .dh2 .dh2-nhan-quai li{font-size:11px;padding:2px 8px}
+  .dh2 .dh2-tran-trum .dh-ds button{min-width:72px;height:44px}
+  .dh2 .dh2-tran-trum .dh-y>div>span{font-size:14px}
+  .dh2 .dh2-sanh .dh-ban-do{min-height:0}
+  .dh2 .dh2-tran .dh-giay{padding:10px 12px;gap:6px}
+  .dh2 .dh2-tran .dh-giay-dau span,.dh2 .dh2-bua small{display:none}
+  .dh2 .dh2-bua{padding:4px 10px}
+  .dh2 .dh2-tran .dh-xin{min-height:44px;font-size:12px}
+}
+@keyframes dh2-vao-phai{0%{transform:translateX(48px);opacity:0}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.dh2 .dh2-tam{animation:none!important}}

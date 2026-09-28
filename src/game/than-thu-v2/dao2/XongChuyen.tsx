@@ -16,9 +16,11 @@ export interface XongChuyenProps{
  oMoi:number|null;coXat:{co:number;tong:number}|null
  aiSai:readonly {ai:number;hen?:string}[];ruong:Ruong2|null;ruongVua?:number|null
  busy?:boolean;loi?:string
+ /** Ảnh thần thú EM ĐÃ CHỌN đúng dạng theo cấp (`anhThu`) — chỉ bố cục ngang hiện, đứng cạnh cụm đất vừa khai phá. */
+ anhThu?:string
  onDiTiep?:()=>void;onVeBanDo:()=>void;onMoSoTay?:()=>void;onMoRuong?:()=>void
 }
-export default function XongChuyen({soChuyen,conCau,tongKet,enemy,oMoi,coXat,aiSai,ruong,ruongVua=null,busy=false,loi='',onDiTiep,onVeBanDo,onMoSoTay,onMoRuong}:XongChuyenProps){
+export default function XongChuyen({soChuyen,conCau,tongKet,enemy,oMoi,coXat,aiSai,ruong,ruongVua=null,busy=false,loi='',anhThu,onDiTiep,onVeBanDo,onMoSoTay,onMoRuong}:XongChuyenProps){
  const haQuai=enemy===0,sang=Math.max(0,Math.min(SANG.length,oMoi??0)),n=soChuyen?.n??0,k=soChuyen?.k??0
  return <div className="dao2-xong" aria-live="polite">
   <div className="dao2-xong-canh">
@@ -39,6 +41,7 @@ export default function XongChuyen({soChuyen,conCau,tongKet,enemy,oMoi,coXat,aiS
    </svg>
    <h2>{haQuai?'SƯƠNG MÙ ĐÃ TAN':'XONG CHUYẾN THÁM HIỂM'}</h2>
    <p>{soChuyen?`Chuyến thám hiểm ${k}/${n} · `:''}{haQuai?'đã hạ Quái Sương Mù':`Quái Sương Mù còn ${enemy}/100 máu`}</p>
+   {anhThu&&<img className="dao2-xong-thu" src={anhThu} alt="" width="160" height="160" loading="lazy" decoding="async" draggable={false}/>}
    {oMoi!==null&&oMoi>0&&<span className="dao2-kinh dao2-xong-chip">+{oMoi} ô đất mới</span>}
   </div>
 

@@ -227,13 +227,17 @@ export default function DoanTran(p: Props) {
     </>
   )
 
+  // Hóa 2.0 · bố cục NGANG (docs/ban-ve-ngang-2809, doan2-ngang.css): hai cột bọc `display:contents` ⇒ màn dọc y nguyên; màn ngang thành lưới 7/5
+  // (chiến trường trái · câu + đòn + CHỐT ĐÒN phải; hiệp trùm 4 ý dài thì đảo: câu trái, trùm phải). Cờ tắt: không bọc gì.
+  const bocPhai = (x: ReactNode) => v2 ? <div className="dh2-cot dh2-cot-phai" data-vung="cot-phai">{x}</div> : x
   return (
-    <div className={v2 ? 'dh-khung dh2-tran' : 'dh-khung'}>
-      {v2 ? <Canh2 xem={xem} tran={tran} con={p.conGiay} mo={mo} oPhucKich={p.oPhucKich ?? null} onRoi={p.onRoi} /> : <>
+    <div className={v2 ? `dh-khung dh2-tran${tran.laTrum ? ' dh2-tran-trum' : ''}` : 'dh-khung'}>
+      {v2 ? <div className="dh2-cot dh2-cot-trai" data-vung="cot-trai"><Canh2 xem={xem} tran={tran} con={p.conGiay} mo={mo} oPhucKich={p.oPhucKich ?? null} onRoi={p.onRoi} /></div> : <>
         <ThanhHiep hiep={tran.hiep} soHiep={tran.soHiep} ketThuc={tran.ketThuc} con={p.conGiay} giay={tran.giay} hien={mo} onRoi={p.onRoi} />
         {canh}
         {daiDoi}
       </>}
+      {bocPhai(<>
       {than}
       {/* Thẻ tiếp sức của bạn nằm DƯỚI câu: đặt trên câu thì mỗi lần bạn gửi thẻ (nhịp hỏi 1,5 s) cả lưới đáp án bị đẩy xuống dưới ngón tay em (P0 "đáp án bị nhảy"). */}
       {mo && ts?.theNhan && <div className="dh-the-nhan" role="status"><small>{ts.theNhan.tuLaMay ? 'BẠN ĐỒNG HÀNH' : ts.theNhan.tuTen.toUpperCase()} TIẾP SỨC · {ts.theNhan.tieuDe.toUpperCase()}</small>{ts.theNhan.noiDung}</div>}
@@ -244,6 +248,7 @@ export default function DoanTran(p: Props) {
       {!mo && !tran.ketThuc && !choTiep && <div className="dh-cho" role="status">{tran.hiep === 1 && !xem.hiepVuaXong ? 'Chuẩn bị lên đường' : `Hiệp ${tran.hiep}${tran.laTrum ? ' · TRÙM' : ''} mở sau`} {Math.max(1, p.moSauGiay)} giây</div>}
       {!mo && !tran.ketThuc && p.hetCauMoi && tran.hiep === 1 && <div className="dh-cho" role="status" data-vung="het-cau-moi">{CHU_HET_CAU_MOI}</div>}
       {!mo && !tran.ketThuc && tran.hiep === 1 && !!xem.soCauThieu && <div className="dh-cho" role="status">Kho của em còn thiếu {xem.soCauThieu} câu phù hợp. Hiệp không có câu, em cổ vũ đồng đội nhé.</div>}
+      </>)}
     </div>
   )
 }

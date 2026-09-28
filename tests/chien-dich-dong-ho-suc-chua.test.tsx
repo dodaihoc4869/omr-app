@@ -1,4 +1,4 @@
-// GAME HÓA 2.0 · ĐỒNG HỒ SỨC CHỨA (bản vẽ GV-GiaoChienDich): xanh ≤ 70% · vàng 70–90% · đỏ > 90%, câu "Em ở giữa lớp…",
+// GAME HÓA 2.0 · "KHỐI LƯỢNG SO VỚI THỜI GIAN CÒN LẠI" (tên cũ Sức chứa tới hạn nộp; bản vẽ docs/ban-ve-gv-2809 28/09): xanh ≤ 70% · vàng 70–90% · đỏ > 90%, câu "Em ở giữa lớp…",
 // thầy 28/09 bỏ hai nút gợi ý "Rút còn" / "Lùi hạn nộp" (thay bằng nút gạt thể lực Tự động ở màn giao).
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
@@ -42,9 +42,9 @@ describe('mức sức chứa — đúng ngưỡng máy chủ', () => {
 
 describe('đồng hồ đổi màu theo tỉ lệ', () => {
   it.each([
-    [0.55, 'xanh', 'vừa sức'],
-    [0.85, 'vang', 'sát'],
-    [0.96, 'do', 'quá tải'],
+    [0.55, 'xanh', 'Vừa sức'],
+    [0.85, 'vang', 'Sát'],
+    [0.96, 'do', 'Quá tải'],
   ])('tỉ lệ %s ⇒ %s, chữ "%s", thanh đúng màu và đúng bề rộng', (tiLe, muc, chu) => {
     const { container } = ve(sc(tiLe))
     const k = khoi(container)
@@ -60,7 +60,7 @@ describe('đồng hồ đổi màu theo tỉ lệ', () => {
 
   it('câu giải thích đủ nhãn: "Em ở giữa lớp cần khoảng X lượt · có D ngày × 40 câu = Y lượt. N em quá tải"', () => {
     const { container } = ve(sc(0.96))
-    expect(khoi(container).textContent).toContain('Em ở giữa lớp cần khoảng 230 lượt · sức chứa 6 ngày × 40 lượt/ngày = 240 lượt.')
+    expect(khoi(container).textContent).toContain('Em ở giữa lớp cần khoảng 230 lượt · có 6 ngày × 40 lượt/ngày = 240 lượt.')
     expect(khoi(container).textContent).toContain('4/33 em quá tải.')
     cleanup()
     const r = ve(sc(0.5))
@@ -76,12 +76,12 @@ describe('không còn nút gợi ý', () => {
   })
   it('không có dữ liệu: nói việc cần làm; lỗi: nói lý do thật + nút tính lại', () => {
     const { container } = ve(null)
-    expect(khoi(container).textContent).toContain('Chọn tờ đề, lớp và hạn nộp để tính sức chứa.')
+    expect(khoi(container).textContent).toContain('Chọn tờ đề, em và hạn nộp để tính khối lượng.')
     cleanup()
     const f = vi.fn()
     render(<DongHoSucChua sc={null} dangTinh={false} loi="Hạn nộp đã qua." theLuc={40} rutCon={null} onRut={vi.fn()} onLuiHan={vi.fn()} onBoRut={vi.fn()} onTinhLai={f} />)
     expect(screen.getByText('Hạn nộp đã qua.')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Tính lại sức chứa' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Tính lại' }))
     expect(f).toHaveBeenCalled()
   })
 })

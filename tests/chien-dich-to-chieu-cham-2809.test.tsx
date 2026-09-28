@@ -173,5 +173,11 @@ describe('Buổi chữa hiện lại kết quả', () => {
     expect([...h17.querySelectorAll('.cd-ket-qua')].map((x) => x.textContent)).toEqual(['Em 01: Đạt'])
     expect([...h44.querySelectorAll('.cd-ket-qua')].map((x) => x.textContent)).toEqual(['Em 03: Chưa đạt'])
     expect(h44.querySelector('.cd-ket-qua--khong')).toBeTruthy()
+    // Bản vẽ 28/09: cột Kết quả của từng câu + thẻ "Tiến độ buổi chữa" (Đạt / Chưa đạt).
+    expect(h17.querySelector('[data-ket-qua-cau]')?.textContent).toBe('Đạt')
+    expect(h44.querySelector('[data-ket-qua-cau]')?.textContent).toBe('Chưa đạt')
+    const tienDo = container.querySelector('[data-so="tien-do"]')!.parentElement!.textContent
+    expect(tienDo).toContain('Đạt 1')
+    expect(tienDo).toContain('Chưa đạt 1')
   })
 })

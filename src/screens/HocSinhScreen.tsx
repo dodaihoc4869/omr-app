@@ -30,6 +30,7 @@ import DoiTenHocSinh from '../components/DoiTenHocSinh'
 import { doiTenEmTrongDanhSachLop } from '../lib/classlist-db'
 import type { KetQuaDoiTen } from '../lib/doi-ten-hs-api'
 import './hoc-sinh-m3.css'
+import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
@@ -65,6 +66,9 @@ export default function HocSinhScreen() {
   const moHoSoEm = useAppStore((s) => s.moHoSoEm)
   const [mucHoSo, setMucHoSo] = useState<MucHoSo>('tong-quan')
   const setScreen = useAppStore((s) => s.setScreen)
+  // GAME HÓA 2.0 (RA-SOAT 28/09 mục 6): bỏ phần thuộc BTVN (Giao bài riêng), hộp hướng dẫn dài, phụ đề; "Đồng bộ danh sách"
+  // cất ở Cài đặt › Công cụ kỹ thuật. Cờ tắt ⇒ màn như cũ.
+  const hoa2 = useHoa2Bat()
   const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
 
@@ -354,6 +358,7 @@ export default function HocSinhScreen() {
               </div>
 
               <div className="hs-hanh-dong">
+                {!hoa2 && (
                 <button
                   type="button"
                   className="tap-target hs-nut-chinh"
@@ -364,6 +369,7 @@ export default function HocSinhScreen() {
                 >
                   Giao bài riêng
                 </button>
+                )}
                 <button
                   type="button"
                   className="tap-target hs-nut-vien"
@@ -543,9 +549,11 @@ export default function HocSinhScreen() {
             <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--sans)' }}>
               Học sinh
             </h1>
-            <p className="hs-phu-de">
-              Quản lý học sinh theo lớp, xem báo cáo và mức độ tiến bộ
-            </p>
+            {!hoa2 && (
+              <p className="hs-phu-de">
+                Quản lý học sinh theo lớp, xem báo cáo và mức độ tiến bộ
+              </p>
+            )}
           </div>
         </div>
 
@@ -553,12 +561,14 @@ export default function HocSinhScreen() {
             chủ. Danh sách này là CỔNG VÀO THI — nạp xong, số báo danh ngoài
             danh sách không thi được nữa. */}
         <div className="gv-header-actions flex flex-col sm:flex-row items-end sm:items-center" style={{ gap: 'var(--k2)' }}>
-          <NutDongBoDanhSach
-            onXong={(soEm, tomTat) => {
-              showToast(`Đã nạp ${soEm} em lên máy chủ${tomTat ? ` — ${tomTat}` : ''}. Từ giờ chỉ những em này vào thi được.`, 'success')
-              void tai()
-            }}
-          />
+          {!hoa2 && (
+            <NutDongBoDanhSach
+              onXong={(soEm, tomTat) => {
+                showToast(`Đã nạp ${soEm} em lên máy chủ${tomTat ? ` — ${tomTat}` : ''}. Từ giờ chỉ những em này vào thi được.`, 'success')
+                void tai()
+              }}
+            />
+          )}
           <NutThemHocSinh
             onXong={(_soEm, tomTat) => {
               showToast(tomTat, 'success')
@@ -568,7 +578,8 @@ export default function HocSinhScreen() {
         </div>
       </div>
 
-      {/* Hướng dẫn quản lý */}
+      {/* Hướng dẫn quản lý — 2.0 bỏ (hộp hướng dẫn dài). */}
+      {!hoa2 && (
       <details className="gv-help hs-huong-dan">
         <summary className="hs-huong-dan-tieu-de">
           <Sparkles size={16} className="hs-bieu-tuong-nhan" />
@@ -580,6 +591,7 @@ export default function HocSinhScreen() {
           <b style={{ color: 'var(--muc)' }}>Đặt lại mật khẩu</b>. Em chỉ vào thi được khi nhập đúng cả ba: số báo danh, họ tên, năm sinh — khớp file danh sách đã đồng bộ.
         </div>
       </details>
+      )}
 
       <TheNoiDung className="gv-directory">
         <div className="gv-filterbar flex items-center" style={{ gap: 'var(--k3)', marginBottom: 'var(--k3)' }}>

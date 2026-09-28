@@ -57,9 +57,13 @@ export default function DoanSanh(p: Props) {
   const chuHetChangNay = p.chang ? chuHetChang(p.chang) : ''
   const khoaMo = hetOn ? chuHetOn : p.goiY?.hetLuot ? chuHetLuot : hetChang ? chuHetChangNay : hetVe ? CHU_HET_VE : p.ban ? 'Đang xử lý, em đợi một chút…' : null
   const sao = Array.from({ length: 26 }, (_, i) => <i key={i} style={{ left: `${(i * 53 + 17) % 100}%`, top: `${(i * 29 + 7) % 60}%`, animationDelay: `${(i % 7) * .4}s` }} />)
+  // Hóa 2.0 · bố cục NGANG (docs/ban-ve-ngang-2809/Ngang-DoanSanh, doan2-ngang.css): bọc hai cột `display:contents` ⇒ màn dọc y nguyên;
+  // màn ngang: bản đồ đoàn bên trái, thẻ chặng + nút LÊN ĐƯỜNG + các thẻ phụ bên phải. Cờ tắt: không bọc gì.
+  const boc = (cot: 'trai' | 'phai', x: ReactNode) => v2 ? <div className={`dh2-cot dh2-cot-${cot}`} data-vung={`cot-${cot}`}>{x}</div> : x
   return (
-    <div className="dh-khung">
+    <div className={v2 ? 'dh-khung dh2-sanh' : 'dh-khung'}>
       <div className="dh-sao-nen" aria-hidden="true">{sao}</div>
+      {boc('trai', <>
       <header className="dh-dau">
         <div><div className="dh-nhan">{s ? `MÙA ${s.mua.so} · CÒN ${s.mua.conNgay} NGÀY` : 'HỘ TỐNG LINH TÂM · CẢ LỚP MỘT ĐOÀN'}</div><h1>{s?.tenDoan ?? p.tenDoan}</h1></div>
         <div className="dh-dau-phai">
@@ -87,6 +91,8 @@ export default function DoanSanh(p: Props) {
         <div className="dh-ban-do-nhan">{lop ? `Trạm ${lop.tram}/${lop.tongTram}${lop.conTramToiMoc ? ` · còn ${lop.conTramToiMoc} trạm tới ${lop.tenMocKe}` : ' · đã về đích mùa này'}` : 'Linh Tâm đang chờ đoàn của em'}</div>
         {lop && <div className="dh-ban-do-gop"><b>{lop.gopSucHomNay}/{lop.siSo} bạn</b> góp sức hôm nay · còn {lop.conChangToiTramKe} chuyến thắng nữa là lớp tiến một trạm</div>}
       </div>
+      </>)}
+      {boc('phai', <>
 
       {p.phong && !p.phong.batDau ? (
         <section className="dh-kinh dh-muc" aria-label="Phòng chờ của đoàn">
@@ -184,6 +190,7 @@ export default function DoanSanh(p: Props) {
           </section>
         </>
       )}
+      </>)}
     </div>
   )
 }

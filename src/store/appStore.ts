@@ -22,6 +22,9 @@ export type ScreenId =
   | 'cauhoi'
   | 'caidat'
   | 'khodegiao'
+  // GAME HÓA 2.0 (bản vẽ docs/ban-ve-gv-2809): trang đầu Tổng quan + màn riêng Chiến dịch luyện.
+  | 'tongquan'
+  | 'chiendich'
 
 export interface ScannedSheet {
   id: string

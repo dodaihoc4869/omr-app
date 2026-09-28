@@ -3,6 +3,10 @@
 // ngày, tỉ lệ đã nộp, nhãn trạng thái. Chạm → Chi tiết ca (ExamMonitorScreen).
 // Bật "Chọn" → mỗi hàng thành ô tích, xoá được nhiều ca ngay tại màn này.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
+// GAME HÓA 2.0 (cờ bật · thầy chốt 28/09 · docs/ban-ve-gv-2809/GV-CaKiemTra + RA-SOAT mục 2): BẢNG GỌN thay lưới thẻ "thư mục
+// năm sinh"; hàng thẻ số tháng này; bỏ phụ đề, bỏ khối chiến dịch (sang màn Chiến dịch luyện), bỏ "Đồng bộ lại phiếu mọi ca"
+// (cất ở Cài đặt › Công cụ kỹ thuật) và nút lớn "Mở ca kiểm tra đầu tiên" (trống = một dòng chữ); ca bài tập về nhà (cũ) ẩn khỏi
+// mặc định, lọc ra được. Cờ tắt ⇒ màn y như cũ.
 import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2, ChevronDown, ChevronRight, ClipboardList } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
@@ -15,13 +19,22 @@ import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
 import './lich-su-ca-m3.css'
 import { gioPhutVN } from '../lib/em-toan-canh'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
-import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
-import DsChienDichDaGiao from '../components/chien-dich/DsChienDichDaGiao'
+import { useSoDemGv } from '../lib/so-dem-gv'
+import { ngayVn } from '../components/chien-dich/ngay'
+import { demEmTheoLop, soVi, thongKeThang } from '../lib/tong-quan-gv'
+import './gv-hoa2.css'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 /** Luật công bố điểm của ca, nói bằng lời cho từng dòng ca (bản vẽ GV-3). Ca cũ không có `congBo` ⇒ không vẽ chip, không đoán. */
 const CONG_BO_NGAN: Record<string, string> = { khong: 'Điểm chưa công bố cho học sinh', ngay: 'Điểm hiện ngay khi học sinh nộp', ca_lop_xong: 'Điểm hiện khi cả lớp nộp xong' }
+/** Cột "Công bố điểm" của bảng 2.0 — chữ ngắn (RA-SOAT mục 2: gộp nhãn trên từng thẻ thành một cột). */
+export const CONG_BO_COT: Record<string, string> = { khong: 'Chưa công bố', ngay: 'Ngay khi nộp', ca_lop_xong: 'Khi cả lớp nộp xong' }
+/** Câu trạng thái trống của Ca kiểm tra 2.0 — một dòng chữ, không ảnh, không nút lớn. */
+export const CHU_CA_TRONG_HOA2 = 'Chưa có ca kiểm tra nào. Mở ca bằng nút Mở ca kiểm tra ở thanh bên.'
+/** Bảng 2.0 hiện bấy nhiêu dòng rồi mới "Xem thêm". */
+const SO_DONG_TRANG = 20
+const TONE_CHIP: Record<string, string> = { tim: 'la', xanh: 'la', cam: 'vang', do: 'do', xam: 'xam' }
 
 /** Trạng thái hiển thị của ca theo mốc thời gian máy chủ + số đã nộp. */
 export function trangThaiCa(ca: Pick<CaTomTat, 'trangThai' | 'batDau' | 'hetHanVao' | 'daVao' | 'daNop'>, nowMs: number): { ten: string; tone: 'xanh' | 'cam' | 'do' | 'tim' | 'xam' } {
@@ -56,14 +69,25 @@ function ngayGio(iso: string): string {
   return `${d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })} ${gioPhutVN(iso)}`
 }
 
+/** Bảng 2.0: "19:15 · 28/09" (giờ Việt Nam, 24 giờ — bản vẽ GV-CaKiemTra). */
+function gioNgayHoa2(iso: string): string {
+  const t = new Date(iso).getTime()
+  if (!Number.isFinite(t)) return ''
+  const n = ngayVn(t)
+  return `${gioPhutVN(iso)} · ${n.slice(8, 10)}/${n.slice(5, 7)}`
+}
+
 export default function LichSuCaScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const showToast = useAppStore((s) => s.showToast)
-  // GAME HÓA 2.0: đường "Giao chiến dịch mới" không cần đi qua một ca (chỉ khi cờ bật).
+  // GAME HÓA 2.0: bảng gọn + thẻ số; chiến dịch đã tách sang màn Chiến dịch luyện.
   const hoa2 = useHoa2Bat()
-  const [moGiaoMoi, setMoGiaoMoi] = useState(false)
-  const [lanTaiCd, setLanTaiCd] = useState(0)
+  const classList = useAppStore((s) => s.classList) as { lop?: string }[] | undefined
+  const datSo = useSoDemGv((s) => s.datSo)
+  /** 2.0: hiện cả ca bài tập về nhà (cũ) — mặc định ẩn. */
+  const [hienBaiTap, setHienBaiTap] = useState(false)
+  const [soDongHien, setSoDongHien] = useState(SO_DONG_TRANG)
 
   const [dsCa, setDsCa] = useState<CaTomTat[] | null>(null)
   const [dangTai, setDangTai] = useState(false)
@@ -90,7 +114,9 @@ export default function LichSuCaScreen() {
       const [url, mat] = await Promise.all([loadScriptUrl(), loadTeacherSecret()])
       if (!url.trim()) throw new Error('Chưa cấu hình địa chỉ máy chủ — vào Cài đặt → Kết nối máy chủ')
       if (!mat.trim()) throw new Error('Chưa nhập mã bí mật — vào Cài đặt → Kết nối máy chủ')
-      setDsCa(await danhSachCa(url.trim(), mat.trim(), xemDaXoa))
+      const ds = await danhSachCa(url.trim(), mat.trim(), xemDaXoa)
+      setDsCa(ds)
+      if (!xemDaXoa) datSo({ caMo: ds.filter((c) => c.loai !== 'baitap' && caConEmDangLam(c, gioMayChu())).length })
     } catch (e) {
       setLoi(e instanceof Error ? e.message : 'Lỗi không rõ')
       if (dsCa === null) setDsCa([])
@@ -109,9 +135,13 @@ export default function LichSuCaScreen() {
   const dsLop = useMemo(() => Array.from(new Set((dsCa ?? []).map((c) => c.lop.trim()).filter(Boolean))).sort(), [dsCa])
   const dsLoc = useMemo(() => {
     const q = timKiem.trim().toLowerCase()
-    return (dsCa ?? []).filter((c) => (!lopLoc || c.lop.trim() === lopLoc) && (!ttLoc || c.trangThai === ttLoc) && (!q || c.maCa.includes(q) || c.tenCa.toLowerCase().includes(q) || c.lop.toLowerCase().includes(q)))
-  }, [dsCa, timKiem, lopLoc, ttLoc])
+    return (dsCa ?? []).filter((c) => (!hoa2 || hienBaiTap || c.loai !== 'baitap') && (!lopLoc || c.lop.trim() === lopLoc) && (!ttLoc || c.trangThai === ttLoc) && (!q || c.maCa.includes(q) || c.maCa.toLowerCase().includes(q) || c.tenCa.toLowerCase().includes(q) || c.lop.toLowerCase().includes(q)))
+  }, [dsCa, timKiem, lopLoc, ttLoc, hoa2, hienBaiTap])
+  const coBaiTap = useMemo(() => (dsCa ?? []).some((c) => c.loai === 'baitap'), [dsCa])
+  const emTheoLop = useMemo(() => demEmTheoLop(classList), [classList])
   const demMo = useMemo(() => (dsCa ?? []).filter((c) => c.trangThai === 'mo').length, [dsCa])
+  /** 2.0: ca ĐANG CHẠY thật (theo giờ máy chủ), không tính ca bài tập về nhà (cũ). */
+  const demMoHoa2 = useMemo(() => (dsCa ?? []).filter((c) => c.loai !== 'baitap' && caConEmDangLam(c, gioMayChu())).length, [dsCa])
   const demDong = useMemo(() => (dsCa ?? []).filter((c) => c.trangThai === 'dong').length, [dsCa])
 
   // Chỉ tính trên danh sách ĐANG hiện — tích "Tất cả" không bao giờ chạm ca bị bộ lọc giấu đi.
@@ -199,32 +229,73 @@ export default function LichSuCaScreen() {
   }
 
   const now = gioMayChu()
+  /** Thẻ số tháng này (2.0) — chỉ khi đang xem danh sách ca dùng và đã có ca. */
+  const tkThang = hoa2 && !xemDaXoa && dsCa !== null && dsCa.length > 0 ? thongKeThang(dsCa, now) : null
+  /** Bảng 2.0: mới nhất trước. */
+  const dsBang = hoa2 ? [...dsLoc].sort((a, b) => (b.batDau || b.moLuc).localeCompare(a.batDau || a.moLuc)) : dsLoc
 
   return (
     <div className="gv-page ls-trang min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="gv-page-header flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="ls-icon">
-            <ClipboardList size={22} />
+      {hoa2 ? (
+        <header className="gv2-dau">
+          <div className="gv2-dau-chu">
+            <h1 className="gv2-tieu-de">{xemDaXoa ? 'Ca đã xoá' : 'Ca kiểm tra'}</h1>
+            {tkThang && (
+              <p className="gv2-phu-de">
+                <span className="gv2-so">{tkThang.soCa}</span> ca trong tháng {tkThang.thang} · <span className="gv2-so">{demMoHoa2}</span> ca đang mở
+              </p>
+            )}
           </div>
-          <div>
-            <h1 className="ls-tieu-de">
-              {xemDaXoa ? 'Ca đã xoá' : 'Ca kiểm tra'}
-            </h1>
-            <p className="ls-phu-de">
-              {xemDaXoa ? 'Thùng rác và phục hồi dữ liệu ca' : 'Quản lý, tìm kiếm và chi tiết các ca kiểm tra'}
-            </p>
+        </header>
+      ) : (
+        <div className="gv-page-header flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="ls-icon">
+              <ClipboardList size={22} />
+            </div>
+            <div>
+              <h1 className="ls-tieu-de">
+                {xemDaXoa ? 'Ca đã xoá' : 'Ca kiểm tra'}
+              </h1>
+              <p className="ls-phu-de">
+                {xemDaXoa ? 'Thùng rác và phục hồi dữ liệu ca' : 'Quản lý, tìm kiếm và chi tiết các ca kiểm tra'}
+              </p>
+            </div>
           </div>
         </div>
-        {hoa2 && !xemDaXoa && !moGiaoMoi && (
-          <button type="button" className="m3-nut-vien" onClick={() => setMoGiaoMoi(true)}>
-            Giao chiến dịch mới
-          </button>
-        )}
-      </div>
+      )}
 
-      {hoa2 && !xemDaXoa && moGiaoMoi && <GiaoChienDich onDeSau={() => setMoGiaoMoi(false)} onXong={() => setLanTaiCd((x) => x + 1)} />}
-      {hoa2 && !xemDaXoa && <DsChienDichDaGiao lanTai={lanTaiCd} />}
+      {tkThang && (
+        <section className="gv2-kpi gv2-kpi--3" aria-label="Số liệu tháng này">
+          <div className="gv2-the gv2-the-so">
+            <div className="gv2-nhan">Ca trong tháng {tkThang.thang}</div>
+            <div className="gv2-so-dong">
+              <span className="gv2-so gv2-so-kpi">{tkThang.soCa}</span> <span className="gv2-don-vi">ca</span>
+            </div>
+            <div className="gv2-phu">
+              <span className="gv2-so">{demMoHoa2}</span> ca đang mở
+            </div>
+          </div>
+          <div className="gv2-the gv2-the-so">
+            <div className="gv2-nhan">Bài đã nộp tháng {tkThang.thang}</div>
+            <div className="gv2-so-dong">
+              <span className="gv2-so gv2-so-kpi">{soVi(tkThang.daNop)}</span> <span className="gv2-don-vi">bài</span>
+            </div>
+            <div className="gv2-phu">
+              trên <span className="gv2-so">{soVi(tkThang.daVao)}</span> lượt vào{tkThang.daVao > 0 ? ` · tỉ lệ nộp ${Math.round((tkThang.daNop / tkThang.daVao) * 100)}%` : ''}
+            </div>
+          </div>
+          <div className="gv2-the gv2-the-so">
+            <div className="gv2-nhan">Rời màn trong tháng {tkThang.thang}</div>
+            <div className="gv2-so-dong">
+              <span className="gv2-so gv2-so-kpi">{soVi(tkThang.roiMan)}</span> <span className="gv2-don-vi">lần</span>
+            </div>
+            <div className="gv2-phu">
+              ở <span className="gv2-so">{tkThang.soCaRoiMan}</span> ca
+            </div>
+          </div>
+        </section>
+      )}
 
       <TheNoiDung className="gv-directory">
         <div className="gv-filterbar flex items-center gap-2 sm:gap-2.5 mb-3">
@@ -232,37 +303,61 @@ export default function LichSuCaScreen() {
             <Search size={18} className="ls-o-tim-bieu-tuong" />
             <input
               className="ls-o-tim"
-              placeholder="Tìm mã ca, tên ca, lớp…"
+              placeholder={hoa2 ? 'Tìm tên ca, mã ca, lớp…' : 'Tìm mã ca, tên ca, lớp…'}
               value={timKiem}
               onChange={(e) => setTimKiem(e.target.value)}
               inputMode="search"
               aria-label="Tìm ca"
             />
           </div>
-          <button
-            type="button"
-            onClick={() => (chonMode ? thoatChon() : setChonMode(true))}
-            className={`tap-target ls-nut-tron${chonMode ? ' ls-nut-tron--bat' : ''}`}
-            aria-label={chonMode ? 'Thoát chế độ chọn' : 'Chọn ca để xoá'}
-            aria-pressed={chonMode}
-            title={chonMode ? 'Xong' : 'Chọn ca để xoá'}
-          >
-            <CheckSquare size={18} />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              thoatChon()
-              setTtLoc('') // thùng rác chỉ có ca đã xoá — không mang bộ lọc trạng thái sang
-              setXemDaXoa((v) => !v)
-            }}
-            className={`tap-target ls-nut-tron${xemDaXoa ? ' ls-nut-tron--do' : ''}`}
-            aria-label={xemDaXoa ? 'Về danh sách ca đang dùng' : 'Xem ca đã xoá'}
-            aria-pressed={xemDaXoa}
-            title={xemDaXoa ? 'Về danh sách ca đang dùng' : 'Ca đã xoá'}
-          >
-            <RotateCcw size={18} />
-          </button>
+          {hoa2 ? (
+            <>
+              <button type="button" onClick={() => (chonMode ? thoatChon() : setChonMode(true))} className={`gv2-nut-vien${chonMode ? ' gv2-nut-bat' : ''}`} aria-pressed={chonMode}>
+                <CheckSquare size={16} aria-hidden="true" />
+                {chonMode ? 'Xong' : 'Chọn để xoá'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  thoatChon()
+                  setTtLoc('')
+                  setXemDaXoa((v) => !v)
+                }}
+                className={`gv2-nut-vien${xemDaXoa ? ' gv2-nut-bat' : ''}`}
+                aria-pressed={xemDaXoa}
+              >
+                <Trash2 size={16} aria-hidden="true" />
+                {xemDaXoa ? 'Về danh sách ca' : 'Ca đã xoá'}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => (chonMode ? thoatChon() : setChonMode(true))}
+                className={`tap-target ls-nut-tron${chonMode ? ' ls-nut-tron--bat' : ''}`}
+                aria-label={chonMode ? 'Thoát chế độ chọn' : 'Chọn ca để xoá'}
+                aria-pressed={chonMode}
+                title={chonMode ? 'Xong' : 'Chọn ca để xoá'}
+              >
+                <CheckSquare size={18} />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  thoatChon()
+                  setTtLoc('') // thùng rác chỉ có ca đã xoá — không mang bộ lọc trạng thái sang
+                  setXemDaXoa((v) => !v)
+                }}
+                className={`tap-target ls-nut-tron${xemDaXoa ? ' ls-nut-tron--do' : ''}`}
+                aria-label={xemDaXoa ? 'Về danh sách ca đang dùng' : 'Xem ca đã xoá'}
+                aria-pressed={xemDaXoa}
+                title={xemDaXoa ? 'Về danh sách ca đang dùng' : 'Ca đã xoá'}
+              >
+                <RotateCcw size={18} />
+              </button>
+            </>
+          )}
           <button
             type="button"
             onClick={tai}
@@ -288,6 +383,11 @@ export default function LichSuCaScreen() {
                 {ten}
               </button>
             ))}
+            {hoa2 && coBaiTap && (
+              <button type="button" onClick={() => setHienBaiTap((v) => !v)} aria-pressed={hienBaiTap} className={`tap-target ls-chip${hienBaiTap ? ' ls-chip--chon' : ''}`}>
+                Loại: Bài tập về nhà (cũ)
+              </button>
+            )}
           </div>
         )}
 
@@ -428,12 +528,105 @@ export default function LichSuCaScreen() {
           <div style={{ ...NHAN_NHO, padding: 'var(--k4) 0' }}>Đang tải danh sách ca từ máy chủ…</div>
         ) : dsLoc.length === 0 ? (
           <div className="flex flex-col" style={{ gap: 'var(--k3)' }}>
-            <div style={{ ...NHAN_NHO, padding: 'var(--k2) 0' }}>{dsCa.length === 0 ? (xemDaXoa ? 'Không có ca nào đã xoá.' : 'Chưa có ca nào.') : 'Không có ca khớp bộ lọc.'}</div>
-            {dsCa.length === 0 && !xemDaXoa && (
+            <div style={{ ...NHAN_NHO, padding: 'var(--k2) 0' }} data-trong-ca="">{dsCa.length === 0 ? (xemDaXoa ? 'Không có ca nào đã xoá.' : hoa2 ? CHU_CA_TRONG_HOA2 : 'Chưa có ca nào.') : 'Không có ca khớp bộ lọc.'}</div>
+            {dsCa.length === 0 && !xemDaXoa && !hoa2 && (
               <NutChinh variant="phu" onClick={() => setScreen('examsetup')}>
                 Mở ca kiểm tra đầu tiên
               </NutChinh>
             )}
+          </div>
+        ) : hoa2 ? (
+          <div className="gv2-cuon">
+            <table className="gv2-bang gv2-bang-ca">
+              <thead>
+                <tr>
+                  {chonMode && (
+                    <th scope="col">
+                      <span className="sr-only">Chọn</span>
+                    </th>
+                  )}
+                  <th scope="col">Tên ca</th>
+                  <th scope="col">Lớp</th>
+                  <th scope="col">Bắt đầu</th>
+                  <th scope="col" className="gv2-phai">
+                    Đã vào / mời
+                  </th>
+                  <th scope="col" className="gv2-phai">
+                    Đã nộp / vào
+                  </th>
+                  <th scope="col" className="gv2-phai">
+                    Rời màn
+                  </th>
+                  <th scope="col">Công bố điểm</th>
+                  <th scope="col">{xemDaXoa ? 'Việc' : 'Trạng thái'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {dsBang.slice(0, soDongHien).map((c) => {
+                  const tt = trangThaiCa(c, now)
+                  const tich = daChon.includes(c.maCa)
+                  const moi = emTheoLop.get(c.lop.trim()) ?? 0
+                  const bam = chonMode ? () => bat(c.maCa) : !xemDaXoa ? () => moChiTietCa(c.maCa) : undefined
+                  return (
+                    <tr key={c.maCa} data-trang-thai={tt.ten} className={chonMode && tich ? 'gv2-dong-chon' : undefined}>
+                      {chonMode && (
+                        <td>
+                          <input type="checkbox" checked={tich} onChange={() => bat(c.maCa)} aria-label={`Chọn ${c.tenCa || c.maCa}`} />
+                        </td>
+                      )}
+                      <td>
+                        {bam ? (
+                          <button type="button" className="gv2-ten-nut" onClick={bam}>
+                            {c.tenCa || `Ca ${c.maCa}`}
+                          </button>
+                        ) : (
+                          <span className="gv2-dam">{c.tenCa || `Ca ${c.maCa}`}</span>
+                        )}
+                        <div className="gv2-phu">Mã ca {c.maCa}</div>
+                      </td>
+                      <td>{c.lop || '—'}</td>
+                      <td className="gv2-so gv2-khong-xuong">{gioNgayHoa2(c.batDau || c.moLuc)}</td>
+                      <td className="gv2-so gv2-phai">
+                        <b>{c.daVao}</b>
+                        {moi > 0 && <span className="gv2-phu"> / {moi}</span>}
+                      </td>
+                      <td className="gv2-so gv2-phai">
+                        <b>{c.daNop}</b>
+                        <span className="gv2-phu"> / {c.daVao}</span>
+                      </td>
+                      <td className="gv2-so gv2-phai">{c.canhBao}</td>
+                      <td className="gv2-phu">{CONG_BO_COT[c.congBo] || '—'}</td>
+                      <td>
+                        {xemDaXoa ? (
+                          <span className="gv2-hang-nut">
+                            <button type="button" className="gv2-nut-chu" onClick={() => handleKhoiPhuc(c.maCa)} disabled={dangKhoiPhuc === c.maCa}>
+                              {dangKhoiPhuc === c.maCa ? 'Đang khôi phục…' : 'Khôi phục'}
+                            </button>
+                            <button type="button" className="gv2-nut-chu gv2-nut-do" onClick={() => setDsXoaVinhVien([c.maCa])} disabled={dangXoaVinhVien}>
+                              Xoá vĩnh viễn
+                            </button>
+                          </span>
+                        ) : (
+                          <span className="gv2-chip" data-tone={TONE_CHIP[tt.tone] ?? 'xam'}>
+                            {tt.ten}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+            <div className="gv2-chan-bang">
+              <span className="gv2-phu">
+                <span className="gv2-so">{Math.min(soDongHien, dsLoc.length)}</span> / <span className="gv2-so">{dsLoc.length}</span> ca · xếp mới nhất trước
+              </span>
+              {dsLoc.length > soDongHien && (
+                <button type="button" className="gv2-nut-vien" onClick={() => setSoDongHien((n) => n + SO_DONG_TRANG)}>
+                  Xem thêm {Math.min(SO_DONG_TRANG, dsLoc.length - soDongHien)} ca
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="ls-thu-muc-luoi">
@@ -644,7 +837,7 @@ export default function LichSuCaScreen() {
       </TheNoiDung>
 
       {/* Công cụ hiếm dùng: xuống CUỐI trang cho danh sách ca lên trước. Nút, câu chữ và luồng xác nhận trong khối này không đổi. */}
-      {!xemDaXoa && !chonMode && <NutDongBoMoiCa />}
+      {!hoa2 && !xemDaXoa && !chonMode && <NutDongBoMoiCa />}
     </div>
   )
 }
