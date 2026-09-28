@@ -91,7 +91,7 @@ export interface DauVaoGiao {
   theLucNgay?: number
   huyetChien?: boolean
   maCa?: string
-  /** "Rút còn N câu" (giữ câu cả lớp sai nhiều) — chỉ `tao` áp; gửi kèm `suc-chua` cho máy chủ đời sau. */
+  /** Trường cũ của máy chủ (rút bớt số câu) — giao diện KHÔNG còn nút này (thầy 28/09); giữ kiểu để khớp hợp đồng API. */
   rutCon?: number
 }
 

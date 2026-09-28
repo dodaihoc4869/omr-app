@@ -3,7 +3,7 @@
 //   2. Chọn em: MỘT ô chọn nhiều tầng Khối › Lớp › Em (`ChonEmGiao`), danh sách em từ máy chủ (`ds-em`).
 //   3. Hạn nộp + "Số lượt câu mỗi ngày (một em)" (tên cũ "Thể lực") gõ số bất kì hoặc gạt "Tự tính" + "Khối lượng so với thời gian còn lại".
 // Hiện ở màn ca đã kết thúc (điền sẵn tờ đề + lớp của ca) và ở màn Chiến dịch luyện ("Giao chiến dịch mới", chưa điền gì).
-// Mỗi lần đổi đầu vào ⇒ gọi `suc-chua`; nút chính "Giao chiến dịch cho N em" ⇒ `tao`. KHÔNG có "Rút còn … câu" / "Lùi hạn nộp" (thầy 28/09).
+// Mỗi lần đổi đầu vào ⇒ gọi `suc-chua`; nút chính "Giao chiến dịch cho N em" ⇒ `tao`. KHÔNG có nút rút bớt câu hay nút dời hạn (thầy 28/09).
 // Giao xong cho HOÀN TÁC ("Huỷ giao" ⇒ `huy`) thay vì hỏi lại trước (luật C8).
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TeacherExamSource } from '../../data/examContent'
