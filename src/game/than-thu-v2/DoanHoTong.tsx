@@ -55,7 +55,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const [tungChuong, setTungChuong] = useState<KhungNhinHiep | null>(null), [loiGiaiTrum, setLoiGiaiTrum] = useState<LoiGiaiTrum | null>(null)
   const [goiYThe, setGoiYTiepSuc] = useState<GoiYTiepSuc | null>(null), [expTiepSuc, setExpTiepSuc] = useState(0)
   const [expNhan, setExpNhan] = useState(0), [, setNhip] = useState(0), [choRoi, setChoRoi] = useState(false)
-  // Hóa 2.0: chặng vừa kết thúc ngay sau câu em làm ⇒ giữ lời giải câu cuối tới khi em bấm "XEM KẾT QUẢ CHẶNG".
+  // Hóa 2.0: chuyến vừa kết thúc ngay sau câu em làm ⇒ giữ lời giải câu cuối tới khi em bấm "XEM KẾT QUẢ CHUYẾN".
   const [daDocCuoi, setDaDocCuoi] = useState(false)
   const de = useRef(new Map<string, Question>()), moc = useRef({ luc: 0, conMs: 0, moSauMs: 0 }), phienBan = useRef({ ma: '', revision: -1 })
   const hiepDaChieu = useRef(0), hiepDangLam = useRef(0), khoa = useRef(false), song = useRef(true)
@@ -212,7 +212,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
       onXinTiepSuc={bat => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: bat ? 'can_tiep_suc' : '' })} onMoTiepSuc={g => void moTiepSuc(g)} expTiepSuc={expTiepSuc}
       onRoi={() => void roi()} onZoom={setZoom} ban={ban} dangChot={dangChot} hetCauMoi={hetCauMoi} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum}
       cheDo2={laHoa2} goiY={xem.cau?.qid ? goiYCau.current.get(xem.cau.qid) ?? null : null} oPhucKich={hoa2?.doanCon ?? null}
-      onDanhTiep={danhTiep} nhanTiep={giuCuoi ? 'XEM KẾT QUẢ CHẶNG' : undefined} />
+      onDanhTiep={danhTiep} nhanTiep={giuCuoi ? 'XEM KẾT QUẢ CHUYẾN' : undefined} />
   )
 
   return createPortal(
