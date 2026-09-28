@@ -105,7 +105,8 @@ describe('Nối và kiểu', () => {
     const css = doc('src/game/than-thu-v2/doan2/doan2.css')
     const dong = css.split('\n').filter(d => /dh2-(chuong|tam)/.test(d) && !d.startsWith('/*') && !d.startsWith('@media') && !d.startsWith('  '))
     expect(dong.length).toBeGreaterThan(10)
-    for (const d of dong) expect(d.startsWith('.dh2 ')).toBe(true)
+    // 28/09 sáng/tối theo máy: khối ép Sáng có tiền tố `:root[data-giao-dien='sang'] ` — vẫn nằm dưới .dh2
+    for (const d of dong) expect(d.replace(/^:root\[data-giao-dien='sang'\] /, '').startsWith('.dh2 ')).toBe(true)
     expect(css).toMatch(/prefers-reduced-motion:reduce\)\{\.dh2 \.dh2-chuong-bo-qua/)
     expect(css).toMatch(/\.dh2-chuong-bo-qua\{[^}]*min-height:44px/)
     expect(css).toMatch(/\.dh2-tam \.dh-tam-chan button\{min-height:44px/)

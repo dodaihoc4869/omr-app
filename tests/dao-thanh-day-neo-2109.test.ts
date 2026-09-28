@@ -16,8 +16,11 @@ describe('khoá nguồn', () => {
   it('nút "Về app học sinh" (dính góc trên trái, cuộn qua nội dung) có nền ĐẶC — chữ và nút không bị nội dung phía sau lọt qua', () => {
     const nut = /\.dao button\.dao-ve-app\{([^}]*)\}/.exec(DAO)![1]!
     expect(nut).toMatch(/position:fixed/)
-    expect(nut).toMatch(/background:rgb\(9,13,40\)/)
-    expect(nut).not.toMatch(/background:rgba/)
+    // 28/09 sáng/tối theo máy: nền qua biến --dao-ve-nen — MỌI giá trị khai báo (đêm + sáng) đều ĐẶC (rgb không alpha)
+    expect(nut).toMatch(/background:var\(--dao-ve-nen\)/)
+    const giaTri = [...DAO.matchAll(/--dao-ve-nen:([^;]+);/g)].map(m => m[1])
+    expect(giaTri).toContain('rgb(9,13,40)')
+    for (const g of giaTri) expect(g).toMatch(/^rgb\(\d+,\d+,\d+\)$/)
   })
   it('hai lớp animation của vỏ sheet dùng fill `backwards` (KHÔNG `forwards`): không để lại ma trận đơn vị làm khung chứa cho phần tử fixed; trạng thái cuối keyframe = trạng thái tự nhiên', () => {
     expect(INDEX).toMatch(/\.animate-google-fade \{\s*animation: google-fade-in-up [^;]*backwards;/)
@@ -31,7 +34,10 @@ describe('khoá nguồn', () => {
     expect(nav).toMatch(/position:fixed/)
     expect(nav).toMatch(/left:0;right:0;bottom:0/)
     expect(nav).not.toMatch(/border-radius|translateX|backdrop-filter/)
-    expect(nav).toMatch(/background:rgb\(14,20,52\)/) // đặc: không alpha
+    expect(nav).toMatch(/background:var\(--dao-nav-nen\)/) // đặc: không alpha — mọi giá trị khai báo (đêm + sáng, 28/09)
+    const giaTri = [...DAO.matchAll(/--dao-nav-nen:([^;]+);/g)].map(m => m[1])
+    expect(giaTri).toContain('rgb(14,20,52)')
+    for (const g of giaTri) expect(g).toMatch(/^rgb\(\d+,\d+,\d+\)$/)
     expect(nav).toMatch(/height:calc\(64px \+ env\(safe-area-inset-bottom,0px\)\)/)
     expect(nav).toMatch(/padding:[^;]*env\(safe-area-inset-bottom,0px\)/)
     expect(nav).toMatch(/box-shadow:0 -1px 0/)

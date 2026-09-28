@@ -1,33 +1,20 @@
 /* SỔ TAY + TÚI ĐỒ · BỐ CỤC NGANG (thầy 28/09: "Sổ tay, túi đồ, cửa hàng làm cả giao diện xoay ngang").
    Chỉ bật khi thẻ gốc có [data-ngang] — do hook useNgang() (dao2/ngang.ts, CÙNG điểm ngắt với Đảo 2.0 / app 2.0) đặt; dọc không đổi gì.
-   Phong cách Sảnh 3D sáng: nền trời hoàng hôn nhạt, thẻ KÍNH SÁNG, chữ TỐI (≥ 4.5:1), nút chính VÀNG 3D. Màu rgb() — không mã hex (`npm run check:mau`).
+   Màu đi qua biến --dao-… và --ng-… của dao.css: máy SÁNG ⇒ phong cách Sảnh 3D (kính sáng, chữ tối ≥ 4.5:1, nút vàng 3D); máy TỐI ⇒ bộ đêm (28/09). Màu rgb() — không mã hex (`npm run check:mau`).
    Khung: cao đúng một màn (không cuộn cả trang); cột/khung trong tự cuộn khi thiếu chỗ (844×390 vẫn dùng được). */
 
 .dao.dao-vo:has(>[data-ngang]){
- --dao-chu:rgb(24,30,62);--dao-chu-mo:rgb(62,72,108);--dao-chu-nhat:rgb(84,92,126);--dao-nhan:rgb(58,84,168);--dao-vang:rgb(150,76,0);
- --dao-kinh:rgba(255,255,255,.78);--dao-kinh-vien:rgba(40,50,110,.14);
- --ng-kinh-bong:0 10px 28px rgba(70,40,120,.16),0 2px 6px rgba(70,40,120,.08);
- --ng-vang-nen:linear-gradient(180deg,rgb(255,224,110),rgb(255,192,44) 52%,rgb(244,148,16));
- --ng-vang-chu:rgb(66,32,0);
- --ng-vang-bong:inset 0 2px 0 rgb(255,255,240),inset 0 -4px 0 rgba(214,120,0,.45),0 5px 0 rgb(186,98,6),0 12px 22px rgba(230,120,20,.3);
  --ng-le:clamp(16px,2.2vw,32px);
  height:100dvh;min-height:0;border-radius:0;
  padding:max(12px,env(safe-area-inset-top,0px)) 0 calc(76px + env(safe-area-inset-bottom,0px));
- background:radial-gradient(90% 70% at 85% 0%,rgba(255,236,190,.9),transparent 60%),linear-gradient(180deg,rgb(255,226,200) 0%,rgb(255,241,228) 42%,rgb(222,242,250) 100%);
- color:var(--dao-chu)}
-.dao.dao-vo:has(>[data-ngang])::before{opacity:0}
 
-/* nút "Về app học sinh" + thanh dưới: kính sáng, chữ tối */
-.dao.dao-vo:has(>[data-ngang]) button.dao-ve-app{--nut-chu:var(--dao-chu);background:rgba(255,255,255,.86);box-shadow:inset 0 0 0 1px rgba(255,255,255,.95),var(--ng-kinh-bong)}
-.dao.dao-vo:has(>[data-ngang]) .dao-nav{background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);box-shadow:0 -1px 0 rgba(40,50,110,.12),0 -8px 20px rgba(70,40,120,.12)}
+ color:var(--dao-chu)}
+
 .dao.dao-vo:has(>[data-ngang]) .dao-nav button{min-height:44px}
-.dao.dao-vo:has(>[data-ngang]) .dao-nav button[aria-current]>span{background:rgba(255,196,46,.35)}
 
 /* thẻ kính sáng dùng chung */
-.dao.dao-vo:has(>[data-ngang]) .dao-kinh{background:rgba(255,255,255,.78);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);box-shadow:inset 0 0 0 1px rgba(255,255,255,.95),var(--ng-kinh-bong)}
-.dao.dao-vo:has(>[data-ngang]) .dao-thanh{background:rgba(40,50,110,.12)}
+.dao.dao-vo:has(>[data-ngang]) .dao-kinh{-webkit-backdrop-filter:var(--ng-kinh-mo);backdrop-filter:var(--ng-kinh-mo)}
 .dao.dao-vo:has(>[data-ngang]) .dao-thanh i{background:var(--ng-vang-nen)}
-.dao.dao-vo:has(>[data-ngang]) .dao-loi{background:rgba(214,40,96,.08);box-shadow:inset 0 0 0 1px rgba(214,40,96,.4);color:rgb(160,20,60)}
 
 /* ───── SỔ TAY: trái = đầu sổ + dạng yếu + danh sách chương · phải = dạng của chương đang chọn ───── */
 .dao .dao-so[data-ngang]{display:grid;grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:20px;height:100%;min-height:0;padding:0 var(--ng-le);max-width:1440px;margin-inline:auto}
@@ -35,22 +22,15 @@
 /* chừa chỗ cho nút "Về app học sinh" ở góc trái trên */
 .dao .dao-so[data-ngang] .dao-so-trai{padding-top:56px}
 .dao .dao-so[data-ngang] header h2{font-size:clamp(19px,2.2vw,26px)}
-.dao .dao-so[data-ngang] .dao-so-yeu{background:linear-gradient(135deg,rgba(255,154,118,.32),rgba(255,255,255,.8));box-shadow:inset 0 0 0 1px rgba(246,146,18,.45),var(--ng-kinh-bong)}
 .dao .dao-so[data-ngang] .dao-so-yeu p{color:var(--dao-chu-mo)}
 .dao .dao-so-ds{display:flex;flex-direction:column;gap:8px}
-.dao .dao-so-ds button{--nut-nen:rgba(255,255,255,.72);--nut-chu:var(--dao-chu);--nut-bong:inset 0 0 0 1px rgba(255,255,255,.95),0 4px 12px rgba(70,40,120,.1);display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:6px 14px;border-radius:16px;font-size:14px;font-weight:700;text-align:left}
+.dao .dao-so-ds button{--nut-nen:var(--ng-o-nen);--nut-chu:var(--dao-chu);--nut-bong:var(--ng-o-bong);display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:6px 14px;border-radius:16px;font-size:14px;font-weight:700;text-align:left}
 .dao .dao-so-ds button>span{min-width:0;overflow-wrap:anywhere}
-.dao .dao-so-ds button>b{flex-shrink:0;font-size:13px;color:var(--dao-vang)}
+.dao .dao-so-ds button>b{flex-shrink:0;font-size:13px;color:var(--dao-vang-so)}
 .dao .dao-so-ds button[aria-current]{--nut-nen:var(--ng-vang-nen);--nut-chu:var(--ng-vang-chu);--nut-bong:var(--ng-vang-bong)}
 .dao .dao-so-ds button[aria-current]>b{color:var(--ng-vang-chu)}
 .dao .dao-so[data-ngang] .dao-so-phai{padding-top:4px}
 .dao .dao-so[data-ngang] .dao-so-chuong ul{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
-.dao .dao-so[data-ngang] .dao-so-chuong li{box-shadow:inset 0 0 0 1px rgba(255,255,255,.9),0 3px 8px rgba(70,40,120,.08)}
-.dao .dao-so[data-ngang] .dao-so-chuong li em{color:rgb(0,110,118)}
-.dao .dao-so[data-ngang] .dao-so-chuong li[data-khoa]{background:rgba(255,255,255,.5);color:var(--dao-chu-nhat)}
-.dao .dao-so[data-ngang] .dao-sao svg{fill:rgba(40,50,110,.18)}
-.dao .dao-so[data-ngang] .dao-sao svg[data-sang]{fill:rgb(246,146,18)}
-.dao .dao-so[data-ngang] .dao-so-thuong>span{background:rgba(255,196,46,.3)}
 
 /* ───── TÚI ĐỒ: lưới thẻ nhiều cột ───── */
 .dao .dao-tui[data-ngang]{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));align-content:start;align-items:start;gap:14px;height:100%;min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 var(--ng-le) 8px;max-width:1440px;margin-inline:auto}
@@ -64,4 +44,4 @@
 .dao .dao-tui[data-ngang] button.dao-tui-ren:active:not(:disabled),.dao .dao-tui[data-ngang] .immortal-inventory>button:active:not(:disabled){--nut-dich:translateY(3px)}
 .dao .dao-tui[data-ngang] button.dao-tui-ren:disabled{opacity:.55;cursor:default}
 .dao .dao-tui[data-ngang] .dao-tui-loi-khac{padding:0}
-.dao .dao-tui[data-ngang] button.dao-tui-loi{--nut-nen:rgba(255,255,255,.78);--nut-bong:inset 0 0 0 1px rgba(255,255,255,.95),var(--ng-kinh-bong)}
+.dao .dao-tui[data-ngang] button.dao-tui-loi{--nut-nen:var(--dao-the-kinh);--nut-bong:var(--dao-the-kinh-bong)}

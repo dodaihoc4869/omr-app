@@ -134,6 +134,19 @@ const GAI = (() => {
 
 const bien = (ten: string, gt: string) => ({ [ten]: gt }) as CSSProperties
 
+/** Sao trời đêm (bản tối): [x, y, bán kính, trễ nhấp nháy giây] — sinh cố định (không ngẫu nhiên mỗi lần vẽ). */
+const SAO_DEM: [number, number, number, number][] = (() => {
+  const ra: [number, number, number, number][] = []
+  let h = 7
+  const rnd = () => (h = (h * 16807) % 2147483647) / 2147483647
+  for (let k = 0; k < 70; k++) {
+    const x = -600 + rnd() * 1600
+    const y = -420 + rnd() * 432
+    ra.push([+x.toFixed(1), +y.toFixed(1), +(0.5 + rnd() * 1.1).toFixed(2), +(rnd() * 4).toFixed(2)])
+  }
+  return ra
+})()
+
 function MayBongBenh({ m, i }: { m: May; i: number }) {
   return (
     <g className="h2c-may-troi" style={{ ...bien('--t', m.t), ...bien('--d', m.d) }} key={i}>
@@ -382,6 +395,11 @@ export default function CanhSanh3D({ s, ngang = false, moMan = false }: CanhSanh
               <stop offset=".6" stopColor="rgb(255 238 170)" />
               <stop offset="1" stopColor="rgb(255 196 110)" />
             </radialGradient>
+            <radialGradient id="h2c-hao-trang">
+              <stop offset="0" stopColor="rgb(220 228 255 / .55)" />
+              <stop offset=".4" stopColor="rgb(170 180 255 / .18)" />
+              <stop offset="1" stopColor="rgb(150 160 255 / 0)" />
+            </radialGradient>
             <radialGradient id="h2c-hao-troi">
               <stop offset="0" stopColor="rgb(255 236 180 / .9)" />
               <stop offset=".35" stopColor="rgb(255 200 160 / .4)" />
@@ -502,13 +520,23 @@ export default function CanhSanh3D({ s, ngang = false, moMan = false }: CanhSanh
               ))}
             </g>
             <circle className="h2c-hao-troi" cx="64" cy="12" r="110" fill="url(#h2c-hao-troi)" />
-            <circle cx="64" cy="12" r="22" fill="url(#h2c-mat-troi)" />
+            <circle className="h2c-mat-troi" cx="64" cy="12" r="22" fill="url(#h2c-mat-troi)" />
+            {/* BẢN ĐÊM (máy ở chế độ tối — sanh-ban-do.css): sao + trăng thay mặt trời; bản sáng ẩn cả nhóm */}
+            <g className="h2c-dem">
+              {SAO_DEM.map(([x, y, r, t], i) => (
+                <circle key={i} className="h2c-sao-dem" cx={x} cy={y} r={r} style={bien('--d', `${t}s`)} />
+              ))}
+              <circle className="h2c-hao-trang" cx="70" cy="-2" r="70" fill="url(#h2c-hao-trang)" />
+              <circle className="h2c-trang" cx="70" cy="-2" r="15" />
+              <circle className="h2c-trang-hom" cx="65" cy="-6" r="3.2" />
+              <circle className="h2c-trang-hom" cx="75" cy="2" r="2.2" />
+            </g>
             <g>
               {c.mayXa.map((m, i) => (
                 <MayBongBenh key={i} m={m} i={i} />
               ))}
             </g>
-            <path d="M-700 22 C-640 6 -600 10 -560 18 C-520 2 -470 4 -430 20 C-380 14 -350 16 -320 22 Z M430 22 C470 4 510 2 550 16 C590 8 630 10 670 22 Z M760 22 C800 12 850 8 900 22 Z" fill="rgb(176 150 214 / .75)" />
+            <path className="h2c-nui-xa" d="M-700 22 C-640 6 -600 10 -560 18 C-520 2 -470 4 -430 20 C-380 14 -350 16 -320 22 Z M430 22 C470 4 510 2 550 16 C590 8 630 10 670 22 Z M760 22 C800 12 850 8 900 22 Z" fill="rgb(176 150 214 / .75)" />
           </g>
 
           {/* LỚP BIỂN: nước ngọc, vệt nắng, sóng, ánh lấp lánh */}

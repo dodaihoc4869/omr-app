@@ -2,17 +2,29 @@
    Mọi bộ chọn đều đứng sau `.dao` để thắng `.spirit-game button{…}` của game.css. Màu chỉ khai ở đây (TSX không có hex). */
 .dao{--dao-nen:rgb(9,13,40);--dao-nen-2:rgb(24,34,92);--dao-chu:rgb(242,245,255);--dao-chu-mo:rgb(201,214,242);--dao-chu-nhat:rgb(159,178,217);--dao-nhan:rgb(168,199,250);
  --dao-vang:rgb(255,209,102);--dao-vang-dam:rgb(242,160,32);--dao-vang-chu:rgb(58,32,0);--dao-the:rgb(246,239,224);--dao-the-chu:rgb(42,33,22);--dao-the-chu-mo:rgb(90,74,54);--dao-cuong-no:rgb(194,65,12);
- --dao-kinh:rgba(255,255,255,.1);--dao-kinh-vien:rgba(255,255,255,.2);--dao-do:rgb(255,180,171);--dao-he:rgb(65,101,183);
+ --dao-he:rgb(65,101,183);
+ --dao-chu:rgb(242,245,255);--dao-chu-mo:rgb(201,214,242);--dao-chu-nhat:rgb(159,178,217);--dao-nhan:rgb(168,199,250);--dao-vang-so:rgb(255,209,102);
+ --dao-kinh:rgba(255,255,255,.1);--dao-kinh-vien:rgba(255,255,255,.2);--dao-do:rgb(255,180,171);--dao-loi-nen:rgba(255,180,171,.14);--dao-loi-vien:rgba(255,180,171,.5);
+ --dao-nen-anh:radial-gradient(120% 60% at 50% 0%,var(--dao-nen-2) 0%,var(--dao-nen) 62%);--dao-sao-mo:.8;
+ --dao-the-kinh:rgba(255,255,255,.07);--dao-the-kinh-bong:inset 0 0 0 1px rgba(255,255,255,.13),0 10px 26px rgba(0,0,0,.28);--dao-vach:rgba(255,255,255,.14);
+ --dao-nav-nen:rgb(14,20,52);--dao-nav-vach:rgba(255,255,255,.16);--dao-nav-bong:rgba(0,0,0,.35);--dao-nav-hien:rgba(255,209,102,.18);
+ --dao-ve-nen:rgb(9,13,40);--dao-ve-bong:inset 0 0 0 1px rgba(255,255,255,.22),0 6px 16px rgba(0,0,0,.35);
+ --dao-yeu-nen:linear-gradient(135deg,rgba(255,154,118,.3),rgba(255,154,118,.08));--dao-yeu-bong:inset 0 0 0 1px rgba(255,154,118,.5);--dao-yeu-chu:rgb(255,208,189);
+ --dao-o-bong:inset 0 0 0 1px rgba(255,255,255,.16);--dao-ngoc-chu:rgb(127,233,255);--dao-khoa-nen:rgba(255,255,255,.05);--dao-khoa-bong:inset 0 0 0 1px rgba(255,255,255,.1);--dao-khoa-chu:rgb(128,140,180);
+ --dao-sao-tat:rgba(255,255,255,.2);--dao-sao-sang:rgb(255,209,102);--dao-thuong-nen:rgba(255,209,102,.2);
+ --ng-kinh-bong:0 10px 26px rgba(0,0,0,.28);--ng-vang-nen:linear-gradient(180deg,rgb(255,224,138) 0%,rgb(255,209,102) 42%,rgb(242,160,32) 100%);--ng-vang-chu:rgb(58,32,0);
+ --ng-vang-bong:0 10px 26px rgba(255,170,40,.42),inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(160,90,0,.35);
+ --ng-o-nen:rgba(255,255,255,.07);--ng-o-bong:inset 0 0 0 1px rgba(255,255,255,.16),0 4px 12px rgba(0,0,0,.2);--ng-kinh-mo:blur(0px);
  position:relative;isolation:isolate;overflow:hidden;overflow:clip;box-sizing:border-box;color:var(--dao-chu);font-family:var(--sans),'Be Vietnam Pro',sans-serif;border-radius:24px;
- background:radial-gradient(120% 60% at 50% 0%,var(--dao-nen-2) 0%,var(--dao-nen) 62%);-webkit-tap-highlight-color:transparent}
+ background:var(--dao-nen-anh);-webkit-tap-highlight-color:transparent}
 .dao *,.dao *::before,.dao *::after{box-sizing:border-box}
 /* sao nền: vài chấm sáng tĩnh, không tốn khung hình */
-.dao::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.8;background-image:radial-gradient(1.2px 1.2px at 12% 9%,rgba(255,255,255,.9) 50%,transparent 51%),radial-gradient(1px 1px at 78% 6%,rgba(255,255,255,.8) 50%,transparent 51%),radial-gradient(1.4px 1.4px at 91% 22%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(1px 1px at 6% 31%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(1.2px 1.2px at 64% 15%,rgba(255,255,255,.6) 50%,transparent 51%),radial-gradient(1px 1px at 33% 4%,rgba(255,255,255,.8) 50%,transparent 51%),radial-gradient(1.3px 1.3px at 86% 58%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1px 1px at 9% 72%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1.1px 1.1px at 48% 88%,rgba(255,255,255,.45) 50%,transparent 51%)}
+.dao::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:var(--dao-sao-mo);background-image:radial-gradient(1.2px 1.2px at 12% 9%,rgba(255,255,255,.9) 50%,transparent 51%),radial-gradient(1px 1px at 78% 6%,rgba(255,255,255,.8) 50%,transparent 51%),radial-gradient(1.4px 1.4px at 91% 22%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(1px 1px at 6% 31%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(1.2px 1.2px at 64% 15%,rgba(255,255,255,.6) 50%,transparent 51%),radial-gradient(1px 1px at 33% 4%,rgba(255,255,255,.8) 50%,transparent 51%),radial-gradient(1.3px 1.3px at 86% 58%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1px 1px at 9% 72%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1.1px 1.1px at 48% 88%,rgba(255,255,255,.45) 50%,transparent 51%)}
 .dao[data-thu="0"],.dao [data-thu="0"]{--dao-he:rgb(150,104,40)}.dao[data-thu="1"],.dao [data-thu="1"]{--dao-he:rgb(29,125,170)}.dao[data-thu="2"],.dao [data-thu="2"]{--dao-he:rgb(194,65,12)}.dao[data-thu="3"],.dao [data-thu="3"]{--dao-he:rgb(24,120,90)}
 .dao[data-thu="4"],.dao [data-thu="4"]{--dao-he:rgb(65,101,183)}.dao[data-thu="5"],.dao [data-thu="5"]{--dao-he:rgb(190,60,118)}.dao[data-thu="6"],.dao [data-thu="6"]{--dao-he:rgb(128,112,40)}.dao[data-thu="7"],.dao [data-thu="7"]{--dao-he:rgb(120,100,200)}
 .dao h2,.dao h3,.dao p{margin:0}
 .dao .dao-nhan{display:block;font-size:12px;font-weight:800;letter-spacing:.3em;color:var(--dao-nhan)}
-.dao .dao-loi{margin:0 16px;padding:8px 12px;border-radius:12px;background:rgba(255,180,171,.14);box-shadow:inset 0 0 0 1px rgba(255,180,171,.5);color:var(--dao-do);font-size:13px;line-height:1.4;text-align:center}
+.dao .dao-loi{margin:0 16px;padding:8px 12px;border-radius:12px;background:var(--dao-loi-nen);box-shadow:inset 0 0 0 1px var(--dao-loi-vien);color:var(--dao-do);font-size:13px;line-height:1.4;text-align:center}
 /* NÚT: game.css có `.spirit-game button{…}` và `button:hover:not(:disabled){background;transform;box-shadow}` (0,3,1) — trên máy cảm ứng
    hover DÍNH lại sau khi chạm. Vì vậy nền/chữ/bóng/dịch chuyển của MỌI nút trong đảo đi qua 4 biến --nut-*, và mọi luật nút viết dạng
    `.dao button.<lớp>` (đứng sau luật đặt lại này, cùng độ ưu tiên ⇒ thắng theo thứ tự). */
@@ -69,7 +81,7 @@
 .dao .dao-chon-meo{padding:0 20px;font-size:12px;line-height:1.45;color:var(--dao-chu-nhat);text-align:center}
 
 /* ───── dùng chung: thẻ kính, chip, nút nhỏ, thanh tiến độ ───── */
-.dao .dao-kinh{border-radius:24px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.13),0 10px 26px rgba(0,0,0,.28)}
+.dao .dao-kinh{border-radius:24px;background:var(--dao-the-kinh);box-shadow:var(--dao-the-kinh-bong)}
 .dao .dao-nhan-nho{font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--dao-nhan)}
 .dao .dao-chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:17px;font-size:13px;font-weight:800;white-space:nowrap}
 .dao .dao-chip-lua{background:rgba(255,138,92,.22);box-shadow:inset 0 0 0 1px rgba(255,138,92,.55);color:rgb(255,194,166)}.dao .dao-chip-lua svg{color:rgb(255,138,92)}
@@ -77,7 +89,7 @@
 .dao button.dao-nut-nho{--nut-nen:var(--dao-vang);--nut-chu:var(--dao-vang-chu);flex-shrink:0;min-height:40px;padding:0 16px;border-radius:20px;font-size:14px;font-weight:800}
 .dao button.dao-nut-nho-mo{--nut-nen:var(--dao-kinh);--nut-chu:var(--dao-chu);--nut-bong:inset 0 0 0 1px var(--dao-kinh-vien)}
 .dao button.dao-nut-nho:disabled{opacity:.55;cursor:default}
-.dao .dao-thanh{height:6px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden}
+.dao .dao-thanh{height:6px;border-radius:999px;background:var(--dao-vach);overflow:hidden}
 .dao .dao-thanh i{display:block;height:100%;border-radius:999px;background:var(--mau,var(--dao-vang));transition:width .5s ease}
 
 /* ───── 2. HÒN ĐẢO CỦA EM ───── */
@@ -151,14 +163,14 @@
 .dao-vo{min-height:min(100dvh,1240px);padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
 .dao-vo:has(>.dao-ve-app){padding-top:calc(60px + max(8px,env(safe-area-inset-top,0px)))}
 .dao-vo.dao-vo-tham{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
-.dao .dao-nav{position:fixed;left:0;right:0;bottom:0;z-index:20;box-sizing:border-box;width:auto;height:calc(64px + env(safe-area-inset-bottom,0px));padding:0 max(8px,calc((100vw - 420px) / 2)) env(safe-area-inset-bottom,0px);display:flex;align-items:center;justify-content:space-around;background:rgb(14,20,52);box-shadow:0 -1px 0 rgba(255,255,255,.16),0 -8px 20px rgba(0,0,0,.35)}
+.dao .dao-nav{position:fixed;left:0;right:0;bottom:0;z-index:20;box-sizing:border-box;width:auto;height:calc(64px + env(safe-area-inset-bottom,0px));padding:0 max(8px,calc((100vw - 420px) / 2)) env(safe-area-inset-bottom,0px);display:flex;align-items:center;justify-content:space-around;background:var(--dao-nav-nen);box-shadow:0 -1px 0 var(--dao-nav-vach),0 -8px 20px var(--dao-nav-bong)}
 .dao .dao-nav button{--nut-chu:var(--dao-chu-nhat);flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;height:100%;justify-content:center;font-size:11px;font-weight:600}
 .dao .dao-nav button>span{display:flex;align-items:center;justify-content:center;width:52px;height:30px;border-radius:15px}
-.dao .dao-nav button[aria-current]{--nut-chu:var(--dao-vang);font-weight:800}
-.dao .dao-nav button[aria-current]>span{background:rgba(255,209,102,.18)}
+.dao .dao-nav button[aria-current]{--nut-chu:var(--dao-vang-so);font-weight:800}
+.dao .dao-nav button[aria-current]>span{background:var(--dao-nav-hien)}
 /* Nút "Về app học sinh" LUÔN HIỆN (thầy lệnh 21/09, game tự toàn màn hình): dải mỏng dính ở trên cùng, đích chạm ≥ 48 px, chừa tai thỏ/thanh hệ thống
    bằng vùng an toàn; nội dung đảo nằm dưới dải (padding-top của .dao-vo). Không có nút bật/thoát toàn màn hình. */
-.dao button.dao-ve-app{--nut-chu:var(--dao-chu);position:fixed;top:max(8px,env(safe-area-inset-top,0px));left:max(8px,env(safe-area-inset-left,0px));z-index:60;display:inline-flex;align-items:center;justify-content:center;min-height:48px;min-width:48px;margin:0;padding:0 18px;border-radius:999px;font-size:14px;font-weight:700;background:rgb(9,13,40);box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 6px 16px rgba(0,0,0,.35);text-decoration:none}
+.dao button.dao-ve-app{--nut-chu:var(--dao-chu);position:fixed;top:max(8px,env(safe-area-inset-top,0px));left:max(8px,env(safe-area-inset-left,0px));z-index:60;display:inline-flex;align-items:center;justify-content:center;min-height:48px;min-width:48px;margin:0;padding:0 18px;border-radius:999px;font-size:14px;font-weight:700;background:var(--dao-ve-nen);box-shadow:var(--dao-ve-bong);text-decoration:none}
 
 /* ───── Túi đồ ───── */
 .dao .dao-tui{display:flex;flex-direction:column;gap:14px;padding:max(18px,4vh) 16px 0}
@@ -280,25 +292,25 @@
 .dao .dao-so header .dao-nhan{letter-spacing:.24em}
 .dao .dao-so header h2{font-size:26px;font-weight:800;line-height:1.2;margin-top:2px}
 .dao .dao-so header p{font-size:13px;color:var(--dao-chu-mo);margin-top:2px}
-.dao .dao-so-yeu{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:24px;background:linear-gradient(135deg,rgba(255,154,118,.3),rgba(255,154,118,.08));box-shadow:inset 0 0 0 1px rgba(255,154,118,.5)}
+.dao .dao-so-yeu{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:24px;background:var(--dao-yeu-nen);box-shadow:var(--dao-yeu-bong)}
 .dao .dao-so-yeu>b{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:rgb(255,154,118);color:rgb(58,18,0);font-size:20px;font-weight:800}
-.dao .dao-so-yeu strong{font-size:15px;font-weight:800}.dao .dao-so-yeu p{font-size:12px;line-height:1.45;color:rgb(255,208,189);margin-top:2px}
-.dao .dao-so-trong{padding:16px;font-size:14px;line-height:1.5;color:var(--dao-chu-mo)}.dao .dao-so-trong b{color:var(--dao-vang)}
+.dao .dao-so-yeu strong{font-size:15px;font-weight:800}.dao .dao-so-yeu p{font-size:12px;line-height:1.45;color:var(--dao-yeu-chu);margin-top:2px}
+.dao .dao-so-trong{padding:16px;font-size:14px;line-height:1.5;color:var(--dao-chu-mo)}.dao .dao-so-trong b{color:var(--dao-vang-so)}
 .dao .dao-so-chuong{display:flex;flex-direction:column;gap:12px;padding:16px}
 .dao .dao-so-chuong-dau{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.dao .dao-so-chuong-dau h3{font-size:16px;font-weight:800}.dao .dao-so-chuong-dau span{flex-shrink:0;font-size:12px;font-weight:700;color:var(--dao-vang)}
+.dao .dao-so-chuong-dau h3{font-size:16px;font-weight:800}.dao .dao-so-chuong-dau span{flex-shrink:0;font-size:12px;font-weight:700;color:var(--dao-vang-so)}
 .dao .dao-so-chuong ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none}
-.dao .dao-so-chuong li{display:flex;flex-direction:column;gap:6px;min-height:84px;padding:12px;border-radius:18px;background:linear-gradient(160deg,rgba(255,154,118,.3),rgba(255,154,118,.08));box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)}
+.dao .dao-so-chuong li{display:flex;flex-direction:column;gap:6px;min-height:84px;padding:12px;border-radius:18px;background:linear-gradient(160deg,rgba(255,154,118,.3),rgba(255,154,118,.08));box-shadow:var(--dao-o-bong)}
 .dao .dao-so-chuong li[data-sao="1"],.dao .dao-so-chuong li[data-sao="2"]{background:linear-gradient(160deg,rgba(127,233,255,.28),rgba(127,233,255,.08))}
 .dao .dao-so-chuong li[data-sao="3"]{background:linear-gradient(160deg,rgba(255,209,102,.34),rgba(255,209,102,.1))}
 .dao .dao-so-chuong li>span:first-child{font-size:13px;font-weight:700;line-height:1.25;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.dao .dao-so-chuong li em{font-style:normal;font-size:10px;font-weight:800;color:rgb(127,233,255)}
-.dao .dao-so-chuong li[data-khoa]{background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);color:rgb(128,140,180)}
+.dao .dao-so-chuong li em{font-style:normal;font-size:10px;font-weight:800;color:var(--dao-ngoc-chu)}
+.dao .dao-so-chuong li[data-khoa]{background:var(--dao-khoa-nen);box-shadow:var(--dao-khoa-bong);color:var(--dao-khoa-chu)}
 .dao .dao-so-chuong li[data-khoa] small{font-size:11px;line-height:1.3}
 .dao .dao-sao{display:flex;gap:2px;margin-top:auto}
-.dao .dao-sao svg{fill:rgba(255,255,255,.2)}.dao .dao-sao svg[data-sang]{fill:var(--dao-vang)}
+.dao .dao-sao svg{fill:var(--dao-sao-tat)}.dao .dao-sao svg[data-sang]{fill:var(--dao-sao-sang)}
 .dao .dao-so-thuong{display:flex;align-items:center;gap:12px;padding:14px 16px;opacity:.7}
-.dao .dao-so-thuong>span{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;background:rgba(255,209,102,.2);color:var(--dao-vang)}
+.dao .dao-so-thuong>span{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;background:var(--dao-thuong-nen);color:var(--dao-vang-so)}
 .dao .dao-so-thuong strong{font-size:14px;font-weight:800}.dao .dao-so-thuong p{font-size:12px;color:var(--dao-chu-mo);margin-top:2px}
 
 @media(prefers-reduced-motion:reduce){
@@ -330,3 +342,44 @@
 .dao .dao-het-luot{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:18px;background:rgba(11,18,48,.4)}
 .dao .dao-het-luot p{margin:0;font-size:14px;font-weight:700;line-height:1.45;color:rgb(255,236,179)}
 
+/* ───── SÁNG / TỐI THEO MÁY — chỉ vỏ GAME HÓA 2.0 (`.dao-v2`: Sổ tay · Túi đồ · thanh dưới; thầy 28/09 "sáng tối theo hệ thống") ─────
+   Mặc định SÁNG (phong cách Sảnh 3D: trời hoàng hôn nhạt, kính trắng, chữ tối ≥ 4.5:1, nút vàng 3D); máy TỐI (hoặc ép `data-giao-dien='toi'`)
+   ⇒ trả đúng bộ đêm cũ. Vỏ 1.0 (`.dao` không có `.dao-v2`) giữ bộ đêm như trước. Hai khối tối GIỐNG HỆT nhau. */
+.dao.dao-v2{--dao-chu:rgb(24,30,62);--dao-chu-mo:rgb(62,72,108);--dao-chu-nhat:rgb(84,92,126);--dao-nhan:rgb(58,84,168);--dao-vang-so:rgb(150,76,0);
+ --dao-kinh:rgba(255,255,255,.78);--dao-kinh-vien:rgba(40,50,110,.14);--dao-do:rgb(160,20,60);--dao-loi-nen:rgba(214,40,96,.08);--dao-loi-vien:rgba(214,40,96,.4);
+ --dao-nen-anh:radial-gradient(90% 70% at 85% 0%,rgba(255,236,190,.9),transparent 60%),linear-gradient(180deg,rgb(255,226,200) 0%,rgb(255,241,228) 42%,rgb(222,242,250) 100%);--dao-sao-mo:0;
+ --dao-the-kinh:rgba(255,255,255,.78);--dao-the-kinh-bong:inset 0 0 0 1px rgba(255,255,255,.95),0 10px 28px rgba(70,40,120,.16),0 2px 6px rgba(70,40,120,.08);--dao-vach:rgba(40,50,110,.12);
+ --dao-nav-nen:rgb(255,255,255);--dao-nav-vach:rgba(40,50,110,.12);--dao-nav-bong:rgba(70,40,120,.12);--dao-nav-hien:rgba(255,196,46,.35);
+ --dao-ve-nen:rgb(255,255,255);--dao-ve-bong:inset 0 0 0 1px rgba(255,255,255,.95),0 10px 28px rgba(70,40,120,.16),0 2px 6px rgba(70,40,120,.08);
+ --dao-yeu-nen:linear-gradient(135deg,rgba(255,154,118,.32),rgba(255,255,255,.8));--dao-yeu-bong:inset 0 0 0 1px rgba(246,146,18,.45),0 10px 28px rgba(70,40,120,.16);--dao-yeu-chu:rgb(62,72,108);
+ --dao-o-bong:inset 0 0 0 1px rgba(255,255,255,.9),0 3px 8px rgba(70,40,120,.08);--dao-ngoc-chu:rgb(0,110,118);--dao-khoa-nen:rgba(255,255,255,.5);--dao-khoa-bong:inset 0 0 0 1px rgba(40,50,110,.1);--dao-khoa-chu:rgb(84,92,126);
+ --dao-sao-tat:rgba(40,50,110,.18);--dao-sao-sang:rgb(246,146,18);--dao-thuong-nen:rgba(255,196,46,.3);
+ --ng-kinh-bong:0 10px 28px rgba(70,40,120,.16),0 2px 6px rgba(70,40,120,.08);--ng-vang-nen:linear-gradient(180deg,rgb(255,224,110),rgb(255,192,44) 52%,rgb(244,148,16));--ng-vang-chu:rgb(66,32,0);
+ --ng-vang-bong:inset 0 2px 0 rgb(255,255,240),inset 0 -4px 0 rgba(214,120,0,.45),0 5px 0 rgb(186,98,6),0 12px 22px rgba(230,120,20,.3);
+ --ng-o-nen:rgba(255,255,255,.72);--ng-o-bong:inset 0 0 0 1px rgba(255,255,255,.95),0 4px 12px rgba(70,40,120,.1);--ng-kinh-mo:blur(14px) saturate(1.4);}
+@media (prefers-color-scheme:dark){
+ :root:not([data-giao-dien='sang']) .dao.dao-v2{--dao-chu:rgb(242,245,255);--dao-chu-mo:rgb(201,214,242);--dao-chu-nhat:rgb(159,178,217);--dao-nhan:rgb(168,199,250);--dao-vang-so:rgb(255,209,102);
+ --dao-kinh:rgba(255,255,255,.1);--dao-kinh-vien:rgba(255,255,255,.2);--dao-do:rgb(255,180,171);--dao-loi-nen:rgba(255,180,171,.14);--dao-loi-vien:rgba(255,180,171,.5);
+ --dao-nen-anh:radial-gradient(120% 60% at 50% 0%,var(--dao-nen-2) 0%,var(--dao-nen) 62%);--dao-sao-mo:.8;
+ --dao-the-kinh:rgba(255,255,255,.07);--dao-the-kinh-bong:inset 0 0 0 1px rgba(255,255,255,.13),0 10px 26px rgba(0,0,0,.28);--dao-vach:rgba(255,255,255,.14);
+ --dao-nav-nen:rgb(14,20,52);--dao-nav-vach:rgba(255,255,255,.16);--dao-nav-bong:rgba(0,0,0,.35);--dao-nav-hien:rgba(255,209,102,.18);
+ --dao-ve-nen:rgb(9,13,40);--dao-ve-bong:inset 0 0 0 1px rgba(255,255,255,.22),0 6px 16px rgba(0,0,0,.35);
+ --dao-yeu-nen:linear-gradient(135deg,rgba(255,154,118,.3),rgba(255,154,118,.08));--dao-yeu-bong:inset 0 0 0 1px rgba(255,154,118,.5);--dao-yeu-chu:rgb(255,208,189);
+ --dao-o-bong:inset 0 0 0 1px rgba(255,255,255,.16);--dao-ngoc-chu:rgb(127,233,255);--dao-khoa-nen:rgba(255,255,255,.05);--dao-khoa-bong:inset 0 0 0 1px rgba(255,255,255,.1);--dao-khoa-chu:rgb(128,140,180);
+ --dao-sao-tat:rgba(255,255,255,.2);--dao-sao-sang:rgb(255,209,102);--dao-thuong-nen:rgba(255,209,102,.2);
+ --ng-kinh-bong:0 10px 26px rgba(0,0,0,.28);--ng-vang-nen:linear-gradient(180deg,rgb(255,224,138) 0%,rgb(255,209,102) 42%,rgb(242,160,32) 100%);--ng-vang-chu:rgb(58,32,0);
+ --ng-vang-bong:0 10px 26px rgba(255,170,40,.42),inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(160,90,0,.35);
+ --ng-o-nen:rgba(255,255,255,.07);--ng-o-bong:inset 0 0 0 1px rgba(255,255,255,.16),0 4px 12px rgba(0,0,0,.2);--ng-kinh-mo:blur(0px);}
+}
+:root[data-giao-dien='toi'] .dao.dao-v2{--dao-chu:rgb(242,245,255);--dao-chu-mo:rgb(201,214,242);--dao-chu-nhat:rgb(159,178,217);--dao-nhan:rgb(168,199,250);--dao-vang-so:rgb(255,209,102);
+ --dao-kinh:rgba(255,255,255,.1);--dao-kinh-vien:rgba(255,255,255,.2);--dao-do:rgb(255,180,171);--dao-loi-nen:rgba(255,180,171,.14);--dao-loi-vien:rgba(255,180,171,.5);
+ --dao-nen-anh:radial-gradient(120% 60% at 50% 0%,var(--dao-nen-2) 0%,var(--dao-nen) 62%);--dao-sao-mo:.8;
+ --dao-the-kinh:rgba(255,255,255,.07);--dao-the-kinh-bong:inset 0 0 0 1px rgba(255,255,255,.13),0 10px 26px rgba(0,0,0,.28);--dao-vach:rgba(255,255,255,.14);
+ --dao-nav-nen:rgb(14,20,52);--dao-nav-vach:rgba(255,255,255,.16);--dao-nav-bong:rgba(0,0,0,.35);--dao-nav-hien:rgba(255,209,102,.18);
+ --dao-ve-nen:rgb(9,13,40);--dao-ve-bong:inset 0 0 0 1px rgba(255,255,255,.22),0 6px 16px rgba(0,0,0,.35);
+ --dao-yeu-nen:linear-gradient(135deg,rgba(255,154,118,.3),rgba(255,154,118,.08));--dao-yeu-bong:inset 0 0 0 1px rgba(255,154,118,.5);--dao-yeu-chu:rgb(255,208,189);
+ --dao-o-bong:inset 0 0 0 1px rgba(255,255,255,.16);--dao-ngoc-chu:rgb(127,233,255);--dao-khoa-nen:rgba(255,255,255,.05);--dao-khoa-bong:inset 0 0 0 1px rgba(255,255,255,.1);--dao-khoa-chu:rgb(128,140,180);
+ --dao-sao-tat:rgba(255,255,255,.2);--dao-sao-sang:rgb(255,209,102);--dao-thuong-nen:rgba(255,209,102,.2);
+ --ng-kinh-bong:0 10px 26px rgba(0,0,0,.28);--ng-vang-nen:linear-gradient(180deg,rgb(255,224,138) 0%,rgb(255,209,102) 42%,rgb(242,160,32) 100%);--ng-vang-chu:rgb(58,32,0);
+ --ng-vang-bong:0 10px 26px rgba(255,170,40,.42),inset 0 2px 0 rgba(255,255,255,.6),inset 0 -3px 0 rgba(160,90,0,.35);
+ --ng-o-nen:rgba(255,255,255,.07);--ng-o-bong:inset 0 0 0 1px rgba(255,255,255,.16),0 4px 12px rgba(0,0,0,.2);--ng-kinh-mo:blur(0px);}

@@ -109,7 +109,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const veBanDo=()=>{setPha('ban-do');setKetThuc(null);if(!luot)void chay(async()=>{await soanChuyen(sanh)})}
  const moRuong=()=>chay(async()=>{const r=await call('hoa2-ruong-mo') as DaoKetQua&{qua?:{vang?:unknown}};const v=Number(r.qua?.vang);setRuongVua(Number.isFinite(v)&&v>0?v:null);await napSanh().catch(()=>null)})
 
- const vo=(con:ReactNode,tham=false)=><div className={`dao dao-vo dao2${tham?' dao-vo-tham':''}`} data-thu={chiSoThu(profile.pet)} data-pha={pha} hidden={an||undefined}>{con}</div>
+ const vo=(con:ReactNode,tham=false)=><div className={`dao dao-vo dao-v2 dao2${tham?' dao-vo-tham':''}`} data-thu={chiSoThu(profile.pet)} data-pha={pha} hidden={an||undefined}>{con}</div>
  if(pha==='ai'&&luot)return vo(<TrongAi profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} busy={busy} loi={loi} maLoi={maLoi}
   onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onRoi={roi}/>,true)
  if(pha==='xong'&&ketThuc){const con=sanh?.dao?.con??null,coThem=con!==null&&con>0&&!sanh?.khoaDao,cd=sanh?.chienDich,hen=henOnCua(daLam,ketThuc.sai.map(s=>s.qid))
