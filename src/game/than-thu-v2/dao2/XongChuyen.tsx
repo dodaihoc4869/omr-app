@@ -2,6 +2,7 @@
 // Rương Bát Linh, nút "ĐI CHUYẾN k/n". Số ải đúng / EXP = máy chủ chấm; ô đất = `hoa2-sanh` trước/sau chuyến; ngày ôn lại = `hoa2-cau-da-lam`.
 import {chuNgay} from './dao2-core'
 import type {Ruong2} from './dao2-core'
+import NutToanManHinh from '../../../components/NutToanManHinh'
 import './dao2.css'
 
 /** Cụm lục giác: 7 ô nền (đất đã có) + tối đa 5 ô sáng (ô đất mới của chuyến này). */
@@ -39,6 +40,8 @@ export default function XongChuyen({soChuyen,conCau,tongKet,enemy,oMoi,coXat,aiS
     </g>
     <g className="dao2-sao-vang"><path d="M60 60 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z"/><path d="M330 90 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z"/><path d="M300 300 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z"/></g>
    </svg>
+   {/* Nút toàn màn hình (hoàn thiện bản vẽ 28/09): màn này không có thanh đầu ⇒ đặt ở góc trên phải của cảnh, không che nút nào. */}
+   <NutToanManHinh className="dao2-xong-ntm"/>
    <h2>{haQuai?'SƯƠNG MÙ ĐÃ TAN':'XONG CHUYẾN THÁM HIỂM'}</h2>
    <p>{soChuyen?`Chuyến thám hiểm ${k}/${n} · `:''}{haQuai?'đã hạ Quái Sương Mù':`Quái Sương Mù còn ${enemy}/100 máu`}</p>
    {anhThu&&<img className="dao2-xong-thu" src={anhThu} alt="" width="160" height="160" loading="lazy" decoding="async" draggable={false}/>}
