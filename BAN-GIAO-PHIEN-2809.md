@@ -67,3 +67,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 12:42 PR #27 deploy SUCCESS (bản sống có mọi thứ tới #27). PR #28 sáng/tối merge `c5e0ea4` (deploy đang chạy). Đang làm: nhánh `de-toi-da` — nút toàn màn hình vào thanh đầu, ô trợ giúp 1 dòng, vùng đề lớn nhất mọi màn game (không giảm cỡ chữ). CHỜ deploy #28 xong mới merge.
 - BẢN VẼ màn chiếu lên bảng mới: nhánh `ban-ve-len-bang` `dbb60c3`, link https://claude.ai/artifact/R4AeUhvavEGCWHKfqKfHxU — CHỜ THẦY CHỐT. Cần thêm API khi build: đọc lần làm theo em+câu; lưu đáp án em chọn (cột mới, chỉ-thêm); đúng/sai 14 ngày cho GV; 5 câu sai gần nhất; lịch sử lên bảng.
 - THẦY CHỐT build màn chiếu lên bảng (bảng chi tiết HIỆN TRÊN MÁY CHIẾU). Đang build: nhánh `build-len-bang` (tờ chiếu + API hồ sơ em chỉ-thêm + migration cột đáp án chọn nếu cần). Nhãn Đạt/Chưa đạt thẻ tên: viên thuốc 1 dòng.
+- PR #29 vùng đề/nút merge `2b22e57` 13:00 (deploy đang chạy, hẹn kiểm 13:14).
