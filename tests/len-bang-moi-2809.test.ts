@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { taoHtmlMayChieu, type OBang } from '../src/lib/html-may-chieu'
 import { CSS_LEN_BANG_MOI, thongKeHtml } from '../src/lib/len-bang-moi-to-chieu'
-import { thongKeLopCau } from '../src/lib/thong-ke-lop-cau'
+import { thongKeLopCau, thongKeTuSoGop } from '../src/lib/thong-ke-lop-cau'
 import { TIN_TO_CHIEU, kiemTinToChieu } from '../src/lib/to-chieu-cau-noi'
 
 const MA = 'phien2809'
@@ -170,6 +170,12 @@ describe('LUẬT 7 — thanh dưới, T, B, ?', () => {
     t.phim('Escape'); expect(t.doc.body.classList.contains('mc-co-but')).toBe(false)
     t.phim('?'); expect(t.doc.querySelector('.mc-phim')!.classList.contains('mc-mo')).toBe(true)
   })
+  it('(hoàn thiện bản vẽ 28/09) đợt KHÔNG có số liệu lớp ⇒ không có dải; bấm T ⇒ báo "Chưa có số liệu lớp"', () => {
+    const t = moTo([o('A', 'An')])
+    expect(t.doc.querySelector('.mc-tk')).toBeNull()
+    t.phim('t')
+    expect(t.doc.querySelector('.mc-bao')!.textContent).toContain('Chưa có số liệu lớp')
+  })
 })
 
 describe('D/K + nhãn trên thẻ tên + bảng chi tiết em (cầu nối)', () => {
@@ -208,6 +214,7 @@ describe('D/K + nhãn trên thẻ tên + bảng chi tiết em (cầu nối)', ()
       lenBang: [{ qid: 'DE-II-17', dat: true, luc: '2026-09-27T12:00:00Z' }],
       caGanNhat: { diem: 7.75, tenCa: 'Kiểm tra tuần 38', luc: '2026-09-26T10:00:00Z', diemTruoc: 7.25 },
       chienDich: { ten: 'Ôn Este', hanNop: '2026-10-05', coXat: 0.8, thanhThao: 0.5, nhip: 'vuot', soNgayTre: 0 },
+      tienDoCap: { cap: 7, exp: 130, moc: 520, toiDa: false },
     } })
     const txt = ct.textContent!
     expect(ct.querySelector('.mc-cau-nay')).toBeTruthy()
@@ -223,6 +230,11 @@ describe('D/K + nhãn trên thẻ tên + bảng chi tiết em (cầu nối)', ()
     expect(txt).toContain('Câu 12 · Phần I')
     expect(txt).toContain('7,75')
     expect(txt).toContain('Lớp 12A1')
+    // hoàn thiện bản vẽ 28/09: thanh tiến độ EXP (cấp · EXP hiện có / mốc cấp sau) từ `tienDoCap`
+    const exp = ct.querySelector('.mc-exp-cap')!
+    expect(exp.textContent).toContain('Cấp 7')
+    expect(exp.textContent).toContain('130 / 520 EXP · lên cấp 8')
+    expect((exp.querySelector('.mc-exp-ray i') as HTMLElement).style.width).toBe('25%')
     t.phim('Escape')
     expect(ct.classList.contains('mc-mo')).toBe(false)
   })
@@ -253,6 +265,15 @@ describe('thống kê lớp (phím T) — số gộp, không tên em', () => {
     expect(thongKeLopCau('III', [{ dung: true, chon: '5,84' }, { dung: false, chon: '5,04' }, { dung: false, chon: '5,04' }, { dung: false, chon: '7,2' }]))
       .toEqual({ kieu: 'so', bai: 4, dung: 25, saiHay: [{ dap: '5,04', tiLe: 50 }, { dap: '7,2', tiLe: 25 }] })
     expect(thongKeLopCau('I', [])).toBeNull()
-    expect(thongKeHtml(null)).toContain('Chưa có bài làm')
+    // buổi chữa KHÔNG từ ca: số GỘP từ sổ su_kien_hoc (máy chủ /gv/thong-ke-lop-cau) — không tên em
+    expect(thongKeTuSoGop('I', { bai: 4, dung: 2, coChon: 4, chon: { B: 2, A: 2 }, chonSai: { A: 2 } }, 'B')).toEqual({ kieu: 'pa', bai: 4, dung: 'B', tiLe: { A: 50, B: 50, C: 0, D: 0 } })
+    // thiếu đáp án chọn của một số em ⇒ KHÔNG bịa % phương án, lùi về "Đúng x%"
+    expect(thongKeTuSoGop('I', { bai: 4, dung: 1, coChon: 2, chon: { A: 2 }, chonSai: { A: 2 } }, 'B')).toEqual({ kieu: 'so', bai: 4, dung: 25, saiHay: [{ dap: 'A', tiLe: 50 }] })
+    expect(thongKeTuSoGop('II', { bai: 2, dung: 0, coChon: 2, chon: { DSSD: 1, DDSS: 1 }, chonSai: {} }, 'DSSD')).toEqual({ kieu: 'y', bai: 2, tiLe: { a: 100, b: 50, c: 100, d: 50 } })
+    expect(thongKeTuSoGop('III', { bai: 2, dung: 1, coChon: 2, chon: { '5,84': 1, '5,04': 1 }, chonSai: { '5,04': 1 } })).toEqual({ kieu: 'so', bai: 2, dung: 50, saiHay: [{ dap: '5,04', tiLe: 50 }] })
+    expect(thongKeTuSoGop('I', undefined)).toBeNull()
+    expect(thongKeTuSoGop('I', { bai: 0, dung: 0, coChon: 0, chon: {}, chonSai: {} })).toBeNull()
+    // SỬA CÓ CHỦ Ý (hoàn thiện bản vẽ 28/09): không có số ⇒ KHÔNG vẽ dải (tờ báo "Chưa có số liệu lớp" khi bấm T)
+    expect(thongKeHtml(null)).toBe('')
   })
 })

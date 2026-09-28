@@ -254,48 +254,29 @@ const cauTrang = (html: string) => {
   }))
 }
 
-describe('tờ chiếu chỉ ghép đôi hai câu cùng bậc 1', () => {
-  it('câu bậc ≥ 2 đứng MỘT MÌNH (2/3 bảng) dù văn bản ngắn; hai câu bậc 1 ghép đôi', () => {
+// SỬA CÓ CHỦ Ý 28/09 (bản vẽ Lên bảng): BỎ ĐỢT ĐÔI. Trước đây tờ ghép đôi hai câu cùng bậc 1 (kéo câu lên trong cửa sổ 6 câu);
+// nay MỖI ĐỢT MỘT CÂU MỘT EM (2/3 đề + 1/3 cột em), đúng thứ tự thầy xếp, bất kể bậc ước lượng.
+describe('tờ chiếu: mỗi đợt MỘT câu MỘT em (bỏ đợt đôi)', () => {
+  it('bậc nào cũng đứng một mình, đúng thứ tự, không kéo câu lên', () => {
     const t = cauTrang(taoHtmlMayChieu([ob('A', 1), ob('B', 2), ob('C', 1), ob('D', 4)]))
     expect(t).toEqual([
-      { don: false, em: ['Em A', 'Em C'] }, // A kéo C lên ghép đôi (bỏ qua B bậc 2)
+      { don: true, em: ['Em A'] },
       { don: true, em: ['Em B'] },
+      { don: true, em: ['Em C'] },
       { don: true, em: ['Em D'] },
     ])
   }, 60000)
 
-  it('câu bậc 1 lẻ không có bạn ⇒ nửa bảng bỏ trống, không bịa em', () => {
-    const t = cauTrang(taoHtmlMayChieu([ob('A', 1), ob('B', 3)]))
-    expect(t).toEqual([{ don: false, em: ['Em A'] }, { don: true, em: ['Em B'] }])
-    expect(taoHtmlMayChieu([ob('A', 1), ob('B', 3)])).toContain('Đợt này chỉ gọi một em')
+  it('không có bậc ước lượng / câu ngắn ⇒ vẫn mỗi đợt một em; không còn nửa bảng bỏ trống', () => {
+    const html = taoHtmlMayChieu([ob('A'), ob('B'), ob('C')])
+    expect(cauTrang(html)).toEqual([{ don: true, em: ['Em A'] }, { don: true, em: ['Em B'] }, { don: true, em: ['Em C'] }])
+    expect(html).not.toContain('Đợt này chỉ gọi một em')
   })
 
-  it('tìm bạn ghép trong vài câu kế tiếp, không kéo từ quá xa', () => {
-    const xa = [ob('A', 1), ...Array.from({ length: 8 }, (_, i) => ob(`L${i}`, 2)), ob('Z', 1)]
-    const t = cauTrang(taoHtmlMayChieu(xa))
-    expect(t[0]).toEqual({ don: false, em: ['Em A'] }) // Z ở xa quá cửa sổ ⇒ A đứng lẻ
-    expect(t[t.length - 1]).toEqual({ don: false, em: ['Em Z'] })
-    const gan = cauTrang(taoHtmlMayChieu([ob('A', 1), ob('L1', 2), ob('L2', 2), ob('Z', 1)]))
-    expect(gan[0]).toEqual({ don: false, em: ['Em A', 'Em Z'] })
-  })
-
-  it('KHÔNG có bậc ước lượng ⇒ y hệt cách cũ (đoán `laCauDai`, ghép liền kề)', () => {
-    const cu = cauTrang(taoHtmlMayChieu([ob('A'), ob('B'), ob('C'), ob('D')]))
-    expect(cu).toEqual([{ don: false, em: ['Em A', 'Em B'] }, { don: false, em: ['Em C', 'Em D'] }])
-    const dai = cauTrang(taoHtmlMayChieu([ob('A', undefined, 'dòng '.repeat(80)), ob('B'), ob('C')]))
-    expect(dai[0]).toEqual({ don: true, em: ['Em A'] })
-  })
-
-  it('bậc thiếu ở MỘT SỐ câu ⇒ câu ấy lùi về đoán `laCauDai`, câu có bậc dùng bậc', () => {
-    const t = cauTrang(taoHtmlMayChieu([ob('A', 1), ob('B'), ob('C', 2)]))
-    expect(t[0]).toEqual({ don: false, em: ['Em A', 'Em B'] })
-    expect(t[1]).toEqual({ don: true, em: ['Em C'] })
-  })
-
-  it('mọi em xuất hiện ĐÚNG MỘT LẦN, không mất, không thừa (kể cả sau khi kéo ghép)', () => {
+  it('mọi em xuất hiện ĐÚNG MỘT LẦN, không mất, không thừa', () => {
     const ds = Array.from({ length: 23 }, (_, i) => ob(`E${i}`, ([1, 2, 1, 3, 1, 1, 5][i % 7]) as 1 | 2 | 3 | 5))
     const em = cauTrang(taoHtmlMayChieu(ds)).flatMap((d) => d.em)
-    expect(em.sort()).toEqual(ds.map((o) => o.hoTen).sort())
+    expect(em).toEqual(ds.map((o) => o.hoTen))
   })
 })
 
@@ -337,7 +318,7 @@ describe('màn giáo viên nối ước lượng bậc vào Engine E và vào t�
     expect(nguon).toContain('bacUoc: goc ? uocLuongBacCauGoc(goc.phan, goc.q).bac : undefined')
   })
 
-  it('ô đưa sang tờ chiếu mang `bacUoc` (đợt đôi chỉ ghép hai câu cùng bậc 1) cho cả câu dạy học lẫn câu luyện', () => {
+  it('ô đưa sang tờ chiếu mang `bacUoc` (ước lượng thời gian buổi; tờ không ghép đôi nữa từ 28/09) cho cả câu dạy học lẫn câu luyện', () => {
     expect(nguon).toContain('bacUoc: (day ? uocLuongBacCauGoc(day.phan, day.q) : uocLuongBacCau(cauHopLe)).bac')
   })
 })

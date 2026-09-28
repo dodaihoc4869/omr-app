@@ -25,7 +25,7 @@ const moHoSoEm = vi.fn()
 let sbdDangXem = ''
 
 vi.mock('../src/store/appStore', () => ({
-  useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ sbdDangXem, moHoSoEm, showToast: vi.fn(), setScreen: vi.fn() }),
+  useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ sbdDangXem, moHoSoEm, showToast: vi.fn(), setScreen: vi.fn(), moChiTietCa: vi.fn() }),
 }))
 vi.mock('../src/lib/exam-db', () => ({ loadScriptUrl: async () => 'https://x', loadTeacherSecret: async () => 'mat' }))
 vi.mock('../src/lib/exam-api', async (goc) => ({

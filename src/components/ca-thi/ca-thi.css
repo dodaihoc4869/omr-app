@@ -371,11 +371,13 @@
   flex: 1;
 }
 .ct-de-chon b {
-  display: block;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   font-size: 15.5px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .ct-pha {
   display: flex;
@@ -1425,4 +1427,173 @@ table.ct-bang {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* ===== CA ĐÃ MỞ (CaDaMo.tsx — thầy 28/09: màn ngay sau khi mở ca theo phong cách app mới) ===== */
+.ct-cdm {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px clamp(12px, 3vw, 32px) 96px;
+  gap: 16px;
+}
+.ct-cdm-the {
+  border-radius: 28px;
+  overflow: hidden;
+  background: var(--gvm-mat);
+  box-shadow: var(--ct-bong);
+  min-width: 0;
+}
+.ct-cdm-dau {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, var(--gvm-xl), var(--gvm-xd));
+  color: var(--gvm-tren-dac);
+}
+.ct-cdm-dau-bt {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--gvm-tren-dac) 22%, transparent);
+}
+.ct-cdm-dau-chu {
+  min-width: 0;
+}
+.ct-cdm-dau .nho {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.92;
+}
+.ct-cdm-dau h2 {
+  margin-top: 2px;
+  font-size: clamp(18px, 2.4vw, 22px);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.ct-cdm-ma {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 22px 20px 6px;
+  text-align: center;
+}
+.ct-cdm-ma .nhan {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gvm-chu-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.ct-cdm-so {
+  font-size: clamp(44px, 12vw, 72px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  margin-right: -0.16em; /* bù khoảng chữ cuối để số đứng giữa */
+  color: var(--gvm-xd-dam);
+}
+.ct-cdm-link {
+  padding: 16px 22px 4px;
+  min-width: 0;
+}
+.ct-cdm-link .ct-link {
+  margin-top: 10px;
+  background: var(--gvm-mat-2);
+  flex-wrap: nowrap;
+}
+.ct-cdm-link .ct-link .ct-nut {
+  flex: none;
+}
+.ct-cdm-nut {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 16px 22px 22px;
+}
+.ct-cdm-nut .ct-nut {
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+}
+@media (max-width: 480px) {
+  .ct-cdm-nut {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .ct-cdm-nut .ct-nut-chinh {
+    order: -1;
+  }
+}
+.ct-cdm-tt {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  padding: 16px;
+}
+.ct-cdm-o {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--c-nen);
+  min-width: 0;
+}
+.ct-cdm-o span {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--c-dam);
+}
+.ct-cdm-o b {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--gvm-chu);
+  overflow-wrap: anywhere;
+}
+.ct-cdm-khac {
+  align-self: center;
+}
+
+/* ===== MỞ CA — KHÔNG TRÀN NGANG (thầy 28/09: "trong cấu hình mở ca thi nhiều nút bị tràn màn hình") =====
+ * Hàng chip theo luật thẻ lọc chung (src/styles/the-loc.css): điện thoại MỘT hàng cuộn ngang trong hàng; ≥ 768 px xuống dòng gọn.
+ * Nút chữ dài trong các bước (vd "Mức rời màn · mật khẩu ca…") được xuống dòng, không vượt mép. */
+.ct-moca .ct-chip {
+  flex: none;
+  white-space: nowrap;
+}
+@media (max-width: 767px) {
+  .ct-moca .ct-hang-chip {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    padding: 4px 0;
+    margin: -4px 0;
+  }
+  .ct-moca .ct-hang-chip::-webkit-scrollbar {
+    display: none;
+  }
+}
+.ct-moca .ct-nut {
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.3;
+  padding-block: 8px;
+}
+.ct-moca .ct-luat {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+/* nút Mở ca khi đang gửi: GIỮ chữ, chỉ mờ đi (thầy 28/09) — không đổi độ rộng */
+.ct-nut[aria-busy='true'] {
+  opacity: 0.55;
+  cursor: progress;
 }

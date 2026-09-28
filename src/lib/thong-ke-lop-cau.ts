@@ -34,3 +34,28 @@ export function thongKeLopCau(phan: string, ds: readonly { dung: boolean; chon?:
   return { kieu: 'so', bai, dung: pt(ds.filter((x) => x.dung).length), saiHay }
 }
 
+
+/** Chỉ số GỘP một câu từ máy chủ (`/gv/thong-ke-lop-cau`, sổ su_kien_hoc — buổi chữa KHÔNG từ ca). Không tên em. */
+export interface SoGopCauLop {
+  bai: number
+  dung: number
+  coChon: number
+  chon: Record<string, number>
+  chonSai: Record<string, number>
+}
+
+/** Dựng thống kê dải T từ số gộp. Phần I/II cần ĐỦ đáp án chọn của mọi em mới vẽ % từng phương án / từng ý; thiếu thì lùi về
+ * "Đúng x% · sai hay gặp" (không bịa phần trăm). Không em nào làm ⇒ `null` (tờ ẩn dải, báo "chưa có số liệu lớp"). */
+export function thongKeTuSoGop(phan: string, g: SoGopCauLop | null | undefined, dapAnDung = ''): ThongKeLopCau | null {
+  if (!g || !(g.bai > 0)) return null
+  const pt = (n: number) => Math.round((n / g.bai) * 100)
+  const du = g.coChon === g.bai
+  if ((phan === 'I' || phan === 'II') && du && (phan === 'I' || dapAnDung)) {
+    const ds = Object.entries(g.chon).flatMap(([chon, n]) => Array.from({ length: n }, () => ({ dung: false, chon, dapAnDung })))
+    const t = thongKeLopCau(phan, ds)
+    if (t && t.kieu === 'pa') return { ...t, dung: String(dapAnDung).trim().toUpperCase() }
+    return t
+  }
+  const saiHay = Object.entries(g.chonSai ?? {}).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([dap, n]) => ({ dap, tiLe: pt(n) }))
+  return { kieu: 'so', bai: g.bai, dung: pt(g.dung), saiHay }
+}

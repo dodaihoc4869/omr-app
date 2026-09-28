@@ -278,11 +278,10 @@ describe('màn gọi tên khi bấm Lên bảng (bản vẽ 28/09)', () => {
   it('có thần thú ⇒ bấm nút hiện màn gọi tên: mỗi em một cụm — thú ảnh thật, "Mời em lên bảng", tên lớn, lần lên bảng; pha "goi"', () => {
     const t = moTo(HAI_EM()); t.doc.getElementById('mc-len-bang')!.click()
     const cum = [...t.doc.querySelectorAll('.mc-goi .mc-g-cum')]
-    expect(cum).toHaveLength(2)
+    expect(cum).toHaveLength(1) // sửa có chủ ý 28/09: bỏ đợt đôi ⇒ mỗi đợt MỘT em ⇒ một cụm gọi tên
     expect(cum[0].querySelector('.mc-g-tg')!.textContent).toBe('Mời em lên bảng')
     expect(cum[0].querySelector('.mc-g-tl')!.textContent).toBe('Nguyễn Văn Minh')
     expect(cum[0].querySelector('.mc-g-tp')!.textContent).toBe('lần lên bảng thứ 3')
-    expect(cum[1].querySelector('.mc-g-tp')!.textContent).toBe('lần lên bảng thứ 1')
     expect(cum[0].querySelector<HTMLImageElement>('img.mc-g-thu')!.src).toBe('https://x/pet.png')
     expect(t.doc.querySelectorAll('.mc-goi .mc-g-hat')).toHaveLength(30)
     expect(t.doc.querySelectorAll('.mc-goi .mc-g-vong')).toHaveLength(2)
@@ -330,7 +329,7 @@ describe('màn gọi tên khi bấm Lên bảng (bản vẽ 28/09)', () => {
 
   it('em chưa có thần thú ⇒ vẫn gọi tên (tên lớn), chỉ không có ảnh thú', () => {
     const t = moTo([o('A', 'An'), o('B', 'Bình')]); t.doc.getElementById('mc-len-bang')!.click()
-    expect(t.doc.querySelectorAll('.mc-goi .mc-g-cum')).toHaveLength(2)
+    expect(t.doc.querySelectorAll('.mc-goi .mc-g-cum')).toHaveLength(1) // mỗi đợt một em (28/09)
     expect(t.doc.querySelector('.mc-goi img')).toBeNull()
     expect(t.doc.querySelector('.mc-goi .mc-g-tl')!.textContent).toBe('An')
   })
@@ -340,7 +339,8 @@ describe('màn gọi tên khi bấm Lên bảng (bản vẽ 28/09)', () => {
     const t = moTo(dsO); t.doc.getElementById('mc-len-bang')!.click()
     t.doc.getElementById('mc-sau')!.click(); expect(t.doc.querySelector('.mc-goi')).toBeNull(); expect(t.pha()).toBe('cho'); t.doc.getElementById('mc-len-bang')!.click()
     expect(t.doc.querySelectorAll('.mc-goi')).toHaveLength(1)
-    expect([...t.doc.querySelectorAll('.mc-goi .mc-g-tl')].map((x) => x.textContent)).toEqual(['Cường', 'Dung'])
+    // mỗi đợt một em (bỏ đợt đôi 28/09) ⇒ đợt 2 là em thứ hai
+    expect([...t.doc.querySelectorAll('.mc-goi .mc-g-tl')].map((x) => x.textContent)).toEqual(['Trần Thu Hà'])
   })
 })
 
@@ -356,7 +356,7 @@ describe('thanh dưới gọi thủ công, không còn đồng hồ',()=>{
     expect(t.pha()).toBe('chua')
     t.dat(7200);t.nhip()
     expect(t.pha()).toBe('chua')
-    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 1/2')
+    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 1/4') // bốn em ⇒ bốn đợt (bỏ đợt đôi 28/09)
     t.doc.getElementById('mc-sau')!.click()
     expect(t.pha()).toBe('cho')
     expect((t.doc.getElementById('mc-len-bang') as HTMLButtonElement).disabled).toBe(false)

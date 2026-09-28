@@ -116,6 +116,12 @@ export async function congBoDiemCa(maCa: string): Promise<string> {
   return r.ok ? '' : r.chu
 }
 
+/** ĐÓNG CỬA VÀO (bản vẽ ca thi 28/09, màn b): máy chủ đặt hạn vào phòng = bây giờ cho ca đang mở. Rỗng = xong; chuỗi = lỗi để hiện. */
+export async function dongCuaVaoCa(maCa: string): Promise<string> {
+  const r = await goiLenh('/gv/dong-cua-vao', { maCa }, 'Máy chủ chưa có lệnh Đóng cửa vào — cần đẩy bản máy chủ mới.')
+  return r.ok ? '' : r.chu
+}
+
 /** Nhận xét đã lưu của thầy (đọc kèm `/gv/bao-cao-ca-em`). */
 export async function layNhanXetEm(maCa: string, sbd: string): Promise<string | null> {
   const r = await goiLenh('/gv/bao-cao-ca-em', { maCa, sbd }, '')

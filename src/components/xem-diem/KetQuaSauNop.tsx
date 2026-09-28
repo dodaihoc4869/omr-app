@@ -44,6 +44,8 @@ export interface KetQuaSauNopProps {
   soDaLam?: number | null
   tongCau?: number
   lam2?: string | null
+  /** (ca thi 28/09, màn e) EXP em nhận từ ca — CHỈ khi đã công bố (máy chủ chỉ trả sau công bố). null/0 ⇒ ẩn. */
+  expCa?: number | null
 }
 
 export default function KetQuaSauNop(p: KetQuaSauNopProps) {
@@ -59,7 +61,7 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
         </p>
         {coDiem ? (
           <>
-            <KetQuaSoLon diem={p.diem!} dung={p.dung!} tong={p.tong!} lam={p.lam} de={p.de} ss={p.ss} truoc={p.truoc} />
+            <KetQuaSoLon diem={p.diem!} dung={p.dung!} tong={p.tong!} lam={p.lam} de={p.de} ss={p.ss} truoc={p.truoc} exp={p.expCa} />
             {p.phan!.length > 0 && (
               <section className="xd-muc" aria-labelledby="xd-h-3p">
                 <div className="xd-muc__dau">

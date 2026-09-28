@@ -58,9 +58,11 @@ describe('cuaVaoCa — ba trạng thái, không lẫn nhau', () => {
 })
 
 describe('màn Chi tiết ca dựng đúng hai nút', () => {
-  it('có nút MỞ CA và nút KHOÁ CA, mỗi nút một nhãn trợ năng riêng', () => {
+  // SỬA CÓ CHỦ Ý 28/09 (bản vẽ ca thi): nút "Khoá ca" cũ trùng với "Kết thúc ca ngay" ⇒ gỡ; Kết thúc ca (cùng lệnh khoaCa) nằm ở Việc nhanh của TheoDoiCa.
+  it('có nút MỞ CA; nút KHOÁ CA cũ đã gỡ (chỉ còn một nút Kết thúc ca ở Việc nhanh)', () => {
     expect(maChiTietCa).toContain('aria-label="Mở ca cho em vào"')
-    expect(maChiTietCa).toContain('aria-label="Khoá ca"')
+    expect(maChiTietCa).not.toContain('aria-label="Khoá ca"')
+    expect(maChiTietCa).toContain('onKetThuc={() => {')
     expect(maChiTietCa).toContain('MỞ CA')
     expect(maChiTietCa).toContain('KHOÁ CA')
   })
