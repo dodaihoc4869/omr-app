@@ -22,6 +22,7 @@ import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
 import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-nay-v2'
 import {gvLichSuCauCuaEm} from './gv-lich-su-cau'
 import {gvBaoCaoCa,gvBaoCaoCaEm} from './bao-cao-ca'
+import { phBaoCaoCa, phHoc2, phLoiThay } from './ph-bao-cao-moi'
 import {gvCongBoCa,gvDongCuaVao,gvNhanXetCaEm} from './ca-thi-them'
 import {gvBangTinSong} from './gv-bang-tin-song'
 import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
@@ -3220,6 +3221,10 @@ const boXuLy = {
       // "Mọi thứ về con" (Code 4, đã soát): ĐỌC-CHỈ, token hoặc SBD trần; chi tiết một câu (lời giải) cùng luật che.
       if (p === '/ph/tat-ca-ve-con') return ra(await phTatCaVeCon(env, b, Date.now(), envDoc, ctx))
       if (p === '/ph/chi-tiet-cau-ve-con') return ra(await phChiTietCauVeCon(env, b, Date.now(), envDoc, ctx))
+      // APP PHỤ HUYNH MỚI 28/09 (chỉ xem báo cáo, không giao bài): báo cáo một ca + nhận xét thầy, lời thầy các ca, Game Hoá 2.0 của con — ĐỌC-CHỈ, cùng xác thực.
+      if (p === '/ph/bao-cao-ca') return ra(await phBaoCaoCa(env, b, Date.now(), envDoc, ctx))
+      if (p === '/ph/loi-thay') return ra(await phLoiThay(env, b, Date.now(), envDoc, ctx))
+      if (p === '/ph/hoc-2') return ra(await phHoc2(env, b, Date.now(), envDoc, ctx))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
