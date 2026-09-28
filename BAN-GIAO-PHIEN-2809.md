@@ -45,3 +45,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - `build-gv-khung` XONG: `7175290` (đã đẩy). build:cf 13/13 (precache 2982/3000 KB — sát trần!). Sửa ngoài làn: `appStore.ts` (+2 ScreenId), `vite.config.ts` globIgnores. Còn: "Mã dạng" vẫn ở Kho đề; chưa đưa "Gọi lên bảng cách cũ" vào Cài đặt; chữ `KhoiBaiLuyen.tsx` chưa sửa — làm khi gộp (có thể xung đột với `build-gv-chien-dich`).
 - `build-gv-chien-dich` XONG: `71fba26` (đã đẩy). Máy chủ `srs2-gv.ts` thêm trường (chỉ thêm) — Worker CHƯA đẩy (CI tự đẩy khi merge main). vitest 132/132, build:cf 13/13.
 - BƯỚC TIẾP: gộp 5 nhánh vào `gop-ngang-gv-2809` (từ origin/main) → sửa việc tồn → test → PR → merge.
+- THẦY ĐÃ CHỐT Sảnh 3D tươi sáng (bản vẽ `9cc4be1`). Đang build ở nhánh `sanh-3d` (tách từ `gop-ngang-gv-2809` @ `d25724e`). Nhánh gộp 5 phần: `gop-ngang-gv-2809` (đã đẩy), đang chạy toàn bộ vitest so nền main.
+- Kế hoạch phát hành: gộp `sanh-3d` vào `gop-ngang-gv-2809` → test → PR vào main → merge (một lượt phát hành).
