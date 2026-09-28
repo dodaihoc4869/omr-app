@@ -6,7 +6,7 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BANG_NHIP_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
+import { BANG_NHIP_THAY, NHIP_PHONG_CHO_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
 import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
@@ -44,6 +44,7 @@ import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 // CA THI 28/09 (docs/ban-ve-ca-thi-2809): đầu màn Theo dõi, màn Kết thúc ca, Báo cáo chi tiết — THAY khối gập BaoCaoCaLop + trang BaoCaoMotEm cũ.
 import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
+import PhongChoCa from '../components/ca-thi/PhongChoCa'
 import KetThucCa from '../components/ca-thi/KetThucCa'
 import BaoCaoChiTiet from '../components/ca-thi/BaoCaoChiTiet'
 import { congBoDiemCa, dongCuaVaoCa, layBaoCaoCaDayDu, type ThemBaoCaoCa } from '../lib/bao-cao-chi-tiet'
@@ -271,7 +272,6 @@ export default function ExamMonitorScreen() {
   // tới khi thầy bấm Bắt đầu thi ngay tại đây.
   const [dangBatDau, setDangBatDau] = useState(false)
   const [gioChungTheoCa, setGioChungTheoCa] = useState<Record<string, boolean>>({})
-  const [hoiHuy, setHoiHuy] = useState(false)
   // Đã ghi điểm lên Sheet cho lượt nào (khoá `${sbd}:${lanThu}:${nopLuc}`) — không ghi lặp mỗi lần tải lại.
   const daGhiRef = useRef<Set<string>>(new Set())
   /** Ca nào đã vá khoá `key/<maCa>.json` rồi — vá một lần là đủ. */
@@ -670,6 +670,11 @@ export default function ExamMonitorScreen() {
   const conDangLam = !!chiTiet && chiTiet.luot.some((l) => l.trangThai === 'dang_lam')
   const maCaTheoDoiNen = chiTiet?.ca.maCa
   useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), BANG_NHIP_THAY.theoDoiCa, conDangLam, TUY_CHON_NHIP_THAY.theoDoiCa)
+  // PHÒNG CHỜ (thầy 28/09: "tự đồng bộ hs vào phòng chờ sau 5 giây"): ca chưa bấm Bắt đầu thi ⇒ tải lại chi tiết ca 5 s/lần QUA NHỊP CHUNG (tab ẩn dừng,
+  // không chồng, lỗi lùi 30 → 40 s, hụt liền ⇒ DongMatKetNoiCa + chấm "mất kết nối" ở khối). Màn Chiếu mã đang mở thì nó tự hỏi 5 s ⇒ vòng này nghỉ, không gọi trùng.
+  // (Chưa bấm Bắt đầu thì chưa em nào đang làm ⇒ vòng 20 s ở trên không chạy cùng lúc.)
+  const dangPhongCho = !!chiTiet?.ca.phongCho && !chiTiet?.ca.batDauThiLuc
+  useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), NHIP_PHONG_CHO_THAY, dangPhongCho && !chieuMa, TUY_CHON_NHIP_THAY.phongCho)
 
   const handleChoThiLai = async (sbd: string) => {
     if (!chiTiet) return
@@ -1014,7 +1019,6 @@ export default function ExamMonitorScreen() {
     try {
       await xoaCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, chiTiet.ca.maCa)
       showToast('Đã huỷ ca. Em đang chờ sẽ thấy báo ca đã huỷ.', 'success')
-      setHoiHuy(false)
       setScreen('lichsuca')
     } catch (e) {
       showToast(`Không huỷ được ca: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
@@ -1355,6 +1359,28 @@ export default function ExamMonitorScreen() {
           )}
           <div className="ca-luoi">
           <div className="ca-cot ca-cot-phai">
+          {/* PHÒNG CHỜ (thầy chốt 07/09; làm lại 28/09 theo M3 — src/components/ca-thi/PhongChoCa.tsx). Ca bật phòng chờ mà thầy chưa bấm
+              bắt đầu thì em đang đứng ở màn chờ — việc gấp nhất trên màn này, nên đứng đầu cột. Hai nút như thầy chốt: Bắt đầu thi và Huỷ ca kiểm tra.
+              Danh sách em tự làm mới 5 giây (cùng lệnh chiTietCa của Chiếu mã); màn Chiếu mã đang mở thì nghỉ để không gọi trùng. */}
+          {chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && (
+            <PhongChoCa
+              maCa={chiTiet.ca.maCa}
+              em={gopEmDaVao(chiTiet.dsCho, [])}
+              siSo={Array.isArray(chiTiet.ca.danhSachMoi) ? chiTiet.ca.danhSachMoi.length : null}
+              onCauSai={caCanDeRieng}
+              coDongBoGio={chiTiet.ca.loai !== 'baitap'}
+              dongBoGio={gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false}
+              onDoiDongBoGio={(bat) => setGioChungTheoCa((c) => ({ ...c, [chiTiet.ca.maCa]: bat }))}
+              dangBatDau={dangBatDau}
+              onBatDau={() => void batDauCaNay()}
+              dangHuy={dangXoa}
+              onHuy={() => void huyCaCho()}
+              noiKhoiPhuc={hoa2 ? 'Ca vào Ca kiểm tra › Ca đã xoá, khôi phục lại được.' : 'Ca vào Lịch sử ca, khôi phục lại được.'}
+              onChieuMa={() => setChieuMa(true)}
+              tuCapNhat
+              matKetNoi={soHut > 0}
+            />
+          )}
           <KhoiThoiGianCa
             ca={chiTiet.ca}
             themPhut={{
@@ -1369,76 +1395,6 @@ export default function ExamMonitorScreen() {
           {/* THÔNG TIN CA */}
           <TheNoiDung className="gv-monitor-overview">
             <DongMatKetNoiCa soHut={soHut} gioTotMs={gioTot} />
-            {/* PHÒNG CHỜ (thầy chốt 07/09). Ca bật phòng chờ mà thầy chưa bấm
-                bắt đầu thì em đang đứng ở màn trắng — đây là việc gấp nhất
-                trên màn này, nên nó đứng trên cả cửa vào ca.
-                Hai nút đúng như thầy chốt: Bắt đầu thi và Huỷ ca kiểm tra (đổi chữ 21/09). */}
-            {chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && (
-              <div style={{ marginTop: 'var(--k3)', background: 'var(--tim-nen)', borderRadius: 'var(--bo-2)', padding: 'var(--k4)' }}>
-                <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-                  Ca đang ở phòng chờ
-                </div>
-                <div style={{ ...NHAN_NHO, marginTop: 'var(--k1)' }}>
-                  Em vào ca đang thấy màn chờ, chưa nhận đề và đồng hồ chưa chạy. Bấm Bắt đầu thi thì cả lớp hiện đề cùng một lúc.
-                </div>
-                {/* AI ĐANG CÓ MẶT. Với ca đề riêng, đây chính là danh sách máy
-                    rút bộ câu cho — thầy phải nhìn thấy trước khi bấm, không
-                    phải bấm rồi mới biết ai có phần. */}
-                <div style={{ ...NHAN_NHO, ...SO, marginTop: 'var(--k2)', color: 'var(--muc)' }}>
-                  <b>{(chiTiet.dsCho ?? []).length}</b> em đang chờ
-                  {(chiTiet.dsCho ?? []).length > 0 ? `: ${(chiTiet.dsCho ?? []).map((x) => x.hoTen || `SBD ${x.sbd}`).join(' · ')}` : ' — chưa em nào vào.'}
-                </div>
-                {caCanDeRieng && (
-                  <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)', color: 'var(--tim)' }}>
-                    Ca này hỏi lại câu em từng sai. Bấm Bắt đầu thì A.I Đỗ Đại Học rút bộ câu riêng cho đúng {(chiTiet.dsCho ?? []).length} em đang chờ — em vào sau đó nhận đề theo luật bốc ngẫu nhiên như ca thường.
-                  </div>
-                )}
-                {chiTiet.ca.loai !== 'baitap' && (
-                  <label className="flex items-start" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)', color: 'var(--muc)' }}>
-                    <input type="checkbox" role="switch" aria-label="Đồng bộ giờ cả phòng"
-                      checked={gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false} disabled={dangBatDau}
-                      onChange={e => setGioChungTheoCa(c => ({ ...c, [chiTiet.ca.maCa]: e.target.checked }))}
-                      style={{ width: 22, height: 22, accentColor: 'var(--tim)' }} />
-                    <span><b>Đồng bộ giờ cả phòng</b><br />
-                      <span style={NHAN_NHO}>Bật: cả phòng tính giờ từ lúc thầy bấm Bắt đầu thi, cùng hết giờ. Em vào muộn chỉ còn thời gian chung. Tắt: mỗi em có đủ thời gian từ lúc nhận đề. Lựa chọn được lưu khi bắt đầu ca.</span>
-                    </span>
-                  </label>
-                )}
-                <div className="grid grid-cols-2" style={{ gap: 'var(--k2)', marginTop: 'var(--k3)' }}>
-                  <button
-                    type="button"
-                    onClick={() => void batDauCaNay()}
-                    disabled={dangBatDau}
-                    className="tap-target font-bold"
-                    style={{ minHeight: 52, borderRadius: 'var(--bo-2)', border: 'none', background: 'var(--xanh)', color: 'var(--muc-nguoc)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
-                  >
-                    {dangBatDau ? 'Đang bắt đầu…' : 'Bắt đầu thi'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setHoiHuy(true)}
-                    disabled={dangXoa}
-                    className="tap-target font-bold"
-                    style={{ minHeight: 52, borderRadius: 'var(--bo-2)', border: '1.5px solid var(--do)', background: 'transparent', color: 'var(--do)', fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}
-                  >
-                    Huỷ ca kiểm tra
-                  </button>
-                </div>
-                {hoiHuy && (
-                  <div style={{ marginTop: 'var(--k3)' }}>
-                    <OThongBao tone="do">Huỷ ca <b style={SO}>{chiTiet.ca.maCa}</b>? Em đang chờ sẽ thấy báo ca đã huỷ. {hoa2 ? 'Ca vào Ca kiểm tra › Ca đã xoá, khôi phục lại được.' : 'Ca vào Lịch sử ca, khôi phục lại được.'}</OThongBao>
-                    <div className="flex" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
-                      <button type="button" onClick={() => setHoiHuy(false)} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)', border: 'none' }}>
-                        Không huỷ
-                      </button>
-                      <button type="button" onClick={() => void huyCaCho()} disabled={dangXoa} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--do)', color: 'var(--giay)', border: 'none' }}>
-                        {dangXoa ? 'Đang huỷ…' : 'Huỷ ca'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
             {chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && (
               <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>
                 Phòng chờ đã mở lúc <span style={SO}>{gio(chiTiet.ca.batDauThiLuc)}</span> — {chiTiet.ca.dongBoGio ? `đồng bộ giờ cả phòng, cùng hết giờ lúc ${gio(new Date(Date.parse(chiTiet.ca.batDauThiLuc) + chiTiet.ca.thoiGianPhut * 60000).toISOString())}.` : 'em vào từ giờ nhận đề ngay, tính giờ riêng từng em.'}

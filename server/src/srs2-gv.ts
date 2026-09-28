@@ -7,7 +7,7 @@ import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { hangTuTiLe, khoiLuongCan, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
-import { chanDoanEm, docChienDichTuDong, docCoHoa2Tu, docHoSoDangCaLop, docMetaCau, hangTuHoSo, KHOA_CO_HOA2, ngayVnCua, type ChienDich } from './srs2-d1'
+import { chanDoanEm, docChienDichTuDong, docCoHoa2Tu, docHoSoDangCaLop, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, mocTinhCua, ngayVnCua, type ChienDich } from './srs2-d1'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -86,7 +86,7 @@ export const maGocCuaTo = (maDe: readonly string[]): string[] => [...new Set(maD
  * Câu hợp lệ của các tờ đề (đã duyệt, bỏ tự luận), theo thứ tự tờ rồi thứ tự câu trong tờ; câu trùng giữa các tờ chỉ tính MỘT lần (tờ đứng trước giữ).
  * `theoTo`: số câu dùng được mà MỖI tờ góp vào (sau khi bỏ trùng) — cộng lại đúng bằng `qids.length`, để màn giao hiện số từng tờ khớp tổng.
  */
-async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promise<{ qids: string[]; theoTo: Record<string, number>; theoMucDo: Record<string, number> }> {
+export async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promise<{ qids: string[]; theoTo: Record<string, number>; theoMucDo: Record<string, number> }> {
   const r = await env.DB.prepare('SELECT ma_de, qid, json FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) ORDER BY rowid').bind(JSON.stringify(maGocCuaTo(maDe))).all<Row>()
   const theoGoc = new Map<string, { qid: string; phan: string; mucDo: string }[]>()
   for (const x of r.results ?? []) {
@@ -109,7 +109,7 @@ async function cauCuaTo(env: Env, maDe: readonly string[]): Promise<string[]> {
   return (await cauCuaToChiTiet(env, maDe)).qids
 }
 /** Lần làm của CẢ LỚP với các câu (một truy vấn), nhóm theo em. */
-async function lanLamCaLop(env: Env, sbd: readonly string[], qids: readonly string[]): Promise<Map<string, LanLam[]>> {
+export async function lanLamCaLop(env: Env, sbd: readonly string[], qids: readonly string[]): Promise<Map<string, LanLam[]>> {
   const ra = new Map<string, LanLam[]>()
   if (!sbd.length || !qids.length) return ra
   let rows: Row[]
@@ -138,10 +138,14 @@ async function mocDayLaiCaLop(env: Env, sbd: readonly string[]): Promise<Map<str
   return ra
 }
 /** Trạng thái từng (em, câu) của một chiến dịch. */
-/** `tuLuc` (thầy 28/09): chỉ tính lần làm TỪ LÚC GIAO chiến dịch — lịch sử trước đó KHÔNG sinh câu ôn; mọi câu của chiến dịch bắt đầu là câu mới. */
-async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly string[], hanNop: string | null, tuLuc: string, lanDaDoc?: Map<string, LanLam[]>): Promise<Map<string, Map<string, TrangThaiCau>>> {
+/** `tuLuc` (thầy 28/09): chỉ tính lần làm TỪ LÚC GIAO chiến dịch — lịch sử trước đó KHÔNG sinh câu ôn; mọi câu của chiến dịch bắt đầu là câu mới.
+ *  `themLuc` (Sửa chiến dịch 28/09): em được THÊM sau ⇒ mốc của em là lúc được thêm. */
+async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly string[], hanNop: string | null, tuLuc: string, lanDaDoc?: Map<string, LanLam[]>, themLuc?: ReadonlyMap<string, string>): Promise<Map<string, Map<string, TrangThaiCau>>> {
   const [lanTho, moc] = await Promise.all([lanDaDoc ?? lanLamCaLop(env, sbd, qids), mocDayLaiCaLop(env, sbd)])
-  const lan = new Map([...lanTho].map(([em, ds]) => [em, ds.filter((x) => x.luc >= tuLuc)] as const))
+  const lan = new Map([...lanTho].map(([em, ds]) => {
+    const tu = mocTinhCua(tuLuc, themLuc?.get(em))
+    return [em, ds.filter((x) => x.luc >= tu)] as const
+  }))
   const ra = new Map<string, Map<string, TrangThaiCau>>()
   for (const em of sbd) {
     const cua = lan.get(em) ?? []
@@ -200,7 +204,7 @@ const soNgayTre = (ngayCuoi: string | null, ngayGiao: string, homNay: string): n
 /** Số liệu LỚP gọn của một chiến dịch (dùng cho danh sách chiến dịch đã giao). */
 async function thongKeLop(env: Env, cd: ChienDich, homNay: string) {
   const [tt, kh] = await Promise.all([
-    trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.taoLuc),
+    docMocThemCaLop(env, cd.id).then((them) => trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.taoLuc, undefined, them)),
     env.DB.prepare('SELECT sbd, huyet_chien FROM srs2_ke_hoach WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))').bind(homNay, JSON.stringify(cd.sbd)).all<Row>().catch(() => ({ results: [] as Row[] })),
   ])
   const moc = mocNhip(cd.taoLuc, cd.hanNop, homNay)
@@ -310,8 +314,8 @@ async function doiTrangThai(env: Env, id: string, trangThai: 'da_dong' | 'da_huy
 async function bang(env: Env, id: string, nowMs: number) {
   const cd = await docMot(env, id)
   const homNay = ngayVnCua(nowMs)
-  const [lanTho, ten, meta, hoSoDang] = await Promise.all([lanLamCaLop(env, cd.sbd, cd.qids), tenEm(env, cd.sbd), docMetaCau(env, cd.qids, cd.maDe), docHoSoDangCaLop(env, cd.sbd)])
-  const tt = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.taoLuc, lanTho)
+  const [lanTho, ten, meta, hoSoDang, them] = await Promise.all([lanLamCaLop(env, cd.sbd, cd.qids), tenEm(env, cd.sbd), docMetaCau(env, cd.qids, cd.maDe), docHoSoDangCaLop(env, cd.sbd), docMocThemCaLop(env, cd.id)])
+  const tt = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.taoLuc, lanTho, them)
   // Tên hiển thị của mã dạng (khoá `hangTheoDang` trùng khoá `theoDang`/`dang[]` của bảng).
   const tenCuaMa = new Map<string, string>()
   for (const q of cd.qids) {
@@ -344,7 +348,7 @@ async function bang(env: Env, id: string, nowMs: number) {
       sbd: s, ten: ten.get(s) ?? s, coXat, thanhThao: ds.filter((t) => t.thanhThao).length, canDayLai: ds.filter((t) => t.catTia).length,
       treNhip: ngayCuoi ? Math.max(0, Math.round((Date.parse(homNay) - Date.parse(ngayCuoi)) / 86_400_000) - 1) : null, huyetChien: huyet.has(s), theoDang,
       // Thầy 28/09 (chỉ-thêm): hạng của em theo từng dạng — cùng cách máy dùng để bốc câu mới (L1 Yếu · L2 Trung bình · L3 Khá · L4 Giỏi).
-      hangTheoDang: Object.fromEntries(Object.entries(hangTuHoSo(hoSoDang.get(s) ?? [], lanTho.get(s) ?? [], meta, cd.qids, cd.taoLuc).hangTheoDang)
+      hangTheoDang: Object.fromEntries(Object.entries(hangTuHoSo(hoSoDang.get(s) ?? [], lanTho.get(s) ?? [], meta, cd.qids, mocTinhCua(cd.taoLuc, them.get(s))).hangTheoDang)
         .filter(([ma]) => tenCuaMa.has(ma)).map(([ma, h]) => [tenCuaMa.get(ma)!, h])),
       daLamTheoDang, nhip: nhipEm(tre, coXat / soCau, moc.mucCanHomNay), soNgayTre: tre,
     }
@@ -354,7 +358,7 @@ async function bang(env: Env, id: string, nowMs: number) {
   const tong = cd.qids.length * Math.max(1, cd.sbd.length)
   // So với hôm qua (chỉ-thêm): phát lại trạng thái chỉ với lần làm TRƯỚC hôm nay.
   const lanHomQua = new Map([...lanTho].map(([k, v]) => [k, v.filter((x) => x.ngay < homNay)] as const))
-  const ttHomQua = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.taoLuc, lanHomQua)
+  const ttHomQua = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.taoLuc, lanHomQua, them)
   let cxHq = 0, ttHq = 0
   for (const s of cd.sbd) for (const t of ttHomQua.get(s)!.values()) { if (!t.laMoi) cxHq++; if (t.thanhThao) ttHq++ }
   const nhip = { vuot: 0, dung: 0, tre12: 0, tre3: 0 }
@@ -385,7 +389,8 @@ async function bang(env: Env, id: string, nowMs: number) {
 async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
   const cd = await docMot(env, id)
   const em = coMat.length ? cd.sbd.filter((s) => coMat.includes(s)) : cd.sbd
-  const [tt, ten, meta] = await Promise.all([trangThaiLop(env, em, cd.qids, cd.hanNop, cd.taoLuc), tenEm(env, em), docMetaCau(env, cd.qids, cd.maDe)])
+  const them = await docMocThemCaLop(env, cd.id)
+  const [tt, ten, meta] = await Promise.all([trangThaiLop(env, em, cd.qids, cd.hanNop, cd.taoLuc, undefined, them), tenEm(env, em), docMetaCau(env, cd.qids, cd.maDe)])
   const cau = cd.qids.map((q) => {
     const chua = em.filter((s) => !tt.get(s)!.get(q)!.thanhThao)
     const dayLai = em.filter((s) => tt.get(s)!.get(q)!.catTia)
@@ -418,7 +423,7 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
 async function chuaXong(env: Env, id: string, qids: string[], nowMs: number) {
   const cd = await docMot(env, id)
   const ds = qids.length ? qids.filter((q) => cd.qids.includes(q)) : cd.qids
-  const tt = await trangThaiLop(env, cd.sbd, ds, cd.hanNop, cd.taoLuc)
+  const tt = await trangThaiLop(env, cd.sbd, ds, cd.hanNop, cd.taoLuc, undefined, await docMocThemCaLop(env, cd.id))
   const luc = new Date(nowMs).toISOString()
   const lenh: ReturnType<Env['DB']['prepare']>[] = []
   for (const s of cd.sbd) for (const q of ds) if (tt.get(s)!.get(q)!.catTia) lenh.push(env.DB.prepare('INSERT OR IGNORE INTO srs2_day_lai (sbd, qid, luc, chien_dich_id) VALUES (?,?,?,?)').bind(s, q, luc, cd.id))
