@@ -145,9 +145,10 @@ export default defineConfig({
           '**/inter-*-wght-normal-*.woff2',
           // Phông tiêu đề Game Hóa 2.0 'Baloo 2' (28/09): chỉ mảnh game/Sảnh 2.0 nạp (src/components/hoa2/phong-baloo.ts) — tải lúc mở game rồi cất ở kho chạy-lúc /assets/*.woff2, không vào precache vỏ.
           '**/baloo-2-*.woff2',
-          // Bi-a Phản Ứng (28/09): gói lười BiaGame + hai mảnh dùng chung với Đảo 2.0 (thẻ câu `TrongAi`, `useNgang`) — Rollup tách riêng vì cả hai game
-          // cùng nhập; trước đó chúng nằm trong mảnh Dao2 (đã ngoài precache). Chỉ máy mở game mới tải, cất ở kho chạy-lúc.
-          '**/{BiaGame,TrongAi,ngang}-*.{js,css}',
+          // Bi-a Phản Ứng (28/09): gói lười BiaGame + mảnh dùng chung với Đảo 2.0 (thẻ câu `TrongAi`, `useNgang`) — Rollup tách riêng vì cả hai game
+          // cùng nhập; trước đó chúng nằm trong mảnh Dao2 (đã ngoài precache). `chu-het-luot` (1 KB) bị tách theo, chỉ DaoThanThu/DoanHoTong/Game
+          // (đều ngoài precache) nhập. Chỉ máy mở game mới tải, cất ở kho chạy-lúc.
+          '**/{BiaGame,TrongAi,ngang,chu-het-luot}-*.{js,css}',
         ],
         // ĐƯỜNG LUI CHO MỌI LƯỢT ĐIỀU HƯỚNG — khai TƯỜNG MINH.
         //
