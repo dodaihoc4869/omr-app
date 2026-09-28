@@ -532,3 +532,65 @@
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* ---- chọn khối → lớp → em (thầy 28/09) ---- */
+.cd-chon-em {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.cd-chon-em legend {
+  padding: 0;
+  margin-bottom: 4px;
+}
+.cd-hang-chip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.cd-chip {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cd-chip[aria-pressed='true'] {
+  border-color: var(--m3-primary, currentColor);
+  background: var(--m3-primary-container, transparent);
+  color: var(--m3-on-primary-container, inherit);
+}
+.cd-chip-tich {
+  min-height: 44px;
+  align-items: center;
+  padding: 0 12px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 12px;
+}
+.cd-tim-em {
+  flex: 1 1 180px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 12px;
+  font: inherit;
+}
+.cd-ds-em {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px 16px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+@media (min-width: 640px) {
+  .cd-ds-em {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

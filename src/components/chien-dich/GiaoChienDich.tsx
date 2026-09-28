@@ -4,10 +4,10 @@
 // Giao xong cho HOÀN TÁC ("Huỷ giao" ⇒ `huy`) thay vì hỏi lại trước (luật C8).
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TeacherExamSource } from '../../data/examContent'
-import { maDeGocMayChu } from '../../lib/btvn-nang-do-thay'
 import { useAppStore } from '../../store/appStore'
 import HopChonDe from '../HopChonDe'
 import { huyChienDich, taoChienDich, tinhSucChua, type SucChua } from './api'
+import ChonEmGiao, { type EmLop } from './ChonEmGiao'
 import DongHoSucChua, { type RutCon } from './DongHoSucChua'
 import HopChon from './HopChon'
 import { congNgay, hienHanNop, laNgay, ngayVn } from './ngay'
@@ -23,7 +23,6 @@ interface ToDe {
   tuCa: boolean
 }
 
-const soCauTo = (s: TeacherExamSource) => (s.phanI?.length ?? 0) + (s.phanII?.length ?? 0) + (s.phanIII?.length ?? 0)
 
 export default function GiaoChienDich({
   maCa,
@@ -45,13 +44,16 @@ export default function GiaoChienDich({
 }) {
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
-  const classList = useAppStore((s) => s.classList) as { lop?: string }[] | undefined
+  const classList = useAppStore((s) => s.classList) as { sbd?: string; hoTen?: string; lop?: string }[] | undefined
   const homNay = useMemo(() => ngayVn(nowMs ?? Date.now()), [nowMs])
 
   const [ten, setTen] = useState(tenGoiY || 'Chiến dịch luyện')
   const [to, setTo] = useState<ToDe[]>(() => maDeCa.map((m) => ({ maDe: m, tuCa: true })))
   const [chon, setChon] = useState<Set<string>>(() => new Set(maDeCa))
   const [lop, setLop] = useState(lopCa)
+  // Chọn khối → lớp → từng em (khi máy có danh sách học sinh). `boEm` = em thầy bỏ tích.
+  const [lopChon, setLopChon] = useState<Set<string>>(() => new Set(lopCa.trim() ? [lopCa.trim()] : []))
+  const [boEm, setBoEm] = useState<Set<string>>(new Set())
   const [hanNop, setHanNop] = useState(() => congNgay(homNay, 7))
   const [theLuc, setTheLuc] = useState(THE_LUC_MAC_DINH)
   const [huyetChien, setHuyetChien] = useState(true)
@@ -67,7 +69,8 @@ export default function GiaoChienDich({
   const [daGiao, setDaGiao] = useState<{ id: string; soCau: number; soEm: number } | null>(null)
   const [dangHuy, setDangHuy] = useState(false)
 
-  // Ngân hàng đề trên máy này — chỉ để đặt tên / đếm câu từng tờ và cho thầy tích thêm tờ.
+  // Ngân hàng đề trên máy này — ĐỦ mọi tờ, tách theo phần y như màn Mở ca (thầy 28/09: "chưa hiển thị đầy đủ đề kho đề").
+  // KHÔNG khử trùng cả kho ở đây: khử trước khi chọn làm tờ trùng hết câu BIẾN MẤT khỏi cây. Câu trùng giữa các tờ ĐÃ TÍCH do máy chủ bỏ khi giao.
   const [kho, setKho] = useState<TeacherExamSource[]>([])
   const [moHopDe, setMoHopDe] = useState(false)
   const [chonTam, setChonTam] = useState<Set<string>>(new Set())
@@ -75,8 +78,8 @@ export default function GiaoChienDich({
     let huy = false
     void (async () => {
       try {
-        const [{ loadExamSources }, { khuTrungNguon }] = await Promise.all([import('../../lib/exam-db'), import('../../lib/khu-trung-cau')])
-        const ds = khuTrungNguon(await loadExamSources()).nguon
+        const [{ loadExamSources }, { tachNhieuTheoPhan }] = await Promise.all([import('../../lib/exam-db'), import('../../lib/tach-phan-de')])
+        const ds = tachNhieuTheoPhan(await loadExamSources())
         if (!huy) setKho(ds)
       } catch {
         /* không đọc được kho: tờ hiện bằng mã, không có số câu */
@@ -86,20 +89,21 @@ export default function GiaoChienDich({
       huy = true
     }
   }, [])
-  const soCauTheoMa = useMemo(() => {
-    const m = new Map<string, number>()
-    for (const s of kho) {
-      const k = maDeGocMayChu(s.maDe)
-      m.set(k, (m.get(k) ?? 0) + soCauTo(s))
-    }
-    return m
-  }, [kho])
-  const dsLop = useMemo(() => [...new Set((classList ?? []).map((r) => String(r.lop ?? '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'vi')), [classList])
+  const dsEm = useMemo<EmLop[]>(
+    () => (classList ?? []).map((r) => ({ sbd: String(r.sbd ?? '').trim(), hoTen: String(r.hoTen ?? '').trim(), lop: String(r.lop ?? '').trim() })).filter((e) => e.sbd && e.lop),
+    [classList],
+  )
+  const coDanhSach = dsEm.length > 0
+  const dsLop = useMemo(() => [...new Set(dsEm.map((e) => e.lop))].sort((a, b) => a.localeCompare(b, 'vi')), [dsEm])
+  const sbdChon = useMemo(() => dsEm.filter((e) => lopChon.has(e.lop) && !boEm.has(e.sbd)).map((e) => e.sbd), [dsEm, lopChon, boEm])
+  // Có danh sách ⇒ gửi đúng SBD đã tích (+ tên lớp làm nhãn); không có ⇒ gửi tên lớp gõ tay, máy chủ tự lấy em của lớp.
+  const nhanLop = coDanhSach ? [...lopChon].sort((a, b) => a.localeCompare(b, 'vi', { numeric: true })).join(', ') : lop.trim()
+  const doiTuong = coDanhSach ? { lop: nhanLop, sbd: sbdChon } : { lop: lop.trim() }
 
   const maDeChon = useMemo(() => to.map((t) => t.maDe).filter((m) => chon.has(m)), [to, chon])
   const hanHopLe = laNgay(hanNop) && hanNop >= homNay
-  const duDauVao = maDeChon.length > 0 && lop.trim() !== '' && hanHopLe
-  const khoaDauVao = JSON.stringify([maDeChon, lop.trim(), hanNop, theLuc])
+  const duDauVao = maDeChon.length > 0 && (coDanhSach ? sbdChon.length > 0 : lop.trim() !== '') && hanHopLe
+  const khoaDauVao = JSON.stringify([maDeChon, doiTuong, hanNop, theLuc])
 
   // Đổi đầu vào ⇒ gợi ý "rút còn" cũ hết đúng.
   const khoaTruoc = useRef(khoaDauVao)
@@ -122,7 +126,7 @@ export default function GiaoChienDich({
     const luot = ++luotTinh.current
     setDangTinh(true)
     const hen = setTimeout(() => {
-      void tinhSucChua({ lop: lop.trim(), maDe: maDeChon, hanNop, theLucNgay: theLuc, ...(rutCon ? { rutCon: rutCon.soCau } : {}) }).then((r) => {
+      void tinhSucChua({ ...doiTuong, maDe: maDeChon, hanNop, theLucNgay: theLuc, ...(rutCon ? { rutCon: rutCon.soCau } : {}) }).then((r) => {
         if (luot !== luotTinh.current) return
         setDangTinh(false)
         if (r.ok) {
@@ -144,7 +148,7 @@ export default function GiaoChienDich({
     setLoiGiao('')
     const r = await taoChienDich({
       ten: ten.trim() || 'Chiến dịch luyện',
-      lop: lop.trim(),
+      ...doiTuong,
       maDe: maDeChon,
       hanNop,
       theLucNgay: theLuc,
@@ -184,7 +188,7 @@ export default function GiaoChienDich({
     })
 
   const themTo = () => {
-    const moi = [...chonTam].map(maDeGocMayChu).filter(Boolean)
+    const moi = [...chonTam].filter(Boolean)
     setTo((cu) => [...cu, ...moi.filter((m, i) => moi.indexOf(m) === i && !cu.some((t) => t.maDe === m)).map((m) => ({ maDe: m, tuCa: false }))])
     setChon((cu) => new Set([...cu, ...moi]))
     setMoHopDe(false)
@@ -229,13 +233,14 @@ export default function GiaoChienDich({
         <legend style={{ padding: 0, marginBottom: 4 }}>Câu trong chiến dịch</legend>
         {to.length === 0 && <p className="cd-phu">Chưa có tờ đề nào — thêm tờ từ Ngân hàng đề.</p>}
         {to.map((t) => {
-          const n = soCauTheoMa.get(t.maDe)
+          // Số câu DÙNG ĐƯỢC của tờ do máy chủ đếm (đã bỏ trùng, tự luận, chưa duyệt) ⇒ cộng các tờ = tổng bên dưới.
+          const n = sc?.soCauTheoTo?.[t.maDe]
           return (
             <label key={t.maDe} className="cd-tich">
               <input type="checkbox" checked={chon.has(t.maDe)} onChange={() => doiTich(t.maDe)} />
               <span>
                 {t.tuCa ? `Đề vừa kiểm tra · ${t.maDe}` : t.maDe}
-                {n ? ` · ${n} câu` : ''}
+                {n !== undefined && chon.has(t.maDe) ? ` · ${n} câu` : ''}
               </span>
             </label>
           )
@@ -255,17 +260,21 @@ export default function GiaoChienDich({
         {tongCau && <small className="cd-so">{tongCau} · đã bỏ câu tự luận và câu chưa duyệt</small>}
       </fieldset>
 
+      {coDanhSach && <ChonEmGiao ds={dsEm} lopChon={lopChon} boEm={boEm} onDoiLop={setLopChon} onDoiBoEm={setBoEm} />}
+
       <div className="cd-luoi-2">
-        <label className="cd-truong">
-          Giao cho lớp
-          <input type="text" list="cd-ds-lop" value={lop} placeholder="Ví dụ 12A1" onChange={(e) => setLop(e.target.value)} />
-          <small className="cd-so">{sc ? `Lớp ${lop.trim()} · ${sc.soEm} em` : lop.trim() ? `Lớp ${lop.trim()}` : 'Chọn lớp để giao'}</small>
-          <datalist id="cd-ds-lop">
-            {dsLop.map((l) => (
-              <option key={l} value={l} />
-            ))}
-          </datalist>
-        </label>
+        {!coDanhSach && (
+          <label className="cd-truong">
+            Giao cho lớp
+            <input type="text" list="cd-ds-lop" value={lop} placeholder="Ví dụ 12A1" onChange={(e) => setLop(e.target.value)} />
+            <small className="cd-so">{sc ? `Lớp ${lop.trim()} · ${sc.soEm} em` : lop.trim() ? `Lớp ${lop.trim()}` : 'Chọn lớp để giao'}</small>
+            <datalist id="cd-ds-lop">
+              {dsLop.map((l) => (
+                <option key={l} value={l} />
+              ))}
+            </datalist>
+          </label>
+        )}
         <label className="cd-truong">
           Hạn nộp (hết lúc 23:59)
           <input type="date" value={hanNop} min={homNay} onChange={(e) => setHanNop(e.target.value)} />

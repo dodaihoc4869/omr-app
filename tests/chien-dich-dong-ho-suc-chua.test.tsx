@@ -60,8 +60,8 @@ describe('đồng hồ đổi màu theo tỉ lệ', () => {
 
   it('câu giải thích đủ nhãn: "Em ở giữa lớp cần khoảng X lượt · có D ngày × 40 câu = Y lượt. N em quá tải"', () => {
     const { container } = ve(sc(0.96))
-    expect(khoi(container).textContent).toContain('Em ở giữa lớp cần khoảng 230 lượt · có 6 ngày × 40 câu = 240 lượt.')
-    expect(khoi(container).textContent).toContain('4 em quá tải.')
+    expect(khoi(container).textContent).toContain('Em ở giữa lớp cần khoảng 230 lượt · sức chứa 6 ngày × 40 lượt/ngày = 240 lượt.')
+    expect(khoi(container).textContent).toContain('4/33 em quá tải.')
     cleanup()
     const r = ve(sc(0.5))
     expect(khoi(r.container).textContent).toContain('Không em nào quá tải.')

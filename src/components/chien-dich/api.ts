@@ -41,6 +41,8 @@ export type MucSucChua = 'xanh' | 'vang' | 'do'
 
 export interface SucChua {
   soCau: number
+  /** Số câu dùng được MỖI tờ góp vào (đã bỏ trùng, tự luận, chưa duyệt) — cộng lại = soCau. Máy chủ cũ không có. */
+  soCauTheoTo?: Record<string, number>
   soEm: number
   /** Số ngày còn lại tính cả hôm nay. */
   D: number
@@ -48,6 +50,8 @@ export interface SucChua {
   sucChua: number
   /** Số lượt em ở giữa lớp cần. */
   khoiLuongTrungVi: number
+  /** Lượt của em ở giữa lớp = câu mới × 2 + lượt ôn (null khi không có em đúng bằng trung vị; máy chủ cũ không có). */
+  tachGiua?: { cauMoi: number; luotOn: number } | null
   tiLe: number
   muc: MucSucChua
   soEmQuaTai: number

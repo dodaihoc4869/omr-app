@@ -58,20 +58,38 @@ async function tenEm(env: Env, ds: readonly string[]): Promise<Map<string, strin
   const r = await env.DB.prepare('SELECT sbd, ho_ten FROM hoc_sinh WHERE sbd IN (SELECT value FROM json_each(?))').bind(JSON.stringify(ds)).all<Row>()
   return new Map((r.results ?? []).map((x) => [str(x.sbd), str(x.ho_ten) || str(x.sbd)]))
 }
-/** Câu hợp lệ của các tờ đề (đã duyệt, bỏ tự luận), theo thứ tự tờ rồi thứ tự câu trong tờ. */
-async function cauCuaTo(env: Env, maDe: readonly string[]): Promise<string[]> {
-  const r = await env.DB.prepare('SELECT ma_de, qid, json FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) ORDER BY rowid').bind(JSON.stringify(maDe)).all<Row>()
-  const theoTo = new Map<string, string[]>()
+/** Mã tờ thầy chọn có thể là tờ ĐÃ TÁCH theo phần (`<gốc>-TN|-DS|-TLN`, như màn Mở ca): tách ra mã gốc (khoá `game_v2_question.ma_de`) + phần. */
+const PHAN_THEO_HAU_TO: Record<string, 'I' | 'II' | 'III'> = { TN: 'I', DS: 'II', TLN: 'III' }
+export function tachMaTo(maDe: string): { goc: string; phan: 'I' | 'II' | 'III' | null } {
+  const m = maDe.trim().match(/^(.*)-(TN|DS|TLN)$/)
+  return m ? { goc: m[1]!, phan: PHAN_THEO_HAU_TO[m[2]!]! } : { goc: maDe.trim(), phan: null }
+}
+export const maGocCuaTo = (maDe: readonly string[]): string[] => [...new Set(maDe.map((m) => tachMaTo(m).goc))]
+/**
+ * Câu hợp lệ của các tờ đề (đã duyệt, bỏ tự luận), theo thứ tự tờ rồi thứ tự câu trong tờ; câu trùng giữa các tờ chỉ tính MỘT lần (tờ đứng trước giữ).
+ * `theoTo`: số câu dùng được mà MỖI tờ góp vào (sau khi bỏ trùng) — cộng lại đúng bằng `qids.length`, để màn giao hiện số từng tờ khớp tổng.
+ */
+async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promise<{ qids: string[]; theoTo: Record<string, number> }> {
+  const r = await env.DB.prepare('SELECT ma_de, qid, json FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) ORDER BY rowid').bind(JSON.stringify(maGocCuaTo(maDe))).all<Row>()
+  const theoGoc = new Map<string, { qid: string; phan: string }[]>()
   for (const x of r.results ?? []) {
     let q: PrivateQuestion
     try { q = JSON.parse(str(x.json)) as PrivateQuestion } catch { continue }
     if (!q.reviewed || laCauTuLuan(q)) continue
     const k = str(x.ma_de)
-    theoTo.set(k, [...(theoTo.get(k) ?? []), str(x.qid)])
+    theoGoc.set(k, [...(theoGoc.get(k) ?? []), { qid: str(x.qid), phan: str(q.phan) }])
   }
-  const ra: string[] = [], da = new Set<string>()
-  for (const m of maDe) for (const q of theoTo.get(m) ?? []) if (!da.has(q)) { da.add(q); ra.push(q) }
-  return ra
+  const qids: string[] = [], da = new Set<string>(), theoTo: Record<string, number> = {}
+  for (const m of maDe) {
+    const { goc, phan } = tachMaTo(m)
+    let n = 0
+    for (const c of theoGoc.get(goc) ?? []) if ((!phan || c.phan === phan) && !da.has(c.qid)) { da.add(c.qid); qids.push(c.qid); n++ }
+    theoTo[m] = (theoTo[m] ?? 0) + n
+  }
+  return { qids, theoTo }
+}
+async function cauCuaTo(env: Env, maDe: readonly string[]): Promise<string[]> {
+  return (await cauCuaToChiTiet(env, maDe)).qids
 }
 /** Lần làm của CẢ LỚP với các câu (một truy vấn), nhóm theo em. */
 async function lanLamCaLop(env: Env, sbd: readonly string[], qids: readonly string[]): Promise<Map<string, LanLam[]>> {
@@ -144,19 +162,26 @@ async function docDauVao(env: Env, b: Row): Promise<DauVaoGiao> {
 /** Đồng hồ sức chứa: khối lượng lượt cần của em ở giữa lớp so với D × thể lực/ngày; kèm hai gợi ý đưa về ≤ 70%. */
 async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   const dv = await docDauVao(env, b)
-  const qids = await cauCuaTo(env, dv.maDe)
+  const { qids, theoTo } = await cauCuaToChiTiet(env, dv.maDe)
   const homNay = ngayVnCua(nowMs)
   if (dv.hanNop < homNay) throw new Error('Hạn nộp đã qua.')
   const D = soNgayConLai(homNay, dv.hanNop)
   const tt = await trangThaiLop(env, dv.sbd, qids, dv.hanNop)
   const khoiLuong = dv.sbd.map((em) => khoiLuongCan([...tt.get(em)!.values()]))
   const kl = trungVi(khoiLuong)
+  // Tách lượt của EM Ở GIỮA LỚP thành "câu mới × 2" + "lượt ôn" để thầy đọc được vì sao ra số lượt (chỉ khi có em đúng bằng trung vị).
+  const emGiua = dv.sbd.find((_, i) => khoiLuong[i] === kl)
+  const tachGiua = emGiua === undefined ? null : (() => {
+    const ds = [...tt.get(emGiua)!.values()].filter((t) => !t.catTia && !t.thanhThao)
+    const cauMoi = ds.filter((t) => t.laMoi).length
+    return { cauMoi, luotOn: kl - 2 * cauMoi }
+  })()
   const sc = sucChua(kl, D, dv.theLucNgay)
   const tran = D * dv.theLucNgay
   const soBo = Math.max(0, Math.ceil((kl - 0.7 * tran) / 2))
   const Dmoi = Math.ceil(kl / (0.7 * dv.theLucNgay))
   return {
-    ok: true, soCau: qids.length, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tiLe: sc.tiLe, muc: sc.muc,
+    ok: true, soCau: qids.length, soCauTheoTo: theoTo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
     soEmQuaTai: khoiLuong.filter((x) => x > tran).length,
     goiY: sc.muc === 'xanh' ? null : {
       rutCon: soBo > 0 && soBo < qids.length ? { soCau: qids.length - soBo, tiLe: (kl - 2 * soBo) / tran } : null,
@@ -180,7 +205,7 @@ async function tao(env: Env, b: Row, nowMs: number) {
   const id = crypto.randomUUID()
   await env.DB.prepare(`INSERT INTO chien_dich (id, ten, lop, sbd_json, ma_de_json, qid_json, han_nop, the_luc_ngay, huyet_chien, ma_ca, tao_luc, trang_thai)
       VALUES (?,?,?,?,?,?,?,?,?,?,?,'dang_chay')`)
-    .bind(id, dv.ten, dv.lop, JSON.stringify(dv.sbd), JSON.stringify(dv.maDe), JSON.stringify(qids), dv.hanNop, dv.theLucNgay, dv.huyetChien ? 1 : 0, dv.maCa, new Date(nowMs).toISOString()).run()
+    .bind(id, dv.ten, dv.lop, JSON.stringify(dv.sbd), JSON.stringify(maGocCuaTo(dv.maDe)), JSON.stringify(qids), dv.hanNop, dv.theLucNgay, dv.huyetChien ? 1 : 0, dv.maCa, new Date(nowMs).toISOString()).run()
   return { ok: true, id, soCau: qids.length, soEm: dv.sbd.length }
 }
 
