@@ -327,7 +327,7 @@ export default function BangChienDich({
                 <div key={k} className="cd-nhip-hang" data-nhip={k}>
                   <span>{CHU_NHIP[k]}</span>
                   <div className="cd-thanh" aria-hidden="true">
-                    <div className={`cd-thanh--${k}`} style={{ width: `${(100 * lop.nhip![k]) / Math.max(1, soEm)}%` }} />
+                    <div className={`cd-thanh--${k}`} style={{ width: `${Math.min(100, Math.max(0, (100 * lop.nhip![k]) / Math.max(1, soEm)))}%` }} />
                   </div>
                   <b className="cd-so">{lop.nhip![k]} em</b>
                 </div>
