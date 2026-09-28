@@ -50,3 +50,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - ĐÃ PHÁT HÀNH 5 phần: PR #16 merge → main `8906461` (CI tự đẩy Pages + Worker ~12 phút). Lùi: `git revert -m 1 8906461`. Lúc phát hành 0 ca thi.
 - CÒN: Sảnh 3D (nhánh `sanh-3d`, trợ lý đang làm; nếu phiên chết thì làm lại theo bản vẽ `9cc4be1:docs/ban-ve-sanh-dong-2809/Sanh-Dong.html`, giữ số thật + `anhThu`). Xong ⇒ PR riêng vào main.
 - ĐÃ PHÁT HÀNH Sảnh 3D: PR #17 (nhánh `sanh-3d` `fe0478b`). Chưa chạy toàn bộ vitest (hết tín dụng). VIỆC SAU: chạy toàn bộ vitest so nền; thêm trôi tự động thị sai, đếm số tăng, nét đứt chạy, sửa 844×390 phải cuộn cột phải, nạp lười cảnh.
+- Sửa Đảo ngang lời giải: PR #18 (tự cuộn tới LỜI GIẢI) + PR #19 `f68e54a` (thẻ câu overflow:hidden bị flex ép lùn ⇒ không cuộn; thêm flex-shrink:0). CẦN KIỂM Đoàn ngang có cùng lỗi không (cột phải XemLaiChuan).
