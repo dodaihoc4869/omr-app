@@ -1,6 +1,6 @@
 /* ĐOÀN HỘ TỐNG · GAME HÓA 2.0 — hệ thiết kế mới (bản vẽ docs/ban-ve-game-hoa-2-2709/Moi-DoanTran, Moi-DoanThang, Game-DoanSanh):
    biển đêm, kính mờ, nút vàng, thẻ câu giấy da. MỌI bộ chọn đều nằm dưới `.dh2` (lớp gốc chỉ có khi `hoa2-sanh` báo cheDo2) ⇒ cờ tắt: không một
-   dòng nào ở đây có hiệu lực, giao diện cũ (doan.css) y nguyên. Màu viết rgb()/rgba() (npm run check:mau). Phông tiêu đề 'Baloo 2' nếu máy có,
+   dòng nào ở đây có hiệu lực, giao diện cũ (doan.css) y nguyên. Màu viết rgb()/rgba() (npm run check:mau). Phông tiêu đề 'Baloo 2' (nạp ở src/components/hoa2/phong-baloo.ts),
    không thì Be Vietnam Pro đậm. Chuyển động ≤ 300 ms, chỉ transform/opacity; giảm chuyển động ⇒ doan.css đã tắt sạch mọi animation dưới `.dh`. */
 .dh.dh2{--dh2-chu:rgb(242,246,255);--dh2-mo:rgb(188,203,235);--dh2-vang:rgb(255,201,64);--dh2-xanh:rgb(91,240,165);
   background:radial-gradient(120% 60% at 50% 0%,rgb(26,44,110) 0%,rgb(12,26,58) 48%,rgb(7,18,41) 100%) rgb(7,18,41);color:var(--dh2-chu)}

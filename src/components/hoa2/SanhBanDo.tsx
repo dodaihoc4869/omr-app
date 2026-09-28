@@ -6,12 +6,13 @@
 //   · hết kế hoạch                     → "Hôm nay em xong rồi" + nút Rương Bát Linh (khi mở được và chưa mở).
 // Mọi con số lấy từ máy chủ (`hoa2-sanh`, thần thú/EXP/chuỗi ngày từ /hs/ke-hoach-ngay) — không tự tính, không bịa.
 // Dải "Vào thi" chỉ hiện khi có ca kiểm tra đang mở; bấm là vào đúng luồng PhongVaoThi → ExamTakeScreen có sẵn.
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 import { thanhExp } from '../../game/than-thu-hoa-hoc/kinh-nghiem'
 import { moRuong, type KetQuaSanh, type SanhHoa2 } from './api'
 import { chuHanNop, ngaySau, ngayThang, thuNgayThang } from './thoi-gian'
 import './sanh-ban-do.css'
+import './phong-baloo'
 
 /** Câu thứ mấy trở đi em không nhận EXP ở ngày Huyết Chiến = trần EXP ngày thường (40 câu, srs2-loi.ts TRAN_NGAY) + 1. */
 export const CAU_HET_EXP_HUYET_CHIEN = 41
@@ -49,16 +50,6 @@ export interface SanhBanDoProps {
   onChonThu: () => void
   onDangXuat: () => void
   onTaiLai: () => void
-}
-
-/** Phông tiêu đề game 'Baloo 2' (Google Fonts) — nạp một lần bằng thẻ <link>; mất mạng thì rơi về Be Vietnam Pro. */
-function napPhongBaloo() {
-  if (typeof document === 'undefined' || document.getElementById('h2-phong-baloo')) return
-  const l = document.createElement('link')
-  l.id = 'h2-phong-baloo'
-  l.rel = 'stylesheet'
-  l.href = 'https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap'
-  document.head.appendChild(l)
 }
 
 // ─── đường hộ tống: hai đoạn Bézier của bản vẽ (bến → cầu) ─────────────────────────────────────────
@@ -542,9 +533,6 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
 }
 
 export default function SanhBanDo(p: SanhBanDoProps) {
-  useEffect(() => {
-    napPhongBaloo()
-  }, [])
   const kq = p.ketQua
   const s = kq && kq.cheDo2 && !kq.canChonThu ? kq.sanh : null
   const chonThu = !!kq && kq.cheDo2 && kq.canChonThu === true

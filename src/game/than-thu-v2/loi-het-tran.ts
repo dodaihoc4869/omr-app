@@ -17,3 +17,10 @@ export function maCuaLoi(e: unknown): string {
   const ma = (e as { ma?: unknown } | null)?.ma
   return typeof ma === 'string' ? ma : ''
 }
+
+/** Lời lỗi máy chủ trong phản hồi `ok:false`: đọc `error` (lệnh game-v2 cũ) rồi `loi` (lệnh Game Hóa 2.0, ví dụ `hoa2-ruong-mo` chưa đủ); không có ⇒ ''. THUẦN. */
+export function loiCuaKetQua(r: unknown): string {
+  const o = (r ?? {}) as { error?: unknown; loi?: unknown }
+  for (const v of [o.error, o.loi]) if (typeof v === 'string' && v.trim()) return v
+  return ''
+}

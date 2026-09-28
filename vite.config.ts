@@ -135,6 +135,8 @@ export default defineConfig({
           '**/html-phieu-*.js',
           // Phông Inter (58 KB) chỉ cho app phụ huynh trên máy KHÔNG phải Apple: tải một lần khi phụ huynh mở app rồi cất ở kho chạy-lúc (đường /assets/*.woff2 của src/sw.ts); không ép vào precache vỏ.
           '**/inter-*-wght-normal-*.woff2',
+          // Phông tiêu đề Game Hóa 2.0 'Baloo 2' (28/09): chỉ mảnh game/Sảnh 2.0 nạp (src/components/hoa2/phong-baloo.ts) — tải lúc mở game rồi cất ở kho chạy-lúc /assets/*.woff2, không vào precache vỏ.
+          '**/baloo-2-*.woff2',
         ],
         // ĐƯỜNG LUI CHO MỌI LƯỢT ĐIỀU HƯỚNG — khai TƯỜNG MINH.
         //
