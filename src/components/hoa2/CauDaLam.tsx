@@ -1,14 +1,17 @@
-// GAME HÓA 2.0 — màn "CÂU ĐÃ LÀM" (bản vẽ đã chốt: docs/ban-ve-game-hoa-2-2709/HS-CauDaLam.dc.html, bản in HS-PDF.dc.html).
-// Chọn chiến dịch · 5 bộ lọc có đếm · danh sách thẻ. Bấm thẻ ⇒ `hoa2-cau-chi-tiet` ⇒ đề + lựa chọn + LỜI GIẢI bằng ĐÚNG thành phần
-// chuẩn `TheCau` chế độ `xem_lai` (lời giải thô đọc qua `chuanHoaLoiGiaiCau`) — KHÔNG vẽ khối lời giải thứ hai.
-// Nút chính "Tải PDF · N câu đang lọc": lấy chi tiết (≤ 60 câu/lượt) → dựng phiếu bằng `dungPhieu` (html-phieu.ts) → mở trong
-// khung phiếu và gọi hộp In của chính phiếu ("Đề và lời giải") → em chọn "Lưu thành PDF".
-import { useCallback, useEffect, useMemo, useState } from 'react'
+// GAME HÓA 2.0 — màn "CÂU ĐÃ LÀM" (bản vẽ đã chốt: docs/ban-ve-game-hoa-2-2709/HS-CauDaLam.dc.html, tờ PDF HS-PDF.dc.html).
+// Chọn chiến dịch · 5 bộ lọc có đếm · danh sách thẻ. Thẻ đóng (bản vẽ): "Câu 5 · Đúng–sai · Thông hiểu · sai 1/4 ý" + nhãn trạng thái ·
+// một dòng đề · "Em chọn: Sai · Đáp án: Đúng" · lịch ôn + "Xem lời giải". Chi tiết lấy qua `hoa2-cau-chi-tiet` cho các câu đang lọc
+// (máy chủ chỉ trả câu em ĐÃ làm). Bấm thẻ ⇒ thẻ trắng: đề + lựa chọn + LỜI GIẢI bằng ĐÚNG thành phần chuẩn `TheCau` chế độ `xem_lai`
+// (lời giải thô đọc qua `chuanHoaLoiGiaiCau`) — KHÔNG vẽ khối lời giải thứ hai — rồi lịch sử làm câu.
+// Nút chính "Tải PDF · N câu đang lọc" (thầy chốt 28/09): lấy chi tiết (≤ 60 câu/lượt) → `dungPdf` (pdf-cau-da-lam.ts, nạp lười) dựng
+// TỆP .pdf thật đúng bản vẽ HS-PDF → tải về `cau-da-lam-<bộ-lọc>-<ngày>.pdf`. Máy yếu không dựng được thì còn nút "Mở bản in" (đường cũ).
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import TheCau from '../TheCau'
 import KhungXemPhieu from '../KhungXemPhieu'
+import { ChemText } from '../../lib/chem-format'
 import '../m3'
 import { taiCauDaLam, taiChiTiet, type CauDaLamMuc, type ChiTietCau, type KetQuaCauDaLam } from './api'
-import { NHAN_TRANG_THAI, cauLuyenTuChiTiet, chuLanLam, dauCau, ngayGanNhat, propsTheCau } from './cau-chuyen'
+import { NHAN_TRANG_THAI, cauLuyenTuChiTiet, chuLanLam, dauCau, ngayGanNhat, propsTheCau, tomTatThe } from './cau-chuyen'
 import { gioThuNgay, thuNgayThang } from './thoi-gian'
 import './cau-da-lam.css'
 
@@ -30,8 +33,8 @@ export function xepCau(ds: CauDaLamMuc[]): CauDaLamMuc[] {
   })
 }
 
-/** Gọi hộp In của CHÍNH phiếu (nút "Đề và lời giải" → `luuPdf(true)` → `window.print()`) ngay khi phiếu nạp xong. Máy chặn in tự động
- * thì phiếu vẫn mở, em bấm "Tải PDF" trên phiếu. Chèn ở nơi gọi, không sửa html-phieu.ts. */
+/** Đường DỰ PHÒNG (máy không dựng được tệp PDF): gọi hộp In của CHÍNH phiếu (nút "Đề và lời giải" → `window.print()`) khi phiếu nạp
+ * xong. Chèn ở nơi gọi, không sửa html-phieu.ts. */
 export function themInTuDong(html: string): string {
   const s = `<script>window.addEventListener('load',function(){setTimeout(function(){var b=document.getElementById('pdf-giai');if(b){b.click()}else{window.print()}},500)})<\/script>`
   return html.includes('</body>') ? html.replace(/<\/body>(?![\s\S]*<\/body>)/, `${s}</body>`) : html + s
@@ -48,12 +51,16 @@ export interface CauDaLamProps {
   token: string
   hoTen: string
   sbd: string
+  /** Lớp của em — in trên tờ PDF ("Nguyễn An · Lớp 12A1 · …"). */
+  lop?: string
   onVe: () => void
 }
 
 type TrangThaiChiTiet = { dang: true } | { loi: string } | { ct: ChiTietCau }
+type TrangThaiPdf = { dang: boolean; chu: string; loi: string; xong: string; duPhong: boolean }
+const PDF_TRONG: TrangThaiPdf = { dang: false, chu: '', loi: '', xong: '', duPhong: false }
 
-export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
+export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLamProps) {
   const [du, setDu] = useState<KetQuaCauDaLam | null>(null)
   const [loi, setLoi] = useState('')
   const [dangTai, setDangTai] = useState(true)
@@ -63,8 +70,9 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
   const [loc, setLoc] = useState<BoLoc>('tat_ca')
   const [mo, setMo] = useState<string | null>(null)
   const [chiTiet, setChiTiet] = useState<Record<string, TrangThaiChiTiet>>({})
-  const [pdf, setPdf] = useState<{ dang: boolean; chu: string; loi: string }>({ dang: false, chu: '', loi: '' })
+  const [pdf, setPdf] = useState<TrangThaiPdf>(PDF_TRONG)
   const [phieu, setPhieu] = useState('')
+  const daXin = useRef(new Set<string>())
 
   useEffect(() => {
     let huy = false
@@ -100,18 +108,39 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
   const boLoc = BO_LOC.find((b) => b.id === loc)!
   const dsLoc = useMemo(() => cauCd.filter(boLoc.hop), [cauCd, boLoc])
 
+  /** Lấy chi tiết các câu chưa có (một lượt ≤ 60 câu — `taiChiTiet` tự chia). */
   const napChiTiet = useCallback(
-    (qid: string) => {
-      setChiTiet((x) => ({ ...x, [qid]: { dang: true } }))
-      taiChiTiet(token, [qid])
+    (qids: string[]) => {
+      if (qids.length === 0) return
+      qids.forEach((q) => daXin.current.add(q))
+      setChiTiet((x) => ({ ...x, ...Object.fromEntries(qids.map((q) => [q, { dang: true } as TrangThaiChiTiet])) }))
+      taiChiTiet(token, qids)
         .then((ds) => {
-          const ct = ds.find((d) => d.de.qid === qid)
-          setChiTiet((x) => ({ ...x, [qid]: ct ? { ct } : { loi: 'Máy chủ chưa trả được đề của câu này.' } }))
+          const theo = new Map(ds.map((d) => [d.de.qid, d]))
+          setChiTiet((x) => ({
+            ...x,
+            ...Object.fromEntries(
+              qids.map((q) => {
+                const ct = theo.get(q)
+                return [q, ct ? { ct } : { loi: 'Máy chủ chưa trả được đề của câu này.' }] as [string, TrangThaiChiTiet]
+              }),
+            ),
+          }))
         })
-        .catch((e: unknown) => setChiTiet((x) => ({ ...x, [qid]: { loi: e instanceof Error ? e.message : 'Chưa tải được lời giải.' } })))
+        .catch((e: unknown) => {
+          const loiChu = e instanceof Error ? e.message : 'Chưa tải được lời giải.'
+          qids.forEach((q) => daXin.current.delete(q))
+          setChiTiet((x) => ({ ...x, ...Object.fromEntries(qids.map((q) => [q, { loi: loiChu } as TrangThaiChiTiet])) }))
+        })
     },
     [token],
   )
+
+  // Thẻ đóng cần một dòng đề + đáp án (bản vẽ) ⇒ lấy chi tiết cho các câu ĐANG LỌC chưa có.
+  useEffect(() => {
+    napChiTiet(dsLoc.map((c) => c.qid).filter((q) => !daXin.current.has(q)))
+  }, [dsLoc, napChiTiet])
+
   const moThe = (qid: string) => {
     if (mo === qid) {
       setMo(null)
@@ -120,26 +149,70 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
     setMo(qid)
     const co = chiTiet[qid]
     if (co && ('ct' in co || 'dang' in co)) return
-    napChiTiet(qid)
+    napChiTiet([qid])
+  }
+
+  /** Chi tiết đủ cho các câu đang lọc (dùng cái đã có, thiếu thì hỏi máy chủ). */
+  const layChiTietDs = async (ds: CauDaLamMuc[]): Promise<Map<string, ChiTietCau>> => {
+    const co = new Map<string, ChiTietCau>()
+    for (const c of ds) {
+      const t = chiTiet[c.qid]
+      if (t && 'ct' in t) co.set(c.qid, t.ct)
+    }
+    const thieu = ds.filter((c) => !co.has(c.qid)).map((c) => c.qid)
+    if (thieu.length) {
+      const ct = await taiChiTiet(token, thieu, (da, tong) => setPdf((x) => ({ ...x, chu: `Đang lấy câu ${da}/${tong}…` })))
+      for (const c of ct) co.set(c.de.qid, c)
+    }
+    return co
   }
 
   const taiPdf = async () => {
     if (pdf.dang || dsLoc.length === 0) return
     const ds = dsLoc
-    setPdf({ dang: true, chu: `Đang lấy ${ds.length} câu…`, loi: '' })
+    const tenCd = cd?.ten ?? ''
+    setPdf({ ...PDF_TRONG, dang: true, chu: `Đang lấy ${ds.length} câu…` })
+    let buoc: 'lay' | 'dung' = 'lay'
     try {
-      const ct = await taiChiTiet(
-        token,
-        ds.map((c) => c.qid),
-        (da, tong) => setPdf((x) => ({ ...x, chu: `Đang lấy câu ${da}/${tong}…` })),
+      const theoQid = await layChiTietDs(ds)
+      const cauIn = ds.flatMap((muc) => {
+        const ct = theoQid.get(muc.qid)
+        return ct ? [{ muc, ct }] : []
+      })
+      if (cauIn.length === 0) throw new Error('Máy chủ chưa trả được câu nào để in. Em thử lại sau ít phút.')
+      buoc = 'dung'
+      setPdf((x) => ({ ...x, chu: 'Đang dựng tệp PDF…' }))
+      const { dungPdf, luuTep, tenTepPdf } = await import('./pdf-cau-da-lam')
+      const inLuc = Date.now()
+      const blob = await dungPdf({ hoTen, lop, sbd, tenChienDich: tenCd, nhanBoLoc: boLoc.nhan, inLuc }, cauIn, (t, tong) =>
+        setPdf((x) => ({ ...x, chu: `Đang dựng trang ${t}/${tong}…` })),
       )
-      const theoQid = new Map(ct.map((c) => [c.de.qid, c]))
+      const ten = tenTepPdf(boLoc.nhan, inLuc)
+      luuTep(blob, ten)
+      const thieu = ds.length - cauIn.length
+      setPdf({ ...PDF_TRONG, xong: `Đã tải tệp ${ten} (${cauIn.length} câu).${thieu > 0 ? ` Có ${thieu} câu máy chủ chưa trả được nên chưa có trong tệp.` : ''}` })
+    } catch (e) {
+      const chu = e instanceof Error ? e.message : ''
+      setPdf({
+        ...PDF_TRONG,
+        loi: buoc === 'dung' ? `Máy chưa dựng được tệp PDF${chu ? ` (${chu})` : ''}. Em bấm "Mở bản in" để lưu PDF bằng hộp In.` : chu || 'Chưa lấy được câu. Em thử lại.',
+        duPhong: buoc === 'dung',
+      })
+    }
+  }
+
+  /** Dự phòng: phiếu HTML chuẩn (`dungPhieu`) + hộp In của phiếu. */
+  const moBanIn = async () => {
+    if (pdf.dang || dsLoc.length === 0) return
+    const ds = dsLoc
+    setPdf({ ...PDF_TRONG, dang: true, chu: 'Đang dựng bản in…' })
+    try {
+      const theoQid = await layChiTietDs(ds)
       const cauIn = ds.flatMap((m) => {
         const c = theoQid.get(m.qid)
         return c ? [cauLuyenTuChiTiet(c, m)] : []
       })
       if (cauIn.length === 0) throw new Error('Máy chủ chưa trả được câu nào để in. Em thử lại sau ít phút.')
-      setPdf((x) => ({ ...x, chu: 'Đang dựng bản in…' }))
       const { dungPhieu } = await import('../../lib/html-phieu')
       const tenCd = cd?.ten ?? 'Câu đã làm'
       const html = dungPhieu(
@@ -162,9 +235,9 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
         { moSan: true, loiNhac: `Câu đã làm — ${boLoc.nhan} · ${cauIn.length} câu · In lúc ${gioThuNgay(Date.now())}` },
       )
       setPhieu(themInTuDong(html))
-      setPdf({ dang: false, chu: '', loi: cauIn.length < ds.length ? `Có ${ds.length - cauIn.length} câu máy chủ chưa trả được, bản in có ${cauIn.length} câu.` : '' })
+      setPdf(PDF_TRONG)
     } catch (e) {
-      setPdf({ dang: false, chu: '', loi: e instanceof Error ? e.message : 'Chưa dựng được bản in. Em thử lại.' })
+      setPdf({ ...PDF_TRONG, loi: e instanceof Error ? e.message : 'Chưa dựng được bản in. Em thử lại.', duPhong: true })
     }
   }
 
@@ -182,9 +255,18 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
           <h1 className="h2-cdl-tieu">Câu đã làm</h1>
         </div>
         {dsChienDich.length > 0 && (
-          <label className="h2-cdl-chon">
-            <span className="h2-cdl-chon-nhan">Chiến dịch</span>
+          <div className="h2-cdl-chon">
+            <span className="h2-cdl-chon-hien" aria-hidden="true">
+              <span className="h2-cdl-chon-chu">
+                Chiến dịch: <b>{cd?.ten ?? ''}</b>
+                {cd ? ` · ${cd.tong} câu` : ''}
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </span>
             <select
+              aria-label="Chiến dịch"
               value={cdHienTai}
               onChange={(e) => {
                 setCdChon(e.target.value)
@@ -197,7 +279,7 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
                 </option>
               ))}
             </select>
-          </label>
+          </div>
         )}
         {trangThaiDs === 'co' && (
           <>
@@ -211,6 +293,7 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
                   onClick={() => {
                     setLoc(b.id)
                     setMo(null)
+                    setPdf(PDF_TRONG)
                   }}
                 >
                   {b.nhan} <span className="h2-cdl-dem">{dem[b.id]}</span>
@@ -266,24 +349,59 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
           dsLoc.map((c) => {
             const dangMo = mo === c.qid
             const tt = chiTiet[c.qid]
+            const ct = tt && 'ct' in tt ? tt.ct : null
+            const tom = ct ? tomTatThe(ct) : null
             const cuoi = c.lichSu.length ? c.lichSu.reduce((m, l) => (l.ngay >= m.ngay ? l : m), c.lichSu[0]!) : null
             const hen = dongHenOn(c)
             const idMo = `h2-cdl-mo-${c.qid.replace(/[^a-zA-Z0-9_-]/g, '_')}`
+            const dau = `${dauCau(c)}${tom?.phuDau ? ` · ${tom.phuDau}` : ''}`
+            const nhanTt = (
+              <span className="h2-the-tt" data-tt={c.trangThai}>
+                {NHAN_TRANG_THAI[c.trangThai]}
+              </span>
+            )
             return (
-              <article key={c.qid} className="h2-the" data-mo={dangMo ? 'true' : 'false'} data-trang-thai={c.trangThai}>
+              <article key={c.qid} className={dangMo ? 'h2-the m3' : 'h2-the'}data-mo={dangMo ? 'true' : 'false'} data-trang-thai={c.trangThai}>
                 <button type="button" className="h2-the-nut" aria-expanded={dangMo} aria-controls={idMo} onClick={() => moThe(c.qid)}>
                   <span className="h2-the-dau">
-                    <span className="h2-the-so">{dauCau(c)}</span>
-                    <span className="h2-the-tt" data-tt={c.trangThai}>
-                      {NHAN_TRANG_THAI[c.trangThai]}
-                    </span>
+                    <span className="h2-the-so">{dau}</span>
+                    {nhanTt}
                   </span>
-                  {c.tenDang && <span className="h2-the-dang">{c.tenDang}</span>}
-                  {cuoi && <span className="h2-the-cuoi">Lần gần nhất: {chuLanLam(cuoi)}</span>}
-                  <span className="h2-the-duoi">
-                    <span>{hen}</span>
-                    <span className="h2-the-xem">{dangMo ? 'Thu gọn' : 'Xem lời giải'}</span>
-                  </span>
+                  {!dangMo && (
+                    <>
+                      {tom ? (
+                        <span className="h2-the-de">
+                          <ChemText text={tom.de} />
+                        </span>
+                      ) : (
+                        c.tenDang && <span className="h2-the-de">{c.tenDang}</span>
+                      )}
+                      {tom ? (
+                        <span className="h2-the-em">
+                          {tom.nhanEm}:{' '}
+                          <b className={tom.dung ? 'h2-the-dung' : 'h2-the-sai'}>
+                            <ChemText text={tom.em} />
+                          </b>
+                          {tom.dapAn ? (
+                            <>
+                              {' · Đáp án: '}
+                              <b className="h2-the-dung">
+                                <ChemText text={tom.dapAn} />
+                              </b>
+                            </>
+                          ) : tom.dung ? (
+                            ' · Đúng'
+                          ) : null}
+                        </span>
+                      ) : (
+                        cuoi && <span className="h2-the-em">Lần gần nhất: {chuLanLam(cuoi)}</span>
+                      )}
+                      <span className="h2-the-duoi">
+                        <span>{c.trangThai === 'can_day_lai' ? 'Thầy chữa câu này trên lớp' : hen}</span>
+                        <span className="h2-the-xem">Xem lời giải</span>
+                      </span>
+                    </>
+                  )}
                 </button>
                 {dangMo && (
                   <div id={idMo} className="h2-the-mo">
@@ -295,11 +413,7 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
                     ) : 'loi' in tt ? (
                       <div className="h2-cdl-thong-bao" role="alert">
                         <p>{tt.loi}</p>
-                        <button
-                          type="button"
-                          className="h2-cdl-nut-phu"
-                          onClick={() => napChiTiet(c.qid)}
-                        >
+                        <button type="button" className="h2-cdl-nut-phu" onClick={() => napChiTiet([c.qid])}>
                           Thử lại
                         </button>
                       </div>
@@ -320,6 +434,10 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
                         </ul>
                       </div>
                     )}
+                    {hen && <p className="h2-the-hen">{hen}</p>}
+                    <button type="button" className="h2-the-thu" aria-controls={idMo} onClick={() => setMo(null)}>
+                      Thu gọn
+                    </button>
                   </div>
                 )}
               </article>
@@ -334,13 +452,23 @@ export default function CauDaLam({ token, hoTen, sbd, onVe }: CauDaLamProps) {
               {pdf.loi}
             </p>
           )}
+          {pdf.xong && (
+            <p className="h2-cdl-xong" role="status">
+              {pdf.xong}
+            </p>
+          )}
           <button type="button" className="h2-cdl-nut-chinh" disabled={pdf.dang || dsLoc.length === 0} aria-busy={pdf.dang} onClick={() => void taiPdf()}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-              <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
             </svg>
             {pdf.dang ? pdf.chu : `Tải PDF · ${dsLoc.length} câu đang lọc`}
           </button>
-          <span className="h2-cdl-nhac">Máy mở hộp In → chọn "Lưu thành PDF". Chạy trên điện thoại và máy tính.</span>
+          {pdf.duPhong && !pdf.dang && (
+            <button type="button" className="h2-cdl-nut-phu h2-cdl-du-phong" onClick={() => void moBanIn()}>
+              Mở bản in
+            </button>
+          )}
+          <span className="h2-cdl-nhac">Tệp PDF tải thẳng về máy: đề đầy đủ, đáp án, lời giải và lịch sử từng câu. Chạy trên điện thoại và máy tính.</span>
         </footer>
       )}
 

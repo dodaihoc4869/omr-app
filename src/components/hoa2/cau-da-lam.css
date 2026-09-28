@@ -80,26 +80,47 @@
   font-size: 22px;
   font-weight: 800;
 }
+/* chọn chiến dịch: trông như nút "Chiến dịch: Ester – Lipid · 120 câu ⌄" (bản vẽ), bên dưới là <select> thật phủ kín (bấm mở hộp chọn của máy) */
 .h2-cdl-chon {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.h2-cdl-chon-nhan {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--h2c-chu-phu);
-}
-.h2-cdl-chon select {
+  position: relative;
   min-height: 48px;
-  width: 100%;
-  padding: 0 14px;
   border-radius: 14px;
   border: 1px solid rgb(51 69 110);
   background: var(--h2c-nen-2);
-  color: var(--h2c-chu);
+}
+.h2-cdl-chon:focus-within {
+  outline: 3px solid var(--h2c-vang-sang);
+  outline-offset: 2px;
+}
+.h2-cdl-chon-hien {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 14px;
   font-size: 15px;
-  font-weight: 700;
+  color: var(--h2c-chu);
+}
+.h2-cdl-chon-chu {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.h2-cdl-chon select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px;
+  background: var(--h2c-nen-2);
+  color: var(--h2c-chu);
+}
+.h2-cdl-chon select:focus-visible {
+  outline: none;
 }
 .h2-cdl-loc {
   display: flex;
@@ -229,14 +250,28 @@
   background: rgb(255 221 179);
   color: rgb(92 50 0);
 }
-.h2-the-dang {
+/* thẻ đóng: một dòng đề (tối đa 3 dòng) + "Em chọn: … · Đáp án: …" */
+.h2-the-de {
   font-size: 15px;
   line-height: 1.5;
   overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
-.h2-the-cuoi {
+.h2-the-em {
   font-size: 14px;
+  line-height: 1.5;
   color: var(--h2c-chu-nhat);
+  overflow-wrap: anywhere;
+}
+.h2-the-sai {
+  color: rgb(255 180 174);
+}
+.h2-the-dung {
+  color: rgb(109 213 140);
 }
 .h2-the-duoi {
   font-size: 13px;
@@ -247,15 +282,57 @@
   color: var(--h2c-xanh);
   font-weight: 700;
 }
+
+/* thẻ mở (bản vẽ: thẻ sáng): bảng màu M3 dùng chung (`.m3` trên thẻ), sáng/tối theo máy */
+.h2-the[data-mo='true'] {
+  background: var(--m3-surface);
+  color: var(--m3-on-surface);
+}
+.h2-the[data-mo='true'] .h2-the-nut {
+  color: var(--m3-on-surface);
+  padding-bottom: 4px;
+}
+.h2-the[data-mo='true'] .h2-the-so,
+.h2-the[data-mo='true'] .h2-the-ls-nhan,
+.h2-the[data-mo='true'] .h2-the-hen {
+  color: var(--m3-on-surface-variant);
+}
 .h2-the-mo {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 0 12px 14px;
+  padding: 0 16px 12px;
 }
 .h2-the-cau {
   background: transparent;
   border-radius: 20px;
+}
+/* TheCau trong thẻ: bỏ dải đầu thẻ (đầu thẻ của màn này đã nêu "Câu 17 · …"), bỏ nền/đệm thẻ lồng — lời giải vẫn là khối chuẩn của TheCau */
+.h2-the .h2-the-cau .the-cau {
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+.h2-the .h2-the-cau .the-cau > div:first-child {
+  display: none !important;
+}
+.h2-the .h2-the-cau .the-cau > div:last-child {
+  padding: 0 !important;
+}
+.h2-the-hen {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.h2-the-thu {
+  align-self: flex-end;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 22px;
+  background: transparent;
+  color: var(--m3-primary);
+  font-size: 14px;
+  font-weight: 700;
 }
 .h2-the-ls {
   display: flex;
@@ -331,4 +408,14 @@
   margin: 0;
   font-size: 13px;
   color: rgb(255 180 174);
+}
+.h2-cdl-xong {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgb(196 238 208);
+  overflow-wrap: anywhere;
+}
+.h2-cdl-du-phong {
+  align-self: center;
 }

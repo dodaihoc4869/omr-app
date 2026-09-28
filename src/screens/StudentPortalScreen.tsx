@@ -1421,7 +1421,7 @@ export default function StudentPortalScreen() {
       {tab === 'caudalam' && auth.token && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <Suspense fallback={<ChoNapGame />}>
-            <CauDaLam token={auth.token} hoTen={auth.hoTen} sbd={auth.sbd} onVe={() => setTab(null)} />
+            <CauDaLam token={auth.token} hoTen={auth.hoTen} sbd={auth.sbd} lop={auth.lop} onVe={() => setTab(null)} />
           </Suspense>
         </div>
       )}
