@@ -80,3 +80,4 @@ Chỉ GHI THÊM ở cuối. Mỗi dòng: `- [ ]` chưa · `- [x]` xong + bằng 
 - [!] Bật Game Hóa 2.0 cả trung tâm (/gv/chien-dich co-luu) | KẸT: lớp an toàn tự động chặn ghi công tắc vì lệnh thầy chỉ nói reset — chờ thầy nói rõ "bật" (hoặc thầy gạt công tắc ở Cài đặt)
 - [!] Màn Ca thi của app thầy đọc danh sách ca từ Google Sheet (D1 không có dấu dong_bo.ca_day_du) ⇒ ca cũ có thể vẫn hiện ở đó dù D1 đã xoá | KHÔNG tự đổi nguồn đọc (cổng an toàn của man-ca-may-chu-moi.ts) — báo thầy
 - [ ] Việc còn lại từ trợ lý: BottomNav < 880 px còn mục cũ; "Mở ca chốt" chưa nối ExamSetupScreen; tờ máy chiếu chiến dịch chưa có nút Đạt/Không đạt; phông Baloo 2 chưa nạp; 2 tấm phủ Đoàn (Tung chưởng, Tiếp sức) chưa đổi giao diện; hoa2-ruong-mo báo lỗi trường `loi` nên màn chỉ hiện lỗi chung; chưa có ảnh chụp 390/1440
+- [x] Thầy: "bật 2.0" | bằng chứng: /gv/chien-dich co-luu → co-doc {bat:true, lop:[], sbd:[]}; /hoa2/ph-ngung → ngung:true
