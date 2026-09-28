@@ -1,6 +1,6 @@
 // SỬA CHIẾN DỊCH ĐANG MỞ — LỆNH CỦA THẦY `POST /gv/chien-dich/sua` (nằm SAU cổng `laThay`; thầy 28/09).
 //   action: doc | xem-truoc | luu (mặc định luu)
-//   body: { id, themMaDe?: string[], themSbd?: string[], botSbd?: string[], hanNop?: 'YYYY-MM-DD', theLucNgay?: number, nguoi?: string }
+//   body: { id, themMaDe?: string[], themSbd?: string[], botSbd?: string[], hanNop?: 'YYYY-MM-DD', batDau?: 'YYYY-MM-DD', theLucNgay?: number, nguoi?: string }
 // Luật (ghi chú đầy đủ: docs/sua-chien-dich-2809/GHI-CHU.md):
 //   · Thêm đề ⇒ câu mới lấy bằng ĐÚNG hàm của lúc tạo (`cauCuaToChiTiet`: câu đã duyệt, bỏ tự luận, bỏ trùng), NỐI SAU câu cũ.
 //     Sổ làm bài + `tao_luc` giữ nguyên ⇒ câu em đã làm vẫn tính (không mất tiến độ/EXP/điểm); thuật toán chia câu (`lapKeHoachNgay`)
@@ -12,12 +12,14 @@
 //     ⇒ tự NÂNG số câu/ngày = ⌈lượt còn cần lớn nhất / ngày còn lại⌉; KHÔNG bao giờ tự hạ. Thầy gửi `theLucNgay` ⇒ dùng số của thầy
 //     (thấp hơn mức cần ⇒ `chuaKipHan: true`, vẫn lưu).
 //   · Sửa hạn ⇒ hạn mới ≥ hôm nay; chiến dịch đã hết hạn / đã kết thúc ⇒ mở lại (`dang_chay`). Chiến dịch đã huỷ ⇒ từ chối.
+//   · Ngày bắt đầu (thầy 28/09, bảng phụ `chien_dich_bat_dau`): chỉ đổi được khi chiến dịch CHƯA bắt đầu; ngày mới ≥ hôm nay và ≤ hạn nộp.
+//     Số ngày còn lại để tự nâng số câu/ngày tính TỪ NGÀY BẮT ĐẦU (mới) nếu chưa bắt đầu.
 //   · Nhật ký: `chien_dich_sua` (ai, lúc nào, đổi gì) + một dòng `nhat_ky_may`.
 // Schema CHỈ-THÊM, tạo lúc chạy (CI không chạy migration): `chien_dich_em`, `chien_dich_sua`.
 // Không gửi đáp án/lời giải: chỉ trả mã tờ, số câu, SBD.
 import type { Env } from './kieu'
 import { cauCuaToChiTiet, maGocCuaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
-import { docChienDichTuDong, docMocThemCaLop, ngayVnCua, type ChienDich } from './srs2-d1'
+import { batDauCua, chuaBatDau, docChienDichKemBatDau, docMocThemCaLop, ghiBatDau, ngayVnCua, type ChienDich } from './srs2-d1'
 import { khoiLuongCan, soNgayConLai } from './srs2-loi'
 import { chuTomTatSua } from '../../src/lib/tom-tat-sua-chien-dich'
 
@@ -63,6 +65,8 @@ export interface KeHoachSua {
   themSbd: string[]
   botSbd: string[]
   hanMoi: string | null
+  /** Ngày bắt đầu mới (`null` = giữ). */
+  batDauMoi: string | null
   moLai: boolean
   sbdSau: string[]
   maDeSau: string[]
@@ -82,11 +86,11 @@ export interface KeHoachSua {
  * câu mới 2 lượt, câu đang ôn 2 − chuỗi đúng, câu đã thành thạo (kể cả thành thạo lần đầu) 0.
  * Mốc tính lần làm: em mới thêm = bây giờ; em cũ = lúc giao / lúc được thêm (như `trangThaiLop`).
  */
-async function khoiLuongLonNhat(env: Env, cd: ChienDich, sbd: readonly string[], qids: readonly string[], themSbd: readonly string[], nowLuc: string, hanNop: string): Promise<number> {
+async function khoiLuongLonNhat(env: Env, cd: ChienDich, sbd: readonly string[], qids: readonly string[], themSbd: readonly string[], nowLuc: string, hanNop: string, mocBatDau: string): Promise<number> {
   if (!sbd.length || !qids.length) return 0
   const them = new Map(await docMocThemCaLop(env, cd.id))
   for (const s of themSbd) them.set(s, nowLuc)
-  const tt = await trangThaiLop(env, sbd, qids, hanNop, cd.taoLuc, undefined, them)
+  const tt = await trangThaiLop(env, sbd, qids, hanNop, mocBatDau, undefined, them)
   let lonNhat = 0
   for (const s of sbd) lonNhat = Math.max(lonNhat, khoiLuongCan(tt.get(s)?.values() ?? []))
   return lonNhat
@@ -104,7 +108,7 @@ async function docMot(env: Env, id: string): Promise<ChienDich> {
   if (!id) throw new Error('Thiếu mã chiến dịch.')
   const r = await env.DB.prepare('SELECT * FROM chien_dich WHERE id = ?').bind(id).first<Row>()
   if (!r) throw new Error('Không tìm thấy chiến dịch.')
-  return docChienDichTuDong(r)
+  return (await docChienDichKemBatDau(env, [r]))[0]!
 }
 
 /** Tính thay đổi (KHÔNG ghi). Ném lỗi bằng MỘT câu thầy đọc được khi đầu vào không hợp lệ. */
@@ -149,6 +153,19 @@ export async function lapKeHoachSua(env: Env, b: Row, nowMs: number): Promise<Ke
     hanMoi = hanGui
   }
   // Hết hạn hoặc đã kết thúc: chỉ đặt hạn mới (≥ hôm nay) mới mở lại được.
+  // ---- ngày bắt đầu: chỉ đổi khi CHƯA bắt đầu; không trước hôm nay, không sau hạn (mới).
+  const hanSauTam = hanMoi ?? cd.hanNop
+  const bdGui = str(b.batDau).trim()
+  let batDauMoi: string | null = null
+  if (bdGui && bdGui !== cd.batDau) {
+    if (!NGAY.test(bdGui)) throw new Error('Ngày bắt đầu phải là ngày dạng YYYY-MM-DD.')
+    if (!chuaBatDau(cd, homNay)) throw new Error('Chiến dịch đã bắt đầu — không đổi được ngày bắt đầu.')
+    if (bdGui < homNay) throw new Error('Ngày bắt đầu phải từ hôm nay trở đi.')
+    batDauMoi = bdGui
+  }
+  const batDauSau = batDauMoi ?? cd.batDau
+  if (batDauSau > hanSauTam) throw new Error('Ngày bắt đầu không được sau hạn nộp.')
+  const mocBatDauSau = batDauMoi ? batDauCua(cd.taoLuc, batDauMoi).mocBatDau : cd.mocBatDau
   const daDung = cd.hanNop < homNay || cd.trangThai === 'da_dong'
   const moLai = daDung && !!hanMoi
   if (daDung && !hanMoi && (qidThem.length || themSbd.length)) throw new Error('Chiến dịch đã hết hạn — chọn hạn nộp mới để mở lại rồi mới thêm đề/em.')
@@ -158,20 +175,22 @@ export async function lapKeHoachSua(env: Env, b: Row, nowMs: number): Promise<Ke
   if (theLucGui != null && (!Number.isFinite(theLucGui) || theLucGui < 1)) throw new Error('Số câu mỗi ngày phải là số nguyên từ 1 trở lên.')
   const hanSau = hanMoi ?? cd.hanNop
   const qidSau = [...cd.qids, ...qidThem]
-  const coXet = qidThem.length > 0 || (!!hanMoi && hanMoi < cd.hanNop)
-  const luotCan = await khoiLuongLonNhat(env, cd, sbdSau, qidSau, themSbd, new Date(nowMs).toISOString(), hanSau)
-  const { can: theLucCan, sau: theLucTu } = theLucSauSua(cd.theLucNgay, luotCan, soNgayConLai(homNay, hanSau < homNay ? homNay : hanSau), coXet)
+  const coXet = qidThem.length > 0 || (!!hanMoi && hanMoi < cd.hanNop) || (!!batDauMoi && batDauMoi > cd.batDau)
+  const luotCan = await khoiLuongLonNhat(env, cd, sbdSau, qidSau, themSbd, new Date(nowMs).toISOString(), hanSau, mocBatDauSau)
+  // Số ngày còn lại tính TỪ NGÀY BẮT ĐẦU nếu chiến dịch chưa bắt đầu (thầy 28/09).
+  const tuNgay = batDauSau > homNay ? batDauSau : homNay
+  const { can: theLucCan, sau: theLucTu } = theLucSauSua(cd.theLucNgay, luotCan, soNgayConLai(tuNgay, hanSau < tuNgay ? tuNgay : hanSau), coXet)
   const theLucSau = theLucGui != null ? Math.min(THE_LUC_TOI_DA, theLucGui) : theLucTu
   const doiTheLuc = theLucSau !== cd.theLucNgay
 
-  if (!maDeChon.length && !themSbd.length && !botSbd.length && !hanMoi && !doiTheLuc) throw new Error('Chưa có thay đổi nào.')
-  if (maDeChon.length && !qidThem.length && !themSbd.length && !botSbd.length && !hanMoi && !doiTheLuc)
+  if (!maDeChon.length && !themSbd.length && !botSbd.length && !hanMoi && !batDauMoi && !doiTheLuc) throw new Error('Chưa có thay đổi nào.')
+  if (maDeChon.length && !qidThem.length && !themSbd.length && !botSbd.length && !hanMoi && !batDauMoi && !doiTheLuc)
     throw new Error('Các tờ đề đã chọn không có câu mới (trùng câu đã có, câu tự luận hoặc câu chưa duyệt).')
 
   const maDeSau = [...cd.maDe, ...maGocCuaTo(themMaDe).filter((m) => !cd.maDe.includes(m))]
-  const tomTat = chuTomTatSua({ themDe: themMaDe.length, themEm: themSbd.length, botEm: botSbd.length, hanCu: cd.hanNop, hanMoi, theLucCu: cd.theLucNgay, theLucMoi: theLucSau })
+  const tomTat = chuTomTatSua({ themDe: themMaDe.length, themEm: themSbd.length, botEm: botSbd.length, hanCu: cd.hanNop, hanMoi, batDauCu: cd.batDau, batDauMoi, theLucCu: cd.theLucNgay, theLucMoi: theLucSau })
   return {
-    cd, homNay, themMaDe, toKhongCoCauMoi, soCauTheoTo, qidThem, themSbd, botSbd, hanMoi, moLai, sbdSau, maDeSau, qidSau,
+    cd, homNay, themMaDe, toKhongCoCauMoi, soCauTheoTo, qidThem, themSbd, botSbd, hanMoi, batDauMoi, moLai, sbdSau, maDeSau, qidSau,
     theLucCu: cd.theLucNgay, theLucSau, theLucCan, tuNang: theLucGui == null && theLucSau > cd.theLucNgay, chuaKipHan: luotCan > 0 && theLucSau < theLucCan, tomTat,
   }
 }
@@ -181,7 +200,7 @@ const traVe = (k: KeHoachSua) => ({
   themMaDe: k.themMaDe, toKhongCoCauMoi: k.toKhongCoCauMoi, soCauTheoTo: k.soCauTheoTo,
   soCauCu: k.cd.qids.length, soCauThem: k.qidThem.length, soCauSau: k.qidSau.length,
   themSbd: k.themSbd, botSbd: k.botSbd, soEmSau: k.sbdSau.length,
-  hanCu: k.cd.hanNop, hanNop: k.hanMoi ?? k.cd.hanNop, moLai: k.moLai,
+  hanCu: k.cd.hanNop, hanNop: k.hanMoi ?? k.cd.hanNop, moLai: k.moLai, batDauCu: k.cd.batDau, batDau: k.batDauMoi ?? k.cd.batDau,
   theLucCu: k.theLucCu, theLucNgay: k.theLucSau, theLucCan: k.theLucCan, tuNang: k.tuNang, chuaKipHan: k.chuaKipHan,
 })
 
@@ -197,6 +216,7 @@ async function luu(env: Env, b: Row, nowMs: number) {
     .bind(JSON.stringify(k.sbdSau), JSON.stringify(k.maDeSau), JSON.stringify(k.qidSau), k.hanMoi ?? cd.hanNop, k.theLucSau, k.moLai ? 1 : 0, k.moLai ? 1 : 0,
       cd.id, JSON.stringify(cd.sbd), JSON.stringify(cd.qids), cd.hanNop).run()
   if (!r.meta.changes) throw new Error('Chiến dịch vừa đổi ở nơi khác — mở lại hộp Chỉnh sửa rồi lưu lại.')
+  if (k.batDauMoi) await ghiBatDau(env, cd.id, k.batDauMoi)
 
   const ai = str(b.nguoi).trim().slice(0, 60) || 'thầy'
   const lenh = [
@@ -207,7 +227,7 @@ async function luu(env: Env, b: Row, nowMs: number) {
     // Phân bổ lại: kế hoạch hôm nay đã chốt với chiến dịch này ⇒ lập lại ở lần mở kế tiếp (giữ câu đã làm hôm nay).
     env.DB.prepare('UPDATE srs2_ke_hoach SET chien_dich_id = ? WHERE ngay = ? AND chien_dich_id = ?').bind(hauToSua(cd.id), k.homNay, cd.id),
     env.DB.prepare('INSERT INTO chien_dich_sua (chien_dich_id, luc, ai, tom_tat, thay_doi_json) VALUES (?,?,?,?,?)').bind(cd.id, luc, ai, k.tomTat, JSON.stringify({
-      themMaDe: k.themMaDe, soCauThem: k.qidThem.length, qidThem: k.qidThem, themSbd: k.themSbd, botSbd: k.botSbd, hanCu: cd.hanNop, hanMoi: k.hanMoi, moLai: k.moLai,
+      themMaDe: k.themMaDe, soCauThem: k.qidThem.length, qidThem: k.qidThem, themSbd: k.themSbd, botSbd: k.botSbd, hanCu: cd.hanNop, hanMoi: k.hanMoi, batDauCu: cd.batDau, batDauMoi: k.batDauMoi, moLai: k.moLai,
       theLucCu: k.theLucCu, theLucMoi: k.theLucSau, tuNang: k.tuNang, theLucCan: k.theLucCan,
     })),
   ]
@@ -223,7 +243,7 @@ async function doc(env: Env, b: Row, nowMs: number) {
   const nk = await env.DB.prepare('SELECT luc, ai, tom_tat FROM chien_dich_sua WHERE chien_dich_id = ? ORDER BY luc DESC LIMIT 20').bind(cd.id).all<Row>().catch(() => ({ results: [] as Row[] }))
   return {
     ok: true, homNay,
-    chienDich: { id: cd.id, ten: cd.ten, lop: cd.lop, maDe: cd.maDe, sbd: cd.sbd, hanNop: cd.hanNop, theLucNgay: cd.theLucNgay, trangThai: cd.trangThai, soCau: cd.qids.length, soEm: cd.sbd.length, hetHan: cd.hanNop < homNay },
+    chienDich: { id: cd.id, ten: cd.ten, lop: cd.lop, maDe: cd.maDe, sbd: cd.sbd, hanNop: cd.hanNop, theLucNgay: cd.theLucNgay, trangThai: cd.trangThai, soCau: cd.qids.length, soEm: cd.sbd.length, hetHan: cd.hanNop < homNay, batDau: cd.batDau, daBatDau: !chuaBatDau(cd, homNay) },
     nhatKy: (nk.results ?? []).map((x) => ({ luc: str(x.luc), ai: str(x.ai), tomTat: str(x.tom_tat) })),
   }
 }

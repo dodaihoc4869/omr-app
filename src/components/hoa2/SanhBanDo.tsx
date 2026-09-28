@@ -464,13 +464,17 @@ function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s:
   )
 }
 
+/** Chưa có chiến dịch đang chạy: chiến dịch sắp bắt đầu (thầy 28/09) ⇒ báo ngày; không thì câu cũ. */
+const chuChuaCoChienDich = (s: SanhHoa2): string =>
+  s.sapBatDau ? `Chiến dịch ${s.sapBatDau.ten} bắt đầu ${thuNgayThang(s.sapBatDau.batDau)}. Tới ngày đó bản đồ sẽ mở đảo mới ở đây.` : 'Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.'
+
 function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
   const xong = s.theLuc.tong > 0 && s.theLuc.con === 0
   const trong = s.theLuc.tong === 0
   return (
     <>
       {s.huyetChien && !xong ? <TheHuyetChien s={s} now={p.now} /> : s.chienDich ? <DongChienDich s={s} now={p.now} /> : (
-        <p className="h2-tam-chu">Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.</p>
+        <p className="h2-tam-chu" data-khoi="sap-bat-dau">{chuChuaCoChienDich(s)}</p>
       )}
       {xong ? (
         <>
@@ -675,7 +679,7 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
       ) : s.chienDich ? (
         <TheChienDichNgang s={s} now={p.now} />
       ) : (
-        <p className="h2-ng-the h2-tam-chu">Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.</p>
+        <p className="h2-ng-the h2-tam-chu" data-khoi="sap-bat-dau">{chuChuaCoChienDich(s)}</p>
       )}
       {!trong && <TheTheLucNgang s={s} />}
       {xong ? (

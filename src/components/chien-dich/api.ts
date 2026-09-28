@@ -30,6 +30,10 @@ export interface ChienDichTom {
   soCau: number
   soEm: number
   hetHan: boolean
+  /** Ngày bắt đầu `YYYY-MM-DD` (thầy 28/09; máy chủ cũ vắng ⇒ coi như ngày giao). */
+  batDau?: string
+  /** Chưa tới ngày bắt đầu ⇒ nhãn "Sắp bắt đầu · <ngày>" thay "Đang chạy". */
+  sapBatDau?: boolean
   /** Số liệu lớp (chỉ khi xin `thongKe`; máy chủ cũ / quá 20 chiến dịch mới nhất ⇒ vắng hoặc null). */
   thongKe?: ThongKeChienDich | null
 }
@@ -88,6 +92,8 @@ export interface DauVaoGiao {
   sbd?: string[]
   maDe: string[]
   hanNop: string
+  /** Ngày bắt đầu `YYYY-MM-DD` (thầy 28/09). Vắng ⇒ bắt đầu ngay lúc giao. */
+  batDau?: string
   theLucNgay?: number
   huyetChien?: boolean
   maCa?: string
@@ -232,6 +238,9 @@ export interface ChienDichDeSua {
   soCau: number
   soEm: number
   hetHan: boolean
+  /** Ngày bắt đầu `YYYY-MM-DD`; `daBatDau` ⇒ không đổi được nữa (thầy 28/09). Máy chủ cũ không gửi. */
+  batDau?: string
+  daBatDau?: boolean
 }
 export interface DongNhatKySua {
   luc: string
@@ -244,6 +253,8 @@ export interface ThayDoiGui {
   themSbd?: string[]
   botSbd?: string[]
   hanNop?: string
+  /** Ngày bắt đầu mới — chỉ khi chiến dịch chưa bắt đầu. */
+  batDau?: string
   /** Thầy nhập tay số câu/ngày (vắng = máy tự nâng khi cần, không tự hạ). */
   theLucNgay?: number
 }
@@ -264,6 +275,8 @@ export interface KetQuaSua {
   hanNop: string
   /** Chiến dịch đã hết hạn / đã kết thúc được mở lại. */
   moLai: boolean
+  batDauCu?: string
+  batDau?: string
   /** Số câu/ngày cũ → sau khi lưu; mức cần để em còn nhiều lượt nhất (`khoiLuongCan`) kịp hạn. Máy chủ cũ không gửi. */
   theLucCu?: number
   theLucNgay?: number

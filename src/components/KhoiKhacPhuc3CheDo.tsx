@@ -44,6 +44,7 @@ import { cacLopHienThi, duocChonLop, khoiEmTuLop, lopEmDuocChon, lopMacDinhCuaEm
 import { napKhoChoMayEm } from '../lib/kho-cho-may-em'
 import type { TeacherExamSource } from '../data/examContent'
 import ModalXacNhanNop from './ModalXacNhanNop'
+import { hoiXacNhan } from './hop-thoai'
 import './m3'
 import './m3/luyen-khac-phuc.css'
 import NhomCaThuGon from './NhomCaThuGon'
@@ -771,9 +772,17 @@ export default function KhoiKhacPhuc3CheDo({
   }
 
   // Xoá bài luyện trong lịch sử
-  const xoaBai = (id: string, e: React.MouseEvent) => {
+  const xoaBai = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    if (!window.confirm('Xoá bài luyện này khỏi lịch sử?')) return
+    // Hộp của app (thay confirm của trình duyệt — thầy 28/09).
+    const ok = await hoiXacNhan({
+      tieuDe: 'Xoá bài luyện?',
+      noiDung: 'Bài này sẽ mất khỏi lịch sử luyện trên máy em.',
+      nhanDongY: 'Xoá bài',
+      nhanKhong: 'Giữ lại',
+      nguyHiem: true,
+    })
+    if (!ok) return
     const historyMoi = history.filter((h) => h.id !== id)
     luuHistory(historyMoi)
     if (currentTest?.id === id) setCurrentTest(null)
@@ -1743,7 +1752,7 @@ export default function KhoiKhacPhuc3CheDo({
                           {daNop ? `${typeof h.score === 'number' ? h.score.toFixed(2) : '--'} điểm` : 'Đang làm'}
                         </span>
                         <button
-                          onClick={(e) => xoaBai(h.id, e)}
+                          onClick={(e) => void xoaBai(h.id, e)}
                           title="Xoá bài luyện này"
                           className="text-slate-300 hover:text-rose-500 p-1 rounded transition cursor-pointer"
                         >
