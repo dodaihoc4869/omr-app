@@ -93,6 +93,9 @@ const TEN_MAN: Record<string, string> = {
   chiendich: 'Chiến dịch luyện',
 }
 
+/** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Lên bảng" → "Chữa trên lớp", "Ngân hàng" → "Kho đề". */
+const TEN_MAN_HOA2: Record<string, string> = { goilenbang: 'Chữa trên lớp', nganhangde: 'Kho đề' }
+
 const HIDE_BOTTOMNAV_ON: string[] = ['examtake']
 
 function App() {
@@ -356,9 +359,9 @@ function App() {
         <div className="giua-noi-dung" data-teacher-screen={laManThi ? undefined : screen}>
       {/* Một màn ném lỗi thì chỉ màn đó hiện báo lỗi, app KHÔNG trắng. key theo
           `screen` để lỗi cũ không dính lại khi thầy sang màn khác.
-          GAME HÓA 2.0: màn đã bỏ thì KHÔNG dựng (kể cả một nhịp) — hiệu ứng ở trên đưa về Ca kiểm tra ngay. */}
+          GAME HÓA 2.0: màn đã bỏ thì KHÔNG dựng (kể cả một nhịp) — hiệu ứng ở trên đưa về Tổng quan ngay. */}
       {!anKhiHoa2 && (
-      <ChanLoi key={screen} o={TEN_MAN[screen]} veManChinh={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')}>
+      <ChanLoi key={screen} o={(hoa2 && TEN_MAN_HOA2[screen]) || TEN_MAN[screen]} veManChinh={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')}>
         <Suspense fallback={<div style={{ padding: 24, fontFamily: 'var(--sans)', color: 'var(--nhat)' }}>Đang mở…</div>}>
         {screen === 'classlist' && <ClassListScreen />}
         {screen === 'examhub' && <ExamHubScreen />}

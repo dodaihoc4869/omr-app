@@ -22,6 +22,7 @@ import { mergeKeepAnswers, validateTeacherSource } from '../data/examContent'
 import { maDeTheoPhan, PHAN_DE_TACH, TEN_PHAN_TACH } from '../lib/tach-phan-de'
 import TheCau from '../components/TheCau'
 import { useAppStore } from '../store/appStore'
+import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { apDungSoSua, type SoSuaDang } from '../lib/sua-dang'
 import { ngayDayDu } from '../lib/ngay-gio-24'
 
@@ -103,6 +104,8 @@ const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'va
 
 export default function NganHangDeScreen() {
   const showToast = useAppStore((s) => s.showToast)
+  // GAME HÓA 2.0 (RA-SOAT 28/09 mục 7): tên "Kho đề"; "Em báo lỗi câu"; Mã dạng vào nhóm thu gọn "Công cụ kỹ thuật". Cờ tắt ⇒ như cũ.
+  const hoa2 = useHoa2Bat()
   const setScreen = useAppStore((s) => s.setScreen)
 
   const [scriptUrl, setScriptUrl] = useState('')
@@ -369,11 +372,13 @@ export default function NganHangDeScreen() {
           </div>
           <div>
             <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
-              Ngân hàng câu hỏi
+              {hoa2 ? 'Kho đề' : 'Ngân hàng câu hỏi'}
             </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Kho đề kiểm tra, thẩm định đáp án và đồng bộ tự động
-            </p>
+            {!hoa2 && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Kho đề kiểm tra, thẩm định đáp án và đồng bộ tự động
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -455,13 +460,13 @@ export default function NganHangDeScreen() {
         )}
       </TheNoiDung>
 
-      <details className="gv-help"><summary>Phản hồi câu hỏi từ Thần thú</summary><GameReports teacher/></details>
+      <details className="gv-help"><summary>{hoa2 ? 'Em báo lỗi câu' : 'Phản hồi câu hỏi từ Thần thú'}</summary><GameReports teacher/></details>
 
       {/* KHỐI MÃ DẠNG — đặc tả v3 mục 4.3. Đặt NGAY SAU khối đồng bộ, trước
           danh sách đề: thầy vừa kéo đề về là thấy ngay kho đang hổng chỗ nào. */}
       {sources.length > 0 && (
         <details className="rounded-2xl border border-slate-200 dark:border-slate-700 p-4 bg-white dark:bg-slate-900">
-          <summary className="cursor-pointer font-bold">Mã dạng · Thống kê và kiểm tra</summary>
+          <summary className="cursor-pointer font-bold">{hoa2 ? 'Công cụ kỹ thuật · Mã dạng, thống kê và kiểm tra' : 'Mã dạng · Thống kê và kiểm tra'}</summary>
         <KhoiMaDang sources={sources} soSua={soSua} onSua={luuSoSua} dangDongBo={dangDongBo} onTaiLaiHet={() => dongBo(scriptUrl, secret, false, true)} />
         </details>
       )}
