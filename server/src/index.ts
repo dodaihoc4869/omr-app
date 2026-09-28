@@ -75,6 +75,7 @@ import type { D1PreparedStatement, DongCa, DongLuot, Env, ExecutionContext } fro
 import { gvChienDich } from './srs2-gv'
 import { gvSuaChienDich } from './srs2-sua'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
+import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
@@ -3280,6 +3281,9 @@ const boXuLy = {
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
 
+      // ĐIỂM DANH BUỔI HỌC (bảng DẠY HỌC của mục Lên bảng, 28/09 — server/src/buoi-hoc.ts): em chỉ điểm danh CHO MÌNH (SBD từ token), mã đổi mỗi 60 giây.
+      if (p === '/hs/buoi-hoc') return ra(await hsBuoiHocDangMo(env, b))
+      if (p === '/hs/diem-danh') return ra(await hsDiemDanh(env, b))
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
             if (p === '/teacher-news') return ra(await teacherNews(env,b))
@@ -3360,6 +3364,9 @@ const boXuLy = {
       if (p === '/gv/chien-dich/sua') return ra(await gvSuaChienDich(env, b))
       // GỌI LÊN BẢNG — bảng chi tiết em trên tờ chiếu (bản vẽ LenBang-Moi 28/09): ĐỌC-CHỈ, số thật từ sổ (`ho-so-em-chieu.ts`).
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
+      // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
+      if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
+      if (p === '/gv/buoi-hoc/suc-hoc') return ra(await gvSucHocBuoi(envDoc, b))
       // DẢI THỐNG KÊ LỚP (phím T) cho buổi chữa KHÔNG từ ca (hoàn thiện bản vẽ 28/09): chỉ số GỘP theo câu từ sổ su_kien_hoc, không tên em. ĐỌC-CHỈ.
       if (p === '/gv/thong-ke-lop-cau') return ra(await gvThongKeLopCau(envDoc, b))
       if (p === '/gv/lop') return ra(await gvLop(envDoc))

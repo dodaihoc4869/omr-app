@@ -1,6 +1,7 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
 import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
+import TheDiemDanhHs from '../components/diem-danh/TheDiemDanhHs'
 import { doiTenThu, useSanhHoa2 } from '../components/hoa2/api'
 import { PETS } from '../game/than-thu-v2/core'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
@@ -1345,6 +1346,8 @@ export default function StudentPortalScreen() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col">
       {hop}
+      {/* ĐIỂM DANH BUỔI HỌC (bảng Dạy học của thầy, 28/09): thẻ nổi khi lớp em có buổi đang mở; quét QR ⇒ tự điểm danh. Không hiện khi đang thi. */}
+      {auth.token && !manThi && tab === null && <TheDiemDanhHs token={auth.token} />}
       {auth.token && cheDo2 && !manThi && (
         <SanhBanDo
           ketQua={hoa2.ketQua}

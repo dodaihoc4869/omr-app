@@ -13,7 +13,22 @@ export interface PhongChoChieu {
   em: EmDaVao[]
   /** Sĩ số dự kiến (danh sách mời / lớp); không biết ⇒ null (chỉ hiện "x em"). */
   siSo: number | null
+  /** MÃ ĐỔI THEO NHỊP (điểm danh buổi học: mã đổi mỗi 60 giây) — có thì thay `maCa`/`link` đang hiện. */
+  ma?: string
+  link?: string
 }
+
+/** Chữ của tấm phủ — mặc định là Chiếu mã vào thi; Điểm danh buổi học (bảng Dạy học) truyền bộ chữ riêng. */
+export interface ChuTamPhu {
+  nhanMa: string
+  tenHop: string
+  danhSach: string
+  chuRong: string
+  aria: string
+  tenMa: string
+  vungMa: string
+}
+export const CHU_VAO_THI: ChuTamPhu = { tenMa: 'Mã ca', vungMa: 'Mã vào thi', nhanMa: 'MÃ VÀO THI', tenHop: 'Chiếu mã vào thi', danhSach: 'Đã vào phòng chờ', chuRong: 'Chưa em nào vào. Màn tự cập nhật mỗi 5 giây.', aria: 'Mã QR vào thi' }
 /** Nhịp tự làm mới danh sách em đã vào (thầy 28/09: "tự động cập nhật 5 giây một lần"). */
 export const NHIP_PHONG_CHO_MS = 5000
 
@@ -37,7 +52,7 @@ export function tenChip(e: EmDaVao): string {
  *  `hoiPhongCho` vắng ⇒ chỉ hiện mã (và `soEmCho` nếu màn cha truyền). Tự làm mới: hỏi ngay khi mở, rồi mỗi 5 giây; TAB ẨN thì không hỏi (hiện lại hỏi
  *  ngay); đóng màn là dừng. Lỗi mạng ⇒ GIỮ danh sách cũ + chấm "mất kết nối" nhỏ. TUYỆT ĐỐI không hiện điểm / đáp án. Đóng: Esc hoặc nút Đóng. */
 export default function TamPhuChieuMa({
-  maCa,
+  maCa: maCaTruyen,
   tenCa,
   diaChi,
   soEmCho,
@@ -45,6 +60,8 @@ export default function TamPhuChieuMa({
   link,
   lop,
   hoiPhongCho,
+  chu: chuTam = CHU_VAO_THI,
+  chuPhuMa,
 }: {
   maCa: string
   tenCa: string
@@ -55,6 +72,9 @@ export default function TamPhuChieuMa({
   link?: string
   lop?: string
   hoiPhongCho?: () => Promise<PhongChoChieu>
+  chu?: ChuTamPhu
+  /** Dòng nhỏ dưới mã (vd "Mã đổi mỗi phút"). */
+  chuPhuMa?: string
 }) {
   const nutDong = useRef<HTMLButtonElement>(null)
   const [pc, setPc] = useState<PhongChoChieu | null>(null)
@@ -116,21 +136,24 @@ export default function TamPhuChieuMa({
     }
   }, [coHoi])
 
-  const qr = taoQr(link || diaChi)
+  // Mã đổi theo nhịp (điểm danh) ⇒ lấy mã mới nhất máy chủ trả; còn lại đúng mã ca truyền vào.
+  const maCa = pc?.ma || maCaTruyen
+  const qr = taoQr(pc?.link || link || diaChi)
   const ve = qr ? duongQr(qr) : null
   const soVao = pc ? pc.em.length : soEmCho
 
   return (
-    <div className="ca-chieu cm" role="dialog" aria-modal="true" aria-label="Chiếu mã vào thi">
+    <div className="ca-chieu cm" role="dialog" aria-modal="true" aria-label={chuTam.tenHop}>
       <button ref={nutDong} type="button" className="ca-chieu-dong cm-dong" onClick={onDong}>
         <X size={20} aria-hidden="true" /> Đóng
       </button>
       <div className={`cm-luoi${coHoi ? ' cm-co-ds' : ''}`}>
-        <section className="ca-chieu-than cm-trai" aria-label="Mã vào thi">
-          <p className="ca-chieu-nhan cm-nhan">MÃ VÀO THI</p>
-          <div className="ca-chieu-ma cm-ma" aria-label={`Mã ca ${maCa}`}>
+        <section className="ca-chieu-than cm-trai" aria-label={chuTam.vungMa}>
+          <p className="ca-chieu-nhan cm-nhan">{chuTam.nhanMa}</p>
+          <div className="ca-chieu-ma cm-ma" aria-label={`${chuTam.tenMa} ${maCa}`} aria-live="polite">
             {dinhDangMa(maCa)}
           </div>
+          {chuPhuMa && <p className="cm-phu-ma">{chuPhuMa}</p>}
           {(tenCa || lop) && (
             <p className="ca-chieu-ten cm-ten">
               {tenCa}
@@ -139,7 +162,7 @@ export default function TamPhuChieuMa({
           )}
           <div className="cm-vao">
             {ve && (
-              <svg className="cm-qr" viewBox={`0 0 ${ve.canh} ${ve.canh}`} role="img" aria-label="Mã QR vào thi" shapeRendering="crispEdges">
+              <svg className="cm-qr" viewBox={`0 0 ${ve.canh} ${ve.canh}`} role="img" aria-label={chuTam.aria} shapeRendering="crispEdges">
                 <rect width={ve.canh} height={ve.canh} className="cm-qr-nen" />
                 <path d={ve.d} className="cm-qr-o" />
               </svg>
@@ -150,9 +173,9 @@ export default function TamPhuChieuMa({
           </div>
         </section>
         {coHoi ? (
-          <section className="cm-phai" aria-label="Đã vào phòng chờ">
+          <section className="cm-phai" aria-label={chuTam.danhSach}>
             <div className="cm-phai-dau">
-              <h2>Đã vào phòng chờ</h2>
+              <h2>{chuTam.danhSach}</h2>
               {matKetNoi && (
                 <span className="cm-mat" role="status" title="Mất kết nối — đang thử lại">
                   <i aria-hidden="true" /> mất kết nối
@@ -168,7 +191,7 @@ export default function TamPhuChieuMa({
                 <i style={{ width: `${Math.min(100, (pc.em.length / pc.siSo) * 100)}%` }} />
               </div>
             ) : null}
-            {pc && pc.em.length === 0 && <p className="cm-rong">Chưa em nào vào. Màn tự cập nhật mỗi 5 giây.</p>}
+            {pc && pc.em.length === 0 && <p className="cm-rong">{chuTam.chuRong}</p>}
             {pc && pc.em.length > 0 && (
               <ul className="cm-chip-ds">
                 {pc.em.map((e) => (

@@ -1,0 +1,225 @@
+/* ĐIỂM DANH BUỔI HỌC trên app học sinh — thẻ kính nổi phía trên Sảnh / Bảng nhiệm vụ. Mọi lớp tiền tố `dd-hs`.
+ * Màu viết rgb() gom thành biến (luật `npm run check:mau`), sáng + tối; đích chạm ≥ 48 px; chuyển động chỉ transform/opacity. */
+.dd-hs {
+  --dd-nen: rgb(255 255 255 / 0.96);
+  --dd-vien: rgb(40 50 110 / 0.14);
+  --dd-bong: 0 12px 32px rgb(40 30 90 / 0.22), 0 2px 8px rgb(40 30 90 / 0.12);
+  --dd-chu: rgb(24 30 62);
+  --dd-chu-phu: rgb(70 78 112);
+  --dd-nhan: rgb(0 104 116);
+  --dd-nhan-chu: rgb(255 255 255);
+  --dd-nhan-nhat: rgb(214 244 245);
+  --dd-do: rgb(176 32 48);
+  --dd-o: rgb(242 244 250);
+
+  position: fixed;
+  z-index: 60;
+  left: 50%;
+  top: calc(env(safe-area-inset-top, 0px) + 76px);
+  transform: translateX(-50%);
+  width: min(420px, calc(100vw - 24px));
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: var(--dd-nen);
+  box-shadow: var(--dd-bong);
+  border: 1px solid var(--dd-vien);
+  color: var(--dd-chu);
+  font-family: var(--sans, system-ui, sans-serif);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  animation: dd-hs-vao 0.22s ease-out;
+}
+@media (prefers-color-scheme: dark) {
+  .dd-hs {
+    --dd-nen: rgb(28 32 52 / 0.96);
+    --dd-vien: rgb(255 255 255 / 0.14);
+    --dd-bong: 0 12px 32px rgb(0 0 0 / 0.5);
+    --dd-chu: rgb(236 238 250);
+    --dd-chu-phu: rgb(186 192 220);
+    --dd-nhan: rgb(92 214 222);
+    --dd-nhan-chu: rgb(0 40 46);
+    --dd-nhan-nhat: rgb(20 70 76);
+    --dd-do: rgb(255 150 160);
+    --dd-o: rgb(44 50 76);
+  }
+}
+@keyframes dd-hs-vao {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dd-hs {
+    animation: none;
+  }
+}
+.dd-hs *,
+.dd-hs *::before,
+.dd-hs *::after {
+  box-sizing: border-box;
+}
+.dd-hs button,
+.dd-hs input {
+  font: inherit;
+  touch-action: manipulation;
+}
+.dd-hs-mo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 10px 12px 10px 16px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.dd-hs-cham {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--dd-nhan);
+  box-shadow: 0 0 0 5px var(--dd-nhan-nhat);
+}
+.dd-hs-chu {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+  line-height: 1.3;
+}
+.dd-hs-chu b {
+  font-size: 16px;
+  font-weight: 800;
+}
+.dd-hs-chu span {
+  font-size: 14px;
+  color: var(--dd-chu-phu);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dd-hs-nut,
+.dd-hs-gui {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--dd-nhan);
+  color: var(--dd-nhan-chu);
+  font-size: 15px;
+  font-weight: 800;
+}
+.dd-hs-gui:disabled {
+  opacity: 0.55;
+}
+.dd-hs-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+}
+.dd-hs-dong {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.dd-hs-dong h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+.dd-hs-ten {
+  margin: 0;
+  font-size: 14px;
+  color: var(--dd-chu-phu);
+}
+.dd-hs-form label {
+  font-size: 14px;
+  font-weight: 700;
+}
+.dd-hs-nhap {
+  display: flex;
+  gap: 8px;
+}
+.dd-hs-nhap input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 2px solid var(--dd-vien);
+  border-radius: 14px;
+  background: var(--dd-o);
+  color: var(--dd-chu);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+  color-scheme: light dark;
+}
+.dd-hs-nhap input:focus-visible {
+  outline: 3px solid var(--dd-nhan);
+  outline-offset: 1px;
+}
+.dd-hs-nhap input[aria-invalid='true'] {
+  border-color: var(--dd-do);
+}
+.dd-hs-loi {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--dd-do);
+}
+.dd-hs-phu {
+  margin: 0;
+  font-size: 13px;
+  color: var(--dd-chu-phu);
+}
+.dd-hs-an {
+  flex: 0 0 auto;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--dd-chu-phu);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.dd-hs--xong {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 8px 8px 14px;
+}
+.dd-hs-dau {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--dd-nhan);
+  color: var(--dd-nhan-chu);
+  font-weight: 900;
+}
+.dd-hs button:focus-visible {
+  outline: 3px solid var(--dd-nhan);
+  outline-offset: 2px;
+}

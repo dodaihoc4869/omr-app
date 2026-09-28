@@ -229,7 +229,7 @@ describe('màn Lên bảng (chế độ chiến dịch)', () => {
         }
       return { ok: false, loai: 'tu_choi', chu: 'lệnh lạ' }
     })
-    render(<LenBangChienDich onCheDoCu={vi.fn()} />)
+    render(<LenBangChienDich />)
     expect(await screen.findByRole('heading', { name: 'Amine · 12A1' })).toBeTruthy()
     expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua')).toBe(false)
 
@@ -237,7 +237,8 @@ describe('màn Lên bảng (chế độ chiến dịch)', () => {
     expect(await screen.findByRole('heading', { name: 'Buổi chữa · Ester – Lipid · 12A1' })).toBeTruthy()
     expect(goi.mock.calls.some(([, b]) => b.action === 'buoi-chua' && b.id === 'cd-1')).toBe(true)
     expect(screen.getByRole('button', { name: 'Mở tờ máy chiếu' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Gọi lên bảng theo một ca kiểm tra (cách cũ)' })).toBeTruthy()
+    // Thầy lệnh 28/09: xoá khối "Gọi lên bảng theo một ca kiểm tra (cách cũ)".
+    expect(screen.queryByRole('button', { name: /cách cũ/ })).toBeNull()
   })
 
   it('máy chủ chưa có lệnh ⇒ nói thật + nút thử lại; chưa có chiến dịch ⇒ nói vì sao + việc làm tiếp', async () => {

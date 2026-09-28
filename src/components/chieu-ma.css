@@ -244,3 +244,11 @@
   font-weight: 700;
   color: rgb(140 240 180);
 }
+/* Điểm danh buổi học (bảng Dạy học, 28/09): dòng nhỏ dưới mã — "Mã đổi mỗi phút". */
+.cm .cm-phu-ma {
+  margin: 0;
+  font-size: clamp(13px, 1.3vw, 22px);
+  font-weight: 700;
+  color: rgb(170 184 230);
+  font-variant-numeric: tabular-nums;
+}
