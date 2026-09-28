@@ -30,14 +30,15 @@ Làm bài · Túi đồ · Sổ tay · Đảo (vào từ Sảnh + trang xem-th�
 
 Tổng: **GV 4 lỗi — sửa 4 · HS 7 lỗi — sửa 7.** Lượt dò cuối (sau sửa, sau gộp main 499ef50): **0 lỗi** ở 67 lượt app thầy và 149 lượt app HS.
 
-## Ghi nhận — không phải tràn chữ / không sửa
+## Đợt 2 (Boss giao sửa nốt)
 
-| Màn | Cỡ | Phần tử | Ghi chú |
-|---|---|---|---|
-| Sảnh HS (dọc) | 360, 390 | `.h2-ray` nút "Đăng xuất" | Nút cuối của cột lối tắt nằm dưới tấm thông tin (bị che, không đè chữ). Cần thiết kế quyết (kéo tấm xuống mới thấy). |
-| Đoàn HUD | mọi cỡ | `.dh2-roi` "Rời chuyến" | Nút vuông 52 px, chữ 2 dòng theo bản vẽ. |
-| Chiếu mã vào thi | 1440 | "/ 24 em" trên nền xanh nhạt | Chữ nhạt trên nền nhạt — tương phản thấp (không phải tràn). |
-| Bảng chiến dịch | mọi cỡ | thanh "Nhịp của lớp" | Thanh dài > 100% khi số em theo nhịp cộng lại > sĩ số (dữ liệu sai mới gặp) — nên kẹp ≤ 100%. |
+| # | App | Màn | Phần tử | Mô tả | Sửa |
+|---|---|---|---|---|---|
+| 12 | HS | Sảnh dọc (360–768) | `.h2-ray` "Đăng xuất" | Nút cuối cột lối tắt bị tấm dưới che, không bấm được | `.h2-dem` cao theo số nút lối tắt (4 nút 330 px, 5 nút 400 px) — kiểm `elementFromPoint` trúng nút ở 5 cỡ |
+| 13 | GV | Chiếu mã vào thi | `.cm-dem` "/ 24 em" | Viên nền xanh nhạt của `.ca-chieu-cho` dưới chữ sáng: tương phản 1,4:1 | `.cm .cm-dem` bỏ nền viên ⇒ chữ sáng trên nền tối (≈10:1) |
+| 14 | GV | Bảng chiến dịch · Nhịp của lớp | `.cd-thanh--*` | Thanh vượt 100% khi dữ liệu > sĩ số | kẹp bề rộng 0–100%, số hiện vẫn là giá trị thật |
+
+Nút "Rời chuyến" (HUD Đoàn) 2 dòng là thiết kế nút vuông, không phải lỗi.
 
 Vùng ca-thi (`src/components/ca-thi/*`, Mở ca, Ca đã mở, Chiếu mã) đã dò sau khi gộp main 499ef50: không còn tràn chữ.
 

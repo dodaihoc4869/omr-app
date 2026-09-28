@@ -165,6 +165,10 @@
 }
 .cm .cm-dem {
   margin: 0;
+  /* bỏ viên nền xanh nhạt của .ca-chieu-cho (màn cũ): chữ sáng trên nền tối, "/ 24 em" đọc được từ cuối lớp */
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
   font-size: clamp(18px, 2vw, 34px);
   font-weight: 700;
   color: rgb(200 210 240);
