@@ -95,9 +95,12 @@ sup{font-size:.62em;vertical-align:.55em;line-height:0}
 .cho strong{display:block;font-size:1.5em;color:var(--muc);margin-bottom:.3em}
 .cho kbd{font:inherit;font-weight:800;border:.1em solid var(--muc2);border-bottom-width:.2em;border-radius:.3em;padding:0 .35em}
 .cho .goi-y{margin-top:1em;font-size:.8em}
-.vung-lam{border-radius:calc(var(--u)*1);border:calc(var(--u)*.1) solid var(--vien);
-  background-image:linear-gradient(var(--vien) 1px,transparent 1px);background-size:100% calc(var(--u)*2.6);opacity:.7;display:grid;place-items:end center;
-  color:var(--muc2);font-size:calc(var(--u)*.9);padding:calc(var(--u)*.6)}
+.vung-lam{border-radius:calc(var(--u)*.6);background:#000;display:grid;place-items:end center;
+  color:#000;font-size:calc(var(--u)*.9);padding:calc(var(--u)*.6)}
+/* ĐANG CHỮA (thầy 28/09): tắt máy chiếu ở chỗ em viết — cả cột 1/3 ĐEN TUYỀN (máy chiếu chiếu màu đen = không có ánh sáng),
+   không chữ, không kẻ dòng; chỉ còn thẻ tên nhỏ ở mép trên. Em viết thẳng lên bảng không bị chói, không lẫn chữ chiếu. */
+.to.dang-chua .cot-em{background:#000;border-left-color:#000}
+.to.dang-chua .the-ten{box-shadow:none}
 /* Thẻ tên (P2, H15): lưới 2 cột, dòng phụ thẳng cột tên */
 .the-ten{visibility:hidden;display:grid;grid-template-columns:calc(var(--u)*4.6) 1fr auto;align-items:center;column-gap:calc(var(--u)*.9);text-align:left;
   background:#fff;border:1px solid var(--vien);border-radius:calc(var(--u)*1);padding:calc(var(--u)*.55) calc(var(--u)*.9) calc(var(--u)*.55) calc(var(--u)*.55);
@@ -541,9 +544,10 @@ function veEm(){
     <span class="phu">${e.lop} · lần lên bảng thứ ${n}</span><span class="xem">Chi tiết ›</span>`;
   $('#theTen').classList.toggle('hien', S.pha === 'chua');
   $('#theTen').style.display = S.pha === 'chua' ? '' : 'none';
-  $('#cho').innerHTML = `<div><strong>Chờ thầy gọi</strong>Bấm <kbd>L</kbd> hoặc nút “Lên bảng”<div class="goi-y">Gợi ý gọi: <b>${e.ten}</b><br>(dạng này em đang ở hạng Trung bình — ví dụ)</div></div>`;
+  $('#cho').innerHTML = `<div><strong>Chờ thầy gọi</strong>Bấm <kbd>L</kbd> hoặc nút “Lên bảng”<div class="goi-y">Tên em chỉ hiện khi thầy bấm Lên bảng</div></div>`;
   $('#cho').style.display = S.pha === 'cho' ? '' : 'none';
   $('#vungLam').style.display = S.pha === 'chua' ? '' : 'none';
+  $('#vungLam').textContent = ''; $('#vungLam').setAttribute('aria-label', 'Vùng em viết — máy chiếu tắt (đen)');
 }
 function veThanh(){
   const c = cau(), e = em();
@@ -573,7 +577,7 @@ function veButCu(){
   });
 }
 function ve(){
-  to.classList.toggle('co-tk', S.tk); to.classList.toggle('co-but', S.but);
+  to.classList.toggle('co-tk', S.tk); to.classList.toggle('co-but', S.but); to.classList.toggle('dang-chua', S.pha === 'chua');
   veDe(); veTk(); veEm(); veThanh(); veButCu(); xepDe(); veBangThu();
 }
 
@@ -908,6 +912,7 @@ const TD = [
   ['H14','Thanh dưới 17 px, số đợt nhạt','Thanh dưới 23 px@1920 đậm, số đợt màu vàng nổi','P10'],
   ['H15','"lần lên bảng" lệch cột khi em chưa có thú','Thẻ tên dạng lưới: ô ảnh cố định, dòng phụ luôn thẳng cột tên','P10'],
   ['H16','Chú thích đầu bo-cuc-to-chieu.ts sai với mã','Việc khi build: viết lại chú thích theo thuật toán mới (chữ cố định → lật trang / cuộn)','P1'],
+  ['Mới','Gợi ý tên em trước khi gọi; cột em viết vẫn bị chiếu sáng','Chờ gọi: KHÔNG hiện tên em nào — tên chỉ hiện khi bấm Lên bảng. Đang chữa: cột 1/3 ĐEN TUYỀN (tắt máy chiếu chỗ em viết), chỉ còn thẻ tên nhỏ ở mép trên','Thầy 28/09'],
   ['Mới','Thầy không biết em đã làm câu này thế nào','Bấm thẻ tên: khối "Câu này" lên đầu — số lần, đúng/sai, từng lần (giờ, nguồn, gợi ý, đáp án chọn)','Thầy 28/09'],
 ];
 $('#btTd').onclick = () => {
