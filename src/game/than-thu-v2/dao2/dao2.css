@@ -265,6 +265,12 @@
 
  /* 2. TRONG ẢI + LỜI GIẢI: trái thanh ải + cảnh trận (+ dải kết quả) · phải đề/lời giải cuộn riêng + nút ở đáy */
  .dao2 .dao2-ai{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:24px;height:var(--d2-cao);min-height:440px}
+ .dao2 .dao2-ai{gap:2px}
+ /* thanh kéo đổi độ rộng hai cột */
+ .dao2 .dao2-keo{display:flex;align-items:center;justify-content:center;cursor:col-resize;touch-action:none;border-radius:10px;min-height:0}
+ .dao2 .dao2-keo>i{display:block;width:6px;height:64px;border-radius:3px;background:rgba(255,255,255,.28);transition:background-color .15s}
+ .dao2 .dao2-keo:hover>i,.dao2 .dao2-keo:focus-visible>i,.dao2 .dao2-keo:active>i{background:rgba(255,255,255,.7)}
+ .dao2 .dao2-keo:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:2px}
  .dao2 .dao2-ai-trai,.dao2 .dao2-ai-phai{display:flex;flex-direction:column;gap:12px;min-height:0}
  .dao2 .dao2-ai-dau{min-height:48px}
  .dao2 .dao2-ai-dau .dao2-ai-nhan{flex:1 1 auto;min-width:0;text-align:left;font-size:17px}
