@@ -209,12 +209,7 @@ describe('GV-1 · em cần thầy để ý', () => {
 describe('GV-1 · chỗ nối ở ExamMonitorScreen (chỉ phần nhìn)', () => {
   const nguon = readFileSync('src/screens/ExamMonitorScreen.tsx', 'utf8')
 
-  it('khối đứng trong cột danh sách em, ngay trên "Học sinh trong ca"; ca đang mở thì gập, đóng thì mở; đổi ca thì dựng lại', () => {
-    expect(nguon).toContain('<BaoCaoCaLopKhoi key={chiTiet.ca.maCa} tomTat={tomTatLop} tinh={tinhBaoCaoLop} khoa={khoaBaoCaoLop} layMayChu={() => layBaoCaoCaLopMayChu(chiTiet.ca.maCa,')
-    expect(nguon).toContain("phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />") // lấy từ máy chủ khi mở khối; rơi về tinhBaoCaoLop khi không có lệnh
-    expect(nguon.indexOf('<BaoCaoCaLopKhoi')).toBeLessThan(nguon.indexOf('Học sinh trong ca ({dsEm.length})'))
-  })
-
+  // (ca thi 28/09) Khối gập đã THAY bằng màn Kết thúc ca + Báo cáo chi tiết — chỗ nối mới khoá ở tests/ca-thi-man-moi-2809.test.tsx.
   it('chỉ GOM số đã có: không chấm lại, không gọi mạng, không đụng công bố/khoá/rời màn; phần nặng nằm TRONG hàm tính lười, không trong phần rẻ chạy mỗi lần làm mới', () => {
     const a = nguon.indexOf('const dungNganHangBaoCao = () =>')
     const khoi = nguon.slice(a, nguon.indexOf('const tinhBaoCaoLop = () =>', a))
