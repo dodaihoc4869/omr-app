@@ -2,11 +2,12 @@ import {PETS} from '../game/than-thu-v2/core'
 import {evolutionCrop,evolutionStage,evolutionMirror,EVOLUTION_NAMES} from '../game/than-thu-v2/evolution'
 import type {OBang} from './html-may-chieu'
 import {anhThu} from '../game/than-thu-v2/dao/anh'
+import {napAnhGame} from '../game/than-thu-v2/anh-webp'
 export interface ClassroomSpirit {nickname?:string;pet:string;cap:number;tower:number;earned:number}
 const atlases=new Map<string,Promise<HTMLImageElement>>()
 function atlas(name:string){
  let pending=atlases.get(name)
- if(!pending){pending=new Promise<HTMLImageElement>((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Chưa tải được ảnh thần thú'));image.src=`/than-thu-v2/evolution-${name}-cutout.png`});atlases.set(name,pending);pending.catch(()=>atlases.delete(name))}
+ if(!pending){pending=new Promise<HTMLImageElement>((resolve,reject)=>{napAnhGame(`/than-thu-v2/evolution-${name}-cutout.png`,resolve,reject)});atlases.set(name,pending);pending.catch(()=>atlases.delete(name))}
  return pending
 }
 /** Uses the exact transparent cell and orientation used by the student's 2D game. */

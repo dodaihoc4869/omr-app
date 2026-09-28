@@ -10,7 +10,7 @@ describe('one evolution source for artwork and spells',()=>{
   for(let pet=0;pet<8;pet++)for(const level of EVOLUTION_LEVELS){
    const c=evolutionCrop(pet,level),html=renderToStaticMarkup(createElement(Spirit2D,{index:pet,level,motion:'cast',event:1,battle:true}))
    expect(html).toContain(`data-stage="${evolutionStage(level)}"`)
-   expect(html).toContain(`evolution-${pet<4?'elements':'virtues'}-cutout.png`)
+   expect(html).toContain(`evolution-${pet<4?'elements':'virtues'}-cutout.webp`) // bản WebP (28/09), PNG là đường lui onError
    expect(html).toContain(`viewBox="0 0 ${c.width} ${c.height}"`)
    expect(html).toContain('clipPath');expect(html).not.toContain('<canvas')
    expect(html).toContain('spirit-2d-cast')

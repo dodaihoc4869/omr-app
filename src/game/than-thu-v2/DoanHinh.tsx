@@ -4,6 +4,7 @@ import { useId } from 'react'
 import type { CSSProperties } from 'react'
 import { evolutionCrop, evolutionMirror } from './evolution'
 import { BATTLE_SKINS } from './learning-battle'
+import { anhWebp, doiVePng } from './anh-webp'
 
 /** Một ô thần thú trong suốt, đúng hình thái theo cấp. `quayTrai` = nhìn sang trái (đứng bên phải sân). */
 export function ThuHinh({ pet, cap, size, quayTrai = false, className = '', style }: { pet: number; cap: number; size?: number; quayTrai?: boolean; className?: string; style?: CSSProperties }) {
@@ -14,7 +15,7 @@ export function ThuHinh({ pet, cap, size, quayTrai = false, className = '', styl
       <div className="dh-thu-bong" />
       <svg viewBox={`0 0 ${crop.width} ${crop.height}`} style={{ transform: lat ? 'scaleX(-1)' : undefined }}>
         <defs><clipPath id={clip}><rect width={crop.width} height={crop.height} /></clipPath></defs>
-        <g clipPath={`url(#${clip})`}><image href={`/than-thu-v2/evolution-${crop.atlas}-cutout.png`} x={-crop.x} y={-crop.y} width="1536" height="1024" /></g>
+        <g clipPath={`url(#${clip})`}><image href={anhWebp(`/than-thu-v2/evolution-${crop.atlas}-cutout.png`)} onError={doiVePng} x={-crop.x} y={-crop.y} width="1536" height="1024" /></g>
       </svg>
     </div>
   )
