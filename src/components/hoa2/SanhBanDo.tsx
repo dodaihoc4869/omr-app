@@ -6,10 +6,11 @@
 //   · hết kế hoạch                     → "Hôm nay em xong rồi" + nút Rương Bát Linh (khi mở được và chưa mở).
 // Mọi con số lấy từ máy chủ (`hoa2-sanh`, thần thú/EXP/chuỗi ngày từ /hs/ke-hoach-ngay) — không tự tính, không bịa.
 // Dải "Vào thi" chỉ hiện khi có ca kiểm tra đang mở; bấm là vào đúng luồng PhongVaoThi → ExamTakeScreen có sẵn.
-import { useState, type ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { anhThu } from '../../game/than-thu-v2/dao/anh'
 import { thanhExp } from '../../game/than-thu-hoa-hoc/kinh-nghiem'
 import { moRuong, type KetQuaSanh, type SanhHoa2 } from './api'
+import { useBoCucNgang, type BoCucNgang } from './bo-cuc-ngang'
 import { chuHanNop, ngaySau, ngayThang, thuNgayThang } from './thoi-gian'
 import './sanh-ban-do.css'
 import './phong-baloo'
@@ -88,9 +89,14 @@ const DAO_MO: { d?: string; cx?: number; cy?: number; r?: number; mo: number }[]
   { cx: 362, cy: 232, r: 10, mo: 0.3 },
   { cx: 318, cy: 520, r: 11, mo: 0.3 },
 ]
+/** Bản ngang: nới biển sang TRÁI (chừa chỗ cho tiêu đề + chú giải ở cột bản đồ), khung 700 × 600; tranh cũ giữ nguyên toạ độ. */
+export const BD_NGANG = { x0: -190, rong: 600, cao: 600 } as const
 const VIEN_DAO = 'M150,200 C150,140 200,110 250,118 C300,124 330,160 322,205 C316,250 280,275 235,272 C190,270 150,255 150,200 Z'
 
-function BanDo({ s }: { s: SanhHoa2 | null }) {
+function BanDo({ s, ngang = false }: { s: SanhHoa2 | null; ngang?: boolean }) {
+  const x0 = ngang ? BD_NGANG.x0 : 0
+  const rong = ngang ? BD_NGANG.rong : 390
+  const px = (x: number) => pct(x - x0, rong)
   const cd = s?.chienDich ?? null
   const p = cd ? phanTram(cd.coXat, cd.tong) : 0
   // Sương mù trên đảo chiến dịch: càng cọ xát nhiều câu, sương càng tan.
@@ -99,7 +105,7 @@ function BanDo({ s }: { s: SanhHoa2 | null }) {
   const khoa = !!s?.khoaDao
   return (
     <div className="h2-ban-do" data-khoa-dao={khoa ? 'true' : 'false'}>
-      <svg viewBox="0 0 390 600" preserveAspectRatio="xMidYMin meet" aria-hidden="true" focusable="false">
+      <svg viewBox={`${x0} 0 ${rong} 600`} preserveAspectRatio={ngang ? 'xMidYMid meet' : 'xMidYMin meet'} aria-hidden="true" focusable="false">
         <defs>
           <linearGradient id="h2sb-bien" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="rgb(13 42 94)" />
@@ -133,7 +139,14 @@ function BanDo({ s }: { s: SanhHoa2 | null }) {
             <feGaussianBlur stdDeviation="5" />
           </filter>
         </defs>
-        <rect width="390" height="600" fill="url(#h2sb-bien)" />
+        <rect x={x0} width={rong} height="600" fill="url(#h2sb-bien)" />
+        {ngang && (
+          <g data-ve="bien-ngang">
+            <path d="M-240 250 q20 -6 40 0 t40 0 t40 0 M-200 470 q20 -6 40 0 t40 0 t40 0 M-130 560 q20 -6 40 0 t40 0" stroke="rgb(140 200 255 / 0.14)" strokeWidth="2" fill="none" />
+            <circle cx="-150" cy="380" r="13" opacity="0.3" fill="url(#h2sb-mo)" />
+            <circle cx="-60" cy="300" r="9" opacity="0.3" fill="url(#h2sb-mo)" />
+          </g>
+        )}
         <path
           d="M0 150 q20 -6 40 0 t40 0 t40 0 M220 330 q20 -6 40 0 t40 0 t40 0 t40 0 M0 400 q20 -6 40 0 t40 0 M260 470 q20 -6 40 0 t40 0 t40 0 M120 540 q20 -6 40 0 t40 0 t40 0"
           stroke="rgb(140 200 255 / 0.14)"
@@ -142,7 +155,7 @@ function BanDo({ s }: { s: SanhHoa2 | null }) {
         />
         <g data-ve="dao-mo">
           {DAO_MO.map((d, i) =>
-            d.d ? (
+            ngang && i === 0 ? null : d.d ? (
               <path key={i} d={d.d} opacity={d.mo} fill="url(#h2sb-mo)" stroke="rgb(143 183 196)" strokeWidth="3" />
             ) : (
               <circle key={i} cx={d.cx} cy={d.cy} r={d.r} opacity={d.mo} fill="url(#h2sb-mo)" />
@@ -209,28 +222,29 @@ function BanDo({ s }: { s: SanhHoa2 | null }) {
       </svg>
 
       {cd && (
-        <span className="h2-nhan-bd h2-kinh h2-nhan-dao" style={{ left: pct(148, 390), top: pct(88, 600) }}>
+        <span className="h2-nhan-bd h2-kinh h2-nhan-dao" style={{ left: px(148), top: pct(88, 600) }}>
           Đảo {cd.ten} · {p}% đã khai phá
         </span>
       )}
       {s && s.doan.con > 0 && (
-        <span className="h2-nhan-bd h2-kinh h2-nhan-phuc-kich" style={{ left: pct(196, 390), top: pct(290, 600) }}>
+        <span className="h2-nhan-bd h2-kinh h2-nhan-phuc-kich" style={{ left: px(196), top: pct(290, 600) }}>
           {s.doan.con} ổ phục kích chặn cầu
         </span>
       )}
       {s && s.doan.con === 0 && s.dao.con > 0 && (
-        <span className="h2-nhan-bd h2-kinh h2-nhan-cau-ha" style={{ left: pct(196, 390), top: pct(290, 600) }}>
+        <span className="h2-nhan-bd h2-kinh h2-nhan-cau-ha" style={{ left: px(196), top: pct(290, 600) }}>
           Cầu sang đảo đã hạ
         </span>
       )}
-      <span className="h2-nhan-bd h2-kinh h2-nhan-ben" style={{ left: pct(108, 390), top: pct(470, 600) }}>
+      <span className="h2-nhan-bd h2-kinh h2-nhan-ben" style={{ left: px(108), top: pct(470, 600) }}>
         Bến Hộ Tống · Linh Tâm của lớp
       </span>
     </div>
   )
 }
 
-function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 'thu' | 'exp' | 'chuoiNgay' | 'onMoThanThu'> & { theLuc: { con: number; tong: number } | null }) {
+/** HUD thần thú. Bản ngang: `theLuc` và `chuoiNgay` = null (Thể lực có thẻ riêng ở cột phải, Chuỗi ngày ở hàng trên — một thông tin một chỗ). */
+function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 'thu' | 'exp' | 'onMoThanThu'> & { chuoiNgay: number | null; theLuc: { con: number; tong: number } | null }) {
   const can = thu ? thanhExp(thu.cap) : 0
   const co = exp && exp.conThieu !== null && can > 0 ? Math.max(0, Math.min(can, can - exp.conThieu)) : null
   const tiLe = co !== null && can > 0 ? co / can : 0
@@ -261,6 +275,7 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 
           )}
         </span>
       </button>
+      {(theLuc || chuoiNgay !== null) && (
       <span className="h2-hud-phai">
         {theLuc && (
           <span className="h2-hud-so h2-the-luc" aria-label={`Thể lực hôm nay: còn ${theLuc.con}/${theLuc.tong} câu`}>
@@ -270,13 +285,14 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 
             <span className="h2-nhan-nho">Thể lực</span> {theLuc.con}/{theLuc.tong}
           </span>
         )}
-        <span className="h2-hud-so h2-chuoi" aria-label={`Chuỗi ${chuoiNgay} ngày`}>
-          <svg width="14" height="16" viewBox="0 0 24 24" fill="rgb(255 122 69)" aria-hidden="true" focusable="false">
-            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-          </svg>
-          Chuỗi {chuoiNgay} ngày
-        </span>
+        {chuoiNgay !== null && (
+          <span className="h2-hud-so h2-chuoi" aria-label={`Chuỗi ${chuoiNgay} ngày`}>
+            <IconChuoi />
+            Chuỗi {chuoiNgay} ngày
+          </span>
+        )}
       </span>
+      )}
     </header>
   )
 }
@@ -292,38 +308,66 @@ function NutRay({ nhan, onClick, children }: { nhan: string; onClick: () => void
   )
 }
 
+const NET = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true, focusable: false }
+function IconSo({ co = 22 }: { co?: number }) {
+  return (
+    <svg width={co} height={co} {...NET}>
+      <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
+      <path d="M4 21V5" />
+      <path d="M9 8h6M9 12h6" />
+    </svg>
+  )
+}
+function IconTui({ co = 22 }: { co?: number }) {
+  return (
+    <svg width={co} height={co} {...NET}>
+      <path d="M5 8h14l-1 12H6z" />
+      <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+    </svg>
+  )
+}
+function IconCuaHang({ co = 22 }: { co?: number }) {
+  return (
+    <svg width={co} height={co} {...NET}>
+      <path d="M4 10h16l-1-5H5z" />
+      <path d="M5 10v10h14V10M10 20v-6h4v6" />
+    </svg>
+  )
+}
+function IconDangXuat({ co = 22 }: { co?: number }) {
+  return (
+    <svg width={co} height={co} {...NET}>
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <path d="M16 17l5-5-5-5M21 12H9" />
+    </svg>
+  )
+}
+function IconChuoi() {
+  return (
+    <svg width="14" height="16" viewBox="0 0 24 24" fill="rgb(255 122 69)" aria-hidden="true" focusable="false">
+      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+    </svg>
+  )
+}
+
 function Ray(p: Pick<SanhBanDoProps, 'onCauDaLam' | 'onTuiDo' | 'onCuaHang' | 'onDangXuat' | 'shopBat'> & { coThu: boolean }) {
-  const net = { width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, 'aria-hidden': true, focusable: false }
   return (
     <nav className="h2-ray" aria-label="Lối tắt">
       <NutRay nhan="Câu đã làm" onClick={p.onCauDaLam}>
-        <svg {...net}>
-          <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
-          <path d="M4 21V5" />
-          <path d="M9 8h6M9 12h6" />
-        </svg>
+        <IconSo />
       </NutRay>
       {p.coThu && (
         <NutRay nhan="Túi đồ" onClick={p.onTuiDo}>
-          <svg {...net}>
-            <path d="M5 8h14l-1 12H6z" />
-            <path d="M9 8V6a3 3 0 0 1 6 0v2" />
-          </svg>
+          <IconTui />
         </NutRay>
       )}
       {p.coThu && p.shopBat && (
         <NutRay nhan="Cửa hàng" onClick={p.onCuaHang}>
-          <svg {...net}>
-            <path d="M4 10h16l-1-5H5z" />
-            <path d="M5 10v10h14V10M10 20v-6h4v6" />
-          </svg>
+          <IconCuaHang />
         </NutRay>
       )}
       <NutRay nhan="Đăng xuất" onClick={p.onDangXuat}>
-        <svg {...net}>
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-          <path d="M16 17l5-5-5-5M21 12H9" />
-        </svg>
+        <IconDangXuat />
       </NutRay>
     </nav>
   )
@@ -413,6 +457,14 @@ function IconKiem() {
     </svg>
   )
 }
+function IconRuong() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <rect x="3" y="9" width="18" height="11" rx="2" />
+      <path d="M3 13h18M12 11v4M5 9a7 5 0 0 1 14 0" />
+    </svg>
+  )
+}
 function IconKhoa() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true" focusable="false">
@@ -423,7 +475,7 @@ function IconKhoa() {
 }
 
 /** Hết kế hoạch hôm nay: lời mừng + Rương Bát Linh (HS-XongHomNay.dc.html). */
-function XongHomNay({ s, exp, token, onTaiLai }: { s: SanhHoa2; exp: SanhBanDoProps['exp']; token: string; onTaiLai: () => void }) {
+function XongHomNay({ s, exp, token, onTaiLai, ngang = false, thu = null }: { s: SanhHoa2; exp: SanhBanDoProps['exp']; token: string; onTaiLai: () => void; ngang?: boolean; thu?: ThuTrenHud | null }) {
   const [dangMo, setDangMo] = useState(false)
   const [loi, setLoi] = useState('')
   const [vangVuaNhan, setVangVuaNhan] = useState<number | null>(null)
@@ -445,6 +497,66 @@ function XongHomNay({ s, exp, token, onTaiLai }: { s: SanhHoa2; exp: SanhBanDoPr
     }
   }
   const mai = s.ngay ? ngaySau(s.ngay) : ''
+  const daLam = r.tong > 0 ? r.daLam : s.theLuc.tong - s.theLuc.con
+  const tongKh = r.tong > 0 ? r.tong : s.theLuc.tong
+  const tinRuong = vangDaCo !== null && (r.daMo || vangVuaNhan !== null) && (
+    <p className="h2-ruong-da" role="status">
+      Rương Bát Linh đã mở · +{vangDaCo} vàng (dùng ở Cửa hàng phụ kiện)
+    </p>
+  )
+  const tinLoi = loi && (
+    <p className="h2-loi" role="alert">
+      {loi}
+    </p>
+  )
+  const nutMo = moDuoc && (
+    <button type="button" className="h2-nut-chinh" onClick={() => void mo()} disabled={dangMo} aria-busy={dangMo}>
+      <span className="h2-nut-chinh-chu">
+        <span className="h2-nut-chinh-lon baloo">{dangMo ? 'ĐANG MỞ RƯƠNG…' : 'MỞ RƯƠNG BÁT LINH'}</span>
+        <span className="h2-nut-chinh-nho">Quà xong trọn kế hoạch hôm nay · vàng mua phụ kiện</span>
+      </span>
+      <IconRuong />
+    </button>
+  )
+  if (ngang) {
+    // Ngang-XongHomNay: cột bản đồ thành màn mừng — thần thú EM ĐÃ CHỌN (ảnh thật, đúng dạng theo cấp) + rương + 2 số có nhãn + nút mở rương.
+    return (
+      <section className="h2-ng-xong" aria-label="Hôm nay em xong rồi">
+        <p className="h2-ng-nho">Kế hoạch hôm nay{s.ngay ? ` · ${thuNgayThang(s.ngay)}` : ''}</p>
+        <h2 className="h2-ng-xong-lon baloo">Hôm nay em xong rồi!</h2>
+        <p className="h2-ng-xong-chu">{moDuoc ? 'Em làm trọn kế hoạch — Rương Bát Linh đã sẵn sàng mở' : 'Em làm trọn kế hoạch hôm nay'}</p>
+        <div className="h2-ng-xong-tranh" aria-hidden="true">
+          {thu && <img className="h2-ng-xong-thu" src={anhThu(thu.index, thu.cap)} alt="" width={200} height={200} />}
+          <svg className="h2-ng-xong-ruong" width="190" height="170" viewBox="0 0 190 170" focusable="false">
+            <path d="M16 70 a79 56 0 0 1 158 0 v14 h-158 z" fill="rgb(176 122 62)" stroke="rgb(90 53 20)" strokeWidth="6" />
+            <rect x="16" y="80" width="158" height="80" rx="10" fill="rgb(150 98 46)" stroke="rgb(90 53 20)" strokeWidth="6" />
+            <rect x="10" y="74" width="170" height="16" rx="4" fill="rgb(255 201 64)" />
+            <rect x="16" y="80" width="10" height="80" fill="rgb(255 201 64)" />
+            <rect x="164" y="80" width="10" height="80" fill="rgb(255 201 64)" />
+            <rect x="78" y="66" width="34" height="40" rx="6" fill="rgb(255 214 107)" stroke="rgb(90 53 20)" strokeWidth="4" />
+            <circle cx="95" cy="86" r="6" fill="rgb(90 53 20)" />
+          </svg>
+        </div>
+        <div className="h2-ng-xong-so">
+          <span className="h2-ng-o-so">
+            <b className="baloo">
+              {daLam}/{tongKh}
+            </b>
+            <span>câu kế hoạch</span>
+          </span>
+          {exp && (
+            <span className="h2-ng-o-so" data-mau="vang">
+              <b className="baloo">+{exp.homNay}</b>
+              <span>EXP{thu ? ` cho ${thu.ten}` : ' hôm nay'}</span>
+            </span>
+          )}
+        </div>
+        {tinRuong}
+        {tinLoi}
+        {nutMo}
+      </section>
+    )
+  }
   return (
     <>
       <section className="h2-xong" aria-label="Hôm nay em xong rồi">
@@ -461,29 +573,10 @@ function XongHomNay({ s, exp, token, onTaiLai }: { s: SanhHoa2; exp: SanhBanDoPr
           {exp ? ` · +${exp.homNay} EXP hôm nay` : ''}
         </p>
         {mai && <p className="h2-xong-phu">Kế hoạch ngày mai sẵn lúc 00:00 {thuNgayThang(mai)}: câu đến lịch ôn lại và câu mới.</p>}
-        {vangDaCo !== null && (r.daMo || vangVuaNhan !== null) && (
-          <p className="h2-ruong-da" role="status">
-            Rương Bát Linh đã mở · +{vangDaCo} vàng (dùng ở Cửa hàng phụ kiện)
-          </p>
-        )}
-        {loi && (
-          <p className="h2-loi" role="alert">
-            {loi}
-          </p>
-        )}
+        {tinRuong}
+        {tinLoi}
       </section>
-      {moDuoc && (
-        <button type="button" className="h2-nut-chinh" onClick={() => void mo()} disabled={dangMo} aria-busy={dangMo}>
-          <span className="h2-nut-chinh-chu">
-            <span className="h2-nut-chinh-lon baloo">{dangMo ? 'ĐANG MỞ RƯƠNG…' : 'MỞ RƯƠNG BÁT LINH'}</span>
-            <span className="h2-nut-chinh-nho">Quà xong trọn kế hoạch hôm nay · vàng mua phụ kiện</span>
-          </span>
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-            <rect x="3" y="9" width="18" height="11" rx="2" />
-            <path d="M3 13h18M12 11v4M5 9a7 5 0 0 1 14 0" />
-          </svg>
-        </button>
-      )}
+      {nutMo}
     </>
   )
 }
@@ -500,7 +593,16 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
         <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} />
       ) : trong ? (
         s.chienDich ? <p className="h2-tam-chu">Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.</p> : null
-      ) : s.doan.con > 0 ? (
+      ) : (
+        <NutViec p={p} s={s} />
+      )}
+    </>
+  )
+}
+
+/** Nút việc hôm nay (còn ổ phục kích ⇒ PHÁ N Ổ; hết ổ ⇒ KHÁM PHÁ ĐẢO) — dùng chung bản dọc và bản ngang. */
+function NutViec({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
+  return s.doan.con > 0 ? (
         <>
           <button type="button" className="h2-nut-chinh" onClick={p.onPhaPhucKich}>
             <span className="h2-nut-chinh-chu">
@@ -527,12 +629,283 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
           </span>
           <IconKiem />
         </button>
-      ) : null}
+      ) : null
+}
+
+// ═══════════════════ BẢN NGANG (docs/ban-ve-ngang-2809/Ngang-Sanh + Ngang-XongHomNay) ═══════════════════
+// Lưới 7/5: cột 7 = bản đồ (hoặc màn mừng khi xong kế hoạch); cột 5 = thẻ chiến dịch · Thể lực · nút chính · Rương · Câu đã làm.
+// Cùng dữ liệu, cùng nút, cùng luồng với bản dọc — chỉ đổi sắp đặt.
+
+function Thanh({ nhan, co, tong, mau }: { nhan: string; co: number; tong: number; mau: 'ngoc' | 'vang' }) {
+  return (
+    <span className="h2-ng-thanh" data-mau={mau}>
+      <span className="h2-ng-thanh-dau">
+        <span>{nhan}</span>
+        <b>
+          {co}/{tong} câu
+        </b>
+      </span>
+      <span className="h2-ng-ray" data-mau={mau} role="progressbar" aria-label={nhan} aria-valuemin={0} aria-valuemax={tong} aria-valuenow={co}>
+        <span style={{ width: `${phanTram(co, tong)}%` }} />
+      </span>
+    </span>
+  )
+}
+
+function TheChienDichNgang({ s, now }: { s: SanhHoa2; now: number }) {
+  const cd = s.chienDich!
+  const p = phanTram(cd.coXat, cd.tong)
+  const chuVi = 2 * Math.PI * 40
+  return (
+    <section className="h2-ng-the h2-ng-cd" aria-label="Chiến dịch đang mở">
+      <span className="h2-ng-vong" role="img" aria-label={`Cọ xát ${p}%`}>
+        <svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
+          <circle cx="48" cy="48" r="40" stroke="rgb(255 255 255 / 0.12)" strokeWidth="9" fill="none" />
+          <circle cx="48" cy="48" r="40" stroke="rgb(55 226 213)" strokeWidth="9" fill="none" strokeDasharray={`${((chuVi * p) / 100).toFixed(1)} ${chuVi.toFixed(1)}`} strokeLinecap="round" transform="rotate(-90 48 48)" />
+        </svg>
+        <span className="h2-ng-vong-chu">
+          <b className="baloo">{p}%</b>
+          <span>Cọ xát</span>
+        </span>
+      </span>
+      <span className="h2-ng-cd-chu">
+        <span className="h2-ng-nho">Chiến dịch đang mở</span>
+        <span className="h2-ng-cd-ten baloo">Chiến dịch {cd.ten}</span>
+        {cd.hanNop && <span className="h2-ng-phu">Hạn nộp: {chuHanNop(cd.hanNop, now)}</span>}
+        <span className="h2-ng-hai-thanh">
+          <Thanh nhan="Cọ xát" co={cd.coXat} tong={cd.tong} mau="ngoc" />
+          <Thanh nhan="Thành thạo" co={cd.thanhThao} tong={cd.tong} mau="vang" />
+        </span>
+        {cd.thanhThao === 0 && cd.thanhThaoTangTu && <span className="h2-ng-phu h2-ng-an-thap">Thành thạo bắt đầu tăng từ {thuNgayThang(cd.thanhThaoTangTu)}.</span>}
+      </span>
+    </section>
+  )
+}
+
+function TheTheLucNgang({ s }: { s: SanhHoa2 }) {
+  const { con, tong } = s.theLuc
+  return (
+    <section className="h2-ng-the h2-ng-tl" aria-label="Thể lực hôm nay">
+      <span className="h2-ng-tl-o" aria-hidden="true">
+        <svg width="24" height="26" viewBox="0 0 14 16" focusable="false">
+          <polygon points="7,0 14,5 11,16 3,16 0,5" fill="rgb(55 226 213)" />
+        </svg>
+      </span>
+      <span className="h2-ng-tl-chu">
+        <span className="h2-ng-tl-dau">
+          <b>Thể lực hôm nay</b>
+          <b className="h2-ng-tl-so baloo">
+            {con}/{tong} câu còn lại
+          </b>
+        </span>
+        <span className="h2-ng-ray" data-mau="ngoc" role="progressbar" aria-label="Thể lực còn lại" aria-valuemin={0} aria-valuemax={tong} aria-valuenow={con}>
+          <span style={{ width: `${phanTram(con, tong)}%` }} />
+        </span>
+        <span className="h2-ng-phu h2-ng-an-thap">
+          {con === 0 ? `Đã làm ${tong} câu · xong kế hoạch hôm nay` : `Đã làm ${tong - con} câu · ${s.doan.con} câu ôn + ${s.dao.con} câu mới đang chờ`}
+        </span>
+      </span>
+    </section>
+  )
+}
+
+function TheRuongNgang({ r }: { r: SanhHoa2['ruong'] }) {
+  return (
+    <section className="h2-ng-the h2-ng-ruong" aria-label="Rương Bát Linh">
+      <span className="h2-ng-ruong-o" aria-hidden="true">
+        <IconRuong />
+      </span>
+      <span className="h2-ng-tl-chu">
+        <b>Rương Bát Linh</b>
+        <span className="h2-ng-phu h2-ng-an-thap">{r.daMo ? 'Rương hôm nay đã mở' : `Xong ${r.tong}/${r.tong} câu hôm nay → mở rương, nhận vàng mua phụ kiện`}</span>
+        <span className="h2-ng-ruong-hang">
+          <span className="h2-ng-ray" data-mau="vang" role="progressbar" aria-label="Câu đã làm cho Rương Bát Linh" aria-valuemin={0} aria-valuemax={r.tong} aria-valuenow={r.daLam}>
+            <span style={{ width: `${phanTram(r.daLam, r.tong)}%` }} />
+          </span>
+          <b className="h2-ng-ruong-so">
+            {r.daLam}/{r.tong} câu
+          </b>
+        </span>
+      </span>
+    </section>
+  )
+}
+
+function NutCauDaLamNgang({ onClick }: { onClick: () => void }) {
+  return (
+    <button type="button" className="h2-ng-the h2-ng-cdl" onClick={onClick}>
+      <IconSo co={24} />
+      <span className="h2-ng-cdl-chu">
+        <b>Câu đã làm</b>
+        <span className="h2-ng-phu"> · xem lại đề, đáp án, lời giải · Tải PDF</span>
+      </span>
+      <svg width="22" height="22" {...NET} strokeWidth={2.4}>
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </button>
+  )
+}
+
+function NutTron({ nhan, onClick, children }: { nhan: string; onClick: () => void; children: ReactNode }) {
+  return (
+    <button type="button" className="h2-kinh h2-ng-nut-tron" aria-label={nhan} title={nhan} onClick={onClick}>
+      {children}
+    </button>
+  )
+}
+
+function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
+  const xong = s.theLuc.tong > 0 && s.theLuc.con === 0
+  const trong = s.theLuc.tong === 0
+  const mai = s.ngay ? ngaySau(s.ngay) : ''
+  return (
+    <>
+      {s.huyetChien && !xong ? (
+        <TheHuyetChien s={s} now={p.now} />
+      ) : s.chienDich ? (
+        <TheChienDichNgang s={s} now={p.now} />
+      ) : (
+        <p className="h2-ng-the h2-tam-chu">Thầy chưa giao chiến dịch nào cho em. Khi thầy giao, bản đồ sẽ mở đảo mới ở đây.</p>
+      )}
+      {!trong && <TheTheLucNgang s={s} />}
+      {xong ? (
+        mai && (
+          <section className="h2-ng-the h2-ng-mai" aria-label="Kế hoạch ngày mai">
+            <b>Kế hoạch ngày mai</b>
+            <span className="h2-ng-phu">Sẵn lúc 00:00 {thuNgayThang(mai)}: câu đến lịch ôn lại và câu mới.</span>
+          </section>
+        )
+      ) : trong ? (
+        s.chienDich ? <p className="h2-ng-the h2-tam-chu">Hôm nay chưa có câu nào trong kế hoạch của em. Em quay lại sau nhé.</p> : null
+      ) : (
+        <NutViec p={p} s={s} />
+      )}
+      {!xong && s.ruong.tong > 0 && <TheRuongNgang r={s.ruong} />}
+      <span className="h2-ng-dan" aria-hidden="true" />
+      <NutCauDaLamNgang onClick={p.onCauDaLam} />
     </>
   )
 }
 
+function TieuDeBanDo({ s }: { s: SanhHoa2 | null }) {
+  const cd = s?.chienDich ?? null
+  return (
+    <div className="h2-ng-bd-dau">
+      <p className="h2-ng-nho">Bản đồ Bát Linh</p>
+      <h1 className="h2-ng-bd-ten baloo">{cd ? `Đảo ${cd.ten}` : 'Quần đảo Bát Linh'}</h1>
+      <p className="h2-ng-phu h2-ng-an-thap">Hộ tống xe hàng qua cầu, rồi xua sương mù trên đảo</p>
+    </div>
+  )
+}
+
+function ChuGiai() {
+  return (
+    <ul className="h2-ng-chu-giai h2-kinh" aria-label="Chú giải bản đồ">
+      <li>
+        <span className="h2-ng-cham" data-mau="hong" aria-hidden="true" />
+        Ổ phục kích = câu ôn hôm nay
+      </li>
+      <li>
+        <span className="h2-ng-cham" data-mau="suong" aria-hidden="true" />
+        Sương mù = câu mới chưa làm
+      </li>
+    </ul>
+  )
+}
+
+function SanhNgang({ p, bc }: { p: SanhBanDoProps; bc: BoCucNgang }) {
+  const kq = p.ketQua
+  const s = kq && kq.cheDo2 && !kq.canChonThu ? kq.sanh : null
+  const chonThu = !!kq && kq.cheDo2 && kq.canChonThu === true
+  const xong = !!s && s.theLuc.tong > 0 && s.theLuc.con === 0
+  const coThu = !chonThu
+  const kieu = bc.thap ? ({ '--h2-ti-le': String(bc.tiLe) } as CSSProperties) : undefined
+  return (
+    <div className="h2-sanh h2-ngang" data-bo-cuc="ngang" data-thap={bc.thap ? 'true' : 'false'} data-trang-thai={s ? 'co' : chonThu ? 'chon-thu' : p.loi ? 'loi' : 'dang-tai'} style={kieu}>
+      <div className="h2-ng-khung">
+        <div className="h2-ng-tren">
+          <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={null} theLuc={null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} />
+          <nav className="h2-ng-tren-phai" aria-label="Lối tắt">
+            <span className="h2-kinh h2-ng-chuoi h2-chuoi" aria-label={`Chuỗi ${p.chuoiNgay} ngày`}>
+              <IconChuoi />
+              Chuỗi {p.chuoiNgay} ngày
+            </span>
+            {coThu && (
+              <NutTron nhan="Túi đồ" onClick={p.onTuiDo}>
+                <IconTui />
+              </NutTron>
+            )}
+            {coThu && p.shopBat && (
+              <NutTron nhan="Cửa hàng" onClick={p.onCuaHang}>
+                <IconCuaHang />
+              </NutTron>
+            )}
+            <NutTron nhan="Đăng xuất" onClick={p.onDangXuat}>
+              <IconDangXuat />
+            </NutTron>
+          </nav>
+        </div>
+        <section className="h2-ng-trai" data-xong={xong ? 'true' : 'false'} aria-label={xong ? 'Kế hoạch hôm nay' : 'Bản đồ Bát Linh'}>
+          {s && xong ? (
+            <XongHomNay s={s} exp={p.exp} token={p.token} onTaiLai={p.onTaiLai} ngang thu={p.thu} />
+          ) : (
+            <>
+              <div className="h2-ng-bd-vung">
+                <BanDo s={s} ngang />
+              </div>
+              <TieuDeBanDo s={s} />
+              {s && <ChuGiai />}
+            </>
+          )}
+        </section>
+        <aside className="h2-ng-phai" aria-label="Việc hôm nay" aria-busy={p.dangTai && !s}>
+          {p.caDangMo && <DaiVaoThi onVaoThi={p.onVaoThi} />}
+          {s ? (
+            <CotPhaiNgang p={p} s={s} />
+          ) : chonThu ? (
+            <>
+              <p className="h2-ng-the h2-tam-chu">Em chọn thần thú đồng hành trước khi lên đường. Thần thú lớn lên theo EXP em học được.</p>
+              <button type="button" className="h2-nut-chinh" onClick={p.onChonThu}>
+                <span className="h2-nut-chinh-chu">
+                  <span className="h2-nut-chinh-lon baloo">CHỌN THẦN THÚ CỦA EM</span>
+                  <span className="h2-nut-chinh-nho">Một lần chọn, đồng hành cả năm học</span>
+                </span>
+              </button>
+            </>
+          ) : p.loi ? (
+            <div className="h2-ng-the h2-loi-khoi" role="alert">
+              <p className="h2-tam-chu">{p.loi}</p>
+              <button type="button" className="h2-nut-phu" onClick={p.onTaiLai}>
+                Thử lại
+              </button>
+            </div>
+          ) : (
+            <div className="h2-ng-the h2-xuong" role="status">
+              <span className="h2-xuong-dong" />
+              <span className="h2-xuong-dong ngan" />
+              <span className="h2-xuong-nut" />
+              <span className="h2-an">Đang mở bản đồ…</span>
+            </div>
+          )}
+          {s && p.loi && (
+            <p className="h2-cu" role="status">
+              Chưa cập nhật được: {p.loi}
+            </p>
+          )}
+        </aside>
+      </div>
+    </div>
+  )
+}
+
 export default function SanhBanDo(p: SanhBanDoProps) {
+  const bc = useBoCucNgang()
+  if (bc.ngang) return <SanhNgang p={p} bc={bc} />
+  return <SanhDoc {...p} />
+}
+
+/** Bản dọc (điện thoại) — giữ nguyên như trước bản ngang. */
+function SanhDoc(p: SanhBanDoProps) {
   const kq = p.ketQua
   const s = kq && kq.cheDo2 && !kq.canChonThu ? kq.sanh : null
   const chonThu = !!kq && kq.cheDo2 && kq.canChonThu === true

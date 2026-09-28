@@ -5,14 +5,17 @@
 // (lời giải thô đọc qua `chuanHoaLoiGiaiCau`) — KHÔNG vẽ khối lời giải thứ hai — rồi lịch sử làm câu.
 // Nút chính "Tải PDF · N câu đang lọc" (thầy chốt 28/09): lấy chi tiết (≤ 60 câu/lượt) → `dungPdf` (pdf-cau-da-lam.ts, nạp lười) dựng
 // TỆP .pdf thật đúng bản vẽ HS-PDF → tải về `cau-da-lam-<bộ-lọc>-<ngày>.pdf`. Máy yếu không dựng được thì còn nút "Mở bản in" (đường cũ).
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+// Bản NGANG (docs/ban-ve-ngang-2809/Ngang-CauDaLam): cột trái bộ lọc + danh sách gọn, cột phải chi tiết câu đang chọn (cùng khối
+// TheCau xem_lai), Tải PDF lên hàng trên. Điểm ngắt: bo-cuc-ngang.ts. Điện thoại dọc giữ nguyên.
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import TheCau from '../TheCau'
 import KhungXemPhieu from '../KhungXemPhieu'
 import { ChemText } from '../../lib/chem-format'
 import '../m3'
 import { taiCauDaLam, taiChiTiet, type CauDaLamMuc, type ChiTietCau, type KetQuaCauDaLam } from './api'
-import { NHAN_TRANG_THAI, cauLuyenTuChiTiet, chuLanLam, dauCau, ngayGanNhat, propsTheCau, tomTatThe } from './cau-chuyen'
+import { NHAN_TRANG_THAI, cauLuyenTuChiTiet, chiSoDuoiRo, chuLanLam, dauCau, ngayGanNhat, propsTheCau, tomTatThe } from './cau-chuyen'
 import { gioThuNgay, thuNgayThang } from './thoi-gian'
+import { useBoCucNgang } from './bo-cuc-ngang'
 import './cau-da-lam.css'
 
 export type BoLoc = 'tat_ca' | 'sai_gan' | 'dang_on' | 'thanh_thao' | 'can_day_lai'
@@ -73,6 +76,8 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
   const [pdf, setPdf] = useState<TrangThaiPdf>(PDF_TRONG)
   const [phieu, setPhieu] = useState('')
   const daXin = useRef(new Set<string>())
+  const bc = useBoCucNgang()
+  const ngang = bc.ngang
 
   useEffect(() => {
     let huy = false
@@ -242,6 +247,292 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
   }
 
   const trangThaiDs = dangTai && !du ? 'dang-tai' : loi && !du ? 'loi' : du && !du.cheDo2 ? 'tat' : cauCd.length === 0 ? 'trong' : 'co'
+  // Bản ngang: danh sách trái – chi tiết phải cùng lúc ⇒ luôn có một câu đang chọn (mặc định câu đầu của bộ lọc).
+  const chonNgang = ngang ? (mo && dsLoc.some((c) => c.qid === mo) ? mo : (dsLoc[0]?.qid ?? null)) : null
+
+  // ── các mảnh dùng chung bản dọc và bản ngang ──
+  const chonCd = dsChienDich.length > 0 && (
+    <div className="h2-cdl-chon">
+      <span className="h2-cdl-chon-hien" aria-hidden="true">
+        <span className="h2-cdl-chon-chu">
+          Chiến dịch: <b>{cd?.ten ?? ''}</b>
+          {cd ? ` · ${cd.tong} câu` : ''}
+        </span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </span>
+      <select
+        aria-label="Chiến dịch"
+        value={cdHienTai}
+        onChange={(e) => {
+          setCdChon(e.target.value)
+          setMo(null)
+        }}
+      >
+        {dsChienDich.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.ten} · {c.tong} câu
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+
+  const locVaTom = trangThaiDs === 'co' && (
+    <>
+      <div className="h2-cdl-loc" role="group" aria-label="Lọc câu">
+        {BO_LOC.map((b) => (
+          <button
+            key={b.id}
+            type="button"
+            className="h2-cdl-chip"
+            aria-pressed={loc === b.id}
+            onClick={() => {
+              setLoc(b.id)
+              setMo(null)
+              setPdf(PDF_TRONG)
+            }}
+          >
+            {b.nhan} <span className="h2-cdl-dem">{dem[b.id]}</span>
+          </button>
+        ))}
+      </div>
+      <p className="h2-cdl-tom">
+        {dsLoc.length} câu · xếp theo lần làm gần nhất{capNhat && !ngang ? ` · cập nhật ${gioThuNgay(capNhat)}` : ''}
+      </p>
+    </>
+  )
+
+  const thongBao = (
+    <>
+      {trangThaiDs === 'dang-tai' && (
+        <div className="h2-cdl-xuong" role="status" aria-label="Đang tải câu đã làm">
+          <span />
+          <span />
+          <span />
+        </div>
+      )}
+      {trangThaiDs === 'loi' && (
+        <div className="h2-cdl-thong-bao" role="alert">
+          <p>{loi}</p>
+          <button type="button" className="h2-cdl-nut-phu" onClick={() => setLuot((n) => n + 1)}>
+            Thử lại
+          </button>
+        </div>
+      )}
+      {trangThaiDs === 'tat' && (
+        <div className="h2-cdl-thong-bao">
+          <p>Mục Câu đã làm chưa mở cho em. Khi thầy bật chiến dịch, câu em làm sẽ hiện ở đây.</p>
+        </div>
+      )}
+      {trangThaiDs === 'trong' && (
+        <div className="h2-cdl-thong-bao">
+          <p>
+            {dsChienDich.length === 0
+              ? 'Em chưa có chiến dịch nào. Khi thầy giao chiến dịch, câu em làm ở Đoàn Hộ Tống và Bát Linh Đảo sẽ hiện ở đây.'
+              : 'Em chưa làm câu nào của chiến dịch này. Câu em làm ở Đoàn Hộ Tống và Bát Linh Đảo sẽ hiện ở đây.'}
+          </p>
+        </div>
+      )}
+      {trangThaiDs === 'co' && dsLoc.length === 0 && (
+        <div className="h2-cdl-thong-bao">
+          <p>Không có câu nào ở mục "{boLoc.nhan}".</p>
+          <button type="button" className="h2-cdl-nut-phu" onClick={() => setLoc('tat_ca')}>
+            Xem tất cả câu
+          </button>
+        </div>
+      )}
+    </>
+  )
+
+  const tinPdf = (
+    <>
+      {pdf.loi && (
+        <p className="h2-cdl-loi" role="alert">
+          {pdf.loi}
+        </p>
+      )}
+      {pdf.xong && (
+        <p className="h2-cdl-xong" role="status">
+          {pdf.xong}
+        </p>
+      )}
+    </>
+  )
+  const nutPdf = (
+    <button type="button" className="h2-cdl-nut-chinh" disabled={pdf.dang || dsLoc.length === 0} aria-busy={pdf.dang} onClick={() => void taiPdf()}>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+        <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
+      </svg>
+      {pdf.dang ? pdf.chu : `Tải PDF · ${dsLoc.length} câu đang lọc`}
+    </button>
+  )
+  const nutDuPhong = pdf.duPhong && !pdf.dang && (
+    <button type="button" className="h2-cdl-nut-phu h2-cdl-du-phong" onClick={() => void moBanIn()}>
+      Mở bản in
+    </button>
+  )
+
+  /** Thông tin một thẻ (đầu thẻ, tóm tắt, lịch ôn). */
+  const thongTin = (c: CauDaLamMuc) => {
+    const tt = chiTiet[c.qid]
+    const ct = tt && 'ct' in tt ? tt.ct : null
+    const tom = ct ? tomTatThe(ct) : null
+    const cuoi = c.lichSu.length ? c.lichSu.reduce((m, l) => (l.ngay >= m.ngay ? l : m), c.lichSu[0]!) : null
+    const hen = dongHenOn(c)
+    const idMo = `h2-cdl-mo-${c.qid.replace(/[^a-zA-Z0-9_-]/g, '_')}`
+    const dau = `${dauCau(c)}${tom?.phuDau ? ` · ${tom.phuDau}` : ''}`
+    const nhanTt = (
+      <span className="h2-the-tt" data-tt={c.trangThai}>
+        {NHAN_TRANG_THAI[c.trangThai]}
+      </span>
+    )
+    return { tt, tom, cuoi, hen, idMo, dau, nhanTt }
+  }
+
+  /** Thân thẻ đóng: một dòng đề + "Em chọn: … · Đáp án: …" + lịch ôn. */
+  const thanDong = (c: CauDaLamMuc, ttin: ReturnType<typeof thongTin>) => {
+    const { tom, cuoi, hen } = ttin
+    return (
+      <>
+        {tom ? (
+          <span className="h2-the-de">
+            <ChemText text={chiSoDuoiRo(tom.de)} />
+          </span>
+        ) : (
+          c.tenDang && <span className="h2-the-de">{c.tenDang}</span>
+        )}
+        {tom ? (
+          <span className="h2-the-em">
+            {tom.nhanEm}:{' '}
+            <b className={tom.dung ? 'h2-the-dung' : 'h2-the-sai'}>
+              <ChemText text={chiSoDuoiRo(tom.em)} />
+            </b>
+            {tom.dapAn ? (
+              <>
+                {' · Đáp án: '}
+                <b className="h2-the-dung">
+                  <ChemText text={chiSoDuoiRo(tom.dapAn)} />
+                </b>
+              </>
+            ) : tom.dung ? (
+              ' · Đúng'
+            ) : null}
+          </span>
+        ) : (
+          cuoi && <span className="h2-the-em">Lần gần nhất: {chuLanLam(cuoi)}</span>
+        )}
+        <span className="h2-the-duoi">
+          <span>{c.trangThai === 'can_day_lai' ? 'Thầy chữa câu này trên lớp' : hen}</span>
+          {!ngang && <span className="h2-the-xem">Xem lời giải</span>}
+        </span>
+      </>
+    )
+  }
+
+  /** Thân chi tiết: đề + lựa chọn + LỜI GIẢI bằng `TheCau` xem_lai (khối chuẩn, không vẽ lại) + lịch sử + lịch ôn. */
+  const thanMo = (c: CauDaLamMuc, ttin: ReturnType<typeof thongTin>) => {
+    const { tt, hen } = ttin
+    return (
+      <>
+        {!tt || 'dang' in tt ? (
+          <div className="h2-cdl-xuong nho" role="status" aria-label="Đang tải lời giải">
+            <span />
+            <span />
+          </div>
+        ) : 'loi' in tt ? (
+          <div className="h2-cdl-thong-bao" role="alert">
+            <p>{tt.loi}</p>
+            <button type="button" className="h2-cdl-nut-phu" onClick={() => napChiTiet([c.qid])}>
+              Thử lại
+            </button>
+          </div>
+        ) : (
+          <div className="m3 h2-the-cau">
+            <TheCau {...propsTheCau(tt.ct, c.stt)} />
+          </div>
+        )}
+        {c.lichSu.length > 0 && (
+          <div className="h2-the-ls">
+            <span className="h2-the-ls-nhan">Lịch sử làm câu này</span>
+            <ul className="h2-the-ls-ds">
+              {c.lichSu.map((l, i) => (
+                <li key={i} className="h2-the-ls-chip" data-dung={l.dung ? 'true' : 'false'}>
+                  {chuLanLam(l)}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {hen && <p className="h2-the-hen">{hen}</p>}
+      </>
+    )
+  }
+
+  if (ngang) {
+    const cauChon = chonNgang ? (dsLoc.find((c) => c.qid === chonNgang) ?? null) : null
+    const tinChon = cauChon ? thongTin(cauChon) : null
+    return (
+      <div className="h2-cdl h2-cdl-ngang" data-bo-cuc="ngang" data-thap={bc.thap ? 'true' : 'false'} data-trang-thai={trangThaiDs} style={bc.thap ? ({ '--h2-ti-le': String(bc.tiLe) } as CSSProperties) : undefined}>
+        <header className="h2-cdl-ng-dau">
+          <button type="button" className="h2-cdl-ve h2-cdl-ve-chu" aria-label="Về Sảnh" onClick={onVe}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+            <span aria-hidden="true">Về Sảnh</span>
+          </button>
+          <div className="h2-cdl-ng-tieu">
+            <h1 className="h2-cdl-tieu">Câu đã làm</h1>
+            {capNhat > 0 && <p className="h2-cdl-tom">Cập nhật {gioThuNgay(capNhat)}</p>}
+          </div>
+          <span className="h2-cdl-ng-dan" aria-hidden="true" />
+          {chonCd}
+          {trangThaiDs === 'co' && nutPdf}
+        </header>
+        <div className="h2-cdl-ng-than">
+          <aside className="h2-cdl-ng-trai" aria-label="Danh sách câu">
+            {locVaTom}
+            {tinPdf}
+            {nutDuPhong}
+            <div className="h2-cdl-ds">
+              {thongBao}
+              {trangThaiDs === 'co' &&
+                dsLoc.map((c) => {
+                  const ttin = thongTin(c)
+                  const chon = c.qid === chonNgang
+                  return (
+                    <article key={c.qid} className="h2-the" data-chon={chon ? 'true' : 'false'} data-trang-thai={c.trangThai}>
+                      <button type="button" className="h2-the-nut" aria-pressed={chon} aria-controls="h2-cdl-chi-tiet" onClick={() => setMo(c.qid)}>
+                        <span className="h2-the-dau">
+                          <span className="h2-the-so">{ttin.dau}</span>
+                          {ttin.nhanTt}
+                        </span>
+                        {thanDong(c, ttin)}
+                      </button>
+                    </article>
+                  )
+                })}
+            </div>
+          </aside>
+          <section id="h2-cdl-chi-tiet" className="h2-cdl-ng-phai m3" aria-label="Chi tiết câu" aria-live="polite">
+            {cauChon && tinChon ? (
+              <>
+                <div className="h2-cdl-ng-ct-dau">
+                  <h2 className="h2-cdl-ng-ct-tieu">{tinChon.dau}</h2>
+                  {tinChon.nhanTt}
+                </div>
+                {thanMo(cauChon, tinChon)}
+              </>
+            ) : (
+              <p className="h2-cdl-ng-trong">{trangThaiDs === 'co' ? 'Em chọn một câu ở danh sách bên trái để xem đề, đáp án và lời giải.' : ''}</p>
+            )}
+          </section>
+        </div>
+        {phieu && <KhungXemPhieu html={phieu} ten="Câu đã làm · bản in" dong={() => setPhieu('')} />}
+      </div>
+    )
+  }
 
   return (
     <div className="h2-cdl" data-trang-thai={trangThaiDs}>
@@ -254,188 +545,29 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
           </button>
           <h1 className="h2-cdl-tieu">Câu đã làm</h1>
         </div>
-        {dsChienDich.length > 0 && (
-          <div className="h2-cdl-chon">
-            <span className="h2-cdl-chon-hien" aria-hidden="true">
-              <span className="h2-cdl-chon-chu">
-                Chiến dịch: <b>{cd?.ten ?? ''}</b>
-                {cd ? ` · ${cd.tong} câu` : ''}
-              </span>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" focusable="false">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </span>
-            <select
-              aria-label="Chiến dịch"
-              value={cdHienTai}
-              onChange={(e) => {
-                setCdChon(e.target.value)
-                setMo(null)
-              }}
-            >
-              {dsChienDich.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.ten} · {c.tong} câu
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-        {trangThaiDs === 'co' && (
-          <>
-            <div className="h2-cdl-loc" role="group" aria-label="Lọc câu">
-              {BO_LOC.map((b) => (
-                <button
-                  key={b.id}
-                  type="button"
-                  className="h2-cdl-chip"
-                  aria-pressed={loc === b.id}
-                  onClick={() => {
-                    setLoc(b.id)
-                    setMo(null)
-                    setPdf(PDF_TRONG)
-                  }}
-                >
-                  {b.nhan} <span className="h2-cdl-dem">{dem[b.id]}</span>
-                </button>
-              ))}
-            </div>
-            <p className="h2-cdl-tom">
-              {dsLoc.length} câu · xếp theo lần làm gần nhất{capNhat ? ` · cập nhật ${gioThuNgay(capNhat)}` : ''}
-            </p>
-          </>
-        )}
+        {chonCd}
+        {locVaTom}
       </header>
 
       <main className="h2-cdl-ds">
-        {trangThaiDs === 'dang-tai' && (
-          <div className="h2-cdl-xuong" role="status" aria-label="Đang tải câu đã làm">
-            <span />
-            <span />
-            <span />
-          </div>
-        )}
-        {trangThaiDs === 'loi' && (
-          <div className="h2-cdl-thong-bao" role="alert">
-            <p>{loi}</p>
-            <button type="button" className="h2-cdl-nut-phu" onClick={() => setLuot((n) => n + 1)}>
-              Thử lại
-            </button>
-          </div>
-        )}
-        {trangThaiDs === 'tat' && (
-          <div className="h2-cdl-thong-bao">
-            <p>Mục Câu đã làm chưa mở cho em. Khi thầy bật chiến dịch, câu em làm sẽ hiện ở đây.</p>
-          </div>
-        )}
-        {trangThaiDs === 'trong' && (
-          <div className="h2-cdl-thong-bao">
-            <p>
-              {dsChienDich.length === 0
-                ? 'Em chưa có chiến dịch nào. Khi thầy giao chiến dịch, câu em làm ở Đoàn Hộ Tống và Bát Linh Đảo sẽ hiện ở đây.'
-                : 'Em chưa làm câu nào của chiến dịch này. Câu em làm ở Đoàn Hộ Tống và Bát Linh Đảo sẽ hiện ở đây.'}
-            </p>
-          </div>
-        )}
-        {trangThaiDs === 'co' && dsLoc.length === 0 && (
-          <div className="h2-cdl-thong-bao">
-            <p>Không có câu nào ở mục "{boLoc.nhan}".</p>
-            <button type="button" className="h2-cdl-nut-phu" onClick={() => setLoc('tat_ca')}>
-              Xem tất cả câu
-            </button>
-          </div>
-        )}
+        {thongBao}
         {trangThaiDs === 'co' &&
           dsLoc.map((c) => {
             const dangMo = mo === c.qid
-            const tt = chiTiet[c.qid]
-            const ct = tt && 'ct' in tt ? tt.ct : null
-            const tom = ct ? tomTatThe(ct) : null
-            const cuoi = c.lichSu.length ? c.lichSu.reduce((m, l) => (l.ngay >= m.ngay ? l : m), c.lichSu[0]!) : null
-            const hen = dongHenOn(c)
-            const idMo = `h2-cdl-mo-${c.qid.replace(/[^a-zA-Z0-9_-]/g, '_')}`
-            const dau = `${dauCau(c)}${tom?.phuDau ? ` · ${tom.phuDau}` : ''}`
-            const nhanTt = (
-              <span className="h2-the-tt" data-tt={c.trangThai}>
-                {NHAN_TRANG_THAI[c.trangThai]}
-              </span>
-            )
+            const ttin = thongTin(c)
             return (
-              <article key={c.qid} className={dangMo ? 'h2-the m3' : 'h2-the'}data-mo={dangMo ? 'true' : 'false'} data-trang-thai={c.trangThai}>
-                <button type="button" className="h2-the-nut" aria-expanded={dangMo} aria-controls={idMo} onClick={() => moThe(c.qid)}>
+              <article key={c.qid} className={dangMo ? 'h2-the m3' : 'h2-the'} data-mo={dangMo ? 'true' : 'false'} data-trang-thai={c.trangThai}>
+                <button type="button" className="h2-the-nut" aria-expanded={dangMo} aria-controls={ttin.idMo} onClick={() => moThe(c.qid)}>
                   <span className="h2-the-dau">
-                    <span className="h2-the-so">{dau}</span>
-                    {nhanTt}
+                    <span className="h2-the-so">{ttin.dau}</span>
+                    {ttin.nhanTt}
                   </span>
-                  {!dangMo && (
-                    <>
-                      {tom ? (
-                        <span className="h2-the-de">
-                          <ChemText text={tom.de} />
-                        </span>
-                      ) : (
-                        c.tenDang && <span className="h2-the-de">{c.tenDang}</span>
-                      )}
-                      {tom ? (
-                        <span className="h2-the-em">
-                          {tom.nhanEm}:{' '}
-                          <b className={tom.dung ? 'h2-the-dung' : 'h2-the-sai'}>
-                            <ChemText text={tom.em} />
-                          </b>
-                          {tom.dapAn ? (
-                            <>
-                              {' · Đáp án: '}
-                              <b className="h2-the-dung">
-                                <ChemText text={tom.dapAn} />
-                              </b>
-                            </>
-                          ) : tom.dung ? (
-                            ' · Đúng'
-                          ) : null}
-                        </span>
-                      ) : (
-                        cuoi && <span className="h2-the-em">Lần gần nhất: {chuLanLam(cuoi)}</span>
-                      )}
-                      <span className="h2-the-duoi">
-                        <span>{c.trangThai === 'can_day_lai' ? 'Thầy chữa câu này trên lớp' : hen}</span>
-                        <span className="h2-the-xem">Xem lời giải</span>
-                      </span>
-                    </>
-                  )}
+                  {!dangMo && thanDong(c, ttin)}
                 </button>
                 {dangMo && (
-                  <div id={idMo} className="h2-the-mo">
-                    {!tt || 'dang' in tt ? (
-                      <div className="h2-cdl-xuong nho" role="status" aria-label="Đang tải lời giải">
-                        <span />
-                        <span />
-                      </div>
-                    ) : 'loi' in tt ? (
-                      <div className="h2-cdl-thong-bao" role="alert">
-                        <p>{tt.loi}</p>
-                        <button type="button" className="h2-cdl-nut-phu" onClick={() => napChiTiet([c.qid])}>
-                          Thử lại
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="m3 h2-the-cau">
-                        <TheCau {...propsTheCau(tt.ct, c.stt)} />
-                      </div>
-                    )}
-                    {c.lichSu.length > 0 && (
-                      <div className="h2-the-ls">
-                        <span className="h2-the-ls-nhan">Lịch sử làm câu này</span>
-                        <ul className="h2-the-ls-ds">
-                          {c.lichSu.map((l, i) => (
-                            <li key={i} className="h2-the-ls-chip" data-dung={l.dung ? 'true' : 'false'}>
-                              {chuLanLam(l)}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {hen && <p className="h2-the-hen">{hen}</p>}
-                    <button type="button" className="h2-the-thu" aria-controls={idMo} onClick={() => setMo(null)}>
+                  <div id={ttin.idMo} className="h2-the-mo">
+                    {thanMo(c, ttin)}
+                    <button type="button" className="h2-the-thu" aria-controls={ttin.idMo} onClick={() => setMo(null)}>
                       Thu gọn
                     </button>
                   </div>
@@ -447,27 +579,9 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
 
       {trangThaiDs === 'co' && (
         <footer className="h2-cdl-chan">
-          {pdf.loi && (
-            <p className="h2-cdl-loi" role="alert">
-              {pdf.loi}
-            </p>
-          )}
-          {pdf.xong && (
-            <p className="h2-cdl-xong" role="status">
-              {pdf.xong}
-            </p>
-          )}
-          <button type="button" className="h2-cdl-nut-chinh" disabled={pdf.dang || dsLoc.length === 0} aria-busy={pdf.dang} onClick={() => void taiPdf()}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-              <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
-            </svg>
-            {pdf.dang ? pdf.chu : `Tải PDF · ${dsLoc.length} câu đang lọc`}
-          </button>
-          {pdf.duPhong && !pdf.dang && (
-            <button type="button" className="h2-cdl-nut-phu h2-cdl-du-phong" onClick={() => void moBanIn()}>
-              Mở bản in
-            </button>
-          )}
+          {tinPdf}
+          {nutPdf}
+          {nutDuPhong}
           <span className="h2-cdl-nhac">Tệp PDF tải thẳng về máy: đề đầy đủ, đáp án, lời giải và lịch sử từng câu. Chạy trên điện thoại và máy tính.</span>
         </footer>
       )}

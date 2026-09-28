@@ -419,3 +419,166 @@
 .h2-cdl-du-phong {
   align-self: center;
 }
+
+/* ═══════════ BẢN NGANG (docs/ban-ve-ngang-2809/Ngang-CauDaLam) ═══════════
+ * Hàng trên: Về Sảnh · tiêu đề · chọn chiến dịch · Tải PDF. Dưới: cột trái (5) bộ lọc + danh sách gọn tự cuộn,
+ * cột phải (7) chi tiết câu đang chọn tự cuộn — khối TheCau xem_lai giữ nguyên (bảng màu `.m3` như thẻ mở bản dọc). */
+.h2-cdl-ngang {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 0%, rgb(22 52 112 / 0.6) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 45% at 100% 100%, rgb(52 36 110 / 0.5) 0%, transparent 70%),
+    var(--h2c-nen);
+}
+.h2-cdl-ngang[data-thap='true'] {
+  zoom: var(--h2-ti-le, 1);
+  height: calc(100dvh / var(--h2-ti-le, 1));
+}
+.h2-cdl-ng-dau,
+.h2-cdl-ng-than {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+.h2-cdl-ng-dau {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: max(20px, env(safe-area-inset-top)) 32px 16px;
+}
+.h2-cdl-ve-chu {
+  width: auto;
+  padding: 0 18px 0 12px;
+  gap: 6px;
+  border-radius: 16px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.h2-cdl-ng-tieu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.h2-cdl-ngang .h2-cdl-tieu {
+  font-size: 26px;
+  line-height: 1.15;
+}
+.h2-cdl-ng-dan {
+  flex: 1 1 auto;
+}
+.h2-cdl-ngang .h2-cdl-chon {
+  flex: 0 1 340px;
+  min-width: 220px;
+}
+.h2-cdl-ngang .h2-cdl-nut-chinh {
+  width: auto;
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 16px;
+  font-size: 16px;
+  white-space: nowrap;
+}
+.h2-cdl-ng-than {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: 24px;
+  padding: 0 32px 24px;
+}
+.h2-cdl-ng-trai {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.h2-cdl-ngang .h2-cdl-ds {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 2px 6px 8px 2px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.h2-cdl-ngang .h2-the {
+  flex-shrink: 0;
+  border: 1px solid rgb(58 75 128 / 0.6);
+}
+.h2-cdl-ngang .h2-the[data-chon='true'] {
+  border: 2px solid var(--h2c-vang-sang);
+  background: var(--h2c-nen-3);
+}
+.h2-cdl-ngang .h2-the-de {
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.h2-cdl-ngang .h2-cdl-du-phong {
+  align-self: flex-start;
+}
+.h2-cdl-ng-phai {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 28px;
+  border-radius: 28px;
+  background: var(--m3-surface);
+  color: var(--m3-on-surface);
+  border: 1px solid var(--h2c-vien);
+}
+.h2-cdl-ng-ct-dau {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.h2-cdl-ng-ct-tieu {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+.h2-cdl-ng-trong {
+  margin: auto 0;
+  font-size: 16px;
+  text-align: center;
+  color: var(--m3-on-surface-variant);
+}
+.h2-cdl-ng-phai .h2-the-ls-nhan,
+.h2-cdl-ng-phai .h2-the-hen {
+  color: var(--m3-on-surface-variant);
+}
+/* TheCau trong cột chi tiết: như thẻ mở bản dọc — bỏ dải đầu thẻ (đầu cột đã nêu "Câu 17 · …"), bỏ nền/đệm thẻ lồng. */
+.h2-cdl-ng-phai .h2-the-cau .the-cau {
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+.h2-cdl-ng-phai .h2-the-cau .the-cau > div:first-child {
+  display: none !important;
+}
+.h2-cdl-ng-phai .h2-the-cau .the-cau > div:last-child {
+  padding: 0 !important;
+}
+
+/* Chỉ số dưới (C₆H₁₂O₆ qua ChemText → <sub>): cùng phông với chữ quanh nó, đủ to, không đẩy giãn dòng. */
+.h2-cdl sub {
+  font-size: 0.78em;
+  line-height: 0;
+  vertical-align: -0.25em;
+}
+.h2-cdl-ngang[data-thap='true'] .h2-cdl-ng-dau {
+  padding: 10px 20px 10px;
+}
+.h2-cdl-ngang[data-thap='true'] .h2-cdl-ng-than {
+  padding: 0 20px 12px;
+  gap: 16px;
+}
