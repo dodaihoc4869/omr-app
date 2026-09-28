@@ -1,0 +1,64 @@
+/* HỘP CHỈNH SỬA CHIẾN DỊCH (SuaChienDich.tsx) — chỉ lớp `scd-*`, gọn trong thành phần; token M3/bts, không hex thô. */
+.scd {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.scd-muc {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--bts-vien);
+}
+.scd-tieu-de {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+.scd-ds-to {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.scd-ds-to li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 4px 4px 12px;
+  border-radius: 12px;
+  background: var(--m3-surface-container, var(--bts-xam-o));
+}
+.scd-ten-to {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+}
+.scd-tom-tat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--m3-primary-container);
+  color: var(--m3-on-primary-container);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.scd-tom-tat p {
+  margin: 0;
+}
+.scd-dong-chinh b {
+  font-size: 16px;
+}
+.scd-tom-tat .cd-phu,
+.scd-tom-tat .cd-nhan-nhom {
+  color: var(--m3-on-primary-container);
+}
