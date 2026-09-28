@@ -102,13 +102,13 @@ export default function DaoThanThu({sbd,token,moShopLucDau,moTuiDoLucDau=false,p
  if(!cheDo2&&dangTham&&luot)return <div className="dao dao-vo dao-vo-tham" data-thu={chiSoThu(profile.pet)}><ThamHiem profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} xong={xong} tongKet={{dung:ketQua.filter(k=>k.correct).length,tong:luot.cau.length,...thuong}}
   busy={busy} loi={loi} maLoi={maLoi} thongBao={bao} onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onVeDao={veDao} onChuyenMoi={conLai===0?undefined:()=>{setLuot(null);void lenDuong()}} onMoSoTay={()=>{veDao();setMan('so-tay')}}/></div>
 
- if(dangShop&&token)return <div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}><Suspense fallback={<p role="status" aria-busy="true" className="spirit-status">{chuCuaHang}</p>}><ManShopThat token={token} pet={chiSoThu(profile.pet)} cap={profile.cap} tenThu={profile.nickname} onDong={()=>setDangShop(false)}/></Suspense></div>
+ if(dangShop&&token)return <div className={cheDo2?'dao dao-vo dao-v2':'dao dao-vo'} data-thu={chiSoThu(profile.pet)}><Suspense fallback={<p role="status" aria-busy="true" className="spirit-status">{chuCuaHang}</p>}><ManShopThat token={token} pet={chiSoThu(profile.pet)} cap={profile.cap} tenThu={profile.nickname} onDong={()=>setDangShop(false)}/></Suspense></div>
  // 2.0: thanh dưới của Đảo BỎ mục Đoàn (bản vẽ Game Hóa 2.0: "Bỏ khỏi thanh chọn game … tab Đoàn trong Đảo") — Đoàn vào từ Sảnh / màn Đảo khoá.
  const muc:[ManDao|'doan'|'cua-hang',string][]=[['dao','Đảo'],...(doanMo&&!cheDo2?[['doan','Đoàn Hộ Tống']] as [ManDao|'doan',string][]:[]),['so-tay','Sổ tay'],['tui-do','Túi đồ'],...(shopBat&&token?[['cua-hang',chuCuaHang]] as [ManDao|'doan'|'cua-hang',string][]:[])]
  const thanhDuoi=<nav className="dao-nav" aria-label="Mục của đảo">{muc.map(([id,nhan])=><button type="button" key={id} aria-current={id===man?'page':undefined} onClick={()=>{if(id==='doan')onMoDoan();else if(id==='cua-hang')setDangShop(true);else setMan(id)}}><span>{ICON[id]}</span>{nhan}</button>)}</nav>
  if(cheDo2)return <>
   <Suspense fallback={man==='dao'?<p role="status" aria-busy="true" className="spirit-status">Đang mở đảo…</p>:null}><Dao2 an={man!=='dao'} sbd={sbd} profile={profile} call={call} doanMo={doanMo} sanhDau={sanh2} thanhDuoi={man==='dao'?thanhDuoi:null} onMoDoan={onMoDoan} onMoSoTay={()=>setMan('so-tay')} onDong={onDong}/></Suspense>
-  {man!=='dao'&&<div className="dao dao-vo" data-thu={chiSoThu(profile.pet)}>
+  {man!=='dao'&&<div className="dao dao-vo dao-v2" data-thu={chiSoThu(profile.pet)}>
    {man==='so-tay'&&<SoTay profile={profile} danhMuc={danhMuc} tenDang={tenDang}/>}
    {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onRenKhien={n=>chay(async()=>{await goiTien('khien-ren',{soDaRen:n})})} onDungKhien={id=>chay(async()=>{await goiTien('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}
    <button type="button" className="dao-ve-app" onClick={onDong}>Về app học sinh</button>

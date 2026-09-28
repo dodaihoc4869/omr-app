@@ -56,7 +56,7 @@ export default function BanDo({profile,sanh,dangTai,loiSanh='',cau,ketQua,soan='
   <div className="dao2-bd-khung">
    <svg className="dao2-bd-svg" viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} aria-hidden="true">
     <defs>
-     <linearGradient id="d2-bien" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="rgb(13,42,94)"/><stop offset="1" stopColor="rgb(7,18,41)"/></linearGradient>
+     <linearGradient id="d2-bien" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={{stopColor:'var(--d2-bien-1)'}}/><stop offset="1" style={{stopColor:'var(--d2-bien-2)'}}/></linearGradient>
      <radialGradient id="d2-dat" cx="35%" cy="30%"><stop offset="0" stopColor="rgb(91,224,168)"/><stop offset=".55" stopColor="rgb(34,148,107)"/><stop offset="1" stopColor="rgb(17,88,63)"/></radialGradient>
      <pattern id="d2-luc" width="18" height="15.6" patternUnits="userSpaceOnUse"><path d="M4.5 0 L13.5 0 L18 7.8 L13.5 15.6 L4.5 15.6 L0 7.8 Z" fill="none" stroke="rgba(255,255,255,.22)" strokeWidth=".9"/></pattern>
      <clipPath id="d2-cat"><path d={DAO}/></clipPath>

@@ -15,7 +15,7 @@ export default function KhoaDao({message,doanCon=null,onVeSanh,onMoDoan}:KhoaDao
  return <section className="dao2-khoa" aria-labelledby="dao2-khoa-tieu-de">
   <svg className="dao2-khoa-canh" viewBox="0 0 390 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
    <defs>
-    <linearGradient id="d2-dem" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="rgb(13,42,94)"/><stop offset="1" stopColor="rgb(7,18,41)"/></linearGradient>
+    <linearGradient id="d2-dem" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style={{stopColor:'var(--d2-bien-1)'}}/><stop offset="1" style={{stopColor:'var(--d2-bien-2)'}}/></linearGradient>
     <filter id="d2-suong-k" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12"/></filter>
    </defs>
    <rect width="390" height="240" fill="url(#d2-dem)"/>
