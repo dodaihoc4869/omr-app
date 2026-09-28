@@ -8,6 +8,7 @@ import { danhSachThongKe, dongChienDich, huyChienDich, type ChienDichTom } from 
 import { KHOA_CHON_CHIEN_DICH } from './LenBangChienDich'
 import { hienNgay, phanTram } from './ngay'
 import SuaChienDich from './SuaChienDich'
+import { hoiXacNhan } from '../hop-thoai'
 import './chien-dich.css'
 
 export type LocChienDich = 'tat-ca' | 'dang-chay' | 'cho-chua' | 'da-dong'
@@ -80,8 +81,24 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
     setScreen('goilenbang')
   }
   const doi = async (c: ChienDichTom, viec: 'dong' | 'huy') => {
-    const chu = viec === 'huy' ? `Huỷ chiến dịch "${c.ten}"? Học sinh sẽ không nhận câu của chiến dịch này nữa.` : `Kết thúc chiến dịch "${c.ten}" ngay bây giờ?`
-    if (!window.confirm(chu)) return
+    // Hộp của app (không dùng confirm của trình duyệt — thầy 28/09): nút nói đúng việc, huỷ là việc nguy hiểm ⇒ nút đỏ.
+    const ok = await hoiXacNhan(
+      viec === 'huy'
+        ? {
+            tieuDe: 'Huỷ chiến dịch?',
+            noiDung: `"${c.ten}" sẽ dừng hẳn: học sinh không nhận câu của chiến dịch này nữa.`,
+            nhanDongY: 'Huỷ chiến dịch',
+            nhanKhong: 'Giữ lại',
+            nguyHiem: true,
+          }
+        : {
+            tieuDe: 'Kết thúc chiến dịch?',
+            noiDung: `"${c.ten}" kết thúc ngay bây giờ, không chờ tới hạn.`,
+            nhanDongY: 'Kết thúc ngay',
+            nhanKhong: 'Chưa kết thúc',
+          },
+    )
+    if (!ok) return
     setDangLam(c.id)
     const r = await (viec === 'huy' ? huyChienDich(c.id) : dongChienDich(c.id))
     setDangLam('')

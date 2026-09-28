@@ -14,7 +14,8 @@ vi.mock('../src/components/BangVinhDanh', () => ({ default: () => null }))
 vi.mock('../src/components/BangTinPhuHuynh', () => ({ default: () => null }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))
 vi.mock('../src/game/than-thu-v2/academic-sync', () => ({ syncStudentExp: async () => {} }))
-vi.mock('../src/components/BaoCaoCaThiHocSinhModal', () => ({ default: (p: any) => { mocks.baoCao(p.baiThi); return <div role="dialog" aria-label="Báo cáo thử">Báo cáo {p.baiThi.maCa}</div> } }))
+// 28/09: cổng học sinh mở BÁO CÁO BẢN MỚI (BaoCaoChiTiet chế độ em, nạp qua BaoCaoCaCuaEm) — không còn BaoCaoCaThiHocSinhModal.
+vi.mock('../src/components/ca-thi/BaoCaoCaCuaEm', () => ({ default: (p: any) => { mocks.baoCao(p); return <div role="dialog" aria-label="Báo cáo thử">Báo cáo {p.maCa}</div> } }))
 vi.mock('../src/lib/de-loi-giai-cua-em', () => ({ deVaLoiGiaiCuaEm: (...a: any[]) => mocks.deVaLoiGiai(...a) }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrlHoacMacDinh: async () => '/test' }))
 vi.mock('../src/lib/exam-api', async (original) => ({

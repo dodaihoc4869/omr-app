@@ -1200,6 +1200,24 @@ body.chi-de .tf-badge.lam-o[aria-checked="true"] { background: #2f3e46 !importan
 .pdf-nhac { font-size: 12.5px; line-height: 1.5; color: var(--nhat); font-weight: 500; }
 .pdf-nhac b { color: var(--muc-2); font-weight: 800; }
 @media print { .pdf-chon, .thanh { display: none !important; } }
+
+/* HỘP HỎI KHI NỘP (hoiNopPhieu trong JS_PHIEU) — màu theo biến của phiếu; phiếu mặc áo M3 thì luật của CSS_PHIEU_M3 đè lên. */
+.gd-hop-nen { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.5); }
+.gd-hop {
+  position: fixed; z-index: 81; left: 50%; top: 50%; transform: translate(-50%, -50%); box-sizing: border-box;
+  width: min(360px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow-y: auto; overflow-wrap: anywhere;
+  padding: 24px 24px 16px; border-radius: 24px; border: 1px solid var(--vien);
+  background: var(--the-nen); color: var(--muc); box-shadow: 0 8px 24px rgba(0,0,0,.25);
+}
+.gd-hop:focus { outline: none; }
+.gd-hop-tieu { font-size: 20px; line-height: 28px; font-weight: 800; margin: 0 0 10px; }
+.gd-hop-nd { font-size: 15px; line-height: 22px; color: var(--muc-2); }
+.gd-hop-nut { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.gd-hop-nut button { min-height: 48px; padding: 0 20px; border: 0; border-radius: 24px; cursor: pointer; font: inherit; font-size: 15px; font-weight: 800; }
+.gd-hop-huy { background: transparent; color: var(--nav); }
+.gd-hop-ok { background: var(--nav); color: var(--the-nen); }
+.gd-hop-nut button:focus-visible { outline: 3px solid var(--nav); outline-offset: 2px; }
+@media print { .gd-hop, .gd-hop-nen { display: none !important; } }
 `
 
 /** Mũi tên chỉ xuống, vẽ bằng SVG nội tuyến — không gọi phông biểu tượng nào,
@@ -1718,6 +1736,71 @@ export function thanhHtml(soCau: number, anGiai = false): string {
  * chỉ mất phần gập. */
 export const JS_PHIEU = `
 (function () {
+  // HỘP HỎI CỦA PHIẾU (thay hộp mặc định của trình duyệt — thầy 28/09). Trả Promise<boolean>: "Nộp luôn" = true;
+  // "Làm tiếp", Esc, bấm nền = false. Tiêu điểm vào "Làm tiếp" (an toàn), Tab xoay vòng trong hộp, nền bị inert,
+  // đóng thì trả tiêu điểm về nút Nộp. Màu theo biến của phiếu (phiếu mặc áo M3 thì CSS_PHIEU_M3 phủ màu M3 lên).
+  // Bấm nền trong 400 ms đầu bị bỏ qua: bấm đúp Nộp thì cú thứ hai rơi trúng nền, không được đóng hộp vừa mở.
+  var hoiNopPhieu = function (loi) {
+    return new Promise(function (giai) {
+      var nen = null, hop = null, khoa = [], moLuc = Date.now(), truoc = document.activeElement;
+      var dong = function (kq) {
+        document.removeEventListener('keydown', phim, true);
+        if (hop && hop.parentNode) hop.parentNode.removeChild(hop);
+        if (nen && nen.parentNode) nen.parentNode.removeChild(nen);
+        for (var i = 0; i < khoa.length; i++) { try { khoa[i].removeAttribute('inert'); } catch (e1) {} }
+        try { var nut = document.getElementById('nut-nop') || truoc; if (nut && nut.focus) nut.focus(); } catch (e2) {}
+        giai(kq);
+      };
+      var phim = function (e) {
+        if (!hop) return;
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); dong(false); return; }
+        if (e.key === 'Tab') {
+          var ds = hop.querySelectorAll('button');
+          var dau = ds[0], cuoi = ds[ds.length - 1];
+          if (!hop.contains(document.activeElement)) { e.preventDefault(); dau.focus(); }
+          else if (e.shiftKey && document.activeElement === dau) { e.preventDefault(); cuoi.focus(); }
+          else if (!e.shiftKey && document.activeElement === cuoi) { e.preventDefault(); dau.focus(); }
+        }
+      };
+      try {
+        nen = document.createElement('div');
+        nen.className = 'gd-hop-nen';
+        nen.addEventListener('click', function () { if (Date.now() - moLuc >= 400) dong(false); });
+        hop = document.createElement('div');
+        hop.className = 'gd-hop';
+        hop.setAttribute('role', 'alertdialog');
+        hop.setAttribute('aria-modal', 'true');
+        hop.setAttribute('aria-labelledby', 'gd-hop-tieu');
+        hop.setAttribute('aria-describedby', 'gd-hop-nd');
+        hop.tabIndex = -1;
+        var tieu = document.createElement('div'); tieu.className = 'gd-hop-tieu'; tieu.id = 'gd-hop-tieu'; tieu.textContent = 'Nộp bài?';
+        var nd = document.createElement('div'); nd.className = 'gd-hop-nd'; nd.id = 'gd-hop-nd'; nd.textContent = loi;
+        var hang = document.createElement('div'); hang.className = 'gd-hop-nut';
+        var huy = document.createElement('button'); huy.type = 'button'; huy.className = 'gd-hop-huy'; huy.textContent = 'Làm tiếp';
+        var ok = document.createElement('button'); ok.type = 'button'; ok.className = 'gd-hop-ok'; ok.textContent = 'Nộp luôn';
+        huy.addEventListener('click', function () { dong(false); });
+        ok.addEventListener('click', function () { dong(true); });
+        hang.appendChild(huy); hang.appendChild(ok);
+        hop.appendChild(tieu); hop.appendChild(nd); hop.appendChild(hang);
+        document.body.appendChild(nen);
+        document.body.appendChild(hop);
+        // Khoá mọi thứ khác trên trang (khung câu, thanh trên, thanh nộp…) để Tab và trình đọc màn hình chỉ ở trong hộp.
+        var vung = [].slice.call(document.body.children).concat([].slice.call(document.querySelectorAll('.khung, #thanh-nop')));
+        for (var i = 0; i < vung.length; i++) {
+          var v = vung[i];
+          if (v === nen || v === hop || v.tagName === 'SCRIPT' || v.hasAttribute('inert')) continue;
+          try { v.setAttribute('inert', ''); khoa.push(v); } catch (e3) {}
+        }
+        document.addEventListener('keydown', phim, true);
+        try { huy.focus(); } catch (e4) {}
+      } catch (eDung) {
+        // Không dựng được hộp: KHÔNG nộp (coi như chưa đồng ý), báo lời hỏi ở dòng lỗi nộp để em biết còn câu trống.
+        hop = null;
+        dong(false);
+        try { var oLoi = document.getElementById('nop-loi'); if (oLoi) { oLoi.hidden = false; oLoi.textContent = loi; } } catch (e5) {}
+      }
+    });
+  };
   // BẢY SẮC CẦU VỒNG XOAY VÒNG (thầy chốt 08/09). Mở phiếu lần nào là nhích
   // sang sắc kế tiếp, hết 7 thì quay về 1; nút "Đổi màu" nhích ngay tại chỗ.
   // Số thứ tự cất ở localStorage nên đóng phiếu mở lại vẫn đi tiếp, không nhảy
@@ -2466,8 +2549,12 @@ export const JS_PHIEU = `
         }
       });
 
-      if (nutNop) nutNop.addEventListener('click', function () {
-        if (daNop) return;
+      // Bấm Nộp: y hệt luồng cũ, chỉ khác chỗ HỎI khi còn câu trống — hộp của phiếu (hoiNopPhieu, trả Promise) thay hộp
+      // mặc định của trình duyệt (thầy 28/09). Đồng ý = chạy lại đúng các bước kiểm như lần bấm đầu rồi nộp; không = thôi.
+      var dangHoiNop = false;
+      if (nutNop) nutNop.addEventListener('click', function () { bamNop(false); });
+      var bamNop = function (daHoi) {
+        if (daNop || dangHoiNop) return;
         if (du.caNhan) { nopChangCaNhan(); return; }
         var thieu = du.cau.length - soDaLam();
         if (du.ch && du.ch.CAN_LAM_HET_MOI_NOP && thieu > 0) {
@@ -2475,7 +2562,14 @@ export const JS_PHIEU = `
           return;
         }
         // NÓI RÕ TRƯỚC KHI NỘP: bỏ trống tính là sai, không để em nộp nhầm.
-        if (thieu > 0 && !window.confirm('Còn ' + thieu + ' câu chưa làm, mấy câu đó tính là sai. Nộp luôn?')) return;
+        if (thieu > 0 && !daHoi) {
+          dangHoiNop = true;
+          hoiNopPhieu('Còn ' + thieu + ' câu chưa làm, mấy câu đó tính là sai. Nộp luôn?').then(function (dongY) {
+            dangHoiNop = false;
+            if (dongY) bamNop(true);
+          });
+          return;
+        }
         daNop = true;
         nutNop.disabled = true;
         nutNop.textContent = 'Đang nộp…';
@@ -2512,7 +2606,7 @@ export const JS_PHIEU = `
             daNop = false;
             if (oLoiNop) { oLoiNop.hidden = false; oLoiNop.textContent = 'Chưa gửi được lên máy Thầy (' + err.message + '). Bài của em vẫn được giữ, mở lại trang là gửi tiếp.'; }
           });
-      });
+      };
 
       // Lần mở sau: còn bài chưa gửi được thì tự gửi, im lặng nếu vẫn hỏng.
       try {
@@ -2874,7 +2968,7 @@ html.gd-m3 body .sol-pa.chon { color: var(--gm-tertiary); }
 */
 html.gd-m3 body .sol-anh img { border: 0; }
 
-/* --- hộp xác nhận nộp bài (thay window.confirm; mã lệnh chỉ hiện khi còn câu chưa làm) --- */
+/* --- hộp hỏi khi nộp thiếu câu (hoiNopPhieu trong JS_PHIEU; thay hộp mặc định của trình duyệt) --- */
 html.gd-m3 body .gd-hop-nen { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.5); }
 html.gd-m3 body .gd-hop {
   position: fixed; z-index: 81; left: 50%; top: 50%; transform: translate(-50%, -50%); box-sizing: border-box;
@@ -3114,102 +3208,7 @@ export const JS_PHIEU_M3 = `
     if (nutLuoi) nutLuoi.addEventListener('click', moLuoi);
   } catch (e) {}
 
-    // ---- HỘP XÁC NHẬN NỘP kiểu M3 (thay window.confirm, CÙNG ngữ nghĩa) ----
-    // Không sửa một dòng nào của luồng nộp cũ. Cách làm: khi bấm Nộp, mã cũ vẫn chạy nguyên vẹn nhưng window.confirm bị
-    // thay tạm bằng hàm chỉ GHI LẠI lời hỏi rồi trả false (= "Huỷ", mã cũ dừng, không đổi gì). Nếu có lời hỏi, hiện hộp M3
-    // với ĐÚNG chuỗi ấy. Bấm "Nộp luôn" = bấm lại nút Nộp với confirm trả true, tức chính mã nộp cũ chạy tiếp; bấm "Xem lại"
-    // hoặc Esc = không làm gì (nền mờ không làm gì cả). Dựng hộp lỗi thì hỏi lại bằng window.confirm gốc, cùng chuỗi cũ.
-    try {
-      var nutNop = document.getElementById('nut-nop');
-      if (nutNop) {
-        var loiHoi = null, confirmCu = null, hopNop = null, nenNop = null, dangMoHop = false, choQua = false, vungKhoa = [];
-        var traConfirm = function () { if (confirmCu) { window.confirm = confirmCu; confirmCu = null; } };
-        var ketThucBam = function () {
-          traConfirm();
-          if (loiHoi !== null) { var m = loiHoi; loiHoi = null; hienHop(m); }
-        };
-        var nopLai = function () {
-          choQua = true;
-          var g = window.confirm;
-          window.confirm = function () { return true; };
-          try { nutNop.click(); } finally { window.confirm = g; choQua = false; }
-        };
-        var dongHop = function (traTieuDiem) {
-          document.removeEventListener('keydown', phimHop, true);
-          if (hopNop && hopNop.parentNode) hopNop.parentNode.removeChild(hopNop);
-          if (nenNop && nenNop.parentNode) nenNop.parentNode.removeChild(nenNop);
-          hopNop = nenNop = null;
-          for (var i = 0; i < vungKhoa.length; i++) { try { vungKhoa[i].removeAttribute('inert'); } catch (e2) {} }
-          vungKhoa = [];
-          dangMoHop = false;
-          if (traTieuDiem) { try { nutNop.focus(); } catch (e3) {} }
-        };
-        var phimHop = function (e) {
-          if (!hopNop) return;
-          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); dongHop(true); return; }
-          if (e.key === 'Tab') {
-            var nut = hopNop.querySelectorAll('button');
-            if (!nut.length) return;
-            var dau = nut[0], cuoi = nut[nut.length - 1];
-            if (!hopNop.contains(document.activeElement)) { e.preventDefault(); dau.focus(); }
-            else if (e.shiftKey && document.activeElement === dau) { e.preventDefault(); cuoi.focus(); }
-            else if (!e.shiftKey && document.activeElement === cuoi) { e.preventDefault(); dau.focus(); }
-          }
-        };
-        var hienHop = function (loi) {
-          try {
-            nenNop = document.createElement('div');
-            nenNop.className = 'gd-hop-nen';
-            // Nền mờ KHÔNG đóng hộp (như window.confirm: chỉ "Xem lại", "Nộp luôn" hoặc Esc mới quyết định). Bấm đúp vào
-            // Nộp thì cú bấm thứ hai rơi trúng nền mờ: nếu nền đóng hộp thì hộp vừa mở đã biến mất.
-            hopNop = document.createElement('div');
-            hopNop.className = 'gd-hop';
-            hopNop.setAttribute('role', 'alertdialog');
-            hopNop.setAttribute('aria-modal', 'true');
-            hopNop.setAttribute('aria-labelledby', 'gd-hop-tieu');
-            hopNop.setAttribute('aria-describedby', 'gd-hop-nd');
-            hopNop.tabIndex = -1;
-            var tieu = document.createElement('div'); tieu.className = 'gd-hop-tieu'; tieu.id = 'gd-hop-tieu'; tieu.textContent = 'Nộp bài?';
-            var nd = document.createElement('div'); nd.className = 'gd-hop-nd'; nd.id = 'gd-hop-nd'; nd.textContent = loi;
-            var hang = document.createElement('div'); hang.className = 'gd-hop-nut';
-            var huy = document.createElement('button'); huy.type = 'button'; huy.className = 'gd-hop-huy'; huy.textContent = 'Xem lại';
-            var ok = document.createElement('button'); ok.type = 'button'; ok.className = 'gd-hop-ok'; ok.textContent = 'Nộp luôn';
-            huy.addEventListener('click', function () { dongHop(true); });
-            ok.addEventListener('click', function () { dongHop(false); nopLai(); });
-            hang.appendChild(huy); hang.appendChild(ok);
-            hopNop.appendChild(tieu); hopNop.appendChild(nd); hopNop.appendChild(hang);
-            document.body.appendChild(nenNop);
-            document.body.appendChild(hopNop);
-            dangMoHop = true;
-            var khoa = document.querySelectorAll('.khung, #gd-tren, #thanh-nop');
-            for (var i = 0; i < khoa.length; i++) { try { khoa[i].setAttribute('inert', ''); vungKhoa.push(khoa[i]); } catch (e4) {} }
-            document.addEventListener('keydown', phimHop, true);
-            try { huy.focus(); } catch (e5) {}
-          } catch (eDung) {
-            dongHop(false);
-            // Không dựng được hộp: hỏi bằng confirm gốc, ĐÚNG chuỗi cũ, cùng ngữ nghĩa.
-            // (hoãn một nhịp: click() lồng trong chính lượt bấm đang chạy trên cùng nút bị trình duyệt bỏ qua)
-            if (window.confirm(loi)) setTimeout(nopLai, 0);
-          }
-        };
-        document.addEventListener('click', function (e) {
-          try {
-            var t = e.target;
-            if (!t || !nutNop.contains(t)) return;
-            if (dangMoHop) { e.stopImmediatePropagation(); e.preventDefault(); return; }
-            if (choQua) return;
-            loiHoi = null;
-            traConfirm();
-            confirmCu = window.confirm;
-            window.confirm = function (m) { loiHoi = String(m); return false; };
-            setTimeout(ketThucBam, 0);
-          } catch (eBam) { traConfirm(); }
-        }, true);
-        document.addEventListener('click', function (e) {
-          try { if (e.target && nutNop.contains(e.target)) ketThucBam(); } catch (eSau) { traConfirm(); }
-        }, false);
-      }
-    } catch (eHopNop) {}
+    // Hộp hỏi khi nộp thiếu câu nay nằm ngay trong JS_PHIEU (hoiNopPhieu, thầy 28/09) — không còn mượn hộp mặc định của trình duyệt ở đây.
 })();
 `
 
