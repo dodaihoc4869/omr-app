@@ -88,3 +88,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 19:24 · Deploy #541 THÀNH CÔNG: PR #43 lượt 4 Bi-a GĐ1 · main bfc5ddf · lùi: git revert -m 1 bfc5ddf. 19:29 thầy lệnh bật cả trung tâm ⇒ bia-co-luu {bat:true, lop:[], sbd:[]}, đọc lại bat:true (tắt: cùng lệnh bat:false). 0 ca mở lúc bật.
 - 19:50 · Deploy #542 THÀNH CÔNG: PR #44 nút Dịu mắt màn thi · main 91dea91 · lùi: git revert -m 1 91dea91. Đang: hop-thoai-app (thay nốt 2 confirm html-phieu), hs-lich-su-ca (thay báo cáo cũ bằng bản mới), thanh-thao-chot.
 - 20:09 · Deploy #543 THÀNH CÔNG: PR #45 Bi-a âm thanh phá bàn (chỉ tiếng bi chạm bi) · main 7a60f32 · lùi: git revert -m 1 7a60f32.
+- 20:35 · Deploy #544 THÀNH CÔNG: PR #46 luật thành thạo lần đầu (P1 + giảm đoán mò) · main 9828882 · lùi: git revert -m 1 9828882. 20:42 merge PR #47 (lịch sử ca HS + báo cáo bản mới + hộp thoại app) main 677b1b1, đang deploy.
