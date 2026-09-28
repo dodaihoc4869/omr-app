@@ -31,6 +31,10 @@ export const TIN_TO_CHIEU = {
   PHAN_HOI: 'ddh-mc-phan-hoi',
   /** App → tờ chiếu: ô này đã được ghi từ chỗ khác (bảng buổi chữa) — khoá nút; kèm `dat` khi vừa ghi xong (không kèm khi chỉ nhắc lại ô đã ghi từ trước). */
   DA_GHI: 'ddh-mc-da-ghi',
+  /** Tờ chiếu → app (bản vẽ 28/09): thầy bấm THẺ TÊN — xin hồ sơ em của ô `khoa` (kèm `id` để ghép câu trả lời). CHỈ ĐỌC. */
+  HO_SO: 'ddh-mc-ho-so',
+  /** App → tờ chiếu: hồ sơ em (`hoSo`, số thật từ `/gv/ho-so-len-bang`) hoặc `loi` cho lệnh `HO_SO` cùng `id`. */
+  HO_SO_TRA: 'ddh-mc-ho-so-tra',
 } as const
 
 /** Quá số giây này mà app không trả lời thì tờ chiếu coi là LỖI và mở lại nút. */
@@ -58,7 +62,10 @@ export function taoMaPhienChieu(): string {
 }
 
 /** `giayThuc` (M6) chỉ có khi tờ báo được CẢ HAI số hợp lệ (giây thật 20..1800, T dự tính > 0); ngoài khoảng thì BỎ số ấy — lệnh ghi vẫn nhận. */
-export type TinDenToChieu = { loai: 'san_sang' } | { loai: 'cham'; khoa: string; dat: boolean; giayThuc?: { giay: number; duTinh: number } }
+export type TinDenToChieu =
+  | { loai: 'san_sang' }
+  | { loai: 'cham'; khoa: string; dat: boolean; giayThuc?: { giay: number; duTinh: number } }
+  | { loai: 'ho_so'; khoa: string; id: string }
 
 export interface BoiCanhKiemTin {
   /** Mã phiên của tờ chiếu đang mở. */
@@ -88,6 +95,11 @@ export function kiemTinToChieu(e: { data: unknown; origin: string; source: unkno
     const giay = chuanGiayThuc(t.giay)
     const duTinh = chuanDuTinh(t.duTinh)
     return giay !== null && duTinh !== null ? { loai: 'cham', khoa: t.khoa, dat: t.dat, giayThuc: { giay, duTinh } } : { loai: 'cham', khoa: t.khoa, dat: t.dat }
+  }
+  if (t.type === TIN_TO_CHIEU.HO_SO) {
+    if (typeof t.khoa !== 'string' || !ctx.khoaHopLe(t.khoa)) return null
+    if (typeof t.id !== 'string' || !/^[A-Za-z0-9_-]{1,40}$/.test(t.id)) return null
+    return { loai: 'ho_so', khoa: t.khoa, id: t.id }
   }
   return null
 }
@@ -153,6 +165,7 @@ export function jsCauNoiToChieu(): string {
   function bo() {
     vung.forEach(function (n) { if (n.parentNode) n.parentNode.removeChild(n); });
     body.classList.remove('mc-noi');
+    try { delete window.__mcHoiHoSo; } catch (x) { window.__mcHoiHoSo = undefined; }
   }
   // MỞ RIÊNG (tệp đã lưu, mở lại hôm khác, tab riêng): không có app ở trên để ghi ⇒ bỏ hẳn hai nút, tờ y như thường.
   if (window.parent === window) { bo(); return; }
@@ -184,6 +197,8 @@ export function jsCauNoiToChieu(): string {
       v.appendChild(s);
       // Tờ chiếu (thẻ tên xanh + thần thú nhảy) nghe sự kiện này. KHÔNG lưu kết quả ở đâu: chỉ phát cho lần này.
       if (dat === true) document.dispatchEvent(new CustomEvent('mc-ghi-nhan', { detail: { khoa: khoa, dat: true, vung: v } }));
+      // Bản vẽ 28/09 (thầy chốt): thẻ tên mang nhãn "Đạt" / "Chưa đạt" ⇒ báo cả hai kết quả cho lớp bản vẽ (không lưu vào mảnh nút).
+      document.dispatchEvent(new CustomEvent('mc-da-cham', { detail: { khoa: khoa, dat: typeof dat === 'boolean' ? dat : null } }));
       return;
     }
     v.setAttribute('data-cham', 'cho');
@@ -200,9 +215,12 @@ export function jsCauNoiToChieu(): string {
       if (nhip) { clearInterval(nhip); nhip = null; }
       body.classList.add('mc-noi');
     } else if (d.type === '${TIN_TO_CHIEU.PHAN_HOI}') {
-      xong(String(d.khoa), d.kq === 'da_ghi' ? 'da_ghi' : 'loi', d.dat === true);
+      xong(String(d.khoa), d.kq === 'da_ghi' ? 'da_ghi' : 'loi', typeof d.dat === 'boolean' ? d.dat : undefined);
     } else if (d.type === '${TIN_TO_CHIEU.DA_GHI}') {
-      xong(String(d.khoa), 'da_ghi', d.dat === true);
+      xong(String(d.khoa), 'da_ghi', typeof d.dat === 'boolean' ? d.dat : undefined);
+    } else if (d.type === '${TIN_TO_CHIEU.HO_SO_TRA}') {
+      var cb = hoi[String(d.id)];
+      if (cb) { delete hoi[String(d.id)]; cb(d.hoSo && typeof d.hoSo === 'object' ? d.hoSo : null, d.loi ? String(d.loi) : ''); }
     }
   });
   document.addEventListener('click', function (e) {
@@ -226,6 +244,15 @@ export function jsCauNoiToChieu(): string {
     } catch (x) {}
     gui(m);
   });
+  // BẢNG CHI TIẾT EM (bản vẽ 28/09): xin hồ sơ qua app thầy — tờ chiếu không tự gọi máy chủ, không giữ mã bí mật.
+  var hoi = {}, soHoi = 0;
+  window.__mcHoiHoSo = function (khoa, cb) {
+    if (!noi) { cb(null, 'khong_noi'); return; }
+    var id = 'h' + (++soHoi);
+    hoi[id] = cb;
+    gui({ type: '${TIN_TO_CHIEU.HO_SO}', khoa: String(khoa), id: id });
+    setTimeout(function () { if (hoi[id]) { var f = hoi[id]; delete hoi[id]; f(null, 'het_gio'); } }, 20000);
+  };
   gui({ type: '${TIN_TO_CHIEU.SAN_SANG}' });
   nhip = setInterval(function () {
     if (noi) { clearInterval(nhip); nhip = null; return; }
