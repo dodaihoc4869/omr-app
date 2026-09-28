@@ -1340,6 +1340,49 @@ table.ct-bang {
   font-size: 14.5px;
   overflow-wrap: anywhere;
 }
+/* Chế độ em xem báo cáo của mình: mỗi câu cần chữa bấm mở ⇒ đề + lời giải bằng TheCau (khuôn Câu đã làm). */
+.ct-xl-mo > summary {
+  list-style: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  border-radius: 12px;
+}
+.ct-xl-mo > summary::-webkit-details-marker {
+  display: none;
+}
+.ct-xl-mo > summary:focus-visible {
+  outline: 3px solid var(--gvm-tim-dam);
+  outline-offset: 2px;
+}
+.ct-xl-mo > summary::after {
+  content: 'Xem đề và lời giải';
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gvm-tim-dam);
+}
+.ct-xl-mo[open] > summary::after {
+  content: 'Thu gọn';
+}
+.ct-xl-giai {
+  margin-top: 12px;
+  min-width: 0;
+}
+/* Đầu câu đã nằm ở dòng bấm mở ⇒ khi mở, bỏ đoạn đề rút gọn (TheCau in đề đầy đủ) và bỏ dải đầu/nền lồng của TheCau — như thẻ Câu đã làm. */
+.ct-xl-mo[open] > summary p {
+  display: none;
+}
+.ct-xl-giai .h2-the-cau .the-cau {
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+.ct-xl-giai .h2-the-cau .the-cau > div:first-child {
+  display: none !important;
+}
+.ct-xl-giai .h2-the-cau .the-cau > div:last-child {
+  padding: 0 !important;
+}
 .ct-nhan-xet textarea {
   width: 100%;
   min-height: 110px;

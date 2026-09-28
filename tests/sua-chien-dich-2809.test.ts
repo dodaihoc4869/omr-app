@@ -198,23 +198,25 @@ describe('sửa hạn', () => {
   })
 })
 
-describe('số câu/ngày khi thêm đề / rút hạn (Boss chốt 28/09)', () => {
+// Thầy chốt 28/09: mức cần tính theo LƯỢT còn cần (`khoiLuongCan`, cùng hàm với Giao chiến dịch/Huyết Chiến): câu mới 2 lượt.
+describe('số câu/ngày khi thêm đề / rút hạn (Boss chốt 28/09; tính theo lượt từ 28/09)', () => {
   const taoTL = async (env: Env, theLucNgay: number, hanNop = '2026-10-05') =>
     ((await gvChienDich(env, { action: 'tao', ten: 'x', sbd: ['S1', 'S2'], maDe: ['DE1'], hanNop, theLucNgay }, T0)) as { id: string }).id
-  it('thêm đề làm câu chưa làm vượt số câu/ngày × ngày còn lại ⇒ tự NÂNG = ⌈chưa làm lớn nhất / ngày còn lại⌉ và ghi nhật ký', async () => {
+  it('thêm đề làm lượt còn cần vượt số câu/ngày × ngày còn lại ⇒ tự NÂNG = ⌈lượt còn cần lớn nhất / ngày còn lại⌉ và ghi nhật ký', async () => {
     const { d, env } = dung()
     const id = await taoTL(env, 1) // 6 câu, 6 ngày (30/09 → 05/10)
     const xem = await gvSuaChienDich(env, { action: 'xem-truoc', id, themMaDe: ['DE2'] }, T0 + GIO)
-    expect(xem).toMatchObject({ ok: true, theLucCu: 1, theLucNgay: 2, theLucCan: 2, tuNang: true, chuaKipHan: false, tomTat: '+1 đề, số câu/ngày 1 → 2' })
+    // 8 câu mới × 2 lượt = 16 lượt / 6 ngày ⇒ 3.
+    expect(xem).toMatchObject({ ok: true, theLucCu: 1, theLucNgay: 3, theLucCan: 3, tuNang: true, chuaKipHan: false, tomTat: '+1 đề, số câu/ngày 1 → 3' })
     await gvSuaChienDich(env, { id, themMaDe: ['DE2'] }, T0 + GIO)
-    expect(Number(hang(d, id).the_luc_ngay)).toBe(2)
+    expect(Number(hang(d, id).the_luc_ngay)).toBe(3)
     const nk = d.sql.prepare('SELECT thay_doi_json FROM chien_dich_sua WHERE chien_dich_id = ?').get(id) as { thay_doi_json: string }
-    expect(JSON.parse(nk.thay_doi_json)).toMatchObject({ theLucCu: 1, theLucMoi: 2, tuNang: true })
+    expect(JSON.parse(nk.thay_doi_json)).toMatchObject({ theLucCu: 1, theLucMoi: 3, tuNang: true })
   })
-  it('rút hạn cũng xét: 6 câu, còn 2 ngày ⇒ 3 câu/ngày', async () => {
+  it('rút hạn cũng xét: 6 câu mới = 12 lượt, còn 2 ngày ⇒ 6 câu/ngày', async () => {
     const { env } = dung()
     const id = await taoTL(env, 1)
-    expect(await gvSuaChienDich(env, { action: 'xem-truoc', id, hanNop: '2026-10-01' }, T0)).toMatchObject({ theLucNgay: 3, tuNang: true })
+    expect(await gvSuaChienDich(env, { action: 'xem-truoc', id, hanNop: '2026-10-01' }, T0)).toMatchObject({ theLucNgay: 6, tuNang: true })
   })
   it('không cần nâng ⇒ giữ; lùi hạn / bớt em KHÔNG tự hạ', async () => {
     const { d, env } = dung()
@@ -228,7 +230,7 @@ describe('số câu/ngày khi thêm đề / rút hạn (Boss chốt 28/09)', () 
     const { d, env } = dung()
     const id = await taoTL(env, 1)
     const r = await gvSuaChienDich(env, { id, themMaDe: ['DE2'], theLucNgay: 1 }, T0)
-    expect(r).toMatchObject({ ok: true, theLucNgay: 1, theLucCan: 2, chuaKipHan: true, tuNang: false })
+    expect(r).toMatchObject({ ok: true, theLucNgay: 1, theLucCan: 3, chuaKipHan: true, tuNang: false })
     expect(Number(hang(d, id).the_luc_ngay)).toBe(1)
     expect(await gvSuaChienDich(env, { id, theLucNgay: 7 }, T0)).toMatchObject({ ok: true, theLucNgay: 7, tomTat: 'số câu/ngày 1 → 7' })
     expect((await gvSuaChienDich(env, { id, theLucNgay: 0 }, T0)).ok).toBe(false)

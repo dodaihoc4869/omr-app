@@ -44,6 +44,8 @@ export interface TrangThaiCau {
   /** Sai ≥ 4 lần và lần cuối vẫn sai ⇒ rời kế hoạch, chờ thầy dạy lại. */
   catTia: boolean
   lichSu: { ngay: string; dung: boolean; coGoiY: boolean }[]
+  /** Thành thạo NGAY từ lần làm đầu (đúng, không gợi ý, câu khó đoán mò — `laCauKhoDoanMo`) — chỉ có mặt khi `true`; sai về sau thì bỏ. */
+  thanhThaoLanDau?: true
 }
 
 export const TRAN_NGAY = 40
@@ -57,6 +59,35 @@ const HEN_DUNG_1 = 3
 const HEN_DUNG_2 = 7
 const HEN_DUNG_3 = 14
 export const HEN_DUY_TRI = 30
+/**
+ * THÀNH THẠO LẦN ĐẦU (thầy CHỐT 28/09/2026): câu làm ĐÚNG ngay lần đầu, KHÔNG gợi ý ⇒ thành thạo luôn, không ôn lại
+ * trong chiến dịch (chỉ còn ôn duy trì sau hạn) — CHỈ với câu KHÓ ĐOÁN MÒ (`laCauKhoDoanMo`):
+ *   · Phần II đúng cả 4 ý (sổ chỉ ghi `dung` khi đủ 4 ý; đoán mò trúng ~1/16),
+ *   · Phần III (điền số, đoán mò ~0),
+ *   · Phần I mức Nhận biết.
+ * Lý do bỏ Phần I Thông hiểu/Vận dụng: 4 phương án ⇒ đoán mò trúng ~25%, mô phỏng lớp yếu có tới 45% câu thành thạo "ảo".
+ * Câu 2 sao (mọi phần), câu đúng nhờ gợi ý, câu sai lần đầu, Phần I Thông hiểu/Vận dụng: luật cũ (đúng 2 ngày khác nhau).
+ * Câu đã thành thạo (kể cả thành thạo lần đầu) mà làm sai ⇒ mất thành thạo như cũ.
+ * Lùi về luật cũ: đổi `true` → `false` (một dòng).
+ */
+export const THANH_THAO_LAN_DAU = true
+/** Số sao từ mức này trở lên vẫn phải đúng 2 ngày khác nhau (câu vận dụng cao đánh dấu 2 sao trong kho). */
+export const SAO_PHAI_ON = 2
+/** Tuỳ chọn phát lại một câu: loại câu trong kho. `sao` vắng = 0; `phan` vắng ⇒ KHÔNG áp thành thạo lần đầu (thận trọng). */
+export interface TuyChonPhatLai { sao?: number | null; phan?: Phan | null; mucDo?: string | null }
+
+/** Câu khó đoán mò (được "thành thạo lần đầu"): Phần II, Phần III, Phần I Nhận biết; trừ câu 2 sao. */
+export function laCauKhoDoanMo(tc: TuyChonPhatLai): boolean {
+  if ((Number(tc.sao) || 0) >= SAO_PHAI_ON) return false
+  if (tc.phan === 'II' || tc.phan === 'III') return true
+  return tc.phan === 'I' && tc.mucDo != null && HANG_MUC_DO[tc.mucDo] === 0
+}
+
+/** Hẹn của câu thành thạo lần đầu: không ôn trong chiến dịch — ôn duy trì sau ≥ 30 ngày và SAU hạn nộp. */
+export function henThanhThaoLanDau(ngay: string, hanNop: string | null): string {
+  const duyTri = congNgay(ngay, HEN_DUY_TRI)
+  return hanNop && ngay <= hanNop && duyTri <= hanNop ? congNgay(hanNop, 1) : duyTri
+}
 
 // ---------------------------------------------------------------- ngày VN dạng chuỗi
 const MOT_NGAY = 86_400_000
@@ -90,7 +121,8 @@ export function henOnSau(ngay: string, soNgayChuan: number, hanNop: string | nul
  * Trạng thái MỘT câu từ các lần làm (mọi nguồn). `mocDayLai`: các thời điểm thầy bấm "Chữa xong" cho câu này —
  * đếm sai về 0 và hẹn ôn ngày hôm sau.
  */
-export function phatLaiCau(qid: string, lanLam: readonly LanLam[], hanNop: string | null, mocDayLai: readonly string[] = []): TrangThaiCau {
+export function phatLaiCau(qid: string, lanLam: readonly LanLam[], hanNop: string | null, mocDayLai: readonly string[] = [], tuyChon: TuyChonPhatLai = {}): TrangThaiCau {
+  const duocLanDau = THANH_THAO_LAN_DAU && laCauKhoDoanMo(tuyChon)
   const ds = [...lanLam].filter((x) => x.qid === qid).sort((a, b) => (a.luc < b.luc ? -1 : a.luc > b.luc ? 1 : 0))
   const moc = [...mocDayLai].sort()
   let iMoc = 0
@@ -106,17 +138,27 @@ export function phatLaiCau(qid: string, lanLam: readonly LanLam[], hanNop: strin
   for (const x of ds) {
     quaMoc(x.luc)
     const D = hanNop && x.ngay <= hanNop ? soNgayConLai(x.ngay, hanNop) : Number.POSITIVE_INFINITY
-    if (x.dung) {
+    if (x.dung && tt.laMoi && !x.coGoiY && duocLanDau) {
+      // Thành thạo lần đầu: coi như đã đủ chuỗi 2 ngày; không hẹn ôn trong chiến dịch.
+      tt.cc = 2
+      tt.ngayDungCuoi = x.ngay
+      tt.thanhThao = true
+      tt.thanhThaoLanDau = true
+      tt.henOn = henThanhThaoLanDau(x.ngay, hanNop)
+    } else if (x.dung) {
       if (tt.laMoi || x.coGoiY) tt.cc = 1
       else if (tt.ngayDungCuoi !== x.ngay || D <= 1) tt.cc += 1
       tt.ngayDungCuoi = x.ngay
       tt.thanhThao = tt.cc >= 2
+      if (!tt.thanhThao) delete tt.thanhThaoLanDau
       const so = tt.cc >= 3 ? HEN_DUNG_3 : tt.cc === 2 ? HEN_DUNG_2 : HEN_DUNG_1
-      tt.henOn = henOnSau(x.ngay, so, hanNop, tt.thanhThao)
+      // Câu thành thạo lần đầu làm đúng lại (ví dụ gặp trong ca kiểm tra): vẫn không kéo vào ôn trong chiến dịch.
+      tt.henOn = tt.thanhThaoLanDau ? henThanhThaoLanDau(x.ngay, hanNop) : henOnSau(x.ngay, so, hanNop, tt.thanhThao)
     } else {
       tt.cc = 0
       tt.lanSai += 1
       tt.thanhThao = false
+      delete tt.thanhThaoLanDau
       tt.henOn = henOnSau(x.ngay, 1, hanNop, false)
     }
     tt.laMoi = false
@@ -183,8 +225,13 @@ export function trongSoOn(t: TrangThaiCau, homNay: string): number {
   return 50 + 20 * tre + (t.cc === 1 ? 80 : t.cc === 0 ? 60 : 0)
 }
 
-/** Lượt tối thiểu còn cần: câu mới 2, câu đang ôn 2 − cc; bỏ câu đã thành thạo và câu cắt tỉa. */
-export function khoiLuongCan(ds: readonly TrangThaiCau[]): number {
+/**
+ * Lượt tối thiểu còn cần: câu mới 2, câu đang ôn 2 − cc; bỏ câu đã thành thạo (kể cả thành thạo lần đầu) và câu cắt tỉa.
+ * MỘT hàm cho mọi nơi ước khối lượng (thầy chốt 28/09, phương án P1): Huyết Chiến (`lapKeHoachNgay`), đồng hồ sức chứa +
+ * "Tự tính" + quá tải ở Giao chiến dịch (`srs2-gv.ts`), tự nâng số câu/ngày ở Sửa chiến dịch (`srs2-sua.ts`).
+ * Câu mới vẫn ước 2 lượt dù có thể thành thạo lần đầu (an toàn; máy tính lại mỗi ngày theo tình trạng thật).
+ */
+export function khoiLuongCan(ds: Iterable<TrangThaiCau>): number {
   let s = 0
   for (const t of ds) {
     if (t.catTia || t.thanhThao) continue

@@ -2,6 +2,7 @@
 // viên thuốc đồng hồ (đỏ khi còn ≤ 5 phút) · tên ca + số câu · "Đã làm x/y" · trạng thái lưu (chữ `dotLabel` nguyên văn của màn) · nút danh sách câu ·
 // thanh tiến độ 4 px sát mép dưới. KHÔNG state, KHÔNG hiệu ứng, KHÔNG gọi gì: mọi giá trị và mọi hành động do màn thi truyền vào.
 // Cao ĐÚNG 56 px (= CAO_THANH_TREN của tấm giữ-để-đọc và top của dải cảnh báo rời màn) và z-30 như thanh cũ; app giáo viên vẫn dùng thanh cũ.
+import type { ReactNode } from 'react'
 import { Check, CloudOff, LayoutGrid, Timer } from 'lucide-react'
 import './man-thi-m3.css'
 
@@ -19,9 +20,11 @@ export interface ThanhTrenThiM3Props {
   mayNgoaiMang: boolean
   dangLuu: boolean
   onMoLuoi: () => void
+  /** Nút phụ đặt ngay trước nút danh sách câu (nút "Dịu mắt"). */
+  nutPhu?: ReactNode
 }
 
-export default function ThanhTrenThiM3({ dongHo, chuThayDongHo, gap, tenCa, daLam, tong, nhanLuu, mayNgoaiMang, dangLuu, onMoLuoi }: ThanhTrenThiM3Props) {
+export default function ThanhTrenThiM3({ dongHo, chuThayDongHo, gap, tenCa, daLam, tong, nhanLuu, mayNgoaiMang, dangLuu, onMoLuoi, nutPhu }: ThanhTrenThiM3Props) {
   const phanTram = tong ? Math.min(100, (daLam / tong) * 100) : 0
   const tieuDe = tenCa.trim() ? `${tenCa.trim()} · ${tong} câu` : `${tong} câu`
   return (
@@ -41,6 +44,7 @@ export default function ThanhTrenThiM3({ dongHo, chuThayDongHo, gap, tenCa, daLa
           {mayNgoaiMang ? <CloudOff size={14} aria-hidden="true" /> : <Check size={14} aria-hidden="true" />}
           <span className="thi-luu-chu">{nhanLuu}</span>
         </div>
+        {nutPhu}
         <button type="button" onClick={onMoLuoi} className="thi-nut-luoi" title="Danh sách câu" aria-label="Danh sách câu">
           <LayoutGrid size={22} aria-hidden="true" />
         </button>

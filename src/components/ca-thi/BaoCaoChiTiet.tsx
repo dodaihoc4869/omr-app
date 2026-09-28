@@ -9,9 +9,16 @@ import type { BaoCaoCaLop } from '../../lib/bao-cao-ca-lop'
 import type { BaoCaoMotEm } from '../../lib/bao-cao-mot-em'
 import { chuPhut, layNhanXetEm, luuNhanXetEm, type ThemBaoCaoCa } from '../../lib/bao-cao-chi-tiet'
 import { soVn } from '../../lib/ket-qua-sau-nop'
+import type { DongMucDo } from '../../lib/muc-do-nhan-thuc'
+import { ChemText } from '../../lib/chem-format'
+import { chiSoDuoiRo } from '../hoa2/cau-chuyen'
+import CauCanChua from './CauCanChua'
+import '../hoa2/cau-da-lam.css'
 import './ca-thi.css'
 
 const TEN_PHAN_DAI = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng–sai', III: 'Phần III · Trả lời ngắn' } as const
+/** Dưới mức này (% câu đúng trọn của một mức độ) thì tô màu "cần ôn" — cùng mốc 60% với "Theo dạng bài". */
+const NGUONG_MUC_DO = 60
 const CHU_O: Record<string, string> = { D: 'Đúng', P: 'Đúng một phần', S: 'Sai', B: 'Bỏ trống', N: 'Chưa chấm', '-': 'Không có câu' }
 
 export interface EmTrongBaoCao {
@@ -42,6 +49,19 @@ export interface BaoCaoChiTietProps {
   onGiaoRieng?: (sbd: string) => void
   /** Chỉ để test: bỏ cổng (vẽ tại chỗ). */
   khongCong?: boolean
+  /** `hs` = EM XEM BÁO CÁO CỦA CHÍNH MÌNH (thầy 28/09 "thay thế hết bằng bản mới"): chỉ trang "Từng em" của đúng em ấy — không tab Cả lớp,
+   * không chọn em, không hạng, không so với lớp, không tên/điểm em khác, không mã ca, không ô nhận xét để sửa. Mặc định `gv`. */
+  cheDo?: 'gv' | 'hs'
+  /** Chế độ `hs`: chênh điểm so với ca ĐÃ CÔNG BỐ liền trước của chính em (null = ca đầu tiên / không biết). */
+  xuHuongEm?: { doi: number; diemTruoc: number } | null
+  /** Chế độ `hs`: đếm câu theo mức độ nhận thức (số THẬT, lib/muc-do-nhan-thuc); rỗng ⇒ ẩn khối. */
+  mucDo?: DongMucDo[]
+  /** Chế độ `hs`: giờ nộp đã định dạng ("09:42 · Thứ Bảy 26/09/2026"). */
+  gioNop?: string
+  /** Chế độ `hs`: làm lại các câu cần chữa của ca (phiếu Khắc phục sau ca). Thiếu ⇒ không có nút. */
+  onKhacPhuc?: () => void
+  /** Chế độ `hs`: mở tờ "Đề và lời giải kèm lỗi sai" của cả ca (phiếu HTML dựng tại máy). Thiếu ⇒ không có nút. */
+  onXemDe?: () => void
 }
 
 function Vong({ diem, co = 140 }: { diem: number; co?: number }) {
@@ -68,8 +88,9 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
   const [nxGoc, setNxGoc] = useState('')
   const [dangLuu, setDangLuu] = useState(false)
   const [chuLuu, setChuLuu] = useState('')
+  const laHs = p.cheDo === 'hs'
   useEffect(() => {
-    if (p.tab !== 'em' || !p.sbdEm) return
+    if (laHs || p.tab !== 'em' || !p.sbdEm) return
     let huy = false
     setNhanXet('')
     setNxGoc('')
@@ -83,7 +104,7 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
     return () => {
       huy = true
     }
-  }, [p.maCa, p.sbdEm, p.tab])
+  }, [p.maCa, p.sbdEm, p.tab, laHs])
   useEffect(() => {
     const bo = () => document.body.classList.remove('ct-dang-in')
     window.addEventListener('afterprint', bo)
@@ -345,7 +366,8 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
   const hang = dongHs ? 1 + hs.filter((x) => x.tong > dongHs.tong).length : b?.soVoiLop?.hang ?? null
   const trangEm = (
     <div className="ct-bc-trang" data-trang="em">
-      {dauIn(`Báo cáo của em · ${p.sbdEm ? tenEm(p.sbdEm) : ''}`)}
+      {dauIn(laHs ? `Báo cáo của em · ${p.tenCa}` : `Báo cáo của em · ${p.sbdEm ? tenEm(p.sbdEm) : ''}`)}
+      {!laHs && (
       <div className="ct-tam ct-khong-in" style={{ padding: '12px 16px' }}>
         <label className="ct-ghi" htmlFor="ct-chon-em" style={{ fontWeight: 700, color: 'var(--gvm-chu-2)', marginRight: 8 }}>
           Em:
@@ -359,31 +381,43 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
           ))}
         </select>
       </div>
+      )}
       {!p.sbdEm ? (
         <div className="ct-tam ct-ghi">Chọn một em để xem báo cáo.</div>
       ) : !b || b.tong === null ? (
-        <div className="ct-tam ct-ghi">{b && !b.daNop ? 'Em chưa nộp bài ca này.' : 'Đang tổng hợp báo cáo của em…'}</div>
+        <div className="ct-tam ct-ghi">{b && !b.daNop ? 'Em chưa nộp bài ca này.' : laHs && !p.dangTai ? 'Ca này chưa có điểm đã công bố.' : 'Đang tổng hợp báo cáo của em…'}</div>
       ) : (
         <>
           <div className="ct-tam">
             <div className="ct-em-dau">
               <Vong diem={b.tong} />
               <div style={{ minWidth: 0 }}>
-                <h2 style={{ fontSize: 24, fontWeight: 800 }}>{tenEm(p.sbdEm)}</h2>
+                <h2 style={{ fontSize: 24, fontWeight: 800 }}>{laHs ? 'Kết quả của em' : tenEm(p.sbdEm)}</h2>
+                {laHs ? (
+                  <p className="ct-ghi">{p.gioNop ? `Nộp lúc ${p.gioNop}` : p.ngay}</p>
+                ) : (
                 <p className="ct-ghi">
                   SBD <span className="mono">{p.sbdEm}</span>
                   {p.lopCa ? ` · ${p.lopCa}` : ''}
                   {em?.nopLuc ? ` · nộp lúc ${new Date(em.nopLuc).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' })}` : ''}
                 </p>
+                )}
                 <div className="ct-hang-nut" style={{ marginTop: 10 }}>
-                  {dongHs && dongHs.doi !== null && (
+                  {laHs && p.xuHuongEm && (
+                    <span className={`ct-nhan ${p.xuHuongEm.doi >= 0 ? 'n-xl' : 'n-ho'}`}>
+                      {p.xuHuongEm.doi >= 0 ? <TrendingUp size={14} aria-hidden="true" /> : <TrendingDown size={14} aria-hidden="true" />}
+                      {p.xuHuongEm.doi > 0 ? '+' : p.xuHuongEm.doi < 0 ? '−' : ''}
+                      {soVn(Math.abs(p.xuHuongEm.doi))} điểm so với ca trước ({soVn(p.xuHuongEm.diemTruoc)})
+                    </span>
+                  )}
+                  {!laHs && dongHs && dongHs.doi !== null && (
                     <span className={`ct-nhan ${dongHs.doi >= 0 ? 'n-xl' : 'n-ho'}`}>
                       {dongHs.doi >= 0 ? <TrendingUp size={14} aria-hidden="true" /> : <TrendingDown size={14} aria-hidden="true" />}
                       {dongHs.doi > 0 ? '+' : dongHs.doi < 0 ? '−' : ''}
                       {soVn(Math.abs(dongHs.doi))} điểm so với lần trước ({soVn(dongHs.diemTruoc ?? 0)})
                     </span>
                   )}
-                  {b.soVoiLop && (
+                  {!laHs && b.soVoiLop && (
                     <span className="ct-nhan n-xd">
                       {b.soVoiLop.hieu >= 0 ? '+' : '−'}
                       {soVn(Math.abs(b.soVoiLop.hieu))} so với TB lớp
@@ -396,6 +430,23 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
                   <b className="so">{b.dung !== null && b.tongCau !== null ? `${b.dung}/${b.tongCau}` : '—'}</b>
                   <span>câu đúng</span>
                 </div>
+                {laHs ? (
+                  <>
+                    {b.motPhan > 0 && (
+                      <div>
+                        <b className="so">{b.motPhan}</b>
+                        <span>câu đúng một phần</span>
+                      </div>
+                    )}
+                    {b.cauXemLai.length > 0 && (
+                      <div>
+                        <b className="so">{b.cauXemLai.length}</b>
+                        <span>câu cần chữa</span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
                 <div>
                   <b className="so">{hang !== null ? `${hang}/${hs.length || b.soVoiLop?.siSo || '—'}` : '—'}</b>
                   <span>hạng trong lớp</span>
@@ -408,6 +459,8 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
                   <b className="so">{em ? `${em.soLanRoiMan} lần` : '—'}</b>
                   <span>rời màn</span>
                 </div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -441,7 +494,8 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
                   x.cau.length === 0 ? null : (
                     <div key={x.ma}>
                       <div className="ct-nhom-phan">
-                        {x.ten} · {soVn(x.diem)}/{soVn(x.toiDa)} điểm
+                        {x.ten}
+                        {Number.isFinite(x.diem) ? ` · ${soVn(x.diem)}${Number.isFinite(x.toiDa) ? `/${soVn(x.toiDa)}` : ''} điểm` : ''}
                       </div>
                       <div className="ct-o-cau">
                         {x.cau.map((c) => (
@@ -481,44 +535,95 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
               )}
             </div>
           </div>
-          <div className="ct-em-luoi">
+          {laHs && p.mucDo && p.mucDo.length > 0 && (
             <div className="ct-tam">
               <div className="ct-tam-dau">
-                <h2>Câu cần xem lại</h2>
-                <span className="ct-ghi">sai trước · đúng nhưng làm lâu sau</span>
+                <h2>Theo mức độ nhận thức</h2>
               </div>
+              {p.mucDo.map((d) => (
+                <div key={d.khoa} className={`ct-dang-hang ${d.phanTram < NGUONG_MUC_DO ? 'c-ho' : 'c-xl'}`}>
+                  <span>{d.ten}</span>
+                  <div className="ct-ray">
+                    <span style={{ width: `${d.phanTram}%` }} />
+                  </div>
+                  <b className="so">
+                    {d.dung}/{d.tong}
+                  </b>
+                </div>
+              ))}
+              <p className="ct-ghi" style={{ marginTop: 6 }}>
+                Số = câu đúng trọn / câu cùng mức độ trong ca.
+              </p>
+            </div>
+          )}
+          <div className={laHs ? undefined : 'ct-em-luoi'}>
+            <div className="ct-tam">
+              <div className="ct-tam-dau">
+                <h2>{laHs ? 'Câu cần chữa' : 'Câu cần xem lại'}</h2>
+                <span className="ct-ghi">{laHs ? 'sai · đúng một phần · bỏ trống — bấm từng câu để xem lời giải' : 'sai trước · đúng nhưng làm lâu sau'}</span>
+              </div>
+              {laHs && ((p.onKhacPhuc && b.cauXemLai.length > 0) || p.onXemDe) && (
+                <div className="ct-hang-nut ct-khong-in" style={{ margin: '4px 0 12px' }}>
+                  {p.onKhacPhuc && b.cauXemLai.length > 0 && (
+                    <button type="button" className="ct-nut ct-nut-tong" onClick={p.onKhacPhuc}>
+                      Làm lại {b.cauXemLai.length} câu cần chữa
+                    </button>
+                  )}
+                  {p.onXemDe && (
+                    <button type="button" className="ct-nut ct-nut-vien" onClick={p.onXemDe}>
+                      Xem đề và lời giải cả ca
+                    </button>
+                  )}
+                </div>
+              )}
               {b.cauXemLai.length === 0 ? (
-                <p className="ct-ghi">Không có câu nào cần xem lại.</p>
+                <p className="ct-ghi">{laHs ? 'Em đúng trọn mọi câu của ca này.' : 'Không có câu nào cần xem lại.'}</p>
               ) : (
                 <div className="ct-xem-lai">
-                  {b.cauXemLai.map((c) => (
-                    <div key={c.qid} className="ct-xl">
-                      <div className="h">
-                        <span>
-                          <b style={{ color: 'var(--gvm-chu)' }}>
-                            Câu {c.soCau} · {TEN_PHAN_DAI[c.phan]}
-                          </b>
-                          {c.dang ? ` · ${c.dang}` : ''}
-                        </span>
-                        <span className="so">
-                          {c.giay !== null ? `${c.giay} giây` : ''}
-                          {c.tbGiayLop !== null ? ` · lớp TB ${Math.round(c.tbGiayLop)} giây` : ''}
-                        </span>
+                  {b.cauXemLai.map((c) => {
+                    const dau = (
+                      <>
+                        <div className="h">
+                          <span>
+                            <b style={{ color: 'var(--gvm-chu)' }}>
+                              Câu {c.soCau} · {TEN_PHAN_DAI[c.phan]}
+                            </b>
+                            {c.dang ? ` · ${c.dang}` : ''}
+                          </span>
+                          <span className="so">
+                            {c.giay !== null ? `${c.giay} giây` : ''}
+                            {c.tbGiayLop !== null ? ` · lớp TB ${Math.round(c.tbGiayLop)} giây` : ''}
+                          </span>
+                        </div>
+                        {c.de && <p><ChemText text={chiSoDuoiRo(c.de.length > 220 ? `${c.de.slice(0, 220)}…` : c.de)} /></p>}
+                        <div className="ct-hang-chip">
+                          {c.loai === 'sai' ? (
+                            <span className="ct-nhan n-ho">{c.dapAnChon.replace(/-/g, '').trim() ? `Em chọn ${c.dapAnChon}` : 'Em bỏ trống'}</span>
+                          ) : (
+                            <span className="ct-nhan n-hp">Đúng nhưng làm lâu</span>
+                          )}
+                          {c.dapAnDung && <span className="ct-nhan n-xl">Đáp án đúng {c.dapAnDung}</span>}
+                        </div>
+                      </>
+                    )
+                    // Có đủ đề (phía em) ⇒ bấm mở: đề + lời giải vẽ bằng ĐÚNG `TheCau` xem_lai của Câu đã làm.
+                    return c.cau ? (
+                      <details key={c.qid} className="ct-xl ct-xl-mo">
+                        <summary aria-label={`Câu ${c.soCau}: bấm để xem đề và lời giải`}>{dau}</summary>
+                        <div className="ct-xl-giai">
+                          <CauCanChua c={c.cau} stt={c.soCau} />
+                        </div>
+                      </details>
+                    ) : (
+                      <div key={c.qid} className="ct-xl">
+                        {dau}
                       </div>
-                      {c.de && <p>{c.de.length > 220 ? `${c.de.slice(0, 220)}…` : c.de}</p>}
-                      <div className="ct-hang-chip">
-                        {c.loai === 'sai' ? (
-                          <span className="ct-nhan n-ho">Em chọn {c.dapAnChon || 'bỏ trống'}</span>
-                        ) : (
-                          <span className="ct-nhan n-hp">Đúng nhưng làm lâu</span>
-                        )}
-                        {c.dapAnDung && <span className="ct-nhan n-xl">Đáp án đúng {c.dapAnDung}</span>}
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
+            {!laHs && (
             <div className="ct-tam ct-nhan-xet">
               <div className="ct-tam-dau">
                 <h2>Nhận xét của Thầy Đỗ Đại Học</h2>
@@ -545,6 +650,7 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
                 </div>
               )}
             </div>
+            )}
           </div>
         </>
       )}
@@ -559,11 +665,12 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
             <div>
               <div className="ct-duong">
                 Ca kiểm tra › {p.tenCa}
-                {p.lopCa ? ` · ${p.lopCa}` : ''} › Báo cáo
+                {!laHs && p.lopCa ? ` · ${p.lopCa}` : ''} › Báo cáo
               </div>
               <h1>Báo cáo chi tiết</h1>
             </div>
             <div className="ct-hang-nut" style={{ alignItems: 'center' }}>
+              {!laHs && (
               <div className="ct-phan-doan" role="tablist" aria-label="Loại báo cáo">
                 <button type="button" role="tab" aria-selected={p.tab === 'lop'} onClick={() => p.onTab('lop')}>
                   Cả lớp
@@ -572,6 +679,7 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
                   Từng em
                 </button>
               </div>
+              )}
               <button type="button" className="ct-nut ct-nut-chinh" onClick={inRa}>
                 <Printer size={18} aria-hidden="true" />
                 In / Lưu PDF
@@ -582,7 +690,7 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
               </button>
             </div>
           </div>
-          {p.tab === 'lop' ? trangLop : trangEm}
+          {!laHs && p.tab === 'lop' ? trangLop : trangEm}
         </div>
       </div>
     </div>

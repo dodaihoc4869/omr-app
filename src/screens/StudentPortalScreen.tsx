@@ -77,12 +77,14 @@ import { LogoDoc } from '../components/LogoVai'
 const ThanThuHoaHocGame = lazy(() => import('../game/than-thu-v2/Game'))
 /** Màn "Câu đã làm" của Game Hóa 2.0 (kéo TheCau + phiếu in): nạp lười, chỉ em mở mới tải. */
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
+// LỊCH SỬ CA + BÁO CÁO CHI TIẾT bản mới (28/09): hai mảnh lazy NGOÀI precache.
+const LichSuCaEm = lazy(() => import('../components/hoa2/LichSuCaEm'))
+const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
 const BiaGame = lazy(() => import('../game/bi-a/BiaGame'))
 /** = KHOA_MAN_DAU của Game.tsx (test khoá khớp). KHÔNG import hằng ấy từ Game.tsx: sẽ kéo cả game vào gói chính, mất nạp lười. */
 const KHOA_MAN_DAU_GAME = 'game-v2:man-dau'
-import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import DongDemCau, { docSoDem } from '../components/DongDemCau'
-import { goiBaiThi } from '../lib/goi-bao-cao'
+import { chuTheCaGanNhat, dungLichSuCa } from '../lib/lich-su-ca-hs'
 import ModalKhacPhucCauSai from '../components/ModalKhacPhucCauSai'
 import type { CauSaiDauVao } from '../lib/thuat-toan-rut-cau-sai'
 import type { TuCongHocSinh } from './ExamTakeScreen'
@@ -185,7 +187,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia'
+type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -251,6 +253,8 @@ export default function StudentPortalScreen() {
   // Dữ liệu ca thi & điểm
   const [dsLichSu, setDsLichSu] = useState<any[]>([])
   const [dangTaiLichSu, setDangTaiLichSu] = useState(false)
+  /** Ca đã nộp mà thầy CHƯA công bố (`chuaCongBo` của `/hs/lich-su`) — không điểm, không số câu. null = chưa nạp được lịch sử. */
+  const [dsChuaCongBo, setDsChuaCongBo] = useState<any[] | null>(null)
 
   // Dữ liệu BTVN
   const [dsBtvn, setDsBtvn] = useState<any[]>([])
@@ -841,6 +845,7 @@ export default function StudentPortalScreen() {
           setDangTaiLichSu(false)
           if (resLs.ok && resLs.items) {
             setDsLichSu(resLs.items)
+            setDsChuaCongBo(resLs.chuaCongBo ?? [])
           }
         }
 
@@ -1335,6 +1340,8 @@ export default function StudentPortalScreen() {
           onPhaPhucKich={() => moGameTai('doan')}
           onKhamPhaDao={() => moGameTai('')}
           onCauDaLam={() => setTab('caudalam')}
+          caGanNhat={dsChuaCongBo !== null ? chuTheCaGanNhat(dungLichSuCa(dsLichSu, dsChuaCongBo)) : null}
+          onLichSuCa={() => setTab('lichsuca')}
           onChoiBia={() => setTab('bia')}
           onTuiDo={() => moGameTai('tui-do')}
           onCuaHang={() => moGameTai('shop')}
@@ -1401,6 +1408,19 @@ export default function StudentPortalScreen() {
 
       {/* FULLSCREEN CHỨC NĂNG: BẤM VÀO MỞ FULL MÀN HÌNH */}
       {/* CÂU ĐÃ LÀM (Game Hóa 2.0): màn riêng toàn màn hình, có nút "Về Sảnh" của chính nó. */}
+      {/* LỊCH SỬ CA KIỂM TRA (thẻ nhỏ trên Sảnh): màn riêng toàn màn hình, lazy ngoài precache. */}
+      {tab === 'lichsuca' && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
+          <Suspense fallback={<ChoNapGame />}>
+            <LichSuCaEm
+              sbd={auth.sbd}
+              scriptUrl={scriptUrl}
+              banDau={dsChuaCongBo !== null ? { items: dsLichSu, chuaCongBo: dsChuaCongBo } : null}
+              onVe={() => setTab(null)}
+            />
+          </Suspense>
+        </div>
+      )}
       {tab === 'caudalam' && auth.token && (
         <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
           <Suspense fallback={<ChoNapGame />}>
@@ -1416,7 +1436,7 @@ export default function StudentPortalScreen() {
         </Suspense>
       )}
 
-      {tab !== null && tab !== 'caudalam' && tab !== 'bia' && (
+      {tab !== null && tab !== 'caudalam' && tab !== 'bia' && tab !== 'lichsuca' && (
         <div
           className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade`}
         >
@@ -2398,31 +2418,24 @@ export default function StudentPortalScreen() {
         />
       )}
 
-      {/* Modal Báo cáo ca thi chuẩn Google Material 3 - Mở tức thì & Thúc đẩy sửa sai ngay */}
+      {/* BÁO CÁO CHI TIẾT CA — BẢN MỚI (BaoCaoChiTiet chế độ em, thầy 28/09 "thay thế hết bằng bản mới"). */}
       {caXemBaoCaoModal && auth && (
-        <BaoCaoCaThiHocSinhModal
-          baiThi={goiBaiThi(
-            caXemBaoCaoModal,
-            caXemBaoCaoModal.nopLuc ? dinhDangNgayGio(caXemBaoCaoModal.nopLuc) : undefined,
-          )}
-          hoTen={auth.hoTen}
-          sbd={auth.sbd}
-          lop={auth.lop}
-          scriptUrl={scriptUrl}
-          onClose={() => setCaXemBaoCaoModal(null)}
-          onBatDauKhacPhuc={(maCa, html) => {
-            setCaXemBaoCaoModal(null)
-            setTab('khacphuc')
-            // Modal khắc phục đã dựng xong tờ phiếu thì MỞ THẲNG. Gọi lại
-            // `taoDeKhacPhuc` ở đây là mở lại đúng modal em vừa bấm — vòng kín.
-            if (html) {
-              setPhieuHtml(html)
-              return
-            }
-            void taoDeKhacPhuc([maCa])
-          }}
-          onMoLaiBaiThi={(maCa) => void moDeVaLoiGiai(maCa)}
-        />
+        <Suspense fallback={<ChoNapGame />}>
+          <BaoCaoCaCuaEm
+            maCa={String(caXemBaoCaoModal.maCa)}
+            tenCa={caXemBaoCaoModal.tenCa}
+            sbd={auth.sbd}
+            scriptUrl={scriptUrl}
+            lichSu={dsChuaCongBo !== null ? { items: dsLichSu, chuaCongBo: dsChuaCongBo } : null}
+            onDong={() => setCaXemBaoCaoModal(null)}
+            onKhacPhuc={(maCa) => {
+              setCaXemBaoCaoModal(null)
+              setTab('khacphuc')
+              void taoDeKhacPhuc([maCa])
+            }}
+            onMoLaiBaiThi={(maCa) => void moDeVaLoiGiai(maCa)}
+          />
+        </Suspense>
       )}
 
       {/* Modal Khắc phục câu sai chuẩn hoá 3 lựa chọn */}

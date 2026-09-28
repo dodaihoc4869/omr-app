@@ -60,13 +60,13 @@ import { LogoDoc } from '../components/LogoVai'
 import PhongChoGame from '../components/PhongChoGame'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid, Flag, Lock, Maximize } from 'lucide-react'
-import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
-import { goiBaiThi } from '../lib/goi-bao-cao'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import KetQuaSauNop from '../components/xem-diem/KetQuaSauNop'
 import { chuGioNop, phanTuDiem, soSanhLanTruoc, thoiGianLam, tongDungTong } from '../lib/ket-qua-sau-nop'
 import { docDuongVao } from '../lib/vai-tro'
 import { dungM3 } from '../components/m3'
+import NutDiuMat from '../components/NutDiuMat'
+import { useDiuMat } from '../lib/diu-mat'
 import ThanhTrenThiM3 from './ThanhTrenThiM3'
 import { DaiBaoNheM3, DaiCanhBaoRoiM3, KhungKhoaM3 } from './ThongBaoThiM3'
 import { ngheHanMoi } from '../lib/may-chu-moi'
@@ -99,6 +99,8 @@ import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
 // Bố cục NGANG nạp lười (mảnh riêng, ngoài precache — vite.config.ts globIgnores); dọc không bao giờ tải mảnh này.
 const LamBaiNgang = lazy(() => import('./LamBaiNgang'))
+// BÁO CÁO CHI TIẾT CA bản mới (BaoCaoChiTiet chế độ em, 28/09) — mảnh lazy ngoài precache.
+const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
 
 /** Đang toàn màn hình: đã thêm vào màn hình chính (standalone) HOẶC Fullscreen API đang bật. */
 function dangToanManHinh(): boolean {
@@ -364,6 +366,8 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   // BỐ CỤC THEO HƯỚNG MÁY (28/09): dọc giữ nguyên màn cũ; ngang chia đề | thanh kéo | phiếu. State bài làm nằm ở đây nên
   // xoay qua lại không mất đáp án / cờ / giờ; `cauDangXemRef` giữ câu đang đọc để cuộn lại đúng chỗ sau khi xoay.
   const boCuc = useBoCuc()
+  // Nút "Dịu mắt" (28/09): luôn thấy ở cả ba bố cục, kể cả toàn màn hình; nhớ theo máy.
+  const [diuMat, doiDiuMat] = useDiuMat()
   // Máy đang ngang ⇒ tải sẵn mảnh bố cục ngang ngay từ màn nhập mã (còn mạng), vào bài là có liền.
   useEffect(() => {
     if (boCuc !== 'doc') void import('./LamBaiNgang').catch(() => {})
@@ -3191,30 +3195,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
         {/* MODAL BÁO CÁO CA THI ĐỒNG BỘ FULL MÀN HÌNH */}
         {xemBaoCaoModal && graded && attempt && (
-          <BaoCaoCaThiHocSinhModal
-            baiThi={goiBaiThi({
-              maCa: attempt.maCa,
-              tenCa: attempt.tenCa || `Ca ${attempt.maCa}`,
-              nopLuc: attempt.submittedAt,
-              tong: graded.score.total,
-              diemI: graded.score.phanIScore,
-              diemII: graded.score.phanIIScore,
-              diemIII: graded.score.phanIIIScore,
-              tongCau: flat.length,
-              soCauSai: graded.wrongPhanI.length + graded.wrongPhanII.length + graded.wrongPhanIII.length,
-              soCauDung: flat.length - (graded.wrongPhanI.length + graded.wrongPhanII.length + graded.wrongPhanIII.length),
-              lanThu: attempt.lanThu,
-            })}
-            hoTen={(xacNhan?.hoTen || hoTen).trim() || `SBD ${attempt.sbd}`}
-            sbd={attempt.sbd}
-            lop={xacNhan?.lop}
-            scriptUrl={scriptUrlRef.current}
-            onClose={() => setXemBaoCaoModal(false)}
-            onBatDauKhacPhuc={(_maCa, html) => {
-              setXemBaoCaoModal(false)
-              if (html) setHtmlDe(html)
-            }}
-          />
+          <Suspense fallback={null}>
+            <BaoCaoCaCuaEm
+              maCa={attempt.maCa}
+              tenCa={attempt.tenCa || undefined}
+              sbd={attempt.sbd}
+              scriptUrl={scriptUrlRef.current}
+              onDong={() => setXemBaoCaoModal(false)}
+            />
+          </Suspense>
         )}
       </Trang>
     )
@@ -3538,7 +3527,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       return { ...chung, tl: attempt.answers.phanIII[qid] ?? '' }
     })
     manNgang = (
-      <Trang className="man-lam-bai lb-trang">
+      <Trang className="man-lam-bai lb-trang" diuMat={diuMat}>
         <VanTay sbd={attempt.sbd} hoTen={hoTen.trim() || `SBD ${attempt.sbd}`} maCa={attempt.maCa} />
         <LamBaiNgang
           boCuc={boCuc}
@@ -3617,6 +3606,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
             </>
           }
+          congCu={<NutDiuMat bat={diuMat} onDoi={doiDiuMat} />}
           phuDe={<ManGiuDeDoc trongKhung chu={coCamUng() ? undefined : 'Giữ phím cách để đọc tiếp'} />}
         >
           {renderPhan('I')}
@@ -3632,7 +3622,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   stt = 0 // thẻ câu của bố cục dọc đánh số lại từ 1 (cùng id `cau-N`; chỉ một bố cục được dựng thật)
 
   const manDoc = (
-    <Trang className="man-lam-bai">
+    <Trang className="man-lam-bai" diuMat={diuMat}>
       {/* THANH TRÊN — 56px, dính. Đường học sinh/phụ huynh (dungM3): bản M3 theo bản vẽ ThiDangLam/ThiCanhBao (ThanhTrenThiM3, chỉ trình bày lại
           các giá trị dưới đây, cao ĐÚNG 56 px như CAO_THANH_TREN). Đường khác: thanh cũ y hệt (mờ; tiến độ 3px sát mép trên; chấm lưu 6px góc phải). */}
       {dungM3() ? (
@@ -3648,6 +3638,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             mayNgoaiMang={!online}
             dangLuu={!!saveFlash}
             onMoLuoi={() => setShowGrid(true)}
+            nutPhu={<NutDiuMat bat={diuMat} onDoi={doiDiuMat} />}
           />
         </div>
       ) : (
@@ -3672,9 +3663,12 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               {formatClock(remaining ?? 0)}
             </div>
           )}
-          <button onClick={() => setShowGrid(true)} className="tap-target flex items-center justify-center" style={{ color: 'var(--muc)' }} title="Danh sách câu" aria-label="Danh sách câu">
-            <LayoutGrid size={22} />
-          </button>
+          <div className="flex items-center" style={{ gap: 'var(--k2)' }}>
+            <NutDiuMat bat={diuMat} onDoi={doiDiuMat} />
+            <button onClick={() => setShowGrid(true)} className="tap-target flex items-center justify-center" style={{ color: 'var(--muc)' }} title="Danh sách câu" aria-label="Danh sách câu">
+              <LayoutGrid size={22} />
+            </button>
+          </div>
         </div>
       </div>
       )}
@@ -3812,9 +3806,9 @@ class BoLuiDoc extends Component<{ duPhong: React.ReactNode; children: React.Rea
 // Chỉ có thế: `m3.css` (Code 4) đã ánh xạ token cũ (--nen, --the, --muc, --xanh, --serif…) sang vai trò M3 dưới `.m3`, nên mọi
 // thứ đọc token — chính màn này, DesignSystem, TheCau (`.m3 .the-cau`) — tự mặc bảng màu M3 sáng/tối; KHÔNG dòng logic nào đổi.
 // Đường `/` (app giáo viên) và vitest mặc định: `dungM3()` = false ⇒ y hệt trước.
-function Trang({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function Trang({ children, className = '', diuMat = false }: { children: React.ReactNode; className?: string; diuMat?: boolean }) {
   return (
-    <div className={`min-h-screen ${dungM3() ? 'm3 ' : ''}${className}`} style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
+    <div className={`min-h-screen ${dungM3() ? 'm3 ' : ''}${className}`} data-diu-mat={diuMat ? 'bat' : undefined} style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--serif)' }}>
       {children}
     </div>
   )

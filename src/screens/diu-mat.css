@@ -1,0 +1,106 @@
+/* NỀN DỊU MẮT của màn làm bài — theo bản vẽ docs/ban-ve-lam-bai-ngang-2809/LamBai-Ngang.html (:root[data-nen="diu"]), nay có thật trong app.
+ * Bật bằng nút "Dịu mắt" (src/components/NutDiuMat.tsx) ⇒ khung `.man-lam-bai` mang data-diu-mat="bat".
+ * Chỉ đổi BỀ MẶT và CHỮ: giấy ngà, chữ nâu mực — chữ đề (on-surface) ≈ 13:1, chữ phụ (on-surface-variant) ≥ 7:1 trên mọi bề mặt dưới đây.
+ * KHÔNG đổi màu đánh dấu đã chọn (primary/tertiary…) ở nền sáng. Máy đang nền tối: dịu mắt luôn là giấy sáng nên đặt lại các vai trò màu
+ * về đúng giá trị NỀN SÁNG của chúng (m3-theme.css / tokens.css) — ô đã chọn trông y như ở nền sáng.
+ * Viết rgb() — `npm run check:mau` cấm mã thập lục phân ngoài tokens.css. */
+.man-lam-bai[data-diu-mat='bat'],
+.man-lam-bai[data-diu-mat='bat'] .m3 {
+  color-scheme: light;
+  --m3-surface: rgb(244 238 226);
+  --m3-surface-container-lowest: rgb(250 246 237);
+  --m3-surface-container-low: rgb(236 229 214);
+  --m3-surface-container: rgb(239 231 214);
+  --m3-surface-container-high: rgb(221 210 187);
+  --m3-on-surface: rgb(43 39 32);
+  --m3-on-surface-variant: rgb(79 71 58);
+  --m3-outline: rgb(122 111 92);
+  --m3-cao-do-1: 0 1px 2px rgb(80 60 20 / 0.12), 0 1px 3px 1px rgb(80 60 20 / 0.08);
+}
+/* đường không M3 (app giáo viên xem thử): token cũ đọc thẳng */
+.man-lam-bai[data-diu-mat='bat']:not(.m3) {
+  --nen: rgb(236 229 214);
+  --the: rgb(250 246 237);
+  --the-2: rgb(239 231 214);
+  --the-mo: rgb(250 246 237 / 0.88);
+  --muc: rgb(43 39 32);
+  --nhat: rgb(79 71 58);
+  --mo: rgb(92 83 68);
+  --vien: rgb(221 210 187);
+  --vien-dam: rgb(201 187 158);
+}
+@media (prefers-color-scheme: dark) {
+  .man-lam-bai[data-diu-mat='bat'],
+  .man-lam-bai[data-diu-mat='bat'] .m3 {
+    --m3-primary: rgb(11 87 208);
+    --m3-on-primary: rgb(255 255 255);
+    --m3-primary-container: rgb(211 227 253);
+    --m3-on-primary-container: rgb(4 30 73);
+    --m3-secondary: rgb(0 99 155);
+    --m3-secondary-container: rgb(194 231 255);
+    --m3-on-secondary-container: rgb(0 29 53);
+    --m3-tertiary: rgb(20 108 46);
+    --m3-tertiary-container: rgb(196 238 208);
+    --m3-on-tertiary-container: rgb(7 33 0);
+    --m3-error: rgb(179 38 30);
+    --m3-on-error: rgb(255 255 255);
+    --m3-error-container: rgb(249 222 220);
+    --m3-on-error-container: rgb(65 14 11);
+    --m3-canh-bao: rgb(254 247 224);
+    --m3-tren-canh-bao: rgb(92 68 0);
+    --m3-canh-bao-nen: rgb(254 247 224);
+    --m3-canh-bao-chu: rgb(92 68 0);
+  }
+  .man-lam-bai[data-diu-mat='bat']:not(.m3) {
+    --muc-nguoc: rgb(255 255 255);
+    --tim: rgb(99 102 241);
+    --tim-nen: rgb(238 242 255);
+    --xanh: rgb(16 185 129);
+    --xanh-nen: rgb(236 253 245);
+    --do: rgb(239 68 68);
+    --do-nen: rgb(254 242 242);
+    --cam: rgb(245 158 11);
+    --cam-nen: rgb(255 251 235);
+    --vang-diu: rgb(145 105 30);
+    --vang-diu-nen: rgb(247 239 217);
+  }
+}
+
+/* ── NÚT "Dịu mắt" ── biểu tượng + nhãn ngắn, aria-pressed; đặt ở thanh trên (dọc) hoặc cạnh A−/A+ (ngang). */
+.nut-diu-mat {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--m3-surface-container-lowest, var(--the));
+  box-shadow: inset 0 0 0 1px var(--m3-outline, var(--vien-dam));
+  color: var(--m3-on-surface-variant, var(--nhat));
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.nut-diu-mat[aria-pressed='true'] {
+  background: var(--m3-secondary-container, var(--vang-diu-nen));
+  box-shadow: none;
+  color: var(--m3-on-secondary-container, var(--muc));
+  font-weight: 700;
+}
+.nut-diu-mat:focus-visible { outline: 3px solid var(--m3-primary, var(--tim)); outline-offset: 2px; }
+.lb-khung .nut-diu-mat { height: 44px; border-radius: 22px; }
+.lb-khung[data-bo-cuc='ngang-gon'] .nut-diu-mat { height: 36px; padding: 0 10px; border-radius: 18px; }
+/* Thanh trên bố cục dọc (56 px, chật ở 360–440 px): nhãn nằm DƯỚI biểu tượng như nút điều hướng M3 — vẫn đủ biểu tượng + chữ mà chỉ rộng ~52 px,
+ * để tên ca và "Đã làm x/y" còn chỗ; "Đã làm" không bao giờ gãy dòng. */
+.thi-tren .nut-diu-mat { flex-direction: column; gap: 2px; width: auto; min-width: 48px; height: 44px; padding: 0 6px; border-radius: 12px; font-size: 10.5px; }
+.thi-tren:has(.nut-diu-mat) .thi-tren-da-lam { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (min-width: 600px) {
+  .thi-tren .nut-diu-mat { flex-direction: row; gap: 6px; height: 40px; padding: 0 12px; border-radius: 20px; font-size: 12.5px; }
+}
