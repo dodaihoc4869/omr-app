@@ -8,6 +8,7 @@ import type { TheCauProps } from '../TheCau'
 import type { CauLuyen, MucDoCau } from '../../lib/bai-tap-pdf'
 import { chuanHoaLoiGiaiCau } from '../../lib/chuan-hoa-loi-giai'
 import type { CauDaLamMuc, ChiTietCau, LanLam, TrangThaiCau } from './api'
+import { NHAN_NGUON_LAN } from './api'
 import { ngayThang } from './thoi-gian'
 import { normalizeNumericAnswer } from '../../engine/score'
 
@@ -37,9 +38,9 @@ export function dauCau(c: Pick<CauDaLamMuc, 'stt' | 'phan' | 'mucDo'>): string {
   return [c.stt > 0 ? `Câu ${c.stt}` : 'Câu', NHAN_PHAN[c.phan], nhanMucDo(c.mucDo)].filter(Boolean).join(' · ')
 }
 
-/** Chip lịch sử: "Sai 29/09 · có gợi ý". */
+/** Chip lịch sử: "Sai 29/09 · Bi-a · có gợi ý" (nguồn khi máy chủ gắn). */
 export function chuLanLam(l: LanLam): string {
-  return `${l.dung ? 'Đúng' : 'Sai'} ${ngayThang(l.ngay)}${l.coGoiY ? ' · có gợi ý' : ''}`
+  return `${l.dung ? 'Đúng' : 'Sai'} ${ngayThang(l.ngay)}${l.nguon ? ` · ${NHAN_NGUON_LAN[l.nguon]}` : ''}${l.coGoiY ? ' · có gợi ý' : ''}`
 }
 
 /** Ngày làm gần nhất (để xếp danh sách): lần cuối trong lịch sử; không có ⇒ ''. */
