@@ -318,6 +318,7 @@ export default function ManShop({ api, pet, cap, tenThu, onDong, veThu, veHinhMo
         {man === 'thu-do' &&
           (mon ? (
             <ThuDo
+              ngang={ngang}
               vang={vang}
               vi={vi}
               em={em}

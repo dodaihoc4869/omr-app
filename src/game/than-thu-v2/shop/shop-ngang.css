@@ -1,7 +1,7 @@
 /* CỬA HÀNG PHỤ KIỆN · BỐ CỤC NGANG (thầy 28/09). Chỉ bật khi `.ps[data-ngang]` — do useNgang() (dao2/ngang.ts, cùng điểm ngắt với Đảo 2.0) đặt; dọc không đổi.
    Phong cách Sảnh 3D sáng: thẻ kính sáng, chữ tối (token --ch-* sẵn có), nút vàng nổi khối. Màu rgb() — không mã hex.
    Cửa hàng: đầu màn hết bề ngang · TRÁI = ví + đổi EXP · PHẢI = bộ lọc + chú giải + LƯỚI MÓN nhiều cột. Tủ đồ: các ô xếp lưới nhiều cột.
-   Cao đúng một màn; cột nào thiếu chỗ thì tự cuộn (844×390 vẫn dùng được). Thử đồ giữ khổ dọc giữa màn. */
+   Cao đúng một màn; cột nào thiếu chỗ thì tự cuộn (844×390 vẫn dùng được). Thử đồ: TRÁI = sân khấu thần thú (lớn, giữa cột) · PHẢI = danh sách đang thử + chi tiết món + nút mua/mặc. */
 
 /* vỏ Đảo quanh cửa hàng: bỏ chỗ chừa thanh dưới (màn cửa hàng không có thanh dưới) để không cuộn cả trang */
 .dao.dao-vo:has(>.ps[data-ngang]) {
@@ -10,14 +10,14 @@
   border-radius: 0;
 }
 
-.ps[data-ngang]:not([data-man='thu-do']) {
+.ps[data-ngang] {
   --ng-le: clamp(16px, 2.2vw, 32px);
   max-width: 1440px;
   height: 100dvh;
   min-height: 0;
   padding: max(12px, env(safe-area-inset-top)) max(var(--ng-le), env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(var(--ng-le), env(safe-area-inset-left));
 }
-.ps[data-ngang]:not([data-man='thu-do']) > .ps-man {
+.ps[data-ngang] > .ps-man {
   height: 100%;
   min-height: 0;
   gap: 12px;
@@ -96,4 +96,12 @@
 }
 .ps[data-ngang][data-man='tu-do'] .ps-tu-o button {
   min-height: 44px;
+}
+
+/* ───── Thử đồ (thầy 28/09) ───── */
+.ps[data-ngang] .ps-ngang-thu {
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 480px);
+}
+.ps[data-ngang] .ps-ngang-thu > .ps-ngang-trai {
+  justify-content: center;
 }
