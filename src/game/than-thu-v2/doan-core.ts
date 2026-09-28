@@ -95,10 +95,15 @@ export interface Chang {
   giaoY: number[]
   trumVoGiap: boolean[]
   lichSu: KetQuaHiep[]
+  /** Chỉ-thêm (28/09): mã quái ĐẦU TIÊN sinh ra khi vào hiệp thường hiện tại — để `boQuaHiepTrong` gỡ đúng lứa quái của hiệp bị bỏ qua. Phòng cũ vắng ⇒ không gỡ con nào. */
+  quaiMoiTu?: number
 }
 export interface NguoiVaoChang { id: string; ten?: string; pet: number }
 /** Một em chốt hiệp thường. `dung` do MÁY CHỦ chấm; `anThach` = câu thuộc dạng em đã khắc phục xong (máy chủ đọc hồ sơ). */
-export interface NopHiep { ghe: number; dung: boolean; hanhDong: HanhDong; anThach?: boolean; tiepSucBoi?: number }
+export interface NopHiep { ghe: number; dung: boolean; hanhDong: HanhDong; anThach?: boolean; tiepSucBoi?: number
+  /** HẾT CÂU RIÊNG (28/09): em đã ôn xong câu hôm nay ⇒ hiệp này em GIỮ KHIÊN cho đoàn như bạn máy chắn:
+   *  +CHAN khiên, KHÔNG tính đúng/sai, không nạp năng lượng, không nhận thẻ tiếp sức, không tính là một câu. */
+  hoTro?: boolean }
 export interface NopTrum { ghe: number; y: number; dung: boolean }
 export interface DauVaoHiep { nop?: NopHiep[]; trum?: NopTrum[] }
 export interface HeSoDon { dung: number; lienKich: number; anThach: number }
@@ -114,6 +119,8 @@ export interface KetQuaGhe {
   nangLuongSau: number
   /** Hiệp trùm: các ý ghế này giữ và kết quả từng ý (riêng tư — không gửi cho bạn khác). */
   yGiu: number[]; yDung: number[]
+  /** Chỉ-thêm (28/09): hiệp này ghế GIỮ KHIÊN vì đã hết câu riêng — không phải một câu đã làm. */
+  hoTro?: boolean
 }
 export interface KetQuaHiep {
   hiep: number; laTrum: boolean; ghe: KetQuaGhe[]
@@ -299,6 +306,7 @@ export function chiaY(hatGiong: string, hiep: number, soGhe: number): number[] {
 
 // ───────────────────────── Mở chặng ─────────────────────────
 function sinhQuai(c: Chang) {
+  c.quaiMoiTu = c.maQuaiKe
   const loai = kichBanChang(c.hatGiong).quai[c.hiep < HIEP_TRUM[0]! ? 0 : 1]!.id
   for (let i = 0; i < c.ghe.length && c.quai.length < QUAI_TOI_DA; i++) c.quai.push({ ma: c.maQuaiKe++, loai, hp: HP_QUAI })
 }
@@ -381,7 +389,7 @@ function giaiHiepThuong(c: Chang, nopVao: NopHiep[]): KetQuaHiep {
   const lienKich = new Set<number>(), daGiup = new Set<number>()
   const kq = c.ghe.map((g, i) => kqTrong(i, g))
   for (const [i, n] of [...nop].sort((a, b) => a[0] - b[0])) {
-    if (n.tiepSucBoi === undefined) continue
+    if (n.tiepSucBoi === undefined || n.hoTro) continue // ghế giữ khiên không có câu ⇒ không nhận thẻ
     kq[i]!.tuLam = false // đã nhận thẻ thì dù nối có hợp lệ hay không cũng không tính là tự làm
     try { kiemTiepSuc(c, n.tiepSucBoi, i, [...daGiup]) } catch { continue }
     daGiup.add(n.tiepSucBoi); c.ghe[i]!.daNhanTiepSuc++
@@ -393,6 +401,12 @@ function giaiHiepThuong(c: Chang, nopVao: NopHiep[]): KetQuaHiep {
   const lan: number[] = []
   for (const [i, n] of [...nop].sort((a, b) => a[0] - b[0])) {
     const g = c.ghe[i]!, r = kq[i]!, lk = lienKich.has(i)
+    if (n.hoTro) {
+      // GIỮ KHIÊN: như bạn máy chắn — khiên bằng mọi khiên khác, không đúng/sai, không năng lượng, không Liên Kích.
+      Object.assign(r, { nop: true, dung: false, hoTro: true, hanhDong: 'chan' as HanhDong, tenChieu: 'Chắn', chan: CHAN })
+      tongChan += r.chan
+      continue
+    }
     // Sai / bỏ trống → đòn tự chuyển thành Chắn (kỹ năng không bị trừ năng lượng). Thiếu năng lượng mà vẫn gửi "kỹ năng"
     // (máy chủ lẽ ra đã chặn) → coi như Đánh, không làm hỏng phòng.
     const hanhDong: HanhDong = !n.dung || n.hanhDong === 'chan' ? 'chan' : n.hanhDong === 'ky_nang' && g.nangLuong >= NL_KY_NANG ? 'ky_nang' : 'danh'
@@ -467,20 +481,37 @@ export function giaiHiep(chang: Chang, dauVao: DauVaoHiep = {}): Chang {
 }
 
 // ───────────────────────── Kết chặng ─────────────────────────
-export interface TomTatGhe { ghe: number; id: string; laMay: boolean; soCau: number; soDung: number; soTuLamDung: number; satThuong: number; chan: number; haGuc: number; soLanGiup: number; soLanGiupThanhCong: number; soLanDuocGiup: number; soLienKich: number }
+export interface TomTatGhe { ghe: number; id: string; laMay: boolean; /** Số CÂU THẬT em đã chốt (hiệp giữ khiên không tính). */ soCau: number; /** Chỉ-thêm (28/09): số hiệp em giữ khiên vì đã hết câu riêng. */ soHiepGiuKhien: number; soDung: number; soTuLamDung: number; satThuong: number; chan: number; haGuc: number; soLanGiup: number; soLanGiupThanhCong: number; soLanDuocGiup: number; soLienKich: number }
 export interface TomTatChang { thang: boolean; sao: number; soHiepDaChoi: number; linhTam: { hp: number; toiDa: number }; trumVoGiap: boolean[]; quaiHaGuc: number; soLienKich: number; ghe: TomTatGhe[] }
 /** Sao: về đích 1 · Linh Tâm còn từ nửa máu +1 · vỡ giáp CẢ HAI trùm +1. Thua = 0 sao, không mất gì. */
 export function tomTatChang(c: Chang): TomTatChang {
   const thuong = c.lichSu.filter(h => !h.laTrum)
   const ghe = c.ghe.map((g, i): TomTatGhe => {
-    const cua = thuong.map(h => h.ghe[i]!).filter(r => r.nop)
-    return { ghe: i, id: g.id, laMay: g.laMay, soCau: cua.length, soDung: cua.filter(r => r.dung).length, soTuLamDung: cua.filter(r => r.dung && r.tuLam).length,
-      satThuong: cua.reduce((s, r) => s + r.satThuong + r.lan, 0), chan: cua.reduce((s, r) => s + r.chan, 0), haGuc: cua.reduce((s, r) => s + r.haGuc, 0),
-      soLanGiup: cua.filter(r => r.giup !== null).length, soLanGiupThanhCong: cua.filter(r => r.giupThanhCong).length, soLanDuocGiup: cua.filter(r => r.duocGiupBoi !== null).length, soLienKich: cua.filter(r => r.lienKich).length }
+    const daChot = thuong.map(h => h.ghe[i]!).filter(r => r.nop)
+    // Câu thật = hiệp em đã chốt MỘT CÂU; hiệp giữ khiên chỉ góp khiên và lượt tiếp sức, không thành câu/đúng/sát thương.
+    const cua = daChot.filter(r => !r.hoTro)
+    return { ghe: i, id: g.id, laMay: g.laMay, soCau: cua.length, soHiepGiuKhien: daChot.length - cua.length, soDung: cua.filter(r => r.dung).length, soTuLamDung: cua.filter(r => r.dung && r.tuLam).length,
+      satThuong: cua.reduce((s, r) => s + r.satThuong + r.lan, 0), chan: daChot.reduce((s, r) => s + r.chan, 0), haGuc: cua.reduce((s, r) => s + r.haGuc, 0),
+      soLanGiup: daChot.filter(r => r.giup !== null).length, soLanGiupThanhCong: daChot.filter(r => r.giupThanhCong).length, soLanDuocGiup: cua.filter(r => r.duocGiupBoi !== null).length, soLienKich: cua.filter(r => r.lienKich).length }
   })
   const thang = c.thang === true
   const sao = !thang ? 0 : 1 + (c.linhTam.hp * 2 >= c.linhTam.toiDa ? 1 : 0) + (c.trumVoGiap.length === HIEP_TRUM.length && c.trumVoGiap.every(Boolean) ? 1 : 0)
   return { thang, sao, soHiepDaChoi: c.lichSu.length, linhTam: { ...c.linhTam }, trumVoGiap: [...c.trumVoGiap], quaiHaGuc: c.lichSu.reduce((s, h) => s + h.quaiHaGuc, 0), soLienKich: ghe.reduce((s, g) => s + g.soLanGiupThanhCong, 0), ghe }
+}
+
+// ───────────────────────── Bỏ qua hiệp riêng trống (28/09) ─────────────────────────
+/**
+ * CẢ ĐOÀN đã hết câu riêng ở hiệp thường này ⇒ BỎ QUA hiệp (không ai phải ngồi chờ, không đồng hồ):
+ * gỡ lứa quái vừa sinh cho hiệp này (quái tồn từ trước vẫn giữ nguyên), không có dòng lịch sử, sang hiệp kế.
+ * Hiệp trùm KHÔNG bao giờ bỏ qua (câu chung không tính vào hồ sơ, vẫn chia ý cho mọi em).
+ */
+export function boQuaHiepTrong(chang: Chang): Chang {
+  if (chang.ketThuc || hiepLaTrum(chang.hiep)) throw new Error('Chỉ bỏ qua được hiệp thường.')
+  if (chang.hiep >= SO_HIEP) throw new Error('Hiệp cuối không bỏ qua được.')
+  const c = saoChep(chang)
+  if (typeof c.quaiMoiTu === 'number') { const tu = c.quaiMoiTu; c.quai = c.quai.filter(q => q.ma < tu) }
+  c.hiep++; vaoHiep(c)
+  return c
 }
 
 // ───────────────────────── EXP thưởng kết chặng (thầy chốt 21/09 · Điều 9, Đợt 2) ─────────────────────────
@@ -497,8 +528,19 @@ export function thuongKetChang(sao: number, laChangThangDauNgay: boolean): numbe
 export const thuongVoGiap = (trumVoGiap: readonly boolean[]): number => THUONG_VO_GIAP * trumVoGiap.filter(Boolean).length
 export interface KhoanKetChang { chang: number; voGiap: number; tong: number }
 /** Các khoản EXP của MỘT em trong đội sau chặng (chưa qua trần 120/ngày của game — Code 3 kẹp bằng `tranExpGameNgay`). `sao` chỉ tính khi thắng. */
-export function khoanKetChang(tt: Pick<TomTatChang, 'thang' | 'sao' | 'trumVoGiap'>, laChangThangDauNgay: boolean): KhoanKetChang {
-  const chang = tt.thang ? thuongKetChang(tt.sao, laChangThangDauNgay) : 0
+/** Số câu riêng của một chặng đầy đủ (hiệp 1–3, 5–7). */
+export const SO_CAU_RIENG_CHANG = SO_HIEP - HIEP_TRUM.length
+/**
+ * CÔNG BẰNG THEO SỐ CÂU (28/09): em vào đoàn với ít câu ôn (kế hoạch ngày chỉ còn `soCauRieng` < 6 câu) thì khoản
+ * THẮNG CHẶNG nhận theo tỉ lệ `soCauRieng / 6`, làm tròn LÊN (không phạt: hiệp giữ khiên không trừ gì; không thưởng như làm đủ).
+ * Khoản VỠ GIÁP là việc CẢ ĐỘI (em vẫn giữ ý trùm như mọi bạn) ⇒ giữ nguyên. Vắng `soCauRieng` hoặc ≥ 6 ⇒ y như cũ.
+ */
+export function thuongTheoSoCau(exp: number, soCauRieng?: number): number {
+  if (typeof soCauRieng !== 'number' || !Number.isFinite(soCauRieng) || soCauRieng >= SO_CAU_RIENG_CHANG) return exp
+  return Math.ceil(exp * Math.max(0, Math.floor(soCauRieng)) / SO_CAU_RIENG_CHANG)
+}
+export function khoanKetChang(tt: Pick<TomTatChang, 'thang' | 'sao' | 'trumVoGiap'>, laChangThangDauNgay: boolean, soCauRieng?: number): KhoanKetChang {
+  const chang = tt.thang ? thuongTheoSoCau(thuongKetChang(tt.sao, laChangThangDauNgay), soCauRieng) : 0
   const voGiap = thuongVoGiap(tt.trumVoGiap)
   return { chang, voGiap, tong: chang + voGiap }
 }
