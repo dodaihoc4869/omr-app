@@ -98,12 +98,13 @@ export const mocTinhCua = (taoLuc: string, themLuc: string | undefined): string 
 export const chienDichDangChay = (ds: readonly ChienDich[], homNay: string): ChienDich | null => ds.find((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay) ?? null
 
 // ---------------------------------------------------------------- câu và sổ
-export interface MetaCau { qid: string; maDe: string; version: string; group: string; phan: Phan; mucDo: string | null; dang: string | null; tenDang: string | null }
+/** `sao`: số sao "cần chữa" của câu trong kho (`canChua.sao` → `sao` trong json câu game): 2 = vận dụng cao đánh dấu 2 sao. */
+export interface MetaCau { qid: string; maDe: string; version: string; group: string; phan: Phan; mucDo: string | null; dang: string | null; tenDang: string | null; sao: number }
 /** Siêu dữ liệu câu (không đáp án, không lời giải). Câu có ở nhiều tờ: ưu tiên tờ thuộc `uuTienMaDe`. */
 export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: readonly string[] = []): Promise<Map<string, MetaCau>> {
   const ra = new Map<string, MetaCau>()
   if (!qids.length) return ra
-  const r = await env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang
+  const r = await env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao
       FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))`).bind(JSON.stringify([...new Set(qids)])).all<Row>()
   const uuTien = new Set(uuTienMaDe)
   for (const x of r.results ?? []) {
@@ -111,7 +112,22 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
     const cu = ra.get(qid)
     if (cu && (uuTien.has(cu.maDe) || !uuTien.has(str(x.ma_de)))) continue
     const phan = (['I', 'II', 'III'].includes(str(x.phan)) ? str(x.phan) : 'I') as Phan
-    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang) })
+    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0 })
+  }
+  return ra
+}
+
+/** Loại câu cho luật THÀNH THẠO LẦN ĐẦU (thầy chốt 28/09): phần, mức độ, số sao (lớn nhất nếu câu có ở nhiều tờ). */
+export interface LoaiCau { sao: number; phan: Phan; mucDo: string | null }
+export async function docLoaiCau(env: Env, qids: readonly string[]): Promise<Map<string, LoaiCau>> {
+  const ra = new Map<string, LoaiCau>()
+  if (!qids.length) return ra
+  const r = await env.DB.prepare(`SELECT qid, MAX(COALESCE(CAST(json_extract(json,'$.sao') AS INTEGER), 0)) AS sao, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do
+      FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) GROUP BY qid`)
+    .bind(JSON.stringify([...new Set(qids)])).all<Row>().catch(() => ({ results: [] as Row[] }))
+  for (const x of r.results ?? []) {
+    const phan = (['I', 'II', 'III'].includes(str(x.phan)) ? str(x.phan) : 'I') as Phan
+    ra.set(str(x.qid), { sao: Number(x.sao) || 0, phan, mucDo: x.muc_do == null ? null : str(x.muc_do) })
   }
   return ra
 }
@@ -225,7 +241,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
   for (const qid of qids) {
     const m = meta.get(qid)
     if (!m) continue // câu đã rút khỏi kho
-    const t = phatLaiCau(qid, theoQid.get(qid) ?? [], hanTheoQid.get(qid) ?? null, moc.get(qid) ?? [])
+    const t = phatLaiCau(qid, theoQid.get(qid) ?? [], hanTheoQid.get(qid) ?? null, moc.get(qid) ?? [], { sao: m.sao, phan: m.phan, mucDo: m.mucDo })
     tt.set(qid, t)
     const nguon = nguonTheoQid.get(qid) === 'chien_dich' ? 'chien_dich' : t.thanhThao ? 'duy_tri' : t.laMoi ? null : 'no_cu'
     if (!nguon) continue // câu chiến dịch cũ em chưa từng gặp: không kéo sang

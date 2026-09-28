@@ -8,7 +8,7 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { hangTuTiLe, khoiLuongCan, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { KHOA_CO_BIA } from './bi-a'
-import { chanDoanEm, docChienDichTuDong, docCoHoa2Tu, docHoSoDangCaLop, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, mocTinhCua, ngayVnCua, type ChienDich } from './srs2-d1'
+import { chanDoanEm, docChienDichTuDong, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, mocTinhCua, ngayVnCua, type ChienDich } from './srs2-d1'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -142,10 +142,11 @@ async function mocDayLaiCaLop(env: Env, sbd: readonly string[]): Promise<Map<str
   return ra
 }
 /** Trạng thái từng (em, câu) của một chiến dịch. */
-/** `tuLuc` (thầy 28/09): chỉ tính lần làm TỪ LÚC GIAO chiến dịch — lịch sử trước đó KHÔNG sinh câu ôn; mọi câu của chiến dịch bắt đầu là câu mới.
+/** Thầy chốt 28/09 "Thành thạo lần đầu": loại câu (phần, mức độ, sao) đưa vào `phatLaiCau` ⇒ câu thành thạo lần đầu tính 0 lượt ở mọi ô ước khối lượng.
+ *  `tuLuc` (thầy 28/09): chỉ tính lần làm TỪ LÚC GIAO chiến dịch — lịch sử trước đó KHÔNG sinh câu ôn; mọi câu của chiến dịch bắt đầu là câu mới.
  *  `themLuc` (Sửa chiến dịch 28/09): em được THÊM sau ⇒ mốc của em là lúc được thêm. */
-async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly string[], hanNop: string | null, tuLuc: string, lanDaDoc?: Map<string, LanLam[]>, themLuc?: ReadonlyMap<string, string>): Promise<Map<string, Map<string, TrangThaiCau>>> {
-  const [lanTho, moc] = await Promise.all([lanDaDoc ?? lanLamCaLop(env, sbd, qids), mocDayLaiCaLop(env, sbd)])
+export async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly string[], hanNop: string | null, tuLuc: string, lanDaDoc?: Map<string, LanLam[]>, themLuc?: ReadonlyMap<string, string>): Promise<Map<string, Map<string, TrangThaiCau>>> {
+  const [lanTho, moc, loai] = await Promise.all([lanDaDoc ?? lanLamCaLop(env, sbd, qids), mocDayLaiCaLop(env, sbd), docLoaiCau(env, qids)])
   const lan = new Map([...lanTho].map(([em, ds]) => {
     const tu = mocTinhCua(tuLuc, themLuc?.get(em))
     return [em, ds.filter((x) => x.luc >= tu)] as const
@@ -155,7 +156,7 @@ async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly str
     const cua = lan.get(em) ?? []
     const theoQid = new Map<string, LanLam[]>()
     for (const x of cua) theoQid.set(x.qid, [...(theoQid.get(x.qid) ?? []), x])
-    ra.set(em, new Map(qids.map((q) => [q, phatLaiCau(q, theoQid.get(q) ?? [], hanNop, moc.get(`${em}|${q}`) ?? [])])))
+    ra.set(em, new Map(qids.map((q) => [q, phatLaiCau(q, theoQid.get(q) ?? [], hanNop, moc.get(`${em}|${q}`) ?? [], loai.get(q))])))
   }
   return ra
 }

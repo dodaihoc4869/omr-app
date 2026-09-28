@@ -264,7 +264,7 @@ export interface KetQuaSua {
   hanNop: string
   /** Chiến dịch đã hết hạn / đã kết thúc được mở lại. */
   moLai: boolean
-  /** Số câu/ngày cũ → sau khi lưu; mức cần để em nhiều câu chưa làm nhất kịp hạn. Máy chủ cũ không gửi. */
+  /** Số câu/ngày cũ → sau khi lưu; mức cần để em còn nhiều lượt nhất (`khoiLuongCan`) kịp hạn. Máy chủ cũ không gửi. */
   theLucCu?: number
   theLucNgay?: number
   theLucCan?: number
