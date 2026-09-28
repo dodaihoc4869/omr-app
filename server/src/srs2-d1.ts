@@ -5,6 +5,7 @@
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import type { Env } from './kieu'
 import { docCauHinhDem } from './cau-hinh-dem'
+import { chayDdlMotLan } from './ddl-mot-lan'
 import {
   lapKeHoachNgay, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
   gopThongKeDang, tinhHangTheoDang,
@@ -97,7 +98,7 @@ export const docChienDichTuDong = (r: Row): ChienDich => ({
 /** Bảng phụ tạo lúc chạy (CI không chạy migration; KHÔNG ALTER `chien_dich`). Không có dòng ⇒ bắt đầu = ngày tạo. */
 export const LENH_TAO_BANG_BAT_DAU = 'CREATE TABLE IF NOT EXISTS chien_dich_bat_dau (id TEXT PRIMARY KEY, bat_dau TEXT NOT NULL)'
 export async function ghiBatDau(env: Env, id: string, batDau: string): Promise<void> {
-  await env.DB.prepare(LENH_TAO_BANG_BAT_DAU).run()
+  await chayDdlMotLan(env, 'chien_dich_bat_dau', [LENH_TAO_BANG_BAT_DAU]) // một lần mỗi isolate (ddl-mot-lan.ts)
   await env.DB.prepare('INSERT INTO chien_dich_bat_dau (id, bat_dau) VALUES (?,?) ON CONFLICT(id) DO UPDATE SET bat_dau = excluded.bat_dau').bind(id, batDau).run()
 }
 /** Ngày bắt đầu đã đặt của các chiến dịch. Bảng chưa có / lỗi đọc ⇒ rỗng (hành vi cũ). */

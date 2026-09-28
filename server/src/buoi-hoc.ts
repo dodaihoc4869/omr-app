@@ -15,6 +15,7 @@
 // SỨC HỌC (`/gv/buoi-hoc/suc-hoc`): số THẬT từ sổ `su_kien_hoc` (60 ngày, theo câu / dạng / chuyên đề / tổng), bậc `nam_kt_dang`, lịch sử `len_bang`.
 // CHỈ ĐỌC. App thầy tự ước xác suất và chọn em (`src/lib/chon-em-day-hoc.ts`), máy chủ không quyết thay.
 import type { Env } from './kieu'
+import { chayDdlMotLan } from './ddl-mot-lan'
 import { gameIdentity } from './game-v2-auth'
 import { ngayVnCua } from './srs2-d1'
 import { tenLopCuaEm } from './ten-lop'
@@ -39,7 +40,7 @@ export const SQL_TAO_BANG = [
 ]
 
 async function taoBang(env: Env): Promise<void> {
-  for (const s of SQL_TAO_BANG) await env.DB.prepare(s).run()
+  await chayDdlMotLan(env, 'buoi_hoc', SQL_TAO_BANG) // một batch, một lần mỗi isolate (ddl-mot-lan.ts)
 }
 
 async function hoi(env: Env, sql: string, ...bind: unknown[]): Promise<Row[] | null> {

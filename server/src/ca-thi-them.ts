@@ -11,6 +11,7 @@
 //   · `expCuaEmTrongCa` — tổng EXP em đã nhận từ MỘT ca (sổ `exp_so`, `ma_nguon = maCa`) cho `ketQua` sau công bố (chỉ-đọc).
 // Cổng mã bí mật của thầy do `index.ts` chặn (sau `laThay`).
 import type { Env } from './kieu'
+import { chayDdlMotLan } from './ddl-mot-lan'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { SBD_THU } from './gv-bang-tin'
 import { laBoTrong } from './su-kien-hoc'
@@ -54,9 +55,10 @@ export async function gvNhanXetCaEm(env: Env, b: Hang, nowMs: number = Date.now(
   if (!ca || chuoi(ca.trang_thai) === 'da_xoa') return { ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca này.' }
   const nay = new Date(nowMs).toISOString()
   // CI không tự chạy migration ⇒ tạo bảng CHỈ-THÊM ngay tại chỗ (y hệt migration-2809-nhan-xet-ca-em.sql; IF NOT EXISTS nên chạy lại vô hại).
-  await env.DB.prepare(
+  // Một lần mỗi isolate (ddl-mot-lan.ts) thay vì mỗi lượt ghi.
+  await chayDdlMotLan(env, 'nhan_xet_ca_em', [
     'CREATE TABLE IF NOT EXISTS nhan_xet_ca_em (ma_ca TEXT NOT NULL, sbd TEXT NOT NULL, noi_dung TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL, PRIMARY KEY (ma_ca, sbd))',
-  ).run()
+  ])
   if (!noiDung) {
     await env.DB.prepare('DELETE FROM nhan_xet_ca_em WHERE ma_ca = ? AND sbd = ?').bind(maCa, sbd).run()
     return { ok: true, maCa, sbd, noiDung: '', capNhatLuc: nay }
