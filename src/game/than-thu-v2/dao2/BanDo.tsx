@@ -51,6 +51,8 @@ export default function BanDo({profile,sanh,dangTai,loiSanh='',cau,ketQua,soan='
    {sanh?.theLuc&&<p className="dao2-kinh dao2-the-luc" aria-label={`Thể lực hôm nay: còn ${sanh.theLuc.con} trên ${sanh.theLuc.tong} câu`}><svg viewBox="0 0 14 16" width="14" height="16" aria-hidden="true"><polygon points="7,0 14,5 11,16 3,16 0,5"/></svg><span><small>Thể lực</small>{sanh.theLuc.con}/{sanh.theLuc.tong}</span></p>}
   </header>
 
+  {/* Dọc: hai lớp bọc là `display:contents` (một cột như cũ). Ngang: TRÁI = bản đồ đảo cao hết màn · PHẢI = số chiến dịch + tấm chuyến, nút ở đáy. */}
+  <div className="dao2-bd-trai">
   <div className="dao2-bd-khung">
    <svg className="dao2-bd-svg" viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`} aria-hidden="true">
     <defs>
@@ -81,7 +83,9 @@ export default function BanDo({profile,sanh,dangTai,loiSanh='',cau,ketQua,soan='
    <img className="dao2-bd-thu" src={anhThu(thu,profile.cap,true)} alt={`Thần thú của em: ${ten}`} width="70" height="70" decoding="async" draggable={false} style={pt(88,202)}/>
    {vung.length>0&&<ul className="dao2-bd-vung" aria-label="Vùng đất theo dạng bài">{vung.slice(0,VUNG.length).map((v,i)=><li key={v.ten} data-sang={v.tiLe>=60?'':undefined} style={pt(...VUNG[i]!)} aria-label={`Vùng ${v.ten}: ${v.tiLe}% câu làm đúng ở lần gần nhất (${v.dung}/${v.daLam} câu)`}>{v.ten} · {v.tiLe}%</li>)}</ul>}
   </div>
+  </div>
 
+  <div className="dao2-bd-phai">
   {cd&&<div className="dao2-bd-so">
    <p className="dao2-kinh"><small>Sương đã tan · Cọ xát</small><b className="dao2-so-xanh">{cd.coXat}/{cd.tong} ô</b></p>
    <p className="dao2-kinh"><small>Đền đã dựng · Thành thạo</small><b className="dao2-so-vang">{cd.thanhThao}/{cd.tong} ô</b>{cd.thanhThao===0&&cd.thanhThaoTangTu&&chuNgay(cd.thanhThaoTangTu)?<small>Đền mọc từ {chuNgay(cd.thanhThaoTangTu)}</small>:null}</p>
@@ -113,6 +117,7 @@ export default function BanDo({profile,sanh,dangTai,loiSanh='',cau,ketQua,soan='
     {!het&&<button type="button" className="dao2-nut-vang" disabled={busy||!!sanh?.khoaDao} onClick={onLenDuong}><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>{busy&&soan?'ĐANG SOẠN HÀNH TRANG…':'LÊN ĐƯỜNG · XUA SƯƠNG MÙ'}</button>}
    </>}
   </section>
+  </div>
   {thanhDuoi}
  </div>
 }
