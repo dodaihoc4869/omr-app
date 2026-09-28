@@ -14,7 +14,9 @@ import { QuaiHinh, ThuHinh, TrumHinh } from './DoanHinh'
 export const GIAY_TUNG_CHUONG = 3
 const so = (n: number) => String(n).replace('.', ',')
 
-export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXong }: { kq: KhungNhinHiep; ghe: GheXem[]; loaiQuai: string; tenQuai: string; tinh: boolean; onXong: () => void }) {
+/** `cheDo2` (chỉ-thêm, GAME HÓA 2.0): cùng nội dung, cùng thời lượng, cùng "một chạm bỏ qua" — chỉ đổi TRÌNH BÀY sang hệ doan2.css
+ *  (biển đêm, dải vàng Baloo, kính mờ), thêm nút "Bỏ qua" thật + Esc, số sát thương có nhãn. Vắng/false ⇒ giao diện cũ y nguyên. */
+export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXong, cheDo2 = false }: { kq: KhungNhinHiep; ghe: GheXem[]; loaiQuai: string; tenQuai: string; tinh: boolean; onXong: () => void; cheDo2?: boolean }) {
   const xong = useRef(onXong); xong.current = onXong
   const idA = useId(), idB = useId()
   const em = ghe.find(g => g.laEm)!, toi = kq.cuaEm
@@ -29,6 +31,13 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
     const t = setTimeout(() => xong.current(), GIAY_TUNG_CHUONG * 1000)
     return () => clearTimeout(t)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // 2.0: Esc đóng tấm phủ (chuẩn giao diện mục 3) — cùng việc với một chạm bỏ qua.
+  useEffect(() => {
+    if (!cheDo2) return
+    const phim = (e: KeyboardEvent) => { if (e.key === 'Escape') xong.current() }
+    window.addEventListener('keydown', phim)
+    return () => window.removeEventListener('keydown', phim)
+  }, [cheDo2])
 
   const dai = tia[0] ?? null
   const viSao = kq.laTrum ? null : !toi?.nop ? [['luc', '…', 'Hiệp này em chưa kịp chốt. Hiệp sau em chốt sớm một chút nhé.']]
@@ -45,9 +54,11 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
     ]
 
   return (
-    <div className={`dh-chuong ${tinh ? 'dh-tinh' : ''}`} role="dialog" aria-label="Cả đội ra đòn" onClick={onXong}>
+    <div className={`dh-chuong ${cheDo2 ? 'dh2-chuong' : ''} ${tinh ? 'dh-tinh' : ''}`} role="dialog" aria-label="Cả đội ra đòn" data-che-do={cheDo2 ? '2' : undefined} onClick={onXong}>
       <div className="dh-chuong-tia-nen" />
-      <span className="dh-chuong-bo-qua">chạm để bỏ qua</span>
+      {cheDo2
+        ? <button type="button" className="dh2-chuong-bo-qua" onClick={e => { e.stopPropagation(); onXong() }}>Bỏ qua</button>
+        : <span className="dh-chuong-bo-qua">chạm để bỏ qua</span>}
       {kq.laTrum ? (
         <>
           <div className="dh-chuong-dai"><div><small>TRÙM · CÂU CHUNG CẢ ĐỘI</small><b>{kq.trum?.voGiap ? 'VỠ GIÁP TRÙM!' : `ĐÚNG ${kq.trum?.yDung ?? 0}/4 Ý`}</b></div></div>
@@ -68,17 +79,17 @@ export default function DoanTungChuong({ kq, ghe, loaiQuai, tenQuai, tinh, onXon
               <ThuHinh pet={t.g.pet} cap={t.g.cap} size={150} quayTrai={i === 1} className="dh-chuong-thu" style={{ [i ? 'right' : 'left']: tia.length === 1 ? 'calc(50% - 75px)' : '2%' } as CSSProperties} />
             </div>
           ))}
-          {kq.tongSatThuong > 0 && <div className="dh-chuong-so"><b className="dh-chu-vang">−{kq.tongSatThuong}</b>{kq.quaiHaGuc > 0 && <small>HẠ GỤC{kq.quaiHaGuc > 1 ? ` ×${kq.quaiHaGuc}` : ''}!</small>}</div>}
+          {kq.tongSatThuong > 0 && <div className="dh-chuong-so">{cheDo2 && <small className="dh2-chuong-nhan-so">SÁT THƯƠNG CẢ ĐỘI</small>}<b className="dh-chu-vang">−{kq.tongSatThuong}</b>{kq.quaiHaGuc > 0 && <small>HẠ GỤC{kq.quaiHaGuc > 1 ? ` ×${kq.quaiHaGuc}` : ''}!</small>}</div>}
           {lienKich && <div className="dh-chuong-lk">LIÊN KÍCH ×2</div>}
         </>
       )}
       <div className="dh-chuong-san">
         {!kq.laTrum && <span>{tenQuai} · hạ {kq.quaiHaGuc} · còn {kq.quaiConLai}</span>}
-        <span style={{ color: 'rgb(200,246,255)' }}>Linh Tâm {kq.linhTamMat > 0 ? `mất ${kq.linhTamMat} máu` : 'không mất máu'}{kq.linhTamHoi > 0 ? `, hồi ${kq.linhTamHoi} máu` : ''}, còn {kq.linhTamSau} máu</span>
+        <span className={cheDo2 ? 'dh2-chuong-linh' : undefined} style={cheDo2 ? undefined : { color: 'rgb(200,246,255)' }}>Linh Tâm {kq.linhTamMat > 0 ? `mất ${kq.linhTamMat} máu` : 'không mất máu'}{kq.linhTamHoi > 0 ? `, hồi ${kq.linhTamHoi} máu` : ''}, còn {kq.linhTamSau} máu</span>
       </div>
       {viSao && (
         <div className="dh-chuong-vi-sao">
-          <div className="dh-nhan" style={{ color: 'rgb(255,217,160)' }}>{emRaDon ? 'VÌ SAO ĐÒN NÀY MẠNH' : 'HIỆP NÀY CỦA EM'}</div>
+          <div className={cheDo2 ? 'dh-nhan dh2-chuong-vi-sao-dau' : 'dh-nhan'} style={cheDo2 ? undefined : { color: 'rgb(255,217,160)' }}>{emRaDon ? 'VÌ SAO ĐÒN NÀY MẠNH' : 'HIỆP NÀY CỦA EM'}</div>
           {viSao.slice(0, 3).map(([mau, nhan, chu], i) => <div key={i}><i className={mau ? `dh-${mau}` : ''}>{nhan}</i><span>{chu}</span></div>)}
         </div>
       )}

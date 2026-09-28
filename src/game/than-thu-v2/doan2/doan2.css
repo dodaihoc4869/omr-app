@@ -158,3 +158,62 @@
 @media (max-width:380px){.dh2 .dh-pa button{min-height:52px;font-size:15px}.dh2 .dh-de{font-size:15.5px}.dh2 .dh2-nut-chinh{font-size:18px}.dh2 .dh-nut-vang{font-size:17px;letter-spacing:.02em}.dh2-thang-tieu-de{font-size:26px}}
 @media (max-height:780px){.dh2-canh{height:clamp(216px,30vh,250px)}.dh2 .dh-don button{min-height:56px}.dh2 .dh2-nut-chinh{min-height:54px}}
 @media (max-height:700px){.dh2-canh{height:clamp(200px,34vh,236px)}.dh2 .dh-pa button{min-height:48px}}
+
+/* ───── Tấm phủ TUNG CHƯỞNG (2.0): cùng bố cục/thời lượng với bản cũ — nền biển đêm + tia vàng, dải chiêu vàng chữ nâu Baloo, số vàng có nhãn,
+   bảng "Vì sao" kính mờ. Chỉ khi DoanTungChuong nhận cheDo2 (lớp .dh2-chuong). Chuyển động rút về ≤ 300 ms (hiệu ứng tia giữ nguyên). ───── */
+.dh2 .dh2-chuong{background:radial-gradient(90% 60% at 50% 24%,rgb(47,91,217) 0%,rgb(26,44,110) 42%,rgb(7,18,41) 100%) rgb(7,18,41);color:var(--dh2-chu)}
+.dh2 .dh2-chuong .dh-chuong-tia-nen{background:repeating-conic-gradient(from 0deg,rgba(255,214,107,.13) 0deg 6deg,rgba(255,214,107,0) 6deg 14deg)}
+.dh2 .dh2-chuong .dh-chuong-dai{height:60px;border-radius:0 18px 18px 0;background:linear-gradient(90deg,rgb(255,214,107) 0%,rgb(255,159,28) 70%,rgba(255,159,28,0));box-shadow:0 6px 0 rgba(184,101,10,.8),0 10px 24px rgba(255,159,28,.35);animation-duration:.28s}
+.dh2 .dh2-chuong .dh-chuong-dai>div{top:6px}
+.dh2 .dh2-chuong .dh-chuong-dai small{font-size:12px;letter-spacing:.08em;color:rgb(58,29,0)}
+.dh2 .dh2-chuong .dh-chuong-dai b{font-family:'Baloo 2',var(--sans,'Be Vietnam Pro'),system-ui,sans-serif;font-size:24px;font-style:normal;line-height:1.1;color:rgb(58,29,0);text-shadow:0 1px 0 rgba(255,236,180,.8)}
+.dh2 .dh2-chuong .dh-chuong-dai.dh-phu{height:52px;border-radius:18px 0 0 18px;background:linear-gradient(270deg,rgb(47,91,217) 0%,rgb(55,226,213) 70%,rgba(55,226,213,0));box-shadow:0 6px 0 rgba(26,44,110,.8),0 10px 24px rgba(55,226,213,.3)}
+.dh2 .dh2-chuong .dh-chuong-dai.dh-phu small{color:rgb(220,232,255)}
+.dh2 .dh2-chuong .dh-chuong-dai.dh-phu b{font-size:18px;color:rgb(255,255,255);text-shadow:0 2px 0 rgb(26,44,110)}
+.dh2 .dh2-chuong .dh-chuong-so{animation-duration:.28s;animation-timing-function:ease-out}
+.dh2 .dh2-chuong .dh-chuong-so b{font-family:'Baloo 2',var(--sans,'Be Vietnam Pro'),system-ui,sans-serif;font-size:52px;color:rgb(255,214,107);text-shadow:0 3px 0 rgb(138,58,0),0 0 18px rgba(255,160,40,.6)}
+.dh2 .dh2-chuong .dh-chuong-so small{margin-top:0;font-size:12px;letter-spacing:.08em;color:rgb(255,255,255);text-shadow:0 1px 3px rgb(0,0,0)}
+.dh2 .dh2-chuong .dh-chuong-so small.dh2-chuong-nhan-so{margin-bottom:-2px;padding:2px 8px;border-radius:8px;background:rgb(255,92,138);text-shadow:none}
+.dh2 .dh2-chuong .dh-chuong-lk{border-radius:14px;background:linear-gradient(90deg,rgb(255,92,138),rgb(255,159,28));box-shadow:0 0 16px rgba(255,92,138,.5);font-family:'Baloo 2',var(--sans,'Be Vietnam Pro'),system-ui,sans-serif;font-size:15px;letter-spacing:.04em;color:rgb(255,255,255);animation-duration:.28s;animation-timing-function:ease-out}
+.dh2 .dh2-chuong .dh-chuong-san{width:auto;max-width:210px;padding:8px 12px;border-radius:16px;background:rgba(12,26,58,.72);box-shadow:inset 0 0 0 1px rgba(160,200,255,.18);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);text-shadow:none;font-size:12px;line-height:1.4;color:rgb(220,232,255)}
+.dh2 .dh2-chuong .dh2-chuong-linh{color:rgb(191,244,255)}
+.dh2 .dh2-chuong .dh-chuong-chop{background:rgb(255,236,180)}
+.dh2 .dh2-chuong .dh-chuong-vi-sao{gap:8px;padding:12px 14px;border-radius:22px;background:rgba(12,26,58,.86);box-shadow:inset 0 0 0 1px rgba(160,200,255,.18),0 -8px 30px rgba(0,0,0,.35);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);animation-duration:.28s}
+.dh2 .dh2-chuong .dh2-chuong-vi-sao-dau{font-family:'Baloo 2',var(--sans,'Be Vietnam Pro'),system-ui,sans-serif;font-size:13px;letter-spacing:.08em;color:var(--dh2-vang)}
+.dh2 .dh2-chuong .dh-chuong-vi-sao>div{font-size:13px;line-height:1.35;color:rgb(220,232,255)}
+.dh2 .dh2-chuong .dh-chuong-vi-sao>div b{color:var(--dh2-chu)}
+.dh2 .dh2-chuong .dh-chuong-vi-sao>div>i{width:36px;height:30px;border-radius:10px;font-size:13px;color:rgb(58,29,0);background:linear-gradient(180deg,rgb(255,214,107),rgb(255,159,28))}
+.dh2 .dh2-chuong .dh-chuong-vi-sao>div>i.dh-lam{color:rgb(7,18,41);background:linear-gradient(180deg,rgb(191,244,255),rgb(127,243,255))}
+.dh2 .dh2-chuong .dh-chuong-vi-sao>div>i.dh-cam{color:rgb(255,255,255);background:linear-gradient(180deg,rgb(255,159,191),rgb(255,92,138))}
+.dh2 .dh2-chuong .dh-chuong-vi-sao>div>i.dh-luc{color:rgb(7,18,41);background:linear-gradient(180deg,rgb(160,250,205),rgb(91,240,165))}
+.dh2 .dh2-chuong-bo-qua{z-index:7;position:absolute;right:12px;top:max(12px,env(safe-area-inset-top));min-width:44px;min-height:44px;padding:0 18px;border-radius:22px;background:rgba(12,26,58,.72);box-shadow:inset 0 0 0 1px rgba(160,200,255,.3);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);font-size:14px;font-weight:700;color:rgb(220,232,255);transition:transform .15s ease-out}
+.dh2 .dh2-chuong-bo-qua:active{transform:scale(.96)}
+
+/* ───── Tấm phủ TIẾP SỨC (2.0): tấm kính biển đêm trượt lên, câu của bạn trên giấy da, ba thẻ màu 2.0 (lam · tím · ngọc), chữ Baloo. ───── */
+.dh2 .dh2-tam-nen{background:rgba(3,8,24,.62);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);overscroll-behavior:contain}
+.dh2 .dh2-tam{max-height:92vh;overflow-y:auto;overscroll-behavior:contain;gap:14px;padding:10px 16px max(18px,env(safe-area-inset-bottom));border-radius:28px 28px 0 0;
+  background:linear-gradient(180deg,rgb(26,44,110) 0%,rgb(12,26,58) 55%,rgb(7,18,41) 100%);box-shadow:0 -14px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(160,200,255,.25);animation-duration:.28s}
+.dh2 .dh2-tam::before{background:rgba(160,200,255,.4)}
+.dh2 .dh2-tam .dh-tam-dau b{font-size:21px;line-height:1.15;color:var(--dh2-chu)}
+.dh2 .dh2-tam .dh-tam-dau small{font-size:13px;line-height:1.4;color:var(--dh2-mo)}
+.dh2 .dh2-tam .dh-tam-dau .dh-chu-vang{color:var(--dh2-vang);font-weight:800}
+.dh2 .dh2-tam .dh-tam-cau{padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,rgb(253,246,230) 0%,rgb(244,230,196) 100%);color:rgb(42,33,19);font-size:15px;line-height:1.5}
+.dh2 .dh2-tam .dh-tam-cau small{font-family:'Baloo 2',var(--sans,'Be Vietnam Pro'),system-ui,sans-serif;font-size:12px;letter-spacing:.05em;color:rgb(47,91,217)}
+.dh2 .dh2-tam .dh-tam-cau i{color:rgb(107,90,58)}
+.dh2 .dh2-tam .dh-the-goi-y{gap:10px}
+.dh2 .dh2-tam .dh-the-goi-y button{min-height:150px;padding:16px 8px 12px;border-radius:22px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),0 10px 22px rgba(0,0,0,.35);transition:transform .15s ease-out,opacity .15s ease-out}
+.dh2 .dh2-tam .dh-the-goi-y button:nth-child(1){background:linear-gradient(180deg,rgb(79,120,236) 0%,rgb(47,91,217) 100%)}
+.dh2 .dh2-tam .dh-the-goi-y button:nth-child(2){background:linear-gradient(160deg,rgb(123,63,224) 0%,rgb(106,47,168) 100%)}
+.dh2 .dh2-tam .dh-the-goi-y button:nth-child(3){background:linear-gradient(180deg,rgb(31,181,166) 0%,rgb(15,123,108) 100%)}
+.dh2 .dh2-tam .dh-the-goi-y button:active:not(:disabled){transform:scale(.97)}
+.dh2 .dh2-tam .dh-the-goi-y button:disabled{opacity:.45}
+.dh2 .dh2-tam .dh-the-goi-y button>i{width:48px;height:48px;border-radius:16px;background:rgb(255,255,255);box-shadow:none;color:rgb(47,91,217)}
+.dh2 .dh2-tam .dh-the-goi-y button:nth-child(2)>i{color:rgb(106,47,168)}
+.dh2 .dh2-tam .dh-the-goi-y button:nth-child(3)>i{color:rgb(15,123,108)}
+.dh2 .dh2-tam .dh-the-goi-y button b{font-size:15px;line-height:1.2}
+.dh2 .dh2-tam .dh-the-goi-y button small{font-size:12px;line-height:1.35;opacity:1;color:rgb(236,242,255)}
+.dh2 .dh2-tam .dh-tam-chan{font-size:13px;line-height:1.45;color:var(--dh2-mo)}
+.dh2 .dh2-tam .dh-tam-chan b{color:var(--dh2-vang)}
+.dh2 .dh2-tam .dh-tam-chan button{min-height:44px;padding:0 18px;border-radius:22px;font-weight:700}
+@media (max-width:380px){.dh2 .dh2-tam .dh-the-goi-y{gap:8px}.dh2 .dh2-tam .dh-the-goi-y button b{font-size:14px}.dh2 .dh2-chuong .dh-chuong-dai b{font-size:21px}}
+@media (prefers-reduced-motion:reduce){.dh2 .dh2-chuong-bo-qua,.dh2 .dh2-tam,.dh2 .dh2-tam *{animation:none!important;transition:none!important}.dh2 .dh2-chuong-bo-qua:active,.dh2 .dh2-tam .dh-the-goi-y button:active{transform:none}}
