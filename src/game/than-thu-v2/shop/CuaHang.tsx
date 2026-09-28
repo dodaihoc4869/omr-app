@@ -52,6 +52,8 @@ import { chuKhoaCanDai, chuSoLuongThe, chuTrangThaiMon, kepSoExp, ngayAnCua, tra
 export type BoLoc = OGan | 'tat-ca'
 
 export interface CuaHangProps {
+  /** Bố cục ngang: bọc ví + đổi EXP vào cột TRÁI, bộ lọc + lưới món vào cột PHẢI (shop-ngang.css). Vắng/false = dọc như cũ. */
+  ngang?: boolean
   /** Đang tải ⇒ khung xám giữ chỗ. */
   dangTai: boolean
   vi: ViSoMo | null
@@ -162,10 +164,8 @@ export default function CuaHang(p: CuaHangProps) {
   const nhanNut = p.dangTai ? NBSP : khongCo ? chuChuaCoExpThua : x <= 0 ? chuKeoThanh : chuNutDoi(x)
   const ds = p.dangTai ? [] : xepTheoGia(p.mon, p.loc)
   const bo: { ma: BoLoc; chu: string; sap: boolean }[] = [{ ma: 'tat-ca', chu: chuTatCa, sap: false }, ...CAC_O.map((o) => ({ ma: o as BoLoc, chu: TEN_O[o], sap: p.sapMo(o) }))]
-  return (
+  const trai = (
     <>
-      <DauCuaHang onVe={p.onVe} onTuDo={p.onTuDo} />
-
       <section className="ps-kinh ps-vi" aria-busy={p.dangTai}>
         <div className="ps-vi-hang">
           <DongVang c={54} className="ps-xu-lon" />
@@ -232,6 +232,10 @@ export default function CuaHang(p: CuaHangProps) {
         </div>
       </section>
 
+    </>
+  )
+  const phai = (
+    <>
       <div className="ps-loc" role="group" aria-label={chuLocNhan}>
         {bo.map((b) => (
           <button key={b.ma} type="button" aria-pressed={p.loc === b.ma} disabled={p.dangTai || b.sap} data-loc={b.ma} onClick={() => p.onLoc(b.ma)}>
@@ -256,6 +260,23 @@ export default function CuaHang(p: CuaHangProps) {
           : ds.map((m) => <TheMon key={m.ma} m={m} vang={p.vang} em={p.em} dangThu={p.dangThu[m.oGan] === m.ma} veHinhMon={p.veHinhMon} onThu={p.onThu} />)}
       </div>
       {!p.dangTai && ds.length === 0 && <p className="ps-ghi-chu ps-giua">{chuOTrong}</p>}
+    </>
+  )
+  return (
+    <>
+      <DauCuaHang onVe={p.onVe} onTuDo={p.onTuDo} />
+
+      {p.ngang ? (
+        <div className="ps-ngang">
+          <div className="ps-ngang-trai">{trai}</div>
+          <div className="ps-ngang-phai">{phai}</div>
+        </div>
+      ) : (
+        <>
+          {trai}
+          {phai}
+        </>
+      )}
     </>
   )
 }
