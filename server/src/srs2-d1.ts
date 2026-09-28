@@ -138,16 +138,18 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
   const ds = await docChienDichCuaEm(env, sbd)
   const dangChay = chienDichDangChay(ds, homNay)
   const hanTheoQid = new Map<string, string>()
+  // Thầy 28/09: "khi giao chiến dịch đầu tiên tất cả không có câu ôn, không được lấy câu ôn trước đó" ⇒ câu của một chiến dịch chỉ tính lần làm TỪ LÚC GIAO chiến dịch ấy.
+  const tuLucTheoQid = new Map<string, string>()
   const nguonTheoQid = new Map<string, 'chien_dich' | 'cu'>()
-  if (dangChay) for (const q of dangChay.qids) { hanTheoQid.set(q, dangChay.hanNop); nguonTheoQid.set(q, 'chien_dich') }
+  if (dangChay) for (const q of dangChay.qids) { hanTheoQid.set(q, dangChay.hanNop); nguonTheoQid.set(q, 'chien_dich'); tuLucTheoQid.set(q, dangChay.taoLuc) }
   for (const c of ds) {
     if (c === dangChay) continue
-    for (const q of c.qids) if (!nguonTheoQid.has(q)) { hanTheoQid.set(q, c.hanNop); nguonTheoQid.set(q, 'cu') }
+    for (const q of c.qids) if (!nguonTheoQid.has(q)) { hanTheoQid.set(q, c.hanNop); nguonTheoQid.set(q, 'cu'); tuLucTheoQid.set(q, c.taoLuc) }
   }
   const qids = [...nguonTheoQid.keys()]
   const [meta, lanLam, moc] = await Promise.all([docMetaCau(env, qids, dangChay?.maDe ?? []), docLanLam(env, sbd, qids), docMocDayLai(env, sbd)])
   const theoQid = new Map<string, LanLam[]>()
-  for (const x of lanLam) theoQid.set(x.qid, [...(theoQid.get(x.qid) ?? []), x])
+  for (const x of lanLam) if (x.luc >= (tuLucTheoQid.get(x.qid) ?? '')) theoQid.set(x.qid, [...(theoQid.get(x.qid) ?? []), x])
   const tt = new Map<string, TrangThaiCau>()
   const cau: CauSrs[] = []
   for (const qid of qids) {
@@ -220,7 +222,9 @@ export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?
     let kh = tuDong(cu, ngay, dem)
     // Thầy 28/09 ("đã giao chiến dịch test nhưng không bấm vào làm được"): kế hoạch chốt LÚC CHƯA CÓ chiến dịch (hoặc chiến dịch khác)
     // thì LẬP LẠI theo chiến dịch hiện tại — giữ các câu đã làm hôm nay (vẫn trừ vào thể lực), thêm câu mới của kế hoạch.
-    if ((kh.chienDichId ?? null) !== (cd?.id ?? null)) {
+    // Kế hoạch đã chốt có câu ÔN (Đoàn) mà theo luật hiện tại là câu MỚI (thầy 28/09: bỏ câu ôn lấy từ lịch sử trước chiến dịch) ⇒ cũng lập lại.
+    const onSaiLuat = kh.conDoan.some((k) => hoSo.tt.get(qidGoc(k))?.laMoi)
+    if ((kh.chienDichId ?? null) !== (cd?.id ?? null) || onSaiLuat) {
       const xongDao = kh.dao.filter((k) => !kh.conDao.includes(k))
       const xongDoan = kh.doan.filter((k) => !kh.conDoan.includes(k))
       const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, tuyChon, xongDao.length + xongDoan.length)

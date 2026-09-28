@@ -138,8 +138,10 @@ async function mocDayLaiCaLop(env: Env, sbd: readonly string[]): Promise<Map<str
   return ra
 }
 /** Trạng thái từng (em, câu) của một chiến dịch. */
-async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly string[], hanNop: string | null): Promise<Map<string, Map<string, TrangThaiCau>>> {
-  const [lan, moc] = await Promise.all([lanLamCaLop(env, sbd, qids), mocDayLaiCaLop(env, sbd)])
+/** `tuLuc` (thầy 28/09): chỉ tính lần làm TỪ LÚC GIAO chiến dịch — lịch sử trước đó KHÔNG sinh câu ôn; mọi câu của chiến dịch bắt đầu là câu mới. */
+async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly string[], hanNop: string | null, tuLuc: string): Promise<Map<string, Map<string, TrangThaiCau>>> {
+  const [lanTho, moc] = await Promise.all([lanLamCaLop(env, sbd, qids), mocDayLaiCaLop(env, sbd)])
+  const lan = new Map([...lanTho].map(([em, ds]) => [em, ds.filter((x) => x.luc >= tuLuc)] as const))
   const ra = new Map<string, Map<string, TrangThaiCau>>()
   for (const em of sbd) {
     const cua = lan.get(em) ?? []
@@ -194,7 +196,7 @@ async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   const homNay = ngayVnCua(nowMs)
   if (dv.hanNop < homNay) throw new Error('Hạn nộp đã qua.')
   const D = soNgayConLai(homNay, dv.hanNop)
-  const tt = await trangThaiLop(env, dv.sbd, qids, dv.hanNop)
+  const tt = await trangThaiLop(env, dv.sbd, qids, dv.hanNop, new Date(nowMs).toISOString())
   const khoiLuong = dv.sbd.map((em) => khoiLuongCan([...tt.get(em)!.values()]))
   const kl = trungVi(khoiLuong)
   // Tách lượt của EM Ở GIỮA LỚP thành "câu mới × 2" + "lượt ôn" để thầy đọc được vì sao ra số lượt (chỉ khi có em đúng bằng trung vị).
@@ -224,7 +226,7 @@ async function tao(env: Env, b: Row, nowMs: number) {
   const rutCon = Math.floor(Number(b.rutCon) || 0)
   if (rutCon > 0 && rutCon < qids.length) {
     // "Rút còn N câu, giữ câu cả lớp sai nhiều": ưu tiên câu nhiều em chưa thành thạo; hoà thì giữ thứ tự tờ đề.
-    const tt = await trangThaiLop(env, dv.sbd, qids, dv.hanNop)
+    const tt = await trangThaiLop(env, dv.sbd, qids, dv.hanNop, new Date(nowMs).toISOString())
     const diem = new Map(qids.map((q) => [q, dv.sbd.filter((em) => !tt.get(em)!.get(q)!.thanhThao).length]))
     const giu = new Set([...qids].sort((a, c) => diem.get(c)! - diem.get(a)! || qids.indexOf(a) - qids.indexOf(c)).slice(0, rutCon))
     qids = qids.filter((q) => giu.has(q))
@@ -247,7 +249,7 @@ async function doiTrangThai(env: Env, id: string, trangThai: 'da_dong' | 'da_huy
 async function bang(env: Env, id: string, nowMs: number) {
   const cd = await docMot(env, id)
   const homNay = ngayVnCua(nowMs)
-  const [tt, ten, meta] = await Promise.all([trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop), tenEm(env, cd.sbd), docMetaCau(env, cd.qids, cd.maDe)])
+  const [tt, ten, meta] = await Promise.all([trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.taoLuc), tenEm(env, cd.sbd), docMetaCau(env, cd.qids, cd.maDe)])
   const dangTheoQid = new Map(cd.qids.map((q) => [q, meta.get(q)?.tenDang ?? meta.get(q)?.dang ?? 'Chưa gắn dạng']))
   const dang = [...new Set(dangTheoQid.values())]
   const kh = await env.DB.prepare('SELECT sbd, huyet_chien FROM srs2_ke_hoach WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))').bind(homNay, JSON.stringify(cd.sbd)).all<Row>().catch(() => ({ results: [] as Row[] }))
@@ -280,7 +282,7 @@ async function bang(env: Env, id: string, nowMs: number) {
 async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
   const cd = await docMot(env, id)
   const em = coMat.length ? cd.sbd.filter((s) => coMat.includes(s)) : cd.sbd
-  const [tt, ten, meta] = await Promise.all([trangThaiLop(env, em, cd.qids, cd.hanNop), tenEm(env, em), docMetaCau(env, cd.qids, cd.maDe)])
+  const [tt, ten, meta] = await Promise.all([trangThaiLop(env, em, cd.qids, cd.hanNop, cd.taoLuc), tenEm(env, em), docMetaCau(env, cd.qids, cd.maDe)])
   const cau = cd.qids.map((q) => {
     const chua = em.filter((s) => !tt.get(s)!.get(q)!.thanhThao)
     const dayLai = em.filter((s) => tt.get(s)!.get(q)!.catTia)
@@ -313,7 +315,7 @@ async function buoiChua(env: Env, id: string, nowMs: number, coMat: string[]) {
 async function chuaXong(env: Env, id: string, qids: string[], nowMs: number) {
   const cd = await docMot(env, id)
   const ds = qids.length ? qids.filter((q) => cd.qids.includes(q)) : cd.qids
-  const tt = await trangThaiLop(env, cd.sbd, ds, cd.hanNop)
+  const tt = await trangThaiLop(env, cd.sbd, ds, cd.hanNop, cd.taoLuc)
   const luc = new Date(nowMs).toISOString()
   const lenh: ReturnType<Env['DB']['prepare']>[] = []
   for (const s of cd.sbd) for (const q of ds) if (tt.get(s)!.get(q)!.catTia) lenh.push(env.DB.prepare('INSERT OR IGNORE INTO srs2_day_lai (sbd, qid, luc, chien_dich_id) VALUES (?,?,?,?)').bind(s, q, luc, cd.id))
