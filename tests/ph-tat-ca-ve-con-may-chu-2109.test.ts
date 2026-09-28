@@ -6,12 +6,11 @@
 import { describe, expect, it } from 'vitest'
 import { parentPass } from '../server/src/game-v2-auth'
 import { dungLaiHoSo } from '../server/src/ho-so-nam-kt'
-import { docCauHinhTangDoc } from '../server/src/bo-nao-doc'
 import { docCauBtvnChuaNop } from '../server/src/game-v2-luot'
 import { tuLucTuNgay } from '../server/src/cau-da-lam'
 import { chuGameTrong } from '../server/src/chu-game'
 import {
-  CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, docCauChanBtvnChuaNop, lyDoCheCuaCau, NGUONG_LAM_LAU_GIAY, lichChangCuaEm, cauHinhTangDocTuChuoi, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
+  CHI_NHAN_TOKEN, MUC_TIEU_CAU_MAC_DINH, docCauChanBtvnChuaNop, lyDoCheCuaCau, NGUONG_LAM_LAU_GIAY, lichChangCuaEm, deRutGon, gioThuongHoc, nhanNguon, phChiTietCauVeCon, phTatCaVeCon,
   DANG_VAP_TI_LE_DUNG_TOI_DA, DANG_VAP_TOI_THIEU_LUOT, PHIEN_CACH_TOI_DA_PHUT, TOI_DA_CAU_HOM_NAY, TOI_THIEU_LUOT_GIO_THUONG_HOC,
 } from '../server/src/ph-tat-ca-ve-con'
 import type { Env } from '../server/src/kieu'
@@ -283,8 +282,8 @@ describe('đủ khối khi có số thật', () => {
     // nhịp học: chỉ ngày có học
     expect(r.nhipHoc.ngay.map((x: any) => x.ngay)).toEqual(['2026-09-20', '2026-09-21', NGAY])
     expect(r.nhipHoc.gioThuongHoc).toBeUndefined() // dưới 20 lượt
-    // lời Bộ não + giao thêm + việc phụ huynh
-    expect(r.loiBoNao).toEqual({ loi: 'Con đang ôn đều, tối nay làm thêm phần ôn lại.', ngay: NGAY, thuTuan: 'Tuần này con làm 4 ngày liên tiếp.' })
+    // Bộ não A.I đã GỠ (28/09): dù còn cấu hình + hàng ai_dieu_chinh THẬT ⇒ KHÔNG có loiBoNao. Giao thêm + việc phụ huynh như cũ.
+    expect('loiBoNao' in r).toBe(false)
     expect(r.giaoThem).toEqual({ conLaiHomNay: 1 })
     expect(r.phuHuynhLamGi.length).toBeGreaterThanOrEqual(1)
     expect(r.phuHuynhLamGi.length).toBeLessThanOrEqual(2)
@@ -368,20 +367,6 @@ describe('khối thiếu dữ liệu ⇒ VẮNG (không có khoá, không số 0
     expect('phutNgayMai' in r.lichOn).toBe(false)
     expect('phuHuynhLamGi' in r).toBe(false)
   })
-  it('Bộ não chạy thử (bong) / tắt / không có lời ⇒ vắng loiBoNao; lời có chữ game bị loại', async () => {
-    for (const cfg of [{ bat: true, cheDo: 'bong', lopThat: [] }, { bat: false, cheDo: 'that', lopThat: [] }]) {
-      const { d } = dung()
-      d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bo_nao',?,'x')").run(JSON.stringify(cfg))
-      d.sql.prepare("INSERT INTO ai_dieu_chinh(sbd,ngay,json,che_do,ap_dung,het_han,huy,nop_luc) VALUES('S1',?,?,'that',1,?,0,'x')").run(NGAY, JSON.stringify({ loiNhanChoPhuHuynh: 'Con làm tốt.' }), themNgay(NGAY, 3))
-      expect('loiBoNao' in (await chay(d, await capPass(d)))).toBe(false)
-    }
-    const { d } = dung()
-    d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bo_nao',?,'x')").run(JSON.stringify({ bat: true, cheDo: 'that', lopThat: [] }))
-    d.sql.prepare("INSERT INTO ai_dieu_chinh(sbd,ngay,json,che_do,ap_dung,het_han,huy,nop_luc) VALUES('S1',?,?,'that',1,?,0,'x')").run(NGAY, JSON.stringify({ loiNhanChoPhuHuynh: 'Con nhận thêm khiên nhờ làm đều.', thuTuan: 'Tuần này con học đều.' }), themNgay(NGAY, 3))
-    const r = await chay(d, await capPass(d))
-    expect(r.loiBoNao).toEqual({ ngay: NGAY, thuTuan: 'Tuần này con học đều.' }) // lời có "khiên" bị loại, thư tuần sạch còn
-    expect(chuGameTrong(JSON.stringify(r))).toEqual([])
-  })
   it('bảng đếm giao thêm chưa có (chưa chạy migration) ⇒ vắng giaoThem, lệnh vẫn ok', async () => {
     const { d } = dung()
     d.sql.exec('DROP TABLE ph_giao_them')
@@ -389,14 +374,6 @@ describe('khối thiếu dữ liệu ⇒ VẮNG (không có khoá, không số 0
     expect(r.ok).toBe(true)
     expect('giaoThem' in r).toBe(false)
     expect(r.hoTen).toBe('Nguyễn Thu Hà')
-  })
-  it('cấu hình Bộ não đọc gộp = docCauHinhTangDoc (cùng kết quả trên nhiều cấu hình)', async () => {
-    const cfgs: (Record<string, unknown> | null)[] = [null, {}, { bat: false, cheDo: 'that' }, { bat: true, cheDo: 'that', lopThat: [] }, { cheDo: 'bong', lopThat: ['12'] }, { cheDo: 'bong', lopThat: [] }, { bat: 'x', cheDo: 'that' }, { cheDo: 'that', lopThat: ['a', '', 'a'] }]
-    for (const c of cfgs) {
-      const { d } = dung()
-      if (c !== null) d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bo_nao',?,'x')").run(JSON.stringify(c))
-      expect(cauHinhTangDocTuChuoi(c === null ? undefined : JSON.stringify(c)), JSON.stringify(c)).toEqual(await docCauHinhTangDoc(d.env))
-    }
   })
 })
 

@@ -22,7 +22,8 @@ import { dungLaiHoSo, themNgay } from './ho-so-nam-kt'
 import { tinhNganSach, tinhVanToc, type DauVaoKeHoach } from './ke-hoach-ngay'
 import { chuyenDeThat, ghiSuKien, ngayVn, phanTuQid, suKienChamBai, suKienTuKetQuaCham, cauTuKho } from './su-kien-hoc'
 import { daTraLoi } from './on-lai-nop'
-import { docDieuChinhHieuLuc, type DieuChinhHieuLuc } from './bo-nao-doc'
+/** Cổng điều chỉnh tuỳ chọn của lõi (`DieuChinhEm`). Bộ não A.I đã GỠ (28/09/2026) ⇒ máy chủ KHÔNG còn nguồn điều chỉnh nào: mọi lời gọi truyền `undefined` (đường mặc định). */
+export interface DieuChinhHieuLuc { dieuChinh: DieuChinhEm; ngay?: string }
 import { btvnNopTreBat, docLichDaLuu, ghiNopTre, LAN_MOI_LUOT, moLucChang, trangThaiCacChang, type LichDaLuu } from './btvn-nang-do-chang'
 import { chiaChangNopTre } from '../../src/lib/ve-dich'
 import { chuMoSomChang, duocMoSomChang } from '../../src/lib/mo-som-chang'
@@ -469,15 +470,14 @@ export async function chotBoChoEm(env: Env, bt: Hang, sbd: string, now: number, 
   const khoa = `${maBtvn}|${sbd}`
   const hanMs = Date.parse(chuoi(bt.han_nop))
   const baiP = docBaiNangDo(env, maBtvn, chuoi(bt.ma_de), true) // chốt bộ đầu: BẬT làm giàu nhãn (nguồn = tờ đề của bài)
-  const [bai, hs, dvAll, dcAll] = await Promise.all([baiP, baiP.then(b => b ? docHoSoRut(env, [sbd], b.cau, now) : null), docDauVaoNganSach(env, [sbd], now), docDieuChinhHieuLuc(env, [sbd], ngayVn(now))])
+  const [bai, hs, dvAll] = await Promise.all([baiP, baiP.then(b => b ? docHoSoRut(env, [sbd], b.cau, now) : null), docDauVaoNganSach(env, [sbd], now)])
   if (!bai || !hs) return null
   const dv = dvAll.get(sbd)!
 
-  const dc = dcAll.get(sbd)
   // NỘP TRỄ (Điều 4 = B, Boss chốt 21/09): em CHƯA TỪNG MỞ bài mà hạn đã qua VẪN phải làm — bộ CHỈ PHẦN LÕI (kể cả lõi đúng bậc), KHÔNG làm thêm/thử sức; chia chặng theo trần buổi (≤ 30 câu / 60 phút, ≤ 2 chặng/ngày;
   // hai chặng đầu mở NGAY, các chặng sau 00:00 những ngày kế) bằng `chiaChangNopTre` (Code 1). Dựng bộ như thường (hạn giả = mai) rồi tước phần làm thêm.
   const nopTre = Number.isFinite(hanMs) && now > hanMs
-  const dung = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) && !nopTre ? hanMs : now + MOT_NGAY_MS, dv, hs.get(sbd)!, dc?.dieuChinh)
+  const dung = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) && !nopTre ? hanMs : now + MOT_NGAY_MS, dv, hs.get(sbd)!)
   const { nganSach, goc, giay } = dung
   let bo = dung.bo
   const chotLuc = new Date(now).toISOString()
@@ -510,7 +510,7 @@ export async function chotBoChoEm(env: Env, bt: Hang, sbd: string, now: number, 
   const kq = await env.DB.batch([
     env.DB.prepare(
       `UPDATE btvn_em SET chot_luc = ?, so_cau_em = ?, so_chang = ?, tom_tat_json = ?, ngan_sach_json = ?, chang_mo_json = ? WHERE khoa = ? AND chot_luc IS NULL AND thu_hoi = 0`,
-    ).bind(chotLuc, hangBatBuoc.length, soChang, json(bo.tomTat), json({ ...nganSach, ...(nopTre ? { nopTre: true } : {}), ...(dc ? { dieuChinh: dc.dieuChinh, dieuChinhNgay: dc.ngay } : {}) }), xep?.json ?? null, khoa),
+    ).bind(chotLuc, hangBatBuoc.length, soChang, json(bo.tomTat), json({ ...nganSach, ...(nopTre ? { nopTre: true } : {}), }), xep?.json ?? null, khoa),
     env.DB.prepare(
       `INSERT OR IGNORE INTO btvn_em_cau (khoa, ma_btvn, sbd, qid, chang, nhan, thu_tu)
        SELECT ? || '|' || json_extract(j.value,'$.q'), ?, ?, json_extract(j.value,'$.q'), json_extract(j.value,'$.c'), json_extract(j.value,'$.n'), json_extract(j.value,'$.t')
@@ -835,12 +835,11 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
     if (n.ok) nop = { daNop: true, nopLuc: n.nopLuc, soDung: n.soDung, soCau: n.soCau, soCauCuaEm: n.soCauCuaEm, soCauThuongSai: n.soCauThuongSai, qidSai: n.qidSai }
   }
   // THÍCH NGHI sau chặng vừa XONG (bước G): `thichNghiChangSau` của lõi đổi/thêm câu ở chặng CHƯA MỞ theo kết quả chặng này (đúng ≥ 80 % ⇒ lên bậc, sai ≥ 50 % ⇒ thêm câu dễ);
-  // BẬT cho mọi em bài cá nhân hoá, tắt được bằng `cau_hinh.btvn_ca_nhan.thichNghi = false`. Nếu em còn điều chỉnh THẬT của Bộ não thì cùng đi qua cổng `dieuChinh` (Bộ não bóng/tắt ⇒ không có).
+  // BẬT cho mọi em bài cá nhân hoá, tắt được bằng `cau_hinh.btvn_ca_nhan.thichNghi = false`. (Bộ não A.I đã gỡ 28/09 ⇒ không còn cổng `dieuChinh`.)
   if (xong && !nop && loMoi < soChang && (await coBatThichNghi(env))) {
-    const dc = (await docDieuChinhHieuLuc(env, [sbd], ngayVn(now))).get(sbd)
     const dung: Record<string, boolean> = {}
     for (const c of daLam) dung[chuoi(c.qid)] = isAnswerCorrect(gop[chuoi(c.qid)], answerText(c.dap_an ?? c.dapAn), phanTuQid(chuoi(c.qid), phanCua(c)))
-    await thichNghiSauChang(env, bt, em, sbd, chiSo, loMoi, dung, dc, now)
+    await thichNghiSauChang(env, bt, em, sbd, chiSo, loMoi, dung, undefined, now)
   }
   // ĐIỀU 6 (mở sớm chặng, Boss chốt B): đúng ≥ 80 % chặng vừa xong ⇒ MỞ SỚM đúng 1 chặng kế trong ngày VN (SAU thích nghi, TRƯỚC khi lập lại kế hoạch để kế hoạch thấy chặng đã mở).
   let moSom: MoSomKq | null = null
@@ -1138,11 +1137,10 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
     if (!Number.isFinite(hanMs) || hanMs <= now) return { ok: false, error: 'Hạn nộp phải là thời điểm trong tương lai.' }
   }
   const dsXet = coTrongBai ? dsSbd.filter((s) => coTrongBai!.has(s)) : dsSbd
-  const [hoSo, dv, ten, dcAll] = await Promise.all([
+  const [hoSo, dv, ten] = await Promise.all([
     docHoSoRut(env, dsXet, bai.cau, now),
     docDauVaoNganSach(env, dsXet, now),
     moiEmDaCoTen(daChotCua) ? Promise.resolve(new Map<string, string>()) : docTenEm(env, dsXet),
-    docDieuChinhHieuLuc(env, dsXet, ngayVn(now)), // Bộ não THẬT: bộ tính thử theo cùng điều chỉnh như lúc chốt; chạy thử/tắt ⇒ rỗng
   ])
   const ds: Hang[] = []
   let chiTiet: Hang | undefined
@@ -1163,7 +1161,7 @@ export async function xemTruocBtvn(env: Env, b: Hang, now: number): Promise<Hang
         if (bo) chiTiet = { sbd, chang: bo.chang, thuSucThem: bo.thuSucThem, nhan: bo.nhan, ...lichCho(docLichDaLuu(da!.chang_mo_json, bo.chang.length, { chotLuc: chuoi(da!.chot_luc), hanNop: hanIso, nowMs: now }), bo.chang, chuoi(da!.chot_luc)) }
       }
     } else {
-      const { bo, nganSach, goc, giay, sc } = dungBoChoEm(bai, hatGiong, sbd, now, hanMs, dv.get(sbd)!, hs, dcAll.get(sbd)?.dieuChinh)
+      const { bo, nganSach, goc, giay, sc } = dungBoChoEm(bai, hatGiong, sbd, now, hanMs, dv.get(sbd)!, hs)
       ds.push({ sbd, hoTen: chuoi(da?.ho_ten) || ten.get(sbd) || '', daChot: false, coHoSo: hs.coHoSo, nganSach, tomTat: bo.tomTat })
       if (!scMin || sc.soCauToiDa < scMin.soCauToiDa) scMin = sc
       if (sbd === sbdChiTiet) {
@@ -1255,12 +1253,12 @@ export async function docChang1ChoEm(env: Env, bt: Hang, dsSbd: string[], now: n
   const bai = await docBaiNangDo(env, chuoi(bt.ma_btvn), chuoi(bt.ma_de), true) // ước lượng chặng 1: BẬT làm giàu nhãn (nguồn = tờ đề của bài)
   if (!bai) return ra
   const hanMs = Date.parse(chuoi(bt.han_nop))
-  const [hs, dv, dc] = await Promise.all([docHoSoRut(env, dsSbd, bai.cau, now), docDauVaoNganSach(env, dsSbd, now), docDieuChinhHieuLuc(env, dsSbd, ngayVn(now))])
+  const [hs, dv] = await Promise.all([docHoSoRut(env, dsSbd, bai.cau, now), docDauVaoNganSach(env, dsSbd, now)])
   for (const sbd of dsSbd) {
     const h = hs.get(sbd)
     const v = dv.get(sbd)
     if (!h || !v) continue
-    const { bo, giay } = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) ? hanMs : now + MOT_NGAY_MS, v, h, dc.get(sbd)?.dieuChinh)
+    const { bo, giay } = dungBoChoEm(bai, hatGiongCuaBai(bt), sbd, now, Number.isFinite(hanMs) ? hanMs : now + MOT_NGAY_MS, v, h)
     const n = bo.chang[0]?.length ?? 0
     if (n > 0) ra.set(sbd, { soCau: n, phut: Math.max(1, Math.round((n * giay) / 60)) })
   }

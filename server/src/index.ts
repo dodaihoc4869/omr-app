@@ -35,7 +35,6 @@ import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
-import {docThanThuSoThat,hsThuThachHomNay,hsThuThachNop} from './thu-thach-rieng'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
 import {parentNews,refreshDailyNews} from './parent-news'
@@ -69,9 +68,6 @@ import {tinhBoSungTheoDoi} from './btvn-theo-doi-nhom'
 import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
 import { capNhatSaiNhanhNeuCu } from './sai-nhanh-gv'
-import * as AI from './bo-nao'
-import {themTenDangDemQua,themTenDangNhatKy} from './ten-dang-bo-nao'
-import {docLoiNhanHlv} from './bo-nao-doc'
 import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
 import { gvChienDich } from './srs2-gv'
@@ -94,25 +90,24 @@ const CORS = {
   'access-control-max-age': '86400',
 }
 const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS }
+/** Bộ não A.I đã gỡ (thầy lệnh 28/09/2026): lời trả cho mọi lệnh cũ của chức năng này. */
+const DA_GO_BO_NAO = 'Chức năng đã gỡ'
 
 async function dungKeHoachEm(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
   const kh = await hsKeHoachNgayCoExp(env, b)
   if (kh.ok === true && typeof kh.sbd === 'string') {
     const sbd = kh.sbd
     // HẠ TẢI D1 (Boss 21/09): bốn khối phụ ĐỘC LẬP chạy SONG SONG (trước đây tuần tự); khoá gán đúng thứ tự cũ để phản hồi y hệt.
-    const [doanMo, vd, loiHlv, canhBao] = await Promise.all([
+    const [doanMo, vd, canhBao] = await Promise.all([
       // `doanMo` (boolean, chỉ khi ok:true): em này được mở game Đoàn Hộ Tống chưa (cùng nguồn cau_hinh.doan_ho_tong với các lệnh doan-*) — Bảng nhiệm vụ chỉ hiện thẻ khi === true.
       doanMoCho(env, sbd),
       // DỒN VỀ ĐÍCH (thầy chốt 21/09 14:13; ve-dich-d1.ts, đọc-chỉ): `no` + `veDich`. Chỉ-thêm; lỗi ⇒ vắng khoá (màn ẩn thẻ).
       docVeDichCuaEm(env, sbd).then((v) => v, (e) => { console.error('[ve-dich] không dựng được (bỏ khối):', e instanceof Error ? e.message : e); return null }),
-      // BỘ NÃO A.I chế độ THẬT: lời nhắn cho ĐÚNG em này (chỉ lời cho em, không lời phụ huynh). Chạy thử/tắt/không có lời ⇒ KHÔNG có khoá `loiNhanHlv`.
-      docLoiNhanHlv(env, sbd, typeof kh.ngay === 'string' ? kh.ngay : ngayVn(Date.now())),
       // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): ≤ 3, bài chưa nộp, gửi trong 48 giờ. Không có ⇒ KHÔNG có khoá `canhBaoThay`.
       canhBaoChoEm(env, sbd),
     ])
     kh.doanMo = doanMo
     if (vd) { kh.no = vd.no; kh.veDich = vd.veDich }
-    if (loiHlv) kh.loiNhanHlv = loiHlv
     if (canhBao.length > 0) kh.canhBaoThay = canhBao
   }
   return kh
@@ -3271,8 +3266,9 @@ const boXuLy = {
       if (p === '/hs/canh-bao/xem') return ra(await emXemCanhBao(env, await gameIdentity(env, b), String(b.id ?? '')))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
-      if (p === '/hs/thu-thach-hom-nay') return ra(await hsThuThachHomNay(env, b))
-      if (p === '/hs/thu-thach-hom-nay/nop') { const r = await sauGhi(env, b, hsThuThachNop(env, b, Date.now(), ctx)); return ra(r, trangThaiNop(r)) }
+      // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.
+      if (p === '/hs/thu-thach-hom-nay') return ra({ ok: true, co: false })
+      if (p === '/hs/thu-thach-hom-nay/nop') return ra({ ok: false, error: DA_GO_BO_NAO })
       if (p === '/hs/thoi-gian-hoc') return ra(await sauGhi(env, b, hsThoiGianHoc(env, b)))
       // `await` là bắt buộc: trả thẳng promise thì lỗi (vd. token sai) lọt khỏi `catch` bên dưới.
       if (p === '/hs/ca-dang-mo') return themMocReset(env, await hsCaDangMo(env, b))
@@ -3419,14 +3415,8 @@ const boXuLy = {
       }
       if (p === '/btvn/sua') return suaBtvn(env,b)
       if (p === '/btvn/cho-lam-lai') return ra(await ND.choLamLaiCaNhan(env, b, Date.now()))
-      // BỘ NÃO A.I (Code 1, `bo-nao.ts`; hợp đồng docs/hop-dong-bo-nao-2109.md): MỌI lệnh /ai/* là lệnh THẦY — nằm SAU cổng `laThay`; các hàm tự trả {ok,…}, không tự kiểm mã.
-      if (p === '/ai/cau-hinh') return ra(await AI.boNaoCauHinh(env, b))
-      if (p === '/ai/ho-so-ngay') return ra(await AI.boNaoHoSoNgay(env, b, Date.now(), { thanThu: (ds) => docThanThuSoThat(env, ds) })) // + SỐ THẬT thần thú trong thẻ (Nấc 1)
-      if (p === '/ai/dieu-chinh/nop') return ra(await AI.boNaoNop(env, b))
-      // TÊN DẠNG cạnh mã dạng (chuẩn từ ngữ luật 4: mã nội bộ không hiện cho thầy) — lớp mỏng `ten-dang-bo-nao.ts`, không sửa lõi Bộ não.
-      if (p === '/ai/dem-qua') return ra(await themTenDangDemQua(env, await AI.boNaoDemQua(env, b)))
-      if (p === '/ai/nhat-ky') return ra(await themTenDangNhatKy(env, await AI.boNaoNhatKy(env, b)))
-      if (p === '/ai/dieu-chinh/bo') return ra(await AI.boNaoBoDieuChinh(env, b))
+      // BỘ NÃO A.I ĐÃ GỠ (thầy lệnh 28/09/2026): mọi lệnh /ai/* (cấu hình, hồ sơ ngày, nộp điều chỉnh, bản tin, nhật ký, bỏ điều chỉnh) trả lời đã gỡ; KHÔNG ghi bảng nào.
+      if (p.startsWith('/ai/')) return ra({ ok: false, error: DA_GO_BO_NAO })
       if (p === '/btvn/giao') return giaoBtvn(env, b)
       if (p === '/btvn/xem-truoc') return ra(await ND.xemTruocBtvn(env, b, Date.now()))
       if (p === '/btvn/bai-lam') return xemBaiBtvn(env,b)

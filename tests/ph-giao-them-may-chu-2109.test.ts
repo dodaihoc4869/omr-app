@@ -129,8 +129,8 @@ describe('lượt giao thành công', () => {
     const r = await chay(d, pass, '19:00') as any
     const tin = d.sql.prepare("SELECT * FROM student_notice WHERE sbd = 'S1'").all() as Record<string, string>[]
     expect(tin).toHaveLength(1)
-    expect(tin[0]).toMatchObject({ id: `mom:S1:giao_them_${NGAY}_1`, title: 'A.I Đỗ Đại Học · Bài gia đình giao', target: 'mom' })
-    expect(tin[0]!.body).toBe(`Gia đình vừa giao cho em ${r.daGiao.soCau} câu, khoảng ${r.daGiao.phutUocTinh} phút. A.I Đỗ Đại Học đã chọn các câu hợp với em hôm nay.`)
+    expect(tin[0]).toMatchObject({ id: `mom:S1:giao_them_${NGAY}_1`, title: 'Thầy Đỗ Đại Học · Bài gia đình giao', target: 'mom' })
+    expect(tin[0]!.body).toBe(`Gia đình vừa giao cho em ${r.daGiao.soCau} câu, khoảng ${r.daGiao.phutUocTinh} phút. Thầy Đỗ Đại Học đã chọn các câu hợp với em hôm nay.`)
     expect(chuGameTrong(tin[0]!.body)).toEqual([])
     const { syncNotices } = await import('../server/src/notifications')
     await syncNotices(d.env, 'S1')
@@ -143,7 +143,7 @@ describe('lượt giao thành công', () => {
     const dong = async () => ((await gvBangTin(d.env, {}, H('19:30'))).mayDaLam as { loai: string; so: number; chu: string }[]).find((x) => x.loai === 'giao_them')
     expect(await dong()).toBeUndefined()
     await chay(d, pass, '19:00')
-    expect(await dong()).toEqual({ loai: 'giao_them', so: 1, chu: 'A.I Đỗ Đại Học soạn 1 gói bài gia đình giao hôm nay' })
+    expect(await dong()).toEqual({ loai: 'giao_them', so: 1, chu: 'App soạn 1 gói bài gia đình giao hôm nay' })
     expect(((await gvBangTin(d.env, {}, H('19:30'))).soTruyVan as number)).toBeLessThanOrEqual(12)
   })
 })
