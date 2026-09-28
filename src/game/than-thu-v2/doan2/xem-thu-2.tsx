@@ -56,7 +56,7 @@ const call = async (lenh: string) => {
   if (lenh === 'recommendations') return { ok: true, suggestions: [] }
   if (lenh === 'doan-xem' && xem) return { ok: true, doan: daNop ?? xem }
   if (lenh === 'doan-nop' && xem) { daNop = { ...xem, revision: 6, tran: tran({ hiep: 4, moSauMs: 15 * 60_000, choTiep: true, quai: [{ ma: 6, loai: 'bun_acid', hp: 24 }] } as never), cau: undefined, hiepVuaXong: { ...vuaXong, hiep: 3 } as never }; return { ok: true, doan: daNop, ketQuaCau: { correct: true, answer: 'B', solution: loiGiai } } }
-  if (lenh === 'doan-the-goi-y') return { ok: true, goiY: { den: 2, ten: 'Nam', pet: 3, cap: 12, tenDang: 'Thuỷ phân ester', de: deI.text, the: [{ loai: 'nhac_cong_thuc', tieuDe: 'Nhắc công thức', moTa: 'Gửi bạn kiến thức gốc của câu' }, { loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án', moTa: 'A.I Đỗ Đại Học gạch một đáp án sai' }] } }
+  if (lenh === 'doan-the-goi-y') return { ok: true, goiY: { den: 2, ten: 'Nam', pet: 3, cap: 12, tenDang: 'Thuỷ phân ester', de: deI.text, the: [{ loai: 'nhac_cong_thuc', tieuDe: 'Nhắc công thức', moTa: 'Gửi bạn kiến thức gốc của câu' }, { loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án', moTa: 'Thầy Đỗ Đại Học gạch một đáp án sai' }] } }
   return { ok: true }
 }
 

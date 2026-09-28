@@ -105,7 +105,7 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
             )}
             {coDiem && p.cau && p.cau.some((c) => c.kq === 'sai' || c.kq === 'trong') && (
               <section className="kq-the" aria-labelledby="kq-h-ai">
-                <h3 id="kq-h-ai">A.I Đỗ Đại Học đã lo cho em</h3>
+                <h3 id="kq-h-ai">Thầy Đỗ Đại Học đã lo cho em</h3>
                 <div className="kq-ai">
                   <div>
                     <i />

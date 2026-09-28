@@ -373,77 +373,18 @@ describe('useTatCaVeCon — nhịp 180 giây ± 30 giây, giữ bản cũ khi l�
   })
 })
 
-describe('ParentPortalScreen thật — màn chính → bảng → về; MỘT nút', () => {
-  const dung = () => {
-    const goi: string[] = []
-    vi.stubGlobal('fetch', vi.fn(async (url: string, o?: any) => {
-      const u = String(url).replace('https://may.test', '')
-      goi.push(`${u} ${o?.body ?? ''}`)
-      const js = (t: unknown) => ({ ok: true, status: 200, json: async () => t, text: async () => JSON.stringify(t) })
-      if (u === '/ph/tat-ca-ve-con') return js(PH_OK)
-      if (u === '/ph/chi-tiet-cau-ve-con') return js(CHI_TIET)
-      if (u === '/ph/giao-them') return js({ ok: true, conLaiHomNay: 2 })
-      return js({ ok: true, items: [], winners: [] })
-    }))
-    return goi
-  }
-  beforeEach(() => {
-    window.history.replaceState(null, '', '/?vai=phuhuynh')
-    localStorage.setItem('omr_ph_sbd', '12121212')
-  })
-
-  it('vào bằng SBD trần: màn chính có dữ liệu; đúng MỘT nút chính; bấm thẻ "Xem mọi thứ về con" ⇒ bảng (gói lười) ⇒ ← về màn chính ⇒ bấm lại được; không gọi lệnh của luồng cũ', async () => {
-    const goi = dung()
-    const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="hom-nay"]')).toBeTruthy())
-    expect(container.querySelectorAll('[data-vung="giao-them"]')).toHaveLength(1)
-    expect(container.querySelector('.phm-ap-dau__con')!.textContent).toBe('Nguyễn Minh Khôi · Lớp 12 - Tinh Hoa')
-    expect(container.textContent).toContain('Thầy nhắc con nộp bài trước 12:00.') // dải cảnh báo
-    fireEvent.click(container.querySelector('[data-vung="xem-tat-ca"]')!)
-    await screen.findByRole('heading', { name: 'Mọi thứ về con' })
-    expect(container.querySelector('[data-vung="bang-moi-thu"]')).toBeTruthy()
-    expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Quay lại màn Hôm nay' }))
-    await waitFor(() => expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeTruthy())
-    fireEvent.click(container.querySelector('[data-vung="xem-tat-ca"]')!)
-    await screen.findByRole('heading', { name: 'Mọi thứ về con' })
-    expect(goi.filter((g) => /parent-news|mom\/|hs\/lich-su|hs\/ke-hoach|hs\/btvn|hs\/cau-sai/.test(g))).toEqual([])
-    expect(goi.filter((g) => g.startsWith('/ph/tat-ca-ve-con'))[0]).toBe('/ph/tat-ca-ve-con {"sbd":"12121212"}')
-  }, 30000)
-
-  it('bấm "Giao thêm bài cho con" ⇒ /ph/giao-them; "Đổi số báo danh" ⇒ về đăng nhập, xoá SBD nhớ', async () => {
-    const goi = dung()
-    const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="luot-giao"]')).toBeTruthy())
-    fireEvent.click(screen.getByRole('button', { name: 'Giao thêm bài cho con' }))
-    await waitFor(() => expect(goi.filter((g) => g.startsWith('/ph/giao-them')).length).toBeGreaterThanOrEqual(2))
-    fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
-    expect(screen.getByRole('menu').textContent).toContain('Đang xem: số báo danh 12121212 của con')
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Đổi số báo danh' }))
-    await screen.findByRole('button', { name: 'Vào xem kết quả của con' })
-    expect(localStorage.getItem('omr_ph_sbd')).toBeNull()
-  }, 30000)
-
-  it('máy chủ lỗi ("Không tìm thấy số báo danh của con.") ⇒ màn chính báo lời thật + Thử lại; nút giao vẫn còn', async () => {
-    vi.stubGlobal('fetch', vi.fn(async (url: string) => (String(url).endsWith('/ph/tat-ca-ve-con') ? { ok: false, status: 500, json: async () => ({ ok: false, error: 'Không tìm thấy số báo danh của con.' }), text: async () => '' } : { ok: true, status: 200, json: async () => ({ ok: true, items: [] }), text: async () => '{}' })))
-    const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="loi-tai"]')).toBeTruthy())
-    expect(container.querySelector('[data-vung="loi-tai"]')!.textContent).toContain('Không tìm thấy số báo danh của con.')
-    expect(screen.getByRole('button', { name: 'Thử lại' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Giao thêm bài cho con' })).toBeTruthy()
-  }, 30000)
-})
+// ĐÃ GỠ 28/09: describe "ParentPortalScreen thật — màn chính → bảng → về; MỘT nút" (3 test). Thầy lệnh 28/09 trùng tu app phụ huynh (chỉ xem, không giao bài):
+// cổng /ph nay mở components/ph-v3/AppPhuHuynh (Hôm nay · Điểm số · Tiến bộ · Lời thầy) — luồng thật khoá ở tests/ph-v3-app-2809.test.tsx. ManChinh/BangMoiThu vẫn khoá ở trên (mã còn trong kho).
 
 describe('khoá nguồn', () => {
-  it('bảng là GÓI TẢI LƯỜI: ParentPortalScreen dùng lazy(() => import(...BangMoiThu)) và KHÔNG import tĩnh BangMoiThu / ChemText; ManChinh không kéo ChemText', () => {
-    const p = doc('src/screens/ParentPortalScreen.tsx')
-    expect(p).toContain("lazy(() => import('../components/ph-moi/BangMoiThu'))")
-    expect(p).not.toMatch(/import\s+BangMoiThu\s+from/)
-    expect(p).not.toContain('chem-format')
-    expect(doc('src/components/ph-moi/ManChinh.tsx')).not.toContain('chem-format')
+  it('gói tải lười: ManChinh / thanh đáy không kéo ChemText; ChemText chỉ ở gói bảng (TungCau); app phụ huynh mới mở màn chi tiết ca (có ChemText) bằng lazy', () => {
     expect(doc('src/components/ph-moi/BangMoiThu.tsx')).toContain("export { default } from './bang/VoBang'") // tệp cửa vào chỉ xuất lại
-    expect(doc('src/components/ph-moi/bang/TungCau.tsx')).toContain("import { ChemText } from '../../../lib/chem-format'") // ChemText chỉ vào gói bảng (TungCau), không vào màn chính
+    expect(doc('src/components/ph-moi/bang/TungCau.tsx')).toContain("import { ChemText } from '../../../lib/chem-format'")
     for (const f of ['ManChinh.tsx', 'ThanhDayAp.tsx', 'BieuTuongAp.tsx']) expect(doc(`src/components/ph-moi/${f}`), f).not.toContain('chem-format')
+    expect(doc('src/screens/ParentPortalScreen.tsx')).not.toContain('chem-format')
+    const app = doc('src/components/ph-v3/AppPhuHuynh.tsx')
+    expect(app).toContain("lazy(() => import('./ManChiTietCa'))")
+    expect(app).not.toMatch(/import\s+ManChiTietCa\s+from/)
   })
   it('phông Inter CHỈ cho app phụ huynh: @font-face trong ph-apple.css (swap, latin + vietnamese, tổng ≤ 150 KB), CSS ấy chỉ được nhập bởi màn chính; Inter đứng TRƯỚC system-ui; không precache; kèm giấy phép OFL', () => {
     const css = doc('src/components/ph-moi/ph-apple.css')

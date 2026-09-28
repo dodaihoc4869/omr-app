@@ -308,6 +308,17 @@ function themLanLam(cu: readonly string[], moi: readonly string[]): string[] {
 }
 
 /**
+ * CHỈ ĐỌC (app phụ huynh mới 28/09): kế hoạch hôm nay ĐÃ CHỐT của em, kèm câu còn lại. Chưa chốt (em chưa mở app hôm nay) ⇒ null.
+ * KHÔNG lập, KHÔNG ghi — phụ huynh mở app không được chốt kế hoạch thay con (khác `layKeHoachHomNay`). Lỗi đọc ⇒ null.
+ */
+export async function docKeHoachDaChot(env: Env, sbd: string, nowMs: number): Promise<KeHoachDaChot | null> {
+  const ngay = ngayVnCua(nowMs)
+  const cu = await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
+  if (!cu) return null
+  return tuDong(cu, ngay, await docDemHomNay(env, sbd, ngay))
+}
+
+/**
  * Kế hoạch HÔM NAY của em: lần mở đầu tiên trong ngày thì lập và CHỐT (bảng `srs2_ke_hoach`), các lần sau đọc lại —
  * Thể lực là con số thật, không nhảy. Ngoại lệ luật B.7: ngày cuối trước hạn, làm hết kế hoạch mà trần ngày còn chỗ và
  * có câu đến lịch lại trong ngày (câu vừa sai) thì BỔ SUNG, không vượt trần.

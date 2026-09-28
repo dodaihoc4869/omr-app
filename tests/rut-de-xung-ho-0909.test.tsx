@@ -60,14 +60,14 @@ describe('khối RÚT ĐỀ xưng hô theo đúng người đang đọc', () => 
   it('BÁO CÁO CỦA EM: nút và chú thích xưng "em", không còn chữ "con"', () => {
     render(<PhieuScreen duCoSan={goiPhieu()} laCuaEm />)
     expect(screen.getByText(/Xem đề em vừa làm \(1 câu\) kèm lời giải/)).toBeTruthy()
-    expect(screen.getByText(/A.I Đỗ Đại Học đã gán riêng cho/).textContent).toContain('cho em')
+    expect(screen.getByText(/Thầy Đỗ Đại Học đã gán riêng cho/).textContent).toContain('cho em')
     expect(screen.queryByText(/Xem đề con vừa làm/)).toBeNull()
   })
 
   it('BÁO CÁO GỬI PHỤ HUYNH: giữ nguyên xưng "con" — không được chữa hỏng vế kia', () => {
     render(<PhieuScreen duCoSan={goiPhieu()} />)
     expect(screen.getByText(/Xem đề con vừa làm \(1 câu\) kèm lời giải/)).toBeTruthy()
-    expect(screen.getByText(/A.I Đỗ Đại Học đã gán riêng cho/).textContent).toContain('cho con')
+    expect(screen.getByText(/Thầy Đỗ Đại Học đã gán riêng cho/).textContent).toContain('cho con')
     expect(screen.queryByText(/Xem đề em vừa làm/)).toBeNull()
   })
 

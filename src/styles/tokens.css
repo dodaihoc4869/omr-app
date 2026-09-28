@@ -531,3 +531,88 @@
   --gvm-bong: 0 1px 2px rgb(0 0 0 / 0.3);
   --gvm-bong-nut: 0 1px 2px rgb(0 0 0 / 0.3);
 }
+
+/* APP PHỤ HUYNH MỚI 28/09 (thầy: "chỉ xem báo cáo mọi thứ về con", màu theo bảng app giáo viên; bản vẽ https://claude.ai/artifact/2HShm51xEiuVKcTAUpfeFT).
+ * Bảng = --gvm-* của app giáo viên (năm màu theo nghĩa: xanh dương, xanh lá, hổ phách, hồng, tím) + khối "anh hùng" xanh hải quân đậm làm điểm nhấn mỗi màn.
+ * Sáng mặc định; tối theo máy (prefers-color-scheme). Nơi dùng DUY NHẤT: src/components/ph-v3/ph-v3.css. */
+:root {
+  --ph3-nen: #f6f7fc;
+  --ph3-mat: #ffffff;
+  --ph3-mat-2: #eef1fa;
+  --ph3-vien: #dde2f0;
+  --ph3-chu: #1a1c24;
+  --ph3-chu-2: #454a5c;
+  --ph3-chu-3: #5f6579;
+  --ph3-xd: #1f5fd6;
+  --ph3-xd-nen: #dbe6ff;
+  --ph3-xd-dam: #0b2f75;
+  --ph3-xl: #0f8a5f;
+  --ph3-xl-nen: #c9f2de;
+  --ph3-xl-dam: #04402a;
+  --ph3-tren-xl: #ffffff;
+  --ph3-hp: #b86a00;
+  --ph3-hp-nen: #ffe2b3;
+  --ph3-hp-dam: #4d2c00;
+  --ph3-hp-nhat: #fff4e0;
+  --ph3-hp-vach: #f3c98a;
+  --ph3-ho: #c42a5c;
+  --ph3-ho-nen: #ffd9e3;
+  --ph3-ho-dam: #5c0a27;
+  --ph3-tim: #6a4fd8;
+  --ph3-tim-nen: #e7defe;
+  --ph3-tim-dam: #2a1872;
+  --ph3-tim-nhat: #b9aaf0;
+  /* khối anh hùng (nền xanh hải quân) + ba màu vòng trên nền ấy */
+  --ph3-ah-nen: #0b2f75;
+  --ph3-ah-tron-1: #123b8c;
+  --ph3-ah-tron-2: #0e3480;
+  --ph3-ah-o: #1d4299;
+  --ph3-ah-vach: #2a4f9f;
+  --ph3-ah-chu: #ffffff;
+  --ph3-ah-chu-2: #c7d6ff;
+  --ph3-ah-truc: #9fb4e6;
+  --ph3-vong-hp: #ffc164;
+  --ph3-vong-xl: #6fdcab;
+  --ph3-vong-tim: #c3b3ff;
+  --ph3-vong-xd: #9cbcff;
+  --ph3-vong-ho: #ff8fb0;
+  --ph3-bong: 0 1px 2px rgb(30 40 80 / 0.06), 0 4px 14px rgb(30 40 80 / 0.06);
+  --ph3-bong-menu: 0 12px 40px -8px rgb(30 40 80 / 0.28), 0 2px 8px rgb(30 40 80 / 0.1);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ph3-nen: #10131c;
+    --ph3-mat: #181c27;
+    --ph3-mat-2: #1f2433;
+    --ph3-vien: #2c3245;
+    --ph3-chu: #e8eaf3;
+    --ph3-chu-2: #b9bed1;
+    --ph3-chu-3: #8c92a8;
+    --ph3-xd: #9cbcff;
+    --ph3-xd-nen: #1d3363;
+    --ph3-xd-dam: #dbe6ff;
+    --ph3-xl: #6fdcab;
+    --ph3-xl-nen: #0f3d2b;
+    --ph3-xl-dam: #c9f2de;
+    --ph3-tren-xl: #04402a;
+    --ph3-hp: #ffc164;
+    --ph3-hp-nen: #43290a;
+    --ph3-hp-dam: #ffe2b3;
+    --ph3-hp-nhat: #2a1d0a;
+    --ph3-hp-vach: #6b4a1a;
+    --ph3-ho: #ff8fb0;
+    --ph3-ho-nen: #4d1428;
+    --ph3-ho-dam: #ffd9e3;
+    --ph3-tim: #c3b3ff;
+    --ph3-tim-nen: #2d2352;
+    --ph3-tim-dam: #e7defe;
+    --ph3-tim-nhat: #5a4a99;
+    --ph3-ah-nen: #172a5c;
+    --ph3-ah-tron-1: #1d3570;
+    --ph3-ah-tron-2: #14254f;
+    --ph3-ah-o: #22407f;
+    --ph3-ah-vach: #2f4d8f;
+    --ph3-bong: 0 1px 2px rgb(0 0 0 / 0.3);
+    --ph3-bong-menu: 0 12px 40px -8px rgb(0 0 0 / 0.6), 0 2px 8px rgb(0 0 0 / 0.4);
+  }
+}
