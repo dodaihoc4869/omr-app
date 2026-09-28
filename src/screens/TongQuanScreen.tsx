@@ -154,7 +154,7 @@ export default function TongQuanScreen() {
           <button type="button" className="gv2-nut-vien gv2-nut-icon" onClick={() => void tai()} disabled={dangTai} aria-label="Tải lại số liệu" title="Tải lại số liệu">
             <RefreshCw size={18} aria-hidden="true" className={dangTai ? 'animate-spin' : ''} />
           </button>
-          <button type="button" className="gv2-nut-vien" onClick={() => setScreen('chiendich')}>
+          <button type="button" className="gv2-nut-chinh" onClick={() => setScreen('chiendich')}>
             <Flag size={18} aria-hidden="true" />
             Giao chiến dịch
           </button>
@@ -385,7 +385,7 @@ function VongNhip({ tre, tong }: { tre: number; tong: number }) {
   )
 }
 
-/** Thanh tiến độ một dải xanh + vạch đen = mức lớp cần đạt hôm nay; số in cạnh (không chỉ màu). */
+/** Thanh tiến độ dải xanh lục + vạch cam (hổ phách) = mức lớp cần đạt hôm nay; số in cạnh (không chỉ màu). */
 export function ThanhTienDo({ tiLe, vach }: { tiLe: number; vach: number }) {
   const pt = phanTramSo(tiLe)
   const can = phanTramSo(vach)

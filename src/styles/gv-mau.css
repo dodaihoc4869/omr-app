@@ -557,6 +557,9 @@
 .gvm-nhip b {
   font-size: 18px;
 }
+.gvm-nhip > span {
+  white-space: nowrap;
+}
 .gvm-dang {
   display: flex;
   flex-direction: column;
