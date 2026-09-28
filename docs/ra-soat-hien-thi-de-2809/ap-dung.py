@@ -18,6 +18,7 @@ D = os.path.dirname(os.path.abspath(__file__))
 sp = util.spec_from_file_location('g', sys.argv[1]); g = util.module_from_spec(sp); sp.loader.exec_module(g)
 lenh = sys.argv[2]
 THAT = '--that' in sys.argv
+GIOI_HAN = int(sys.argv[sys.argv.index('--gioi-han') + 1]) if '--gioi-han' in sys.argv else 10**9
 SUA = json.load(open(f'{D}/sua-tung-cau.json'))
 SAO_LUU = f'{D}/sao-luu-truoc-sua.json'
 NHAT_KY = f'{D}/nhat-ky-ap-dung.md'
@@ -115,6 +116,8 @@ elif lenh in ('ap', 'lui'):
         ghi_nk('# Nhật ký áp dụng sửa trình bày kho đề (28/09)\n\n| giờ | lô | tờ | số câu | qid | kết quả |\n|---|---|---|---|---|---|')
     tong = {'cau': 0, 'truong': 0, 'bo_qua': 0}
     for so_lo, (maDe, muc) in enumerate(nhom_lo(SUA), 1):
+        if so_lo > GIOI_HAN:
+            break
         goi = lay(maDe)
         doi = 0
         for x in muc:
