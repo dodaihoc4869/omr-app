@@ -267,7 +267,7 @@ export default function LichSuCaScreen() {
 
       {tkThang && (
         <section className="gv2-kpi gv2-kpi--3" aria-label="Số liệu tháng này">
-          <div className="gv2-the gv2-the-so">
+          <div className="gv2-the gv2-the-so" data-mau="xd">
             <div className="gv2-nhan">Ca trong tháng {tkThang.thang}</div>
             <div className="gv2-so-dong">
               <span className="gv2-so gv2-so-kpi">{tkThang.soCa}</span> <span className="gv2-don-vi">ca</span>
@@ -276,7 +276,7 @@ export default function LichSuCaScreen() {
               <span className="gv2-so">{demMoHoa2}</span> ca đang mở
             </div>
           </div>
-          <div className="gv2-the gv2-the-so">
+          <div className="gv2-the gv2-the-so" data-mau="xl">
             <div className="gv2-nhan">Bài đã nộp tháng {tkThang.thang}</div>
             <div className="gv2-so-dong">
               <span className="gv2-so gv2-so-kpi">{soVi(tkThang.daNop)}</span> <span className="gv2-don-vi">bài</span>
@@ -285,7 +285,7 @@ export default function LichSuCaScreen() {
               trên <span className="gv2-so">{soVi(tkThang.daVao)}</span> lượt vào{tkThang.daVao > 0 ? ` · tỉ lệ nộp ${Math.round((tkThang.daNop / tkThang.daVao) * 100)}%` : ''}
             </div>
           </div>
-          <div className="gv2-the gv2-the-so">
+          <div className="gv2-the gv2-the-so" data-mau="hp">
             <div className="gv2-nhan">Rời màn trong tháng {tkThang.thang}</div>
             <div className="gv2-so-dong">
               <span className="gv2-so gv2-so-kpi">{soVi(tkThang.roiMan)}</span> <span className="gv2-don-vi">lần</span>

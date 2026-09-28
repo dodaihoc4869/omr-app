@@ -65,6 +65,7 @@ const ChienDichScreen = lazy(() => import('./screens/ChienDichScreen'))
 const ParentPortalScreen = lazy(() => import('./screens/ParentPortalScreen'))
 import KhoaAppScreen from './screens/KhoaAppScreen'
 import ChanLoi from './components/ChanLoi'
+import './styles/gv-mau.css' // BẢN MÀU app thầy (thầy chốt 28/09) — nạp sau cùng, chỉ tác dụng dưới .vo-thay
 
 // APP GIÁO VIÊN. Màn đăng ký, hồ sơ, lịch sử, bài tập và nhắn tin PHÍA HỌC SINH
 // và PHÍA PHỤ HUYNH đã gỡ khỏi repo này — hai app đó tách sang repo riêng

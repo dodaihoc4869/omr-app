@@ -3,7 +3,7 @@
 // bài nộp 14 ngày. CHỈ dùng API sẵn có: `danhSachCa` + `/gv/chien-dich` danh-sach + bang. Không đổi máy chủ.
 // Phép tính thuần ở `src/lib/tong-quan-gv.ts` (có test). Ghi số đếm cạnh mục thanh bên vào `useSoDemGv`.
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { AlertTriangle, ChevronRight, Clock, Flag, MonitorCheck, RefreshCw } from 'lucide-react'
+import { AlertTriangle, BookOpen, ChevronRight, Clock, Flag, MonitorCheck, RefreshCw, Star, Users, type LucideIcon } from 'lucide-react'
 import { danhSachCa, type CaTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
@@ -177,16 +177,18 @@ export default function TongQuanScreen() {
           )}
 
           <section className="gv2-kpi" aria-label="Số liệu chính">
-            <TheSo nhan="Em được giao chiến dịch" so={soVi(kpi.emDuocGiao)} donVi={tongEm > 0 ? `/ ${soVi(tongEm)} em` : 'em'} phu={`trong ${kpi.soChay} chiến dịch đang chạy`} />
+            <TheSo mau="xd" icon={Users} nhan="Em được giao chiến dịch" so={soVi(kpi.emDuocGiao)} donVi={tongEm > 0 ? `/ ${soVi(tongEm)} em` : 'em'} phu={`trong ${kpi.soChay} chiến dịch đang chạy`} />
             <TheSo
+              mau="xl"
+              icon={Star}
               nhan="Thành thạo trung bình"
               so={kpi.thanhThaoTb === null ? '—' : String(phanTramSo(kpi.thanhThaoTb))}
               donVi="% câu"
               phu={kpi.mucCanTb === null ? 'chưa có chiến dịch đang chạy' : `mức cần hôm nay ${phanTramSo(kpi.mucCanTb)}%`}
               tone={kpi.thanhThaoTb !== null && kpi.mucCanTb !== null ? (kpi.thanhThaoTb + 1e-9 < kpi.mucCanTb ? 'do' : 'la') : undefined}
             />
-            <TheSo nhan="Em trễ nhịp từ 2 ngày" so={soVi(kpi.treNhip)} donVi="em" phu={`trên ${soVi(kpi.emDuocGiao)} em được giao`} tone={kpi.treNhip > 0 ? 'do' : undefined} />
-            <TheSo nhan="Câu cần thầy dạy lại" so={soVi(kpi.canDayLaiCau)} donVi="câu" phu={`${soVi(kpi.canDayLaiLuot)} lượt em cần chữa`} />
+            <TheSo mau="hp" icon={Clock} nhan="Em trễ nhịp từ 2 ngày" so={soVi(kpi.treNhip)} donVi="em" phu={`trên ${soVi(kpi.emDuocGiao)} em được giao`} tone={kpi.treNhip > 0 ? 'do' : undefined} />
+            <TheSo mau="ho" icon={BookOpen} nhan="Câu cần thầy dạy lại" so={soVi(kpi.canDayLaiCau)} donVi="câu" phu={`${soVi(kpi.canDayLaiLuot)} lượt em cần chữa`} />
           </section>
 
           <div className="gv2-luoi">
@@ -203,62 +205,49 @@ export default function TongQuanScreen() {
                 {dong.length === 0 ? (
                   <p className="gv2-nhat">{du.loiCd ? 'Chưa đọc được danh sách chiến dịch.' : 'Chưa có chiến dịch nào đang chạy. Giao chiến dịch ở mục Chiến dịch luyện.'}</p>
                 ) : (
-                  <div className="gv2-cuon">
-                    <table className="gv2-bang">
-                      <thead>
-                        <tr>
-                          <th scope="col">Chiến dịch · lớp</th>
-                          <th scope="col">Thành thạo · vạch = mức cần hôm nay</th>
-                          <th scope="col">Chậm nhịp</th>
-                          <th scope="col">Dạng yếu nhất của lớp</th>
-                          <th scope="col">Hạn nộp</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {dong.slice(0, SO_CHIEN_DICH_HIEN).map((d) => (
-                          <tr key={d.cd.id}>
-                            <td>
-                              <button type="button" className="gv2-ten-nut" onClick={() => moBang(d.cd.id)} title="Mở bảng chiến dịch ở Chữa trên lớp">
-                                {d.cd.ten}
-                              </button>
-                              <div className="gv2-phu">
-                                {d.cd.lop || 'Nhiều lớp'} · <span className="gv2-so">{d.soEm}</span> em
-                              </div>
-                              <span className="gv2-chip" data-tone={d.nhip === 'dung' ? 'la' : d.nhip === 'cham' ? 'do' : 'vang'}>
-                                {CHU_NHIP[d.nhip]}
+                  <ul className="gvm-cd-ds">
+                    {dong.slice(0, SO_CHIEN_DICH_HIEN).map((d) => (
+                      <li key={d.cd.id} className="gvm-cd">
+                        <div className="gvm-cd-ten">
+                          <button type="button" className="gv2-ten-nut" onClick={() => moBang(d.cd.id)} title="Mở bảng chiến dịch ở Chữa trên lớp">
+                            {d.cd.ten}
+                          </button>
+                          <div className="gv2-phu">
+                            {d.cd.lop || 'Nhiều lớp'} · <span className="gv2-so">{d.soEm}</span> em
+                          </div>
+                          <span className="gv2-chip" data-tone={d.nhip === 'dung' ? 'la' : d.nhip === 'cham' ? 'do' : 'vang'}>
+                            {CHU_NHIP[d.nhip]}
+                          </span>
+                        </div>
+                        <div className="gv2-o-thanh">
+                          <div className="gvm-nho">Thành thạo · vạch = mức cần hôm nay</div>
+                          {d.thanhThao === null ? <span className="gv2-nhat">chưa đọc được bảng</span> : <ThanhTienDo tiLe={d.thanhThao} vach={d.mucCan} />}
+                        </div>
+                        <div>
+                          <div className="gvm-nho">Chậm nhịp</div>
+                          <VongNhip tre={d.treNhip} tong={d.soEm} />
+                        </div>
+                        <div className="gvm-dang">
+                          <div className="gvm-nho">Dạng yếu nhất của lớp</div>
+                          {d.dangYeu ? (
+                            <>
+                              <span className="gvm-chip-dang">{d.dangYeu.ten}</span>
+                              <span className="gv2-phu">
+                                <span className="gv2-so">{phanTramSo(d.dangYeu.tiLe)}%</span> câu thành thạo
                               </span>
-                            </td>
-                            <td className="gv2-o-thanh">
-                              {d.thanhThao === null ? (
-                                <span className="gv2-nhat">chưa đọc được bảng</span>
-                              ) : (
-                                <ThanhTienDo tiLe={d.thanhThao} vach={d.mucCan} />
-                              )}
-                            </td>
-                            <td className="gv2-so">
-                              <b>{d.treNhip}</b> / {d.soEm} em
-                            </td>
-                            <td>
-                              {d.dangYeu ? (
-                                <>
-                                  <div className="gv2-dam">{d.dangYeu.ten}</div>
-                                  <div className="gv2-phu">
-                                    <span className="gv2-so">{phanTramSo(d.dangYeu.tiLe)}%</span> câu thành thạo
-                                  </div>
-                                </>
-                              ) : (
-                                <span className="gv2-nhat">—</span>
-                              )}
-                            </td>
-                            <td>
-                              <div className="gv2-dam">{d.conNgay > 0 ? `còn ${d.conNgay} ngày` : 'hết hạn'}</div>
-                              <div className="gv2-phu gv2-so">23:59 · {d.cd.hanNop.slice(8, 10)}/{d.cd.hanNop.slice(5, 7)}</div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                            </>
+                          ) : (
+                            <span className="gv2-nhat">—</span>
+                          )}
+                        </div>
+                        <div>
+                          <div className="gvm-nho">Hạn nộp</div>
+                          <div className="gv2-dam">{d.conNgay > 0 ? `còn ${d.conNgay} ngày` : 'hết hạn'}</div>
+                          <div className="gv2-phu gv2-so">23:59 · {d.cd.hanNop.slice(8, 10)}/{d.cd.hanNop.slice(5, 7)}</div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </section>
 
@@ -359,16 +348,39 @@ export default function TongQuanScreen() {
   )
 }
 
-function TheSo({ nhan, so, donVi, phu, tone }: { nhan: string; so: string; donVi: string; phu: string; tone?: 'la' | 'do' }) {
+/** Thẻ số "bản màu": tông theo NGHĨA (xd em/số lượng · xl thành thạo · hp trễ · ho cần chữa · tim dạng), biểu tượng trong ô vuông tròn góc. */
+function TheSo({ nhan, so, donVi, phu, tone, mau, icon: Icon }: { nhan: string; so: string; donVi: string; phu: string; tone?: 'la' | 'do'; mau: 'xd' | 'xl' | 'hp' | 'ho' | 'tim'; icon: LucideIcon }) {
   return (
-    <div className="gv2-the gv2-the-so">
-      <div className="gv2-nhan">{nhan}</div>
+    <div className="gv2-the gv2-the-so" data-mau={mau}>
+      <div className="gv2-nhan">
+        <span className="gv2-the-so-bt" aria-hidden="true">
+          <Icon size={20} strokeWidth={2.2} />
+        </span>
+        {nhan}
+      </div>
       <div className="gv2-so-dong">
         <span className="gv2-so gv2-so-kpi">{so}</span> <span className="gv2-don-vi">{donVi}</span>
       </div>
       <div className="gv2-phu" data-tone={tone}>
         {phu}
       </div>
+    </div>
+  )
+}
+
+/** Vòng nhịp: phần tô = em ĐÚNG nhịp (xanh lục; có em trễ thì hổ phách); số in cạnh — không chỉ màu. */
+function VongNhip({ tre, tong }: { tre: number; tong: number }) {
+  const C = 2 * Math.PI * 14
+  const dung = tong > 0 ? Math.max(0, tong - tre) / tong : 0
+  return (
+    <div className="gvm-nhip">
+      <svg viewBox="0 0 36 36" aria-hidden="true">
+        <circle cx="18" cy="18" r="14" className="gvm-vong-nen" />
+        {dung > 0 && <circle cx="18" cy="18" r="14" className="gvm-vong" data-tre={tre > 0 ? '' : undefined} strokeDasharray={`${(dung * C).toFixed(1)} ${C.toFixed(1)}`} transform="rotate(-90 18 18)" />}
+      </svg>
+      <span className="gv2-so">
+        <b>{tre}</b> / {tong} em
+      </span>
     </div>
   )
 }
