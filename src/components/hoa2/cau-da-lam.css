@@ -582,3 +582,17 @@
   padding: 0 20px 12px;
   gap: 16px;
 }
+
+/* Hàng tải PDF: nút chính + nút phụ "Tải chỉ đề" (thầy 28/09) */
+.h2-cdl-hang-pdf {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.h2-cdl-hang-pdf .h2-cdl-chi-de {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
