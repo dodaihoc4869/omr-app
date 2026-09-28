@@ -56,3 +56,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - ĐÃ PHÁT HÀNH PR #22 Thử đồ ngang (`f2a2d8f`) — chưa có test riêng, chưa xem trình duyệt thật.
 - ĐÃ PHÁT HÀNH PR #23 Đoàn ngang thanh kéo cột + cột lời giải cuộn (`301ed39`).
 - BẢN VẼ app GV nhiều màu (Material 3): `docs/ban-ve-gv-mau-2809/GV-TongQuan-Mau.html`, link https://claude.ai/artifact/1D6kCkQWqZRUNFPcdbhi1t — CHỜ THẦY CHỐT rồi mới build (áp cho cả app GV).
+- THẦY CHỐT phong cách màu GV cho toàn app ("thiết kế full app mọi lớp màu sắc chuẩn như vậy"). Đang build ở nhánh `gv-mau-m3` (token M3 trong tokens.css, rail, thẻ số theo nghĩa màu, thẻ chiến dịch ngang). Xong ⇒ PR vào main.
