@@ -283,7 +283,10 @@
 @keyframes bia-bong{0%{opacity:0;transform:translate(-50%,6px)}10%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.bia-bong-nhan{animation:none}}
 .bia-mat-noi{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:8px;align-items:center;padding:6px 12px;border-radius:14px;background:rgba(120,20,20,.88);color:rgb(255,236,236);font-size:12.5px;font-weight:700}
-.bia-nhan-nhanh{position:absolute;right:8px;bottom:8px;z-index:6}
+.bia-nhan-nhanh{position:absolute;right:8px;bottom:26%;z-index:6}
+/* bàn nằm ngang (điện thoại xoay ngang, máy tính): cạnh phải là băng NGẮN, giữa băng không có lỗ ⇒ nút nằm giữa, bảng câu mở sang trái */
+.bia[data-bo-cuc='ngang'] .bia-nhan-nhanh,.bia[data-bo-cuc='pc'] .bia-nhan-nhanh{bottom:auto;top:50%;transform:translateY(-50%)}
+.bia[data-bo-cuc='ngang'] .bia-pop-nhan,.bia[data-bo-cuc='pc'] .bia-pop-nhan{bottom:auto;top:50%;right:calc(100% + 6px);transform:translateY(-50%)}
 .bia-pop-nhan{position:absolute;right:0;bottom:calc(100% + 6px);display:grid;gap:6px;padding:8px;border-radius:16px;background:var(--b-dac);border:1px solid var(--b-vien);box-shadow:0 12px 30px rgba(0,0,0,.28);min-width:170px}
 .bia-pop-nhan .bia-nut-chu{justify-content:flex-start;text-align:left}
 .bia-diem-ban{padding:8px 14px;border-radius:16px;background:var(--b-kinh);border:1px solid var(--b-vien)}

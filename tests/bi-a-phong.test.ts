@@ -212,6 +212,28 @@ describe('Phòng đấu BanBiA — đấu đơn online', () => {
     expect(p.d.dem('bi_a_diem_ban', "sbd='S1' AND diem=1012")).toBe(1)
   })
 
+  it('mất tín hiệu CÂM (không có gói đóng): quá 70 giây không ping ⇒ phòng tự đóng kết nối, tính rời TỪ PING CUỐI ⇒ đấu đơn: bạn thắng; máy vẫn ping thì không sao', async () => {
+    const p = dungPhong()
+    const A = await vao(p, 'S1', 'Khánh Linh', true), B = await vao(p, 'S2', 'Minh Châu', false)
+    await sanSang(p, A); await sanSang(p, B)
+    // Durable Object thật tự trả lời ping và nhớ lúc trả lời cuối của từng kết nối
+    const ping = new Map<unknown, number>()
+    Object.assign(p.st, { getWebSocketAutoResponseTimestamp: (ws: unknown) => (ping.has(ws) ? new Date(ping.get(ws)!) : null) })
+    ping.set(B.ws, T0 + 5_000) // B ping một lần rồi mất tín hiệu câm
+    let dongLuc = 0
+    for (let t = 0; t <= 150_000 && !S(A.ws).over; t += 1_000) {
+      p.dh.now = T0 + t
+      if (t % 25_000 === 0) ping.set(A.ws, p.dh.now) // A vẫn ping đều
+      if (p.st.bao !== null && p.dh.now >= p.st.bao) { await p.phong.alarm(); if (B.ws.dong && !dongLuc) dongLuc = t }
+    }
+    expect(A.ws.dong).toBe(false)
+    expect(B.ws.dong).toBe(true)
+    expect(dongLuc).toBeGreaterThanOrEqual(75_000) // ping cuối 5 giây + 70 giây
+    expect(dongLuc).toBeLessThanOrEqual(5_000 + 70_000 + 35_000) // phòng thức ít nhất mỗi 35 giây để soát
+    expect(S(A.ws).over).toMatchObject({ doiThang: 0, lyDo: 'roi_mang' }) // rời từ giây 5 ⇒ quá 60 giây ngay lúc phát hiện
+    expect(p.d.dem('bi_a_diem_ban', "sbd='S1' AND diem=1012")).toBe(1)
+  })
+
   it('hết 30 giây không đánh ⇒ phòng tự sang lượt (hẹn giờ của Durable Object)', async () => {
     const p = dungPhong()
     const A = await vao(p, 'S1', 'Khánh Linh', true), B = await vao(p, 'S2', 'Minh Châu', false)

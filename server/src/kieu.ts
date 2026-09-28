@@ -60,6 +60,8 @@ export interface DurableObjectState {
   acceptWebSocket(ws: WsMayChu, tags?: string[]): void
   getWebSockets(tag?: string): WsMayChu[]
   setWebSocketAutoResponse?(cap: unknown): void
+  /** Lần cuối phòng TỰ trả lời gói ping của kết nối này (không cần thức dậy); chưa có ⇒ null. */
+  getWebSocketAutoResponseTimestamp?(ws: WsMayChu): Date | null
 }
 export interface Env {
   PUSH_PUBLIC_KEY?: string

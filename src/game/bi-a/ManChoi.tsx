@@ -456,7 +456,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
         </div></div>}
         {ket && <div className="bia-che"><div className="bia-ket" role="dialog" aria-modal="true" aria-labelledby="bia-ket-ten">
           <div className="bia-nhan-tam"><span>Kết thúc ván</span><span>{Math.floor(ket.giay / 60)} phút {ket.giay % 60} giây · {doi ? 'đánh đôi' : 'đấu đơn'}</span></div>
-          <h3 id="bia-ket-ten">{vm?.ketMang && vm.ketMang.doiThang === null ? 'Ván quá 2 giờ · không ai thắng' : doi ? `${TEN_PHE[ket.doiThang]} thắng ván` : `${v.ghe.find((g) => g.doi === ket.doiThang)!.ten} thắng ván`}</h3>
+          <h3 id="bia-ket-ten">{vm?.ketMang && vm.ketMang.doiThang === null ? 'Ván quá 2 giờ · không ai thắng' : vm && ket.doiThang === v.ghe[v.em]!.doi ? (doi ? 'Phe em thắng ván' : 'Em thắng ván') : doi ? `${TEN_PHE[ket.doiThang]} thắng ván` : `${v.ghe.find((g) => g.doi === ket.doiThang)!.ten} thắng ván`}</h3>
           {vm?.ketMang && vm.ketMang.lyDo !== 'thang' && vm.ketMang.doiThang !== null && <p className="bia-chu-nho">{vm.ketMang.lyDo === 'bo' ? 'Bạn đã rời ván.' : 'Bạn mất kết nối quá 60 giây.'}</p>}
           <table className="bia-bang-diem">
             <thead><tr><th>Người</th><th>Câu đúng</th><th>Bi ăn</th><th>Bi vàng</th></tr></thead>

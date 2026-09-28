@@ -1,7 +1,8 @@
 // BI-A PHẢN ỨNG GĐ2 · KẾT NỐI PHÒNG ĐẤU (WebSocket tới Durable Object `BanBiA`, đặc tả 6.2).
 // Mở ⇒ gửi ngay vé vào bàn; rớt ⇒ tự nối lại (chờ 1 → 2 → 4 → 5 giây) bằng CHÍNH vé cũ, phòng gửi lại trạng thái đầy đủ; quá 60 giây
 // không nối được ⇒ báo 'mat' (phòng cũng coi ghế đã rời). Giữ kết nối bằng 'ping' mỗi 25 giây — hẹn giờ NỐI TIẾP, không `setInterval`,
-// và không gọi máy chủ qua HTTP (không thuộc bảng nhịp tự gọi `nhip-bang-2109`).
+// và không gọi máy chủ qua HTTP (không thuộc bảng nhịp tự gọi `nhip-bang-2109`). Phòng trả 'pong' cho mỗi ping (tự trả lời, không thức dậy);
+// quá 60 giây không nhận được gói nào ⇒ kết nối chết CÂM (đổi mạng, mạng treo — trình duyệt chưa báo đóng) ⇒ tự đóng và nối lại.
 export type TrangThaiNoi = 'dang_noi' | 'noi' | 'noi_lai' | 'mat' | 'dong'
 export type GoiPhong = Record<string, unknown> & { t: string }
 export interface TuyChonKetNoi {
@@ -16,6 +17,10 @@ export interface TuyChonKetNoi {
   bayGio?: () => number
 }
 export const GIAY_BO_NOI = 60
+/** Quá chừng này giây không nhận được gói nào (kể cả 'pong') ⇒ coi kết nối đã chết. */
+export const GIAY_CAM_MAY = 60
+/** Đúng chuỗi phòng tự trả lời (`GOI_PING` ở server/src/bi-a-phong.ts). */
+const GOI_PING = '{"t":"ping"}'
 const CHO_NOI_LAI = [1000, 2000, 4000, 5000]
 
 export class KetNoiBan {
@@ -24,6 +29,7 @@ export class KetNoiBan {
   private dongHan = false
   private lan = 0
   private rotLuc = 0
+  private nhanLuc = 0
   private gioNoi: ReturnType<typeof setTimeout> | undefined
   private gioPing: ReturnType<typeof setTimeout> | undefined
   trangThai: TrangThaiNoi = 'dang_noi'
@@ -38,12 +44,13 @@ export class KetNoiBan {
     try { ws = (this.o.taoWs ?? ((u) => new WebSocket(u)))(this.o.url) } catch { this.rot(); return }
     this.ws = ws
     ws.onopen = () => {
-      this.lan = 0; this.rotLuc = 0
+      this.lan = 0; this.rotLuc = 0; this.nhanLuc = this.now
       ws.send(JSON.stringify({ t: 'vao', ve: this.o.ve }))
       this.dongTT('noi')
       this.henPing()
     }
     ws.onmessage = (e) => {
+      this.nhanLuc = this.now
       let m: unknown
       try { m = JSON.parse(typeof e.data === 'string' ? e.data : '') } catch { return }
       if (m && typeof m === 'object' && typeof (m as GoiPhong).t === 'string' && (m as GoiPhong).t !== 'pong') this.o.nhan(m as GoiPhong)
@@ -53,7 +60,13 @@ export class KetNoiBan {
   }
   private henPing(): void {
     this.xoa(this.gioPing)
-    this.gioPing = this.dat(() => { if (this.ws?.readyState === 1) { try { this.ws.send('{"t":"ping"}') } catch { /* rớt */ } this.henPing() } }, 25_000)
+    this.gioPing = this.dat(() => {
+      const ws = this.ws
+      if (ws?.readyState !== 1) return
+      if (this.now - this.nhanLuc > GIAY_CAM_MAY * 1000) { this.ws = null; try { ws.close(4001, 'Mất tín hiệu') } catch { /* đã đóng */ } this.rot(); return }
+      try { ws.send(GOI_PING) } catch { /* rớt */ }
+      this.henPing()
+    }, 25_000)
   }
   private rot(): void {
     this.xoa(this.gioPing)

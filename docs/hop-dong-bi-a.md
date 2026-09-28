@@ -63,3 +63,43 @@ Ra: `{ ok, van, dung, sai, theLuc:{ con, tong } }`; gọi lại lần hai ⇒ `{
 ## Bảng mới (`server/migration-2809-bi-a.sql`, CHỈ THÊM)
 CI deploy không chạy migration ⇒ lệnh `bia-*` (khi cờ bật cho em) tự dựng đủ bảng + chỉ mục bằng `CREATE … IF NOT EXISTS` (`damBaoBangBia`, `SQL_BANG_BIA` = đúng nội dung tệp migration, test khoá). Không cần ai chạy wrangler tay.
 `bi_a_van`, `bi_a_ghe` (GĐ1) · `bi_a_diem_ban`, `bi_a_moi`, `bi_a_co_mat` (dựng sẵn cho GĐ2). Reset Game Hóa 2.0 xoá cả 5 bảng; reset toàn app GIỮ.
+
+---
+
+# GĐ2 · Đấu với bạn (28/09/2026)
+
+Máy chủ: `server/src/bi-a.ts` (lệnh sảnh), `server/src/bi-a-phong.ts` (phòng đấu Durable Object `BanBiA`), `server/src/bi-a-ve.ts` (vé ký), lõi trận dùng chung `src/game/bi-a/tran.ts`.
+Máy khách: `src/game/bi-a/api.ts`, `ket-noi.ts`, `dieu-khien-mang.ts` (`VanMang`), `BanOnline.tsx`, `PhongCho.tsx`, `BiaGame.tsx`.
+
+## Vé ký (HMAC-SHA256 bằng `MA_BI_MAT`, tiền tố `bi-a|`, không lẫn token game)
+| Loại | Ai cấp | Chứa | Dùng |
+|---|---|---|---|
+| `sanh` | lệnh sảnh (tạo bàn / nhập mã / nhận lời mời) | ván, sbd, tên, chế độ, loại, chủ bàn?, mã | gói `vao` vào phòng (cả lần nối lại) |
+| `ghe` | phòng (lúc Bắt đầu) | ván, ghế, sbd, chế độ, loại | `bia-xep-ban { veGhe }` |
+| `tran` | `bia-xep-ban` online | ván, ghế, sbd, phiên, câu từng bi `{qid, muc, giay}`, Câu chốt | gói `san_sang` |
+| `cau` | `bia-doi-cau` online | ván, sbd, kí hiệu bi, câu mới \| null (bi trống) | gói `doi_cau` |
+Phòng không đọc D1 để biết câu của bi: mọi thứ nằm trong vé ⇒ đọc D1 mỗi ván ≤ số câu đã trả lời + 2 (test đo).
+
+## Lệnh sảnh (`POST /game-v2/<lệnh>`, chặn chung như GĐ1)
+- `bia-sanh` thêm `online: boolean` (Worker có `BAN_BIA`) và `diemBan: { diem, soVan }` (khởi đầu 1000).
+- `bia-tao-ban { cheDo:'don'|'doi', loai:'ban'|'giao_huu' }` ⇒ `{ van, ma (4 chữ số), cheDo, loai, ve }`. Đóng ván mở cũ của em trước.
+- `bia-vao-ban { ma }` ⇒ như trên (chỉ bàn đang `cho`, tạo trong 2 giờ). Sai ⇒ lỗi "Không thấy bàn có mã này…".
+- `bia-moi { van, den }` (chỉ chủ bàn, bạn cùng lớp có mặt trong 20 giây) ⇒ `{ id }`; mời lại khi lời cũ còn hạn ⇒ trả id cũ.
+- `bia-loi-moi { con }` — mỗi 6 giây, CHỈ khi em ở Sảnh Bi-a / phòng chờ (`batVongTrucTiep`, có trong `nhip-bang-2109`): một lô D1 (ghi có mặt + 3 đọc) ⇒ `{ ban:[{sbd, ten, conTran}], moi:[{id, tu, cheDo, loai, conGiay}], phanHoi:[{id, ten, nhan}] }`. Lời mời hết hạn 60 giây.
+- `bia-tra-loi-moi { id, nhan }` ⇒ nhận: vé vào bàn như `bia-tao-ban`; từ chối: `{ tuChoi:true }`.
+- `bia-xep-ban { veGhe }` (sau khi phòng Bắt đầu) ⇒ `{ van, ghe, session, bi:[{ki, cau}], chot, veTran }` — câu cho ĐÚNG bi của ghế (đơn 7; đôi người 1 của phe 4, người 2 của phe 3 — G11). Bàn giao hữu: `session:null`, mọi `cau:null`.
+- `bia-doi-cau { session, qidCu, chot, ki }` ở ván online trả thêm `ve` (vé câu) để máy em đưa phòng.
+
+## Phòng đấu `wss://<máy chủ>/bi-a/phong/<mã ván>` (Durable Object, WebSocket Hibernation)
+Máy em → phòng: `vao {ve}` · `ghe {lam:'them_ai'|'bo_ai'|'doi_cho', ghe, ghe2?}` (chủ bàn, phòng chờ đôi) · `bat_dau` (chủ bàn) · `san_sang {ve}` · `cu {dx,dy,v,sx,sy,datBi?}` · `cau_xong {ki,qid,loai:'bi'|'chot'|'giai_truoc'}` · `cau_ai {ghe,ki,loai,dung}` / `giai_truoc_ai {ghe,ki,dung}` (chỉ máy chủ bàn = ghế người nhỏ nhất đang nối) · `doi_cau {ve}` · `nhan {id:1..6}` (2 giây/lần) · `bo_van` · `ping`.
+Phòng → máy em: `phong {toi, phong}` · `bat_dau {ghe, veGhe}` · `tt {toi, su, S, chuMay}` (S = trạng thái công khai, không mã câu; `su` = sự kiện vừa áp, `null` = gói đầy đủ khi vào/nối lại) · `nhan {tu,id}` · `loi {ma,chu}` · `pong`.
+- Phòng mô phỏng lại MỌI cú bằng cùng bước chuẩn `buocChuan` (máy em vẽ trước y hệt, bi dừng thì khớp trạng thái phòng; `su.bamVa` để đo lệch).
+- `cau_xong` chỉ được nhận khi `game_v2_attempt` khoá `phiên|qid` có thật và đúng câu đang chờ của đúng ghế ⇒ gói giả bị từ chối.
+- Hẹn giờ bằng `alarm`: 30 (+2) giây một cú, câu = giây của câu + 10, phòng chờ Bắt đầu 90 giây (ghế chưa sẵn sàng ⇒ A.I), rời > 60 giây: đơn ⇒ bạn thắng; đôi ⇒ ghế thành A.I, ván không tính Điểm bàn (G14); bàn quá 2 giờ ⇒ huỷ.
+- Còn sống: máy em gửi đúng chuỗi `{"t":"ping"}` mỗi 25 giây; phòng TỰ trả `{"t":"pong"}` (`setWebSocketAutoResponse`, không thức dậy). Phòng thức ít nhất mỗi 35 giây khi có máy nối; kết nối quá 70 giây không ping (mất tín hiệu câm — khoá màn, đổi mạng) ⇒ phòng đóng (mã 4001) và tính rời TỪ PING CUỐI. Máy em quá 60 giây không nhận gói nào ⇒ tự đóng và nối lại. Chạy thật trên workerd: máy câm bị đóng ở giây 70; máy ping đều giữ nguyên 150 giây.
+- Kết ván: MỘT lô D1 — `bi_a_van` xong, `bi_a_ghe`, đóng phiên (câu chưa trả lời về kế hoạch), Điểm bàn Elo K = 24 (chỉ bàn `ban`, toàn người, không ghế nào thành A.I).
+
+## Khác đặc tả (ghi lại để đối chiếu)
+- Xếp ghế trong phòng chờ (thêm/bỏ A.I, đổi chỗ) đi qua WebSocket của phòng (gói `ghe`), không qua lệnh HTTP riêng.
+- Có mặt ở Sảnh: máy em gửi kèm số câu Bi-a còn (`con`) để bạn thấy, không tính lại trên máy chủ mỗi 6 giây.
+- Cài đặt Worker: `wrangler.toml` thêm binding `BAN_BIA` + migration DO `bia-v1` (`new_sqlite_classes`). Không có binding ⇒ `online:false`, Sảnh giữ nút "Sắp mở".

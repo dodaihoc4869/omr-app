@@ -58,7 +58,7 @@ export default function PhongCho({ token, phong, toi, trangThaiNoi, conTran, loi
             <li key={i} data-phe={i % 2} data-chon={chonDoi === i ? '' : undefined}>
               <span className="bia-chu-nho">{tenGhe(i)}</span>
               <span className="bia-ghe-ten">{g ? `${g.ten}${i === toi ? ' (em)' : ''}` : 'Ghế trống'}</span>
-              <span className="bia-chu-nho">{g ? (g.ai ? 'A.I đánh ghế này' : [i === phong.chuBan ? 'Chủ bàn' : '', g.noi ? '' : 'Đang nối lại', phong.trangThai === 'bat_dau' ? (g.sanSang ? 'Sẵn sàng' : 'Đang xếp câu') : ''].filter(Boolean).join(' · ')) : laChu ? 'Mời bạn ở dưới hoặc thêm A.I' : 'Chờ chủ bàn xếp'}</span>
+              <span className="bia-chu-nho">{g ? (g.ai ? 'A.I đánh ghế này' : [i === phong.chuBan ? 'Chủ bàn' : '', g.noi ? '' : 'Đang nối lại', phong.trangThai === 'bat_dau' ? (g.sanSang ? 'Sẵn sàng' : 'Đang xếp câu') : ''].filter(Boolean).join(' · ')) : laChu ? (doi ? 'Mời bạn ở dưới hoặc thêm A.I' : 'Mời bạn ở dưới hoặc đọc mã bàn') : doi ? 'Chờ chủ bàn xếp' : 'Chờ bạn vào'}</span>
               {laChu && phong.trangThai === 'cho' && doi && <span className="bia-hang-nut-nho">
                 {!g && <button type="button" className="bia-nut-chu" onClick={() => onGhe('them_ai', i)}>Thêm A.I</button>}
                 {g?.ai && <button type="button" className="bia-nut-chu" onClick={() => onGhe('bo_ai', i)}>Bỏ A.I</button>}

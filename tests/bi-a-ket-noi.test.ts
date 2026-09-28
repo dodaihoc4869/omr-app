@@ -93,6 +93,24 @@ describe('KetNoiBan', () => {
     expect(d.kn.trangThai).toBe('noi')
   })
 
+  it('kết nối chết CÂM (trình duyệt chưa báo đóng): quá 60 giây không nhận gói nào ⇒ tự đóng, "noi_lai", nối lại; có pong đều thì giữ', () => {
+    const d = dung()
+    d.kn.mo(); d.ws[0]!.mo()
+    for (let i = 0; i < 6; i++) { d.chay(25_000); d.ws[0]!.den({ t: 'pong' }) } // phòng trả pong ⇒ còn sống
+    expect(d.kn.trangThai).toBe('noi')
+    expect(d.ws).toHaveLength(1)
+    d.chay(25_000); d.chay(25_000) // hai ping không ai trả lời
+    expect(d.kn.trangThai).toBe('noi')
+    d.chay(25_000) // lần ping thứ ba: 75 giây im lặng ⇒ chết câm
+    expect(d.kn.trangThai).toBe('noi_lai')
+    expect(d.ws[0]!.readyState).toBe(3)
+    d.chay(1000)
+    expect(d.ws).toHaveLength(2)
+    d.ws[1]!.mo()
+    expect(JSON.parse(d.ws[1]!.gui[0]!)).toEqual({ t: 'vao', ve: 'VE-CU' })
+    expect(d.ws[0]!.gui.filter((s) => s === '{"t":"ping"}').length).toBe(8)
+  })
+
   it('đóng hẳn (rời bàn) ⇒ "dong", huỷ mọi hẹn, không tự nối', () => {
     const d = dung()
     d.kn.mo(); d.ws[0]!.mo()

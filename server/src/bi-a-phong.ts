@@ -19,6 +19,13 @@ export const GIAY_ROI = 60
 export const GIAY_SAN_SANG = 90
 export const HAN_PHONG_MS = 2 * 3_600_000
 export const HAN_VE_GHE_MS = 10 * 60_000
+/** Máy em gửi đúng chuỗi này mỗi 25 giây (`ket-noi.ts`); phòng tự trả lời `GOI_PONG` mà không thức dậy. */
+export const GOI_PING = '{"t":"ping"}'
+export const GOI_PONG = '{"t":"pong"}'
+/** Quá chừng này giây không ping ⇒ mất tín hiệu câm. */
+export const GIAY_CAM = 70
+/** Có máy đang nối ⇒ phòng thức ít nhất mỗi chừng này giây để soát mất tín hiệu. */
+export const GIAY_KIEM_SONG = 35
 export const CAU_NHAN = ['Cú đẹp!', 'Suýt nữa!', 'Tới lượt tớ nhé', 'Hay đấy', 'Chờ tớ giải câu', 'Đấu lại không?'] as const
 
 export interface GhePhong { sbd: string | null; ten: string; ai: boolean }
@@ -30,7 +37,7 @@ export interface Phong {
   daGhi: boolean
 }
 interface GheVao { session: string | null; bi: Record<string, CauBi>; chot: CauBi | null }
-interface Gan { sbd: string; ghe: number }
+interface Gan { sbd: string; ghe: number; /** lúc vào (ms) — mốc 'còn sống' trước gói ping đầu */ luc?: number }
 type Goi = Record<string, unknown>
 
 const so = (x: unknown): number | null => (typeof x === 'number' && Number.isFinite(x) ? x : null)
@@ -50,7 +57,7 @@ export class BanBiA {
   constructor(state: DurableObjectState, env: Env) {
     this.state = state
     this.env = env
-    try { if (state.setWebSocketAutoResponse && typeof WebSocketRequestResponsePair === 'function') state.setWebSocketAutoResponse(new WebSocketRequestResponsePair('ping', 'pong')) } catch { /* máy không hỗ trợ: em tự trả lời 'ping' ở dưới */ }
+    try { if (state.setWebSocketAutoResponse && typeof WebSocketRequestResponsePair === 'function') state.setWebSocketAutoResponse(new WebSocketRequestResponsePair(GOI_PING, GOI_PONG)) } catch { /* máy không hỗ trợ: em tự trả lời 'ping' ở dưới */ }
   }
 
   // ───────────── nạp / lưu (phòng có thể ngủ giữa hai gói) ─────────────
@@ -72,6 +79,7 @@ export class BanBiA {
     for (const r of Object.values(this.roi)) moc.push(r + GIAY_ROI * 1000)
     if (p.trangThai === 'bat_dau') moc.push(p.hanSanSang)
     if (t && !t.over) moc.push(t.cho[0] ? t.cho[0].han : t.hanCu)
+    if (this.cacKetNoi().some((k) => k.gan)) moc.push(this.now() + GIAY_KIEM_SONG * 1000) // soát mất tín hiệu câm
     await this.state.storage.setAlarm(Math.max(this.now() + 50, Math.min(...moc)))
   }
 
@@ -114,7 +122,7 @@ export class BanBiA {
     await this.nap()
     let m: Goi
     try { m = JSON.parse(typeof raw === 'string' ? raw : new TextDecoder().decode(raw)) as Goi } catch { return }
-    if (m.t === 'ping') { this.gui(ws, { t: 'pong' }); return }
+    if (m.t === 'ping') { try { ws.send(GOI_PONG) } catch { /* đã đóng */ } return } // máy không có tự trả lời (test / bản cũ)
     try { await this.xuLy(ws, m) } catch (e) {
       this.gui(ws, { t: 'loi', ma: m.t, chu: e instanceof Error ? e.message : 'Phòng đấu gặp lỗi.' })
       const g = this.gan(ws)
@@ -123,14 +131,31 @@ export class BanBiA {
   }
   async webSocketClose(ws: WsMayChu): Promise<void> { await this.nap(); await this.dong(ws) }
   async webSocketError(ws: WsMayChu): Promise<void> { await this.nap(); await this.dong(ws) }
-  private async dong(ws: WsMayChu): Promise<void> {
+  /**
+   * Mất tín hiệu CÂM (điện thoại khoá màn, đổi mạng — không có gói đóng, phòng không nhận webSocketClose): máy em gửi ping mỗi 25 giây,
+   * phòng tự trả lời mà không cần thức. Quá 70 giây (`GIAY_CAM`) không ping ⇒ đóng kết nối, coi như rời TỪ LÚC PING CUỐI (luật rớt > 60 giây tính từ đó).
+   */
+  private async kiemSong(now: number): Promise<void> {
+    const moc = this.state.getWebSocketAutoResponseTimestamp
+    if (!moc) return
+    for (const { ws, gan } of this.cacKetNoi()) {
+      if (!gan) continue
+      let ping = 0
+      try { ping = moc.call(this.state, ws)?.getTime() ?? 0 } catch { ping = 0 }
+      const song = Math.max(ping, gan.luc ?? now)
+      if (now - song < GIAY_CAM * 1000) continue
+      try { ws.close(4001, 'Mất tín hiệu') } catch { /* đã đóng */ }
+      await this.dong(ws, song)
+    }
+  }
+  private async dong(ws: WsMayChu, luc?: number): Promise<void> {
     const g = this.gan(ws), p = this.phong
     if (!g || !p) return
     const conNoi = this.cacKetNoi().some((k) => k.ws !== ws && k.gan?.sbd === g.sbd)
     if (conNoi) return
     try { ws.serializeAttachment(null) } catch { /* đã đóng */ }
     if (p.trangThai === 'cho' && g.sbd !== p.chuBan) p.ghe[g.ghe] = null // phòng chờ: bạn rời thì nhả ghế (vào lại bằng vé cũ)
-    else if (p.trangThai !== 'xong' && p.trangThai !== 'huy') { this.roi[g.ghe] = this.now(); if (this.tran) this.tran.ghe[g.ghe]!.roi = true }
+    else if (p.trangThai !== 'xong' && p.trangThai !== 'huy') { this.roi[g.ghe] = luc ?? this.now(); if (this.tran) this.tran.ghe[g.ghe]!.roi = true }
     await this.luu()
     this.phat()
   }
@@ -172,7 +197,7 @@ export class BanBiA {
       p.ghe[g] = { sbd: v.sbd, ten: v.ten, ai: false }
     }
     for (const k of this.cacKetNoi()) if (k.ws !== ws && k.gan?.sbd === v.sbd) { try { k.ws.serializeAttachment(null); k.ws.close(4000, 'Em đã vào bàn ở máy khác.') } catch { /* đã đóng */ } }
-    ws.serializeAttachment({ sbd: v.sbd, ghe: g } satisfies Gan)
+    ws.serializeAttachment({ sbd: v.sbd, ghe: g, luc: now } satisfies Gan)
     delete this.roi[g]
     if (this.tran) this.tran.ghe[g]!.roi = false
     if (p.trangThai === 'cho' && p.cheDo === 'don' && p.ghe.every((x) => x && !x.ai)) { await this.batDau(); return }
@@ -192,7 +217,7 @@ export class BanBiA {
       const b = so(m.ghe2)
       if (b === null || b < 0 || b >= n || b === a) throw new Error('Ghế không hợp lệ.')
       ;[p.ghe[a], p.ghe[b]] = [p.ghe[b]!, p.ghe[a]!]
-      for (const k of this.cacKetNoi()) if (k.gan) { const moi = p.ghe.findIndex((x) => x?.sbd === k.gan!.sbd); if (moi >= 0 && moi !== k.gan.ghe) k.ws.serializeAttachment({ sbd: k.gan.sbd, ghe: moi } satisfies Gan) }
+      for (const k of this.cacKetNoi()) if (k.gan) { const moi = p.ghe.findIndex((x) => x?.sbd === k.gan!.sbd); if (moi >= 0 && moi !== k.gan.ghe) k.ws.serializeAttachment({ ...k.gan, ghe: moi } satisfies Gan) }
     } else throw new Error('Thao tác ghế không hợp lệ.')
     await this.luu()
     this.phat()
@@ -323,6 +348,7 @@ export class BanBiA {
     await this.nap()
     const p = this.phong, now = this.now()
     if (!p || p.trangThai === 'xong' || p.trangThai === 'huy') return
+    await this.kiemSong(now)
     if (now >= p.tao + HAN_PHONG_MS) {
       if (this.tran && p.trangThai === 'dang' && !this.tran.over) { this.tran.over = { doiThang: null, nguoiHa: null, lyDo: 'het_han' }; this.tran.seq++; await this.ketThuc(); await this.luu(); this.phat({ k: 'ket_thuc', ket: this.tran.over }); return }
       p.trangThai = 'huy'; await this.ghiHuy(); await this.luu(); this.phat(); return
