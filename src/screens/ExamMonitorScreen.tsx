@@ -11,10 +11,10 @@ import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
 import { maDeTuBoCau } from '../components/chien-dich/tinh'
-import { Check, RefreshCw, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
+import { Check, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
-import { danhSachCa, type CaTomTat, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem, khoiTuNamSinh } from '../lib/exam-api'
+import { danhSachCa, type CaTomTat, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem } from '../lib/exam-api'
 import { chuanTenCa, tenHienCua, TEN_CA_TOI_DA } from '../lib/ten-ca'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { emLechDiem, loiBaoLechDiem } from '../lib/lech-diem'
@@ -31,8 +31,6 @@ import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { soanTinRoiMan } from '../lib/tin-nhan-thay'
 import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
-import { hoSoEm, hsLichSuCaApi, type HoSoEm } from '../lib/exam-api'
-import type { CaLichSu } from '../components/TheTienBo'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { chuTatDe } from '../lib/giu-de-doc'
 import { useAppStore } from '../store/appStore'
@@ -44,10 +42,13 @@ import { themPhutCa, cauKetQuaThemPhut } from '../lib/them-phut-api'
 import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
-import BaoCaoCaLopKhoi from '../components/xem-diem-gv/BaoCaoCaLop'
-import { tinhBaoCaoCaLop, tomTatCaLop, type EmChoBaoCao } from '../lib/bao-cao-ca-lop'
-import { ghepBaoCaoMotEm, layBaoCaoCaLopMayChu, layBaoCaoEmMayChu, type BaoCaoEmMayChu } from '../lib/bao-cao-may-chu'
-import BaoCaoMotEmTrang from '../components/xem-diem-gv/BaoCaoMotEm'
+// CA THI 28/09 (docs/ban-ve-ca-thi-2809): đầu màn Theo dõi, màn Kết thúc ca, Báo cáo chi tiết — THAY khối gập BaoCaoCaLop + trang BaoCaoMotEm cũ.
+import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
+import KetThucCa from '../components/ca-thi/KetThucCa'
+import BaoCaoChiTiet from '../components/ca-thi/BaoCaoChiTiet'
+import { congBoDiemCa, layBaoCaoCaDayDu, type ThemBaoCaoCa } from '../lib/bao-cao-chi-tiet'
+import { tinhBaoCaoCaLop, tomTatCaLop, type BaoCaoCaLop, type EmChoBaoCao } from '../lib/bao-cao-ca-lop'
+import { ghepBaoCaoMotEm, layBaoCaoEmMayChu, type BaoCaoEmMayChu } from '../lib/bao-cao-may-chu'
 import { nguonCauTuNganHang, tinhBaoCaoMotEm } from '../lib/bao-cao-mot-em'
 
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -201,7 +202,6 @@ export default function ExamMonitorScreen() {
   // luôn mạnh–yếu và soạn được phiếu gửi phụ huynh — không phải nhớ số báo danh
   // rồi sang tab Học sinh tìm lại.
   const [sbdHoSo, setSbdHoSo] = useState('')
-  const [hoSo, setHoSo] = useState<HoSoEm | null>(null)
   const setScreen = useAppStore((s) => s.setScreen)
   const classList = useAppStore((s) => s.classList)
   const maCaTheoDoi = useAppStore((s) => s.maCaTheoDoi)
@@ -272,23 +272,7 @@ export default function ExamMonitorScreen() {
   /** Ca nào đã vá khoá `key/<maCa>.json` rồi — vá một lần là đủ. */
   const daVaKeyRef = useRef<Set<string>>(new Set())
 
-  // Nạp hồ sơ khi thầy chạm tên một em. Chỉ nạp khi thật sự mở — hồ sơ tốn
-  // 2–4 giây một lượt gọi máy chủ, nạp sẵn cho cả lớp là phí.
-  useEffect(() => {
-    if (!sbdHoSo || !scriptUrl.trim() || !secret.trim()) {
-      setHoSo(null)
-      return
-    }
-    let huy = false
-    // KHÔNG NUỐT LỖI: thẻ hiện lỗi đã bỏ theo lệnh thầy (báo cáo chỉ còn bốn
-    // thẻ), nên báo thẳng bằng toast thay vì cất vào một biến không ai đọc.
-    hoSoEm(scriptUrl.trim(), { secret: secret.trim(), sbd: sbdHoSo })
-      .then((h) => !huy && setHoSo(h))
-      .catch((e) => !huy && showToast(e instanceof Error ? e.message : 'Không mở được hồ sơ', 'error'))
-    return () => {
-      huy = true
-    }
-  }, [sbdHoSo, scriptUrl, secret])
+  // (Hồ sơ `hoSoEm` cũ của trang một em đã bỏ: Báo cáo chi tiết ca thi 28/09 dùng số của ca + `/gv/bao-cao-ca`.)
 
   const [dsCaGoiY, setDsCaGoiY] = useState<CaTomTat[]>([])
 
@@ -556,6 +540,52 @@ export default function ExamMonitorScreen() {
     () => (baoCaoMotEm && baoCaoEmMay && baoCaoEmMay.khoa === khoaEmMay && !baoCaoMotEm.coBangCham ? ghepBaoCaoMotEm(baoCaoMotEm, baoCaoEmMay.may) : baoCaoMotEm),
     [baoCaoMotEm, baoCaoEmMay, khoaEmMay],
   )
+
+  // BÁO CÁO CA TỪ MÁY CHỦ (ca thi 28/09): MỘT lần gọi `/gv/bao-cao-ca` cho màn Kết thúc ca + Báo cáo chi tiết (hocSinh, maTran, tbCaTruoc…). Chỉ hỏi khi ca đã đóng
+  // hoặc thầy mở báo cáo; nhớ theo `khoaBaoCaoLop` (đổi số liệu mới hỏi lại). Máy chủ không trả ⇒ số tính ở máy (`tinhBaoCaoLop`).
+  const [moBaoCao, setMoBaoCao] = useState<'lop' | 'em' | null>(null)
+  const [bcMay, setBcMay] = useState<{ khoa: string; lop: BaoCaoCaLop | null; them: ThemBaoCaoCa | null; loi: string } | null>(null)
+  const [dangTaiBc, setDangTaiBc] = useState(false)
+  const [dangCongBo, setDangCongBo] = useState(false)
+  const caDaDong = !!chiTiet && chiTiet.ca.trangThai !== 'mo'
+  const canBaoCao = !!chiTiet && (caDaDong || moBaoCao !== null || !!sbdHoSo)
+  const khoaBcMay = chiTiet ? `${chiTiet.ca.maCa}|${chiTiet.ca.congBo}|${khoaBaoCaoLop}` : ''
+  useEffect(() => {
+    if (!canBaoCao || !chiTiet || bcMay?.khoa === khoaBcMay) return
+    let huy = false
+    setDangTaiBc(true)
+    void layBaoCaoCaDayDu(chiTiet.ca.maCa, dsEm.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, soLanRoiMan: e.moiNhat.soLanRoiMan, tongGiayRoiMan: e.moiNhat.tongGiayRoiMan })))
+      .then((r) => {
+        if (huy) return
+        let lop = r.lop
+        if (!lop) {
+          try {
+            lop = tinhBaoCaoLop()
+          } catch {
+            lop = null
+          }
+        }
+        setBcMay({ khoa: khoaBcMay, lop, them: r.them, loi: r.loi })
+      })
+      .finally(() => {
+        if (!huy) setDangTaiBc(false)
+      })
+    return () => {
+      huy = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- khoá quyết định lúc hỏi lại
+  }, [canBaoCao, khoaBcMay])
+  const congBoNgay = async () => {
+    if (!chiTiet) return
+    setDangCongBo(true)
+    const loiCb = await congBoDiemCa(chiTiet.ca.maCa)
+    setDangCongBo(false)
+    if (loiCb) showToast(`Chưa công bố được: ${loiCb}`, 'error')
+    else {
+      showToast('Đã công bố điểm — em và phụ huynh thấy ngay', 'success')
+      await tai(chiTiet.ca.maCa, true)
+    }
+  }
 
   // VÁ NGƯỢC KHOÁ `key/<maCa>.json` CHO CA CŨ — TỰ LÀNH KHI THẦY MỞ MÀN.
   //
@@ -1061,10 +1091,6 @@ export default function ExamMonitorScreen() {
 
   // ---------------------------------------------------------- HỒ SƠ MỘT EM (MODAL BÁO CÁO CHUẨN GOOGLE MATERIAL 3)
   // Thay toàn bộ màn chi tiết cũ bằng modal Báo cáo ca thi chuẩn Google Material 3 của học sinh
-  const emTrongCa = useMemo(() => {
-    if (!sbdHoSo) return null
-    return dsEm.find((e) => e.sbd === sbdHoSo) || null
-  }, [sbdHoSo, dsEm])
 
 
   return (
@@ -1232,6 +1258,68 @@ export default function ExamMonitorScreen() {
               />
             )
           })()}
+          {chiTiet.ca.trangThai === 'mo' ? (
+            <TheoDoiCa
+              tenCa={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
+              maCa={chiTiet.ca.maCa}
+              link={`${location.origin}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`}
+              daChepLink={daCopy}
+              onChepLink={copyLink}
+              moLuc={ngayGio(chiTiet.ca.batDau || chiTiet.ca.moLuc)}
+              hetHanVao={chiTiet.ca.hetHanVao ? gio(chiTiet.ca.hetHanVao) : ''}
+              thoiGianPhut={chiTiet.ca.thoiGianPhut}
+              congBoChu={TEN_CONG_BO[chiTiet.ca.congBo]}
+              phamViChu={TEN_PHAM_VI[chiTiet.ca.phamVi]}
+              conGiay={(() => {
+                const vao = dsEm.filter((e) => e.moiNhat.trangThai === 'dang_lam' && e.moiNhat.vaoLuc).map((e) => Date.parse(String(e.moiNhat.vaoLuc))).filter((x) => Number.isFinite(x))
+                return vao.length ? Math.round((Math.max(...vao) + chiTiet.ca.thoiGianPhut * 60_000 - now) / 1000) : null
+              })()}
+              em={[
+                ...dsEm.map((e): EmTheoDoi => ({
+                  sbd: e.sbd,
+                  hoTen: e.hoTen,
+                  tt: e.moiNhat.trangThai === 'duoc_duyet_lai' ? 'cho_thi_lai' : (e.moiNhat.trangThai as EmTheoDoi['tt']),
+                  daLam: e.moiNhat.dapAn && tongCauDe ? demCauDaLam(e.moiNhat.dapAn) : null,
+                  tongCau: tongCauDe || null,
+                  soLanRoiMan: e.moiNhat.soLanRoiMan,
+                  tongGiayRoiMan: e.moiNhat.tongGiayRoiMan,
+                  diem: e.diem ?? null,
+                })),
+                ...emChuaVao.map((sbd): EmTheoDoi => ({ sbd, hoTen: classList.find((c) => c.sbd === sbd)?.hoTen || '', tt: 'chua_vao', daLam: null, tongCau: null, soLanRoiMan: 0, tongGiayRoiMan: 0, diem: null })),
+              ]}
+              soChuaVao={chuaVao}
+              nguongLan={chiTiet.ca.nguongLan ?? 3}
+              dangTai={dangTai}
+              dangDuyet={dangDuyet}
+              onLamMoi={() => tai(chiTiet.ca.maCa)}
+              onMoKhoa={(sbd) => setXacNhanMoKhoa(sbd)}
+              onXemEm={(sbd) => setSbdHoSo(sbd)}
+              onChieuMa={() => setChieuMa(true)}
+              onKetThuc={() => {
+                setHoiKhoa(true)
+                // Hộp hỏi lại nằm ở cột dưới: kéo tới cho thầy thấy ngay (không khoá khi chưa bấm xác nhận).
+                setTimeout(() => document.querySelector('[data-hop="khoa-ca"]')?.scrollIntoView?.({ behavior: 'smooth', block: 'center' }), 60)
+              }}
+              dangLamNgay={dangLamNgay}
+            />
+          ) : (
+            <KetThucCa
+              tenCa={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
+              luc={ngayGio(chiTiet.ca.batDau || chiTiet.ca.moLuc)}
+              siSo={Array.isArray(chiTiet.ca.danhSachMoi) ? chiTiet.ca.danhSachMoi.length : dsEm.length}
+              phutDe={chiTiet.ca.thoiGianPhut}
+              lop={bcMay?.lop ?? null}
+              them={bcMay?.them ?? null}
+              dangTai={dangTaiBc}
+              loi={bcMay?.loi ?? ''}
+              canCongBo={chiTiet.ca.congBo === 'khong' && chiTiet.ca.loai !== 'baitap'}
+              dangCongBo={dangCongBo}
+              onCongBo={congBoNgay}
+              onXemBaoCao={() => setMoBaoCao('lop')}
+              onMoEm={(sbd) => setSbdHoSo(sbd)}
+              emChuaNop={dsEm.filter((e) => e.moiNhat.trangThai === 'dang_lam' || e.moiNhat.trangThai === 'duoc_duyet_lai').map((e) => ({ sbd: e.sbd, hoTen: e.hoTen }))}
+            />
+          )}
           <div className="ca-luoi">
           <div className="ca-cot ca-cot-phai">
           <KhoiThoiGianCa
@@ -1247,78 +1335,7 @@ export default function ExamMonitorScreen() {
           />
           {/* THÔNG TIN CA */}
           <TheNoiDung className="gv-monitor-overview">
-            <div className="gv-page-header flex items-start justify-between flex-wrap" style={{ gap: 'var(--k3)' }}>
-              <div className="min-w-0 flex-1 space-y-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono font-black text-xl sm:text-2xl text-blue-600 dark:text-blue-400 tracking-wider">
-                    #{chiTiet.ca.maCa}
-                  </span>
-                  {chiTiet.ca.lop && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-slate-700">
-                      Lớp {chiTiet.ca.lop}
-                    </span>
-                  )}
-                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-800">
-                    {chiTiet.ca.thoiGianPhut} phút
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 flex-wrap text-xs text-slate-600 dark:text-slate-300">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80">
-                    <span className="text-slate-400">Bắt đầu:</span>
-                    <span style={SO} className="font-semibold">{ngayGio(chiTiet.ca.batDau || chiTiet.ca.moLuc)}</span>
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100/90 dark:bg-slate-800/90 border border-slate-200/80 dark:border-slate-700/80">
-                    <span className="text-slate-400">Vào phòng đến:</span>
-                    <span style={SO} className="font-semibold">{chiTiet.ca.hetHanVao ? gio(chiTiet.ca.hetHanVao) : 'không giới hạn'}</span>
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 flex-wrap text-xs">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800/80 font-medium">
-                    Khoá rời màn: {chiTiet.ca.nguongLan ?? 3} lần / {chiTiet.ca.nguongGiay ?? 30}s
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800/80 font-medium">
-                    {TEN_CONG_BO[chiTiet.ca.congBo]} · {TEN_PHAM_VI[chiTiet.ca.phamVi]}
-                    {chiTiet.ca.phamVi === 'khoi' ? ` (sinh ${chiTiet.ca.danhSachMoi} → K${khoiTuNamSinh(String(chiTiet.ca.danhSachMoi)) ?? '?'})` : ''}
-                    {chiTiet.ca.phamVi === 'chon' && Array.isArray(chiTiet.ca.danhSachMoi) ? ` (${chiTiet.ca.danhSachMoi.length} em)` : ''}
-                  </span>
-                </div>
-              </div>
-
-              {/* Nhãn trạng thái và Nút làm mới cùng một cụm cân xứng */}
-              <div className="shrink-0 flex items-center gap-2">
-                <Nhan tone={tt.tone}>{tt.ten}</Nhan>
-                <button
-                  type="button"
-                  onClick={() => tai(chiTiet.ca.maCa)}
-                  disabled={dangTai}
-                  className="tap-target inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/80 text-blue-600 dark:text-blue-300 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition shadow-2xs text-xs font-bold cursor-pointer active:scale-95 disabled:opacity-50"
-                  aria-label="Làm mới ca kiểm tra"
-                  title="Làm mới dữ liệu ca kiểm tra"
-                >
-                  <RefreshCw size={13} className={dangTai ? 'animate-spin' : ''} />
-                  <span>Làm mới</span>
-                </button>
-              </div>
-            </div>
             <DongMatKetNoiCa soHut={soHut} gioTotMs={gioTot} />
-            <div className="grid grid-cols-3" style={{ gap: 'var(--k2)', marginTop: 'var(--k4)' }}>
-              {(
-                [
-                  ['Đã vào', tk.daVao, 'var(--muc)'],
-                  ['Đã nộp', tk.daNop, 'var(--xanh)'],
-                  ['Cảnh báo', tk.canhBao, tk.canhBao > 0 ? 'var(--cam)' : 'var(--nhat)'],
-                ] as const
-              ).map(([ten, so, mau]) => (
-                <div key={ten} className="text-center" style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3) var(--k2)' }}>
-                  <div className="font-bold" style={{ ...SO, fontSize: 'var(--cx-5)', color: mau }}>
-                    {so}
-                  </div>
-                  <div style={NHAN_NHO}>{ten}</div>
-                </div>
-              ))}
-            </div>
             {/* PHÒNG CHỜ (thầy chốt 07/09). Ca bật phòng chờ mà thầy chưa bấm
                 bắt đầu thì em đang đứng ở màn trắng — đây là việc gấp nhất
                 trên màn này, nên nó đứng trên cả cửa vào ca.
@@ -1688,7 +1705,7 @@ export default function ExamMonitorScreen() {
               Thầy phải biết mình đang cắt bài của mấy em trước khi bấm. */}
           {hoiKhoa && (
             <TheNoiDung>
-              <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Khoá ca {chiTiet.ca.maCa}?</div>
+              <div data-hop="khoa-ca" style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Kết thúc ca {chiTiet.ca.maCa}?</div>
               <OThongBao tone="do">
                 <b style={SO}>{dangLamNgay}</b> em đang làm bài sẽ bị nộp bài ngay, chấm theo phần đã làm.{' '}
                 {chuaVao === null ? 'Em nào chưa vào sẽ không vào được nữa.' : <>
@@ -1721,7 +1738,7 @@ export default function ExamMonitorScreen() {
 
           </div>
           <div className="ca-cot ca-cot-trai">
-          <BaoCaoCaLopKhoi key={chiTiet.ca.maCa} tomTat={tomTatLop} tinh={tinhBaoCaoLop} khoa={khoaBaoCaoLop} layMayChu={() => layBaoCaoCaLopMayChu(chiTiet.ca.maCa, dsEm.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, soLanRoiMan: e.moiNhat.soLanRoiMan, tongGiayRoiMan: e.moiNhat.tongGiayRoiMan })))} phutDe={chiTiet.ca.thoiGianPhut} moSan={chiTiet.ca.trangThai !== 'mo'} onMoEm={setSbdHoSo} />
+          {/* Báo cáo lớp cũ (khối gập) đã THAY bằng màn Kết thúc ca + Báo cáo chi tiết (ca thi 28/09). */}
           {/* DANH SÁCH EM */}
           <TheNoiDung className="gv-monitor-students">
             <div style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Học sinh trong ca ({dsEm.length})</div>
@@ -2039,24 +2056,33 @@ export default function ExamMonitorScreen() {
         />
       )}
 
-      {sbdHoSo && emTrongCa && baoCaoMotEmHienThi && chiTiet && (
-        <BaoCaoMotEmTrang
-          bc={baoCaoMotEmHienThi}
-          hoTen={emTrongCa.hoTen || hoSo?.em.hoTen || ''}
-          sbd={sbdHoSo}
+      {chiTiet && (moBaoCao !== null || !!sbdHoSo) && (
+        <BaoCaoChiTiet
           maCa={chiTiet.ca.maCa}
-          layLichSu={() => hsLichSuCaApi(scriptUrl.trim(), sbdHoSo).then((r) => (r && r.ok && Array.isArray(r.items) ? (r.items as CaLichSu[]) : null))}
-          lop={emTrongCa.lop || hoSo?.em.lop || chiTiet.ca.lop || ''}
-          tenCa={chiTiet.ca.tenCa || ''}
+          tenCa={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
+          lopCa={chiTiet.ca.lop || ''}
+          ngay={(() => {
+            const t = Date.parse(String(chiTiet.ca.batDau || chiTiet.ca.moLuc || ''))
+            return Number.isFinite(t) ? new Date(t).toLocaleDateString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : ''
+          })()}
           thoiGianPhut={chiTiet.ca.thoiGianPhut}
-          nopLuc={emTrongCa.moiNhat.nopLuc}
-          trangThai={emTrongCa.moiNhat.trangThai}
-          soLanRoiMan={emTrongCa.moiNhat.soLanRoiMan}
-          tongGiayRoiMan={emTrongCa.moiNhat.tongGiayRoiMan}
-          onDong={() => setSbdHoSo('')}
-          onToanCanh={() => moToanCanh(sbdHoSo)}
-          onGiaoRieng={() => {
-            datSbdGiaoRieng(sbdHoSo) // màn Giao bài mở sẵn chế độ chọn từng em, đã tick em này
+          siSo={Array.isArray(chiTiet.ca.danhSachMoi) ? chiTiet.ca.danhSachMoi.length : dsEm.length}
+          lop={bcMay?.lop ?? null}
+          them={bcMay?.them ?? null}
+          dangTai={dangTaiBc}
+          dsEm={dsEm.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, soLanRoiMan: e.moiNhat.soLanRoiMan, nopLuc: String(e.moiNhat.nopLuc || '') }))}
+          tab={sbdHoSo && moBaoCao !== 'lop' ? 'em' : (moBaoCao ?? 'lop')}
+          onTab={setMoBaoCao}
+          sbdEm={sbdHoSo}
+          onChonEm={setSbdHoSo}
+          emBc={baoCaoMotEmHienThi}
+          onDong={() => {
+            setMoBaoCao(null)
+            setSbdHoSo('')
+          }}
+          onToanCanh={(sbd) => moToanCanh(sbd)}
+          onGiaoRieng={(sbd) => {
+            datSbdGiaoRieng(sbd) // màn Giao bài mở sẵn chế độ chọn từng em, đã tick em này
             setScreen('giaobtvn')
           }}
         />

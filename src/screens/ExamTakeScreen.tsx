@@ -2957,6 +2957,21 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               daVao={choCaLop?.daVao}
               onXemBaoCao={graded && (!attempt?.integrity.blocked || xemLai) ? () => setXemBaoCaoModal(true) : undefined}
               onVe={onVe}
+              /* Ca thi 28/09 (e): ô từng câu CHỈ khi đã có điểm (graded = đã công bố); chưa công bố chỉ số câu đã làm. */
+              cau={
+                graded
+                  ? (['I', 'II', 'III'] as const).flatMap((ph) =>
+                      (ph === 'I' ? graded.score.phanI : ph === 'II' ? graded.score.phanII : graded.score.phanIII).items.map((it, i) => ({
+                        phan: ph,
+                        so: i + 1,
+                        kq: it.correct ? ('dung' as const) : it.flag === 'EMPTY' ? ('trong' as const) : ph === 'II' && (it.yDung ?? 0) > 0 ? ('mot_phan' as const) : ('sai' as const),
+                      })),
+                    )
+                  : undefined
+              }
+              soDaLam={soDaLam}
+              tongCau={flat.length}
+              lam2={thoiGianLam(attempt?.startedAt, attempt?.submittedAt)}
             />
           )}
 

@@ -9,6 +9,8 @@ import {
   gopThongKeDang, tinhHangTheoDang,
   type CauSrs, type HangEm, type TuyChonKeHoach, type HoSoDangTho, type LanLam, type TrangThaiCau, type Phan,
 } from './srs2-loi'
+import { SQL_DA_CONG_BO } from './cong-bo-diem'
+import { jsonLaTuLuan } from './cam-tu-luan'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -134,6 +136,47 @@ export interface HoSo2 {
   ttChienDich: TrangThaiCau[]
   /** Lần làm câu của chiến dịch đang chạy, từ lúc giao (chỉ-thêm 28/09 — để xếp hạng theo dạng khi bốc câu mới). */
   lanLamChienDich?: LanLam[]
+  /** Câu vào hàng ôn CHỈ vì em sai/bỏ trống trong ca kiểm tra ĐÃ CÔNG BỐ (nguồn thứ 3 `ca_sai`, chỉ-thêm 28/09). */
+  qidCaSai?: Set<string>
+}
+
+/**
+ * NGUỒN THỨ 3 — `ca_sai` (thầy chốt 28/09): câu em làm SAI hoặc BỎ TRỐNG trong ca kiểm tra ĐÃ CÔNG BỐ (sổ `su_kien_hoc` nguồn 'thi',
+ * không bị che, ca chưa xoá, luật công bố `SQL_DA_CONG_BO`) ⇒ vào hàng ôn của Đoàn như câu ôn thường, KỂ CẢ câu không thuộc chiến dịch nào.
+ * Trả qid → lúc làm SỚM NHẤT trong ca (mốc `tuLuc`: lần làm trong ca được tính). Câu tự luận (JSON kho) và câu đã rút khỏi kho bị bỏ.
+ * Lỗi đọc (bảng/cột thiếu) ⇒ rỗng: không làm hỏng kế hoạch.
+ */
+export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<string, string>> {
+  const ra = new Map<string, string>()
+  const cau = (coVis: boolean) =>
+    `SELECT s.qid, MIN(s.luc) AS luc FROM su_kien_hoc s JOIN ca c ON c.ma_ca = s.ma_nguon
+      WHERE s.sbd = ? AND s.nguon = 'thi' AND COALESCE(s.ket_qua, 0) <> 1 AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}
+        ${coVis ? "AND COALESCE(s.visibility, '') <> 'embargoed'" : ''}
+      GROUP BY s.qid`
+  let rows: Row[]
+  try {
+    rows = (await env.DB.prepare(cau(true)).bind(sbd).all<Row>()).results ?? []
+  } catch {
+    try {
+      rows = (await env.DB.prepare(cau(false)).bind(sbd).all<Row>()).results ?? []
+    } catch {
+      return ra
+    }
+  }
+  const qids = [...new Set(rows.map((x) => str(x.qid)).filter(Boolean))]
+  if (!qids.length) return ra
+  const kho = await env.DB.prepare('SELECT qid, json FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))').bind(JSON.stringify(qids)).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const tuLuan = new Set<string>()
+  const coKho = new Set<string>()
+  for (const x of kho.results ?? []) {
+    coKho.add(str(x.qid))
+    if (jsonLaTuLuan(x.json)) tuLuan.add(str(x.qid))
+  }
+  for (const x of rows) {
+    const q = str(x.qid)
+    if (q && coKho.has(q) && !tuLuan.has(q)) ra.set(q, str(x.luc))
+  }
+  return ra
 }
 
 /** Toàn bộ trạng thái luyện của em: chiến dịch đang chạy + nợ cũ + ôn duy trì của chiến dịch trước. */
@@ -148,6 +191,14 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
   for (const c of ds) {
     if (c === dangChay) continue
     for (const q of c.qids) if (!nguonTheoQid.has(q)) { hanTheoQid.set(q, c.hanNop); nguonTheoQid.set(q, 'cu'); tuLucTheoQid.set(q, c.taoLuc) }
+  }
+  // Nguồn thứ 3 `ca_sai`: câu sai/bỏ trống trong ca ĐÃ CÔNG BỐ. Câu đã thuộc chiến dịch ⇒ GIỮ nguồn chiến dịch (không nhân đôi).
+  const qidCaSai = new Set<string>()
+  for (const [q, luc] of await docQidSaiCaDaCongBo(env, sbd)) {
+    if (nguonTheoQid.has(q)) continue
+    nguonTheoQid.set(q, 'cu')
+    tuLucTheoQid.set(q, luc)
+    qidCaSai.add(q)
   }
   const qids = [...nguonTheoQid.keys()]
   const [meta, lanLam, moc] = await Promise.all([docMetaCau(env, qids, dangChay?.maDe ?? []), docLanLam(env, sbd, qids), docMocDayLai(env, sbd)])
@@ -165,7 +216,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
     cau.push({ qid, phan: m.phan, mucDo: m.mucDo, dang: m.dang, nguon })
   }
   const lanLamChienDich = dangChay ? dangChay.qids.flatMap((q) => theoQid.get(q) ?? []) : []
-  return { chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich }
+  return { chienDich: dangChay, cau, meta, tt, ttChienDich: dangChay ? dangChay.qids.map((q) => tt.get(q)).filter((x): x is TrangThaiCau => !!x) : [], lanLamChienDich, qidCaSai }
 }
 
 // ---------------------------------------------------------------- hạng theo dạng (bốc câu mới cá nhân hoá, thầy 28/09)
@@ -273,7 +324,8 @@ export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?
       return { kh: hoanThien(ngay, cd?.id ?? null, dao, doan, lap.huyetChien, dem), hs: hoSo }
     }
     if (cd && cd.hanNop === ngay && kh.conDao.length + kh.conDoan.length === 0) {
-      const them = lapKeHoachNgay(hoSo.cau, hoSo.tt, await tuyChonLap(), kh.tong)
+      // Bổ sung ngày cuối KHÔNG kéo câu `ca_sai` vào kế hoạch đã chốt: câu sai của ca vào từ lần lập kế hoạch kế tiếp (thầy 28/09).
+      const them = lapKeHoachNgay(hoSo.cau.filter((c) => !hoSo.qidCaSai?.has(c.qid)), hoSo.tt, await tuyChonLap(), kh.tong)
       if (them.dao.length + them.doan.length) {
         const dao = [...kh.dao, ...themLanLam([...kh.dao, ...kh.doan], them.dao)]
         const doan = [...kh.doan, ...themLanLam([...dao, ...kh.doan], them.doan)]
