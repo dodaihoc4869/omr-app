@@ -94,3 +94,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 21:37 · Deploy #547 THÀNH CÔNG: PR #49 xoá báo cáo HS cũ · main 2e41cfb · lùi: git revert -m 1 2e41cfb.
 - 21:51 · Deploy #548 THÀNH CÔNG: PR #50 đổi tên thần thú · main 7ff811e · lùi: git revert -m 1 7ff811e.
 - 22:09 · Deploy #549 THÀNH CÔNG: PR #51 Bi-a GĐ2 Đấu với bạn (DO BanBiA) · main abea3ea · lùi: git revert -m 1 abea3ea. Còn: Code 1 chưa làm Bi-a → Câu đã làm.
+- 22:38 · Deploy #550 THÀNH CÔNG: PR #52 Câu đã làm hiện câu ôn từ ca (Bi-a/Đoàn) + nguồn từng lần · main 87ce9bb · lùi: git revert -m 1 87ce9bb. Chờ: len-bang-day-hoc; tối ưu FE/BE (scratchpad/toi-uu).
