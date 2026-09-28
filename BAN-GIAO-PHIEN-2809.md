@@ -70,3 +70,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - PR #29 vùng đề/nút merge `2b22e57` 13:00 (deploy đang chạy, hẹn kiểm 13:14).
 - VIỆC MỚI: rà soát + vẽ lại luồng ca kiểm tra (mở ca, theo dõi, kết thúc, BÁO CÁO CHI TIẾT thay toàn bộ, màn HS xem kết quả) — nhánh `ban-ve-ca-thi`, `docs/ban-ve-ca-thi-2809/`. CHỜ THẦY CHỐT mới build.
 - 13:11 PR #29 deploy SUCCESS. PR #30 (`7049bee`): lối vào Ca kiểm tra ở Sảnh + câu ngắn thẻ đề gọn — deploy đang chạy, hẹn kiểm 13:30.
+- Bản vẽ ca kiểm tra: `ban-ve-ca-thi` `d1d9092`, link https://claude.ai/artifact/EZWNwNRXNeNqpxqawCYsoh — CHỜ CHỐT. API cần: /gv/cong-bo-ca, tbCaTruoc, /gv/nhan-xet-ca-em, maTran trong /gv/bao-cao-ca. Nhánh `chip-gon` (ee59c6d) chờ merge sau deploy #30.
