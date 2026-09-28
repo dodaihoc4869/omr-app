@@ -7,17 +7,18 @@
 //     chia lại phần câu CHƯA làm trên số ngày còn lại. Kế hoạch HÔM NAY đã chốt được đánh dấu để lập lại (giữ câu đã làm hôm nay).
 //   · Thêm em ⇒ mốc tính lần làm của em = lúc được thêm (như em giao từ đầu); em từng bị bớt rồi thêm lại giữ mốc cũ.
 //   · Bớt em ⇒ bỏ khỏi `sbd_json` (em không thấy chiến dịch nữa); KHÔNG xoá sổ làm bài.
-//   · Số câu/ngày (Boss chốt 28/09): thêm đề hoặc rút hạn mà câu CHƯA LÀM của em nhiều nhất > số câu/ngày × số ngày còn lại (tính cả hôm nay)
-//     ⇒ tự NÂNG số câu/ngày = ⌈câu chưa làm lớn nhất / ngày còn lại⌉; KHÔNG bao giờ tự hạ. Thầy gửi `theLucNgay` ⇒ dùng số của thầy
+//   · Số câu/ngày (Boss chốt 28/09; thầy chốt 28/09 tính theo LƯỢT, cùng hàm `khoiLuongCan` với Giao chiến dịch và Huyết Chiến):
+//     thêm đề hoặc rút hạn mà LƯỢT CÒN CẦN của em nhiều nhất > số câu/ngày × số ngày còn lại (tính cả hôm nay)
+//     ⇒ tự NÂNG số câu/ngày = ⌈lượt còn cần lớn nhất / ngày còn lại⌉; KHÔNG bao giờ tự hạ. Thầy gửi `theLucNgay` ⇒ dùng số của thầy
 //     (thấp hơn mức cần ⇒ `chuaKipHan: true`, vẫn lưu).
 //   · Sửa hạn ⇒ hạn mới ≥ hôm nay; chiến dịch đã hết hạn / đã kết thúc ⇒ mở lại (`dang_chay`). Chiến dịch đã huỷ ⇒ từ chối.
 //   · Nhật ký: `chien_dich_sua` (ai, lúc nào, đổi gì) + một dòng `nhat_ky_may`.
 // Schema CHỈ-THÊM, tạo lúc chạy (CI không chạy migration): `chien_dich_em`, `chien_dich_sua`.
 // Không gửi đáp án/lời giải: chỉ trả mã tờ, số câu, SBD.
 import type { Env } from './kieu'
-import { cauCuaToChiTiet, lanLamCaLop, maGocCuaTo, THE_LUC_TOI_DA } from './srs2-gv'
-import { docChienDichTuDong, docMocThemCaLop, mocTinhCua, ngayVnCua, type ChienDich } from './srs2-d1'
-import { soNgayConLai } from './srs2-loi'
+import { cauCuaToChiTiet, maGocCuaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
+import { docChienDichTuDong, docMocThemCaLop, ngayVnCua, type ChienDich } from './srs2-d1'
+import { khoiLuongCan, soNgayConLai } from './srs2-loi'
 import { chuTomTatSua } from '../../src/lib/tom-tat-sua-chien-dich'
 
 type Row = Record<string, unknown>
@@ -69,28 +70,33 @@ export interface KeHoachSua {
   theLucCu: number
   /** Số câu/ngày sau khi lưu. */
   theLucSau: number
-  /** Số câu/ngày NHỎ NHẤT để em nhiều câu chưa làm nhất kịp hạn. */
+  /** Số câu/ngày NHỎ NHẤT để em cần nhiều lượt nhất làm đủ lượt trước hạn (`khoiLuongCan`). */
   theLucCan: number
   tuNang: boolean
   chuaKipHan: boolean
   tomTat: string
 }
 
-/** Số câu CHƯA LÀM lớn nhất trong lớp (em mới: mọi câu; em cũ: câu chưa có lần làm từ mốc của em). */
-async function cauChuaLamLonNhat(env: Env, cd: ChienDich, sbd: readonly string[], qids: readonly string[], themSbd: readonly string[], nowLuc: string): Promise<number> {
+/**
+ * Số LƯỢT còn cần lớn nhất trong lớp — CÙNG hàm `khoiLuongCan` với Huyết Chiến và màn Giao chiến dịch (thầy chốt 28/09):
+ * câu mới 2 lượt, câu đang ôn 2 − chuỗi đúng, câu đã thành thạo (kể cả thành thạo lần đầu) 0.
+ * Mốc tính lần làm: em mới thêm = bây giờ; em cũ = lúc giao / lúc được thêm (như `trangThaiLop`).
+ */
+async function khoiLuongLonNhat(env: Env, cd: ChienDich, sbd: readonly string[], qids: readonly string[], themSbd: readonly string[], nowLuc: string, hanNop: string): Promise<number> {
   if (!sbd.length || !qids.length) return 0
-  const [lan, them] = await Promise.all([lanLamCaLop(env, sbd, qids), docMocThemCaLop(env, cd.id)])
+  const them = new Map(await docMocThemCaLop(env, cd.id))
+  for (const s of themSbd) them.set(s, nowLuc)
+  const tt = await trangThaiLop(env, sbd, qids, hanNop, cd.taoLuc, undefined, them)
   let lonNhat = 0
-  for (const s of sbd) {
-    const tu = themSbd.includes(s) ? nowLuc : mocTinhCua(cd.taoLuc, them.get(s))
-    const daLam = new Set((lan.get(s) ?? []).filter((x) => x.luc >= tu).map((x) => x.qid))
-    lonNhat = Math.max(lonNhat, qids.filter((q) => !daLam.has(q)).length)
-  }
+  for (const s of sbd) lonNhat = Math.max(lonNhat, khoiLuongCan(tt.get(s)?.values() ?? []))
   return lonNhat
 }
-/** Luật nâng số câu/ngày (Boss chốt 28/09): cần = ⌈chưa làm lớn nhất / ngày còn lại⌉; chỉ NÂNG, không hạ. */
-export function theLucSauSua(theLucCu: number, chuaLamLonNhat: number, ngayConLai: number, coXet: boolean): { can: number; sau: number } {
-  const can = Math.min(THE_LUC_TOI_DA, Math.max(1, Math.ceil(chuaLamLonNhat / Math.max(1, ngayConLai))))
+/**
+ * Luật nâng số câu/ngày (Boss chốt 28/09; thầy chốt 28/09 đổi sang LƯỢT): cần = ⌈lượt còn cần lớn nhất / ngày còn lại⌉
+ * (= mức "không em nào quá tải" của Tự tính ở màn Giao); chỉ NÂNG, không hạ.
+ */
+export function theLucSauSua(theLucCu: number, luotLonNhat: number, ngayConLai: number, coXet: boolean): { can: number; sau: number } {
+  const can = Math.min(THE_LUC_TOI_DA, Math.max(1, Math.ceil(luotLonNhat / Math.max(1, ngayConLai))))
   return { can, sau: coXet && can > theLucCu ? can : theLucCu }
 }
 
@@ -153,8 +159,8 @@ export async function lapKeHoachSua(env: Env, b: Row, nowMs: number): Promise<Ke
   const hanSau = hanMoi ?? cd.hanNop
   const qidSau = [...cd.qids, ...qidThem]
   const coXet = qidThem.length > 0 || (!!hanMoi && hanMoi < cd.hanNop)
-  const chuaLam = await cauChuaLamLonNhat(env, cd, sbdSau, qidSau, themSbd, new Date(nowMs).toISOString())
-  const { can: theLucCan, sau: theLucTu } = theLucSauSua(cd.theLucNgay, chuaLam, soNgayConLai(homNay, hanSau < homNay ? homNay : hanSau), coXet)
+  const luotCan = await khoiLuongLonNhat(env, cd, sbdSau, qidSau, themSbd, new Date(nowMs).toISOString(), hanSau)
+  const { can: theLucCan, sau: theLucTu } = theLucSauSua(cd.theLucNgay, luotCan, soNgayConLai(homNay, hanSau < homNay ? homNay : hanSau), coXet)
   const theLucSau = theLucGui != null ? Math.min(THE_LUC_TOI_DA, theLucGui) : theLucTu
   const doiTheLuc = theLucSau !== cd.theLucNgay
 
@@ -166,7 +172,7 @@ export async function lapKeHoachSua(env: Env, b: Row, nowMs: number): Promise<Ke
   const tomTat = chuTomTatSua({ themDe: themMaDe.length, themEm: themSbd.length, botEm: botSbd.length, hanCu: cd.hanNop, hanMoi, theLucCu: cd.theLucNgay, theLucMoi: theLucSau })
   return {
     cd, homNay, themMaDe, toKhongCoCauMoi, soCauTheoTo, qidThem, themSbd, botSbd, hanMoi, moLai, sbdSau, maDeSau, qidSau,
-    theLucCu: cd.theLucNgay, theLucSau, theLucCan, tuNang: theLucGui == null && theLucSau > cd.theLucNgay, chuaKipHan: chuaLam > 0 && theLucSau < theLucCan, tomTat,
+    theLucCu: cd.theLucNgay, theLucSau, theLucCan, tuNang: theLucGui == null && theLucSau > cd.theLucNgay, chuaKipHan: luotCan > 0 && theLucSau < theLucCan, tomTat,
   }
 }
 

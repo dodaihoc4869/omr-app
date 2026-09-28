@@ -266,7 +266,7 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
                   )}
                   {xem.chuaKipHan && (
                     <p className="scd-canh-bao" role="status">
-                      Chưa kịp hạn: cần ít nhất {xem.theLucCan} câu/ngày để em nhiều câu chưa làm nhất xong trước {ngayNgan(xem.hanNop)}. Vẫn lưu được.
+                      Chưa kịp hạn: cần ít nhất {xem.theLucCan} câu/ngày để em còn nhiều lượt nhất (câu mới 2 lượt, câu đã thành thạo không tính) làm đủ trước {ngayNgan(xem.hanNop)}. Vẫn lưu được.
                     </p>
                   )}
                   {xem.moLai && <p>Chiến dịch được mở lại tới hạn nộp mới.</p>}
