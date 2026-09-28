@@ -1,5 +1,5 @@
 // MÀN LÀM BÀI NGANG (thầy chốt bản vẽ 28/09, docs/ban-ve-lam-bai-ngang-2809): bố cục theo hướng, thanh kéo, phím tắt, đồng hồ đổi màu,
-// tự vào toàn màn hình trong cú bấm + đường dự phòng, xoay qua lại không mất trạng thái. Kèm ô Phần III: dải "−" "," "⌫", "." ⇒ ",".
+// tự vào toàn màn hình trong cú bấm + đường dự phòng, xoay qua lại không mất trạng thái. Kèm ô Phần III gọn: chỉ nút "−" trong ô ở iPhone/iPad, "." ⇒ ",".
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, renderHook } from '@testing-library/react'
 import { useState } from 'react'
@@ -21,7 +21,7 @@ import {
   tiLeTheoPhim,
   TI_LE_MAC_DINH,
 } from '../src/lib/lam-bai-ngang'
-import { chuanDauGo, suaXoaLui } from '../src/lib/nhap-dap-so'
+import { banPhimThieuDauTru, chuanDauGo } from '../src/lib/nhap-dap-so'
 import { normalizeNumericAnswer } from '../src/engine/score'
 import ONhapDapSo from '../src/components/ONhapDapSo'
 
@@ -155,7 +155,7 @@ function props(p: Partial<LamBaiNgangProps> = {}): LamBaiNgangProps {
     onChonPa: () => {},
     onGhiY: () => {},
     onNhap: () => {},
-    oDapSo: (o) => <ONhapDapSo chuanViet nutXoa value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />,
+    oDapSo: (o) => <ONhapDapSo chuanViet value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />,
     onDoiDau: () => {},
     dongHo: '38:12',
     chuThayDongHo: 'Bài tập',
@@ -404,7 +404,7 @@ describe('tự vào toàn màn hình trong cú bấm + đường dự phòng', (
 })
 
 // ---------------------------------------------------------------- Ô PHẦN III
-describe('ô trả lời ngắn: dải "−" "," "⌫", "." ⇒ ",", một dấu phẩy, dấu âm bật/tắt', () => {
+describe('ô trả lời ngắn gọn: không "," không nút xoá; "−" chỉ ở iPhone/iPad; "." ⇒ ","', () => {
   it('chuanDauGo: "." ⇒ ","; dấu trừ Unicode ⇒ "-"; chỉ giữ MỘT dấu thập phân', () => {
     expect(chuanDauGo('12.3')).toBe('12,3')
     expect(chuanDauGo('7,44')).toBe('7,44')
@@ -414,17 +414,20 @@ describe('ô trả lời ngắn: dải "−" "," "⌫", "." ⇒ ",", một dấu
     expect(chuanDauGo('1..5')).toBe('1,5')
     expect(chuanDauGo('')).toBe('')
   })
-  it('suaXoaLui: xoá ký tự trước con trỏ / vùng chọn; đầu ô ⇒ null', () => {
-    expect(suaXoaLui('12,3', 4, 4)).toEqual({ value: '12,', caret: 3 })
-    expect(suaXoaLui('12,3', 1, 3)).toEqual({ value: '13', caret: 1 })
-    expect(suaXoaLui('12', 0, 0)).toBeNull()
+  it('banPhimThieuDauTru: iPhone/iPad (kể cả iPad khai Macintosh) ⇒ có; Android, máy tính, Mac thật ⇒ không', () => {
+    expect(banPhimThieuDauTru({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X)', maxTouchPoints: 5 })).toBe(true)
+    expect(banPhimThieuDauTru({ userAgent: 'Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X)', maxTouchPoints: 5 })).toBe(true)
+    expect(banPhimThieuDauTru({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', maxTouchPoints: 5 })).toBe(true)
+    expect(banPhimThieuDauTru({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', maxTouchPoints: 0 })).toBe(false)
+    expect(banPhimThieuDauTru({ userAgent: 'Mozilla/5.0 (Linux; Android 14; SM-A546E) Chrome/126.0 Mobile', maxTouchPoints: 5 })).toBe(false)
+    expect(banPhimThieuDauTru({ userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0', maxTouchPoints: 0 })).toBe(false)
+    expect(banPhimThieuDauTru(undefined)).toBe(false)
   })
   function O({ dau = '', ghi }: { dau?: string; ghi: (v: string) => void }) {
     const [v, setV] = useState(dau)
     return (
       <ONhapDapSo
         chuanViet
-        nutXoa
         value={v}
         onChange={(x) => {
           setV(x)
@@ -433,45 +436,46 @@ describe('ô trả lời ngắn: dải "−" "," "⌫", "." ⇒ ",", một dấu
       />
     )
   }
-  it('trên ô: gõ "12.3" gửi "12,3"; "−" bật rồi tắt; "," khoá khi đã có; "⌫" xoá lùi; bấm nút không lấy tiêu điểm khỏi ô', () => {
+  it('iPhone: chỉ một nút "−" trong ô, bật rồi tắt; gõ "12.3" gửi "12,3"; bấm nút không lấy tiêu điểm khỏi ô', () => {
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X)')
     const ghi = vi.fn()
     const r = render(<O ghi={ghi} />)
     const o = r.container.querySelector('input') as HTMLInputElement
+    expect([...r.container.querySelectorAll('button')].map((b) => b.textContent)).toEqual(['−'])
     fireEvent.change(o, { target: { value: '12.3' } })
     expect(ghi).toHaveBeenLastCalledWith('12,3')
     expect(o.value).toBe('12,3')
-    const phay = r.getByRole('button', { name: 'Thêm dấu phẩy' }) as HTMLButtonElement
-    expect(phay.disabled).toBe(true)
     fireEvent.click(r.getByRole('button', { name: 'Thêm dấu âm' }))
     expect(ghi).toHaveBeenLastCalledWith('-12,3')
     fireEvent.click(r.getByRole('button', { name: 'Bỏ dấu âm' }))
     expect(ghi).toHaveBeenLastCalledWith('12,3')
-    fireEvent.click(r.getByRole('button', { name: 'Xoá một ký tự' }))
-    expect(ghi).toHaveBeenLastCalledWith('12,')
-    fireEvent.click(r.getByRole('button', { name: 'Xoá một ký tự' }))
-    expect(ghi).toHaveBeenLastCalledWith('12')
-    expect(phay.disabled).toBe(false)
-    fireEvent.click(phay)
-    expect(ghi).toHaveBeenLastCalledWith('12,')
     o.focus()
-    for (const nut of r.container.querySelectorAll('.ond-nut')) {
-      const pd = new Event('pointerdown', { bubbles: true, cancelable: true })
-      nut.dispatchEvent(pd)
-      expect(pd.defaultPrevented).toBe(true)
-    }
+    const pd = new Event('pointerdown', { bubbles: true, cancelable: true })
+    r.container.querySelector('.ond-nut')!.dispatchEvent(pd)
+    expect(pd.defaultPrevented).toBe(true)
     expect(document.activeElement).toBe(o)
+    vi.restoreAllMocks()
   })
-  it('phiếu ngang: ô Phần III có đủ dải phím và gửi dạng chuẩn', () => {
+  it('Android / máy tính: KHÔNG nút nào; gõ "-" và "." trực tiếp vẫn nhận, gửi dạng chuẩn', () => {
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (Linux; Android 14; SM-A546E) Chrome/126.0 Mobile')
+    const ghi = vi.fn()
+    const r = render(<O ghi={ghi} />)
+    expect(r.container.querySelectorAll('button')).toHaveLength(0)
+    fireEvent.change(r.container.querySelector('input')!, { target: { value: '-0.5' } })
+    expect(ghi).toHaveBeenLastCalledWith('-0,5')
+    vi.restoreAllMocks()
+  })
+  it('phiếu ngang: ô Phần III không còn nút "," và nút xoá; gửi dạng chuẩn', () => {
     const nhap = vi.fn()
     const r = render(<LamBaiNgang {...props({ onNhap: nhap })} />)
     const hang = r.container.querySelector('[data-hang="4"]')!
-    expect([...hang.querySelectorAll('.ond-nut')].map((b) => b.textContent)).toEqual(['−', ',', '⌫'])
+    expect([...hang.querySelectorAll('.ond-nut')].map((b) => b.textContent).filter((t) => t !== '−')).toEqual([])
     fireEvent.change(hang.querySelector('input')!, { target: { value: '0.54' } })
     expect(nhap).toHaveBeenLastCalledWith(4, '0,54')
   })
-  it('thẻ câu thi (bố cục DỌC) cũng có "⌫" và đổi "." ⇒ ","', () => {
-    const src = doc('src/components/TheCau.tsx')
-    expect(src).toMatch(/<ONhapDapSo\s+nutTruoc\s+chuanViet\s+nutXoa/)
+  it('thẻ câu thi (bố cục DỌC) cũng dùng ô gọn; không còn prop nút xoá ở đâu', () => {
+    expect(doc('src/components/TheCau.tsx')).toMatch(/<ONhapDapSo\s+nutTruoc\s+chuanViet\s+value=/)
+    expect(doc('src/components/ONhapDapSo.tsx')).not.toContain('⌫')
   })
 })
 

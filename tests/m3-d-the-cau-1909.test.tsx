@@ -113,7 +113,8 @@ describe('dưới tổ tiên `.m3`: hành vi y hệt (chỉ đổi phần nhìn)
     expect(container.querySelector('.y-nut button')!.getAttribute('data-trang-thai')).toBe('chon')
   })
 
-  it('Phần III: ô nhập số giữ inputMode=decimal, gõ là gọi onChange, nút đổi dấu / dấu phẩy còn', () => {
+  it('Phần III: ô nhập số giữ inputMode=decimal, gõ là gọi onChange; iPhone còn nút đổi dấu (28/09: bỏ nút dấu phẩy)', () => {
+    vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X)')
     const onChange = vi.fn()
     const { container } = boc(<TheCau {...P3} onChange={onChange} />)
     const o = container.querySelector('input') as HTMLInputElement
@@ -121,7 +122,8 @@ describe('dưới tổ tiên `.m3`: hành vi y hệt (chỉ đổi phần nhìn)
     fireEvent.change(o, { target: { value: '12,5' } })
     expect(onChange).toHaveBeenCalledWith('12,5')
     expect(screen.getByRole('button', { name: 'Thêm dấu âm' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Thêm dấu phẩy' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Thêm dấu phẩy' })).toBeNull()
+    vi.restoreAllMocks()
   })
 
   it('xem lại: đúng ✓ (aria-label đúng), em chọn sai ✗ (aria-label sai) — hai trạng thái vẫn có nhãn riêng', () => {

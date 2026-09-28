@@ -3561,7 +3561,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             const f = flat[n - 1]
             if (f?.phan === 'III') setPhanIII(assignment.phanIII[f.i].qid, text)
           }}
-          oDapSo={(o) => <ONhapDapSo chuanViet nutXoa value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />}
+          oDapSo={(o) => <ONhapDapSo chuanViet value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />}
           onDoiDau={(n) => {
             const f = flat[n - 1]
             if (f) doiDauCau(dsItem(f).qid)
