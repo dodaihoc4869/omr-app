@@ -114,7 +114,6 @@ export default function BangChienDich({
   const soDangYeu = dang.filter((d) => typeof tb[d] === 'number' && hangTuTiLe(tb[d]!) === 'L1').length
   const hangLop = demHangLop(tb, lop.hangTheoDang)
   const tongHang = hangLop.L1 + hangLop.L2 + hangLop.L3 + hangLop.L4
-  const tbThanhThaoLop = du.em.length ? du.em.reduce((s, e) => s + e.thanhThao, 0) / du.em.length / soCau : lop.thanhThao
 
   const chieuBa = async () => {
     const ok = await onChieu(nguoiGiaiMau(ba, du.em), `Chữa sớm · ${cd.ten}`)
@@ -240,7 +239,7 @@ export default function BangChienDich({
                     <th scope="row" className="cd-nhiet-ten">
                       Cả lớp ({soEm} em)
                     </th>
-                    <td className="cd-so">{phanTram(tbThanhThaoLop)}</td>
+                    <td className="cd-so">{phanTram(lop.thanhThao)}</td>
                     <td>—</td>
                     {dang.map((d) => {
                       const t = tb[d]

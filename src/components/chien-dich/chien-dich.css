@@ -969,6 +969,13 @@
   flex: 1 1 auto;
   min-width: 0;
 }
+.cd-hang-o .cd-gat {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.cd-hang-o .cd-gat input {
+  flex: 0 0 auto;
+}
 .cd-dong-ho-so {
   display: flex;
   align-items: baseline;
@@ -1379,4 +1386,20 @@ tr.cd-muc-cd {
 }
 .cd-vs-day {
   background: var(--bts-do);
+}
+/* Chữ ẩn cho trình đọc màn hình nằm TRONG vùng cuộn ngang: vùng cuộn phải là khung định vị, không thì chữ ẩn (absolute) thoát ra và kéo cả trang cuộn ngang. */
+.cd-cuon-ngang {
+  position: relative;
+}
+.cd-bang-cd th,
+.cd-bang-cd td {
+  text-align: left;
+}
+/* Ô tìm trong tấm chọn em / đầu bảng chiến dịch: cao một dòng (không giãn theo cột flex). */
+.cd-tam-chon .cd-tim-em,
+.cd-hang-nut .cd-tim-em {
+  flex: 0 0 auto;
+}
+.cd-hang-nut .cd-tim-em {
+  width: min(260px, 100%);
 }
