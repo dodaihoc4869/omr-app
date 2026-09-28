@@ -218,6 +218,18 @@ export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?
   const cu = await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
   if (cu) {
     let kh = tuDong(cu, ngay, dem)
+    // Thầy 28/09 ("đã giao chiến dịch test nhưng không bấm vào làm được"): kế hoạch chốt LÚC CHƯA CÓ chiến dịch (hoặc chiến dịch khác)
+    // thì LẬP LẠI theo chiến dịch hiện tại — giữ các câu đã làm hôm nay (vẫn trừ vào thể lực), thêm câu mới của kế hoạch.
+    if ((kh.chienDichId ?? null) !== (cd?.id ?? null)) {
+      const xongDao = kh.dao.filter((k) => !kh.conDao.includes(k))
+      const xongDoan = kh.doan.filter((k) => !kh.conDoan.includes(k))
+      const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, tuyChon, xongDao.length + xongDoan.length)
+      const dao = [...xongDao, ...themLanLam([...xongDao, ...xongDoan], lap.dao)]
+      const doan = [...xongDoan, ...themLanLam([...dao, ...xongDoan], lap.doan)]
+      await env.DB.prepare('UPDATE srs2_ke_hoach SET chien_dich_id = ?, dao_json = ?, doan_json = ?, huyet_chien = ?, tong = ? WHERE sbd = ? AND ngay = ?')
+        .bind(cd?.id ?? null, JSON.stringify(dao), JSON.stringify(doan), lap.huyetChien ? 1 : 0, dao.length + doan.length, sbd, ngay).run()
+      return { kh: hoanThien(ngay, cd?.id ?? null, dao, doan, lap.huyetChien, dem), hs: hoSo }
+    }
     if (cd && cd.hanNop === ngay && kh.conDao.length + kh.conDoan.length === 0) {
       const them = lapKeHoachNgay(hoSo.cau, hoSo.tt, tuyChon, kh.tong)
       if (them.dao.length + them.doan.length) {
