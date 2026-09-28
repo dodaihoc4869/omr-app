@@ -22,6 +22,8 @@ export interface ChienDichSanh {
 export interface SanhHoa2 {
   ngay: string
   chienDich: ChienDichSanh | null
+  /** Chiến dịch chưa tới ngày bắt đầu (thầy 28/09): chỉ tên + ngày, không lộ câu. Máy chủ cũ không gửi ⇒ null. */
+  sapBatDau?: { ten: string; batDau: string } | null
   theLuc: { con: number; tong: number }
   huyetChien: boolean
   doan: { con: number }
@@ -135,6 +137,12 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
   }
 }
 
+function docSapBatDau(v: unknown): { ten: string; batDau: string } | null {
+  if (!v || typeof v !== 'object') return null
+  const o = v as Record<string, unknown>
+  return laNgay(o.batDau) ? { ten: chu(o.ten).trim() || 'Chiến dịch của lớp', batDau: o.batDau } : null
+}
+
 /** Đọc CHẶT phản hồi `hoa2-sanh`. Trả null nếu thiếu phần bắt buộc (coi như lỗi, KHÔNG đoán). */
 export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
   if (o.cheDo2 !== true) return { cheDo2: false }
@@ -163,6 +171,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
     sanh: {
       ngay: laNgay(o.ngay) ? o.ngay : '',
       chienDich,
+      sapBatDau: docSapBatDau(o.sapBatDau),
       theLuc: { con: soKhongAm(tl.con), tong: soKhongAm(tl.tong) },
       huyetChien: o.huyetChien === true,
       doan: { con: soKhongAm((o.doan as Record<string, unknown> | undefined)?.con) },

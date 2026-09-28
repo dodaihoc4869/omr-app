@@ -130,7 +130,8 @@ const doc = (p: string) => readFileSync(resolve(__dirname, '..', p), 'utf8')
 const boChuThich = (ma: string) => ma.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
 
 const API = boChuThich(doc('src/lib/exam-api.ts'))
-const BC_HS = boChuThich(doc('src/components/BaoCaoCaThiHocSinhModal.tsx'))
+// 28/09: modal học sinh cũ ĐÃ XOÁ — báo cáo của em nay nạp qua `ca-thi/BaoCaoCaCuaEm` (bản mới).
+const BC_HS = boChuThich(doc('src/components/ca-thi/BaoCaoCaCuaEm.tsx'))
 const BC_PH = boChuThich(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx'))
 const CONG_PH = boChuThich(doc('src/screens/ParentPortalScreen.tsx'))
 const DB = boChuThich(doc('src/lib/exam-db.ts'))
@@ -164,10 +165,12 @@ describe('Mọi lượt gọi của học sinh và phụ huynh dùng chung một
 })
 
 describe('Màn báo cáo hết canh cửa bằng `scriptUrl`', () => {
-  it('app học sinh: hai lượt nạp không còn cổng `!scriptUrl`', () => {
-    expect(BC_HS).not.toContain('if (!sbd || !scriptUrl) return')
-    expect(BC_HS).not.toContain('if (!baiThi.maCa || !scriptUrl) return')
-    expect(BC_HS).toContain('if (!baiThi.maCa) return')
+  it('app học sinh: hai lượt nạp không canh cửa bằng `scriptUrl` — đi thẳng vào hàm API (một nguồn địa chỉ)', () => {
+    expect(BC_HS).not.toMatch(/!\s*scriptUrl/)
+    expect(BC_HS).toContain('hsLichSuCaApi(scriptUrl, sbd)')
+    expect(BC_HS).toContain('hsCauDaThiApi(scriptUrl, sbd, [maCa])')
+    // báo cáo không tự dựng địa chỉ máy chủ
+    expect(BC_HS).not.toMatch(/fetch\(|layDiaChiMayChu|scriptUrl\.replace/)
   })
 
   it('app phụ huynh: hai lượt nạp không còn cổng `!scriptUrl`', () => {
@@ -182,9 +185,13 @@ describe('Màn báo cáo hết canh cửa bằng `scriptUrl`', () => {
 })
 
 describe('Cấm nuốt lỗi im lặng', () => {
-  it('app học sinh: gọi hỏng thì giữ lại lý do và hiện ra', () => {
-    expect(BC_HS).toContain('setLoiCauSai')
-    expect(BC_HS).toContain("loiCauSai || 'Chưa lấy được danh sách câu sai của ca này'")
+  it('app học sinh: gọi hỏng thì giữ lại lý do và hiện ra (báo cáo bản mới)', () => {
+    expect(BC_HS).toContain("setLoiLs(a.status === 'fulfilled' ? null : chuLoi(a.reason, 'Chưa tải được kết quả của em.'))")
+    expect(BC_HS).toContain("setLoiCau(b.status === 'fulfilled' ? null : chuLoi(b.reason, 'Chưa tải được từng câu của ca này.'))")
+    expect(BC_HS).toContain('loiEm={loiLs}')
+    expect(BC_HS).toContain('loiCauEm={loiCau}')
+    const CT = boChuThich(doc('src/components/ca-thi/BaoCaoChiTiet.tsx'))
+    expect(CT).toContain("p.loiEm || 'Ca này chưa có điểm đã công bố.'")
   })
 
   it('app phụ huynh: gọi hỏng thì giữ lại lý do và hiện ra', () => {

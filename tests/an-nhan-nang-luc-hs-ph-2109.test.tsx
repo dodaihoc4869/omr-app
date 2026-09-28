@@ -8,6 +8,7 @@ import BieuDoTienBoGoogle from '../src/components/BieuDoTienBoGoogle'
 import TheTienBo from '../src/components/TheTienBo'
 import { classify } from '../src/engine/score'
 import type { HoSoEm } from '../src/lib/exam-api'
+import { CA_MAU, nguonBaoCaoEmMoi, veBaoCaoEmMoi } from './_bao-cao-em-moi'
 
 afterEach(cleanup)
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
@@ -52,11 +53,22 @@ describe('TheTienBo truyền cờ xuống; chỉ màn HS/PH bật', () => {
     expect(t).toContain('anNhanNangLuc = false')
     expect(t).toContain('anNhanNangLuc={anNhanNangLuc}')
   })
-  it('modal báo cáo HỌC SINH và PHỤ HUYNH bật cờ; màn thầy (ExamMonitor, BaoCaoMotEm) KHÔNG bật', () => {
-    expect(doc('src/components/BaoCaoCaThiHocSinhModal.tsx')).toMatch(/<TheTienBo [^>]*anNhanNangLuc \/>/)
+  it('modal báo cáo PHỤ HUYNH bật cờ; màn thầy (ExamMonitor, BaoCaoMotEm) KHÔNG bật', () => {
     expect(doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')).toMatch(/<TheTienBo[\s\S]*?anNhanNangLuc\s*\/>/)
     expect(doc('src/components/xem-diem-gv/BaoCaoMotEm.tsx')).not.toContain('anNhanNangLuc')
     expect(doc('src/screens/ExamMonitorScreen.tsx')).not.toContain('anNhanNangLuc')
+  })
+  it('báo cáo HỌC SINH bản mới (28/09, thay modal cũ đã xoá): không dùng thẻ có nhãn, màn KHÔNG in nhãn xếp loại hay hạng', () => {
+    const nguon = nguonBaoCaoEmMoi()
+    // thẻ/biểu đồ tiến bộ (nơi tự in classify + Hạng) không có mặt trong báo cáo em
+    expect(nguon).not.toMatch(/<TheTienBo|<BieuDoTienBoGoogle|classify\(/)
+    for (const diem of [2.5, 5.5, 7.25, 9.5]) {
+      const { container, unmount } = veBaoCaoEmMoi({ ...CA_MAU, tong: diem })
+      const chu = container.textContent || ''
+      expect(chu, `điểm ${diem}`).not.toContain(classify(diem))
+      expect(chu, `điểm ${diem}`).not.toMatch(/Hạng \d+|hạng trong lớp/i)
+      unmount()
+    }
   })
   it('dùng thẻ thật: TheTienBo với cờ ⇒ không nhãn xếp loại', () => {
     const lichSu = [{ maCa: 'A', tenCa: 'Ca A', nopLuc: '2026-09-10T02:00:00Z', tong: 2.5, tongCau: 28 }, { maCa: 'B', tenCa: 'Ca B', nopLuc: '2026-09-17T02:00:00Z', tong: 6.5, tongCau: 28 }]

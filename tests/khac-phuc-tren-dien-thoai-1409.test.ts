@@ -52,15 +52,9 @@ const doc = (p: string) => readFileSync(join(process.cwd(), p), 'utf8')
 const boChuThich = (s: string) => s.replace(/^\s*\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '')
 
 describe('LỖI 1 — vòng kín "Bắt đầu làm bài"', () => {
-  const bc = boChuThich(doc('src/components/BaoCaoCaThiHocSinhModal.tsx'))
+  // 28/09: modal báo cáo cũ (BaoCaoCaThiHocSinhModal) ĐÃ XOÁ (thầy cho phép). Phép kiểm "trao tờ phiếu lên qua onTaoPhieuXong" chỉ khoá
+  // dây nối của modal ấy; LUẬT còn giá trị — không vòng kín — nay khoá ở báo cáo bản mới ngay dưới.
   const cong = boChuThich(doc('src/screens/StudentPortalScreen.tsx'))
-
-  it('báo cáo ca thi trao TỜ PHIẾU lên, không vứt đi', () => {
-    expect(bc).toContain('onTaoPhieuXong={(html) => {')
-    expect(bc).toContain('onBatDauKhacPhuc(baiThi.maCa, html)')
-    // Bản cũ gọi không tham số — đó chính là chỗ tờ phiếu bị rơi.
-    expect(bc).not.toContain('onBatDauKhacPhuc(baiThi.maCa)')
-  })
 
   it('cổng học sinh: nút "Làm lại câu cần chữa" của báo cáo BẢN MỚI đóng báo cáo rồi mới dựng phiếu (không vòng kín)', () => {
     // 28/09: hộp báo cáo cũ được thay bằng BaoCaoChiTiet chế độ em; không còn modal nào để "mở lại đúng nó".
