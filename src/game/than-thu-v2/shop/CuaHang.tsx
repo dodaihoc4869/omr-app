@@ -5,6 +5,7 @@ import { useId } from 'react'
 import type { CSSProperties, ReactNode, Ref } from 'react'
 import { BtKhoa, BtTich, BtTu, DongVang } from './bieu-tuong'
 import { DauMan, HinhGiuCho, HuyHieuBac, SoVang } from './chung'
+import NutToanManHinh from '../../../components/NutToanManHinh'
 import {
   TEN_O,
   chuCuaHang,
@@ -144,10 +145,14 @@ export function DauCuaHang({ onVe, onTuDo }: { onVe: () => void; onTuDo: () => v
       nhanVe={chuVeDao}
       onVe={onVe}
       phai={
-        <button type="button" className="ps-nut-tron ps-nut-tron-chu" onClick={onTuDo}>
-          <BtTu />
-          {chuTuDo}
-        </button>
+        <>
+          <button type="button" className="ps-nut-tron ps-nut-tron-chu" onClick={onTuDo}>
+            <BtTu />
+            {chuTuDo}
+          </button>
+          {/* Nút toàn màn hình (hoàn thiện bản vẽ 28/09): trong thanh đầu, cạnh nút Tủ đồ — như các màn game khác. */}
+          <NutToanManHinh className="ps-ntm" />
+        </>
       }
     />
   )
@@ -236,9 +241,9 @@ export default function CuaHang(p: CuaHangProps) {
   )
   const phai = (
     <>
-      <div className="ps-loc" role="group" aria-label={chuLocNhan}>
+      <div className="tl-hang tl-hang--mot-dong ps-loc" role="group" aria-label={chuLocNhan}>
         {bo.map((b) => (
-          <button key={b.ma} type="button" aria-pressed={p.loc === b.ma} disabled={p.dangTai || b.sap} data-loc={b.ma} onClick={() => p.onLoc(b.ma)}>
+          <button key={b.ma} type="button" className="tl-the" aria-pressed={p.loc === b.ma} disabled={p.dangTai || b.sap} data-loc={b.ma} onClick={() => p.onLoc(b.ma)}>
             {b.chu}
             {b.sap && <em>{chuSapMo}</em>}
           </button>

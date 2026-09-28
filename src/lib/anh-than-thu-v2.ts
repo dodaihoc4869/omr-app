@@ -1,6 +1,7 @@
 import {PETS} from '../game/than-thu-v2/core'
 import {evolutionCrop,evolutionStage,evolutionMirror,EVOLUTION_NAMES} from '../game/than-thu-v2/evolution'
 import type {OBang} from './html-may-chieu'
+import {anhThu} from '../game/than-thu-v2/dao/anh'
 export interface ClassroomSpirit {nickname?:string;pet:string;cap:number;tower:number;earned:number}
 const atlases=new Map<string,Promise<HTMLImageElement>>()
 function atlas(name:string){
@@ -23,7 +24,8 @@ export async function thanThuV2ChoToChieu(doc:(sbd:string)=>Promise<unknown>,sbd
   const p=await doc(sbd) as ClassroomSpirit|null
   if(!p||!Number.isInteger(p.cap)||p.cap<1||p.cap>120)return null
   const index=PETS.findIndex(x=>x.id===p.pet);if(index<0)return null
-  const pet=PETS[index]!,anh=await classroomSpiritImage(index,p.cap)
+  // ẢNH THẬT như app học sinh (`anhThu`, thầy chốt 28/09) — đường dẫn TUYỆT ĐỐI vì tờ chiếu là trang srcdoc/tệp riêng.
+  const pet=PETS[index]!,goc=typeof location!=='undefined'&&/^https?:/.test(location.origin)?location.origin:'',anh=goc+anhThu(index,p.cap)
   if(!anh)return null
   return {anh,ten:p.nickname||pet.name,danhHieu:pet.skill,he:pet.element,capDo:p.cap,hinhThai:EVOLUTION_NAMES[evolutionStage(p.cap)],tangThapCaoNhat:p.tower,soCauDaThanhTay:0,earned:p.earned,capToiDa:120}
  }

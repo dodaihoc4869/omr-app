@@ -34,7 +34,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Đấu cuối tuần (nếu còn đường vào) | **Võ đài thứ Bảy** | arena |
 | Bài phụ huynh giao cho con | **Bài gia đình giao** (tiêu đề ĐÃ LƯU trong dữ liệu cũ giữ nguyên) | Mom, Mẹ giao, bài của Mom |
 | Lịch làm lại câu sai (màn HS/PH) | **đến lịch ôn lại** · **chuyển sang lịch ôn xa hơn** | hạn ôn, lên bậc ôn, tụt bậc (chỉ app thầy) |
-| Trợ lý AI của từng em | **Bộ não A.I hỗ trợ riêng em <họ tên>** | bộ não (trơn), HLV, AI coach |
+| Trợ lý AI của từng em | App GIÁO VIÊN: **Bộ não A.I hỗ trợ riêng em <họ tên>**. App HỌC SINH + PHỤ HUYNH (thầy lệnh 28/09): **Thầy Đỗ Đại Học hỗ trợ riêng em <họ tên>** | bộ não (trơn), HLV, AI coach; "Bộ não A.I" trên màn học sinh/phụ huynh |
 | Chế độ chưa tác động học sinh | **Chạy thử** | chạy bóng, shadow |
 | Thầy nhắc em chưa nộp | **Cảnh báo của thầy** | push, notice |
 | Câu từng sai nay đã đúng lại đủ lịch | **Đã khắc phục** (trạng thái) — hoạt động làm lại gọi là **Ôn lại** | fixed, done |
@@ -44,7 +44,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Dạng em sai nhiều | App thầy: **Dạng em đang yếu**. Màn học sinh/phụ huynh: **Dạng em đang luyện thêm** | yếu kém, hổng |
 | Bảng mỗi em nhận câu nào | **Xem trước phân bổ** (app thầy) | — |
 
-| Hệ thống tự động của app khi là CHỦ NGỮ làm việc thay thầy (nhắc nộp, xếp ôn, khắc phục, rút bộ câu, vinh danh…) | **A.I Đỗ Đại Học** — thầy lệnh 21/09: "Thay toàn bộ từ Máy bằng A.I Đỗ Đại Học". Ví dụ: "A.I Đỗ Đại Học đã tự làm hôm nay", "A.I Đỗ Đại Học đã lo", "A.I Đỗ Đại Học đã nhắc 9 em". Lời RIÊNG cho từng em vẫn ký "Bộ não A.I hỗ trợ riêng em <họ tên>". KHÔNG đổi chữ "máy" chỉ THIẾT BỊ: máy chủ, máy này, máy em, máy chiếu, máy tính | Máy (làm chủ ngữ), hệ thống, app tự… |
+| Hệ thống tự động của app khi là CHỦ NGỮ làm việc thay thầy (nhắc nộp, xếp ôn, khắc phục, rút bộ câu, vinh danh…) | **A.I Đỗ Đại Học** — thầy lệnh 21/09: "Thay toàn bộ từ Máy bằng A.I Đỗ Đại Học". Ví dụ: "A.I Đỗ Đại Học đã tự làm hôm nay", "A.I Đỗ Đại Học đã lo", "A.I Đỗ Đại Học đã nhắc 9 em". Lời RIÊNG cho từng em vẫn ký "Bộ não A.I hỗ trợ riêng em <họ tên>". KHÔNG đổi chữ "máy" chỉ THIẾT BỊ: máy chủ, máy này, máy em, máy chiếu, máy tính **Thầy lệnh 28/09: "Bỏ A.I Đỗ Đại Học thay bằng Thầy Đỗ Đại Học" — trên app HỌC SINH + PHỤ HUYNH (và mọi tin gửi học sinh/phụ huynh) chủ ngữ này là "Thầy Đỗ Đại Học"**; chữ máy chủ đã lưu đi qua `chuThay()` (`src/lib/chu-thay.ts`) trước khi hiện. "A.I Đỗ Đại Học" chỉ còn trong app GIÁO VIÊN | Máy (làm chủ ngữ), hệ thống, app tự…; "A.I Đỗ Đại Học"/"Bộ não A.I" trên màn học sinh/phụ huynh |
 
 ### A3. Cách làm đợt chuẩn hoá (KHÔNG sửa bừa — nhiều test đang khoá chuỗi)
 Mỗi phiên rà làn của mình, lập BẢNG trong `docs/ra-soat-tu-ngu-2109-<phiên>.md`: `màn · chữ hiện tại · vấn đề (luật số mấy) · chữ đề nghị · tệp:dòng · test nào khoá`. Boss duyệt bảng ⇒ phiên sửa chữ + sửa test CÓ CHỦ Ý theo từng cụm màn, commit nhỏ, ảnh trước/sau. Ưu tiên: màn học sinh nhìn mỗi ngày (bảng nhiệm vụ, phiếu, game Đảo thần thú, Đoàn) → phụ huynh → thầy. KHÔNG đổi: câu chữ cảnh báo của MÀN THI THẬT (đã khoá), tên bảng/cột/mã nội bộ.

@@ -37,9 +37,8 @@
 
 /* bộ lọc lớp + ô tìm chung */
 .btg-loc { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.btg-chip-hang { display: flex; gap: 8px; flex-wrap: wrap; }
-.btg-chip { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--vien); background: transparent; color: var(--muc); font-size: 14px; cursor: pointer; }
-.btg-chip--chon { background: var(--gg-xanh-nen); border-color: transparent; font-weight: 600; }
+/* thẻ lọc lớp: kiểu chung src/styles/the-loc.css (.tl-hang / .tl-the); ở đây chỉ đặt tông xanh của khung */
+.btg-chip-hang { --tl-chon-nen: var(--gg-xanh-nen); --tl-chon-chu: var(--gg-xanh); --tl-vong: var(--gg-xanh); }
 .btg-tim { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--vien); background: var(--the); color: var(--nhat); flex: 1 1 240px; max-width: 360px; }
 .btg-tim input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--muc); font: inherit; font-size: 14px; }
 .btg-tim:focus-within { border-color: var(--gg-xanh); }

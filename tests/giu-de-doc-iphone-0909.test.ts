@@ -109,7 +109,8 @@ describe('màn thi nối đúng dây', () => {
   })
 
   it('lõi được hỏi bằng `coCamUngThat`, không phải hằng `true`', () => {
-    expect(MAN).toContain('coCamUng: coCamUngThat(daThayCham, khaiCoCamUng),')
+    expect(MAN).toContain('coCamUng: coCamUngHieuLuc(),')
+    expect(MAN).toContain('coCamUngThat(daThayCham, khaiCoCamUng) ||') // 28/09: + phím cách ở bố cục ngang máy không cảm ứng
     expect(MAN).not.toContain('coCamUng: true, dangGoO')
   })
 

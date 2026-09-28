@@ -532,6 +532,13 @@
   flex: 1 1 auto;
   min-height: 300px;
 }
+/* Cột lối tắt (4–5 nút ≈ 75 px/nút) phải nằm TRỌN trên tấm dưới — nút cuối "Đăng xuất" không bị tấm che (sửa tràn 28/09). */
+.h2-khung:has(.h2-ray > :nth-child(4)) .h2-dem {
+  min-height: 330px;
+}
+.h2-khung:has(.h2-ray > :nth-child(5)) .h2-dem {
+  min-height: 400px;
+}
 
 /* ══════════════ tấm dưới kính sáng ══════════════ */
 .h2-tam {
@@ -2056,6 +2063,40 @@
   .h2c-sao-dem {
     animation: none;
   }
+}
+
+/* Lối vào CA KIỂM TRA (thầy 28/09): luôn có ở lối tắt; khi có ca đang mở thì sáng vàng + nhịp nhẹ để em thấy ngay. */
+.h2-nut-ray[data-noi-bat] .h2-nut-ray-o {
+  background: linear-gradient(180deg, rgb(255 226 120), rgb(246 146 18));
+  color: rgb(66 32 0);
+  box-shadow: 0 0 0 3px rgb(255 214 107 / 0.55), 0 6px 16px rgb(246 146 18 / 0.45);
+  animation: h2-ca-nhip 1.8s ease-in-out infinite;
+}
+.h2-nut-ray[data-noi-bat] .h2-nut-ray-chu { font-weight: 800; }
+.h2-ng-nut-ca {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 22px;
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.h2-ng-nut-ca[data-noi-bat] {
+  background: linear-gradient(180deg, rgb(255 226 120), rgb(246 146 18));
+  color: rgb(66 32 0);
+  border-color: rgb(255 240 190);
+  animation: h2-ca-nhip 1.8s ease-in-out infinite;
+}
+@keyframes h2-ca-nhip {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .h2-nut-ray[data-noi-bat] .h2-nut-ray-o, .h2-ng-nut-ca[data-noi-bat] { animation: none; }
 }
 
 /* Cửa thứ ba · Bi-a Phản Ứng (đặc tả Bi-a mục 8.1): cùng khuôn nút Đảo, viền tím để phân biệt. */

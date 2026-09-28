@@ -98,7 +98,6 @@ import { baoDaXemHocSinh } from '../lib/canh-bao-thay-may-chu'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import { useToanManHinhGame } from '../components/useToanManHinhGame'
 import { ketThucLuotToanManHinh } from '../lib/toan-man-hinh-game'
-import NutToanManHinh from '../components/NutToanManHinh'
 import ONhapDapSo from '../components/ONhapDapSo'
 import { batNhipBenVung } from '../lib/nhip-ben-vung'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, TOI_DA_LAN_THU, khoaChang } from '../lib/hang-doi-nop'
@@ -242,7 +241,7 @@ export default function StudentPortalScreen() {
 
   // Tab
   const [tab, setTab] = useState<TabType | null>(null)
-  // Mọi cửa vào game đi qua `moGame()`. 28/09 thầy bỏ chế độ TỰ vào toàn màn hình: em bấm nút toàn màn hình (NutToanManHinh) ở góc màn game;
+  // Mọi cửa vào game đi qua `moGame()`. 28/09 thầy bỏ chế độ TỰ vào toàn màn hình: em bấm nút toàn màn hình (NutToanManHinh) trong thanh đầu của từng màn game;
   // rời game ⇒ thoát toàn màn hình. Xem lib/toan-man-hinh-game.ts.
   const moGame = () => {
     setTab('thanthu')
@@ -2298,7 +2297,6 @@ export default function StudentPortalScreen() {
 
         {/* TAB 7: THẦN THÚ HÓA HỌC (ALCHEMON) — Nuôi thú, leo tháp & săn boss câu sai.
             Gắn kết chặt chẽ với nhiệm vụ làm BTVN, sửa câu sai và vào phòng thi. */}
-        {tab === 'thanthu' && <NutToanManHinh />}
         {tab === 'thanthu' && (
           <Suspense fallback={<ChoNapGame />}>
           <ThanThuHoaHocGame

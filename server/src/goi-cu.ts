@@ -29,6 +29,7 @@ import type { D1PreparedStatement, Env } from './kieu'
 import { docDsQid, docNamKtChoLop, type NamKtCauMayChu } from './ho-so-len-bang'
 import { tenLopCuaEm } from './ten-lop'
 import { docTrangThaiCongBo, dongChuaCongBo, laSanSangCongBo } from './cong-bo-diem'
+import { expCuaEmTrongCa } from './ca-thi-them'
 
 export const NAY = (): string => new Date().toISOString()
 
@@ -2062,7 +2063,10 @@ export async function ketQuaCuaEm(env: Env, b: Record<string, unknown>): Promise
       }
     }
   }
-  return { ok: true, congBo, sanSang, daNop, daVao, keyBank }
+  // EXP em nhận từ ca (bản vẽ ca thi 28/09, màn e): CHỈ khi đã được xem điểm (cùng cổng với đáp án) và có SBD. Chỉ-đọc.
+  const sbd = chuoi(b.sbd).trim()
+  const expCa = sanSang && sbd ? await expCuaEmTrongCa(env, maCa, sbd) : null
+  return { ok: true, congBo, sanSang, daNop, daVao, keyBank, ...(expCa !== null ? { expCa } : {}) }
 }
 
 /** DỰNG NGÂN HÀNG CÓ ĐÁP ÁN TỪ BẢNG CHẤM, cho ca cũ thiếu khoá `key/<maCa>.json`.

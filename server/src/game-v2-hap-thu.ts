@@ -11,7 +11,7 @@ import { ngayVn } from './su-kien-hoc'
 
 export const TOI_DA_HO_SO_MOI_TICK = 40
 export const KHOA_CHUYEN_DOI_XONG = 'chuyen_doi_cap_v3'
-export const TIEU_DE_LUAT_CAP = 'A.I Đỗ Đại Học · Thần thú của em'
+export const TIEU_DE_LUAT_CAP = 'Thầy Đỗ Đại Học · Thần thú của em'
 export const KENH_LUAT_CAP = 'than_thu'
 export const LOI_LUAT_CAP = 'Từ 21/09 thần thú lớn theo từng ngày em học: mỗi ngày hấp thụ tối đa 200 EXP khi em đạt nhiệm vụ ngày. EXP em đã kiếm vẫn nguyên trong ống nghiệm, thần thú sẽ ăn dần mỗi ngày em học.'
 

@@ -13,14 +13,14 @@ import { themNgay } from './ho-so-nam-kt'
 import { docNgayNghi } from './ke-hoach-ngay-d1'
 import { ngayVn } from './su-kien-hoc'
 
-export const TIEU_DE_KHIEN = 'A.I Đỗ Đại Học · Khiên của em'
+export const TIEU_DE_KHIEN = 'Thầy Đỗ Đại Học · Khiên của em'
 export const KENH_KHIEN = 'khien'
 const DANG_NGAY = /^\d{4}-\d{2}-\d{2}$/
 
 export const loiBaoSapMat = (): string =>
   `Em đã nghỉ ${KHIEN_BAO_VANG_NGAY} ngày. Còn ${KHIEN_MAT_KHI_VANG_NGAY - KHIEN_BAO_VANG_NGAY} ngày nữa chưa quay lại thì em mất 1 khiên — làm một việc nhỏ hôm nay là giữ được.`
 export const loiDaMat = (): string =>
-  `Em đã nghỉ ${KHIEN_MAT_KHI_VANG_NGAY} ngày liên tiếp nên A.I Đỗ Đại Học đã trừ 1 khiên của em. Em làm nhiệm vụ ngày hôm nay là bắt đầu rèn lại được; mảnh khiên em đã có vẫn còn nguyên.`
+  `Em đã nghỉ ${KHIEN_MAT_KHI_VANG_NGAY} ngày liên tiếp nên Thầy Đỗ Đại Học đã trừ 1 khiên của em. Em làm nhiệm vụ ngày hôm nay là bắt đầu rèn lại được; mảnh khiên em đã có vẫn còn nguyên.`
 
 /**
  * HÀM THUẦN: số ngày vắng liên tiếp tính ngược từ `homQua` về `batDau` (gồm cả hai đầu). Ngày đạt cắt chuỗi; ngày nghỉ bị bỏ qua (không cộng, không cắt).

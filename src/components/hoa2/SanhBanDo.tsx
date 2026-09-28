@@ -119,14 +119,23 @@ function Hud({ thu, exp, theLuc, chuoiNgay, onMoThanThu }: Pick<SanhBanDoProps, 
   )
 }
 
-function NutRay({ nhan, onClick, children }: { nhan: string; onClick: () => void; children: ReactNode }) {
+function NutRay({ nhan, onClick, children, noiBat }: { nhan: string; onClick: () => void; children: ReactNode; noiBat?: boolean }) {
   return (
-    <button type="button" className="h2-nut-ray" onClick={onClick}>
+    <button type="button" className="h2-nut-ray" data-noi-bat={noiBat ? 'true' : undefined} onClick={onClick}>
       <span className="h2-kinh h2-nut-ray-o" aria-hidden="true">
         {children}
       </span>
       <span className="h2-nut-ray-chu">{nhan}</span>
     </button>
+  )
+}
+
+/** Bảng kẹp giấy có dấu tích — lối vào Ca kiểm tra (thầy 28/09: "app học sinh chưa có chỗ bấm để vào ca kiểm tra"). */
+function IconCa({ co = 22 }: { co?: number }) {
+  return (
+    <svg width={co} height={co} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      <path d="M9 4h6v3H9zM8 5H6a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2M9 14l2 2 4-4" />
+    </svg>
   )
 }
 
@@ -172,9 +181,12 @@ function IconChuoi() {
   )
 }
 
-function Ray(p: Pick<SanhBanDoProps, 'onCauDaLam' | 'onTuiDo' | 'onCuaHang' | 'onDangXuat' | 'shopBat'> & { coThu: boolean }) {
+function Ray(p: Pick<SanhBanDoProps, 'onCauDaLam' | 'onTuiDo' | 'onCuaHang' | 'onDangXuat' | 'shopBat' | 'onVaoThi' | 'caDangMo'> & { coThu: boolean }) {
   return (
     <nav className="h2-ray" aria-label="Lối tắt">
+      <NutRay nhan={p.caDangMo ? 'Ca đang mở' : 'Ca kiểm tra'} onClick={p.onVaoThi} noiBat={p.caDangMo}>
+        <IconCa />
+      </NutRay>
       <NutRay nhan="Câu đã làm" onClick={p.onCauDaLam}>
         <IconSo />
       </NutRay>
@@ -746,6 +758,10 @@ function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan:
               <IconChuoi />
               Chuỗi {p.chuoiNgay} ngày
             </span>
+            <button type="button" className="h2-kinh h2-ng-nut-ca" data-noi-bat={p.caDangMo ? 'true' : undefined} onClick={p.onVaoThi}>
+              <IconCa co={20} />
+              {p.caDangMo ? 'Ca đang mở · Vào thi' : 'Ca kiểm tra'}
+            </button>
             {coThu && (
               <NutTron nhan="Túi đồ" onClick={p.onTuiDo}>
                 <IconTui />
@@ -833,7 +849,7 @@ function SanhDoc({ p, moMan }: { p: SanhBanDoProps; moMan: boolean }) {
       <div className="h2-khung">
         <CanhSanh3D s={s} moMan={moMan} />
         <Hud thu={chonThu ? null : p.thu} exp={chonThu ? null : p.exp} chuoiNgay={p.chuoiNgay} theLuc={s ? s.theLuc : null} onMoThanThu={chonThu ? p.onChonThu : p.onMoThanThu} />
-        <Ray onCauDaLam={p.onCauDaLam} onTuiDo={p.onTuiDo} onCuaHang={p.onCuaHang} onDangXuat={p.onDangXuat} shopBat={p.shopBat} coThu={!chonThu} />
+        <Ray onCauDaLam={p.onCauDaLam} onTuiDo={p.onTuiDo} onCuaHang={p.onCuaHang} onDangXuat={p.onDangXuat} shopBat={p.shopBat} onVaoThi={p.onVaoThi} caDangMo={p.caDangMo} coThu={!chonThu} />
         <div className="h2-dem" aria-hidden="true" />
         <section className="h2-tam" aria-label="Việc hôm nay" aria-busy={p.dangTai && !s}>
           {p.caDangMo && <DaiVaoThi onVaoThi={p.onVaoThi} />}

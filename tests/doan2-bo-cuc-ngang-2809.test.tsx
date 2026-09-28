@@ -110,6 +110,6 @@ describe('Đoàn 2.0 · bố cục ngang: tệp CSS', () => {
     expect(boChon.length).toBeGreaterThan(20)
     for (const b of boChon) for (const phan of b.split(',')) expect(phan.trim(), phan).toMatch(/^\.dh2\s/)
     expect(ngang).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
-    expect(ngang).toMatch(/\.dh2 \.dh2-tran \.dh2-cot-phai>\.dh-giay\{flex:1 1 0;min-height:0\}/) // chỉ thẻ câu cuộn bên trong
+    expect(ngang).toMatch(/\.dh2 \.dh2-tran \.dh2-cot-phai>\.dh-giay\{flex:0 1 auto;min-height:0\}/) // 28/09: câu ngắn ôm nội dung; dài thì co bằng cột và cuộn bên trong
   })
 })

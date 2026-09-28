@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { choBaoLau, gianNopTuDong, gianVaoSauBatDau, gianVaoThi, laLoiDongNguoi } from '../lib/nhip-gui-lai'
 import type { PublicExamBank, TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../data/examContent'
 import { assignStudentQuestions, type StudentAssignment } from '../lib/exam-assign'
@@ -59,7 +59,7 @@ import LogoHocSinh from '../components/LogoHocSinh'
 import { LogoDoc } from '../components/LogoVai'
 import PhongChoGame from '../components/PhongChoGame'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
-import { TriangleAlert, X, ArrowLeft, LayoutGrid, Flag, Lock } from 'lucide-react'
+import { TriangleAlert, X, ArrowLeft, LayoutGrid, Flag, Lock, Maximize } from 'lucide-react'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
 import { goiBaiThi } from '../lib/goi-bao-cao'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
@@ -94,6 +94,11 @@ import { datDangLamBai } from '../lib/cap-nhat-app'
 import { napDong } from '../lib/nap-manh'
 import KhungXemPhieu from '../components/KhungXemPhieu'
 import NutNopBtvn from '../components/NutNopBtvn'
+import ONhapDapSo from '../components/ONhapDapSo'
+import type { CauPhieu } from './LamBaiNgang'
+import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
+// Bố cục NGANG nạp lười (mảnh riêng, ngoài precache — vite.config.ts globIgnores); dọc không bao giờ tải mảnh này.
+const LamBaiNgang = lazy(() => import('./LamBaiNgang'))
 
 /** Đang toàn màn hình: đã thêm vào màn hình chính (standalone) HOẶC Fullscreen API đang bật. */
 function dangToanManHinh(): boolean {
@@ -356,6 +361,16 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   // standalone, hoặc bật Fullscreen API). Thoát toàn màn hình giữa chừng =
   // rời màn hình = khoá bài.
   const [toanManHinh, setToanManHinh] = useState(() => dangToanManHinh())
+  // BỐ CỤC THEO HƯỚNG MÁY (28/09): dọc giữ nguyên màn cũ; ngang chia đề | thanh kéo | phiếu. State bài làm nằm ở đây nên
+  // xoay qua lại không mất đáp án / cờ / giờ; `cauDangXemRef` giữ câu đang đọc để cuộn lại đúng chỗ sau khi xoay.
+  const boCuc = useBoCuc()
+  // Máy đang ngang ⇒ tải sẵn mảnh bố cục ngang ngay từ màn nhập mã (còn mạng), vào bài là có liền.
+  useEffect(() => {
+    if (boCuc !== 'doc') void import('./LamBaiNgang').catch(() => {})
+  }, [boCuc])
+  const boCucRef = useRef(boCuc)
+  boCucRef.current = boCuc
+  const cauDangXemRef = useRef(1)
   useEffect(() => {
     const cap = () => setToanManHinh(dangToanManHinh())
     document.addEventListener('fullscreenchange', cap)
@@ -382,6 +397,8 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   // Chế độ công bố của ca (server trả về sau khi nộp / khi hỏi lại) + số em
   // đã nộp / đã vào thi để hiện "đang chờ cả lớp x/y".
   const [congBo, setCongBo] = useState<CongBoDiem | null>(null)
+  // EXP em nhận từ ca (bản vẽ ca thi 28/09, màn e) — máy chủ chỉ trả SAU công bố (`ketQua.expCa`). null = chưa có ⇒ ẩn.
+  const [expCa, setExpCa] = useState<number | null>(null)
   const [choCaLop, setChoCaLop] = useState<{ daNop: number; daVao: number } | null>(null)
   // Lưu lại keyBank (CÓ đáp án + lời giải) nhận được lúc nộp bài — để màn
   // "Xem lại lời giải" mở lại được bất cứ lúc nào trong phiên này mà không
@@ -1258,6 +1275,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     } catch {
       // trình duyệt chặn storage — chỉ mất tiện dùng, vẫn thi được
     }
+    // TỰ VÀO TOÀN MÀN HÌNH (thầy chốt 28/09) — gọi ĐỒNG BỘ trong đúng cú bấm Vào thi/Bắt đầu (trước mọi lượt chờ mạng), vì trình
+    // duyệt chỉ cho khi có thao tác. Từ cổng học sinh: cú bấm ở cổng vài trăm ms trước vẫn còn hiệu lực. Không được ⇒ lặng lẽ.
+    if (!laXemDiem) thuVaoToanManHinh()
     setPhase('loading')
     try {
       const existing = await loadAttempt(ma, sb)
@@ -1953,6 +1973,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // `touchstart` thật thì bật. Xem `coCamUngThat`.
     const khaiCoCamUng = coCamUng()
     let daThayCham = false
+    // MÁY TÍNH / BÀN PHÍM (thầy chốt 28/09): ở bố cục NGANG, máy không cảm ứng dùng PHÍM CÁCH làm "ngón tay giữ" — giữ phím
+    // cách thì đề hiện, nhả quá ân hạn thì tắt. Bố cục dọc trên máy không cảm ứng vẫn như cũ (không bật).
+    const coCamUngHieuLuc = () => coCamUngThat(daThayCham, khaiCoCamUng) || (!khaiCoCamUng && boCucRef.current !== 'doc')
 
     const anHanMs = anHanMsCua(a.anHanGiay)
     const tt = moTrangThaiGiu(performance.now())
@@ -1980,7 +2003,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       const nay = performance.now()
       dat(
         !coMat(tt, nay, {
-          coCamUng: coCamUngThat(daThayCham, khaiCoCamUng),
+          coCamUng: coCamUngHieuLuc(),
           dangGoO: dangGoOnhap(document.activeElement),
           anHanMs,
         }),
@@ -2021,6 +2044,21 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     document.addEventListener('touchcancel', len, { passive: true })
     document.addEventListener('scroll', dong, { passive: true, capture: true })
     document.addEventListener('keydown', dong)
+    // PHÍM CÁCH = một "ngón" có mã -1: giữ là chạm, nhả là nhấc tay. Đang gõ trong ô đáp số thì phím cách là chữ, không tính.
+    const phimCach = (e: KeyboardEvent) => e.key === ' ' || e.code === 'Space'
+    const cachXuong = (e: KeyboardEvent) => {
+      if (!phimCach(e) || e.repeat || dangGoOnhap(document.activeElement)) return
+      const nay = performance.now()
+      if (!khaiCoCamUng) demTatDe.current.coChay = true
+      chamXuong(tt, -1, 0, 0, nay)
+      dat(false, nay)
+    }
+    const cachLen = (e: KeyboardEvent) => {
+      if (!phimCach(e)) return
+      chamLen(tt, -1, performance.now())
+    }
+    document.addEventListener('keydown', cachXuong)
+    document.addEventListener('keyup', cachLen)
     const nhip = window.setInterval(soi, MS_NHIP_SOI_GIU)
 
     return () => {
@@ -2030,6 +2068,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       document.removeEventListener('touchcancel', len)
       document.removeEventListener('scroll', dong, true)
       document.removeEventListener('keydown', dong)
+      document.removeEventListener('keydown', cachXuong)
+      document.removeEventListener('keyup', cachLen)
       window.clearInterval(nhip)
       dat(false, performance.now())
       goc.removeAttribute('data-giu-de-an')
@@ -2053,6 +2093,45 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       document.documentElement.removeAttribute('data-la-chan')
     }
   }, [phase])
+
+  // RỜI PHA LÀM BÀI (nộp bài, bị khoá, đóng phòng thi) ⇒ trả lại màn hình thường. Dọn SAU dọn tai nghe rời màn cùng
+  // lượt (React dọn hết rồi mới chạy mới), và `fullscreenchange` bắn sau — nên việc thoát này không bị tính là rời màn.
+  useEffect(() => {
+    if (phase !== 'exam') return
+    return () => thoatToanManHinh()
+  }, [phase])
+
+  // CÂU ĐANG ĐỌC ở bố cục dọc (cuộn cả trang) — để xoay sang ngang mở đúng câu đó. Bố cục ngang tự báo qua `onCauDangXem`.
+  useEffect(() => {
+    if (phase !== 'exam' || boCuc !== 'doc') return
+    let raf = 0
+    const khiCuon = () => {
+      if (raf) return
+      raf = requestAnimationFrame(() => {
+        raf = 0
+        const moc = 56 + window.innerHeight * 0.2
+        let chon = 1
+        for (const el of Array.from(document.querySelectorAll<HTMLElement>('[id^="cau-"]'))) {
+          if (el.getBoundingClientRect().top <= moc) chon = Number(el.id.slice(4)) || chon
+          else break
+        }
+        cauDangXemRef.current = chon
+      })
+    }
+    window.addEventListener('scroll', khiCuon, { passive: true, capture: true })
+    return () => {
+      window.removeEventListener('scroll', khiCuon, true)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [phase, boCuc])
+  // Xoay từ ngang về dọc ⇒ cuộn trang tới câu em đang đọc (không trượt).
+  const boCucTruocRef = useRef(boCuc)
+  useLayoutEffect(() => {
+    const truoc = boCucTruocRef.current
+    boCucTruocRef.current = boCuc
+    if (truoc === boCuc || boCuc !== 'doc' || phase !== 'exam') return
+    document.getElementById(`cau-${cauDangXemRef.current}`)?.scrollIntoView?.({ block: 'start' })
+  }, [boCuc, phase])
 
   // CHẶN SAO CHÉP ĐỀ (mục 6D). Không chặn được ảnh chụp, nhưng chặn được đường
   // chép chữ — đường rẻ nhất để tuồn nguyên đề ra ngoài.
@@ -2199,6 +2278,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         const r = await fetchKetQua(url, attempt.maCa, attempt.sbd)
         if (dung) return
         setCongBo(r.congBo)
+        if (r.expCa !== null) setExpCa(r.expCa)
         if (r.sanSang && r.keyBank) apDungKeyBank(r.keyBank, attempt)
         else if (r.congBo === 'ca_lop_xong') setChoCaLop({ daNop: r.daNop, daVao: r.daVao })
       } catch {
@@ -2221,6 +2301,27 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, keyBank, attempt?.pendingSubmit, congBo])
+
+  // EXP TỪ CA khi điểm đã về bằng đường khác (nộp xong có ngay đáp án, hoặc mở lại link): hỏi `ketQua` MỘT lần. Chỉ sau khi đã có điểm
+  // (graded = đã công bố) — máy chủ cũng chỉ trả `expCa` khi đã được xem điểm, nên không lộ gì trước công bố.
+  useEffect(() => {
+    if (phase !== 'submitted' || !graded || !attempt || attempt.pendingSubmit || expCa !== null) return
+    const url = scriptUrlRef.current.trim()
+    if (!url) return
+    let dung = false
+    const id = setTimeout(() => {
+      fetchKetQua(url, attempt.maCa, attempt.sbd)
+        .then((r) => {
+          if (!dung && r.expCa !== null) setExpCa(r.expCa)
+        })
+        .catch(() => {})
+    }, 1500)
+    return () => {
+      dung = true
+      clearTimeout(id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, !!graded, attempt?.maCa, attempt?.sbd, attempt?.pendingSubmit])
 
   /** GỬI BÀI LÊN MÁY CHỦ, có chốt chống chồng lượt và nhịp lùi dần.
    *
@@ -2957,6 +3058,22 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               daVao={choCaLop?.daVao}
               onXemBaoCao={graded && (!attempt?.integrity.blocked || xemLai) ? () => setXemBaoCaoModal(true) : undefined}
               onVe={onVe}
+              /* Ca thi 28/09 (e): ô từng câu CHỈ khi đã có điểm (graded = đã công bố); chưa công bố chỉ số câu đã làm. */
+              cau={
+                graded
+                  ? (['I', 'II', 'III'] as const).flatMap((ph) =>
+                      (ph === 'I' ? graded.score.phanI : ph === 'II' ? graded.score.phanII : graded.score.phanIII).items.map((it, i) => ({
+                        phan: ph,
+                        so: i + 1,
+                        kq: it.correct ? ('dung' as const) : it.flag === 'EMPTY' ? ('trong' as const) : ph === 'II' && (it.yDung ?? 0) > 0 ? ('mot_phan' as const) : ('sai' as const),
+                      })),
+                    )
+                  : undefined
+              }
+              soDaLam={soDaLam}
+              tongCau={flat.length}
+              lam2={thoiGianLam(attempt?.startedAt, attempt?.submittedAt)}
+              expCa={graded ? expCa : null}
             />
           )}
 
@@ -3241,7 +3358,279 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     ? `Nộp bài (còn ${phutChoPhepNop}:${leGiayChoPhepNop < 10 ? '0' : ''}${leGiayChoPhepNop})`
     : 'Nộp bài'
 
-  return (
+  const lopPhu = (
+    <>
+      {/* LƯỚI SỐ CÂU — tấm trượt từ dưới lên */}
+      {showGrid && (
+        <div className="fixed inset-0 z-40 flex items-end" style={{ background: 'var(--phu)' }} onClick={() => setShowGrid(false)}>
+          <div
+            className="w-full flex flex-col"
+            style={{ background: 'var(--the)', borderTopLeftRadius: 'var(--bo-3)', borderTopRightRadius: 'var(--bo-3)', padding: 'var(--k4)', gap: 'var(--k3)', maxHeight: '75vh', paddingBottom: 'calc(var(--k4) + env(safe-area-inset-bottom))', boxShadow: 'var(--bong-2)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <div className="font-bold" style={{ fontSize: 'var(--cx-3)' }}>
+                Đã làm{' '}
+                <span style={SANS_SO}>
+                  {daLamCount}/{total}
+                </span>
+              </div>
+              <button onClick={() => setShowGrid(false)} className="tap-target flex items-center justify-center" style={{ color: 'var(--nhat)' }} aria-label="Đóng">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="grid grid-cols-6 overflow-y-auto" style={{ gap: 'var(--k2)', maxHeight: '45vh' }}>
+              {flat.map((f, i) => {
+                const done = daTraLoiEntry(attempt, assignment, f)
+                return (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setShowGrid(false)
+                      cuonToiCau(i + 1)
+                    }}
+                    className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
+                    style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
+                  >
+                    {i + 1}
+                    {dungM3() && sttDanhDau.includes(i + 1) && (
+                      <span className="thi-o-cau-co" role="img" aria-label="đã đánh dấu xem lại">
+                        <Flag size={9} aria-hidden="true" fill="currentColor" />
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+            {camNopSom && (
+              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)', marginBottom: 'var(--k2)', textAlign: 'center' }}>
+                Chỉ nộp bài trong 1 phút cuối
+              </div>
+            )}
+            <NutChinh
+              disabled={camNopSom}
+              onClick={() => {
+                if (camNopSom) return
+                setShowGrid(false)
+                setShowConfirm(true)
+              }}
+            >
+              {nhanNutNop}
+            </NutChinh>
+          </div>
+        </div>
+      )}
+
+      {/* XÁC NHẬN NỘP BÀI */}
+      {showConfirm && (
+        <HopThoai>
+          <div style={{ fontSize: 'var(--cx-3)', lineHeight: 1.6 }}>
+            Em đã làm{' '}
+            <b style={SANS_SO}>
+              {daLamCount}/{total}
+            </b>{' '}
+            câu.
+          </div>
+          {chuaLam.length > 0 && (
+            <OThongBao tone="do">
+              Còn {chuaLam.length} câu chưa làm: câu {chuaLam.join(', ')}.
+            </OThongBao>
+          )}
+          {dungM3() && sttDanhDau.length > 0 && (
+            <OThongBao tone="cam">
+              Em đã đánh dấu xem lại: câu {sttDanhDau.join(', ')}.
+            </OThongBao>
+          )}
+          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Sau khi nộp không sửa được nữa.</div>
+          <div className="flex" style={{ gap: 'var(--k2)' }}>
+            <NutChinh
+              variant="phu"
+              onClick={() => {
+                setShowConfirm(false)
+                if (chuaLam.length > 0) cuonToiCau(chuaLam[0])
+                else if (dungM3() && sttDanhDau.length > 0) cuonToiCau(sttDanhDau[0])
+              }}
+            >
+              Xem lại
+            </NutChinh>
+            <NutChinh
+              disabled={camNopSom}
+              onClick={() => {
+                if (camNopSom) return
+                setShowConfirm(false)
+                doSubmit(attempt)
+              }}
+            >
+              {nhanNutNop}
+            </NutChinh>
+          </div>
+        </HopThoai>
+      )}
+
+      {/* BẤM BACK TRONG LÚC THI */}
+      {showBackDialog && (
+        <HopThoai>
+          <div style={{ fontSize: 'var(--cx-3)', lineHeight: 1.6 }}>Đang làm bài, không thoát được. Nộp bài luôn?</div>
+          <div className="flex" style={{ gap: 'var(--k2)' }}>
+            <NutChinh variant="phu" onClick={() => setShowBackDialog(false)}>
+              Tiếp tục làm
+            </NutChinh>
+            <NutChinh
+              disabled={camNopSom}
+              onClick={() => {
+                if (camNopSom) return
+                setShowBackDialog(false)
+                doSubmit(attempt)
+              }}
+            >
+              {nhanNutNop}
+            </NutChinh>
+          </div>
+        </HopThoai>
+      )}
+
+      {zoomSrc && <ZoomOverlay src={zoomSrc} onClose={() => setZoomSrc(null)} />}
+
+      {/* TẤM CHE — lớp React, dựng ngay trong hàm xử lý sự kiện, trước khung
+          hình kế tiếp. Không chứa nội dung câu hỏi nào. */}
+      {lyDoChe && <ManChan lyDo={lyDoChe} onQuayLai={() => setLyDoChe(null)} />}
+
+      {/* TẤM PHỦ "GIỮ ĐỂ ĐỌC" — LUÔN trong DOM, ẩn/hiện bằng CSS theo thuộc
+          tính `data-giu-de-an` trên <html>. Không state, không render lại danh
+          sách câu, không tụt tốc độ cuộn (GIUDEDOC mục 5). */}
+    </>
+  )
+
+  // Em thoát toàn màn hình (Esc, nút Back) ⇒ MỘT nút nhỏ kín đáo để vào lại; không có nút thường trực. Máy không hỗ trợ
+  // (iPhone Safari) thì không hiện gì — bố cục vốn chiếm trọn khung nhìn.
+  const nutVaoLai =
+    !toanManHinh && coTheBatToanManHinh() ? (
+      <button
+        type="button"
+        onClick={() => thuVaoToanManHinh()}
+        className="fixed flex items-center"
+        style={{ left: 12, bottom: 'calc(12px + env(safe-area-inset-bottom))', zIndex: 45, gap: 6, height: 36, padding: '0 12px', borderRadius: 18, border: '1px solid var(--vien-dam)', background: 'var(--the)', color: 'var(--nhat)', fontFamily: 'var(--sans)', fontSize: 12.5, fontWeight: 600, boxShadow: 'var(--bong-1)', opacity: 0.92 }}
+      >
+        <Maximize size={14} aria-hidden="true" />
+        Vào lại toàn màn hình
+      </button>
+    ) : null
+
+  // BỐ CỤC NGANG (thầy chốt 28/09): đề | thanh kéo | phiếu + đồng hồ/nộp. Đề vẫn là CHÍNH các thẻ câu ở trên (chọn trong đề
+  // hay trên phiếu đều gọi setPhanI/II/III), mọi lớp phủ (nộp, back, phóng ảnh, tấm che, giữ để đọc) dùng chung với bố cục dọc.
+  let manNgang: React.ReactElement | null = null
+  if (boCuc !== 'doc') {
+    const dsItem = (f: FlatRef) => (f.phan === 'I' ? assignment.phanI[f.i] : f.phan === 'II' ? assignment.phanII[f.i] : assignment.phanIII[f.i])
+    const cauPhieu: CauPhieu[] = flat.map((f, i) => {
+      const qid = qidCuaCau(f)
+      const chung = { stt: i + 1, phan: f.phan, daLam: daTraLoiEntry(attempt, assignment, f), danhDau: xemLaiSau.has(qid) }
+      if (f.phan === 'I') {
+        const perm = assignment.phanI[f.i].choicePerm
+        const goc = attempt.answers.phanI[qid]
+        const viTri = goc ? perm.indexOf('ABCD'.indexOf(goc)) : -1
+        return { ...chung, chon: viTri >= 0 ? viTri : null }
+      }
+      if (f.phan === 'II') {
+        const thuTu = assignment.phanII[f.i].yPerm?.length === 4 ? assignment.phanII[f.i].yPerm : [0, 1, 2, 3]
+        const hang = attempt.answers.phanII[qid] ?? [null, null, null, null]
+        return { ...chung, y: thuTu.map((g) => (hang[g] === 'D' || hang[g] === 'S' ? hang[g] : null)) }
+      }
+      return { ...chung, tl: attempt.answers.phanIII[qid] ?? '' }
+    })
+    manNgang = (
+      <Trang className="man-lam-bai lb-trang">
+        <VanTay sbd={attempt.sbd} hoTen={hoTen.trim() || `SBD ${attempt.sbd}`} maCa={attempt.maCa} />
+        <LamBaiNgang
+          boCuc={boCuc}
+          tenCa={attempt.tenCa || ''}
+          cau={cauPhieu}
+          onChonPa={(n, viTri) => {
+            const f = flat[n - 1]
+            if (f?.phan !== 'I') return
+            const it = assignment.phanI[f.i]
+            setPhanI(it.qid, 'ABCD'[it.choicePerm[viTri]] as 'A' | 'B' | 'C' | 'D')
+          }}
+          onGhiY={(n, viTri, gt) => {
+            const f = flat[n - 1]
+            if (f?.phan !== 'II') return
+            const it = assignment.phanII[f.i]
+            const thuTu = it.yPerm?.length === 4 ? it.yPerm : [0, 1, 2, 3]
+            setPhanII(it.qid, thuTu[viTri], gt)
+          }}
+          onNhap={(n, text) => {
+            const f = flat[n - 1]
+            if (f?.phan === 'III') setPhanIII(assignment.phanIII[f.i].qid, text)
+          }}
+          oDapSo={(o) => <ONhapDapSo chuanViet value={o.value} onChange={o.onChange} placeholder="Đáp số" ariaLabel={o.ariaLabel} />}
+          onDoiDau={(n) => {
+            const f = flat[n - 1]
+            if (f) doiDauCau(dsItem(f).qid)
+          }}
+          dongHo={laBaiTap ? null : formatClock(remaining ?? 0)}
+          chuThayDongHo={hanNopNgan ? `Hạn ${hanNopNgan}` : 'Bài tập'}
+          conGiay={laBaiTap ? null : remaining}
+          daLam={daLamCount}
+          tong={total}
+          nhanLuu={dotLabel}
+          mayNgoaiMang={!online}
+          dangLuu={!!saveFlash}
+          nhanNutNop={nhanNutNop}
+          khoaNop={camNopSom}
+          ghiChuNop={camNopSom ? 'Chỉ nộp bài trong 1 phút cuối' : undefined}
+          onNop={() => setShowConfirm(true)}
+          tatPhim={showConfirm || showBackDialog || !!zoomSrc || !!lyDoChe || showGrid}
+          cauBatDau={cauDangXemRef.current}
+          onCauDangXem={(n) => {
+            cauDangXemRef.current = n
+          }}
+          tren={
+            <>
+      {/* DẢI CẢNH BÁO RỜI MÀN (mục 6) — dính dưới thanh trên, tự ẩn sau 15 giây */}
+      {canhBaoRoi &&
+        (dungM3() ? (
+          <div className="sticky z-30" style={{ top: 56 }} role="alert" data-canh-bao={canhBaoRoi.muc}>
+            <DaiCanhBaoRoiM3 muc={canhBaoRoi.muc} loi={canhBaoRoi.loi} />
+          </div>
+        ) : (
+          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="alert" data-canh-bao={canhBaoRoi.muc}>
+            <OThongBao tone={canhBaoRoi.muc === 'dam' ? 'do' : 'cam'}>
+              <b>{canhBaoRoi.loi}</b>
+            </OThongBao>
+          </div>
+        ))}
+
+      {/* DÒNG BÁO "Thầy cho thêm N phút" — nhẹ, tự tắt; nhường chỗ cho cảnh báo rời màn (cùng vị trí dính) */}
+      {baoThemGio &&
+        !canhBaoRoi &&
+        (dungM3() ? (
+          <div className="sticky z-30" style={{ top: 56 }} role="status" data-bao-them-gio>
+            <DaiBaoNheM3 chu={baoThemGio} />
+          </div>
+        ) : (
+          <div className="sticky z-30 px-3 sm:px-4" style={{ top: 56, paddingTop: 'var(--k2)', background: 'var(--nen)' }} role="status" data-bao-them-gio>
+            <OThongBao tone="xanh">
+              <b>{baoThemGio}</b>
+            </OThongBao>
+          </div>
+        ))}
+
+            </>
+          }
+          phuDe={<ManGiuDeDoc trongKhung chu={coCamUng() ? undefined : 'Giữ phím cách để đọc tiếp'} />}
+        >
+          {renderPhan('I')}
+          {renderPhan('II')}
+          {renderPhan('III')}
+        </LamBaiNgang>
+        {nutVaoLai}
+        {lopPhu}
+      </Trang>
+    )
+  }
+
+  stt = 0 // thẻ câu của bố cục dọc đánh số lại từ 1 (cùng id `cau-N`; chỉ một bố cục được dựng thật)
+
+  const manDoc = (
     <Trang className="man-lam-bai">
       {/* THANH TRÊN — 56px, dính. Đường học sinh/phụ huynh (dungM3): bản M3 theo bản vẽ ThiDangLam/ThiCanhBao (ThanhTrenThiM3, chỉ trình bày lại
           các giá trị dưới đây, cao ĐÚNG 56 px như CAO_THANH_TREN). Đường khác: thanh cũ y hệt (mờ; tiến độ 3px sát mép trên; chấm lưu 6px góc phải). */}
@@ -3386,147 +3775,30 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         </div>
       </div>
 
-      {/* LƯỚI SỐ CÂU — tấm trượt từ dưới lên */}
-      {showGrid && (
-        <div className="fixed inset-0 z-40 flex items-end" style={{ background: 'var(--phu)' }} onClick={() => setShowGrid(false)}>
-          <div
-            className="w-full flex flex-col"
-            style={{ background: 'var(--the)', borderTopLeftRadius: 'var(--bo-3)', borderTopRightRadius: 'var(--bo-3)', padding: 'var(--k4)', gap: 'var(--k3)', maxHeight: '75vh', paddingBottom: 'calc(var(--k4) + env(safe-area-inset-bottom))', boxShadow: 'var(--bong-2)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              <div className="font-bold" style={{ fontSize: 'var(--cx-3)' }}>
-                Đã làm{' '}
-                <span style={SANS_SO}>
-                  {daLamCount}/{total}
-                </span>
-              </div>
-              <button onClick={() => setShowGrid(false)} className="tap-target flex items-center justify-center" style={{ color: 'var(--nhat)' }} aria-label="Đóng">
-                <X size={20} />
-              </button>
-            </div>
-            <div className="grid grid-cols-6 overflow-y-auto" style={{ gap: 'var(--k2)', maxHeight: '45vh' }}>
-              {flat.map((f, i) => {
-                const done = daTraLoiEntry(attempt, assignment, f)
-                return (
-                  <button
-                    key={i}
-                    onClick={() => {
-                      setShowGrid(false)
-                      cuonToiCau(i + 1)
-                    }}
-                    className={`tap-target aspect-square flex items-center justify-center font-bold${dungM3() ? ' thi-o-cau' : ''}`}
-                    style={{ ...SANS_SO, fontSize: 'var(--cx-2)', borderRadius: 'var(--bo-1)', background: done ? 'var(--muc)' : 'var(--the-2)', color: done ? 'var(--muc-nguoc)' : 'var(--muc)' }}
-                  >
-                    {i + 1}
-                    {dungM3() && sttDanhDau.includes(i + 1) && (
-                      <span className="thi-o-cau-co" role="img" aria-label="đã đánh dấu xem lại">
-                        <Flag size={9} aria-hidden="true" fill="currentColor" />
-                      </span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-            {camNopSom && (
-              <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--cam)', marginBottom: 'var(--k2)', textAlign: 'center' }}>
-                Chỉ nộp bài trong 1 phút cuối
-              </div>
-            )}
-            <NutChinh
-              disabled={camNopSom}
-              onClick={() => {
-                if (camNopSom) return
-                setShowGrid(false)
-                setShowConfirm(true)
-              }}
-            >
-              {nhanNutNop}
-            </NutChinh>
-          </div>
-        </div>
-      )}
-
-      {/* XÁC NHẬN NỘP BÀI */}
-      {showConfirm && (
-        <HopThoai>
-          <div style={{ fontSize: 'var(--cx-3)', lineHeight: 1.6 }}>
-            Em đã làm{' '}
-            <b style={SANS_SO}>
-              {daLamCount}/{total}
-            </b>{' '}
-            câu.
-          </div>
-          {chuaLam.length > 0 && (
-            <OThongBao tone="do">
-              Còn {chuaLam.length} câu chưa làm: câu {chuaLam.join(', ')}.
-            </OThongBao>
-          )}
-          {dungM3() && sttDanhDau.length > 0 && (
-            <OThongBao tone="cam">
-              Em đã đánh dấu xem lại: câu {sttDanhDau.join(', ')}.
-            </OThongBao>
-          )}
-          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }}>Sau khi nộp không sửa được nữa.</div>
-          <div className="flex" style={{ gap: 'var(--k2)' }}>
-            <NutChinh
-              variant="phu"
-              onClick={() => {
-                setShowConfirm(false)
-                if (chuaLam.length > 0) cuonToiCau(chuaLam[0])
-                else if (dungM3() && sttDanhDau.length > 0) cuonToiCau(sttDanhDau[0])
-              }}
-            >
-              Xem lại
-            </NutChinh>
-            <NutChinh
-              disabled={camNopSom}
-              onClick={() => {
-                if (camNopSom) return
-                setShowConfirm(false)
-                doSubmit(attempt)
-              }}
-            >
-              {nhanNutNop}
-            </NutChinh>
-          </div>
-        </HopThoai>
-      )}
-
-      {/* BẤM BACK TRONG LÚC THI */}
-      {showBackDialog && (
-        <HopThoai>
-          <div style={{ fontSize: 'var(--cx-3)', lineHeight: 1.6 }}>Đang làm bài, không thoát được. Nộp bài luôn?</div>
-          <div className="flex" style={{ gap: 'var(--k2)' }}>
-            <NutChinh variant="phu" onClick={() => setShowBackDialog(false)}>
-              Tiếp tục làm
-            </NutChinh>
-            <NutChinh
-              disabled={camNopSom}
-              onClick={() => {
-                if (camNopSom) return
-                setShowBackDialog(false)
-                doSubmit(attempt)
-              }}
-            >
-              {nhanNutNop}
-            </NutChinh>
-          </div>
-        </HopThoai>
-      )}
-
-      {zoomSrc && <ZoomOverlay src={zoomSrc} onClose={() => setZoomSrc(null)} />}
-
-      {/* TẤM CHE — lớp React, dựng ngay trong hàm xử lý sự kiện, trước khung
-          hình kế tiếp. Không chứa nội dung câu hỏi nào. */}
-      {lyDoChe && <ManChan lyDo={lyDoChe} onQuayLai={() => setLyDoChe(null)} />}
-
-      {/* TẤM PHỦ "GIỮ ĐỂ ĐỌC" — LUÔN trong DOM, ẩn/hiện bằng CSS theo thuộc
-          tính `data-giu-de-an` trên <html>. Không state, không render lại danh
-          sách câu, không tụt tốc độ cuộn (GIUDEDOC mục 5). */}
+      {nutVaoLai}
+      {lopPhu}
       <ManGiuDeDoc />
     </Trang>
   )
+  if (!manNgang) return manDoc
+  // Mảnh ngang nạp LƯỜI (ngoài precache). Đang nạp ⇒ tạm hiện bố cục dọc; nạp hỏng (mất mạng, chưa có trong kho) ⇒ ở lại
+  // bố cục dọc — em vẫn làm bài bình thường, không bao giờ trắng màn.
+  return (
+    <BoLuiDoc duPhong={manDoc}>
+      <Suspense fallback={manDoc}>{manNgang}</Suspense>
+    </BoLuiDoc>
+  )
+}
+
+/** Mảnh bố cục ngang không nạp được ⇒ dựng bố cục dọc thay vì trắng màn. */
+class BoLuiDoc extends Component<{ duPhong: React.ReactNode; children: React.ReactNode }, { loi: boolean }> {
+  state = { loi: false }
+  static getDerivedStateFromError() {
+    return { loi: true }
+  }
+  render() {
+    return this.state.loi ? this.props.duPhong : this.props.children
+  }
 }
 
 // Khung trang chung cho mọi trạng thái của màn này — nền --nen, chữ --muc,

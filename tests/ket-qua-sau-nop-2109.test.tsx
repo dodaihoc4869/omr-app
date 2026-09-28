@@ -62,6 +62,16 @@ describe('KetQuaSauNop · đã công bố', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Xem báo cáo chi tiết' })); expect(onXem).toHaveBeenCalledTimes(1)
     fireEvent.click(screen.getByRole('button', { name: 'Về bảng nhiệm vụ' })); expect(onVe).toHaveBeenCalledTimes(1)
   })
+  it('(bản vẽ 28/09, màn e) EXP em nhận từ ca: hiện "+N EXP" khi đã công bố; 0/null ⇒ ẩn; CHƯA công bố ⇒ không bao giờ hiện dù có số', () => {
+    const { container, rerender } = render(<KetQuaSauNop {...DA_CONG_BO} expCa={40} />)
+    expect(container.querySelector('[data-vung="exp-ca"]')?.textContent).toBe('+40 EXP em nhận từ ca này')
+    rerender(<KetQuaSauNop {...DA_CONG_BO} expCa={0} />)
+    expect(container.querySelector('[data-vung="exp-ca"]')).toBeNull()
+    rerender(<KetQuaSauNop kieu="khong" {...CHUNG} expCa={40} soDaLam={20} tongCau={28} />)
+    expect(container.textContent).not.toContain('EXP')
+    // ExamTakeScreen chỉ chuyển expCa khi đã có điểm (graded = đã công bố)
+    expect(doc('src/screens/ExamTakeScreen.tsx')).toContain('expCa={graded ? expCa : null}')
+  })
   it('KHÔNG xếp hạng, KHÔNG nhãn năng lực, KHÔNG emoji, KHÔNG "nắm chắc"; giảm điểm nói trung tính; ca đầu tiên nói thẳng', () => {
     const { container, rerender } = render(<KetQuaSauNop {...DA_CONG_BO} ss={-0.5} truoc={8} />)
     expect(container.textContent).toContain('−0,5 điểm so với lần trước của em (8)')

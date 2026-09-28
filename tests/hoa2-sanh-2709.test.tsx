@@ -6,7 +6,6 @@ import SanhBanDo, { viTriOPhucKich, type SanhBanDoProps } from '../src/component
 import { docSanh, type KetQuaSanh } from '../src/components/hoa2/api'
 import { chuHanNop, thuNgayThang } from '../src/components/hoa2/thoi-gian'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
-import ParentPortalScreen, { CHU_PH_DA_NGUNG } from '../src/screens/ParentPortalScreen'
 
 const mocks = vi.hoisted(() => ({ items: [] as any[], momItems: [] as any[] }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
@@ -243,13 +242,5 @@ describe('StudentPortalScreen thật: cờ Game Hóa 2.0', () => {
   })
 })
 
-describe('ParentPortalScreen: app phụ huynh đã ngừng (khi Game Hóa 2.0 bật cả trung tâm)', () => {
-  it('một màn M3 báo đã ngừng; không gọi máy chủ, không ô đăng nhập', async () => {
-    const { container } = render(<ParentPortalScreen ngungSan />)
-    expect(container.querySelector('.m3')).not.toBeNull()
-    expect(container.textContent).toContain(CHU_PH_DA_NGUNG)
-    expect(container.querySelector('input')).toBeNull()
-    await new Promise((r) => setTimeout(r, 50))
-    expect(cuocGoi.length).toBe(0)
-  })
-})
+// ĐÃ GỠ 28/09: describe "ParentPortalScreen: app phụ huynh đã ngừng" — thầy lệnh trùng tu app phụ huynh (chỉ xem báo cáo), app chạy lại dù Game Hoá 2.0 bật;
+// hành vi mới khoá ở tests/ph-ngung-2709.test.tsx + tests/ph-v3-app-2809.test.tsx.

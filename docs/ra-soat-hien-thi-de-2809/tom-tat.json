@@ -1,0 +1,72 @@
+{
+ "soTo": 268,
+ "soCau": 15359,
+ "soTruong": 95828,
+ "soMucSua": 882,
+ "soCauSua": 799,
+ "soToSua": 158,
+ "theoLoai": {
+  "so-hieu-cuoi-dong": {
+   "cau": 57,
+   "truong": 57
+  },
+  "tach-dong-so-do": {
+   "cau": 450,
+   "truong": 450
+  },
+  "nhan-ngoac-kep": {
+   "cau": 10,
+   "truong": 10
+  },
+  "cach-truoc-dau": {
+   "cau": 60,
+   "truong": 68
+  },
+  "liet-ke-dinh": {
+   "cau": 103,
+   "truong": 103
+  },
+  "don-vi-ml": {
+   "cau": 58,
+   "truong": 58
+  },
+  "lien-ket-cach": {
+   "cau": 1,
+   "truong": 1
+  },
+  "chi-so-roi": {
+   "cau": 1,
+   "truong": 1
+  },
+  "n-sau-ngoac": {
+   "cau": 37,
+   "truong": 46
+  },
+  "nhan-ngoac-hong": {
+   "cau": 4,
+   "truong": 4
+  },
+  "nhan-truoc-mui": {
+   "cau": 83,
+   "truong": 96
+  },
+  "chi-so-ascii": {
+   "cau": 34,
+   "truong": 83
+  },
+  "nhan-mu-truoc-mui": {
+   "cau": 2,
+   "truong": 2
+  },
+  "mui-lap": {
+   "cau": 2,
+   "truong": 2
+  }
+ },
+ "canXem": 88,
+ "canXemTheoLyDo": {
+  "Bảng bị dàn thành chữ có dấu |": 74,
+  "Dãy số liệu của một bảng bị dàn thành chữ": 10,
+  "Điều kiện phản ứng bị vỡ chữ khi chép từ PDF": 4
+ }
+}

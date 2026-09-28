@@ -21,8 +21,8 @@ afterEach(() => cleanup())
 describe('học sinh', () => {
   it('tên thẻ ghép họ tên; lời hôm nay; nhãn ngày; nút "Xem 7 lời gần nhất"', () => {
     ve()
-    expect(screen.getByRole('heading', { level: 2, name: 'Bộ não A.I hỗ trợ riêng em Đỗ Minh' })).toBeTruthy()
-    expect(the()!.getAttribute('aria-label')).toBe('Bộ não A.I hỗ trợ riêng em Đỗ Minh')
+    expect(screen.getByRole('heading', { level: 2, name: 'Thầy Đỗ Đại Học hỗ trợ riêng em Đỗ Minh' })).toBeTruthy()
+    expect(the()!.getAttribute('aria-label')).toBe('Thầy Đỗ Đại Học hỗ trợ riêng em Đỗ Minh')
     expect(screen.getByText(LOI)).toBeTruthy()
     expect(screen.getByText('Lời hôm nay · Thứ Hai 21/09')).toBeTruthy()
     expect(screen.getByRole('button', { name: /Xem 7 lời gần nhất/ })).toBeTruthy()
@@ -130,7 +130,7 @@ describe('phụ huynh', () => {
 
   it('cùng tên thẻ; nhãn "Lời cho anh chị"; lời; thư tuần GẬP sẵn; KHÔNG có "Xem … lời gần nhất"', () => {
     phv()
-    expect(screen.getByRole('heading', { level: 2, name: 'Bộ não A.I hỗ trợ riêng em Đỗ Minh' })).toBeTruthy()
+    expect(screen.getByRole('heading', { level: 2, name: 'Thầy Đỗ Đại Học hỗ trợ riêng em Đỗ Minh' })).toBeTruthy()
     expect(screen.getByText('Lời cho anh chị · Thứ Hai 21/09')).toBeTruthy()
     expect(screen.getByText(PH.loiNhan)).toBeTruthy()
     const thu = screen.getByRole('button', { name: /Thư tuần này/ })

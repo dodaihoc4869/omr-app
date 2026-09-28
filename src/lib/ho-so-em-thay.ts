@@ -3,6 +3,7 @@
  *   · kế hoạch hôm nay của em (ngân sách, việc, tiến bộ, thần thú, EXP) — CHỜ lệnh chỉ đọc `/gv/ke-hoach-em` của Code 3 (xem `layKeHoachEm`).
  *  Mọi con số trên màn truy được về một trường của hai lệnh này; lệnh lỗi / chưa có ⇒ `null` và màn hiện "đang chờ máy chủ", KHÔNG bịa số.
  *  Không kết luận năng lực từ điểm: chỉ đếm câu theo trạng thái hồ sơ. Không in "nắm chắc". */
+import type { SoGopCauLop } from './thong-ke-lop-cau'
 import { layCauHinhMayChu } from './may-chu-moi'
 import { loadTeacherSecret } from './exam-db'
 import { soCauDaLamHienThi } from './so-cau-hien-thi'
@@ -157,4 +158,18 @@ export function tomTatKeHoach(kh: KeHoachEm): TomTatKeHoach {
     chuaCo: kh.chuaCo === true,
     thanThu: tt ? { ten: (tt.nickname || tt.pet || '').toString(), cap: typeof tt.cap === 'number' ? tt.cap : null, expHomNay: typeof kh.exp?.homNay === 'number' ? kh.exp.homNay : null } : null,
   }
+}
+
+/** THỐNG KÊ LỚP THEO CÂU cho dải phím T (hoàn thiện bản vẽ 28/09) khi buổi chữa KHÔNG đi từ ca: `/gv/thong-ke-lop-cau {sbd[], qid[]}` — CHỈ ĐỌC,
+ * máy chủ trả CHỈ SỐ GỘP theo câu (không tên em). Lỗi / máy chủ cũ ⇒ `null` (tờ ẩn dải). `qid` là mã câu của MÁY CHỦ. */
+export async function layThongKeLopCau(sbd: string[], qid: string[]): Promise<Record<string, SoGopCauLop> | null> {
+  if (!sbd.length || !qid.length) return null
+  const j = await goi('/gv/thong-ke-lop-cau', { sbd, qid }, true)
+  return j && j.cau && typeof j.cau === 'object' ? (j.cau as Record<string, SoGopCauLop>) : null
+}
+
+/** HỒ SƠ EM CHO TỜ CHIẾU (bản vẽ Lên bảng 28/09): `/gv/ho-so-len-bang {sbd, qid}` — lệnh thầy CHỈ ĐỌC. Lỗi / chưa có ⇒ `null`
+ * (tờ chiếu hiện "chưa lấy được số liệu", không bịa). `qid` là mã câu của MÁY CHỦ (`qidMayChuCuaIdCau`). */
+export async function layHoSoLenBang(sbd: string, qid: string): Promise<Record<string, unknown> | null> {
+  return goi('/gv/ho-so-len-bang', { sbd, qid }, true)
 }

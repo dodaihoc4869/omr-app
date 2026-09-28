@@ -22,6 +22,8 @@ import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
 import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-nay-v2'
 import {gvLichSuCauCuaEm} from './gv-lich-su-cau'
 import {gvBaoCaoCa,gvBaoCaoCaEm} from './bao-cao-ca'
+import { phBaoCaoCa, phHoc2, phLoiThay } from './ph-bao-cao-moi'
+import {gvCongBoCa,gvDongCuaVao,gvNhanXetCaEm} from './ca-thi-them'
 import {gvBangTinSong} from './gv-bang-tin-song'
 import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
 import {gvBuoiChuaDeXuat} from './gv-buoi-chua-de-xuat'
@@ -74,6 +76,9 @@ import {docLoiNhanHlv} from './bo-nao-doc'
 import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
 import { gvChienDich } from './srs2-gv'
+import { gvSuaChienDich } from './srs2-sua'
+import { gvHoSoLenBang } from './ho-so-em-chieu'
+import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
@@ -3217,6 +3222,10 @@ const boXuLy = {
       // "Mọi thứ về con" (Code 4, đã soát): ĐỌC-CHỈ, token hoặc SBD trần; chi tiết một câu (lời giải) cùng luật che.
       if (p === '/ph/tat-ca-ve-con') return ra(await phTatCaVeCon(env, b, Date.now(), envDoc, ctx))
       if (p === '/ph/chi-tiet-cau-ve-con') return ra(await phChiTietCauVeCon(env, b, Date.now(), envDoc, ctx))
+      // APP PHỤ HUYNH MỚI 28/09 (chỉ xem báo cáo, không giao bài): báo cáo một ca + nhận xét thầy, lời thầy các ca, Game Hoá 2.0 của con — ĐỌC-CHỈ, cùng xác thực.
+      if (p === '/ph/bao-cao-ca') return ra(await phBaoCaoCa(env, b, Date.now(), envDoc, ctx))
+      if (p === '/ph/loi-thay') return ra(await phLoiThay(env, b, Date.now(), envDoc, ctx))
+      if (p === '/ph/hoc-2') return ra(await phHoc2(env, b, Date.now(), envDoc, ctx))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
@@ -3336,6 +3345,11 @@ const boXuLy = {
       // BÁO CÁO CA cho THẦY (docs/hop-dong-xem-diem-v2-2109.md mục 2 + 4): ĐỌC-CHỈ, không bị chặn công bố (trả `congBo`); `phan[].toiDa` / `phanTb[].toiDa` = trần điểm từng phần từ `quotaPhan` (một nguồn với chấm điểm). Lỗi đọc ⇒ {ok:false, lyDo:'loi_doc'}.
       if (p === '/gv/bao-cao-ca') return ra(await gvBaoCaoCa(envDoc, b))
       if (p === '/gv/bao-cao-ca-em') return ra(await gvBaoCaoCaEm(envDoc, b))
+      // CA THI 28/09 (server/src/ca-thi-them.ts): công bố điểm ca ĐÃ ĐÓNG (đổi cong_bo sang 'ngay', ghi nhat_ky_may) và lưu nhận xét của thầy theo em + ca. GHI — dùng env (không bản đọc).
+      if (p === '/gv/cong-bo-ca') return ra(await gvCongBoCa(env, b))
+      if (p === '/gv/nhan-xet-ca-em') return ra(await gvNhanXetCaEm(env, b))
+      // ĐÓNG CỬA VÀO (bản vẽ ca thi 28/09, màn b): đặt hạn vào phòng = bây giờ cho ca đang mở — em đã vào vẫn làm tiếp. GHI, chỉ-thêm.
+      if (p === '/gv/dong-cua-vao') return ra(await gvDongCuaVao(env, b))
       if (p === '/gv/suc-khoe-may-chu') return ra({ ok: true, ...sucKhoeMay(), nguong: { banMs: 1500, nghenMs: 3500, toiThieuMau: 20 }, ghiChu: 'Số đo của chính isolate đang trả lời (mỗi lượt có thể rơi vào isolate khác): lấy MAX của vài lượt gần nhất.' })
       if (p === '/gv/bang-tin-song') {
         const co = await envDoc.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind('bang_tin_san').first<{ gia_tri: unknown }>().catch(() => null)
@@ -3345,6 +3359,12 @@ const boXuLy = {
       // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
       // GAME HÓA 2.0 (srs2-gv.ts): chiến dịch luyện — giao, đồng hồ sức chứa, bảng chiến dịch, buổi chữa, chữa xong, công tắc.
       if (p === '/gv/chien-dich') return ra(await gvChienDich(env, b))
+      // SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09, srs2-sua.ts): thêm đề (chia lại câu chưa làm), thêm/bớt em (không xoá sổ), sửa hạn (hết hạn ⇒ mở lại). GHI — dùng env.
+      if (p === '/gv/chien-dich/sua') return ra(await gvSuaChienDich(env, b))
+      // GỌI LÊN BẢNG — bảng chi tiết em trên tờ chiếu (bản vẽ LenBang-Moi 28/09): ĐỌC-CHỈ, số thật từ sổ (`ho-so-em-chieu.ts`).
+      if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
+      // DẢI THỐNG KÊ LỚP (phím T) cho buổi chữa KHÔNG từ ca (hoàn thiện bản vẽ 28/09): chỉ số GỘP theo câu từ sổ su_kien_hoc, không tên em. ĐỌC-CHỈ.
+      if (p === '/gv/thong-ke-lop-cau') return ra(await gvThongKeLopCau(envDoc, b))
       if (p === '/gv/lop') return ra(await gvLop(envDoc))
       if (p === '/gv/doi-lop-em') return ra(await gvDoiLopEm(env, b))
       // BUỔI CHỮA TỐI NAY (B6, docs/hop-dong-buoi-chua-de-xuat-2109.md): số liệu thô ĐỌC-CHỈ, ≤ 12 truy vấn.
@@ -3398,6 +3418,13 @@ const boXuLy = {
       if (p === '/kho/xoa') return xoaDeKho(env, b)
       if (p === '/kho/rut-cau') return rutCau(env, b)
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
+      // CHỈ ĐỌC chỉ mục câu của MỘT tờ (28/09): để công cụ sửa trình bày kho đề đẩy lại gói mà GIỮ NGUYÊN chuyên đề/mức độ/lớp đang có.
+      if (p === '/kho/chi-muc-lay') {
+        const maDe = String(b.maDe ?? '').trim()
+        if (!maDe) return ra({ ok: false, error: 'Thiếu mã đề' })
+        const r = await env.DB.prepare('SELECT qid, chuyen_de, muc_do, phan, lop, co_loi_giai FROM cau_hoi WHERE ma_de = ?').bind(maDe).all<Record<string, unknown>>()
+        return ra({ ok: true, maDe, items: r.results ?? [] })
+      }
       if (p === '/btvn/sua') return suaBtvn(env,b)
       if (p === '/btvn/cho-lam-lai') return ra(await ND.choLamLaiCaNhan(env, b, Date.now()))
       // BỘ NÃO A.I (Code 1, `bo-nao.ts`; hợp đồng docs/hop-dong-bo-nao-2109.md): MỌI lệnh /ai/* là lệnh THẦY — nằm SAU cổng `laThay`; các hàm tự trả {ok,…}, không tự kiểm mã.

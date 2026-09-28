@@ -63,7 +63,7 @@
 .dao .dao-chon-the[data-lat] .dao-chon-tranh{transform:rotateY(180deg)}
 .dao .dao-chon-no-nhan{position:absolute;left:10px;top:10px;transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:4px 10px;border-radius:999px;background:linear-gradient(90deg,rgb(255,90,42),rgb(255,197,61));color:rgb(42,18,0);font-size:11px;font-weight:800;letter-spacing:.08em;box-shadow:0 0 14px rgba(255,140,40,.8)}
 .dao .dao-chon-chu{display:flex;flex-direction:column;gap:4px;padding:10px 14px 14px}
-.dao .dao-chon-ten{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.dao .dao-chon-ten{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 8px} /* thẻ hẹp (màn ngang): nhãn hệ xuống dòng, không bị cắt */
 .dao .dao-chon-ten strong{font-size:16px;font-weight:800}
 .dao .dao-chon-o[data-lech="0"] .dao-chon-ten strong{font-size:22px}
 .dao .dao-chon-ten em{flex-shrink:0;font-style:normal;padding:2px 9px;border-radius:999px;background:var(--dao-he);color:rgb(255,255,255);font-size:11px;font-weight:800}
@@ -170,6 +170,8 @@
 .dao .dao-nav button[aria-current]>span{background:var(--dao-nav-hien)}
 /* Nút "Về app học sinh" LUÔN HIỆN (thầy lệnh 21/09, game tự toàn màn hình): dải mỏng dính ở trên cùng, đích chạm ≥ 48 px, chừa tai thỏ/thanh hệ thống
    bằng vùng an toàn; nội dung đảo nằm dưới dải (padding-top của .dao-vo). Không có nút bật/thoát toàn màn hình. */
+/* nút toàn màn hình của vỏ Đảo (Sổ tay / Túi đồ / đảo cũ): cùng dải đầu với "Về app học sinh" (dải đã chừa padding-top), góc phải — không đè nội dung */
+.dao button.nut-toan-man.dao-toan-man{position:fixed;top:max(10px,env(safe-area-inset-top,0px));right:max(8px,env(safe-area-inset-right,0px));z-index:60;color:var(--dao-chu)}
 .dao button.dao-ve-app{--nut-chu:var(--dao-chu);position:fixed;top:max(8px,env(safe-area-inset-top,0px));left:max(8px,env(safe-area-inset-left,0px));z-index:60;display:inline-flex;align-items:center;justify-content:center;min-height:48px;min-width:48px;margin:0;padding:0 18px;border-radius:999px;font-size:14px;font-weight:700;background:var(--dao-ve-nen);box-shadow:var(--dao-ve-bong);text-decoration:none}
 
 /* ───── Túi đồ ───── */
@@ -315,6 +317,8 @@
 
 @media(prefers-reduced-motion:reduce){
  .dao *,.dao *::before,.dao *::after{animation:none!important;transition:none!important}
+ /* số máu nổi chỉ là hiệu ứng thoáng qua (đã có thanh Máu): không chuyển động thì ẩn, khỏi đứng đè nhãn thần thú */
+ .dao .dao-san-so,.dao .dao-san-hoi{display:none}
  /* không xoay 3D: đổi tranh tức thì */
  .dao .dao-chon-tranh,.dao .dao-chon-the[data-lat] .dao-chon-tranh{transform:none}
  .dao .dao-chon-mat-no,.dao .dao-chon-no-nhan{transform:none;backface-visibility:visible;-webkit-backface-visibility:visible}

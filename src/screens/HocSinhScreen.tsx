@@ -7,15 +7,14 @@
 // Cùng hồ sơ này sẽ dùng lại cho lối vào từ mục Phụ huynh — không dựng hai màn.
 // Chỉ dùng token + 6 thành phần thiết kế; số liệu dùng --sans.
 import { useEffect, useMemo, useState } from 'react'
-import { goiBaiThi } from '../lib/goi-bao-cao'
 import { ArrowLeft, ChevronRight, FileText, History, KeyRound, RefreshCw, Search, Trash2, Sparkles, TrendingUp, Users } from 'lucide-react'
 import { Hang, Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
-import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai, ngayGio } from '../components/HoSoEmView'
+import { KhoiChuyenDe, KhoiLichSuCa, toneXepLoai } from '../components/HoSoEmView'
 import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import KhoiTienBo from '../components/KhoiTienBo'
 import BieuDoTienBoGoogle from '../components/BieuDoTienBoGoogle'
-import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
-import { chuChipLop, useLopThay } from '../lib/ten-lop-thay'
+import { useLopThay } from '../lib/ten-lop-thay'
+import ChuTheLoc, { tenTheLoc } from '../components/ChuTheLoc'
 import DoiLopMotEm from '../components/DoiLopMotEm'
 import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, resetMatKhauHsApi, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
@@ -96,7 +95,6 @@ export default function HocSinhScreen() {
   const [lanTaiHoSo, setLanTaiHoSo] = useState(0) // tăng lên để tải lại hồ sơ (sau khi đổi tên)
   const [dangTaiHoSo, setDangTaiHoSo] = useState(false)
   const [caBaoCao, setCaBaoCao] = useState<HoSoEm['ca'][number] | null>(null)
-  const [tabBaoCaoMo, setTabBaoCaoMo] = useState<string>('tong_quan')
   const showToast = useAppStore((s) => s.showToast)
 
   const tai = async () => {
@@ -134,6 +132,14 @@ export default function HocSinhScreen() {
       .catch((e) => setLoi(e instanceof Error ? e.message : 'Không mở được hồ sơ'))
       .finally(() => setDangTaiHoSo(false))
   }, [sbdDangXem, cauHinh, lanTaiHoSo])
+
+  // CHẠM "BÁO CÁO" MỘT CA ⇒ sang Báo cáo chi tiết › Từng em của ca ấy (bản vẽ ca thi 28/09 — một kiểu báo cáo cho cả app thầy, thay modal HS cũ).
+  useEffect(() => {
+    if (!caBaoCao || !hoSo) return
+    setCaBaoCao(null)
+    setMucHoSo((m) => (m === 'bao-cao' ? 'tong-quan' : m)) // thầy đã bấm sang mục khác thì giữ mục ấy
+    moChiTietCa(caBaoCao.maCa, hoSo.em.sbd)
+  }, [caBaoCao, hoSo, moChiTietCa])
 
   // Tự động bật luôn báo cáo mới chuẩn Google Material 3 khi chạm "Báo cáo"
   useEffect(() => {
@@ -512,25 +518,7 @@ export default function HocSinhScreen() {
           </>
         )}
 
-        {/* MODAL BÁO CÁO CA THI HỌC SINH CHUẨN GOOGLE MATERIAL 3 */}
-        {caBaoCao && hoSo && (
-          <BaoCaoCaThiHocSinhModal
-            baiThi={goiBaiThi(caBaoCao, caBaoCao.nopLuc ? ngayGio(caBaoCao.nopLuc) : undefined)}
-            hoTen={hoSo.em.hoTen || `SBD ${hoSo.em.sbd}`}
-            sbd={hoSo.em.sbd}
-            lop={hoSo.em.lop}
-            scriptUrl={cauHinh?.url || ''}
-            tabMacDinh={tabBaoCaoMo}
-            onClose={() => {
-              setCaBaoCao(null)
-              setMucHoSo('tong-quan')
-            }}
-            onBatDauKhacPhuc={() => {
-              setCaBaoCao(null)
-              moHoSoEm('')
-            }}
-          />
-        )}
+        {/* Báo cáo MỘT CA của em: modal báo cáo HS cũ đã GỘP vào Báo cáo chi tiết › Từng em ở màn Theo dõi ca (bản vẽ ca thi 28/09) — xem hiệu ứng `caBaoCao`. */}
         {hopXacNhan}
       </div>
     )
@@ -621,41 +609,30 @@ export default function HocSinhScreen() {
         </div>
 
         {/* BỘ LỌC KHỐI & TẤT CẢ CÁC LỚP */}
-        <div className="space-y-2.5" style={{ marginBottom: 'var(--k3)' }}>
-          {/* Lọc theo khối */}
-          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Lọc theo khối">
-            <span className="hs-nhan-loc">Khối:</span>
+        <div className="flex flex-col" style={{ gap: 10, marginBottom: 'var(--k3)' }}>
+          {/* Lọc theo khối — thẻ lọc kiểu chung (src/styles/the-loc.css) */}
+          <div className="tl-hang" role="group" aria-label="Lọc theo khối">
+            <span className="tl-nhan">Khối</span>
             {[null, 10, 11, 12].map((k) => {
               const chon = khoiLoc === k
               return (
-                <button
-                  key={k ?? 'tat_ca'}
-                  type="button"
-                  onClick={() => setKhoiLoc(k)}
-                  className={`tap-target hs-chip${chon ? ' hs-chip--chon' : ''}`}
-                  style={{ ...SO }}
-                >
+                <button key={k ?? 'tat_ca'} type="button" onClick={() => setKhoiLoc(k)} aria-pressed={chon} className={`tl-the hs-chip${chon ? ' hs-chip--chon' : ''}`}>
                   {k === null ? 'Tất cả khối' : `Khối ${k}`}
                 </button>
               )
             })}
           </div>
 
-          {/* Lọc theo lớp (đồng bộ tất cả các lớp) */}
+          {/* Lọc theo lớp (đồng bộ tất cả các lớp); số em là huy hiệu tách khỏi tên lớp */}
           {dsLop.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Lọc theo lớp">
-              <span className="hs-nhan-loc">Lớp:</span>
+            <div className="tl-hang" role="group" aria-label="Lọc theo lớp">
+              <span className="tl-nhan">Lớp</span>
               {['', ...dsLop].map((l) => {
                 const chon = lopLoc === l
+                const lt = l && lopThay.ds ? (lopThay.ds.find((x) => x.tenLop === l) ?? { tenLop: l, soEm: 0 }) : null
                 return (
-                  <button
-                    key={l || '__tat_ca_lop'}
-                    type="button"
-                    onClick={() => setLopLoc(l)}
-                    className={`tap-target hs-chip${chon ? ' hs-chip--chon' : ''}`}
-                    style={{ ...SO }}
-                  >
-                    {l ? (lopThay.ds ? chuChipLop(lopThay.ds.find((x) => x.tenLop === l) ?? { tenLop: l, soEm: 0 }) : `Lớp ${l}`) : 'Tất cả các lớp'}
+                  <button key={l || '__tat_ca_lop'} type="button" onClick={() => setLopLoc(l)} aria-pressed={chon} aria-label={lt ? tenTheLoc(lt.tenLop, lt.soEm, ' · ', 'em') : undefined} className={`tl-the hs-chip${chon ? ' hs-chip--chon' : ''}`}>
+                    {!l ? 'Tất cả các lớp' : lt ? <ChuTheLoc chu={lt.tenLop} so={lt.soEm} donVi="em" /> : `Lớp ${l}`}
                   </button>
                 )
               })}
@@ -683,7 +660,6 @@ export default function HocSinhScreen() {
                       <button
                         type="button"
                         onClick={() => {
-                          setTabBaoCaoMo('tong_quan')
                           moHoSo(e.sbd, 'tong-quan')
                         }}
                         className="tap-target font-bold inline-flex items-center text-left"
@@ -744,7 +720,6 @@ export default function HocSinhScreen() {
                         key={muc}
                         type="button"
                         onClick={() => {
-                          setTabBaoCaoMo(muc === 'bao-cao' ? 'tong_quan' : 'tien_bo')
                           moHoSo(e.sbd, muc)
                         }}
                         aria-label={`${TEN_MUC_HO_SO[muc]} của ${e.hoTen || `SBD ${e.sbd}`}`}

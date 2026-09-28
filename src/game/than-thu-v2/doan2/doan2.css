@@ -6,6 +6,8 @@
   background:radial-gradient(120% 60% at 50% 0%,rgb(26,44,110) 0%,rgb(12,26,58) 48%,rgb(7,18,41) 100%) rgb(7,18,41);color:var(--dh2-chu)}
 .dh2 .dh2-baloo,.dh2 .dh-dau h1,.dh2 .dh-chang h2,.dh2 .dh-chang-nhan,.dh2 .dh-nut-vang{font-family:'Baloo 2',var(--sans,'Be Vietnam Pro'),system-ui,sans-serif}
 .dh2 .dh2-kinh{background:rgba(12,26,58,.72);box-shadow:inset 0 0 0 1px rgba(160,200,255,.18);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+/* nút toàn màn hình (src/components/NutToanManHinh) trong HUD / đầu sảnh: cùng kính với .dh2-kinh */
+.dh2 .dh2-hud,.dh2 .dh-dau-phai{--ntm-nen:rgba(12,26,58,.72);--ntm-vien:inset 0 0 0 1px rgba(160,200,255,.18);--ntm-chu:var(--dh2-chu)}
 .dh2-cot{display:contents} /* bọc cột của bố cục ngang: màn dọc coi như không có */
 .dh2-nhan-quai{display:none} /* nhãn Máu từng quái: chỉ màn ngang */
 .dh2 .dh2-keo{display:none} /* chỉ hiện ở bố cục ngang (doan2-ngang.css) */
@@ -29,8 +31,8 @@
 .dh2 .dh-muc p,.dh2 .dh-ban-do-gop{color:rgb(220,232,255)}
 
 /* ───── Trong trận ───── */
-.dh2 .dh-khung.dh2-tran{gap:10px}
-.dh2-canh{position:relative;flex:0 0 auto;height:clamp(236px,34vh,320px);margin:calc(-1 * max(10px,env(safe-area-inset-top))) -16px 0;overflow:hidden;background:rgb(27,21,84)}
+.dh2 .dh-khung.dh2-tran{gap:8px} /* 28/09 lần 2: bớt khe để đề lớn nhất */
+.dh2-canh{position:relative;flex:0 0 auto;height:clamp(216px,30vh,284px);margin:calc(-1 * max(10px,env(safe-area-inset-top))) -16px 0;overflow:hidden;background:rgb(27,21,84)}
 .dh2-canh.dh2-canh-trum{background:rgb(27,12,64)}
 .dh2-ve{position:absolute;left:0;right:0;bottom:0;aspect-ratio:390/340}
 .dh2-ve>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -41,6 +43,7 @@
 .dh2-sat-thuong{position:absolute;left:57%;top:55%;display:flex;flex-direction:column;align-items:flex-start;gap:2px;transform:rotate(-8deg);pointer-events:none;animation:dh2-bat .28s ease-out both}
 .dh2-sat-thuong b{font-family:'Baloo 2',var(--sans,'Be Vietnam Pro'),system-ui,sans-serif;font-size:34px;font-weight:800;line-height:1;color:rgb(255,214,107);text-shadow:0 3px 0 rgb(138,58,0),0 0 18px rgba(255,160,40,.6)}
 .dh2-sat-thuong span{padding:2px 8px;border-radius:8px;background:rgb(255,92,138);color:rgb(255,255,255);font-size:12px;font-weight:800;white-space:nowrap}
+@media (orientation:portrait){.dh2-sat-thuong{top:auto;bottom:58px;flex-direction:row;align-items:center;gap:6px;transform:rotate(-4deg)}.dh2-sat-thuong b{font-size:28px}} /* màn dọc: số sát thương nằm một hàng trên nhãn Máu, không đè chip đồng đội / Liên kích */
 .dh2-nhan-canh{position:absolute;bottom:30px;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
 .dh2-nhan-mau{left:3%;color:rgb(191,244,255)}
 .dh2-nhan-o{right:3%;color:rgb(255,179,200)}
@@ -49,7 +52,7 @@
 .dh2-hud-hiep{flex:1 1 auto;min-width:0;height:52px;padding:6px 12px;border-radius:18px;display:flex;flex-direction:column;justify-content:center;gap:6px}
 .dh2-hud-dong{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;font-weight:800}
 .dh2-hud-dong b{font-size:16px;letter-spacing:1px;white-space:nowrap}
-.dh2-hud-dong span{color:var(--dh2-mo);white-space:nowrap}
+.dh2-hud-dong span{min-width:0;overflow:hidden;text-overflow:ellipsis;color:var(--dh2-mo);white-space:nowrap} /* HUD hẹp: chú thích hiệp trùm tự rút gọn, không chui dưới nút Rời chuyến */
 .dh2-vach{display:flex;align-items:center;gap:4px}
 .dh2-vach i{flex:1 1 0;height:6px;border-radius:3px;background:rgba(255,255,255,.18)}
 .dh2-vach i.dh2-xong{background:var(--dh2-xanh)}
@@ -103,14 +106,14 @@
 .dh2 .dh-ds button{min-height:44px}
 .dh2 .dh-ds button[aria-pressed=true]{background:rgb(31,181,166)}
 
-.dh2 .dh-don button{min-height:64px;border-radius:20px;background:rgba(12,26,58,.72);box-shadow:inset 0 0 0 1px rgba(160,200,255,.18);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--dh2-chu)}
+.dh2 .dh-don button{min-height:56px;border-radius:20px;background:rgba(12,26,58,.72);box-shadow:inset 0 0 0 1px rgba(160,200,255,.18);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:var(--dh2-chu)}
 .dh2 .dh-don button>svg{display:none}
 .dh2 .dh-don button b{font-family:'Baloo 2',var(--sans,'Be Vietnam Pro'),system-ui,sans-serif;font-size:17px}
 .dh2 .dh-don button small{font-size:11px;color:var(--dh2-mo)}
 .dh2 .dh-don button:nth-child(3) b{color:rgb(255,159,107)}
 .dh2 .dh-don button[aria-pressed=true]{background:linear-gradient(180deg,rgb(74,52,16),rgb(42,29,8));box-shadow:inset 0 0 0 2px var(--dh2-vang),0 0 16px rgba(255,201,64,.35);color:rgb(255,224,138)}
 .dh2 .dh-don button[aria-pressed=true] small,.dh2 .dh-don button[aria-pressed=true] b{color:rgb(255,224,138)}
-.dh2 .dh2-nut-chinh{display:flex;align-items:center;justify-content:center;width:100%;min-height:62px;padding:0 16px;border-radius:22px;background:linear-gradient(180deg,rgb(255,214,107) 0%,rgb(255,159,28) 100%);color:rgb(58,29,0);
+.dh2 .dh2-nut-chinh{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;padding:0 16px;border-radius:22px;background:linear-gradient(180deg,rgb(255,214,107) 0%,rgb(255,159,28) 100%);color:rgb(58,29,0);
   font-size:21px;font-weight:800;letter-spacing:.5px;box-shadow:0 6px 0 rgb(184,101,10),0 10px 24px rgba(255,159,28,.35)}
 .dh2 .dh2-nut-chinh:disabled{opacity:.55;box-shadow:0 6px 0 rgba(184,101,10,.5)}
 .dh2 .dh2-nut-chinh:active:not(:disabled){transform:translateY(2px)}
@@ -160,7 +163,7 @@
 @keyframes dh2-noi{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
 
 @media (max-width:380px){.dh2 .dh-pa button{min-height:52px;font-size:15px}.dh2 .dh-de{font-size:15.5px}.dh2 .dh2-nut-chinh{font-size:18px}.dh2 .dh-nut-vang{font-size:17px;letter-spacing:.02em}.dh2-thang-tieu-de{font-size:26px}}
-@media (max-height:780px){.dh2-canh{height:clamp(216px,30vh,250px)}.dh2 .dh-don button{min-height:56px}.dh2 .dh2-nut-chinh{min-height:54px}}
+@media (max-height:780px){.dh2-canh{height:clamp(200px,28vh,236px)}.dh2 .dh-don button{min-height:52px}.dh2 .dh2-nut-chinh{min-height:52px}}
 @media (max-height:700px){.dh2-canh{height:clamp(200px,34vh,236px)}.dh2 .dh-pa button{min-height:48px}}
 
 /* ───── Tấm phủ TUNG CHƯỞNG (2.0): cùng bố cục/thời lượng với bản cũ — nền biển đêm + tia vàng, dải chiêu vàng chữ nâu Baloo, số vàng có nhãn,
@@ -230,6 +233,7 @@
   :root:not([data-giao-dien='toi']) .dh.dh2{color-scheme:light;--dh-chu:rgb(24,30,62);--dh-mo:rgb(62,72,108);--dh-vang-nhat:rgb(150,76,0);--dh-xanh:rgb(10,110,70);--dh-lam:rgb(0,110,118);
  --dh2-chu:rgb(24,30,62);--dh2-mo:rgb(62,72,108);--dh2-vang:rgb(150,76,0);--dh2-xanh:rgb(10,120,80);
  background:radial-gradient(90% 50% at 85% 0%,rgba(255,236,190,.9),transparent 60%),linear-gradient(180deg,rgb(255,226,206) 0%,rgb(236,222,255) 45%,rgb(206,238,246) 100%) rgb(236,222,255)}
+  :root:not([data-giao-dien='toi']) .dh2 .dh2-hud,:root:not([data-giao-dien='toi']) .dh2 .dh-dau-phai{--ntm-nen:rgba(255,255,255,.8);--ntm-vien:inset 0 0 0 1px rgba(255,255,255,.95),0 4px 12px rgba(70,40,120,.12)}
   :root:not([data-giao-dien='toi']) .dh2 .dh2-kinh,:root:not([data-giao-dien='toi']) .dh2 .dh-kinh,:root:not([data-giao-dien='toi']) .dh2 .dh-don button{background:rgba(255,255,255,.8);box-shadow:inset 0 0 0 1px rgba(255,255,255,.95),0 8px 22px rgba(70,40,120,.14),0 2px 6px rgba(70,40,120,.08)}
   :root:not([data-giao-dien='toi']) .dh2 .dh2-chuong{--dh-chu:rgb(238,243,255);--dh-mo:rgb(159,178,217);--dh-vang-nhat:rgb(255,224,138);--dh-xanh:rgb(125,255,176);--dh-lam:rgb(127,233,255);--dh2-chu:rgb(242,246,255);--dh2-mo:rgb(188,203,235);--dh2-vang:rgb(255,201,64);--dh2-xanh:rgb(91,240,165)}
   :root:not([data-giao-dien='toi']) .dh2 .dh2-chuong .dh2-lam{color:rgb(127,243,255)}
@@ -276,6 +280,7 @@
 :root[data-giao-dien='sang'] .dh.dh2{color-scheme:light;--dh-chu:rgb(24,30,62);--dh-mo:rgb(62,72,108);--dh-vang-nhat:rgb(150,76,0);--dh-xanh:rgb(10,110,70);--dh-lam:rgb(0,110,118);
  --dh2-chu:rgb(24,30,62);--dh2-mo:rgb(62,72,108);--dh2-vang:rgb(150,76,0);--dh2-xanh:rgb(10,120,80);
  background:radial-gradient(90% 50% at 85% 0%,rgba(255,236,190,.9),transparent 60%),linear-gradient(180deg,rgb(255,226,206) 0%,rgb(236,222,255) 45%,rgb(206,238,246) 100%) rgb(236,222,255)}
+:root[data-giao-dien='sang'] .dh2 .dh2-hud,:root[data-giao-dien='sang'] .dh2 .dh-dau-phai{--ntm-nen:rgba(255,255,255,.8);--ntm-vien:inset 0 0 0 1px rgba(255,255,255,.95),0 4px 12px rgba(70,40,120,.12)}
 :root[data-giao-dien='sang'] .dh2 .dh2-kinh,:root[data-giao-dien='sang'] .dh2 .dh-kinh,:root[data-giao-dien='sang'] .dh2 .dh-don button{background:rgba(255,255,255,.8);box-shadow:inset 0 0 0 1px rgba(255,255,255,.95),0 8px 22px rgba(70,40,120,.14),0 2px 6px rgba(70,40,120,.08)}
 :root[data-giao-dien='sang'] .dh2 .dh2-chuong{--dh-chu:rgb(238,243,255);--dh-mo:rgb(159,178,217);--dh-vang-nhat:rgb(255,224,138);--dh-xanh:rgb(125,255,176);--dh-lam:rgb(127,233,255);--dh2-chu:rgb(242,246,255);--dh2-mo:rgb(188,203,235);--dh2-vang:rgb(255,201,64);--dh2-xanh:rgb(91,240,165)}
 :root[data-giao-dien='sang'] .dh2 .dh2-chuong .dh2-lam{color:rgb(127,243,255)}

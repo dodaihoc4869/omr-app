@@ -142,10 +142,10 @@ export default function KhungBtvnDaGiao(p: KhungBtvnDaGiaoProps) {
         <>
           <div className="btg-loc" role="search">
             {lopDs.length > 0 && (
-              <div className="btg-chip-hang" role="group" aria-label="Lọc theo lớp">
-                <button type="button" className={`btg-chip${lop === '' ? ' btg-chip--chon' : ''}`} aria-pressed={lop === ''} onClick={() => setLop('')}>Tất cả lớp</button>
+              <div className="tl-hang btg-chip-hang" role="group" aria-label="Lọc theo lớp">
+                <button type="button" className={`tl-the btg-chip${lop === '' ? ' btg-chip--chon' : ''}`} aria-pressed={lop === ''} onClick={() => setLop('')}>Tất cả lớp</button>
                 {lopDs.map((l) => (
-                  <button key={l} type="button" className={`btg-chip${lop === l ? ' btg-chip--chon' : ''}`} aria-pressed={lop === l} onClick={() => setLop(lop === l ? '' : l)}>{l}</button>
+                  <button key={l} type="button" className={`tl-the btg-chip${lop === l ? ' btg-chip--chon' : ''}`} aria-pressed={lop === l} onClick={() => setLop(lop === l ? '' : l)}>{l}</button>
                 ))}
               </div>
             )}

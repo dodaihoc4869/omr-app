@@ -26,6 +26,7 @@ import type { JSX } from 'react'
 import katex from 'katex'
 import 'katex/contrib/mhchem'
 import { goKyTuLa } from './chu-la-pdf'
+import { gomTuCongThuc, laNhanMuiTen, nhanTruocMuiTenVeSau, tachDongSoDo } from './chem-format-so-do'
 
 export type ChemPart =
   | { t: 'text'; v: string }
@@ -186,7 +187,8 @@ const RE_MUI = /(<=>|<->|->|<-|→|←|⇌)/g
 /** Tách chuỗi thành chữ và MŨI TÊN KÈM NHÃN (nhận cả ngoặc vuông [...] và ngoặc tròn (...)).
  * Nhãn nằm TRÊN và DƯỚI thân mũi tên đúng như sách giáo khoa. */
 export function tachMuiTen(raw: string): KhucMuiTen[] {
-  const s = String(raw ?? '')
+  // Số hiệu viết TRƯỚC mũi tên ("CO₂ ⁽¹⁾→ X", "CO₂ (1) → X") đưa lên thân mũi tên.
+  const s = nhanTruocMuiTenVeSau(String(raw ?? ''))
   const ra: KhucMuiTen[] = []
   let i = 0
   RE_MUI.lastIndex = 0
@@ -204,6 +206,9 @@ export function tachMuiTen(raw: string): KhucMuiTen[] {
       const mo = j + sau[0].length - 1
       const dong = timNgoacDongChar(s, mo, moChar)
       if (dong < 0) break
+      // Ngoặc cách mũi tên một dấu cách, hay có chỉ số bám sau — "→ (C₆H₁₀O₅)ₙ",
+      // "→ [Cu(NH₃)₄](OH)₂" — là CHẤT sản phẩm, không phải điều kiện.
+      if (!laNhanMuiTen(s, mo, dong, sau[0].length > 1, lan === 1)) break
       nhan.push(chuanHoaNhanTrenMuiTen(s.slice(mo + 1, dong)))
       j = dong + 1
     }
@@ -747,7 +752,10 @@ const DAI_PHAI_CUON = 26
 
 function chuanHoaMuiTenMhchem(raw: string): string {
   let s = String(raw ?? '')
-  s = s.replace(/(<=>>|<<=>|<=>|<->|->|<-|→|←|⇌|\\to|\\rightarrow)\s*\(([^)]+)\)/g, (_m, mui, nhan) => {
+  s = s.replace(/(<=>>|<<=>|<=>|<->|->|<-|→|←|⇌|\\to|\\rightarrow)(\s*)\(([^)]+)\)/g, (m, mui: string, cach: string, nhan: string, viTri: number, goc: string) => {
+    // "-> (CH3)2O" là chất sản phẩm, không phải điều kiện — xem `laNhanMuiTen`.
+    const mo = viTri + mui.length + cach.length
+    if (!laNhanMuiTen(goc, mo, mo + nhan.length + 1, cach.length > 0, false)) return m
     const chuanMui = mui === '→' || mui === '\\to' || mui === '\\rightarrow' ? '->' : mui === '←' ? '<-' : mui === '⇌' ? '<=>' : mui
     return `${chuanMui}[${nhan}]`
   })
@@ -806,46 +814,99 @@ function ChemFormula({ t, latex: latexGoc }: { t: 'ce' | 'math'; latex: string }
 export function ChemText({ text }: { text: string }): JSX.Element {
   // Lớp chắn cuối cho ký tự vùng dùng riêng: đề cũ đã nằm trong máy trước khi
   // cửa nạp biết dọn thì vẫn hiện đúng chứ không ra ô vuông rỗng.
-  const segments = splitCeSegments(goKyTuLa(text ?? ''))
+  const khucs = tachDongSoDo(goKyTuLa(text ?? ''))
+  if (khucs.length === 1 && khucs[0].t === 'chu') return <ChemDong text={khucs[0].v} />
+  return (
+    <>
+      {khucs.map((k, i) =>
+        k.t === 'sodo' ? (
+          // Sơ đồ/phương trình đứng RIÊNG một dòng, không dính vào câu chữ.
+          <span key={i} className="so-do" style={{ display: 'block', margin: '4px 0' }}>
+            <ChemDong text={k.v} />
+          </span>
+        ) : (
+          <ChemDong key={i} text={k.v} />
+        ),
+      )}
+    </>
+  )
+}
+
+function laMuiPart(p: ChemPart): boolean {
+  return p.t === 'mui' || (p.t === 'text' && /^[→←⇌]$/.test(p.v))
+}
+
+function MotPhan({ p }: { p: ChemPart }): JSX.Element | null {
+  if (p.t === 'sub') return <sub>{p.v}</sub>
+  if (p.t === 'sup') return <sup>{p.v}</sup>
+  if (p.t === 'mui') {
+    const huong = p.mui === '→' ? 'mt-phai' : p.mui === '←' ? 'mt-trai' : 'mt-hai'
+    if (!p.tren && !p.duoi) {
+      return (
+        <span className="mt mt-tran">
+          <span className={`mt-than ${huong}`} />
+        </span>
+      )
+    }
+    return (
+      <span className="mt">
+        {p.tren && (
+          <span className="mt-tren">
+            <ChemTextNoMui text={p.tren} />
+          </span>
+        )}
+        <span className={`mt-than ${huong}`} />
+        {p.duoi && (
+          <span className="mt-duoi">
+            <ChemTextNoMui text={p.duoi} />
+          </span>
+        )}
+      </span>
+    )
+  }
+  return <span>{p.v}</span>
+}
+
+/** Một khúc chữ (không tách sơ đồ nữa). Công thức và "mũi tên + chất sau" được
+ * bọc liền (`ct-lien`) để không bị ngắt dòng giữa chừng. */
+function ChemDong({ text }: { text: string }): JSX.Element {
+  const segments = splitCeSegments(text)
   return (
     <>
       {segments.map((seg, si) => {
         if (seg.t !== 'plain') return <ChemFormula key={si} t={seg.t} latex={seg.latex} />
-        const parts = parseChemText(seg.text)
-        return (
-          <span key={si}>
-            {parts.map((p, i) => {
-              if (p.t === 'sub') return <sub key={i}>{p.v}</sub>
-              if (p.t === 'sup') return <sup key={i}>{p.v}</sup>
-              if (p.t === 'mui') {
-                const huong = p.mui === '→' ? 'mt-phai' : p.mui === '←' ? 'mt-trai' : 'mt-hai'
-                if (!p.tren && !p.duoi) {
-                  return (
-                    <span key={i} className="mt mt-tran">
-                      <span className={`mt-than ${huong}`} />
-                    </span>
-                  )
-                }
-                return (
-                  <span key={i} className="mt">
-                    {p.tren && (
-                      <span className="mt-tren">
-                        <ChemTextNoMui text={p.tren} />
-                      </span>
-                    )}
-                    <span className={`mt-than ${huong}`} />
-                    {p.duoi && (
-                      <span className="mt-duoi">
-                        <ChemTextNoMui text={p.duoi} />
-                      </span>
-                    )}
-                  </span>
-                )
-              }
-              return <span key={i}>{p.v}</span>
-            })}
-          </span>
+        const gom = gomTuCongThuc<ChemPart>(
+          parseChemText(seg.text),
+          (p) => (p.t === 'text' && !/^[→←⇌]$/.test(p.v) ? p.v : null),
+          (v) => ({ t: 'text', v }),
+          laMuiPart,
         )
+        // Chữ thường liền kề gộp lại một span như bản cũ — DOM gọn, test cũ không đổi.
+        const nut: JSX.Element[] = []
+        let dem = ''
+        const xa = () => {
+          if (dem) nut.push(<span key={nut.length}>{dem}</span>)
+          dem = ''
+        }
+        for (const g of gom) {
+          if (!g.lien) {
+            if (g.x.t === 'text') {
+              dem += g.x.v
+              continue
+            }
+            xa()
+            nut.push(<MotPhan key={nut.length} p={g.x} />)
+            continue
+          }
+          xa()
+          nut.push(
+            <span key={nut.length} className="ct-lien" style={{ whiteSpace: 'nowrap' }}>
+              {g.ds.map((p, j) => (p.t === 'text' ? <span key={j}>{p.v}</span> : <MotPhan key={j} p={p} />))}
+            </span>,
+          )
+        }
+        xa()
+        return <span key={si}>{nut}</span>
       })}
     </>
   )

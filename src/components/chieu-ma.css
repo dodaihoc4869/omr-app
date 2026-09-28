@@ -1,0 +1,246 @@
+/* CHIẾU MÃ VÀO THI (TamPhuChieuMa, thầy 28/09: làm lại hiện đại, đọc rõ từ cuối lớp). Nền tối tương phản cao cho máy chiếu, chữ rất to theo
+ * khung nhìn (vw/vh — không tràn ở 1366×768 lẫn 1920×1080). Không mã màu hex (luật check:mau) — chỉ rgb(). */
+.ca-chieu.cm {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 76px clamp(16px, 3vw, 56px) clamp(16px, 3vh, 40px);
+  background: radial-gradient(120% 90% at 20% 10%, rgb(30 44 92), rgb(10 14 32) 70%);
+  color: rgb(244 246 255);
+  font-family: var(--sans, system-ui, sans-serif);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.cm *,
+.cm *::before,
+.cm *::after {
+  box-sizing: border-box;
+}
+.ca-chieu.cm .cm-dong {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  color: rgb(244 246 255);
+  font: 700 15px var(--sans, system-ui, sans-serif);
+  cursor: pointer;
+}
+.ca-chieu.cm .cm-dong:focus-visible {
+  outline: 3px solid rgb(255 210 122);
+  outline-offset: 2px;
+}
+.cm-luoi {
+  width: 100%;
+  max-width: 1760px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(16px, 3vw, 48px);
+  align-items: center;
+  min-height: 0;
+}
+.cm-luoi.cm-co-ds {
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+}
+@media (max-width: 900px) {
+  .cm-luoi.cm-co-ds {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    overflow-y: auto;
+  }
+}
+.cm-trai {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 1.6vh, 20px);
+  min-width: 0;
+  text-align: center;
+}
+.cm .cm-nhan {
+  margin: 0;
+  font-size: clamp(14px, 1.6vw, 26px);
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  color: rgb(170 184 230);
+}
+.cm .cm-ma {
+  font-size: min(15vw, 22vh, 240px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: rgb(255 255 255);
+  text-shadow: 0 0 40px rgb(120 150 255 / 0.45);
+}
+.cm-co-ds .cm-ma {
+  font-size: min(9.5vw, 20vh, 220px);
+}
+.cm .cm-ten {
+  margin: 0;
+  max-width: 100%;
+  font-size: clamp(18px, 2.2vw, 38px);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.cm-vao {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 28px);
+  max-width: 100%;
+  margin-top: clamp(4px, 1vh, 12px);
+  text-align: left;
+}
+.cm-qr {
+  flex: none;
+  width: min(22vh, 15vw, 240px);
+  height: auto;
+  border-radius: 14px;
+}
+.cm-qr-nen {
+  fill: rgb(255 255 255);
+}
+.cm-qr-o {
+  fill: rgb(10 14 32);
+}
+.cm .cm-huong-dan {
+  margin: 0;
+  min-width: 0;
+  font-size: clamp(15px, 1.6vw, 28px);
+  line-height: 1.35;
+  color: rgb(200 210 240);
+  overflow-wrap: anywhere;
+}
+.cm .cm-huong-dan b {
+  color: rgb(255 255 255);
+}
+.cm-phai {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.4vh, 16px);
+  min-width: 0;
+  max-height: 100%;
+  padding: clamp(16px, 2.4vw, 36px);
+  border-radius: 32px;
+  background: rgb(255 255 255 / 0.07);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+  overflow: hidden;
+}
+.cm-phai-dau {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cm-phai-dau h2 {
+  margin: 0;
+  font-size: clamp(18px, 2vw, 34px);
+  font-weight: 800;
+}
+.cm-mat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: clamp(12px, 1vw, 16px);
+  font-weight: 700;
+  color: rgb(255 190 120);
+}
+.cm-mat i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgb(255 150 90);
+}
+.cm .cm-dem {
+  margin: 0;
+  /* bỏ viên nền xanh nhạt của .ca-chieu-cho (màn cũ): chữ sáng trên nền tối, "/ 24 em" đọc được từ cuối lớp */
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: clamp(18px, 2vw, 34px);
+  font-weight: 700;
+  color: rgb(200 210 240);
+  font-variant-numeric: tabular-nums;
+}
+.cm .cm-dem b {
+  font-size: clamp(44px, 6vw, 110px);
+  line-height: 1;
+  color: rgb(140 240 180);
+}
+.cm-vach {
+  height: 12px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  overflow: hidden;
+}
+.cm-vach i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgb(90 210 150), rgb(140 240 180));
+  transition: width 0.4s ease;
+}
+.cm-rong {
+  margin: 0;
+  font-size: clamp(15px, 1.4vw, 24px);
+  color: rgb(170 184 230);
+}
+.cm-chip-ds {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: clamp(6px, 0.7vw, 12px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-height: 0;
+  overflow-y: auto;
+}
+.cm-chip {
+  max-width: 100%;
+  padding: 0.35em 0.85em;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  font-size: clamp(15px, 1.35vw, 26px);
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cm-chip.cm-moi {
+  background: rgb(90 210 150 / 0.3);
+  box-shadow: inset 0 0 0 2px rgb(140 240 180);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cm-chip.cm-moi {
+    animation: cm-hien 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+@keyframes cm-hien {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.cm .cm-dem-le {
+  margin: 0;
+  font-size: clamp(18px, 2.4vw, 36px);
+  font-weight: 700;
+  color: rgb(140 240 180);
+}

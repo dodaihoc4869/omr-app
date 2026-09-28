@@ -28,20 +28,20 @@ const CFG: CauHinhLeoBac = {
   toiDaLanDo: BO_CUC_TO_CHIEU.TOI_DA_LAN_DO,
 }
 
-/** Duyệt vét cạn theo ĐÚNG thứ tự ưu tiên: bậc thấp trước, trong bậc thì chữ to trước / hình to trước. */
+/** Duyệt vét cạn theo ĐÚNG thứ tự ưu tiên (LUẬT THẦY 28/09: KHÔNG co chữ — không còn bậc 4/5): bậc thấp trước, hình to trước. */
 function vetCan(vua: Vua, cfg: CauHinhLeoBac): { bac: number; co: number; hinh: number } | null {
   const co0 = Math.max(cfg.coChuan, cfg.coSan)
   const ds: [number, number, number][] = []
   if (cfg.batDauOBac === 1) ds.push([1, co0, 1])
   ds.push([2, co0, 1])
   if (cfg.coBac3) for (let h = 1; h > cfg.hinhToiThieu - 1e-9; h = Math.round((h - cfg.buocHinh) * 100) / 100) ds.push([3, co0, h])
-  const hCo = cfg.coBac3 ? cfg.hinhToiThieu : 1
-  for (let c = co0 - cfg.buocCo; c >= cfg.coSan - 1e-9; c -= cfg.buocCo) ds.push([4, c, hCo])
-  for (let c = co0; c >= cfg.coDay - 1e-9; c -= cfg.buocCo) ds.push([5, c, hCo])
   for (const [b, c, h] of ds) if (vua(b, c, h)) return { bac: b, co: c, hinh: h }
   return null
 }
 
+// LUẬT THẦY 28/09 (bản vẽ LenBang-Moi): "KHÔNG BAO GIỜ thu nhỏ chữ" — các test cũ về bậc 4 (co chữ từng px), bậc 5 (toàn bảng, đáy
+// tuyệt đối, `duoiSan`) và cảnh báo "quá dài" là LUẬT CŨ đã bị thầy thay; nay: không vừa ⇒ bậc 2 ở cỡ chuẩn, `vua=false`, tờ lật
+// trang (chờ gọi) / cuộn (đang chữa).
 describe('THUẬT TOÁN LEO BẬC (mã thật của tờ chiếu, thước đo giả)', () => {
   it('bản CHỮ nhúng vào tờ là một biểu thức hàm TỰ CHỨA (không tham chiếu tên nào ngoài `vua`/`cfg`)', () => {
     expect(JS_LEO_BAC).toMatch(/^var leoBacBoCuc = \(/)
@@ -72,36 +72,23 @@ describe('THUẬT TOÁN LEO BẬC (mã thật của tờ chiếu, thước đo g
     }
   })
 
-  it('câu KHÔNG có phương án/ý/hình (coBac3 = false) ⇒ bỏ hẳn bậc 3, nhảy sang co chữ', () => {
+  it('câu KHÔNG có phương án/ý/hình (coBac3 = false) ⇒ bỏ hẳn bậc 3; không vừa ⇒ bậc 2 CỠ CHUẨN, vua=false', () => {
     const goi: number[] = []
-    const r = leo((b, c) => (goi.push(b), b === 4 && c <= 25), { ...CFG, coBac3: false })
+    const r = leo((b) => (goi.push(b), false), { ...CFG, coBac3: false })
     expect(goi.includes(3)).toBe(false)
-    expect(r).toMatchObject({ bac: 4, co: 25, hinh: 1, vua: true })
+    expect(r).toMatchObject({ bac: 2, co: 30, hinh: 1, vua: false, duoiSan: false })
   })
 
-  it('bậc 4: cỡ chữ LỚN NHẤT còn vừa, giảm từng 1 px, không bao giờ dưới sàn', () => {
-    const r = leo((b, c) => b >= 4 && c <= 21, CFG)
-    expect(r).toMatchObject({ bac: 4, co: 21, vua: true, duoiSan: false })
-    expect(r.hinh).toBeCloseTo(CFG.hinhToiThieu, 6) // hình đã ở mức nhỏ nhất
-    const goi4: number[] = []
-    leo((b, c) => (b === 4 && goi4.push(c), b === 5), CFG)
-    expect(goi4[0]).toBe(29)
-    expect(goi4[goi4.length - 1]).toBe(16) // chạm sàn rồi mới sang bậc 5
-    for (let i = 1; i < goi4.length; i++) expect(goi4[i - 1] - goi4[i]).toBe(1)
+  it('LUẬT 28/09 — KHÔNG BAO GIỜ thử cỡ chữ nhỏ hơn cỡ chuẩn, không bậc 4/5', () => {
+    const co: number[] = []
+    const bac: number[] = []
+    leo((b, c) => (co.push(c), bac.push(b), false), CFG)
+    expect(new Set(co)).toEqual(new Set([30]))
+    expect(Math.max(...bac)).toBeLessThanOrEqual(3)
   })
 
-  it('bậc 5 (toàn bảng) thử lại từ CỠ CHUẨN: vùng rộng hơn nên chữ to có thể vừa', () => {
-    const r = leo((b, c) => b === 5 && c <= 30, CFG)
-    expect(r).toMatchObject({ bac: 5, co: 30, vua: true, duoiSan: false })
-  })
-
-  it('bậc 5 vừa nhờ xuống DƯỚI sàn ⇒ báo `duoiSan`', () => {
-    const r = leo((b, c) => b === 5 && c <= 14, CFG)
-    expect(r).toMatchObject({ bac: 5, co: 14, vua: true, duoiSan: true })
-  })
-
-  it('không thứ gì vừa ⇒ bậc 5 ở ĐÁY TUYỆT ĐỐI, `vua = false` và `duoiSan = true` (tờ sẽ CẢNH BÁO thầy)', () => {
-    expect(leo(() => false, CFG)).toMatchObject({ bac: 5, co: CFG.coDay, vua: false, duoiSan: true })
+  it('không thứ gì vừa ⇒ bậc 2 ở CỠ CHUẨN, `vua = false`, `duoiSan = false` (tờ lật trang / cuộn — không cảnh báo)', () => {
+    expect(leo(() => false, CFG)).toMatchObject({ bac: 2, co: 30, hinh: 1, vua: false, duoiSan: false })
   })
 
   it('có trần số lần đo (chống vòng lặp vô hạn) và `soLanDo` khớp số lần gọi', () => {
@@ -114,14 +101,13 @@ describe('THUẬT TOÁN LEO BẬC (mã thật của tờ chiếu, thước đo g
     expect(r2.soLanDo).toBe(5)
   })
 
-  it('cỡ chuẩn thấp hơn sàn (màn nhỏ) ⇒ bắt đầu ở SÀN, không bao giờ thử chữ dưới sàn ở bậc 1–4', () => {
+  it('cỡ chuẩn thấp hơn sàn (màn nhỏ) ⇒ dùng SÀN (không bao giờ dưới sàn)', () => {
     const co: number[] = []
-    leo((b, c) => (b < 5 && co.push(c), false), { ...CFG, coChuan: 10 })
-    expect(Math.min(...co)).toBeGreaterThanOrEqual(CFG.coSan)
+    leo((_b, c) => (co.push(c), false), { ...CFG, coChuan: 10 })
+    expect(Math.min(...co)).toBe(CFG.coSan)
   })
 
-  it('ĐỐI CHIẾU VÉT CẠN trên 3.000 thước đo ngẫu nhiên đơn điệu: luôn ra ĐÚNG bố cục thấp bậc nhất, chữ to nhất còn vừa', () => {
-    // PRNG tất định (mulberry32)
+  it('ĐỐI CHIẾU VÉT CẠN trên 3.000 thước đo ngẫu nhiên đơn điệu: luôn ra ĐÚNG bố cục thấp bậc nhất; không vừa ⇒ bậc 2 cỡ chuẩn', () => {
     let a = 20260919
     const rnd = () => {
       a |= 0
@@ -131,22 +117,20 @@ describe('THUẬT TOÁN LEO BẬC (mã thật của tờ chiếu, thước đo g
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296
     }
     for (let k = 0; k < 3000; k++) {
-      // Chiều cao cần = nền × cỡ chữ × hệ số bậc; sức chứa theo bậc. Đơn điệu theo cỡ chữ và hình (đúng thực tế).
       const nen = 0.5 + rnd() * 30
       const hinhTP = rnd() * 0.5
-      const chua: Record<number, number> = { 1: 40 + rnd() * 300, 2: 200 + rnd() * 450, 3: 200 + rnd() * 450, 4: 200 + rnd() * 450, 5: 250 + rnd() * 450 }
-      const heSo: Record<number, number> = { 1: 1.6, 2: 1.0, 3: 0.82, 4: 0.82, 5: 0.6 }
+      const chua: Record<number, number> = { 1: 40 + rnd() * 300, 2: 200 + rnd() * 450, 3: 200 + rnd() * 450 }
+      const heSo: Record<number, number> = { 1: 1.6, 2: 1.0, 3: 0.82 }
       const vua: Vua = (b, c, h) => nen * c * heSo[b] * (1 - hinhTP + hinhTP * h) <= chua[b]
       const cfg: CauHinhLeoBac = { ...CFG, batDauOBac: rnd() < 0.5 ? 1 : 2, coBac3: rnd() < 0.7 }
       const goc = vetCan(vua, cfg)
       const r = leo(vua, cfg)
-      expect(leoChu(vua, cfg)).toEqual(r) // bản chữ nhúng trong tờ = bản TS
+      expect(leoChu(vua, cfg)).toEqual(r)
       if (goc) {
         expect(r.vua).toBe(true)
         expect({ bac: r.bac, co: r.co, hinh: +r.hinh.toFixed(2) }).toEqual({ bac: goc.bac, co: goc.co, hinh: +goc.hinh.toFixed(2) })
-        expect(vua(r.bac, r.co, r.hinh)).toBe(true) // và bố cục trả về THẬT SỰ vừa
       } else {
-        expect(r.vua).toBe(false)
+        expect(r).toMatchObject({ bac: 2, co: 30, hinh: 1, vua: false })
       }
     }
   })
@@ -246,47 +230,34 @@ function moTo(dsO: OBang[], opt: { rong?: number; dayHoc?: boolean; dsDapAn?: OB
   return { dom, doc, w, dot, rong, nhatKy, hen, chayHen, html }
 }
 
-describe('mã trong tờ — đợt ĐÔI', () => {
-  it('hai câu ngắn vừa bậc 1 ⇒ giữ NGUYÊN đợt đôi (không tách), gắn bậc và cỡ chữ', () => {
+// SỬA CÓ CHỦ Ý 28/09 (bản vẽ Lên bảng): BỎ ĐỢT ĐÔI — tờ dựng sẵn mỗi đợt MỘT câu MỘT em (2/3 + 1/3), nên không còn "giữ đợt đôi"
+// hay "tách đợt đôi". Khoá: đợt nào cũng đơn, không bao giờ bậc 1 (nửa bảng), không tách, bộ đếm đúng số em.
+describe('mã trong tờ — mỗi đợt MỘT em (bỏ đợt đôi)', () => {
+  it('hai câu ngắn ⇒ HAI đợt đơn ngay từ đầu, không tách, không bậc 1; bố cục chạy xong', () => {
     const t = moTo([ngan('A'), ngan('B')])
     const d = t.dot()
-    expect(d).toHaveLength(1)
-    expect(d[0].getAttribute('data-bac')).toBe('1')
-    expect(d[0].classList.contains('mc-b1')).toBe(true)
-    expect(d[0].querySelectorAll('.mc-nua')).toHaveLength(2)
-    expect(d[0].hasAttribute('data-tach')).toBe(false)
+    expect(d).toHaveLength(2)
+    expect(d.every((x) => x.classList.contains('mc-dot-don'))).toBe(true)
+    expect(d.every((x) => x.querySelectorAll('.mc-nua').length === 1)).toBe(true)
+    expect(d.every((x) => !x.hasAttribute('data-tach'))).toBe(true)
+    expect(d.every((x) => Number(x.getAttribute('data-bac')) >= 2)).toBe(true)
+    expect(d[0].textContent).toContain('Em A')
+    expect(d[1].textContent).toContain('Em B')
     expect(t.doc.body.classList.contains('mc-bc')).toBe(true)
     expect(t.doc.body.getAttribute('data-bo-cuc')).toBe('xong')
   })
 
-  it('đợt đôi mà MỘT câu dài không vừa nửa bảng ⇒ TÁCH thành hai đợt đơn, đánh số lại, có ghi chú', () => {
-    // Hai câu cùng dài vừa phải: dài quá nửa bảng nhưng vừa 2/3 ⇒ sau tách mỗi đợt ở bậc 2.
-    const t = moTo([cau('A', 'từ '.repeat(75)), cau('B', 'từ '.repeat(75))])
-    const d = t.dot()
-    expect(d).toHaveLength(2)
-    expect(d.map((x) => x.getAttribute('data-dot'))).toEqual(['1', '2'])
-    expect(d.every((x) => x.getAttribute('data-tach') === '1')).toBe(true)
-    expect(d.every((x) => x.querySelectorAll('.mc-nua').length === 1)).toBe(true)
-    expect(d.every((x) => Number(x.getAttribute('data-bac')) >= 2)).toBe(true)
-    expect(d.every((x) => x.classList.contains('mc-dot-don'))).toBe(true)
-    expect(d[0].querySelector('.mc-ghi-chu')?.textContent).toMatch(/tách/)
-    // em thứ nhất vẫn ở đợt 1, em thứ hai sang đợt 2 (thứ tự gọi không đổi)
-    expect(d[0].textContent).toContain('Em A')
-    expect(d[1].textContent).toContain('Em B')
-  })
-
-  it('tách đợt báo cho script chính: bộ đếm "Đợt k/n" và nút Đợt sau dùng số đợt MỚI', () => {
+  it('bộ đếm "Đợt k/n" và nút Đợt sau: bốn em ⇒ bốn đợt', () => {
     const t = moTo([cau('A', 'từ '.repeat(75)), cau('B', 'từ '.repeat(75)), ngan('C'), ngan('D')])
     const n = t.dot().length
-    expect(n).toBe(3) // 2 đợt tách + 1 đợt đôi C-D
+    expect(n).toBe(4)
     expect(t.doc.getElementById('mc-dem')!.textContent).toBe(`Đợt 1/${n}`)
-    t.doc.getElementById('mc-sau')!.click()
-    t.doc.getElementById('mc-sau')!.click()
-    expect(t.doc.getElementById('mc-dem')!.textContent).toBe(`Đợt 3/${n}`)
+    for (let i = 0; i < 3; i++) t.doc.getElementById('mc-sau')!.click()
+    expect(t.doc.getElementById('mc-dem')!.textContent).toBe(`Đợt 4/${n}`)
     expect((t.doc.getElementById('mc-sau') as HTMLButtonElement).disabled).toBe(true)
   })
 
-  it('chế độ dạy học: đợt bị tách tính lại GIỜ theo từng câu (data-giay → data-seconds)', () => {
+  it('chế độ dạy học: mỗi đợt mang GIỜ của đúng câu mình (data-giay = data-seconds)', () => {
     const t = moTo([cau('A', 'từ '.repeat(75)), cau('B', 'từ '.repeat(75))], { dayHoc: true })
     const d = t.dot()
     expect(d).toHaveLength(2)
@@ -311,27 +282,34 @@ describe('mã trong tờ — đợt ĐƠN leo bậc', () => {
     expect(r.co).toBe(30)
   })
 
-  it('câu dài hơn ⇒ leo bậc 3 (chia cột) hoặc 4 (co chữ); cỡ chữ KHÔNG dưới sàn (16 px ở 1280)', () => {
+  it('câu dài hơn ⇒ bậc 3 (chia cột) hoặc giữ bậc 2 — cỡ chữ LUÔN là cỡ chuẩn (luật 28/09: không co chữ)', () => {
     const r = bacCua('A', 300)
-    expect(r.bac).toBeGreaterThanOrEqual(3)
-    expect(r.co).toBeGreaterThanOrEqual(1280 * BO_CUC_TO_CHIEU.CO_SAN_TL_RONG - 0.1)
-    expect(r.d.style.getPropertyValue('--mc-co')).toBe(`${r.co}px`)
+    expect([2, 3]).toContain(r.bac)
+    expect(r.co).toBe(30)
+    expect(r.d.style.getPropertyValue('--mc-co')).toBe('30px')
   })
 
-  it('câu RẤT dài ⇒ bậc 5: bỏ vùng làm bài, ghi chú "em làm ở bảng phụ"', () => {
+  it('câu RẤT dài ⇒ vẫn 2/3 bảng (bậc 2, không toàn bảng), cỡ chuẩn, KHÔNG ghi chú cảnh báo — tờ lật trang / cuộn', () => {
     const r = bacCua('A', 1500)
-    expect(r.bac).toBe(5)
-    expect(r.d.classList.contains('mc-b5')).toBe(true)
-    expect(r.d.querySelector('.mc-ghi-chu')?.textContent).toMatch(/bảng phụ|nhỏ hơn|quá dài/)
+    expect(r.bac).toBe(2)
+    expect(r.co).toBe(30)
+    expect(r.vua).toBe('0')
+    expect(r.d.classList.contains('mc-b5')).toBe(false)
+    expect(r.d.querySelector('.mc-ghi-chu')).toBeNull()
   })
 
   it('ghi chú của đợt đang hiện nằm ở Ô CHỮ của thanh dưới (không vẽ đè lên đề); đợt không ghi chú thì để trống', () => {
-    const co = moTo([cau('A', 'từ '.repeat(1500))])
+    // Bỏ đợt đôi (28/09) ⇒ tờ không tự sinh ghi chú "tách" nữa: gắn tay một ghi chú vào đợt đang hiện rồi báo bố cục xong.
+    const co = moTo([cau('A', 'từ '.repeat(75)), cau('B', 'từ '.repeat(75))])
     const phu = co.doc.querySelector('.mc-thanh-phu')!
+    const gc = co.doc.createElement('div')
+    gc.className = 'mc-ghi-chu'
+    gc.textContent = 'Ghi chú thử của đợt 1'
+    co.dot()[0].appendChild(gc)
+    co.doc.dispatchEvent(new co.w.CustomEvent('mc-bo-cuc-xong'))
     const chu = co.dot()[0].querySelector('.mc-ghi-chu')!.textContent
-    expect(chu).toMatch(/bảng phụ/)
     expect(phu.textContent).toBe(chu)
-    expect(phu.getAttribute('data-ghi-chu')).toBe('canh-bao')
+    expect(phu.getAttribute('data-ghi-chu')).toBe('thong-tin')
     const khong = moTo([ngan('A'), ngan('B')])
     const phuKhong = khong.doc.querySelector('.mc-thanh-phu')!
     expect(khong.dot()[0].querySelector('.mc-ghi-chu')).toBeNull()
@@ -349,18 +327,18 @@ describe('mã trong tờ — đợt ĐƠN leo bậc', () => {
     expect(CSS_BO_CUC).not.toMatch(/\.mc-ghi-chu \{[^}]*position: absolute/)
   })
 
-  it('câu dài tới mức KHÔNG vừa nổi ⇒ cảnh báo thầy (data-vua = 0), không im lặng', () => {
+  it('câu dài tới mức KHÔNG vừa nổi ⇒ data-vua = 0 (tờ lật trang), KHÔNG cảnh báo "quá dài" (luật 28/09)', () => {
     const r = bacCua('A', 5000)
     expect(r.vua).toBe('0')
-    expect(r.d.querySelector('.mc-ghi-chu')?.getAttribute('data-kieu')).toBe('canh-bao')
-    expect(r.d.querySelector('.mc-ghi-chu')?.textContent).toMatch(/quá dài/)
+    expect(r.d.querySelector('.mc-ghi-chu')).toBeNull()
+    expect(r.t.doc.body.innerHTML).not.toMatch(/quá dài để vừa bảng/)
   })
 
-  it('MỌI đợt kết thúc ở một bậc cho kết quả VỪA, hoặc bị cảnh báo — không có trạng thái "tràn mà không ai biết"', () => {
+  it('MỌI đợt: cỡ chữ = cỡ chuẩn; không vừa thì đánh dấu data-vua = 0 cho lớp lật trang', () => {
     for (const n of [5, 40, 80, 130, 200, 300, 400, 500, 800, 1300, 1500, 5000]) {
       const r = bacCua('A', n)
-      expect(['1', '0']).toContain(r.vua ?? '1') // đơn: có data-vua; đôi vừa: không có
-      if (r.vua === '0') expect(r.d.querySelector('.mc-ghi-chu')).toBeTruthy()
+      expect(['1', '0']).toContain(r.vua ?? '1')
+      expect(r.co).toBe(30)
     }
   }, 60000)
 
@@ -369,7 +347,7 @@ describe('mã trong tờ — đợt ĐƠN leo bậc', () => {
     expect(co).toBe(true) // câu Phần I có phương án ⇒ có bậc 3
     const t = moTo([{ ...cau('B', 'từ '.repeat(300)), cau: { ...cau('B', 'từ '.repeat(300)).cau, phan: 'III', luaChon: null } as OBang['cau'] }])
     expect(t.dot()[0].querySelector('.mc-vung-de .mc-ds-pa')).toBeNull()
-    expect([2, 4, 5]).toContain(Number(t.dot()[0].getAttribute('data-bac')))
+    expect(Number(t.dot()[0].getAttribute('data-bac'))).toBe(2)
   })
 })
 
@@ -426,7 +404,8 @@ describe('mã trong tờ — an toàn khi đo', () => {
   })
 })
 
-describe('CSS — không còn chỗ nào cho phép CUỘN vùng đề', () => {
+// LUẬT 28/09: vùng đề CẮT (overflow hidden) khi CHỜ GỌI — lật trang; chỉ CUỘN khi đang chữa (lớp bản vẽ thêm lớp `.mc-cuon`).
+describe('CSS — vùng đề cắt khi chờ gọi (lật trang), chỉ cuộn khi đang chữa', () => {
   const html = taoHtmlMayChieu([ngan('A'), ngan('B')])
   it('`.mc-nua` không còn `overflow-y: auto`', () => {
     expect(html).not.toMatch(/\.mc-nua\s*\{[^}]*overflow-y:\s*auto/)
@@ -438,8 +417,9 @@ describe('CSS — không còn chỗ nào cho phép CUỘN vùng đề', () => {
     expect(CSS_BO_CUC).not.toMatch(/\.mc-vung-de\s*\{[^}]*overflow(-y)?:\s*(auto|scroll)/)
   })
 
-  it('lời giải phủ lên đúng vùng đề, có cuộn RIÊNG (là phụ lục, không phải đề)', () => {
-    expect(CSS_BO_CUC).toMatch(/\.mc-vung-de > \.mc-giai \{[^}]*position: absolute; inset: 0[^}]*overflow-y: auto/)
+  it('lời giải (luật 28/09) nằm NGAY DƯỚI ĐỀ trong vùng 2/3, không còn lớp phủ; chỉ cuộn khi đang chữa', () => {
+    expect(html).toContain('body.mc-bc .mc-vung-de>.mc-giai{position:static;inset:auto;overflow:visible')
+    expect(html).toContain('body.mc-bc .mc-vung-de.mc-cuon{overflow-y:auto!important')
   })
 
   it('bản in giữ nguyên: vùng đề hiện đủ, ghi chú ẩn', () => {

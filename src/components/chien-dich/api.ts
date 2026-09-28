@@ -215,3 +215,68 @@ export const dongChienDich = (id: string) => goiChienDich<{ ok: true }>('dong', 
 export const docBang = (id: string) => goiChienDich<BangChienDich>('bang', { id })
 export const docBuoiChua = (id: string, coMat?: string[]) => goiChienDich<BuoiChuaMayChu>('buoi-chua', coMat && coMat.length ? { id, coMat } : { id })
 export const chuaXong = (id: string, qids?: string[]) => goiChienDich<KetQuaChuaXong>('chua-xong', qids && qids.length ? { id, qids } : { id })
+
+// ---------------------------------------------------------------- SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09, máy chủ `srs2-sua.ts`)
+export const DUONG_SUA_CHIEN_DICH = '/gv/chien-dich/sua'
+
+export interface ChienDichDeSua {
+  id: string
+  ten: string
+  lop: string | null
+  maDe: string[]
+  sbd: string[]
+  hanNop: string
+  /** Số câu/ngày (một em) hiện tại. */
+  theLucNgay: number
+  trangThai: TrangThaiChienDich
+  soCau: number
+  soEm: number
+  hetHan: boolean
+}
+export interface DongNhatKySua {
+  luc: string
+  ai: string
+  tomTat: string
+}
+/** Đầu vào sửa: chỉ gửi phần thay đổi. */
+export interface ThayDoiGui {
+  themMaDe?: string[]
+  themSbd?: string[]
+  botSbd?: string[]
+  hanNop?: string
+  /** Thầy nhập tay số câu/ngày (vắng = máy tự nâng khi cần, không tự hạ). */
+  theLucNgay?: number
+}
+/** Kết quả `xem-truoc` / `luu` (máy chủ tính, cùng một hàm). */
+export interface KetQuaSua {
+  tomTat: string
+  themMaDe: string[]
+  /** Tờ thầy chọn mà không góp câu mới (trùng câu đã có, tự luận, chưa duyệt). */
+  toKhongCoCauMoi: string[]
+  soCauTheoTo: Record<string, number>
+  soCauCu: number
+  soCauThem: number
+  soCauSau: number
+  themSbd: string[]
+  botSbd: string[]
+  soEmSau: number
+  hanCu: string
+  hanNop: string
+  /** Chiến dịch đã hết hạn / đã kết thúc được mở lại. */
+  moLai: boolean
+  /** Số câu/ngày cũ → sau khi lưu; mức cần để em nhiều câu chưa làm nhất kịp hạn. Máy chủ cũ không gửi. */
+  theLucCu?: number
+  theLucNgay?: number
+  theLucCan?: number
+  tuNang?: boolean
+  chuaKipHan?: boolean
+}
+
+async function goiSua<T>(action: string, body: Record<string, unknown>): Promise<KetQuaLenh<T>> {
+  const r = await goiLenh(DUONG_SUA_CHIEN_DICH, { ...body, action }, 'Máy chủ chưa có lệnh Sửa chiến dịch — cần đẩy bản máy chủ mới.')
+  if (!r.ok) return r
+  return { ok: true, du: r.du as unknown as T }
+}
+export const docChienDichDeSua = (id: string) => goiSua<{ homNay: string; chienDich: ChienDichDeSua; nhatKy: DongNhatKySua[] }>('doc', { id })
+export const xemTruocSua = (id: string, t: ThayDoiGui) => goiSua<KetQuaSua>('xem-truoc', { id, ...t })
+export const luuSuaChienDich = (id: string, t: ThayDoiGui) => goiSua<KetQuaSua & { id: string }>('luu', { id, ...t })

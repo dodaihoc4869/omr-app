@@ -229,7 +229,7 @@ describe('mã chạy: MỌI vòng tự gọi máy chủ của app thầy đi qua
     expect(m).toContain('<DongMatKetNoiCa soHut={soHut} gioTotMs={gioTot} />')
     expect(m).toMatch(/setSoHut\(0\)\s*setGioTot\(Date\.now\(\)\)/)
     expect(m).toMatch(/setSoHut\(\(n\) => n \+ 1\)\s*return false/)
-    expect(m).toContain('onClick={() => tai(chiTiet.ca.maCa)}') // bấm tay: imLang = false ⇒ luôn gọi ngay
+    expect(m).toContain('onLamMoi={() => tai(chiTiet.ca.maCa)}') // bấm tay (nút Làm mới ở đầu màn Theo dõi ca 28/09): imLang = false ⇒ luôn gọi ngay
     expect(Math.max(...LUI_THEO_DOI_CA_MS)).toBeLessThanOrEqual(40_000)
   })
   it('useTuLamMoi (Bảng tin bản 3 + sàn) là vỏ của useNhipThay: không còn setInterval / visibilitychange tự viết', () => {

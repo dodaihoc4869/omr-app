@@ -45,7 +45,11 @@ interface AppState {
   setScreen: (s: ScreenId) => void
   /** Mã ca đang mở ở màn Chi tiết ca / Theo dõi (đi từ Lịch sử ca thi hoặc ngay sau khi mở ca). */
   maCaTheoDoi: string
-  moChiTietCa: (maCa: string) => void
+  /** `sbdBaoCao` (tuỳ chọn): mở thẳng Báo cáo chi tiết › Từng em của em này (thay modal báo cáo HS cũ ở app thầy — bản vẽ ca thi 28/09). */
+  moChiTietCa: (maCa: string, sbdBaoCao?: string) => void
+  /** SBD chờ mở ở Báo cáo chi tiết › Từng em khi màn Theo dõi ca tải xong ca `maCaTheoDoi`. Rỗng = không. */
+  sbdBaoCaoCa: string
+  xongSbdBaoCaoCa: () => void
   /** SBD đang mở hồ sơ ở màn Học sinh (BA-APP.md đợt 2). Rỗng = đang ở danh sách. */
   sbdDangXem: string
   moHoSoEm: (sbd: string) => void
@@ -86,7 +90,9 @@ export const useAppStore = create<AppState>((set) => ({
   screen: 'examhub',
   setScreen: (s) => set({ screen: s }),
   maCaTheoDoi: '',
-  moChiTietCa: (maCa) => set({ maCaTheoDoi: maCa, screen: 'exammonitor' }),
+  moChiTietCa: (maCa, sbdBaoCao) => set({ maCaTheoDoi: maCa, sbdBaoCaoCa: sbdBaoCao ?? '', screen: 'exammonitor' }),
+  sbdBaoCaoCa: '',
+  xongSbdBaoCaoCa: () => set({ sbdBaoCaoCa: '' }),
   sbdDangXem: '',
   moHoSoEm: (sbd) => set({ sbdDangXem: sbd, screen: 'hocsinh' }),
   sbdToanCanh: '',

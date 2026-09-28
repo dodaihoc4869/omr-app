@@ -1,3 +1,4 @@
+// SỬA CÓ CHỦ Ý 28/09: màn sau khi mở ca làm lại theo app mới (CaDaMo) — tiêu đề "Ca đã mở".
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 const m = vi.hoisted(() => ({ publish: vi.fn(), save: vi.fn(), address: vi.fn(), toast: vi.fn() }))
@@ -26,7 +27,7 @@ async function prepare() {
 it('không có URL lưu cũ vẫn tạo được ca và không tải cấu hình để dựng link',async()=>{
  const f=vi.fn(() => new Promise(()=>{}));vi.stubGlobal('fetch',f)
  fireEvent.click(await prepare())
- expect(await screen.findByRole('heading',{name:'Ca kiểm tra đã mở'})).toBeTruthy()
+ expect(await screen.findByRole('heading',{name:'Ca đã mở'})).toBeTruthy()
  expect(m.publish.mock.calls[0][0]).toBe('https://test.example')
  expect(f).not.toHaveBeenCalled()
 })
@@ -34,7 +35,7 @@ it.each(['pending','rejected'])('đã lưu trên máy chủ vẫn hiện ca khi 
  m.save.mockImplementation(() => state==='pending'?new Promise(()=>{}):Promise.reject(new Error('QuotaExceededError')))
  const button=await prepare();vi.useFakeTimers();fireEvent.click(button)
  await act(async()=>{await vi.advanceTimersByTimeAsync(0)})
- expect(screen.getByRole('heading',{name:'Ca kiểm tra đã mở'})).toBeTruthy()
+ expect(screen.getByRole('heading',{name:'Ca đã mở'})).toBeTruthy()
  await act(async()=>{await vi.advanceTimersByTimeAsync(10000)})
  expect(m.toast).toHaveBeenCalledWith(expect.stringContaining('đã lưu trên máy chủ'), 'error')
  expect(m.publish).toHaveBeenCalledTimes(1)

@@ -18,10 +18,10 @@
 // đổi hợp đồng bố cục của M2 (`.mc-nua > .mc-em / .mc-vung-de / .mc-giai-vung / .mc-trang`).
 
 export const GIAO_DIEN_TO_CHIEU = {
-  /** Màn gọi tên đầu mỗi đợt: hiện bấy nhiêu ms rồi thu về thẻ tên (bấm phím/chạm để bỏ qua). */
-  GOI_TEN_MS: 10000,
+  /** Màn gọi tên khi thầy bấm Lên bảng (bản vẽ 28/09: cả hiệu ứng ≈ 1,5 s): hiện bấy nhiêu ms rồi thu về thẻ tên (bấm phím/chạm để bỏ qua). */
+  GOI_TEN_MS: 1080,
   /** Thu màn gọi tên về thẻ tên nhỏ: bấy nhiêu ms bay. */
-  BAY_VE_THE_MS: 850,
+  BAY_VE_THE_MS: 420,
   /** Thần thú ăn mừng khi Đạt: bấy nhiêu ms rồi đứng yên. */
   AN_MUNG_MS: 1500,
   /** Màu nền thẻ tên khi Đạt và chữ trên đó. */

@@ -11,6 +11,7 @@ import { taoHtmlMayChieu, type OBang } from '../src/lib/html-may-chieu'
 import { CSS_GIAO_DIEN_NUT_CHAM, CSS_GIAO_DIEN_TO_CHIEU, GIAO_DIEN_TO_CHIEU, MAU_HAO_QUANG_MAC_DINH, MAU_HAO_QUANG_THEO_HE, mauHaoQuang } from '../src/lib/giao-dien-to-chieu'
 import { thoiGianCau, noiDungTuCauLuyen } from '../src/lib/thoi-gian-len-bang'
 import { TIN_TO_CHIEU } from '../src/lib/to-chieu-cau-noi'
+import { CSS_LEN_BANG_MOI } from '../src/lib/len-bang-moi-to-chieu'
 
 const MA = 'abc123'
 const GOC = 'https://app.test'
@@ -193,7 +194,7 @@ describe('TRONG LÚC ĐỌC ĐỀ KHÔNG CÓ GÌ CHUYỂN ĐỘNG', () => {
       const bo = m[1].trim()
       const ten = m[2].trim()
       if (ten.startsWith('none')) continue
-      expect(bo, `luật có chuyển động ngoài màn gọi tên/ăn mừng: ${bo}`).toMatch(/mc-intro|mc-mung/)
+      expect(bo, `luật có chuyển động ngoài màn gọi tên/ăn mừng: ${bo}`).toMatch(/mc-intro|mc-mung|mc-hoa/)
     }
     expect(CSS_GIAO_DIEN_TO_CHIEU).toMatch(/@keyframes mc-hao-quang/)
     expect(CSS_GIAO_DIEN_TO_CHIEU).toMatch(/@keyframes mc-nhay/)
@@ -205,8 +206,9 @@ describe('TRONG LÚC ĐỌC ĐỀ KHÔNG CÓ GÌ CHUYỂN ĐỘNG', () => {
     expect(h).toContain("window.matchMedia('(prefers-reduced-motion: reduce)').matches")
   })
 
-  it('thu về thẻ tên đúng thời gian đã chốt: 2,5 s gọi tên, 1,5 s ăn mừng', () => {
-    expect(GIAO_DIEN_TO_CHIEU.GOI_TEN_MS).toBe(2500)
+  it('thu về thẻ tên đúng thời gian đã chốt (bản vẽ 28/09): gọi tên ≈ 1,5 s cả bay; ăn mừng 1,5 s', () => {
+    expect(GIAO_DIEN_TO_CHIEU.GOI_TEN_MS).toBe(1080)
+    expect(GIAO_DIEN_TO_CHIEU.BAY_VE_THE_MS).toBe(420)
     expect(GIAO_DIEN_TO_CHIEU.AN_MUNG_MS).toBe(1500)
   })
 })
@@ -269,71 +271,76 @@ function moTo(dsO: OBang[], opt: { tuyChon?: Parameters<typeof taoHtmlMayChieu>[
 const HAI_EM = () => [o('A', 'Nguyễn Văn Minh', { thanThu: thu('Lửa'), lanLenBang: 3 }), o('B', 'Trần Thu Hà', { thanThu: thu('Nước', 'Thuỷ Lân', 8), lanLenBang: 1, soCau: 9 })]
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
-describe('màn gọi tên đầu đợt', () => {
-  it('có thần thú ⇒ bấm nút mới hiện màn gọi tên: mỗi em một nửa, tên to, thú · cấp, chip câu + lần lên bảng; đồng hồ đứng yên (pha "goi")', () => {
+// BẢN VẼ 28/09 (thầy chốt LenBang-Moi): màn gọi tên MỚI ≈ 1,5 s — vòng sáng, hạt, thần thú ẢNH THẬT (ảnh của thẻ tên), "Mời em lên
+// bảng", tên lớn, lớp · lần lên bảng thứ N — rồi thu về thẻ tên. Các test cũ (màn .mc-intro 2,5 s, "mỗi em một nửa", chip câu,
+// bỏ qua khi không có thú) là LUẬT CŨ đã bị thầy thay.
+describe('màn gọi tên khi bấm Lên bảng (bản vẽ 28/09)', () => {
+  it('có thần thú ⇒ bấm nút hiện màn gọi tên: mỗi em một cụm — thú ảnh thật, "Mời em lên bảng", tên lớn, lần lên bảng; pha "goi"', () => {
     const t = moTo(HAI_EM()); t.doc.getElementById('mc-len-bang')!.click()
-    const the = [...t.doc.querySelectorAll('.mc-intro-card')]
-    expect(the).toHaveLength(2)
-    expect(t.doc.querySelector('.mc-intro-label')!.textContent).toBe('Đợt 1 · mời hai bạn lên bảng')
-    expect(the[0].querySelector('h2')!.textContent).toBe('Nguyễn Văn Minh')
-    expect(the[0].querySelector('p')!.textContent).toBe('Hoả Long · Cấp 12')
-    expect([...the[0].querySelectorAll('.mc-intro-chips span')].map((x) => x.textContent)).toEqual(['Câu 7', 'Lần lên bảng thứ 3'])
-    expect([...the[1].querySelectorAll('.mc-intro-chips span')].map((x) => x.textContent)).toEqual(['Câu 9', 'Lần lên bảng thứ 1'])
-    expect((the[0] as HTMLElement).style.getPropertyValue('--aura')).toBe('241,99,59')
-    expect((the[1] as HTMLElement).style.getPropertyValue('--aura')).toBe('43,166,208')
+    const cum = [...t.doc.querySelectorAll('.mc-goi .mc-g-cum')]
+    expect(cum).toHaveLength(1) // sửa có chủ ý 28/09: bỏ đợt đôi ⇒ mỗi đợt MỘT em ⇒ một cụm gọi tên
+    expect(cum[0].querySelector('.mc-g-tg')!.textContent).toBe('Mời em lên bảng')
+    expect(cum[0].querySelector('.mc-g-tl')!.textContent).toBe('Nguyễn Văn Minh')
+    expect(cum[0].querySelector('.mc-g-tp')!.textContent).toBe('lần lên bảng thứ 3')
+    expect(cum[0].querySelector<HTMLImageElement>('img.mc-g-thu')!.src).toBe('https://x/pet.png')
+    expect(t.doc.querySelectorAll('.mc-goi .mc-g-hat')).toHaveLength(30)
+    expect(t.doc.querySelectorAll('.mc-goi .mc-g-vong')).toHaveLength(2)
     expect(t.pha()).toBe('goi')
     expect(t.doc.getElementById('mc-pha')!.textContent).toBe('MỜI LÊN BẢNG')
-    expect(t.doc.getElementById('mc-clock')).toBeNull()
-    t.dat(1000)
-    t.nhip()
-    expect(t.pha()).toBe('goi')
   })
 
-  it('sau 2,5 s thu về thẻ tên (bay 0,85 s) rồi sang CHỮA; màn gọi tên biến mất', () => {
+  it(`sau ${GIAO_DIEN_TO_CHIEU.GOI_TEN_MS} ms thu về thẻ tên (bay ${GIAO_DIEN_TO_CHIEU.BAY_VE_THE_MS} ms) rồi sang CHỮA — cả hiệu ứng ≈ 1,5 s`, () => {
+    expect(GIAO_DIEN_TO_CHIEU.GOI_TEN_MS + GIAO_DIEN_TO_CHIEU.BAY_VE_THE_MS).toBeGreaterThanOrEqual(1300)
+    expect(GIAO_DIEN_TO_CHIEU.GOI_TEN_MS + GIAO_DIEN_TO_CHIEU.BAY_VE_THE_MS).toBeLessThanOrEqual(1700)
     const t = moTo(HAI_EM()); t.doc.getElementById('mc-len-bang')!.click()
     expect(t.hen.some((x) => !x.huy && x.ms === GIAO_DIEN_TO_CHIEU.GOI_TEN_MS)).toBe(true)
     t.chay(GIAO_DIEN_TO_CHIEU.GOI_TEN_MS)
-    expect(t.doc.querySelector('.mc-intro')!.classList.contains('mc-shrink')).toBe(true)
+    expect(t.doc.querySelector('.mc-goi')!.classList.contains('mc-ve')).toBe(true)
     expect(t.pha()).toBe('goi') // còn đang bay
     t.chay(GIAO_DIEN_TO_CHIEU.BAY_VE_THE_MS + 60)
-    expect(t.doc.querySelector('.mc-intro')).toBeNull()
+    expect(t.doc.querySelector('.mc-goi')).toBeNull()
     expect(t.pha()).toBe('chua')
     expect(t.doc.getElementById('mc-pha')!.textContent).toBe('ĐANG CHỮA')
+    // thẻ tên hiện lại (không còn visibility:hidden) và "bật" nhẹ
+    for (const e of t.doc.querySelectorAll<HTMLElement>('.mc-dot:first-child .mc-em')) {
+      expect(e.style.visibility).toBe('')
+      expect(e.classList.contains('mc-pop')).toBe(true)
+    }
   })
 
   it('bấm phím bất kỳ, hoặc chạm vào màn gọi tên ⇒ bỏ qua ngay và sang CHỮA', () => {
     const a = moTo(HAI_EM()); a.doc.getElementById('mc-len-bang')!.click()
     a.doc.dispatchEvent(new a.w.KeyboardEvent('keydown', { key: 'a' }))
-    expect(a.doc.querySelector('.mc-intro')).toBeNull()
+    expect(a.doc.querySelector('.mc-goi')).toBeNull()
     expect(a.pha()).toBe('chua')
     const b = moTo(HAI_EM()); b.doc.getElementById('mc-len-bang')!.click()
-    ;(b.doc.querySelector('.mc-intro') as HTMLElement).click()
-    expect(b.doc.querySelector('.mc-intro')).toBeNull()
+    ;(b.doc.querySelector('.mc-goi') as HTMLElement).click()
+    expect(b.doc.querySelector('.mc-goi')).toBeNull()
     expect(b.pha()).toBe('chua')
   })
 
-  it('giảm chuyển động ⇒ KHÔNG có màn gọi tên nào, bấm nút vào thẳng CHỮA; không phải ⇒ có', () => {
+  it('giảm chuyển động ⇒ KHÔNG có màn gọi tên, vào thẳng CHỮA (thẻ tên chỉ bật nhẹ); không giảm ⇒ có', () => {
     const giam = moTo(HAI_EM(), { giam: true }); giam.doc.getElementById('mc-len-bang')!.click()
-    expect(giam.doc.querySelector('.mc-intro')).toBeNull()
+    expect(giam.doc.querySelector('.mc-goi')).toBeNull()
     expect(giam.pha()).toBe('chua')
-    const normal=moTo(HAI_EM(),{giam:false});normal.doc.getElementById('mc-len-bang')!.click();expect(normal.doc.querySelector('.mc-intro')).toBeTruthy()
+    const normal = moTo(HAI_EM(), { giam: false }); normal.doc.getElementById('mc-len-bang')!.click(); expect(normal.doc.querySelector('.mc-goi')).toBeTruthy()
+    expect(CSS_LEN_BANG_MOI).toMatch(/@media \(prefers-reduced-motion: reduce\)\{[^@]*\.mc-goi \*[^@]*animation-duration:\.01ms!important/)
   })
 
-  it('không thần thú nào tải được ⇒ bỏ qua màn gọi tên (không chờ, không bể); đợt sau vẫn gọi tên bình thường', () => {
+  it('em chưa có thần thú ⇒ vẫn gọi tên (tên lớn), chỉ không có ảnh thú', () => {
     const t = moTo([o('A', 'An'), o('B', 'Bình')]); t.doc.getElementById('mc-len-bang')!.click()
-    expect(t.doc.querySelector('.mc-intro')).toBeNull()
-    expect(t.pha()).toBe('chua')
+    expect(t.doc.querySelectorAll('.mc-goi .mc-g-cum')).toHaveLength(1) // mỗi đợt một em (28/09)
+    expect(t.doc.querySelector('.mc-goi img')).toBeNull()
+    expect(t.doc.querySelector('.mc-goi .mc-g-tl')!.textContent).toBe('An')
   })
 
-  it('sang đợt khác ⇒ dọn màn gọi tên cũ, gọi tên đợt mới ("Đợt 2 · mời hai bạn lên bảng")', () => {
+  it('sang đợt khác ⇒ dọn màn gọi tên cũ; gọi đợt mới chỉ hiện tên em của đợt mới', () => {
     const dsO = [...HAI_EM(), o('C', 'Cường', { thanThu: thu('Đất'), soCau: 11 }), o('D', 'Dung', { thanThu: thu('Khí'), soCau: 12 })]
     const t = moTo(dsO); t.doc.getElementById('mc-len-bang')!.click()
-    t.goiXong()
-    t.doc.getElementById('mc-sau')!.click(); expect(t.pha()).toBe('cho'); t.doc.getElementById('mc-len-bang')!.click()
-    expect(t.doc.querySelectorAll('.mc-intro')).toHaveLength(1)
-    expect(t.doc.querySelector('.mc-intro-label')!.textContent).toBe('Đợt 2 · mời hai bạn lên bảng')
-    t.doc.getElementById('mc-truoc')!.click(); t.doc.getElementById('mc-len-bang')!.click()
-    expect(t.doc.querySelector('.mc-intro-label')!.textContent).toBe('Đợt 1 · mời hai bạn lên bảng')
+    t.doc.getElementById('mc-sau')!.click(); expect(t.doc.querySelector('.mc-goi')).toBeNull(); expect(t.pha()).toBe('cho'); t.doc.getElementById('mc-len-bang')!.click()
+    expect(t.doc.querySelectorAll('.mc-goi')).toHaveLength(1)
+    // mỗi đợt một em (bỏ đợt đôi 28/09) ⇒ đợt 2 là em thứ hai
+    expect([...t.doc.querySelectorAll('.mc-goi .mc-g-tl')].map((x) => x.textContent)).toEqual(['Trần Thu Hà'])
   })
 })
 
@@ -349,7 +356,7 @@ describe('thanh dưới gọi thủ công, không còn đồng hồ',()=>{
     expect(t.pha()).toBe('chua')
     t.dat(7200);t.nhip()
     expect(t.pha()).toBe('chua')
-    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 1/2')
+    expect(t.doc.getElementById('mc-dem')!.textContent).toBe('Đợt 1/4') // bốn em ⇒ bốn đợt (bỏ đợt đôi 28/09)
     t.doc.getElementById('mc-sau')!.click()
     expect(t.pha()).toBe('cho')
     expect((t.doc.getElementById('mc-len-bang') as HTMLButtonElement).disabled).toBe(false)
@@ -409,8 +416,10 @@ describe('ăn mừng khi Đạt (chỉ Đạt)', () => {
       expect(nua.querySelector('.mc-em')!.classList.contains('mc-em-dat'), String(dat)).toBe(false)
       expect(nua.querySelector('.mc-em')!.classList.contains('mc-mung'), String(dat)).toBe(false)
       expect(nua.querySelector('.mc-lam-tot'), String(dat)).toBeNull()
-      // không chữ "Chưa đạt"/"Không đạt" nào cạnh tên em sau khi ghi
-      expect(nua.querySelector('.mc-em')!.textContent).not.toMatch(/Chưa đạt|Không đạt/)
+      // LUẬT MỚI (thầy chốt bản vẽ 28/09): thẻ tên mang nhãn viên thuốc "Chưa đạt" CHỈ khi app báo dat === false; tin không rõ kết quả ⇒ không nhãn
+      const nhan = nua.querySelector<HTMLElement>('.mc-em .mc-dau-kq')!
+      if (dat === false) expect([nhan.hidden, nhan.textContent, nhan.classList.contains('mc-kd')]).toEqual([false, 'Chưa đạt', true])
+      else expect(nhan.hidden, String(dat)).toBe(true)
       expect(v.textContent).not.toMatch(/Chưa đạt|Không đạt|Đạt/)
     }
   })
@@ -447,87 +456,23 @@ describe('ăn mừng khi Đạt (chỉ Đạt)', () => {
   })
 })
 
-describe('lời giải co chữ trước khi phải cuộn (sàn 24 px ở 1920)', () => {
-  /** Một lớp phủ giả: chiều cao nội dung tỉ lệ với cỡ chữ đang đặt (`--mc-co-giai`). */
-  function moGiai(rong: number, cao: number, tiLe: number, coDot = '') {
+// LUẬT THẦY 28/09: "KHÔNG BAO GIỜ thu nhỏ chữ" — lời giải cùng cỡ với đề (`--mc-co`), nằm dưới đề; dài thì lật trang / cuộn. Các test cũ
+// "lời giải co chữ từng 1 px tới sàn" là LUẬT CŨ đã bị thầy thay.
+describe('lời giải CÙNG CỠ CHỮ với đề, không co (luật 28/09)', () => {
+  it('__mcVuaLoiGiai không đặt cỡ riêng cho lời giải (không còn --mc-co-giai)', () => {
     const t = moTo([o('A', 'An')])
-    Object.defineProperty(t.doc.getElementById('mc-ray')!, 'clientWidth', { get: () => rong, configurable: true })
-    const dot = t.doc.querySelector<HTMLElement>('.mc-dot')!
-    if (coDot) dot.style.setProperty('--mc-co', coDot)
     const g = t.doc.querySelector<HTMLElement>('.mc-giai')!
     g.hidden = false
-    const co = () => parseFloat(g.style.getPropertyValue('--mc-co-giai'))
-    Object.defineProperty(g, 'clientHeight', { get: () => cao, configurable: true })
-    Object.defineProperty(g, 'clientWidth', { get: () => 900, configurable: true })
-    Object.defineProperty(g, 'scrollHeight', { get: () => Math.round(co() * tiLe), configurable: true })
-    Object.defineProperty(g, 'scrollWidth', { get: () => 900, configurable: true })
-    const vua = (t.w as unknown as { __mcVuaLoiGiai: (x: HTMLElement) => void }).__mcVuaLoiGiai
-    return { g, co, chay: () => vua(g), t }
-  }
-
-  it('bắt đầu từ cỡ chữ đề của đợt, giảm từng 1 px, DỪNG ở cỡ LỚN NHẤT còn vừa', () => {
-    const x = moGiai(1920, 600, 20, '45px') // cao 600 px: vừa khi cỡ ≤ 30 px
-    x.chay()
-    expect(x.co()).toBe(30)
-    expect(x.g.scrollHeight).toBeLessThanOrEqual(600)
+    g.style.setProperty('--mc-co-giai', '20px')
+    ;(t.w as unknown as { __mcVuaLoiGiai: (x: HTMLElement) => void }).__mcVuaLoiGiai(g)
+    expect(g.style.getPropertyValue('--mc-co-giai')).toBe('')
   })
-
-  it('vừa ngay ở cỡ đề ⇒ không co', () => {
-    const x = moGiai(1920, 2000, 10, '45px')
-    x.chay()
-    expect(x.co()).toBe(45)
-  })
-
-  it('không vừa ngay cả ở sàn ⇒ co tới đúng SÀN 24 px @1920 (18 px @1440… quy đổi theo bề ngang) rồi để cuộn riêng', () => {
-    const a = moGiai(1920, 100, 40, '45px')
-    a.chay()
-    expect(a.co()).toBe(24)
-    const b = moGiai(1280, 100, 40, '30px')
-    b.chay()
-    expect(b.co()).toBeCloseTo(16, 1)
-    // bề ngang lạ: bước co 1 px đi từ cỡ chuẩn nên dừng trong khoảng [sàn, sàn + 1 px) — không bao giờ DƯỚI sàn
-    const c = moGiai(1366, 100, 40)
-    c.chay()
-    const san = Math.round(((1366 * 24) / 1920) * 10) / 10
-    expect(c.co()).toBeGreaterThanOrEqual(san)
-    expect(c.co()).toBeLessThan(san + 1)
-  })
-
-  it('bấm "Hiện lời giải" gọi bộ co chữ; đóng lời giải thì không', () => {
-    const t = moTo([o('A', 'An')])
-    let goi = 0
-    ;(t.w as unknown as { __mcVuaLoiGiai: unknown }).__mcVuaLoiGiai = () => goi++
-    const nut = t.doc.querySelector<HTMLButtonElement>('.mc-giai-vung .mc-nut-giai')!
-    nut.click()
-    expect(t.doc.querySelector('.mc-giai')!.hasAttribute('hidden')).toBe(false)
-    nut.click()
-    expect(t.doc.querySelector('.mc-giai')!.hasAttribute('hidden')).toBe(true)
-    // bản gốc của hàm đã được nối vào click (không phải biến toàn cục thay được lúc chạy)
-    expect(goi).toBe(0)
-    expect(t.html).toContain('if (!mo) { void o.offsetHeight; vuaLoiGiai(o); }')
-    // CSS THẬT SỰ đọc cỡ chữ do JS đặt (không thì co chữ chỉ là số vô nghĩa)
-    expect(CSS_GIAO_DIEN_TO_CHIEU).toMatch(/\.mc-giai \.sol-box\{font-size:var\(--mc-co-giai,var\(--mc-co,28px\)\)\}/)
-  })
-
-  it('đợt đôi: mở lời giải ⇒ nửa bảng đổi sang chế độ "lời giải lấy cả nửa" (lớp mc-giai-mo), đóng thì trả lại; CSS ẩn vùng làm bài và cho thẻ đề giãn', () => {
-    const t = moTo(HAI_EM())
-    const nua = t.doc.querySelector('.mc-nua')!
-    const nut = nua.querySelector<HTMLButtonElement>('.mc-giai-vung .mc-nut-giai')!
-    nut.click()
-    expect(nua.classList.contains('mc-giai-mo')).toBe(true)
-    // nửa bảng bên kia không bị ảnh hưởng
-    expect(t.doc.querySelectorAll('.mc-nua')[1].classList.contains('mc-giai-mo')).toBe(false)
-    nut.click()
-    expect(nua.classList.contains('mc-giai-mo')).toBe(false)
-    expect(CSS_GIAO_DIEN_TO_CHIEU).toContain('body.mc-bc .mc-dot:not(.mc-dot-don) .mc-nua.mc-giai-mo .mc-trang{display:none}')
-    expect(CSS_GIAO_DIEN_TO_CHIEU).toContain('body.mc-bc .mc-dot:not(.mc-dot-don) .mc-nua.mc-giai-mo .mc-vung-de{flex:1 1 0}')
-    // hàng nút nằm ĐÈ lên giấy của lời giải ⇒ phải đảo màu, không thì chữ giấy-ấm-trên-giấy-ấm biến mất (đã gặp khi chụp ảnh)
-    expect(CSS_GIAO_DIEN_TO_CHIEU).toContain('.mc-nua.mc-giai-mo .mc-giai-vung .mc-nut-giai{background:var(--mc-chu);color:var(--mc-giay)}')
-    expect(CSS_GIAO_DIEN_NUT_CHAM).toContain('.mc-giai-mo .mc-cham-nut{background:var(--mc-chu);color:var(--mc-giay)}')
-    expect(CSS_GIAO_DIEN_TO_CHIEU).toMatch(/\.mc-giai-vung\{position:absolute[^}]*z-index:8/) // trên lớp phủ lời giải (z-index 6)
+  it('CSS: lời giải và phương án lấy đúng --mc-co của đề; lời giải không còn là lớp phủ', () => {
+    expect(CSS_LEN_BANG_MOI).toContain('body.mc-bc .mc-vung-de>.mc-giai,body.mc-bc .mc-vung-de>.mc-giai .sol-box{font-size:var(--mc-co,28px)!important}')
+    expect(CSS_LEN_BANG_MOI).toContain('body.mc-bc .mc-vung-de .mc-pa,body.mc-bc .mc-vung-de .mc-pa-chu{font-size:var(--mc-co,28px)}')
+    expect(CSS_LEN_BANG_MOI).toContain('body.mc-bc .mc-vung-de>.mc-giai{position:static')
   })
 })
-
 describe('hộp cài đặt trên thanh dưới', () => {
   it('bấm "Cài đặt" mở/đóng; bấm ra ngoài hoặc Esc thì đóng', () => {
     const t = moTo([o('A', 'An')])

@@ -2,6 +2,7 @@
 // (vòng Máu quanh cầu), quái phục kích màu hồng, số sát thương đòn vừa rồi; HUD kính "HIỆP k/8" + vạch 8 hiệp có kim cương hiệp trùm + đồng hồ vòng;
 // huy hiệu LIÊN KÍCH; đồng đội góc phải (CHỈ trạng thái, không bao giờ đáp án hay chữ "sai" của bạn). Mọi con số do máy chủ trả.
 // Tranh vẽ bằng SVG tĩnh trong mã (không ảnh nạp trễ ⇒ không xô lệch); hoạt ảnh duy nhất là thú nổi nhẹ, tắt sạch khi giảm chuyển động.
+import NutToanManHinh from '../../../components/NutToanManHinh'
 import { useId } from 'react'
 import { HE_LIEN_KICH, HIEP_TRUM, HP_QUAI } from '../doan-core'
 import { CHU_TRANG_THAI, type DoanXem, type TranXem } from '../doan-kieu'
@@ -103,7 +104,7 @@ export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
 
       <header className="dh2-hud">
         <div className="dh2-kinh dh2-hud-hiep">
-          <span className="dh2-hud-dong"><b className="dh2-baloo">HIỆP {tran.hiep}/{tran.soHiep}</b>{tran.laTrum ? <span className="dh2-dang-trum">◆ đang ở hiệp trùm</span> : <span>◆ = hiệp trùm</span>}</span>
+          <span className="dh2-hud-dong"><b className="dh2-baloo">HIỆP {tran.hiep}/{tran.soHiep}</b>{tran.laTrum ? <span className="dh2-dang-trum" title="Đang ở hiệp trùm">◆ đang ở hiệp trùm</span> : <span title="◆ = hiệp trùm">◆ = hiệp trùm</span>}</span>
           <span className="dh2-vach" role="img" aria-label={`Đang ở hiệp ${tran.hiep} trên ${tran.soHiep}; hiệp ${HIEP_TRUM.join(' và ')} là hiệp trùm`}>
             {Array.from({ length: tran.soHiep }, (_, i) => i + 1).map(h => (
               <i key={h} className={`${HIEP_TRUM.includes(h) ? 'dh2-kc' : ''} ${tran.ketThuc || h < tran.hiep ? 'dh2-xong' : h === tran.hiep ? 'dh2-dang' : ''}`} />
@@ -119,6 +120,7 @@ export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
           </svg>
           <b className="dh2-baloo">{mo ? con : '·'}</b>
         </span>
+        <NutToanManHinh />
       </header>
 
       <div className="dh2-hang">

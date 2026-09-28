@@ -256,6 +256,6 @@ describe('docBaoCaoEmMayChu — thân máy chủ ⇒ phần ghép được', () 
     expect(man).toMatch(/const canHoiMayChu = !!baoCaoMotEm && !baoCaoMotEm\.coBangCham && baoCaoMotEm\.daNop/)
     expect(man).toMatch(/layBaoCaoEmMayChu\(chiTiet\.ca\.maCa, sbdHoSo\)/)
     expect(man).toMatch(/ghepBaoCaoMotEm\(baoCaoMotEm, baoCaoEmMay\.may\)/)
-    expect(man).toMatch(/<BaoCaoMotEmTrang\s+bc=\{baoCaoMotEmHienThi\}/)
+    expect(man).toContain('emBc={baoCaoMotEmHienThi}') // ca thi 28/09: bản ghép hiện ở tab Từng em của Báo cáo chi tiết
   })
 })

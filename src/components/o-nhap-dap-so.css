@@ -9,6 +9,10 @@
 .ond>.ond-nut:focus-visible{outline:3px solid var(--ond-tieu-diem);outline-offset:2px}
 .ond>.ond-nut:disabled{opacity:.45;cursor:default}
 .ond>.ond-nut[data-bat]{background:var(--ond-bat-nen,var(--ond-chu));color:var(--ond-bat-chu,var(--ond-nen))}
+/* KIỂU GỌN (chuanViet, màn thi 28/09): nút "−" nhỏ nằm TRONG ô, bên phải; ô chừa chỗ cho nút. */
+.ond.ond-gon{position:relative}
+.ond.ond-gon[data-co-nut-am]>input{padding-right:56px !important}
+.ond.ond-gon>.ond-nut-trong{position:absolute;top:50%;right:6px;min-width:40px;min-height:36px;height:36px;padding:0 8px;border-radius:calc(var(--ond-bo) - 4px);font-size:20px;transform:translateY(-50%)}
 @media (prefers-color-scheme:dark){
   .ond{--ond-nen:rgb(30,35,46);--ond-chu:rgb(232,236,246);--ond-vien:rgb(96,106,128);--ond-nut-nen:rgb(46,54,72);--ond-nut-chu:rgb(232,236,246);--ond-tieu-diem:rgb(150,190,255)}
 }

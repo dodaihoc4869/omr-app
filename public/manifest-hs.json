@@ -6,7 +6,7 @@
   "lang": "vi",
   "display": "fullscreen",
   "display_override": ["fullscreen", "standalone", "window-controls-overlay"],
-  "orientation": "portrait",
+  "orientation": "any",
   "start_url": "./hs",
   "scope": "./",
   "background_color": "#ffffff",
