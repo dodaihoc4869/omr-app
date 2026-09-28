@@ -1,13 +1,15 @@
 // Đổi câu "Câu đã làm" (hoa2-cau-chi-tiet) sang hai khuôn CHUẨN có sẵn của app — KHÔNG dựng khối lời giải thứ hai:
 //   · màn hình: props của `TheCau` chế độ `xem_lai` (LỜI GIẢI → KIẾN THỨC CỐT LÕI → từng phương án/ý ✓✗; Phần III bước + kết quả),
 //     lời giải thô của kho đọc qua `chuanHoaLoiGiaiCau` (một bộ đọc cho cả app);
-//   · bản in PDF: `CauLuyen` cho `dungPhieu` (html-phieu.ts).
+//   · bản in dự phòng: `CauLuyen` cho `dungPhieu` (html-phieu.ts); tệp PDF chính dựng ở pdf-cau-da-lam.ts (cùng `chuanHoaLoiGiaiCau`);
+//   · thẻ đóng: `tomTatThe` (một dòng đề + "Em chọn: … · Đáp án: …").
 import type { HinhAnh, LoiGiaiCauTruc } from '../../data/examContent'
 import type { TheCauProps } from '../TheCau'
 import type { CauLuyen, MucDoCau } from '../../lib/bai-tap-pdf'
 import { chuanHoaLoiGiaiCau } from '../../lib/chuan-hoa-loi-giai'
 import type { CauDaLamMuc, ChiTietCau, LanLam, TrangThaiCau } from './api'
 import { ngayThang } from './thoi-gian'
+import { normalizeNumericAnswer } from '../../engine/score'
 
 type Chu = 'A' | 'B' | 'C' | 'D'
 type DS = 'D' | 'S'
@@ -155,4 +157,65 @@ export function cauLuyenTuChiTiet(ct: ChiTietCau, muc: CauDaLamMuc | undefined):
         }
       : {}),
   }
+}
+
+const CHU_Y = ['a', 'b', 'c', 'd'] as const
+/** 'D' → "Đúng", 'S' → "Sai", trống → "bỏ trống". */
+export const chuDS = (v: DS | null | undefined): string => (v === 'D' ? 'Đúng' : v === 'S' ? 'Sai' : 'bỏ trống')
+const soChuan = (s: string | null | undefined): string => normalizeNumericAnswer(String(s ?? ''))
+
+/** Phần III: câu trả lời của em có khớp đáp án không (cùng luật chấm số với TheCau). */
+export function traLoiNganDung(em: string | null | undefined, dapAn: string): boolean {
+  const e = soChuan(em)
+  return !!e && !!soChuan(dapAn) && e === soChuan(dapAn)
+}
+
+/** Phần tóm tắt của THẺ ĐANG ĐÓNG (bản vẽ HS-CauDaLam): một dòng đề + "Em chọn: … · Đáp án: …".
+ *  Phần II: dòng đề là ý em làm sai đầu tiên ("a) …") và đầu thẻ thêm "sai 1/4 ý". Chỉ dựng từ `hoa2-cau-chi-tiet`. */
+export interface TomTatThe {
+  /** Thêm vào đầu thẻ, ví dụ "sai 1/4 ý" (chỉ phần II có ý sai). */
+  phuDau: string
+  /** Dòng đề (có thể chứa công thức — hiện bằng ChemText). */
+  de: string
+  /** "Em chọn" (I, II) · "Em trả lời" (III). */
+  nhanEm: string
+  em: string
+  /** Rỗng khi em đúng (khỏi nhắc lại). */
+  dapAn: string
+  dung: boolean
+}
+export function tomTatThe(ct: ChiTietCau): TomTatThe {
+  const { de } = ct
+  if (de.phan === 'I') {
+    const chon = String(ct.emTraLoi ?? '').trim().toUpperCase()
+    const dung = ct.dapAn.trim().toUpperCase()
+    const pa = (k: string) => {
+      const i = 'ABCD'.indexOf(k)
+      if (!/^[A-D]$/.test(k)) return ''
+      const chu = (de.choices[i] ?? '').trim()
+      return chu && !de.choiceImgs?.[i] ? `${k}. ${chu}` : k
+    }
+    const dungKhong = !!chon && chon === dung
+    return { phuDau: '', de: de.text, nhanEm: 'Em chọn', em: pa(chon) || 'bỏ trống', dapAn: dungKhong ? '' : pa(dung) || dung, dung: dungKhong }
+  }
+  if (de.phan === 'II') {
+    const em = tachDungSai(ct.emTraLoi) ?? [null, null, null, null]
+    const dung = tachDungSai(ct.dapAn)
+    const sai = dung ? [0, 1, 2, 3].filter((i) => em[i] !== dung[i]) : []
+    if (!dung || sai.length === 0) {
+      return { phuDau: '', de: de.text, nhanEm: 'Em chọn', em: dung ? 'đúng cả 4 ý' : em.map((v, i) => `${CHU_Y[i]}) ${chuDS(v)}`).join(' · '), dapAn: '', dung: !!dung }
+    }
+    const i = sai[0]!
+    return {
+      phuDau: `sai ${sai.length}/4 ý`,
+      de: `${CHU_Y[i]}) ${(de.ideas[i] ?? '').trim()}`,
+      nhanEm: 'Em chọn',
+      em: chuDS(em[i]),
+      dapAn: chuDS(dung[i]),
+      dung: false,
+    }
+  }
+  const em = String(ct.emTraLoi ?? '').trim()
+  const dung = traLoiNganDung(em, ct.dapAn)
+  return { phuDau: '', de: de.text, nhanEm: 'Em trả lời', em: em || 'bỏ trống', dapAn: dung ? '' : ct.dapAn, dung }
 }

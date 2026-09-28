@@ -45,9 +45,32 @@ export function taiLaiMotLan(nay: number = Date.now(), kho: Storage | null = lay
   if (typeof location !== 'undefined') {
     const u = new URL(location.href)
     u.searchParams.set('_moi', String(nay))
-    location.replace(u.toString())
+    taiLaiKhiCoBanMoi(u.toString())
   }
   return true
+}
+
+/**
+ * Thiếu mảnh = máy đang chạy bản cũ (service worker cũ giữ trang cũ). Tải lại NGAY thì thường vẫn ra bản cũ và lại văng
+ * (thầy 28/09: "bấm vào bị văng ra" sau các lần phát hành liên tiếp). Nên: xin service worker kiểm bản mới, CHỜ bản mới
+ * nhận quyền (`controllerchange`, tối đa 8 giây) rồi mới tải lại. Không có service worker ⇒ tải lại ngay như cũ.
+ */
+export function taiLaiKhiCoBanMoi(url: string, choToiDaMs = 8_000): void {
+  const sw = typeof navigator !== 'undefined' ? navigator.serviceWorker : undefined
+  let xong = false
+  const di = () => {
+    if (xong) return
+    xong = true
+    location.replace(url)
+  }
+  if (!sw || typeof sw.getRegistration !== 'function') return di()
+  try {
+    sw.addEventListener('controllerchange', di, { once: true })
+    void sw.getRegistration().then((r) => r?.update()).catch(() => {})
+  } catch {
+    return di()
+  }
+  setTimeout(di, choToiDaMs)
 }
 
 function layKho(): Storage | null {

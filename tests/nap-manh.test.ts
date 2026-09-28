@@ -78,3 +78,53 @@ describe('napDong', () => {
     vi.unstubAllGlobals()
   })
 })
+
+describe('thiếu mảnh sau khi phát hành: chờ bản mới nhận quyền rồi mới tải lại (thầy 28/09 "bấm vào bị văng ra")', () => {
+  it('có service worker ⇒ xin kiểm bản mới, KHÔNG tải lại ngay; bản mới nhận quyền ⇒ tải lại đúng một lần', async () => {
+    const { taiLaiKhiCoBanMoi } = await import('../src/lib/nap-manh')
+    const nghe: Record<string, () => void> = {}
+    const update = vi.fn(async () => {})
+    const sw = { addEventListener: (t: string, f: () => void) => { nghe[t] = f }, getRegistration: async () => ({ update }) }
+    const cuNav = Object.getOwnPropertyDescriptor(globalThis.navigator, 'serviceWorker')
+    Object.defineProperty(globalThis.navigator, 'serviceWorker', { value: sw, configurable: true })
+    const replace = vi.fn()
+    const cuLoc = globalThis.location
+    Object.defineProperty(globalThis, 'location', { value: { ...cuLoc, replace }, configurable: true })
+    vi.useFakeTimers()
+    try {
+      taiLaiKhiCoBanMoi('https://x/?_moi=1', 8000)
+      await Promise.resolve(); await Promise.resolve()
+      expect(update).toHaveBeenCalled()
+      expect(replace).not.toHaveBeenCalled()
+      nghe.controllerchange!()
+      expect(replace).toHaveBeenCalledTimes(1)
+      vi.advanceTimersByTime(9000)
+      expect(replace).toHaveBeenCalledTimes(1)
+    } finally {
+      vi.useRealTimers()
+      Object.defineProperty(globalThis, 'location', { value: cuLoc, configurable: true })
+      if (cuNav) Object.defineProperty(globalThis.navigator, 'serviceWorker', cuNav)
+    }
+  })
+  it('bản mới không tới ⇒ hết 8 giây vẫn tải lại', async () => {
+    const { taiLaiKhiCoBanMoi } = await import('../src/lib/nap-manh')
+    const sw = { addEventListener: () => {}, getRegistration: async () => ({ update: async () => {} }) }
+    const cuNav = Object.getOwnPropertyDescriptor(globalThis.navigator, 'serviceWorker')
+    Object.defineProperty(globalThis.navigator, 'serviceWorker', { value: sw, configurable: true })
+    const replace = vi.fn()
+    const cuLoc = globalThis.location
+    Object.defineProperty(globalThis, 'location', { value: { ...cuLoc, replace }, configurable: true })
+    vi.useFakeTimers()
+    try {
+      taiLaiKhiCoBanMoi('https://x/', 8000)
+      vi.advanceTimersByTime(7999)
+      expect(replace).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(2)
+      expect(replace).toHaveBeenCalledTimes(1)
+    } finally {
+      vi.useRealTimers()
+      Object.defineProperty(globalThis, 'location', { value: cuLoc, configurable: true })
+      if (cuNav) Object.defineProperty(globalThis.navigator, 'serviceWorker', cuNav)
+    }
+  })
+})
