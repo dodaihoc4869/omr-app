@@ -28,8 +28,7 @@ export const TEP = [
   'src/components/KhoiKhacPhuc3CheDo.tsx',
   'src/components/ModalKhacPhucCauSai.tsx',
   'src/components/KhoiCauSai.tsx',
-  // nhóm C — báo cáo + tiến bộ (và các khối con nằm TRONG hai modal báo cáo)
-  'src/components/BaoCaoCaThiHocSinhModal.tsx',
+  // nhóm C — báo cáo + tiến bộ (và các khối con nằm TRONG modal báo cáo phụ huynh; modal học sinh cũ đã xoá 28/09)
   'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
   'src/components/BieuDoTienBoGoogle.tsx',
   'src/components/KhoiBaPhan.tsx',
@@ -186,9 +185,22 @@ function luat(c) {
   return null
 }
 
+// GIỮ LẠI 28/09: modal báo cáo học sinh CŨ (BaoCaoCaThiHocSinhModal) đã xoá (thầy cho phép). Các lớp màu dưới đây
+// trước chỉ được quét từ tệp ấy, nhưng NHIỀU màn khác nằm trong vỏ `.m3` (cổng học sinh, game thần thú, xác nhận nộp,
+// bảng tin…) vẫn dùng — bỏ đi là đổi màu các màn đó. Giữ nguyên để tệp CSS sinh ra không đổi một luật.
+export const LOP_GIU_LAI = [
+  'bg-amber-400', 'bg-amber-50/70', 'bg-blue-200/80', 'bg-rose-50/50',
+  'border-emerald-600', 'border-red-300', 'border-rose-600', 'border-white/30',
+  'from-rose-600', 'from-slate-50', 'via-rose-500', 'to-amber-500',
+  'text-amber-200', 'text-emerald-500', 'text-red-700',
+  'active:bg-blue-800', 'focus:border-blue-500', 'focus:ring-blue-500/30', 'hover:bg-amber-100/70', 'hover:bg-blue-100/70',
+  'dark:bg-emerald-950/30', 'dark:bg-rose-950/30', 'dark:bg-slate-950', 'dark:text-red-400', 'dark:hover:text-slate-300',
+].join(' ')
+
 export function sinh(doc = (p) => readFileSync(GOC + p, 'utf8')) {
   const tatCa = new Map()
   for (const p of TEP) for (const [k, v] of quetLop(doc(p))) tatCa.set(k, v)
+  for (const [k, v] of quetLop(' ' + LOP_GIU_LAI + ' ')) tatCa.set(k, v)
   const sang = [], toi = []
   for (const c of [...tatCa.values()].sort((a, b) => (a.bienThe + a.tenLop).localeCompare(b.bienThe + b.tenLop))) {
     const r = luat(c)
