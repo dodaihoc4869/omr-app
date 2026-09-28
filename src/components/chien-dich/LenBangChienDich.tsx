@@ -14,6 +14,9 @@ import { dungToChieu, napBangTra, type CauGoc, type OChieu } from './to-chieu'
 import { useGhiToChieu } from './ghi-to-chieu'
 import './chien-dich.css'
 
+/** Khoá sessionStorage: id chiến dịch cần mở sẵn ở màn Lên bảng. */
+export const KHOA_CHON_CHIEN_DICH = 'ddh.chienDichChon'
+
 /** Chiến dịch mặc định: cái đang chạy mới giao nhất (danh sách máy chủ đã xếp mới trước). */
 export function chonMacDinh(ds: DanhSachChienDich['chienDich']): string {
   return (ds.find((c) => c.trangThai === 'dang_chay') ?? ds[0])?.id ?? ''
@@ -25,7 +28,16 @@ export default function LenBangChienDich({ onCheDoCu }: { onCheDoCu?: () => void
 
   const [ds, setDs] = useState<DanhSachChienDich | null>(null)
   const [loiDs, setLoiDs] = useState('')
-  const [chonId, setChonId] = useState('')
+  // Mở từ khung "Chiến dịch đã giao" (màn Ca kiểm tra): chọn sẵn đúng chiến dịch thầy bấm (đọc một lần rồi xoá).
+  const [chonId, setChonId] = useState(() => {
+    try {
+      const id = sessionStorage.getItem(KHOA_CHON_CHIEN_DICH) ?? ''
+      sessionStorage.removeItem(KHOA_CHON_CHIEN_DICH)
+      return id
+    } catch {
+      return ''
+    }
+  })
   const [bang, setBang] = useState<DuBang | null>(null)
   const [buoi, setBuoi] = useState<BuoiChuaMayChu | null>(null)
   const [coMat, setCoMat] = useState<string[]>([])

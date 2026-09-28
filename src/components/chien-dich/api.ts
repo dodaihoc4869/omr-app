@@ -160,6 +160,7 @@ export const docDsEm = () => goiChienDich<{ em: { sbd: string; hoTen: string; lo
 export const tinhSucChua = (dv: DauVaoGiao) => goiChienDich<SucChua>('suc-chua', { ...dv })
 export const taoChienDich = (dv: DauVaoGiao & { ten: string }) => goiChienDich<{ id: string; soCau: number; soEm: number }>('tao', { ...dv })
 export const huyChienDich = (id: string) => goiChienDich<{ ok: true }>('huy', { id })
+export const dongChienDich = (id: string) => goiChienDich<{ ok: true }>('dong', { id })
 export const docBang = (id: string) => goiChienDich<BangChienDich>('bang', { id })
 export const docBuoiChua = (id: string, coMat?: string[]) => goiChienDich<BuoiChuaMayChu>('buoi-chua', coMat && coMat.length ? { id, coMat } : { id })
 export const chuaXong = (id: string, qids?: string[]) => goiChienDich<KetQuaChuaXong>('chua-xong', qids && qids.length ? { id, qids } : { id })

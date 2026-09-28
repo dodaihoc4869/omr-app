@@ -619,3 +619,33 @@
   font-weight: 700;
   color: var(--bts-chu-phu);
 }
+
+/* ---- chiến dịch đã giao (màn Ca kiểm tra) ---- */
+.cd-ds-cd {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cd-muc-cd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px;
+  border: 1px solid var(--bts-vien);
+  border-radius: 12px;
+}
+.cd-muc-cd-chu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.cd-muc-cd[data-trang-thai='da_huy'],
+.cd-muc-cd[data-trang-thai='da_dong'] {
+  opacity: 0.7;
+}
