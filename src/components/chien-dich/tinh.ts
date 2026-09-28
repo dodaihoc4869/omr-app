@@ -1,23 +1,30 @@
-// PHẦN TÍNH THUẦN của các màn chiến dịch (không IO, có test): màu ô bảng chiến dịch, mức đồng hồ sức chứa,
+// PHẦN TÍNH THUẦN của các màn chiến dịch (không IO, có test): hạng ô heatmap em × dạng, mức đồng hồ sức chứa,
 // xếp buổi chữa (≤ 90 phút, mỗi em có mặt ≥ 1 lượt), tờ đề của một ca, xếp tên em.
 import { maDeGocMayChu } from '../../lib/btvn-nang-do-thay'
 import { CAU_HINH_LEN_BANG_MAC_DINH } from '../../lib/len-bang-cau-hinh'
-import type { CauBuoiChua, EmTen, MucSucChua } from './api'
+import type { CauBuoiChua, EmTen, HangEm, MucSucChua } from './api'
 
-// ---------------------------------------------------------------- màu
-/** Ô màu theo % câu thành thạo của dạng: ≥ 70 xanh đậm · 40–69 xanh nhạt · 20–39 vàng · < 20 đỏ. */
-export type MucO = 'xd' | 'xg' | 'xv' | 'xr' | 'trong'
-export function mucO(tiLe: number | null | undefined): MucO {
-  if (typeof tiLe !== 'number' || !Number.isFinite(tiLe)) return 'trong'
-  const p = Math.round(tiLe * 100)
-  return p >= 70 ? 'xd' : p >= 40 ? 'xg' : p >= 20 ? 'xv' : 'xr'
+// ---------------------------------------------------------------- hạng theo dạng (heatmap em × dạng)
+/** Hạng theo % — ĐÚNG ngưỡng thuật toán bốc câu (máy chủ `hangTuTiLe`, srs2-loi.ts):
+ *  Yếu < 40% · Trung bình 40–65% · Khá 65–85% · Giỏi > 85%. (Bản vẽ ghi 40/60/80 — sai, thầy chốt theo thuật toán.) */
+export function hangTuTiLe(p: number): HangEm {
+  return p < 0.4 ? 'L1' : p < 0.65 ? 'L2' : p <= 0.85 ? 'L3' : 'L4'
 }
-export const CHU_GIAI_O: { muc: Exclude<MucO, 'trong'>; chu: string }[] = [
-  { muc: 'xd', chu: '≥ 70%' },
-  { muc: 'xg', chu: '40–69%' },
-  { muc: 'xv', chu: '20–39%' },
-  { muc: 'xr', chu: 'dưới 20%' },
+export const CHU_HANG: Record<HangEm, string> = { L1: 'Yếu', L2: 'Trung bình', L3: 'Khá', L4: 'Giỏi' }
+/** Chú giải ngưỡng — cùng một nguồn với `hangTuTiLe`. */
+export const CHU_GIAI_HANG: { hang: HangEm; chu: string }[] = [
+  { hang: 'L1', chu: 'Yếu dưới 40%' },
+  { hang: 'L2', chu: 'Trung bình 40–65%' },
+  { hang: 'L3', chu: 'Khá 65–85%' },
+  { hang: 'L4', chu: 'Giỏi trên 85%' },
 ]
+/** Ô heatmap: hạng theo % thành thạo; `chua-lam` = em chưa làm câu nào của dạng; `trong` = dạng không có câu. */
+export type MucO = HangEm | 'chua-lam' | 'trong'
+export function mucO(tiLe: number | null | undefined, daLam?: number | null): MucO {
+  if (typeof tiLe !== 'number' || !Number.isFinite(tiLe)) return 'trong'
+  if (daLam === 0) return 'chua-lam'
+  return hangTuTiLe(tiLe)
+}
 
 /** Mức đồng hồ sức chứa: xanh ≤ 70% · vàng 70–90% · đỏ > 90% (cùng luật `sucChua` của máy chủ). */
 export function mucSucChua(tiLe: number): MucSucChua {

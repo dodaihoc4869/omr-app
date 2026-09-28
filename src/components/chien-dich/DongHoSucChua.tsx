@@ -1,8 +1,11 @@
-// ĐỒNG HỒ SỨC CHỨA (bản vẽ GV-GiaoChienDich): khối lượng lượt em ở giữa lớp cần so với D ngày × thể lực/ngày.
+// KHỐI LƯỢNG SO VỚI THỜI GIAN CÒN LẠI (tên cũ "Sức chứa tới hạn nộp"; bản vẽ docs/ban-ve-gv-2809/GV-GiaoChienDich):
+// lượt em ở giữa lớp cần so với D ngày × số lượt câu mỗi ngày.
 // Xanh ≤ 70% · vàng 70–90% · đỏ > 90%. Màu không là kênh duy nhất: luôn kèm % và chữ "vừa sức / sát / quá tải".
 import type { SucChua } from './api'
 import { phanTram } from './ngay'
 import { CHU_MUC } from './tinh'
+
+const CHU_MUC_HOA = { xanh: 'Vừa sức', vang: 'Sát', do: 'Quá tải' } as const
 
 export default function DongHoSucChua({
   sc,
@@ -23,7 +26,7 @@ export default function DongHoSucChua({
         <p className="cd-loi">{loi}</p>
         <div>
           <button type="button" className="m3-nut-chu cd-nut-nho" onClick={onTinhLai}>
-            Tính lại sức chứa
+            Tính lại
           </button>
         </div>
       </div>
@@ -32,7 +35,7 @@ export default function DongHoSucChua({
   if (!sc) {
     return (
       <div className="cd-dong-ho" data-khoi="dong-ho-suc-chua" aria-live="polite" aria-busy={dangTinh}>
-        <p className="cd-phu">{dangTinh ? 'Đang tính sức chứa…' : 'Chọn tờ đề, lớp và hạn nộp để tính sức chứa.'}</p>
+        <p className="cd-phu">{dangTinh ? 'Đang tính khối lượng…' : 'Chọn tờ đề, em và hạn nộp để tính khối lượng.'}</p>
         <div className="cd-ray" aria-hidden="true" />
       </div>
     )
@@ -49,16 +52,22 @@ export default function DongHoSucChua({
   return (
     <div className="cd-dong-ho" data-khoi="dong-ho-suc-chua" data-muc={muc} aria-live="polite" aria-busy={dangTinh}>
       <div className="cd-dong-ho-dau">
-        <span id="cd-suc-chua-nhan">Sức chứa tới hạn nộp</span>
-        <span>
-          <strong data-so="ti-le">{phanTram(tiLe)}</strong> · {CHU_MUC[muc]}
-        </span>
+        <span id="cd-suc-chua-nhan">Khối lượng so với thời gian còn lại</span>
+        <span className={`cd-chip-muc cd-chip-muc--${muc}`}>{CHU_MUC_HOA[muc]}</span>
+      </div>
+      <div className="cd-dong-ho-so">
+        <strong data-so="ti-le">{phanTram(tiLe)}</strong>
       </div>
       <div className="cd-ray" role="meter" aria-labelledby="cd-suc-chua-nhan" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(tiLe * 100)} aria-valuetext={`${phanTram(tiLe)} · ${CHU_MUC[muc]}`}>
         <div className={`cd-ray--${muc}`} data-ray={muc} style={{ width: `${rong}%` }} />
       </div>
+      <div className="cd-vach-thang cd-so" aria-hidden="true">
+        <span style={{ left: 0 }}>0%</span>
+        <span style={{ left: '70%' }}>70</span>
+        <span style={{ left: '90%' }}>90</span>
+      </div>
       <p className="cd-phu cd-so">
-        Em ở giữa lớp cần khoảng {khoiLuong} lượt{viSao} · sức chứa {sc.D} ngày × {theLuc} lượt/ngày = {sc.sucChua} lượt.
+        Em ở giữa lớp cần khoảng {khoiLuong} lượt{viSao} · có {sc.D} ngày × {theLuc} lượt/ngày = {sc.sucChua} lượt.
         {cauQuaTai}
       </p>
     </div>

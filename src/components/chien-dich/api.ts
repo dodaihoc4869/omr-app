@@ -30,6 +30,25 @@ export interface ChienDichTom {
   soCau: number
   soEm: number
   hetHan: boolean
+  /** Số liệu lớp (chỉ khi xin `thongKe`; máy chủ cũ / quá 20 chiến dịch mới nhất ⇒ vắng hoặc null). */
+  thongKe?: ThongKeChienDich | null
+}
+
+/** Số liệu lớp gọn của một chiến dịch — bảng "Chiến dịch đã giao" (bản vẽ GV-ChienDichDaGiao 28/09). */
+export interface ThongKeChienDich {
+  /** Tỉ lệ (0–1) câu đã làm qua, trung bình lớp. */
+  coXat: number
+  thanhThao: number
+  /** Số em đúng nhịp (kể cả vượt nhịp). */
+  dungNhip: number
+  /** Số em làm qua đủ mọi câu. */
+  emLamQuaDu: number
+  /** Số em quá tải hôm nay (phải làm vượt số lượt/ngày để kịp hạn). */
+  quaTai: number
+  canDayLaiCau: number
+  canDayLaiLuot: number
+  /** Mức "đã làm qua" lớp cần đạt hết hôm nay (0–1). */
+  mucCanHomNay: number
 }
 
 export interface DanhSachChienDich {
@@ -45,6 +64,8 @@ export interface SucChua {
   theLucDeXuat?: number
   /** Số câu dùng được MỖI tờ góp vào (đã bỏ trùng, tự luận, chưa duyệt) — cộng lại = soCau. Máy chủ cũ không có. */
   soCauTheoTo?: Record<string, number>
+  /** Số câu theo mức độ (Nhận biết / Thông hiểu / Vận dụng…) — cộng lại = soCau. Máy chủ cũ không có. */
+  soCauTheoMucDo?: Record<string, number>
   soEm: number
   /** Số ngày còn lại tính cả hôm nay. */
   D: number
@@ -87,21 +108,47 @@ export interface EmBang {
   /** Tỉ lệ câu thành thạo theo dạng (0–1); `null` = dạng không có câu. */
   theoDang: Record<string, number | null>
   /** Sức học của em theo dạng (máy dùng để bốc câu mới): L1 Yếu · L2 Trung bình · L3 Khá · L4 Giỏi. Máy chủ cũ không gửi ⇒ vắng. */
-  hangTheoDang?: Record<string, 'L1' | 'L2' | 'L3' | 'L4'>
+  hangTheoDang?: Record<string, HangEm>
+  /** Tỉ lệ câu ĐÃ LÀM QUA theo dạng (0 ⇒ ô "Chưa làm"). Máy chủ cũ không gửi. */
+  daLamTheoDang?: Record<string, number | null>
+  /** Nhịp của em hôm nay. Máy chủ cũ không gửi. */
+  nhip?: NhipEm
+  /** Số ngày liền không làm câu nào (chưa làm ⇒ tính từ ngày giao). */
+  soNgayTre?: number
 }
+
+export type HangEm = 'L1' | 'L2' | 'L3' | 'L4'
+export type NhipEm = 'vuot' | 'dung' | 'tre12' | 'tre3'
 
 export interface CauCanDayLai {
   qid: string
   stt: number
   dang: string
   soEm: number
+  mucDo?: string | null
 }
 
 export interface BangChienDich {
   chienDich: Omit<ChienDichTom, 'hetHan'>
   homNay: string
   hetHan: boolean
-  lop: { coXat: number; thanhThao: number; huyetChien: number; canDayLaiCau: number; canDayLaiLuot: number }
+  lop: {
+    coXat: number
+    thanhThao: number
+    /** Số em quá tải hôm nay (tên cũ phía máy chủ: Huyết Chiến). */
+    huyetChien: number
+    canDayLaiCau: number
+    canDayLaiLuot: number
+    // ---- chỉ-thêm 28/09 (máy chủ cũ không gửi) ----
+    homQua?: { coXat: number; thanhThao: number }
+    nhip?: Record<NhipEm, number>
+    dungNhip?: number
+    mucCanHomNay?: number
+    ngayThu?: number
+    tongNgay?: number
+    theoDang?: Record<string, number | null>
+    hangTheoDang?: Record<string, HangEm>
+  }
   dang: string[]
   em: EmBang[]
   canDayLai: CauCanDayLai[]
@@ -157,8 +204,10 @@ export const luuCo = async (co: CoHoa2): Promise<KetQuaLenh<CoHoa2>> => {
   return { ok: true, du: r.du.co ?? co }
 }
 export const danhSach = () => goiChienDich<DanhSachChienDich>('danh-sach')
+/** Danh sách kèm số liệu lớp từng chiến dịch (bảng Chiến dịch đã giao). */
+export const danhSachThongKe = () => goiChienDich<DanhSachChienDich>('danh-sach', { thongKe: true })
 /** Danh sách học sinh máy chủ (sbd, họ tên, lớp) cho bộ chọn khối → lớp → em. */
-export const docDsEm = () => goiChienDich<{ em: { sbd: string; hoTen: string; lop: string }[] }>('ds-em', {})
+export const docDsEm = () => goiChienDich<{ em: { sbd: string; hoTen: string; lop: string; khoi?: string; tenLop?: string }[] }>('ds-em', {})
 export const tinhSucChua = (dv: DauVaoGiao) => goiChienDich<SucChua>('suc-chua', { ...dv })
 export const taoChienDich = (dv: DauVaoGiao & { ten: string }) => goiChienDich<{ id: string; soCau: number; soEm: number }>('tao', { ...dv })
 export const huyChienDich = (id: string) => goiChienDich<{ ok: true }>('huy', { id })

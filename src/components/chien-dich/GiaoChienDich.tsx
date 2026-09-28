@@ -1,7 +1,9 @@
-// BƯỚC TIẾP THEO · GIAO CHIẾN DỊCH LUYỆN (bản vẽ docs/ban-ve-game-hoa-2-2709/GV-GiaoChienDich.dc.html).
-// Hiện ở màn ca đã kết thúc (điền sẵn tờ đề + lớp của ca) và ở màn Ca kiểm tra ("Giao chiến dịch mới", chưa điền gì).
-// Mỗi lần đổi đầu vào ⇒ gọi `suc-chua` (đồng hồ sức chứa); nút chính "Giao chiến dịch cho N em" ⇒ `tao`.
-// Thầy 28/09: thể lực/ngày điền số bất kì + nút gạt "Tự động" (máy chủ tính thể lực nhỏ nhất bảo đảm mục tiêu); bỏ "rút còn" và "lùi hạn nộp".
+// GIAO CHIẾN DỊCH LUYỆN — 3 bước + cột tóm tắt cố định (bản vẽ docs/ban-ve-gv-2809/GV-GiaoChienDich, thầy chốt 28/09).
+//   1. Chọn tờ đề: tờ đã chọn (số câu từng tờ do máy chủ đếm) + cây Kho đề có ô tìm + cơ cấu câu theo mức độ.
+//   2. Chọn em: MỘT ô chọn nhiều tầng Khối › Lớp › Em (`ChonEmGiao`), danh sách em từ máy chủ (`ds-em`).
+//   3. Hạn nộp + "Số lượt câu mỗi ngày (một em)" (tên cũ "Thể lực") gõ số bất kì hoặc gạt "Tự tính" + "Khối lượng so với thời gian còn lại".
+// Hiện ở màn ca đã kết thúc (điền sẵn tờ đề + lớp của ca) và ở màn Chiến dịch luyện ("Giao chiến dịch mới", chưa điền gì).
+// Mỗi lần đổi đầu vào ⇒ gọi `suc-chua`; nút chính "Giao chiến dịch cho N em" ⇒ `tao`. KHÔNG có "Rút còn … câu" / "Lùi hạn nộp" (thầy 28/09).
 // Giao xong cho HOÀN TÁC ("Huỷ giao" ⇒ `huy`) thay vì hỏi lại trước (luật C8).
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TeacherExamSource } from '../../data/examContent'
@@ -10,8 +12,8 @@ import HopChonDe from '../HopChonDe'
 import { docDsEm, huyChienDich, taoChienDich, tinhSucChua, type SucChua } from './api'
 import ChonEmGiao, { khoiCuaLop, type EmLop } from './ChonEmGiao'
 import DongHoSucChua from './DongHoSucChua'
-import HopChon from './HopChon'
-import { congNgay, hienHanNop, laNgay, ngayVn } from './ngay'
+import { congNgay, conLai, hienHanNop, hienNgay, laNgay, ngayVn, phanTram } from './ngay'
+import { CHU_MUC } from './tinh'
 import './chien-dich.css'
 
 export const THE_LUC_MAC_DINH = 40
@@ -76,9 +78,9 @@ export default function GiaoChienDich({
 
   // Ngân hàng đề trên máy này — ĐỦ mọi tờ, tách theo phần y như màn Mở ca (thầy 28/09: "chưa hiển thị đầy đủ đề kho đề").
   // KHÔNG khử trùng cả kho ở đây: khử trước khi chọn làm tờ trùng hết câu BIẾN MẤT khỏi cây. Câu trùng giữa các tờ ĐÃ TÍCH do máy chủ bỏ khi giao.
-  const [kho, setKho] = useState<TeacherExamSource[]>([])
-  const [moHopDe, setMoHopDe] = useState(false)
-  const [chonTam, setChonTam] = useState<Set<string>>(new Set())
+  const [kho, setKho] = useState<TeacherExamSource[] | null>(null)
+  // Cây Kho đề: mở sẵn khi chưa có tờ nào (giao mới); thu gọn khi đã điền sẵn tờ của ca.
+  const [moCay, setMoCay] = useState(maDeCa.length === 0)
   useEffect(() => {
     let huy = false
     void (async () => {
@@ -88,6 +90,7 @@ export default function GiaoChienDich({
         if (!huy) setKho(ds)
       } catch {
         /* không đọc được kho: tờ hiện bằng mã, không có số câu */
+        if (!huy) setKho([])
       }
     })()
     return () => {
@@ -233,11 +236,20 @@ export default function GiaoChienDich({
       return s
     })
 
-  const themTo = () => {
-    const moi = [...chonTam].filter(Boolean)
-    setTo((cu) => [...cu, ...moi.filter((m, i) => moi.indexOf(m) === i && !cu.some((t) => t.maDe === m)).map((m) => ({ maDe: m, tuCa: false }))])
-    setChon((cu) => new Set([...cu, ...moi]))
-    setMoHopDe(false)
+  // Cây Kho đề tích cả nhánh (chương/bài) ⇒ trả TẬP chọn mới đầy đủ: tờ mới vào danh sách, tờ bỏ tích giữ dòng (bỏ tích).
+  const datChonTuCay = (ma: string[]) => {
+    const moi = [...new Set(ma)]
+    setTo((cu) => [...cu, ...moi.filter((m) => !cu.some((t) => t.maDe === m)).map((m) => ({ maDe: m, tuCa: false }))])
+    setChon(new Set(moi))
+  }
+  // Tích một tờ trên cây Kho đề: chưa có ⇒ thêm vào danh sách + tích; đang tích ⇒ bỏ tích.
+  const tichTuCay = (m: string) => {
+    if (chon.has(m)) {
+      doiTich(m)
+      return
+    }
+    setTo((cu) => (cu.some((t) => t.maDe === m) ? cu : [...cu, { maDe: m, tuCa: false }]))
+    setChon((cu) => new Set([...cu, m]))
   }
 
   if (daGiao) {
@@ -246,7 +258,7 @@ export default function GiaoChienDich({
         <span className="cd-nhan-buoc">ĐÃ GIAO CHIẾN DỊCH</span>
         <h2>{ten.trim() || 'Chiến dịch luyện'}</h2>
         <p className="cd-phu">
-          {daGiao.soEm} em · {daGiao.soCau} câu · hạn nộp {hienHanNop(hanNop)}. Theo dõi ở mục Lên bảng.
+          {daGiao.soEm} em · {daGiao.soCau} câu · hạn nộp {hienHanNop(hanNop)}. Theo dõi ở mục Chữa trên lớp.
         </p>
         <div className="cd-hang-nut">
           <button type="button" className="m3-nut-chu cd-nut-nho" disabled={dangHuy} onClick={() => void huyGiao()}>
@@ -262,157 +274,257 @@ export default function GiaoChienDich({
 
   const soEm = sc?.soEm ?? 0
   const tongCau = sc ? `Tổng ${sc.soCau} câu` : ''
+  const mucDo = thuTuMucDo(sc?.soCauTheoMucDo)
+  const tongMucDo = mucDo.reduce((s, x) => s + x.n, 0)
+  const soEmChon = coDanhSach ? sbdChon.length : soEm
+  const now = nowMs ?? Date.now()
+  // Dự kiến: em ở giữa lớp làm đủ lượt cần sau ⌈khối lượng / lượt mỗi ngày⌉ ngày (tính cả hôm nay).
+  const soNgayCan = sc && theLuc > 0 ? Math.max(1, Math.ceil(sc.khoiLuongTrungVi / theLuc)) : 0
+  const ngayXong = soNgayCan ? congNgay(homNay, soNgayCan - 1) : ''
+  const tenTo = to.filter((t) => chon.has(t.maDe)).map((t) => (t.tuCa ? `Đề vừa kiểm tra · ${t.maDe}` : t.maDe))
 
   return (
-    <section className="cd-the" data-khoi="giao-chien-dich" aria-labelledby="cd-giao-tieu-de">
-      <div>
+    <section className="cd-the cd-giao" data-khoi="giao-chien-dich" aria-labelledby="cd-giao-tieu-de">
+      <div className="cd-giao-dau">
         <span className="cd-nhan-buoc">{maCa ? 'BƯỚC TIẾP THEO' : 'CHIẾN DỊCH MỚI'}</span>
         <h2 id="cd-giao-tieu-de">Giao chiến dịch luyện{ten.trim() ? `: ${ten.trim()}` : ''}</h2>
       </div>
 
-      <label className="cd-truong">
-        Tên chiến dịch
-        <input type="text" value={ten} maxLength={80} onChange={(e) => setTen(e.target.value)} />
-      </label>
+      <div className="cd-giao-luoi">
+        <div className="cd-giao-chinh">
+          <div className="cd-giao-hai">
+            {/* ---- BƯỚC 1: tờ đề ---- */}
+            <section className="cd-buoc" aria-labelledby="cd-buoc-1" data-buoc="1">
+              <div className="cd-buoc-dau">
+                <span className={`cd-so-buoc${maDeChon.length ? ' cd-so-buoc--xong' : ''}`} aria-hidden="true">
+                  1
+                </span>
+                <h3 id="cd-buoc-1">Chọn tờ đề</h3>
+                <span className={`cd-chip-muc cd-chip-muc--${maDeChon.length ? 'xanh' : 'xam'}`}>{maDeChon.length ? `Đã chọn ${maDeChon.length} tờ` : 'Chưa chọn'}</span>
+              </div>
+              <label className="cd-truong">
+                Tên chiến dịch
+                <input type="text" value={ten} maxLength={80} onChange={(e) => setTen(e.target.value)} />
+              </label>
+              <fieldset className="cd-truong cd-khung-tron">
+                <legend className="cd-an-chu">Tờ đề đã chọn</legend>
+                {to.length === 0 && <p className="cd-phu">Chưa có tờ đề nào — tích tờ trong Kho đề bên dưới.</p>}
+                {to.map((t) => {
+                  // Số câu DÙNG ĐƯỢC của tờ do máy chủ đếm (đã bỏ trùng, tự luận, chưa duyệt) ⇒ cộng các tờ = tổng bên dưới.
+                  const n = sc?.soCauTheoTo?.[t.maDe]
+                  return (
+                    <label key={t.maDe} className="cd-tich">
+                      <input type="checkbox" checked={chon.has(t.maDe)} onChange={() => doiTich(t.maDe)} />
+                      <span>
+                        {t.tuCa ? `Đề vừa kiểm tra · ${t.maDe}` : t.maDe}
+                        {n !== undefined && chon.has(t.maDe) ? ` · ${n} câu` : ''}
+                      </span>
+                    </label>
+                  )
+                })}
+                {tongCau && <small className="cd-so cd-phu">{tongCau} · đã bỏ câu tự luận và câu chưa duyệt</small>}
+              </fieldset>
+              <button type="button" className="m3-nut-chu cd-nut-nho cd-nut-trai" aria-expanded={moCay} onClick={() => setMoCay((x) => !x)}>
+                {moCay ? 'Thu gọn Kho đề' : 'Thêm tờ từ Kho đề'}
+              </button>
+              {moCay &&
+                (kho === null ? (
+                  <p className="cd-phu">Đang đọc Kho đề trên máy này…</p>
+                ) : kho.length === 0 ? (
+                  <p className="cd-phu">Máy này chưa có Kho đề — vào Kho đề để đồng bộ trước.</p>
+                ) : (
+                  <HopChonDe ds={kho} daChon={chon} chonNhieu cao={260} onChon={tichTuCay} onChonTatCa={datChonTuCay} />
+                ))}
+              {tongMucDo > 0 && (
+                <div className="cd-co-cau" data-khoi="co-cau-muc-do">
+                  <span className="cd-nhan-nhom">Cơ cấu {tongMucDo} câu theo mức độ</span>
+                  <div className="cd-thanh-chong" aria-hidden="true">
+                    {mucDo.map((m, i) => (
+                      <div key={m.ten} className={`cd-muc-${Math.min(i, 3)}`} style={{ width: `${(100 * m.n) / tongMucDo}%` }} />
+                    ))}
+                  </div>
+                  <ul className="cd-ds-muc">
+                    {mucDo.map((m, i) => (
+                      <li key={m.ten}>
+                        <span className={`cd-cham cd-muc-${Math.min(i, 3)}`} aria-hidden="true" />
+                        <span>{m.ten}</span>
+                        <b className="cd-so">{m.n} câu</b>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </section>
 
-      <fieldset className="cd-truong" style={{ border: 0, margin: 0, padding: 0 }}>
-        <legend style={{ padding: 0, marginBottom: 4 }}>Câu trong chiến dịch</legend>
-        {to.length === 0 && <p className="cd-phu">Chưa có tờ đề nào — thêm tờ từ Ngân hàng đề.</p>}
-        {to.map((t) => {
-          // Số câu DÙNG ĐƯỢC của tờ do máy chủ đếm (đã bỏ trùng, tự luận, chưa duyệt) ⇒ cộng các tờ = tổng bên dưới.
-          const n = sc?.soCauTheoTo?.[t.maDe]
-          return (
-            <label key={t.maDe} className="cd-tich">
-              <input type="checkbox" checked={chon.has(t.maDe)} onChange={() => doiTich(t.maDe)} />
-              <span>
-                {t.tuCa ? `Đề vừa kiểm tra · ${t.maDe}` : t.maDe}
-                {n !== undefined && chon.has(t.maDe) ? ` · ${n} câu` : ''}
+            {/* ---- BƯỚC 2: em ---- */}
+            <section className="cd-buoc" aria-labelledby="cd-buoc-2" data-buoc="2">
+              <div className="cd-buoc-dau">
+                <span className={`cd-so-buoc${soEmChon ? ' cd-so-buoc--xong' : ''}`} aria-hidden="true">
+                  2
+                </span>
+                <h3 id="cd-buoc-2">Chọn em nhận chiến dịch</h3>
+                {coDanhSach && (
+                  <span className={`cd-chip-muc cd-chip-muc--${sbdChon.length ? 'xanh' : 'xam'} cd-so`}>
+                    {sbdChon.length} / {dsEm.length} em
+                  </span>
+                )}
+              </div>
+              {coDanhSach ? (
+                <ChonEmGiao ds={dsEm} chon={chonEm} onDoi={setChonEm} />
+              ) : (
+                <label className="cd-truong">
+                  Giao cho lớp
+                  <input type="text" list="cd-ds-lop" value={lop} placeholder="Ví dụ 12A1" onChange={(e) => setLop(e.target.value)} />
+                  <small className="cd-so">{sc ? `Lớp ${lop.trim()} · ${sc.soEm} em` : lop.trim() ? `Lớp ${lop.trim()}` : 'Chưa có danh sách em — gõ tên lớp để giao'}</small>
+                  <datalist id="cd-ds-lop">
+                    {dsLop.map((l) => (
+                      <option key={l} value={l} />
+                    ))}
+                  </datalist>
+                </label>
+              )}
+            </section>
+          </div>
+
+          {/* ---- BƯỚC 3: hạn nộp + số lượt câu mỗi ngày ---- */}
+          <section className="cd-buoc" aria-labelledby="cd-buoc-3" data-buoc="3">
+            <div className="cd-buoc-dau">
+              <span className={`cd-so-buoc${sc ? ' cd-so-buoc--xong' : ''}`} aria-hidden="true">
+                3
               </span>
-            </label>
-          )
-        })}
-        <div>
-          <button
-            type="button"
-            className="m3-nut-chu cd-nut-nho"
-            onClick={() => {
-              setChonTam(new Set())
-              setMoHopDe(true)
-            }}
-          >
-            + Thêm tờ đề từ Ngân hàng đề
-          </button>
+              <h3 id="cd-buoc-3">Hạn nộp và số lượt câu mỗi ngày</h3>
+            </div>
+            <div className="cd-giao-ba">
+              <label className="cd-truong">
+                Hạn nộp (hết lúc 23:59)
+                <input type="date" value={hanNop} min={homNay} onChange={(e) => setHanNop(e.target.value)} />
+                <small className="cd-so cd-phu">{hanHopLe ? hienHanNop(hanNop) : 'Hạn nộp phải từ hôm nay trở đi'}</small>
+              </label>
+              <div className="cd-truong">
+                <label htmlFor="cd-the-luc">Số lượt câu mỗi ngày (một em)</label>
+                <div className="cd-hang-o">
+                  <input
+                    id="cd-the-luc"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    max={THE_LUC_TOI_DA}
+                    value={theLucChu}
+                    disabled={tuDong}
+                    onChange={(e) => {
+                      setTheLucChu(e.target.value)
+                      const n = Math.floor(Number(e.target.value))
+                      if (Number.isFinite(n) && n >= 1) setTheLuc(Math.min(THE_LUC_TOI_DA, n))
+                    }}
+                  />
+                  <label className="cd-tich cd-gat">
+                    <input type="checkbox" role="switch" checked={tuDong} onChange={(e) => setTuDong(e.target.checked)} />
+                    <span>Tự tính</span>
+                  </label>
+                </div>
+                <small className="cd-so cd-phu">
+                  {tuDong
+                    ? sc?.theLucDeXuat
+                      ? `A.I Đỗ Đại Học đề xuất ${sc.theLucDeXuat} lượt/ngày — số nhỏ nhất để em ở giữa lớp ≤ 70% và không em nào quá tải`
+                      : 'A.I Đỗ Đại Học tính số nhỏ nhất đủ để cả lớp kịp hạn nộp'
+                    : 'Gõ số bất kì; gạt Tự tính để A.I Đỗ Đại Học tính'}
+                </small>
+                <label className="cd-tich">
+                  <input type="checkbox" checked={huyetChien} onChange={(e) => setHuyetChien(e.target.checked)} />
+                  <span>Em chậm nhịp được làm tới {2 * theLuc} câu/ngày (Quá tải hôm nay · tự tính gấp đôi)</span>
+                </label>
+              </div>
+              <DongHoSucChua sc={sc} dangTinh={dangTinh} loi={loiTinh} theLuc={theLuc} onTinhLai={() => setLanTinh((x) => x + 1)} />
+            </div>
+          </section>
         </div>
-        {tongCau && <small className="cd-so">{tongCau} · đã bỏ câu tự luận và câu chưa duyệt</small>}
-      </fieldset>
 
-      {coDanhSach && <ChonEmGiao ds={dsEm} chon={chonEm} onDoi={setChonEm} />}
-
-      <div className="cd-luoi-2">
-        {!coDanhSach && (
-          <label className="cd-truong">
-            Giao cho lớp
-            <input type="text" list="cd-ds-lop" value={lop} placeholder="Ví dụ 12A1" onChange={(e) => setLop(e.target.value)} />
-            <small className="cd-so">{sc ? `Lớp ${lop.trim()} · ${sc.soEm} em` : lop.trim() ? `Lớp ${lop.trim()}` : 'Chọn lớp để giao'}</small>
-            <datalist id="cd-ds-lop">
-              {dsLop.map((l) => (
-                <option key={l} value={l} />
-              ))}
-            </datalist>
-          </label>
-        )}
-        <label className="cd-truong">
-          Hạn nộp (hết lúc 23:59)
-          <input type="date" value={hanNop} min={homNay} onChange={(e) => setHanNop(e.target.value)} />
-          <small className="cd-so">{hanHopLe ? hienHanNop(hanNop) : 'Hạn nộp phải từ hôm nay trở đi'}</small>
-        </label>
-      </div>
-
-      <div className="cd-luoi-2">
-        <div className="cd-truong">
-          <label htmlFor="cd-the-luc">Thể lực mỗi ngày (lượt câu)</label>
-          <input
-            id="cd-the-luc"
-            type="number"
-            inputMode="numeric"
-            min={1}
-            max={THE_LUC_TOI_DA}
-            value={theLucChu}
-            disabled={tuDong}
-            onChange={(e) => {
-              setTheLucChu(e.target.value)
-              const n = Math.floor(Number(e.target.value))
-              if (Number.isFinite(n) && n >= 1) setTheLuc(Math.min(THE_LUC_TOI_DA, n))
-            }}
-          />
-          <label className="cd-tich cd-gat">
-            <input type="checkbox" role="switch" checked={tuDong} onChange={(e) => setTuDong(e.target.checked)} />
-            <span>Tự động: máy tính số lượt/ngày nhỏ nhất đủ để cả lớp kịp hạn nộp</span>
-          </label>
-          <small className="cd-so">
-            {tuDong ? (sc?.theLucDeXuat ? `Máy đề xuất ${sc.theLucDeXuat} lượt/ngày · em ở giữa lớp ≤ 70% sức chứa, không em nào quá tải` : 'Đang tính…') : 'Gõ số bất kì; gạt Tự động để máy tính'}
-          </small>
-        </div>
-        <label className="cd-tich" style={{ alignSelf: 'end' }}>
-          <input type="checkbox" checked={huyetChien} onChange={(e) => setHuyetChien(e.target.checked)} />
-          <span>Cho Huyết Chiến tới {2 * theLuc} câu/ngày khi em chậm nhịp (tự tính: gấp đôi thể lực)</span>
-        </label>
-      </div>
-
-      <DongHoSucChua
-        sc={sc}
-        dangTinh={dangTinh}
-        loi={loiTinh}
-        theLuc={theLuc}
-        onTinhLai={() => setLanTinh((x) => x + 1)}
-      />
-
-      {loiGiao && (
-        <p className="cd-loi" role="alert">
-          {loiGiao}
-        </p>
-      )}
-      <div className="cd-hang-nut">
-        {onDeSau && (
-          <button type="button" className="m3-nut-chu cd-nut-nho" onClick={onDeSau}>
-            Để sau
-          </button>
-        )}
-        <button type="button" className="m3-nut-chinh" disabled={!duDauVao || !sc || dangTinh || dangGiao} onClick={() => void giao()}>
-          {dangGiao ? 'Đang giao…' : `Giao chiến dịch cho ${soEm} em`}
-        </button>
-      </div>
-
-      {moHopDe && (
-        <HopChon
-          tieuDe="Thêm tờ đề từ Ngân hàng đề"
-          moTa="Tích các tờ muốn đưa vào chiến dịch. Câu tự luận và câu chưa duyệt tự bỏ."
-          nhanXacNhan={`Thêm ${chonTam.size} tờ`}
-          xacNhanDuoc={chonTam.size > 0}
-          onXacNhan={themTo}
-          onDong={() => setMoHopDe(false)}
-          rong={640}
-        >
-          {kho.length === 0 ? (
-            <p className="cd-phu">Máy này chưa có Ngân hàng đề — vào Ngân hàng đề để đồng bộ trước.</p>
-          ) : (
-            <HopChonDe
-              ds={kho}
-              daChon={chonTam}
-              chonNhieu
-              onChon={(m) =>
-                setChonTam((cu) => {
-                  const s = new Set(cu)
-                  if (s.has(m)) s.delete(m)
-                  else s.add(m)
-                  return s
-                })
-              }
-              onChonTatCa={(ma) => setChonTam(new Set(ma))}
-            />
+        {/* ---- TÓM TẮT cố định ---- */}
+        <aside className="cd-tom-tat" aria-labelledby="cd-tom-tat" data-khoi="tom-tat-giao">
+          <h3 id="cd-tom-tat">Tóm tắt chiến dịch</h3>
+          <dl className="cd-dl">
+            <div>
+              <dt>Tờ đề</dt>
+              <dd>{tenTo.length ? tenTo.join(', ') : 'Chưa chọn'}</dd>
+            </div>
+            <div>
+              <dt>Số câu</dt>
+              <dd className="cd-so">{sc ? `${sc.soCau} câu` : '—'}</dd>
+            </div>
+            {tongMucDo > 0 && (
+              <div>
+                <dt>Mức độ</dt>
+                <dd className="cd-so">{mucDo.map((m) => `${m.ten} ${m.n}`).join(' · ')}</dd>
+              </div>
+            )}
+            <div>
+              <dt>Giao cho</dt>
+              <dd className="cd-so">{soEmChon || nhanLop ? `${soEmChon} em${nhanLop ? ` · ${nhanLop}` : ''}` : 'Chưa chọn'}</dd>
+            </div>
+            <div>
+              <dt>Hạn nộp</dt>
+              <dd className="cd-so">
+                {hanHopLe ? hienHanNop(hanNop) : '—'}
+                {hanHopLe && <small>{conLai(hanNop, now)}</small>}
+              </dd>
+            </div>
+            <div>
+              <dt>Lượt câu mỗi ngày</dt>
+              <dd className="cd-so">
+                {theLuc} lượt{tuDong ? ' (tự tính)' : ''}
+              </dd>
+            </div>
+            <div>
+              <dt>Khối lượng</dt>
+              <dd>{sc ? <span className={`cd-chip-muc cd-chip-muc--${sc.muc} cd-so`}>{`${phanTram(sc.tiLe)} · ${CHU_MUC[sc.muc]}`}</span> : '—'}</dd>
+            </div>
+            <div>
+              <dt>Dự kiến</dt>
+              <dd className="cd-so">
+                {!sc
+                  ? '—'
+                  : soNgayCan <= sc.D
+                    ? `Em ở giữa lớp làm đủ lượt trước 23:59 · ${hienNgay(ngayXong, false)}`
+                    : `Em ở giữa lớp cần ${soNgayCan} ngày, còn ${sc.D} ngày — chưa kịp hạn`}
+              </dd>
+            </div>
+            <div>
+              <dt>Em dự kiến quá tải</dt>
+              <dd className="cd-so">{sc ? `${sc.soEmQuaTai} / ${sc.soEm} em` : '—'}</dd>
+            </div>
+          </dl>
+          {loiGiao && (
+            <p className="cd-loi" role="alert">
+              {loiGiao}
+            </p>
           )}
-        </HopChon>
-      )}
+          <div className="cd-tom-tat-nut">
+            <button type="button" className="m3-nut-chinh" disabled={!duDauVao || !sc || dangTinh || dangGiao} onClick={() => void giao()}>
+              {dangGiao ? 'Đang giao…' : `Giao chiến dịch cho ${soEm} em`}
+            </button>
+            {onDeSau && (
+              <button type="button" className="m3-nut-vien" onClick={onDeSau}>
+                Để sau
+              </button>
+            )}
+            <p className="cd-phu">Các em thấy chiến dịch trong game ngay khi giao. Huỷ được ngay sau khi giao nếu nhầm.</p>
+          </div>
+        </aside>
+      </div>
     </section>
   )
+}
+
+/** Mức độ xếp theo thứ tự quen (Nhận biết → Vận dụng cao), mức lạ đứng sau. */
+const THU_TU_MUC = ['nhận biết', 'nb', 'thông hiểu', 'th', 'vận dụng', 'vd', 'vận dụng cao', 'vdc']
+function thuTuMucDo(m: Record<string, number> | undefined): { ten: string; n: number }[] {
+  if (!m) return []
+  const vi = (t: string) => {
+    const i = THU_TU_MUC.indexOf(t.trim().toLowerCase())
+    return i < 0 ? 99 : i
+  }
+  return Object.entries(m)
+    .filter(([, n]) => n > 0)
+    .map(([ten, n]) => ({ ten, n }))
+    .sort((a, b) => vi(a.ten) - vi(b.ten) || a.ten.localeCompare(b.ten, 'vi'))
 }
