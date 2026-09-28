@@ -195,7 +195,12 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
   {!phanHoi?<>
    <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)}/>
    {hinhLoi&&<p role="alert" className="dao2-loi">Hình của câu chưa tải được. Em về bản đồ rồi bấm LÊN ĐƯỜNG để mở lại; câu này chưa bị tính sai.</p>}
-   {!goiY&&<label className="dao2-tro"><input type="checkbox" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/> Em có dùng tài liệu hoặc được trợ giúp ở câu này</label>}
+   {/* Ô "có trợ giúp" (thầy 28/09: thiết kế lại tinh tế, hợp ngữ cảnh): thẻ gạt nhỏ — bật ⇒ máy chủ ghi `assisted`, câu chưa tính Thành thạo và quay lại sớm. */}
+   {!goiY&&<label className="dao2-tro" data-bat={assisted?'':undefined}>
+    <span className="dao2-tro-bt" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 7v13M3 5.5A2.5 2.5 0 0 1 5.5 3H10a2 2 0 0 1 2 2 2 2 0 0 1 2-2h4.5A2.5 2.5 0 0 1 21 5.5V18h-7a2 2 0 0 0-2 2 2 2 0 0 0-2-2H3z"/></svg></span>
+    <span className="dao2-tro-chu"><b>Câu này em có trợ giúp</b><small>Xem tài liệu hoặc được chỉ bài thì bật lên · câu sẽ quay lại để em tự làm</small></span>
+    <input type="checkbox" role="switch" className="dao2-tro-gat" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/>
+   </label>}
   </>:<KhoiLoiGiai cau={q} stt={viTri+1} phanHoi={phanHoi} traLoiMay={traLoi} onZoom={setZoom}/>}
   <div className="dao2-chan" data-noi={phanHoi||!thieu||loi?'':undefined}>
    {hetTran&&!phanHoi?<div className="dao2-kinh dao2-het-tran" role="alert"><p ref={loiRef}>{CHU_HET_TRAN_DAO}</p><button type="button" className="dao2-nut-vang" onClick={onRoi}>VỀ BẢN ĐỒ</button></div>
