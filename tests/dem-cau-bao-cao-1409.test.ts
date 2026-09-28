@@ -9,10 +9,14 @@
 import { describe, expect, it } from 'vitest'
 import fs from 'node:fs'
 import path from 'node:path'
+import { baoCaoCuaEm } from '../src/lib/bao-cao-cua-em'
+import { nguonBaoCaoEmMoi } from './_bao-cao-em-moi'
 
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const SRV = doc('server/src/goi-cu.ts')
-const HS_MODAL = doc('src/components/BaoCaoCaThiHocSinhModal.tsx')
+// 28/09: báo cáo cũ `BaoCaoCaThiHocSinhModal` ĐÃ XOÁ — luật "số câu chỉ số thật" nay khoá ở BẢN MỚI phía em
+// (BaoCaoCaCuaEm → BaoCaoChiTiet chế độ em, số dựng bằng lib/bao-cao-cua-em).
+const HS_MOI = nguonBaoCaoEmMoi()
 const PH_MODAL = doc('src/components/BaoCaoCaThiPhuHuynhModal.tsx')
 
 /** Mọi công thức suy số câu từ điểm đã từng tồn tại trong mã. */
@@ -67,10 +71,15 @@ describe('MÁY CHỦ — số câu chỉ đến từ bảng chấm', () => {
 })
 
 describe('BA APP — không màn nào tự dựng số câu', () => {
-  it('báo cáo cổng HỌC SINH bỏ hết công thức suy từ điểm', () => {
-    for (const ct of CONG_THUC_BIA) expect(HS_MODAL, ct).not.toContain(ct)
-    expect(HS_MODAL).toContain("const tongCau = baiThi.tongCau && baiThi.tongCau > 0 ? baiThi.tongCau : null")
-    expect(HS_MODAL).toContain('const coDemCau = tongCau !== null && soDung !== null')
+  it('báo cáo cổng HỌC SINH (bản mới) bỏ hết công thức suy từ điểm; chưa chấm ⇒ null, không bịa', () => {
+    for (const ct of CONG_THUC_BIA) expect(HS_MOI, ct).not.toContain(ct)
+    // chỉ nhận số của máy chủ khi hợp lệ, không thì đếm từ bảng chấm thật, không có gì thì null
+    expect(HS_MOI).toContain('const hopLe = dungLs !== null && tongLs !== null && tongLs > 0')
+    const chuaCham = baoCaoCuaEm({ maCa: 'X', tong: 1.56 }, null)
+    expect(chuaCham.dung).toBeNull()
+    expect(chuaCham.tongCau).toBeNull()
+    // điểm 1,56 KHÔNG được biến thành "đúng 2/12" hay "đúng x/28"
+    expect(baoCaoCuaEm({ maCa: 'X', tong: 1.56, tongCau: 0, soCauDung: 0 }, []).tongCau).toBeNull()
   })
 
   it('báo cáo cổng PHỤ HUYNH bỏ hết công thức suy từ điểm', () => {
@@ -82,9 +91,10 @@ describe('BA APP — không màn nào tự dựng số câu', () => {
   it('không màn nào còn số câu gõ cứng 28 hay 40', () => {
     expect(doc('src/screens/HocSinhScreen.tsx')).not.toContain('tongCau: 40')
     expect(doc('src/screens/ExamMonitorScreen.tsx')).not.toContain('.items.length) : 40)')
-    for (const f of [HS_MODAL, PH_MODAL]) {
+    for (const f of [HS_MOI, PH_MODAL]) {
       expect(f).not.toContain('Math.max(28, dsCauSai.length)')
     }
+    expect(HS_MOI).not.toMatch(/tongCau\s*[:=]\s*(28|40)\b/)
   })
 
   it('chưa chấm thì GIẤU dòng đếm, không hiện "Đúng 0/0 câu"', () => {
@@ -94,9 +104,16 @@ describe('BA APP — không màn nào tự dựng số câu', () => {
   })
 
   it('danh sách câu sai THẬT vẫn được dùng khi máy chủ chưa trả số', () => {
-    for (const f of [HS_MODAL, PH_MODAL]) {
-      expect(f).toContain("dsCauSai.length > 0 ? dsCauSai.length : null")
-    }
+    expect(PH_MODAL).toContain("dsCauSai.length > 0 ? dsCauSai.length : null")
+    // bản mới phía em: lịch sử thiếu số ⇒ đếm từ bảng chấm thật của ca (/hs/cau-da-thi)
+    const bc = baoCaoCuaEm({ maCa: 'X', tong: 5 }, [
+      { maCa: 'X', phan: 'I', soCau: 1, dungSai: true, dapAnChon: 'A', dapAnDung: 'A' },
+      { maCa: 'X', phan: 'I', soCau: 2, dungSai: false, dapAnChon: 'B', dapAnDung: 'C' },
+      { maCa: 'X', phan: 'III', soCau: 1, dungSai: false, dapAnChon: '', dapAnDung: '5' },
+    ])
+    expect(bc.tongCau).toBe(3)
+    expect(bc.dung).toBe(1)
+    expect(bc.cauXemLai).toHaveLength(2)
   })
 })
 
@@ -138,8 +155,9 @@ describe('Nút mở bài đã nộp nói đúng việc nó làm', () => {
     const SP = doc('src/screens/StudentPortalScreen.tsx')
     expect(SP).toContain('Xem đề và lời giải kèm lỗi sai')
     expect(SP).not.toContain('Mở lại bài thi')
-    expect(HS_MODAL).toContain('Xem đề và lời giải kèm lỗi sai')
-    expect(HS_MODAL).not.toContain('Mở lại bài thi')
+    // báo cáo bản mới phía em: nút "Xem đề và lời giải cả ca" — không bao giờ "Mở lại bài thi"
+    expect(HS_MOI).toContain('Xem đề và lời giải cả ca')
+    expect(HS_MOI).not.toContain('Mở lại bài thi')
   })
 })
 

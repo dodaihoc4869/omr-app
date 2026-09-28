@@ -1,5 +1,5 @@
 // TÓM TẮT THAY ĐỔI KHI SỬA CHIẾN DỊCH (thầy 28/09) — MỘT nguồn cho hộp "Chỉnh sửa" của app thầy và dòng nhật ký máy chủ.
-// Ví dụ: "+2 đề, +3 em, −1 em, hạn 30/09 → 05/10". Không có thay đổi ⇒ chuỗi rỗng.
+// Ví dụ: "+2 đề, +3 em, −1 em, hạn 30/09 → 05/10, bắt đầu 30/09 → 01/10". Không có thay đổi ⇒ chuỗi rỗng.
 
 export interface ThayDoiChienDich {
   /** Số tờ đề thêm vào. */
@@ -10,6 +10,9 @@ export interface ThayDoiChienDich {
   hanCu: string
   /** Hạn mới (`null` = giữ hạn cũ). */
   hanMoi: string | null
+  /** Ngày bắt đầu cũ → mới (thầy 28/09); vắng hoặc `null` = không đổi. */
+  batDauCu?: string
+  batDauMoi?: string | null
   /** Số câu/ngày (thể lực) cũ → mới; vắng hoặc bằng nhau = không đổi. */
   theLucCu?: number
   theLucMoi?: number | null
@@ -28,6 +31,7 @@ export function chuTomTatSua(t: ThayDoiChienDich): string {
   if (t.themEm > 0) phan.push(`+${t.themEm} em`)
   if (t.botEm > 0) phan.push(`−${t.botEm} em`)
   if (t.hanMoi && t.hanMoi !== t.hanCu) phan.push(`hạn ${ngayNgan(t.hanCu)} → ${ngayNgan(t.hanMoi)}`)
+  if (t.batDauMoi && t.batDauCu && t.batDauMoi !== t.batDauCu) phan.push(`bắt đầu ${ngayNgan(t.batDauCu)} → ${ngayNgan(t.batDauMoi)}`)
   if (t.theLucMoi != null && t.theLucCu != null && t.theLucMoi !== t.theLucCu) phan.push(`số câu/ngày ${t.theLucCu} → ${t.theLucMoi}`)
   return phan.join(', ')
 }

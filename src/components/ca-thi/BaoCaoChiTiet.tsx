@@ -62,6 +62,12 @@ export interface BaoCaoChiTietProps {
   onKhacPhuc?: () => void
   /** Chế độ `hs`: mở tờ "Đề và lời giải kèm lỗi sai" của cả ca (phiếu HTML dựng tại máy). Thiếu ⇒ không có nút. */
   onXemDe?: () => void
+  /** Chế độ `hs`: lý do KHÔNG tải được kết quả của em (cấm nuốt lỗi — không được rơi thành "chưa có điểm đã công bố"). */
+  loiEm?: string | null
+  /** Chế độ `hs`: lý do KHÔNG tải được từng câu (không được rơi thành "Em đúng trọn mọi câu"). */
+  loiCauEm?: string | null
+  /** Chế độ `hs`: hỏi lại máy chủ sau khi tải hỏng (trạng thái lỗi = lý do thật + thử lại). */
+  onThuLaiEm?: () => void
 }
 
 function Vong({ diem, co = 140 }: { diem: number; co?: number }) {
@@ -364,6 +370,11 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
   const dongHs = hs.find((h) => h.sbd === p.sbdEm)
   const b = p.emBc
   const hang = dongHs ? 1 + hs.filter((x) => x.tong > dongHs.tong).length : b?.soVoiLop?.hang ?? null
+  const nutThuLai = p.onThuLaiEm ? (
+    <button type="button" className="ct-nut ct-nut-vien ct-nut-nho ct-khong-in" style={{ marginLeft: 8 }} onClick={p.onThuLaiEm}>
+      Thử lại
+    </button>
+  ) : null
   const trangEm = (
     <div className="ct-bc-trang" data-trang="em">
       {dauIn(laHs ? `Báo cáo của em · ${p.tenCa}` : `Báo cáo của em · ${p.sbdEm ? tenEm(p.sbdEm) : ''}`)}
@@ -385,7 +396,10 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
       {!p.sbdEm ? (
         <div className="ct-tam ct-ghi">Chọn một em để xem báo cáo.</div>
       ) : !b || b.tong === null ? (
-        <div className="ct-tam ct-ghi">{b && !b.daNop ? 'Em chưa nộp bài ca này.' : laHs && !p.dangTai ? 'Ca này chưa có điểm đã công bố.' : 'Đang tổng hợp báo cáo của em…'}</div>
+        <div className="ct-tam ct-ghi" role={laHs && !p.dangTai && p.loiEm ? 'alert' : undefined}>
+          {b && !b.daNop ? 'Em chưa nộp bài ca này.' : laHs && !p.dangTai ? p.loiEm || 'Ca này chưa có điểm đã công bố.' : 'Đang tổng hợp báo cáo của em…'}
+          {laHs && !p.dangTai && p.loiEm && nutThuLai}
+        </div>
       ) : (
         <>
           <div className="ct-tam">
@@ -488,7 +502,10 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
                 </div>
               </div>
               {b.phan.every((x) => x.cau.length === 0) ? (
-                <p className="ct-ghi">Chưa có bảng chấm từng câu của em.</p>
+                <p className="ct-ghi" role={laHs && p.loiCauEm ? 'alert' : undefined}>
+                  {laHs && p.loiCauEm ? p.loiCauEm : 'Chưa có bảng chấm từng câu của em.'}
+                  {laHs && p.loiCauEm && nutThuLai}
+                </p>
               ) : (
                 b.phan.map((x) =>
                   x.cau.length === 0 ? null : (
@@ -577,7 +594,7 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
                 </div>
               )}
               {b.cauXemLai.length === 0 ? (
-                <p className="ct-ghi">{laHs ? 'Em đúng trọn mọi câu của ca này.' : 'Không có câu nào cần xem lại.'}</p>
+                <p className="ct-ghi">{laHs ? (p.loiCauEm ? p.loiCauEm : b.coBangCham ? 'Em đúng trọn mọi câu của ca này.' : 'Chưa có bảng chấm từng câu của em.') : 'Không có câu nào cần xem lại.'}</p>
               ) : (
                 <div className="ct-xem-lai">
                   {b.cauXemLai.map((c) => {

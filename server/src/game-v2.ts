@@ -39,7 +39,7 @@ import {ghiKhoanExpGame} from './exp-d1'
 import {LENH_SHOP,shopAction,shopBatCho} from './game-v2-shop'
 import {LENH_BIA,biaAction,biaChoSanh} from './bi-a'
 import {expMotCau} from './exp-hoc-tap'
-export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
+export interface Profile {nickname?:string;/** Đếm lượt đổi tên trong ngày VN (rename). */doiTen?:{ngay:string;lan:number};academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
 type Row={revision:number;json:string}
 type Session={doan?:number;guardian?:string;guardianRound?:number;mode:Mode;questions:{qid:string;maDe:string;version:string;group:string;novel:boolean;role?:string}[];created:number}
 const now=()=>new Date().toISOString()
@@ -248,6 +248,8 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>):Pro
   }
   return r
 }
+/** Số lần đổi tên thần thú tối đa mỗi ngày (máy chủ đếm). */
+export const DOI_TEN_MOI_NGAY=3
 async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise<Record<string,unknown>> {
   const sbd=await gameIdentity(env,b)
   if(action==='sync')return {ok:true,...await syncIndex(env)}
@@ -274,7 +276,13 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     for(const q of scope.pool){if(!q.reviewed||laTuLuanPool(q)||!allowed(q,scope.evidence,blocked)||control.types.length&&(!q.dang||!control.types.includes(q.dang)))continue;const key=q.dang??q.group;if(!ds.has(key))ds.set(key,{key,ten:q.tenDang||'',chuong:q.dang?.split('.')[0]??''})}
     return {ok:true,dang:[...ds.values()].sort((a,b)=>a.key.localeCompare(b.key))}
   }
-  if(action==='rename'){if(p.choice)throw new Error('Em chọn thần thú trước khi đặt tên.');p.nickname=normalizePetName(b.name);return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision)}}
+  // ĐỔI TÊN THẦN THÚ: chỉ hồ sơ của CHÍNH em (sbd lấy từ token, bỏ qua `sbd` gửi kèm); luật tên ở pet-name.ts (1–16 ký tự, lọc từ tục);
+  // tối đa DOI_TEN_MOI_NGAY lần/ngày VN, đếm trong hồ sơ (`doiTen`, trường chỉ-thêm). Gửi lại đúng tên đang dùng ⇒ không tính lượt.
+  if(action==='rename'){if(p.choice)throw new Error('Em chọn thần thú trước khi đặt tên.');const ten=normalizePetName(b.name),ngay=academicDay(now())
+    const da=p.doiTen?.ngay===ngay?p.doiTen.lan:0
+    if(ten===p.nickname)return {ok:true,profile:visible(p),revision,doiTenConLai:Math.max(0,DOI_TEN_MOI_NGAY-da)}
+    if(da>=DOI_TEN_MOI_NGAY)throw new Error(`Hôm nay em đã đổi tên ${DOI_TEN_MOI_NGAY} lần rồi. Mai em đổi tiếp nhé.`)
+    p.nickname=ten;p.doiTen={ngay,lan:da+1};return {ok:true,profile:visible(p),revision:await save(env,sbd,p,revision),doiTenConLai:DOI_TEN_MOI_NGAY-da-1}}
   if(action==='share')return {ok:true,pass:await parentPass(env,sbd)}
   if(action==='profile'){const tasks=await env.DB.prepare('SELECT id,dang FROM game_v2_task WHERE sbd=? AND completed_at IS NULL ORDER BY created_at LIMIT 20').bind(sbd).all<{id:string;dang:string}>();const tranHapThu=await docTranHapThu(env,sbd,academicDay(now()));const dauVaoLuot=await docDauVaoLuot(env,sbd,academicDay(now()),Date.now(),tranHapThu.dat);return {ok:true,profile:visible(p,{tran:tranHapThu.tran,soCauHomNay:tranHapThu.soCauHomNay,canCau:tranHapThu.canCau}),revision,luot:tomTatLuot(luotHomNay(dauVaoLuot),dauVaoLuot.soLuotDaLam),tasks:tasks.results,doanMo:await doanMoCho(env,sbd)}}
   if(action==='khien-ren'){

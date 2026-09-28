@@ -60,16 +60,18 @@ describe('2. Đếm câu — không app nào được tự trừ ngược nữa'
   const nguon = [
     'src/screens/StudentPortalScreen.tsx',
     // ParentPortalScreen: ĐÃ GỠ khỏi danh sách (app PH một màn một nút, 21/09 — màn không còn danh sách ca/đếm câu; báo cáo ca nằm ở BaoCaoCaThiPhuHuynhModal bên dưới).
-    'src/components/BaoCaoCaThiHocSinhModal.tsx',
     'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
   ]
+  // 28/09: modal học sinh cũ ĐÃ XOÁ — báo cáo của em bản mới (BaoCaoCaCuaEm → BaoCaoChiTiet chế độ em) vẽ số theo bản vẽ thầy chốt,
+  // không qua DongDemCau; luật "không tự trừ ngược" vẫn phủ cả ba tệp của nó.
+  const baoCaoEmMoi = ['src/components/ca-thi/BaoCaoCaCuaEm.tsx', 'src/components/ca-thi/BaoCaoChiTiet.tsx', 'src/lib/bao-cao-cua-em.ts']
 
-  it('cả ba app dùng CHUNG một khuôn DongDemCau', () => {
+  it('cổng học sinh + phụ huynh dùng CHUNG một khuôn DongDemCau', () => {
     for (const f of nguon) expect(doc(f)).toContain('DongDemCau')
   })
 
   it('không còn công thức "tongCau - soCauDung" ở bất kỳ app nào', () => {
-    for (const f of nguon) {
+    for (const f of [...nguon, ...baoCaoEmMoi]) {
       const t = doc(f)
       expect(t, f).not.toMatch(/tongCau\s*-\s*\(?\s*item\.soCauDung/)
       expect(t, f).not.toMatch(/tongSoCau\s*-\s*b\.soCauDung/)

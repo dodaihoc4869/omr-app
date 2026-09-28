@@ -1,7 +1,8 @@
 // HỘP CHỈNH SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09): "thêm đề, thêm bớt học sinh, chỉnh lại hạn; lưu lại thì phân bổ lại số câu nếu thêm đề".
 // Khung M3 `HopChon` (cùng hộp chọn của màn chiến dịch); dùng lại cây Kho đề `HopChonDe` + bộ chọn em `ChonEmGiao` của màn Giao.
 // Máy chủ `/gv/chien-dich/sua`: `doc` (em + tờ + hạn hiện tại) · `xem-truoc` (không ghi — số câu sau khi thêm) · `luu`.
-// Tóm tắt thay đổi trước khi lưu: "+2 đề, +3 em, −1 em, hạn 30/09 → 05/10" (`chuTomTatSua`, một nguồn với nhật ký máy chủ).
+// Ngày bắt đầu (thầy 28/09): sửa được khi chiến dịch chưa bắt đầu; đã bắt đầu ⇒ ô khoá kèm chú thích.
+// Tóm tắt thay đổi trước khi lưu: "+2 đề, +3 em, −1 em, hạn 30/09 → 05/10, bắt đầu 30/09 → 01/10" (`chuTomTatSua`, một nguồn với nhật ký máy chủ).
 // Nút "Lưu" mờ đi khi đang lưu, GIỮ NGUYÊN chữ.
 // Số câu/ngày (Boss chốt 28/09): thêm đề / rút hạn mà không kịp ⇒ máy tự NÂNG (không tự hạ), hiện "Số câu/ngày: 12 → 15 (để kịp hạn 05/10)";
 // thầy sửa tay được (số nguyên ≥ 1); thấp hơn mức cần ⇒ cảnh báo vàng "chưa kịp hạn", vẫn cho lưu.
@@ -13,7 +14,7 @@ import { docChienDichDeSua, luuSuaChienDich, xemTruocSua, type ChienDichDeSua, t
 import ChonEmGiao from './ChonEmGiao'
 import HopChon from './HopChon'
 import { useDsEmGiao, useKhoDe } from './nguon-giao'
-import { hienHanNop, laNgay } from './ngay'
+import { hienHanNop, hienNgay, laNgay } from './ngay'
 import './chien-dich.css'
 import './sua-chien-dich.css'
 
@@ -30,6 +31,7 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
   const [moCay, setMoCay] = useState(false)
   const [chonEm, setChonEm] = useState<Set<string>>(new Set())
   const [hanNop, setHanNop] = useState('')
+  const [batDau, setBatDau] = useState('')
   /** Chữ thầy gõ ở ô số câu/ngày; rỗng = để máy tự tính. */
   const [theLucTay, setTheLucTay] = useState('')
   const [xem, setXem] = useState<KetQuaSua | null>(null)
@@ -53,6 +55,7 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
       setGoc({ homNay: r.du.homNay, cd: r.du.chienDich })
       setChonEm(new Set(r.du.chienDich.sbd))
       setHanNop(r.du.chienDich.hanNop)
+      setBatDau(r.du.chienDich.batDau ?? '')
     })
     return () => {
       huy = true
@@ -69,24 +72,30 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
   const homNay = goc?.homNay ?? ''
   const hanMoi = goc && hanNop !== goc.cd.hanNop ? hanNop : null
   const hanHopLe = !hanMoi || (laNgay(hanMoi) && hanMoi >= homNay)
+  // Ngày bắt đầu (thầy 28/09): chỉ sửa khi chiến dịch CHƯA bắt đầu; không trước hôm nay, không sau hạn nộp.
+  const daBatDau = !goc?.cd.batDau || goc.cd.daBatDau !== false
+  const batDauMoi = goc && !daBatDau && batDau !== goc.cd.batDau ? batDau : null
+  const loiBatDau = !batDauMoi ? '' : !laNgay(batDauMoi) || batDauMoi < homNay ? 'Ngày bắt đầu phải từ hôm nay trở đi' : laNgay(hanNop) && batDauMoi > hanNop ? 'Ngày bắt đầu không được sau hạn nộp' : ''
+  const batDauSauHopLe = !goc?.cd.batDau || !laNgay(hanNop) || (batDauMoi ?? goc.cd.batDau) <= hanNop
+  const batDauHopLe = !loiBatDau && batDauSauHopLe
   const soTay = theLucTay.trim() === '' ? null : Number(theLucTay)
   const theLucGui = soTay != null && Number.isInteger(soTay) && soTay >= 1 ? Math.min(THE_LUC_TOI_DA, soTay) : null
   const theLucHopLe = theLucTay.trim() === '' || theLucGui != null
-  const tt = { themDe: themDe.length, themEm: themSbd.length, botEm: botSbd.length, hanCu: goc?.cd.hanNop ?? '', hanMoi, theLucCu: goc?.cd.theLucNgay }
+  const tt = { themDe: themDe.length, themEm: themSbd.length, botEm: botSbd.length, hanCu: goc?.cd.hanNop ?? '', hanMoi, batDauCu: goc?.cd.batDau, batDauMoi, theLucCu: goc?.cd.theLucNgay }
   // Có thay đổi do THẦY làm (chưa tính phần máy tự nâng — phần đó chỉ có sau khi xem trước).
   const coThayDoi = !!goc && chuTomTatSua({ ...tt, theLucMoi: theLucGui }) !== ''
   const tomTat = goc ? chuTomTatSua({ ...tt, theLucMoi: theLucGui ?? xem?.theLucNgay ?? null }) : ''
   const daDung = !!goc && (goc.cd.hetHan || goc.cd.trangThai === 'da_dong')
   const thayDoi: ThayDoiGui = useMemo(
-    () => ({ ...(themDe.length ? { themMaDe: themDe } : {}), ...(themSbd.length ? { themSbd } : {}), ...(botSbd.length ? { botSbd } : {}), ...(hanMoi ? { hanNop: hanMoi } : {}), ...(theLucGui != null ? { theLucNgay: theLucGui } : {}) }),
-    [themDe, themSbd, botSbd, hanMoi, theLucGui],
+    () => ({ ...(themDe.length ? { themMaDe: themDe } : {}), ...(themSbd.length ? { themSbd } : {}), ...(botSbd.length ? { botSbd } : {}), ...(hanMoi ? { hanNop: hanMoi } : {}), ...(batDauMoi ? { batDau: batDauMoi } : {}), ...(theLucGui != null ? { theLucNgay: theLucGui } : {}) }),
+    [themDe, themSbd, botSbd, hanMoi, batDauMoi, theLucGui],
   )
   const khoaThayDoi = JSON.stringify(thayDoi)
 
   // ---- xem trước ở máy chủ (số câu sau khi thêm đề, tờ không có câu mới, mở lại); câu trả lời cũ về muộn thì bỏ
   const luot = useRef(0)
   useEffect(() => {
-    if (!goc || !coThayDoi || !hanHopLe || !theLucHopLe) {
+    if (!goc || !coThayDoi || !hanHopLe || !batDauHopLe || !theLucHopLe) {
       luot.current++
       setXem(null)
       setLoiXem('')
@@ -110,13 +119,13 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
     }, CHO_XEM_MS)
     return () => clearTimeout(hen)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [khoaThayDoi, goc, coThayDoi, hanHopLe, theLucHopLe, id])
+  }, [khoaThayDoi, goc, coThayDoi, hanHopLe, batDauHopLe, theLucHopLe, id])
 
   const tichTuCay = (m: string) => setThemDe((cu) => (cu.includes(m) ? cu.filter((x) => x !== m) : [...cu, m]))
   const datChonTuCay = (ma: string[]) => setThemDe([...new Set(ma)])
 
   const luu = async () => {
-    if (dangLuu || !coThayDoi || !hanHopLe || !theLucHopLe || !goc) return
+    if (dangLuu || !coThayDoi || !hanHopLe || !batDauHopLe || !theLucHopLe || !goc) return
     setDangLuu(true)
     setLoiLuu('')
     const r = await luuSuaChienDich(id, thayDoi)
@@ -128,7 +137,7 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
     onDaLuu(r.du)
   }
 
-  const luuDuoc = !!goc && coThayDoi && hanHopLe && theLucHopLe && !dangLuu && !dangXem && !loiXem
+  const luuDuoc = !!goc && coThayDoi && hanHopLe && batDauHopLe && theLucHopLe && !dangLuu && !dangXem && !loiXem
   const daChonDe = useMemo(() => new Set(themDe), [themDe])
 
   // Cổng ra document.body nằm NGOÀI vỏ `.m3.vo-thay` ⇒ mất token màu (--m3-surface-container-high…) ⇒ hộp trong suốt (thầy 28/09).
@@ -202,7 +211,18 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
 
             {/* ---- Hạn nộp ---- */}
             <section className="scd-muc" aria-labelledby="scd-han">
-              <h3 id="scd-han" className="scd-tieu-de">Hạn nộp</h3>
+              <h3 id="scd-han" className="scd-tieu-de">{goc.cd.batDau ? 'Ngày bắt đầu và hạn nộp' : 'Hạn nộp'}</h3>
+              {goc.cd.batDau && (
+                <label className="cd-truong" data-khoi="ngay-bat-dau">
+                  Ngày bắt đầu
+                  <input type="date" value={batDau} min={homNay} max={laNgay(hanNop) ? hanNop : undefined} disabled={daBatDau} onChange={(e) => setBatDau(e.target.value)} />
+                  <small className="cd-so cd-phu">
+                    {daBatDau
+                      ? `Đã bắt đầu ${hienNgay(goc.cd.batDau)} — không đổi được ngày bắt đầu`
+                      : loiBatDau || (!batDauSauHopLe ? 'Ngày bắt đầu không được sau hạn nộp' : `${hienNgay(batDau)} — trước ngày này em chưa nhận câu`)}
+                  </small>
+                </label>
+              )}
               <label className="cd-truong">
                 Hạn nộp (hết lúc 23:59)
                 <input type="date" value={hanNop} min={homNay} onChange={(e) => setHanNop(e.target.value)} />

@@ -7,6 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import BaoCaoCaThiPhuHuynhModal from '../src/components/BaoCaoCaThiPhuHuynhModal'
 import { danhGiaBai } from '../src/lib/danh-gia-bai'
+import { CA_MAU, TEP_BAO_CAO_EM_MOI, veBaoCaoEmMoi } from './_bao-cao-em-moi'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 
@@ -25,11 +26,22 @@ afterEach(() => {
 })
 
 describe('báo cáo ca thi không kết luận năng lực từ điểm số', () => {
-  it('mã nguồn hai modal báo cáo và danh-gia-bai.ts không còn các cụm bị cấm', () => {
-    for (const f of ['src/components/BaoCaoCaThiPhuHuynhModal.tsx', 'src/components/BaoCaoCaThiHocSinhModal.tsx', 'src/lib/danh-gia-bai.ts']) {
+  it('mã nguồn modal phụ huynh, báo cáo em bản mới và danh-gia-bai.ts không còn các cụm bị cấm', () => {
+    // 28/09: modal học sinh cũ ĐÃ XOÁ — báo cáo của em nay là BaoCaoCaCuaEm → BaoCaoChiTiet chế độ em (lib/bao-cao-cua-em)
+    for (const f of ['src/components/BaoCaoCaThiPhuHuynhModal.tsx', ...TEP_BAO_CAO_EM_MOI, 'src/lib/danh-gia-bai.ts']) {
       expect(doc(f).match(CAM)?.[0] ?? null, f).toBeNull()
     }
   })
+
+  for (const diem of [9.75, 8.5, 5.25]) {
+    it(`báo cáo em bản mới ở điểm ${diem}: chỉ nói số liệu, không cụm kết luận năng lực`, () => {
+      const { container } = veBaoCaoEmMoi({ ...CA_MAU, tong: diem })
+      const chu = container.textContent || ''
+      expect(chu).toContain(String(diem).replace('.', ','))
+      expect(chu.match(CAM)?.[0] ?? null).toBeNull()
+      expect(chu.match(/năng lực|nền tảng|lỗ hổng/i)?.[0] ?? null).toBeNull()
+    })
+  }
 
   for (const diem of [9.75, 8.5, 7, 5.25]) {
     it(`modal phụ huynh ở điểm ${diem}: lời khuyên NÊU đúng con số ${diem.toFixed(2)}/10 và không có cụm bị cấm`, () => {

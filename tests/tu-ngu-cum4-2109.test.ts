@@ -26,7 +26,11 @@ const TEP_HS_PH = [
   'src/components/ModalKhacPhucCauSai.tsx',
   'src/components/BangTinPhuHuynh.tsx',
   'src/components/BaoCaoCaThiPhuHuynhModal.tsx',
-  'src/components/BaoCaoCaThiHocSinhModal.tsx',
+  // 28/09: modal học sinh cũ ĐÃ XOÁ — báo cáo của em bản mới (nạp + vẽ + số liệu):
+  'src/components/ca-thi/BaoCaoCaCuaEm.tsx',
+  'src/components/ca-thi/BaoCaoChiTiet.tsx',
+  'src/components/ca-thi/CauCanChua.tsx',
+  'src/lib/bao-cao-cua-em.ts',
   'src/components/InfographicHuongDan.tsx',
   'src/components/xem-diem/TheCaGanNhat.tsx', // thay CardCaThiGanNhat.tsx (mồ côi, đã xoá 21/09)
   'src/components/BieuDoTienBoGoogle.tsx',
@@ -55,7 +59,10 @@ describe('chữ mới đúng chuẩn', () => {
     for (const t of ['src/components/bang-nhiem-vu/LichSuCaM3.tsx', 'src/lib/the-ca-gan-nhat.ts', 'src/screens/StudentPortalScreen.tsx'])
       expect(doc(t), t).toMatch(/Ca kiểm tra mã /)
     for (const t of TEP_HS_PH) expect(dongChu(t).join('\n'), t).not.toMatch(/Ca (thi|kiểm tra) #/)
-    expect(doc('src/components/BaoCaoCaThiHocSinhModal.tsx')).toContain('ca kiểm tra (mã {baiThi.maCa})')
+    // báo cáo em bản mới: KHÔNG in mã ca (chặt hơn "Ca kiểm tra mã …"); đường dẫn đầu màn gọi "Ca kiểm tra › <tên ca>"
+    const bc = doc('src/components/ca-thi/BaoCaoChiTiet.tsx')
+    expect(bc).toContain('Ca kiểm tra › {p.tenCa}')
+    expect(bc).not.toMatch(/\{p\.maCa\}/)
   })
   it('cổng vào ca: nhãn "Vào ca kiểm tra trực tuyến", "Mã ca kiểm tra (thường 6 chữ số)", "Vào ca kiểm tra"; LUẬT kiểm mã 4–8 chữ số GIỮ NGUYÊN', () => {
     const form = doc('src/components/bang-nhiem-vu/VaoThiForm.tsx')
