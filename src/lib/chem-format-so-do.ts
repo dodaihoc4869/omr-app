@@ -302,6 +302,9 @@ export function gomTuCongThuc<T>(ds: T[], chu: (x: T) => string | null, taoChu: 
       ra.push({ lien: false, x: n.x })
       continue
     }
+    // Trước mũi tên luôn được ngắt dòng (phiếu gỡ dấu cách quanh mũi tên, không
+    // cắt ở đây thì cả sơ đồ thành MỘT từ không xuống dòng được, tràn khổ giấy).
+    if (laMui(n.x)) chot()
     tu.push(n)
   }
   chot()
