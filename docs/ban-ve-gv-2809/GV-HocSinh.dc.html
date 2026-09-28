@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Hồ sơ học sinh</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Lấy từ src/styles/tokens.css (--bts-* bản sáng) + src/components/bang-nhiem-vu/m3-theme.css (--m3-primary*) */
+  --nen:#f8fafd; --mat:#ffffff; --mat-2:#f0f4f9; --vien:#dde3ea; --luoi:#eaeef3; --xam-o:#e3e8ef; --xam-thanh:#cbd3dd;
+  --chu:#1f1f1f; --chu-phu:#444746; --chu-mo:#656b73;
+  --nhan:#0b57d0; --nhan-nen:#d3e3fd; --tren-nhan-nen:#041e49; --duong:#1a73e8; --duong-nhat:#e8f0fe;
+  --la:#188038; --la-nhat:#e6f4ea; --do:#d93025; --do-nhat:#fce8e6; --vang:#f9ab00; --vang-nhat:#fef7e0; --vang-chu:#8a5a00;
+  /* Dải tuần tự MỘT sắc xanh cho mức thành thạo (nhạt → đậm) */
+  --t1:#d3e3fd; --t2:#a8c7fa; --t3:#7cacf8; --t4:#0842a0;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--nen);color:var(--chu);font-size:14px;line-height:1.4;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button{font-family:inherit}
+a{text-decoration:none}
+.man{width:1440px;height:900px;display:flex;overflow:hidden;background:var(--nen);position:relative}
+/* ---- thanh bên ---- */
+.ben{width:240px;flex:none;background:var(--mat);border-right:1px solid var(--vien);display:flex;flex-direction:column;padding:18px 12px 14px;gap:2px}
+.logo{display:flex;align-items:center;gap:10px;padding:2px 10px 18px}
+.logo b{display:block;font-size:15px;font-weight:800;letter-spacing:.2px;line-height:1.2}
+.logo small{display:block;font-size:12px;color:var(--chu-mo);font-weight:500}
+.nut-ca{height:44px;border-radius:12px;border:0;background:var(--nhan);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;padding:0 16px;margin-bottom:14px}
+.muc{height:42px;border-radius:10px;display:flex;align-items:center;gap:12px;padding:0 12px;color:var(--chu-phu);font-weight:600;font-size:14px;text-decoration:none}
+.muc svg{flex:none}
+.muc.dang{background:var(--nhan-nen);color:var(--tren-nhan-nen)}
+.muc .dem{margin-left:auto;font-size:12px;font-weight:700;min-width:22px;height:20px;padding:0 7px;border-radius:10px;background:var(--mat-2);color:var(--chu-phu);display:inline-flex;align-items:center;justify-content:center}
+.muc .dem.do{background:var(--do-nhat);color:#a50e0e}
+.muc .dem.la{background:var(--la-nhat);color:#0d652d}
+.muc.nho{height:38px;font-weight:500;font-size:13px}
+.vach{height:1px;background:var(--vien);margin:10px 8px}
+.day-ben{margin-top:auto;display:flex;flex-direction:column;gap:2px}
+.may{font-size:11px;color:var(--chu-mo);padding:8px 12px 0}
+/* ---- vùng chính ---- */
+.chinh{flex:1;min-width:0;padding:22px 28px 20px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.dau{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.dau-trai{min-width:0}
+.vet{font-size:12px;color:var(--chu-mo);font-weight:600;margin-bottom:4px}
+.vet a{color:var(--nhan);text-decoration:none}
+h1{font-size:24px;font-weight:700;margin:0;letter-spacing:-.2px}
+.phu{color:var(--chu-mo);font-size:13px;margin-top:4px}
+.hang{display:flex;gap:12px;align-items:center}
+.luoi{display:grid;gap:16px;min-height:0}
+.the{background:var(--mat);border:1px solid var(--vien);border-radius:12px;padding:16px 18px;min-width:0}
+.the-dau{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.the h2{font-size:15px;font-weight:700;margin:0}
+.the .ghi{font-size:12px;color:var(--chu-mo)}
+.kpi{padding:14px 16px}
+.kpi .nhan-so{font-size:12px;font-weight:600;color:var(--chu-phu);display:flex;gap:6px;align-items:center}
+.kpi .so{font-size:28px;font-weight:700;letter-spacing:-.5px;margin-top:4px;line-height:1.1}
+.kpi .so small{font-size:14px;font-weight:500;color:var(--chu-mo);letter-spacing:0}
+.kpi .so-sanh{font-size:12px;color:var(--chu-mo);margin-top:6px}
+.len{color:var(--la);font-weight:700}.xuong{color:var(--do);font-weight:700}
+.nho{font-size:12px;color:var(--chu-mo)}
+.dam{font-weight:700}
+table.bang{width:100%;border-collapse:collapse}
+.bang th{font-size:12px;color:var(--chu-mo);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--vien);white-space:nowrap;vertical-align:bottom}
+.bang td{padding:8px 10px;border-bottom:1px solid var(--luoi);vertical-align:middle}
+.bang tr:last-child td{border-bottom:0}
+.bang .so-cot{text-align:right}
+.bang th.so-cot{text-align:right}
+.chip{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.chip.tron::before{display:none}
+.chip.la{background:var(--la-nhat);color:#0d652d}.chip.vang{background:var(--vang-nhat);color:var(--vang-chu)}.chip.do{background:var(--do-nhat);color:#a50e0e}
+.chip.xam{background:var(--mat-2);color:var(--chu-phu)}.chip.nhan{background:var(--nhan-nen);color:var(--tren-nhan-nen)}
+.thanh{height:8px;background:var(--xam-o);border-radius:4px;overflow:hidden;position:relative}
+.thanh>i{display:block;height:100%;background:var(--nhan);border-radius:4px}
+.thanh>i.la{background:var(--la)}.thanh>i.vang{background:var(--vang)}.thanh>i.do{background:var(--do)}
+.moc{position:absolute;top:-3px;width:2px;height:14px;background:var(--chu)}
+.nut{height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--xam-thanh);background:var(--mat);font-weight:600;font-size:14px;color:var(--chu);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.nut.chinh-n{background:var(--nhan);color:#fff;border-color:transparent}
+.nut.nho-n{height:32px;padding:0 12px;font-size:13px;border-radius:8px}
+.nut.chu-n{border-color:transparent;background:transparent;color:var(--nhan);padding:0 8px}
+.o-nhap{height:40px;border:1px solid var(--xam-thanh);border-radius:10px;background:var(--mat);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--chu-mo);font-size:14px}
+.loc{display:inline-flex;border:1px solid var(--xam-thanh);border-radius:10px;overflow:hidden;height:36px}
+.loc span{padding:0 12px;display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--chu-phu);border-right:1px solid var(--xam-thanh)}
+.loc span:last-child{border-right:0}
+.loc span.chon{background:var(--nhan-nen);color:var(--tren-nhan-nen)}
+.chu-giai{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--chu-phu);align-items:center}
+.chu-giai i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.t1{background:var(--t1)}.t2{background:var(--t2)}.t3{background:var(--t3)}.t4{background:var(--t4);color:#fff}
+.t0{background:repeating-linear-gradient(135deg,var(--mat-2) 0 4px,var(--mat) 4px 8px);color:var(--chu-mo)}
+.hang-nl{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap}
+.cham{color:var(--xam-thanh);padding:0 6px}
+</style>
+</head>
+<body>
+<div class="man"><nav class="ben" aria-label="Điều hướng chính"><div class="logo"><svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="10" fill="#0b57d0"/><path d="M18 7 27.5 12.5v11L18 29 8.5 23.5v-11z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><circle cx="18" cy="18" r="3.2" fill="#fff"/></svg><div><b>Đỗ Đại Học</b><small>Giáo viên</small></div></div><button class="nut-ca"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Mở ca kiểm tra</button><a class="muc" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Tổng quan</a><a class="muc" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16M8 14h3M8 17h6"/></svg>Ca kiểm tra<span class="dem la">1 mở</span></a><a class="muc" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Chiến dịch luyện<span class="dem ">4</span></a><a class="muc" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 9l3 3 6-5"/></svg>Chữa trên lớp<span class="dem do">9</span></a><a class="muc dang" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.6-3.4 3-5.2 6-5.2s5.4 1.8 6 5.2"/><path d="M16 4.5a3 3 0 0 1 0 6M18 14.8c1.7.6 2.7 2.4 3 5.2"/></svg>Học sinh</a><div class="day-ben"><div class="vach"></div><a class="muc nho" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h5v15H4zM10 5h5v15h-5zM16 6l4 1-3 13-4-1z"/></svg>Kho đề</a><a class="muc nho" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Cài đặt</a></div></nav><aside style="width:250px;flex:none;border-right:1px solid var(--vien);background:var(--mat);padding:20px 12px;display:flex;flex-direction:column;gap:10px">
+<div style="font-size:17px;font-weight:700;padding:0 6px">Học sinh</div>
+<div class="o-nhap" style="height:36px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Tìm tên hoặc SBD</div>
+<div class="o-nhap" style="height:36px;justify-content:space-between;color:var(--chu)">12 - Tinh Hoa · 44 em<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div>
+<div class="nho" style="display:flex;justify-content:space-between;padding:4px 10px 0"><span>Thành thạo thấp trước</span><span>% câu</span></div>
+<div style="display:flex;flex-direction:column;gap:1px"><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Ngô Bảo Long</div></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">25%</div><div class="thanh" style="height:5px"><i style="width:25%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Trần Gia Bảo</div></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">27%</div><div class="thanh" style="height:5px"><i style="width:27%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Đỗ Phương Linh</div></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">30%</div><div class="thanh" style="height:5px"><i style="width:30%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;background:var(--nhan-nen);">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Nguyễn Minh Anh</div></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">31%</div><div class="thanh" style="height:5px"><i style="width:31%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Phạm Đức Duy</div><span class="chip do" style="height:18px;font-size:11px;padding:0 6px">Trễ 4 ngày</span></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">34%</div><div class="thanh" style="height:5px"><i style="width:34%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Hoàng Thu Hà</div></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">34%</div><div class="thanh" style="height:5px"><i style="width:34%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Lý Thành Nam</div><span class="chip do" style="height:18px;font-size:11px;padding:0 6px">Trễ 3 ngày</span></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">41%</div><div class="thanh" style="height:5px"><i style="width:41%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Vũ Quang Huy</div></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">46%</div><div class="thanh" style="height:5px"><i style="width:46%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Bùi Tuấn Khang</div></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">47%</div><div class="thanh" style="height:5px"><i style="width:47%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Lê Khánh Chi</div><span class="chip vang" style="height:18px;font-size:11px;padding:0 6px">Trễ 1 ngày</span></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">58%</div><div class="thanh" style="height:5px"><i style="width:58%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Trịnh Hoàng Phúc</div></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">62%</div><div class="thanh" style="height:5px"><i style="width:62%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Đặng Ngọc Hân</div><span class="chip vang" style="height:18px;font-size:11px;padding:0 6px">Trễ 2 ngày</span></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">63%</div><div class="thanh" style="height:5px"><i style="width:63%"></i></div></div></div><div style="display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;">
+<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13.5px;white-space:nowrap">Dương Hải My</div></div>
+<div style="width:74px"><div style="font-size:11.5px;text-align:right;font-weight:700">68%</div><div class="thanh" style="height:5px"><i style="width:68%"></i></div></div></div></div>
+<div class="nho" style="padding:0 10px">13 / 44 em · cuộn để xem thêm</div></aside><main class="chinh" style="gap:14px">
+<div class="dau"><div class="hang" style="gap:14px"><div style="width:52px;height:52px;border-radius:50%;background:var(--nhan-nen);color:var(--tren-nhan-nen);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px">MA</div>
+<div><h1 style="font-size:22px">Nguyễn Minh Anh</h1><div class="phu" style="margin-top:2px">SBD 12045 · 12 - Tinh Hoa · đang có 1 chiến dịch</div></div></div>
+<div class="hang"><a class="nut"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Giao chiến dịch cho em này</a><a class="nut">Quản lý em <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></a></div></div>
+<div class="luoi" style="grid-template-columns:repeat(4,1fr);gap:12px"><div class="the kpi"><div class="nhan-so">Thành thạo · Carbohydrate</div><div class="so">31 <small>% câu</small></div><div class="so-sanh">lớp 46% · mức cần 50%</div></div><div class="the kpi"><div class="nhan-so">Đã làm qua · Carbohydrate</div><div class="so">59 <small>% câu</small></div><div class="so-sanh">101 / 170 câu · lớp 72%</div></div><div class="the kpi"><div class="nhan-so">Điểm ca gần nhất</div><div class="so">6,25 <small>/ 10</small></div><div class="so-sanh"><span class="len">▲ 0,75</span> · lớp 7,0</div></div><div class="the kpi"><div class="nhan-so">Ngày luyện, 14 ngày qua</div><div class="so">12 <small>/ 14 ngày</small></div><div class="so-sanh">trễ nhịp 0 ngày</div></div></div>
+<div class="luoi" style="grid-template-columns:1.12fr .88fr;flex:1;gap:12px"><div class="the" style="padding:14px 16px;min-width:0"><div class="the-dau" style="margin-bottom:4px"><h2>Năng lực theo dạng · Carbohydrate</h2><span class="ghi">12 / 30 dạng</span></div>
+<div class="nho" style="margin-bottom:8px">Thanh = % câu của dạng em đã thành thạo · vạch đen = trung bình lớp 12 - Tinh Hoa</div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Lên men — tính khối lượng</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t1" style="position:absolute;left:0;top:0;bottom:0;width:1%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(21% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">0%</b><span class="hang-nl t1" style="justify-self:start">Yếu</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Thuỷ phân tinh bột — hiệu suất</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t1" style="position:absolute;left:0;top:0;bottom:0;width:12%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(29% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">12%</b><span class="hang-nl t1" style="justify-self:start">Yếu</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Quang hợp — thể tích CO₂</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t1" style="position:absolute;left:0;top:0;bottom:0;width:18%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(33% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">18%</b><span class="hang-nl t1" style="justify-self:start">Yếu</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Cellulose — điều chế ester</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t1" style="position:absolute;left:0;top:0;bottom:0;width:22%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(38% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">22%</b><span class="hang-nl t1" style="justify-self:start">Yếu</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Tráng bạc — tính khối lượng Ag</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t1" style="position:absolute;left:0;top:0;bottom:0;width:31%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(44% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">31%</b><span class="hang-nl t1" style="justify-self:start">Yếu</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Đốt cháy carbohydrate</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t1" style="position:absolute;left:0;top:0;bottom:0;width:30%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(52% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">30%</b><span class="hang-nl t1" style="justify-self:start">Yếu</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Thuỷ phân saccharose</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t2" style="position:absolute;left:0;top:0;bottom:0;width:49%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(58% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">49%</b><span class="hang-nl t2" style="justify-self:start">Trung bình</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Nhận biết bằng thuốc thử</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t2" style="position:absolute;left:0;top:0;bottom:0;width:43%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(66% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">43%</b><span class="hang-nl t2" style="justify-self:start">Trung bình</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Phản ứng với Cu(OH)₂</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t3" style="position:absolute;left:0;top:0;bottom:0;width:63%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(74% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">63%</b><span class="hang-nl t3" style="justify-self:start">Khá</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Đồng phân glucose – fructose</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t2" style="position:absolute;left:0;top:0;bottom:0;width:58%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(70% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">58%</b><span class="hang-nl t2" style="justify-self:start">Trung bình</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Cấu tạo — nhận dạng</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t3" style="position:absolute;left:0;top:0;bottom:0;width:61%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(83% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">61%</b><span class="hang-nl t3" style="justify-self:start">Khá</span></div><div style="display:grid;grid-template-columns:168px 1fr 36px 74px;gap:8px;align-items:center;font-size:13px;height:28px">
+<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Tính chất vật lý</span>
+<div style="position:relative;height:12px;background:var(--mat-2);border-radius:3px"><i class="t4" style="position:absolute;left:0;top:0;bottom:0;width:86%;border-radius:3px"></i><span style="position:absolute;top:-3px;left:calc(88% - 1px);width:2px;height:18px;background:var(--chu)"></span></div>
+<b style="text-align:right">86%</b><span class="hang-nl t4" style="justify-self:start">Giỏi</span></div>
+<div class="chu-giai" style="margin-top:10px"><span><i class="t1"></i>Yếu &lt; 40%</span><span><i class="t2"></i>Trung bình 40–59%</span><span><i class="t3"></i>Khá 60–79%</span><span><i class="t4"></i>Giỏi ≥ 80%</span></div>
+<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--luoi)"><div class="nho" style="font-weight:600;margin-bottom:6px">Thành thạo theo mức độ câu</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:13px"><div>Nhận biết <b style="float:right">72%</b><div class="thanh" style="margin-top:4px"><i style="width:72%"></i></div></div><div>Thông hiểu <b style="float:right">34%</b><div class="thanh" style="margin-top:4px"><i style="width:34%"></i></div></div><div>Vận dụng <b style="float:right">9%</b><div class="thanh" style="margin-top:4px"><i style="width:9%"></i></div></div></div></div>
+<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--luoi);font-size:13px"><b>Dạng em đang yếu:</b> 6 dạng · 3 câu đang chờ thầy dạy lại (Câu 47, 112, 88)</div></div><div style="display:flex;flex-direction:column;gap:12px;min-width:0"><div class="the" style="padding:14px 16px"><div class="the-dau" style="margin-bottom:6px"><h2>Điểm ca kiểm tra</h2><span class="ghi">6 ca gần nhất · thang 10</span></div><svg width="336" height="150" viewBox="0 0 336 150" role="img" aria-label="Điểm 6 ca kiểm tra gần nhất"><line x1="30" x2="330" y1="128.0" y2="128.0" stroke="var(--luoi)"/><text x="24" y="132.0" font-size="11" text-anchor="end" fill="var(--chu-mo)">0</text><line x1="30" x2="330" y1="70.0" y2="70.0" stroke="var(--luoi)"/><text x="24" y="74.0" font-size="11" text-anchor="end" fill="var(--chu-mo)">5</text><line x1="30" x2="330" y1="12.0" y2="12.0" stroke="var(--luoi)"/><text x="24" y="16.0" font-size="11" text-anchor="end" fill="var(--chu-mo)">10</text><path d="M30.0 53.8 L88.0 51.4 L146.0 49.1 L204.0 37.5 L262.0 45.6 L320.0 46.8" fill="none" stroke="var(--chu-mo)" stroke-width="2" stroke-dasharray="4 4"/><path d="M30.0 64.2 L88.0 58.4 L146.0 61.3 L204.0 52.6 L262.0 64.2 L320.0 55.5" fill="none" stroke="var(--nhan)" stroke-width="2"/><circle cx="30.0" cy="64.2" r="4" fill="var(--nhan)" stroke="#fff" stroke-width="2"/><circle cx="88.0" cy="58.4" r="4" fill="var(--nhan)" stroke="#fff" stroke-width="2"/><circle cx="146.0" cy="61.3" r="4" fill="var(--nhan)" stroke="#fff" stroke-width="2"/><circle cx="204.0" cy="52.6" r="4" fill="var(--nhan)" stroke="#fff" stroke-width="2"/><circle cx="262.0" cy="64.2" r="4" fill="var(--nhan)" stroke="#fff" stroke-width="2"/><circle cx="320.0" cy="55.5" r="4" fill="var(--nhan)" stroke="#fff" stroke-width="2"/><text x="30.0" y="145" font-size="11" text-anchor="middle" fill="var(--chu-mo)">27/08</text><text x="88.0" y="145" font-size="11" text-anchor="middle" fill="var(--chu-mo)">03/09</text><text x="146.0" y="145" font-size="11" text-anchor="middle" fill="var(--chu-mo)">09/09</text><text x="204.0" y="145" font-size="11" text-anchor="middle" fill="var(--chu-mo)">16/09</text><text x="262.0" y="145" font-size="11" text-anchor="middle" fill="var(--chu-mo)">21/09</text><text x="320.0" y="145" font-size="11" text-anchor="middle" fill="var(--chu-mo)">28/09</text><text x="312.0" y="73.5" font-size="12" font-weight="700" text-anchor="end" fill="var(--chu)">6,25</text></svg>
+<div class="chu-giai" style="margin-top:4px"><span><i style="background:var(--nhan);height:3px;vertical-align:3px"></i>Em</span><span><i style="background:var(--chu-mo);height:3px;vertical-align:3px"></i>Trung bình lớp (nét đứt)</span></div></div><div class="the" style="padding:12px 8px 4px;flex:1"><div class="the-dau" style="padding:0 10px;margin-bottom:2px"><h2>Chiến dịch của em</h2><span class="ghi">4 chiến dịch</span></div>
+<table class="bang"><thead><tr><th>Chiến dịch</th><th class="so-cot">Thành thạo</th><th>Lên bảng</th></tr></thead><tbody><tr><td><div class="dam">Carbohydrate</div><div class="nho">đang chạy · hạn 08/10</div></td><td class="so-cot dam">31%</td><td><span class="chip vang">Chưa tới hạn</span></td></tr><tr><td><div class="dam">Ester – Lipid (Cơ bản)</div><div class="nho">kết thúc 20/09</div></td><td class="so-cot dam">82%</td><td><span class="chip la">Đạt 2 / 2</span></td></tr><tr><td><div class="dam">Đại cương kim loại</div><div class="nho">kết thúc 18/09</div></td><td class="so-cot dam">64%</td><td><span class="chip xam">Chưa lên bảng</span></td></tr><tr><td><div class="dam">Amine – Amino acid</div><div class="nho">kết thúc 08/09</div></td><td class="so-cot dam">71%</td><td><span class="chip la">Đạt 1 / 1</span></td></tr></tbody></table></div></div></div>
+</main></div>
+</body>
+</html>

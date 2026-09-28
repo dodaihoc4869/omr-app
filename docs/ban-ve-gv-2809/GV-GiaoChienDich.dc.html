@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Giao chiến dịch luyện</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Lấy từ src/styles/tokens.css (--bts-* bản sáng) + src/components/bang-nhiem-vu/m3-theme.css (--m3-primary*) */
+  --nen:#f8fafd; --mat:#ffffff; --mat-2:#f0f4f9; --vien:#dde3ea; --luoi:#eaeef3; --xam-o:#e3e8ef; --xam-thanh:#cbd3dd;
+  --chu:#1f1f1f; --chu-phu:#444746; --chu-mo:#656b73;
+  --nhan:#0b57d0; --nhan-nen:#d3e3fd; --tren-nhan-nen:#041e49; --duong:#1a73e8; --duong-nhat:#e8f0fe;
+  --la:#188038; --la-nhat:#e6f4ea; --do:#d93025; --do-nhat:#fce8e6; --vang:#f9ab00; --vang-nhat:#fef7e0; --vang-chu:#8a5a00;
+  /* Dải tuần tự MỘT sắc xanh cho mức thành thạo (nhạt → đậm) */
+  --t1:#d3e3fd; --t2:#a8c7fa; --t3:#7cacf8; --t4:#0842a0;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Be Vietnam Pro',system-ui,sans-serif;background:var(--nen);color:var(--chu);font-size:14px;line-height:1.4;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+button{font-family:inherit}
+a{text-decoration:none}
+.man{width:1440px;height:900px;display:flex;overflow:hidden;background:var(--nen);position:relative}
+/* ---- thanh bên ---- */
+.ben{width:240px;flex:none;background:var(--mat);border-right:1px solid var(--vien);display:flex;flex-direction:column;padding:18px 12px 14px;gap:2px}
+.logo{display:flex;align-items:center;gap:10px;padding:2px 10px 18px}
+.logo b{display:block;font-size:15px;font-weight:800;letter-spacing:.2px;line-height:1.2}
+.logo small{display:block;font-size:12px;color:var(--chu-mo);font-weight:500}
+.nut-ca{height:44px;border-radius:12px;border:0;background:var(--nhan);color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;gap:10px;padding:0 16px;margin-bottom:14px}
+.muc{height:42px;border-radius:10px;display:flex;align-items:center;gap:12px;padding:0 12px;color:var(--chu-phu);font-weight:600;font-size:14px;text-decoration:none}
+.muc svg{flex:none}
+.muc.dang{background:var(--nhan-nen);color:var(--tren-nhan-nen)}
+.muc .dem{margin-left:auto;font-size:12px;font-weight:700;min-width:22px;height:20px;padding:0 7px;border-radius:10px;background:var(--mat-2);color:var(--chu-phu);display:inline-flex;align-items:center;justify-content:center}
+.muc .dem.do{background:var(--do-nhat);color:#a50e0e}
+.muc .dem.la{background:var(--la-nhat);color:#0d652d}
+.muc.nho{height:38px;font-weight:500;font-size:13px}
+.vach{height:1px;background:var(--vien);margin:10px 8px}
+.day-ben{margin-top:auto;display:flex;flex-direction:column;gap:2px}
+.may{font-size:11px;color:var(--chu-mo);padding:8px 12px 0}
+/* ---- vùng chính ---- */
+.chinh{flex:1;min-width:0;padding:22px 28px 20px;display:flex;flex-direction:column;gap:16px;overflow:hidden}
+.dau{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.dau-trai{min-width:0}
+.vet{font-size:12px;color:var(--chu-mo);font-weight:600;margin-bottom:4px}
+.vet a{color:var(--nhan);text-decoration:none}
+h1{font-size:24px;font-weight:700;margin:0;letter-spacing:-.2px}
+.phu{color:var(--chu-mo);font-size:13px;margin-top:4px}
+.hang{display:flex;gap:12px;align-items:center}
+.luoi{display:grid;gap:16px;min-height:0}
+.the{background:var(--mat);border:1px solid var(--vien);border-radius:12px;padding:16px 18px;min-width:0}
+.the-dau{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.the h2{font-size:15px;font-weight:700;margin:0}
+.the .ghi{font-size:12px;color:var(--chu-mo)}
+.kpi{padding:14px 16px}
+.kpi .nhan-so{font-size:12px;font-weight:600;color:var(--chu-phu);display:flex;gap:6px;align-items:center}
+.kpi .so{font-size:28px;font-weight:700;letter-spacing:-.5px;margin-top:4px;line-height:1.1}
+.kpi .so small{font-size:14px;font-weight:500;color:var(--chu-mo);letter-spacing:0}
+.kpi .so-sanh{font-size:12px;color:var(--chu-mo);margin-top:6px}
+.len{color:var(--la);font-weight:700}.xuong{color:var(--do);font-weight:700}
+.nho{font-size:12px;color:var(--chu-mo)}
+.dam{font-weight:700}
+table.bang{width:100%;border-collapse:collapse}
+.bang th{font-size:12px;color:var(--chu-mo);text-align:left;font-weight:600;padding:8px 10px;border-bottom:1px solid var(--vien);white-space:nowrap;vertical-align:bottom}
+.bang td{padding:8px 10px;border-bottom:1px solid var(--luoi);vertical-align:middle}
+.bang tr:last-child td{border-bottom:0}
+.bang .so-cot{text-align:right}
+.bang th.so-cot{text-align:right}
+.chip{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 9px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.chip.tron::before{display:none}
+.chip.la{background:var(--la-nhat);color:#0d652d}.chip.vang{background:var(--vang-nhat);color:var(--vang-chu)}.chip.do{background:var(--do-nhat);color:#a50e0e}
+.chip.xam{background:var(--mat-2);color:var(--chu-phu)}.chip.nhan{background:var(--nhan-nen);color:var(--tren-nhan-nen)}
+.thanh{height:8px;background:var(--xam-o);border-radius:4px;overflow:hidden;position:relative}
+.thanh>i{display:block;height:100%;background:var(--nhan);border-radius:4px}
+.thanh>i.la{background:var(--la)}.thanh>i.vang{background:var(--vang)}.thanh>i.do{background:var(--do)}
+.moc{position:absolute;top:-3px;width:2px;height:14px;background:var(--chu)}
+.nut{height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--xam-thanh);background:var(--mat);font-weight:600;font-size:14px;color:var(--chu);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.nut.chinh-n{background:var(--nhan);color:#fff;border-color:transparent}
+.nut.nho-n{height:32px;padding:0 12px;font-size:13px;border-radius:8px}
+.nut.chu-n{border-color:transparent;background:transparent;color:var(--nhan);padding:0 8px}
+.o-nhap{height:40px;border:1px solid var(--xam-thanh);border-radius:10px;background:var(--mat);display:flex;align-items:center;gap:8px;padding:0 12px;color:var(--chu-mo);font-size:14px}
+.loc{display:inline-flex;border:1px solid var(--xam-thanh);border-radius:10px;overflow:hidden;height:36px}
+.loc span{padding:0 12px;display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--chu-phu);border-right:1px solid var(--xam-thanh)}
+.loc span:last-child{border-right:0}
+.loc span.chon{background:var(--nhan-nen);color:var(--tren-nhan-nen)}
+.chu-giai{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--chu-phu);align-items:center}
+.chu-giai i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+.t1{background:var(--t1)}.t2{background:var(--t2)}.t3{background:var(--t3)}.t4{background:var(--t4);color:#fff}
+.t0{background:repeating-linear-gradient(135deg,var(--mat-2) 0 4px,var(--mat) 4px 8px);color:var(--chu-mo)}
+.hang-nl{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:5px;font-size:11px;font-weight:700;white-space:nowrap}
+.cham{color:var(--xam-thanh);padding:0 6px}
+
+.buoc{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.buoc .so-b{width:26px;height:26px;border-radius:50%;background:var(--nhan);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.buoc .so-b.xong{background:var(--la)}
+.buoc h2{font-size:15px;font-weight:700;margin:0}
+.buoc .tom{margin-left:auto;font-size:13px;color:var(--chu-phu)}
+.cay{border:1px solid var(--vien);border-radius:10px;padding:6px;font-size:13.5px}
+.nut-cay{display:flex;align-items:center;gap:8px;height:32px;padding:0 8px;border-radius:8px;color:var(--chu);white-space:nowrap}
+.nut-cay .dem-cay{margin-left:auto;color:var(--chu-mo);font-size:12px;white-space:nowrap}
+.nut-cay.chon{background:var(--nhan-nen);color:var(--tren-nhan-nen);font-weight:600}
+.radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--chu-mo);flex:none}
+.radio.on{border-color:var(--nhan);box-shadow:inset 0 0 0 3px var(--mat);background:var(--nhan)}
+.o-tich{width:18px;height:18px;border-radius:4px;border:2px solid var(--chu-mo);flex:none;display:flex;align-items:center;justify-content:center;color:#fff}
+.o-tich.on{background:var(--nhan);border-color:var(--nhan)}
+.o-tich.nua{background:var(--nhan);border-color:var(--nhan)}
+.o-tich.nua::after{content:"";width:8px;height:2px;background:#fff}
+.gat{width:36px;height:20px;border-radius:10px;background:var(--nhan);position:relative;flex:none}
+.gat::after{content:"";position:absolute;right:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#fff}
+.tt-dong{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--luoi);font-size:13.5px}
+.tt-dong span:first-child{color:var(--chu-mo)}
+.tt-dong span:last-child{text-align:right;font-weight:600}
+</style>
+</head>
+<body>
+<div class="man"><nav class="ben" aria-label="Điều hướng chính"><div class="logo"><svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="10" fill="#0b57d0"/><path d="M18 7 27.5 12.5v11L18 29 8.5 23.5v-11z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><circle cx="18" cy="18" r="3.2" fill="#fff"/></svg><div><b>Đỗ Đại Học</b><small>Giáo viên</small></div></div><button class="nut-ca"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Mở ca kiểm tra</button><a class="muc" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Tổng quan</a><a class="muc" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2v4M16 2v4M4 10h16M8 14h3M8 17h6"/></svg>Ca kiểm tra<span class="dem la">1 mở</span></a><a class="muc dang" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>Chiến dịch luyện<span class="dem ">4</span></a><a class="muc" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M12 16v4M8 20h8M7 9l3 3 6-5"/></svg>Chữa trên lớp<span class="dem do">9</span></a><a class="muc" href="#"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c.6-3.4 3-5.2 6-5.2s5.4 1.8 6 5.2"/><path d="M16 4.5a3 3 0 0 1 0 6M18 14.8c1.7.6 2.7 2.4 3 5.2"/></svg>Học sinh</a><div class="day-ben"><div class="vach"></div><a class="muc nho" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h5v15H4zM10 5h5v15h-5zM16 6l4 1-3 13-4-1z"/></svg>Kho đề</a><a class="muc nho" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Cài đặt</a></div></nav><main class="chinh" style="gap:14px">
+<div class="dau"><div class="dau-trai"><div class="vet"><a href="#">Chiến dịch luyện</a> › Giao mới</div><h1>Giao chiến dịch luyện</h1></div></div>
+<div class="luoi" style="grid-template-columns:1fr 330px;flex:1;gap:16px">
+<div style="display:flex;flex-direction:column;gap:12px;min-width:0"><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="the">
+<div class="buoc"><span class="so-b xong">1</span><h2>Chọn tờ đề</h2><span class="tom chip la">Đã chọn</span></div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div><div class="o-nhap" style="height:36px;margin-bottom:8px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Tìm tờ đề theo tên hoặc chuyên đề…</div>
+<div class="cay">
+<div class="nut-cay"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>Khối 10<span class="dem-cay">14 tờ</span></div>
+<div class="nut-cay"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>Khối 11<span class="dem-cay">11 tờ</span></div>
+<div class="nut-cay"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><b>Khối 12</b><span class="dem-cay">23 tờ</span></div>
+<div style="padding-left:22px">
+<div class="nut-cay"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>Ester – Lipid<span class="dem-cay">4 tờ</span></div>
+<div class="nut-cay"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>Carbohydrate<span class="dem-cay">3 tờ</span></div>
+<div style="padding-left:22px">
+<div class="nut-cay chon"><span class="radio on"></span>Carbohydrate — Tổng ôn<span class="dem-cay">170 câu</span></div>
+<div class="nut-cay"><span class="radio"></span>Carbohydrate — Cơ bản<span class="dem-cay">64 câu</span></div>
+</div>
+<div class="nut-cay"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>Amine – Amino acid<span class="dem-cay">3 tờ</span></div>
+</div></div></div>
+<div style="background:var(--mat-2);border-radius:10px;padding:10px 12px;font-size:13px">
+<div class="nho" style="font-weight:600;margin-bottom:6px">Cơ cấu 170 câu theo mức độ</div>
+<div style="display:flex;gap:2px;height:12px;margin-bottom:8px"><i style="width:31%;background:var(--t2);border-radius:4px 0 0 4px"></i><i style="width:41%;background:var(--t3)"></i><i style="width:28%;background:var(--t4);border-radius:0 4px 4px 0"></i></div>
+<div style="display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center">
+<i class="t2" style="width:10px;height:10px;border-radius:2px"></i><span>Nhận biết</span><b>52 câu</b>
+<i class="t3" style="width:10px;height:10px;border-radius:2px"></i><span>Thông hiểu</span><b>71 câu</b>
+<i class="t4" style="width:10px;height:10px;border-radius:2px"></i><span>Vận dụng</span><b>47 câu</b></div>
+<div style="border-top:1px solid var(--vien);margin-top:10px;padding-top:8px;display:flex;align-items:center;gap:8px"><span class="o-tich"></span><span>Rút còn <b>— câu</b> (giữ câu cả lớp sai nhiều)</span></div>
+</div></div></div><div class="the" style="position:relative">
+<div class="buoc"><span class="so-b xong">2</span><h2>Chọn em nhận chiến dịch</h2><span class="tom chip la">44 / 254 em</span></div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="flex:1">
+<div class="o-nhap" style="border-color:var(--nhan);box-shadow:0 0 0 1px var(--nhan);justify-content:space-between;color:var(--chu)"><span style="display:flex;gap:6px"><span class="chip nhan tron">12 - Tinh Hoa · 44 em <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></span></span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div>
+<div style="margin-top:6px;border:1px solid var(--vien);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.12);background:var(--mat);padding:8px;font-size:13.5px">
+<div class="o-nhap" style="height:34px;margin-bottom:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Tìm tên, SBD hoặc lớp</div>
+<div class="nut-cay"><span class="o-tich"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>Khối 10<span class="dem-cay">0 / 61 em</span></div>
+<div class="nut-cay"><span class="o-tich"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>Khối 11<span class="dem-cay">0 / 68 em</span></div>
+<div class="nut-cay"><span class="o-tich nua"></span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><b>Khối 12</b><span class="dem-cay">44 / 125 em</span></div>
+<div style="padding-left:28px">
+<div class="nut-cay chon"><span class="o-tich on"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg></span>12 - Tinh Hoa<span class="dem-cay">44 / 44 em ›</span></div>
+<div class="nut-cay"><span class="o-tich"></span>12 - Nhóm 10 điểm<span class="dem-cay">0 / 15 em ›</span></div>
+<div class="nut-cay"><span class="o-tich"></span>12 - Lớp Thường<span class="dem-cay">0 / 66 em ›</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:8px;border-top:1px solid var(--luoi);margin-top:6px;padding:8px 4px 0"><span class="nho">Bấm › để chọn từng em</span><a class="nut nho-n chu-n" style="margin-left:auto">Bỏ chọn hết</a><a class="nut nho-n chinh-n">Xong</a></div>
+</div></div>
+<div style="font-size:13px;color:var(--chu-phu);background:var(--mat-2);border-radius:10px;padding:10px 12px">
+<div class="nho" style="font-weight:600;margin-bottom:6px">Em đã chọn theo lớp</div>
+<div style="display:flex;justify-content:space-between"><span>12 - Tinh Hoa</span><b>44 em</b></div>
+<div class="thanh" style="margin:6px 0 10px"><i style="width:100%"></i></div>
+<div class="nho">Trong 44 em: 3 em còn nợ chiến dịch "Ester – Lipid" (hết hạn 02/10) — hai chiến dịch chạy song song, số lượt/ngày tính gộp.</div>
+</div></div></div></div><div class="the">
+<div class="buoc"><span class="so-b">3</span><h2>Hạn nộp và số lượt câu mỗi ngày</h2></div>
+<div style="display:grid;grid-template-columns:210px 230px 1fr;gap:16px;align-items:start">
+<div><div class="nho" style="font-weight:600;margin-bottom:6px">Hạn nộp</div><div class="o-nhap" style="color:var(--chu)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>23:59 · 08/10/2026</div><div class="nho" style="margin-top:4px">Thứ Năm · còn 10 ngày 4 giờ</div></div>
+<div><div class="nho" style="font-weight:600;margin-bottom:6px">Số lượt câu mỗi ngày (một em)</div>
+<div class="o-nhap" style="justify-content:space-between;color:var(--chu)"><b>38 lượt / ngày</b><span style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--chu-phu)">Tự tính<span class="gat"></span></span></div>
+<div class="nho" style="margin-top:4px">A.I Đỗ Đại Học tính số nhỏ nhất đủ kịp hạn</div></div>
+<div><div style="display:flex;justify-content:space-between;align-items:baseline"><span class="nho" style="font-weight:600">Khối lượng so với thời gian còn lại</span><span class="chip la">Vừa sức</span></div>
+<div style="font-size:24px;font-weight:700;margin:2px 0 6px">64<small style="font-size:14px;color:var(--chu-mo);font-weight:500"> %</small></div>
+<div style="position:relative;height:10px;display:flex;gap:2px"><i style="width:70%;background:var(--la-nhat);border-radius:4px 0 0 4px"></i><i style="width:20%;background:var(--vang-nhat)"></i><i style="width:10%;background:var(--do-nhat);border-radius:0 4px 4px 0"></i>
+<span style="position:absolute;left:0;top:0;height:10px;width:64%;background:var(--la);border-radius:4px"></span></div>
+<div style="position:relative;height:14px;font-size:11px;color:var(--chu-mo);margin-top:3px"><span style="position:absolute;left:0">0%</span><span style="position:absolute;left:70%;transform:translateX(-50%)">70</span><span style="position:absolute;left:90%;transform:translateX(-50%)">90</span></div>
+<div class="nho" style="margin-top:2px">Em ở giữa lớp cần ≈ 243 lượt; có 10 ngày × 38 = 380 lượt</div></div>
+</div></div></div><div class="the" style="display:flex;flex-direction:column">
+<h2 style="font-size:15px;margin:0 0 6px">Tóm tắt chiến dịch</h2>
+<div class="tt-dong"><span>Tờ đề</span><span>Carbohydrate — Tổng ôn</span></div>
+<div class="tt-dong"><span>Số câu</span><span>170 câu · 30 dạng</span></div>
+<div class="tt-dong"><span>Mức độ</span><span>Nhận biết 52 · Thông hiểu 71<br>Vận dụng 47</span></div>
+<div class="tt-dong"><span>Giao cho</span><span>44 em · 12 - Tinh Hoa</span></div>
+<div class="tt-dong"><span>Hạn nộp</span><span>23:59 · Thứ Năm 08/10/2026<br><span class="nho" style="font-weight:500">còn 10 ngày</span></span></div>
+<div class="tt-dong"><span>Lượt câu mỗi ngày</span><span>38 lượt (tự tính)</span></div>
+<div class="tt-dong"><span>Khối lượng</span><span><span class="chip la">64% · Vừa sức</span></span></div>
+<div class="tt-dong"><span>Dự kiến</span><span>Làm qua đủ 170 câu<br>trước 23:59 · 05/10</span></div>
+<div class="tt-dong"><span>Em dự kiến quá tải</span><span>0 / 44 em</span></div>
+<div class="tt-dong" style="border-bottom:0"><span>Đang có chiến dịch khác</span><span>3 / 44 em</span></div>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:8px;padding-top:12px">
+<a class="nut chinh-n" style="justify-content:center;height:44px">Giao chiến dịch cho 44 em</a>
+<a class="nut" style="justify-content:center">Để sau</a>
+<div class="nho" style="text-align:center">Các em thấy chiến dịch trong game (Bát Linh Đảo · Đoàn Hộ Tống) ngay khi giao. Huỷ được ngay sau khi giao nếu nhầm.</div></div></div></div>
+</main></div>
+</body>
+</html>
