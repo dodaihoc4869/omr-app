@@ -6,6 +6,7 @@ import type { ChiTietCauRow } from './exam-api'
 import { demKetQua, soYDungPhanII } from './dem-ket-qua'
 import { phanTuDiem, thoiGianLam, type PhanKetQua } from './ket-qua-sau-nop'
 import type { EmChoBaoCao } from './bao-cao-ca-lop'
+import type { CauSaiHienThi } from '../components/KhoiCauSai'
 
 /** Dưới mức này (đúng/tổng của một dạng trong ca) thì gắn "Cần ôn thêm". Cùng mốc 60% với "Cả lớp còn vấp". */
 export const NGUONG_CAN_ON = 0.6
@@ -49,6 +50,8 @@ export interface CauXemLai {
   tbGiayLop: number | null
   /** Lời giải gốc trong kho (màn chuẩn hoá bằng chuanHoaLoiGiaiCau); null = kho không có/không có kho. */
   loiGiai: unknown
+  /** Đủ đề (phương án, ý, bảng, ảnh) để vẽ bằng `TheCau` xem_lai như Câu đã làm — chỉ báo cáo phía học sinh có (lib/bao-cao-cua-em.ts). */
+  cau?: CauSaiHienThi
 }
 export interface SoVoiLop {
   tbLop: number

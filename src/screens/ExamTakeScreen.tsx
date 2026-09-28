@@ -60,8 +60,6 @@ import { LogoDoc } from '../components/LogoVai'
 import PhongChoGame from '../components/PhongChoGame'
 import { TheNoiDung, NutChinh, OThongBao, Nhan } from '../components/DesignSystem'
 import { TriangleAlert, X, ArrowLeft, LayoutGrid, Flag, Lock, Maximize } from 'lucide-react'
-import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
-import { goiBaiThi } from '../lib/goi-bao-cao'
 import { classify, moTaBieuDiem, type SoCauBaPhan } from '../engine/score'
 import KetQuaSauNop from '../components/xem-diem/KetQuaSauNop'
 import { chuGioNop, phanTuDiem, soSanhLanTruoc, thoiGianLam, tongDungTong } from '../lib/ket-qua-sau-nop'
@@ -101,6 +99,8 @@ import type { CauPhieu } from './LamBaiNgang'
 import { thoatToanManHinh, thuVaoToanManHinh, useBoCuc } from '../lib/lam-bai-ngang'
 // Bố cục NGANG nạp lười (mảnh riêng, ngoài precache — vite.config.ts globIgnores); dọc không bao giờ tải mảnh này.
 const LamBaiNgang = lazy(() => import('./LamBaiNgang'))
+// BÁO CÁO CHI TIẾT CA bản mới (BaoCaoChiTiet chế độ em, 28/09) — mảnh lazy ngoài precache.
+const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
 
 /** Đang toàn màn hình: đã thêm vào màn hình chính (standalone) HOẶC Fullscreen API đang bật. */
 function dangToanManHinh(): boolean {
@@ -3195,30 +3195,15 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
 
         {/* MODAL BÁO CÁO CA THI ĐỒNG BỘ FULL MÀN HÌNH */}
         {xemBaoCaoModal && graded && attempt && (
-          <BaoCaoCaThiHocSinhModal
-            baiThi={goiBaiThi({
-              maCa: attempt.maCa,
-              tenCa: attempt.tenCa || `Ca ${attempt.maCa}`,
-              nopLuc: attempt.submittedAt,
-              tong: graded.score.total,
-              diemI: graded.score.phanIScore,
-              diemII: graded.score.phanIIScore,
-              diemIII: graded.score.phanIIIScore,
-              tongCau: flat.length,
-              soCauSai: graded.wrongPhanI.length + graded.wrongPhanII.length + graded.wrongPhanIII.length,
-              soCauDung: flat.length - (graded.wrongPhanI.length + graded.wrongPhanII.length + graded.wrongPhanIII.length),
-              lanThu: attempt.lanThu,
-            })}
-            hoTen={(xacNhan?.hoTen || hoTen).trim() || `SBD ${attempt.sbd}`}
-            sbd={attempt.sbd}
-            lop={xacNhan?.lop}
-            scriptUrl={scriptUrlRef.current}
-            onClose={() => setXemBaoCaoModal(false)}
-            onBatDauKhacPhuc={(_maCa, html) => {
-              setXemBaoCaoModal(false)
-              if (html) setHtmlDe(html)
-            }}
-          />
+          <Suspense fallback={null}>
+            <BaoCaoCaCuaEm
+              maCa={attempt.maCa}
+              tenCa={attempt.tenCa || undefined}
+              sbd={attempt.sbd}
+              scriptUrl={scriptUrlRef.current}
+              onDong={() => setXemBaoCaoModal(false)}
+            />
+          </Suspense>
         )}
       </Trang>
     )

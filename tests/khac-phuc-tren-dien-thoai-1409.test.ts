@@ -62,13 +62,13 @@ describe('LỖI 1 — vòng kín "Bắt đầu làm bài"', () => {
     expect(bc).not.toContain('onBatDauKhacPhuc(baiThi.maCa)')
   })
 
-  it('cổng học sinh có phiếu thì mở thẳng, không gọi lại taoDeKhacPhuc', () => {
-    const i = cong.indexOf('onBatDauKhacPhuc={(maCa, html)')
+  it('cổng học sinh: nút "Làm lại câu cần chữa" của báo cáo BẢN MỚI đóng báo cáo rồi mới dựng phiếu (không vòng kín)', () => {
+    // 28/09: hộp báo cáo cũ được thay bằng BaoCaoChiTiet chế độ em; không còn modal nào để "mở lại đúng nó".
+    const i = cong.indexOf('onKhacPhuc={(maCa) => {')
     expect(i).toBeGreaterThan(-1)
-    const khoi = cong.slice(i, i + 600)
-    expect(khoi).toContain('setPhieuHtml(html)')
-    // `return` phải đứng TRƯỚC lượt gọi lại, nếu không vẫn mở lại modal cũ.
-    expect(khoi.indexOf('return')).toBeLessThan(khoi.indexOf('taoDeKhacPhuc([maCa])'))
+    const khoi = cong.slice(i, i + 300)
+    expect(khoi.indexOf('setCaXemBaoCaoModal(null)')).toBeGreaterThan(-1)
+    expect(khoi.indexOf('setCaXemBaoCaoModal(null)')).toBeLessThan(khoi.indexOf('taoDeKhacPhuc([maCa])'))
   })
 })
 

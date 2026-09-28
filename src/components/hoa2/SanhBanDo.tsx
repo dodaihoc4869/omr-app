@@ -56,6 +56,10 @@ export interface SanhBanDoProps {
   onChonThu: () => void
   onDangXuat: () => void
   onTaiLai: () => void
+  /** Thẻ nhỏ "Ca kiểm tra gần nhất: 7,25 điểm · 26/09" (CHỈ ca đã công bố; chưa có ⇒ "Chưa có ca đã công bố"). null/thiếu = chưa biết ⇒ không vẽ. */
+  caGanNhat?: { chu: string; coDiem: boolean } | null
+  /** Bấm thẻ ⇒ màn Lịch sử ca kiểm tra. */
+  onLichSuCa?: () => void
 }
 
 const phanTram = (a: number, b: number) => (b > 0 ? Math.round((100 * Math.min(a, b)) / b) : 0)
@@ -281,6 +285,25 @@ function DaiVaoThi({ onVaoThi }: { onVaoThi: () => void }) {
         Vào thi
       </button>
     </div>
+  )
+}
+
+/** Thẻ nhỏ cạnh lối vào Ca kiểm tra: điểm ca ĐÃ CÔNG BỐ gần nhất; bấm ⇒ Lịch sử ca kiểm tra (thầy lệnh 28/09). */
+function TheCaGanNhatSanh({ p }: { p: SanhBanDoProps }) {
+  if (!p.caGanNhat || !p.onLichSuCa) return null
+  return (
+    <button type="button" className="h2-ca-gan" data-co-diem={p.caGanNhat.coDiem ? 'true' : 'false'} onClick={p.onLichSuCa}>
+      <span className="h2-ca-gan-o" aria-hidden="true">
+        <IconCa co={20} />
+      </span>
+      <span className="h2-ca-gan-chu">
+        <span className="h2-ca-gan-lon">{p.caGanNhat.chu}</span>
+        <span className="h2-ca-gan-nho">Xem lịch sử ca kiểm tra</span>
+      </span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+        <path d="M9 6l6 6-6 6" />
+      </svg>
+    </button>
   )
 }
 
@@ -792,6 +815,7 @@ function SanhNgang({ p, bc, moMan }: { p: SanhBanDoProps; bc: BoCucNgang; moMan:
         </section>
         <aside className="h2-ng-phai" aria-label="Việc hôm nay" aria-busy={p.dangTai && !s}>
           {p.caDangMo && <DaiVaoThi onVaoThi={p.onVaoThi} />}
+          <TheCaGanNhatSanh p={p} />
           {s ? (
             <CotPhaiNgang p={p} s={s} />
           ) : chonThu ? (
@@ -853,6 +877,7 @@ function SanhDoc({ p, moMan }: { p: SanhBanDoProps; moMan: boolean }) {
         <div className="h2-dem" aria-hidden="true" />
         <section className="h2-tam" aria-label="Việc hôm nay" aria-busy={p.dangTai && !s}>
           {p.caDangMo && <DaiVaoThi onVaoThi={p.onVaoThi} />}
+          <TheCaGanNhatSanh p={p} />
           {s ? (
             <TamDuoi p={p} s={s} />
           ) : chonThu ? (
