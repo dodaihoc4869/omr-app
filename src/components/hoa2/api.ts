@@ -3,6 +3,7 @@
 // Đọc CHẶT: trường thiếu/sai kiểu thì bỏ, KHÔNG bịa số. Cờ `cheDo2` chỉ tính khi đúng `true`.
 import { useEffect, useRef, useState } from 'react'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
+import { loiCuaKetQua } from '../../game/than-thu-v2/loi-het-tran'
 
 export interface ChienDichSanh {
   id: string
@@ -119,7 +120,8 @@ export async function goiHoa2(lenh: string, token: string, du: Record<string, un
     }
     if (!j || typeof j !== 'object') throw new LoiHoa2('Máy chủ chưa trả lời được. Em thử lại sau ít phút.')
     const o = j as Record<string, unknown>
-    if (o.ok !== true) throw new LoiHoa2(chu(o.error || o.loi) || 'Máy chủ chưa trả lời được. Em thử lại sau ít phút.', chu(o.ma))
+    // Lời máy chủ: `error` hoặc `loi` (vd. `hoa2-ruong-mo` chưa đủ: ma `chua_du`).
+    if (o.ok !== true) throw new LoiHoa2(loiCuaKetQua(o) || 'Máy chủ chưa trả lời được. Em thử lại sau ít phút.', chu(o.ma))
     return o
   } catch (e) {
     if (e instanceof LoiHoa2) throw e

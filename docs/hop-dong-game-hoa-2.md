@@ -52,7 +52,7 @@ Bộ lọc màn hình: Tất cả · Sai lần gần nhất (`lanCuoiDung === fa
 Hiển thị lời giải: **bắt buộc dùng khối LỜI GIẢI chuẩn của `TheCau`** (chế độ `xem_lai`, `chuanHoaLoiGiaiCau`) — LỜI GIẢI → KIẾN THỨC CỐT LÕI → từng phương án/ý ✓ ✗ (Phần III: bước + kết quả). Tải PDF: dựng phiếu bằng `html-phieu.ts` rồi `window.print()`.
 
 ### `hoa2-ruong-mo` → mở Rương Bát Linh (xong trọn kế hoạch hôm nay, mỗi ngày 1 lần)
-`{ ok:true, qua:{ vang:20 }, lapLai:false }` · chưa đủ: `{ ok:false, ma:"chua_du", loi:"Em làm xong 40/40 câu hôm nay thì rương mở…" }`. Vàng dùng ở Cửa hàng phụ kiện; không phải EXP.
+`{ ok:true, qua:{ vang:20 }, lapLai:false }` · chưa đủ: `{ ok:false, ma:"chua_du", loi:"Em làm xong 40/40 câu hôm nay thì rương mở…", error:<cùng lời với loi> }` (28/09: thêm `error` cho lớp gọi game-v2 chung đọc được; client đọc `error` rồi `loi`). Vàng dùng ở Cửa hàng phụ kiện; không phải EXP.
 
 ## B. Giáo viên — `POST /gv/chien-dich` (sau cổng mã thầy), `action`:
 
