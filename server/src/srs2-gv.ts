@@ -3,7 +3,7 @@
 // Vòng khép kín: Kết thúc ca kiểm tra → Giao chiến dịch (có đồng hồ sức chứa) → Bảng chiến dịch khi đang chạy →
 // Buổi chữa khi hết hạn nộp → "Chữa xong" (câu cần dạy lại quay về Đoàn Hộ Tống hôm sau).
 import type { Env } from './kieu'
-import { tenLopCuaEm } from './ten-lop'
+import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { khoiLuongCan, phatLaiCau, soNgayConLai, sucChua, congNgay, TRAN_NGAY, type LanLam, type TrangThaiCau } from './srs2-loi'
@@ -53,10 +53,17 @@ async function docMot(env: Env, id: string): Promise<ChienDich> {
 }
 /** Danh sách học sinh (đang học) cho bộ chọn khối → lớp → em ở màn giao — CÙNG bảng `emCuaLop` dùng, không phụ thuộc bộ nhớ máy thầy. */
 async function dsEm(env: Env) {
-  // `lop` = KHỐI ('10'/'11'/'12'); `ten_lop` = lớp thầy đã phân (vd '12 - Tinh Hoa'), rỗng ⇒ mặc định theo khối (ten-lop.ts). Chưa có cột ⇒ đọc lại không có nó.
-  const doc = (cot: string) => env.DB.prepare(`SELECT ${cot} FROM hoc_sinh WHERE COALESCE(trang_thai,'') <> 'khoa' AND COALESCE(lop,'') <> '' ORDER BY lop, ho_ten`).all<Row>()
-  const r = await doc('sbd, ho_ten, lop, ten_lop').catch(() => doc('sbd, ho_ten, lop'))
-  return { ok: true, em: (r.results ?? []).map((x) => ({ sbd: str(x.sbd), hoTen: str(x.ho_ten), lop: str(x.lop), khoi: str(x.lop), tenLop: tenLopCuaEm(x.lop, x.ten_lop) })) }
+  // Thầy 28/09: "lọc theo lớp ở đây nhé" ⇒ DÙNG ĐÚNG nguồn của bộ lọc lớp app thầy (`/gv/lop`, ten-lop.ts): hoc_sinh (không khoá, kể cả em
+  // chưa ghi khối — vd tài khoản test) + em chỉ có trong danh_sach; khối của em = khối của lớp em thuộc. Tên em: hoc_sinh, thiếu thì danh_sach.
+  const g = await gvLop(env)
+  if (!g.ok) return g
+  const ten = new Map<string, string>()
+  for (const bang of ['danh_sach', 'hoc_sinh']) {
+    const r = await env.DB.prepare(`SELECT sbd, ho_ten FROM ${bang}`).all<Row>().catch(() => ({ results: [] as Row[] }))
+    for (const x of r.results ?? []) if (str(x.ho_ten)) ten.set(str(x.sbd), str(x.ho_ten))
+  }
+  const em = (g.lop as { tenLop: string; khoi: string; sbd: string[] }[]).flatMap((l) => l.sbd.map((sbd) => ({ sbd, hoTen: ten.get(sbd) ?? sbd, lop: l.khoi, khoi: l.khoi, tenLop: l.tenLop })))
+  return { ok: true, em }
 }
 async function emCuaLop(env: Env, lop: string): Promise<string[]> {
   const r = await env.DB.prepare("SELECT sbd FROM hoc_sinh WHERE COALESCE(lop,'') = ? AND COALESCE(trang_thai,'') <> 'khoa' ORDER BY sbd").bind(lop).all<Row>()
