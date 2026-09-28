@@ -265,7 +265,7 @@ export default function DoanTran(p: Props) {
       {choTiep && <button type="button" className="dh-nut-lam dh2-nut-chinh dh2-baloo" data-vung="danh-tiep" style={{ minHeight: 54 }} disabled={p.ban} onClick={p.onDanhTiep}>{p.ban ? 'CHỜ MỘT CHÚT…' : p.nhanTiep ?? 'ĐÁNH TIẾP'}</button>}
       {!mo && !tran.ketThuc && !choTiep && <div className="dh-cho" role="status">{tran.hiep === 1 && !xem.hiepVuaXong ? 'Chuẩn bị lên đường' : `Hiệp ${tran.hiep}${tran.laTrum ? ' · TRÙM' : ''} mở sau`} {Math.max(1, p.moSauGiay)} giây</div>}
       {!mo && !tran.ketThuc && p.hetCauMoi && tran.hiep === 1 && <div className="dh-cho" role="status" data-vung="het-cau-moi">{CHU_HET_CAU_MOI}</div>}
-      {!mo && !tran.ketThuc && tran.hiep === 1 && !!xem.soCauThieu && <div className="dh-cho" role="status">Chặng này em có {Math.max(0, SO_CAU_RIENG_CHANG - xem.soCauThieu)} câu ôn. Hiệp nào em đã ôn xong, em giữ khiên cho đoàn và tiếp sức bạn.</div>}
+      {!mo && !tran.ketThuc && tran.hiep === 1 && !!xem.soCauThieu && <div className="dh-cho" role="status">Chuyến này em có {Math.max(0, SO_CAU_RIENG_CHANG - xem.soCauThieu)} câu ôn. Hiệp nào em đã ôn xong, em giữ khiên cho đoàn và tiếp sức bạn.</div>}
       </>)}
     </div>
   )
