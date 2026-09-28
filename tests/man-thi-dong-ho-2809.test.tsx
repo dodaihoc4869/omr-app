@@ -234,7 +234,7 @@ describe('ChemText: memo + nhớ KaTeX, HTML y hệt bản trước 28/09', () =
       b.unmount()
     }
     expect(soKatex).toBeGreaterThanOrEqual(10)
-  })
+  }, 60_000) // vẽ hàng trăm công thức KaTeX hai lượt: chạy chung toàn bộ vitest (máy tải nặng) vượt 5 s mặc định ⇒ nới thời hạn, KHÔNG nới điều kiện so HTML
   it('ChemText là memo; cha vẽ lại với cùng chuỗi ⇒ KaTeX không chạy lại, DOM công thức giữ nguyên nút', () => {
     expect((ChemText as unknown as { $$typeof: symbol }).$$typeof).toBe(Symbol.for('react.memo'))
     const spy = vi.spyOn(katex, 'renderToString')

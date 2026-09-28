@@ -3,6 +3,7 @@
 // (phiên `mode:'bia'`, `hoa2:1`, `bia:1`), nên Thể lực, EXP (trần 120/ngày), lịch ôn, Câu đã làm tự khớp như Đảo và Đoàn.
 // Trần Bi-a (thầy chốt 28/09): tối đa floor(40% phần Đoàn) + floor(40% phần Đảo) của kế hoạch hôm nay.
 import type { Env, DongCa, DongLuot } from './kieu'
+import { docCauHinhDem } from './cau-hinh-dem'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { protectedQuestions } from './game-v2-bank'
@@ -71,8 +72,7 @@ export function damBaoBangBia(env: Env): Promise<void> {
 
 // ---------------------------------------------------------------- cờ + khoá
 export async function docCoBia(env: Env) {
-  const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CO_BIA).first<{ gia_tri: string }>().catch(() => null)
-  return docCoHoa2Tu(r?.gia_tri)
+  return docCoHoa2Tu(await docCauHinhDem(env, KHOA_CO_BIA)) // đệm 15 s trong isolate (cau-hinh-dem.ts)
 }
 /** Bi-a mở cho em khi: Game Hóa 2.0 mở cho em (Sảnh Bát Linh) VÀ cờ `bi_a` bật cho em (theo sbd, theo lớp, hoặc cả trường khi không liệt kê). Lỗi đọc ⇒ đóng. */
 export async function biaMoCho(env: Env, sbd: string): Promise<boolean> {
@@ -177,11 +177,9 @@ export function xepUngVienChot(khoa: readonly string[], hs: Pick<HoSo2, 'meta' |
 }
 
 async function napMot(env: Env, hs: HoSo2, khoa: readonly string[], chan: ReadonlySet<string>) {
-  for (const k of khoa) {
-    const [x] = await napCau(env, hs, [k], 1, chan)
-    if (x) return x
-  }
-  return null
+  // Tối ưu 28/09: napCau đã nạp theo lô (một truy vấn) và bỏ câu hỏng ⇒ không lặp từng câu (N+1). Kết quả y hệt: câu dùng được ĐẦU TIÊN.
+  const [x] = await napCau(env, hs, khoa, 1, chan)
+  return x ?? null
 }
 
 // ---------------------------------------------------------------- lệnh

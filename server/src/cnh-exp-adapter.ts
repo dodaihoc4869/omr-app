@@ -11,6 +11,7 @@
 // ⚠️ TỆP NÀY KHÔNG TỰ BẬT CỜ, KHÔNG ĐỔI ROUTE ĐANG CHẠY, KHÔNG GHI GÌ khi cửa đóng.
 // Việc nối từng route (`server/src/index.ts`, `on-lai-nop.ts`, `mom.ts`, …) là bước sau, có cửa canh.
 import type { Env } from './kieu'
+import { docCauHinhDem } from './cau-hinh-dem'
 import {
   doiVangCore,
   dungKhienCore,
@@ -74,12 +75,12 @@ const laBool = (x: unknown): boolean => x === true
  * Hàm THUẦN ở phần diễn giải: mọi trường đọc theo kiểu chặt, mọi thứ không phải boolean/chuỗi hợp lệ
  * rơi về giá trị an toàn (đóng), không bao giờ "suy ra" là đã sẵn sàng.
  */
-export async function docCauHinhKichHoat(env: Env): Promise<CauHinhKichHoat> {
-  const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?')
-    .bind(KHOA_CAU_HINH_KICH_HOAT)
-    .first<{ gia_tri: string | null }>()
-    .catch(() => null)
-  const raw = r?.gia_tri
+export async function docCauHinhKichHoat(env: Env, dem = false): Promise<CauHinhKichHoat> {
+  // `dem = true` CHỈ cho đường HIỂN THỊ (trám P08 trên MỌI phản hồi có profile): đệm 15 s trong isolate (cau-hinh-dem.ts).
+  // Cửa GHI (moCuaRoute, cuaP08Mo) luôn đọc TƯƠI — đóng cửa khẩn là có hiệu lực ngay.
+  const raw = dem
+    ? await docCauHinhDem(env, KHOA_CAU_HINH_KICH_HOAT)
+    : (await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CAU_HINH_KICH_HOAT).first<{ gia_tri: string | null }>().catch(() => null))?.gia_tri
   if (typeof raw !== 'string' || !raw.trim()) return { ...CAU_HINH_KICH_HOAT_MAC_DINH }
   let j: Record<string, unknown>
   try {
