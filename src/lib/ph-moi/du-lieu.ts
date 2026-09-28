@@ -88,7 +88,6 @@ export interface PhMoi {
   aiDaChuanBi: ViecAi[] | null
   no: NoPh | null
   phuHuynhLamGi: string[]
-  loiBoNao: { loi: string; ngay: string; thuTuan: string } | null
   giaoThemConLai: number | null
   doCham: { hang: number; siSo: number } | null
 }
@@ -335,7 +334,6 @@ export function docTatCaVeCon(raw: unknown): PhMoi | null {
   const my = laDoiTuong(raw.manhYeu) ? raw.manhYeu : null
   const bt = laDoiTuong(raw.baiTapVeNha) ? raw.baiTapVeNha : null
   const lo = laDoiTuong(raw.lichOn) ? raw.lichOn : null
-  const lb = laDoiTuong(raw.loiBoNao) ? raw.loiBoNao : null
   const gt = laDoiTuong(raw.giaoThem) ? raw.giaoThem : null
   const dc = laDoiTuong(raw.doCham) ? raw.doCham : null
   const dongTG = hn && Array.isArray(hn.dongThoiGian) ? lapDanh(hn.dongThoiGian, docMoc, 60).sort((a, b) => Date.parse(a.batDau) - Date.parse(b.batDau)) : null
@@ -448,7 +446,6 @@ export function docTatCaVeCon(raw: unknown): PhMoi | null {
     })(),
     no: docNo(raw.no),
     phuHuynhLamGi: lapDanh(raw.phuHuynhLamGi, (e) => (typeof e === 'string' && e.trim() ? chuoi(e, 240) : null), 2),
-    loiBoNao: lb && (chuoi(lb.loi, 600) || chuoi(lb.thuTuan, 900)) ? { loi: chuoi(lb.loi, 600), ngay: typeof lb.ngay === 'string' ? lb.ngay : '', thuTuan: chuoi(lb.thuTuan, 900) } : null,
     giaoThemConLai: gt ? nguyenKhongAm(gt.conLaiHomNay) : null,
     doCham: dc && nguyenKhongAm(dc.hang) !== null && nguyenKhongAm(dc.siSo) !== null && (dc.hang as number) >= 1 && (dc.siSo as number) >= (dc.hang as number) ? { hang: dc.hang as number, siSo: dc.siSo as number } : null,
   }

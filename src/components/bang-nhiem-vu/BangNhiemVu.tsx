@@ -3,7 +3,6 @@
 // sách 4 bậc, (4) nút Vào thi, (5) vinh danh top 3 — trên nền động tinh tế.
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
-import TheBoNao from './TheBoNao'
 import TheCanhBaoThay from './TheCanhBaoThay'
 import TheThuThachRieng from './TheThuThachRieng'
 import GiaoThemChoCon from './GiaoThemChoCon'
@@ -15,12 +14,11 @@ import { ngayVuaTraXong, type VeDichView } from '../../lib/ve-dich-hien-thi'
 import TheChoAn, { viewChoAn } from './TheChoAn'
 import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
-import type { BoNaoPhuHuynh } from '../../lib/bo-nao-hien-thi'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, PawPrint, RefreshCw, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react'
 import { chuDangCho } from '../../lib/hang-doi-nop'
 import { chuCuaHang } from '../../game/than-thu-v2/shop/chu-cua-vao'
-import { boGameChoPhuHuynh, sachBoNaoChoPhuHuynh, type DuLieuBangNhiemVu, type HanhDongNhiemVu, type TheNhiemVu } from '../../lib/nhiem-vu-adapter'
+import { boGameChoPhuHuynh, type DuLieuBangNhiemVu, type HanhDongNhiemVu, type TheNhiemVu } from '../../lib/nhiem-vu-adapter'
 import type { SpiritMotion } from '../../game/than-thu-v2/Spirit2D'
 import DauTrang, { type MucMenu, type ThanThuGoc } from './DauTrang'
 import TheLamNgay from './TheLamNgay'
@@ -119,8 +117,6 @@ export interface BangNhiemVuProps {
   onVaoThi?: () => void
   onXemBaiDaNop?: () => void
   taiVinhDanh?: () => Promise<DuLieuVinhDanh | null>
-  /** Lời cho phụ huynh + thư tuần của "Bộ não A.I" (lệnh riêng /ph/ke-hoach). Học sinh KHÔNG nhận qua đây (lời của em đi theo `duLieu.boNao`). */
-  boNaoPh?: BoNaoPhuHuynh | null
   /** Chỗ đặt thẻ "Ca kiểm tra gần nhất của con" (chỉ phụ huynh): ngay dưới khối tiến độ, trên việc hôm nay. */
   theCaGanNhat?: ReactNode
   /** Ô "Thi đua hôm nay" (chỉ học sinh; phương án 8A): ngay dưới khối tiến độ, trên việc hôm nay. Màn cha truyền vào; thiếu dữ liệu ⇒ không dựng. */
@@ -158,7 +154,6 @@ export default function BangNhiemVu({
   onVaoThi,
   onXemBaiDaNop,
   taiVinhDanh,
-  boNaoPh: boNaoPhGoc,
   theCaGanNhat,
   thiDua,
   giaoThem,
@@ -173,7 +168,6 @@ export default function BangNhiemVu({
   // APP PHỤ HUYNH KHÔNG CÒN GÌ CỦA GAME (thầy 21/09): dữ liệu vào từ MỌI chỗ (bản mới, bản nhớ, test) đều bị gỡ thần thú/EXP/khiên/Đoàn ở ĐÂY, một cửa duy nhất;
   // việc "luyện dạng còn yếu" đọc thành "Luyện dạng con còn vấp". Học sinh giữ nguyên. Xem `boGameChoPhuHuynh` (nhiem-vu-adapter.ts).
   const duLieu = useMemo(() => (laPh ? boGameChoPhuHuynh(duLieuGoc) : duLieuGoc), [laPh, duLieuGoc])
-  const boNaoPh = useMemo(() => (laPh ? sachBoNaoChoPhuHuynh(boNaoPhGoc) : boNaoPhGoc), [laPh, boNaoPhGoc])
 
   // Thần thú mừng 1,2 s khi em vừa làm thêm được câu TRONG phiên này.
   const [dongThu, setDongThu] = useState<SpiritMotion>('idle')
@@ -441,7 +435,7 @@ export default function BangNhiemVu({
             {/* Ô "THI ĐUA HÔM NAY" (chỉ học sinh; 8A): ngay dưới thanh tiến độ, TRÊN việc hôm nay. */}
             {!laPh && thiDua && <OThiDua v={thiDua} onLam={lamViecDau} />}
 
-            {/* THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I, thầy chốt 21/09): ngay dưới thanh tiến độ, TRÊN việc hôm nay. Chỉ học sinh; không thử thách hợp lệ ⇒ không dựng. */}
+            {/* THỬ THÁCH RIÊNG HÔM NAY (thầy chốt 21/09; nguồn Bộ não A.I đã gỡ 28/09 ⇒ máy chủ luôn `co:false`, thẻ không dựng): ngay dưới thanh tiến độ, TRÊN việc hôm nay. Chỉ học sinh. */}
             {!laPh && duLieu.thuThachRieng && (duLieu.thuThachRieng.trangThai === 'xong' || (onLamThuThach && onDeSauThuThach)) && (
               <TheThuThachRieng thuThach={duLieu.thuThachRieng} hoTen={hoTen} onLam={(t) => onLamThuThach?.(t)} onDeSau={(t) => onDeSauThuThach?.(t)} />
             )}
@@ -499,9 +493,7 @@ export default function BangNhiemVu({
                 <DanhSachNhiemVu cacBac={duLieu.cacBac} docChi={laPh} onChon={chon} />
               </>
             )}
-            {/* H1 (rà soát dư thừa, Boss duyệt): việc hôm nay đứng NGAY dưới tiến độ; lời Bộ não + EXP hôm nay xuống dưới việc. */}
-            {/* TheBoNao tự chọn phần theo vai: học sinh chỉ thấy lời của em, phụ huynh chỉ thấy lời + thư tuần (test bo-nao-the/bo-nao-bang khoá). */}
-            <TheBoNao vaiTro={vaiTro} hoTen={hoTen} now={now} hs={duLieu.boNao?.hs ?? null} ph={boNaoPh ?? null} />
+            {/* H1 (rà soát dư thừa, Boss duyệt): việc hôm nay đứng NGAY dưới tiến độ; EXP hôm nay xuống dưới việc. (Thẻ lời Bộ não A.I đã gỡ 28/09.) */}
 
             {duLieu.exp && !laPh && (
               <section className="bnv-exp" aria-label="EXP học tập hôm nay" data-vung="exp">

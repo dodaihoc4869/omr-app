@@ -311,8 +311,8 @@ export default function BangChienDich({
             )}
           </div>
           <p className="cd-phu">
-            Em xếp theo thành thạo thấp trước (▲). Dạng xếp theo cả lớp yếu nhất bên trái. Số trong ô = % câu của dạng em đã thành thạo; hạng theo đúng ngưỡng A.I Đỗ Đại
-            Học dùng để bốc câu mới. Rê chuột lên tên em để xem sức học theo dạng.
+            Em xếp theo thành thạo thấp trước (▲). Dạng xếp theo cả lớp yếu nhất bên trái. Số trong ô = % câu của dạng em đã thành thạo; hạng theo đúng ngưỡng app
+            dùng để bốc câu mới. Rê chuột lên tên em để xem sức học theo dạng.
           </p>
         </section>
 

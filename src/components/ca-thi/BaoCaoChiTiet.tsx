@@ -318,7 +318,7 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
           {p.them?.aiDaLo && (p.them.aiDaLo.soCauSaiVaoLichOn || p.them.aiDaLo.dangBaiTapKe.length > 0) && (
             <div className="ct-tam">
               <div className="ct-tam-dau">
-                <h2>A.I Đỗ Đại Học đã lo</h2>
+                <h2>Thầy Đỗ Đại Học đã lo</h2>
               </div>
               <div style={{ color: 'var(--gvm-chu-2)', display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {p.them.aiDaLo.soCauSaiVaoLichOn ? (
@@ -521,9 +521,9 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
             </div>
             <div className="ct-tam ct-nhan-xet">
               <div className="ct-tam-dau">
-                <h2>Nhận xét của thầy</h2>
+                <h2>Nhận xét của Thầy Đỗ Đại Học</h2>
               </div>
-              <textarea aria-label="Nhận xét của thầy" value={nhanXet} maxLength={2000} onChange={(e) => setNhanXet(e.target.value)} placeholder="Viết vài dòng cho em và phụ huynh…" />
+              <textarea aria-label="Nhận xét của Thầy Đỗ Đại Học" value={nhanXet} maxLength={2000} onChange={(e) => setNhanXet(e.target.value)} placeholder="Viết vài dòng cho em và phụ huynh…" />
               <div className="ct-hang-nut ct-khong-in" style={{ marginTop: 8, alignItems: 'center' }}>
                 <button type="button" className="ct-nut ct-nut-tong ct-nut-nho" onClick={luu} disabled={dangLuu || nhanXet.trim() === nxGoc}>
                   {dangLuu ? 'Đang lưu…' : 'Lưu nhận xét'}

@@ -138,10 +138,10 @@ describe('taiThuThachHomNay — lệnh mạng', () => {
 describe('TheThuThachRieng — thẻ', () => {
   const moi = docThuThachRieng(THU_THACH())!
   const dung = (t: ThuThachRieng = moi, tay = { onLam: vi.fn(), onDeSau: vi.fn() }) => ({ ...tay, ...render(<div className="bnv"><TheThuThachRieng thuThach={t} hoTen="Minh Anh" {...tay} /></div>) })
-  it('mời: nhãn "Bộ não A.I hỗ trợ riêng em <họ tên>", tiêu đề, lời mời nguyên văn, số câu + "không bắt buộc, không có hạn", MỘT nút chính + "Để sau"', () => {
+  it('mời: nhãn "Thầy Đỗ Đại Học gửi riêng em <họ tên>" (Bộ não A.I đã gỡ 28/09), tiêu đề, lời mời nguyên văn, số câu + "không bắt buộc, không có hạn", MỘT nút chính + "Để sau"', () => {
     const { onLam, onDeSau } = dung()
     const the = screen.getByRole('region', { name: 'Thử thách riêng hôm nay' })
-    expect(the.textContent).toContain('Bộ não A.I hỗ trợ riêng em Minh Anh')
+    expect(the.textContent).toContain('Thầy Đỗ Đại Học gửi riêng em Minh Anh')
     expect(the.textContent).toContain('Rồng Lửa còn thiếu 40 EXP để lên cấp 7. Hôm nay thử 2 câu Thuỷ phân ester, xong là đủ.')
     expect(within(the).getByText('2 câu')).toBeTruthy(); expect(within(the).getByText('Không bắt buộc, không có hạn')).toBeTruthy()
     expect(within(the).getByText('Mảnh khiên 3/12')).toBeTruthy(); expect(the.textContent).not.toContain('Chuỗi') // chuỗi ngày đã có ở đầu trang, không lặp
@@ -164,16 +164,16 @@ describe('TheThuThachRieng — thẻ', () => {
 })
 
 describe('cổng học sinh THẬT: thẻ → làm câu → nộp', () => {
-  it('thẻ nằm NGAY dưới thanh tiến độ và TRÊN việc hôm nay; Bộ não + EXP xuống dưới việc (H1)', async () => {
+  it('thẻ nằm NGAY dưới thanh tiến độ và TRÊN việc hôm nay (thẻ lời Bộ não đã gỡ 28/09)', async () => {
     tra['/hs/ke-hoach-ngay'] = { body: KE_HOACH }
     tra['/hs/thu-thach-hom-nay'] = { body: THU_THACH() }
     const { container } = render(<StudentPortalScreen />)
     const the = await screen.findByRole('region', { name: 'Thử thách riêng hôm nay' })
     const tienDo = container.querySelector('[data-vung="tien-do"]')!
     const lamNgay = await screen.findByRole('region', { name: /^Làm ngay: Ôn 3 câu/ })
-    const boNao = await waitFor(() => { const e = container.querySelector('[data-vung="bo-nao"]'); if (!e) throw new Error('chưa có'); return e })
     const truoc = (a: Element, b: Element) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING)
-    expect(truoc(tienDo, the)).toBe(true); expect(truoc(the, lamNgay)).toBe(true); expect(truoc(lamNgay, boNao)).toBe(true)
+    expect(truoc(tienDo, the)).toBe(true); expect(truoc(the, lamNgay)).toBe(true)
+    expect(container.querySelector('[data-vung="bo-nao"]')).toBeNull()
     expect(container.querySelectorAll('.bnv-nut-chinh').length).toBe(1) // vẫn MỘT nút chính của cả màn
     expect(goiTheo('/hs/thu-thach-hom-nay')[0].body).toEqual({ token: 'test-token' })
   })

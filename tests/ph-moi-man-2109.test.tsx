@@ -15,7 +15,7 @@ import { PH_OK, PH_CHUA_CB, PH_TRONG, CHI_TIET, H, NAY } from './_ph-moi/du-lieu
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))
 vi.mock('../src/lib/exam-api', async (original) => ({ ...(await original<any>()), tenTheoSbd: async () => ({ sbd: '12121212', hoTen: 'Nguyễn Minh Khôi', lop: '12 - Tinh Hoa', tenCa: '' }) }))
-vi.mock('../src/lib/bo-nao-lay-loi-ph', () => ({ taiThongTinPhuHuynh: async () => ({ boNao: null, canhBao: [CANH_BAO] }) }))
+vi.mock('../src/lib/tai-thong-tin-ph', () => ({ taiThongTinPhuHuynh: async () => ({ canhBao: [CANH_BAO] }) }))
 const CANH_BAO = { id: 'cb-1', maBtvn: 'BT-1', tenBtvn: 'BTVN Este', guiLuc: '2026-09-21T01:00:00Z', hanNop: '2026-09-22T05:00:00Z', loi: 'Thầy nhắc con nộp bài trước 12:00.', trangThaiEm: 'chua_mo', chang: null, daXem: false }
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const CAM_GAME = /thần thú|khiên|Võ đài|Đảo thần thú|Linh Tâm|Đoàn Hộ Tống|\bEXP\b/i
@@ -217,7 +217,7 @@ describe('ManChinh — màn chính kiểu Apple, phương án B "Widget"', () =>
     expect(nut).toHaveLength(1)
     expect(nut[0]!.textContent).toBe('Giao thêm bài cho con')
     expect(nut[0]!.closest('.phm-ap-day')).toBeTruthy()
-    expect(container.querySelector('[data-vung="luot-giao"]')!.textContent).toBe('Hôm nay còn 2 lượt giao · A.I Đỗ Đại Học chọn câu hợp với con')
+    expect(container.querySelector('[data-vung="luot-giao"]')!.textContent).toBe('Hôm nay còn 2 lượt giao · Thầy Đỗ Đại Học chọn câu hợp với con')
     expect(container.textContent).not.toMatch(CAM_GAME)
     expect(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(container.textContent || '')).toBe(false)
     cleanup()
@@ -239,7 +239,7 @@ describe('ManChinh — màn chính kiểu Apple, phương án B "Widget"', () =>
     expect(t.getAttribute('role')).toBe('alert')
     expect(t.textContent).toContain('Cần liên kết riêng của con.')
     expect(t.compareDocumentPosition(container.querySelector('[data-vung="giao-them"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    const daGiao = { kieu: 'da_giao', tieuDe: 'Đã giao cho con 6 câu, khoảng 8 phút', dong: ['A.I Đỗ Đại Học đã chọn 6 câu hợp với con hôm nay.'], cuoi: 'Hôm nay còn 1 lượt giao' }
+    const daGiao = { kieu: 'da_giao', tieuDe: 'Đã giao cho con 6 câu, khoảng 8 phút', dong: ['Thầy Đỗ Đại Học đã chọn 6 câu hợp với con hôm nay.'], cuoi: 'Hôm nay còn 1 lượt giao' }
     rerender(<ManChinh {...props} giaoThem={giaoThemMau({ the: daGiao, conLai: 1 }) as any} />)
     const d = container.querySelector('[data-vung="the-giao-them"]') as HTMLElement
     expect(d.getAttribute('role')).toBe('status')

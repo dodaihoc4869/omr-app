@@ -10,7 +10,6 @@ import {
   TEN_BUC,
   type BaiTapBangTin,
   type BangTin,
-  type BoNaoBangTin,
   type DangVapBangTin,
   type EmCanDeY,
   type EmSaiNhanh,
@@ -197,7 +196,7 @@ function ThanhBaiTap({ b }: { b: BaiTapBangTin }) {
 /** Dòng dưới thanh: việc A.I Đỗ Đại Học đã/sẽ làm (nhắc tự động) + chặng xong trung bình của bài cá nhân hoá. Không có gì thật để nói ⇒ '' (không vẽ dòng). */
 export function chuMayBaiTap(b: BaiTapBangTin): string {
   const phan: string[] = []
-  if (b.nhac && (b.nhac.soEm > 0 || b.nhac.soPhuHuynh > 0)) phan.push(`A.I Đỗ Đại Học đã nhắc ${b.nhac.soEm} em${b.nhac.soPhuHuynh > 0 ? ` · ${b.nhac.soPhuHuynh} phụ huynh` : ''}`)
+  if (b.nhac && (b.nhac.soEm > 0 || b.nhac.soPhuHuynh > 0)) phan.push(`App đã nhắc ${b.nhac.soEm} em${b.nhac.soPhuHuynh > 0 ? ` · ${b.nhac.soPhuHuynh} phụ huynh` : ''}`)
   if (b.nhac?.luotKe) phan.push(`lượt nhắc kế ${gioPhutVN(b.nhac.luotKe)}`)
   if (b.chang) phan.push(`chặng xong trung bình ${b.chang.tbDaXong.toLocaleString('vi-VN')}/${b.chang.tong}`)
   return phan.join(' · ')
@@ -451,57 +450,6 @@ export function KhoiDangVap({ bt, nayMs, onMoTatCa }: { bt: BangTin; nayMs: numb
   )
 }
 
-// ─────────────────────────────── BỘ NÃO A.I · ĐÊM QUA ───────────────────────────────
-
-export function KhoiBoNao({ bn, lyDo, thuThach }: { bn: BoNaoBangTin | null; lyDo?: string; thuThach?: string }) {
-  const gio = bn?.chayLuc ? gioPhutVN(bn.chayLuc) : ''
-  // Gợi ý cho thầy: chỉ hiện số hộp VỪA chỗ (không cắt ngang một hộp), luôn ≥ 1.
-  const [ref, cao, hang] = useChieuCao<HTMLUListElement>(68)
-  const goiY = bn?.goiY ?? []
-  const n = chiaHang(goiY.length, cao == null ? null : cao + 8, hang, 0) // +8: khoảng cách cuối không tính vào chiều cao
-  return (
-    <O id="bt3-bn" tieuDe="Bộ não A.I · đêm qua" lop="bt3-o-bn" khoi="bo-nao">
-      <div className="bt3-than">
-        {!bn ? (
-          <Trong>{lyDo ? `Chưa có bản tin của Bộ não A.I: ${lyDo}.` : 'Chưa có bản tin của Bộ não A.I đêm qua.'}</Trong>
-        ) : (
-          <>
-            <dl className="bt3-bn-so">
-              {bn.soEmSoi != null && (
-                <div>
-                  <dd>{bn.soEmSoi.toLocaleString('vi-VN')}</dd>
-                  <dt>em được soi{gio ? ` lúc ${gio}` : ''}</dt>
-                </div>
-              )}
-              {bn.soEmDieuChinh != null && (
-                <div>
-                  <dd>{bn.soEmDieuChinh.toLocaleString('vi-VN')}</dd>
-                  <dt>em được chỉnh bài</dt>
-                </div>
-              )}
-              {bn.soLoiNhan != null && (
-                <div>
-                  <dd>{bn.soLoiNhan.toLocaleString('vi-VN')}</dd>
-                  <dt>lời nhắn cho em</dt>
-                </div>
-              )}
-            </dl>
-            {thuThach && <p className="bt3-bn-thu">{thuThach}</p>}
-            {goiY.length > 0 && <p className="bt3-bn-cd">Gợi ý cho thầy</p>}
-            <ul className="bt3-bn-y" ref={ref}>
-              {goiY.slice(0, n).map((g) => (
-                <li key={g.chu} title={g.chu}>
-                  <span>{g.chu}</span>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </div>
-    </O>
-  )
-}
-
 // ─────────────────────────────── MÁY ĐÃ TỰ LÀM HÔM NAY ───────────────────────────────
 
 /** In đậm con số đầu tiên của câu ("Nhắc nộp bài cho **12 em**, báo 9 phụ huynh") như bản vẽ. */
@@ -526,8 +474,8 @@ export function HangViec({ v }: { v: ViecMayLam }) {
   )
 }
 
-/** Tên ô "A.I Đỗ Đại Học đã tự làm hôm nay" (thầy lệnh 21/09: thay chữ "Máy" làm chủ ngữ bằng "A.I Đỗ Đại Học"; bảng A2 docs/CHUAN-TU-NGU). */
-export const TEN_O_MAY = 'A.I Đỗ Đại Học đã tự làm hôm nay'
+/** Tên ô "App đã tự làm hôm nay" (21/09 thầy đổi "Máy" → "A.I Đỗ Đại Học"; 28/09 gỡ Bộ não A.I ⇒ việc tự động ở app thầy ghi "App"; docs/CHUAN-TU-NGU). */
+export const TEN_O_MAY = 'App đã tự làm hôm nay'
 
 /** Chân ô: bình thường ⇒ đúng câu bản vẽ thầy chốt ("Hệ thống bình thường · thầy không cần làm gì"; giờ chạy nằm ở `title`); cần để ý / có lỗi ⇒ nói lý do thật của máy chủ. */
 function SucKhoe({ s }: { s: SucKhoeBangTin }) {
@@ -540,11 +488,9 @@ function SucKhoe({ s }: { s: SucKhoeBangTin }) {
   )
 }
 
-/** "Bộ não A.I soi N em" đã nằm ở ô Bộ não A.I · đêm qua ⇒ không nhắc lại ở đây (một thông tin một chỗ); ô Bộ não vắng thì giữ dòng này. */
-const laThuThach = (v: ViecMayLam) => v.loai.startsWith('thu_thach')
-export const viecCuaMay = (bt: BangTin): ViecMayLam[] => bt.mayDaLam.filter((v) => !laThuThach(v) && (!bt.boNao || v.loai !== 'bo_nao_soi'))
-/** Dòng "N em nhận thử thách riêng · M em đã làm" (Bộ não nấc 1) nằm ở ô Bộ não A.I, không lặp ở ô Máy đã làm. Chưa có ⇒ undefined. */
-export const dongThuThach = (bt: BangTin): string | undefined => bt.mayDaLam.find(laThuThach)?.chu
+/** Việc máy chủ đã tự làm. Dòng cũ của Bộ não A.I (đã gỡ 28/09: `bo_nao_soi`, `thu_thach_*`) nếu còn trong bản đệm thì bỏ. */
+const laDongBoNaoCu = (v: ViecMayLam) => v.loai.startsWith('thu_thach') || v.loai === 'bo_nao_soi'
+export const viecCuaMay = (bt: BangTin): ViecMayLam[] => bt.mayDaLam.filter((v) => !laDongBoNaoCu(v))
 
 export function KhoiMayDaLam({ bt, nayMs, onMoTatCa }: { bt: BangTin; nayMs: number; onMoTatCa: () => void }) {
   const [ref, cao, hang] = useChieuCao<HTMLDivElement>(48)
@@ -553,7 +499,7 @@ export function KhoiMayDaLam({ bt, nayMs, onMoTatCa }: { bt: BangTin; nayMs: num
   return (
     <O id="bt3-may" tieuDe={TEN_O_MAY} lop="bt3-o-may" khoi="may-da-lam">
       <div className="bt3-than" ref={ref}>
-        {ds.length === 0 ? <Trong>{bt.lyDoThieu.mayDaLam ?? `${chuTuMoc(bt, nayMs)} A.I Đỗ Đại Học chưa có việc nào cần tự làm.`}</Trong> : <ul className="bt3-ds">{ds.slice(0, n).map((v) => <HangViec key={v.loai} v={v} />)}</ul>}
+        {ds.length === 0 ? <Trong>{bt.lyDoThieu.mayDaLam ?? `${chuTuMoc(bt, nayMs)} app chưa có việc nào cần tự làm.`}</Trong> : <ul className="bt3-ds">{ds.slice(0, n).map((v) => <HangViec key={v.loai} v={v} />)}</ul>}
         {ds.length > n && <NutNua conLai={ds.length - n} don="việc" onMo={onMoTatCa} />}
       </div>
       {bt.sucKhoe && <SucKhoe s={bt.sucKhoe} />}

@@ -6,7 +6,7 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
 import { datPassPhuHuynh } from '../lib/mom-api'
 import { docPass, nhanPassTuDiaChi, xacDinhPhuHuynh, xoaPass } from '../lib/ph-token'
-import { taiThongTinPhuHuynh } from '../lib/bo-nao-lay-loi-ph'
+import { taiThongTinPhuHuynh } from '../lib/tai-thong-tin-ph'
 import { baoDaXemPhuHuynh } from '../lib/canh-bao-thay-may-chu'
 import type { CanhBaoThay } from '../lib/canh-bao-thay-hien-thi'
 import { useGioHocTap } from '../hooks/useGioHocTap'
@@ -42,7 +42,7 @@ function ParentPortalCu() {
   // Đang ở màn chính hay ở bảng; `mucDau` = khối bảng phải cuộn tới khi mở (thẻ "Ca kiểm tra gần nhất").
   const [xemBang, setXemBang] = useState<{ mucDau?: 'ca-kiem-tra' } | null>(null)
   const nowHocTap = useGioHocTap()
-  // "Cảnh báo của thầy" cho phụ huynh (lời cho phụ huynh, cửa sổ 72 giờ, chỉ đúng con; lệnh /ph/ke-hoach bằng token phụ huynh): MỘT dải thụ động ở màn chính. Lời Bộ não/thư tuần của lệnh này KHÔNG dùng.
+  // "Cảnh báo của thầy" cho phụ huynh (lời cho phụ huynh, cửa sổ 72 giờ, chỉ đúng con; lệnh /ph/ke-hoach bằng token phụ huynh): MỘT dải thụ động ở màn chính.
   const [canhBaoPh, setCanhBaoPh] = useState<CanhBaoThay[]>([])
   useEffect(() => {
     if (!sbdHienTai) {

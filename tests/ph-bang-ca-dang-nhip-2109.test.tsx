@@ -159,7 +159,7 @@ describe('Dang — "Điểm mạnh · cần luyện"', () => {
     expect(vap).toHaveLength(2)
     expect(vap[0]!.querySelector('.phm-thanh')!.getAttribute('data-mau')).toBe('cam')
     expect(chu(vap[0]!.querySelector('.phm-bac [data-nay]'))).toBe('Biết')
-    expect(chu(the[1]!.querySelector('.phm-the__cuoi'))).toBe('A.I Đỗ Đại Học đã xếp 7 câu vào lịch ôn ngày 22/09')
+    expect(chu(the[1]!.querySelector('.phm-the__cuoi'))).toBe('Thầy Đỗ Đại Học đã xếp 7 câu vào lịch ôn ngày 22/09')
     expect(the[0]!.querySelector('.phm-the__cuoi')).toBeNull()
     expect(chu(c.querySelector('.phm-ghi-chu'))).toBe('Mỗi dạng bài con đi qua ba bậc: Biết, Hiểu, Vận dụng.')
     // máy chủ không trả số câu ôn theo từng dạng ⇒ KHÔNG có dòng "N câu vào lịch ôn ngày …" ở từng dạng
@@ -469,15 +469,13 @@ describe('Nhip14 — "14 ngày gần đây"', () => {
   })
 })
 
-describe('LoiAi — "Lời A.I Đỗ Đại Học gửi anh/chị"', () => {
-  it('đủ dữ liệu: thư chỉ dùng chữ máy chủ + chữ ký + hai gợi ý đánh số', () => {
-    const c = ve(<LoiAi pm={APPLE} />)
+describe('LoiAi — "Lời Thầy Đỗ Đại Học gửi anh/chị" (thư Bộ não A.I đã gỡ 28/09)', () => {
+  it('đủ dữ liệu: tiêu đề ký Thầy Đỗ Đại Học + hai gợi ý đánh số; KHÔNG còn thẻ thư dù máy chủ cũ còn gửi loiBoNao', () => {
+    const c = ve(<LoiAi pm={{ ...APPLE, loiBoNao: { loi: 'Thư cũ.', ngay: '2026-09-21', thuTuan: '' } } as typeof APPLE} />)
     expect(c.querySelector('section#muc-loi')).not.toBeNull()
-    expect(chu(c.querySelector('h2'))).toBe('Lời A.I Đỗ Đại Học gửi anh/chị')
-    expect(chu(c.querySelector('.phm-thu__dau'))).toBe('A.I A.I Đỗ Đại Học Thứ Hai 21/09/2026')
-    const doan = [...c.querySelectorAll('.phm-thu__than p')].map((p) => chu(p))
-    expect(doan).toEqual([PH_OK.loiBoNao.loi])
-    expect(chu(c.querySelector('.phm-thu__ky'))).toBe('A.I Đỗ Đại Học viết từ số liệu học của con.')
+    expect(chu(c.querySelector('h2'))).toBe('Lời Thầy Đỗ Đại Học gửi anh/chị')
+    expect(c.querySelector('.phm-thu')).toBeNull()
+    expect(c.textContent).not.toMatch(/A\.I|Bộ não|Thư cũ/)
     expect(chu(c.querySelector('.phm-goi-y')!.parentElement!.querySelector('.phm-nhan-muc'))).toBe('Anh/chị có thể làm gì')
     const goiY = [...c.querySelectorAll('.phm-goi-y > li')]
     expect(goiY.map((l) => chu(l.querySelector('i')))).toEqual(['1', '2'])
@@ -485,35 +483,15 @@ describe('LoiAi — "Lời A.I Đỗ Đại Học gửi anh/chị"', () => {
     expect(coLoiAi(APPLE)).toBe(true)
   })
 
-  it('thuTuan ⇒ đoạn thứ hai; xuống dòng ⇒ tách đoạn; chỉ có gợi ý ⇒ không thẻ thư; thiếu ngày ⇒ bỏ dòng ngày', () => {
-    const pm = sua(PH_OK, (r) => { r.loiBoNao.thuTuan = 'Tuần này con ôn đều.' })
-    const c = ve(<LoiAi pm={pm} />)
-    expect([...c.querySelectorAll('.phm-thu__than p')].map((p) => chu(p))).toEqual([PH_OK.loiBoNao.loi, 'Tuần này con ôn đều.'])
-    cleanup()
-    const tach = ve(<LoiAi pm={{ ...APPLE, loiBoNao: { loi: 'Đoạn một.\nĐoạn hai.', ngay: '', thuTuan: '' } }} />)
-    expect([...tach.querySelectorAll('.phm-thu__than p')].map((p) => chu(p))).toEqual(['Đoạn một.', 'Đoạn hai.'])
-    expect(tach.querySelector('.phm-thu__dau p')).toBeNull()
-    cleanup()
-    const chiGoiY = ve(<LoiAi pm={sua(PH_OK, (r) => { delete r.loiBoNao })} />)
-    expect(chiGoiY.querySelector('.phm-thu')).toBeNull()
-    expect(chiGoiY.querySelectorAll('.phm-goi-y > li')).toHaveLength(2)
-    cleanup()
-    const chiThu = ve(<LoiAi pm={sua(PH_OK, (r) => { r.phuHuynhLamGi = [] })} />)
-    expect(chiThu.querySelector('.phm-goi-y')).toBeNull()
-    expect(chiThu.querySelector('.phm-thu')).not.toBeNull()
-  })
-
   it('tối đa hai gợi ý dù pm dựng tay có nhiều hơn', () => {
     const c = ve(<LoiAi pm={{ ...APPLE, phuHuynhLamGi: ['một', 'hai', 'ba'] }} />)
     expect([...c.querySelectorAll('.phm-goi-y > li span')].map((x) => chu(x))).toEqual(['một', 'hai'])
   })
 
-  it('không có gì ⇒ không vẽ', () => {
-    const pm = sua(PH_OK, (r) => { delete r.loiBoNao; r.phuHuynhLamGi = [] })
+  it('không có gợi ý ⇒ không vẽ', () => {
+    const pm = sua(PH_OK, (r) => { r.phuHuynhLamGi = [] })
     expect(ve(<LoiAi pm={pm} />).innerHTML).toBe('')
     expect(coLoiAi(pm)).toBe(false)
-    cleanup()
-    expect(ve(<LoiAi pm={sua(PH_OK, (r) => { r.loiBoNao = { loi: '  ', ngay: '2026-09-21', thuTuan: '' }; r.phuHuynhLamGi = [] })} />).innerHTML).toBe('')
   })
 })
 
@@ -523,7 +501,7 @@ describe('SapCo + DoCham', () => {
     expect(chu(c.querySelector('.phm-nhan-muc'))).toBe('Bảng sẽ đầy dần khi con học thêm')
     const li = [...c.querySelectorAll('.phm-sap > li')].map((l) => chu(l))
     expect(li).toEqual([
-      'Điểm mạnh · cần luyện hiện khi con làm thêm câu, đủ để A.I Đỗ Đại Học nhận ra từng dạng',
+      'Điểm mạnh · cần luyện hiện khi con làm thêm câu, đủ để Thầy Đỗ Đại Học nhận ra từng dạng',
       'Ca kiểm tra gần nhất hiện khi thầy công bố điểm ca kiểm tra đầu tiên của con',
       'Bài tập về nhà hiện khi thầy giao bài cho lớp của con',
     ])

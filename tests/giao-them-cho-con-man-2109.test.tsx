@@ -89,7 +89,7 @@ describe('chữ hiển thị — số THẬT, giọng phụ huynh, chủ ngữ A
   it('thẻ xác nhận: "Đã giao cho con 6 câu, khoảng 8 phút" + "A.I Đỗ Đại Học đã chọn 6 câu hợp với con hôm nay." + từng thành phần + "Hôm nay còn 2 lượt giao"', () => {
     const t = theXacNhan(docKetQuaGiaoThem(THAN_GIAO)!.daGiao!, 2)
     expect(t.tieuDe).toBe('Đã giao cho con 6 câu, khoảng 8 phút')
-    expect(t.dong).toEqual(['A.I Đỗ Đại Học đã chọn 6 câu hợp với con hôm nay.', '3 câu ôn lại đến lịch', '3 câu dạng Thuỷ phân ester (dạng con đang vấp)'])
+    expect(t.dong).toEqual(['Thầy Đỗ Đại Học đã chọn 6 câu hợp với con hôm nay.', '3 câu ôn lại đến lịch', '3 câu dạng Thuỷ phân ester (dạng con đang vấp)'])
     expect(t.cuoi).toBe('Hôm nay còn 2 lượt giao')
     expect(JSON.stringify(t)).not.toMatch(CAM)
   })
@@ -282,7 +282,7 @@ describe('GiaoThemChoCon — màn', () => {
     const nut = screen.getByRole('button', { name: /Đang chọn câu/ }) as HTMLButtonElement
     expect(nut.disabled).toBe(true)
     expect(nut.getAttribute('aria-busy')).toBe('true')
-    expect(container.textContent).toContain('A.I Đỗ Đại Học đang chọn câu cho con')
+    expect(container.textContent).toContain('Thầy Đỗ Đại Học đang chọn câu cho con')
   })
 
   it('hết 3 lượt: nút MỜ (disabled) + "Hôm nay đã giao đủ 3 lượt, mai giao tiếp được"', () => {
@@ -367,7 +367,7 @@ describe('Cổng phụ huynh thật — MỘT màn, MỘT nút, mọi kiểu đ�
     await waitFor(() => expect(container.querySelector('[data-vung="the-giao-them"]')).toBeTruthy())
     const the = container.querySelector('[data-vung="the-giao-them"]')!.textContent!
     expect(the).toContain('Đã giao cho con 6 câu, khoảng 8 phút')
-    expect(the).toContain('A.I Đỗ Đại Học đã chọn 6 câu hợp với con hôm nay.')
+    expect(the).toContain('Thầy Đỗ Đại Học đã chọn 6 câu hợp với con hôm nay.')
     expect(container.textContent).toContain('Hôm nay còn 2 lượt giao')
     expect(goi).toEqual([{ pass: 'MA-PH', chiXem: true }, { pass: 'MA-PH' }])
   }, 20000)

@@ -8,7 +8,7 @@ vi.mock('../src/lib/ph-token', () => ({ docPass: () => docPass() }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: () => layDiaChiMayChu() }))
 
 import { baoDaXemHocSinh, baoDaXemPhuHuynh } from '../src/lib/canh-bao-thay-may-chu'
-import { KHONG_CO_GI_PH, taiBoNaoPhuHuynh, taiThongTinPhuHuynh } from '../src/lib/bo-nao-lay-loi-ph'
+import { KHONG_CO_GI_PH, taiThongTinPhuHuynh } from '../src/lib/tai-thong-tin-ph'
 
 const goc = globalThis.fetch
 const traVe = (thanh: unknown, ok = true) => vi.fn(async () => ({ ok, json: async () => thanh }) as unknown as Response)
@@ -72,26 +72,16 @@ describe('báo đã xem', () => {
   })
 })
 
-describe('taiThongTinPhuHuynh — lời Bộ não + cảnh báo của thầy cùng MỘT lệnh /ph/ke-hoach', () => {
-  it('đọc cả boNaoAi lẫn canhBaoThay (lời cho phụ huynh), gọi đúng MỘT lần', async () => {
+describe('taiThongTinPhuHuynh — cảnh báo của thầy qua lệnh /ph/ke-hoach (lời Bộ não A.I đã gỡ 28/09)', () => {
+  it('đọc canhBaoThay (lời cho phụ huynh), gọi đúng MỘT lần; khoá boNaoAi cũ (nếu còn) bị bỏ qua', async () => {
     const f = traVe({ ok: true, boNaoAi: { ngay: '2026-09-21', loiNhan: 'Lời cho anh chị.', thuTuan: '' }, canhBaoThay: [tho()] })
     globalThis.fetch = f as never
     const r = await taiThongTinPhuHuynh()
     expect(f).toHaveBeenCalledTimes(1)
-    expect(r.boNao!.loiNhan).toBe('Lời cho anh chị.')
+    expect(r).not.toHaveProperty('boNao')
     expect(r.canhBao).toHaveLength(1)
     expect(r.canhBao[0]!.loi).toBe('Anh chị nhắc con nộp bài giúp thầy.')
     expect((f.mock.calls[0] as unknown as [string, RequestInit])[0]).toBe('https://may-chu.thu/ph/ke-hoach')
-  })
-  it('chỉ có cảnh báo (bộ não chạy thử) ⇒ boNao null nhưng cảnh báo vẫn có; chỉ có bộ não ⇒ canhBao []', async () => {
-    globalThis.fetch = traVe({ ok: true, canhBaoThay: [tho()] }) as never
-    const a = await taiThongTinPhuHuynh()
-    expect(a.boNao).toBeNull()
-    expect(a.canhBao).toHaveLength(1)
-    globalThis.fetch = traVe({ ok: true, boNaoAi: { loiNhan: 'x', thuTuan: '' } }) as never
-    const b = await taiThongTinPhuHuynh()
-    expect(b.boNao).not.toBeNull()
-    expect(b.canhBao).toEqual([])
   })
   it('thiếu mã / lỗi / ok:false / mạng đứt / chưa có địa chỉ ⇒ không có gì, không ném; thiếu mã không gọi mạng', async () => {
     const f = traVe({ ok: true, canhBaoThay: [tho()] })
@@ -111,9 +101,5 @@ describe('taiThongTinPhuHuynh — lời Bộ não + cảnh báo của thầy cù
     layDiaChiMayChu.mockResolvedValue('')
     globalThis.fetch = f as never
     expect(await taiThongTinPhuHuynh()).toBe(KHONG_CO_GI_PH)
-  })
-  it('taiBoNaoPhuHuynh (cũ) vẫn trả đúng phần bộ não', async () => {
-    globalThis.fetch = traVe({ ok: true, boNaoAi: { loiNhan: 'Lời.', thuTuan: '' }, canhBaoThay: [tho()] }) as never
-    expect((await taiBoNaoPhuHuynh())!.loiNhan).toBe('Lời.')
   })
 })

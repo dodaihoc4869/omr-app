@@ -108,7 +108,7 @@ export default function InfographicHuongDan({ onClose, vaiMacDinh }: Infographic
                 <div className="flex items-start gap-2">
                   <CheckCircle2 size={15} className="text-emerald-500 shrink-0 mt-0.5" />
                   <span>
-                    Làm <b>Bài gia đình giao</b> & Trợ lý AI
+                    Làm <b>Bài gia đình giao</b>
                   </span>
                 </div>
               </div>
@@ -237,7 +237,7 @@ export default function InfographicHuongDan({ onClose, vaiMacDinh }: Infographic
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 size={15} className="text-indigo-500 shrink-0 mt-0.5" />
-                  <span>Kho đề thi, phân công, hộp thư & Trợ lý AI</span>
+                  <span>Kho đề thi, phân công, hộp thư</span>
                 </div>
               </div>
             </div>

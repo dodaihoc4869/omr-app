@@ -74,7 +74,7 @@ describe('giao chiến dịch — điền sẵn và gọi đúng lệnh', () => 
     await waitFor(() => expect(o.value).toBe('47'))
     expect(o.disabled).toBe(true)
     await waitFor(() => expect(lenh('suc-chua').some((b) => b.theLucNgay === 47)).toBe(true))
-    expect(screen.getByText(/A.I Đỗ Đại Học đề xuất 47 lượt\/ngày/)).toBeTruthy()
+    expect(screen.getByText(/App đề xuất 47 lượt\/ngày/)).toBeTruthy()
     expect(screen.getByRole('checkbox', { name: /làm tới 94 câu\/ngày/ })).toBeTruthy()
     expect(screen.queryByRole('button', { name: /Rút còn|Lùi hạn nộp/ })).toBeNull()
 

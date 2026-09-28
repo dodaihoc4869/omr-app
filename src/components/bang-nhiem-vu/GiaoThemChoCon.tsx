@@ -17,10 +17,10 @@ export default function GiaoThemChoCon({ v }: { v: ViewGiaoThem }) {
         </p>
       )}
       {v.dangGui && (
-        <div className="bnv-giao-them-cho" role="status" aria-label="A.I Đỗ Đại Học đang chọn câu cho con" data-vung="giao-them-cho">
+        <div className="bnv-giao-them-cho" role="status" aria-label="Thầy Đỗ Đại Học đang chọn câu cho con" data-vung="giao-them-cho">
           <i />
           <i />
-          <span className="bnv-sr">A.I Đỗ Đại Học đang chọn câu cho con…</span>
+          <span className="bnv-sr">Thầy Đỗ Đại Học đang chọn câu cho con…</span>
         </div>
       )}
       {!v.dangGui && v.the && (

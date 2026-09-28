@@ -184,7 +184,7 @@
   flex: 1 1 0;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.15fr) minmax(0, 1.1fr); /* ô Bộ não A.I đã gỡ 28/09 ⇒ còn 3 ô */
   gap: 16px;
 }
 .bt3-o {
@@ -610,71 +610,6 @@
   }
 }
 
-/* ── Bộ não A.I · đêm qua ─────────────────────────────────────────── */
-.bt3-bn-so {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin: 0 0 10px;
-}
-.bt3-bn-so > div {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.bt3-bn-so dd {
-  margin: 0;
-  font-size: 26px;
-  line-height: 30px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--m3-primary);
-}
-.bt3-bn-so dt {
-  font-size: 12px;
-  line-height: 15px;
-  color: var(--m3-on-surface-variant);
-}
-.bt3-bn-cd {
-  margin: 0 0 6px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  color: var(--m3-on-surface-variant);
-}
-.bt3-bn-thu {
-  margin: 0 0 8px;
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--m3-on-surface);
-}
-.bt3-bn-y {
-  --bt3-hang: 68px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  flex: 1 1 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow: hidden;
-}
-.bt3-bn-y li > span {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-}
-.bt3-bn-y li {
-  flex: 0 0 auto;
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--m3-primary-container) 55%, var(--bt3-the));
-  font-size: 14px;
-  line-height: 20px;
-}
 
 /* ── máy đã tự làm hôm nay (nền đậm ở CẢ sáng và tối) ─────────────── */
 .bt3-o-may {
@@ -1047,18 +982,6 @@
     width: 40px;
     height: 40px;
   }
-  .bt3-bn-so dd {
-    font-size: 22px;
-    line-height: 26px;
-  }
-  .bt3-bn-y {
-    --bt3-hang: 56px;
-  }
-  .bt3-bn-y li {
-    padding: 8px 10px;
-    font-size: 13px;
-    line-height: 18px;
-  }
 }
 @media (min-width: 880px) and (max-width: 1199px) {
   .bt3-dau .hn2-tim-khung {
@@ -1282,13 +1205,6 @@
   }
   .bt3-may-chu {
     -webkit-line-clamp: 1;
-  }
-  .bt3-bn-y {
-    --bt3-hang: 80px;
-  }
-  .bt3-bn-y li {
-    font-size: 15px;
-    line-height: 20px;
   }
   .bt3-tb-ds {
     gap: 10px;

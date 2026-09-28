@@ -425,9 +425,9 @@ export default function GiaoChienDich({
                 <small className="cd-so cd-phu">
                   {tuDong
                     ? sc?.theLucDeXuat
-                      ? `A.I Đỗ Đại Học đề xuất ${sc.theLucDeXuat} lượt/ngày — số nhỏ nhất để em ở giữa lớp ≤ 70% và không em nào quá tải`
-                      : 'A.I Đỗ Đại Học tính số nhỏ nhất đủ để cả lớp kịp hạn nộp'
-                    : 'Gõ số bất kì; gạt Tự tính để A.I Đỗ Đại Học tính'}
+                      ? `App đề xuất ${sc.theLucDeXuat} lượt/ngày — số nhỏ nhất để em ở giữa lớp ≤ 70% và không em nào quá tải`
+                      : 'App tính số nhỏ nhất đủ để cả lớp kịp hạn nộp'
+                    : 'Gõ số bất kì; gạt Tự tính để app tính'}
                 </small>
                 <label className="cd-tich">
                   <input type="checkbox" checked={huyetChien} onChange={(e) => setHuyetChien(e.target.checked)} />

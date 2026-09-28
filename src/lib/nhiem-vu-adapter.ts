@@ -3,7 +3,6 @@
 // DE-XUAT-CA-NHAN-HOA-1909.md) — ra CÙNG một cấu trúc `DuLieuBangNhiemVu`.
 // Hàm thuần: không đọc giờ, không gọi mạng, KHÔNG xếp lại thứ tự — thứ tự là
 // của dữ liệu; ở đây chỉ gán bậc, tính cổng và chọn thẻ "Làm ngay".
-import { docBoNao, docBoNaoHocSinh, type BoNaoView } from './bo-nao-hien-thi'
 import { docCanhBaoThay, type CanhBaoThay } from './canh-bao-thay-hien-thi'
 import type { ThuThachRieng } from './thu-thach-rieng'
 import { chuSoCauCuaEm, dongPhuChang, tenBaiTapVeNha } from './btvn-ca-nhan-kieu'
@@ -115,13 +114,8 @@ export interface DuLieuBangNhiemVu {
    */
   doanMo?: boolean
   /**
-   * Lời nhắn của "Bộ não A.I hỗ trợ riêng em" (`loiNhanHlv` ở gốc /hs/ke-hoach-ngay): CHỈ phần học sinh (`hs`). Phần phụ huynh (`ph`)
-   * không đi qua đây (lệnh riêng `/ph/ke-hoach`, xem bo-nao-lay-loi-ph.ts). null/vắng ⇒ KHÔNG thẻ. Nguồn trợ lý không có ⇒ null.
-   */
-  boNao?: BoNaoView | null
-  /**
    * "Cảnh báo của thầy" (khoá `canhBaoThay` ở gốc /hs/ke-hoach-ngay, lời cho EM): ≤ 3, chỉ bài chưa nộp; [] ⇒ KHÔNG thẻ. Phụ huynh nhận qua /ph/ke-hoach
-   * (lời cho phụ huynh, xem bo-nao-lay-loi-ph.ts) chứ không qua đây. KHÔNG lưu vào bản nhớ: cảnh báo cũ có thể đã hết đúng (em vừa nộp).
+   * (lời cho phụ huynh, xem tai-thong-tin-ph.ts) chứ không qua đây. KHÔNG lưu vào bản nhớ: cảnh báo cũ có thể đã hết đúng (em vừa nộp).
    */
   canhBaoThay?: CanhBaoThay[]
   /**
@@ -129,7 +123,7 @@ export interface DuLieuBangNhiemVu {
    */
   veDich?: VeDichView | null
   /**
-   * "Thử thách riêng hôm nay" của Bộ não A.I: lời mời + câu do MÁY CHỦ chọn. Đến từ lệnh RIÊNG `POST /hs/thu-thach-hom-nay` (không nằm trong /hs/ke-hoach-ngay) nên
+   * "Thử thách riêng hôm nay" (Bộ não A.I đã gỡ 28/09 ⇒ máy chủ luôn `co:false`, thẻ không hiện): lời mời + câu do MÁY CHỦ chọn. Đến từ lệnh RIÊNG `POST /hs/thu-thach-hom-nay` (không nằm trong /hs/ke-hoach-ngay) nên
    * adapter luôn để null; màn cổng học sinh gắn vào SAU (`docThuThachRieng`). null/vắng ⇒ KHÔNG thẻ. Không lưu vào bản nhớ. Phụ huynh chưa nhận gì ở Nấc 1.
    */
   thuThachRieng?: ThuThachRieng | null
@@ -365,7 +359,6 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     manhNhan: [],
     // Nguồn trợ lý không biết cờ mở game: KHÔNG mời (cùng bộ khoá ở gốc với nguồn máy chủ — test khoá).
     doanMo: false,
-    boNao: null,
     canhBaoThay: [],
     thuThachRieng: null,
   }, {
@@ -443,8 +436,6 @@ export interface KeHoachNgayMayChu {
   manhNhan?: { loai?: string; so?: number; ghiChu?: string }[]
   /** Cờ mở game Đoàn Hộ Tống cho em (docs/hop-dong-mo-game-doan-ho-tong-1909.md). Đọc chặt `=== true`. */
   doanMo?: unknown
-  /** Lời nhắn Bộ não cho học sinh — đọc chặt bằng `docBoNao` (bo-nao-hien-thi.ts). */
-  loiNhanHlv?: unknown
   /** "Cảnh báo của thầy" cho em — đọc chặt bằng `docCanhBaoThay` (canh-bao-thay-hien-thi.ts). */
   canhBaoThay?: unknown
 }
@@ -724,7 +715,6 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     tonCu,
     ...docExp(keHoach),
     doanMo: keHoach.doanMo === true,
-    boNao: (() => { const v = docBoNao(keHoach); return v.hs ? { hs: v.hs, ph: null } : null })(),
     canhBaoThay: docCanhBaoThay(keHoach.canhBaoThay),
     thuThachRieng: null,
   }, { dat: keHoach.tienBo.dat === true && !chuaDat, daLamCau: daLam, lenBac })
@@ -794,18 +784,10 @@ export function dungBangNhiemVu(input: {
 /** Chữ thuộc game. `EXP` đứng riêng (không dính chữ khác); "Linh Tâm" là tên quái của Đoàn Hộ Tống. */
 export const CHU_GAME_PH = /thần thú|\bEXP\b|khiên|Đoàn Hộ Tống|Đảo thần thú|Võ đài|Linh Tâm/i
 
-/** Chữ tự do của máy chủ (cảnh báo, ghi chú, lời Bộ não…): có chữ game ⇒ bỏ CẢ câu (rỗng), không cắt vụn. */
+/** Chữ tự do của máy chủ (cảnh báo, ghi chú…): có chữ game ⇒ bỏ CẢ câu (rỗng), không cắt vụn. */
 export const khongChuGame = (s: string | null | undefined): string => {
   const t = typeof s === 'string' ? s : ''
   return CHU_GAME_PH.test(t) ? '' : t
-}
-
-/** Lời Bộ não cho phụ huynh: câu nào có chữ game bị bỏ; hết cả lời lẫn thư ⇒ null (không thẻ). */
-export function sachBoNaoChoPhuHuynh<T extends { loiNhan: string; thuTuan: string } | null | undefined>(ph: T): T | null {
-  if (!ph) return null
-  const loiNhan = khongChuGame(ph.loiNhan)
-  const thuTuan = khongChuGame(ph.thuTuan)
-  return loiNhan || thuTuan ? { ...ph, loiNhan, thuTuan } : null
 }
 
 /** Việc "luyện dạng còn yếu" (loại `than_thu` của máy chủ) nói bằng chữ HỌC TẬP: "Luyện dạng con còn vấp · 6 câu" (số câu do thẻ tự in). */
@@ -916,7 +898,6 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
     expNhan: [],
     manhNhan: [],
     doanMo: (d as any).doanMo === true,
-    boNao: (() => { const hs = docBoNaoHocSinh((d as any).boNao?.hs); return hs ? { hs, ph: null } : null })(),
     canhBaoThay: [],
     thuThachRieng: null,
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,

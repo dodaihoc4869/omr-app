@@ -19,7 +19,7 @@ export default function TheThuThachRieng({
   onLam: (t: ThuThachRieng) => void
   onDeSau: (t: ThuThachRieng) => void
 }) {
-  const nhan = `Bộ não A.I hỗ trợ riêng em ${hoTen}`.trim()
+  const nhan = `Thầy Đỗ Đại Học gửi riêng em ${hoTen}`.trim()
   const xong = thuThach.trangThai === 'xong'
   const dangLam = thuThach.trangThai === 'dang_lam'
   const dongExp = chuExpThanThu(thuThach)
