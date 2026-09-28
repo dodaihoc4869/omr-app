@@ -122,6 +122,12 @@ async function sauGhi<T>(env: Env, b: Record<string, unknown>, viec: Promise<T>)
   try { return await viec } finally { try { emCoGhi(await gameIdentity(env, b)) } catch { /* token sai / hết hạn */ } }
 }
 
+/** Lỗi máy chủ ⇒ JSON {ok:false,error[,ma]} 500 KÈM CORS (máy em đọc được lời, không tưởng mất mạng). `ma`: mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời. */
+function raLoi(e: unknown): Response {
+  const ma = (e as { ma?: unknown } | null)?.ma
+  return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ', ...(typeof ma === 'string' ? { ma } : {}) }, 500)
+}
+
 function ra(data: unknown, status = 200): Response {
   return new Response(JSON.stringify({ ...(data as object), serverNow: Date.now(), nhipDeNghi: nhipDeNghi() }), { status, headers: JSON_HEADERS }) // nhipDeNghi: hệ số nhịp hỏi nền cho máy khách (suc-khoe-may.ts)
 }
@@ -3442,8 +3448,7 @@ const boXuLy = {
 
       return ra({ ok: false, error: 'Không có đường này' }, 404)
     } catch (e) {
-      const ma = (e as { ma?: unknown } | null)?.ma // mã lỗi có tên (vd het_tran của game) để màn hiện đúng lời; lỗi thường không có
-      return ra({ ok: false, error: e instanceof Error ? e.message : 'Lỗi máy chủ', ...(typeof ma === 'string' ? { ma } : {}) }, 500)
+      return raLoi(e)
     }
   },
 }
@@ -3457,7 +3462,9 @@ export default {
     if (new URL(req.url).pathname.startsWith('/bi-a/phong/')) return denPhongBiA(req, env)
     const t0 = Date.now()
     let res: Response
-    try { res = await boXuLy.fetch(req, env, ctx) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
+    // ỔN ĐỊNH (28/09): ~40 nhánh định tuyến `return handler(...)` KHÔNG await ⇒ Promise bị từ chối thoát khỏi try/catch của định tuyến (và các nhánh GET
+    // nằm ngoài try) ⇒ Cloudflare trả 1101 thiếu CORS, máy em tưởng mất mạng. `await` + `catch` Ở ĐÂY bắt MỌI lỗi (đồng bộ lẫn bất đồng bộ) một chỗ duy nhất.
+    try { res = await boXuLy.fetch(req, env, ctx) } catch (e) { console.error('[may-chu] lỗi chưa bắt:', tenLenh(new URL(req.url).pathname), e); res = raLoi(e) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }
     // HEADER song song với trường JSON `nhipDeNghi` (Code 2: máy em yếu, khỏi phải clone + parse thân phản hồi 20–100 KB): `x-nhip-de-nghi: 1|2|4` + cho trình duyệt đọc qua CORS. Thân phản hồi đi nguyên (stream).
     const h = new Headers(res.headers)
     h.set('x-nhip-de-nghi', String(nhipDeNghi().heSo))
