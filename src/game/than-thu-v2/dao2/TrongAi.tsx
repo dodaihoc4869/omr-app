@@ -154,12 +154,18 @@ export function DaiKetQua({profile,cau:q,phanHoi,ketQua,tong}:{profile:DaoProfil
 }
 
 // ───────────── màn trong ải (làm + lời giải) ─────────────
+const KHOA_TI='ddh.dao2.tiCot',TI_MIN=30,TI_MAX=75,TI_MAC_DINH=58
+function docTi():number{try{const v=Number(localStorage.getItem(KHOA_TI));return v>=TI_MIN&&v<=TI_MAX?v:TI_MAC_DINH}catch{return TI_MAC_DINH}}
 export interface TrongAiProps{
  profile:DaoProfile;cau:readonly CauDao2[];viTri:number;ketQua:readonly BattleAnswer[]
  traLoi:string;assisted:boolean;phanHoi:PhanHoi2|null;busy?:boolean;loi?:string;maLoi?:string
  onTraLoi:(v:string)=>void;onAssisted:(v:boolean)=>void;onNop:()=>void;onTiep:()=>void;onRoi:()=>void
 }
 export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi,busy=false,loi='',maLoi='',onTraLoi,onAssisted,onNop,onTiep,onRoi}:TrongAiProps){
+ // Ngang: thanh kéo giữa hai cột (thầy 28/09) — tỉ lệ cột trái % lưu trên máy em.
+ const khung=useRef<HTMLDivElement>(null),[ti,setTi]=useState(docTi)
+ const datTi=(v:number)=>{const x=Math.min(TI_MAX,Math.max(TI_MIN,v));setTi(x);try{localStorage.setItem(KHOA_TI,String(Math.round(x)))}catch{/* máy chặn lưu: bỏ qua */}}
+ const keoTi=(x:number)=>{const r=khung.current?.getBoundingClientRect();if(r&&r.width>0)datTi((x-r.left)/r.width*100)}
  const ngang=useNgang(),[zoom,setZoom]=useState(''),[hinhLoi,setHinhLoi]=useState(false),q=cau[viTri],hetTran=!!loi&&laLoiHetTran(loi,maLoi),loiRef=useRef<HTMLParagraphElement>(null)
  useEffect(()=>{setHinhLoi(false)},[viTri])
  useEffect(()=>{if(loi)loiRef.current?.scrollIntoView?.({block:'nearest'})},[loi])
@@ -170,7 +176,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
  const chuNutThieu=q.phan==='I'?'Chọn một phương án để tung chiêu':q.phan==='II'?'Chọn đủ 4 ý để tung chiêu':'Nhập đáp án để tung chiêu'
  // Dọc: một cột như cũ (hai lớp bọc `display:contents`). Ngang: cột TRÁI = thế giới game (thanh ải, cảnh trận, dải kết quả) · cột PHẢI = phần học
  // (đề + phương án tự cuộn trong cột, lời giải, nút chính ở đáy). Lúc đọc lời giải bố cục ngang GIỮ cảnh trận (đòn vừa đánh) ở cột trái.
- return <div className="dao2-ai" data-pha={phanHoi?'giai':'lam'}>
+ return <div className="dao2-ai" data-pha={phanHoi?'giai':'lam'} ref={khung} style={ngang?{gridTemplateColumns:`minmax(0,${ti}fr) 20px minmax(0,${100-ti}fr)`}:undefined}>
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi / lời giải" onClose={()=>setZoom('')}/>}
   <div className="dao2-ai-trai">
    <div className="dao2-ai-dau">
@@ -182,6 +188,9 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
    {phanHoi&&<DaiKetQua profile={profile} cau={q} phanHoi={phanHoi} ketQua={ketQua} tong={cau.length}/>}
    {ngang&&<TienDoChuyen cau={cau} viTri={viTri} ketQua={ketQua}/>}
   </div>
+  {ngang&&<div className="dao2-keo" role="separator" aria-orientation="vertical" aria-label="Kéo để đổi độ rộng hai cột" aria-valuemin={TI_MIN} aria-valuemax={TI_MAX} aria-valuenow={Math.round(ti)} tabIndex={0}
+   onPointerDown={e=>{e.currentTarget.setPointerCapture(e.pointerId)}} onPointerMove={e=>{if(e.currentTarget.hasPointerCapture(e.pointerId))keoTi(e.clientX)}}
+   onKeyDown={e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();datTi(ti+(e.key==='ArrowLeft'?-5:5))}}}><i/></div>}
   <div className="dao2-ai-phai">
   {!phanHoi?<>
    <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)}/>
