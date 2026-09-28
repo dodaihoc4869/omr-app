@@ -85,7 +85,6 @@ function duLieuDayGame(): DuLieuBangNhiemVu {
     doanMo: true,
     boNao: { hs: { loi: 'Em chọn thần thú rồi cùng Đoàn Hộ Tống nhé', ngay: '2026-09-21' } as any, ph: null },
     canhBaoThay: [],
-    thuThachRieng: null,
   }
 }
 
@@ -130,7 +129,7 @@ describe('boGameChoPhuHuynh — gỡ game ở DỮ LIỆU (thuần)', () => {
     expect(d.expNhan).toEqual([])
     expect(d.manhNhan).toEqual([])
     expect(d.doanMo).toBe(false)
-    expect(d.thuThachRieng).toBeNull()
+    expect('thuThachRieng' in d).toBe(false) // thẻ Thử thách riêng đã gỡ 28/09
     const v = d.cacBac[2].viec[0]
     expect(TEN_VIEC_LUYEN_DANG_PH).toBe('Luyện dạng con còn vấp')
     expect(v.tieuDe).toBe('Luyện dạng con còn vấp')

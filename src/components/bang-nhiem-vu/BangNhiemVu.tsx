@@ -4,7 +4,6 @@
 // Màn này KHÔNG xếp việc, không tính điểm, không gọi API nhiệm vụ: nhận
 // `DuLieuBangNhiemVu` từ `nhiem-vu-adapter` và chỉ vẽ.
 import TheCanhBaoThay from './TheCanhBaoThay'
-import TheThuThachRieng from './TheThuThachRieng'
 import GiaoThemChoCon from './GiaoThemChoCon'
 import type { ViewGiaoThem } from '../../lib/use-giao-them'
 import type { ViewThiDua } from '../../lib/use-thi-dua'
@@ -12,7 +11,6 @@ import OThiDua from './OThiDua'
 import TheVeDich from './TheVeDich'
 import { ngayVuaTraXong, type VeDichView } from '../../lib/ve-dich-hien-thi'
 import TheChoAn, { viewChoAn } from './TheChoAn'
-import type { ThuThachRieng } from '../../lib/thu-thach-rieng'
 import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { CheckCircle2, ChevronRight, ClipboardCheck, Compass, PawPrint, RefreshCw, Shield, ShoppingBag, Sparkles, Zap } from 'lucide-react'
@@ -129,10 +127,6 @@ export interface BangNhiemVuProps {
   canhBaoPh?: CanhBaoThay[]
   /** Em/phụ huynh bấm "Đã xem" (hoặc "Làm ngay") ở một cảnh báo ⇒ màn cha báo máy chủ. */
   onCanhBaoDaXem?: (cb: CanhBaoThay) => void
-  /** "Làm mấy câu này": mở màn ôn câu với đúng câu máy chủ chọn cho thử thách (nguồn `thu_thach_rieng`). Vắng ⇒ không dựng thẻ mời. */
-  onLamThuThach?: (t: ThuThachRieng) => void
-  /** "Để sau": màn cha nhớ ẩn thẻ tới ngày mai (thẻ biến mất khỏi `duLieu.thuThachRieng`). */
-  onDeSauThuThach?: (t: ThuThachRieng) => void
 }
 
 export default function BangNhiemVu({
@@ -160,8 +154,6 @@ export default function BangNhiemVu({
   canhBaoPh,
   onCanhBaoDaXem,
   onDoiSbd,
-  onLamThuThach,
-  onDeSauThuThach,
 }: BangNhiemVuProps) {
   const laPh = vaiTro === 'phuhuynh'
   const choDong = useChoPhepChuyenDong()
@@ -434,11 +426,6 @@ export default function BangNhiemVu({
 
             {/* Ô "THI ĐUA HÔM NAY" (chỉ học sinh; 8A): ngay dưới thanh tiến độ, TRÊN việc hôm nay. */}
             {!laPh && thiDua && <OThiDua v={thiDua} onLam={lamViecDau} />}
-
-            {/* THỬ THÁCH RIÊNG HÔM NAY (thầy chốt 21/09; nguồn Bộ não A.I đã gỡ 28/09 ⇒ máy chủ luôn `co:false`, thẻ không dựng): ngay dưới thanh tiến độ, TRÊN việc hôm nay. Chỉ học sinh. */}
-            {!laPh && duLieu.thuThachRieng && (duLieu.thuThachRieng.trangThai === 'xong' || (onLamThuThach && onDeSauThuThach)) && (
-              <TheThuThachRieng thuThach={duLieu.thuThachRieng} hoTen={hoTen} onLam={(t) => onLamThuThach?.(t)} onDeSau={(t) => onDeSauThuThach?.(t)} />
-            )}
 
             {duLieu.trong ? (
               <>

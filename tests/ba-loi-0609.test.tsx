@@ -101,6 +101,9 @@ describe('Lỗi 2 — iPhone khoá bài dù em không vi phạm', () => {
 // ---------------------------------------------------------------------------
 
 describe('Lỗi 3 — bàn phím iPhone không có dấu trừ', () => {
+  // 28/09 (thầy): ô gọn — nút "−" CHỈ ở iPhone/iPad (bàn phím thập phân iOS thiếu dấu trừ), nút "," bỏ ở mọi máy ("." tự thành ",").
+  const laIPhone = () => vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X)')
+  afterEach(() => vi.restoreAllMocks())
   it('đổi dấu qua lại, ô trống bấm cũng ra dấu trừ', () => {
     expect(doiDau('')).toBe('-')
     expect(doiDau('12,5')).toBe('-12,5')
@@ -119,7 +122,8 @@ describe('Lỗi 3 — bàn phím iPhone không có dấu trừ', () => {
     expect(laAm(null)).toBe(false)
   })
 
-  it('ô trả lời ngắn có NÚT DẤU ÂM, bấm là ra dấu', () => {
+  it('ô trả lời ngắn có NÚT DẤU ÂM (iPhone), bấm là ra dấu', () => {
+    laIPhone()
     const doi = vi.fn()
     render(<TheCau kieu="sa" id="c1" stt={1} text="Tính ΔH" selected="" onChange={doi} />)
     const nut = document.querySelector('[aria-label="Thêm dấu âm"]') as HTMLElement
@@ -129,6 +133,7 @@ describe('Lỗi 3 — bàn phím iPhone không có dấu trừ', () => {
   })
 
   it('đang âm thì nút đổi nhãn thành BỎ dấu âm, bấm là bỏ', () => {
+    laIPhone()
     const doi = vi.fn()
     render(<TheCau kieu="sa" id="c1" stt={1} text="Tính ΔH" selected="-92,4" onChange={doi} />)
     const nut = document.querySelector('[aria-label="Bỏ dấu âm"]') as HTMLElement
@@ -158,29 +163,14 @@ describe('Lỗi 3 — bàn phím iPhone không có dấu trừ', () => {
     expect(coPhay(null)).toBe(false)
   })
 
-  it('ô trả lời ngắn có NÚT DẤU PHẨY cạnh nút dấu âm, bấm là ra dấu', () => {
+  it('28/09: KHÔNG còn nút dấu phẩy ở mọi máy — gõ "." tự thành ","; iPhone chỉ còn nút dấu âm', () => {
+    laIPhone()
     const doi = vi.fn()
-    render(<TheCau kieu="sa" id="c1" stt={1} text="Tính m" selected="12" onChange={doi} />)
-    const nut = document.querySelector('[aria-label="Thêm dấu phẩy"]') as HTMLButtonElement
-    expect(nut).toBeTruthy()
-    expect(nut.disabled).toBe(false)
-    fireEvent.click(nut)
-    expect(doi).toHaveBeenCalledWith('12,')
-  })
-
-  it('đã có dấu thập phân thì nút KHOÁ, không bấm được nữa', () => {
-    const doi = vi.fn()
-    render(<TheCau kieu="sa" id="c1" stt={1} text="Tính m" selected="12,5" onChange={doi} />)
-    const nut = document.querySelector('[aria-label="Thêm dấu phẩy"]') as HTMLButtonElement
-    expect(nut.disabled).toBe(true)
-    fireEvent.click(nut)
-    expect(doi).not.toHaveBeenCalled()
-  })
-
-  it('hai nút đứng cạnh nhau, KHÔNG nút nào thay chỗ nút nào', () => {
-    render(<TheCau kieu="sa" id="c1" stt={1} text="Tính m" selected="" onChange={() => {}} />)
+    render(<TheCau kieu="sa" id="c1" stt={1} text="Tính m" selected="" onChange={doi} />)
+    expect(document.querySelector('[aria-label="Thêm dấu phẩy"]')).toBeNull()
     expect(document.querySelector('[aria-label="Thêm dấu âm"]')).toBeTruthy()
-    expect(document.querySelector('[aria-label="Thêm dấu phẩy"]')).toBeTruthy()
+    fireEvent.change(document.querySelector('input')!, { target: { value: '1.5' } })
+    expect(doi).toHaveBeenCalledWith('1,5')
   })
 
   it('vẫn giữ bàn phím số — em gõ số là chính', () => {

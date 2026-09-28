@@ -20,17 +20,19 @@ import { CHU_TAM_PHU } from '../lib/giu-de-doc'
 /** Chiều cao thanh trên màn thi — cùng con số dải cảnh báo rời màn đang dùng. */
 export const CAO_THANH_TREN = 56
 
-export default function ManGiuDeDoc() {
+/** `trongKhung` (bố cục NGANG, 28/09): phủ đúng khung đề (cha `position: relative`), chừa phiếu + đồng hồ bên phải.
+ * `chu`: máy không cảm ứng dùng "Giữ phím cách để đọc tiếp" (thầy chốt phím cách = Giữ để đọc). */
+export default function ManGiuDeDoc({ trongKhung, chu }: { trongKhung?: boolean; chu?: string } = {}) {
   return (
     <div
       data-giu-de-phu
       aria-hidden="true"
       className="flex flex-col items-center justify-center text-center"
       style={{
-        position: 'fixed',
+        position: trongKhung ? 'absolute' : 'fixed',
         left: 0,
         right: 0,
-        top: CAO_THANH_TREN,
+        top: trongKhung ? 0 : CAO_THANH_TREN,
         bottom: 0,
         zIndex: 'var(--z-giu-de)' as unknown as number,
         background: 'var(--nen)',
@@ -49,7 +51,7 @@ export default function ManGiuDeDoc() {
         <Hand size={40} style={{ color: 'var(--mo)' }} />
       )}
       <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-3)' }}>
-        {CHU_TAM_PHU}
+        {chu ?? CHU_TAM_PHU}
       </div>
     </div>
   )

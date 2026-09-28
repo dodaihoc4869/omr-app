@@ -4,7 +4,6 @@
 // Hàm thuần: không đọc giờ, không gọi mạng, KHÔNG xếp lại thứ tự — thứ tự là
 // của dữ liệu; ở đây chỉ gán bậc, tính cổng và chọn thẻ "Làm ngay".
 import { docCanhBaoThay, type CanhBaoThay } from './canh-bao-thay-hien-thi'
-import type { ThuThachRieng } from './thu-thach-rieng'
 import { chuSoCauCuaEm, dongPhuChang, tenBaiTapVeNha } from './btvn-ca-nhan-kieu'
 import { dinhDangConLai } from './tro-ly-ca-nhan'
 import { ngayVietNam } from './han-bai-tap'
@@ -122,11 +121,6 @@ export interface DuLieuBangNhiemVu {
    * "Đường về đích" (Dồn về đích, thầy chốt mẫu 21/09): `veDich[]` + `no` của `/hs/ke-hoach-ngay` đọc CHẶT (`docVeDich`). Máy chủ chưa trả `veDich` ⇒ null ⇒ KHÔNG thẻ. KHÔNG lưu vào bản nhớ (số nợ cũ sẽ nói sai khi mở lại).
    */
   veDich?: VeDichView | null
-  /**
-   * "Thử thách riêng hôm nay" (Bộ não A.I đã gỡ 28/09 ⇒ máy chủ luôn `co:false`, thẻ không hiện): lời mời + câu do MÁY CHỦ chọn. Đến từ lệnh RIÊNG `POST /hs/thu-thach-hom-nay` (không nằm trong /hs/ke-hoach-ngay) nên
-   * adapter luôn để null; màn cổng học sinh gắn vào SAU (`docThuThachRieng`). null/vắng ⇒ KHÔNG thẻ. Không lưu vào bản nhớ. Phụ huynh chưa nhận gì ở Nấc 1.
-   */
-  thuThachRieng?: ThuThachRieng | null
 }
 
 export interface DuLieuExp {
@@ -360,7 +354,6 @@ export function tuKeHoachTroLy(keHoach: KeHoachNgayTroLy, phu: NguonPhuTroLy = {
     // Nguồn trợ lý không biết cờ mở game: KHÔNG mời (cùng bộ khoá ở gốc với nguồn máy chủ — test khoá).
     doanMo: false,
     canhBaoThay: [],
-    thuThachRieng: null,
   }, {
     // Nguồn trợ lý không có `tienBo.dat`: coi là đạt khi đã làm đủ mức gợi ý.
     dat: nganSach.mucTieuCau > 0 && nganSach.daLamCau >= nganSach.mucTieuCau,
@@ -716,7 +709,6 @@ export function tuKeHoachNgay(keHoach: KeHoachNgayMayChu, now: number, phu: Nguo
     ...docExp(keHoach),
     doanMo: keHoach.doanMo === true,
     canhBaoThay: docCanhBaoThay(keHoach.canhBaoThay),
-    thuThachRieng: null,
   }, { dat: keHoach.tienBo.dat === true && !chuaDat, daLamCau: daLam, lenBac })
 }
 
@@ -813,7 +805,6 @@ export function boGameChoPhuHuynh(d: DuLieuBangNhiemVu): DuLieuBangNhiemVu {
     expNhan: [],
     manhNhan: [],
     doanMo: false,
-    thuThachRieng: null,
     lamNgay: d.lamNgay ? sachViecPh(d.lamNgay) : null,
     cacBac: d.cacBac.map((n) => ({ ...n, viec: n.viec.map(sachViecPh) })),
     canhBao: d.canhBao.filter((c) => khongChuGame(c.noiDung)),
@@ -899,7 +890,6 @@ export function phucHoiBanNho(x: unknown, now: number): DuLieuBangNhiemVu | null
     manhNhan: [],
     doanMo: (d as any).doanMo === true,
     canhBaoThay: [],
-    thuThachRieng: null,
     lamNgay: d.lamNgay ? lamMoiThe(d.lamNgay, now) : null,
     cacBac: d.cacBac.map((g) => ({ ...g, viec: g.viec.map((v) => lamMoiThe(v, now)) })),
     ghiChuCu: gioLuu ? `Kế hoạch lúc ${gioLuu} · đang cập nhật…` : 'Kế hoạch đã nhớ · đang cập nhật…',

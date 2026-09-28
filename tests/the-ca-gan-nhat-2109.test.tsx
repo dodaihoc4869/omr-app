@@ -165,7 +165,7 @@ describe('khoá nguồn', () => {
     const b = doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')
     expect(b).toContain('{laPh && theCaGanNhat}')
     expect(b.indexOf('data-vung="tien-do"')).toBeLessThan(b.indexOf('{laPh && theCaGanNhat}'))
-    expect(b.indexOf('{laPh && theCaGanNhat}')).toBeLessThan(b.indexOf('THỬ THÁCH RIÊNG HÔM NAY'))
+    expect(b.indexOf('{laPh && theCaGanNhat}')).toBeLessThan(b.indexOf('{duLieu.trong ? (')) // (thẻ Thử thách riêng đã gỡ 28/09)
   })
   it('ca đã công bố: cả thẻ là MỘT <button> ≥ 48 px (dải "Xem báo cáo ca này" 52 px); ca chưa công bố: <div role="group"> (không nút); không lồng nút/liên kết, dùng bộ xd-* và biến m3', () => {
     const t = doc('src/components/xem-diem/TheCaGanNhat.tsx')

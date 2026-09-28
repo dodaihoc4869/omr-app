@@ -328,79 +328,27 @@ describe('Menu phụ huynh — ĐÃ GỠ (một màn một nút, 21/09)', () => 
   })
 })
 
-describe('Cổng phụ huynh thật — MỘT màn, MỘT nút, mọi kiểu đăng nhập', () => {
-  const dung = (coLenh: boolean, loiXem?: string) => {
-    const goi: unknown[] = []
-    vi.stubGlobal('fetch', vi.fn(async (url: string, o?: any) => {
-      if (String(url).endsWith('/ph/xac-dinh')) {
-        const t = { ok: true, sbd: '12121212', hoTen: 'Đỗ Minh', lop: '12A1' }
-        return { ok: true, status: 200, json: async () => t, text: async () => JSON.stringify(t) }
-      }
-      if (String(url).endsWith('/ph/giao-them')) {
-        const b = JSON.parse(o.body)
-        goi.push(b)
-        if (!coLenh) return { ok: false, status: 404, json: async () => ({}), text: async () => '' }
-        if (loiXem && b.chiXem) return { ok: true, status: 200, json: async () => ({ ok: false, error: loiXem }), text: async () => '' }
-        const than = b.chiXem ? { ok: true, conLaiHomNay: 3 } : THAN_GIAO
-        return { ok: true, status: 200, json: async () => than, text: async () => JSON.stringify(than) }
-      }
-      return { ok: true, status: 200, json: async () => ({ ok: true, items: [], winners: [] }), text: async () => '{}' }
-    }))
-    return goi
-  }
+// ĐÃ GỠ 28/09: describe "Cổng phụ huynh thật — MỘT màn, MỘT nút" (4 test trên ParentPortalScreen). Thầy lệnh 28/09: "app phụ huynh không có giao bài cho con nữa
+// chỉ xem được báo cáo mọi thứ về con" ⇒ cổng phụ huynh không còn nút "Giao thêm bài cho con" và không gọi /ph/giao-them (khoá ở tests/ph-v3-app-2809.test.tsx).
+// Các mảnh còn lại của tệp này (lớp đọc, API, hook, GiaoThemChoCon) vẫn khoá vì mã còn trong kho.
+describe('cổng phụ huynh thật (28/09): KHÔNG còn nút giao bài', () => {
   beforeEach(() => {
     window.history.replaceState(null, '', '/?vai=phuhuynh')
     localStorage.setItem('omr_ph_sbd', '12121212')
-    localStorage.setItem('omr_ph_pass', 'MA-PH')
   })
   afterEach(() => window.history.replaceState(null, '', '/'))
-
-  it('CÓ mã liên kết: nút mới; KHÔNG menu ba chấm; bấm ⇒ thẻ xác nhận có số + đếm lượt theo máy chủ; MỘT nút chính; gửi {pass}', async () => {
-    const goi = dung(true)
+  it('đã đăng nhập: không nút "Giao thêm bài cho con", không vùng giao-them, không gọi /ph/giao-them', async () => {
+    const goi: string[] = []
+    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
+      goi.push(String(url))
+      return { ok: true, status: 200, json: async () => ({ ok: true, serverNow: Date.UTC(2026, 8, 28, 13), hoTen: 'Đỗ Minh' }), text: async () => '{}' }
+    }))
     const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="giao-them"]')).toBeTruthy())
-    expect(container.querySelector('[data-vung="giao-bai"]')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
-    await waitFor(() => expect(container.textContent).toContain('Hôm nay còn 3 lượt giao'))
-    expect(container.querySelectorAll('[data-vung="giao-them"]').length).toBe(1)
-    fireEvent.click(screen.getByRole('button', { name: 'Giao thêm bài cho con' }))
-    await waitFor(() => expect(container.querySelector('[data-vung="the-giao-them"]')).toBeTruthy())
-    const the = container.querySelector('[data-vung="the-giao-them"]')!.textContent!
-    expect(the).toContain('Đã giao cho con 6 câu, khoảng 8 phút')
-    expect(the).toContain('Thầy Đỗ Đại Học đã chọn 6 câu hợp với con hôm nay.')
-    expect(container.textContent).toContain('Hôm nay còn 2 lượt giao')
-    expect(goi).toEqual([{ pass: 'MA-PH', chiXem: true }, { pass: 'MA-PH' }])
-  }, 20000)
-
-  it('SBD TRẦN (không có mã liên kết — 100% phụ huynh hiện tại): nút VẪN chạy, gửi {sbd} (không kèm pass)', async () => {
-    localStorage.removeItem('omr_ph_pass')
-    const goi = dung(true)
-    const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="giao-them"]')).toBeTruthy())
-    await waitFor(() => expect(container.textContent).toContain('Hôm nay còn 3 lượt giao'))
-    fireEvent.click(screen.getByRole('button', { name: 'Giao thêm bài cho con' }))
-    await waitFor(() => expect(container.querySelector('[data-vung="the-giao-them"]')).toBeTruthy())
-    expect(goi).toEqual([{ sbd: '12121212', chiXem: true }, { sbd: '12121212' }])
-    expect(container.querySelector('[data-vung="giao-bai"]')).toBeNull()
-  }, 20000)
-
-  it('máy chủ trả lời thật "Cần liên kết riêng của con.": hiện ĐÚNG lời đó ngay dưới nút; KHÔNG quay về đường/menu cũ', async () => {
-    dung(true, 'Cần liên kết riêng của con.')
-    const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="the-giao-them"]')).toBeTruthy())
-    expect(container.querySelector('[data-vung="the-giao-them"]')!.textContent).toContain('Cần liên kết riêng của con.')
-    expect(container.querySelector('[data-vung="giao-bai"]')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
-  }, 20000)
-
-  it('CHƯA có lệnh (404): vẫn MỘT nút + câu lỗi chung ("chưa mất lượt nào") — không ô cũ, không menu cũ', async () => {
-    dung(false)
-    const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="the-giao-them"]')).toBeTruthy())
-    expect(container.querySelector('[data-vung="the-giao-them"]')!.textContent).toContain('chưa mất lượt nào')
-    expect(screen.getByRole('button', { name: 'Giao thêm bài cho con' })).toBeTruthy()
-    expect(container.querySelector('[data-vung="giao-bai"]')).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Mở menu' })).toBeNull()
+    await waitFor(() => expect(container.querySelector('[data-vung="man-chinh-ph"]')).toBeTruthy())
+    await new Promise((r) => setTimeout(r, 30))
+    expect(screen.queryByRole('button', { name: 'Giao thêm bài cho con' })).toBeNull()
+    expect(container.querySelector('[data-vung="giao-them"]')).toBeNull()
+    expect(goi.some((u) => u.endsWith('/ph/giao-them'))).toBe(false)
   }, 20000)
 })
 
@@ -410,9 +358,10 @@ describe('khoá nguồn', () => {
     expect(b).toContain('{laPh && giaoThem && <GiaoThemChoCon v={giaoThem} />}')
     expect(b).not.toContain('bnv-giao-bai')
     expect(b).not.toContain('onGiaoHangNgay')
-    const p = doc('src/screens/ParentPortalScreen.tsx')
-    expect(p).toContain('const giaoThem = useGiaoThem(!!sbdHienTai, undefined, sbdHienTai ?? undefined)')
-    expect(p).toContain('giaoThem={giaoThem}')
+    // 28/09: màn phụ huynh KHÔNG còn nối hook giao thêm (thầy: không giao bài cho con nữa).
+    const p = doc('src/screens/ParentPortalScreen.tsx').replace(/\/\/.*$/gm, '')
+    expect(p).not.toContain('useGiaoThem')
+    expect(p).not.toContain('giaoThem')
     expect(p).not.toContain('mucMenuPhuHuynh')
   })
   it('API chỉ gọi /ph/giao-them, không đọc mã bằng cách nào khác ngoài docPass, không in console', () => {

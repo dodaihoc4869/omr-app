@@ -2,7 +2,7 @@
 // vì bàn phím SỐ của điện thoại không có hai dấu ấy (thầy 06/09, 07/09, lệnh 21/09 "quét mọi chỗ mọi app").
 // Luật: hai nút KHÔNG lấy tiêu điểm khỏi ô (bấm không làm đóng bàn phím); "−" bật/tắt "-" ở ĐẦU số; "," chèn TẠI CON TRỎ, chỉ MỘT dấu thập phân; em gõ / dán gì (kể cả "0.54") gửi nấy — KHÔNG chuẩn hoá ở đây.
 import { useLayoutEffect, useRef, type CSSProperties } from 'react'
-import { choPhepPhay, laAm, suaChenPhay, suaDoiDau, type KetQuaSua } from '../lib/nhap-dap-so'
+import { banPhimThieuDauTru, choPhepPhay, chuanDauGo, laAm, suaChenPhay, suaDoiDau, type KetQuaSua } from '../lib/nhap-dap-so'
 import './o-nhap-dap-so.css'
 
 export interface ONhapDapSoProps {
@@ -23,11 +23,16 @@ export interface ONhapDapSoProps {
   nutStyle?: CSSProperties
   /** Cả hai nút đứng TRƯỚC ô (thẻ câu thi giữ bố cục cũ: − , ô); mặc định "−" trước, "," sau ô. */
   nutTruoc?: boolean
+  /** MÀN THI (thầy 28/09): gõ "." tự thành ",", dấu trừ Unicode thành "-", chỉ giữ một dấu thập phân (`chuanDauGo`).
+   * Kiểu GỌN: KHÔNG nút "," (bàn phím số nào cũng có dấu thập phân; "." tự đổi thành ","), KHÔNG nút xoá; nút "−" nhỏ NẰM TRONG ô
+   * bên phải và CHỈ hiện ở iPhone/iPad — nơi bàn phím `inputMode="decimal"` không có dấu trừ (`banPhimThieuDauTru`). */
+  chuanViet?: boolean
 }
 
 const giuTieuDiem = (e: { preventDefault: () => void }) => e.preventDefault()
 
-export default function ONhapDapSo({ value, onChange, disabled, maxLength, placeholder, inputMode = 'decimal', id, ariaLabel, className, inputClassName, nutClassName, style, inputStyle, nutStyle, nutTruoc }: ONhapDapSoProps) {
+export default function ONhapDapSo({ value, onChange, disabled, maxLength, placeholder, inputMode = 'decimal', id, ariaLabel, className, inputClassName, nutClassName, style, inputStyle, nutStyle, nutTruoc, chuanViet }: ONhapDapSoProps) {
+  const coNutAm = chuanViet ? banPhimThieuDauTru() : true
   const oRef = useRef<HTMLInputElement>(null)
   const caretCho = useRef<number | null>(null)
   const am = laAm(value)
@@ -61,8 +66,8 @@ export default function ONhapDapSo({ value, onChange, disabled, maxLength, place
   const nutAm = (
     <button
       type="button"
-      className={`ond-nut${nutClassName ? ` ${nutClassName}` : ''}`}
-      style={nutStyle}
+      className={chuanViet ? 'ond-nut ond-nut-trong' : `ond-nut${nutClassName ? ` ${nutClassName}` : ''}`}
+      style={chuanViet ? undefined : nutStyle}
       aria-label={am ? 'Bỏ dấu âm' : 'Thêm dấu âm'}
       data-bat={am ? '' : undefined}
       disabled={disabled}
@@ -88,9 +93,9 @@ export default function ONhapDapSo({ value, onChange, disabled, maxLength, place
     </button>
   )
   return (
-    <div className={`ond${className ? ` ${className}` : ''}`} style={style}>
-      {nutAm}
-      {nutTruoc && nutPhay}
+    <div className={`ond${chuanViet ? ' ond-gon' : ''}${className ? ` ${className}` : ''}`} style={style} data-co-nut-am={chuanViet && coNutAm ? '' : undefined}>
+      {!chuanViet && nutAm}
+      {!chuanViet && nutTruoc && nutPhay}
       <input
         ref={oRef}
         id={id}
@@ -106,9 +111,17 @@ export default function ONhapDapSo({ value, onChange, disabled, maxLength, place
         maxLength={maxLength}
         disabled={disabled}
         value={value}
-        onChange={(e) => { caretCho.current = null; onChange(e.target.value) }}
+        onChange={(e) => {
+          caretCho.current = null
+          if (!chuanViet) return onChange(e.target.value)
+          const moi = chuanDauGo(e.target.value)
+          // Độ dài không đổi khi chuẩn hoá (thay 1 ký tự bằng 1 ký tự) trừ khi bỏ dấu phẩy thừa ⇒ giữ con trỏ tại chỗ.
+          if (moi !== e.target.value && document.activeElement === e.target) caretCho.current = Math.max(0, (e.target.selectionStart ?? moi.length) - (e.target.value.length - moi.length))
+          onChange(moi)
+        }}
       />
-      {!nutTruoc && nutPhay}
+      {!chuanViet && !nutTruoc && nutPhay}
+      {chuanViet && coNutAm && nutAm}
     </div>
   )
 }

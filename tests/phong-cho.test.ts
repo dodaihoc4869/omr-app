@@ -20,6 +20,7 @@ import { batDauThi, trangThaiPhongCho, vaoThi } from '../src/lib/exam-api'
 const GS = fs.readFileSync(path.join(process.cwd(), 'docs/apps-script-kiem-tra.gs'), 'utf8')
 const MAN_EM = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamTakeScreen.tsx'), 'utf8')
 const MAN_THAY = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamMonitorScreen.tsx'), 'utf8')
+const KHOI_PC = fs.readFileSync(path.join(process.cwd(), 'src/components/ca-thi/PhongChoCa.tsx'), 'utf8')
 const MAN_MO = fs.readFileSync(path.join(process.cwd(), 'src/screens/ExamSetupScreen.tsx'), 'utf8')
 
 afterEach(() => {
@@ -157,15 +158,19 @@ describe('màn của em', () => {
 
 describe('màn của thầy', () => {
   it('khối phòng chờ chỉ hiện khi ca đang chờ, và có ĐÚNG hai nút', () => {
-    const than = MAN_THAY.slice(MAN_THAY.indexOf('{chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && ('), MAN_THAY.indexOf('{chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && ('))
-    expect(than).toContain('Bắt đầu thi')
-    expect(than).toContain('Huỷ ca kiểm tra')
+    // Làm lại 28/09: khối phòng chờ tách ra src/components/ca-thi/PhongChoCa.tsx; màn chỉ nối khi ca đang chờ.
+    const than = MAN_THAY.slice(MAN_THAY.indexOf('{chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && ('), MAN_THAY.indexOf('<KhoiThoiGianCa'))
+    expect(than).toContain('<PhongChoCa')
+    expect(than).toContain('onBatDau={() => void batDauCaNay()}')
+    expect(than).toContain('onHuy={() => void huyCaCho()}')
+    expect(KHOI_PC).toContain('Bắt đầu thi')
+    expect(KHOI_PC).toContain('Huỷ ca kiểm tra')
   })
 
   it('huỷ ca là XOÁ MỀM — bấm nhầm còn khôi phục được, và có bước hỏi lại', () => {
     const than = MAN_THAY.slice(MAN_THAY.indexOf('const huyCaCho'), MAN_THAY.indexOf('const daCham ='))
     expect(than).toContain('xoaCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa, chiTiet.ca.maCa)')
-    expect(MAN_THAY).toContain('{hoiHuy && (')
+    expect(KHOI_PC).toContain('{!hoiHuy ? (')
     expect(MAN_THAY).toContain('khôi phục lại được')
   })
 

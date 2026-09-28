@@ -63,9 +63,10 @@ describe('hai lỗi nhỏ ghi tồn — sửa ở chỗ dùng (0.Planer 19/09)',
   // (ii) tiêu đề sheet Báo cáo điểm — ĐÃ GỠ cùng sheet (app phụ huynh một màn một nút, 21/09).
 
   it('(i) thanh trên màn đăng nhập chừa tối thiểu 10 px phía trên (env() rỗng ở máy không tai thỏ làm chữ ĐỖ ĐẠI HỌC bị cắt mép); LogoApp.tsx KHÔNG bị sửa', () => {
-    const t = doc('src/screens/ParentPortalScreen.tsx')
-    expect(t).toContain("paddingTop: 'max(10px, env(safe-area-inset-top))'")
-    expect(t).not.toContain("paddingTop: 'env(safe-area-inset-top, 10px)'")
+    // App phụ huynh mới 28/09: màn đăng nhập không còn thanh trên; khoảng chừa tai thỏ (tối thiểu, không phụ thuộc env()) nằm ở CSS `.ph3-vao`.
+    const css = doc('src/components/ph-v3/ph-v3.css')
+    expect(css).toMatch(/\.ph3-vao \{[^}]*padding: max\(24px, env\(safe-area-inset-top\)\)/)
+    expect(doc('src/screens/ParentPortalScreen.tsx')).not.toContain("paddingTop: 'env(safe-area-inset-top, 10px)'")
     expect(doc('src/components/LogoApp.tsx')).not.toContain('safe-area')
   })
 })

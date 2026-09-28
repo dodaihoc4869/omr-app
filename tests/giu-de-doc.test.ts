@@ -236,7 +236,7 @@ describe('GIỮ ĐỂ ĐỌC — nối vào màn thi', () => {
     expect(z('giu-de')).toBeGreaterThan(z('noi-dung'))
     expect(z('giu-de')).toBeLessThan(z('van-tay'))
     // phủ từ dưới thanh trên xuống, để đồng hồ còn nhìn thấy
-    expect(phu).toContain('top: CAO_THANH_TREN')
+    expect(phu).toContain('top: trongKhung ? 0 : CAO_THANH_TREN') // bố cục ngang: phủ đúng khung đề, đồng hồ bên phải vẫn thấy
   })
 
   it('11b. tấm phủ LUÔN trong DOM, ẩn hiện bằng CSS — không state, không render lại', () => {
@@ -281,7 +281,9 @@ describe('GIỮ ĐỂ ĐỌC — nối vào màn thi', () => {
     // một `touchstart` thật. Máy tính không bao giờ bắn sự kiện đó.
     expect(man).not.toContain('if (!coCamUng()) return')
     expect(man).toContain('const khaiCoCamUng = coCamUng()')
-    expect(man).toContain('coCamUng: coCamUngThat(daThayCham, khaiCoCamUng),')
+    // 28/09 thầy chốt: bố cục NGANG trên máy không cảm ứng dùng PHÍM CÁCH làm ngón giữ ⇒ bật ở đó; bố cục dọc máy không cảm ứng vẫn KHÔNG bật.
+    expect(man).toContain('coCamUng: coCamUngHieuLuc(),')
+    expect(man).toContain("coCamUngThat(daThayCham, khaiCoCamUng) || (!khaiCoCamUng && boCucRef.current !== 'doc')")
   })
 
   it('ca cũ (không bật) thì effect không chạy — hành vi cũ nguyên vẹn', () => {

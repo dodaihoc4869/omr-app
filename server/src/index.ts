@@ -22,6 +22,7 @@ import {gvNhacTuDong,nhacTuDong} from './nhac-tu-dong'
 import {gvCanGiup,gvChuaNop,gvEmToanCanh,gvTimEm,gvVinhDanhNgay} from './gv-hom-nay-v2'
 import {gvLichSuCauCuaEm} from './gv-lich-su-cau'
 import {gvBaoCaoCa,gvBaoCaoCaEm} from './bao-cao-ca'
+import { phBaoCaoCa, phHoc2, phLoiThay } from './ph-bao-cao-moi'
 import {gvCongBoCa,gvDongCuaVao,gvNhanXetCaEm} from './ca-thi-them'
 import {gvBangTinSong} from './gv-bang-tin-song'
 import {docBangTenLop,gvDoiLopEm,gvLop,tenLopCuaEm} from './ten-lop'
@@ -71,6 +72,7 @@ import { capNhatSaiNhanhNeuCu } from './sai-nhanh-gv'
 import * as VD from './vo-dai'
 import type { D1PreparedStatement, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
 import { gvChienDich } from './srs2-gv'
+import { gvSuaChienDich } from './srs2-sua'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
@@ -3215,6 +3217,10 @@ const boXuLy = {
       // "Mọi thứ về con" (Code 4, đã soát): ĐỌC-CHỈ, token hoặc SBD trần; chi tiết một câu (lời giải) cùng luật che.
       if (p === '/ph/tat-ca-ve-con') return ra(await phTatCaVeCon(env, b, Date.now(), envDoc, ctx))
       if (p === '/ph/chi-tiet-cau-ve-con') return ra(await phChiTietCauVeCon(env, b, Date.now(), envDoc, ctx))
+      // APP PHỤ HUYNH MỚI 28/09 (chỉ xem báo cáo, không giao bài): báo cáo một ca + nhận xét thầy, lời thầy các ca, Game Hoá 2.0 của con — ĐỌC-CHỈ, cùng xác thực.
+      if (p === '/ph/bao-cao-ca') return ra(await phBaoCaoCa(env, b, Date.now(), envDoc, ctx))
+      if (p === '/ph/loi-thay') return ra(await phLoiThay(env, b, Date.now(), envDoc, ctx))
+      if (p === '/ph/hoc-2') return ra(await phHoc2(env, b, Date.now(), envDoc, ctx))
       if (p.startsWith('/luyen-de/')) return ra(await luyenDe(env, p.slice('/luyen-de/'.length), b))
       if (p.startsWith('/game-v2/')) return ra(await gameV2(env, p.slice('/game-v2/'.length), b))
       if (p === '/hs/dat-mat-khau') return ra(await G.hsDatMatKhau(env, b))
@@ -3349,6 +3355,8 @@ const boXuLy = {
       // TÊN LỚP (docs/hop-dong-ten-lop-2109.md): `/gv/lop` ĐỌC-CHỈ; `/gv/doi-lop-em` GHI cột `hoc_sinh.ten_lop` của MỘT em (không đụng `lop` = khối).
       // GAME HÓA 2.0 (srs2-gv.ts): chiến dịch luyện — giao, đồng hồ sức chứa, bảng chiến dịch, buổi chữa, chữa xong, công tắc.
       if (p === '/gv/chien-dich') return ra(await gvChienDich(env, b))
+      // SỬA CHIẾN DỊCH ĐANG MỞ (thầy 28/09, srs2-sua.ts): thêm đề (chia lại câu chưa làm), thêm/bớt em (không xoá sổ), sửa hạn (hết hạn ⇒ mở lại). GHI — dùng env.
+      if (p === '/gv/chien-dich/sua') return ra(await gvSuaChienDich(env, b))
       // GỌI LÊN BẢNG — bảng chi tiết em trên tờ chiếu (bản vẽ LenBang-Moi 28/09): ĐỌC-CHỈ, số thật từ sổ (`ho-so-em-chieu.ts`).
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
       // DẢI THỐNG KÊ LỚP (phím T) cho buổi chữa KHÔNG từ ca (hoàn thiện bản vẽ 28/09): chỉ số GỘP theo câu từ sổ su_kien_hoc, không tên em. ĐỌC-CHỈ.

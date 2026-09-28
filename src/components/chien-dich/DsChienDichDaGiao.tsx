@@ -7,6 +7,7 @@ import { useAppStore } from '../../store/appStore'
 import { danhSachThongKe, dongChienDich, huyChienDich, type ChienDichTom } from './api'
 import { KHOA_CHON_CHIEN_DICH } from './LenBangChienDich'
 import { hienNgay, phanTram } from './ngay'
+import SuaChienDich from './SuaChienDich'
 import './chien-dich.css'
 
 export type LocChienDich = 'tat-ca' | 'dang-chay' | 'cho-chua' | 'da-dong'
@@ -52,6 +53,8 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
   const [dangLam, setDangLam] = useState('')
   const [loc, setLoc] = useState<LocChienDich>('tat-ca')
   const [tim, setTim] = useState('')
+  // Hộp "Chỉnh sửa" (thầy 28/09): thêm đề, thêm/bớt em, sửa hạn của chiến dịch đang mở.
+  const [dangSua, setDangSua] = useState<ChienDichTom | null>(null)
 
   const tai = useCallback(async () => {
     setLoi('')
@@ -276,6 +279,9 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
                           </button>
                           {c.trangThai === 'dang_chay' && (
                             <>
+                              <button type="button" className="m3-nut-chu cd-nut-nho" disabled={dangLam === c.id} onClick={() => setDangSua(c)}>
+                                Chỉnh sửa
+                              </button>
                               <button type="button" className="m3-nut-chu cd-nut-nho" disabled={dangLam === c.id} onClick={() => void doi(c, 'dong')}>
                                 Kết thúc
                               </button>
@@ -304,6 +310,18 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
             vượt số lượt/ngày để kịp hạn · <b>Cần dạy lại</b> = câu có em sai từ 4 lần.
           </p>
         </>
+      )}
+      {dangSua && (
+        <SuaChienDich
+          id={dangSua.id}
+          ten={dangSua.ten}
+          onDong={() => setDangSua(null)}
+          onDaLuu={(kq) => {
+            setDangSua(null)
+            showToast(`Đã lưu chiến dịch: ${kq.tomTat}${kq.soCauThem > 0 ? ` · ${kq.soCauSau} câu` : ''}`, 'success')
+            void tai()
+          }}
+        />
       )}
     </section>
   )

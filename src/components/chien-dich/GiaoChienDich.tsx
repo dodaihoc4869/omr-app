@@ -6,11 +6,11 @@
 // Mỗi lần đổi đầu vào ⇒ gọi `suc-chua`; nút chính "Giao chiến dịch cho N em" ⇒ `tao`. KHÔNG có nút rút bớt câu hay nút dời hạn (thầy 28/09).
 // Giao xong cho HOÀN TÁC ("Huỷ giao" ⇒ `huy`) thay vì hỏi lại trước (luật C8).
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { TeacherExamSource } from '../../data/examContent'
 import { useAppStore } from '../../store/appStore'
 import HopChonDe from '../HopChonDe'
-import { docDsEm, huyChienDich, taoChienDich, tinhSucChua, type SucChua } from './api'
-import ChonEmGiao, { khoiCuaLop, type EmLop } from './ChonEmGiao'
+import { huyChienDich, taoChienDich, tinhSucChua, type SucChua } from './api'
+import ChonEmGiao from './ChonEmGiao'
+import { useDsEmGiao, useKhoDe } from './nguon-giao'
 import DongHoSucChua from './DongHoSucChua'
 import { congNgay, conLai, hienHanNop, hienNgay, laNgay, ngayVn, phanTram } from './ngay'
 import { CHU_MUC } from './tinh'
@@ -49,7 +49,6 @@ export default function GiaoChienDich({
 }) {
   const showToast = useAppStore((s) => s.showToast)
   const setScreen = useAppStore((s) => s.setScreen)
-  const classList = useAppStore((s) => s.classList) as { sbd?: string; hoTen?: string; lop?: string }[] | undefined
   const homNay = useMemo(() => ngayVn(nowMs ?? Date.now()), [nowMs])
 
   const [ten, setTen] = useState(tenGoiY || 'Chiến dịch luyện')
@@ -76,54 +75,11 @@ export default function GiaoChienDich({
   const [daGiao, setDaGiao] = useState<{ id: string; soCau: number; soEm: number } | null>(null)
   const [dangHuy, setDangHuy] = useState(false)
 
-  // Ngân hàng đề trên máy này — ĐỦ mọi tờ, tách theo phần y như màn Mở ca (thầy 28/09: "chưa hiển thị đầy đủ đề kho đề").
-  // KHÔNG khử trùng cả kho ở đây: khử trước khi chọn làm tờ trùng hết câu BIẾN MẤT khỏi cây. Câu trùng giữa các tờ ĐÃ TÍCH do máy chủ bỏ khi giao.
-  const [kho, setKho] = useState<TeacherExamSource[] | null>(null)
+  // Kho đề trên máy (đủ mọi tờ, tách theo phần) + danh sách em (ưu tiên máy chủ) — dùng chung với hộp Chỉnh sửa chiến dịch.
+  const kho = useKhoDe()
   // Cây Kho đề: mở sẵn khi chưa có tờ nào (giao mới); thu gọn khi đã điền sẵn tờ của ca.
   const [moCay, setMoCay] = useState(maDeCa.length === 0)
-  useEffect(() => {
-    let huy = false
-    void (async () => {
-      try {
-        const [{ loadExamSources }, { tachNhieuTheoPhan }] = await Promise.all([import('../../lib/exam-db'), import('../../lib/tach-phan-de')])
-        const ds = tachNhieuTheoPhan(await loadExamSources())
-        if (!huy) setKho(ds)
-      } catch {
-        /* không đọc được kho: tờ hiện bằng mã, không có số câu */
-        if (!huy) setKho([])
-      }
-    })()
-    return () => {
-      huy = true
-    }
-  }, [])
-  // Danh sách học sinh: ƯU TIÊN máy chủ (cùng bảng máy chủ dùng khi giao) — máy thầy chưa nạp "Danh sách lớp" vẫn chọn được khối/lớp/em.
-  // Máy chủ không trả lời ⇒ dùng danh sách trên máy; cả hai rỗng ⇒ lùi về ô gõ tên lớp.
-  const [emMayChu, setEmMayChu] = useState<{ sbd: string; hoTen: string; khoi?: string; lop?: string; tenLop?: string }[] | null>(null)
-  useEffect(() => {
-    let huy = false
-    void docDsEm().then((r) => {
-      if (!huy && r.ok && Array.isArray(r.du.em) && r.du.em.length > 0) setEmMayChu(r.du.em)
-    }).catch(() => {})
-    return () => {
-      huy = true
-    }
-  }, [])
-  const dsEm = useMemo<EmLop[]>(
-    () =>
-      emMayChu
-        ? emMayChu.map((e) => {
-            const khoi = String(e.khoi ?? e.lop ?? '').trim()
-            return { sbd: e.sbd, hoTen: e.hoTen, khoi: khoiCuaLop(khoi), tenLop: String(e.tenLop ?? '').trim() || khoi }
-          }).filter((e) => e.sbd && e.tenLop)
-        : (classList ?? [])
-            .map((r) => {
-              const lop = String(r.lop ?? '').trim()
-              return { sbd: String(r.sbd ?? '').trim(), hoTen: String(r.hoTen ?? '').trim(), khoi: khoiCuaLop(lop), tenLop: lop }
-            })
-            .filter((e) => e.sbd && e.tenLop),
-    [emMayChu, classList],
-  )
+  const dsEm = useDsEmGiao()
   const coDanhSach = dsEm.length > 0
   const dsLop = useMemo(() => [...new Set(dsEm.map((e) => e.tenLop))].sort((a, b) => a.localeCompare(b, 'vi')), [dsEm])
   // Ca vừa kiểm tra có lớp ⇒ tích sẵn em của khối/lớp đó MỘT lần khi danh sách về.

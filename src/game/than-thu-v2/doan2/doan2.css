@@ -43,6 +43,7 @@
 .dh2-sat-thuong{position:absolute;left:57%;top:55%;display:flex;flex-direction:column;align-items:flex-start;gap:2px;transform:rotate(-8deg);pointer-events:none;animation:dh2-bat .28s ease-out both}
 .dh2-sat-thuong b{font-family:'Baloo 2',var(--sans,'Be Vietnam Pro'),system-ui,sans-serif;font-size:34px;font-weight:800;line-height:1;color:rgb(255,214,107);text-shadow:0 3px 0 rgb(138,58,0),0 0 18px rgba(255,160,40,.6)}
 .dh2-sat-thuong span{padding:2px 8px;border-radius:8px;background:rgb(255,92,138);color:rgb(255,255,255);font-size:12px;font-weight:800;white-space:nowrap}
+@media (orientation:portrait){.dh2-sat-thuong{top:auto;bottom:58px;flex-direction:row;align-items:center;gap:6px;transform:rotate(-4deg)}.dh2-sat-thuong b{font-size:28px}} /* màn dọc: số sát thương nằm một hàng trên nhãn Máu, không đè chip đồng đội / Liên kích */
 .dh2-nhan-canh{position:absolute;bottom:30px;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
 .dh2-nhan-mau{left:3%;color:rgb(191,244,255)}
 .dh2-nhan-o{right:3%;color:rgb(255,179,200)}
@@ -51,7 +52,7 @@
 .dh2-hud-hiep{flex:1 1 auto;min-width:0;height:52px;padding:6px 12px;border-radius:18px;display:flex;flex-direction:column;justify-content:center;gap:6px}
 .dh2-hud-dong{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:12px;font-weight:800}
 .dh2-hud-dong b{font-size:16px;letter-spacing:1px;white-space:nowrap}
-.dh2-hud-dong span{color:var(--dh2-mo);white-space:nowrap}
+.dh2-hud-dong span{min-width:0;overflow:hidden;text-overflow:ellipsis;color:var(--dh2-mo);white-space:nowrap} /* HUD hẹp: chú thích hiệp trùm tự rút gọn, không chui dưới nút Rời chuyến */
 .dh2-vach{display:flex;align-items:center;gap:4px}
 .dh2-vach i{flex:1 1 0;height:6px;border-radius:3px;background:rgba(255,255,255,.18)}
 .dh2-vach i.dh2-xong{background:var(--dh2-xanh)}

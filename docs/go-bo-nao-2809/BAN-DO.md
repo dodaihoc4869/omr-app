@@ -25,9 +25,10 @@ KHÔNG DROP bảng, KHÔNG xoá dữ liệu: `ai_ho_so_ngay`, `ai_dieu_chinh`, `
 | Thầy · Toàn cảnh em | loại sự kiện `bo_nao` trong dòng thời gian + bộ lọc | **Gỡ** (máy chủ + app) |
 | Thầy · Buổi chữa đề xuất | `dangBoNao` / `dongBoNao` từ `ai_ban_tin` | Máy chủ trả `[]` (giữ khoá hợp đồng) |
 | Học sinh · Bảng nhiệm vụ | `TheBoNao` (lời "Bộ não A.I hỗ trợ riêng em") | **Xoá** |
-| Học sinh · Thử thách riêng hôm nay | thẻ do Bộ não chọn dạng/số câu | Máy chủ `/hs/thu-thach-hom-nay` luôn `{ok:true, co:false}` ⇒ app tự ẩn thẻ; `/nop` ⇒ `{ok:false, error:'Chức năng đã gỡ'}`. Mã thẻ phía app (`TheThuThachRieng`, `thu-thach-rieng.ts`) để NGỦ (không dựng được) — gỡ hẳn sau nếu Boss muốn |
+| Học sinh · Thử thách riêng hôm nay | thẻ do Bộ não chọn dạng/số câu | **Xoá** thẻ `TheThuThachRieng` + css, hook `useThuThachHomNay`, trường `thuThachRieng` của Bảng nhiệm vụ, nhánh "Để sau". Máy chủ `/hs/thu-thach-hom-nay` luôn `{ok:true, co:false}`, `/nop` ⇒ đã gỡ. Còn lại: nút cũ "Luyện nâng cao" của nguồn trợ lý (`mo_thu_thach`) gọi route ấy ⇒ báo "Chưa có câu thử thách" |
 | Phụ huynh (cũ) · Bảng nhiệm vụ | lời + thư tuần Bộ não | **Xoá**; `bo-nao-lay-loi-ph.ts` → `tai-thong-tin-ph.ts` chỉ còn "Cảnh báo của thầy" |
 | Phụ huynh (mới) · Mọi thứ về con | thư "Lời A.I Đỗ Đại Học gửi anh/chị" (`loiBoNao`) | Bỏ phần thư; khối còn "Anh/chị có thể làm gì" (số thật của máy chủ), đổi tên "Lời Thầy Đỗ Đại Học gửi anh/chị" |
+| Phụ huynh (ph-v3, PR #39) · Lời thầy | khối "Thư tuần về con" (`loiBoNao`) | **Gỡ**; khối đầu = nhận xét mới nhất của thầy. `AppPhuHuynh` lấy cảnh báo qua `tai-thong-tin-ph.ts` |
 
 ## 3. Máy chủ — đã gỡ gì
 
