@@ -165,7 +165,39 @@ export async function hoa2Action(env: Env, sbd: string, action: string, b: Row, 
   return { ok: false, error: 'Lệnh không hợp lệ.' }
 }
 
-/** Danh sách câu em ĐÃ làm trong mọi chiến dịch (câu chưa làm không hiện). */
+/** Nhóm "chiến dịch" giả cho câu ôn NGOÀI chiến dịch (câu sai trong ca kiểm tra đã công bố — nguồn `ca_sai` của `docHoSo2`). */
+export const NHOM_CAU_ON_CA = 'cau-sai-ca-kiem-tra'
+/** Nguồn của một lần làm, hiện cạnh lịch sử câu: Bi-a / Đoàn Hộ Tống / Bát Linh Đảo / Ca kiểm tra; nguồn khác ⇒ 'khac'. */
+export type NguonLanLam = 'bia' | 'doan' | 'dao' | 'thi' | 'khac'
+/**
+ * Gắn nguồn cho từng lần trong `lichSu` của các câu đã liệt kê. `lichSu` (phatLaiCau) = các lần làm (bỏ lần bị giữ kín) xếp theo giờ, CẮT từ
+ * mốc chiến dịch ⇒ là ĐUÔI của danh sách đầy đủ ⇒ lấy đúng số lần cuối. Lỗi đọc ⇒ để trống nguồn (không làm hỏng danh sách).
+ */
+async function ganNguonLanLam(env: Env, sbd: string, cau: Record<string, unknown>[]): Promise<void> {
+  if (!cau.length) return
+  const ds = JSON.stringify(cau.map((c) => str(c.qid)))
+  const sql = (coVis: boolean) => `SELECT s.qid, s.luc, s.nguon, ${coVis ? 's.visibility' : 'NULL AS visibility'},
+      COALESCE(json_extract(g.json, '$.bia'), 0) AS bia, json_extract(g.json, '$.doan') AS doan
+    FROM su_kien_hoc s LEFT JOIN game_v2_session g ON s.nguon = 'game' AND g.id = s.ma_nguon
+    WHERE s.sbd = ? AND s.qid IN (SELECT value FROM json_each(?)) ORDER BY s.luc`
+  const r = await env.DB.prepare(sql(true)).bind(sbd, ds).all<Row>().catch(() => env.DB.prepare(sql(false)).bind(sbd, ds).all<Row>()).catch(() => null)
+  if (!r) return
+  const theoQid = new Map<string, NguonLanLam[]>()
+  for (const x of r.results ?? []) {
+    if (str(x.visibility) === 'embargoed') continue
+    const n: NguonLanLam = str(x.nguon) === 'thi' ? 'thi' : str(x.nguon) !== 'game' ? 'khac' : Number(x.bia) === 1 ? 'bia' : x.doan != null ? 'doan' : 'dao'
+    theoQid.set(str(x.qid), [...(theoQid.get(str(x.qid)) ?? []), n])
+  }
+  for (const c of cau) {
+    const ls = c.lichSu as { nguon?: NguonLanLam }[]
+    const ns = theoQid.get(str(c.qid)) ?? []
+    if (ns.length < ls.length) continue
+    const duoi = ns.slice(ns.length - ls.length)
+    c.lichSu = ls.map((l, i) => ({ ...l, nguon: duoi[i] }))
+  }
+}
+
+/** Danh sách câu em ĐÃ làm trong mọi chiến dịch + câu ôn ngoài chiến dịch em đã làm (câu chưa làm không hiện). */
 async function cauDaLam(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   const homNay = ngayVnCua(nowMs)
   const hs = await docHoSo2(env, sbd, homNay)
@@ -184,6 +216,21 @@ async function cauDaLam(env: Env, sbd: string, nowMs: number): Promise<Record<st
       })
     })
   }
+  // Câu ôn NGOÀI chiến dịch (câu sai trong ca kiểm tra đã công bố): Đoàn và Bi-a phát câu ôn trước ⇒ em làm rồi thì phải thấy ở đây
+  // (thầy 28/09: "Phải lưu câu đã làm ở game bia nữa").
+  const ngoai: string[] = []
+  for (const qid of hs.qidCaSai ?? []) {
+    const t = hs.tt.get(qid), m = hs.meta.get(qid)
+    if (!t || !m || t.laMoi || daCo.has(qid)) continue
+    daCo.add(qid)
+    ngoai.push(qid)
+    cau.push({
+      qid, chienDichId: NHOM_CAU_ON_CA, stt: ngoai.length, phan: m.phan, mucDo: m.mucDo, tenDang: m.tenDang ?? m.dang,
+      trangThai: t.catTia ? 'can_day_lai' : t.thanhThao ? 'thanh_thao' : 'dang_on', lanCuoiDung: t.lanCuoiDung, henOn: t.henOn, lichSu: t.lichSu,
+    })
+  }
+  if (ngoai.length) chienDich.push({ id: NHOM_CAU_ON_CA, ten: 'Câu sai trong ca kiểm tra', hanNop: '', qids: ngoai })
+  await ganNguonLanLam(env, sbd, cau)
   return { ok: true, chienDich: chienDich.map(({ qids, ...c }) => ({ ...c, tong: qids.length })), cau }
 }
 

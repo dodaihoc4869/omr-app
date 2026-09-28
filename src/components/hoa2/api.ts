@@ -47,10 +47,15 @@ export interface ChienDichCau {
   tong: number
 }
 export type TrangThaiCau = 'dang_on' | 'thanh_thao' | 'can_day_lai'
+/** Nơi em làm lần đó (máy chủ gắn): Bi-a Phản Ứng / Đoàn Hộ Tống / Bát Linh Đảo / Ca kiểm tra; nguồn khác hoặc bản máy chủ cũ ⇒ vắng. */
+export type NguonLanLam = 'bia' | 'doan' | 'dao' | 'thi'
+export const NHAN_NGUON_LAN: Record<NguonLanLam, string> = { bia: 'Bi-a', doan: 'Đoàn Hộ Tống', dao: 'Bát Linh Đảo', thi: 'Ca kiểm tra' }
+const laNguonLan = (x: unknown): x is NguonLanLam => x === 'bia' || x === 'doan' || x === 'dao' || x === 'thi'
 export interface LanLam {
   ngay: string
   dung: boolean
   coGoiY: boolean
+  nguon?: NguonLanLam
 }
 export interface CauDaLamMuc {
   qid: string
@@ -226,7 +231,7 @@ export function docCauDaLam(o: Record<string, unknown>): KetQuaCauDaLam {
       henOn: laNgay(c.henOn) ? c.henOn : null,
       lichSu: (Array.isArray(c.lichSu) ? c.lichSu : [])
         .filter((l): l is Record<string, unknown> => !!l && typeof l === 'object' && laNgay(l.ngay))
-        .map((l) => ({ ngay: chu(l.ngay), dung: l.dung === true, coGoiY: l.coGoiY === true })),
+        .map((l) => ({ ngay: chu(l.ngay), dung: l.dung === true, coGoiY: l.coGoiY === true, ...(laNguonLan(l.nguon) ? { nguon: l.nguon } : {}) })),
     }))
   return { cheDo2: true, chienDich, cau }
 }
