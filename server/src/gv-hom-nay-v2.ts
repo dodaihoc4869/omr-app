@@ -360,10 +360,10 @@ export async function gvVinhDanhNgay(env: Env, b: Record<string, unknown>, nowMs
 
 // ================================================================== /gv/em-toan-canh ==================================================================
 
-const LOAI_DONG = ['ca', 'btvn', 'on_lai', 'bai_rieng', 'len_bang', 'game', 'exp', 'bo_nao', 'canh_bao'] as const
+const LOAI_DONG = ['ca', 'btvn', 'on_lai', 'bai_rieng', 'len_bang', 'game', 'exp', 'canh_bao'] as const
 type LoaiDong = (typeof LOAI_DONG)[number]
 type Chip = { chu: string; muc: 'tot' | 'sai' | 'trung' }
-const TIEU_DE: Record<LoaiDong, string> = { ca: 'Ca kiểm tra', btvn: 'Bài tập về nhà', on_lai: 'Ôn lại', bai_rieng: 'Bài riêng', len_bang: 'Lên bảng', game: 'Game', exp: 'EXP', bo_nao: 'Bộ não A.I', canh_bao: 'Cảnh báo của thầy' }
+const TIEU_DE: Record<LoaiDong, string> = { ca: 'Ca kiểm tra', btvn: 'Bài tập về nhà', on_lai: 'Ôn lại', bai_rieng: 'Bài riêng', len_bang: 'Lên bảng', game: 'Game', exp: 'EXP', canh_bao: 'Cảnh báo của thầy' }
 
 const chuThoiGian = (giay: number): string => {
   if (giay <= 0) return ''
@@ -387,7 +387,6 @@ const DONG_THOI_GIAN = (coCanhBao: boolean) => `
   UNION ALL SELECT luc, 'len_bang', qid, COALESCE(chuyen_de, ''), COALESCE(dat, 0), 0, 0, 0, '' FROM len_bang WHERE sbd = ?
   )
   UNION ALL SELECT MAX(luc), 'exp', ngay_vn, '', SUM(exp), COUNT(*), 0, 0, '' FROM exp_so WHERE sbd = ? GROUP BY ngay_vn
-  UNION ALL SELECT COALESCE(nop_luc, ngay || 'T05:00:00.000Z'), 'bo_nao', ngay, COALESCE(che_do, ''), 0, 0, 0, 0, COALESCE(json, '') FROM ai_dieu_chinh WHERE sbd = ? AND COALESCE(huy, 0) = 0 AND COALESCE(json_extract(json, '$.luot'), '') <> 'chieu'
   ${coCanhBao ? "UNION ALL SELECT gui_luc, 'canh_bao', id, ma_btvn, CASE WHEN em_xem_luc IS NULL THEN 0 ELSE 1 END, CASE WHEN ph_xem_luc IS NULL THEN 0 ELSE 1 END, 0, 0, loi_em FROM canh_bao_thay WHERE sbd = ?" : ''}`
 
 function dongTuHang(x: Dong): { luc: string; loai: LoaiDong; tieuDe: string; chiTiet: Record<string, unknown>; chips: Chip[] } {
@@ -427,22 +426,6 @@ function dongTuHang(x: Dong): { luc: string; loai: LoaiDong; tieuDe: string; chi
     chiTiet.exp = n1
     mota = `Nhận ${n1} EXP trong ngày (${n2} lần ghi)`
     chips.push({ chu: `+${n1} EXP`, muc: 'trung' })
-  } else if (loai === 'bo_nao') {
-    let loiEm = ''
-    let loiPh = ''
-    try {
-      const j = JSON.parse(chuoi(x.txt)) as { loiNhanChoEm?: unknown; loiNhanChoPhuHuynh?: unknown }
-      loiEm = chuoi(j.loiNhanChoEm)
-      loiPh = chuoi(j.loiNhanChoPhuHuynh)
-    } catch { /* json hỏng: chỉ hiện nhãn */ }
-    const that = chuoi(x.ten) === 'that'
-    tieuDe = `Bộ não A.I${that ? '' : ' (chạy thử)'}`
-    chiTiet.ngay = ma
-    chiTiet.cheDo = that ? 'that' : 'bong'
-    if (loiEm) chiTiet.loiChoEm = loiEm
-    if (loiPh) chiTiet.loiChoPhuHuynh = loiPh
-    mota = loiEm ? `Lời nhắn cho em: ${loiEm}` : loiPh ? `Lời nhắn cho phụ huynh: ${loiPh}` : 'Bộ não A.I đã soi ngày này'
-    chips.push({ chu: that ? 'Đã gửi' : 'Chạy thử, chưa gửi', muc: 'trung' })
   } else if (loai === 'canh_bao') {
     chiTiet.maBtvn = chuoi(x.ten)
     chiTiet.id = ma
@@ -508,8 +491,8 @@ export async function gvEmToanCanh(env: Env, b: Record<string, unknown>, nowMs: 
     ...(tong && tong.exp_tong !== null && tong.exp_tong !== undefined ? { expTong: so(tong.exp_tong), expHomNay: so(tong.exp_nay) } : {}),
   }
 
-  // 2 · dòng thời gian: MỘT truy vấn UNION (ca, sổ học theo nhóm, lên bảng, EXP theo ngày, Bộ não, cảnh báo)
-  const bindDong = (coCb: boolean) => [sbd, sbd, sbd, sbd, sbd, ...(coCb ? [sbd] : [])]
+  // 2 · dòng thời gian: MỘT truy vấn UNION (ca, sổ học theo nhóm, lên bảng, EXP theo ngày, cảnh báo)
+  const bindDong = (coCb: boolean) => [sbd, sbd, sbd, sbd, ...(coCb ? [sbd] : [])]
   const sqlNgoai = (coCb: boolean) => `SELECT * FROM (${DONG_THOI_GIAN(coCb)}) WHERE luc IS NOT NULL AND luc <> '' AND luc < ? AND loai IN (SELECT value FROM json_each(?)) ORDER BY luc DESC LIMIT ${TOI_DA_DONG_MOT_TRANG + 1}`
   const mocTruoc = truoc || '9999-12-31T00:00:00.000Z'
   const rDong = (await Q.hoi(sqlNgoai(true), ...bindDong(true), mocTruoc, json(loaiLoc))) ?? (await Q.hoi(sqlNgoai(false), ...bindDong(false), mocTruoc, json(loaiLoc))) ?? []

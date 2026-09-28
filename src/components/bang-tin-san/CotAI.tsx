@@ -1,4 +1,4 @@
-// Cột tối "A.I Đỗ Đại Học đã tự làm hôm nay": việc máy đã làm (số thật), Bộ não A.I đêm qua, dạng cả lớp đang vấp, chân "Hệ thống bình thường". Chỉ ĐỌC. Con số nào máy chủ không có ⇒ bỏ dòng ấy (không vẽ 0 giả).
+// Cột tối "App đã tự làm hôm nay": việc máy đã làm (số thật), dạng cả lớp đang vấp, chân "Hệ thống bình thường". Chỉ ĐỌC. Con số nào máy chủ không có ⇒ bỏ dòng ấy (không vẽ 0 giả).
 import { useEffect, useRef, useState } from 'react'
 import type { BangTin } from '../../lib/bang-tin-thay'
 
@@ -43,13 +43,11 @@ function DongViec({ chu, so }: { chu: string; so: number }) {
 
 export function CotAI({ bt }: { bt: BangTin }) {
   const viec = bt.mayDaLam.slice(0, TOI_DA_VIEC)
-  const nao = bt.boNao
   const vap = bt.dangVap.slice(0, TOI_DA_DANG)
-  const soNao = nao ? [[nao.soEmSoi, 'em được soi'], [nao.soEmDieuChinh, 'em được chỉnh bài'], [nao.soLoiNhan, 'lời nhắn']].filter((x): x is [number, string] => x[0] !== null) : []
   return (
     <article className="bts-the bts-the-ai" data-khoi="cot-ai">
       <div className="bts-the-dau">
-        <h2 className="bts-ten">A.I Đỗ Đại Học đã tự làm hôm nay</h2>
+        <h2 className="bts-ten">App đã tự làm hôm nay</h2>
       </div>
       {viec.length > 0 && (
         <ul className="bts-ai-ds">
@@ -60,17 +58,6 @@ export function CotAI({ bt }: { bt: BangTin }) {
             </li>
           ))}
         </ul>
-      )}
-      {soNao.length > 0 && (
-        <div className="bts-nao">
-          <span className="bts-nao-ten">Bộ não A.I đêm qua</span>
-          {soNao.map(([so, nhan]) => (
-            <div key={nhan}>
-              <b className="bts-so">{nghin(so)}</b>
-              <span>{nhan}</span>
-            </div>
-          ))}
-        </div>
       )}
       {vap.length > 0 && (
         <>

@@ -58,7 +58,7 @@ export default function ThanhDayAp({ giaoThem }: { giaoThem: ViewGiaoThem }) {
             {!hetLuot && (
               <>
                 <i aria-hidden="true"> · </i>
-                <span>A.I Đỗ Đại Học chọn câu hợp với con</span>
+                <span>Thầy Đỗ Đại Học chọn câu hợp với con</span>
               </>
             )}
           </p>

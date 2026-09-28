@@ -28,7 +28,6 @@ import { tuLucHomNay } from './cau-da-lam'
 import { docMocHienThi } from './moc-no'
 import { docLichDaLuu, moLucChang } from './btvn-nang-do-chang'
 import { ketQuaChotNgay } from '../../src/lib/dat-nhiem-vu-ngay'
-import { docDieuChinhHieuLuc } from './bo-nao-doc'
 
 export const TOI_DA_EM_MOI_LO = 50
 const MOT_NGAY_MS = 86_400_000
@@ -268,7 +267,6 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const denCa = new Date(now + NGAY_ON_THI * MOT_NGAY_MS).toISOString()
   // HẠ TẢI D1 (Boss 22/09): ca sắp mở đệm 30 giây (đọc qua docCaSapMo, game-v2-bank.ts — dùng chung móc bất hoạt với protectedQuestions).
   const pRca = chan(tat(() => docCaSapMo(env, nowIso, denCa), []))
-  const pDieuChinh = chan(docDieuChinhHieuLuc(env, em, homNay)) // có thể ném lỗi: ném ở chỗ await cuối như cũ
   const pRb = chan((async () => {
     // BTVN chưa nộp (còn hạn hoặc mới quá hạn ≤ 14 ngày). Có phòng vệ khi cột `lo_da_xong` chưa có.
     const q = (cot: string, them = '') => `SELECT be.sbd, be.ma_btvn, ${cot} AS lo, b.so_cau, b.giao_luc, b.han_nop${them}
@@ -458,15 +456,6 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
       cua(x)?.cauOnThi?.push({ qid: String(x.qid), lanSai: Number(x.lan_sai) || 0, moiSai: String(x.trang_thai) === 'moi_sai' })
     }
   }
-  // BỘ NÃO A.I (chế độ THẬT): điều chỉnh còn hạn của các em — nhịp vào ngân sách ngày; `on_som` kéo `moc_on_ke` của câu vừa sai thuộc dạng đó VỀ NGÀY MAI (chỉ SỚM hơn).
-  // Chạy thử / tắt ⇒ `docDieuChinhHieuLuc` trả rỗng, kế hoạch Y HỆT (một truy vấn cấu hình). Không đụng hạn nộp bài nào.
-  const dieuChinh = await pDieuChinh
-  for (const [sbd, dc] of dieuChinh) {
-    const c = map.get(sbd)
-    if (!c) continue
-    if (dc.nhip !== 0) c.boNao = { nhip: dc.nhip }
-    if (dc.onSom.length > 0) await keoOnSom(env, c, dc.onSom, themNgay(dc.ngay, 1), homNay, hopKhoi, coChiMuc, baoVe)
-  }
   // CNH-1.0 RV07 mục 7 (02 §7.1): SẮP lại hai danh sách TỰ ĐỘNG của kế hoạch bằng CHÍNH bộ chọn chung.
   // Cờ đọc GỘP trong `docCauHinhKeHoach` (không thêm truy vấn cho đường lập kế hoạch).
   await sapDanhSachTuDongTheoBoChon(env, map, homNay, now, cauHinh.nganSachChung)
@@ -537,29 +526,6 @@ async function sapDanhSachTuDongTheoBoChon(env: Env, map: Map<string, DauVaoKeHo
     const theoThuTu = <T extends { qid: string }>(ds: T[]): T[] => ds.filter((x) => giu.has(x.qid)).sort((a, b) => (thuTu.get(a.qid) ?? 1e9) - (thuTu.get(b.qid) ?? 1e9))
     c.cauToiHan = theoThuTu(c.cauToiHan)
     if (c.cauOnThi) c.cauOnThi = theoThuTu(c.cauOnThi)
-  }
-}
-
-/**
- * `on_som`: câu ĐÃ TỪNG sai, còn đang ôn (`moi_sai`/`dang_on`), thuộc dạng được bộ não chọn, mà mốc ôn kế còn ở tương lai ⇒ mốc HIỆU LỰC = min(mốc, ngày mai của đêm điều chỉnh).
- * CHỈ SỚM hơn, không bao giờ muộn hơn, không ghi lại `nam_kt_cau` (hồ sơ nguồn không đổi). Vào hàng ôn qua đúng cửa `cauToiHan` (cùng bộ lọc phục vụ được).
- */
-async function keoOnSom(
-  env: Env, c: DauVaoKeHoach, dsDang: string[], ngayMai: string, homNay: string,
-  hopKhoi: (x: Record<string, unknown>) => boolean = () => true, coChiMuc?: boolean, baoVe?: { baoVe: Set<string> | null; kiemDuocBaoVe: boolean },
-): Promise<void> {
-  if (ngayMai > homNay) return // chưa tới "ngày mai" của đêm điều chỉnh
-  const daCo = new Set(c.cauToiHan.map((x) => x.qid))
-  const r = await tat(() => env.DB.prepare(
-    `SELECT qid, ma_dang, moc_on_ke, lan_sai FROM nam_kt_cau
-      WHERE sbd = ? AND ma_dang IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai','dang_on') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke > ?`,
-  ).bind(c.sbd, json(dsDang), homNay).all<Record<string, unknown>>(), trong())
-  const ung = (r.results ?? []).filter((x) => !daCo.has(String(x.qid)))
-  const phucVu = await tapQidPhucVu(env, ung.map((x) => String(x.qid)), coChiMuc, baoVe)
-  for (const x of ung) {
-    if (phucVu && !phucVu.has(String(x.qid))) continue
-    if (!hopKhoi({ sbd: c.sbd, qid: x.qid })) continue
-    c.cauToiHan.push({ qid: String(x.qid), maDang: x.ma_dang ? String(x.ma_dang) : null, mocOnKe: ngayMai < String(x.moc_on_ke) ? ngayMai : String(x.moc_on_ke), lanSai: Number(x.lan_sai) || 0 })
   }
 }
 

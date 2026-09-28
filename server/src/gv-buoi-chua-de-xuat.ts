@@ -2,10 +2,10 @@
 // ĐỌC-CHỈ (không ghi, không bảng mới, không cron — giai đoạn 1: tính khi thầy mở màn), ≤ 12 truy vấn D1. Máy chủ chỉ GOM số liệu; ngưỡng, xếp câu, ước phút, lý do bằng số là của hàm thuần
 // `src/lib/buoi-chua-de-xuat.ts` (Code 1). Không nhãn năng lực; tên em chỉ ở lệnh thầy (sau cổng `laThay`).
 //   · `dangCaLopYeu`  dạng cả lớp yếu THEO HỒ SƠ (`dangYeu` của `nam_kt_dang`): mỗi lớp ≤ 8 dạng có ≥ 3 em yếu; `lop` = TÊN LỚP hiệu lực (docs/hop-dong-ten-lop-2109.md), kèm `khoi` và `siSo`;
-//   · `dangBoNao`     dòng `ca_lop` của bản tin Bộ não gần nhất tới `ngay` (dạng cả lớp yếu theo Bộ não; chưa có số riêng);
+//   · `dangBoNao`     LUÔN RỖNG (Bộ não A.I đã gỡ 28/09/2026; giữ khoá cho hợp đồng);
 //   · `cauSaiNhieu`   câu nhiều em sai trong 3 ngày tới `ngay`, MỌI nguồn sổ, chỉ tính lượt ĐÃ CHẤM (`ket_qua` có giá trị) — ≥ 3 em sai VÀ ≥ 30 % em làm sai, ≤ 40 câu — ĐÃ LỌC câu tự luận (cấm rút tự luận — kênh tự động) và câu thuộc đề thi ĐANG BẢO VỆ;
 //     `loi` = câu cốt lõi của một bài tập về nhà đang có (`btvn_cau.loi = 1`);
-//   · `dongBoNao`     dòng bản tin có `hanhDong` = `goi_len_bang` | `dua_vao_buoi_chua` (em + dạng do Bộ não gợi ý);
+//   · `dongBoNao`     LUÔN RỖNG (Bộ não A.I đã gỡ 28/09/2026; giữ khoá cho hợp đồng);
 //   · `soEmCoSo3Ngay` số em có sổ học trong 3 ngày (dưới 5 ⇒ hàm thuần ẩn thẻ, không bịa).
 // `lop` trong thân yêu cầu: khớp TÊN LỚP hoặc KHỐI của em (vd "12 - Tinh Hoa" hay "12"). Thiếu khối nào ⇒ khối đó vắng + `lyDoThieu` (không bịa).
 import type { Env } from './kieu'
@@ -99,15 +99,7 @@ export async function gvBuoiChuaDeXuat(env: Env, b: Record<string, unknown>, now
     yeuTheoLop.set(e.lop, m)
   }
 
-  // 3 · bản tin Bộ não gần nhất (tới `ngay`)
-  const rBt = await Q.hoi('SELECT ngay, json FROM ai_ban_tin WHERE ngay <= ? ORDER BY ngay DESC LIMIT 1', ngay)
-  let cacDong: Dong[] = []
-  try {
-    const o = rBt?.[0] ? (JSON.parse(chuoi(rBt[0].json)) as { cacDong?: Dong[] }) : {}
-    cacDong = Array.isArray(o.cacDong) ? o.cacDong : []
-  } catch {
-    cacDong = []
-  }
+  // 3 · (Bộ não A.I đã gỡ 28/09/2026: không còn đọc `ai_ban_tin`; `dangBoNao`/`dongBoNao` luôn rỗng để giữ hợp đồng.)
 
   // 4 · số em có sổ 3 ngày + câu nhiều em sai (GROUP BY qid)
   const rSo = dsSbd.length > 0
@@ -166,12 +158,9 @@ export async function gvBuoiChuaDeXuat(env: Env, b: Record<string, unknown>, now
   const loi = new Set((rLoi ?? []).map((x) => chuoi(x.qid)))
 
   // 7 · tên dạng
-  const dongBoNao = cacDong.filter((d) => (HANH_DONG_BUOI_CHUA as readonly string[]).includes(chuoi(d.hanhDong)) && em.has(chuoi(d.sbd)) && trongLop(em.get(chuoi(d.sbd))!))
-  const dangBoNao = cacDong.filter((d) => chuoi(d.loai) === 'ca_lop')
   const maDang = [
     ...[...yeuTheoLop.values()].flatMap((m) => [...m.keys()]),
     ...giu.map((x) => chuoi(noiDung.get(chuoi(x.qid))?.dang) || chuoi(x.dang)),
-    ...dongBoNao.map((d) => chuoi(d.dang)), ...dangBoNao.map((d) => chuoi(d.dang)),
   ].filter(Boolean)
   Q.tinh()
   const ten = await tenCuaCacDang(env, maDang)
@@ -200,12 +189,9 @@ export async function gvBuoiChuaDeXuat(env: Env, b: Record<string, unknown>, now
     ok: true, ngay, ...(lopLoc ? { lop: lopLoc } : {}),
     soEmCoSo3Ngay: so(rSo?.[0]?.n),
     dangCaLopYeu,
-    dangBoNao: dangBoNao.map((d) => ({ dang: chuoi(d.dang), ...(chuoi(d.dang) ? cotTen(chuoi(d.dang)) : {}), chu: chuoi(d.chu) })),
+    dangBoNao: [],
     cauSaiNhieu,
-    dongBoNao: dongBoNao.map((d) => ({
-      sbd: chuoi(d.sbd), hoTen: em.get(chuoi(d.sbd))?.hoTen ?? '', lop: em.get(chuoi(d.sbd))?.lop ?? '', hanhDong: chuoi(d.hanhDong),
-      ...(chuoi(d.dang) ? { dang: chuoi(d.dang), ...cotTen(chuoi(d.dang)) } : {}), chu: chuoi(d.chu),
-    })),
+    dongBoNao: [],
     ...(Object.keys(lyDoThieu).length > 0 ? { lyDoThieu } : {}),
     soTruyVan: Q.dem(),
   }

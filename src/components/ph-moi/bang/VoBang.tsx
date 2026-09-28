@@ -81,7 +81,7 @@ export default function BangMoiThu({ pm, sbd, lop, giaoThem, onVe, mucDau }: Ban
     coBtvn(pm) && { id: 'muc-btvn', ten: 'Bài tập về nhà' },
     coLichOn(pm) && { id: 'muc-on', ten: 'Lịch ôn lại' },
     coNhip14(pm) && { id: 'muc-14', ten: '14 ngày' },
-    coLoiAi(pm) && { id: 'muc-loi', ten: 'Lời A.I Đỗ Đại Học' },
+    coLoiAi(pm) && { id: 'muc-loi', ten: 'Lời Thầy Đỗ Đại Học' },
   ].filter((x): x is MucLuc => !!x)
 
   const tq = coTongQuan(pm) ? <TongQuan key="tq" pm={pm} now={pm.serverNow ?? undefined} /> : null

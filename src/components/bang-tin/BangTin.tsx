@@ -10,7 +10,7 @@ import type { EmTraCuu } from '../../lib/hom-nay-v2'
 import OTraCuu from '../hom-nay/OTraCuu'
 import TamBen from './TamBen'
 import { useMedia, useTrangLuot } from './hooks'
-import { BonSoLon, ChuGiaiBaiTap, HangBaiTap, HangChuaHoc, HangDang, HangEm, HangNoLop, HangSaiNhanh, HangViec, KhoiBaiTap, dongThuThach, KhoiBoNao, KhoiCanDeY, KhoiDangVap, KhoiMayDaLam, KhoiTienBo, TEN_O_MAY, viecCuaMay, type DungNhip } from './cac-khoi'
+import { BonSoLon, ChuGiaiBaiTap, HangBaiTap, HangChuaHoc, HangDang, HangEm, HangNoLop, HangSaiNhanh, HangViec, KhoiBaiTap, KhoiCanDeY, KhoiDangVap, KhoiMayDaLam, KhoiTienBo, TEN_O_MAY, viecCuaMay, type DungNhip } from './cac-khoi'
 import '../../styles/hom-nay-v2.css'
 import '../../styles/bang-tin-v3.css'
 
@@ -173,7 +173,6 @@ export default function BangTinV3(p: BangTinProps) {
     tien: <KhoiTienBo bt={bt} nayMs={nayMs} onMoEm={onMoEm} />,
     em: <KhoiCanDeY bt={bt} nayMs={nayMs} onMoEm={onMoEm} onMoTatCa={moTam('em')} onMoChuaHoc={moTam('chua-hoc')} onMoSaiNhanh={moTam('sai-nhanh')} />,
     dang: <KhoiDangVap bt={bt} nayMs={nayMs} onMoTatCa={moTam('dang')} />,
-    bn: <KhoiBoNao bn={bt.boNao} lyDo={bt.lyDoThieu.boNao} thuThach={dongThuThach(bt)} />,
     may: <KhoiMayDaLam bt={bt} nayMs={nayMs} onMoTatCa={moTam('may')} />,
   }
 
@@ -217,9 +216,8 @@ export default function BangTinV3(p: BangTinProps) {
                 { ten: 'Tiến bộ hôm nay', nd: khoi.tien },
                 { ten: 'Em cần thầy để ý', nd: khoi.em },
                 { ten: 'Dạng cả lớp đang vấp', nd: khoi.dang },
-                { ten: 'Bộ não A.I đêm qua', nd: khoi.bn },
               ]}
-              tenNgan={['Nhịp hôm nay', 'Bài tập về nhà', 'Tiến bộ hôm nay', 'Em cần thầy để ý', 'Dạng đang vấp', 'Bộ não A.I']}
+              tenNgan={['Nhịp hôm nay', 'Bài tập về nhà', 'Tiến bộ hôm nay', 'Em cần thầy để ý', 'Dạng đang vấp']}
             />
           </>
         ) : (
@@ -239,7 +237,6 @@ export default function BangTinV3(p: BangTinProps) {
             <div className="bt3-duoi">
               {khoi.em}
               {khoi.dang}
-              {khoi.bn}
               {khoi.may}
             </div>
           </>

@@ -153,7 +153,7 @@ export function taoDuLieuGia(nowMs: number, hatGiong = 20260921): DuLieuSan {
     { luc: nowMs - 8 * PHUT, loai: 'cham', chu: 'Khối 11', phu: '· 3 em vừa xong chặng 2, đúng nhịp' },
     { luc: nowMs - 7 * PHUT, loai: 'xuong', chu: 'Phản ứng tráng bạc', phu: '· 12 - Lớp Thường · 3 em vừa sai' },
     { luc: nowMs - 6 * PHUT, loai: 'len', chu: tenEm(dangHoc[2]!), phu: `· ${dangHoc[2]!.lop} · vừa nộp bài Amine – Amino acid` },
-    { luc: nowMs - 5 * PHUT, loai: 'cham', chu: 'A.I Đỗ Đại Học', phu: `· rút bộ câu riêng cho ${dangHoc[4]!.hoTen}` },
+    { luc: nowMs - 5 * PHUT, loai: 'cham', chu: 'App', phu: `· rút bộ câu riêng cho ${dangHoc[4]!.hoTen}` },
     { luc: nowMs - 4 * PHUT, loai: 'cham', chu: '12 - Tinh Hoa', phu: '· thêm 12 câu · đúng 92 %' },
     { luc: nowMs - 3 * PHUT, loai: 'len', chu: tenEm(dangHoc[5]!), phu: `· ${dangHoc[5]!.lop} · đúng 8 câu liền` },
     { luc: nowMs - 2 * PHUT, loai: 'xuong', chu: 'Chuyển dịch cân bằng', phu: '· Khối 11 · 3 em vừa sai' },
@@ -189,7 +189,6 @@ export function taoDuLieuGia(nowMs: number, hatGiong = 20260921): DuLieuSan {
       { ma: 'D1', ten: 'Chuyển dịch cân bằng', soEmVap: 14, soEmGap: 36 },
       { ma: 'D2', ten: 'Phản ứng tráng bạc', soEmVap: 9, soEmGap: 30 },
     ],
-    boNao: { chayLuc: new Date(nowMs - 12 * 3_600_000).toISOString(), soEmSoi: 220, soEmDieuChinh: 0, soLoiNhan: 47, goiY: [] },
     mayDaLam: [
       { loai: 'on_lai', so: 128, soPhuHuynh: null, chu: 'Đưa 128 câu sai về lịch ôn lại' },
       { loai: 'bo_cau_rieng', so: 23, soPhuHuynh: null, chu: 'Rút bộ câu riêng cho 23 em' },

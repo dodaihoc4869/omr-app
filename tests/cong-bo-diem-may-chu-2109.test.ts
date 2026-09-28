@@ -6,7 +6,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { cheDoCongBo, docTrangThaiCongBo, laSanSangCongBo, SQL_DA_CONG_BO } from '../server/src/cong-bo-diem'
 import { hsLichSuCa, ketQuaCuaEm, lichSuEm, phieuCuaEm } from '../server/src/goi-cu'
-import { boNaoHoSoNgay } from '../server/src/bo-nao'
 import { refreshDailyNews } from '../server/src/parent-news'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
@@ -185,7 +184,7 @@ describe('phieuCuaEm: ca chưa công bố ⇒ không điểm, không chi tiết 
   })
 })
 
-describe('bài tin phụ huynh / học sinh và thẻ Bộ não không nêu điểm ca chưa công bố', () => {
+describe('bài tin phụ huynh / học sinh không nêu điểm ca chưa công bố', () => {
   it('refreshDailyNews: điểm hôm nay + điểm mới nhất chỉ tính ca đã công bố (kể cả chi tiết câu dùng cho dự đoán)', async () => {
     const NOW = Date.parse('2026-09-21T09:00:00.000Z')
     vi.useFakeTimers({ toFake: ['Date'] })
@@ -215,25 +214,5 @@ describe('bài tin phụ huynh / học sinh và thẻ Bộ não không nêu đi�
     const khongCa = (() => { const d = taoD1That(); d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em S1','12','mk','x')").run(); return d })()
     const trang = (await refreshDailyNews(khongCa.env, 'S1', NOW)).reports[0] as unknown as { duDoanDiem: unknown }
     expect(chua.du).toBe(JSON.stringify(trang.duDoanDiem))
-  })
-  it('thẻ Bộ não (`ca` gần nhất): ca chưa công bố không vào thẻ; đã công bố thì vào', async () => {
-    const NOW = Date.parse('2026-09-21T21:00:00.000Z')
-    const chay = async (congBo: string) => {
-      const d = taoD1That()
-      d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,trang_thai,cap_nhat_luc) VALUES('S1','Em S1','12A1','da_duyet','x')").run()
-      themCa(d, 'CA-X', congBo)
-      themLuot(d, 'CA-X', 'S1', 'da_nop', { tong: 8.5, nop: '2026-09-20T02:00:00.000Z' })
-      themLuot(d, 'CA-X', 'S9', 'dang_lam') // còn người đang làm ⇒ ca_lop_xong CHƯA đủ lớp
-      d.sql.exec("INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES ('k1', 'S1', 'q1', 'btvn', 'm', 1, 1, 30, '2026-09-21T02:00:00.000Z', '2026-09-21')") // em có hoạt động ⇒ có thẻ
-      await boNaoHoSoNgay(d.env, { ngay: '2026-09-22' }, NOW)
-      const row = d.sql.prepare("SELECT the_json FROM ai_ho_so_ngay WHERE sbd = 'S1'").get() as { the_json: string } | undefined
-      return row?.the_json ?? ''
-    }
-    const ngay = await chay('ngay')
-    const khong = await chay('ca_lop_xong')
-    const nhan = await chay('khong')
-    expect(ngay).toContain('8.5') // đối chứng: ca đã công bố có trong thẻ
-    expect(khong).not.toContain('8.5')
-    expect(nhan).not.toContain('8.5')
   })
 })

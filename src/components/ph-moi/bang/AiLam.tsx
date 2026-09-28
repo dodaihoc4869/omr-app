@@ -99,7 +99,7 @@ function DongViec({ v, chuanBi, i }: { v: ViecAi; chuanBi: boolean; i: number })
 export function AiLam({ pm }: { pm: PhMoi }) {
   const h = viecAiHienThi(pm);
   if (!h) return null;
-  const tieuDe = h.chuanBi ? "A.I Đỗ Đại Học đã chuẩn bị gì cho con hôm nay" : "Thầy và A.I Đỗ Đại Học đã làm gì cho con hôm nay";
+  const tieuDe = h.chuanBi ? "Thầy Đỗ Đại Học đã chuẩn bị gì cho con hôm nay" : "Thầy Đỗ Đại Học đã làm gì cho con hôm nay";
   // câu chốt: bản chuẩn bị chỉ nói "có bài vừa sức" khi máy chủ thật sự đã chọn sẵn câu
   const cuoi = h.chuanBi
     ? h.ds.some((v) => v.loai === "chon_rieng")
@@ -111,7 +111,7 @@ export function AiLam({ pm }: { pm: PhMoi }) {
       <div className="phm-the phm-the--dem">
         <p className="phm-nhan-muc">
           <BtDanhSach />
-          A.I Đỗ Đại Học · hôm nay
+          Thầy Đỗ Đại Học · hôm nay
         </p>
         <h2 className="phm-ten-the">{tieuDe}</h2>
         <ul className="phm-lam">

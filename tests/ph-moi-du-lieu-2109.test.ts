@@ -41,7 +41,7 @@ describe('docTatCaVeCon — đọc chặt', () => {
 
   it('con mới hoàn toàn: chỉ {ok, hoTen, giaoThem} ⇒ mọi khối null/rỗng (KHÔNG số 0 giả, KHÔNG mảng bịa)', () => {
     const pm = docTatCaVeCon(PH_TRONG)!
-    for (const k of ['caGanNhat', 'tienBo', 'tongQuan', 'dongThoiGian', 'cau', 'nhipHoc', 'bacTheoDang', 'dangVap', 'vuaLenBac', 'manhYeu', 'baiTapVeNha', 'lichOn', 'loiBoNao', 'doCham'] as const) expect(pm[k], k).toBeNull()
+    for (const k of ['caGanNhat', 'tienBo', 'tongQuan', 'dongThoiGian', 'cau', 'nhipHoc', 'bacTheoDang', 'dangVap', 'vuaLenBac', 'manhYeu', 'baiTapVeNha', 'lichOn', 'doCham'] as const) expect(pm[k], k).toBeNull()
     expect(pm.phuHuynhLamGi).toEqual([])
     expect(pm.giaoThemConLai).toBe(3)
   })
