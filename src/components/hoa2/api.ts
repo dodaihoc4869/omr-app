@@ -283,6 +283,13 @@ export async function moRuong(token: string): Promise<KetQuaRuong> {
   return { vang: soKhongAm(q.vang), lapLai: o.lapLai === true }
 }
 
+/** Đổi tên thần thú của CHÍNH em (`rename`; máy chủ soát luật tên + tối đa 3 lần/ngày). Trả tên máy chủ đã lưu. */
+export async function doiTenThu(token: string, ten: string): Promise<string> {
+  const o = await goiHoa2('rename', token, { name: ten })
+  const p = (o.profile ?? {}) as Record<string, unknown>
+  return typeof p.nickname === 'string' && p.nickname ? p.nickname : ten
+}
+
 // ─── nhớ chế độ 2.0 theo SBD (để lần mở sau vẽ ngay Sảnh, không nháy Bảng nhiệm vụ cũ) ──────────
 const khoaNho = (sbd: string) => `omr_hoa2_che_do:${sbd}`
 export function docNhoCheDo2(sbd: string | undefined): boolean {

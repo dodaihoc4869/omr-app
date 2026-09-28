@@ -398,8 +398,37 @@
   font-weight: 800;
   line-height: 1.1;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Tên thần thú tới 16 ký tự (đổi tên 28/09): xuống tối đa 2 dòng, ngắt cả chữ dài liền, không tràn khung. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+/* Tên dài (> 10 ký tự): chữ nhỏ lại, cho 3 dòng — tên 16 ký tự rộng vẫn đọc đủ ở 360 px. */
+.h2-hud-ten[data-dai='true'] {
+  font-size: 14px;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+/* Nút bút chì "Đổi tên" cạnh HUD thần thú: đích chạm 44 px, token kính của Sảnh. */
+.h2-hud-doi-ten {
+  flex-shrink: 0;
+  align-self: center;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--h2-net-nhat);
+  color: var(--h2-chu-phu);
+  cursor: pointer;
+}
+.h2-hud-doi-ten:focus-visible {
+  outline: 3px solid var(--h2-ngoc-dam);
+  outline-offset: 2px;
 }
 .h2-thanh-exp {
   position: relative;

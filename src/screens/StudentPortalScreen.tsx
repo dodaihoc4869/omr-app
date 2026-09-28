@@ -1,7 +1,7 @@
 import BangNhiemVu from '../components/bang-nhiem-vu/BangNhiemVu'
 // GAME HÓA 2.0 (docs/hop-dong-game-hoa-2.md): máy chủ bật `cheDo2` ⇒ màn chính là Sảnh bản đồ Bát Linh thay Bảng nhiệm vụ; cờ tắt ⇒ y như cũ.
 import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
-import { useSanhHoa2 } from '../components/hoa2/api'
+import { doiTenThu, useSanhHoa2 } from '../components/hoa2/api'
 import { PETS } from '../game/than-thu-v2/core'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
 import { taiKeHoachNgay, useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
@@ -1002,12 +1002,15 @@ export default function StudentPortalScreen() {
   const dungBanNho = !!banNho && !sanSangBang
   const duLieuBang = useMemo(() => (dungBanNho ? banNho! : duLieuNhiemVu), [dungBanNho, banNho, duLieuNhiemVu]) // thẻ Thử thách riêng (Bộ não A.I) đã gỡ 28/09
   // HUD của Sảnh (Game Hóa 2.0): thần thú / EXP / chuỗi ngày lấy ĐÚNG nguồn Bảng nhiệm vụ đang dùng (/hs/ke-hoach-ngay, kể cả bản nhớ cùng ngày).
+  // Tên vừa đổi (máy chủ đã lưu) phủ lên ngay, không chờ /hs/ke-hoach-ngay tải lại (bản nhớ cùng ngày còn tên cũ). Theo SBD.
+  const [tenThuDaDoi, setTenThuDaDoi] = useState<{ sbd: string; ten: string } | null>(null)
   const thuSanh = useMemo((): ThuTrenHud | null => {
     const t = duLieuBang.thanThu
     if (t.kieu !== 'co') return null
     const index = PETS.findIndex((p) => p.id === t.pet)
-    return index < 0 ? null : { index, cap: t.cap, ten: t.ten || PETS[index].name }
-  }, [duLieuBang.thanThu])
+    const tenMoi = tenThuDaDoi && tenThuDaDoi.sbd === auth?.sbd ? tenThuDaDoi.ten : ''
+    return index < 0 ? null : { index, cap: t.cap, ten: tenMoi || t.ten || PETS[index].name }
+  }, [duLieuBang.thanThu, tenThuDaDoi, auth?.sbd])
   const expSanh = duLieuBang.exp ? { homNay: duLieuBang.exp.homNay, conThieu: duLieuBang.exp.thu?.expConThieu ?? null } : null
 
   // Rút đề khắc phục câu sai
@@ -1346,6 +1349,11 @@ export default function StudentPortalScreen() {
           onTuiDo={() => moGameTai('tui-do')}
           onCuaHang={() => moGameTai('shop')}
           onMoThanThu={() => moGameTai('')}
+          onDoiTen={async (ten) => {
+            const sbd = auth.sbd
+            const daLuu = await doiTenThu(auth.token!, ten)
+            setTenThuDaDoi({ sbd, ten: daLuu })
+          }}
           onChonThu={() => moGameTai('')}
           onDangXuat={hoiDangXuat}
           onTaiLai={hoa2.taiLai}
