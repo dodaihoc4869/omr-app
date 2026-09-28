@@ -39,8 +39,8 @@ import KhungXemPhieu from '../components/KhungXemPhieu'
 import type { OBang as OBangMayChieu } from '../lib/html-may-chieu'
 import { khoaEmCau, nhanLichSuCau, qidMayChuCuaIdCau, type CapEmCau, type LichSuCauEm, type NhanLichSuCau } from '../lib/lich-su-cau-len-bang'
 import { layLichSuCau } from '../lib/lich-su-cau-len-bang-lenh'
-import { layHoSoLenBang } from '../lib/ho-so-em-thay'
-import { thongKeLopCau } from '../lib/thong-ke-lop-cau'
+import { layHoSoLenBang, layThongKeLopCau } from '../lib/ho-so-em-thay'
+import { thongKeLopCau, thongKeTuSoGop } from '../lib/thong-ke-lop-cau'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
 import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChua, type DongPhanCong, type KetQuaPhanCong } from '../lib/phan-cong'
 import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
@@ -1118,7 +1118,7 @@ function GoiLenBangCu() {
           sbd: p.sbd,
           hoTen: p.hoTen,
           qid: p.cau.id,
-          // Bậc bố cục ước lượng: tờ CHỈ ghép đôi hai câu cùng bậc 1 (câu dài đứng một mình); tờ vẫn đo lại lúc chiếu.
+          // Bậc bố cục ước lượng (ước thời gian buổi); tờ không ghép đôi nữa (bản vẽ 28/09: mỗi đợt một câu một em) và vẫn đo lại lúc chiếu.
           bacUoc: (day ? uocLuongBacCauGoc(day.phan, day.q) : uocLuongBacCau(cauHopLe)).bac,
           soCau: p.cau.so,
           sao: p.cau.sao,
@@ -1144,6 +1144,15 @@ function GoiLenBangCu() {
         return
       }
 
+      // DẢI THỐNG KÊ LỚP (phím T) Ở MỌI BUỔI CHỮA (hoàn thiện bản vẽ 28/09): buổi chữa KHÔNG từ ca ⇒ lấy chỉ số GỘP theo câu từ sổ su_kien_hoc
+      // của cả lớp (máy chủ `/gv/thong-ke-lop-cau`, không tên em). Không có số ⇒ tờ ẩn dải và báo "chưa có số liệu lớp". Chạy song song với thần thú.
+      const tkLopHua = du
+        ? Promise.resolve(null)
+        : layThongKeLopCau(
+            [...new Set([...hoSoLop.map((e) => e.sbd), ...dsO.map((o) => o.sbd)])],
+            [...new Set(dsO.flatMap((o) => (o.qid && qidMayChuCuaIdCau(o.qid) ? [qidMayChuCuaIdCau(o.qid)!] : [])))],
+          ).catch(() => null)
+
       // "EM ĐÃ LÀM CÂU NÀY CHƯA": quét HẾT lịch sử của từng cặp (em, câu) MỘT lần, chạy song song với thần thú. Không gọi được ⇒ tờ không có nhãn (không bịa).
       const lichSuTheoCap = layLichSuCau(dsO.flatMap((o) => (o.qid && qidMayChuCuaIdCau(o.qid) ? [{ sbd: o.sbd, qid: qidMayChuCuaIdCau(o.qid)! }] : []))).catch(() => null)
 
@@ -1159,6 +1168,15 @@ function GoiLenBangCu() {
         }
       } catch {
         /* không lấy được thú thì thôi — tờ chiếu vẫn phải mở */
+      }
+
+      const tkLop = await tkLopHua
+      if (tkLop) {
+        for (const o of dsO) {
+          const qid = o.qid ? qidMayChuCuaIdCau(o.qid) : null
+          const tk = qid ? thongKeTuSoGop(o.cau.phan, tkLop[qid], String(o.cau.dapAn ?? '')) : null
+          if (tk) o.thongKe = tk
+        }
       }
 
       const mapLichSu = await lichSuTheoCap

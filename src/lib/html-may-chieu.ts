@@ -34,9 +34,8 @@ export interface OBang {
   /** Mã câu (qid) — CHỈ để tờ chiếu ghi kết quả Đạt / Không đạt về màn giáo viên (`cauNoi`). Thiếu thì ô
    * không có nút. Không bao giờ hiện thành chữ trên tờ. */
   qid?: string
-  /** BẬC BỐ CỤC ƯỚC LƯỢNG lúc xếp buổi (`uoc-luong-bo-cuc.ts`): 1 = vừa nửa bảng, ghép đôi được; ≥ 2 = phải chiếm 2/3 bảng
-   * trở lên. Có thì tờ CHỈ GHÉP ĐÔI hai câu cùng bậc 1 (câu bậc ≥ 2 đứng một mình); thiếu thì lùi về đoán `laCauDai`.
-   * Ước lượng sai một bậc không gây tràn chữ: tờ chiếu luôn đo lại (`bo-cuc-to-chieu.ts`) và tự tách/gộp. */
+  /** BẬC BỐ CỤC ƯỚC LƯỢNG lúc xếp buổi (`uoc-luong-bo-cuc.ts`). Từ bản vẽ 28/09 tờ KHÔNG ghép đôi nữa (mỗi đợt MỘT câu MỘT em, 2/3 đề + 1/3 cột em);
+   * trường này chỉ còn để app thầy ước lượng thời gian buổi. Tờ chiếu luôn đo lại (`bo-cuc-to-chieu.ts`). */
   bacUoc?: 1 | 2 | 3 | 4 | 5
   /** Số thứ tự câu in cho em nhìn. */
   soCau: number
@@ -109,8 +108,6 @@ export interface TuyChonMayChieu {
   nganSachPhut?: number
 }
 
-/** Khi có bậc ước lượng: một câu bậc 1 tìm bạn ghép đôi trong bấy nhiêu câu kế tiếp (kéo lên, không xáo trộn xa). */
-const CUA_SO_TIM_BAN_GHEP = 6
 
 /** Số câu mỗi trang đáp án. Chiếu lên tường thì 12 dòng là vừa mắt từ cuối lớp;
  * nhồi hơn là em ngồi xa không đọc nổi. */
@@ -338,37 +335,7 @@ function chamHtml(o: OBang, cauNoi: boolean): string {
   return cauNoi && o.qid ? mangNutChamToChieu(khoaToChieu(o.sbd, o.qid)) : ''
 }
 
-function nuaHtml(o: OBang | undefined, viTri: 'trai' | 'phai', maDot: number, cauNoi = false, dayHoc = false): string {
-  if (!o) {
-    return `<section class="mc-nua mc-${viTri} mc-trong" aria-hidden="true"><div class="mc-trong-chu">Đợt này chỉ gọi một em</div></section>`
-  }
-  const ma = `giai-${maDot}-${viTri}`
-  const gio = gioCuaO(o, dayHoc)
-  // `data-giay`: giờ ĐỌC + LÀM của chính câu này — để đợt bị TÁCH lúc chiếu (M2) tính lại thời gian từng đợt (chế độ dạy học).
-  // `data-lam` / `data-chua`: giờ hai pha của thanh dưới (M3); đợt tính bằng max(lam) và Σ chua của các ô còn trong đợt.
-  return `<section class="mc-nua mc-${viTri}"${dayHoc ? ` data-giay="${thoiGianDayHoc(o)}"` : ''} data-lam="${gio.lam}" data-chua="${gio.chua}" data-lam0="${gio.lam0}" data-chua0="${gio.chua0}">
-  <button type="button" class="mc-nut-hien-em mc-nut-giai" aria-expanded="false" aria-controls="em-${ma}">Hiện học sinh và thần thú →</button>
-  ${headerEmHtml(o, ma)}
-  <div class="mc-vung-de">${thongKeHtml(o.thongKe)}${dauDeHtml(o)}<div class="mc-than">${thanCauHtml(o.cau)}</div>
-    <div class="mc-giai" id="${ma}" hidden>${oGiaiHtml(o.cau)}</div>
-  </div>
-  <div class="mc-giai-vung">
-    <button type="button" class="mc-nut-giai" aria-expanded="false" aria-controls="${ma}">
-      <span class="mc-nut-chu">Hiện lời giải</span>
-    </button>${chamHtml(o, cauNoi)}
-  </div>
-  <div class="mc-trang" aria-hidden="true" ${thuocTinhNhan(o)}></div>
-</section>`
-}
-
-/** Đợt chiếu hai em chia đôi bảng 50% - 50% khi cả 2 câu đủ ngắn */
-function dotHaiEmHtml(o1: OBang, o2: OBang | undefined, soDot: number, tuyChon: TuyChonMayChieu): string {
-  const secondsAttr = tuyChon.dayHoc ? `data-seconds="${Math.max(thoiGianDayHoc(o1), o2 ? thoiGianDayHoc(o2) : 0)}"` : ''
-  const cauNoi = Boolean(tuyChon.cauNoi?.maPhien)
-  return `<div class="mc-dot" data-dot="${soDot}" ${secondsAttr}>${nuaHtml(o1, 'trai', soDot, cauNoi, Boolean(tuyChon.dayHoc))}${nuaHtml(o2, 'phai', soDot, cauNoi, Boolean(tuyChon.dayHoc))}</div>`
-}
-
-/** Đợt chiếu một em khi câu dài: 2/3 bảng chiếu câu hỏi, 1/3 bảng để trống cho học sinh lên làm */
+/** MỘT ĐỢT = MỘT CÂU MỘT EM (bản vẽ Lên bảng 28/09 — bỏ đợt đôi ½ bảng): 2/3 bảng chiếu đề (+ lời giải), 1/3 cột em lên làm. */
 function dotMotEmHtml(o: OBang, soDot: number, tuyChon: TuyChonMayChieu): string {
   const secondsAttr = tuyChon.dayHoc ? `data-seconds="${thoiGianDayHoc(o)}"` : ''
   const ma = `giai-${soDot}-don`
@@ -1059,10 +1026,7 @@ const JS_MAY_CHIEU = `
 `
 
 /**
- * Dựng tờ máy chiếu từ danh sách ô bảng, hai ô một đợt.
- *
- * KHÔNG ĐỘN CHO ĐỦ CẶP: lẻ một em thì nửa còn lại để trắng và nói rõ, chứ không
- * gọi thêm một em không có trong phân công.
+ * Dựng tờ máy chiếu từ danh sách ô bảng, MỘT ô một đợt (bản vẽ 28/09: bỏ đợt đôi ½ bảng).
  */
 export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}): string {
   // Chuẩn hoá mã phiên MỘT lần rồi mọi chỗ cùng đọc: mã rỗng/toàn ký tự lạ = KHÔNG có cầu nối (không nút, không mã).
@@ -1071,58 +1035,10 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   const ngay = tuyChon.ngay ?? new Date()
   const dot: string[] = []
   let demDot = 0
-  const coBacUoc = dsO.some((o) => o.bacUoc !== undefined)
-  if (coBacUoc) {
-    // Có bậc ước lượng: CHỈ ghép đôi hai câu cùng bậc 1. Câu bậc 1 chưa có bạn thì tìm bạn trong vài câu kế tiếp (kéo lên);
-    // câu bậc ≥ 2 đứng một mình (2/3 bảng). Câu không có `bacUoc` lùi về đoán `laCauDai`.
-    const ghepDuoc = (o: OBang) => (o.bacUoc !== undefined ? o.bacUoc === 1 : !laCauDai(o.cau))
-    const da = new Array<boolean>(dsO.length).fill(false)
-    for (let k = 0; k < dsO.length; k++) {
-      if (da[k]) continue
-      da[k] = true
-      demDot++
-      const o1 = dsO[k]
-      if (!ghepDuoc(o1)) {
-        dot.push(dotMotEmHtml(o1, demDot, tuyChon))
-        continue
-      }
-      let j = -1
-      for (let x = k + 1; x < dsO.length && x <= k + CUA_SO_TIM_BAN_GHEP; x++) {
-        if (!da[x] && ghepDuoc(dsO[x])) {
-          j = x
-          break
-        }
-      }
-      if (j >= 0) {
-        da[j] = true
-        dot.push(dotHaiEmHtml(o1, dsO[j], demDot, tuyChon))
-      } else {
-        dot.push(dotHaiEmHtml(o1, undefined, demDot, tuyChon))
-      }
-    }
-  } else {
-    let k = 0
-    while (k < dsO.length) {
-      demDot++
-      const o1 = dsO[k]
-      const cau1Dai = laCauDai(o1.cau)
-      if (cau1Dai) {
-        // Câu dài không vừa nửa bảng: chiếu 1 câu lên 2/3 bảng, 1/3 để trống cho học sinh lên làm
-        dot.push(dotMotEmHtml(o1, demDot, tuyChon))
-        k += 1
-      } else {
-        const o2 = dsO[k + 1]
-        if (o2 && !laCauDai(o2.cau)) {
-          // Cả 2 câu đủ ngắn: chia đôi bảng 50% - 50%
-          dot.push(dotHaiEmHtml(o1, o2, demDot, tuyChon))
-          k += 2
-        } else {
-          // Câu 1 ngắn nhưng không có bạn ghép đôi cùng ngắn: để trắng nửa còn lại
-          dot.push(dotHaiEmHtml(o1, undefined, demDot, tuyChon))
-          k += 1
-        }
-      }
-    }
+  // BỎ ĐỢT ĐÔI (bản vẽ 28/09): mỗi ô bảng một đợt, đúng thứ tự thầy xếp — không ghép, không kéo câu lên.
+  for (const o of dsO) {
+    demDot++
+    dot.push(dotMotEmHtml(o, demDot, tuyChon))
   }
   // TRANG ĐÁP ÁN nối ngay sau các đợt — lật tiếp là tới, không phải mở tờ khác.
   const dsDa = tuyChon.dsDapAn ?? []
