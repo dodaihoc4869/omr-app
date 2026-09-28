@@ -1,6 +1,7 @@
 import {layDiaChiMayChu} from './dia-chi-may-chu'
 import {chuanHoaLoiGiaiCau} from './chuan-hoa-loi-giai'
-import {dungPhieu, type ThongTinPhieu} from './html-phieu'
+// Phiếu HTML nạp lười (≈ 52 KB gzip): chỉ tải khi em mở kết quả bài, không kéo vào lượt tải đầu.
+import type {ThongTinPhieu} from './html-phieu'
 import type {CauLuyen} from './bai-tap-pdf'
 const saves = new Map<string, Promise<any>>()
 // TOKEN PHỤ HUYNH (giai đoạn mềm, docs/token-phu-huynh-1909.md): có pass thì các lệnh phụ huynh gửi `{pass}` THAY `{sbd}` (máy chủ lấy danh tính từ token).
@@ -95,7 +96,7 @@ export function chuanHoaBaiMom(b: any): any {
 }
 
 /** Báo cáo dựng từ nội dung và điểm đã lưu trên máy chủ, đồng điệu với tất cả các phiếu HTML trong app. */
-export function momReviewHtml(b: any): string {
+export async function momReviewHtml(b: any): Promise<string> {
   const dsCauRaw = Array.isArray(b.dsCau) ? b.dsCau : (Array.isArray(b.cau) ? b.cau : [])
   const dapAnDaNop = b.dapAnDaNop || b.answers || {}
 
@@ -151,6 +152,7 @@ export function momReviewHtml(b: any): string {
     ],
   }
 
+  const { dungPhieu } = await import('./html-phieu')
   return dungPhieu(thongTin, cauLuyen, {
     moSan: true,
     loiNhac: `Kết quả bài gia đình giao: Đạt ${b.diem ?? 0}/10 điểm (Đúng ${b.soCauDung ?? 0}/${b.soCau ?? cauLuyen.length} câu). Bấm vào từng câu để mở hoặc đóng lời giải chi tiết.`,

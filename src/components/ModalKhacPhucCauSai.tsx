@@ -408,13 +408,13 @@ export default function ModalKhacPhucCauSai({
       const options = { hoTen, sbd, tieuDe: tieuDeCa }
       if (cheDo === 1) {
         // Chế độ 1: Làm lại các câu sai
-        const res = taoDeLamLaiCauSai(dsCauSai, options)
+        const res = await taoDeLamLaiCauSai(dsCauSai, options)
         ketQuaHtml = res.html
         dsCauKetQua = res.dsCau
         tieuDeBai = `Làm lại ${dsCauKetQua.length} câu sai`
       } else if (cheDo === 2) {
         // Chế độ 2: Luyện thêm dạng câu sai theo các ca đã chọn
-        const res = rutLuyenThemDangCauSai(dsCauSaiCheDo2, khoDe, soCauCheDo2, options)
+        const res = await rutLuyenThemDangCauSai(dsCauSaiCheDo2, khoDe, soCauCheDo2, options)
         ketQuaHtml = res.html
         dsCauKetQua = res.dsCau
         tieuDeBai = `Luyện thêm dạng câu sai (${dsCauKetQua.length} câu)`
@@ -424,7 +424,7 @@ export default function ModalKhacPhucCauSai({
           setLoiRut('Em chọn lớp, tên bài rồi chọn một dạng bài trước.')
           return
         }
-        const res = rutLuyenDangBai(khoDangBai, soCauCheDo4, {
+        const res = await rutLuyenDangBai(khoDangBai, soCauCheDo4, {
           hoTen,
           sbd,
           tenDang: dangChon.ten,
@@ -436,7 +436,7 @@ export default function ModalKhacPhucCauSai({
         tieuDeBai = `Luyện câu: ${dangChon.ten} (${dsCauKetQua.length} câu)`
       } else {
         // Chế độ 3: Luyện câu theo bộ lọc
-        const res = rutLuyenTheoBoLoc(dsCauSai, khoDe, boLocHienTai, soCauCheDo3, options)
+        const res = await rutLuyenTheoBoLoc(dsCauSai, khoDe, boLocHienTai, soCauCheDo3, options)
         ketQuaHtml = res.html
         dsCauKetQua = res.dsCau
         const tenSao = boLocSao === 'sao_2' ? '2 sao' : boLocSao === 'sao_1' ? '1 sao' : boLocSao === 'sao_0' ? '0 sao' : 'Mọi sao'

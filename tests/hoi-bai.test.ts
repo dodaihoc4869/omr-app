@@ -295,9 +295,10 @@ describe('HOIBAITHAY.md mục 8 — định nghĩa hoàn thành', () => {
     // Không tự viết style hay script — tất cả đi qua taiLieuHtml của html-phieu.
     expect(lib).not.toContain('<style')
     expect(lib).not.toContain('CSS_PHIEU')
-    expect(lib).toContain("from './html-phieu'")
+    // Bộ dựng phiếu nạp lười: `await import('./html-phieu')` trong hàm.
+    expect(lib).toMatch(/from '\.\/html-phieu'|import\('\.\/html-phieu'\)/)
 
-    const html = dungTrangTongHop({ tenCa: 'Ca thu', lop: '12A2', ngay: new Date('2026-09-05') }, [dong('1', 'A', ['q1'])], DE)
+    const html = await dungTrangTongHop({ tenCa: 'Ca thu', lop: '12A2', ngay: new Date('2026-09-05') }, [dong('1', 'A', ['q1'])], DE)
     // Đúng MỘT khối style, và nó là của html-phieu (chứa lớp .q-card).
     expect(html.match(/<style>/g)).toHaveLength(1)
     expect(html).toContain('.q-card')
@@ -306,10 +307,10 @@ describe('HOIBAITHAY.md mục 8 — định nghĩa hoàn thành', () => {
     expect(html).toContain('class="q-card"')
   })
 
-  it('12. không em nào hỏi → KHÔNG dựng trang rỗng', () => {
-    expect(dungTrangTongHop({ tenCa: 'Ca thu', lop: '', ngay: new Date() }, [], DE)).toBe('')
+  it('12. không em nào hỏi → KHÔNG dựng trang rỗng', async () => {
+    expect(await dungTrangTongHop({ tenCa: 'Ca thu', lop: '', ngay: new Date() }, [], DE)).toBe('')
     // Em có gửi nhưng qid không còn trong đề (thầy đổi đề) → cũng không dựng.
-    expect(dungTrangTongHop({ tenCa: 'Ca thu', lop: '', ngay: new Date() }, [dong('1', 'A', ['q-cu'])], DE)).toBe('')
+    expect(await dungTrangTongHop({ tenCa: 'Ca thu', lop: '', ngay: new Date() }, [dong('1', 'A', ['q-cu'])], DE)).toBe('')
   })
 })
 
@@ -365,9 +366,9 @@ describe('Điều cấm mục 9', () => {
     expect(String(m.bang.CauHoiEm[1][0])).toBe('CA1|100001')
   })
 
-  it('cấm máy tự sinh lời giải — trang in đúng những gì kho đề có', () => {
+  it('cấm máy tự sinh lời giải — trang in đúng những gì kho đề có', async () => {
     const thieu: CauLuyen = { ...cau('q1', 'Câu thiếu lời giải'), buoc: null, chot: '', ketQua: '' }
-    const html = dungTrangTongHop({ tenCa: 'Ca thu', lop: '', ngay: new Date() }, [dong('1', 'A', ['q1'])], [thieu])
+    const html = await dungTrangTongHop({ tenCa: 'Ca thu', lop: '', ngay: new Date() }, [dong('1', 'A', ['q1'])], [thieu])
     expect(html).toContain('Câu thiếu lời giải')
     // Không có chữ nào bịa thêm vào chỗ lời giải trống.
     expect(html).not.toContain('Bước một')

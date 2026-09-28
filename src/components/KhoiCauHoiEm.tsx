@@ -72,9 +72,9 @@ export default function KhoiCauHoiEm({ scriptUrl, secret, maCa, tenCa, lop, bank
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moSan, maCa])
 
-  const moTongHop = () => {
+  const moTongHop = async () => {
     if (!dong) return
-    const t = dungTrangTongHop({ tenCa: tenCa || `Ca ${maCa}`, lop, ngay: new Date() }, dong, deCuaCa)
+    const t = await dungTrangTongHop({ tenCa: tenCa || `Ca ${maCa}`, lop, ngay: new Date() }, dong, deCuaCa)
     // KHÔNG dựng trang rỗng (phép kiểm 12): không câu nào khớp đề thì nói ra.
     if (!t) return showToast('Không có câu nào của em còn trong đề của ca này', 'warn')
     setHtml(t)

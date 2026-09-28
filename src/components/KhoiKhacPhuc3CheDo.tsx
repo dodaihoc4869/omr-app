@@ -559,7 +559,7 @@ export default function KhoiKhacPhuc3CheDo({
           setLoi(res.error || (vaiTro === 'ph' ? 'Các ca kiểm tra đã chọn không có câu sai nào cần khắc phục!' : 'Các ca kiểm tra đã chọn không có câu sai nào cần khắc phục!'))
           return
         }
-        const { dsCau } = taoDeLamLaiCauSai(res.items as CauSaiDauVao[], {
+        const { dsCau } = await taoDeLamLaiCauSai(res.items as CauSaiDauVao[], {
           hoTen,
           sbd,
           tenDe: dsMa.length === 1 ? `Khắc phục Ca #${dsMa[0]}` : `Khắc phục ${dsMa.length} ca đã chọn`,
@@ -600,7 +600,7 @@ export default function KhoiKhacPhuc3CheDo({
           setLoi('Chưa có kho câu cùng dạng. Vui lòng đợi hệ thống tải xong hoặc thử lại.')
           return
         }
-        const res2 = rutLuyenThemDangCauSai(dsCauSaiCheDo2, khoDe2, soCauCheDo2, { hoTen, sbd })
+        const res2 = await rutLuyenThemDangCauSai(dsCauSaiCheDo2, khoDe2, soCauCheDo2, { hoTen, sbd })
         const dsCau = res2.dsCau
         if (dsCau.length === 0) {
           setLoi(vaiTro === 'ph' ? 'Kho đề chưa có câu nào cùng dạng câu sai của con.' : 'Kho đề chưa có câu nào cùng dạng câu sai. Em hãy làm thêm bài để ghi nhận câu sai.')
@@ -642,7 +642,7 @@ export default function KhoiKhacPhuc3CheDo({
           cacDangChon.size === 1
             ? dangsCuaBai.find((d) => cacDangChon.has(d.ma))?.ten || 'Dạng bài'
             : `${cacDangChon.size} dạng bài`
-        const { dsCau } = rutLuyenDangBai(
+        const { dsCau } = await rutLuyenDangBai(
           khoDangBai,
           soCauCheDo3,
           {

@@ -39,7 +39,7 @@ const khoMock = (cauList: any[]): TeacherExamSource[] => [
 
 describe('Thuật toán rút câu sai & khắc phục lỗi sai', () => {
   describe('Lựa chọn 1: Làm lại các câu sai', () => {
-    it('chuyển đổi câu sai thành CauLuyen chuẩn hoá kèm lời giải và laLamLai: true', () => {
+    it('chuyển đổi câu sai thành CauLuyen chuẩn hoá kèm lời giải và laLamLai: true', async () => {
       const cs: CauSaiDauVao = {
         qid: 'q1',
         soCau: 1,
@@ -60,7 +60,7 @@ describe('Thuật toán rút câu sai & khắc phục lỗi sai', () => {
       expect(cl.chot).toBeTruthy()
       expect(cl.dapAn).toBe('A')
 
-      const de = taoDeLamLaiCauSai([cs], { hoTen: 'Em Học Sinh', sbd: '001' })
+      const de = await taoDeLamLaiCauSai([cs], { hoTen: 'Em Học Sinh', sbd: '001' })
       expect(de.dsCau).toHaveLength(1)
       expect(de.html).toContain('LÀM LẠI CÂU SAI')
       expect(de.html).toContain('Thuỷ phân etyl axetat')
@@ -68,7 +68,7 @@ describe('Thuật toán rút câu sai & khắc phục lỗi sai', () => {
   })
 
   describe('Lựa chọn 2: Luyện thêm dạng câu sai theo tỷ lệ tối đa', () => {
-    it('10 câu sai, mỗi câu có 10 câu giống nhãn dán -> tổng tối đa 100 câu', () => {
+    it('10 câu sai, mỗi câu có 10 câu giống nhãn dán -> tổng tối đa 100 câu', async () => {
       // Dựng 10 câu sai
       const dsCauSai: CauSaiDauVao[] = Array.from({ length: 10 }, (_, i) => ({
         qid: `sai_${i + 1}`,
@@ -109,7 +109,7 @@ describe('Thuật toán rút câu sai & khắc phục lỗi sai', () => {
       }
 
       // Thực hiện rút đề thực tế
-      const res = rutLuyenThemDangCauSai(dsCauSai, khoMock(khoCau), 25, { hoTen: 'Học Sinh', sbd: '123' })
+      const res = await rutLuyenThemDangCauSai(dsCauSai, khoMock(khoCau), 25, { hoTen: 'Học Sinh', sbd: '123' })
       expect(res.dsCau.length).toBeGreaterThan(0)
       expect(res.html).toContain('LUYỆN DẠNG CÂU SAI')
     })
@@ -146,7 +146,7 @@ describe('Thuật toán rút câu sai & khắc phục lỗi sai', () => {
   })
 
   describe('Lựa chọn 3: Luyện câu theo bộ lọc (sao & lý thuyết/bài tập)', () => {
-    it('lọc chính xác theo mức sao và thể loại, trần thanh trượt tối đa 100 câu', () => {
+    it('lọc chính xác theo mức sao và thể loại, trần thanh trượt tối đa 100 câu', async () => {
       const dsCauSai: CauSaiDauVao[] = [
         { qid: 's1', soCau: 1, phan: 'I', dang: A, text: 'S1', dapAnDung: 'A' },
       ]
@@ -178,7 +178,7 @@ describe('Thuật toán rút câu sai & khắc phục lỗi sai', () => {
       expect(tk0[0].ungVien.map((c) => c.id)).toEqual(['c4'])
 
       // Rút thực tế
-      const res = rutLuyenTheoBoLoc(
+      const res = await rutLuyenTheoBoLoc(
         dsCauSai,
         khoMock(khoCau),
         { sao: 'sao_2', dang: 'ly_thuyet' },
@@ -232,9 +232,9 @@ describe('Chế độ 2 — tối đa là số câu PHÂN BIỆT, không cộng 
     expect(tongToiDa).toBeLessThanOrEqual(soCauTrongKho)
   })
 
-  it('kéo hết thanh thì rút đủ số tối đa, và rút được thật', () => {
+  it('kéo hết thanh thì rút đủ số tối đa, và rút được thật', async () => {
     const { tongToiDa } = phanTichTyLeDang(SAI, KHO)
-    const { dsCau } = rutLuyenThemDangCauSai(SAI, KHO, tongToiDa, { hoTen: 'Em A', sbd: '10001' })
+    const { dsCau } = await rutLuyenThemDangCauSai(SAI, KHO, tongToiDa, { hoTen: 'Em A', sbd: '10001' })
     expect(dsCau.length).toBeGreaterThan(0)
     expect(dsCau.length).toBeLessThanOrEqual(tongToiDa)
     // Không câu nào lặp lại.

@@ -436,7 +436,7 @@ export default function StudentPortalScreen() {
         await napDsMom()
         try {
           const rev = await momApi('review', { token: auth.token, id: bai.id })
-          if (rev?.item) setPhieuHtml(momReviewHtml(chuanHoaBaiMom(rev.item)))
+          if (rev?.item) setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(rev.item)))
           else setLoiMom('Chưa tải được kết quả. Em thử lại.')
         } catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả. Em thử lại.') }
         return
@@ -1939,7 +1939,7 @@ export default function StudentPortalScreen() {
                 onBatDau={(bai) => void batDauLamBaiMom(bai as unknown as BaiMomGiao)}
                 onXemKetQua={async (bai: any) => {
                   if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
-                  try { const data = await momApi('review', { token: auth?.token, id: bai.id }); setPhieuHtml(momReviewHtml(chuanHoaBaiMom(data.item))) }
+                  try { const data = await momApi('review', { token: auth?.token, id: bai.id }); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
                   catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
                 }}
               />
@@ -2200,7 +2200,7 @@ export default function StudentPortalScreen() {
                               <button
                                 onClick={async () => {
                                   if (bai.htmlKetQua) { setPhieuHtml(bai.htmlKetQua); return }
-                                  try { const data = await momApi('review', {token:auth?.token,id:bai.id}); setPhieuHtml(momReviewHtml(chuanHoaBaiMom(data.item))) }
+                                  try { const data = await momApi('review', {token:auth?.token,id:bai.id}); setPhieuHtml(await momReviewHtml(chuanHoaBaiMom(data.item))) }
                                   catch (e) { setLoiMom(e instanceof Error ? e.message : 'Chưa tải được kết quả.') }
                                 }}
                                 className="btn-google-outlined text-xs py-2 px-3.5 rounded-full font-semibold flex items-center gap-1.5 cursor-pointer"
