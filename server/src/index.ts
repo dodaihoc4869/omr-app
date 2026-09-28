@@ -79,6 +79,7 @@ import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
+import { gan } from './cau-hinh-dem'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
@@ -3125,7 +3126,7 @@ const boXuLy = {
     // /ph/* KHÔNG đủ điều kiện dù nhìn tưởng đọc-chỉ). Cloudflare tự chọn bản sao gần nhất thay vì luôn đi primary, giảm tải D1 chính; không
     // đổi kết quả (đọc-chỉ, không cần "đọc ngay sau ghi của chính lượt này"). `withSession` vắng ở D1 giả/local ⇒ dùng nguyên `env`, hành vi cũ.
     // `env.DB?.` (không chỉ `.withSession?`): vài test dựng `env` tối giản KHÔNG có `DB` để kiểm đường từ chối trước khi chạm D1 (vd. chưa xác thực) — phải sống sót cả khi thiếu hẳn `DB`.
-    const envDoc: Env = env.DB?.withSession ? { ...env, DB: env.DB.withSession('first-unconstrained') } : env
+    const envDoc: Env = env.DB?.withSession ? { ...env, DB: gan(env.DB.withSession('first-unconstrained'), env.DB) } : env
 
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
     // RESET TOÀN APP 00:01 thứ Hai 21/09 (reset-toan-app.ts): trong cửa sổ đóng băng [00:00, 00:20] giờ VN mà job CHƯA xong thì mọi lệnh trả lời tử tế để máy khách

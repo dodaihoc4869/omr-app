@@ -4,6 +4,7 @@
 //   {"bat":true,"lop":["12A1"]}          ⇒ chỉ các lớp này
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import type { Env } from './kieu'
+import { docCauHinhDem } from './cau-hinh-dem'
 import {
   lapKeHoachNgay, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
   gopThongKeDang, tinhHangTheoDang,
@@ -37,8 +38,8 @@ export function docCoHoa2Tu(giaTri: unknown): CoHoa2 {
   }
 }
 export async function docCoHoa2(env: Env): Promise<CoHoa2> {
-  const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CO_HOA2).first<{ gia_tri: string }>().catch(() => null)
-  return docCoHoa2Tu(r?.gia_tri)
+  // Đệm 15 s trong isolate (cau-hinh-dem.ts): Sảnh/start/Đoàn/Bi-a đọc cờ này nhiều lần mỗi request.
+  return docCoHoa2Tu(await docCauHinhDem(env, KHOA_CO_HOA2))
 }
 /** Em này đang ở chế độ Game Hóa 2.0? Lỗi đọc ⇒ `false` (đường cũ). */
 export async function cheDo2(env: Env, sbd: string): Promise<boolean> {

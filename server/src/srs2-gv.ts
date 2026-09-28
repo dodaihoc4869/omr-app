@@ -3,6 +3,7 @@
 // Vòng khép kín: Kết thúc ca kiểm tra → Giao chiến dịch (có đồng hồ sức chứa) → Bảng chiến dịch khi đang chạy →
 // Buổi chữa khi hết hạn nộp → "Chữa xong" (câu cần dạy lại quay về Đoàn Hộ Tống hôm sau).
 import type { Env } from './kieu'
+import { xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
@@ -47,6 +48,7 @@ async function coLuu(env: Env, b: Row, nowMs: number, khoa = KHOA_CO_HOA2) {
   const co = { bat: b.bat === true, lop: mangChuoi(b.lop), sbd: mangChuoi(b.sbd) }
   await env.DB.prepare('INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?,?,?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
     .bind(khoa, JSON.stringify(co), new Date(nowMs).toISOString()).run()
+  xoaDemCauHinh(env, khoa) // isolate này thấy cờ mới ngay; isolate khác ≤ 15 s
   return { ok: true, co }
 }
 

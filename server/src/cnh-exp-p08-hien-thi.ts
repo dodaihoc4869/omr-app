@@ -42,7 +42,7 @@ interface DongTrangThai {
  */
 export async function tramP08LenHienThi(env: Env, sbd: string): Promise<TramP08 | null> {
   try {
-    const c = await docCauHinhKichHoat(env)
+    const c = await docCauHinhKichHoat(env, true)
     if (!kiemCuaKichHoat(c).choPhep) return null
     const [tk, st] = await Promise.all([
       env.DB.prepare('SELECT wallet_exp, earned_exp FROM cnh_exp_account WHERE student_id = ?').bind(sbd).first<DongVi>(),
