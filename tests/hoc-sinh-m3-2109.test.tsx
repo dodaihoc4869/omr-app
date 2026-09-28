@@ -262,10 +262,12 @@ describe('HocSinhScreen · hồ sơ tổng quan', () => {
     expect(screen.getByRole('button', { name: 'Xem báo cáo chi tiết' })).toBeTruthy()
   })
 
-  it('nút Báo cáo (trong danh sách) vẫn MỞ BÁO CÁO như cũ; đóng báo cáo thì về hồ sơ tổng quan, không văng ra danh sách', async () => {
+  // SỬA CÓ CHỦ Ý 28/09 (hoàn thiện bản vẽ ca thi): modal báo cáo HS cũ đã GỘP vào Báo cáo chi tiết › Từng em ở màn Theo dõi ca —
+  // nút Báo cáo nay mở thẳng trang ấy (moChiTietCa(maCa, sbd)), không bật hộp cũ; hồ sơ ở lại tổng quan, không văng ra danh sách.
+  it('nút Báo cáo (trong danh sách) ⇒ mở Báo cáo chi tiết › Từng em của ca gần nhất; không còn hộp báo cáo cũ; hồ sơ ở lại tổng quan', async () => {
     await moHoSo('bao-cao')
-    fireEvent.click(await screen.findByRole('button', { name: 'Đóng báo cáo' }))
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    await waitFor(() => expect(m.moChiTietCa).toHaveBeenCalledWith(expect.any(String), '001'))
+    expect(screen.queryByRole('dialog')).toBeNull()
     expect(m.moHoSoEm).not.toHaveBeenCalledWith('')
     expect(document.querySelector('.hs-ho-so-ten')).toBeTruthy()
     expect(document.querySelector('.hs-luoi')).toBeTruthy()

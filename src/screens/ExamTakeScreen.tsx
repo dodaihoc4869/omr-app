@@ -382,6 +382,8 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   // Chế độ công bố của ca (server trả về sau khi nộp / khi hỏi lại) + số em
   // đã nộp / đã vào thi để hiện "đang chờ cả lớp x/y".
   const [congBo, setCongBo] = useState<CongBoDiem | null>(null)
+  // EXP em nhận từ ca (bản vẽ ca thi 28/09, màn e) — máy chủ chỉ trả SAU công bố (`ketQua.expCa`). null = chưa có ⇒ ẩn.
+  const [expCa, setExpCa] = useState<number | null>(null)
   const [choCaLop, setChoCaLop] = useState<{ daNop: number; daVao: number } | null>(null)
   // Lưu lại keyBank (CÓ đáp án + lời giải) nhận được lúc nộp bài — để màn
   // "Xem lại lời giải" mở lại được bất cứ lúc nào trong phiên này mà không
@@ -2199,6 +2201,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         const r = await fetchKetQua(url, attempt.maCa, attempt.sbd)
         if (dung) return
         setCongBo(r.congBo)
+        if (r.expCa !== null) setExpCa(r.expCa)
         if (r.sanSang && r.keyBank) apDungKeyBank(r.keyBank, attempt)
         else if (r.congBo === 'ca_lop_xong') setChoCaLop({ daNop: r.daNop, daVao: r.daVao })
       } catch {
@@ -2221,6 +2224,27 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, keyBank, attempt?.pendingSubmit, congBo])
+
+  // EXP TỪ CA khi điểm đã về bằng đường khác (nộp xong có ngay đáp án, hoặc mở lại link): hỏi `ketQua` MỘT lần. Chỉ sau khi đã có điểm
+  // (graded = đã công bố) — máy chủ cũng chỉ trả `expCa` khi đã được xem điểm, nên không lộ gì trước công bố.
+  useEffect(() => {
+    if (phase !== 'submitted' || !graded || !attempt || attempt.pendingSubmit || expCa !== null) return
+    const url = scriptUrlRef.current.trim()
+    if (!url) return
+    let dung = false
+    const id = setTimeout(() => {
+      fetchKetQua(url, attempt.maCa, attempt.sbd)
+        .then((r) => {
+          if (!dung && r.expCa !== null) setExpCa(r.expCa)
+        })
+        .catch(() => {})
+    }, 1500)
+    return () => {
+      dung = true
+      clearTimeout(id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, !!graded, attempt?.maCa, attempt?.sbd, attempt?.pendingSubmit])
 
   /** GỬI BÀI LÊN MÁY CHỦ, có chốt chống chồng lượt và nhịp lùi dần.
    *
@@ -2972,6 +2996,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
               soDaLam={soDaLam}
               tongCau={flat.length}
               lam2={thoiGianLam(attempt?.startedAt, attempt?.submittedAt)}
+              expCa={graded ? expCa : null}
             />
           )}
 

@@ -230,47 +230,34 @@ function moTo(dsO: OBang[], opt: { rong?: number; dayHoc?: boolean; dsDapAn?: OB
   return { dom, doc, w, dot, rong, nhatKy, hen, chayHen, html }
 }
 
-describe('mã trong tờ — đợt ĐÔI', () => {
-  it('hai câu ngắn vừa bậc 1 ⇒ giữ NGUYÊN đợt đôi (không tách), gắn bậc và cỡ chữ', () => {
+// SỬA CÓ CHỦ Ý 28/09 (bản vẽ Lên bảng): BỎ ĐỢT ĐÔI — tờ dựng sẵn mỗi đợt MỘT câu MỘT em (2/3 + 1/3), nên không còn "giữ đợt đôi"
+// hay "tách đợt đôi". Khoá: đợt nào cũng đơn, không bao giờ bậc 1 (nửa bảng), không tách, bộ đếm đúng số em.
+describe('mã trong tờ — mỗi đợt MỘT em (bỏ đợt đôi)', () => {
+  it('hai câu ngắn ⇒ HAI đợt đơn ngay từ đầu, không tách, không bậc 1; bố cục chạy xong', () => {
     const t = moTo([ngan('A'), ngan('B')])
     const d = t.dot()
-    expect(d).toHaveLength(1)
-    expect(d[0].getAttribute('data-bac')).toBe('1')
-    expect(d[0].classList.contains('mc-b1')).toBe(true)
-    expect(d[0].querySelectorAll('.mc-nua')).toHaveLength(2)
-    expect(d[0].hasAttribute('data-tach')).toBe(false)
+    expect(d).toHaveLength(2)
+    expect(d.every((x) => x.classList.contains('mc-dot-don'))).toBe(true)
+    expect(d.every((x) => x.querySelectorAll('.mc-nua').length === 1)).toBe(true)
+    expect(d.every((x) => !x.hasAttribute('data-tach'))).toBe(true)
+    expect(d.every((x) => Number(x.getAttribute('data-bac')) >= 2)).toBe(true)
+    expect(d[0].textContent).toContain('Em A')
+    expect(d[1].textContent).toContain('Em B')
     expect(t.doc.body.classList.contains('mc-bc')).toBe(true)
     expect(t.doc.body.getAttribute('data-bo-cuc')).toBe('xong')
   })
 
-  it('đợt đôi mà MỘT câu dài không vừa nửa bảng ⇒ TÁCH thành hai đợt đơn, đánh số lại, có ghi chú', () => {
-    // Hai câu cùng dài vừa phải: dài quá nửa bảng nhưng vừa 2/3 ⇒ sau tách mỗi đợt ở bậc 2.
-    const t = moTo([cau('A', 'từ '.repeat(75)), cau('B', 'từ '.repeat(75))])
-    const d = t.dot()
-    expect(d).toHaveLength(2)
-    expect(d.map((x) => x.getAttribute('data-dot'))).toEqual(['1', '2'])
-    expect(d.every((x) => x.getAttribute('data-tach') === '1')).toBe(true)
-    expect(d.every((x) => x.querySelectorAll('.mc-nua').length === 1)).toBe(true)
-    expect(d.every((x) => Number(x.getAttribute('data-bac')) >= 2)).toBe(true)
-    expect(d.every((x) => x.classList.contains('mc-dot-don'))).toBe(true)
-    expect(d[0].querySelector('.mc-ghi-chu')?.textContent).toMatch(/tách/)
-    // em thứ nhất vẫn ở đợt 1, em thứ hai sang đợt 2 (thứ tự gọi không đổi)
-    expect(d[0].textContent).toContain('Em A')
-    expect(d[1].textContent).toContain('Em B')
-  })
-
-  it('tách đợt báo cho script chính: bộ đếm "Đợt k/n" và nút Đợt sau dùng số đợt MỚI', () => {
+  it('bộ đếm "Đợt k/n" và nút Đợt sau: bốn em ⇒ bốn đợt', () => {
     const t = moTo([cau('A', 'từ '.repeat(75)), cau('B', 'từ '.repeat(75)), ngan('C'), ngan('D')])
     const n = t.dot().length
-    expect(n).toBe(3) // 2 đợt tách + 1 đợt đôi C-D
+    expect(n).toBe(4)
     expect(t.doc.getElementById('mc-dem')!.textContent).toBe(`Đợt 1/${n}`)
-    t.doc.getElementById('mc-sau')!.click()
-    t.doc.getElementById('mc-sau')!.click()
-    expect(t.doc.getElementById('mc-dem')!.textContent).toBe(`Đợt 3/${n}`)
+    for (let i = 0; i < 3; i++) t.doc.getElementById('mc-sau')!.click()
+    expect(t.doc.getElementById('mc-dem')!.textContent).toBe(`Đợt 4/${n}`)
     expect((t.doc.getElementById('mc-sau') as HTMLButtonElement).disabled).toBe(true)
   })
 
-  it('chế độ dạy học: đợt bị tách tính lại GIỜ theo từng câu (data-giay → data-seconds)', () => {
+  it('chế độ dạy học: mỗi đợt mang GIỜ của đúng câu mình (data-giay = data-seconds)', () => {
     const t = moTo([cau('A', 'từ '.repeat(75)), cau('B', 'từ '.repeat(75))], { dayHoc: true })
     const d = t.dot()
     expect(d).toHaveLength(2)
@@ -312,10 +299,15 @@ describe('mã trong tờ — đợt ĐƠN leo bậc', () => {
   })
 
   it('ghi chú của đợt đang hiện nằm ở Ô CHỮ của thanh dưới (không vẽ đè lên đề); đợt không ghi chú thì để trống', () => {
+    // Bỏ đợt đôi (28/09) ⇒ tờ không tự sinh ghi chú "tách" nữa: gắn tay một ghi chú vào đợt đang hiện rồi báo bố cục xong.
     const co = moTo([cau('A', 'từ '.repeat(75)), cau('B', 'từ '.repeat(75))])
     const phu = co.doc.querySelector('.mc-thanh-phu')!
+    const gc = co.doc.createElement('div')
+    gc.className = 'mc-ghi-chu'
+    gc.textContent = 'Ghi chú thử của đợt 1'
+    co.dot()[0].appendChild(gc)
+    co.doc.dispatchEvent(new co.w.CustomEvent('mc-bo-cuc-xong'))
     const chu = co.dot()[0].querySelector('.mc-ghi-chu')!.textContent
-    expect(chu).toMatch(/tách ra/)
     expect(phu.textContent).toBe(chu)
     expect(phu.getAttribute('data-ghi-chu')).toBe('thong-tin')
     const khong = moTo([ngan('A'), ngan('B')])

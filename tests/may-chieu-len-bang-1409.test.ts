@@ -44,9 +44,11 @@ describe('Tờ máy chiếu', () => {
   const dsO = [O(1, 'Nguyễn Văn An'), O(2, 'Trần Thị Bình'), O(3, 'Lê Văn Cường', 'III'), O(4, 'Phạm Thị Dung')]
   const html = taoHtmlMayChieu(dsO, { tenBuoi: 'Chữa bài ca 814335', ngay: new Date(2026, 8, 14) })
 
-  it('chia hai em một đợt, bốn em ra hai đợt', () => {
-    expect(html.match(/class="mc-dot"/g)).toHaveLength(2)
-    expect(html).toContain('Đợt 1/2')
+  // SỬA CÓ CHỦ Ý 28/09 (bản vẽ Lên bảng): BỎ ĐỢT ĐÔI — mỗi đợt MỘT câu MỘT em (2/3 đề + 1/3 cột em).
+  it('mỗi đợt MỘT em: bốn em ra bốn đợt, không còn đợt đôi', () => {
+    expect(html.match(/class="mc-dot mc-dot-don"/g)).toHaveLength(4)
+    expect(html.match(/class="mc-dot"/g)).toBeNull()
+    expect(html).toContain('Đợt 1/4')
   })
 
   // Thầy 14/09: "1 đợt là 1 trang chia đôi bảng chứ không cuộn xuống, khi bấm
@@ -69,10 +71,11 @@ describe('Tờ máy chiếu', () => {
     expect(den).not.toContain('scrollIntoView')
   })
 
-  it('mỗi đợt chia đôi màn: nửa trái và nửa phải', () => {
-    expect(html.match(/class="mc-nua mc-trai"/g)).toHaveLength(2)
-    expect(html.match(/class="mc-nua mc-phai"/g)).toHaveLength(2)
-    expect(html).toContain('grid-template-columns: 1fr 1fr')
+  it('mỗi đợt 2/3 đề + 1/3 cột em lên làm (không còn nửa trái / nửa phải)', () => {
+    expect(html).not.toContain('class="mc-nua mc-trai"')
+    expect(html).not.toContain('class="mc-nua mc-phai"')
+    expect(html.match(/class="mc-cot-lam-bai"/g)).toHaveLength(4)
+    expect(html).toContain('.mc-dot-don { grid-template-columns: 2fr 1fr; }')
   })
 
   it('in đủ tên bốn em và đề bài đi kèm', () => {
@@ -82,10 +85,10 @@ describe('Tờ máy chiếu', () => {
     }
   })
 
-  it('mỗi nửa có nút hiện lời giải riêng, đóng sẵn', () => {
+  it('mỗi đợt có nút hiện lời giải riêng, đóng sẵn', () => {
     expect(html.match(/class="mc-nut-giai"/g)).toHaveLength(4)
     expect(html.match(/class="mc-nut-giai" aria-expanded="false"/g)).toHaveLength(4)
-    expect(html.match(/class="mc-giai" id="giai-\d+-(trai|phai)" hidden/g)).toHaveLength(4)
+    expect(html.match(/class="mc-giai" id="giai-\d+-don" hidden/g)).toHaveLength(4)
     // Lời giải phải là lời giải THẬT của câu, không phải chữ độn.
     expect(html).toContain('Bước một của lời giải')
     expect(html).not.toContain('Cần chú ý định luật bảo toàn')
@@ -172,8 +175,8 @@ describe('Tờ máy chiếu', () => {
   it('câu chỉ đọc đáp án thành TRANG ĐÁP ÁN nối sau các đợt', () => {
     const dsDapAn = Array.from({ length: 26 }, (_, i) => ({ ...cau(i + 50), dapAn: 'C' }))
     const o = taoHtmlMayChieu([O(1, 'Em A'), O(2, 'Em B')], { dsDapAn })
-    // 1 đợt gọi em + 3 trang đáp án (12 + 12 + 2)
-    expect(o.match(/class="mc-dot"/g)).toHaveLength(1)
+    // 2 đợt gọi em (mỗi đợt một em — bỏ đợt đôi 28/09) + 3 trang đáp án (12 + 12 + 2)
+    expect(o.match(/class="mc-dot mc-dot-don"/g)).toHaveLength(2)
     expect(o.match(/class="mc-dot mc-dot-da"/g)).toHaveLength(3)
     expect(o).toContain('Đáp án các câu còn lại')
     expect(o).toContain('1–12 trong 26 câu')
@@ -204,10 +207,10 @@ describe('Tờ máy chiếu', () => {
     expect(html).toContain("e.key === 'ArrowRight'")
   })
 
-  it('lẻ một em thì để trắng nửa kia, KHÔNG bịa thêm em', () => {
+  it('một em ⇒ một đợt, KHÔNG bịa thêm em, không còn nửa trắng', () => {
     const le = taoHtmlMayChieu([O(1, 'Nguyễn Văn An')], {})
-    expect(le).toContain('mc-trong')
-    expect(le).toContain('Đợt này chỉ gọi một em')
+    expect(le).not.toContain('Đợt này chỉ gọi một em')
+    expect(le.match(/class="mc-dot mc-dot-don"/g)).toHaveLength(1)
     expect(le.match(/class="mc-nut-giai"/g)).toHaveLength(1)
   })
 })

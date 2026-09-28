@@ -473,3 +473,7 @@
 /* Nút toàn màn hình (src/components/NutToanManHinh) trong đầu Bản đồ / Trong ải: cùng kính với nút quay lại `.dao2-nut-tron` (theo sáng/tối) */
 .dao2{--ntm-nen:var(--d2-kinh);--ntm-vien:inset 0 0 0 1px var(--d2-kinh-vien);--ntm-chu:var(--d2-chu)}
 .dao2 .dao2-ai-dau .nut-toan-man{margin-left:auto}
+/* Nút toàn màn hình ở màn Xong chuyến (hoàn thiện bản vẽ 28/09): góc trên phải của cảnh (cảnh luôn tối ⇒ chữ sáng); tiêu đề chừa hai bên để không đè */
+.dao2 .dao2-xong-canh .nut-toan-man.dao2-xong-ntm{position:absolute;top:10px;right:10px;z-index:2;color:rgb(220,232,255)}
+.dao2 .dao2-xong-canh:has(.dao2-xong-ntm) h2{margin-left:50px;margin-right:50px}
+@media (max-width:1023px) and (not ((orientation:landscape) and (min-width:700px))){.dao2 .dao2-xong-canh:has(.dao2-xong-ntm) h2{font-size:clamp(20px,6.6vw,32px)}}

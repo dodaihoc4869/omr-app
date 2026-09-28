@@ -39,7 +39,8 @@ const NGOAI_LENH: Record<string, string> = {
   'src/components/ThanThuHoaHocGame.tsx': 'MÃ CHẾT (không được nhập ở đâu)',
 }
 /** Làn của app thầy (Code 4) — có thể đổi; chỉ cho phép tồn tại. */
-const LAN_APP_THAY = ['src/components/bang-tin/hooks.ts', 'src/screens/ExamMonitorScreen.tsx']
+// + màn Chiếu mã vào thi (28/09): 5 giây/lần hỏi danh sách em đã vào, dừng khi tab ẩn / đóng màn — chỉ chạy khi thầy đang chiếu.
+const LAN_APP_THAY = ['src/components/bang-tin/hooks.ts', 'src/screens/ExamMonitorScreen.tsx', 'src/components/TamPhuChieuMa.tsx']
 
 const dem = (nguon: string) =>
   nguon

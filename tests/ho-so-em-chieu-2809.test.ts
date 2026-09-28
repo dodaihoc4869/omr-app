@@ -2,7 +2,8 @@
 // HỒ SƠ EM CHO TỜ CHIẾU (bản vẽ LenBang-Moi 28/09): `/gv/ho-so-len-bang` CHỈ ĐỌC, số thật từ sổ — trên D1 thật (node:sqlite).
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
-import { gvHoSoLenBang, hangTuTiLeDung, tenNguon } from '../server/src/ho-so-em-chieu'
+import { gvHoSoLenBang, hangTuTiLeDung, tenNguon, tienDoCapTuHoSo } from '../server/src/ho-so-em-chieu'
+import { thanhExp } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import type { Env } from '../server/src/kieu'
 
@@ -47,5 +48,15 @@ describe('/gv/ho-so-len-bang', () => {
     expect((await gvHoSoLenBang(env, { sbd: 'KHONG' }, T0)).ok).toBe(false)
     expect([0.39, 0.4, 0.65, 0.85, 0.86].map(hangTuTiLeDung)).toEqual(['L1', 'L2', 'L3', 'L3', 'L4'])
     expect(tenNguon('game', true)).toBe('Đoàn')
+  })
+  // HOÀN THIỆN BẢN VẼ 28/09: thanh tiến độ EXP (cấp · EXP trong thanh / mốc cấp sau) — trường CHỈ-ĐỌC `tienDoCap`.
+  it('tienDoCap: số thật từ game_v2_profile (cap, exp) + mốc thanhExp(cap); chưa chọn thú ⇒ vắng; cấp 120 ⇒ toiDa', async () => {
+    const { d, env } = fixture()
+    expect((await gvHoSoLenBang(env, { sbd: 'S1' }, T0)).tienDoCap).toBeUndefined()
+    d.sql.exec(`INSERT INTO game_v2_profile(sbd,json,created_at) VALUES('S1','{"pet":"rong","cap":7,"exp":130}','x')`)
+    expect((await gvHoSoLenBang(env, { sbd: 'S1' }, T0)).tienDoCap).toEqual({ cap: 7, exp: 130, moc: thanhExp(7), toiDa: false })
+    expect(tienDoCapTuHoSo('{"pet":"rong","cap":120,"exp":0}')).toEqual({ cap: 120, exp: 0, moc: null, toiDa: true })
+    expect(tienDoCapTuHoSo('{"choice":true}')).toBeNull()
+    expect(tienDoCapTuHoSo('hỏng')).toBeNull()
   })
 })

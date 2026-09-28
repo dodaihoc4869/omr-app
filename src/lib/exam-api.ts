@@ -908,12 +908,15 @@ export interface KetQuaCongBo {
   daNop: number
   daVao: number
   keyBank: KeyBank | null
+  /** EXP em nhận từ ca (máy chủ chỉ trả SAU công bố — cùng cổng với đáp án). null = chưa có. */
+  expCa: number | null
 }
 
 export async function fetchKetQua(scriptUrl: string, maCa: string, sbd: string): Promise<KetQuaCongBo> {
   const r = await postJson(scriptUrl, { action: 'ketQua', maCa, sbd })
   if (!r.ok) throw new Error(r.error || 'Không hỏi được kết quả')
-  return { congBo: r.congBo, sanSang: !!r.sanSang, daNop: r.daNop ?? 0, daVao: r.daVao ?? 0, keyBank: r.keyBank ?? null }
+  const expCa = r.sanSang && typeof r.expCa === 'number' && Number.isFinite(r.expCa) ? r.expCa : null
+  return { congBo: r.congBo, sanSang: !!r.sanSang, daNop: r.daNop ?? 0, daVao: r.daVao ?? 0, keyBank: r.keyBank ?? null, expCa }
 }
 
 export async function fetchSession(scriptUrl: string, maCa: string): Promise<SessionConfig> {
