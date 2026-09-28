@@ -1116,6 +1116,9 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  /* Sửa tràn chữ 28/09: nhãn "Chọn em" không được bẻ 2 dòng khi ô gợi ý bên cạnh dài. */
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 .cd-tam-chon {
   position: absolute;

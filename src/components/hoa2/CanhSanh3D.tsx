@@ -230,7 +230,8 @@ export default function CanhSanh3D({ s, ngang = false, moMan = false }: CanhSanh
       n.style.maxWidth = `${Math.max(120, W - phai - 16)}px` // nhãn dài hơn chỗ trống ⇒ xuống dòng, không chui dưới lối tắt
       const w = n.offsetWidth, h = n.offsetHeight
       const l = Math.min(Math.max(8, sx - w / 2), W - phai - w - 4)
-      const t = n.dataset.neo === 'tren' ? sy - h : sy
+      // nhãn neo TRÊN không được vượt lên mép trên vùng cảnh (chui dưới/ đè tiêu đề bản ngang, HUD bản dọc) — sửa tràn chữ 28/09
+      const t = n.dataset.neo === 'tren' ? Math.max(sy - h, tren - 10) : sy
       n.style.transform = `translate(${Math.round(Math.max(8, l))}px, ${Math.round(t)}px)`
     }
   }

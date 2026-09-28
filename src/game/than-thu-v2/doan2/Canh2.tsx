@@ -104,7 +104,7 @@ export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
 
       <header className="dh2-hud">
         <div className="dh2-kinh dh2-hud-hiep">
-          <span className="dh2-hud-dong"><b className="dh2-baloo">HIỆP {tran.hiep}/{tran.soHiep}</b>{tran.laTrum ? <span className="dh2-dang-trum">◆ đang ở hiệp trùm</span> : <span>◆ = hiệp trùm</span>}</span>
+          <span className="dh2-hud-dong"><b className="dh2-baloo">HIỆP {tran.hiep}/{tran.soHiep}</b>{tran.laTrum ? <span className="dh2-dang-trum" title="Đang ở hiệp trùm">◆ đang ở hiệp trùm</span> : <span title="◆ = hiệp trùm">◆ = hiệp trùm</span>}</span>
           <span className="dh2-vach" role="img" aria-label={`Đang ở hiệp ${tran.hiep} trên ${tran.soHiep}; hiệp ${HIEP_TRUM.join(' và ')} là hiệp trùm`}>
             {Array.from({ length: tran.soHiep }, (_, i) => i + 1).map(h => (
               <i key={h} className={`${HIEP_TRUM.includes(h) ? 'dh2-kc' : ''} ${tran.ketThuc || h < tran.hiep ? 'dh2-xong' : h === tran.hiep ? 'dh2-dang' : ''}`} />

@@ -532,6 +532,13 @@
   flex: 1 1 auto;
   min-height: 300px;
 }
+/* Cột lối tắt (4–5 nút ≈ 75 px/nút) phải nằm TRỌN trên tấm dưới — nút cuối "Đăng xuất" không bị tấm che (sửa tràn 28/09). */
+.h2-khung:has(.h2-ray > :nth-child(4)) .h2-dem {
+  min-height: 330px;
+}
+.h2-khung:has(.h2-ray > :nth-child(5)) .h2-dem {
+  min-height: 400px;
+}
 
 /* ══════════════ tấm dưới kính sáng ══════════════ */
 .h2-tam {

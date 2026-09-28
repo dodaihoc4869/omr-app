@@ -28,8 +28,11 @@
 }
 .ct button {
   font: inherit;
-  color: inherit;
   touch-action: manipulation;
+}
+/* màu chữ nút kế thừa ở độ ưu tiên THẤP (0,1,0 qua :where) — để .ct-nut-chinh/.ct-nut-vien… đặt màu riêng thắng được (trước: .ct button 0,1,1 đè ⇒ chữ tối trên nền màu) */
+.ct :where(button) {
+  color: inherit;
 }
 .ct :focus-visible {
   outline: 3px solid var(--gvm-tim);
