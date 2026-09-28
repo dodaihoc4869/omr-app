@@ -43,3 +43,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - `build-ngang-sanh` XONG: `cc1a5f8` (đã đẩy). tsc 0, `tests/hoa2-` 39/39. CHƯA chạy build:cf. Lỗi còn: màn 844×390 thu nhỏ 0,75 ⇒ nút < 44 px — sửa khi gộp.
 - Bản vẽ Sảnh động bản 2 (hoàng hôn sáng, 2.5D, thị sai) XONG: nhánh `ban-ve-sanh-dong` commit `9cc4be1` (đã đẩy). Link xem: https://claude.ai/artifact/XzDYtWoFJfnB6zr6PZKmJh — CHỜ THẦY CHỐT, chưa build.
 - `build-gv-khung` XONG: `7175290` (đã đẩy). build:cf 13/13 (precache 2982/3000 KB — sát trần!). Sửa ngoài làn: `appStore.ts` (+2 ScreenId), `vite.config.ts` globIgnores. Còn: "Mã dạng" vẫn ở Kho đề; chưa đưa "Gọi lên bảng cách cũ" vào Cài đặt; chữ `KhoiBaiLuyen.tsx` chưa sửa — làm khi gộp (có thể xung đột với `build-gv-chien-dich`).
+- `build-gv-chien-dich` XONG: `71fba26` (đã đẩy). Máy chủ `srs2-gv.ts` thêm trường (chỉ thêm) — Worker CHƯA đẩy (CI tự đẩy khi merge main). vitest 132/132, build:cf 13/13.
+- BƯỚC TIẾP: gộp 5 nhánh vào `gop-ngang-gv-2809` (từ origin/main) → sửa việc tồn → test → PR → merge.
