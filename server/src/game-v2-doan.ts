@@ -17,6 +17,7 @@ import {
   moChang, giaiHiep, roiTran, datGiaoY, kiemHanhDong, hiepLaTrum, giayCuaHiep, tomTatChang, khungNhinHiep, kichBanChang,
   kiemTiepSuc, NHAN_TIEP_SUC_TOI_DA, SO_GHE_TOI_DA, SO_HIEP, SO_Y_TRUM, type Chang, type HanhDong, type NopHiep, type NopTrum,
   chotTask, chuyenHiepTask, conNopDuoc, hetHanTask, khoaTask, moLaiTask, moTask, type TaskDoan,
+  boQuaHiepTrong, banMayDungY, CHAN,
 } from '../../src/game/than-thu-v2/doan-core'
 import { hashSeed } from '../../src/lib/exam-shuffle'
 import { protectedQuestions, docKhoiThapNhat } from './game-v2-bank'
@@ -192,7 +193,8 @@ async function luuPhong(env: Env, ma: string, p: PhongDoan, revision: number): P
   for (const g of choGhi) lenh.push(env.DB.prepare('UPDATE doan_tiep_suc SET thanh_cong=? WHERE ma_chang=? AND hiep=? AND den_sbd=? AND EXISTS(SELECT 1 FROM doan_chang WHERE ma=? AND revision=?)').bind(g.thanhCong ? 1 : 0, ma, g.hiep, g.den, ma, revision + 1))
   const r = await env.DB.batch(lenh)
   // ĐIỀU 9: chặng vừa kết thúc ⇒ trao EXP kết chặng (thắng 5/10/15, vỡ giáp +3/trùm) cho từng bạn thật, qua cửa trần 120 EXP game/ngày. Idempotent theo khoá; lỗi chỉ ghi log.
-  if (r[0]?.meta.changes && c?.ketThuc && p.ketLuc) await traoExpKetChang(env, ma, p.ketLuc, tomTatChang(c))
+  // 28/09: em vào đoàn với ít câu ôn (soCauThieu > 0) ⇒ khoản thắng chặng theo tỉ lệ câu thật (`thuongTheoSoCau`).
+  if (r[0]?.meta.changes && c?.ketThuc && p.ketLuc) await traoExpKetChang(env, ma, p.ketLuc, tomTatChang(c), Date.now(), new Map(p.nguoi.filter(n => (n.soCauThieu ?? 0) > 0).map(n => [n.sbd, n.cau.length])))
   // Sổ câu trùm là sổ PHỤ cho thầy (bảng của bước 6 có thể chưa có) → ghi ngoài giao dịch, lỗi thì bỏ qua.
   if (r[0]?.meta.changes) for (const g of choGhiTrum) await env.DB.prepare('INSERT OR IGNORE INTO doan_trum_cau(ma_chang,hiep,lop,ngay_vn,ma_dang,qid,y_dung,so_ghe) VALUES(?,?,?,?,?,?,?,?)').bind(ma, g.hiep, p.nguoi[0]?.lop ?? '', ngayVn(iso(p.hiepLuc)), g.maDang, g.qid, g.yDung, p.nguoi.length).run().catch(() => {})
   return !!r[0]?.meta.changes
@@ -406,10 +408,33 @@ function batDau(p: PhongDoan, ma: string, now: number) {
   p.hiepLuc = now + DEM_NGUOC_MS; p.nop = {}; p.nopY = {}; p.tinHieu = {}; p.the = {}; p.daGiup = []; p.choGhi = []
   p.task = {} // task cá nhân phát lại từ đầu cho từng hiệp (02 §8)
 }
-/** Trùm không có câu chung: ý của ghế nào ĐÚNG khi ghế ấy tự làm đúng ≥ 2 trong 3 hiệp thường vừa rồi — phong độ của đoạn đường quyết định vỡ giáp. */
+/** Trùm không có câu chung: ý của ghế nào ĐÚNG khi ghế ấy tự làm đúng ≥ 2 trong 3 hiệp thường vừa rồi — phong độ của đoạn đường quyết định vỡ giáp.
+ *  28/09: chỉ đếm hiệp ghế ấy CÓ CÂU (hiệp giữ khiên vì hết câu không phải là sai): đúng ≥ 2/3 số câu đã làm; không làm câu nào ⇒ tính như bạn máy. */
 function yTheoPhongDo(c: Chang): NopTrum[] {
   const gan = c.lichSu.filter(h => !h.laTrum).slice(-3)
-  return c.giaoY.map((ghe, y) => ({ ghe, y, dung: gan.filter(h => h.ghe[ghe]?.dung && h.ghe[ghe]?.tuLam).length >= 2 }))
+  return c.giaoY.map((ghe, y) => {
+    const lam = gan.filter(h => !h.ghe[ghe]?.hoTro)
+    if (!lam.length) return { ghe, y, dung: banMayDungY(c, y) }
+    return { ghe, y, dung: lam.filter(h => h.ghe[ghe]?.dung && h.ghe[ghe]?.tuLam).length * 3 >= lam.length * 2 }
+  })
+}
+/** HẾT CÂU RIÊNG (28/09): ở hiệp thường đang chạy, ghế người `i` không còn câu riêng (bộ câu ôn của em ngắn hơn 6). */
+export const hetCauRieng = (p: PhongDoan, i: number): boolean => {
+  const c = p.chang
+  return !!c && !hiepLaTrum(c.hiep) && !!p.nguoi[i] && !p.nguoi[i]!.cau[chiSoCau(c.hiep)]
+}
+/** CẢ ĐOÀN hết câu riêng ở hiệp thường này (chưa ai chốt) ⇒ bỏ qua thẳng tới hiệp trùm kế / hiệp có câu, không chờ đồng hồ. */
+function boQuaHiepRong(p: PhongDoan): boolean {
+  let doi = false
+  for (;;) {
+    const c = p.chang
+    if (!c || c.ketThuc || hiepLaTrum(c.hiep) || c.hiep >= SO_HIEP || Object.keys(p.nop).length) return doi
+    const nguoi = gheNguoi(p)
+    if (!nguoi.length || !nguoi.every(({ i }) => hetCauRieng(p, i))) return doi
+    chuyenTaskHiep(p, c.hiep)
+    p.chang = boQuaHiepTrong(c); p.tinHieu = {}; p.the = {}; p.daGiup = []; doi = true
+    if (hiepLaTrum(p.chang.hiep) && p.trum[p.chang.hiep] && p.giaoY[p.chang.hiep]) p.chang = datGiaoY(p.chang, p.giaoY[p.chang.hiep]!)
+  }
 }
 function giai(p: PhongDoan, now: number) {
   const c = p.chang!
@@ -420,6 +445,8 @@ function giai(p: PhongDoan, now: number) {
     if (cauTrum) (p.choGhiTrum ??= []).push({ hiep: c.hiep, maDang: cauTrum.dang, qid: cauTrum.qid, yDung: p.chang.lichSu.at(-1)!.trum!.yDung })
   } else {
     const nop: NopHiep[] = Object.entries(p.nop).map(([ghe, n]) => ({ ghe: Number(ghe), dung: n.dung, hanhDong: n.hanhDong, anThach: !!p.nguoi[Number(ghe)]?.cau[chiSoCau(c.hiep)]?.an, tiepSucBoi: n.tiepSucBoi }))
+    // HẾT CÂU RIÊNG (28/09): ghế người không còn câu ở hiệp này ⇒ máy coi em đã chốt vai GIỮ KHIÊN (như bạn máy chắn, không đúng/sai).
+    for (const { i } of gheNguoi(p)) if (!p.nop[i] && hetCauRieng(p, i)) nop.push({ ghe: i, dung: false, hanhDong: 'chan', hoTro: true })
     p.chang = giaiHiep(c, { nop })
     const kq = p.chang.lichSu.at(-1)!
     for (const ghe of Object.keys(p.the)) if (p.nguoi[Number(ghe)]) p.choGhi.push({ hiep: kq.hiep, den: p.nguoi[Number(ghe)]!.sbd, thanhCong: !!kq.ghe[Number(ghe)]?.dung })
@@ -429,7 +456,8 @@ function giai(p: PhongDoan, now: number) {
   p.choTiep = choEmMotMinh(p)
   if (p.choTiep) p.hiepLuc = now + HAN_CHO_TIEP_MS
   chuyenTaskHiep(p, c.hiep) // task chưa chốt của hiệp vừa giải ⇒ `continuing` (02 §8)
-  if (p.chang.ketThuc) p.ketLuc = now
+  boQuaHiepRong(p) // cả đoàn hết câu riêng ở các hiệp kế ⇒ đi thẳng tới hiệp trùm kế (28/09)
+  if (p.chang!.ketThuc) p.ketLuc = now
   else if (hiepLaTrum(p.chang.hiep) && p.trum[p.chang.hiep] && p.giaoY[p.chang.hiep]) p.chang = datGiaoY(p.chang, p.giaoY[p.chang.hiep]!)
 }
 /** Phòng Hóa 2.0, chặng còn đi, đúng MỘT người thật còn ở lại ⇒ giữa hai hiệp chờ em bấm tiếp. */
@@ -447,6 +475,7 @@ function tienHanh(p: PhongDoan, now: number): boolean {
   if (!c || c.ketThuc || now < p.hiepLuc) return doiHan
   if (moTaskHiep(p, now)) { /* hiệp vừa mở: phát task cho các ghế có câu */ }
   if (gheNguoi(p).length === 0) { p.chang = { ...c, ketThuc: true, thang: false }; p.ketLuc = now; return true } // cả đội đã rời: đóng chặng, không ai bị phạt
+  if (boQuaHiepRong(p)) return true // bạn còn câu vừa rời ⇒ những bạn ở lại đều đã hết câu: bỏ qua hiệp trống, không chờ đồng hồ
   if (now >= hanHiep(p) + AN_HAN_MS || duBai(p)) { giai(p, now); return true }
   return doiHan
 }
@@ -476,7 +505,7 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
     if (!g) return 'cho'
     if (g.laMay || g.roi) return 'may'
     if (!mo) return 'cho'
-    if (laTrum ? c!.giaoY.every((gi, y) => gi !== ghe || p.nopY[y] !== undefined) : p.nop[ghe] !== undefined) return 'da_chot'
+    if (laTrum ? c!.giaoY.every((gi, y) => gi !== ghe || p.nopY[y] !== undefined) : p.nop[ghe] !== undefined || hetCauRieng(p, ghe)) return 'da_chot' // hết câu riêng = đã chốt vai giữ khiên
     return p.tinHieu[ghe] === 'can_tiep_suc' ? 'can_tiep_suc' : 'dang_lam'
   }
   const ghe = (c ? c.ghe : p.nguoi.map(n => ({ ten: n.ten, pet: n.pet, laMay: false, roi: false }))).map((g, k) =>
@@ -501,7 +530,7 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
 
   if (mo && !laTrum) {
     const ref = p.nguoi[i]!.cau[chiSoCau(c.hiep)], da = p.nop[i]
-    if (!ref) doan.cau = { het: true, loiNhan: 'Hôm nay em đã hết câu vừa sức trong kho — em cổ vũ đồng đội hiệp này nhé.' }
+    if (!ref) doan.cau = { het: true, giuKhien: true, chan: CHAN, loiNhan: 'Em đã ôn xong câu hôm nay — hiệp này em giữ khiên cho đoàn.' }
     else if (da) {
       // Em đã chốt → được xem lại kết quả câu CỦA MÌNH (tải lại trang không mất lời giải).
       const a = da.boTrong ? null : await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE id=? AND sbd=?').bind(`${p.nguoi[i]!.phien}|${ref.qid}`, sbd).first<{ json: string }>()
@@ -519,7 +548,7 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
       conLuotNhan: Math.max(0, NHAN_TIEP_SUC_TOI_DA - c.ghe[i]!.daNhanTiepSuc - (the ? 1 : 0)), daXin: p.tinHieu[i] === 'can_tiep_suc',
       // Nội dung thẻ CHỈ có trong gói của người NHẬN. Người tiếp sức không bao giờ thấy nội dung (không đọc hộ bạn).
       theNhan: the ? { tuTen: c.ghe[the.tu]!.ten, tuLaMay: c.ghe[the.tu]!.laMay || c.ghe[the.tu]!.roi, loai: the.loai, tieuDe: the.tieuDe, noiDung: the.noiDung } : null,
-      banCan: p.nop[i] && !daGiup ? c.ghe.flatMap((g, k) => k !== i && !g.laMay && !g.roi && p.tinHieu[k] === 'can_tiep_suc' && !p.the[k] && !p.nop[k] && g.daNhanTiepSuc < NHAN_TIEP_SUC_TOI_DA ? [k] : []) : [],
+      banCan: (p.nop[i] || hetCauRieng(p, i)) && !daGiup ? c.ghe.flatMap((g, k) => k !== i && !g.laMay && !g.roi && p.tinHieu[k] === 'can_tiep_suc' && !p.the[k] && !p.nop[k] && g.daNhanTiepSuc < NHAN_TIEP_SUC_TOI_DA ? [k] : []) : [],
       daGiup, lienKichSanSang: !!the || daGiup,
     }
   }
@@ -555,7 +584,7 @@ function kiemGiup(p: PhongDoan, tu: number, den: number, now: number) {
   const c = p.chang
   if (!c || c.ketThuc || now < p.hiepLuc) throw new Error('Hiệp chưa mở.')
   kiemTiepSuc(c, tu, den, p.daGiup)
-  if (!p.nop[tu]) throw new Error('Em chốt câu của mình trước rồi mới tiếp sức bạn được.')
+  if (!p.nop[tu] && !hetCauRieng(p, tu)) throw new Error('Em chốt câu của mình trước rồi mới tiếp sức bạn được.')
   if (p.nop[den]) throw new Error('Bạn ấy vừa chốt xong rồi.')
   if (p.the[den]) throw new Error('Bạn ấy vừa nhận thẻ của một bạn khác rồi.')
   if (p.tinHieu[den] !== 'can_tiep_suc') throw new Error('Bạn ấy chưa bật tín hiệu "cần tiếp sức".')
@@ -679,6 +708,7 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
         const c = phong.chang
         if (hiepLaTrum(c.hiep)) throw new Error('Hiệp trùm cả đội bàn chung, không dùng thẻ tiếp sức.')
         if (phong.nop[i]) throw new Error('Em đã chốt đòn của hiệp này.')
+        if (hetCauRieng(phong, i)) throw new Error('Hiệp này em giữ khiên cho đoàn, không có câu cần tiếp sức.')
         if (phong.the[i]) throw new Error('Hiệp này em đã nhận một thẻ rồi.')
         if (c.ghe[i]!.daNhanTiepSuc >= NHAN_TIEP_SUC_TOI_DA) throw new Error(`Em đã dùng hết ${NHAN_TIEP_SUC_TOI_DA} lần được tiếp sức của chặng này. Câu này em tự làm nhé.`)
         const { the } = await theChoGhe(env, phong, ma, i)
@@ -719,7 +749,9 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       if (c.ghe[i]!.roi) throw new Error('Em đã rời chặng này.')
       if (phong.nop[i]) throw new Error('Em đã chốt đòn của hiệp này.')
       const ref = phong.nguoi[i]!.cau[chiSoCau(c.hiep)]
-      const boTrong = b.boTrong === true || !ref
+      // Hết câu riêng: máy đã tính em chốt vai giữ khiên — không có câu để nộp, không độn câu mới.
+      if (!ref) throw new Error('Em đã ôn xong câu hôm nay — hiệp này em giữ khiên cho đoàn, không cần chốt.')
+      const boTrong = b.boTrong === true
       // Bỏ trống: không chấm, không ghi sổ, 0 sát thương — nhưng vẫn được Chắn (khiên yếu).
       if (boTrong && hanhDong !== 'chan') throw new Error('Bỏ trống thì em chỉ Chắn được. Muốn Đánh hay dùng Kỹ năng, em trả lời câu hỏi nhé.')
       let dung = false

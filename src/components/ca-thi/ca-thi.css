@@ -1597,3 +1597,297 @@ table.ct-bang {
   opacity: 0.55;
   cursor: progress;
 }
+
+/* ===== PHÒNG CHỜ (PhongChoCa, thầy 28/09) — cùng họ "Ca đã mở" + "Chiếu mã": chip trạng thái, số lớn, chip tên em, MỘT nút chính ===== */
+.ct-pc {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ct-pc-dau {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ct-pc-song {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--gvm-chu-3);
+}
+.ct-pc-song i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gvm-xl);
+}
+.ct-pc-song--mat {
+  color: var(--gvm-hp-dam);
+}
+.ct-pc-song--mat i {
+  background: var(--gvm-hp);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ct-pc-song:not(.ct-pc-song--mat) i {
+    animation: ct-nhip 1.6s ease-in-out infinite;
+  }
+}
+.ct-pc-dem {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: var(--gvm-chu-2);
+  font-size: 15px;
+  font-weight: 600;
+}
+.ct-pc-dem > b {
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--gvm-chu);
+}
+.ct-pc-vach {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--gvm-mat-2);
+  overflow: hidden;
+}
+.ct-pc-vach i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--gvm-tim);
+}
+.ct-pc-ds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 232px;
+  overflow-y: auto;
+  min-width: 0;
+}
+.ct-pc-em {
+  max-width: 100%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--gvm-tim-nen);
+  color: var(--gvm-tim-dam);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ct-pc-em.ct-pc-moi {
+  background: var(--gvm-xl-nen);
+  color: var(--gvm-xl-dam);
+  box-shadow: inset 0 0 0 1.5px var(--gvm-xl);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ct-pc-em.ct-pc-moi {
+    animation: ct-pc-hien 240ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+@keyframes ct-pc-hien {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.ct .ct-pc-trong .ct-nut-tong {
+  color: var(--gvm-xd-dam);
+}
+.ct-pc-trong {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px dashed var(--gvm-vien);
+  color: var(--gvm-chu-2);
+  font-size: 14px;
+}
+.ct-pc-tin {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--gvm-xd-nen);
+  color: var(--gvm-xd-dam);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.ct-pc-tin svg {
+  flex: none;
+  margin-top: 2px;
+}
+.ct-pc-tin span {
+  min-width: 0;
+}
+.ct-pc-gio {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gvm-vien);
+}
+.ct-pc-cong-tac {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  min-width: 0;
+  cursor: pointer;
+}
+.ct-pc-cong-tac-chu {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ct-pc-cong-tac-chu b {
+  font-size: 15px;
+}
+.ct-pc-cong-tac-chu span {
+  font-size: 13px;
+  color: var(--gvm-chu-3);
+}
+/* Công tắc M3: rãnh 52×32, núm tròn; bật ⇒ rãnh màu chính, núm lớn lệch phải. Vẫn là <input type=checkbox role=switch>. */
+.ct input[type='checkbox'].ct-sw {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  position: relative;
+  width: 52px;
+  height: 32px;
+  margin: 0;
+  border-radius: 16px;
+  border: 2px solid var(--gvm-chu-3);
+  background: var(--gvm-mat-2);
+  cursor: pointer;
+  overflow: hidden;
+}
+.ct input[type='checkbox'].ct-sw::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gvm-chu-3);
+  transform: translateY(-50%);
+}
+.ct input[type='checkbox'].ct-sw:checked {
+  background: var(--gvm-xd);
+  border-color: var(--gvm-xd);
+}
+.ct input[type='checkbox'].ct-sw:checked::before {
+  width: 24px;
+  height: 24px;
+  left: 22px;
+  background: var(--gvm-tren-dac);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ct input[type='checkbox'].ct-sw::before {
+    transition: left 160ms ease, width 160ms ease, height 160ms ease;
+  }
+}
+.ct input[type='checkbox'].ct-sw:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ct .ct-pc-i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--gvm-chu-3);
+  cursor: pointer;
+}
+.ct .ct-pc-i[aria-expanded='true'] {
+  background: var(--gvm-mat-2);
+  color: var(--gvm-chu);
+}
+.ct-pc-gio-chu {
+  grid-column: 1 / -1;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--gvm-chu-2);
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--gvm-mat-2);
+}
+.ct .ct-pc-bat-dau {
+  color: var(--gvm-tren-dac);
+  width: 100%;
+  min-height: 56px;
+  border-radius: 28px;
+  font-size: 17px;
+}
+.ct-pc-bat-dau:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.ct .ct-pc-huy {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 22px;
+  background: transparent;
+  color: var(--gvm-ho);
+  font-weight: 700;
+  font-size: 14.5px;
+  cursor: pointer;
+}
+.ct-pc-huy:disabled {
+  opacity: 0.55;
+}
+.ct-pc-hoi {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--gvm-ho-nen);
+  color: var(--gvm-ho-dam);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.ct-pc-hoi-nut {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ct-pc-hoi-nut .ct-nut {
+  flex: 1 1 120px;
+}
+.ct .ct-pc-hoi .ct-nut-vien {
+  background: var(--gvm-mat);
+  color: var(--gvm-chu);
+}
+.ct .ct-pc-hoi .ct-nut-do {
+  background: var(--gvm-ho);
+  color: var(--gvm-tren-dac);
+}
