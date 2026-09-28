@@ -182,7 +182,9 @@ async function xemBuoi(env: Env, id: string, nowMs: number, kemLop: boolean): Pr
       "SELECT d.sbd, d.luc, d.cach, h.ho_ten FROM buoi_hoc_diem_danh d LEFT JOIN hoc_sinh h ON h.sbd = d.sbd WHERE d.buoi_id = ? AND d.trang_thai = 'co_mat' ORDER BY d.luc, d.sbd",
       id,
     )) ?? []
-  const lop = await emCuaLop(env, buoi.lop)
+  // Cả trường (em chưa khoá) — app thầy lọc theo lớp thầy chọn ở khối "Thêm em chưa điểm danh được" (em học ghép lớp khác vẫn thêm được).
+  const moiEm = await emCuaLop(env, '')
+  const lop = buoi.lop ? moiEm.filter((e) => e.tenLop === buoi.lop) : moiEm
   const w = cuaSoCua(nowMs)
   return {
     ok: true,
@@ -190,7 +192,7 @@ async function xemBuoi(env: Env, id: string, nowMs: number, kemLop: boolean): Pr
     ...(buoi.dangMo ? { ma: await maCuaBuoi(str(r.bi_mat), w), doiMaLuc: (w + 1) * CHU_KY_MA_MS } : {}),
     coMat: rCo.map((x) => ({ sbd: str(x.sbd), hoTen: str(x.ho_ten), luc: str(x.luc), cach: str(x.cach) === 'thay' ? 'thay' : 'ma' })),
     siSo: buoi.lop ? lop.length : null,
-    ...(kemLop ? { lopEm: lop.slice(0, 400) } : {}),
+    ...(kemLop ? { lopEm: moiEm.slice(0, 600) } : {}),
   }
 }
 

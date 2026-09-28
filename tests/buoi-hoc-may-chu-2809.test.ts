@@ -32,7 +32,9 @@ describe('mở buổi + mã đổi mỗi phút', () => {
     expect(r.doiMaLuc).toBe((cuaSoCua(T0) + 1) * CHU_KY_MA_MS)
     expect(r.buoi).toMatchObject({ lop: '12 - Lớp Thường', dangMo: true })
     expect(r.siSo).toBe(2)
-    expect(r.lopEm.map((e: any) => e.sbd).sort()).toEqual(['S1', 'S2'])
+    // lopEm = cả trường (để thêm tay em học ghép lớp khác); sĩ số vẫn theo lớp của buổi
+    expect(r.lopEm.map((e: any) => e.sbd).sort()).toEqual(['S1', 'S2', 'S3'])
+    expect(r.lopEm.find((e: any) => e.sbd === 'S3').tenLop).toBe('11')
     const r2 = (await gvBuoiHoc(env, { action: 'xem', id: r.buoi.id }, T0 + 5_000)) as any
     expect(r2.ma).toBe(r.ma)
     // mã = HMAC(bí mật buổi, phút): phút sau ra mã khác (xác suất trùng 1/900 000 — dùng hai phút để chắc)

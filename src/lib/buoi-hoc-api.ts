@@ -169,3 +169,27 @@ export async function emDiemDanh(token: string, ma: string): Promise<{ ok: true;
   if (j.ok === true && b) return { ok: true, buoi: b }
   return { ok: false, chu: chu(j.error) || 'Chưa điểm danh được. Em thử lại.' }
 }
+
+
+// ───────── LỌC EM ĐỂ THẦY THÊM TAY (khối "Thêm em chưa điểm danh được", 28/09) ─────────
+/** Bỏ dấu + chữ thường ("Đỗ Thị Ánh" → "do thi anh") để tìm không phân biệt dấu/hoa. */
+export function boDau(s: string): string {
+  return String(s ?? '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+/** Em theo lớp đang chọn (rỗng = mọi lớp) + chữ tìm (SBD hoặc tên, không dấu, không phân biệt hoa; mọi từ phải khớp). Giữ thứ tự tên. */
+export function locEmThem(ds: readonly EmLop[], lop: string, tim: string): EmLop[] {
+  const tu = boDau(tim).split(' ').filter(Boolean)
+  return ds.filter((e) => {
+    if (lop && e.tenLop !== lop) return false
+    if (!tu.length) return true
+    const chu = `${boDau(e.hoTen)} ${boDau(e.sbd)}`
+    return tu.every((t) => chu.includes(t))
+  })
+}

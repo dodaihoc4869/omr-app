@@ -471,3 +471,81 @@
   outline: 3px solid var(--bts-duong);
   outline-offset: 2px;
 }
+
+/* ---- khối "Thêm em chưa điểm danh được" (28/09) ---- */
+.dh-them-dau {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.dh-them-dau h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+.dh-chon-lop input.dh-tim {
+  width: 100%;
+}
+.dh-chon-lop--hep {
+  flex: 0 1 220px;
+}
+.dh-them .dh-them-ds {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  max-height: 360px;
+}
+.dh-them-dong {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 6px;
+  border-radius: 12px;
+}
+.dh-them-dong:hover {
+  background: var(--bts-mat);
+}
+.dh-them-dong .dh-them-o {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.dh-them-o small {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.dh-them-o--co {
+  cursor: default;
+}
+.dh-them-o--co .dh-them-ten {
+  color: var(--bts-chu-phu);
+}
+.dh-them .m3-nut-chinh[aria-busy='true'] {
+  opacity: 0.6;
+}
+.dh-chon-lop .dh-tim {
+  flex: 0 0 auto;
+}
+.dh-them-o .dh-them-chu {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  overflow: visible;
+  font-weight: 400;
+}
+.dh-them-chu .dh-them-ten {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.dh-them-chu small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.dh-them-dong .dh-chip {
+  flex: 0 0 auto;
+}

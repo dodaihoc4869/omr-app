@@ -140,7 +140,8 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
   /** Nhánh thầy TỰ bấm mở/gập, gắn với chữ đang gõ. Đổi chữ tìm là quay về mặc định. */
   const [moTay, setMoTay] = useState<{ tim: string; set: Set<string> } | null>(null)
 
-  const dsKhoi = useMemo(() => KHOI_CO_THE.filter((k) => ds.some((c) => khoiCuaDe(c) === k)), [ds])
+  // Chip lọc lớp TỰ SINH theo dữ liệu đang có (không danh sách cứng): kho có tờ khối nào thì có chip khối đó, xếp theo số.
+  const dsKhoi = useMemo(() => [...new Set(ds.map((c) => khoiCuaDe(c)).filter(Boolean))].sort((a, b) => Number(a) - Number(b) || a.localeCompare(b)), [ds])
 
   const dsLoc = useMemo(() => ds.filter((c) => (!khoi || khoiCuaDe(c) === khoi) && (!nhomLoc || (c.nhom || '') === nhomLoc)), [ds, khoi, nhomLoc])
   const cayGoc = useMemo(() => dungCay(dsLoc), [dsLoc])
