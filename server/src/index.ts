@@ -1,3 +1,4 @@
+import { denPhongBiA } from './bi-a-phong'
 import { ghiDoLenh, nhipDeNghi, sucKhoeMay, tenLenh } from './suc-khoe-may'
 import { emCoGhi, keHoachCoDem } from './dem-ke-hoach'
 import {homeworkQuestions,homeworkKeys,gradeHomework,LoiChamBtvn} from './btvn-grading'
@@ -3441,9 +3442,12 @@ const boXuLy = {
 }
 
 /** Bọc `boXuLy.fetch`: đo thời gian trả lời từng lệnh (trừ OPTIONS) vào bộ nhớ ⇒ p50/p95 ⇒ `nhipDeNghi` + `/gv/suc-khoe-may-chu` (suc-khoe-may.ts). Không tốn truy vấn nào. */
+export { BanBiA } from './bi-a-phong'
 export default {
   ...boXuLy,
   async fetch(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> {
+    // Phòng đấu Bi-a (WebSocket, GĐ2): đi thẳng tới Durable Object, KHÔNG qua lớp bọc dưới (dựng lại Response làm hỏng bắt tay 101).
+    if (new URL(req.url).pathname.startsWith('/bi-a/phong/')) return denPhongBiA(req, env)
     const t0 = Date.now()
     let res: Response
     try { res = await boXuLy.fetch(req, env, ctx) } finally { if (req.method !== 'OPTIONS') ghiDoLenh(tenLenh(new URL(req.url).pathname), Date.now() - t0) }

@@ -24,3 +24,27 @@ Phiên: cloud, nhánh `claude/fervent-edison-otwz9p`. Không có khoá Cloudflar
 
 ## GĐ2 (chưa làm)
 Đấu với bạn, Nhập mã bàn, lời mời, bảng điểm bàn — hai nút đang hiện "Sắp mở".
+
+## GĐ2 — lệnh thầy 28/09: "hãy thực thi giai đoạn 2 luôn"
+Đích (đặc tả §11 dòng GĐ2 + §12 "GĐ2 thêm" + §6.2, §6.3, §8.2, G7, G14):
+- [ ] Phòng đấu Durable Object `BanBiA` (SQLite, WebSocket Hibernation), khoá theo mã ván | bằng chứng: (chưa có)
+- [ ] Đấu đơn online với bạn (2 người) | bằng chứng: (chưa có)
+- [ ] Đánh đôi online tối đa 4 người + phòng chờ 4 ghế (thêm A.I ghế trống, đổi chỗ, Bắt đầu khi đủ 4) | bằng chứng: (chưa có)
+- [ ] A.I ở ghế trống chạy trên máy chủ bàn; chủ bàn rớt ⇒ ghế nhỏ nhất còn lại chạy A.I | bằng chứng: (chưa có)
+- [ ] Mời bạn cùng lớp đang ở Sảnh Bi-a (thấy trong 20 giây), lời mời hết hạn 60 giây, Nhận/Từ chối | bằng chứng: (chưa có)
+- [ ] Mã bàn 4 chữ số (tạo / nhập) | bằng chứng: (chưa có)
+- [ ] Nối lại (nhận trạng thái đầy đủ) — nghiệm thu: nối lại sau 10 giây | bằng chứng: (chưa có)
+- [ ] Rớt mạng > 60 giây: đơn ⇒ người còn lại thắng; đôi ⇒ ghế chuyển A.I, ván không tính Điểm bàn (G14) | bằng chứng: (chưa có)
+- [ ] 6 câu nhắn soạn sẵn | bằng chứng: (chưa có)
+- [ ] Bàn giao hữu với bạn (mọi em đã xong kế hoạch, còn lượt; không câu, không Điểm bàn) | bằng chứng: (chưa có)
+- [ ] Điểm bàn Elo K = 24, khởi đầu 1000, chỉ ván online với bạn toàn người | bằng chứng: (chưa có)
+- [ ] Phòng mô phỏng lại mọi cú (vat-ly + luat), 2 máy đánh hết 1 ván, băm trùng sau mỗi cú | bằng chứng: (chưa có)
+- [ ] Gói cau_xong giả (attempt không có hoặc sai) bị từ chối | bằng chứng: (chưa có)
+- [ ] Số lần đọc D1 mỗi ván ≤ số câu đã trả lời + 2 | bằng chứng: (chưa có)
+- [ ] Câu sai: phòng đổi lượt ngay khi nhận cau_xong sai | bằng chứng: (chưa có)
+- [ ] Sảnh Bi-a §8.2: nút "Đấu đơn với bạn", "Đánh đôi 2 đấu 2", "Nhập mã bàn", "Tự chơi với A.I"; danh sách bạn đang ở Sảnh + "Mời"; tấm lời mời đến | bằng chứng: (chưa có)
+- [ ] Không phá GĐ1 (ván A.I, giao hữu A.I chạy như cũ) + tsc + check:mau + build:cf 13/13 + toàn bộ vitest 0 đỏ mới so với main | bằng chứng: (chưa có)
+- [ ] Đẩy nhánh, báo Code app xếp lượt deploy (Worker có DO mới) | bằng chứng: (chưa có)
+
+## Việc thêm giữa chừng
+- [!] Thầy 28/09: "cho tôi thêm đặt thời gian bắt đầu chiến dịch nhé." | CHUYỂN LÀN: thuộc làn chiến dịch của phiên Code app (đang sửa src/components/chien-dich/*, srs2-sua.ts) — đã gửi nguyên văn + thiết kế (bảng phụ chien_dich_bat_dau, mốc = max(tao_luc, bat_dau), kế hoạch bỏ qua chiến dịch chưa tới ngày) qua trig_01WcrzMzpquwxrjoywqfDmta lúc 13:03 UTC; Code app báo thầy khi xong.
