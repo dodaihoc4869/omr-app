@@ -1,4 +1,5 @@
 import './exam-setup.css'
+import '../components/ca-thi/ca-thi.css'
 import { laBoDe12, rutDeChuan2026, SO_CAU_CHUAN_2026 } from '../lib/ma-tran-hoa-2026'
 // MỞ CA KIỂM TRA — tối giản theo yêu cầu thầy (2026-09-02): đề đã tự về từ
 // kho, link Apps Script đã cấu hình 1 lần ở màn Ngân hàng câu hỏi, nên màn
@@ -19,11 +20,8 @@ import {
   KeyRound,
   Zap,
   AlarmClock,
-  Globe,
-  Target,
   DoorOpen,
   Pointer,
-  Lock,
   Rocket,
 } from 'lucide-react'
 import NutQuayLai from '../components/NutQuayLai'
@@ -36,7 +34,6 @@ import { tachNhieuTheoPhan } from '../lib/tach-phan-de'
 import { randomSessionCode, taoLinkMoiTrucTiep } from '../lib/ca-link'
 import { layDiaChiMayChu } from '../lib/dia-chi-may-chu'
 import { voiHanCho } from '../lib/han-cho'
-import { TheNoiDung, NutChinh } from '../components/DesignSystem'
 import NutDongBo from '../components/NutDongBo'
 import { chuoi, danhSachEm, publishSession, type CongBoDiem, type PhamViCa } from '../lib/exam-api'
 import { docSoCauCa, loadAllSessionTeacherBanks, loadExamSources, loadTeacherSecret, luuCheDoDeRieng, luuKhoChuaCa, luuSoCauCa, saveSessionTeacherBank } from '../lib/exam-db'
@@ -46,10 +43,8 @@ import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
 import { canhBaoThieuSauLoc, chuBoTuLuanChiTiet, demCauTheoPhan, locTuLuanKhiMoCa } from '../lib/loc-tu-luan-mo-ca'
 import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
-import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { chonSanCaChot, chuBaoCaChot, docGoiCaChot, xoaGoiCaChot, type ChonSanCaChot } from '../lib/ca-chot-chien-dich'
 
-const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
 
 /** Cửa sổ VÀO PHÒNG (QUANLYCATHI mục 3): số phút sau giờ bắt đầu còn cho vào;
@@ -78,8 +73,6 @@ function gioHienThi(iso: string): string {
   return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
 }
 
-/** Biểu tượng đứng trước chữ trên nút/chip (thay emoji — app cấm emoji, chữ giữ nguyên). */
-const BIEU_TUONG_NHAN = { display: 'inline-block', verticalAlign: '-3px', marginRight: 5 } as const
 
 /** Chip chọn 1 trong nhiều (bắt đầu ngay/hẹn giờ, hạn vào phòng) — cùng kiểu với chip lớp. */
 function ChipChon({ chon, onClick, children }: { chon: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -127,7 +120,6 @@ export default function ExamSetupScreen() {
   const moChiTietCa = useAppStore((s) => s.moChiTietCa)
   const classList = useAppStore((s) => s.classList)
   // GAME HÓA 2.0 (RA-SOAT 28/09 mục 3): chỉ ĐỔI CHỮ cho dễ hiểu — luồng mở ca, phạm vi, link giữ nguyên.
-  const hoa2 = useHoa2Bat()
 
   const [scriptUrl, setScriptUrl] = useState('')
   const [savedSources, setSavedSources] = useState<TeacherExamSource[]>([])
@@ -417,467 +409,422 @@ export default function ExamSetupScreen() {
     })
   }
 
-  // ------------------------------------------------------------ CA ĐÃ MỞ
+  // ------------------------------------------------------------ CA ĐÃ MỞ (bản vẽ ca thi 28/09: link + mã ca để chép)
   if (opened) {
     return (
-      <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-        <h1 className="font-bold" style={{ fontSize: 'var(--cx-5)', fontFamily: 'var(--serif)' }}>
-          Ca kiểm tra đã mở
-        </h1>
-        <div className="text-center" style={{ background: 'var(--g1)', color: 'var(--giay)', borderRadius: 'var(--bo-3)', padding: 'var(--k6)', boxShadow: 'var(--bong-2)' }}>
-          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', opacity: 0.9 }}>Mã ca</div>
-          <div className="font-bold" style={{ ...SO, fontSize: 44, letterSpacing: '.18em' }}>
-            {opened.maCa}
+      <div className="gv-page ct" style={{ background: 'var(--gvm-nen)', minHeight: '100vh', padding: '16px clamp(12px, 3vw, 32px) 96px' }}>
+        <div className="ct-khung ct-da-mo" style={{ maxWidth: 640, margin: '0 auto' }}>
+          <div className="ct-dau">
+            <div>
+              <div className="ct-duong">Ca kiểm tra › Mở ca mới</div>
+              <h1>Ca kiểm tra đã mở</h1>
+            </div>
           </div>
-          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', opacity: 0.9 }}>
-            Lớp {lop.trim()} · {thoiGianPhut} phút · {tongCauDaChon} câu · {CACH_CONG_BO.find((c) => c.id === congBoDiem)?.ten}
+          <div className="ct-ve">
+            <div className="ct-ve-dau">
+              <div className="nho">Mã ca</div>
+              <h3 className="so" style={{ fontSize: 44, letterSpacing: '.18em' }}>
+                {opened.maCa}
+              </h3>
+            </div>
+            <dl>
+              <dt>Lớp</dt>
+              <dd>{lop.trim() || '—'}</dd>
+              <dt>Số câu</dt>
+              <dd className="so">
+                {tongCauDaChon} câu · {chuan2026 ? 50 : thoiGianPhut} phút
+              </dd>
+              <dt>Công bố điểm</dt>
+              <dd>{CACH_CONG_BO.find((c) => c.id === congBoDiem)?.ten}</dd>
+              <dt>Giờ</dt>
+              <dd className="so">
+                Bắt đầu {gioHienThi(opened.batDau) || 'ngay'} · vào phòng đến {opened.hetHanVao ? gioHienThi(opened.hetHanVao) : 'không giới hạn'}
+              </dd>
+              <dt>Ai làm</dt>
+              <dd>{phamVi === 'chon' ? `${chonSbd.size} em được mời` : phamVi === 'sbd' ? 'Chỉ em trong danh sách lớp' : 'Mọi em có link'}</dd>
+            </dl>
           </div>
-          <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', opacity: 0.9, marginTop: 'var(--k1)' }}>
-            Bắt đầu <b style={SO}>{gioHienThi(opened.batDau) || 'ngay'}</b> · vào phòng đến <b style={SO}>{opened.hetHanVao ? gioHienThi(opened.hetHanVao) : 'không giới hạn'}</b>
-            {phamVi === 'chon' ? ` · ${chonSbd.size} em được mời` : phamVi === 'sbd' ? ' · Cả lớp (SBD)' : ' · tự do'}
+          <div className="ct-tam">
+            <p className="ct-ghi">Gửi link này vào nhóm Zalo lớp — em mở link, gõ số báo danh là vào thi:</p>
+            <div className="ct-link" style={{ marginTop: 10, background: 'var(--gvm-mat-2)' }}>
+              <span className="mono" style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>
+                {opened.joinLink}
+              </span>
+            </div>
+            <div className="ct-hang-nut" style={{ marginTop: 12 }}>
+              <button type="button" className="ct-nut ct-nut-chinh" onClick={copyLink}>
+                {daCopy ? <Check size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />}
+                {daCopy ? 'Đã chép' : 'Chép link vào thi'}
+              </button>
+              <button
+                type="button"
+                className="ct-nut ct-nut-tong"
+                onClick={() => {
+                  void navigator.clipboard?.writeText(opened.maCa).then(() => showToast('Đã chép mã ca', 'success'))
+                }}
+              >
+                <Copy size={18} aria-hidden="true" />
+                Chép mã ca
+              </button>
+            </div>
           </div>
+          <button type="button" className="ct-nut ct-nut-chinh" onClick={() => moChiTietCa(opened.maCa)}>
+            Theo dõi bài nộp của ca này →
+          </button>
+          <NutQuayLai onClick={() => setOpened(null)} label="Mở ca khác" />
         </div>
-        <TheNoiDung>
-          <div style={NHAN_NHO}>Gửi link này vào nhóm Zalo lớp — em mở link, gõ số báo danh là vào thi:</div>
-          <div className="break-all" style={{ ...SO, fontSize: 'var(--cx-1)', background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', marginTop: 'var(--k2)', marginBottom: 'var(--k3)' }}>
-            {opened.joinLink}
-          </div>
-          <NutChinh onClick={copyLink}>
-            <span className="inline-flex items-center gap-2">
-              {daCopy ? <Check size={18} /> : <Copy size={18} />} {daCopy ? (hoa2 ? 'Đã chép' : 'Đã copy') : hoa2 ? 'Chép link vào thi' : 'Copy link mời vào thi'}
-            </span>
-          </NutChinh>
-        </TheNoiDung>
-        <NutChinh variant="phu" onClick={() => moChiTietCa(opened.maCa)}>
-          Theo dõi bài nộp của ca này →
-        </NutChinh>
-        <NutQuayLai onClick={() => setOpened(null)} label="Mở ca khác" />
       </div>
     )
   }
 
-  // ------------------------------------------------------------ SOẠN CA — GỌN 1 TRANG ĐIỆN THOẠI CHUẨN GOOGLE
+  // ------------------------------------------------------------ SOẠN CA — bản vẽ ca thi 28/09 (docs/ban-ve-ca-thi-2809, màn a): 4 bước Đề → Ai làm → Giờ → Luật + cột Xem trước
+  const phutCa = chuan2026 ? 50 : thoiGianPhut
+  const tenXemTruoc = tenCa.trim() || `${selectedSources.length === 1 ? selectedSources[0]!.maDe : 'Ca kiểm tra'}${lop.trim() ? ` · ${lop.trim()}` : ''}`
+  const siSoLop = lop.trim() ? classList.filter((r) => chuoi(r.lop).trim() === lop.trim()).length : 0
+  const chuAiLam = phamVi === 'chon' ? `${chonSbd.size} em được chọn` : phamVi === 'sbd' ? `${lop.trim() || 'Lớp'}${siSoLop ? ` · ${siSoLop} em` : ''} trong danh sách` : 'Mọi em có link'
+  const mocMo = (() => {
+    const t = batDauCach === 'hen' ? new Date(batDauLocal).getTime() : Date.now()
+    return Number.isFinite(t) ? t : Date.now()
+  })()
+  const gioMoc = (ms: number) => new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  const mocHetVao = hanVaoPhut > 0 ? mocMo + hanVaoPhut * 60000 : null
+  const mocEmCuoi = (mocHetVao ?? mocMo) + phutCa * 60000
+  const phongChoBat = phongCho || deRiengBat || dongBoGio
+  const cheDoDe = chuan2026 ? 'chuan' : deRiengBat ? 'rieng' : boRut ? 'rut' : 'nguyen'
+  const LUAT: { id: CongBoDiem; ten: string; mota: string }[] = [
+    { id: 'ngay', ten: 'Ngay khi em nộp', mota: 'Em nộp sớm có thể kể đáp án cho bạn đang làm.' },
+    { id: 'ca_lop_xong', ten: 'Khi cả lớp nộp xong', mota: 'Em nộp xong thấy "đang chờ cả lớp".' },
+    { id: 'khong', ten: 'Thầy công bố sau', mota: 'Thầy xem trước, rồi bấm Công bố điểm ở màn Kết thúc ca.' },
+  ]
   return (
-    <div className="gv-page max-w-2xl mx-auto px-3 py-3 sm:py-4 flex flex-col gap-2.5 sm:gap-3" style={{ background: 'var(--nen)', color: 'var(--muc)', fontFamily: 'var(--sans)' }}>
-      {/* HEADER COMPACT */}
-      <div className="flex items-center justify-between gap-2 pb-1">
-        <div className="flex items-center gap-2">
-          <NutQuayLai onClick={() => setScreen('lichsuca')} label="Ca kiểm tra" />
-          <h1 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
-            Mở ca kiểm tra
-          </h1>
-        </div>
-        <NutDongBo
-          onXong={(kq) => {
-            if (kq.moi.length + kq.capNhat.length > 0) loadExamSources().then(setSavedSources)
-            if (kq.canXem.length > 0) showToast(`${kq.canXem.length} câu nghi đáp án — xem ở Ngân hàng câu hỏi`, 'error')
-          }}
-        />
-      </div>
-
-      {caChot && (
-        <div role="status" data-khoi="ca-chot" className="px-4 py-3 rounded-2xl text-sm font-semibold bg-[color:var(--m3-primary-container)] text-[color:var(--m3-on-primary-container)]">
-          {chuBaoCaChot(caChot, kqCaChot)}
-        </div>
-      )}
-
-      {/* THẺ 1: ĐỀ KIỂM TRA */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs">
-        <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950/70 text-[color:var(--m3-primary)] border border-blue-200/80 dark:border-blue-800 flex items-center justify-center shrink-0 shadow-2xs">
-              <Library size={18} />
-            </div>
-            <div className="min-w-0">
-              <div className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                {selectedSources.length > 0
-                  ? `${selectedSources.length} đề đã chọn · ${tongCauDaChon} câu${soCauTrung > 0 ? ` (lọc trùng ${soCauTrung})` : ''}`
-                  : 'Chưa chọn đề kiểm tra'}
-              </div>
-              <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-                {chuan2026 ? 'Bộ đề 12 · Chuẩn cấu trúc 2026 (50 phút)' : soCauRaDe ? `Chế độ rút: ${soCauRaDe.I} câu I · ${soCauRaDe.II} câu II · ${soCauRaDe.III} câu III` : 'Lấy nguyên vẹn toàn bộ câu trong đề'}
-              </div>
-            </div>
+    <div className="gv-page ct" style={{ background: 'var(--gvm-nen)', color: 'var(--gvm-chu)', fontFamily: 'var(--sans)' }}>
+      <div className="ct-khung" style={{ maxWidth: 1320, margin: '0 auto', padding: '16px clamp(12px, 3vw, 32px) 64px' }}>
+        <div className="ct-dau">
+          <div>
+            <div className="ct-duong">Ca kiểm tra › Mở ca mới</div>
+            <h1>Mở ca kiểm tra</h1>
+            <p>Bốn việc, đi từ trên xuống. Mọi thứ khác đã có giá trị sẵn.</p>
           </div>
-
-          <div className="flex items-center gap-2 shrink-0 ml-auto">
-            {!chuan2026 && selectedSources.length > 0 && (
-              <button
-                type="button"
-                onClick={() => setHienRutDe(true)}
-                className="tap-target px-3.5 py-2 rounded-xl text-xs font-semibold bg-amber-50/70 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/80 hover:bg-amber-100/70 cursor-pointer transition active:scale-95 shadow-2xs"
-              >
-                {boRut ? `Rút ${tongCauDaChon} câu` : 'Rút câu'}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => setHienChonDe(true)}
-              className="tap-target px-4 py-2 rounded-xl text-xs font-bold bg-blue-50 dark:bg-blue-950/70 text-[color:var(--m3-primary)] dark:text-blue-300 border border-blue-200/90 dark:border-blue-800 hover:bg-blue-100/70 cursor-pointer transition active:scale-95 shadow-2xs"
-            >
-              {selectedSources.length > 0 ? 'Đổi đề khác' : 'Chọn đề kiểm tra'}
-            </button>
-          </div>
-        </div>
-        {(chuBoTuLuan || canhBaoThieu.length > 0) && (
-          <div className="mt-3 space-y-1" role="status">
-            {chuBoTuLuan && <div className="text-xs text-amber-700 dark:text-amber-300">{chuBoTuLuan}</div>}
-            {canhBaoThieu.map((c) => (
-              <div key={c} className="text-xs font-semibold text-red-600 dark:text-red-400">
-                {c}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* THẺ 2: LỚP HỌC & THỜI GIAN LÀM BÀI */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-4">
-        {/* Hàng 1: Chọn lớp học */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-              Lớp kiểm tra:
-            </span>
-            <span className="text-[11px] text-slate-400">Chọn nhanh hoặc nhập tên lớp</span>
-          </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-            {dsLop.map((l) => {
-              const chon = lop.trim() === l
-              return (
-                <button
-                  key={l}
-                  type="button"
-                  onClick={() => setLop(l)}
-                  className={`tap-target text-xs font-semibold px-3.5 py-1.5 rounded-xl shrink-0 transition-[transform,background-color,box-shadow,opacity] cursor-pointer active:scale-95 ${
-                    chon
-                      ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
-                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  {l}
-                </button>
-              )
-            })}
-            <input
-              aria-label="Lớp của ca kiểm tra"
-              placeholder="Nhập lớp…"
-              value={lop}
-              onChange={(e) => setLop(e.target.value)}
-              className="h-8 w-28 px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white shrink-0 outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
-            />
-            <input
-              aria-label="Tên ca kiểm tra"
-              placeholder="Tên ca (tùy chọn, ví dụ: 15 Phút Số 1)"
-              value={tenCa}
-              onChange={(e) => setTenCa(e.target.value)}
-              className="h-8 flex-1 min-w-[140px] px-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 truncate"
-            />
-          </div>
-        </div>
-
-        {/* Hàng 2: Thời gian làm bài & Bắt đầu */}
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-          {/* Thời lượng làm bài */}
-          <div className="space-y-1.5">
-            <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-              Thời gian làm bài:
-            </div>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {[15, 45, 50, 90].map((ph) => {
-                const chon = (chuan2026 ? 50 : thoiGianPhut) === ph
-                return (
-                  <button
-                    key={ph}
-                    type="button"
-                    disabled={chuan2026}
-                    onClick={() => setThoiGianPhut(ph)}
-                    className={`tap-target text-xs font-semibold px-3 py-1.5 rounded-xl transition-[transform,background-color,box-shadow,opacity] cursor-pointer active:scale-95 ${
-                      chon
-                        ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
-                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    {ph} phút
-                  </button>
-                )
-              })}
-              {!chuan2026 && (
-                <div className="flex items-center gap-1 text-xs text-slate-500">
-                  <input
-                    type="number"
-                    min={1}
-                    aria-label="Số phút làm bài"
-                    value={thoiGianPhut}
-                    onChange={(e) => setThoiGianPhut(Number(e.target.value))}
-                    className="h-8 w-14 px-1.5 text-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-1 focus:ring-blue-500"
-                  />
-                  <span>phút</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Lựa chọn bắt đầu ngay / hẹn giờ */}
-          <div className="space-y-1.5">
-            <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-              Thời điểm bắt đầu:
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setBatDauCach('ngay')}
-                className={`tap-target flex-1 text-xs font-semibold py-1.5 px-3 rounded-xl transition-[transform,background-color,box-shadow,opacity] cursor-pointer active:scale-95 text-center ${
-                  batDauCach === 'ngay'
-                    ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
-                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <Zap size={14} aria-hidden="true" style={BIEU_TUONG_NHAN} />
-                Bắt đầu ngay
-              </button>
-              <button
-                type="button"
-                onClick={() => setBatDauCach('hen')}
-                className={`tap-target flex-1 text-xs font-semibold py-1.5 px-3 rounded-xl transition-[transform,background-color,box-shadow,opacity] cursor-pointer active:scale-95 text-center ${
-                  batDauCach === 'hen'
-                    ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
-                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                }`}
-              >
-                <AlarmClock size={14} aria-hidden="true" style={BIEU_TUONG_NHAN} />
-                Hẹn giờ mở
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {batDauCach === 'hen' && (
-          <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80">
-            <div className="text-xs text-slate-500 dark:text-slate-400 block mb-1">
-              Chọn thời điểm tự động mở ca (ngày/tháng/năm, giờ 24 giờ):
-            </div>
-            <ONgayGio24 nhan="Thời điểm tự động mở ca" value={batDauLocal} onChange={setBatDauLocal} muiGio="may" />
-          </div>
-        )}
-      </div>
-
-      {/* THẺ 3: QUY CHẾ THI & BẢO MẬT */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs space-y-4">
-        {/* Phạm vi tham gia */}
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-              Phạm vi học sinh tham gia:
-            </span>
-            <span className="text-[11px] text-slate-400">{hoa2 ? 'Ai được vào' : 'Quy định quyền truy cập'}</span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { id: 'tu_do', Icon: Globe, label: hoa2 ? 'Mọi em có link' : 'Tự do' },
-              { id: 'sbd', Icon: Users, label: hoa2 ? 'Chỉ em trong danh sách lớp' : 'SBD cả lớp' },
-              { id: 'chon', Icon: Target, label: `Chọn em${chonSbd.size > 0 ? ` (${chonSbd.size})` : ''}` },
-            ].map((p) => {
-              const chon = phamVi === p.id
-              return (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => {
-                    setPhamVi(p.id as PhamViCa)
-                    if (p.id === 'chon') setHienChonEm(true)
-                  }}
-                  className={`tap-target text-xs font-semibold py-2 px-2.5 rounded-xl transition-[transform,background-color,box-shadow,opacity] flex items-center justify-center gap-[5px] leading-tight text-center cursor-pointer active:scale-95 ${
-                    chon
-                      ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
-                      : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <p.Icon size={14} aria-hidden="true" className="shrink-0" />
-                  <span>{p.label}</span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-
-        <label className="flex items-start gap-3 rounded-xl border border-slate-200 dark:border-slate-700 p-3">
-          <input type="checkbox" role="switch" aria-label="Đồng bộ giờ cả phòng" checked={dongBoGio}
-            onChange={e => setDongBoGio(e.target.checked)} className="mt-1 h-5 w-5" />
-          <span className="text-sm text-slate-800 dark:text-slate-200"><b>Đồng bộ giờ cả phòng</b><br />
-            Bật sẽ dùng phòng chờ. Cả phòng tính giờ từ lúc thầy bấm Bắt đầu thi và cùng hết giờ; em vào muộn chỉ còn thời gian chung.
-          </span>
-        </label>
-
-        {/* 2 Chế độ kiểm soát phòng thi */}
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5">
-          <div className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-            Kiểm soát phòng thi:
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <button
-              type="button"
-              disabled={deRiengBat || dongBoGio}
-              onClick={() => !deRiengBat && setPhongCho((v) => !v)}
-              className={`tap-target p-3 rounded-xl border text-left transition-[transform,background-color,box-shadow,opacity] cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
-                phongCho || deRiengBat || dongBoGio
-                  ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 shadow-2xs'
-                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
-              } ${deRiengBat ? 'opacity-80 cursor-not-allowed' : ''}`}
-            >
-              <div className="min-w-0">
-                <div className="text-xs font-bold flex items-center gap-1.5">
-                  <DoorOpen size={14} aria-hidden="true" />
-                  <span>Phòng chờ phát đề</span>
-                </div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  {deRiengBat ? 'Bật sẵn và không tắt được (Đề riêng từng em)' : 'Chờ Thầy bấm Bắt đầu mới đếm ngược'}
-                </div>
-              </div>
-              <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                  phongCho || deRiengBat || dongBoGio
-                    ? 'bg-blue-200/80 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-                    : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
-                }`}
-              >
-                {phongCho || deRiengBat || dongBoGio ? 'BẬT' : 'TẮT'}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setGiuDeDoc((v) => {
-                  const moi = !v
-                  if (moi) {
-                    setAnHanGiay(3)
-                  }
-                  return moi
-                })
+          <div className="ct-hang-nut" style={{ alignItems: 'center' }}>
+            <NutQuayLai onClick={() => setScreen('lichsuca')} label="Ca kiểm tra" />
+            <NutDongBo
+              onXong={(kq) => {
+                if (kq.moi.length + kq.capNhat.length > 0) loadExamSources().then(setSavedSources)
+                if (kq.canXem.length > 0) showToast(`${kq.canXem.length} câu nghi đáp án — xem ở Ngân hàng câu hỏi`, 'error')
               }}
-              className={`tap-target p-3 rounded-xl border text-left transition-[transform,background-color,box-shadow,opacity] cursor-pointer flex items-center justify-between gap-2 active:scale-98 ${
-                giuDeDoc
-                  ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-300 dark:border-blue-700 text-blue-800 dark:text-blue-200 shadow-2xs'
-                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100'
-              }`}
-            >
-              <div className="min-w-0">
-                <div className="text-xs font-bold flex items-center gap-1.5">
-                  <Pointer size={14} aria-hidden="true" />
-                  <span>Giữ để đọc đề</span>
-                </div>
-                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Chống chụp ảnh đề & chia sẻ · Mặc định 3s
-                </div>
-              </div>
-              <span
-                className={`text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
-                  giuDeDoc
-                    ? 'bg-blue-200/80 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-                    : 'bg-slate-200/80 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
-                }`}
-              >
-                {giuDeDoc ? 'BẬT (3s)' : 'TẮT'}
-              </span>
-            </button>
+            />
           </div>
         </div>
 
-        {/* Công bố điểm & Hạn vào phòng */}
-        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
-          <div className="space-y-1.5">
-            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">
-              Công bố kết quả điểm:
-            </span>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: 'khong', Icon: Lock, label: 'Không hiện' },
-                { id: 'ngay', Icon: Zap, label: 'Khi nộp bài' },
-                { id: 'ca_lop_xong', Icon: Users, label: 'Cả lớp xong' },
-              ].map((c) => {
-                const chon = congBoDiem === c.id
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setCongBoDiem(c.id as CongBoDiem)}
-                    className={`tap-target text-xs font-semibold py-1.5 px-2 rounded-xl transition-[transform,background-color,box-shadow,opacity] flex items-center justify-center gap-[5px] leading-tight text-center cursor-pointer active:scale-95 ${
-                      chon
-                        ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
-                        : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    <c.Icon size={14} aria-hidden="true" className="shrink-0" />
-                    <span>{c.label}</span>
+        {caChot && (
+          <div role="status" data-khoi="ca-chot" className="ct-tam" style={{ background: 'var(--gvm-xd-nen)', color: 'var(--gvm-xd-dam)', fontWeight: 600, padding: '12px 18px' }}>
+            {chuBaoCaChot(caChot, kqCaChot)}
+          </div>
+        )}
+
+        <div className="ct-moca">
+          <div className="ct-tam">
+            {/* BƯỚC 1 — ĐỀ */}
+            <div className="ct-buoc c-xd">
+              <div className="so-b">1</div>
+              <div style={{ minWidth: 0 }}>
+                <h3>Đề</h3>
+                <p className="ct-ghi">Chọn một đề trong kho. Câu tự luận tự được lọc bỏ.</p>
+                <div className="ct-de-chon">
+                  <div className="bia" aria-hidden="true">
+                    <Library size={22} />
+                  </div>
+                  <div className="tt">
+                    <b>
+                      {selectedSources.length > 0
+                        ? `${selectedSources.length === 1 ? selectedSources[0]!.maDe : `${selectedSources.length} đề đã chọn`} · ${tongCauDaChon} câu${soCauTrung > 0 ? ` (lọc trùng ${soCauTrung})` : ''}`
+                        : 'Chưa chọn đề kiểm tra'}
+                    </b>
+                    {selectedSources.length > 0 && (
+                      <div className="ct-ghi so">{chuan2026 ? 'Bộ đề 12 · Chuẩn cấu trúc 2026 (50 phút)' : soCauRaDe ? `Chế độ rút: ${soCauRaDe.I} câu I · ${soCauRaDe.II} câu II · ${soCauRaDe.III} câu III` : 'Lấy nguyên vẹn toàn bộ câu trong đề'}</div>
+                    )}
+                    <div className="ct-pha">
+                      {selectedSources.length > 0 ? (
+                        <>
+                          {(() => {
+                            const d = soCauRaDe ?? demCauTheoPhan(locMoCa.nguon)
+                            return (
+                              <>
+                                {d.I > 0 && <span className="ct-nhan n-xd so">Phần I · {d.I} câu</span>}
+                                {d.II > 0 && <span className="ct-nhan n-tim so">Phần II · {d.II} câu</span>}
+                                {d.III > 0 && <span className="ct-nhan n-xl so">Phần III · {d.III} câu</span>}
+                              </>
+                            )
+                          })()}
+                          {chuan2026 && <span className="ct-nhan n-hp">Chuẩn cấu trúc 2026 · 50 phút</span>}
+                        </>
+                      ) : (
+                        <span className="ct-ghi">Bấm Chọn đề kiểm tra.</span>
+                      )}
+                    </div>
+                  </div>
+                  <button type="button" className="ct-nut ct-nut-vien ct-nut-nho" onClick={() => setHienChonDe(true)}>
+                    {selectedSources.length > 0 ? 'Đổi đề khác' : 'Chọn đề kiểm tra'}
                   </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between gap-3 pt-1 text-xs flex-wrap">
-            <button
-              type="button"
-              onClick={() => setHienNangCao(true)}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 text-slate-700 dark:text-slate-300 font-semibold cursor-pointer tap-target transition shadow-2xs"
-            >
-              <Settings2 size={15} className="text-[color:var(--m3-primary)]" />
-              <span>Nâng cao: {nguongLan}l rời · {matKhauCa ? 'có mật khẩu' : 'không MK'}</span>
-            </button>
-
-            <div className="flex items-center gap-1.5 text-xs text-slate-500">
-              <span className="font-semibold text-slate-600 dark:text-slate-400">Hạn vào phòng:</span>
-              <div className="flex items-center gap-1">
-                {HAN_VAO_CHON.map((h) => {
-                  const chon = hanVaoPhut === h.phut
-                  return (
-                    <button
-                      key={h.phut}
-                      type="button"
-                      onClick={() => setHanVaoPhut(h.phut)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer transition ${
-                        chon
-                          ? 'bg-blue-50 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 font-bold shadow-2xs'
-                          : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      {h.phut ? `${h.phut}'` : '∞'}
+                </div>
+                {!chuan2026 && selectedSources.length > 0 && (
+                  <div className="ct-hang-chip" style={{ marginTop: 10 }} role="group" aria-label="Cách lấy câu">
+                    <button type="button" className="ct-chip" aria-pressed={cheDoDe === 'nguyen'} onClick={() => setBoRut(null)}>
+                      Lấy nguyên đề
                     </button>
-                  )
-                })}
+                    <button type="button" className="ct-chip" aria-pressed={cheDoDe === 'rut'} onClick={() => setHienRutDe(true)}>
+                      {boRut && !deRiengBat ? `Rút ${tongCauDaChon} câu` : 'Rút câu'}
+                    </button>
+                    <button type="button" className="ct-chip" aria-pressed={cheDoDe === 'rieng'} onClick={() => setHienRutDe(true)}>
+                      Mỗi em một bộ câu riêng
+                    </button>
+                  </div>
+                )}
+                {(chuBoTuLuan || canhBaoThieu.length > 0) && (
+                  <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 4 }} role="status">
+                    {chuBoTuLuan && <div className="ct-ghi">{chuBoTuLuan}</div>}
+                    {canhBaoThieu.map((c) => (
+                      <div key={c} style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--gvm-ho)' }}>
+                        {c}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* BƯỚC 2 — AI LÀM */}
+            <div className="ct-buoc c-tim">
+              <div className="so-b">2</div>
+              <div style={{ minWidth: 0 }}>
+                <h3>Ai làm</h3>
+                <p className="ct-ghi">Chọn lớp, rồi chọn ai được vào.</p>
+                <div className="ct-hang-chip" role="group" aria-label="Lớp">
+                  {dsLop.map((l) => {
+                    const n = classList.filter((r) => chuoi(r.lop).trim() === l).length
+                    return (
+                      <button key={l} type="button" className="ct-chip so" aria-pressed={lop.trim() === l} onClick={() => setLop(l)}>
+                        {l}
+                        {n ? ` · ${n} em` : ''}
+                      </button>
+                    )
+                  })}
+                  <input aria-label="Lớp của ca kiểm tra" placeholder="Nhập lớp…" value={lop} onChange={(e) => setLop(e.target.value)} className="ct-chip" style={{ width: 140, cursor: 'text' }} />
+                </div>
+                {/* Phạm vi học sinh tham gia — BA chế độ (thầy chốt 07/09; "Theo khối" đã bỏ). */}
+                <div className="ct-hang-chip" style={{ marginTop: 10 }} role="group" aria-label="Ai được vào">
+                  {[
+                    { id: 'tu_do', label: 'Mọi em có link' },
+                    { id: 'sbd', label: 'Chỉ em trong danh sách lớp' },
+                    { id: 'chon', label: `Chọn từng em…${chonSbd.size > 0 ? ` (${chonSbd.size})` : ''}` },
+                  ].map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      className="ct-chip"
+                      aria-pressed={phamVi === p.id}
+                      onClick={() => {
+                        setPhamVi(p.id as PhamViCa)
+                        if (p.id === 'chon') setHienChonEm(true)
+                      }}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* BƯỚC 3 — GIỜ */}
+            <div className="ct-buoc c-hp">
+              <div className="so-b">3</div>
+              <div style={{ minWidth: 0 }}>
+                <h3>Giờ</h3>
+                <p className="ct-ghi">Thời gian làm bài · lúc bắt đầu · hạn vào phòng.</p>
+                <div className="ct-hang-chip" role="group" aria-label="Thời gian làm bài">
+                  {[15, 45, 50, 90].map((ph) => (
+                    <button key={ph} type="button" className="ct-chip so" aria-pressed={phutCa === ph} disabled={chuan2026} onClick={() => setThoiGianPhut(ph)}>
+                      {ph} phút
+                    </button>
+                  ))}
+                  {!chuan2026 && (
+                    <label className="ct-chip so" style={{ cursor: 'text' }}>
+                      <input type="number" min={1} aria-label="Số phút làm bài" value={thoiGianPhut} onChange={(e) => setThoiGianPhut(Number(e.target.value))} style={{ width: 52, border: 0, background: 'transparent', font: 'inherit', color: 'inherit', textAlign: 'center' }} />
+                      phút
+                    </label>
+                  )}
+                </div>
+                <div className="ct-hang-chip" style={{ marginTop: 10 }} role="group" aria-label="Lúc bắt đầu và hạn vào phòng">
+                  <button type="button" className="ct-chip" aria-pressed={batDauCach === 'ngay'} onClick={() => setBatDauCach('ngay')}>
+                    <Zap size={14} aria-hidden="true" />
+                    Bắt đầu ngay
+                  </button>
+                  <button type="button" className="ct-chip" aria-pressed={batDauCach === 'hen'} onClick={() => setBatDauCach('hen')}>
+                    <AlarmClock size={14} aria-hidden="true" />
+                    Hẹn giờ…
+                  </button>
+                  <span style={{ width: 8 }} />
+                  {HAN_VAO_CHON.map((h) => (
+                    <button key={h.phut} type="button" className="ct-chip so" aria-pressed={hanVaoPhut === h.phut} onClick={() => setHanVaoPhut(h.phut)}>
+                      {h.phut ? `Vào trong ${h.phut} phút` : 'Không giới hạn'}
+                    </button>
+                  ))}
+                </div>
+                {batDauCach === 'hen' && (
+                  <div style={{ marginTop: 10 }}>
+                    <div className="ct-ghi" style={{ marginBottom: 4 }}>
+                      Chọn thời điểm tự động mở ca (ngày/tháng/năm, giờ 24 giờ):
+                    </div>
+                    <ONgayGio24 nhan="Thời điểm tự động mở ca" value={batDauLocal} onChange={setBatDauLocal} muiGio="may" />
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* BƯỚC 4 — LUẬT */}
+            <div className="ct-buoc c-xl">
+              <div className="so-b">4</div>
+              <div style={{ minWidth: 0 }}>
+                <h3>Luật</h3>
+                <p className="ct-ghi">Khi nào em thấy điểm. "Thầy công bố sau" thì bấm Công bố điểm khi ca kết thúc.</p>
+                <div className="ct-o-luat" role="group" aria-label="Công bố điểm">
+                  {LUAT.map((c) => (
+                    <button key={c.id} type="button" className="ct-luat" aria-pressed={congBoDiem === c.id} onClick={() => setCongBoDiem(c.id)}>
+                      <b>{c.ten}</b>
+                      <span>{c.mota}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="ct-bao-ve">
+                  <span className="ct-ghi" style={{ fontWeight: 700, color: 'var(--gvm-chu-2)' }}>
+                    Chống gian lận:
+                  </span>
+                  <span className={`ct-nhan ${giuDeDoc ? 'n-xl' : 'n-xam'}`}>{giuDeDoc ? `Giữ để đọc đề (nhả tay ${anHanGiay} giây)` : 'Giữ để đọc đề: tắt'}</span>
+                  <span className="ct-nhan n-xl so">Rời màn {nguongLan} lần thì khoá bài</span>
+                  <span className="ct-nhan n-xl so">Rời màn quá {nguongGiay} giây thì khoá bài</span>
+                  <span className={`ct-nhan ${phongChoBat ? 'n-xl' : 'n-xam'}`}>Phòng chờ: {phongChoBat ? 'bật' : 'tắt'}</span>
+                  {dongBoGio && <span className="ct-nhan n-xl">Đồng bộ giờ cả phòng</span>}
+                  {matKhauCa && <span className="ct-nhan n-xl">Có mật khẩu ca</span>}
+                  {chiNop3PhutCuoi && <span className="ct-nhan n-xl">Chỉ nộp trong 3 phút cuối</span>}
+                </div>
+                <details className="ct-them">
+                  <summary>Thêm tuỳ chọn…</summary>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <span className="ct-ghi">Tên ca (để trống thì tự đặt theo đề và lớp)</span>
+                      <input aria-label="Tên ca kiểm tra" placeholder="Ví dụ: Kiểm tra tuần 4" value={tenCa} onChange={(e) => setTenCa(e.target.value)} className="ct-chip" style={{ cursor: 'text', width: '100%' }} />
+                    </label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+                      {/* Mỗi công tắc là MỘT nút cả hàng (tiêu đề + mô tả + nhãn BẬT/TẮT trong nút). */}
+                      <button type="button" className="tap-target ct-luat" aria-pressed={phongChoBat} disabled={deRiengBat || dongBoGio} onClick={() => !deRiengBat && setPhongCho((v) => !v)}>
+                        <b style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <DoorOpen size={14} aria-hidden="true" />
+                          <span>Phòng chờ phát đề</span>
+                          <em className="ct-nhan n-xam" style={{ fontStyle: 'normal', marginLeft: 'auto' }}>{phongCho || deRiengBat || dongBoGio ? 'BẬT' : 'TẮT'}</em>
+                        </b>
+                        <span>{deRiengBat ? 'Bật sẵn và không tắt được (Đề riêng từng em)' : 'Chờ Thầy bấm Bắt đầu mới đếm ngược'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={`tap-target ct-luat`}
+                        aria-pressed={giuDeDoc}
+                        onClick={() => {
+                          setGiuDeDoc((v) => {
+                            const moi = !v
+                            if (moi) {
+                              setAnHanGiay(3)
+                            }
+                            return moi
+                          })
+                        }}
+                      >
+                        <b style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <Pointer size={14} aria-hidden="true" />
+                          <span>Giữ để đọc đề</span>
+                          <em className="ct-nhan n-xam" style={{ fontStyle: 'normal', marginLeft: 'auto' }}>{giuDeDoc ? 'BẬT (3s)' : 'TẮT'}</em>
+                        </b>
+                        <span>Chống chụp ảnh đề & chia sẻ · Mặc định 3s</span>
+                      </button>
+                    </div>
+                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, minHeight: 44 }}>
+                      <input type="checkbox" role="switch" aria-label="Đồng bộ giờ cả phòng" checked={dongBoGio} onChange={(e) => setDongBoGio(e.target.checked)} style={{ width: 20, height: 20, marginTop: 2 }} />
+                      <span style={{ fontSize: 14 }}>
+                        <b>Đồng bộ giờ cả phòng</b> — bật sẽ dùng phòng chờ. Cả phòng tính giờ từ lúc thầy bấm Bắt đầu thi và cùng hết giờ; em vào muộn chỉ còn thời gian chung.
+                      </span>
+                    </label>
+                    <button type="button" className="ct-nut ct-nut-vien ct-nut-nho" style={{ alignSelf: 'flex-start' }} onClick={() => setHienNangCao(true)}>
+                      <Settings2 size={16} aria-hidden="true" />
+                      Mức rời màn · mật khẩu ca · chỉ nộp phút cuối · ân hạn nhả tay
+                    </button>
+                  </div>
+                </details>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* NÚT MỞ CA KIỂM TRA — NỔI BẬT, TRANG NHÃ CHUẨN GOOGLE */}
-      <div className="pt-2">
-        <button
-          type="button"
-          disabled={opening || selectedSources.length === 0}
-          onClick={handleOpenSession}
-          className="w-full py-4 px-6 rounded-2xl bg-[color:var(--m3-primary)] hover:opacity-90 text-[color:var(--m3-on-primary)] font-bold text-sm sm:text-base shadow-md hover:shadow-lg transition-[transform,background-color,box-shadow,opacity] active:scale-[0.99] disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2.5"
-        >
-          {opening ? (
-            <>
-              <RefreshCw size={19} className="animate-spin" />
-              <span role="status">{buocMoCa}</span>
-            </>
-          ) : (
-            <>
-              <Rocket size={18} aria-hidden="true" />
-              <span>Mở ca kiểm tra ngay</span>
-              <span className="text-xs sm:text-sm font-normal opacity-90 pl-1 border-l border-white/30">
-                {lop.trim() || 'Chưa chọn lớp'} · {tongCauDaChon} câu · {chuan2026 ? 50 : thoiGianPhut} phút
-              </span>
-            </>
-          )}
-        </button>
-        {loiMoCa && <p role="alert" className="mt-3 rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-800">{loiMoCa}</p>}
+          <aside className="ct-xem-truoc" aria-label="Xem trước ca">
+            <div className="ct-ve">
+              <div className="ct-ve-dau">
+                <div className="nho">Xem trước · ca sẽ mở</div>
+                <h3>{tenXemTruoc}</h3>
+              </div>
+              <dl>
+                <dt>Đề</dt>
+                <dd>{selectedSources.length > 0 ? (selectedSources.length === 1 ? selectedSources[0]!.maDe : `${selectedSources.length} đề`) : 'Chưa chọn'}</dd>
+                <dt>Số câu</dt>
+                <dd className="so">{tongCauDaChon} câu · 10 điểm</dd>
+                <dt>Ai làm</dt>
+                <dd>{chuAiLam}</dd>
+                <dt>Thời gian</dt>
+                <dd className="so">{phutCa} phút</dd>
+                <dt>Công bố điểm</dt>
+                <dd>{LUAT.find((c) => c.id === congBoDiem)?.ten}</dd>
+              </dl>
+              <div className="ct-dong-thoi">
+                <div className="c-xd">
+                  <b className="so">{gioMoc(mocMo)}</b>Mở
+                </div>
+                <div className="c-hp">
+                  <b className="so">{mocHetVao ? gioMoc(mocHetVao) : '—'}</b>Hết giờ vào
+                </div>
+                <div className="c-xl">
+                  <b className="so">{mocHetVao ? gioMoc(mocEmCuoi) : '—'}</b>Em cuối nộp
+                </div>
+              </div>
+              <div className="cuoi">
+                <button type="button" className="ct-nut ct-nut-chinh" disabled={opening || selectedSources.length === 0} onClick={handleOpenSession}>
+                  {opening ? (
+                    <>
+                      <RefreshCw size={18} className="animate-spin" aria-hidden="true" />
+                      <span role="status">{buocMoCa}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Rocket size={18} aria-hidden="true" />
+                      Mở ca kiểm tra ngay
+                    </>
+                  )}
+                </button>
+                {loiMoCa && (
+                  <p role="alert" style={{ borderRadius: 14, background: 'var(--gvm-ho-nen)', color: 'var(--gvm-ho-dam)', padding: 12, fontSize: 14 }}>
+                    {loiMoCa}
+                  </p>
+                )}
+                <p className="ct-ghi" style={{ textAlign: 'center' }}>
+                  Mở xong có ngay link + mã ca để gửi nhóm lớp.
+                </p>
+              </div>
+            </div>
+            <div className="ct-tam" style={{ padding: '16px 18px' }}>
+              <div className="ct-ghi" style={{ fontWeight: 700, color: 'var(--gvm-chu-2)', marginBottom: 6 }}>
+                Em sẽ thấy khi vào
+              </div>
+              <p style={{ fontSize: 14 }}>
+                Gõ số báo danh → máy hiện tên em → em bấm <b>Bắt đầu</b>. {phongChoBat ? 'Em chờ ở phòng chờ tới khi thầy bấm Bắt đầu thi.' : `Đồng hồ ${phutCa} phút chạy từ lúc em nhận đề.`}
+              </p>
+            </div>
+          </aside>
+        </div>
       </div>
 
       {/* MODAL 1: CHỌN ĐỀ KIỂM TRA (NGÂN HÀNG CÂY THƯ MỤC) */}

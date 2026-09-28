@@ -1,0 +1,128 @@
+/* THẺ LỌC DÙNG CHUNG (thầy 28/09: "mấy cái thẻ này làm tinh tế gọn gàng sạch sẽ đẹp trực quan, chỗ nào có kiểu này sửa lại hết").
+ * MỘT kiểu cho mọi hàng thẻ lọc/chọn của 3 app + game. Nạp toàn cục ở main.tsx. Không hex: chỉ token.
+ *
+ *   <div class="tl-hang" role="group" aria-label="Lọc theo lớp">
+ *     <span class="tl-nhan">Lớp</span>
+ *     <button class="tl-the" aria-pressed="true">Tất cả các lớp</button>
+ *     <button class="tl-the" aria-pressed="false"><span>12 - Lớp Thường</span><span class="tl-dem">66</span></button>
+ *   </div>
+ *
+ * - Viên mảnh 32 px, chữ 13/600, viền 1 px nhạt; vùng chạm vẫn ≥ 44 px nhờ ::after (không tăng chiều cao hiển thị).
+ * - Đang chọn (aria-pressed='true' hoặc data-chon): nền tông nhạt màu chủ (M3 secondary-container) + ✓ nhỏ, không viền.
+ * - Số đếm: huy hiệu nhỏ `.tl-dem` (nền pha 13 % màu chữ). Chữ ẩn `.tl-an` giữ câu đọc đủ cho máy đọc màn hình ("· 66 em").
+ * - Điện thoại: MỘT hàng cuộn ngang; máy tính (≥ 768 px): được xuống dòng gọn, gap 6 px. `.tl-hang--mot-dong` = luôn một hàng.
+ * - Màu đổi theo nơi dùng bằng biến --tl-* (mặc định lấy M3 nếu có, không thì token app) ⇒ sáng/tối tự theo token. */
+.tl-hang {
+  --tl-vien: var(--m3-outline, var(--vien-dam));
+  --tl-chu: var(--m3-on-surface-variant, var(--nhat));
+  --tl-chon-nen: var(--m3-secondary-container, var(--tim-nen));
+  --tl-chon-chu: var(--m3-on-secondary-container, var(--tim));
+  --tl-nhan-chu: var(--m3-on-surface-variant, var(--mo));
+  --tl-vong: var(--m3-primary, var(--tim));
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  /* chừa chỗ cho vòng focus + vùng chạm ::after, không bị cắt bởi overflow */
+  padding: 6px 2px;
+  margin: -6px -2px;
+}
+.tl-hang::-webkit-scrollbar { display: none; }
+@media (min-width: 768px) {
+  .tl-hang:not(.tl-hang--mot-dong) { flex-wrap: wrap; overflow: visible; row-gap: 8px; }
+}
+
+.tl-nhan {
+  flex: none;
+  margin-right: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tl-nhan-chu);
+  white-space: nowrap;
+}
+
+.tl-hang .tl-the {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-sizing: border-box;
+  height: 32px;
+  min-height: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0 12px;
+  border: 1px solid var(--tl-vien);
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--tl-chu);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+/* thẻ có huy hiệu số đếm: mép phải ôm huy hiệu */
+.tl-hang .tl-the:has(> .tl-dem:last-child) { padding-right: 5px; }
+/* vùng chạm ≥ 44 px mà không tăng chiều cao hiển thị */
+.tl-hang .tl-the::after { content: ""; position: absolute; inset: -6px -2px; }
+.tl-hang .tl-the:hover { background: color-mix(in srgb, var(--tl-chu) 8%, transparent); }
+.tl-hang .tl-the:focus-visible { outline: 2px solid var(--tl-vong); outline-offset: 2px; }
+.tl-hang .tl-the[aria-pressed='true'],
+.tl-hang .tl-the[data-chon='true'] {
+  padding-left: 9px;
+  border-color: transparent;
+  background: var(--tl-chon-nen);
+  color: var(--tl-chon-chu);
+  font-weight: 700;
+}
+.tl-hang .tl-the[aria-pressed='true']:hover,
+.tl-hang .tl-the[data-chon='true']:hover { background: color-mix(in srgb, var(--tl-chon-chu) 10%, var(--tl-chon-nen)); }
+.tl-hang .tl-the[aria-pressed='true']::before,
+.tl-hang .tl-the[data-chon='true']::before {
+  content: "✓";
+  margin-right: -2px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.tl-hang .tl-the:disabled { opacity: 0.5; cursor: default; }
+
+.tl-dem {
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 13%, transparent);
+  font-size: 11.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+/* chữ chỉ cho máy đọc màn hình (giữ câu đọc "12 - Lớp Thường · 66 em") */
+.tl-an {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (prefers-reduced-motion: reduce) { .tl-hang .tl-the { transition: none; } }
