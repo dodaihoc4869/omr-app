@@ -22,3 +22,9 @@ Không có: `window.alert`, `window.prompt`, `prompt(` của trình duyệt (ch�
 `src/components/hop-thoai.tsx`: `hoiXacNhan` → `Promise<boolean>`, `baoTin` → `Promise<void>`, `hoiNhap` → `Promise<string | null>`.
 Vẽ bằng `HopXacNhan` (lớp `hxn-*`, `hop-xac-nhan.css`), bọc vỏ `display: contents`: `.m3.vo-thay` ở app thầy, `.m3` ở HS/PH.
 Test: `tests/hop-thoai-app-2809.test.tsx`.
+
+## Kiểm (28/09)
+- `npx tsc -b`, tsc server, `npm run check:mau`: sạch. `npm run build:cf`: 13/13, precache 165 tệp / 2911 KB.
+- Vitest toàn bộ: 41 tệp đỏ ngoài `docs/nen-vitest-do-1909.txt`, chạy lại riêng vẫn đỏ, KHÔNG tệp nào chạm phần sửa
+  (vd. `m3-b-1909` đỏ do `m3-tuong-thich.css` sinh lệch sẵn trên origin/main; `khong-cu-phap-may-cu` do `chem-format-so-do.ts`).
+- Ảnh: hộp huỷ chiến dịch (thầy sáng/tối), xoá bài luyện (HS sáng/tối), báo tin (PH) ở 390 và 1440 — nền đặc, tiêu điểm ở nút an toàn, không tràn ngang.
