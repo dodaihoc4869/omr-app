@@ -98,6 +98,8 @@ export interface LamBaiNgangProps {
   tren?: ReactNode
   /** Tấm phủ Giữ để đọc (trongKhung) — phủ đúng khung đề. */
   phuDe?: ReactNode
+  /** Công cụ đặt cạnh cụm A−/A+ ở đầu cột đề (nút "Dịu mắt") — luôn thấy, kể cả toàn màn hình. */
+  congCu?: ReactNode
   children: ReactNode
 }
 
@@ -372,6 +374,7 @@ export default function LamBaiNgang(p: LamBaiNgangProps) {
                 {p.tong} câu · Phím tắt: bấm <kbd>?</kbd>
               </span>
             </div>
+            {p.congCu}
             <div className="lb-co-chu" role="group" aria-label="Cỡ chữ đề">
               <button type="button" onClick={() => doiCo(-1)} disabled={coChu <= CO_MIN} aria-label="Chữ đề nhỏ lại">
                 A−
