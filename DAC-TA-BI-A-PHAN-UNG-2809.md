@@ -404,7 +404,8 @@ Cửa trên Sảnh: thêm prop `onChoiBia` vào `SanhBanDoProps` (`SanhBanDo.tsx
 | Mở tấm câu | tiếng lật giấy | mở câu, mở Xem lại câu sai |
 | Thắng ván | kèn 4 nốt + hợp âm + tiếng vỗ tay | hạ Bi chốt đúng |
 
-- **KHÔNG có tiếng lăn trên nỉ** (thầy bỏ hẳn 28/09): bi đang lăn thì im; chỉ có tiếng va chạm, rơi lỗ và các tín hiệu trong bảng trên.
+- **KHÔNG có tiếng lăn trên nỉ** (thầy bỏ hẳn 28/09): bi đang lăn thì im; chỉ có tiếng va chạm, rơi lỗ và các tín hiệu trong bảng trên. Rơi lỗ không còn tiếng "ầm" kéo dài 0,7 giây.
+- **Cú phá bàn** (thầy 28/09): suốt lúc bi chạy của cú phá bàn CHỈ có tiếng bi chạm bi, phát **khô** (không gửi vang phòng — hàng chục đuôi vang chồng nhau nghe như bi lăn trên nỉ); không tiếng gậy, không tiếng dội băng, không tiếng rơi lỗ. Từ cú thứ hai trở đi đủ tiếng như bảng trên. Áp dụng cả trong bản vẽ `docs/ban-ve-bi-a-2809/bi-a-phan-ung.html` (nút thử "Phá bàn" cũng chỉ còn tiếng bi chạm bi; đã bỏ nút "Lăn trên nỉ").
 - Mở khoá âm thanh ở thao tác chạm/phím đầu tiên (luật trình duyệt). Tắt/bật: nút loa và phím M, dùng chung khoá `localStorage 'game-battle-muted'` qua `battleMuted()`/`setBattleMuted()` của `battle-audio.ts`. Tôn trọng máy đang tắt tiếng.
 - Bản vẽ có thẻ "Nghe thử từng tiếng" (16 nút) để thầy duyệt.
 
