@@ -79,6 +79,7 @@ import { LogoDoc } from '../components/LogoVai'
 const ThanThuHoaHocGame = lazy(() => import('../game/than-thu-v2/Game'))
 /** Màn "Câu đã làm" của Game Hóa 2.0 (kéo TheCau + phiếu in): nạp lười, chỉ em mở mới tải. */
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
+const BiaGame = lazy(() => import('../game/bi-a/BiaGame'))
 /** = KHOA_MAN_DAU của Game.tsx (test khoá khớp). KHÔNG import hằng ấy từ Game.tsx: sẽ kéo cả game vào gói chính, mất nạp lười. */
 const KHOA_MAN_DAU_GAME = 'game-v2:man-dau'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
@@ -187,7 +188,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam'
+type TabType = 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -247,6 +248,7 @@ export default function StudentPortalScreen() {
     setTab('thanthu')
   }
   useToanManHinhGame(tab === 'thanthu')
+  useToanManHinhGame(tab === 'bia') // Bi-a Phản Ứng: nút toàn màn hình riêng trong màn chơi (chỉ hiện bàn); rời tab ⇒ thoát toàn màn hình
   const [cheDoKhacPhuc, setCheDoKhacPhuc] = useState<1 | 2 | 3 | 4>(1)
 
   // Dữ liệu ca thi & điểm
@@ -1345,6 +1347,7 @@ export default function StudentPortalScreen() {
           onPhaPhucKich={() => moGameTai('doan')}
           onKhamPhaDao={() => moGameTai('')}
           onCauDaLam={() => setTab('caudalam')}
+          onChoiBia={() => setTab('bia')}
           onTuiDo={() => moGameTai('tui-do')}
           onCuaHang={() => moGameTai('shop')}
           onMoThanThu={() => moGameTai('')}
@@ -1426,7 +1429,14 @@ export default function StudentPortalScreen() {
         </div>
       )}
 
-      {tab !== null && tab !== 'caudalam' && (
+      {/* BI-A PHẢN ỨNG (cửa thứ ba trên Sảnh): màn riêng toàn màn hình, có nút "Sảnh" của chính nó. */}
+      {tab === 'bia' && auth.token && (
+        <Suspense fallback={<ChoNapGame />}>
+          <BiaGame token={auth.token} hoTen={auth.hoTen} onVe={() => setTab(null)} />
+        </Suspense>
+      )}
+
+      {tab !== null && tab !== 'caudalam' && tab !== 'bia' && (
         <div
           className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade`}
         >

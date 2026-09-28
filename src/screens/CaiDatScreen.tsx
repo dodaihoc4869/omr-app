@@ -11,6 +11,7 @@ import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { TheNoiDung } from '../components/DesignSystem'
 import KhoiBoNaoCaiDat from '../components/KhoiBoNaoCaiDat'
 import CongTacHoa2 from '../components/chien-dich/CongTacHoa2'
+import CongTacBia from '../components/chien-dich/CongTacBia'
 import KhoiKetNoiKhoDe from '../components/KhoiKetNoiKhoDe'
 import KhoiMatKhauApp from '../components/KhoiMatKhauApp'
 import KhoiMayChuMoi from '../components/KhoiMayChuMoi'
@@ -85,6 +86,8 @@ export default function CaiDatScreen() {
 
       {/* GAME HÓA 2.0 — công tắc cả trung tâm / theo lớp (`/gv/chien-dich` co-luu), có hộp xác nhận nói rõ hậu quả. */}
       <CongTacHoa2 />
+      {/* BI-A PHẢN ỨNG — cửa thứ ba trên Sảnh Bát Linh (`/gv/chien-dich` bia-co-luu, khoá riêng `bi_a`, mặc định TẮT). */}
+      <CongTacBia />
 
       <KhoiBoNaoCaiDat />
 

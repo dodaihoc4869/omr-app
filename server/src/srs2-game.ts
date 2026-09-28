@@ -47,10 +47,10 @@ export async function soCauGameHomNay(env: Env, sbd: string, nowMs: number): Pro
   return Number(r?.n) || 0
 }
 
-interface RefPhien { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3 }
+export interface RefPhien { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3 }
 
 /** Nạp câu đầy đủ theo thứ tự kế hoạch, bỏ câu đang bảo vệ/tự luận/rút khỏi kho; lấy tối đa `toiDa`. */
-async function napCau(env: Env, hs: HoSo2, khoa: readonly string[], toiDa: number, chan: ReadonlySet<string>): Promise<{ q: PrivateQuestion; m: MetaCau }[]> {
+export async function napCau(env: Env, hs: HoSo2, khoa: readonly string[], toiDa: number, chan: ReadonlySet<string>): Promise<{ q: PrivateQuestion; m: MetaCau }[]> {
   const ra: { q: PrivateQuestion; m: MetaCau }[] = []
   const daLay = new Set<string>()
   for (const k of khoa) {
@@ -69,6 +69,32 @@ async function napCau(env: Env, hs: HoSo2, khoa: readonly string[], toiDa: numbe
   return ra
 }
 
+/** Điều kiện SQL (bảng `game_v2_session` bí danh `s`): phiên Bi-a Phản Ứng còn mở (chưa `dong`). */
+export const DK_PHIEN_BIA_MO = "json_extract(s.json,'$.bia') = 1 AND COALESCE(json_extract(s.json,'$.dong'),0) = 0"
+/** Điều kiện SQL: phiên Game Hóa 2.0 của Đảo/Đoàn (không phải Bi-a). */
+export const DK_PHIEN_DAO_DOAN = "json_extract(s.json,'$.hoa2') = 1 AND COALESCE(json_extract(s.json,'$.bia'),0) = 0"
+/**
+ * Câu đang GIỮ trong các phiên còn hạn (< 2 giờ) thoả `dieuKien` mà em CHƯA trả lời — để Đảo/Đoàn và Bi-a không phát trùng câu của nhau
+ * (Bi-a Phản Ứng, đặc tả mục 4.7). Lỗi đọc ⇒ tập rỗng (không chặn thêm, hành vi cũ).
+ */
+export async function cauDangGiu(env: Env, sbd: string, nowMs: number, dieuKien: string): Promise<Set<string>> {
+  const ra = new Set<string>()
+  try {
+    const r = await env.DB.prepare(`SELECT s.id AS id, s.json AS json FROM game_v2_session s WHERE s.sbd = ? AND s.created_at >= ? AND ${dieuKien}`)
+      .bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString()).all<Row>()
+    const phien = r.results ?? []
+    if (!phien.length) return ra
+    const da = await env.DB.prepare('SELECT session, qid FROM game_v2_attempt WHERE sbd = ? AND session IN (SELECT value FROM json_each(?))')
+      .bind(sbd, JSON.stringify(phien.map((x) => str(x.id)))).all<Row>()
+    const daTraLoi = new Set((da.results ?? []).map((x) => `${str(x.session)}|${str(x.qid)}`))
+    for (const x of phien) {
+      const qs = (JSON.parse(str(x.json)) as { questions?: RefPhien[] }).questions ?? []
+      for (const q of qs) if (!daTraLoi.has(`${str(x.id)}|${q.qid}`)) ra.add(q.qid)
+    }
+  } catch { /* lỗi đọc: không chặn thêm */ }
+  return ra
+}
+
 /**
  * Lượt Bát Linh Đảo (chuyến thám hiểm 6 ải) ở chế độ 2.0.
  * - Còn câu ôn hôm nay ở Đoàn ⇒ khoá, trả đúng lời thầy.
@@ -80,7 +106,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   const tomTat = { theLuc: { con: kh.conDao.length + kh.conDoan.length, tong: kh.tong }, dao: { con: kh.conDao.length }, doan: { con: kh.conDoan.length } }
   if (kh.conDoan.length) return { ok: true, questions: [], lyDo: 'khoa_cho_doan', khoaDao: true, message: LOI_KHOA_DAO, ...tomTat }
   if (!kh.conDao.length) return { ok: true, questions: [], lyDo: 'xong_ke_hoach', het: true, message: kh.tong ? 'Hôm nay em xong rồi. Mai quay lại khám phá tiếp nhé.' : 'Hôm nay chưa có câu nào cho em. Thầy giao chiến dịch là đảo mở.', ...tomTat }
-  const dangCho = await env.DB.prepare(`SELECT id, json FROM game_v2_session s WHERE sbd = ? AND created_at >= ? AND json_extract(json,'$.hoa2') = 1 AND COALESCE(json_extract(json,'$.doan'),0) = 0
+  const dangCho = await env.DB.prepare(`SELECT id, json FROM game_v2_session s WHERE sbd = ? AND created_at >= ? AND json_extract(json,'$.hoa2') = 1 AND COALESCE(json_extract(json,'$.doan'),0) = 0 AND COALESCE(json_extract(json,'$.bia'),0) = 0
       AND NOT EXISTS (SELECT 1 FROM game_v2_attempt a WHERE a.session = s.id) ORDER BY created_at DESC LIMIT 1`).bind(sbd, new Date(nowMs - 2 * 3_600_000).toISOString()).first<Row>().catch(() => null)
   if (dangCho) {
     const cu = JSON.parse(str(dangCho.json)) as { questions: RefPhien[] }
@@ -90,6 +116,7 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
     }
   }
   const chan = await protectedQuestions(env)
+  for (const q of await cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)) chan.add(q) // câu đang nằm trên bàn Bi-a không ra Đảo
   // Thầy 28/09: câu ôn Đúng–sai đi trước như cũ; câu mới dễ → khó ⇒ ải 1–2 dễ nhất, ải 6 (Trùm) khó nhất.
   const chon = xepChuyenDao(await napCau(env, hs, kh.conDao, SO_CAU_CHUYEN, chan), (x) => !!hs.tt.get(x.q.qid)?.laMoi, (x) => x.m.mucDo)
   if (!chon.length) return { ok: true, questions: [], lyDo: 'cau_dang_bao_ve', message: 'Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.', ...tomTat }
@@ -112,9 +139,11 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
   const dangPhat = new Set<string>()
   for (const x of r.results ?? []) for (const q of (JSON.parse(str(x.json)) as { questions: RefPhien[] }).questions) dangPhat.add(q.qid)
   const chan = await protectedQuestions(env)
+  const chanBia = await cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO) // câu đang nằm trên bàn Bi-a không ra Đoàn
   for (const q of dangPhat) chan.add(q)
+  for (const q of chanBia) chan.add(q)
   let chon = await napCau(env, hs, kh.conDoan, SO_CAU_CHANG, chan)
-  if (!chon.length) chon = await napCau(env, hs, kh.conDoan, SO_CAU_CHANG, await protectedQuestions(env)) // phiên cũ bỏ dở: phát lại
+  if (!chon.length) { const lai = await protectedQuestions(env); for (const q of chanBia) lai.add(q); chon = await napCau(env, hs, kh.conDoan, SO_CAU_CHANG, lai) } // phiên cũ bỏ dở: phát lại
   if (!chon.length) return { ok: true, questions: [], lyDo: 'cau_dang_bao_ve', message: 'Các câu ôn hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.' }
   const refs: RefPhien[] = chon.map(({ q, m }) => {
     const g = goiYCho(q, hs.tt.get(q.qid), `${sbd}|${q.qid}|${kh.ngay}`)

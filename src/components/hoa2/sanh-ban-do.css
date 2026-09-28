@@ -2057,3 +2057,11 @@
     animation: none;
   }
 }
+
+/* Cửa thứ ba · Bi-a Phản Ứng (đặc tả Bi-a mục 8.1): cùng khuôn nút Đảo, viền tím để phân biệt. */
+.h2-nut-bia {
+  border-color: rgb(106 47 168 / 0.5);
+}
+.h2-nut-bia:disabled {
+  border-color: rgb(106 47 168 / 0.35);
+}

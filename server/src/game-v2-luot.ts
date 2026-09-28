@@ -23,7 +23,10 @@ export const TRAN_CAU_DAO_NGAY = 36
 export type LoaiTran = 'doan' | 'dao'
 export const tranCuaLoai = (loai: LoaiTran): number => (loai === 'doan' ? TRAN_CAU_DOAN_NGAY : TRAN_CAU_DAO_NGAY)
 /** Điều kiện SQL "lượt `a` thuộc loại này" (bảng `game_v2_attempt` bí danh `a`): phiên Đoàn = `game_v2_session.json $.doan = 1`; phiên khác / phiên đã xoá = Đảo. Chỉ đọc. */
-export const dieuKienLoaiPhien = (loai: LoaiTran): string => `${loai === 'doan' ? '' : 'NOT '}EXISTS (SELECT 1 FROM game_v2_session s WHERE s.id = a.session AND s.sbd = a.sbd AND json_extract(s.json, '$.doan') = 1)`
+// Bi-a Phản Ứng (28/09, đặc tả mục 4.7): lượt của phiên Bi-a (`$.bia = 1`) KHÔNG tính là Đảo (và cũng không phải Đoàn).
+export const dieuKienLoaiPhien = (loai: LoaiTran): string => loai === 'doan'
+  ? `EXISTS (SELECT 1 FROM game_v2_session s WHERE s.id = a.session AND s.sbd = a.sbd AND json_extract(s.json, '$.doan') = 1)`
+  : `NOT EXISTS (SELECT 1 FROM game_v2_session s WHERE s.id = a.session AND s.sbd = a.sbd AND (json_extract(s.json, '$.doan') = 1 OR json_extract(s.json, '$.bia') = 1))`
 /** Số lượt trả lời hôm nay (từ `tuIso`, đầu ngày VN) của một em theo LOẠI. */
 export async function demCauTrongNgay(env: Env, sbd: string, tuIso: string, loai: LoaiTran): Promise<number> {
   const r = await env.DB.prepare(`SELECT COUNT(*) AS n FROM game_v2_attempt a WHERE a.sbd = ? AND a.created_at >= ? AND ${dieuKienLoaiPhien(loai)}`).bind(sbd, tuIso).first<{ n: number }>()

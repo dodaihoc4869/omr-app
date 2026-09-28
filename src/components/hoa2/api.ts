@@ -29,7 +29,11 @@ export interface SanhHoa2 {
   khoaDao: boolean
   loiKhoaDao: string
   ruong: { daLam: number; tong: number; moDuoc: boolean; daMo: boolean; qua: { vang: number } | null }
+  /** Cửa thứ ba Bi-a Phản Ứng (máy chủ trả kèm `hoa2-sanh` khi cờ `bi_a` bật). null ⇒ không vẽ cửa. */
+  bia: BiaTrenSanh | null
 }
+/** Tóm tắt Bi-a cho cửa trên Sảnh: số câu Bi-a còn / trần hôm nay; Bàn giao hữu; lý do khoá. */
+export interface BiaTrenSanh { con: number; tong: number; giaoHuu: { mo: boolean; con: number }; lyDoKhoa: string | null }
 
 /** Kết quả đọc `hoa2-sanh`: cờ tắt · em chưa chọn thần thú · có dữ liệu Sảnh. */
 export type KetQuaSanh = { cheDo2: false } | { cheDo2: true; canChonThu: true } | { cheDo2: true; canChonThu?: false; sanh: SanhHoa2 }
@@ -165,6 +169,7 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
       dao: { con: soKhongAm((o.dao as Record<string, unknown> | undefined)?.con) },
       khoaDao: o.khoaDao === true,
       loiKhoaDao: chu(o.loiKhoaDao).trim(),
+      bia: docBiaTrenSanh(o.bia),
       ruong: {
         daLam: soKhongAm(r.daLam),
         tong: soKhongAm(r.tong),
@@ -174,6 +179,14 @@ export function docSanh(o: Record<string, unknown>): KetQuaSanh | null {
       },
     },
   }
+}
+
+/** Đọc chặt phần `bia` của `hoa2-sanh`: chỉ khi `bat === true` mới vẽ cửa. */
+export function docBiaTrenSanh(x: unknown): BiaTrenSanh | null {
+  const o = x && typeof x === 'object' ? (x as Record<string, unknown>) : null
+  if (!o || o.bat !== true) return null
+  const g = o.giaoHuu && typeof o.giaoHuu === 'object' ? (o.giaoHuu as Record<string, unknown>) : {}
+  return { con: soKhongAm(o.con), tong: soKhongAm(o.tong), giaoHuu: { mo: g.mo === true, con: soKhongAm(g.con) }, lyDoKhoa: typeof o.lyDoKhoa === 'string' && o.lyDoKhoa ? o.lyDoKhoa : null }
 }
 
 export async function taiSanh(token: string): Promise<KetQuaSanh> {

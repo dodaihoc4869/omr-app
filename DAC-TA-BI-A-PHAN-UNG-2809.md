@@ -129,7 +129,7 @@ Chạm băng sau va không bắt buộc (luật đơn giản cho học sinh).
 
 ### 3.5 Trả lời câu sau khi bi rơi
 - **Ai trả lời**: người giữ bi (G11). Đánh đôi: đồng đội đánh bi của em vào lỗ ⇒ tấm câu mở trên máy em, dòng trên cùng "Đồng đội Minh Châu đánh bi Na của em vào lỗ · em trả lời". Em đang giải trước dở ⇒ chốt câu đó xong mới mở câu này; lượt đứng chờ. Người khác thấy "Linh đang giải bi Na · Thông hiểu" và đồng hồ câu, không thấy nội dung.
-- Thời gian: Phần I 90 giây, Phần II 180 giây, Phần III 180 giây. 10 giây cuối có tiếng tích tắc. Hết giờ = sai.
+- Thời gian: Phần I 90 giây, Phần II 180 giây, Phần III 180 giây. 10 giây cuối có tiếng tích tắc. Hết giờ = sai trong ván (bi về chân bàn, sang lượt). *(Đã làm, 28/09)*: hết giờ mà em đã chọn đủ ⇒ tự nộp cho máy chủ chấm; chưa chọn đủ ⇒ KHÔNG gửi máy chủ (lệnh `answer` chỉ nhận đáp án đúng định dạng) — câu **chưa tính**, bi giữ câu cũ, không đếm vào câu sai của ván.
 - **Đúng** (Phần II: đúng cả 4 ý): phe ăn bi, cộng điểm ván, người trả lời +1 Mắt thần (tối đa 3). Lời giải gập, bấm "Xem lời giải" mới mở. Nút vàng "Đánh tiếp" (em là người đánh) hoặc "Về bàn" (đồng đội là người đánh); bấm xong người đánh đánh tiếp.
 - **Sai**: bi đặt lại chân bàn và **đổi câu** (mục 4.4). **Lượt sang người kế tiếp ngay lúc chấm** — không chờ em đọc lời giải; người kế tiếp (bạn, đồng đội hay A.I) đánh được luôn. Tấm câu ở lại trên máy em: băng "Chưa đúng · bi Na quay lại bàn · Đã sang lượt <tên>", lời giải mở sẵn theo mẫu chuẩn, đồng hồ câu ẩn, một nút xanh **"Đã đọc lời giải"**; bấm là tấm đóng, không làm gì thêm. Câu vào danh sách **Xem lại câu sai** của ván (8.8).
 - Tấm lời giải đang mở mà tới lượt em đánh: đồng hồ cú đánh chưa chạy, bấm "Đã đọc" xong mới chạy.
@@ -150,7 +150,7 @@ Chạm băng sau va không bắt buộc (luật đơn giản cho học sinh).
 
 ### 3.8 Bi chốt và Câu chốt
 - Phe ăn đủ 7 bi thì người tới lượt của phe mới được nhắm Bi chốt.
-- Bi chốt rơi hợp lệ ⇒ người hạ trả lời Câu chốt **của chính mình**. Đúng: +50 điểm ván, phe thắng. Sai: Bi chốt đặt lại chân bàn, lời giải, hết lượt; lần sau dùng **Câu chốt khác** (câu Vận dụng kế tiếp trong trần còn, gọi `bia-doi-cau` với `ki = 'C'`). Không bao giờ hỏi lại câu đã trả lời trong phiên, vì `answer` chỉ nhận mỗi câu một lần mỗi phiên (khoá `phiên|câu`, gửi lại chỉ trả kết quả cũ). Hết trần khi cần Câu chốt mới ⇒ Bi chốt thành bi trống: hạ hợp lệ là thắng, không +50.
+- Bi chốt rơi hợp lệ ⇒ người hạ trả lời Câu chốt **của chính mình**. Đúng: +50 điểm ván, phe thắng. Sai: Bi chốt đặt lại chân bàn, lời giải, hết lượt; lần sau dùng **Câu chốt khác** (câu Vận dụng kế tiếp trong trần còn, gọi `bia-doi-cau` với `chot: true`). Không bao giờ hỏi lại câu đã trả lời trong phiên, vì `answer` chỉ nhận mỗi câu một lần mỗi phiên (khoá `phiên|câu`, gửi lại chỉ trả kết quả cũ). Hết trần khi cần Câu chốt mới ⇒ Bi chốt thành bi trống: hạ hợp lệ là thắng, không +50.
 - Câu chốt chấm như vai `trum` (EXP câu trùm, mục 4.8).
 
 ### 3.9 Kết thúc ván
@@ -201,7 +201,7 @@ Thầy giao **Chiến dịch luyện** (`GiaoChienDich.tsx` → `/gv/chien-dich`
 5. Chọn tối đa `soBi` câu cho các bi em giữ (đấu đơn 7; đánh đôi 4 cho người 1 của phe, 3 cho người 2 — G11): phần `doan` trước (tới hết trần phần `doan`), rồi phần `dao`. Trong mỗi phần giữ đúng thứ tự kế hoạch. Nạp bằng `napCau` (hiện là hàm nội bộ của `srs2-game.ts` — xuất ra để dùng chung).
 6. Thiếu câu (trần còn < `soBi` + 1) ⇒ số bi còn lại là **bi trống**; Câu chốt luôn được giữ trước nếu trần còn ≥ 1. Trần còn 0 ⇒ không xếp ván, trả `{ lyDo: 'het_tran', conDoan, conDao }`.
 7. Tạo phiên `game_v2_session` với json `{ mode: 'bia', hoa2: 1, bia: 1, van: <id ván>, created, questions: RefPhien[] }`; ref của Câu chốt có `role: 'trum'`, câu mới `'moi'`, câu ôn `'on_lai'`; `goiY` từ `goiYCho(q, t, sbd|qid|ngay)` như Đảo/Đoàn.
-8. Trả về: `{ ok, van, session, bi: [{ ki: 'Na'|'Al'|…, trong: boolean, cau?: publicQuestion + vai + goiY? }], chot: { cau: publicQuestion + vai + goiY? }, tran: { con, tong }, conDoan, conDao }` — `ki` là kí hiệu nguyên tố của bi em giữ. **Không** có `correct`, `solution`, `answer` (dùng `publicQuestion`, qua `chanPhanHoiCau` ở máy).
+8. Trả về: `{ ok, van, session, bi: CauCongKhai[], trong, chot: CauCongKhai | null, tran: { con, tong }, theLuc, conDoan, conDao }`. *(Đã làm, 28/09 — khác bản đầu)*: `bi` là danh sách câu theo thứ tự, máy khách gán lần lượt cho các bi em giữ; `trong` = số bi em giữ không có câu. Máy chủ không cần biết kí hiệu bi. **Không** có `correct`, `solution`, `answer` (test quét sâu). Hợp đồng đầy đủ: `docs/hop-dong-bi-a.md`.
 
 ### 4.3 Trần Bi-a 40% (thầy chốt)
 - `tranDoan = floor(0,4 × số khoá phần doan của kế hoạch đã chốt hôm nay)`, `tranDao = floor(0,4 × số khoá phần dao)`. Trần Bi-a = `tranDoan + tranDao`.
@@ -213,7 +213,7 @@ Thầy giao **Chiến dịch luyện** (`GiaoChienDich.tsx` → `/gv/chien-dich`
 - Kế hoạch bị dựng lại giữa ngày (đổi chiến dịch, `onSaiLuat`): trần tính lại theo kế hoạch mới; câu đã làm vẫn đã làm.
 
 ### 4.4 Đổi câu khi sai (`bia-doi-cau`)
-- Gọi sau mỗi câu sai của bi thường (`ki` = kí hiệu bi), và sau mỗi Câu chốt sai (`ki = 'C'`, câu thay là câu Vận dụng kế tiếp). Gọi ngay lúc chấm, không chờ em bấm "Đã đọc".
+- Gọi sau mỗi câu sai của bi thường, và sau mỗi Câu chốt sai (câu thay là câu Vận dụng kế tiếp). Gọi ngay lúc chấm, không chờ em bấm "Đã đọc". *(Đã làm, 28/09)*: vào `{ session, qidCu, chot }` — mã câu vừa sai + cờ câu chốt; máy chủ từ chối nếu câu cũ chưa có lượt trả lời.
 - Câu thay: câu cùng `dang` trong phần được phép và còn trần; không có thì câu kế tiếp trong phần được phép; trần hết ⇒ bi thành **bi trống** (`{ trong: true }`).
 - Câu thay được thêm vào `questions` của phiên (để `answer` nhận), trả `publicQuestion`.
 - Câu sai đã ghi `su_kien_hoc` nên thuật toán tự xếp lịch ôn; không cần làm gì thêm.
@@ -420,12 +420,12 @@ Cửa trên Sảnh: thêm prop `onChoiBia` vào `SanhBanDoProps` (`SanhBanDo.tsx
 |---|---|---|---|
 | `bia-sanh` | — | `{ bat, lyDoKhoa?, chienDich, theLuc, conDoan, conDao, tran:{con,tong}, giaoHuu:{mo, con}, diemBan?, vanDangMo? }` | 1 |
 | `bia-xep-ban` | `{ loai, cheDo, soBi, van? }` — `loai` là `ai`, `ban` hoặc `giao_huu`; `cheDo` là `don` hoặc `doi`; `soBi` 7, 4 hoặc 3 | mục 4.2 (giao hữu: mọi bi `trong:true`) | 1 |
-| `bia-doi-cau` | `{ session, ki }` | `{ ki, trong, cau? }` | 1 |
-| `bia-ket-van` | `{ session, van, cheDo, ghe:[{ghe, doi, ai, dung, sai, an, vang}], ketQua:{doiThang, diem:[2], lyDo} }` | `{ ok, expHomNay, theLuc, tran }` | 1 |
+| `bia-doi-cau` | `{ session, qidCu, chot }` *(đã làm)* | `{ trong, cau? }` | 1 |
+| `bia-ket-van` | `{ van, ghe:[{ghe, doi, ai, dung, sai, an, vang}], ketQua:{doiThang, diem:[2], lyDo}, soCu }` *(đã làm)* | `{ ok, van, dung, sai, theLuc }` (gọi lại ⇒ `{ daGhiTruoc:true }`) | 1 |
 | `bia-moi` / `bia-loi-moi` / `bia-tra-loi-moi` | `{sbd, van, ghe}` / — / `{id, nhan}` | lời mời | 2 |
 | `bia-tao-ban` / `bia-vao-ban` / `bia-ghe` | `{cheDo}` / `{ma}` / `{van, ghe, lam:'them_ai'|'bo_ai'|'doi_cho'}` | `{ma, van, ghe[]}` | 2 |
 `hoa2-sanh` (`sanh2`, `srs2-d1.ts:297-316`) trả thêm `bia: { bat, con, tong, giaoHuu:{mo,con}, lyDoKhoa? }` để Sảnh vẽ cửa.
-Mọi lệnh `bia-*` trả `{ lyDoKhoa: 'dang_co_ca' }` khi em có ca kiểm tra mở (dùng cùng nguồn với `hsCaDangMo`, `index.ts:3275`) và `{ lyDoKhoa: 'chua_bat' }` khi cờ tắt.
+Mọi lệnh `bia-*` trả `{ lyDoKhoa: 'dang_co_ca' }` khi em có ca kiểm tra mở (dùng cùng nguồn với `hsCaDangMo`, `index.ts:3275`) và `{ lyDoKhoa: 'chua_bat' }` khi cờ tắt. *(Đã làm, 28/09)*: `coCaDangMo` dùng `quyetDinhVaoThi` trên ca `mo` của lớp em nhưng KHÔNG xét phạm vi khối/danh sách chọn — chặt hơn một chút (ca của lớp đang mở là đóng Bi-a). Hợp đồng đầy đủ: `docs/hop-dong-bi-a.md`.
 
 ### 9.2 Cờ bật Bi-a
 - Khoá riêng `cau_hinh.khoa = 'bi_a'`, giá trị `{ bat, lop[], sbd[] }`, đọc bằng `biaMoCho(env, sbd, lop)` theo mẫu `doanMoCho` (`game-v2-doan.ts:55-62`). Không nhét vào khoá `game_hoa_2` vì `coLuu` (`srs2-gv.ts:42-47`) chỉ giữ `{bat, lop, sbd}` và ghi đè mỗi lần lưu.

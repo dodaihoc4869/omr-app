@@ -45,6 +45,8 @@ export const BANG_XOA_HOA2: readonly string[] = [
   'srs2_ke_hoach', 'ruong_bat_linh',
   // CỬA HÀNG PHỤ KIỆN (migration-2109-shop-phu-kien.sql): thầy chốt 27/09 "xoá cả vàng và phụ kiện luôn nhé vì cho chọn lại thần thú từ đầu chơi cho công bằng".
   'vang_so', 'phu_kien_so_huu', 'phu_kien_dang_mac',
+  // BI-A PHẢN ỨNG (migration-2809-bi-a.sql): ván, ghế, lời mời, có mặt, Điểm bàn — trạng thái chơi, về 0 như game. Câu đã trả lời nằm ở sổ `su_kien_hoc` (GIỮ).
+  'bi_a_ghe', 'bi_a_van', 'bi_a_moi', 'bi_a_co_mat', 'bi_a_diem_ban',
   // MỌI CA THI cũ (thầy 27/09: "xoá toàn bộ các ca thi cũ"). `ca` cuối cùng.
   ...BANG_CA_THI_HOA2,
 ]

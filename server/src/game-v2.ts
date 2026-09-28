@@ -37,6 +37,7 @@ import {duocThuongCauThu} from './srs2-loi'
 import {TRAN_CAU_DAO_NGAY,TRAN_CAU_DOAN_NGAY,demCauTrongNgay,tranCuaLoai,type LoaiTran,docCauBtvnChuaNop,docDauVaoLuot,docLuotDangCho,luotMoiBat,maiCho,tomTatLuot,moPhienLuotMoi} from './game-v2-luot'
 import {ghiKhoanExpGame} from './exp-d1'
 import {LENH_SHOP,shopAction,shopBatCho} from './game-v2-shop'
+import {LENH_BIA,biaAction,biaChoSanh} from './bi-a'
 import {expMotCau} from './exp-hoc-tap'
 export interface Profile {nickname?:string;academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
 type Row={revision:number;json:string}
@@ -255,7 +256,9 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
   if(action.startsWith('room-'))return roomAction(env,sbd,p.pet,action,b)
   if(action.startsWith('doan-')){if(p.choice)throw new Error('Em chọn thần thú trước khi lên đường cùng Đoàn Hộ Tống.');return doanAction(env,sbd,p,action,b,gameV2)}
   // GAME HÓA 2.0 (srs2-game.ts): Sảnh bản đồ, Câu đã làm, Rương Bát Linh. Chỉ khi cờ `cau_hinh.game_hoa_2` bật cho em.
-  if(LENH_HOA2.has(action)){if(!await cheDo2(env,sbd))return {ok:true,cheDo2:false};if(p.choice)return {ok:true,cheDo2:true,canChonThu:true};return hoa2Action(env,sbd,action,b)}
+  if(LENH_HOA2.has(action)){if(!await cheDo2(env,sbd))return {ok:true,cheDo2:false};if(p.choice)return {ok:true,cheDo2:true,canChonThu:true};const h=await hoa2Action(env,sbd,action,b);if(action==='hoa2-sanh'&&h.ok===true)h.bia=await biaChoSanh(env,sbd,Date.now());return h}
+  // BI-A PHẢN ỨNG (bi-a.ts; cờ `cau_hinh.bi_a`, mặc định TẮT): cửa thứ ba trên Sảnh Bát Linh. Câu trả lời đi qua `answer` chung bên dưới.
+  if(LENH_BIA.has(action))return biaAction(env,sbd,action,b)
   if(LENH_SHOP.has(action)){if(p.choice)throw new Error('Em chọn thần thú trước khi vào Cửa hàng.');return shopAction(env,sbd,p,revision,action,b,()=>loadProfile(env,sbd))} // Cửa hàng phụ kiện (game-v2-shop.ts; cờ cau_hinh.shop_phu_kien mặc định TẮT)
   if(action==='academic-sync'){const result=await syncAcademic(env,sbd,p,b.mom);return {ok:true,...result,profile:visible(p),revision:await save(env,sbd,p,revision)}}
   if(action==='progress-history'){
@@ -400,7 +403,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     return {ok:true,id,questions:qsDay.map(q=>({...publicQuestion(q),role:vai.get(q.qid)})),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(nganSachThieu?{nganSach:nganSachThieu}:{}),...(giuDangMo?{giuChoDangMo:giuDangMo}:{}),...(lyDoLuot?{chonLyDo:lyDoLuot}:{}),...(hoanLuot?{hoanLuot}:{})}
   }
   if(action==='resume'){
-    const row=await env.DB.prepare("SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>? AND json_extract(json,'$.doan') IS NULL ORDER BY created_at DESC LIMIT 1").bind(sbd,new Date(Date.now()-2*3600000).toISOString()).first<{id:string;json:string}>()
+    const row=await env.DB.prepare("SELECT id,json FROM game_v2_session WHERE sbd=? AND created_at>? AND json_extract(json,'$.doan') IS NULL AND COALESCE(json_extract(json,'$.bia'),0)=0 ORDER BY created_at DESC LIMIT 1").bind(sbd,new Date(Date.now()-2*3600000).toISOString()).first<{id:string;json:string}>()
     if(!row)return {ok:true,questions:[]}
     const session=JSON.parse(row.json) as Session;const blocked=await protectedQuestions(env);const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game.');for(const key of control.blocked)blocked.add(key);const qs=[]
     // CẤM RÚT TỰ LUẬN (21/09): lượt soạn trước lệnh cấm mà còn câu tự luận ⇒ BỎ câu ấy khỏi lượt trả về (em làm nốt các câu còn lại, `complete` cũng chỉ đòi các câu này).
