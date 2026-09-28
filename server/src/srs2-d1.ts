@@ -5,7 +5,7 @@
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import type { Env } from './kieu'
 import {
-  lapKeHoachNgay, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
+  lapKeHoachNgay, tranHuyetChienTheo, phatLaiCau, canGoiY, mauLanDauTuTrangThai, tiLeDungLanDau, uocLuotCauMoi, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
   gopThongKeDang, tinhHangTheoDang,
   type CauSrs, type HangEm, type TuyChonKeHoach, type HoSoDangTho, type LanLam, type TrangThaiCau, type Phan,
 } from './srs2-loi'
@@ -98,12 +98,13 @@ export const mocTinhCua = (taoLuc: string, themLuc: string | undefined): string 
 export const chienDichDangChay = (ds: readonly ChienDich[], homNay: string): ChienDich | null => ds.find((c) => c.trangThai === 'dang_chay' && c.hanNop >= homNay) ?? null
 
 // ---------------------------------------------------------------- câu và sổ
-export interface MetaCau { qid: string; maDe: string; version: string; group: string; phan: Phan; mucDo: string | null; dang: string | null; tenDang: string | null }
+/** `sao`: số sao "cần chữa" của câu trong kho (`canChua.sao` → `sao` trong json câu game): 2 = vận dụng cao đánh dấu 2 sao. */
+export interface MetaCau { qid: string; maDe: string; version: string; group: string; phan: Phan; mucDo: string | null; dang: string | null; tenDang: string | null; sao: number }
 /** Siêu dữ liệu câu (không đáp án, không lời giải). Câu có ở nhiều tờ: ưu tiên tờ thuộc `uuTienMaDe`. */
 export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: readonly string[] = []): Promise<Map<string, MetaCau>> {
   const ra = new Map<string, MetaCau>()
   if (!qids.length) return ra
-  const r = await env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang
+  const r = await env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao
       FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?))`).bind(JSON.stringify([...new Set(qids)])).all<Row>()
   const uuTien = new Set(uuTienMaDe)
   for (const x of r.results ?? []) {
@@ -111,8 +112,18 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
     const cu = ra.get(qid)
     if (cu && (uuTien.has(cu.maDe) || !uuTien.has(str(x.ma_de)))) continue
     const phan = (['I', 'II', 'III'].includes(str(x.phan)) ? str(x.phan) : 'I') as Phan
-    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang) })
+    ra.set(qid, { qid, maDe: str(x.ma_de), version: str(x.version), group: str(x.content_group), phan, mucDo: x.muc_do == null ? null : str(x.muc_do), dang: x.dang == null ? null : str(x.dang), tenDang: x.ten_dang == null ? null : str(x.ten_dang), sao: Number(x.sao) || 0 })
   }
+  return ra
+}
+
+/** Số sao của từng câu (lớn nhất nếu câu có ở nhiều tờ) — cho luật THÀNH THẠO LẦN ĐẦU. Câu không có sao ⇒ không có trong bảng (= 0). */
+export async function docSaoCau(env: Env, qids: readonly string[]): Promise<Map<string, number>> {
+  const ra = new Map<string, number>()
+  if (!qids.length) return ra
+  const r = await env.DB.prepare(`SELECT qid, MAX(CAST(json_extract(json,'$.sao') AS INTEGER)) AS sao FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?)) GROUP BY qid`)
+    .bind(JSON.stringify([...new Set(qids)])).all<Row>().catch(() => ({ results: [] as Row[] }))
+  for (const x of r.results ?? []) if (Number(x.sao) > 0) ra.set(str(x.qid), Number(x.sao))
   return ra
 }
 
@@ -225,7 +236,7 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string): Promise<H
   for (const qid of qids) {
     const m = meta.get(qid)
     if (!m) continue // câu đã rút khỏi kho
-    const t = phatLaiCau(qid, theoQid.get(qid) ?? [], hanTheoQid.get(qid) ?? null, moc.get(qid) ?? [])
+    const t = phatLaiCau(qid, theoQid.get(qid) ?? [], hanTheoQid.get(qid) ?? null, moc.get(qid) ?? [], { sao: m.sao })
     tt.set(qid, t)
     const nguon = nguonTheoQid.get(qid) === 'chien_dich' ? 'chien_dich' : t.thanhThao ? 'duy_tri' : t.laMoi ? null : 'no_cu'
     if (!nguon) continue // câu chiến dịch cũ em chưa từng gặp: không kéo sang
@@ -258,12 +269,17 @@ export function hangTuHoSo(hoSoDang: readonly HoSoDangTho[], lanLam: readonly La
   return tinhHangTheoDang(tk, dangCan)
 }
 
-/** Hạng theo dạng của em cho kế hoạch hôm nay (chỉ khi có chiến dịch đang chạy). */
-export async function docHangEm(env: Env, sbd: string, hs: HoSo2): Promise<{ hangTheoDang: Record<string, HangEm>; hangChung: HangEm } | null> {
+/**
+ * Hạng theo dạng của em cho kế hoạch hôm nay (chỉ khi có chiến dịch đang chạy) + cách ước lượt câu MỚI cho Huyết Chiến
+ * (`uocLuotCauMoi`, cùng hàm với màn giao chiến dịch — thầy 28/09 "Thành thạo lần đầu").
+ */
+export async function docHangEm(env: Env, sbd: string, hs: HoSo2): Promise<{ hangTheoDang: Record<string, HangEm>; hangChung: HangEm; luotCauMoi: (qid: string) => number } | null> {
   const cd = hs.chienDich
   if (!cd) return null
   const hoSoDang = (await docHoSoDangCaLop(env, [sbd])).get(sbd) ?? []
-  return hangTuHoSo(hoSoDang, hs.lanLamChienDich ?? [], hs.meta, cd.qids, cd.taoLuc)
+  const saoCua = (q: string) => hs.meta.get(q)?.sao ?? 0
+  const tiLe = tiLeDungLanDau(mauLanDauTuTrangThai(hs.ttChienDich, saoCua), hoSoDang)
+  return { ...hangTuHoSo(hoSoDang, hs.lanLamChienDich ?? [], hs.meta, cd.qids, cd.taoLuc), luotCauMoi: (q) => uocLuotCauMoi(saoCua(q), tiLe) }
 }
 
 // ---------------------------------------------------------------- kế hoạch ngày (chốt một lần)

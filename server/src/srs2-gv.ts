@@ -6,8 +6,8 @@ import type { Env } from './kieu'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
-import { hangTuTiLe, khoiLuongCan, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
-import { chanDoanEm, docChienDichTuDong, docCoHoa2Tu, docHoSoDangCaLop, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, mocTinhCua, ngayVnCua, type ChienDich } from './srs2-d1'
+import { hangTuTiLe, mauLanDauTuTrangThai, phatLaiCau, tiLeDungLanDau, uocKhoiLuong, type UocKhoiLuong, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
+import { chanDoanEm, docChienDichTuDong, docCoHoa2Tu, docHoSoDangCaLop, docMetaCau, docMocThemCaLop, docSaoCau, hangTuHoSo, KHOA_CO_HOA2, mocTinhCua, ngayVnCua, type ChienDich } from './srs2-d1'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -141,7 +141,7 @@ async function mocDayLaiCaLop(env: Env, sbd: readonly string[]): Promise<Map<str
 /** `tuLuc` (thầy 28/09): chỉ tính lần làm TỪ LÚC GIAO chiến dịch — lịch sử trước đó KHÔNG sinh câu ôn; mọi câu của chiến dịch bắt đầu là câu mới.
  *  `themLuc` (Sửa chiến dịch 28/09): em được THÊM sau ⇒ mốc của em là lúc được thêm. */
 async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly string[], hanNop: string | null, tuLuc: string, lanDaDoc?: Map<string, LanLam[]>, themLuc?: ReadonlyMap<string, string>): Promise<Map<string, Map<string, TrangThaiCau>>> {
-  const [lanTho, moc] = await Promise.all([lanDaDoc ?? lanLamCaLop(env, sbd, qids), mocDayLaiCaLop(env, sbd)])
+  const [lanTho, moc, sao] = await Promise.all([lanDaDoc ?? lanLamCaLop(env, sbd, qids), mocDayLaiCaLop(env, sbd), docSaoCau(env, qids)])
   const lan = new Map([...lanTho].map(([em, ds]) => {
     const tu = mocTinhCua(tuLuc, themLuc?.get(em))
     return [em, ds.filter((x) => x.luc >= tu)] as const
@@ -151,7 +151,7 @@ async function trangThaiLop(env: Env, sbd: readonly string[], qids: readonly str
     const cua = lan.get(em) ?? []
     const theoQid = new Map<string, LanLam[]>()
     for (const x of cua) theoQid.set(x.qid, [...(theoQid.get(x.qid) ?? []), x])
-    ra.set(em, new Map(qids.map((q) => [q, phatLaiCau(q, theoQid.get(q) ?? [], hanNop, moc.get(`${em}|${q}`) ?? [])])))
+    ra.set(em, new Map(qids.map((q) => [q, phatLaiCau(q, theoQid.get(q) ?? [], hanNop, moc.get(`${em}|${q}`) ?? [], { sao: sao.get(q) ?? 0 })])))
   }
   return ra
 }
@@ -261,25 +261,30 @@ async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   const homNay = ngayVnCua(nowMs)
   if (dv.hanNop < homNay) throw new Error('Hạn nộp đã qua.')
   const D = soNgayConLai(homNay, dv.hanNop)
-  const tt = await trangThaiLop(env, dv.sbd, qids, dv.hanNop, new Date(nowMs).toISOString())
-  const khoiLuong = dv.sbd.map((em) => khoiLuongCan([...tt.get(em)!.values()]))
+  const [tt, sao, hoSo] = await Promise.all([trangThaiLop(env, dv.sbd, qids, dv.hanNop, new Date(nowMs).toISOString()), docSaoCau(env, qids), docHoSoDangCaLop(env, dv.sbd).catch(() => new Map())])
+  // Thầy 28/09 "Thành thạo lần đầu": câu mới ước lượt bằng CÙNG hàm với Huyết Chiến (`uocKhoiLuong` → `uocLuotCauMoi`, P1/P2 theo cờ).
+  const saoCua = (q: string) => sao.get(q) ?? 0
+  const uoc: UocKhoiLuong[] = dv.sbd.map((em) => {
+    const ds = [...tt.get(em)!.values()]
+    return uocKhoiLuong(ds, saoCua, tiLeDungLanDau(mauLanDauTuTrangThai(ds, saoCua), hoSo.get(em) ?? []))
+  })
+  const khoiLuong = uoc.map((u) => u.tong)
   const kl = trungVi(khoiLuong)
-  // Tách lượt của EM Ở GIỮA LỚP thành "câu mới × 2" + "lượt ôn" để thầy đọc được vì sao ra số lượt (chỉ khi có em đúng bằng trung vị).
-  const emGiua = dv.sbd.find((_, i) => khoiLuong[i] === kl)
-  const tachGiua = emGiua === undefined ? null : (() => {
-    const ds = [...tt.get(emGiua)!.values()].filter((t) => !t.catTia && !t.thanhThao)
-    const cauMoi = ds.filter((t) => t.laMoi).length
-    return { cauMoi, luotOn: kl - 2 * cauMoi }
-  })()
+  // Tách lượt của EM Ở GIỮA LỚP thành câu mới (× lượt ước) + câu 2 sao × 2 + lượt ôn để thầy đọc được vì sao ra số lượt (chỉ khi có em đúng bằng trung vị).
+  const iGiua = khoiLuong.indexOf(kl)
+  const uGiua = iGiua < 0 ? null : uoc[iGiua]!
+  const tachGiua = uGiua ? { cauMoi: uGiua.cauMoi + uGiua.cauMoi2Sao, luotOn: uGiua.luotOn, cauMoi2Sao: uGiua.cauMoi2Sao, luotMoiCau: uGiua.luotMoiCau, tiLeLanDau: uGiua.tiLeLanDau } : null
   const sc = sucChua(kl, D, dv.theLucNgay)
   const tran = D * dv.theLucNgay
-  const soBo = Math.max(0, Math.ceil((kl - 0.7 * tran) / 2))
+  // Lượt trung bình của một câu bỏ bớt (rút đề): theo cách ước của em ở giữa lớp; không có ⇒ 2.
+  const luotMotCau = uGiua && uGiua.cauMoi + uGiua.cauMoi2Sao > 0 ? (kl - uGiua.luotOn) / (uGiua.cauMoi + uGiua.cauMoi2Sao) : 2
+  const soBo = Math.max(0, Math.ceil((kl - 0.7 * tran) / luotMotCau))
   const Dmoi = Math.ceil(kl / (0.7 * dv.theLucNgay))
   return {
     ok: true, soCau: qids.length, theLucDeXuat: theLucDeXuat(kl, Math.max(0, ...khoiLuong), D), soCauTheoTo: theoTo, soCauTheoMucDo: theoMucDo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
     soEmQuaTai: khoiLuong.filter((x) => x > tran).length,
     goiY: sc.muc === 'xanh' ? null : {
-      rutCon: soBo > 0 && soBo < qids.length ? { soCau: qids.length - soBo, tiLe: (kl - 2 * soBo) / tran } : null,
+      rutCon: soBo > 0 && soBo < qids.length ? { soCau: qids.length - soBo, tiLe: (kl - luotMotCau * soBo) / tran } : null,
       luiHan: Dmoi > D ? { hanNop: congNgay(homNay, Dmoi - 1), tiLe: kl / (Dmoi * dv.theLucNgay) } : null,
     },
   }

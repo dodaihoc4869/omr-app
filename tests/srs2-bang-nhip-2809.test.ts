@@ -67,7 +67,7 @@ describe('bang: trường chỉ-thêm', () => {
     }
     const e = Object.fromEntries(b.em.map((x) => [x.sbd, x]))
     expect(b.lop).toMatchObject({ ngayThu: 5, tongNgay: 10, mucCanHomNay: 0.5 })
-    expect(e.S1).toMatchObject({ nhip: 'vuot', soNgayTre: 0, daLamTheoDang: { 'Dạng A': 1, 'Dạng B': 0.5 }, theoDang: { 'Dạng A': 1, 'Dạng B': 0 } })
+    expect(e.S1).toMatchObject({ nhip: 'vuot', soNgayTre: 0, daLamTheoDang: { 'Dạng A': 1, 'Dạng B': 0.5 }, theoDang: { 'Dạng A': 1, 'Dạng B': 0.5 } }) // Q3 (1 sao) đúng lần đầu ⇒ thành thạo lần đầu (thầy 28/09)
     expect(e.S2).toMatchObject({ nhip: 'tre12', soNgayTre: 2, daLamTheoDang: { 'Dạng A': 0.5, 'Dạng B': 0 } })
     expect(e.S3).toMatchObject({ nhip: 'dung', soNgayTre: 0 })
     expect(b.lop.nhip).toEqual({ vuot: 1, dung: 1, tre12: 1, tre3: 0 })
@@ -93,7 +93,8 @@ describe('danh-sach có thongKe + suc-chua có số câu theo mức độ', () =
     const tron = await gvChienDich(env, { action: 'danh-sach' }, GIAO + 60_000) as { chienDich: Record<string, unknown>[] }
     expect('thongKe' in tron.chienDich[0]!).toBe(false)
     const co = await gvChienDich(env, { action: 'danh-sach', thongKe: true }, GIAO + 60_000) as { chienDich: { thongKe: Record<string, number> }[] }
-    expect(co.chienDich[0]!.thongKe).toMatchObject({ coXat: 1 / 12, thanhThao: 0, dungNhip: 3, quaTai: 0, canDayLaiCau: 0, canDayLaiLuot: 0, emLamQuaDu: 0 })
+    // Q1 (1 sao) đúng lần đầu ⇒ thành thạo lần đầu (thầy 28/09): 1 / 12.
+    expect(co.chienDich[0]!.thongKe).toMatchObject({ coXat: 1 / 12, thanhThao: 1 / 12, dungNhip: 3, quaTai: 0, canDayLaiCau: 0, canDayLaiLuot: 0, emLamQuaDu: 0 })
   })
   it('suc-chua trả số câu theo mức độ (cộng = tổng)', async () => {
     const { env } = await dung()

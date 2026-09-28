@@ -11,6 +11,9 @@ const HAN = '2026-10-04'
 const lam = (ngay: string, dung: boolean, gio = 10, coGoiY = false, qid = 'Q'): LanLam => ({ qid, ngay, luc: `${ngay}T${String(gio).padStart(2, '0')}:00:00Z`, dung, coGoiY })
 const cau = (qid: string, phan: CauSrs['phan'] = 'I', mucDo: string | null = 'TH', dang: string | null = 'D1', nguon?: CauSrs['nguon']): CauSrs => ({ qid, phan, mucDo, dang, ...(nguon ? { nguon } : {}) })
 const moi = (qid: string): TrangThaiCau => phatLaiCau(qid, [], HAN)
+// Luật THÀNH THẠO LẦN ĐẦU (thầy 28/09): câu 0/1 sao đúng ngay lần đầu (không gợi ý) ⇒ thành thạo luôn. Các test chuỗi
+// "đúng 2 ngày khác nhau" dưới đây chạy trên câu 2 SAO — loại câu vẫn giữ luật chuỗi cũ. Luật mới: tests/srs2-thanh-thao-lan-dau-2809.test.ts.
+const SAO2 = { sao: 2 }
 
 describe('ngày và D', () => {
   it('D tính cả hôm nay, tối thiểu 1', () => {
@@ -22,24 +25,24 @@ describe('ngày và D', () => {
 })
 
 describe('B.3 khi trả lời', () => {
-  it('đúng câu mới ⇒ cc = 1, hẹn +3 ngày', () => {
-    const t = phatLaiCau('Q', [lam('2026-09-20', true)], HAN)
+  it('đúng câu mới (câu 2 sao) ⇒ cc = 1, hẹn +3 ngày', () => {
+    const t = phatLaiCau('Q', [lam('2026-09-20', true)], HAN, [], SAO2)
     expect([t.laMoi, t.cc, t.thanhThao, t.henOn]).toEqual([false, 1, false, '2026-09-23'])
   })
   it('sai rồi đúng (cc lên 1) VẪN được hẹn lại +3 — lỗi đặc tả gốc đã sửa', () => {
     const t = phatLaiCau('Q', [lam('2026-09-20', false), lam('2026-09-21', true)], HAN)
     expect([t.cc, t.henOn]).toEqual([1, '2026-09-24'])
   })
-  it('đúng 2 ngày khác nhau ⇒ THÀNH THẠO, hẹn +7; lần 3 hẹn +14', () => {
-    const t2 = phatLaiCau('Q', [lam('2026-09-01', true), lam('2026-09-04', true)], HAN)
+  it('đúng 2 ngày khác nhau (câu 2 sao) ⇒ THÀNH THẠO, hẹn +7; lần 3 hẹn +14', () => {
+    const t2 = phatLaiCau('Q', [lam('2026-09-01', true), lam('2026-09-04', true)], HAN, [], SAO2)
     expect([t2.cc, t2.thanhThao, t2.henOn]).toEqual([2, true, '2026-09-11'])
-    const t3 = phatLaiCau('Q', [lam('2026-09-01', true), lam('2026-09-04', true), lam('2026-09-11', true)], '2026-12-31')
+    const t3 = phatLaiCau('Q', [lam('2026-09-01', true), lam('2026-09-04', true), lam('2026-09-11', true)], '2026-12-31', [], SAO2)
     expect([t3.cc, t3.henOn]).toEqual([3, '2026-09-25'])
   })
-  it('đúng lần hai CÙNG ngày không cộng chuỗi (trừ ngày cuối)', () => {
-    const t = phatLaiCau('Q', [lam('2026-09-20', true, 8), lam('2026-09-20', true, 20)], HAN)
+  it('đúng lần hai CÙNG ngày không cộng chuỗi (trừ ngày cuối) — câu 2 sao', () => {
+    const t = phatLaiCau('Q', [lam('2026-09-20', true, 8), lam('2026-09-20', true, 20)], HAN, [], SAO2)
     expect([t.cc, t.thanhThao]).toEqual([1, false])
-    const cuoi = phatLaiCau('Q', [lam(HAN, true, 8), lam(HAN, true, 20)], HAN)
+    const cuoi = phatLaiCau('Q', [lam(HAN, true, 8), lam(HAN, true, 20)], HAN, [], SAO2)
     expect([cuoi.cc, cuoi.thanhThao]).toEqual([2, true])
   })
   it('sai ⇒ cc = 0, sai + 1, BỎ cờ thành thạo, hẹn ngày mai — lỗi đặc tả gốc (không bỏ cờ) đã sửa', () => {
@@ -127,7 +130,7 @@ describe('B.2 lập kế hoạch ngày', () => {
   })
   it('trọng số ôn: 50 + 20 × ngày trễ + 80 sắp chín / + 60 vừa sai; sắp chín xếp trước vừa sai', () => {
     const vuaSai = phatLaiCau('Q', [lam('2026-09-28', false)], HAN)
-    const sapChin = phatLaiCau('Q', [lam('2026-09-26', true)], HAN)
+    const sapChin = phatLaiCau('Q', [lam('2026-09-26', true)], HAN, [], SAO2)
     expect(trongSoOn(vuaSai, '2026-09-29')).toBe(110)
     expect(trongSoOn(vuaSai, '2026-10-01')).toBe(150)
     expect(trongSoOn(sapChin, '2026-09-29')).toBe(130)
@@ -163,7 +166,7 @@ describe('B.4 Huyết Chiến', () => {
     expect(kh.dao.length).toBe(80)
   })
   it('khối lượng: câu mới 2, câu đang ôn 2 − cc, bỏ câu thành thạo và cắt tỉa', () => {
-    const ds = [moi('a'), phatLaiCau('b', [lam('2026-09-01', true, 10, false, 'b')], HAN), phatLaiCau('c', [lam('2026-09-01', true, 10, false, 'c'), lam('2026-09-04', true, 10, false, 'c')], HAN)]
+    const ds = [moi('a'), phatLaiCau('b', [lam('2026-09-01', true, 10, false, 'b')], HAN, [], SAO2), phatLaiCau('c', [lam('2026-09-01', true, 10, false, 'c'), lam('2026-09-04', true, 10, false, 'c')], HAN)]
     expect(khoiLuongCan(ds)).toBe(3)
   })
   it('từ câu thứ 41 trong ngày không rơi EXP', () => {
@@ -186,7 +189,7 @@ describe('Rương Bát Linh, sức chứa, tỉ lệ', () => {
     expect(sucChua(230, 6).muc).toBe('do')
   })
   it('tỉ lệ chiến dịch và ngày thành thạo sớm nhất', () => {
-    const ds = [moi('a'), phatLaiCau('b', [lam('2026-09-29', true, 10, false, 'b')], HAN)]
+    const ds = [moi('a'), phatLaiCau('b', [lam('2026-09-29', true, 10, false, 'b')], HAN, [], SAO2)]
     expect(tiLeChienDich(ds)).toEqual({ tong: 2, coXat: 1, thanhThao: 0, canDayLai: 0 })
     expect(ngayThanhThaoSomNhat(ds)).toBe('2026-10-02')
   })
@@ -215,7 +218,8 @@ function chayMoi(n: number, soNgay: number, mu: number, seed: number) {
   const r = rng(seed), em = taoEm(n, mu, r), bat = '2026-09-01', han = congNgay(bat, soNgay - 1)
   const cs = Array.from({ length: n }, (_, i) => cau(`q${i}`, 'I', 'TH', `D${i % 6}`))
   const lich: LanLam[] = []
-  const trangThai = () => new Map(cs.map((c) => [c.qid, phatLaiCau(c.qid, lich, han)]))
+  // Đối chứng với đặc tả gốc (thành thạo = đúng 2 ngày) ⇒ chạy luật chuỗi: câu 2 sao.
+  const trangThai = () => new Map(cs.map((c) => [c.qid, phatLaiCau(c.qid, lich, han, [], SAO2)]))
   for (let t = 0; t < soNgay; t++) {
     const ngay = congNgay(bat, t)
     let daLam = 0

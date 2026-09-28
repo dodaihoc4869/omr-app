@@ -1,0 +1,110 @@
+
+## Bộ A (đề bài thầy) — 30 em × 120 câu × 10 ngày, trần 40/ngày, Huyết Chiến 80; ngưỡng bật: lượt còn cần > 0,9 × số ngày còn lại × 40
+
+| Chỉ số (TB / em) | 40% cũ | 40% mới P1 | 40% mới P2 | 60% cũ | 60% mới P1 | 60% mới P2 | 80% cũ | 80% mới P1 | 80% mới P2 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Đúng lần đầu đo được | 40% | 40% | 40% | 61% | 61% | 61% | 80% | 80% | 80% |
+| Câu phải làm / ngày (TB) | 50 | 41 | 41 | 44 | 32 | 32 | 37 | 24 | 24 |
+| Câu phải làm ngày nhiều nhất | 80 | 65 | 65 | 76 | 40 | 40 | 55 | 40 | 40 |
+| Tổng lượt làm tới hạn | 503 | 406 | 406 | 443 | 324 | 324 | 374 | 244 | 244 |
+| Ngày làm xong câu mới (trung vị) | ngày 7 | ngày 7 | ngày 7 | ngày 7 | ngày 4 | ngày 4 | ngày 7 | ngày 4 | ngày 4 |
+| Em có Huyết Chiến | 100% | 82% | 82% | 91% | 29% | 29% | 38% | 1% | 1% |
+| Số ngày Huyết Chiến (TB / em) | 3.3 | 1.1 | 1.1 | 1.5 | 0.3 | 0.3 | 0.4 | 0.0 | 0.0 |
+| Huyết Chiến bật từ (trung vị) | ngày 8 | ngày 10 | ngày 10 | ngày 10 | ngày 10 (29% em) | ngày 10 (29% em) | ngày 10 (38% em) | ngày 10 (1% em) | ngày 10 (1% em) |
+| Huyết Chiến tắt (trung vị, em có tắt trước hạn) | ngày 8 (1% em) | không tắt tới hạn | không tắt tới hạn | không tắt tới hạn | không tắt tới hạn | không tắt tới hạn | không tắt tới hạn | không tắt tới hạn | không tắt tới hạn |
+| % thành thạo lúc hạn | 58% | 76% | 76% | 70% | 88% | 88% | 86% | 96% | 96% |
+| Em đạt 100% trước hạn | 0% | 0% | 0% | 0% | 1% | 1% | 0% | 9% | 9% |
+| Ngày đạt 100% (trung vị) | chưa đạt | chưa đạt | chưa đạt | chưa đạt | ngày 10 (1% em) | ngày 10 (1% em) | chưa đạt | ngày 10 (9% em) | ngày 10 (9% em) |
+| Ngày đạt 90% (trung vị) | chưa đạt | ngày 10 (3% em) | ngày 10 (3% em) | ngày 10 (3% em) | ngày 10 (49% em) | ngày 10 (49% em) | ngày 10 (43% em) | ngày 7 | ngày 7 |
+| Thành thạo "ảo" (biết < 50% lúc hạn) | 25% | 45% | 45% | 9% | 15% | 15% | 1% | 1% | 1% |
+| Mức biết thật lúc hạn (mô hình) | 59% | 54% | 54% | 68% | 65% | 65% | 81% | 81% | 81% |
+| Câu cần thầy dạy lại / em | 8.7 | 11.0 | 11.0 | 2.7 | 4.4 | 4.4 | 0.5 | 1.0 | 1.0 |
+
+Câu phát mỗi ngày = MỚI + ÔN (ngày 1 → 10; ôn duy trì = 0 vì chưa có câu cũ):
+- 40% cũ: 40+0 · 20+20 · 21+19 · 10+30 · 10+30 · 10+31 · 9+48 · 0+48 · 0+78 · 0+80
+- 40% mới P1: 40+0 · 20+20 · 21+19 · 21+19 · 8+30 · 6+30 · 4+28 · 0+29 · 0+45 · 0+65
+- 40% mới P2: 40+0 · 20+20 · 21+19 · 21+19 · 8+30 · 6+30 · 4+28 · 0+29 · 0+45 · 0+65
+- 60% cũ: 40+0 · 28+12 · 27+13 · 7+33 · 6+34 · 6+34 · 6+34 · 0+32 · 0+55 · 0+76
+- 60% mới P1: 40+0 · 28+12 · 27+13 · 21+15 · 3+24 · 1+21 · 0+22 · 0+18 · 0+39 · 0+40
+- 60% mới P2: 40+0 · 28+12 · 27+13 · 21+15 · 3+24 · 1+21 · 0+22 · 0+18 · 0+39 · 0+40
+- 80% cũ: 40+0 · 36+4 · 33+7 · 3+37 · 3+37 · 3+37 · 2+22 · 0+14 · 0+41 · 0+55
+- 80% mới P1: 40+0 · 36+4 · 33+7 · 11+10 · 0+10 · 0+14 · 0+17 · 0+10 · 0+31 · 0+20
+- 80% mới P2: 40+0 · 36+4 · 33+7 · 11+10 · 0+10 · 0+14 · 0+17 · 0+10 · 0+31 · 0+20
+
+VÍ DỤ 3 EM (kịch bản 60%, luật mới):
+- Em yếu: đúng lần đầu 42%; THÀNH THẠO NGAY 44/120 câu, ví dụ c021 (PI, TH), c023 (PII, NB), c030 (PII, VD), c032 (PII, TH).
+    vẫn phải ôn — sai lần đầu: 70 câu, ví dụ c020 (PII, TH), c024 (PI, TH), c026 (PIII, VD), c027 (PI, NB)
+    vẫn phải ôn — câu 2 sao: 6 câu, ví dụ c007 (PI, VDC, 2 sao), c010 (PI, VDC, 2 sao), c012 (PI, VDC, 2 sao), c013 (PI, VDC, 2 sao)
+    lượt làm cả chiến dịch: cũ 511 → mới 379; thành thạo lúc hạn: cũ 60% → mới 73%
+- Em trung bình: đúng lần đầu 68%; THÀNH THẠO NGAY 77/120 câu, ví dụ c021 (PI, TH), c023 (PII, NB), c024 (PI, TH), c026 (PIII, VD).
+    vẫn phải ôn — sai lần đầu: 38 câu, ví dụ c020 (PII, TH), c027 (PI, NB), c048 (PIII, TH), c050 (PI, VD)
+    vẫn phải ôn — câu 2 sao: 5 câu, ví dụ c007 (PI, VDC, 2 sao), c008 (PI, VDC, 2 sao), c010 (PI, VDC, 2 sao), c011 (PI, VDC, 2 sao)
+    lượt làm cả chiến dịch: cũ 429 → mới 289; thành thạo lúc hạn: cũ 71% → mới 94%
+- Em khá: đúng lần đầu 74%; THÀNH THẠO NGAY 78/120 câu, ví dụ c023 (PII, NB), c024 (PI, TH), c026 (PIII, VD), c029 (PI, TH).
+    vẫn phải ôn — sai lần đầu: 31 câu, ví dụ c020 (PII, TH), c021 (PI, TH), c027 (PI, NB), c030 (PII, VD)
+    vẫn phải ôn — câu 2 sao: 11 câu, ví dụ c002 (PII, VDC, 2 sao), c003 (PII, VDC, 2 sao), c005 (PI, VDC, 2 sao), c006 (PIII, VDC, 2 sao)
+    lượt làm cả chiến dịch: cũ 418 → mới 277; thành thạo lúc hạn: cũ 75% → mới 93%
+
+## Bộ B (nặng, giống chiến dịch thật: 170 câu, 8 ngày, thể lực 60) — 30 em × 170 câu × 8 ngày, trần 60/ngày, Huyết Chiến 120; ngưỡng bật: lượt còn cần > 0,9 × số ngày còn lại × 60
+
+| Chỉ số (TB / em) | 40% cũ | 40% mới P1 | 40% mới P2 | 60% cũ | 60% mới P1 | 60% mới P2 | 80% cũ | 80% mới P1 | 80% mới P2 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Đúng lần đầu đo được | 40% | 40% | 40% | 60% | 60% | 60% | 81% | 80% | 80% |
+| Câu phải làm / ngày (TB) | 85 | 68 | 68 | 77 | 52 | 52 | 64 | 39 | 39 |
+| Câu phải làm ngày nhiều nhất | 120 | 103 | 103 | 118 | 60 | 60 | 86 | 60 | 60 |
+| Tổng lượt làm tới hạn | 679 | 540 | 540 | 615 | 414 | 414 | 516 | 316 | 316 |
+| Ngày làm xong câu mới (trung vị) | ngày 5 | ngày 5 | ngày 5 | ngày 5 | ngày 4 | ngày 4 | ngày 5 | ngày 4 | ngày 4 |
+| Em có Huyết Chiến | 100% | 95% | 95% | 97% | 56% | 56% | 43% | 4% | 4% |
+| Số ngày Huyết Chiến (TB / em) | 3.9 | 1.8 | 1.8 | 2.5 | 0.6 | 0.6 | 0.7 | 0.0 | 0.0 |
+| Huyết Chiến bật từ (trung vị) | ngày 5 | ngày 7 | ngày 7 | ngày 6 | ngày 8 | ngày 8 | ngày 8 (43% em) | ngày 8 (4% em) | ngày 8 (4% em) |
+| Huyết Chiến tắt (trung vị, em có tắt trước hạn) | ngày 6 (2% em) | không tắt tới hạn | không tắt tới hạn | ngày 7 (1% em) | không tắt tới hạn | không tắt tới hạn | không tắt tới hạn | không tắt tới hạn | không tắt tới hạn |
+| % thành thạo lúc hạn | 57% | 78% | 78% | 68% | 88% | 88% | 84% | 96% | 96% |
+| Em đạt 100% trước hạn | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 3% | 3% |
+| Ngày đạt 100% (trung vị) | chưa đạt | chưa đạt | chưa đạt | chưa đạt | chưa đạt | chưa đạt | chưa đạt | ngày 8 (3% em) | ngày 8 (3% em) |
+| Ngày đạt 90% (trung vị) | chưa đạt | ngày 8 (3% em) | ngày 8 (3% em) | ngày 8 (1% em) | ngày 8 (49% em) | ngày 8 (49% em) | ngày 8 (34% em) | ngày 8 | ngày 8 |
+| Thành thạo "ảo" (biết < 50% lúc hạn) | 26% | 45% | 45% | 9% | 17% | 17% | 1% | 1% | 1% |
+| Mức biết thật lúc hạn (mô hình) | 59% | 54% | 54% | 68% | 65% | 65% | 81% | 81% | 81% |
+| Câu cần thầy dạy lại / em | 9.8 | 12.1 | 12.1 | 3.0 | 3.5 | 3.5 | 0.3 | 0.8 | 0.8 |
+
+Câu phát mỗi ngày = MỚI + ÔN (ngày 1 → 8; ôn duy trì = 0 vì chưa có câu cũ):
+- 40% cũ: 60+0 · 31+29 · 32+28 · 26+40 · 21+83 · 0+89 · 0+120 · 0+120
+- 40% mới P1: 60+0 · 31+29 · 32+28 · 30+30 · 17+43 · 0+58 · 0+81 · 0+103
+- 40% mới P2: 60+0 · 31+29 · 32+28 · 30+30 · 17+43 · 0+58 · 0+81 · 0+103
+- 60% cũ: 60+0 · 42+18 · 41+19 · 14+46 · 13+55 · 0+79 · 0+110 · 0+118
+- 60% mới P1: 60+0 · 42+18 · 41+19 · 25+24 · 2+35 · 0+30 · 0+58 · 0+60
+- 60% mới P2: 60+0 · 42+18 · 41+19 · 25+24 · 2+35 · 0+30 · 0+58 · 0+60
+- 80% cũ: 60+0 · 53+7 · 49+10 · 4+56 · 4+57 · 0+60 · 0+72 · 0+86
+- 80% mới P1: 60+0 · 53+7 · 49+10 · 8+16 · 0+13 · 0+23 · 0+44 · 0+33
+- 80% mới P2: 60+0 · 53+7 · 49+10 · 8+16 · 0+13 · 0+23 · 0+44 · 0+33
+
+## Bộ C (giao quá sức: 260 câu, 8 ngày, thể lực 60 — Huyết Chiến bật từ ngày đầu với P1) — 30 em × 260 câu × 8 ngày, trần 60/ngày, Huyết Chiến 120; ngưỡng bật: lượt còn cần > 0,9 × số ngày còn lại × 60
+
+| Chỉ số (TB / em) | 40% cũ | 40% mới P1 | 40% mới P2 | 60% cũ | 60% mới P1 | 60% mới P2 | 80% cũ | 80% mới P1 | 80% mới P2 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Đúng lần đầu đo được | 40% | 40% | 40% | 60% | 60% | 60% | 80% | 80% | 80% |
+| Câu phải làm / ngày (TB) | 119 | 102 | 99 | 113 | 78 | 77 | 94 | 57 | 57 |
+| Câu phải làm ngày nhiều nhất | 120 | 120 | 120 | 120 | 120 | 120 | 120 | 120 | 120 |
+| Tổng lượt làm tới hạn | 956 | 817 | 796 | 906 | 623 | 615 | 750 | 455 | 455 |
+| Ngày làm xong câu mới (trung vị) | ngày 5 | ngày 5 | ngày 5 | ngày 3 | ngày 5 | ngày 5 | ngày 3 | ngày 4 | ngày 4 |
+| Em có Huyết Chiến | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 100% | 100% |
+| Số ngày Huyết Chiến (TB / em) | 8.0 | 6.6 | 6.4 | 7.7 | 3.4 | 3.4 | 5.0 | 1.3 | 1.3 |
+| Huyết Chiến bật từ (trung vị) | ngày 1 | ngày 1 | ngày 1 | ngày 1 | ngày 1 | ngày 1 | ngày 1 | ngày 1 | ngày 1 |
+| Huyết Chiến tắt (trung vị, em có tắt trước hạn) | không tắt tới hạn | ngày 3 (64% em) | ngày 2 (75% em) | ngày 5 (19% em) | ngày 2 (99% em) | ngày 2 (99% em) | ngày 3 (91% em) | ngày 2 (100% em) | ngày 2 (100% em) |
+| % thành thạo lúc hạn | 65% | 77% | 76% | 76% | 88% | 88% | 85% | 95% | 95% |
+| Em đạt 100% trước hạn | 0% | 0% | 0% | 0% | 0% | 0% | 0% | 1% | 1% |
+| Ngày đạt 100% (trung vị) | chưa đạt | chưa đạt | chưa đạt | chưa đạt | chưa đạt | chưa đạt | chưa đạt | ngày 8 (1% em) | ngày 8 (1% em) |
+| Ngày đạt 90% (trung vị) | chưa đạt | ngày 8 (1% em) | ngày 8 (1% em) | ngày 8 (2% em) | ngày 8 (19% em) | ngày 8 (18% em) | ngày 8 (28% em) | ngày 8 | ngày 8 |
+| Thành thạo "ảo" (biết < 50% lúc hạn) | 33% | 47% | 48% | 9% | 15% | 15% | 0% | 1% | 1% |
+| Mức biết thật lúc hạn (mô hình) | 57% | 54% | 53% | 68% | 64% | 64% | 81% | 80% | 80% |
+| Câu cần thầy dạy lại / em | 12.6 | 16.8 | 15.9 | 5.0 | 5.4 | 5.1 | 0.8 | 1.0 | 1.0 |
+
+Câu phát mỗi ngày = MỚI + ÔN (ngày 1 → 8; ôn duy trì = 0 vì chưa có câu cũ):
+- 40% cũ: 120+0 · 57+63 · 58+60 · 13+107 · 12+108 · 0+117 · 0+120 · 0+120
+- 40% mới P1: 120+0 · 51+60 · 42+50 · 35+51 · 11+79 · 0+80 · 0+117 · 0+119
+- 40% mới P2: 120+0 · 38+41 · 42+49 · 47+56 · 13+80 · 0+76 · 0+114 · 0+120
+- 60% cũ: 120+0 · 81+39 · 57+44 · 1+119 · 1+110 · 0+100 · 0+116 · 0+118
+- 60% mới P1: 120+0 · 41+30 · 38+25 · 37+26 · 25+38 · 0+59 · 0+89 · 0+97
+- 60% mới P2: 120+0 · 36+25 · 38+23 · 40+26 · 26+41 · 0+56 · 0+86 · 0+97
+- 80% cũ: 120+0 · 105+15 · 35+26 · 0+104 · 0+72 · 0+78 · 0+90 · 0+106
+- 80% mới P1: 120+0 · 46+14 · 50+10 · 37+15 · 6+27 · 0+22 · 0+57 · 0+51
+- 80% mới P2: 120+0 · 46+14 · 50+10 · 37+15 · 6+27 · 0+22 · 0+57 · 0+51
