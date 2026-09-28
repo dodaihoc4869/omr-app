@@ -14,9 +14,9 @@
   /* ───── Trong trận ───── */
   .dh2 .dh2-tran.dh2-tran-trum>.dh2-cot-phai{order:-1} /* hiệp trùm: câu 4 ý sang cột trái rộng */
   .dh2 .dh2-tran .dh2-cot-trai>.dh2-canh{flex:1 1 auto;height:auto;min-height:0;margin:0;border-radius:28px;container-type:size;
-    background:linear-gradient(180deg,rgb(27,21,84) 0%,rgb(59,42,122) 45%,rgb(26,23,69) 70%,rgb(58,38,24) 100%);box-shadow:inset 0 0 0 1px rgba(160,200,255,.18),0 14px 30px rgba(0,0,0,.35)}
-  .dh2 .dh2-tran .dh2-cot-trai>.dh2-canh.dh2-canh-trum{background:linear-gradient(180deg,rgb(27,12,64) 0%,rgb(66,28,122) 55%,rgb(20,18,56) 80%,rgb(58,38,24) 100%)}
-  /* Tranh giữ đúng tỉ lệ 390×340 (toạ độ thú/quái theo % tranh), co theo chiều nào chật hơn, đứng giữa đáy khung. */
+    background:rgb(27,21,84);box-shadow:inset 0 0 0 1px rgba(160,200,255,.18),0 14px 30px rgba(0,0,0,.35)}
+  .dh2 .dh2-tran .dh2-cot-trai>.dh2-canh.dh2-canh-trum{background:rgb(27,12,64)} /* nền = màu trời đỉnh tranh ⇒ phần trời phía trên liền mạch */
+  /* (nền khung = màu trời ở đỉnh tranh) Tranh giữ đúng tỉ lệ 390×340 (toạ độ thú/quái theo % tranh), co theo chiều nào chật hơn, đứng giữa đáy khung. */
   .dh2 .dh2-tran .dh2-cot-trai .dh2-ve{left:50%;right:auto;width:min(100cqw,calc(100cqh * 390 / 340));translate:-50% 0}
   .dh2 .dh2-tran .dh2-hud{top:16px;left:16px;right:16px}
   .dh2 .dh2-tran .dh2-hang{top:78px;left:16px;right:16px}
@@ -98,6 +98,10 @@
   .dh2 .dh2-tran-trum .dh-ds button{min-width:72px;height:44px}
   .dh2 .dh2-tran-trum .dh-y>div>span{font-size:14px}
   .dh2 .dh2-sanh .dh-ban-do{min-height:0}
+  .dh2 .dh2-tran .dh-giay{padding:10px 12px;gap:6px}
+  .dh2 .dh2-tran .dh-giay-dau span,.dh2 .dh2-bua small{display:none}
+  .dh2 .dh2-bua{padding:4px 10px}
+  .dh2 .dh2-tran .dh-xin{min-height:44px;font-size:12px}
 }
 @keyframes dh2-vao-phai{0%{transform:translateX(48px);opacity:0}100%{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.dh2 .dh2-tam{animation:none!important}}
