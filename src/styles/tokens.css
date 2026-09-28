@@ -436,3 +436,98 @@
   --pk-chu: rgb(238 243 255);
   --pk-chu-mo: rgb(180 196 232);
 }
+
+/* ── APP GIÁO VIÊN "BẢN MÀU" (thầy chốt 28/09 — docs/ban-ve-gv-mau-2809/GV-TongQuan-Mau.html): M3 Expressive nhiều tông ─────────────
+ * Năm màu theo NGHĨA, mỗi màu 3 bậc: đậm (--gvm-X: chữ/biểu tượng/nền đặc) · nền tông (--gvm-X-nen) · chữ-trên-nền-tông (--gvm-X-dam).
+ *   xd = xanh dương (em, số lượng, nút chính) · xl = xanh lục (thành thạo, đúng, đã nộp) · hp = hổ phách (trễ, cảnh báo)
+ *   ho = hồng (cần chữa, lỗi, số đếm) · tim = tím (dạng, nhóm).
+ * Chỉ ÁNH XẠ vào vai trò --m3-* / --bts-* dưới `.vo-thay` (src/styles/gv-mau.css) — app học sinh/phụ huynh không đọc các biến này.
+ * Ba đường vào nền tối như --bts-*: @media tối (trừ khi ép Sáng) · [data-giao-dien='toi'] · [data-giao-dien='sang'] giữ sáng.
+ * Hai khối tối PHẢI giống hệt nhau. */
+:root,
+:root[data-giao-dien='sang'] {
+  --gvm-nen: #f6f7fc;
+  --gvm-mat: #ffffff;
+  --gvm-mat-2: #eef1fa;
+  --gvm-vien: #dde2f0;
+  --gvm-chu: #1a1c24;
+  --gvm-chu-2: #454a5c;
+  --gvm-chu-3: #5f6579; /* bản vẽ #6b7187 chỉ ~4,3:1 trên --gvm-mat-2 → đậm thêm cho ≥ 4,5 */
+  --gvm-xd: #1f5fd6;
+  --gvm-xd-nen: #dbe6ff;
+  --gvm-xd-dam: #0b2f75;
+  --gvm-xl: #0f8a5f;
+  --gvm-xl-sang: #34c38a; /* đuôi dải thành thạo */
+  --gvm-xl-nen: #c9f2de;
+  --gvm-xl-dam: #04402a;
+  --gvm-hp: #b86a00;
+  --gvm-hp-nen: #ffe2b3;
+  --gvm-hp-dam: #4d2c00;
+  --gvm-ho: #c42a5c;
+  --gvm-ho-nen: #ffd9e3;
+  --gvm-ho-dam: #5c0a27;
+  --gvm-tim: #6a4fd8;
+  --gvm-tim-nen: #e7defe;
+  --gvm-tim-dam: #2a1872;
+  --gvm-tren-dac: #ffffff; /* chữ trên nền màu đặc (nút chính, số đếm, ô biểu tượng) */
+  --gvm-bong: 0 1px 2px rgb(30 40 80 / 0.06), 0 4px 14px rgb(30 40 80 / 0.06);
+  --gvm-bong-nut: 0 2px 8px rgb(31 95 214 / 0.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-giao-dien='sang']) {
+    --gvm-nen: #10131c;
+    --gvm-mat: #181c27;
+    --gvm-mat-2: #1f2433;
+    --gvm-vien: #2c3245;
+    --gvm-chu: #e8eaf3;
+    --gvm-chu-2: #b9bed1;
+    --gvm-chu-3: #8c92a8;
+    --gvm-xd: #9cbcff;
+    --gvm-xd-nen: #1d3363;
+    --gvm-xd-dam: #dbe6ff;
+    --gvm-xl: #6fdcab;
+    --gvm-xl-sang: #9ff0c8;
+    --gvm-xl-nen: #0f3d2b;
+    --gvm-xl-dam: #c9f2de;
+    --gvm-hp: #ffc164;
+    --gvm-hp-nen: #43290a;
+    --gvm-hp-dam: #ffe2b3;
+    --gvm-ho: #ff8fb0;
+    --gvm-ho-nen: #4d1428;
+    --gvm-ho-dam: #ffd9e3;
+    --gvm-tim: #c3b3ff;
+    --gvm-tim-nen: #2d2352;
+    --gvm-tim-dam: #e7defe;
+    --gvm-tren-dac: #0b1a3a;
+    --gvm-bong: 0 1px 2px rgb(0 0 0 / 0.3);
+    --gvm-bong-nut: 0 1px 2px rgb(0 0 0 / 0.3);
+  }
+}
+:root[data-giao-dien='toi'] {
+  --gvm-nen: #10131c;
+  --gvm-mat: #181c27;
+  --gvm-mat-2: #1f2433;
+  --gvm-vien: #2c3245;
+  --gvm-chu: #e8eaf3;
+  --gvm-chu-2: #b9bed1;
+  --gvm-chu-3: #8c92a8;
+  --gvm-xd: #9cbcff;
+  --gvm-xd-nen: #1d3363;
+  --gvm-xd-dam: #dbe6ff;
+  --gvm-xl: #6fdcab;
+  --gvm-xl-sang: #9ff0c8;
+  --gvm-xl-nen: #0f3d2b;
+  --gvm-xl-dam: #c9f2de;
+  --gvm-hp: #ffc164;
+  --gvm-hp-nen: #43290a;
+  --gvm-hp-dam: #ffe2b3;
+  --gvm-ho: #ff8fb0;
+  --gvm-ho-nen: #4d1428;
+  --gvm-ho-dam: #ffd9e3;
+  --gvm-tim: #c3b3ff;
+  --gvm-tim-nen: #2d2352;
+  --gvm-tim-dam: #e7defe;
+  --gvm-tren-dac: #0b1a3a;
+  --gvm-bong: 0 1px 2px rgb(0 0 0 / 0.3);
+  --gvm-bong-nut: 0 1px 2px rgb(0 0 0 / 0.3);
+}

@@ -151,7 +151,7 @@ export default function BangChienDich({
       </div>
 
       <div className="cd-kpi-hang" data-khoi="o-so-chien-dich">
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="xd">
           <span className="cd-kpi-nhan" title="Câu em đã làm ít nhất 1 lần (trung bình lớp)">
             Đã làm qua <span className="cd-chu-thich">(câu em đã làm ít nhất 1 lần)</span>
           </span>
@@ -164,7 +164,7 @@ export default function BangChienDich({
             {chenhCoXat && <span className={`cd-chenh cd-chenh--${chenhCoXat.huong}`}> · {chenhCoXat.chu}</span>}
           </span>
         </div>
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="xl">
           <span className="cd-kpi-nhan" title="Câu đúng đủ lịch ôn, lần cuối đúng">
             Thành thạo <span className="cd-chu-thich">(đúng đủ lịch ôn, lần cuối đúng)</span>
           </span>
@@ -177,7 +177,7 @@ export default function BangChienDich({
             {chenhThanhThao && <span className={`cd-chenh cd-chenh--${chenhThanhThao.huong}`}> · {chenhThanhThao.chu}</span>}
           </span>
         </div>
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="xd">
           <span className="cd-kpi-nhan">Đúng nhịp</span>
           <strong data-so="dung-nhip">
             {typeof lop.dungNhip === 'number' ? lop.dungNhip : '—'}
@@ -185,7 +185,7 @@ export default function BangChienDich({
           </strong>
           <span className="cd-kpi-phu cd-so">{lop.nhip ? `${soTre} em trễ nhịp · ${lop.nhip.tre3} em từ 3 ngày` : 'máy chủ chưa gửi nhịp'}</span>
         </div>
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="hp">
           <span className="cd-kpi-nhan" title="Em phải làm vượt số lượt/ngày để kịp hạn">
             Quá tải hôm nay
           </span>
@@ -195,7 +195,7 @@ export default function BangChienDich({
           </strong>
           <span className="cd-kpi-phu cd-so">phải làm quá {cd.theLucNgay} lượt/ngày để kịp hạn</span>
         </div>
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="ho">
           <span className="cd-kpi-nhan">Cần thầy dạy lại</span>
           <strong data-so="can-day-lai">
             {lop.canDayLaiCau}

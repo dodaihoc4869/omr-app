@@ -173,7 +173,7 @@ export default function BuoiChua({
       </div>
 
       <div className="cd-kpi-hang" data-khoi="o-so-buoi-chua">
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="xd">
           <span className="cd-kpi-nhan" title="Câu em đã làm ít nhất 1 lần">
             Đã làm qua cuối kỳ
           </span>
@@ -183,7 +183,7 @@ export default function BuoiChua({
           </strong>
           <span className="cd-kpi-phu cd-so">{du.soEm} em có mặt · trung bình lớp</span>
         </div>
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="xl">
           <span className="cd-kpi-nhan" title="Câu đúng đủ lịch ôn, lần cuối đúng">
             Thành thạo cuối kỳ
           </span>
@@ -193,7 +193,7 @@ export default function BuoiChua({
           </strong>
           <span className="cd-kpi-phu">trung bình lớp</span>
         </div>
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="ho">
           <span className="cd-kpi-nhan">Câu chữa xếp sẵn</span>
           <strong data-so="buoi-chua">
             {kq.dong.length}
@@ -201,7 +201,7 @@ export default function BuoiChua({
           </strong>
           <span className="cd-kpi-phu">mỗi dạng yếu một câu</span>
         </div>
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="tim">
           <span className="cd-kpi-nhan">Thời gian dự kiến</span>
           <strong data-so="thoi-gian">
             {phut(kq.tongGiay)}
@@ -211,7 +211,7 @@ export default function BuoiChua({
             {kq.soEmCoLuot}/{kq.soEmCoMat} em có lượt lên bảng
           </span>
         </div>
-        <div className="cd-kpi">
+        <div className="cd-kpi" data-mau="xd">
           <span className="cd-kpi-nhan">Tiến độ buổi chữa</span>
           <strong data-so="tien-do">
             {soDaChua}

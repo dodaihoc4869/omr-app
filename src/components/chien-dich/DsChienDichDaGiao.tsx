@@ -141,7 +141,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
       {ds && ds.length > 0 && (
         <>
           <div className="cd-kpi-hang cd-kpi-hang--4" data-khoi="o-so-ds-chien-dich">
-            <div className="cd-kpi">
+            <div className="cd-kpi" data-mau="xd">
               <span className="cd-kpi-nhan">Chiến dịch đang chạy</span>
               <strong data-so="dang-chay">
                 {dangChay.length}
@@ -149,7 +149,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
               </strong>
               <span className="cd-kpi-phu cd-so">{emDangChay} lượt em nhận (em ở 2 chiến dịch tính 2 lần)</span>
             </div>
-            <div className="cd-kpi">
+            <div className="cd-kpi" data-mau="xl">
               <span className="cd-kpi-nhan">Thành thạo trung bình</span>
               <strong data-so="thanh-thao-tb">
                 {thanhThaoTb == null ? '—' : Math.round(thanhThaoTb * 100)}
@@ -157,7 +157,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
               </strong>
               <span className="cd-kpi-phu">các chiến dịch đang chạy, tính theo số em</span>
             </div>
-            <div className="cd-kpi">
+            <div className="cd-kpi" data-mau="hp">
               <span className="cd-kpi-nhan">Em quá tải hôm nay</span>
               <strong data-so="qua-tai">
                 {quaTai}
@@ -165,7 +165,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
               </strong>
               <span className="cd-kpi-phu">phải làm vượt số lượt/ngày để kịp hạn</span>
             </div>
-            <div className="cd-kpi">
+            <div className="cd-kpi" data-mau="ho">
               <span className="cd-kpi-nhan">Câu cần thầy dạy lại</span>
               <strong data-so="can-day-lai">
                 {cauDayLai}
@@ -192,7 +192,7 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
                 </button>
               ))}
             </div>
-            <span className="cd-phu">Vạch đen trên thanh Đã làm qua = mức lớp cần đạt hôm nay để kịp hạn</span>
+            <span className="cd-phu">Vạch cam trên thanh Đã làm qua = mức lớp cần đạt hôm nay để kịp hạn</span>
           </div>
 
           <div className="cd-cuon-ngang">
