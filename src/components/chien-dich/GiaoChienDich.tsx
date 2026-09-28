@@ -1,7 +1,7 @@
 // GIAO CHIẾN DỊCH LUYỆN — 3 bước + cột tóm tắt cố định (bản vẽ docs/ban-ve-gv-2809/GV-GiaoChienDich, thầy chốt 28/09).
 //   1. Chọn tờ đề: tờ đã chọn (số câu từng tờ do máy chủ đếm) + cây Kho đề có ô tìm + cơ cấu câu theo mức độ.
 //   2. Chọn em: MỘT ô chọn nhiều tầng Khối › Lớp › Em (`ChonEmGiao`), danh sách em từ máy chủ (`ds-em`).
-//   3. Hạn nộp + "Số lượt câu mỗi ngày (một em)" (tên cũ "Thể lực") gõ số bất kì hoặc gạt "Tự tính" + "Khối lượng so với thời gian còn lại".
+//   3. Ngày bắt đầu (thầy 28/09: mặc định hôm nay, không trước hôm nay, không sau hạn) + Hạn nộp + "Số lượt câu mỗi ngày (một em)" (tên cũ "Thể lực") gõ số bất kì hoặc gạt "Tự tính" + "Khối lượng so với thời gian còn lại".
 // Hiện ở màn ca đã kết thúc (điền sẵn tờ đề + lớp của ca) và ở màn Chiến dịch luyện ("Giao chiến dịch mới", chưa điền gì).
 // Mỗi lần đổi đầu vào ⇒ gọi `suc-chua`; nút chính "Giao chiến dịch cho N em" ⇒ `tao`. KHÔNG có nút rút bớt câu hay nút dời hạn (thầy 28/09).
 // Giao xong cho HOÀN TÁC ("Huỷ giao" ⇒ `huy`) thay vì hỏi lại trước (luật C8).
@@ -59,6 +59,7 @@ export default function GiaoChienDich({
   const [chonEm, setChonEm] = useState<Set<string>>(new Set())
   const daDienSan = useRef(false)
   const [hanNop, setHanNop] = useState(() => congNgay(homNay, 7))
+  const [batDau, setBatDau] = useState(homNay)
   const [theLuc, setTheLuc] = useState(THE_LUC_MAC_DINH)
   // Ô thể lực giữ CHỮ thầy đang gõ (xoá trắng để gõ lại được); số hợp lệ mới đổi `theLuc`.
   const [theLucChu, setTheLucChu] = useState(String(THE_LUC_MAC_DINH))
@@ -109,8 +110,12 @@ export default function GiaoChienDich({
 
   const maDeChon = useMemo(() => to.map((t) => t.maDe).filter((m) => chon.has(m)), [to, chon])
   const hanHopLe = laNgay(hanNop) && hanNop >= homNay
-  const duDauVao = maDeChon.length > 0 && (coDanhSach ? sbdChon.length > 0 : lop.trim() !== '') && hanHopLe
-  const khoaDauVao = JSON.stringify([maDeChon, doiTuong, hanNop, theLuc])
+  const batDauHopLe = laNgay(batDau) && batDau >= homNay && (!hanHopLe || batDau <= hanNop)
+  const loiBatDau = !laNgay(batDau) || batDau < homNay ? 'Ngày bắt đầu phải từ hôm nay trở đi' : batDau > hanNop ? 'Ngày bắt đầu không được sau hạn nộp' : ''
+  // Chỉ gửi ngày bắt đầu khi khác hôm nay ⇒ bắt đầu ngay như cũ.
+  const guiBatDau = batDauHopLe && batDau > homNay ? { batDau } : {}
+  const duDauVao = maDeChon.length > 0 && (coDanhSach ? sbdChon.length > 0 : lop.trim() !== '') && hanHopLe && batDauHopLe
+  const khoaDauVao = JSON.stringify([maDeChon, doiTuong, hanNop, theLuc, batDau])
 
   // ĐỒNG HỒ SỨC CHỨA: gọi lại mỗi khi đổi đầu vào (chờ thầy gõ xong); câu trả lời cũ về muộn thì bỏ.
   const luotTinh = useRef(0)
@@ -125,7 +130,7 @@ export default function GiaoChienDich({
     const luot = ++luotTinh.current
     setDangTinh(true)
     const hen = setTimeout(() => {
-      void tinhSucChua({ ...doiTuong, maDe: maDeChon, hanNop, theLucNgay: theLuc }).then((r) => {
+      void tinhSucChua({ ...doiTuong, maDe: maDeChon, hanNop, ...guiBatDau, theLucNgay: theLuc }).then((r) => {
         if (luot !== luotTinh.current) return
         setDangTinh(false)
         if (r.ok) {
@@ -157,6 +162,7 @@ export default function GiaoChienDich({
       ...doiTuong,
       maDe: maDeChon,
       hanNop,
+      ...guiBatDau,
       theLucNgay: theLuc,
       huyetChien,
       ...(maCa ? { maCa } : {}),
@@ -236,7 +242,7 @@ export default function GiaoChienDich({
   const now = nowMs ?? Date.now()
   // Dự kiến: em ở giữa lớp làm đủ lượt cần sau ⌈khối lượng / lượt mỗi ngày⌉ ngày (tính cả hôm nay).
   const soNgayCan = sc && theLuc > 0 ? Math.max(1, Math.ceil(sc.khoiLuongTrungVi / theLuc)) : 0
-  const ngayXong = soNgayCan ? congNgay(homNay, soNgayCan - 1) : ''
+  const ngayXong = soNgayCan ? congNgay(batDau > homNay ? batDau : homNay, soNgayCan - 1) : ''
   const tenTo = to.filter((t) => chon.has(t.maDe)).map((t) => (t.tuCa ? `Đề vừa kiểm tra · ${t.maDe}` : t.maDe))
 
   return (
@@ -351,11 +357,20 @@ export default function GiaoChienDich({
               <h3 id="cd-buoc-3">Hạn nộp và số lượt câu mỗi ngày</h3>
             </div>
             <div className="cd-giao-ba">
-              <label className="cd-truong">
-                Hạn nộp (hết lúc 23:59)
-                <input type="date" value={hanNop} min={homNay} onChange={(e) => setHanNop(e.target.value)} />
-                <small className="cd-so cd-phu">{hanHopLe ? hienHanNop(hanNop) : 'Hạn nộp phải từ hôm nay trở đi'}</small>
-              </label>
+              <div className="cd-hai-ngay">
+                <label className="cd-truong" data-khoi="ngay-bat-dau">
+                  Ngày bắt đầu
+                  <input type="date" value={batDau} min={homNay} max={hanHopLe ? hanNop : undefined} onChange={(e) => setBatDau(e.target.value)} />
+                  <small className="cd-so cd-phu">
+                    {loiBatDau || (batDau === homNay ? 'Hôm nay — em nhận câu ngay' : `${hienNgay(batDau)} — trước ngày này em chưa nhận câu`)}
+                  </small>
+                </label>
+                <label className="cd-truong">
+                  Hạn nộp (hết lúc 23:59)
+                  <input type="date" value={hanNop} min={homNay} onChange={(e) => setHanNop(e.target.value)} />
+                  <small className="cd-so cd-phu">{hanHopLe ? hienHanNop(hanNop) : 'Hạn nộp phải từ hôm nay trở đi'}</small>
+                </label>
+              </div>
               <div className="cd-truong">
                 <label htmlFor="cd-the-luc">Số lượt câu mỗi ngày (một em)</label>
                 <div className="cd-hang-o">
@@ -416,6 +431,10 @@ export default function GiaoChienDich({
             <div>
               <dt>Giao cho</dt>
               <dd className="cd-so">{soEmChon || nhanLop ? `${soEmChon} em${nhanLop ? ` · ${nhanLop}` : ''}` : 'Chưa chọn'}</dd>
+            </div>
+            <div>
+              <dt>Bắt đầu</dt>
+              <dd className="cd-so">{batDauHopLe ? (batDau === homNay ? 'Hôm nay' : hienNgay(batDau)) : '—'}</dd>
             </div>
             <div>
               <dt>Hạn nộp</dt>

@@ -12,18 +12,19 @@ import { hoiXacNhan } from '../hop-thoai'
 import './chien-dich.css'
 
 export type LocChienDich = 'tat-ca' | 'dang-chay' | 'cho-chua' | 'da-dong'
-export type TrangThaiHien = 'dang_chay' | 'cham_nhip' | 'cho_chua' | 'da_dong'
+export type TrangThaiHien = 'sap_bat_dau' | 'dang_chay' | 'cham_nhip' | 'cho_chua' | 'da_dong'
 
-/** Trạng thái hiển thị: hết hạn mà chưa đóng ⇒ Chờ buổi chữa; đang chạy mà đã làm qua thấp hơn mức cần hôm nay từ 10 điểm % ⇒ Chậm nhịp. */
+/** Trạng thái hiển thị: hết hạn mà chưa đóng ⇒ Chờ buổi chữa; chưa tới ngày bắt đầu ⇒ Sắp bắt đầu (chỉ ở Tất cả, không tính Đang chạy); đang chạy mà đã làm qua thấp hơn mức cần hôm nay từ 10 điểm % ⇒ Chậm nhịp. */
 export function trangThaiHien(c: ChienDichTom): TrangThaiHien {
   if (c.trangThai !== 'dang_chay') return 'da_dong'
   if (c.hetHan) return 'cho_chua'
+  if (c.sapBatDau) return 'sap_bat_dau'
   const tk = c.thongKe
   if (tk && tk.coXat < tk.mucCanHomNay - 0.1) return 'cham_nhip'
   return 'dang_chay'
 }
-const CHU_TRANG_THAI: Record<TrangThaiHien, string> = { dang_chay: 'Đang chạy', cham_nhip: 'Chậm nhịp', cho_chua: 'Chờ buổi chữa', da_dong: 'Đã kết thúc' }
-const MAU_TRANG_THAI: Record<TrangThaiHien, string> = { dang_chay: 'xanh', cham_nhip: 'do', cho_chua: 'vang', da_dong: 'xam' }
+const CHU_TRANG_THAI: Record<TrangThaiHien, string> = { sap_bat_dau: 'Sắp bắt đầu', dang_chay: 'Đang chạy', cham_nhip: 'Chậm nhịp', cho_chua: 'Chờ buổi chữa', da_dong: 'Đã kết thúc' }
+const MAU_TRANG_THAI: Record<TrangThaiHien, string> = { sap_bat_dau: 'duong', dang_chay: 'xanh', cham_nhip: 'do', cho_chua: 'vang', da_dong: 'xam' }
 const khopLoc = (t: TrangThaiHien, loc: LocChienDich) =>
   loc === 'tat-ca' || (loc === 'dang-chay' && (t === 'dang_chay' || t === 'cham_nhip')) || (loc === 'cho-chua' && t === 'cho_chua') || (loc === 'da-dong' && t === 'da_dong')
 
@@ -287,7 +288,9 @@ export default function DsChienDichDaGiao({ lanTai = 0, onGiaoMoi }: { lanTai?: 
                         <small className="cd-phu">23:59 · {hienNgay(c.hanNop, false)}</small>
                       </td>
                       <td>
-                        <span className={`cd-chip-muc cd-chip-muc--${MAU_TRANG_THAI[tt]}`}>{CHU_TRANG_THAI[tt]}</span>
+                        <span className={`cd-chip-muc cd-chip-muc--${MAU_TRANG_THAI[tt]}`}>
+                          {tt === 'sap_bat_dau' && c.batDau ? `${CHU_TRANG_THAI[tt]} · ${hienNgay(c.batDau, false)}` : CHU_TRANG_THAI[tt]}
+                        </span>
                       </td>
                       <td>
                         <div className="cd-hang-nut cd-hang-nut--hep">
