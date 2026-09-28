@@ -46,3 +46,10 @@ Chưa phát hành: nhánh đã đẩy, chờ gộp vào `main` (GitHub Actions t
   - Test khoá nguồn: không tệp nào trong `src/components/ph-v3/` (trừ `tien-ich.ts`) còn chữ "A.I"/"Bộ não" ngoài chú thích; màn Lời thầy không hiện "A.I".
 - Bản vẽ (artifact 2HShm51xEiuVKcTAUpfeFT, bản 4): đủ 3 hàng × 5 màn — dọc, xoay ngang (844), máy tính (1440); bấm "xem chi tiết ca" ở khổ nào mở chi tiết ca ĐÚNG khổ đó. App thật vốn đã co giãn theo khổ (không nhảy sang dọc).
 - Đo: tsc 0 lỗi; vitest 5 tệp phụ huynh 47/47; check:mau sạch; chụp 30 màn (sáng/tối × dọc/ngang/máy tính): còn chữ A.I 0, cuộn ngang 0, đích < 44px 0, chữ < 11px 0.
+
+## Vòng 3 — thầy 28/09: "gộp luôn, đổi cả bên học sinh"
+- App học sinh: thẻ "Thầy Đỗ Đại Học hỗ trợ riêng em <tên>", thử thách riêng, kết quả sau nộp, phiếu, khung lời giải game, thẻ Đoàn; tin khiên/thần thú/thẻ Đoàn/bài gia đình giao. Tin cũ đã lưu: `/notifications list` lọc qua `chuThay` (`src/lib/chu-thay.ts`), không ghi đè D1. App giáo viên giữ "A.I Đỗ Đại Học".
+- Tự phát hiện + sửa: hướng dẫn ở cổng phụ huynh còn "Tạo Bài gia đình giao (tối đa 99 câu)".
+- Gộp: PR dodaihoc4869/omr-app#39 → main 441cc5e (đã trộn PR #38; PR #40 gộp xen giữa, không tệp chung, tsc + 168 test liên quan xanh trên 441cc5e). Thầy xác nhận không có ca mở (18:15).
+- Phát hành: GitHub Actions run 538 thành công 18:39 giờ VN (Pages + Worker). Kiểm sống: /ph/hoc-2, /ph/loi-thay, /ph/bao-cao-ca trả lời đúng (đòi số báo danh). Toàn vitest 131 đỏ = nền. Precache 169/170 tệp · 2940/3000 KB.
+- Lùi bản: `git revert -m 1 441cc5e` rồi đẩy main (Actions tự phát hành lại).
