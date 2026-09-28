@@ -56,7 +56,10 @@ export default function DongHoSucChua({
   const muc = dungRut ? mucSucChua(tiLe) : sc.muc
   const khoiLuong = dungRut ? Math.round(tiLe * sc.sucChua) : sc.khoiLuongTrungVi
   const rong = Math.max(0, Math.min(1, Number.isFinite(tiLe) ? tiLe : 1)) * 100
-  const cauQuaTai = dungRut ? '' : sc.soEmQuaTai > 0 ? ` ${sc.soEmQuaTai} em quá tải.` : ' Không em nào quá tải.'
+  const cauQuaTai = dungRut ? '' : sc.soEmQuaTai > 0 ? ` ${sc.soEmQuaTai}/${sc.soEm} em quá tải.` : ' Không em nào quá tải.'
+  // Vì sao ra số lượt: mỗi câu MỚI cần 2 lượt (đúng 2 lần mới chín), câu đang ôn cần 2 − số lần đúng liên tiếp.
+  const tg = !dungRut && sc.tachGiua && sc.tachGiua.cauMoi * 2 + sc.tachGiua.luotOn === khoiLuong ? sc.tachGiua : null
+  const viSao = tg ? ` (${tg.cauMoi} câu mới × 2 lượt${tg.luotOn > 0 ? ` + ${tg.luotOn} lượt ôn` : ''})` : ''
 
   return (
     <div className="cd-dong-ho" data-khoi="dong-ho-suc-chua" data-muc={muc} aria-live="polite" aria-busy={dangTinh}>
@@ -70,7 +73,7 @@ export default function DongHoSucChua({
         <div className={`cd-ray--${muc}`} data-ray={muc} style={{ width: `${rong}%` }} />
       </div>
       <p className="cd-phu cd-so">
-        {dungRut ? `Rút còn ${dungRut.soCau} câu (giữ câu cả lớp sai nhiều): em` : 'Em'} ở giữa lớp cần khoảng {khoiLuong} lượt · có {sc.D} ngày × {theLuc} câu = {sc.sucChua} lượt.
+        {dungRut ? `Rút còn ${dungRut.soCau} câu (giữ câu cả lớp sai nhiều): em` : 'Em'} ở giữa lớp cần khoảng {khoiLuong} lượt{viSao} · sức chứa {sc.D} ngày × {theLuc} lượt/ngày = {sc.sucChua} lượt.
         {cauQuaTai}
       </p>
       {dungRut ? (
