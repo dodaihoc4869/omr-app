@@ -26,10 +26,13 @@ NGAY = datetime.date.today().isoformat()
 
 
 def lay(maDe):
-    ma, j = g.goi('/kho/lay', {'maDe': maDe})
-    if ma != 200 or not isinstance(j, dict) or 'cau' not in j:
-        raise RuntimeError(f'không đọc được {maDe}: {ma}')
-    return j
+    # Gói lớn đôi khi về không trọn (curl cắt) ⇒ thử lại tối đa 3 lần rồi mới dừng.
+    for lan in range(3):
+        ma, j = g.goi('/kho/lay', {'maDe': maDe})
+        if ma == 200 and isinstance(j, dict) and 'cau' in j:
+            return j
+        time.sleep(2 * (lan + 1))
+    raise RuntimeError(f'không đọc được {maDe}: {ma}')
 
 
 def tim_cau(goi, phan, so):
@@ -58,10 +61,28 @@ def ghi_truong(c, t, v):
 
 
 def chi_muc(maDe, goi):
+    """Chỉ mục gửi kèm /kho/day. GIỮ NGUYÊN chỉ mục đang có trên máy chủ (đọc /kho/chi-muc-lay):
+    chuyên đề/mức độ/lớp/có lời giải lấy từ dòng cũ cùng qid — sửa trình bày KHÔNG được đổi phân loại câu.
+    Tờ DB-… cố ý không có chỉ mục. Không đọc được chỉ mục cũ, hoặc số dòng cũ ≠ số câu ⇒ DỪNG (không đoán)."""
     if maDe.startswith('DB-'):
         return []
-    return [{'phan': c.get('phan'), 'so': c.get('so'), 'chuyenDe': c.get('chuyen_de') or '', 'mucDo': c.get('muc_do') or '',
-             'lop': '', 'loiGiai': 1 if c.get('loi_giai') else None} for c in goi['cau']]
+    ma, j = g.goi('/kho/chi-muc-lay', {'maDe': maDe})
+    if ma != 200 or not isinstance(j, dict) or not j.get('ok') or not isinstance(j.get('items'), list):
+        raise RuntimeError(f'không đọc được chỉ mục cũ của {maDe}: {ma}')
+    cu = {str(x.get('qid')): x for x in j['items']}
+    if not cu:
+        return []  # tờ vốn KHÔNG có chỉ mục (như tờ DB-): giữ nguyên, không tự tạo chỉ mục mới
+    ra = []
+    for c in goi['cau']:
+        qid = str(c.get('qid') or c.get('id') or '').strip() or f"{maDe}-{str(c.get('phan') or '').strip().upper()}-{str(c.get('so') or '').strip()}"
+        x = cu.get(qid)
+        if x is None:
+            raise RuntimeError(f'{maDe}: câu {qid} chưa có trong chỉ mục cũ — dừng, không đoán phân loại')
+        ra.append({'phan': c.get('phan'), 'so': c.get('so'), 'qid': qid, 'chuyenDe': x.get('chuyen_de') or '', 'mucDo': x.get('muc_do') or '',
+                   'lop': x.get('lop') or '', 'loiGiai': 1 if x.get('co_loi_giai') else None})
+    if len(ra) != len(cu):
+        raise RuntimeError(f'{maDe}: chỉ mục cũ có {len(cu)} dòng, gói có {len(ra)} câu — dừng')
+    return ra
 
 
 def day(maDe, goi):
