@@ -22,6 +22,7 @@ import '@fontsource/be-vietnam-pro/vietnamese-600.css'
 import '@fontsource/be-vietnam-pro/vietnamese-700.css'
 import './styles/tokens.css'
 import './index.css'
+import './styles/the-loc.css'
 import 'katex/dist/katex.min.css'
 import App from './App.tsx'
 

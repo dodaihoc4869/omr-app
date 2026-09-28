@@ -7,6 +7,7 @@
 // TỆP .pdf thật đúng bản vẽ HS-PDF → tải về `cau-da-lam-<bộ-lọc>-<ngày>.pdf`. Máy yếu không dựng được thì còn nút "Mở bản in" (đường cũ).
 // Bản NGANG (docs/ban-ve-ngang-2809/Ngang-CauDaLam): cột trái bộ lọc + danh sách gọn, cột phải chi tiết câu đang chọn (cùng khối
 // TheCau xem_lai), Tải PDF lên hàng trên. Điểm ngắt: bo-cuc-ngang.ts. Điện thoại dọc giữ nguyên.
+import ChuTheLoc, { tenTheLoc } from '../ChuTheLoc'
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import TheCau from '../TheCau'
 import KhungXemPhieu from '../KhungXemPhieu'
@@ -281,20 +282,21 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
 
   const locVaTom = trangThaiDs === 'co' && (
     <>
-      <div className="h2-cdl-loc" role="group" aria-label="Lọc câu">
+      <div className="tl-hang tl-hang--mot-dong h2-cdl-loc" role="group" aria-label="Lọc câu">
         {BO_LOC.map((b) => (
           <button
             key={b.id}
             type="button"
-            className="h2-cdl-chip"
+            className="tl-the h2-cdl-chip"
             aria-pressed={loc === b.id}
+            aria-label={tenTheLoc(b.nhan, dem[b.id], ' ')}
             onClick={() => {
               setLoc(b.id)
               setMo(null)
               setPdf(PDF_TRONG)
             }}
           >
-            {b.nhan} <span className="h2-cdl-dem">{dem[b.id]}</span>
+            <ChuTheLoc chu={b.nhan} so={dem[b.id]} noi=" " />
           </button>
         ))}
       </div>

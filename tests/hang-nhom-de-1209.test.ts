@@ -40,8 +40,8 @@ describe('CẮT NHÃN', () => {
 
 describe('MỘT DÒNG, VUỐT NGANG', () => {
   it('không xuống dòng — chiều cao khối lọc là hằng số dù kho có bao nhiêu nhóm', () => {
-    expect(HANG).toContain("overflowX: 'auto'")
-    expect(HANG).toContain("whiteSpace: 'nowrap'")
+    // 28/09: hình thẻ về kiểu chung the-loc.css; `.tl-hang--mot-dong` = luôn một hàng cuộn ngang
+    expect(HANG).toContain('tl-hang tl-hang--mot-dong')
     expect(HANG).not.toContain('flex-wrap')
   })
 
@@ -53,8 +53,8 @@ describe('MỘT DÒNG, VUỐT NGANG', () => {
     expect(HANG).toContain("title={n || 'Tất cả nhóm đề'}")
   })
 
-  it('nút đủ cao cho ngón tay', () => {
-    expect(HANG).toContain('minHeight: 34')
+  it('nút đủ cao cho ngón tay (thẻ chung .tl-the: vùng chạm 44 px nhờ ::after)', () => {
+    expect(HANG).toContain('className="tl-the"')
   })
 })
 

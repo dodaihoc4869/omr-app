@@ -54,12 +54,12 @@ export function DongThoiGian({
         </h2>
         <span className="tc-phu">mới nhất trên cùng</span>
       </div>
-      <div className="hn2-loc-lop" role="group" aria-label="Lọc theo loại việc">
-        <button type="button" className="hn2-loc" aria-pressed={loai === ''} onClick={() => onLoc('')}>
+      <div className="tl-hang hn2-loc-lop" role="group" aria-label="Lọc theo loại việc">
+        <button type="button" className="tl-the hn2-loc" aria-pressed={loai === ''} onClick={() => onLoc('')}>
           Tất cả
         </button>
         {loc.map((l) => (
-          <button key={l} type="button" className="hn2-loc" aria-pressed={loai === l} onClick={() => onLoc(l)}>
+          <button key={l} type="button" className="tl-the hn2-loc" aria-pressed={loai === l} onClick={() => onLoc(l)}>
             {TEN_LOAI[l]}
           </button>
         ))}

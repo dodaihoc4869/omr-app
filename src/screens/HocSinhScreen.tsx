@@ -15,7 +15,8 @@ import NutBaiTapPdf from '../components/NutBaiTapPdf'
 import KhoiTienBo from '../components/KhoiTienBo'
 import BieuDoTienBoGoogle from '../components/BieuDoTienBoGoogle'
 import BaoCaoCaThiHocSinhModal from '../components/BaoCaoCaThiHocSinhModal'
-import { chuChipLop, useLopThay } from '../lib/ten-lop-thay'
+import { useLopThay } from '../lib/ten-lop-thay'
+import ChuTheLoc, { tenTheLoc } from '../components/ChuTheLoc'
 import DoiLopMotEm from '../components/DoiLopMotEm'
 import { danhSachEm, deleteStudentRegistration, hoSoEm, khoiTuNamSinh, resetMatKhauHsApi, type EmTomTat, type HoSoEm } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
@@ -621,41 +622,30 @@ export default function HocSinhScreen() {
         </div>
 
         {/* BỘ LỌC KHỐI & TẤT CẢ CÁC LỚP */}
-        <div className="space-y-2.5" style={{ marginBottom: 'var(--k3)' }}>
-          {/* Lọc theo khối */}
-          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Lọc theo khối">
-            <span className="hs-nhan-loc">Khối:</span>
+        <div className="flex flex-col" style={{ gap: 10, marginBottom: 'var(--k3)' }}>
+          {/* Lọc theo khối — thẻ lọc kiểu chung (src/styles/the-loc.css) */}
+          <div className="tl-hang" role="group" aria-label="Lọc theo khối">
+            <span className="tl-nhan">Khối</span>
             {[null, 10, 11, 12].map((k) => {
               const chon = khoiLoc === k
               return (
-                <button
-                  key={k ?? 'tat_ca'}
-                  type="button"
-                  onClick={() => setKhoiLoc(k)}
-                  className={`tap-target hs-chip${chon ? ' hs-chip--chon' : ''}`}
-                  style={{ ...SO }}
-                >
+                <button key={k ?? 'tat_ca'} type="button" onClick={() => setKhoiLoc(k)} aria-pressed={chon} className={`tl-the hs-chip${chon ? ' hs-chip--chon' : ''}`}>
                   {k === null ? 'Tất cả khối' : `Khối ${k}`}
                 </button>
               )
             })}
           </div>
 
-          {/* Lọc theo lớp (đồng bộ tất cả các lớp) */}
+          {/* Lọc theo lớp (đồng bộ tất cả các lớp); số em là huy hiệu tách khỏi tên lớp */}
           {dsLop.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Lọc theo lớp">
-              <span className="hs-nhan-loc">Lớp:</span>
+            <div className="tl-hang" role="group" aria-label="Lọc theo lớp">
+              <span className="tl-nhan">Lớp</span>
               {['', ...dsLop].map((l) => {
                 const chon = lopLoc === l
+                const lt = l && lopThay.ds ? (lopThay.ds.find((x) => x.tenLop === l) ?? { tenLop: l, soEm: 0 }) : null
                 return (
-                  <button
-                    key={l || '__tat_ca_lop'}
-                    type="button"
-                    onClick={() => setLopLoc(l)}
-                    className={`tap-target hs-chip${chon ? ' hs-chip--chon' : ''}`}
-                    style={{ ...SO }}
-                  >
-                    {l ? (lopThay.ds ? chuChipLop(lopThay.ds.find((x) => x.tenLop === l) ?? { tenLop: l, soEm: 0 }) : `Lớp ${l}`) : 'Tất cả các lớp'}
+                  <button key={l || '__tat_ca_lop'} type="button" onClick={() => setLopLoc(l)} aria-pressed={chon} aria-label={lt ? tenTheLoc(lt.tenLop, lt.soEm, ' · ', 'em') : undefined} className={`tl-the hs-chip${chon ? ' hs-chip--chon' : ''}`}>
+                    {!l ? 'Tất cả các lớp' : lt ? <ChuTheLoc chu={lt.tenLop} so={lt.soEm} donVi="em" /> : `Lớp ${l}`}
                   </button>
                 )
               })}

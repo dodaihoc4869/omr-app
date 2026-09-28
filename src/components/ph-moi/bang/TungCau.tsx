@@ -1,5 +1,6 @@
 // TỪNG CÂU CON ĐÃ LÀM của bảng "Mọi thứ về con" kiểu Apple: lọc Tất cả/Sai/Làm lâu/Chưa công bố, nhóm theo lần ngồi học (dải ô đúng/sai + danh sách kiểu iOS), mở câu ⇒ 4 phương án + lời giải lấy từ máy chủ. Mẫu: ph-d-bang-day-du.html (#muc-cau) + ph-e.
 // Logic nguồn: BangMoiThu.tsx (KhoiTungCau, DongCau, ChiTiet). LUẬT: câu bị che (kieu 'che') KHÔNG bao giờ có đề, đáp án, đúng/sai, con chọn, tên dạng, nút mở; nhóm bị che chỉ một dòng khoá + dải ô che. Đáp án/lời giải chỉ hiện khi máy chủ trả qua taiChiTietCau và câu có qid. Chỉ tệp này kéo ChemText (bảng là gói tải lười).
+import ChuTheLoc, { tenTheLoc } from '../../ChuTheLoc'
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { MutableRefObject } from 'react'
 import './TungCau.css'
@@ -125,12 +126,10 @@ export function TungCau({ pm, nhom: nhomTheoLan, sbd, nhomMo, batMo, dongMo, lan
         <p>{tatCa.length} câu hôm nay · xếp theo giờ làm</p>
       </header>
       {nut.length >= 2 && (
-        <div className="phm-seg" role="group" aria-label="Lọc câu">
+        <div className="tl-hang tl-hang--mot-dong phm-seg" role="group" aria-label="Lọc câu">
           {nut.map((k) => (
-            <button key={k} type="button" aria-pressed={locHieu === k} onClick={() => setLoc(k)}>
-              <span>
-                {NHAN_LOC[k]} <small>{dem[k]}</small>
-              </span>
+            <button key={k} type="button" className="tl-the" aria-pressed={locHieu === k} aria-label={tenTheLoc(NHAN_LOC[k], dem[k], ' ')} onClick={() => setLoc(k)}>
+              <ChuTheLoc chu={NHAN_LOC[k]} so={dem[k]} noi=" " />
             </button>
           ))}
         </div>
