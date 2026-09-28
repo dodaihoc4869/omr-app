@@ -84,7 +84,8 @@ export class VanMang extends VanBia {
       this.dangVe = false; this.cuMinh = false; this.ketQuaCu = null; this.choKetQua = false; this.ev = null
       this.dongBo({ su: null, S: this.S, chuMay: this.laChuMay ? this.em : -1 })
     }
-    if (chu) this.nhac(chu, '', 1800)
+    // gói tự động của máy chủ bàn (A.I trả lời / giải trước) bị từ chối lúc đổi máy chủ bàn = máy kia đã làm rồi ⇒ im, không báo em
+    if (chu && ma !== 'cau_ai' && ma !== 'giai_truoc_ai') this.nhac(chu, '', 1800)
   }
   apNhan(tu: number, id: number): void {
     this.nhanDen.push({ ma: ++this.maNhan, tu, id, t: 0 })
@@ -220,6 +221,7 @@ export class VanMang extends VanBia {
     danhBiV(c, cu.dx / d, cu.dy / d, cu.v, cu.sx, cu.sy)
     this.aim = { x: cu.dx / d, y: cu.dy / d }
     this.ev = suKienMoi(); this.cur = ghe; this.pha = 'moving'; this.acc = 0; this.ballInHand = false
+    this.ai = null // A.I đang ngắm dở (máy này vừa thôi làm máy chủ bàn) ⇒ bỏ, kẻo hết 1,25 giây ngắm lại đè pha 'moving'
     this.dungMT = minh && ghe === this.em && this.matThan > 0 && this.loaiMang === 'ban'
     this.dangVe = true; this.cuMinh = minh; this.choKetQua = false
     this.soCu++

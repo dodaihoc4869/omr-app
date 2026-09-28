@@ -444,6 +444,7 @@ export class VanBia {
   protected aiDanh(): void {
     if (this.pha !== 'ai') return
     this.sau(() => {
+      if (this.pha !== 'ai') return // trong 80 ms chờ, pha đã đổi (ván online: cú của máy khác tới) ⇒ thôi ngắm, kẻo đè pha đang vẽ
       const doi = this.ghe[this.cur]!.doi
       if (this.ballInHand) { aiDatBi(this.st, doi, this.bi, this.isBreak, this.rand); this.ballInHand = false; this.goiYNham(); const c = this.bi_('cue'); this.sk.am('dat', 0, c.x, c.y) }
       const plan = aiTinh(this.st, doi, this.bi, this.isBreak, this.aim, this.rand)

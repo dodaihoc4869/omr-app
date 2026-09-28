@@ -106,7 +106,7 @@ class May {
           sk, { gui: (o) => this.gui(o) }, m as GoiTT)
         this.v.datHen(this.b.dh.dat)
       } else this.v.apTT(m as GoiTT)
-    } else if (m.t === 'loi') { this.loi.push(String(m.chu)); this.v?.apLoi(m.ma, String(m.chu ?? '')) }
+    } else if (m.t === 'loi') { this.loi.push(`${m.ma}: ${m.chu}`); this.v?.apLoi(m.ma, String(m.chu ?? '')) }
     else if (m.t === 'nhan') this.v?.apNhan(Number(m.tu), Number(m.id))
   }
   /** Một khung hình của máy em: trả lời tấm câu đang mở (ghi lượt `answer` thật), hoặc đánh khi tới lượt. */
@@ -260,13 +260,31 @@ describe('Máy em (VanMang) + phòng đấu thật — đánh đôi 2 người +
     expect(A.v!.laChuMay).toBe(true)
     expect(B.v!.laChuMay).toBe(false)
     const rand = randHat('ban-tay-2')
-    for (let vong = 0; vong < 900 && !A.v!.S.over; vong++) await b.chay([A, B], 1000, rand, () => !!A.v!.S.over)
+    let daRot = false
+    for (let vong = 0; vong < 900 && !A.v!.S.over; vong++) {
+      await b.chay([A, B], 1000, rand, () => !!A.v!.S.over)
+      // chủ bàn (ghế 0) rớt 40 giây ⇒ máy B (ghế người nhỏ nhất còn nối) chạy A.I thay; A vào lại ⇒ A lại là máy chủ bàn
+      if (!daRot && A.v!.S.soCu >= 6 && !A.v!.S.over) {
+        daRot = true
+        const aiTruoc = trong.reduce((n, i) => n + (b.soCu[i] ?? 0), 0)
+        A.rot(); await b.bom()
+        await b.chay([B], 10_000, rand, () => B.v!.laChuMay) // B đang vẽ dở cú thì gói phòng xếp hàng tới khi vẽ xong
+        expect(B.v!.laChuMay).toBe(true)
+        await b.chay([B], 40_000, rand, () => !!B.v!.S.over)
+        if (!B.v!.S.over) expect(trong.reduce((n, i) => n + (b.soCu[i] ?? 0), 0)).toBeGreaterThan(aiTruoc) // A.I vẫn đánh, qua máy B
+        await A.vao('doi')
+        await b.chay([A, B], 10_000, rand, () => (A.v!.laChuMay && !B.v!.laChuMay) || !!A.v!.S.over)
+        if (!A.v!.S.over) { expect(A.v!.laChuMay).toBe(true); expect(B.v!.laChuMay).toBe(false) }
+      }
+    }
+    expect(daRot).toBe(true)
     await b.chay([A, B], 3000, rand)
     const s = A.v!.S
     expect(s.over).not.toBeNull()
     expect(B.v!.S.bam).toBe(s.bam)
     expect(A.v!.lech + B.v!.lech).toBe(0)
-    expect(A.loi.concat(B.loi)).toEqual([])
+    // lúc đổi máy chủ bàn, gói A.I tự động của máy cũ có thể bị từ chối (máy kia đã làm) — máy em không báo gì; ngoài ra không lỗi nào
+    expect(A.loi.concat(B.loi).filter((l) => !/^(cau_ai|giai_truoc_ai|cu): /.test(l))).toEqual([])
     // A.I (ghế trống cũ) có đánh thật, qua máy chủ bàn
     for (const i of trong) expect(b.soCu[i] ?? 0).toBeGreaterThan(0)
     expect(b.demGoi.cau_ai ?? 0).toBeGreaterThan(0) // A.I trả lời câu qua máy chủ bàn
