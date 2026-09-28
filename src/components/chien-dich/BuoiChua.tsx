@@ -1,4 +1,5 @@
-// BUỔI CHỮA khi chiến dịch hết hạn nộp (bản vẽ docs/ban-ve-game-hoa-2-2709/GV-BuoiChua.dc.html) — dữ liệu từ `buoi-chua`.
+// BUỔI CHỮA khi chiến dịch hết hạn nộp (bản vẽ docs/ban-ve-gv-2809/GV-BuoiChua, thầy chốt 28/09) — dữ liệu từ `buoi-chua`.
+// Đầu màn: 3 nút (Mở ca chốt · Chữa xong · Mở tờ máy chiếu = nút chính); 5 thẻ số (đã làm qua / thành thạo cuối kỳ, câu xếp sẵn, thời gian, tiến độ Đạt/Chưa đạt).
 // Bảng câu xếp sẵn (điểm chữa = chưa thành thạo + 2 × cần dạy lại, mỗi dạng một câu), người lên bảng (giải mẫu + sửa),
 // thời gian ước lượng bằng CÙNG công thức của Gọi lên bảng (`thoiGianCau`), tổng ≤ 90 phút, mỗi em có mặt ≥ 1 lượt (`xepBuoiChua`).
 // Nút chính "Mở tờ máy chiếu" (luồng tờ chiếu có sẵn), "Chữa xong" (hỏi lại, nói rõ hậu quả) ⇒ `chua-xong`, "Mở ca chốt".
@@ -11,7 +12,7 @@ import HopXacNhan from '../HopXacNhan'
 import { chuaXong, type BuoiChuaMayChu, type CauCanDayLai, type EmTen } from './api'
 import type { BangKetQua } from './ghi-to-chieu'
 import HopChon from './HopChon'
-import { congNgay, hienHanNop, hienNgay, phanTram } from './ngay'
+import { congNgay, hienHanNop, hienNgay } from './ngay'
 import { noiDungCua, type CauGoc, type OChieu } from './to-chieu'
 import { cauCaChot, chuNguoiSua, sapTheoTen, saoTuMucDo, xepBuoiChua, type DongBuoiChua } from './tinh'
 import './chien-dich.css'
@@ -93,6 +94,16 @@ export default function BuoiChua({
     return ra
   }
   const luotDayLai = kq.dong.reduce((s, d) => s + d.cau.soCanDayLai, 0)
+  // Tiến độ buổi chữa: câu đã có kết quả trên tờ chiếu; câu có em Chưa đạt ⇒ Chưa đạt, còn lại Đạt.
+  const ketQuaDong = kq.dong.map((d) => {
+    const r = ketQuaCua(d)
+    return r.length === 0 ? null : r.some((x) => x.kq === 'khong_dat') ? 'khong_dat' : 'dat'
+  })
+  const soDat = ketQuaDong.filter((x) => x === 'dat').length
+  const soChuaDat = ketQuaDong.filter((x) => x === 'khong_dat').length
+  const soDaChua = soDat + soChuaDat
+  const giayDaDung = kq.dong.reduce((s, d, i) => s + (ketQuaDong[i] ? d.giay : 0), 0)
+  const maxDiem = Math.max(1, ...kq.dong.map((d) => d.cau.soChuaThanhThao + 2 * d.cau.soCanDayLai))
   const ngayMai = congNgay(homNay, 1)
   const caChot = cauCaChot(
     kq.dong.map((d) => d.cau),
@@ -128,10 +139,13 @@ export default function BuoiChua({
     <>
       <div className="cd-dau">
         <div>
-          <h1>Lên bảng · Buổi chữa {du.chienDich.ten}</h1>
+          <p className="cd-duong-dan">Chữa trên lớp › Buổi chữa</p>
+          <h1>
+            Buổi chữa · {du.chienDich.ten}
+            {du.chienDich.lop ? ` · ${du.chienDich.lop}` : ''}
+          </h1>
           <p className="cd-so">
-            Chiến dịch đã hết hạn nộp lúc {hienHanNop(du.chienDich.hanNop, false).replace(' · ', ' ')}
-            {du.chienDich.lop ? ` · Lớp ${du.chienDich.lop}` : ''} · có mặt {emCoMat.length}/{dsEm.length || emCoMat.length} em ·{' '}
+            Chiến dịch đã hết hạn nộp lúc {hienHanNop(du.chienDich.hanNop, false).replace(' · ', ' ')} · có mặt {emCoMat.length}/{dsEm.length || emCoMat.length} em ·{' '}
             <button
               type="button"
               className="m3-nut-chu cd-nut-nho"
@@ -145,29 +159,67 @@ export default function BuoiChua({
             </button>
           </p>
         </div>
-        <span className="cd-chip cd-chip--vang">Hết hạn nộp · buổi chữa xếp sẵn</span>
+        <div className="cd-hang-nut">
+          <button type="button" className="m3-nut-vien cd-nut-nho" disabled={caChot.length === 0} onClick={moCaChot}>
+            Mở ca chốt · {caChot.length} câu
+          </button>
+          <button type="button" className="m3-nut-vien cd-nut-nho" disabled={!!daChua || kq.dong.length === 0} onClick={() => setHoiChua(true)}>
+            {daChua ? 'Đã chữa xong' : 'Chữa xong'}
+          </button>
+          <button type="button" className="m3-nut-chinh" disabled={kq.dong.length === 0 || dangChieu} onClick={() => void onChieu(oChieuTuDong(kq.dong), `Buổi chữa · ${du.chienDich.ten}`)}>
+            {dangChieu ? 'Đang mở tờ chiếu…' : 'Mở tờ máy chiếu'}
+          </button>
+        </div>
       </div>
 
-      <div className="cd-o-so-hang" data-khoi="o-so-buoi-chua">
-        <div className="cd-o-so">
-          <span>Cọ xát cuối kỳ (lớp)</span>
-          <strong>{phanTram(du.lop.coXat)}</strong>
+      <div className="cd-kpi-hang" data-khoi="o-so-buoi-chua">
+        <div className="cd-kpi">
+          <span className="cd-kpi-nhan" title="Câu em đã làm ít nhất 1 lần">
+            Đã làm qua cuối kỳ
+          </span>
+          <strong data-so="da-lam-qua">
+            {Math.round(du.lop.coXat * 100)}
+            <small>% câu</small>
+          </strong>
+          <span className="cd-kpi-phu cd-so">{du.soEm} em có mặt · trung bình lớp</span>
         </div>
-        <div className="cd-o-so">
-          <span>Thành thạo cuối kỳ (lớp)</span>
-          <strong>{phanTram(du.lop.thanhThao)}</strong>
+        <div className="cd-kpi">
+          <span className="cd-kpi-nhan" title="Câu đúng đủ lịch ôn, lần cuối đúng">
+            Thành thạo cuối kỳ
+          </span>
+          <strong data-so="thanh-thao">
+            {Math.round(du.lop.thanhThao * 100)}
+            <small>% câu</small>
+          </strong>
+          <span className="cd-kpi-phu">trung bình lớp</span>
         </div>
-        <div className="cd-o-so">
-          <span>Buổi chữa</span>
+        <div className="cd-kpi">
+          <span className="cd-kpi-nhan">Câu chữa xếp sẵn</span>
           <strong data-so="buoi-chua">
-            {kq.dong.length} câu · {phut(kq.tongGiay)}/{phut(kq.nganSachGiay)} phút
+            {kq.dong.length}
+            <small>câu</small>
           </strong>
+          <span className="cd-kpi-phu">mỗi dạng yếu một câu</span>
         </div>
-        <div className="cd-o-so">
-          <span>Em có lượt lên bảng</span>
-          <strong data-so="co-luot">
-            {kq.soEmCoLuot}/{kq.soEmCoMat} em
+        <div className="cd-kpi">
+          <span className="cd-kpi-nhan">Thời gian dự kiến</span>
+          <strong data-so="thoi-gian">
+            {phut(kq.tongGiay)}
+            <small>/ {phut(kq.nganSachGiay)} phút</small>
           </strong>
+          <span className="cd-kpi-phu cd-so" data-so="co-luot">
+            {kq.soEmCoLuot}/{kq.soEmCoMat} em có lượt lên bảng
+          </span>
+        </div>
+        <div className="cd-kpi">
+          <span className="cd-kpi-nhan">Tiến độ buổi chữa</span>
+          <strong data-so="tien-do">
+            {soDaChua}
+            <small>/ {kq.dong.length} câu</small>
+          </strong>
+          <span className="cd-kpi-phu cd-so">
+            <span className="cd-chu-xanh">Đạt {soDat}</span> · <span className="cd-chu-do">Chưa đạt {soChuaDat}</span> · đã dùng {phut(giayDaDung)} / {phut(kq.tongGiay)} phút
+          </span>
         </div>
       </div>
 
@@ -176,13 +228,18 @@ export default function BuoiChua({
           <p className="cd-phu">Không còn câu nào cần chữa: mọi em có mặt đã thành thạo các câu của chiến dịch.</p>
         ) : (
           <div role="table" aria-label="Câu chữa xếp sẵn">
+            <div className="cd-the-dau">
+              <h2>Câu chữa xếp sẵn · điểm chữa cao trước</h2>
+              <span className="cd-phu">Điểm chữa = số em chưa thành thạo + 2 × số em cần dạy lại</span>
+            </div>
             <div className="cd-hang-chua cd-hang-chua--dau" role="row">
               <span role="columnheader">#</span>
-              <span role="columnheader">Câu · dạng</span>
+              <span role="columnheader">Câu · dạng · mức độ</span>
               <span role="columnheader">Vì sao chữa</span>
               <span role="columnheader">Điểm chữa</span>
               <span role="columnheader">Người lên bảng</span>
               <span role="columnheader">Thời gian</span>
+              <span role="columnheader">Kết quả</span>
             </div>
             {kq.dong.map((d, i) => (
               <div key={d.cau.qid} className="cd-hang-chua" role="row" data-hang-chua={d.cau.qid}>
@@ -191,8 +248,13 @@ export default function BuoiChua({
                 </span>
                 <span role="cell">
                   <b>Câu {d.cau.stt}</b> · {d.cau.dang}
+                  {d.cau.mucDo && <small className="cd-phu cd-dong-phu">{d.cau.mucDo}</small>}
                 </span>
                 <span role="cell">
+                  <span className="cd-thanh-vi-sao" aria-hidden="true">
+                    <span className="cd-vs-chua" style={{ width: `${(100 * Math.max(0, d.cau.soChuaThanhThao - d.cau.soCanDayLai)) / maxDiem}%` }} />
+                    <span className="cd-vs-day" style={{ width: `${(100 * 2 * d.cau.soCanDayLai) / maxDiem}%` }} />
+                  </span>
                   {d.cau.soChuaThanhThao} em chưa thành thạo
                   {d.cau.soCanDayLai > 0 && (
                     <>
@@ -217,33 +279,28 @@ export default function BuoiChua({
                 <span className="cd-so" role="cell">
                   {phut(d.giay)} phút
                 </span>
+                <span role="cell">
+                  <span className={`cd-chip-muc cd-chip-muc--${ketQuaDong[i] === 'dat' ? 'xanh' : ketQuaDong[i] === 'khong_dat' ? 'do' : 'xam'}`} data-ket-qua-cau={ketQuaDong[i] ?? 'chua'}>
+                    {ketQuaDong[i] === 'dat' ? 'Đạt' : ketQuaDong[i] === 'khong_dat' ? 'Chưa đạt' : 'Chưa chữa'}
+                  </span>
+                </span>
               </div>
             ))}
           </div>
         )}
         <p className="cd-phu">
+          <span className="cd-cham cd-vs-chua" aria-hidden="true" /> Em chưa thành thạo (1 điểm/em) · <span className="cd-cham cd-vs-day" aria-hidden="true" /> Em cần dạy lại (2 điểm/em).
           Cách xếp: điểm chữa = số em chưa thành thạo + 2 × số em cần thầy dạy lại · mỗi dạng 1 câu đại diện · tổng ≤ {phut(kq.nganSachGiay)} phút · mỗi em có mặt ≥ 1 lượt.
           {kq.boCau.length > 0 && ` Đã bỏ bớt ${kq.boCau.length} câu điểm chữa thấp cho vừa giờ (Câu ${kq.boCau.map((c) => c.stt).join(', ')}).`}
         </p>
         {kq.vuotNganSach && <p className="cd-loi">Lớp đông: cho mỗi em một lượt thì buổi chữa cần {phut(kq.tongGiay)} phút, vượt {phut(kq.nganSachGiay)} phút.</p>}
       </section>
 
-      <div className="cd-thanh-hanh-dong">
-        <p className="cd-phu" aria-live="polite">
-          {daChua
-            ? `Đã chữa xong: ${daChua.soLuot} lượt em được mở khoá, vào Đoàn Hộ Tống từ ${hienNgay(daChua.ngayOnLai)}.`
-            : `Bấm “Chữa xong” khi chữa hết: ${luotDayLai} lượt em cần dạy lại được mở khoá, vào Đoàn Hộ Tống từ ${hienNgay(ngayMai, false)}.`}
-        </p>
-        <button type="button" className="m3-nut-chu cd-nut-nho" disabled={caChot.length === 0} onClick={moCaChot}>
-          Mở ca chốt · {caChot.length} câu
-        </button>
-        <button type="button" className="m3-nut-vien cd-nut-nho" disabled={!!daChua || kq.dong.length === 0} onClick={() => setHoiChua(true)}>
-          {daChua ? 'Đã chữa xong' : 'Chữa xong'}
-        </button>
-        <button type="button" className="m3-nut-chinh" disabled={kq.dong.length === 0 || dangChieu} onClick={() => void onChieu(oChieuTuDong(kq.dong), `Buổi chữa · ${du.chienDich.ten}`)}>
-          {dangChieu ? 'Đang mở tờ chiếu…' : 'Mở tờ máy chiếu'}
-        </button>
-      </div>
+      <p className="cd-phu" aria-live="polite">
+        {daChua
+          ? `Đã chữa xong: ${daChua.soLuot} lượt em được mở khoá, vào Đoàn Hộ Tống từ ${hienNgay(daChua.ngayOnLai)}.`
+          : `Bấm “Chữa xong” khi chữa hết: ${luotDayLai} lượt em cần dạy lại được mở khoá, vào Đoàn Hộ Tống từ ${hienNgay(ngayMai, false)}. Kết quả Đạt / Chưa đạt thầy bấm trên tờ máy chiếu, hiện lại ở cột Kết quả.`}
+      </p>
 
       {hoiChua && (
         <HopXacNhan

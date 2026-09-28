@@ -1,5 +1,5 @@
 // GAME HÓA 2.0 · GIAO CHIẾN DỊCH (bản vẽ GV-GiaoChienDich): điền sẵn tờ đề + lớp của ca, hạn nộp +7 ngày 23:59, thể lực 40,
-// Huyết Chiến tới 80. Đổi đầu vào ⇒ gọi lại `suc-chua`; nút chính ⇒ `tao`. Thầy 28/09: thể lực gõ số bất kì + nút gạt Tự động; bỏ rút câu / lùi hạn.
+// Quá tải hôm nay tới 80 (tên cũ Huyết Chiến). Đổi đầu vào ⇒ gọi lại `suc-chua`; nút chính ⇒ `tao`. Thầy 28/09: thể lực gõ số bất kì + nút gạt Tự động; bỏ rút câu / lùi hạn.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 
@@ -56,10 +56,10 @@ describe('giao chiến dịch — điền sẵn và gọi đúng lệnh', () => 
     expect(screen.getByText('BƯỚC TIẾP THEO')).toBeTruthy()
     expect(screen.getByRole('heading', { name: 'Giao chiến dịch luyện: Ester – Lipid' })).toBeTruthy()
     expect((screen.getByRole('checkbox', { name: /Đề vừa kiểm tra · DE-A/ }) as HTMLInputElement).checked).toBe(true)
-    expect((screen.getByLabelText(/Hạn nộp/) as HTMLInputElement).value).toBe('2026-10-04')
-    expect(screen.getByText('23:59 · Chủ Nhật 04/10/2026')).toBeTruthy()
-    expect((screen.getByLabelText(/Thể lực mỗi ngày/) as HTMLInputElement).value).toBe('40')
-    expect((screen.getByRole('checkbox', { name: /Huyết Chiến tới 80 câu\/ngày/ }) as HTMLInputElement).checked).toBe(true)
+    expect((screen.getByLabelText(/Hạn nộp \(hết lúc/) as HTMLInputElement).value).toBe('2026-10-04')
+    expect(screen.getAllByText('23:59 · Chủ Nhật 04/10/2026')).toHaveLength(2) // bước 3 + cột tóm tắt
+    expect((screen.getByLabelText(/Số lượt câu mỗi ngày/) as HTMLInputElement).value).toBe('40')
+    expect((screen.getByRole('checkbox', { name: /làm tới 80 câu\/ngày \(Quá tải hôm nay/ }) as HTMLInputElement).checked).toBe(true)
 
     await waitFor(() => expect(lenh('suc-chua').length).toBeGreaterThan(0))
     expect(lenh('suc-chua').at(-1)).toMatchObject({ action: 'suc-chua', lop: '12A1', maDe: ['DE-A'], hanNop: '2026-10-04', theLucNgay: 40 })
@@ -69,16 +69,16 @@ describe('giao chiến dịch — điền sẵn và gọi đúng lệnh', () => 
 
   it('Tự động (mặc định bật): thể lực nhận số máy chủ đề xuất, ô bị khoá; gạt tắt ⇒ gõ số bất kì (kể cả > 80) và gọi lại với số đó', async () => {
     render(<GiaoChienDich maCa="CA-1" lop="12A1" maDeCa={['DE-A']} nowMs={NOW} />)
-    const o = screen.getByLabelText(/Thể lực mỗi ngày/) as HTMLInputElement
-    expect((screen.getByRole('switch', { name: /Tự động/ }) as HTMLInputElement).checked).toBe(true)
+    const o = screen.getByLabelText(/Số lượt câu mỗi ngày/) as HTMLInputElement
+    expect((screen.getByRole('switch', { name: /Tự tính/ }) as HTMLInputElement).checked).toBe(true)
     await waitFor(() => expect(o.value).toBe('47'))
     expect(o.disabled).toBe(true)
     await waitFor(() => expect(lenh('suc-chua').some((b) => b.theLucNgay === 47)).toBe(true))
-    expect(screen.getByText(/Máy đề xuất 47 lượt\/ngày/)).toBeTruthy()
-    expect(screen.getByRole('checkbox', { name: /Huyết Chiến tới 94 câu\/ngày/ })).toBeTruthy()
+    expect(screen.getByText(/A.I Đỗ Đại Học đề xuất 47 lượt\/ngày/)).toBeTruthy()
+    expect(screen.getByRole('checkbox', { name: /làm tới 94 câu\/ngày/ })).toBeTruthy()
     expect(screen.queryByRole('button', { name: /Rút còn|Lùi hạn nộp/ })).toBeNull()
 
-    fireEvent.click(screen.getByRole('switch', { name: /Tự động/ }))
+    fireEvent.click(screen.getByRole('switch', { name: /Tự tính/ }))
     expect(o.disabled).toBe(false)
     fireEvent.change(o, { target: { value: '135' } })
     await waitFor(() => expect(lenh('suc-chua').some((b) => b.theLucNgay === 135)).toBe(true))
@@ -87,7 +87,7 @@ describe('giao chiến dịch — điền sẵn và gọi đúng lệnh', () => 
 
   it('bấm nút chính ⇒ `tao` với thể lực đang dùng, maCa, huyetChien, KHÔNG có rutCon; xong thì cho huỷ giao', async () => {
     render(<GiaoChienDich maCa="CA-1" lop="12A1" maDeCa={['DE-A']} tenGoiY="Ester – Lipid" nowMs={NOW} />)
-    await waitFor(() => expect((screen.getByLabelText(/Thể lực mỗi ngày/) as HTMLInputElement).value).toBe('47'))
+    await waitFor(() => expect((screen.getByLabelText(/Số lượt câu mỗi ngày/) as HTMLInputElement).value).toBe('47'))
     const nut = await screen.findByRole('button', { name: 'Giao chiến dịch cho 33 em' })
     await waitFor(() => expect((nut as HTMLButtonElement).disabled).toBe(false))
     fireEvent.click(nut)
@@ -105,6 +105,6 @@ describe('giao chiến dịch — điền sẵn và gọi đúng lệnh', () => 
     await new Promise((r) => setTimeout(r, 450))
     expect(lenh('suc-chua').length).toBe(1)
     expect((screen.getByRole('button', { name: /Giao chiến dịch cho/ }) as HTMLButtonElement).disabled).toBe(true)
-    expect(screen.getByText('Chọn tờ đề, lớp và hạn nộp để tính sức chứa.')).toBeTruthy()
+    expect(screen.getByText('Chọn tờ đề, em và hạn nộp để tính khối lượng.')).toBeTruthy()
   })
 })

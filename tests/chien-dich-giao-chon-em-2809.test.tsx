@@ -1,4 +1,4 @@
-// Giao chiến dịch (thầy 28/09): "chỗ chọn đề luyện chưa hiển thị đầy đủ đề kho đề, chọn lớp cho tôi chọn khối, chọn lớp tick theo em, số câu ở thanh đỏ chưa đồng bộ".
+// Giao chiến dịch (thầy 28/09; bản vẽ docs/ban-ve-gv-2809 GV-GiaoChienDich): ô chọn em nhiều tầng Khối › Lớp › Em, cây Kho đề, số câu đồng bộ, cột tóm tắt.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 
@@ -14,7 +14,7 @@ vi.mock('../src/lib/exam-db', () => ({
 }))
 
 import GiaoChienDich from '../src/components/chien-dich/GiaoChienDich'
-import { khoiCuaLop } from '../src/components/chien-dich/ChonEmGiao'
+import { khoiCuaLop, nhomDaChon } from '../src/components/chien-dich/ChonEmGiao'
 import { useAppStore } from '../src/store/appStore'
 
 const NOW = Date.UTC(2026, 8, 27, 3, 0, 0)
@@ -54,80 +54,119 @@ const coMayChu = () => {
   goi.mockImplementation(async (d: string, b: Record<string, unknown>) => (b.action === 'ds-em' ? { ok: true, du: { ok: true, em: EM_MAY_CHU } } : cu(d, b)))
 }
 const cuoi = () => lenh('suc-chua').at(-1) as Record<string, unknown>
+const moChon = async () => fireEvent.click(await screen.findByRole('button', { name: 'Chọn em' }))
 
-describe('giao chiến dịch — ba cách tích: toàn khối · theo lớp · từng em (danh sách từ máy chủ, có lớp đã phân)', () => {
+describe('ô chọn em nhiều tầng Khối › Lớp › Em (bản vẽ 28/09) — danh sách từ máy chủ, có lớp đã phân', () => {
   it('khối đọc từ đầu tên lớp', () => {
     expect(khoiCuaLop('12A1')).toBe('12')
     expect(khoiCuaLop('11')).toBe('11')
     expect(khoiCuaLop('10CL')).toBe('10')
     expect(khoiCuaLop('Ôn thi')).toBe('Khác')
   })
-  it('tích "Khối 12" ⇒ chọn cả 3 em khối 12, nhãn "Khối 12"; bỏ tích ⇒ 0 em, nút giao tắt', async () => {
+  it('gom thẻ đã chọn: khối đủ (nhiều lớp) ⇒ một thẻ khối; lớp đủ ⇒ thẻ lớp; một phần lớp ⇒ "x/y em"', () => {
+    const ds = EM_MAY_CHU.map((e) => ({ ...e }))
+    expect(nhomDaChon(ds, new Set(['1201', '1202', '1203'])).map((n) => [n.khoa, n.sbd.length, n.tong])).toEqual([['k:12', 3, 3]])
+    expect(nhomDaChon(ds, new Set(['1201', '1202', '1101'])).map((n) => [n.khoa, n.sbd.length, n.tong])).toEqual([
+      ['l:11', 1, 2],
+      ['l:12 - Tinh Hoa', 2, 2],
+    ])
+  })
+  it('tích "Khối 12" trong tấm ⇒ chọn cả 3 em, thẻ "Khối 12 · 3 em"; bỏ tích ⇒ 0 em, nút giao tắt', async () => {
     useAppStore.setState({ classList: [] } as never)
     coMayChu()
     render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
-    fireEvent.click(await screen.findByRole('checkbox', { name: 'Khối 12 · 3 em' }))
+    await moChon()
+    expect(screen.getByRole('button', { name: 'Đóng' }).getAttribute('aria-expanded')).toBe('true')
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Khối 12 · 0/3 em' }))
     await waitFor(() => expect(cuoi()).toMatchObject({ lop: 'Khối 12', sbd: ['1201', '1202', '1203'] }))
     expect(screen.getByText(/Đã chọn 3\/5 em/)).toBeTruthy()
-    fireEvent.click(screen.getByRole('checkbox', { name: 'Khối 12 · 3 em' }))
+    expect(document.querySelector('[data-nhom="k:12"]')?.textContent).toContain('Khối 12 · 3 em')
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Khối 12 · 3/3 em' }))
     expect(screen.getByText('Chưa chọn em nào')).toBeTruthy()
     await waitFor(() => expect((screen.getByRole('button', { name: /Giao chiến dịch cho/ }) as HTMLButtonElement).disabled).toBe(true))
   })
-  it('tích lớp đã phân "12 - Tinh Hoa" ⇒ đúng 2 em; ô Khối 12 hiện "2/3" (một phần)', async () => {
+  it('mở nhánh Khối 12, tích lớp "12 - Tinh Hoa" ⇒ đúng 2 em; ô Khối 12 thành "một phần" 2/3; thẻ × bỏ cả lớp', async () => {
     useAppStore.setState({ classList: [] } as never)
     coMayChu()
     render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
-    fireEvent.click(await screen.findByRole('checkbox', { name: '12 - Tinh Hoa · 2 em' }))
+    await moChon()
+    expect(screen.queryByRole('checkbox', { name: /12 - Tinh Hoa/ })).toBeNull() // nhánh gập sẵn
+    fireEvent.click(screen.getByRole('button', { name: 'Mở Khối 12' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: '12 - Tinh Hoa · 0/2 em' }))
     await waitFor(() => expect(cuoi()).toMatchObject({ lop: '12 - Tinh Hoa', sbd: ['1201', '1202'] }))
     const khoi12 = screen.getByRole('checkbox', { name: 'Khối 12 · 2/3 em' }) as HTMLInputElement
     expect(khoi12.checked).toBe(false)
     expect(khoi12.indeterminate).toBe(true)
+    expect(document.querySelector('[data-khoi="em-da-chon-theo-lop"]')?.textContent).toContain('12 - Tinh Hoa2 em')
+    fireEvent.click(screen.getByRole('button', { name: 'Bỏ 12 - Tinh Hoa' }))
+    expect(screen.getByText('Chưa chọn em nào')).toBeTruthy()
   })
-  it('từng em: lọc Khối 11 rồi "Tích tất cả" ⇒ chỉ thêm em khối 11; bỏ tích một em; "Bỏ hết" chỉ bỏ em đang hiện', async () => {
+  it('từng em: mở tới lớp để tích một em; ô tìm không dấu ("binh"); "Chọn hết" / "Bỏ chọn hết" chỉ áp cho em đang khớp', async () => {
     useAppStore.setState({ classList: [] } as never)
     coMayChu()
     render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
-    fireEvent.click(await screen.findByRole('checkbox', { name: '12 - Lớp Thường · 1 em' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Khối 11' }))
+    await moChon()
+    fireEvent.click(screen.getByRole('button', { name: 'Mở Khối 12' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Mở 12 - Lớp Thường' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /Giang/ }))
+    const tim = screen.getByRole('searchbox', { name: 'Tìm em' })
+    fireEvent.change(tim, { target: { value: 'binh' } })
+    expect(screen.getByRole('checkbox', { name: /Bình/ })).toBeTruthy()
     expect(screen.queryByRole('checkbox', { name: /Giang/ })).toBeNull()
-    fireEvent.click(screen.getByRole('button', { name: 'Tích tất cả' }))
+    fireEvent.change(tim, { target: { value: '11' } }) // khớp tên lớp "11" ⇒ An, Bình
+    fireEvent.click(screen.getByRole('button', { name: 'Chọn hết' }))
     fireEvent.click(screen.getByRole('checkbox', { name: /Bình/ }))
     await waitFor(() => expect(cuoi()).toMatchObject({ sbd: ['1101', '1203'] }))
-    fireEvent.click(screen.getByRole('button', { name: 'Bỏ hết' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Bỏ chọn hết' }))
     await waitFor(() => expect(cuoi()).toMatchObject({ sbd: ['1203'] }))
   })
-  it('ca vừa kiểm tra lớp "12" ⇒ tích sẵn cả khối 12', async () => {
+  it('Esc và "Xong" đóng tấm, tiêu điểm về nút mở', async () => {
+    useAppStore.setState({ classList: [] } as never)
+    coMayChu()
+    render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
+    await moChon()
+    expect(screen.getByRole('dialog', { name: 'Chọn em nhận chiến dịch' })).toBeTruthy()
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog', { name: 'Chọn em nhận chiến dịch' })).toBeNull()
+    expect(document.activeElement?.textContent).toContain('Chọn em')
+    await moChon()
+    fireEvent.click(screen.getByRole('button', { name: 'Xong' }))
+    expect(screen.queryByRole('dialog', { name: 'Chọn em nhận chiến dịch' })).toBeNull()
+  })
+  it('ca vừa kiểm tra lớp "12" ⇒ tích sẵn cả khối 12 (thẻ "Khối 12 · 3 em")', async () => {
     useAppStore.setState({ classList: [] } as never)
     coMayChu()
     render(<GiaoChienDich maDeCa={['DE-A-TN']} lop="12" nowMs={NOW} />)
-    await waitFor(() => expect((screen.getByRole('checkbox', { name: 'Khối 12 · 3 em' }) as HTMLInputElement).checked).toBe(true))
+    await waitFor(() => expect(document.querySelector('[data-nhom="k:12"]')?.textContent).toContain('Khối 12 · 3 em'))
     await waitFor(() => expect(cuoi()).toMatchObject({ lop: 'Khối 12', sbd: ['1201', '1202', '1203'] }))
   })
   it('máy chủ không trả danh sách ⇒ dùng danh sách trên máy (lớp của classList)', async () => {
     render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
-    fireEvent.click(screen.getByRole('checkbox', { name: '11A1 · 2 em' }))
+    await moChon()
+    fireEvent.click(screen.getByRole('button', { name: 'Mở Khối 11' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: '11A1 · 0/2 em' }))
     await waitFor(() => expect(cuoi()).toMatchObject({ lop: '11A1', sbd: ['1101', '1102'] }))
   })
 })
 
 describe('giao chiến dịch — kho đề đủ và số câu đồng bộ', () => {
-  it('hộp "Thêm tờ đề" hiện ĐỦ tờ, kể cả tờ trùng hết câu với tờ khác, và tách theo phần như màn Mở ca', async () => {
+  it('cây Kho đề (hiện ngay khi giao mới) có ĐỦ tờ, kể cả tờ trùng hết câu với tờ khác, tách theo phần như màn Mở ca; không có "Rút còn"', async () => {
     render(<GiaoChienDich nowMs={NOW} />)
-    fireEvent.click(screen.getByRole('button', { name: '+ Thêm tờ đề từ Ngân hàng đề' }))
-    const hop = await screen.findByRole('dialog')
+    const cay = await screen.findByRole('tree', { name: 'Cây chọn đề' })
     // Mở hết các nhánh của cây (cây gập sẵn) rồi mới đọc.
-    await waitFor(() => expect(within(hop).queryAllByRole('button', { name: /^Mở / }).length).toBeGreaterThan(0))
+    await waitFor(() => expect(within(cay).queryAllByRole('button', { name: /^Mở / }).length).toBeGreaterThan(0))
     for (let i = 0; i < 10; i++) {
-      const nut = within(hop).queryAllByRole('button', { name: /^Mở / })
+      const nut = within(cay).queryAllByRole('button', { name: /^Mở / })
       if (!nut.length) break
       nut.forEach((b) => fireEvent.click(b))
     }
-    expect(hop.textContent).toContain('DE-B')
-    expect(hop.textContent).toMatch(/DE-A-TN|Trắc nghiệm/)
-    expect(hop.textContent).toMatch(/DE-A-DS|Đúng sai/)
-    expect(within(hop).queryByText(/chưa có Ngân hàng đề/)).toBeNull()
+    expect(cay.textContent).toContain('DE-B')
+    expect(cay.textContent).toMatch(/DE-A-TN|Trắc nghiệm/)
+    expect(cay.textContent).toMatch(/DE-A-DS|Đúng sai/)
+    expect(screen.queryByText(/chưa có Kho đề/)).toBeNull()
+    expect(screen.queryByText(/Rút còn/)).toBeNull()
   })
-  it('số câu cạnh từng tờ lấy từ máy chủ (cộng = tổng); thanh đỏ ghi rõ câu mới × 2 lượt, lượt/ngày, x/y em quá tải', async () => {
+  it('số câu cạnh từng tờ lấy từ máy chủ (cộng = tổng); khối lượng ghi rõ câu mới × 2 lượt, lượt/ngày, x/y em quá tải; tóm tắt đủ dòng', async () => {
     useAppStore.setState({ classList: [] } as never)
     render(<GiaoChienDich maDeCa={['DE-A-TN', 'DE-A-DS']} lop="11" nowMs={NOW} />)
     await screen.findByText('106%')
@@ -135,9 +174,13 @@ describe('giao chiến dịch — kho đề đủ và số câu đồng bộ', (
     expect(screen.getByRole('checkbox', { name: /DE-A-DS · 50 câu/ })).toBeTruthy()
     expect(screen.getByText(/Tổng 170 câu/)).toBeTruthy()
     const dh = document.querySelector('[data-khoi="dong-ho-suc-chua"]')!
-    expect(dh.textContent).toContain('Em ở giữa lớp cần khoảng 340 lượt (170 câu mới × 2 lượt) · sức chứa 8 ngày × 40 lượt/ngày = 320 lượt.')
+    expect(dh.textContent).toContain('Khối lượng so với thời gian còn lại')
+    expect(dh.textContent).toContain('Em ở giữa lớp cần khoảng 340 lượt (170 câu mới × 2 lượt) · có 8 ngày × 40 lượt/ngày = 320 lượt.')
     expect(dh.textContent).toContain('91/91 em quá tải.')
     expect(lenh('suc-chua').at(-1)).toMatchObject({ lop: '11' })
     expect(lenh('suc-chua').at(-1)!.sbd).toBeUndefined()
+    const tt = document.querySelector('[data-khoi="tom-tat-giao"]') as HTMLElement
+    for (const chu of ['Tờ đề', 'Số câu170 câu', 'Giao cho', 'Hạn nộp', 'Lượt câu mỗi ngày', 'Khối lượng106% · quá tải', 'Dự kiến', 'Em dự kiến quá tải91 / 91 em'])
+      expect(tt.textContent).toContain(chu)
   })
 })
