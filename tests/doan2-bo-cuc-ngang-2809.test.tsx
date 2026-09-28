@@ -41,9 +41,11 @@ describe('Đoàn 2.0 · bố cục ngang: cấu trúc hai cột', () => {
     await screen.findByText('HCOONa')
     await waitFor(() => expect(man().className).toContain('dh2'))
     const khung = document.querySelector('.dh-khung.dh2-tran') as HTMLElement
-    const [trai, phai] = [...khung.children] as HTMLElement[]
+    // 28/09: giữa hai cột có thanh kéo đổi độ rộng (role=separator)
+    const [trai, keo, phai] = [...khung.children] as HTMLElement[]
     expect(trai.className).toContain('dh2-cot-trai'); expect(phai.className).toContain('dh2-cot-phai')
-    expect(khung.children).toHaveLength(2)
+    expect(keo.className).toContain('dh2-keo'); expect(keo.getAttribute('role')).toBe('separator')
+    expect(khung.children).toHaveLength(3)
     expect(trai.querySelector('[data-vung="canh-2"]')).toBeTruthy()
     expect(trai.textContent).toContain('HIỆP 2/8')
     expect(trai.querySelector('[aria-label="Đồng đội"]')?.textContent).toContain('Lan')
