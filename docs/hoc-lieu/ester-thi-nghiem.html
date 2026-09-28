@@ -288,15 +288,19 @@ select.sel{width:100%;appearance:none;-webkit-appearance:none;border:1px solid v
 @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* role cards */
-.roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.role{perspective:900px;height:170px;border:0;background:none;padding:0;cursor:pointer;text-align:left}
-.role .in{position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
+.roles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.lab-body.k3{grid-template-columns:minmax(0,1fr)}
+.lab-body.k3>.st{border-right:0;border-bottom:1px solid var(--line)}
+.lab-body.k3>.sd .game{max-width:640px}
+@media (max-width:900px){.roles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.role{display:block;width:100%;perspective:900px;height:178px;border:0;background:none;padding:0;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.role .in{display:block;position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.3,1.3,.5,1);transform-style:preserve-3d}
 .role.flip .in{transform:rotateY(180deg)}
 .role .fa,.role .fb{position:absolute;inset:0;border-radius:var(--r-m);backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:12px;display:flex;flex-direction:column;border:1px solid var(--line)}
 .role .fa{background:var(--surface);justify-content:space-between}
-.role .fa .ch{font:800 20px/1.1 var(--f-display)}
-.role .fa .q{font-size:12.5px;color:var(--muted)}
-.role .fa .sw{height:8px;border-radius:4px;background:var(--rc,var(--k3))}
+.role .fa .ch{display:block;font:800 20px/1.15 var(--f-display);overflow-wrap:anywhere}
+.role .fa .q{display:block;font-size:12.5px;line-height:1.35;color:var(--muted)}
+.role .fa .sw{display:block;height:8px;border-radius:4px;background:var(--rc,var(--k3))}
 .role .fb{background:color-mix(in srgb,var(--rc,var(--k3)) 14%,var(--surface));transform:rotateY(180deg);font-size:12.8px;line-height:1.45;overflow:auto}
 .role .fb b{display:block;font:700 13.5px/1.3 var(--f-body);margin-bottom:4px}
 .role.trap .fa{border-color:var(--bad);border-style:dashed}
@@ -1942,7 +1946,7 @@ LABS.k2 = function (el, pid) {
    ============================================================ */
 LABS.k3 = function (el, pid) {
   const flipIdx = { naoh: 3, kettinh: 7, h3po4: 8 }[pid];
-  el.innerHTML = `<div class="lab-body"><div class="st"><div class="h4" style="margin-bottom:10px">Bấm từng thẻ: mặt sau là vai trò và hậu quả nếu thay/bỏ</div><div class="roles" id="k3roles"></div></div>
+  el.innerHTML = `<div class="lab-body k3"><div class="st"><div class="h4" style="margin-bottom:10px">Bấm từng thẻ: mặt sau là vai trò và hậu quả nếu thay/bỏ</div><div class="roles" id="k3roles"></div></div>
   <div class="sd"><div class="game" id="k3game"></div></div></div>`;
   $('#k3roles').innerHTML = ROLES.map((r, i) => `<button type="button" class="role ${r.trap ? 'trap' : ''} ${i === flipIdx ? 'flip' : ''}" style="--rc:var(${r.rc})" aria-label="${esc(r.ch.replace(/[{}]/g, ''))}: lật thẻ"><span class="in"><span class="fa"><span class="ch">${fx(r.ch)}</span><span class="q">${r.trap ? 'Bẫy hay gặp' : 'Cho vào để làm gì?'}</span><span class="sw"></span></span><span class="fb"><b>${fx(r.vai)}</b>${fx(r.neu)}</span></span></button>`).join('');
   $$('#k3roles .role').forEach(b => b.addEventListener('click', () => b.classList.toggle('flip')));
