@@ -52,5 +52,6 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - ĐÃ PHÁT HÀNH Sảnh 3D: PR #17 (nhánh `sanh-3d` `fe0478b`). Chưa chạy toàn bộ vitest (hết tín dụng). VIỆC SAU: chạy toàn bộ vitest so nền; thêm trôi tự động thị sai, đếm số tăng, nét đứt chạy, sửa 844×390 phải cuộn cột phải, nạp lười cảnh.
 - Sửa Đảo ngang lời giải: PR #18 (tự cuộn tới LỜI GIẢI) + PR #19 `f68e54a` (thẻ câu overflow:hidden bị flex ép lùn ⇒ không cuộn; thêm flex-shrink:0). CẦN KIỂM Đoàn ngang có cùng lỗi không (cột phải XemLaiChuan).
 - VIỆC MỚI (thầy 28/09): "Sổ tay, túi đồ, cửa hàng làm cả giao diện xoay ngang luôn nhé" — nhánh `ngang-so-tay-tui-cua-hang`. Theo phong cách bản ngang đã phát hành (Sảnh 3D sáng, kính sáng chữ tối; ≥1024 px hoặc xoay ngang ≥700 px), dọc giữ nguyên.
-- ĐÃ PHÁT HÀNH: PR #20 thanh kéo cột Đảo ngang (`95a3404`); PR #21 ngang Sổ tay/Túi đồ/Cửa hàng (`f9f6ee1`). Còn: chưa xem thật 844×390; kiểm Đoàn ngang có cùng lỗi cuộn lời giải không; chạy toàn bộ vitest so nền.
+- ĐÃ PHÁT HÀNH: PR #20 thanh kéo cột Đảo ngang (`95a3404`); PR #21 ngang Sổ tay/Túi đồ/Cửa hàng (`f9f6ee1`). Còn: chưa xem thật 844×390; chạy toàn bộ vitest so nền.
 - ĐÃ PHÁT HÀNH PR #22 Thử đồ ngang (`f2a2d8f`) — chưa có test riêng, chưa xem trình duyệt thật.
+- ĐÃ PHÁT HÀNH PR #23 Đoàn ngang thanh kéo cột + cột lời giải cuộn (`301ed39`).
