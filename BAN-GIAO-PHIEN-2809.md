@@ -92,3 +92,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 20:53 · Deploy #545 THÀNH CÔNG: PR #47 lịch sử ca HS + báo cáo bản mới + hộp thoại app · main 677b1b1 · lùi: git revert -m 1 677b1b1. Chờ: xoa-bao-cao-cu, Code 1 Bi-a Câu đã làm, ngay-bat-dau-cd.
 - 21:13 · Deploy #546 THÀNH CÔNG: PR #48 ngày bắt đầu chiến dịch · main 9fcef48 · lùi: git revert -m 1 9fcef48. 21:25 merge PR #49 xoá báo cáo HS cũ (main 2e41cfb), đang deploy.
 - 21:37 · Deploy #547 THÀNH CÔNG: PR #49 xoá báo cáo HS cũ · main 2e41cfb · lùi: git revert -m 1 2e41cfb.
+- 21:51 · Deploy #548 THÀNH CÔNG: PR #50 đổi tên thần thú · main 7ff811e · lùi: git revert -m 1 7ff811e.
