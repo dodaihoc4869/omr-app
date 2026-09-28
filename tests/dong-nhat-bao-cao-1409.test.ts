@@ -94,8 +94,14 @@ describe('không chỗ gọi nào được tự nhặt trường nữa', () => {
   const goi = ['src/screens/StudentPortalScreen.tsx']
   const chiaSe = ['src/screens/ExamMonitorScreen.tsx', 'src/lib/bao-cao-mot-em.ts']
 
-  it('hai chỗ còn mở hộp báo cáo chung (học sinh, hồ sơ em) đều đi qua `goiBaiThi`', () => {
-    for (const f of goi) expect(doc(f), f).toContain('goiBaiThi(')
+  it('cổng học sinh và màn thi mở BÁO CÁO BẢN MỚI (BaoCaoCaCuaEm → BaoCaoChiTiet chế độ em), không còn hộp báo cáo cũ', () => {
+    // 28/09 thầy: "báo cáo chi tiết đã sửa bản mới rồi, thay thế hết bằng bản mới".
+    for (const f of [...goi, 'src/screens/ExamTakeScreen.tsx']) {
+      expect(doc(f), f).toContain("import('../components/ca-thi/BaoCaoCaCuaEm')")
+      expect(doc(f), f).not.toContain('BaoCaoCaThiHocSinhModal')
+      expect(doc(f), f).not.toContain('goiBaiThi(')
+    }
+    expect(doc('src/components/ca-thi/BaoCaoCaCuaEm.tsx')).toContain('cheDo="hs"')
     expect(doc('src/screens/HocSinhScreen.tsx')).not.toContain('BaoCaoCaThiHocSinhModal')
     expect(doc('src/screens/HocSinhScreen.tsx')).toContain('moChiTietCa(caBaoCao.maCa, hoSo.em.sbd)')
   })

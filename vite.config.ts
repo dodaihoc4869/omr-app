@@ -123,6 +123,8 @@ export default defineConfig({
           // Bảng tin sàn của thầy: bản đồ lớp 3D nạp LƯỜI (import động) — three (≈ 536 KB) chỉ máy thầy tải khi mở màn Hôm nay; máy học sinh / phụ huynh KHÔNG được cất vào bộ nhớ đệm.
           '**/ban-do-3d-three-*.js',
           '**/{CaiDatScreen,TongQuanScreen,ChienDichScreen,gv-hoa2,GiaoDeTheoTuanScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,DaoThanThu,DoanHoTong,Game,html-may-chieu,Dao2,DoanHinh,chien-dich,ca-chot-chien-dich,CauDaLam}-*.{js,css}',
+          // Lịch sử ca + báo cáo chi tiết bản mới của em (28/09): mảnh nạp LƯỜI khi em bấm thẻ "Ca kiểm tra gần nhất" / "Xem báo cáo" (đang có mạng) — kho chạy-lúc.
+          '**/{LichSuCaEm,BaoCaoCaCuaEm,BaoCaoChiTiet,CauCanChua,ca-thi,cau-da-lam,cau-chuyen}-*.{js,css}',
           // Game Hóa 2.0 (27/09): hình vẽ 32 phụ kiện thần thú (nạp lười trong game) — chỉ máy mở game mới tải, cất ở kho chạy-lúc.
           '**/pk-{cl,da,hq,vd}-*.js',
           // Gộp ngang + app thầy 2.0 (28/09): các mảnh nạp LƯỜI chỉ của app thầy (giao/chiếu chiến dịch, bố cục tờ chiếu) và của game

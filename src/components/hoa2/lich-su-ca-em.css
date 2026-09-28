@@ -1,0 +1,172 @@
+/* LỊCH SỬ CA KIỂM TRA của em (Game Hóa 2.0, 28/09). Khung + bảng màu dùng lại `.h2-cdl` (cau-da-lam.css). Màu viết rgb()/biến — `npm run check:mau`.
+ * Chạm ≥ 48 px, chữ thân ≥ 15 px, số tabular-nums, không cuộn ngang ở 360 px. */
+.h2-lsc-ds {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 16px max(24px, env(safe-area-inset-bottom));
+}
+.h2-lsc-danh {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.h2-lsc-the {
+  width: 100%;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--h2c-vien);
+  background: var(--h2c-nen-2);
+  color: var(--h2c-chu);
+  text-align: left;
+  font: inherit;
+}
+button.h2-lsc-the {
+  transition: transform 150ms ease, background-color 150ms ease;
+}
+button.h2-lsc-the:hover {
+  background: var(--h2c-nen-3);
+}
+button.h2-lsc-the:active {
+  transform: scale(0.99);
+}
+.h2-lsc-the[data-cho='true'] {
+  background: transparent;
+  border-style: dashed;
+}
+.h2-lsc-chu {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.h2-lsc-ten {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.h2-lsc-gio {
+  font-size: 13px;
+  color: var(--h2c-chu-phu);
+  font-variant-numeric: tabular-nums;
+}
+.h2-lsc-phu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 14px;
+  color: var(--h2c-chu-nhat);
+  font-variant-numeric: tabular-nums;
+}
+.h2-lsc-xh {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+.h2-lsc-xh[data-huong='len'] {
+  color: rgb(120 230 170);
+}
+.h2-lsc-xh[data-huong='xuong'] {
+  color: rgb(255 156 140);
+}
+.h2-lsc-xh[data-huong='bang'],
+.h2-lsc-xh[data-huong='dau'] {
+  color: var(--h2c-chu-phu);
+}
+.h2-lsc-diem {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-variant-numeric: tabular-nums;
+}
+.h2-lsc-diem b {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--h2c-vang-sang);
+}
+.h2-lsc-diem span {
+  font-size: 13px;
+  color: var(--h2c-chu-phu);
+}
+.h2-lsc-cho {
+  flex-shrink: 0;
+  max-width: 45%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--h2c-vien);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--h2c-chu-nhat);
+  text-align: center;
+}
+.h2-lsc-thong-bao {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--h2c-nen-2);
+  font-size: 15px;
+  line-height: 1.5;
+}
+.h2-lsc-thong-bao p {
+  margin: 0;
+}
+.h2-lsc-nut-phu {
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 24px;
+  border: 1px solid var(--h2c-xanh);
+  background: transparent;
+  color: var(--h2c-xanh);
+  font-size: 15px;
+  font-weight: 700;
+}
+.h2-lsc-xuong {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.h2-lsc-xuong > span:not(.h2-an) {
+  height: 72px;
+  border-radius: 18px;
+  background: var(--h2c-nen-2);
+  opacity: 0.7;
+}
+.h2-lsc .h2-an {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.h2-lsc-phu-man {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(10 19 48 / 0.7);
+  color: var(--h2c-chu);
+  font-size: 15px;
+}
+@media (prefers-reduced-motion: reduce) {
+  button.h2-lsc-the {
+    transition: none;
+  }
+}
