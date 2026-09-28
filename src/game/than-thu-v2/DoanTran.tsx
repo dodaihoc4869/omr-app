@@ -1,6 +1,6 @@
 // ĐOÀN HỘ TỐNG — màn TRONG TRẬN (bản vẽ 2) và TRÙM CÂU CHUNG (bản vẽ 5). Không cuộn từ 360×740: mọi khối cố định chiều cao,
 // chỉ riêng thẻ câu được cuộn BÊN TRONG khi đề quá dài.
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type { Question } from './core'
 import { CHIEU, HIEP_TRUM, NL_KY_NANG, CHAN, satThuongDon, type HanhDong } from './doan-core'
 import { CHU_TRANG_THAI, NHAN_CAU, TIN_HIEU_TRUM, type DoanXem, type GheXem, type KetQuaCau } from './doan-kieu'
@@ -15,7 +15,7 @@ import BuaTroGiang from './doan2/BuaTroGiang'
 import XemLaiChuan from './doan2/XemLaiChuan'
 import type { GoiYM3 } from './doan2/kieu2'
 
-export interface CauVuaLam { q: Question; chon: string; ketQua: KetQuaCau | null }
+export interface CauVuaLam { q: Question; chon: string; ketQua: KetQuaCau | null; /** Chỉ-thêm: hiệp của câu (để biết câu này đã là "câu vừa rồi" chưa). */ hiep?: number }
 export interface LoiGiaiTrum { hiep: number; de: Question; answer: string; solution: unknown }
 interface Props {
   xem: DoanXem; de?: Question; deTrum?: Question
@@ -28,6 +28,8 @@ interface Props {
   onXinTiepSuc: (bat: boolean) => void; onMoTiepSuc: (ghe: number) => void; expTiepSuc?: number
   /** GAME HÓA 2.0 (`hoa2-sanh` báo `cheDo2`): giao diện mới theo bản vẽ Moi-DoanTran — cùng lệnh, cùng luồng; vắng ⇒ y hệt bản cũ. */
   cheDo2?: boolean; /** Gợi ý M3 (Bùa Trợ giảng) của câu đang chơi. */ goiY?: GoiYM3 | null; /** Ổ phục kích (câu ôn) còn lại hôm nay; null = chưa biết. */ oPhucKich?: number | null
+  /** Chỉ-thêm (Hóa 2.0): có ⇒ quãng nghỉ giữ nguyên lời giải, KHÔNG đồng hồ, tới khi em bấm nút này (`nhanTiep`, mặc định "ĐÁNH TIẾP"). */
+  onDanhTiep?: () => void; nhanTiep?: string
 }
 
 const phut = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
@@ -112,6 +114,12 @@ export default function DoanTran(p: Props) {
   )
 
   const v2 = !!p.cheDo2
+  // Hóa 2.0 · phòng ≥ 2 người thật giữ nhịp cũ (không bắt bạn chờ) ⇒ em vẫn mở lại được lời giải câu vừa rồi, đồng hồ hiệp vẫn chạy.
+  const [xemLai, setXemLai] = useState(false)
+  const nhieuNguoi = xem.ghe.filter(g => !g.laMay && !g.roi).length >= 2
+  const cauTruoc = p.cauVuaLam && p.cauVuaLam.hiep !== undefined && p.cauVuaLam.hiep < tran.hiep ? p.cauVuaLam : null
+  const coXemLai = v2 && mo && nhieuNguoi && !tran.laTrum && !!cauTruoc?.ketQua
+  const choTiep = v2 && !mo && !!p.onDanhTiep
   let than: ReactNode
   if (!mo) {
     // Quãng nghỉ giữa hai hiệp: em đọc lại câu vừa làm + lời giải; sau hiệp trùm thì đáp án câu chung.
@@ -130,9 +138,14 @@ export default function DoanTran(p: Props) {
       </section>
     ) : p.cauVuaLam ? (
       <DoanCau q={p.cauVuaLam.q} chon={p.cauVuaLam.chon} onChon={() => {}} khoa ketQua={p.cauVuaLam.ketQua} onZoom={p.onZoom} dau={<><b className="dh-vien-thuoc">{v2 ? 'CÂU ÔN EM VỪA LÀM' : 'CÂU EM VỪA LÀM'}</b><span>đọc lại trước khi sang hiệp mới</span></>}
-        xemLaiChuan={v2 ? { stt: Math.max(1, tran.hiep - 1) } : undefined} />
+        xemLaiChuan={v2 ? { stt: p.cauVuaLam.hiep ?? Math.max(1, tran.hiep - 1) } : undefined} />
     ) : (
       <section className="dh-giay"><div className="dh-de">{tran.hiep === 1 ? 'Cả đội vào vị trí. Mỗi bạn sẽ nhận MỘT câu của riêng mình — làm đúng thì ra đòn, làm sai thì thần thú tự chắn cho Linh Tâm.' : 'Hiệp mới sắp mở.'}</div></section>
+    )
+  } else if (coXemLai && xemLai) {
+    than = (
+      <DoanCau q={cauTruoc!.q} chon={cauTruoc!.chon} onChon={() => {}} khoa ketQua={cauTruoc!.ketQua} onZoom={p.onZoom} dau={<><b className="dh-vien-thuoc">CÂU ÔN EM VỪA LÀM</b><span>đồng hồ hiệp này vẫn chạy</span></>}
+        xemLaiChuan={{ stt: cauTruoc!.hiep! }} />
     )
   } else if (tran.laTrum) {
     const trum = xem.trum
@@ -225,8 +238,10 @@ export default function DoanTran(p: Props) {
       {/* Thẻ tiếp sức của bạn nằm DƯỚI câu: đặt trên câu thì mỗi lần bạn gửi thẻ (nhịp hỏi 1,5 s) cả lưới đáp án bị đẩy xuống dưới ngón tay em (P0 "đáp án bị nhảy"). */}
       {mo && ts?.theNhan && <div className="dh-the-nhan" role="status"><small>{ts.theNhan.tuLaMay ? 'BẠN ĐỒNG HÀNH' : ts.theNhan.tuTen.toUpperCase()} TIẾP SỨC · {ts.theNhan.tieuDe.toUpperCase()}</small>{ts.theNhan.noiDung}</div>}
       {p.loi && <div className="dh-loi" role="alert">{p.loi}</div>}
-      {duoi}
-      {!mo && !tran.ketThuc && <div className="dh-cho" role="status">{tran.hiep === 1 && !xem.hiepVuaXong ? 'Chuẩn bị lên đường' : `Hiệp ${tran.hiep}${tran.laTrum ? ' · TRÙM' : ''} mở sau`} {Math.max(1, p.moSauGiay)} giây</div>}
+      {coXemLai && <button type="button" className="dh-xin" style={{ minHeight: 48 }} aria-pressed={xemLai} onClick={() => setXemLai(x => !x)}>{xemLai ? 'Quay lại câu hiệp này' : 'Xem lại câu vừa rồi'}</button>}
+      {!(coXemLai && xemLai) && duoi}
+      {choTiep && <button type="button" className="dh-nut-lam dh2-nut-chinh dh2-baloo" data-vung="danh-tiep" style={{ minHeight: 54 }} disabled={p.ban} onClick={p.onDanhTiep}>{p.ban ? 'CHỜ MỘT CHÚT…' : p.nhanTiep ?? 'ĐÁNH TIẾP'}</button>}
+      {!mo && !tran.ketThuc && !choTiep && <div className="dh-cho" role="status">{tran.hiep === 1 && !xem.hiepVuaXong ? 'Chuẩn bị lên đường' : `Hiệp ${tran.hiep}${tran.laTrum ? ' · TRÙM' : ''} mở sau`} {Math.max(1, p.moSauGiay)} giây</div>}
       {!mo && !tran.ketThuc && p.hetCauMoi && tran.hiep === 1 && <div className="dh-cho" role="status" data-vung="het-cau-moi">{CHU_HET_CAU_MOI}</div>}
       {!mo && !tran.ketThuc && tran.hiep === 1 && !!xem.soCauThieu && <div className="dh-cho" role="status">Kho của em còn thiếu {xem.soCauThieu} câu phù hợp. Hiệp không có câu, em cổ vũ đồng đội nhé.</div>}
     </div>
