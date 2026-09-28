@@ -11,7 +11,7 @@ import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
 import { maDeTuBoCau } from '../components/chien-dich/tinh'
-import { Check, Trash2, ChevronRight, Lock, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
+import { Check, Trash2, ChevronRight, Unlock, Pencil, LogIn, BarChart3, ArrowLeft } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
 import { classify } from '../engine/score'
 import { danhSachCa, type CaTomTat, batDauThi, capNhatKeyBank, chiTietCa, doiTenCa, dongBoTenCa, moTaLyDoChan, ghiDiem, khoaCa, moKhoa, moKhoaCa, sendTeacherMessage, xoaCa, type ChiTietCa, type ChiTietCauRow, type LuotThiRow, type PhamViCa, type CongBoDiem } from '../lib/exam-api'
@@ -46,7 +46,7 @@ import './ca-thi-m3.css'
 import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
 import KetThucCa from '../components/ca-thi/KetThucCa'
 import BaoCaoChiTiet from '../components/ca-thi/BaoCaoChiTiet'
-import { congBoDiemCa, layBaoCaoCaDayDu, type ThemBaoCaoCa } from '../lib/bao-cao-chi-tiet'
+import { congBoDiemCa, dongCuaVaoCa, layBaoCaoCaDayDu, type ThemBaoCaoCa } from '../lib/bao-cao-chi-tiet'
 import { tinhBaoCaoCaLop, tomTatCaLop, type BaoCaoCaLop, type EmChoBaoCao } from '../lib/bao-cao-ca-lop'
 import { ghepBaoCaoMotEm, layBaoCaoEmMayChu, type BaoCaoEmMayChu } from '../lib/bao-cao-may-chu'
 import { nguonCauTuNganHang, tinhBaoCaoMotEm } from '../lib/bao-cao-mot-em'
@@ -205,6 +205,8 @@ export default function ExamMonitorScreen() {
   const setScreen = useAppStore((s) => s.setScreen)
   const classList = useAppStore((s) => s.classList)
   const maCaTheoDoi = useAppStore((s) => s.maCaTheoDoi)
+  const sbdBaoCaoCa = useAppStore((s) => s.sbdBaoCaoCa)
+  const xongSbdBaoCaoCa = useAppStore((s) => s.xongSbdBaoCaoCa)
   const moToanCanh = useAppStore((s) => s.moToanCanh)
   const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
   // GAME HÓA 2.0: ca đã kết thúc ⇒ thẻ "BƯỚC TIẾP THEO · Giao chiến dịch luyện" (chỉ khi cờ bật; tắt thì màn như cũ).
@@ -253,6 +255,9 @@ export default function ExamMonitorScreen() {
   const [dangGuiBao, setDangGuiBao] = useState(false)
   const [dangXoa, setDangXoa] = useState(false)
   const [hoiKhoa, setHoiKhoa] = useState(false)
+  // ĐÓNG CỬA VÀO (bản vẽ 28/09): hỏi lại trước khi gọi `/gv/dong-cua-vao`.
+  const [hoiDongCua, setHoiDongCua] = useState(false)
+  const [dangDongCua, setDangDongCua] = useState(false)
   const [dangKhoa, setDangKhoa] = useState(false)
   // ĐỔI TÊN CA (thầy báo 07/09). `null` = đang không sửa; chuỗi = ô nhập đang
   // mở và giữ bản nháp. Bản nháp tách khỏi `chiTiet` để thầy gõ dở rồi bấm Huỷ
@@ -363,6 +368,15 @@ export default function ExamMonitorScreen() {
       setDangTai(false)
     }
   }
+
+  // ĐI TỪ MÀN HỌC SINH (nút Báo cáo một ca): modal báo cáo HS cũ đã gộp vào đây ⇒ tải xong đúng ca thì mở Báo cáo chi tiết › Từng em.
+  useEffect(() => {
+    if (!sbdBaoCaoCa || !chiTiet || chiTiet.ca.maCa !== maCaTheoDoi) return
+    setSbdHoSo(sbdBaoCaoCa)
+    setMoBaoCao('em')
+    xongSbdBaoCaoCa?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sbdBaoCaoCa, chiTiet?.ca.maCa, maCaTheoDoi])
 
   useEffect(() => {
     if (maCaTheoDoi) tai(maCaTheoDoi)
@@ -1066,13 +1080,24 @@ export default function ExamMonitorScreen() {
     try {
       const kq = await khoaCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa)
       setHoiKhoa(false)
-      showToast(kq.soEmBiNop > 0 ? `Đã khoá ca — ${kq.soEmBiNop} em bị nộp bài theo phần đã làm` : 'Đã khoá ca — không em nào đang làm', 'success')
+      showToast(kq.soEmBiNop > 0 ? `Đã kết thúc ca — ${kq.soEmBiNop} em bị nộp bài theo phần đã làm` : 'Đã kết thúc ca — không em nào đang làm', 'success')
       await tai(chiTiet.ca.maCa, true)
     } catch (e) {
-      showToast(`Không khoá được: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
+      showToast(`Chưa kết thúc được ca: ${e instanceof Error ? e.message : 'lỗi không rõ'}`, 'error')
     } finally {
       setDangKhoa(false)
     }
+  }
+
+  const dongCuaVaoNay = async () => {
+    if (!chiTiet) return
+    setDangDongCua(true)
+    const loiDc = await dongCuaVaoCa(chiTiet.ca.maCa)
+    setDangDongCua(false)
+    if (loiDc) return showToast(`Chưa đóng được cửa vào: ${loiDc}`, 'error')
+    setHoiDongCua(false)
+    showToast('Đã đóng cửa vào — em đang làm vẫn làm tiếp, em chưa vào không vào được nữa', 'success')
+    await tai(chiTiet.ca.maCa, true)
   }
 
   const moLaiCa = async () => {
@@ -1300,6 +1325,14 @@ export default function ExamMonitorScreen() {
                 // Hộp hỏi lại nằm ở cột dưới: kéo tới cho thầy thấy ngay (không khoá khi chưa bấm xác nhận).
                 setTimeout(() => document.querySelector('[data-hop="khoa-ca"]')?.scrollIntoView?.({ behavior: 'smooth', block: 'center' }), 60)
               }}
+              onDongCuaVao={() => {
+                setHoiDongCua(true)
+                setTimeout(() => document.querySelector('[data-hop="dong-cua"]')?.scrollIntoView?.({ behavior: 'smooth', block: 'center' }), 60)
+              }}
+              daDongCua={(() => {
+                const t = Date.parse(String(chiTiet.ca.hetHanVao || ''))
+                return Number.isFinite(t) && t <= now
+              })()}
               dangLamNgay={dangLamNgay}
             />
           ) : (
@@ -1452,7 +1485,10 @@ export default function ExamMonitorScreen() {
                   {cua.moCua ? 'Ca đang mở' : 'Ca đang khoá'}
                 </span>
               </div>
-              <div className="grid grid-cols-2" style={{ gap: 'var(--k2)' }}>
+              {/* BẢN VẼ 28/09: nút "Khoá ca" cũ trùng việc với "Kết thúc ca ngay" ở Việc nhanh ⇒ GỠ; chỉ còn MỘT nút Kết thúc ca (cùng lệnh khoaCa, hỏi lại).
+                  Ở đây chỉ còn Mở ca, hiện khi ca đang khoá. */}
+              {!cua.moCua && (
+              <div className="grid grid-cols-1" style={{ gap: 'var(--k2)' }}>
                 <button
                   type="button"
                   onClick={moLaiCa}
@@ -1485,43 +1521,12 @@ export default function ExamMonitorScreen() {
                     <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', opacity: 0.85 }}>Em vào được ngay</span>
                   </span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setHoiKhoa(true)}
-                  disabled={dangKhoa || !cua.khoaDuoc}
-                  aria-label="Khoá ca"
-                  className="tap-target flex items-center"
-                  style={{
-                    minHeight: 64,
-                    gap: 'var(--k2)',
-                    padding: '0 var(--k3)',
-                    borderRadius: 'var(--bo-3)',
-                    border: 'none',
-                    textAlign: 'left',
-                    background: cua.khoaDuoc ? 'var(--do-nen)' : 'var(--the-2)',
-                    color: cua.khoaDuoc ? 'var(--do)' : 'var(--mo)',
-                    boxShadow: cua.khoaDuoc ? 'var(--bong-1)' : 'none',
-                    transition: 'transform 120ms ease, box-shadow 120ms ease',
-                  }}
-                >
-                  <span
-                    className="flex items-center justify-center shrink-0"
-                    style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: cua.khoaDuoc ? 'var(--do)' : 'var(--the)', color: cua.khoaDuoc ? 'var(--muc-nguoc)' : 'var(--mo)' }}
-                  >
-                    <Lock size={19} />
-                  </span>
-                  <span className="flex flex-col" style={{ gap: 1, minWidth: 0 }}>
-                    <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
-                      Khoá ca
-                    </span>
-                    <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', opacity: 0.85 }}>Dừng và nộp bài</span>
-                  </span>
-                </button>
               </div>
+              )}
               <div style={{ ...NHAN_NHO, marginTop: 'var(--k2)' }}>
                 {cua.moCua
-                  ? 'Khoá ca: em đang làm bị nộp ngay theo phần đã làm, em chưa vào thì không vào được nữa.'
-                  : 'Mở ca: bỏ hạn giờ vào phòng, em đến muộn vào được ngay. Em đã bị nộp do khoá phải duyệt thi lại từng em.'}
+                  ? 'Kết thúc ca: bấm "Kết thúc ca ngay" ở Việc nhanh phía trên — máy hỏi lại trước khi làm.'
+                  : 'Mở ca: bỏ hạn giờ vào phòng, em đến muộn vào được ngay. Em đã bị nộp do kết thúc ca phải duyệt thi lại từng em.'}
               </div>
             </div>
             {/* HAI LINK GỬI CHO EM — vẽ lại 07/09 theo ý thầy.
@@ -1703,6 +1708,25 @@ export default function ExamMonitorScreen() {
 
           {/* HỘP XÁC NHẬN KHOÁ — nêu ĐÚNG SỐ ĐẾM THẬT, không nói chung chung.
               Thầy phải biết mình đang cắt bài của mấy em trước khi bấm. */}
+          {hoiDongCua && (
+            <TheNoiDung>
+              <div data-hop="dong-cua" style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Đóng cửa vào ca {chiTiet.ca.maCa}?</div>
+              <OThongBao tone="cam">
+                {chuaVao === null ? 'Em nào chưa vào sẽ không vào được nữa.' : <><b style={SO}>{chuaVao}</b> em chưa vào sẽ không vào được nữa.</>}{' '}
+                <b style={SO}>{dangLamNgay}</b> em đang làm vẫn làm tiếp tới hết giờ.
+              </OThongBao>
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Em được thầy duyệt thi lại vẫn vào được. Ca vẫn mở, chưa nộp bài của ai.</div>
+              <div className="flex" style={{ gap: 'var(--k3)', marginTop: 'var(--k4)' }}>
+                <button type="button" onClick={() => setHoiDongCua(false)} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}>
+                  Huỷ
+                </button>
+                <button type="button" onClick={dongCuaVaoNay} disabled={dangDongCua} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--cam)', color: 'var(--giay)' }}>
+                  {dangDongCua ? 'Đang đóng…' : 'Đóng cửa vào'}
+                </button>
+              </div>
+            </TheNoiDung>
+          )}
+
           {hoiKhoa && (
             <TheNoiDung>
               <div data-hop="khoa-ca" style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Kết thúc ca {chiTiet.ca.maCa}?</div>
@@ -1718,7 +1742,7 @@ export default function ExamMonitorScreen() {
                   Huỷ
                 </button>
                 <button type="button" onClick={khoaCaNay} disabled={dangKhoa} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--do)', color: 'var(--giay)' }}>
-                  {dangKhoa ? 'Đang khoá…' : 'Khoá'}
+                  {dangKhoa ? 'Đang kết thúc…' : 'Kết thúc ca'}
                 </button>
               </div>
             </TheNoiDung>

@@ -97,6 +97,26 @@ describe('(b) Theo dõi ca — đầu màn mới', () => {
     const dau = await waitFor(() => container.querySelector('[data-vung="theo-doi-ca"]') as HTMLElement)
     fireEvent.click(within(dau).getByRole('button', { name: /Kết thúc ca ngay/ }))
     expect(await screen.findByText(/em đang làm bài sẽ bị nộp bài ngay/)).toBeTruthy()
+    // Chỉ còn MỘT nút Kết thúc ca (nút "Khoá ca" cũ đã gỡ — hoàn thiện bản vẽ 28/09).
+    expect(screen.queryByRole('button', { name: 'Khoá ca' })).toBeNull()
+  })
+  it('Đóng cửa vào HỎI LẠI rồi mới gọi /gv/dong-cua-vao đúng mã ca; chưa bấm xác nhận thì không gọi', async () => {
+    m.lenh.mockImplementation(async (duong: string) => (duong === '/gv/dong-cua-vao' ? { ok: true, du: { ok: true } } : { ok: false, loai: 'chua_co_lenh', chu: 'chưa có lệnh' }))
+    const { container } = await mo('mo')
+    const dau = await waitFor(() => container.querySelector('[data-vung="theo-doi-ca"]') as HTMLElement)
+    fireEvent.click(within(dau).getByRole('button', { name: 'Đóng cửa vào' }))
+    expect(m.lenh).not.toHaveBeenCalledWith('/gv/dong-cua-vao', expect.anything(), expect.anything())
+    expect(await screen.findByText(/em đang làm vẫn làm tiếp tới hết giờ/)).toBeTruthy()
+    const hop = container.querySelector('[data-hop="dong-cua"]')!.parentElement as HTMLElement
+    fireEvent.click(within(hop).getByRole('button', { name: 'Đóng cửa vào' }))
+    await waitFor(() => expect(m.lenh).toHaveBeenCalledWith('/gv/dong-cua-vao', { maCa: 'C1' }, expect.any(String)))
+  })
+  it('hạn vào phòng đã qua ⇒ nút chìm "Đã đóng cửa vào"', async () => {
+    m.detail.mockImplementation(async () => ({ ca: { ...CA('mo'), hetHanVao: ISO(BAY_GIO - 60000) }, luot: DS.map((l) => ({ ...l })), dsCho: [], biChan: [] }))
+    const { container } = render(<ExamMonitorScreen />)
+    await screen.findByRole('tablist', { name: 'Lọc học sinh theo trạng thái' })
+    const dau = container.querySelector('[data-vung="theo-doi-ca"]') as HTMLElement
+    expect((within(dau).getByRole('button', { name: 'Đã đóng cửa vào' }) as HTMLButtonElement).disabled).toBe(true)
   })
 })
 

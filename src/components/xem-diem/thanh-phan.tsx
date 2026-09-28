@@ -41,6 +41,7 @@ export function KetQuaSoLon({
   truoc,
   ai = 'em',
   nop,
+  exp,
 }: {
   diem: number
   dung: number
@@ -52,6 +53,8 @@ export function KetQuaSoLon({
   truoc?: number
   ai?: 'em' | 'con'
   nop?: string
+  /** EXP nhận từ ca (chỉ có sau công bố); null/0/vắng ⇒ ẩn dòng. */
+  exp?: number | null
 }) {
   const r = 52
   const cv = 2 * Math.PI * r
@@ -83,6 +86,11 @@ export function KetQuaSoLon({
           </p>
         )}
         {nop && <p className="xd-kq__phu xd-so">{nop}</p>}
+        {typeof exp === 'number' && exp > 0 && (
+          <p className="xd-kq__phu xd-so" data-vung="exp-ca">
+            <b>+{exp} EXP</b> {ai === 'con' ? 'con' : 'em'} nhận từ ca này
+          </p>
+        )}
         {ss !== undefined && <SoSanh hieu={ss} truoc={truoc} ai={ai} />}
       </div>
     </section>
