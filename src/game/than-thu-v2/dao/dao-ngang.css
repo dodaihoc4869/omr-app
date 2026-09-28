@@ -1,6 +1,6 @@
 /* SỔ TAY + TÚI ĐỒ · BỐ CỤC NGANG (thầy 28/09: "Sổ tay, túi đồ, cửa hàng làm cả giao diện xoay ngang").
    Chỉ bật khi thẻ gốc có [data-ngang] — do hook useNgang() (dao2/ngang.ts, CÙNG điểm ngắt với Đảo 2.0 / app 2.0) đặt; dọc không đổi gì.
-   Màu đi qua biến --dao-*/--ng-* của dao.css: máy SÁNG ⇒ phong cách Sảnh 3D (kính sáng, chữ tối ≥ 4.5:1, nút vàng 3D); máy TỐI ⇒ bộ đêm (28/09). Màu rgb() — không mã hex (`npm run check:mau`).
+   Màu đi qua biến --dao-… và --ng-… của dao.css: máy SÁNG ⇒ phong cách Sảnh 3D (kính sáng, chữ tối ≥ 4.5:1, nút vàng 3D); máy TỐI ⇒ bộ đêm (28/09). Màu rgb() — không mã hex (`npm run check:mau`).
    Khung: cao đúng một màn (không cuộn cả trang); cột/khung trong tự cuộn khi thiếu chỗ (844×390 vẫn dùng được). */
 
 .dao.dao-vo:has(>[data-ngang]){
