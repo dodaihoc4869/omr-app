@@ -1,11 +1,11 @@
 // KHỐI "PHÒNG CHỜ" của màn Theo dõi ca (thầy 28/09: "làm lại cho đẹp trực quan đồng bộ với thiết kế hiện tại. Có tự đồng bộ hs vào phòng chờ sau 5 giây").
 // Cùng họ M3 nhiều tông với "Ca đã mở" (CaDaMo) và "Chiếu mã" (TamPhuChieuMa): chip trạng thái + số lớn + chip tên em (em mới vào hiện nhẹ) + MỘT nút chính.
-// Chỉ VẼ + vòng tự làm mới 5 giây: mọi lệnh máy chủ đi qua hàm của màn cha (ExamMonitorScreen — `batDauCaNay`, `huyCaCho`, `tai`).
-// Vòng 5 giây: gọi `lamMoi` (màn cha tải lại chi tiết ca = cùng lệnh `chiTietCa` màn Chiếu mã dùng); tab ẩn thì không gọi (hiện lại gọi ngay);
-// `tamDung` (màn Chiếu mã đang mở — nó có vòng 5 giây riêng) thì nghỉ để không gọi trùng; không gọi chồng; lỗi ⇒ GIỮ danh sách cũ + chấm "mất kết nối".
+// Chỉ VẼ: mọi lệnh máy chủ đi qua hàm của màn cha (ExamMonitorScreen — `batDauCaNay`, `huyCaCho`, `tai`). Vòng tự làm mới 5 giây nằm ở màn cha,
+// QUA NHỊP CHUNG app thầy (`useNhipThay` + `NHIP_PHONG_CHO_THAY`, src/lib/nhip-may-thay.ts): tab ẩn dừng, không chồng, lỗi lùi dần, hụt ⇒ `matKetNoi`.
+// Lỗi mạng: màn cha GIỮ chi tiết ca cũ ⇒ khối giữ danh sách em cũ + chấm "mất kết nối".
 import { useEffect, useRef, useState } from 'react'
 import { Info, MonitorPlay, Play, RotateCcw, Users } from 'lucide-react'
-import { NHIP_PHONG_CHO_MS, tenChip, type EmDaVao } from '../TamPhuChieuMa'
+import { tenChip, type EmDaVao } from '../TamPhuChieuMa'
 import './ca-thi.css'
 
 export interface PhongChoCaProps {
@@ -28,14 +28,13 @@ export interface PhongChoCaProps {
   /** Câu nói nơi khôi phục ca sau khi huỷ. */
   noiKhoiPhuc: string
   onChieuMa: () => void
-  /** Tải lại chi tiết ca; trả `false` hoặc ném lỗi = hỏng. Vắng ⇒ không tự làm mới. */
-  lamMoi?: () => Promise<boolean>
-  /** Nghỉ vòng tự làm mới (vd. màn Chiếu mã đang mở và tự hỏi rồi). */
-  tamDung?: boolean
+  /** Màn cha đang tự làm mới 5 giây (hiện chấm "tự cập nhật"). */
+  tuCapNhat?: boolean
+  /** Lần tải gần nhất hụt (màn cha đếm `soHut`) ⇒ chấm "mất kết nối", danh sách là lần tải trước. */
+  matKetNoi?: boolean
 }
 
 export default function PhongChoCa(p: PhongChoCaProps) {
-  const [matKetNoi, setMatKetNoi] = useState(false)
   const [hoiHuy, setHoiHuy] = useState(false)
   const [moGioChung, setMoGioChung] = useState(false)
 
@@ -50,38 +49,6 @@ export default function PhongChoCa(p: PhongChoCaProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [khoaEm])
 
-  // TỰ LÀM MỚI 5 GIÂY.
-  const lamMoiRef = useRef(p.lamMoi)
-  lamMoiRef.current = p.lamMoi
-  const coLamMoi = !!p.lamMoi
-  const chay = coLamMoi && !p.tamDung
-  useEffect(() => {
-    if (!chay) return
-    let dung = false
-    let dangHoi = false
-    const hoi = async () => {
-      if (dung || dangHoi || document.visibilityState === 'hidden' || !lamMoiRef.current) return
-      dangHoi = true
-      try {
-        const ok = await lamMoiRef.current()
-        if (!dung) setMatKetNoi(ok === false)
-      } catch {
-        if (!dung) setMatKetNoi(true)
-      } finally {
-        dangHoi = false
-      }
-    }
-    const id = setInterval(() => void hoi(), NHIP_PHONG_CHO_MS)
-    const hien = () => {
-      if (document.visibilityState !== 'hidden') void hoi()
-    }
-    document.addEventListener('visibilitychange', hien)
-    return () => {
-      dung = true
-      clearInterval(id)
-      document.removeEventListener('visibilitychange', hien)
-    }
-  }, [chay])
 
   const n = p.em.length
   const siSo = p.siSo && p.siSo > 0 ? p.siSo : null
@@ -93,8 +60,8 @@ export default function PhongChoCa(p: PhongChoCaProps) {
           <Users size={14} aria-hidden="true" />
           Phòng chờ
         </span>
-        {coLamMoi &&
-          (matKetNoi ? (
+        {p.tuCapNhat &&
+          (p.matKetNoi ? (
             <span className="ct-pc-song ct-pc-song--mat" role="status" title="Mất kết nối — đang thử lại, danh sách dưới là lần tải trước">
               <i aria-hidden="true" /> mất kết nối
             </span>
