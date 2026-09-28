@@ -2,10 +2,14 @@
 // → `KhungXemPhieu`), chỉ khác NGUỒN: danh sách câu + người lên bảng của buổi chữa / "câu cần thầy dạy lại".
 // Nội dung đề tra từ Ngân hàng đề trên máy này theo mã câu máy chủ (`<tờ gốc>-<phần>-<số>`); câu không tra được vẫn chiếu
 // bằng dòng thay thế (cùng cách màn Gọi lên bảng) và nơi gọi được báo số câu thiếu.
+// HAI NÚT ĐẠT / CHƯA ĐẠT trên tờ: truyền `maPhien` ⇒ tờ dựng kèm `cauNoi` (đúng cầu nối `to-chieu-cau-noi.ts` của Gọi lên bảng);
+// chỉ ô CÓ em (không phải "Cả lớp") và câu tra được chuyên đề mới có nút — thiếu chuyên đề thì máy chủ không ghi được.
+// Trả kèm `o` (khoá `sbd|qid` ⇒ ô) để nơi nghe tin tra lại ô theo khoá, không tin nội dung tin đến.
 import type { TeacherExamSource, TeacherMcqQuestion, TeacherShortAnswerQuestion, TeacherTrueFalseQuestion } from '../../data/examContent'
 import type { CauLuyen } from '../../lib/bai-tap-pdf'
 import type { OBang } from '../../lib/html-may-chieu'
 import { qidMayChuCuaIdCau } from '../../lib/lich-su-cau-len-bang'
+import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { noiDungTuCauGoc, type NoiDungCau } from '../../lib/thoi-gian-len-bang'
 import { saoTuMucDo } from './tinh'
 
@@ -53,8 +57,23 @@ export interface OChieu {
   viSao: string
 }
 
-/** Dựng HTML tờ máy chiếu. Trả số câu KHÁC NHAU không tra được nội dung để nơi gọi báo thầy trước. */
-export async function dungToChieu(ds: readonly OChieu[], tenBuoi: string, tra?: ReadonlyMap<string, CauGoc>): Promise<{ html: string; soThieu: number }> {
+/** Một ô em × câu có nút Đạt / Chưa đạt trên tờ — đủ để ghi kết quả (cùng lệnh `ghiLenBang` của Gọi lên bảng). */
+export interface OGhiToChieu {
+  sbd: string
+  hoTen: string
+  /** Mã câu máy chủ (`<tờ gốc>-<phần>-<số>`). */
+  qid: string
+  chuyenDe: string
+}
+
+/** Dựng HTML tờ máy chiếu. Trả số câu KHÁC NHAU không tra được nội dung để nơi gọi báo thầy trước.
+ * `maPhien` ⇒ tờ có hai nút Đạt / Chưa đạt ở các ô trong `o`. */
+export async function dungToChieu(
+  ds: readonly OChieu[],
+  tenBuoi: string,
+  tra?: ReadonlyMap<string, CauGoc>,
+  maPhien?: string,
+): Promise<{ html: string; soThieu: number; o: Map<string, OGhiToChieu> }> {
   const bang = tra ?? (await napBangTra())
   const [{ cauLuyenTuBoCau }, { taoHtmlMayChieu }, { uocLuongBacCau, uocLuongBacCauGoc }, { CAU_HINH_LEN_BANG_MAC_DINH }] = await Promise.all([
     import('../../lib/bai-tap-pdf'),
@@ -63,6 +82,7 @@ export async function dungToChieu(ds: readonly OChieu[], tenBuoi: string, tra?: 
     import('../../lib/len-bang-cau-hinh'),
   ])
   const thieu = new Set<string>()
+  const oGhi = new Map<string, OGhiToChieu>()
   const dsO: OBang[] = ds.map((o) => {
     const goc = bang.get(o.qid)
     let cl: CauLuyen | undefined
@@ -84,9 +104,12 @@ export async function dungToChieu(ds: readonly OChieu[], tenBuoi: string, tra?: 
       buoc: null,
       ketQua: '',
     }
+    const coNut = !!maPhien && !!o.sbd && !!goc && !!cau.chuyenDe
+    if (coNut) oGhi.set(khoaToChieu(o.sbd, o.qid), { sbd: o.sbd, hoTen: o.ten, qid: o.qid, chuyenDe: cau.chuyenDe })
     return {
       sbd: o.sbd,
       hoTen: o.ten,
+      ...(coNut ? { qid: o.qid } : {}),
       bacUoc: (goc ? uocLuongBacCauGoc(goc.phan, goc.q) : uocLuongBacCau(cau)).bac,
       soCau: o.stt,
       sao: cau.sao,
@@ -95,6 +118,11 @@ export async function dungToChieu(ds: readonly OChieu[], tenBuoi: string, tra?: 
       viSao: o.viSao,
     }
   })
-  const html = taoHtmlMayChieu(dsO, { tenBuoi, ngay: new Date(), nganSachPhut: CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT })
-  return { html, soThieu: thieu.size }
+  const html = taoHtmlMayChieu(dsO, {
+    tenBuoi,
+    ngay: new Date(),
+    nganSachPhut: CAU_HINH_LEN_BANG_MAC_DINH.NGAN_SACH_PHUT,
+    ...(maPhien && oGhi.size > 0 ? { cauNoi: { maPhien } } : {}),
+  })
+  return { html, soThieu: thieu.size, o: oGhi }
 }

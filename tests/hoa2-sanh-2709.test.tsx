@@ -181,6 +181,15 @@ describe('SanhBanDo — theo bản vẽ Moi-SanhBanDo', () => {
     expect(screen.queryByRole('button', { name: /MỞ RƯƠNG BÁT LINH/ })).toBeNull()
   })
 
+  it('mở rương khi chưa đủ: máy chủ trả { ok:false, ma:"chua_du", loi } ⇒ hiện ĐÚNG lời máy chủ, không lời chung (28/09)', async () => {
+    const loi = 'Em làm xong 40/40 câu hôm nay thì rương mở. Hiện em đã làm 38 câu.'
+    tra['/game-v2/hoa2-ruong-mo'] = { body: { ok: false, ma: 'chua_du', loi } }
+    veSanh({}, { ...SANH, theLuc: { con: 0, tong: 40 }, doan: { con: 0 }, dao: { con: 0 }, khoaDao: false, ruong: { daLam: 40, tong: 40, moDuoc: true, daMo: false } })
+    fireEvent.click(screen.getByRole('button', { name: /MỞ RƯƠNG BÁT LINH/ }))
+    await screen.findByText(loi)
+    expect(screen.queryByText(/Máy chủ chưa trả lời được/)).toBeNull()
+  })
+
   it('Huyết Chiến: thẻ đỏ "Thành trì bị vây hãm", hôm nay N câu, từ câu thứ 41 không nhận EXP', () => {
     const { container } = veSanh({}, { ...SANH, huyetChien: true, theLuc: { con: 80, tong: 80 } })
     const the = screen.getByRole('region', { name: 'Huyết Chiến' })

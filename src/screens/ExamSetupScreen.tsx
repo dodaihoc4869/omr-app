@@ -4,7 +4,7 @@ import { laBoDe12, rutDeChuan2026, SO_CAU_CHUAN_2026 } from '../lib/ma-tran-hoa-
 // kho, link Apps Script đã cấu hình 1 lần ở màn Ngân hàng câu hỏi, nên màn
 // này CHỈ còn 3 việc: chọn đề · lớp & thời gian · cách công bố điểm → Mở ca.
 // Không còn mục dán link, không xoá đề ở đây (xoá ở Ngân hàng câu hỏi).
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   CheckSquare,
   Square,
@@ -46,6 +46,7 @@ import { khuTrungNguon, tongBoQua } from '../lib/khu-trung-cau'
 import { canhBaoThieuSauLoc, chuBoTuLuanChiTiet, demCauTheoPhan, locTuLuanKhiMoCa } from '../lib/loc-tu-luan-mo-ca'
 import { useAppStore } from '../store/appStore'
 import ONgayGio24 from '../components/ONgayGio24'
+import { chonSanCaChot, chuBaoCaChot, docGoiCaChot, xoaGoiCaChot, type ChonSanCaChot } from '../lib/ca-chot-chien-dich'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -178,6 +179,17 @@ export default function ExamSetupScreen() {
   const [hienNangCao, setHienNangCao] = useState(false)
   // Mã bí mật — mọi lệnh đọc dữ liệu học sinh của thầy đều phải kèm (BA-APP đợt 1).
   const [maBiMat, setMaBiMat] = useState('')
+  // CA CHỐT CHIẾN DỊCH (Game Hóa 2.0): nút "Mở ca chốt" ở Buổi chữa để lại gói câu trong bộ nhớ phiên. Đọc MỘT LẦN
+  // khi mở màn (xoá ngay sau đó), khi Ngân hàng đề đã nạp thì tích sẵn đúng tờ + đặt bộ rút = đúng các câu ấy.
+  const [caChot] = useState(() => docGoiCaChot())
+  const [kqCaChot, setKqCaChot] = useState<ChonSanCaChot | null>(null)
+  const daApCaChot = useRef(false)
+  useEffect(() => {
+    if (!caChot) return
+    xoaGoiCaChot()
+    if (caChot.lop) setLop((cu) => cu || caChot.lop || '')
+    setTenCa((cu) => cu || `Ca chốt · ${caChot.ten}`.trim())
+  }, [caChot])
   // MỘT MÀN MỞ CA DUY NHẤT (thầy chốt 05/09 chiều — bỏ tách kiểm tra/chẩn
   // đoán). Thầy tự tay tích đề, ca ghi đủ dữ liệu như mọi ca khác, nên một ca
   // phục vụ CẢ HAI việc: gửi phiếu cho phụ huynh và phân công gọi lên bảng.
@@ -260,6 +272,17 @@ export default function ExamSetupScreen() {
   // Tách CHỈ Ở ĐÂY, id từng câu giữ nguyên (xem `tach-phan-de.ts`), nên chấm
   // bài, tránh câu trùng ca trước, lịch sử ca cũ đều không đụng gì.
   const dsDeTach = useMemo(() => tachNhieuTheoPhan(savedSources), [savedSources])
+
+  // Áp ca chốt đúng một lần, khi Ngân hàng đề trên máy đã nạp (chạy sau "chỉ có 1 đề thì chọn sẵn" nên ghi đè lựa chọn ấy).
+  useEffect(() => {
+    if (!caChot || daApCaChot.current || savedSources.length === 0) return
+    daApCaChot.current = true
+    const kq = chonSanCaChot(dsDeTach, caChot.qids)
+    setKqCaChot(kq)
+    if (kq.soKhop === 0) return
+    setSelectedMaDe(new Set(kq.maDe))
+    setBoRut({ ids: kq.ids, soCau: kq.soCau, lenBang: false })
+  }, [caChot, savedSources, dsDeTach])
 
   // KHỬ TRÙNG NGAY Ở ĐÂY, trước mọi thứ khác (đếm câu, bộ rút, gói đẩy lên máy
   // chủ), để cả màn chỉ nhìn thấy bộ câu đã sạch. Khử ở dưới sâu hơn thì con số
@@ -448,6 +471,12 @@ export default function ExamSetupScreen() {
           }}
         />
       </div>
+
+      {caChot && (
+        <div role="status" data-khoi="ca-chot" className="px-4 py-3 rounded-2xl text-sm font-semibold bg-[color:var(--m3-primary-container)] text-[color:var(--m3-on-primary-container)]">
+          {chuBaoCaChot(caChot, kqCaChot)}
+        </div>
+      )}
 
       {/* THẺ 1: ĐỀ KIỂM TRA */}
       <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-2xs">

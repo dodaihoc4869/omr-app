@@ -21,6 +21,7 @@ import { docHoa2, goiYCuaCau, type GoiYM3, type Hoa2Xem } from './doan2/kieu2'
 import KetChang2 from './doan2/KetChang2'
 import './doan.css'
 import './doan2/doan2.css'
+import '../../components/hoa2/phong-baloo'
 
 export const NHIP_HOI_MS = 1500
 const khoaLuu = (sbd: string) => `doan:${sbd}`
@@ -208,8 +209,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   return createPortal(
     <div className={`dh ${laHoa2 ? 'dh2' : ''} ${tinh ? 'dh-tinh' : ''} ${trongTran ? 'dh-tran' : ''}`} data-che-do={laHoa2 ? '2' : undefined} data-man={!xem?.batDau ? 'sanh' : tran?.ketThuc && !tungChuong ? 'ket-chang' : tran?.laTrum ? 'trum' : 'tran'}>
       {than}
-      {tungChuong && xem && tran && <DoanTungChuong kq={tungChuong} ghe={xem.ghe} loaiQuai={tran.loaiQuai[loaiQuaiVuaDanh] ?? 'bun_acid'} tenQuai={tran.tenQuai[loaiQuaiVuaDanh] ?? 'Tạp Chất'} tinh={tinh} onXong={xongChuong} />}
-      {goiYThe && trongTran && !tungChuong && <DoanTiepSuc goiY={goiYThe} ban={ban} loi={loi} onChon={l => void guiThe(l)} onDong={() => { setGoiYTiepSuc(null); setLoi('') }} />}
+      {tungChuong && xem && tran && <DoanTungChuong kq={tungChuong} ghe={xem.ghe} loaiQuai={tran.loaiQuai[loaiQuaiVuaDanh] ?? 'bun_acid'} tenQuai={tran.tenQuai[loaiQuaiVuaDanh] ?? 'Tạp Chất'} tinh={tinh} onXong={xongChuong} cheDo2={laHoa2} />}
+      {goiYThe && trongTran && !tungChuong && <DoanTiepSuc goiY={goiYThe} ban={ban} loi={loi} onChon={l => void guiThe(l)} onDong={() => { setGoiYTiepSuc(null); setLoi('') }} cheDo2={laHoa2} />}
       {zoom && <ManHinhAnh src={zoom} alt="Ảnh của câu" onClose={() => setZoom('')} />}
     </div>,
     document.body,

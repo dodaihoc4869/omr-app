@@ -1,10 +1,13 @@
 // THANH ĐÁY (< 880 px) CỦA APP GIÁO VIÊN — cùng danh sách mục với `ThanhBenTrai` (MUC_DIEU_HUONG), nên ngăn kéo, rail và thanh đáy luôn khớp.
 // Bốn mục chính nằm trên thanh; các mục còn lại (Ngân hàng đề, Gọi lên bảng, Học sinh hỏi, Cài đặt) ở tờ "Thêm" — ĐỦ mục, không mục nào mất.
+// GAME HÓA 2.0 (cờ bật): thanh đáy dùng CHÍNH hai danh sách của ThanhBenTrai — `MUC_HOA2_CHINH` trên thanh, `MUC_HOA2_THEM` ở tờ "Thêm";
+// không chép tay lần hai. Cờ tắt ⇒ đúng như cũ.
 // Nút nổi "Mở ca kiểm tra" nằm trên thanh, góc phải. Ẩn ở màn làm bài (App.tsx: HIDE_BOTTOMNAV_ON), ở màn theo dõi ca và ở chính màn Mở ca.
 import { useState } from 'react'
 import { MoreHorizontal, Plus } from 'lucide-react'
 import { useAppStore } from '../store/appStore'
-import { MUC_DIEU_HUONG, mucDangSang } from './ThanhBenTrai'
+import { MUC_DIEU_HUONG, MUC_HOA2_CHINH, MUC_HOA2_THEM, mucDangSang, type MucDieuHuong } from './ThanhBenTrai'
+import { useHoa2Bat } from './chien-dich/co-hoa2'
 
 const CHINH = ['examhub', 'hocsinh', 'lichsuca', 'giaobtvn']
 
@@ -12,17 +15,18 @@ export default function BottomNav() {
   const screen = useAppStore((s) => s.screen)
   const setScreen = useAppStore((s) => s.setScreen)
   const [mo, setMo] = useState(false)
-  const sang = mucDangSang(screen)
-  const chinh = MUC_DIEU_HUONG.filter((m) => CHINH.includes(m.id))
-  const them = MUC_DIEU_HUONG.filter((m) => !CHINH.includes(m.id))
+  const hoa2 = useHoa2Bat()
+  const sang = mucDangSang(screen, hoa2)
+  const chinh: MucDieuHuong[] = hoa2 ? MUC_HOA2_CHINH : MUC_DIEU_HUONG.filter((m) => CHINH.includes(m.id))
+  const them: MucDieuHuong[] = hoa2 ? MUC_HOA2_THEM : MUC_DIEU_HUONG.filter((m) => !CHINH.includes(m.id))
   const themDangSang = them.some((m) => m.id === sang)
-  const di = (id: (typeof MUC_DIEU_HUONG)[number]['id']) => {
+  const di = (id: MucDieuHuong['id']) => {
     setMo(false)
     setScreen(id)
   }
 
   return (
-    <nav className="day-thay" aria-label="Điều hướng chính">
+    <nav className="day-thay" aria-label="Điều hướng chính" data-hoa2={hoa2 ? '' : undefined}>
       {/* Không đè lên màn THEO DÕI CA (giữa giờ thi, góc phải dưới là chỗ nút Khoá ca / Mở khoá — bấm nhầm "Mở ca" là văng khỏi ca) và không lặp ở chính màn Mở ca. */}
       {screen !== 'exammonitor' && screen !== 'examsetup' && (
         <button type="button" className="day-thay-nut-ca" aria-label="Mở ca kiểm tra" onClick={() => di('examsetup')}>

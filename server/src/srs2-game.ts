@@ -191,7 +191,11 @@ const publicQuestionDayDu = (q: PrivateQuestion): Question => {
 async function moRuong(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   const { kh } = await layKeHoachHomNay(env, sbd, nowMs)
   const daLam = kh.tong - kh.conDao.length - kh.conDoan.length
-  if (!moDuocRuong(kh.tong, daLam)) return { ok: false, ma: 'chua_du', loi: `Em làm xong ${kh.tong}/${kh.tong} câu hôm nay thì rương mở. Hiện em đã làm ${daLam} câu.` }
+  if (!moDuocRuong(kh.tong, daLam)) {
+    // Trả CẢ `loi` (hợp đồng gốc) lẫn `error` (lớp gọi game-v2 chung của app học sinh đọc `error`) — cùng một lời, chỉ-thêm.
+    const loi = `Em làm xong ${kh.tong}/${kh.tong} câu hôm nay thì rương mở. Hiện em đã làm ${daLam} câu.`
+    return { ok: false, ma: 'chua_du', loi, error: loi }
+  }
   const luc = new Date(nowMs).toISOString()
   const qua = { vang: VANG_RUONG }
   const ghi = await env.DB.prepare('INSERT OR IGNORE INTO ruong_bat_linh(sbd, ngay, mo_luc, qua_json) VALUES (?,?,?,?)').bind(sbd, kh.ngay, luc, JSON.stringify(qua)).run()

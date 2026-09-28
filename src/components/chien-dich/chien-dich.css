@@ -594,3 +594,22 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* ---- kết quả lên bảng (Đạt / Chưa đạt, ghi từ tờ máy chiếu) ở Buổi chữa ---- */
+.cd-ket-qua {
+  display: inline-flex;
+  align-items: center;
+  margin: 4px 0 0 6px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  color: var(--bts-chu);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.cd-ket-qua--dat {
+  background: var(--bts-la-nhat);
+}
+.cd-ket-qua--khong {
+  background: var(--bts-do-nhat);
+}

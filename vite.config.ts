@@ -122,7 +122,7 @@ export default defineConfig({
           '**/Spirit3D-*.js',
           // Bảng tin sàn của thầy: bản đồ lớp 3D nạp LƯỜI (import động) — three (≈ 536 KB) chỉ máy thầy tải khi mở màn Hôm nay; máy học sinh / phụ huynh KHÔNG được cất vào bộ nhớ đệm.
           '**/ban-do-3d-three-*.js',
-          '**/{CaiDatScreen,GiaoDeTheoTuanScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,DaoThanThu,DoanHoTong,Game,html-may-chieu,Dao2,DoanHinh,chien-dich,CauDaLam}-*.{js,css}',
+          '**/{CaiDatScreen,GiaoDeTheoTuanScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,DaoThanThu,DoanHoTong,Game,html-may-chieu,Dao2,DoanHinh,chien-dich,ca-chot-chien-dich,CauDaLam}-*.{js,css}',
           // Game Hóa 2.0 (27/09): hình vẽ 32 phụ kiện thần thú (nạp lười trong game) — chỉ máy mở game mới tải, cất ở kho chạy-lúc.
           '**/pk-{cl,da,hq,vd}-*.js',
           '**/cai-app/**',
@@ -135,6 +135,8 @@ export default defineConfig({
           '**/html-phieu-*.js',
           // Phông Inter (58 KB) chỉ cho app phụ huynh trên máy KHÔNG phải Apple: tải một lần khi phụ huynh mở app rồi cất ở kho chạy-lúc (đường /assets/*.woff2 của src/sw.ts); không ép vào precache vỏ.
           '**/inter-*-wght-normal-*.woff2',
+          // Phông tiêu đề Game Hóa 2.0 'Baloo 2' (28/09): chỉ mảnh game/Sảnh 2.0 nạp (src/components/hoa2/phong-baloo.ts) — tải lúc mở game rồi cất ở kho chạy-lúc /assets/*.woff2, không vào precache vỏ.
+          '**/baloo-2-*.woff2',
         ],
         // ĐƯỜNG LUI CHO MỌI LƯỢT ĐIỀU HƯỚNG — khai TƯỜNG MINH.
         //
