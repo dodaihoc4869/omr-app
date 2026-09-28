@@ -37,6 +37,8 @@ import type { TrangThaiMon } from './logic-shop'
 import SanKhau from './san-khau'
 
 export interface ThuDoProps {
+  /** Bố cục ngang: TRÁI = sân khấu thần thú, PHẢI = danh sách đang thử + chi tiết (shop-ngang.css). Vắng/false = dọc như cũ. */
+  ngang?: boolean
   /** Số vàng MÁY CHỦ trả. */
   vang: number
   vi: ViSoMo | null
@@ -169,6 +171,49 @@ export default function ThuDo(p: ThuDoProps) {
           </span>
         }
       />
+      {p.ngang ? (
+        <div className="ps-ngang ps-ngang-thu">
+          <div className="ps-ngang-trai">
+      <SanKhau pet={p.pet} cap={p.cap} hienThi={hienThiTrenThu(p.dangMac, p.dangThu)} dangThu={p.dangThu} tenThu={p.tenThu} mon={p.mon} veThu={p.veThu} />
+      <p className="ps-ban-be ps-cho-3" role="status" aria-live="polite">
+        {p.bao || chuTuHao}
+      </p>
+          </div>
+          <div className="ps-ngang-phai">
+      <section className="ps-kinh ps-thu-ds" aria-labelledby="ps-thu-ds-tieu">
+        <h3 id="ps-thu-ds-tieu">{chuDangThuDanhSach}</h3>
+        {thu.length === 0 ? (
+          <div className="ps-thu-trong">
+            <p className="ps-ghi-chu">{chuChuaThuMon}</p>
+            <button type="button" className="ps-nut-mo" onClick={p.onToiCuaHang}>
+              {chuToiCuaHang}
+            </button>
+          </div>
+        ) : (
+          thu.map((m) => {
+            const tt = trangThaiMon(m, p.vang)
+            return (
+              <button key={m.ma} type="button" className={`ps-thu-hang ps-bac-${m.bac}`} aria-pressed={chon?.ma === m.ma} data-ma={m.ma} onClick={() => p.onTieuDiem(m.ma)}>
+                <span className="ps-ngoc" aria-hidden="true" />
+                <span className="ps-thu-chu">
+                  <b>{m.ten}</b>
+                  <span>
+                    <span className="ps-bac-chu">{TEN_BAC[m.bac]}</span> · {TEN_O[m.oGan]} · <span className="ps-so">{chuGia} {so(m.gia)} {chuVang}</span>
+                  </span>
+                </span>
+                <span className={`ps-thu-tt ps-tt-${toneCua(tt)}`}>{chuTrangThaiMon(tt, m, p.em)}</span>
+              </button>
+            )
+          })
+        )}
+      </section>
+
+      {chon && <ChiTiet m={chon} vang={p.vang} vi={p.vi} em={p.em} dangGuiMac={p.dangGuiMac} onMua={p.onMua} onMac={p.onMac} onToiDoi={p.onToiDoi} onBoThu={p.onBoThu} />}
+      {p.loiMac && <KhoiLoi loi={p.loiMac.loi} onThuLai={p.loiMac.thuLai} />}
+          </div>
+        </div>
+      ) : (
+        <>
       <SanKhau pet={p.pet} cap={p.cap} hienThi={hienThiTrenThu(p.dangMac, p.dangThu)} dangThu={p.dangThu} tenThu={p.tenThu} mon={p.mon} veThu={p.veThu} />
       <p className="ps-ban-be ps-cho-3" role="status" aria-live="polite">
         {p.bao || chuTuHao}
@@ -204,6 +249,8 @@ export default function ThuDo(p: ThuDoProps) {
 
       {chon && <ChiTiet m={chon} vang={p.vang} vi={p.vi} em={p.em} dangGuiMac={p.dangGuiMac} onMua={p.onMua} onMac={p.onMac} onToiDoi={p.onToiDoi} onBoThu={p.onBoThu} />}
       {p.loiMac && <KhoiLoi loi={p.loiMac.loi} onThuLai={p.loiMac.thuLai} />}
+        </>
+      )}
     </>
   )
 }
