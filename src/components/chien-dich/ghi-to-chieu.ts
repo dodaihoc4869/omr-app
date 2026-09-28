@@ -4,7 +4,7 @@
 //   · ghi bằng CÙNG lệnh `ghiLenBang` (máy chủ ghi `len_bang` + sổ) — không có lệnh máy chủ mới;
 //   · chống ghi đôi theo khoá `sbd|qid` (ô đã ghi trả "đã ghi" ngay; ô đang chờ thì chờ đúng lượt ấy);
 //   · trả `da_ghi` / `loi` cho tờ; mở tờ mới thì ô đã ghi khoá ngay (`DA_GHI`).
-// Kết quả đã ghi nhớ trên máy này theo chiến dịch (localStorage) để Buổi chữa hiện lại "Đạt" / "Không đạt" cạnh tên em.
+// Kết quả đã ghi nhớ trên máy này theo chiến dịch (localStorage) để Buổi chữa hiện lại "Đạt" / "Chưa đạt" cạnh tên em.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { TIN_TO_CHIEU, gocGuiLai, kiemTinToChieu, taoMaPhienChieu } from '../../lib/to-chieu-cau-noi'

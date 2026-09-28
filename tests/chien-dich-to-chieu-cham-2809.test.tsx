@@ -152,7 +152,7 @@ describe('Buổi chữa hiện lại kết quả', () => {
     lop: { coXat: 0.9, thanhThao: 0.5 },
     cau: [cau(17, '01', ['02']), cau(44, '03', ['02'])],
   }
-  it('"Em 01: Đạt", "Em 03: Không đạt" ở đúng câu; câu chưa ghi không có nhãn', () => {
+  it('"Em 01: Đạt", "Em 03: Chưa đạt" ở đúng câu; câu chưa ghi không có nhãn', () => {
     const { container } = render(
       <BuoiChua
         du={DU}
@@ -171,7 +171,7 @@ describe('Buổi chữa hiện lại kết quả', () => {
     const h17 = container.querySelector('[data-hang-chua="DE-A-I-17"]') as HTMLElement
     const h44 = container.querySelector('[data-hang-chua="DE-A-I-44"]') as HTMLElement
     expect([...h17.querySelectorAll('.cd-ket-qua')].map((x) => x.textContent)).toEqual(['Em 01: Đạt'])
-    expect([...h44.querySelectorAll('.cd-ket-qua')].map((x) => x.textContent)).toEqual(['Em 03: Không đạt'])
+    expect([...h44.querySelectorAll('.cd-ket-qua')].map((x) => x.textContent)).toEqual(['Em 03: Chưa đạt'])
     expect(h44.querySelector('.cd-ket-qua--khong')).toBeTruthy()
   })
 })

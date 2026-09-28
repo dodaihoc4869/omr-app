@@ -2,7 +2,7 @@
 // Bảng câu xếp sẵn (điểm chữa = chưa thành thạo + 2 × cần dạy lại, mỗi dạng một câu), người lên bảng (giải mẫu + sửa),
 // thời gian ước lượng bằng CÙNG công thức của Gọi lên bảng (`thoiGianCau`), tổng ≤ 90 phút, mỗi em có mặt ≥ 1 lượt (`xepBuoiChua`).
 // Nút chính "Mở tờ máy chiếu" (luồng tờ chiếu có sẵn), "Chữa xong" (hỏi lại, nói rõ hậu quả) ⇒ `chua-xong`, "Mở ca chốt".
-// Kết quả Đạt / Không đạt thầy bấm trên tờ chiếu (`ghi-to-chieu.ts`) hiện lại ở cột "Người lên bảng" của đúng câu.
+// Kết quả Đạt / Chưa đạt thầy bấm trên tờ chiếu (`ghi-to-chieu.ts`) hiện lại ở cột "Người lên bảng" của đúng câu.
 import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { thoiGianCau } from '../../lib/thoi-gian-len-bang'
@@ -210,7 +210,7 @@ export default function BuoiChua({
                   {d.sua.length > 0 ? ` · ${chuNguoiSua(d.sua)}` : ''}
                   {ketQuaCua(d).map(({ em, kq }) => (
                     <span key={em.sbd} className={`cd-ket-qua cd-ket-qua--${kq === 'dat' ? 'dat' : 'khong'}`} data-ket-qua={`${em.sbd}|${d.cau.qid}`}>
-                      {em.ten}: {kq === 'dat' ? 'Đạt' : 'Không đạt'}
+                      {em.ten}: {kq === 'dat' ? 'Đạt' : 'Chưa đạt'}
                     </span>
                   ))}
                 </span>

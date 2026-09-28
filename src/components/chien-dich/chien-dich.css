@@ -595,7 +595,7 @@
   }
 }
 
-/* ---- kết quả lên bảng (Đạt / Không đạt, ghi từ tờ máy chiếu) ở Buổi chữa ---- */
+/* ---- kết quả lên bảng (Đạt / Chưa đạt, ghi từ tờ máy chiếu) ở Buổi chữa ---- */
 .cd-ket-qua {
   display: inline-flex;
   align-items: center;
