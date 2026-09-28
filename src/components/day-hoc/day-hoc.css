@@ -522,3 +522,30 @@
 .dh-them .m3-nut-chinh[aria-busy='true'] {
   opacity: 0.6;
 }
+.dh-chon-lop .dh-tim {
+  flex: 0 0 auto;
+}
+.dh-them-o .dh-them-chu {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: normal;
+  overflow: visible;
+  font-weight: 400;
+}
+.dh-them-chu .dh-them-ten {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.dh-them-chu small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.dh-them-dong .dh-chip {
+  flex: 0 0 auto;
+}

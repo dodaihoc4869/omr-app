@@ -483,11 +483,13 @@ export default function DayHocLenBang() {
                                   })
                                 }
                               />
-                              <span className="dh-them-ten">{e.hoTen || e.sbd}</span>
-                              <small>
-                                {e.sbd}
-                                {e.tenLop ? ` · ${e.tenLop}` : ''}
-                              </small>
+                              <span className="dh-them-chu">
+                                <span className="dh-them-ten">{e.hoTen || e.sbd}</span>
+                                <small>
+                                  SBD {e.sbd}
+                                  {e.tenLop ? ` · ${e.tenLop}` : ''}
+                                </small>
+                              </span>
                             </label>
                             {co && <span className={`dh-chip ${co.cach === 'thay' ? 'dh-chip--vang' : 'dh-chip--xanh'}`}>{co.cach === 'thay' ? 'thầy thêm' : 'đã điểm danh'}</span>}
                             {co?.cach === 'thay' && (
