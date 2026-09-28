@@ -26,13 +26,10 @@ function tepNguon(thu: string, ra: string[] = []): string[] {
 }
 const GOI_HOP_TRINH_DUYET = /\b(window|globalThis|self)\.(confirm|alert|prompt)\s*\(|(^|[^.\w$'"`])(confirm|alert|prompt)\s*\(/
 
-/** NGOẠI LỆ có chú thích — tệp → số lần gọi được phép + câu chú thích bắt buộc có trong tệp.
- *  html-phieu.ts: phiếu HTML ĐỘC LẬP (không có React). Luồng nộp cũ gọi window.confirm nhưng lời hỏi bị CHẶN và vẽ lại bằng hộp
- *  M3 `gd-hop` (xem chú thích "HỘP XÁC NHẬN NỘP kiểu M3"); window.confirm gốc chỉ là đường lùi khi không dựng được hộp.
- *  Giữ nguyên để KHÔNG đổi luật nộp. `beforeunload`: không có trong src/ (nếu thêm, trình duyệt bắt buộc hộp mặc định). */
-const NGOAI_LE: Record<string, { soLan: number; chuThich: string }> = {
-  'src/lib/html-phieu.ts': { soLan: 2, chuThich: 'HỘP XÁC NHẬN NỘP kiểu M3' },
-}
+/** NGOẠI LỆ có chú thích — tệp → số lần gọi được phép + câu chú thích bắt buộc có trong tệp. Hiện KHÔNG có ngoại lệ nào:
+ *  phiếu HTML (html-phieu.ts) hỏi bằng hộp riêng `hoiNopPhieu` (28/09). `beforeunload` không có trong src/ (nếu thêm, trình
+ *  duyệt bắt buộc hộp mặc định — khi đó ghi vào đây kèm chú thích). */
+const NGOAI_LE: Record<string, { soLan: number; chuThich: string }> = {}
 
 describe('nguồn: không còn hộp mặc định của trình duyệt', () => {
   it('src/ không gọi confirm()/alert()/prompt() (trừ ngoại lệ có chú thích)', () => {
