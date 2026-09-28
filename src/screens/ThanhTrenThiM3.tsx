@@ -7,8 +7,8 @@ import { Check, CloudOff, LayoutGrid, Timer } from 'lucide-react'
 import './man-thi-m3.css'
 
 export interface ThanhTrenThiM3Props {
-  /** Chuỗi đồng hồ đã định dạng (mm:ss) — bài tập về nhà thì null. */
-  dongHo: string | null
+  /** Đồng hồ (mm:ss) — chuỗi, hoặc nút lá tự đếm `<SoDongHo>` của màn thi để thanh này không vẽ lại mỗi giây. Bài tập về nhà thì null. */
+  dongHo: ReactNode | null
   /** Bài tập về nhà: chữ thay cho đồng hồ ("Hạn 21/09" / "Bài tập"). */
   chuThayDongHo: string
   gap: boolean

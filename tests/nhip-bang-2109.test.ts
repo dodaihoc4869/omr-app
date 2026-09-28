@@ -25,6 +25,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/game/bi-a/ManChoi.tsx': 1, // 45 ms khi GIỮ nút xoay hướng nhắm (chỉ đổi hướng cục bộ)
   'src/hooks/useGioHocTap.ts': 1,
   'src/lib/html-may-chieu.ts': 0,
+  'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe
   'src/lib/html-phieu.ts': 1,
   'src/lib/thu-tin-hieu.ts': 1,
   'src/lib/to-chieu-cau-noi.ts': 1,

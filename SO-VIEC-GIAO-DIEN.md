@@ -512,3 +512,5 @@ Luật: vòng nền của app HS/PH ≥ 180 giây ± 30 giây lệch ngẫu nhi�
 
 ## PHÒNG CHỜ Theo dõi ca — xếp loại vòng 5 giây (28/09)
 - Khối Phòng chờ (`src/components/ca-thi/PhongChoCa.tsx`) chỉ VẼ; vòng tự làm mới 5 s nằm ở `ExamMonitorScreen` QUA NHỊP CHUNG: `useNhipThay(tai, NHIP_PHONG_CHO_THAY, phòng chờ && !chiếu mã, TUY_CHON_NHIP_THAY.phongCho)` (src/lib/nhip-may-thay.ts). Tab ẩn dừng, không chồng, lỗi lùi 30 → 40 s, máy chủ bận ×2 (trần 10 s), hụt ⇒ chấm "mất kết nối" + DongMatKetNoiCa. Không còn `setInterval` trần trong khối. Vòng Chiếu mã (`TamPhuChieuMa`, 5 s, đã xếp ở LAN_APP_THAY) giữ nguyên; khi Chiếu mã mở, vòng phòng chờ nghỉ. Bảng: docs/nhip-app-thay-2109.md dòng "Phòng chờ". Test: tests/phong-cho-ca-2809.test.tsx.
+
+- 28/09 · Tối ưu màn thi (nhánh `toi-uu-man-thi`) · xếp loại vòng `setInterval` mới `src/lib/dong-ho-thi.ts` (1 s, KHÔNG gọi máy chủ — kho giờ đếm ngược cho màn thi / luyện đề chuẩn / bài gia đình giao; chỉ chạy khi có nút lá đồng hồ nghe) vào `KHONG_GOI_MAY_CHU`. `StudentPortalScreen` vẫn 1 vòng (soi hết giờ để tự nộp); số giờ hiển thị chuyển sang kho. Chi tiết: `docs/toi-uu-2809/MAN-THI.md`.

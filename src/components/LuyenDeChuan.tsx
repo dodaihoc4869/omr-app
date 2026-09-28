@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { taoKhoGio, useGiayConLai, useMocGio, type KhoGio } from '../lib/dong-ho-thi'
 import TheCau from './TheCau'
 import { createPortal } from 'react-dom'
 import { ArrowUpRight, Clock3, FileText, ChevronLeft, Award, ChevronDown } from 'lucide-react'
@@ -20,6 +21,24 @@ type Paper = {
 }
 
 type History = { id: string; createdAt: number; status: string; score: number | null }
+
+/** Giây nguyên còn lại như bản cũ: làm tròn LÊN, không âm. */
+const giayNguyen = (giay: number | null) => Math.max(0, Math.ceil(giay ?? 0))
+
+/** Đồng hồ thanh dưới — NÚT LÁ duy nhất đổi mỗi giây (đỏ khi ≤ 5 phút). Trước
+ * 28/09 `setSeconds` mỗi giây ở gốc làm cả đề luyện vẽ lại từng giây. */
+function DongHoLuyen({ kho, giayDau }: { kho: KhoGio | null; giayDau: number }) {
+  const song = useGiayConLai(kho)
+  const seconds = kho ? giayNguyen(song) : giayDau
+  return (
+    <div className={`flex items-center gap-2 font-bold tabular-nums text-sm ${seconds <= 300 ? 'text-red-600' : 'text-slate-900 dark:text-white'}`}>
+      <Clock3 size={18} />
+      <span aria-label="Thời gian còn lại">
+        {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}
+      </span>
+    </div>
+  )
+}
 
 export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: string }) {
   const [ready, setReady] = useState(false)
@@ -129,16 +148,27 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
     }
   }
 
+  // Giờ còn lại nằm trong KHO GIỜ (lib/dong-ho-thi), giờ máy chủ = Date.now() + lệch.
+  // Gốc chỉ nghe MỐC (hết giờ hay chưa) ⇒ không vẽ lại cả đề mỗi giây.
+  const dangLam = paper?.status === 'active'
+  const khoGio = useMemo(
+    () => (paper && dangLam ? taoKhoGio(paper.deadline, () => Date.now() + offset.current) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [paper?.id, dangLam, paper?.deadline],
+  )
+  const mocGio = useMocGio(khoGio)
+  // Hết giờ (giây làm tròn lên về 0 ⇔ còn ≤ 0) ⇒ tự nộp; nộp hỏng thì thử lại mỗi giây như bản cũ.
+  const hetGio = mocGio === 'het'
   useEffect(() => {
-    if (!paper || paper.status !== 'active') return
-    const tick = () => {
-      const n = Math.max(0, Math.ceil((paper.deadline - Date.now() - offset.current) / 1000))
-      setSeconds(n)
-      if (n === 0 && !submitting.current) void submit(true)
+    if (!hetGio || !dangLam) return
+    const thu = () => {
+      if (!submitting.current) void submit(true)
     }
-    const clock = setInterval(tick, 1000)
-    return () => clearInterval(clock)
-  }, [paper?.id, paper?.status])
+    thu()
+    const id = setInterval(thu, 1000)
+    return () => clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hetGio, dangLam, paper?.id])
 
   useEffect(() => {
     if (!paper || paper.status !== 'active') return
@@ -278,7 +308,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
   const getSolution = (id: string) =>
     paper.solutions?.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII]).find((q) => q.id === id)
   const change = (id: string, v: string) => {
-    if (!done && seconds > 0) setAnswers((a) => ({ ...a, [id]: v }))
+    if (!done && (khoGio ? !hetGio : seconds > 0)) setAnswers((a) => ({ ...a, [id]: v }))
   }
 
   const tongSoCau = paper.bank.phanI.length + paper.bank.phanII.length + paper.bank.phanIII.length
@@ -400,16 +430,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
             style={{ pointerEvents: 'auto' }}
           >
             <div className="min-w-0">
-              <div
-                className={`flex items-center gap-2 font-bold tabular-nums text-sm ${
-                  seconds <= 300 ? 'text-red-600' : 'text-slate-900 dark:text-white'
-                }`}
-              >
-                <Clock3 size={18} />
-                <span aria-label="Thời gian còn lại">
-                  {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}
-                </span>
-              </div>
+              <DongHoLuyen kho={khoGio} giayDau={seconds} />
               <p className="mt-0.5 text-xs text-slate-500" role="status">
                 Đã làm {soCauDaLam}/{tongSoCau} câu · {saved}
               </p>
