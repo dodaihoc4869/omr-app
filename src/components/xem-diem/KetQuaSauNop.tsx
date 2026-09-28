@@ -5,6 +5,16 @@
 import { FileText } from 'lucide-react'
 import type { PhanKetQua, TrangThaiCongBo } from '../../lib/ket-qua-sau-nop'
 import { KetQuaSoLon, NutXd, PhanGon, ThanhTrenXd, TrangThaiChuaCoDiem } from './thanh-phan'
+import './ket-qua-kinh.css'
+
+/** Một ô "từng câu" (ca thi 28/09): kết quả chấm của CHÍNH em — chỉ truyền khi `kieu === 'da_cong_bo'`. */
+export interface OCauKq {
+  phan: 'I' | 'II' | 'III'
+  so: number
+  kq: 'dung' | 'sai' | 'mot_phan' | 'trong'
+}
+const TEN_PHAN_O = { I: 'Phần I', II: 'Phần II', III: 'Phần III' } as const
+const CHU_O = { dung: 'đúng', sai: 'sai', mot_phan: 'đúng một phần', trong: 'bỏ trống' } as const
 
 export interface KetQuaSauNopProps {
   kieu: TrangThaiCongBo
@@ -28,13 +38,19 @@ export interface KetQuaSauNopProps {
   daVao?: number
   onXemBaoCao?: () => void
   onVe?: () => void
+  /** (ca thi 28/09) Ô từng câu — CHỈ vẽ khi đã công bố. Bấm câu sai/bỏ trống ⇒ `onXemBaoCao` (báo cáo có lời giải của luồng cũ). */
+  cau?: OCauKq[]
+  /** Chưa công bố: số câu em đã làm / tổng câu (không phải số câu đúng). */
+  soDaLam?: number | null
+  tongCau?: number
+  lam2?: string | null
 }
 
 export default function KetQuaSauNop(p: KetQuaSauNopProps) {
   const ten = p.tenCa.trim() || 'Ca kiểm tra'
   const coDiem = p.kieu === 'da_cong_bo' && typeof p.diem === 'number' && Array.isArray(p.phan) && typeof p.dung === 'number' && typeof p.tong === 'number'
   return (
-    <div className="m3 xd" data-vung="ket-qua-sau-nop" data-trang-thai={p.kieu}>
+    <div className="m3 xd kq-kinh" data-vung="ket-qua-sau-nop" data-trang-thai={p.kieu}>
       <ThanhTrenXd ten="Kết quả kiểm tra" phu={ten} onQuayLai={p.onVe} quayLai="Quay lại" />
       <main className="xd-khung">
         <p className="xd-muc__mo-ta">
@@ -56,6 +72,48 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
                 </div>
               </section>
             )}
+            {coDiem && p.cau && p.cau.length > 0 && (
+              <section className="kq-the" aria-labelledby="kq-h-cau">
+                <h3 id="kq-h-cau">
+                  Từng câu{p.onXemBaoCao && p.cau.some((c) => c.kq === 'sai' || c.kq === 'trong') ? <span style={{ fontWeight: 600, fontSize: 12.5, color: 'var(--k-chu2)' }}> · bấm câu đỏ xem lời giải</span> : null}
+                </h3>
+                {(['I', 'II', 'III'] as const).map((ph) => {
+                  const ds = p.cau!.filter((c) => c.phan === ph)
+                  if (ds.length === 0) return null
+                  return (
+                    <div key={ph}>
+                      <div className="kq-nhom">{TEN_PHAN_O[ph]}</div>
+                      <div className="kq-cau">
+                        {ds.map((c) =>
+                          (c.kq === 'sai' || c.kq === 'trong') && p.onXemBaoCao ? (
+                            <button key={c.so} type="button" className={c.kq} onClick={p.onXemBaoCao} aria-label={`Câu ${c.so} ${TEN_PHAN_O[ph]}: ${CHU_O[c.kq]} — xem lời giải`}>
+                              {c.so}
+                            </button>
+                          ) : (
+                            <span key={c.so} className={c.kq} role="img" aria-label={`Câu ${c.so} ${TEN_PHAN_O[ph]}: ${CHU_O[c.kq]}`}>
+                              {c.so}
+                            </span>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </section>
+            )}
+            {coDiem && p.cau && p.cau.some((c) => c.kq === 'sai' || c.kq === 'trong') && (
+              <section className="kq-the" aria-labelledby="kq-h-ai">
+                <h3 id="kq-h-ai">A.I Đỗ Đại Học đã lo cho em</h3>
+                <div className="kq-ai">
+                  <div>
+                    <i />
+                    <span>
+                      <b className="xd-so">{p.cau.filter((c) => c.kq === 'sai' || c.kq === 'trong').length} câu sai hoặc bỏ trống</b> sẽ vào hàng ôn lại của em, bắt đầu từ ngày mai.
+                    </span>
+                  </div>
+                </div>
+              </section>
+            )}
             {(p.onXemBaoCao || p.onVe) && (
               <div className="xd-nut-hang">
                 {p.onXemBaoCao && (
@@ -73,6 +131,27 @@ export default function KetQuaSauNop(p: KetQuaSauNopProps) {
           </>
         ) : (
           <>
+            <section className="kq-the kq-da-nop" aria-label="Em đã nộp bài">
+              <h2>Em đã nộp bài</h2>
+              {typeof p.soDaLam === 'number' && typeof p.tongCau === 'number' && p.tongCau > 0 && (
+                <div className="kq-3" style={{ width: '100%', marginTop: 6 }}>
+                  <div>
+                    <b>
+                      {p.soDaLam}/{p.tongCau}
+                    </b>
+                    <span>câu đã làm</span>
+                  </div>
+                  <div>
+                    <b>{p.gioNop.split(' · ')[0] || '—'}</b>
+                    <span>giờ nộp</span>
+                  </div>
+                  <div>
+                    <b>{p.lam2 ? p.lam2.replace(/ \d+ giây$/, '') : '—'}</b>
+                    <span>làm bài</span>
+                  </div>
+                </div>
+              )}
+            </section>
             <TrangThaiChuaCoDiem kieu={p.kieu === 'ca_lop' ? 'ca_lop' : 'khong'} nop={p.daNop} si={p.daVao} luc={p.gioNop.split(' · ')[0]} />
             {p.onVe && (
               <div className="xd-nut-hang">
