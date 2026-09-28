@@ -57,3 +57,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - ĐÃ PHÁT HÀNH PR #23 Đoàn ngang thanh kéo cột + cột lời giải cuộn (`301ed39`).
 - BẢN VẼ app GV nhiều màu (Material 3): `docs/ban-ve-gv-mau-2809/GV-TongQuan-Mau.html`, link https://claude.ai/artifact/1D6kCkQWqZRUNFPcdbhi1t — CHỜ THẦY CHỐT rồi mới build (áp cho cả app GV).
 - THẦY CHỐT phong cách màu GV cho toàn app ("thiết kế full app mọi lớp màu sắc chuẩn như vậy"). Đang build ở nhánh `gv-mau-m3` (token M3 trong tokens.css, rail, thẻ số theo nghĩa màu, thẻ chiến dịch ngang). Xong ⇒ PR vào main.
+- ĐÃ PHÁT HÀNH PR #24 (`d56a32d`): bỏ tự toàn màn hình khi vào game; nút toàn màn hình kính tròn góc dưới phải (NutToanManHinh).
+- ĐANG CHẠY: (1) màu M3 toàn app GV — nhánh `gv-mau-m3`; (2) game sáng/tối theo hệ thống — nhánh `game-sang-toi`; (3) rà soát màn chiếu Gọi lên bảng + đề xuất — nhánh `ra-soat-len-bang` (`docs/ra-soat-len-bang-2809/DE-XUAT.md`), CHỈ đề xuất, chờ thầy chốt.
