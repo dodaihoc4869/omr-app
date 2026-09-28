@@ -1,6 +1,6 @@
-# Bi-a Phản Ứng · trạng thái build GĐ1 (28/09/2026)
+# Bi-a Phản Ứng · trạng thái build (cập nhật 28/09/2026)
 
-**Đã build xong GĐ1, chưa phát hành.** Cờ `bi_a` mặc định TẮT ⇒ đẩy lên cũng chưa em nào thấy cho tới khi thầy bật ở Cài đặt.
+**GĐ1 đã phát hành** (Code app gộp PR #43, deploy #541; cờ `bi_a` đã bật theo lệnh thầy). **GĐ2 đã build, chờ xếp lượt deploy** — xem mục GĐ2 cuối tệp.
 
 ## Có gì
 | Phần | Tệp chính |
@@ -36,5 +36,27 @@
 - Đã gộp `origin/main` (441cc5e) vào nhánh: 3 xung đột thêm song song đã gỡ; precache sau gộp 169 tệp / 2 941 KB (main 169 / 2 940), `build:cf` ĐẠT 13/13.
 - **Thầy**: Cài đặt → Bi-a Phản Ứng → Bật theo lớp (thử một lớp trước).
 
-## GĐ2 (chưa làm)
-Đấu với bạn · Nhập mã bàn · lời mời · bảng điểm bàn (bảng đã dựng sẵn).
+## GĐ2 · Đấu với bạn (lệnh thầy 28/09 "hãy thực thi giai đoạn 2 luôn")
+**Đã build + chạy thật trên workerd, chưa phát hành** (chờ Code app xếp lượt deploy: Worker có lớp Durable Object mới `BanBiA`, migration DO `bia-v1`).
+
+| Phần | Tệp |
+|---|---|
+| Lõi trận dùng chung phòng/máy em (bước chuẩn, luật, băm, Elo) | `src/game/bi-a/tran.ts` |
+| Phòng đấu Durable Object (WebSocket Hibernation, alarm, 1 lô D1 khi kết ván, soát mất tín hiệu câm) | `server/src/bi-a-phong.ts`, `server/src/bi-a-ve.ts`, `server/wrangler.toml`, `server/src/index.ts` |
+| Lệnh sảnh online (tạo bàn, mã bàn, mời, có mặt, xếp câu theo ghế) | `server/src/bi-a.ts` |
+| Máy em: kết nối, ván online, phòng chờ, Sảnh online | `src/game/bi-a/{ket-noi.ts,dieu-khien-mang.ts,BanOnline.tsx,PhongCho.tsx,BiaGame.tsx,ManChoi.tsx,api.ts}` |
+| Hợp đồng | `docs/hop-dong-bi-a.md` mục GĐ2 |
+
+### Bằng chứng
+- Test Bi-a 13 tệp / 127 test xanh (thêm `bi-a-van-mang` — VanMang thật + phòng thật từng khung 1/60 giây, `bi-a-ket-noi`, `bi-a-ban-online`).
+- Chạy thật: `wrangler dev --local` (workerd + DO + D1 cục bộ, dữ liệu mẫu) + 2 Chromium: mời → Nhận (2,9–3,4 giây) → trọn ván 31 cú, lệch băm 0 cả hai máy, băm cuối trùng; S2 mất mạng 10 giây rồi nối lại; kết ván D1 đúng (xong, 2 ghế, đúng/sai khớp số bấm, Elo 976→966 / 1024→1034 khớp tính tay). Vào bàn bằng mã 4 chữ số. Máy câm bị phòng đóng ở giây 70; máy ping đều giữ 150 giây.
+- Lỗi lộ ra khi chạy thật/test và đã sửa: (1) đổi máy chủ bàn giữa lúc A.I đang ngắm ⇒ máy đứng hình (3df8f75); (2) cú của em mất cùng kết nối cũ ⇒ đứng "Đang chờ phòng đấu…" (3465263); (3) ping không khớp chuỗi tự trả lời ⇒ phòng không phát hiện mất tín hiệu câm (2261b1e); (4) A.I máy chủ bàn không giải trước khi người khác đang nhắm (3465263).
+- `tsc` app + máy chủ sạch; `check:mau` sạch; sau gộp main 7ff811e `build:cf` ĐẠT 13/13 (164 tệp / 2 855 KB); `wrangler deploy --dry-run` thấy binding `BAN_BIA (BanBiA)`.
+- Toàn bộ vitest nhánh (2261b1e) vs main (677b1b1), so theo TÊN: 128 đỏ = 128 đỏ, 0 đỏ mới; nhánh có 12 134 test (thêm 41).
+
+### Khác đặc tả
+Xếp ghế phòng chờ qua WebSocket (gói `ghe`) thay lệnh HTTP; có mặt gửi kèm số câu còn từ máy em; thêm soát mất tín hiệu câm 70 giây (đặc tả chỉ nói rời > 60 giây).
+
+### Phát hành / lùi
+- Code app đẩy Worker như thường (CI `wrangler deploy` tự áp migration DO `bia-v1`). Bảng `bi_a_*` đã tự dựng lúc chạy từ GĐ1.
+- Lùi: `git revert` các commit GĐ2; Worker không có binding `BAN_BIA` ⇒ Sảnh tự về nút "Sắp mở".
