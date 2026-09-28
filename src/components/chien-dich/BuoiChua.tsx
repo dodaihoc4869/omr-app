@@ -2,19 +2,22 @@
 // Bảng câu xếp sẵn (điểm chữa = chưa thành thạo + 2 × cần dạy lại, mỗi dạng một câu), người lên bảng (giải mẫu + sửa),
 // thời gian ước lượng bằng CÙNG công thức của Gọi lên bảng (`thoiGianCau`), tổng ≤ 90 phút, mỗi em có mặt ≥ 1 lượt (`xepBuoiChua`).
 // Nút chính "Mở tờ máy chiếu" (luồng tờ chiếu có sẵn), "Chữa xong" (hỏi lại, nói rõ hậu quả) ⇒ `chua-xong`, "Mở ca chốt".
+// Kết quả Đạt / Không đạt thầy bấm trên tờ chiếu (`ghi-to-chieu.ts`) hiện lại ở cột "Người lên bảng" của đúng câu.
 import { useMemo, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { thoiGianCau } from '../../lib/thoi-gian-len-bang'
+import { KHOA_CA_CHOT, type GoiCaChot } from '../../lib/ca-chot-chien-dich'
 import HopXacNhan from '../HopXacNhan'
 import { chuaXong, type BuoiChuaMayChu, type CauCanDayLai, type EmTen } from './api'
+import type { BangKetQua } from './ghi-to-chieu'
 import HopChon from './HopChon'
 import { congNgay, hienHanNop, hienNgay, phanTram } from './ngay'
 import { noiDungCua, type CauGoc, type OChieu } from './to-chieu'
 import { cauCaChot, chuNguoiSua, sapTheoTen, saoTuMucDo, xepBuoiChua, type DongBuoiChua } from './tinh'
 import './chien-dich.css'
 
-/** Khoá phiên (sessionStorage) màn Mở ca kiểm tra đọc để chọn sẵn câu của ca chốt. */
-export const KHOA_CA_CHOT = 'ddh.caChotChienDich'
+/** Khoá phiên màn Mở ca kiểm tra đọc để chọn sẵn câu của ca chốt (nguồn: `lib/ca-chot-chien-dich.ts`). */
+export { KHOA_CA_CHOT }
 
 export function oChieuTuDong(dong: readonly DongBuoiChua[]): OChieu[] {
   return dong.map((d) => {
@@ -38,6 +41,7 @@ export default function BuoiChua({
   canDayLai,
   homNay,
   tra,
+  ketQua = {},
   dangChieu,
   onChieu,
   onDoiCoMat,
@@ -51,6 +55,8 @@ export default function BuoiChua({
   canDayLai: CauCanDayLai[]
   homNay: string
   tra: ReadonlyMap<string, CauGoc>
+  /** Kết quả lên bảng đã ghi (khoá `sbd|qid`), từ tờ máy chiếu. */
+  ketQua?: BangKetQua
   dangChieu: boolean
   onChieu: (ds: OChieu[], tenBuoi: string) => Promise<boolean>
   onDoiCoMat: (sbd: string[]) => void
@@ -73,6 +79,19 @@ export default function BuoiChua({
     [du, emCoMat, tra],
   )
   const phut = (giay: number) => Math.ceil(giay / 60)
+  /** Em (của câu này) đã có kết quả lên bảng — người giải mẫu trước, rồi người sửa, rồi em khác có mặt. */
+  const ketQuaCua = (d: DongBuoiChua) => {
+    const ds = [d.giaiMau, ...d.sua, ...emCoMat].filter((e): e is EmTen => !!e)
+    const daXet = new Set<string>()
+    const ra: { em: EmTen; kq: 'dat' | 'khong_dat' }[] = []
+    for (const em of ds) {
+      if (daXet.has(em.sbd)) continue
+      daXet.add(em.sbd)
+      const kq = ketQua[`${em.sbd}|${d.cau.qid}`]
+      if (kq) ra.push({ em, kq })
+    }
+    return ra
+  }
   const luotDayLai = kq.dong.reduce((s, d) => s + d.cau.soCanDayLai, 0)
   const ngayMai = congNgay(homNay, 1)
   const caChot = cauCaChot(
@@ -95,14 +114,13 @@ export default function BuoiChua({
   }
 
   const moCaChot = () => {
-    // TODO(ExamSetupScreen — làn khác): đọc sessionStorage[KHOA_CA_CHOT] để CHỌN SẴN các câu này khi mở ca chốt.
-    // Hiện màn Mở ca kiểm tra chưa nhận danh sách câu từ ngoài, nên thầy vẫn tự chọn tờ đề của chiến dịch.
+    // Màn Mở ca kiểm tra đọc gói này MỘT LẦN khi mở (tích sẵn tờ + câu, hiện dòng "Đang mở ca chốt…") rồi xoá.
+    const goi: GoiCaChot = { chienDichId: du.chienDich.id, ten: du.chienDich.ten, lop: du.chienDich.lop, qids: caChot }
     try {
-      sessionStorage.setItem(KHOA_CA_CHOT, JSON.stringify({ chienDichId: du.chienDich.id, ten: du.chienDich.ten, lop: du.chienDich.lop, qids: caChot }))
+      sessionStorage.setItem(KHOA_CA_CHOT, JSON.stringify(goi))
     } catch {
-      /* chặn bộ nhớ phiên: chỉ mất phần điền sẵn */
+      showToast(`Máy chặn bộ nhớ phiên: thầy tự chọn ${caChot.length} câu của chiến dịch ${du.chienDich.ten} ở màn Mở ca`, 'warn')
     }
-    showToast(`Ca chốt ${caChot.length} câu: màn Mở ca chưa tự chọn sẵn câu — thầy chọn tờ đề của chiến dịch ${du.chienDich.ten}`, 'warn')
     setScreen('examsetup')
   }
 
@@ -190,6 +208,11 @@ export default function BuoiChua({
                 <span role="cell">
                   {d.giaiMau ? `Giải mẫu: ${d.giaiMau.ten}` : 'Thầy giải mẫu'}
                   {d.sua.length > 0 ? ` · ${chuNguoiSua(d.sua)}` : ''}
+                  {ketQuaCua(d).map(({ em, kq }) => (
+                    <span key={em.sbd} className={`cd-ket-qua cd-ket-qua--${kq === 'dat' ? 'dat' : 'khong'}`} data-ket-qua={`${em.sbd}|${d.cau.qid}`}>
+                      {em.ten}: {kq === 'dat' ? 'Đạt' : 'Không đạt'}
+                    </span>
+                  ))}
                 </span>
                 <span className="cd-so" role="cell">
                   {phut(d.giay)} phút

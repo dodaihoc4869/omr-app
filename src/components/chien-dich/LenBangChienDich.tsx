@@ -1,6 +1,7 @@
 // LÊN BẢNG — CHẾ ĐỘ GAME HÓA 2.0 (chỉ khi cờ bật; cờ tắt thì màn Gọi lên bảng chạy như cũ).
 // Đầu màn chọn chiến dịch (`danh-sach`). Chiến dịch đang chạy ⇒ Bảng chiến dịch (`bang`); hết hạn nộp ⇒ TỰ chuyển Buổi chữa
 // (`buoi-chua`), kể cả khi màn đang mở đúng lúc qua 23:59. Tờ máy chiếu dùng lại luồng có sẵn (`to-chieu.ts` + `KhungXemPhieu`).
+// Tờ có hai nút Đạt / Chưa đạt (cầu nối của Gọi lên bảng, `ghi-to-chieu.ts`); kết quả hiện lại trên Buổi chữa.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { chuThieuNoiDung } from '../../lib/tra-cau-chieu'
@@ -10,6 +11,7 @@ import BangChienDich from './BangChienDich'
 import BuoiChua from './BuoiChua'
 import { hienNgay, mocHetHan } from './ngay'
 import { dungToChieu, napBangTra, type CauGoc, type OChieu } from './to-chieu'
+import { useGhiToChieu } from './ghi-to-chieu'
 import './chien-dich.css'
 
 /** Chiến dịch mặc định: cái đang chạy mới giao nhất (danh sách máy chủ đã xếp mới trước). */
@@ -105,6 +107,7 @@ export default function LenBangChienDich({ onCheDoCu }: { onCheDoCu?: () => void
 
   const [html, setHtml] = useState('')
   const [dangChieu, setDangChieu] = useState(false)
+  const { ketQua, moPhien, ganO, dongPhien } = useGhiToChieu(chonId)
   const moChieu = async (dsO: OChieu[], tenBuoi: string): Promise<boolean> => {
     if (!dsO.length) {
       showToast('Chưa có câu nào để chiếu lên bảng', 'warn')
@@ -112,9 +115,11 @@ export default function LenBangChienDich({ onCheDoCu }: { onCheDoCu?: () => void
     }
     setDangChieu(true)
     try {
-      const { html: h, soThieu } = await dungToChieu(dsO, tenBuoi, await layTra())
+      const ma = moPhien()
+      const { html: h, soThieu, o } = await dungToChieu(dsO, tenBuoi, await layTra(), ma)
       const bao = chuThieuNoiDung(soThieu)
       if (bao) showToast(bao, 'warn')
+      ganO(ma, o)
       setHtml(h)
       return true
     } catch (e) {
@@ -205,6 +210,7 @@ export default function LenBangChienDich({ onCheDoCu }: { onCheDoCu?: () => void
           canDayLai={bang.canDayLai}
           homNay={bang.homNay}
           tra={tra}
+          ketQua={ketQua}
           dangChieu={dangChieu}
           onChieu={moChieu}
           onDoiCoMat={(sbd) => {
@@ -223,7 +229,16 @@ export default function LenBangChienDich({ onCheDoCu }: { onCheDoCu?: () => void
         </div>
       )}
 
-      {html && <KhungXemPhieu html={html} ten="Tờ máy chiếu — lên bảng chiến dịch" dong={() => setHtml('')} />}
+      {html && (
+        <KhungXemPhieu
+          html={html}
+          ten="Tờ máy chiếu — lên bảng chiến dịch"
+          dong={() => {
+            dongPhien()
+            setHtml('')
+          }}
+        />
+      )}
     </div>
   )
 }

@@ -122,7 +122,7 @@ export default defineConfig({
           '**/Spirit3D-*.js',
           // Bảng tin sàn của thầy: bản đồ lớp 3D nạp LƯỜI (import động) — three (≈ 536 KB) chỉ máy thầy tải khi mở màn Hôm nay; máy học sinh / phụ huynh KHÔNG được cất vào bộ nhớ đệm.
           '**/ban-do-3d-three-*.js',
-          '**/{CaiDatScreen,GiaoDeTheoTuanScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,DaoThanThu,DoanHoTong,Game,html-may-chieu,Dao2,DoanHinh,chien-dich,CauDaLam}-*.{js,css}',
+          '**/{CaiDatScreen,GiaoDeTheoTuanScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,DaoThanThu,DoanHoTong,Game,html-may-chieu,Dao2,DoanHinh,chien-dich,ca-chot-chien-dich,CauDaLam}-*.{js,css}',
           // Game Hóa 2.0 (27/09): hình vẽ 32 phụ kiện thần thú (nạp lười trong game) — chỉ máy mở game mới tải, cất ở kho chạy-lúc.
           '**/pk-{cl,da,hq,vd}-*.js',
           '**/cai-app/**',
