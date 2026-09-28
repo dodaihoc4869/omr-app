@@ -723,6 +723,11 @@
   background: var(--bts-xam-o);
   color: var(--bts-chu-phu);
 }
+/* Chiến dịch chưa tới ngày bắt đầu (thầy 28/09). */
+.cd-chip-muc--duong {
+  background: var(--bts-duong-nhat);
+  color: var(--bts-duong);
+}
 
 /* ---- thẻ số (KPI) ---- */
 .cd-kpi-hang {
@@ -964,6 +969,10 @@
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr) minmax(0, 1.2fr);
     align-items: start;
   }
+}
+.cd-hai-ngay {
+  display: grid;
+  gap: 12px;
 }
 .cd-hang-o {
   display: flex;
