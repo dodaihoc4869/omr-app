@@ -7,7 +7,7 @@ import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { khoiLuongCan, phatLaiCau, soNgayConLai, sucChua, congNgay, TRAN_NGAY, type LanLam, type TrangThaiCau } from './srs2-loi'
-import { docChienDichTuDong, docCoHoa2Tu, docMetaCau, KHOA_CO_HOA2, ngayVnCua, type ChienDich } from './srs2-d1'
+import { chanDoanEm, docChienDichTuDong, docCoHoa2Tu, docMetaCau, KHOA_CO_HOA2, ngayVnCua, type ChienDich } from './srs2-d1'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -22,6 +22,7 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
     if (action === 'danh-sach') return danhSach(env, nowMs)
     if (action === 'suc-chua') return tinhSucChua(env, b, nowMs)
     if (action === 'ds-em') return dsEm(env)
+    if (action === 'chan-doan-em') return chanDoanEm(env, str(b.sbd).trim(), nowMs)
     if (action === 'tao') return tao(env, b, nowMs)
     if (action === 'dong' || action === 'huy') return doiTrangThai(env, str(b.id), action === 'dong' ? 'da_dong' : 'da_huy', nowMs)
     if (action === 'bang') return bang(env, str(b.id), nowMs)
