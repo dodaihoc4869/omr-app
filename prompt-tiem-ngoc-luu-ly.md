@@ -1,6 +1,6 @@
 # Prompt — Tiệm Ngọc Lưu Ly: game sưu tầm – chế tác ngọc gắn kế hoạch ngày, cửa thứ tư trên Sảnh Bát Linh
 
-Soạn 28/09/2026, **bản 1 — chờ thầy duyệt**. Chưa build. **Bản vẽ chơi được (GĐ0) đã có**: `docs/ban-ve-tiem-ngoc-2809/tiem-ngoc.html` (artifact https://claude.ai/artifact/4hKiByn6NVspXEsKQ9bgBF, phiên bản 1). Thầy duyệt bản vẽ rồi gõ **HÃY THỰC THI PROMPT NÀY** thì mới làm GĐ1.
+Soạn 28/09/2026, **bản 1 — chờ thầy duyệt**. Chưa build. **Bản vẽ chơi được (GĐ0) đã có**: `docs/ban-ve-tiem-ngoc-2809/tiem-ngoc.html` (artifact https://claude.ai/artifact/4hKiByn6NVspXEsKQ9bgBF, phiên bản 2 — gam sáng lung linh). Thầy duyệt bản vẽ rồi gõ **HÃY THỰC THI PROMPT NÀY** thì mới làm GĐ1.
 
 ## Góc nhìn khác
 
