@@ -1,0 +1,166 @@
+/* THANH BÊN · RAIL · THANH TRÊN/ĐÁY — GAME HÓA 2.0 (bản vẽ thầy chốt 28/09: docs/ban-ve-gv-2809/GV-ThanhBen).
+ * Chỉ áp khi `[data-hoa2]` (App đặt trên `.vo-thay`, ThanhBenTrai đặt trên `.ben-trai`); cờ tắt ⇒ vo-thay.css như cũ.
+ * Màu = token M3 / --bts-*; không hex (npm run check:mau). */
+
+/* logo chữ "Đỗ Đại Học · Giáo viên" (thay "ĐỖ ĐẠI HỌC GIÁO VIÊN 6,022 · 10²³") */
+.ben-trai-logo-chu {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+  font-family: var(--sans);
+  line-height: 1.15;
+}
+.ben-trai-logo-ten {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--m3-on-surface);
+}
+.ben-trai-logo-vai {
+  font-size: 13px;
+  color: var(--m3-on-surface-variant);
+}
+
+/* số đếm cạnh mục: "1 mở" (xanh lá), số chiến dịch (xám), số câu cần dạy lại (đỏ) — luôn là chữ, không chỉ màu */
+.ben-trai-dem {
+  display: none;
+  font-family: var(--sans);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1;
+}
+.ben-trai-dem[data-tone='la'] {
+  background: var(--bts-la-nhat);
+  color: var(--bts-la);
+}
+.ben-trai-dem[data-tone='xam'] {
+  background: var(--m3-surface-container-high);
+  color: var(--m3-on-surface-variant);
+}
+.ben-trai-dem[data-tone='do'] {
+  background: var(--bts-do-nhat);
+  color: var(--bts-do);
+}
+
+@media (min-width: 880px) {
+  .ben-trai[data-hoa2] .ben-trai-dem {
+    display: inline-flex;
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 11px;
+  }
+  .ben-trai-cuoi--gv2 {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ben-trai[data-hoa2] .ben-trai-muc--phu .ben-trai-bieu-tuong {
+    display: flex;
+  }
+}
+
+@media (min-width: 1100px) {
+  .vo-thay[data-hoa2] {
+    grid-template-columns: 240px minmax(0, 1fr);
+  }
+  .ben-trai[data-hoa2] {
+    padding: 20px 12px;
+  }
+  .ben-trai-logo--gv2 {
+    gap: 12px;
+  }
+  .ben-trai-logo--gv2 .ben-trai-logo-chu {
+    display: flex;
+  }
+  .ben-trai[data-hoa2] .ben-trai-dem {
+    position: static;
+    margin-left: auto;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .ben-trai[data-hoa2] .ben-trai-muc {
+    min-height: 48px;
+    gap: 12px;
+    padding: 0 14px;
+  }
+  .ben-trai[data-hoa2] .ben-trai-muc--phu {
+    min-height: 44px;
+  }
+  .ben-trai[data-hoa2] .ben-trai-muc--phu .ben-trai-ten {
+    font-size: 14px;
+    color: var(--m3-on-surface-variant);
+  }
+  .ben-trai[data-hoa2] .ben-trai-muc--phu.dang .ben-trai-ten {
+    color: var(--m3-on-primary-container);
+  }
+}
+
+/* ── điện thoại < 880 px: thanh trên (logo · tên màn · bánh răng) ─────────── */
+.tren-thay {
+  display: none;
+}
+@media (max-width: 879px) {
+  .tren-thay {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 56px;
+    padding: 0 8px 0 12px;
+    background: var(--m3-surface-container);
+    box-shadow: 0 1px 0 var(--m3-outline);
+  }
+  .tren-thay-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: transparent;
+  }
+  .tren-thay-ten {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--sans);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--m3-on-surface);
+  }
+  .tren-thay-banh-rang {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    background: transparent;
+    color: var(--m3-on-surface-variant);
+  }
+  .tren-thay-banh-rang.dang {
+    background: var(--m3-primary-container);
+    color: var(--m3-on-primary-container);
+  }
+  .day-thay-them.day-thay-them--tren {
+    top: 60px;
+    bottom: auto;
+  }
+  .vo-thay[data-hoa2] .khung-noi-dung {
+    padding-top: 56px;
+  }
+  .vo-thay[data-hoa2] .day-thay-muc {
+    font-size: 11.5px;
+  }
+  .vo-thay[data-hoa2] .day-thay-bieu-tuong {
+    width: 56px;
+  }
+}
