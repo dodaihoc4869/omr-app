@@ -97,6 +97,16 @@ describe('nút Chỉnh sửa chiến dịch đang mở', () => {
     await waitFor(() => expect(goi.mock.calls.filter(([, b]) => b.action === 'danh-sach').length).toBeGreaterThan(soDanhSach))
   })
 
+  it('hộp nằm trong vỏ màu app thầy (.m3.vo-thay) dù cổng ra document.body — không bị nền trong suốt (thầy 28/09)', async () => {
+    render(<DsChienDichDaGiao />)
+    await screen.findByText('Chiến dịch luyện')
+    fireEvent.click(screen.getByRole('button', { name: 'Chỉnh sửa' }))
+    const hop = await screen.findByRole('dialog')
+    const vo = hop.closest('.m3.vo-thay') as HTMLElement | null
+    expect(vo).toBeTruthy()
+    expect(vo!.style.display).toBe('contents')
+  })
+
   it('hạn mới trước hôm nay ⇒ báo ngay cạnh ô, không cho lưu', async () => {
     render(<DsChienDichDaGiao />)
     await screen.findByText('Chiến dịch luyện')
