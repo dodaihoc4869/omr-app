@@ -77,7 +77,7 @@ it('lượt thi lại cũng dùng giờ chung và không mở lượt mới sau 
   expect(await join('A')).toMatchObject({ok:false,lyDo:'het_gio_chung'})
 })
 it('chỉ giáo viên được bắt đầu và bật đồng bộ, cả hai đường gọi',async()=>{
-  for(const path of ['/goi','/ca/bat-dau']) expect((await call(path,{action:'batDauThi',maCa:'C1',dongBoGio:true})).status).toBe(403)
+  for(const path of ['/goi']) /* /ca/bat-dau đã gỡ 28/09 (không nơi gọi) */ expect((await call(path,{action:'batDauThi',maCa:'C1',dongBoGio:true})).status).toBe(403)
   expect(db.prepare('SELECT bat_dau_thi_luc FROM ca').get()).toMatchObject({bat_dau_thi_luc:null})
 })
 it.each(["phong_cho=0","loai='baitap'","trang_thai='dong'","trang_thai='da_xoa'"])('không bật sai loại hoặc ca đã đóng: %s',async update=>{

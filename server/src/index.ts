@@ -80,6 +80,7 @@ import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
 import { gan } from './cau-hinh-dem'
+import { gvKhoDeGiao } from './gv-kho-de-giao'
 import { damBaoChiMuc } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
@@ -2584,27 +2585,6 @@ async function tienDoEm(env: Env, sbd: string): Promise<Response> {
   })
 }
 
-/** CÂU SAI CHƯA CHỮA của một em — để rút câu khắc phục. */
-async function cauSaiCuaEm(env: Env, b: Record<string, unknown>): Promise<Response> {
-  const sbd = String(b.sbd ?? '').trim()
-  if (!sbd) return ra({ ok: false, error: 'Thiếu số báo danh' })
-  const maCa = String(b.maCa ?? '').trim()
-  const r = maCa
-    ? await env.DB.prepare('SELECT * FROM ban_do_sai WHERE sbd = ? AND ma_ca = ? ORDER BY cap_nhat_luc DESC').bind(sbd, maCa).all<Record<string, unknown>>()
-    : await env.DB.prepare('SELECT * FROM ban_do_sai WHERE sbd = ? AND da_chua = 0 ORDER BY cap_nhat_luc DESC LIMIT 300').bind(sbd).all<Record<string, unknown>>()
-  return ra({
-    ok: true,
-    ds: (r.results ?? []).map((x) => ({
-      maCa: String(x.ma_ca ?? ''),
-      qid: String(x.qid ?? ''),
-      chuyenDe: String(x.chuyen_de ?? ''),
-      mucDo: String(x.muc_do ?? ''),
-      soLanSai: Number(x.so_lan_sai) || 1,
-      daChua: Number(x.da_chua) === 1,
-    })),
-  })
-}
-
 /** GỌI LÊN BẢNG — ghi một câu chữa tại lớp vào bảng mạnh–yếu, KHÔNG tạo lượt
  * thi giả và KHÔNG đụng điểm số. Đúng khuôn `ghiLenBang` bên Apps Script. */
 async function ghiLenBangMoi(env: Env, b: Record<string, unknown>): Promise<Response> {
@@ -3376,6 +3356,9 @@ const boXuLy = {
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
       // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
       if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
+      // GIAO ĐỀ THEO TUẦN (26/09, gv-kho-de-giao.ts): màn thầy `GiaoDeTheoTuanScreen` gọi lệnh này; dòng định tuyến bị rơi mất sau một lần gộp ⇒ màn báo
+      // "Máy chủ chưa có lệnh". Nối lại (28/09). Có ghi (`luu`) ⇒ dùng `env` (không phải bản đọc-chỉ).
+      if (p === '/gv/kho-de-giao') return ra(await gvKhoDeGiao(env, b))
       if (p === '/gv/buoi-hoc/suc-hoc') return ra(await gvSucHocBuoi(envDoc, b))
       // DẢI THỐNG KÊ LỚP (phím T) cho buổi chữa KHÔNG từ ca (hoàn thiện bản vẽ 28/09): chỉ số GỘP theo câu từ sổ su_kien_hoc, không tên em. ĐỌC-CHỈ.
       if (p === '/gv/thong-ke-lop-cau') return ra(await gvThongKeLopCau(envDoc, b))
@@ -3404,13 +3387,11 @@ const boXuLy = {
       if (p === '/phieu/xoa') return xoaPhieuR2(env, String(b.ma ?? ''))
       if (p === '/chua-day') return chuaDay(env, String(b.maCa ?? ''))
       if (p === '/da-day') return danhDauDaDay(env, b)
-      if (p === '/ca/bat-dau') return batDauThi(env, String(b.maCa ?? ''), b.dongBoGio)
       if (p === '/theo-doi') return xemTheoDoi(env, String(b.maCa ?? ''))
       if (p === '/ca/luot') return luotCuaCa(env, String(b.maCa ?? ''))
       if (p === '/ca/nhieu') return dayNhieuCa(env, b)
       if (p === '/ca/danh-sach') return themMocReset(env, await danhSachCaMoi(env, b.daXoa === true)) // đường CHÍNH app thầy (Code 1): phải mang `mocReset` như /goi danhSachCa
       if (p === '/ca/sua') return suaCa(env, b)
-      if (p === '/ca/xoa-vinh-vien') return ra(await G.xoaVinhVienCa(env, b))
       if (p === '/ca/chi-tiet') return chiTietCaMoi(env, String(b.maCa ?? ''))
       // THÊM PHÚT cho ca đang chạy (docs/hop-dong-them-phut-2109.md): chỉ cộng, trần 30 phút mỗi ca.
       if (p === '/ca/them-phut') return ra(await themPhutCa(env, b))
@@ -3424,7 +3405,6 @@ const boXuLy = {
       // CHẤM LẠI MỘT CA CŨ bằng luật chấm hiện hành rồi ghi lại D1 (thầy chốt 23/09 — việc còn lại của MỤC 3).
       if (p === '/ca/cham-lai') return chamLaiCaRoute(env, b)
       if (p === '/em/tien-do') return tienDoEm(env, String(b.sbd ?? ''))
-      if (p === '/em/cau-sai') return cauSaiCuaEm(env, b)
       if (p === '/len-bang') return ghiLenBangMoi(env, b)
       if (p === '/kho/day') return dayDeKho(env, b)
       if (p === '/kho/danh-sach') return danhSachDeKho(env, b)
