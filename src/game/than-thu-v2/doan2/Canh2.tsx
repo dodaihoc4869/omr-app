@@ -3,7 +3,7 @@
 // huy hiệu LIÊN KÍCH; đồng đội góc phải (CHỈ trạng thái, không bao giờ đáp án hay chữ "sai" của bạn). Mọi con số do máy chủ trả.
 // Tranh vẽ bằng SVG tĩnh trong mã (không ảnh nạp trễ ⇒ không xô lệch); hoạt ảnh duy nhất là thú nổi nhẹ, tắt sạch khi giảm chuyển động.
 import { useId } from 'react'
-import { HE_LIEN_KICH, HIEP_TRUM } from '../doan-core'
+import { HE_LIEN_KICH, HIEP_TRUM, HP_QUAI } from '../doan-core'
 import { CHU_TRANG_THAI, type DoanXem, type TranXem } from '../doan-kieu'
 import { ThuHinh, TrumHinh } from '../DoanHinh'
 
@@ -44,7 +44,7 @@ export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
   const nhanDon = donEm ? (donEm.lienKich ? 'LIÊN KÍCH' : donEm.haGuc > 0 ? 'HẠ GỤC' : 'ĐÒN CỦA EM') : ''
   // Huy hiệu Liên Kích: sẵn sàng (bạn vừa được em tiếp sức) hoặc đòn vừa rồi của em nổ Liên Kích — hai dòng cho gọn một ô.
   const lienKich = xem.tiepSuc?.lienKichSanSang && mo ? 'sẵn sàng' : donEm?.lienKich ? 'vừa nổ' : ''
-  const quai = tran.quai.slice(0, CHO_QUAI.length), dau = quai[0]
+  const quai = tran.quai.slice(0, CHO_QUAI.length), dau = quai[0], tenQuai = tran.tenQuai[tran.hiep < HIEP_TRUM[0]! ? 0 : 1] ?? 'Tạp Chất'
   return (
     <div className={`dh2-canh ${tran.laTrum ? 'dh2-canh-trum' : ''}`} data-vung="canh-2">
       <div className="dh2-ve" aria-label={tran.laTrum ? `Trùm ${tran.tenTrum[soTrum] ?? ''} chặn đường, Linh Tâm còn Máu ${tran.linhTam.hp}/${tran.linhTam.toiDa}` : `Linh Tâm trên xe còn Máu ${tran.linhTam.hp}/${tran.linhTam.toiDa}, ${tran.quai.length} Tạp Chất phục kích`} role="img">
@@ -88,6 +88,12 @@ export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
           <div className="dh2-sat-thuong" aria-label={`Đòn của em hiệp ${vua!.hiep}: ${donEm.satThuong} sát thương`}>
             <b>-{donEm.satThuong}</b><span>{nhanDon}</span>
           </div>
+        )}
+        {/* Màn NGANG (doan2-ngang.css): nhãn Máu từng quái xếp thành cột ở khoảng trời trống phía trên bầy quái — không hình nào che; màn dọc ẩn (giữ y bản vẽ dọc). */}
+        {!tran.laTrum && quai.length > 0 && (
+          <ul className="dh2-nhan-quai" aria-label="Máu từng Tạp Chất" data-vung="mau-quai">
+            {quai.map(q => <li key={q.ma} className="dh2-kinh">{tenQuai} · Máu {Math.max(0, q.hp)}/{HP_QUAI}</li>)}
+          </ul>
         )}
         <span className="dh2-kinh dh2-nhan-canh dh2-nhan-mau">Máu Linh Tâm {tran.linhTam.hp}/{tran.linhTam.toiDa}</span>
         {tran.laTrum

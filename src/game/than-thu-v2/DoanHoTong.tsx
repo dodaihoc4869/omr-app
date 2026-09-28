@@ -21,6 +21,7 @@ import { docHoa2, goiYCuaCau, type GoiYM3, type Hoa2Xem } from './doan2/kieu2'
 import KetChang2 from './doan2/KetChang2'
 import './doan.css'
 import './doan2/doan2.css'
+import './doan2/doan2-ngang.css'
 import '../../components/hoa2/phong-baloo'
 
 export const NHIP_HOI_MS = 1500

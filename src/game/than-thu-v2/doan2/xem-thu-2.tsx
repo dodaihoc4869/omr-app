@@ -1,4 +1,4 @@
-// TRANG XEM THỬ ĐOÀN 2.0 (chỉ `npm run dev`, KHÔNG vào bản build): /src/game/than-thu-v2/doan2/xem-thu-2.html?man=tran|cot-loi|ket-qua|thang|keo|thua|sanh|sanh-het
+// TRANG XEM THỬ ĐOÀN 2.0 (chỉ `npm run dev`, KHÔNG vào bản build): /src/game/than-thu-v2/doan2/xem-thu-2.html?man=tran|cot-loi|ket-qua|trum|tiep-suc|thang|keo|thua|sanh|sanh-het (man=tran: chọn + chốt ⇒ tung chưởng ⇒ lời giải đứng yên + ĐÁNH TIẾP)
 // Dựng DoanHoTong THẬT với máy chủ giả (dữ liệu bịa chỉ để nhìn bố cục — không bao giờ chạy trên máy em). Dùng để chụp ảnh đối chiếu bản vẽ Moi-DoanTran / Moi-DoanThang.
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -38,18 +38,25 @@ const xem: DoanXem | null =
   man === 'tran' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe, gioMayChu: 0, tran: tran(), hiepVuaXong: vuaXong as never, tiepSuc: { conLuotNhan: 2, daXin: false, theNhan: null, banCan: [], daGiup: false, lienKichSanSang: true }, cau: { qid: 'Q1', nhan: 'toi_han_on', de: deI, goiY: { gach: ['A', 'D'] } } as never }
     : man === 'cot-loi' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe, gioMayChu: 0, tran: tran(), cau: { qid: 'Q2', nhan: 'toi_han_on', de: deII, goiY: { cotLoi: 'Ester thuỷ phân trong kiềm là phản ứng một chiều (xà phòng hoá).' } } as never }
       : man === 'ket-qua' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe, gioMayChu: 0, tran: tran(), cau: { qid: 'Q1', nhan: 'toi_han_on', de: deI, daChot: true, hanhDong: 'danh', ketQua: { correct: false, answer: 'B', solution: loiGiai } } }
+        : man === 'trum' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe, gioMayChu: 0, tran: tran({ hiep: 4, laTrum: true, quai: [], giay: 60 }),
+          trum: { coCau: true, giaoY: [0, 1, 2, 0], yCuaEm: [0, 3], yDaChot: [false, true, false, false], qid: 'Q2', tenDang: 'Thuỷ phân ester', de: deII } }
+        : man === 'tiep-suc' ? { ma: 'DH1', revision: 5, laChu: true, batDau: true, ghe: ghe.map(g => g.ghe === 2 ? { ...g, trangThai: 'can_tiep_suc' as const } : g), gioMayChu: 0, tran: tran(),
+          tiepSuc: { conLuotNhan: 2, daXin: false, theNhan: null, banCan: [2], daGiup: false, lienKichSanSang: false }, cau: { qid: 'Q1', nhan: 'toi_han_on', de: deI, daChot: true, hanhDong: 'danh', ketQua: null } }
         : man === 'thang' || man === 'keo' ? ket(true) : man === 'thua' ? ket(false) : null
 const con = man === 'thang' || man === 'sanh-het' ? 0 : man === 'keo' || man === 'thua' ? 2 : 4
 if (xem) sessionStorage.setItem('doan:S1', xem.ma); else sessionStorage.removeItem('doan:S1')
 const sanh = { lop: '12A1', tenDoan: 'Đoàn Hộ Tống 12A1', mua: { so: 1, conNgay: 19 }, ve: 0, mienPhiHomNay: false, chuoi: { ngay: 5, daDiHomNay: false, mocKe: 7, conNgay: 2 },
   doanLop: { lop: '12A1', tram: 17, tongTram: 30, changThang: 3, changMoiTram: 4, conChangToiTramKe: 4, mocKe: 20, tenMocKe: 'Hồ Cân Bằng', conTramToiMoc: 3, gopSucHomNay: 9, siSo: 32 },
   trumLop: { dangMo: false, chuNhat: '2026-10-04', moSauMs: 4 * 24 * 3_600_000 + 5 * 3_600_000, conMs: 0, daGop: 0, mucTieu: 300, daHa: false }, quaMoi: [] }
+let daNop: DoanXem | null = null
 const call = async (lenh: string) => {
   await new Promise(r => setTimeout(r, 30))
   if (lenh === 'hoa2-sanh') return { ok: true, cheDo2: true, doan: { con }, dao: { con: 28 } }
   if (lenh === 'doan-sanh') return { ok: true, sanh, dangDo: null, tranNgay: 60, dailyUsed: 8 }
   if (lenh === 'recommendations') return { ok: true, suggestions: [] }
-  if (lenh === 'doan-xem' && xem) return { ok: true, doan: xem }
+  if (lenh === 'doan-xem' && xem) return { ok: true, doan: daNop ?? xem }
+  if (lenh === 'doan-nop' && xem) { daNop = { ...xem, revision: 6, tran: tran({ hiep: 4, moSauMs: 15 * 60_000, choTiep: true, quai: [{ ma: 6, loai: 'bun_acid', hp: 24 }] } as never), cau: undefined, hiepVuaXong: { ...vuaXong, hiep: 3 } as never }; return { ok: true, doan: daNop, ketQuaCau: { correct: true, answer: 'B', solution: loiGiai } } }
+  if (lenh === 'doan-the-goi-y') return { ok: true, goiY: { den: 2, ten: 'Nam', pet: 3, cap: 12, tenDang: 'Thuỷ phân ester', de: deI.text, the: [{ loai: 'nhac_cong_thuc', tieuDe: 'Nhắc công thức', moTa: 'Gửi bạn kiến thức gốc của câu' }, { loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án', moTa: 'A.I Đỗ Đại Học gạch một đáp án sai' }] } }
   return { ok: true }
 }
 
