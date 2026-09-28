@@ -1,4 +1,5 @@
 import {lazy,Suspense,useCallback,useEffect,useRef,useState} from 'react'
+import NutToanManHinh from '../../../components/NutToanManHinh'
 import type {ReactNode} from 'react'
 import type {BattleAnswer} from '../learning-battle'
 import ChonBanDongHanh,{theMoDau} from './ChonBanDongHanh'
@@ -111,7 +112,7 @@ export default function DaoThanThu({sbd,token,moShopLucDau,moTuiDoLucDau=false,p
   {man!=='dao'&&<div className="dao dao-vo dao-v2" data-thu={chiSoThu(profile.pet)}>
    {man==='so-tay'&&<SoTay profile={profile} danhMuc={danhMuc} tenDang={tenDang}/>}
    {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onRenKhien={n=>chay(async()=>{await goiTien('khien-ren',{soDaRen:n})})} onDungKhien={id=>chay(async()=>{await goiTien('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}
-   <button type="button" className="dao-ve-app" onClick={onDong}>Về app học sinh</button>
+   <button type="button" className="dao-ve-app" onClick={onDong}>Về app học sinh</button><NutToanManHinh className="dao-toan-man"/>
    {thanhDuoi}
   </div>}
  </>
@@ -120,7 +121,7 @@ export default function DaoThanThu({sbd,token,moShopLucDau,moTuiDoLucDau=false,p
    onLenDuong={()=>void lenDuong()} onOnTheoNhac={dang=>void lenDuong('repair',dang)} onNap={()=>void chay(async()=>{await goiTien('invest')})} onDoiTen={ten=>void chay(async()=>{await call('rename',{name:ten});setLoiChon('')})}/>}
   {man==='so-tay'&&<SoTay profile={profile} danhMuc={danhMuc} tenDang={tenDang}/>}
   {man==='tui-do'&&<TuiDo profile={profile} exp={exp} busy={busy} loi={loi} onRenKhien={n=>chay(async()=>{await goiTien('khien-ren',{soDaRen:n})})} onDungKhien={id=>chay(async()=>{await goiTien('shield-use',{useId:id})})} onMoVoDai={onMoVoDai} onMoTienBo={onMoTienBo}/>}
-  <button type="button" className="dao-ve-app" onClick={onDong}>Về app học sinh</button>
+  <button type="button" className="dao-ve-app" onClick={onDong}>Về app học sinh</button><NutToanManHinh className="dao-toan-man"/>
   {thanhDuoi}
  </div>
 }

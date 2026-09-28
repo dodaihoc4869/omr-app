@@ -62,7 +62,9 @@ function DoiHinh({ ghe }: { ghe: GheXem[] }) {
   )
 }
 
-const KHOA_TI = 'ddh.doan2.tiCot', TI_MIN = 30, TI_MAX = 75, TI_MAC_DINH = 58
+// 28/09 lần 2 (thầy: "chỗ hiển thị đề phải có diện tích lớn nhất"): `ti` = % bề rộng cột CHIẾN TRƯỜNG (kể cả hiệp trùm, khi chiến trường đứng bên phải);
+// mặc định 40 ⇒ cột câu 60 %. Khoá lưu mới (…2) để máy đã lưu tỉ lệ cũ cũng nhận mặc định mới.
+const KHOA_TI = 'ddh.doan2.tiCot2', TI_MIN = 25, TI_MAX = 70, TI_MAC_DINH = 40
 function docTi(): number { try { const v = Number(localStorage.getItem(KHOA_TI)); return v >= TI_MIN && v <= TI_MAX ? v : TI_MAC_DINH } catch { return TI_MAC_DINH } }
 
 export default function DoanTran(p: Props) {
@@ -234,8 +236,8 @@ export default function DoanTran(p: Props) {
 
   // Hóa 2.0 · bố cục NGANG (docs/ban-ve-ngang-2809, doan2-ngang.css): hai cột bọc `display:contents` ⇒ màn dọc y nguyên; màn ngang thành lưới 7/5
   // (chiến trường trái · câu + đòn + CHỐT ĐÒN phải; hiệp trùm 4 ý dài thì đảo: câu trái, trùm phải). Cờ tắt: không bọc gì.
-  // Thanh kéo đổi độ rộng hai cột (thầy 28/09): `--dh2-ti` = % bề rộng cột ĐỨNG ĐẦU (hiệp trùm là cột câu), lưu trên máy em.
-  const keoTi = (x: number) => { const r = khungRef.current?.getBoundingClientRect(); if (r && r.width > 0) datTi((x - r.left) / r.width * 100) }
+  // Thanh kéo đổi độ rộng hai cột (thầy 28/09): `--dh2-ti` = % bề rộng cột CHIẾN TRƯỜNG (trái; hiệp trùm thì phải), lưu trên máy em.
+  const keoTi = (x: number) => { const r = khungRef.current?.getBoundingClientRect(); if (r && r.width > 0) { const f = (x - r.left) / r.width * 100; datTi(tran.laTrum ? 100 - f : f) } }
   const bocPhai = (x: ReactNode) => v2 ? <div className="dh2-cot dh2-cot-phai" data-vung="cot-phai">{x}</div> : x
   return (
     <div ref={khungRef} className={v2 ? `dh-khung dh2-tran${tran.laTrum ? ' dh2-tran-trum' : ''}` : 'dh-khung'} style={v2 ? { '--dh2-ti': ti } as CSSProperties : undefined}>
@@ -246,7 +248,7 @@ export default function DoanTran(p: Props) {
       </>}
       {v2 && <div className="dh2-keo" role="separator" aria-orientation="vertical" aria-label="Kéo để đổi độ rộng hai cột" aria-valuemin={TI_MIN} aria-valuemax={TI_MAX} aria-valuenow={Math.round(ti)} tabIndex={0}
         onPointerDown={e => e.currentTarget.setPointerCapture(e.pointerId)} onPointerMove={e => { if (e.currentTarget.hasPointerCapture(e.pointerId)) keoTi(e.clientX) }}
-        onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); datTi(ti + (e.key === 'ArrowLeft' ? -5 : 5)) } }}><i /></div>}
+        onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); datTi(ti + (e.key === 'ArrowLeft' ? -5 : 5) * (tran.laTrum ? -1 : 1)) } }}><i /></div>}
       {bocPhai(<>
       {than}
       {/* Thẻ tiếp sức của bạn nằm DƯỚI câu: đặt trên câu thì mỗi lần bạn gửi thẻ (nhịp hỏi 1,5 s) cả lưới đáp án bị đẩy xuống dưới ngón tay em (P0 "đáp án bị nhảy"). */}

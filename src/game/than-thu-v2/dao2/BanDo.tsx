@@ -1,6 +1,7 @@
 // ĐẢO 2.0 · BẢN ĐỒ BÁT LINH ĐẢO (bản vẽ Moi-DaoBanDo.dc.html): đảo lục giác, sương mù tan theo CỌ XÁT, vùng theo dạng có %,
 // đường 6 nút của chuyến hôm nay (nút Trùm có vương miện), thần thú đứng ở đầu đường; tấm dưới: "Chuyến thám hiểm k/n", 6 ô vai,
 // Rương Bát Linh, nút LÊN ĐƯỜNG. Mọi số lấy từ `hoa2-sanh` / câu `start` trả — thiếu thì ẩn, không bịa.
+import NutToanManHinh from '../../../components/NutToanManHinh'
 import type {ReactNode} from 'react'
 import type {BattleAnswer} from '../learning-battle'
 import {anhThu} from '../dao/anh'
@@ -49,6 +50,7 @@ export default function BanDo({profile,sanh,dangTai,loiSanh='',cau,ketQua,soan='
    <button type="button" className="dao2-nut-tron dao2-nut-tron-lon" onClick={onVe} aria-label="Về app học sinh" title="Về app học sinh"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
    <h2><small>BÁT LINH ĐẢO</small>{cd?.ten?`Đảo ${cd.ten}`:'Bát Linh Đảo'}</h2>
    {sanh?.theLuc&&<p className="dao2-kinh dao2-the-luc" aria-label={`Thể lực hôm nay: còn ${sanh.theLuc.con} trên ${sanh.theLuc.tong} câu`}><svg viewBox="0 0 14 16" width="14" height="16" aria-hidden="true"><polygon points="7,0 14,5 11,16 3,16 0,5"/></svg><span><small>Thể lực</small>{sanh.theLuc.con}/{sanh.theLuc.tong}</span></p>}
+   <NutToanManHinh/>
   </header>
 
   {/* Dọc: hai lớp bọc là `display:contents` (một cột như cũ). Ngang: TRÁI = bản đồ đảo cao hết màn · PHẢI = số chiến dịch + tấm chuyến, nút ở đáy. */}

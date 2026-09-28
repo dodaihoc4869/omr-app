@@ -4,6 +4,7 @@
 // đáp án không bao giờ có trên máy trước khi em chốt.
 import {useEffect,useLayoutEffect,useRef,useState} from 'react'
 import TheCau from '../../../components/TheCau'
+import NutToanManHinh from '../../../components/NutToanManHinh'
 import type {TheCauProps} from '../../../components/TheCau'
 import {HinhTaiViTri,ManHinhAnh} from '../../../components/QuestionMedia'
 import {ChemText} from '../../../lib/chem-format'
@@ -154,7 +155,8 @@ export function DaiKetQua({profile,cau:q,phanHoi,ketQua,tong}:{profile:DaoProfil
 }
 
 // ───────────── màn trong ải (làm + lời giải) ─────────────
-const KHOA_TI='ddh.dao2.tiCot',TI_MIN=30,TI_MAX=75,TI_MAC_DINH=58
+// 28/09 lần 2 (thầy: "chỗ hiển thị đề phải có diện tích lớn nhất"): mặc định cột TRẬN 40 % ⇒ cột đề 60 %; khoá lưu mới (…2) để máy đã lưu 58 cũng nhận mặc định mới.
+const KHOA_TI='ddh.dao2.tiCot2',TI_MIN=30,TI_MAX=75,TI_MAC_DINH=40
 function docTi():number{try{const v=Number(localStorage.getItem(KHOA_TI));return v>=TI_MIN&&v<=TI_MAX?v:TI_MAC_DINH}catch{return TI_MAC_DINH}}
 export interface TrongAiProps{
  profile:DaoProfile;cau:readonly CauDao2[];viTri:number;ketQua:readonly BattleAnswer[]
@@ -182,6 +184,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
    <div className="dao2-ai-dau">
     <button type="button" className="dao2-nut-tron" onClick={onRoi} aria-label="Rời chuyến về bản đồ (chuyến đang làm được giữ lại)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
     {ngang?nhan:<div className="dao2-kinh dao2-thanh-khung"><ThanhAi cau={cau} viTri={viTri} ketQua={ketQua}/></div>}
+    <NutToanManHinh/>
    </div>
    {!ngang&&!phanHoi&&nhan}
    {(!phanHoi||ngang)&&<CanhRung profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length}/>}
@@ -195,17 +198,20 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
   {!phanHoi?<>
    <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)}/>
    {hinhLoi&&<p role="alert" className="dao2-loi">Hình của câu chưa tải được. Em về bản đồ rồi bấm LÊN ĐƯỜNG để mở lại; câu này chưa bị tính sai.</p>}
-   {/* Ô "có trợ giúp" (thầy 28/09: thiết kế lại tinh tế, hợp ngữ cảnh): thẻ gạt nhỏ — bật ⇒ máy chủ ghi `assisted`, câu chưa tính Thành thạo và quay lại sớm. */}
-   {!goiY&&<label className="dao2-tro" data-bat={assisted?'':undefined}>
-    <span className="dao2-tro-bt" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 7v13M3 5.5A2.5 2.5 0 0 1 5.5 3H10a2 2 0 0 1 2 2 2 2 0 0 1 2-2h4.5A2.5 2.5 0 0 1 21 5.5V18h-7a2 2 0 0 0-2 2 2 2 0 0 0-2-2H3z"/></svg></span>
-    <span className="dao2-tro-chu"><b>Câu này em có trợ giúp</b><small>Xem tài liệu hoặc được chỉ bài thì bật lên · câu sẽ quay lại để em tự làm</small></span>
-    <input type="checkbox" role="switch" className="dao2-tro-gat" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/>
-   </label>}
   </>:<KhoiLoiGiai cau={q} stt={viTri+1} phanHoi={phanHoi} traLoiMay={traLoi} onZoom={setZoom}/>}
   <div className="dao2-chan" data-noi={phanHoi||!thieu||loi?'':undefined}>
    {hetTran&&!phanHoi?<div className="dao2-kinh dao2-het-tran" role="alert"><p ref={loiRef}>{CHU_HET_TRAN_DAO}</p><button type="button" className="dao2-nut-vang" onClick={onRoi}>VỀ BẢN ĐỒ</button></div>
    :<>{loi&&<p className="dao2-loi" role="alert" ref={loiRef}>{loi}</p>}
-    {!phanHoi?<button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN · TUNG CHIÊU'}</button>
+    {/* Ô "có trợ giúp" (thầy 28/09 lần 2: thu thành chip mảnh CẠNH nút chốt, không chiếm dòng riêng — nhường chỗ cho đề): bật ⇒ máy chủ ghi `assisted`,
+        câu chưa tính Thành thạo và quay lại sớm; lời giải thích nằm ở `title` và hiện một dòng nhỏ khi đã bật. */}
+    {!phanHoi?<><div className="dao2-chan-hang">
+     {!goiY&&<label className="dao2-tro" data-bat={assisted?'':undefined} title="Xem tài liệu hoặc được chỉ bài thì bật lên · câu sẽ quay lại để em tự làm">
+      <input type="checkbox" role="switch" className="dao2-tro-gat" aria-label="Câu này em có trợ giúp" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/>
+      <span className="dao2-tro-chu" aria-hidden="true">Trợ giúp</span>
+     </label>}
+     <button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN · TUNG CHIÊU'}</button>
+    </div>
+    {assisted&&!goiY&&<small className="dao2-tro-ghi">Có trợ giúp · câu này sẽ quay lại để em tự làm.</small>}</>
     :<button type="button" className="dao2-nut-xanh" disabled={busy} onClick={onTiep}>{cuoi?'ĐÃ ĐỌC LỜI GIẢI · HOÀN THÀNH CHUYẾN':`ĐÃ ĐỌC LỜI GIẢI · SANG ẢI ${viTri+2}`}</button>}</>}
   </div>
   </div>

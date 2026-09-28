@@ -39,9 +39,13 @@ describe('Toàn màn hình của game: mã ở lib + hook + nút của cổng (2
     expect(doc('src/components/useToanManHinhGame.ts')).not.toMatch(/<button|<\/[a-z]/i)
     const cong = doc('src/screens/StudentPortalScreen.tsx')
     expect(cong).toContain("useToanManHinhGame(tab === 'thanthu')")
-    // 28/09 thầy đổi luật: bỏ tự vào toàn màn hình; có MỘT nút toàn màn hình (src/components/NutToanManHinh.tsx) ở cổng, không nằm trong tệp game
+    // 28/09 thầy đổi luật: bỏ tự vào toàn màn hình; có nút toàn màn hình (src/components/NutToanManHinh.tsx — chữ/mã xin ở component + lib, không trong tệp game).
+    // 28/09 lần 2 (thầy: "nút toàn màn hình hiển thị ở vị trí chưa phù hợp"): bỏ nút nổi ở cổng; mỗi màn game đặt nút vào THANH ĐẦU sẵn có.
     expect(cong).not.toContain("xinToanManHinh('cu-cham-vao')")
-    expect(cong).toContain('<NutToanManHinh />')
+    expect(cong).not.toContain('<NutToanManHinh')
+    for (const t of ['src/game/than-thu-v2/dao2/BanDo.tsx', 'src/game/than-thu-v2/dao2/TrongAi.tsx', 'src/game/than-thu-v2/doan2/Canh2.tsx', 'src/game/than-thu-v2/DoanSanh.tsx', 'src/game/than-thu-v2/dao/DaoThanThu.tsx'])
+      expect(doc(t), t).toMatch(/<NutToanManHinh[ /]/)
+    expect(doc('src/components/nut-toan-man-hinh.css')).not.toMatch(/position:\s*fixed/)
     // toàn bộ khoá hành vi (xin trong cú chạm, một lần/lượt, từ chối im lặng, em thoát không ép lại, Về app thoát): tests/toan-man-hinh-game-2109.test.tsx
   })
 })
