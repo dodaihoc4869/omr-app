@@ -29,6 +29,8 @@
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   line-height: 1;
+  /* Sửa tràn chữ 28/09: huy hiệu "1 mở" không được tách 2 dòng. */
+  white-space: nowrap;
 }
 .ben-trai-dem[data-tone='la'] {
   background: var(--bts-la-nhat);
