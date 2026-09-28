@@ -3569,6 +3569,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           dongHo={laBaiTap ? null : formatClock(remaining ?? 0)}
           chuThayDongHo={hanNopNgan ? `Hạn ${hanNopNgan}` : 'Bài tập'}
           conGiay={laBaiTap ? null : remaining}
+          hetGioLuc={laBaiTap ? undefined : gioNgan(hetGioCua(attempt))}
           daLam={daLamCount}
           tong={total}
           nhanLuu={dotLabel}
