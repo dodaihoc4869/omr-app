@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ca kiểm tra · bản vẽ mới</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Roboto+Mono:wght@500;700&display=swap">
+<style>
+/* BẢN VẼ CA KIỂM TRA (28/09/2026) — 5 màn: Mở ca · Theo dõi · Kết thúc ca · Báo cáo chi tiết · Học sinh xem kết quả.
+   App thầy: Material 3 nhiều tông (cùng bộ màu docs/ban-ve-gv-mau-2809). App học sinh: kính sáng/tối như Sảnh 3D.
+   Mọi số là VÍ DỤ. Chỉ vẽ trường dữ liệu có thật trong mã/máy chủ; chỗ cần API mới có nhãn "cần API". */
+:root{
+  --nen:#f6f7fc; --mat:#ffffff; --mat-2:#eef1fa; --mat-3:#e4e8f5; --vien:#dde2f0;
+  --chu:#1a1c24; --chu-2:#454a5c; --chu-3:#646a80;
+  --xd:#1f5fd6; --xd-nen:#dbe6ff; --xd-dam:#0b2f75;
+  --xl:#0f8a5f; --xl-nen:#c9f2de; --xl-dam:#04402a;
+  --hp:#b86a00; --hp-nen:#ffe2b3; --hp-dam:#4d2c00;
+  --ho:#c42a5c; --ho-nen:#ffd9e3; --ho-dam:#5c0a27;
+  --tim:#6a4fd8; --tim-nen:#e7defe; --tim-dam:#2a1673; --tren-xd:#ffffff;
+  --bong:0 1px 2px rgb(30 40 80/.06),0 4px 14px rgb(30 40 80/.06);
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --nen:#10131c; --mat:#181c27; --mat-2:#1f2433; --mat-3:#282e40; --vien:#2c3245;
+  --chu:#e8eaf3; --chu-2:#b9bed1; --chu-3:#9197ad;
+  --xd:#9cbcff; --xd-nen:#1d3363; --xd-dam:#dbe6ff;
+  --xl:#6fdcab; --xl-nen:#0f3d2b; --xl-dam:#c9f2de;
+  --hp:#ffc164; --hp-nen:#43290a; --hp-dam:#ffe2b3;
+  --ho:#ff8fb0; --ho-nen:#4d1428; --ho-dam:#ffd9e3;
+  --tim:#c3b3ff; --tim-nen:#2d2352; --tim-dam:#e7defe; --tren-xd:#0b1a3a;
+  --bong:0 1px 2px rgb(0 0 0/.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --nen:#10131c; --mat:#181c27; --mat-2:#1f2433; --mat-3:#282e40; --vien:#2c3245;
+  --chu:#e8eaf3; --chu-2:#b9bed1; --chu-3:#9197ad;
+  --xd:#9cbcff; --xd-nen:#1d3363; --xd-dam:#dbe6ff;
+  --xl:#6fdcab; --xl-nen:#0f3d2b; --xl-dam:#c9f2de;
+  --hp:#ffc164; --hp-nen:#43290a; --hp-dam:#ffe2b3;
+  --ho:#ff8fb0; --ho-nen:#4d1428; --ho-dam:#ffd9e3;
+  --tim:#c3b3ff; --tim-nen:#2d2352; --tim-dam:#e7defe; --tren-xd:#0b1a3a;
+  --bong:0 1px 2px rgb(0 0 0/.3); color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--nen);color:var(--chu);font:15px/1.5 'Be Vietnam Pro',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.so{font-variant-numeric:tabular-nums}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{text-wrap:balance}
+button{font:inherit;color:inherit;touch-action:manipulation}
+svg.i{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:3px solid var(--tim);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* THANH CHỌN MÀN của bản vẽ (không phải một phần của app) */
+.bv{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:10px clamp(12px,3vw,32px);background:color-mix(in srgb,var(--mat) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--vien);overflow-x:auto;scrollbar-width:none}
+.bv b{font-weight:800;white-space:nowrap;margin-right:6px}
+.bv .tab{min-height:40px;padding:0 16px;border-radius:20px;border:1px solid var(--vien);background:var(--mat);cursor:pointer;font-weight:600;font-size:14px;white-space:nowrap}
+.bv .tab[aria-selected="true"]{background:var(--xd);color:var(--tren-xd);border-color:var(--xd)}
+.bv .gian{flex:1}
+.bv .chude{display:flex;border:1px solid var(--vien);border-radius:20px;overflow:hidden;flex:none}
+.bv .chude button{min-height:38px;padding:0 12px;border:0;background:none;cursor:pointer;font-size:13px;font-weight:600;color:var(--chu-2)}
+.bv .chude button[aria-pressed="true"]{background:var(--mat-3);color:var(--chu)}
+.vd{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:8px;background:var(--hp-nen);color:var(--hp-dam);font-size:11.5px;font-weight:700;letter-spacing:.02em;vertical-align:middle}
+.can-api{display:inline-flex;padding:2px 8px;border-radius:8px;background:var(--tim-nen);color:var(--tim-dam);font-size:11.5px;font-weight:700}
+
+.man{display:none}
+.man.hien{display:block}
+.khung{max-width:1320px;margin:0 auto;padding:24px clamp(16px,3vw,40px) 56px;display:flex;flex-direction:column;gap:20px;min-width:0}
+.dau{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 20px}
+.dau h1{font-size:clamp(26px,3.2vw,34px);font-weight:800;letter-spacing:-.02em}
+.dau p{color:var(--chu-3);margin-top:4px}
+.duong{font-size:13px;color:var(--chu-3);font-weight:600;margin-bottom:2px}
+.tam{background:var(--mat);border-radius:28px;padding:22px 24px;box-shadow:var(--bong);min-width:0}
+.tam-dau{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.tam-dau h2{font-size:19px;font-weight:800}
+.ghi{color:var(--chu-3);font-size:13.5px}
+.nut{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border-radius:24px;border:0;font-weight:700;font-size:15px;cursor:pointer;text-decoration:none;white-space:nowrap}
+.nut-chinh{background:var(--xd);color:var(--tren-xd);box-shadow:0 2px 8px rgb(31 95 214/.3)}
+.nut-tong{background:var(--xd-nen);color:var(--xd-dam)}
+.nut-vien{background:transparent;color:var(--xd);border:1px solid var(--vien)}
+.nut-do{background:var(--ho-nen);color:var(--ho-dam)}
+.nut-nho{min-height:40px;padding:0 14px;font-size:14px;border-radius:20px}
+.hang-nut{display:flex;gap:10px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:12px;border:1px solid var(--vien);background:var(--mat);cursor:pointer;font-weight:600;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--xd-nen);color:var(--xd-dam);border-color:transparent}
+.chip[aria-pressed="true"]::before{content:"";width:14px;height:8px;border:solid currentColor;border-width:0 0 2.5px 2.5px;transform:rotate(-45deg) translate(1px,-2px)}
+.nhan{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:10px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.n-xd{background:var(--xd-nen);color:var(--xd-dam)} .n-xl{background:var(--xl-nen);color:var(--xl-dam)}
+.n-hp{background:var(--hp-nen);color:var(--hp-dam)} .n-ho{background:var(--ho-nen);color:var(--ho-dam)}
+.n-tim{background:var(--tim-nen);color:var(--tim-dam)} .n-xam{background:var(--mat-2);color:var(--chu-2)}
+.c-xd{--c:var(--xd);--c-nen:var(--xd-nen);--c-dam:var(--xd-dam)}
+.c-xl{--c:var(--xl);--c-nen:var(--xl-nen);--c-dam:var(--xl-dam)}
+.c-hp{--c:var(--hp);--c-nen:var(--hp-nen);--c-dam:var(--hp-dam)}
+.c-ho{--c:var(--ho);--c-nen:var(--ho-nen);--c-dam:var(--ho-dam)}
+.c-tim{--c:var(--tim);--c-nen:var(--tim-nen);--c-dam:var(--tim-dam)}
+.so-o{position:relative;overflow:hidden;border-radius:28px;padding:18px 20px;background:var(--c-nen);color:var(--c-dam);display:flex;flex-direction:column;gap:4px;min-width:0}
+.so-o::after{content:"";position:absolute;right:-28px;top:-28px;width:110px;height:110px;border-radius:40px;background:var(--c);opacity:.12;transform:rotate(18deg)}
+.so-o .t{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.so-o .t i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.so-o .lon{font-size:40px;font-weight:800;line-height:1.1;letter-spacing:-.02em}
+.so-o .lon small{font-size:16px;font-weight:600;margin-left:4px;letter-spacing:0}
+.so-o .phu{font-size:13px;font-weight:500;opacity:.85}
+.luoi-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.luoi-4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ===== (a) MỞ CA ===== */
+.moca{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;align-items:start}
+@media (max-width:1040px){.moca{grid-template-columns:minmax(0,1fr)}}
+.buoc{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px}
+.buoc+.buoc{margin-top:22px;padding-top:22px;border-top:1px solid var(--vien)}
+.buoc .so-b{width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-weight:800;font-size:18px;background:var(--c-nen);color:var(--c-dam)}
+.buoc h3{font-size:17px;font-weight:800;margin-bottom:2px}
+.buoc .ghi{margin-bottom:12px}
+.hang-chip{display:flex;flex-wrap:wrap;gap:8px}
+.de-chon{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:20px;background:var(--mat-2);min-width:0}
+.de-chon .bia{width:48px;height:56px;border-radius:12px;background:linear-gradient(160deg,var(--xd),var(--tim));display:grid;place-items:center;color:var(--tren-xd);font-weight:800;flex:none}
+.de-chon .tt{min-width:0;flex:1}
+.de-chon b{display:block;font-size:15.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pha{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.o-luat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:700px){.o-luat{grid-template-columns:minmax(0,1fr)}}
+.luat{text-align:left;padding:14px;border-radius:18px;border:1.5px solid var(--vien);background:var(--mat);cursor:pointer;display:flex;flex-direction:column;gap:4px;min-height:44px}
+.luat b{font-size:14.5px}
+.luat span{font-size:13px;color:var(--chu-3)}
+.luat[aria-pressed="true"]{border-color:var(--xd);background:var(--xd-nen);color:var(--xd-dam)}
+.luat[aria-pressed="true"] span{color:var(--xd-dam);opacity:.85}
+.bao-ve{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.them{margin-top:12px;border-radius:16px;background:var(--mat-2);padding:4px 14px}
+.them summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;color:var(--xd);list-style:none}
+.them summary::-webkit-details-marker{display:none}
+.them ul{margin:0 0 12px;padding-left:18px;color:var(--chu-2);font-size:14px}
+.xem-truoc{position:sticky;top:76px;display:flex;flex-direction:column;gap:14px}
+.ve{border-radius:28px;overflow:hidden;background:var(--mat);box-shadow:var(--bong)}
+.ve-dau{padding:20px 22px;background:linear-gradient(135deg,var(--xd),var(--tim));color:var(--tren-xd)}
+.ve-dau .nho{font-size:12.5px;font-weight:700;opacity:.85;letter-spacing:.04em;text-transform:uppercase}
+.ve-dau h3{font-size:21px;font-weight:800;margin-top:4px}
+.ve dl{margin:0;padding:16px 22px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 14px;font-size:14px}
+.ve dt{color:var(--chu-3)}
+.ve dd{margin:0;font-weight:700;text-align:right}
+.ve .cuoi{padding:0 22px 20px;display:flex;flex-direction:column;gap:10px}
+.ve .cuoi .nut{width:100%}
+.dong-thoi{display:flex;align-items:center;gap:0;margin:0 22px 16px;font-size:12px;color:var(--chu-3)}
+.dong-thoi div{flex:1;text-align:center;position:relative;padding-top:18px}
+.dong-thoi div::before{content:"";position:absolute;top:5px;left:50%;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--c)}
+.dong-thoi div::after{content:"";position:absolute;top:9px;left:50%;width:100%;height:2px;background:var(--vien);z-index:-1}
+.dong-thoi div:last-child::after{display:none}
+.dong-thoi b{display:block;color:var(--chu);font-size:13px}
+
+/* ===== (b) THEO DÕI ===== */
+.td-dau{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;padding:22px 26px;border-radius:32px;background:linear-gradient(135deg,var(--xd-nen),var(--tim-nen));color:var(--xd-dam)}
+@media (max-width:760px){.td-dau{grid-template-columns:minmax(0,1fr)}}
+.td-dau h1{font-size:clamp(24px,3vw,30px);font-weight:800;letter-spacing:-.02em;color:var(--chu)}
+.song{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;color:var(--xl-dam);background:var(--xl-nen);padding:4px 12px;border-radius:12px}
+.song i{width:8px;height:8px;border-radius:50%;background:var(--xl);animation:nhip 1.6s ease-in-out infinite}
+@keyframes nhip{50%{opacity:.3}}
+.dong-ho{display:flex;align-items:center;gap:18px}
+.vong{position:relative;width:132px;height:132px;flex:none}
+.vong svg{width:132px;height:132px;transform:rotate(-90deg)}
+.vong .giua{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.vong .giua b{font-size:28px;font-weight:800;display:block;line-height:1.1;color:var(--chu)}
+.vong .giua span{font-size:12px;color:var(--chu-2);font-weight:600}
+.meta-ca{font-size:14px;color:var(--chu-2);display:flex;flex-direction:column;gap:6px}
+.meta-ca b{color:var(--chu)}
+.thanh-lop{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--mat-2);margin-top:12px}
+.thanh-lop span{display:block;height:100%}
+.chu-thich{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:13px;color:var(--chu-2)}
+.chu-thich i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.td-luoi{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+@media (max-width:1040px){.td-luoi{grid-template-columns:minmax(0,1fr)}.td-luoi>div:last-child{order:-1}}
+.loc{display:flex;gap:8px;flex-wrap:wrap}
+.o-em{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.em{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:18px;background:var(--mat-2);border:1.5px solid transparent;text-align:left;cursor:pointer;min-width:0}
+.em:hover{border-color:var(--vien)}
+.em .h{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.em .ten{font-weight:700;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.em .sbd{font-size:12px;color:var(--chu-3)}
+.em .tien{height:6px;border-radius:3px;background:var(--mat-3);overflow:hidden}
+.em .tien span{display:block;height:100%;background:var(--c)}
+.em .d{display:flex;justify-content:space-between;font-size:12.5px;color:var(--chu-2)}
+.em.canh{border-color:var(--ho);background:var(--ho-nen)}
+.canh-bao{display:flex;flex-direction:column;gap:10px}
+.cb{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;padding:14px;border-radius:20px;background:var(--c-nen);color:var(--c-dam)}
+.cb .bt{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;background:var(--c);color:var(--mat)}
+.cb b{display:block;font-size:14.5px}
+.cb p{font-size:13.5px;opacity:.9;margin:2px 0 8px}
+.cb .nut{min-height:40px;padding:0 14px;font-size:13.5px;background:var(--mat);color:var(--c-dam)}
+.hd-nhanh{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hd-nhanh .nut{width:100%;padding:6px 12px;white-space:normal;text-align:center;line-height:1.25}
+.link-ca{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px;border-radius:16px;background:var(--mat-2);min-width:0}
+.link-ca span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+
+/* ===== (c) KẾT THÚC CA ===== */
+.kt-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:20px}
+@media (max-width:980px){.kt-hero{grid-template-columns:minmax(0,1fr)}}
+.diem-to{border-radius:32px;padding:26px 28px;background:linear-gradient(145deg,var(--xd),var(--tim));color:var(--tren-xd);display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.diem-to::after{content:"";position:absolute;right:-60px;bottom:-80px;width:260px;height:260px;border-radius:80px;background:var(--tren-xd);opacity:.08;transform:rotate(24deg)}
+.diem-to .nho{font-size:13px;font-weight:700;opacity:.9}
+.diem-to .so-lon{font-size:84px;font-weight:800;line-height:1;letter-spacing:-.03em}
+.diem-to .so-lon small{font-size:22px;font-weight:600;letter-spacing:0;margin-left:6px;opacity:.85}
+.diem-to .ba{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.diem-to .ba div{background:rgb(255 255 255/.14);border-radius:18px;padding:10px 12px}
+.diem-to .ba b{display:block;font-size:22px;font-weight:800}
+.diem-to .ba span{font-size:12.5px;opacity:.9}
+.pho{display:flex;align-items:flex-end;gap:8px;height:190px;padding-top:24px}
+.pho .cot{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;min-width:0}
+.pho .cot i{display:block;width:100%;max-width:44px;border-radius:10px 10px 4px 4px;background:var(--c);position:relative}
+.pho .cot i b{position:absolute;top:-20px;left:0;right:0;text-align:center;font-style:normal;font-size:12.5px;color:var(--chu-2)}
+.pho .cot span{font-size:12px;color:var(--chu-3)}
+.kt-luoi{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:980px){.kt-luoi{grid-template-columns:minmax(0,1fr)}}
+.cau-sai{display:flex;flex-direction:column;gap:10px}
+.cs{display:grid;grid-template-columns:56px minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 14px;border-radius:18px;background:var(--mat-2)}
+.cs .c{width:56px;height:56px;border-radius:16px;background:var(--ho-nen);color:var(--ho-dam);display:grid;place-items:center;text-align:center;line-height:1.1}
+.cs .c b{font-size:20px;display:block}
+.cs .c span{font-size:10.5px;font-weight:700}
+.cs .ten{font-weight:700;font-size:14.5px}
+.cs .phu{font-size:13px;color:var(--chu-3)}
+.cs .ti{font-size:22px;font-weight:800;color:var(--ho)}
+.cs .ti small{display:block;font-size:11.5px;color:var(--chu-3);font-weight:600;text-align:right}
+.ba-phan{display:flex;flex-direction:column;gap:14px}
+.bp .h{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;gap:8px}
+.bp .h b{font-weight:700}
+.bp .ray{height:12px;border-radius:6px;background:var(--mat-2);overflow:hidden}
+.bp .ray span{display:block;height:100%;border-radius:6px;background:var(--c)}
+.chu-y{display:flex;flex-direction:column;gap:8px}
+.cy{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:var(--mat-2);min-width:0}
+.cy .av{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-weight:800;background:var(--c-nen);color:var(--c-dam);flex:none}
+.cy .tt{flex:1;min-width:0}
+.cy .tt b{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cy .tt span{font-size:12.5px;color:var(--chu-3)}
+.cy .d{font-weight:800;font-size:18px}
+.cong-bo{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 22px;border-radius:24px;background:var(--hp-nen);color:var(--hp-dam)}
+.cong-bo b{font-size:16px}
+.dang-vap{display:flex;flex-direction:column;gap:12px}
+
+/* ===== (d) BÁO CÁO CHI TIẾT ===== */
+.bc-dau{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.phan-doan{display:inline-flex;padding:4px;border-radius:24px;background:var(--mat-2)}
+.phan-doan button{min-height:40px;padding:0 18px;border-radius:20px;border:0;background:none;cursor:pointer;font-weight:700;font-size:14px;color:var(--chu-2)}
+.phan-doan button[aria-selected="true"]{background:var(--mat);color:var(--chu);box-shadow:var(--bong)}
+.bang-wrap{overflow-x:auto;border-radius:18px;border:1px solid var(--vien)}
+table.bang{width:100%;border-collapse:collapse;font-size:14px;min-width:640px}
+.bang th{text-align:left;font-size:12.5px;color:var(--chu-3);font-weight:700;padding:10px 12px;background:var(--mat-2);white-space:nowrap}
+.bang td{padding:10px 12px;border-top:1px solid var(--vien);white-space:nowrap}
+.bang td.so,.bang th.so{text-align:right}
+.bang tr.chon td{background:var(--xd-nen)}
+.bang button.lk{border:0;background:none;color:var(--xd);font-weight:700;cursor:pointer;padding:6px 0;min-height:36px}
+.nhiet{overflow-x:auto;padding-bottom:4px}
+.nhiet table{border-collapse:separate;border-spacing:3px;font-size:11.5px}
+.nhiet th{font-weight:600;color:var(--chu-3);padding:0 4px;white-space:nowrap}
+.nhiet th.ten{text-align:right;max-width:150px;overflow:hidden;text-overflow:ellipsis}
+.nhiet td{width:22px;height:22px;border-radius:6px}
+.o-d{background:var(--xl)} .o-s{background:var(--ho)} .o-b{background:var(--mat-3)} .o-n{background:var(--hp)}
+.em-dau{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:center}
+@media (max-width:760px){.em-dau{grid-template-columns:minmax(0,1fr)}}
+.vong-diem{position:relative;width:140px;height:140px}
+.vong-diem svg{width:140px;height:140px;transform:rotate(-90deg)}
+.vong-diem .giua{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.vong-diem b{font-size:36px;font-weight:800;line-height:1;display:block}
+.vong-diem span{font-size:12px;color:var(--chu-3)}
+.em-so{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.em-so{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.em-so div{padding:10px 12px;border-radius:16px;background:var(--mat-2)}
+.em-so b{display:block;font-size:20px;font-weight:800}
+.em-so span{font-size:12.5px;color:var(--chu-3)}
+.o-cau{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:6px}
+.o-cau div{height:44px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:13px}
+.o-cau .d{background:var(--xl-nen);color:var(--xl-dam)}
+.o-cau .s{background:var(--ho-nen);color:var(--ho-dam);box-shadow:inset 0 0 0 2px var(--ho)}
+.o-cau .b{background:var(--mat-2);color:var(--chu-3);box-shadow:inset 0 0 0 1.5px var(--vien)}
+.o-cau .n{background:var(--hp-nen);color:var(--hp-dam)}
+.nhom-phan{font-size:12.5px;font-weight:700;color:var(--chu-3);margin:10px 0 6px}
+.em-luoi{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:980px){.em-luoi{grid-template-columns:minmax(0,1fr)}}
+.xem-lai{display:flex;flex-direction:column;gap:10px}
+.xl{padding:14px 16px;border-radius:18px;background:var(--mat-2)}
+.xl .h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--chu-3)}
+.xl p{margin:6px 0 8px;font-size:14.5px}
+.xl .da{display:flex;gap:8px;flex-wrap:wrap}
+.nhan-xet textarea{width:100%;min-height:110px;border-radius:16px;border:1px solid var(--vien);background:var(--mat-2);color:var(--chu);padding:12px 14px;font:inherit;resize:vertical}
+.dang-hang{display:grid;grid-template-columns:minmax(0,1fr) 120px 64px;gap:12px;align-items:center;font-size:14px;padding:6px 0}
+.dang-hang .ray{height:10px;border-radius:5px;background:var(--mat-2);overflow:hidden}
+.dang-hang .ray span{display:block;height:100%;background:var(--c)}
+.bc-trang{display:flex;flex-direction:column;gap:20px}
+
+/* ===== (e) HỌC SINH — kính sáng/tối như Sảnh 3D ===== */
+.hs{--k-nen:linear-gradient(160deg,#e9f0ff 0%,#f4ecff 45%,#e6fbf3 100%);--k-the:rgb(255 255 255/.62);--k-vien:rgb(255 255 255/.8);--k-chu:#1b1d2b;--k-chu2:#4d5270;--k-nhan:#5b3fd6;--k-xl:#0d7f57;--k-ho:#c0265a;--k-bong:0 10px 40px rgb(60 60 140/.14);--k-nut:#5b3fd6;--k-tren-nut:#fff;--k-o:rgb(255 255 255/.55);
+  background:var(--k-nen);color:var(--k-chu);min-height:calc(100vh - 61px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hs{--k-nen:radial-gradient(1200px 600px at 20% -10%,#3a2a7a 0%,transparent 60%),radial-gradient(900px 500px at 100% 100%,#0f4d52 0%,transparent 60%),#0b0d1a;--k-the:rgb(30 34 60/.55);--k-vien:rgb(255 255 255/.12);--k-chu:#eef0ff;--k-chu2:#b3b8d9;--k-nhan:#c4b5ff;--k-xl:#72e3b3;--k-ho:#ff8fb3;--k-bong:0 10px 40px rgb(0 0 0/.45);--k-nut:#b9a8ff;--k-tren-nut:#1a1240;--k-o:rgb(255 255 255/.07)}}
+:root[data-theme="dark"] .hs{--k-nen:radial-gradient(1200px 600px at 20% -10%,#3a2a7a 0%,transparent 60%),radial-gradient(900px 500px at 100% 100%,#0f4d52 0%,transparent 60%),#0b0d1a;--k-the:rgb(30 34 60/.55);--k-vien:rgb(255 255 255/.12);--k-chu:#eef0ff;--k-chu2:#b3b8d9;--k-nhan:#c4b5ff;--k-xl:#72e3b3;--k-ho:#ff8fb3;--k-bong:0 10px 40px rgb(0 0 0/.45);--k-nut:#b9a8ff;--k-tren-nut:#1a1240;--k-o:rgb(255 255 255/.07)}
+.hs .khung{align-items:center}
+.hs-dau{text-align:center;max-width:720px}
+.hs-dau h1{font-size:clamp(22px,2.6vw,28px);font-weight:800}
+.hs-dau p{color:var(--k-chu2);margin-top:4px}
+.dt-hang{display:flex;gap:28px;flex-wrap:wrap;justify-content:center;align-items:flex-start;width:100%}
+.dt{width:min(390px,100%);border-radius:40px;padding:14px;background:var(--k-o);border:1px solid var(--k-vien);box-shadow:var(--k-bong);backdrop-filter:blur(20px)}
+.dt-man{border-radius:30px;overflow:hidden;display:flex;flex-direction:column;gap:12px;padding:18px 14px 20px;min-height:640px}
+.dt-nhan{font-size:12.5px;text-align:center;color:var(--k-chu2);font-weight:600}
+.kinh{background:var(--k-the);border:1px solid var(--k-vien);border-radius:24px;padding:16px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:var(--k-bong)}
+.kinh h3{font-size:15px;font-weight:800;margin-bottom:8px}
+.kq-dau{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.kq-dau .ca{font-size:13px;color:var(--k-chu2);font-weight:600}
+.vong-hs{position:relative;width:168px;height:168px}
+.vong-hs svg{width:168px;height:168px;transform:rotate(-90deg)}
+.vong-hs .giua{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.vong-hs b{font-size:46px;font-weight:800;line-height:1;display:block;letter-spacing:-.02em}
+.vong-hs span{font-size:13px;color:var(--k-chu2);font-weight:600}
+.chip-ss{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:14px;background:color-mix(in srgb,var(--k-xl) 16%,transparent);color:var(--k-xl);font-weight:700;font-size:13.5px}
+.hs-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center}
+.hs-3 b{display:block;font-size:19px;font-weight:800}
+.hs-3 span{font-size:12px;color:var(--k-chu2)}
+.hs-phan{display:flex;flex-direction:column;gap:10px}
+.hs-phan .h{display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:4px}
+.hs-phan .ray{height:10px;border-radius:5px;background:var(--k-o);overflow:hidden;border:1px solid var(--k-vien)}
+.hs-phan .ray span{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--k-nhan),var(--k-xl))}
+.hs-cau{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.hs-cau div{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-size:12px;font-weight:700}
+.hs-cau .d{background:color-mix(in srgb,var(--k-xl) 20%,transparent);color:var(--k-xl)}
+.hs-cau .s{background:color-mix(in srgb,var(--k-ho) 20%,transparent);color:var(--k-ho);box-shadow:inset 0 0 0 1.5px var(--k-ho)}
+.hs-cau .b{background:var(--k-o);color:var(--k-chu2);box-shadow:inset 0 0 0 1px var(--k-vien)}
+.hs-ai{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.hs-ai div{display:flex;gap:8px;align-items:flex-start}
+.hs-ai i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--k-nhan);margin-top:7px}
+.nut-hs{min-height:52px;border-radius:26px;border:0;background:var(--k-nut);color:var(--k-tren-nut);font-weight:800;font-size:16px;cursor:pointer;width:100%}
+.nut-hs-phu{min-height:48px;border-radius:24px;border:1px solid var(--k-vien);background:var(--k-o);color:var(--k-chu);font-weight:700;font-size:15px;cursor:pointer;width:100%}
+.cho{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:26px 16px}
+.cho .bieu{width:84px;height:84px;border-radius:28px;display:grid;place-items:center;background:color-mix(in srgb,var(--k-nhan) 18%,transparent);color:var(--k-nhan)}
+.cho .bieu svg{width:40px;height:40px}
+.cho h3{font-size:19px;font-weight:800;margin:0}
+.cho p{color:var(--k-chu2);font-size:14.5px}
+.tien-cho{width:100%;height:10px;border-radius:5px;background:var(--k-o);border:1px solid var(--k-vien);overflow:hidden}
+.tien-cho span{display:block;height:100%;background:var(--k-nhan)}
+.hs .vd{background:color-mix(in srgb,var(--k-nhan) 16%,transparent);color:var(--k-nhan)}
+
+/* ===== BẢN IN A4 (chỉ báo cáo chi tiết) ===== */
+@page{size:A4;margin:14mm 12mm}
+@media print{
+  :root{--nen:#fff;--mat:#fff;--mat-2:#f3f4f8;--mat-3:#e6e8ef;--vien:#d5d9e4;--chu:#111;--chu-2:#333;--chu-3:#555;--bong:none}
+  body{background:#fff;font-size:11pt}
+  .bv,.man:not(#man-d),.khong-in,.phan-doan{display:none!important}
+  #man-d{display:block!important}
+  .khung{padding:0;max-width:none;gap:10pt}
+  .tam{box-shadow:none;border:1px solid var(--vien);border-radius:10pt;padding:10pt 12pt;break-inside:avoid}
+  .bc-trang{display:flex!important}
+  .bc-trang+.bc-trang{break-before:page}
+  .nhiet td{width:12pt;height:12pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .o-cau div,.em-so div,.dang-hang .ray span,.bp .ray span{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .bang-wrap,.nhiet{overflow:visible}
+  table.bang{min-width:0}
+  .in-dau{display:flex!important}
+}
+.in-dau{display:none;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--chu);padding-bottom:6pt}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-de" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></symbol>
+  <symbol id="i-lop" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.5c2.6.2 4.3 1.9 5 5"/></symbol>
+  <symbol id="i-gio" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></symbol>
+  <symbol id="i-khien" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-khoa" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-chep" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></symbol>
+  <symbol id="i-chieu" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
+  <symbol id="i-canh" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></symbol>
+  <symbol id="i-cua" viewBox="0 0 24 24"><path d="M4 21V4h11v17M15 7h5v14M4 21h16"/><circle cx="12" cy="13" r=".8"/></symbol>
+  <symbol id="i-in" viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></symbol>
+  <symbol id="i-gui" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+  <symbol id="i-mat" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-len" viewBox="0 0 24 24"><path d="M4 16l6-6 4 4 6-6M14 8h6v6"/></symbol>
+  <symbol id="i-xuong" viewBox="0 0 24 24"><path d="M4 8l6 6 4-4 6 6M14 16h6v-6"/></symbol>
+  <symbol id="i-dh" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></symbol>
+</svg>
+
+<nav class="bv" aria-label="Chọn màn của bản vẽ" role="tablist">
+  <b>Ca kiểm tra · bản vẽ mới</b>
+  <button class="tab" role="tab" data-man="a">a · Mở ca</button>
+  <button class="tab" role="tab" data-man="b">b · Theo dõi ca</button>
+  <button class="tab" role="tab" data-man="c">c · Kết thúc ca</button>
+  <button class="tab" role="tab" data-man="d">d · Báo cáo chi tiết</button>
+  <button class="tab" role="tab" data-man="e">e · Học sinh xem kết quả</button>
+  <span class="gian"></span>
+  <div class="chude" role="group" aria-label="Sáng hoặc tối">
+    <button data-chude="" aria-pressed="true">Theo máy</button>
+    <button data-chude="light" aria-pressed="false">Sáng</button>
+    <button data-chude="dark" aria-pressed="false">Tối</button>
+  </div>
+</nav>
+
+<!-- ============ (a) MỞ CA ============ -->
+<section class="man" id="man-a" aria-label="Mở ca kiểm tra">
+<div class="khung">
+  <div class="dau">
+    <div>
+      <div class="duong">Ca kiểm tra › Mở ca mới</div>
+      <h1>Mở ca kiểm tra</h1>
+      <p>Bốn việc, đi từ trên xuống. Mọi thứ khác đã có giá trị sẵn. <span class="vd">ví dụ</span></p>
+    </div>
+  </div>
+  <div class="moca">
+    <div class="tam">
+      <div class="buoc c-xd">
+        <div class="so-b">1</div>
+        <div>
+          <h3>Đề</h3>
+          <p class="ghi">Chọn một đề trong kho. Câu tự luận tự được lọc bỏ.</p>
+          <div class="de-chon">
+            <div class="bia">12</div>
+            <div class="tt">
+              <b>Bộ đề 12 · Chuẩn cấu trúc 2026 · Đề số 7</b>
+              <div class="pha"><span class="nhan n-xd">Phần I · 18 câu</span><span class="nhan n-tim">Phần II · 4 câu</span><span class="nhan n-xl">Phần III · 6 câu</span></div>
+            </div>
+            <button class="nut nut-vien nut-nho">Đổi đề</button>
+          </div>
+          <div class="hang-chip" style="margin-top:10px">
+            <button class="chip" aria-pressed="true" data-g="rut">Lấy nguyên đề</button>
+            <button class="chip" aria-pressed="false" data-g="rut">Rút câu theo cấu trúc</button>
+            <button class="chip" aria-pressed="false" data-g="rut">Mỗi em một bộ câu riêng</button>
+          </div>
+        </div>
+      </div>
+      <div class="buoc c-tim">
+        <div class="so-b">2</div>
+        <div>
+          <h3>Ai làm</h3>
+          <p class="ghi">Chọn lớp, rồi chọn ai được vào.</p>
+          <div class="hang-chip" data-nhom="lop">
+            <button class="chip" aria-pressed="true" data-g="lop">12A1 · 34 em</button>
+            <button class="chip" aria-pressed="false" data-g="lop">12A2 · 31 em</button>
+            <button class="chip" aria-pressed="false" data-g="lop">11B · 28 em</button>
+            <button class="chip" aria-pressed="false" data-g="lop">Lớp khác…</button>
+          </div>
+          <div class="hang-chip" style="margin-top:10px">
+            <button class="chip" aria-pressed="true" data-g="ai">Chỉ em trong danh sách lớp</button>
+            <button class="chip" aria-pressed="false" data-g="ai">Mọi em có link</button>
+            <button class="chip" aria-pressed="false" data-g="ai">Chọn từng em…</button>
+          </div>
+        </div>
+      </div>
+      <div class="buoc c-hp">
+        <div class="so-b">3</div>
+        <div>
+          <h3>Giờ</h3>
+          <p class="ghi">Thời gian làm bài · lúc bắt đầu · hạn vào phòng.</p>
+          <div class="hang-chip">
+            <button class="chip" aria-pressed="false" data-g="phut">15 phút</button>
+            <button class="chip" aria-pressed="false" data-g="phut">45 phút</button>
+            <button class="chip" aria-pressed="true" data-g="phut">50 phút</button>
+            <button class="chip" aria-pressed="false" data-g="phut">90 phút</button>
+          </div>
+          <div class="hang-chip" style="margin-top:10px">
+            <button class="chip" aria-pressed="true" data-g="bd">Bắt đầu ngay</button>
+            <button class="chip" aria-pressed="false" data-g="bd">Hẹn giờ…</button>
+            <span style="width:8px"></span>
+            <button class="chip" aria-pressed="false" data-g="han">Vào trong 15 phút</button>
+            <button class="chip" aria-pressed="true" data-g="han">Vào trong 30 phút</button>
+            <button class="chip" aria-pressed="false" data-g="han">Không giới hạn</button>
+          </div>
+        </div>
+      </div>
+      <div class="buoc c-xl">
+        <div class="so-b">4</div>
+        <div>
+          <h3>Luật</h3>
+          <p class="ghi">Khi nào em thấy điểm. Có thể đổi sau khi ca kết thúc.</p>
+          <div class="o-luat">
+            <button class="luat" aria-pressed="false" data-g="cb"><b>Ngay khi em nộp</b><span>Em nộp sớm có thể kể đáp án cho bạn đang làm.</span></button>
+            <button class="luat" aria-pressed="true" data-g="cb"><b>Khi cả lớp nộp xong</b><span>Em nộp xong thấy "đang chờ cả lớp".</span></button>
+            <button class="luat" aria-pressed="false" data-g="cb"><b>Thầy công bố sau</b><span>Thầy xem trước, rồi bấm Công bố điểm.</span></button>
+          </div>
+          <div class="bao-ve" style="margin-top:14px">
+            <span class="ghi" style="font-weight:700;color:var(--chu-2)">Chống gian lận:</span>
+            <span class="nhan n-xl">Giữ để đọc đề</span>
+            <span class="nhan n-xl">Rời màn 3 lần thì khoá bài</span>
+            <span class="nhan n-xl">Rời màn quá 10 giây thì khoá bài</span>
+            <span class="nhan n-xam">Phòng chờ: tắt</span>
+          </div>
+          <details class="them">
+            <summary>Thêm tuỳ chọn…</summary>
+            <ul>
+              <li>Phòng chờ phát đề (cả lớp nhận đề cùng lúc khi thầy bấm Bắt đầu thi) · Đồng bộ giờ cả phòng</li>
+              <li>Mật khẩu ca · Chỉ nộp trong 1 phút cuối · Ân hạn nhả tay khi giữ để đọc</li>
+              <li>Mức rời màn: số lần và số giây trước khi khoá bài</li>
+              <li>Tên ca (để trống thì tự đặt theo đề và ngày)</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+    </div>
+
+    <aside class="xem-truoc" aria-label="Xem trước ca">
+      <div class="ve">
+        <div class="ve-dau">
+          <div class="nho">Xem trước · ca sẽ mở</div>
+          <h3 id="xt-ten">Kiểm tra tuần 4 · 12A1</h3>
+        </div>
+        <dl>
+          <dt>Đề</dt><dd>Bộ đề 12 · Đề số 7</dd>
+          <dt>Số câu</dt><dd class="so">28 câu · 10 điểm</dd>
+          <dt>Ai làm</dt><dd id="xt-ai">12A1 · 34 em trong danh sách</dd>
+          <dt>Thời gian</dt><dd id="xt-phut" class="so">50 phút</dd>
+          <dt>Công bố điểm</dt><dd id="xt-cb">Khi cả lớp nộp xong</dd>
+        </dl>
+        <div class="dong-thoi c-hp">
+          <div style="--c:var(--xd)"><b class="so">08:00</b>Mở</div>
+          <div style="--c:var(--hp)"><b class="so">08:30</b>Hết giờ vào</div>
+          <div style="--c:var(--xl)"><b class="so">09:20</b>Em cuối nộp</div>
+        </div>
+        <div class="cuoi">
+          <button class="nut nut-chinh"><svg class="i"><use href="#i-cua"/></svg>Mở ca kiểm tra</button>
+          <p class="ghi" style="text-align:center">Mở xong có ngay link + mã ca để gửi nhóm lớp.</p>
+        </div>
+      </div>
+      <div class="tam" style="padding:16px 18px">
+        <div class="ghi" style="font-weight:700;color:var(--chu-2);margin-bottom:6px">Em sẽ thấy khi vào</div>
+        <p style="font-size:14px">Gõ số báo danh → máy hiện tên em → em bấm <b>Bắt đầu</b>. Đồng hồ 50 phút chạy từ lúc em nhận đề.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+</section>
+
+<!-- ============ (b) THEO DÕI CA ============ -->
+<section class="man" id="man-b" aria-label="Theo dõi ca đang mở">
+<div class="khung">
+  <div class="td-dau">
+    <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="song"><i></i>Ca đang mở · tự làm mới mỗi 20 giây</span><span class="vd">ví dụ</span></div>
+      <h1>Kiểm tra tuần 4 · 12A1</h1>
+      <div class="meta-ca">
+        <span>Mở lúc <b class="so">08:00 · Thứ Hai 28/09/2026</b> · Đồng hồ = thời gian còn của em vào muộn nhất · Hết giờ vào <b class="so">08:30</b> · <b>50 phút</b></span>
+        <span>Công bố điểm: <b>khi cả lớp nộp xong</b> · Chỉ em trong danh sách lớp</span>
+      </div>
+      <div class="link-ca" style="background:var(--mat)"><svg class="i" style="color:var(--xd)"><use href="#i-gui"/></svg><span class="mono">omr-app-b3u.pages.dev/t/280914</span><button class="nut nut-tong nut-nho"><svg class="i"><use href="#i-chep"/></svg>Chép link</button></div>
+    </div>
+    <div class="dong-ho">
+      <div class="vong" aria-label="Thời gian còn lại của em vào muộn nhất">
+        <svg viewBox="0 0 132 132"><circle cx="66" cy="66" r="56" fill="none" stroke="var(--mat)" stroke-width="12"/><circle id="vong-b" cx="66" cy="66" r="56" fill="none" stroke="var(--xd)" stroke-width="12" stroke-linecap="round" stroke-dasharray="351.9" stroke-dashoffset="140"/></svg>
+        <div class="giua"><div><b class="so" id="dem-b">23:41</b><span>phút còn lại</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="luoi-4">
+    <div class="so-o c-xd"><div class="t"><i></i>Đang làm</div><div class="lon so">18<small>em</small></div><div class="phu">trung bình đã làm 19/28 câu</div></div>
+    <div class="so-o c-xl"><div class="t"><i></i>Đã nộp</div><div class="lon so">9<small>em</small></div><div class="phu">em nộp sớm nhất sau 31 phút</div></div>
+    <div class="so-o c-hp"><div class="t"><i></i>Chưa vào</div><div class="lon so">5<small>em</small></div><div class="phu">còn 12 phút tới hết giờ vào</div></div>
+    <div class="so-o c-ho"><div class="t"><i></i>Cảnh báo</div><div class="lon so">2<small>em</small></div><div class="phu">1 em bị khoá · 1 em rời màn 2 lần</div></div>
+  </div>
+  <div class="tam" style="padding:16px 22px">
+    <div class="thanh-lop" role="img" aria-label="Cả lớp 34 em: 9 đã nộp, 18 đang làm, 2 cảnh báo, 5 chưa vào">
+      <span style="width:26.5%;background:var(--xl)"></span><span style="width:52.9%;background:var(--xd)"></span><span style="width:5.9%;background:var(--ho)"></span><span style="width:14.7%;background:var(--hp)"></span>
+    </div>
+    <div class="chu-thich"><span><i style="background:var(--xl)"></i>Đã nộp 9</span><span><i style="background:var(--xd)"></i>Đang làm 18</span><span><i style="background:var(--ho)"></i>Cảnh báo 2</span><span><i style="background:var(--hp)"></i>Chưa vào 5</span><span style="margin-left:auto">Cả lớp <b class="so">34</b> em</span></div>
+  </div>
+
+  <div class="td-luoi">
+    <div class="tam">
+      <div class="tam-dau"><h2>Từng em</h2>
+        <div class="loc" role="group" aria-label="Lọc em">
+          <button class="chip" aria-pressed="true" data-g="loc-b">Tất cả 34</button>
+          <button class="chip" aria-pressed="false" data-g="loc-b">Cảnh báo 2</button>
+          <button class="chip" aria-pressed="false" data-g="loc-b">Chưa vào 5</button>
+          <button class="chip" aria-pressed="false" data-g="loc-b">Đã nộp 9</button>
+        </div>
+      </div>
+      <div class="o-em" id="o-em"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div class="tam">
+        <div class="tam-dau"><h2>Cần thầy xử lý</h2><span class="nhan n-ho">2</span></div>
+        <div class="canh-bao">
+          <div class="cb c-ho"><div class="bt"><svg class="i"><use href="#i-khoa"/></svg></div><div><b>Trần Minh Khang bị khoá bài</b><p>Rời màn 3 lần, lâu nhất 14 giây · đã làm 22/28 câu.</p><button class="nut">Mở khoá cho em</button></div></div>
+          <div class="cb c-hp"><div class="bt"><svg class="i"><use href="#i-canh"/></svg></div><div><b>Lê Thu Hà rời màn 2 lần</b><p>Thêm 1 lần nữa là khoá bài.</p><button class="nut">Xem hồ sơ em</button></div></div>
+          <div class="cb c-xd"><div class="bt"><svg class="i"><use href="#i-lop"/></svg></div><div><b>5 em chưa vào</b><p>Hết giờ vào lúc 08:30 (còn 12 phút).</p><button class="nut">Xem 5 em</button></div></div>
+        </div>
+      </div>
+      <div class="tam">
+        <div class="tam-dau"><h2>Việc nhanh</h2></div>
+        <div class="hd-nhanh">
+          <button class="nut nut-tong"><svg class="i"><use href="#i-chieu"/></svg>Chiếu mã lên bảng</button>
+          <button class="nut nut-tong"><svg class="i"><use href="#i-cua"/></svg>Đóng cửa vào</button>
+        </div>
+        <button class="nut nut-do" style="width:100%;margin-top:10px"><svg class="i"><use href="#i-khoa"/></svg>Kết thúc ca ngay</button>
+        <p class="ghi" style="margin-top:8px">Kết thúc ca: em đang làm bị nộp theo phần đã làm (18 em), em chưa vào không vào được nữa. Hỏi lại trước khi làm.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ (c) KẾT THÚC CA ============ -->
+<section class="man" id="man-c" aria-label="Kết quả ngay khi kết thúc ca">
+<div class="khung">
+  <div class="dau">
+    <div>
+      <div class="duong">Ca kiểm tra › Kiểm tra tuần 4 · 12A1</div>
+      <h1>Ca đã kết thúc</h1>
+      <p>09:20 · Thứ Hai 28/09/2026 · 32 trên 34 em đã nộp <span class="vd">ví dụ</span></p>
+    </div>
+    <div class="hang-nut">
+      <button class="nut nut-vien" data-di="d">Xem báo cáo chi tiết</button>
+    </div>
+  </div>
+
+  <div class="cong-bo">
+    <div><b>Điểm chưa hiện cho học sinh.</b><div style="font-size:14px;margin-top:2px">Ca chọn "Thầy công bố sau". Xem xong thì công bố — em và phụ huynh thấy ngay. <span class="can-api">cần API</span></div></div>
+    <button class="nut nut-chinh"><svg class="i"><use href="#i-mat"/></svg>Công bố điểm cho 32 em</button>
+  </div>
+
+  <div class="kt-hero">
+    <div class="diem-to">
+      <div class="nho">Điểm trung bình cả lớp</div>
+      <div class="so-lon so">6,9<small>trên 10</small></div>
+      <div class="ba">
+        <div><b class="so">9,5</b><span>cao nhất</span></div>
+        <div><b class="so">2,5</b><span>thấp nhất</span></div>
+        <div><b class="so">41 phút</b><span>làm trung bình (ca 50)</span></div>
+      </div>
+    </div>
+    <div class="tam">
+      <div class="tam-dau"><h2>Phổ điểm</h2><span class="ghi">nhiều nhất: 7 đến dưới 8 điểm (9 em)</span></div>
+      <div class="pho c-xd" id="pho-c" role="img" aria-label="Phổ điểm của lớp"></div>
+    </div>
+  </div>
+
+  <div class="kt-luoi">
+    <div class="tam">
+      <div class="tam-dau"><h2>Câu cả lớp sai nhiều nhất</h2><span class="ghi">bấm câu để xem đề + lời giải</span></div>
+      <div class="cau-sai">
+        <div class="cs"><div class="c"><div><b>7</b><span>PHẦN I</span></div></div><div style="min-width:0"><div class="ten">Thuỷ phân ester</div><div class="phu">Đáp án đúng C · nhiều em chọn A (9 em)</div></div><div class="ti so">15/27<small>em sai</small></div></div>
+        <div class="cs"><div class="c"><div><b>2</b><span>PHẦN II</span></div></div><div style="min-width:0"><div class="ten">Pin điện hoá</div><div class="phu">Đáp án đúng a Đ · b S · c Đ · d S</div></div><div class="ti so">13/27<small>em sai</small></div></div>
+        <div class="cs"><div class="c"><div><b>5</b><span>PHẦN III</span></div></div><div style="min-width:0"><div class="ten">Tính khối lượng muối</div><div class="phu">Đáp án đúng 12,6 · nhiều em ghi 11,4 (5 em)</div></div><div class="ti so">12/27<small>em sai</small></div></div>
+        <div class="cs"><div class="c"><div><b>14</b><span>PHẦN I</span></div></div><div style="min-width:0"><div class="ten">Polymer và vật liệu</div><div class="phu">Đáp án đúng B · nhiều em chọn D (6 em)</div></div><div class="ti so">10/27<small>em sai</small></div></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+      <div class="tam">
+        <div class="tam-dau"><h2>Em cần thầy để ý</h2></div>
+        <div class="chu-y">
+          <div class="cy c-ho"><div class="av">NL</div><div class="tt"><b>Nguyễn Hoàng Long</b><span>Thấp hơn lần trước 2,5 điểm</span></div><div class="d so">2,5</div></div>
+          <div class="cy c-ho"><div class="av">TK</div><div class="tt"><b>Trần Minh Khang</b><span>Bị khoá bài · rời màn 3 lần</span></div><div class="d so">4,0</div></div>
+          <div class="cy c-hp"><div class="av">PA</div><div class="tt"><b>Phạm Ngọc Anh</b><span>Điểm dưới 5 · bỏ trống 6 câu</span></div><div class="d so">4,25</div></div>
+          <div class="cy c-xam" style="--c-nen:var(--mat-3);--c-dam:var(--chu-2)"><div class="av">+2</div><div class="tt"><b>2 em chưa nộp</b><span>Vũ Đức Minh · Đỗ Thị Lan</span></div></div>
+        </div>
+      </div>
+      <div class="tam">
+        <div class="tam-dau"><h2>Ba phần của bài</h2><span class="ghi">trung bình cả lớp</span></div>
+        <div class="ba-phan">
+          <div class="bp c-xd"><div class="h"><b>Phần I · Trắc nghiệm</b><span class="so">3,1 / 4,5 điểm · đúng 12,4/18 câu</span></div><div class="ray"><span style="width:69%"></span></div></div>
+          <div class="bp c-tim"><div class="h"><b>Phần II · Đúng–sai</b><span class="so">2,6 / 4 điểm</span></div><div class="ray"><span style="width:65%"></span></div></div>
+          <div class="bp c-xl"><div class="h"><b>Phần III · Trả lời ngắn</b><span class="so">1,2 / 1,5 điểm · đúng 4,8/6 câu</span></div><div class="ray"><span style="width:80%"></span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ (d) BÁO CÁO CHI TIẾT ============ -->
+<section class="man" id="man-d" aria-label="Báo cáo chi tiết">
+<div class="khung">
+  <div class="bc-dau khong-in">
+    <div>
+      <div class="duong">Ca kiểm tra › Kiểm tra tuần 4 · 12A1 › Báo cáo</div>
+      <h1 style="font-size:clamp(26px,3.2vw,34px);font-weight:800;letter-spacing:-.02em">Báo cáo chi tiết <span class="vd">ví dụ</span></h1>
+    </div>
+    <div class="hang-nut">
+      <div class="phan-doan" role="tablist" aria-label="Loại báo cáo">
+        <button role="tab" aria-selected="true" data-bc="lop">Cả lớp</button>
+        <button role="tab" aria-selected="false" data-bc="em">Từng em</button>
+      </div>
+      <button class="nut nut-vien" id="nut-gui"><svg class="i"><use href="#i-gui"/></svg>Gửi phụ huynh</button>
+      <button class="nut nut-chinh" id="nut-in"><svg class="i"><use href="#i-in"/></svg>In / Lưu PDF</button>
+    </div>
+  </div>
+
+  <!-- BÁO CÁO LỚP -->
+  <div class="bc-trang" id="bc-lop">
+    <div class="in-dau"><div><b style="font-size:16pt">Báo cáo ca kiểm tra · Kiểm tra tuần 4 · 12A1</b><div>Trung tâm luyện thi Hoá — thầy Đỗ Đại Học</div></div><div class="so">28/09/2026 · 50 phút · 28 câu</div></div>
+    <div class="luoi-4">
+      <div class="so-o c-xd"><div class="t"><i></i>Điểm trung bình</div><div class="lon so">6,9<small>/10</small></div><div class="phu">cao 9,5 · thấp 2,5</div></div>
+      <div class="so-o c-xl"><div class="t"><i></i>Đã nộp</div><div class="lon so">32<small>/34 em</small></div><div class="phu">2 em chưa nộp</div></div>
+      <div class="so-o c-hp"><div class="t"><i></i>Thời gian làm</div><div class="lon so">41<small>phút</small></div><div class="phu">trung bình · ca cho 50 phút</div></div>
+      <div class="so-o c-tim"><div class="t"><i></i>So với ca trước</div><div class="lon so">+0,4<small>điểm</small></div><div class="phu">trung bình lớp · ca 21/09 là 6,5 <span class="can-api">cần API</span></div></div>
+    </div>
+    <div class="tam">
+      <div class="tam-dau"><h2>Bản đồ đúng–sai cả lớp</h2>
+        <div class="chu-thich" style="margin:0"><span><i style="background:var(--xl)"></i>Đúng</span><span><i style="background:var(--hp)"></i>Đúng một phần (Phần II)</span><span><i style="background:var(--ho)"></i>Sai</span><span><i style="background:var(--mat-3)"></i>Bỏ trống</span></div>
+      </div>
+      <p class="ghi" style="margin-bottom:10px">Mỗi hàng một em (điểm cao ở trên), mỗi cột một câu. Cột đỏ dày = câu cả lớp cần chữa.</p>
+      <div class="nhiet" id="nhiet"></div>
+    </div>
+    <div class="kt-luoi">
+      <div class="tam">
+        <div class="tam-dau"><h2>Bảng điểm</h2><span class="ghi">bấm tên để mở báo cáo từng em</span></div>
+        <div class="bang-wrap"><table class="bang" id="bang-diem"><thead><tr><th>Hạng</th><th>Họ tên</th><th class="so">Điểm</th><th class="so">Đúng</th><th class="so">Thời gian</th><th class="so">So lần trước</th></tr></thead><tbody></tbody></table></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;min-width:0">
+        <div class="tam">
+          <div class="tam-dau"><h2>Dạng cả lớp đang vấp</h2></div>
+          <div class="dang-vap">
+            <div class="dang-hang c-ho"><span>Thuỷ phân ester</span><div class="ray"><span style="width:46%"></span></div><b class="so">46%</b></div>
+            <div class="dang-hang c-ho"><span>Pin điện hoá</span><div class="ray"><span style="width:52%"></span></div><b class="so">52%</b></div>
+            <div class="dang-hang c-hp"><span>Polymer và vật liệu</span><div class="ray"><span style="width:58%"></span></div><b class="so">58%</b></div>
+            <div class="dang-hang c-xl"><span>Amine, amino acid</span><div class="ray"><span style="width:81%"></span></div><b class="so">81%</b></div>
+          </div>
+          <p class="ghi" style="margin-top:8px">Số = tỉ lệ câu đúng của cả lớp ở dạng đó trong ca.</p>
+        </div>
+        <div class="tam">
+          <div class="tam-dau"><h2>A.I Đỗ Đại Học đã lo</h2></div>
+          <div class="hs-ai" style="color:var(--chu-2)">
+            <p>· <b class="so">96</b> câu sai của <b class="so">24</b> em đã vào lịch ôn lại.</p>
+            <p>· Bài tập về nhà tới sẽ ưu tiên dạng <b>Thuỷ phân ester</b> (12 em).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BÁO CÁO MỘT EM -->
+  <div class="bc-trang" id="bc-em" hidden>
+    <div class="in-dau"><div><b style="font-size:16pt">Báo cáo của em · <span class="ten-em">Lê Thu Hà</span></b><div>Kiểm tra tuần 4 · 12A1 · Trung tâm luyện thi Hoá — thầy Đỗ Đại Học</div></div><div class="so">28/09/2026</div></div>
+    <div class="tam khong-in" style="padding:12px 16px">
+      <label class="ghi" for="chon-em" style="font-weight:700;color:var(--chu-2);margin-right:8px">Em:</label>
+      <select id="chon-em" style="min-height:44px;border-radius:12px;border:1px solid var(--vien);background:var(--mat-2);color:var(--chu);padding:0 12px;font:inherit;max-width:100%"></select>
+    </div>
+    <div class="tam">
+      <div class="em-dau">
+        <div class="vong-diem"><svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="60" fill="none" stroke="var(--mat-2)" stroke-width="12"/><circle id="vong-em" cx="70" cy="70" r="60" fill="none" stroke="var(--xd)" stroke-width="12" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="94"/></svg><div class="giua"><div><b class="so" id="em-diem">7,5</b><span>trên 10 điểm</span></div></div></div>
+        <div style="min-width:0">
+          <h2 style="font-size:24px;font-weight:800" class="ten-em">Lê Thu Hà</h2>
+          <p class="ghi">SBD <span class="mono" id="em-sbd">120417</span> · 12A1 · nộp lúc <span class="so">09:08</span></p>
+          <div class="hang-nut" style="margin-top:10px" id="em-chip"></div>
+        </div>
+        <div class="em-so" style="min-width:260px">
+          <div><b class="so" id="em-dung">21/28</b><span>câu đúng</span></div>
+          <div><b class="so" id="em-hang">5/32</b><span>hạng trong lớp</span></div>
+          <div><b class="so" id="em-tg">38 phút</b><span>thời gian làm</span></div>
+          <div><b class="so" id="em-rm">1 lần</b><span>rời màn</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="em-luoi">
+      <div class="tam">
+        <div class="tam-dau"><h2>Từng câu</h2><div class="chu-thich" style="margin:0"><span><i style="background:var(--xl)"></i>Đúng</span><span><i style="background:var(--hp)"></i>Đúng một phần</span><span><i style="background:var(--ho)"></i>Sai</span><span><i style="background:var(--mat-3)"></i>Bỏ trống</span></div></div>
+        <div id="em-cau"></div>
+      </div>
+      <div class="tam">
+        <div class="tam-dau"><h2>Theo dạng bài</h2></div>
+        <div id="em-dang"></div>
+        <p class="ghi" style="margin-top:6px">Số = câu đúng / câu của dạng trong ca. Mũi tên: bậc đổi sau ca này.</p>
+      </div>
+    </div>
+    <div class="em-luoi">
+      <div class="tam">
+        <div class="tam-dau"><h2>Câu cần xem lại</h2><span class="ghi">sai trước · đúng nhưng làm lâu sau</span></div>
+        <div class="xem-lai" id="em-xl"></div>
+      </div>
+      <div class="tam nhan-xet">
+        <div class="tam-dau"><h2>Nhận xét của thầy</h2></div>
+        <textarea id="nhan-xet" aria-label="Nhận xét của thầy">Hà làm chắc Phần III. Còn nhầm chiều thuỷ phân ester trong môi trường kiềm — tối nay xem lại câu 7 và câu 11.</textarea>
+        <p class="ghi" style="margin-top:6px">Nhận xét in kèm bản PDF và gửi phụ huynh. <span class="can-api">cần API lưu</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ============ (e) HỌC SINH ============ -->
+<section class="man hs" id="man-e" aria-label="Học sinh xem kết quả">
+<div class="khung">
+  <div class="hs-dau">
+    <h1>Học sinh xem kết quả</h1>
+    <p>Trái: khi thầy đã công bố. Phải: khi chưa công bố. <span class="vd">ví dụ</span></p>
+  </div>
+  <div class="dt-hang">
+    <div class="dt">
+      <div class="dt-man">
+        <div class="kinh kq-dau">
+          <div class="ca">Kiểm tra tuần 4 · nộp 09:08 · Thứ Hai 28/09</div>
+          <div class="vong-hs"><svg viewBox="0 0 168 168"><defs><linearGradient id="gd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--k-nhan)"/><stop offset="1" stop-color="var(--k-xl)"/></linearGradient></defs><circle cx="84" cy="84" r="72" fill="none" stroke="var(--k-o)" stroke-width="14"/><circle cx="84" cy="84" r="72" fill="none" stroke="url(#gd)" stroke-width="14" stroke-linecap="round" stroke-dasharray="452.4" stroke-dashoffset="113"/></svg><div class="giua"><div><b class="so">7,5</b><span>điểm trên 10</span></div></div></div>
+          <span class="chip-ss"><svg class="i" style="width:16px;height:16px"><use href="#i-len"/></svg>Hơn 0,75 điểm so với lần trước của em</span>
+          <div class="hs-3" style="width:100%;margin-top:6px">
+            <div><b class="so">21/28</b><span>câu đúng</span></div>
+            <div><b class="so">38 phút</b><span>làm bài</span></div>
+            <div><b class="so">+40</b><span>EXP</span></div>
+          </div>
+        </div>
+        <div class="kinh">
+          <h3>Ba phần của bài</h3>
+          <div class="hs-phan">
+            <div><div class="h"><span>Phần I · Trắc nghiệm</span><b class="so">3,75/4,5</b></div><div class="ray"><span style="width:83%"></span></div></div>
+            <div><div class="h"><span>Phần II · Đúng–sai</span><b class="so">2,5/4</b></div><div class="ray"><span style="width:62%"></span></div></div>
+            <div><div class="h"><span>Phần III · Trả lời ngắn</span><b class="so">1,25/1,5</b></div><div class="ray"><span style="width:83%"></span></div></div>
+          </div>
+        </div>
+        <div class="kinh">
+          <h3>Từng câu <span style="font-weight:600;font-size:12.5px;color:var(--k-chu2)">· bấm câu đỏ xem lời giải</span></h3>
+          <div class="hs-cau" id="hs-cau"></div>
+        </div>
+        <div class="kinh">
+          <h3>A.I Đỗ Đại Học đã lo cho em</h3>
+          <div class="hs-ai">
+            <div><i></i><span><b>5 câu sai</b> đã vào lịch ôn lại, đến lịch ôn lại đầu tiên <b>Thứ Tư 30/09</b>.</span></div>
+            <div><i></i><span>Dạng em đang luyện thêm: <b>Thuỷ phân ester</b>.</span></div>
+          </div>
+        </div>
+        <button class="nut-hs">Xem lại 5 câu sai</button>
+      </div>
+    </div>
+    <div class="dt">
+      <div class="dt-man">
+        <div class="kinh cho">
+          <div class="bieu"><svg class="i"><use href="#i-dh"/></svg></div>
+          <h3>Em đã nộp bài</h3>
+          <p>Điểm hiện khi cả lớp nộp xong.</p>
+          <div class="tien-cho" role="img" aria-label="Đã nộp 27 trên 34 em"><span style="width:79%"></span></div>
+          <p class="so"><b>27/34</b> bạn đã nộp</p>
+        </div>
+        <div class="kinh">
+          <h3>Bài của em</h3>
+          <div class="hs-3">
+            <div><b class="so">28/28</b><span>câu đã làm</span></div>
+            <div><b class="so">09:08</b><span>giờ nộp</span></div>
+            <div><b class="so">38 phút</b><span>làm bài</span></div>
+          </div>
+        </div>
+        <div class="kinh cho" style="padding:18px 16px">
+          <h3 style="font-size:16px">Nếu thầy chọn "công bố sau"</h3>
+          <p>Màn này ghi: "Thầy chưa công bố điểm. Khi thầy công bố, điểm hiện ở đây và trong Bảng nhiệm vụ."</p>
+        </div>
+        <div style="flex:1"></div>
+        <button class="nut-hs-phu">Về Bảng nhiệm vụ</button>
+        <p class="dt-nhan">Không hiện điểm, đáp án, lời giải trước khi công bố.</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<script>
+(function(){
+  // ---------- điều hướng màn + chủ đề ----------
+  var tabs=[].slice.call(document.querySelectorAll('.bv .tab'));
+  function moMan(k){
+    if(!/^[a-e]$/.test(k))k='a';
+    tabs.forEach(function(t){t.setAttribute('aria-selected',t.dataset.man===k?'true':'false')});
+    document.querySelectorAll('.man').forEach(function(m){m.classList.toggle('hien',m.id==='man-'+k)});
+    window.scrollTo(0,0);
+  }
+  tabs.forEach(function(t){t.addEventListener('click',function(){history.replaceState(null,'','#'+t.dataset.man);moMan(t.dataset.man)})});
+  document.querySelectorAll('[data-di]').forEach(function(b){b.addEventListener('click',function(){history.replaceState(null,'','#'+b.dataset.di);moMan(b.dataset.di)})});
+  moMan((location.hash||'#a').slice(1,2));
+  window.addEventListener('hashchange',function(){moMan((location.hash||'#a').slice(1,2))});
+  var cd=[].slice.call(document.querySelectorAll('.chude button'));
+  function datChuDe(v){
+    if(v)document.documentElement.setAttribute('data-theme',v);else document.documentElement.removeAttribute('data-theme');
+    cd.forEach(function(b){b.setAttribute('aria-pressed',b.dataset.chude===v?'true':'false')});
+    try{localStorage.setItem('bv-ca-chude',v)}catch(e){}
+  }
+  cd.forEach(function(b){b.addEventListener('click',function(){datChuDe(b.dataset.chude)})});
+  var q=new URLSearchParams(location.search).get('theme');
+  var luu='';try{luu=localStorage.getItem('bv-ca-chude')||''}catch(e){}
+  datChuDe(q!==null?q:luu);
+
+  // ---------- chip chọn một trong nhóm ----------
+  var xt={phut:document.getElementById('xt-phut'),cb:document.getElementById('xt-cb'),ai:document.getElementById('xt-ai')};
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-g]');if(!b)return;
+    var g=b.dataset.g;
+    document.querySelectorAll('[data-g="'+g+'"]').forEach(function(x){x.setAttribute('aria-pressed',x===b?'true':'false')});
+    if(g==='phut')xt.phut.textContent=b.textContent;
+    if(g==='cb')xt.cb.textContent=b.querySelector('b').textContent;
+    if(g==='lop'&&!/khác/.test(b.textContent))xt.ai.textContent=b.textContent+' trong danh sách';
+  });
+
+  // ---------- dữ liệu VÍ DỤ ----------
+  var ho=['Nguyễn','Trần','Lê','Phạm','Hoàng','Vũ','Đỗ','Bùi','Đặng','Ngô'];
+  var dem=['Minh','Thu','Ngọc','Đức','Hoàng','Thị','Văn','Gia','Bảo','Khánh'];
+  var ten=['Anh','Hà','Khang','Long','Lan','Minh','Châu','Phúc','Vy','Nam','Trang','Huy','Linh','Quân','My','Sơn','Tâm'];
+  var seed=7;function r(){seed=(seed*9301+49297)%233280;return seed/233280}
+  var PHAN=[].concat(Array(18).fill('I'),Array(4).fill('II'),Array(6).fill('III'));
+  var ds=[];
+  for(var i=0;i<32;i++){
+    var tr=0.25+r()*0.72, cau=[], diem=0, dung=0;
+    PHAN.forEach(function(p,j){
+      var kho=(j===6||j===13||j===19||j===22)?0.35:0;
+      var x=r();
+      if(x>0.95-tr*0.1){cau.push('b');return}
+      if(p==='II'){var y=Math.round((tr-kho+0.2)*4*r()+ (tr>0.6?1:0));y=Math.max(0,Math.min(4,y));cau.push(y===4?'d':y===0?'s':'n');diem+=[0,0.1,0.25,0.5,1][y];if(y===4)dung++}
+      else{var ok=x<tr-kho;cau.push(ok?'d':'s');if(ok){diem+=0.25;dung++}}
+    });
+    ds.push({ten:ho[i%10]+' '+dem[(i*3)%10]+' '+ten[(i*7)%17],sbd:String(120401+i),cau:cau,diem:Math.round(diem*4)/4,dung:dung,phut:28+Math.round(r()*21),doi:Math.round((r()*4-1.6)*4)/4,rm:r()>0.8?Math.ceil(r()*2):0});
+  }
+  ds[4].ten='Lê Thu Hà';
+  ds.sort(function(a,b){return b.diem-a.diem});
+  function vn(n){return String(n).replace('.',',')}
+
+  // (b) lưới em đang thi
+  var oem=document.getElementById('o-em'),tt=[];
+  for(i=0;i<34;i++){tt.push(i<9?'nop':i<27?'lam':i<29?'canh':'chua')}
+  var tenB=ds.map(function(x){return x.ten}).concat(['Vũ Đức Minh','Đỗ Thị Lan']);
+  tenB[27]='Trần Minh Khang';tenB[28]='Lê Thu Hà';
+  oem.innerHTML=tt.map(function(t,k){
+    var lam=t==='nop'?28:t==='chua'?0:Math.round(8+((k*37)%20));
+    var map={nop:['n-xl','Đã nộp','var(--xl)'],lam:['n-xd','Đang làm','var(--xd)'],canh:[k===27?'n-ho':'n-hp',k===27?'Bị khoá':'Rời màn 2 lần','var(--ho)'],chua:['n-hp','Chưa vào','var(--hp)']}[t];
+    return '<button class="em'+(t==='canh'?' canh':'')+'" style="--c:'+map[2]+'"><div class="h"><span class="ten">'+tenB[k]+'</span><span class="nhan '+map[0]+'">'+map[1]+'</span></div><div class="tien"><span style="width:'+Math.round(lam/28*100)+'%"></span></div><div class="d"><span class="so">'+lam+'/28 câu</span><span class="sbd mono">'+(120401+k)+'</span></div></button>';
+  }).join('');
+  // đồng hồ (b)
+  var con=23*60+41,db=document.getElementById('dem-b'),vb=document.getElementById('vong-b');
+  setInterval(function(){if(con>0)con--;db.textContent=String(Math.floor(con/60)).padStart(2,'0')+':'+String(con%60).padStart(2,'0');vb.setAttribute('stroke-dashoffset',String(351.9*(1-con/3000)))},1000);
+
+  // (c) phổ điểm
+  var pho=[0,1,1,2,3,4,6,9,4,2];
+  var mx=Math.max.apply(null,pho);
+  document.getElementById('pho-c').innerHTML=pho.map(function(s,k){
+    var c=k<5?'var(--ho)':k<7?'var(--hp)':'var(--xd)';
+    return '<div class="cot"><i style="height:'+Math.max(4,Math.round(s/mx*140))+'px;background:'+c+'"><b class="so">'+s+'</b></i><span class="so">'+k+(k===9?'–10':'')+'</span></div>';
+  }).join('');
+
+  // (d) bản đồ đúng–sai
+  var hd='<tr><th></th>'+PHAN.map(function(p,j){return '<th class="so">'+(p==='I'?j+1:p==='II'?'II.'+(j-17):'III.'+(j-21))+'</th>'}).join('')+'</tr>';
+  document.getElementById('nhiet').innerHTML='<table aria-label="Bản đồ đúng sai: hàng là em, cột là câu"><thead>'+hd+'</thead><tbody>'+ds.slice(0,20).map(function(e){return '<tr><th class="ten">'+e.ten+'</th>'+e.cau.map(function(c){return '<td class="o-'+c+'" title="'+({d:'Đúng',s:'Sai',b:'Bỏ trống',n:'Đúng một phần'})[c]+'"></td>'}).join('')+'</tr>'}).join('')+'</tbody></table><p class="ghi" style="margin-top:6px">Đang hiện 20/32 em · <button class="nut nut-vien nut-nho khong-in">Hiện đủ 32 em</button></p>';
+  // bảng điểm
+  document.querySelector('#bang-diem tbody').innerHTML=ds.map(function(e,k){
+    var d=e.doi>0?'<span class="nhan n-xl">+'+vn(e.doi)+'</span>':e.doi<0?'<span class="nhan n-ho">'+vn(e.doi)+'</span>':'<span class="nhan n-xam">bằng</span>';
+    return '<tr'+(e.ten==='Lê Thu Hà'?' class="chon"':'')+'><td class="so">'+(k+1)+'</td><td><button class="lk" data-em="'+k+'">'+e.ten+'</button></td><td class="so"><b>'+vn(e.diem)+'</b></td><td class="so">'+e.dung+'/28</td><td class="so">'+e.phut+' phút</td><td class="so">'+d+'</td></tr>';
+  }).join('');
+
+  // báo cáo một em
+  var sel=document.getElementById('chon-em');
+  sel.innerHTML=ds.map(function(e,k){return '<option value="'+k+'">'+(k+1)+'. '+e.ten+' · '+vn(e.diem)+' điểm</option>'}).join('');
+  var DANG=['Ester, lipid','Thuỷ phân ester','Carbohydrate','Amine, amino acid','Polymer và vật liệu','Pin điện hoá','Kim loại kiềm','Tính khối lượng muối'];
+  function veEm(k){
+    var e=ds[k];sel.value=k;
+    document.querySelectorAll('.ten-em').forEach(function(x){x.textContent=e.ten});
+    document.getElementById('em-diem').textContent=vn(e.diem);
+    document.getElementById('vong-em').setAttribute('stroke-dashoffset',String(377*(1-e.diem/10)));
+    document.getElementById('em-sbd').textContent=e.sbd;
+    document.getElementById('em-dung').textContent=e.dung+'/28';
+    document.getElementById('em-hang').textContent=(k+1)+'/32';
+    document.getElementById('em-tg').textContent=e.phut+' phút';
+    document.getElementById('em-rm').textContent=e.rm?e.rm+' lần':'không';
+    document.getElementById('em-chip').innerHTML=(e.doi>0?'<span class="nhan n-xl"><svg class="i" style="width:15px;height:15px"><use href="#i-len"/></svg>Hơn '+vn(e.doi)+' điểm so với lần trước</span>':e.doi<0?'<span class="nhan n-ho"><svg class="i" style="width:15px;height:15px"><use href="#i-xuong"/></svg>Kém '+vn(-e.doi)+' điểm so với lần trước</span>':'<span class="nhan n-xam">Bằng lần trước</span>')+'<span class="nhan n-xd">Dạng em đang yếu: '+DANG[1]+'</span>';
+    var nhom=[['Phần I · Trắc nghiệm',0,18],['Phần II · Đúng–sai',18,22],['Phần III · Trả lời ngắn',22,28]];
+    document.getElementById('em-cau').innerHTML=nhom.map(function(n){return '<div class="nhom-phan">'+n[0]+'</div><div class="o-cau">'+e.cau.slice(n[1],n[2]).map(function(c,j){return '<div class="'+c+'" title="'+({d:'Đúng',s:'Sai',b:'Bỏ trống',n:'Đúng một phần'})[c]+'">'+(n[1]+j+1-n[1])+'</div>'}).join('')+'</div>'}).join('');
+    var h='';DANG.forEach(function(t,j){var tong=3+(j%3),d=Math.max(0,Math.min(tong,Math.round(tong*(e.diem/10)+(j%2?-1:0.4)))),p=Math.round(d/tong*100);var c=p<50?'c-ho':p<75?'c-hp':'c-xl';var mt=j===1?' <span class="nhan n-ho" style="padding:1px 6px">↓ bậc</span>':j===3?' <span class="nhan n-xl" style="padding:1px 6px">↑ bậc</span>':'';h+='<div class="dang-hang '+c+'"><span>'+t+mt+'</span><div class="ray"><span style="width:'+p+'%"></span></div><b class="so">'+d+'/'+tong+'</b></div>'});
+    document.getElementById('em-dang').innerHTML=h;
+    var sai=[];e.cau.forEach(function(c,j){if(c==='s'&&sai.length<3)sai.push(j)});
+    document.getElementById('em-xl').innerHTML=sai.map(function(j){var p=PHAN[j];var so=p==='I'?j+1:p==='II'?j-17:j-21;return '<div class="xl"><div class="h"><b style="color:var(--chu)">Phần '+p+' · câu '+so+' · '+DANG[j%8]+'</b><span class="so">em làm 84 giây · cả lớp 61 giây</span></div><p>Thuỷ phân hoàn toàn 8,8 gam ethyl acetate trong NaOH dư… (đề rút gọn)</p><div class="da"><span class="nhan n-ho">Em chọn: A</span><span class="nhan n-xl">Đáp án đúng: C</span><span class="nhan n-tim">Ôn lại: Thứ Tư 30/09</span></div></div>'}).join('')||'<p class="ghi">Không có câu sai.</p>';
+    document.querySelectorAll('#bang-diem tr').forEach(function(tr,x){tr.classList.toggle('chon',x-1===k)});
+  }
+  veEm(ds.findIndex(function(e){return e.ten==='Lê Thu Hà'}));
+  sel.addEventListener('change',function(){veEm(+sel.value)});
+  var pd=[].slice.call(document.querySelectorAll('.phan-doan button'));
+  function moBc(v){pd.forEach(function(b){b.setAttribute('aria-selected',b.dataset.bc===v?'true':'false')});document.getElementById('bc-lop').hidden=v!=='lop';document.getElementById('bc-em').hidden=v!=='em'}
+  pd.forEach(function(b){b.addEventListener('click',function(){moBc(b.dataset.bc)})});
+  document.getElementById('bang-diem').addEventListener('click',function(ev){var b=ev.target.closest('[data-em]');if(!b)return;veEm(+b.dataset.em);moBc('em');window.scrollTo(0,0)});
+  document.getElementById('nut-in').addEventListener('click',function(){window.print()});
+  if(/bc=em/.test(location.search))moBc('em');
+
+  // (e) ô câu của học sinh
+  var e0=ds[ds.findIndex(function(e){return e.ten==='Lê Thu Hà'})];
+  document.getElementById('hs-cau').innerHTML=e0.cau.map(function(c,j){return '<div class="'+(c==='n'?'s':c)+'">'+(j+1)+'</div>'}).join('');
+})();
+</script>
+</body>
+</html>
