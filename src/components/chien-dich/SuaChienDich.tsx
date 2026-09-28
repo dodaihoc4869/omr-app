@@ -131,7 +131,10 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
   const luuDuoc = !!goc && coThayDoi && hanHopLe && theLucHopLe && !dangLuu && !dangXem && !loiXem
   const daChonDe = useMemo(() => new Set(themDe), [themDe])
 
+  // Cổng ra document.body nằm NGOÀI vỏ `.m3.vo-thay` ⇒ mất token màu (--m3-surface-container-high…) ⇒ hộp trong suốt (thầy 28/09).
+  // Bọc lại bằng lớp vỏ `display: contents`: token và luật con của vỏ thầy áp vào hộp, không thêm hộp bố cục nào.
   return createPortal(
+    <div className="m3 vo-thay" data-vo-cong="sua-chien-dich" style={{ display: 'contents' }}>
     <HopChon tieuDe={`Chỉnh sửa: ${ten}`} nhanXacNhan="Lưu" xacNhanDuoc={luuDuoc} onXacNhan={() => void luu()} onDong={() => {
       // Esc khi tấm chọn em đang mở: tấm tự đóng, hộp giữ nguyên.
       if (!document.querySelector('[data-khoi="sua-chien-dich"] .cd-tam-chon')) onDong()
@@ -286,7 +289,8 @@ export default function SuaChienDich({ id, ten, onDong, onDaLuu }: { id: string;
           </>
         )}
       </div>
-    </HopChon>,
+    </HopChon>
+    </div>,
     document.body,
   )
 }
