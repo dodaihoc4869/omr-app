@@ -122,6 +122,9 @@ export function TheCauAi({cau:q,stt,traLoi,khoa,onTraLoi,onZoom,onHinhLoi}:TheCa
 export interface KhoiLoiGiaiProps{cau:CauDao2;stt:number;phanHoi:PhanHoi2;traLoiMay:string;onZoom?:(src:string)=>void}
 /** Thẻ trắng M3: đầu thẻ "ẢI k · CÂU MỚI" + dạng · mức độ; TheCau `xem_lai` (phương án ✓ ✗ + khối LỜI GIẢI → KIẾN THỨC CỐT LÕI → từng phương án/ý) + hình sau lời giải. */
 export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom}:KhoiLoiGiaiProps){
+ // Ngang: thẻ lời giải là cột tự cuộn, khối LỜI GIẢI nằm dưới 4 ý ⇒ em không thấy (thầy báo 28/09). Vừa chốt xong thì tự cuộn tới khối LỜI GIẢI.
+ const ngang=useNgang(),goc=useRef<HTMLElement>(null)
+ useEffect(()=>{if(ngang)goc.current?.querySelector('.loi-giai')?.scrollIntoView?.({block:'start',behavior:'smooth'})},[ngang,stt])
  const em=(phanHoi.traLoi||traLoiMay).trim(),dap=phanHoi.answer.trim(),vai=docVai(q.vai)
  const chung={stt,onZoom,text:q.text,table:q.table,thanCauImg:q.thanCauImg,imageDataUrl:q.imageDataUrl,hinhAnh:q.hinhAnh as HinhAnh[],tieuDe:q.tenDang||'',cheDo:'xem_lai' as const,loiGiai:loiGiaiChoTheCau(phanHoi.solution,q.phan,dap)}
  const pc:TheCauProps=q.phan==='I'?{...chung,phan:'I',choices:q.choices as [string,string,string,string],choiceImgs:q.choiceImgs as [string?,string?,string?,string?],choicePerm:[0,1,2,3],
@@ -129,7 +132,7 @@ export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom}:KhoiLoiGiaiProp
   :q.phan==='II'?{...chung,phan:'II',ideas:q.ideas as [string,string,string,string],ideaImgs:q.ideaImgs as [string?,string?,string?,string?],
    selected:Array.from({length:4},(_,i)=>(em[i]==='D'||em[i]==='S'?em[i]:null) as 'D'|'S'|null),correct:dapAnDungSai(dap)}
   :{...chung,phan:'III',selected:em||null,correct:dap}
- return <section className="dao2-the-giai m3" aria-label={`Lời giải ải ${stt}`}>
+ return <section ref={goc} className="dao2-the-giai m3" aria-label={`Lời giải ải ${stt}`}>
   <p className="dao2-giai-dau"><b data-vai={vai??undefined}>ẢI {stt}{vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
   <TheCau {...pc}/>
   <HinhTaiViTri hinhAnh={phanHoi.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={onZoom}/>
