@@ -1,5 +1,5 @@
 // BA VIỆC THẦY GIAO 14/09 LƯỢT 2.
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { dungHtmlDeVaLoiGiai } from '../src/lib/de-loi-giai-cua-em'
@@ -23,7 +23,11 @@ const ROWS: ChiTietCauRow[] = [
 ] as unknown as ChiTietCauRow[]
 
 describe('1. Xem đề và lời giải — là TỜ ĐỀ, không phải phiếu khắc phục', () => {
-  const html = dungHtmlDeVaLoiGiai(BANK, '814335', '12121212', 'Đỗ Đại Học', 'Test4', ROWS)
+  // Bộ dựng phiếu nay nạp lười (import động) nên hàm trả Promise.
+  let html = ''
+  beforeAll(async () => {
+    html = await dungHtmlDeVaLoiGiai(BANK, '814335', '12121212', 'Đỗ Đại Học', 'Test4', ROWS)
+  })
 
   it('dựng được phiếu và có đủ cả hai câu', () => {
     expect(html.length).toBeGreaterThan(200)

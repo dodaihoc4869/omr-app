@@ -6,13 +6,14 @@ import Spirit2D from './Spirit2D'
 import {evolutionStage,EVOLUTION_NAMES} from './evolution'
 import {battleMuted,setBattleMuted,playBattleSound} from './battle-audio'
 import './learning-battle.css'
+import { anhWebp, doiVePng, napAnhGame } from './anh-webp'
 export default function LearningBattle({pet,nickname,level,answers,total,event,finished}:{nickname?:string;pet:number;level:number;answers:BattleAnswer[];total:number;event:number;finished:boolean}){
  const battle=learningBattle(answers,total),skin=BATTLE_SKINS[pet]??BATTLE_SKINS[0]
  const [active,setActive]=useState(false);const [muted,setMuted]=useState(battleMuted);const spellClip=useId();const stageIndex=evolutionStage(level)
  const [quiet,setQuiet]=useState(()=>localStorage.getItem('game-battle-quiet')==='1')
  const stage=useRef<HTMLDivElement>(null),lastEvent=useRef(event)
  useEffect(()=>{if(!event||lastEvent.current===event)return;lastEvent.current=event;setActive(true);playBattleSound(pet,stageIndex,!!battle.correct,battle.rage);stage.current?.scrollIntoView({behavior:'instant',block:'start'});const timer=setTimeout(()=>setActive(false),1800);return()=>clearTimeout(timer)},[event])
- useEffect(()=>{const image=new Image();image.src=`/than-thu-v2/spells/${SPELL_NAMES[pet]}.png`},[pet])
+ useEffect(()=>{napAnhGame(`/than-thu-v2/spells/${SPELL_NAMES[pet]}.png`)},[pet])
  const firing=active&&battle.correct,hit=active&&battle.correct===false
  const label=finished?(battle.enemy===0?'Đã phá tan quái vật!':'Đã hoàn thành lượt học'):active?(firing?(battle.rage?'CƯỜNG NỘ · ':'')+skin.move+' · '+EVOLUTION_NAMES[stageIndex]:'QUÁI VẬT PHẢN CÔNG'):battle.enemy===0?'Quái đã tan · tiếp tục luyện để giữ vững kiến thức':battle.protected?'Bảo hộ đang che chở thần thú':'Kiến thức tiếp sức cho thần thú'
  return <div ref={stage} data-element={pet} className={`learning-battle ${quiet?'battle-quiet':''} ${firing?'battle-fire':''} ${hit?'battle-hurt':''} ${active&&battle.rage?'battle-rage':''}`} style={{'--battle-color':skin.color} as CSSProperties}>
@@ -47,7 +48,7 @@ const SPELL_LEFT=[[60,60,60,60,35,0],[40,40,30,20,0,0],[450,310,210,150,80,0],[3
 const SPELL_RIGHT=[[850,980,1110,1250,1400,1536],[1480,1480,1500,1536,1536,1536],[1100,1180,1270,1330,1450,1536],[1170,1260,1370,1460,1536,1536],[1440,1470,1536,1536,1536,1536],[1240,1340,1430,1510,1536,1536],[1160,1330,1420,1470,1536,1536],[1310,1380,1460,1536,1536,1536]]
 export function SpellArt({pet,stage,clipId}:{pet:number;stage:number;clipId:string}){
  const rows=SPELL_ROWS[pet]??SPELL_ROWS[0]!,y=rows[stage]!,height=rows[stage+1]!-y,x=SPELL_LEFT[pet]![stage]!,width=SPELL_RIGHT[pet]![stage]!-x
- return <svg className="battle-painted-spell" data-stage={stage} data-pet={pet} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none"><defs><clipPath id={clipId}><rect width={width} height={height}/></clipPath></defs><g clipPath={`url(#${clipId})`}><image href={`/than-thu-v2/spells/${SPELL_NAMES[pet]}.png`} width="1536" height="1024" x={-x} y={-y}/></g></svg>
+ return <svg className="battle-painted-spell" data-stage={stage} data-pet={pet} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none"><defs><clipPath id={clipId}><rect width={width} height={height}/></clipPath></defs><g clipPath={`url(#${clipId})`}><image href={anhWebp(`/than-thu-v2/spells/${SPELL_NAMES[pet]}.png`)} onError={doiVePng} width="1536" height="1024" x={-x} y={-y}/></g></svg>
 }
 
 export function SpellPreview({pet,level}:{pet:number;level:number}){

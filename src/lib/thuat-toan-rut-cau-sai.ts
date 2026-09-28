@@ -11,7 +11,8 @@ import { chuanHoaLoiGiaiCau } from './chuan-hoa-loi-giai'
 import { dangCua } from './dang-cau'
 import { hopSao, type LocSaoMoRong } from './loc-sao'
 import type { DangCauKho } from './rut-de-chua'
-import { dungPhieu, type ThongTinPhieu } from './html-phieu'
+// Phiếu HTML (≈ 52 KB gzip) NẠP LƯỜI: chỉ tải khi thật sự dựng phiếu, không kéo vào lượt tải đầu của 3 app.
+import type { ThongTinPhieu } from './html-phieu'
 import { hopLeDeRut } from './loc-cau-rut'
 
 export interface CauSaiDauVao {
@@ -232,10 +233,10 @@ function rutTheoPhanBo(thongKe:ThongKeDangCauSai[],phanBo:Map<string,number>,gio
 }
 
 /** LỰA CHỌN 1: Làm lại toàn bộ câu sai */
-export function taoDeLamLaiCauSai(
+export async function taoDeLamLaiCauSai(
   dsCauSai: CauSaiDauVao[],
   thongTin: { hoTen: string; sbd: string; tenDe?: string }
-): { html: string; dsCau: CauLuyen[] } {
+): Promise<{ html: string; dsCau: CauLuyen[] }> {
   const dsCauHopLe = dsCauSai.filter((c) =>
     hopLeDeRut({
       phan: c.phan,
@@ -256,6 +257,7 @@ export function taoDeLamLaiCauSai(
     giaoDienHocSinh: true,
     nhanBia: 'LÀM LẠI CÂU SAI',
   }
+  const { dungPhieu } = await import('./html-phieu')
   const html = dungPhieu(tt, dsCau, { anGiai: false })
   return { html, dsCau }
 }
@@ -328,12 +330,12 @@ export function phanTichTyLeDang(
 }
 
 /** Rút luyện thêm dạng câu sai theo tỷ lệ số câu chọn */
-export function rutLuyenThemDangCauSai(
+export async function rutLuyenThemDangCauSai(
   dsCauSai: CauSaiDauVao[],
   khoDe: TeacherExamSource[],
   soCauRut: number,
   thongTin: { hoTen: string; sbd: string; tenDe?: string }
-): { html: string; dsCau: CauLuyen[] } {
+): Promise<{ html: string; dsCau: CauLuyen[] }> {
   const { thongKe, tongToiDa, tinhSoCauMoiDang } = phanTichTyLeDang(dsCauSai, khoDe)
   const phanBo = tinhSoCauMoiDang(soCauRut)
 
@@ -349,6 +351,7 @@ export function rutLuyenThemDangCauSai(
     giaoDienHocSinh: true,
     nhanBia: 'LUYỆN DẠNG CÂU SAI',
   }
+  const { dungPhieu } = await import('./html-phieu')
   const html = dungPhieu(tt, dsCauRut, { anGiai: false })
   return { html, dsCau: dsCauRut }
 }
@@ -374,13 +377,13 @@ export function phanTichBoLocCau(
 }
 
 /** Rút đề theo bộ lọc sao & thể loại */
-export function rutLuyenTheoBoLoc(
+export async function rutLuyenTheoBoLoc(
   dsCauSai: CauSaiDauVao[],
   khoDe: TeacherExamSource[],
   boLoc: BoLocCauLuyen,
   soCauRut: number,
   thongTin: { hoTen: string; sbd: string; tenDe?: string }
-): { html: string; dsCau: CauLuyen[] } {
+): Promise<{ html: string; dsCau: CauLuyen[] }> {
   const { thongKe, tongToiDa, tinhSoCauMoiDang } = phanTichBoLocCau(dsCauSai, khoDe, boLoc)
   const phanBo = tinhSoCauMoiDang(soCauRut)
 
@@ -400,6 +403,7 @@ export function rutLuyenTheoBoLoc(
     giaoDienHocSinh: true,
     nhanBia: 'BỘ LỌC CÂU LUYỆN',
   }
+  const { dungPhieu } = await import('./html-phieu')
   const html = dungPhieu(tt, dsCauRut, { anGiai: false })
   return { html, dsCau: dsCauRut }
 }
@@ -442,12 +446,12 @@ function locCauTuDo(kho: TeacherExamSource[], boLoc?: BoLocCauLuyen): CauLuyen[]
   })
 }
 
-export function rutLuyenDangBai(
+export async function rutLuyenDangBai(
   khoDangBai: TeacherExamSource[],
   soCauRut: number,
   thongTin: { hoTen: string; sbd: string; tenDang: string; tenBai: string; lop: string },
   boLoc?: BoLocCauLuyen,
-): { html: string; dsCau: CauLuyen[] } {
+): Promise<{ html: string; dsCau: CauLuyen[] }> {
   const tatCa = locCauTuDo(khoDangBai, boLoc)
   const dsCauRut = tronMang(tatCa).slice(0, Math.max(0, soCauRut))
 
@@ -461,6 +465,7 @@ export function rutLuyenDangBai(
     giaoDienHocSinh: true,
     nhanBia: 'LUYỆN ĐỀ TỰ DO',
   }
+  const { dungPhieu } = await import('./html-phieu')
   const html = dungPhieu(tt, dsCauRut, { anGiai: false })
   return { html, dsCau: dsCauRut }
 }

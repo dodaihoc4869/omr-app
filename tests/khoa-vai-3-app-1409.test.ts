@@ -204,8 +204,18 @@ describe('Tốc độ — mảnh mã chính không cõng thứ người khác kh
     expect(APP).not.toMatch(/^import ParentPortalScreen from/m)
   })
 
-  it('MÀN LÀM BÀI và MÀN PHIẾU vẫn nạp SỚM — ngày thi không đánh cược', () => {
-    expect(APP).toMatch(/^import ExamTakeScreen from/m)
+  it('MÀN PHIẾU vẫn nạp SỚM; MÀN LÀM BÀI tách mảnh nhưng ngày thi không đánh cược', () => {
     expect(APP).toMatch(/^import PhieuScreen from/m)
+    // 28/09: màn thi + cổng học sinh ra khỏi mảnh chính (máy thầy/phụ huynh không tải kèm)…
+    expect(APP).not.toMatch(/^import ExamTakeScreen from/m)
+    expect(APP).not.toMatch(/^import StudentPortalScreen from/m)
+    // …nhưng đường vào là máy em thì tải NGAY lúc mảnh chính chạy, không chờ React dựng,
+    expect(APP).toContain("if (dv.maCa || dv.vai === 'diem') huaManThi ??= napManThi()")
+    expect(APP).toMatch(/^napSomTheoDuong\(\)$/m)
+    // …và hai mảnh ấy VẪN nằm trong precache: mất mạng vẫn mở được màn thi.
+    const CFG = doc('vite.config.ts')
+    const bo = CFG.slice(CFG.indexOf('globIgnores'), CFG.indexOf('maximumFileSizeToCacheInBytes'))
+    expect(bo).not.toContain('ExamTakeScreen')
+    expect(bo).not.toContain('StudentPortalScreen')
   })
 })

@@ -68,7 +68,7 @@ describe('Mục 4 — Luyện dạng bài trên màn hình', () => {
   })
 
   it('rút xong trộn thứ tự, không phát lại đúng 20 câu đầu mỗi lượt', () => {
-    expect(thuatToan).toContain('export function rutLuyenDangBai(')
+    expect(thuatToan).toContain('export async function rutLuyenDangBai(')
     expect(thuatToan).toContain('tronMang(tatCa).slice(0, Math.max(0, soCauRut))')
   })
 })

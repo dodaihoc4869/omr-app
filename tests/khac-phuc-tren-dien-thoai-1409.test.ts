@@ -73,13 +73,13 @@ describe('LỖI 2 — máy học sinh không có kho đề', () => {
     expect(thongKe).toHaveLength(10)
   })
 
-  it('chế độ 2 hết ứng viên trả rỗng, không tự chèn câu cũ khi chọn 0', () => {
-    const { dsCau } = rutLuyenThemDangCauSai(DS_CAU_SAI, [], 0, { hoTen: 'Em A', sbd: '12109' })
+  it('chế độ 2 hết ứng viên trả rỗng, không tự chèn câu cũ khi chọn 0', async () => {
+    const { dsCau } = await rutLuyenThemDangCauSai(DS_CAU_SAI, [], 0, { hoTen: 'Em A', sbd: '12109' })
     expect(dsCau).toHaveLength(0)
   })
 
-  it('chế độ 1 ra đủ 10 câu vì nội dung câu sai đi kèm báo cáo', () => {
-    const { dsCau, html } = taoDeLamLaiCauSai(DS_CAU_SAI, { hoTen: 'Em A', sbd: '12109' })
+  it('chế độ 1 ra đủ 10 câu vì nội dung câu sai đi kèm báo cáo', async () => {
+    const { dsCau, html } = await taoDeLamLaiCauSai(DS_CAU_SAI, { hoTen: 'Em A', sbd: '12109' })
     expect(dsCau).toHaveLength(10)
     expect(html).toContain('Nhận định nào sau đây về ester là đúng (mục 1)?')
     expect(html).toContain('Nhận định nào sau đây về ester là đúng (mục 10)?')

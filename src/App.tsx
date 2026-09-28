@@ -16,10 +16,8 @@ import { phaiHoiLai, type BanGhiKhoa } from './lib/khoa-app'
 import { docDuongVao, laLinkAppCu, laManThayQuanLy } from './lib/vai-tro'
 import KhoaMayThayScreen from './screens/KhoaMayThayScreen'
 import { ganCauNoi, goCauNoi } from './lib/cau-noi-ddh'
-import ExamTakeScreen from './screens/ExamTakeScreen'
 import AppDaChuyenScreen from './screens/AppDaChuyenScreen'
 import PhieuScreen from './screens/PhieuScreen'
-import StudentPortalScreen from './screens/StudentPortalScreen'
 
 
 // TÁM MÀN CHỈ THẦY DÙNG — NẠP MUỘN.
@@ -35,14 +33,43 @@ import StudentPortalScreen from './screens/StudentPortalScreen'
 // HAI MÀN GIỮ NGUYÊN NẠP SỚM, và chỉ hai:
 //   · `PhieuScreen` — trang phụ huynh mở. Nạp muộn thì đúng người cần nhanh
 //     nhất lại phải chờ thêm một vòng mạng.
-//   · `ExamTakeScreen` — màn em làm bài. Ngày thi không đánh cược vào một mảnh
-//     mã tải muộn.
+//   · (`ExamTakeScreen` từng nạp sớm ở đây; 28/09 chuyển sang mảnh riêng VẪN
+//     precache + tải ngay theo đường vào — xem khối "MÀN LÀM BÀI" dưới.)
 //   · `AppDaChuyenScreen` — tấm biển "link này đã ngừng dùng". Nạp muộn thì em
 //     bấm link cũ thấy một khoảnh trắng rồi mới thấy chữ; màn này nhỏ xíu nên
 //     tách ra chẳng được bao nhiêu. Phép kiểm `link-cu-hs-ph` bắt đúng chỗ này.
 //
 // Mảnh nạp muộn hỏng vì thầy đang mở bản cũ đã được `batLoiThieuManh()` trong
 // `main.tsx` lo: bắt đúng lỗi thiếu mảnh rồi tự tải lại một lần.
+// MÀN LÀM BÀI + CỔNG HỌC SINH — NẠP MUỘN (28/09, tối ưu lượt tải đầu).
+//
+// Đo 28/09: hai màn này (+ Sảnh 2.0, Khắc phục, Bảng tin phụ huynh kéo theo)
+// ≈ 350 KB thô nằm trong mảnh chính — máy thầy và máy phụ huynh tải mà không
+// bao giờ dùng. Nay tách mảnh riêng, NHƯNG ngày thi vẫn không đánh cược:
+//   · Hai mảnh này VẪN trong precache (không có trong `globIgnores` của
+//     vite.config.ts) ⇒ máy đã cài app mở màn thi được cả khi mất mạng.
+//   · Đường vào là máy em (`/t/<mã ca>`, `/d/<mã ca>`, `/hs`) thì BẮT ĐẦU TẢI
+//     NGAY khi mảnh chính vừa chạy (`napSomTheoDuong` dưới), không chờ React dựng.
+//   · Tải hỏng thì thử lại một lần; thiếu mảnh vì đang mở bản cũ thì
+//     `batLoiThieuManh()` (main.tsx) tự tải lại trang.
+const thuLaiMotLan = <T,>(nap: () => Promise<T>) => () =>
+  nap().catch(() => new Promise<void>((r) => setTimeout(r, 800)).then(nap))
+const napManThi = thuLaiMotLan(() => import('./screens/ExamTakeScreen'))
+const napCongHocSinh = thuLaiMotLan(() => import('./screens/StudentPortalScreen'))
+let huaManThi: ReturnType<typeof napManThi> | null = null
+let huaCongHocSinh: ReturnType<typeof napCongHocSinh> | null = null
+const ExamTakeScreen = lazy(() => (huaManThi ??= napManThi()))
+const StudentPortalScreen = lazy(() => (huaCongHocSinh ??= napCongHocSinh()))
+function napSomTheoDuong() {
+  if (typeof location === 'undefined') return
+  const dv = docDuongVao(location.search, location.pathname)
+  if (dv.maCa || dv.vai === 'diem') huaManThi ??= napManThi()
+  else if (dv.vai === 'hocsinh') huaCongHocSinh ??= napCongHocSinh()
+}
+napSomTheoDuong()
+/** Chỗ giữ màn khi mảnh màn em đang về — đúng nền app, không chữ, không nhấp nháy. */
+const ChoManEm = () => <div className="min-h-screen" style={{ background: 'var(--nen)' }} />
+
 const ExamHubScreen = lazy(() => import('./screens/ExamHubScreen'))
 const ClassListScreen = lazy(() => import('./screens/ClassListScreen'))
 const ExamSetupScreen = lazy(() => import('./screens/ExamSetupScreen'))
@@ -275,7 +302,9 @@ function App() {
   if (laHocSinh) {
     return (
       <ChanLoi o="Cổng học sinh">
-        <StudentPortalScreen />
+        <Suspense fallback={<ChoManEm />}>
+          <StudentPortalScreen />
+        </Suspense>
       </ChanLoi>
     )
   }
@@ -343,7 +372,9 @@ function App() {
   if (docDuongVao(location.search, location.pathname).maCa || laXemDiem) {
     return (
       <ChanLoi o="Làm bài" veManChinh={() => location.reload()}>
-        <ExamTakeScreen />
+        <Suspense fallback={<ChoManEm />}>
+          <ExamTakeScreen />
+        </Suspense>
       </ChanLoi>
     )
   }
