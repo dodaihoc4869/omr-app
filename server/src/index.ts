@@ -80,6 +80,7 @@ import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
 import { gan } from './cau-hinh-dem'
+import { damBaoChiMuc } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 
 // CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
@@ -3462,6 +3463,8 @@ export default {
     // Phòng đấu Bi-a (WebSocket, GĐ2): đi thẳng tới Durable Object, KHÔNG qua lớp bọc dưới (dựng lại Response làm hỏng bắt tay 101).
     if (new URL(req.url).pathname.startsWith('/bi-a/phong/')) return denPhongBiA(req, env)
     const t0 = Date.now()
+    // Chỉ mục tạo lúc chạy (chi-muc-luc-chay.ts): MỘT lần mỗi isolate, sau phản hồi (waitUntil) ⇒ không thêm độ trễ.
+    if (ctx && env.DB) ctx.waitUntil(damBaoChiMuc(env))
     let res: Response
     // ỔN ĐỊNH (28/09): ~40 nhánh định tuyến `return handler(...)` KHÔNG await ⇒ Promise bị từ chối thoát khỏi try/catch của định tuyến (và các nhánh GET
     // nằm ngoài try) ⇒ Cloudflare trả 1101 thiếu CORS, máy em tưởng mất mạng. `await` + `catch` Ở ĐÂY bắt MỌI lỗi (đồng bộ lẫn bất đồng bộ) một chỗ duy nhất.
