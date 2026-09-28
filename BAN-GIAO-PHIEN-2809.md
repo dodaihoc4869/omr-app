@@ -62,3 +62,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - ĐÃ PHÁT HÀNH PR #25 ô "có trợ giúp" thẻ công tắc. RÀ SOÁT lên bảng xong: `docs/ra-soat-len-bang-2809/DE-XUAT.md` (16 hạn chế, 10 đề xuất P1–P10) — CHỜ THẦY CHỐT.
 - ĐÃ PHÁT HÀNH PR #26 PDF chỉ đề + nét hơn (`a3f6521`); PR #27 màu M3 toàn app GV (`4232ea5`). Còn chạy: game sáng/tối (`game-sang-toi`). Chờ thầy chốt: đề xuất màn chiếu lên bảng P1–P10.
 - LUẬT THẦY CHỐT màn chiếu: KHÔNG BAO GIỜ thu nhỏ chữ; câu dài ⇒ lật nhiều trang cùng câu (ngắt theo khối, "Trang 1/2 của Câu N", Space/↓ lật trong câu, ←/→ đổi đợt), giữ cột làm bài 1/3. Bảng chi tiết HS: mục "Câu này" lên đầu (số lần làm/đúng/sai + từng lần ngày giờ, đáp án, trợ giúp, nguồn).
+- Bổ sung: KHI ĐÃ GỌI LÊN BẢNG (thẻ tên hiện) ⇒ mọi câu dài/quá dài về vùng 2/3 trái TỰ CUỘN (chữ giữ cỡ), 1/3 phải trống cho em làm bài; trước khi gọi vẫn lật trang.
