@@ -73,3 +73,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - Bản vẽ ca kiểm tra: `ban-ve-ca-thi` `d1d9092`, link https://claude.ai/artifact/EZWNwNRXNeNqpxqawCYsoh — CHỜ CHỐT. API cần: /gv/cong-bo-ca, tbCaTruoc, /gv/nhan-xet-ca-em, maTran trong /gv/bao-cao-ca. Nhánh `chip-gon` (ee59c6d) chờ merge sau deploy #30.
 - THẦY CHỐT build ca kiểm tra + báo cáo mới: nhánh `build-ca-thi` (a–e + API /gv/cong-bo-ca, tbCaTruoc, /gv/nhan-xet-ca-em, maTran). Đang build.
 - THẦY: Đảo 3D vẽ xong BUILD LUÔN + phát hành + báo cáo. Trợ lý vẽ tiếp tục build ở nhánh `build-dao-3d`.
+- 13:35 PR #31 lên bảng merge `4370dea` (deploy đang chạy). THẦY CHỐT: câu sai ca đã công bố tự vào Đoàn (nguồn ca_sai), vào kế hoạch từ NGÀY HÔM SAU, không phá kế hoạch hôm nay — giao cho trợ lý build-ca-thi.
