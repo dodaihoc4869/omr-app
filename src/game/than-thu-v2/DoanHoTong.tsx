@@ -54,6 +54,8 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const [tungChuong, setTungChuong] = useState<KhungNhinHiep | null>(null), [loiGiaiTrum, setLoiGiaiTrum] = useState<LoiGiaiTrum | null>(null)
   const [goiYThe, setGoiYTiepSuc] = useState<GoiYTiepSuc | null>(null), [expTiepSuc, setExpTiepSuc] = useState(0)
   const [expNhan, setExpNhan] = useState(0), [, setNhip] = useState(0), [choRoi, setChoRoi] = useState(false)
+  // Hóa 2.0: chặng vừa kết thúc ngay sau câu em làm ⇒ giữ lời giải câu cuối tới khi em bấm "XEM KẾT QUẢ CHẶNG".
+  const [daDocCuoi, setDaDocCuoi] = useState(false)
   const de = useRef(new Map<string, Question>()), moc = useRef({ luc: 0, conMs: 0, moSauMs: 0 }), phienBan = useRef({ ma: '', revision: -1 })
   const hiepDaChieu = useRef(0), hiepDangLam = useRef(0), khoa = useRef(false), song = useRef(true)
   const tinh = (() => { try { return localStorage.getItem('game-v2-low') === '1' } catch { return false } })()
@@ -149,7 +151,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     // Đi một mình thì chốt xong hiệp giải NGAY và máy chủ đã sang hiệp mới: kết quả này thuộc hiệp cũ, chỉ hiện ở quãng nghỉ (cauVuaLam).
     if (r.doan?.tran?.hiep === tran.hiep) setKetQuaCau(kq)
     if (kq?.reward) setExpNhan(n => n + (kq.reward ?? 0))
-    setCauVuaLam(deHienTai ? { q: deHienTai, chon: boTrong ? '' : chon, ketQua: kq } : null)
+    setCauVuaLam(deHienTai ? { q: deHienTai, chon: boTrong ? '' : chon, ketQua: kq, hiep: tran.hiep } : null)
     if (laHoa2) void docLaiHoa2() // 2.0: một ổ phục kích vừa bị phá ⇒ số "Ổ phục kích còn N" đọc lại từ máy chủ, không tự trừ
   }
   const moTiepSuc = async (ghe: number) => { if (!xem) return; const r = await goi('doan-the-goi-y', { ma: xem.ma, den: ghe }); if (r?.goiY) setGoiYTiepSuc(r.goiY) }
@@ -168,7 +170,7 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
   const veSanh = () => {
     try { sessionStorage.removeItem(khoaLuu(sbd)) } catch { /* bỏ qua */ }
     phienBan.current = { ma: '', revision: -1 }; hiepDaChieu.current = 0; hiepDangLam.current = 0
-    setXem(null); setTungChuong(null); setCauVuaLam(null); setLoiGiaiTrum(null); setExpNhan(0); setLoi(''); setHetCauMoi(false); goiYCau.current.clear(); setHoa2SauChang(undefined)
+    setXem(null); setTungChuong(null); setCauVuaLam(null); setLoiGiaiTrum(null); setExpNhan(0); setLoi(''); setHetCauMoi(false); goiYCau.current.clear(); setHoa2SauChang(undefined); setDaDocCuoi(false)
     void call('doan-sanh').then(r => { if (song.current) apSanh(r as PhanHoiDoan) }).catch(() => {})
     if (laHoa2) void docLaiHoa2()
   }
@@ -187,27 +189,33 @@ export default function DoanHoTong({ call, sbd, pet, cap, onDong, onVeBangNhiemV
     if (!daKet || !laHoa2) return // `hoa2SauChang` về undefined (đang đọc) ở `veSanh` — không đặt state đồng bộ trong hiệu ứng
     void call('hoa2-sanh').then(r => { if (!song.current) return; const h = docHoa2(r); setHoa2SauChang(h); if (h) datHoa2(h) }).catch(() => { if (song.current) setHoa2SauChang(null) })
   }, [daKet, laHoa2, call, datHoa2])
-  const trongTran = !!xem?.batDau && !!tran && !(tran.ketThuc && !tungChuong)
+  // Hóa 2.0 (thầy 28/09): lời giải câu vừa làm đứng yên, KHÔNG đồng hồ, tới khi em bấm. Phòng một người thật: máy chủ báo `choTiep`
+  // (hiệp kế chờ lệnh `doan-tiep`). Chặng kết thúc ngay sau câu em làm: giữ lời giải câu cuối trước màn kết chặng.
+  const vuaXong = xem?.hiepVuaXong?.hiep
+  const giuCuoi = laHoa2 && !!tran?.ketThuc && !tungChuong && !daDocCuoi && vuaXong !== undefined && (loiGiaiTrum?.hiep === vuaXong || cauVuaLam?.hiep === vuaXong)
+  const danhTiep = !xem || !tran ? undefined : giuCuoi ? () => setDaDocCuoi(true) : laHoa2 && tran.choTiep && !tran.ketThuc ? () => { unlockBattleAudio(); void goi('doan-tiep', { ma: xem.ma }) } : undefined
+  const trongTran = !!xem?.batDau && !!tran && (!(tran.ketThuc && !tungChuong) || giuCuoi)
   const loaiQuaiVuaDanh = tungChuong && !tungChuong.laTrum ? (tungChuong.hiep < HIEP_TRUM[0]! ? 0 : 1) : 0
   const than = !xem || !xem.batDau || !tran ? (
     <DoanSanh pet={pet} cap={cap} tenDoan="Đoàn Hộ Tống" goiY={goiYSanh} chang={chang} sanh={sanh} anThach={anThach} banDongHanh={banDongHanh} phong={xem} ban={ban} loi={loi}
       hoa2={hoa2 ? { con: hoa2.doanCon, daoCon: hoa2.daoCon } : null} onRaDao={onRaDao}
       onLenDuong={() => { unlockBattleAudio(); void goi('doan-mo') }} onMoPhong={() => { unlockBattleAudio(); void goi('doan-mo', { cheDo: 'phong' }) }}
       onVaoPhong={ma => { unlockBattleAudio(); void goi('doan-vao', { ma }) }} onBatDau={() => xem && void goi('doan-bat-dau', { ma: xem.ma })} onRoi={() => void roi()} onDong={onDong} />
-  ) : tran.ketThuc && !tungChuong && xem.ketChang && hoa2 ? (
+  ) : tran.ketThuc && !tungChuong && xem.ketChang && hoa2 && !giuCuoi ? (
     <KetChang2 xem={xem} expNhan={expNhan} cau={hoa2SauChang} ban={ban} onRaDao={() => { veSanh(); (onRaDao ?? onDong)() }} onVeBanDo={() => { veSanh(); onDong() }} onDiTiep={veSanh} />
-  ) : tran.ketThuc && !tungChuong && xem.ketChang ? (
+  ) : tran.ketThuc && !tungChuong && xem.ketChang && !giuCuoi ? (
     <DoanKetChang xem={xem} expNhan={expNhan} ve={veSauChang} ban={ban} onVe={() => { veSanh(); onVeBangNhiemVu() }} onDiTiep={veSanh} />
   ) : (
     <DoanTran xem={xem} de={deHienTai} deTrum={deTrum} conGiay={conGiay} moSauGiay={moSauGiay} chon={chon} onChon={setChon} hanhDong={hanhDong} onHanhDong={setHanhDong}
       yChon={yChon} onYChon={(y, v) => setYChon(o => ({ ...o, [y]: v }))} onChot={b => void chot(b)} onChotY={chotY} onTinHieu={t => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: t })}
       onXinTiepSuc={bat => void goi('doan-tin-hieu', { ma: xem.ma, tinHieu: bat ? 'can_tiep_suc' : '' })} onMoTiepSuc={g => void moTiepSuc(g)} expTiepSuc={expTiepSuc}
       onRoi={() => void roi()} onZoom={setZoom} ban={ban} dangChot={dangChot} hetCauMoi={hetCauMoi} loi={goiYThe ? '' : loi} ketQuaCau={ketQuaCau} cauVuaLam={cauVuaLam} loiGiaiTrum={loiGiaiTrum}
-      cheDo2={laHoa2} goiY={xem.cau?.qid ? goiYCau.current.get(xem.cau.qid) ?? null : null} oPhucKich={hoa2?.doanCon ?? null} />
+      cheDo2={laHoa2} goiY={xem.cau?.qid ? goiYCau.current.get(xem.cau.qid) ?? null : null} oPhucKich={hoa2?.doanCon ?? null}
+      onDanhTiep={danhTiep} nhanTiep={giuCuoi ? 'XEM KẾT QUẢ CHẶNG' : undefined} />
   )
 
   return createPortal(
-    <div className={`dh ${laHoa2 ? 'dh2' : ''} ${tinh ? 'dh-tinh' : ''} ${trongTran ? 'dh-tran' : ''}`} data-che-do={laHoa2 ? '2' : undefined} data-man={!xem?.batDau ? 'sanh' : tran?.ketThuc && !tungChuong ? 'ket-chang' : tran?.laTrum ? 'trum' : 'tran'}>
+    <div className={`dh ${laHoa2 ? 'dh2' : ''} ${tinh ? 'dh-tinh' : ''} ${trongTran ? 'dh-tran' : ''}`} data-che-do={laHoa2 ? '2' : undefined} data-man={!xem?.batDau ? 'sanh' : tran?.ketThuc && !tungChuong && !giuCuoi ? 'ket-chang' : tran?.laTrum ? 'trum' : 'tran'}>
       {than}
       {tungChuong && xem && tran && <DoanTungChuong kq={tungChuong} ghe={xem.ghe} loaiQuai={tran.loaiQuai[loaiQuaiVuaDanh] ?? 'bun_acid'} tenQuai={tran.tenQuai[loaiQuaiVuaDanh] ?? 'Tạp Chất'} tinh={tinh} onXong={xongChuong} cheDo2={laHoa2} />}
       {goiYThe && trongTran && !tungChuong && <DoanTiepSuc goiY={goiYThe} ban={ban} loi={loi} onChon={l => void guiThe(l)} onDong={() => { setGoiYTiepSuc(null); setLoi('') }} cheDo2={laHoa2} />}

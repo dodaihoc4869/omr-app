@@ -12,6 +12,8 @@ export interface TranXem {
   tenChang: string; hiep: number; soHiep: number; laTrum: boolean; ketThuc: boolean; thang: boolean | null
   linhTam: { hp: number; toiDa: number }; quai: Quai[]; trumVoGiap: boolean[]
   nangLuong: number; daNhanTiepSuc: number; giay: number; moSauMs: number; conMs: number; tenQuai: string[]; loaiQuai: string[]; tenTrum: string[]; loaiTrum: string[]
+  /** Chỉ-thêm (Hóa 2.0, phòng một người thật): hiệp kế đang CHỜ em bấm "ĐÁNH TIẾP" — không có đồng hồ. Vắng ⇒ nhịp cũ. */
+  choTiep?: boolean
 }
 export interface KetQuaCau { correct: boolean; answer: string; solution: unknown; solutionImages?: HinhAnh[]; reward?: number; stage?: number }
 export interface CauXem { qid?: string; nhan?: NhanCau; an?: boolean; de?: Question; giuNguyen?: boolean; daChot?: boolean; hanhDong?: HanhDong; boTrong?: boolean; ketQua?: KetQuaCau | null; het?: boolean; rut?: boolean; loiNhan?: string }

@@ -44,6 +44,10 @@ export const NGHI_GIUA_HIEP_MS = 6000
 /** Bài tới trễ vì mạng chập chờn vẫn được nhận trong khoảng này sau khi đồng hồ về 0. */
 export const AN_HAN_MS = 1500
 export const PHONG_HET_HAN_MS = 3_600_000
+/** GAME HÓA 2.0 (thầy 28/09 "máy tự đánh", "thời gian xem đáp án quá ngắn"): phòng chỉ còn MỘT người thật ⇒ sau khi hiệp giải,
+ *  máy chủ CHỜ em bấm "ĐÁNH TIẾP" (lệnh `doan-tiep`) rồi mới mở hiệp kế — em đọc lời giải không có đồng hồ. Hạn chờ an toàn:
+ *  quá hạn này em vẫn chưa bấm (bỏ dở) thì hiệp tự mở như cũ, phòng không treo mãi. Phòng ≥ 2 người thật giữ nhịp cũ. */
+export const HAN_CHO_TIEP_MS = 15 * 60_000
 
 // CỜ MỞ GAME (0.Planer đặt 19/09, cùng kiểu cờ EXP của Code 3): bảng `cau_hinh`, khoá `doan_ho_tong`, JSON `{"dsSbd":["12121212"],"toanBo":false}`.
 // KHÔNG có dòng / JSON hỏng / thiếu bảng = TẮT với mọi em: game y hệt trước khi có Đoàn. Bật cho vài em để chơi thật trên bản sống rồi mới mở cả trường.
@@ -96,6 +100,10 @@ export interface PhongDoan {
   /** Ý trùm giao theo bậc của từng bạn ở dạng của câu chung (ý a dễ nhất → bạn bậc thấp nhất). */
   giaoY: Record<string, number[]>
   ketLuc: number | null
+  /** Chỉ-thêm (Hóa 2.0): phòng mở ở chế độ Game Hóa 2.0 ⇒ khi còn MỘT người thật thì chờ em bấm tiếp giữa hai hiệp. Vắng ⇒ nhịp cũ. */
+  choEmBamTiep?: boolean
+  /** Chỉ-thêm: hiệp kế đang CHỜ em bấm "ĐÁNH TIẾP" (hiepLuc = hạn chờ an toàn). */
+  choTiep?: boolean
 }
 const TIN_HIEU = ['can_tiep_suc', 'chac_y', 'ban_them', 'doi_ti'] as const
 
@@ -417,10 +425,15 @@ function giai(p: PhongDoan, now: number) {
     for (const ghe of Object.keys(p.the)) if (p.nguoi[Number(ghe)]) p.choGhi.push({ hiep: kq.hiep, den: p.nguoi[Number(ghe)]!.sbd, thanhCong: !!kq.ghe[Number(ghe)]?.dung })
   }
   p.nop = {}; p.nopY = {}; p.tinHieu = {}; p.the = {}; p.daGiup = []; p.hiepLuc = now + NGHI_GIUA_HIEP_MS
+  // Hóa 2.0 + chỉ còn MỘT người thật: hiệp kế chờ em bấm tiếp (tối đa HAN_CHO_TIEP_MS). Không đổi luật chấm — chỉ lùi lúc MỞ hiệp.
+  p.choTiep = choEmMotMinh(p)
+  if (p.choTiep) p.hiepLuc = now + HAN_CHO_TIEP_MS
   chuyenTaskHiep(p, c.hiep) // task chưa chốt của hiệp vừa giải ⇒ `continuing` (02 §8)
   if (p.chang.ketThuc) p.ketLuc = now
   else if (hiepLaTrum(p.chang.hiep) && p.trum[p.chang.hiep] && p.giaoY[p.chang.hiep]) p.chang = datGiaoY(p.chang, p.giaoY[p.chang.hiep]!)
 }
+/** Phòng Hóa 2.0, chặng còn đi, đúng MỘT người thật còn ở lại ⇒ giữa hai hiệp chờ em bấm tiếp. */
+export const choEmMotMinh = (p: PhongDoan): boolean => !!p.choEmBamTiep && !!p.chang && !p.chang.ketThuc && gheNguoi(p).length === 1
 /** Đã đủ bài để giải sớm chưa: mọi em còn ở lại (và còn câu để làm) đã chốt; hiệp trùm thì mọi ý do người giữ đã chốt. */
 function duBai(p: PhongDoan): boolean {
   const c = p.chang!
@@ -474,7 +487,7 @@ async function khungNhin(env: Env, ma: string, p: PhongDoan, revision: number, s
   const kb = kichBanChang(c.hatGiong)
   doan.tran = {
     tenChang: c.tenChang, hiep: c.hiep, soHiep: SO_HIEP, laTrum, ketThuc: c.ketThuc, thang: c.thang, linhTam: c.linhTam, quai: c.quai, trumVoGiap: c.trumVoGiap,
-    nangLuong: c.ghe[i]!.nangLuong, daNhanTiepSuc: c.ghe[i]!.daNhanTiepSuc, giay: giayHiepPhong(p), moSauMs: Math.max(0, p.hiepLuc - now), conMs: c.ketThuc ? 0 : Math.max(0, hanHiep(p) - Math.max(now, p.hiepLuc)),
+    nangLuong: c.ghe[i]!.nangLuong, daNhanTiepSuc: c.ghe[i]!.daNhanTiepSuc, giay: giayHiepPhong(p), moSauMs: Math.max(0, p.hiepLuc - now), ...(p.choTiep && now < p.hiepLuc && !c.ketThuc ? { choTiep: true } : {}), conMs: c.ketThuc ? 0 : Math.max(0, hanHiep(p) - Math.max(now, p.hiepLuc)),
     tenQuai: kb.quai.map(q => q.ten), loaiQuai: kb.quai.map(q => q.id), tenTrum: kb.trum.map(t => t.ten), loaiTrum: kb.trum.map(t => t.id),
   }
   const vuaXong = c.lichSu.at(-1)
@@ -588,8 +601,9 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
     if (dangDo) return chay(env, sbd, hoSo, 'doan-xem', { ...b, ma: dangDo.ma_chang }, goiGame)
     const toi = await taoNguoi(env, sbd, hoSo, b, goiGame, now), ma = 'DH' + hex(4)
     // GAME HÓA 2.0: mọi chặng đều chở câu ôn của kế hoạch ngày ⇒ miễn phí, không trần số chặng (hết câu ôn thì không có chặng).
-    if (!await cheDo2(env, sbd)) await quaCongVe(env, sbd, ma, now) // chặng đầu ngày miễn phí; chặng thêm trừ 1 vé; hết vé → lời chỉ cách kiếm vé
-    const phong: PhongDoan = { kind: 'doan-phong', chu: sbd, taoLuc: now, nguoi: [toi], chang: null, hiepLuc: 0, nop: {}, nopY: {}, tinHieu: {}, the: {}, daGiup: [], choGhi: [], trum: {}, giaoY: {}, ketLuc: null }
+    const hoa2 = await cheDo2(env, sbd)
+    if (!hoa2) await quaCongVe(env, sbd, ma, now) // chặng đầu ngày miễn phí; chặng thêm trừ 1 vé; hết vé → lời chỉ cách kiếm vé
+    const phong: PhongDoan = { kind: 'doan-phong', chu: sbd, taoLuc: now, nguoi: [toi], chang: null, hiepLuc: 0, nop: {}, nopY: {}, tinHieu: {}, the: {}, daGiup: [], choGhi: [], trum: {}, giaoY: {}, ketLuc: null, ...(hoa2 ? { choEmBamTiep: true } : {}) }
     if (b.cheDo !== 'phong') { Object.assign(phong, await chonCauTrum(env, ma, phong.nguoi, now)); batDau(phong, ma, now) }
     // GIÀNH CHẶNG NGUYÊN TỬ (thầy 24/09, lát cắt 2): hai yêu cầu SONG SONG chỉ mở MỘT chặng ⇒ không phát hai bộ câu cá nhân cho một em.
     if (!await gianhChangDoan(env, ma, phong, sbd, toi.lop, now)) {
@@ -636,6 +650,11 @@ async function chay(env: Env, sbd: string, hoSo: Profile, action: string, b: Row
       }
     } else if (i < 0) throw new Error('Em chưa ở trong đoàn này.')
     else if (action === 'doan-xem') { /* chỉ xem */ }
+    else if (action === 'doan-tiep') {
+      // Hóa 2.0: em đọc xong lời giải, bấm "ĐÁNH TIẾP" ⇒ hiệp kế MỞ NGAY, đồng hồ bắt đầu từ lúc này. Lặp lại / tới trễ ⇒ không làm gì.
+      const c = phong.chang
+      if (c && !c.ketThuc && phong.choTiep && now < phong.hiepLuc) { phong.hiepLuc = now; phong.choTiep = false; tienHanh(phong, now); doi = true }
+    }
     else if (action === 'doan-bat-dau') {
       if (phong.chu !== sbd) throw new Error('Chỉ bạn mở đoàn mới cho đoàn lên đường được.')
       if (!phong.chang) { Object.assign(phong, await chonCauTrum(env, ma, phong.nguoi, now)); batDau(phong, ma, now); doi = true }
