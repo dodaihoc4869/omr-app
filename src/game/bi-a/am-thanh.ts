@@ -13,9 +13,6 @@ export class AmThanhBia {
   private noise: AudioBuffer | null = null
   private master: GainNode | null = null
   private rv: ConvolverNode | null = null
-  private lanG: GainNode | null = null
-  private lanF: BiquadFilterNode | null = null
-  private lanCu = -1
   private hang: { k: 'bi' | 'bang'; v: number; pan: number }[] = []
   tat: boolean
   private taoCtx: () => Ctx | null
@@ -41,15 +38,7 @@ export class AmThanhBia {
         for (let ch = 0; ch < 2; ch++) { const x = ir.getChannelData(ch); for (let i = 0; i < rl; i++) { const t = i / c.sampleRate; x[i] = (Math.random() * 2 - 1) * Math.exp(-t * 6.5) * (t < 0.012 ? t / 0.012 : 1) } }
         this.rv = c.createConvolver(); this.rv.buffer = ir
         const rg = c.createGain(); rg.gain.value = 0.16; this.rv.connect(rg); rg.connect(this.master)
-        // Tiếng lăn trên nỉ: nhiễu nâu lặp, lọc dải; âm lượng theo tổng tốc độ các bi.
-        const bl = c.createBuffer(1, c.sampleRate * 2, c.sampleRate), bd = bl.getChannelData(0)
-        let lt = 0
-        for (let i = 0; i < bd.length; i++) { lt = (lt + 0.02 * (Math.random() * 2 - 1)) / 1.02; bd[i] = lt * 3.5 }
-        const src = c.createBufferSource(); src.buffer = bl; src.loop = true
-        this.lanF = c.createBiquadFilter(); this.lanF.type = 'bandpass'; this.lanF.frequency.value = 420; this.lanF.Q.value = 0.6
-        const f2 = c.createBiquadFilter(); f2.type = 'lowpass'; f2.frequency.value = 1600
-        this.lanG = c.createGain(); this.lanG.gain.value = 0
-        src.connect(this.lanF); this.lanF.connect(f2); f2.connect(this.lanG); this.lanG.connect(this.master); src.start()
+        // Không có tiếng lăn trên nỉ (thầy bỏ hẳn 28/09): bi đang lăn thì im, chỉ phát tiếng va chạm / rơi lỗ / tín hiệu.
       }
       if (this.ctx.state === 'suspended') void this.ctx.resume().catch(() => {})
     } catch { /* âm thanh không bao giờ chặn ván */ }
@@ -135,14 +124,5 @@ export class AmThanhBia {
     }
     return nb + nc
   }
-  /** Tiếng lăn trên nỉ: gọi mỗi khung với tổng tốc độ các bi đang lăn. */
-  lan(tongTocDo: number): void {
-    if (!this.ctx || !this.lanG || !this.lanF) return
-    const g = this.tat ? 0 : Math.min(0.28, tongTocDo / 9000)
-    if (Math.abs(g - this.lanCu) < 0.004) return
-    this.lanCu = g
-    const t = this.ctx.currentTime
-    this.lanG.gain.setTargetAtTime(g, t, 0.06); this.lanF.frequency.setTargetAtTime(260 + Math.min(600, tongTocDo / 6), t, 0.1)
-  }
-  dong(): void { try { void this.ctx?.close() } catch { /* bỏ qua */ } this.ctx = null; this.master = null; this.lanG = null; this.lanF = null }
+  dong(): void { try { void this.ctx?.close() } catch { /* bỏ qua */ } this.ctx = null; this.master = null }
 }

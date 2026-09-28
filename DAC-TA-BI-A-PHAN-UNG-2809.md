@@ -395,7 +395,6 @@ Cửa trên Sảnh: thêm prop `onChoiBia` vào `SanhBanDoProps` (`SanhBanDo.tsx
 | Bi chạm bi | 3 dao động không hoà âm (≈2,7–3,6 kHz × 1; 1,53; 2,31) tắt trong 12–28 ms + nhiễu cao 3,5 kHz — tiếng "cạch" nhựa phenolic | mỗi va chạm |
 | Dội băng | nhiễu trầm 320 Hz 60 ms + 120→70 Hz — cao su | mỗi lần chạm băng, hàm lỗ |
 | Rơi lỗ | chạm túi (nhiễu 420 Hz + 150→60 Hz) rồi 6 tiếng lọc cọc thưa dần trong máng + tiếng ầm 0,7 giây | bi rơi |
-| Lăn trên nỉ | nhiễu nâu lặp, lọc dải; âm lượng và độ sáng theo **tổng tốc độ** các bi | liên tục khi bi lăn |
 | Đặt bi cái, xoa phấn | tiếng chạm nỉ; 5 tiếng sột soạt | thả bi cái; mở chọn xoáy |
 | Trả lời đúng / sai | chuông 4 nốt đi lên / 2 nốt đi xuống nhẹ | chấm câu |
 | Bi hoá vàng, ăn bi | chuỗi nốt cao lấp lánh; tiếng "ting" | giải trước đúng; ăn bi |
@@ -404,6 +403,7 @@ Cửa trên Sảnh: thêm prop `onChoiBia` vào `SanhBanDoProps` (`SanhBanDo.tsx
 | Mở tấm câu | tiếng lật giấy | mở câu, mở Xem lại câu sai |
 | Thắng ván | kèn 4 nốt + hợp âm + tiếng vỗ tay | hạ Bi chốt đúng |
 
+- **KHÔNG có tiếng lăn trên nỉ** (thầy bỏ hẳn 28/09): bi đang lăn thì im; chỉ có tiếng va chạm, rơi lỗ và các tín hiệu trong bảng trên.
 - Mở khoá âm thanh ở thao tác chạm/phím đầu tiên (luật trình duyệt). Tắt/bật: nút loa và phím M, dùng chung khoá `localStorage 'game-battle-muted'` qua `battleMuted()`/`setBattleMuted()` của `battle-audio.ts`. Tôn trọng máy đang tắt tiếng.
 - Bản vẽ có thẻ "Nghe thử từng tiếng" (16 nút) để thầy duyệt.
 

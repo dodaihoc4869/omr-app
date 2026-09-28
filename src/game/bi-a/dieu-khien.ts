@@ -251,8 +251,6 @@ export class VanBia {
     for (const n2 of this.noi) n2.t += dt
     this.noi = this.noi.filter((n2) => n2.t < 1.2)
   }
-  /** Tổng tốc độ các bi (âm thanh lăn trên nỉ). */
-  tongTocDo(): number { let s = 0; if (this.pha === 'moving') for (const b of this.st.balls) if (b.on) s += Math.hypot(b.vx, b.vy); return s }
 
   // ───────────── cuối cú đánh ─────────────
   ketThucCu(): void {

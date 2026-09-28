@@ -33,7 +33,7 @@ afterEach(() => setBattleMuted(false))
 describe('AmThanhBia', () => {
   it('máy không có Web Audio ⇒ mọi lệnh im lặng, không ném lỗi', () => {
     const a = new AmThanhBia(() => null)
-    expect(() => { a.mo(); for (const k of DS_TIENG) a.phat(k, 500, 0.3); a.gom('bi', 900, 0); a.xa(); a.lan(3000); a.dong() }).not.toThrow()
+    expect(() => { a.mo(); for (const k of DS_TIENG) a.phat(k, 500, 0.3); a.gom('bi', 900, 0); a.xa(); a.dong() }).not.toThrow()
     expect(a.ctx).toBeNull()
   })
   it('đủ 15 tiếng; tiếng nào cũng phát ra ít nhất một nguồn âm', () => {
@@ -46,6 +46,14 @@ describe('AmThanhBia', () => {
       a.phat(k, 900, -0.4)
       expect(dem.nguon, `tiếng ${k}`).toBeGreaterThan(truoc)
     }
+  })
+  it('KHÔNG có tiếng lăn trên nỉ (thầy bỏ 28/09): mở âm thanh không bật nguồn nào chạy liên tục, không còn hàm lan', () => {
+    const { ctx, dem } = taoCtxGia()
+    const a = new AmThanhBia(() => ctx)
+    a.mo()
+    expect(dem.nguon).toBe(0)
+    expect('lan' in a).toBe(false)
+    expect(DS_TIENG).not.toContain('lan')
   })
   it('một khung nhiều va chạm ⇒ chỉ phát 5 tiếng bi + 3 tiếng băng to nhất', () => {
     const { ctx } = taoCtxGia()

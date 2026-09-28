@@ -91,7 +91,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
       const dt = Math.min(0.05, (now - truoc) / 1000); truoc = now
       if (spaceRef.current !== null && v.pha === 'aim') { const p = Math.min(1, (now - spaceRef.current) / 1400); v.datLuc(p); setLucHien(p) }
       v.buoc(dt)
-      am.xa(); am.lan(v.tongTocDo())
+      am.xa()
       const cv = cvRef.current, ctx = cv?.getContext('2d'), k = khungRef.current, bv = boVeRef.current
       const c = chiRef.current, conChi = c && (!c.den || now < c.den) ? c : null
       if (c && c.den && now >= c.den) chiRef.current = null
