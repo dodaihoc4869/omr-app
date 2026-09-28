@@ -217,8 +217,6 @@ async function songSong<T, R>(ds: T[], soLuong: number, viec: (x: T) => Promise<
   return ra
 }
 
-const KHOA_THE_LEN_BANG = 'ddh.theLenBang'
-
 /** LÊN BẢNG — HAI THẺ ở đầu mục (thầy 28/09):
  *  · Thẻ thứ nhất: Game Hóa 2.0 BẬT (cờ `/gv/chien-dich` co-doc) ⇒ Chiến dịch (`LenBangChienDich`: Bảng chiến dịch / Buổi chữa); cờ TẮT ⇒ màn Gọi lên
  *    bảng theo ca kiểm tra (`GoiLenBangCu` dưới đây, giữ cho app thầy khi chưa bật 2.0). ĐÃ XOÁ nút "Gọi lên bảng theo một ca kiểm tra (cách cũ)" ở
@@ -226,21 +224,8 @@ const KHOA_THE_LEN_BANG = 'ddh.theLenBang'
  *  · Thẻ DẠY HỌC (thủ công): điểm danh → chọn câu kho Dạy học → chiếu, app chọn em (`src/components/day-hoc/DayHocLenBang.tsx`). */
 export default function GoiLenBangScreen() {
   const hoa2 = useHoa2Bat()
-  const [the, setThe] = useState<'chinh' | 'day_hoc'>(() => {
-    try {
-      return sessionStorage.getItem(KHOA_THE_LEN_BANG) === 'day_hoc' ? 'day_hoc' : 'chinh'
-    } catch {
-      return 'chinh'
-    }
-  })
-  const chon = (t: 'chinh' | 'day_hoc') => {
-    setThe(t)
-    try {
-      sessionStorage.setItem(KHOA_THE_LEN_BANG, t)
-    } catch {
-      /* máy chặn bộ nhớ: chỉ mất phần nhớ thẻ */
-    }
-  }
+  // Mỗi lần mở mục là thẻ thứ nhất (không nhớ qua lần tải lại — tránh thầy mở ra màn khác với lần trước mà không để ý).
+  const [the, chon] = useState<'chinh' | 'day_hoc'>('chinh')
   const DS_THE = [
     { id: 'chinh' as const, ten: hoa2 ? 'Chiến dịch' : 'Theo ca kiểm tra' },
     { id: 'day_hoc' as const, ten: 'Dạy học' },
