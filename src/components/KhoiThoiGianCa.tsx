@@ -42,7 +42,8 @@ export default function KhoiThoiGianCa({ ca, themPhut }: { ca: CaGioHienThi; the
     return () => clearInterval(t)
   }, [coChung])
   const cl = conLaiCa(ca, now)
-  const coThemPhut = !!themPhut && ca.trangThai === 'mo' && ca.loai !== 'baitap'
+  // Ca còn ở PHÒNG CHỜ (chưa bấm Bắt đầu thi): đồng hồ chưa chạy nên "Thêm 5 phút" chưa có nghĩa ⇒ ẩn (thầy 28/09: không để một thẻ chỉ có một nút).
+  const coThemPhut = !!themPhut && ca.trangThai === 'mo' && ca.loai !== 'baitap' && !(ca.phongCho && !ca.batDauThiLuc)
   const tong = tongMoi ?? themPhut?.tong ?? 0
   const chayThemPhut = async () => {
     if (!themPhut) return
