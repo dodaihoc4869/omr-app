@@ -27,7 +27,7 @@ describe('Chọn bạn đồng hành', () => {
     fireEvent.change(o, { target: { value: '@@@' } })
     fireEvent.click(screen.getByRole('button', { name: 'CHỌN THUỶ LONG' }))
     expect(onChon).toHaveBeenCalledTimes(1)
-    expect(screen.getByRole('alert').textContent).toMatch(/1–24/)
+    expect(screen.getByRole('alert').textContent).toMatch(/1–16/)
   })
   it('mọi tên gợi ý đều hợp lệ; nút gợi ý điền tên của đúng thú đang ở giữa và xoay vòng', () => {
     expect(TEN_GOI_Y.length).toBe(PETS.length)
