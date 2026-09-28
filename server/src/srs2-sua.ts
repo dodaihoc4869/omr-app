@@ -18,6 +18,7 @@
 // Schema CHỈ-THÊM, tạo lúc chạy (CI không chạy migration): `chien_dich_em`, `chien_dich_sua`.
 // Không gửi đáp án/lời giải: chỉ trả mã tờ, số câu, SBD.
 import type { Env } from './kieu'
+import { chayDdlMotLan } from './ddl-mot-lan'
 import { cauCuaToChiTiet, maGocCuaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
 import { batDauCua, chuaBatDau, docChienDichKemBatDau, docMocThemCaLop, ghiBatDau, ngayVnCua, type ChienDich } from './srs2-d1'
 import { khoiLuongCan, soNgayConLai } from './srs2-loi'
@@ -50,7 +51,7 @@ export const LENH_TAO_BANG_SUA = [
   'CREATE INDEX IF NOT EXISTS idx_chien_dich_sua_cd ON chien_dich_sua(chien_dich_id, luc)',
 ]
 async function taoBang(env: Env): Promise<void> {
-  for (const l of LENH_TAO_BANG_SUA) await env.DB.prepare(l).run()
+  await chayDdlMotLan(env, 'chien_dich_sua', LENH_TAO_BANG_SUA) // một batch, một lần mỗi isolate (ddl-mot-lan.ts)
 }
 
 export interface KeHoachSua {

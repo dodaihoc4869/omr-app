@@ -73,7 +73,7 @@ describe('LUẬT ĐẾM PHẢI KHỚP APPS SCRIPT — lệch một ly là thầy
   const SQL = MAY.slice(MAY.indexOf('async function danhSachCaMoi'), MAY.indexOf('async function danhSachCaMoi') + 2600)
 
   it('lấy LẦN THỬ CAO NHẤT của mỗi em trong ca', () => {
-    expect(SQL).toContain('SELECT ma_ca, sbd, MAX(lan_thu) AS m FROM luot GROUP BY ma_ca, sbd')
+    expect(SQL).toContain('SELECT ma_ca, sbd, MAX(lan_thu) AS m FROM luot WHERE ma_ca IN (SELECT ma_ca FROM ca WHERE ${locCa}) GROUP BY ma_ca, sbd')
   })
 
   it('lượt `duoc_duyet_lai` KHÔNG tính vào bất kỳ ô nào', () => {
