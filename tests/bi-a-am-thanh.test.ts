@@ -2,6 +2,7 @@
 // tắt tiếng dùng CHUNG khoá với trận Đảo (battle-audio); máy không có Web Audio thì im lặng, không lỗi.
 import { describe, it, expect, afterEach } from 'vitest'
 import { AmThanhBia, DS_TIENG } from '../src/game/bi-a/am-thanh'
+import { VanBia } from '../src/game/bi-a/dieu-khien'
 import { battleMuted, setBattleMuted } from '../src/game/than-thu-v2/battle-audio'
 
 // AudioContext giả: nút nào cũng nối được, đếm số nguồn âm đã `start`.
@@ -55,6 +56,14 @@ describe('AmThanhBia', () => {
     expect('lan' in a).toBe(false)
     expect(DS_TIENG).not.toContain('lan')
   })
+  it('tiếng bi chạm bi "khô" (cú phá bàn) không gửi sang vang phòng — hàng chục đuôi vang chồng nhau nghe như bi lăn trên nỉ', () => {
+    const { ctx, dem } = taoCtxGia()
+    const a = new AmThanhBia(() => ctx)
+    a.mo()
+    let n = dem.nut; a.gom('bi', 1500, 0, false); a.xa(); const coVang = dem.nut - n
+    n = dem.nut; a.gom('bi', 1500, 0, true); a.xa(); const kho = dem.nut - n
+    expect(coVang - kho).toBe(1) // đúng một nút gửi vang phòng bị bỏ
+  })
   it('một khung nhiều va chạm ⇒ chỉ phát 5 tiếng bi + 3 tiếng băng to nhất', () => {
     const { ctx } = taoCtxGia()
     const a = new AmThanhBia(() => ctx)
@@ -63,6 +72,28 @@ describe('AmThanhBia', () => {
     for (let i = 0; i < 6; i++) a.gom('bang', 50 * i, 0)
     expect(a.xa()).toBe(8)
     expect(a.xa()).toBe(0) // hàng đã xả
+  })
+  it('cú PHÁ BÀN thật (thầy 28/09): chỉ phát tiếng bi chạm bi, khô — không tiếng gậy, không băng, không rơi lỗ; cú sau có lại tiếng gậy', () => {
+    let s = 7
+    const rand = () => ((s = (s * 16807) % 2147483647) / 2147483647)
+    const nhat: string[] = []
+    const v = new VanBia({ cheDo: 'don', loai: 'ai', tenEm: 'Em', cauEm: [], chot: null, rand }, {
+      moCau: () => {}, ketThuc: () => {},
+      am: (k) => { nhat.push(k) },
+      gomVa: (k, _v, _x, _y, kho) => { nhat.push(k === 'bi' ? (kho ? 'bi-kho' : 'bi-vang') : k) },
+    })
+    expect(v.isBreak).toBe(true)
+    v.datLuc(1)
+    expect(v.ban()).toBe(true)
+    for (let i = 0; i < 4000 && v.pha === 'moving'; i++) v.buoc(1 / 60)
+    const trongPhaBan = [...nhat]
+    expect(trongPhaBan.filter((k) => k === 'bi-kho').length).toBeGreaterThan(5)
+    expect(trongPhaBan.filter((k) => ['co', 'bang', 'lo', 'bi-vang'].includes(k))).toEqual([])
+    // cú thường sau phá bàn: có lại tiếng gậy
+    nhat.length = 0
+    v.isBreak = false; v.pha = 'aim'; v.cur = 0; v.datLuc(0.5)
+    expect(v.ban()).toBe(true)
+    expect(nhat[0]).toBe('co')
   })
   it('tắt tiếng: không phát nữa, lưu CHUNG khoá với trận Đảo; bản mới đọc lại trạng thái tắt', () => {
     const { ctx, dem } = taoCtxGia()

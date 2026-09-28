@@ -26,7 +26,8 @@ export interface SuKienVan {
   moCau(y: YeuCauCau): void
   /** Phát một tiếng; (x, y) là toạ độ bàn để lệch trái/phải theo màn (vắng ⇒ giữa). */
   am(k: 'co' | 'lo' | 'dat' | 'an' | 'loi' | 'luot' | 'tich' | 'thang' | 'vang' | 'dung' | 'sai', v?: number, x?: number, y?: number): void
-  gomVa(k: 'bi' | 'bang', v: number, x: number, y: number): void
+  /** `kho`: tiếng khô, không vang phòng (cú phá bàn — hàng chục đuôi vang chồng nhau nghe như bi lăn trên nỉ). */
+  gomVa(k: 'bi' | 'bang', v: number, x: number, y: number, kho?: boolean): void
   ketThuc(k: KetThucVan): void
 }
 export interface TuyChonVan {
@@ -192,7 +193,7 @@ export class VanBia {
     const nguoi = !this.ghe[this.cur]!.ai
     if (nguoi && this.matThan > 0 && this.loai !== 'giao_huu') { this.matThan--; this.dungMT = true } else this.dungMT = false
     this.pha = 'moving'; this.ballInHand = false; this.acc = 0; this.soCu++
-    this.sk.am('co', tocDo(p), c.x, c.y)
+    if (!this.isBreak) this.sk.am('co', tocDo(p), c.x, c.y) // phá bàn: chỉ tiếng bi chạm bi (thầy 28/09)
     this.power = 0
     this.doi()
     return true
@@ -219,10 +220,12 @@ export class VanBia {
       this.acc += dt * this.nhan
       let n = 0
       const hook = (k: 'bi' | 'bang' | 'lo', a: Bi, b: Bi | Lo | null, v?: number) => {
-        if (k === 'bi') this.sk.gomVa('bi', v ?? 0, a.x, a.y)
-        else if (k === 'bang') this.sk.gomVa('bang', Math.hypot(a.vx, a.vy), a.x, a.y)
-        else if (k === 'lo' && b && a.id !== 'cue') { this.roi.push({ id: a.id, x: a.x, y: a.y, px: b.x, py: b.y, t: 0 }); this.viTriLo[a.id] = { x: b.x, y: b.y }; this.sk.am('lo', 0, b.x, b.y) }
-        else if (k === 'lo' && b) { this.roi.push({ id: 'cue', x: a.x, y: a.y, px: b.x, py: b.y, t: 0 }); this.sk.am('lo', 0, b.x, b.y) }
+        // Cú phá bàn (thầy 28/09): CHỈ tiếng bi chạm bi, khô (không vang) — không tiếng băng, không tiếng rơi lỗ.
+        const phaBan = this.isBreak
+        if (k === 'bi') this.sk.gomVa('bi', v ?? 0, a.x, a.y, phaBan)
+        else if (k === 'bang') { if (!phaBan) this.sk.gomVa('bang', Math.hypot(a.vx, a.vy), a.x, a.y) }
+        else if (k === 'lo' && b && a.id !== 'cue') { this.roi.push({ id: a.id, x: a.x, y: a.y, px: b.x, py: b.y, t: 0 }); this.viTriLo[a.id] = { x: b.x, y: b.y }; if (!phaBan) this.sk.am('lo', 0, b.x, b.y) }
+        else if (k === 'lo' && b) { this.roi.push({ id: 'cue', x: a.x, y: a.y, px: b.x, py: b.y, t: 0 }); if (!phaBan) this.sk.am('lo', 0, b.x, b.y) }
       }
       while (this.acc >= HS && n < 24 * this.nhan) { step(this.st, this.ev, hook); for (const b of this.st.balls) if (b.on) quay(b, HS); this.acc -= HS; n++ }
       if (!dangChay(this.st)) { this.acc = 0; this.pha = 'xet'; this.sau(() => this.ketThucCu(), this.roi.length ? 260 : 120); this.doi() }

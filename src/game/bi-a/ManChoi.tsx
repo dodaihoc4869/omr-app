@@ -63,7 +63,7 @@ export default function ManChoi({ token, tenEm, van, session, cheDo, loai, cauEm
   const [v] = useState(() => new VanBia({ cheDo, loai, tenEm, cauEm, chot }, {
     moCau: (y) => setSheet(y),
     am: (k, sp, x, y) => am.phat(k, sp ?? 0, pan(x, y)),
-    gomVa: (k, sp, x, y) => am.gom(k, sp, pan(x, y)),
+    gomVa: (k, sp, x, y, kho) => am.gom(k, sp, pan(x, y), kho),
     ketThuc: (k) => setKet(k),
   }))
   useSyncExternalStore(useCallback((fn: () => void) => v.dangKy(fn), [v]), () => v.phienBan)
