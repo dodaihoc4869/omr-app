@@ -128,6 +128,8 @@ export default defineConfig({
           // Gộp ngang + app thầy 2.0 (28/09): các mảnh nạp LƯỜI chỉ của app thầy (giao/chiếu chiến dịch, bố cục tờ chiếu) và của game
           // (cửa hàng phụ kiện, lọc câu theo khối) ra kho chạy-lúc — giữ precache vỏ ≤ 2850 KB (chừa ≥ 150 KB dưới trần 3000 KB).
           '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau}-*.{js,css}',
+          // Màn làm bài NGANG (28/09): mảnh nạp lười chỉ máy ngang/máy tính cần; màn thi tải sẵn khi máy đang ngang, nạp hỏng thì ở lại bố cục dọc.
+          '**/LamBaiNgang-*.{js,css}',
           // Tải PDF "Câu đã làm" (28/09): jspdf (+ canvg `index.es`, dompurify `purify.es`, html2canvas mà jspdf kéo theo) và html2canvas-pro
           // ≈ 1 MB, chỉ nạp khi em bấm "Tải PDF" (import động, lúc đó đang có mạng) — cất ở kho chạy-lúc, KHÔNG vào precache vỏ.
           '**/{jspdf.es.min,html2canvas,html2canvas-pro.esm,purify.es,index.es,pdf-cau-da-lam}-*.js',

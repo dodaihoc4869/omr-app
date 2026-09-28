@@ -198,7 +198,7 @@ describe('Chromium thật — bố cục', () => {
 describe('khoá nguồn', () => {
   it('nút KHÔNG chặn Enter/không phải submit; hai nút dùng preventDefault ở pointerdown + mousedown; không hex trong CSS/TSX', () => {
     const src = fs.readFileSync(path.join(process.cwd(), 'src/components/ONhapDapSo.tsx'), 'utf8')
-    expect(src.match(/type="button"/g)).toHaveLength(2)
+    expect(src.match(/type="button"/g)).toHaveLength(3) // "−", "," và "⌫" (28/09, chỉ hiện khi truyền nutXoa)
     expect(src).toMatch(/onPointerDown=\{giuTieuDiem\}/)
     expect(src).toMatch(/onMouseDown=\{giuTieuDiem\}/)
     expect(src).not.toMatch(/onTouchStart/) // preventDefault ở touchstart chặn luôn cú click trên điện thoại

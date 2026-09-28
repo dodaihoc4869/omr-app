@@ -3,6 +3,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render } from '@testing-library/react'
 import TheCau from '../src/components/TheCau'
+import { chuanDauGo } from '../src/lib/nhap-dap-so'
 
 afterEach(cleanup)
 
@@ -24,10 +25,10 @@ const theCau = (selected: string, onChange = vi.fn()) => {
 }
 
 describe('bố cục + nhãn cũ giữ nguyên', () => {
-  it('thứ tự trong khối: "−", ",", rồi ô nhập (như cũ); placeholder "Nhập đáp án"; bàn phím số; aria-label cũ', () => {
+  it('thứ tự trong khối: "−", ",", rồi ô nhập (như cũ), rồi "⌫" (thêm 28/09); placeholder "Nhập đáp án"; bàn phím số; aria-label cũ', () => {
     const { container } = theCau('')
     const khoi = container.querySelector('.ond')!
-    const [a, b, c] = [...khoi.children]
+    const [a, b, c, d] = [...khoi.children]
     expect(a!.tagName).toBe('BUTTON')
     expect(a!.getAttribute('aria-label')).toBe('Thêm dấu âm')
     expect(a!.textContent).toBe('−')
@@ -37,7 +38,9 @@ describe('bố cục + nhãn cũ giữ nguyên', () => {
     expect(c!.tagName).toBe('INPUT')
     expect(c!.getAttribute('placeholder')).toBe('Nhập đáp án')
     expect(c!.getAttribute('inputmode')).toBe('decimal')
-    expect(khoi.children).toHaveLength(3)
+    expect(d!.tagName).toBe('BUTTON')
+    expect(d!.getAttribute('aria-label')).toBe('Xoá một ký tự')
+    expect(khoi.children).toHaveLength(4)
   })
   it('nhãn nút "−" đổi Thêm/Bỏ dấu âm theo giá trị như cũ; nút có lớp tap-target; ô có lớp tap-target', () => {
     for (const v of GIA_TRI) {
@@ -72,12 +75,15 @@ describe('GÓI GỬI LÊN không đổi: onChange nhận đúng chuỗi của b�
       cleanup()
     }
   })
-  it('gõ tay ⇒ onChange đúng chuỗi trong ô (không chuẩn hoá, không lọc)', () => {
-    for (const v of ['12,5', '-3', '5 mol', '0.54', '−7', 'abc', '']) {
+  // 28/09 (thầy, ảnh phiếu Phần III có "12.3"): màn thi đổi "." ⇒ "," và dấu trừ Unicode ⇒ "-" ngay khi gõ; ngoài ra không lọc gì.
+  // Hàm chấm vốn coi hai dạng như nhau (tests/lam-bai-ngang-2809.test.tsx chứng minh) ⇒ không đổi điểm.
+  it('gõ tay ⇒ onChange đúng chuỗi trong ô, chỉ chuẩn dấu Việt ("." ⇒ ",", "−" ⇒ "-"), không lọc gì khác', () => {
+    for (const [v, mong] of [['12,5', '12,5'], ['-3', '-3'], ['5 mol', '5 mol'], ['0.54', '0,54'], ['−7', '-7'], ['abc', 'abc'], ['', '']]) {
       const { container, doi } = theCau('x')
       const o = container.querySelector('input') as HTMLInputElement
       fireEvent.change(o, { target: { value: v } })
-      expect(doi).toHaveBeenLastCalledWith(v)
+      expect(doi).toHaveBeenLastCalledWith(mong)
+      expect(chuanDauGo(v)).toBe(mong)
       cleanup()
     }
   })

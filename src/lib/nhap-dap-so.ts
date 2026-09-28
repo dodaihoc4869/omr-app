@@ -71,3 +71,29 @@ export function suaChenPhay(v: string, tu: number, den: number, maxLength?: numb
 export function choPhepPhay(v: string, tu: number, den: number, maxLength?: number): boolean {
   return suaChenPhay(v, tu, den, maxLength) !== null
 }
+
+// ---------------------------------------------------------------------------
+// MÀN THI (thầy 28/09, ảnh phiếu Phần III có câu điền "12.3"): ô đáp số của màn thi đổi "." thành ","
+// ngay khi gõ (chuẩn Việt Nam, như "7,44") và thêm nút "⌫". Chỉ bật ở nơi truyền `chuanViet` cho
+// `ONhapDapSo` — các nơi khác vẫn "em gõ gì gửi nấy". Hàm chấm (`normalizeNumericAnswer`) vốn coi
+// "12.3" = "12,3" và "−0,5" = "-0,5" (test chứng minh), nên đây là việc HIỂN THỊ cho đúng chuẩn, không đổi điểm.
+
+/** Mọi kiểu gạch ngang/dấu trừ Unicode em có thể dán vào. */
+const MOI_DAU_TRU_GO = /[‐‑‒–—―−－]/g
+
+/** Chuẩn hoá chuỗi vừa gõ: "." ⇒ ","; dấu trừ Unicode ⇒ "-"; chỉ giữ dấu thập phân ĐẦU TIÊN. */
+export function chuanDauGo(v: string): string {
+  const s = String(v ?? '').replace(MOI_DAU_TRU_GO, DAU_AM).replace(/\./g, DAU_PHAY)
+  const dau = s.indexOf(DAU_PHAY)
+  if (dau < 0) return s
+  return s.slice(0, dau + 1) + s.slice(dau + 1).split(DAU_PHAY).join('')
+}
+
+/** Nút "⌫": xoá vùng đang chọn, hoặc MỘT ký tự trước con trỏ. Không còn gì để xoá ⇒ null. */
+export function suaXoaLui(v: string, tu: number, den: number): KetQuaSua | null {
+  const s = String(v ?? '')
+  const a = kep(Math.min(tu, den), s.length), b = kep(Math.max(tu, den), s.length)
+  if (a !== b) return { value: s.slice(0, a) + s.slice(b), caret: a }
+  if (a === 0) return null
+  return { value: s.slice(0, a - 1) + s.slice(a), caret: a - 1 }
+}
