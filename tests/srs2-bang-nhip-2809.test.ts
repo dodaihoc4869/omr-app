@@ -93,7 +93,8 @@ describe('danh-sach có thongKe + suc-chua có số câu theo mức độ', () =
     const tron = await gvChienDich(env, { action: 'danh-sach' }, GIAO + 60_000) as { chienDich: Record<string, unknown>[] }
     expect('thongKe' in tron.chienDich[0]!).toBe(false)
     const co = await gvChienDich(env, { action: 'danh-sach', thongKe: true }, GIAO + 60_000) as { chienDich: { thongKe: Record<string, number> }[] }
-    expect(co.chienDich[0]!.thongKe).toMatchObject({ coXat: 1 / 12, thanhThao: 0, dungNhip: 3, quaTai: 0, canDayLaiCau: 0, canDayLaiLuot: 0, emLamQuaDu: 0 })
+    // Thầy chốt 28/09 "Thành thạo lần đầu": Q1 (Phần I Nhận biết) đúng ngay lần đầu ⇒ thành thạo: 1 / 12.
+    expect(co.chienDich[0]!.thongKe).toMatchObject({ coXat: 1 / 12, thanhThao: 1 / 12, dungNhip: 3, quaTai: 0, canDayLaiCau: 0, canDayLaiLuot: 0, emLamQuaDu: 0 })
   })
   it('suc-chua trả số câu theo mức độ (cộng = tổng)', async () => {
     const { env } = await dung()
