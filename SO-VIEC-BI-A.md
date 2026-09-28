@@ -18,6 +18,7 @@ Phiên: cloud, nhánh `claude/fervent-edison-otwz9p`. Không có khoá Cloudflar
 - [x] Precache PWA về lại 146 tệp / 2 901 KB (kiem-sw ĐẠT): loại `BiaGame`, `TrongAi`, `ngang` khỏi precache (`vite.config.ts` globIgnores) — phiên Code app nhắc trần 3 000 KB lúc 11:25 UTC.
 - [x] Phiên Code app kiểm thử gộp (11:29 UTC) ⇒ đã: gộp `origin/main` 441cc5e (gỡ 3 xung đột), precache 169 / 2 941 KB (`build:cf` 13/13), bảng `bi_a_*` tự dựng lúc chạy (CI không chạy migration), tên đối thủ "A.I" thay "A.I Đỗ Đại Học" (test khoá `chu-thay-hoc-sinh-2809`).
 - [x] Thầy lệnh 28/09: bỏ hẳn tiếng bi lăn trên nỉ.
+- [x] Thầy lệnh 28/09 (nhắc 3 lần): phá bàn chỉ còn tiếng bi chạm bi. Gốc tiếng "lăn lẫn trong phá bàn": (1) bản vẽ còn nguyên tiếng lăn + nút thử "Phá bàn" gọi tiếng lăn; (2) đuôi vang phòng 0,9 s của hàng chục tiếng bi chồng nhau thành tiếng xào xạo. Đã: gỡ tiếng lăn khỏi bản vẽ, phá bàn (game + bản vẽ) chỉ phát tiếng bi chạm bi KHÔ, không gậy/băng/lỗ; bỏ tiếng ầm 0,7 s của rơi lỗ. Đo trên bản vẽ: nút Phá bàn 17 tiếng đều bi-khô; phá bàn thật 22 tiếng đều bi-khô. Test khoá: `tests/bi-a-am-thanh.test.ts`.
 - [ ] Phát hành: xếp hàng deploy của phiên Code app (không tự gộp main).
 - [ ] Thầy bật thử cho một lớp ở Cài đặt → Bi-a Phản Ứng.
 
