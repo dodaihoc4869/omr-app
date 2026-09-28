@@ -646,29 +646,10 @@
   color: var(--m3-on-error-container);
   font-variant-numeric: tabular-nums;
 }
+/* thẻ lọc lớp / loại việc: kiểu chung src/styles/the-loc.css (.tl-hang / .tl-the) */
 .hn2-loc-lop {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 12px 0 4px;
+  margin: 12px -2px 4px;
 }
-.hn2-loc {
-  min-height: 44px;
-  padding: 0 16px;
-  border: 0;
-  border-radius: 22px;
-  background: var(--m3-surface-container);
-  color: var(--m3-on-surface);
-  font: inherit;
-  font-size: 13.5px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.hn2-loc[aria-pressed='true'] {
-  background: var(--m3-primary);
-  color: var(--m3-on-primary);
-}
-.hn2-loc:focus-visible,
 .hn2-em-ten--nut:focus-visible {
   outline: 2px solid var(--m3-primary);
   outline-offset: 2px;

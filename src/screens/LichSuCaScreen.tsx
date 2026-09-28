@@ -7,6 +7,7 @@
 // năm sinh"; hàng thẻ số tháng này; bỏ phụ đề, bỏ khối chiến dịch (sang màn Chiến dịch luyện), bỏ "Đồng bộ lại phiếu mọi ca"
 // (cất ở Cài đặt › Công cụ kỹ thuật) và nút lớn "Mở ca kiểm tra đầu tiên" (trống = một dòng chữ); ca bài tập về nhà (cũ) ẩn khỏi
 // mặc định, lọc ra được. Cờ tắt ⇒ màn y như cũ.
+import ChuTheLoc, { tenTheLoc } from '../components/ChuTheLoc'
 import { useEffect, useMemo, useState } from 'react'
 import { CheckSquare, RefreshCw, RotateCcw, Search, Square, Trash2, ChevronDown, ChevronRight, ClipboardList } from 'lucide-react'
 import { Nhan, OThongBao, NutChinh, TheNoiDung } from '../components/DesignSystem'
@@ -371,20 +372,20 @@ export default function LichSuCaScreen() {
         </div>
 
         {!xemDaXoa && dsCa !== null && dsCa.length > 0 && (
-          <div className="ls-chips" role="group" aria-label="Lọc theo trạng thái ca">
+          <div className="tl-hang ls-chips" role="group" aria-label="Lọc theo trạng thái ca">
             {(
               [
-                ['', `Tất cả ${dsCa.length}`],
-                ['mo', `Đang mở ${demMo}`],
-                ['dong', `Đã đóng ${demDong}`],
+                ['', 'Tất cả', dsCa.length],
+                ['mo', 'Đang mở', demMo],
+                ['dong', 'Đã đóng', demDong],
               ] as const
-            ).map(([k, ten]) => (
-              <button key={k || '__tat_ca_tt'} type="button" onClick={() => setTtLoc(k)} aria-pressed={ttLoc === k} className={`tap-target ls-chip${ttLoc === k ? ' ls-chip--chon' : ''}`} style={SO}>
-                {ten}
+            ).map(([k, ten, so]) => (
+              <button key={k || '__tat_ca_tt'} type="button" onClick={() => setTtLoc(k)} aria-pressed={ttLoc === k} aria-label={tenTheLoc(ten, so, ' ')} className={`tl-the ls-chip${ttLoc === k ? ' ls-chip--chon' : ''}`}>
+                <ChuTheLoc chu={ten} so={so} noi=" " />
               </button>
             ))}
             {hoa2 && coBaiTap && (
-              <button type="button" onClick={() => setHienBaiTap((v) => !v)} aria-pressed={hienBaiTap} className={`tap-target ls-chip${hienBaiTap ? ' ls-chip--chon' : ''}`}>
+              <button type="button" onClick={() => setHienBaiTap((v) => !v)} aria-pressed={hienBaiTap} className={`tl-the ls-chip${hienBaiTap ? ' ls-chip--chon' : ''}`}>
                 Loại: Bài tập về nhà (cũ)
               </button>
             )}
@@ -392,7 +393,7 @@ export default function LichSuCaScreen() {
         )}
 
         {dsLop.length > 1 && (
-          <div className="ls-chips" role="group" aria-label="Lọc theo lớp">
+          <div className="tl-hang ls-chips" role="group" aria-label="Lọc theo lớp">
             {['', ...dsLop].map((l) => {
               const chon = lopLoc === l
               return (
@@ -400,8 +401,8 @@ export default function LichSuCaScreen() {
                   key={l || '__tat_ca'}
                   type="button"
                   onClick={() => setLopLoc(l)}
-                  className={`tap-target ls-chip${chon ? ' ls-chip--chon' : ''}`}
-                  style={SO}
+                  aria-pressed={chon}
+                  className={`tl-the ls-chip${chon ? ' ls-chip--chon' : ''}`}
                 >
                   {l || 'Tất cả'}
                 </button>

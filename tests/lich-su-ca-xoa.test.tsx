@@ -133,7 +133,8 @@ describe('Ca thi — tích chọn xoá', () => {
 
   it('bộ lọc lớp đang bật: "Chọn tất cả" không đụng ca của lớp khác', async () => {
     const r = await moMan([ca('111111', '12', 0), ca('222222', '2', 0)])
-    fireEvent.click(r.getByText('2'))
+    // 28/09: số đếm "Tất cả 2" nay là huy hiệu riêng (thẻ lọc chung) ⇒ chữ "2" có ở hai chỗ; bấm đúng NÚT lớp "2"
+    fireEvent.click(r.getByRole('button', { name: '2' }))
     fireEvent.click(r.getByText('Chọn tất cả (1)'))
     await act(async () => {
       fireEvent.click(r.getByText('Xoá 1'))

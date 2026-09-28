@@ -236,9 +236,9 @@ export default function CuaHang(p: CuaHangProps) {
   )
   const phai = (
     <>
-      <div className="ps-loc" role="group" aria-label={chuLocNhan}>
+      <div className="tl-hang tl-hang--mot-dong ps-loc" role="group" aria-label={chuLocNhan}>
         {bo.map((b) => (
-          <button key={b.ma} type="button" aria-pressed={p.loc === b.ma} disabled={p.dangTai || b.sap} data-loc={b.ma} onClick={() => p.onLoc(b.ma)}>
+          <button key={b.ma} type="button" className="tl-the" aria-pressed={p.loc === b.ma} disabled={p.dangTai || b.sap} data-loc={b.ma} onClick={() => p.onLoc(b.ma)}>
             {b.chu}
             {b.sap && <em>{chuSapMo}</em>}
           </button>
