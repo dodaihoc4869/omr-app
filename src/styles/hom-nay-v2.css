@@ -979,30 +979,6 @@
 .hn2-luoi-b > .hn2-the--chua .hn2-nut {
   align-self: flex-start;
 }
-/* Bộ não A.I · đêm qua (component dùng chung .bnao): trong hàng B thành khung cuộn, đầu dính, tiêu đề MỘT dòng, trạng thái ở dòng phụ */
-.hn2-luoi-b > .bnao {
-  gap: 12px;
-  padding-top: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-.hn2-luoi-b > .bnao > .bnao-dau {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  flex-wrap: nowrap;
-  padding: 18px 0 8px;
-  background: var(--m3-surface-container-lowest);
-}
-.hn2-luoi-b > .bnao .bnao-tieu-de {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.hn2-luoi-b > .bnao .bnao-dau-chu {
-  min-width: 0;
-}
-
 /* Điện thoại: đặt SAU các luật gốc (luật cùng độ ưu tiên thì cái viết sau thắng) */
 @media (max-width: 719px) {
   .hn2-bai {

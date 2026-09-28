@@ -33,7 +33,7 @@ const NAY = Date.parse('2026-09-21T13:31:00Z') // 20:31 Thứ Hai 21/09/2026 gi�
 const sk = (luc: string, loai: string, tieuDe: string, o: Record<string, unknown> = {}) => ({ luc, loai, tieuDe, chiTiet: { mota: '' }, chips: [], ...o })
 const DONG_1: unknown[] = [
   sk('2026-09-21T13:14:00Z', 'btvn', 'Chương 1 · Ester – Lipid · chặng 3 trong 7 chặng', { chiTiet: { mota: 'Làm 6 câu trong 14 phút: đúng 5, sai 1.', maBtvn: 'B1' }, chips: [{ chu: '5 đúng', muc: 'tot' }, { chu: '1 sai', muc: 'sai' }, { chu: 'câu cốt lõi 4/6', muc: 'trung' }] }),
-  sk('2026-09-21T13:02:00Z', 'bo_nao', 'Lời Bộ não A.I đã gửi cho em', { chiTiet: { mota: '“Hôm qua em làm xong 4 câu đầu chặng 3.”' }, chips: [{ chu: 'đã gửi 20:02', muc: 'tot' }] }),
+  sk('2026-09-21T13:02:00Z', 'bai_rieng', 'Bài riêng đã làm 4 câu', { chiTiet: { mota: 'Làm xong 4 câu đầu chặng 3' }, chips: [{ chu: '20:02', muc: 'tot' }] }), // (28/09: loại bo_nao đã gỡ)
   sk('2026-09-20T14:10:00Z', 'ca', 'Ca kiểm tra Chương 1 · 8,25 điểm', { chiTiet: { mota: 'Làm 44/50 phút · rời màn 1 lần (12 giây).', maCa: '784817' }, chips: [{ chu: '8,25 điểm', muc: 'tot' }] }),
 ]
 const DONG_2: unknown[] = [sk('2026-09-15T02:00:00Z', 'on_lai', 'Ôn lại 1·3·7 ngày', { chiTiet: { mota: '4 câu tới hạn: đúng lại 3/4.' } })]
@@ -214,18 +214,18 @@ describe('ToanCanhEmScreen — trang Toàn cảnh một em', () => {
     expect(screen.queryByRole('button', { name: 'Cho thi lại' })).toBeNull()
   })
 
-  it('BỘ LỌC: không chip đếm số; có 9 loại (không "Mở app" khi chưa thấy); bấm loại ⇒ hỏi {sbd, loai:[…]} và thay dòng thời gian; "Tất cả" trả lại', async () => {
+  it('BỘ LỌC: không chip đếm số; có 8 loại (không "Mở app" khi chưa thấy; "Bộ não A.I" đã gỡ 28/09); bấm loại ⇒ hỏi {sbd, loai:[…]} và thay dòng thời gian; "Tất cả" trả lại', async () => {
     await chay((b) => ((b.loai as string[] | undefined)?.[0] === 'on_lai' ? { json: day({ dong: DONG_2, conNua: '' }) } : { json: day() }))
     const nhom = screen.getByRole('group', { name: 'Lọc theo loại việc' })
-    expect(within(nhom).getAllByRole('button').map((b) => b.textContent)).toEqual(['Tất cả', 'Ca kiểm tra', 'Bài tập về nhà', 'Ôn lại', 'Bài riêng', 'Gọi lên bảng', 'Game', 'EXP', 'Bộ não A.I', 'Cảnh báo của thầy'])
+    expect(within(nhom).getAllByRole('button').map((b) => b.textContent)).toEqual(['Tất cả', 'Ca kiểm tra', 'Bài tập về nhà', 'Ôn lại', 'Bài riêng', 'Gọi lên bảng', 'Game', 'EXP', 'Cảnh báo của thầy'])
     fireEvent.click(within(nhom).getByRole('button', { name: 'Ôn lại' }))
     await screen.findByText('Ôn lại 1·3·7 ngày')
     expect(goi.mock.calls.at(-1)).toEqual(['/gv/em-toan-canh', { sbd: '12121007', loai: ['on_lai'] }])
-    expect(screen.queryByText('Lời Bộ não A.I đã gửi cho em')).toBeNull()
+    expect(screen.queryByText('Bài riêng đã làm 4 câu')).toBeNull()
     expect(within(nhom).getByRole('button', { name: 'Ôn lại' }).getAttribute('aria-pressed')).toBe('true')
     expect(screen.queryByRole('button', { name: 'Xem thêm việc cũ hơn' })).toBeNull() // hết trang
     fireEvent.click(within(nhom).getByRole('button', { name: 'Tất cả' }))
-    await screen.findByText('Lời Bộ não A.I đã gửi cho em')
+    await screen.findByText('Bài riêng đã làm 4 câu')
     expect(goi.mock.calls.at(-1)).toEqual(['/gv/em-toan-canh', { sbd: '12121007' }])
   })
 
@@ -249,7 +249,7 @@ describe('ToanCanhEmScreen — trang Toàn cảnh một em', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Xem thêm việc cũ hơn' }))
     await screen.findByText('Ôn lại 1·3·7 ngày')
     expect(goi.mock.calls.at(-1)).toEqual(['/gv/em-toan-canh', { sbd: '12121007', truoc: '2026-09-20T14:10:00Z' }])
-    expect(screen.getByText('Lời Bộ não A.I đã gửi cho em')).toBeTruthy() // việc cũ vẫn còn
+    expect(screen.getByText('Bài riêng đã làm 4 câu')).toBeTruthy() // việc cũ vẫn còn
     expect(screen.getByText('Thứ Ba 15/09/2026')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Xem thêm việc cũ hơn' })).toBeNull()
   })

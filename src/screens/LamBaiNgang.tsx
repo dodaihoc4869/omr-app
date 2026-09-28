@@ -79,6 +79,8 @@ export interface LamBaiNgangProps {
   dongHo: string | null
   chuThayDongHo: string
   conGiay: number | null
+  /** "11:08" — giờ hết bài (theo máy chủ); không có ⇒ không hiện dòng này. */
+  hetGioLuc?: string
   daLam: number
   tong: number
   nhanLuu: string
@@ -443,6 +445,7 @@ export default function LamBaiNgang(p: LamBaiNgangProps) {
               <span>{p.dongHo === null ? 'Bài tập về nhà' : muc === 'do' ? 'Còn dưới 5 phút' : muc === 'vang' ? 'Còn dưới 10 phút' : 'Thời gian còn lại'}</span>
             </div>
             <div className="lb-gio-so">{p.dongHo ?? p.chuThayDongHo}</div>
+            {p.dongHo !== null && p.hetGioLuc && <div className="lb-gio-phu">Hết giờ lúc {p.hetGioLuc}</div>}
           </div>
           <div className="lb-tien">
             <div className="lb-tien-dong">

@@ -40,7 +40,6 @@ vi.mock('../src/store/appStore', () => ({
   useAppStore: (sel: (s: Record<string, unknown>) => unknown) => sel({ setScreen: m.setScreen, showToast: m.toast }),
 }))
 vi.mock('../src/components/NutCapNhatApp', () => ({ default: () => null }))
-vi.mock('../src/components/KhoiBoNaoCaiDat', () => ({ default: () => null }))
 
 const { default: KhoiKetNoiKhoDe } = await import('../src/components/KhoiKetNoiKhoDe')
 const { default: CaiDatScreen } = await import('../src/screens/CaiDatScreen')

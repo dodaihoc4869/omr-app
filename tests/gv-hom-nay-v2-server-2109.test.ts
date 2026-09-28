@@ -276,21 +276,21 @@ describe('/gv/em-toan-canh', () => {
     const trong = (await goi(d, '/gv/em-toan-canh', { sbd: '2001' })).em
     expect(trong).toEqual({ sbd: '2001', hoTen: 'Phạm Minh Châu', lop: '12B', chuoiNgay: 0 })
   })
-  it('dòng thời gian: hàng CHIỀU-riêng-lẻ của Bộ não (json.luot = "chieu", chỉ có thử thách) KHÔNG thành thêm một dòng "Bộ não A.I"', async () => {
+  it('dòng thời gian: Bộ não A.I đã GỠ (28/09) — hàng ai_dieu_chinh (đêm lẫn chiều) KHÔNG thành dòng nào', async () => {
     const d = await emDayDu()
     const soBoNao = async () => (await goi(d, '/gv/em-toan-canh', { sbd: '1001' })).dong.filter((x: { loai: string }) => x.loai === 'bo_nao').length
-    expect(await soBoNao()).toBe(2)
+    expect(await soBoNao()).toBe(0)
     d.sql.prepare("INSERT INTO ai_dieu_chinh(sbd,ngay,json,che_do,het_han,nop_luc) VALUES('1001','2026-09-22',?,'that','2026-09-30',?)")
       .run(JSON.stringify({ luot: 'chieu', thuThach: { dang: ['DA-1'], soCau: 5, bac: 'dung_bac' }, loiMoi: 'Hôm nay thử mấy câu nhé.', loiNhanChoEm: '', loiNhanChoPhuHuynh: '' }), luc(0, 5))
-    expect(await soBoNao()).toBe(2)
+    expect(await soBoNao()).toBe(0)
   })
-  it('dòng thời gian: mới nhất trước; đủ loại (ca, btvn, on_lai, game, len_bang, exp, bo_nao, canh_bao); mota bằng SỐ THẬT; chiTiet có maCa/maBtvn; KHÔNG bao giờ có loại mo_app', async () => {
+  it('dòng thời gian: mới nhất trước; đủ loại (ca, btvn, on_lai, game, len_bang, exp, canh_bao; bo_nao đã gỡ 28/09); mota bằng SỐ THẬT; chiTiet có maCa/maBtvn; KHÔNG bao giờ có loại mo_app', async () => {
     const d = await emDayDu()
     const r = await goi(d, '/gv/em-toan-canh', { sbd: '1001' })
     const luc_ = r.dong.map((x: { luc: string }) => x.luc)
     expect([...luc_].sort().reverse()).toEqual(luc_)
     const loai = new Set(r.dong.map((x: { loai: string }) => x.loai))
-    expect([...loai].sort()).toEqual(['bo_nao', 'btvn', 'ca', 'canh_bao', 'exp', 'game', 'len_bang', 'on_lai'])
+    expect([...loai].sort()).toEqual(['btvn', 'ca', 'canh_bao', 'exp', 'game', 'len_bang', 'on_lai'])
     expect(loai.has('mo_app')).toBe(false)
     const ca = r.dong.find((x: { loai: string }) => x.loai === 'ca')
     expect(ca).toMatchObject({ tieuDe: 'Ca kiểm tra: Ca giữa kỳ', chiTiet: { maCa: 'CA1', mota: 'Làm 45 phút · rời màn 1 lần (12 giây) · điểm 7.5' } })
@@ -300,9 +300,7 @@ describe('/gv/em-toan-canh', () => {
     expect(bt.chips).toEqual([{ chu: 'Đúng 3', muc: 'tot' }, { chu: 'Sai 1', muc: 'sai' }, { chu: '2 phút 10 giây', muc: 'trung' }])
     const cb = r.dong.find((x: { loai: string }) => x.loai === 'canh_bao')
     expect(cb).toMatchObject({ tieuDe: 'Cảnh báo của thầy', chiTiet: { maBtvn: 'BT-1', emDaXem: true, phuHuynhDaXem: false, mota: 'Thầy nhắc em.' } })
-    const bn = r.dong.filter((x: { loai: string }) => x.loai === 'bo_nao')
-    expect(bn.map((x: { tieuDe: string }) => x.tieuDe).sort()).toEqual(['Bộ não A.I', 'Bộ não A.I (chạy thử)']) // nhãn chạy thử/thật
-    expect(bn.find((x: { tieuDe: string }) => x.tieuDe === 'Bộ não A.I').chiTiet).toMatchObject({ cheDo: 'that', loiChoEm: 'Em làm đều, thầy thấy.', loiChoPhuHuynh: 'Lời PH' })
+    expect(r.dong.filter((x: { loai: string }) => x.loai === 'bo_nao')).toEqual([]) // Bộ não A.I đã gỡ 28/09
     expect(r.dong.find((x: { loai: string }) => x.loai === 'len_bang').chiTiet.mota).toBe('Lên bảng và làm đúng')
     expect(r.dong.find((x: { loai: string }) => x.loai === 'exp' && x.chiTiet.ngay === '2026-09-22').chiTiet.mota).toBe('Nhận 40 EXP trong ngày (1 lần ghi)')
   })

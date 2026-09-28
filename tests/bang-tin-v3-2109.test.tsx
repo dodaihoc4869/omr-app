@@ -43,7 +43,7 @@ describe('docBangTin — đọc CÓ CHỐNG SAI KIỂU', () => {
     expect(d.canDeY.ds).toHaveLength(5)
     expect(d.canDeY.conLai).toBe(7)
     expect(d.dangVap.map((x) => x.soEmVap)).toEqual([9, 8, 7, 6, 5])
-    expect(d.boNao).toMatchObject({ soEmSoi: 250, soEmDieuChinh: 12, soLoiNhan: 30 })
+    expect('boNao' in d).toBe(false) // Bộ não A.I đã gỡ 28/09: không đọc khoá boNao nữa
     expect(d.mayDaLam).toHaveLength(6)
     expect(d.sucKhoe).toEqual({ muc: 'xanh', chu: 'Bộ não A.I chạy lúc 01:04 · nhắc nộp bài chạy lúc 13:30' })
   })
@@ -56,7 +56,6 @@ describe('docBangTin — đọc CÓ CHỐNG SAI KIỂU', () => {
   it('khoá vắng ⇒ null / rỗng, KHÔNG số 0 giả: không homQua, không boNao, không sucKhoe', () => {
     const d = bt(MAU_THAT_SANG_21)
     expect(d.nhip.homQua).toBeNull()
-    expect(d.boNao).toBeNull()
     expect(d.tienBo).toEqual([])
     expect(d.lyDoThieu).toEqual({ boNao: 'Chưa có bản tin' })
     const r = bt(MAU_RONG)
@@ -127,9 +126,9 @@ describe('chữ hiển thị (giờ 24, tiếng Việt, bản vẽ thầy chốt
     expect([...container.querySelectorAll('b')].map((b) => b.textContent)).toEqual(['12 em'])
   })
 
-  it('dòng dưới mỗi bài: chủ ngữ "A.I Đỗ Đại Học" (thầy lệnh 21/09), không còn "Máy đã tự nhắc"; không có gì thật ⇒ rỗng', () => {
+  it('dòng dưới mỗi bài: chủ ngữ "App" (21/09 A.I Đỗ Đại Học → 28/09 App), không còn "Máy đã tự nhắc"; không có gì thật ⇒ rỗng', () => {
     const [b1, , b3] = bt().baiTap
-    expect(chuMayBaiTap(b1)).toBe('A.I Đỗ Đại Học đã nhắc 12 em · 9 phụ huynh · lượt nhắc kế 18:00 · chặng xong trung bình 1,4/5')
+    expect(chuMayBaiTap(b1)).toBe('App đã nhắc 12 em · 9 phụ huynh · lượt nhắc kế 18:00 · chặng xong trung bình 1,4/5')
     expect(chuMayBaiTap(b3)).toBe('chặng xong trung bình 4,6/5')
     expect(chuMayBaiTap({ ...b3, chang: null })).toBe('')
   })
@@ -178,10 +177,10 @@ describe('BangTinV3 — bố cục máy tính, đủ dữ liệu', () => {
 
   it('bảy ô đúng thứ tự bản vẽ; tiêu đề ô "A.I Đỗ Đại Học đã tự làm hôm nay" (không còn "Máy đã tự làm")', () => {
     const { container } = dung()
-    expect([...container.querySelectorAll('section[data-khoi]')].map((s) => s.getAttribute('data-khoi'))).toEqual(['bai-tap', 'tien-bo', 'can-de-y', 'dang-vap', 'bo-nao', 'may-da-lam'])
-    expect(screen.getByRole('heading', { name: 'A.I Đỗ Đại Học đã tự làm hôm nay' })).toBeTruthy()
+    expect([...container.querySelectorAll('section[data-khoi]')].map((s) => s.getAttribute('data-khoi'))).toEqual(['bai-tap', 'tien-bo', 'can-de-y', 'dang-vap', 'may-da-lam'])
+    expect(screen.getByRole('heading', { name: 'App đã tự làm hôm nay' })).toBeTruthy()
     expect(container.textContent).not.toMatch(/Máy đã|máy đã tự|Máy chưa/)
-    expect(screen.getByRole('heading', { name: 'Bộ não A.I · đêm qua' })).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: 'Bộ não A.I · đêm qua' })).toBeNull() // gỡ 28/09
   })
 
   it('bài tập: mỗi bài MỘT thanh xếp chồng có số, nhãn đọc màn hình đủ ba số; hạn nộp có thứ + giờ 24; lớp kèm số em', () => {
@@ -231,9 +230,7 @@ describe('BangTinV3 — bố cục máy tính, đủ dữ liệu', () => {
       ['Phản ứng xà phòng hoá', '8 / 22 em vấp'],
     ])
     expect(container.querySelector('[data-khoi="dang-vap"]')?.textContent).not.toMatch(/ESTE\./)
-    const bn = container.querySelector('[data-khoi="bo-nao"]')!
-    expect([...bn.querySelectorAll('.bt3-bn-so > div')].map((d) => d.textContent)).toEqual(['250em được soi lúc 01:04', '12em được chỉnh bài', '30lời nhắn cho em'])
-    expect(bn.textContent).toContain('Gợi ý cho thầy')
+    expect(container.querySelector('[data-khoi="bo-nao"]')).toBeNull() // ô Bộ não A.I đã gỡ 28/09
     const may = container.querySelector('[data-khoi="may-da-lam"]')!
     expect([...may.querySelectorAll('.bt3-may')].map((l) => l.textContent)).toEqual(['Nhắc nộp bài cho 12 em, báo 9 phụ huynh', 'Cho 5 em khắc phục luôn các câu vừa sai', 'Đưa 38 câu sai về lịch ôn lại 1·3·7', 'Rút bộ câu riêng cho 40 em', 'Vinh danh 3 em'])
     expect(may.textContent).not.toContain('soi 250')
@@ -246,11 +243,11 @@ describe('BangTinV3 — bố cục máy tính, đủ dữ liệu', () => {
     expect(container.querySelector('.bt3-suc')?.textContent).toContain('Cần để ý · Chưa có bản tin Bộ não A.I để kiểm')
   })
 
-  it('dòng "N em nhận thử thách riêng · M em đã làm" (Bộ não nấc 1) nằm ở ô Bộ não, không lặp ở ô A.I Đỗ Đại Học', () => {
+  it('dòng cũ của Bộ não A.I (thử thách riêng, "soi N em") còn trong bản đệm ⇒ KHÔNG hiện ở ô App (Bộ não đã gỡ 28/09)', () => {
     const mau = { ...MAU_DAY, mayDaLam: [...MAU_DAY.mayDaLam, { loai: 'thu_thach_rieng', so: 40, chu: '40 em nhận thử thách riêng · 12 em đã làm' }] }
     const { container } = dung(mau)
-    expect(container.querySelector('[data-khoi="bo-nao"] .bt3-bn-thu')?.textContent).toBe('40 em nhận thử thách riêng · 12 em đã làm')
-    expect(container.querySelector('[data-khoi="may-da-lam"]')?.textContent).not.toContain('thử thách')
+    expect(container.querySelector('[data-khoi="bo-nao"]')).toBeNull()
+    expect(container.querySelector('[data-khoi="may-da-lam"]')?.textContent).not.toMatch(/thử thách|soi/)
   })
 
   it('KHÔNG có nút hành động trên trang: mọi nút là chạm-vào-em, "+N … nữa" hoặc ô tra cứu', () => {
@@ -273,8 +270,8 @@ describe('BangTinV3 — trạng thái rỗng thật (không giả số)', () => 
     const chuTrong = [...container.querySelectorAll('.bt3-trong')].map((e) => e.textContent)
     expect(chuTrong).toContain('Từ 12:00 trưa nay chưa giao bài tập về nhà nào.')
     expect(chuTrong).toContain('Từ 12:00 trưa nay chưa có em nào cần thầy để ý.')
-    expect(chuTrong).toContain('Từ 12:00 trưa nay A.I Đỗ Đại Học chưa có việc nào cần tự làm.')
-    expect(chuTrong).toContain('Chưa có bản tin của Bộ não A.I: Chưa có bản tin.')
+    expect(chuTrong).toContain('Từ 12:00 trưa nay app chưa có việc nào cần tự làm.')
+    expect(chuTrong.join(' ')).not.toContain('Bộ não')
     expect(container.querySelectorAll('[data-khoi="bai-tap"] .bt3-bt')).toHaveLength(0)
   })
 
@@ -342,23 +339,22 @@ describe('top-N + tấm bên (trang chính không cuộn)', () => {
   })
 })
 
-describe('điện thoại: 6 trang lướt ngang', () => {
+describe('điện thoại: 5 trang lướt ngang (ô Bộ não A.I đã gỡ 28/09)', () => {
   beforeEach(() => {
     vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('max-width: 879px'), addEventListener: () => {}, removeEventListener: () => {} }))
     Element.prototype.scrollTo = vi.fn() as never
   })
 
-  it('sáu trang đúng thứ tự, nhãn "Trang k trong 6 · …", chấm chỉ trang, nút "Lướt sang: …" (48 px) và nút tìm tròn', () => {
+  it('năm trang đúng thứ tự, nhãn "Trang k trong 5 · …", chấm chỉ trang, nút "Lướt sang: …" (48 px) và nút tìm tròn', () => {
     const { container } = dung()
     expect([...container.querySelectorAll('.bt3-trang-nhan')].map((e) => e.textContent)).toEqual([
-      'Trang 1 trong 6 · Nhịp hôm nay',
-      'Trang 2 trong 6 · Bài tập về nhà đang chạy',
-      'Trang 3 trong 6 · Tiến bộ hôm nay',
-      'Trang 4 trong 6 · Em cần thầy để ý',
-      'Trang 5 trong 6 · Dạng cả lớp đang vấp',
-      'Trang 6 trong 6 · Bộ não A.I đêm qua',
+      'Trang 1 trong 5 · Nhịp hôm nay',
+      'Trang 2 trong 5 · Bài tập về nhà đang chạy',
+      'Trang 3 trong 5 · Tiến bộ hôm nay',
+      'Trang 4 trong 5 · Em cần thầy để ý',
+      'Trang 5 trong 5 · Dạng cả lớp đang vấp',
     ])
-    expect(container.querySelectorAll('.bt3-cham > span')).toHaveLength(6)
+    expect(container.querySelectorAll('.bt3-cham > span')).toHaveLength(5)
     const sang = screen.getByRole('button', { name: 'Lướt sang: Bài tập về nhà' })
     fireEvent.click(sang)
     expect((Element.prototype.scrollTo as unknown as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1)
@@ -366,9 +362,9 @@ describe('điện thoại: 6 trang lướt ngang', () => {
     expect(screen.getByRole('region', { name: /lướt ngang/ }).getAttribute('tabindex')).toBe('0')
   })
 
-  it('nút tròn tìm em mở tấm "Tìm học sinh" có ô nhập; trang 1 có ô A.I Đỗ Đại Học đã tự làm', () => {
+  it('nút tròn tìm em mở tấm "Tìm học sinh" có ô nhập; trang 1 có ô App đã tự làm', () => {
     dung()
-    expect(screen.getByRole('heading', { name: 'A.I Đỗ Đại Học đã tự làm hôm nay' })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: 'App đã tự làm hôm nay' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'Tìm học sinh' }))
     const tam = screen.getByRole('dialog', { name: 'Tìm học sinh' })
     expect(within(tam).getByRole('combobox')).toBeTruthy()
@@ -492,7 +488,7 @@ describe('khoá nguồn: một khung nhìn, token, cỡ chữ, chuyển động,
     expect(css).toMatch(/gap: 16px/)
     expect(css).toMatch(/\.bt3-o \{[^}]*border-radius: 20px/)
     expect(css).toMatch(/\.bt3-giua \{[^}]*1\.55fr[^}]*1fr/)
-    expect(css).toMatch(/\.bt3-duoi \{[^}]*1\.25fr[^}]*1\.15fr[^}]*1fr[^}]*1\.1fr/)
+    expect(css).toMatch(/\.bt3-duoi \{[^}]*1\.25fr[^}]*1\.15fr[^}]*1\.1fr/) // 3 ô (Bộ não A.I đã gỡ 28/09)
   })
 
   it('tên dạng được xuống 2 dòng, KHÔNG cắt một dòng "…" (luật B của Boss 21/09): span bên trong clamp 2 dòng, ô tên không nowrap', () => {
@@ -533,7 +529,7 @@ describe('khoá nguồn: một khung nhìn, token, cỡ chữ, chuyển động,
       expect(s).not.toMatch(/<div[^>]*onClick/)
     }
     const kho = doc('src/components/bang-tin/cac-khoi.tsx')
-    expect(kho).toContain('A.I Đỗ Đại Học đã tự làm hôm nay')
-    expect(kho).toContain('A.I Đỗ Đại Học đã nhắc')
+    expect(kho).toContain('App đã tự làm hôm nay')
+    expect(kho).toContain('App đã nhắc')
   })
 })

@@ -398,15 +398,7 @@
 .phm-14__chu i[data-nay] { background: var(--phm-nhan-to); }
 .phm-14__chu i[data-nghi] { width: 5px; height: 5px; border-radius: 50%; background: var(--phm-net); opacity: 0.55; }
 
-/* ── LỜI A.I ĐỖ ĐẠI HỌC ───────────────────────────────────────────── */
-.phm-thu { padding: 20px 20px 18px; }
-.phm-thu__dau { display: flex; align-items: center; gap: 12px; }
-.phm-thu__dau > i { width: 42px; height: 42px; border-radius: 50%; flex: none; display: grid; place-items: center; font-style: normal; font-size: 0.875rem; font-weight: 700; letter-spacing: -0.01em; background: var(--phm-nhan-nen); color: var(--phm-tren-nhan-nen); }
-.phm-thu__dau h3 { font-size: 1.0625rem; line-height: 1.294; font-weight: 600; letter-spacing: -0.015em; }
-.phm-thu__dau p { font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
-.phm-thu__than { margin-top: 14px; font-size: 1.0625rem; line-height: 1.5; letter-spacing: -0.011em; text-wrap: pretty; }
-.phm-thu__than p + p { margin-top: 0.7em; }
-.phm-thu__ky { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--phm-vach); font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
+/* ── LỜI THẦY ĐỖ ĐẠI HỌC ─────────────────────────────────────────── */
 .phm-goi-y > li { display: grid; grid-template-columns: 28px minmax(0, 1fr); column-gap: 12px; align-items: start; padding: 13px 0; font-size: 0.9375rem; line-height: 1.4; }
 .phm-goi-y > li + li { border-top: 1px solid var(--phm-vach); }
 .phm-goi-y > li > i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 0.8125rem; font-weight: 700; background: var(--phm-nhan-nen); color: var(--phm-tren-nhan-nen); }

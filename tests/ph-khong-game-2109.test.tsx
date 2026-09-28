@@ -8,7 +8,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import BangNhiemVu from '../src/components/bang-nhiem-vu/BangNhiemVu'
 import BangTinPhuHuynh from '../src/components/BangTinPhuHuynh'
-import { boGameChoPhuHuynh, CHU_GAME_PH, khongChuGame, sachBoNaoChoPhuHuynh, TEN_VIEC_LUYEN_DANG_PH, type DuLieuBangNhiemVu, type TheNhiemVu } from '../src/lib/nhiem-vu-adapter'
+import { boGameChoPhuHuynh, CHU_GAME_PH, khongChuGame, TEN_VIEC_LUYEN_DANG_PH, type DuLieuBangNhiemVu, type TheNhiemVu } from '../src/lib/nhiem-vu-adapter'
 
 configure({ asyncUtilTimeout: 8000 })
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
@@ -85,7 +85,6 @@ function duLieuDayGame(): DuLieuBangNhiemVu {
     doanMo: true,
     boNao: { hs: { loi: 'Em chọn thần thú rồi cùng Đoàn Hộ Tống nhé', ngay: '2026-09-21' } as any, ph: null },
     canhBaoThay: [],
-    thuThachRieng: null,
   }
 }
 
@@ -97,7 +96,6 @@ const VINH_DANH = async () => ({
     { rank: 2, name: 'Trần A.', score: 9, seconds: null, exam: 'CA-1', pet: null, level: 1 },
   ],
 })
-const BO_NAO_PH = { ngay: '2026-09-21', loiNhan: 'Hôm nay con ôn đều, thần thú của con lên cấp rồi.', thuTuan: 'Tuần này con tiến bộ ở dạng Thuỷ phân ester: từ Biết lên Hiểu.', tuanTu: '2026-09-14' }
 
 function veBangPh(tuy: Record<string, unknown> = {}) {
   return render(
@@ -107,7 +105,6 @@ function veBangPh(tuy: Record<string, unknown> = {}) {
       now={NOW}
       duLieu={duLieuDayGame()}
       taiVinhDanh={VINH_DANH}
-      boNaoPh={BO_NAO_PH}
       onLenDuongDoan={() => {}}
       onMoThanThu={() => {}}
       onDoiSbd={() => {}}
@@ -132,7 +129,7 @@ describe('boGameChoPhuHuynh — gỡ game ở DỮ LIỆU (thuần)', () => {
     expect(d.expNhan).toEqual([])
     expect(d.manhNhan).toEqual([])
     expect(d.doanMo).toBe(false)
-    expect(d.thuThachRieng).toBeNull()
+    expect('thuThachRieng' in d).toBe(false) // thẻ Thử thách riêng đã gỡ 28/09
     const v = d.cacBac[2].viec[0]
     expect(TEN_VIEC_LUYEN_DANG_PH).toBe('Luyện dạng con còn vấp')
     expect(v.tieuDe).toBe('Luyện dạng con còn vấp')
@@ -176,15 +173,6 @@ describe('boGameChoPhuHuynh — gỡ game ở DỮ LIỆU (thuần)', () => {
     expect(khongChuGame(undefined)).toBe('')
     expect(khongChuGame(null)).toBe('')
     expect(CHU_GAME_PH.flags).toContain('i')
-  })
-
-  it('sachBoNaoChoPhuHuynh: bỏ câu có chữ game; còn một trong hai (lời / thư) thì giữ thẻ; hết cả hai ⇒ null (không thẻ); null vào null ra', () => {
-    expect(sachBoNaoChoPhuHuynh(BO_NAO_PH)).toEqual({ ...BO_NAO_PH, loiNhan: '' })
-    expect(sachBoNaoChoPhuHuynh({ ...BO_NAO_PH, thuTuan: 'Con có 30 EXP' })).toBeNull() // lời có chữ game + thư có chữ game ⇒ hết cả hai ⇒ không thẻ
-    expect(sachBoNaoChoPhuHuynh(null)).toBeNull()
-    expect(sachBoNaoChoPhuHuynh(undefined)).toBeNull()
-    const sach = { ...BO_NAO_PH, loiNhan: 'Con ôn đều 3 ngày liền.' }
-    expect(sachBoNaoChoPhuHuynh(sach)).toEqual(sach)
   })
 })
 
@@ -230,13 +218,6 @@ describe('CHỐT CHẶN — chữ hiển thị của MÀN PHỤ HUYNH không cò
     expect(container.querySelector('.bnv-vd, [data-vung="vinh-danh"]')).toBeNull()
   })
 
-  it('lời Bộ não cho phụ huynh: câu nhắc thú/EXP bị bỏ, thư tuần không chữ game vẫn hiện', async () => {
-    const { container } = veBangPh()
-    await screen.findByText(/Thuỷ phân ester/)
-    expect(container.textContent).toContain('Tuần này con tiến bộ ở dạng Thuỷ phân ester')
-    expect(container.textContent).not.toContain('thần thú của con lên cấp')
-  })
-
   it('CẢ khi màn cha quên gỡ dữ liệu: BangNhiemVu vai phụ huynh tự gỡ (một cửa duy nhất) — cùng dữ liệu, học sinh VẪN thấy game', async () => {
     const { container: ph } = veBangPh()
     await screen.findByText('Bài tập về nhà · Chặng 2')
@@ -273,7 +254,7 @@ describe('khoá nguồn — các chốt `laPh` nằm đúng chỗ (đột biến
   const bang = doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')
   it('BangNhiemVu: gỡ dữ liệu một cửa + vùng EXP, "Vừa nhận EXP", chọn thú đều có `!laPh`', () => {
     expect(bang).toContain('const duLieu = useMemo(() => (laPh ? boGameChoPhuHuynh(duLieuGoc) : duLieuGoc), [laPh, duLieuGoc])')
-    expect(bang).toContain('const boNaoPh = useMemo(() => (laPh ? sachBoNaoChoPhuHuynh(boNaoPhGoc) : boNaoPhGoc), [laPh, boNaoPhGoc])')
+    expect(bang).not.toContain('boNaoPh') // thẻ lời Bộ não A.I đã gỡ 28/09
     expect(bang).toContain("const coBaoNhan = !dangTai && !laPh && khoaNhan !== '#'")
     expect(bang).toContain("const chuaChonThu = !dangTai && !laPh && duLieu.thanThu.kieu === 'chua_chon'")
     expect(bang).toContain('{duLieu.exp && !laPh && (')

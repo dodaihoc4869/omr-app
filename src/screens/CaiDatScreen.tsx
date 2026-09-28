@@ -1,6 +1,6 @@
 // CÀI ĐẶT của app giáo viên (màn MỚI, G1 — thầy chốt 21/09): gom những thứ trước đây nằm cuối "Ngân hàng đề → Cấu hình (1 lần)":
 // địa chỉ máy chủ + mã bí mật kho đề (G4, dời nguyên từ Ngân hàng đề), kết nối máy chủ mới, mật khẩu mở app; thêm phần GIAO DIỆN (sáng / tối / theo máy). Không đổi hàm nào của hai khối cũ — chỉ đặt chúng ở đây.
-// GAME HÓA 2.0 (thầy chốt 28/09 · docs/ban-ve-gv-2809/RA-SOAT.md mục 7): còn Giao diện · Game Hóa 2.0 · Bộ não A.I; mọi thứ kỹ thuật
+// GAME HÓA 2.0 (thầy chốt 28/09 · docs/ban-ve-gv-2809/RA-SOAT.md mục 7): còn Giao diện · Game Hóa 2.0 (Bộ não A.I đã gỡ 28/09); mọi thứ kỹ thuật
 // (kết nối máy chủ, máy chủ mới, mật khẩu mở app, cập nhật app, đồng bộ lại phiếu mọi ca, đồng bộ danh sách lớp) gom vào MỘT nhóm
 // thu gọn "Công cụ kỹ thuật" (mặc định đóng). Không đổi hàm nào — chỉ chỗ đặt. Cờ tắt ⇒ màn như cũ.
 import { useState, type ReactNode } from 'react'
@@ -9,7 +9,6 @@ import NutDongBoMoiCa from '../components/NutDongBoMoiCa'
 import NutDongBoDanhSach from '../components/NutDongBoDanhSach'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import { TheNoiDung } from '../components/DesignSystem'
-import KhoiBoNaoCaiDat from '../components/KhoiBoNaoCaiDat'
 import CongTacHoa2 from '../components/chien-dich/CongTacHoa2'
 import CongTacBia from '../components/chien-dich/CongTacBia'
 import KhoiKetNoiKhoDe from '../components/KhoiKetNoiKhoDe'
@@ -59,7 +58,7 @@ export default function CaiDatScreen() {
       <div className="gv-page-header">
         <div>
           <h1>Cài đặt</h1>
-          {!hoa2 && <p>Giao diện, Bộ não A.I, kết nối máy chủ, mật khẩu mở app và cập nhật app</p>}
+          {!hoa2 && <p>Giao diện, kết nối máy chủ, mật khẩu mở app và cập nhật app</p>}
         </div>
       </div>
 
@@ -88,8 +87,6 @@ export default function CaiDatScreen() {
       <CongTacHoa2 />
       {/* BI-A PHẢN ỨNG — cửa thứ ba trên Sảnh Bát Linh (`/gv/chien-dich` bia-co-luu, khoá riêng `bi_a`, mặc định TẮT). */}
       <CongTacBia />
-
-      <KhoiBoNaoCaiDat />
 
       {hoa2 ? (
         <section aria-labelledby="cai-dat-ky-thuat">

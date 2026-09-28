@@ -85,7 +85,7 @@ export interface DuLieuSan {
   nhiet: EmNhiet[] | null
   /** ≤ 5 em dẫn đầu (chăm + tiến bộ so với chính em). null ⇒ ẩn khối. */
   danDau: DanDauSan[] | null
-  /** Các khối sẵn có của `/gv/bang-tin` (bài tập về nhà, tiến bộ, em cần để ý, dạng vấp, Bộ não, việc A.I đã làm, sức khoẻ). null ⇒ ẩn các khối ấy. */
+  /** Các khối sẵn có của `/gv/bang-tin` (bài tập về nhà, tiến bộ, em cần để ý, dạng vấp, việc A.I đã làm, sức khoẻ). null ⇒ ẩn các khối ấy. */
   bt: BangTin | null
   /** Dữ liệu mô phỏng (chỉ bản vẽ / kiểm thử) — hiện chip "Dữ liệu mô phỏng". */
   moPhong?: boolean

@@ -3,7 +3,7 @@
 // Khoá: (1) bộ lọc chuThay; (2) thông báo CŨ đã lưu trong student_notice (ghi trước 28/09, không ghi đè dữ liệu thật) hiện ra chữ "Thầy";
 // (3) mọi tệp màn HỌC SINH + game + tin máy chủ gửi học sinh không còn "A.I Đỗ Đại Học"/"Bộ não A.I" ngoài chú thích.
 // App GIÁO VIÊN giữ "A.I Đỗ Đại Học" (docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md bảng A2).
-import { readFileSync, readdirSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('../server/src/game-v2-auth', () => ({ gameIdentity: async () => 'S1' }))
@@ -51,7 +51,7 @@ describe('khoá nguồn màn học sinh', () => {
   const TEP = [
     'src/screens/StudentPortalScreen.tsx', 'src/screens/ExamTakeScreen.tsx', 'src/screens/PhieuScreen.tsx',
     'src/components/KhoiBaiLuyen.tsx', 'src/components/KhungLoiGiaiGame.tsx', 'src/components/xem-diem/KetQuaSauNop.tsx',
-    'src/components/bang-nhiem-vu/TheBoNao.tsx', 'src/components/bang-nhiem-vu/TheThuThachRieng.tsx', 'src/components/InfographicHuongDan.tsx',
+    'src/components/InfographicHuongDan.tsx', // TheBoNao + TheThuThachRieng đã XOÁ cùng Bộ não A.I (28/09)
     'server/src/khien-mat.ts', 'server/src/game-v2-hap-thu.ts', 'server/src/game-v2-doan-the.ts', 'server/src/ph-giao-them.ts',
   ]
   const game = (thu: string): string[] => readdirSync(thu, { withFileTypes: true }).flatMap((e) => e.isDirectory() ? game(`${thu}/${e.name}`) : /\.tsx?$/.test(e.name) ? [`${thu}/${e.name}`] : [])
@@ -61,8 +61,8 @@ describe('khoá nguồn màn học sinh', () => {
   it('hướng dẫn ở cổng đăng nhập: không còn "Bài gia đình giao" (phụ huynh không giao bài nữa)', () => {
     expect(readFileSync('src/components/InfographicHuongDan.tsx', 'utf8')).not.toContain('Bài gia đình giao')
   })
-  it('thẻ học sinh: lời máy soạn đi qua chuThay', () => {
-    expect(readFileSync('src/components/bang-nhiem-vu/TheBoNao.tsx', 'utf8')).toContain('chuThay(loiChinh)')
-    expect(readFileSync('src/components/bang-nhiem-vu/TheThuThachRieng.tsx', 'utf8')).toContain('chuThay(thuThach.loiMoi)')
+  it('thẻ Bộ não + Thử thách riêng đã GỠ HẲN (28/09): hai tệp thẻ không còn', () => {
+    expect(existsSync('src/components/bang-nhiem-vu/TheBoNao.tsx')).toBe(false)
+    expect(existsSync('src/components/bang-nhiem-vu/TheThuThachRieng.tsx')).toBe(false)
   })
 })

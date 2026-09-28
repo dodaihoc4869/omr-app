@@ -64,14 +64,6 @@ describe('CỤM 1 · Giao bài tập về nhà + Xem trước + theo dõi (hàng
 })
 
 describe('CỤM 2 · Hồ sơ em / Bộ não / Ngân hàng đề (hàng 8, 10, 15)', () => {
-  it('hàng 8 + 10: hoạt động gọi "Ôn lại" (không "Khắc phục:"); không mã dạng trơ trọi trong nhật ký điều chỉnh', () => {
-    const bn = chuHienRa('src/lib/bo-nao-thay.ts')
-    expect(bn).toContain('`Ôn lại: ${tenDangHienThi(k.dang, k.tenDang)}')
-    expect(bn).not.toContain('`Khắc phục: ')
-    expect(bn).not.toMatch(/: \$\{x\.ma\}`|: \$\{k\.dang\}`/) // mã dạng đi qua tenDangHienThi, không nối thẳng
-    // "đã khắc phục" (trạng thái) và "Khắc phục sau ca" (phiếu quen) GIỮ — không khoá ở đây
-  })
-
   it('hàng 15: Ngân hàng đề viết đầy đủ "Trắc nghiệm · Đúng–sai · Trả lời ngắn" (không TN / Đ/S / TLN); lỗi soạn đề nói "Đúng/Sai"', () => {
     const nh = chuHienRa('src/screens/NganHangDeScreen.tsx')
     expect(nh).toContain('· Trắc nghiệm {s.phanI.length}')
@@ -83,13 +75,8 @@ describe('CỤM 2 · Hồ sơ em / Bộ não / Ngân hàng đề (hàng 8, 10, 1
 })
 
 describe('CỤM 3 · Bộ não A.I · ngày giờ · Gọi lên bảng (hàng 9, 13, 18)', () => {
-  it('hàng 9: "Bộ não A.I" ở mọi chữ hiện ra của app thầy (thông báo, nhãn nút, aria, lời lỗi) — không "bộ não" trơn', () => {
-    for (const f of ['src/components/KhoiBoNaoDemQua.tsx', 'src/components/KhoiBoNaoCaiDat.tsx', 'src/components/NhatKyDieuChinh.tsx', 'src/lib/bo-nao-thay.ts', 'src/screens/CaiDatScreen.tsx']) {
-      const c = chuHienRa(f).replace(/\/\^Bộ não A\\\.I/g, '') // bỏ regex nội bộ dò tiêu đề
-      expect(c, f).not.toMatch(/\b[Bb]ộ não(?! A\.I)/)
-    }
-    expect(chuHienRa('src/components/KhoiBoNaoCaiDat.tsx')).toContain('aria-label="Bật Bộ não A.I"')
-    expect(chuHienRa('src/components/KhoiBoNaoCaiDat.tsx')).not.toContain('câu khắc phục') // hoạt động gọi "ôn lại"
+  it('hàng 9 (đổi 28/09): Bộ não A.I đã GỠ — màn Cài đặt không còn chữ "Bộ não"', () => {
+    expect(chuHienRa('src/screens/CaiDatScreen.tsx')).not.toMatch(/[Bb]ộ não/)
   })
 
   it('hàng 13: Gọi lên bảng hiện ngày giờ kiểu chuẩn "Hạn nộp 23:59 · Thứ … dd/mm/yyyy" (gioDayDu), không toLocaleDateString', () => {

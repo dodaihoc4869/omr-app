@@ -16,10 +16,7 @@ import type { Env, ExecutionContext } from './kieu'
 import { laDatNgay } from '../../src/lib/dat-nhiem-vu-ngay'
 import { GIAO_THEM } from '../../src/lib/giao-them-cho-con'
 import { phutUocTinhChang } from '../../src/lib/btvn-nang-do-lich'
-import type { CauHinhBoNao } from './bo-nao'
-import { docBoNaoAiChoPhuHuynh } from './bo-nao-doc'
 import { laCauTuLuan } from './cam-tu-luan'
-import { coChuGame } from './chu-game'
 import { chuoiLoiGiai } from './goi-cu'
 import { docTrangThaiCongBo, type TrangThaiCongBoCa } from './cong-bo-diem'
 import { BAC_DANG_BAT_DAU } from './ho-so-cau-hinh'
@@ -94,20 +91,6 @@ function boHoi(env: Env) {
       }
     },
   }
-}
-
-// ------------------------------------------------------------------ cấu hình Bộ não (đọc chung một truy vấn gộp) ------------------------------------------------------------------
-/**
- * Cùng luật với `docCauHinhTangDoc` (bo-nao-doc.ts) nhưng từ CHUỖI đã đọc sẵn (tiết kiệm một truy vấn): `null` khi tầng đọc phải im (tắt, hoặc không lớp nào ở chế độ THẬT).
- * Test khoá hai đường cho cùng kết quả trên nhiều cấu hình.
- */
-export function cauHinhTangDocTuChuoi(giaTri: unknown): CauHinhBoNao | null {
-  const o = parse<Row>(giaTri, {})
-  const lop = Array.isArray(o.lopThat) ? o.lopThat.filter((x): x is string => typeof x === 'string' && x.length > 0 && x.length <= 60).slice(0, 50) : []
-  const ch: CauHinhBoNao = { bat: typeof o.bat === 'boolean' ? o.bat : true, cheDo: o.cheDo === 'that' ? 'that' : 'bong', lopThat: [...new Set(lop)], thuThach: o.thuThach !== false }
-  if (!ch.bat) return null
-  if (ch.cheDo !== 'that' && ch.lopThat.length === 0) return null
-  return ch
 }
 
 // ------------------------------------------------------------------ luật che ------------------------------------------------------------------
@@ -258,7 +241,7 @@ export function lichChangCuaEm(chuoiLich: unknown, soChang: number, loDaXong: nu
 interface PhanHoSo { bang: string; batBuoc: boolean; sql: string; bind: (sbd: string, homNay: string) => unknown[] }
 const PHAN_HO_SO: PhanHoSo[] = [
   { bang: 'hoc_sinh', batBuoc: true, sql: "SELECT 'em' AS k, ho_ten AS a, lop AS b, NULL AS c FROM hoc_sinh WHERE sbd = ?", bind: (s) => [s] },
-  // MỘT term cho cả cấu hình Bộ não ('cfg': a = gia_tri) lẫn ba khoá mốc hiển thị ('moc': a = khoa, b = gia_tri): D1 CHỈ cho tối đa 5 term trong một truy vấn UNION (term thứ 6 ⇒ "too many terms in compound SELECT",
+  // (Bộ não A.I đã gỡ 28/09: hàng 'cfg' của khoá `bo_nao` vẫn đọc nhưng BỎ QUA — giữ nguyên câu SQL đã soát giới hạn term.) MỘT term cho cả cấu hình Bộ não ('cfg': a = gia_tri) lẫn ba khoá mốc hiển thị ('moc': a = khoa, b = gia_tri): D1 CHỈ cho tối đa 5 term trong một truy vấn UNION (term thứ 6 ⇒ "too many terms in compound SELECT",
   // /ph/tat-ca-ve-con trả 500 trên D1 thật lúc 16:19–16:5x 21/09). Hàng trả ra Y HỆT khi tách hai term.
   { bang: 'cau_hinh', batBuoc: true, sql: "SELECT CASE WHEN khoa = 'bo_nao' THEN 'cfg' ELSE 'moc' END, CASE WHEN khoa = 'bo_nao' THEN gia_tri ELSE khoa END, CASE WHEN khoa = 'bo_nao' THEN NULL ELSE gia_tri END, NULL FROM cau_hinh WHERE khoa IN ('bo_nao', 'hien_thi_tu', 've_dich_tu', 'bang_tin_tu')", bind: () => [] },
   { bang: 'ph_giao_them', batBuoc: false, sql: "SELECT 'gt', COUNT(*), NULL, NULL FROM ph_giao_them WHERE sbd = ? AND ngay_vn = ?", bind: (s, n) => [s, n] },
@@ -312,9 +295,8 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
   const dau14 = themNgay(homNay, -(SO_NGAY_NHIP - 1))
   const ra: Row = { ok: true, serverNow: nowMs, hoTen: '' }
 
-  // 1 · truy vấn gộp: tên em, cấu hình Bộ não, số lượt giao thêm hôm nay, kế hoạch hôm nay, (qid → dạng) của hồ sơ
+  // 1 · truy vấn gộp: tên em, số lượt giao thêm hôm nay, kế hoạch hôm nay, (qid → dạng) của hồ sơ
   let hoTen = ''
-  let cfgBoNao: unknown
   let daGiaoThem: number | null = null
   let kh: Row | null = null
   let coHoSo = false
@@ -322,7 +304,6 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
   const tra: { dang: Map<string, string>; chuyenDe: Map<string, string> } = { dang: new Map(), chuyenDe: new Map() }
   for (const x of await docHoSo(hoi, sbd, homNay)) {
     if (x.k === 'em') hoTen = chuoi(x.a)
-    else if (x.k === 'cfg') cfgBoNao = x.a
     else if (x.k === 'moc') cauHinhMoc.set(chuoi(x.a), x.b)
     else if (x.k === 'gt') daGiaoThem = so(x.a)
     else if (x.k === 'kh') kh = x
@@ -754,15 +735,6 @@ export async function phTatCaVeCon(envGoc: Env, b: Record<string, unknown>, nowM
     if (lichOn.homNay > 0) cau1.push(`Nhắc con làm ${lichOn.homNay} câu ôn lại hôm nay, khoảng ${phutUocTinhChang(lichOn.homNay, giayMoiCau)} phút.`)
     if (lichOn.ngayMai > 0) cau1.push(`Nhắc con làm ${lichOn.ngayMai} câu ôn lại vào ngày mai, khoảng ${phutUocTinhChang(lichOn.ngayMai, giayMoiCau)} phút.`)
     if (cau1.length > 0) ra.phuHuynhLamGi = cau1.slice(0, 2)
-  }
-
-  // ── lời Bộ não dành cho phụ huynh (chế độ THẬT, đã qua kiểm khuôn; không chữ game) ─────────────────────────────────────
-  const chBoNao = cauHinhTangDocTuChuoi(cfgBoNao)
-  const boNao = chBoNao ? await docBoNaoAiChoPhuHuynh(env, sbd, homNay, chBoNao) : null
-  if (boNao) {
-    const loi = coChuGame(boNao.loiNhan) ? '' : boNao.loiNhan
-    const thuTuan = coChuGame(boNao.thuTuan) ? '' : boNao.thuTuan
-    if (loi || thuTuan) ra.loiBoNao = { ...(loi ? { loi } : {}), ngay: boNao.ngay, ...(thuTuan ? { thuTuan } : {}) }
   }
 
   // ── giao thêm ─────────────────────────────────────────────────────────────────────────────────────────────────────────────

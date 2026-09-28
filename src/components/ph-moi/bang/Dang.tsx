@@ -69,7 +69,7 @@ function TheDang({ pm, tieuDe, ds, vap }: { pm: PhMoi; tieuDe: string; ds: DangM
         <p className="phm-the__cuoi">
           <BtLichTich />
           <span>
-            A.I Đỗ Đại Học đã xếp <b>{mai} câu</b> vào lịch ôn ngày {ngayNganVn(mocMay(pm) + 86_400_000)}
+            Thầy Đỗ Đại Học đã xếp <b>{mai} câu</b> vào lịch ôn ngày {ngayNganVn(mocMay(pm) + 86_400_000)}
           </span>
         </p>
       )}

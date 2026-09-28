@@ -35,7 +35,7 @@ describe('VoBang — ghép khối, mục lục, thứ tự', () => {
     const onVe = vi.fn()
     const { container } = ve(PH_APPLE, { onVe })
     expect(idKhoi(container)).toEqual(['muc-tong-quan', 'muc-mung', 'muc-ai-lam', 'muc-thoi-gian', 'muc-ca', 'muc-dang', 'muc-cau', 'muc-btvn', 'muc-on', 'muc-14', 'muc-loi'])
-    expect(chip(container)).toEqual(['Tổng quan', 'Dòng thời gian', 'Ca kiểm tra', 'Điểm mạnh · cần luyện', 'Từng câu (38)', 'Bài tập về nhà', 'Lịch ôn lại', '14 ngày', 'Lời A.I Đỗ Đại Học'])
+    expect(chip(container)).toEqual(['Tổng quan', 'Dòng thời gian', 'Ca kiểm tra', 'Điểm mạnh · cần luyện', 'Từng câu (38)', 'Bài tập về nhà', 'Lịch ôn lại', '14 ngày', 'Lời Thầy Đỗ Đại Học'])
     expect(container.querySelector('h1')!.textContent).toBe('Mọi thứ về con')
     expect(container.textContent).toContain('Nguyễn Minh Khôi')
     expect(container.textContent).toContain('Lớp 12 - Tinh Hoa')
@@ -67,14 +67,14 @@ describe('VoBang — ghép khối, mục lục, thứ tự', () => {
     expect(cu.querySelector('.phm-vong3')).toBeTruthy() // vòng % vẫn có; vòng câu/phút ẩn (chưa có mục tiêu)
     cleanup()
     const thua = ve(PH_APPLE_THUA).container
-    expect(chip(thua)).toEqual(['Tổng quan', 'Dòng thời gian', 'Từng câu (9)', 'Lịch ôn lại', '14 ngày', 'Lời A.I Đỗ Đại Học'])
+    expect(chip(thua)).toEqual(['Tổng quan', 'Dòng thời gian', 'Từng câu (9)', 'Lịch ôn lại', '14 ngày', 'Lời Thầy Đỗ Đại Học'])
     expect(thua.querySelector('#muc-ca, #muc-dang, #muc-btvn')).toBeNull()
     expect(thua.textContent).toContain('Bảng sẽ đầy dần khi con học thêm')
     cleanup()
     const chua = ve(PH_APPLE_CHUA_HOC).container
-    expect(chip(chua)).toEqual(['Tổng quan', 'Lịch ôn lại', '14 ngày', 'Lời A.I Đỗ Đại Học'])
+    expect(chip(chua)).toEqual(['Tổng quan', 'Lịch ôn lại', '14 ngày', 'Lời Thầy Đỗ Đại Học'])
     expect(chua.querySelector('#muc-thoi-gian, #muc-cau')).toBeNull()
-    expect(chua.querySelector('#muc-ai-lam h2')!.textContent).toBe('A.I Đỗ Đại Học đã chuẩn bị gì cho con hôm nay')
+    expect(chua.querySelector('#muc-ai-lam h2')!.textContent).toBe('Thầy Đỗ Đại Học đã chuẩn bị gì cho con hôm nay')
     expect(chua.textContent).toContain('Hôm nay con chưa học')
     cleanup()
     const chuaCb = ve(PH_CHUA_CB).container
@@ -95,7 +95,7 @@ describe('VoBang — ghép khối, mục lục, thứ tự', () => {
   it('MỘT nút hành động chính (thanh đáy dùng chung với màn chính); không chữ game, không emoji, không chữ "Biến thể" của bản vẽ', () => {
     const { container } = ve(PH_APPLE)
     expect(container.querySelectorAll('[data-vung="giao-them"]')).toHaveLength(1)
-    expect(container.querySelector('[data-vung="luot-giao"]')!.textContent).toBe('Hôm nay còn 2 lượt giao · A.I Đỗ Đại Học chọn câu hợp với con')
+    expect(container.querySelector('[data-vung="luot-giao"]')!.textContent).toBe('Hôm nay còn 2 lượt giao · Thầy Đỗ Đại Học chọn câu hợp với con')
     expect(container.textContent).not.toMatch(CAM_GAME)
     expect(container.textContent).not.toMatch(/Biến thể/)
     expect(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(container.textContent || '')).toBe(false)

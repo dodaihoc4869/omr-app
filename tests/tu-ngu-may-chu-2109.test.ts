@@ -5,9 +5,9 @@ import { readFileSync } from 'node:fs'
 import { chuLoiMay } from '../server/src/nhat-ky-may'
 import { MO_TA_THE } from '../server/src/game-v2-doan-the'
 
-describe('từ ngữ máy chủ: chủ ngữ tự động là A.I Đỗ Đại Học', () => {
+describe('từ ngữ máy chủ: chủ ngữ tự động (28/09: thầy đọc ⇒ "app", em đọc ⇒ "Thầy Đỗ Đại Học")', () => {
   it('câu lỗi cron cho thầy', () => {
-    expect(chuLoiMay('nhac_nop_bai')).toBe('Nhắc nộp bài lỗi, A.I Đỗ Đại Học sẽ thử lại')
+    expect(chuLoiMay('nhac_nop_bai')).toBe('Nhắc nộp bài lỗi, app sẽ tự thử lại')
     expect(chuLoiMay('nhac_nop_bai')).not.toMatch(/\bmáy\b/i)
   })
   it('thẻ Tiếp sức "Loại 1 phương án"', () => {
@@ -15,7 +15,7 @@ describe('từ ngữ máy chủ: chủ ngữ tự động là A.I Đỗ Đại H
   })
   it('gv-bang-tin: câu cảnh báo không còn "máy sẽ thử lại"', () => {
     const src = readFileSync('server/src/gv-bang-tin.ts', 'utf8')
-    expect(src).toContain('A.I Đỗ Đại Học sẽ thử lại')
+    expect(src).toContain('app sẽ tự thử lại')
     expect(src).not.toMatch(/, máy sẽ thử lại/)
   })
 })
