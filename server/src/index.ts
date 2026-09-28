@@ -3405,6 +3405,13 @@ const boXuLy = {
       if (p === '/kho/xoa') return xoaDeKho(env, b)
       if (p === '/kho/rut-cau') return rutCau(env, b)
       if (p === '/kho/chi-muc') return dungChiMucKho(env, b)
+      // CHỈ ĐỌC chỉ mục câu của MỘT tờ (28/09): để công cụ sửa trình bày kho đề đẩy lại gói mà GIỮ NGUYÊN chuyên đề/mức độ/lớp đang có.
+      if (p === '/kho/chi-muc-lay') {
+        const maDe = String(b.maDe ?? '').trim()
+        if (!maDe) return ra({ ok: false, error: 'Thiếu mã đề' })
+        const r = await env.DB.prepare('SELECT qid, chuyen_de, muc_do, phan, lop, co_loi_giai FROM cau_hoi WHERE ma_de = ?').bind(maDe).all<Record<string, unknown>>()
+        return ra({ ok: true, maDe, items: r.results ?? [] })
+      }
       if (p === '/btvn/sua') return suaBtvn(env,b)
       if (p === '/btvn/cho-lam-lai') return ra(await ND.choLamLaiCaNhan(env, b, Date.now()))
       // BỘ NÃO A.I (Code 1, `bo-nao.ts`; hợp đồng docs/hop-dong-bo-nao-2109.md): MỌI lệnh /ai/* là lệnh THẦY — nằm SAU cổng `laThay`; các hàm tự trả {ok,…}, không tự kiểm mã.
