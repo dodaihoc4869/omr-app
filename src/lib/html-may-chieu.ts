@@ -682,7 +682,7 @@ const JS_MAY_CHIEU = `
     if (gd.pha === 'goi') chuyenPha(gd.sau);
   }
   /** MÀN GỌI TÊN (bản vẽ 28/09, ≈1,5 s): vòng sáng, hạt, thần thú ẢNH THẬT (ảnh của thẻ tên — anhThu), "Mời em lên bảng", tên lớn,
-   * lớp · lần lên bảng thứ N — rồi thu về thẻ tên ở mép trên cột 1/3. Giảm chuyển động ⇒ bỏ màn này, thẻ tên chỉ "bật" nhẹ. */
+   * lớp và số lần lên bảng — rồi thu về thẻ tên ở mép trên cột 1/3. Giảm chuyển động ⇒ bỏ màn này, thẻ tên chỉ "bật" nhẹ. */
   var anDi = [];
   function hienLaiThe() { anDi.forEach(function (h) { h.style.visibility = ''; h.classList.remove('mc-pop'); void h.offsetWidth; h.classList.add('mc-pop'); }); anDi = []; }
   function goiTen(page, sauDo) {
@@ -1165,7 +1165,7 @@ export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}):
   return `<!DOCTYPE html>
 <html lang="vi" data-projector="matte-light" data-sang><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')} — tờ máy chiếu</title>
-<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style><style>${CSS_GIAO_DIEN_TO_CHIEU}</style>${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style><style>${CSS_GIAO_DIEN_NUT_CHAM}</style>` : ''}<style>${CSS_LEN_BANG_MOI}</style></head>
+<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style><style>${CSS_GIAO_DIEN_TO_CHIEU}</style><style>${CSS_LEN_BANG_MOI}</style>${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style><style>${CSS_GIAO_DIEN_NUT_CHAM}</style>` : ''}</head>
 <body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}"${maPhien ? ` data-cau-noi="${maPhien}"` : ''}${nganSach > 0 ? ` data-ngan-sach="${nganSach}"` : ''}>${than}
-<script>${JS_MAY_CHIEU}</script><script>${jsBoCuc()}</script>${maPhien ? `<script>${jsCauNoiToChieu()}</script>` : ''}<script>${jsLenBangMoi()}</script></body></html>`
+<script>${JS_MAY_CHIEU}</script><script>${jsBoCuc()}</script>${maPhien ? `<script>${jsCauNoiToChieu()}</script>` : ''}<script>${jsLenBangMoi({ cauNoi: Boolean(maPhien) })}</script></body></html>`
 }

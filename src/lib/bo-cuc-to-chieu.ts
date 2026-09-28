@@ -136,8 +136,8 @@ body.mc-bc .mc-vung-de img { max-width: 100%; width: auto; height: auto; max-hei
 body.mc-bc .mc-vung-de img.mc-anh-pa { max-height: calc(12vh * var(--mc-hinh, 1)); }
 body.mc-bc .mc-vung-de .q-bang-cuon { overflow: visible; }
 body.mc-bc .mc-vung-de .q-bang { width: auto; max-width: 100%; font-size: calc(var(--mc-co, 28px) * .72); }
-/* lời giải PHỦ lên đúng vùng đề (có cuộn riêng — lời giải là phụ lục, không phải đề) */
-body.mc-bc .mc-vung-de > .mc-giai { position: absolute; inset: 0; margin: 0; padding: 14px 20px; overflow-y: auto; background: var(--mc-nen); z-index: 6; box-sizing: border-box; }
+/* lời giải NẰM DƯỚI ĐỀ trong vùng đề (luật 28/09 — không còn lớp phủ; dài thì lật trang / cuộn cùng đề) */
+body.mc-bc .mc-vung-de > .mc-giai { position: static; margin: .5em 0 0; box-sizing: border-box; }
 body.mc-bc .mc-vung-de > .mc-giai[hidden] { display: none; }
 body.mc-bc .mc-giai-vung { margin: 0; flex: none; }
 /* BẬC 1: hai em, mỗi em nửa bảng — vùng làm bài co giãn nhưng KHÔNG dưới ngưỡng */
@@ -163,10 +163,9 @@ body.mc-bc .mc-b5 .mc-vung-de { grid-column: 1; grid-row: 2; }
 body.mc-bc .mc-b5 .mc-nut-hien-em { grid-column: 1; grid-row: 1; align-self: start; z-index: 3; }
 body.mc-bc .mc-b5 .mc-cot-lam-bai, body.mc-bc .mc-b5 .mc-trang, body.mc-bc .mc-b5 > .mc-trong { display: none; }
 body.mc-bc .mc-b5 .mc-giai-vung { grid-column: 1; grid-row: 1; justify-self: end; align-self: center; padding: 0 16px; z-index: 3; }
-body.mc-bc .mc-b5 .mc-vung-de { overflow-y: auto !important; }
 /* Khi bấm lên bảng (pha="goi"), mc-b5 biến thành 2/3 bảng y hệt mc-dot-don, VÀ cho phép cuộn */
 body[data-pha="goi"].mc-bc .mc-dot.mc-b5 { grid-template-columns: 2fr 1fr; grid-template-rows: auto minmax(0, 1fr); }
-body[data-pha="goi"].mc-bc .mc-b5 .mc-vung-de { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; overflow-y: auto !important; }
+body[data-pha="goi"].mc-bc .mc-b5 .mc-vung-de { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; }
 body[data-pha="goi"].mc-bc .mc-b5 .mc-em { grid-column: 2; grid-row: 1; }
 body[data-pha="goi"].mc-bc .mc-b5 .mc-nut-hien-em { grid-column: 2; grid-row: 1; align-self: start; z-index: 3; }
 body[data-pha="goi"].mc-bc .mc-b5 .mc-cot-lam-bai { display: block; grid-column: 2; grid-row: 2; padding: 0; border: 0; border-radius: 16px; box-shadow: inset 0 0 0 2px var(--mc-vien); background: transparent; }

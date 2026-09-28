@@ -203,8 +203,8 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 .mc-cau-nay{background:linear-gradient(135deg,rgba(255,210,122,.14),rgba(255,255,255,.05));border:1px solid rgba(255,210,122,.35);border-radius:calc(var(--u)*.9);padding:calc(var(--u)*.7) calc(var(--u)*.9);display:grid;grid-template-columns:calc(var(--u)*13) minmax(0,1fr);gap:calc(var(--u)*1.2)}
 .mc-cau-nay h4,.mc-the-ct h4{grid-column:1/-1;margin:0 0 .4em;font-size:.82em;letter-spacing:.05em;text-transform:uppercase;font-weight:800}
 .mc-cau-nay h4{color:var(--mc-vang-noi)}
-.mc-tong .mc-lan{font-size:calc(var(--u)*2.3);font-weight:800;line-height:1}
-.mc-tong .mc-lan small{font-size:.45em;color:rgb(170,178,197);font-weight:600}
+.mc-tong .mc-ct-lan{font-size:calc(var(--u)*2.3);font-weight:800;line-height:1}
+.mc-tong .mc-ct-lan small{font-size:.45em;color:rgb(170,178,197);font-weight:600}
 .mc-tong .mc-ds{display:flex;gap:.4em;margin:.35em 0}
 .mc-tong .mc-gan{font-size:.92em;color:rgb(201,208,224)}
 .mc-kq{font-weight:800;font-size:.85em;border-radius:1em;padding:.05em .6em;white-space:nowrap}
@@ -252,11 +252,15 @@ body.mc-bc .mc-vung-de img.mc-anh,body.mc-bc .mc-vung-de .mc-than img{cursor:zoo
 // ───────────────────────── JS TRONG TỜ ─────────────────────────
 /** Mã chạy trong tờ, nhúng SAU script chính + bố cục + cầu nối. Cần các móc của script chính: `__mcDot`, `__mcDen`, `__mcSoDot`,
  * `__mcLenBang`, sự kiện `mc-vao-dot` / `mc-doi-pha`; và của cầu nối: `__mcHoiHoSo` (vắng khi tờ mở riêng). */
-export function jsLenBangMoi(): string {
+export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
+  // Tờ KHÔNG có cầu nối thì không có ô chấm nào: mã không nhắc tới lớp của ô chấm (hợp đồng `to-chieu-cau-noi.ts`).
+  const CHAM = tuy.cauNoi ? "'.mc-cham'" : 'null'
   return `
 (function () {
   var body = document.body, ray = document.getElementById('mc-ray');
   if (!ray) return;
+  var CHAM = ${CHAM};
+  function oCham(g) { return CHAM ? $$(g, CHAM) : []; }
   var S = { tk: false, but: false, mau: 'rgb(229,72,77)', tay: false, soGo: '', ketQua: {}, daGoi: {} };
   function $$(g, s) { return Array.prototype.slice.call((g || document).querySelectorAll(s)); }
   function dot() { return window.__mcDot ? window.__mcDot() : null; }
@@ -465,14 +469,14 @@ export function jsLenBangMoi(): string {
   function cham(dat) {
     if (pha() !== 'chua') { baoNhanh('Gọi em lên bảng trước (L)'); return; }
     if (!body.classList.contains('mc-noi')) { baoNhanh('Tờ chưa nối với app thầy — chưa ghi được'); return; }
-    var d = dot(), v = d && d.querySelector('.mc-cham[data-cham="cho"]');
+    var d = dot(), v = d && CHAM ? d.querySelector(CHAM + '[data-cham="cho"]') : null;
     if (!v) { baoNhanh('Đợt này đã ghi xong'); return; }
-    var nut = v.querySelector('.mc-cham-nut[data-kq="' + (dat ? '1' : '0') + '"]');
+    var nut = v.querySelector(CHAM + '-nut[data-kq="' + (dat ? '1' : '0') + '"]');
     if (nut) { S.choGhi = { khoa: v.getAttribute('data-khoa'), dat: dat }; nut.click(); baoNhanh('Đang ghi: ' + (dat ? 'Đạt' : 'Chưa đạt')); }
   }
   function dauKq(khoa, dat) {
     S.ketQua[khoa] = dat ? 'dat' : 'kd';
-    var v = null; $$(ray, '.mc-cham').forEach(function (x) { if (x.getAttribute('data-khoa') === khoa) v = x; });
+    var v = null; oCham(ray).forEach(function (x) { if (x.getAttribute('data-khoa') === khoa) v = x; });
     var nua = v && v.closest('.mc-nua'), p = nua && nua.querySelector('.mc-dau-kq');
     if (p) { p.hidden = false; p.className = 'mc-dau-kq ' + (dat ? 'mc-dat' : 'mc-kd'); p.textContent = dat ? 'Đạt' : 'Chưa đạt'; }
     baoNhanh('Đã ghi: ' + (dat ? 'Đạt' : 'Chưa đạt'));
@@ -483,7 +487,7 @@ export function jsLenBangMoi(): string {
     if (dat !== null) dauKq(String(d.khoa), dat);
   });
   // bấm nút cũ trực tiếp (vẫn có trong DOM) cũng nhớ để gắn nhãn
-  document.addEventListener('click', function (e) { var n = e.target.closest && e.target.closest('.mc-cham-nut'); if (n) { var v = n.closest('.mc-cham'); if (v) S.choGhi = { khoa: v.getAttribute('data-khoa'), dat: n.getAttribute('data-kq') === '1' }; } }, true);
+  if (CHAM) document.addEventListener('click', function (e) { var n = e.target.closest && e.target.closest(CHAM + '-nut'); if (n) { var v = n.closest(CHAM); if (v) S.choGhi = { khoa: v.getAttribute('data-khoa'), dat: n.getAttribute('data-kq') === '1' }; } }, true);
 
   // ── T · thống kê ──
   function batTk() { S.tk = !S.tk; body.classList.toggle('mc-co-tk', S.tk); xep(); veThanh(); }
@@ -530,8 +534,8 @@ export function jsLenBangMoi(): string {
   function moLuoi() {
     var ds = $$(ray, ':scope > .mc-dot'), h = '<h2>Tổng quan buổi chữa <span>Bấm thẻ, hoặc gõ số đợt rồi Enter · Tab/Esc để đóng</span></h2><div class="mc-ds">';
     ds.forEach(function (d, i) {
-      var cau = $$(d, '.mc-cau-so').map(function (c) { return c.textContent; }).join(' + ') || (d.classList.contains('mc-dot-da') ? 'Đáp án các câu còn lại' : '');
-      var kq = $$(d, '.mc-cham').map(function (v) { return S.ketQua[v.getAttribute('data-khoa')]; }).filter(Boolean);
+      var cau = $$(d, '.mc-cau-so').map(function (c) { return c.textContent; }).join(' + ') || (d.classList.contains('mc-dot-da') ? 'Trang đáp án' : '');
+      var kq = oCham(d).map(function (v) { return S.ketQua[v.getAttribute('data-khoa')]; }).filter(Boolean);
       // LUẬT 4: chỉ ĐỢT ĐÃ GỌI mới có tên em
       var ten = S.daGoi[i] ? $$(d, '.mc-ten').map(function (t) { return t.textContent; }).join(', ') : '';
       var tt = i === chiSo() ? '<span class="mc-tt mc-dang">Đang chiếu</span>' : kq.length ? '<span class="mc-tt ' + (kq.indexOf('kd') >= 0 ? 'mc-kd' : 'mc-dat') + '">' + (kq.indexOf('kd') >= 0 ? 'Chưa đạt' : 'Đạt') + '</span>' : S.daGoi[i] ? '<span class="mc-tt">Đã gọi</span>' : '<span class="mc-tt">Chưa chữa</span>';
@@ -571,10 +575,10 @@ export function jsLenBangMoi(): string {
     } else {
       var c = hs.cauNay;
       h += '<section class="mc-cau-nay"><h4>Câu này · ' + thoat(cauSo ? cauSo.textContent : '') + '</h4>';
-      if (!c || !c.soLan) h += '<div class="mc-tong"><div class="mc-lan">0 <small>lần làm</small></div></div><div class="mc-rong">Em chưa làm câu này lần nào.</div>';
+      if (!c || !c.soLan) h += '<div class="mc-tong"><div class="mc-ct-lan">0 <small>lần làm</small></div></div><div class="mc-rong">Em chưa làm câu này lần nào.</div>';
       else {
         var cuoi = c.lan[c.lan.length - 1], gc = gioVn(cuoi.luc);
-        h += '<div class="mc-tong"><div class="mc-lan">' + c.soLan + ' <small>lần làm</small></div><div class="mc-ds"><span class="mc-kq mc-dat">Đúng ' + c.soDung + '</span><span class="mc-kq mc-kd">Sai ' + c.soSai + '</span></div><div class="mc-gan">Gần nhất: <b>' + (cuoi.dung ? 'đúng' : 'sai') + '</b> lúc ' + gc.gio + ' ' + gc.ngay + '</div></div><div class="mc-dtg">' +
+        h += '<div class="mc-tong"><div class="mc-ct-lan">' + c.soLan + ' <small>lần làm</small></div><div class="mc-ds"><span class="mc-kq mc-dat">Đúng ' + c.soDung + '</span><span class="mc-kq mc-kd">Sai ' + c.soSai + '</span></div><div class="mc-gan">Gần nhất: <b>' + (cuoi.dung ? 'đúng' : 'sai') + '</b> lúc ' + gc.gio + ' ' + gc.ngay + '</div></div><div class="mc-dtg">' +
           c.lan.map(function (x) { var g = gioVn(x.luc); return '<div class="mc-lanlam ' + (x.dung ? 'mc-dung' : 'mc-sai') + '"><div class="mc-gio">' + g.ngay + ' · ' + g.gio + '</div><div><span class="mc-kq2">' + (x.dung ? 'Đúng' : 'Sai') + '</span> · chọn <b>' + thoat(x.chon || '—') + '</b></div><div class="mc-ph">' + (x.coGoiY ? 'Có gợi ý' : 'Không gợi ý') + (x.giay != null ? ' · ' + x.giay + ' giây' : '') + '</div><span class="mc-ng">' + thoat(x.nguon) + '</span></div>'; }).join('') + '</div>';
       }
       h += '</section><div class="mc-ct-luoi">';
@@ -602,7 +606,7 @@ export function jsLenBangMoi(): string {
   }
   function moCt(nua) {
     if (!nua) return;
-    var v = nua.querySelector('.mc-cham') || (nua.closest('.mc-dot') && nua.closest('.mc-dot').querySelector('.mc-cham')), khoa = nua.getAttribute('data-khoa') || (v ? v.getAttribute('data-khoa') : '');
+    var v = oCham(nua)[0] || oCham(nua.closest('.mc-dot') || nua)[0], khoa = nua.getAttribute('data-khoa') || (v ? v.getAttribute('data-khoa') : '');
     ct.classList.add('mc-mo'); ctMo.classList.add('mc-mo');
     if (!window.__mcHoiHoSo || !khoa) { veCt(nua, null, 'khong_noi'); return; }
     veCt(nua, null, 'dang');
@@ -671,7 +675,7 @@ export function jsLenBangMoi(): string {
     xep(); veThanh();
   });
   document.addEventListener('mc-bo-cuc-xong', function () { xep(); });
-  window.addEventListener('resize', function () { setTimeout(xep, 80); });
+  // đổi cỡ cửa sổ: bộ đo bố cục đo lại rồi phát 'mc-bo-cuc-xong' ⇒ xếp trang lại ở đó (không hẹn giờ riêng)
   // cầu nối nối xong ⇒ hiện D / K
   if (window.MutationObserver) new MutationObserver(veThanh).observe(body, { attributes: true, attributeFilter: ['class'] });
   xep(); veThanh();
