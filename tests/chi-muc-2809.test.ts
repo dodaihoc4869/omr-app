@@ -25,15 +25,18 @@ describe('chỉ mục game_v2_attempt(session, sbd)', () => {
     await damBaoChiMuc({ DB: db } as any)
     expect(lan).toBe(1)
   })
-  it('lớp bọc fetch gọi qua ctx.waitUntil, không thêm vòng nào ở lượt sau', async () => {
+  it('cron tạo chỉ mục (không nằm trên đường lệnh fetch); lượt cron sau không tạo lại', async () => {
     const d1 = taoD1That()
-    const cho: Promise<unknown>[] = []
-    const ctx: any = { waitUntil: (p: Promise<unknown>) => cho.push(p), passThroughOnException() {} }
-    const env: any = { ...d1.env, MA_BI_MAT: 'm' }
-    await worker.fetch(new Request('https://x.dev/khoe'), env, ctx)
-    await worker.fetch(new Request('https://x.dev/khoe'), env, ctx)
-    await Promise.all(cho)
-    expect(cho[0]).toBe(cho[1]) // cùng một lời hứa ⇒ chỉ chạy một lần
+    d1.sql.exec('DROP INDEX IF EXISTS game_v2_attempt_session')
+    let lanBatch = 0
+    const batchGoc = d1.env.DB.batch.bind(d1.env.DB)
+    const env: any = { ...d1.env, DB: { ...d1.env.DB, prepare: d1.env.DB.prepare, batch: (ds: any[]) => { if (ds.length === 1) lanBatch++; return batchGoc(ds) } } }
+    await worker.fetch(new Request('https://x.dev/khoe'), env)
+    expect(keHoach(d1.sql, Q_PHIEN)).not.toContain('game_v2_attempt_session') // fetch không đụng DDL
+    await worker.scheduled({ cron: '* * * * *' } as any, env).catch(() => undefined)
     expect(keHoach(d1.sql, Q_PHIEN)).toContain('game_v2_attempt_session')
+    const truoc = lanBatch
+    await worker.scheduled({ cron: '* * * * *' } as any, env).catch(() => undefined)
+    expect(lanBatch).toBeLessThanOrEqual(truoc) // không tạo lại (không thêm batch chỉ mục)
   })
 })

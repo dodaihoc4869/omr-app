@@ -46,9 +46,10 @@ const now=()=>new Date().toISOString()
 /** Lỗi hết trần câu trong ngày, mang mã `het_tran` để màn game hiện lời cạnh nút và nút Về đảo (index.ts đưa `ma` vào phản hồi). */
 const hetTran=(n:number)=>Object.assign(new Error(`Em đã hoàn thành ${n} câu hôm nay. Ngày mai quay lại nhận nhiệm vụ mới nhé.`),{ma:'het_tran'})
 export async function loadProfile(env:Env,sbd:string):Promise<{profile:Profile;revision:number}>{
-  const reset=await env.DB.prepare("SELECT json FROM game_v2_settings WHERE key='season'").first<{json:string}>()
+  // Tối ưu 28/09: mùa + hồ sơ là hai lượt đọc độc lập ⇒ song song (một đợt D1 thay vì hai).
+  const [reset,row0]=await Promise.all([env.DB.prepare("SELECT json FROM game_v2_settings WHERE key='season'").first<{json:string}>(),env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd).first<Row>()])
   const season=reset?String(JSON.parse(reset.json).id):''
-  let row=await env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd).first<Row>()
+  let row=row0
   if(!row){
     const legacy=await env.DB.prepare('SELECT du_lieu_json AS json FROM than_thu WHERE sbd=?').bind(sbd).first<{json:string}>()
     let old:Record<string,unknown>={};try{old=JSON.parse(legacy?.json??'{}')}catch{/* Keep raw snapshot below. */}

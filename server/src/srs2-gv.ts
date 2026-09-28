@@ -3,7 +3,7 @@
 // Vòng khép kín: Kết thúc ca kiểm tra → Giao chiến dịch (có đồng hồ sức chứa) → Bảng chiến dịch khi đang chạy →
 // Buổi chữa khi hết hạn nộp → "Chữa xong" (câu cần dạy lại quay về Đoàn Hộ Tống hôm sau).
 import type { Env } from './kieu'
-import { xoaDemCauHinh } from './cau-hinh-dem'
+import { dbGoc, xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
@@ -176,7 +176,7 @@ async function danhSach(env: Env, nowMs: number, coThongKe = false) {
   const ds = await docChienDichKemBatDau(env, r.results ?? [])
   // Chỉ-thêm (bản vẽ GV-ChienDichDaGiao 28/09): `thongKe: true` ⇒ số liệu lớp của TỐI ĐA 20 chiến dịch mới nhất (đã làm qua, thành thạo,
   // đúng nhịp, quá tải hôm nay, cần dạy lại). Lỗi đọc một chiến dịch ⇒ `thongKe: null` cho riêng chiến dịch đó. Màn Chữa trên lớp không xin ⇒ nhẹ như cũ.
-  const tk = coThongKe ? await Promise.all(ds.slice(0, SO_CD_THONG_KE).map((cd) => thongKeLop(env, cd, homNay).catch(() => null))) : []
+  const tk = coThongKe ? await Promise.all(ds.slice(0, SO_CD_THONG_KE).map((cd) => thongKeLop(env, cd, homNay, nowMs).catch(() => null))) : []
   return {
     ok: true, homNay,
     chienDich: ds.map(({ qids, sbd, ...c }, i) => ({ ...c, soCau: qids.length, soEm: sbd.length, hetHan: c.hanNop < homNay, sapBatDau: chuaBatDau({ ...c, qids, sbd }, homNay), ...(coThongKe ? { thongKe: tk[i] ?? null } : {}) })),
@@ -208,8 +208,30 @@ export function mocNhip(taoLuc: string, hanNop: string, homNay: string): { ngayG
 const soNgayTre = (ngayCuoi: string | null, ngayGiao: string, homNay: string): number =>
   Math.max(0, soNgayGiua(ngayCuoi ?? ngayGiao, homNay) - 1)
 
+/**
+ * ĐỆM số liệu lớp (tối ưu 28/09): `danh-sach` + thongKe = 20 chiến dịch × ~5 truy vấn (đo 2,3–3,7 s). Đệm trong isolate DEM_THONG_KE_MS = 60 s,
+ * khoá theo D1 + ngày VN + CHỮ KÝ chiến dịch (em, câu, hạn, mốc bắt đầu, trạng thái) ⇒ chiến dịch vừa sửa/đóng/giao lại là khoá đổi, không đọc bản cũ.
+ * Số em vừa làm (sổ) có thể trễ ≤ 60 s trên màn danh sách — màn Bảng chiến dịch (`bang`) vẫn đọc tươi.
+ */
+export const DEM_THONG_KE_MS = 60_000
+type ThongKeLop = Awaited<ReturnType<typeof thongKeLopTho>>
+const demThongKe = new WeakMap<object, Map<string, { het: number; p: Promise<ThongKeLop> }>>()
+export function xoaDemThongKe(env: Env): void { if (env.DB) demThongKe.delete(dbGoc(env.DB as unknown as object)) }
+function thongKeLop(env: Env, cd: ChienDich, homNay: string, nowMs: number): Promise<ThongKeLop> {
+  const db = dbGoc(env.DB as unknown as object)
+  let m = demThongKe.get(db)
+  if (!m) { m = new Map(); demThongKe.set(db, m) }
+  const khoa = JSON.stringify([cd.id, homNay, cd.trangThai, cd.hanNop, cd.mocBatDau, cd.sbd, cd.qids])
+  const o = m.get(khoa)
+  if (o && o.het > nowMs) return o.p
+  if (m.size >= 200) m.clear() // chặn cỡ bộ nhớ isolate
+  const p = thongKeLopTho(env, cd, homNay)
+  p.catch(() => { if (m!.get(khoa)?.p === p) m!.delete(khoa) }) // lỗi ⇒ không đệm
+  m.set(khoa, { het: nowMs + DEM_THONG_KE_MS, p })
+  return p
+}
 /** Số liệu LỚP gọn của một chiến dịch (dùng cho danh sách chiến dịch đã giao). */
-async function thongKeLop(env: Env, cd: ChienDich, homNay: string) {
+async function thongKeLopTho(env: Env, cd: ChienDich, homNay: string) {
   const [tt, kh] = await Promise.all([
     docMocThemCaLop(env, cd.id).then((them) => trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.mocBatDau, undefined, them)),
     env.DB.prepare('SELECT sbd, huyet_chien FROM srs2_ke_hoach WHERE ngay = ? AND sbd IN (SELECT value FROM json_each(?))').bind(homNay, JSON.stringify(cd.sbd)).all<Row>().catch(() => ({ results: [] as Row[] })),

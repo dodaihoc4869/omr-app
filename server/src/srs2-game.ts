@@ -6,7 +6,7 @@ import type { Env } from './kieu'
 import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
-import { doDayDu, protectedQuestions, type CauPool } from './game-v2-bank'
+import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v2-bank'
 import { chonPhuongAnGach, moDuocRuong, xepChuyenDao, type TrangThaiCau } from './srs2-loi'
 import { coGoiY, docHoSo2, layKeHoachHomNay, LOI_KHOA_DAO, ngayVnCua, qidGoc, sanh2, type HoSo2, type MetaCau } from './srs2-d1'
 
@@ -49,22 +49,38 @@ export async function soCauGameHomNay(env: Env, sbd: string, nowMs: number): Pro
 
 export interface RefPhien { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3 }
 
-/** Nạp câu đầy đủ theo thứ tự kế hoạch, bỏ câu đang bảo vệ/tự luận/rút khỏi kho; lấy tối đa `toiDa`. */
+/** Cỡ lô một truy vấn nạp câu đầy đủ (chặn cỡ tham số JSON; kế hoạch ngày ≤ vài chục câu nên thường chỉ MỘT lô). */
+export const LO_NAP_CAU = 40
+/**
+ * Nạp câu đầy đủ theo thứ tự kế hoạch, bỏ câu đang bảo vệ/tự luận/rút khỏi kho; lấy tối đa `toiDa`.
+ * Tối ưu 28/09: trước gọi `doDayDu` TỪNG câu nối tiếp (N+1, ≥ 6 vòng D1 mỗi lượt Đảo/Đoàn); nay nạp theo LÔ ứng viên (một truy vấn IN,
+ * ≤ LO_NAP_CAU câu), chỉ nạp lô kế khi lô trước bị loại quá nhiều. Kết quả (thứ tự, luật bỏ câu) y hệt.
+ */
 export async function napCau(env: Env, hs: HoSo2, khoa: readonly string[], toiDa: number, chan: ReadonlySet<string>): Promise<{ q: PrivateQuestion; m: MetaCau }[]> {
   const ra: { q: PrivateQuestion; m: MetaCau }[] = []
-  const daLay = new Set<string>()
+  // Ứng viên theo thứ tự, mỗi qid một lần, đã lọc meta/chặn (không tốn truy vấn).
+  const ung: { qid: string; m: MetaCau }[] = []
+  const thay = new Set<string>()
   for (const k of khoa) {
-    if (ra.length >= toiDa) break
     const qid = qidGoc(k)
-    if (daLay.has(qid)) continue
+    if (thay.has(qid)) continue
+    thay.add(qid)
     const m = hs.meta.get(qid)
     if (!m || chan.has(qid) || chan.has(m.group)) continue
-    try {
-      const [q] = await doDayDu(env, [{ qid, maDe: m.maDe, version: m.version, nhe: true } as unknown as CauPool])
-      if (!q || laCauTuLuan(q)) continue
-      ra.push({ q, m })
-      daLay.add(qid)
-    } catch { /* câu vừa sửa/rút khỏi kho: bỏ qua */ }
+    ung.push({ qid, m })
+  }
+  let i = 0
+  while (ra.length < toiDa && i < ung.length) {
+    const lo = ung.slice(i, i + Math.min(LO_NAP_CAU, Math.max(toiDa - ra.length + 2, 8)))
+    i += lo.length
+    let day: Map<string, PrivateQuestion>
+    try { day = await napDayDuMem(env, lo.map((x) => ({ maDe: x.m.maDe, qid: x.qid, version: x.m.version }))) } catch { continue } // lỗi đọc lô: bỏ lô như bỏ câu (hành vi cũ)
+    for (const x of lo) {
+      if (ra.length >= toiDa) break
+      const q = day.get(`${x.m.maDe}|${x.qid}|${x.m.version}`)
+      if (!q || laCauTuLuan(q)) continue // câu vừa sửa/rút khỏi kho hoặc tự luận: bỏ qua
+      ra.push({ q, m: x.m })
+    }
   }
   return ra
 }

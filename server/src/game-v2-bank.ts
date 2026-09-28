@@ -67,7 +67,7 @@ const demCaBaoVe=new DemTTL<Set<string>>(5_000,4)
 /** Ca sắp mở (kế hoạch ngày, "ca sắp tới") — cùng bảng `ca`, dùng CHUNG móc bất hoạt với đệm bảo vệ (Boss 22/09: không cần móc riêng). Đệm 30 giây theo (nowIso, hạn) làm tròn phút để không đổi khoá mỗi mili giây. */
 const demCaSapMo=new DemTTL<{maCa:string;tenCa:string;batDau:string;lop:string}[]>(30_000,200)
 /** Xoá đệm 5 giây của `protectedQuestions` + đệm 30 giây "ca sắp mở" — gọi ngay sau MỌI câu ghi bảng `ca` (production) hoặc sau khi test tự tay sửa bảng `ca` bằng SQL thô (bỏ qua đường ghi thật, nên không tự kích hoạt móc bất hoạt). */
-export function xoaDemCaBaoVe():void{demCaBaoVe.xoa();demCaSapMo.xoa()}
+export function xoaDemCaBaoVe():void{demCaBaoVe.xoa();demCaSapMo.xoa();demQidDeBaoVe.clear()}
 /** Ca `mo`, loại thi, mở trong khoảng (nowIso, denCaIso]. Đệm 30 giây theo khoá làm tròn phút (bind chính xác vẫn dùng nowIso/denCaIso thật khi đọc D1 tươi — chỉ khoá đệm làm tròn để cùng phút dùng chung). */
 export async function docCaSapMo(env:Env,nowIso:string,denCaIso:string):Promise<{maCa:string;tenCa:string;batDau:string;lop:string}[]> {
   const now=Date.now()
@@ -79,6 +79,8 @@ export async function docCaSapMo(env:Env,nowIso:string,denCaIso:string):Promise<
   return ds
 }
 const protectionCache=new Map<string,{fingerprint:string;blocked:Set<string>}>()
+/** qid + nhóm của từng đề đang bảo vệ, khoá `bank_r2|cap_nhat_luc` (xem protectedQuestions). Chỉ đọc (mảng dùng chung, không sửa). */
+const demQidDeBaoVe=new Map<string,readonly string[]>()
 export async function protectedQuestions(env:Env):Promise<Set<string>> {
   const now=Date.now()
   const nong=demCaBaoVe.doc('current',now);if(nong)return new Set(nong)
@@ -97,13 +99,20 @@ export async function protectedQuestions(env:Env):Promise<Set<string>> {
   // Trả BẢN SAO ở mọi lối ra: nơi gọi (game-v2.ts `start`/`resume`/`answer`) `.add()` câu riêng của từng em vào tập này; trả thẳng tập trong đệm là ghi bẩn đệm dùng chung, câu của em A rò sang em B.
   const fingerprint=await hash(r.results);const cached=protectionCache.get('current')
   if(cached?.fingerprint===fingerprint){demCaBaoVe.ghi('current',now,new Set(cached.blocked));return new Set(cached.blocked)}
+  // Tối ưu 28/09: vân tay gồm số lượt sống ⇒ trong ca thi MỖI lần em vào/nộp là vân tay đổi. Trước: đọc + chuẩn hoá LẠI mọi đề từ R2 (nối tiếp).
+  // Nay: tập qid/nhóm của TỪNG đề đệm theo khoá (bank_r2, cap_nhat_luc) — mọi lượt ghi ca (đẩy đề/chỉ mốc) đều đặt cap_nhat_luc mới ⇒ đề đổi là khoá đổi;
+  // vân tay chỉ còn quyết CA NÀO đang bảo vệ. Các đề chưa đệm đọc SONG SONG.
   const blocked=new Set<string>()
-  for(const ca of r.results){
-    if(!ca.bank_r2)continue
+  const tapTheoCa=await Promise.all(r.results.filter(ca=>ca.bank_r2).map(async ca=>{
+    const khoa=`${str(ca.bank_r2)}|${str(ca.cap_nhat_luc)}`
+    const co=demQidDeBaoVe.get(khoa);if(co)return co
     const bank=await readJson(env,str(ca.bank_r2));const qs=await normalizeBank(bank,'protected')
     if(!qs.length&&['phanI','phanII','phanIII'].some(p=>Array.isArray(bank[p])&&(bank[p] as unknown[]).length))throw new Error('Chưa kiểm tra xong phạm vi đề thi đang bảo vệ.')
-    for(const q of qs){blocked.add(q.qid);blocked.add(q.group)}
-  }
+    const ds=qs.flatMap(q=>[q.qid,q.group])
+    if(demQidDeBaoVe.size>=200)demQidDeBaoVe.clear() // chặn cỡ bộ nhớ isolate
+    demQidDeBaoVe.set(khoa,ds);return ds
+  }))
+  for(const ds of tapTheoCa)for(const x of ds)blocked.add(x)
   protectionCache.set('current',{fingerprint,blocked:new Set(blocked)});demCaBaoVe.ghi('current',now,new Set(blocked));return blocked
 }
 /** Câu trong POOL của readScope: câu ĐẦY ĐỦ (bằng chứng của em, `originals`) hoặc bản NHẸ của kho theo dạng (`nhe: true`: chỉ siêu dữ liệu để CHỌN + cờ `tuLuan` tính sẵn; KHÔNG có text, choices, ideas, hinhAnh, correct, solution).
@@ -119,6 +128,13 @@ export async function doDayDu(env:Env,cau:readonly CauPool[]):Promise<PrivateQue
   const r=await env.DB.prepare(`SELECT q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') AND q.version=json_extract(j.value,'$[2]')`).bind(JSON.stringify(can.map(q=>[q.maDe,q.qid,q.version]))).all<{json:string}>()
   const theo=new Map<string,PrivateQuestion>();for(const x of r.results??[]){const q=JSON.parse(str(x.json)) as PrivateQuestion;theo.set(`${q.maDe}|${q.qid}|${q.version}`,q)}
   return cau.map(q=>{if(!q.nhe)return q as PrivateQuestion;const d=theo.get(`${q.maDe}|${q.qid}|${q.version}`);if(!d)throw new Error('Câu đã được sửa hoặc rút khỏi kho. Em mở lượt mới; lượt này không bị tính sai.');return d})
+}
+/** Như `doDayDu` nhưng KHÔNG ném: nạp bản đầy đủ của nhiều câu trong MỘT truy vấn, trả Map khoá `maDe|qid|version` (câu vắng = đã sửa/rút khỏi kho). Tối ưu 28/09: bỏ N+1 của `napCau`. */
+export async function napDayDuMem(env:Env,ds:readonly {maDe:string;qid:string;version:string}[]):Promise<Map<string,PrivateQuestion>>{
+  const theo=new Map<string,PrivateQuestion>();if(!ds.length)return theo
+  const r=await env.DB.prepare(`SELECT q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') AND q.version=json_extract(j.value,'$[2]')`).bind(JSON.stringify(ds.map(q=>[q.maDe,q.qid,q.version]))).all<{json:string}>()
+  for(const x of r.results??[]){try{const q=JSON.parse(str(x.json)) as PrivateQuestion;theo.set(`${q.maDe}|${q.qid}|${q.version}`,q)}catch{/* JSON hỏng ⇒ coi như vắng */}}
+  return theo
 }
 // ĐỆM KHO NHẸ THEO DẠNG (Code 1 đo trên kho thật: 15.359 câu / 953 dạng / 60 triệu ký tự JSON ⇒ đệm json 16 triệu ký tự bị đẩy liên tục): chỉ giữ SIÊU DỮ LIỆU (~300 byte/câu ⇒ cả kho ~5 MB), sống 15 phút;
 // đổi kho (thêm/sửa/xoá tờ) đổi khoá `phienBanKho` nên không bao giờ dùng bản cũ. Câu đầy đủ chỉ nạp cho vài câu được chọn (`doDayDu`).

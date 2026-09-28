@@ -177,11 +177,9 @@ export function xepUngVienChot(khoa: readonly string[], hs: Pick<HoSo2, 'meta' |
 }
 
 async function napMot(env: Env, hs: HoSo2, khoa: readonly string[], chan: ReadonlySet<string>) {
-  for (const k of khoa) {
-    const [x] = await napCau(env, hs, [k], 1, chan)
-    if (x) return x
-  }
-  return null
+  // Tối ưu 28/09: napCau đã nạp theo lô (một truy vấn) và bỏ câu hỏng ⇒ không lặp từng câu (N+1). Kết quả y hệt: câu dùng được ĐẦU TIÊN.
+  const [x] = await napCau(env, hs, khoa, 1, chan)
+  return x ?? null
 }
 
 // ---------------------------------------------------------------- lệnh

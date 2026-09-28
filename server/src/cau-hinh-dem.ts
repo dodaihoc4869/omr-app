@@ -16,8 +16,13 @@ export const D1_GOC = Symbol.for('omr.d1Goc')
 type O = { het: number; p: Promise<string | null> }
 const demTheoDb = new WeakMap<object, Map<string, O>>()
 
+/** D1 gốc của một đối tượng D1 (bản session ⇒ D1 gốc; còn lại ⇒ chính nó) — khoá cho mọi đệm theo isolate. */
+export function dbGoc(db: object): object {
+  return ((db as Record<symbol, unknown>)[D1_GOC] as object | undefined) ?? db
+}
+
 function bangDem(db: object): Map<string, O> {
-  const goc = ((db as Record<symbol, unknown>)[D1_GOC] as object | undefined) ?? db
+  const goc = dbGoc(db)
   let m = demTheoDb.get(goc)
   if (!m) { m = new Map(); demTheoDb.set(goc, m) }
   return m

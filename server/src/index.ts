@@ -71,7 +71,7 @@ import * as ND from './btvn-nang-do-d1'
 import { btvnNopTreBat } from './btvn-nang-do-chang'
 import { capNhatSaiNhanhNeuCu } from './sai-nhanh-gv'
 import * as VD from './vo-dai'
-import type { D1PreparedStatement, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
+import type { D1PreparedStatement, D1Result, DongCa, DongLuot, Env, ExecutionContext } from './kieu'
 import { gvChienDich } from './srs2-gv'
 import { gvSuaChienDich } from './srs2-sua'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
@@ -986,17 +986,16 @@ async function dayNhieuCa(env: Env, b: Record<string, unknown>): Promise<Respons
  * Lệch luật ở đây là thầy nhìn màn Ca thi thấy số em khác với sự thật trên
  * Sheet — sai số liệu còn tệ hơn chậm. */
 async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
-  const rCa = await env.DB.prepare(
-    daXoa
-      ? `SELECT * FROM ca WHERE trang_thai = 'da_xoa'`
-      : `SELECT * FROM ca WHERE trang_thai <> 'da_xoa' AND ma_ca <> 'DOTAI'`,
-  ).all<Record<string, unknown>>()
-
-  const rDem = await env.DB.prepare(
-    `WITH moi AS (
+  // TỐI ƯU 28/09: (1) phần đếm CHỈ quét `luot` của các ca đang liệt kê (trước: GROUP BY TOÀN BỘ `luot`, kể cả ca đã xoá) — lọc bằng
+  // `ma_ca IN (...)` đi theo chỉ mục idx_luot_em(ma_ca, sbd, lan_thu); (2) hai câu chạy trong MỘT `DB.batch` (một vòng D1 thay vì hai nối tiếp).
+  const locCa = daXoa ? `trang_thai = 'da_xoa'` : `trang_thai <> 'da_xoa' AND ma_ca <> 'DOTAI'`
+  const [rCa, rDem] = await env.DB.batch([
+    env.DB.prepare(`SELECT * FROM ca WHERE ${locCa}`),
+    env.DB.prepare(
+      `WITH moi AS (
        SELECT l.ma_ca, l.trang_thai, l.so_lan_roi_man
        FROM luot l
-       JOIN (SELECT ma_ca, sbd, MAX(lan_thu) AS m FROM luot GROUP BY ma_ca, sbd) x
+       JOIN (SELECT ma_ca, sbd, MAX(lan_thu) AS m FROM luot WHERE ma_ca IN (SELECT ma_ca FROM ca WHERE ${locCa}) GROUP BY ma_ca, sbd) x
          ON l.ma_ca = x.ma_ca AND l.sbd = x.sbd AND l.lan_thu = x.m
        WHERE l.trang_thai <> 'duoc_duyet_lai'
      )
@@ -1005,7 +1004,8 @@ async function danhSachCaMoi(env: Env, daXoa: boolean): Promise<Response> {
             SUM(CASE WHEN trang_thai IN ('da_nop','khoa') THEN 1 ELSE 0 END) AS da_nop,
             SUM(CASE WHEN trang_thai = 'khoa' OR so_lan_roi_man > 0 THEN 1 ELSE 0 END) AS canh_bao
      FROM moi GROUP BY ma_ca`,
-  ).all<{ ma_ca: string; da_vao: number; da_nop: number; canh_bao: number }>()
+    ),
+  ]) as [D1Result<Record<string, unknown>>, D1Result<{ ma_ca: string; da_vao: number; da_nop: number; canh_bao: number }>]
 
   const dem: Record<string, { da_vao: number; da_nop: number; canh_bao: number }> = {}
   for (const d of rDem.results ?? []) dem[String(d.ma_ca)] = d
@@ -3094,6 +3094,8 @@ const boXuLy = {
     if(dangReset)return
     // RESET LẦN 2 (Game Hóa 2.0, reset-hoa2.ts): chỉ chạy khi có cờ reset_hoa2_cho_phep; HOÃN khi có ca thi mở. Đang làm thì các việc cron khác nghỉ lượt này.
     if(await cronResetHoa2(env,Date.now()).catch(e=>{console.error('[reset-hoa2] cron lỗi:',e);return false}))return
+    // Chỉ mục tạo lúc chạy (chi-muc-luc-chay.ts, tối ưu 28/09): MỘT lần mỗi isolate, trong cron (không nằm trên đường lệnh của em/thầy). Lỗi chỉ ghi log.
+    await damBaoChiMuc(env)
     if(event.cron==='1 17 * * *'){
       // 00:01 giờ VN: tin phụ huynh + vinh danh như cũ, THÊM chốt ngày cũ và lập kế hoạch ngày mới (GĐ 2).
       // Kế hoạch có lỗi thì chỉ ghi log — không được kéo hai việc cũ đổ theo.
@@ -3463,8 +3465,6 @@ export default {
     // Phòng đấu Bi-a (WebSocket, GĐ2): đi thẳng tới Durable Object, KHÔNG qua lớp bọc dưới (dựng lại Response làm hỏng bắt tay 101).
     if (new URL(req.url).pathname.startsWith('/bi-a/phong/')) return denPhongBiA(req, env)
     const t0 = Date.now()
-    // Chỉ mục tạo lúc chạy (chi-muc-luc-chay.ts): MỘT lần mỗi isolate, sau phản hồi (waitUntil) ⇒ không thêm độ trễ.
-    if (ctx && env.DB) ctx.waitUntil(damBaoChiMuc(env))
     let res: Response
     // ỔN ĐỊNH (28/09): ~40 nhánh định tuyến `return handler(...)` KHÔNG await ⇒ Promise bị từ chối thoát khỏi try/catch của định tuyến (và các nhánh GET
     // nằm ngoài try) ⇒ Cloudflare trả 1101 thiếu CORS, máy em tưởng mất mạng. `await` + `catch` Ở ĐÂY bắt MỌI lỗi (đồng bộ lẫn bất đồng bộ) một chỗ duy nhất.
