@@ -144,8 +144,8 @@ describe('nối vào màn thi (khoá nguồn)', () => {
     expect(man).toMatch(/<OThongBao tone="xanh">\s*<b>\{baoThemGio\}<\/b>/)
   })
 
-  it('KHÔNG đụng chốt an toàn: vẫn còn nguyên VanTay, ManGiuDeDoc, ManChan, hạn tự nộp theo `remaining <= 0`, luật 1 phút cuối', () => {
-    for (const s of ['<VanTay sbd={attempt.sbd}', '<ManGiuDeDoc />', '<ManChan lyDo={lyDoChe}', 'if (remaining !== null && remaining <= 0) void doSubmit(attempt, true)', "a.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 60"]) expect(man, s).toContain(s)
+  it('KHÔNG đụng chốt an toàn: vẫn còn nguyên VanTay, ManGiuDeDoc, ManChan, hạn tự nộp theo mốc `het` (còn ≤ 0 giây, kho giờ 28/09), luật 1 phút cuối', () => {
+    for (const s of ['<VanTay sbd={attempt.sbd}', '<ManGiuDeDoc />', '<ManChan lyDo={lyDoChe}', "if (mocGio === 'het') void doSubmit(attempt, true)", "a.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 60"]) expect(man, s).toContain(s)
   })
 
   it('CSS dòng báo: token M3, không hex, mọi luật dưới `.m3`', () => {

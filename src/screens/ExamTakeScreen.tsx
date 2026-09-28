@@ -14,6 +14,7 @@ import { chuyenDeXinKho, dungCauSai, dungPhieuMayEm, SO_CAU_BAI_TAP_KEM, type Di
 import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../lib/exam-kho-de-import'
 import PhieuScreen from './PhieuScreen'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
+import { dinhDangDongHo, taoKhoGio, useGiayConLai, useMocGio, type KhoGio } from '../lib/dong-ho-thi'
 import { layIdThietBi } from '../lib/thiet-bi'
 import { MS_XAC_NHAN_AN, MS_XAC_NHAN_BLUR, chuanHoaNguong, khoaViRoiLau, laMayCamUng, loiCanhBao, mucKhiRoiMan, soLanTinhTu, tinhLaRoiMan, type NguongGianLan } from '../lib/chong-gian-lan'
 import { MS_AN_HAN_VAO_BAI, MS_TRUNG_KHOP, MS_VE_SOM, MS_XAC_NHAN_CO_MAN, MS_XAC_NHAN_CUA_SO_NOI, type PhieuKenh } from '../lib/do-dau-vet'
@@ -160,11 +161,20 @@ async function batToanManHinh(): Promise<void> {
   }
 }
 
-function formatClock(totalSeconds: number): string {
-  const s = Math.max(0, Math.floor(totalSeconds))
-  const m = Math.floor(s / 60)
-  const sec = s % 60
-  return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+const formatClock = dinhDangDongHo
+
+/** Số giờ "mm:ss" — NÚT LÁ duy nhất đổi mỗi giây (gốc màn không vẽ lại). */
+function SoDongHo({ kho }: { kho: KhoGio | null }) {
+  const giay = useGiayConLai(kho)
+  return <>{formatClock(giay ?? 0)}</>
+}
+
+/** Nhãn nút nộp khi chỉ được nộp 1 phút cuối: "Nộp bài (còn m:ss)" tự đếm. */
+function NhanNopCho({ kho }: { kho: KhoGio | null }) {
+  const giay = useGiayConLai(kho)
+  const cho = Math.max(0, Math.floor((giay ?? 0) - 60))
+  const le = cho % 60
+  return <>{`Nộp bài (còn ${Math.floor(cho / 60)}:${le < 10 ? '0' : ''}${le})`}</>
 }
 
 // ============================================================================
@@ -324,11 +334,19 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   const [lop, setLop] = useState('')
   const [attempt, setAttempt] = useState<ExamAttempt | null>(null)
   const [phieuSan, setPhieuSan] = useState<PhieuDayDu | null>(null)
-  // null = chưa tính lần nào (mới vào thi) — PHẢI phân biệt với 0 (đã hết giờ
-  // thật sự), nếu không effect tự-nộp-bài bên dưới sẽ chạy với giá trị khởi
-  // tạo 0 TRƯỚC khi effect đồng hồ kịp tính giờ thật, khiến bài tự nộp ngay
-  // lập tức lúc vừa vào thi.
-  const [remaining, setRemaining] = useState<number | null>(null)
+  // Đồng hồ đếm ngược: mốc hết giờ do MÁY CHỦ đặt (hetGioLuc), thời gian hiện
+  // tại lấy từ gioMayChu() (đã hiệu chỉnh theo máy chủ, chống chỉnh giờ máy) —
+  // không cộng dồn setInterval để không lệch giờ. Giây còn lại nằm trong KHO GIỜ
+  // (lib/dong-ho-thi): chỉ nút lá `SoDongHo`/`NhanNopCho` vẽ lại mỗi giây; gốc
+  // màn chỉ nghe MỐC (thường/gấp/cuối/hết) — trước đây `setRemaining` mỗi giây
+  // làm cả đề (~260 công thức) vẽ lại, máy yếu đứng hình (MAN-THI.md 28/09).
+  // BÀI TẬP VỀ NHÀ: không đồng hồ, không tự nộp (BA-APP.md mục 6) ⇒ kho = null.
+  // Kho tạo xong đã có giây thật ⇒ không bao giờ tự nộp nhầm lúc vừa vào thi.
+  const hetLucMs = phase === 'exam' && attempt && attempt.loai !== 'baitap' ? new Date(hetGioCua(attempt)).getTime() : null
+  const khoGio = useMemo(() => (hetLucMs === null ? null : taoKhoGio(hetLucMs, gioMayChu)), [hetLucMs])
+  const mocGio = useMocGio(khoGio)
+  /** Giây còn lại ĐÚNG LÚC NÀY (cho hàm xử lý sự kiện) — null nếu không tính giờ. */
+  const conLaiNgay = (): number | null => (khoGio ? khoGio.conLaiNgay() : null)
   const retryTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   /** ĐANG CÓ MỘT LƯỢT NỘP CHẠY DỞ. Chốt chống chồng lượt — xem `nhip-gui-lai`. */
   const dangGui = useRef(false)
@@ -482,11 +500,11 @@ export default function ExamTakeScreen({ tuCong, onVe }: { tuCong?: TuCongHocSin
   // Rung MỘT LẦN DUY NHẤT khi vừa xuống dưới 5 phút — không lặp lại, không
   // nhấp nháy, đúng nguyên tắc "báo trạng thái, không gây hoảng".
   useEffect(() => {
-    if (remaining !== null && remaining <= 300 && !gapVibratedRef.current) {
+    if ((mocGio === 'gap' || mocGio === 'cuoi' || mocGio === 'het') && !gapVibratedRef.current) {
       gapVibratedRef.current = true
       navigator.vibrate?.(200)
     }
-  }, [remaining])
+  }, [mocGio])
 
   // Đang thi thì hoãn việc tự tải bản app mới — tải lại giữa bài làm mất toàn
   // màn hình và có thể bị tính là một lần rời màn (xem cap-nhat-app.ts).
@@ -1469,24 +1487,6 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tuCong, scriptUrl, maCa, sbd, xacNhan])
 
-  // Đồng hồ đếm ngược: mốc hết giờ do MÁY CHỦ đặt (hetGioLuc), thời gian hiện
-  // tại lấy từ gioMayChu() (đã hiệu chỉnh theo máy chủ, chống chỉnh giờ máy) —
-  // không cộng dồn setInterval để không lệch giờ.
-  useEffect(() => {
-    if (phase !== 'exam' || !attempt) return
-    // BÀI TẬP VỀ NHÀ: không đồng hồ đếm ngược, không tự nộp — chỉ hiện hạn nộp
-    // (BA-APP.md mục 6). Quá hạn vẫn làm và nộp được, máy chủ đánh dấu quá hạn.
-    if (attempt.loai === 'baitap') {
-      setRemaining(null)
-      return
-    }
-    const deadline = new Date(hetGioCua(attempt)).getTime()
-    const tick = () => setRemaining((deadline - gioMayChu()) / 1000)
-    tick()
-    const id = setInterval(tick, 1000)
-    return () => clearInterval(id)
-  }, [phase, attempt])
-
   // Gửi trạng thái làm bài lên máy chủ theo lô mỗi 10 giây (GIAO-DIEN-LAM-BAI.md
   // "Lưu bài"): ngay khi vào thi + định kỳ, không cần đợi em thao tác gì.
   useEffect(() => {
@@ -2173,6 +2173,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   }
 
   const doSubmit = async (a: ExamAttempt, tuDongNop = false) => {
+    const remaining = conLaiNgay()
     if (!tuDongNop && a.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 60) {
       showToast(`Chỉ được nộp bài trong 1 phút cuối của ca thi (còn ${Math.ceil((remaining - 60) / 60)} phút)`, 'warn')
       return
@@ -2390,9 +2391,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
   useEffect(() => {
     if (phase !== 'exam' || !attempt) return
     if (attempt.loai === 'baitap') return // bài tập không tự nộp theo giờ
-    if (remaining !== null && remaining <= 0) void doSubmit(attempt, true)
+    if (mocGio === 'het') void doSubmit(attempt, true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [remaining, phase])
+  }, [mocGio, phase])
 
   useEffect(() => {
     return () => {
@@ -3231,7 +3232,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     ) : (
       the
     )
-  const gapNow = remaining !== null && remaining <= 300
+  const gapNow = mocGio === 'gap' || mocGio === 'cuoi' || mocGio === 'het'
   // BÀI TẬP VỀ NHÀ: thay đồng hồ đếm ngược bằng hạn nộp (BA-APP.md mục 6).
   const laBaiTap = attempt?.loai === 'baitap'
   const hanNopNgan = (() => {
@@ -3339,13 +3340,8 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
     )
   }
 
-  const camNopSom = Boolean(attempt.chiNop3PhutCuoi && typeof remaining === 'number' && remaining > 60)
-  const giayChoPhepNop = camNopSom ? Math.max(0, Math.floor((remaining ?? 0) - 60)) : 0
-  const phutChoPhepNop = Math.floor(giayChoPhepNop / 60)
-  const leGiayChoPhepNop = giayChoPhepNop % 60
-  const nhanNutNop = camNopSom
-    ? `Nộp bài (còn ${phutChoPhepNop}:${leGiayChoPhepNop < 10 ? '0' : ''}${leGiayChoPhepNop})`
-    : 'Nộp bài'
+  const camNopSom = Boolean(attempt.chiNop3PhutCuoi && (mocGio === 'thuong' || mocGio === 'gap'))
+  const nhanNutNop = camNopSom ? <NhanNopCho kho={khoGio} /> : 'Nộp bài'
 
   const lopPhu = (
     <>
@@ -3555,9 +3551,10 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             const f = flat[n - 1]
             if (f) doiDauCau(dsItem(f).qid)
           }}
-          dongHo={laBaiTap ? null : formatClock(remaining ?? 0)}
+          dongHo={laBaiTap ? null : ''}
           chuThayDongHo={hanNopNgan ? `Hạn ${hanNopNgan}` : 'Bài tập'}
-          conGiay={laBaiTap ? null : remaining}
+          conGiay={null}
+          khoGio={laBaiTap ? null : khoGio}
           hetGioLuc={laBaiTap ? undefined : gioNgan(hetGioCua(attempt))}
           daLam={daLamCount}
           tong={total}
@@ -3628,7 +3625,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       {dungM3() ? (
         <div className="sticky top-0 z-30">
           <ThanhTrenThiM3
-            dongHo={laBaiTap ? null : formatClock(remaining ?? 0)}
+            dongHo={laBaiTap ? null : <SoDongHo kho={khoGio} />}
             chuThayDongHo={hanNopNgan ? `Hạn ${hanNopNgan}` : 'Bài tập'}
             gap={!laBaiTap && gapNow}
             tenCa={attempt.tenCa || ''}
@@ -3660,7 +3657,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
             </div>
           ) : (
             <div className="font-bold" style={{ ...SANS_SO, fontSize: 'var(--cx-4)', color: gapNow ? 'var(--gap)' : 'var(--muc)', transitionProperty: 'color', transitionDuration: 'var(--nhanh)' }}>
-              {formatClock(remaining ?? 0)}
+              <SoDongHo kho={khoGio} />
             </div>
           )}
           <div className="flex items-center" style={{ gap: 'var(--k2)' }}>

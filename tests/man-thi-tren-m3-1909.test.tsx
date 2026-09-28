@@ -101,7 +101,7 @@ describe('ThanhTrenThiM3 — hợp đồng với màn thi', () => {
     expect(man).toMatch(/\{dungM3\(\) \? \(\s*<div className="sticky top-0 z-30">\s*<ThanhTrenThiM3/)
     expect(man).toContain("style={{ height: 56, background: 'var(--the-mo)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid var(--vien)' }}")
     // mọi giá trị đưa vào thanh là giá trị ĐÃ CÓ của màn (không tính mới, không gọi mới)
-    for (const s of ['dongHo={laBaiTap ? null : formatClock(remaining ?? 0)}', 'gap={!laBaiTap && gapNow}', 'nhanLuu={dotLabel}', 'mayNgoaiMang={!online}', 'onMoLuoi={() => setShowGrid(true)}']) expect(man, s).toContain(s)
+    for (const s of ['dongHo={laBaiTap ? null : <SoDongHo kho={khoGio} />}', 'gap={!laBaiTap && gapNow}', 'nhanLuu={dotLabel}', 'mayNgoaiMang={!online}', 'onMoLuoi={() => setShowGrid(true)}']) expect(man, s).toContain(s)
   })
 
   it('cổng học sinh chừa chỗ bên phải cho nút "Đóng phòng thi" (--thi-le-phai) để không che nút danh sách câu; thanh M3 đọc đúng biến ấy', () => {
