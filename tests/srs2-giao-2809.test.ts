@@ -79,3 +79,14 @@ describe('trần Huyết Chiến tự tính (thầy 28/09)', () => {
     expect(tranHuyetChienTheo(25)).toBe(50)
   })
 })
+
+describe('ds-em trả KHỐI + LỚP ĐÃ PHÂN (thầy 28/09: "học sinh đã phân lớp cho khối 12")', () => {
+  it('ten_lop có thì dùng; chưa phân ⇒ mặc định theo khối', async () => {
+    const { d, env } = dung()
+    d.sql.exec("INSERT INTO hoc_sinh(sbd,ho_ten,lop,ten_lop,cap_nhat_luc) VALUES('K1','Khoa','12','12 - Tinh Hoa','x'),('K2','Lan','12',NULL,'x')")
+    const ds = await gvChienDich(env, { action: 'ds-em' }, T0) as { em: { sbd: string; khoi: string; tenLop: string }[] }
+    const k = Object.fromEntries(ds.em.map((e) => [e.sbd, e]))
+    expect(k.K1).toMatchObject({ khoi: '12', tenLop: '12 - Tinh Hoa' })
+    expect(k.K2).toMatchObject({ khoi: '12', tenLop: '12 - Lớp Thường' })
+  })
+})

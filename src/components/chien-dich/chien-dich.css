@@ -613,3 +613,9 @@
 .cd-ket-qua--khong {
   background: var(--bts-do-nhat);
 }
+.cd-nhan-nhom {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bts-chu-phu);
+}
