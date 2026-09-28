@@ -674,7 +674,15 @@
 .h2-ngang[data-thap='true'] .h2-ng-an-thap {
   display: none;
 }
-.h2-ng-khung {
+/* Thu tỉ lệ (zoom ≥ 0,75) KHÔNG được làm đích chạm dưới 44 px thật: kích thước trước zoom ≥ 44 / tỉ lệ (0,75 ⇒ ≈ 59 px). */
+.h2-ngang[data-thap='true'] .h2-ng-nut-tron {
+  width: max(52px, calc(44px / var(--h2-ti-le, 1)));
+  height: max(52px, calc(44px / var(--h2-ti-le, 1)));
+}
+.h2-ngang[data-thap='true'] .h2-hud-thu,
+.h2-ngang[data-thap='true'] .h2-ng-chuoi {
+  min-height: max(48px, calc(44px / var(--h2-ti-le, 1)));
+}.h2-ng-khung {
   width: 100%;
   max-width: 1440px;
   height: 100%;
