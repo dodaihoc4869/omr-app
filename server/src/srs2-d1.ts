@@ -5,7 +5,7 @@
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import type { Env } from './kieu'
 import {
-  lapKeHoachNgay, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
+  lapKeHoachNgay, tranHuyetChienTheo, phatLaiCau, canGoiY, moDuocRuong, tiLeChienDich, ngayThanhThaoSomNhat, soNgayConLai,
   type CauSrs, type LanLam, type TrangThaiCau, type Phan,
 } from './srs2-loi'
 
@@ -214,7 +214,7 @@ export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?
   const dem = await docDemHomNay(env, sbd, ngay)
   const cd = hoSo.chienDich
   const tranNgay = cd?.theLucNgay
-  const tuyChon = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(tranNgay ? { tranNgay } : {}), ...(cd && !cd.huyetChien ? { tranHuyetChien: cd.theLucNgay } : {}) }
+  const tuyChon = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(tranNgay ? { tranNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay } : {}) }
   const cu = await env.DB.prepare('SELECT * FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch(() => null)
   if (cu) {
     let kh = tuDong(cu, ngay, dem)

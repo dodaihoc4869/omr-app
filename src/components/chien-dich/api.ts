@@ -41,6 +41,8 @@ export type MucSucChua = 'xanh' | 'vang' | 'do'
 
 export interface SucChua {
   soCau: number
+  /** Thể lực/ngày nhỏ nhất bảo đảm mục tiêu (em giữa lớp ≤ 70%, không em nào quá tải) — nút gạt "Tự động". Máy chủ cũ không có. */
+  theLucDeXuat?: number
   /** Số câu dùng được MỖI tờ góp vào (đã bỏ trùng, tự luận, chưa duyệt) — cộng lại = soCau. Máy chủ cũ không có. */
   soCauTheoTo?: Record<string, number>
   soEm: number
@@ -153,6 +155,8 @@ export const luuCo = async (co: CoHoa2): Promise<KetQuaLenh<CoHoa2>> => {
   return { ok: true, du: r.du.co ?? co }
 }
 export const danhSach = () => goiChienDich<DanhSachChienDich>('danh-sach')
+/** Danh sách học sinh máy chủ (sbd, họ tên, lớp) cho bộ chọn khối → lớp → em. */
+export const docDsEm = () => goiChienDich<{ em: { sbd: string; hoTen: string; lop: string }[] }>('ds-em', {})
 export const tinhSucChua = (dv: DauVaoGiao) => goiChienDich<SucChua>('suc-chua', { ...dv })
 export const taoChienDich = (dv: DauVaoGiao & { ten: string }) => goiChienDich<{ id: string; soCau: number; soEm: number }>('tao', { ...dv })
 export const huyChienDich = (id: string) => goiChienDich<{ ok: true }>('huy', { id })

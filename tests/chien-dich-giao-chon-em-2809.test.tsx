@@ -72,6 +72,19 @@ describe('giao chiến dịch — chọn khối → lớp → từng em', () => 
   })
 })
 
+describe('giao chiến dịch — danh sách học sinh lấy từ MÁY CHỦ (máy thầy chưa nạp Danh sách lớp vẫn chọn được)', () => {
+  it('classList trên máy rỗng + máy chủ trả ds-em ⇒ vẫn hiện Khối/Lớp/em và gửi đúng SBD', async () => {
+    useAppStore.setState({ classList: [] } as never)
+    const cu = goi.getMockImplementation()!
+    goi.mockImplementation(async (d: string, b: Record<string, unknown>) => (b.action === 'ds-em' ? { ok: true, du: { ok: true, em: [{ sbd: '1101', hoTen: 'An', lop: '11' }, { sbd: '1102', hoTen: 'Bình', lop: '11' }] } } : cu(d, b)))
+    render(<GiaoChienDich maDeCa={['DE-A-TN']} nowMs={NOW} />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Khối 11' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /Lớp 11 · 2 em/ }))
+    await waitFor(() => expect(lenh('suc-chua').at(-1)).toMatchObject({ lop: '11', sbd: ['1101', '1102'] }))
+    expect(lenh('ds-em')).toHaveLength(1)
+  })
+})
+
 describe('giao chiến dịch — kho đề đủ và số câu đồng bộ', () => {
   it('hộp "Thêm tờ đề" hiện ĐỦ tờ, kể cả tờ trùng hết câu với tờ khác, và tách theo phần như màn Mở ca', async () => {
     render(<GiaoChienDich nowMs={NOW} />)

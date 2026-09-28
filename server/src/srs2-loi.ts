@@ -48,6 +48,8 @@ export interface TrangThaiCau {
 
 export const TRAN_NGAY = 40
 export const TRAN_HUYET_CHIEN = 80
+/** Thầy 28/09: trần Huyết Chiến TỰ TÍNH theo thể lực của chiến dịch = GẤP ĐÔI thể lực/ngày (giữ tỉ lệ gốc 40 → 80), không cố định 80. */
+export const tranHuyetChienTheo = (theLucNgay: number): number => 2 * Math.max(1, Math.floor(theLucNgay))
 export const NGAY_DEM = 3
 export const NGUONG_CAT_TIA = 4
 export const TI_LE_DUY_TRI = 0.2

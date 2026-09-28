@@ -20,6 +20,7 @@ export async function gvChienDich(env: Env, b: Row, nowMs = Date.now()): Promise
     if (action === 'co-luu') return coLuu(env, b, nowMs)
     if (action === 'danh-sach') return danhSach(env, nowMs)
     if (action === 'suc-chua') return tinhSucChua(env, b, nowMs)
+    if (action === 'ds-em') return dsEm(env)
     if (action === 'tao') return tao(env, b, nowMs)
     if (action === 'dong' || action === 'huy') return doiTrangThai(env, str(b.id), action === 'dong' ? 'da_dong' : 'da_huy', nowMs)
     if (action === 'bang') return bang(env, str(b.id), nowMs)
@@ -48,6 +49,11 @@ async function docMot(env: Env, id: string): Promise<ChienDich> {
   const r = await env.DB.prepare('SELECT * FROM chien_dich WHERE id = ?').bind(id).first<Row>()
   if (!r) throw new Error('Không tìm thấy chiến dịch.')
   return docChienDichTuDong(r)
+}
+/** Danh sách học sinh (đang học) cho bộ chọn khối → lớp → em ở màn giao — CÙNG bảng `emCuaLop` dùng, không phụ thuộc bộ nhớ máy thầy. */
+async function dsEm(env: Env) {
+  const r = await env.DB.prepare("SELECT sbd, ho_ten, lop FROM hoc_sinh WHERE COALESCE(trang_thai,'') <> 'khoa' AND COALESCE(lop,'') <> '' ORDER BY lop, ho_ten").all<Row>()
+  return { ok: true, em: (r.results ?? []).map((x) => ({ sbd: str(x.sbd), hoTen: str(x.ho_ten), lop: str(x.lop) })) }
 }
 async function emCuaLop(env: Env, lop: string): Promise<string[]> {
   const r = await env.DB.prepare("SELECT sbd FROM hoc_sinh WHERE COALESCE(lop,'') = ? AND COALESCE(trang_thai,'') <> 'khoa' ORDER BY sbd").bind(lop).all<Row>()
@@ -146,6 +152,16 @@ async function danhSach(env: Env, nowMs: number) {
   return { ok: true, homNay, chienDich: (r.results ?? []).map(docChienDichTuDong).map(({ qids, sbd, ...c }) => ({ ...c, soCau: qids.length, soEm: sbd.length, hetHan: c.hanNop < homNay })) }
 }
 
+export const THE_LUC_TOI_DA = 500
+/**
+ * THỂ LỰC TỰ ĐỘNG (nút gạt "Tự động" ở màn giao): số lượt/ngày NHỎ NHẤT bảo đảm mục tiêu tới hạn nộp —
+ * em ở giữa lớp ở vùng vừa sức (≤ 70% sức chứa) VÀ không em nào quá tải (em nặng nhất ≤ 100%). Tối thiểu 10.
+ */
+export function theLucDeXuat(klGiua: number, klNangNhat: number, D: number): number {
+  if (D <= 0) return THE_LUC_TOI_DA
+  return Math.min(THE_LUC_TOI_DA, Math.max(10, Math.ceil(klGiua / (0.7 * D)), Math.ceil(klNangNhat / D)))
+}
+
 interface DauVaoGiao { ten: string; lop: string | null; sbd: string[]; maDe: string[]; hanNop: string; theLucNgay: number; huyetChien: boolean; maCa: string | null }
 async function docDauVao(env: Env, b: Row): Promise<DauVaoGiao> {
   const lop = str(b.lop).trim() || null
@@ -155,7 +171,8 @@ async function docDauVao(env: Env, b: Row): Promise<DauVaoGiao> {
   if (!sbd.length) throw new Error('Chưa chọn em nào.')
   if (!maDe.length) throw new Error('Chưa chọn tờ đề nào.')
   if (!NGAY.test(hanNop)) throw new Error('Hạn nộp phải là ngày dạng YYYY-MM-DD.')
-  const theLucNgay = Math.max(10, Math.min(80, Math.floor(Number(b.theLucNgay) || TRAN_NGAY)))
+  // Thầy 28/09: "thể lực một ngày cho tôi điền con số bất kì" ⇒ chỉ chặn số vô nghĩa (≥ 1, ≤ 500 lượt/ngày).
+  const theLucNgay = Math.max(1, Math.min(THE_LUC_TOI_DA, Math.floor(Number(b.theLucNgay) || TRAN_NGAY)))
   return { ten: str(b.ten).trim() || 'Chiến dịch luyện', lop, sbd, maDe, hanNop, theLucNgay, huyetChien: b.huyetChien !== false, maCa: str(b.maCa).trim() || null }
 }
 
@@ -181,7 +198,7 @@ async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   const soBo = Math.max(0, Math.ceil((kl - 0.7 * tran) / 2))
   const Dmoi = Math.ceil(kl / (0.7 * dv.theLucNgay))
   return {
-    ok: true, soCau: qids.length, soCauTheoTo: theoTo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
+    ok: true, soCau: qids.length, theLucDeXuat: theLucDeXuat(kl, Math.max(0, ...khoiLuong), D), soCauTheoTo: theoTo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
     soEmQuaTai: khoiLuong.filter((x) => x > tran).length,
     goiY: sc.muc === 'xanh' ? null : {
       rutCon: soBo > 0 && soBo < qids.length ? { soCau: qids.length - soBo, tiLe: (kl - 2 * soBo) / tran } : null,
