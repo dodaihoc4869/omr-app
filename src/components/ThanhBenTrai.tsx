@@ -4,15 +4,19 @@
 //   ≥ 1100 px  ngăn kéo 264 px (logo + chữ, nút "Mở ca kiểm tra", mục có nhãn, Cài đặt ở đáy);
 //   880–1100   thanh rail 88 px (chỉ biểu tượng + nhãn ngắn dưới biểu tượng);
 //   < 880      không hiện thanh này — `BottomNav` (thanh đáy) dùng chính danh sách ấy.
-// GAME HÓA 2.0 (cờ `co.bat`, bản vẽ docs/ban-ve-game-hoa-2-2709/GV-*.dc.html): app thầy chỉ còn HAI việc chính —
-//   "Mở ca kiểm tra" (giữ) · Ca kiểm tra · Lên bảng · vạch · "Thêm…" (Học sinh, Ngân hàng đề, Cài đặt). Ẩn Hôm nay, Giao BTVN,
-//   Học sinh hỏi, Giao đề theo tuần (thầy: "Bỏ hẳn BTVN"). Cờ tắt ⇒ đúng danh sách cũ `MUC_DIEU_HUONG`, không đổi gì.
+// GAME HÓA 2.0 (cờ `co.bat`, bản vẽ thầy chốt 28/09 docs/ban-ve-gv-2809/GV-ThanhBen + RA-SOAT.md mục 1):
+//   "Mở ca kiểm tra" (nút chính) · Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh; ĐÁY: Kho đề · Cài đặt.
+//   Bỏ nhãn "Thêm…" và dòng "6,022 · 10²³" (logo = "Đỗ Đại Học · Giáo viên"). Ẩn Hôm nay, Giao BTVN, Học sinh hỏi, Giao đề theo
+//   tuần. Số đếm cạnh mục lấy từ `useSoDemGv` (màn đã tải ghi vào) — chưa biết thì không vẽ. Cờ tắt ⇒ đúng danh sách cũ.
 // Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
-import { CalendarDays, ClipboardCheck, FileText, Home, Library, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
+import { CalendarDays, ClipboardCheck, FileText, Flag, Home, Library, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import LogoGiaoVien from './LogoGiaoVien'
+import { AnhLogo } from './LogoVai'
+import { useSoDemGv } from '../lib/so-dem-gv'
 import { useHoa2Bat } from './chien-dich/co-hoa2'
 import './chien-dich/thanh-ben-hoa2.css'
+import './thanh-ben-gv2.css'
 
 export interface MucDieuHuong {
   id: ScreenId
@@ -40,26 +44,38 @@ export const MUC_DIEU_HUONG: MucDieuHuong[] = [
   { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
 
-/** GAME HÓA 2.0 — hai việc chính của thầy. */
+/** GAME HÓA 2.0 — bốn việc + Học sinh (bản vẽ GV-ThanhBen). Thanh đáy điện thoại dùng CHÍNH danh sách này (nhãn `ngan`). */
 export const MUC_HOA2_CHINH: MucDieuHuong[] = [
+  { id: 'tongquan', ten: 'Tổng quan', ngan: 'Tổng quan', icon: Home },
   { id: 'lichsuca', ten: 'Ca kiểm tra', ngan: 'Ca kiểm tra', icon: CalendarDays, con: ['exammonitor', 'examsetup'] },
-  { id: 'goilenbang', ten: 'Lên bảng', ngan: 'Lên bảng', icon: Presentation },
-]
-/** GAME HÓA 2.0 — thu vào "Thêm…". */
-export const MUC_HOA2_THEM: MucDieuHuong[] = [
+  { id: 'chiendich', ten: 'Chiến dịch luyện', ngan: 'Chiến dịch', icon: Flag },
+  { id: 'goilenbang', ten: 'Chữa trên lớp', ngan: 'Chữa bài', icon: Presentation },
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist', 'toancanh'] },
-  { id: 'nganhangde', ten: 'Ngân hàng đề', ngan: 'Ngân hàng', icon: Library },
-  { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings },
+]
+/** GAME HÓA 2.0 — hai mục ở ĐÁY thanh bên (điện thoại: nút bánh răng trên thanh trên). */
+export const MUC_HOA2_DAY: MucDieuHuong[] = [
+  { id: 'nganhangde', ten: 'Kho đề', ngan: 'Kho đề', icon: Library, cuoi: true },
+  { id: 'caidat', ten: 'Cài đặt', ngan: 'Cài đặt', icon: Settings, cuoi: true },
 ]
 /** Màn KHÔNG còn khi Game Hóa 2.0 bật — App chuyển về `MAN_DAU_HOA2`. */
 export const MAN_AN_KHI_HOA2: readonly ScreenId[] = ['examhub', 'giaobtvn', 'cauhoi', 'khodegiao']
+/** Màn CHỈ có khi Game Hóa 2.0 bật — cờ tắt thì App chuyển về Hôm nay. */
+export const MAN_CHI_HOA2: readonly ScreenId[] = ['tongquan', 'chiendich']
 /** Màn đầu của app thầy khi Game Hóa 2.0 bật. */
-export const MAN_DAU_HOA2: ScreenId = 'lichsuca'
+export const MAN_DAU_HOA2: ScreenId = 'tongquan'
 
 /** Mục nào đang sáng ở màn `screen` (mục có màn con tô sáng cả khi đứng ở màn con). `hoa2` = dùng danh sách Game Hóa 2.0. */
 export function mucDangSang(screen: ScreenId, hoa2 = false): ScreenId | null {
-  const ds = hoa2 ? [...MUC_HOA2_CHINH, ...MUC_HOA2_THEM] : MUC_DIEU_HUONG
+  const ds = hoa2 ? [...MUC_HOA2_CHINH, ...MUC_HOA2_DAY] : MUC_DIEU_HUONG
   return ds.find((m) => m.id === screen || (m.con ?? []).includes(screen))?.id ?? null
+}
+
+/** Số đếm cạnh mục (2.0): chữ ngắn + nhãn đầy đủ cho trình đọc màn hình. `null` ⇒ không vẽ. */
+export function soDemMuc(id: ScreenId, so: { caMo: number | null; chienDichChay: number | null; canDayLai: number | null }): { chu: string; nhan: string; tone: 'la' | 'xam' | 'do' } | null {
+  if (id === 'lichsuca' && so.caMo) return { chu: `${so.caMo} mở`, nhan: `${so.caMo} ca đang mở`, tone: 'la' }
+  if (id === 'chiendich' && so.chienDichChay) return { chu: String(so.chienDichChay), nhan: `${so.chienDichChay} chiến dịch đang chạy`, tone: 'xam' }
+  if (id === 'goilenbang' && so.canDayLai) return { chu: String(so.canDayLai), nhan: `${so.canDayLai} câu cần dạy lại`, tone: 'do' }
+  return null
 }
 
 export default function ThanhBenTrai() {
@@ -67,12 +83,16 @@ export default function ThanhBenTrai() {
   const setScreen = useAppStore((s) => s.setScreen)
   const hoa2 = useHoa2Bat()
   const sang = mucDangSang(screen, hoa2)
+  const caMo = useSoDemGv((s) => s.caMo)
+  const chienDichChay = useSoDemGv((s) => s.chienDichChay)
+  const canDayLai = useSoDemGv((s) => s.canDayLai)
 
   const nut = (m: MucDieuHuong, phu = false) => {
     const Icon = m.icon
     const dang = sang === m.id
+    const dem = hoa2 ? soDemMuc(m.id, { caMo, chienDichChay, canDayLai }) : null
     return (
-      <button key={m.id} type="button" onClick={() => setScreen(m.id)} aria-current={dang ? 'page' : undefined} className={`ben-trai-muc${phu ? ' ben-trai-muc--phu' : ''}${dang ? ' dang' : ''}`} aria-label={m.ten} title={m.ten}>
+      <button key={m.id} type="button" onClick={() => setScreen(m.id)} aria-current={dang ? 'page' : undefined} className={`ben-trai-muc${phu ? ' ben-trai-muc--phu' : ''}${dang ? ' dang' : ''}`} aria-label={m.ten} title={dem ? `${m.ten} · ${dem.nhan}` : m.ten}>
         <span className="ben-trai-bieu-tuong">
           <Icon size={22} strokeWidth={dang ? 2.3 : 1.9} aria-hidden="true" />
         </span>
@@ -80,13 +100,41 @@ export default function ThanhBenTrai() {
         <span className="ben-trai-ngan" aria-hidden="true">
           {m.ngan}
         </span>
+        {dem && (
+          <span className="ben-trai-dem" data-tone={dem.tone} aria-hidden="true">
+            {dem.chu}
+          </span>
+        )}
       </button>
     )
   }
 
+  if (hoa2) {
+    return (
+      <nav className="ben-trai" aria-label="Điều hướng chính" data-hoa2="">
+        <button type="button" onClick={() => setScreen(MAN_DAU_HOA2)} className="ben-trai-logo ben-trai-logo--gv2" title="Về Tổng quan">
+          <AnhLogo vai="gv" size={40} />
+          <span className="ben-trai-logo-chu">
+            <span className="ben-trai-logo-ten">Đỗ Đại Học</span>
+            <span className="ben-trai-logo-vai">Giáo viên</span>
+          </span>
+        </button>
+        <button type="button" onClick={() => setScreen('examsetup')} className="ben-trai-nut-ca" aria-label="Mở ca kiểm tra">
+          <Plus size={22} aria-hidden="true" />
+          <span className="ben-trai-nut-ca-chu">Mở ca kiểm tra</span>
+        </button>
+        <div className="ben-trai-danh-sach">{MUC_HOA2_CHINH.map((m) => nut(m))}</div>
+        <div className="ben-trai-cuoi ben-trai-cuoi--gv2">
+          <div className="ben-trai-vach" role="separator" />
+          {MUC_HOA2_DAY.map((m) => nut(m, true))}
+        </div>
+      </nav>
+    )
+  }
+
   return (
-    <nav className="ben-trai" aria-label="Điều hướng chính" data-hoa2={hoa2 ? '' : undefined}>
-      <button type="button" onClick={() => setScreen(hoa2 ? MAN_DAU_HOA2 : 'examhub')} className="ben-trai-logo" title={hoa2 ? 'Về Ca kiểm tra' : 'Trang chủ Kiên trì'}>
+    <nav className="ben-trai" aria-label="Điều hướng chính">
+      <button type="button" onClick={() => setScreen('examhub')} className="ben-trai-logo" title="Trang chủ Kiên trì">
         <LogoGiaoVien size={40} hienChu={true} className="ben-trai-logo-goc" />
       </button>
 
@@ -95,23 +143,8 @@ export default function ThanhBenTrai() {
         <span className="ben-trai-nut-ca-chu">Mở ca kiểm tra</span>
       </button>
 
-      {hoa2 ? (
-        <>
-          <div className="ben-trai-danh-sach">{MUC_HOA2_CHINH.map((m) => nut(m))}</div>
-          <div className="ben-trai-vach" role="separator" />
-          <div className="ben-trai-danh-sach" role="group" aria-labelledby="ben-trai-them">
-            <span id="ben-trai-them" className="ben-trai-them-nhan">
-              Thêm…
-            </span>
-            {MUC_HOA2_THEM.map((m) => nut(m, true))}
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="ben-trai-danh-sach">{MUC_DIEU_HUONG.filter((m) => !m.cuoi).map((m) => nut(m))}</div>
-          <div className="ben-trai-cuoi">{MUC_DIEU_HUONG.filter((m) => m.cuoi).map((m) => nut(m))}</div>
-        </>
-      )}
+      <div className="ben-trai-danh-sach">{MUC_DIEU_HUONG.filter((m) => !m.cuoi).map((m) => nut(m))}</div>
+      <div className="ben-trai-cuoi">{MUC_DIEU_HUONG.filter((m) => m.cuoi).map((m) => nut(m))}</div>
     </nav>
   )
 }
