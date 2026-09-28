@@ -6,7 +6,6 @@ import { chuGameTrong, coChuGame } from '../server/src/chu-game'
 import { loiPhGop, loiPhMotBai, type DauVaoLoi } from '../server/src/nhac-tu-dong'
 import { loiChoPhuHuynh } from '../server/src/canh-bao-thay'
 import { analyzeParent } from '../server/src/parent-news'
-import { docBoNaoAiChoPhuHuynh } from '../server/src/bo-nao-doc'
 import { taoD1That, type D1That } from './_d1-that'
 
 describe('chuGameTrong: bắt đúng chữ game, không bắt chữ học tập', () => {
@@ -46,42 +45,5 @@ describe('mẫu chữ do máy chủ sinh cho phụ huynh không có chữ game',
       const chu = JSON.stringify([x.mode, x.reason, x.keHoach, x.weak, x.duDoanDiem, x.today])
       expect(chuGameTrong(chu), chu).toEqual([])
     }
-  })
-})
-
-describe('lời Bộ não A.I cho phụ huynh và thư tuần: lời có chữ game bị bỏ ở máy chủ (lớp phòng thủ)', () => {
-  const NGAY = '2026-09-22'
-  const dung = (): D1That => {
-    const d = taoD1That()
-    d.sql.exec("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('bo_nao','{\"bat\":true,\"cheDo\":\"that\",\"lopThat\":[]}','x')")
-    return d
-  }
-  const ai = (d: D1That, ngay: string, o: { loiPh?: string; thuTuan?: string; loiEm?: string }) => {
-    d.sql.prepare("INSERT INTO ai_dieu_chinh(sbd,ngay,json,do_tin,che_do,ap_dung,het_han,huy,tu_go,ly_do_bo,nop_luc) VALUES('S1',?,?,0.9,'that',1,'2026-10-30',0,0,'[]','x')")
-      .run(ngay, JSON.stringify({ loiNhanChoEm: o.loiEm ?? '', loiNhanChoPhuHuynh: o.loiPh ?? '', thuTuan: o.thuTuan ?? '' }))
-    d.sql.prepare("INSERT OR REPLACE INTO ai_ho_so_ngay(sbd,ngay,lop,luong,ly_do_luong,the_json,tao_luc) VALUES('S1',?,'12A1','sau','[]','{}','x')").run(ngay)
-  }
-  it('lời sạch ra bình thường; lời có "thần thú/EXP/khiên/game" coi như vắng và rơi về lời sạch cũ hơn; thư tuần cũng vậy', async () => {
-    const d = dung()
-    ai(d, '2026-09-21', { loiPh: 'Hôm qua con đúng 7 trong 8 câu. Mai con ôn lại 3 câu.', thuTuan: 'Tuần này con học đều 5 ngày.' })
-    expect(await docBoNaoAiChoPhuHuynh(d.env, 'S1', NGAY)).toMatchObject({ loiNhan: 'Hôm qua con đúng 7 trong 8 câu. Mai con ôn lại 3 câu.', thuTuan: 'Tuần này con học đều 5 ngày.' })
-    for (const xau of ['Con được thêm 20 EXP hôm qua.', 'Thần thú của con lên cấp.', 'Con sắp đủ mảnh khiên.', 'Con chơi game nhiều.']) {
-      const e = dung()
-      ai(e, '2026-09-21', { loiPh: 'Hôm qua con đúng 7 trong 8 câu.', thuTuan: 'Tuần này con học đều 5 ngày.' })
-      ai(e, NGAY, { loiPh: xau, thuTuan: xau })
-      const r = await docBoNaoAiChoPhuHuynh(e.env, 'S1', NGAY)
-      expect(r?.loiNhan, xau).toBe('Hôm qua con đúng 7 trong 8 câu.') // lời mới nhất bị bỏ ⇒ dùng lời sạch của hôm trước
-      expect(r?.thuTuan, xau).toBe('Tuần này con học đều 5 ngày.')
-      expect(JSON.stringify(r)).not.toMatch(/EXP|thần thú|khiên|game/i)
-    }
-    const f = dung()
-    ai(f, NGAY, { loiPh: 'Con được thêm 20 EXP.', thuTuan: 'Con lên cấp thần thú.' })
-    expect(await docBoNaoAiChoPhuHuynh(f.env, 'S1', NGAY)).toBeNull() // chỉ có lời vi phạm ⇒ không khoá boNaoAi
-  })
-  it('lời cho EM không bị lọc chữ game (chỉ phụ huynh)', async () => {
-    const d = dung()
-    ai(d, NGAY, { loiEm: 'Em còn thiếu 40 EXP để lên cấp thần thú.', loiPh: 'Hôm qua con đúng 7 trong 8 câu.' })
-    const { docLoiNhanHlv } = await import('../server/src/bo-nao-doc')
-    expect((await docLoiNhanHlv(d.env, 'S1', NGAY))?.loi).toBe('Em còn thiếu 40 EXP để lên cấp thần thú.')
   })
 })

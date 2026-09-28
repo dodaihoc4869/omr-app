@@ -143,7 +143,7 @@ describe('lượt giao thành công', () => {
     const dong = async () => ((await gvBangTin(d.env, {}, H('19:30'))).mayDaLam as { loai: string; so: number; chu: string }[]).find((x) => x.loai === 'giao_them')
     expect(await dong()).toBeUndefined()
     await chay(d, pass, '19:00')
-    expect(await dong()).toEqual({ loai: 'giao_them', so: 1, chu: 'A.I Đỗ Đại Học soạn 1 gói bài gia đình giao hôm nay' })
+    expect(await dong()).toEqual({ loai: 'giao_them', so: 1, chu: 'App soạn 1 gói bài gia đình giao hôm nay' })
     expect(((await gvBangTin(d.env, {}, H('19:30'))).soTruyVan as number)).toBeLessThanOrEqual(12)
   })
 })

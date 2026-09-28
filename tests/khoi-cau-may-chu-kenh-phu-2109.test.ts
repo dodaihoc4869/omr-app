@@ -54,24 +54,7 @@ const cauHs = (d: D1That, qid: string, dang: string, trangThai: string, moc: str
      VALUES (?, 'S1', ?, ?, 'CĐ', 2, ?, 0, 0, 0, 0, 'btvn', '2026-09-10T02:00:00.000Z', ?, ?, 0, NULL, 'x')`).run(`S1|${qid}`, qid, dang, lanSai, moc, trangThai)
 const emKhoi = (d: D1That, khoi: Khoi) => d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES('S1','Em Một',?,'mk','x')").run(String(khoi))
 
-describe('THỬ THÁCH RIÊNG hôm nay — câu chọn từ kho theo dạng, không khối', () => {
-  const goi = (d: D1That, duong: string, b: Record<string, unknown> = {}) => goiWorker(worker, d.env, duong, { token: 'token-S1', ...b })
-  it('em khối 11, thử thách dạng D1 (bộ não áp): câu của thử thách KHÔNG thuộc tờ khối 12', async () => {
-    const d = taoD1That()
-    emKhoi(d, 11)
-    themKho(d, 'D1', 'hieu')
-    dangHs(d, 'D1', { gap: 8, bac: 1 })
-    d.sql.prepare("INSERT OR REPLACE INTO ai_dieu_chinh(sbd,ngay,json,ap_dung,het_han,huy,nop_luc,che_do) VALUES('S1',?,?,1,'2999-01-01',0,'x','that')")
-      .run(ngayVn(Date.now()), JSON.stringify({ thuThach: { dang: ['D1'], soCau: 6, bac: 'dung_bac' }, loiMoi: 'Hôm nay thử 6 câu dạng D1, xong là đủ.' }))
-    d.sql.prepare('INSERT OR REPLACE INTO game_v2_profile(sbd,revision,json,created_at) VALUES(?,1,?,?)').run('S1', JSON.stringify({ pet: 'lua_phuong', choice: false, cap: 6, exp: 50, nickname: 'x', mastery: [], cutover: '2026-09-21T05:00:00.000Z' }), 'x')
-    const r = await goi(d, '/hs/thu-thach-hom-nay') as { co?: boolean; cau?: { qid: string }[] }
-    expect(r.co, 'phải có thử thách để kiểm').toBe(true)
-    const qs = (r.cau ?? []).map((c) => c.qid)
-    expect(qs.length).toBeGreaterThan(0)
-    expect(qs.filter((q) => khoiQid(q) > 11), `thử thách khối cao: ${qs.join(',')}`).toEqual([])
-  })
-})
-
+// (Khối THỬ THÁCH RIÊNG đã bỏ 28/09: gỡ cùng Bộ não A.I — route luôn co:false.)
 describe('BÀI HẰNG NGÀY của phụ huynh (`chonCauBaiHangNgay`) — câu tới hạn nạp theo qid không lọc khối', () => {
   it('em khối 11 có 6 câu tờ khối 12 + 3 câu tờ khối 11 tới hạn ôn (khối 12 lọt vào sổ từ trước): bài chọn ra KHÔNG có câu khối 12', async () => {
     const d = taoD1That()

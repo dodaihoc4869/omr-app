@@ -16,7 +16,7 @@ interface Vang {
 /** Các khối đang vắng, đúng thứ tự mẫu: Điểm mạnh · cần luyện → Ca kiểm tra gần nhất → Bài tập về nhà. */
 export function khoiDangVang(pm: PhMoi): Vang[] {
   const ra: Vang[] = []
-  if (!coDang(pm)) ra.push({ ten: 'Điểm mạnh · cần luyện', khiNao: 'hiện khi con làm thêm câu, đủ để A.I Đỗ Đại Học nhận ra từng dạng', icon: <BtCot /> })
+  if (!coDang(pm)) ra.push({ ten: 'Điểm mạnh · cần luyện', khiNao: 'hiện khi con làm thêm câu, đủ để Thầy Đỗ Đại Học nhận ra từng dạng', icon: <BtCot /> })
   if (!coCa(pm)) ra.push({ ten: 'Ca kiểm tra gần nhất', khiNao: 'hiện khi thầy công bố điểm ca kiểm tra đầu tiên của con', icon: <BtDanhSach /> })
   if (!coBtvn(pm)) ra.push({ ten: 'Bài tập về nhà', khiNao: 'hiện khi thầy giao bài cho lớp của con', icon: <BtSach /> })
   return ra

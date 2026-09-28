@@ -4,10 +4,8 @@ import SanhBanDo, { type ThuTrenHud } from '../components/hoa2/SanhBanDo'
 import { useSanhHoa2 } from '../components/hoa2/api'
 import { PETS } from '../game/than-thu-v2/core'
 import { mucMenuHocSinh } from '../components/bang-nhiem-vu/muc-menu'
-import { taiKeHoachNgay, useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong, useThuThachHomNay } from '../components/bang-nhiem-vu/may-chu'
+import { taiKeHoachNgay, useBanNho, useCaDangMo, useKeHoachNgay, useLamMoiKhiDong } from '../components/bang-nhiem-vu/may-chu'
 import { taiThuThachHomNay, DUONG_NOP_THU_THACH, type CauOn, type MucTraLoi } from '../components/bang-nhiem-vu/cau-on-api'
-import { dangDeSau, docDeSau, luuDeSau, type ThuThachRieng } from '../lib/thu-thach-rieng'
-import { ngayVietNam } from '../lib/han-bai-tap'
 import { dungBangNhiemVu, soThuSucCua } from '../lib/nhiem-vu-adapter'
 import { tongHopKeHoachTroLy } from '../lib/tro-ly-ca-nhan'
 import NhanHanBaiTap from '../components/NhanHanBaiTap'
@@ -970,17 +968,8 @@ export default function StudentPortalScreen() {
   const hoa2 = useSanhHoa2(auth?.token, auth?.sbd, lamMoiSheet + lamMoiHang)
   const cheDo2 = !!auth?.token && hoa2.cheDo2
   const keHoachNgay = useKeHoachNgay({ token: auth?.token, sbd: auth?.sbd }, !!auth, lamMoiSheet + lamMoiHang)
-  // "Thử thách riêng hôm nay" của Bộ não A.I (lệnh riêng, hợp đồng docs/hop-dong-thu-thach-rieng-2109.md): co:false/lỗi/404 ⇒ null ⇒ không thẻ. "Để sau" ẩn tới ngày mai.
-  const thuThachMayChu = useThuThachHomNay(auth?.token, lamMoiSheet + lamMoiHang)
   // Ô "Thi đua hôm nay" (8A): nạp /hs/thi-dua-hom-nay, làm mới mỗi 60 giây khi bảng đang hiện (không có lệnh ⇒ không ô).
   const thiDua = useThiDua(auth?.token, !!auth?.token && tab === null && !cheDo2)
-  const [deSauThuThach, setDeSauThuThach] = useState('')
-  const homNayVn = ngayVietNam(nowHocTap) ?? ''
-  const thuThachRieng = useMemo(() => {
-    if (!thuThachMayChu) return null
-    if (thuThachMayChu.trangThai !== 'xong' && dangDeSau(deSauThuThach || docDeSau(auth?.sbd ?? ''), thuThachMayChu.ngay, homNayVn)) return null
-    return thuThachMayChu
-  }, [thuThachMayChu, deSauThuThach, homNayVn, auth?.sbd])
   const caDangMo = useCaDangMo({ token: auth?.token, sbd: auth?.sbd }, !!auth)
   const duLieuNhiemVu = useMemo(
     () =>
@@ -1006,7 +995,7 @@ export default function StudentPortalScreen() {
   const sanSangBang = daNapLanDau && (daTaiMom || !!loiMom) && keHoachNgay.daXong
   const banNho = useBanNho(auth?.sbd, sanSangBang && !keHoachNgay.cu && duLieuNhiemVu.nguon === 'ke_hoach_ngay' ? duLieuNhiemVu : null)
   const dungBanNho = !!banNho && !sanSangBang
-  const duLieuBang = useMemo(() => ({ ...(dungBanNho ? banNho! : duLieuNhiemVu), thuThachRieng }), [dungBanNho, banNho, duLieuNhiemVu, thuThachRieng])
+  const duLieuBang = useMemo(() => (dungBanNho ? banNho! : duLieuNhiemVu), [dungBanNho, banNho, duLieuNhiemVu]) // thẻ Thử thách riêng (Bộ não A.I) đã gỡ 28/09
   // HUD của Sảnh (Game Hóa 2.0): thần thú / EXP / chuỗi ngày lấy ĐÚNG nguồn Bảng nhiệm vụ đang dùng (/hs/ke-hoach-ngay, kể cả bản nhớ cùng ngày).
   const thuSanh = useMemo((): ThuTrenHud | null => {
     const t = duLieuBang.thanThu
@@ -1362,14 +1351,6 @@ export default function StudentPortalScreen() {
           now={nowHocTap}
           duLieu={duLieuBang}
           thiDua={thiDua}
-          onLamThuThach={(t: ThuThachRieng) => {
-            setCauOn({ viecId: `thu_thach_rieng:${t.ngay || homNayVn}`, qid: t.cau.map((c) => c.qid), tieuDe: 'Thử thách riêng hôm nay', cauSan: t.cau as unknown as CauOn[], duongNop: DUONG_NOP_THU_THACH })
-            setTab('cauon')
-          }}
-          onDeSauThuThach={(t: ThuThachRieng) => {
-            luuDeSau(auth.sbd, t.ngay || homNayVn)
-            setDeSauThuThach(t.ngay || homNayVn)
-          }}
           onCanhBaoDaXem={(cb) => void baoDaXemHocSinh(auth.token!, cb.id)}
           dangTai={!sanSangBang && !dungBanNho}
           dangLamMoi={keHoachNgay.dangLamMoi}

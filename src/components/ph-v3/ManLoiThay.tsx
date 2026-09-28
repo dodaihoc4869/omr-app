@@ -1,4 +1,4 @@
-// Mục "Lời thầy" (bản vẽ khổ 4): khối anh hùng = thư tuần ký tên Thầy Đỗ Đại Học (khi có) hoặc nhận xét mới nhất của thầy; cảnh báo của thầy (đã xem / chưa xem);
+// Mục "Lời thầy" (bản vẽ khổ 4): khối anh hùng = nhận xét mới nhất của thầy (thư tuần của Bộ não A.I đã GỠ 28/09); cảnh báo của thầy (đã xem / chưa xem);
 // nhận xét sau từng ca kiểm tra đã công bố (bấm mở màn chi tiết ca). Không có lời nào ⇒ một thẻ trống nói rõ.
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import type { NhanXetCa } from '../../lib/ph-v3/du-lieu'
@@ -17,10 +17,9 @@ export default function ManLoiThay({ v, loiThay, thuLaiLoiThay, canhBao, onDaXem
   onDaXem: (id: string) => void
 }) {
   const pm = v.pm
-  const thu = pm?.loiBoNao ?? null
   const ds = loiThay.ds
   const moiNhat = ds?.[0] ?? null
-  const coLoi = !!(thu && (thu.thuTuan || thu.loi)) || canhBao.length > 0 || (ds?.length ?? 0) > 0
+  const coLoi = canhBao.length > 0 || (ds?.length ?? 0) > 0
   const nay = pm?.serverNow ?? Date.now()
   return (
     <div data-vung="man-loi-thay">
@@ -29,19 +28,7 @@ export default function ManLoiThay({ v, loiThay, thuLaiLoiThay, canhBao, onDaXem
         <DangTai />
       ) : (
         <div className="ph3-luoi">
-          {thu && (thu.thuTuan || thu.loi) ? (
-            <section className="ph3-ah ph3-o-rong" aria-labelledby="ph3-thu" data-vung="thu-tuan">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span className="ph3-o-bt" data-mau="thay" aria-hidden="true">ĐH</span>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
-                  <h2 id="ph3-thu" style={{ fontSize: 17 }}>{thu.thuTuan ? 'Thư tuần về con' : 'Lời nhắn hôm nay về con'}</h2>
-                  {thu.ngay && <span className="ph3-ah__ky">{ngayDayDuVn(`${thu.ngay}T12:00:00+07:00`)}</span>}
-                </div>
-              </div>
-              <p className="ph3-ah__thu">{chuThay(thu.thuTuan || thu.loi)}</p>
-              <span className="ph3-ah__ky">Thầy Đỗ Đại Học</span>
-            </section>
-          ) : moiNhat ? (
+          {moiNhat ? (
             <section className="ph3-ah ph3-o-rong" aria-labelledby="ph3-nx-moi" data-vung="nhan-xet-moi">
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span className="ph3-o-bt" data-mau="thay" aria-hidden="true">ĐH</span>

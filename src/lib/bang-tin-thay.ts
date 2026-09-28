@@ -1,5 +1,5 @@
 // BẢNG TIN CỦA THẦY bản 3 (màn Hôm nay) — MỘT tệp giữ hợp đồng máy chủ, phần còn lại của app chỉ nói chuyện với tệp này.
-//   POST /gv/bang-tin {} → { ok, ngay, tu, tuHomNay, tuDangAp, capNhatLuc, nhip, baiTap[], tienBo[], canDeY{ds,conLai}, dangVap[], boNao, mayDaLam[], sucKhoe, lyDoThieu?, soTruyVan }
+//   POST /gv/bang-tin {} → { ok, ngay, tu, tuHomNay, tuDangAp, capNhatLuc, nhip, baiTap[], tienBo[], canDeY{ds,conLai}, dangVap[], mayDaLam[], sucKhoe, lyDoThieu?, soTruyVan }
 //   (docs/hop-dong-bang-tin-v3-2109.md, Code 3). Lệnh CHỈ ĐỌC. Mọi con số "hôm nay" chỉ đếm từ mốc `tuHomNay`.
 // Luật đọc: khoá vắng = KHÔNG có số thật ⇒ ẩn hoặc ghi "chưa có", không vẽ số 0 giả; sai kiểu ⇒ bỏ dòng ấy, không làm hỏng cả màn; chưa có lệnh (404) ⇒ lời thật, màn rơi về các lệnh cũ.
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
@@ -91,14 +91,6 @@ export interface DangVapBangTin {
   soEmGap: number
 }
 
-export interface BoNaoBangTin {
-  chayLuc: string
-  soEmSoi: number | null
-  soEmDieuChinh: number | null
-  soLoiNhan: number | null
-  goiY: { chu: string; tenDang: string }[]
-}
-
 export interface ViecMayLam {
   loai: string
   so: number
@@ -127,7 +119,6 @@ export interface BangTin {
   /** Em có tín hiệu sai rất nhanh rồi đúng lại (khoá `saiNhanh`, Code 3). null = máy chủ chưa trả / không em nào `co` ⇒ ẩn. */
   saiNhanh: EmSaiNhanh[] | null
   dangVap: DangVapBangTin[]
-  boNao: BoNaoBangTin | null
   mayDaLam: ViecMayLam[]
   sucKhoe: SucKhoeBangTin | null
   /** Khối nào máy chủ không tính được ⇒ lý do bằng lời (khoá = tên khối). */
@@ -265,24 +256,6 @@ function docDangVap(x: unknown): DangVapBangTin | null {
   return { ma: chu(o.ma) || chu(o.ten), ten: chu(o.ten), soEmVap: soKhong(o.soEmVap), soEmGap: gap }
 }
 
-function docBoNao(v: unknown): BoNaoBangTin | null {
-  const o = doiTuong(v)
-  if (!o) return null
-  return {
-    chayLuc: chu(o.chayLuc),
-    soEmSoi: so(o.soEmSoi),
-    soEmDieuChinh: so(o.soEmDieuChinh),
-    soLoiNhan: so(o.soLoiNhan),
-    goiY: mang(o.goiY)
-      .map((g) => {
-        const d = doiTuong(g)
-        return d && chu(d.chu) ? { chu: chu(d.chu), tenDang: chu(d.tenDang) } : null
-      })
-      .filter((g): g is { chu: string; tenDang: string } => g != null)
-      .slice(0, 2),
-  }
-}
-
 /** Dòng "máy đã làm": ưu tiên câu sẵn của máy chủ (`chu`); chỉ dòng có số > 0 (đúng hợp đồng). */
 function docViec(x: unknown): ViecMayLam | null {
   const o = doiTuong(x)
@@ -344,7 +317,6 @@ export function docBangTin(j: Record<string, unknown>): BangTin | null {
     chuaHoc: docChuaHoc(j.chuaHocHomNay),
     saiNhanh: docSaiNhanh(j.saiNhanh),
     dangVap: mang(j.dangVap).map(docDangVap).filter((d): d is DangVapBangTin => d != null),
-    boNao: docBoNao(j.boNao),
     mayDaLam: mang(j.mayDaLam).map(docViec).filter((v): v is ViecMayLam => v != null),
     sucKhoe: docSucKhoe(j.sucKhoe),
     lyDoThieu,

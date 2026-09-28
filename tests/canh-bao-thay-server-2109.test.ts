@@ -238,10 +238,8 @@ describe('lời viết: hàm thuần', () => {
 })
 
 describe('an toàn: bộ não không có đường ghi; bảng vào danh sách reset', () => {
-  it('không tệp bo-nao*.ts nào nhắc tới canh_bao_thay hay canh-bao-thay (chỉ thầy bấm mới gửi)', () => {
-    const tep = readdirSync('server/src').filter((f) => /^bo-nao/.test(f)).concat(['../../src/lib/bo-nao-khuon.ts', '../../src/lib/bo-nao-dac-trung.ts'])
-    expect(tep.length).toBeGreaterThan(1)
-    for (const f of tep) expect(readFileSync(`server/src/${f}`, 'utf-8')).not.toMatch(/canh_bao_thay|canh-bao-thay|guiCanhBao/)
+  it('Bộ não A.I đã GỠ (28/09/2026): máy chủ không còn tệp bo-nao*.ts nào (nên không có đường ghi canh_bao_thay từ bộ não)', () => {
+    expect(readdirSync('server/src').filter((f) => /^bo-nao/.test(f))).toEqual([])
   })
   it('chỉ HAI nơi trong máy chủ ghi canh_bao_thay: canh-bao-thay.ts (thầy bấm tay) và nhac-tu-dong.ts (nhắc TỰ ĐỘNG theo luật Boss 21/09, không AI); chỉ index.ts gọi guiCanhBao (sau cổng laThay)', () => {
     // Đổi có chủ ý 21/09: trước là MỘT nơi (chỉ thầy bấm mới gửi); Boss chốt cảnh báo phải TỰ ĐỘNG (nhac-tu-dong.ts) — bộ não A.I vẫn KHÔNG có đường ghi (test trên).

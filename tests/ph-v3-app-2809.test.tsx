@@ -17,7 +17,7 @@ const daXem = vi.fn()
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<any>()), loadScriptUrl: async () => '/test' }))
 vi.mock('../src/lib/exam-api', async (original) => ({ ...(await original<any>()), tenTheoSbd: async () => ({ sbd: '12121212', hoTen: 'Nguyễn Minh Khôi', lop: '12A1', tenCa: '' }) }))
-vi.mock('../src/lib/bo-nao-lay-loi-ph', () => ({ taiThongTinPhuHuynh: async () => ({ boNao: null, canhBao: [CANH_BAO] }) }))
+vi.mock('../src/lib/tai-thong-tin-ph', () => ({ taiThongTinPhuHuynh: async () => ({ canhBao: [CANH_BAO] }) }))
 vi.mock('../src/lib/canh-bao-thay-may-chu', async (original) => ({ ...(await original<any>()), baoDaXemPhuHuynh: (id: string) => { daXem(id); return Promise.resolve() } }))
 const CANH_BAO = { id: 'cb-1', maBtvn: 'BT-1', tenBtvn: 'BTVN Este', guiLuc: '2026-09-21T01:00:00Z', hanNop: '2026-09-22T05:00:00Z', loi: 'Thầy nhắc con nộp bài trước 12:00.', trangThaiEm: 'chua_mo', chang: null, daXem: false }
 
@@ -163,12 +163,13 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     expect(container.querySelectorAll('.ph3-nhip__cot > span').length).toBe(14)
   })
 
-  it('Lời thầy: lời nhắn ký tên Thầy Đỗ Đại Học, cảnh báo của thầy (bấm "Đã xem cảnh báo" ⇒ báo máy chủ), nhận xét sau từng ca', async () => {
+  it('Lời thầy: thư Bộ não đã GỠ 28/09 (khối anh hùng = nhận xét mới nhất của thầy), cảnh báo của thầy (bấm "Đã xem cảnh báo" ⇒ báo máy chủ), nhận xét sau từng ca', async () => {
     const { container } = await vaoApp()
     await diToi('#loi-thay')
     await waitFor(() => expect(container.querySelector('[data-vung="ds-nhan-xet"]')).toBeTruthy())
-    expect(container.querySelector('[data-vung="thu-tuan"]')!.textContent).toContain('Hôm nay Khôi làm 38 câu')
-    expect(container.querySelector('[data-vung="thu-tuan"]')!.textContent).toContain('Thầy Đỗ Đại Học')
+    expect(container.querySelector('[data-vung="thu-tuan"]')).toBeNull()
+    expect(container.textContent).not.toContain('Hôm nay Khôi làm 38 câu')
+    expect(container.querySelector('[data-vung="nhan-xet-moi"]')).toBeTruthy()
     expect(container.textContent).not.toMatch(/A\.I|Bộ não/)
     expect(container.querySelector('[data-vung="ds-nhan-xet"]')!.textContent).toContain('Con mất điểm ở bài đốt cháy ester.')
     fireEvent.click(screen.getByRole('button', { name: 'Đã xem cảnh báo' }))

@@ -1,3 +1,4 @@
+// (28/09: gỡ Bộ não A.I ⇒ màn HS/PH ghi "Thầy Đỗ Đại Học", màn thầy ghi "app" — docs/CHUAN-TU-NGU hàng 47.)
 // TỪ NGỮ · CỤM 8 (thầy lệnh 21/09: "Thay toàn bộ từ Máy bằng A.I Đỗ Đại Học"; luật ở docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md bảng A2):
 // khi "Máy" là CHỦ NGỮ làm việc tự động (gạch đáp án, soạn thẻ, gán bộ câu, chấm, rút chuyên đề) ⇒ "A.I Đỗ Đại Học". KHÔNG đổi "máy" chỉ THIẾT BỊ
 // (máy chủ, máy này, máy em…). Chỗ mơ hồ (bạn máy trong Đoàn, khoá bài ở ca kiểm tra…) do Boss quyết — chưa đổi, không khoá ở đây.
@@ -13,7 +14,7 @@ const CAP: [string, string, string][] = [
   ['src/screens/PhieuScreen.tsx', 'Đúng bộ câu Thầy Đỗ Đại Học đã gán riêng cho', 'Đúng bộ câu máy đã gán riêng cho'],
   ['src/screens/StudentPortalScreen.tsx', 'để A.I Đỗ Đại Học chấm điểm ngay', 'để máy chấm điểm ngay'],
   ['src/components/KhoiBaiLuyen.tsx', 'Thầy Đỗ Đại Học rút đúng chuyên đề em vừa mất điểm', 'Máy rút đúng chuyên đề em vừa mất điểm'],
-  ['src/components/KhoiLuyenKhacPhuc.tsx', 'bấm nộp và A.I Đỗ Đại Học chấm', 'bấm nộp và máy chấm'],
+  ['src/components/KhoiLuyenKhacPhuc.tsx', 'bấm nộp và app chấm', 'bấm nộp và máy chấm'],
   ['src/components/KhungLoiGiaiGame.tsx', 'Thầy Đỗ Đại Học tự giải ra một đáp án', 'Máy tự giải ra một đáp án'],
 ]
 describe('cụm 8 · "Máy" làm chủ ngữ tự động ⇒ "A.I Đỗ Đại Học"', () => {

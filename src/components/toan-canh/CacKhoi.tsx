@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, BookOpen, CalendarDays, ClipboardCheck, Eye, Gamepad2, PenLine, Presentation, Sparkles, TrendingDown, TrendingUp, Zap, Minus } from 'lucide-react'
+import { Bell, BookOpen, CalendarDays, ClipboardCheck, Eye, Gamepad2, PenLine, Presentation, TrendingDown, TrendingUp, Zap, Minus } from 'lucide-react'
 import { TEN_BAC_DANG, TEN_XU_HUONG } from '../../lib/hom-nay-v2'
 import { gioPhutVN, LOAI_SU_KIEN, luoiNhip, moiXemChu, nhomTheoNgay, TEN_LOAI, tomTatNhip, type DangCuaEm, type LoaiSuKien, type NhipNgay, type SuKienEm } from '../../lib/em-toan-canh'
 import '../../styles/hom-nay-v2.css'
@@ -13,7 +13,6 @@ const BIEU_TUONG: Record<LoaiSuKien, typeof Bell> = {
   len_bang: Presentation,
   game: Gamepad2,
   exp: Zap,
-  bo_nao: Sparkles,
   canh_bao: Bell,
   mo_app: Eye,
 }

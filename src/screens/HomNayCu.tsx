@@ -5,7 +5,6 @@ import { useAppStore } from '../store/appStore'
 import { layCauToiHan, layHomNay, ngayDai, phanTram, type CauToiHan, type HomNay } from '../lib/hom-nay-api'
 import { layBangTinNgay, type BangTinNgay } from '../lib/hom-nay-v2'
 import type { KetQuaLenh } from '../lib/goi-lenh-thay'
-import KhoiBoNaoDemQua from '../components/KhoiBoNaoDemQua'
 import OTraCuu from '../components/hom-nay/OTraCuu'
 import ViecGap from '../components/hom-nay/ViecGap'
 import EmCanGiup from '../components/hom-nay/EmCanGiup'
@@ -92,8 +91,6 @@ export default function HomNayCu() {
       </div>
 
       <div className="hn2-luoi-b">
-        <KhoiBoNaoDemQua onMoHoSo={moToanCanh} onGoiLenBang={() => setScreen('goilenbang')} onMoCaiDat={() => setScreen('caidat')} />
-
         <section className="hn2-the hn2-khung" aria-labelledby="hn2-yeu" data-khoi="dang-yeu">
           <div className="hn2-khung-dau">
             <h2 id="hn2-yeu" className="hn2-tieu-de hn2-tieu-de--1dong" title={dangDuocDung ? `Dạng cả lớp ${dangDuocDung.lop} đang yếu` : 'Dạng cả lớp đang yếu'}>

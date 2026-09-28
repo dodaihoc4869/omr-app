@@ -388,14 +388,14 @@ describe('DanDau — dẫn đầu, tiến bộ nhất, em cần để ý', () =>
   })
 })
 
-describe('CotAI — A.I Đỗ Đại Học đã tự làm', () => {
+describe('CotAI — App đã tự làm (Bộ não A.I đã gỡ 28/09)', () => {
   const goc = () => taoDuLieuGia(NAY).bt!
-  it('tiêu đề đúng; ≤ 3 việc có số; số tách riêng để nhảy; Bộ não 3 con số; dạng vấp "N / M em vấp" + thanh theo %; chân "Hệ thống bình thường"', () => {
+  it('tiêu đề đúng; ≤ 3 việc có số; số tách riêng để nhảy; KHÔNG còn khối Bộ não; dạng vấp "N / M em vấp" + thanh theo %; chân "Hệ thống bình thường"', () => {
     const { container } = render(<CotAI bt={goc()} />)
-    expect(container.querySelector('h2')!.textContent).toBe('A.I Đỗ Đại Học đã tự làm hôm nay')
+    expect(container.querySelector('h2')!.textContent).toBe('App đã tự làm hôm nay')
     expect([...container.querySelectorAll('.bts-ai-ds li')].map((l) => l.textContent)).toEqual(['Đưa 128 câu sai về lịch ôn lại', 'Rút bộ câu riêng cho 23 em', 'Nhắc 44 em chưa mở bài'])
     expect([...container.querySelectorAll('.bts-ai-ds b')].map((b) => b.textContent)).toEqual(['128', '23', '44'])
-    expect([...container.querySelectorAll('.bts-nao div')].map((d) => d.textContent)).toEqual(['220em được soi', '0em được chỉnh bài', '47lời nhắn'])
+    expect(container.querySelector('.bts-nao')).toBeNull()
     expect([...container.querySelectorAll('.bts-vap li')].map((l) => l.querySelector('.bts-vap-dong')!.textContent)).toEqual(['Chuyển dịch cân bằng14 / 36 em vấp', 'Phản ứng tráng bạc9 / 30 em vấp'])
     expect([...container.querySelectorAll<HTMLElement>('.bts-vap-thanh i')].map((i) => i.style.transform)).toEqual(['scaleX(0.389)', 'scaleX(0.300)'])
     expect(container.querySelector('.bts-ai-chan')!.textContent).toBe('Hệ thống bình thường · thầy không cần làm gì')
@@ -410,14 +410,12 @@ describe('CotAI — A.I Đỗ Đại Học đã tự làm', () => {
     await khung.chay(2) // tắt sau HAI khung hình (khung giả, không đoán theo thời gian)
     expect(container.querySelector('.bts-vua')).toBeNull()
   })
-  it('KHÔNG vẽ 0 giả: Bộ não thiếu số nào bỏ số ấy; không Bộ não ⇒ không khối; không dạng vấp / không việc / không sức khoẻ ⇒ bỏ khối ấy', () => {
+  it('KHÔNG vẽ 0 giả: không dạng vấp / không việc / không sức khoẻ ⇒ bỏ khối ấy', () => {
     const b = goc()
-    const a = render(<CotAI bt={{ ...b, boNao: { ...b.boNao!, soEmDieuChinh: null } }} />).container
-    expect([...a.querySelectorAll('.bts-nao div span')].map((s) => s.textContent)).toEqual(['em được soi', 'lời nhắn'])
     cleanup()
-    const c = render(<CotAI bt={{ ...b, boNao: null, dangVap: [], mayDaLam: [], sucKhoe: null }} />).container
+    const c = render(<CotAI bt={{ ...b, dangVap: [], mayDaLam: [], sucKhoe: null }} />).container
     for (const k of ['.bts-nao', '.bts-vap', '.bts-ai-ds', '.bts-ai-chan']) expect(c.querySelector(k), k).toBeNull()
-    expect(c.querySelector('h2')!.textContent).toBe('A.I Đỗ Đại Học đã tự làm hôm nay')
+    expect(c.querySelector('h2')!.textContent).toBe('App đã tự làm hôm nay')
   })
   it('sức khoẻ cần để ý ⇒ chân mang mức (vàng/đỏ) để đổi màu chấm; chữ do máy chủ soạn giữ nguyên', () => {
     const c = render(<CotAI bt={{ ...goc(), sucKhoe: { muc: 'do', chu: 'Có lỗi: cron nhắc chưa chạy' } }} />).container

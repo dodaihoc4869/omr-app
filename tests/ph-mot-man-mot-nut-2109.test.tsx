@@ -18,7 +18,7 @@ vi.mock('../src/lib/exam-api', async (original) => ({
   hsCauSaiApi: async () => ({ ok: true, items: [{ qid: 'q1', phan: 'I', maCa: 'CA-ANCOL', text: 'Câu sai 1', dapAnDung: 'A', choices: { A: 'a', B: 'b', C: 'c', D: 'd' }, mucDo: 'hieu' }] }),
 }))
 const CANH_BAO = { id: 'cb-1', maBtvn: 'BT-1', tenBtvn: 'BTVN Este', guiLuc: '2026-09-21T01:00:00Z', hanNop: '2026-09-22T05:00:00Z', loi: 'Thầy nhắc con nộp bài trước 12:00.', trangThaiEm: 'chua_mo', chang: null, daXem: false }
-vi.mock('../src/lib/bo-nao-lay-loi-ph', () => ({ taiThongTinPhuHuynh: async () => ({ boNao: { ngay: '2026-09-21', loiNhan: 'Lời Bộ não CHO PH', thuTuan: 'Thư tuần CHO PH', tuanTu: '2026-09-14' }, canhBao: [CANH_BAO] }) }))
+vi.mock('../src/lib/tai-thong-tin-ph', () => ({ taiThongTinPhuHuynh: async () => ({ canhBao: [CANH_BAO] }) }))
 
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 // Chuỗi của MỌI tính năng đã gỡ: không một chuỗi nào được còn trên cây màn PH.

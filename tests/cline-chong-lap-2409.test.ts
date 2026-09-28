@@ -90,54 +90,7 @@ describe('LÁT 1 · /game-v2/start (lượt Đảo — nguồn câu cá nhân c�
   })
 })
 
-describe('LÁT 1 · /hs/thu-thach-hom-nay (thử thách riêng): chốt MỘT lần/ngày cả khi retry/cạnh tranh', () => {
-  const themDieuChinh = (d: D1That, dang: string[], soCau: number) =>
-    d.sql.prepare("INSERT OR REPLACE INTO ai_dieu_chinh(sbd,ngay,json,ap_dung,het_han,huy,nop_luc,che_do) VALUES('S1',?,?,1,'2999-01-01',0,'x','that')")
-      .run(new Date(T0).toISOString().slice(0, 10), JSON.stringify({ thuThach: { dang, soCau, bac: 'dung_bac' }, loiMoi: 'Hôm nay thử sức vài câu vừa sức nhé.' }))
-  const truong = () => {
-    const d = dung({ soA: 12, soII: 0, mucDo: 'hieu' })
-    // Đủ căn cứ bậc hồ sơ 1 (như bộ câu bài tập về nhà): thiếu dòng này bậc đích = 0 ⇒ mức nhắm "biết" ⇒ không có câu nào để chốt.
-    d.sql.prepare("INSERT OR REPLACE INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,cap_nhat_luc) VALUES('S1|A.1','S1','A.1',8,0,0,0,0,1,'x')").run()
-    themDieuChinh(d, ['A.1'], 6)
-    return d
-  }
-
-  it('RETRY: gọi lại trả ĐÚNG các câu đã chốt, chỉ MỘT dòng `thu_thach_rieng`', async () => {
-    const d = truong()
-    const t = await token(d)
-    const a = await thuThach(d, t)
-    expect(a.ok).toBe(true)
-    expect(a.co).toBe(true)
-    expect((a.cau as unknown[]).length).toBeGreaterThan(0)
-    const b = await thuThach(d, t)
-    expect((b.cau as { qid: string }[]).map((c) => c.qid)).toEqual((a.cau as { qid: string }[]).map((c) => c.qid))
-    expect((d.sql.prepare('SELECT COUNT(*) AS n FROM thu_thach_rieng').get() as { n: number }).n).toBe(1)
-  })
-
-  it('CẠNH TRANH: hai yêu cầu SONG SONG ⇒ một dòng chốt, hai phản hồi cùng bộ câu', async () => {
-    const d = truong()
-    const t = await token(d)
-    const [a, b] = await Promise.all([thuThach(d, t), thuThach(d, t)])
-    expect((d.sql.prepare('SELECT COUNT(*) AS n FROM thu_thach_rieng').get() as { n: number }).n).toBe(1)
-    const co = [a, b].filter((r) => r.co === true)
-    expect(co.length).toBe(2)
-    expect(new Set(co.map((r) => (r.cau as { qid: string }[]).map((c) => c.qid).join(','))).size).toBe(1)
-    const hang = d.sql.prepare('SELECT qid_json FROM thu_thach_rieng').get() as { qid_json: string }
-    const daChot = JSON.parse(hang.qid_json) as string[]
-    expect(new Set(daChot).size).toBe(daChot.length)
-    expect((co[0]!.cau as { qid: string }[]).map((c) => c.qid)).toEqual(daChot)
-  })
-
-  it('MỘT BỘ không trùng qid và không trùng content_group', async () => {
-    const d = truong()
-    const r = await thuThach(d)
-    const qid = (r.cau as { qid: string }[]).map((c) => c.qid)
-    expect(new Set(qid).size).toBe(qid.length)
-    const nhom = qid.map((q) => (d.sql.prepare('SELECT content_group FROM game_v2_question WHERE qid = ?').get(q) as { content_group: string }).content_group)
-    expect(new Set(nhom).size).toBe(nhom.length)
-  })
-})
-
+// (Khối /hs/thu-thach-hom-nay đã bỏ 28/09: thử thách riêng gỡ cùng Bộ não A.I — route luôn co:false.)
 describe('LÁT 1 · /parent-news/assign (bài hằng ngày của phụ huynh): giao MỘT lần/ngày khi retry/cạnh tranh', () => {
   const themHs = (d: D1That) => d.sql.prepare("INSERT OR IGNORE INTO hoc_sinh(sbd,ho_ten,lop,cap_nhat_luc) VALUES('S1','Em Một','12','x')").run()
   const cauKho = (qid: string, dang: string, mucDo = 'hieu') => ({

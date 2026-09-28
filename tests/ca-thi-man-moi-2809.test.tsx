@@ -170,7 +170,7 @@ describe('(c) Kết thúc ca + (d) Báo cáo chi tiết', () => {
     fireEvent.click(within(bc).getByRole('button', { name: 'Mở báo cáo của Vũ Đức Anh' }))
     await waitFor(() => expect(within(bc).getByRole('tab', { name: 'Từng em' }).getAttribute('aria-selected')).toBe('true'))
     expect(await within(bc).findByRole('heading', { name: 'Vũ Đức Anh' })).toBeTruthy()
-    expect(bc.textContent).toContain('Nhận xét của thầy')
+    expect(bc.textContent).toContain('Nhận xét của Thầy Đỗ Đại Học')
     fireEvent.click(within(bc).getByRole('button', { name: /Đóng/ }))
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Báo cáo chi tiết' })).toBeNull())
   })

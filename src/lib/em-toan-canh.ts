@@ -2,9 +2,9 @@
 // `docs/hop-dong-hom-nay-v2-2109.md` mục 8, Code 3). Trường có `?` thiếu ⇒ màn ẨN phần đó, KHÔNG bịa. Máy chủ chưa có lệnh ⇒ `KetQuaLenh` báo thật.
 import { goiLenh, type KetQuaLenh } from './goi-lenh-thay'
 
-export type LoaiSuKien = 'ca' | 'btvn' | 'on_lai' | 'bai_rieng' | 'len_bang' | 'game' | 'exp' | 'bo_nao' | 'canh_bao' | 'mo_app'
-/** Thứ tự bộ lọc (chữ theo docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md: "Ca kiểm tra", "Bài tập về nhà", "Ôn lại", "Bộ não A.I", "Gửi cảnh báo"). */
-export const LOAI_SU_KIEN: readonly LoaiSuKien[] = ['ca', 'btvn', 'on_lai', 'bai_rieng', 'len_bang', 'game', 'exp', 'bo_nao', 'canh_bao', 'mo_app']
+export type LoaiSuKien = 'ca' | 'btvn' | 'on_lai' | 'bai_rieng' | 'len_bang' | 'game' | 'exp' | 'canh_bao' | 'mo_app'
+/** Thứ tự bộ lọc (chữ theo docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md: "Ca kiểm tra", "Bài tập về nhà", "Ôn lại", "Gửi cảnh báo"). */
+export const LOAI_SU_KIEN: readonly LoaiSuKien[] = ['ca', 'btvn', 'on_lai', 'bai_rieng', 'len_bang', 'game', 'exp', 'canh_bao', 'mo_app']
 export const TEN_LOAI: Record<LoaiSuKien, string> = {
   ca: 'Ca kiểm tra',
   btvn: 'Bài tập về nhà',
@@ -13,7 +13,6 @@ export const TEN_LOAI: Record<LoaiSuKien, string> = {
   len_bang: 'Gọi lên bảng',
   game: 'Game',
   exp: 'EXP',
-  bo_nao: 'Bộ não A.I',
   canh_bao: 'Cảnh báo của thầy',
   mo_app: 'Mở app',
 }

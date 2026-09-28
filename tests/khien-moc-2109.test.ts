@@ -366,7 +366,7 @@ describe('mất 1 khiên khi vắng 7 ngày liên tiếp không đạt nhiệm v
     expect(truoc.find((x) => x.loai === 'khien_mat')).toBeUndefined()
     await matKhienVangNgay(d.env, NOW)
     const bt = await gvBangTin(d.env, {}, NOW)
-    expect((bt.mayDaLam as { loai: string; so: number; chu: string }[]).find((x) => x.loai === 'khien_mat')).toEqual({ loai: 'khien_mat', so: 3, chu: 'A.I Đỗ Đại Học đã trừ 1 khiên của 3 em vắng nhiệm vụ ngày 7 ngày liên tiếp' })
+    expect((bt.mayDaLam as { loai: string; so: number; chu: string }[]).find((x) => x.loai === 'khien_mat')).toEqual({ loai: 'khien_mat', so: 3, chu: 'App đã trừ 1 khiên của 3 em vắng nhiệm vụ ngày 7 ngày liên tiếp' })
     expect(bt.soTruyVan as number).toBeLessThanOrEqual(12)
   })
 })

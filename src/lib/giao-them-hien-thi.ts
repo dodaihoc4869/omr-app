@@ -94,7 +94,7 @@ export function theXacNhan(d: DaGiao, conLai: number | null): { tieuDe: string; 
   const phut = d.phutUocTinh !== null && d.phutUocTinh > 0 ? `, khoảng ${d.phutUocTinh} phút` : ''
   return {
     tieuDe: d.laLuotCu ? `Bài vừa giao cho con đây: ${d.soCau} câu${phut}` : `Đã giao cho con ${d.soCau} câu${phut}`,
-    dong: [`A.I Đỗ Đại Học đã chọn ${d.soCau} câu hợp với con hôm nay.`, ...d.thanhPhan.map(chuThanhPhan)],
+    dong: [`Thầy Đỗ Đại Học đã chọn ${d.soCau} câu hợp với con hôm nay.`, ...d.thanhPhan.map(chuThanhPhan)],
     cuoi: d.laLuotCu ? `Anh/chị chưa mất thêm lượt nào. ${chuLuot(conLai)}`.trim() : chuLuot(conLai),
   }
 }

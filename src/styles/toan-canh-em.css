@@ -151,7 +151,6 @@
   background: var(--m3-primary-container);
   color: var(--m3-on-primary-container);
 }
-.tc-viec-bieu--bo_nao,
 .tc-viec-bieu--exp {
   background: var(--m3-tertiary-container);
   color: var(--m3-on-tertiary-container);

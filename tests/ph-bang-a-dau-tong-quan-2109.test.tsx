@@ -430,9 +430,9 @@ describe('AiLam — Thầy và A.I đã làm gì', () => {
     const s = container.querySelector('section') as HTMLElement
     expect(s.id).toBe('muc-ai-lam')
     expect(s.className).toBe('phm-muc phm-muc--sat')
-    expect(s.getAttribute('aria-label')).toBe('Thầy và A.I Đỗ Đại Học đã làm gì cho con hôm nay')
-    expect(s.querySelector('.phm-nhan-muc')!.textContent).toBe('A.I Đỗ Đại Học · hôm nay')
-    expect(s.querySelector('h2.phm-ten-the')!.textContent).toBe('Thầy và A.I Đỗ Đại Học đã làm gì cho con hôm nay')
+    expect(s.getAttribute('aria-label')).toBe('Thầy Đỗ Đại Học đã làm gì cho con hôm nay')
+    expect(s.querySelector('.phm-nhan-muc')!.textContent).toBe('Thầy Đỗ Đại Học · hôm nay')
+    expect(s.querySelector('h2.phm-ten-the')!.textContent).toBe('Thầy Đỗ Đại Học đã làm gì cho con hôm nay')
     const dong = [...s.querySelectorAll('.phm-lam > li')]
     expect(dong.map((l) => l.querySelector('h3')!.textContent)).toEqual([
       'Chọn riêng 23 câu hợp với sức của con',
@@ -450,8 +450,8 @@ describe('AiLam — Thầy và A.I đã làm gì', () => {
   it('cảnh CHƯA HỌC dùng aiDaChuanBi: tiêu đề "đã chuẩn bị", "Chọn sẵn", đúng thứ tự máy chủ, dòng cuối chỉ khi có chọn sẵn câu', () => {
     const pm = pmOf(PH_APPLE_CHUA_HOC)
     const { container } = render(<AiLam pm={pm} />)
-    expect(container.querySelector('h2')!.textContent).toBe('A.I Đỗ Đại Học đã chuẩn bị gì cho con hôm nay')
-    expect(container.querySelector('section')!.getAttribute('aria-label')).toBe('A.I Đỗ Đại Học đã chuẩn bị gì cho con hôm nay')
+    expect(container.querySelector('h2')!.textContent).toBe('Thầy Đỗ Đại Học đã chuẩn bị gì cho con hôm nay')
+    expect(container.querySelector('section')!.getAttribute('aria-label')).toBe('Thầy Đỗ Đại Học đã chuẩn bị gì cho con hôm nay')
     expect(cacO(container, '.phm-lam > li h3')).toEqual(['Xếp 2 câu con từng sai vào lịch ôn ngày mai', 'Chọn sẵn 6 câu hợp với sức của con'])
     expect(container.querySelectorAll('.phm-lam > li')[1]!.querySelector('p')!.textContent).toBe('2 câu ôn lại đến lịch, 4 câu luyện dạng con còn vấp')
     expect(container.querySelector('.phm-lam__cuoi')!.textContent).toBe('Mọi thứ đã sẵn. Con chỉ cần mở app là có bài vừa sức để làm ngay.')
@@ -477,7 +477,7 @@ describe('AiLam — Thầy và A.I đã làm gì', () => {
     delete chua.homNay.aiDaChuanBi
     chua.homNay.aiDaLam = [{ loai: 'xep_on', so: 4 }]
     const c = render(<AiLam pm={pmOf(chua)} />).container
-    expect(c.querySelector('h2')!.textContent).toBe('Thầy và A.I Đỗ Đại Học đã làm gì cho con hôm nay')
+    expect(c.querySelector('h2')!.textContent).toBe('Thầy Đỗ Đại Học đã làm gì cho con hôm nay')
     expect(cacO(c, '.phm-lam > li h3')).toEqual(['Xếp 4 câu con từng sai vào lịch ôn ngày mai'])
   })
 

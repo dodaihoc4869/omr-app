@@ -4,7 +4,7 @@
 // viết `loiMoi`; MÁY CHỦ chọn và CHỐT câu (không tự luận, chưa làm trong 14 ngày, không vượt bậc + 1).
 // THUẦN: không mạng, không đồng hồ. Đọc CHẶT: `co !== true`, thiếu lời mời, hoặc chưa xong mà không có câu nào ⇒ null ⇒ KHÔNG dựng thẻ (im lặng, không lỗi đỏ, không khung rỗng).
 // Chỉ nói con số máy chủ trả (đúng x/y câu, còn bao nhiêu EXP…): trường nào thiếu/không hợp lệ thì bỏ dòng đó, không đoán.
-import { lamSachLoi } from './bo-nao-hien-thi'
+import { lamSachLoi } from './lam-sach-loi'
 import { chanCauTuLuan } from './cau-tu-luan-may-hs'
 
 export const TOI_DA_LOI_MOI = 200

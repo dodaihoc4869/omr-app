@@ -210,29 +210,15 @@ describe('dangCaLopYeu: dạng cả lớp yếu THEO HỒ SƠ (≥ 3 em yếu, �
   })
 })
 
-describe('Bộ não: dangBoNao (dòng ca_lop) và dongBoNao (hai hành động gọi lên bảng)', () => {
+describe('Bộ não A.I đã GỠ (28/09): dangBoNao / dongBoNao luôn rỗng (giữ khoá hợp đồng)', () => {
   const banTin = (d: D1That, ngay: string, cacDong: unknown[]) => d.sql.prepare("INSERT INTO ai_ban_tin(ngay,json,nop_luc) VALUES(?,?,'x')").run(ngay, JSON.stringify({ cacDong }))
-  it('lấy bản tin MỚI NHẤT tới `ngay` (bản ngày sau bị bỏ); dangBoNao = dòng ca_lop; dongBoNao = chỉ goi_len_bang | dua_vao_buoi_chua của em CÓ trong trường (và trong lớp lọc)', async () => {
+  it('còn bản tin cũ trong bảng ⇒ vẫn KHÔNG đọc: hai danh sách rỗng', async () => {
     const d = truong()
-    banTin(d, '2026-09-20', [{ loai: 'ca_lop', dang: 'CU', chu: 'bản tin cũ' }])
-    banTin(d, '2026-09-22', [
-      { loai: 'ca_lop', dang: 'D1', chu: 'Cả lớp yếu dạng D1' },
-      { loai: 'em', sbd: '12001', hanhDong: 'goi_len_bang', dang: 'D1', chu: 'em một' },
-      { loai: 'em', sbd: '12021', hanhDong: 'dua_vao_buoi_chua', dang: 'D2', chu: 'em Tinh Hoa' },
-      { loai: 'em', sbd: '12002', hanhDong: 'khac_phuc', dang: 'D1', chu: 'hành động khác' },
-      { loai: 'em', sbd: '99999', hanhDong: 'goi_len_bang', dang: 'D1', chu: 'em không có trong trường' },
-      { loai: 'nhan_xet', dang: 'D7', chu: 'loại dòng khác không phải ca_lop' },
-    ])
-    banTin(d, '2026-09-23', [{ loai: 'ca_lop', dang: 'MAI', chu: 'bản tin ngày mai' }])
+    banTin(d, '2026-09-22', [{ loai: 'ca_lop', dang: 'D1', chu: 'Cả lớp yếu dạng D1' }, { loai: 'em', sbd: '12001', hanhDong: 'goi_len_bang', dang: 'D1', chu: 'em một' }])
     const r = await goi(d)
     expect(HANH_DONG_BUOI_CHUA).toEqual(['goi_len_bang', 'dua_vao_buoi_chua'])
-    expect(r.dangBoNao).toEqual([{ dang: 'D1', chu: 'Cả lớp yếu dạng D1' }])
-    expect(r.dongBoNao).toEqual([
-      { sbd: '12001', hoTen: 'Em Thường 1', lop: '12 - Lớp Thường', hanhDong: 'goi_len_bang', dang: 'D1', chu: 'em một' },
-      { sbd: '12021', hoTen: 'Em Tinh Hoa 1', lop: '12 - Tinh Hoa', hanhDong: 'dua_vao_buoi_chua', dang: 'D2', chu: 'em Tinh Hoa' },
-    ])
-    expect((await goi(d, { lop: '12 - Tinh Hoa' })).dongBoNao).toEqual([expect.objectContaining({ sbd: '12021' })])
-    expect((await goi(d, { ngay: '2026-09-23' })).dangBoNao).toEqual([{ dang: 'MAI', chu: 'bản tin ngày mai' }])
+    expect(r.dangBoNao).toEqual([])
+    expect(r.dongBoNao).toEqual([])
   })
   it('không có bản tin / bản tin hỏng ⇒ hai danh sách rỗng, không lỗi', async () => {
     const d = truong()

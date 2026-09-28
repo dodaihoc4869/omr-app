@@ -87,10 +87,11 @@
   display: grid; flex: none; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'gio tien nop'; align-items: center; gap: 14px;
   margin: 10px calc(12px + var(--thi-le-phai, 0px)) 0 8px; padding: 12px; border-radius: 24px; background: var(--lb-mat); box-shadow: var(--lb-bong);
 }
-.lb-gio { grid-area: gio; min-width: 150px; padding: 8px 14px 10px; border-radius: 18px; background: var(--lb-xd-nen); color: var(--lb-xd-dam); transition: background-color 400ms, color 400ms; }
+.lb-gio { grid-area: gio; min-width: max-content; padding: 8px 14px 10px; border-radius: 18px; background: var(--lb-xd-nen); color: var(--lb-xd-dam); transition: background-color 400ms, color 400ms; }
 .lb-gio[data-muc='vang'] { background: var(--lb-hp-nen); color: var(--lb-hp-chu); }
 .lb-gio[data-muc='do'] { background: var(--lb-do); color: var(--lb-tren-do); }
 .lb-gio-nhan { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.lb-gio-phu { font-size: 12px; font-weight: 600; opacity: 0.85; white-space: nowrap; }
 .lb-gio-so { margin-top: 2px; font-size: 40px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
 @media (prefers-reduced-motion: no-preference) { .lb-gio[data-muc='do'] .lb-gio-so { animation: lb-nhip 2s ease-in-out infinite; } }
 @keyframes lb-nhip { 50% { opacity: 0.78; } }
@@ -113,15 +114,22 @@
 .lb-nop:hover:not(:disabled) { transform: translateY(-1px); }
 .lb-nop:disabled { opacity: 0.55; cursor: default; font-size: 14px; }
 .lb-nop-ghi { max-width: 150px; font-size: 12px; font-weight: 600; text-align: center; color: var(--lb-hp-chu); }
+/* CỘT PHIẾU HẸP (29/09, ảnh thầy: nút Nộp đè đồng hồ). Gốc lỗi: lưới "minmax(0,1fr) auto" để cột đồng hồ co về 0 (min-width: 0)
+ * trong khi cột nút `auto` giữ nguyên bề rộng nội dung ⇒ số giờ tràn xuống dưới nút. Nay cột hẹp xếp DỌC: đồng hồ một hàng (giờ lớn trái,
+ * nhãn + "Hết giờ lúc" phải, không gãy chữ) · nút Nộp cả bề ngang cao 52 px · tiến độ. Đồng hồ không bao giờ co dưới nội dung. */
 @container lb-phai (max-width: 560px) {
-  .lb-dk { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'gio nop' 'tien tien'; gap: 10px; }
-  .lb-gio { min-width: 0; }
-  .lb-gio-so { font-size: 34px; }
-  .lb-nop { min-height: 68px; height: 100%; }
+  .lb-khung .lb-dk { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'gio' 'nop' 'tien'; gap: 10px; }
+  .lb-khung .lb-gio { display: grid; grid-template-columns: auto minmax(max-content, 1fr); grid-template-areas: 'so nhan' 'so phu'; column-gap: 14px; align-items: center; min-width: 0; }
+  .lb-gio-nhan { grid-area: nhan; align-self: end; }
+  .lb-gio-so { grid-area: so; margin: 0; font-size: 34px; }
+  .lb-gio-phu { grid-area: phu; align-self: start; }
+  .lb-khung .lb-nop { width: 100%; min-width: 0; min-height: 0; height: 52px; border-radius: 16px; }
+  .lb-nop-ghi { max-width: none; }
 }
-@container lb-phai (max-width: 340px) {
-  .lb-gio-so { font-size: 28px; }
-  .lb-nop { min-width: 92px; padding: 0 10px; font-size: 15px; }
+/* Cột rất hẹp (kéo đề 75 % trên máy 1024): đồng hồ 3 dòng gọn — nhãn · giờ · "Hết giờ lúc". */
+@container lb-phai (max-width: 330px) {
+  .lb-khung .lb-gio { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'nhan' 'so' 'phu'; }
+  .lb-gio-so { font-size: 30px; }
 }
 
 .lb-phieu { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px calc(12px + var(--thi-le-phai, 0px)) 12px 8px; }
@@ -189,10 +197,17 @@
 .lb-khung[data-bo-cuc='ngang-gon'] .lb-co-chu button { height: 36px; }
 .lb-khung[data-bo-cuc='ngang-gon'] .lb-phan-tab button { height: 32px; }
 .lb-khung[data-bo-cuc='ngang-gon'] .lb-de { padding: 4px 8px 40vh 12px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-dk { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'gio nop' 'tien tien'; gap: 6px; margin: 6px calc(8px + var(--thi-le-phai, 0px)) 0 4px; padding: 8px; border-radius: 18px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-gio { min-width: 0; padding: 4px 10px 6px; border-radius: 14px; }
+.lb-khung[data-bo-cuc='ngang-gon'] .lb-dk { gap: 6px; margin: 6px calc(8px + var(--thi-le-phai, 0px)) 0 4px; padding: 8px; border-radius: 18px; }
+.lb-khung[data-bo-cuc='ngang-gon'] .lb-gio { padding: 4px 10px 6px; border-radius: 14px; }
 .lb-khung[data-bo-cuc='ngang-gon'] .lb-gio-so { font-size: 26px; }
-.lb-khung[data-bo-cuc='ngang-gon'] .lb-nop { min-width: 84px; min-height: 52px; height: 100%; padding: 0 10px; font-size: 15px; border-radius: 14px; }
+.lb-khung[data-bo-cuc='ngang-gon'] .lb-gio-phu { display: none; } /* điện thoại ngang: chỗ dọc quý — giữ nhãn + giờ */
+.lb-khung[data-bo-cuc='ngang-gon'] .lb-nop { padding: 0 10px; font-size: 15px; border-radius: 14px; }
+/* Điện thoại ngang, cột đủ chỗ: đồng hồ (không co dưới nội dung) | nút Nộp cạnh nhau, tiến độ dòng dưới. Hẹp hơn ⇒ xếp dọc như trên. */
+@container lb-phai (min-width: 280px) {
+  .lb-khung[data-bo-cuc='ngang-gon'] .lb-dk { grid-template-columns: minmax(max-content, 1fr) minmax(88px, auto); grid-template-areas: 'gio nop' 'tien tien'; }
+  .lb-khung[data-bo-cuc='ngang-gon'] .lb-gio { display: block; min-width: max-content; }
+  .lb-khung[data-bo-cuc='ngang-gon'] .lb-nop { width: 100%; height: 100%; min-height: 52px; }
+}
 .lb-khung[data-bo-cuc='ngang-gon'] .lb-tien { gap: 3px; }
 .lb-khung[data-bo-cuc='ngang-gon'] .lb-tien-dong b { font-size: 17px; }
 .lb-khung[data-bo-cuc='ngang-gon'] .lb-phieu { padding: 6px calc(8px + var(--thi-le-phai, 0px)) 8px 4px; }

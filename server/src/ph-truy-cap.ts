@@ -7,7 +7,6 @@
 //
 // Quy tắc: có `pass` thì DANH TÍNH lấy từ token, mọi `sbd` trong thân bị bỏ qua (không cho token của em A đọc em B). Token sai/hết hạn/bị thu hồi thì báo lỗi,
 // KHÔNG rơi xuống SBD trần. Đếm lỗi (thiếu bảng, D1 lỗi tạm) không bao giờ làm hỏng lệnh chính.
-import { docBoNaoAiChoPhuHuynh } from './bo-nao-doc'
 import { canhBaoChoPh, phXemCanhBao } from './canh-bao-thay'
 import type { Env, ExecutionContext } from './kieu'
 import { parentIdentity, parentPass } from './game-v2-auth'
@@ -84,13 +83,12 @@ export async function phXacDinh(env: Env, b: Record<string, unknown>): Promise<R
  * KHÔNG có mã câu, mã bài, mã ca, nội dung câu hỏi hay đáp án (`chiTiet`, `ma`, `nguon` bị bỏ). Nội dung chữ (ghiChu, cảnh báo) do cổng phụ huynh tự soạn từ `loai`.
  *
  * `envDoc` (Boss 22/09 lượt 2, mặc định = `env`): xác định danh tính + tra tên/lớp đọc trên bản sao khi có, đếm truy cập vẫn ghi `env` (primary) qua
- * `sbdCuaPhuHuynh`. `lapVaLuuKeHoach`/`docBoNaoAiChoPhuHuynh`/`canhBaoChoPh` GIỮ NGUYÊN `env` — có đọc-rồi-ghi (lập kế hoạch), không đổi để tránh đọc lệch bản.
+ * `sbdCuaPhuHuynh`. `lapVaLuuKeHoach`/`canhBaoChoPh` GIỮ NGUYÊN `env` — có đọc-rồi-ghi (lập kế hoạch), không đổi để tránh đọc lệch bản.
  */
 export async function phKeHoach(env: Env, b: Record<string, unknown>, envDoc: Env = env, ctx?: ExecutionContext): Promise<Record<string, unknown>> {
   const { sbd } = await sbdCuaPhuHuynh(envDoc, b, 'ph-ke-hoach', { chiToken: true, envGhi: env, ctx })
   const em = await envDoc.DB.prepare('SELECT ho_ten, lop FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ ho_ten: string | null; lop: string | null }>()
   const kh = (await lapVaLuuKeHoach(env, [sbd], Date.now())).get(sbd)!
-  const boNaoAi = await docBoNaoAiChoPhuHuynh(env, sbd, kh.ngay)
   const canhBao = await canhBaoChoPh(env, sbd)
   return {
     ok: true,
@@ -110,8 +108,6 @@ export async function phKeHoach(env: Env, b: Record<string, unknown>, envDoc: En
     chuoiDat: kh.chuoiDat,
     canhBao: kh.canhBao.map((c) => c.loai),
     tonCuTong: kh.tonCuTong,
-    // BỘ NÃO A.I chế độ THẬT: lời nhắn + thư tuần cho phụ huynh, CHỈ của đúng con (SBD từ token). Chạy thử/tắt/không có ⇒ KHÔNG có khoá này.
-    ...(boNaoAi ? { boNaoAi } : {}),
     // CẢNH BÁO CỦA THẦY (chỉ thầy bấm mới có): lời cho PHỤ HUYNH, ≤ 3, bài của con chưa nộp, gửi trong 72 giờ. Không có ⇒ KHÔNG có khoá.
     ...(canhBao.length > 0 ? { canhBaoThay: canhBao } : {}),
   }

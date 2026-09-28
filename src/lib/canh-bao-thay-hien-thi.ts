@@ -4,7 +4,7 @@
 //   { id, maBtvn, tenBtvn, guiLuc, hanNop, loi, trangThaiEm:'chua_mo'|'do_chang'|'qua_han', chang?:{hienTai,tong}, daXem }
 // THUẦN: không mạng, không đồng hồ (giờ hiện tại truyền vào), không trường lạ ra ngoài. Nói ĐÚNG SỰ THẬT (chưa mở / dở chặng mấy / hạn lúc nào),
 // không doạ, không so với bạn, không nhãn năng lực. Mã tờ đề không bao giờ làm tên.
-import { lamSachLoi } from './bo-nao-hien-thi'
+import { lamSachLoi } from './lam-sach-loi'
 import { trongNhuMa } from './btvn-ca-nhan-kieu'
 import { gioDayDu } from './ngay-gio-24'
 
