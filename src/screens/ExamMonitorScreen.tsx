@@ -37,7 +37,7 @@ import { useAppStore } from '../store/appStore'
 import { cuaVaoCa } from '../lib/cua-vao-ca'
 import { trangThaiCa } from './LichSuCaScreen'
 import KhoiThoiGianCa from '../components/KhoiThoiGianCa'
-import TamPhuChieuMa from '../components/TamPhuChieuMa'
+import TamPhuChieuMa, { gopEmDaVao } from '../components/TamPhuChieuMa'
 import { themPhutCa, cauKetQuaThemPhut } from '../lib/them-phut-api'
 import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
@@ -2077,6 +2077,13 @@ export default function ExamMonitorScreen() {
           diaChi={`${location.host}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`}
           soEmCho={chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc ? (chiTiet.dsCho ?? []).length : null}
           onDong={() => setChieuMa(false)}
+          lop={chiTiet.ca.lop || ''}
+          link={`${location.origin}${import.meta.env.BASE_URL}t/${chiTiet.ca.maCa}`}
+          hoiPhongCho={async () => {
+            // Tự làm mới 5 giây (thầy 28/09) — cùng lệnh chiTietCa của màn này; chỉ tên em đã vào.
+            const ct = await chiTietCa(scriptUrl.trim(), secret.trim(), chiTiet.ca.maCa)
+            return { em: gopEmDaVao(ct.dsCho, ct.luot), siSo: Array.isArray(ct.ca.danhSachMoi) ? ct.ca.danhSachMoi.length : null }
+          }}
         />
       )}
 
