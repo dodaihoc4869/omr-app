@@ -1,5 +1,5 @@
 // Mục "Hôm nay" (bản vẽ khổ 1): khối anh hùng (ba vòng: kế hoạch hôm nay · làm đúng · thời gian học) → chiến dịch → ca kiểm tra gần nhất → điều đáng mừng → dạng con đang luyện thêm
-// → con học lúc nào → A.I Đỗ Đại Học đã lo. Mỗi khối chỉ hiện khi có SỐ THẬT; không có gì ⇒ vắng (không số 0 giả).
+// → con học lúc nào → Thầy Đỗ Đại Học đã lo. Mỗi khối chỉ hiện khi có SỐ THẬT; không có gì ⇒ vắng (không số 0 giả).
 import type { ViewPhMoi } from '../../lib/ph-moi/use-tat-ca-ve-con'
 import { mauSoTiLeDung, type PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2 } from '../../lib/ph-v3/du-lieu'
@@ -7,9 +7,9 @@ import type { CanhBaoThay } from '../../lib/canh-bao-thay-hien-thi'
 import { chuHanNop, chuGuiLuc, tieuDeCanhBao } from '../../lib/canh-bao-thay-hien-thi'
 import { gioVn, ngayDayDuVn, soVn, tachVn } from '../../lib/ph-moi/dinh-dang'
 import { NHAN_NGUON, chuCongBoCa, tenMoc } from '../ph-moi/nhan'
-import { BtAi, BtBang, BtBia, BtChuong, BtCo, BtDongHo, BtLen, BtLua, BtPhai, BtSach, BtSao, BtTich } from './BieuTuong'
+import { BtBang, BtBia, BtChuong, BtCo, BtDongHo, BtLen, BtLua, BtPhai, BtSach, BtSao, BtTich } from './BieuTuong'
 import { ChipDoi, Chip, DangTai, The, TheLoi, VongDongTam } from './dung-chung'
-import { TEN_PHAN, chuHanNgay, lienKetCa } from './tien-ich'
+import { TEN_PHAN, chuHanNgay, chuThay, lienKetCa } from './tien-ich'
 
 const GIO_DAU = 5 * 60
 const GIO_CUOI = 23 * 60
@@ -47,7 +47,7 @@ function CanhBao({ cb, nay, onDaXem }: { cb: CanhBaoThay; nay: number; onDaXem: 
     <section className="ph3-canh-bao ph3-o-du" aria-label="Cảnh báo của thầy" data-vung="canh-bao-thay">
       <div className="ph3-canh-bao__dau"><BtChuong co={18} />Cảnh báo của thầy · {chuGuiLuc(cb)}</div>
       <p><b>{tieuDeCanhBao(cb, 'phuhuynh')}</b></p>
-      {cb.loi && <p>{cb.loi}</p>}
+      {cb.loi && <p>{chuThay(cb.loi)}</p>}
       <p>{chuHanNop(cb, nay)}</p>
       <button type="button" className="ph3-nut-vien" style={{ alignSelf: 'flex-start' }} onClick={() => onDaXem(cb.id)}>Đã xem cảnh báo</button>
     </section>
@@ -290,7 +290,7 @@ function AiDaLo({ pm }: { pm: PhMoi }) {
     return `Chấm và giải thích ${x.so} câu ngay khi con làm xong`
   }
   return (
-    <The id="ph3-ai" tieuDe="A.I Đỗ Đại Học đã lo cho con" bieuTuong={<BtAi />} mau="xd">
+    <The id="ph3-ai" tieuDe="Thầy Đỗ Đại Học đã lo cho con" bieuTuong="ĐH" mau="thay">
       <ul className="ph3-ai">
         {ds.map((x, i) => <li key={i}><BtTich co={20} day={2.5} /><span>{chu(x)}</span></li>)}
       </ul>

@@ -11,7 +11,7 @@ import type { BaoCaoCa, CauXemLai } from '../../lib/ph-v3/du-lieu'
 import { chuCongBoCa } from '../ph-moi/nhan'
 import { BtKhoa, BtLen, BtLenGon, BtTrai, BtXuong } from './BieuTuong'
 import { DangTai, The, TheLoi } from './dung-chung'
-import { TEN_PHAN } from './tien-ich'
+import { chuThay, TEN_PHAN } from './tien-ich'
 
 type TrangThai = { kieu: 'tai' } | { kieu: 'loi'; chu: string } | { kieu: 'ok'; bc: BaoCaoCa }
 
@@ -88,7 +88,7 @@ function BaoCao({ sbd, bc }: { sbd: string; bc: BaoCaoCa }) {
 
       {bc.nhanXet && (
         <The id="ph3-nx" className="ph3-o-hep" vung="nhan-xet-thay" tieuDe="Nhận xét của thầy" phu={`Thầy Đỗ Đại Học${bc.nhanXet.capNhatLuc ? ` · ${ngayDayDuVn(bc.nhanXet.capNhatLuc)}` : ''}`} bieuTuong="ĐH" mau="thay">
-          <p className="ph3-loi-thay">{bc.nhanXet.noiDung}</p>
+          <p className="ph3-loi-thay">{chuThay(bc.nhanXet.noiDung)}</p>
         </The>
       )}
 

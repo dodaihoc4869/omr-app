@@ -7,7 +7,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import ParentPortalScreen from '../src/screens/ParentPortalScreen'
 import { docBaoCaoCa, docHoc2, docLoiThay } from '../src/lib/ph-v3/du-lieu'
-import { docTuyen, lienKetCa, chuHanNgay } from '../src/components/ph-v3/tien-ich'
+import { docTuyen, lienKetCa, chuHanNgay, chuThay } from '../src/components/ph-v3/tien-ich'
 import { dungBieuDo, thuNgan } from '../src/components/ph-v3/ManDiemSo'
 import { muoiBonNgay } from '../src/components/ph-v3/ManTienBo'
 import { chuBanApp } from '../src/lib/cap-nhat-app'
@@ -163,11 +163,13 @@ describe('app phụ huynh mới — CHỈ XEM, không giao bài (thầy 28/09)',
     expect(container.querySelectorAll('.ph3-nhip__cot > span').length).toBe(14)
   })
 
-  it('Lời thầy: lời Bộ não, cảnh báo của thầy (bấm "Đã xem cảnh báo" ⇒ báo máy chủ), nhận xét sau từng ca', async () => {
+  it('Lời thầy: lời nhắn ký tên Thầy Đỗ Đại Học, cảnh báo của thầy (bấm "Đã xem cảnh báo" ⇒ báo máy chủ), nhận xét sau từng ca', async () => {
     const { container } = await vaoApp()
     await diToi('#loi-thay')
     await waitFor(() => expect(container.querySelector('[data-vung="ds-nhan-xet"]')).toBeTruthy())
     expect(container.querySelector('[data-vung="thu-tuan"]')!.textContent).toContain('Hôm nay Khôi làm 38 câu')
+    expect(container.querySelector('[data-vung="thu-tuan"]')!.textContent).toContain('Thầy Đỗ Đại Học')
+    expect(container.textContent).not.toMatch(/A\.I|Bộ não/)
     expect(container.querySelector('[data-vung="ds-nhan-xet"]')!.textContent).toContain('Con mất điểm ở bài đốt cháy ester.')
     fireEvent.click(screen.getByRole('button', { name: 'Đã xem cảnh báo' }))
     expect(daXem).toHaveBeenCalledWith('cb-1')
@@ -214,6 +216,11 @@ describe('lớp đọc chặt của ba lệnh mới', () => {
     expect(docTuyen('#la')).toEqual({ muc: 'hom-nay', maCa: null })
     expect(docTuyen('#ca/%E0')).toEqual({ muc: 'hom-nay', maCa: null })
     expect(chuHanNgay('2026-09-30')).toBe('23:59 · Thứ Tư 30/09/2026')
+    // Thầy 28/09: phụ huynh chỉ thấy "Thầy Đỗ Đại Học", không thấy "A.I Đỗ Đại Học" / "Bộ não A.I …"
+    expect(chuThay('Bộ não A.I hỗ trợ riêng em Khôi đã xếp lịch ôn.')).toBe('Thầy Đỗ Đại Học đã xếp lịch ôn.')
+    expect(chuThay('Bộ não A.I: thêm 2 câu/ngày')).toBe('Thầy Đỗ Đại Học: thêm 2 câu/ngày')
+    expect(chuThay('A.I Đỗ Đại Học sẽ thử lại')).toBe('Thầy Đỗ Đại Học sẽ thử lại')
+    expect(chuThay('Con làm tốt phần ester.')).toBe('Con làm tốt phần ester.')
     expect(thuNgan('2026-09-26')).toBe('T7')
     const b = dungBieuDo([{ diem: 6.25 }, { diem: 7.75 }, { diem: 10 }])
     for (const y of b.y) expect(y).toBeGreaterThanOrEqual(20)
@@ -235,6 +242,7 @@ describe('khoá nguồn', () => {
       const s = doc(`${thuMuc}/${t}`)
       expect(s, t).not.toMatch(/giao-them|GiaoThem|giaoThem|\/mom\/|parent-news/)
       expect(s, t).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+      if (t !== 'tien-ich.ts') expect(s.replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, ''), `${t}: chữ A.I`).not.toMatch(/A\.I|Bộ não/)
     }
     const css = doc(`${thuMuc}/ph-v3.css`).replace(/\/\*[\s\S]*?\*\//g, '').replace(/url\([^)]*\)/g, '')
     const lop = [...css.matchAll(/\.([a-zA-Z][\w-]*)/g)].map((m) => m[1]!).filter((x) => !/^woff2?$/.test(x))

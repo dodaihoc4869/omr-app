@@ -39,3 +39,10 @@ Mã cũ `src/components/ph-moi/**` (ManChinh, bảng "Mọi thứ về con", Gia
 
 ## Phát hành
 Chưa phát hành: nhánh đã đẩy, chờ gộp vào `main` (GitHub Actions tự đẩy Pages + Worker). Lùi: `git revert <mã commit gộp>`.
+
+## Vòng 2 — thầy 28/09 tối: "Bỏ A.I Đỗ Đại Học thay bằng Thầy Đỗ Đại Học" + "đồng bộ mọi giao diện xoay ngang"
+- App: mọi chữ phụ huynh thấy dùng "Thầy Đỗ Đại Học" (thẻ "Thầy Đỗ Đại Học đã lo cho con", chữ ký thư tuần, biểu tượng ĐH). Chữ máy chủ (thư tuần, cảnh báo, nhận xét ca) đi qua `chuThay()` trong `src/components/ph-v3/tien-ich.ts` — đổi "Bộ não A.I hỗ trợ riêng em <Tên>" / "Bộ não A.I" / "A.I Đỗ Đại Học" ⇒ "Thầy Đỗ Đại Học".
+  - Lỗi vòng này: khoảng `[A-ZÀ-Ỹ]` chứa cả chữ thường (đ, à…) ⇒ ăn mất "đã" sau tên con. Sửa bằng `\p{Lu}`; test `chuThay` khoá.
+  - Test khoá nguồn: không tệp nào trong `src/components/ph-v3/` (trừ `tien-ich.ts`) còn chữ "A.I"/"Bộ não" ngoài chú thích; màn Lời thầy không hiện "A.I".
+- Bản vẽ (artifact 2HShm51xEiuVKcTAUpfeFT, bản 4): đủ 3 hàng × 5 màn — dọc, xoay ngang (844), máy tính (1440); bấm "xem chi tiết ca" ở khổ nào mở chi tiết ca ĐÚNG khổ đó. App thật vốn đã co giãn theo khổ (không nhảy sang dọc).
+- Đo: tsc 0 lỗi; vitest 5 tệp phụ huynh 47/47; check:mau sạch; chụp 30 màn (sáng/tối × dọc/ngang/máy tính): còn chữ A.I 0, cuộn ngang 0, đích < 44px 0, chữ < 11px 0.
