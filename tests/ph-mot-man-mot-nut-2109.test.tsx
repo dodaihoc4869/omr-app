@@ -44,50 +44,46 @@ afterEach(() => {
   window.history.replaceState(null, '', '/')
 })
 
-describe('MỘT màn, MỘT nút — cây màn phụ huynh thật', () => {
-  it('đúng MỘT nút hành động chính ("Giao thêm bài cho con"); không chuỗi nào của tính năng đã gỡ; không menu / sheet / tab', async () => {
+// ĐỔI 28/09 — thầy: "app phụ huynh không có giao bài cho con nữa chỉ xem được báo cáo mọi thứ về con". "MỘT nút Giao thêm bài cho con" (21/09) đã GỠ:
+// cổng mở app chỉ xem components/ph-v3/AppPhuHuynh (4 mục bằng liên kết). Khối dưới giữ tinh thần cũ (không tính năng đã gỡ, danh sách nút hữu hạn) cho app mới.
+describe('CHỈ XEM — cây màn phụ huynh thật (28/09)', () => {
+  it('không chuỗi nào của tính năng đã gỡ (kể cả "Giao thêm bài cho con"); không tab/sheet cũ; menu tài khoản chỉ dựng khi bấm nút tròn', async () => {
     const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="hom-nay"]')).toBeTruthy())
-    await waitFor(() => expect(container.textContent).toContain('Hôm nay còn 3 lượt giao'))
-    const chinh = container.querySelectorAll('[data-vung="giao-them"]')
-    expect(chinh).toHaveLength(1)
-    expect(chinh[0]!.textContent).toContain('Giao thêm bài cho con')
+    await waitFor(() => expect(container.querySelector('[data-vung="anh-hung"]')).toBeTruthy())
     const ten = (e: Element) => `${e.textContent} ${e.getAttribute('aria-label') ?? ''} ${e.getAttribute('title') ?? ''}`
     const chu = [container.textContent ?? '', ...[...container.querySelectorAll('button,[role],[title],[aria-label],a')].map(ten)].join('\n')
-    for (const cam of CAM_CU) expect(chu, String(cam)).not.toMatch(cam)
-    expect(container.querySelector('[role="menu"], .bnv-menu, .bnv, [role="tablist"]')).toBeNull() // menu tài khoản chỉ dựng khi bấm nút tròn
-    expect(document.querySelector('.fixed.inset-0')).toBeNull() // không sheet toàn màn
+    for (const cam of [...CAM_CU, /Giao thêm bài cho con/]) expect(chu, String(cam)).not.toMatch(cam)
+    expect(container.querySelector('[role="menu"], .bnv-menu, .bnv, [role="tablist"], [data-vung="giao-them"]')).toBeNull()
+    expect(document.querySelector('.fixed.inset-0')).toBeNull()
   })
 
-  it('MỌI nút bấm được trên màn chính khớp danh sách hữu hạn: nút tròn tài khoản · thẻ "Xem mọi thứ về con" · "Đã xem" · "Giao thêm bài cho con"; menu mở ⇒ thêm "Đóng menu" + mục "Đổi số báo danh" (đúng MỘT mục)', async () => {
+  it('MỌI nút bấm được khớp danh sách hữu hạn: nút tròn tài khoản · "Đã xem cảnh báo" · "Đổi số báo danh" (thanh bên máy tính); menu mở ⇒ đúng MỘT mục', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="ca-gan-nhat"]')).toBeTruthy())
     const ten = () => [...container.querySelectorAll('button')].map((b) => (b.getAttribute('aria-label') || b.textContent || '').replace(/\s+/g, ' ').trim())
-    const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Xem mọi thứ về conTừng câu, điểm mạnh, dạng còn vấp|Đã xem|Giao thêm bài cho con|Đóng menu|Đổi số báo danh)$/
+    const HOP_LE = /^(Tài khoản: mở để đổi số báo danh|Đã xem cảnh báo|Đổi số báo danh)$/
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
-    expect(ten().filter((t) => t === 'Giao thêm bài cho con')).toHaveLength(1)
-    expect(ten().filter((t) => t === 'Đổi số báo danh')).toHaveLength(0) // còn ẩn trong menu
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
     for (const t of ten()) expect(t, t).toMatch(HOP_LE)
-    expect(ten().filter((t) => t === 'Đổi số báo danh')).toHaveLength(1)
     expect(container.querySelectorAll('[role="menuitem"]')).toHaveLength(1)
+    // bốn mục điều hướng là LIÊN KẾT (không phải nút)
+    expect([...container.querySelectorAll('nav a')].map((a) => a.textContent)).toEqual(['Hôm nay', 'Điểm số', 'Tiến bộ', 'Lời thầy'])
   })
 
-  it('lời Bộ não / thư tuần KHÔNG hiện dù lệnh /ph/ke-hoach có trả; dải cảnh báo của thầy vẫn còn (thụ động)', async () => {
+  it('cảnh báo của thầy hiện ở Hôm nay (thụ động: chỉ "Đã xem cảnh báo", không "Làm ngay")', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.textContent).toContain('Thầy nhắc con nộp bài trước 12:00.'))
-    expect(container.textContent).not.toMatch(/Lời Bộ não CHO PH|Thư tuần CHO PH/)
     expect(screen.queryByRole('button', { name: 'Làm ngay' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Đã xem cảnh báo' })).toBeTruthy()
   })
 
-  it('"Đổi số báo danh" nằm trong menu của nút tròn (đích ≥ 48 px theo CSS) cùng số bản app; màn KHÔNG còn chân "Bản app"; bấm ⇒ về màn đăng nhập, xoá SBD nhớ', async () => {
+  it('"Đổi số báo danh" nằm trong menu nút tròn (đích ≥ 44 px, mục ≥ 48 px theo CSS) cùng số bản app; bấm ⇒ về màn đăng nhập, xoá SBD nhớ', async () => {
     const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.querySelector('[data-vung="hom-nay"]')).toBeTruthy())
-    expect(container.querySelector('[data-vung="chan-ph"]')).toBeNull()
+    await waitFor(() => expect(container.querySelector('[data-vung="anh-hung"]')).toBeTruthy())
     expect(container.textContent).not.toMatch(/Bản app|Bản chạy thử/)
-    const css = doc('src/components/ph-moi/ph-apple.css')
-    expect(css).toMatch(/\.phm-ap-anh \{[^}]*width: 48px; height: 48px/)
-    expect(css).toMatch(/\.phm-ap-menu__muc \{[^}]*min-height: 50px/)
+    const css = doc('src/components/ph-v3/ph-v3.css')
+    expect(css).toMatch(/\.ph3-tron__nut \{[^}]*width: 44px; height: 44px/)
+    expect(css).toMatch(/\.ph3-menu button \{[^}]*min-height: 48px/)
     fireEvent.click(screen.getByRole('button', { name: 'Tài khoản: mở để đổi số báo danh' }))
     expect(container.querySelector('[data-vung="ban-app"]')!.textContent).toBe(chuBanApp())
     fireEvent.click(screen.getByRole('menuitem', { name: 'Đổi số báo danh' }))
@@ -95,11 +91,12 @@ describe('MỘT màn, MỘT nút — cây màn phụ huynh thật', () => {
     expect(localStorage.getItem('omr_ph_sbd')).toBeNull()
   })
 
-  it('không gọi /parent-news, /mom/*, /hs/lich-su, /hs/ke-hoach-ngay, /hs/btvn (luồng cũ); chỉ /ph/tat-ca-ve-con + /ph/giao-them chiXem (+ /ph/ke-hoach cho cảnh báo)', async () => {
+  it('không gọi luồng cũ (/parent-news, /mom/*, /hs/*) và KHÔNG BAO GIỜ /ph/giao-them; /ph/tat-ca-ve-con gửi SBD trần', async () => {
     const { container } = render(<ParentPortalScreen />)
-    await waitFor(() => expect(container.textContent).toContain('Hôm nay còn 3 lượt giao'))
+    await waitFor(() => expect(container.querySelector('[data-vung="anh-hung"]')).toBeTruthy())
+    await new Promise((r) => setTimeout(r, 30))
     expect(goi.filter((g) => /parent-news|\/mom\/|hs\/lich-su|hs\/ke-hoach|hs\/btvn|hs\/cau-sai/.test(g))).toEqual([])
-    expect(goi.filter((g) => g.startsWith('/ph/giao-them'))).toEqual(['/ph/giao-them {"sbd":"12121212","chiXem":true}'])
+    expect(goi.filter((g) => g.startsWith('/ph/giao-them'))).toEqual([])
     expect(goi.filter((g) => g.startsWith('/ph/tat-ca-ve-con'))).toEqual(['/ph/tat-ca-ve-con {"sbd":"12121212"}'])
   })
 })
@@ -119,13 +116,13 @@ describe('hộp báo cáo PH — chế độ khongGiaoBai (còn dùng nếu nơi
 })
 
 describe('khoá nguồn — mã của các tính năng đã gỡ không còn ở màn phụ huynh', () => {
-  it('ParentPortalScreen: không tab/sheet/menu/handler giao cũ; không import các thành phần đã gỡ; SBD trần đi cùng hook; dải cảnh báo qua ManChinh', () => {
+  it('ParentPortalScreen: không tab/sheet/menu/handler giao cũ; không import các thành phần đã gỡ; chỉ đăng nhập rồi mở app chỉ xem', () => {
     const p = doc('src/screens/ParentPortalScreen.tsx').replace(/\/\/.*$/gm, '')
     for (const cam of ['tabPh', 'setTabPh', 'cheDoKhacPhuc', 'mucMenuPhuHuynh', 'KhoiKhacPhuc3CheDo', 'ModalKhacPhucCauSai', 'BangTinPhuHuynh', 'parentNewsApi', 'giaoHangNgay', 'napDeXuat', 'xuLyGiaoBai', 'xuLyTaoBaiCuaMom', 'momReviewHtml', 'guiTinNhan', 'KhungXemPhieu', 'NutQuayLai', 'boNaoPh', 'giaoBai=', 'onGiaoBai', 'useHopThoai', 'BangNhiemVu', 'BaoCaoCaThiPhuHuynhModal', 'TheVinhDanh', 'useKeHoachNgay', 'hsLichSuCaApi', 'hsBtvnApi'])
       expect(p, cam).not.toContain(cam)
-    expect(p).toContain('canhBao={canhBaoPh}')
-    expect(p).toContain('onDoiSbd={dangXuat}')
-    expect(p).toContain('const giaoThem = useGiaoThem(!!sbdHienTai, undefined, sbdHienTai ?? undefined)')
+    // 28/09: cổng chỉ còn đăng nhập rồi giao cho app chỉ xem; không hook giao thêm.
+    expect(p).toContain('<AppPhuHuynh sbd={sbdHienTai} hoTen={hoTenCon} lop={lopCon} onDoiSbd={dangXuat} />')
+    expect(p).not.toContain('useGiaoThem')
   })
   it('BangNhiemVu: không còn prop/ô giao bài cũ; muc-menu không còn menu phụ huynh', () => {
     const b = doc('src/components/bang-nhiem-vu/BangNhiemVu.tsx')
