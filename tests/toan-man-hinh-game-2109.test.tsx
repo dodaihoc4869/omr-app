@@ -12,8 +12,12 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 vi.mock('../src/game/than-thu-v2/Spirit2D', () => ({ default: () => <div data-testid="thu" /> }))
 vi.mock('../src/components/ThongBaoHocSinh', () => ({ default: () => null, noticeApi: vi.fn() }))
 vi.mock('../src/game/than-thu-v2/academic-sync', () => ({ syncStudentExp: async () => {} }))
-// Game v2 giả: chỉ để soi lối ra "Về app học sinh" (onDong) của cổng.
-vi.mock('../src/game/than-thu-v2/Game', () => ({ default: (p: { onDong: () => void }) => <div data-testid="game"><button onClick={p.onDong}>Về app học sinh</button></div> }))
+// Game v2 giả: soi lối ra "Về app học sinh" (onDong) của cổng. 28/09 lần 2: nút toàn màn hình nằm TRONG thanh đầu của từng màn game
+// (không còn nút nổi ở cổng) ⇒ game giả đặt NutToanManHinh thật trong <header> như các màn thật.
+vi.mock('../src/game/than-thu-v2/Game', async () => {
+  const { default: NutToanManHinh } = await import('../src/components/NutToanManHinh')
+  return { default: (p: { onDong: () => void }) => <div data-testid="game"><header><NutToanManHinh /></header><button onClick={p.onDong}>Về app học sinh</button></div> }
+})
 vi.mock('../src/lib/exam-db', async (original) => ({ ...(await original<Record<string, unknown>>()), loadScriptUrlHoacMacDinh: async () => '/test' }))
 vi.mock('../src/lib/exam-api', async (original) => ({
   ...(await original<Record<string, unknown>>()),

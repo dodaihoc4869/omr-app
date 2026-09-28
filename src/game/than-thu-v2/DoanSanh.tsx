@@ -1,5 +1,6 @@
 // ĐOÀN HỘ TỐNG — SẢNH hằng ngày (bản vẽ 1) + phòng chờ khi đi cùng bạn. Khối nào cần số liệu mà máy chủ chưa trả (Đoàn lớp, vé,
 // rương chuỗi, Trùm lớp, ấn thạch — bước 5 và 6) thì KHÔNG hiện: không bịa số.
+import NutToanManHinh from '../../components/NutToanManHinh'
 import { useEffect, useRef, useState } from 'react'
 import { Flag, Flame, Ticket, X } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -67,6 +68,7 @@ export default function DoanSanh(p: Props) {
       <header className="dh-dau">
         <div><div className="dh-nhan">{s ? `MÙA ${s.mua.so} · CÒN ${s.mua.conNgay} NGÀY` : 'HỘ TỐNG LINH TÂM · CẢ LỚP MỘT ĐOÀN'}</div><h1>{s?.tenDoan ?? p.tenDoan}</h1></div>
         <div className="dh-dau-phai">
+          <NutToanManHinh />
           <button type="button" className="dh-nut-dong" aria-label="Về Đảo thần thú" title="Về Đảo thần thú" onClick={p.onDong}><X size={18} aria-hidden="true" /></button>
         </div>
       </header>
