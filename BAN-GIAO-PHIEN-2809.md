@@ -98,3 +98,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 23:30 · Deploy #551 THÀNH CÔNG: PR #53 bảng DẠY HỌC (điểm danh, cây DẠY HỌC, chiếu đủ, chọn em) · main f1c0704 · lùi: git revert -m 1 f1c0704. Đang: toi-uu-man-thi, toi-uu-may-chu; FE còn lại chờ.
 - 00:30 · Deploy #552 THÀNH CÔNG: PR #54 màn thi hết đứng máy · main 25042c8 · lùi: git revert -m 1 25042c8.
 - 00:48 · Deploy #553 THÀNH CÔNG: PR #55 tối ưu máy chủ · main 4570868 · lùi: git revert -m 1 4570868. Đo sau: /ca/danh-sach 1,34–1,64 s (trước ~1,6), /gv/chien-dich thongKe 1,78–1,97 s (trước ~2,1); bia-co-doc ok.
+- 01:04 · Deploy #554 THÀNH CÔNG: PR #56 tối ưu app (gói đầu gv 591→251 KB, WebP 25→5 MB, precache 161, dọn ảnh/mã) · main c1fd22c · lùi: git revert -m 1 c1fd22c. HẾT ĐỢT TỐI ƯU 28/09.
