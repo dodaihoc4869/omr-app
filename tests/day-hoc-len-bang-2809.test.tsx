@@ -97,6 +97,8 @@ describe('phần thuần', () => {
     const ds = cauTuDeChon(KHO, new Set(['DH-12-C1-B1-TN']))
     expect(ds.map((c) => c.phan)).toEqual(['I', 'I', 'III'])
     expect(ds.find((c) => c.phan === 'III')!.tuLuan).toBe(true)
+    // nhãn theo NỘI DUNG, không theo mã: câu trắc nghiệm có đủ đáp án không bị gắn "Tự luận"
+    expect(ds.filter((c) => c.phan === 'I').every((c) => !c.tuLuan)).toBe(true)
   })
   it('tờ chiếu MỚI: mỗi câu một đợt, đủ câu (kể cả tự luận), lớp bản vẽ 28/09, tên em + nút Đạt/Chưa đạt khi có phiên', async () => {
     const ds = cauTuDeChon(KHO, new Set(['DH-12-C1-B1-TN']))
@@ -105,6 +107,8 @@ describe('phần thuần', () => {
     expect(html).toContain('LÊN BẢNG — BẢN VẼ MỚI 28/09')
     expect((html.match(/class="mc-dot mc-dot-don"/g) ?? []).length).toBe(3)
     expect(html).toContain('xà phòng hoá ethyl acetate')
+    expect(html).toContain('Phần III · Tự luận')
+    expect(html).toContain('Tự luận — em trình bày lời giải đầy đủ lên bảng.')
     expect(html).toContain('Chất nào sau đây là ester?')
     expect(html).toContain('Nguyễn An')
     expect([...o.values()].map((x) => x.sbd)).toEqual(['S1'])

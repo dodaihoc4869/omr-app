@@ -166,7 +166,7 @@ export function chonEmChoCau(
     xacSuat: chon.xacSuat,
     uocLuong,
     duMuc: chon.duMuc,
-    lyDo: `${uocLuong ? 'Ước lượng · ' : ''}Khả năng làm đúng ≈ ${pt(chon.xacSuat)} · ${lyMuc}${chon.soLanGoi ? ` · đã lên ${chon.soLanGoi} lần buổi này` : ''}.`,
+    lyDo: `${uocLuong ? 'Ước lượng · ' : ''}${lyMuc.charAt(0).toUpperCase()}${lyMuc.slice(1)}${chon.soLanGoi ? ` · đã lên ${chon.soLanGoi} lần buổi này` : ''}.`,
     bang: ds,
   }
 }

@@ -46,7 +46,7 @@ describe('chọn em cho một câu', () => {
     const k = chonEmChoCau(cauVD, em('B', 'A'), s)!
     expect(k.sbd).toBe('A')
     expect(k.duMuc).toBe(true)
-    expect(k.lyDo).toMatch(/bậc Vận dụng ≥ mức Vận dụng/)
+    expect(k.lyDo).toMatch(/Bậc Vận dụng ≥ mức Vận dụng/)
   })
   it('xác suất cao nhất trong nhóm đủ mức; câu Nhận biết thì cả A lẫn B đủ mức ⇒ em xác suất cao hơn', () => {
     const k = chonEmChoCau(cauNB, em('A', 'B'), soLieu)!

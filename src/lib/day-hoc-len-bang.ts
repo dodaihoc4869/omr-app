@@ -55,7 +55,8 @@ export function cauTuDeChon(ds: readonly TeacherExamSource[], maChon: ReadonlySe
         maDang: q.dang?.ma || null,
         tenDang: q.dang?.ten || null,
         mucDo: q.mucDo ?? '',
-        tuLuan: laCauTuLuan(q, phan),
+        // Nhãn "Tự luận" theo NỘI DUNG câu (không theo mã): cả thư mục Dạy học mang đuôi -VD/-DT nên luật mã của `cau-tu-luan.ts` coi mọi câu là tự luận.
+        tuLuan: laCauTuLuan({ ...q, id: undefined, qid: undefined, maDe: undefined }, phan),
       })
     }
     for (const q of s.phanI ?? []) them('I', q)
@@ -79,6 +80,7 @@ export function demCau(ds: readonly CauDayHoc[]): { tong: number; I: number; II:
 export function tomTatDe(c: Pick<CauDayHoc, 'q'>, toiDa = 110): string {
   const t = String(c.q.text || '')
     .replace(/<[^>]*>/g, ' ')
+    .replace(/\\ce\{([^{}]*)\}/g, '$1')
     .replace(/\$+/g, '')
     .replace(/\s+/g, ' ')
     .trim()
