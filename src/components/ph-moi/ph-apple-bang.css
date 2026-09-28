@@ -285,12 +285,9 @@
 .phm-ghi-chu { margin: 10px 6px 0; font-size: 0.8125rem; line-height: 1.385; color: var(--phm-chu-2); }
 
 /* ── TỪNG CÂU CON ĐÃ LÀM ──────────────────────────────────────────── */
-.phm-seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); min-width: 0; border-radius: 12px; background: var(--phm-o); }
-.phm-seg button { min-width: 0; min-height: 48px; padding: 4px; border: 0; background: none; cursor: pointer; display: grid; }
-.phm-seg button span { display: grid; place-items: center; min-width: 0; border-radius: 9px; padding: 2px 4px; font-size: 0.9375rem; line-height: 1.2; font-weight: 500; color: var(--phm-chu); text-align: center; }
-.phm-seg button span small { font-size: inherit; color: var(--phm-chu-2); font-weight: 500; }
-.phm-seg button[aria-pressed="true"] span { background: var(--phm-the); font-weight: 600; box-shadow: 0 0 0 0.5px var(--phm-vach), 0 3px 8px -2px rgb(0 0 0 / 0.16); }
-@media (prefers-color-scheme: dark) { .phm-seg button[aria-pressed="true"] span { background: color-mix(in srgb, var(--m3-on-surface) 22%, var(--phm-o)); } .phm-bac span[data-nay] { background: color-mix(in srgb, var(--m3-on-surface) 22%, var(--phm-o)); } }
+/* Lọc câu: thẻ lọc kiểu chung src/styles/the-loc.css (một hàng cuộn ngang, ✓ khi chọn, số đếm là huy hiệu) */
+.phm-seg { --tl-chu: var(--phm-chu); }
+@media (prefers-color-scheme: dark) { .phm-bac span[data-nay] { background: color-mix(in srgb, var(--m3-on-surface) 22%, var(--phm-o)); } }
 .phm-chu-thich { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; margin: 10px 4px 0; font-size: 0.75rem; line-height: 1.333; color: var(--phm-chu-2); }
 .phm-chu-thich span { display: inline-flex; align-items: center; gap: 5px; }
 .phm-o-cau { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 3.5px; background: var(--phm-dat-to); }

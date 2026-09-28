@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import ChuTheLoc, { tenTheLoc } from '../ChuTheLoc'
 import { ChevronRight, Info, Minus, TrendingDown, TrendingUp } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import { cauLyDo, hanhDongCua, NHAN_HANH_DONG, type HomNay, type HomNayEm } from '../../lib/hom-nay-api'
@@ -104,11 +105,10 @@ export default function EmCanGiup({
           {soTong != null && <span className="hn2-em-tong">{soTong} em</span>}
         </div>
         {goc && goc.lop.length > 1 && (
-          <div className="hn2-loc-lop" role="group" aria-label="Lọc theo lớp">
+          <div className="tl-hang hn2-loc-lop" role="group" aria-label="Lọc theo lớp">
             {['', ...goc.lop].map((l) => (
-              <button key={l || 'tat-ca'} type="button" className="hn2-loc" aria-pressed={lop === l} onClick={() => setLop(l)}>
-                {l || 'Tất cả'}
-                {l && dem ? ` · ${dem[l] ?? 0}` : ''}
+              <button key={l || 'tat-ca'} type="button" className="tl-the hn2-loc" aria-pressed={lop === l} aria-label={l && dem ? tenTheLoc(l, dem[l] ?? 0) : undefined} onClick={() => setLop(l)}>
+                {l && dem ? <ChuTheLoc chu={l} so={dem[l] ?? 0} /> : l || 'Tất cả'}
               </button>
             ))}
           </div>

@@ -183,7 +183,7 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
   return (
     <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
       {dsKhoi.length > 0 && (
-        <div className="flex flex-wrap" style={{ gap: 'var(--k2)' }} role="group" aria-label="Lọc theo khối">
+        <div className="tl-hang" role="group" aria-label="Lọc theo khối">
           {['', ...dsKhoi].map((k) => {
             const chon = khoi === k
             return (
@@ -192,19 +192,7 @@ export default function HopChonDe({ ds, daChon, onChon, nhomLoc = '', cao = 308,
                 type="button"
                 onClick={() => setKhoi(k)}
                 aria-pressed={chon}
-                className="tap-target font-bold"
-                style={{
-                  fontFamily: 'var(--sans)',
-                  fontSize: 'var(--cx-1)',
-                  minHeight: 36,
-                  padding: '0 var(--k3)',
-                  borderRadius: 'var(--bo-tron)',
-                  background: chon ? 'var(--xanh-nen)' : 'var(--the-2)',
-                  color: chon ? 'var(--xanh)' : 'var(--nhat)',
-                  border: `1.5px solid ${chon ? 'var(--xanh)' : 'transparent'}`,
-                  transitionProperty: 'background-color, color, border-color',
-                  transitionDuration: 'var(--nhanh)',
-                }}
+                className="tl-the"
               >
                 {k ? `Lớp ${k}` : 'Tất cả'}
               </button>

@@ -20,8 +20,9 @@ it('hiện thần thú toàn màn hình rồi dọn hiệu ứng khi chuyển l�
  let now=0;let tick=()=>{}
  const pet={anh:'https://example.com/pet.png',ten:'Rồng',danhHieu:'',he:'',capDo:1,hinhThai:'',tangThapCaoNhat:0,soCauDaThanhTay:0}
  const dom=new JSDOM(taoHtmlMayChieu([{...o('A'),thanThu:pet},{...o('B'),thanThu:pet},o('C')],{dayHoc:true}),{runScripts:'dangerously',beforeParse(w){w.Date.now=()=>now;w.setInterval=((f:()=>void)=>{tick=f;return 1}) as never;w.clearInterval=()=>{};w.HTMLElement.prototype.scrollTo=()=>{};Object.defineProperty(w.HTMLImageElement.prototype,'complete',{get:()=>true});Object.defineProperty(w.HTMLImageElement.prototype,'naturalWidth',{get:()=>512})}})
- const doc=dom.window.document;now=61000;tick();expect(doc.querySelectorAll('.mc-intro-card')).toHaveLength(0);doc.getElementById('mc-len-bang')!.click()
- expect(doc.querySelectorAll('.mc-intro-card')).toHaveLength(2)
- expect(doc.querySelector('.mc-intro')?.textContent).toContain('A')
- doc.getElementById('mc-sau')!.click();expect(doc.querySelector('.mc-intro')).toBeNull();dom.window.close()
+ const doc=dom.window.document;now=61000;tick();expect(doc.querySelectorAll('.mc-g-cum')).toHaveLength(0);doc.getElementById('mc-len-bang')!.click()
+ // Bản vẽ 28/09: màn gọi tên mới (.mc-goi, mỗi em một cụm .mc-g-cum: thú ảnh thật, "Mời em lên bảng", tên lớn)
+ expect(doc.querySelectorAll('.mc-goi .mc-g-cum')).toHaveLength(2)
+ expect(doc.querySelector('.mc-goi')?.textContent).toContain('A')
+ doc.getElementById('mc-sau')!.click();expect(doc.querySelector('.mc-goi')).toBeNull();dom.window.close()
 })

@@ -816,20 +816,22 @@ body.co-lam .thanh:not(#thanh-nop) { position: static; }
    line-height riêng để nhãn không bị giãn theo giãn dòng của đoạn văn. */
 .mt {
   display: inline-grid; justify-items: center; align-items: center;
-  vertical-align: middle; margin: 0 3px; line-height: 1.15; text-align: center;
+  vertical-align: middle; margin: 0 .24em; line-height: 1.15; text-align: center;
 }
-.mt-tren, .mt-duoi { font-size: .74em; white-space: nowrap; padding: 0 4px; color: var(--nhat); }
-.mt-than { position: relative; width: 100%; min-width: 26px; height: 0; border-top: 1.4px solid currentColor; margin: 3px 0; }
-.mt-than::after, .mt-than::before { content: ""; position: absolute; top: -4px; width: 0; height: 0; border: 4px solid transparent; }
-.mt-phai::after { right: -1px; border-right: 0; border-left-color: currentColor; }
-.mt-trai::before { left: -1px; border-left: 0; border-right-color: currentColor; }
+/* MŨI TÊN THEO CỠ CHỮ (thầy chốt bản vẽ Lên bảng 28/09, H7): rộng ≥ 1,6em, nét ≈ 0,075em, đầu nhọn theo em, lề .24em hai bên —
+   chiếu 45 px vẫn thấy rõ từ cuối lớp, in giấy vẫn sắc. */
+.mt-tren, .mt-duoi { font-size: .74em; white-space: nowrap; padding: 0 .3em; color: var(--nhat); }
+.mt-than { position: relative; width: 100%; min-width: 1.6em; height: 0; border-top: .075em solid currentColor; margin: .12em 0; }
+.mt-than::after, .mt-than::before { content: ""; position: absolute; top: -.2575em; width: 0; height: 0; border: .22em solid transparent; }
+.mt-phai::after { right: -.06em; border-right: 0; border-left-width: .34em; border-left-color: currentColor; }
+.mt-trai::before { left: -.06em; border-left: 0; border-right-width: .34em; border-right-color: currentColor; }
 /* Hai chiều: hai nét song song, mỗi nét một đầu nhọn ngược hướng nhau. */
-.mt-hai { height: 5px; border-bottom: 1.4px solid currentColor; }
-.mt-hai::after { top: -4px; right: -1px; border-right: 0; border-left-color: currentColor; }
-.mt-hai::before { top: 1px; left: -1px; border-left: 0; border-right-color: currentColor; }
-/* Mũi tên trần (không nhãn) đứng ngay trong dòng chữ, không cần chiều rộng lớn. */
-.mt-tran { margin: 0 5px; }
-.mt-tran .mt-than { min-width: 20px; }
+.mt-hai { height: .3em; border-bottom: .075em solid currentColor; }
+.mt-hai::after { top: -.2575em; right: -.06em; border-right: 0; border-left-width: .34em; border-left-color: currentColor; }
+.mt-hai::before { top: .1175em; left: -.06em; border-left: 0; border-right-width: .34em; border-right-color: currentColor; }
+/* Mũi tên trần (không nhãn) đứng ngay trong dòng chữ. */
+.mt-tran { margin: 0 .24em; }
+.mt-tran .mt-than { min-width: 1.6em; }
 
 /* HAI CỘT CỐ ĐỊNH trên màn rộng, đúng mẫu theo ảnh. */
 .q-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }

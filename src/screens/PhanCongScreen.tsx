@@ -1,4 +1,5 @@
 import { hanNhapVietNam, hanChoOChon } from '../lib/han-bai-tap'
+import ChuTheLoc, { tenTheLoc } from '../components/ChuTheLoc'
 import { gioDayDu } from '../lib/ngay-gio-24'
 import ONgayGio24 from '../components/ONgayGio24'
 import KhungBtvnDaGiao from '../components/btvn-da-giao/KhungBtvnDaGiao'
@@ -17,7 +18,7 @@ import { OThongBao } from '../components/DesignSystem'
 import { danhSachCa, danhSachEm, khoiTuNamSinh, type CaTomTat, type EmTomTat } from '../lib/exam-api'
 import { loadScriptUrl, loadTeacherSecret, loadExamSources } from '../lib/exam-db'
 import { layCauHinhMayChu } from '../lib/may-chu-moi'
-import { chuChipLop, useLopThay, type LopThay } from '../lib/ten-lop-thay'
+import { useLopThay, type LopThay } from '../lib/ten-lop-thay'
 import { luotCuaCaMoi } from '../lib/day-ca-may-chu-moi'
 import { giaoBtvn, theoDoiBtvn, suaGiaoBtvn, type DongTheoDoiBtvn } from '../lib/btvn-may-chu-moi'
 import HopChonDe from '../components/HopChonDe'
@@ -612,7 +613,7 @@ function TheGiaoBtvn() {
             {lopThay.ds && (
               <div data-khoi="chon-theo-lop" className="space-y-1.5">
                 <div className="text-xs font-bold text-slate-800 dark:text-slate-200">Chọn theo lớp</div>
-                <div role="group" aria-label="Chọn theo lớp" className="flex flex-wrap items-center gap-2">
+                <div role="group" aria-label="Chọn theo lớp" className="tl-hang">
                   {lopThay.ds.map((l) => {
                     const chon = lopDaChonHet(l)
                     return (
@@ -621,13 +622,10 @@ function TheGiaoBtvn() {
                         type="button"
                         aria-pressed={chon}
                         onClick={() => batLop(l)}
-                        className={`min-h-[44px] text-xs font-bold px-4 rounded-full transition-colors cursor-pointer ${
-                          chon
-                            ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs'
-                            : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                        }`}
+                        aria-label={tenTheLoc(l.tenLop, sbdCuaLop(l).length, ' · ', 'em')}
+                        className="tl-the"
                       >
-                        {chuChipLop({ tenLop: l.tenLop, soEm: sbdCuaLop(l).length })}
+                        <ChuTheLoc chu={l.tenLop} so={sbdCuaLop(l).length} donVi="em" />
                       </button>
                     )
                   })}
@@ -748,7 +746,7 @@ function TheGiaoBtvn() {
 
                     {/* BỘ LỌC KHỐI VÀ TÌM KIẾM */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <div className="flex items-center gap-1" aria-label="Lọc khối">
+                      <div className="tl-hang" role="group" aria-label="Lọc khối">
                         {['', '10', '11', '12'].map((k) => {
                           const chon = khoiThem === k
                           return (
@@ -756,11 +754,8 @@ function TheGiaoBtvn() {
                               key={k}
                               type="button"
                               onClick={() => setKhoiThem(k)}
-                              className={`text-xs font-bold px-3 py-1 rounded-full transition-colors cursor-pointer ${
-                                chon
-                                  ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs'
-                                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                              }`}
+                              aria-pressed={chon}
+                              className="tl-the"
                             >
                               {k ? `Khối ${k}` : 'Tất cả'}
                             </button>
@@ -885,7 +880,7 @@ function TheGiaoBtvn() {
 
                 {/* BỘ LỌC KHỐI LỚP VÀ Ô TÌM KIẾM */}
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex items-center gap-1" aria-label="Lọc khối lớp">
+                  <div className="tl-hang" role="group" aria-label="Lọc khối lớp">
                     {['', '10', '11', '12'].map((k) => {
                       const chon = khoiTheoEm === k
                       return (
@@ -893,11 +888,8 @@ function TheGiaoBtvn() {
                           key={k}
                           type="button"
                           onClick={() => setKhoiTheoEm(k)}
-                          className={`text-xs font-bold px-3 py-1 rounded-full transition-colors cursor-pointer ${
-                            chon
-                              ? 'bg-[color:var(--m3-primary)] text-[color:var(--m3-on-primary)] shadow-2xs'
-                              : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100'
-                          }`}
+                          aria-pressed={chon}
+                          className="tl-the"
                         >
                           {k ? `Lớp ${k}` : 'Tất cả'}
                         </button>

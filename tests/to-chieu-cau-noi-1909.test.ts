@@ -116,7 +116,7 @@ describe('tờ dựng ra: có nút khi nào', () => {
       expect(h).not.toContain('data-cau-noi')
       expect(h).not.toContain('ddh-mc-')
       expect(h).toContain('<body class="mc">')
-      expect(h.match(/<script>/g)).toHaveLength(2) // tờ + bố cục đo thật (M2); KHÔNG có script cầu nối
+      expect(h.match(/<script>/g)).toHaveLength(3) // tờ + bố cục đo thật (M2) + lớp bản vẽ 28/09; KHÔNG có script cầu nối
     }
     expect(taoHtmlMayChieu([o('A'), o('B')])).toBe(taoHtmlMayChieu([o('A'), o('B')], { cauNoi: undefined }))
   })
@@ -420,7 +420,8 @@ describe('TẾ NHỊ TRƯỚC LỚP — tờ chiếu không bao giờ lộ kết
       const vung = t.o1()
       expect(vung.getAttributeNames().sort()).toEqual(['class', 'data-cham', 'data-khoa'])
       expect(vung.getAttribute('data-cham')).toBe('xong')
-      expect(t.doc.body.getAttributeNames().sort()).toEqual(['class', 'data-cau-noi'])
+      // `data-pha` là PHA của đợt (chờ gọi / đang chữa), không phải kết quả. Nhãn Đạt/Chưa đạt trên THẺ TÊN là luật mới thầy chốt 28/09.
+      expect(t.doc.body.getAttributeNames().sort()).toEqual(['class', 'data-cau-noi', 'data-pha'])
       expect(t.doc.body.className).not.toMatch(/dat|khong|do\b/)
     }
   })

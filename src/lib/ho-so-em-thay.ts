@@ -158,3 +158,9 @@ export function tomTatKeHoach(kh: KeHoachEm): TomTatKeHoach {
     thanThu: tt ? { ten: (tt.nickname || tt.pet || '').toString(), cap: typeof tt.cap === 'number' ? tt.cap : null, expHomNay: typeof kh.exp?.homNay === 'number' ? kh.exp.homNay : null } : null,
   }
 }
+
+/** HỒ SƠ EM CHO TỜ CHIẾU (bản vẽ Lên bảng 28/09): `/gv/ho-so-len-bang {sbd, qid}` — lệnh thầy CHỈ ĐỌC. Lỗi / chưa có ⇒ `null`
+ * (tờ chiếu hiện "chưa lấy được số liệu", không bịa). `qid` là mã câu của MÁY CHỦ (`qidMayChuCuaIdCau`). */
+export async function layHoSoLenBang(sbd: string, qid: string): Promise<Record<string, unknown> | null> {
+  return goi('/gv/ho-so-len-bang', { sbd, qid }, true)
+}

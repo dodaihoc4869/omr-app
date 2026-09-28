@@ -744,42 +744,54 @@
   box-shadow: 0 0 8px rgb(var(--ch-bac-c) / 0.8);
 }
 
-/* ───── bộ lọc theo chỗ đeo ───── */
+/* ───── bộ lọc theo chỗ đeo: thẻ lọc kiểu chung src/styles/the-loc.css (.tl-hang--mot-dong / .tl-the); ở đây chỉ bảng màu game ───── */
 .ps .ps-loc {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: none;
+  --tl-vien: var(--ch-kinh-vien);
+  --tl-chu: var(--ch-chu-mo);
+  --tl-chon-nen: color-mix(in srgb, var(--ch-lam) 18%, transparent);
+  --tl-chon-chu: var(--ch-chu);
+  --tl-vong: var(--ch-lam);
   -webkit-overflow-scrolling: touch;
-  margin: 0 -14px;
-  padding: 4px 14px;
+  margin: -6px -14px;
+  padding: 6px 14px;
 }
-.ps .ps-loc::-webkit-scrollbar {
-  display: none;
+/* `.ps.ps button` (đặt lại mọi nút của game) mạnh hơn kiểu chung ⇒ nhắc lại hình thẻ ở đây, màu đi qua --nut-* của game */
+.ps.ps .ps-loc .tl-the {
+  --nut-nen: transparent;
+  --nut-chu: var(--tl-chu);
+  --nut-bong: none;
+  --nut-dich: none;
+  padding: 0 12px;
+  border: 1px solid var(--tl-vien);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
 }
-.ps button.ps-loc-nut,
-.ps .ps-loc button {
+.ps.ps .ps-loc .tl-the:hover:not(:disabled) { --nut-nen: color-mix(in srgb, var(--tl-chu) 10%, transparent); }
+.ps.ps .ps-loc .tl-the[aria-pressed='true'] {
+  --nut-nen: var(--tl-chon-nen);
+  --nut-chu: var(--tl-chon-chu);
+  padding-left: 9px;
+  border-color: transparent;
+  font-weight: 700;
+}
+.ps.ps .ps-loc .tl-the:disabled { opacity: 0.7; }
+.ps button.ps-loc-nut {
   --nut-nen: var(--ch-kinh);
   --nut-chu: var(--ch-chu-mo);
   --nut-bong: inset 0 0 0 1px var(--ch-kinh-vien);
+  position: relative;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 48px;
-  padding: 0 16px;
-  border-radius: 24px;
-  font-size: 14px;
+  min-height: 36px; /* thẻ lọc gọn (thầy 28/09); vùng chạm 44 px nhờ ::after */
+  padding: 0 14px;
+  border-radius: 18px;
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
-}
-.ps .ps-loc button[aria-pressed='true'] {
-  --nut-nen: linear-gradient(180deg, rgb(56, 104, 224), rgb(34, 72, 184));
-  --nut-chu: rgb(255, 255, 255);
-  --nut-bong: 0 6px 16px rgba(47, 91, 208, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
-.ps .ps-loc button:disabled {
-  opacity: 0.7;
 }
 .ps .ps-loc em,
 .ps .ps-tu-o h3 em {

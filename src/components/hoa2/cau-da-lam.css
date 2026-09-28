@@ -122,29 +122,14 @@
 .h2-cdl-chon select:focus-visible {
   outline: none;
 }
+/* Thẻ lọc: kiểu chung src/styles/the-loc.css (.tl-hang--mot-dong: một hàng cuộn ngang, viên 32 px, ✓ khi chọn, số đếm là huy hiệu);
+   ở đây chỉ đặt bảng màu riêng của khung Câu đã làm. */
 .h2-cdl-loc {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.h2-cdl-chip {
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 22px;
-  border: 1px solid var(--h2c-vien);
-  background: transparent;
-  color: var(--h2c-chu-nhat);
-  font-size: 14px;
-  font-weight: 600;
-}
-.h2-cdl-chip[aria-pressed='true'] {
-  border-color: var(--h2c-xanh);
-  background: var(--h2c-xanh);
-  color: var(--h2c-xanh-chu);
-  font-weight: 800;
-}
-.h2-cdl-dem {
-  font-variant-numeric: tabular-nums;
+  --tl-vien: var(--h2c-vien);
+  --tl-chu: var(--h2c-chu-nhat);
+  --tl-chon-nen: var(--h2c-xanh);
+  --tl-chon-chu: var(--h2c-xanh-chu);
+  --tl-vong: var(--h2c-xanh);
 }
 .h2-cdl-tom {
   margin: 0;

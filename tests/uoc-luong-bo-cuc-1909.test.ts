@@ -34,6 +34,10 @@ interface Do {
 }
 const DO: Do = JSON.parse(readFileSync('docs/anh-man-chieu-1909/do-bo-cuc-40-cau.json', 'utf8'))
 const KHUNG_HIEU_CHINH = ['1280x720', '1920x1080']
+// LUẬT THẦY 28/09 (bản vẽ LenBang-Moi): KHÔNG co chữ, không "toàn bảng" — bậc 4/5 đã bỏ; câu không vừa 2/3 thì giữ 2/3 ở cỡ chuẩn
+// rồi LẬT TRANG / CUỘN. Phép đo Chrome lưu từ 19/09 theo luật cũ, nên so sánh quy về điều ước lượng CÒN quyết định: GHÉP ĐÔI
+// (bậc 1 = nửa bảng) hay KHÔNG (≥ 2 = một em, 2/3 bảng). Cỡ chữ chỉ so ở câu mà luật cũ không co (bậc thật ≤ 3).
+const quy = (b: number) => (b >= 2 ? 2 : 1)
 const KHUNG_LA = ['1366x768', '1600x900']
 
 describe('phép đo Chrome đã lưu — bản thân nó phải đạt', () => {
@@ -77,7 +81,7 @@ describe('khung LẠ chưa từng dùng để chỉnh — ước lượng vẫn 
     describe(k, () => {
       const kq = DO_LA.khung[k].rieng.map((r) => {
         const m = CAU_MAU.find((x) => x.ten === r.ten)!
-        return { ten: r.ten, that: r.bac, uoc: uocLuongBacCau(m.o.cau, { rong: w, cao: h }).bac }
+        return { ten: r.ten, that: quy(r.bac), uoc: quy(uocLuongBacCau(m.o.cau, { rong: w, cao: h }).bac) }
       })
       it('sai lệch ≤ 1 bậc ở MỌI câu', () => {
         expect(kq.filter((x) => Math.abs(x.uoc - x.that) > 1).map((x) => `${x.ten}: thật ${x.that} ước ${x.uoc}`)).toEqual([])
@@ -97,7 +101,7 @@ describe('ước lượng bám phép đo thật', () => {
     const [W, H] = k.split('x').map(Number)
     return DO.khung[k].rieng.map((r, i) => {
       const u = uocLuongBacCau(CAU_MAU[i].o.cau, { rong: W, cao: H })
-      return { ten: r.ten, that: r.bac, uoc: u.bac, dl: u.bac - r.bac, coThat: r.co, coUoc: u.co }
+      return { ten: r.ten, that: quy(r.bac), uoc: quy(u.bac), dl: quy(u.bac) - quy(r.bac), coThat: r.co, coUoc: u.co, coCu: r.bac >= 4 }
     })
   }
 
@@ -122,17 +126,19 @@ describe('ước lượng bám phép đo thật', () => {
       })
 
       it('cỡ chữ ước lệch cỡ thật ≤ 3 px ở mọi câu', () => {
-        expect(kq.filter((x) => Math.abs(x.coUoc - x.coThat) > 3).map((x) => `${x.ten}: thật ${x.coThat} ước ${x.coUoc}`)).toEqual([])
+        expect(kq.filter((x) => !x.coCu && Math.abs(x.coUoc - x.coThat) > 3).map((x) => `${x.ten}: thật ${x.coThat} ước ${x.coUoc}`)).toEqual([])
       })
     })
   }
 
-  it('bảng phân loại mẫu: câu ngắn bậc 1; câu Phần I đề dài bậc 2; đề cực dài bậc 4 với chữ co (ở 1280×720)', () => {
+  it('bảng phân loại mẫu: câu ngắn bậc 1; câu Phần I đề dài bậc 2; đề cực dài vẫn bậc 2 ở CỠ CHUẨN (luật 28/09: không co chữ) (ở 1280×720)', () => {
     const b = Object.fromEntries(doKhung('1280x720').map((x) => [x.ten, x.uoc]))
     for (let i = 1; i <= 10; i++) expect(b[`I-ngắn-${i}`]).toBe(1)
     expect(b['I-đề-dài-70']).toBe(2)
-    expect(b['cực-I-đề-160']).toBe(4)
-    expect(b['III-bảng-lớn']).toBeGreaterThanOrEqual(3)
+    expect(b['cực-I-đề-160']).toBe(2)
+    expect(b['III-bảng-lớn']).toBeGreaterThanOrEqual(2)
+    const c = uocLuongBacCau(CAU_MAU.find((x) => x.ten === 'cực-I-đề-160')!.o.cau, { rong: 1280, cao: 720 })
+    expect(c.co).toBe(30)
   })
 })
 
@@ -226,7 +232,7 @@ describe('câu GỐC trong gói đề cho cùng kết quả với CauLuyen', () 
     for (const m of CAU_MAU) {
       const a = uocLuongBacCau(m.o.cau, { rong: 1280, cao: 720 }, 1).bac
       const b = uocLuongBacCau(m.o.cau, { rong: 1280, cao: 720 }, 1.4).bac
-      expect(b, m.ten).toBeGreaterThanOrEqual(a)
+      expect(quy(b), m.ten).toBeGreaterThanOrEqual(quy(a))
     }
   })
 })
