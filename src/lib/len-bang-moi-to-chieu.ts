@@ -63,6 +63,8 @@ body.mc-do .mc-vung-de>*{transform:none!important}
 .mc-tiep-bar{position:absolute;left:0;right:0;top:0;z-index:4;display:none;align-items:center;gap:.6em;height:calc(var(--u)*2.6);padding:0 clamp(14px,1.9vw,34px);background:var(--mc-giay);border-bottom:1px dashed var(--mc-vien);font:700 calc(var(--u)*1.1) var(--mc-sans);color:var(--mc-phu);border-radius:inherit}
 .mc-tiep-bar.mc-hien{display:flex}
 .mc-tiep-bar b{color:var(--mc-nhan)}
+.mc-che{position:absolute;left:0;right:0;bottom:0;z-index:3;display:none;background:var(--mc-giay);border-radius:0 0 clamp(14px,1.72vw,30px) clamp(14px,1.72vw,30px)}
+.mc-che.mc-hien{display:block}
 .mc-trang-so{position:absolute;right:calc(var(--u)*1);bottom:calc(var(--u)*.5);z-index:4;display:none;align-items:center;gap:.5em;padding:.2em .7em;border-radius:1em;background:var(--mc-giay);box-shadow:0 0 0 1px var(--mc-vien);font:800 calc(var(--u)*1.05) var(--mc-sans);color:var(--mc-chu)}
 .mc-trang-so.mc-hien{display:flex}
 .mc-trang-so i{display:inline-block;width:calc(var(--u)*.7);height:calc(var(--u)*.7);border-radius:50%;background:var(--mc-vien)}
@@ -79,7 +81,7 @@ body.mc-bc[data-pha="chua"] .mc-cot-lam-bai,body.mc-bc[data-pha="goi"] .mc-cot-l
 body.mc-bc[data-pha="chua"] .mc-cot-lam-bai::before,body.mc-bc[data-pha="chua"] .mc-cot-lam-bai::after,body.mc-bc[data-pha="chua"] .mc-trang::before,body.mc-bc[data-pha="chua"] .mc-trang::after{content:none!important;display:none!important}
 /* 4 · CHỜ GỌI: cột 1/3 chỉ có lời mời, KHÔNG tên em nào */
 body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai{display:grid;place-items:center;text-align:center}
-body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai::before{content:"Chờ thầy gọi\\ABấm L hoặc nút “Lên bảng”\\A\\ATên em chỉ hiện khi thầy bấm Lên bảng";white-space:pre-line;font:600 calc(var(--u)*1.25)/1.5 var(--mc-sans);color:var(--mc-bang-phu);padding:calc(var(--u)*1.5)}
+body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai::before{content:"Chờ thầy gọi\\A Bấm L hoặc nút “Lên bảng”\\A \\A Tên em chỉ hiện khi thầy bấm Lên bảng";white-space:pre-line;font:600 calc(var(--u)*1.25)/1.5 var(--mc-sans);color:var(--mc-bang-phu);padding:calc(var(--u)*1.5)}
 /* THẺ TÊN (bản vẽ H15 + thầy 28/09): lưới cố định; nhãn Đạt/Chưa đạt là viên thuốc MỘT dòng, tên dài tự cắt "…" */
 body.mc .mc-em .mc-ten-hang{grid-column:2;grid-row:1;display:flex;align-items:center;min-width:0;gap:.6em}
 body.mc .mc-em:not(:has(.mc-thu)) .mc-ten-hang{grid-column:1 / span 2}
@@ -274,7 +276,7 @@ export function jsLenBangMoi(): string {
   function khoi(v) {
     var ra = [];
     function them(el) {
-      if (el.hidden || el.classList.contains('mc-tiep-bar') || el.classList.contains('mc-trang-so') || el.classList.contains('mc-con-nua')) return;
+      if (el.hidden || el.classList.contains('mc-tiep-bar') || el.classList.contains('mc-trang-so') || el.classList.contains('mc-con-nua') || el.classList.contains('mc-che')) return;
       if (el.matches(HOP) || (el.classList.contains('sol-text') && el.querySelector('.sol-pa'))) { Array.prototype.forEach.call(el.children, them); return; }
       ra.push(el);
     }
@@ -282,7 +284,7 @@ export function jsLenBangMoi(): string {
     return ra;
   }
   function phu(v, cls, tag) { var e = v.querySelector(':scope > .' + cls); if (!e) { e = tao(tag || 'div', cls); v.appendChild(e); } return e; }
-  function dat(v, off) { Array.prototype.forEach.call(v.children, function (c) { if (c.classList.contains('mc-tiep-bar') || c.classList.contains('mc-trang-so') || c.classList.contains('mc-con-nua')) return; c.style.transform = off ? 'translateY(' + (-off) + 'px)' : ''; }); }
+  function dat(v, off) { Array.prototype.forEach.call(v.children, function (c) { if (c.classList.contains('mc-tiep-bar') || c.classList.contains('mc-trang-so') || c.classList.contains('mc-con-nua') || c.classList.contains('mc-che')) return; c.style.transform = off ? 'translateY(' + (-off) + 'px)' : ''; }); }
   function soCauCua(v) { var s = v.querySelector('.mc-de-so'); if (s) return s.textContent; var n = v.closest('.mc-nua'); var c = n && n.querySelector('.mc-cau-so'); return c ? c.textContent.split(' · ')[0] : 'Câu'; }
 
   /** CHIA TRANG một vùng đề theo khối (chờ gọi). Lưu mốc từng trang vào v.__trang. */
@@ -292,17 +294,35 @@ export function jsLenBangMoi(): string {
     var cs = getComputedStyle(v), pT = parseFloat(cs.paddingTop) || 0, pB = parseFloat(cs.paddingBottom) || 0;
     var H = v.clientHeight, hT = u() * 2.6 + 4, r0 = v.getBoundingClientRect().top;
     var ds = khoi(v).map(function (b) { var r = b.getBoundingClientRect(); return { b: b, tren: r.top - r0, duoi: r.bottom - r0 }; }).filter(function (x) { return x.duoi > x.tren; });
-    var moc = [ds.length ? Math.min(pT, ds[0].tren) : pT], dau = moc[0], suc = H - pT - pB;
-    ds.forEach(function (x) { if (x.duoi - dau > suc + 1 && x.tren > dau + 1) { dau = x.tren; moc.push(dau); suc = H - pT - pB - hT; } });
-    v.__moc = moc; v.__khoi = ds; v.__pT = pT; v.__hT = hT;
+    var moc = [ds.length ? Math.min(pT, ds[0].tren) : pT], dau = moc[0], suc = H - pT - pB, suc2 = H - pT - pB - hT;
+    ds.forEach(function (x) {
+      if (x.duoi - dau <= suc + 1) return;
+      var cao = x.duoi - x.tren;
+      // khối VỪA một trang ⇒ sang trang mới ở đầu khối (không cắt giữa đoạn / hình / phương án / ý / mục lời giải)
+      if (cao <= suc2 + 1 && x.tren > dau + 1) { dau = x.tren; moc.push(dau); suc = suc2; return; }
+      // khối CAO HƠN một trang (đoạn dẫn rất dài): ngắt ở RANH GIỚI DÒNG bên trong khối
+      var lh = parseFloat(getComputedStyle(x.b).lineHeight) || u() * 3;
+      var an = 0;
+      while (x.duoi - dau > suc + 1 && an++ < 50) {
+        var ngat = x.tren + Math.floor((dau + suc - x.tren) / lh) * lh;
+        if (ngat <= dau + 1) ngat = dau + suc;
+        dau = ngat; moc.push(dau); suc = suc2;
+      }
+    });
+    v.__moc = moc; v.__khoi = ds; v.__pT = pT; v.__hT = hT; v.__cuoiNd = ds.length ? ds[ds.length - 1].duoi : pT;
     if (!(v.__trang < moc.length)) v.__trang = 0;
   }
   function hienTrang(v, k) {
     var moc = v.__moc || [0];
     k = Math.max(0, Math.min(moc.length - 1, k)); v.__trang = k;
     var dau = moc[k], cuoi = k + 1 < moc.length ? moc[k + 1] : Infinity;
-    (v.__khoi || []).forEach(function (x) { x.b.classList.toggle('mc-ngoai', x.tren < dau - 1 || x.tren >= cuoi - 1); });
+    // khối nằm hẳn ngoài trang thì ẩn; khối dài vắt qua nhiều trang thì hiện ở mọi trang nó chạm tới
+    (v.__khoi || []).forEach(function (x) { x.b.classList.toggle('mc-ngoai', x.duoi <= dau + 1 || x.tren >= cuoi - 1); });
     dat(v, k ? dau - v.__pT - v.__hT : 0);
+    // CHE phần dưới mốc trang sau (dòng bị cắt dở của khối dài) — trang nào cũng kết thúc gọn ở ranh giới dòng/khối
+    var che = phu(v, 'mc-che'), dinh = (k ? v.__pT + v.__hT : dau) + (Math.min(cuoi, v.__cuoiNd || cuoi) - dau);
+    che.style.top = Math.max(0, dinh) + 'px';
+    che.classList.toggle('mc-hien', cuoi !== Infinity);
     var tiep = phu(v, 'mc-tiep-bar'), so = phu(v, 'mc-trang-so');
     tiep.innerHTML = '<b>' + thoat(soCauCua(v)) + '</b> (tiếp) · trang ' + (k + 1) + '/' + moc.length;
     tiep.classList.toggle('mc-hien', k > 0);
@@ -326,8 +346,7 @@ export function jsLenBangMoi(): string {
           $$(v, '.mc-ngoai').forEach(function (b) { b.classList.remove('mc-ngoai'); });
           v.scrollTop = Math.max(0, giu - (v.__pT || 0));
         }
-        var t = v.querySelector(':scope > .mc-tiep-bar'), s = v.querySelector(':scope > .mc-trang-so');
-        if (t) t.classList.remove('mc-hien'); if (s) s.classList.remove('mc-hien');
+        ['mc-tiep-bar', 'mc-trang-so', 'mc-che'].forEach(function (c) { var e = v.querySelector(':scope > .' + c); if (e) e.classList.remove('mc-hien'); });
         v.removeAttribute('data-trang');
         conNua(v);
         if (!v.__ngheCuon) { v.__ngheCuon = true; v.addEventListener('scroll', function () { conNua(v); }); }
@@ -537,12 +556,12 @@ export function jsLenBangMoi(): string {
   function dongCt() { ct.classList.remove('mc-mo'); ctMo.classList.remove('mc-mo'); }
   var THU = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
   function gioVn(iso) { var t = Date.parse(iso); if (!isFinite(t)) return { ngay: '—', gio: '' }; var d = new Date(t + 7 * 3600e3), p = function (n) { return (n < 10 ? '0' : '') + n; }; return { ngay: THU[d.getUTCDay()] + ' ' + p(d.getUTCDate()) + '/' + p(d.getUTCMonth() + 1), gio: p(d.getUTCHours()) + ':' + p(d.getUTCMinutes()), ngan: p(d.getUTCDate()) + '/' + p(d.getUTCMonth() + 1) }; }
-  function tenCau(qid) { var m = /-(III|II|I)-(\\d+)$/.exec(String(qid || '')); return m ? 'Câu ' + m[2] + ' · Phần ' + m[1] : 'Câu'; }
+  function tenCau(qid) { var m = /-(III|II|I)-(\\d+)$/.exec(String(qid || '')); return m ? 'Câu ' + m[2] + ' · Phần ' + m[1] : String(qid || '—'); }
   function vongSo(p, mau, chu) { var R = 42, C = 2 * Math.PI * R; return '<div class="mc-vong-so"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="' + R + '" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="10"/><circle cx="50" cy="50" r="' + R + '" fill="none" stroke="' + mau + '" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + (C * p).toFixed(1) + ' ' + C.toFixed(1) + '"/></svg><div><b>' + Math.round(p * 100) + '%</b><span>' + chu + '</span></div></div>'; }
   var RONG = '<div class="mc-rong">—</div>';
   function veCt(nua, hs, loi) {
     var anh = nua.querySelector('img.mc-thu-anh'), ten = nua.querySelector('.mc-ten'), thuTen = nua.querySelector('.mc-thu-ten'), cap = nua.querySelector('.mc-thu-cap b'), cauSo = nua.querySelector('.mc-cau-so');
-    var em = (hs && hs.em) || {}, lop = em.tenLop || em.lop || nua.getAttribute('data-lop') || '';
+    var the = nua.querySelector('.mc-em'), em = (hs && hs.em) || {}, lop = (the && the.getAttribute('data-lop')) || em.tenLop || em.lop || '';
     var h = '<button type="button" class="mc-ct-dong" aria-label="Đóng">✕</button><div class="mc-ct-dau"><div class="mc-ct-anh">' + (anh ? '<img alt="" src="' + thoat(anh.src) + '">' : '') + '</div><div><h2>' + thoat(ten ? ten.textContent : em.hoTen || '') + '</h2><div class="mc-ct-chips">' +
       (lop ? '<span class="mc-chip">Lớp ' + thoat(lop) + '</span>' : '') + (thuTen ? '<span class="mc-chip">' + thoat(thuTen.textContent) + (cap ? ' · ' + thoat(cap.textContent.split('/')[0]) : '') + '</span>' : '') +
       (typeof em.expTong === 'number' ? '<span class="mc-chip">' + em.expTong.toLocaleString('vi-VN') + ' EXP' + (typeof em.expHomNay === 'number' ? ' · hôm nay +' + em.expHomNay : '') + '</span>' : '') +

@@ -296,7 +296,7 @@ function lichSuHtml(o: OBang): string {
 
 function headerEmHtml(o: OBang, ma: string): string {
   const lanRieng = o.thanThu ? '' : lanHtml(o, 'mc-em-phu')
-  return `<header class="mc-em" id="em-${ma}" style="--mc-he:${mauHaoQuang(o.thanThu?.he)}" hidden>
+  return `<header class="mc-em" id="em-${ma}" style="--mc-he:${mauHaoQuang(o.thanThu?.he)}"${o.lop ? ` data-lop="${thoat(o.lop)}"` : ''} hidden>
     <div class="mc-em-trai">
       <div class="mc-em-hang1">
         <div class="mc-ten-hang"><span class="mc-ten">${thoat(o.hoTen || o.sbd)}</span><span class="mc-dau-kq" hidden></span></div>
