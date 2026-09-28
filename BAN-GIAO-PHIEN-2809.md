@@ -74,3 +74,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - THẦY CHỐT build ca kiểm tra + báo cáo mới: nhánh `build-ca-thi` (a–e + API /gv/cong-bo-ca, tbCaTruoc, /gv/nhan-xet-ca-em, maTran). Đang build.
 - THẦY: Đảo 3D vẽ xong BUILD LUÔN + phát hành + báo cáo. Trợ lý vẽ tiếp tục build ở nhánh `build-dao-3d`.
 - 13:35 PR #31 lên bảng merge `4370dea` (deploy đang chạy). THẦY CHỐT: câu sai ca đã công bố tự vào Đoàn (nguồn ca_sai), vào kế hoạch từ NGÀY HÔM SAU, không phá kế hoạch hôm nay — giao cho trợ lý build-ca-thi.
+- 13:44 PR #31 lên bảng deploy SUCCESS. PR #32 thẻ lọc gọn toàn app merge `536c590` (deploy đang chạy). Đảo 3D: `build-dao-3d` `b8d40f4` (đã commit + build:cf đạt) chờ merge sau #32 (hẹn 14:02). Đang chạy: build-ca-thi (+ câu sai ca vào Đoàn), hien-thi-de (rà + TỰ SỬA kho đề, thầy cho phép, có sao lưu).
