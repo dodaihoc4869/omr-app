@@ -48,6 +48,10 @@ export async function gvNhanXetCaEm(env: Env, b: Hang, nowMs: number = Date.now(
   const ca = await env.DB.prepare('SELECT trang_thai FROM ca WHERE ma_ca = ?').bind(maCa).first<Hang>()
   if (!ca || chuoi(ca.trang_thai) === 'da_xoa') return { ok: false, lyDo: 'khong_co_ca', error: 'Không tìm thấy ca này.' }
   const nay = new Date(nowMs).toISOString()
+  // CI không tự chạy migration ⇒ tạo bảng CHỈ-THÊM ngay tại chỗ (y hệt migration-2809-nhan-xet-ca-em.sql; IF NOT EXISTS nên chạy lại vô hại).
+  await env.DB.prepare(
+    'CREATE TABLE IF NOT EXISTS nhan_xet_ca_em (ma_ca TEXT NOT NULL, sbd TEXT NOT NULL, noi_dung TEXT NOT NULL, cap_nhat_luc TEXT NOT NULL, PRIMARY KEY (ma_ca, sbd))',
+  ).run()
   if (!noiDung) {
     await env.DB.prepare('DELETE FROM nhan_xet_ca_em WHERE ma_ca = ? AND sbd = ?').bind(maCa, sbd).run()
     return { ok: true, maCa, sbd, noiDung: '', capNhatLuc: nay }
