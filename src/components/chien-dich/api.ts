@@ -86,6 +86,8 @@ export interface EmBang {
   huyetChien: boolean
   /** Tỉ lệ câu thành thạo theo dạng (0–1); `null` = dạng không có câu. */
   theoDang: Record<string, number | null>
+  /** Sức học của em theo dạng (máy dùng để bốc câu mới): L1 Yếu · L2 Trung bình · L3 Khá · L4 Giỏi. Máy chủ cũ không gửi ⇒ vắng. */
+  hangTheoDang?: Record<string, 'L1' | 'L2' | 'L3' | 'L4'>
 }
 
 export interface CauCanDayLai {

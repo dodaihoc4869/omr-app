@@ -7,7 +7,7 @@ import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { doDayDu, protectedQuestions, type CauPool } from './game-v2-bank'
-import { chonPhuongAnGach, moDuocRuong, type TrangThaiCau } from './srs2-loi'
+import { chonPhuongAnGach, moDuocRuong, xepChuyenDao, type TrangThaiCau } from './srs2-loi'
 import { coGoiY, docHoSo2, layKeHoachHomNay, LOI_KHOA_DAO, ngayVnCua, qidGoc, sanh2, type HoSo2, type MetaCau } from './srs2-d1'
 
 type Row = Record<string, unknown>
@@ -69,13 +69,11 @@ async function napCau(env: Env, hs: HoSo2, khoa: readonly string[], toiDa: numbe
   return ra
 }
 
-const HANG = (m: string | null) => ({ NB: 0, 'Nhận biết': 0, TH: 1, 'Thông hiểu': 1, VD: 2, 'Vận dụng': 2, VDC: 3, 'Vận dụng cao': 3 } as Record<string, number>)[m ?? ''] ?? 9
-
 /**
  * Lượt Bát Linh Đảo (chuyến thám hiểm 6 ải) ở chế độ 2.0.
  * - Còn câu ôn hôm nay ở Đoàn ⇒ khoá, trả đúng lời thầy.
  * - Lượt đang chờ (chưa trả lời câu nào) ⇒ trả lại chính lượt ấy.
- * - Câu dễ trước, câu khó nhất cuối chuyến làm Trùm ải.
+ * - Câu ôn Đúng–sai trước; câu mới dễ → khó: ải 1–2 dễ nhất, câu khó nhất cuối chuyến làm Trùm ải (`xepChuyenDao`).
  */
 export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
@@ -92,7 +90,8 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
     }
   }
   const chan = await protectedQuestions(env)
-  const chon = (await napCau(env, hs, kh.conDao, SO_CAU_CHUYEN, chan)).sort((a, b) => HANG(a.m.mucDo) - HANG(b.m.mucDo))
+  // Thầy 28/09: câu ôn Đúng–sai đi trước như cũ; câu mới dễ → khó ⇒ ải 1–2 dễ nhất, ải 6 (Trùm) khó nhất.
+  const chon = xepChuyenDao(await napCau(env, hs, kh.conDao, SO_CAU_CHUYEN, chan), (x) => !!hs.tt.get(x.q.qid)?.laMoi, (x) => x.m.mucDo)
   if (!chon.length) return { ok: true, questions: [], lyDo: 'cau_dang_bao_ve', message: 'Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.', ...tomTat }
   const refs: RefPhien[] = chon.map(({ q, m }, i) => {
     const t = hs.tt.get(q.qid)
