@@ -539,6 +539,17 @@
     </div>
   </div>
 
+  <!-- HỘP NHẮC CÀI TRÊN ANDROID (thay hộp alert mặc định của trình duyệt — thầy 28/09): cùng kiểu hộp của trang. Nút = mở trang cài; nền/Esc = ở lại. -->
+  <div id="modal-android" class="modal-overlay" onclick="dongHopAndroid()">
+    <div class="modal-content" role="alertdialog" aria-modal="true" aria-labelledby="modal-android-tieu" aria-describedby="modal-android-nd" onclick="event.stopPropagation()">
+      <div class="modal-title" id="modal-android-tieu">Cài app từ trình duyệt</div>
+      <div class="modal-desc" id="modal-android-nd">
+        Trang cài đặt sẽ mở. Bấm biểu tượng <strong>dấu 3 chấm (⋮)</strong> ở góc trên bên phải Chrome rồi chọn <strong>"Cài đặt ứng dụng"</strong> hoặc <strong>"Thêm vào Màn hình chính"</strong>.
+      </div>
+      <button class="modal-close-btn" id="modal-android-nut" onclick="moTrangCai()">Mở trang cài</button>
+    </div>
+  </div>
+
   <script>
     var currentRole = 'hs';
     var deferredPrompt = null;
@@ -653,11 +664,22 @@
           deferredPrompt = null;
         });
       } else {
-        var targetUrl = currentRole === 'ph' ? '/?vai=phuhuynh' : '/?vai=hocsinh';
-        alert('Đang mở trang cài đặt... Bạn vui lòng bấm vào biểu tượng dấu 3 chấm (⋮) ở góc trên bên phải trình duyệt Chrome và chọn "Cài đặt ứng dụng" hoặc "Thêm vào Màn hình chính" nhé!');
-        window.location.href = targetUrl;
+        document.getElementById('modal-android').classList.add('active');
+        try { document.getElementById('modal-android-nut').focus(); } catch (e) {}
       }
     }
+
+    function moTrangCai() {
+      window.location.href = currentRole === 'ph' ? '/?vai=phuhuynh' : '/?vai=hocsinh';
+    }
+
+    function dongHopAndroid() {
+      document.getElementById('modal-android').classList.remove('active');
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { dongHopAndroid(); closeModal(); }
+    });
 
     switchTab(currentRole);
     adjustDeviceUI();
