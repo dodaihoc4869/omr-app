@@ -15,6 +15,7 @@
   --g-kinh:rgba(255,255,255,.8); --g-kinh-2:rgba(255,255,255,.55); --g-vien:rgba(24,30,62,.12);
   --g-muc:#181E3E; --g-muc-2:#3E486C; --g-mo:#56618A;
   --g-do:#B3261E; --g-dung:#146C2E; --g-p0:#C77700; --g-p1:#0B8F87;
+  --doan-nen:#D3E3FD; --doan-chu:#062E6F; --dao-nen:#C4EED0; --dao-chu:#0F5223; --bia-soc:rgba(255,159,28,.62);
   --bong:0 1px 2px rgba(19,25,51,.06),0 10px 28px rgba(19,25,51,.10);
   --sans:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   --tron:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif;
@@ -30,6 +31,7 @@
     --g-kinh:rgba(12,26,58,.78); --g-kinh-2:rgba(12,26,58,.5); --g-vien:rgba(160,200,255,.18);
     --g-muc:#F2F5FF; --g-muc-2:#C9D6F2; --g-mo:#9FB2D9;
     --g-do:#FFB4AB; --g-dung:#5BF0A5; --g-p0:#FFC940; --g-p1:#37E2D5;
+    --doan-nen:#0842A0; --doan-chu:#D3E3FD; --dao-nen:#0F5223; --dao-chu:#C4EED0; --bia-soc:rgba(255,178,70,.7);
     --bong:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.4);
     color-scheme:dark;
   }
@@ -43,6 +45,7 @@
   --g-kinh:rgba(12,26,58,.78); --g-kinh-2:rgba(12,26,58,.5); --g-vien:rgba(160,200,255,.18);
   --g-muc:#F2F5FF; --g-muc-2:#C9D6F2; --g-mo:#9FB2D9;
   --g-do:#FFB4AB; --g-dung:#5BF0A5; --g-p0:#FFC940; --g-p1:#37E2D5;
+  --doan-nen:#0842A0; --doan-chu:#D3E3FD; --dao-nen:#0F5223; --dao-chu:#C4EED0; --bia-soc:rgba(255,178,70,.7);
   --bong:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.4);
   color-scheme:dark;
 }
@@ -304,6 +307,25 @@ details.xem-lg[open] summary::before{content:"▾"}
 .re .nhan-re{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
 .re .d .nhan-re{color:var(--dung)}.re .s .nhan-re{color:var(--do)}
 
+/* ---------- Chia câu cho 3 game ---------- */
+.chia{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.chia{grid-template-columns:minmax(0,1fr)}}
+.thanh-cau{display:flex;height:64px;border-radius:14px;overflow:hidden;border:1px solid var(--vien);margin:6px 0 8px}
+.phan{position:relative;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;line-height:1.2;text-align:center;padding:0 6px}
+.phan.doan{background:var(--doan-nen);color:var(--doan-chu)}
+.phan.dao{background:var(--dao-nen);color:var(--dao-chu)}
+.phan .bia{position:absolute;left:0;top:0;bottom:0;background:repeating-linear-gradient(135deg,var(--bia-soc) 0 7px,transparent 7px 13px);border-right:2px solid rgba(255,159,28,.95)}
+.phan span{position:relative}
+.chu-thanh{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--mo);margin-bottom:12px}
+.chu-thanh i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:6px}
+.bang-kb{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.bang-kb th,.bang-kb td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--vien);vertical-align:top}
+.bang-kb thead th{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--mo)}
+.bang-kb td:not(:first-child){white-space:nowrap}
+.ds-vl{margin:0;padding:0;list-style:none;display:grid;gap:7px;font-size:14px;color:var(--muc-2)}
+.ds-vl li{display:grid;grid-template-columns:104px 1fr;gap:10px}
+.ds-vl b{color:var(--muc);font-weight:600}
+
 /* ---------- Các màn khác ---------- */
 .bon-man{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:22px;align-items:start}
 .man-nho figure{margin:0;display:grid;gap:12px}
@@ -357,7 +379,7 @@ details.xem-lg[open] summary::before{content:"▾"}
 
 <div class="trang">
   <header class="dau">
-    <div class="mat"><span class="the-tt">Bản vẽ lần 2 — chưa build</span><span>App học sinh · cửa thứ ba trên Sảnh Bát Linh</span><span>28/09/2026</span></div>
+    <div class="mat"><span class="the-tt">Bản vẽ lần 3 — chưa build</span><span>App học sinh · cửa thứ ba trên Sảnh Bát Linh</span><span>28/09/2026</span></div>
     <h1>Bi-a <span>Phản Ứng</span></h1>
     <p class="lead">Mỗi viên bi của em là một câu trong kế hoạch hôm nay, lấy từ chiến dịch thầy giao, giống Bát Linh Đảo và Đoàn Hộ Tống. Bi rơi lỗ thì trả lời: đúng mới ăn bi. Lúc bạn đang đánh, em giải trước để bi hoá vàng.</p>
   </header>
@@ -413,7 +435,7 @@ details.xem-lg[open] summary::before{content:"▾"}
               <button class="nut-tron" id="phai" type="button" aria-label="Xoay hướng nhắm sang phải một chút"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
             </div>
             <div class="pop-xoay" id="pop-xoay" hidden>
-              <p>Chạm vào bi để chọn điểm đánh. Trên: bi cái chạy theo. Dưới: bi cái lùi lại.</p>
+              <p>Chạm vào bi để chọn điểm đánh. Cao: bi cái chạy theo. Thấp: lùi lại. Trái, phải: dội băng lệch.</p>
               <div class="bi-lon" id="bi-lon"><i></i></div>
               <button class="nut-chu" id="bo-xoay" type="button">Bỏ xoáy</button>
             </div>
@@ -457,9 +479,26 @@ details.xem-lg[open] summary::before{content:"▾"}
           <li><b>Nhắm</b><span>Chạm hoặc kéo ngón tay trên bàn. Nút ‹ › chỉnh từng chút.</span></li>
           <li><b>Đánh</b><span>Kéo thanh lực sang phải, thả tay là đánh.</span></li>
           <li><b>Giải trước</b><span>Khi A.I đang đánh, chạm một bi ở hàng “Bi của em”.</span></li>
-          <li><b>Mắt thần</b><span>Mỗi câu đúng được 1 Mắt thần. Cú đánh nào có Mắt thần thì hiện đường ngắm đầy đủ.</span></li>
+          <li><b>Xoáy</b><span>Nút bi trắng bên trái: chạm cao, thấp, trái, phải trên bi để chọn điểm đánh.</span></li>
+          <li><b>Mắt thần</b><span>Mỗi câu đúng được 1 Mắt thần. Cú đánh nào có Mắt thần thì thấy trước đường đi thật của bi.</span></li>
           <li><b>Bàn phím</b><span>← → để nhắm, giữ phím cách để lấy lực, thả ra để đánh.</span></li>
         </ul>
+      </div>
+
+      <div class="o">
+        <p class="nhan-mu">Vật lý bi</p>
+        <h2>Bi xoay, xoáy, trượt như thật</h2>
+        <ul class="ds-vl">
+          <li><b>Trượt rồi lăn</b><span>Bi mới đánh trượt trên nỉ, ma sát kéo dần thành lăn, còn 5/7 tốc độ. Đã lăn thì bi rất trơn, đi xa, chậm dần đều.</span></li>
+          <li><b>Đánh giữa</b><span>Đánh ở gần, bi cái dừng ngay sau khi va thẳng.</span></li>
+          <li><b>Xoáy trên</b><span>Bi cái chạy theo sau khi va.</span></li>
+          <li><b>Xoáy dưới</b><span>Bi cái lùi lại. Bi mục tiêu càng xa, xoáy càng bị nỉ ăn mất.</span></li>
+          <li><b>Xoáy ngang</b><span>Đập băng thì bật lệch trái hoặc phải, tới khoảng 24°, và truyền một chút xoáy sang bi mục tiêu.</span></li>
+          <li><b>Bi va bi</b><span>Có ma sát giữa hai bi: cắt mỏng thì bi mục tiêu lệch vài độ.</span></li>
+          <li><b>Băng</b><span>Đánh càng mạnh, băng càng ăn nhiều lực.</span></li>
+          <li><b>Thấy bi xoay</b><span>Số trên bi lăn tròn theo hướng chạy. Bi cái có 6 chấm đỏ để nhìn rõ xoáy.</span></li>
+        </ul>
+        <p class="ghi" style="margin-top:10px">Mắt thần vẽ trước đường đi thật của bi cái (chấm trắng) và bi mục tiêu (vàng) theo lực và xoáy em đang chọn. Kéo thanh lực là đường vẽ đổi theo.</p>
       </div>
 
       <div class="o">
@@ -530,6 +569,40 @@ details.xem-lg[open] summary::before{content:"▾"}
     </div>
   </section>
 
+  <section class="muc" aria-labelledby="t-chia">
+    <h2 id="t-chia">Số câu chia cho 3 game</h2>
+    <p>Mỗi ngày em có một kho câu chung (Thể lực, mặc định 40 câu), chia sẵn thành phần của Đoàn (câu ôn Phần I, III) và phần của Đảo (câu mới và câu ôn Phần II). Làm ở game nào thì trừ vào kho chung. Nếu để Bi-a lấy tự do, em chơi Bi-a trước có thể làm Đoàn và Đảo còn 0 câu. Vì vậy Bi-a có trần riêng.</p>
+    <div class="chia">
+      <div class="lan">
+        <h3>Ví dụ một ngày 40 câu<small>14 câu ôn của Đoàn · 26 câu của Đảo</small></h3>
+        <div class="thanh-cau" role="img" aria-label="40 câu: phần Đoàn 14 câu, Bi-a được lấy tối đa 5; phần Đảo 26 câu, Bi-a được lấy tối đa 10">
+          <div class="phan doan" style="flex:14"><div class="bia" style="width:35.7%"></div><span>Đoàn 14</span></div>
+          <div class="phan dao" style="flex:26"><div class="bia" style="width:38.5%"></div><span>Đảo 26</span></div>
+        </div>
+        <div class="chu-thanh"><span><i style="background:repeating-linear-gradient(135deg,var(--bia-soc) 0 3px,transparent 3px 6px);border:1px solid rgba(255,159,28,.95)"></i>Bi-a được lấy tối đa: 5 + 10 = 15 câu</span></div>
+        <table class="bang-kb">
+          <thead><tr><th>Em chơi thế nào</th><th>Bi-a</th><th>Đoàn còn</th><th>Đảo còn</th></tr></thead>
+          <tbody>
+            <tr><td>Vào Bi-a trước, chơi tới hết trần</td><td>15 câu</td><td>9 câu</td><td>16 câu</td></tr>
+            <tr><td>Không chơi Bi-a</td><td>0</td><td>14 câu</td><td>26 câu</td></tr>
+            <tr><td>Làm hết Đoàn trước, rồi vào Bi-a</td><td>tối đa 10</td><td>0 (đã làm)</td><td>16 câu</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="lan">
+        <h3>Luật chia câu<small>áp dụng cho từng em, từng ngày</small></h3>
+        <ol class="luat">
+          <li><span class="so">1</span><div><p>Tổng mỗi ngày không đổi: vẫn đúng số Thể lực thầy đặt ở chiến dịch. Ba game là ba cửa vào cùng một kho câu.</p></div></li>
+          <li><span class="so">2</span><div><p>Bi-a lấy tối đa 40% phần Đoàn và 40% phần Đảo (ngày 40 câu: khoảng 15–16 câu, tức 2 ván). Trong phần của mình, Bi-a vẫn lấy câu ôn trước.</p></div></li>
+          <li><span class="so">3</span><div><p>Đoàn và Đảo không bị đặt trần mới: làm được toàn bộ phần còn lại. Em không thích Bi-a vẫn làm đủ kế hoạch như hiện nay.</p></div></li>
+          <li><span class="so">4</span><div><p>Không game nào về 0 vì Bi-a: mỗi phần luôn còn ít nhất 60% cho game của nó.</p></div></li>
+          <li><span class="so">5</span><div><p>Hết trần giữa ván: bi chưa có câu thành bi trống, vào lỗ là ăn, 5 điểm, không EXP. Hết trần thì không mở ván mới; Sảnh ghi rõ Đoàn, Đảo còn bao nhiêu câu.</p></div></li>
+          <li><span class="so">6</span><div><p>Xong cả kế hoạch ngày: cả ba game cùng nghỉ như Đảo, Đoàn hiện nay (“Hôm nay em xong rồi”). Ngày Huyết Chiến 80 câu thì trần Bi-a tăng theo, khoảng 32 câu.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
   <section class="muc" aria-labelledby="t-man">
     <h2 id="t-man">Bốn màn còn lại</h2>
     <p>Vẽ tĩnh để thầy duyệt bố cục và chữ. Tên học sinh, số câu, điểm và EXP là số ví dụ.</p>
@@ -544,7 +617,8 @@ details.xem-lg[open] summary::before{content:"▾"}
               <span class="chu-nho">Hạn nộp: 23:59 Thứ Năm 01/10/2026</span>
               <div class="dong-so"><span>Thể lực hôm nay</span><b>còn 26/40 câu</b></div>
               <div class="thanh" style="--w:35%"><i></i></div>
-              <span class="chu-nho">Mỗi ván dùng 8 câu của kế hoạch: 7 bi + Câu chốt. Câu ôn vào bàn trước.</span>
+              <div class="dong-so"><span>Bi-a hôm nay</span><b>còn 15/15 câu</b></div>
+              <span class="chu-nho">Đoàn còn 6 câu · Đảo còn 20 câu. Mỗi ván Bi-a dùng 8 câu.</span>
             </div>
             <button class="nut-vang" type="button" style="min-height:50px;font-size:16px">Đấu với bạn cùng lớp</button>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><span class="nut-phu">Nhập mã bàn</span><span class="nut-phu">Đấu với A.I</span></div>
@@ -622,6 +696,7 @@ details.xem-lg[open] summary::before{content:"▾"}
             <div class="the-kinh" style="display:grid;gap:5px">
               <div class="dong-so"><span>EXP nhận (chung trần 120/ngày)</span><b>+34</b></div>
               <div class="dong-so"><span>Thể lực hôm nay</span><b>còn 15/40 câu</b></div>
+              <div class="dong-so"><span>Bi-a hôm nay</span><b>còn 4/15 câu</b></div>
               <div class="dong-so"><span>Câu sai vào lịch ôn</span><b>2 câu</b></div>
               <span class="chu-nho">Tên gọi ester · Chất béo</span>
             </div>
@@ -641,7 +716,7 @@ details.xem-lg[open] summary::before{content:"▾"}
         <h2>Câu lấy từ đâu</h2>
         <div class="chuoi"><span>Thầy giao Chiến dịch luyện</span><i>→</i><span>Kế hoạch ngày của từng em (chốt lúc mở app)</span><i>→</i><span>Đoàn · Đảo · Bi-a</span></div>
         <ul>
-          <li>Bi-a lấy câu từ đúng kế hoạch hôm nay mà Đảo và Đoàn đang dùng. Thứ tự: câu ôn Phần I, III (phần của Đoàn) trước, rồi câu mới và câu ôn Phần II (phần của Đảo). Câu nào đã làm ở game khác thì không vào bàn.</li>
+          <li>Bi-a lấy câu từ đúng kế hoạch hôm nay mà Đảo và Đoàn đang dùng, tối đa 40% phần của mỗi game (xem mục “Số câu chia cho 3 game”). Câu ôn vào bàn trước. Câu nào đã làm ở game khác thì không vào bàn.</li>
           <li>Mỗi câu gửi qua lệnh chấm chung của game: ghi hồ sơ, trừ Thể lực, câu sai vào lịch ôn, hiện trong “Câu đã làm” và Bảng chiến dịch của thầy.</li>
           <li>Câu chốt là một câu Vận dụng trong kế hoạch, hoặc câu ôn em đang sai. Chấm như câu trùm của Đoàn.</li>
           <li>Câu ôn em đã sai từ 2 lần: có Bùa Trợ giảng gạch 2 phương án sai, giống Đoàn.</li>
@@ -684,9 +759,10 @@ details.xem-lg[open] summary::before{content:"▾"}
       <div class="o">
         <h2>Thầy cần chốt</h2>
         <ul class="chot-ds">
-          <li><b>Thứ tự lấy câu</b>Câu ôn trước rồi câu mới (em đề nghị), hay chỉ câu mới?</li>
+          <li><b>Trần Bi-a</b>40% phần Đoàn + 40% phần Đảo (ngày 40 câu ≈ 15–16 câu, 2 ván). Giữ, tăng hay giảm?</li>
           <li><b>Đúng–sai</b>Đúng cả 4 ý mới ăn bi, theo cách chấm hiện có. Giữ vậy?</li>
           <li><b>Câu chốt</b>Câu Vận dụng, hay câu ôn em đang sai?</li>
+          <li><b>Sau khi xong kế hoạch</b>Có mở “Bàn giao hữu” (không câu, không EXP, tối đa 2 ván) làm phần thưởng không?</li>
         </ul>
       </div>
     </div>
@@ -773,24 +849,46 @@ const MAU_BI={1:'#F2B705',2:'#1E5BD8',3:'#D62839',4:'#6B3FB6',5:'#F07A12',6:'#17
 const mauBi=id=>MAU_BI[id>8?id-8:id];
 const XEP=[[1],[10,2],[3,8,11],[12,4,13,5],[6,14,7,15,9]];
 
-/* ================= BÀN VÀ VẬT LÝ (tất định: bước cố định, chỉ + − × ÷ √) ================= */
-const W=500,H=900,R=21,T=26,D2=(2*R)*(2*R);
-const HS=1/240,VMAX=2650,MU=230,KL=0.42,E_BI=0.95,E_BANG=0.78,CM=50,SM=37,JR=5;
+/* ================= BÀN VÀ VẬT LÝ THẬT (tất định: bước cố định 1/240 s, chỉ + − × ÷ √) =================
+   Trục: x sang phải, y xuống, z đâm vào mặt bàn; 1 đơn vị ≈ 2,54 mm ⇒ g ≈ 3862 đv/s².
+   Mỗi bi có vận tốc (vx,vy) và vận tốc góc (wx,wy,wz). Vận tốc trượt ở điểm chạm nỉ: u = (vx + R·wy, vy − R·wx).
+   u ≠ 0 ⇒ TRƯỢT: ma sát trượt kéo dần về lăn (còn 5/7 tốc độ). u = 0 ⇒ LĂN: ma sát lăn rất nhỏ, bi trơn đi xa.
+   Xoáy ngang wz ⇒ đập băng bật lệch; bi va bi có ma sát ⇒ bi mục tiêu lệch nhẹ, truyền xoáy. */
+const W=500,H=900,R=21,T=26,D2=(2*R)*(2*R),HS=1/240,VMAX=2600;
+const G0=3862,A_TRUOT=0.2*G0,A_LAN=0.02*G0,MU_BI=0.06,MU_BANG=0.2,GIAM_WZ=24,E_BI=0.95,KW=5/(2*R);
+const CM=50,SM=37,JR=5;
 const LO=[{x:-4,y:-4,r:36,v:31},{x:W+4,y:-4,r:36,v:31},{x:-14,y:H/2,r:30,v:27},{x:W+14,y:H/2,r:30,v:27},{x:-4,y:H+4,r:36,v:31},{x:W+4,y:H+4,r:36,v:31}];
 const HAM=[[-JR,CM],[CM,-JR],[W-CM,-JR],[W+JR,CM],[-JR,H-CM],[CM,H+JR],[W-CM,H+JR],[W+JR,H-CM],[-JR,H/2-SM],[-JR,H/2+SM],[W+JR,H/2-SM],[W+JR,H/2+SM]];
 const DIEM_CHAN={x:W/2,y:270},DIEM_DAU={x:W/2,y:720};
 const LO_NHAM=[{x:8,y:8},{x:W-8,y:8},{x:-4,y:H/2},{x:W+4,y:H/2},{x:8,y:H-8},{x:W-8,y:H-8}];
 const tocDo=p=>VMAX*(0.05+0.95*Math.pow(p,1.2));
-
+/** Đánh bi cái: hướng (dx,dy), lực p, xoáy sx (ngang, phải +) sy (trên +); điểm chạm lệch tâm 0,5R·(sx,sy). */
+function danhBi(c,dx,dy,p,sx,sy){const v=tocDo(p),k=1.25*v/R;c.vx=dx*v;c.vy=dy*v;c.wx=k*sy*dy;c.wy=-k*sy*dx;c.wz=-k*sx;}
+function qMul(a,b){return[a[0]*b[0]-a[1]*b[1]-a[2]*b[2]-a[3]*b[3],a[0]*b[1]+a[1]*b[0]+a[2]*b[3]-a[3]*b[2],a[0]*b[2]-a[1]*b[3]+a[2]*b[0]+a[3]*b[1],a[0]*b[3]+a[1]*b[2]-a[2]*b[1]+a[3]*b[0]];}
+function qTruc(ax,ay,az,g){const s=Math.sin(g/2);return[Math.cos(g/2),ax*s,ay*s,az*s];}
+function qDau(){return qMul(qTruc(0,0,1,(Math.random()-.5)*1.4),qMul(qTruc(1,0,0,(Math.random()-.5)*0.9),qTruc(0,1,0,Math.PI/2)));}
+/** Hướng quay chỉ để vẽ (số trên bi lăn theo), không ảnh hưởng vật lý. */
+function quay(b,h){const wx=b.wx,wy=b.wy,wz=b.wz;if(!wx&&!wy&&!wz)return;const q=b.q;
+  const a0=0.5*h*(-(wx*q[1]+wy*q[2]+wz*q[3])),a1=0.5*h*(q[0]*wx+wy*q[3]-wz*q[2]),a2=0.5*h*(q[0]*wy+wz*q[1]-wx*q[3]),a3=0.5*h*(q[0]*wz+wx*q[2]-wy*q[1]);
+  q[0]+=a0;q[1]+=a1;q[2]+=a2;q[3]+=a3;const n=Math.sqrt(q[0]*q[0]+q[1]*q[1]+q[2]*q[2]+q[3]*q[3]);q[0]/=n;q[1]/=n;q[2]/=n;q[3]/=n;b.ver++;}
+const biMoi=(id,x,y)=>({id,x,y,vx:0,vy:0,wx:0,wy:0,wz:0,on:true,q:qDau(),ver:0});
 function xepBan(){
   const balls=[],gap=2*R+1,dy=gap*Math.sqrt(3)/2;
-  XEP.forEach((row,k)=>row.forEach((id,i)=>balls.push({id,x:W/2+(i-(row.length-1)/2)*gap,y:DIEM_CHAN.y-k*dy,vx:0,vy:0,on:true})));
-  balls.push({id:'cue',x:DIEM_DAU.x,y:DIEM_DAU.y,vx:0,vy:0,on:true});
+  XEP.forEach((row,k)=>row.forEach((id,i)=>balls.push(biMoi(id,W/2+(i-(row.length-1)/2)*gap,DIEM_CHAN.y-k*dy))));
+  balls.push(biMoi('cue',DIEM_DAU.x,DIEM_DAU.y));
   return balls;
 }
 const suKienMoi=()=>({firstHit:null,potted:[],cuePotted:false,rails:0});
-function dangChay(st){for(const b of st.balls)if(b.on&&(b.vx||b.vy))return true;return false;}
-function step(st,ev,loud){
+function dangChay(st){for(const b of st.balls){if(!b.on)continue;if(b.vx||b.vy)return true;const ux=b.vx+R*b.wy,uy=b.vy-R*b.wx;if(ux*ux+uy*uy>1)return true;}return false;}
+function dapBang(b,Nx,Ny){
+  const vn=b.vx*Nx+b.vy*Ny;if(vn>=0)return false;
+  const e=0.86-0.1*Math.min(1,-vn/2500),Tx=-Ny,Ty=Nx;
+  b.vx-=(1+e)*vn*Nx;b.vy-=(1+e)*vn*Ny;
+  const wt=b.wx*Tx+b.wy*Ty;b.wx-=0.6*wt*Tx;b.wy-=0.6*wt*Ty;
+  const s=b.vx*Tx+b.vy*Ty-R*b.wz,lim=MU_BANG*(1+e)*(-vn),jt=Math.max(-lim,Math.min(lim,-s/3.5));
+  b.vx+=jt*Tx;b.vy+=jt*Ty;b.wz-=2.5*jt/R;return true;
+}
+function step(st,ev,hook){
   const B=st.balls;
   for(const b of B){if(b.on&&(b.vx||b.vy)){b.x+=b.vx*HS;b.y+=b.vy*HS;}}
   for(let i=0;i<B.length;i++){const a=B[i];if(!a.on)continue;
@@ -800,40 +898,46 @@ function step(st,ev,loud){
       a.x-=nx*ov;a.y-=ny*ov;b.x+=nx*ov;b.y+=ny*ov;
       const rv=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;
       if(rv<0){
-        let cue=null,pre=0;if(a.id==='cue'||b.id==='cue'){cue=a.id==='cue'?a:b;pre=Math.sqrt(cue.vx*cue.vx+cue.vy*cue.vy);}
-        const jj=-(1+E_BI)*rv/2;a.vx-=jj*nx;a.vy-=jj*ny;b.vx+=jj*nx;b.vy+=jj*ny;
-        if(cue){const o=cue===a?b:a;if(ev.firstHit===null)ev.firstHit=o.id;
-          if(!st.spin.hit){st.spin.hit=true;const k=st.spin.y*0.55*pre;cue.vx+=st.spin.dx*k;cue.vy+=st.spin.dy*k;}}
-        if(loud)am('bi',-rv);
+        const jn=-(1+E_BI)*rv/2;a.vx-=jn*nx;a.vy-=jn*ny;b.vx+=jn*nx;b.vy+=jn*ny;
+        const tx=-ny,ty=nx,gt=(b.vx-a.vx)*tx+(b.vy-a.vy)*ty-R*(a.wz+b.wz),jt=Math.max(-MU_BI*jn,Math.min(MU_BI*jn,-gt/7));
+        b.vx+=jt*tx;b.vy+=jt*ty;a.vx-=jt*tx;a.vy-=jt*ty;a.wz-=2.5*jt/R;b.wz-=2.5*jt/R;
+        if(a.id==='cue'||b.id==='cue'){const o=a.id==='cue'?b:a;if(ev.firstHit===null)ev.firstHit=o.id;}
+        if(hook)hook('bi',a,b,-rv);
       }
     }
   }
-  for(const b of B){if(b.on)thanhBan(b,st,ev,loud);}
-  for(const b of B){if(!b.on||!(b.vx||b.vy))continue;const v=Math.sqrt(b.vx*b.vx+b.vy*b.vy),nv=v-(MU+KL*v)*HS;
-    if(nv<=3){b.vx=0;b.vy=0;}else{const f=nv/v;b.vx*=f;b.vy*=f;}}
-}
-function thanhBan(b,st,ev,loud){
-  const x=b.x,y=b.y;let dap=false;
-  const mieng2ben=(y<CM||y>H-CM||Math.abs(y-H/2)<SM),mieng2dau=(x<CM||x>W-CM);
-  if(!mieng2ben){if(x<R){b.x=R;if(b.vx<0){b.vx=-b.vx*E_BANG;b.vy*=0.97;dap=true;}}else if(x>W-R){b.x=W-R;if(b.vx>0){b.vx=-b.vx*E_BANG;b.vy*=0.97;dap=true;}}}
-  if(!mieng2dau){if(y<R){b.y=R;if(b.vy<0){b.vy=-b.vy*E_BANG;b.vx*=0.97;dap=true;}}else if(y>H-R){b.y=H-R;if(b.vy>0){b.vy=-b.vy*E_BANG;b.vx*=0.97;dap=true;}}}
-  const gan=b.x<R+JR+10||b.x>W-R-JR-10||b.y<R+JR+10||b.y>H-R-JR-10;
-  if(gan){for(const J of HAM){const dx=b.x-J[0],dy=b.y-J[1],d2=dx*dx+dy*dy,rr=R+JR;
-    if(d2<rr*rr&&d2>0){const d=Math.sqrt(d2),nx=dx/d,ny=dy/d;b.x=J[0]+nx*rr;b.y=J[1]+ny*rr;const vn=b.vx*nx+b.vy*ny;if(vn<0){b.vx-=1.7*vn*nx;b.vy-=1.7*vn*ny;dap=true;}}}}
-  if(dap){ev.rails++;
-    if(b.id==='cue'&&!st.spin.rail&&st.spin.x){st.spin.rail=true;const g=st.spin.x*0.28,c=Math.cos(g),s=Math.sin(g),vx=b.vx;b.vx=vx*c-b.vy*s;b.vy=vx*s+b.vy*c;}
-    if(loud)am('bang',Math.sqrt(b.vx*b.vx+b.vy*b.vy));}
-  if(gan||b.x<0||b.x>W||b.y<0||b.y>H){
-    let best=null,bd=1e9;
-    for(const P of LO){const dx=P.x-b.x,dy=P.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<bd){bd=d;best=P;}if(d<P.r){roiLo(b,P,ev,loud);return;}}
-    if(b.x<0||b.x>W||b.y<0||b.y>H){const dx=best.x-b.x,dy=best.y-b.y,d=bd||1;b.vx+=dx/d*1800*HS;b.vy+=dy/d*1800*HS;if(bd>70)roiLo(b,best,ev,loud);}
+  for(const b of B){if(b.on)thanhBan(b,ev,hook);}
+  for(const b of B){if(!b.on)continue;
+    const ux=b.vx+R*b.wy,uy=b.vy-R*b.wx,us2=ux*ux+uy*uy;
+    if(us2>1){const us=Math.sqrt(us2);
+      if(us<=3.5*A_TRUOT*HS){const nvx=(5*b.vx-2*R*b.wy)/7,nvy=(5*b.vy+2*R*b.wx)/7;b.vx=nvx;b.vy=nvy;b.wx=nvy/R;b.wy=-nvx/R;}
+      else{const ex=ux/us,ey=uy/us;b.vx-=A_TRUOT*ex*HS;b.vy-=A_TRUOT*ey*HS;b.wx+=KW*A_TRUOT*ey*HS;b.wy-=KW*A_TRUOT*ex*HS;}
+    }else if(b.vx||b.vy){const s=Math.sqrt(b.vx*b.vx+b.vy*b.vy),ns=s-A_LAN*HS;
+      if(ns<=2){b.vx=0;b.vy=0;b.wx=0;b.wy=0;}else{const f=ns/s;b.vx*=f;b.vy*=f;b.wx=b.vy/R;b.wy=-b.vx/R;}}
+    if(b.wz){const dz=GIAM_WZ*HS;b.wz=Math.abs(b.wz)<=dz?0:b.wz-(b.wz>0?dz:-dz);}
+    if(!b.vx&&!b.vy&&us2<=1){b.wx=0;b.wy=0;}
   }
 }
-function roiLo(b,P,ev,loud){b.on=false;ev.potted.push(b.id);if(b.id==='cue')ev.cuePotted=true;
-  if(loud){G.roi.push({id:b.id,x:b.x,y:b.y,px:P.x,py:P.y,t:0});G.viTriLo[b.id]={x:P.x,y:P.y};am('lo');}b.vx=0;b.vy=0;}
+function thanhBan(b,ev,hook){
+  const x=b.x,y=b.y;let dap=false;
+  const m2b=(y<CM||y>H-CM||Math.abs(y-H/2)<SM),m2d=(x<CM||x>W-CM);
+  if(!m2b){if(x<R){b.x=R;dap=dapBang(b,1,0)||dap;}else if(x>W-R){b.x=W-R;dap=dapBang(b,-1,0)||dap;}}
+  if(!m2d){if(y<R){b.y=R;dap=dapBang(b,0,1)||dap;}else if(y>H-R){b.y=H-R;dap=dapBang(b,0,-1)||dap;}}
+  const gan=b.x<R+JR+10||b.x>W-R-JR-10||b.y<R+JR+10||b.y>H-R-JR-10;
+  if(gan){for(const J of HAM){const dx=b.x-J[0],dy=b.y-J[1],d2=dx*dx+dy*dy,rr=R+JR;
+    if(d2<rr*rr&&d2>0){const d=Math.sqrt(d2),nx=dx/d,ny=dy/d;b.x=J[0]+nx*rr;b.y=J[1]+ny*rr;dap=dapBang(b,nx,ny)||dap;}}}
+  if(dap){ev.rails++;if(hook)hook('bang',b);}
+  if(gan||b.x<0||b.x>W||b.y<0||b.y>H){
+    let best=null,bd=1e9;
+    for(const P of LO){const dx=P.x-b.x,dy=P.y-b.y,d=Math.sqrt(dx*dx+dy*dy);if(d<bd){bd=d;best=P;}if(d<P.r){roiLo(b,P,ev,hook);return;}}
+    if(b.x<0||b.x>W||b.y<0||b.y>H){const dx=best.x-b.x,dy=best.y-b.y,d=bd||1;b.vx+=dx/d*1800*HS;b.vy+=dy/d*1800*HS;if(bd>70)roiLo(b,best,ev,hook);}
+  }
+}
+function roiLo(b,P,ev,hook){b.on=false;ev.potted.push(b.id);if(b.id==='cue')ev.cuePotted=true;if(hook)hook('lo',b,P);b.vx=b.vy=b.wx=b.wy=b.wz=0;}
+function amThat(k,a,b,v){if(k==='bi')am('bi',v);else if(k==='bang')am('bang',Math.sqrt(a.vx*a.vx+a.vy*a.vy));else if(k==='lo'){G.roi.push({id:a.id,x:a.x,y:a.y,px:b.x,py:b.y,t:0});G.viTriLo[a.id]={x:b.x,y:b.y};am('lo');}}
 
 /* ================= TRẠNG THÁI VÁN ================= */
-const G={st:{balls:[],spin:{x:0,y:0,dx:0,dy:-1,hit:false,rail:false}},ev:null,phase:'aim',cur:0,aim:{x:0,y:-1},power:0,spin:{x:0,y:0},
+const G={st:{balls:[]},ev:null,phase:'aim',cur:0,aim:{x:0,y:-1},power:0,spin:{x:0,y:0},
   ballInHand:false,isBreak:true,players:[],time:30,shotCtx:null,fx:[],roi:[],noi:[],ai:null,bi:{},du:[],chotIdx:0,matThan:0,dungMT:false,
   sheet:null,aiGiaiT:0,viTriLo:{},batDau:0,dangKeo:false,keoBi:false,acc:0,nhan:1};
 const bi=id=>G.st.balls.find(b=>b.id===id);
@@ -843,7 +947,7 @@ const conLai=p=>idsCua(p).filter(id=>!G.bi[id].an).length;
 const mucBi=id=>id<=7?CAU[G.bi[id].q].muc:G.bi[id].muc;
 
 function vanMoi(){
-  G.st={balls:xepBan(),spin:{x:0,y:0,dx:0,dy:-1,hit:false,rail:false}};
+  G.st={balls:xepBan()};
   G.fx=[];G.roi=[];G.noi=[];G.ai=null;G.ev=null;G.isBreak=true;G.cur=0;G.ballInHand=false;G.aim={x:0,y:-1};G.power=0;G.spin={x:0,y:0};
   G.time=30;G.phase='aim';G.batDau=performance.now();G.matThan=0;G.dungMT=false;G.sheet=null;G.aiGiaiT=0;G.viTriLo={};G.chotIdx=0;G.du=[...DU_TRU];
   G.bi={};BI_EM.forEach((q,i)=>G.bi[i+1]={q,vang:false,an:false,doi:0});MUC_AI.forEach((m,i)=>G.bi[i+9]={muc:m,vang:false,an:false});
@@ -854,10 +958,10 @@ function vanMoi(){
 }
 
 function ban(){
-  if(G.phase!=='aim'||G.sheet)return;
+  if(G.phase!=='aim'||(G.sheet&&!G.players[G.cur].ai))return; // tấm câu giải trước chỉ chặn cú đánh của người, không chặn A.I
   const c=bi('cue'),p=G.power;if(p<0.02)return;
-  const v=tocDo(p);c.vx=G.aim.x*v;c.vy=G.aim.y*v;
-  G.ev=suKienMoi();G.st.spin={x:G.spin.x,y:G.spin.y,dx:G.aim.x,dy:G.aim.y,hit:false,rail:false};
+  danhBi(c,G.aim.x,G.aim.y,p,G.spin.x,G.spin.y);const v=tocDo(p);
+  G.ev=suKienMoi();
   G.shotCtx={con:conLai(G.cur)};
   if(!G.players[G.cur].ai&&G.matThan>0){G.matThan--;G.dungMT=true;}else G.dungMT=false;
   G.phase='moving';G.ballInHand=false;G.acc=0;am('co',v);capNhat();capNhatNham();
@@ -907,7 +1011,7 @@ function anBi(id,p){
   G.noi.push({x,y,chu:`+${d}`,t:0});for(let i=0;i<22;i++){const a=Math.random()*6.283,s=40+Math.random()*90;G.fx.push({k:'hat',x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,s:2+Math.random()*2.5,c:'#FFD66B',t:0,life:.9+Math.random()*.6});}
   G.fx.push({k:'vong',x,y,t:0,life:.6});am('an');
 }
-function datLai(id){const b=bi(id);if(!b)return;b.on=true;b.vx=b.vy=0;datCho(b,DIEM_CHAN.x,DIEM_CHAN.y);}
+function datLai(id){const b=bi(id);if(!b)return;b.on=true;b.vx=b.vy=b.wx=b.wy=b.wz=0;datCho(b,DIEM_CHAN.x,DIEM_CHAN.y);}
 function doiCau(id){
   const q=G.bi[id].q,dang=CAU[q].dang;if(!G.du.length)return;
   let k=G.du.findIndex(x=>CAU[x].dang===dang);if(k<0)k=0;
@@ -1056,9 +1160,9 @@ function aiTinh(){
   return{aim:{x:best.aim.x*ce-best.aim.y*se,y:best.aim.x*se+best.aim.y*ce},p:best.p};
 }
 function aiCham(s,con){
-  const st={balls:G.st.balls.map(b=>({...b})),spin:{x:0,y:0,dx:s.aim.x,dy:s.aim.y,hit:false,rail:false}},ev=suKienMoi();
-  const c=st.balls.find(b=>b.id==='cue'),v=tocDo(s.p);c.vx=s.aim.x*v;c.vy=s.aim.y*v;
-  for(let i=0;i<240*7;i++){step(st,ev,false);if(i%8===0&&!dangChay(st))break;}
+  const st={balls:G.st.balls.map(b=>({...b}))},ev=suKienMoi();
+  const c=st.balls.find(b=>b.id==='cue');danhBi(c,s.aim.x,s.aim.y,s.p,0,0);
+  for(let i=0;i<240*8;i++){step(st,ev,null);if(i%8===0&&!dangChay(st))break;}
   let sc=0,loi=false;
   if(ev.cuePotted){sc-=300;loi=true;}
   if(ev.firstHit===null){sc-=250;loi=true;}
@@ -1112,7 +1216,7 @@ function am(kind,v){
 
 /* ================= VẼ ================= */
 const cv=$('#ban'),ctx=cv.getContext('2d'),hopBan=$('#m-ban');
-let S=0.6,DPR=1,nen=null,sprite={};
+let S=0.6,DPR=1,nen=null;
 function doKichThuoc(){
   const r=hopBan.getBoundingClientRect(),bw=r.width-16,bh=r.height-4;if(bw<=0||bh<=0)return;
   S=Math.min(bw/(W+2*T),bh/(H+2*T));DPR=Math.min(3,window.devicePixelRatio||1);cv.style.borderRadius=(22*S)+'px';
@@ -1151,22 +1255,65 @@ function veNen(){
   for(const k of [1,2,3,5,6,7]){kc(-T/2,H*k/8);kc(W+T/2,H*k/8);}
   for(const k of [1,2,3]){kc(W*k/4,-T/2);kc(W*k/4,H+T/2);}
 }
+/* ---- Bi 3D: vẽ từng điểm ảnh theo hướng quay thật, đèn chiếu góc trên trái, bi cái có chấm đỏ để thấy xoáy ---- */
+const RGB=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const BONG={N:0,du:2*R,nx:null,ny:null,nz:null,sh:null,sp:null,al:null,chu:{},T:48};
+const anhCache={},TRANG=[246,243,236],MUC_SO=[22,22,26],DO_CHAM=[206,32,44];
 function taoSprite(){
-  sprite={};for(const id of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,'cue']){const sz=Math.ceil((2*R+8)*S*DPR),c=document.createElement('canvas');c.width=c.height=sz;const x=c.getContext('2d');
-    x.scale(S*DPR,S*DPR);x.translate(R+4,R+4);veBi(x,id);sprite[id]=c;}
+  const Dr=Math.min(2,DPR),N=Math.max(16,Math.ceil(2*R*S*Dr)+2),rp=(N-2)/2,n=N*N;
+  BONG.N=N;BONG.du=N/(S*Dr);
+  for(const k of ['nx','ny','nz','sh','sp','al'])BONG[k]=new Float32Array(n);
+  let Lx=-0.42,Ly=-0.55,Lz=-0.72;const lL=Math.sqrt(Lx*Lx+Ly*Ly+Lz*Lz);Lx/=lL;Ly/=lL;Lz/=lL;
+  let Hx=Lx,Hy=Ly,Hz=Lz-1;const lH=Math.sqrt(Hx*Hx+Hy*Hy+Hz*Hz);Hx/=lH;Hy/=lH;Hz/=lH;
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const k=j*N+i,cx=(i+0.5-N/2)/rp,cy=(j+0.5-N/2)/rp,d=Math.sqrt(cx*cx+cy*cy);
+    const al=Math.max(0,Math.min(1,(1-d)*rp+0.5));BONG.al[k]=al;if(al<=0)continue;
+    let nx=cx,ny=cy,nz=-Math.sqrt(Math.max(0,1-d*d));if(d>1){nx=cx/d;ny=cy/d;nz=0;}
+    BONG.nx[k]=nx;BONG.ny[k]=ny;BONG.nz[k]=nz;
+    const dif=Math.max(0,nx*Lx+ny*Ly+nz*Lz);BONG.sh[k]=(0.3+0.78*dif)*(0.7+0.3*(-nz));
+    const h=Math.max(0,nx*Hx+ny*Hy+nz*Hz);BONG.sp[k]=Math.pow(h,60)*0.95+Math.pow(h,8)*0.1;}
+  const Tt=BONG.T;BONG.chu={};
+  for(let id=1;id<=15;id++){const c=document.createElement('canvas');c.width=c.height=Tt;const x=c.getContext('2d');x.fillStyle='#000';x.textAlign='center';x.textBaseline='middle';
+    x.font=`800 ${id>9?26:32}px 'Baloo 2','Be Vietnam Pro',sans-serif`;x.fillText(String(id),Tt/2,Tt/2+2);
+    const d=x.getImageData(0,0,Tt,Tt).data,a=new Uint8Array(Tt*Tt);for(let k=0;k<Tt*Tt;k++)a[k]=d[k*4+3];BONG.chu[id]=a;}
+  for(const k in anhCache)delete anhCache[k];
 }
-function veBi(x,id){
-  x.save();x.beginPath();x.arc(0,0,R,0,7);x.clip();
-  if(id==='cue'){x.fillStyle='#F7F4EC';x.fillRect(-R,-R,2*R,2*R);}
-  else if(id>8){x.fillStyle='#F5F2EA';x.fillRect(-R,-R,2*R,2*R);x.fillStyle=mauBi(id);x.fillRect(-R,-R*.52,2*R,R*1.04);}
-  else{x.fillStyle=mauBi(id);x.fillRect(-R,-R,2*R,2*R);}
-  if(id!=='cue'){x.beginPath();x.arc(0,0,R*.56,0,7);x.fillStyle='#FFFFFF';x.fill();
-    x.fillStyle='#14161C';x.textAlign='center';x.textBaseline='middle';x.font=`800 ${id>9?15:18}px 'Baloo 2','Be Vietnam Pro',sans-serif`;x.fillText(String(id),0,1.5);}
-  const g=x.createRadialGradient(-R*.35,-R*.45,R*.05,0,0,R*1.05);g.addColorStop(0,'rgba(255,255,255,.5)');g.addColorStop(.35,'rgba(255,255,255,.04)');g.addColorStop(.72,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.4)');
-  x.fillStyle=g;x.fillRect(-R,-R,2*R,2*R);
-  x.beginPath();x.ellipse(-R*.4,-R*.5,R*.2,R*.12,-.6,0,7);x.fillStyle='rgba(255,255,255,.8)';x.fill();
-  x.restore();
+function anhBi(b){
+  const id=b.id;let c=anhCache[id];
+  if(c&&c.N===BONG.N&&c.ver===b.ver)return c.cv;
+  if(!c||c.N!==BONG.N){const cv=document.createElement('canvas');cv.width=cv.height=BONG.N;const x=cv.getContext('2d');c=anhCache[id]={cv,x,img:x.createImageData(BONG.N,BONG.N),N:BONG.N,ver:-1};}
+  const q=b.q,w=q[0],qx=q[1],qy=q[2],qz=q[3];
+  const m00=1-2*(qy*qy+qz*qz),m01=2*(qx*qy-w*qz),m02=2*(qx*qz+w*qy),m10=2*(qx*qy+w*qz),m11=1-2*(qx*qx+qz*qz),m12=2*(qy*qz-w*qx),m20=2*(qx*qz-w*qy),m21=2*(qy*qz+w*qx),m22=1-2*(qx*qx+qy*qy);
+  const la=id==='cue',soc=!la&&id>8,base=la?TRANG:id===8?[18,20,24]:RGB(mauBi(id)),chu=la?null:BONG.chu[id],Tt=BONG.T,SD=0.4359;
+  const d=c.img.data,N=BONG.N;
+  for(let k=0;k<N*N;k++){const al=BONG.al[k],o=k*4;if(al<=0){d[o+3]=0;continue;}
+    const nx=BONG.nx[k],ny=BONG.ny[k],nz=BONG.nz[k];
+    const lx=m00*nx+m10*ny+m20*nz,ly=m01*nx+m11*ny+m21*nz,lz=m02*nx+m12*ny+m22*nz;
+    let r=base[0],g=base[1],bl=base[2];
+    if(soc&&(lz>0.5||lz<-0.5)){r=TRANG[0];g=TRANG[1];bl=TRANG[2];}
+    if(la){if(lx>0.972||lx<-0.972||ly>0.972||ly<-0.972||lz>0.972||lz<-0.972){r=DO_CHAM[0];g=DO_CHAM[1];bl=DO_CHAM[2];}}
+    else if(lx>0.9||lx<-0.9){let u=lz/SD;const v=ly/SD;if(lx<0)u=-u;const tx=((u*0.5+0.5)*(Tt-1))|0,ty=((v*0.5+0.5)*(Tt-1))|0;
+      const a=(tx>=0&&ty>=0&&tx<Tt&&ty<Tt)?chu[ty*Tt+tx]/255:0;r=TRANG[0]+(MUC_SO[0]-TRANG[0])*a;g=TRANG[1]+(MUC_SO[1]-TRANG[1])*a;bl=TRANG[2]+(MUC_SO[2]-TRANG[2])*a;}
+    const sh=BONG.sh[k],sp=BONG.sp[k]*255;d[o]=r*sh+sp;d[o+1]=g*sh+sp;d[o+2]=bl*sh+sp;d[o+3]=al*255;}
+  c.x.putImageData(c.img,0,0);c.ver=b.ver;return c.cv;
 }
+/* ---- Mắt thần: mô phỏng trước bằng chính lõi vật lý (lực, xoáy đang chọn) ⇒ đường đi thật của bi cái và bi mục tiêu ---- */
+let duDoanCu={key:'',t:0,cue:[],obj:[]};
+function duDoan(now){
+  const c=bi('cue'),p=G.power>0.02?G.power:0.5;
+  const key=[G.aim.x.toFixed(4),G.aim.y.toFixed(4),p.toFixed(2),G.spin.x.toFixed(2),G.spin.y.toFixed(2),c.x.toFixed(1),c.y.toFixed(1)].join();
+  if(key===duDoanCu.key||now-duDoanCu.t<60)return duDoanCu;
+  const balls=G.st.balls.filter(b=>b.on).map(b=>({id:b.id,x:b.x,y:b.y,vx:0,vy:0,wx:0,wy:0,wz:0,on:true})),cc=balls.find(b=>b.id==='cue');
+  danhBi(cc,G.aim.x,G.aim.y,p,G.spin.x,G.spin.y);
+  const st={balls},ev=suKienMoi(),pc=[[cc.x,cc.y]],po=[];let ob=null,tva=-1,lanVa=0;
+  const hook=(k,a,b)=>{if(k==='bi'&&(a.id==='cue'||b.id==='cue'))lanVa++;};
+  for(let i=0;i<240*2.4;i++){step(st,ev,hook);
+    if(!ob&&ev.firstHit!==null){ob=balls.find(b=>b.id===ev.firstHit);tva=i;po.push([ob.x,ob.y]);}
+    if(i%4===0){if(cc.on)pc.push([cc.x,cc.y]);if(ob&&ob.on&&i-tva<240*0.9)po.push([ob.x,ob.y]);}
+    if(lanVa>=2||(tva>=0&&i-tva>240*1.1)||!dangChay(st))break;}
+  if(cc.on)pc.push([cc.x,cc.y]);
+  duDoanCu={key,t:now,cue:pc,obj:po};return duDoanCu;
+}
+function veDuong(x,pts){if(pts.length<2)return;x.beginPath();x.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)x.lineTo(pts[i][0],pts[i][1]);x.stroke();}
 function nhamInfo(){
   const c=bi('cue');if(!c||!c.on)return null;const dx=G.aim.x,dy=G.aim.y;let tb=Infinity,hb=null;
   for(const b of G.st.balls){if(!b.on||b.id==='cue')continue;const fx=c.x-b.x,fy=c.y-b.y,bq=fx*dx+fy*dy,cq=fx*fx+fy*fy-D2,disc=bq*bq-cq;if(disc<0)continue;const t=-bq-Math.sqrt(disc);if(t>0&&t<tb){tb=t;hb=b;}}
@@ -1180,7 +1327,7 @@ function ve(){
   const x=ctx;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);if(!nen)return;x.drawImage(nen,0,0);
   x.setTransform(S*DPR,0,0,S*DPR,T*S*DPR,T*S*DPR);
   for(const b of G.st.balls){if(!b.on)continue;const g=x.createRadialGradient(b.x+3,b.y+5,R*.2,b.x+3,b.y+5,R*1.15);g.addColorStop(0,'rgba(0,0,0,.38)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.beginPath();x.arc(b.x+3,b.y+5,R*1.15,0,7);x.fill();}
-  for(const r of G.roi){const k=Math.min(1,r.t/.28),sp=sprite[r.id];if(!sp)continue;const px=r.x+(r.px-r.x)*k,py=r.y+(r.py-r.y)*k,sc=1-.55*k;x.globalAlpha=1-k;const s=(2*R+8)*sc;x.drawImage(sp,px-s/2,py-s/2,s,s);x.globalAlpha=1;}
+  for(const r of G.roi){const k=Math.min(1,r.t/.28),rb=bi(r.id);if(!rb)continue;const sp=anhBi(rb),px=r.x+(r.px-r.x)*k,py=r.y+(r.py-r.y)*k,sc=1-.55*k;x.globalAlpha=1-k;const s=BONG.du*sc;x.drawImage(sp,px-s/2,py-s/2,s,s);x.globalAlpha=1;}
   const nguoi=!G.players[G.cur].ai,nhin=((G.phase==='aim'&&!G.sheet)||G.phase==='ai-nham')&&bi('cue').on,mt=nguoi&&G.matThan>0;
   const info=nhin?nhamInfo():null;
   if(info){
@@ -1189,17 +1336,20 @@ function ve(){
     x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=1.6;x.beginPath();x.arc(info.gx,info.gy,R,0,7);x.stroke();
     if(info.loai==='bi'){
       const ok=hopLeDich(info.b.id,G.cur);
-      if(mt||G.phase==='ai-nham'){x.strokeStyle=ok?'rgba(255,224,130,.95)':'rgba(255,107,107,.95)';x.lineWidth=2.6;x.beginPath();x.moveTo(info.b.x,info.b.y);x.lineTo(info.b.x+info.nx*(60+160*info.cut),info.b.y+info.ny*(60+160*info.cut));x.stroke();
-        const tl=Math.hypot(info.tx,info.ty);if(tl>.05){x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=1.6;x.beginPath();x.moveTo(info.gx,info.gy);x.lineTo(info.gx+info.tx/tl*100*tl,info.gy+info.ty/tl*100*tl);x.stroke();}}
+      if(G.phase==='ai-nham'){x.strokeStyle='rgba(255,224,130,.9)';x.lineWidth=2.4;x.beginPath();x.moveTo(info.b.x,info.b.y);x.lineTo(info.b.x+info.nx*(60+140*info.cut),info.b.y+info.ny*(60+140*info.cut));x.stroke();}
       if(!ok){x.strokeStyle='rgba(255,107,107,.95)';x.lineWidth=2.4;const d=8;x.beginPath();x.moveTo(info.gx-d,info.gy-d);x.lineTo(info.gx+d,info.gy+d);x.moveTo(info.gx+d,info.gy-d);x.lineTo(info.gx-d,info.gy+d);x.stroke();}
       x.strokeStyle=ok?'rgba(255,214,107,.9)':'rgba(255,107,107,.9)';x.lineWidth=2;x.beginPath();x.arc(info.b.x,info.b.y,R+4,0,7);x.stroke();
-    }else if(mt){x.strokeStyle='rgba(255,224,130,.6)';x.lineWidth=1.6;x.setLineDash([4,6]);x.beginPath();x.moveTo(info.gx,info.gy);x.lineTo(info.gx+info.rx*160,info.gy+info.ry*160);x.stroke();}
+    }
+    if(mt&&G.phase==='aim'){const dd=duDoan(performance.now());x.setLineDash([2,7]);x.strokeStyle='rgba(255,255,255,.95)';x.lineWidth=2.4;veDuong(x,dd.cue);x.setLineDash([]);
+      x.strokeStyle='rgba(255,214,107,.95)';x.lineWidth=2.8;veDuong(x,dd.obj);
+      const e=dd.cue[dd.cue.length-1];if(e){x.strokeStyle='rgba(255,255,255,.7)';x.lineWidth=1.4;x.beginPath();x.arc(e[0],e[1],R,0,7);x.stroke();}
+      const o=dd.obj[dd.obj.length-1];if(o){x.fillStyle='rgba(255,214,107,.95)';x.beginPath();x.arc(o[0],o[1],5,0,7);x.fill();}}
     x.restore();
   }
   nhip+=.05;
-  for(const b of G.st.balls){if(!b.on)continue;const sp=sprite[b.id];
+  for(const b of G.st.balls){if(!b.on)continue;const sp=anhBi(b);
     if(typeof b.id==='number'&&b.id!==8&&G.bi[b.id]&&G.bi[b.id].vang){x.save();x.shadowColor='rgba(255,200,60,.95)';x.shadowBlur=10+4*Math.sin(nhip*3);x.strokeStyle='#FFD66B';x.lineWidth=3.2;x.beginPath();x.arc(b.x,b.y,R+3,0,7);x.stroke();x.restore();}
-    if(sp){const s=2*R+8;x.drawImage(sp,b.x-s/2,b.y-s/2,s,s);}}
+    const s=BONG.du;x.drawImage(sp,b.x-s/2,b.y-s/2,s,s);}
   if(G.ballInHand&&G.phase==='aim'&&nguoi&&!G.sheet){const c=bi('cue');x.save();x.setLineDash([5,5]);x.strokeStyle=G.keoBi?'#FFD66B':'rgba(255,255,255,.85)';x.lineWidth=2;x.beginPath();x.arc(c.x,c.y,R+9,0,7);x.stroke();x.restore();
     x.fillStyle='rgba(255,255,255,.9)';x.font="600 13px 'Be Vietnam Pro',sans-serif";x.textAlign='center';x.fillText('Kéo để đặt',c.x,c.y+R+26);}
   if(info){const c=info.c,an=Math.atan2(G.aim.y,G.aim.x),keo=6+G.power*80;x.save();x.translate(c.x,c.y);x.rotate(an+Math.PI);
@@ -1316,7 +1466,7 @@ let last=performance.now();
 if(location.hash==='#thu')window.__biA={G,ban,vanMoi,datLuc,conLai,batDauLuot,aiDanh,chamCau,dongCau,moCau,CAU};
 function khung(now){
   const dt=Math.min(.05,(now-last)/1000);last=now;
-  if(G.phase==='moving'){G.acc+=dt*G.nhan;let n=0;while(G.acc>=HS&&n<24*G.nhan){step(G.st,G.ev,true);G.acc-=HS;n++;}
+  if(G.phase==='moving'){G.acc+=dt*G.nhan;let n=0;while(G.acc>=HS&&n<24*G.nhan){step(G.st,G.ev,amThat);for(const b of G.st.balls)if(b.on)quay(b,HS);G.acc-=HS;n++;}
     if(!dangChay(G.st)){G.acc=0;G.phase='xet';setTimeout(ketThucCu,G.roi.length?260:120);}}
   if(G.phase==='ai-nham'&&G.ai){const a=G.ai;a.t+=dt;const k=Math.min(1,a.t/.7),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2,an=a.a0+(a.a1-a.a0)*e;G.aim={x:Math.cos(an),y:Math.sin(an)};
     if(a.t>.7)datLuc(Math.min(a.p,(a.t-.7)/.45*a.p));

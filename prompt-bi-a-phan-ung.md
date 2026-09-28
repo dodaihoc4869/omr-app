@@ -1,12 +1,13 @@
 # Prompt — Bi-a Phản Ứng: game bi-a gắn kho đề chiến dịch, cửa thứ ba trên Sảnh Bát Linh
 
-Soạn 28/09/2026, **bản 2** (thay bản 1 dùng bi ion và vé). Bản vẽ chơi được: `docs/ban-ve-bi-a-2809/bi-a-phan-ung.html` (artifact https://claude.ai/artifact/7FjPu2CSL4QtnigCD4gdQg, phiên bản 2). Chưa build. Thầy gõ **HÃY THỰC THI PROMPT NÀY** thì mới làm.
+Soạn 28/09/2026, **bản 3**: thêm vật lý bi-a thật và trần câu riêng của Bi-a (bản 2 bỏ bi ion và vé; bản 3 giữ luật bản 2). Bản vẽ chơi được: `docs/ban-ve-bi-a-2809/bi-a-phan-ung.html` (artifact https://claude.ai/artifact/7FjPu2CSL4QtnigCD4gdQg, phiên bản 3). Chưa build. Thầy gõ **HÃY THỰC THI PROMPT NÀY** thì mới làm.
 
 ## Góc nhìn khác
 
 - Chèn câu hỏi vào giữa các cú đánh ("đánh xong rồi trả lời") làm nhịp chơi bị cắt, học sinh chán nhanh. Nên để **viên bi chính là câu hỏi**. Em nhìn thấy bi nào là dạng gì, khó hay dễ, rồi chọn đánh bi mình chắc nhất. Chọn đường bi cũng là chọn câu để làm.
 - Chơi với nhau thì lãng phí nhất là thời gian ngồi chờ bạn đánh. Luật mới biến lúc chờ thành lúc học: **lượt mình thì đánh, lượt bạn thì giải trước** câu của bi mình. Giải đúng thì bi hoá vàng. Hai em bận suốt ván, không ai ngồi chờ không.
 - Bi-a không cần luồng câu hỏi riêng. Nó lấy câu từ **đúng kế hoạch ngày** mà Đảo và Đoàn đang dùng, chấm bằng **đúng lệnh chấm chung**. Vì vậy Thể lực, EXP, lịch ôn, Câu đã làm và Bảng chiến dịch của thầy tự khớp. Không cần vé, vì chơi Bi-a chính là làm câu trong kế hoạch.
+- Kho câu mỗi ngày là **một kho chung** cho cả 3 game. Để Bi-a lấy tự do thì em chơi Bi-a trước sẽ làm Đoàn, Đảo hết câu. Bi-a phải có **trần riêng tính theo phần của từng game**, còn Đoàn, Đảo giữ nguyên như hiện nay.
 
 ## Người top 0,1% làm gì
 
@@ -14,7 +15,8 @@ Soạn 28/09/2026, **bản 2** (thay bản 1 dùng bi ion và vé). Bản vẽ c
 - **Sai thì bị thiệt, nhưng không bị loại khỏi ván.** Mất lượt, bi quay lại bàn và đổi sang câu khác cùng dạng, lời giải mở ngay. Em chưa vững vẫn chơi tiếp được, và gặp lại dạng đó trong cùng ván.
 - **Không cho đoán mò có lợi**: đáp án chỉ về máy sau khi em chốt; hết giờ tính là sai; đoán sai lúc giải trước thì tốn Thể lực mà không được gì.
 - **Tái dùng thay vì viết mới**: dùng lại lệnh chấm, Bùa Trợ giảng, mẫu lời giải TheCau, cách chấm Đúng–sai (đúng đủ 4 ý). Làm vậy thì dữ liệu học của em không bị tách thành hai luồng.
-- **Vật lý tất định, mỗi cú một gói tin**: đấu online không làm nặng D1. Mỗi bàn đấu chạy trong một Durable Object; đối thủ chỉ thấy "đang giải bi 5 · Vận dụng", không thấy nội dung câu.
+- **Vật lý thật mà vẫn tất định**: mô hình trượt rồi lăn, xoáy từ điểm chạm lệch tâm, ma sát băng và ma sát bi–bi, bước thời gian cố định, chỉ dùng + − × ÷ √. Cùng một cú cho cùng kết quả trên mọi máy, nên đấu online chỉ gửi một gói tin mỗi cú. Mỗi bàn đấu chạy trong một Durable Object; đối thủ chỉ thấy "đang giải bi 5 · Vận dụng", không thấy nội dung câu.
+- **Mắt thần dùng chính lõi vật lý để mô phỏng trước**, không vẽ đường thẳng giả. Em thấy đúng đường bi sẽ đi với lực và xoáy đang chọn, nên học được cách dùng xoáy.
 
 ## PROMPT
 
@@ -39,12 +41,12 @@ Build "Bi-a Phản Ứng" thành cửa thứ ba trên Sảnh Bát Linh, mỗi vi
 NGUYÊN TẮC BẮT BUỘC
 - Luật bàn: 7 bi trơn 1–7 (người mời), 7 bi sọc 9–15 (người được mời), Bi chốt số 8. Mỗi bi thường là 1 câu của chủ bi; điểm ván theo mức độ: Nhận biết 10, Thông hiểu 20, Vận dụng 30; hạ Bi chốt +50. Phải chạm bi của mình trước. Bi vàng rơi lỗ thì ăn ngay; bi thường rơi lỗ thì mở câu của bi đó (rơi 2 bi thì trả lời lần lượt). Đúng: ăn bi, đánh tiếp, +1 Mắt thần. Sai: bi quay lại chân bàn và đổi sang câu khác cùng dạng trong kế hoạch, hiện lời giải, mất lượt. Bi của đối thủ rơi: quay lại chân bàn, mất lượt. Phạm luật (bi cái rơi lỗ, không chạm bi nào, chạm bi đối thủ trước, Bi chốt rơi khi chưa ăn đủ 7 bi): mọi bi rơi trong cú đó quay lại bàn, đối thủ được đặt bi cái. Ăn đủ 7 bi rồi hạ Bi chốt thì trả lời Câu chốt: đúng thắng ván, sai thì Bi chốt quay lại và mất lượt.
 - Giải trước: khi không phải lượt đánh của mình, em mở hàng "Bi của em" và giải câu của bất kỳ bi chưa ăn nào. Đúng: bi hoá vàng, +1 Mắt thần. Sai: lời giải, bi đổi câu cùng dạng. Tới lượt em mà đang giải dở thì giải xong mới đánh; đồng hồ cú đánh chỉ chạy khi tấm câu hỏi đã đóng.
-- Mắt thần: giữ tối đa 3. Mỗi cú đánh của em dùng 1 nếu có. Có Mắt thần thì hiện đường ngắm đầy đủ (hướng bi mục tiêu, đường bi cái sau va, 1 lần dội băng). Không có thì chỉ hiện đường tới điểm va và bóng bi ma.
+- Mắt thần: giữ tối đa 3. Mỗi cú đánh của em dùng 1 nếu có. Có Mắt thần thì mô phỏng trước bằng chính lõi vật lý (lực, xoáy đang chọn), vẽ đường thật của bi cái tới lần va thứ 2 và của bi mục tiêu trong 0,9 giây. Không có Mắt thần thì chỉ hiện đường thẳng tới điểm va và bóng bi ma.
 - Thời gian: 30 giây một cú; Phần I 90 giây, Phần II và III 180 giây; hết giờ là sai.
-- Câu lấy từ kế hoạch ngày đã chốt của chính em, theo thứ tự: phần doan (câu ôn Phần I/III) trước, rồi phần dao (câu mới, câu ôn Phần II); bỏ câu đã làm ở game khác trong ngày. Câu chốt: câu Vận dụng trong kế hoạch, ưu tiên câu ôn em đang sai; chấm như vai 'trum'. Câu ôn sai ≥ 2 lần có goiY như Đoàn (gạch 2 phương án Phần I, hoặc kiến thức cốt lõi).
+- Câu lấy từ kế hoạch ngày đã chốt của chính em; bỏ câu đã làm ở game khác trong ngày. TRẦN BI-A tính trên kế hoạch đông cứng của ngày: tối đa floor(40% · số câu phần doan) + floor(40% · số câu phần dao) (ngày 40 câu: khoảng 15–16 câu; Huyết Chiến 80: khoảng 32). Trong trần, câu ôn doan vào bàn trước. Đoàn và Đảo không có trần mới, làm được toàn bộ phần còn lại, nên mỗi phần luôn còn ít nhất 60% cho game của nó. Hết trần giữa ván: bi chưa có câu thành bi trống (vào lỗ là ăn, 5 điểm, 0 EXP). Hết trần thì không mở ván mới. Xong cả kế hoạch ngày thì Bi-a nghỉ như Đảo, Đoàn. Lệnh hoa2-sanh trả thêm {bia:{con, tran}} để Sảnh hiện số câu còn của cả 3 game. Câu chốt: câu Vận dụng trong kế hoạch, ưu tiên câu ôn em đang sai; chấm như vai 'trum'. Câu ôn sai ≥ 2 lần có goiY như Đoàn (gạch 2 phương án Phần I, hoặc kiến thức cốt lõi).
 - Mọi câu gửi qua lệnh 'answer' chung (thêm trò chơi 'bi-a' vào phiên, không đổi cách chấm, không đổi thuật toán kế hoạch). Thể lực, EXP (trần 120/ngày, câu 41+ 0 EXP), lịch ôn, Câu đã làm, Bảng chiến dịch tự cập nhật như Đảo và Đoàn. Thắng ván không cộng thêm EXP. Ván dừng giữa chừng: câu chưa đụng tới trả về kế hoạch, không trừ Thể lực.
 - Đáp án và lời giải không có trong bất kỳ phản hồi nào trước khi em chốt. Đối thủ chỉ nhận {bi, trạng thái: đang giải|vàng|đã ăn|đổi câu, mức độ}, không nhận nội dung câu.
-- Vật lý thuần TS dùng chung máy khách và Worker (src/game/bi-a/vat-ly.ts): bước cố định 1/240 giây, chỉ + − × ÷ và Math.sqrt trong vòng mô phỏng, hằng số lấy từ bản vẽ (bàn 500×900, R = 21, VMAX = 2650, ma sát 230 + 0,42·v, hồi phục bi 0,95, băng 0,78). Online: mỗi cú một gói {seq, huong, luc, xoay, datBi?}; mỗi bàn 1 Durable Object + WebSocket Hibernation; trong trận không đọc D1. Gói Cloudflare không có Durable Object thì dự phòng hỏi vòng 1,5 giây như Đoàn.
+- Vật lý thuần TS dùng chung máy khách và Worker (src/game/bi-a/vat-ly.ts), chép từ bản vẽ: bước cố định 1/240 giây; chỉ + − × ÷ và Math.sqrt trong vòng mô phỏng; mỗi bi có (vx, vy, wx, wy, wz). Vận tốc trượt ở điểm chạm nỉ u = (vx + R·wy, vy − R·wx): u ≠ 0 thì ma sát trượt 0,2·g kéo về lăn (tốc độ còn 5/7), u = 0 thì ma sát lăn 0,02·g. Xoáy đứng wz giảm 24 rad/s². Cú đánh: điểm chạm lệch tâm 0,5R·(xoáy ngang, xoáy dọc) sinh wx, wy, wz. Bi–bi: hồi phục 0,95, ma sát 0,06 (lệch bi mục tiêu, truyền xoáy). Băng: hồi phục 0,86 − 0,1·min(1, |vn|/2500), ma sát 0,2 với xoáy đứng (bật lệch), mũi băng ăn 60% xoáy lăn vào băng. g = 3862 đv/s², bàn 500×900, R = 21, VMAX = 2600. Hướng quay (quaternion) chỉ để vẽ bi 3D, không ảnh hưởng vật lý. Online: mỗi cú một gói {seq, huong, luc, xoay, datBi?}; mỗi bàn 1 Durable Object + WebSocket Hibernation; trong trận không đọc D1. Gói Cloudflare không có Durable Object thì dự phòng hỏi vòng 1,5 giây như Đoàn.
 - Tấm câu hỏi dùng lại TheCau và mẫu lời giải chuẩn (LỜI GIẢI, KIẾN THỨC CỐT LÕI, từng phương án/ý có ✓/✗, Phần III có các bước và kết quả). Câu đúng: lời giải gập lại, bấm "Xem lời giải". Câu sai: lời giải mở sẵn, nút "Đã đọc lời giải · …".
 
 GIẢ ĐỊNH ĐÃ DÙNG
@@ -74,10 +76,12 @@ NGHIỆM THU
 4. Luật: test luat.ts phủ 12 ca (bi vàng rơi; bi thường rơi đúng/sai; rơi 2 bi, câu đầu sai; bi đối thủ rơi; 4 kiểu phạm luật; Câu chốt đúng/sai; giải trước đúng/sai; hết giờ); Mắt thần không vượt 3.
 5. Tất định và online: 1.000 cú ngẫu nhiên có seed cố định cho cùng một băm trạng thái trên Node và trong Chromium; Playwright 2 trình duyệt đánh hết 1 ván qua Durable Object cục bộ, băm trạng thái 2 màn trùng sau mỗi cú.
 6. Giao diện: check:mau đạt; có ảnh 390 px và 1440 px, sáng và tối; tấm câu hỏi dài cuộn được, không mất phần đầu; khung hình p95 ≤ 16,7 ms khi hạ CPU 4 lần; không tràn ngang ở 360 px.
+7. Vật lý: test đo được (a) bi đánh giữa tâm chuyển sang lăn ở 5/7 tốc độ ± 1%; (b) va thẳng bi cách 150 đơn vị, lực 45%, sau 0,6 giây: xoáy trên thì bi cái đi theo > 100, đánh giữa thì đi theo < 60, xoáy dưới thì lùi > 60; (c) xoáy phải đập băng thẳng thì bật sang phải, xoáy trái bật sang trái, đối xứng ± 2 đơn vị; (d) phá bàn lực 100% dừng trong 3–7 giây.
+8. Chia câu: test với kế hoạch 14 + 26 câu: Bi-a lấy tối đa 5 + 10; Đoàn, Đảo vẫn làm được toàn bộ phần còn lại; tổng câu cả ngày không đổi; hết trần thì bia-xep-ban trả lý do và số câu còn của Đoàn, Đảo.
 ```
 
 ## Ba câu hỏi làm prompt sắc hơn
 
-1. Thứ tự lấy câu: câu ôn trước rồi câu mới (em đề nghị, để Bi-a cũng giúp em làm hết câu ôn như Đoàn), hay Bi-a chỉ lấy câu mới?
+1. Trần Bi-a: giữ 40% phần của mỗi game (ngày 40 câu ≈ 15–16 câu, tức 2 ván), hay thầy muốn tăng hoặc giảm?
 2. Câu Đúng–sai: giữ "đúng đủ 4 ý mới ăn bi" theo cách chấm hiện có, hay đúng 3/4 ý cũng ăn bi nhưng không được Mắt thần?
-3. Câu chốt: lấy câu Vận dụng trong kế hoạch, hay ưu tiên câu ôn em đang sai nhiều nhất?
+3. Sau khi em xong cả kế hoạch ngày: có mở "Bàn giao hữu" (không câu, không EXP, tối đa 2 ván) làm phần thưởng không, hay Bi-a nghỉ như Đảo, Đoàn?
