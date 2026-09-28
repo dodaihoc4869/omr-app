@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bản đồ Đảo 3D</title>
+<!--
+ BẢN VẼ 28/09 · BẢN ĐỒ BÁT LINH ĐẢO trong game (thay kiểu phẳng của src/game/than-thu-v2/dao2/BanDo.tsx + dao2.css)
+ theo ĐÚNG ngôn ngữ hình của Sảnh 3D (src/components/hoa2/CanhSanh3D.tsx + sanh-ban-do.css):
+ SÁNG = hoàng hôn (trời tím → hồng → cam, mặt trời + tia) · TỐI = đêm (tím sẫm, sao, trăng, viền sáng trăng).
+ Giữ đủ chức năng BanDo.tsx: vùng theo dạng "Tên · x%", Sương đã tan · Cọ xát, Đền đã dựng · Thành thạo, đường 6 ải
+ (ải Trùm to + vương miện) + vị trí thần thú, chuyến k/n + 6 ô vai, Rương Bát Linh (+ Mở rương), đi dở, đảo khoá,
+ đảo trống (THONG_BAO_TRONG_2), LÊN ĐƯỜNG · XUA SƯƠNG MÙ, thanh dưới Đảo/Sổ tay/Túi đồ/Cửa hàng, nút toàn màn hình.
+ KHI BUILD:
+  · Thần thú ở đây là hình tượng trưng — dùng <img src={anhThu(thu,profile.cap,true)}> như BanDo.tsx hiện có.
+  · Mọi số lấy từ `hoa2-sanh`/`start` như cũ; thiếu thì ẩn, không bịa. Màu đưa vào biến --d2-* (check:mau cấm hex).
+  · Sương mỗi vùng: độ đục = 1 − tiLe/100 (vùng chưa có số dùng tỉ lệ Cọ xát chung). Đền: ceil(6·thanhThao/tong) ở vùng % cao nhất.
+  · Chuyển động chỉ transform/opacity; prefers-reduced-motion ⇒ đứng yên; thị sai chỉ khi có chuột/nghiêng máy.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+ --chu:rgb(24 30 62);--chu-phu:rgb(62 72 108);--chu-mo:rgb(84 92 126);
+ --kinh-nen:rgb(255 255 255 / .78);--kinh-vien:rgb(255 255 255 / .95);
+ --kinh-bong:0 10px 28px rgb(70 40 120 / .18),0 2px 6px rgb(70 40 120 / .1);
+ --vang:rgb(255 196 46);--vang-sang:rgb(255 226 120);--cam:rgb(246 146 18);--nau-chu:rgb(66 32 0);--nau-bong:rgb(186 98 6);
+ --ngoc:rgb(0 170 175);--xanh:rgb(16 122 76);--hong:rgb(214 40 96);--cam-chu:rgb(170 72 0);
+ --troi-1:rgb(128 132 236);--troi-2:rgb(206 150 226);--troi-3:rgb(255 164 180);--troi-4:rgb(255 206 150);
+ --bien-0:rgb(255 214 190);--bien-1:rgb(170 226 232);--bien-2:rgb(92 206 214);--bien-3:rgb(28 150 186);
+ --co-1:rgb(180 240 130);--co-2:rgb(96 196 110);--co-3:rgb(40 130 80);
+ --vach-1:rgb(214 170 120);--vach-2:rgb(160 116 84);--vach-3:rgb(110 78 78);
+ --vien-sang:rgb(255 244 200);--bong-dao:rgb(20 70 120 / .38);--bot:rgb(255 255 255 / .85);
+ --suong:rgb(255 255 255);--suong-hong:rgb(250 238 252);
+ --duong:rgb(255 226 140);--duong-sang:rgb(255 200 90);
+ --nut-bg:rgb(255 255 255 / .92);
+ color-scheme:light;
+}
+:root[data-giao-dien="toi"]{
+ --chu:rgb(236 238 255);--chu-phu:rgb(206 210 240);--chu-mo:rgb(178 186 224);
+ --kinh-nen:rgb(24 22 62 / .74);--kinh-vien:rgb(170 160 255 / .26);--kinh-bong:0 10px 28px rgb(0 0 0 / .42),0 2px 6px rgb(0 0 0 / .26);
+ --ngoc:rgb(60 214 220);--xanh:rgb(110 230 160);--hong:rgb(255 128 168);--cam-chu:rgb(255 196 110);
+ --troi-1:rgb(14 12 44);--troi-2:rgb(34 26 86);--troi-3:rgb(62 44 120);--troi-4:rgb(92 70 150);
+ --bien-0:rgb(120 110 190);--bien-1:rgb(40 60 130);--bien-2:rgb(20 40 100);--bien-3:rgb(8 18 60);
+ --co-1:rgb(96 170 120);--co-2:rgb(44 116 96);--co-3:rgb(18 70 66);
+ --vach-1:rgb(110 96 130);--vach-2:rgb(72 62 104);--vach-3:rgb(40 36 72);
+ --vien-sang:rgb(190 220 255);--bong-dao:rgb(0 0 20 / .5);--bot:rgb(200 220 255 / .6);
+ --suong:rgb(200 206 240);--suong-hong:rgb(170 170 230);
+ --duong:rgb(255 220 130);--duong-sang:rgb(255 190 80);--nut-bg:rgb(30 28 74 / .92);
+ color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){:root:not([data-giao-dien="sang"]){
+ --chu:rgb(236 238 255);--chu-phu:rgb(206 210 240);--chu-mo:rgb(178 186 224);
+ --kinh-nen:rgb(24 22 62 / .74);--kinh-vien:rgb(170 160 255 / .26);--kinh-bong:0 10px 28px rgb(0 0 0 / .42),0 2px 6px rgb(0 0 0 / .26);
+ --ngoc:rgb(60 214 220);--xanh:rgb(110 230 160);--hong:rgb(255 128 168);--cam-chu:rgb(255 196 110);
+ --troi-1:rgb(14 12 44);--troi-2:rgb(34 26 86);--troi-3:rgb(62 44 120);--troi-4:rgb(92 70 150);
+ --bien-0:rgb(120 110 190);--bien-1:rgb(40 60 130);--bien-2:rgb(20 40 100);--bien-3:rgb(8 18 60);
+ --co-1:rgb(96 170 120);--co-2:rgb(44 116 96);--co-3:rgb(18 70 66);
+ --vach-1:rgb(110 96 130);--vach-2:rgb(72 62 104);--vach-3:rgb(40 36 72);
+ --vien-sang:rgb(190 220 255);--bong-dao:rgb(0 0 20 / .5);--bot:rgb(200 220 255 / .6);
+ --suong:rgb(200 206 240);--suong-hong:rgb(170 170 230);
+ --duong:rgb(255 220 130);--duong-sang:rgb(255 190 80);--nut-bg:rgb(30 28 74 / .92);
+ color-scheme:dark;
+}}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:var(--troi-2);color:var(--chu);font:500 14px/1.35 'Be Vietnam Pro',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--vang);outline-offset:2px}
+.baloo{font-family:'Baloo 2','Be Vietnam Pro',system-ui,sans-serif}
+.kinh{background:var(--kinh-nen);border:1px solid var(--kinh-vien);box-shadow:var(--kinh-bong),inset 0 1px 0 rgb(255 255 255 / .5);backdrop-filter:blur(14px) saturate(1.3);-webkit-backdrop-filter:blur(14px) saturate(1.3)}
+
+/* ── CẢNH NỀN (trời · biển · sóng · mây) phủ cả màn ─────────────────── */
+.canh{position:fixed;inset:0;overflow:hidden;background:linear-gradient(180deg,var(--troi-1) 0%,var(--troi-2) 11%,var(--troi-3) 19%,var(--troi-4) 24%,var(--bien-0) 25%,var(--bien-1) 32%,var(--bien-2) 60%,var(--bien-3) 100%)}
+.canh svg{position:absolute;inset:0;width:100%;height:100%}
+.lop{position:absolute;inset:-24px;will-change:transform}
+.mat-troi{position:absolute;left:68%;top:14%;width:110px;height:110px;margin:-55px;border-radius:50%;background:radial-gradient(circle,rgb(255 255 240) 0%,rgb(255 238 170) 38%,rgb(255 196 110 / .7) 52%,rgb(255 196 110 / 0) 70%)}
+.tia{position:absolute;left:68%;top:14%;width:420px;height:420px;margin:-210px;border-radius:50%;background:repeating-conic-gradient(rgb(255 240 200 / .22) 0 5deg,rgb(255 240 200 / 0) 5deg 18deg);-webkit-mask:radial-gradient(circle,black 10%,transparent 68%);mask:radial-gradient(circle,black 10%,transparent 68%);animation:xoay 90s linear infinite}
+.trang,.sao{display:none}
+.trang{position:absolute;left:74%;top:10%;width:54px;height:54px;margin:-27px;border-radius:50%;background:radial-gradient(circle at 38% 36%,rgb(255 252 236),rgb(236 230 206) 60%,rgb(214 208 186));box-shadow:0 0 40px 12px rgb(200 210 255 / .35)}
+.sao i{position:absolute;width:3px;height:3px;border-radius:50%;background:rgb(255 255 255);animation:lap var(--t,3s) ease-in-out var(--d,0s) infinite}
+:root[data-giao-dien="toi"] .mat-troi,:root[data-giao-dien="toi"] .tia{display:none}
+:root[data-giao-dien="toi"] .trang,:root[data-giao-dien="toi"] .sao{display:block}
+@media (prefers-color-scheme:dark){:root:not([data-giao-dien="sang"]) .mat-troi,:root:not([data-giao-dien="sang"]) .tia{display:none}
+ :root:not([data-giao-dien="sang"]) .trang,:root:not([data-giao-dien="sang"]) .sao{display:block}}
+.song{animation:troi var(--t,10s) linear infinite}
+.song.nguoc{animation-direction:reverse}
+.lap{animation:lap var(--t,3s) ease-in-out var(--d,0s) infinite}
+.may{position:absolute;height:34px;border-radius:40px;background:radial-gradient(ellipse at 50% 60%,rgb(255 255 255 / .95),rgb(250 240 252 / .8) 55%,rgb(236 222 250 / 0) 72%);animation:may var(--t,40s) ease-in-out var(--d,0s) infinite alternate}
+.may::before,.may::after{content:"";position:absolute;border-radius:50%;background:inherit}
+.may::before{width:46%;height:150%;left:16%;top:-60%}.may::after{width:36%;height:120%;left:48%;top:-40%}
+:root[data-giao-dien="toi"] .may{opacity:.35}
+@media (prefers-color-scheme:dark){:root:not([data-giao-dien="sang"]) .may{opacity:.35}}
+
+/* ── KHUNG MÀN ───────────────────────────────────────────────────────── */
+.man{position:relative;height:100dvh;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto auto;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.dau{display:flex;align-items:center;gap:6px;padding:8px 12px 4px;position:relative;z-index:5}
+.nut-tron{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--chu)}
+.dau h1{flex:1;min-width:0;margin:0;font:800 19px/1.05 'Baloo 2',system-ui;color:var(--chu);text-shadow:0 1px 0 rgb(255 255 255 / .5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dau h1 small{display:block;font:700 10px/1.2 'Be Vietnam Pro';letter-spacing:.14em;color:var(--chu-phu)}
+.the-luc{flex:none;display:flex;align-items:center;gap:6px;margin:0;padding:5px 10px 5px 8px;border-radius:999px}
+.the-luc svg{fill:var(--ngoc)}
+.the-luc span{font:800 15px/1 'Baloo 2';color:var(--chu)}
+.the-luc small{display:block;font:600 9px/1.1 'Be Vietnam Pro';color:var(--chu-mo)}
+
+.trai{position:relative;min-height:0}
+.dao-lop{position:absolute;inset:0;will-change:transform}
+.dao-lop>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.phu{position:absolute;inset:0;pointer-events:none}
+.phu>*{pointer-events:auto}
+.nhan{position:absolute;transform:translate(-50%,-50%);padding:4px 10px;border-radius:999px;font:700 12px/1.2 'Be Vietnam Pro';color:var(--chu);white-space:nowrap}
+.nhan b{font:800 13px/1 'Baloo 2';color:var(--cam-chu)}
+.nhan[data-sang]{border-color:var(--vang);box-shadow:var(--kinh-bong),0 0 0 2px rgb(255 214 107 / .5),0 0 18px rgb(255 214 107 / .6)}
+.nhan[data-sang] b{color:var(--xanh)}
+.thu{position:absolute;width:64px;height:64px;margin:-60px 0 0 -32px;animation:nhun 1.6s ease-in-out infinite;filter:drop-shadow(0 6px 6px rgb(40 20 80 / .35))}
+.thu svg{width:100%;height:100%}
+.thu-ghi{position:absolute;transform:translate(-50%,0);font:600 9px/1 'Be Vietnam Pro';color:var(--chu-phu);opacity:.8;white-space:nowrap}
+
+.phai{display:flex;flex-direction:column;gap:6px;padding:0 12px 6px;position:relative;z-index:4;min-height:0}
+.so{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.so p{margin:0;padding:5px 10px;border-radius:14px}
+.so small{display:block;font:600 10.5px/1.2 'Be Vietnam Pro';color:var(--chu-mo)}
+.so b{font:800 17px/1.05 'Baloo 2'}
+.so-xanh{color:var(--ngoc)}.so-vang{color:var(--cam-chu)}
+.chu-thich{grid-column:1/-1;margin:0;font:500 10px/1.3 'Be Vietnam Pro';color:var(--chu-phu);text-align:center;text-shadow:0 1px 0 rgb(255 255 255 / .35)}
+.tam{border-radius:22px;padding:10px 12px 12px;display:flex;flex-direction:column;gap:7px}
+.tam-dau{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.tam-dau h2{margin:0;font:800 17px/1.1 'Baloo 2'}
+.tam-dau span{font:600 11.5px/1 'Be Vietnam Pro';color:var(--chu-mo);white-space:nowrap}
+.vai{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:0;padding:0;list-style:none}
+.vai li{height:30px;border-radius:10px;display:grid;place-items:center;font:700 11px/1 'Be Vietnam Pro';background:rgb(255 214 107 / .22);border:1.5px solid rgb(255 196 46 / .6);color:var(--cam-chu)}
+.vai li[data-vai="on_lai"]{background:rgb(0 170 175 / .14);border-color:rgb(0 170 175 / .5);color:var(--ngoc)}
+.vai li[data-vai="trum"]{background:rgb(214 40 96 / .14);border-color:rgb(214 40 96 / .55);color:var(--hong)}
+.vai li[data-trang="dung"]{background:var(--xanh);border-color:var(--xanh);color:rgb(255 255 255)}
+.vai li[data-trang="sai"]{background:rgb(255 150 120 / .35);border-color:rgb(230 100 70);color:var(--chu)}
+.vai li[data-hien]{box-shadow:0 0 0 2px var(--vang),0 0 12px rgb(255 196 46 / .7)}
+.ruong{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:rgb(255 214 107 / .16);border:1px solid rgb(255 196 46 / .4)}
+.ruong b{display:block;font:700 12px/1.25 'Be Vietnam Pro'}
+.vach{display:block;height:6px;margin-top:5px;border-radius:9px;background:rgb(120 90 40 / .18);overflow:hidden}
+.vach i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--vang),var(--cam));transform-origin:left}
+.ruong-so{font:800 14px/1 'Baloo 2';color:var(--cam-chu)}
+.nut-vien{padding:6px 12px;border-radius:999px;border:1.5px solid var(--cam);color:var(--cam-chu);font-weight:700;font-size:12px;background:var(--nut-bg)}
+.ruong .nut-vien{grid-column:1/-1}
+.ghi{margin:0;font:500 12px/1.35 'Be Vietnam Pro';color:var(--chu-phu)}
+.ghi.khoa{color:var(--cam-chu);font-weight:600}
+.het{margin:0;padding:14px 12px;border-radius:14px;text-align:center;font:600 13.5px/1.4 'Be Vietnam Pro';background:rgb(255 255 255 / .18);border:1px dashed var(--kinh-vien)}
+.nut-vang{display:flex;align-items:center;justify-content:center;gap:8px;height:48px;border-radius:16px;font:800 16px/1 'Baloo 2';letter-spacing:.04em;color:var(--nau-chu);background:linear-gradient(180deg,var(--vang-sang),var(--vang) 55%,var(--cam));box-shadow:0 5px 0 var(--nau-bong),0 10px 18px rgb(186 98 6 / .35),inset 0 2px 0 rgb(255 255 255 / .6);transition:transform .12s}
+.nut-vang:active{transform:translateY(3px)}
+.nut-vang:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.duoi{display:flex;justify-content:space-around;margin:0 12px 8px;padding:4px;border-radius:22px;position:relative;z-index:4}
+.duoi button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;border-radius:16px;font:600 11px/1.1 'Be Vietnam Pro';color:var(--chu-phu)}
+.duoi button svg{width:22px;height:22px}
+.duoi button[aria-current]{background:linear-gradient(180deg,var(--vang-sang),var(--vang));color:var(--nau-chu);box-shadow:0 3px 0 var(--nau-bong)}
+
+/* bảng thử */
+.thu-bang{position:fixed;z-index:20;top:58px;right:12px;width:230px;border-radius:18px;padding:12px;display:none;flex-direction:column;gap:6px}
+.thu-bang[data-mo]{display:flex}
+.thu-bang h3{margin:0 0 2px;font:800 14px/1 'Baloo 2'}
+.thu-bang button{text-align:left;padding:7px 10px;border-radius:10px;font-size:12.5px;font-weight:600;background:rgb(255 255 255 / .2);border:1px solid var(--kinh-vien)}
+.thu-bang button[aria-pressed="true"]{background:var(--vang);color:var(--nau-chu)}
+.thu-bang .hang{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.thu-bang .hang button{text-align:center;padding:6px 0}
+
+/* ── SVG ĐẢO ─────────────────────────────────────────────────────────── */
+.bot-vien{animation:bot 3.2s ease-in-out infinite;transform-origin:200px 240px;transform-box:view-box}
+.bot-vien.b2{animation-delay:-1.6s}
+.suong-vung{transition:opacity 1.2s ease}
+.suong-cuon{animation:cuon var(--t,14s) ease-in-out var(--d,0s) infinite alternate;transform-box:fill-box;transform-origin:center}
+.duong-sang{stroke-dasharray:2 12;animation:chay 1.4s linear infinite}
+.nut-hien{animation:nhip 1.6s ease-out infinite;transform-box:fill-box;transform-origin:center}
+.co{animation:phap 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:left center}
+.la-cay{animation:lac 4s ease-in-out var(--d,0s) infinite alternate;transform-box:fill-box;transform-origin:bottom center}
+
+@keyframes xoay{to{transform:rotate(360deg)}}
+@keyframes troi{from{transform:translateX(0)}to{transform:translateX(-120px)}}
+@keyframes lap{0%,100%{opacity:.15}50%{opacity:1}}
+@keyframes may{from{transform:translateX(-30px)}to{transform:translateX(40px)}}
+@keyframes nhun{0%,100%{transform:translateY(0) scale(1,1)}45%{transform:translateY(-7px) scale(.97,1.03)}55%{transform:translateY(-7px) scale(.97,1.03)}}
+@keyframes bot{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.85;transform:scale(1.012)}}
+@keyframes cuon{from{transform:translate(-6px,2px) scale(1)}to{transform:translate(8px,-3px) scale(1.08)}}
+@keyframes chay{to{stroke-dashoffset:-28}}
+@keyframes nhip{0%{opacity:.9;transform:scale(.8)}100%{opacity:0;transform:scale(1.9)}}
+@keyframes phap{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.8) skewY(4deg)}}
+@keyframes lac{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}
+
+/* ── NGANG ───────────────────────────────────────────────────────────── */
+@media (min-width:900px) and (min-aspect-ratio:1/1){
+ .man{grid-template-columns:minmax(0,1fr) 420px;grid-template-rows:auto minmax(0,1fr) auto}
+ .dau{grid-column:1/-1;padding:16px 24px 8px}
+ .dau h1{font-size:24px}
+ .trai{grid-row:2/4;grid-column:1}
+ .phai{grid-row:2;grid-column:2;padding:8px 24px 12px 0;justify-content:flex-end;gap:12px}
+ .duoi{grid-row:3;grid-column:2;margin:0 24px 18px 0}
+ .so p{padding:10px 14px}.so b{font-size:22px}
+ .tam{padding:16px 18px 18px;gap:12px}
+ .tam-dau h2{font-size:20px}
+ .vai li{height:38px;font-size:12px}
+ .nut-vang{height:58px;font-size:18px}
+ .nhan{font-size:13px;padding:6px 13px}
+ .thu{width:92px;height:92px;margin:-86px 0 0 -46px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="canh" aria-hidden="true">
+ <div class="lop" data-sau=".15">
+  <div class="tia"></div><div class="mat-troi"></div><div class="trang"></div>
+  <div class="sao" id="sao"></div>
+  <div class="may" style="left:6%;top:9%;width:120px;--t:46s"></div>
+  <div class="may" style="left:44%;top:5%;width:90px;--t:38s;--d:-12s"></div>
+  <div class="may" style="left:80%;top:19%;width:140px;--t:52s;--d:-20s"></div>
+ </div>
+ <div class="lop" data-sau=".35">
+  <svg preserveAspectRatio="none" viewBox="0 0 400 800" id="bien"></svg>
+ </div>
+</div>
+
+<div class="man">
+ <header class="dau">
+  <button type="button" class="nut-tron kinh" aria-label="Về app học sinh" title="Về app học sinh"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <h1><small>BÁT LINH ĐẢO</small><span id="ten-dao"></span></h1>
+  <p class="kinh the-luc" id="the-luc"></p>
+  <button type="button" class="nut-tron kinh" id="mo-thu" aria-label="Bảng thử bản vẽ" title="Bảng thử bản vẽ" aria-expanded="false"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></button>
+  <button type="button" class="nut-tron kinh" id="toan-man" aria-label="Toàn màn hình" title="Toàn màn hình"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+ </header>
+
+ <div class="trai">
+  <div class="dao-lop" data-sau=".6" id="dao-lop">
+   <svg id="dao" viewBox="22 52 356 396" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+   <div class="phu" id="phu"></div>
+  </div>
+ </div>
+
+ <div class="phai" id="phai"></div>
+
+ <nav class="duoi kinh" aria-label="Đảo">
+  <button type="button" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 17c3-1 5-6 9-6s6 5 9 6M12 11V4l5 2-5 2"/></svg>Đảo</button>
+  <button type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11"/></svg>Sổ tay</button>
+  <button type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7zM9 8a3 3 0 0 1 6 0"/></svg>Túi đồ</button>
+  <button type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l2-5h12l2 5M4 9h16v11H4zM4 9a3 3 0 0 0 5 1 3 3 0 0 0 6 0 3 3 0 0 0 5-1"/></svg>Cửa hàng</button>
+ </nav>
+</div>
+
+<aside class="thu-bang kinh" id="thu-bang" aria-label="Bảng thử">
+ <h3>Bảng thử</h3>
+ <button type="button" data-ca="dido">Đảo đang đi dở (ải 3/6)</button>
+ <button type="button" data-ca="moi">Đảo mới · chưa có câu</button>
+ <button type="button" data-ca="tam">Đảo 80% khai phá · rương mở được</button>
+ <button type="button" data-ca="khoa">Đảo khoá (còn câu ôn ở Đoàn)</button>
+ <h3 style="margin-top:6px">Giao diện</h3>
+ <div class="hang"><button type="button" data-gd="">Tự động</button><button type="button" data-gd="sang">Hoàng hôn</button><button type="button" data-gd="toi">Đêm</button></div>
+</aside>
+
+<script>
+'use strict';
+const NS='http://www.w3.org/2000/svg';
+const VB={x:22,y:52,w:356,h:396};
+const DAO='M44 190 C34 124 104 74 196 70 C262 68 300 88 330 104 C368 126 372 176 360 210 C352 234 330 238 334 262 C340 290 372 300 350 334 C318 378 236 386 176 380 C132 376 110 392 78 376 C44 358 30 318 38 280 C44 250 52 226 44 190 Z';
+/* 6 vùng: tâm mảng đất (x,y,rx,ry) + chỗ đặt nhãn */
+const VUNG=[{c:[118,138,92,62],n:[108,112]},{c:[288,132,90,60],n:[292,106]},{c:[82,246,64,70],n:[64,212]},{c:[322,236,60,72],n:[340,318]},{c:[140,338,90,52],n:[122,356]},{c:[274,334,90,54],n:[286,372]}];
+/* chỗ mọc đền của từng vùng (tránh nhãn + đường ải) */
+const DEN=[[176,166],[336,178],[64,300],[300,252],[204,346],[236,346]];
+const TONE=[['co-1',.55],['co-2',.45],['co-1',.35],['co-3',.35],['co-2',.6],['co-1',.25]];
+/* 6 mốc ải (mốc cuối = Trùm) */
+const NUT=[[122,300],[172,272],[222,292],[262,248],[222,198],[270,160]];
+const TRUM_R=17,NUT_R=11;
+const CA={
+ dido:{ten:'Este – Lipit',theLuc:{con:8,tong:12},cd:{coXat:22,tong:40,thanhThao:6,tangTu:''},soChuyen:{k:2,n:4},
+  cau:['moi','moi','on_lai','moi','on_lai','trum'],kq:[true,false],khoa:false,het:'',
+  vung:[{t:'Thuỷ phân este',p:72,d:13,l:18},{t:'Đốt cháy este',p:55,d:6,l:11},{t:'Chất béo',p:40,d:4,l:10},{t:'Xà phòng hoá',p:18,d:2,l:11},{t:'Đồng phân este',p:64,d:7,l:11}],
+  ruong:{daLam:8,tong:12,moDuoc:false,daMo:false,vang:0}},
+ moi:{ten:'Amin – Amino axit',theLuc:{con:12,tong:12},cd:{coXat:0,tong:30,thanhThao:0,tangTu:'thứ Tư 30/09'},soChuyen:null,
+  cau:null,kq:[],khoa:false,het:'Hôm nay chưa có câu nào cho em ở đảo. Em quay lại sau nhé.',vung:[],ruong:null},
+ tam:{ten:'Este – Lipit',theLuc:{con:2,tong:12},cd:{coXat:32,tong:40,thanhThao:22,tangTu:''},soChuyen:{k:4,n:4},
+  cau:['on_lai','moi','on_lai','moi','moi','trum'],kq:[],khoa:false,het:'',
+  vung:[{t:'Thuỷ phân este',p:92,d:22,l:24},{t:'Đốt cháy este',p:85,d:11,l:13},{t:'Chất béo',p:78,d:7,l:9},{t:'Xà phòng hoá',p:81,d:9,l:11},{t:'Đồng phân este',p:88,d:15,l:17},{t:'Bài tập hỗn hợp',p:70,d:7,l:10}],
+  ruong:{daLam:12,tong:12,moDuoc:true,daMo:false,vang:0}},
+ khoa:{ten:'Este – Lipit',theLuc:{con:8,tong:12},cd:{coXat:22,tong:40,thanhThao:6,tangTu:''},soChuyen:{k:2,n:4},
+  cau:['moi','moi','on_lai','moi','on_lai','trum'],kq:[],khoa:true,het:'',
+  vung:[{t:'Thuỷ phân este',p:72,d:13,l:18},{t:'Đốt cháy este',p:55,d:6,l:11},{t:'Chất béo',p:40,d:4,l:10},{t:'Xà phòng hoá',p:18,d:2,l:11},{t:'Đồng phân este',p:64,d:7,l:11}],
+  ruong:{daLam:8,tong:12,moDuoc:false,daMo:false,vang:0}}
+};
+const TEN_VAI={moi:'Câu mới',on_lai:'Ôn lại',trum:'Trùm ải'},NHAN={moi:'Mới',on_lai:'Ôn lại',trum:'Trùm'};
+/* hạt giống cố định → ảnh chụp lặp lại được */
+let seed=7;const rnd=()=>(seed=(seed*9301+49297)%233280)/233280;
+const el=(tag,at={},cha)=>{const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);if(cha)cha.appendChild(e);return e};
+const h=(s)=>{const t=document.createElement('template');t.innerHTML=s.trim();return t.content.firstChild};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ── biển: sóng + lấp lánh (vẽ một lần) ── */
+(function veBien(){const s=document.getElementById('bien');seed=3;
+ for(let i=0;i<16;i++){const y=230+i*36,g=el('g',{class:'song'+(i%2?' nguoc':''),style:`--t:${8+rnd()*8}s`},s);
+  let d='';for(let x=-120;x<560;x+=40)d+=`M${x} ${y} q10 -5 20 0 `;el('path',{d,stroke:'rgb(255 255 255 / '+(.1+rnd()*.18).toFixed(2)+')','stroke-width':'2',fill:'none','stroke-linecap':'round'},g)}
+ for(let i=0;i<34;i++)el('ellipse',{class:'lap',cx:(rnd()*400).toFixed(0),cy:(220+rnd()*560).toFixed(0),rx:(3+rnd()*6).toFixed(1),ry:'1.2',fill:'rgb(255 250 220 / .9)',style:`--t:${2+rnd()*3}s;--d:${-rnd()*3}s`},s);
+ const sao=document.getElementById('sao');for(let i=0;i<46;i++){const e=document.createElement('i');e.style.cssText=`left:${(rnd()*100).toFixed(1)}%;top:${(rnd()*22).toFixed(1)}%;--t:${2+rnd()*3}s;--d:${-rnd()*3}s;opacity:.6`;sao.appendChild(e)}
+})();
+
+/* ── đảo: phần tĩnh (vách, bóng, mặt cỏ, viền sáng, cây) ── */
+function veDao(ca){
+ const s=document.getElementById('dao');s.textContent='';seed=11;
+ const defs=el('defs',{},s);
+ defs.innerHTML=`
+ <linearGradient id="g-co" x1="0" y1="0" x2=".4" y2="1"><stop offset="0" style="stop-color:var(--co-1)"/><stop offset=".55" style="stop-color:var(--co-2)"/><stop offset="1" style="stop-color:var(--co-3)"/></linearGradient>
+ <linearGradient id="g-vach" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--vach-1)"/><stop offset="1" style="stop-color:var(--vach-3)"/></linearGradient>
+ <linearGradient id="g-vien" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--vien-sang);stop-opacity:1"/><stop offset=".5" style="stop-color:var(--vien-sang);stop-opacity:.25"/><stop offset="1" style="stop-color:var(--vien-sang);stop-opacity:0"/></linearGradient>
+ <radialGradient id="g-hao" cx="30%" cy="25%" r="70%"><stop offset="0" stop-color="rgb(255 255 230)" stop-opacity=".45"/><stop offset="1" stop-color="rgb(255 255 230)" stop-opacity="0"/></radialGradient>
+ <filter id="f-mo" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
+ <filter id="f-bong" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="10"/></filter>
+ <filter id="f-suong" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="11"/></filter>
+ <filter id="f-sang" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="3.5"/></filter>
+ <clipPath id="c-dao"><path d="${DAO}"/></clipPath>`;
+ /* bóng đảo đổ xuống nước */
+ el('path',{d:DAO,fill:'var(--bong-dao)',transform:'translate(16 54)',filter:'url(#f-bong)'},s);
+ /* bọt sóng quanh chân đảo */
+ el('path',{d:DAO,fill:'none',stroke:'var(--bot)','stroke-width':'5',transform:'translate(0 44)',class:'bot-vien'},s);
+ el('path',{d:DAO,fill:'none',stroke:'var(--bot)','stroke-width':'2',transform:'translate(0 50) scale(1.02) translate(-4 -4)','stroke-dasharray':'10 8',class:'bot-vien b2'},s);
+ /* vách đá nhiều lớp */
+ [[40,'var(--vach-3)'],[31,'var(--vach-2)'],[22,'url(#g-vach)'],[12,'var(--vach-1)'],[5,'var(--vach-1)']].forEach(([dy,f])=>el('path',{d:DAO,fill:f,transform:`translate(0 ${dy})`},s));
+ /* vân vách */
+ [[10,.35],[18,.3],[27,.28],[36,.25]].forEach(([dy,o])=>el('path',{d:DAO,fill:'none',stroke:`rgb(50 26 30 / ${o})`,'stroke-width':'1.4',transform:`translate(0 ${dy})`},s));
+ el('path',{d:DAO,fill:'none',stroke:'rgb(255 236 200 / .35)','stroke-width':'1',transform:'translate(0 13)'},s);
+ /* mặt cỏ */
+ el('path',{d:DAO,fill:'url(#g-co)'},s);
+ const mat=el('g',{'clip-path':'url(#c-dao)'},s);
+ /* mảng đất theo vùng: ranh giới mềm */
+ const soVung=Math.max(ca.vung.length,0);
+ const vg=el('g',{filter:'url(#f-mo)'},mat);
+ VUNG.forEach((v,i)=>{const [cx,cy,rx,ry]=v.c,[tone,op]=TONE[i];el('ellipse',{cx,cy,rx,ry,style:`fill:var(--${tone})`,opacity:i<soVung?op:op*.5},vg)});
+ /* ranh vùng: đường mòn mảnh */
+ el('path',{d:'M204 76 C198 150 214 200 200 250 C188 300 206 350 200 390 M36 248 C110 236 160 262 200 250 C250 238 300 256 368 244',fill:'none',stroke:'rgb(255 255 240 / .28)','stroke-width':'1.5','stroke-dasharray':'2 6','stroke-linecap':'round'},mat);
+ el('path',{d:DAO,fill:'url(#g-hao)'},mat);
+ /* cây + đá (xếp theo y để che đúng) */
+ const cay=[];for(let i=0;i<30;i++){const x=50+rnd()*300,y=90+rnd()*280;if(NUT.some(([a,b])=>Math.hypot(a-x,b-y)<34))continue;if(VUNG.some(v=>Math.hypot(v.n[0]-x,v.n[1]-y)<30))continue;cay.push([x,y,rnd()])}
+ cay.sort((a,b)=>a[1]-b[1]).forEach(([x,y,r])=>{const g=el('g',{class:'la-cay',style:`--d:${-r*4}s`},mat);
+  if(r<.72){el('ellipse',{cx:x+3,cy:y+2,rx:7,ry:2.6,fill:'rgb(20 50 30 / .3)'},g);el('rect',{x:x-1.2,y:y-6,width:2.4,height:7,fill:'var(--vach-2)'},g);el('circle',{cx:x,cy:y-10,r:6+r*3,style:'fill:var(--co-3)'},g);el('circle',{cx:x-2,cy:y-12,r:3.4+r*2,style:'fill:var(--co-2)'},g)}
+  else{el('ellipse',{cx:x,cy:y,rx:6,ry:4,style:'fill:var(--vach-1)'},g);el('ellipse',{cx:x-1,cy:y-1.4,rx:3.5,ry:1.8,fill:'rgb(255 255 255 / .35)'},g)}});
+ /* viền sáng mép trên */
+ el('path',{d:DAO,fill:'none',stroke:'url(#g-vien)','stroke-width':'3'},s);
+ /* các lớp động được vẽ riêng */
+ el('g',{id:'lop-den'},s);el('g',{id:'lop-suong','clip-path':'url(#c-dao)'},s);el('g',{id:'lop-duong'},s);
+}
+
+function duongMuot(p){let d=`M${p[0][0]} ${p[0][1]}`;for(let i=0;i<p.length-1;i++){const a=p[i-1]||p[i],b=p[i],c=p[i+1],e=p[i+2]||c;
+ d+=` C${(b[0]+(c[0]-a[0])/6).toFixed(1)} ${(b[1]+(c[1]-a[1])/6).toFixed(1)} ${(c[0]-(e[0]-b[0])/6).toFixed(1)} ${(c[1]-(e[1]-b[1])/6).toFixed(1)} ${c[0]} ${c[1]}`}return d}
+
+function veDong(ca){
+ const cd=ca.cd,tile=cd&&cd.tong?cd.coXat/cd.tong:0;
+ /* sương mỗi vùng: độ đục theo % thật */
+ const su=document.getElementById('lop-suong');su.textContent='';seed=21;
+ const phu=el('g',{filter:'url(#f-suong)'},su);
+ [...VUNG,{c:[206,250,96,84]}].forEach((v,i)=>{const p=ca.vung[i]?ca.vung[i].p/100:tile,op=Math.max(0,1-p*1.08); /* mục 7 = lõi đảo, theo Cọ xát chung */
+  const g=el('g',{class:'suong-vung',opacity:op.toFixed(2)},phu);const [cx,cy,rx,ry]=v.c;
+  for(let k=0;k<6;k++){el('ellipse',{class:'suong-cuon',cx:(cx+(rnd()-.5)*rx*1.2).toFixed(0),cy:(cy+(rnd()-.5)*ry*1.2).toFixed(0),rx:(rx*.62+rnd()*22).toFixed(0),ry:(ry*.58+rnd()*16).toFixed(0),style:`fill:var(--${k%2?'suong':'suong-hong'});--t:${10+rnd()*8}s;--d:${-rnd()*10}s`},g)}});
+ /* đền + cờ ở vùng thành thạo (vùng % cao nhất) */
+ const den=document.getElementById('lop-den');den.textContent='';
+ const soDen=cd&&cd.thanhThao>0&&cd.tong>0?Math.min(6,Math.ceil(6*cd.thanhThao/cd.tong)):0;
+ const thuTu=VUNG.map((_,i)=>i).sort((a,b)=>((ca.vung[b]||{p:-1}).p)-((ca.vung[a]||{p:-1}).p));
+ thuTu.slice(0,soDen).forEach(i=>{const [x,y]=DEN[i];const g=el('g',{},den);
+  el('ellipse',{cx:x+3,cy:y+3,rx:15,ry:4,fill:'rgb(20 40 30 / .35)'},g);
+  el('rect',{x:x-11,y:y-4,width:22,height:6,rx:1,fill:'rgb(240 226 200)'},g);
+  el('rect',{x:x-11,y:y+1,width:22,height:3,fill:'rgb(190 160 120)'},g);
+  [-7,0,7].forEach(o=>el('rect',{x:x+o-1.3,y:y-15,width:2.6,height:11,fill:'rgb(255 248 230)'},g));
+  el('path',{d:`M${x-14} ${y-15} L${x} ${y-25} L${x+14} ${y-15} Z`,fill:'rgb(214 70 60)'},g);
+  el('path',{d:`M${x-14} ${y-15} L${x} ${y-25} L${x} ${y-15} Z`,fill:'rgb(240 110 90)'},g);
+  el('rect',{x:x-.8,y:y-44,width:1.6,height:20,fill:'rgb(120 80 50)'},g);
+  el('path',{class:'co',d:`M${x+.8} ${y-44} l14 4 -14 5 z`,fill:'rgb(255 196 46)'},g);});
+ /* đường ải phát sáng + 6 mốc */
+ const du=document.getElementById('lop-duong');du.textContent='';
+ const cau=ca.cau||[],kq=ca.kq,hien=Math.min(kq.length,5);
+ const d=duongMuot(NUT);
+ el('path',{d,fill:'none',stroke:'rgb(90 60 20 / .35)','stroke-width':'9','stroke-linecap':'round',transform:'translate(0 2)'},du);
+ el('path',{d,fill:'none',stroke:'rgb(240 214 160)','stroke-width':'7','stroke-linecap':'round'},du);
+ el('path',{d,fill:'none',stroke:'var(--duong-sang)','stroke-width':'6','stroke-linecap':'round',filter:'url(#f-sang)',opacity:cau.length?'.8':'.35'},du);
+ el('path',{d,fill:'none',stroke:'rgb(255 255 240)','stroke-width':'2.2','stroke-linecap':'round',class:'duong-sang',opacity:cau.length?'1':'.4'},du);
+ NUT.forEach(([x,y],i)=>{const vai=cau[i]||null,trum=i===5,r=trum?TRUM_R:NUT_R,k=kq[i];
+  const trang=k===undefined?'cho':(k?'dung':'sai');const g=el('g',{},du);
+  el('ellipse',{cx:x,cy:y+r*.55,rx:r*1.05,ry:r*.42,fill:'rgb(40 20 10 / .35)'},g);
+  if(i===hien&&cau.length)el('circle',{cx:x,cy:y,r:r+4,fill:'none',stroke:'var(--vang)','stroke-width':'3',class:'nut-hien'},g);
+  if(trum)el('circle',{cx:x,cy:y,r:r+6,fill:'rgb(255 60 110 / .55)',filter:'url(#f-sang)'},g);
+  const mau=!cau.length?'rgb(200 200 210)':trang==='dung'?'rgb(40 170 110)':trang==='sai'?'rgb(240 120 90)':trum?'rgb(214 40 96)':vai==='on_lai'?'rgb(0 170 175)':'rgb(255 196 46)';
+  el('circle',{cx:x,cy:y+2.5,r,fill:'rgb(60 30 30 / .45)'},g);
+  el('circle',{cx:x,cy:y,r,fill:mau,stroke:'rgb(255 255 255)','stroke-width':'2.5'},g);
+  el('ellipse',{cx:x-r*.3,cy:y-r*.4,rx:r*.45,ry:r*.25,fill:'rgb(255 255 255 / .45)'},g);
+  if(trang==='dung')el('path',{d:`M${x-4.5} ${y} l3 3.5 6 -7`,fill:'none',stroke:'rgb(255 255 255)','stroke-width':'2.6','stroke-linecap':'round','stroke-linejoin':'round'},g);
+  else if(trang==='sai')el('path',{d:`M${x-3.5} ${y-3.5} l7 7 M${x+3.5} ${y-3.5} l-7 7`,stroke:'rgb(255 255 255)','stroke-width':'2.4','stroke-linecap':'round'},g);
+  else if(trum)el('path',{d:`M${x-9} ${y+5} l2 -10 4.5 4.5 2.5 -7 2.5 7 4.5 -4.5 2 10 z`,fill:'rgb(255 226 120)',stroke:'rgb(150 76 0)','stroke-width':'1','stroke-linejoin':'round'},g);
+  else if(vai==='on_lai')el('path',{d:`M${x-4.5} ${y} a4.5 4.5 0 1 1 4.5 4.5`,fill:'none',stroke:'rgb(255 255 255)','stroke-width':'2.2','stroke-linecap':'round'},g);
+  else el('path',{d:`M${x} ${y-5.5} l3.2 5.5 -3.2 5.5 -3.2 -5.5 z`,fill:'rgb(255 255 255)'},g);});
+}
+
+/* thần thú tượng trưng (build: <img src={anhThu(thu,profile.cap,true)}>) */
+const THU=`<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="58" rx="16" ry="4" fill="rgb(20 20 40 / .3)"/><path d="M14 22 L10 6 L24 16 Z M50 22 L54 6 L40 16 Z" fill="rgb(255 150 90)"/><ellipse cx="32" cy="36" rx="21" ry="20" fill="rgb(255 190 110)"/><ellipse cx="32" cy="44" rx="12" ry="10" fill="rgb(255 236 200)"/><circle cx="24" cy="32" r="4.2" fill="rgb(40 24 40)"/><circle cx="40" cy="32" r="4.2" fill="rgb(40 24 40)"/><circle cx="25.4" cy="30.6" r="1.5" fill="rgb(255 255 255)"/><circle cx="41.4" cy="30.6" r="1.5" fill="rgb(255 255 255)"/><path d="M29 40 q3 3 6 0" stroke="rgb(120 50 30)" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="19" cy="39" r="3" fill="rgb(255 120 130 / .5)"/><circle cx="45" cy="39" r="3" fill="rgb(255 120 130 / .5)"/><path d="M50 44 q10 -2 8 -12" stroke="rgb(255 150 90)" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`;
+
+/* đổi toạ độ bản vẽ → px trong khung (preserveAspectRatio meet) */
+function doiToaDo(){const k=document.getElementById('dao-lop'),W=k.clientWidth,H=k.clientHeight,s=Math.min(W/VB.w,H/VB.h),ox=(W-VB.w*s)/2,oy=(H-VB.h*s)/2;return (x,y)=>[ox+(x-VB.x)*s,oy+(y-VB.y)*s]}
+function datNhan(){const P=doiToaDo(),k=document.getElementById('dao-lop'),W=k.clientWidth,H=k.clientHeight;
+ document.querySelectorAll('#phu [data-x]').forEach(e=>{let [x,y]=P(+e.dataset.x,+e.dataset.y);if(e.classList.contains('nhan')){const w=e.offsetWidth/2+6,hh=e.offsetHeight/2+4;x=Math.max(w,Math.min(W-w,x));y=Math.max(hh,Math.min(H-hh,y))}e.style.left=x+'px';e.style.top=y+'px'})}
+
+let caHien='dido';
+function veHUD(){const ca=CA[caHien],cd=ca.cd;
+ document.getElementById('ten-dao').textContent=cd?`Đảo ${ca.ten}`:'Bát Linh Đảo';
+ const tl=document.getElementById('the-luc');
+ tl.hidden=!ca.theLuc;if(ca.theLuc){tl.setAttribute('aria-label',`Thể lực hôm nay: còn ${ca.theLuc.con} trên ${ca.theLuc.tong} câu`);tl.innerHTML=`<svg viewBox="0 0 14 16" width="14" height="16" aria-hidden="true"><polygon points="7,0 14,5 11,16 3,16 0,5"/></svg><span><small>Thể lực</small>${ca.theLuc.con}/${ca.theLuc.tong}</span>`}
+ /* nhãn vùng + thần thú */
+ const phu=document.getElementById('phu');phu.textContent='';
+ const ul=h('<ul aria-label="Vùng đất theo dạng bài" style="margin:0;padding:0;list-style:none"></ul>');phu.appendChild(ul);
+ ca.vung.slice(0,6).forEach((v,i)=>{const li=h(`<li class="nhan kinh" data-x="${VUNG[i].n[0]}" data-y="${VUNG[i].n[1]}" ${v.p>=60?'data-sang':''} aria-label="Vùng ${esc(v.t)}: ${v.p}% câu làm đúng ở lần gần nhất (${v.d}/${v.l} câu)">${esc(v.t)} · <b>${v.p}%</b></li>`);ul.appendChild(li)});
+ const hien=Math.min(ca.kq.length,5),[tx,ty]=ca.cau?NUT[hien]:[110,330];
+ const thu=h(`<div class="thu" data-x="${tx}" data-y="${ty}" role="img" aria-label="Thần thú của em: Hoả Linh">${THU}</div>`);phu.appendChild(thu);
+ /* cột phải / tấm dưới */
+ const ph=document.getElementById('phai');ph.textContent='';
+ if(cd){ph.appendChild(h(`<div class="so"><p class="kinh"><small>Sương đã tan · Cọ xát</small><b class="so-xanh">${cd.coXat}/${cd.tong} ô</b></p><p class="kinh"><small>Đền đã dựng · Thành thạo</small><b class="so-vang">${cd.thanhThao}/${cd.tong} ô</b>${cd.thanhThao===0&&cd.tangTu?`<small>Đền mọc từ ${cd.tangTu}</small>`:''}</p>${ca.vung.length?'<p class="chu-thich">1 ô = 1 câu của chiến dịch · % ở mỗi vùng = câu em làm đúng ở lần gần nhất</p>':''}</div>`))}
+ const cau=ca.cau;
+ let t=`<section class="kinh tam" aria-label="Chuyến thám hiểm hôm nay"><div class="tam-dau"><h2>${ca.soChuyen?`Chuyến thám hiểm ${ca.soChuyen.k}/${ca.soChuyen.n}`:'Chuyến thám hiểm'}</h2>${cau?`<span>${cau.length} ải · ${cau.length}–${cau.length+2} phút</span>`:''}</div>`;
+ if(ca.het)t+=`<p class="het" role="status">${esc(ca.het)}</p>`;
+ else t+='<ol class="vai" aria-label="Vai của từng ải">'+cau.map((v,i)=>{const k=ca.kq[i];return `<li data-vai="${v}" ${k===undefined?'':`data-trang="${k?'dung':'sai'}"`} ${i===hien&&!ca.khoa?'data-hien':''} aria-label="Ải ${i+1}: ${TEN_VAI[v]}${k===undefined?'':(k?' · đã qua, đúng':' · đã qua, chưa đúng')}">${NHAN[v]}</li>`}).join('')+'</ol>';
+ const ru=ca.ruong;
+ if(ru&&ru.tong>0)t+=`<div class="ruong"><svg viewBox="0 0 28 24" width="28" height="24" aria-hidden="true"><rect x="2" y="9" width="24" height="13" rx="2" fill="rgb(186 98 6)"/><path d="M2 11 C2 4 26 4 26 11 Z" fill="rgb(246 146 18)"/><rect x="12" y="9" width="4" height="7" rx="1" fill="rgb(255 226 120)"/></svg><span><b>${ru.daMo?'Rương Bát Linh · đã mở hôm nay':`Rương Bát Linh · xong ${ru.tong}/${ru.tong} câu hôm nay để mở`}</b><span class="vach" role="progressbar" aria-label="Câu đã làm hôm nay" aria-valuemin="0" aria-valuemax="${ru.tong}" aria-valuenow="${Math.min(ru.daLam,ru.tong)}"><i style="transform:scaleX(${Math.min(1,ru.daLam/ru.tong)})"></i></span></span><span class="ruong-so">${Math.min(ru.daLam,ru.tong)}/${ru.tong}</span>${ru.moDuoc&&!ru.daMo?'<button type="button" class="nut-vien">Mở rương</button>':''}</div>`;
+ if(ca.khoa)t+='<p class="ghi khoa" role="status">Đảo đang khoá: em còn câu ôn hôm nay ở Đoàn Hộ Tống — làm xong là đảo mở.</p>';
+ else if(ca.kq.length&&!ca.het)t+=`<p class="ghi">Em đang đi dở chuyến — bấm LÊN ĐƯỜNG để đi tiếp từ ải ${ca.kq.length+1}.</p>`;
+ if(!ca.het)t+=`<button type="button" class="nut-vang" ${ca.khoa?'disabled':''}><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>LÊN ĐƯỜNG · XUA SƯƠNG MÙ</button>`;
+ t+='</section>';ph.appendChild(h(t));
+ datNhan();
+}
+function ve(){const ca=CA[caHien];veDao(ca);veDong(ca);veHUD();
+ document.querySelectorAll('[data-ca]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.ca===caHien)))}
+
+/* ── bảng thử + giao diện ── */
+const bang=document.getElementById('thu-bang'),moThu=document.getElementById('mo-thu');
+moThu.addEventListener('click',()=>{const m=!bang.hasAttribute('data-mo');bang.toggleAttribute('data-mo',m);moThu.setAttribute('aria-expanded',String(m))});
+bang.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.ca){caHien=b.dataset.ca;ve()}
+ if(b.dataset.gd!==undefined){if(b.dataset.gd)document.documentElement.dataset.giaoDien=b.dataset.gd;else delete document.documentElement.dataset.giaoDien;danhDauGd()}});
+function danhDauGd(){const g=document.documentElement.dataset.giaoDien||'';document.querySelectorAll('[data-gd]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gd===g)))}
+document.getElementById('toan-man').addEventListener('click',()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}});
+
+/* ── thị sai: chỉ khi có chuột / nghiêng máy; dừng khi tab ẩn ── */
+const giam=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let mx=0,my=0,cx=0,cy=0,raf=0;
+const lop=[...document.querySelectorAll('[data-sau]')];
+function buoc(){cx+=(mx-cx)*.08;cy+=(my-cy)*.08;lop.forEach(l=>{const k=+l.dataset.sau;l.style.transform=`translate3d(${(cx*k*18).toFixed(2)}px,${(cy*k*10).toFixed(2)}px,0)`});
+ raf=Math.abs(mx-cx)+Math.abs(my-cy)>.002&&!document.hidden?requestAnimationFrame(buoc):0}
+function day(x,y){if(giam)return;mx=x;my=y;if(!raf)raf=requestAnimationFrame(buoc)}
+addEventListener('pointermove',e=>day(e.clientX/innerWidth-.5,e.clientY/innerHeight-.5),{passive:true});
+addEventListener('deviceorientation',e=>{if(e.gamma!=null)day(Math.max(-1,Math.min(1,e.gamma/30))*.5,Math.max(-1,Math.min(1,(e.beta-40)/30))*.5)},{passive:true});
+new ResizeObserver(()=>datNhan()).observe(document.getElementById('dao-lop'));
+if(document.fonts)document.fonts.ready.then(datNhan);
+const q=new URLSearchParams(location.search);if(CA[q.get('ca')])caHien=q.get('ca');if(q.get('gd'))document.documentElement.dataset.giaoDien=q.get('gd');
+ve();danhDauGd();
+</script>
+</body>
+</html>
