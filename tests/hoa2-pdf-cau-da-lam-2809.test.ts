@@ -3,7 +3,7 @@
 // KIẾN THỨC CỐT LÕI → từng phương án/ý ✓✗ · bước + kết quả · Lịch sử), công thức ra <sub>, chia trang, và đường jsPDF (thư viện giả).
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { docChiTiet, type CauDaLamMuc } from '../src/components/hoa2/api'
-import { cauPdfHtml, chanTrangPdf, chiaTrang, dauCauPdf, dongThongTinPdf, dungPdf, slugChu, tenTepPdf, tieuDePdf, type ThongTinIn } from '../src/components/hoa2/pdf-cau-da-lam'
+import { cauChiDePdfHtml, cauPdfHtml, chanTrangPdf, chiaTrang, dauCauPdf, dongThongTinPdf, dungPdf, slugChu, tenTepPdf, tieuDePdf, type ThongTinIn } from '../src/components/hoa2/pdf-cau-da-lam'
 
 const { anhGia, addPageGia, addImageGia, html2canvasGia } = vi.hoisted(() => ({
   anhGia: [] as string[],
@@ -138,5 +138,25 @@ describe('tờ PDF Câu đã làm — khớp bản vẽ HS-PDF', () => {
     expect(addPageGia).not.toHaveBeenCalled()
     expect(tienDo).toHaveBeenLastCalledWith(1, 1)
     expect(document.querySelector('.pdfc-goc')).toBeNull()
+  })
+})
+
+// Thầy 28/09: "cho thêm chế độ chỉ tải nguyên đề" + "độ nét của pdf chưa ổn".
+describe('PDF chế độ CHỈ ĐỀ + độ nét', () => {
+  it('chỉ đề: có đề + phương án, KHÔNG lời giải / đáp án / dấu ✓✗ / bài làm / lịch sử', () => {
+    for (const [muc, ct] of [[M_17, CT_17], [MUC({ qid: 'q5', stt: 5 }), CT_5], [MUC({ qid: 'q31', stt: 31 }), CT_31]] as const) {
+      const h = cauChiDePdfHtml({ muc, ct })
+      expect(h).toContain(`Câu ${muc.stt}`)
+      expect(h).not.toMatch(/LỜI GIẢI|KIẾN THỨC CỐT LÕI|✓|✗|em chọn|Em trả lời|Em:|Lịch sử|Đang ôn|Cần dạy lại/)
+    }
+  })
+  it('tên tệp + tiêu đề có hậu tố chỉ đề', () => {
+    expect(tenTepPdf('Sai lần gần nhất', LUC, true)).toBe('cau-da-lam-sai-lan-gan-nhat-chi-de-04-10-2026.pdf')
+    expect(tieuDePdf('Sai lần gần nhất', true)).toBe('Câu đã làm — Sai lần gần nhất · Chỉ đề')
+  })
+  it('độ nét: chụp trang ở scale 3 (tờ ngắn)', async () => {
+    html2canvasGia.mockClear()
+    await dungPdf({ ...TT, chiDe: true }, [{ muc: M_17, ct: CT_17 }])
+    expect(html2canvasGia.mock.calls[0]![1]).toMatchObject({ scale: 3 })
   })
 })

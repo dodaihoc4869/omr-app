@@ -172,7 +172,7 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
     return co
   }
 
-  const taiPdf = async () => {
+  const taiPdf = async (chiDe = false) => {
     if (pdf.dang || dsLoc.length === 0) return
     const ds = dsLoc
     const tenCd = cd?.ten ?? ''
@@ -189,10 +189,10 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
       setPdf((x) => ({ ...x, chu: 'Đang dựng tệp PDF…' }))
       const { dungPdf, luuTep, tenTepPdf } = await import('./pdf-cau-da-lam')
       const inLuc = Date.now()
-      const blob = await dungPdf({ hoTen, lop, sbd, tenChienDich: tenCd, nhanBoLoc: boLoc.nhan, inLuc }, cauIn, (t, tong) =>
+      const blob = await dungPdf({ hoTen, lop, sbd, tenChienDich: tenCd, nhanBoLoc: boLoc.nhan, inLuc, chiDe }, cauIn, (t, tong) =>
         setPdf((x) => ({ ...x, chu: `Đang dựng trang ${t}/${tong}…` })),
       )
-      const ten = tenTepPdf(boLoc.nhan, inLuc)
+      const ten = tenTepPdf(boLoc.nhan, inLuc, chiDe)
       luuTep(blob, ten)
       const thieu = ds.length - cauIn.length
       setPdf({ ...PDF_TRONG, xong: `Đã tải tệp ${ten} (${cauIn.length} câu).${thieu > 0 ? ` Có ${thieu} câu máy chủ chưa trả được nên chưa có trong tệp.` : ''}` })
@@ -361,12 +361,23 @@ export default function CauDaLam({ token, hoTen, sbd, lop = '', onVe }: CauDaLam
     </>
   )
   const nutPdf = (
-    <button type="button" className="h2-cdl-nut-chinh" disabled={pdf.dang || dsLoc.length === 0} aria-busy={pdf.dang} onClick={() => void taiPdf()}>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
-        <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
-      </svg>
-      {pdf.dang ? pdf.chu : `Tải PDF · ${dsLoc.length} câu đang lọc`}
-    </button>
+    <div className="h2-cdl-hang-pdf">
+      <button type="button" className="h2-cdl-nut-chinh" disabled={pdf.dang || dsLoc.length === 0} aria-busy={pdf.dang} onClick={() => void taiPdf()}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+          <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
+        </svg>
+        {pdf.dang ? pdf.chu : `Tải PDF · ${dsLoc.length} câu đang lọc`}
+      </button>
+      {/* Chế độ CHỈ ĐỀ (thầy 28/09): tờ sạch để em in ra làm lại — không đáp án, không lời giải. */}
+      {!pdf.dang && (
+        <button type="button" className="h2-cdl-nut-phu h2-cdl-chi-de" disabled={dsLoc.length === 0} onClick={() => void taiPdf(true)}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h5" />
+          </svg>
+          Tải chỉ đề · để làm lại
+        </button>
+      )}
+    </div>
   )
   const nutDuPhong = pdf.duPhong && !pdf.dang && (
     <button type="button" className="h2-cdl-nut-phu h2-cdl-du-phong" onClick={() => void moBanIn()}>

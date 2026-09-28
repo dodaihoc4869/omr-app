@@ -31,6 +31,8 @@ export interface ThongTinIn {
   nhanBoLoc: string
   /** Mốc in (ms). */
   inLuc: number
+  /** Chế độ CHỈ ĐỀ (thầy 28/09): chỉ in đề + phương án/ý sạch để em làm lại — không đáp án, không lời giải, không bài làm/lịch sử. */
+  chiDe?: boolean
 }
 
 const LECH_VN = 7 * 3600_000
@@ -53,14 +55,14 @@ function ngayVn(ms: number): [string, string, string] {
 }
 
 /** Tên tệp: `cau-da-lam-sai-lan-gan-nhat-28-09-2026.pdf`. */
-export function tenTepPdf(nhanBoLoc: string, ms: number): string {
+export function tenTepPdf(nhanBoLoc: string, ms: number, chiDe = false): string {
   const [d, m, y] = ngayVn(ms)
-  return `cau-da-lam-${slugChu(nhanBoLoc) || 'tat-ca'}-${d}-${m}-${y}.pdf`
+  return `cau-da-lam-${slugChu(nhanBoLoc) || 'tat-ca'}${chiDe ? '-chi-de' : ''}-${d}-${m}-${y}.pdf`
 }
 
 /** "Câu đã làm — Sai lần gần nhất" */
-export function tieuDePdf(nhanBoLoc: string): string {
-  return `Câu đã làm — ${nhanBoLoc}`
+export function tieuDePdf(nhanBoLoc: string, chiDe = false): string {
+  return `Câu đã làm — ${nhanBoLoc}${chiDe ? ' · Chỉ đề' : ''}`
 }
 
 /** "Nguyễn An · Lớp 12A1 · Chiến dịch Ester – Lipid · 14 câu · In lúc 20:15 Chủ Nhật 04/10/2026" */
@@ -120,6 +122,33 @@ export function dauCauPdf(m: MucIn): string {
   ]
     .filter(Boolean)
     .join(' · ')
+}
+
+/** CHỈ ĐỀ: đầu câu (số câu · phần · mức độ) + đề + hình/bảng + phương án/ý SẠCH (không ✓✗, không "em chọn"), chừa dòng làm bài. */
+export function cauChiDePdfHtml(m: MucIn): string {
+  const { muc, ct } = m
+  const { de } = ct
+  const phan: string[] = []
+  const dau = [muc.stt > 0 ? `Câu ${muc.stt}` : 'Câu', NHAN_PHAN[de.phan], nhanMucDo(de.mucDo ?? muc.mucDo)].filter(Boolean).join(' · ')
+  phan.push(`<div class="pdfc-dau">${thoat(dau)}</div>`)
+  phan.push(de.thanCauImg ? `<div class="pdfc-de">${anh(de.thanCauImg, 'Đề bài')}</div>` : `<div class="pdfc-de">${chuHtml(de.text)}</div>`)
+  const phuDe = [anh(de.imageDataUrl, 'Hình của câu'), anhViTri(ct, 'sau_de'), bangHtml(de.table)].join('')
+  if (phuDe) phan.push(`<div class="pdfc-phu">${phuDe}</div>`)
+  if (de.phan === 'I') {
+    const dai = de.choices.some((c) => c.length > 40) || de.choiceImgs?.some(Boolean) ? 1 : de.choices.some((c) => c.length > 12) ? 2 : 4
+    const o = CHU_PA.map((k, i) => `<span class="pdfc-pa">${k}. ${de.choiceImgs?.[i] ? anh(de.choiceImgs[i], `Phương án ${k}`) : chuHtml(de.choices[i] ?? '')}</span>`).join('')
+    const cot = dai === 4 ? 'repeat(4,max-content);column-gap:36px' : `repeat(${dai},minmax(0,1fr))`
+    phan.push(`<div class="pdfc-ds-pa" style="grid-template-columns:${cot}">${o}</div>`)
+  } else if (de.phan === 'II') {
+    const dai = de.ideas.some((c) => c.length > 60) ? 1 : 2
+    const o = CHU_Y.map((c, i) => `<span class="pdfc-y">${c}) ${chuHtml(de.ideas[i] ?? '')}${de.ideaImgs?.[i] ? anh(de.ideaImgs[i], `Ý ${c}`) : ''} <b class="pdfc-o-ds">Đ ☐ · S ☐</b></span>`).join('')
+    phan.push(`<div class="pdfc-ds-y" style="grid-template-columns:repeat(${dai},minmax(0,1fr))">${o}</div>`)
+  } else {
+    phan.push(`<div class="pdfc-ghi">Đáp số: ........................................</div>`)
+  }
+  const cuoi = anhViTri(ct, 'cuoi_cau')
+  if (cuoi) phan.push(`<div class="pdfc-phu">${cuoi}</div>`)
+  return `<section class="pdfc-cau" data-chi-de="">${phan.join('')}</section>`
 }
 
 /** Một câu trên tờ PDF — đúng khối của bản vẽ HS-PDF. */
@@ -208,7 +237,7 @@ export function cauPdfHtml(m: MucIn): string {
 
 /** Khối đầu tờ: tiêu đề + dòng thông tin. */
 export function dauPdfHtml(tt: ThongTinIn, soCau: number): string {
-  return `<header class="pdfc-dau-to"><div class="pdfc-tieu">${thoat(tieuDePdf(tt.nhanBoLoc))}</div><div class="pdfc-tt">${thoat(dongThongTinPdf(tt, soCau))}</div></header>`
+  return `<header class="pdfc-dau-to"><div class="pdfc-tieu">${thoat(tieuDePdf(tt.nhanBoLoc, tt.chiDe))}</div><div class="pdfc-tt">${thoat(dongThongTinPdf(tt, soCau))}</div></header>`
 }
 
 export const RONG_TRANG = 794
@@ -233,6 +262,8 @@ export const CSS_PDF = `
 .pdfc-xanh{font-weight:700;color:rgb(20 108 46)}
 .pdfc-do{font-weight:700;color:rgb(179 38 30)}
 .pdfc-ghi{font-size:13px;line-height:1.5;color:rgb(68 71 70)}
+.pdfc-o-ds{margin-left:6px;font-weight:600;color:rgb(68 71 70);white-space:nowrap}
+.pdfc-cau[data-chi-de] .pdfc-ghi{margin-top:6px;font-size:14px}
 .pdfc-lg{padding:12px 14px;border-radius:12px;background:rgb(233 238 246)}
 .pdfc-lgn{font-size:12px;font-weight:700;letter-spacing:.1em;color:rgb(11 87 208);margin-bottom:8px}
 .pdfc-chot{margin-bottom:8px;padding:6px 10px;border-left:3px solid rgb(11 87 208);background:rgb(240 244 249);border-radius:0 8px 8px 0}
@@ -286,7 +317,7 @@ export function chiaTrang(cao: number[], caoToiDa: number, khe = 14): number[][]
 
 /** HTML đầy đủ của tờ (để xem thử / kiểm) — các trang nối nhau. */
 export function htmlToPdf(tt: ThongTinIn, ds: MucIn[]): string {
-  return `<div class="pdfc-goc"><div class="pdfc-trang">${dauPdfHtml(tt, ds.length)}${ds.map(cauPdfHtml).join('')}<div class="pdfc-chan"><span>${thoat(chanTrangPdf(tt))}</span><span>Trang 1/1</span></div></div></div>`
+  return `<div class="pdfc-goc"><div class="pdfc-trang">${dauPdfHtml(tt, ds.length)}${ds.map(tt.chiDe ? cauChiDePdfHtml : cauPdfHtml).join('')}<div class="pdfc-chan"><span>${thoat(chanTrangPdf(tt))}</span><span>Trang 1/1</span></div></div></div>`
 }
 
 async function choPhong(): Promise<void> {
@@ -325,7 +356,7 @@ export async function dungPdf(tt: ThongTinIn, ds: MucIn[], tienDo?: (trang: numb
   try {
     await choPhong()
     // 1) Đo từng khối ở đúng bề rộng trang.
-    const khoi = [dauPdfHtml(tt, ds.length), ...ds.map(cauPdfHtml)]
+    const khoi = [dauPdfHtml(tt, ds.length), ...ds.map(tt.chiDe ? cauChiDePdfHtml : cauPdfHtml)]
     const do_ = document.createElement('div')
     do_.className = 'pdfc-trang'
     do_.style.minHeight = '0'
@@ -337,7 +368,8 @@ export async function dungPdf(tt: ThongTinIn, ds: MucIn[], tienDo?: (trang: numb
     // Chiều cao dành cho nội dung: trang trừ lề trên/dưới (44 + 32) và chân trang (~26 px + khe 14).
     const trang = chiaTrang(cao, CAO_TRANG - 44 - 32 - 26 - 14)
     const tong = trang.length
-    const scale = tong > 24 ? 1.5 : 2
+    // Độ nét (thầy 28/09 "độ nét của pdf chưa ổn"): chụp ≈ 3× (≈ 290 dpi trên A4) thay vì 1,5–2×; JPEG 0,95. Tờ rất dài hạ 2,5× cho nhẹ máy.
+    const scale = tong > 30 ? 2.5 : 3
     const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait', compress: true })
     const rongPt = pdf.internal.pageSize.getWidth()
     const caoPt = pdf.internal.pageSize.getHeight()
@@ -349,7 +381,7 @@ export async function dungPdf(tt: ThongTinIn, ds: MucIn[], tienDo?: (trang: numb
       goc.appendChild(el)
       await choAnh(el)
       const canvas = await html2canvas(el, { scale, backgroundColor: 'rgb(255, 255, 255)', useCORS: true, logging: false, width: RONG_TRANG, windowWidth: RONG_TRANG })
-      const anhTrang = canvas.toDataURL('image/jpeg', 0.9)
+      const anhTrang = canvas.toDataURL('image/jpeg', 0.95)
       const caoAnhPt = (canvas.height / canvas.width) * rongPt
       // Câu dài hơn một trang: cùng một ảnh, dịch lên từng khổ A4.
       for (let y = 0; y < caoAnhPt - 1; y += caoPt) {
@@ -362,7 +394,7 @@ export async function dungPdf(tt: ThongTinIn, ds: MucIn[], tienDo?: (trang: numb
       canvas.height = 0
       tienDo?.(t + 1, tong)
     }
-    pdf.setProperties({ title: tieuDePdf(tt.nhanBoLoc), subject: dongThongTinPdf(tt, ds.length), creator: 'Câu đã làm' })
+    pdf.setProperties({ title: tieuDePdf(tt.nhanBoLoc, tt.chiDe), subject: dongThongTinPdf(tt, ds.length), creator: 'Câu đã làm' })
     return pdf.output('blob')
   } finally {
     goc.remove()
