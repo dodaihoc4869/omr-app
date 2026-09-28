@@ -1,0 +1,116 @@
+/* ĐẢO 2.0 · HOẠT CẢNH BẮN CHƯỞNG (ChuongTranDau.tsx). Chỉ transform/opacity; màu tranh cố định như cảnh trận (rgb, không hex).
+   Toạ độ theo đơn vị khung (cqw/cqh) của lớp phủ: thần thú ≈ (21%, 62%), quái ≈ (80%, 60%). */
+.d2c{position:absolute;inset:0;container-type:size;pointer-events:none;overflow:hidden;
+ --xt:21cqw;--yt:62cqh;--xq:80cqw;--yq:58cqh;--xa:var(--xt);--ya:var(--yt);--xb:var(--xq);--yb:var(--yq);--vong:15cqh;
+ --d2c-nhe:rgb(255,255,255)}
+.d2c[data-kieu="sai"]{--xa:var(--xq);--ya:var(--yq);--xb:var(--xt);--yb:var(--yt);--vong:14cqh;--d2c-mau:rgb(168,85,247)}
+.d2c[data-cuong-no]{--d2c-mau:rgb(255,92,138);--d2c-nhe:rgb(255,228,140)}
+.d2c i,.d2c-bay,.d2c-no{position:absolute;display:block}
+.d2c-tu,.d2c-bay{left:var(--xa);top:var(--ya)}
+.d2c-no,.d2c-do{left:var(--xb);top:var(--yb)}
+.d2c-tu,.d2c-bay,.d2c-no,.d2c i{opacity:0}
+.d2c-cau,.d2c-bong,.d2c-tu,.d2c-do,.d2c .d2c-no>i{will-change:transform,opacity}
+
+/* bản giản lược (prefers-reduced-motion): một nháy sáng tại phía trúng đòn */
+.d2c .d2c-nhay{left:var(--xb);top:var(--yb);width:34cqw;height:34cqw;margin:-17cqw 0 0 -17cqw;border-radius:50%;
+ background:radial-gradient(circle,rgba(255,255,255,.85),rgba(255,255,255,0) 65%);animation:d2c-nhay .45s ease-out both}
+.d2c[data-kieu="sai"] .d2c-nhay{background:radial-gradient(circle,rgba(255,80,110,.75),rgba(255,80,110,0) 65%)}
+@keyframes d2c-nhay{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+
+@media (prefers-reduced-motion:no-preference){
+ /* 1 · tụ lực: hai vòng hào quang co về tâm */
+ .d2c .d2c-tu{width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;border:3px solid var(--d2c-mau);
+  box-shadow:0 0 18px var(--d2c-mau),inset 0 0 14px var(--d2c-mau);animation:d2c-tu .32s ease-in both}
+ .d2c .d2c-tu-2{width:46px;height:46px;margin:-23px 0 0 -23px;border-width:2px;animation-delay:.06s;animation-duration:.26s}
+ /* 2 · bay: ngoài = trục ngang (đều), trong = vòng cung (lên chậm dần, xuống nhanh dần) */
+ .d2c .d2c-bay{width:0;height:0;animation:d2c-ngang .4s cubic-bezier(.35,0,.65,1) calc(var(--d2c-phong) + var(--k)*28ms) both}
+ .d2c-cung{animation:d2c-vong .4s linear calc(var(--d2c-phong) + var(--k)*28ms) both}
+ .d2c .d2c-cau,.d2c .d2c-bong{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;opacity:1;
+  background:radial-gradient(circle at 42% 40%,var(--d2c-nhe) 0 22%,var(--d2c-mau) 48%,rgba(255,255,255,0) 72%);
+  box-shadow:0 0 16px 4px var(--d2c-mau);transform:scale(var(--d2c-co,1))}
+ .d2c .d2c-bong{box-shadow:none;opacity:calc(.55 - var(--k)*.13);transform:scale(calc(var(--d2c-co,1)*(1 - var(--k)*.2)))}
+ .d2c-cau::before{content:"";position:absolute;inset:-5px;border-radius:50%;
+  background:conic-gradient(from 0deg,rgba(255,255,255,0),var(--d2c-nhe) 20%,rgba(255,255,255,0) 40%,var(--d2c-mau) 65%,rgba(255,255,255,0) 85%);
+  opacity:.8;animation:d2c-xoay .22s linear infinite}
+ .d2c[data-kieu="sai"] .d2c-cau,.d2c[data-kieu="sai"] .d2c-bong{border-radius:46% 54% 42% 58%/55% 45% 55% 45%;
+  background:radial-gradient(circle at 40% 38%,rgb(233,213,255) 0 16%,rgb(168,85,247) 46%,rgba(88,28,135,.85) 64%,rgba(88,28,135,0) 74%);
+  box-shadow:0 0 14px 3px rgba(168,85,247,.7)}
+ .d2c[data-kieu="sai"] .d2c-cau::before{background:none;border:3px dotted rgba(233,213,255,.7);animation-duration:.5s}
+ /* hạt lấp lánh rơi lại phía sau cầu */
+ .d2c .d2c-cau>i{left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--d2c-nhe);box-shadow:0 0 6px var(--d2c-mau);
+  animation:d2c-lap .24s linear calc(var(--i)*-40ms) infinite}
+ .d2c[data-kieu="sai"] .d2c-cau>i{background:rgb(216,180,254)}
+ /* 3 · trúng: loé + 2 sóng xung kích + 8 tia + 10 mảnh */
+ .d2c .d2c-no{width:0;height:0;opacity:1}
+ .d2c .d2c-no>i{left:0;top:0}
+ .d2c .d2c-loe{width:96px;height:96px;margin:-48px 0 0 -48px;border-radius:50%;
+  background:radial-gradient(circle,var(--d2c-nhe) 0 18%,var(--d2c-mau) 42%,rgba(255,255,255,0) 70%);animation:d2c-loe .38s ease-out var(--d2c-trung) forwards}
+ .d2c .d2c-song{width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:4px solid var(--d2c-nhe);box-shadow:0 0 12px var(--d2c-mau);
+  animation:d2c-song .5s cubic-bezier(.1,.7,.3,1) var(--d2c-trung) forwards}
+ .d2c .d2c-song-2{border-width:2px;border-color:var(--d2c-mau);animation-delay:calc(var(--d2c-trung) + 90ms)}
+ .d2c .d2c-tia{width:4px;height:34px;margin:-17px 0 0 -2px;border-radius:2px;background:linear-gradient(var(--d2c-nhe),rgba(255,255,255,0));
+  transform-origin:50% 100%;animation:d2c-tia .34s ease-out var(--d2c-trung) forwards}
+ .d2c .d2c-manh{width:7px;height:7px;margin:-3.5px 0 0 -3.5px;border-radius:2px;background:var(--d2c-mau);box-shadow:0 0 6px var(--d2c-nhe);
+  animation:d2c-manh .55s cubic-bezier(.15,.8,.35,1) var(--d2c-trung) forwards}
+ .d2c[data-kieu="sai"] .d2c-tia{display:none}
+ .d2c[data-kieu="sai"] .d2c-manh{border-radius:50%;background:rgb(192,132,252)}
+ /* SAI: thần thú chớp đỏ */
+ .d2c .d2c-do{width:30cqw;height:30cqw;margin:-15cqw 0 0 -15cqw;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,60,90,.75),rgba(255,60,90,0) 66%);animation:d2c-do .42s linear var(--d2c-trung) forwards}
+ /* Combo xN: bật lên giữa cảnh lúc phóng */
+ .d2c .d2c-combo{position:absolute;left:50%;top:24%;margin:0;padding:2px 12px;border-radius:12px;white-space:nowrap;font-size:clamp(14px,5cqw,24px);font-weight:800;letter-spacing:.02em;
+  color:rgb(255,255,255);background:linear-gradient(90deg,var(--d2c-mau),rgba(255,255,255,.12));box-shadow:0 0 16px var(--d2c-mau);text-shadow:0 2px 0 rgba(0,0,0,.4);
+  animation:d2c-combo .72s cubic-bezier(.2,1.4,.4,1) .1s both}
+ .d2c[data-cuong-no] .d2c-combo{background:linear-gradient(90deg,rgb(214,40,90),rgb(214,110,10))}
+
+ /* nhân vật trong cảnh (dựng mới theo suKien nên hoạt cảnh chạy lại mỗi đòn) */
+ .dao2 .dao2-canh[data-chuong="dung"] .dao2-canh-thu[data-dong="danh"]{transform-origin:50% 100%;animation:d2c-nhun .56s ease-out both}
+ .dao2 .dao2-canh[data-chuong="dung"] .dao2-quai[data-trung]{transform-origin:50% 100%;animation:d2c-lui .6s cubic-bezier(.2,.8,.3,1) .68s both}
+ .dao2 .dao2-canh[data-chuong="dung"] .dao2-quai[data-trung]::before{content:"";position:absolute;inset:8% 12% 6%;border-radius:50% 50% 44% 44%/62% 62% 38% 38%;
+  background:rgba(255,255,255,.92);opacity:0;animation:d2c-trang .3s linear .68s both}
+ /* mặt nhăn: che mắt tròn, vẽ mắt "> <" (toạ độ khớp SVG quái 120×120) */
+ .dao2 .dao2-canh[data-chuong="dung"] .dao2-quai[data-trung]::after{content:"";position:absolute;inset:0;opacity:0;animation:d2c-nhan .62s linear .7s both;
+  background:no-repeat center/100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cg fill='rgb(88,196,166)'%3E%3Cellipse cx='46' cy='65' rx='10' ry='11'/%3E%3Cellipse cx='74' cy='65' rx='10' ry='11'/%3E%3C/g%3E%3Cg fill='none' stroke='rgb(14,59,49)' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M39 58l12 6-12 6M81 58l-12 6 12 6'/%3E%3Cpath d='M46 90q4-5 7 0t7 0 7 0 7 0'/%3E%3C/g%3E%3C/svg%3E")}
+ .dao2 .dao2-canh[data-chuong="sai"] .dao2-quai{transform-origin:50% 100%;animation:d2c-phun .42s ease-in-out both}
+ .dao2 .dao2-canh[data-chuong="sai"] .dao2-canh-thu[data-dong="dau"]{transform-origin:50% 100%;animation:d2c-giat .5s cubic-bezier(.2,.8,.3,1) .66s both}
+ /* số máu bật ra ĐÚNG lúc trúng */
+ .dao2 .dao2-canh[data-chuong] .dao2-so{animation:d2c-so .62s cubic-bezier(.2,1.5,.4,1) .68s both}
+ /* rung màn + thanh máu tụt mượt (tên keyframes đổi theo chẵn/lẻ ⇒ chạy lại mỗi đòn dù thẻ không dựng mới) */
+ .dao2 .dao2-canh[data-chuong][data-nhip="0"]{animation:d2c-rung-0 .3s linear .68s}
+ .dao2 .dao2-canh[data-chuong][data-nhip="1"]{animation:d2c-rung-1 .3s linear .68s}
+ .dao2 .dao2-canh[data-chuong] .dao2-vach>i{transform-origin:0 50%}
+ .dao2 .dao2-canh[data-chuong][data-nhip="0"] .dao2-mau-quai .dao2-vach>i{--tu:var(--d2c-quai-tu,1);animation:d2c-tut-0 .5s ease-out .72s both}
+ .dao2 .dao2-canh[data-chuong][data-nhip="1"] .dao2-mau-quai .dao2-vach>i{--tu:var(--d2c-quai-tu,1);animation:d2c-tut-1 .5s ease-out .72s both}
+ .dao2 .dao2-canh[data-chuong][data-nhip="0"] .dao2-mau-thu .dao2-vach>i{--tu:var(--d2c-thu-tu,1);animation:d2c-tut-0 .5s ease-out .72s both}
+ .dao2 .dao2-canh[data-chuong][data-nhip="1"] .dao2-mau-thu .dao2-vach>i{--tu:var(--d2c-thu-tu,1);animation:d2c-tut-1 .5s ease-out .72s both}
+}
+@media (prefers-reduced-motion:no-preference) and (min-width:1024px),(prefers-reduced-motion:no-preference) and (orientation:landscape) and (min-width:700px){
+ .d2c{--xt:22cqw;--yt:60cqh;--xq:79cqw;--yq:58cqh}
+ .d2c .d2c-cau,.d2c .d2c-bong{width:40px;height:40px;margin:-20px 0 0 -20px}
+ .d2c .d2c-loe{width:140px;height:140px;margin:-70px 0 0 -70px}
+}
+
+@keyframes d2c-tu{0%{opacity:0;transform:scale(2.3)}55%{opacity:1}100%{opacity:0;transform:scale(.35)}}
+@keyframes d2c-ngang{0%{opacity:0;transform:translateX(0)}10%,90%{opacity:1}100%{opacity:0;transform:translateX(calc(var(--xb) - var(--xa)))}}
+@keyframes d2c-vong{0%{transform:translateY(0);animation-timing-function:cubic-bezier(.3,.6,.6,1)}
+ 50%{transform:translateY(calc((var(--yb) - var(--ya))/2 - var(--vong)));animation-timing-function:cubic-bezier(.4,0,.7,.4)}
+ 100%{transform:translateY(calc(var(--yb) - var(--ya)))}}
+@keyframes d2c-xoay{to{transform:rotate(360deg)}}
+@keyframes d2c-lap{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(-28px,calc((var(--i) - 2.5)*5px)) scale(.2)}}
+@keyframes d2c-loe{0%{opacity:1;transform:scale(.2)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes d2c-song{0%{opacity:1;transform:scale(.3)}100%{opacity:0;transform:scale(3.2)}}
+@keyframes d2c-tia{0%{opacity:1;transform:rotate(var(--a)) translateY(-8px) scaleY(.2)}60%{opacity:1;transform:rotate(var(--a)) translateY(-34px) scaleY(1)}100%{opacity:0;transform:rotate(var(--a)) translateY(-52px) scaleY(.4)}}
+@keyframes d2c-manh{0%{opacity:1;transform:rotate(var(--a)) translateY(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateY(-58px) scale(.3)}}
+@keyframes d2c-do{0%,100%{opacity:0}20%{opacity:1}45%{opacity:.25}65%{opacity:.9}}
+@keyframes d2c-combo{0%{opacity:0;transform:translateX(-50%) scale(.3)}30%{opacity:1;transform:translateX(-50%) scale(1.15)}45%{transform:translateX(-50%) scale(1)}75%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-12px)}}
+@keyframes d2c-nhun{0%{transform:none}35%{transform:translateY(5px) scale(1.06,.9)}55%{transform:translateX(12px) translateY(-6px) scale(.95,1.06)}75%{transform:translateX(4px)}100%{transform:none}}
+@keyframes d2c-lui{0%{transform:none}18%{transform:translateX(16px) rotate(7deg) scale(1.06,.9)}45%{transform:translateX(9px) rotate(3deg) scale(.98,1.03)}100%{transform:none}}
+@keyframes d2c-trang{0%{opacity:0}15%{opacity:.95}35%{opacity:.2}55%{opacity:.7}100%{opacity:0}}
+@keyframes d2c-nhan{0%,100%{opacity:0}8%,80%{opacity:1}}
+@keyframes d2c-phun{0%{transform:none}45%{transform:scale(1.1,.88)}70%{transform:translateX(-8px) scale(.92,1.1)}100%{transform:none}}
+@keyframes d2c-giat{0%{transform:none}20%{transform:translateX(-16px) rotate(-7deg)}50%{transform:translateX(-8px) rotate(-2deg)}100%{transform:none}}
+@keyframes d2c-so{0%{opacity:0;transform:translateY(14px) scale(.4)}35%{opacity:1;transform:translateY(-10px) scale(1.35)}60%{transform:translateY(-6px) scale(1)}100%{opacity:1;transform:translateY(-12px) scale(1)}}
+@keyframes d2c-rung-0{0%,100%{transform:none}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(2px,-1px)}}
+@keyframes d2c-rung-1{0%,100%{transform:none}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(2px,-1px)}}
+@keyframes d2c-tut-0{from{transform:scaleX(var(--tu))}to{transform:scaleX(1)}}
+@keyframes d2c-tut-1{from{transform:scaleX(var(--tu))}to{transform:scaleX(1)}}

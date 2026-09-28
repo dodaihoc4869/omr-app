@@ -23,6 +23,7 @@ import '../../../components/bang-nhiem-vu/m3-theme.css'
 import '../../../components/m3/m3.css'
 import {useNgang} from './ngang'
 import './dao2.css'
+import ChuongTranDau,{thuocTinhCanh} from './ChuongTranDau'
 
 export const TEN_QUAI='Quái Sương Mù'
 const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
@@ -52,7 +53,7 @@ export function TienDoChuyen({cau,viTri,ketQua}:{cau:readonly CauDao2[];viTri:nu
 export function CanhRung({profile,ketQua,tong,suKien}:{profile:DaoProfile;ketQua:readonly BattleAnswer[];tong:number;suKien:number}){
  const thu=chiSoThu(profile.pet),ten=tenThu(profile),tran=learningBattle([...ketQua],tong),[tat,setTat]=useState(battleMuted)
  const vuaNop=suKien>0&&tran.count>0,no=vuaNop&&tran.rage
- return <section className="dao2-canh" data-no={no?'':undefined} aria-label="Trận đấu">
+ return <section className="dao2-canh" data-no={no?'':undefined} aria-label="Trận đấu" {...thuocTinhCanh(ketQua,tong,suKien)}>
   <svg className="dao2-canh-nen" viewBox="0 0 390 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
    <defs>
     <linearGradient id="d2-rung" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="rgb(14,42,74)"/><stop offset="1" stopColor="rgb(18,59,58)"/></linearGradient>
@@ -80,6 +81,7 @@ export function CanhRung({profile,ketQua,tong,suKien}:{profile:DaoProfile;ketQua
    </svg>
   </div>
   <img className="dao2-canh-thu" key={`thu-${suKien}`} data-dong={vuaNop?(tran.correct?'danh':'dau'):undefined} src={anhThu(thu,profile.cap)} alt={`Thần thú của em: ${ten}`} width="140" height="140" decoding="async" draggable={false}/>
+  <ChuongTranDau key={`chuong-${suKien}`} thu={thu} ketQua={ketQua} tong={tong} suKien={suKien}/>
   {no?<p className="dao2-cuong-no">CUỒNG NỘ ×2 · 3 câu đúng liền</p>:tran.streak>0&&<p className="dao2-chuoi">Đúng liền {tran.streak%3}/3 · đủ 3 là CUỒNG NỘ</p>}
   <div className="dao2-kinh dao2-mau-quai"><span>{tran.enemy===0?`Đã hạ ${TEN_QUAI}`:`${TEN_QUAI} · Máu ${tran.enemy}/100`}</span>
    <span className="dao2-vach" role="progressbar" aria-label={`Máu ${TEN_QUAI}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.enemy}><i style={{width:`${tran.enemy}%`}}/></span></div>

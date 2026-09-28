@@ -5,9 +5,14 @@ try{muted=localStorage.getItem('game-battle-muted')==='1'}catch{/* Optional pref
 export const battleMuted=()=>muted
 export function setBattleMuted(value:boolean){muted=value;try{localStorage.setItem('game-battle-muted',value?'1':'0')}catch{/* Optional preference. */}if(!value)unlockBattleAudio()}
 export function unlockBattleAudio(){try{if(muted)return;context??=new AudioContext();if(context.state==='suspended')void context.resume().catch(()=>{})}catch{/* Sound must never block grading. */}}
+/** Cảnh chưởng (dao2/ChuongTranDau) tự phát tiếng khớp nhịp ⇒ chặn tiếng đòn chung trong `ms` để một lượt chấm không kêu hai lần. */
+let chanDen=0
+export function chanTiengTran(ms:number){chanDen=Date.now()+ms}
+/** AudioContext đang chạy (đã mở bằng cú bấm, không tắt tiếng, tab đang hiện) — hoặc null. */
+export function nguCanhTran():AudioContext|null{return !muted&&context&&context.state==='running'&&!document.hidden?context:null}
 export function playBattleSound(pet:number,stage:number,correct:boolean,rage:boolean){
  try{
- const ctx=context;if(muted||!ctx||ctx.state!=='running'||document.hidden)return
+ const ctx=context;if(muted||!ctx||ctx.state!=='running'||document.hidden||Date.now()<chanDen)return
  const start=ctx.currentTime+.015,duration=rage?1.3:.8
  const master=ctx.createGain();master.gain.value=.24;master.connect(ctx.destination)
  const tone=(frequency:number,to:number,at:number,length:number,type:OscillatorType,volume:number)=>{const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=type;osc.frequency.setValueAtTime(frequency,start+at);osc.frequency.exponentialRampToValueAtTime(Math.max(25,to),start+at+length);gain.gain.setValueAtTime(.0001,start+at);gain.gain.exponentialRampToValueAtTime(volume,start+at+.025);gain.gain.exponentialRampToValueAtTime(.0001,start+at+length);osc.connect(gain);gain.connect(master);osc.start(start+at);osc.stop(start+at+length+.03);osc.onended=()=>{osc.disconnect();gain.disconnect()}}
