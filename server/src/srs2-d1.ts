@@ -275,3 +275,27 @@ export async function sanh2(env: Env, sbd: string, nowMs: number): Promise<Recor
 
 /** Gợi ý M3 cho lần phục vụ tới của câu. */
 export const coGoiY = (t: TrangThaiCau | undefined): boolean => !!t && canGoiY(t)
+
+/** CHẨN ĐOÁN (thầy, CHỈ ĐỌC — không ghi kế hoạch): máy chủ thấy gì với một em hôm nay. Dùng khi Sảnh báo "chưa có câu nào". */
+export async function chanDoanEm(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
+  const ngay = ngayVnCua(nowMs)
+  const hoSo = await docHoSo2(env, sbd, ngay)
+  const cd = hoSo.chienDich
+  const dsCd = await docChienDichCuaEm(env, sbd)
+  const tuyChon = { homNay: ngay, hanNop: cd?.hanNop ?? null, ...(cd?.theLucNgay ? { tranNgay: cd.theLucNgay } : {}), ...(cd ? { tranHuyetChien: cd.huyetChien ? tranHuyetChienTheo(cd.theLucNgay) : cd.theLucNgay } : {}) }
+  const lap = lapKeHoachNgay(hoSo.cau, hoSo.tt, tuyChon)
+  const cu = await env.DB.prepare('SELECT chien_dich_id, tong, tao_luc, dao_json, doan_json FROM srs2_ke_hoach WHERE sbd = ? AND ngay = ?').bind(sbd, ngay).first<Row>().catch((e) => ({ loi: String(e) }) as Row)
+  const cauCd = hoSo.cau.filter((c) => c.nguon === 'chien_dich')
+  return {
+    ok: true, ngay, sbd,
+    coHoa2: await cheDo2(env, sbd),
+    chienDichCuaEm: dsCd.map((c) => ({ id: c.id, ten: c.ten, trangThai: c.trangThai, hanNop: c.hanNop, soCau: c.qids.length })),
+    chienDichDangChay: cd ? { id: cd.id, hanNop: cd.hanNop, theLucNgay: cd.theLucNgay, soQid: cd.qids.length } : null,
+    soMetaTimThay: hoSo.meta.size,
+    soCauTrongHoSo: hoSo.cau.length,
+    soCauChienDich: cauCd.length,
+    soCauMoi: cauCd.filter((c) => hoSo.tt.get(c.qid)?.laMoi).length,
+    keHoachDaChot: cu ? { chienDichId: cu.chien_dich_id ?? null, tong: cu.tong ?? null, taoLuc: cu.tao_luc ?? null, loi: (cu as Row).loi ?? null } : null,
+    lapLaiSeRa: { dao: lap.dao.length, doan: lap.doan.length, huyetChien: lap.huyetChien },
+  }
+}
