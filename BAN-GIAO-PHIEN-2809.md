@@ -90,3 +90,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 20:09 · Deploy #543 THÀNH CÔNG: PR #45 Bi-a âm thanh phá bàn (chỉ tiếng bi chạm bi) · main 7a60f32 · lùi: git revert -m 1 7a60f32.
 - 20:35 · Deploy #544 THÀNH CÔNG: PR #46 luật thành thạo lần đầu (P1 + giảm đoán mò) · main 9828882 · lùi: git revert -m 1 9828882. 20:42 merge PR #47 (lịch sử ca HS + báo cáo bản mới + hộp thoại app) main 677b1b1, đang deploy.
 - 20:53 · Deploy #545 THÀNH CÔNG: PR #47 lịch sử ca HS + báo cáo bản mới + hộp thoại app · main 677b1b1 · lùi: git revert -m 1 677b1b1. Chờ: xoa-bao-cao-cu, Code 1 Bi-a Câu đã làm, ngay-bat-dau-cd.
+- 21:13 · Deploy #546 THÀNH CÔNG: PR #48 ngày bắt đầu chiến dịch · main 9fcef48 · lùi: git revert -m 1 9fcef48. 21:25 merge PR #49 xoá báo cáo HS cũ (main 2e41cfb), đang deploy.
