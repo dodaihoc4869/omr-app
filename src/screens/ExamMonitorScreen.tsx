@@ -6,7 +6,7 @@
 // xám chờ thi lại · tím đang làm · cam rời màn N lần · đỏ bị khoá · xanh đã nộp.
 // Xoá ca = xoá mềm, phải gõ đúng mã ca.
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { BANG_NHIP_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
+import { BANG_NHIP_THAY, NHIP_PHONG_CHO_THAY, TUY_CHON_NHIP_THAY, useNhipThay } from '../lib/nhip-may-thay'
 import DongMatKetNoiCa from '../components/theo-doi-ca/DongMatKetNoiCa'
 import { useHoa2Bat } from '../components/chien-dich/co-hoa2'
 import GiaoChienDich from '../components/chien-dich/GiaoChienDich'
@@ -669,9 +669,12 @@ export default function ExamMonitorScreen() {
   // `setInterval` trần: một lượt chậm 20 s dồn thêm lượt, lỗi cũng cứ 20 s một lần), lỗi ⇒ lùi dần 30 → 60 → 120 s. Vòng chạy MỘT mạch (không dựng lại mỗi lần chiTiet đổi).
   const conDangLam = !!chiTiet && chiTiet.luot.some((l) => l.trangThai === 'dang_lam')
   const maCaTheoDoiNen = chiTiet?.ca.maCa
-  // Ca còn ở PHÒNG CHỜ thì khối PhongChoCa đã tự tải lại 5 giây/lần (cùng lệnh) ⇒ vòng 20 giây nghỉ, không gọi trùng.
+  useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), BANG_NHIP_THAY.theoDoiCa, conDangLam, TUY_CHON_NHIP_THAY.theoDoiCa)
+  // PHÒNG CHỜ (thầy 28/09: "tự đồng bộ hs vào phòng chờ sau 5 giây"): ca chưa bấm Bắt đầu thi ⇒ tải lại chi tiết ca 5 s/lần QUA NHỊP CHUNG (tab ẩn dừng,
+  // không chồng, lỗi lùi 30 → 40 s, hụt liền ⇒ DongMatKetNoiCa + chấm "mất kết nối" ở khối). Màn Chiếu mã đang mở thì nó tự hỏi 5 s ⇒ vòng này nghỉ, không gọi trùng.
+  // (Chưa bấm Bắt đầu thì chưa em nào đang làm ⇒ vòng 20 s ở trên không chạy cùng lúc.)
   const dangPhongCho = !!chiTiet?.ca.phongCho && !chiTiet?.ca.batDauThiLuc
-  useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), BANG_NHIP_THAY.theoDoiCa, conDangLam && !dangPhongCho, TUY_CHON_NHIP_THAY.theoDoiCa)
+  useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), NHIP_PHONG_CHO_THAY, dangPhongCho && !chieuMa, TUY_CHON_NHIP_THAY.phongCho)
 
   const handleChoThiLai = async (sbd: string) => {
     if (!chiTiet) return
@@ -1374,8 +1377,8 @@ export default function ExamMonitorScreen() {
               onHuy={() => void huyCaCho()}
               noiKhoiPhuc={hoa2 ? 'Ca vào Ca kiểm tra › Ca đã xoá, khôi phục lại được.' : 'Ca vào Lịch sử ca, khôi phục lại được.'}
               onChieuMa={() => setChieuMa(true)}
-              lamMoi={() => tai(chiTiet.ca.maCa, true)}
-              tamDung={chieuMa}
+              tuCapNhat
+              matKetNoi={soHut > 0}
             />
           )}
           <KhoiThoiGianCa

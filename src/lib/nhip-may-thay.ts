@@ -8,6 +8,10 @@
 import { useEffect, useRef } from 'react'
 import { batNhipBenVung, CHAN_DOI_MS } from './nhip-ben-vung'
 
+/** PHÒNG CHỜ (thầy 28/09: "tự đồng bộ hs vào phòng chờ sau 5 giây"): Theo dõi ca khi ca còn ở phòng chờ + màn Chiếu mã. CHỈ chạy khi thầy đang
+ *  nhìn phòng chờ (chưa bấm Bắt đầu thi / đang chiếu mã), tuỳ chọn `TUY_CHON_NHIP_THAY.phongCho`. Để riêng (không trong BANG_NHIP_THAY — bảng ấy khoá 3 vòng nền thường trực). */
+export const NHIP_PHONG_CHO_THAY = 5_000
+
 /** BẢNG NHỊP của app thầy (mili-giây). Thêm vòng tự gọi mới ⇒ thêm dòng ở đây + một dòng trong docs/nhip-app-thay-2109.md. */
 export const BANG_NHIP_THAY = {
   /** Màn Hôm nay = Bảng tin sàn: `/gv/bang-tin-song`, số sống. Máy chủ bận / lỗi ⇒ tự lùi 30 s trở đi. */
@@ -39,6 +43,8 @@ export const TUY_CHON_NHIP_THAY = {
   bangTinV3: { heSoToiDa: 2, tranMs: 120_000 },
   theoDoiCa: { heSoToiDa: 2, tranMs: 40_000, luiDanMs: LUI_THEO_DOI_CA_MS },
   sucKhoeMay: { heSoToiDa: 2, tranMs: 20_000 },
+  /** PHÒNG CHỜ (Theo dõi ca khi chưa bấm Bắt đầu thi + màn Chiếu mã, thầy 28/09): 5 s → máy chủ bận ×2 = 10 s; lỗi lùi 30 → 40 s như Theo dõi ca. */
+  phongCho: { heSoToiDa: 2, tranMs: 10_000, luiDanMs: LUI_THEO_DOI_CA_MS },
 } as const satisfies Record<string, TuyChonNhipThay>
 
 /**

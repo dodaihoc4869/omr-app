@@ -1,5 +1,5 @@
 // KHỐI PHÒNG CHỜ làm lại (thầy 28/09: "làm lại cho đẹp trực quan đồng bộ với thiết kế hiện tại. Có tự đồng bộ hs vào phòng chờ sau 5 giây").
-// Kiểm: vòng tự làm mới 5 giây (đồng hồ giả), dừng khi tab ẩn / rời màn / Chiếu mã đang mở, lỗi GIỮ danh sách cũ + chấm "mất kết nối",
+// Kiểm: vòng tự làm mới 5 giây QUA NHỊP CHUNG app thầy (đồng hồ giả), dừng khi tab ẩn / rời màn, lỗi GIỮ danh sách cũ + chấm "mất kết nối" + lùi dần,
 // trạng thái trống có nút Chiếu mã, Huỷ ca hỏi lại trước, Bắt đầu thi giữ chữ khi đang gửi, không còn chữ "A.I Đỗ Đại Học",
 // và "Thêm 5 phút" ẩn khi ca còn ở phòng chờ.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -7,12 +7,32 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import PhongChoCa, { type PhongChoCaProps } from '../src/components/ca-thi/PhongChoCa'
 import KhoiThoiGianCa from '../src/components/KhoiThoiGianCa'
+import ExamMonitorScreen from '../src/screens/ExamMonitorScreen'
+import { NHIP_PHONG_CHO_THAY, TUY_CHON_NHIP_THAY } from '../src/lib/nhip-may-thay'
+
+const m = vi.hoisted(() => ({
+  detail: vi.fn(),
+  ca: { maCa: '123456', tenCa: 'Ca thử', loai: 'thi', lop: '12', phongCho: true, batDauThiLuc: '', thoiGianPhut: 45, trangThai: 'mo', phamVi: 'tu_do', congBo: 'khong', dongBoGio: false },
+}))
+vi.mock('../src/store/appStore', () => ({ useAppStore: (select: (s: unknown) => unknown) => select({ maCaTheoDoi: '123456', classList: [], setScreen: vi.fn(), showToast: vi.fn() }) }))
+vi.mock('../src/lib/exam-db', async (original) => ({
+  ...(await original<Record<string, unknown>>()),
+  loadScriptUrl: async () => 'https://local.test',
+  loadTeacherSecret: async () => 'test-only',
+  loadSessionTeacherBank: async () => null,
+  docSoCauCa: async () => undefined,
+  docDeRiengCa: async () => undefined,
+  docCheDoDeRieng: async () => false,
+}))
+vi.mock('../src/lib/exam-api', async (original) => ({ ...(await original<Record<string, unknown>>()), chiTietCa: m.detail, danhSachCa: async () => [] }))
 
 let an = false
 beforeEach(() => {
   an = false
+  m.ca.batDauThiLuc = ''
   vi.useFakeTimers()
   Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (an ? 'hidden' : 'visible') })
+  Object.defineProperty(document, 'hidden', { configurable: true, get: () => an })
 })
 afterEach(() => {
   cleanup()
@@ -48,77 +68,85 @@ const nhay = async (ms: number) => {
   })
 }
 
-describe('PhongChoCa · tự làm mới 5 giây', () => {
-  it('gọi lamMoi mỗi 5 giây, không gọi ngay khi vẽ', async () => {
-    const lamMoi = vi.fn(async () => true)
-    dung({ lamMoi })
-    expect(lamMoi).not.toHaveBeenCalled()
-    await nhay(5000)
-    expect(lamMoi).toHaveBeenCalledTimes(1)
-    await nhay(10000)
-    expect(lamMoi).toHaveBeenCalledTimes(3)
+describe('Theo dõi ca · phòng chờ tự làm mới 5 giây QUA NHỊP CHUNG (useNhipThay + NHIP_PHONG_CHO_THAY)', () => {
+  const EM3 = [
+    { sbd: '12001', hoTen: 'Nguyễn Minh Anh', vaoLuc: '2026-09-28T07:00:00Z' },
+    { sbd: '12002', hoTen: 'Trần Thu Hà', vaoLuc: '2026-09-28T07:00:00Z' },
+  ]
+  let loiMang = false
+  let dsCho = EM3.slice(0, 1)
+  beforeEach(() => {
+    loiMang = false
+    dsCho = EM3.slice(0, 1)
+    m.detail.mockReset()
+    m.detail.mockImplementation(async () => {
+      if (loiMang) throw new Error('mất mạng')
+      return { ca: { ...m.ca }, luot: [], dsCho, biChan: [] }
+    })
+  })
+  /** Vẽ màn, chờ tải lần đầu xong (khối phòng chờ hiện). */
+  const moMan = async () => {
+    const r = render(<ExamMonitorScreen />)
+    await nhay(0)
+    await nhay(0)
+    expect(r.container.querySelector('[data-vung="phong-cho"]')).toBeTruthy()
+    return r
+  }
+
+  it('nhịp 5 giây là hằng của bảng nhịp app thầy; tuỳ chọn lùi ≤ 40 s', () => {
+    expect(NHIP_PHONG_CHO_THAY).toBe(5000)
+    expect(Math.max(...TUY_CHON_NHIP_THAY.phongCho.luiDanMs)).toBeLessThanOrEqual(40_000)
+  })
+
+  it('mạng tốt: tải lại chi tiết ca mỗi 5 giây; em mới vào hiện ngay', async () => {
+    const { container } = await moMan()
+    const dau = m.detail.mock.calls.length
+    dsCho = EM3
+    await nhay(4900)
+    expect(m.detail.mock.calls.length).toBe(dau)
+    await nhay(200)
+    expect(m.detail.mock.calls.length).toBe(dau + 1)
+    expect(container.querySelector('.ct-pc-dem')?.textContent).toContain('2em đang chờ')
+    await nhay(10_000)
+    expect(m.detail.mock.calls.length).toBe(dau + 3)
     expect(screen.getByText('tự cập nhật')).toBeTruthy()
   })
 
-  it('tab ẩn thì không gọi; hiện lại gọi ngay', async () => {
-    const lamMoi = vi.fn(async () => true)
-    dung({ lamMoi })
+  it('tab ẩn ⇒ không gọi; rời màn ⇒ dừng hẳn', async () => {
+    const r = await moMan()
+    const dau = m.detail.mock.calls.length
     an = true
-    await nhay(15000)
-    expect(lamMoi).not.toHaveBeenCalled()
+    await nhay(20_000)
+    expect(m.detail.mock.calls.length).toBe(dau)
     an = false
-    await act(async () => {
-      document.dispatchEvent(new Event('visibilitychange'))
-    })
-    expect(lamMoi).toHaveBeenCalledTimes(1)
-  })
-
-  it('rời màn (gỡ khối) hoặc Chiếu mã đang mở ⇒ dừng', async () => {
-    const lamMoi = vi.fn(async () => true)
-    const { unmount } = dung({ lamMoi, tamDung: true })
-    await nhay(15000)
-    expect(lamMoi).not.toHaveBeenCalled()
-    unmount()
-    const lamMoi2 = vi.fn(async () => true)
-    const r = dung({ lamMoi: lamMoi2 })
-    await nhay(5000)
-    expect(lamMoi2).toHaveBeenCalledTimes(1)
     r.unmount()
-    await nhay(20000)
-    expect(lamMoi2).toHaveBeenCalledTimes(1)
+    await nhay(20_000)
+    expect(m.detail.mock.calls.length).toBe(dau)
   })
 
-  it('không gọi chồng khi lần trước chưa xong', async () => {
-    let xong: (v: boolean) => void = () => {}
-    const lamMoi = vi.fn(() => new Promise<boolean>((r) => (xong = r)))
-    dung({ lamMoi })
-    await nhay(15000)
-    expect(lamMoi).toHaveBeenCalledTimes(1)
-    await act(async () => xong(true))
-    await nhay(5000)
-    expect(lamMoi).toHaveBeenCalledTimes(2)
-  })
-
-  it('lỗi mạng: GIỮ danh sách cũ + chấm "mất kết nối"; tải lại được thì tắt chấm', async () => {
-    let ok = false
-    const lamMoi = vi.fn(async () => {
-      if (!ok) throw new Error('mất mạng')
-      return true
-    })
-    dung({ lamMoi })
-    await nhay(5000)
+  it('lỗi mạng ⇒ GIỮ danh sách cũ + chấm "mất kết nối", lùi dần (không dội 5 s); tải lại được thì hết chấm', async () => {
+    await moMan()
+    loiMang = true
+    await nhay(5100)
     expect(screen.getByText('mất kết nối')).toBeTruthy()
     expect(screen.getByText('Minh Anh')).toBeTruthy()
-    expect(screen.getByText('Thu Hà')).toBeTruthy()
-    ok = true
-    await nhay(5000)
+    const sauLoi = m.detail.mock.calls.length
+    await nhay(20_000)
+    expect(m.detail.mock.calls.length).toBe(sauLoi) // lùi 30 s, không gọi lại mỗi 5 s
+    loiMang = false
+    await nhay(10_100)
+    expect(m.detail.mock.calls.length).toBe(sauLoi + 1)
     expect(screen.queryByText('mất kết nối')).toBeNull()
   })
 
-  it('lamMoi trả false (tải hỏng) cũng hiện "mất kết nối"', async () => {
-    dung({ lamMoi: vi.fn(async () => false) })
-    await nhay(5000)
-    expect(screen.getByText('mất kết nối')).toBeTruthy()
+  it('ca đã bấm Bắt đầu thi ⇒ không còn khối phòng chờ, không còn nhịp 5 giây', async () => {
+    m.ca.batDauThiLuc = '2026-09-28T07:00:00Z'
+    render(<ExamMonitorScreen />)
+    await nhay(0)
+    await nhay(0)
+    const dau = m.detail.mock.calls.length
+    await nhay(15_000)
+    expect(m.detail.mock.calls.length).toBe(dau)
   })
 })
 
