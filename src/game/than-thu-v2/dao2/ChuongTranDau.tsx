@@ -73,7 +73,7 @@ export default function ChuongTranDau({thu,ketQua,tong,suKien}:{thu:number;ketQu
  useEffect(()=>{
   if(!d)return
   // chưởng phát tiếng khớp nhịp ⇒ chặn tiếng đòn chung (DaiKetQua) cùng lượt để không kêu hai lần
-  if(phatTiengChuong(d.dung,d.combo,d.cuongNo))chanTiengTran(600)
+  if(phatTiengChuong(d.dung,d.combo,d.cuongNo))chanTiengTran(1800)
   const h=setTimeout(()=>setXong(true),(MOC_CHUONG.het+.3)*1000);return()=>clearTimeout(h)
  },[]) // eslint-disable-line react-hooks/exhaustive-deps -- một lần mỗi đòn (component được key theo suKien)
  if(!d||xong)return null

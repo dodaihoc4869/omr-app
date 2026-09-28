@@ -23,7 +23,7 @@ import '../../../components/bang-nhiem-vu/m3-theme.css'
 import '../../../components/m3/m3.css'
 import {useNgang} from './ngang'
 import './dao2.css'
-import ChuongTranDau,{thuocTinhCanh} from './ChuongTranDau'
+import ChuongTranDau,{giamChuyenDong,thuocTinhCanh} from './ChuongTranDau'
 
 export const TEN_QUAI='Quái Sương Mù'
 const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
@@ -50,10 +50,11 @@ export function TienDoChuyen({cau,viTri,ketQua}:{cau:readonly CauDao2[];viTri:nu
 
 // ───────────── cảnh rừng sương + quái + thần thú ─────────────
 /** Cảnh giữ lại đòn gần nhất (số máu, Cuồng nộ) như sân đấu cũ; tiếng đòn phát ở `DaiKetQua` — lúc máy chủ vừa chấm. */
-export function CanhRung({profile,ketQua,tong,suKien}:{profile:DaoProfile;ketQua:readonly BattleAnswer[];tong:number;suKien:number}){
+/** `chuong` = chiếu hoạt cảnh bắn chưởng cho đòn `suKien` (chỉ lúc máy chủ VỪA chấm; dựng lại cảnh khi sang câu sau thì không chiếu lại). */
+export function CanhRung({profile,ketQua,tong,suKien,chuong=false}:{profile:DaoProfile;ketQua:readonly BattleAnswer[];tong:number;suKien:number;chuong?:boolean}){
  const thu=chiSoThu(profile.pet),ten=tenThu(profile),tran=learningBattle([...ketQua],tong),[tat,setTat]=useState(battleMuted)
  const vuaNop=suKien>0&&tran.count>0,no=vuaNop&&tran.rage
- return <section className="dao2-canh" data-no={no?'':undefined} aria-label="Trận đấu" {...thuocTinhCanh(ketQua,tong,suKien)}>
+ return <section className="dao2-canh" data-no={no?'':undefined} aria-label="Trận đấu" {...(chuong?thuocTinhCanh(ketQua,tong,suKien):{})}>
   <svg className="dao2-canh-nen" viewBox="0 0 390 260" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
    <defs>
     <linearGradient id="d2-rung" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="rgb(14,42,74)"/><stop offset="1" stopColor="rgb(18,59,58)"/></linearGradient>
@@ -81,7 +82,7 @@ export function CanhRung({profile,ketQua,tong,suKien}:{profile:DaoProfile;ketQua
    </svg>
   </div>
   <img className="dao2-canh-thu" key={`thu-${suKien}`} data-dong={vuaNop?(tran.correct?'danh':'dau'):undefined} src={anhThu(thu,profile.cap)} alt={`Thần thú của em: ${ten}`} width="140" height="140" decoding="async" draggable={false}/>
-  <ChuongTranDau key={`chuong-${suKien}`} thu={thu} ketQua={ketQua} tong={tong} suKien={suKien}/>
+  {chuong&&<ChuongTranDau key={`chuong-${suKien}`} thu={thu} ketQua={ketQua} tong={tong} suKien={suKien}/>}
   {no?<p className="dao2-cuong-no">CUỒNG NỘ ×2 · 3 câu đúng liền</p>:tran.streak>0&&<p className="dao2-chuoi">Đúng liền {tran.streak%3}/3 · đủ 3 là CUỒNG NỘ</p>}
   <div className="dao2-kinh dao2-mau-quai"><span>{tran.enemy===0?`Đã hạ ${TEN_QUAI}`:`${TEN_QUAI} · Máu ${tran.enemy}/100`}</span>
    <span className="dao2-vach" role="progressbar" aria-label={`Máu ${TEN_QUAI}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.enemy}><i style={{width:`${tran.enemy}%`}}/></span></div>
@@ -165,10 +166,19 @@ export interface TrongAiProps{
  traLoi:string;assisted:boolean;phanHoi:PhanHoi2|null;busy?:boolean;loi?:string;maLoi?:string
  onTraLoi:(v:string)=>void;onAssisted:(v:boolean)=>void;onNop:()=>void;onTiep:()=>void;onRoi:()=>void
 }
-export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi,busy=false,loi='',maLoi='',onTraLoi,onAssisted,onNop,onTiep,onRoi}:TrongAiProps){
- // Ngang: thanh kéo giữa hai cột (thầy 28/09) — tỉ lệ cột trái % lưu trên máy em.
+export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHoi:phanHoiMay,busy=false,loi='',maLoi='',onTraLoi,onAssisted,onNop,onTiep,onRoi}:TrongAiProps){
  const khung=useRef<HTMLDivElement>(null),[ti,setTi]=useState(docTi)
- const datTi=(v:number)=>{const x=Math.min(TI_MAX,Math.max(TI_MIN,v));setTi(x);try{localStorage.setItem(KHOA_TI,String(Math.round(x)))}catch{/* máy chặn lưu: bỏ qua */}}
+ // BẮN CHƯỞNG TRƯỚC LỜI GIẢI (thầy 28/09: "cho chưởng chạy ngay lúc em chốt đáp án"): máy chủ vừa trả kết quả (phanHoi null → có) ⇒ GIỮ cảnh trận
+ // ~1,1 s (giảm chuyển động: 0,45 s) cho chưởng chạy trọn rồi mới mở lời giải; em bấm vào màn (click, không pointerdown: tránh cú chạm rơi trúng nút SANG ẢI vừa hiện) ⇒ bỏ qua. `chuongSk` = đòn được chiếu —
+ // sang câu sau thì xoá ⇒ cảnh dựng lại không chiếu lần hai. Máu/EXP/lời giải vẫn là số máy chủ, chỉ trễ lúc HIỆN.
+ const suKien=ketQua.length,[phTruoc,setPhTruoc]=useState(phanHoiMay),[cho,setCho]=useState(false),[chuongSk,setChuongSk]=useState(-1)
+ if(phanHoiMay!==phTruoc){setPhTruoc(phanHoiMay);if(phanHoiMay&&!phTruoc){setCho(true);setChuongSk(suKien)}else if(!phanHoiMay){setCho(false);setChuongSk(-1)}}
+ const phanHoi=cho?null:phanHoiMay,boQua=()=>{if(cho)setCho(false)}
+ useEffect(()=>{if(!cho)return
+  khung.current?.querySelector('.dao2-canh')?.scrollIntoView?.({block:'nearest',behavior:'smooth'})
+  const h=setTimeout(()=>setCho(false),giamChuyenDong()?450:1100);return()=>clearTimeout(h)},[cho])
+ // Ngang: thanh kéo giữa hai cột (thầy 28/09) — tỉ lệ cột trái % lưu trên máy em.
+  const datTi=(v:number)=>{const x=Math.min(TI_MAX,Math.max(TI_MIN,v));setTi(x);try{localStorage.setItem(KHOA_TI,String(Math.round(x)))}catch{/* máy chặn lưu: bỏ qua */}}
  const keoTi=(x:number)=>{const r=khung.current?.getBoundingClientRect();if(r&&r.width>0)datTi((x-r.left)/r.width*100)}
  const ngang=useNgang(),[zoom,setZoom]=useState(''),[hinhLoi,setHinhLoi]=useState(false),q=cau[viTri],hetTran=!!loi&&laLoiHetTran(loi,maLoi),loiRef=useRef<HTMLParagraphElement>(null)
  useEffect(()=>{setHinhLoi(false)},[viTri])
@@ -180,7 +190,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
  const chuNutThieu=q.phan==='I'?'Chọn một phương án để tung chiêu':q.phan==='II'?'Chọn đủ 4 ý để tung chiêu':'Nhập đáp án để tung chiêu'
  // Dọc: một cột như cũ (hai lớp bọc `display:contents`). Ngang: cột TRÁI = thế giới game (thanh ải, cảnh trận, dải kết quả) · cột PHẢI = phần học
  // (đề + phương án tự cuộn trong cột, lời giải, nút chính ở đáy). Lúc đọc lời giải bố cục ngang GIỮ cảnh trận (đòn vừa đánh) ở cột trái.
- return <div className="dao2-ai" data-pha={phanHoi?'giai':'lam'} ref={khung} style={ngang?{gridTemplateColumns:`minmax(0,${ti}fr) 20px minmax(0,${100-ti}fr)`}:undefined}>
+ return <div className="dao2-ai" data-pha={phanHoi?'giai':'lam'} data-chuong={cho?'':undefined} ref={khung} onClickCapture={boQua} style={ngang?{gridTemplateColumns:`minmax(0,${ti}fr) 20px minmax(0,${100-ti}fr)`}:undefined}>
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi / lời giải" onClose={()=>setZoom('')}/>}
   <div className="dao2-ai-trai">
    <div className="dao2-ai-dau">
@@ -189,7 +199,7 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
     <NutToanManHinh/>
    </div>
    {!ngang&&!phanHoi&&nhan}
-   {(!phanHoi||ngang)&&<CanhRung profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length}/>}
+   {(!phanHoi||ngang)&&<CanhRung profile={profile} ketQua={ketQua} tong={cau.length} suKien={suKien} chuong={chuongSk===suKien}/>}
    {phanHoi&&<DaiKetQua profile={profile} cau={q} phanHoi={phanHoi} ketQua={ketQua} tong={cau.length}/>}
    {ngang&&<TienDoChuyen cau={cau} viTri={viTri} ketQua={ketQua}/>}
   </div>
@@ -198,11 +208,12 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
    onKeyDown={e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();datTi(ti+(e.key==='ArrowLeft'?-5:5))}}}><i/></div>}
   <div className="dao2-ai-phai">
   {!phanHoi?<>
-   <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)}/>
+   <TheCauAi cau={q} stt={viTri+1} traLoi={traLoi} khoa={busy||cho} onTraLoi={onTraLoi} onZoom={setZoom} onHinhLoi={()=>setHinhLoi(true)}/>
    {hinhLoi&&<p role="alert" className="dao2-loi">Hình của câu chưa tải được. Em về bản đồ rồi bấm LÊN ĐƯỜNG để mở lại; câu này chưa bị tính sai.</p>}
   </>:<KhoiLoiGiai cau={q} stt={viTri+1} phanHoi={phanHoi} traLoiMay={traLoi} onZoom={setZoom}/>}
   <div className="dao2-chan" data-noi={phanHoi||!thieu||loi?'':undefined}>
-   {hetTran&&!phanHoi?<div className="dao2-kinh dao2-het-tran" role="alert"><p ref={loiRef}>{CHU_HET_TRAN_DAO}</p><button type="button" className="dao2-nut-vang" onClick={onRoi}>VỀ BẢN ĐỒ</button></div>
+   {cho?<button type="button" className="dao2-nut-xanh" onClick={boQua}>XEM LỜI GIẢI</button>
+   :hetTran&&!phanHoi?<div className="dao2-kinh dao2-het-tran" role="alert"><p ref={loiRef}>{CHU_HET_TRAN_DAO}</p><button type="button" className="dao2-nut-vang" onClick={onRoi}>VỀ BẢN ĐỒ</button></div>
    :<>{loi&&<p className="dao2-loi" role="alert" ref={loiRef}>{loi}</p>}
     {/* Ô "có trợ giúp" (thầy 28/09 lần 2: thu thành chip mảnh CẠNH nút chốt, không chiếm dòng riêng — nhường chỗ cho đề): bật ⇒ máy chủ ghi `assisted`,
         câu chưa tính Thành thạo và quay lại sớm; lời giải thích nằm ở `title` và hiện một dòng nhỏ khi đã bật. */}

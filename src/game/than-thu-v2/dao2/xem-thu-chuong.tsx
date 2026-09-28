@@ -23,7 +23,7 @@ function XemThu(){
  const them=(...dung:boolean[])=>{unlockBattleAudio();setKq(k=>{const n=k.length+dung.length>TONG?[]:k;return [...n,...dung.map((correct,i)=>({qid:`q${n.length+i}`,correct}))]})}
  const nut={padding:'10px 16px',borderRadius:12,border:0,fontWeight:700,fontSize:15,cursor:'pointer'}
  return <div className="dao dao-vo dao-v2 dao2" style={{maxWidth:Number(q.get('rong')??520),margin:'0 auto',padding:16}}>
-  <CanhRung profile={hoSo} ketQua={kq} tong={TONG} suKien={kq.length}/>
+  <CanhRung profile={hoSo} ketQua={kq} tong={TONG} suKien={kq.length} chuong/>
   <div style={{display:'flex',gap:10,marginTop:14,flexWrap:'wrap'}}>
    <button type="button" id="dung" style={{...nut,background:'rgb(91,240,165)'}} onClick={()=>them(true)}>Đúng</button>
    <button type="button" id="sai" style={{...nut,background:'rgb(255,122,156)'}} onClick={()=>them(false)}>Sai</button>
