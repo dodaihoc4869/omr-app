@@ -39,6 +39,8 @@ import KhungXemPhieu from '../components/KhungXemPhieu'
 import type { OBang as OBangMayChieu } from '../lib/html-may-chieu'
 import { khoaEmCau, nhanLichSuCau, qidMayChuCuaIdCau, type CapEmCau, type LichSuCauEm, type NhanLichSuCau } from '../lib/lich-su-cau-len-bang'
 import { layLichSuCau } from '../lib/lich-su-cau-len-bang-lenh'
+import { layHoSoLenBang } from '../lib/ho-so-em-thay'
+import { thongKeLopCau } from '../lib/thong-ke-lop-cau'
 import type { CauLuyen } from '../lib/bai-tap-pdf'
 import { bangChu, chuCau, chuChum, MAC_DINH, phanCong, TEN_MUC_NHAM, type CauChua, type DongPhanCong, type KetQuaPhanCong } from '../lib/phan-cong'
 import { baiLamCoGiayTuCa } from '../lib/du-lieu-len-bang'
@@ -1131,6 +1133,9 @@ function GoiLenBangCu() {
           tiLeLopSai: tiLeDungTheoCau.get(p.cau.id) != null ? 1 - (tiLeDungTheoCau.get(p.cau.id) as number) : undefined,
           bacEm: hoSoEmTheoSbd.get(p.sbd)?.namKt?.get(p.cau.id)?.bac ?? null,
           heSoHieuChinh: heSoCua(heSoHC, p.cau.phan, p.cau.sao),
+          // Bản vẽ 28/09: lớp trên thẻ tên + dải thống kê lớp (phím T) — số GỘP từ bài làm của ca, không tên em.
+          lop: du?.lop || undefined,
+          thongKe: du ? thongKeLopCau(p.cau.phan, baiLamGiay.filter((b) => b.idCau === p.cau.id)) : undefined,
         })
       }
 
@@ -1359,6 +1364,20 @@ function GoiLenBangCu() {
       if (!tin) return
       const cuaSo = e.source as Window
       const goc = gocGuiLai(e.origin)
+      if (tin.loai === 'ho_so') {
+        // BẢNG CHI TIẾT EM trên tờ chiếu: app gọi máy chủ (mã bí mật thầy nằm ở app, KHÔNG xuống tờ) rồi trả hồ sơ về đúng khung.
+        const o = p.o.get(tin.khoa)
+        if (!o) return
+        void layHoSoLenBang(o.sbd, qidMayChuCuaIdCau(o.cau.id) ?? o.cau.id).then((hoSo) => {
+          if (phienChieu.current !== p) return
+          try {
+            cuaSo.postMessage({ type: TIN_TO_CHIEU.HO_SO_TRA, maPhien: p.ma, id: tin.id, ...(hoSo ? { hoSo } : { loi: 'loi' }) }, goc)
+          } catch {
+            /* khung đã đóng */
+          }
+        })
+        return
+      }
       if (tin.loai === 'san_sang') {
         p.cuaSo = cuaSo
         p.goc = goc

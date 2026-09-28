@@ -153,6 +153,18 @@ export function useGhiToChieu(chienDichId: string) {
       }
       const o = p.o.get(tin.khoa)
       if (!o) return
+      if (tin.loai === 'ho_so') {
+        // Bảng chi tiết em trên tờ chiếu (bản vẽ 28/09): app gọi lệnh thầy chỉ-đọc rồi trả về đúng khung.
+        void import('../../lib/ho-so-em-thay').then(({ layHoSoLenBang }) => layHoSoLenBang(o.sbd, o.qid)).catch(() => null).then((hoSo) => {
+          if (phien.current !== p) return
+          try {
+            cuaSo.postMessage({ type: TIN_TO_CHIEU.HO_SO_TRA, maPhien: p.ma, id: tin.id, ...(hoSo ? { hoSo } : { loi: 'loi' }) }, goc)
+          } catch {
+            /* khung đã đóng */
+          }
+        })
+        return
+      }
       void ghiRef.current(tin.khoa, o, tin.dat, tin.giayThuc?.giay).then((ok) => {
         if (phien.current !== p) return
         try {

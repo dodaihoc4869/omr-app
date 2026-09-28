@@ -427,12 +427,12 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     if(control.types.length&&(!q.dang||!control.types.includes(q.dang)))throw new Error('Thầy vừa đổi phạm vi luyện. Em mở lượt mới.')
     if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Câu đang được dùng cho ca thi. Em mở lượt học khác; câu này không bị tính sai.')
     // Hậu xử lý có thể chạy lại từ receipt nếu lần nộp trước dừng giữa chừng.
-    const ghiKetQuaHoc=async(attempt:Attempt)=>{
+    const ghiKetQuaHoc=async(attempt:Attempt,chon?:string)=>{
       // CNH-1.0 P03: khi cờ `nang_luc_v1` BẬT, sự kiện ĐƯỢC HỖ TRỢ cũng vào sổ (kèm `assistance:'assisted'`)
       // để phần hỗ trợ có bằng chứng và KHÔNG bị tính là lần tự làm. Cờ TẮT ⇒ giữ nguyên hành vi cũ (bỏ qua),
       // không đổi hồ sơ mạnh yếu đang chạy.
       const ghiAssisted = !attempt.assisted || hoa2 || await nangLucBat(env)
-      if(ghiAssisted)await ghiSuKien(env,[{nguon:'game',maNguon:id,sbd,qid,lan:1,ketQua:attempt.correct?1:0,luc:new Date(attempt.at).toISOString(),maDang:q.dang,chuyenDe:'',mucDo:q.mucDo??'',attemptId:receipt,assistance:attempt.assisted?'assisted':'none',purpose:session.mode==='repair'?'repair':session.mode==='tower'?'consolidation':'maintenance',receivedAt:attempt.at}])
+      if(ghiAssisted)await ghiSuKien(env,[{nguon:'game',maNguon:id,sbd,qid,lan:1,ketQua:attempt.correct?1:0,luc:new Date(attempt.at).toISOString(),maDang:q.dang,chuyenDe:'',mucDo:q.mucDo??'',attemptId:receipt,assistance:attempt.assisted?'assisted':'none',purpose:session.mode==='repair'?'repair':session.mode==='tower'?'consolidation':'maintenance',receivedAt:attempt.at,...(chon?{raw:{chon}}:{})}])
       if(attempt.correct&&!attempt.assisted&&!khongThuong&&(ref.role==='thu_thach'||ref.role==='trum')){
         const goc=expMotCau(q.phan,Number(q.sao)||0)
         return ghiKhoanExpGame(env,sbd,{khoa:`thuthach|${qid}`,loai:'thu_thach',exp:goc,ngay:academicDay(new Date(attempt.at).toISOString()),luc:new Date(attempt.at).toISOString(),ghiChu:`Câu thử thách đúng lần đầu: +${goc}`,maNguon:id,qid},Date.now())
@@ -440,7 +440,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
       return {bat:false,exp:0,daGhiTruoc:false}
     }
     const previous=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE id=? AND sbd=?').bind(receipt,sbd).first<{json:string}>()
-    if(previous){const cu=JSON.parse(previous.json);await ghiKetQuaHoc(cu.attempt);const moi=await loadProfile(env,sbd);return {ok:true,...cu,profile:visible(moi.profile),revision:moi.revision,replayed:true}}
+    if(previous){const cu=JSON.parse(previous.json);await ghiKetQuaHoc(cu.attempt,typeof cu.traLoi==='string'?cu.traLoi:undefined);const moi=await loadProfile(env,sbd);return {ok:true,...cu,profile:visible(moi.profile),revision:moi.revision,replayed:true}}
     if(session.guardian){const {r}=await escortContext(env,session.guardian,sbd);if(r.finished||r.round!==session.guardianRound||Date.now()>=Math.min(r.deadline,r.roundAt+60000))throw new Error('Lượt vừa kết thúc. Em làm câu của lượt mới.')}
     // TRẦN CÂU/NGÀY chỉ chặn ở lúc PHÁT câu (`start` / rút: `Math.min(soCau, remaining)`), KHÔNG chặn ở đây (Boss 21/09, P0 "không nộp được bài"): câu ĐÃ PHÁT trong một lượt đang mở thì luôn được trả lời, em không kẹt giữa ải
     // vì trần đổi / đếm lại. Mỗi câu của một lượt chỉ trả lời MỘT lần (`receipt` = lượt|câu là khoá chính; nộp lại ⇒ `replayed`), nên tổng số lượt trong ngày ≤ trần + phần dư của lượt cuối đã phát.
@@ -459,7 +459,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     queries.push(env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=? AND EXISTS(SELECT 1 FROM game_v2_attempt WHERE id=?)').bind(JSON.stringify(p),sbd,revision,receipt))
     const written=await env.DB.batch(queries)
     if(!written[0]?.meta.changes)throw new Error('Một thiết bị khác vừa cập nhật. Em bấm chấm lại để đồng bộ.')
-    const g=await ghiKetQuaHoc(attempt)
+    const g=await ghiKetQuaHoc(attempt,submitted) // ĐÁP ÁN EM CHỌN vào sổ (`raw_json`) — cho bảng chi tiết em trên tờ chiếu (28/09)
     const expThuThach=g.exp
     let pOut=p,revOut=revision+1
     if(g.bat){const f=await loadProfile(env,sbd);pOut=f.profile;revOut=f.revision}

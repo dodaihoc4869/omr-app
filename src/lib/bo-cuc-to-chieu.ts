@@ -1,18 +1,17 @@
-// BỐ CỤC TỜ MÁY CHIẾU — ĐO THẬT, KHÔNG BAO GIỜ CUỘN (M2, 19/09/2026).
+// BỐ CỤC TỜ MÁY CHIẾU — ĐO THẬT, CHỮ CỐ ĐỊNH (M2 19/09 · viết lại theo luật thầy 28/09/2026, bản vẽ LenBang-Moi).
 //
-// Thầy chốt: "câu dài thì tự động lấy 2/3 bảng để hiển thị (làm lại thuật toán chỗ này cho chuẩn, để phải hiển
-// thị đầy đủ trên bảng KHÔNG PHẢI CUỘN bất kể câu nào). 1/3 bảng còn lại để học sinh lên làm bài."
+// LUẬT THẦY 28/09: "KHÔNG BAO GIỜ thu nhỏ chữ." Cỡ chữ đề = phương án = lời giải = `--mc-co` (tỉ lệ bề ngang × hệ số thầy chọn),
+// KHÔNG co từng px, KHÔNG bậc "co chữ", KHÔNG cảnh báo "quá dài". Câu dài hơn vùng 2/3 thì:
+//   · CHỜ GỌI  ⇒ LẬT TRANG trong câu, ngắt ở ranh giới khối (lớp bản vẽ `len-bang-moi-to-chieu.ts`);
+//   · ĐANG CHỮA ⇒ CUỘN dọc trong vùng 2/3. Cột 1/3 LUÔN giữ cho em làm bài (không còn "toàn bảng").
 //
-// BẢN CŨ ĐOÁN bằng ký tự (`laCauDai`: >280 ký tự, ≥4 dòng, có ảnh…) rồi để nửa bảng `overflow-y:auto` — đoán sai là
-// chữ tràn và thầy phải cuộn giữa giờ. Chiều cao chữ thật phụ thuộc phông, bề ngang màn, công thức, ảnh: chỉ ĐO mới đúng.
-//
-// THUẬT TOÁN — mỗi đợt LEO BẬC cho tới khi vùng đề VỪA (không `scrollHeight > clientHeight`, không tràn ngang):
+// THUẬT TOÁN — mỗi đợt thử theo thứ tự, dừng ở bố cục đầu tiên VỪA (không `scrollHeight > clientHeight`, không tràn ngang):
 //   bậc 1  ĐÔI      hai em, mỗi em ½ bảng: đề trên, vùng làm bài dưới (≥ 30% chiều cao)   [chỉ ghép đôi khi CẢ HAI vừa]
 //   bậc 2  ĐƠN 2/3  một em: đề chiếm 2/3 bề ngang, 1/3 bên phải là thẻ tên + vùng làm bài
-//   bậc 3  CHIA CỘT bậc 2 + phương án/ý chia 2 cột, hình co dần tới 40% cỡ gốc
-//   bậc 4  CO CHỮ   bậc 3 + cỡ chữ giảm từng 1 px từ cỡ chuẩn xuống SÀN (24 px ở 1920 px bề ngang, quy đổi theo bề ngang)
-//   bậc 5  TOÀN BẢNG không còn vùng làm bài (em làm ở bảng phụ); vẫn vừa thì thôi, chưa vừa thì co tiếp tới đáy tuyệt đối và CẢNH BÁO
+//   bậc 3  CHIA CỘT bậc 2 + phương án/ý chia 2 cột (phương trình không ngắt ⇒ tràn ngang ⇒ bỏ), hình co dần tới 40% cỡ gốc
+//   không vừa  ⇒ bậc 2 ở cỡ chuẩn, `vua = false` — KHÔNG co chữ; tờ chia trang (chờ) / cuộn (chữa). Không ghi chú cảnh báo.
 // Đợt ĐÔI mà đo lại không vừa (bậc 1) thì TÁCH thành hai đợt đơn, cộng thời gian, ghi chú cho thầy.
+// (Bậc 4 "co chữ" và bậc 5 "toàn bảng" đã BỎ; kiểu `BacBoCuc` giữ 4/5 chỉ để dữ liệu cũ đọc được.)
 //
 // HAI PHẦN, MỘT NGUỒN HẰNG SỐ (`BO_CUC_TO_CHIEU`):
 //   · `jsBoCuc()` — mã CHẠY TRONG TỜ CHIẾU (đo bằng DOM thật của trình duyệt). Đây là chân lý;
@@ -51,8 +50,8 @@ export const TEN_BAC_BO_CUC: Record<BacBoCuc, string> = {
   1: 'hai em, mỗi em nửa bảng',
   2: 'một em, đề chiếm 2/3 bảng',
   3: 'một em, 2/3 bảng, phương án chia cột và hình thu nhỏ',
-  4: 'một em, 2/3 bảng, chữ co nhỏ để vừa',
-  5: 'toàn bảng, em làm ở bảng phụ',
+  4: 'một em, 2/3 bảng (bậc cũ — đã bỏ 28/09)',
+  5: 'một em, 2/3 bảng (bậc cũ — đã bỏ 28/09)',
 }
 
 export interface CauHinhLeoBac {
@@ -77,7 +76,7 @@ export interface KetQuaLeoBac {
   bac: BacBoCuc
   co: number
   hinh: number
-  /** Đã vừa vùng đề chưa. `false` chỉ khi ngay cả đáy tuyệt đối ở bậc 5 vẫn tràn. */
+  /** Đã vừa vùng đề chưa. `false` ⇒ câu dài hơn 2/3: tờ lật trang (chờ gọi) / cuộn (đang chữa), chữ giữ cỡ chuẩn. */
   vua: boolean
   /** Cỡ chữ thấp hơn SÀN (chỉ xảy ra ở bậc 5). */
   duoiSan: boolean
@@ -110,11 +109,8 @@ export function leoBacBoCuc(vua: (bac: number, co: number, hinh: number) => bool
       if (thu(3, co0, h)) return ra(3, co0, h, true)
     }
   }
-  // NẾU VẪN KHÔNG VỪA (Bậc 1, 2, 3 ở cỡ chuẩn đều tràn)
-  // Bỏ hẳn Bậc 4 (co chữ) và Bậc 5 co chữ — luôn giữ cỡ chuẩn!
-  // Đẩy sang Bậc 5 (toàn bảng) với cỡ chuẩn, chấp nhận không vừa để CSS xử lý cuộn.
-  const hCo = cfg.coBac3 ? hMin : 1
-  return ra(5, co0, hCo, false, false)
+  // KHÔNG VỪA: giữ bố cục 2/3 ở CỠ CHUẨN (luật 28/09 — không co chữ, không toàn bảng); tờ chiếu lật trang / cuộn.
+  return ra(2, co0, 1, false, false)
 }
 
 /** Bản chữ của `leoBacBoCuc` để nhúng vào tờ chiếu (gán vào biến cùng tên). */
@@ -140,8 +136,8 @@ body.mc-bc .mc-vung-de img { max-width: 100%; width: auto; height: auto; max-hei
 body.mc-bc .mc-vung-de img.mc-anh-pa { max-height: calc(12vh * var(--mc-hinh, 1)); }
 body.mc-bc .mc-vung-de .q-bang-cuon { overflow: visible; }
 body.mc-bc .mc-vung-de .q-bang { width: auto; max-width: 100%; font-size: calc(var(--mc-co, 28px) * .72); }
-/* lời giải PHỦ lên đúng vùng đề (có cuộn riêng — lời giải là phụ lục, không phải đề) */
-body.mc-bc .mc-vung-de > .mc-giai { position: absolute; inset: 0; margin: 0; padding: 14px 20px; overflow-y: auto; background: var(--mc-nen); z-index: 6; box-sizing: border-box; }
+/* lời giải NẰM DƯỚI ĐỀ trong vùng đề (luật 28/09 — không còn lớp phủ; dài thì lật trang / cuộn cùng đề) */
+body.mc-bc .mc-vung-de > .mc-giai { position: static; margin: .5em 0 0; box-sizing: border-box; }
 body.mc-bc .mc-vung-de > .mc-giai[hidden] { display: none; }
 body.mc-bc .mc-giai-vung { margin: 0; flex: none; }
 /* BẬC 1: hai em, mỗi em nửa bảng — vùng làm bài co giãn nhưng KHÔNG dưới ngưỡng */
@@ -167,10 +163,9 @@ body.mc-bc .mc-b5 .mc-vung-de { grid-column: 1; grid-row: 2; }
 body.mc-bc .mc-b5 .mc-nut-hien-em { grid-column: 1; grid-row: 1; align-self: start; z-index: 3; }
 body.mc-bc .mc-b5 .mc-cot-lam-bai, body.mc-bc .mc-b5 .mc-trang, body.mc-bc .mc-b5 > .mc-trong { display: none; }
 body.mc-bc .mc-b5 .mc-giai-vung { grid-column: 1; grid-row: 1; justify-self: end; align-self: center; padding: 0 16px; z-index: 3; }
-body.mc-bc .mc-b5 .mc-vung-de { overflow-y: auto !important; }
 /* Khi bấm lên bảng (pha="goi"), mc-b5 biến thành 2/3 bảng y hệt mc-dot-don, VÀ cho phép cuộn */
 body[data-pha="goi"].mc-bc .mc-dot.mc-b5 { grid-template-columns: 2fr 1fr; grid-template-rows: auto minmax(0, 1fr); }
-body[data-pha="goi"].mc-bc .mc-b5 .mc-vung-de { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; overflow-y: auto !important; }
+body[data-pha="goi"].mc-bc .mc-b5 .mc-vung-de { grid-column: 1; grid-row: 1 / span 2; align-self: stretch; }
 body[data-pha="goi"].mc-bc .mc-b5 .mc-em { grid-column: 2; grid-row: 1; }
 body[data-pha="goi"].mc-bc .mc-b5 .mc-nut-hien-em { grid-column: 2; grid-row: 1; align-self: start; z-index: 3; }
 body[data-pha="goi"].mc-bc .mc-b5 .mc-cot-lam-bai { display: block; grid-column: 2; grid-row: 2; padding: 0; border: 0; border-radius: 16px; box-shadow: inset 0 0 0 2px var(--mc-vien); background: transparent; }
@@ -346,10 +341,8 @@ export function jsBoCuc(): string {
     dot.setAttribute('data-bac', String(kq.bac));
     dot.setAttribute('data-co', String(kq.co));
     dot.setAttribute('data-vua', kq.vua ? '1' : '0');
-    if (!kq.vua) ghiChu(dot, 'Câu này quá dài để vừa bảng — cân nhắc chia hai đợt hoặc phát đề in', 'canh-bao');
-    else if (kq.duoiSan) ghiChu(dot, 'Câu rất dài — chữ nhỏ hơn mức khuyến nghị', 'canh-bao');
-    else if (kq.bac === 5) ghiChu(dot, 'Câu dài — cả bảng cho đề; em làm ở bảng phụ', '');
-    else if (dot.getAttribute('data-tach') === '1') ghiChu(dot, 'Đợt này tách ra vì hai câu không vừa một bảng', '');
+    // Luật 28/09: không cảnh báo "quá dài" — câu dài thì lật trang / cuộn, chữ giữ nguyên.
+    if (dot.getAttribute('data-tach') === '1') ghiChu(dot, 'Đợt này tách ra vì hai câu không vừa một bảng', '');
     else ghiChu(dot, '');
   }
 
