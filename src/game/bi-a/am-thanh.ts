@@ -13,7 +13,7 @@ export class AmThanhBia {
   private noise: AudioBuffer | null = null
   private master: GainNode | null = null
   private rv: ConvolverNode | null = null
-  private hang: { k: 'bi' | 'bang'; v: number; pan: number }[] = []
+  private hang: { k: 'bi' | 'bang'; v: number; pan: number; kho: boolean }[] = []
   tat: boolean
   private taoCtx: () => Ctx | null
   constructor(taoCtx: () => Ctx | null = () => { const C = (globalThis as { AudioContext?: new () => Ctx; webkitAudioContext?: new () => Ctx }).AudioContext ?? (globalThis as { webkitAudioContext?: new () => Ctx }).webkitAudioContext; return C ? new C() : null }) {
@@ -74,20 +74,20 @@ export class AmThanhBia {
     s.connect(fl); fl.connect(g); g.connect(out); s.start(t, Math.random() * Math.max(0, 0.95 - dur)); s.stop(t + dur + 0.03)
   }
   /** Tạo một tiếng tại thời điểm t. v: vận tốc va chạm (đv/s) hoặc tốc độ cú đánh. */
-  private tao(k: TenTieng, t: number, v: number, pan: number): void {
+  private tao(k: TenTieng, t: number, v: number, pan: number, kho = false): void {
     switch (k) {
       case 'bi': { // bi nhựa phenolic chạm nhau: "cạch" sáng, 3 tần số không hoà âm, tắt rất nhanh
         const kk = Math.min(1, Math.pow(v / 1800, 0.8)); if (kk < 0.03) return
-        const o = this.daPhat(0.25, pan), f = 2700 + Math.random() * 900
+        const o = this.daPhat(kho ? 0 : 0.25, pan), f = 2700 + Math.random() * 900
         this.tone(o, t, f, 0.028, 0.34 * kk); this.tone(o, t, f * 1.53, 0.018, 0.2 * kk); this.tone(o, t, f * 2.31, 0.012, 0.12 * kk); this.nhieu(o, t, 0.012, 0.28 * kk, 'highpass', 3500); this.tone(o, t, 480, 0.02, 0.06 * kk); return
       }
       case 'bang': { const kk = Math.min(1, v / 2200); if (kk < 0.04) return; const o = this.daPhat(0.2, pan); this.nhieu(o, t, 0.06, 0.55 * kk, 'lowpass', 320, 0.8); this.tone(o, t, 120, 0.07, 0.35 * kk, 'sine', 70); this.nhieu(o, t, 0.018, 0.1 * kk, 'bandpass', 1100, 2); return }
       case 'co': { const kk = 0.25 + 0.75 * Math.min(1, v / 2600), o = this.daPhat(0.2, pan); this.nhieu(o, t, 0.014, 0.5 * kk, 'bandpass', 1700, 1.2); this.tone(o, t, 820, 0.03, 0.22 * kk, 'triangle', 600); this.tone(o, t, 190, 0.05, 0.18 * kk, 'sine', 120); if (kk > 0.8) this.nhieu(o, t, 0.008, 0.25 * kk, 'highpass', 4500); return }
-      case 'lo': { // chạm túi da rồi lăn lọc cọc trong máng hứng
+      case 'lo': { // chạm túi da rồi lọc cọc trong máng hứng (không tiếng ầm kéo dài — thầy bỏ mọi tiếng lăn 28/09)
         const o = this.daPhat(0.3, pan); this.nhieu(o, t, 0.09, 0.45, 'lowpass', 420, 0.7); this.tone(o, t, 150, 0.16, 0.4, 'sine', 60)
         let tt = t + 0.16 + Math.random() * 0.06, g = 0.2
         for (let i = 0; i < 6; i++) { this.tone(o, tt, 230 + Math.random() * 90, 0.045, g, 'triangle', 160); this.nhieu(o, tt, 0.02, g * 0.6, 'bandpass', 900, 1.5); tt += 0.07 + i * 0.035; g *= 0.72 }
-        this.nhieu(o, t + 0.15, 0.7, 0.12, 'lowpass', 200, 0.7); return
+        return
       }
       case 'dat': { const o = this.daPhat(0.1, pan); this.nhieu(o, t, 0.03, 0.22, 'lowpass', 600); this.tone(o, t, 320, 0.025, 0.12); return }
       case 'phan': { const o = this.daPhat(0.05, 0); for (let i = 0; i < 5; i++) this.nhieu(o, t + i * 0.05 + Math.random() * 0.015, 0.045, 0.12, 'bandpass', 3200 + Math.random() * 1200, 2.5); return }
@@ -108,8 +108,8 @@ export class AmThanhBia {
     }
   }
   phat(k: TenTieng, v = 0, pan = 0): void { if (!this.chay()) return; try { this.tao(k, this.ctx!.currentTime + 0.005, v, pan) } catch { /* bỏ qua */ } }
-  /** Va chạm trong khung hình: gom lại, phát ở `xa()`. */
-  gom(k: 'bi' | 'bang', v: number, pan: number): void { this.hang.push({ k, v, pan }) }
+  /** Va chạm trong khung hình: gom lại, phát ở `xa()`. `kho`: không vang phòng (cú phá bàn). */
+  gom(k: 'bi' | 'bang', v: number, pan: number, kho = false): void { this.hang.push({ k, v, pan, kho }) }
   /** Phát tối đa 5 tiếng bi + 3 tiếng băng to nhất của khung, lệch nhau vài mili giây. Trả số tiếng đã phát. */
   xa(): number {
     if (!this.hang.length) return 0
@@ -120,7 +120,7 @@ export class AmThanhBia {
     const t0 = this.ctx!.currentTime + 0.005
     for (const e of h) {
       if (e.k === 'bi') { if (nb >= 5) continue; nb++ } else { if (nc >= 3) continue; nc++ }
-      try { this.tao(e.k, t0 + (nb + nc - 1) * 0.004 + Math.random() * 0.003, e.v, e.pan) } catch { /* bỏ qua */ }
+      try { this.tao(e.k, t0 + (nb + nc - 1) * 0.004 + Math.random() * 0.003, e.v, e.pan, e.kho) } catch { /* bỏ qua */ }
     }
     return nb + nc
   }
