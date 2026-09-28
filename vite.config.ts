@@ -125,6 +125,9 @@ export default defineConfig({
           '**/{CaiDatScreen,TongQuanScreen,ChienDichScreen,gv-hoa2,GiaoDeTheoTuanScreen,CauHoiScreen,ClassListScreen,ExamHubScreen,ExamMonitorScreen,ExamSetupScreen,GoiLenBangScreen,HocSinhScreen,LichSuCaScreen,NganHangDeScreen,PhanCongScreen,ToanCanhEmScreen,ExperimentDemo,DaoThanThu,DoanHoTong,Game,html-may-chieu,Dao2,DoanHinh,chien-dich,ca-chot-chien-dich,CauDaLam}-*.{js,css}',
           // Game Hóa 2.0 (27/09): hình vẽ 32 phụ kiện thần thú (nạp lười trong game) — chỉ máy mở game mới tải, cất ở kho chạy-lúc.
           '**/pk-{cl,da,hq,vd}-*.js',
+          // Gộp ngang + app thầy 2.0 (28/09): các mảnh nạp LƯỜI chỉ của app thầy (giao/chiếu chiến dịch, bố cục tờ chiếu) và của game
+          // (cửa hàng phụ kiện, lọc câu theo khối) ra kho chạy-lúc — giữ precache vỏ ≤ 2850 KB (chừa ≥ 150 KB dưới trần 3000 KB).
+          '**/{LenBangChienDich,GiaoChienDich,bo-cuc-to-chieu,ManShopThat,khoi-cau}-*.{js,css}',
           // Tải PDF "Câu đã làm" (28/09): jspdf (+ canvg `index.es`, dompurify `purify.es`, html2canvas mà jspdf kéo theo) và html2canvas-pro
           // ≈ 1 MB, chỉ nạp khi em bấm "Tải PDF" (import động, lúc đó đang có mạng) — cất ở kho chạy-lúc, KHÔNG vào precache vỏ.
           '**/{jspdf.es.min,html2canvas,html2canvas-pro.esm,purify.es,index.es,pdf-cau-da-lam}-*.js',
