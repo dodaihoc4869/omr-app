@@ -32,8 +32,8 @@ describe('Đảo 2.0 · bố cục ngang', () => {
     expect(css).toContain('.dao2.dao2-bd-trai,.dao2.dao2-bd-phai,.dao2.dao2-ai-trai,.dao2.dao2-ai-phai{display:contents}')
     const ngang = css.slice(css.indexOf('@media' + MQ_NGANG.replace(/\s+/g, '')))
     expect(ngang).toMatch(/\.dao2\.dao2-ai\{display:grid;grid-template-columns:minmax\(0,7fr\)minmax\(0,5fr\)/)
-    expect(ngang).toMatch(/\.dao2\.dao2-giay,\.dao2\.dao2-the-giai\{flex:11auto;min-height:0;overflow:auto/)
-    expect(ngang).toContain('.dao2.dao2-chan,.dao2.dao2-chan[data-noi]{position:static;margin-top:auto')
+    expect(ngang).toContain('.dao2.dao2-chan,.dao2.dao2-chan[data-noi]{position:static;margin-top:0') // 28/09: nút chốt ngay dưới thẻ câu; câu ngắn không kéo giãn
+    expect(ngang).toContain('.dao2.dao2-giay,.dao2.dao2-the-giai{flex:01auto;min-height:0;overflow:auto')
   })
 
   it('Trong ải (ngang): trái = thanh ải + cảnh trận + thẻ tiến độ có nhãn vai; phải = thẻ đề + nút chốt', () => {
