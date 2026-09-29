@@ -4,6 +4,7 @@
 import type { CaTomTat } from './exam-api'
 import type { BangChienDich, ChienDichTom } from '../components/chien-dich/api'
 import { mocHetHan, ngayVn } from '../components/chien-dich/ngay'
+import { laChamNhip } from './nhip-chien-dich'
 
 const NGAY_MS = 86_400_000
 
@@ -70,7 +71,14 @@ export function dongChienDich(cd: ChienDichTom, bang: BangChienDich | null, nowM
     const tb = ds.reduce((a, b) => a + b, 0) / ds.length
     if (!dangYeu || tb < dangYeu.tiLe) dangYeu = { ten: d, tiLe: tb }
   }
-  const nhip: NhipChienDich = cd.hetHan ? 'cho_chua' : thanhThao !== null && thanhThao + 1e-9 < mucCan ? 'cham' : 'dung'
+  // Nhịp: CÙNG luật với trang Chiến dịch (src/lib/nhip-chien-dich.ts, 29/09) — đo trên phần lớp ĐÃ LÀM QUA, so mức cần tới hết hôm qua.
+  // Máy chủ cũ không gửi ngày thứ ⇒ lùi về so thành thạo với mức cần theo giờ, vẫn chừa 10 điểm %.
+  const lop = bang?.lop
+  const nhip: NhipChienDich = cd.hetHan
+    ? 'cho_chua'
+    : lop && typeof lop.ngayThu === 'number'
+      ? laChamNhip(lop.coXat, lop) ? 'cham' : 'dung'
+      : thanhThao !== null && laChamNhip(thanhThao, { mucCanHomNay: mucCan }) ? 'cham' : 'dung'
   return {
     cd,
     thanhThao,

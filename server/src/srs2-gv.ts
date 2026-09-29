@@ -256,6 +256,7 @@ async function thongKeLopTho(env: Env, cd: ChienDich, homNay: string) {
     coXat: coXat / tong, thanhThao: thanhThao / tong, dungNhip, emLamQuaDu,
     quaTai: (kh.results ?? []).filter((x) => Number(x.huyet_chien) === 1).length,
     canDayLaiCau: canDayLai.size, canDayLaiLuot: [...canDayLai.values()].reduce((a, b) => a + b, 0), mucCanHomNay: moc.mucCanHomNay,
+    ngayThu: moc.ngayThu, tongNgay: moc.tongNgay, // chỉ-thêm 29/09: luật Chậm nhịp chung (src/lib/nhip-chien-dich.ts)
   }
 }
 
