@@ -129,3 +129,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 19:25 · Gộp PR #83 màn theo dõi ca gọn + nhịp 3 s (/ca/nhip, ~80 truy vấn D1/phút/100 em) · main 59abb58 · 0 ca mở · lùi: git revert -m 1 59abb58.
 - 19:29 · Deploy #580 THÀNH CÔNG: PR #83 · main 59abb58 · /ca/nhip thử OK · lùi: git revert -m 1 59abb58. Thầy đổi ý: bỏ cả thẻ Thời gian trở xuống — đang làm PR mới.
 - 19:52 · Gộp PR #84 màn thi điện thoại xoay ngang (bỏ phiếu điền ô, câu dài chia 2 cột + thanh kéo, thanh trên 32 px; dọc/máy tính giữ nguyên) · main 1dc3912 · 0 ca mở · 224 test màn thi xanh · lùi: git revert -m 1 1dc3912.
+- 19:50 · Deploy #581 THÀNH CÔNG: PR #84 màn thi ngang · main 1dc3912 · lùi: git revert -m 1 1dc3912.
