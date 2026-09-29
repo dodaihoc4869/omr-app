@@ -207,6 +207,15 @@ describe('phép tính Tổng quan', () => {
     expect(d.dangYeu?.ten).toBe('Lipid')
     expect(d.treNhip).toBe(1)
   })
+  it('chiến dịch VỪA GIAO (0% thành thạo, mức cần mới nhích 1 chút) ⇒ Đúng nhịp; hụt từ 10 điểm % mới Chậm nhịp (29/09)', () => {
+    const moi = cd('M', { taoLuc: '2026-09-28T09:00:00Z', hanNop: '2026-10-05' })
+    expect(mucCanHomNay(moi.taoLuc, moi.hanNop, now)).toBeGreaterThan(0)
+    expect(dongChienDich(moi, bang(moi, 0), now).nhip).toBe('dung')
+    const c = cd('A')
+    const can = mucCanHomNay(c.taoLuc, c.hanNop, now)
+    expect(dongChienDich(c, bang(c, can - 0.05), now).nhip).toBe('dung')
+    expect(dongChienDich(c, bang(c, can - 0.15), now).nhip).toBe('cham')
+  })
   it('thống kê tháng + bài nộp 14 ngày bỏ ca bài tập về nhà (cũ)', () => {
     const ds = [ca('a', { daNop: 5, daVao: 6, canhBao: 1 }), ca('b', { loai: 'baitap', daNop: 9 }), ca('c', { batDau: '2026-08-30T00:00:00Z', daNop: 7 })]
     expect(thongKeThang(ds, now)).toMatchObject({ thang: 9, soCa: 1, daNop: 5, daVao: 6, roiMan: 1, soCaRoiMan: 1 })

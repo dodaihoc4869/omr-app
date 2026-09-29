@@ -39,6 +39,9 @@ export function soNgayCon(hanNop: string, nowMs: number): number {
   return Math.ceil((het - nowMs) / NGAY_MS)
 }
 
+/** Khoảng hụt so với mức cần hôm nay mới tính là Chậm nhịp (10 điểm %). */
+export const NGUONG_CHAM_NHIP = 0.1
+
 export type NhipChienDich = 'dung' | 'cham' | 'cho_chua'
 export const CHU_NHIP: Record<NhipChienDich, string> = { dung: 'Đúng nhịp', cham: 'Chậm nhịp', cho_chua: 'Chờ buổi chữa' }
 
@@ -70,7 +73,9 @@ export function dongChienDich(cd: ChienDichTom, bang: BangChienDich | null, nowM
     const tb = ds.reduce((a, b) => a + b, 0) / ds.length
     if (!dangYeu || tb < dangYeu.tiLe) dangYeu = { ten: d, tiLe: tb }
   }
-  const nhip: NhipChienDich = cd.hetHan ? 'cho_chua' : thanhThao !== null && thanhThao + 1e-9 < mucCan ? 'cham' : 'dung'
+  // CHẬM NHỊP = thấp hơn mức cần hôm nay TỪ 10 điểm % — CÙNG luật trang Chiến dịch (`trangThaiHien`, DsChienDichDaGiao.tsx).
+  // Trước 29/09 so sát nút ⇒ chiến dịch vừa giao (0% thành thạo, mức cần 0,3% hiện "cần 0%") đã bị báo Chậm nhịp.
+  const nhip: NhipChienDich = cd.hetHan ? 'cho_chua' : thanhThao !== null && thanhThao < mucCan - NGUONG_CHAM_NHIP ? 'cham' : 'dung'
   return {
     cd,
     thanhThao,
