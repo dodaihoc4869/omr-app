@@ -1,0 +1,65 @@
+{
+ "qid": "12-BD7-13-III-3",
+ "bam": "c5a3e0e901d152b1",
+ "dang": "tln",
+ "ten": "Methylamine gặp năm thuốc thử: chọn chất có phản ứng",
+ "keys": ["k3"],
+ "dung": [
+  {
+   "ic": "i-atom",
+   "t": "Dựng phân tử {CH3NH2}",
+   "p": "Amine bậc I, no: N còn cặp electron tự do nên là base, mạnh hơn {NH3}. Phân tử không có vòng benzene.",
+   "io": [["in", "–{NH2} bậc I"], ["out", "vòng benzene"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Vai base: (1) {HCl}, (2) {FeCl3}",
+   "p": "Nhận H<sup>+</sup> của {HCl} tạo muối tan; trong nước sinh {OH}<sup>−</sup> đủ kết tủa {Fe(OH)3} nâu đỏ.",
+   "io": [["in", "(1)"], ["in", "(2)"]]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "Bậc I no gặp (5) {HNO2}",
+   "p": "Tạo alcohol, khí {N2} thoát ra.",
+   "io": [["in", "(5)"], ["out", "{N2}↑"]]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Loại (3) {NaOH}, (4) {Br2}",
+   "p": "{NaOH} cũng là base nên không phản ứng. {Br2} chỉ thế vào vòng benzene của aniline.",
+   "io": [["out", "(3)"], ["out", "(4)"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "125",
+  "donVi": "",
+  "k": "k3",
+  "bay": "xuhuong",
+  "soi": "\"methylamine\": amine no, không có vòng benzene, nên chỉ nhận thuốc thử của base và của amine bậc I no; đừng mang phản ứng của aniline sang.",
+  "g": [
+   "Chìa khoá <b>Amine gặp thuốc thử</b>: amine no là base, gặp {HCl} tạo muối, gặp {FeCl3} cho {Fe(OH)3} nâu đỏ; không phản ứng với {NaOH}; {Br2} chỉ tác dụng với aniline; {HNO2} gặp bậc I no cho alcohol và {N2}.",
+   "Methylamine {CH3NH2}: bậc mấy, có vòng benzene không?",
+   "Soát lần lượt (1) đến (5): chất nào là acid hoặc cần base, chất nào chỉ hợp với vòng thơm?"
+  ],
+  "giai": "Đáp số: 125. (1) {CH3NH2} + {HCl} → {CH3NH3Cl}. (2) 3{CH3NH2} + {FeCl3} + 3{H2O} → {Fe(OH)3}↓ + 3{CH3NH3Cl}. (3) {NaOH} là base, không phản ứng. (4) Không có vòng benzene nên không phản ứng với {Br2}. (5) {CH3NH2} + {HNO2} → {CH3OH} + {N2}↑ + {H2O}. Ghép số thứ tự tăng dần: 125."
+ },
+ "ket": "Đáp số: 125",
+ "nho": "Amine no phản ứng với {HCl}, {FeCl3}, {HNO2}; không phản ứng với {NaOH}; {Br2} chỉ tạo kết tủa với aniline.",
+ "phepTinh": [
+  { "ten": "Ghép bộ số (1), (2), (5)", "bieuThuc": "1*100+2*10+5", "ketQua": 125, "lamTron": 0, "laDapSo": true }
+ ],
+ "tuongTu": [
+  {
+   "t": "Cho aniline lần lượt tác dụng với: (1) dung dịch {HCl}, (2) dung dịch {NaOH}, (3) nước {Br2}. Bộ số các chất phản ứng với aniline là 13.",
+   "d": "D",
+   "giai": "Đúng. Aniline là base yếu nên vẫn tạo muối với {HCl}; không phản ứng với {NaOH}; vòng benzene gắn –{NH2} thế {Br2} cho kết tủa trắng."
+  },
+  {
+   "t": "Dung dịch dimethylamine làm quỳ tím hoá xanh và tác dụng với {HNO2} giải phóng khí {N2}.",
+   "d": "S",
+   "giai": "Sai. Dimethylamine là base nên làm quỳ hoá xanh, nhưng là amine bậc II nên gặp {HNO2} không giải phóng {N2}."
+  }
+ ],
+ "co": []
+}

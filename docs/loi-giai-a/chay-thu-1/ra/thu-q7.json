@@ -227,7 +227,12 @@
    ]
   }
  ],
- "canThayChot": [
-  "Đề gốc in tiêu đề bảng 1 là \"Nhiệt độ sôi\"; hồ sơ hiểu là nhiệt độ tiến hành phản ứng (đã chú thích trong đề). Hàng \"Hàm lượng ethyl acrylate\" không ghi đơn vị; lời giải coi đó là hiệu suất (%), đúng như cách ý b và d gọi."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Đề gốc in tiêu đề bảng 1 là \"Nhiệt độ sôi\"; hồ sơ hiểu là nhiệt độ tiến hành phản ứng (đã chú thích trong đề). Hàng \"Hàm lượng ethyl acrylate\" không ghi đơn vị; lời giải coi đó là hiệu suất (%), đúng như cách ý b và d gọi.",
+   "loai": "loiDe",
+   "chot": "Sửa đề: tiêu đề bảng 1 \"Nhiệt độ sôi\" → \"Nhiệt độ phản ứng (°C)\"; hàng hàm lượng ghi thêm \"(%)\"."
+  }
  ]
 }

@@ -252,7 +252,13 @@
    ]
   }
  ],
- "canThayChot": [
-  "Ý 2: đáp án chính thức S dựa trên quy tắc phổ thông (thế vào vị trí o/p còn trống → 2 {Br2}). Thực tế, salicylic acid với nước bromine dư có thể vừa thế vừa tách {CO2} (bromo-decarboxyl hoá) tạo 2,4,6-tribromophenol, tiêu tốn 3 {Br2}; khi đó tỉ lệ 1 : 3 cũng bảo vệ được. Lời giải giữ S theo quy tắc chìa khoá k5; thầy xem có cần chú thích cho học sinh không."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Ý 2: đáp án chính thức S dựa trên quy tắc phổ thông (thế vào vị trí o/p còn trống → 2 {Br2}). Thực tế, salicylic acid với nước bromine dư có thể vừa thế vừa tách {CO2} (bromo-decarboxyl hoá) tạo 2,4,6-tribromophenol, tiêu tốn 3 {Br2}; khi đó tỉ lệ 1 : 3 cũng bảo vệ được. Lời giải giữ S theo quy tắc chìa khoá k5; thầy xem có cần chú thích cho học sinh không.",
+   "loai": "dapAn",
+   "chot": "Giữ đáp án kho (chỗ tranh luận chỉ là cách hiểu).",
+   "daXoa": true
+  }
  ]
 }

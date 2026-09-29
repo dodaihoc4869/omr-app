@@ -1,0 +1,112 @@
+{
+ "qid": "12-C5-B16-II-15",
+ "bam": "5f9fc901635fb98d",
+ "dang": "ds",
+ "ten": "Pin Li-ion: quá trình khi phóng điện và khi sạc",
+ "keys": ["k4", "k3"],
+ "dung": [
+  {
+   "ic": "i-hex",
+   "t": "Hai điện cực của pin Li-ion",
+   "p": "Cực âm là than chì chứa Li ({LiC6}); cực dương là {CoO2}, nhận Li<sup>+</sup> thành {LiCoO2}.",
+   "io": [["in", "{LiC6}"], ["in", "{CoO2}"]]
+  },
+  {
+   "ic": "i-battery",
+   "t": "Phóng điện: cực âm bị oxi hoá",
+   "p": "{LiC6} → {C6} + Li<sup>+</sup> + e. Electron đi qua mạch ngoài, Li<sup>+</sup> đi qua chất điện li sang cực dương.",
+   "io": [["out", "Li<sup>+</sup> rời cực âm"]]
+  },
+  {
+   "ic": "i-atom",
+   "t": "Cực dương nhận Li<sup>+</sup>",
+   "p": "{CoO2} + Li<sup>+</sup> + e → {LiCoO2}: {CoO2} bị khử.",
+   "io": [["in", "{LiCoO2}"]]
+  },
+  {
+   "ic": "i-bolt",
+   "t": "Sạc: mọi chiều đảo lại",
+   "p": "Nguồn ngoài đẩy Li<sup>+</sup> về than chì: {C6} + {LiCoO2} → {LiC6} + {CoO2}. Điện năng thành hoá năng.",
+   "io": [["in", "điện năng"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "“cực âm” + “oxi hoá {LiC6}”: đối chiếu với bán phản ứng đề cho ở cực âm.",
+   "g": [
+    "Chìa khoá <b>Phóng điện – nạp điện</b>: phóng điện là pin, cực âm là anode, chất ở đó bị oxi hoá.",
+    "Đề cho ở cực âm: {LiC6} → {C6} + Li<sup>+</sup> + 1e.",
+    "{LiC6} nhường hay nhận electron?"
+   ],
+   "giai": "Đúng. {LiC6} nhường electron, Li<sup>+</sup> rời than chì: đó là quá trình oxi hoá ở anode (cực âm).",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "D",
+   "k": "k4",
+   "bay": null,
+   "soi": "“sạc pin” → đang là pin hay bình điện phân, năng lượng đi theo chiều nào?",
+   "g": [
+    "Chìa khoá <b>Phóng điện – nạp điện</b>: nạp điện là điện phân, điện năng → hoá năng, mọi quá trình đảo chiều.",
+    "Khi sạc, bộ sạc cấp dòng điện từ nguồn ngoài vào pin.",
+    "Năng lượng điện lúc đó được cất vào đâu để lần sau pin phóng ra?"
+   ],
+   "giai": "Đúng. Sạc là điện phân: điện năng từ nguồn ngoài đẩy phản ứng đi ngược chiều tự nhiên, cất lại thành hoá năng trong {LiC6} và {CoO2}.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "S",
+   "k": "k4",
+   "bay": "doicuc",
+   "soi": "“khi sạc pin” đi kèm phương trình {LiC6} + {CoO2} → …: so chiều phương trình với chiều phóng điện.",
+   "g": [
+    "Chìa khoá <b>Phóng điện – nạp điện</b>: sạc là điện phân, phản ứng đi ngược chiều phóng điện.",
+    "Phương trình tổng khi phóng điện: {LiC6} + {CoO2} → {C6} + {LiCoO2}.",
+    "Phương trình trong ý trùng chiều phóng điện hay chiều ngược lại?"
+   ],
+   "giai": "Sai. Đó là phản ứng khi phóng điện. Khi sạc: {C6} + {LiCoO2} → {LiC6} + {CoO2}, Li<sup>+</sup> quay về than chì.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "D",
+   "k": "k3",
+   "bay": null,
+   "soi": "“từ cực âm sang cực dương” khi phóng điện: kiểm chiều đi của cation trong pin.",
+   "g": [
+    "Chìa khoá <b>Pin Galvani</b>: bên trong pin, cation đi về cathode (cực dương), anion đi về anode (cực âm).",
+    "Cực âm sinh Li<sup>+</sup> ({LiC6} → {C6} + Li<sup>+</sup> + e); cực dương dùng Li<sup>+</sup> ({CoO2} + Li<sup>+</sup> + e → {LiCoO2}).",
+    "Li<sup>+</sup> sinh ra ở cực nào, bị dùng ở cực nào? Vậy nó đi theo chiều nào?"
+   ],
+   "giai": "Đúng. Li<sup>+</sup> sinh ra ở cực âm, bị tiêu thụ ở cực dương nên đi từ cực âm sang cực dương qua chất điện li; electron cũng đi từ cực âm sang cực dương nhưng qua mạch ngoài.",
+   "lab": null
+  }
+ ],
+ "ket": "a Đ – b Đ – c S – d Đ",
+ "nho": "Li-ion phóng điện: {LiC6} bị oxi hoá, Li<sup>+</sup> sang cực dương; sạc thì mọi chiều đảo lại.",
+ "phepTinh": [],
+ "tuongTu": [
+  {
+   "t": "Khi sạc pin Li-ion, tại điện cực than chì (nối với cực âm của bộ sạc) xảy ra quá trình {C6} + Li<sup>+</sup> + e → {LiC6}.",
+   "d": "D",
+   "giai": "Đúng. Khi sạc, than chì nối cực âm của nguồn nên là cathode của quá trình điện phân: Li<sup>+</sup> nhận electron, xen vào than chì thành {LiC6}."
+  },
+  {
+   "t": "Khi sạc pin Li-ion, ion Li<sup>+</sup> di chuyển từ cực âm sang cực dương.",
+   "d": "S",
+   "giai": "Sai. Khi sạc mọi chiều đảo lại: Li<sup>+</sup> rời {LiCoO2} ở cực dương, đi về than chì ở cực âm."
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Đề in “C6” không hạ chỉ số ở hai chỗ (bán phản ứng cực âm và phương trình tổng quát), cần là C₆. Ý d viết “dung dịch điện ly”, thuật ngữ chuẩn là “chất điện li”."
+  }
+ ]
+}

@@ -1,0 +1,63 @@
+{
+ "ma": "PHUC_CHAT",
+ "chuong": "Sơ lược dãy kim loại chuyển tiếp thứ nhất và phức chất",
+ "lop": "12",
+ "KEYS": {
+  "k1": {
+   "ten": "Kim loại chuyển tiếp",
+   "rule": "Dãy thứ nhất Sc → Cu: [Ar]3d<sup>n</sup>4s<sup>2</sup>, ngoại lệ <b>Cr 3d<sup>5</sup>4s<sup>1</sup>, Cu 3d<sup>10</sup>4s<sup>1</sup></b>. Tạo ion: bỏ electron <b>4s trước</b> (Fe<sup>2+</sup> 3d<sup>6</sup>, Fe<sup>3+</sup> 3d<sup>5</sup>). Nhiều electron hoá trị → liên kết kim loại mạnh: <b>cứng, khó nóng chảy, khối lượng riêng lớn</b> (Sc, Ti nhẹ), dẫn điện, dẫn nhiệt tốt. Nhiều số oxi hoá: Fe +2, +3; Cu +1, +2; Cr +3, +6; Mn +2 đến +7."
+  },
+  "k2": {
+   "ten": "Màu & nhận biết ion",
+   "rule": "Ion có 3d chưa đầy thường có màu: Fe<sup>2+</sup> lục nhạt, Fe<sup>3+</sup> vàng nâu, Cu<sup>2+</sup> xanh lam, Co<sup>2+</sup> hồng, Ni<sup>2+</sup> xanh lục; 3d<sup>0</sup>, 3d<sup>10</sup> (Sc<sup>3+</sup>, Zn<sup>2+</sup>) không màu. {MnO4}<sup>−</sup> tím, {Cr2O7}<sup>2−</sup> da cam, {CrO4}<sup>2−</sup> vàng. Nhận biết bằng OH<sup>−</sup>: {Fe(OH)3} <b>nâu đỏ</b>; {Fe(OH)2} <b>trắng xanh</b>, để ngoài không khí hoá nâu đỏ; {Cu(OH)2} <b>xanh lam</b>."
+  },
+  "k3": {
+   "ten": "Chuẩn độ oxi hoá – khử",
+   "rule": "Chuẩn độ Fe<sup>2+</sup>: acid hoá bằng <b>{H2SO4}</b>, không dùng {HCl}, {HNO3}. {KMnO4} tự chỉ thị: dư một giọt là <b>hồng nhạt bền</b>. Tỉ lệ lấy từ electron: <b>1 {MnO4}<sup>−</sup> : 5 Fe<sup>2+</sup></b>; <b>1 {Cr2O7}<sup>2−</sup> : 6 Fe<sup>2+</sup></b>. Tổng electron nhường = nhận ({NO3}<sup>−</sup> → {NH3} nhận 8). Hai thí nghiệm song song: lượng chất chuẩn <b>chênh lệch</b> chính là phần chất cần tìm đã tiêu thụ."
+  },
+  "k4": {
+   "ten": "Con số quy trình",
+   "rule": "Đổi đơn vị trước: mg/L × L = mg; 1 m<sup>3</sup> = 1000 L. Chuẩn độ một phần mẫu thì <b>nhân ngược</b> theo tỉ lệ (15 mL trong 60 mL → × 4). <b>Bảo toàn nguyên tố</b> xuyên chuỗi: {FeCr2O4} có 2 Cr → 1 {K2Cr2O7}; Ca của vôi đi hết vào {CaSO4} → n({Ca(OH)2}) = n({SO4}<sup>2−</sup>). Độ tinh khiết = m chất : m mẫu; hiệu suất = thực tế (đã nhân độ tinh khiết) : lí thuyết."
+  },
+  "k5": {
+   "ten": "Mổ phức chất",
+   "rule": "Trong [ ]: <b>nguyên tử trung tâm</b> nhận cặp electron, <b>phối tử</b> ({H2O}, {NH3}, Cl<sup>−</sup>, OH<sup>−</sup>, CN<sup>−</sup>) cho cặp electron: liên kết cho – nhận, mỗi phối tử một liên kết σ. <b>Điện tích phức = số oxi hoá trung tâm + tổng điện tích phối tử</b> (phân tử 0, anion −1). 6 phối tử → bát diện; 4 → tứ diện hoặc vuông phẳng; 2 → thẳng. Al<sup>3+</sup> (không chuyển tiếp) cũng tạo phức aqua."
+  },
+  "k6": {
+   "ten": "Thế phối tử & màu",
+   "rule": "Phối tử mới đẩy {H2O} ra → đổi màu, có thể đổi hình học. {[Cu(OH2)6]}<sup>2+</sup> xanh + {NH3} → {[Cu(NH3)4(OH2)2]}<sup>2+</sup> <b>xanh lam đậm</b> ({Cu(OH)2} cũng tan trong {NH3} dư). {[Co(OH2)6]}<sup>2+</sup> hồng + 4Cl<sup>−</sup> ⇌ {[CoCl4]}<sup>2−</sup> xanh. Phản ứng đi về phía <b>phức bền hơn</b>. Thêm phối tử mới → chiều thuận; pha loãng (thêm nước) hoặc kéo phối tử ra ({AgNO3} tạo AgCl trắng) → chiều nghịch."
+  },
+  "k7": {
+   "ten": "Phức aqua là acid",
+   "rule": "Hoà tan muối: ion kim loại phân li rồi tạo <b>phức aqua</b> {[M(OH2)6]}<sup>n+</sup>. Phức aqua của Fe<sup>3+</sup>, Al<sup>3+</sup> nhường H<sup>+</sup>: {[M(OH2)6]}<sup>3+</sup> ⇌ {[M(OH)(OH2)5]}<sup>2+</sup> + H<sup>+</sup>, nên là <b>acid Brønsted</b>, dung dịch có môi trường acid. Số oxi hoá M <b>không đổi</b>, vẫn 6 phối tử. Thêm acid → chiều nghịch; thêm base → chiều thuận, đến hydroxide kết tủa keo (phèn làm trong nước)."
+  }
+ },
+ "TRAPS_THEM": {
+  "chieucb": {
+   "ten": "Chiều cân bằng",
+   "hoi": "Chất thêm vào hay bị lấy đi nằm ở vế nào? Pha loãng là thêm nước; nước nằm ở vế nào?"
+  },
+  "phanmau": {
+   "ten": "Quên phần mẫu",
+   "hoi": "Số liệu chuẩn độ là của phần mẫu nào? Đã nhân lại theo toàn bộ dung dịch và toàn bộ chất rắn chưa?"
+  }
+ },
+ "DANG_KEY": {
+  "PHUC_CHAT.KIM_LOAI_CHUYEN_TIEP.NHAN_DANG": "k1",
+  "PHUC_CHAT.KIM_LOAI_CHUYEN_TIEP.TINH_KHOI_LUONG": "k4",
+  "PHUC_CHAT.CHUAN_DO.TINH_KHOI_LUONG": "k3",
+  "PHUC_CHAT.CHUAN_DO.TINH_HIEU_SUAT": "k3",
+  "PHUC_CHAT.CAU_TAO_PHUC.CHON_PHAT_BIEU": "k5",
+  "PHUC_CHAT.MAU_SAC.CHON_PHAT_BIEU": "k6"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Dãy kim loại chuyển tiếp thứ nhất: GIỮ Sc → Cu.",
+  "Màu ion: GIỮ Fe³⁺ vàng nâu (màu dung dịch muối Fe(III)), Ni²⁺ xanh lục, Co²⁺ hồng.",
+  "Ý \"[Fe(OH2)6]³⁺ bền hơn [Fe(OH2)5(OH)]²⁺\" chấm Sai: GIỮ. Dung dịch vàng và có môi trường acid chứng tỏ cân bằng (2) xảy ra, tạo phức hydroxo — phù hợp luật \"phản ứng đi về phía phức bền hơn\" của SGK.",
+  "Dùng \"số phối tử\" (đếm phối tử); không đưa \"số phối trí\" vào chìa.",
+  "GIỮ ngoại lệ Sc, Ti là kim loại nhẹ.",
+  "Điểm cuối KMnO4: GIỮ \"hồng nhạt bền\", không ghi số giây."
+ ],
+ "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+}

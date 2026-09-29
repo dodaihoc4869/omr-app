@@ -173,7 +173,12 @@
    ]
   }
  ],
- "canThayChot": [
-  "Trường đề còn lẫn phần cuối đề thi (\"HẾT – Thí sinh không sử dụng tài liệu – Giám thị không giải thích gì thêm\"); nên cắt khỏi kho."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Trường đề còn lẫn phần cuối đề thi (\"HẾT – Thí sinh không sử dụng tài liệu – Giám thị không giải thích gì thêm\"); nên cắt khỏi kho.",
+   "loai": "hienThi",
+   "chot": "Sửa kho: cắt dòng \"HẾT – Thí sinh không sử dụng tài liệu…\"."
+  }
  ]
 }

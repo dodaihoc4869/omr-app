@@ -1,0 +1,68 @@
+{
+ "ma": "KIM_LOAI",
+ "chuong": "Đại cương kim loại",
+ "lop": "12",
+ "KEYS": {
+  "k1": {
+   "ten": "Liên kết kim loại",
+   "rule": "Nút mạng là <b>cation kim loại</b>, giữa là <b>electron hoá trị tự do</b>, hút nhau bằng lực tĩnh điện. So với liên kết ion ({NaCl}): giống ở tĩnh điện và cation kim loại, khác ở phần âm (electron tự do ↔ anion cố định). Electron tự do gây dẫn điện, dẫn nhiệt, ánh kim, dẻo. Kim loại có 1–3 electron lớp ngoài: Na 1, Mg 2, Al 3 (3s²3p¹)."
+  },
+  "k2": {
+   "ten": "Dãy thế điện cực",
+   "rule": "E° càng nhỏ, kim loại <b>khử càng mạnh</b>, ion oxi hoá càng yếu. Dãy E° tăng: K, Na, Mg, Al, Zn, Fe, Ni, Sn, Pb, {H2}, Cu, Fe²⁺ (cặp Fe³⁺/Fe²⁺), Ag, Au. Chất khử cặp trước + chất oxi hoá cặp sau → phản ứng. E° < 0 khử được H⁺ acid loãng; E° < −0,41 V khử được nước (xét theo thế); Cu chỉ tan trong acid loãng khi có {O2}."
+  },
+  "k3": {
+   "ten": "Sản phẩm kim loại",
+   "rule": "Kim loại luôn <b>bị oxi hoá</b> (số oxi hoá tăng từ 0); chất có số oxi hoá giảm mới là chất oxi hoá. Fe gặp H⁺, Cu²⁺, Fe³⁺ chỉ lên <b>Fe²⁺</b>; Fe³⁺ gặp Cu chỉ về Fe²⁺, không ra Fe. {H2SO4} đặc, {HNO3} hoà tan cả Cu, sinh {SO2}, NO…, không sinh {H2}. Kim loại mạnh đẩy kim loại yếu khỏi muối (trừ Na, K, Ca, Ba: gặp nước trước)."
+  },
+  "k4": {
+   "ten": "Ăn mòn điện hoá",
+   "rule": "<b>Đủ ba điều kiện</b>: hai điện cực khác chất (Fe – Cu, Fe – C, kim loại bám lên), tiếp xúc nhau, cùng chạm hơi ẩm hay chất điện li. Thiếu một: <b>ăn mòn hoá học</b>. Kim loại E° nhỏ hơn là anode, bị ăn mòn. Cực kia: acid ra {H2}; trung tính chỉ {O2} bị khử. Gỉ: {Fe2O3}·n{H2O}. Chống: Zn, Mg hi sinh; phủ dầu, sơn. Al có màng oxide bền."
+  },
+  "k5": {
+   "ten": "Chọn cách điều chế",
+   "rule": "K … Al: <b>điện phân nóng chảy</b>. <b>Nhiệt luyện</b> = C, CO, {H2}, Al, Si khử oxide ở nhiệt độ cao (Zn … Cu; cả Mg bằng Si). <b>Thuỷ luyện</b> = hoà tan rồi cho kim loại mạnh hơn đẩy ra (Zn đẩy Au). Quặng sulfide đốt thành oxide trước, sinh {SO2} độc. Chỉ bước biến ion thành kim loại là oxi hoá – khử. Tái chế tốn ít năng lượng hơn."
+  },
+  "k6": {
+   "ten": "Tính theo chuỗi",
+   "rule": "Chất chính = m × %, đổi mol (tấn → tấn·mol). <b>Bảo toàn nguyên tố</b> hoặc cộng các phương trình: {Fe2O3} → 2Fe, {Cu2S} → 2Cu, 2{KCN} → Au. Sản phẩm <b>× H</b>, nguyên liệu <b>: H</b>, rồi chia % kim loại trong sản phẩm. Rắn đổi khối lượng: độ chênh : Δm của 1 mol. Có dòng điện: It : F = n(e) = z·n(kim loại), F = 96500. ΔrH° = ΣΔfH°(sản phẩm) − ΣΔfH°(chất đầu), âm là toả nhiệt, tính theo mol."
+  },
+  "k7": {
+   "ten": "Hợp kim",
+   "rule": "Hợp kim thường cứng hơn, nóng chảy thấp hơn, dẫn điện kém hơn kim loại thành phần. Đo hàm lượng: chọn thuốc thử <b>hoà tan hết một kim loại, không đụng kim loại kia</b> (Al tan trong kiềm; Cu tan trong {HNO3}, Fe³⁺, {H2SO4} đặc, Au thì không) và <b>không đẩy kim loại mới bám vào</b> (loại Ag⁺, Au³⁺). % = m rắn còn lại : m mẫu."
+  }
+ },
+ "TRAPS_THEM": {
+  "nacoxihoa": {
+   "ten": "Nhầm nấc oxi hoá",
+   "hoi": "Chất oxi hoá này đủ mạnh đưa Fe lên Fe³⁺ không? Fe³⁺ gặp Cu chỉ về Fe²⁺, không ra Fe."
+  },
+  "haidiencuc": {
+   "ten": "Nhầm kiểu ăn mòn",
+   "hoi": "Đủ hai điện cực khác chất, tiếp xúc nhau, cùng trong dung dịch điện li chưa? Thiếu một là ăn mòn hoá học."
+  }
+ },
+ "DANG_KEY": {
+  "KIM_LOAI.LIEN_KET_KIM_LOAI.NHAN_DANG": "k1",
+  "KIM_LOAI.TINH_KHU.NHAN_DANG": "k2",
+  "KIM_LOAI.TINH_KHU.CHON_PHAT_BIEU": "k2",
+  "KIM_LOAI.AN_MON.CHON_PHAT_BIEU": "k4",
+  "KIM_LOAI.AN_MON.NHAN_DANG": "k4",
+  "KIM_LOAI.AN_MON.SO_SANH": "k4",
+  "KIM_LOAI.DIEU_CHE.CHON_PHAT_BIEU": "k5",
+  "KIM_LOAI.DIEU_CHE.TINH_KHOI_LUONG": "k6",
+  "KIM_LOAI.UNG_DUNG.TINH_KHOI_LUONG": "k6",
+  "KIM_LOAI.HOP_KIM.CHON_PHAT_BIEU": "k7",
+  "KIM_LOAI.HOP_KIM.TINH_PHAN_TRAM": "k7",
+  "KIM_LOAI.HOP_KIM.DEM_DONG_PHAN": "k7"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Lời giải kho 12-C6-B19-II-7 ý d viết sai thứ tự: đúng là Na > Cu > Fe²⁺ > Ag; đáp án S giữ nguyên. Hồ sơ mới thay lời giải cũ.",
+  "Ý \"Nhôm phản ứng được với nước ngay ở điều kiện chuẩn\" chấm Đúng: GIỮ (xét theo thế: E°(Al³⁺/Al) = −1,66 V < −0,413 V của nước ở pH 7; ngoài thực tế màng oxide ngăn lại). Mốc dùng −0,413 V.",
+  "Mg điều chế bằng Si (Pidgeon) là nhiệt luyện: GIỮ ngoại lệ trong k5.",
+  "Hợp kim: GIỮ \"cứng hơn, nóng chảy thấp hơn, dẫn điện, dẫn nhiệt kém hơn kim loại thành phần\" (đúng cách nói SGK).",
+  "Mã dạng 12-C6-B21-II-3: GIỮ mã; chìa gắn theo nội dung."
+ ],
+ "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+}

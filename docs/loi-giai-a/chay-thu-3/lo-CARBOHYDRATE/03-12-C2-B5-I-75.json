@@ -1,0 +1,105 @@
+{
+ "qid": "12-C2-B5-I-75",
+ "bam": "fcf51616e4cd5313",
+ "dang": "tn",
+ "ten": "Sơ đồ thuỷ phân saccharose, tráng bạc, nước bromine: phát biểu sai",
+ "keys": ["k3", "k2"],
+ "dung": [
+  {
+   "ic": "i-reflux",
+   "t": "Thuỷ phân saccharose",
+   "p": "Saccharose + {H2O} (H<sup>+</sup>, t°) → glucose + fructose.",
+   "io": [["in", "glucose"], ["in", "fructose"]]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "Nước {Br2}: chỉ glucose",
+   "p": "Y làm mất màu nước bromine nên Y là glucose, Z là gluconic acid. X còn lại là fructose.",
+   "io": [["in", "Y = glucose"], ["in", "X = fructose"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Tollens: fructose cũng phản ứng",
+   "p": "Trong môi trường {NH3}, fructose chuyển thành glucose, cho Ag và T là ammonium gluconate.",
+   "io": [["out", "Ag↓"], ["in", "T"]]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Soi Z: gluconic acid",
+   "p": "Z có nhóm –COOH nên dung dịch làm quỳ tím hoá đỏ.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "d": "S",
+   "k": "k2",
+   "bay": "tinhkhu",
+   "soi": "\"X là fructose\" → X tráng bạc được; chỉ glucose mới tráng bạc hay không?",
+   "g": [
+    "Chìa khoá <b>Bảng thuốc thử</b>: nước {Br2} chỉ phản ứng với glucose; Tollens phản ứng với cả glucose và fructose.",
+    "Y phản ứng với nước {Br2} nên Y là glucose; X còn lại là fructose."
+   ],
+   "giai": "Loại. Phát biểu đúng: Y làm mất màu nước bromine nên là glucose, X là fructose. Fructose vẫn tráng bạc vì trong môi trường kiềm chuyển thành glucose.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "d": "S",
+   "k": "k3",
+   "bay": null,
+   "soi": "\"oxi hoá – khử\" → soi nhóm –CHO ở (2) và (3) biến thành gì.",
+   "g": [
+    "Chìa khoá <b>Đọc sơ đồ chuyển hoá</b>: –CHO thành nhóm carboxyl (–COOH hoặc –COO<sup>−</sup>) là bị oxi hoá.",
+    "(2): {Ag}<sup>+</sup> → Ag; (3): {Br2} → {Br}<sup>−</sup>. Cả hai đều có chất bị khử."
+   ],
+   "giai": "Loại. Phát biểu đúng: ở (2) và (3), nhóm –CHO bị oxi hoá thành nhóm carboxyl; {Ag}<sup>+</sup> và {Br2} bị khử. Cả hai là phản ứng oxi hoá – khử.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "d": "S",
+   "k": "k2",
+   "bay": "tinhkhu",
+   "soi": "\"T là {CH2OH[CHOH]4COONH4}\" → fructose tráng bạc cho sản phẩm gì?",
+   "g": [
+    "Chìa khoá <b>Bảng thuốc thử</b>: glucose + Tollens → ammonium gluconate.",
+    "Fructose trong {NH3} chuyển thành glucose rồi mới bị oxi hoá, nên T cũng là ammonium gluconate."
+   ],
+   "giai": "Loại. Phát biểu đúng: T là ammonium gluconate {CH2OH[CHOH]4COONH4}, khác Z là gluconic acid, đúng như đề cho bốn chất khác nhau.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "d": "D",
+   "k": "k3",
+   "bay": "tengoi",
+   "soi": "\"không làm quỳ tím chuyển màu\" → Z là chất gì, có nhóm –COOH không?",
+   "g": [
+    "Chìa khoá <b>Đọc sơ đồ chuyển hoá</b>: glucose + nước {Br2} → gluconic acid.",
+    "Z là gluconic acid {CH2OH[CHOH]4COOH}: có nhóm –COOH.",
+    "Dung dịch chất có nhóm –COOH làm quỳ tím đổi sang màu gì?"
+   ],
+   "giai": "Chọn. Z là gluconic acid, nhóm –COOH phân li ra H<sup>+</sup> nên dung dịch làm quỳ tím hoá đỏ. Phát biểu D sai.",
+   "lab": null
+  }
+ ],
+ "mc": { "d": "D" },
+ "ket": "Đáp án D",
+ "nho": "Nước bromine chỉ nhận glucose; Tollens nhận cả glucose lẫn fructose, đều cho ammonium gluconate.",
+ "phepTinh": [],
+ "tuongTu": [
+  {
+   "t": "Chất T trong sơ đồ tác dụng với dung dịch HCl tạo ra chất Z.",
+   "d": "D",
+   "giai": "Đúng. Muối của acid yếu gặp acid mạnh: {CH2OH[CHOH]4COONH4} + HCl → {CH2OH[CHOH]4COOH} + {NH4Cl}."
+  },
+  {
+   "t": "Có thể dùng thuốc thử Tollens để phân biệt dung dịch glucose và dung dịch fructose.",
+   "d": "S",
+   "giai": "Sai. Cả hai đều tạo lớp bạc với Tollens (fructose chuyển thành glucose trong môi trường kiềm). Muốn phân biệt, dùng nước bromine."
+  }
+ ],
+ "co": []
+}

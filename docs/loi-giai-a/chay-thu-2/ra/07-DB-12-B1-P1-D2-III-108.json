@@ -161,7 +161,12 @@
    ]
   }
  ],
- "canThayChot": [
-  "Trong đề, các nhãn \"salicylic acid methanol methyl salicylate\" bị dính liền sau phương trình (mất định dạng chú thích dưới từng chất); nên tách dòng hoặc bỏ."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Trong đề, các nhãn \"salicylic acid methanol methyl salicylate\" bị dính liền sau phương trình (mất định dạng chú thích dưới từng chất); nên tách dòng hoặc bỏ.",
+   "loai": "hienThi",
+   "chot": "Sửa kho: tách nhãn tên chất xuống dưới phương trình (đã có trong danh sách sửa hiển thị 28/09)."
+  }
  ]
 }

@@ -1,0 +1,107 @@
+{
+ "qid": "DB-12-B4-D1-II-172",
+ "bam": "866b44eb1506f25a",
+ "dang": "ds",
+ "ten": "Sơ đồ saccharose → glucose, fructose → gluconic acid và muối ammonium",
+ "keys": ["k3", "k2", "k1"],
+ "dung": [
+  {
+   "ic": "i-reflux",
+   "t": "Thuỷ phân saccharose",
+   "p": "Saccharose + {H2O} (H<sup>+</sup>, t°) → glucose + fructose.",
+   "io": [["in", "glucose"], ["in", "fructose"]]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "Nước {Br2} chỉ nhận glucose",
+   "p": "Y là glucose nên T là gluconic acid; X còn lại là fructose.",
+   "io": [["in", "Y = glucose"], ["in", "T = gluconic acid"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Tollens với fructose",
+   "p": "Trong {NH3}, fructose chuyển thành glucose, cho Ag và Z là ammonium gluconate.",
+   "io": [["out", "Ag↓"], ["in", "Z"]]
+  },
+  {
+   "ic": "i-hex",
+   "t": "Soi nhóm chức bốn chất",
+   "p": "Cả bốn chất giữ nguyên 5 –OH trên mạch; chỉ nhóm cuối mạch đổi: C=O, –CHO, –{COONH4}, –COOH.",
+   "io": []
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "D",
+   "k": "k2",
+   "bay": null,
+   "soi": "\"phân biệt X và Y bằng nước bromine\" → hai chất có phản ứng khác nhau với {Br2} không?",
+   "g": [
+    "Chìa khoá <b>Bảng thuốc thử</b>: nước {Br2} chỉ bị mất màu bởi glucose, maltose; fructose không.",
+    "X là fructose, Y là glucose.",
+    "Nhỏ nước {Br2} vào hai mẫu: mấy mẫu mất màu?"
+   ],
+   "giai": "Đúng. Glucose (Y) làm mất màu nước bromine, fructose (X) thì không. Chính dữ kiện này giúp tách vai X, Y trong sơ đồ.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "D",
+   "k": "k1",
+   "bay": null,
+   "soi": "\"nhiều nhóm hydroxy\" → đếm –OH còn lại sau khi nhóm cuối mạch bị biến đổi.",
+   "g": [
+    "Chìa khoá <b>Soi cấu tạo</b>: glucose {CH2OH[CHOH]4CHO} có 5 –OH, fructose {CH2OH[CHOH]3COCH2OH} có 5 –OH.",
+    "Z và T sinh ra khi nhóm –CHO bị oxi hoá; các –OH khác giữ nguyên.",
+    "Z là {CH2OH[CHOH]4COONH4}, T là {CH2OH[CHOH]4COOH}: đếm –OH trên mạch."
+   ],
+   "giai": "Đúng. Các phản ứng chỉ đổi nhóm –CHO thành –COOH hoặc –{COONH4}; 5 nhóm –OH trên mạch giữ nguyên. X, Y, Z, T đều có 5 nhóm hydroxy.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "D",
+   "k": "k3",
+   "bay": null,
+   "soi": "\"một phản ứng\" → từ acid ra muối ammonium cần chất gì?",
+   "g": [
+    "Chìa khoá <b>Đọc sơ đồ chuyển hoá</b>: gluconic acid và ammonium gluconate chuyển qua lại bằng phản ứng acid – base.",
+    "T là gluconic acid, Z là ammonium gluconate.",
+    "Cho T tác dụng với {NH3}: sản phẩm là gì?"
+   ],
+   "giai": "Đúng. {CH2OH[CHOH]4COOH} + {NH3} → {CH2OH[CHOH]4COONH4}: chỉ một phản ứng acid – base.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "S",
+   "k": "k3",
+   "bay": "tengoi",
+   "soi": "\"pH > 7\" → Z là muối của acid nào với base nào?",
+   "g": [
+    "Chìa khoá <b>Đọc sơ đồ chuyển hoá</b>: Z là muối ammonium của gluconic acid.",
+    "{NH4}<sup>+</sup> cho H<sup>+</sup> (tính acid); gốc gluconate nhận H<sup>+</sup> (tính base). Cả hai đều yếu.",
+    "Hai tính chất gần bù nhau thì pH nằm ở đâu so với 7?"
+   ],
+   "giai": "Sai. Z là muối của acid yếu và base yếu; hai quá trình cho, nhận H<sup>+</sup> gần bù nhau nên dung dịch gần trung tính, không có pH > 7. Môi trường kiềm lúc tráng bạc là do {NH3} dư, không phải do Z.",
+   "lab": null
+  }
+ ],
+ "ket": "a Đ – b Đ – c Đ – d S",
+ "nho": "Glucose → gluconic acid (nước {Br2}) hay ammonium gluconate (Tollens): chỉ đổi –CHO, 5 –OH giữ nguyên.",
+ "phepTinh": [],
+ "tuongTu": [
+  {
+   "t": "Chất T tác dụng với dung dịch {NaHCO3} giải phóng khí {CO2}.",
+   "d": "D",
+   "giai": "Đúng. T là gluconic acid, có nhóm –COOH nên phản ứng với {NaHCO3} sinh khí {CO2}."
+  },
+  {
+   "t": "Chất X không phản ứng với dung dịch {AgNO3} trong {NH3}.",
+   "d": "S",
+   "giai": "Sai. X là fructose; trong môi trường {NH3}, fructose chuyển thành glucose nên vẫn tráng bạc, tạo Z."
+  }
+ ],
+ "co": []
+}

@@ -93,7 +93,11 @@ function renderQ(set) {
   const q = list.find(x => x.id === curQ[set]);
   clearInterval(timers[set]);
   const idx = list.indexOf(q), last = idx === list.length - 1;
-  const flag = window.XEM_THU && q.canThayChot && q.canThayChot.length ? `<div class="res no" style="margin:14px 20px 0"><div class="rv">⚑ Máy soạn ghi chú: cần thầy chốt</div><ul style="margin:4px 0 0;padding-left:18px">${q.canThayChot.map(c => `<li>${fx(c)}</li>`).join('')}</ul></div>` : '';
+  const TEN_CO = { dapAn: 'Đáp án', hienThi: 'Hiển thị', loiDe: 'Đề' };
+  const daChot = (q.daChot || []).map(c => `<li><b>${c.daXoa ? 'Giữ đáp án kho' : (TEN_CO[c.loai] || c.loai)}:</b> ${fx(c.chot || '')}${c.ghi ? ` <span class="muted">(máy soạn nêu: ${fx(c.ghi)})</span>` : ''}</li>`).join('');
+  const chuaChot = (q.canThayChot || []).map(c => `<li>${fx(c)}</li>`).join('');
+  const flag = !window.XEM_THU ? '' : (chuaChot ? `<div class="res no" style="margin:14px 20px 0"><div class="rv">⚑ Chờ máy chốt</div><ul style="margin:4px 0 0;padding-left:18px">${chuaChot}</ul></div>` : '')
+    + (daChot ? `<div class="res ok" style="margin:14px 20px 0"><div class="rv">✓ Máy đã chốt (chỉ thầy thấy)</div><ul style="margin:4px 0 0;padding-left:18px">${daChot}</ul></div>` : '');
   el.innerHTML = flag + `<div class="qtop"><h3>${q.so} · ${fx(q.ten)}<small>${q.nguon} · ${DANG[q.dang]}</small></h3>
     <div class="kchips">${lv === 'but' ? '<span class="kchip ghost">Chìa khoá: em tự gắn</span>' : q.keys.map(k => keyChip(k)).join('')}</div>
     ${lv === 'but' ? `<span class="timer" id="${set}timer" aria-label="Thời gian làm câu">0:00</span>` : ''}</div>

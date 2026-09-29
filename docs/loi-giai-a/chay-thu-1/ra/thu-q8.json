@@ -8,7 +8,7 @@
  "keys": [
   "k6"
  ],
- "de": "<p><b>Câu 50:</b> Khi các acid béo không no có nhiều liên kết đôi (C=C) thì nhiệt độ nóng chảy của nó sẽ bé hơn các acid béo có cùng số nguyên tử carbon nhưng ít liên kết đôi hơn. Phát biểu nào sau đây là <b>sai</b>?</p>\n<p class=\"note\">Đề in palmitic acid là {C15H29COOH}; công thức đúng của palmitic acid là {C15H31COOH} (acid béo no).</p>",
+ "de": "<p><b>Câu 50:</b> Khi các acid béo không no có nhiều liên kết đôi (C=C) thì nhiệt độ nóng chảy của nó sẽ bé hơn các acid béo có cùng số nguyên tử carbon nhưng ít liên kết đôi hơn. Phát biểu nào sau đây là <b>sai</b>?</p>\n<p class=\"note\">Đã sửa lỗi in của đề gốc: palmitic acid là {C15H31COOH} (acid béo no), không phải {C15H29COOH}.</p>",
  "dung": [
   {
    "ic": "i-hex",
@@ -108,17 +108,17 @@
   },
   {
    "id": "D",
-   "t": "Chưa có cơ sở để so sánh nhiệt độ nóng chảy của oleic acid ({C17H33COOH}) với palmitic acid ({C15H29COOH}) vì chúng đều có một liên kết đôi (C=C) trong phân tử.",
+   "t": "Chưa có cơ sở để so sánh nhiệt độ nóng chảy của oleic acid ({C17H33COOH}) với palmitic acid ({C15H31COOH}) vì chúng đều có một liên kết đôi (C=C) trong phân tử.",
    "d": "S",
    "k": "k6",
    "bay": "nguyennhan",
-   "soi": "\"chưa có cơ sở … vì đều có một liên kết đôi\": số C=C bằng nhau chưa phải là hết, còn độ dài mạch để so.",
+   "soi": "\"chưa có cơ sở … vì đều có một liên kết đôi\": kiểm lại vế \"đều có một liên kết đôi\" bằng cách đếm C=C từ công thức.",
    "g": [
-    "Chìa khoá <b>Tính chất vật lí</b>: nhiệt độ nóng chảy phụ thuộc cả độ dài mạch lẫn số C=C cis, không chỉ số C=C.",
-    "Đếm số C: oleic acid {C17H33COOH} có 18 C, palmitic acid có 16 C. Lưu ý palmitic acid đúng là {C15H31COOH}.",
-    "Theo công thức in, hai acid cùng 1 C=C nhưng oleic dài hơn 2 C → vẫn so được. Theo công thức đúng, gốc {C15H31}– có (31 − 31) ÷ 2 = 0 C=C, là acid no → càng có cơ sở để so."
+    "Chìa khoá <b>Tính chất vật lí</b>: nhiệt độ nóng chảy phụ thuộc số C=C cis và độ dài mạch.",
+    "Đếm C=C từ công thức: gốc {C15H31} = C<sub>n</sub>H<sub>2n+1</sub> nên palmitic acid no; gốc {C17H33} thiếu 2 H nên oleic acid có 1 C=C.",
+    "Hai acid khác nhau ở số C=C, vậy có cơ sở so sánh; vế \"đều có một liên kết đôi\" cũng sai."
    ],
-   "giai": "Sai. Palmitic acid đúng là {C15H31COOH}, acid béo no, mạch thẳng xếp khít; ở nhiệt độ thường palmitic acid rắn, oleic acid lỏng, nên palmitic acid nóng chảy cao hơn. Kể cả theo công thức in (cùng 1 C=C) vẫn so được nhờ độ dài mạch: oleic acid 18 C dài hơn nên nóng chảy cao hơn.",
+   "giai": "Sai. Palmitic acid {C15H31COOH} là acid no, oleic acid {C17H33COOH} có một C=C dạng cis. Acid no mạch thẳng xếp khít nên palmitic acid nóng chảy cao hơn (khoảng 63 °C so với khoảng 13 °C), dù mạch ngắn hơn 2 C.",
    "lab": [
     "k6",
     "fat-pal"
@@ -251,7 +251,12 @@
    ]
   }
  ],
- "canThayChot": [
-  "Đề in palmitic acid là {C15H29COOH} (trong ghi chú của đề và nguyên văn ý D, lời giải giữ nguyên chữ của ý); công thức đúng là {C15H31COOH} (acid no). {C15H29COOH} thực ra là công thức của palmitoleic acid (16 C, 1 C=C). Đáp án D (Sai) đứng vững theo cả hai cách đọc, nhưng chiều so sánh đổi: theo công thức in thì oleic acid nóng chảy cao hơn (dài hơn 2 C, cùng 1 C=C); theo công thức đúng thì palmitic acid nóng chảy cao hơn (acid no). Lời giải nêu cả hai. Nên sửa công thức trong ý D."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Đề in palmitic acid là {C15H29COOH} (trong ghi chú của đề và nguyên văn ý D, lời giải giữ nguyên chữ của ý); công thức đúng là {C15H31COOH} (acid no). {C15H29COOH} thực ra là công thức của palmitoleic acid (16 C, 1 C=C). Đáp án D (Sai) đứng vững theo cả hai cách đọc, nhưng chiều so sánh đổi: theo công thức in thì oleic acid nóng chảy cao hơn (dài hơn 2 C, cùng 1 C=C); theo công thức đúng thì palmitic acid nóng chảy cao hơn (acid no). Lời giải nêu cả hai. Nên sửa công thức trong ý D.",
+   "loai": "loiDe",
+   "chot": "Đã sửa đề: palmitic acid là C15H31COOH (acid no). Giữ đáp án D (Sai); lời giải viết lại theo công thức đúng."
+  }
  ]
 }

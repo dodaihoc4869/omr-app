@@ -1,0 +1,93 @@
+{
+ "ma": "CARBOHYDRATE",
+ "chuong": "Carbohydrate",
+ "lop": "12",
+ "KEYS": {
+  "k1": {
+   "ten": "Soi cấu tạo",
+   "rule": "Glucose mạch hở {CH2OH[CHOH]4CHO}: 5 –OH, 1 –CHO; fructose {CH2OH[CHOH]3COCH2OH}: C=O ở C2. Vòng: glucose có –OH <b>hemiacetal</b>, fructose –OH <b>hemiketal</b>. Tinh bột, maltose: α-glucose, <b>α-1,4</b> (amylopectin thêm α-1,6 → nhánh). Cellulose: β-glucose, <b>β-1,4</b>, mạch thẳng. Saccharose: <b>α-1,2</b>, hết –OH hemi. Mỗi liên kết glycoside mất 2 –OH: mắt xích cellulose còn 3, {[C6H7O2(OH)3]n}, cả phân tử 3n; maltose còn 7 –OH alcohol + 1 hemiacetal."
+  },
+  "k2": {
+   "ten": "Bảng thuốc thử",
+   "rule": "{Cu(OH)2} thường → <b>xanh lam</b>: nhiều –OH kề (glucose, fructose, saccharose, maltose, glycerol); tinh bột, cellulose không; protein cho màu tím. Tollens → Ag, {Cu(OH)2}/kiềm đun → {Cu2O} đỏ gạch: glucose, maltose, cả fructose (kiềm chuyển thành glucose); <b>saccharose, tinh bột, cellulose không</b>. Nước {Br2}: chỉ glucose, maltose. {I2}: tinh bột xanh tím. Glucose + Tollens → ammonium gluconate; + {Br2} → gluconic acid; + {H2}/Ni → sorbitol."
+  },
+  "k3": {
+   "ten": "Đọc sơ đồ chuyển hoá",
+   "rule": "Gọi tên theo chất vào → ra. {CO2} → tinh bột: <b>quang hợp</b>. Cắt glycoside hay ester bằng {H2O}: <b>thuỷ phân</b> (saccharose → glucose + fructose; tinh bột → maltose → glucose; cellulose → glucose); monosaccharide không thuỷ phân. Glucose → {C2H5OH} + {CO2}: <b>lên men rượu</b> (oxi hoá – khử, toả nhiệt); → lactic acid {CH3CH(OH)COOH}: lên men lactic; ethanol → acetic acid: lên men giấm. –OH + {HNO3}, anhydride: <b>ester hoá</b>. Gluconate + HCl → gluconic acid {C6H12O7}."
+  },
+  "k4": {
+   "ten": "Quy trình thí nghiệm",
+   "rule": "Hỏi mỗi bước để làm gì. Thuỷ phân: acid + đun (cellulose: {H2SO4} 70%); {H2SO4} đặc <b>than hoá</b>. Trước Tollens, {Cu(OH)2}: <b>trung hoà acid</b> ({NaHCO3} hết bọt, {NaOH} đến quỳ xanh). Đường khử + {Cu(OH)2}: không đun → xanh lam, đun → đỏ gạch. Iodine còn xanh tím: <b>chưa thuỷ phân hết</b>; đun mất màu, nguội hiện lại. Nitrate hoá: trộn acid trong nước đá, dùng bông. Tách cồn: chưng cất."
+  },
+  "k5": {
+   "ten": "Dây chuyền mol",
+   "rule": "Quy về mắt xích, nhân hệ số: {C6H10O5} 162 → glucose 180 → <b>2</b>{C2H5OH}; glucose → <b>2</b>Ag, 2 lactic acid; saccharose 342 → <b>4</b>Ag, 4{C2H5OH}; mắt xích → trinitrate 297 (3{HNO3}), triacetate 288. Ra sản phẩm <b>× H</b>, tìm nguyên liệu <b>÷ H</b>; nhiều giai đoạn nhân các H. Rượu a°: V ethanol = V·a/100; m = D·V; lớp bạc V = S·dày. %N = 14x : (162 + 45x), x = số –{ONO2}."
+  },
+  "k6": {
+   "ten": "Năng lượng & quang hợp",
+   "rule": "ΔrH = Σ ΔfH(sản phẩm) − Σ ΔfH(chất đầu), nhân hệ số. Quang hợp <b>thu nhiệt</b>, hút {CO2} (chu trình carbon); oxi hoá glucose toả nhiệt. Năng lượng = mức/cm<sup>2</sup>/phút × diện tích × phút × % hữu ích; 1 m<sup>2</sup> = 10<sup>4</sup> cm<sup>2</sup>. n = năng lượng : |ΔH|; <b>1 mắt xích ↔ 1 glucose ↔ 6{CO2} ↔ 6{O2}</b>. Cháy, nổ: cân bằng nguyên tố trước, rồi tính ΔH, mol khí."
+  },
+  "k7": {
+   "ten": "Vật lí & ứng dụng",
+   "rule": "Độ ngọt tăng dần: <b>maltose, glucose, saccharose, fructose</b>. Glucose, fructose, saccharose: rắn, tan tốt. Tinh bột không tan nước lạnh, nước nóng thành hồ (keo); cellulose không tan, tan trong nước Schweizer. Cellulose trinitrate: rắn trắng, không tan, cháy không khói (thuốc súng); triacetate: tơ acetate. Saccharose: mía, củ cải đường, thốt nốt; mạch nha: maltose; gạo, ngô, sắn, bánh mì: tinh bột; ethanol: xăng E5."
+  }
+ },
+ "TRAPS_THEM": {
+  "tinhkhu": {
+   "ten": "Nhầm tính khử",
+   "hoi": "Chất có –CHO tự do không? Saccharose, tinh bột, cellulose không tráng bạc; fructose tráng bạc nhưng không làm mất màu nước bromine."
+  },
+  "hieusuat": {
+   "ten": "Nhầm chiều hiệu suất",
+   "hoi": "Đang tính sản phẩm thu được (nhân H) hay nguyên liệu cần dùng (chia H)? Có nhân, chia H hai lần không?"
+  }
+ },
+ "DANG_KEY": {
+  "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU": "k1",
+  "CARBOHYDRATE.CAU_TAO.DEM_DONG_PHAN": "k6",
+  "CARBOHYDRATE.CAU_TAO.GOI_TEN": "k3",
+  "CARBOHYDRATE.CAU_TAO.NHAN_DANG": "k1",
+  "CARBOHYDRATE.CAU_TAO.TINH_KHOI_LUONG": "k6",
+  "CARBOHYDRATE.CAU_TAO.TINH_NANG_LUONG": "k6",
+  "CARBOHYDRATE.CAU_TAO.TINH_PHAN_TRAM": "k5",
+  "CARBOHYDRATE.CAU_TAO.VIET_CTCT": "k1",
+  "CARBOHYDRATE.CAU_TAO.XAC_DINH_CTPT": "k3",
+  "CARBOHYDRATE.LEN_MEN.CHON_PHAT_BIEU": "k3",
+  "CARBOHYDRATE.LEN_MEN.NHAN_DANG": "k3",
+  "CARBOHYDRATE.LEN_MEN.SO_SANH": "k3",
+  "CARBOHYDRATE.LEN_MEN.TINH_KHOI_LUONG": "k5",
+  "CARBOHYDRATE.LEN_MEN.TINH_PHAN_TRAM": "k5",
+  "CARBOHYDRATE.LEN_MEN.TINH_THE_TICH": "k5",
+  "CARBOHYDRATE.LEN_MEN.XAC_DINH_CHAT": "k3",
+  "CARBOHYDRATE.PHAN_UNG_MAU.CHON_PHAT_BIEU": "k4",
+  "CARBOHYDRATE.PHAN_UNG_MAU.NHAN_DANG": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.DEM_DONG_PHAN": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.NHAN_DANG": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.SO_SANH": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_KHOI_LUONG": "k5",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_PHAN_TRAM": "k5",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_SO_MOL": "k5",
+  "CARBOHYDRATE.THUY_PHAN.CHON_PHAT_BIEU": "k1",
+  "CARBOHYDRATE.THUY_PHAN.SO_SANH": "k3",
+  "CARBOHYDRATE.THUY_PHAN.TINH_KHOI_LUONG": "k6",
+  "CARBOHYDRATE.THUY_PHAN.TINH_NANG_LUONG": "k6",
+  "CARBOHYDRATE.THUY_PHAN.XAC_DINH_CHAT": "k3",
+  "CARBOHYDRATE.TINH_CHAT_VAT_LI.SO_SANH": "k7",
+  "CARBOHYDRATE.UNG_DUNG.CHON_PHAT_BIEU": "k4",
+  "CARBOHYDRATE.UNG_DUNG.NHAN_DANG": "k5",
+  "CARBOHYDRATE.UNG_DUNG.TINH_KHOI_LUONG": "k5",
+  "CARBOHYDRATE.UNG_DUNG.TINH_THE_TICH": "k5"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Ý \"hồ tinh bột 1% + HCl, sau bước 1 thu được dung dịch đồng nhất\": CHỐT ĐÚNG. Hồ tinh bột 1% loãng là hệ keo trong suốt, không phân lớp, không kết tủa; thêm HCl vẫn đồng nhất. Hai bản đang chấm Sai (DB-12-B4-D3-II-269, DH-12-C2-B7-D1-II-3) ghi vào danh sách sửa đáp án kho.",
+  "Cellulose trinitrate: CHỐT rắn màu trắng (giữ nguyên hình dạng bông). Ý \"sản phẩm màu vàng\" chấm Sai là đúng.",
+  "Ý \"cháy cellulose trinitrate toả nhiệt mạnh do tạo khí N2\" chấm Đúng: GIỮ. Liên kết ba N≡N rất bền nên tạo N2 giải phóng nhiều năng lượng; đây là cách giải thích chuẩn cho chất nổ. Không đưa vào chìa.",
+  "Cách viết [C6H7O2(NO3)3]n: CHẤP NHẬN (cùng thành phần nguyên tố); chìa và lời giải viết –ONO2 cho đúng nhóm nitrate ester.",
+  "Liên kết trong saccharose: CHỐT ghi \"α-1,2-glycoside\" theo SGK (C1 của α-glucose nối C2 của β-fructose).",
+  "Đề cây sắn dây dùng ΔfH(CO2) = −395,50 kJ/mol: số lệch chuẩn (−393,5) nhưng đáp án 223 khớp đúng số đề cho ⇒ GIỮ, không sửa (sửa số là đổi đáp án).",
+  "Mã dạng lệch nội dung (CAU_TAO.DEM_DONG_PHAN, CAU_TAO.TINH_KHOI_LUONG là câu quang hợp): GIỮ mã cũ để không lệch thống kê dạng của học sinh; DANG_KEY gán theo nội dung thật (k6)."
+ ],
+ "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+}

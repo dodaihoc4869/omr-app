@@ -1,0 +1,79 @@
+{
+ "qid": "12-C2-B4-D2-III-26",
+ "bam": "aea58091ae7576e4",
+ "dang": "tln",
+ "ten": "Lên men nho: thể tích rượu vang 13,8° thu được (H = 60%)",
+ "keys": ["k3", "k5"],
+ "dung": [
+  {
+   "ic": "i-scale",
+   "t": "Glucose trong nho",
+   "p": "16,8 kg × 15% = 2,52 kg glucose, tức 0,014 kmol.",
+   "io": [["in", "2,52 kg glucose"]]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "Lên men rượu, nhân H",
+   "p": "{C6H12O6} → 2{C2H5OH} + 2{CO2}. Nhân H = 60%: 0,0168 kmol ethanol, 772,8 g.",
+   "io": [["in", "{C2H5OH}"], ["out", "{CO2}↑"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Đổi ra thể tích ethanol",
+   "p": "V = m : D = 772,8 : 0,789 ≈ 979,47 mL ethanol nguyên chất.",
+   "io": [["in", "979,47 mL ethanol"]]
+  },
+  {
+   "ic": "i-chart",
+   "t": "Quy ra rượu vang 13,8°",
+   "p": "V rượu = 979,47 : 0,138 ≈ 7097,6 mL ≈ 7,1 lít.",
+   "io": [["in", "7,1 L rượu vang"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "7,1",
+  "donVi": "lít",
+  "k": "k5",
+  "bay": "hieusuat",
+  "soi": "\"hiệu suất toàn bộ 60%\" → tính sản phẩm nên nhân H một lần; \"13,8°\" → V rượu = V ethanol : 0,138.",
+  "g": [
+   "Chìa khoá <b>Dây chuyền mol</b>: glucose → <b>2</b>{C2H5OH}; ra sản phẩm thì <b>× H</b>; V ethanol = V rượu × độ rượu : 100.",
+   "m glucose = 16,8 × 0,15 = 2,52 kg → 0,014 kmol; n ethanol = 0,014 × 2 × 0,6 = 0,0168 kmol.",
+   "m ethanol = 0,0168 × 46 = 0,7728 kg. Đổi ra mL bằng D, rồi chia 0,138."
+  ],
+  "giai": "Đáp số: 7,1. m glucose = 2,52 kg → 0,014 kmol. n ethanol = 0,014 × 2 × 0,6 = 0,0168 kmol → 772,8 g. V ethanol = 772,8 : 0,789 ≈ 979,47 mL. V rượu = 979,47 : 0,138 ≈ 7097,6 mL ≈ 7,1 lít."
+ },
+ "ket": "Đáp số: 7,1 lít",
+ "nho": "Glucose → 2 ethanol; nhân H một lần; V rượu = V ethanol : (độ rượu : 100).",
+ "phepTinh": [
+  { "ten": "m glucose (kg)", "bieuThuc": "16.8*0.15", "ketQua": 2.52, "lamTron": 2 },
+  { "ten": "n glucose (kmol)", "bieuThuc": "2.52/180", "ketQua": 0.014, "lamTron": 4 },
+  { "ten": "n ethanol thu được (kmol)", "bieuThuc": "0.014*2*0.6", "ketQua": 0.0168, "lamTron": 4 },
+  { "ten": "m ethanol (g)", "bieuThuc": "0.0168*46*1000", "ketQua": 772.8, "lamTron": 1 },
+  { "ten": "V ethanol (mL)", "bieuThuc": "772.8/0.789", "ketQua": 979.47, "lamTron": 2 },
+  { "ten": "V rượu vang (mL)", "bieuThuc": "772.8/0.789/0.138", "ketQua": 7097.6, "lamTron": 1 },
+  { "ten": "V rượu vang (lít)", "bieuThuc": "772.8/0.789/0.138/1000", "ketQua": 7.1, "lamTron": 1, "laDapSo": true }
+ ],
+ "tuongTu": [
+  {
+   "t": "Nếu hiệu suất toàn bộ quá trình là 80% (các dữ kiện khác giữ nguyên) thì V ≈ 9,5 lít.",
+   "d": "D",
+   "giai": "Đúng. n ethanol = 0,014 × 2 × 0,8 = 0,0224 kmol → 1030,4 g; V rượu = 1030,4 : 0,789 : 0,138 ≈ 9463,5 mL ≈ 9,5 lít.",
+   "phepTinh": [
+    { "ten": "n ethanol (kmol)", "bieuThuc": "0.014*2*0.8", "ketQua": 0.0224, "lamTron": 4 },
+    { "ten": "m ethanol (g)", "bieuThuc": "0.0224*46*1000", "ketQua": 1030.4, "lamTron": 1 },
+    { "ten": "V rượu vang (lít)", "bieuThuc": "1030.4/0.789/0.138/1000", "ketQua": 9.5, "lamTron": 1 }
+   ]
+  },
+  {
+   "t": "Lượng ethanol thu được ở trên (979,47 mL) pha thành rượu 10° thì được khoảng 7,1 lít.",
+   "d": "S",
+   "giai": "Sai. V rượu 10° = 979,47 : 0,10 = 9794,7 mL ≈ 9,8 lít. Độ rượu càng thấp thì thể tích rượu càng lớn.",
+   "phepTinh": [
+    { "ten": "V rượu 10° (lít)", "bieuThuc": "979.47/0.1/1000", "ketQua": 9.8, "lamTron": 1 }
+   ]
+  }
+ ],
+ "co": []
+}

@@ -446,7 +446,7 @@ const QUESTIONS = [
 
 {id:'q8', so:'Câu 50', nguon:'Đề thi thử', dang:'sai', ten:'Acid béo: liên kết đôi, độ dài mạch và nhiệt độ nóng chảy', keys:['k6'],
  de:`<p><b>Câu 50:</b> Khi các acid béo không no có nhiều liên kết đôi (C=C) thì nhiệt độ nóng chảy của nó sẽ bé hơn các acid béo có cùng số nguyên tử carbon nhưng ít liên kết đôi hơn. Phát biểu nào sau đây là <b>sai</b>?</p>
-<p class="note">Đề in palmitic acid là {C15H29COOH}; công thức đúng của palmitic acid là {C15H31COOH} (acid béo no).</p>`,
+<p class="note">Đã sửa lỗi in của đề gốc: palmitic acid là {C15H31COOH} (acid béo no), không phải {C15H29COOH}.</p>`,
  dung:[
   {ic:'i-hex', t:'Dựng mạch', p:'Acid béo = mạch carbon dài 16–18 C + nhóm –COOH.', io:[]},
   {ic:'i-thermo', t:'Hai yếu tố quyết định nhiệt độ nóng chảy', p:'Độ dài mạch (dài → cao) và số C=C cis (nhiều → thấp).', io:[['in','mạch dài ↑'],['out','C=C cis ↓']]},
@@ -464,10 +464,10 @@ const QUESTIONS = [
    soi:'"đều… mạnh hơn" → kiểm cả acid no lẫn không no.',
    g:['Chìa khoá <b>Tính chất vật lí</b>: mạch carbon càng dài, tương tác Van der Waals càng mạnh.','Acid béo có 16–18 C; carboxylic acid thấp chỉ có vài C.','Kể cả khi gấp khúc, mạch 18 C vẫn có diện tích tiếp xúc lớn hơn nhiều → đúng.'],
    giai:'Đúng. Mạch 16–18 C dài hơn nhiều nên tương tác Van der Waals mạnh hơn các acid ít carbon, dù mạch no hay không no.', lab:['k6','fat-18']},
-  {id:'D', t:'Chưa có cơ sở để so sánh nhiệt độ nóng chảy của oleic acid ({C17H33COOH}) với palmitic acid ({C15H29COOH}) vì chúng đều có một liên kết đôi (C=C) trong phân tử.', d: CHOT.q8==='D'?'S':'D', k:'k6', bay:'tuyetdoi',
+  {id:'D', t:'Chưa có cơ sở để so sánh nhiệt độ nóng chảy của oleic acid ({C17H33COOH}) với palmitic acid ({C15H31COOH}) vì chúng đều có một liên kết đôi (C=C) trong phân tử.', d: CHOT.q8==='D'?'S':'D', k:'k6', bay:'tuyetdoi',
    soi:'"Chưa có cơ sở" → chỉ cần chỉ ra một cơ sở là câu sai.',
-   g:['Chìa khoá <b>Tính chất vật lí</b>: nhiệt độ nóng chảy phụ thuộc số C=C và độ dài mạch.','Nếu hai acid cùng số C=C thì còn yếu tố nào để so?','Độ dài mạch: 18 C dài hơn 16 C → nóng chảy cao hơn. Vậy luôn có cơ sở.'],
-   giai:'Sai. Cùng một C=C thì so độ dài mạch: oleic (18 C) nóng chảy cao hơn acid 16 C có một C=C. Lưu ý: palmitic acid đúng là {C15H31COOH}, acid no; hiểu theo cách nào thì D vẫn sai.', lab:['k6','fat-16']}],
+   g:['Chìa khoá <b>Tính chất vật lí</b>: nhiệt độ nóng chảy phụ thuộc số C=C và độ dài mạch.','Đếm C=C từ công thức: gốc {C15H31} = C<sub>n</sub>H<sub>2n+1</sub> nên palmitic acid no; gốc {C17H33} thiếu 2 H nên oleic acid có 1 C=C.','Hai acid khác nhau ở số C=C, vậy có cơ sở so sánh. Vế "đều có một liên kết đôi" cũng sai.'],
+   giai:'Sai. Palmitic acid {C15H31COOH} là acid no, oleic acid {C17H33COOH} có một C=C dạng cis. Acid no mạch thẳng xếp khít nên palmitic acid nóng chảy cao hơn (khoảng 63 °C so với khoảng 13 °C), dù mạch ngắn hơn 2 C.', lab:['k6','fat-pal']}],
  mc:{hoi:'Phát biểu sai là', o:[['A','Nhiều C=C → cồng kềnh, xếp kém khít'],['B','Oleic nóng chảy cao hơn linoleic'],['C','Van der Waals mạnh hơn acid ít carbon'],['D','"Chưa có cơ sở" so sánh oleic với palmitic']], d:CHOT.q8},
  ket:'Phát biểu sai: D', nho:'Palmitic acid là acid no; cùng số C=C thì so độ dài mạch.'},
 ];

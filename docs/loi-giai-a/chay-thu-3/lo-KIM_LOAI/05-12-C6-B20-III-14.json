@@ -1,0 +1,122 @@
+{
+ "qid": "12-C6-B20-III-14",
+ "bam": "7c721bc1c37fa861",
+ "dang": "tln",
+ "ten": "Sản xuất Cu từ quặng {Cu2S}: khối lượng quặng cho 1 tấn Cu",
+ "keys": ["k5", "k6"],
+ "dung": [
+  {
+   "ic": "i-heat",
+   "t": "Giai đoạn 1: đốt một phần {Cu2S}",
+   "p": "2{Cu2S} + 3{O2} → 2{Cu2O} + 2{SO2}.",
+   "io": [["in", "{Cu2O}"], ["out", "{SO2}↑"]]
+  },
+  {
+   "ic": "i-heat",
+   "t": "Giai đoạn 2: {Cu2O} gặp {Cu2S}",
+   "p": "2{Cu2O} + {Cu2S} → 6Cu + 2{SO2}.",
+   "io": [["in", "Cu"], ["out", "{SO2}↑"]]
+  },
+  {
+   "ic": "i-chain",
+   "t": "Cộng hai giai đoạn",
+   "p": "3{Cu2S} + 3{O2} → 6Cu + 3{SO2}: mỗi {Cu2S} cho 2Cu, đúng bảo toàn nguyên tố Cu.",
+   "io": [["in", "1 {Cu2S} → 2 Cu"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Chia hiệu suất, chia 40%",
+   "p": "m({Cu2S}) lí thuyết = 1 : 64 : 2 × 160 = 1,25 tấn; chia 0,9 rồi chia 0,4 được khối lượng quặng.",
+   "io": [["in", "≈ 3,47 tấn quặng"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "3,47",
+  "donVi": "tấn",
+  "k": "k6",
+  "bay": "conso",
+  "soi": "\"90%\" và \"40%\" đều áp lên phía nguyên liệu, nên phải CHIA cả hai, không nhân.",
+  "g": [
+   "Chìa khoá <b>Tính theo chuỗi</b>: bảo toàn nguyên tố, {Cu2S} → 2Cu; nguyên liệu thì chia hiệu suất, rồi chia % chất chính trong quặng.",
+   "n(Cu) = 1 : 64 tấn·mol; M({Cu2S}) = 2 × 64 + 32 = 160.",
+   "Tính m({Cu2S}) lí thuyết, rồi quyết định: 0,9 và 0,4 nhân vào hay chia ra thì lượng quặng mới đủ?"
+  ],
+  "giai": "Đáp số: 3,47. n(Cu) = 1 : 64 = 0,015625 tấn·mol. {Cu2S} → 2Cu nên n({Cu2S}) = 0,0078125 tấn·mol, m({Cu2S}) lí thuyết = 0,0078125 × 160 = 1,25 tấn. Hiệu suất 90%: 1,25 : 0,9 ≈ 1,389 tấn {Cu2S}. Quặng 40%: 1,389 : 0,4 ≈ 3,47 tấn."
+ },
+ "ket": "Đáp số: 3,47 tấn",
+ "nho": "Tính lượng nguyên liệu: chia hiệu suất, chia % chất chính; {Cu2S} → 2Cu theo bảo toàn Cu.",
+ "phepTinh": [
+  {
+   "ten": "n Cu (tấn·mol)",
+   "bieuThuc": "1/64",
+   "ketQua": 0.015625,
+   "lamTron": 6
+  },
+  {
+   "ten": "n Cu2S (tấn·mol)",
+   "bieuThuc": "1/64/2",
+   "ketQua": 0.0078125,
+   "lamTron": 7
+  },
+  {
+   "ten": "m Cu2S lí thuyết (tấn)",
+   "bieuThuc": "1/64/2*160",
+   "ketQua": 1.25,
+   "lamTron": 2
+  },
+  {
+   "ten": "m Cu2S thực tế (tấn)",
+   "bieuThuc": "1/64/2*160/0.9",
+   "ketQua": 1.389,
+   "lamTron": 3
+  },
+  {
+   "ten": "m quặng (tấn)",
+   "bieuThuc": "1/64/2*160/0.9/0.4",
+   "ketQua": 3.47,
+   "lamTron": 2,
+   "laDapSo": true
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Nếu quặng chứa 50% {Cu2S} (hiệu suất vẫn 90%) thì cần khoảng 2,78 tấn quặng để điều chế 1 tấn Cu.",
+   "d": "D",
+   "giai": "Đúng. m(quặng) = 1,25 : 0,9 : 0,5 ≈ 2,78 tấn.",
+   "phepTinh": [
+    {
+     "ten": "m quặng (tấn)",
+     "bieuThuc": "1/64/2*160/0.9/0.5",
+     "ketQua": 2.78,
+     "lamTron": 2
+    }
+   ]
+  },
+  {
+   "t": "Từ 10 tấn quặng chứa 40% {Cu2S}, hiệu suất 90%, thu được khoảng 3,6 tấn Cu.",
+   "d": "S",
+   "giai": "Sai. 3,6 tấn là nhầm khối lượng {Cu2S} với khối lượng Cu. m({Cu2S}) = 10 × 0,4 = 4 tấn; m(Cu) = 4 × 128 : 160 × 0,9 = 2,88 tấn.",
+   "phepTinh": [
+    {
+     "ten": "m Cu2S (tấn)",
+     "bieuThuc": "10*0.4",
+     "ketQua": 4,
+     "lamTron": 2
+    },
+    {
+     "ten": "m Cu (tấn)",
+     "bieuThuc": "10*0.4*128/160*0.9",
+     "ketQua": 2.88,
+     "lamTron": 2
+    }
+   ]
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Đề in \"Cu 2S\" (chữ số 2 tách rời, không hạ chỉ số) ở nhiều chỗ, cần sửa thành {Cu2S}; phương trình giai đoạn 2 dính liền câu \"Quặng đồng ban đầu…\", thiếu xuống dòng."
+  }
+ ]
+}

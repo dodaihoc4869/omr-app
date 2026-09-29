@@ -59,6 +59,7 @@ const GiaoDeTheoTuanScreen = lazy(() => import('./screens/GiaoDeTheoTuanScreen')
 // GAME HÓA 2.0 (bản vẽ docs/ban-ve-gv-2809): trang đầu Tổng quan + màn riêng Chiến dịch luyện — chỉ vào được khi cờ bật.
 const TongQuanScreen = lazy(() => import('./screens/TongQuanScreen'))
 const ChienDichScreen = lazy(() => import('./screens/ChienDichScreen'))
+const DuyetLoiGiaiScreen = lazy(() => import('./screens/DuyetLoiGiaiScreen'))
 // CỔNG PHỤ HUYNH NẠP MUỘN. Link phụ huynh dùng hằng ngày là `/p#…` (phiếu kết
 // quả) — màn ấy vẫn nạp SỚM. Cổng tra cứu `/ph` thì mở thưa hơn nhiều, mà để
 // nó nhập thẳng là em học sinh nào cũng phải tải kèm.
@@ -92,6 +93,7 @@ const TEN_MAN: Record<string, string> = {
   caidat: 'Cài đặt',
   tongquan: 'Tổng quan',
   chiendich: 'Chiến dịch luyện',
+  duyetloigiai: 'Duyệt lời giải',
 }
 
 /** Game Hóa 2.0 đổi tên màn (RA-SOAT 28/09): "Lên bảng" → "Chữa trên lớp", "Ngân hàng" → "Kho đề". */
@@ -256,6 +258,13 @@ function App() {
     })
   }, [linkCu, laPhieu, laXemDiem, laHocSinh, laPhuHuynh, khoa, setClassList])
 
+  // Lời giải từng bước (29/09): `#duyet-loi-giai` hoặc `#duyet-loi-giai=<mã đề>` mở thẳng màn Duyệt lời giải (màn tự đọc mã đề).
+  useEffect(() => {
+    if (linkCu || laPhieu || laHocSinh || laPhuHuynh) return
+    if (location.hash.startsWith('#duyet-loi-giai')) setScreen('duyetloigiai')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [linkCu, laPhieu, laHocSinh, laPhuHuynh])
+
   // Link mời làm bài (?examCode=) mở thẳng màn thi. Không có thì vào app thầy.
   useEffect(() => {
     if (linkCu || laPhieu || laHocSinh || laPhuHuynh) return
@@ -380,6 +389,7 @@ function App() {
         {screen === 'khodegiao' && <GiaoDeTheoTuanScreen />}
         {screen === 'tongquan' && <TongQuanScreen />}
         {screen === 'chiendich' && <ChienDichScreen />}
+        {screen === 'duyetloigiai' && <DuyetLoiGiaiScreen />}
         </Suspense>
       </ChanLoi>
       )}

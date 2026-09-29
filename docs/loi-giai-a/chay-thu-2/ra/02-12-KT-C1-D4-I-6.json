@@ -6,25 +6,50 @@
  "chuong": "Ester – lipid",
  "de": "<p>Tổng hợp ethyl acetate trong phòng thí nghiệm từ nhóm hóa chất nào sau đây sẽ đạt hiệu quả cao nhất?</p>",
  "ten": "Chọn hoá chất điều chế ethyl acetate cho hiệu suất cao nhất",
- "keys": ["k3"],
+ "keys": [
+  "k3"
+ ],
  "dung": [
   {
    "ic": "i-reflux",
    "t": "Ester hoá là thuận nghịch",
    "p": "{CH3COOH} + {C2H5OH} ⇌ {CH3COOC2H5} + {H2O}. Nước sinh ra cùng phía với ester.",
-   "io": [["in", "acid"], ["in", "ethanol"], ["out", "{H2O}"]]
+   "io": [
+    [
+     "in",
+     "acid"
+    ],
+    [
+     "in",
+     "ethanol"
+    ],
+    [
+     "out",
+     "{H2O}"
+    ]
+   ]
   },
   {
    "ic": "i-lens",
    "t": "Soi lượng nước mang vào",
    "p": "Dung dịch acid 5%, cồn 90°, cồn 96°, {HCl} 36,5% đều chứa nước. Nước càng nhiều, cân bằng càng lùi về chiều nghịch.",
-   "io": [["out", "nước lẫn trong chất đầu"]]
+   "io": [
+    [
+     "out",
+     "nước lẫn trong chất đầu"
+    ]
+   ]
   },
   {
    "ic": "i-dry",
    "t": "{H2SO4} đặc: xúc tác + hút nước",
    "p": "{H2SO4} 98% vừa tăng tốc phản ứng vừa giữ nước lại, kéo cân bằng về phía tạo ester.",
-   "io": [["in", "{H2SO4} 98%"]]
+   "io": [
+    [
+     "in",
+     "{H2SO4} 98%"
+    ]
+   ]
   }
  ],
  "y": [
@@ -41,7 +66,10 @@
     "Nhóm nào vừa không mang nước vào, vừa có chất hút nước làm xúc tác?"
    ],
    "giai": "Chọn. Acid và ethanol đều nguyên chất nên không mang nước vào; {H2SO4} 98% vừa xúc tác vừa hút nước, kéo cân bằng về phía tạo ester.",
-   "lab": ["k3", "h3po4"]
+   "lab": [
+    "k3",
+    "h3po4"
+   ]
   },
   {
    "id": "B",
@@ -83,26 +111,61 @@
     "Dung dịch {HCl} 36,5% có 63,5% là nước, cồn 96° còn 4% nước."
    ],
    "giai": "Loại. Dung dịch {HCl} 36,5% có 63,5% là nước, cồn 96° cũng còn nước, và {HCl} không hút nước như {H2SO4} đặc.",
-   "lab": ["k3", "h3po4"]
+   "lab": [
+    "k3",
+    "h3po4"
+   ]
   }
  ],
  "mc": {
   "hoi": "Chọn đáp án",
   "o": [
-   ["A", "Acetic acid nguyên chất; ethanol nguyên chất, dung dịch H2SO4 98%"],
-   ["B", "Dung dịch CH3COOH 5%; ethanol nguyên chất, dung dịch H2SO4 98%"],
-   ["C", "Acetic acid nguyên chất; cồn 90o; dung dịch H2SO4 98%"],
-   ["D", "Acetic acid nguyên chất; cồn 96o, dung dịch HCl 36,5%"]
+   [
+    "A",
+    "Acetic acid nguyên chất; ethanol nguyên chất, dung dịch H2SO4 98%"
+   ],
+   [
+    "B",
+    "Dung dịch CH3COOH 5%; ethanol nguyên chất, dung dịch H2SO4 98%"
+   ],
+   [
+    "C",
+    "Acetic acid nguyên chất; cồn 90o; dung dịch H2SO4 98%"
+   ],
+   [
+    "D",
+    "Acetic acid nguyên chất; cồn 96o, dung dịch HCl 36,5%"
+   ]
   ],
   "d": "A"
  },
  "ket": "Đáp án A",
  "nho": "Ester hoá thuận nghịch: chất đầu phải khan, {H2SO4} đặc vừa xúc tác vừa hút nước.",
  "phepTinh": [
-  {"ten": "% nước trong dung dịch CH3COOH 5%", "bieuThuc": "100-5", "ketQua": 95, "lamTron": 0},
-  {"ten": "% nước (thể tích) trong cồn 90°", "bieuThuc": "100-90", "ketQua": 10, "lamTron": 0},
-  {"ten": "% nước (thể tích) trong cồn 96°", "bieuThuc": "100-96", "ketQua": 4, "lamTron": 0},
-  {"ten": "% nước trong dung dịch HCl 36,5%", "bieuThuc": "100-36.5", "ketQua": 63.5, "lamTron": 1}
+  {
+   "ten": "% nước trong dung dịch CH3COOH 5%",
+   "bieuThuc": "100-5",
+   "ketQua": 95,
+   "lamTron": 0
+  },
+  {
+   "ten": "% nước (thể tích) trong cồn 90°",
+   "bieuThuc": "100-90",
+   "ketQua": 10,
+   "lamTron": 0
+  },
+  {
+   "ten": "% nước (thể tích) trong cồn 96°",
+   "bieuThuc": "100-96",
+   "ketQua": 4,
+   "lamTron": 0
+  },
+  {
+   "ten": "% nước trong dung dịch HCl 36,5%",
+   "bieuThuc": "100-36.5",
+   "ketQua": 63.5,
+   "lamTron": 1
+  }
  ],
  "tuongTu": [
   {
@@ -110,7 +173,12 @@
    "d": "S",
    "giai": "Sai. Cồn 70° mang vào 30% nước theo thể tích; lượng nước này đẩy cân bằng về chiều nghịch, {H2SO4} đặc không hút hết được nên hiệu suất giảm.",
    "phepTinh": [
-    {"ten": "% nước (thể tích) trong cồn 70°", "bieuThuc": "100-70", "ketQua": 30, "lamTron": 0}
+    {
+     "ten": "% nước (thể tích) trong cồn 70°",
+     "bieuThuc": "100-70",
+     "ketQua": 30,
+     "lamTron": 0
+    }
    ]
   },
   {
@@ -120,7 +188,12 @@
    "phepTinh": []
   }
  ],
- "canThayChot": [
-  "Đề và phương án ghi \"cồn 90o\", \"cồn 96o\": chữ o đang thay cho dấu độ (90°, 96°). Nên sửa hiển thị trong kho."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Đề và phương án ghi \"cồn 90o\", \"cồn 96o\": chữ o đang thay cho dấu độ (90°, 96°). Nên sửa hiển thị trong kho.",
+   "loai": "hienThi",
+   "chot": "Sửa kho: \"90o\" → \"90°\", \"96o\" → \"96°\"."
+  }
  ]
 }

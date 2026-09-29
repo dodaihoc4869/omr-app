@@ -179,9 +179,23 @@
    "phepTinh": []
   }
  ],
- "canThayChot": [
-  "Hình bộ đun hồi lưu ghi \"Nước mát\" vào ở đầu trên, \"Nước nóng\" ra ở đầu dưới, ngược quy tắc nước vào thấp, ra cao. Nên sửa hình hoặc lưu ý học sinh.",
-  "Ý b nói \"bình hứng\" nhưng thí nghiệm chỉ có đun hồi lưu rồi chiết, không có bước chưng cất; đáp án S vẫn đứng vì hỗn hợp còn acid, alcohol, nước.",
-  "Đề lặp bảng nhiệt độ sôi dưới dạng chữ ngay trước bảng và ghi \"(0C)\" thay cho \"(°C)\"."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Hình bộ đun hồi lưu ghi \"Nước mát\" vào ở đầu trên, \"Nước nóng\" ra ở đầu dưới, ngược quy tắc nước vào thấp, ra cao. Nên sửa hình hoặc lưu ý học sinh.",
+   "loai": "loiDe",
+   "chot": "Sửa hình: nước vào ở đầu DƯỚI ống sinh hàn, ra ở đầu TRÊN (đổi chỗ hai nhãn)."
+  },
+  {
+   "ghi": "Ý b nói \"bình hứng\" nhưng thí nghiệm chỉ có đun hồi lưu rồi chiết, không có bước chưng cất; đáp án S vẫn đứng vì hỗn hợp còn acid, alcohol, nước.",
+   "loai": "dapAn",
+   "chot": "Giữ đáp án kho (chỗ tranh luận chỉ là cách hiểu).",
+   "daXoa": true
+  },
+  {
+   "ghi": "Đề lặp bảng nhiệt độ sôi dưới dạng chữ ngay trước bảng và ghi \"(0C)\" thay cho \"(°C)\".",
+   "loai": "hienThi",
+   "chot": "Sửa kho: bỏ đoạn chữ chép lặp bảng, \"(0C)\" → \"(°C)\"."
+  }
  ]
 }

@@ -169,8 +169,18 @@
    ]
   }
  ],
- "canThayChot": [
-  "Đề viết \"ethyl acetate không phân cực\" là chưa chính xác: phân tử ethyl acetate có phân cực, chỉ kém acid và ethanol vì không tạo liên kết hydrogen giữa các phân tử. Lời giải dùng chữ \"ít phân cực\".",
-  "Ý a (đáp án Đ) có thể tranh luận ở chữ \"lí tưởng\": acetic acid và ethanol cũng tan tốt trong diethyl ether, còn ethyl acetate vẫn tan một phần trong nước, nên sự chia lớp không hoàn toàn. Lời giải giữ Đ theo lập luận phân cực của đề."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Đề viết \"ethyl acetate không phân cực\" là chưa chính xác: phân tử ethyl acetate có phân cực, chỉ kém acid và ethanol vì không tạo liên kết hydrogen giữa các phân tử. Lời giải dùng chữ \"ít phân cực\".",
+   "loai": "loiDe",
+   "chot": "Sửa đề: \"không phân cực\" → \"ít phân cực\"."
+  },
+  {
+   "ghi": "Ý a (đáp án Đ) có thể tranh luận ở chữ \"lí tưởng\": acetic acid và ethanol cũng tan tốt trong diethyl ether, còn ethyl acetate vẫn tan một phần trong nước, nên sự chia lớp không hoàn toàn. Lời giải giữ Đ theo lập luận phân cực của đề.",
+   "loai": "dapAn",
+   "chot": "Giữ đáp án kho (chỗ tranh luận chỉ là cách hiểu).",
+   "daXoa": true
+  }
  ]
 }

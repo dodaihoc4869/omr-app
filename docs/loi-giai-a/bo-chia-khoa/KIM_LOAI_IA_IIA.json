@@ -1,0 +1,70 @@
+{
+ "ma": "KIM_LOAI_IA_IIA",
+ "chuong": "Kim loại nhóm IA, IIA",
+ "lop": "12",
+ "KEYS": {
+  "k1": {
+   "ten": "Độ mạnh kim loại",
+   "rule": "Tính khử tăng <b>xuống dưới nhóm</b> (Li → Cs, Be → Ba). Ở nhiệt độ thường chỉ <b>nhóm IA và Ca, Sr, Ba</b> tác dụng mạnh với nước → hydroxide + {H2}, phenolphthalein hoá hồng, là dấu hiệu kim loại mạnh; <b>Mg</b> chỉ phản ứng chậm với nước nóng, <b>Be</b> không phản ứng. Kim loại kiềm mềm, nhẹ, nóng chảy thấp (giảm Li → Cs), bảo quản trong <b>dầu hoả, khí hiếm, chân không</b>."
+  },
+  "k2": {
+   "ten": "Màu ngọn lửa",
+   "rule": "Đốt hợp chất trên ngọn lửa đèn khí: màu do <b>ion kim loại</b>, gốc acid không ảnh hưởng. <b>Li đỏ tía, Na vàng, K tím nhạt, Ca đỏ cam, Sr đỏ son, Ba lục ánh vàng</b>; Be, Mg không có màu đặc trưng. Chốt kim loại bằng màu trước, rồi chốt hợp chất bằng phản ứng đi kèm (nhiệt phân, tác dụng acid hay base)."
+  },
+  "k3": {
+   "ten": "Vòng carbonate",
+   "rule": "Trục {CO3}<sup>2−</sup> ⇌ {HCO3}<sup>−</sup>: thêm {CO2} + {H2O} → hydrogencarbonate (tan); thêm OH<sup>−</sup> hoặc đun nóng → carbonate; thêm acid → {CO2}. Nhiệt phân: {NaHCO3} → {Na2CO3} (rắn giảm 62/168 = 36,9%); {Na2CO3}, {K2CO3} bền nhiệt; carbonate, nitrate nhóm IIA → oxide, bền dần từ Mg → Ba; nitrate nhóm IA → nitrite + {O2}. Sơ đồ chuyển hoá: điền chất rồi <b>viết từng mũi tên</b>; một mũi tên không có phản ứng thật là loại."
+  },
+  "k4": {
+   "ten": "Độ tan nhóm IIA",
+   "rule": "Đi xuống nhóm IIA: hydroxide <b>tan tăng</b> ({Mg(OH)2} không tan, {Ca(OH)2} ít tan, {Ba(OH)2} tan tốt), sulfate <b>tan giảm</b> ({MgSO4} tan, {CaSO4} ít tan, {BaSO4} không tan, dùng cản quang). Carbonate IIA không tan. Đục hay trong: so <b>lượng tạo ra với độ tan</b>. Thạch cao: sống {CaSO4.2H2O}, nung {CaSO4.0,5H2O} (bó bột, đúc tượng), khan {CaSO4}."
+  },
+  "k5": {
+   "ten": "Nước cứng",
+   "rule": "Ca<sup>2+</sup>, Mg<sup>2+</sup> đi với {HCO3}<sup>−</sup> → <b>tạm thời</b>; với Cl<sup>−</sup>, {SO4}<sup>2−</sup> → <b>vĩnh cửu</b>. Đun sôi, {Ca(OH)2} vừa đủ chỉ trị tạm thời; carbonate, phosphate tan, nhựa trao đổi ion trị mọi loại; {NaCl}, {HCl} không trị được. Tác hại: tốn xà phòng, đóng cặn ống, nồi hơi, thức ăn lâu chín. Tính: <b>2 × n(M<sup>2+</sup>) = tổng điện tích âm</b>; đun sôi 2{HCO3}<sup>−</sup> kéo 1 M<sup>2+</sup>; nhựa: 1 M<sup>2+</sup> đổi 2 gốc {SO3X}."
+  },
+  "k6": {
+   "ten": "Nhiệt phản ứng",
+   "rule": "Δ<sub>r</sub>H° = ΣΔ<sub>f</sub>H°(sản phẩm) − ΣΔ<sub>f</sub>H°(chất đầu), <b>nhân đủ hệ số</b>, đơn chất bền bằng 0. Δ<sub>r</sub>H° <b>dương</b> là thu nhiệt: nhiệt phân carbonate, nitrate, nung thạch cao, Pidgeon. Δ<sub>r</sub>H° <b>âm</b> là toả nhiệt: kim loại + nước hoặc phi kim, tôi vôi {CaO} + {H2O}. Nhiệt cho m gam: <b>Q = (n chất : hệ số của nó) × Δ<sub>r</sub>H°</b>; đổi kg → g, dùng M của cả tinh thể ngậm nước."
+  },
+  "k7": {
+   "ten": "Sản xuất & tách",
+   "rule": "IA, IIA khử mạnh → điều chế bằng <b>điện phân nóng chảy</b> muối chloride; điện phân dung dịch {NaCl} (màng ngăn) chỉ ra {NaOH}, {H2}, {Cl2}. Ngoại lệ Pidgeon: Si khử {MgO} (không khử {CaO}), là <b>nhiệt luyện</b>. Solvay: {NaHCO3} kết tủa vì <b>ít tan</b>, không vì acid mạnh; nung ra soda; thu hồi {NH3}, {CO2}. Tách KCl khỏi NaCl: <b>kết tinh</b>. Bảo toàn kim loại từ quặng, × H."
+  }
+ },
+ "TRAPS_THEM": {
+  "ngoaile": {
+   "ten": "Ngoại lệ trong nhóm",
+   "hoi": "Chất nêu ra có phải Be, Mg, Li hoặc hợp chất của chúng không? Quy luật chung của nhóm có áp được cho nó không?"
+  },
+  "luongdu": {
+   "ten": "Vừa đủ hay dư",
+   "hoi": "Chất thêm vào vừa đủ hay dư? Tính lượng tạo ra, so với độ tan hoặc lượng ion còn lại rồi mới kết luận."
+  }
+ },
+ "DANG_KEY": {
+  "KIM_LOAI_IA_IIA.TINH_CHAT_KIM_LOAI.SO_SANH": "k1",
+  "KIM_LOAI_IA_IIA.TINH_CHAT_KIM_LOAI.NHAN_DANG": "k1",
+  "KIM_LOAI_IA_IIA.MAU_NGON_LUA.NHAN_DANG": "k2",
+  "KIM_LOAI_IA_IIA.HOP_CHAT.NHAN_DANG": "k3",
+  "KIM_LOAI_IA_IIA.HOP_CHAT.VIET_CTCT": "k3",
+  "KIM_LOAI_IA_IIA.HOP_CHAT.CHON_PHAT_BIEU": "k4",
+  "KIM_LOAI_IA_IIA.NUOC_CUNG.CHON_PHAT_BIEU": "k5",
+  "KIM_LOAI_IA_IIA.NUOC_CUNG.NHAN_DANG": "k5",
+  "KIM_LOAI_IA_IIA.NUOC_CUNG.TINH_SO_MOL": "k5",
+  "KIM_LOAI_IA_IIA.NUOC_CUNG.TINH_KHOI_LUONG": "k5",
+  "KIM_LOAI_IA_IIA.HOP_CHAT.TINH_NANG_LUONG": "k6",
+  "KIM_LOAI_IA_IIA.HOP_CHAT.DEM_DONG_PHAN": "k6",
+  "KIM_LOAI_IA_IIA.SAN_XUAT.CHON_PHAT_BIEU": "k7"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Màu ngọn lửa: GIỮ Li đỏ tía, Na vàng, K tím nhạt, Ca đỏ cam, Sr đỏ son, Ba lục ánh vàng.",
+  "Li: GIỮ \"tính khử tăng Li → Cs\" theo xu hướng nhóm; đề hỏi theo E° thì soạn theo E° của đề (Li âm nhất nhưng phản ứng với nước chậm hơn Na, K).",
+  "Nhiệt phân nitrate nhóm IA (→ nitrite + O2): đã thêm vào k3.",
+  "Ý Pidgeon \"MgO … \" chấm Đúng: GIỮ; k7 ghi đúng điều kiện.",
+  "Mã dạng 12-C7-B24-III-8: GIỮ mã, DANG_KEY gán k6.",
+  "Lời giải cũ có lí do lạ (I-83 phương án D, I-75 phương án A) và độ tan Ca(OH)2, Ba(OH)2 không theo SGK ở II-8: hồ sơ mới thay lời giải cũ; chìa không ghi số độ tan."
+ ],
+ "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+}

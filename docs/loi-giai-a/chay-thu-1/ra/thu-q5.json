@@ -222,7 +222,12 @@
    ]
   }
  ],
- "canThayChot": [
-  "Đề gốc in \"cinnmate\", tên đúng là \"cinnamate\" (đã có ghi chú trong đề); lỗi chính tả, không ảnh hưởng đáp án."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Đề gốc in \"cinnmate\", tên đúng là \"cinnamate\" (đã có ghi chú trong đề); lỗi chính tả, không ảnh hưởng đáp án.",
+   "loai": "hienThi",
+   "chot": "Sửa đề: \"cinnmate\" → \"cinnamate\"."
+  }
  ]
 }

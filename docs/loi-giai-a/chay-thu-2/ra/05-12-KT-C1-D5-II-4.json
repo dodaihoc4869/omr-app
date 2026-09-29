@@ -219,7 +219,12 @@
    ]
   }
  ],
- "canThayChot": [
-  "Đề lặp bảng số liệu dưới dạng chữ ngay trước bảng; câu dẫn nói ghi \"thể tích … với thời gian thí nghiệm tương ứng\" nhưng bảng chỉ có nhiệt độ và thể tích."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Đề lặp bảng số liệu dưới dạng chữ ngay trước bảng; câu dẫn nói ghi \"thể tích … với thời gian thí nghiệm tương ứng\" nhưng bảng chỉ có nhiệt độ và thể tích.",
+   "loai": "loiDe",
+   "chot": "Sửa kho: câu dẫn ghi \"ở từng nhiệt độ\" thay \"với thời gian\"; bỏ đoạn chữ chép lặp bảng."
+  }
  ]
 }

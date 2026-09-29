@@ -1,0 +1,110 @@
+{
+ "qid": "12-C3-B9-D3-I-39",
+ "bam": "5d0bb640631aa673",
+ "dang": "tn",
+ "ten": "Alanine, muối, muối ester và Gly-Ala: đếm nhận định đúng",
+ "keys": ["k5", "k7", "k6"],
+ "dung": [
+  {
+   "ic": "i-bolt",
+   "t": "(1) X trong điện trường",
+   "p": "Alanine ở dạng ion lưỡng cực. pH thấp thành cation, về cực âm; pH cao thành anion, về cực dương; chỉ ở pH ≈ pI mới đứng yên.",
+   "io": [["out", "(1)"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "(2) Y là muối của acid mạnh",
+   "p": "–{NH3Cl} và –{COOH} đều có tính acid; phenolphthalein không đổi màu trong môi trường acid.",
+   "io": [["out", "(2)"]]
+  },
+  {
+   "ic": "i-reflux",
+   "t": "(3) Ester hoá alanine",
+   "p": "Alanine + {C2H5OH}, có {HCl}: –{COOH} thành –{COOC2H5}, –{NH2} thành –{NH3Cl}, ra đúng Z.",
+   "io": [["in", "(3)"], ["out", "{H2O}"]]
+  },
+  {
+   "ic": "i-chain",
+   "t": "(4) T là dipeptide Gly-Ala",
+   "p": "Có một liên kết peptide nên bị thuỷ phân, nhưng chưa đủ để cho màu biuret.",
+   "io": [["out", "(4)"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "d": "S",
+   "k": "k6",
+   "bay": "tengoi",
+   "soi": "Chọn 4 là coi cả (4) đúng: T thuỷ phân được, nhưng có màu biuret không?",
+   "g": [
+    "Chìa khoá <b>Peptide: đếm &amp; tính</b>: màu biuret có từ tripeptide; dipeptide không.",
+    "T là Gly-Ala, chỉ có một liên kết peptide, nên vế \"màu biuret\" của (4) đã sai."
+   ],
+   "giai": "Loại. (4) sai vì dipeptide không cho màu biuret; (1), (2) cũng sai.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "d": "S",
+   "k": "k5",
+   "bay": "tuyetdoi",
+   "soi": "Chọn 2 là đã tính thêm một trong (1), (2), (4); chữ \"ở các dung dịch có pH khác nhau\" của (1) là chỗ tuyệt đối hoá.",
+   "g": [
+    "Chìa khoá <b>Amino acid lưỡng tính</b>: pH thấp amino acid là cation, về cực âm; pH cao là anion, về cực dương; muối có –{NH3Cl} mang tính acid.",
+    "(1) nói X không di chuyển ở mọi pH; (2) nói dung dịch có tính acid làm phenolphthalein hoá hồng."
+   ],
+   "giai": "Loại. Ngoài (3), không nhận định nào đúng: X di chuyển khi pH khác pI, Y có tính acid, T là dipeptide không có màu biuret.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "d": "D",
+   "k": "k5",
+   "bay": null,
+   "soi": "Soát từng nhận định; ba chỗ cần soi là \"không di chuyển … pH khác nhau\", \"màu hồng\" và \"màu biuret\".",
+   "g": [
+    "Chìa khoá <b>Amino acid lưỡng tính</b>: alcohol/{HCl} cho muối ester; điện di: pH thấp về cực âm, pH cao về cực dương, pH ≈ pI đứng yên; dư –{COOH} hay có –{NH3Cl} thì có tính acid.",
+    "X là alanine, Y là muối {HCl} của alanine, Z là muối ester ethyl của alanine, T là Gly-Ala.",
+    "(1) có ngoại lệ ở pH khác pI không? (2) môi trường acid có làm phenolphthalein hoá hồng không? (4) dipeptide có màu biuret không?"
+   ],
+   "giai": "Chọn. Chỉ (3) đúng: alanine ester hoá với ethanol khi có {HCl} cho {ClH3NCH(CH3)COOC2H5}. (1) sai vì X di chuyển khi pH khác pI; (2) sai vì Y có tính acid; (4) sai vì dipeptide không có màu biuret.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "d": "S",
+   "k": "k6",
+   "bay": "tengoi",
+   "soi": "Chọn 3 là coi thêm hai nhận định sai là đúng; (4) là chỗ dễ nhận nhầm nhất.",
+   "g": [
+    "Chìa khoá <b>Peptide: đếm &amp; tính</b>: dipeptide có một liên kết peptide, chưa cho màu biuret.",
+    "Ngoài (4), còn (1) và (2): X có đứng yên ở mọi pH không, Y có tính base không?"
+   ],
+   "giai": "Loại. Chỉ (3) đúng; (1), (2), (4) đều sai nên không thể có ba nhận định đúng.",
+   "lab": null
+  }
+ ],
+ "mc": { "d": "C" },
+ "ket": "Đáp án C",
+ "nho": "Amino acid chỉ đứng yên khi pH ≈ pI; muối –{NH3Cl} có tính acid; dipeptide không có màu biuret.",
+ "phepTinh": [],
+ "tuongTu": [
+  {
+   "t": "Dung dịch {H2NCH2COONa} làm phenolphthalein chuyển màu hồng.",
+   "d": "D",
+   "giai": "Đúng. Chất còn –{NH2} tự do và gốc –{COO}<sup>−</sup> nhận H<sup>+</sup> của nước, dung dịch có tính base nên phenolphthalein hoá hồng."
+  },
+  {
+   "t": "Tripeptide Gly-Ala-Gly có phản ứng thuỷ phân nhưng không có phản ứng màu biuret.",
+   "d": "S",
+   "giai": "Sai. Tripeptide có hai liên kết peptide nên đã có phản ứng màu biuret, tạo màu tím với {Cu(OH)2} trong kiềm."
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Đề: công thức có khoảng trắng thừa (\"H₂NCH(CH₃) COOH\", \"… COOH .\"); nhận định (3) thiếu chữ \"hoá\" trong \"phản ứng ester hoá\"."
+  }
+ ]
+}

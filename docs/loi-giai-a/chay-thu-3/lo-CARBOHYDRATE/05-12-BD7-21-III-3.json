@@ -1,0 +1,71 @@
+{
+ "qid": "12-BD7-21-III-3",
+ "bam": "17d7b2f4d236c157",
+ "dang": "tln",
+ "ten": "Tính chất đúng với glucose: tan, thuỷ phân, {Cu(OH)2}, {Br2}, Tollens",
+ "keys": ["k7", "k1", "k2", "k3"],
+ "dung": [
+  {
+   "ic": "i-crystal",
+   "t": "Tính chất vật lí",
+   "p": "Glucose là chất rắn, kết tinh, tan tốt trong nước.",
+   "io": [["in", "(1)"]]
+  },
+  {
+   "ic": "i-hex",
+   "t": "Soi cấu tạo mạch hở",
+   "p": "{CH2OH[CHOH]4CHO}: 5 –OH (có –OH kề nhau) và 1 –CHO.",
+   "io": [["in", "5 –OH"], ["in", "–CHO"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Thử ba thuốc thử",
+   "p": "{Cu(OH)2}: dung dịch xanh lam. Nước {Br2}: mất màu. Tollens: kết tủa Ag.",
+   "io": [["in", "(3)"], ["in", "(4)"], ["in", "(5)"]]
+  },
+  {
+   "ic": "i-filter",
+   "t": "Loại phản ứng thuỷ phân",
+   "p": "Glucose là monosaccharide, không bị thuỷ phân thành đường nhỏ hơn.",
+   "io": [["out", "(2)"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "1345",
+  "donVi": "",
+  "k": "k2",
+  "bay": "tengoi",
+  "soi": "\"tham gia phản ứng thuỷ phân\" → glucose thuộc loại carbohydrate nào?",
+  "g": [
+   "Chìa khoá <b>Bảng thuốc thử</b>: glucose có nhiều –OH kề nhau và –CHO nên phản ứng với {Cu(OH)2}, nước {Br2}, Tollens.",
+   "Glucose là monosaccharide: chất rắn kết tinh, tan tốt trong nước.",
+   "Monosaccharide có bị {H2O} cắt thành đường nhỏ hơn không?"
+  ],
+  "giai": "Đáp số: 1345. (1) đúng: glucose rắn, kết tinh, tan tốt. (2) sai: monosaccharide không thuỷ phân. (3) –OH kề nhau → xanh lam với {Cu(OH)2}. (4), (5) nhóm –CHO bị nước bromine và thuốc thử Tollens oxi hoá."
+ },
+ "ket": "Đáp số: 1345",
+ "nho": "Glucose có –OH kề nhau và –CHO: phản ứng với {Cu(OH)2}, nước {Br2}, Tollens; là monosaccharide nên không thuỷ phân.",
+ "phepTinh": [
+  { "ten": "Bộ số (ghép số thứ tự tăng dần)", "bieuThuc": "1345", "ketQua": 1345, "lamTron": 0, "laDapSo": true }
+ ],
+ "tuongTu": [
+  {
+   "t": "Với fructose, bộ số các tính chất đúng trong 5 tính chất trên là 135.",
+   "d": "D",
+   "giai": "Đúng. Fructose rắn, tan tốt; có –OH kề nhau nên hoà tan {Cu(OH)2}; tráng bạc được vì trong môi trường kiềm chuyển thành glucose. Fructose không làm mất màu nước bromine và không thuỷ phân.",
+   "phepTinh": [
+    { "ten": "Bộ số với fructose", "bieuThuc": "135", "ketQua": 135, "lamTron": 0 }
+   ]
+  },
+  {
+   "t": "Với saccharose, bộ số các tính chất đúng trong 5 tính chất trên là 1235.",
+   "d": "S",
+   "giai": "Sai. Saccharose rắn, tan tốt, thuỷ phân được và hoà tan {Cu(OH)2}; nhưng không có –CHO nên không tráng bạc, không làm mất màu nước bromine. Bộ số đúng là 123.",
+   "phepTinh": [
+    { "ten": "Bộ số với saccharose", "bieuThuc": "123", "ketQua": 123, "lamTron": 0 }
+   ]
+  }
+ ],
+ "co": []
+}

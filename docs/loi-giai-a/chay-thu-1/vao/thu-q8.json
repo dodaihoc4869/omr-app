@@ -4,7 +4,7 @@
  "nguon": "Đề thi thử",
  "dang": "sai",
  "chuong": "ester-lipid",
- "de": "<p><b>Câu 50:</b> Khi các acid béo không no có nhiều liên kết đôi (C=C) thì nhiệt độ nóng chảy của nó sẽ bé hơn các acid béo có cùng số nguyên tử carbon nhưng ít liên kết đôi hơn. Phát biểu nào sau đây là <b>sai</b>?</p>\n<p class=\"note\">Đề in palmitic acid là {C15H29COOH}; công thức đúng của palmitic acid là {C15H31COOH} (acid béo no).</p>",
+ "de": "<p><b>Câu 50:</b> Khi các acid béo không no có nhiều liên kết đôi (C=C) thì nhiệt độ nóng chảy của nó sẽ bé hơn các acid béo có cùng số nguyên tử carbon nhưng ít liên kết đôi hơn. Phát biểu nào sau đây là <b>sai</b>?</p>\n<p class=\"note\">Đã sửa lỗi in của đề gốc: palmitic acid là {C15H31COOH} (acid béo no), không phải {C15H29COOH}.</p>",
  "y": [
   {
    "id": "A",
@@ -20,7 +20,7 @@
   },
   {
    "id": "D",
-   "t": "Chưa có cơ sở để so sánh nhiệt độ nóng chảy của oleic acid ({C17H33COOH}) với palmitic acid ({C15H29COOH}) vì chúng đều có một liên kết đôi (C=C) trong phân tử."
+   "t": "Chưa có cơ sở để so sánh nhiệt độ nóng chảy của oleic acid ({C17H33COOH}) với palmitic acid ({C15H31COOH}) vì chúng đều có một liên kết đôi (C=C) trong phân tử."
   }
  ],
  "dapAn": {

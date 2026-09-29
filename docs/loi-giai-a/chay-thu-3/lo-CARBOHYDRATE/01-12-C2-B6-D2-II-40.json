@@ -1,0 +1,199 @@
+{
+ "qid": "12-C2-B6-D2-II-40",
+ "bam": "dc8d0dbc436b6d93",
+ "dang": "ds",
+ "ten": "Maltose: số nhóm –OH, liên kết α-1,4 và phản ứng với {Br2}, {Cu(OH)2}",
+ "keys": [
+  "k1",
+  "k2"
+ ],
+ "dung": [
+  {
+   "ic": "i-hex",
+   "t": "Hai gốc α-glucose",
+   "p": "Nối C1 gốc trái với C4 gốc phải qua một nguyên tử O, tách ra một {H2O}.",
+   "io": [
+    [
+     "in",
+     "2 gốc glucose"
+    ],
+    [
+     "out",
+     "{H2O}"
+    ]
+   ]
+  },
+  {
+   "ic": "i-chain",
+   "t": "Liên kết α-1,4-glycoside",
+   "p": "Mỗi gốc glucose có 5 –OH; tạo liên kết glycoside mất 2 –OH, còn 8 –OH.",
+   "io": [
+    [
+     "in",
+     "8 –OH"
+    ]
+   ]
+  },
+  {
+   "ic": "i-atom",
+   "t": "Dạng vòng (I): 1 –OH hemiacetal",
+   "p": "Gốc phải còn –OH hemiacetal ở C1. 7 –OH còn lại là –OH alcohol.",
+   "io": [
+    [
+     "in",
+     "7 –OH alcohol"
+    ],
+    [
+     "in",
+     "1 –OH hemiacetal"
+    ]
+   ]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Dạng mở (II): lộ nhóm –CHO",
+   "p": "Vòng gốc phải mở ra cho –CHO tự do, nên maltose là đường khử: tráng bạc, làm mất màu nước bromine.",
+   "io": [
+    [
+     "in",
+     "–CHO"
+    ]
+   ]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "D",
+   "k": "k1",
+   "bay": null,
+   "soi": "\"7 nhóm –OH (alcohol)\" → đếm tổng –OH rồi tách riêng –OH hemiacetal ra.",
+   "g": [
+    "Chìa khoá <b>Soi cấu tạo</b>: mỗi liên kết glycoside làm mất 2 –OH; –OH gắn ở C1 cạnh O vòng là –OH hemiacetal, không tính là alcohol.",
+    "Hai gốc glucose có 2 × 5 = 10 –OH; nối α-1,4 mất 2, còn 8 –OH ở dạng vòng (I).",
+    "Trong 8 –OH đó, bao nhiêu nhóm gắn vào C1 cạnh O vòng?"
+   ],
+   "giai": "Đúng. Dạng vòng (I) có 10 − 2 = 8 nhóm –OH, trong đó 1 nhóm là –OH hemiacetal ở C1 gốc phải, còn lại 7 nhóm –OH alcohol. Số –OH của maltose đếm theo dạng vòng (I) là dạng chủ yếu; dạng mở (II) chỉ là dạng trung gian lượng rất nhỏ, không đếm thành 8 –OH alcohol.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "D",
+   "k": "k2",
+   "bay": null,
+   "soi": "\"phân biệt\" → một chất phải có hiện tượng, chất kia không.",
+   "g": [
+    "Chìa khoá <b>Bảng thuốc thử</b>: nước {Br2} chỉ bị mất màu bởi chất có –CHO tự do (glucose, maltose).",
+    "Maltose có dạng mở (II) với –CHO; saccharose nối α-1,2, hết –OH hemi, không mở vòng được.",
+    "Nhỏ nước {Br2} vào từng mẫu: mẫu nào mất màu, mẫu nào không?"
+   ],
+   "giai": "Đúng. Maltose có –CHO ở dạng mở nên làm mất màu nước bromine; saccharose không có –CHO nên không. Hai mẫu cho hiện tượng khác nhau.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "S",
+   "k": "k1",
+   "bay": "tengoi",
+   "soi": "\"β-1,4\" → soi xem C1 của liên kết thuộc gốc α-glucose hay β-glucose.",
+   "g": [
+    "Chìa khoá <b>Soi cấu tạo</b>: tinh bột, maltose gồm α-glucose, nối α-1,4; cellulose gồm β-glucose, nối β-1,4.",
+    "Maltose sinh ra khi thuỷ phân tinh bột, nên giữ nguyên kiểu liên kết của tinh bột.",
+    "Liên kết β-1,4 là của polysaccharide nào?"
+   ],
+   "giai": "Sai. Hai gốc glucose trong maltose nối bằng liên kết α-1,4-glycoside, giống tinh bột. Liên kết β-1,4 là của cellulose.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "D",
+   "k": "k2",
+   "bay": null,
+   "soi": "\"nhiệt độ thường\" + \"xanh lam\" → đây là phản ứng của các –OH kề nhau, không phải của –CHO.",
+   "g": [
+    "Chìa khoá <b>Bảng thuốc thử</b>: {Cu(OH)2} ở nhiệt độ thường tạo dung dịch xanh lam với chất có nhiều –OH kề nhau.",
+    "Mỗi gốc glucose trong maltose còn các –OH ở C2, C3 kề nhau.",
+    "Không đun, chỉ cần –OH kề nhau. Maltose có đủ không?"
+   ],
+   "giai": "Đúng. Maltose có nhiều –OH kề nhau nên hoà tan {Cu(OH)2} ở nhiệt độ thường, tạo dung dịch xanh lam. Đun nóng trong kiềm mới cho {Cu2O} đỏ gạch.",
+   "lab": null
+  }
+ ],
+ "ket": "a Đ – b Đ – c S – d Đ",
+ "nho": "Maltose: 2 α-glucose nối α-1,4; dạng vòng có 7 –OH alcohol + 1 –OH hemiacetal, mở vòng ra –CHO.",
+ "phepTinh": [
+  {
+   "ten": "Tổng –OH của hai gốc glucose",
+   "bieuThuc": "2*5",
+   "ketQua": 10,
+   "lamTron": 0
+  },
+  {
+   "ten": "–OH còn lại sau khi nối glycoside",
+   "bieuThuc": "10-2",
+   "ketQua": 8,
+   "lamTron": 0
+  },
+  {
+   "ten": "–OH alcohol ở dạng vòng (I)",
+   "bieuThuc": "8-1",
+   "ketQua": 7,
+   "lamTron": 0
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Phân tử saccharose có 8 nhóm –OH và không còn nhóm –OH hemiacetal hay hemiketal nào.",
+   "d": "D",
+   "giai": "Đúng. Gốc glucose và gốc fructose mỗi gốc có 5 –OH, tổng 10; liên kết α-1,2 dùng cả hai –OH hemi nên mất 2, còn 8 –OH alcohol.",
+   "phepTinh": [
+    {
+     "ten": "–OH còn lại trong saccharose",
+     "bieuThuc": "5+5-2",
+     "ketQua": 8,
+     "lamTron": 0
+    }
+   ]
+  },
+  {
+   "t": "Maltose và cellulose đều gồm các gốc glucose nối với nhau bằng liên kết α-1,4-glycoside.",
+   "d": "S",
+   "giai": "Sai. Maltose gồm α-glucose nối α-1,4. Cellulose gồm β-glucose nối β-1,4, mạch thẳng."
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Ý c in \"b -1,4 glycoside .\", đúng phải là \"β-1,4-glycoside.\" (mất chữ β, thừa dấu cách).",
+   "sua": {
+    "truong": "y.c",
+    "truoc": "b -1,4 glycoside .",
+    "sau": "β-1,4-glycoside."
+   }
+  },
+  {
+   "loai": "hienThi",
+   "ghi": "Ý b dư dấu cách trước dấu chấm.",
+   "sua": {
+    "truong": "y.b",
+    "truoc": "maltose .",
+    "sau": "maltose."
+   }
+  },
+  {
+   "loai": "hienThi",
+   "ghi": "Đề thiếu dấu cách sau \"ngũ cốc,...\".",
+   "sua": {
+    "truong": "de",
+    "truoc": "ngũ cốc,...Thành",
+    "sau": "ngũ cốc,... Thành"
+   }
+  }
+ ],
+ "daChot": [
+  {
+   "ghi": "Ý a: \"7 nhóm –OH alcohol\" chỉ đúng với dạng vòng (I); dạng mở (II) có 8.",
+   "chot": "Giữ đáp án kho (Đúng): SGK và đề thi đếm theo dạng vòng; chữ \"(alcohol)\" đã tách riêng –OH hemiacetal. Dạng mở chỉ là trung gian, lượng rất nhỏ."
+  }
+ ]
+}

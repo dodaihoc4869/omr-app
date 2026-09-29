@@ -1,0 +1,70 @@
+{
+ "qid": "12-C5-B16-III-4",
+ "bam": "3bfa224a8b4e25bc",
+ "dang": "tln",
+ "ten": "Pin nhiên liệu hydrogen – oxygen: khối lượng {H2} cho 1 kWh",
+ "keys": ["k4"],
+ "dung": [
+  {
+   "ic": "i-thermo",
+   "t": "ΔrH° của phản ứng",
+   "p": "2{H2} + {O2} → 2{H2O}: ΔrH° = 2 × (−285,8) = −571,6 kJ, ứng với 2 mol {H2}.",
+   "io": [["in", "2 mol {H2}"]]
+  },
+  {
+   "ic": "i-bolt",
+   "t": "Điện năng ≈ |ΔrH°|",
+   "p": "1 mol {H2} cho khoảng 285,8 kJ điện. Cần 3600 kJ thì lí thuyết cần 3600 : 285,8 ≈ 12,596 mol {H2}.",
+   "io": [["out", "3600 kJ điện"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Chia hiệu suất 60%",
+   "p": "Chỉ 60% {H2} được oxi hoá có ích nên cần 12,596 : 0,6 ≈ 20,99 mol, tức khoảng 42 g.",
+   "io": [["in", "≈ 42 g {H2}"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "42",
+  "donVi": "g",
+  "k": "k4",
+  "bay": "soe",
+  "soi": "“hiệu suất 60%” → nhiên liệu thật phải nhiều hơn lí thuyết; ΔrH° tính cho 2 mol {H2}, không phải 1 mol.",
+  "g": [
+   "Chìa khoá <b>Phóng điện – nạp điện</b>: pin nhiên liệu cho điện năng ≈ |ΔrH|; nhiên liệu thật = lí thuyết : H.",
+   "ΔrH° = 2 × (−285,8) = −571,6 kJ cho 2 mol {H2}, tức 285,8 kJ cho 1 mol {H2}.",
+   "Tính n({H2}) lí thuyết cho 3600 kJ. Hiệu suất 60% thì nhân hay chia 0,6?"
+  ],
+  "giai": "Đáp số: 42. Mỗi mol {H2} cho 571,6 : 2 = 285,8 kJ. n({H2}) lí thuyết = 3600 : 285,8 ≈ 12,596 mol. Hiệu suất 60% nên n({H2}) cần = 12,596 : 0,6 ≈ 20,99 mol. m = 20,99 × 2 ≈ 41,99 g, làm tròn 42 g."
+ },
+ "ket": "Đáp số: 42 g",
+ "nho": "Pin nhiên liệu: điện năng ≈ |ΔrH|; hiệu suất dưới 100% nên nhiên liệu thật = lí thuyết : H.",
+ "phepTinh": [
+  { "ten": "|ΔrH°| cho 2 mol H2 (kJ)", "bieuThuc": "2*285.8", "ketQua": 571.6, "lamTron": 1 },
+  { "ten": "n H2 lí thuyết (mol)", "bieuThuc": "3600/285.8", "ketQua": 12.596, "lamTron": 3 },
+  { "ten": "n H2 cần khi H = 60% (mol)", "bieuThuc": "3600/285.8/0.6", "ketQua": 20.994, "lamTron": 3 },
+  { "ten": "m H2 (g)", "bieuThuc": "3600/285.8/0.6*2", "ketQua": 42, "lamTron": 0, "laDapSo": true }
+ ],
+ "tuongTu": [
+  {
+   "t": "Cũng pin trên, nếu hiệu suất oxi hoá {H2} ở anode đạt 80% thì để tạo ra 1 kWh (3600 kJ) điện năng cần khoảng 31,5 g {H2}.",
+   "d": "D",
+   "giai": "Đúng. n({H2}) = 3600 : 285,8 : 0,8 ≈ 15,75 mol; m ≈ 15,75 × 2 ≈ 31,5 g.",
+   "phepTinh": [
+    { "ten": "n H2 (mol)", "bieuThuc": "3600/285.8/0.8", "ketQua": 15.75, "lamTron": 2 },
+    { "ten": "m H2 (g)", "bieuThuc": "3600/285.8/0.8*2", "ketQua": 31.5, "lamTron": 1 }
+   ]
+  },
+  {
+   "t": "Cũng pin trên với hiệu suất 60%, tiêu thụ hết 21 g {H2} thì tạo ra được 1 kWh (3600 kJ) điện năng.",
+   "d": "S",
+   "giai": "Sai. 21 g là 10,5 mol {H2}; chỉ 60% có ích nên điện năng ≈ 10,5 × 0,6 × 285,8 ≈ 1800,5 kJ, chỉ khoảng một nửa của 1 kWh.",
+   "phepTinh": [
+    { "ten": "n H2 (mol)", "bieuThuc": "21/2", "ketQua": 10.5, "lamTron": 2 },
+    { "ten": "Điện năng (kJ)", "bieuThuc": "21/2*0.6*285.8", "ketQua": 1800.5, "lamTron": 1 }
+   ]
+  }
+ ],
+ "co": []
+}

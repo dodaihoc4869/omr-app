@@ -257,7 +257,13 @@
    ]
   }
  ],
- "canThayChot": [
-  "Ý b: đáp án S dựa trên lập luận acetic acid tan trong nước, đã theo nước lọc ra ở bước 2, còn bước 3 nhắm vào salicylic acid chưa phản ứng. Nhưng ý chỉ nói bước 3 \"có vai trò\" loại acetic acid (không nói \"chỉ\"); kết tinh lại cũng cuốn đi phần acetic acid còn bám trên chất rắn, nên học sinh có thể cãi. Lời giải vẫn giữ S."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Ý b: đáp án S dựa trên lập luận acetic acid tan trong nước, đã theo nước lọc ra ở bước 2, còn bước 3 nhắm vào salicylic acid chưa phản ứng. Nhưng ý chỉ nói bước 3 \"có vai trò\" loại acetic acid (không nói \"chỉ\"); kết tinh lại cũng cuốn đi phần acetic acid còn bám trên chất rắn, nên học sinh có thể cãi. Lời giải vẫn giữ S.",
+   "loai": "dapAn",
+   "chot": "Giữ đáp án kho (chỗ tranh luận chỉ là cách hiểu).",
+   "daXoa": true
+  }
  ]
 }

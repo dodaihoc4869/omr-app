@@ -1,0 +1,61 @@
+{
+ "ma": "POLYMER",
+ "chuong": "Polymer",
+ "lop": "12",
+ "KEYS": {
+  "k1": {
+   "ten": "Gọi tên polymer",
+   "rule": "Tên = <b>poly + tên monomer</b>, tên nhiều chữ đặt trong ngoặc: poly(vinyl chloride). Nylon-n: đếm <b>tổng C trong mắt xích</b>, kể cả C của –CO–: –NH–{(CH2)5}–CO– có 6 C → nylon-6 (capron); nylon-6,6 đi từ hai monomer 6 C. Tên riêng: nitron (olon) = poly(acrylonitrile), PVA = poly(vinyl acetate), PMMA = poly(methyl methacrylate), PS = polystyrene, cao su buna = polybuta-1,3-diene."
+  },
+  "k2": {
+   "ten": "Monomer & cách trùng",
+   "rule": "Bỏ ngoặc mắt xích, nối lại C=C → ra monomer. Monomer có <b>C=C</b> hoặc vòng kém bền (caprolactam) → <b>trùng hợp</b>, không tách phân tử nhỏ. Monomer có <b>từ 2 nhóm chức</b> (–{NH2}, –{COOH}, –OH) → <b>trùng ngưng</b>, tách {H2O}: nylon-6,6 từ hexamethylenediamine + adipic acid. PVA từ vinyl acetate {CH3COOCH=CH2}, không phải {CH2=CHCOOCH3}. Cao su thiên nhiên là polyisoprene, khác buna (từ buta-1,3-diene) ở nhóm –{CH3}."
+  },
+  "k3": {
+   "ten": "Nguồn gốc & loại",
+   "rule": "<b>Thiên nhiên</b>: có sẵn (bông, đay là cellulose; tơ tằm, len là protein; cao su thiên nhiên). <b>Bán tổng hợp</b>: chế hoá từ polymer thiên nhiên (tơ visco, cellulose acetate từ cellulose). <b>Tổng hợp</b>: đi từ monomer (capron, nylon-6,6, nitron, PE, PVC, cao su buna). \"Nguồn gốc cellulose\" = bông, đay, visco, cellulose acetate. Theo công dụng: chất dẻo, tơ, cao su, keo dán; <b>chỉ cao su có tính đàn hồi</b>."
+  },
+  "k4": {
+   "ten": "Phản ứng của polymer",
+   "rule": "So mạch trước và sau. Nối các mạch bằng cầu (lưu hoá cao su bằng S) → <b>tăng mạch</b>. Mạch ngắn lại: giải trùng hợp (polystyrene → styrene), thuỷ phân tinh bột, cellulose, polyamide → <b>cắt mạch</b>. Chỉ đổi nhóm thế (poly(vinyl acetate) + {NaOH} → poly(vinyl alcohol)) → <b>giữ nguyên mạch</b>. Thành chất đơn giản (tinh bột + {H2SO4} đặc → C + {H2O}) → <b>phân huỷ</b>. Polymer không có nhiệt độ nóng chảy xác định, không bay hơi."
+  },
+  "k5": {
+   "ten": "Tính theo mắt xích",
+   "rule": "Trùng hợp: 1 mắt xích = 1 monomer, n = m : M(mắt xích). Mắt xích hay gặp: {C2H3Cl} 62,5; {C4H6} 54; {C4H5Cl} 88,5; {C8H8} 104. Nhiều giai đoạn: <b>H chung = H<sub>1</sub> × H<sub>2</sub> × …</b>; tính sản phẩm thì × H, tìm nguyên liệu thì <b>÷ H</b>. Soi hệ số: 2 {C2H5OH} → 1 {C4H6}; 2 {C2H2} → 1 {C4H4}. Khí ở 25 °C, 1 bar: <b>24,79 L/mol</b>. Hệ số polymer hoá = M(polymer) : M(mắt xích)."
+  },
+  "k6": {
+   "ten": "Mắt xích cellulose",
+   "rule": "Cellulose [{C6H7O2(OH)3}]<sub>n</sub>: mỗi mắt xích <b>3 nhóm –OH</b>. Thay x nhóm –OH bằng –{OCOCH3}: <b>M = 162 + 42x</b>, số C = 6 + 2x; triacetate (x = 3) là [{C6H7O2(OOCCH3)3}]<sub>n</sub>, diacetate x = 2. Thay bằng –{ONO2}: M = 162 + 45x, trinitrate [{C6H7O2(ONO2)3}]<sub>n</sub>. Đề cho %C hoặc %N → lập phương trình theo x; x lẻ nghĩa là hỗn hợp di- và triacetate."
+  }
+ },
+ "TRAPS_THEM": {
+  "daoester": {
+   "ten": "Đảo chiều ester",
+   "hoi": "Gốc vinyl gắn phía O hay phía C=O? Vinyl acetate và methyl acrylate cùng công thức phân tử nhưng cho hai polymer khác nhau."
+  },
+  "nguongoc": {
+   "ten": "Nhầm nguồn gốc tơ",
+   "hoi": "Polymer có sẵn, chế hoá từ polymer thiên nhiên, hay tổng hợp từ monomer? Visco, cellulose acetate là bán tổng hợp."
+  }
+ },
+ "DANG_KEY": {
+  "POLYMER.CAU_TAO.TINH_HIEU_SUAT": "k5",
+  "POLYMER.DANH_PHAP.GOI_TEN": "k1",
+  "POLYMER.PHAN_LOAI.DEM_NGUYEN_TU": "k6",
+  "POLYMER.PHAN_LOAI.NHAN_DANG": "k3",
+  "POLYMER.PHAN_LOAI.SO_SANH": "k3",
+  "POLYMER.PHAN_LOAI.TINH_HIEU_SUAT": "k5",
+  "POLYMER.PHAN_LOAI.VIET_CTCT": "k6",
+  "POLYMER.TINH_CHAT.DEM_DONG_PHAN": "k3",
+  "POLYMER.TRUNG_HOP.TINH_KHOI_LUONG": "k5",
+  "POLYMER.TRUNG_NGUNG.CHON_PHAT_BIEU": "k2",
+  "POLYMER.UNG_DUNG.GOI_TEN": "k4"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "PVA = poly(vinyl acetate) theo đề kho; khi nói poly(vinyl alcohol) thì viết đủ tên, không viết tắt.",
+  "Ý \"trùng hợp buta-1,3-diene có cấu trúc tương tự cao su tự nhiên\" chấm Sai: GIỮ. Cao su thiên nhiên là polyisoprene (có nhánh –CH3), buna là polybuta-1,3-diene.",
+  "Nhóm \"phân huỷ\" (tinh bột + H2SO4 đặc → C + H2O): GIỮ để khớp đáp án 2341 của kho."
+ ],
+ "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+}

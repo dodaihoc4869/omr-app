@@ -214,7 +214,12 @@
    "phepTinh": []
   }
  ],
- "canThayChot": [
-  "Ý d: đề ghi hao hụt \"tối đa\" 6% nên nói chặt thì thể tích thu được là \"ít nhất\" 10,4 mL, không phải đúng bằng 10,4 mL. Giữ đáp án Đ vì 10,4 mL chính là giá trị tính với hao hụt 6%; thầy xem có cần sửa chữ \"tối đa\" trong đề không."
+ "canThayChot": [],
+ "daChot": [
+  {
+   "ghi": "Ý d: đề ghi hao hụt \"tối đa\" 6% nên nói chặt thì thể tích thu được là \"ít nhất\" 10,4 mL, không phải đúng bằng 10,4 mL. Giữ đáp án Đ vì 10,4 mL chính là giá trị tính với hao hụt 6%; thầy xem có cần sửa chữ \"tối đa\" trong đề không.",
+   "loai": "loiDe",
+   "chot": "Sửa đề: bỏ chữ \"tối đa\" (hao hụt 6%); đáp án Đ giữ nguyên."
+  }
  ]
 }

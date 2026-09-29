@@ -25,6 +25,8 @@ export type ScreenId =
   // GAME HÓA 2.0 (bản vẽ docs/ban-ve-gv-2809): trang đầu Tổng quan + màn riêng Chiến dịch luyện.
   | 'tongquan'
   | 'chiendich'
+  // LỜI GIẢI TỪNG BƯỚC (29/09): thầy duyệt hồ sơ lời giải theo đề trước khi giao.
+  | 'duyetloigiai'
 
 export interface ScannedSheet {
   id: string

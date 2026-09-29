@@ -1,0 +1,80 @@
+{
+ "qid": "12-C3-B9-D3-III-42",
+ "bam": "1dab9fee21f4a98e",
+ "dang": "tln",
+ "ten": "Thuỷ phân tetrapeptide và tripeptide bằng {NaOH}: tìm m",
+ "keys": ["k6"],
+ "dung": [
+  {
+   "ic": "i-chain",
+   "t": "Dựng hai peptide",
+   "p": "X có 4 gốc (a mol), Y có 3 gốc (2a mol); mỗi gốc có một –{COOH}, một –{NH2}.",
+   "io": [["in", "X: a mol"], ["in", "Y: 2a mol"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "{NaOH} vừa đủ: đếm gốc",
+   "p": "Mỗi gốc lấy một {NaOH}: 4a + 3 × 2a = 10a = 0,1 nên a = 0,01.",
+   "io": [["in", "0,1 mol {NaOH}"]]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "{H2O} sinh ra theo số phân tử",
+   "p": "Mỗi phân tử peptide chỉ có một –{COOH} đầu mạch tạo {H2O}: n({H2O}) = 3a = 0,03 mol.",
+   "io": [["out", "0,03 mol {H2O}"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Bảo toàn khối lượng",
+   "p": "m + 4 = 12,08 + 0,54 nên m = 8,62 gam.",
+   "io": [["in", "12,08 g muối"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "8,62",
+  "donVi": "gam",
+  "k": "k6",
+  "bay": "tengoi",
+  "soi": "\"vừa đủ\" và \"một nhóm –{COOH}\": n({NaOH}) bằng tổng số gốc, còn {H2O} sinh ra bằng số mol peptide, không bằng số liên kết peptide.",
+  "g": [
+   "Chìa khoá <b>Peptide: đếm &amp; tính</b>: trong {NaOH}, n({NaOH}) bằng tổng –{COOH} của các gốc; n({H2O}) bằng n(peptide); rồi bảo toàn khối lượng.",
+   "n({NaOH}) = 0,1 × 1 = 0,1 mol; X có 4 gốc, Y có 3 gốc, số mol Y gấp đôi số mol X.",
+   "Lập 4a + 3 × 2a = 0,1 để tìm a; rồi dùng m + m({NaOH}) = m(muối) + m({H2O})."
+  ],
+  "giai": "Đáp số: 8,62. n({NaOH}) = 4a + 6a = 10a = 0,1 nên a = 0,01. n({H2O}) = n(peptide) = a + 2a = 0,03 mol. Bảo toàn khối lượng: m = 12,08 + 0,03 × 18 − 0,1 × 40 = 8,62 gam."
+ },
+ "ket": "Đáp số: 8,62 gam",
+ "nho": "Peptide + {NaOH}: n({NaOH}) bằng tổng số gốc, n({H2O}) bằng số mol peptide, rồi bảo toàn khối lượng.",
+ "phepTinh": [
+  { "ten": "n NaOH (mol)", "bieuThuc": "0.1*1", "ketQua": 0.1, "lamTron": 2 },
+  { "ten": "a (mol)", "bieuThuc": "0.1/(4+3*2)", "ketQua": 0.01, "lamTron": 3 },
+  { "ten": "n H2O (mol)", "bieuThuc": "0.01+2*0.01", "ketQua": 0.03, "lamTron": 3 },
+  { "ten": "m H2O (g)", "bieuThuc": "0.03*18", "ketQua": 0.54, "lamTron": 2 },
+  { "ten": "m (g)", "bieuThuc": "12.08+0.03*18-0.1*40", "ketQua": 8.62, "lamTron": 2, "laDapSo": true }
+ ],
+ "tuongTu": [
+  {
+   "t": "Đun nóng hỗn hợp gồm a mol tripeptide X và a mol dipeptide Y (mạch hở, tạo từ amino acid có một –{COOH}, một –{NH2}) với 0,15 mol {NaOH} vừa đủ, thu được 14,55 g muối. Khối lượng hỗn hợp peptide là 9,63 g.",
+   "d": "D",
+   "giai": "Đúng. 3a + 2a = 0,15 nên a = 0,03; n({H2O}) = 2a = 0,06 mol; m = 14,55 + 0,06 × 18 − 0,15 × 40 = 9,63 g.",
+   "phepTinh": [
+    { "ten": "a (mol)", "bieuThuc": "0.15/(3+2)", "ketQua": 0.03, "lamTron": 3 },
+    { "ten": "n H2O (mol)", "bieuThuc": "2*0.03", "ketQua": 0.06, "lamTron": 3 },
+    { "ten": "m (g)", "bieuThuc": "14.55+0.06*18-0.15*40", "ketQua": 9.63, "lamTron": 2 }
+   ]
+  },
+  {
+   "t": "Khi thuỷ phân hoàn toàn a mol tetrapeptide mạch hở (tạo từ Gly, Ala) trong dung dịch {NaOH} vừa đủ, số mol {H2O} sinh ra là 3a.",
+   "d": "S",
+   "giai": "Sai. Chỉ nhóm –{COOH} đầu mạch bị trung hoà mới tạo {H2O}, nên n({H2O}) sinh ra bằng a. Số 3a là số liên kết peptide bị cắt.",
+   "phepTinh": []
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Đề ghi \"100 ml\"; nên thống nhất đơn vị \"mL\"."
+  }
+ ]
+}

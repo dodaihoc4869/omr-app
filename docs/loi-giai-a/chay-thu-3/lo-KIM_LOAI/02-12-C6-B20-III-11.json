@@ -1,0 +1,117 @@
+{
+ "qid": "12-C6-B20-III-11",
+ "bam": "bbcfaf4b78b5f5a2",
+ "dang": "tln",
+ "ten": "Bể điện phân Downs: khối lượng Na thu được trong 24 giờ",
+ "keys": ["k5", "k6"],
+ "dung": [
+  {
+   "ic": "i-bolt",
+   "t": "Điện lượng qua bể trong 1 ngày",
+   "p": "t = 24 × 3600 = 86 400 s; q = 40 000 × 86 400 C.",
+   "io": [["in", "I = 40 000 A"], ["in", "t = 86 400 s"]]
+  },
+  {
+   "ic": "i-battery",
+   "t": "Cathode nhận electron",
+   "p": "Điện phân nóng chảy {NaCl}: ở cathode {Na}<sup>+</sup> + 1e → Na, nên n(Na) = n(e).",
+   "io": [["in", "Na ở cathode"], ["out", "{Cl2} ở anode"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Trừ hao hiệu suất 90%",
+   "p": "Chỉ 90% điện lượng dùng để tạo Na: n(Na) = n(e) × 0,9.",
+   "io": [["out", "10% điện năng hao"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Đổi ra kg",
+   "p": "m = n(Na) × 23 gam, chia 1000 ra kg, làm tròn phần nguyên.",
+   "io": [["in", "≈ 741 kg"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "741",
+  "donVi": "kg",
+  "k": "k6",
+  "bay": "conso",
+  "soi": "Ba con số cần xử lí: \"24 giờ\" phải đổi ra giây, \"90%\" là phần điện năng dùng được, \"kg\" phải đổi từ gam.",
+  "g": [
+   "Chìa khoá <b>Tính theo chuỗi</b>: có dòng điện thì It : F = n(e) = z·n(kim loại), F = 96500.",
+   "I = 40 000 A, t = 24 giờ đổi ra giây; {Na}<sup>+</sup> nhận 1 electron nên z = 1.",
+   "Tính n(e), nhân 90% ra n(Na), nhân 23 rồi đổi gam sang kg."
+  ],
+  "giai": "Đáp số: 741. t = 24 × 3600 = 86 400 s. n(e) = 40 000 × 86 400 : 96 500 ≈ 35 813,5 mol. Hiệu suất 90% nên n(Na) ≈ 32 232,1 mol. m = 32 232,1 × 23 ≈ 741 339 g ≈ 741 kg."
+ },
+ "ket": "Đáp số: 741 kg",
+ "nho": "Điện phân: n(e) = It : F; kim loại hoá trị z có n = n(e) : z; hiệu suất nhân vào sản phẩm.",
+ "phepTinh": [
+  {
+   "ten": "t (s)",
+   "bieuThuc": "24*3600",
+   "ketQua": 86400,
+   "lamTron": 0
+  },
+  {
+   "ten": "q (C)",
+   "bieuThuc": "40000*86400",
+   "ketQua": 3456000000,
+   "lamTron": 0
+  },
+  {
+   "ten": "n e (mol)",
+   "bieuThuc": "40000*86400/96500",
+   "ketQua": 35813.47,
+   "lamTron": 2
+  },
+  {
+   "ten": "n Na (mol)",
+   "bieuThuc": "40000*86400/96500*0.9",
+   "ketQua": 32232.12,
+   "lamTron": 2
+  },
+  {
+   "ten": "m Na (g)",
+   "bieuThuc": "40000*86400/96500*0.9*23",
+   "ketQua": 741338.86,
+   "lamTron": 2
+  },
+  {
+   "ten": "m Na (kg)",
+   "bieuThuc": "40000*86400/96500*0.9*23/1000",
+   "ketQua": 741,
+   "lamTron": 0,
+   "laDapSo": true
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Nếu cường độ dòng điện chỉ còn 20 000 A, các dữ kiện khác giữ nguyên, thì mỗi ngày bể tạo ra khoảng 371 kg Na.",
+   "d": "D",
+   "giai": "Đúng. Khối lượng Na tỉ lệ thuận với I: m = 20 000 × 86 400 : 96 500 × 0,9 × 23 ≈ 370 669 g ≈ 371 kg.",
+   "phepTinh": [
+    {
+     "ten": "m Na (kg)",
+     "bieuThuc": "20000*86400/96500*0.9*23/1000",
+     "ketQua": 371,
+     "lamTron": 0
+    }
+   ]
+  },
+  {
+   "t": "Với cùng dòng điện 40 000 A, hiệu suất 90% trong 24 giờ, khối lượng {Cl2} thoát ra ở anode cũng khoảng 741 kg.",
+   "d": "S",
+   "giai": "Sai. Ở anode 2{Cl}<sup>−</sup> → {Cl2} + 2e nên n({Cl2}) = n(Na) : 2 ≈ 16 116 mol; m({Cl2}) ≈ 16 116 × 71 ≈ 1 144 240 g ≈ 1144 kg.",
+   "phepTinh": [
+    {
+     "ten": "m Cl2 (kg)",
+     "bieuThuc": "40000*86400/96500*0.9/2*71/1000",
+     "ketQua": 1144,
+     "lamTron": 0
+    }
+   ]
+  }
+ ],
+ "co": []
+}

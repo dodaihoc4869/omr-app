@@ -1,0 +1,75 @@
+{
+ "qid": "12-C3-B9-D3-III-11",
+ "bam": "a7466864628adf2d",
+ "dang": "tln",
+ "ten": "Glutamic acid qua hai lần ester hoá rồi {NaOH} dư: phân tử khối T",
+ "keys": ["k5"],
+ "dung": [
+  {
+   "ic": "i-atom",
+   "t": "Dựng glutamic acid",
+   "p": "{HOOC[CH2]2CH(NH2)COOH}, M = 147: hai nhóm –{COOH}, một nhóm –{NH2}.",
+   "io": [["in", "2 –{COOH}"], ["in", "1 –{NH2}"]]
+  },
+  {
+   "ic": "i-reflux",
+   "t": "Ester hoá trong {HCl}",
+   "p": "Với {CH3OH}/{HCl} rồi {C2H5OH}/{HCl}: –{COOH} thành –{COOR}, –{NH2} thành –{NH3Cl}. Y, Z là muối ester.",
+   "io": [["in", "Y, Z: muối ester"], ["out", "{H2O}"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "{NaOH} dư, đun nóng",
+   "p": "Cắt hết nhóm ester thành –{COONa} và trả –{NH3Cl} về –{NH2}.",
+   "io": [["out", "alcohol"], ["out", "{NaCl}"], ["in", "T"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Tính M của T",
+   "p": "T là {NaOOC[CH2]2CH(NH2)COONa}: mỗi –{COOH} thành –{COONa} tăng 22.",
+   "io": [["in", "M(T) = 191"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "191",
+  "donVi": "",
+  "k": "k5",
+  "bay": "nhomnhanh",
+  "soi": "\"glutamic acid\" và \"{NaOH} dư\": Glu có hai nhóm –{COOH}, cả hai nhóm ester đều bị cắt, –{NH3Cl} trở về –{NH2}.",
+  "g": [
+   "Chìa khoá <b>Amino acid lưỡng tính</b>: alcohol/{HCl} cho muối ester; {NaOH} dư đổi –{COOR} thành –{COONa} + ROH, –{NH3Cl} thành –{NH2}; mỗi –{COOH} thành –{COONa} thì M tăng 22.",
+   "Dù Y, Z là ester methyl hay ethyl, {NaOH} dư đều cắt gốc alcohol ra. Glu có mấy nhóm –{COOH}?",
+   "T là muối của glutamic acid với cả hai –{COOH} đã thành –{COONa}, còn –{NH2} tự do. Lấy 147 cộng bao nhiêu?"
+  ],
+  "giai": "Đáp số: 191. Y là {ClH3NC3H5(COOCH3)2}, Z là {ClH3NC3H5(COOC2H5)2}. {NaOH} dư thuỷ phân hai nhóm ester và trung hoà –{NH3Cl}, nên T là {NaOOC[CH2]2CH(NH2)COONa} ({C5H7NO4Na2}). M(T) = 147 + 2 × 22 = 191."
+ },
+ "ket": "Đáp số: 191",
+ "nho": "Glu có hai –{COOH}: sau {NaOH} dư thành muối disodium, M = 147 + 2 × 22 = 191.",
+ "phepTinh": [
+  { "ten": "M Y (muối ester methyl)", "bieuThuc": "147+2*14+36.5", "ketQua": 211.5, "lamTron": 1 },
+  { "ten": "M Z (muối ester ethyl)", "bieuThuc": "147+2*28+36.5", "ketQua": 239.5, "lamTron": 1 },
+  { "ten": "M T theo công thức C5H7NO4Na2", "bieuThuc": "5*12+7*1+14+4*16+2*23", "ketQua": 191, "lamTron": 0 },
+  { "ten": "M T", "bieuThuc": "147+2*22", "ketQua": 191, "lamTron": 0, "laDapSo": true }
+ ],
+ "tuongTu": [
+  {
+   "t": "Lysine ({H2N[CH2]4CH(NH2)COOH}, M = 146) tác dụng với {HCl} dư, muối thu được có phân tử khối 219.",
+   "d": "D",
+   "giai": "Đúng. Lysine có hai nhóm –{NH2}, mỗi nhóm nhận một {HCl}: M = 146 + 2 × 36,5 = 219.",
+   "phepTinh": [
+    { "ten": "M muối", "bieuThuc": "146+2*36.5", "ketQua": 219, "lamTron": 1 }
+   ]
+  },
+  {
+   "t": "Glutamic acid tác dụng với {NaOH} dư thu được muối có phân tử khối 169.",
+   "d": "S",
+   "giai": "Sai. Glu có hai nhóm –{COOH}, cả hai đều thành –{COONa}: M = 147 + 2 × 22 = 191. Số 169 là do chỉ tính một nhóm.",
+   "phepTinh": [
+    { "ten": "M muối đúng", "bieuThuc": "147+2*22", "ketQua": 191, "lamTron": 0 },
+    { "ten": "M nếu sót một nhóm", "bieuThuc": "147+22", "ketQua": 169, "lamTron": 0 }
+   ]
+  }
+ ],
+ "co": []
+}
