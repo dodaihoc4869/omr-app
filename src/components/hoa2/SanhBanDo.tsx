@@ -63,6 +63,8 @@ export interface SanhBanDoProps {
   caGanNhat?: { chu: string; coDiem: boolean } | null
   /** Bấm thẻ ⇒ màn Lịch sử ca kiểm tra. */
   onLichSuCa?: () => void
+  /** Cửa "Tu luyện" (29/09): 4 chế độ luyện tự do, không tính EXP. Thiếu ⇒ không vẽ cửa. */
+  onTuLuyen?: () => void
 }
 
 const phanTram = (a: number, b: number) => (b > 0 ? Math.round((100 * Math.min(a, b)) / b) : 0)
@@ -499,6 +501,7 @@ function TamDuoi({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
       ) : (
         <NutViec p={p} s={s} />
       )}
+      <NutTuLuyen p={p} />
     </>
   )
 }
@@ -519,6 +522,33 @@ function NutBia({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
         <span className="h2-nut-dao-lon">{lon}</span>
         <span className="h2-nut-dao-khoa">{nho}</span>
       </span>
+    </button>
+  )
+}
+
+/** Cửa TU LUYỆN (thầy chốt 29/09): luyện tự do 4 chế độ, KHÔNG tính EXP, không đụng câu game — luôn mở (máy chủ tự chặn khi em có ca kiểm tra mở). */
+function NutTuLuyen({ p }: { p: SanhBanDoProps }) {
+  if (!p.onTuLuyen) return null
+  return (
+    <button type="button" className="h2-nut-dao h2-nut-tu-luyen" onClick={p.onTuLuyen}>
+      <span className="h2-nut-dao-chu">
+        <span className="h2-nut-dao-lon">Tu luyện</span>
+        <span className="h2-nut-dao-khoa">Luyện tự do · không tính EXP</span>
+      </span>
+    </button>
+  )
+}
+function NutTuLuyenNgang({ onClick }: { onClick: () => void }) {
+  return (
+    <button type="button" className="h2-ng-the h2-ng-cdl h2-ng-tu-luyen" onClick={onClick}>
+      <IconSo co={24} />
+      <span className="h2-ng-cdl-chu">
+        <b>Tu luyện</b>
+        <span className="h2-ng-phu"> · Luyện tự do · không tính EXP</span>
+      </span>
+      <svg width="22" height="22" {...NET} strokeWidth={2.4}>
+        <path d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
     </button>
   )
 }
@@ -713,6 +743,7 @@ function CotPhaiNgang({ p, s }: { p: SanhBanDoProps; s: SanhHoa2 }) {
       {!xong && s.ruong.tong > 0 && <TheRuongNgang r={s.ruong} />}
       <span className="h2-ng-dan" aria-hidden="true" />
       <NutCauDaLamNgang onClick={p.onCauDaLam} />
+      {p.onTuLuyen && <NutTuLuyenNgang onClick={p.onTuLuyen} />}
     </>
   )
 }

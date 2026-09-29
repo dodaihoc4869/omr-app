@@ -78,6 +78,8 @@ import { LogoDoc } from '../components/LogoVai'
 const ThanThuHoaHocGame = lazy(() => import('../game/than-thu-v2/Game'))
 /** Màn "Câu đã làm" của Game Hóa 2.0 (kéo TheCau + phiếu in): nạp lười, chỉ em mở mới tải. */
 const CauDaLam = lazy(() => import('../components/hoa2/CauDaLam'))
+// TU LUYỆN (29/09): màn riêng, nạp lười — máy yếu không tải khi chưa bấm cửa.
+const ManTuLuyen = lazy(() => import('../components/tu-luyen/ManTuLuyen'))
 // LỊCH SỬ CA + BÁO CÁO CHI TIẾT bản mới (28/09): hai mảnh lazy NGOÀI precache.
 const LichSuCaEm = lazy(() => import('../components/hoa2/LichSuCaEm'))
 const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
@@ -192,7 +194,7 @@ function mauDiem(diem: number | null): string {
   return 'text-rose-700 bg-rose-50 border-rose-200 dark:text-rose-400 dark:bg-rose-950/40 dark:border-rose-800'
 }
 
-type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia'
+type TabType = 'lichsuca' | 'diem' | 'btvn' | 'mom' | 'khacphuc' | 'vaothi' | 'thanthu' | 'bantin' | 'cauon' | 'caudalam' | 'bia' | 'tuluyen'
 
 /** Chỗ giữ màn trong lúc mảnh mã game đang về. Cao bằng vùng game để không
  * giật layout, và nói rõ đang chờ chứ không để em nhìn khoảng trắng. */
@@ -1370,6 +1372,7 @@ export default function StudentPortalScreen() {
           caGanNhat={dsChuaCongBo !== null ? chuTheCaGanNhat(dungLichSuCa(dsLichSu, dsChuaCongBo)) : null}
           onLichSuCa={() => setTab('lichsuca')}
           onChoiBia={() => setTab('bia')}
+          onTuLuyen={() => setTab('tuluyen')}
           onTuiDo={() => moGameTai('tui-do')}
           onCuaHang={() => moGameTai('shop')}
           onMoThanThu={() => moGameTai('')}
@@ -1468,7 +1471,16 @@ export default function StudentPortalScreen() {
         </Suspense>
       )}
 
-      {tab !== null && tab !== 'caudalam' && tab !== 'bia' && tab !== 'lichsuca' && (
+      {/* TU LUYỆN (cửa trên Sảnh): 4 chế độ luyện tự do, không tính EXP — màn riêng toàn màn hình, nút "Về Sảnh" của chính nó. */}
+      {tab === 'tuluyen' && auth.token && (
+        <div className="fixed inset-0 z-50 overflow-y-auto" style={{ overscrollBehavior: 'contain' }}>
+          <Suspense fallback={<ChoNapGame />}>
+            <ManTuLuyen token={auth.token} sbd={auth.sbd} onVe={() => setTab(null)} />
+          </Suspense>
+        </div>
+      )}
+
+      {tab !== null && tab !== 'caudalam' && tab !== 'bia' && tab !== 'lichsuca' && tab !== 'tuluyen' && (
         <div
           className={`${vaoM3 ? 'm3 m3-sheet ' : ''}fixed inset-0 z-50 bg-slate-50 dark:bg-slate-950 overflow-y-auto flex flex-col animate-google-fade`}
         >
