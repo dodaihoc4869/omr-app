@@ -1,0 +1,63 @@
+{
+ "ma": "TOC_DO",
+ "chuong": "Tốc độ phản ứng",
+ "lop": "10",
+ "KEYS": {
+  "k1": {
+   "ten": "Tốc độ trung bình",
+   "rule": "<b>Khái niệm:</b> tốc độ phản ứng là độ biến thiên nồng độ một chất trong một đơn vị thời gian; đơn vị thường là M/s.<br><b>Công thức:</b> aA + bB → mM + nN: v = −(1/a)·ΔC<sub>A</sub>/Δt = (1/m)·ΔC<sub>M</sub>/Δt.<br><b>Chia hệ số:</b> {BrO3}<sup>−</sup> + 5{Br}<sup>−</sup> + …: v = (1/5)·2,0·10<sup>−3</sup> = 0,4·10<sup>−3</sup> M/s.<br><b>Nồng độ sau:</b> chất đầu giảm ΔC = a·v·Δt; sản phẩm tăng tương ứng.<br><b>Theo khí:</b> có thể đo bằng thể tích khí thoát ra (mL/s)."
+  },
+  "k2": {
+   "ten": "Định luật tác dụng khối lượng",
+   "rule": "<b>Biểu thức:</b> với phản ứng đơn giản aA + bB → sản phẩm: <b>v = k·C<sub>A</sub><sup>a</sup>·C<sub>B</sub><sup>b</sup></b>.<br><b>Hằng số k:</b> chỉ phụ thuộc bản chất chất phản ứng và nhiệt độ; <b>không</b> phụ thuộc nồng độ.<br><b>Nghĩa của k:</b> k là tốc độ khi mọi nồng độ bằng 1 M.<br><b>Tính k:</b> k = v : (C<sub>A</sub><sup>a</sup>·C<sub>B</sub><sup>b</sup>).<br><b>Đổi nồng độ:</b> tăng C<sub>A</sub> gấp 2, số mũ a = 2 → v tăng 4 lần."
+  },
+  "k3": {
+   "ten": "Yếu tố ảnh hưởng",
+   "rule": "<b>Nồng độ:</b> tăng nồng độ chất phản ứng → tốc độ tăng; thêm dung dịch <b>cùng nồng độ</b> thì tốc độ không đổi.<br><b>Áp suất:</b> chỉ ảnh hưởng khi có <b>chất khí</b> tham gia; phản ứng chỉ có chất rắn, lỏng thì không.<br><b>Nhiệt độ:</b> tăng nhiệt độ → tốc độ tăng (bảo quản lạnh làm chậm hư hỏng).<br><b>Diện tích bề mặt:</b> chất rắn càng nhỏ, mịn → tốc độ càng lớn: bột > viên > khối.<br><b>Chất xúc tác:</b> xem k5.<br><b>Đời sống:</b> quạt gió vào bếp than (tăng {O2}), đập nhỏ nguyên liệu, nồi áp suất."
+  },
+  "k4": {
+   "ten": "Hệ số nhiệt độ Van't Hoff",
+   "rule": "<b>Công thức:</b> <b>v<sub>2</sub>/v<sub>1</sub> = γ<sup>(t<sub>2</sub> − t<sub>1</sub>)/10</sup></b>, γ thường từ 2 đến 4.<br><b>Thời gian:</b> tỉ lệ nghịch với tốc độ: t<sub>1</sub>/t<sub>2</sub> = v<sub>2</sub>/v<sub>1</sub>.<br><b>Ví dụ:</b> γ = 2, tăng 30 °C → tốc độ gấp 2<sup>3</sup> = 8 lần.<br><b>Tìm γ:</b> lấy căn bậc (Δt : 10) của tỉ số tốc độ.<br><b>Giảm nhiệt độ:</b> số mũ âm → tốc độ giảm."
+  },
+  "k5": {
+   "ten": "Chất xúc tác",
+   "rule": "<b>Định nghĩa:</b> làm <b>tăng</b> tốc độ phản ứng, <b>còn lại sau phản ứng</b> với khối lượng và bản chất hoá học không đổi.<br><b>Cách tác động:</b> làm giảm năng lượng hoạt hoá; không làm tăng lượng sản phẩm tối đa.<br><b>Ví dụ:</b> {MnO2} phân huỷ {H2O2}, {KClO3}; Fe tổng hợp {NH3}; {V2O5} oxi hoá {SO2}; enzyme là xúc tác sinh học.<br><b>Ô tô:</b> bộ chuyển đổi xúc tác biến CO, NO thành {CO2}, {N2}, giảm ô nhiễm."
+  },
+  "k6": {
+   "ten": "Đọc đồ thị động học",
+   "rule": "<b>Độ dốc:</b> độ dốc đường cong = tốc độ tại thời điểm đó; càng dốc càng nhanh.<br><b>Giảm dần:</b> nồng độ chất đầu giảm nên tốc độ giảm theo thời gian; tốc độ trung bình các khoảng bằng nhau <b>không</b> như nhau.<br><b>Đường nằm ngang:</b> phản ứng đã dừng, tốc độ bằng 0.<br><b>Tốc độ trung bình:</b> ΔV : Δt hoặc ΔC : Δt, đọc đúng hai mốc trên trục.<br><b>So hai đường:</b> đường dốc hơn ứng với điều kiện nhanh hơn; cùng lượng chất hết thì mức cuối bằng nhau."
+  }
+ },
+ "TRAPS_THEM": {
+  "chiaheso": {
+   "ten": "Quên chia hệ số",
+   "hoi": "Tốc độ phản ứng hay tốc độ tiêu thụ một chất? Đã chia cho hệ số của chất đó trong phương trình chưa?"
+  },
+  "chatran": {
+   "ten": "Áp suất với chất rắn",
+   "hoi": "Chất tham gia có chất khí không? Áp suất và nồng độ không áp dụng cho chất rắn."
+  },
+  "nhanhnhieu": {
+   "ten": "Nhanh là nhiều",
+   "hoi": "Yếu tố này làm phản ứng nhanh hơn hay làm thu được nhiều sản phẩm hơn? Xúc tác, bột mịn không tăng lượng sản phẩm cuối."
+  }
+ },
+ "DANG_KEY": {
+  "TOC_DO.YEU_TO.NHAN_DANG": "k3",
+  "TOC_DO.YEU_TO.SO_SANH": "k3",
+  "TOC_DO.YEU_TO.CHON_PHAT_BIEU": "k6",
+  "TOC_DO.YEU_TO.TINH_PHAN_TRAM": "k1",
+  "TOC_DO.YEU_TO.TINH_TI_SO": "k4",
+  "TOC_DO.XUC_TAC.CHON_PHAT_BIEU": "k5",
+  "TOC_DO.DUONG_CONG_DONG_HOC.NHAN_DANG": "k6",
+  "TOC_DO.BIEU_THUC.TINH_NONG_DO": "k1",
+  "TOC_DO.BIEU_THUC.TINH_HANG_SO": "k2"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Câu Zn + H2SO4: tăng gấp đôi thể tích dung dịch cùng nồng độ thì tốc độ không đổi (đáp án D của kho) — ghi thẳng vào k3.",
+  "Câu đồ thị CO2 dán mã YEU_TO.CHON_PHAT_BIEU nhưng nội dung là đọc đồ thị → gán k6.",
+  "Định luật tác dụng khối lượng chỉ áp dụng cho phản ứng đơn giản (theo SGK 2018); số mũ bằng hệ số tỉ lượng."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

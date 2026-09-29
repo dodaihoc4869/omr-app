@@ -60,5 +60,86 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "DH-12-C2-B5-II-19": {
+  "luc": "2026-09-29T08:26:23.817Z",
+  "cau": {
+   "phan": "II",
+   "so": 19,
+   "de": "Cho hai disaccharide có công thức cấu tạo dưới đây:\nHình (1) và Hình (2).\nMỗi phát biểu sau đây là đúng hay sai?",
+   "dap_an": "SDSS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-1.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "II-1-1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Saccharose và maltose",
+   "y": {
+    "a": "Công thức phân tử của disaccharide trong hình (1) và (2) đều là C₁₂H₂₀O₁₁.",
+    "b": "Hình (1) mô tả phân tử saccharose được cấu tạo từ một đơn vị α-glucose và một đơn vị β-fructose qua liên kết α-1,2-glycoside.",
+    "c": "Hình (2) mô tả phân tử maltose được cấu tạo từ một đơn vị β-glucose và và một đơn vị α-fructose qua liên kết α-1,4-glycoside.",
+    "d": "Hình (1) và hình (2) đều có nhóm -OH hemiacetal hoặc nhóm -OH hemiketal."
+   },
+   "loi_giai": {
+    "chot": "Hình (1): vòng 6 cạnh (glucose) nối vòng 5 cạnh (fructose) qua liên kết α-1,2-glycoside ⇒ saccharose. Hình (2): hai vòng 6 cạnh nối qua α-1,4-glycoside ⇒ maltose.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: cả hai đều là C₁₂H₂₂O₁₁, không phải C₁₂H₂₀O₁₁."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: hình (1) đúng là saccharose — đơn vị α-glucose vòng 6 cạnh nối đơn vị β-fructose vòng 5 cạnh bằng liên kết α-1,2-glycoside."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: hình (2) là maltose gồm HAI đơn vị glucose nối bằng liên kết α-1,4-glycoside, không hề có đơn vị fructose."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: maltose còn một nhóm -OH hemiacetal tự do ở C1 đơn vị glucose thứ hai, nhưng saccharose đã dùng hết cả -OH hemiacetal lẫn -OH hemiketal để tạo liên kết glycoside nên KHÔNG còn nhóm nào — không phải \"đều có\"."
+     }
+    },
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "SDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Máy tự mở hai ảnh công thức trong tờ ra xem: hình (1) ghi rõ \"liên kết α-1,2-glycoside\" nối vòng 6 cạnh với vòng 5 cạnh ⇒ saccharose; hình (2) ghi rõ \"liên kết α-1,4-glycoside\" nối hai vòng 6 cạnh ⇒ maltose. Đáp án SĐSS, khớp tác giả. Bỏ cờ can_xem ngày 16/09."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
  }
 }

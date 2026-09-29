@@ -65,5 +65,69 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI_IA_IIA"
   }
+ },
+ "12-C7-B24-I-11": {
+  "luc": "2026-09-29T08:25:25.522Z",
+  "cau": {
+   "phan": "I",
+   "so": 11,
+   "de": "Ứng dụng nào sau đây không phải của NaCl?",
+   "pa": {
+    "A": "Làm gia vị, bảo quản và chế biến thực phẩm.",
+    "B": "Pha nước muối sinh lí, chất điện giải, ...",
+    "C": "Tẩy rửa vết bẩn dầu mỡ.",
+    "D": "Sản xuất chlorine – kiềm, nước Javel, …."
+   },
+   "dap_an": "C",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Kim loại nhóm IA, IIA",
+   "muc_do": "hieu",
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "NaCl trung tính, không thuỷ phân chất béo nên không tẩy được dầu mỡ.",
+    "bay": null
+   },
+   "loi_giai": {
+    "chot": "Tẩy dầu mỡ cần chất giặt rửa hoặc kiềm, không phải muối trung tính.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đây là ứng dụng quen thuộc nhất của muối ăn."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Nước muối sinh lí 0,9% chính là dung dịch NaCl."
+     },
+     "C": {
+      "dung": true,
+      "vi_sao": "NaCl không có phần kị nước để hoà tan dầu mỡ."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Điện phân dung dịch NaCl là nguồn của NaOH, Cl₂ và nước Javel."
+     }
+    },
+    "dap_an_de": "C",
+    "dap_an_tu_giai": "C",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Câu hỏi tìm ứng dụng KHÔNG PHẢI nên phương án đúng là phương án nêu ứng dụng sai."
+   },
+   "dang": {
+    "ma": "KIM_LOAI_IA_IIA.HOP_CHAT.NHAN_DANG",
+    "ten": "Hợp chất và ứng dụng — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-BD7-14",
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề KIM_LOAI_IA_IIA"
+  }
  }
 }

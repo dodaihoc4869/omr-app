@@ -69,5 +69,170 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
   }
+ },
+ "12-C3-B8-D2-II-23": {
+  "luc": "2026-09-29T08:14:45.503Z",
+  "cau": {
+   "phan": "II",
+   "so": 23,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Một học sinh tiến hành thí nghiệm để so sánh tính base trong dung dịch nước của một số amine và ammonia với dự đoán: \"khi số nguyên tử carbon trong phân tử amine tăng thì tính base của amine tăng, pH của dung dịch amine trong nước tăng\".\nHọc sinh tiến hành như sau: Chuẩn bị các cốc chứa dung dịch nồng độ 0,1 M của các chất ở 25 °C: NH₃; CH₃NH₂; CH₃CH₂NH₂; (CH₃)₂NH; CH₃CH₂CH₂NH₂. Dùng máy đo pH để đo giá trị pH của các dung dịch. Đồ thị thể hiện kết quả thu được như hình (so sánh pH của dung dịch 0,1 M các amine).",
+   "y": {
+    "a": "Biết Kb = ([C₂H₅NH₃⁺][OH⁻])/([C₂H₅NH₂]) là hằng số cân bằng của quá trình C₂H₅NH₂ + H₂O ⇌ C₂H₅NH₃⁺ + OH⁻. Thì giá trị Kb ở 25 °C tính được từ kết quả là 6,5·10⁻⁵.",
+    "b": "(CH₃)₂NH có tên thường là ethylamine.",
+    "c": "Từ kết quả thí nghiệm kết luận được giả thuyết ban đầu của học sinh là hoàn toàn đúng.",
+    "d": "NH₃ có tính base yếu hơn các amine được khảo sát."
+   },
+   "dap_an": "SSSD",
+   "hinh": [
+    {
+     "tep": "II-25.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Từ pH đọc trên biểu đồ: [OH⁻] = 10⁽ᵖᴴ⁻¹⁴⁾ rồi Kb = [OH⁻]²/(0,1 − [OH⁻]); (CH₃)₂NH là dimethylamine; dimethylamine chỉ 2 C mà base mạnh hơn propan-1-amine 3 C nên giả thuyết sai; NH₃ có pH thấp nhất.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: ethylamine là base mạnh hơn hẳn ammonia, pH của dung dịch C₂H₅NH₂ 0,1 M trên biểu đồ cho Kb cỡ 10⁻⁴ (≈ 4,5·10⁻⁴), lớn hơn giá trị 6,5·10⁻⁵ tới gần một bậc."
+     },
+     "b": {
+      "dung": false,
+      "vi_sao": "Sai: (CH₃)₂NH là dimethylamine; ethylamine là CH₃CH₂NH₂, hai chất khác nhau."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: dimethylamine chỉ có 2 C nhưng pH cao hơn propan-1-amine có 3 C, nên kết luận “càng nhiều carbon thì tính base càng mạnh” không đúng hoàn toàn."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: cột pH của NH₃ thấp nhất trong năm dung dịch nên ammonia có tính base yếu nhất."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DSSD",
+    "dap_an_tu_giai": "SSSD",
+    "trang_thai": "soan-lai-1109",
+    "ghi_chu": "Chốt 05/9 theo lời giải này. Bảng đáp án gốc của đề ghi DSSD, thầy quyết bỏ. BIỂU ĐỒ pH KHÔNG có trong bản docx xuất ra (chỗ hình để trống, ảnh kèm chỉ là mảnh phương trình). Ý a phụ thuộc số đọc pH của C₂H₅NH₂ trên biểu đồ nên máy KHÔNG kiểm chứng được (Kb thực của ethylamine ≈ 4,5·10⁻⁴, nếu biểu đồ cho pH ≈ 11,4 thì a Đ). Ý b, c, d không cần biểu đồ. Thầy đối chiếu biểu đồ gốc. Hình mất khi xuất PDF, ngày 05/09/2026 lấy lại từ file docx nguồn và đã đối chiếu bằng mắt (Biểu đồ cột pH của năm amine). Lời giải soạn lại 11/09/2026 cho khớp đáp án đã soát hai lượt."
+   },
+   "can_chua": {
+    "sao": 2,
+    "ly_do": "Đổi pH ra nồng độ OH⁻ rồi tính Kb; dimethylamine hai carbon lại mạnh hơn propylamine ba carbon nên giả thuyết ban đầu sai.",
+    "bay": "Kết luận giả thuyết đúng vì chỉ nhìn ba chất đầu mà bỏ qua dimethylamine trên đồ thị.",
+    "dk": [
+     "bay",
+     "buoc"
+    ],
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINE_TINH_BASE.CHON_PHAT_BIEU",
+    "ten": "Amine — tính base — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B8",
+   "dangBai": {
+    "ma": "DB-12-B8-D2",
+    "ten": "Tính chất hóa học của amine",
+    "lop": "12",
+    "bai": "DB-12-B8",
+    "tenBai": "Amine",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ },
+ "12-C3-B8-D2-I-5": {
+  "luc": "2026-09-29T08:25:13.380Z",
+  "cau": {
+   "phan": "I",
+   "so": 5,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "de": "Amphetamine (còn được gọi là hồng phiến) là một dạng chất ma tuý có tác dụng gây kích thích thần kinh, tăng cường sức chịu đựng, tăng cảm giác hưng phấn, nếu sử dụng quá liều sẽ gây nghiện, dẫn đến lạm dụng; ảnh hưởng xấu đến hệ thần kinh; gây rối loạn nhịp tim, tăng hoặc giảm huyết áp; gây rối loạn nhịp thở, co giật; suy nhược cơ thể. Amphetamine có cấu tạo như sau:\nCho các phát biểu sau đây:\n(a) 1 mol amphetamine tác dụng tối đa với 1 mol HCl.\n(b) Amphetamine là amine bậc 2.\n(c) Đốt cháy hoàn toàn 0,1 mol amphetamine mol thu được 0,1 mol N₂.\n(d) Công thức phân tử của amphetamine C₉H₁₂N.\n(e) Ở điều kiện thích hợp, amphetamine có thể tham gia phản ứng cộng H₂ theo tỷ lệ mol 1 : 3.\nSố phát biểu đúng là",
+   "pa": {
+    "A": "4.",
+    "B": "3.",
+    "C": "5.",
+    "D": "2."
+   },
+   "dap_an": "D",
+   "hinh": [
+    {
+     "tep": "I-83-0.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Amphetamine C₆H₅-CH₂-CH(CH₃)-NH₂: CTPT C₉H₁₃N, amine bậc I, 1 N → 1 mol HCl, 0,1 mol cháy cho 0,05 mol N₂, vòng benzene cộng 3 H₂.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Chỉ có 2 phát biểu đúng."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "(b), (c), (d) đều sai."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Không thể cả 5 đúng."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "(a) đúng, (e) đúng; (b) sai (bậc I), (c) sai (0,05 mol N₂), (d) sai (C₉H₁₃N)."
+     }
+    },
+    "tung_y": null,
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "ly_do": "Trùng cách xác định bậc amine ở câu 4 và tính toán theo công thức phân tử ở câu 82.",
+    "bay": null,
+    "dk": []
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINE_CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Amine — cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B8",
+   "dangBai": {
+    "ma": "DB-12-B8-D1",
+    "ten": "Thiết lập công thức phân tử amine",
+    "lop": "12",
+    "bai": "DB-12-B8",
+    "tenBai": "Amine",
+    "soBai": 8,
+    "phanBai": 0,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
  }
 }

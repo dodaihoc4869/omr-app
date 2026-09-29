@@ -1,0 +1,80 @@
+{
+ "ma": "OXI_HOA_KHU",
+ "chuong": "Phản ứng oxi hoá – khử",
+ "lop": "10",
+ "KEYS": {
+  "k1": {
+   "ten": "Tính số oxi hoá",
+   "rule": "<b>Đơn chất:</b> số oxi hoá bằng 0.<br><b>Hay gặp:</b> H là +1 (hydride kim loại như {NaH} là −1); O là −2 (peroxide {H2O2} là −1, {OF2} là +2); kim loại nhóm IA +1, IIA +2, Al +3.<br><b>Tổng:</b> phân tử bằng 0, ion bằng điện tích ion.<br><b>Ví dụ:</b> {K2Cr2O7}: 2(+1) + 2x + 7(−2) = 0 → Cr +6; {Cu3P}: Cu +1 → P −3.<br><b>Số lẻ:</b> {Fe3O4} cho Fe trung bình +8/3 (một Fe<sup>+2</sup>, hai Fe<sup>+3</sup>)."
+  },
+  "k2": {
+   "ten": "Chất khử, chất oxi hoá",
+   "rule": "<b>Chất khử:</b> nhường electron, số oxi hoá <b>tăng</b>, bị oxi hoá (xảy ra quá trình oxi hoá).<br><b>Chất oxi hoá:</b> nhận electron, số oxi hoá <b>giảm</b>, bị khử.<br><b>Cách làm:</b> ghi số oxi hoá nguyên tố đó ở hai vế rồi so.<br><b>Ví dụ:</b> {N2} + {O2} → 2NO: N từ 0 lên +2 → {N2} là chất khử; Ca + {N2} → {Ca3N2}: N xuống −3 → {N2} là chất oxi hoá.<br><b>Đoán tính chất:</b> số oxi hoá cao nhất chỉ có tính oxi hoá, thấp nhất chỉ có tính khử, trung gian có cả hai."
+  },
+  "k3": {
+   "ten": "Nhận phản ứng oxi hoá – khử",
+   "rule": "<b>Dấu hiệu:</b> có <b>ít nhất một nguyên tố đổi số oxi hoá</b>; chất khử và chất oxi hoá xảy ra đồng thời.<br><b>Thường là oxi hoá – khử:</b> có đơn chất tham gia hoặc tạo thành (đốt cháy, kim loại + acid, gỉ sắt).<br><b>Thường không phải:</b> phản ứng trao đổi ion, trung hoà, nhiệt phân muối carbonate, hydrogencarbonate ({Fe(HCO3)2} → {Fe(OH)2} + {CO2}).<br><b>Đếm:</b> xét lần lượt từng phản ứng, ghi số oxi hoá của nguyên tố nghi ngờ ở hai vế."
+  },
+  "k4": {
+   "ten": "Cân bằng thăng bằng electron",
+   "rule": "<b>Bốn bước:</b> ghi số oxi hoá → viết quá trình oxi hoá, quá trình khử → nhân hệ số để <b>tổng e nhường = tổng e nhận</b> → điền hệ số, kiểm H, O.<br><b>Một chất nhiều nguyên tố đổi:</b> cộng e cả phân tử: {Cu3P} nhường 3·1 + 8 = 11 e.<br><b>Tự oxi hoá – khử:</b> 3{Cl2} + 6KOH → 5KCl + {KClO3} + 3{H2O}: 5 nguyên tử Cl nhận e (chất oxi hoá), 1 nguyên tử Cl nhường e (chất khử).<br><b>Môi trường:</b> {H2SO4}, {H}<sup>+</sup> đủ để cân bằng O, H; hệ số tối giản."
+  },
+  "k5": {
+   "ten": "Chuẩn độ bằng KMnO4",
+   "rule": "<b>Dụng cụ:</b> dung dịch {KMnO4} ở burette; dung dịch {Fe}<sup>2+</sup> + {H2SO4} loãng ở bình tam giác.<br><b>Phương trình:</b> {MnO4}<sup>−</sup> + 5{Fe}<sup>2+</sup> + 8{H}<sup>+</sup> → {Mn}<sup>2+</sup> + 5{Fe}<sup>3+</sup> + 4{H2O}; acid <b>tham gia</b> phản ứng.<br><b>Tỉ lệ:</b> Mn +7 → +2 nhận 5e ⇒ <b>n({Fe}<sup>2+</sup>) = 5·n({KMnO4})</b>.<br><b>Điểm cuối:</b> {KMnO4} tự làm chỉ thị; dư 1 giọt → màu hồng nhạt bền khoảng 20 giây.<br><b>Tính %:</b> n = C·V (V đổi ra lít); m(Fe) = 56·n; % = m(Fe) : m(mẫu) × 100."
+  },
+  "k6": {
+   "ten": "Tính theo phương trình",
+   "rule": "<b>Bước 1:</b> cân bằng phương trình (k4) rồi mới lấy tỉ lệ mol: 2ZnS + 3{O2} → 2ZnO + 2{SO2}.<br><b>Bảo toàn electron:</b> tổng mol e nhường = tổng mol e nhận, không cần viết đủ phương trình.<br><b>Thể tích khí:</b> đkc 25 °C, 1 bar: <b>24,79 L/mol</b>; 1 m³ = 1000 L.<br><b>Khối lượng:</b> m = n·M; đổi tấn, kg, mg về cùng đơn vị với đáp số.<br><b>Hiệu suất:</b> tính sản phẩm × H, tìm nguyên liệu ÷ H."
+  },
+  "k7": {
+   "ten": "Hợp chất vô cơ quen",
+   "rule": "<b>Gọi tên:</b> kim loại nhiều hoá trị ghi số La Mã: iron(III) oxide {Fe2O3}, copper(II) sulfate {CuSO4}, iron(II,III) oxide {Fe3O4}.<br><b>{H2SO4} loãng:</b> tính oxi hoá do {H}<sup>+</sup>, không tác dụng với Cu.<br><b>{H2SO4} đặc, nóng:</b> S<sup>+6</sup> oxi hoá mạnh, sinh {SO2} độc → cách sản xuất có {SO2} gây ô nhiễm hơn.<br><b>Pha loãng an toàn:</b> <b>rót từ từ acid đặc vào nước</b>, khuấy đều; không làm ngược lại.<br><b>Hiện tượng:</b> dung dịch {KMnO4} tím mất màu khi bị khử; {Cu}<sup>2+</sup> xanh; {Fe}<sup>3+</sup> vàng nâu."
+  }
+ },
+ "TRAPS_THEM": {
+  "songuyentu": {
+   "ten": "Quên số nguyên tử",
+   "hoi": "Đã nhân số oxi hoá, số electron với chỉ số nguyên tử trong công thức chưa? {Cu3P} có 3 Cu, {Cr2O7}<sup>2−</sup> có 2 Cr."
+  },
+  "moitruong": {
+   "ten": "Bỏ sót môi trường",
+   "hoi": "Acid trong phản ứng chỉ tạo môi trường hay còn góp {H}<sup>+</sup> vào phương trình? Có mặt trong phương trình ion là có tham gia."
+  },
+  "hesonguyentu": {
+   "ten": "Nhầm tỉ lệ nguyên tử",
+   "hoi": "Đề hỏi số nguyên tử đóng vai trò chất oxi hoá hay hệ số phân tử? Trong phản ứng tự oxi hoá – khử, cùng một chất chia làm hai vai."
+  }
+ },
+ "DANG_KEY": {
+  "OXI_HOA_KHU.CHAT_KHU_CHAT_OXH.NHAN_DANG": "k2",
+  "OXI_HOA_KHU.CHAT_KHU_CHAT_OXH.CHON_PHAT_BIEU": "k2",
+  "OXI_HOA_KHU.CHAT_KHU_CHAT_OXH.DEM_DONG_PHAN": "k2",
+  "OXI_HOA_KHU.CHAT_KHU_CHAT_OXH.DEM_NGUYEN_TU": "k4",
+  "OXI_HOA_KHU.SO_OXI_HOA.XAC_DINH_SO_OXI_HOA": "k1",
+  "OXI_HOA_KHU.SO_OXI_HOA.NHAN_DANG": "k1",
+  "OXI_HOA_KHU.SO_OXI_HOA.CHON_PHAT_BIEU": "k4",
+  "OXI_HOA_KHU.SO_OXI_HOA.DEM_DONG_PHAN": "k3",
+  "OXI_HOA_KHU.CHUAN_DO.CHON_PHAT_BIEU": "k5",
+  "OXI_HOA_KHU.CHUAN_DO.NHAN_DANG": "k5",
+  "OXI_HOA_KHU.CHUAN_DO.TINH_PHAN_TRAM": "k5",
+  "OXI_HOA_KHU.CHUAN_DO.DEM_DONG_PHAN": "k5",
+  "OXI_HOA_KHU.HIEN_TUONG.CHON_PHAT_BIEU": "k7",
+  "OXI_HOA_KHU.HIEN_TUONG.NEU_HIEN_TUONG": "k7",
+  "OXI_HOA_KHU.HIEN_TUONG.NHAN_DANG": "k7",
+  "OXI_HOA_KHU.HOP_CHAT_VO_CO.GOI_TEN": "k7",
+  "OXI_HOA_KHU.HOP_CHAT_VO_CO.CHON_PHAT_BIEU": "k7",
+  "OXI_HOA_KHU.HOP_CHAT_VO_CO.SO_SANH": "k7",
+  "OXI_HOA_KHU.HOP_CHAT_VO_CO.DEM_NGUYEN_TU": "k4",
+  "OXI_HOA_KHU.HOP_CHAT_VO_CO.TINH_SO_MOL": "k6",
+  "OXI_HOA_KHU.HOP_CHAT_VO_CO.TINH_THE_TICH": "k6",
+  "OXI_HOA_KHU.HOP_CHAT_VO_CO.TINH_KHOI_LUONG": "k6"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Ý \"H2SO4 chỉ tạo môi trường, không tham gia phản ứng\" trong chuẩn độ Fe2+ bằng KMnO4 chấm Sai: H+ có mặt trong phương trình ion (hệ số 8).",
+  "Cu3P: Cu +1, P −3 (theo quy tắc tổng bằng 0); một phân tử Cu3P nhường 11 e — khớp đáp án SDDD của kho.",
+  "Thể tích khí đkc dùng 24,79 L/mol (25 °C, 1 bar) theo SGK 2018; kiểm câu ZnS: 120 000 mol O2 → 2975 m³ khớp kho."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}

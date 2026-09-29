@@ -1,0 +1,74 @@
+{
+ "12-BD7-18-I-2": {
+  "luc": "2026-09-29T08:26:32.831Z",
+  "cau": {
+   "phan": "I",
+   "so": 2,
+   "de": "Phát biểu nào sau đây về maltose là đúng?",
+   "pa": {
+    "A": "Một phân tử maltose gồm một đơn vị α-glucose liên kết với một đơn vị β-fructose.",
+    "B": "Maltose có chứa nhóm -OH hemiacetal.",
+    "C": "Maltose có công thức phân tử C₆H₁₂O₆.",
+    "D": "Maltose tồn tại dạng mạch vòng và mạch hở trong dung dịch."
+   },
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Maltose là hai đơn vị glucose, công thức C₁₂H₂₂O₁₁, còn OH hemiacetal tự do.",
+    "bay": null
+   },
+   "loi_giai": {
+    "chot": "Maltose gồm hai glucose và còn một nhóm OH hemiacetal tự do.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đó là cấu tạo của saccharose, maltose gồm hai đơn vị glucose."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đầu glucose thứ hai còn nhóm OH hemiacetal nên maltose có tính khử."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "C₆H₁₂O₆ là công thức của monosaccharide, maltose là C₁₂H₂₂O₁₁."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Theo cách diễn đạt của tác giả, maltose tồn tại dạng mạch vòng và dạng mở vòng."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Hướng dẫn của tác giả gõ nhầm C₁₂H₂₂O₁, đúng là C₁₂H₂₂O₁₁."
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "bai": "Bài 5. Saccharose và maltose",
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   }
+  }
+ }
+}

@@ -1,0 +1,82 @@
+{
+ "12-C3-B9-D2-II-10": {
+  "luc": "2026-09-29T08:25:18.171Z",
+  "cau": {
+   "phan": "II",
+   "so": 10,
+   "bang": null,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "biet",
+   "de": "Glutamic acid có vai trò quan trọng trong quá trình xây dựng cấu trúc tế bào của con người. Ngoài ra, muối monosodium glutamate còn được dùng chế biến gia vị thức ăn (bột ngọt hay mì chính).\nGlutamic acid có cấu trúc HOOC-CH₂-CH₂-CH(NH₂)-COOH và có điểm đẳng điện pI = 3,2 (pI là giá trị pH mà khi đó amino acid có nồng độ ion lưỡng cực là cực đại. Khi pH < pI thì amino acid đó tồn tại chủ yếu ở dạng cation, còn khi pH > pI thì amino acid đó tồn tại chủ yếu ở dạng anion).",
+   "y": {
+    "a": "Glutamic acid thuộc loại hợp chất hữu cơ tạp chức, trong phân tử chứa hai loại nhóm chức.",
+    "b": "Tên thay thế của glutamic acid là 2 -aminopentane-1,5-dioic acid.",
+    "c": "Trong dung dịch pH = 3,2, glutamic acid tồn tại chủ yếu ở dạng HOOC-CH₂-CH₂-CH(NH₂)-COO⁻.",
+    "d": "Trong dung dịch pH = 6, có thể tách hỗn hợp gồm glutamic acid và lysine (pI = 9,7) bằng phương pháp điện di."
+   },
+   "dap_an": "DDSD",
+   "hinh": null,
+   "can_xem": false,
+   "loi_giai": {
+    "chot": "Ở pH = pI glutamic acid là ion lưỡng cực HOOC-[CH₂]₂-CH(NH₃⁺)-COO⁻ (nhóm amino ở dạng -NH₃⁺, không phải -NH₂); ở pH 6 glutamic acid là anion (→ +), lysine là cation (→ −) nên tách được.",
+    "tung_pa": null,
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: chứa nhóm -NH₂ và -COOH."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: 2-aminopentane-1,5-dioic acid."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: dạng viết -NH₂ với -COO⁻ là anion; ở pI phải là -NH₃⁺ và -COO⁻ (ion lưỡng cực)."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: hai chất mang điện trái dấu ở pH 6, đi về hai cực khác nhau."
+     }
+    },
+    "buoc": [],
+    "ket_qua": "",
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Tại điểm đẳng điện, nhóm amino vẫn ở dạng NH₃ cộng chứ không phải NH₂ tự do.",
+    "bay": "Viết dạng lưỡng cực với nhóm NH₂ còn nguyên nên nhận ý c là đúng.",
+    "dk": [
+     "bay"
+    ],
+    "y_can_chua": [
+     "c",
+     "d"
+    ]
+   },
+   "dang": {
+    "ma": "HOP_CHAT_N.AMINO_ACID.CHON_PHAT_BIEU",
+    "ten": "Amino acid — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-C3-B9-P1",
+   "dangBai": {
+    "ma": "DB-12-B9-P1-D2",
+    "ten": "Tính chất lưỡng tính của amino acid",
+    "lop": "12",
+    "bai": "DB-12-B9-P1",
+    "tenBai": "Amino acid (P1)",
+    "soBai": 9,
+    "phanBai": 1,
+    "chuong": "C3 - Hợp chất chứa N"
+   }
+  }
+ }
+}

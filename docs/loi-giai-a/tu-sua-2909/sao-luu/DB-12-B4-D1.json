@@ -271,5 +271,224 @@
    "nguonDe": "DH-12-C2-B6",
    "nguonCau": "III-47"
   }
+ },
+ "DB-12-B4-D1-II-109": {
+  "luc": "2026-09-29T08:26:00.204Z",
+  "cau": {
+   "phan": "II",
+   "so": 109,
+   "de": "Cho các mô tả về một số thí nghiệm sau đây:",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Cho một ít tinh bột vào bát sứ đựng nước lạnh, khuấy đều, để lắng thấy có chất rắn ở dưới đáy bát. Đun nóng bát này và khuấy đều thấy thu được chất lỏng sệt.",
+    "b": "Cho dung dịch glucose vào ống nghiệm đựng Cu(OH)2 trong dung dịch NaOH, lắc nhẹ thấy chất rắn tan đần, thu được dung dịch màu xanh lam đậm. Đun nhẹ ống nhiệm, thấy có kết tủa màu nâu đỏ.",
+    "c": "Cho dung dịch saccharose vào ống nghiệm đựng dung dịch AgNO₃/NH₃, đun nhẹ thấy có kết tủa Ag xuất hiện.",
+    "d": "Đun sôi dung dịch saccharose trong ống nghiệm có pha mấy giọt dung dịch HCl, sau đó để nguội. Rót dung dịch này vào ống nghiệm đựng dung dịch AgNO₃/NH₃ dư, đun nhẹ thấy có kết tủa Ag bám vào thành ống."
+   },
+   "loi_giai": {
+    "chot": "Saccharose không tráng bạc được, nhưng sau khi đun với acid thì nó thuỷ phân cho glucose và fructose, và lúc đó phản ứng tráng bạc xảy ra.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: tinh bột không tan trong nước lạnh, đun nóng thì tạo hồ tinh bột sệt."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: dung dịch xanh lam chứng tỏ polyalcohol, kết tủa nâu đỏ là Cu₂O."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: saccharose là đường không khử nên không cho kết tủa bạc."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: acid đã thuỷ phân saccharose thành glucose và fructose nên tráng bạc được."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Thuỷ phân trước thì saccharose mới tráng bạc.",
+    "bay": "Không thấy khác nhau giữa ý c và ý d, chỉ khác ở bước thuỷ phân bằng acid."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU",
+    "ten": "Phản ứng tráng bạc — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-KT-C2-D2",
+   "nguonCau": "II-4"
+  }
+ },
+ "DB-12-B4-D1-II-82": {
+  "luc": "2026-09-29T08:26:00.204Z",
+  "cau": {
+   "phan": "II",
+   "so": 82,
+   "de": "Cho các mô tả về một số thí nghiệm sau đây:",
+   "dap_an": "DDSD",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Cho một ít tinh bột vào bát sứ đựng nước lạnh, khuấy đều, để lắng thấy có chất rắn ở dưới đáy bát. Đun nóng bát này và khuấy đều thấy thu được chất lỏng sệt.",
+    "b": "Cho dung dịch glucose vào ống nghiệm đựng Cu(OH)₂ trong dung dịch NaOH, lắc nhẹ thấy chất rắn tan đần, thu được dung dịch màu xanh lam đậm. Đun nhẹ ống nhiệm, thấy có kết tủa màu nâu đỏ.",
+    "c": "Cho dung dịch saccharose vào ống nghiệm đựng dung dịch AgNO₃/NH₃, đun nhẹ thấy có kết tủa Ag xuất hiện.",
+    "d": "Đun sôi dung dịch saccharose trong ống nghiệm có pha mấy giọt acid HCl, sau đó để nguội. Rót dung dịch này vào ống nghiệm đựng dung dịch AgNO₃/NH₃ dư, đun nhẹ thấy có kết tủa Ag bám vào thành ống nghiệm."
+   },
+   "loi_giai": {
+    "chot": "Saccharose không còn -OH hemiacetal nên không tráng bạc; phải thuỷ phân bằng acid thành glucose và fructose thì mới có phản ứng.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: tinh bột không tan trong nước lạnh, đun nóng mới tạo hồ."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: nhiệt độ thường cho phức xanh lam, đun nóng cho kết tủa Cu₂O nâu đỏ."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: saccharose không có phản ứng tráng bạc."
+     },
+     "d": {
+      "dung": true,
+      "vi_sao": "Đúng: sau khi thuỷ phân sinh glucose nên có kết tủa bạc."
+     }
+    },
+    "dap_an_de": "DDSD",
+    "dap_an_tu_giai": "DDSD",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "bay"
+    ],
+    "ly_do": "Ý c và ý d chỉ khác nhau ở chỗ có thuỷ phân trước hay không.",
+    "bay": "Saccharose KHÔNG tráng bạc; chỉ sau khi thuỷ phân bằng acid mới có kết tủa bạc."
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU",
+    "ten": "Phản ứng tráng bạc — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B6-D2",
+   "nguonCau": "II-42"
+  }
+ },
+ "DB-12-B4-D1-III-157": {
+  "luc": "2026-09-29T08:26:00.204Z",
+  "cau": {
+   "phan": "III",
+   "so": 157,
+   "de": "Cho 1,8 gam fructose (C₆H₁₂O₆) tác dụng hết với0 lượng dư dung dịch AgNO₃ trong NH₃, thu được m gam Ag.\nGiá trị của m là bao nhiêu?",
+   "dap_an": "2,16",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "III-1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "bai": "Bài 4. Glucose và fructose",
+   "loi_giai": {
+    "chot": "n(fructose) = 0,01 mol ⇒ n(Ag) = 0,02 mol ⇒ m = 2,16 g.",
+    "buoc": [
+     "n(fructose) = 1,8 : 180 = 0,01 mol.",
+     "Trong NH₃, fructose chuyển thành glucose rồi tráng bạc ⇒ n(Ag) = 2 × 0,01 = 0,02 mol.",
+     "m(Ag) = 0,02 × 108 = 2,16 g."
+    ],
+    "ket_qua": "2,16",
+    "dap_an_de": "2,16",
+    "dap_an_tu_giai": "2,16",
+    "trang_thai": "khop",
+    "ghi_chu": "Đề gốc lọt chữ số 0 ('tác dụng hết với0 lượng dư'); đã bỏ."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen",
+     "tinh"
+    ],
+    "ly_do": "Trong môi trường NH₃, fructose chuyển hoá thành glucose nên vẫn tráng bạc, cho 2 mol Ag.",
+    "bay": "Cho rằng fructose không tráng bạc vì không có nhóm −CHO."
+   },
+   "kienThuc": [
+    "M(C₆H₁₂O₆) = 180; M(Ag) = 108.",
+    "Trong môi trường base, fructose chuyển hoá thành glucose nên vẫn tham gia phản ứng tráng bạc.",
+    "1 mol glucose (hoặc fructose) cho 2 mol Ag."
+   ],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_KHOI_LUONG",
+    "ten": "Phản ứng tráng bạc — tính khối lượng"
+   },
+   "viSaoNull": null,
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B4-D1",
+    "ten": "Phản ứng tráng bạc",
+    "lop": "12",
+    "bai": "DB-12-B4",
+    "tenBai": "Glucose và fructose",
+    "soBai": 4,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B4",
+   "nguonCau": "III-46"
+  }
  }
 }

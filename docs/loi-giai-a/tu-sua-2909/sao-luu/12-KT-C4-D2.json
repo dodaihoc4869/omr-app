@@ -1,0 +1,133 @@
+{
+ "12-KT-C4-D2-I-13": {
+  "luc": "2026-09-29T08:25:47.584Z",
+  "cau": {
+   "phan": "I",
+   "so": 13,
+   "de": "Dãy nào sau đây gồm các polymer có nguồn gốc từ cellulose?",
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Tơ tằm, sợi bông, tơ nitron",
+    "B": "Sợi bông, tơ visco, tơ acetate",
+    "C": "Sợi bông, tơ visco, tơ nylon-6",
+    "D": "Tơ visco, tơ nilon-6, tơ acetate"
+   },
+   "loi_giai": {
+    "chot": "Sợi bông là cellulose nguyên chất, còn tơ visco và tơ acetate đều chế hoá từ cellulose.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Tơ tằm là protein, tơ nitron là tơ tổng hợp."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đúng: cả ba đều đi từ cellulose."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Tơ nylon-6 là tơ tổng hợp từ caprolactam."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Tơ nylon-6 không có nguồn gốc cellulose."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "POLYMER.PHAN_LOAI.NHAN_DANG",
+    "ten": "Phân loại polymer, tơ — nhận dạng"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ },
+ "12-KT-C4-D2-I-9": {
+  "luc": "2026-09-29T08:25:47.584Z",
+  "cau": {
+   "phan": "I",
+   "so": 9,
+   "de": "Polymer X được dùng để sản xuất một loại chất dẻo an toàn thực phẩm. Chất dẻo này được sử dụng để chế tạo chai lọ đựng nước, bao bì đựng thực phẩm.\nCho cấu tạo của một đoạn mạch trong phân tử polymer X trong hình dưới đây.\nTên gọi của X là",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_9.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "polypropane",
+    "B": "poly(2,3-dimethylbutane)",
+    "C": "polyisopentane",
+    "D": "polypropylene. Mã đề thi: 042"
+   },
+   "loi_giai": {
+    "chot": "Đoạn mạch lặp lại nhóm −CH₂−CH(CH₃)−, tức mắt xích của polypropylene.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Không có polymer nào mang tên polypropane."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Mắt xích chỉ có ba carbon, không phải sáu carbon."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Isopentane có năm carbon, không khớp với đoạn mạch."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: X là polypropylene."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "POLYMER.UNG_DUNG.GOI_TEN",
+    "ten": "Ứng dụng và môi trường — gọi tên"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
+ }
+}

@@ -55,5 +55,75 @@
     "chuong": "C3 - Hợp chất chứa N"
    }
   }
+ },
+ "12-KT-C3-D2-I-16": {
+  "luc": "2026-09-29T08:14:52.285Z",
+  "cau": {
+   "phan": "I",
+   "so": 16,
+   "de": "Các enzyme trong cơ thể người đã tiến hoá để hoạt động tốt nhất ở nhiệt độ cơ thể bình thường. Đồ thị dưới đây biểu diễn tốc độ của một phản ứng sinh hoá trong cơ thể với sự xúc tác của một enzyme theo nhiệt độ.\nCho các phát biểu sau:\n(a) Ở 37 °C enzyme có hoạt tính tối đa làm tốc độ phản ứng xảy ra nhanh nhất.\n(b) Enzyme bất hoạt hoàn toàn ở khoảng 51 °C.\n(c) Tốc độ phản ứng thấp hơn ở nhiệt độ trên hoặc dưới 37 °C.\n(d) Tốc độ phản ứng tăng khi nhiệt độ tăng từ 0 °C đến 37 °C; khi nhiệt độ vượt quá 37 °C enzyme bị biến tính và tốc độ phản ứng bắt đầu giảm.\nCác phát biểu đúng là",
+   "dap_an": "A",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "I_16.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": true,
+   "chuyen_de": "Hợp chất chứa nitrogen",
+   "muc_do": "van_dung",
+   "pa": {
+    "A": "(a), (b), (d)",
+    "B": "(a), (c), (d)",
+    "C": "(b), (c), (d)",
+    "D": "(a), (b), (c)"
+   },
+   "loi_giai": {
+    "chot": "Đồ thị đạt cực đại đúng ở 37 °C và tụt về 0 quanh 50 °C, nên (a), (b), (d) đều đúng; phát biểu (c) cũng phù hợp với đồ thị nên câu này chưa có phương án duy nhất.",
+    "tung_pa": {
+     "A": {
+      "dung": true,
+      "vi_sao": "Đúng theo đáp án đề: (a), (b), (d) đều khớp với đồ thị."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Bộ này bỏ (b), trong khi đồ thị cho thấy tốc độ về 0 quanh 50 °C."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Bộ này bỏ (a), trong khi đỉnh đồ thị nằm đúng ở 37 °C."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Bộ này bỏ (d), phát biểu mô tả đầy đủ nhất chiều biến đổi tốc độ."
+     }
+    },
+    "dap_an_de": "A",
+    "dap_an_tu_giai": "A",
+    "trang_thai": "khop",
+    "ghi_chu": "CẦN THẦY XEM: đọc đồ thị thì cả bốn phát biểu (a), (b), (c), (d) đều đúng, trong khi đề chỉ cho chọn ba. Máy giữ nguyên đáp án A của tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Enzyme là protein, quá nóng sẽ biến tính.",
+    "bay": "Chỉ nhìn đỉnh đồ thị mà không xem nhánh giảm sau 37 °C."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU",
+    "ten": "Protein — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề HOP_CHAT_N"
+  }
  }
 }

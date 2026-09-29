@@ -74,5 +74,53 @@
     "chuong": "C2 - Carbohidrade"
    }
   }
+ },
+ "12-C2-B4-D2-III-37": {
+  "luc": "2026-09-29T08:25:00.207Z",
+  "cau": {
+   "phan": "III",
+   "so": 37,
+   "de": "Ở trạng thái tinh thể, phân tử frutose tồn tại ở dạng mạch vòng có mấy cạnh?",
+   "dap_an": "5",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "loi_giai": {
+    "chot": "Ở trạng thái tinh thể, fructose tồn tại chủ yếu ở dạng vòng năm cạnh, gọi là dạng furanose.",
+    "buoc": [
+     "Nhóm -OH ở carbon số 5 cộng vào nhóm carbonyl ở carbon số 2.",
+     "Vòng tạo thành gồm bốn nguyên tử carbon và một nguyên tử oxygen.",
+     "Vậy vòng có năm cạnh."
+    ],
+    "ket_qua": "5",
+    "dap_an_de": "5",
+    "dap_an_tu_giai": "5",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Phải nhớ fructose đóng vòng năm cạnh, khác glucose sáu cạnh.",
+    "bay": null
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.TINH_CHAT_VAT_LI.DEM_DONG_PHAN",
+    "ten": "Tính chất vật lí — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề CARBOHYDRATE"
+  }
  }
 }

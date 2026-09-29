@@ -68,5 +68,68 @@
    "dangBai": null,
    "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
   }
+ },
+ "12-KT-C4-D4-I-11": {
+  "luc": "2026-09-29T08:26:35.211Z",
+  "cau": {
+   "phan": "I",
+   "so": 11,
+   "de": "Phát biểu nào sau đây về composite là đúng?",
+   "dap_an": "D",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Polymer",
+   "muc_do": "hieu",
+   "pa": {
+    "A": "Vật liệu nền có thể là chất dẻo hoặc cao su",
+    "B": "Vật liệu cốt có vai trò đảm bảo cho các thành phần composite liên kết với nhau",
+    "C": "Vật liệu cốt được trộn vào vật liệu nền để tăng tính chất cơ lí",
+    "D": "Vật liệu cốt có thể ở dạng sợi (sợi carbon, sợi vải,…) hoặc dạng bột (bột nhôm, bột silica,…)"
+   },
+   "loi_giai": {
+    "chot": "Vật liệu cốt của composite có thể ở dạng sợi như sợi carbon, sợi vải hoặc dạng bột như bột nhôm, bột silica.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Vật liệu nền còn có thể là kim loại hay gốm nên phát biểu này chưa đủ."
+     },
+     "B": {
+      "dung": false,
+      "vi_sao": "Vai trò liên kết các thành phần là của vật liệu nền."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "Câu này viết ngược vai trò của cốt và nền."
+     },
+     "D": {
+      "dung": true,
+      "vi_sao": "Đúng: cốt có thể ở dạng sợi hoặc dạng bột."
+     }
+    },
+    "dap_an_de": "D",
+    "dap_an_tu_giai": "D",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "dang": {
+    "ma": "POLYMER.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo, mắt xích — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": null,
+   "viSaoNullDB": "không trùng dạng toán trọng tâm nào của chuyên đề POLYMER"
+  }
  }
 }

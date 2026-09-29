@@ -57,5 +57,423 @@
    "nguonDe": "DH-12-C2-B6",
    "nguonCau": "III-7"
   }
+ },
+ "DB-12-B5-D2-II-297": {
+  "luc": "2026-09-29T08:26:03.838Z",
+  "cau": {
+   "phan": "II",
+   "so": 297,
+   "de": "Cho hai disaccharide có công thức cấu tạo dưới đây:\nHình (1) và Hình (2).\nMỗi phát biểu sau đây là đúng hay sai?",
+   "dap_an": "SDSS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II-1.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "II-1-1.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "van_dung",
+   "bai": "Bài 5. Saccharose và maltose",
+   "y": {
+    "a": "Công thức phân tử của disaccharide trong hình (1) và (2) đều là C₁₂H₂₀O₁₁.",
+    "b": "Hình (1) mô tả phân tử saccharose được cấu tạo từ một đơn vị α-glucose và một đơn vị β-fructose qua liên kết α-1,2-glycoside.",
+    "c": "Hình (2) mô tả phân tử maltose được cấu tạo từ một đơn vị β-glucose và và một đơn vị α-fructose qua liên kết α-1,4-glycoside.",
+    "d": "Hình (1) và hình (2) đều có nhóm -OH hemiacetal hoặc nhóm -OH hemiketal."
+   },
+   "loi_giai": {
+    "chot": "Hình (1): vòng 6 cạnh (glucose) nối vòng 5 cạnh (fructose) qua liên kết α-1,2-glycoside ⇒ saccharose. Hình (2): hai vòng 6 cạnh nối qua α-1,4-glycoside ⇒ maltose.",
+    "tung_y": {
+     "a": {
+      "dung": false,
+      "vi_sao": "Sai: cả hai đều là C₁₂H₂₂O₁₁, không phải C₁₂H₂₀O₁₁."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: hình (1) đúng là saccharose — đơn vị α-glucose vòng 6 cạnh nối đơn vị β-fructose vòng 5 cạnh bằng liên kết α-1,2-glycoside."
+     },
+     "c": {
+      "dung": false,
+      "vi_sao": "Sai: hình (2) là maltose gồm HAI đơn vị glucose nối bằng liên kết α-1,4-glycoside, không hề có đơn vị fructose."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: maltose còn một nhóm -OH hemiacetal tự do ở C1 đơn vị glucose thứ hai, nhưng saccharose đã dùng hết cả -OH hemiacetal lẫn -OH hemiketal để tạo liên kết glycoside nên KHÔNG còn nhóm nào — không phải \"đều có\"."
+     }
+    },
+    "dap_an_de": "SDSS",
+    "dap_an_tu_giai": "SDSS",
+    "trang_thai": "khop",
+    "ghi_chu": "Máy tự mở hai ảnh công thức trong tờ ra xem: hình (1) ghi rõ \"liên kết α-1,2-glycoside\" nối vòng 6 cạnh với vòng 5 cạnh ⇒ saccharose; hình (2) ghi rõ \"liên kết α-1,4-glycoside\" nối hai vòng 6 cạnh ⇒ maltose. Đáp án SĐSS, khớp tác giả. Bỏ cờ can_xem ngày 16/09."
+   },
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Câu nhắc lại kiến thức đã chữa ở câu khác cùng đề.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "phương án là chữ, đề không đòi tính ra số",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B5",
+   "nguonCau": "II-19"
+  }
+ },
+ "DB-12-B5-D2-II-79": {
+  "luc": "2026-09-29T08:26:03.838Z",
+  "cau": {
+   "phan": "II",
+   "so": 79,
+   "de": "Cấu trúc phân tử saccharose và maltose được cho trong hình dưới đây:",
+   "dap_an": "DDDS",
+   "bang": null,
+   "hinh": [
+    {
+     "tep": "II_6.png",
+     "vi_tri": "sau_de"
+    },
+    {
+     "tep": "II_6_2.png",
+     "vi_tri": "sau_de"
+    }
+   ],
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "y": {
+    "a": "Saccharose và maltose đều là các disaccharide.",
+    "b": "Liên kết a-1,2-glycoside giữa đơn vị glucose và đơn vị fructose trong phân tử saccharose là nguyên nhân dẫn đến saccharose không có khả năng mở vòng.",
+    "c": "Maltose chỉ có khả năng mở được một vòng.",
+    "d": "Thuỷ phân saccharose và maltose chỉ thu được một monosaccharide duy nhất."
+   },
+   "loi_giai": {
+    "chot": "Saccharose dùng cả hai carbon anomeric để tạo liên kết nên không mở vòng được; maltose còn một carbon anomeric tự do nên mở được một vòng.",
+    "tung_y": {
+     "a": {
+      "dung": true,
+      "vi_sao": "Đúng: cả hai đều gồm hai đơn vị monosaccharide."
+     },
+     "b": {
+      "dung": true,
+      "vi_sao": "Đúng: liên kết alpha-1,2-glycoside khoá cả hai carbon anomeric."
+     },
+     "c": {
+      "dung": true,
+      "vi_sao": "Đúng: maltose chỉ còn một carbon anomeric tự do."
+     },
+     "d": {
+      "dung": false,
+      "vi_sao": "Sai: thuỷ phân saccharose cho glucose và fructose, tức hai monosaccharide."
+     }
+    },
+    "dap_an_de": "DDDS",
+    "dap_an_tu_giai": "DDDS",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Nhìn hình để thấy carbon anomeric nào còn tự do, từ đó suy ra khả năng mở vòng.",
+    "bay": null
+   },
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B5",
+   "nguonCau": "II-20"
+  }
+ },
+ "DB-12-B5-D2-III-149": {
+  "luc": "2026-09-29T08:26:03.838Z",
+  "cau": {
+   "phan": "III",
+   "so": 149,
+   "de": "Cho các phân tử: tinh bột, cellulose, saccharose, maltose và fructose.\nCó bao nhiêu phân tử có chứa liên kết a-1,4-glycoside?",
+   "dap_an": "2",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "loi_giai": {
+    "chot": "Liên kết alpha-1,4-glycoside có ở tinh bột và maltose; cellulose là beta-1,4 còn saccharose là alpha-1,2.",
+    "buoc": [
+     "Tinh bột gồm các gốc alpha-glucose nối alpha-1,4-glycoside.",
+     "Maltose cũng nối bằng alpha-1,4-glycoside.",
+     "Cellulose là beta-1,4, saccharose là alpha-1,2 nên loại.",
+     "Fructose là monosaccharide, không có liên kết glycoside."
+    ],
+    "ket_qua": "2",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "2",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Phải nhớ đúng kiểu liên kết của từng chất chứ không chỉ nhớ chất nào có glycoside.",
+    "bay": null
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-TO-07",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.DEM_DONG_PHAN",
+    "ten": "Cấu tạo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B6-D2",
+   "nguonCau": "III-41"
+  }
+ },
+ "DB-12-B5-D2-III-59": {
+  "luc": "2026-09-29T08:26:03.838Z",
+  "cau": {
+   "phan": "III",
+   "so": 59,
+   "de": "Cho các loại thực phẩm sau: mật mía, đường phèn, đường cát, mật ong và mạch nha.\nCó bao nhiêu bao nhiêu loại thực phẩm trong dãy trên có chứa nhiều saccharose trong thành phần hóa học?",
+   "dap_an": "3",
+   "bang": null,
+   "hinh": [],
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "biet",
+   "loi_giai": {
+    "chot": "Đường cát, đường phèn, mật mía đều là saccharose từ mía. Mật ong chủ yếu là glucose và fructose; mạch nha chủ yếu là maltose.",
+    "tung_pa": null,
+    "tung_y": null,
+    "buoc": [
+     "Chứa nhiều saccharose: mật mía, đường phèn, đường cát.",
+     "Không: mật ong (glucose, fructose), mạch nha (maltose). Có 3 loại."
+    ],
+    "ket_qua": "3",
+    "dap_an_de": "3",
+    "dap_an_tu_giai": "",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề."
+   },
+   "can_chua": {
+    "sao": 1,
+    "ly_do": "Mật mía, đường phèn, đường cát đều là saccharose; mật ong là glucose và fructose, mạch nha là maltose.",
+    "bay": "Đếm cả mật ong vì thấy chữ mật giống mật mía.",
+    "dk": [
+     "bay"
+    ]
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.UNG_DUNG.DEM_DONG_PHAN",
+    "ten": "Ứng dụng — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "de_goc": "12-C2-B5",
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-C2-B5",
+   "nguonCau": "III-9"
+  }
+ },
+ "DB-12-B5-D2-I-163": {
+  "luc": "2026-09-29T08:26:03.838Z",
+  "cau": {
+   "phan": "I",
+   "so": 163,
+   "de": "Phát biểu nào sau đây về maltose là đúng?",
+   "pa": {
+    "A": "Một phân tử maltose gồm một đơn vị α-glucose liên kết với một đơn vị β-fructose.",
+    "B": "Maltose có chứa nhóm -OH hemiacetal.",
+    "C": "Maltose có công thức phân tử C₆H₁₂O₆.",
+    "D": "Maltose tồn tại dạng mạch vòng và mạch hở trong dung dịch."
+   },
+   "dap_an": "B",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "can_chua": {
+    "sao": 0,
+    "dk": [],
+    "ly_do": "Maltose là hai đơn vị glucose, công thức C₁₂H₂₂O₁₁, còn OH hemiacetal tự do.",
+    "bay": null
+   },
+   "loi_giai": {
+    "chot": "Maltose gồm hai glucose và còn một nhóm OH hemiacetal tự do.",
+    "tung_pa": {
+     "A": {
+      "dung": false,
+      "vi_sao": "Đó là cấu tạo của saccharose, maltose gồm hai đơn vị glucose."
+     },
+     "B": {
+      "dung": true,
+      "vi_sao": "Đầu glucose thứ hai còn nhóm OH hemiacetal nên maltose có tính khử."
+     },
+     "C": {
+      "dung": false,
+      "vi_sao": "C₆H₁₂O₆ là công thức của monosaccharide, maltose là C₁₂H₂₂O₁₁."
+     },
+     "D": {
+      "dung": false,
+      "vi_sao": "Theo cách diễn đạt của tác giả, maltose tồn tại dạng mạch vòng và dạng mở vòng."
+     }
+    },
+    "dap_an_de": "B",
+    "dap_an_tu_giai": "B",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Hướng dẫn của tác giả gõ nhầm C₁₂H₂₂O₁, đúng là C₁₂H₂₂O₁₁."
+   },
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU",
+    "ten": "Cấu tạo — chọn phát biểu"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "kieu": "ly_thuyet",
+   "kieu_vi_sao": "mặt chữ đã rõ hai chiều",
+   "bai": "Bài 5. Saccharose và maltose",
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "12-BD7-18",
+   "nguonCau": "I-2"
+  }
+ },
+ "DB-12-B5-D2-III-255": {
+  "luc": "2026-09-29T08:26:03.838Z",
+  "cau": {
+   "phan": "III",
+   "so": 255,
+   "de": "Cho các saccharide sau: cellulose, glucose, maltose, fructose, tinh bột và saccharose.\nCó bao nhiêu saccharide trong dãy trên thuộc loại monosaccharide?",
+   "dap_an": "6,67",
+   "bang": null,
+   "hinh": null,
+   "tieu_de": null,
+   "can_xem": false,
+   "chuyen_de": "Carbohydrate",
+   "muc_do": "hieu",
+   "bai": "Bài 4. Glucose và fructose",
+   "loi_giai": {
+    "chot": "Monosaccharide là đường đơn, không bị thuỷ phân.",
+    "buoc": [
+     "Monosaccharide là đường đơn, không bị thuỷ phân.",
+     "Glucose và fructose đạt điều kiện này.",
+     "Maltose, saccharose là disaccharide; tinh bột, cellulose là polysaccharide.",
+     "Vậy có 2 chất."
+    ],
+    "ket_qua": "6,67",
+    "dap_an_de": "2",
+    "dap_an_tu_giai": "6,67",
+    "trang_thai": "khop",
+    "ghi_chu": "Lời giải do máy tự giải từ đề bài; đáp án đối chiếu với tác giả đề. Đáp án đề (6,67) là khối lượng glucose tính theo kg; máy giữ nguyên con số ấy, khối lượng AgNO₃ 12,59 kg nằm trong các bước giải."
+   },
+   "can_chua": {
+    "sao": 1,
+    "dk": [
+     "nen"
+    ],
+    "ly_do": "Maltose thuỷ phân cho hai phân tử glucose nên là disaccharide.",
+    "bay": "Đếm cả maltose vì thấy cũng gồm các gốc glucose."
+   },
+   "kieu": "bai_tap",
+   "kieu_vi_sao": "phần III: đáp án là số phải tính ra",
+   "dang": {
+    "ma": "CARBOHYDRATE.CAU_TAO.DEM_DONG_PHAN",
+    "ten": "Cấu tạo — đếm đồng phân"
+   },
+   "viSaoNull": null,
+   "kienThuc": [],
+   "loiThuongGap": [],
+   "dangBai": {
+    "ma": "DB-12-B5-D2",
+    "ten": "Một số bài toán đặc trưng của saccharose",
+    "lop": "12",
+    "bai": "DB-12-B5",
+    "tenBai": "Saccharose và maltose",
+    "soBai": 5,
+    "phanBai": 0,
+    "chuong": "C2 - Carbohidrade"
+   },
+   "nguonDe": "DH-12-C2-B4",
+   "nguonCau": "III-2"
+  }
  }
 }
