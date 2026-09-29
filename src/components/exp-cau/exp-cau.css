@@ -10,8 +10,9 @@
   border-radius: var(--m3-bo-tron, 999px);
   font-weight: 700;
   font-size: 0.875rem;
-  background: var(--m3-tertiary-container);
-  color: var(--m3-on-tertiary-container);
+  /* Màn GAME không nằm trong `.m3` (StudentPortal: vaoM3 = … && tab !== 'thanthu') ⇒ biến --m3-* vắng: dùng màu dự phòng = bảng sáng m3-theme để số luôn hiện rõ. */
+  background: var(--m3-tertiary-container, rgb(196 238 208));
+  color: var(--m3-on-tertiary-container, rgb(7 33 0));
 }
 .exp-cau-so[data-che-do='day-du'],
 .exp-cau-so[data-che-do='gon'] {
@@ -24,7 +25,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--m3-tertiary);
+  background: var(--m3-tertiary, rgb(20 108 46));
   pointer-events: none;
   opacity: 0;
   animation: exp-cau-hat 700ms ease-out both;
@@ -56,10 +57,11 @@
 }
 .exp-thanh-nho-ray > i {
   position: absolute;
-  inset: 0 auto 0 0;
+  inset: 0;
   border-radius: inherit;
   background: var(--m3-tertiary);
-  transition: width 700ms ease-out;
+  transform-origin: left center;
+  transition: transform 700ms ease-out;
 }
 .exp-thanh-nho[data-che-do='tinh'] .exp-thanh-nho-ray > i { transition: none; }
 .exp-len-cap {
@@ -126,4 +128,52 @@
   .exp-cau-so, .exp-cau-hat, .exp-len-cap { animation: none !important; }
   .exp-cau-hat { display: none; }
   .exp-thanh-nho-ray > i { transition: none; }
+}
+
+/* "+N EXP" BAY VÀO THẦN THÚ (bay-exp.ts, Boss 29/09): vật bay gắn vào body, vị trí cố định, chỉ hoạt ảnh transform/opacity (Web Animations API). */
+.exp-cau-so[data-bay='dang'] { opacity: 0; animation: none !important; }
+.exp-cau-so[data-bay='xong'] { animation: exp-hien-lai 320ms ease-out both !important; }
+.exp-cau-so[data-bay='xong'][data-vao-thu='noi'] { display: none; }
+@keyframes exp-hien-lai { from { opacity: 0; } to { opacity: 1; } }
+.exp-bay-so,
+.exp-bay-hat,
+.exp-loe {
+  position: fixed;
+  z-index: 2147483000;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  will-change: transform, opacity;
+}
+.exp-bay-so {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 3px 12px;
+  border-radius: var(--m3-bo-tron, 999px);
+  font-weight: 800;
+  font-size: 1.05rem;
+  white-space: nowrap;
+  /* Màn game không nằm trong `.m3` ⇒ biến --m3-* có thể vắng: màu dự phòng = bảng sáng m3-theme (như .exp-cau-so). */
+  background: var(--m3-tertiary-container, rgb(196 238 208));
+  color: var(--m3-on-tertiary-container, rgb(7 33 0));
+  box-shadow: 0 0 0 2px var(--m3-tertiary, rgb(20 108 46)), 0 6px 18px color-mix(in srgb, var(--m3-tertiary, rgb(20 108 46)) 45%, transparent);
+}
+.exp-bay-hat {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--m3-tertiary, rgb(20 108 46));
+  box-shadow: 0 0 10px 3px color-mix(in srgb, var(--m3-tertiary, rgb(20 108 46)) 70%, transparent);
+}
+.exp-loe {
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, color-mix(in srgb, var(--m3-tertiary-container, rgb(196 238 208)) 90%, transparent) 0%, color-mix(in srgb, var(--m3-tertiary, rgb(20 108 46)) 55%, transparent) 45%, transparent 70%);
+}
+.exp-loe-cap {
+  background: radial-gradient(circle, transparent 38%, color-mix(in srgb, var(--m3-primary, rgb(20 108 46)) 80%, transparent) 50%, transparent 66%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .exp-bay-so, .exp-bay-hat, .exp-loe { display: none; }
+  .exp-cau-so[data-bay] { opacity: 1; animation: none; }
 }

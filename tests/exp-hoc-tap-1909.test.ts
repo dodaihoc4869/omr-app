@@ -1,7 +1,7 @@
 // @vitest-environment node
 // EXP HỌC TẬP + MẢNH KHIÊN — hàm thuần (DE-XUAT-EXP-MANH-KHIEN-1909.md): bảng giá trị, trần mềm, khoá idempotent, mảnh khiên, "một ngày mẫu".
 import { describe, it, expect } from 'vitest'
-import { congManh, expMotCau, expSauTran, tinhExp, type KhoanExp, type SuKienExp, type VaoTinhExp } from '../server/src/exp-hoc-tap'
+import { congManh, expMotCau, tinhExp, type KhoanExp, type SuKienExp, type VaoTinhExp } from '../server/src/exp-hoc-tap'
 import * as CH from '../server/src/exp-cau-hinh'
 
 const NGAY = '2026-09-20'
@@ -50,23 +50,15 @@ describe('bảng EXP một câu đúng (phần × sao)', () => {
   })
 })
 
-describe('trần MỀM 2 × mục tiêu ngày', () => {
-  it('đủ giá tới câu thứ 2×mục tiêu; sau đó 25% làm tròn lên, tối thiểu 1', () => {
+// SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT luật EXP v5, docs/DE-XUAT-EXP-V5-2909.md): BỎ trần mềm 2 × mục tiêu (25 %) — mọi câu đúng đủ giá.
+describe('v5: KHÔNG còn trần mềm câu theo mục tiêu ngày', () => {
+  it('20 câu, mục tiêu 8: cả 20 câu đủ giá theo phần/sao, không ghi chú 25%', () => {
     const suKien = Array.from({ length: 20 }, (_, i) => sk(`Q${String(i).padStart(2, '0')}`, 1, { luc: luc(i) }))
     const r = tinhExp(vao({ mucTieuCau: 8, suKien, metaCau: Object.fromEntries(suKien.map((e, i) => [e.qid, { phan: 'I' as const, sao: (i % 3) as 0 | 1 | 2 }])) }))
     const cau = theoLoai(r.khoan, 'cau')
     expect(cau).toHaveLength(20)
-    expect(cau.slice(0, 16).map((k) => k.exp)).toEqual(Array.from({ length: 16 }, (_, i) => [2, 3, 5][i % 3]))
-    // Câu thứ 17..20 (i = 16..19) có giá gốc sao i%3 ⇒ [3, 5, 2, 3] ⇒ 25% làm tròn lên, tối thiểu 1 ⇒ [1, 2, 1, 1].
-    expect(cau.slice(16).map((k) => k.exp)).toEqual([3, 5, 2, 3].map((g) => Math.max(1, Math.ceil(g / 4))))
-    expect(cau[16]!.ghiChu).toContain('25%')
-    expect(cau[15]!.ghiChu).not.toContain('25%')
-    expect(expSauTran(10)).toBe(3); expect(expSauTran(2)).toBe(1); expect(expSauTran(3)).toBe(1); expect(expSauTran(5)).toBe(2)
-  })
-  it('ngưỡng theo mục tiêu ngày: 16 → ngưỡng 32; thay đổi ngưỡng đổi đúng câu thứ 17', () => {
-    const suKien = Array.from({ length: 18 }, (_, i) => sk(`Q${String(i).padStart(2, '0')}`, 1, { luc: luc(i) }))
-    const so = (m: number) => theoLoai(tinhExp(vao({ mucTieuCau: m, suKien })).khoan, 'cau').filter((k) => k.ghiChu.includes('25%')).length
-    expect(so(8)).toBe(2); expect(so(9)).toBe(0); expect(so(16)).toBe(0)
+    expect(cau.map((k) => k.exp)).toEqual(Array.from({ length: 20 }, (_, i) => [2, 3, 5][i % 3]))
+    expect(cau.some((k) => k.ghiChu.includes('25%'))).toBe(false)
   })
   it('thưởng theo việc KHÔNG bị trần', () => {
     const suKien = Array.from({ length: 40 }, (_, i) => sk(`Q${i}`, 1, { luc: luc(i) }))
@@ -169,16 +161,17 @@ describe('đạt nhiệm vụ ngày, chuỗi và mảnh khiên', () => {
 })
 
 describe('khiên RÈN: 21 mảnh → 1 khiên (thầy lệnh 21/09); tối đa 5 khiên rèn chưa dùng; mảnh kẹp 42', () => {
-  it('21 mảnh ⇒ tự rèn, trừ 21; 43 mảnh ⇒ rèn 2 dư 1; chưa đủ thì giữ; mảnh cũ 7/12 giữ nguyên thành 7/21', () => {
-    expect(congManh({ manh: 20, daRen: 0 }, 1, 0)).toEqual({ manh: 0, daRen: 1 })
-    expect(congManh({ manh: 0, daRen: 3 }, 43, 0)).toEqual({ manh: 1, daRen: 5 })
+  // SỬA CÓ CHỦ Ý 29/09 v5: một khiên = 36 mảnh (trước: 21). Tự rèn bằng mảnh chỉ còn ở hồ sơ rất cũ (luatCap < 3).
+  it('36 mảnh ⇒ tự rèn, trừ 36; 73 mảnh ⇒ rèn 2 dư 1; chưa đủ thì giữ; mảnh cũ giữ nguyên', () => {
+    expect(congManh({ manh: 35, daRen: 0 }, 1, 0)).toEqual({ manh: 0, daRen: 1 })
+    expect(congManh({ manh: 0, daRen: 3 }, 73, 0)).toEqual({ manh: 1, daRen: 5 })
     expect(congManh({ manh: 5, daRen: 2 }, 3, 0)).toEqual({ manh: 8, daRen: 2 })
     expect(congManh({ manh: 7, daRen: 1 }, 0, 0)).toEqual({ manh: 7, daRen: 1 }) // mảnh em đang có: không mất, không tự rèn
     expect(congManh({ manh: 12, daRen: 1 }, 0, 0)).toEqual({ manh: 12, daRen: 1 }) // 12 mảnh KHÔNG còn đủ một khiên
   })
-  it('đã có 5 khiên rèn chưa dùng ⇒ KHÔNG rèn thêm, mảnh vẫn cộng nhưng kẹp ở 42; còn 4 thì rèn đúng 1 rồi dừng', () => {
-    expect(congManh({ manh: 10, daRen: 5 }, 90, 5)).toEqual({ manh: 42, daRen: 5 })
-    expect(congManh({ manh: 20, daRen: 7 }, 90, 4)).toEqual({ manh: 42, daRen: 8 }) // 110 → rèn 1 (74) rồi chạm 5 chưa dùng → giữ, kẹp 42
+  it('đã có 5 khiên rèn chưa dùng ⇒ KHÔNG rèn thêm, mảnh vẫn cộng nhưng kẹp ở 72; còn 4 thì rèn đúng 1 rồi dừng', () => {
+    expect(congManh({ manh: 10, daRen: 5 }, 90, 5)).toEqual({ manh: 72, daRen: 5 })
+    expect(congManh({ manh: 20, daRen: 7 }, 90, 4)).toEqual({ manh: 72, daRen: 8 }) // 110 → rèn 1 (74) rồi chạm 5 chưa dùng → giữ, kẹp 72
     expect(congManh({ manh: 0, daRen: 0 }, 0, 0)).toEqual({ manh: 0, daRen: 0 })
   })
   it('đầu vào lạ (âm, phân số, NaN) không làm mảnh âm hay sinh khiên ảo', () => {
@@ -186,7 +179,7 @@ describe('khiên RÈN: 21 mảnh → 1 khiên (thầy lệnh 21/09); tối đa 5
     expect(congManh({ manh: 3, daRen: 0 }, 2.9, 0)).toEqual({ manh: 5, daRen: 0 })
   })
   it('hằng số đúng như đặc tả', () => {
-    expect(CH.MANH_MOI_KHIEN).toBe(21); expect(CH.KHIEN_REN_TOI_DA).toBe(5); expect(CH.MANH_TOI_DA).toBe(42)
+    expect(CH.MANH_MOI_KHIEN).toBe(36); expect(CH.KHIEN_REN_TOI_DA).toBe(5); expect(CH.MANH_TOI_DA).toBe(72) // SỬA CÓ CHỦ Ý 29/09 v5 (21/42 ⇒ 36/72)
     expect(CH.MANH_DAT_NGAY).toBe(1); expect(CH.MANH_CHUOI_BOI_SO_THUONG).toBe(0); expect(CH.MANH_DANG_ROI_YEU).toBe(0) // nguồn mảnh DUY NHẤT là ngày đạt
     expect(CH.EXP_MOI_TU).toBeNull() // chưa phát hành ⇒ không mốc
   })
@@ -234,9 +227,9 @@ describe('MỘT NGÀY MẪU (bảng để 0.Planer đối chiếu với con số
     const r = tinhExp(vao({ suKien: ['G1', 'G2', 'G3', 'G4'].map((q) => sk(q, 1, { nguon: 'game' })) }))
     expect(r).toEqual({ khoan: [], manh: [] })
   })
-  it('em làm ít (4 câu Phần I không sao, chưa đạt ngày) = 8 EXP; em làm nhiều gấp đôi mục tiêu ngày vẫn có trần mềm', () => {
+  it('em làm ít (4 câu Phần I không sao, chưa đạt ngày) = 8 EXP; SỬA CÓ CHỦ Ý 29/09 v5: em làm gấp ba mục tiêu ngày thì mọi câu đủ giá', () => {
     expect(tong(tinhExp(vao({ suKien: ['A', 'B', 'C', 'D'].map((q) => sk(q, 1)) })).khoan)).toBe(8)
     const nhieu = Array.from({ length: 24 }, (_, i) => sk(`Q${i}`, 1, { luc: luc(i) }))
-    expect(tong(tinhExp(vao({ mucTieuCau: 8, suKien: nhieu })).khoan)).toBe(16 * 2 + 8 * 1) // 40
+    expect(tong(tinhExp(vao({ mucTieuCau: 8, suKien: nhieu })).khoan)).toBe(24 * 2) // 48
   })
 })

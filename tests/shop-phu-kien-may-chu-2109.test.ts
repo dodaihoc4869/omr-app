@@ -15,11 +15,12 @@ beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(T0) 
 afterEach(() => vi.useRealTimers())
 
 const K = (n: string) => `khoa-${n}-abcdefgh` // khoaYeuCau hợp lệ (8–64 ký tự)
-function dung(o: { wallet?: number; em?: string[]; co?: unknown; khongCo?: boolean } = {}): D1That {
+// SỬA CÓ CHỦ Ý 29/09 v5 (khoá cấp shop: bậc 4 cần thú cấp ≥ 10, bậc 5 cần cấp ≥ 20): hồ sơ thử mặc định cấp 20 để các test chuỗi/ấn thạch/số cái giữ nguyên nghĩa; khoá cấp thử riêng (`capThu`).
+function dung(o: { wallet?: number; em?: string[]; co?: unknown; khongCo?: boolean; capThu?: number } = {}): D1That {
   const d = taoD1That()
   for (const sbd of o.em ?? ['S1', 'S2']) {
     d.sql.prepare("INSERT INTO hoc_sinh(sbd,ho_ten,lop,mat_khau,cap_nhat_luc) VALUES(?,?,'12','mk','x')").run(sbd, `Em ${sbd}`)
-    d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run(sbd, JSON.stringify({ pet: 'lua_phuong', choice: false, legacy: null, cap: 5, exp: 40, wallet: o.wallet ?? 620, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z', luatCap: LUAT_CAP_MOI }), 'x')
+    d.sql.prepare('INSERT INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').run(sbd, JSON.stringify({ pet: 'lua_phuong', choice: false, legacy: null, cap: o.capThu ?? 20, exp: 40, wallet: o.wallet ?? 620, earned: 0, tower: 1, mastery: [], arena: null, cutover: '2020-01-01T00:00:00.000Z', luatCap: LUAT_CAP_MOI }), 'x')
   }
   if (!o.khongCo) d.sql.prepare("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('shop_phu_kien',?,'x')").run(JSON.stringify(o.co ?? { bat: true }))
   return d
@@ -118,16 +119,30 @@ describe('shop-danh-sach', () => {
     expect(r).toMatchObject({ ok: true, phienBan: 'm1-v1', vang: 340, emCo: { chuoiNgay: 9, anThachSang: 0 }, dangMac: { vet: 'VD-04', 'hao-quang': null, khung: null, dau: null, 'co-lung': null } })
     expect(r.mon).toHaveLength(24); expect(r.mon.map((m: any) => m.ma)).toEqual(DANH_MUC_PHU_KIEN.filter((m) => m.moBan === 1).map((m) => m.ma))
     const mon = (ma: string) => r.mon.find((m: any) => m.ma === ma)
-    expect(mon('VD-04')).toEqual({ ma: 'VD-04', gia: 250, daCo: true, dangMac: true, moKhoa: true, thieu: null, suatCon: null, suatTong: null })
-    expect(mon('KT-08')).toEqual({ ma: 'KT-08', gia: 2210, daCo: false, dangMac: false, moKhoa: false, thieu: 'Cần chuỗi 14 ngày', suatCon: 29, suatTong: 30 }) // S2 đã mua 1 cái
+    expect(mon('VD-04')).toEqual({ ma: 'VD-04', gia: 250, daCo: true, dangMac: true, moKhoa: true, thieu: null, canCap: null, suatCon: null, suatTong: null })
+    expect(mon('KT-08')).toEqual({ ma: 'KT-08', gia: 2210, daCo: false, dangMac: false, moKhoa: false, thieu: 'Cần chuỗi 14 ngày', canCap: 20, suatCon: 29, suatTong: 30 }) // S2 đã mua 1 cái
     expect(mon('HQ-08')).toMatchObject({ moKhoa: false, thieu: 'Cần chuỗi 14 ngày + 5 ấn thạch sáng', suatCon: 20, suatTong: 20 })
     expect(mon('HQ-07')).toMatchObject({ moKhoa: true, thieu: null }); expect(mon('VD-08')).toMatchObject({ moKhoa: false, thieu: 'Cần chuỗi 21 ngày', suatCon: 25 }); expect(mon('HQ-01')).toMatchObject({ moKhoa: true, thieu: null }) // chuỗi 9 ≥ 7 ⇒ Sử thi mở; Huyền thoại 21 ngày còn khoá
     expect(r.mon.some((m: any) => /^(DA|CL)-/.test(m.ma))).toBe(false)                    // đợt 2 chưa bán
   })
+  it('v5 — KHOÁ CẤP: bậc 4 cần thần thú cấp ≥ 10, bậc 5 cần cấp ≥ 20 (danh sách nói rõ; mua ⇒ chua_mo có số, không trừ vàng)', async () => {
+    const d = dung({ capThu: 9 }); cap(d, 'S1', 9000); chuoi(d, 'S1', 30)
+    const r = await goi(d, 'S1', 'shop-danh-sach')
+    const mon = (ma: string) => r.mon.find((m: any) => m.ma === ma)
+    expect(mon('HQ-07')).toMatchObject({ canCap: 10, moKhoa: false, thieu: 'Cần thần thú cấp 10' })
+    expect(mon('VD-04')).toMatchObject({ canCap: null, moKhoa: true })
+    const m = await goi(d, 'S1', 'shop-mua', { maMon: 'HQ-07', giaThay: DANH_MUC_PHU_KIEN.find((x) => x.ma === 'HQ-07')!.gia, khoaYeuCau: K('cap9') })
+    expect(m).toMatchObject({ ok: false, ma: 'chua_mo', loi: 'Món này cần thần thú cấp 10. Thần thú của em đang cấp 9.' })
+    expect(vangSo(d, 'S1')).toBe(9000)
+    const e = dung({ capThu: 10 }); cap(e, 'S1', 9000); chuoi(e, 'S1', 30)
+    const r2 = await goi(e, 'S1', 'shop-danh-sach')
+    expect(r2.mon.find((x: any) => x.ma === 'HQ-07')).toMatchObject({ moKhoa: true, thieu: null })
+    expect(r2.mon.find((x: any) => x.ma === 'KT-08').thieu).toMatch(/^Cần thần thú cấp 20/)
+  })
   it('đủ chuỗi 14 ngày nhưng thiếu ấn thạch ⇒ HQ-08 vẫn khoá, KT-08 mở; đủ cả hai ⇒ mở', async () => {
     const d = dung(); chuoi(d, 'S1', 14)
     let r = await goi(d, 'S1', 'shop-danh-sach'); expect(r.mon.find((m: any) => m.ma === 'HQ-08')).toMatchObject({ moKhoa: false, thieu: 'Cần chuỗi 14 ngày + 5 ấn thạch sáng' }); expect(r.mon.find((m: any) => m.ma === 'KT-08').moKhoa).toBe(true)
-    anSang(d, 'S1', 5); r = await goi(d, 'S1', 'shop-danh-sach'); expect(r.mon.find((m: any) => m.ma === 'HQ-08')).toMatchObject({ moKhoa: true, thieu: null }); expect(r.emCo).toEqual({ chuoiNgay: 14, anThachSang: 5 })
+    anSang(d, 'S1', 5); r = await goi(d, 'S1', 'shop-danh-sach'); expect(r.mon.find((m: any) => m.ma === 'HQ-08')).toMatchObject({ moKhoa: true, thieu: null }); expect(r.emCo).toEqual({ chuoiNgay: 14, anThachSang: 5, cap: 20 }) // v5 chỉ thêm: cấp thú cho khoá cấp
   })
 })
 

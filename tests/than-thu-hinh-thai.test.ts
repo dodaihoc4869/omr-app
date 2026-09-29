@@ -119,9 +119,10 @@ describe('kinh nghiệm', () => {
     expect(EXP_BAN_DAU).toBe(120)
     expect(thanhExpCu(1)).toBe(120)
     // SỬA CÓ CHỦ Ý 29/09 (luật v4, docs/DE-XUAT-EXP-2909.md): thanh đầu 90, thanh 2 = 270 ⇒ 300 EXP lên cấp 2, dư 210/270.
-    expect(thanhExp(1)).toBe(90)
+    // SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT, docs/DE-XUAT-EXP-V5-2909.md): thanh đầu 100, thanh 2 = 750 ⇒ 300 EXP lên cấp 2, dư 200/750.
+    expect(thanhExp(1)).toBe(100)
     expect(NGUON_EXP.caThi(5)).toBe(300)
-    expect(nhanExp({ capDo: 1, exp: 0 }, 300)).toMatchObject({ capDo: 2, exp: 210, expToiDa: 270 })
+    expect(nhanExp({ capDo: 1, exp: 0 }, 300)).toMatchObject({ capDo: 2, exp: 200, expToiDa: 750 })
   })
 
   it('thanh dài dần, và cấp 120 là hết đường lên', () => {
@@ -137,10 +138,11 @@ describe('kinh nghiệm', () => {
     let chinDau = 0
     for (let c = 1; c <= 9; c++) chinDau += thanhExp(c)
     // SỬA CÓ CHỦ Ý 29/09 (luật v4): chín cấp đầu = 11 700 (em chăm nhất ngày 21), từ cấp 10 mỗi cấp +60.
-    expect(chinDau).toBe(11_700)
-    expect(thanhExp(9)).toBe(2930)
-    expect(thanhExp(10)).toBe(2990)
-    expect(thanhExp(119)).toBe(2930 + 60 * 110)
+    // SỬA CÓ CHỦ Ý 29/09 v5: T(10) = 11 690 (D(10) = 21 ngày đạt); thanh theo bảng T viết thẳng.
+    expect(chinDau).toBe(11_690)
+    expect(thanhExp(9)).toBe(2020)
+    expect(thanhExp(10)).toBe(2140)
+    expect(thanhExp(119)).toBe(8990)
     expect(thanhExp(60)).toBeGreaterThan(thanhExp(13) * 1.5)
   })
 
@@ -181,15 +183,16 @@ describe('kinh nghiệm', () => {
     // để không ai lỡ tay đổi `EXP_BAN_DAU` mà không thấy hệ quả.
     // SỬA CÓ CHỦ Ý 21/09: 1 286 590 → 240 000 (= 1 200 ngày × 200); 120 → 160; 400 → 1 000; 46 740 → 3 950.
     // SỬA CÓ CHỦ Ý 29/09 (luật v4): 238 200 → 700 300; 120 → 90; 1 000 → 2 990; 3 950 → 9 530.
-    expect(t).toBe(700_300)
-    expect(thanhExp(1)).toBe(90)
-    expect(thanhExp(10)).toBe(2990)
-    expect(thanhExp(119)).toBe(9530)
+    // SỬA CÓ CHỦ Ý 29/09 v5: 700 300 → 683 720; 90 → 100; 2 990 → 2 140; 9 530 → 8 990.
+    expect(t).toBe(683_720)
+    expect(thanhExp(1)).toBe(100)
+    expect(thanhExp(10)).toBe(2140)
+    expect(thanhExp(119)).toBe(8990)
     // VÀO NHANH VỀ CHẬM: mười hai cấp đầu chưa tới 4% cả đường (7 240 / 240 000).
     let muoiHaiDau = 0
     for (let c = 1; c <= 12; c++) muoiHaiDau += thanhExp(c)
     // SỬA CÓ CHỦ Ý 29/09 (luật v4): 12 thanh đầu = 11 700 + 2 990 + 3 050 + 3 110 = 20 850 (≈ 3 % đường). Chủ ý "rẻ hơn đường 12 cấp cũ (15 120)" thuộc đường 21/09 — luật v4 chốt cấp 10 đúng ngày 21 của em chăm nhất.
-    expect(muoiHaiDau).toBe(20_850)
+    expect(muoiHaiDau).toBe(18_500) // SỬA CÓ CHỦ Ý 29/09 v5: T(13) = 18 500 (≈ 2,7 % đường)
     expect(muoiHaiDau / t).toBeLessThan(0.04)
     // eslint-disable-next-line no-console
     console.log(`  tổng EXP từ cấp 1 lên cấp 120: ${t.toLocaleString()} · tới cấp 12: ${muoiHaiDau.toLocaleString()}`)
@@ -328,7 +331,7 @@ describe('hồ sơ lưu', () => {
   })
 
   it('hồ sơ mặc định bắt đầu bằng thanh 160 (đường cấp mới)', () => {
-    expect(layHoSoThanThuMacDinh().expToiDa).toBe(90) // luật v4 (29/09)
+    expect(layHoSoThanThuMacDinh().expToiDa).toBe(100) // SỬA CÓ CHỦ Ý 29/09 v5 (luật v4: 90)
     expect(layHoSoThanThuMacDinh().capDo).toBe(1)
   })
 })

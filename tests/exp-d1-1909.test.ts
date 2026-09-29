@@ -117,20 +117,20 @@ describe('EXP câu đúng theo bảng phần × sao (mọi nguồn trừ game)',
     expect(khoaExp(d)).toEqual([`cau|${qid(4)}|${HOM_NAY}`])
     expect(tongExp(d)).toBe(2)
   })
-  it('trần MỀM: 2 × mục tiêu (mặc định 8 → 16 câu) tính đủ, câu sau nhận 25% (làm tròn lên, tối thiểu 1)', async () => {
+  // SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT, docs/DE-XUAT-EXP-V5-2909.md): BỎ trần mềm 2 × mục tiêu — mọi câu đúng đủ giá, dù mục tiêu ngày là bao nhiêu.
+  it('v5: không còn trần mềm — 18 câu với mục tiêu mặc định 8 đều đủ 2 EXP', async () => {
     const d = await dung()
     await ghi(d, Array.from({ length: 18 }, (_, i) => sk(qid(i), 1, NOW - (20 - i) * 1000)))
     await capNhatExp(d.env, 'S1', NOW)
-    expect(dongExp(d).filter((x) => x.loai === 'cau').map((x) => x.exp)).toEqual([...Array(16).fill(2), 1, 1])
+    expect(dongExp(d).filter((x) => x.loai === 'cau').map((x) => x.exp)).toEqual(Array(18).fill(2))
   })
-  it('mục tiêu ngày lấy từ kế hoạch ĐÃ LƯU: mục tiêu 10 → ngưỡng 20 câu', async () => {
+  it('v5: mục tiêu ngày của kế hoạch ĐÃ LƯU không còn cắt EXP câu (21 câu, mục tiêu 10 ⇒ 21 × 2)', async () => {
     const d = await dung()
     luuKeHoach(d, { mucTieu: 10, toiThieu: 99 })
     await ghi(d, Array.from({ length: 21 }, (_, i) => sk(qid(i), 1, NOW - (30 - i) * 1000)))
     await capNhatExp(d.env, 'S1', NOW)
     const c = dongExp(d).filter((x) => x.loai === 'cau').map((x) => x.exp)
-    expect(c.slice(0, 20).every((e) => e === 2)).toBe(true)
-    expect(c[20]).toBe(1)
+    expect(c).toEqual(Array(21).fill(2))
   })
 })
 
@@ -483,23 +483,24 @@ describe('đạt nhiệm vụ ngày + chuỗi + mảnh khiên', () => {
 })
 
 describe('mảnh khiên → khiên rèn (nối vào hồ sơ game)', () => {
-  it('đủ 21 mảnh tự rèn 1 khiên, trừ 21; khiên còn dùng được tăng 1; 20 mảnh thì CHƯA', () => {
+  // SỬA CÓ CHỦ Ý 29/09 v5: một khiên = 36 mảnh (trước: 21), kẹp 72 (trước: 42) — chỉ áp cho hồ sơ rất cũ còn tự rèn bằng mảnh.
+  it('đủ 36 mảnh tự rèn 1 khiên, trừ 36; khiên còn dùng được tăng 1; 35 mảnh thì CHƯA', () => {
     const p: any = hoSoGame({ cap: 10 })
     const truoc = khienConLai(p)
-    const r = congTongSoVaoHoSo(p, 0, 22)
-    expect(r).toEqual({ exp: 0, manh: 22, khienMoi: 1 })
+    const r = congTongSoVaoHoSo(p, 0, 37)
+    expect(r).toEqual({ exp: 0, manh: 37, khienMoi: 1 })
     expect(p.khienRen).toEqual({ manh: 1, daRen: 1 })
     expect(khienConLai(p)).toBe(truoc + 1)
-    expect(congTongSoVaoHoSo(p, 0, 22)).toEqual({ exp: 0, manh: 0, khienMoi: 0 })
+    expect(congTongSoVaoHoSo(p, 0, 37)).toEqual({ exp: 0, manh: 0, khienMoi: 0 })
     const q: any = hoSoGame({ cap: 10 })
-    expect(congTongSoVaoHoSo(q, 0, 20)).toEqual({ exp: 0, manh: 20, khienMoi: 0 })
-    expect(q.khienRen).toEqual({ manh: 20, daRen: 0 })
+    expect(congTongSoVaoHoSo(q, 0, 35)).toEqual({ exp: 0, manh: 35, khienMoi: 0 })
+    expect(q.khienRen).toEqual({ manh: 35, daRen: 0 })
   })
-  it('đang giữ 5 khiên rèn CHƯA dùng thì không rèn thêm, mảnh kẹp ở 42', () => {
+  it('đang giữ 5 khiên rèn CHƯA dùng thì không rèn thêm, mảnh kẹp ở 72', () => {
     const p: any = hoSoGame({ cap: 1, khienRen: { manh: 0, daRen: 5 } })
     expect(khienRenChuaDung(p)).toBe(5)
     congTongSoVaoHoSo(p, 0, 90)
-    expect(p.khienRen).toEqual({ manh: 42, daRen: 5 })
+    expect(p.khienRen).toEqual({ manh: 72, daRen: 5 })
     p.shields = { used: 2, activeUntil: 0 }
     expect(khienRenChuaDung(p)).toBeLessThanOrEqual(5)
   })
@@ -602,7 +603,7 @@ describe('đường nộp và màn hình', () => {
     expect(r.ok).toBe(true)
     expect(r.exp.homNay).toBe(4)
     expect(r.exp.chiTietHomNay).toEqual([{ loai: 'cau', exp: 4, soKhoan: 2, ghiChu: '2 câu đúng: +4' }])
-    expect(r.exp.manhKhien).toMatchObject({ manh: 0, moiKhien: 21, khienRen: 0 })
+    expect(r.exp.manhKhien).toMatchObject({ manh: 0, moiKhien: 36, khienRen: 0 }) // SỬA CÓ CHỦ Ý 29/09 v5: 21 ⇒ 36 mảnh/khiên
     expect(r.expNhan).toHaveLength(2)
     const r2 = await goiWorker(worker, d.env, '/hs/ke-hoach-ngay', { sbd: 'S1' })
     expect(r2.expNhan).toEqual([])
@@ -705,30 +706,31 @@ describe('trạng thái đạt ngày cho giao diện: còn THIẾU gì', () => {
 })
 
 describe('tiếp sức đồng đội cho game (ghiTiepSuc)', () => {
-  it('+5 EXP mỗi lần (sửa CÓ CHỦ Ý 21/09 Điều 9: 3 ⇒ 5; qua cửa trần 120 EXP game), tối đa 5 lần một ngày VN, sang ngày mới đếm lại; khoá `<sbd>|tiepsuc|<ngày>|<n>`', async () => {
+  // SỬA CÓ CHỦ Ý 29/09 v5: BỎ trần 5 lần tiếp sức mỗi ngày (và trần 120 EXP game) — mọi lần đều +5; `conLai` = −1 (không giới hạn).
+  it('+5 EXP mỗi lần, KHÔNG trần số lần trong ngày (v5); khoá `<sbd>|tiepsuc|<ngày>|<n>`', async () => {
     const d = await dung()
     const kq = []
     for (let i = 0; i < 7; i++) kq.push(await ghiTiepSuc(d.env, 'S1', NOW + i))
-    expect(kq.map((x) => [x.exp, x.lanThu, x.conLai])).toEqual([[5, 1, 4], [5, 2, 3], [5, 3, 2], [5, 4, 1], [5, 5, 0], [0, 0, 0], [0, 0, 0]])
-    expect(khoaExp(d)).toEqual([1, 2, 3, 4, 5].map((n) => `tiepsuc|${HOM_NAY}|${n}`))
-    expect(docHoSoGame(d).earned).toBe(25)
+    expect(kq.map((x) => [x.exp, x.lanThu, x.conLai])).toEqual([1, 2, 3, 4, 5, 6, 7].map((n) => [5, n, -1]))
+    expect(khoaExp(d)).toEqual([1, 2, 3, 4, 5, 6, 7].map((n) => `tiepsuc|${HOM_NAY}|${n}`))
+    expect(docHoSoGame(d).earned).toBe(35)
     expect((await ghiTiepSuc(d.env, 'S1', NOW + D)).exp).toBe(5)
   })
   it('gọi lại cùng `idLuot` không cộng đôi', async () => {
     const d = await dung()
     expect((await ghiTiepSuc(d.env, 'S1', NOW, 'luot-1')).exp).toBe(5)
     const l = await ghiTiepSuc(d.env, 'S1', NOW + 1, 'luot-1')
-    expect(l).toMatchObject({ exp: 0, daGhiTruoc: true, conLai: 4 })
+    expect(l).toMatchObject({ exp: 0, daGhiTruoc: true, conLai: -1 })
     expect((await ghiTiepSuc(d.env, 'S1', NOW + 2, 'luot-2')).lanThu).toBe(2)
     expect(tongExp(d)).toBe(10)
   })
-  it('năm lượt CHỒNG NHAU vẫn đúng 5 khoản, mỗi ô một lần', async () => {
+  it('SỬA CÓ CHỦ Ý 29/09 v5 — tám lượt CHỒNG NHAU (khác lượt) ⇒ đủ 8 khoản, mỗi ô một lần, không cộng đôi', async () => {
     const d = await dung()
     serialiseD1(d.env)
     const r = await Promise.all(Array.from({ length: 8 }, (_, i) => ghiTiepSuc(d.env, 'S1', NOW + i, `l${i}`)))
-    expect(r.filter((x) => x.exp === 5)).toHaveLength(5)
-    expect(new Set(khoaExp(d)).size).toBe(5)
-    expect(docHoSoGame(d).earned).toBe(25)
+    expect(r.filter((x) => x.exp === 5)).toHaveLength(8)
+    expect(new Set(khoaExp(d)).size).toBe(8)
+    expect(docHoSoGame(d).earned).toBe(40)
   })
   it('cờ tắt → không ghi gì; không ném lỗi khi thiếu bảng', async () => {
     const t = taoD1That()

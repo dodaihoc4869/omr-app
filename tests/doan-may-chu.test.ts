@@ -361,7 +361,8 @@ describe('Đoàn Hộ Tống · máy chủ · Tiếp sức', () => {
     khongLo(xemThe.goiY, ['S2']); expect(JSON.stringify(xemThe)).not.toContain(`${BI_MAT}-${yq}`); expect(JSON.stringify(xemThe.goiY)).not.toMatch(/noiDung|choices|Kiến thức gốc|Phương án [ABCD] không/)
     await expect(goi(d, 'S1', 'tiep-suc', { ma, hiep: 1, den: 1, the: 'buoc_dau' })).rejects.toThrow('không dùng được')
     const gui = await goi(d, 'S1', 'tiep-suc', { ma, hiep: 1, den: 1, the: 'loai_phuong_an' }) as any
-    expect(gui.expTiepSuc).toEqual({ bat: true, exp: 5, conLai: 4 }); expect(gui.doan.tiepSuc).toMatchObject({ banCan: [], daGiup: true, lienKichSanSang: true }); expect(JSON.stringify(gui)).not.toContain(`${BI_MAT}-${yq}`); expect(JSON.stringify(gui)).not.toContain('"S2"')
+    expect(gui.expTiepSuc).toEqual({ bat: true, exp: 5, conLai: -1 }); // SỬA CÓ CHỦ Ý 29/09 v5: bỏ trần 5 lần tiếp sức/ngày ⇒ conLai −1 (không giới hạn)
+    expect(gui.doan.tiepSuc).toMatchObject({ banCan: [], daGiup: true, lienKichSanSang: true }); expect(JSON.stringify(gui)).not.toContain(`${BI_MAT}-${yq}`); expect(JSON.stringify(gui)).not.toContain('"S2"')
     expect(JSON.stringify(gui)).not.toContain('không đúng — em gạch') // nội dung thẻ không về máy người giúp
     const b = await goi(d, 'S2', 'xem', { ma })
     expect(b.doan.tiepSuc).toMatchObject({ conLuotNhan: 1, daXin: false, lienKichSanSang: true, theNhan: { tuTen: 'Thu Hà', tuLaMay: false, loai: 'loai_phuong_an', tieuDe: 'Loại 1 phương án' } })

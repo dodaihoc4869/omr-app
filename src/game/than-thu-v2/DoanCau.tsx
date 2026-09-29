@@ -43,9 +43,9 @@ export interface DoanCau2 { gach?: readonly string[]; bua?: ReactNode; xemLaiChu
 
 export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, gach, bua, xemLaiChuan }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode } & DoanCau2) {
   const hinh = q.hinhAnh as HinhAnh[]
-  // Luật v4 (29/09): "+N EXP" bay sang thần thú — số máy chủ (`reward`); câu sai / có trợ giúp / có Bùa Trợ giảng ⇒ không hiệu ứng.
+  // Luật v4 (29/09): "+N EXP" bay sang thần thú — số máy chủ (`expCau`; máy chủ cũ: `reward`); câu sai / có trợ giúp / có Bùa Trợ giảng ⇒ không hiệu ứng.
   const cheDo = useCheDoHieuUng()
-  const expBay = ketQua ? expCauGame({ correct: ketQua.correct, assisted: ketQua.assisted, coTroGiup: (gach?.length ?? 0) > 0, reward: ketQua.reward }) : 0
+  const expBay = ketQua ? expCauGame({ correct: ketQua.correct, assisted: ketQua.assisted, coTroGiup: (gach?.length ?? 0) > 0, reward: ketQua.reward, expCau: ketQua.expCau }) : 0
   if (xemLaiChuan && ketQua) return (
     <section className="dh-giay dh2-giay-ket" aria-label="Kết quả câu của em">
       <div className="dh-giay-dau">{dau}</div>

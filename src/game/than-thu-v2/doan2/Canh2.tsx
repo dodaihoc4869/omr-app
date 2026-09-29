@@ -83,7 +83,7 @@ export default function Canh2({ xem, tran, con, mo, oPhucKich, onRoi }: Props) {
           {donEm && <path d="M250 250 l16 -8 l-6 10 l14 -2 l-16 10 l6 -8 z" fill="rgb(255,224,138)" />}
         </svg>
         {tran.laTrum && <div className="dh2-trum"><TrumHinh loai={tran.loaiTrum[soTrum] ?? ''} size={150} className="dh-noi" /></div>}
-        {em && <ThuHinh pet={em.pet} cap={em.cap} className="dh-noi" style={{ left: '9%', top: '52%', width: '33%', aspectRatio: '1' }} />}
+        {em && <ThuHinh pet={em.pet} cap={em.cap} className="dh-noi dh-thu-em" style={{ left: '9%', top: '52%', width: '33%', aspectRatio: '1' }} />}
         {ban.slice(0, CHO_BAN.length).map((g, i) => <ThuHinh key={g.ghe} pet={g.pet} cap={g.cap} className="dh-noi-2" style={{ ...CHO_BAN[i], aspectRatio: '1', animationDelay: `${i * .4}s` }} />)}
         {donEm && (
           <div className="dh2-sat-thuong" aria-label={`Đòn của em hiệp ${vua!.hiep}: ${donEm.satThuong} sát thương`}>

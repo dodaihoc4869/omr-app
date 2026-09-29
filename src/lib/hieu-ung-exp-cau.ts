@@ -11,13 +11,17 @@ export interface KhoanExpNhan {
   qid?: string
 }
 
-/** Thần thú sau lượt nộp (máy chủ v4 gửi `thanThu`). */
+/** Thần thú sau lượt nộp (máy chủ v4/v5 gửi `thanThu`). v5 (chỉ-thêm): `choNgay` số ngày đạt còn thiếu khi thanh đã đầy; `tran`/`vangTran`/`manhTran` EXP tràn của lần này và phần đã đổi. */
 export interface AnhThuNhan {
   cap: number
   exp: number
   thanh: number
   soCapLen: number
   choMoc: number
+  choNgay?: number
+  tran?: number
+  vangTran?: number
+  manhTran?: number
 }
 
 export type CheDoHieuUng = 'day-du' | 'gon' | 'tinh'
@@ -48,12 +52,14 @@ export function expTheoCau(
 }
 
 /**
- * EXP hiện cho MỘT câu trả lời trong GAME (Đảo, Đoàn Hộ Tống, Bi-a): số lấy NGUYÊN từ phản hồi máy chủ (`reward` thưởng nấc đã qua trần 120 + `expThuThach`).
- * Câu sai, câu có trợ giúp (ô "Trợ giúp", Bùa Trợ giảng) hoặc câu em đã bấm Hỏi thầy ⇒ 0 (không hiệu ứng), dù máy chủ trả gì.
+ * EXP hiện cho MỘT câu trả lời trong GAME (Đảo, Đảo 2, Đoàn Hộ Tống, Bi-a): số lấy NGUYÊN từ phản hồi máy chủ.
+ * Luật 29/09: máy chủ trả `expCau` = EXP THẬT đã vào thú nhờ câu này (EXP câu game theo bảng + thưởng nấc + thử thách) ⇒ dùng đúng số đó.
+ * Máy chủ cũ chưa có `expCau` ⇒ lùi về `reward` + `expThuThach`. Câu sai, câu có trợ giúp (ô "Trợ giúp", Bùa Trợ giảng) hoặc em đã bấm Hỏi thầy ⇒ 0 (không hiệu ứng), dù máy chủ trả gì.
  */
-export function expCauGame(r: { correct?: boolean; assisted?: boolean; coTroGiup?: boolean; daHoi?: boolean; reward?: number; expThuThach?: number } | null | undefined): number {
+export function expCauGame(r: { correct?: boolean; assisted?: boolean; coTroGiup?: boolean; daHoi?: boolean; reward?: number; expThuThach?: number; expCau?: number } | null | undefined): number {
   if (!r || r.correct !== true || r.assisted === true || r.coTroGiup === true || r.daHoi === true) return 0
   const so = (x: unknown) => (typeof x === 'number' && Number.isFinite(x) && x > 0 ? Math.floor(x) : 0)
+  if (typeof r.expCau === 'number') return so(r.expCau)
   return so(r.reward) + so(r.expThuThach)
 }
 
@@ -65,7 +71,8 @@ export function docAnhThu(raw: unknown): AnhThuNhan | null {
   const o = raw as Record<string, unknown>
   const cap = nguyen(o.cap), exp = nguyen(o.exp), thanh = nguyen(o.thanh)
   if (cap === null || cap < 1 || exp === null || thanh === null) return null
-  return { cap, exp, thanh, soCapLen: nguyen(o.soCapLen) ?? 0, choMoc: nguyen(o.choMoc) ?? 0 }
+  const them = (k: 'choNgay' | 'tran' | 'vangTran' | 'manhTran') => { const v = nguyen(o[k]); return v && v > 0 ? { [k]: v } : {} }
+  return { cap, exp, thanh, soCapLen: nguyen(o.soCapLen) ?? 0, choMoc: nguyen(o.choMoc) ?? 0, ...them('choNgay'), ...them('tran'), ...them('vangTran'), ...them('manhTran') }
 }
 
 /** Tỉ lệ thanh EXP (0…1); cấp tối đa (thanh 0) ⇒ đầy. */
@@ -76,5 +83,12 @@ export const chuExpCau = (n: number): string => `+${Math.max(0, Math.floor(n)).t
 export const chuLenCap = (cap: number): string => `Lên cấp ${cap}!`
 export const chuThanhThu = (t: AnhThuNhan): string =>
   t.thanh > 0 ? `Thần thú cấp ${t.cap} · ${t.exp.toLocaleString('vi-VN')} / ${t.thanh.toLocaleString('vi-VN')} EXP` : `Thần thú cấp ${t.cap} · cấp cao nhất`
-export const chuChoMocNgan = (choMoc: number, ngayCan: number): string =>
-  `${Math.max(0, Math.floor(choMoc)).toLocaleString('vi-VN')} EXP đang được giữ, vào thần thú khi em đạt nhiệm vụ ngày đủ ${ngayCan} ngày.`
+/** EXP chờ mốc của luật cũ (ngăn riêng): được giữ, vào thú khi em có thêm ngày đạt. */
+export const chuChoMocNgan = (choMoc: number): string =>
+  `${Math.max(0, Math.floor(choMoc)).toLocaleString('vi-VN')} EXP đang được giữ, vào thần thú khi em đạt nhiệm vụ ngày thêm ngày mới.`
+/** v5: thanh đã đầy, còn thiếu ngày đạt. `vangTran`/`manhTran` = phần EXP làm thêm vừa đổi được (có thì nói, có số). */
+export const chuChoNgayNgan = (t: Pick<AnhThuNhan, 'cap' | 'choNgay' | 'vangTran' | 'manhTran'>): string => {
+  const n = Math.max(0, Math.floor(t.choNgay ?? 0)), v = Math.max(0, Math.floor(t.vangTran ?? 0)), m = Math.max(0, Math.floor(t.manhTran ?? 0))
+  const doi = v > 0 || m > 0 ? ` EXP làm thêm đổi thành ${[v > 0 ? `+${v.toLocaleString('vi-VN')} vàng` : '', m > 0 ? `+${m} mảnh khiên` : ''].filter(Boolean).join(', ')}.` : ''
+  return `Thanh EXP đã đầy. Em đạt nhiệm vụ ngày thêm ${n} ngày nữa thì thần thú lên cấp ${t.cap + 1}.${doi}`
+}

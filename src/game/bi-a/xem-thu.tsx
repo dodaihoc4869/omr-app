@@ -10,6 +10,8 @@ import '@fontsource/be-vietnam-pro/latin-600.css'
 import '@fontsource/be-vietnam-pro/latin-700.css'
 import '../../styles/tokens.css'
 import '../../index.css'
+import '../../components/exp-cau/exp-cau.css' // hiệu ứng "+N EXP" (bản thật nạp ở src/main.tsx)
+import { expMotCauGame } from '../../../server/src/exp-hoc-tap'
 import BiaGame from './BiaGame'
 import { datBoGoiBia } from './api'
 
@@ -50,7 +52,7 @@ datBoGoiBia(async (lenh, _token, d = {}) => {
     const c = CAU.find((x) => x.qid === d.qid)!
     const tl = String(d.answer ?? '')
     const dung = c.phan === 'III' ? chuan(tl) === chuan(c.dap) : tl === c.dap
-    return { ok: true, correct: dung, answer: c.dap, traLoi: tl, solution: loiGiai(c), solutionImages: [], reward: dung ? 4 : 0 }
+    return { ok: true, correct: dung, answer: c.dap, traLoi: tl, solution: loiGiai(c), solutionImages: [], reward: dung ? 4 : 0, expCau: dung ? 4 + expMotCauGame(c.phan, 1) : 0 }
   }
   if (lenh === 'bia-doi-cau') { const moi = du.shift(); return moi ? { ok: true, trong: false, cau: congKhai(moi) } : { ok: true, trong: true } }
   if (lenh === 'bia-ket-van') return { ok: true, theLuc: { con: 18, tong: 40 } }

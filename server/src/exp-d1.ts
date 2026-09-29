@@ -15,13 +15,13 @@ import type { D1PreparedStatement, Env } from './kieu'
 import { DemTTL } from './dem-chung'
 import { gameIdentity } from './game-v2-auth'
 import { chuyenTrangThaiTrongNgay } from './exp-chuyen-trang-thai'
-import { EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, TIEP_SUC_TOI_DA_NGAY, bangGiaExp } from './exp-cau-hinh'
+import { EXP_MOI_TU, EXP_TIEP_SUC, MANH_MOI_KHIEN, SQL_KHIEN_MOC, SQL_SO_MANH_TINH, bangGiaExp } from './exp-cau-hinh'
 import { congManh, NGUON_EXP_CAU, tinhExp, type KhoanExp, type KhoanManh, type MetaCauExp, type VaoTinhExp } from './exp-hoc-tap'
 import { congTongSoVaoHoSo, khienConLai, khienRenChuaDung, type DaCong, type HoSoGameExp } from './exp-ho-so-game'
 import { NGAN_SACH_SAN, TOI_THIEU_CAU_SAN } from './ho-so-cau-hinh'
 import type { SuKienDoc } from './ho-so-nam-kt'
 import { traCuuTheoQid } from './ho-so-nam-kt'
-import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach } from './ke-hoach-ngay-d1'
+import { docNgayNghi, hsKeHoachNgay, lapVaLuuKeHoach, phanTichNgayNghi } from './ke-hoach-ngay-d1'
 import { docHapThuChoEm, nhanExpGame } from './game-v2-hap-thu'
 import type { Profile } from './game-v2'
 import { tinhDatNhiemVuNgay } from '../../src/lib/dat-nhiem-vu-ngay'
@@ -561,6 +561,18 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
 }
 
 /**
+ * v5 (điểm chốt 2): số NGÀY NGHỈ CHUNG thầy đặt (`cau_hinh.ngay_nghi`) được tính là ngày đạt cho MỐC CẤP (không cộng mảnh): ngày nghỉ từ mốc `khien_moc`
+ * và từ đầu mùa (`since`) tới HÔM NAY, không trùng ngày em đã đạt (`dsDat` = các ngày đạt, cách nhau dấu phẩy). Hàm thuần.
+ */
+export function demNgayNghiChoCap(cauHinhNghi: string, dsDat: string, moc: string, since: string, homNay: string): number {
+  const dat = new Set(dsDat.split(',').map((x) => x.trim()).filter(Boolean))
+  const tu = [moc, since ? ngayVn(since) : ''].reduce((a, b) => (b > a ? b : a), '')
+  let n = 0
+  for (const d of phanTichNgayNghi(cauHinhNghi)) if (d >= tu && d <= homNay && !dat.has(d)) n++
+  return n
+}
+
+/**
  * Cộng phần chênh SUM(sổ) − đã cộng vào hồ sơ game bằng CAS theo `revision` (thử tối đa 3 lần). Em chưa có hồ sơ game → null, khoản nằm chờ.
  * `since` = ngày bắt đầu mùa game (hồ sơ mùa mới không nhận khoản của mùa cũ).
  */
@@ -579,16 +591,20 @@ export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Pro
       () => env.DB.prepare(
         `SELECT (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) AS e,
                 (SELECT COALESCE(SUM(${SQL_SO_MANH_TINH}), 0) FROM manh_khien_so WHERE sbd = ? AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS m,
-                (SELECT COUNT(*) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS d`,
-      ).bind(sbd, since, sbd, since, sbd, since).first<{ e: number; m: number; d: number }>(),
+                (SELECT COUNT(*) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS d,
+                (SELECT group_concat(ngay_vn) FROM manh_khien_so WHERE sbd = ? AND loai = 'dat' AND luc >= ? AND ngay_vn >= ${SQL_KHIEN_MOC}) AS ds,
+                ${SQL_KHIEN_MOC} AS moc,
+                (SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngay_nghi') AS nn`,
+      ).bind(sbd, since, sbd, since, sbd, since, sbd, since).first<{ e: number; m: number; d: number; ds: string | null; moc: string | null; nn: string | null }>(),
       null,
     )
     if (!t) return null
     const tongExp = Number(t.e) || 0
     const tongManh = Number(t.m) || 0
     const ngayDat = Number(t.d) || 0
-    if (tongExp === (p.expMoi?.daCong ?? 0) && tongManh === (p.expMoi?.manhDaTinh ?? 0) && ngayDat === (p.expMoi?.ngayDat ?? 0)) return { exp: 0, manh: 0, khienMoi: 0 }
-    const ra = congTongSoVaoHoSo(p, tongExp, tongManh, ngayDat)
+    const ngayNghi = demNgayNghiChoCap(String(t.nn ?? ''), String(t.ds ?? ''), String(t.moc ?? ''), since, ngayVn(Date.now()))
+    if (tongExp === (p.expMoi?.daCong ?? 0) && tongManh === (p.expMoi?.manhDaTinh ?? 0) && ngayDat === (p.expMoi?.ngayDat ?? 0) && ngayNghi === (p.expMoi?.ngayNghi ?? 0)) return { exp: 0, manh: 0, khienMoi: 0 }
+    const ra = congTongSoVaoHoSo(p, tongExp, tongManh, ngayDat, ngayNghi)
     const lenh: D1PreparedStatement[] = [
       env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(json(p), sbd, row.revision),
     ]
@@ -621,17 +637,18 @@ export async function congVaoHoSoGame(env: Env, sbd: string, since: string): Pro
 export interface KetQuaTiepSuc {
   /** false = EXP mới chưa bật cho em này: KHÔNG ghi gì. */
   bat: boolean
-  /** EXP vừa cộng lần này (0 khi đã đủ số lần trong ngày hoặc lượt này đã ghi rồi). */
+  /** EXP vừa cộng lần này (0 khi lượt này đã ghi rồi). */
   exp: number
-  /** Lần tiếp sức thứ mấy trong ngày (1..TIEP_SUC_TOI_DA_NGAY); 0 khi đã đủ. */
+  /** Lần tiếp sức thứ mấy trong ngày (1, 2, …); 0 khi lượt này đã ghi rồi. */
   lanThu: number
+  /** v5: bỏ trần số lần tiếp sức mỗi ngày ⇒ luôn −1 (không giới hạn). Giữ trường cho máy em cũ. */
   conLai: number
   /** Lượt này (`idLuot`) đã được ghi từ trước — gọi lại không cộng thêm. */
   daGhiTruoc: boolean
 }
 
 /**
- * Tiếp sức đồng đội: +EXP_TIEP_SUC mỗi lần, tối đa TIEP_SUC_TOI_DA_NGAY lần mỗi ngày VN. Khoá `tiepsuc|<ngày>|<n>` trong sổ của em (khoá đầy đủ
+ * Tiếp sức đồng đội: +EXP_TIEP_SUC mỗi lần (v5: không trần số lần mỗi ngày VN). Khoá `tiepsuc|<ngày>|<n>` trong sổ của em (khoá đầy đủ
  * `<sbd>|tiepsuc|<ngày>|<n>`). `idLuot` (mã lượt của game) làm gọi lại cùng lượt KHÔNG cộng đôi. Không ném lỗi. Game gọi hàm này sau khi tự xác thực em.
  */
 export async function ghiTiepSuc(env: Env, sbd: string, nowMs: number, idLuot: string | null = null): Promise<KetQuaTiepSuc> {
@@ -641,23 +658,22 @@ export async function ghiTiepSuc(env: Env, sbd: string, nowMs: number, idLuot: s
     if (!tu) return khong
     const ngay = ngayVn(nowMs)
     const luc = new Date(nowMs).toISOString()
-    for (let thu = 0; thu < TIEP_SUC_TOI_DA_NGAY + 1; thu++) {
+    for (let thu = 0; thu < 12; thu++) {
       const r = await env.DB.prepare("SELECT khoa, ma_nguon FROM exp_so WHERE sbd = ? AND ngay_vn = ? AND loai = 'tiepsuc'").bind(sbd, ngay).all<{ khoa: string; ma_nguon: string | null }>()
       const co = r.results ?? []
-      if (idLuot && co.some((x) => x.ma_nguon === idLuot)) { await congVaoHoSoGame(env, sbd, await docTuNgayMua(env)); return { bat: true, exp: 0, lanThu: 0, conLai: Math.max(0, TIEP_SUC_TOI_DA_NGAY - co.length), daGhiTruoc: true } }
-      if (co.length >= TIEP_SUC_TOI_DA_NGAY) return { bat: true, exp: 0, lanThu: 0, conLai: 0, daGhiTruoc: false }
+      if (idLuot && co.some((x) => x.ma_nguon === idLuot)) { await congVaoHoSoGame(env, sbd, await docTuNgayMua(env)); return { bat: true, exp: 0, lanThu: 0, conLai: -1, daGhiTruoc: true } }
       const n = co.length + 1
-      // ĐIỀU 9: tiếp sức là EXP sinh trong game ⇒ qua cửa trần 120 EXP/ngày (quá trần ghi khoản 0 EXP, vẫn tính là một lần tiếp sức).
+      // v5: bỏ trần 5 lần/ngày và trần 120 EXP game/ngày — mỗi lần tiếp sức đủ EXP_TIEP_SUC.
       const k: KhoanGame = { khoa: `tiepsuc|${ngay}|${n}`, loai: 'tiepsuc', exp: EXP_TIEP_SUC, ngay, luc, maNguon: idLuot, ghiChu: `Tiếp sức đồng đội lần ${n}` }
       const w = await ghiGameNguyenTu(env, sbd, k)
       if (w.ghi) {
         await congVaoHoSoGame(env, sbd, await docTuNgayMua(env))
         emCoGhi(sbd)
-        return { bat: true, exp: w.exp, lanThu: n, conLai: TIEP_SUC_TOI_DA_NGAY - n, daGhiTruoc: false }
+        return { bat: true, exp: w.exp, lanThu: n, conLai: -1, daGhiTruoc: false }
       }
       // Ô số n vừa bị lượt khác giữ chỗ: đọc lại và thử ô kế.
     }
-    return { bat: true, exp: 0, lanThu: 0, conLai: 0, daGhiTruoc: false }
+    return { bat: true, exp: 0, lanThu: 0, conLai: -1, daGhiTruoc: false }
   } catch (e) {
     console.error('[exp] tiếp sức lỗi (bỏ qua):', e instanceof Error ? e.message : e)
     return khong
@@ -674,11 +690,13 @@ export interface KhoanGame {
   ghiChu: string
   maNguon?: string | null
   qid?: string | null
+  /** true ⇒ KHÔNG qua trần 120 EXP game/ngày và không tính vào bộ đếm trần (EXP câu game, luật 29/09 chờ v5). */
+  khongTran?: boolean
 }
 
 /**
- * Ghi MỘT khoản EXP sinh trong game (thử thách/Lượt trùm, kết chặng Đoàn, vỡ giáp…) cùng hạn mức 120/ngày trong một giao dịch, rồi cộng phần chênh sổ vào ống nghiệm. Idempotent theo `khoa`.
- * Quá trần ⇒ ghi khoản 0 EXP (đánh dấu đã xét, không tự cộng lại khi sang ngày). EXP mới TẮT cho em ⇒ không ghi gì. Không ném lỗi.
+ * Ghi MỘT khoản EXP sinh trong game (câu game đúng, thử thách/Lượt trùm, kết chặng Đoàn, vỡ giáp…) trong một giao dịch, rồi cộng phần chênh sổ vào thú. Idempotent theo `khoa`.
+ * v5: bỏ trần 120 EXP game/ngày (bộ đếm theo ngày vẫn ghi để thống kê). EXP mới TẮT cho em ⇒ không ghi gì. Không ném lỗi.
  */
 export async function ghiKhoanExpGame(env: Env, sbd: string, k: KhoanGame, nowMs: number): Promise<{ bat: boolean; exp: number; daGhiTruoc: boolean }> {
   try {
@@ -711,16 +729,14 @@ async function ghiGameNguyenTu(env: Env, sbd: string, k: KhoanGame): Promise<{ g
       continue
     }
     const p = JSON.parse(row.json) as Profile
-    const exp = nhanExpGame(p, k.ngay, k.exp)
+    const exp = k.khongTran ? Math.max(0, Math.floor(Number(k.exp) || 0)) : nhanExpGame(p, k.ngay, k.exp)
     const khoa = `${sbd}|${k.khoa}`
     const ketQua = await env.DB.batch([
       env.DB.prepare(`INSERT OR IGNORE INTO exp_so(khoa,sbd,ngay_vn,loai,qid,ma_nguon,exp,luc,ghi_chu)
         SELECT ?,?,?,?,?,?,?,?,? WHERE EXISTS(SELECT 1 FROM game_v2_profile WHERE sbd=? AND revision=?)
-        AND (? <> 'tiepsuc' OR (
-          (SELECT COUNT(*) FROM exp_so WHERE sbd=? AND ngay_vn=? AND loai='tiepsuc') < ?
-          AND (? IS NULL OR NOT EXISTS(SELECT 1 FROM exp_so WHERE sbd=? AND ngay_vn=? AND loai='tiepsuc' AND ma_nguon=?))))`)
+        AND (? <> 'tiepsuc' OR ? IS NULL OR NOT EXISTS(SELECT 1 FROM exp_so WHERE sbd=? AND ngay_vn=? AND loai='tiepsuc' AND ma_nguon=?))`)
         .bind(khoa,sbd,k.ngay,k.loai,k.qid??null,k.maNguon??null,exp,k.luc,k.ghiChu,sbd,row.revision,
-          k.loai,sbd,k.ngay,TIEP_SUC_TOI_DA_NGAY,k.maNguon??null,sbd,k.ngay,k.maNguon??null),
+          k.loai,k.maNguon??null,sbd,k.ngay,k.maNguon??null),
       env.DB.prepare('UPDATE game_v2_profile SET json=?, revision=revision+1 WHERE sbd=? AND revision=? AND changes()=1')
         .bind(json(p),sbd,row.revision),
     ])
@@ -843,7 +859,7 @@ export async function chotExpNgayQuaDayDu(env: Env, nowMs: number, tuyChon: { to
 
 const TEN_LOAI: Record<string, string> = {
   cau: 'câu đúng', lo: 'lô BTVN', btvn: 'nộp bài BTVN đúng hạn', mom: 'bài được giao', len_bac: 'câu ôn lên bậc', khac_phuc: 'câu khắc phục xong',
-  len_bang: 'lần lên bảng', diem_ca: 'ca thi có điểm', dat_ngay: 'lần đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt', tiepsuc: 'lượt tiếp sức', dau_ngay: 'câu đúng đầu tiên trong ngày', tro_lai: 'lần mừng em trở lại', thu_thach: 'câu thử thách đúng', doan_chang: 'chặng Đoàn thắng', doan_giap: 'lần vỡ giáp trùm',
+  len_bang: 'lần lên bảng', diem_ca: 'ca thi có điểm', dat_ngay: 'lần đạt nhiệm vụ ngày', chuoi: 'chuỗi ngày đạt', tiepsuc: 'lượt tiếp sức', dau_ngay: 'câu đúng đầu tiên trong ngày', tro_lai: 'lần mừng em trở lại', thu_thach: 'câu thử thách đúng', cau_game: 'câu đúng trong game', doan_chang: 'chặng Đoàn thắng', doan_giap: 'lần vỡ giáp trùm',
 }
 
 export interface ExpHomNay {

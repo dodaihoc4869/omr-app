@@ -4,10 +4,9 @@
 // Tất định: cùng đầu vào → cùng danh sách; thứ tự theo `luc`, hoà thì theo `khoa`. Mọi khoản có KHOÁ idempotent; khoá nằm trong `daCoKhoa` thì
 // KHÔNG sinh lại (gọi lại/nạp lại sổ không cộng trùng).
 import {
-  EXP_CAU, EXP_CHUOI_HE_SO, EXP_CHUOI_TOI_DA, EXP_DIEM_CA_HE_SO, EXP_KHAC_PHUC, EXP_LEN_BAC, EXP_LEN_BANG_CHUA_DAT,
+  EXP_CAU, EXP_CAU_GAME, EXP_CHUOI_HE_SO, EXP_CHUOI_TOI_DA, EXP_DIEM_CA_HE_SO, EXP_KHAC_PHUC, EXP_LEN_BAC, EXP_LEN_BANG_CHUA_DAT,
   EXP_LEN_BANG_DAT, EXP_MOM_XONG, KHIEN_REN_TOI_DA, MANH_CHUOI_BOI_SO, MANH_CHUOI_BOI_SO_THUONG, MANH_DANG_ROI_YEU,
-  MANH_DAT_NGAY, MANH_MOI_KHIEN, MANH_TOI_DA, TRAN_MEM_HE_SO, TRAN_MEM_TY_LE, TRO_LAI_CACH_NHAU, TRO_LAI_VANG_TOI_THIEU, bangGiaExp,
-  KHAC_PHUC_TOI_DA_NGAY, LEN_BAC_TOI_DA_NGAY, TRAN_CUNG_HE_SO,
+  MANH_DAT_NGAY, MANH_MOI_KHIEN, MANH_TOI_DA, TRO_LAI_CACH_NHAU, TRO_LAI_VANG_TOI_THIEU, bangGiaExp,
 } from './exp-cau-hinh'
 
 /** Nguồn cho EXP câu: mọi nguồn TRỪ game (game giữ 20/40/40 theo mastery, tránh thưởng đôi) và trừ `len_bang` (có thưởng riêng). */
@@ -111,8 +110,16 @@ export function expMotCau(phan: 'I' | 'II' | 'III', sao: number): number {
   return EXP_CAU[phan][s]!
 }
 
-/** Sau ngưỡng trần mềm: 25% làm tròn lên, tối thiểu 1. */
-export const expSauTran = (goc: number): number => Math.max(1, Math.ceil(goc * TRAN_MEM_TY_LE))
+/**
+ * EXP MỘT câu GAME tự làm ĐÚNG (Đảo, Đảo 2, Đoàn, Bi-a — thầy 29/09: "trả lời đúng mỗi câu trong game đều có +N EXP bay vào thú"). MỘT hàm duy nhất cho mọi game.
+ * v5 (THẦY ĐÃ CHỐT 29/09, điểm 5): = ½ câu học tập làm tròn lên (bảng `EXP_CAU_GAME`: I 1/2/3 · II 2/3/4 · III 2/3/5), KHÔNG trần ngày; phần lạ ⇒ Phần I, sao lạ ⇒ 0.
+ * Câu thử thách / câu trùm KHÔNG dùng hàm này (giữ đủ `expMotCau`, không cộng thêm).
+ */
+export function expMotCauGame(phan: string, sao: number): number {
+  const ph = phan === 'II' || phan === 'III' ? phan : 'I'
+  const s = sao === 1 || sao === 2 ? sao : 0
+  return EXP_CAU_GAME[ph][s]!
+}
 
 export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] } {
   const khoan: KhoanExp[] = []
@@ -122,26 +129,17 @@ export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] }
     if (k.exp > 0 && !v.daCoKhoa.has(k.khoa)) khoan.push(k)
   }
 
-  // 1. Câu ĐÚNG: mỗi qid MỘT lần mỗi ngày VN (lần đúng ĐẦU trong ngày, theo `luc` rồi `khoa`). Trần mềm xét theo THỨ TỰ trong ngày của TOÀN BỘ câu-được-thưởng
-  //    (kể cả câu đã có khoá từ lần gọi trước) nên kết quả không phụ thuộc số lần gọi.
+  // 1. Câu ĐÚNG: mỗi qid MỘT lần mỗi ngày VN (lần đúng ĐẦU trong ngày, theo `luc` rồi `khoa`) — luật chống lặp theo khoá sổ.
+  //    v5 (thầy chốt 29/09): BỎ trần mềm 25% và trần cứng 3× mục tiêu — MỌI câu đúng đều đủ EXP (chống cày là cổng ngày đạt + EXP tràn giảm dần).
   const dung = sapXep(v.suKien.filter((e) => e.ketQua === 1 && e.qid && NGUON_EXP_CAU.includes(e.nguon)))
   const daTinh = new Set<string>()
-  const nguong = TRAN_MEM_HE_SO * Math.max(0, Math.floor(v.mucTieuCau))
-  // Trần CỨNG (v4): câu thứ tự ≥ TRAN_CUNG_HE_SO × mục tiêu (đếm từ 0) = 0 EXP ⇒ không sinh khoản. Làm 200 câu vẫn chỉ bằng 3× mục tiêu câu.
-  const tranCung = TRAN_CUNG_HE_SO * Math.max(0, Math.floor(v.mucTieuCau))
-  let thuTu = 0
   for (const e of dung) {
     if (daTinh.has(e.qid)) continue
     daTinh.add(e.qid)
     const meta = v.metaCau[e.qid]
     const phan = meta?.phan ?? phanTuQid(e.qid)
-    const goc = expMotCau(phan, meta?.sao ?? 0)
-    const qua = thuTu >= nguong
-    const hetTran = thuTu >= tranCung
-    thuTu++
-    if (hetTran) continue
-    const exp = qua ? expSauTran(goc) : goc
-    them({ khoa: `cau|${e.qid}|${v.ngay}`, loai: 'cau', exp, ngay: v.ngay, qid: e.qid, maNguon: e.maNguon, luc: e.luc, ghiChu: `Câu đúng Phần ${phan}${meta?.sao ? `, ${meta.sao} sao` : ''}: +${exp}${qua ? ' (đã quá mục tiêu ngày, tính 25%)' : ''}` })
+    const exp = expMotCau(phan, meta?.sao ?? 0)
+    them({ khoa: `cau|${e.qid}|${v.ngay}`, loai: 'cau', exp, ngay: v.ngay, qid: e.qid, maNguon: e.maNguon, luc: e.luc, ghiChu: `Câu đúng Phần ${phan}${meta?.sao ? `, ${meta.sao} sao` : ''}: +${exp}` })
   }
 
   // 1b. Câu ĐÚNG ĐẦU TIÊN trong ngày (Điều 10): MỌI nguồn kể cả game (khác EXP câu ở trên), một khoản mỗi ngày, không tính vào trần game. Bảng cũ (trước 22/09) giá 0 ⇒ không sinh.
@@ -167,23 +165,16 @@ export function tinhExp(v: VaoTinhExp): { khoan: KhoanExp[]; manh: KhoanManh[] }
     if (b.dungHan) them({ khoa: `btvn|${b.maBtvn}`, loai: 'btvn', exp: gia.btvnDungHan, ngay: v.ngay, maNguon: b.maBtvn, luc: b.luc, ghiChu: `Nộp cả bài BTVN đúng hạn: +${gia.btvnDungHan}` })
   }
   for (const m of v.momXong) them({ khoa: `mom|${m.id}`, loai: 'mom', exp: EXP_MOM_XONG, ngay: v.ngay, maNguon: m.id, luc: m.luc, ghiChu: `Xong bài được giao: +${EXP_MOM_XONG}` })
-  // Trần nguồn v4: lên bậc ≤ LEN_BAC_TOI_DA_NGAY khoản/ngày, khắc phục ≤ KHAC_PHUC_TOI_DA_NGAY khoản/ngày — đếm CẢ khoản đã ghi ở lần gọi trước (kết quả không phụ thuộc số lần gọi).
-  const tienToBac = 'bac|', hauToBac = `|${v.ngay}`
-  let daBac = Math.max(v.daTraTrongNgay?.lenBac ?? 0, [...v.daCoKhoa].filter((k) => k.startsWith(tienToBac) && k.endsWith(hauToBac)).length)
+  // v5: BỎ trần lên bậc ≤ 10 và khắc phục ≤ 3 mỗi ngày — mỗi khoá một lần (chống lặp theo khoá sổ).
   for (const qid of [...new Set(v.lenBac)].sort()) {
     const khoa = `bac|${qid}|${v.ngay}`
     if (v.daCoKhoa.has(khoa)) continue
-    if (daBac >= LEN_BAC_TOI_DA_NGAY) break
     const luc = v.suKien.filter((e) => e.qid === qid && e.ketQua === 1).map((e) => e.luc).sort()[0] ?? `${v.ngay}T00:00:00.000Z`
     them({ khoa, loai: 'len_bac', exp: EXP_LEN_BAC, ngay: v.ngay, qid, luc, ghiChu: `Câu ôn lên bậc: +${EXP_LEN_BAC}` })
-    daBac++
   }
-  let daKp = Math.max(0, v.daTraTrongNgay?.khacPhuc ?? 0)
   for (const k of sapXep(v.khacPhuc.map((x) => ({ ...x, khoa: `kp|${x.qid}|${x.lan}` })))) {
     if (v.daCoKhoa.has(k.khoa)) continue
-    if (daKp >= KHAC_PHUC_TOI_DA_NGAY) break
     them({ khoa: k.khoa, loai: 'khac_phuc', exp: EXP_KHAC_PHUC, ngay: v.ngay, qid: k.qid, luc: k.luc, ghiChu: `Khắc phục xong một câu (đúng 3 mốc): +${EXP_KHAC_PHUC}` })
-    daKp++
   }
   for (const e of sapXep(v.suKien.filter((x) => x.nguon === 'len_bang' && x.ketQua !== null))) {
     const dat = e.ketQua === 1

@@ -32,7 +32,9 @@ export const TEN_QUAI='Quái Sương Mù'
 const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
 export interface PhanHoi2{correct:boolean;answer:string;traLoi:string;solution:unknown;solutionImages:HinhAnh[];reward:number;lyDo:LyDoThuong
  /** Luật v4 (chỉ-thêm): EXP câu thử thách máy chủ trả; `coTroGiup` = câu có trợ giúp / Bùa / Hỏi thầy ⇒ không hiệu ứng. */
- expThuThach?:number;coTroGiup?:boolean}
+ expThuThach?:number;coTroGiup?:boolean
+ /** Luật 29/09: EXP thật máy chủ ghi cho câu này (dùng nguyên số). */
+ expCau?:number}
 
 // ───────────── thanh 6 nút của chuyến ─────────────
 /** Nút đã qua: xanh (đúng) / hồng (chưa đúng); nút đang làm sáng; nút Trùm ải là ô trám tím viền vàng. */
@@ -149,19 +151,21 @@ export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom,nguon='dao'}:Kho
   <NutHoiThay qid={q.qid} nguon={nguon} gon/>
  </section>
 }
+/** "+N EXP" bay từ nút dưới (chỗ vừa bấm CHỐT, nay là nút đọc xong lời giải) lên ảnh thần thú. Hằng ngoài component để không đổi mỗi lần vẽ. */
+const TU_NUT_DAO2=['.dao2-nut-chot','.dao2-ai .dao2-nut-xanh'] as const
 /** Dải kết quả trên thẻ lời giải: đúng ⇒ quái trúng đòn; chưa đúng ⇒ quái phản đòn (số máu đúng `learningBattle`). Chữ thưởng lấy nguyên lời máy chủ. */
 export function DaiKetQua({profile,cau:q,phanHoi,ketQua,tong}:{profile:DaoProfile;cau:CauDao2;phanHoi:PhanHoi2;ketQua:readonly BattleAnswer[];tong:number}){
- const cheDo=useCheDoHieuUng(),expBay=expCauGame({correct:phanHoi.correct,coTroGiup:phanHoi.coTroGiup,reward:phanHoi.reward,expThuThach:phanHoi.expThuThach})
+ const cheDo=useCheDoHieuUng(),expBay=expCauGame({correct:phanHoi.correct,coTroGiup:phanHoi.coTroGiup,reward:phanHoi.reward,expThuThach:phanHoi.expThuThach,expCau:phanHoi.expCau})
  const tran=learningBattle([...ketQua],tong),thu=chiSoThu(profile.pet),lyDo=phanHoi.lyDo.chu.replace(/^\+\d+\s*(EXP)?\s*·\s*/,'').trim()
  // tiếng đòn: MỘT lần mỗi lần chấm (dải này dựng mới mỗi ải); tắt tiếng / chưa mở âm thanh ⇒ im lặng
  useEffect(()=>{playBattleSound(thu,evolutionStage(profile.cap),phanHoi.correct,tran.rage)},[]) // eslint-disable-line react-hooks/exhaustive-deps
  return <div className="dao2-kinh dao2-ket-qua" data-dung={phanHoi.correct?'':undefined} role="status">
-  <img src={anhThu(thu,profile.cap,true)} alt="" width="88" height="88" decoding="async" draggable={false}/>
+  <img src={anhThu(thu,profile.cap,true)} alt="" width="88" height="88" decoding="async" draggable={false} data-dich-exp=""/>
   <b className="dao2-ket-qua-so" aria-label={phanHoi.correct?`${TEN_QUAI} mất ${tran.damage} máu`:`Thần thú của em mất ${tran.damage} máu`}>−{tran.damage}</b>
   <span><strong>{phanHoi.correct?'Đúng rồi · quái trúng đòn':'Chưa đúng · quái phản đòn'}</strong>
    {phanHoi.correct&&tran.rage&&<em className="dao2-ket-qua-no">CUỒNG NỘ ×2 · 3 câu đúng liền</em>}
    {/* Luật v4: "+N EXP" bay sang ảnh thú nhỏ (số máy chủ); câu có trợ giúp vẫn hiện số thưởng tĩnh như cũ */}
-   {expBay>0?<SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong"/>:phanHoi.reward>0&&<em>+{phanHoi.reward} EXP</em>}
+   {expBay>0?<SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" tu={TU_NUT_DAO2}/>:phanHoi.reward>0&&<em>+{phanHoi.reward} EXP</em>}
    <small>{[lyDo,!phanHoi.correct&&docVai(q.vai)==='moi'?'Ô đất vẫn được khai phá.':'',!phanHoi.correct?'Câu này sẽ quay lại theo lịch ôn lại.':''].filter(Boolean).join(' ')}</small></span>
  </div>
 }

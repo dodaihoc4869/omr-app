@@ -57,7 +57,7 @@ function DoiHinh({ ghe }: { ghe: GheXem[] }) {
   return (
     <div className="dh-doi">
       {ban.map((g, i) => <ThuHinh key={g.ghe} pet={g.pet} cap={g.cap} className="dh-noi-2" style={{ ...CHO_BAN[i], aspectRatio: '1', animationDelay: `${i * .4}s` }} />)}
-      {em && <ThuHinh pet={em.pet} cap={em.cap} className="dh-noi" style={{ left: '14%', bottom: '0%', height: '66%', aspectRatio: '1' }} />}
+      {em && <ThuHinh pet={em.pet} cap={em.cap} className="dh-noi dh-thu-em" style={{ left: '14%', bottom: '0%', height: '66%', aspectRatio: '1' }} />}
     </div>
   )
 }

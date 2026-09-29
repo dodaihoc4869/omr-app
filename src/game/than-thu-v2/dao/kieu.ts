@@ -9,11 +9,16 @@ export interface DaoProfile{nickname?:string;pet:string;choice:boolean;cap:numbe
  khienConLai?:number
  ngayMoKhienQua?:number
  soNgayDat?:number
- /** Giá rèn một khiên. Luật v4 (29/09): `donVi:'vang'` ⇒ `gia` là VÀNG (1 400), `duTru` = 0; máy chủ cũ (không có `donVi`) ⇒ `gia` là EXP. */
- renKhien?:{gia:number;duTru:number;manh:number;donVi?:'vang'}
- /** Luật v4: EXP chờ mốc cấp 10 (chưa đủ `ngayMoCap10` ngày đạt). Vắng ⇒ 0. */
+ /** Giá rèn một khiên. `donVi:'vang'` ⇒ `gia` là VÀNG (v5: 2 600), `duTru` = 0; máy chủ cũ (không có `donVi`) ⇒ `gia` là EXP. v5: `ngayCan` = số ngày đạt cần cho khiên kế tiếp. */
+ renKhien?:{gia:number;duTru:number;manh:number;donVi?:'vang';ngayCan?:number}
+ /** EXP chờ mốc của luật v4 (ngăn riêng, vào thú khi có thêm ngày đạt). Vắng ⇒ 0. */
  choMoc?:number
  ngayMoCap10?:number
+ /** Luật v5 (chỉ-thêm): số ngày tính cho mốc cấp (ngày đạt + ngày nghỉ chung), mốc ngày của cấp kế tiếp, số ngày còn thiếu khi thanh đã đầy (0 = không chờ), EXP tràn hôm nay đã đổi. */
+ soNgayCap?:number
+ ngayCapSau?:number
+ choNgay?:number
+ tranHomNay?:{exp:number;vang:number;manh:number}
  khienRen?:{manh:number;daRen?:number;chuaDung?:number;conLai?:number;moiKhien:number}
  /** THẦN THÚ MỖI NGÀY (Điều 1, Đợt 1): hôm nay thú đã hấp thụ `da` EXP; hôm nay được ăn tối đa `tran` (200 khi đạt nhiệm vụ ngày · 120 khi có học · 0 khi chưa học). `lyDo` = vì sao lần nạp gần nhất bị chặn:
   *  'no' (đủ trần) · 'chua_hoc' · 'het_ong' · 'cap_toi_da' · null. Máy chủ cũ KHÔNG có trường này ⇒ màn ẩn thanh. */
@@ -33,7 +38,7 @@ export interface DaoKetQua{ok:boolean;error?:string;message?:string;missing?:num
  tranNgay?:number
  suggestions?:{title:string;source:string;part:string}[]
  id?:string;mode?:Mode;questions?:CauDao[];answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[]
- correct?:boolean;answer?:string;solution?:unknown;reward?:number;/** EXP câu thử thách / Lượt trùm máy chủ trả (chỉ-thêm). */expThuThach?:number;stage?:number;solutionImages?:HinhAnh[];lyDoThuong?:LyDoThuong
+ correct?:boolean;answer?:string;solution?:unknown;reward?:number;/** EXP câu thử thách / Lượt trùm máy chủ trả (chỉ-thêm). */expThuThach?:number;/** Luật 29/09: EXP thật đã vào thú nhờ câu này (máy chủ tính). */expCau?:number;stage?:number;solutionImages?:HinhAnh[];lyDoThuong?:LyDoThuong
  /** Đợt 2 (chỉ-thêm): tóm tắt lượt trong ngày · màn hết lượt (`het`) + "Mai thú chờ em" (`maiCho`) — đọc chặt bằng `docLuotNgay`/`docMaiCho`. */
  luot?:unknown;maiCho?:unknown;het?:boolean
  /** Thưởng ĐÁNG LẼ của câu — chỉ có khi trần 120 EXP/ngày từ game đã CẮT `reward` (máy chủ Đợt 1). */
