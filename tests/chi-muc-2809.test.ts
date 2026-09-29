@@ -1,6 +1,6 @@
 // @vitest-environment node
 // Tối ưu máy chủ 28/09 (việc 3): chỉ mục game_v2_attempt(session, sbd) — migration CHỈ-THÊM + tạo lúc chạy MỘT lần mỗi isolate.
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { damBaoChiMuc, CHI_MUC_LUC_CHAY } from '../server/src/chi-muc-luc-chay'
 import worker from '../server/src/index'
@@ -25,7 +25,10 @@ describe('chỉ mục game_v2_attempt(session, sbd)', () => {
     await damBaoChiMuc({ DB: db } as any)
     expect(lan).toBe(1)
   })
+  afterEach(() => { vi.useRealTimers() })
   it('cron tạo chỉ mục (không nằm trên đường lệnh fetch); lượt cron sau không tạo lại', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(Date.parse('2026-09-30T10:00:00+07:00')) // ngoài khung cao điểm 20h–24h (khung ấy cron không chạy DDL — test dưới)
     const d1 = taoD1That()
     d1.sql.exec('DROP INDEX IF EXISTS game_v2_attempt_session')
     let lanBatch = 0
@@ -38,5 +41,13 @@ describe('chỉ mục game_v2_attempt(session, sbd)', () => {
     const truoc = lanBatch
     await worker.scheduled({ cron: '* * * * *' } as any, env).catch(() => undefined)
     expect(lanBatch).toBeLessThanOrEqual(truoc) // không tạo lại (không thêm batch chỉ mục)
+  })
+  it('CAO ĐIỂM 20:00–23:59 giờ VN: cron KHÔNG chạy DDL chỉ mục (29/09) — để isolate cron ngoài khung làm', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(Date.parse('2026-09-30T21:30:00+07:00'))
+    const d1 = taoD1That()
+    d1.sql.exec('DROP INDEX IF EXISTS game_v2_attempt_session')
+    await worker.scheduled({ cron: '* * * * *' } as any, d1.env).catch(() => undefined)
+    expect(keHoach(d1.sql, Q_PHIEN)).not.toContain('game_v2_attempt_session')
   })
 })
