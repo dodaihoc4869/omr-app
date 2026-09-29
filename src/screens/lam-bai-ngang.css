@@ -258,6 +258,12 @@
 .lb-gon .lb-gon-de .thi-cau-dau { position: relative; min-height: 0 !important; height: 36px; }
 .lb-gon-de .thi-cau-dau::after { content: ''; position: absolute; inset: -4px; }
 
+/* Phương án / ý: chữ CĂN TRÁI như màn dọc, vòng chữ cái thẳng DÒNG ĐẦU (Boss soát 29/09: cột phương án hẹp, phương án 3 dòng mà vòng chữ
+ * nằm giữa khối chữ trông như chữ căn giữa, dòng thò thụt). */
+.lb-gon .lb-gon-de .the-cau .pa-hang { align-items: start; justify-items: start; text-align: left; }
+.lb-gon .lb-gon-de .the-cau .pa-noi-dung,
+.lb-gon .lb-gon-de .the-cau .y-noi-dung { justify-self: stretch; text-align: left; }
+
 /* CÂU DÀI ⇒ CHIA ĐÔI: trái đề (cuộn cùng thân thẻ), phải phương án / ý / ô đáp số (dính đầu, cuộn riêng khi dài). */
 .lb-gon-de[data-chia] { display: flex; flex-direction: column; overflow: hidden; padding-bottom: 8px; }
 .lb-gon-de[data-chia] > [data-gon-hien] { display: flex; flex: 1 1 auto; flex-direction: column; width: 100%; min-height: 0; }
