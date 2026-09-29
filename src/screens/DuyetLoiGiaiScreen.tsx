@@ -1,5 +1,5 @@
-// DUYỆT LỜI GIẢI THEO ĐỀ (phương án A, thầy chốt 29/09: "cách 2" — duyệt theo đề lúc giao). Một việc chính: đề sắp giao ⇒
-// duyệt cả lô các câu SẠCH (không cờ đáp án), xem kĩ từng câu có cờ, trả lại câu chưa ổn kèm ghi chú cho máy soạn làm lại.
+// DUYỆT LỜI GIẢI THEO ĐỀ (phương án A, thầy chốt 29/09: "cách 2" — duyệt theo đề lúc giao). Từ 29/09 máy tự duyệt câu SẠCH lúc nộp
+// ("máy duyệt luôn") ⇒ màn này để xem câu có cờ đáp án, xem lại / trả lại câu chưa ổn kèm ghi chú cho máy soạn làm lại.
 // Chỉ câu trắc nghiệm, Đúng/Sai, trả lời ngắn (tự luận không soạn). Máy chủ: server/src/loi-giai.ts.
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { gvChoDuyet, gvDuyetLoiGiai, gvSoanGap, gvXemLoiGiai, type CauChoDuyet, type CauChoKhung, type HoSoLoiGiai, type KetQuaChoDuyet, type TrangThaiLoiGiai } from '../lib/loi-giai-api'
@@ -138,7 +138,7 @@ export default function DuyetLoiGiaiScreen() {
                     <div className="lg-dong-dau">
                       <span className="gv2-the-tieu-de">{tenCau(c.qid)}</span>
                       <span className="gv2-phu">{TEN_DANG[c.dang] ?? c.dang}</span>
-                      <span className="gv2-chip" data-tone={tt.tone}>{tt.chu}</span>
+                      <span className="gv2-chip" data-tone={tt.tone}>{c.mayDuyet ? 'Máy đã duyệt' : tt.chu}</span>
                     </div>
                     {c.co.length > 0 && (
                       <ul className="lg-co">

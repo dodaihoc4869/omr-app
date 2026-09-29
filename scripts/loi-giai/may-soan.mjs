@@ -10,7 +10,7 @@
 //
 // Cần: `claude` (Claude Code) đã đăng nhập; biến OMR_MA_BI_MAT = mã bí mật của thầy (hoặc tệp ~/.omr-ma-bi-mat). Không in mã ra đâu cả.
 // Mỗi lô: máy chủ phát 12 câu CÙNG CHƯƠNG ⇒ thư mục .may-soan/<ngày>/<lô>/ (vao/, bo.json, gói giao việc, bộ kiểm) ⇒ `claude -p`
-// soạn + tự kiểm ⇒ máy này kiểm lại ⇒ nộp từng hồ sơ; máy chủ kiểm lần nữa với đáp án KHO rồi mới xếp "chờ thầy duyệt".
+// soạn + tự kiểm ⇒ máy này kiểm lại ⇒ nộp từng hồ sơ; máy chủ kiểm lần nữa với đáp án KHO rồi mới lưu (sạch ⇒ máy duyệt; còn cờ đáp án ⇒ chờ, không hiện với học sinh).
 import { spawn } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'

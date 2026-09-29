@@ -36,7 +36,7 @@ import {hsThiDuaHomNay,gvChuaHocHomNay} from './thi-dua-hom-nay'
 import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
-import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvSoanGap,gvSuaKho,gvXemHoSo,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
+import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvMayDuyetBu,gvSoanGap,gvSuaKho,gvXemHoSo,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -3436,6 +3436,7 @@ const boXuLy = {
       if (p === '/gv/loi-giai/duyet') return ra(await gvDuyet(env, b))
       if (p === '/gv/loi-giai/soan-gap') return ra(await gvSoanGap(env, b))
       if (p === '/gv/loi-giai/sua-kho') return ra(await gvSuaKho(env, b))
+      if (p === '/gv/loi-giai/may-duyet-bu') return ra(await gvMayDuyetBu(env, b))
       // CHỈ ĐỌC chỉ mục câu của MỘT tờ (28/09): để công cụ sửa trình bày kho đề đẩy lại gói mà GIỮ NGUYÊN chuyên đề/mức độ/lớp đang có.
       if (p === '/kho/chi-muc-lay') {
         const maDe = String(b.maDe ?? '').trim()

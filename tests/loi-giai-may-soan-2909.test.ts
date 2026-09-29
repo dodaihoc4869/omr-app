@@ -1,6 +1,6 @@
 // @vitest-environment node
 // Máy soạn trên máy thầy (scripts/loi-giai/may-soan.mjs) chạy THẬT từ đầu tới cuối: Worker thật (SQLite) sau một cổng HTTP cục bộ,
-// `claude` giả (chép hồ sơ mẫu vào ra/) — kiểm: nhận lô cùng chương, dựng thư mục lô, bộ kiểm trong lô chạy được, nộp, máy chủ xếp chờ duyệt.
+// `claude` giả (chép hồ sơ mẫu vào ra/) — kiểm: nhận lô cùng chương, dựng thư mục lô, bộ kiểm trong lô chạy được, nộp, máy chủ tự duyệt hồ sơ sạch.
 import { afterAll, describe, expect, it } from 'vitest'
 import { spawn } from 'node:child_process'
 import fs from 'node:fs'
@@ -83,7 +83,7 @@ function chayMaySoan(url: string, bin: string, them: string[]) {
 }
 
 describe('máy soạn chạy thật với máy chủ thật', () => {
-  it('nhận lô → soạn → tự kiểm → nộp; máy chủ xếp đủ 3 hồ sơ chờ duyệt', async () => {
+  it('nhận lô → soạn → tự kiểm → nộp; máy chủ tự duyệt đủ 3 hồ sơ sạch', async () => {
     const d = taoD1That()
     const { url, dong } = await dungMayChu(d)
     try {
@@ -94,10 +94,10 @@ describe('máy soạn chạy thật với máy chủ thật', () => {
       const kq = await chayMaySoan(url, bin, ['--mot-lan', '--luong', '2', '--so', '2'])
       expect(kq.ma, kq.ra).toBe(0)
       expect(kq.ra).toContain('Kết thúc: đạt 3 · trượt 0 · thiếu 0')
-      expect(d.dem('loi_giai', "trang_thai='cho_duyet'")).toBe(3)
-      // Phiên chốt chạy cho đúng câu có cờ đáp án ⇒ cả 3 hồ sơ đều sạch (duyệt được cả lô), quyết định giữ lại trong daChot.
+      // Phiên chốt chạy cho đúng câu có cờ đáp án ⇒ cả 3 hồ sơ đều sạch ⇒ máy duyệt ngay lúc nộp (thầy chốt 29/09), quyết định giữ lại trong daChot.
       expect(kq.ra).toContain('chốt 1 hồ sơ có cờ đáp án')
-      expect(d.dem('loi_giai', "trang_thai='cho_duyet' AND so_co_dap_an=0")).toBe(3)
+      expect(d.dem('loi_giai', "trang_thai='da_duyet' AND so_co_dap_an=0 AND ghi_chu='máy duyệt'")).toBe(3)
+      expect(d.dem('loi_giai', "trang_thai='cho_duyet'")).toBe(0)
       const bam = (d.sql.prepare("SELECT bam FROM loi_giai_cau WHERE qid='12-THU-MS-II-4'").get() as { bam: string }).bam
       expect(JSON.parse(d.objects.get(`giai/${bam}.json`) as string).daChot).toEqual([{ ghi: 'thử cờ cho phiên chốt', chot: 'Giữ đáp án kho: thử' }])
       // Bộ kiểm trong thư mục lô chạy được và ra ĐẠT (phiên soạn thật dựa vào nó để tự sửa).
