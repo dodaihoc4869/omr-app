@@ -14,7 +14,7 @@ import { Nhan, OThongBao } from './DesignSystem'
 import { boMotCau, demDangUngVien, demMucDo, doiMotCau, dsChuyenDe, dungUngVien, giayUocTinh, moiIdDaRut, MOI_MUC, PHAN_DE, PHUT_TOI_DA_LEN_BANG, rutDe, rutDeLenBang, rutKhoChua, soCauCua, soCauLenBang, soTinHieu, TEN_MUC, tongCau, type CauUngVien, type KetQuaRut, type MucDoRut, type PhanDe, type SoCauPhan, type YeuCauRut } from '../lib/rut-de'
 import { MOI_LOC_DANG, LOC_DANG_MAC_DINH, soCauDung, TEN_DANG, TEN_LOC_DANG, type LocDang } from '../lib/dang-cau'
 import { demSao, LOC_SAO_MAC_DINH, MOI_LOC_SAO, soCauHopSao, TEN_LOC_SAO, type LocSao } from '../lib/loc-sao'
-import { GIAI_THICH_PHAM_VI, TEN_PHAM_VI_HOI_LAI, type CauHinhDeRieng } from '../lib/cau-hinh-de-rieng'
+import { GIAI_THICH_PHAM_VI, MOI_PHAM_VI_HOI_LAI, TEN_PHAM_VI_HOI_LAI, type CauHinhDeRieng } from '../lib/cau-hinh-de-rieng'
 
 const NHAN_NHO: React.CSSProperties = { fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--nhat)' }
 const SO: React.CSSProperties = { fontFamily: 'var(--sans)', fontVariantNumeric: 'tabular-nums' }
@@ -207,7 +207,10 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
   const [deRieng, setDeRieng] = useState(false)
   // HAI NÚT PHẠM VI (thầy chốt 08/09): lấy câu sai của ca gần nhất, hay gộp
   // câu sai của 3 ca gần nhất. Mặc định ca gần nhất — đo đúng buổi vừa dạy.
+  // Thêm nút thứ ba "Không rút câu sai" (đặc tả 29/09 mục C). Bấm lại nút ĐANG
+  // chọn = bỏ chọn = cùng nghĩa "Không rút câu sai".
   const [phamViHoiLai, setPhamViHoiLai] = useState<CauHinhDeRieng['PHAM_VI_HOI_LAI']>('gan_nhat')
+  const khongRutCauSai = phamViHoiLai === 'khong'
   // Câu thầy đã bấm đổi/bỏ trong lượt này — không cho quay lại ngay.
   const [daBo, setDaBo] = useState<string[]>([])
 
@@ -481,17 +484,25 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
                 <div style={NHAN_NHO}>
                   <b>Thuật toán mới cá nhân hóa 100%:</b> Mỗi học sinh nhận một đề riêng biệt (độ trùng ≈ 0%, triệt tiêu quay cóp).
                 </div>
-                <div style={NHAN_NHO}>
-                  <b>Cặp đôi Song sinh (50/50):</b> Tự động rút 50% câu sai gốc (đo độ hiểu lời giải) + 50% câu song sinh cùng dạng đổi số từ kho đề (chống học vẹt đáp án). Áp dụng trần chuẩn {'{I: 3, II: 1, III: 1}'} cho ca 14 câu.
-                </div>
-                <div style={NHAN_NHO}>
-                  <b>70% câu mới:</b> Rút thích ứng dạng bài để củng cố lỗ hổng và phát triển năng lực cho từng em.
-                </div>
+                {khongRutCauSai ? (
+                  <div style={NHAN_NHO} data-che-do-cau-sai="khong">
+                    <b>100% câu mới:</b> Không rút câu sai. Bỏ mọi câu em đã gặp ở các ca kiểm tra trước (cả câu đúng lẫn câu sai), không câu tự luận.
+                  </div>
+                ) : (
+                  <>
+                    <div style={NHAN_NHO}>
+                      <b>Cặp đôi Song sinh (50/50):</b> Tự động rút 50% câu sai gốc (đo độ hiểu lời giải) + 50% câu song sinh cùng dạng đổi số từ kho đề (chống học vẹt đáp án). Áp dụng trần chuẩn {'{I: 3, II: 1, III: 1}'} cho ca 14 câu.
+                    </div>
+                    <div style={NHAN_NHO}>
+                      <b>70% câu mới:</b> Rút thích ứng dạng bài để củng cố lỗ hổng và phát triển năng lực cho từng em.
+                    </div>
+                  </>
+                )}
 
                 <div className="flex flex-wrap items-center" style={{ gap: 'var(--k2)', marginTop: 'var(--k1)' }} role="radiogroup" aria-label="Lấy câu sai từ đâu">
                   <span style={NHAN_NHO}>Phạm vi quét câu sai:</span>
-                  {(['gan_nhat', 'ba_ca'] as const).map((v) => (
-                    <Chip key={v} chon={phamViHoiLai === v} onClick={() => setPhamViHoiLai(v)} mau="tim">
+                  {MOI_PHAM_VI_HOI_LAI.map((v) => (
+                    <Chip key={v} chon={phamViHoiLai === v} onClick={() => setPhamViHoiLai((cu) => (cu === v ? 'khong' : v))} mau="tim">
                       {TEN_PHAM_VI_HOI_LAI[v]}
                     </Chip>
                   ))}
@@ -617,7 +628,9 @@ export default function KhoiRutDe({ nguon, qidCaTruoc, phutLamBai, onDoi, onDoiP
           <div style={NHAN_NHO}>
             {rieng ? (
               <span>
-                <b>Thuật toán mới cá nhân hóa 100%:</b> Quét toàn bộ kho {tongKho} câu ứng viên để rút đề riêng biệt đẳng cấu cho từng em (cùng dạng bài và mức độ, triệt tiêu quay cóp lân cận). Tự động lồng ghép Cặp đôi Song sinh 50/50 từ câu sai ca trước và 70% câu mới nâng đỡ tiến bộ.
+                <b>Thuật toán mới cá nhân hóa 100%:</b> Quét toàn bộ kho {tongKho} câu ứng viên để rút đề riêng biệt đẳng cấu cho từng em (cùng dạng bài và mức độ, triệt tiêu quay cóp lân cận). {khongRutCauSai
+                  ? 'Không rút câu sai: toàn bộ là câu mới, bỏ mọi câu em đã gặp ở các ca kiểm tra trước.'
+                  : 'Tự động lồng ghép Cặp đôi Song sinh 50/50 từ câu sai ca trước và 70% câu mới nâng đỡ tiến bộ.'}
               </span>
             ) : (
               'Cả lớp làm cùng bộ câu này, chỉ đảo thứ tự câu và thứ tự A–D riêng từng em. Điểm hai em so được trực tiếp với nhau.'
