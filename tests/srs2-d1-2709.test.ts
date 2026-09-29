@@ -78,12 +78,14 @@ describe('Game Hóa 2.0 trên D1 thật', () => {
     expect(dao).toMatchObject({ lyDo: 'khoa_cho_doan', message: LOI_KHOA_DAO })
     const doan = await startDoan2(env, 'S1', T0)
     const qs = doan.questions as { qid: string; goiY?: { gach?: string[] } }[]
-    expect(qs.map((q) => q.qid).sort()).toEqual(['Q1', 'Q2'])
+    // ĐAN XEN (thầy 29/09): em sai 3/3 ⇒ hạng Yếu ⇒ mỗi chặng ≤ 1 câu khó. Q1 (sai 2 lần) và Q2 (Vận dụng) đều khó ⇒ hai chặng.
+    expect(qs.map((q) => q.qid)).toEqual(['Q1'])
     const q1 = qs.find((q) => q.qid === 'Q1')!
     expect(q1.goiY?.gach).toHaveLength(2)
     expect(q1.goiY?.gach).not.toContain('B')
-    expect(qs.find((q) => q.qid === 'Q2')!.goiY).toBeUndefined()
     expect(JSON.stringify(doan)).not.toContain('"correct"')
+    // Nhãn nợ trên câu (Sổ nợ 29/09): "Sai 2 lần · Đảo 28/09 · Đảo 29/09" (phiên game không có trong bảng phiên ⇒ Đảo).
+    expect((qs[0] as { nhanNo?: string }).nhanNo).toMatch(/^Sai 2 lần · /)
   })
 
   it('kế hoạch CHỐT trong ngày; xoá bảng đệm dựng lại từ sổ khớp 100% (N3)', async () => {

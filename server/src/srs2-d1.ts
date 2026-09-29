@@ -535,11 +535,12 @@ export function hangTuHoSo(hoSoDang: readonly HoSoDangTho[], lanLam: readonly La
   return tinhHangTheoDang(tk, dangCan)
 }
 
-/** Hạng theo dạng của em cho kế hoạch hôm nay (chỉ khi có chiến dịch đang chạy). */
+/** Hạng theo dạng của em cho kế hoạch hôm nay (không chiến dịch ⇒ chỉ từ hồ sơ dạng). */
 export async function docHangEm(env: Env, sbd: string, hs: HoSo2): Promise<{ hangTheoDang: Record<string, HangEm>; hangChung: HangEm } | null> {
   const cd = hs.chienDich
-  if (!cd) return null
   const hoSoDang = (await docHoSoDangCaLop(env, [sbd])).get(sbd) ?? []
+  // Không chiến dịch (Sổ nợ 29/09): vẫn cần hạng CHUNG để đan xen câu nợ theo sức em — chỉ từ hồ sơ dạng.
+  if (!cd) return hangTuHoSo(hoSoDang, [], hs.meta, [], '')
   return hangTuHoSo(hoSoDang, hs.lanLamChienDich ?? [], hs.meta, cd.qids, cd.mocBatDau)
 }
 

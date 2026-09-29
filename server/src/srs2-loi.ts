@@ -556,10 +556,12 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const chonMoi = thuTuMoi.slice(0, layMoi + themMoi)
   const chonOn = [...no.slice(0, layNo + themNo), ...cungCo.slice(0, layCungCo), ...duyTri.slice(0, layDuyTri)]
 
+  // ĐAN XEN (thầy 29/09): chọn xong mới xếp thứ tự phục vụ — chia lượt 6 câu theo mật độ của em, mở/kết lượt bằng câu dễ.
+  const suc = sucEmCua(tc.hangChung)
+  const loai = (c: CauSrs) => phanLoaiDanXen(c.qid, tt(c), c)
   return {
-    // Câu ôn Đúng–sai (nợ trước) đứng TRƯỚC câu mới: dọn nợ trước (cùng tinh thần khoá Đảo khi Đoàn còn câu ôn).
-    dao: [...chonOn.filter((c) => c.phan === 'II').map((c) => c.qid), ...chonMoi.map((c) => c.qid)],
-    doan: chonOn.filter((c) => c.phan !== 'II').map((c) => c.qid),
+    dao: danXenNgay([...chonOn.filter((c) => c.phan === 'II'), ...chonMoi].map(loai), suc).map((x) => x.qid),
+    doan: danXenNgay(chonOn.filter((c) => c.phan !== 'II').map(loai), suc).map((x) => x.qid),
     huyetChien,
     khoiLuong,
     sucChua: D * tranNgay,
@@ -622,6 +624,113 @@ export function nhanNo(lichSu: readonly { ngay: string; dung: boolean; nguon?: s
   if (ngayChua) phan.push(`Thầy đã chữa ${ddmm(ngayChua)}`)
   return phan.join(' · ')
 }
+
+// ---------------------------------------------------------------- ĐAN XEN câu trong ngày (thầy yêu cầu 29/09)
+// "Câu nợ hãy hiển thị đan xen hợp lý trong ngày, đừng để học sinh nản, đặc biệt câu khó cho học sinh yếu." Luật CHỌN câu giữ nguyên
+// (`lapKeHoachNgay`); ở đây chỉ đổi THỨ TỰ PHỤC VỤ và cách chia câu thành từng lượt game (chuyến Đảo, chặng Đoàn). Tất định.
+/** Một câu đã phân loại để đan xen. `no` = câu nợ; `kho` = 2 sao / Vận dụng trở lên / sai ≥ 2 lần; `de` = câu "khởi động" dễ đúng. */
+export interface CauDanXen { qid: string; no: boolean; kho: boolean; de: boolean; /** Mức (NB 0 … VDC 3) — chọn Trùm khó nhất cho em khá/giỏi. */ muc: number }
+/** Sức em cho mật độ: yếu (L1) · trung bình (L2, không rõ) · khá/giỏi (L3, L4). */
+export type SucEm = 'yeu' | 'tb' | 'kha'
+export const sucEmCua = (h: HangEm | null | undefined): SucEm => (h === 'L1' ? 'yeu' : h === 'L3' || h === 'L4' ? 'kha' : 'tb')
+/** Mật độ tối đa mỗi lượt 6 câu: em yếu 1 khó + 2 nợ, em TB 2 khó + 3 nợ, khá/giỏi không hạn (vẫn không liền nhau). Khó là trần CỨNG; nợ là trần mềm. */
+export const MAT_DO_LUOT: Record<SucEm, { kho: number; no: number }> = { yeu: { kho: 1, no: 2 }, tb: { kho: 2, no: 3 }, kha: { kho: Number.POSITIVE_INFINITY, no: Number.POSITIVE_INFINITY } }
+/** Phân loại một câu từ trạng thái + loại câu (mức, sao). Câu chưa có trạng thái ⇒ coi là câu mới. */
+export function phanLoaiDanXen(qid: string, t: TrangThaiCau | undefined, loai: { mucDo?: string | null; sao?: number | null } | undefined): CauDanXen {
+  const muc = mucCaNhan(loai?.mucDo ?? null)
+  const laMoi = !t || t.laMoi
+  const kho = (Number(loai?.sao) || 0) >= SAO_PHAI_ON || muc >= 2 || (!!t && soLanSai(t) >= 2)
+  const no = !!t && laNo(t)
+  const de = !kho && (laMoi ? muc === 0 : t!.thanhThao || t!.cc >= 1)
+  return { qid, no, kho, de, muc }
+}
+
+/**
+ * Chia danh sách câu (đúng thứ tự ưu tiên) thành các LƯỢT ≤ `co` câu theo mật độ của em: câu NỢ khó rải vòng tròn (mỗi lượt ≤ trần khó —
+ * em yếu có nhiều nợ khó ⇒ nhiều lượt ngắn hơn, KHÔNG dồn vào một lượt); câu mới khó sang lượt ít khó nhất; câu nợ sang lượt ít nợ nhất;
+ * câu còn lại lấp chỗ.
+ * Không bớt câu nào (tổng giữ nguyên). Khá/giỏi: lượt đầy `co` câu theo thứ tự.
+ */
+export function chiaLuot<T extends CauDanXen>(ds: readonly T[], suc: SucEm, co = 6): T[][] {
+  const n = ds.length
+  if (!n) return []
+  const md = MAT_DO_LUOT[suc]
+  // Trần khó CỨNG cho câu NỢ khó (dồn nhiều ⇒ thêm lượt ngắn, trải cả ngày); câu MỚI khó chỉ rải đều (không làm vụn lượt ngày toàn câu Vận dụng).
+  const khoNo = ds.filter((x) => x.kho && x.no)
+  const khoMoi = ds.filter((x) => x.kho && !x.no)
+  const L = Math.max(Math.ceil(n / co), Number.isFinite(md.kho) ? Math.ceil(khoNo.length / md.kho) : 0)
+  // Khá/giỏi: lượt đầy `co` câu (lượt cuối phần dư); yếu/TB: số câu chia đều cho L lượt.
+  const coLuot = Array.from({ length: L }, (_, i) => (suc === 'kha' ? Math.min(co, n - i * co) : Math.floor(n / L) + (i < n % L ? 1 : 0)))
+  const luot: T[][] = Array.from({ length: L }, () => [])
+  const soNo = Array(L).fill(0) as number[]
+  const soKho = Array(L).fill(0) as number[]
+  const conCho = (j: number) => luot[j]!.length < coLuot[j]!
+  const dat = (j: number, x: T) => { luot[j]!.push(x); if (x.no) soNo[j]!++; if (x.kho) soKho[j]!++ }
+  /** Lượt còn chỗ có `dem` nhỏ nhất (hoà ⇒ lượt sớm hơn); hết chỗ ⇒ lượt đầu chưa đủ `co`. */
+  const itNhat = (dem: number[]) => {
+    let tot = -1
+    for (let j = 0; j < L; j++) if (conCho(j) && (tot < 0 || dem[j]! < dem[tot]!)) tot = j
+    return tot >= 0 ? tot : Math.max(0, luot.findIndex((l) => l.length < co))
+  }
+  // Nợ khó: vòng tròn (mỗi lượt ≤ trần khó).
+  khoNo.forEach((x, i) => {
+    let j = i % L
+    for (let k = 0; k < L && !conCho(j); k++) j = (j + 1) % L
+    dat(j, x)
+  })
+  for (const x of khoMoi) dat(itNhat(soKho), x)
+  for (const x of ds.filter((y) => !y.kho && y.no)) dat(itNhat(soNo), x)
+  for (const x of ds.filter((y) => !y.kho && !y.no)) {
+    const j = luot.findIndex((_, k) => conCho(k))
+    dat(j >= 0 ? j : Math.max(0, luot.findIndex((l) => l.length < co)), x)
+  }
+  const viTri = new Map(ds.map((x, i) => [x.qid, i]))
+  return luot.filter((l) => l.length).map((l) => l.sort((a, b) => viTri.get(a.qid)! - viTri.get(b.qid)!))
+}
+
+/** Điểm phạt của một thứ tự trong lượt (thấp = tốt). */
+function phatThuTu<T extends CauDanXen>(xs: readonly T[], suc: SucEm, viTri: ReadonlyMap<string, number>, trumKho: boolean): number {
+  const n = xs.length
+  let p = 0
+  const coDe = xs.some((x) => x.de)
+  if (coDe && !xs[0]!.de) p += 40
+  if (n > 1) {
+    const cuoi = xs[n - 1]!
+    if (trumKho) { if (cuoi.muc < Math.max(...xs.map((x) => x.muc))) p += 20 }
+    else if (xs.filter((x) => x.de).length >= 2 && !cuoi.de) p += 20
+    else if (!coDe && cuoi.kho && xs.some((x) => !x.kho)) p += 20
+  }
+  for (let i = 1; i < n; i++) {
+    const a = xs[i - 1]!, b = xs[i]!
+    if (a.kho && b.kho) p += 100
+    if (a.no && b.no) p += 10
+    if (suc === 'yeu' && b.kho && !a.de) p += 15
+  }
+  if (suc === 'yeu') xs.forEach((x, i) => { if (x.kho && (i === 0 || (i === n - 1 && !trumKho))) p += 15 })
+  xs.forEach((x, i) => { p += 0.001 * Math.abs(i - viTri.get(x.qid)!) })
+  return p
+}
+function* hoanVi<T>(xs: readonly T[]): Generator<T[]> {
+  if (xs.length <= 1) { yield [...xs]; return }
+  for (let i = 0; i < xs.length; i++) for (const r of hoanVi([...xs.slice(0, i), ...xs.slice(i + 1)])) yield [xs[i]!, ...r]
+}
+/**
+ * Thứ tự câu TRONG một lượt: mở đầu bằng câu khởi động dễ, kết thúc bằng câu dễ (nếu có); không 2 câu khó liền nhau, không 2 câu nợ liền
+ * nhau khi còn câu khác; em yếu: câu khó ở giữa lượt, ngay sau một câu dễ. `trumKho` (Đảo, em khá/giỏi, chuyến đủ 6): ải cuối (Trùm) là câu
+ * khó nhất như thầy chốt 28/09. Duyệt mọi hoán vị (lượt ≤ 7 câu), hoà ⇒ gần thứ tự ưu tiên nhất. Lượt dài hơn ⇒ giữ nguyên thứ tự.
+ */
+export function danXenLuot<T extends CauDanXen>(luot: readonly T[], suc: SucEm, tuyChon: { trumKho?: boolean } = {}): T[] {
+  if (luot.length <= 1 || luot.length > 7) return [...luot]
+  const viTri = new Map(luot.map((x, i) => [x.qid, i]))
+  let tot: T[] = [...luot], diem = phatThuTu(tot, suc, viTri, !!tuyChon.trumKho)
+  for (const xs of hoanVi(luot)) {
+    const d = phatThuTu(xs, suc, viTri, !!tuyChon.trumKho)
+    if (d < diem - 1e-9) { tot = xs; diem = d }
+  }
+  return tot
+}
+/** Thứ tự phục vụ CẢ NGÀY của một danh sách (Đảo hoặc Đoàn): chia lượt theo mật độ rồi đan xen từng lượt. Không thêm, không bớt câu. */
+export const danXenNgay = <T extends CauDanXen>(ds: readonly T[], suc: SucEm, co = 6): T[] => chiaLuot(ds, suc, co).flatMap((l) => danXenLuot(l, suc))
 
 /** Huyết Chiến: từ câu thứ 41 trong ngày không rơi EXP, không rơi vật phẩm. `thuTu` đếm từ 1. */
 export const duocThuongCauThu = (thuTu: number, tranNgay = TRAN_NGAY): boolean => thuTu <= tranNgay

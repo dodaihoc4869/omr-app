@@ -7,8 +7,8 @@ import type { PrivateQuestion, Question } from '../../src/game/than-thu-v2/core'
 import { publicQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
 import { doDayDu, napDayDuMem, protectedQuestions, type CauPool } from './game-v2-bank'
-import { chonPhuongAnGach, moDuocRuong, nhanNo, xepChuyenDao, type NguonNhan, type TrangThaiCau } from './srs2-loi'
-import { coGoiY, docHoSo2, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, ngayVnCua, qidGoc, sanh2, type HoSo2, type MetaCau } from './srs2-d1'
+import { chiaLuot, chonPhuongAnGach, danXenLuot, moDuocRuong, nhanNo, phanLoaiDanXen, sucEmCua, type CauDanXen, type NguonNhan, type SucEm, type TrangThaiCau } from './srs2-loi'
+import { coGoiY, docHangEm, docHoSo2, docLichSuCoNguon, docNhanNo, ganNguonDuoi, layKeHoachHomNay, LOI_KHOA_DAO, ngayVnCua, qidGoc, sanh2, type HoSo2, type MetaCau } from './srs2-d1'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -48,6 +48,31 @@ export async function soCauGameHomNay(env: Env, sbd: string, nowMs: number): Pro
 }
 
 export interface RefPhien { qid: string; maDe: string; version: string; group: string; novel: boolean; role: string; goiY?: GoiYM3; /** Nhãn nợ (Sổ nợ 29/09). */ nhanNo?: string }
+
+/**
+ * ĐAN XEN (thầy 29/09): câu của LƯỢT TỚI (chuyến Đảo / chặng Đoàn) — chia phần kế hoạch còn lại theo mật độ của em (`chiaLuot`), lấy lượt
+ * đầu, nạp câu đầy đủ, rồi xếp thứ tự trong lượt (`danXenLuot`: mở/kết bằng câu dễ, không 2 khó/2 nợ liền nhau). Tất định: cùng kế hoạch
+ * còn lại ⇒ cùng lượt. Câu bị chặn / thiếu siêu dữ liệu bị bỏ TRƯỚC khi chia.
+ */
+export async function napLuot(env: Env, hs: HoSo2, khoa: readonly string[], chan: ReadonlySet<string>, suc: SucEm, co: number, trumKho = false): Promise<{ q: PrivateQuestion; m: MetaCau }[]> {
+  const thay = new Set<string>()
+  const ung: CauDanXen[] = []
+  for (const k of khoa) {
+    const q = qidGoc(k), m = hs.meta.get(q)
+    if (thay.has(q) || !m || chan.has(q) || chan.has(m.group)) continue
+    thay.add(q)
+    ung.push(phanLoaiDanXen(q, hs.tt.get(q), m))
+  }
+  const luot = chiaLuot(ung, suc, co)[0] ?? []
+  const day = await napCau(env, hs, luot.map((x) => x.qid), luot.length, chan)
+  const theo = new Map(day.map((x) => [x.q.qid, x]))
+  const xep = danXenLuot(luot.filter((x) => theo.has(x.qid)), suc, { trumKho: trumKho && theo.size === co })
+  return xep.map((x) => theo.get(x.qid)!)
+}
+/** Sức em (hạng chung) cho đan xen; lỗi đọc ⇒ trung bình. */
+export async function sucEmHomNay(env: Env, sbd: string, hs: HoSo2): Promise<SucEm> {
+  return sucEmCua((await docHangEm(env, sbd, hs).catch(() => null))?.hangChung)
+}
 
 /** Cỡ lô một truy vấn nạp câu đầy đủ (chặn cỡ tham số JSON; kế hoạch ngày ≤ vài chục câu nên thường chỉ MỘT lô). */
 export const LO_NAP_CAU = 40
@@ -115,7 +140,7 @@ export async function cauDangGiu(env: Env, sbd: string, nowMs: number, dieuKien:
  * Lượt Bát Linh Đảo (chuyến thám hiểm 6 ải) ở chế độ 2.0.
  * - Còn câu ôn hôm nay ở Đoàn ⇒ khoá, trả đúng lời thầy.
  * - Lượt đang chờ (chưa trả lời câu nào) ⇒ trả lại chính lượt ấy.
- * - Câu ôn Đúng–sai trước; câu mới dễ → khó: ải 1–2 dễ nhất, câu khó nhất cuối chuyến làm Trùm ải (`xepChuyenDao`).
+ * - Thứ tự trong chuyến: ĐAN XEN (thầy 29/09, `napLuot`) — mở/kết bằng câu dễ, không 2 câu khó/2 câu nợ liền nhau; em khá/giỏi Trùm là câu khó nhất.
  */
 export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<Record<string, unknown>> {
   const { kh, hs } = await layKeHoachHomNay(env, sbd, nowMs)
@@ -133,8 +158,10 @@ export async function startDao2(env: Env, sbd: string, nowMs: number): Promise<R
   }
   const chan = await protectedQuestions(env)
   for (const q of await cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO)) chan.add(q) // câu đang nằm trên bàn Bi-a không ra Đảo
-  // Thầy 28/09: câu ôn Đúng–sai đi trước như cũ; câu mới dễ → khó ⇒ ải 1–2 dễ nhất, ải 6 (Trùm) khó nhất.
-  const chon = xepChuyenDao(await napCau(env, hs, kh.conDao, SO_CAU_CHUYEN, chan), (x) => !!hs.tt.get(x.q.qid)?.laMoi, (x) => x.m.mucDo)
+  // ĐAN XEN (thầy 29/09): chuyến mở/kết bằng câu dễ, không 2 câu khó / 2 câu nợ liền nhau, mật độ theo sức em.
+  // Em khá/giỏi, chuyến đủ 6 ải: ải 6 (Trùm) vẫn là câu khó nhất (thầy 28/09); em yếu/TB kết chuyến bằng câu dễ.
+  const suc = await sucEmHomNay(env, sbd, hs)
+  const chon = await napLuot(env, hs, kh.conDao, chan, suc, SO_CAU_CHUYEN, suc === 'kha')
   if (!chon.length) return { ok: true, questions: [], lyDo: 'cau_dang_bao_ve', message: 'Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.', ...tomTat }
   const nhan = await docNhanNo(env, sbd, hs, chon.map(({ q }) => q.qid)).catch(() => new Map<string, string>())
   const refs: RefPhien[] = chon.map(({ q, m }, i) => {
@@ -160,8 +187,10 @@ export async function startDoan2(env: Env, sbd: string, nowMs: number): Promise<
   const chanBia = await cauDangGiu(env, sbd, nowMs, DK_PHIEN_BIA_MO) // câu đang nằm trên bàn Bi-a không ra Đoàn
   for (const q of dangPhat) chan.add(q)
   for (const q of chanBia) chan.add(q)
-  let chon = await napCau(env, hs, kh.conDoan, SO_CAU_CHANG, chan)
-  if (!chon.length) { const lai = await protectedQuestions(env); for (const q of chanBia) lai.add(q); chon = await napCau(env, hs, kh.conDoan, SO_CAU_CHANG, lai) } // phiên cũ bỏ dở: phát lại
+  // ĐAN XEN (thầy 29/09): chặng của TỪNG em theo sức em (mỗi em câu riêng).
+  const suc = await sucEmHomNay(env, sbd, hs)
+  let chon = await napLuot(env, hs, kh.conDoan, chan, suc, SO_CAU_CHANG)
+  if (!chon.length) { const lai = await protectedQuestions(env); for (const q of chanBia) lai.add(q); chon = await napLuot(env, hs, kh.conDoan, lai, suc, SO_CAU_CHANG) } // phiên cũ bỏ dở: phát lại
   if (!chon.length) return { ok: true, questions: [], lyDo: 'cau_dang_bao_ve', message: 'Các câu ôn hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.' }
   const nhan = await docNhanNo(env, sbd, hs, chon.map(({ q }) => q.qid)).catch(() => new Map<string, string>())
   const refs: RefPhien[] = chon.map(({ q, m }) => {
