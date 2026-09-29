@@ -5,31 +5,31 @@
  "KEYS": {
   "k1": {
    "ten": "Liên kết kim loại",
-   "rule": "Nút mạng là <b>cation kim loại</b>, giữa là <b>electron hoá trị tự do</b>, hút nhau bằng lực tĩnh điện. So với liên kết ion ({NaCl}): giống ở tĩnh điện và cation kim loại, khác ở phần âm (electron tự do ↔ anion cố định). Electron tự do gây dẫn điện, dẫn nhiệt, ánh kim, dẻo. Kim loại có 1–3 electron lớp ngoài: Na 1, Mg 2, Al 3 (3s²3p¹)."
+   "rule": "<b>Cấu tạo:</b> nút mạng là <b>cation kim loại</b>, giữa là <b>electron hoá trị tự do</b><br><b>Lực liên kết:</b> hút nhau bằng lực tĩnh điện<br><b>Giống liên kết ion:</b> ở tĩnh điện và cation kim loại (như {NaCl})<br><b>Khác liên kết ion:</b> ở phần âm: electron tự do ↔ anion cố định<br><b>Tính chất chung:</b> electron tự do → dẫn điện, dẫn nhiệt, ánh kim, dẻo<br><b>Số electron ngoài:</b> kim loại có 1–3 electron lớp ngoài: Na 1, Mg 2, Al 3 (3s²3p¹)"
   },
   "k2": {
    "ten": "Dãy thế điện cực",
-   "rule": "E° càng nhỏ, kim loại <b>khử càng mạnh</b>, ion oxi hoá càng yếu. Dãy E° tăng: K, Na, Mg, Al, Zn, Fe, Ni, Sn, Pb, {H2}, Cu, Fe²⁺ (cặp Fe³⁺/Fe²⁺), Ag, Au. Chất khử cặp trước + chất oxi hoá cặp sau → phản ứng. E° < 0 khử được H⁺ acid loãng; E° < −0,41 V khử được nước (xét theo thế); Cu chỉ tan trong acid loãng khi có {O2}."
+   "rule": "<b>Quy luật:</b> E° càng nhỏ → kim loại <b>khử càng mạnh</b>, ion oxi hoá càng yếu<br><b>Dãy E° tăng:</b> K, Na, Mg, Al, Zn, Fe, Ni, Sn, Pb, {H2}, Cu, Fe²⁺ (cặp Fe³⁺/Fe²⁺), Ag, Au<br><b>Đoán phản ứng:</b> chất khử cặp trước + chất oxi hoá cặp sau → phản ứng<br><b>Khử H⁺:</b> E° < 0 khử được H⁺ acid loãng<br><b>Khử nước:</b> E° < −0,41 V khử được nước (xét theo thế)<br><b>Riêng Cu:</b> chỉ tan trong acid loãng khi có {O2}"
   },
   "k3": {
    "ten": "Sản phẩm kim loại",
-   "rule": "Kim loại luôn <b>bị oxi hoá</b> (số oxi hoá tăng từ 0); chất có số oxi hoá giảm mới là chất oxi hoá. Fe gặp H⁺, Cu²⁺, Fe³⁺ chỉ lên <b>Fe²⁺</b>; Fe³⁺ gặp Cu chỉ về Fe²⁺, không ra Fe. {H2SO4} đặc, {HNO3} hoà tan cả Cu, sinh {SO2}, NO…, không sinh {H2}. Kim loại mạnh đẩy kim loại yếu khỏi muối (trừ Na, K, Ca, Ba: gặp nước trước)."
+   "rule": "<b>Kim loại:</b> luôn <b>bị oxi hoá</b> (số oxi hoá tăng từ 0)<br><b>Nhận chất oxi hoá:</b> chất có số oxi hoá giảm mới là chất oxi hoá<br><b>Đẩy khỏi muối:</b> kim loại mạnh đẩy kim loại yếu (trừ Na, K, Ca, Ba: gặp nước trước)<br><b>Hoà tan cả Cu:</b> {H2SO4} đặc, {HNO3} → sinh {SO2}, NO…, không sinh {H2}<br><b>Fe:</b> gặp H⁺, Cu²⁺, Fe³⁺ chỉ lên <b>Fe²⁺</b><br><b>Fe³⁺ gặp Cu:</b> chỉ về Fe²⁺, không ra Fe"
   },
   "k4": {
    "ten": "Ăn mòn điện hoá",
-   "rule": "<b>Đủ ba điều kiện</b>: hai điện cực khác chất (Fe – Cu, Fe – C, kim loại bám lên), tiếp xúc nhau, cùng chạm hơi ẩm hay chất điện li. Thiếu một: <b>ăn mòn hoá học</b>. Kim loại E° nhỏ hơn là anode, bị ăn mòn. Cực kia: acid ra {H2}; trung tính chỉ {O2} bị khử. Gỉ: {Fe2O3}·n{H2O}. Chống: Zn, Mg hi sinh; phủ dầu, sơn. Al có màng oxide bền."
+   "rule": "<b>Đủ ba điều kiện:</b> hai điện cực khác chất, tiếp xúc nhau, cùng chạm hơi ẩm hay chất điện li<br><b>Ví dụ điện cực:</b> Fe – Cu, Fe – C, kim loại bám lên<br><b>Bị ăn mòn:</b> kim loại E° nhỏ hơn là anode<br><b>Cực kia:</b> acid ra {H2}; trung tính chỉ {O2} bị khử<br><b>Gỉ, chống gỉ:</b> gỉ là {Fe2O3}·n{H2O}; chống: Zn, Mg hi sinh, phủ dầu, sơn; Al có màng oxide bền<br><b>Thiếu một điều kiện:</b> là <b>ăn mòn hoá học</b>"
   },
   "k5": {
    "ten": "Chọn cách điều chế",
-   "rule": "K … Al: <b>điện phân nóng chảy</b>. <b>Nhiệt luyện</b> = C, CO, {H2}, Al, Si khử oxide ở nhiệt độ cao (Zn … Cu; cả Mg bằng Si). <b>Thuỷ luyện</b> = hoà tan rồi cho kim loại mạnh hơn đẩy ra (Zn đẩy Au). Quặng sulfide đốt thành oxide trước, sinh {SO2} độc. Chỉ bước biến ion thành kim loại là oxi hoá – khử. Tái chế tốn ít năng lượng hơn."
+   "rule": "<b>Điện phân nóng chảy:</b> K … Al<br><b>Nhiệt luyện:</b> Zn … Cu (cả Mg bằng Si); C, CO, {H2}, Al, Si khử oxide ở nhiệt độ cao<br><b>Thuỷ luyện:</b> hoà tan rồi cho kim loại mạnh hơn đẩy ra (Zn đẩy Au)<br><b>Quặng sulfide:</b> đốt thành oxide trước, sinh {SO2} độc<br><b>Tái chế:</b> tốn ít năng lượng hơn<br><b>Bẫy hay gặp:</b> chỉ bước biến ion thành kim loại là oxi hoá – khử"
   },
   "k6": {
    "ten": "Tính theo chuỗi",
-   "rule": "Chất chính = m × %, đổi mol (tấn → tấn·mol). <b>Bảo toàn nguyên tố</b> hoặc cộng các phương trình: {Fe2O3} → 2Fe, {Cu2S} → 2Cu, 2{KCN} → Au. Sản phẩm <b>× H</b>, nguyên liệu <b>: H</b>, rồi chia % kim loại trong sản phẩm. Rắn đổi khối lượng: độ chênh : Δm của 1 mol. Có dòng điện: It : F = n(e) = z·n(kim loại), F = 96500. ΔrH° = ΣΔfH°(sản phẩm) − ΣΔfH°(chất đầu), âm là toả nhiệt, tính theo mol."
+   "rule": "<b>Chất chính:</b> m × %, đổi mol (tấn → tấn·mol)<br><b>Nối chuỗi:</b> <b>bảo toàn nguyên tố</b> hoặc cộng các phương trình: {Fe2O3} → 2Fe, {Cu2S} → 2Cu, 2{KCN} → Au<br><b>Hiệu suất:</b> sản phẩm <b>× H</b>, nguyên liệu <b>: H</b>, rồi chia % kim loại trong sản phẩm<br><b>Rắn đổi khối lượng:</b> độ chênh : Δm của 1 mol<br><b>Có dòng điện:</b> It : F = n(e) = z·n(kim loại), F = 96500<br><b>Tính ΔrH°:</b> ΔrH° = ΣΔfH°(sản phẩm) − ΣΔfH°(chất đầu); âm là toả nhiệt, tính theo mol"
   },
   "k7": {
    "ten": "Hợp kim",
-   "rule": "Hợp kim thường cứng hơn, nóng chảy thấp hơn, dẫn điện kém hơn kim loại thành phần. Đo hàm lượng: chọn thuốc thử <b>hoà tan hết một kim loại, không đụng kim loại kia</b> (Al tan trong kiềm; Cu tan trong {HNO3}, Fe³⁺, {H2SO4} đặc, Au thì không) và <b>không đẩy kim loại mới bám vào</b> (loại Ag⁺, Au³⁺). % = m rắn còn lại : m mẫu."
+   "rule": "<b>Tính chất hợp kim:</b> thường cứng hơn, nóng chảy thấp hơn, dẫn điện kém hơn kim loại thành phần<br><b>Đo hàm lượng:</b> chọn thuốc thử <b>hoà tan hết một kim loại, không đụng kim loại kia</b><br><b>Ví dụ thuốc thử:</b> Al tan trong kiềm; Cu tan trong {HNO3}, Fe³⁺, {H2SO4} đặc, Au thì không<br><b>Tính %:</b> % = m rắn còn lại : m mẫu<br><b>Không dùng:</b> thuốc thử <b>đẩy kim loại mới bám vào</b> (loại Ag⁺, Au³⁺)"
   }
  },
  "TRAPS_THEM": {

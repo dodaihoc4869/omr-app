@@ -1247,6 +1247,8 @@ export function theCauHtml(
   choLam = false,
   laBtvn = false,
   soCauSang?: number,
+  /** Nút "Hỏi thầy" (thầy lệnh 29/09): chỉ phiếu HỌC SINH (giao diện M3), không phải phiếu in của thầy. */
+  hoiThay = false,
 ): string {
   // Nhãn CHỮA đứng trước mọi nhãn khác: đọc một dòng là biết câu này có mặt
   // ở đây để sửa lỗi nào, không phải "một câu Ester bất kỳ".
@@ -1398,7 +1400,7 @@ export function theCauHtml(
     ${than}
     ${hinhTaiViTri(c, 'cuoi_cau')}${cn?.daCham ? `<div class="lam-ket">${cn.daCham.dung ? 'Đúng' : 'Sai'}</div>` : ''}
   </div>
-  ${nut}
+  ${nut}${hoiThay && c.id ? `\n  <div class="q-hoi-thay"><button type="button" class="nut-hoi-thay" data-hoi-thay="${thoat(c.id)}">Hỏi thầy</button></div>` : ''}
 </article>`
 }
 
@@ -3328,8 +3330,10 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   // Câu thử sức KHÔNG tính vào "Đã làm x/y" và không chặn nút nộp. Không câu nào mang `thuSuc` ⇒ đúng như trước, từng byte.
   const soThuSuc = caNhan ? cau.filter((c) => c.caNhan?.thuSuc).length : 0
   const soBatBuoc = cau.length - soThuSuc
+  // NÚT "HỎI THẦY" trên phiếu học sinh: bấm ⇒ phiếu nhắn app (khung xem phiếu) mở lời giải từng bước; máy chủ tự chặn câu đang thi / ca chưa công bố.
+  const coHoiThay = m3 && !anGiai
   const the = cau
-    .map((c, i) => (caNhan && c.caNhan?.thuSuc && !cau.slice(0, i).some((x) => x.caNhan?.thuSuc) ? nhomThuSucHtml(soThuSuc) : '') + theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn, soCauSang))
+    .map((c, i) => (caNhan && c.caNhan?.thuSuc && !cau.slice(0, i).some((x) => x.caNhan?.thuSuc) ? nhomThuSucHtml(soThuSuc) : '') + theCauHtml(c, i + 1, !!tuyChon.moSan, anGiai, !!nop, laBtvn, soCauSang, coHoiThay))
     .join('\n') + (soThuSuc > 0 && caNhan?.thuSuc ? '\n' + nopThuSucHtml(caNhan.thuSuc.nut, caNhan.thuSuc.tat) : '')
   // KHOÁ LỜI GIẢI TỚI KHI NỘP. Chỉ áp cho phiếu nộp được và khi thầy không
   // bật `HIEN_GIAI_TRUOC_NOP`.
@@ -3392,8 +3396,23 @@ export function dungPhieu(t: ThongTinPhieu, cauVao: CauLuyen[], tuyChon: TuyChon
   // `co-lam` bật khổ ô Đ/S to bằng ngón tay. Tách khỏi `chua-nop` vì thầy có
   // thể bật HIEN_GIAI_TRUOC_NOP — lúc đó vẫn làm bài, chỉ là không khoá giải.
   const lopBody = [nop ? 'co-lam' : '', khoaGiai ? 'chua-nop' : '', caNhan ? 'ca-nhan' : ''].filter(Boolean).join(' ')
-  return taiLieuHtml(than + goiNop, `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody, m3, caNhan ? CSS_PHIEU_CA_NHAN : '')
+  return taiLieuHtml(than + goiNop + (coHoiThay ? HOI_THAY_PHIEU : ''), `${t.tenChuyenDe}${ai ? ` · ${ai}` : ''}`, lopBody, m3, caNhan ? CSS_PHIEU_CA_NHAN : '')
 }
+
+/** Kiểu + mã nút Hỏi thầy trên phiếu học sinh: bắt trước mọi trình nghe khác của thẻ câu (không mở/đóng lời giải cũ), nhắn app đúng qid. */
+const HOI_THAY_PHIEU = `<style>
+.q-hoi-thay{display:flex;justify-content:flex-end;padding:0 16px 14px}
+.nut-hoi-thay{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer;touch-action:manipulation}
+.nut-hoi-thay:focus-visible{outline:3px solid currentColor;outline-offset:2px}
+@media print{.q-hoi-thay{display:none}}
+</style><script>
+document.addEventListener('click', function (e) {
+  var b = e.target && e.target.closest ? e.target.closest('[data-hoi-thay]') : null;
+  if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  try { window.parent.postMessage({ type: 'ddh-hoi-thay', qid: b.getAttribute('data-hoi-thay') }, '*'); } catch (x) {}
+}, true);
+<\/script>`
 
 /** THANH NỘP — dính dưới thanh điều khiển, NOP-PHIEU-KHAC-PHUC mục 6. */
 export function thanhNopHtml(soCau: number, nutChu = 'Nộp bài', tat = false): string {

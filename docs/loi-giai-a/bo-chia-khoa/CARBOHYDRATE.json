@@ -5,31 +5,31 @@
  "KEYS": {
   "k1": {
    "ten": "Soi cấu tạo",
-   "rule": "Glucose mạch hở {CH2OH[CHOH]4CHO}: 5 –OH, 1 –CHO; fructose {CH2OH[CHOH]3COCH2OH}: C=O ở C2. Vòng: glucose có –OH <b>hemiacetal</b>, fructose –OH <b>hemiketal</b>. Tinh bột, maltose: α-glucose, <b>α-1,4</b> (amylopectin thêm α-1,6 → nhánh). Cellulose: β-glucose, <b>β-1,4</b>, mạch thẳng. Saccharose: <b>α-1,2</b>, hết –OH hemi. Mỗi liên kết glycoside mất 2 –OH: mắt xích cellulose còn 3, {[C6H7O2(OH)3]n}, cả phân tử 3n; maltose còn 7 –OH alcohol + 1 hemiacetal."
+   "rule": "<b>Mạch hở:</b> glucose {CH2OH[CHOH]4CHO} có 5 –OH, 1 –CHO; fructose {CH2OH[CHOH]3COCH2OH} có C=O ở C2<br><b>Dạng vòng:</b> glucose có –OH <b>hemiacetal</b>, fructose có –OH <b>hemiketal</b>; saccharose hết –OH hemi<br><b>Liên kết α:</b> tinh bột, maltose từ α-glucose, <b>α-1,4</b> (amylopectin thêm α-1,6 → nhánh); saccharose <b>α-1,2</b><br><b>Liên kết β:</b> cellulose từ β-glucose, <b>β-1,4</b>, mạch thẳng<br><b>Đếm –OH:</b> mỗi liên kết glycoside mất 2 –OH<br><b>Áp dụng:</b> maltose còn 7 –OH alcohol + 1 hemiacetal; mắt xích cellulose còn 3, {[C6H7O2(OH)3]n}, cả phân tử 3n"
   },
   "k2": {
    "ten": "Bảng thuốc thử",
-   "rule": "{Cu(OH)2} thường → <b>xanh lam</b>: nhiều –OH kề (glucose, fructose, saccharose, maltose, glycerol); tinh bột, cellulose không; protein cho màu tím. Tollens → Ag, {Cu(OH)2}/kiềm đun → {Cu2O} đỏ gạch: glucose, maltose, cả fructose (kiềm chuyển thành glucose); <b>saccharose, tinh bột, cellulose không</b>. Nước {Br2}: chỉ glucose, maltose. {I2}: tinh bột xanh tím. Glucose + Tollens → ammonium gluconate; + {Br2} → gluconic acid; + {H2}/Ni → sorbitol."
+   "rule": "<b>{Cu(OH)2} thường:</b> nhiều –OH kề → <b>xanh lam</b>: glucose, fructose, saccharose, maltose, glycerol; tinh bột, cellulose không; protein cho màu tím<br><b>Đường khử:</b> Tollens → Ag, {Cu(OH)2}/kiềm đun → {Cu2O} đỏ gạch: glucose, maltose, cả fructose<br><b>Nước {Br2}:</b> chỉ glucose, maltose<br><b>{I2}:</b> tinh bột → xanh tím<br><b>Sản phẩm glucose:</b> + Tollens → ammonium gluconate; + {Br2} → gluconic acid; + {H2}/Ni → sorbitol<br><b>Bẫy hay gặp:</b> fructose có phản ứng (kiềm chuyển thành glucose); <b>saccharose, tinh bột, cellulose không</b>"
   },
   "k3": {
    "ten": "Đọc sơ đồ chuyển hoá",
-   "rule": "Gọi tên theo chất vào → ra. {CO2} → tinh bột: <b>quang hợp</b>. Cắt glycoside hay ester bằng {H2O}: <b>thuỷ phân</b> (saccharose → glucose + fructose; tinh bột → maltose → glucose; cellulose → glucose); monosaccharide không thuỷ phân. Glucose → {C2H5OH} + {CO2}: <b>lên men rượu</b> (oxi hoá – khử, toả nhiệt); → lactic acid {CH3CH(OH)COOH}: lên men lactic; ethanol → acetic acid: lên men giấm. –OH + {HNO3}, anhydride: <b>ester hoá</b>. Gluconate + HCl → gluconic acid {C6H12O7}."
+   "rule": "<b>Cách đọc:</b> gọi tên theo chất vào → ra; {CO2} → tinh bột: <b>quang hợp</b><br><b>Thuỷ phân:</b> cắt glycoside hay ester bằng {H2O}; saccharose → glucose + fructose; tinh bột → maltose → glucose; cellulose → glucose<br><b>Lên men rượu:</b> glucose → {C2H5OH} + {CO2}; oxi hoá – khử, toả nhiệt<br><b>Tạo acid:</b> glucose → lactic acid {CH3CH(OH)COOH}: lên men lactic; ethanol → acetic acid: lên men giấm; gluconate + HCl → gluconic acid {C6H12O7}<br><b>Ester hoá:</b> –OH + {HNO3}, anhydride<br><b>Bẫy hay gặp:</b> monosaccharide không thuỷ phân"
   },
   "k4": {
    "ten": "Quy trình thí nghiệm",
-   "rule": "Hỏi mỗi bước để làm gì. Thuỷ phân: acid + đun (cellulose: {H2SO4} 70%); {H2SO4} đặc <b>than hoá</b>. Trước Tollens, {Cu(OH)2}: <b>trung hoà acid</b> ({NaHCO3} hết bọt, {NaOH} đến quỳ xanh). Đường khử + {Cu(OH)2}: không đun → xanh lam, đun → đỏ gạch. Iodine còn xanh tím: <b>chưa thuỷ phân hết</b>; đun mất màu, nguội hiện lại. Nitrate hoá: trộn acid trong nước đá, dùng bông. Tách cồn: chưng cất."
+   "rule": "<b>Cách đọc:</b> hỏi mỗi bước để làm gì<br><b>Thuỷ phân:</b> acid + đun (cellulose: {H2SO4} 70%); {H2SO4} đặc → <b>than hoá</b><br><b>Iodine:</b> còn xanh tím → <b>chưa thuỷ phân hết</b>; đun mất màu, nguội hiện lại<br><b>Trung hoà acid:</b> làm trước Tollens, {Cu(OH)2}; {NaHCO3} đến hết bọt, {NaOH} đến quỳ xanh<br><b>Đường khử + {Cu(OH)2}:</b> không đun → xanh lam, đun → đỏ gạch<br><b>Bước khác:</b> nitrate hoá → trộn acid trong nước đá, dùng bông; tách cồn → chưng cất"
   },
   "k5": {
    "ten": "Dây chuyền mol",
-   "rule": "Quy về mắt xích, nhân hệ số: {C6H10O5} 162 → glucose 180 → <b>2</b>{C2H5OH}; glucose → <b>2</b>Ag, 2 lactic acid; saccharose 342 → <b>4</b>Ag, 4{C2H5OH}; mắt xích → trinitrate 297 (3{HNO3}), triacetate 288. Ra sản phẩm <b>× H</b>, tìm nguyên liệu <b>÷ H</b>; nhiều giai đoạn nhân các H. Rượu a°: V ethanol = V·a/100; m = D·V; lớp bạc V = S·dày. %N = 14x : (162 + 45x), x = số –{ONO2}."
+   "rule": "<b>Quy về mắt xích:</b> nhân hệ số; {C6H10O5} 162 → glucose 180 → <b>2</b>{C2H5OH}; glucose → <b>2</b>Ag, 2 lactic acid<br><b>Saccharose:</b> 342 → <b>4</b>Ag, 4{C2H5OH}<br><b>Ester cellulose:</b> mắt xích → trinitrate 297 (3{HNO3}), triacetate 288<br><b>Hiệu suất:</b> ra sản phẩm <b>× H</b>, tìm nguyên liệu <b>÷ H</b>; nhiều giai đoạn nhân các H<br><b>Quy đổi:</b> rượu a° → V ethanol = V·a/100; m = D·V; lớp bạc V = S·dày<br><b>Tính %N:</b> %N = 14x : (162 + 45x), x = số –{ONO2}"
   },
   "k6": {
    "ten": "Năng lượng & quang hợp",
-   "rule": "ΔrH = Σ ΔfH(sản phẩm) − Σ ΔfH(chất đầu), nhân hệ số. Quang hợp <b>thu nhiệt</b>, hút {CO2} (chu trình carbon); oxi hoá glucose toả nhiệt. Năng lượng = mức/cm<sup>2</sup>/phút × diện tích × phút × % hữu ích; 1 m<sup>2</sup> = 10<sup>4</sup> cm<sup>2</sup>. n = năng lượng : |ΔH|; <b>1 mắt xích ↔ 1 glucose ↔ 6{CO2} ↔ 6{O2}</b>. Cháy, nổ: cân bằng nguyên tố trước, rồi tính ΔH, mol khí."
+   "rule": "<b>Tính ΔrH:</b> ΔrH = Σ ΔfH(sản phẩm) − Σ ΔfH(chất đầu), nhân hệ số<br><b>Thu hay toả:</b> quang hợp <b>thu nhiệt</b>, hút {CO2} (chu trình carbon); oxi hoá glucose toả nhiệt<br><b>Năng lượng:</b> mức/cm<sup>2</sup>/phút × diện tích × phút × % hữu ích; 1 m<sup>2</sup> = 10<sup>4</sup> cm<sup>2</sup><br><b>Tính mol:</b> n = năng lượng : |ΔH|; <b>1 mắt xích ↔ 1 glucose ↔ 6{CO2} ↔ 6{O2}</b><br><b>Cháy, nổ:</b> cân bằng nguyên tố trước, rồi tính ΔH, mol khí"
   },
   "k7": {
    "ten": "Vật lí & ứng dụng",
-   "rule": "Độ ngọt tăng dần: <b>maltose, glucose, saccharose, fructose</b>. Glucose, fructose, saccharose: rắn, tan tốt. Tinh bột không tan nước lạnh, nước nóng thành hồ (keo); cellulose không tan, tan trong nước Schweizer. Cellulose trinitrate: rắn trắng, không tan, cháy không khói (thuốc súng); triacetate: tơ acetate. Saccharose: mía, củ cải đường, thốt nốt; mạch nha: maltose; gạo, ngô, sắn, bánh mì: tinh bột; ethanol: xăng E5."
+   "rule": "<b>Độ ngọt:</b> tăng dần <b>maltose, glucose, saccharose, fructose</b><br><b>Tính tan:</b> glucose, fructose, saccharose rắn, tan tốt; tinh bột không tan nước lạnh, nước nóng → hồ (keo)<br><b>Cellulose:</b> không tan, tan trong nước Schweizer; trinitrate rắn trắng, không tan, cháy không khói (thuốc súng)<br><b>Nguồn gốc:</b> saccharose: mía, củ cải đường, thốt nốt; mạch nha: maltose; gạo, ngô, sắn, bánh mì: tinh bột<br><b>Ứng dụng:</b> cellulose triacetate → tơ acetate; ethanol → xăng E5"
   }
  },
  "TRAPS_THEM": {

@@ -152,3 +152,5 @@
 @media (prefers-reduced-motion: reduce) {
   .lco * { transition: none !important; animation: none !important; }
 }
+/* Nút Hỏi thầy (29/09): câu em hỏi trước khi nộp — một dòng nói thật vì sao câu chưa được tính. */
+.lco-da-hoi { margin: 0; padding: 8px 12px; border-radius: 12px; background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); font-size: var(--bnv-cx-2); }

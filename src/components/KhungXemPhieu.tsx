@@ -35,6 +35,8 @@ import { X } from 'lucide-react'
 import { ThanhTren, dungM3 } from './m3'
 import './m3/khung-xem-phieu.css'
 import type { TinNopChang } from '../lib/btvn-nop-chang-em'
+import { hoiThay, type CauChoKhung, type HoSoLoiGiai, type LoiGiaiChu } from '../lib/loi-giai-api'
+import KhungLoiGiai from './loi-giai/KhungLoiGiai'
 
 export interface KhungXemPhieuProps {
   /** Nội dung dựng sẵn tại máy. Dùng cho phiếu bài tập và đề ca. */
@@ -53,6 +55,10 @@ export interface KhungXemPhieuProps {
 }
 
 export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: KhungXemPhieuProps) {
+  const [hoi, setHoi] = useState<{ cau: CauChoKhung; hoSo?: HoSoLoiGiai; loiGiaiChu?: LoiGiaiChu } | null>(null)
+  const [loiHoi, setLoiHoi] = useState('')
+  const hoiMoRef = useRef(false)
+  hoiMoRef.current = hoi !== null
   // ĐO THẲNG mép phải của thanh điều hướng, không trông vào CSS.
   //
   // Bản trước để CSS lo bằng `body:has(.ben-trai)`. Luật đó đúng và chạy được,
@@ -122,9 +128,19 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
       dongRef.current()
     }
     const phim = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') dongRef.current()
+      // Đang mở lời giải "Hỏi thầy" thì Esc chỉ đóng lời giải (khung lời giải tự nghe Esc), không đóng cả phiếu.
+      if (e.key === 'Escape' && !hoiMoRef.current) dongRef.current()
     }
     const tinNhan = (e: MessageEvent) => {
+      if (e.data?.type === 'ddh-hoi-thay' && e.data.qid) {
+        // NÚT HỎI THẦY trên phiếu học sinh (29/09): chỉ nhận từ chính iframe của khung này; máy chủ tự chặn câu đang thi.
+        if (e.source !== iframeRef.current?.contentWindow) return
+        void hoiThay(String(e.data.qid), 'phieu').then((r) => {
+          if (r.ok) setHoi({ cau: r.cau, hoSo: r.hoSo, loiGiaiChu: r.loiGiaiChu })
+          else setLoiHoi(r.loi)
+        })
+        return
+      }
       if (e.data?.type === 'ddh-btvn-draft' && e.data.ma) {
         try {
           const k = `ddh.btvn.draft.${e.data.ma}.${e.data.sbd || ''}`
@@ -227,6 +243,13 @@ export default function KhungXemPhieu({ html, src, ten, dong, nopChang, phu }: K
           ngang: dải đó chồng lên nhau khi mở phiếu từ trong báo cáo.
           (Dưới M3 nút Đóng nằm trong thanh trên ở trên.) */}
       {phu}
+      {hoi && <KhungLoiGiai hoSo={hoi.hoSo} cau={hoi.cau} loiGiaiChu={hoi.loiGiaiChu} onDong={() => setHoi(null)} />}
+      {loiHoi && (
+        <div className="lg-bao-loi m3" role="alert">
+          <span>{loiHoi}</span>
+          <button type="button" className="lg-nut" onClick={() => setLoiHoi('')}>Đóng</button>
+        </div>
+      )}
       {!m3 && (
         <button className="nut-dong-phieu" type="button" onClick={() => dongRef.current()} aria-label="Đóng" title="Đóng (Esc, hoặc vuốt quay lại)">
           <X size={18} />

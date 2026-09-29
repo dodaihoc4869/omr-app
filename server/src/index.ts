@@ -36,7 +36,7 @@ import {hsThiDuaHomNay,gvChuaHocHomNay} from './thi-dua-hom-nay'
 import {phTatCaVeCon,phChiTietCauVeCon} from './ph-tat-ca-ve-con'
 import {docVeDichCuaEm} from './ve-dich-d1'
 import {phGiaoThem} from './ph-giao-them'
-import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvSoanGap,gvSuaKho,gvXemHoSo,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
+import {ghiCauVaoHang,gvChoDuyet,gvDuyet,gvSoanGap,gvSuaKho,gvXemHoSo,hsHoiThay,hsLoiGiai,hsLoiGiaiCo,layViec,napHangTuKho,nopHoSo,tongHang} from './loi-giai'
 import {gvTuDongCacViec} from './tu-dong-cac-viec'
 import {dailyHonors} from './honors'
 import {teacherNews,recordPresence} from './teacher-news'
@@ -3273,6 +3273,7 @@ const boXuLy = {
       // LỜI GIẢI TỪNG BƯỚC (phương án A, 29/09): cổng công bố + hồ sơ đã duyệt + băm khớp đề hiện tại — xem server/src/loi-giai.ts
       if (p === '/hs/loi-giai') return ra(await hsLoiGiai(env, b))
       if (p === '/hs/loi-giai/co') return ra(await hsLoiGiaiCo(env, b))
+      if (p === '/hs/hoi-thay') return ra(await hsHoiThay(env, b))
       if (p === '/hs/on-lai/nop') { const r = await sauGhi(env, b, hsOnLaiNop(env, b, ctx)); return ra(r, trangThaiNop(r)) }
       // THỬ THÁCH RIÊNG HÔM NAY (Bộ não A.I Nấc 1, docs/hop-dong-thu-thach-rieng-2109.md): máy chủ chọn + chốt câu; nộp đi đường chấm của ôn lại.
       // ĐÃ GỠ cùng Bộ não A.I (28/09/2026): thử thách do Bộ não chọn ⇒ không còn nguồn. Máy em cũ gọi ⇒ `co:false` (app tự ẩn thẻ); nộp ⇒ báo đã gỡ.

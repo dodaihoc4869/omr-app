@@ -20,7 +20,11 @@ export function dungKhung() {
     .replace(/<meta name="description"[^>]*>/, '<meta name="description" content="Lời giải từng bước cho một câu Hoá — chìa khoá, dựng, gắn, soi, chốt.">')
   // Không mạng ra ngoài ngoài phông chữ; không form, không kết nối — khung chỉ nhận dữ liệu qua postMessage.
   const csp = `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'unsafe-inline'; connect-src 'none'; form-action 'none'; base-uri 'none'">`
-  const nhung = '<style>[data-next]{display:none!important}#qbar{display:none!important}.hdr .nav{display:none}</style>'
+  const nhung = '<style>[data-next]{display:none!important}#qbar{display:none!important}.hdr .nav{display:none}'
+    + '.luat{list-style:none;margin:0;padding:16px 20px 20px;display:grid;gap:10px;font-size:16px;line-height:1.6}'
+    + '.luat li{position:relative;padding-left:20px}'
+    + '.luat li::before{content:"";position:absolute;left:3px;top:.62em;width:8px;height:8px;border-radius:50%;background:var(--kc)}'
+    + '.luat b{color:var(--ink)}</style>'
   return [
     '<!doctype html>\n<html lang="vi">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n',
     csp, '\n', head, nhung, '\n</head>\n<body>\n', K('p2-khung.html'),

@@ -12,6 +12,10 @@
 import type { Env } from './kieu'
 import { gameIdentity } from './game-v2-auth'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
+import { coCaDangMo } from './bi-a'
+import { protectedQuestions } from './game-v2-bank'
+import { qidGoc } from './srs2-d1'
+import { ghiSuKien, ngayVn } from './su-kien-hoc'
 import {
   bamCau, boCua, cauTrongGoi, chuHtml, dauVao, deHtml, gonHoSo, kiemHoSo, laHoSoSach, lopCua, loaiCau, tangCau,
   type CauKho, type DangLoiGiai,
@@ -29,6 +33,9 @@ export const SQL_BANG_LOI_GIAI: readonly string[] = [
   'CREATE INDEX IF NOT EXISTS loi_giai_cau_de ON loi_giai_cau(ma_de)',
   `CREATE TABLE IF NOT EXISTS loi_giai_viec (bam TEXT PRIMARY KEY, qid TEXT NOT NULL, ma_de TEXT NOT NULL, dang TEXT NOT NULL, lop TEXT, bo TEXT, tang TEXT, uu_tien INTEGER NOT NULL DEFAULT 0, trang_thai TEXT NOT NULL, so_lan INTEGER NOT NULL DEFAULT 0, ma_luot TEXT, nhan_luc TEXT, loi TEXT, tao_luc TEXT NOT NULL)`,
   'CREATE INDEX IF NOT EXISTS loi_giai_viec_hang ON loi_giai_viec(trang_thai, bo, uu_tien)',
+  // Nút "Hỏi thầy" (29/09): mỗi lần em bấm một dòng — màn "Học sinh hỏi" của thầy và luật chấm luyện tập đọc được em đã xem lời giải câu nào.
+  `CREATE TABLE IF NOT EXISTS loi_giai_hoi (sbd TEXT NOT NULL, qid TEXT NOT NULL, nguon TEXT, luc TEXT NOT NULL, co_ho_so INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (sbd, qid, luc))`,
+  'CREATE INDEX IF NOT EXISTS loi_giai_hoi_qid ON loi_giai_hoi(qid)',
 ]
 const bangDaDung = new WeakMap<object, Promise<void>>()
 export function damBaoBangLoiGiai(env: Env): Promise<void> {
@@ -41,6 +48,12 @@ export function damBaoBangLoiGiai(env: Env): Promise<void> {
   }
   return p
 }
+
+/**
+ * HỒ SƠ HỌC SINH ĐƯỢC XEM: thầy đã duyệt, HOẶC hồ sơ SẠCH đang chờ duyệt (qua đủ bộ kiểm máy chủ, máy đã tự chốt, không còn cờ đáp án).
+ * Thầy giao máy tự chốt (29/09) và muốn "Hỏi thầy" hiện lời giải ngay ⇒ không bắt em đợi thầy duyệt từng đề. Cờ "đáp án kho sai" không bao giờ lộ ra.
+ */
+const SQL_XEM_DUOC = (l = 'l') => `(${l}.trang_thai = 'da_duyet' OR (${l}.trang_thai = 'cho_duyet' AND ${l}.so_co_dap_an = 0))`
 
 /** Số lần máy soạn được thử một câu trước khi câu bị đẩy sang "trượt" để thầy xem. */
 const SO_LAN_TOI_DA = 3
@@ -103,6 +116,7 @@ async function docGoi(env: Env, maDe: string): Promise<unknown | null> {
 /** Câu HIỆN TẠI trong kho theo qid (đọc gói R2 của đề ghi trong loi_giai_cau), kèm băm tính lại ngay. */
 async function cauHienTai(env: Env, qid: string, maDeGoiY?: string, boNho?: Map<string, unknown>): Promise<{ c: CauKho; bam: string } | null> {
   const maDe = maDeGoiY || str((await env.DB.prepare('SELECT ma_de FROM loi_giai_cau WHERE qid = ?').bind(qid).first<Obj>())?.ma_de)
+    || (/^(.+)-(?:III|II|I)-\d+$/.exec(qid)?.[1] ?? '')
   if (!maDe) return null
   let goi = boNho?.get(maDe)
   if (goi === undefined) { goi = await docGoi(env, maDe); boNho?.set(maDe, goi) }
@@ -347,14 +361,14 @@ export async function gvSoanGap(env: Env, b: Obj) {
 
 // ---------------------------------------------------------------- học sinh
 
-/** Trong các qid, câu nào ĐÃ có lời giải từng bước được duyệt (chỉ báo có/không — không lộ nội dung). */
+/** Trong các qid, câu nào ĐÃ có lời giải từng bước xem được (chỉ báo có/không — không lộ nội dung). */
 export async function hsLoiGiaiCo(env: Env, b: Obj) {
   await damBaoBangLoiGiai(env)
   await gameIdentity(env, b)
   const qids = (Array.isArray(b.qids) ? b.qids : []).map(str).filter(Boolean).slice(0, 80)
   if (!qids.length) return { ok: true, qids: [] }
   const r = await env.DB.prepare(
-    `SELECT q.qid FROM loi_giai_cau q JOIN loi_giai l ON l.bam = q.bam AND l.trang_thai = 'da_duyet' WHERE q.qid IN (SELECT value FROM json_each(?))`,
+    `SELECT q.qid FROM loi_giai_cau q JOIN loi_giai l ON l.bam = q.bam AND ${SQL_XEM_DUOC('l')} WHERE q.qid IN (SELECT value FROM json_each(?))`,
   ).bind(JSON.stringify(qids)).all<Obj>()
   return { ok: true, qids: (r.results ?? []).map((x) => str(x.qid)) }
 }
@@ -362,7 +376,7 @@ export async function hsLoiGiaiCo(env: Env, b: Obj) {
 /**
  * EM MỞ LỜI GIẢI TỪNG BƯỚC CỦA MỘT CÂU. Đủ ba điều kiện mới trả:
  *   (1) em được xem đáp án câu này: câu nằm trong ca của em đã CÔNG BỐ (luật `SQL_DA_CONG_BO`), hoặc em đã tự làm câu ở chỗ luyện (không phải ca thi);
- *   (2) hồ sơ thầy đã duyệt;
+ *   (2) hồ sơ xem được (`SQL_XEM_DUOC`: thầy đã duyệt hoặc hồ sơ sạch);
  *   (3) băm hồ sơ = băm câu HIỆN TẠI trong kho (thầy sửa đề thì hồ sơ cũ tự tắt).
  */
 export async function hsLoiGiai(env: Env, b: Obj) {
@@ -381,11 +395,80 @@ export async function hsLoiGiai(env: Env, b: Obj) {
     duoc = !!luyen
   }
   if (!duoc) return { ok: false, error: 'Lời giải mở sau khi Thầy công bố kết quả, hoặc sau khi em tự làm câu này.' }
-  const dong = await env.DB.prepare(`SELECT q.bam FROM loi_giai_cau q JOIN loi_giai l ON l.bam = q.bam AND l.trang_thai = 'da_duyet' WHERE q.qid = ?`).bind(qid).first<Obj>()
+  // Câu từng luyện nay nằm trong một ca đang thi / chưa công bố ⇒ khoá (em đã làm ca ấy và ca đã công bố thì nhánh thi ở trên cho qua).
+  if (!thi && (await cauDangBaoVe(env, qid))) return { ok: false, error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em xem lại nhé.' }
+  const dong = await env.DB.prepare(`SELECT q.bam FROM loi_giai_cau q JOIN loi_giai l ON l.bam = q.bam AND ${SQL_XEM_DUOC('l')} WHERE q.qid = ?`).bind(qid).first<Obj>()
   if (!dong) return { ok: true, coLoiGiai: false }
   const ht = await cauHienTai(env, qid)
   if (!ht || ht.bam !== str(dong.bam)) return { ok: true, coLoiGiai: false }
   const hoSo = await docHoSo(env, ht.bam)
   if (!hoSo) return { ok: true, coLoiGiai: false }
   return { ok: true, coLoiGiai: true, hoSo, cau: cauChoKhung(ht.c) }
+}
+
+/**
+ * Câu thuộc đề của một ca CHƯA công bố hoặc còn làm được (kể cả bài tập) — đúng tập game dùng để KHÔNG chấm câu ấy (`protectedQuestions`).
+ * Lỗi đọc phạm vi ⇒ coi như ĐANG bảo vệ (thà khoá nhầm một lúc còn hơn lộ lời giải câu đang thi).
+ */
+async function cauDangBaoVe(env: Env, qid: string): Promise<boolean> {
+  try {
+    const tap = await protectedQuestions(env)
+    return tap.has(qid) || tap.has(qidGoc(qid))
+  } catch {
+    return true
+  }
+}
+
+/** Lời giải chữ đang có trong kho (khi câu chưa có hồ sơ từng bước): đúng trường của gói, không bịa thêm gì. */
+function loiGiaiChu(c: CauKho) {
+  const lg = (c.loiGiai ?? {}) as Obj
+  const tung = (lg.tung_y ?? lg.tung_pa ?? null) as Record<string, { dung?: unknown; vi_sao?: unknown }> | null
+  return {
+    dapAn: c.dapAn,
+    chot: str(lg.chot),
+    tung: tung ? Object.entries(tung).map(([id, v]) => ({ id, dung: v?.dung === true, viSao: str(v?.vi_sao) })) : [],
+    buoc: Array.isArray(lg.buoc) ? (lg.buoc as unknown[]).map((x) => (typeof x === 'string' ? x : str((x as Obj)?.noi_dung ?? (x as Obj)?.t ?? JSON.stringify(x)))) : [],
+    ketQua: str(lg.ket_qua),
+  }
+}
+
+/**
+ * NÚT "HỎI THẦY" (thầy lệnh 29/09: "bất kể câu nào học sinh làm trừ lúc học sinh kiểm tra có một nút Hỏi thầy, bấm vào là hiển thị luôn lời giải kiểu mới").
+ * Chặn ở MÁY CHỦ, không tin máy em:
+ *   - em đang có ca kiểm tra mở vào được (`coCaDangMo`, đúng luật cổng vào thi) ⇒ khoá mọi câu;
+ *   - câu nằm trong một ca kiểm tra CHƯA công bố kết quả (của bất kì em nào) ⇒ khoá câu ấy, kẻo em làm xong chuyền lời giải cho bạn chưa làm.
+ * Có hồ sơ xem được ⇒ trả hồ sơ + câu cho khung. Chưa có ⇒ trả lời giải chữ của kho và đẩy câu lên đầu hàng soạn.
+ * Mỗi lần bấm ghi một dòng `loi_giai_hoi` (em đã xem lời giải câu này).
+ */
+export async function hsHoiThay(env: Env, b: Obj) {
+  await damBaoBangLoiGiai(env)
+  const sbd = await gameIdentity(env, b)
+  const qid = qidGoc(str(b.qid)) // câu game có hậu tố "#n" cho lượt lặp
+  const nguon = str(b.nguon).slice(0, 40) || 'luyen'
+  if (!qid) return { ok: false, error: 'Thiếu câu cần hỏi.' }
+  const nay = Date.now()
+  if (await coCaDangMo(env, sbd, nay)) return { ok: false, khoa: 'dang_kiem_tra', error: 'Em đang có ca kiểm tra mở nên nút Hỏi thầy tạm khoá. Làm xong ca kiểm tra rồi hỏi nhé.' }
+  if (await cauDangBaoVe(env, qid)) return { ok: false, khoa: 'ca_chua_cong_bo', error: 'Câu này đang nằm trong một ca kiểm tra chưa công bố kết quả. Thầy công bố xong em hỏi lại nhé.' }
+  const ht = await cauHienTai(env, qid).catch(() => null)
+  if (!ht) return { ok: false, error: 'Không tìm thấy câu này trong kho đề.' }
+  const dong = await env.DB.prepare(`SELECT l.bam FROM loi_giai l WHERE l.bam = ? AND ${SQL_XEM_DUOC('l')}`).bind(ht.bam).first<Obj>()
+  const hoSo = dong ? await docHoSo(env, ht.bam) : null
+  const luc = new Date(nay).toISOString()
+  const ghi = [env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi (sbd, qid, nguon, luc, co_ho_so) VALUES (?,?,?,?,?)').bind(sbd, qid, nguon, luc, hoSo ? 1 : 0)]
+  if (!hoSo) {
+    // Câu học sinh hỏi mà chưa có hồ sơ ⇒ lên đầu hàng soạn (mục 5.6: câu học sinh cần). Chưa vào hàng thì xếp cả đề ngay.
+    const coViec = await env.DB.prepare('SELECT 1 AS co FROM loi_giai_viec WHERE bam = ?').bind(ht.bam).first<Obj>()
+    if (!coViec) await ghiCauVaoHang(env, ht.c.maDe, await docGoi(env, ht.c.maDe)).catch(() => null)
+    ghi.push(env.DB.prepare("UPDATE loi_giai_viec SET uu_tien = uu_tien + 3000 WHERE bam = ? AND trang_thai = 'cho' AND uu_tien < 3000").bind(ht.bam))
+  }
+  await env.DB.batch(ghi).catch(() => null)
+  // ÔN LẠI: hỏi thầy khi CHƯA nộp câu hôm nay ⇒ ghi trước lần làm đầu tiên của câu là "có trợ giúp" (assisted, chưa đúng).
+  // Ôn lại lấy kết quả LẦN ĐẦU trong ngày (nộp lại không đổi) ⇒ em không nhận EXP cho câu vừa xem lời giải, câu quay lại lịch ôn để tự làm.
+  // Đã nộp rồi mới hỏi thì khoá trùng ⇒ không đổi gì. Chỉ các nguồn có luật "lần đầu" này mới ghi (game tự gửi `assisted` khi trả lời).
+  if (nguon === 'on_lai') {
+    await ghiSuKien(env, [{ nguon: 'on_lai', maNguon: `on_lai:${ngayVn(nay)}`, sbd, qid, lan: 1, ketQua: 0, luc, assistance: 'assisted' }]).catch(() => null)
+  }
+  const cau = cauChoKhung(ht.c)
+  if (hoSo) return { ok: true, coLoiGiai: true, hoSo, cau }
+  return { ok: true, coLoiGiai: false, cau, loiGiaiChu: loiGiaiChu(ht.c) }
 }

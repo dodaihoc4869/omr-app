@@ -72,6 +72,26 @@ export async function taiLoiGiai(qid: string): Promise<KetQuaLoiGiai> {
   return { ok: true, hoSo: j.hoSo as HoSoLoiGiai, cau: j.cau as CauChoKhung }
 }
 
+// ---------------------------------------------------------------- nút "Hỏi thầy" (mọi câu luyện tập, trừ lúc kiểm tra)
+
+/** Lời giải chữ của kho — hiện khi câu chưa có hồ sơ từng bước (máy chủ đã đẩy câu lên đầu hàng soạn). */
+export interface LoiGiaiChu { dapAn: string; chot: string; tung: { id: string; dung: boolean; viSao: string }[]; buoc: string[]; ketQua: string }
+export type KetQuaHoiThay =
+  | { ok: true; cau: CauChoKhung; hoSo: HoSoLoiGiai; loiGiaiChu?: undefined }
+  | { ok: true; cau: CauChoKhung; hoSo?: undefined; loiGiaiChu: LoiGiaiChu }
+  | { ok: false; loi: string; khoa?: 'dang_kiem_tra' | 'ca_chua_cong_bo' }
+
+/** `nguon`: nơi em bấm (on_lai, luyen_de, khac_phuc, btvn, gia_dinh, game, dao, doan, vo_dai, bi_a…) — chỉ để thầy xem thống kê. */
+export async function hoiThay(qid: string, nguon: string): Promise<KetQuaHoiThay> {
+  const token = docTokenHs()
+  if (!token) return { ok: false, loi: 'Em đăng nhập lại để hỏi thầy.' }
+  const j = await goiHs('/hs/hoi-thay', { token, qid, nguon })
+  if (!j) return { ok: false, loi: 'Chưa nối được máy chủ. Em thử lại sau.' }
+  if (j.ok !== true) return { ok: false, loi: String(j.error ?? 'Chưa mở được lời giải.'), khoa: j.khoa as 'dang_kiem_tra' | 'ca_chua_cong_bo' | undefined }
+  if (j.coLoiGiai === true) return { ok: true, cau: j.cau as CauChoKhung, hoSo: j.hoSo as HoSoLoiGiai }
+  return { ok: true, cau: j.cau as CauChoKhung, loiGiaiChu: j.loiGiaiChu as LoiGiaiChu }
+}
+
 // ---------------------------------------------------------------- thầy
 
 async function goiThay(duong: string, body: Record<string, unknown>): Promise<any> { // eslint-disable-line @typescript-eslint/no-explicit-any

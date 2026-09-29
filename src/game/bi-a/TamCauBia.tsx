@@ -95,8 +95,8 @@ export default function TamCauBia({ y, token, session, tenNguoiDanh, laEmDanh, t
         <div className="dao2 bia-dao2">
           {!phanHoi && !hetGio && <TheCauAi cau={y.cau} stt={1} traLoi={traLoi} khoa={dang} onTraLoi={setTraLoi} />}
           {phanHoi && (dung
-            ? <details className="bia-xem-lg"><summary className="bia-nut-chu">Xem lời giải</summary><KhoiLoiGiai cau={y.cau} stt={1} phanHoi={phanHoiChoLoiGiai(phanHoi)} traLoiMay={traLoi} /></details>
-            : <KhoiLoiGiai cau={y.cau} stt={1} phanHoi={phanHoiChoLoiGiai(phanHoi)} traLoiMay={traLoi} />)}
+            ? <details className="bia-xem-lg"><summary className="bia-nut-chu">Xem lời giải</summary><KhoiLoiGiai nguon="bi_a" cau={y.cau} stt={1} phanHoi={phanHoiChoLoiGiai(phanHoi)} traLoiMay={traLoi} /></details>
+            : <KhoiLoiGiai nguon="bi_a" cau={y.cau} stt={1} phanHoi={phanHoiChoLoiGiai(phanHoi)} traLoiMay={traLoi} />)}
         </div>
         {loi && <p className="bia-loi" role="alert">{loi}</p>}
         {!xong

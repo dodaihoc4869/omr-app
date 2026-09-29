@@ -141,12 +141,15 @@ describe('thầy duyệt theo đề + học sinh xem qua cổng công bố', () 
     expect(x).toMatchObject({ ok: true, cau: { qid: QA.tln } })
   })
 
-  it('học sinh: ca chưa công bố ⇒ chặn; công bố + đã duyệt ⇒ có; chưa duyệt ⇒ không có', async () => {
+  it('học sinh: ca chưa công bố ⇒ chặn; công bố ⇒ có (hồ sơ sạch không cần chờ duyệt); còn cờ đáp án ⇒ không có', async () => {
     const { d, token } = await chuanBi()
     caCongBo(d, 'CA-KHONG', 'khong', 'E1', QA.ds)
     expect(await em(d, '/hs/loi-giai', { token, qid: QA.ds })).toMatchObject({ ok: false })
     caCongBo(d, 'CA-NGAY', 'ngay', 'E1', QA.ds)
-    expect(await em(d, '/hs/loi-giai', { token, qid: QA.ds })).toMatchObject({ ok: true, coLoiGiai: false })
+    caCongBo(d, 'CA-NGAY-2', 'ngay', 'E1', QA.tln)
+    // Thầy giao máy tự chốt (29/09): hồ sơ SẠCH đang chờ duyệt đã xem được; hồ sơ còn cờ đáp án thì không.
+    expect(await em(d, '/hs/loi-giai', { token, qid: QA.ds })).toMatchObject({ ok: true, coLoiGiai: true })
+    expect(await em(d, '/hs/loi-giai', { token, qid: QA.tln })).toMatchObject({ ok: true, coLoiGiai: false })
     await thay(d, '/gv/loi-giai/duyet', { quyet: 'duyet', maDe: DE_A, caLoSach: true })
     const r = await em(d, '/hs/loi-giai', { token, qid: QA.ds })
     expect(r).toMatchObject({ ok: true, coLoiGiai: true, cau: { qid: QA.ds } })
@@ -189,5 +192,74 @@ describe('thầy duyệt theo đề + học sinh xem qua cổng công bố', () 
     expect(await thay(d, '/gv/loi-giai/duyet', { quyet: 'tra_lai', bam: [bam], ghiChu: 'Bước 2 thiếu hiệu suất' })).toMatchObject({ ok: true, soCau: 1 })
     const l = await thay(d, '/kho/loi-giai/viec', { so: 5 })
     expect(l.viec).toEqual([expect.objectContaining({ qid: QA.tln, ghiChuThay: 'Thầy trả lại: Bước 2 thiếu hiệu suất' })])
+  })
+})
+
+describe('nút Hỏi thầy (/hs/hoi-thay) — mọi câu luyện tập, trừ lúc kiểm tra', () => {
+  const H = 3_600_000
+  const iso = (gio: number) => new Date(Date.now() + gio * H).toISOString()
+  async function coDe() {
+    const d = taoD1That()
+    await napDe(d, DE_A, GOI_A)
+    hocSinh(d, 'E1')
+    return { d, token: await gameToken(d.env, 'E1') }
+  }
+  async function nop(d: D1That, qid: string, tep: string, co: unknown[] = []) {
+    const bam = (d.sql.prepare('SELECT bam FROM loi_giai_cau WHERE qid=?').get(qid) as { bam: string }).bam
+    const h = { ...hoSoTu(tep, qid, bam), co }
+    expect(await thay(d, '/kho/loi-giai/nop', { qid, bam, hoSo: h })).toMatchObject({ ok: true })
+    return bam
+  }
+
+  it('chưa có hồ sơ ⇒ hiện lời giải chữ của kho + đáp án, ghi lượt hỏi, câu lên đầu hàng soạn', async () => {
+    const { d, token } = await coDe()
+    const r = await em(d, '/hs/hoi-thay', { token, qid: QA.ds, nguon: 'on_lai' })
+    expect(r).toMatchObject({ ok: true, coLoiGiai: false, cau: { qid: QA.ds }, loiGiaiChu: { dapAn: expect.stringMatching(/^[DS]{4}$/) } })
+    expect(d.dem('loi_giai_hoi', `sbd='E1' AND qid='${QA.ds}' AND nguon='on_lai' AND co_ho_so=0`)).toBe(1)
+    expect(d.dem('loi_giai_viec', `qid='${QA.ds}' AND uu_tien >= 3000`)).toBe(1)
+  })
+
+  it('hồ sơ SẠCH (máy đã chốt, chưa cần thầy duyệt) ⇒ hiện ngay; còn cờ đáp án ⇒ chỉ lời giải chữ', async () => {
+    const { d, token } = await coDe()
+    await nop(d, QA.ds, '04-12-KT-C1-D4-II-4.json')
+    await nop(d, QA.tln, '06-12-KT-C1-D2-III-6.json', [{ loai: 'dapAn', ghi: 'đáp án kho sai', chot: 'Đáp án đúng là 7' }])
+    expect(await em(d, '/hs/hoi-thay', { token, qid: QA.ds })).toMatchObject({ ok: true, coLoiGiai: true, hoSo: { qid: QA.ds }, cau: { qid: QA.ds } })
+    expect(await em(d, '/hs/hoi-thay', { token, qid: QA.tln })).toMatchObject({ ok: true, coLoiGiai: false })
+    // câu game mang hậu tố lượt lặp "#2" vẫn đúng câu
+    expect(await em(d, '/hs/hoi-thay', { token, qid: QA.ds + '#2' })).toMatchObject({ ok: true, coLoiGiai: true })
+  })
+
+  it('em đang có ca kiểm tra mở ⇒ khoá mọi câu', async () => {
+    const { d, token } = await coDe()
+    d.sql.prepare('INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,lop,bat_dau,het_han_vao,thoi_gian_phut,pham_vi,danh_sach_chon_json,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+      .run('CA-MO', 'Ca mở', 'mo', 'thi', '12', iso(-1), iso(2), 45, 'tu_do', null, 'x')
+    const r = await em(d, '/hs/hoi-thay', { token, qid: QA.ds })
+    expect(r).toMatchObject({ ok: false, khoa: 'dang_kiem_tra' })
+    expect(d.dem('loi_giai_hoi')).toBe(0)
+  })
+
+  it('câu nằm trong đề của một ca chưa công bố (kể cả bài tập) ⇒ khoá câu ấy, câu khác vẫn hỏi được', async () => {
+    const { d, token } = await coDe()
+    d.objects.set('ca/BT1.json', JSON.stringify({ phanI: [{ id: QA.tn, text: 'x', choices: ['a', 'b', 'c', 'd'], correct: 'A' }] }))
+    d.sql.prepare('INSERT INTO ca(ma_ca,ten_ca,trang_thai,loai,lop,bat_dau,han_nop,cong_bo,bank_r2,pham_vi,cap_nhat_luc) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+      .run('BT1', 'Bài tập', 'mo', 'baitap', '11', iso(-1), iso(48), 'khong', 'ca/BT1.json', 'tu_do', 'x')
+    expect(await em(d, '/hs/hoi-thay', { token, qid: QA.tn })).toMatchObject({ ok: false, khoa: 'ca_chua_cong_bo' })
+    expect(await em(d, '/hs/hoi-thay', { token, qid: QA.ds })).toMatchObject({ ok: true })
+  })
+
+  it('ôn lại: hỏi thầy trước khi nộp ⇒ lần làm đầu trong ngày ghi "có trợ giúp" (không EXP, câu quay lại lịch ôn)', async () => {
+    const { d, token } = await coDe()
+    await em(d, '/hs/hoi-thay', { token, qid: QA.ds, nguon: 'on_lai' })
+    expect(d.dem('su_kien_hoc', `sbd='E1' AND qid='${QA.ds}' AND nguon='on_lai' AND lan=1 AND ket_qua=0 AND assistance='assisted'`)).toBe(1)
+    // nguồn khác (phiếu, game…) không ghi sổ ôn lại
+    await em(d, '/hs/hoi-thay', { token, qid: QA.tn, nguon: 'phieu' })
+    expect(d.dem('su_kien_hoc', `qid='${QA.tn}'`)).toBe(0)
+  })
+
+  it('không token hợp lệ ⇒ không trả gì', async () => {
+    const { d } = await coDe()
+    const r = await em(d, '/hs/hoi-thay', { token: 'gia.mao', qid: QA.ds })
+    expect(r.ok).not.toBe(true)
+    expect(r.cau).toBeUndefined()
   })
 })

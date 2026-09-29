@@ -24,7 +24,11 @@ function datBo(ma) {
   openLab = la ? openLabEster : (k) => {
     const K = KEYS[k] || KEYS[Object.keys(KEYS)[0]];
     $$('.key').forEach(b => b.classList.toggle('on', b.dataset.k === k));
-    $('#lab').innerHTML = `<div style="padding:18px 20px"><h3 style="margin:0 0 8px;--kc:var(${K.cv})">${icon(K.ic)} ${K.ten}</h3><p style="margin:0;line-height:1.65">${fx(K.rule)}</p></div>`;
+    // Quy tắc viết thành từng dòng "<b>Nhãn:</b> nội dung" nối bằng <br> (thầy yêu cầu 29/09: ngắt dòng, mạch lạc) ⇒ mỗi dòng một mục.
+    const dong = String(K.rule).split(/<br\s*\/?>/i).map(x => x.trim()).filter(Boolean);
+    $('#lab').style.setProperty('--kc', `var(${K.cv})`);
+    $('#lab').innerHTML = `<div class="lab-top"><span class="kic">${icon(K.ic)}</span><h3>${K.ten}</h3></div>`
+      + `<ul class="luat">${dong.map(x => `<li>${fx(x)}</li>`).join('')}</ul>`;
   };
   $('#nhanChuong').textContent = (bo && bo.chuong) || 'Hoá 12';
   $('#tieuDeKhoa').textContent = `${Object.keys(KEYS).length} chìa khoá chương ${(bo && bo.chuong) || ''}`.trim();

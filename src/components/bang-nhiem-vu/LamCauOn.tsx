@@ -13,6 +13,7 @@ import ONhapDapSo from '../ONhapDapSo'
 import { soCauDaLamHienThi } from '../../lib/so-cau-hien-thi'
 import { nopOnLai, taiCauTheoQid, type CauOn, type KetQuaCauOn, type MucTraLoi, type PhanHoiNopOn, type TienBoOn } from './cau-on-api'
 import { CHU_DA_LUU_MAY, SU_KIEN_HANG_DOI_XONG, khoaOnCau } from '../../lib/hang-doi-nop'
+import NutHoiThay from '../loi-giai/NutHoiThay'
 
 const KY_TU = ['A', 'B', 'C', 'D', 'E', 'F']
 const NHAN_PHAN: Record<CauOn['phan'], string> = { I: 'Phần I · Trắc nghiệm', II: 'Phần II · Đúng / Sai', III: 'Phần III · Trả lời ngắn' }
@@ -378,6 +379,8 @@ function TheCauOn({
   onChonY: (y: number, v: 'D' | 'S') => void
 }) {
   const daCham = !!ketQua
+  // Em bấm Hỏi thầy TRƯỚC khi nộp câu này ⇒ máy chủ đã ghi câu là "có trợ giúp"; nói thật cho em biết vì sao câu chưa được tính.
+  const [daHoi, setDaHoi] = useState<string | null>(null)
   const khoaO = daCham || khoa
   const idTen = `lco-c-${c.qid}`
   const dungChuoi = ketQua ? (c.phan === 'II' ? chuanDS(String(ketQua.dapAnDung || '')) : String(ketQua.dapAnDung || '').trim().toUpperCase()) : ''
@@ -467,6 +470,12 @@ function TheCauOn({
         </div>
       )}
 
+      {/* Nút Hỏi thầy TRƯỚC khi nộp (thầy lệnh 29/09); nộp xong thì nút nằm trong hộp lời giải bên dưới. */}
+      {!daCham && <NutHoiThay qid={c.qid} nguon="on_lai" gon onHoi={() => setDaHoi(c.qid)} />}
+      {daCham && daHoi === c.qid && (
+        <p className="lco-da-hoi" role="note">Em đã hỏi thầy trước khi nộp nên câu này chưa tính là tự làm được. Câu sẽ quay lại lịch ôn để em tự làm.</p>
+      )}
+
       {daCham && (
         <div className="lco-loi-giai">
           {c.phan === 'III' && (
@@ -474,7 +483,7 @@ function TheCauOn({
               Đáp án đúng: <b>{ketQua!.dapAnDung}</b>
             </p>
           )}
-          <LoiGiaiCauSai hoaHoc c={{ text: c.text, phan: c.phan, dapAnDung: ketQua!.dapAnDung, loiGiai: ketQua!.loiGiai } as any} />
+          <LoiGiaiCauSai hoaHoc c={{ text: c.text, phan: c.phan, dapAnDung: ketQua!.dapAnDung, loiGiai: ketQua!.loiGiai } as any} qid={c.qid} nguon="on_lai" />
           <HinhTaiViTri hinhAnh={anhLoi as any} viTri="sau_loi_giai" nhan="lời giải" />
         </div>
       )}

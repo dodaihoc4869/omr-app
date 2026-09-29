@@ -5,31 +5,31 @@
  "KEYS": {
   "k1": {
    "ten": "So E°, đoán chiều",
-   "rule": "Phản ứng tự xảy ra khi <b>E° cặp chứa chất oxi hoá > E° cặp chứa chất khử</b> (quy tắc α), sinh ra chất oxi hoá và chất khử yếu hơn. Đếm phản ứng: mỗi phản ứng tìm đúng hai cặp rồi so. Dãy E° tăng: Mg, Al, Zn, Fe, Ni, Sn, Pb, {H2} (0), Cu (0,340), Fe³⁺/Fe²⁺ (0,771), Ag (0,799), {O2}/{H2O}. E° < 0 mới đẩy {H2} khỏi acid loãng."
+   "rule": "<b>Tự xảy ra:</b> E° cặp chứa chất oxi hoá > E° cặp chứa chất khử (quy tắc α)<br><b>Sản phẩm:</b> chất oxi hoá và chất khử yếu hơn<br><b>Dãy E° tăng:</b> Mg, Al, Zn, Fe, Ni, Sn, Pb, {H2} (0), Cu (0,340), Fe³⁺/Fe²⁺ (0,771), Ag (0,799), {O2}/{H2O}<br><b>Đếm phản ứng:</b> mỗi phản ứng tìm đúng hai cặp rồi so<br><b>Với acid loãng:</b> E° < 0 mới đẩy {H2} khỏi acid loãng"
   },
   "k2": {
    "ten": "Suy dãy từ phản ứng",
-   "rule": "Không cho số E°: mỗi phản ứng xảy ra cho <b>hai bất đẳng thức</b>: chất khử vế trái mạnh hơn chất khử vế phải; chất oxi hoá vế trái mạnh hơn chất oxi hoá vế phải. \"Không phản ứng\" thì đảo lại. Ghép thành một dãy. Kim loại khử càng mạnh, ion của nó oxi hoá càng yếu. Kim loại đẩy được {H2} khỏi HCl ⇒ E° âm."
+   "rule": "<b>Không cho số E°:</b> mỗi phản ứng xảy ra cho <b>hai bất đẳng thức</b><br><b>Chất khử:</b> vế trái mạnh hơn vế phải<br><b>Chất oxi hoá:</b> vế trái mạnh hơn vế phải<br><b>Ghép dãy:</b> \"không phản ứng\" → đảo lại, rồi ghép thành một dãy<br><b>Kim loại – ion:</b> kim loại khử càng mạnh, ion của nó oxi hoá càng yếu<br><b>Dấu E°:</b> kim loại đẩy được {H2} khỏi HCl ⇒ E° âm"
   },
   "k3": {
    "ten": "Pin Galvani",
-   "rule": "Cặp E° nhỏ là <b>anode (cực âm)</b>: kim loại bị oxi hoá, tan dần. Cặp E° lớn là <b>cathode (cực dương)</b>: ion bị khử; điện cực Pt không đổi khối lượng. E°pin = E°(cathode) − E°(anode) > 0, vôn kế chỉ số dương. Cầu muối: <b>cation về cathode, anion về anode</b>. Chỉ phản ứng oxi hoá – khử <b>tự xảy ra</b> mới lập được pin; không tự xảy ra thì phải điện phân."
+   "rule": "<b>Anode (cực âm):</b> cặp E° nhỏ → kim loại bị oxi hoá, tan dần<br><b>Cathode (cực dương):</b> cặp E° lớn → ion bị khử; điện cực Pt không đổi khối lượng<br><b>Tính E°pin:</b> E°pin = E°(cathode) − E°(anode) > 0, vôn kế chỉ số dương<br><b>Cầu muối:</b> cation về cathode, anion về anode<br><b>Lập được pin:</b> chỉ phản ứng oxi hoá – khử <b>tự xảy ra</b><br><b>Không tự xảy ra:</b> phải điện phân"
   },
   "k4": {
    "ten": "Phóng điện – nạp điện",
-   "rule": "<b>Phóng điện</b> = pin: hoá năng → điện năng, cực âm là anode, bị oxi hoá. <b>Nạp điện</b> = điện phân: điện năng → hoá năng, mọi quá trình đảo chiều. Acquy chì phóng: Pb và {PbO2} đều thành {PbSO4} bám cực ⇒ hai cực cùng nặng thêm (+96 và +64 g/mol), {H2SO4} giảm; chì độc. Li-ion phóng: Li⁺ sang cực dương. Pin nhiên liệu: điện năng ≈ |ΔrH|, nhiên liệu thật = lí thuyết : H."
+   "rule": "<b>Phóng điện = pin:</b> hoá năng → điện năng; cực âm là anode, bị oxi hoá<br><b>Nạp điện = điện phân:</b> điện năng → hoá năng, mọi quá trình đảo chiều<br><b>Acquy chì phóng:</b> Pb và {PbO2} đều → {PbSO4} bám cực; {H2SO4} giảm; chì độc<br><b>Khối lượng cực:</b> hai cực cùng nặng thêm (+96 và +64 g/mol)<br><b>Li-ion phóng:</b> Li⁺ sang cực dương<br><b>Pin nhiên liệu:</b> điện năng ≈ |ΔrH|; nhiên liệu thật = lí thuyết : H"
   },
   "k5": {
    "ten": "Thứ tự điện phân",
-   "rule": "Anode nối cực (+), oxi hoá; cathode nối cực (−), khử. <b>Cathode</b>: E° lớn bị khử trước: Ag⁺ > Fe³⁺ (→ Fe²⁺) > Cu²⁺ > H⁺ (acid) > Fe²⁺, Ni²⁺, Zn²⁺ (vẫn trước nước). K⁺, Na⁺, Mg²⁺, Al³⁺ không bị khử, nước bị khử thay: {H2} + OH⁻, pH tăng. <b>Anode trơ</b>: Cl⁻, Br⁻ trước nước; {SO4}²⁻, {NO3}⁻ không bị oxi hoá, nước bị oxi hoá: {O2} + H⁺, pH giảm. Anode bằng Cu thì Cu tan."
+   "rule": "<b>Hai cực:</b> anode nối cực (+), oxi hoá; cathode nối cực (−), khử<br><b>Cathode:</b> E° lớn bị khử trước: Ag⁺ > Fe³⁺ (→ Fe²⁺) > Cu²⁺ > H⁺ (acid) > Fe²⁺, Ni²⁺, Zn²⁺ (vẫn trước nước)<br><b>Nước ở cathode:</b> K⁺, Na⁺, Mg²⁺, Al³⁺ không bị khử → nước bị khử thay: {H2} + OH⁻, pH tăng<br><b>Anode trơ:</b> Cl⁻, Br⁻ bị oxi hoá trước nước<br><b>Nước ở anode:</b> {SO4}²⁻, {NO3}⁻ không bị oxi hoá → nước bị oxi hoá: {O2} + H⁺, pH giảm<br><b>Anode bằng Cu:</b> Cu tan"
   },
   "k6": {
    "ten": "Điện phân sản xuất",
-   "rule": "Na, Al chỉ điều chế được bằng <b>điện phân nóng chảy</b>. {Al2O3} (từ bauxite) trộn cryolite: <b>hạ nhiệt độ nóng chảy, tăng dẫn điện</b>; Al ra ở cathode, {O2} ở anode đốt mòn than; không dùng {AlCl3} (thăng hoa). {NaCl} dung dịch <b>có màng ngăn</b> → {NaOH} (cô đặc, kết tinh) + {H2} + {Cl2}; <b>không màng ngăn</b> → {Cl2} gặp {NaOH} ra nước Javel (tẩy màu, diệt khuẩn), gộp: {NaCl} + {H2O} → {NaClO} + {H2}."
+   "rule": "<b>Na, Al:</b> chỉ điều chế được bằng <b>điện phân nóng chảy</b><br><b>Cryolite:</b> trộn {Al2O3} (từ bauxite) → <b>hạ nhiệt độ nóng chảy, tăng dẫn điện</b><br><b>Điện cực Al:</b> Al ra ở cathode, {O2} ở anode đốt mòn than<br><b>Có màng ngăn:</b> {NaCl} dung dịch → {NaOH} (cô đặc, kết tinh) + {H2} + {Cl2}<br><b>Không màng ngăn:</b> {Cl2} gặp {NaOH} → nước Javel (tẩy màu, diệt khuẩn); gộp: {NaCl} + {H2O} → {NaClO} + {H2}<br><b>Bẫy hay gặp:</b> sản xuất Al không dùng {AlCl3} (thăng hoa)"
   },
   "k7": {
    "ten": "Định luật Faraday",
-   "rule": "q = I·t = n(e)·F ⇒ <b>n(chất) = It : (zF)</b>, F = 96500 C/mol (đề cho số khác thì theo đề). t tính bằng <b>giây</b>; 1 A·h = 3600 C. z = số electron một ion, phân tử trao đổi: Ag⁺ 1, Cu²⁺ 2, Al³⁺ 3, {Cl2} 2, {H2} 2, {O2} 4; hợp chất thì lấy độ đổi số oxi hoá. Hiệu suất: sản phẩm thực = lí thuyết × H; điện lượng, thời gian cần = lí thuyết : H."
+   "rule": "<b>Công thức:</b> q = I·t = n(e)·F ⇒ <b>n(chất) = It : (zF)</b><br><b>Số F:</b> F = 96500 C/mol; đề cho số khác → theo đề<br><b>Đổi đơn vị:</b> t tính bằng <b>giây</b>; 1 A·h = 3600 C<br><b>Số z:</b> số electron một ion, phân tử trao đổi; hợp chất → lấy độ đổi số oxi hoá<br><b>z hay gặp:</b> Ag⁺ 1, Cu²⁺ 2, Al³⁺ 3, {Cl2} 2, {H2} 2, {O2} 4<br><b>Hiệu suất:</b> sản phẩm thực = lí thuyết × H; điện lượng, thời gian cần = lí thuyết : H"
   }
  },
  "TRAPS_THEM": {

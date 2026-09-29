@@ -5,27 +5,27 @@
  "KEYS": {
   "k1": {
    "ten": "Gọi tên polymer",
-   "rule": "Tên = <b>poly + tên monomer</b>, tên nhiều chữ đặt trong ngoặc: poly(vinyl chloride). Nylon-n: đếm <b>tổng C trong mắt xích</b>, kể cả C của –CO–: –NH–{(CH2)5}–CO– có 6 C → nylon-6 (capron); nylon-6,6 đi từ hai monomer 6 C. Tên riêng: nitron (olon) = poly(acrylonitrile), PVA = poly(vinyl acetate), PMMA = poly(methyl methacrylate), PS = polystyrene, cao su buna = polybuta-1,3-diene."
+   "rule": "<b>Tên chung:</b> <b>poly + tên monomer</b>; tên nhiều chữ đặt trong ngoặc: poly(vinyl chloride).<br><b>Nylon-n:</b> đếm <b>tổng C trong mắt xích</b>, kể cả C của –CO–.<br><b>Ví dụ nylon:</b> –NH–{(CH2)5}–CO– có 6 C → nylon-6 (capron); nylon-6,6 đi từ hai monomer 6 C.<br><b>Tên riêng:</b> nitron (olon) = poly(acrylonitrile), PVA = poly(vinyl acetate), PMMA = poly(methyl methacrylate), PS = polystyrene, cao su buna = polybuta-1,3-diene."
   },
   "k2": {
    "ten": "Monomer & cách trùng",
-   "rule": "Bỏ ngoặc mắt xích, nối lại C=C → ra monomer. Monomer có <b>C=C</b> hoặc vòng kém bền (caprolactam) → <b>trùng hợp</b>, không tách phân tử nhỏ. Monomer có <b>từ 2 nhóm chức</b> (–{NH2}, –{COOH}, –OH) → <b>trùng ngưng</b>, tách {H2O}: nylon-6,6 từ hexamethylenediamine + adipic acid. PVA từ vinyl acetate {CH3COOCH=CH2}, không phải {CH2=CHCOOCH3}. Cao su thiên nhiên là polyisoprene, khác buna (từ buta-1,3-diene) ở nhóm –{CH3}."
+   "rule": "<b>Tìm monomer:</b> bỏ ngoặc mắt xích, nối lại C=C → ra monomer.<br><b>Trùng hợp:</b> monomer có <b>C=C</b> hoặc vòng kém bền (caprolactam); không tách phân tử nhỏ.<br><b>Trùng ngưng:</b> monomer có <b>từ 2 nhóm chức</b> (–{NH2}, –{COOH}, –OH), tách {H2O}: nylon-6,6 từ hexamethylenediamine + adipic acid.<br><b>Bẫy PVA:</b> từ vinyl acetate {CH3COOCH=CH2}, không phải {CH2=CHCOOCH3}.<br><b>Bẫy cao su:</b> cao su thiên nhiên là polyisoprene, khác buna (từ buta-1,3-diene) ở nhóm –{CH3}."
   },
   "k3": {
    "ten": "Nguồn gốc & loại",
-   "rule": "<b>Thiên nhiên</b>: có sẵn (bông, đay là cellulose; tơ tằm, len là protein; cao su thiên nhiên). <b>Bán tổng hợp</b>: chế hoá từ polymer thiên nhiên (tơ visco, cellulose acetate từ cellulose). <b>Tổng hợp</b>: đi từ monomer (capron, nylon-6,6, nitron, PE, PVC, cao su buna). \"Nguồn gốc cellulose\" = bông, đay, visco, cellulose acetate. Theo công dụng: chất dẻo, tơ, cao su, keo dán; <b>chỉ cao su có tính đàn hồi</b>."
+   "rule": "<b>Thiên nhiên:</b> có sẵn (bông, đay là cellulose; tơ tằm, len là protein; cao su thiên nhiên).<br><b>Bán tổng hợp:</b> chế hoá từ polymer thiên nhiên (tơ visco, cellulose acetate từ cellulose).<br><b>Tổng hợp:</b> đi từ monomer (capron, nylon-6,6, nitron, PE, PVC, cao su buna).<br><b>Nguồn gốc cellulose:</b> bông, đay, visco, cellulose acetate.<br><b>Theo công dụng:</b> chất dẻo, tơ, cao su, keo dán; <b>chỉ cao su có tính đàn hồi</b>."
   },
   "k4": {
    "ten": "Phản ứng của polymer",
-   "rule": "So mạch trước và sau. Nối các mạch bằng cầu (lưu hoá cao su bằng S) → <b>tăng mạch</b>. Mạch ngắn lại: giải trùng hợp (polystyrene → styrene), thuỷ phân tinh bột, cellulose, polyamide → <b>cắt mạch</b>. Chỉ đổi nhóm thế (poly(vinyl acetate) + {NaOH} → poly(vinyl alcohol)) → <b>giữ nguyên mạch</b>. Thành chất đơn giản (tinh bột + {H2SO4} đặc → C + {H2O}) → <b>phân huỷ</b>. Polymer không có nhiệt độ nóng chảy xác định, không bay hơi."
+   "rule": "<b>Cách nhận:</b> so mạch trước và sau.<br><b>Tăng mạch:</b> nối các mạch bằng cầu (lưu hoá cao su bằng S).<br><b>Cắt mạch:</b> mạch ngắn lại; giải trùng hợp (polystyrene → styrene), thuỷ phân tinh bột, cellulose, polyamide.<br><b>Giữ nguyên mạch:</b> chỉ đổi nhóm thế (poly(vinyl acetate) + {NaOH} → poly(vinyl alcohol)).<br><b>Phân huỷ:</b> thành chất đơn giản (tinh bột + {H2SO4} đặc → C + {H2O}).<br><b>Lưu ý:</b> polymer không có nhiệt độ nóng chảy xác định, không bay hơi."
   },
   "k5": {
    "ten": "Tính theo mắt xích",
-   "rule": "Trùng hợp: 1 mắt xích = 1 monomer, n = m : M(mắt xích). Mắt xích hay gặp: {C2H3Cl} 62,5; {C4H6} 54; {C4H5Cl} 88,5; {C8H8} 104. Nhiều giai đoạn: <b>H chung = H<sub>1</sub> × H<sub>2</sub> × …</b>; tính sản phẩm thì × H, tìm nguyên liệu thì <b>÷ H</b>. Soi hệ số: 2 {C2H5OH} → 1 {C4H6}; 2 {C2H2} → 1 {C4H4}. Khí ở 25 °C, 1 bar: <b>24,79 L/mol</b>. Hệ số polymer hoá = M(polymer) : M(mắt xích)."
+   "rule": "<b>Trùng hợp:</b> 1 mắt xích = 1 monomer, n = m : M(mắt xích).<br><b>Hệ số polymer hoá:</b> = M(polymer) : M(mắt xích).<br><b>Mắt xích hay gặp:</b> {C2H3Cl} 62,5; {C4H6} 54; {C4H5Cl} 88,5; {C8H8} 104.<br><b>Nhiều giai đoạn:</b> <b>H chung = H<sub>1</sub> × H<sub>2</sub> × …</b>; tính sản phẩm × H, tìm nguyên liệu <b>÷ H</b>.<br><b>Soi hệ số:</b> 2 {C2H5OH} → 1 {C4H6}; 2 {C2H2} → 1 {C4H4}.<br><b>Thể tích mol khí:</b> ở 25 °C, 1 bar là <b>24,79 L/mol</b>."
   },
   "k6": {
    "ten": "Mắt xích cellulose",
-   "rule": "Cellulose [{C6H7O2(OH)3}]<sub>n</sub>: mỗi mắt xích <b>3 nhóm –OH</b>. Thay x nhóm –OH bằng –{OCOCH3}: <b>M = 162 + 42x</b>, số C = 6 + 2x; triacetate (x = 3) là [{C6H7O2(OOCCH3)3}]<sub>n</sub>, diacetate x = 2. Thay bằng –{ONO2}: M = 162 + 45x, trinitrate [{C6H7O2(ONO2)3}]<sub>n</sub>. Đề cho %C hoặc %N → lập phương trình theo x; x lẻ nghĩa là hỗn hợp di- và triacetate."
+   "rule": "<b>Cellulose:</b> [{C6H7O2(OH)3}]<sub>n</sub>, mỗi mắt xích <b>3 nhóm –OH</b>.<br><b>Thay bằng –{OCOCH3}:</b> x nhóm –OH → <b>M = 162 + 42x</b>, số C = 6 + 2x.<br><b>Tri-, diacetate:</b> triacetate (x = 3) là [{C6H7O2(OOCCH3)3}]<sub>n</sub>, diacetate x = 2.<br><b>Thay bằng –{ONO2}:</b> M = 162 + 45x, trinitrate [{C6H7O2(ONO2)3}]<sub>n</sub>.<br><b>Đề cho %C, %N:</b> lập phương trình theo x; x lẻ → hỗn hợp di- và triacetate."
   }
  },
  "TRAPS_THEM": {

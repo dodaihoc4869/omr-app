@@ -6,7 +6,7 @@ import '../m3'
 import { propsTheCau } from '../hoa2/cau-chuyen'
 import type { ChiTietCau } from '../hoa2/api'
 import type { CauSaiHienThi } from '../KhoiCauSai'
-import NutLoiGiai from '../loi-giai/NutLoiGiai'
+import NutHoiThay from '../loi-giai/NutHoiThay'
 
 /** Một đường dẫn ảnh vẽ được, hay chuỗi rỗng (cùng luật `KhoiCauSai`). */
 function duongAnh(v: unknown): string {
@@ -58,7 +58,8 @@ export default function CauCanChua({ c, stt }: { c: CauSaiHienThi; stt: number }
   return (
     <div className="m3 h2-the-cau">
       <TheCau {...propsTheCau(chiTietTuCauSai(c), stt)} />
-      <NutLoiGiai qid={c.qid} />
+      {/* Báo cáo ca ĐÃ công bố (màn này chỉ hiện sau công bố): nút Hỏi thầy như mọi chỗ luyện tập — máy chủ vẫn tự chặn nếu ca chưa công bố. */}
+      <NutHoiThay qid={c.qid} nguon="bao_cao_ca" />
     </div>
   )
 }
