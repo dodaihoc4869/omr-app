@@ -1,0 +1,110 @@
+{
+ "ma": "CAN_BANG",
+ "chuong": "Cân bằng hoá học",
+ "lop": "11",
+ "KEYS": {
+  "k1": {
+   "ten": "Cân bằng & biểu thức KC",
+   "rule": "<b>Phản ứng thuận nghịch:</b> xảy ra hai chiều (⇌), không chất nào hết.<br><b>Cân bằng động:</b> v<sub>thuận</sub> = v<sub>nghịch</sub> ≠ 0; nồng độ các chất không đổi nhưng phản ứng vẫn diễn ra.<br><b>Biểu thức:</b> aA + bB ⇌ cC + dD → K<sub>C</sub> = [C]<sup>c</sup>[D]<sup>d</sup> : ([A]<sup>a</sup>[B]<sup>b</sup>); hệ số thành số mũ.<br><b>Không ghi vào K<sub>C</sub>:</b> chất rắn (s), nước là dung môi (l).<br><b>Ý nghĩa:</b> K<sub>C</sub> lớn → cân bằng nghiêng về sản phẩm; K<sub>C</sub> <b>chỉ phụ thuộc nhiệt độ</b>.<br><b>Viết ngược chiều:</b> K<sub>nghịch</sub> = 1 : K<sub>thuận</sub>; nhân đôi hệ số → K<sup>2</sup>."
+  },
+  "k2": {
+   "ten": "Chuyển dịch Le Chatelier",
+   "rule": "<b>Nguyên lí:</b> cân bằng chuyển dịch theo chiều <b>làm giảm</b> tác động bên ngoài.<br><b>Nồng độ:</b> thêm chất nào → dịch chiều tiêu thụ chất đó; thêm chất rắn → không dịch.<br><b>Áp suất:</b> tăng p → dịch về phía <b>ít mol khí</b>; tổng hệ số khí hai vế bằng nhau → không dịch.<br><b>Nhiệt độ:</b> tăng T → dịch chiều <b>thu nhiệt</b> (Δ<sub>r</sub>H > 0); phản ứng thuận toả nhiệt thì tăng T làm K<sub>C</sub> giảm.<br><b>Chất xúc tác:</b> không làm chuyển dịch, chỉ giúp đạt cân bằng nhanh hơn.<br><b>Dấu hiệu màu:</b> {NO2} nâu đỏ, {N2O4} không màu → hỗn hợp nhạt màu là dịch sang {N2O4}."
+  },
+  "k3": {
+   "ten": "Bảng cân bằng tính KC",
+   "rule": "<b>Lập bảng ba dòng:</b> ban đầu – phản ứng – cân bằng; lượng phản ứng tỉ lệ <b>theo hệ số</b>.<br><b>Đổi nồng độ:</b> C = n : V (V bình kín tính bằng lít) trước khi thế vào K<sub>C</sub>.<br><b>Tính K<sub>C</sub>:</b> chỉ dùng nồng độ <b>lúc cân bằng</b>, không dùng nồng độ ban đầu.<br><b>Biết K<sub>C</sub> tìm nồng độ:</b> đặt x, thế vào biểu thức, giải và loại nghiệm âm hoặc vượt lượng ban đầu.<br><b>Hiệu suất:</b> H = lượng đã phản ứng : lượng phản ứng tối đa (tính theo chất thiếu) × 100%.<br><b>Xét chiều:</b> tính Q<sub>C</sub> như K<sub>C</sub>; Q<sub>C</sub> < K<sub>C</sub> → chiều thuận, Q<sub>C</sub> > K<sub>C</sub> → chiều nghịch."
+  },
+  "k4": {
+   "ten": "Sự điện li & ion",
+   "rule": "<b>Điện li mạnh (→):</b> acid mạnh {HCl}, {HBr}, {HI}, {HNO3}, {H2SO4}, {HClO4}; base kiềm {NaOH}, {KOH}, {Ba(OH)2}; hầu hết muối tan.<br><b>Điện li yếu (⇌):</b> {CH3COOH}, {HF}, {H2S}, {H2CO3}, {HNO2}, {HClO}, {H3PO4}; {NH3}; nước.<br><b>Không điện li:</b> glucose, saccharose, ethanol, glycerol; nước cất dẫn điện rất kém.<br><b>Nồng độ ion:</b> nhân <b>chỉ số</b> trong công thức: {Ba(NO3)2} 0,1 M → [{NO3}<sup>−</sup>] = 0,2 M; acid yếu thì [{H}<sup>+</sup>] nhỏ hơn nồng độ acid.<br><b>Bảo toàn điện tích:</b> Σ(mol × điện tích) cation = Σ anion; m muối = Σ m các ion.<br><b>Phương trình ion rút gọn:</b> giữ dạng phân tử chất kết tủa, chất khí, chất điện li yếu."
+  },
+  "k5": {
+   "ten": "Brønsted & môi trường muối",
+   "rule": "<b>Định nghĩa:</b> acid <b>cho</b> {H}<sup>+</sup>, base <b>nhận</b> {H}<sup>+</sup>; cặp acid – base liên hợp chỉ khác nhau một {H}<sup>+</sup>.<br><b>Xét từng chiều:</b> {CO3}<sup>2−</sup> + {H2O} ⇌ {HCO3}<sup>−</sup> + {OH}<sup>−</sup>: acid là {H2O} và {HCO3}<sup>−</sup>.<br><b>Lưỡng tính:</b> {HCO3}<sup>−</sup>, {HS}<sup>−</sup>, {H2PO4}<sup>−</sup>, {HPO4}<sup>2−</sup>, {H2O}; {HSO4}<sup>−</sup> chỉ là acid.<br><b>Ion trung tính:</b> {Na}<sup>+</sup>, {K}<sup>+</sup>, {Ca}<sup>2+</sup>, {Ba}<sup>2+</sup>, {Cl}<sup>−</sup>, {NO3}<sup>−</sup>, {SO4}<sup>2−</sup> (không bị thuỷ phân).<br><b>Ion acid:</b> {NH4}<sup>+</sup>, {Al}<sup>3+</sup>, {Fe}<sup>3+</sup>, {Fe}<sup>2+</sup>, {Cu}<sup>2+</sup>, {Zn}<sup>2+</sup> → pH < 7 (phèn chua: {Al}<sup>3+</sup> + {H2O} ⇌ {Al(OH)}<sup>2+</sup> + {H}<sup>+</sup>).<br><b>Ion base:</b> {CO3}<sup>2−</sup>, {S}<sup>2−</sup>, {CH3COO}<sup>−</sup>, {PO4}<sup>3−</sup>, {NO2}<sup>−</sup> → pH > 7."
+  },
+  "k6": {
+   "ten": "pH và tích số ion nước",
+   "rule": "<b>Tích số ion của nước:</b> K<sub>w</sub> = [{H}<sup>+</sup>][{OH}<sup>−</sup>] = 10<sup>−14</sup> ở 25 °C, <b>chỉ phụ thuộc nhiệt độ</b>.<br><b>Công thức:</b> pH = −lg[{H}<sup>+</sup>]; [{H}<sup>+</sup>] = 10<sup>−pH</sup>; pH + pOH = 14.<br><b>Môi trường:</b> pH < 7 acid, = 7 trung tính, > 7 base; pH giảm 1 đơn vị → [{H}<sup>+</sup>] tăng 10 lần.<br><b>Pha loãng acid mạnh:</b> pha loãng 10<sup>n</sup> lần → pH tăng n (không vượt quá 7).<br><b>Trộn acid với base:</b> n({H}<sup>+</sup>) và n({OH}<sup>−</sup>) trung hoà 1 : 1; phần dư chia <b>tổng thể tích</b>.<br><b>Chất chỉ thị, thực tế:</b> quỳ acid đỏ, base xanh; phenolphthalein không màu → hồng khi pH ≥ 8,3; mưa acid pH < 5,6; đất chua bón vôi."
+  },
+  "k7": {
+   "ten": "Chuẩn độ acid – base",
+   "rule": "<b>Dụng cụ:</b> burette đựng <b>dung dịch chuẩn</b> (biết chính xác nồng độ); pipette lấy dung dịch cần xác định cho vào bình tam giác.<br><b>Chỉ thị:</b> phenolphthalein; chuẩn độ acid bằng {NaOH}, dừng khi xuất hiện màu <b>hồng nhạt bền khoảng 20 giây</b>.<br><b>Điểm tương đương:</b> n({H}<sup>+</sup>) = n({OH}<sup>−</sup>); acid hai nấc nhân 2: 2 C({H2SO4}) · V = C({NaOH}) · V′.<br><b>Thao tác:</b> tráng burette bằng chính dung dịch chuẩn; lặp 3 lần, lấy thể tích trung bình.<br><b>Độ tinh khiết:</b> từ n chất phản ứng → m → % = m tinh khiết : m mẫu × 100%.<br><b>Đọc kết quả:</b> thể tích đã dùng = số đọc sau − số đọc trước."
+  }
+ },
+ "TRAPS_THEM": {
+  "chatran": {
+   "ten": "Đưa chất rắn vào KC",
+   "hoi": "Chất rắn và nước dung môi không có mặt trong K_C, cũng không tính vào số mol khí khi xét áp suất. Đã bỏ chúng ra chưa?"
+  },
+  "xuctac": {
+   "ten": "Xúc tác làm dịch cân bằng",
+   "hoi": "Chất xúc tác tăng tốc cả hai chiều như nhau, không làm cân bằng chuyển dịch và không đổi K_C. Ý này có gán cho xúc tác việc tăng lượng sản phẩm không?"
+  },
+  "chiso": {
+   "ten": "Quên nhân chỉ số ion",
+   "hoi": "Một phân tử phân li ra mấy ion này? Ba(OH)2 cho 2 OH⁻, H2SO4 cho 2 H⁺, Al2(SO4)3 cho 2 Al³⁺ và 3 SO4²⁻."
+  }
+ },
+ "DANG_KEY": {
+  "CAN_BANG.ACID_BASE.CHON_PHAT_BIEU": "k5",
+  "CAN_BANG.ACID_BASE.DEM_NGUYEN_TU": "k5",
+  "CAN_BANG.ACID_BASE.NHAN_DANG": "k5",
+  "CAN_BANG.CAN_BANG.CHON_PHAT_BIEU": "k2",
+  "CAN_BANG.CAN_BANG.DEM_DONG_PHAN": "k2",
+  "CAN_BANG.CAN_BANG.NEU_HIEN_TUONG": "k2",
+  "CAN_BANG.CAN_BANG.NHAN_DANG": "k2",
+  "CAN_BANG.CAN_BANG.SO_SANH": "k2",
+  "CAN_BANG.CAN_BANG.TINH_HIEU_SUAT": "k3",
+  "CAN_BANG.CAN_BANG.TINH_NONG_DO": "k3",
+  "CAN_BANG.CAN_BANG.TINH_SO_MOL": "k3",
+  "CAN_BANG.CAN_BANG.VIET_PTHH": "k1",
+  "CAN_BANG.CAN_BANG.XAC_DINH_CHIEU": "k2",
+  "CAN_BANG.CHUAN_DO.CHON_PHAT_BIEU": "k7",
+  "CAN_BANG.CHUAN_DO.NEU_HIEN_TUONG": "k7",
+  "CAN_BANG.CHUAN_DO.NHAN_DANG": "k7",
+  "CAN_BANG.CHUAN_DO.TINH_KHOI_LUONG": "k7",
+  "CAN_BANG.CHUAN_DO.TINH_NONG_DO": "k7",
+  "CAN_BANG.CHUAN_DO.TINH_PHAN_TRAM": "k7",
+  "CAN_BANG.CHUAN_DO.TINH_THE_TICH": "k7",
+  "CAN_BANG.DIEN_LI.CHON_PHAT_BIEU": "k4",
+  "CAN_BANG.DIEN_LI.DEM_DONG_PHAN": "k4",
+  "CAN_BANG.DIEN_LI.DEM_NGUYEN_TU": "k6",
+  "CAN_BANG.DIEN_LI.GIAI_THICH": "k4",
+  "CAN_BANG.DIEN_LI.NEU_HIEN_TUONG": "k4",
+  "CAN_BANG.DIEN_LI.NHAN_DANG": "k4",
+  "CAN_BANG.DIEN_LI.SO_SANH": "k4",
+  "CAN_BANG.DIEN_LI.TINH_KHOI_LUONG": "k4",
+  "CAN_BANG.DIEN_LI.TINH_NONG_DO": "k4",
+  "CAN_BANG.DIEN_LI.TINH_SO_MOL": "k4",
+  "CAN_BANG.DIEN_LI.VIET_PTHH": "k4",
+  "CAN_BANG.HANG_SO_K.CHON_PHAT_BIEU": "k1",
+  "CAN_BANG.HANG_SO_K.NHAN_DANG": "k1",
+  "CAN_BANG.HANG_SO_K.TINH_HANG_SO": "k3",
+  "CAN_BANG.HANG_SO_K.TINH_HIEU_SUAT": "k3",
+  "CAN_BANG.HANG_SO_K.TINH_KHOI_LUONG": "k3",
+  "CAN_BANG.HANG_SO_K.TINH_NONG_DO": "k3",
+  "CAN_BANG.HANG_SO_K.TINH_SO_MOL": "k3",
+  "CAN_BANG.HANG_SO_K.VIET_PTHH": "k1",
+  "CAN_BANG.PH_DUNG_DICH.CHON_PHAT_BIEU": "k6",
+  "CAN_BANG.PH_DUNG_DICH.DEM_DONG_PHAN": "k5",
+  "CAN_BANG.PH_DUNG_DICH.NEU_HIEN_TUONG": "k6",
+  "CAN_BANG.PH_DUNG_DICH.NHAN_DANG": "k6",
+  "CAN_BANG.PH_DUNG_DICH.SO_SANH": "k6",
+  "CAN_BANG.PH_DUNG_DICH.TINH_KHOI_LUONG": "k6",
+  "CAN_BANG.PH_DUNG_DICH.TINH_NONG_DO": "k6",
+  "CAN_BANG.PH_DUNG_DICH.TINH_THE_TICH": "k6",
+  "CAN_BANG.PH_DUNG_DICH.TINH_TI_SO": "k6",
+  "CAN_BANG.THUY_PHAN_MUOI.TINH_NONG_DO": "k5",
+  "CAN_BANG.THUY_PHAN_MUOI.VIET_PTHH": "k5"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "H3PO4 xếp vào chất điện li yếu (khớp đáp án kho: dãy có H3PO4 không phải toàn điện li mạnh).",
+  "HSO4⁻ coi là acid (không lưỡng tính) theo SGK 2018.",
+  "Mã DIEN_LI.DEM_NGUYEN_TU thực chất hỏi tích số ion của nước ⇒ gắn k6; máy soạn gắn chìa theo từng ý nếu lệch.",
+  "Mã HANG_SO_K.TINH_HANG_SO gồm cả câu viết biểu thức K_C: gắn k3, câu chỉ viết biểu thức thì máy soạn dùng k1.",
+  "Ngưỡng phenolphthalein ghi pH ≥ 8,3 (SGK), không dùng số khác."
+ ],
+ "daDuyet": "máy dựng 29/09"
+}
