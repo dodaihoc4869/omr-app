@@ -45,9 +45,14 @@ export function nhanTruocMuiTenVeSau(raw: string): string {
     return ` ${mui}(${n}) `
   })
   // "NH₄Clto→" (PDF mất dấu độ): "to" dính sau công thức ngay trước mũi tên là t°.
-  s = s.replace(/(?<=[A-Z₀-₉)]|[A-Z][a-z])to(?=[ \t]?(→|⇌))/g, 't°')
+  // KHÔNG dùng lookbehind (nhóm nhìn lùi): Safari iOS < 16.4 báo "invalid group specifier name" lúc NẠP tệp ⇒ sập cả Cổng học sinh (29/09).
+  s = s.replace(/([A-Z₀-₉)]|[A-Z][a-z])to(?=[ \t]?(→|⇌))/g, '$1t°')
   // Điều kiện viết ngay TRƯỚC mũi tên: "Fe + H₂SO₄ t°→ …", "4NH₃+3O₂t°→ …", "Pt,t°→".
-  s = s.replace(/[ \t]?(?:(H₂SO₄(?: đặc)?|Ni|Pt|Pd|H⁺|V₂O₅)[ \t]*,[ \t]*)?(t°|(?<![a-z])xt|đpdd|đpnc)[ \t]*(→|⇌)(?!\()[ \t]*/g, (_m, tac: string | undefined, dk: string, mui: string) => ` ${mui}(${tac ? `${tac}, ` : ''}${dk}) `)
+  s = s.replace(/[ \t]?(?:(H₂SO₄(?: đặc)?|Ni|Pt|Pd|H⁺|V₂O₅)[ \t]*,[ \t]*)?(t°|xt|đpdd|đpnc)[ \t]*(→|⇌)(?!\()[ \t]*/g, (m: string, tac: string | undefined, dk: string, mui: string, viTri: number, goc: string) => {
+    // "xt" ngay sau chữ thường (vd "next→") không phải xúc tác — thay cho nhóm nhìn lùi cũ.
+    if (dk === 'xt' && /[a-z]/.test(goc.charAt(viTri + m.indexOf('xt') - 1))) return m
+    return ` ${mui}(${tac ? `${tac}, ` : ''}${dk}) `
+  })
   return s
 }
 
