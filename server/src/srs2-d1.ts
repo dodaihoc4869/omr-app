@@ -12,6 +12,7 @@ import {
   type CauSrs, type HangEm, type TuyChonKeHoach, type HoSoDangTho, type LanLam, type TrangThaiCau, type Phan,
 } from './srs2-loi'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
+import { protectedQuestions } from './game-v2-bank'
 import { jsonLaTuLuan } from './cam-tu-luan'
 
 type Row = Record<string, unknown>
@@ -555,6 +556,11 @@ export interface KeHoachDaChot {
   tong: number
   conDao: string[]
   conDoan: string[]
+  /**
+   * Câu còn lại TẠM HOÃN hôm nay (sửa lỗi 29/09 "Đảo báo nhầm ca kiểm tra", rương kẹt 42/46): đã bỏ khỏi `dao/doan/con*` và `tong`.
+   * `ca` = đang bảo vệ cho ca kiểm tra chưa công bố (`protectedQuestions`), `kho` = đã rút khỏi kho. Vắng = không có câu nào.
+   */
+  tamHoan?: { ca: number; kho: number }
 }
 
 /** Bỏ hậu tố lần-làm-trong-ngày (`qid#2`). */
@@ -601,7 +607,32 @@ export async function docKeHoachDaChot(env: Env, sbd: string, nowMs: number): Pr
  * Thể lực là con số thật, không nhảy. Ngoại lệ luật B.7: ngày cuối trước hạn, làm hết kế hoạch mà trần ngày còn chỗ và
  * có câu đến lịch lại trong ngày (câu vừa sai) thì BỔ SUNG, không vượt trần.
  */
+/**
+ * Kế hoạch hôm nay cho game/rương/thể lực: kế hoạch ĐÃ CHỐT (`layKeHoachChot`, không đổi bản ghi) trừ đi câu CÒN LẠI không làm được lúc này
+ * (`tamHoanCauKhoa`): đang bảo vệ cho ca kiểm tra, hoặc đã rút khỏi kho. Nhờ vậy em không bị kẹt (Đảo rỗng, Đảo khoá chờ Đoàn, rương 42/46);
+ * câu bảo vệ vẫn KHÔNG ra máy em. Ca công bố xong ⇒ câu tự quay lại kế hoạch hôm nay (không ghi gì vào `srs2_ke_hoach`).
+ */
 export async function layKeHoachHomNay(env: Env, sbd: string, nowMs: number, hs?: HoSo2): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
+  const r = await layKeHoachChot(env, sbd, nowMs, hs)
+  return { kh: await tamHoanCauKhoa(env, r.kh, r.hs), hs: r.hs }
+}
+
+/** Bỏ câu CÒN LẠI đang bị ca khoá / đã rút khỏi kho khỏi kế hoạch (câu đã làm giữ nguyên). Lỗi đọc bảo vệ ⇒ không bỏ gì (nơi phát câu vẫn tự chặn). */
+export async function tamHoanCauKhoa(env: Env, kh: KeHoachDaChot, hs: Pick<HoSo2, 'meta'>): Promise<KeHoachDaChot> {
+  if (!kh.conDao.length && !kh.conDoan.length) return kh
+  const chan = await protectedQuestions(env).catch(() => new Set<string>())
+  let ca = 0, kho = 0
+  const bo = new Set<string>()
+  for (const k of [...kh.conDao, ...kh.conDoan]) {
+    const q = qidGoc(k), m = hs.meta.get(q)
+    if (!m) { bo.add(k); kho++ } else if (chan.has(q) || chan.has(m.group)) { bo.add(k); ca++ }
+  }
+  if (!bo.size) return kh
+  const dao = kh.dao.filter((k) => !bo.has(k)), doan = kh.doan.filter((k) => !bo.has(k))
+  return { ...kh, dao, doan, tong: dao.length + doan.length, conDao: kh.conDao.filter((k) => !bo.has(k)), conDoan: kh.conDoan.filter((k) => !bo.has(k)), tamHoan: { ca, kho } }
+}
+
+async function layKeHoachChot(env: Env, sbd: string, nowMs: number, hs?: HoSo2): Promise<{ kh: KeHoachDaChot; hs: HoSo2 }> {
   const ngay = ngayVnCua(nowMs)
   // Tối ưu 28/09: hồ sơ, số lần làm hôm nay và kế hoạch đã chốt là ba lượt ĐỌC độc lập ⇒ chạy SONG SONG (trước: ba đợt nối tiếp).
   const [hoSo, dem, cu] = await Promise.all([

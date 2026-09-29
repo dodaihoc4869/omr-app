@@ -6,8 +6,8 @@ import { laKiHieu, type KiHieu } from './nguyen-to'
 import type { HinhAnh } from '../../data/examContent'
 import type { CauBia } from './dieu-khien'
 
-export type LyDoBia = 'chua_bat' | 'dang_co_ca' | 'chua_co_chien_dich' | 'het_tran' | 'xong_ke_hoach' | 'cau_dang_bao_ve' | 'giao_huu_chua_mo' | 'het_luot_giao_huu'
-const LY_DO: ReadonlySet<string> = new Set(['chua_bat', 'dang_co_ca', 'chua_co_chien_dich', 'het_tran', 'xong_ke_hoach', 'cau_dang_bao_ve', 'giao_huu_chua_mo', 'het_luot_giao_huu'])
+export type LyDoBia = 'chua_bat' | 'dang_co_ca' | 'chua_co_chien_dich' | 'het_tran' | 'xong_ke_hoach' | 'cau_dang_bao_ve' | 'cau_dang_o_dao' | 'giao_huu_chua_mo' | 'het_luot_giao_huu'
+const LY_DO: ReadonlySet<string> = new Set(['chua_bat', 'dang_co_ca', 'chua_co_chien_dich', 'het_tran', 'xong_ke_hoach', 'cau_dang_bao_ve', 'cau_dang_o_dao', 'giao_huu_chua_mo', 'het_luot_giao_huu'])
 /** Bộ gọi máy chủ: mặc định `goiHoa2` (POST /game-v2/<lệnh>). Trang xem thử và test thay bằng máy chủ giả. */
 export type BoGoiBia = (lenh: string, token: string, du?: Record<string, unknown>) => Promise<Record<string, unknown>>
 let goi: BoGoiBia = goiHoa2
