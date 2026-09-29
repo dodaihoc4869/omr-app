@@ -38,21 +38,54 @@ export async function normalizeBank(raw:Row,maDe:string):Promise<PrivateQuestion
         family:(()=>{const f=str(c.family??c.familyId??'') ;return f?f:null})(),
         correct,solution:c.loiGiai??c.explanation??null,
         reviewed:!c.canXem&&(!c.loiGiaiTrangThai||c.loiGiaiTrangThai==='khop') && (phan==='I'?/^[ABCD]$/.test(correct):phan==='II'?/^[DS]{4}$/.test(correct):correct.trim().length>0)}
-      q.group=await contentGroup(q);q.version=crypto.randomUUID();result.push(q)
+      q.group=await contentGroup(q);q.version=await versionCau(q);result.push(q)
     }
   }
   return result
 }
 export async function contentGroup(q:Question):Promise<string>{return hash([q.phan,q.text.trim().replace(/\s+/g,' '),q.choices,q.ideas,q.table??null,q.thanCauImg??null,q.imageDataUrl??null,q.choiceImgs??null,q.ideaImgs??null,q.hinhAnh.filter(h=>h.viTri!=='sau_loi_giai')])}
+/** PHIÊN BẢN CÂU TẤT ĐỊNH (sửa lỗi thầy báo 21:15 29/09): trước đây mỗi lần lập lại chỉ mục một tờ thì MỌI câu của tờ nhận `randomUUID()` mới ⇒ sửa
+ *  một câu khác / ghi thêm lời giải là mọi lượt đang mở chứa câu của tờ ấy báo "Câu đã được sửa hoặc rút khỏi kho". Nay version = băm NỘI DUNG CHẤM:
+ *  nhóm nội dung (`contentGroup`: phần + đề hiển thị + phương án/ý + bảng/hình, bỏ hình sau lời giải) + đáp án đúng. KHÔNG gồm lời giải/nhãn/sao
+ *  ⇒ câu không đổi giữ version qua mọi lần lập chỉ mục; đổi đề hay đáp án ⇒ version đổi ⇒ lượt cũ không chấm theo bản cũ (mã `cau_doi`). */
+export async function versionCau(q:PrivateQuestion):Promise<string>{return (await hash(['cham-v1',q.group,q.correct])).slice(0,32)}
+/** Mã lỗi (index.ts đưa `ma` vào phản hồi) khi câu của lượt đã đổi đề/đáp án hoặc bị rút khỏi kho ⇒ máy em bỏ qua câu / mở lượt mới. */
+export const MA_CAU_DOI='cau_doi'
+export const LOI_CAU_DOI='Câu đã được sửa hoặc rút khỏi kho. Em mở lượt mới; lượt này không bị tính sai.'
+export const loiCauDoi=():Error&{ma:string}=>Object.assign(new Error(LOI_CAU_DOI),{ma:MA_CAU_DOI})
+/** Lập chỉ mục MỘT tờ (dòng `de_kho`: ma_de, r2_khoa, cap_nhat_luc) — xoá câu cũ của tờ, ghi câu mới, ghi mốc nguồn; một lô nguyên tử. */
+async function lapChiMucTo(env:Env,d:Row):Promise<void>{
+  const ma=str(d.ma_de);const qs=await normalizeBank(await readJson(env,str(d.r2_khoa)||`kho/${ma}.json`),ma)
+  const stmts=[env.DB.prepare('DELETE FROM game_v2_question WHERE ma_de=?').bind(ma),...qs.map(q=>env.DB.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').bind(ma,q.qid,q.version,q.group,q.dang,JSON.stringify(q))),env.DB.prepare('INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,?,?) ON CONFLICT(ma_de) DO UPDATE SET source_version=excluded.source_version,indexed_at=excluded.indexed_at').bind(ma,d.cap_nhat_luc,new Date().toISOString())]
+  await env.DB.batch(stmts)
+}
+/** Các tờ (trong `maDes`, còn dùng) mà chỉ mục đang LỆCH nguồn (chưa lập / `source_version` ≠ `cap_nhat_luc`). Một truy vấn nhẹ. */
+async function toLech(env:Env,maDes:readonly string[]):Promise<Row[]>{
+  if(!maDes.length)return []
+  const r=await env.DB.prepare(`SELECT d.ma_de,d.r2_khoa,d.cap_nhat_luc FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE d.ma_de IN (SELECT value FROM json_each(?)) AND COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc)`).bind(JSON.stringify([...new Set(maDes)])).all<Row>()
+  return r.results??[]
+}
+/** Chỉ mục của các tờ này lệch nguồn ⇒ đồng bộ NGAY đúng các tờ đó (tối đa 3 tờ/lần gọi, lỗi nguồn thì bỏ qua). Trả số tờ đã đồng bộ. */
+export async function dongBoCacTo(env:Env,maDes:readonly string[]):Promise<number>{
+  let n=0
+  for(const d of (await toLech(env,maDes)).slice(0,3)){try{await lapChiMucTo(env,d);n++}catch{/* nguồn R2 hỏng/chưa sẵn: giữ như cũ */}}
+  return n
+}
+const SQL_THEO_REF=`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`
+/** Câu ĐẦY ĐỦ (bản mới nhất: lời giải mới nhất) theo tham chiếu của lượt (ma_de, qid, version), chỉ khi tờ còn và chỉ mục khớp nguồn.
+ *  Chỉ mục lệch (kho vừa ghi, chưa đồng bộ) ⇒ đồng bộ đúng tờ đó rồi tra lại. `null` ⇒ câu thật sự đổi đề/đáp án hoặc tờ đã rút. */
+export async function docCauTheoRef(env:Env,ref:{maDe:string;qid:string;version:string}):Promise<PrivateQuestion|null>{
+  const tra=()=>env.DB.prepare(SQL_THEO_REF).bind(ref.maDe,ref.qid,ref.version).first<{json:string}>()
+  let row=await tra()
+  if(!row&&await dongBoCacTo(env,[ref.maDe]))row=await tra()
+  if(!row)return null
+  try{return JSON.parse(row.json) as PrivateQuestion}catch{return null}
+}
 /** Work is bounded per call; cursor/checkpoints cover the entire bank, not eight sheets. */
 export async function syncIndex(env:Env):Promise<{remaining:number;indexed:number}> {
   const pending=await env.DB.prepare(`SELECT d.ma_de,d.r2_khoa,d.cap_nhat_luc FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc) ORDER BY d.ma_de LIMIT 3`).all<Row>()
   let indexed=0
-  for(const d of pending.results){
-    const ma=str(d.ma_de);const qs=await normalizeBank(await readJson(env,str(d.r2_khoa)||`kho/${ma}.json`),ma)
-    const stmts=[env.DB.prepare('DELETE FROM game_v2_question WHERE ma_de=?').bind(ma),...qs.map(q=>env.DB.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,?,?,?,?)').bind(ma,q.qid,q.version,q.group,q.dang,JSON.stringify(q))),env.DB.prepare('INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES(?,?,?) ON CONFLICT(ma_de) DO UPDATE SET source_version=excluded.source_version,indexed_at=excluded.indexed_at').bind(ma,d.cap_nhat_luc,new Date().toISOString())]
-    await env.DB.batch(stmts);indexed++
-  }
+  for(const d of pending.results){await lapChiMucTo(env,d);indexed++}
   const n=await env.DB.prepare(`SELECT COUNT(*) n FROM de_kho d LEFT JOIN game_v2_index g ON g.ma_de=d.ma_de WHERE COALESCE(d.da_xoa,0)=0 AND (g.ma_de IS NULL OR g.source_version<>d.cap_nhat_luc)`).first<{n:number}>()
   return {remaining:n?.n??0,indexed}
 }
@@ -125,15 +158,20 @@ export const laTuLuanPool=(q:CauPool):boolean=>q.tuLuan??laCauTuLuan(q)
 /** Nạp bản ĐẦY ĐỦ của các câu nhẹ (một truy vấn, theo (ma_de, qid, version)); câu đầy đủ giữ nguyên. Thứ tự và độ dài giữ nguyên. Câu vừa bị sửa/rút khỏi kho ⇒ lỗi để em mở lượt mới (không tính sai). */
 export async function doDayDu(env:Env,cau:readonly CauPool[]):Promise<PrivateQuestion[]>{
   const can=cau.filter(q=>q.nhe);if(!can.length)return cau as PrivateQuestion[]
-  const r=await env.DB.prepare(`SELECT q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') AND q.version=json_extract(j.value,'$[2]')`).bind(JSON.stringify(can.map(q=>[q.maDe,q.qid,q.version]))).all<{json:string}>()
-  const theo=new Map<string,PrivateQuestion>();for(const x of r.results??[]){const q=JSON.parse(str(x.json)) as PrivateQuestion;theo.set(`${q.maDe}|${q.qid}|${q.version}`,q)}
-  return cau.map(q=>{if(!q.nhe)return q as PrivateQuestion;const d=theo.get(`${q.maDe}|${q.qid}|${q.version}`);if(!d)throw new Error('Câu đã được sửa hoặc rút khỏi kho. Em mở lượt mới; lượt này không bị tính sai.');return d})
+  const theo=await napDayDuMem(env,can.map(q=>({maDe:q.maDe,qid:q.qid,version:q.version})))
+  return cau.map(q=>{if(!q.nhe)return q as PrivateQuestion;const d=theo.get(`${q.maDe}|${q.qid}|${q.version}`);if(!d)throw loiCauDoi();return d})
 }
-/** Như `doDayDu` nhưng KHÔNG ném: nạp bản đầy đủ của nhiều câu trong MỘT truy vấn, trả Map khoá `maDe|qid|version` (câu vắng = đã sửa/rút khỏi kho). Tối ưu 28/09: bỏ N+1 của `napCau`. */
+/** Như `doDayDu` nhưng KHÔNG ném: nạp bản đầy đủ của nhiều câu trong MỘT truy vấn, trả Map khoá `maDe|qid|version` (câu vắng = đã sửa/rút khỏi kho). Tối ưu 28/09: bỏ N+1 của `napCau`.
+ *  29/09: câu vắng mà tờ của nó đang lệch chỉ mục ⇒ đồng bộ đúng các tờ đó rồi tra lại phần vắng (version tất định nên câu không đổi vẫn khớp). */
 export async function napDayDuMem(env:Env,ds:readonly {maDe:string;qid:string;version:string}[]):Promise<Map<string,PrivateQuestion>>{
   const theo=new Map<string,PrivateQuestion>();if(!ds.length)return theo
-  const r=await env.DB.prepare(`SELECT q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') AND q.version=json_extract(j.value,'$[2]')`).bind(JSON.stringify(ds.map(q=>[q.maDe,q.qid,q.version]))).all<{json:string}>()
-  for(const x of r.results??[]){try{const q=JSON.parse(str(x.json)) as PrivateQuestion;theo.set(`${q.maDe}|${q.qid}|${q.version}`,q)}catch{/* JSON hỏng ⇒ coi như vắng */}}
+  const tra=async(xs:readonly {maDe:string;qid:string;version:string}[])=>{
+    const r=await env.DB.prepare(`SELECT q.json FROM json_each(?) j JOIN game_v2_question q ON q.ma_de=json_extract(j.value,'$[0]') AND q.qid=json_extract(j.value,'$[1]') AND q.version=json_extract(j.value,'$[2]')`).bind(JSON.stringify(xs.map(q=>[q.maDe,q.qid,q.version]))).all<{json:string}>()
+    for(const x of r.results??[]){try{const q=JSON.parse(str(x.json)) as PrivateQuestion;theo.set(`${q.maDe}|${q.qid}|${q.version}`,q)}catch{/* JSON hỏng ⇒ coi như vắng */}}
+  }
+  await tra(ds)
+  const vang=ds.filter(q=>!theo.has(`${q.maDe}|${q.qid}|${q.version}`))
+  if(vang.length&&await dongBoCacTo(env,vang.map(q=>q.maDe)))await tra(vang)
   return theo
 }
 // ĐỆM KHO NHẸ THEO DẠNG (Code 1 đo trên kho thật: 15.359 câu / 953 dạng / 60 triệu ký tự JSON ⇒ đệm json 16 triệu ký tự bị đẩy liên tục): chỉ giữ SIÊU DỮ LIỆU (~300 byte/câu ⇒ cả kho ~5 MB), sống 15 phút;

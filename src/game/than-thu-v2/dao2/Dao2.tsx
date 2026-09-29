@@ -7,7 +7,7 @@ import type {ReactNode} from 'react'
 import {learningBattle} from '../learning-battle'
 import type {BattleAnswer} from '../learning-battle'
 import {chiSoThu,lyDoThuongTuKetQua,lyDoTranExpGame,tenThu} from '../dao/dao-core'
-import {maCuaLoi} from '../loi-het-tran'
+import {CHU_CAU_DOI,laLoiCauDoi,maCuaLoi} from '../loi-het-tran'
 import {anhThu} from '../dao/anh'
 import type {DaoCall,DaoKetQua,DaoProfile} from '../dao/kieu'
 import BanDo from './BanDo'
@@ -43,7 +43,7 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const [luot,setLuot]=useState<Luot2|null>(null),[pha,setPha]=useState<'ban-do'|'ai'|'xong'>('ban-do')
  const [khoa,setKhoa]=useState(''),[het,setHet]=useState(''),[soan,setSoan]=useState('')
  const [viTri,setViTri]=useState(0),[ketQua,setKetQua]=useState<BattleAnswer[]>([]),[traLoi,setTraLoi]=useState(''),[assisted,setAssisted]=useState(false),[phanHoi,setPhanHoi]=useState<PhanHoi2|null>(null),[exp,setExp]=useState(0)
- const [busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[maLoi,setMaLoi]=useState('')
+ const [busy,setBusy]=useState(false),[loi,setLoi]=useState(''),[maLoi,setMaLoi]=useState(''),[baoCau,setBaoCau]=useState('')
  const [xongHomNay,setXongHomNay]=useState(0),[coXatTruoc,setCoXatTruoc]=useState<number|null>(null),[ruongVua,setRuongVua]=useState<number|null>(null)
  const [ketThuc,setKetThuc]=useState<{dung:number;tong:number;exp:number;enemy:number;sai:{ai:number;qid:string}[]}|null>(null)
  const dangChay=useRef(false),conSong=useRef(true)
@@ -91,26 +91,30 @@ export default function Dao2({sbd,profile,call:callProp,doanMo,sanhDau,thanhDuoi
  const lenDuong=()=>chay(moChuyen)
  const thuLai=()=>chay(async()=>{setDangTai(true);try{const s=await napSanh();if(!s){setLoiSanh(LOI_BAN_DO);return}await soanChuyen(s)}catch(e){setLoiSanh(e instanceof Error&&e.message?e.message:LOI_BAN_DO)}finally{if(conSong.current)setDangTai(false)}})
  const nop=()=>chay(async()=>{const q=luot?.cau[viTri];if(!luot||!q)return
-  const r=await call('answer',{session:luot.id,qid:q.qid,answer:traLoi,assisted}),correct=!!r.correct,reward=r.reward??0,coBua=!!docGoiY(q.goiY,q.phan)
+  setBaoCau('')
+  // Câu vừa được thầy sửa đề/đáp án (mã `cau_doi`, 29/09) ⇒ không để em kẹt: tự sang ải kế (câu không bị tính sai), hết ải thì kết thúc chuyến.
+  let r:Awaited<ReturnType<DaoCall>>;try{r=await call('answer',{session:luot.id,qid:q.qid,answer:traLoi,assisted})}catch(e){if(!laLoiCauDoi(e))throw e;await sangAiKe();if(conSong.current)setBaoCau(CHU_CAU_DOI);return}
+  const correct=!!r.correct,reward=r.reward??0,coBua=!!docGoiY(q.goiY,q.phan)
   const lyDo=lyDoTranExpGame(reward,r.thuongGoc,tenThu(profile))??r.lyDoThuong??lyDoThuongTuKetQua({correct,assisted:assisted||coBua,reward,stage:r.stage??0})
   const emGui=(r as {traLoi?:unknown}).traLoi
   setKetQua(cu=>cu.some(a=>a.qid===q.qid)?cu:[...cu,{qid:q.qid,correct}]);setExp(t=>t+(typeof r.expCau==='number'?Math.max(0,r.expCau):reward))
   setPhanHoi({correct,answer:r.answer??'',traLoi:typeof emGui==='string'?emGui:traLoi,solution:r.solution,solutionImages:r.solutionImages??[],reward,lyDo,expThuThach:typeof r.expThuThach==='number'?r.expThuThach:0,...(typeof r.expCau==='number'?{expCau:r.expCau}:{}),coTroGiup:assisted||coBua})})
- const tiep=()=>chay(async()=>{if(!luot)return
+ const tiep=()=>chay(async()=>{setBaoCau('');await sangAiKe()})
+ async function sangAiKe(){if(!luot)return
   if(viTri+1<luot.cau.length){setViTri(viTri+1);setTraLoi('');setAssisted(false);setPhanHoi(null);return}
   await call('complete',{session:luot.id})
   const tran=learningBattle([...ketQua],luot.cau.length),xong=xongHomNay+1
   setXongHomNay(xong);ghiSoChuyenXong(sbd,sanh?.ngay??'',xong)
   setKetThuc({dung:ketQua.filter(k=>k.correct).length,tong:luot.cau.length,exp,enemy:tran.enemy,sai:luot.cau.map((c,i)=>({ai:i+1,qid:c.qid})).filter(x=>ketQua.find(k=>k.qid===x.qid)?.correct===false)})
   setLuot(null);setPhanHoi(null);setPha('xong')
-  await napSanh().catch(()=>null);napDaLam()})
+  await napSanh().catch(()=>null);napDaLam()}
  /** Rời chuyến về bản đồ: chuyến giữ lại. Vừa có lỗi (lượt hết hạn, câu vừa rút…) ⇒ bỏ bản trên máy, soạn lại từ máy chủ (resume trả đúng chỗ em đang làm nếu lượt còn hạn). */
  const roi=()=>{setPha('ban-do');if(!loi){setLoi('');return}setLuot(null);void chay(async()=>{await soanChuyen(sanh)})}
  const veBanDo=()=>{setPha('ban-do');setKetThuc(null);if(!luot)void chay(async()=>{await soanChuyen(sanh)})}
  const moRuong=()=>chay(async()=>{const r=await call('hoa2-ruong-mo') as DaoKetQua&{qua?:{vang?:unknown}};const v=Number(r.qua?.vang);setRuongVua(Number.isFinite(v)&&v>0?v:null);await napSanh().catch(()=>null)})
 
  const vo=(con:ReactNode,tham=false)=><div className={`dao dao-vo dao-v2 dao2${tham?' dao-vo-tham':''}`} data-thu={chiSoThu(profile.pet)} data-pha={pha} hidden={an||undefined}>{con}</div>
- if(pha==='ai'&&luot)return vo(<TrongAi profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} busy={busy} loi={loi} maLoi={maLoi}
+ if(pha==='ai'&&luot)return vo(<TrongAi profile={profile} cau={luot.cau} viTri={viTri} ketQua={ketQua} traLoi={traLoi} assisted={assisted} phanHoi={phanHoi} busy={busy} loi={loi} maLoi={maLoi} baoCau={baoCau}
   onTraLoi={setTraLoi} onAssisted={setAssisted} onNop={()=>void nop()} onTiep={()=>void tiep()} onRoi={roi}/>,true)
  if(pha==='xong'&&ketThuc){const con=sanh?.dao?.con??null,coThem=con!==null&&con>0&&!sanh?.khoaDao,cd=sanh?.chienDich,hen=henOnCua(daLam,ketThuc.sai.map(s=>s.qid))
   return vo(<XongChuyen soChuyen={con!==null?{k:xongHomNay,n:xongHomNay+Math.ceil(con/SO_AI_CHUYEN)}:null} conCau={con} tongKet={ketThuc} enemy={ketThuc.enemy}

@@ -10,7 +10,7 @@ import {readGameScope} from './game-v2-reports'
 import {roomAction} from './game-v2-room'
 import type {Env} from './kieu'
 import {gameIdentity,parentPass} from './game-v2-auth'
-import {hash,readScope,syncIndex,protectedQuestions,docKhoiEm,doDayDu,laTuLuanPool,type CauPool} from './game-v2-bank'
+import {hash,readScope,syncIndex,protectedQuestions,docKhoiEm,doDayDu,laTuLuanPool,docCauTheoRef,loiCauDoi,type CauPool} from './game-v2-bank'
 import {cauHopKhoi,type Khoi} from '../../src/lib/khoi-cau'
 import {lyDoThuong} from '../../src/game/than-thu-v2/ly-do-thuong'
 import {nangLucBat} from './nang-luc-d1'
@@ -18,7 +18,7 @@ import {nganSachLuotBat,docNganSachConLai} from './ngan-sach-luot'
 import {chonCauChoLuot,familyTuNhan} from './bo-chon-that'
 import {giuCho,nhaCho} from './giu-cho'
 import {PETS,ALIASES,OLD_SIX,allowed,learnedQuestionFilter,chooseSessionWithRoles,chooseLuotMoi,luotHomNay,SO_CAU_MOI_LUOT,publicQuestion,grade,advance,newArena,arenaAction} from '../../src/game/than-thu-v2/core'
-import type {Attempt,Mastery,PrivateQuestion,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
+import type {Attempt,Mastery,Mode,Arena,ArenaAction} from '../../src/game/than-thu-v2/core'
 import type {ShieldState} from '../../src/game/than-thu-v2/shields'
 import {khienConLai,khienRenChuaDung} from './exp-ho-so-game'
 import {CAP_KHIEN_QUA_DAU,MANH_MOI_KHIEN,NGAY_DAT_MO_KHIEN_QUA} from './exp-cau-hinh'
@@ -79,12 +79,13 @@ function visible(p:Profile,hapThuInfo?:{tran:number;lyDo?:string|null;soCauHomNa
   const soNgayCap=Math.max(0,expMoi?.ngayDat??0)+Math.max(0,expMoi?.ngayNghi??0),capSau=Math.min(120,Math.max(1,p.cap)+1),tranHomNay=tranV5&&tranV5.ngay===homNay?{exp:tranV5.exp,vang:tranV5.vang,manh:tranV5.manh}:{exp:0,vang:0,manh:0}
   return {...rest,ongNghiem:v4?0:p.wallet,...(v4?{choMoc:p.choMoc??0,ngayMoCap10:BANG_NGAY_CAP[capSau]??0,ngayCapSau:BANG_NGAY_CAP[capSau]??0,soNgayCap,choNgay:dangChoNgayV5(p.cap,p.exp,soNgayCap)?ngayConThieuLenCap(p.cap,soNgayCap):0,tranHomNay,expMoiVang:EXP_MOI_VANG}:{hapThuHomNay:{da:p.hapThu&&p.hapThu.ngay===homNay?p.hapThu.da:0,tran:hapThuInfo?.tran??null,lyDo:hapThuInfo?.lyDo??null,...(hapThuInfo?.soCauHomNay!==undefined?{soCauHomNay:hapThuInfo.soCauHomNay,canCau:hapThuInfo.canCau}:{})}}),expGameHomNay:{da:daExpGameHomNay(p,homNay),tran:null},khienConLai:khienConLai(p),soNgayDat:expMoi?.ngayDat??0,renKhien:{gia:VANG_REN_KHIEN,duTru:0,manh:MANH_REN_KHIEN,donVi:'vang',ngayCan:ngayDatKhien((p.khienRen?.daRen??0)+1)},ngayMoKhienQua:NGAY_DAT_MO_KHIEN_QUA,khienRen:p.khienRen?{manh:p.khienRen.manh,daRen:p.khienRen.daRen,chuaDung:khienRenChuaDung(p),conLai:khienConLai(p),moiKhien:MANH_MOI_KHIEN}:undefined,academic:academic?{total:academic.total,today:academic.days[academicDay(now())]??0,lastGain:academic.lastGain,at:academic.at,dailyLimit:100}:undefined}}
 async function attempts(env:Env,sbd:string){const r=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE sbd=? ORDER BY created_at DESC LIMIT 3000').bind(sbd).all<{json:string}>();return r.results.map(x=>(JSON.parse(x.json) as {attempt:Attempt}).attempt).reverse()}
+/** Câu của lượt theo (ma_de, qid, version). Chỉ mục lệch nguồn ⇒ `docCauTheoRef` tự đồng bộ đúng tờ đó rồi tra lại (29/09); version tất định nên câu
+ *  không đổi vẫn chấm được và lời giải là bản mới nhất. Câu thật sự đổi đề/đáp án hoặc bị rút ⇒ lỗi mã `cau_doi` (máy em bỏ qua câu / mở lượt mới). */
 async function currentQuestion(env:Env,q:{qid:string;maDe:string;version:string}){
-  const row=await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`).bind(q.maDe,q.qid,q.version).first<{json:string}>()
-  if(!row)throw new Error('Câu đã được sửa hoặc rút khỏi kho. Em mở lượt mới; lượt này không bị tính sai.')
-  const cau=JSON.parse(row.json) as PrivateQuestion
+  const cau=await docCauTheoRef(env,q)
+  if(!cau)throw loiCauDoi()
   // CẤM RÚT TỰ LUẬN (21/09): lượt đã tạo trước lệnh cấm mà còn câu tự luận thì đóng như câu rút khỏi kho — không phục vụ, không chấm.
-  if(laCauTuLuan(cau))throw new Error('Câu đã được sửa hoặc rút khỏi kho. Em mở lượt mới; lượt này không bị tính sai.')
+  if(laCauTuLuan(cau))throw loiCauDoi()
   return cau
 }
 /** Các qid trong LƯỢT mà hiện là TỰ LUẬN (lượt soạn trước lệnh cấm 21/09). MỘT truy vấn theo (qid, version); không thấy dòng ⇒ không kết tội. */
@@ -418,7 +419,8 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     const session=JSON.parse(row.json) as Session;const blocked=await protectedQuestions(env);const control=await readGameScope(env,sbd);if(!control.enabled)throw new Error('Thầy đang tạm dừng game.');for(const key of control.blocked)blocked.add(key);const qs=[]
     // CẤM RÚT TỰ LUẬN (21/09): lượt soạn trước lệnh cấm mà còn câu tự luận ⇒ BỎ câu ấy khỏi lượt trả về (em làm nốt các câu còn lại, `complete` cũng chỉ đòi các câu này).
     const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await docKhoiEm(env,sbd))
-    for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await currentQuestion(env,ref);if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');qs.push(publicQuestion(q))}
+    // 29/09: câu THẬT SỰ đổi đề/đáp án (hoặc bị rút) giữa lượt ⇒ BỎ câu ấy khỏi lượt trả về như câu tự luận (em làm nốt các câu còn lại, `complete` cũng không đòi) — em không kẹt.
+    for(const ref of session.questions){if(tuLuan.has(ref.qid))continue;const q=await docCauTheoRef(env,ref);if(!q||laCauTuLuan(q))continue;if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Lượt cũ có câu đang bảo vệ. Em mở lượt mới.');qs.push(publicQuestion(q))}
     if(!qs.length)return {ok:true,questions:[]}
     const rows=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE session=? AND sbd=? ORDER BY created_at').bind(row.id,sbd).all<{json:string}>()
     return {ok:true,id:row.id,questions:qs,mode:session.mode,answered:rows.results.map(x=>JSON.parse(x.json))}
@@ -498,6 +500,9 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     const done=r.results.map(x=>JSON.parse(x.json) as {attempt:Attempt})
     // CẤM RÚT TỰ LUẬN (21/09): câu tự luận còn sót trong lượt cũ không được đòi em làm; chỉ đếm các câu rút được.
     const tuLuan=await qidTuLuanTrongLuot(env,session.questions,await docKhoiEm(env,sbd))
+    // 29/09: câu chưa làm mà nay đã đổi đề/đáp án hoặc bị rút (máy em đã tự bỏ qua) cũng không bị đòi — chỉ tra khi còn thiếu, nên lượt đủ câu không tốn thêm truy vấn.
+    const daLam=new Set(done.map(x=>x.attempt.qid))
+    for(const ref of session.questions)if(!tuLuan.has(ref.qid)&&!daLam.has(ref.qid)&&!await docCauTheoRef(env,ref))tuLuan.add(ref.qid)
     if(done.filter(x=>!tuLuan.has(x.attempt.qid)).length!==session.questions.filter(x=>!tuLuan.has(x.qid)).length)throw new Error('Em cần hoàn thành các câu trong lượt.')
     if(session.mode==='tower'&&done.filter(x=>x.attempt.correct&&!x.attempt.assisted).length>=Math.ceil(done.length*.7)){
       const milestone=`${sbd}|tower|${id}`

@@ -12,7 +12,7 @@ import {chiSoThu,docLuotNgay,docMaiCho,lyDoThuongTuKetQua,lyDoTranExpGame,tenThu
 import type {LuotNgay,MaiCho} from './dao-core'
 import type {CauDao,DaoKetQua,DaoThanThuProps,ManDao} from './kieu'
 import {docLuotCauNgay,type LuotCauNgay} from '../chu-het-luot'
-import {laLoiHetTran,maCuaLoi} from '../loi-het-tran'
+import {CHU_CAU_DOI,laLoiCauDoi,laLoiHetTran,maCuaLoi} from '../loi-het-tran'
 import {chuCuaHang} from '../shop/chu-cua-vao' // KHÔNG nhập chu-shop ở đây: module dùng chung với gói cửa hàng sẽ bị gộp NGUYÊN vào gói Đảo
 import './dao.css'
 
@@ -88,13 +88,16 @@ export default function DaoThanThu({sbd,token,moShopLucDau,moTuiDoLucDau=false,p
   if(!s.questions?.length){setBao(s.message||THONG_BAO_TRONG);napGoiY();return}
   setBao(s.message||'');moLuot(s,false)})
  const nop=()=>chay(async()=>{const q=luot?.cau[viTri];if(!luot||!q)return
-  const r=await call('answer',{session:luot.id,qid:q.qid,answer:traLoi,assisted}),correct=!!r.correct,reward=r.reward??0
+  // Câu vừa được thầy sửa đề/đáp án (mã `cau_doi`, 29/09) ⇒ không để em kẹt: tự sang câu kế (không tính sai), hết câu thì kết thúc lượt.
+  let r:Awaited<ReturnType<typeof call>>;try{r=await call('answer',{session:luot.id,qid:q.qid,answer:traLoi,assisted})}catch(e){if(!laLoiCauDoi(e))throw e;await sangCauKe();if(conSong.current)setBao(CHU_CAU_DOI);return}
+  const correct=!!r.correct,reward=r.reward??0
   const lyDo=lyDoTranExpGame(reward,r.thuongGoc,tenThu(profile))??r.lyDoThuong??lyDoThuongTuKetQua({correct,assisted,reward,stage:r.stage??0})
   setKetQua(cu=>cu.some(a=>a.qid===q.qid)?cu:[...cu,{qid:q.qid,correct}]);setThuong(t=>({exp:t.exp+(typeof r.expCau==='number'?Math.max(0,r.expCau):reward),sao:t.sao+(reward>0?1:0)}))
   setPhanHoi({correct,answer:r.answer??'',solution:r.solution,solutionImages:r.solutionImages??[],lyDo,reward,expThuThach:typeof r.expThuThach==='number'?r.expThuThach:0,...(typeof r.expCau==='number'?{expCau:r.expCau}:{})})})
- const tiep=()=>chay(async()=>{if(!luot)return
+ const tiep=()=>chay(async()=>{setBao(b=>b===CHU_CAU_DOI?'':b);await sangCauKe()})
+ async function sangCauKe(){if(!luot)return
   if(viTri+1>=luot.cau.length){await call('complete',{session:luot.id});setXong(true);setPhanHoi(null);napGoiY()}
-  else{setViTri(viTri+1);setTraLoi('');setAssisted(false);setPhanHoi(null)}})
+  else{setViTri(viTri+1);setTraLoi('');setAssisted(false);setPhanHoi(null)}}
  const veDao=()=>{setDangTham(false);setMan('dao');setBao('');if(xong)setLuot(null)}
 
  const [loiChon,setLoiChon]=useState('')

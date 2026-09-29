@@ -24,3 +24,14 @@ export function loiCuaKetQua(r: unknown): string {
   for (const v of [o.error, o.loi]) if (typeof v === 'string' && v.trim()) return v
   return ''
 }
+
+// CÂU ĐỔI GIỮA LƯỢT (thầy báo 21:15 29/09): máy chủ trả mã `cau_doi` khi câu của lượt đã thật sự đổi đề/đáp án hoặc bị rút khỏi kho (câu không đổi
+// thì nay chấm bình thường — phiên bản câu tất định). Máy em KHÔNG để em kẹt ở câu ấy: tự sang câu kế (câu không bị tính sai), hết câu thì kết thúc lượt.
+export const MA_CAU_DOI = 'cau_doi'
+export const CHU_CAU_DOI = 'Thầy vừa sửa một câu trong lượt nên em sang câu kế. Câu đó không bị tính sai.'
+/** Lỗi này là "câu đã đổi/rút khỏi kho" chưa: mã `cau_doi` (máy chủ mới) hoặc nhận theo lời (máy chủ cũ). THUẦN. */
+export function laLoiCauDoi(e: unknown): boolean {
+  if (maCuaLoi(e) === MA_CAU_DOI) return true
+  const loi = e instanceof Error ? e.message : typeof e === 'string' ? e : ''
+  return /sửa hoặc rút khỏi kho/i.test(loi)
+}
