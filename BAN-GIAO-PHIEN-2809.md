@@ -139,3 +139,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 22:05 · Boss · merge PR #88 chấm trả lời ngắn ×10ⁿ (merge 6dc00e7) · không ca mở · lùi: git revert -m1 6dc00e7
 - 22:17 · deploy #88 xanh (run 585)
 - 22:3x · Boss · merge PR #89 version câu tất định (merge 7e56d8a) · 181 test xanh · không ca mở · lùi: git revert -m1 7e56d8a
+- 22:29 · deploy #89 xanh (run 586)
+- 22:36 · Boss · merge PR #90 Đảo báo nhầm ca (9b37f2e) + PR #91 mốc khoá ca 29/09 thầy xác nhận (6721255) · không ca mở · lùi: git revert -m1 6721255 && git revert -m1 9b37f2e
