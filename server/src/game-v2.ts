@@ -241,6 +241,8 @@ async function startDoanKhoLop(env:Env,sbd:string,p:Profile):Promise<Record<stri
   const day=await doDayDu(env,chon.map(x=>x.q as CauPool))
   return {ok:true,id,questions:chon.map((x,i)=>({...publicQuestion(day[i]!),role:x.role})),soCauThieu:Math.max(0,soCau-chon.length),missing:scope.missing,sourceCases:[...new Set(scope.evidence.map(e=>e.ca))].slice(0,3),...(hetCauMoi?{hetCauMoi:true}:{})}
 }
+/** Promise bắt đầu sớm: đánh dấu "đã bắt" để lỗi không thành lỗi treo — nơi dùng vẫn `await` và nhận đúng lỗi. */
+const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
 /** Bọc `gameV2Tho`: phản hồi `recommendations` (Đảo mở là gọi) mang thêm `shopBat` (boolean; cờ cửa hàng bật VÀ em thuộc chiSbd nếu có) để máy em biết có hiện nút "Cửa hàng" hay không mà KHÔNG thêm lượt gọi nào. Cờ đọc từ đệm 30 giây. */
 export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?:ExecutionContext):Promise<Record<string,unknown>> {
   // CHỐT ĐÁP ÁN (29/09): cờ cửa P08 cho phần trám bên dưới đọc CÙNG đợt đầu (đệm 15 s dùng chung lượt đọc đang bay) — không thêm một đợt D1 ở cuối.
@@ -261,8 +263,6 @@ export async function gameV2(env:Env,action:string,b:Record<string,unknown>,ctx?
 }
 /** Chốt đáp án (29/09): bốn lượt đọc của `answer` không cần hồ sơ ⇒ bắt đầu sớm, song song. Promise bị từ chối được "đánh dấu đã bắt" để không thành lỗi treo;
  *  nơi dùng vẫn `await` từng cái theo đúng thứ tự cũ nên lỗi báo cho em không đổi. */
-/** Promise bắt đầu sớm: đánh dấu "đã bắt" để lỗi không thành lỗi treo — nơi dùng vẫn `await` và nhận đúng lỗi. */
-const som=<T,>(p:Promise<T>)=>{p.catch(()=>{});return p}
 function docTruocAnswer(env:Env,sbd:string,b:Record<string,unknown>){
   const id=String(b.session??''),qid=String(b.qid??'')
   return {
@@ -465,11 +465,6 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     if(control.types.length&&(!q.dang||!control.types.includes(q.dang)))throw new Error('Thầy vừa đổi phạm vi luyện. Em mở lượt mới.')
     if(blocked.has(q.qid)||blocked.has(q.group))throw new Error('Câu đang được dùng cho ca thi. Em mở lượt học khác; câu này không bị tính sai.')
     // Hậu xử lý có thể chạy lại từ receipt nếu lần nộp trước dừng giữa chừng.
-    // 29/09: phần SỔ (su_kien_hoc) không nằm trong phản hồi ⇒ VIỆC PHỤ (`ctx.waitUntil` trên Worker thật; không có ctx ⇒ chạy tại chỗ, song song với EXP).
-    // Phần EXP vẫn chờ (số trả em). `hoSo` = hồ sơ ngay sau batch chấm (đã biết) ⇒ khoản EXP khỏi đọc lại.
-    const ghiKetQuaHoc=async(attempt:Attempt,chon?:string,hoSo?:{revision:number;json:string},expSom?:Promise<DocTruocKhoanGame>)=>{
-      const [,e]=await Promise.all([viecPhu(ctx,()=>ghiSoHoc(attempt,chon)),ghiExpCau(attempt,hoSo,expSom)]);return e
-    }
     const ghiSoHoc=async(attempt:Attempt,chon?:string)=>{
       // CNH-1.0 P03: khi cờ `nang_luc_v1` BẬT, sự kiện ĐƯỢC HỖ TRỢ cũng vào sổ (kèm `assistance:'assisted'`)
       // để phần hỗ trợ có bằng chứng và KHÔNG bị tính là lần tự làm. Cờ TẮT ⇒ giữ nguyên hành vi cũ (bỏ qua),
@@ -491,6 +486,11 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       const n=expMotCauGame(q.phan,Number(q.sao)||0)
       const c=await ghiKhoanExpGame(env,sbd,{khoa:`cau_game|${id}|${qid}`,loai:'cau_game',exp:n,ngay,luc,ghiChu:`Câu đúng trong game Phần ${q.phan}: +${n}`,maNguon:id,qid,khongTran:true},Date.now(),{hoSo,docSom:expSom})
       return {...c,thuThach:0}
+    }
+    // 29/09: phần SỔ (su_kien_hoc) không nằm trong phản hồi ⇒ VIỆC PHỤ (`ctx.waitUntil` trên Worker thật; không có ctx ⇒ chạy tại chỗ, song song với EXP).
+    // Phần EXP vẫn chờ (số trả em). `hoSo` = hồ sơ ngay sau batch chấm (đã biết) ⇒ khoản EXP khỏi đọc lại.
+    const ghiKetQuaHoc=async(attempt:Attempt,chon?:string,hoSo?:{revision:number;json:string},expSom?:Promise<DocTruocKhoanGame>)=>{
+      const [,e]=await Promise.all([viecPhu(ctx,()=>ghiSoHoc(attempt,chon)),ghiExpCau(attempt,hoSo,expSom)]);return e
     }
     /** `expCau` = EXP THẬT đã vào thú nhờ câu này (thưởng nấc + khoản câu game + thử thách của CHÍNH lượt này) — đọc lại từ sổ nên gọi lại vẫn ra đúng số, không cộng đôi. */
     const expCauCuaCau=async(reward:number)=>{
