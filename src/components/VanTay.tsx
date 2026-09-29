@@ -35,9 +35,21 @@ export function chuGoc(sbd: string, hoTen: string): string {
   return [sbd, hoTen].filter(Boolean).join(' · ')
 }
 
+/** Giờ:phút hiện tại — CÙNG kết quả `toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })` nhưng dùng lại MỘT bộ định dạng
+ * (máy yếu 29/09: dựng bộ định dạng Intl mỗi lần vẽ tốn ~10 ms trên máy chậm, mà màn thi vẽ lại mỗi lần em chọn đáp án). */
+let dinhDangGio: Intl.DateTimeFormat | null = null
+export function gioPhutNay(luc: Date = new Date()): string {
+  try {
+    dinhDangGio ??= new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' })
+    return dinhDangGio.format(luc)
+  } catch {
+    return luc.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  }
+}
+
 export default function VanTay({ sbd, hoTen, maCa, gio }: VanTayProps) {
   const id = useId().replace(/[^a-zA-Z0-9]/g, '')
-  const luc = gio ?? new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+  const luc = gio ?? gioPhutNay()
   const chu = chuVanTay(sbd, hoTen, maCa, luc)
   const goc = chuGoc(sbd, hoTen)
 
