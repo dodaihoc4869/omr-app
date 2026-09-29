@@ -111,3 +111,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 11:25 · Deploy #564 THÀNH CÔNG: PR #66 máy tự duyệt · main 8c84047 · lùi: git revert -m 1 8c84047. Duyệt bù 500 hồ sơ sạch; tiến độ lời giải 12: 535 xong / 4363, 534 đã duyệt, 1 còn cờ đáp án, 2 trượt.
 - 11:46 · Deploy #565 THÀNH CÔNG: PR #67 sửa sập Cổng HS iOS<16.4 (lookbehind) · main cec4371 · lùi: git revert -m 1 cec4371. 11:48 gộp PR #68 hộp kéo chiến dịch Tổng quan (main 140afea, 0 ca mở).
 - 12:15 · Deploy #567 THÀNH CÔNG: PR #69 tab Điểm danh dọc mép trái · main 511048c · lùi: git revert -m 1 511048c. (#566 PR #68 hộp kéo 140afea THÀNH CÔNG.) 12:18 gộp PR #70 tối ưu máy yếu (main b654155, 0 ca mở). Hàng chờ: #71, #72.
+- 12:28 · Deploy #568 THÀNH CÔNG: PR #70 tối ưu máy yếu · main b654155 · lùi: git revert -m 1 b654155. 12:39 gộp PR #71 nút Hỏi thầy trong game (main 5683fc1, 0 ca mở). Chờ: #72.
