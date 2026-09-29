@@ -252,7 +252,8 @@ describe('nội dung và dữ liệu của phiếu không đổi', () => {
 
   it('mọi thẻ câu ra ĐÚNG như hàm dựng thẻ cũ (chuHtml, oGiaiHtml nằm trong đó)', () => {
     CAU.forEach((c, i) => {
-      expect(phanCoThanTren).toContain(theCauHtml(c, i + 1, false, false, true, false, undefined))
+      // Phiếu HỌC SINH (M3) có thêm nút "Hỏi thầy" ở mỗi thẻ (thầy lệnh 29/09) — tham số cuối `hoiThay`.
+      expect(phanCoThanTren).toContain(theCauHtml(c, i + 1, false, false, true, false, undefined, true))
       expect(phanCoThanTren).toContain(chuHtml(c.text))
       const g = oGiaiHtml(c)
       if (g) expect(phanCoThanTren).toContain(g)

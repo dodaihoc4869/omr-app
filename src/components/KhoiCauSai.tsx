@@ -18,6 +18,7 @@ import { useState } from 'react'
 import { ChemText } from '../lib/chem-format'
 import { chuanHoaLoiGiaiCau, CHUA_CO_LOI_GIAI } from '../lib/chuan-hoa-loi-giai'
 import { chuDiemTheoY, soYCuaCau, soYDungPhanII } from '../lib/dem-ket-qua'
+import NutHoiThay from './loi-giai/NutHoiThay'
 
 export interface CauSaiHienThi {
   qid?: string
@@ -285,7 +286,7 @@ export function ThanCauSai({ c }: { c: CauSaiHienThi }) {
 }
 
 /** HỘP LỜI GIẢI CHUẨN — cùng một khuôn ở mọi báo cáo. */
-export function LoiGiaiCauSai({ c, hoaHoc = false }: { c: Omit<CauSaiHienThi, 'loiGiai'> & {loiGiai?: unknown}; hoaHoc?: boolean }) {
+export function LoiGiaiCauSai({ c, hoaHoc = false, qid, nguon }: { c: Omit<CauSaiHienThi, 'loiGiai'> & {loiGiai?: unknown}; hoaHoc?: boolean; /** Có qid ⇒ thêm nút "Hỏi thầy" (lời giải từng bước) dưới hộp — chỉ truyền ở chỗ LUYỆN TẬP, không truyền trong màn thi. */ qid?: string | null; nguon?: string }) {
   const lg = chuanHoaLoiGiaiCau(c.loiGiai, (c.phan as 'I' | 'II' | 'III') || 'I', c.dapAnDung || '')
   return (
     <div className="readable-solution p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 text-amber-950 dark:text-amber-100 shadow-sm space-y-3">
@@ -327,6 +328,7 @@ export function LoiGiaiCauSai({ c, hoaHoc = false }: { c: Omit<CauSaiHienThi, 'l
           </div>
         </div>
       )}
+      {qid && <NutHoiThay qid={qid} nguon={nguon ?? 'luyen'} gon />}
     </div>
   )
 }

@@ -1,0 +1,136 @@
+{
+ "qid": "12-C6-B19-I-52",
+ "bam": "d716f559135423c0",
+ "dang": "tn",
+ "ten": "Suy thứ tự thế điện cực từ phản ứng của Sn với {HCl} và {Cl2}",
+ "keys": [
+  "k3",
+  "k2"
+ ],
+ "dung": [
+  {
+   "ic": "i-chart",
+   "t": "(a): Sn khử được {H}<sup>+</sup>",
+   "p": "Sn + 2{HCl} → {SnCl2} + {H2}: cặp {Sn}<sup>2+</sup>/Sn đứng trước cặp 2{H}<sup>+</sup>/{H2}, tức có thế âm.",
+   "io": [
+    [
+     "out",
+     "{H2}↑"
+    ]
+   ]
+  },
+  {
+   "ic": "i-chart",
+   "t": "(a) dừng ở {SnCl2}",
+   "p": "Không tạo {SnCl4}: {H}<sup>+</sup> không đủ mạnh đưa {Sn}<sup>2+</sup> lên {Sn}<sup>4+</sup>, nên cặp {Sn}<sup>4+</sup>/{Sn}<sup>2+</sup> đứng sau cặp 2{H}<sup>+</sup>/{H2}.",
+   "io": [
+    [
+     "in",
+     "chỉ có {SnCl2}"
+    ]
+   ]
+  },
+  {
+   "ic": "i-chart",
+   "t": "(b): {Cl2} oxi hoá tiếp {SnCl2}",
+   "p": "{Cl2} là chất oxi hoá mạnh hơn {Sn}<sup>4+</sup>: cặp {Cl2}/2{Cl}<sup>−</sup> đứng sau cặp {Sn}<sup>4+</sup>/{Sn}<sup>2+</sup>.",
+   "io": [
+    [
+     "in",
+     "{SnCl4}"
+    ]
+   ]
+  },
+  {
+   "ic": "i-lens",
+   "t": "Xếp dãy rồi đếm",
+   "p": "Thế tăng dần: {Sn}<sup>2+</sup>/Sn &lt; 2{H}<sup>+</sup>/{H2} &lt; {Sn}<sup>4+</sup>/{Sn}<sup>2+</sup> &lt; {Cl2}/2{Cl}<sup>−</sup>. Nhận định (1), (3), (4) đúng; (2) sai.",
+   "io": [
+    [
+     "in",
+     "(1) (3) (4)"
+    ],
+    [
+     "out",
+     "(2)"
+    ]
+   ]
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "d": "S",
+   "k": "k3",
+   "bay": "nacoxihoa",
+   "soi": "Đếm ra 2 thường là bỏ sót (4) vì bỏ qua chú thích \"không tạo ra {SnCl4}\".",
+   "g": [
+    "Chìa khoá <b>Sản phẩm kim loại</b>: giống Fe gặp {H}<sup>+</sup> chỉ lên {Fe}<sup>2+</sup>, chú ý chất oxi hoá đưa kim loại lên nấc nào.",
+    "{H}<sup>+</sup> đưa Sn lên {Sn}<sup>2+</sup> nhưng không đưa tiếp lên {Sn}<sup>4+</sup>. Điều đó nói gì về cặp {Sn}<sup>4+</sup>/{Sn}<sup>2+</sup> so với 2{H}<sup>+</sup>/{H2}?"
+   ],
+   "giai": "Loại. {H}<sup>+</sup> không oxi hoá được {Sn}<sup>2+</sup> nên cặp {Sn}<sup>4+</sup>/{Sn}<sup>2+</sup> có thế lớn hơn cặp 2{H}<sup>+</sup>/{H2}, tức dương; cộng thêm {Cl2}/2{Cl}<sup>−</sup> cũng dương thì (4) đúng. Bỏ sót (4) mới đếm ra 2.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "d": "D",
+   "k": "k2",
+   "bay": null,
+   "soi": "Cần xếp đủ bốn cặp lên một trục thế, lấy cặp 2{H}<sup>+</sup>/{H2} làm mốc 0 V.",
+   "g": [
+    "Chìa khoá <b>Dãy thế điện cực</b>: chất khử cặp trước + chất oxi hoá cặp sau thì phản ứng; cặp đứng trước 2{H}<sup>+</sup>/{H2} có thế âm, đứng sau có thế dương.",
+    "(a) cho biết Sn khử được {H}<sup>+</sup> nhưng {H}<sup>+</sup> không oxi hoá được {Sn}<sup>2+</sup>; (b) cho biết {Cl2} oxi hoá được {Sn}<sup>2+</sup>.",
+    "Xếp bốn cặp theo thế tăng dần, rồi soát từng nhận định (1)–(4) với dãy đó."
+   ],
+   "giai": "Chọn. Dãy thế tăng: {Sn}<sup>2+</sup>/Sn &lt; 2{H}<sup>+</sup>/{H2} &lt; {Sn}<sup>4+</sup>/{Sn}<sup>2+</sup> &lt; {Cl2}/2{Cl}<sup>−</sup>. (1), (3), (4) đúng; (2) đảo ngược thứ tự nên sai. Có 3 nhận định đúng.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "d": "S",
+   "k": "k2",
+   "bay": "doivai",
+   "soi": "Chọn 4 là đã tính cả (2), tức đổi vai {Sn}<sup>4+</sup> và {Cl2} trong phản ứng (b).",
+   "g": [
+    "Chìa khoá <b>Dãy thế điện cực</b>: chất oxi hoá ở vế trái phải mạnh hơn chất oxi hoá sinh ra ở vế phải.",
+    "Trong (b), {Cl2} nhận electron, {Sn}<sup>4+</sup> là sản phẩm. Cặp nào phải có thế lớn hơn?"
+   ],
+   "giai": "Loại. (b) xảy ra nên {Cl2} oxi hoá mạnh hơn {Sn}<sup>4+</sup>: thế cặp {Cl2}/2{Cl}<sup>−</sup> lớn hơn cặp {Sn}<sup>4+</sup>/{Sn}<sup>2+</sup>. Nhận định (2) sai, không thể có 4 nhận định đúng.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "d": "S",
+   "k": "k2",
+   "bay": null,
+   "soi": "Chỉ công nhận một nhận định là bỏ sót ít nhất hai nhận định đúng.",
+   "g": [
+    "Chìa khoá <b>Dãy thế điện cực</b>: mỗi phản ứng xảy ra (hoặc không xảy ra) cho một cặp so sánh thế điện cực.",
+    "(a) cho hai thông tin: Sn khử được {H}<sup>+</sup>, và {H}<sup>+</sup> không oxi hoá được {Sn}<sup>2+</sup>. Mỗi thông tin kiểm được nhận định nào?"
+   ],
+   "giai": "Loại. Riêng (a) đã chứng minh (3) đúng; phối hợp (a), (b) chứng minh thêm (1) và (4). Chỉ 1 nhận định đúng là đếm thiếu.",
+   "lab": null
+  }
+ ],
+ "mc": {
+  "d": "B"
+ },
+ "ket": "Đáp án B",
+ "nho": "Phản ứng xảy ra: chất oxi hoá vế trái mạnh hơn vế phải; phản ứng dừng ở nấc thấp cũng là một dữ kiện.",
+ "phepTinh": [],
+ "tuongTu": [
+  {
+   "t": "Từ phản ứng Fe + 2{FeCl3} → 3{FeCl2} suy ra thế điện cực chuẩn của cặp {Fe}<sup>3+</sup>/{Fe}<sup>2+</sup> lớn hơn của cặp {Fe}<sup>2+</sup>/Fe.",
+   "d": "D",
+   "giai": "Đúng. Fe là chất khử (cặp {Fe}<sup>2+</sup>/Fe), {Fe}<sup>3+</sup> là chất oxi hoá (cặp {Fe}<sup>3+</sup>/{Fe}<sup>2+</sup>); phản ứng xảy ra nên cặp chứa chất oxi hoá có thế lớn hơn.",
+   "phepTinh": []
+  },
+  {
+   "t": "Từ phản ứng Zn + {CuSO4} → {ZnSO4} + Cu suy ra ion {Zn}<sup>2+</sup> có tính oxi hoá mạnh hơn ion {Cu}<sup>2+</sup>.",
+   "d": "S",
+   "giai": "Sai. {Cu}<sup>2+</sup> nhận electron của Zn nên {Cu}<sup>2+</sup> là chất oxi hoá mạnh hơn {Zn}<sup>2+</sup> sinh ra; thế cặp {Cu}<sup>2+</sup>/Cu lớn hơn cặp {Zn}<sup>2+</sup>/Zn.",
+   "phepTinh": []
+  }
+ ],
+ "co": []
+}

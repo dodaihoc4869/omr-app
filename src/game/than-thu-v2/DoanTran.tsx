@@ -141,7 +141,7 @@ export default function DoanTran(p: Props) {
         <div className="dh-giay-dau"><b className="dh-vien-thuoc dh-tim">ĐÁP ÁN CÂU CHUNG</b><span>hiệp {lg.hiep}</span></div>
         <DeBai q={lg.de} onZoom={p.onZoom} />
         <div className="dh-y">{lg.de.ideas.map((y, i) => <div key={i}><span><small>Ý {'abcd'[i]}</small><ChemText text={y} /></span><em className="dh-xong">{lg.answer[i] === 'D' ? 'Đúng' : 'Sai'}</em></div>)}</div>
-        <div className="dh-ket-qua-cau dh-dung"><details><summary>Lời giải</summary><LoiGiaiCauSai hoaHoc c={{ text: lg.de.text, phan: 'II', dapAnDung: lg.answer, loiGiai: lg.solution }} /></details></div>
+        <div className="dh-ket-qua-cau dh-dung"><details><summary>Lời giải</summary><LoiGiaiCauSai hoaHoc c={{ text: lg.de.text, phan: 'II', dapAnDung: lg.answer, loiGiai: lg.solution }} qid={lg.de.qid} nguon="doan" /></details></div>
       </section>
     ) : p.cauVuaLam ? (
       <DoanCau q={p.cauVuaLam.q} chon={p.cauVuaLam.chon} onChon={() => {}} khoa ketQua={p.cauVuaLam.ketQua} onZoom={p.onZoom} dau={<><b className="dh-vien-thuoc">{v2 ? 'CÂU ÔN EM VỪA LÀM' : 'CÂU EM VỪA LÀM'}</b><span>đọc lại trước khi sang hiệp mới</span></>}

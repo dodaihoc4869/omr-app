@@ -1,0 +1,74 @@
+{
+ "qid": "12-KT-C5-D3-III-2",
+ "bam": "d0552f61343db785",
+ "dang": "tln",
+ "ten": "Đếm phản ứng không tự xảy ra ở điều kiện chuẩn",
+ "keys": ["k1"],
+ "dung": [
+  {
+   "ic": "i-chart",
+   "t": "Xếp dãy E° tăng dần",
+   "p": "Mg −2,356 < Mn −1,180 < Zn −0,763 < Fe −0,440 < Ni −0,257 < Sn −0,137 < Pb −0,126 < {O2}/{H2O} 1,229 (V, bảng SGK; Mn theo đề).",
+   "io": []
+  },
+  {
+   "ic": "i-lens",
+   "t": "Mỗi phản ứng: tìm hai cặp",
+   "p": "Chất oxi hoá – chất khử ở vế trái: (a) {Mg}<sup>2+</sup> – Pb; (b) {O2} – Zn; (c) {Sn}<sup>2+</sup> – Ni; (d) {Mn}<sup>2+</sup> – Fe.",
+   "io": []
+  },
+  {
+   "ic": "i-scale",
+   "t": "So, đếm phản ứng ngược chiều",
+   "p": "(a) và (d): chất oxi hoá có E° nhỏ hơn chất khử nên không tự xảy ra. (b), (c) xảy ra.",
+   "io": [["out", "(a)"], ["out", "(d)"], ["in", "(b)"], ["in", "(c)"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "2",
+  "donVi": "phản ứng",
+  "k": "k1",
+  "bay": "doivai",
+  "soi": "“không tự xảy ra” → đếm phản ứng có E°(oxi hoá) nhỏ hơn E°(khử); ở (b) phải nhận ra cặp {O2}/{H2O}.",
+  "g": [
+   "Chìa khoá <b>So E°, đoán chiều</b>: phản ứng tự xảy ra khi E° cặp chứa chất oxi hoá lớn hơn E° cặp chứa chất khử; nhỏ hơn thì không tự xảy ra.",
+   "Tìm hai cặp: (a) {Mg}<sup>2+</sup>/Mg với {Pb}<sup>2+</sup>/Pb; (b) {O2}/{H2O} với {Zn}<sup>2+</sup>/Zn; (c) {Sn}<sup>2+</sup>/Sn với {Ni}<sup>2+</sup>/Ni; (d) {Mn}<sup>2+</sup>/Mn (−1,180 V) với {Fe}<sup>2+</sup>/Fe.",
+   "Theo dãy E° tăng Mg, Mn, Zn, Fe, Ni, Sn, Pb, {H2}, …, {O2}/{H2O}: ở phản ứng nào chất oxi hoá đứng trước chất khử?"
+  ],
+  "giai": "Đáp số: 2. (a) {Mg}<sup>2+</sup>/Mg (−2,356 V) nhỏ hơn {Pb}<sup>2+</sup>/Pb (−0,126 V): Pb không khử được {Mg}<sup>2+</sup>, không xảy ra. (b) {O2}/{H2O} (1,229 V) lớn hơn {Zn}<sup>2+</sup>/Zn (−0,763 V): xảy ra. (c) {Sn}<sup>2+</sup>/Sn (−0,137 V) lớn hơn {Ni}<sup>2+</sup>/Ni (−0,257 V): xảy ra. (d) {Mn}<sup>2+</sup>/Mn (−1,180 V) nhỏ hơn {Fe}<sup>2+</sup>/Fe (−0,440 V): không xảy ra. Có 2 phản ứng không tự xảy ra là (a) và (d)."
+ },
+ "ket": "Đáp số: 2",
+ "nho": "Không tự xảy ra khi E° cặp chứa chất oxi hoá nhỏ hơn E° cặp chứa chất khử; tìm đúng cặp rồi mới so.",
+ "phepTinh": [
+  { "ten": "Hiệu E° (a) (V)", "bieuThuc": "-2.356+0.126", "ketQua": -2.23, "lamTron": 3 },
+  { "ten": "Hiệu E° (b) (V)", "bieuThuc": "1.229+0.763", "ketQua": 1.992, "lamTron": 3 },
+  { "ten": "Hiệu E° (c) (V)", "bieuThuc": "-0.137+0.257", "ketQua": 0.12, "lamTron": 3 },
+  { "ten": "Hiệu E° (d) (V)", "bieuThuc": "-1.180+0.440", "ketQua": -0.74, "lamTron": 3 },
+  { "ten": "Số phản ứng không tự xảy ra: (a) và (d)", "bieuThuc": "1+1", "ketQua": 2, "lamTron": 0, "laDapSo": true }
+ ],
+ "tuongTu": [
+  {
+   "t": "Cho E°({Mn}<sup>2+</sup>/Mn) = −1,180 V và E°({Zn}<sup>2+</sup>/Zn) = −0,763 V. Phản ứng Mn(s) + {Zn}<sup>2+</sup>(aq) → {Mn}<sup>2+</sup>(aq) + Zn(s) tự xảy ra ở điều kiện chuẩn.",
+   "d": "D",
+   "giai": "Đúng. E°(oxi hoá) − E°(khử) = −0,763 − (−1,180) = 0,417 V > 0.",
+   "phepTinh": [
+    { "ten": "Hiệu E° (V)", "bieuThuc": "-0.763+1.180", "ketQua": 0.417, "lamTron": 3 }
+   ]
+  },
+  {
+   "t": "Cho E°({Pb}<sup>2+</sup>/Pb) = −0,126 V và E°({Sn}<sup>2+</sup>/Sn) = −0,137 V. Phản ứng Pb(s) + {Sn}<sup>2+</sup>(aq) → {Pb}<sup>2+</sup>(aq) + Sn(s) tự xảy ra ở điều kiện chuẩn.",
+   "d": "S",
+   "giai": "Sai. E°({Sn}<sup>2+</sup>/Sn) − E°({Pb}<sup>2+</sup>/Pb) = −0,137 − (−0,126) = −0,011 V < 0; chỉ chiều nghịch (Sn khử {Pb}<sup>2+</sup>) mới tự xảy ra.",
+   "phepTinh": [
+    { "ten": "Hiệu E° (V)", "bieuThuc": "-0.137+0.126", "ketQua": -0.011, "lamTron": 3 }
+   ]
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Bốn phản ứng (a) đến (d) in liền một dòng với câu hỏi, không xuống dòng."
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "ma": "DIEN_PHAN",
+ "chuong": "Pin điện và điện phân",
+ "lop": "12",
+ "KEYS": {
+  "k1": {
+   "ten": "So E°, đoán chiều",
+   "rule": "<b>Tự xảy ra:</b> E° cặp chứa chất oxi hoá > E° cặp chứa chất khử (quy tắc α)<br><b>Sản phẩm:</b> chất oxi hoá và chất khử yếu hơn<br><b>Dãy E° tăng:</b> Mg, Al, Zn, Fe, Ni, Sn, Pb, {H2} (0), Cu (0,340), Fe³⁺/Fe²⁺ (0,771), Ag (0,799), {O2}/{H2O}<br><b>Đếm phản ứng:</b> mỗi phản ứng tìm đúng hai cặp rồi so<br><b>Với acid loãng:</b> E° < 0 mới đẩy {H2} khỏi acid loãng"
+  },
+  "k2": {
+   "ten": "Suy dãy từ phản ứng",
+   "rule": "<b>Không cho số E°:</b> mỗi phản ứng xảy ra cho <b>hai bất đẳng thức</b><br><b>Chất khử:</b> vế trái mạnh hơn vế phải<br><b>Chất oxi hoá:</b> vế trái mạnh hơn vế phải<br><b>Ghép dãy:</b> \"không phản ứng\" → đảo lại, rồi ghép thành một dãy<br><b>Kim loại – ion:</b> kim loại khử càng mạnh, ion của nó oxi hoá càng yếu<br><b>Dấu E°:</b> kim loại đẩy được {H2} khỏi HCl ⇒ E° âm"
+  },
+  "k3": {
+   "ten": "Pin Galvani",
+   "rule": "<b>Anode (cực âm):</b> cặp E° nhỏ → kim loại bị oxi hoá, tan dần<br><b>Cathode (cực dương):</b> cặp E° lớn → ion bị khử; điện cực Pt không đổi khối lượng<br><b>Tính E°pin:</b> E°pin = E°(cathode) − E°(anode) > 0, vôn kế chỉ số dương<br><b>Cầu muối:</b> cation về cathode, anion về anode<br><b>Lập được pin:</b> chỉ phản ứng oxi hoá – khử <b>tự xảy ra</b><br><b>Không tự xảy ra:</b> phải điện phân"
+  },
+  "k4": {
+   "ten": "Phóng điện – nạp điện",
+   "rule": "<b>Phóng điện = pin:</b> hoá năng → điện năng; cực âm là anode, bị oxi hoá<br><b>Nạp điện = điện phân:</b> điện năng → hoá năng, mọi quá trình đảo chiều<br><b>Acquy chì phóng:</b> Pb và {PbO2} đều → {PbSO4} bám cực; {H2SO4} giảm; chì độc<br><b>Khối lượng cực:</b> hai cực cùng nặng thêm (+96 và +64 g/mol)<br><b>Li-ion phóng:</b> Li⁺ sang cực dương<br><b>Pin nhiên liệu:</b> điện năng ≈ |ΔrH|; nhiên liệu thật = lí thuyết : H"
+  },
+  "k5": {
+   "ten": "Thứ tự điện phân",
+   "rule": "<b>Hai cực:</b> anode nối cực (+), oxi hoá; cathode nối cực (−), khử<br><b>Cathode:</b> E° lớn bị khử trước: Ag⁺ > Fe³⁺ (→ Fe²⁺) > Cu²⁺ > H⁺ (acid) > Fe²⁺, Ni²⁺, Zn²⁺ (vẫn trước nước)<br><b>Nước ở cathode:</b> K⁺, Na⁺, Mg²⁺, Al³⁺ không bị khử → nước bị khử thay: {H2} + OH⁻, pH tăng<br><b>Anode trơ:</b> Cl⁻, Br⁻ bị oxi hoá trước nước<br><b>Nước ở anode:</b> {SO4}²⁻, {NO3}⁻ không bị oxi hoá → nước bị oxi hoá: {O2} + H⁺, pH giảm<br><b>Anode bằng Cu:</b> Cu tan"
+  },
+  "k6": {
+   "ten": "Điện phân sản xuất",
+   "rule": "<b>Na, Al:</b> chỉ điều chế được bằng <b>điện phân nóng chảy</b><br><b>Cryolite:</b> trộn {Al2O3} (từ bauxite) → <b>hạ nhiệt độ nóng chảy, tăng dẫn điện</b><br><b>Điện cực Al:</b> Al ra ở cathode, {O2} ở anode đốt mòn than<br><b>Có màng ngăn:</b> {NaCl} dung dịch → {NaOH} (cô đặc, kết tinh) + {H2} + {Cl2}<br><b>Không màng ngăn:</b> {Cl2} gặp {NaOH} → nước Javel (tẩy màu, diệt khuẩn); gộp: {NaCl} + {H2O} → {NaClO} + {H2}<br><b>Bẫy hay gặp:</b> sản xuất Al không dùng {AlCl3} (thăng hoa)"
+  },
+  "k7": {
+   "ten": "Định luật Faraday",
+   "rule": "<b>Công thức:</b> q = I·t = n(e)·F ⇒ <b>n(chất) = It : (zF)</b><br><b>Số F:</b> F = 96500 C/mol; đề cho số khác → theo đề<br><b>Đổi đơn vị:</b> t tính bằng <b>giây</b>; 1 A·h = 3600 C<br><b>Số z:</b> số electron một ion, phân tử trao đổi; hợp chất → lấy độ đổi số oxi hoá<br><b>z hay gặp:</b> Ag⁺ 1, Cu²⁺ 2, Al³⁺ 3, {Cl2} 2, {H2} 2, {O2} 4<br><b>Hiệu suất:</b> sản phẩm thực = lí thuyết × H; điện lượng, thời gian cần = lí thuyết : H"
+  }
+ },
+ "TRAPS_THEM": {
+  "doicuc": {
+   "ten": "Đảo cực",
+   "hoi": "Đang là pin hay bình điện phân? Anode luôn oxi hoá; pin: anode là cực âm, điện phân: anode nối cực dương."
+  },
+  "soe": {
+   "ten": "Sai số electron",
+   "hoi": "Một ion, phân tử trao đổi mấy electron? Thời gian đã đổi ra giây chưa? Hiệu suất nhân hay chia?"
+  }
+ },
+ "DANG_KEY": {
+  "DIEN_PHAN.THE_DIEN_CUC.CHON_PHAT_BIEU": "k2",
+  "DIEN_PHAN.THE_DIEN_CUC.DEM_DONG_PHAN": "k1",
+  "DIEN_PHAN.THE_DIEN_CUC.SO_SANH": "k2",
+  "DIEN_PHAN.THE_DIEN_CUC.XAC_DINH_CHAT": "k1",
+  "DIEN_PHAN.PIN_GALVANI.CHON_PHAT_BIEU": "k3",
+  "DIEN_PHAN.PIN_GALVANI.DEM_DONG_PHAN": "k3",
+  "DIEN_PHAN.PIN_GALVANI.TINH_KHOI_LUONG": "k7",
+  "DIEN_PHAN.PIN_GALVANI.TINH_THE_TICH": "k7",
+  "DIEN_PHAN.NGUON_DIEN.CHON_PHAT_BIEU": "k4",
+  "DIEN_PHAN.NGUON_DIEN.NHAN_DANG": "k4",
+  "DIEN_PHAN.NGUON_DIEN.TINH_KHOI_LUONG": "k4",
+  "DIEN_PHAN.DIEN_PHAN_DD.CHON_PHAT_BIEU": "k5",
+  "DIEN_PHAN.DIEN_PHAN_DD.SO_SANH": "k5",
+  "DIEN_PHAN.DIEN_PHAN_DD.DEM_DONG_PHAN": "k5",
+  "DIEN_PHAN.DIEN_PHAN_DD.NHAN_DANG": "k5",
+  "DIEN_PHAN.DIEN_PHAN_DD.XAC_DINH_SO_OXI_HOA": "k7",
+  "DIEN_PHAN.DIEN_PHAN_DD.TINH_THE_TICH": "k6",
+  "DIEN_PHAN.DIEN_PHAN_NC.CHON_PHAT_BIEU": "k6",
+  "DIEN_PHAN.MA_TINH_LUYEN.XAC_DINH_DIEN_TICH": "k7"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "\"Số phản ứng lập được pin điện hoá\": CHỐT 2. Chỉ phản ứng oxi hoá – khử TỰ XẢY RA mới lập được pin ((d), (e)); (a)–(c) không đổi số oxi hoá; (g) là oxi hoá – khử nhưng không tự xảy ra. Bản 12-KT-C56-D1-III-4 đang ghi 5 ⇒ danh sách sửa đáp án kho. Phiên chốt độc lập (29/09) ra cùng kết quả.",
+  "F: mặc định 96500 C/mol theo SGK; đề cho 96485 thì dùng số đề.",
+  "Mã dạng 12-C5-B16-II-22 (điện phân nóng chảy Al2O3) gắn DIEN_PHAN_DD: GIỮ mã, chìa gắn theo nội dung (k6).",
+  "Thứ tự ở cathode: CHỐT theo dãy phổ thông Ag⁺ > Fe³⁺ > Cu²⁺ > H⁺ (acid) > Fe²⁺, Ni²⁺, Zn²⁺ > H2O; đã ghi thêm vào k5.",
+  "Nhiệt độ nóng chảy hỗn hợp Al2O3 – cryolite: KHÔNG đưa số vào chìa (tài liệu ghi khác nhau)."
+ ],
+ "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+}

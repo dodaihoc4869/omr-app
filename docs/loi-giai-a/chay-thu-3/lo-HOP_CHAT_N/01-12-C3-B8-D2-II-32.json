@@ -1,0 +1,125 @@
+{
+ "qid": "12-C3-B8-D2-II-32",
+ "bam": "f7d82de30f662aab",
+ "dang": "ds",
+ "ten": "Điều chế aniline từ nitrobenzene: phổ IR, vai trò, hiệu suất",
+ "keys": ["k1", "k4", "k3"],
+ "dung": [
+  {
+   "ic": "i-heat",
+   "t": "Giai đoạn (1): Fe + {HCl} khử nitro",
+   "p": "N đi từ +3 trong –{NO2} xuống −3 trong {C6H5NH3Cl}: nitrobenzene nhận electron.",
+   "io": [["in", "{C6H5NO2}"], ["in", "Fe, {HCl} dư"]]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "Giai đoạn (2): thêm {NaOH}",
+   "p": "{C6H5NH3}<sup>+</sup> nhường H<sup>+</sup> cho {OH}<sup>−</sup>, aniline tách ra thành lớp vẩn đục.",
+   "io": [["in", "{C6H5NH2}"], ["out", "{NaCl}, {H2O}"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Bảo toàn N: 1 mol ra 1 mol",
+   "p": "1,23 × 1,20 = 1,476 g nitrobenzene, tức 0,012 mol; thực tế thu 0,67 g aniline.",
+   "io": [["in", "0,012 mol N"]]
+  },
+  {
+   "ic": "i-ir",
+   "t": "Soi phổ IR của sản phẩm",
+   "p": "Aniline là amine bậc I, nhóm –{NH2} có liên kết N–H nên có peak ở 3500–3300 cm<sup>−1</sup>.",
+   "io": [["in", "N–H"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "D",
+   "k": "k1",
+   "bay": null,
+   "soi": "\"3500 – 3300 cm<sup>−1</sup>\" và \"N-H\": đối chiếu bảng số sóng đề cho với bậc của aniline.",
+   "g": [
+    "Chìa khoá <b>Bậc, tên, phổ IR</b>: liên kết N–H hấp thụ ở 3500–3300 cm<sup>−1</sup>; amine bậc III không có N–H nên không có peak này.",
+    "Aniline {C6H5NH2}: N gắn mấy gốc hydrocarbon, còn mấy nguyên tử H?",
+    "Bậc I, trên N còn hai H. Bảng đề cho ghi vùng nào ứng với N–H?"
+   ],
+   "giai": "Đúng. Aniline là amine bậc I, nhóm –{NH2} có liên kết N–H. Bảng đề cho ghi N–H (amine) hấp thụ ở 3500–3300 cm<sup>−1</sup>.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "S",
+   "k": "k4",
+   "bay": "doivai",
+   "soi": "\"chất khử\": phải xét số oxi hoá của N tăng hay giảm ở giai đoạn (1).",
+   "g": [
+    "Chìa khoá <b>Điều chế &amp; con số</b>: N trong –{NO2} có số oxi hoá +3, trong amine là −3. Chất có số oxi hoá giảm là chất oxi hoá.",
+    "Giai đoạn (1): N đi từ –{NO2} của nitrobenzene sang –{NH3}<sup>+</sup> của {C6H5NH3Cl}.",
+    "Từ +3 xuống −3: N nhận hay nhường electron? Chất nào nhường electron cho nó?"
+   ],
+   "giai": "Sai. Số oxi hoá của N giảm từ +3 xuống −3, nitrobenzene nhận electron nên là chất oxi hoá. Fe nhường electron mới là chất khử.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "S",
+   "k": "k4",
+   "bay": "conso",
+   "soi": "\"61,0\" là con số cài sẵn: tự tính h theo bảo toàn N, không làm tròn giữa chừng, rồi mới so.",
+   "g": [
+    "Chìa khoá <b>Điều chế &amp; con số</b>: V × D → m → n; bảo toàn N: 1 mol nitrobenzene cho tối đa 1 mol aniline.",
+    "m(nitrobenzene) = 1,23 × 1,20 = 1,476 g; M(nitrobenzene) 123, M(aniline) 93.",
+    "n lí thuyết là 1,476 ÷ 123, n thực tế là 0,67 ÷ 93. Chia hai số, giữ nguyên số lẻ, cuối cùng mới làm tròn."
+   ],
+   "giai": "Sai. n(nitrobenzene) = 1,476 ÷ 123 = 0,012 mol; n(aniline) = 0,67 ÷ 93 ≈ 0,007204 mol. h = 0,007204 ÷ 0,012 × 100 ≈ 60,04, làm tròn 60,0, không phải 61,0.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "D",
+   "k": "k3",
+   "bay": null,
+   "soi": "\"acid theo Brønsted – Lowry\": xem {C6H5NH3}<sup>+</sup> cho hay nhận H<sup>+</sup> ở giai đoạn (2).",
+   "g": [
+    "Chìa khoá <b>Amine gặp thuốc thử</b>: muối amine gặp {NaOH} thì amine tách ra; ion {RNH3}<sup>+</sup> là acid Brønsted.",
+    "Giai đoạn (2): {C6H5NH3}<sup>+</sup> + {OH}<sup>−</sup> → {C6H5NH2} + {H2O}.",
+    "Theo Brønsted – Lowry, chất cho H<sup>+</sup> là acid. Ở phương trình trên, H<sup>+</sup> đi từ đâu sang đâu?"
+   ],
+   "giai": "Đúng. {C6H5NH3}<sup>+</sup> nhường H<sup>+</sup> cho {OH}<sup>−</sup> để trở thành aniline, nên nó là acid Brønsted – Lowry; {OH}<sup>−</sup> là base.",
+   "lab": null
+  }
+ ],
+ "ket": "a Đ – b S – c S – d Đ",
+ "nho": "Nitro → amine: N từ +3 xuống −3, nitrobenzene là chất oxi hoá; hiệu suất tính theo bảo toàn N.",
+ "phepTinh": [
+  { "ten": "m nitrobenzene (g)", "bieuThuc": "1.23*1.20", "ketQua": 1.476, "lamTron": 3 },
+  { "ten": "n nitrobenzene (mol)", "bieuThuc": "1.23*1.20/123", "ketQua": 0.012, "lamTron": 4 },
+  { "ten": "n aniline (mol)", "bieuThuc": "0.67/93", "ketQua": 0.007204, "lamTron": 6 },
+  { "ten": "h (%)", "bieuThuc": "0.67/93/(1.23*1.20/123)*100", "ketQua": 60.0, "lamTron": 1 }
+ ],
+ "tuongTu": [
+  {
+   "t": "Theo sơ đồ trên, từ 2,46 mL nitrobenzene (D = 1,20 g/mL) thu được 1,395 g aniline thì hiệu suất quá trình là 62,5%.",
+   "d": "D",
+   "giai": "Đúng. n(nitrobenzene) = 2,46 × 1,20 ÷ 123 = 0,024 mol; n(aniline) = 1,395 ÷ 93 = 0,015 mol; h = 0,015 ÷ 0,024 × 100 = 62,5%.",
+   "phepTinh": [
+    { "ten": "n nitrobenzene (mol)", "bieuThuc": "2.46*1.20/123", "ketQua": 0.024, "lamTron": 4 },
+    { "ten": "n aniline (mol)", "bieuThuc": "1.395/93", "ketQua": 0.015, "lamTron": 4 },
+    { "ten": "h (%)", "bieuThuc": "1.395/93/(2.46*1.20/123)*100", "ketQua": 62.5, "lamTron": 1 }
+   ]
+  },
+  {
+   "t": "Ở giai đoạn (1), mỗi nguyên tử N của nitrobenzene nhận 6 electron.",
+   "d": "D",
+   "giai": "Đúng. Số oxi hoá của N giảm từ +3 xuống −3, tức giảm 3 + 3 = 6 đơn vị: mỗi N nhận 6 electron.",
+   "phepTinh": [
+    { "ten": "Số electron N nhận", "bieuThuc": "3+3", "ketQua": 6, "lamTron": 0 }
+   ]
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Đề: bảng số sóng IR bị dàn thành một dòng chữ (\"Liên kết … Số sóng (cm⁻¹) 3500 – 3300 1600 – 1450 …\"), mất cấu trúc bảng; thiếu xuống dòng trước \"Trong một thí nghiệm\". Ý d: dấu + của cation phenylammonium chưa đặt ở chỉ số trên."
+  }
+ ]
+}

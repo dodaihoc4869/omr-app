@@ -1,0 +1,59 @@
+{
+ "qid": "thu-q3",
+ "so": "Câu 80",
+ "nguon": "Đề thi thử",
+ "dang": "dem",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 80:</b> Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế bằng phản ứng giữa salicylic acid (<i>o</i>-hydroxybenzoic acid) và methanol. Cho các nhận định sau (xem ở dưới). Số nhận định đúng là</p>\n<p class=\"st\"><b>A.</b> 4. &nbsp;&nbsp; <b>B.</b> 1. &nbsp;&nbsp; <b>C.</b> 3. &nbsp;&nbsp; <b>D.</b> 2.</p>",
+ "y": [
+  {
+   "id": "1",
+   "t": "Methyl salicylate tác dụng tối đa với NaOH trong dung dịch theo tỉ lệ mol 1 : 2."
+  },
+  {
+   "id": "2",
+   "t": "Salicylic acid tác dụng tối đa với nước bromine theo tỉ lệ mol 1 : 3."
+  },
+  {
+   "id": "3",
+   "t": "Methyl salicylate tác dụng tối đa với {H2} (xt Ni, t°) theo tỉ lệ mol 1 : 3."
+  },
+  {
+   "id": "4",
+   "t": "Số liên kết π trong salicylic acid là 5."
+  },
+  {
+   "id": "5",
+   "t": "Methyl salicylate là hợp chất hữu cơ đa chức."
+  }
+ ],
+ "dapAn": {
+  "1": "D",
+  "2": "S",
+  "3": "D",
+  "4": "S",
+  "5": "S"
+ },
+ "mc": {
+  "hoi": "Số nhận định đúng là",
+  "o": [
+   [
+    "A",
+    "4"
+   ],
+   [
+    "B",
+    "1"
+   ],
+   [
+    "C",
+    "3"
+   ],
+   [
+    "D",
+    "2"
+   ]
+  ],
+  "dapAn": "D"
+ }
+}

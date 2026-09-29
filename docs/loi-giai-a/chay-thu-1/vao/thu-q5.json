@@ -1,0 +1,32 @@
+{
+ "qid": "thu-q5",
+ "so": "Câu 24",
+ "nguon": "Đề thi thử",
+ "dang": "ds",
+ "chuong": "ester-lipid",
+ "de": "<p><b>Câu 24:</b> Methyl cinnamate là một ester có công thức phân tử {C10H10O2} và có mùi thơm của dâu tây (strawberry) được sử dụng trong ngành công nghiệp hương liệu và nước hoa. Để điều chế 16,2 gam ester methyl cinnamate người ta cho 29,6 gam cinnamic acid phản ứng với lượng dư methyl alcohol ({CH3OH}).</p>\n<div class=\"fig\">Hình trong đề: vòng benzene – CH=CH – C(=O) – O – CH<sub>3</sub> &nbsp;({C6H5}–CH=CH–{COOCH3})</div>\n<p class=\"note\">Đề in \"cinnmate\"; tên đúng là \"cinnamate\".</p>",
+ "y": [
+  {
+   "id": "a",
+   "t": "Methyl cinnamate có đồng phân hình học."
+  },
+  {
+   "id": "b",
+   "t": "Methyl cinnamate có công thức cấu tạo là {CH3COO}–CH=CH–{C6H5}."
+  },
+  {
+   "id": "c",
+   "t": "Methyl cinnamate phản ứng với NaOH với tỉ lệ 1 : 2."
+  },
+  {
+   "id": "d",
+   "t": "Hiệu suất phản ứng ester hoá trong trường hợp này là 50%."
+  }
+ ],
+ "dapAn": {
+  "a": "D",
+  "b": "S",
+  "c": "S",
+  "d": "D"
+ }
+}

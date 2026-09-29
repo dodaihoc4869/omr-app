@@ -1,0 +1,161 @@
+{
+ "qid": "12-C6-B19-II-8",
+ "bam": "ac786d4112f8b6fb",
+ "dang": "ds",
+ "ten": "Cu tan trong {H2SO4} đặc nóng và loãng có {O2}: ai là chất oxi hoá",
+ "keys": [
+  "k3",
+  "k6",
+  "k2"
+ ],
+ "dung": [
+  {
+   "ic": "i-atom",
+   "t": "Số oxi hoá ở (1)",
+   "p": "Cu từ 0 lên +2; S từ +6 (trong {H2SO4}) xuống +4 (trong {SO2}).",
+   "io": [
+    [
+     "in",
+     "{H2SO4} đặc nhận electron"
+    ],
+    [
+     "out",
+     "{SO2}↑"
+    ]
+   ]
+  },
+  {
+   "ic": "i-atom",
+   "t": "Số oxi hoá ở (2)",
+   "p": "Cu từ 0 lên +2; O từ 0 (trong {O2}) xuống −2. S giữ +6 từ {H2SO4} sang {CuSO4}.",
+   "io": [
+    [
+     "in",
+     "{O2} nhận electron"
+    ],
+    [
+     "in",
+     "{H2SO4} chỉ là môi trường"
+    ]
+   ]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Đếm acid cho 1 mol {CuSO4}",
+   "p": "(1): 2 mol {H2SO4} cho 1 mol {CuSO4}. (2): 2 mol {H2SO4} cho 2 mol {CuSO4}, tức 1 mol cho mỗi mol.",
+   "io": [
+    [
+     "in",
+     "(1) gấp đôi (2)"
+    ]
+   ]
+  },
+  {
+   "ic": "i-battery",
+   "t": "Đặt Cu lên dãy thế điện cực",
+   "p": "E°({Cu}<sup>2+</sup>/Cu) dương nên Cu không khử được {H}<sup>+</sup>. Cu tan ở (2) vì cặp của {O2} có thế lớn hơn.",
+   "io": [
+    [
+     "out",
+     "không có {H2}"
+    ]
+   ]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "S",
+   "k": "k3",
+   "bay": "doivai",
+   "soi": "\"đều\" và \"chất oxi hoá\": phải xét số oxi hoá của S trong từng phản ứng, không suy từ (1) sang (2).",
+   "g": [
+    "Chìa khoá <b>Sản phẩm kim loại</b>: kim loại luôn bị oxi hoá; chất có số oxi hoá GIẢM mới là chất oxi hoá.",
+    "Ở (1) S đi vào {SO2}; ở (2) S đi vào {CuSO4}. Còn {O2} ở (2) đi vào đâu?",
+    "Tính số oxi hoá của S trong {CuSO4} ở (2) và của O trong {H2O}. Nguyên tố nào thật sự giảm?"
+   ],
+   "giai": "Sai. Ở (1) S giảm từ +6 xuống +4 nên {H2SO4} đặc là chất oxi hoá. Ở (2) S giữ nguyên +6; O trong {O2} giảm từ 0 xuống −2, nên {O2} mới là chất oxi hoá, {H2SO4} chỉ cung cấp môi trường acid.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "\"cùng một lượng {CuSO4}\": quy hai phương trình về cùng 1 mol {CuSO4} rồi so lượng acid.",
+   "g": [
+    "Chìa khoá <b>Tính theo chuỗi</b>: đọc tỉ lệ mol ngay trên hệ số phương trình.",
+    "(1): Cu + 2{H2SO4} → {CuSO4}; (2): 2Cu + 2{H2SO4} + {O2} → 2{CuSO4}.",
+    "Chia hệ số {H2SO4} cho hệ số {CuSO4} ở mỗi phương trình rồi so hai tỉ số."
+   ],
+   "giai": "Đúng. (1) tốn 2 mol {H2SO4} cho mỗi mol {CuSO4} (một nửa bị khử thành {SO2}); (2) chỉ tốn 1 mol. Phản ứng (1) tốn acid gấp đôi và còn sinh {SO2} độc.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "S",
+   "k": "k2",
+   "bay": "nguyennhan",
+   "soi": "\"Do có giá trị thế điện cực chuẩn dương nên\": vế lí do đúng về E° của Cu, nhưng có gây ra phản ứng không?",
+   "g": [
+    "Chìa khoá <b>Dãy thế điện cực</b>: chỉ kim loại có E° &lt; 0 mới khử được {H}<sup>+</sup> của acid loãng; Cu chỉ tan khi có {O2}.",
+    "E°({Cu}<sup>2+</sup>/Cu) dương, tức Cu đứng sau {H2} trong dãy.",
+    "Bỏ {O2} khỏi (2), Cu có tan trong {H2SO4} loãng không? Vậy điều gì mới làm Cu tan?"
+   ],
+   "giai": "Sai. E° dương chính là lí do Cu KHÔNG tan trong {H2SO4} loãng (không khử được {H}<sup>+</sup>). Cu tan ở (2) là nhờ {O2} oxi hoá Cu.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "D",
+   "k": "k2",
+   "bay": null,
+   "soi": "\"chứng tỏ\": phản ứng (2) xảy ra ở điều kiện thường là bằng chứng để so hai thế điện cực.",
+   "g": [
+    "Chìa khoá <b>Dãy thế điện cực</b>: chất khử của cặp E° nhỏ phản ứng với chất oxi hoá của cặp E° lớn.",
+    "Ở (2), Cu là chất khử (cặp {Cu}<sup>2+</sup>/Cu), {O2} là chất oxi hoá (cặp {O2} + 4{H}<sup>+</sup>/2{H2O}).",
+    "Phản ứng xảy ra thì cặp chứa chất oxi hoá phải đứng trước hay sau cặp chứa chất khử?"
+   ],
+   "giai": "Đúng. {O2} oxi hoá được Cu nên cặp {O2} + 4{H}<sup>+</sup>/2{H2O} có E° lớn hơn cặp {Cu}<sup>2+</sup>/Cu.",
+   "lab": null
+  }
+ ],
+ "ket": "a S – b Đ – c S – d Đ",
+ "nho": "Chất oxi hoá là chất có số oxi hoá giảm; ở (2) S giữ +6, {O2} mới nhận electron.",
+ "phepTinh": [
+  {
+   "ten": "mol H2SO4 cho 1 mol CuSO4 ở (1)",
+   "bieuThuc": "2/1",
+   "ketQua": 2,
+   "lamTron": 0
+  },
+  {
+   "ten": "mol H2SO4 cho 1 mol CuSO4 ở (2)",
+   "bieuThuc": "2/2",
+   "ketQua": 1,
+   "lamTron": 0
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Trong phản ứng (1), số mol {H2SO4} đóng vai trò chất oxi hoá bằng số mol Cu phản ứng.",
+   "d": "D",
+   "giai": "Đúng. 1 mol Cu phản ứng tạo 1 mol {SO2}; chỉ phần S đi vào {SO2} bị khử, tức 1 mol {H2SO4} là chất oxi hoá, mol còn lại tạo muối.",
+   "phepTinh": []
+  },
+  {
+   "t": "Cho 0,1 mol Cu tan hết theo phản ứng (2) thì cần 0,1 mol {O2}.",
+   "d": "S",
+   "giai": "Sai. Theo (2), 2 mol Cu cần 1 mol {O2}, nên 0,1 mol Cu chỉ cần 0,1 : 2 = 0,05 mol {O2}.",
+   "phepTinh": [
+    {
+     "ten": "n O2",
+     "bieuThuc": "0.1/2",
+     "ketQua": 0.05,
+     "lamTron": 2
+    }
+   ]
+  }
+ ],
+ "co": []
+}

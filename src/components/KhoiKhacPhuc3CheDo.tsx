@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Sparkles,
@@ -48,6 +48,7 @@ import { hoiXacNhan } from './hop-thoai'
 import './m3'
 import './m3/luyen-khac-phuc.css'
 import NhomCaThuGon from './NhomCaThuGon'
+import NutHoiThay from './loi-giai/NutHoiThay'
 
 export interface BaiLuyenKhacPhuc {
   id: string
@@ -837,9 +838,15 @@ export default function KhoiKhacPhuc3CheDo({
             )}
           </div>
 
-          {/* Danh sách câu hỏi */}
+          {/* Danh sách câu hỏi. Mỗi câu có nút Hỏi thầy (thầy lệnh 29/09: mọi câu luyện tập, trừ lúc kiểm tra) — khắc phục là luyện tập, chấm trên máy em. */}
           <div className="space-y-6">
             {currentTest.dsCau.map((q, idx) => {
+              const boc = (qid: string, the: ReactNode) => (
+                <div key={qid}>
+                  {the}
+                  <NutHoiThay qid={qid} nguon="khac_phuc" gon />
+                </div>
+              )
               const common = {
                 key: q.id,
                 id: q.id,
@@ -852,7 +859,7 @@ export default function KhoiKhacPhuc3CheDo({
               }
 
               if (q.phan === 'I') {
-                return (
+                return boc(q.id, (
                   <TheCau
                     {...common}
                     phan="I"
@@ -863,13 +870,13 @@ export default function KhoiKhacPhuc3CheDo({
                     correct={q.dapAn as 'A' | 'B' | 'C' | 'D' | undefined}
                     onSelect={(orig) => capNhatDapAn(q.id, orig)}
                   />
-                )
+                ))
               }
 
               if (q.phan === 'II') {
                 const ideas = (q.luaChon || ['', '', '', '']) as [string, string, string, string]
                 const cleanKey = (q.dapAn || '').replace(/[^DS]/gi, '').toUpperCase().split('')
-                return (
+                return boc(q.id, (
                   <TheCau
                     {...common}
                     phan="II"
@@ -886,10 +893,10 @@ export default function KhoiKhacPhuc3CheDo({
                       capNhatDapAn(q.id, arr.join(''))
                     }}
                   />
-                )
+                ))
               }
 
-              return (
+              return boc(q.id, (
                 <TheCau
                   {...common}
                   phan="III"
@@ -897,7 +904,7 @@ export default function KhoiKhacPhuc3CheDo({
                   correct={q.dapAn}
                   onChange={(val) => capNhatDapAn(q.id, val)}
                 />
-              )
+              ))
             })}
           </div>
         </div>

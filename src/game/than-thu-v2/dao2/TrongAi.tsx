@@ -24,6 +24,7 @@ import '../../../components/m3/m3.css'
 import {useNgang} from './ngang'
 import './dao2.css'
 import ChuongTranDau,{giamChuyenDong,thuocTinhCanh} from './ChuongTranDau'
+import NutHoiThay from '../../../components/loi-giai/NutHoiThay'
 
 export const TEN_QUAI='Quái Sương Mù'
 const MUC_DO:Record<string,string>={biet:'Nhận biết',hieu:'Thông hiểu',van_dung:'Vận dụng'}
@@ -124,9 +125,9 @@ export function TheCauAi({cau:q,stt,traLoi,khoa,onTraLoi,onZoom,onHinhLoi}:TheCa
 }
 
 // ───────────── sau khi chốt: kết quả + LỜI GIẢI chuẩn ─────────────
-export interface KhoiLoiGiaiProps{cau:CauDao2;stt:number;phanHoi:PhanHoi2;traLoiMay:string;onZoom?:(src:string)=>void}
+export interface KhoiLoiGiaiProps{cau:CauDao2;stt:number;phanHoi:PhanHoi2;traLoiMay:string;onZoom?:(src:string)=>void;/** nơi em bấm Hỏi thầy (thống kê) */nguon?:string}
 /** Thẻ trắng M3: đầu thẻ "ẢI k · CÂU MỚI" + dạng · mức độ; TheCau `xem_lai` (phương án ✓ ✗ + khối LỜI GIẢI → KIẾN THỨC CỐT LÕI → từng phương án/ý) + hình sau lời giải. */
-export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom}:KhoiLoiGiaiProps){
+export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom,nguon='dao'}:KhoiLoiGiaiProps){
  // Ngang: thẻ lời giải là cột tự cuộn, khối LỜI GIẢI nằm dưới 4 ý ⇒ em không thấy (thầy báo 28/09). Vừa chốt xong thì tự cuộn tới khối LỜI GIẢI.
  const ngang=useNgang(),goc=useRef<HTMLElement>(null)
  useEffect(()=>{if(ngang)goc.current?.querySelector('.loi-giai')?.scrollIntoView?.({block:'start',behavior:'smooth'})},[ngang,stt])
@@ -141,6 +142,7 @@ export function KhoiLoiGiai({cau:q,stt,phanHoi,traLoiMay,onZoom}:KhoiLoiGiaiProp
   <p className="dao2-giai-dau"><b data-vai={vai??undefined}>ẢI {stt}{vai?` · ${TEN_VAI[vai].toLocaleUpperCase('vi')}`:''}</b><span>{[q.tenDang,q.mucDo?MUC_DO[q.mucDo]:''].filter(Boolean).join(' · ')}</span></p>
   <TheCau {...pc}/>
   <HinhTaiViTri hinhAnh={phanHoi.solutionImages} viTri="sau_loi_giai" nhan="lời giải" onZoom={onZoom}/>
+  <NutHoiThay qid={q.qid} nguon={nguon} gon/>
  </section>
 }
 /** Dải kết quả trên thẻ lời giải: đúng ⇒ quái trúng đòn; chưa đúng ⇒ quái phản đòn (số máu đúng `learningBattle`). Chữ thưởng lấy nguyên lời máy chủ. */
@@ -223,6 +225,8 @@ export default function TrongAi({profile,cau,viTri,ketQua,traLoi,assisted,phanHo
       <input type="checkbox" role="switch" className="dao2-tro-gat" aria-label="Câu này em có trợ giúp" checked={assisted} disabled={busy} onChange={e=>onAssisted(e.target.checked)}/>
       <span className="dao2-tro-chu" aria-hidden="true">Trợ giúp</span>
      </label>}
+     {/* Hỏi thầy trước khi chốt (thầy lệnh 29/09) ⇒ bật "Trợ giúp": câu chưa tính Thành thạo, quay lại sớm cho em tự làm. */}
+     <NutHoiThay qid={q?.qid} nguon="dao" gon onHoi={()=>{if(!goiY)onAssisted(true)}}/>
      <button type="button" className="dao2-nut-chot" disabled={busy||hinhLoi||thieu} onClick={()=>{unlockBattleAudio();onNop()}}>{busy?'Đang chấm…':thieu?chuNutThieu:'CHỐT ĐÁP ÁN · TUNG CHIÊU'}</button>
     </div>
     {assisted&&!goiY&&<small className="dao2-tro-ghi">Có trợ giúp · câu này sẽ quay lại để em tự làm.</small>}</>

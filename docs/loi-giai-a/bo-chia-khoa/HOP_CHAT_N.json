@@ -1,0 +1,75 @@
+{
+ "ma": "HOP_CHAT_N",
+ "chuong": "Hợp chất chứa nitrogen",
+ "lop": "12",
+ "KEYS": {
+  "k1": {
+   "ten": "Bậc, tên, phổ IR",
+   "rule": "<b>Bậc amine:</b> <b>số gốc hydrocarbon gắn vào N</b>, không xét bậc carbon.<br><b>Nhận bậc:</b> {RNH2} bậc I, {R2NH} bậc II, {R3N} bậc III.<br><b>Tên thay thế:</b> mạch chính chứa C gắn N + vị trí + amine; gốc trên N ghi <i>N-</i>.<br><b>Ví dụ tên:</b> {CH3CH2CH2NHCH3} là N-methylpropan-1-amine.<br><b>Tên amino acid:</b> thường alanine, bán hệ thống α-aminopropionic acid, thay thế 2-aminopropanoic acid.<br><b>Phổ IR:</b> N–H ở <b>3500–3300 cm<sup>−1</sup></b>; bậc III không có."
+  },
+  "k2": {
+   "ten": "Sôi, tan, trạng thái",
+   "rule": "<b>Nhiệt độ sôi:</b> M xấp xỉ → giảm dần <b>acid, alcohol, amine</b> (liên kết hydrogen O–H mạnh hơn N–H).<br><b>Cùng loại:</b> M lớn → sôi cao; bậc III không có N–H → sôi thấp.<br><b>Chất khí:</b> methylamine, dimethylamine, trimethylamine, ethylamine (ở điều kiện thường).<br><b>Aniline:</b> lỏng, <b>hầu như không tan</b>, nặng hơn nước (vẩn đục, lắng đáy).<br><b>Amino acid:</b> rắn, nóng chảy cao, dễ tan trong nước (ion lưỡng cực)."
+  },
+  "k3": {
+   "ten": "Amine gặp thuốc thử",
+   "rule": "<b>Lực base:</b> base yếu (⇌), mạnh dần <b>{C6H5NH2}, {NH3}, {CH3NH2}, {(CH3)2NH}</b>.<br><b>Quỳ, {FeCl3}:</b> amine no → quỳ hoá xanh, {FeCl3} → {Fe(OH)3} nâu đỏ; aniline không đổi màu quỳ.<br><b>Gặp {HCl}:</b> tạo muối tan; muối + {NaOH} → amine tách ra (aniline vẩn đục lại); {RNH3}<sup>+</sup> là acid Brønsted.<br><b>Gặp {NaOH}, {Br2}:</b> {NaOH} không phản ứng; {Br2} chỉ aniline → kết tủa trắng.<br><b>Gặp {HNO2}:</b> bậc I no → alcohol + {N2}; aniline (0–5 °C) → muối diazonium; bậc II không ra {N2}.<br><b>Ngoại lệ lực base:</b> trimethylamine trong nước yếu hơn {CH3NH2}, {(CH3)2NH} (vẫn mạnh hơn {NH3})."
+  },
+  "k4": {
+   "ten": "Điều chế & con số",
+   "rule": "<b>Điều chế amine:</b> {NH3} + {CH3Br} thế <b>lần lượt từng H</b> → bậc I, II, III (không nối dài mạch).<br><b>Điều chế aniline:</b> nitrobenzene + {Fe/HCl} → {C6H5NH3Cl}, thêm {NaOH} → aniline.<br><b>Số oxi hoá N:</b> –{NO2} +3, {HNO2} +3, {N2} 0, amine −3.<br><b>Suy ra:</b> nitrobenzene là <b>chất oxi hoá</b>; amine gặp {HNO2} là <b>chất khử</b>.<br><b>Hiệu suất:</b> V × D → m → n (bảo toàn N); tìm nguyên liệu <b>÷ H</b>.<br><b>Tính pH:</b> x<sup>2</sup> : (C − x) = K<sub>b</sub>, x = [OH<sup>−</sup>], pH = 14 − pOH."
+  },
+  "k5": {
+   "ten": "Amino acid lưỡng tính",
+   "rule": "<b>Lưỡng tính:</b> có –{NH2} và –{COOH} → phản ứng cả acid lẫn base.<br><b>{HCl} dư:</b> –{NH2} → –{NH3Cl}, –{COONa} → –{COOH}; alcohol/{HCl} → muối ester.<br><b>{NaOH} dư:</b> –{NH3Cl} → –{NH2}; –{COOH} → –{COONa} (M + 22 mỗi nhóm); –{COOR} → –{COONa} + ROH.<br><b>Acid hay base:</b> dư –{COOH} hay có –{NH3Cl} → acid; dư –{NH2} → base.<br><b>Điện di:</b> pH thấp → cation về <b>cực âm</b>; pH cao → anion về <b>cực dương</b>; pH ≈ pI → đứng yên.<br><b>M cần nhớ:</b> Gly 75, Ala 89, Glu 147 (hai –{COOH})."
+  },
+  "k6": {
+   "ten": "Peptide: đếm & tính",
+   "rule": "<b>Liên kết peptide:</b> n gốc → <b>n − 1</b> liên kết, mất n − 1 {H2O}.<br><b>Đếm N, O:</b> gốc kiểu Gly, Ala → có n N, <b>n + 1</b> O.<br><b>Số trật tự:</b> = số hoán vị (3 Gly + 1 Ala → 4).<br><b>Trong {NaOH}:</b> n({NaOH}) = tổng –{COOH} các gốc (Glu tính 2); n({H2O}) = n(peptide), +1 mỗi Glu → bảo toàn khối lượng.<br><b>Thuỷ phân một phần:</b> ghép các đoạn chồng khớp.<br><b>Màu biuret:</b> có <b>từ tripeptide</b>; dipeptide không."
+  },
+  "k7": {
+   "ten": "Protein & tên phản ứng",
+   "rule": "<b>Vai trò:</b> cấu trúc (collagen, keratin), vận chuyển (hemoglobin), điều hoà (insulin), bảo vệ (kháng thể).<br><b>Xúc tác (enzyme):</b> chọn lọc cao, tăng tốc độ phản ứng sinh hoá.<br><b>Đông tụ:</b> khi đun, gặp acid, base, muối kim loại nặng; {HNO3} đặc → vàng.<br><b>Tên phản ứng:</b> cắt –CO–NH– là <b>thuỷ phân</b>; + alcohol/{HCl} là <b>ester hoá</b>.<br><b>Trùng ngưng:</b> amino acid nối mạch, tách {H2O}.<br><b>Màu biuret:</b> {Cu(OH)2}/kiềm → tím."
+  }
+ },
+ "TRAPS_THEM": {
+  "bacamine": {
+   "ten": "Nhầm bậc amine",
+   "hoi": "Đếm số gốc hydrocarbon gắn vào N. Carbon mang nhóm –NH2 bậc mấy không quyết định bậc amine."
+  },
+  "nhomnhanh": {
+   "ten": "Sót nhóm mạch nhánh",
+   "hoi": "Glu có hai –COOH, Lys có hai –NH2. Khi đếm NaOH, HCl, số O, đã tính nhóm ở mạch nhánh chưa?"
+  }
+ },
+ "DANG_KEY": {
+  "HOP_CHAT_N.AMINE_CAU_TAO.CHON_PHAT_BIEU": "k1",
+  "HOP_CHAT_N.AMINE_CAU_TAO.SO_SANH": "k2",
+  "HOP_CHAT_N.AMINE_CAU_TAO.TINH_HANG_SO": "k4",
+  "HOP_CHAT_N.AMINE_CAU_TAO.TINH_HIEU_SUAT": "k4",
+  "HOP_CHAT_N.AMINE_DIEU_CHE.CHON_PHAT_BIEU": "k4",
+  "HOP_CHAT_N.AMINE_TINH_BASE.NHAN_DANG": "k3",
+  "HOP_CHAT_N.AMINE_TINH_BASE.SO_SANH": "k3",
+  "HOP_CHAT_N.AMINE_TINH_BASE.VIET_CTCT": "k5",
+  "HOP_CHAT_N.AMINO_ACID.CHON_PHAT_BIEU": "k5",
+  "HOP_CHAT_N.AMINO_ACID.SO_SANH": "k1",
+  "HOP_CHAT_N.AMINO_ACID.VIET_CTCT": "k5",
+  "HOP_CHAT_N.AMINO_ACID.XAC_DINH_CHAT": "k5",
+  "HOP_CHAT_N.AMINO_ACID.XAC_DINH_CTPT": "k5",
+  "HOP_CHAT_N.PEPTIDE.CHON_PHAT_BIEU": "k6",
+  "HOP_CHAT_N.PEPTIDE.TINH_KHOI_LUONG": "k6",
+  "HOP_CHAT_N.PEPTIDE.TINH_NONG_DO": "k6",
+  "HOP_CHAT_N.PROTEIN.CHON_PHAT_BIEU": "k7",
+  "HOP_CHAT_N.PROTEIN.DEM_DONG_PHAN": "k7",
+  "HOP_CHAT_N.PROTEIN.SO_SANH": "k7"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Lực base amine bậc III: đã ghi vào k3 (trimethylamine trong nước yếu hơn methylamine, dimethylamine, mạnh hơn NH3).",
+  "IR N–H: GIỮ 3500–3300 cm⁻¹ (khớp bảng trong đề kho và SGK).",
+  "Gọi \"tên thay thế\" theo SGK 2018; đề ghi \"tên hệ thống\" vẫn chấp nhận là cùng nghĩa.",
+  "Mã dạng lệch nhãn: GIỮ mã; máy soạn gắn chìa theo từng ý.",
+  "Đề cho khối lượng riêng aniline 1,219 g/mL (thực tế ≈ 1,02): đáp án khớp số đề cho ⇒ GIỮ, không sửa."
+ ],
+ "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+}

@@ -1,0 +1,114 @@
+{
+ "qid": "12-C5-B15-I-38",
+ "bam": "a627ebe2023460dd",
+ "dang": "tn",
+ "ten": "So E°, đếm phản ứng xảy ra theo chiều thuận",
+ "keys": ["k1"],
+ "dung": [
+  {
+   "ic": "i-chart",
+   "t": "Xếp dãy E° tăng dần",
+   "p": "Zn −0,763 < Ni −0,257 < Cu 0,340 < {Fe}<sup>3+</sup>/{Fe}<sup>2+</sup> 0,771 < Ag 0,799 (V).",
+   "io": []
+  },
+  {
+   "ic": "i-lens",
+   "t": "Mỗi phản ứng: tìm đúng hai cặp",
+   "p": "Lấy chất oxi hoá và chất khử ở vế trái. {Fe}<sup>2+</sup> làm chất khử thì dùng cặp {Fe}<sup>3+</sup>/{Fe}<sup>2+</sup>.",
+   "io": []
+  },
+  {
+   "ic": "i-scale",
+   "t": "Lấy hiệu, đếm hiệu dương",
+   "p": "E°(oxi hoá) − E°(khử): (1) 1,534 V, (2) 1,028 V, (4) 0,028 V đều dương; (3) −0,431 V âm.",
+   "io": [["in", "(1)"], ["in", "(2)"], ["in", "(4)"], ["out", "(3)"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "A",
+   "d": "D",
+   "k": "k1",
+   "bay": null,
+   "soi": "“xảy ra theo chiều thuận”: mỗi phản ứng phải so đúng cặp của chất oxi hoá và chất khử ở vế trái.",
+   "g": [
+    "Chìa khoá <b>So E°, đoán chiều</b>: phản ứng tự xảy ra khi E° cặp chứa chất oxi hoá lớn hơn E° cặp chứa chất khử.",
+    "Ghép cặp: (1) {Fe}<sup>3+</sup> 0,771 với Zn −0,763; (2) {Fe}<sup>3+</sup> 0,771 với Ni −0,257; (3) {Cu}<sup>2+</sup> 0,340 với {Fe}<sup>2+</sup> 0,771; (4) {Ag}<sup>+</sup> 0,799 với {Fe}<sup>2+</sup> 0,771.",
+    "Tính hiệu E°(oxi hoá) − E°(khử) cho từng phản ứng. Có mấy hiệu dương?"
+   ],
+   "giai": "Chọn. (1) 0,771 − (−0,763) = 1,534 V; (2) 0,771 − (−0,257) = 1,028 V; (4) 0,799 − 0,771 = 0,028 V: ba hiệu dương nên ba phản ứng xảy ra. (3) 0,340 − 0,771 = −0,431 V âm, chỉ chiều nghịch mới xảy ra.",
+   "lab": null
+  },
+  {
+   "id": "B",
+   "d": "S",
+   "k": "k1",
+   "bay": "doivai",
+   "soi": "“4” nghĩa là tin cả (3) xảy ra: soi lại cặp của {Fe}<sup>2+</sup> ở (3).",
+   "g": [
+    "Chìa khoá <b>So E°, đoán chiều</b>: ở (3), {Fe}<sup>2+</sup> đóng vai chất khử nên cặp của nó là {Fe}<sup>3+</sup>/{Fe}<sup>2+</sup> (0,771 V).",
+    "So 0,340 với 0,771: {Cu}<sup>2+</sup> là chất oxi hoá yếu hơn {Fe}<sup>3+</sup> sinh ra."
+   ],
+   "giai": "Loại. Ở (3), E° của chất oxi hoá (0,340 V) nhỏ hơn E° của chất khử (0,771 V) nên phản ứng không xảy ra. Chỉ có 3 phản ứng.",
+   "lab": null
+  },
+  {
+   "id": "C",
+   "d": "S",
+   "k": "k1",
+   "bay": null,
+   "soi": "“1” là đếm thiếu cả (2) và (4).",
+   "g": [
+    "Chìa khoá <b>So E°, đoán chiều</b>: không cần chất khử mạnh nhất; chỉ cần E°(oxi hoá) lớn hơn E°(khử). (2) có 0,771 > −0,257, (4) có 0,799 > 0,771."
+   ],
+   "giai": "Loại. Ngoài (1), cả (2) và (4) cũng có E° chất oxi hoá lớn hơn E° chất khử nên đều xảy ra.",
+   "lab": null
+  },
+  {
+   "id": "D",
+   "d": "S",
+   "k": "k1",
+   "bay": "tuyetdoi",
+   "soi": "“2” thường do bỏ (4): tưởng {Fe}<sup>2+</sup> không làm chất khử được, hoặc chênh 0,028 V là quá nhỏ.",
+   "g": [
+    "Chìa khoá <b>So E°, đoán chiều</b>: {Fe}<sup>2+</sup> ở mức trung gian, vừa là chất oxi hoá (cặp {Fe}<sup>2+</sup>/Fe) vừa là chất khử (cặp {Fe}<sup>3+</sup>/{Fe}<sup>2+</sup>).",
+    "Ở (4): E°({Ag}<sup>+</sup>/Ag) 0,799 V > E°({Fe}<sup>3+</sup>/{Fe}<sup>2+</sup>) 0,771 V."
+   ],
+   "giai": "Loại. (4) vẫn xảy ra vì 0,799 > 0,771; hiệu nhỏ nhưng dương là đủ. Tổng là 3 phản ứng.",
+   "lab": null
+  }
+ ],
+ "mc": { "d": "A" },
+ "ket": "Đáp án A",
+ "nho": "Đếm phản ứng xảy ra: mỗi phản ứng tìm đúng hai cặp, lấy E°(oxi hoá) − E°(khử), dương thì xảy ra.",
+ "phepTinh": [
+  { "ten": "Hiệu E° phản ứng (1) (V)", "bieuThuc": "0.771+0.763", "ketQua": 1.534, "lamTron": 3 },
+  { "ten": "Hiệu E° phản ứng (2) (V)", "bieuThuc": "0.771+0.257", "ketQua": 1.028, "lamTron": 3 },
+  { "ten": "Hiệu E° phản ứng (3) (V)", "bieuThuc": "0.340-0.771", "ketQua": -0.431, "lamTron": 3 },
+  { "ten": "Hiệu E° phản ứng (4) (V)", "bieuThuc": "0.799-0.771", "ketQua": 0.028, "lamTron": 3 }
+ ],
+ "tuongTu": [
+  {
+   "t": "Với cùng bảng E° trên, phản ứng Cu(s) + 2{Fe}<sup>3+</sup>(aq) → {Cu}<sup>2+</sup>(aq) + 2{Fe}<sup>2+</sup>(aq) xảy ra theo chiều thuận ở điều kiện chuẩn.",
+   "d": "D",
+   "giai": "Đúng. E°({Fe}<sup>3+</sup>/{Fe}<sup>2+</sup>) − E°({Cu}<sup>2+</sup>/Cu) = 0,771 − 0,340 = 0,431 V > 0.",
+   "phepTinh": [
+    { "ten": "Hiệu E° (V)", "bieuThuc": "0.771-0.340", "ketQua": 0.431, "lamTron": 3 }
+   ]
+  },
+  {
+   "t": "Với cùng bảng E° trên, phản ứng Ni(s) + {Zn}<sup>2+</sup>(aq) → {Ni}<sup>2+</sup>(aq) + Zn(s) xảy ra theo chiều thuận ở điều kiện chuẩn.",
+   "d": "S",
+   "giai": "Sai. E°({Zn}<sup>2+</sup>/Zn) − E°({Ni}<sup>2+</sup>/Ni) = −0,763 − (−0,257) = −0,506 V < 0; chỉ chiều nghịch (Zn khử {Ni}<sup>2+</sup>) mới xảy ra.",
+   "phepTinh": [
+    { "ten": "Hiệu E° (V)", "bieuThuc": "-0.763+0.257", "ketQua": -0.506, "lamTron": 3 }
+   ]
+  }
+ ],
+ "co": [
+  {
+   "loai": "hienThi",
+   "ghi": "Bảng E° trong đề bị dàn thành một dòng chữ. Chỗ xuống dòng đặt sai: số thứ tự (2), (3), (4) dính ở cuối dòng trước, phương trình nằm ở dòng sau."
+  }
+ ]
+}

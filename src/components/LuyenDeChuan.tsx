@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { taoKhoGio, useGiayConLai, useMocGio, type KhoGio } from '../lib/dong-ho-thi'
 import TheCau from './TheCau'
 import { createPortal } from 'react-dom'
@@ -8,6 +8,7 @@ import type { PublicExamBank, TeacherExamSource } from '../data/examContent'
 import ModalXacNhanNop from './ModalXacNhanNop'
 import './m3'
 import './m3/luyen-khac-phuc.css'
+import NutHoiThay from './loi-giai/NutHoiThay'
 
 type Paper = {
   id: string
@@ -305,6 +306,12 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
 
   // MÀN HÌNH ĐANG LÀM BÀI HOẶC XEM LẠI — FULL MÀN HÌNH ĐỂ TẬP TRUNG
   const done = paper.status === 'submitted'
+  const boc = (qid: string, the: ReactNode) => (
+    <div key={qid}>
+      {the}
+      {done && <NutHoiThay qid={qid} nguon="luyen_de" gon />}
+    </div>
+  )
   const getSolution = (id: string) =>
     paper.solutions?.flatMap((s) => [...s.phanI, ...s.phanII, ...s.phanIII]).find((q) => q.id === id)
   const change = (id: string, v: string) => {
@@ -356,7 +363,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
           </p>
         )}
 
-        {/* Danh sách câu hỏi 3 phần */}
+        {/* Danh sách câu hỏi 3 phần. Nút Hỏi thầy chỉ hiện SAU KHI NỘP: luyện đề là bài làm trọn đề có chấm điểm (thầy lệnh 29/09: trừ lúc kiểm tra). */}
         {(['I', 'II', 'III'] as const).map((phan) => (
           <div key={phan} className="space-y-4">
             <h3 className="font-bold text-sm text-slate-700 dark:text-slate-300">PHẦN {phan}</h3>
@@ -370,7 +377,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
                 loiGiai: sol?.loiGiai,
               }
               if ('choices' in q)
-                return (
+                return boc(q.id, (
                   <TheCau
                     key={q.id}
                     {...common}
@@ -382,9 +389,9 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
                     correct={sol?.correct as 'A' | 'B' | 'C' | 'D' | undefined}
                     onSelect={(v) => change(q.id, v)}
                   />
-                )
+                ))
               if ('ideas' in q)
-                return (
+                return boc(q.id, (
                   <TheCau
                     key={q.id}
                     {...common}
@@ -402,8 +409,8 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
                       change(q.id, a.join(''))
                     }}
                   />
-                )
-              return (
+                ))
+              return boc(q.id, (
                 <TheCau
                   key={q.id}
                   {...common}
@@ -412,7 +419,7 @@ export default function LuyenDeChuan({ sbd, token }: { sbd: string; token?: stri
                   correct={sol?.correct as string | undefined}
                   onChange={(v) => change(q.id, v)}
                 />
-              )
+              ))
             })}
           </div>
         ))}

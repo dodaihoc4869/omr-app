@@ -1,0 +1,93 @@
+{
+ "ma": "CARBOHYDRATE",
+ "chuong": "Carbohydrate",
+ "lop": "12",
+ "KEYS": {
+  "k1": {
+   "ten": "Soi cấu tạo",
+   "rule": "<b>Mạch hở:</b> glucose {CH2OH[CHOH]4CHO} có 5 –OH, 1 –CHO; fructose {CH2OH[CHOH]3COCH2OH} có C=O ở C2<br><b>Dạng vòng:</b> glucose có –OH <b>hemiacetal</b>, fructose có –OH <b>hemiketal</b>; saccharose hết –OH hemi<br><b>Liên kết α:</b> tinh bột, maltose từ α-glucose, <b>α-1,4</b> (amylopectin thêm α-1,6 → nhánh); saccharose <b>α-1,2</b><br><b>Liên kết β:</b> cellulose từ β-glucose, <b>β-1,4</b>, mạch thẳng<br><b>Đếm –OH:</b> mỗi liên kết glycoside mất 2 –OH<br><b>Áp dụng:</b> maltose còn 7 –OH alcohol + 1 hemiacetal; mắt xích cellulose còn 3, {[C6H7O2(OH)3]n}, cả phân tử 3n"
+  },
+  "k2": {
+   "ten": "Bảng thuốc thử",
+   "rule": "<b>{Cu(OH)2} thường:</b> nhiều –OH kề → <b>xanh lam</b>: glucose, fructose, saccharose, maltose, glycerol; tinh bột, cellulose không; protein cho màu tím<br><b>Đường khử:</b> Tollens → Ag, {Cu(OH)2}/kiềm đun → {Cu2O} đỏ gạch: glucose, maltose, cả fructose<br><b>Nước {Br2}:</b> chỉ glucose, maltose<br><b>{I2}:</b> tinh bột → xanh tím<br><b>Sản phẩm glucose:</b> + Tollens → ammonium gluconate; + {Br2} → gluconic acid; + {H2}/Ni → sorbitol<br><b>Bẫy hay gặp:</b> fructose có phản ứng (kiềm chuyển thành glucose); <b>saccharose, tinh bột, cellulose không</b>"
+  },
+  "k3": {
+   "ten": "Đọc sơ đồ chuyển hoá",
+   "rule": "<b>Cách đọc:</b> gọi tên theo chất vào → ra; {CO2} → tinh bột: <b>quang hợp</b><br><b>Thuỷ phân:</b> cắt glycoside hay ester bằng {H2O}; saccharose → glucose + fructose; tinh bột → maltose → glucose; cellulose → glucose<br><b>Lên men rượu:</b> glucose → {C2H5OH} + {CO2}; oxi hoá – khử, toả nhiệt<br><b>Tạo acid:</b> glucose → lactic acid {CH3CH(OH)COOH}: lên men lactic; ethanol → acetic acid: lên men giấm; gluconate + HCl → gluconic acid {C6H12O7}<br><b>Ester hoá:</b> –OH + {HNO3}, anhydride<br><b>Bẫy hay gặp:</b> monosaccharide không thuỷ phân"
+  },
+  "k4": {
+   "ten": "Quy trình thí nghiệm",
+   "rule": "<b>Cách đọc:</b> hỏi mỗi bước để làm gì<br><b>Thuỷ phân:</b> acid + đun (cellulose: {H2SO4} 70%); {H2SO4} đặc → <b>than hoá</b><br><b>Iodine:</b> còn xanh tím → <b>chưa thuỷ phân hết</b>; đun mất màu, nguội hiện lại<br><b>Trung hoà acid:</b> làm trước Tollens, {Cu(OH)2}; {NaHCO3} đến hết bọt, {NaOH} đến quỳ xanh<br><b>Đường khử + {Cu(OH)2}:</b> không đun → xanh lam, đun → đỏ gạch<br><b>Bước khác:</b> nitrate hoá → trộn acid trong nước đá, dùng bông; tách cồn → chưng cất"
+  },
+  "k5": {
+   "ten": "Dây chuyền mol",
+   "rule": "<b>Quy về mắt xích:</b> nhân hệ số; {C6H10O5} 162 → glucose 180 → <b>2</b>{C2H5OH}; glucose → <b>2</b>Ag, 2 lactic acid<br><b>Saccharose:</b> 342 → <b>4</b>Ag, 4{C2H5OH}<br><b>Ester cellulose:</b> mắt xích → trinitrate 297 (3{HNO3}), triacetate 288<br><b>Hiệu suất:</b> ra sản phẩm <b>× H</b>, tìm nguyên liệu <b>÷ H</b>; nhiều giai đoạn nhân các H<br><b>Quy đổi:</b> rượu a° → V ethanol = V·a/100; m = D·V; lớp bạc V = S·dày<br><b>Tính %N:</b> %N = 14x : (162 + 45x), x = số –{ONO2}"
+  },
+  "k6": {
+   "ten": "Năng lượng & quang hợp",
+   "rule": "<b>Tính ΔrH:</b> ΔrH = Σ ΔfH(sản phẩm) − Σ ΔfH(chất đầu), nhân hệ số<br><b>Thu hay toả:</b> quang hợp <b>thu nhiệt</b>, hút {CO2} (chu trình carbon); oxi hoá glucose toả nhiệt<br><b>Năng lượng:</b> mức/cm<sup>2</sup>/phút × diện tích × phút × % hữu ích; 1 m<sup>2</sup> = 10<sup>4</sup> cm<sup>2</sup><br><b>Tính mol:</b> n = năng lượng : |ΔH|; <b>1 mắt xích ↔ 1 glucose ↔ 6{CO2} ↔ 6{O2}</b><br><b>Cháy, nổ:</b> cân bằng nguyên tố trước, rồi tính ΔH, mol khí"
+  },
+  "k7": {
+   "ten": "Vật lí & ứng dụng",
+   "rule": "<b>Độ ngọt:</b> tăng dần <b>maltose, glucose, saccharose, fructose</b><br><b>Tính tan:</b> glucose, fructose, saccharose rắn, tan tốt; tinh bột không tan nước lạnh, nước nóng → hồ (keo)<br><b>Cellulose:</b> không tan, tan trong nước Schweizer; trinitrate rắn trắng, không tan, cháy không khói (thuốc súng)<br><b>Nguồn gốc:</b> saccharose: mía, củ cải đường, thốt nốt; mạch nha: maltose; gạo, ngô, sắn, bánh mì: tinh bột<br><b>Ứng dụng:</b> cellulose triacetate → tơ acetate; ethanol → xăng E5"
+  }
+ },
+ "TRAPS_THEM": {
+  "tinhkhu": {
+   "ten": "Nhầm tính khử",
+   "hoi": "Chất có –CHO tự do không? Saccharose, tinh bột, cellulose không tráng bạc; fructose tráng bạc nhưng không làm mất màu nước bromine."
+  },
+  "hieusuat": {
+   "ten": "Nhầm chiều hiệu suất",
+   "hoi": "Đang tính sản phẩm thu được (nhân H) hay nguyên liệu cần dùng (chia H)? Có nhân, chia H hai lần không?"
+  }
+ },
+ "DANG_KEY": {
+  "CARBOHYDRATE.CAU_TAO.CHON_PHAT_BIEU": "k1",
+  "CARBOHYDRATE.CAU_TAO.DEM_DONG_PHAN": "k6",
+  "CARBOHYDRATE.CAU_TAO.GOI_TEN": "k3",
+  "CARBOHYDRATE.CAU_TAO.NHAN_DANG": "k1",
+  "CARBOHYDRATE.CAU_TAO.TINH_KHOI_LUONG": "k6",
+  "CARBOHYDRATE.CAU_TAO.TINH_NANG_LUONG": "k6",
+  "CARBOHYDRATE.CAU_TAO.TINH_PHAN_TRAM": "k5",
+  "CARBOHYDRATE.CAU_TAO.VIET_CTCT": "k1",
+  "CARBOHYDRATE.CAU_TAO.XAC_DINH_CTPT": "k3",
+  "CARBOHYDRATE.LEN_MEN.CHON_PHAT_BIEU": "k3",
+  "CARBOHYDRATE.LEN_MEN.NHAN_DANG": "k3",
+  "CARBOHYDRATE.LEN_MEN.SO_SANH": "k3",
+  "CARBOHYDRATE.LEN_MEN.TINH_KHOI_LUONG": "k5",
+  "CARBOHYDRATE.LEN_MEN.TINH_PHAN_TRAM": "k5",
+  "CARBOHYDRATE.LEN_MEN.TINH_THE_TICH": "k5",
+  "CARBOHYDRATE.LEN_MEN.XAC_DINH_CHAT": "k3",
+  "CARBOHYDRATE.PHAN_UNG_MAU.CHON_PHAT_BIEU": "k4",
+  "CARBOHYDRATE.PHAN_UNG_MAU.NHAN_DANG": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.CHON_PHAT_BIEU": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.DEM_DONG_PHAN": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.NHAN_DANG": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.SO_SANH": "k2",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_KHOI_LUONG": "k5",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_PHAN_TRAM": "k5",
+  "CARBOHYDRATE.PHAN_UNG_TRANG_BAC.TINH_SO_MOL": "k5",
+  "CARBOHYDRATE.THUY_PHAN.CHON_PHAT_BIEU": "k1",
+  "CARBOHYDRATE.THUY_PHAN.SO_SANH": "k3",
+  "CARBOHYDRATE.THUY_PHAN.TINH_KHOI_LUONG": "k6",
+  "CARBOHYDRATE.THUY_PHAN.TINH_NANG_LUONG": "k6",
+  "CARBOHYDRATE.THUY_PHAN.XAC_DINH_CHAT": "k3",
+  "CARBOHYDRATE.TINH_CHAT_VAT_LI.SO_SANH": "k7",
+  "CARBOHYDRATE.UNG_DUNG.CHON_PHAT_BIEU": "k4",
+  "CARBOHYDRATE.UNG_DUNG.NHAN_DANG": "k5",
+  "CARBOHYDRATE.UNG_DUNG.TINH_KHOI_LUONG": "k5",
+  "CARBOHYDRATE.UNG_DUNG.TINH_THE_TICH": "k5"
+ },
+ "canThayXem": [],
+ "daChot": [
+  "Ý \"hồ tinh bột 1% + HCl, sau bước 1 thu được dung dịch đồng nhất\": CHỐT ĐÚNG. Hồ tinh bột 1% loãng là hệ keo trong suốt, không phân lớp, không kết tủa; thêm HCl vẫn đồng nhất. Hai bản đang chấm Sai (DB-12-B4-D3-II-269, DH-12-C2-B7-D1-II-3) ghi vào danh sách sửa đáp án kho.",
+  "Cellulose trinitrate: CHỐT rắn màu trắng (giữ nguyên hình dạng bông). Ý \"sản phẩm màu vàng\" chấm Sai là đúng.",
+  "Ý \"cháy cellulose trinitrate toả nhiệt mạnh do tạo khí N2\" chấm Đúng: GIỮ. Liên kết ba N≡N rất bền nên tạo N2 giải phóng nhiều năng lượng; đây là cách giải thích chuẩn cho chất nổ. Không đưa vào chìa.",
+  "Cách viết [C6H7O2(NO3)3]n: CHẤP NHẬN (cùng thành phần nguyên tố); chìa và lời giải viết –ONO2 cho đúng nhóm nitrate ester.",
+  "Liên kết trong saccharose: CHỐT ghi \"α-1,2-glycoside\" theo SGK (C1 của α-glucose nối C2 của β-fructose).",
+  "Đề cây sắn dây dùng ΔfH(CO2) = −395,50 kJ/mol: số lệch chuẩn (−393,5) nhưng đáp án 223 khớp đúng số đề cho ⇒ GIỮ, không sửa (sửa số là đổi đáp án).",
+  "Mã dạng lệch nội dung (CAU_TAO.DEM_DONG_PHAN, CAU_TAO.TINH_KHOI_LUONG là câu quang hợp): GIỮ mã cũ để không lệch thống kê dạng của học sinh; DANG_KEY gán theo nội dung thật (k6)."
+ ],
+ "daDuyet": "Máy chốt 29/09/2026 (thầy giao máy tự chốt mọi điểm \"cần thầy chốt\")"
+}

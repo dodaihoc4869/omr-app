@@ -1,0 +1,100 @@
+{
+ "ghiChu": "Máy chốt 29/09 (thầy giao máy tự chốt). sua: THAY ĐOẠN nguyên văn trong trường, chỉ ghi khi giá trị hiện tại trên máy chủ còn chứa đúng đoạn `truoc`. dapAn: đổi đáp án kho — chỉ ảnh hưởng lượt làm SAU khi sửa, không chấm lại ca cũ.",
+ "sua": [
+  {
+   "qid": "12-KT-C1-D4-I-6",
+   "truong": "pa.C",
+   "truoc": "cồn 90o",
+   "sau": "cồn 90°",
+   "loai": "hien-thi",
+   "lyDo": "chữ o thay cho dấu độ"
+  },
+  {
+   "qid": "12-KT-C1-D4-I-6",
+   "truong": "pa.D",
+   "truoc": "cồn 96o",
+   "sau": "cồn 96°",
+   "loai": "hien-thi",
+   "lyDo": "chữ o thay cho dấu độ"
+  },
+  {
+   "qid": "12-KT-C1-D4-II-4",
+   "truong": "de",
+   "truoc": " Chất acetic acid isoamyl alcohol isoamyl acetate Nhiệt độ sôi (0C) 117,9 131,1 142,0",
+   "sau": "",
+   "loai": "hien-thi",
+   "lyDo": "bảng nhiệt độ sôi bị chép lặp thành chữ ngay trước bảng, lại ghi (0C)"
+  },
+  {
+   "qid": "12-KT-C1-D5-II-4",
+   "truong": "de",
+   "truoc": "thể tích ethyl acetate thu được với thời gian thí nghiệm tương ứng và kết quả ở bảng sau: Nhiệt độ (°C) 60 65 70 75 80 85 Thể tích ethyl acetate (mL) 25,8 30,5 35,1 39,8 36,6 32,9",
+   "sau": "thể tích ethyl acetate thu được ở từng nhiệt độ và kết quả ở bảng sau:",
+   "loai": "loi-de",
+   "lyDo": "câu dẫn nói \"thời gian\" nhưng bảng là nhiệt độ; bảng bị chép lặp thành chữ"
+  },
+  {
+   "qid": "12-KT-C1-D2-III-6",
+   "truong": "de",
+   "truoc": " ------------------------- HẾT ------------------------- - Thí sinh không sử dụng tài liệu. - Giám thị không giải thích gì thêm.",
+   "sau": "",
+   "loai": "hien-thi",
+   "lyDo": "lẫn phần cuối đề thi vào câu"
+  },
+  {
+   "qid": "12-C2-B6-D2-II-40",
+   "truong": "y.c",
+   "truoc": "b -1,4 glycoside .",
+   "sau": "β-1,4-glycoside.",
+   "loai": "hien-thi",
+   "lyDo": "Ý c in \"b -1,4 glycoside .\", đúng phải là \"β-1,4-glycoside.\" (mất chữ β, thừa dấu cách)."
+  },
+  {
+   "qid": "12-C2-B6-D2-II-40",
+   "truong": "y.b",
+   "truoc": "maltose .",
+   "sau": "maltose.",
+   "loai": "hien-thi",
+   "lyDo": "Ý b dư dấu cách trước dấu chấm."
+  },
+  {
+   "qid": "12-C2-B6-D2-II-40",
+   "truong": "de",
+   "truoc": "ngũ cốc,...Thành",
+   "sau": "ngũ cốc,... Thành",
+   "loai": "hien-thi",
+   "lyDo": "Đề thiếu dấu cách sau \"ngũ cốc,...\"."
+  },
+  {
+   "qid": "12-C5-B15-III-8",
+   "truong": "de",
+   "truoc": "AgCl(s) (b) [Zn(OH₂)₄]²⁺(aq) + 4NH₃(aq) → [Zn(NH₃)₄]²⁺(aq) + 4H₂O(l) (c) H⁺(aq) + OH⁻(aq) → H₂O(l) (d) C₂H₅OH(l) + 3O₂(g) → 2CO₂(g) + 3H₂O(g) (e) Al(s) + 3Ag⁺(aq) → Al³⁺(aq) + 3Ag(s) (g) 2NH₃(g) → N₂(g) + 3H₂(g) Số",
+   "sau": "AgCl(s)\n(b) [Zn(OH₂)₄]²⁺(aq) + 4NH₃(aq) → [Zn(NH₃)₄]²⁺(aq) + 4H₂O(l)\n(c) H⁺(aq) + OH⁻(aq) → H₂O(l)\n(d) C₂H₅OH(l) + 3O₂(g) → 2CO₂(g) + 3H₂O(g)\n(e) Al(s) + 3Ag⁺(aq) → Al³⁺(aq) + 3Ag(s)\n(g) 2NH₃(g) → N₂(g) + 3H₂(g)\nSố",
+   "loai": "hien-thi",
+   "lyDo": "Sáu phản ứng (a) đến (g) in liền một dòng, không xuống dòng giữa các phản ứng."
+  }
+ ],
+ "dapAn": [
+  {
+   "qid": "DB-12-B4-D3-II-269",
+   "y": "a",
+   "hienTai": "S",
+   "dung": "D",
+   "lyDo": "Hồ tinh bột 1% loãng + HCl vẫn đồng nhất (keo trong suốt, không phân lớp). Ba bản cùng đề trong kho (DB-12-B4-D3-II-260, DH-12-C2-B6-II-35, DH-12-C2-B6-VD-II-5) chấm Đúng."
+  },
+  {
+   "qid": "DH-12-C2-B7-D1-II-3",
+   "y": "a",
+   "hienTai": "S",
+   "dung": "D",
+   "lyDo": "Cùng ý trên."
+  },
+  {
+   "qid": "12-KT-C56-D1-III-4",
+   "y": "kq",
+   "hienTai": "5",
+   "dung": "2",
+   "lyDo": "Chỉ phản ứng oxi hoá – khử tự xảy ra mới lập được pin: (d), (e). Bản 12-C5-B15-III-8 cùng đề ghi 2; phiên chốt độc lập ra 2."
+  }
+ ]
+}

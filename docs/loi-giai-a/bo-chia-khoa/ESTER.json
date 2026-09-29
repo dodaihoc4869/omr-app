@@ -1,0 +1,86 @@
+{
+ "ma": "ESTER",
+ "chuong": "Ester – lipid",
+ "lop": "12",
+ "KEYS": {
+  "k1": {
+   "ten": "Tách chất",
+   "rule": "Hai lớp → <b>chiết</b> (chất có D nhỏ nằm trên). Một lớp → so nhiệt độ sôi: chênh nhiều thì <b>chưng cất thường</b>, chênh ít thì <b>chưng cất phân đoạn</b>, gần trùng thì phải đổi cách. Chất rắn lẫn tạp → <b>kết tinh lại</b>."
+  },
+  "k2": {
+   "ten": "An toàn & dụng cụ",
+   "rule": "Chất dễ cháy, sôi thấp: <b>không lửa trần</b>, dùng nước nóng. Nguồn nhiệt phải <b>nóng hơn nhiệt độ sôi</b>. Sinh hàn: <b>nước vào thấp, ra cao</b>. Đá bọt chống sôi bùng. Đun lâu mà không mất chất: <b>hồi lưu</b>."
+  },
+  "k3": {
+   "ten": "Vai trò hoá chất",
+   "rule": "Với mỗi chất, hỏi: <b>thêm vào để làm gì</b>, và <b>thay bằng chất khác có phá sản phẩm không</b>. {H2SO4} đặc: xúc tác + hút nước. {Na2CO3}: trung hoà acid. {NaOH} dư: thuỷ phân mất ester. {NaCl} bão hoà: tách lớp gọn. Chất làm khan: hút nước."
+  },
+  "k4": {
+   "ten": "Con số",
+   "rule": "Hiệu suất: <b>V → m → n → chất thiếu → lí thuyết → × H → × (1 − hao hụt)</b>. Bảng số liệu: \"tăng nhiều nhất\" là <b>hiệu số lớn nhất</b>, \"tối ưu\" là <b>đỉnh</b>, \"càng… càng\" phải đúng trên <b>cả dãy</b>."
+  },
+  "k5": {
+   "ten": "Soi phân tử",
+   "rule": "Đếm từng nhóm rồi cộng. {NaOH}: ester thường 1, ester của phenol 2, –COOH 1, –OH phenol 1. {Br2}: C=C 1, vòng phenol thế vào vị trí o/p còn trống. {H2}: C=C 1, vòng 3, C=O của –COO– không cộng. Ester hoá: <b>acid mất –OH, alcohol mất H</b>."
+  },
+  "k6": {
+   "ten": "Tính chất vật lí",
+   "rule": "Nổi hay chìm do <b>khối lượng riêng</b>; tan hay không do <b>phân cực, liên kết hydrogen</b>. Mạch dài → nóng chảy cao; thêm C=C cis → gấp khúc → nóng chảy thấp. Ester không có liên kết hydrogen giữa các phân tử nên sôi thấp hơn acid."
+  }
+ },
+ "TRAPS_THEM": {},
+ "LAB_PRESETS": {
+  "k1": [
+   "q1",
+   "q6",
+   "q7",
+   "aspirin",
+   "etoh",
+   "dcm"
+  ],
+  "k2": [
+   "q1c",
+   "q1d",
+   "q6d",
+   "hoiluu",
+   "sai3"
+  ],
+  "k3": [
+   "naoh",
+   "kettinh",
+   "h3po4"
+  ],
+  "k4": [
+   "iaac",
+   "aspirin",
+   "cin",
+   "etac",
+   "bang-q7",
+   "bang-p3"
+  ],
+  "k5": [
+   "msal-naoh",
+   "sal-br",
+   "msal-h2",
+   "sal-pi",
+   "msal-chuc",
+   "cin-geo",
+   "cin-naoh",
+   "phac-naoh",
+   "builder-cin",
+   "builder-acr",
+   "gh",
+   "ir"
+  ],
+  "k6": [
+   "tan",
+   "fat-18",
+   "fat-ol-li",
+   "fat-16",
+   "fat-pal"
+  ]
+ },
+ "DANG_KEY": {},
+ "canThayXem": [],
+ "daDuyet": "thầy dùng từ 28/09 (Phòng thí nghiệm Ester)"
+}

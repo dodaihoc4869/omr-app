@@ -1,0 +1,111 @@
+{
+ "qid": "12-C6-B21-III-14",
+ "bam": "6eda28dac64d695a",
+ "dang": "tln",
+ "ten": "Hợp kim Cu – Al C60600: %Cu bằng chuẩn độ iodine – thiosulfate",
+ "keys": ["k7", "k6"],
+ "dung": [
+  {
+   "ic": "i-flask",
+   "t": "Hoà tan mẫu 0,5 g",
+   "p": "{H2SO4} đặc hoà tan Cu thành {Cu}<sup>2+</sup> (Al thành {Al}<sup>3+</sup>), pha loãng bằng nước.",
+   "io": [["in", "{Cu}<sup>2+</sup>"], ["in", "{Al}<sup>3+</sup>"]]
+  },
+  {
+   "ic": "i-crystal",
+   "t": "Thêm {I}<sup>−</sup> dư",
+   "p": "2{Cu}<sup>2+</sup> + 4{I}<sup>−</sup> → 2{CuI}↓ + {I2}: cứ 2 mol Cu cho 1 mol {I2}; {Al}<sup>3+</sup> không phản ứng.",
+   "io": [["out", "{CuI}↓"], ["in", "{I2}"]]
+  },
+  {
+   "ic": "i-funnel",
+   "t": "Chuẩn độ {I2} bằng thiosulfate",
+   "p": "{I2} + 2{S2O3}<sup>2−</sup> → 2{I}<sup>−</sup> + {S4O6}<sup>2−</sup>: 1 mol {I2} cần 2 mol thiosulfate.",
+   "io": [["in", "14,85 mL · 0,50 M"]]
+  },
+  {
+   "ic": "i-scale",
+   "t": "Nối chuỗi, tính %",
+   "p": "2Cu → {I2} → 2{S2O3}<sup>2−</sup>, nên n(Cu) = n(thiosulfate); %Cu = m(Cu) : 0,5 × 100.",
+   "io": [["in", "≈ 95,0%"]]
+  }
+ ],
+ "y": [],
+ "tl": {
+  "dapAn": "95,0",
+  "donVi": "%",
+  "k": "k7",
+  "bay": null,
+  "soi": "Hai hệ số 2 : 1 và 1 : 2 nối tiếp nhau; ghép sai một bước là n(Cu) lệch gấp đôi hoặc một nửa.",
+  "g": [
+   "Chìa khoá <b>Hợp kim</b>: đo lượng một kim loại bằng phản ứng chỉ kim loại đó tham gia; %m = m kim loại : m mẫu × 100.",
+   "V = 14,85 mL = 0,01485 L, nồng độ 0,50 M; chỉ {Cu}<sup>2+</sup> phản ứng với {I}<sup>−</sup>.",
+   "Nối 2{Cu}<sup>2+</sup> → {I2} → 2{S2O3}<sup>2−</sup> để ra tỉ lệ n(Cu) : n(thiosulfate), rồi tính m(Cu) với Cu = 64."
+  ],
+  "giai": "Đáp số: 95,0. n({S2O3}<sup>2−</sup>) = 0,01485 × 0,50 = 0,007425 mol. n({I2}) = 0,007425 : 2 = 0,0037125 mol. n(Cu) = 2 × 0,0037125 = 0,007425 mol. m(Cu) = 0,007425 × 64 = 0,4752 g. %Cu = 0,4752 : 0,5 × 100 = 95,04 ≈ 95,0%."
+ },
+ "ket": "Đáp số: 95,0%",
+ "nho": "Chuẩn độ nối tiếp: 2Cu → {I2} → 2{S2O3}<sup>2−</sup>, nên n(Cu) = n(thiosulfate).",
+ "phepTinh": [
+  {
+   "ten": "n S2O3 2- (mol)",
+   "bieuThuc": "14.85/1000*0.5",
+   "ketQua": 0.007425,
+   "lamTron": 6
+  },
+  {
+   "ten": "n I2 (mol)",
+   "bieuThuc": "14.85/1000*0.5/2",
+   "ketQua": 0.0037125,
+   "lamTron": 7
+  },
+  {
+   "ten": "n Cu (mol)",
+   "bieuThuc": "14.85/1000*0.5/2*2",
+   "ketQua": 0.007425,
+   "lamTron": 6
+  },
+  {
+   "ten": "m Cu (g)",
+   "bieuThuc": "14.85/1000*0.5/2*2*64",
+   "ketQua": 0.4752,
+   "lamTron": 4
+  },
+  {
+   "ten": "%Cu",
+   "bieuThuc": "14.85/1000*0.5/2*2*64/0.5*100",
+   "ketQua": 95.0,
+   "lamTron": 1,
+   "laDapSo": true
+  }
+ ],
+ "tuongTu": [
+  {
+   "t": "Nếu chỉ cần 14,00 mL dung dịch {S2O3}<sup>2−</sup> 0,50 M cho cùng 0,5 g mẫu thì hàm lượng Cu khoảng 89,6%.",
+   "d": "D",
+   "giai": "Đúng. n(Cu) = 0,014 × 0,50 = 0,007 mol; m(Cu) = 0,007 × 64 = 0,448 g; %Cu = 0,448 : 0,5 × 100 = 89,6%.",
+   "phepTinh": [
+    {
+     "ten": "%Cu",
+     "bieuThuc": "14/1000*0.5*64/0.5*100",
+     "ketQua": 89.6,
+     "lamTron": 1
+    }
+   ]
+  },
+  {
+   "t": "Nếu hoà tan 1,0 g cùng mẫu hợp kim C60600 thì thể tích dung dịch {S2O3}<sup>2−</sup> 0,50 M cần dùng vẫn là 14,85 mL.",
+   "d": "S",
+   "giai": "Sai. Khối lượng mẫu gấp đôi thì n(Cu) gấp đôi, thể tích thiosulfate cũng gấp đôi: 14,85 × 2 = 29,70 mL.",
+   "phepTinh": [
+    {
+     "ten": "V S2O3 2- (mL)",
+     "bieuThuc": "14.85*2",
+     "ketQua": 29.7,
+     "lamTron": 2
+    }
+   ]
+  }
+ ],
+ "co": []
+}

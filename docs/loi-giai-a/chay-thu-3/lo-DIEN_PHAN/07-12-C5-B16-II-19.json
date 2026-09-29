@@ -1,0 +1,104 @@
+{
+ "qid": "12-C5-B16-II-19",
+ "bam": "b64c91c2dc0e510f",
+ "dang": "ds",
+ "ten": "Điện phân {NaCl} bão hoà không màng ngăn điều chế nước Javel",
+ "keys": ["k6", "k5"],
+ "dung": [
+  {
+   "ic": "i-bolt",
+   "t": "Anode (+): Cl<sup>−</sup> bị oxi hoá",
+   "p": "2Cl<sup>−</sup> → {Cl2} + 2e. Cl<sup>−</sup> bị oxi hoá trước nước.",
+   "io": [["in", "{Cl2}"]]
+  },
+  {
+   "ic": "i-bubbles",
+   "t": "Cathode (−): nước bị khử",
+   "p": "2{H2O} + 2e → {H2} + 2OH<sup>−</sup>. Na<sup>+</sup> không bị khử trong dung dịch.",
+   "io": [["out", "{H2}↑"], ["in", "OH<sup>−</sup>"]]
+  },
+  {
+   "ic": "i-flask",
+   "t": "Không màng ngăn: {Cl2} gặp {NaOH}",
+   "p": "{Cl2} + 2{NaOH} → {NaCl} + {NaClO} + {H2O}. Gộp lại: {NaCl} + {H2O} → {NaClO} + {H2}.",
+   "io": [["in", "{NaClO} (nước Javel)"], ["out", "{H2}↑"]]
+  }
+ ],
+ "y": [
+  {
+   "id": "a",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "“diệt khuẩn và tẩy màu” → dung dịch sau điện phân chứa chất gì?",
+   "g": [
+    "Chìa khoá <b>Điện phân sản xuất</b>: điện phân dung dịch {NaCl} không màng ngăn, {Cl2} gặp {NaOH} ra nước Javel.",
+    "Sơ đồ không có màng ngăn: khí ở anode và dung dịch ở cathode chung một cốc.",
+    "Nước Javel chứa {NaClO}. {NaClO} có tính oxi hoá mạnh không?"
+   ],
+   "giai": "Đúng. Dung dịch sau điện phân là nước Javel ({NaCl} và {NaClO}); {NaClO} có tính oxi hoá mạnh nên tẩy màu và diệt khuẩn.",
+   "lab": null
+  },
+  {
+   "id": "b",
+   "d": "S",
+   "k": "k5",
+   "bay": "doivai",
+   "soi": "“thứ tự … {H2O}, Cl<sup>−</sup>” và “Na<sup>+</sup>, {H2O}”: kiểm chất nào bị điện phân trước ở mỗi cực.",
+   "g": [
+    "Chìa khoá <b>Thứ tự điện phân</b>: anode trơ, Cl<sup>−</sup> bị oxi hoá trước nước; cathode, Na<sup>+</sup> không bị khử, nước bị khử thay.",
+    "Anode nối cực (+) có Cl<sup>−</sup> và {H2O}; cathode nối cực (−) có Na<sup>+</sup> và {H2O}.",
+    "Ở mỗi cực, chất nào đứng đầu hàng? Na<sup>+</sup> có mặt trong hàng không?"
+   ],
+   "giai": "Sai. Anode: Cl<sup>−</sup> bị oxi hoá trước, hết Cl<sup>−</sup> mới đến nước. Cathode: Na<sup>+</sup> không bị khử trong dung dịch, chỉ nước bị khử ra {H2}.",
+   "lab": null
+  },
+  {
+   "id": "c",
+   "d": "S",
+   "k": "k6",
+   "bay": "tuyetdoi",
+   "soi": "“bay ra khỏi dung dịch” + “bằng”: không có màng ngăn, {Cl2} có thoát hết ra ngoài không?",
+   "g": [
+    "Chìa khoá <b>Điện phân sản xuất</b>: không màng ngăn thì {Cl2} gặp {NaOH} tạo nước Javel.",
+    "Phương trình điện phân: 2{NaCl} + 2{H2O} → 2{NaOH} + {H2} + {Cl2}, hai khí sinh ra bằng mol.",
+    "Sinh ra bằng nhau, nhưng khí nào bị {NaOH} giữ lại trong dung dịch?"
+   ],
+   "giai": "Sai. {H2} và {Cl2} sinh ra bằng mol, nhưng {Cl2} tan và phản ứng với {NaOH} ngay trong cốc nên thoát ra rất ít, còn {H2} bay ra gần hết. Số mol {Cl2} bay ra nhỏ hơn số mol {H2}.",
+   "lab": null
+  },
+  {
+   "id": "d",
+   "d": "D",
+   "k": "k6",
+   "bay": null,
+   "soi": "Kiểm phản ứng tạo nước Javel giữa {Cl2} và {NaOH}.",
+   "g": [
+    "Chìa khoá <b>Điện phân sản xuất</b>: không màng ngăn, {Cl2} sinh ở anode gặp {NaOH} sinh ở cathode.",
+    "{Cl2} phản ứng với dung dịch kiềm ở nhiệt độ thường cho những muối nào?",
+    "{Cl2} + 2{NaOH} → {NaCl} + {NaClO} + {H2O}. Hỗn hợp {NaCl} và {NaClO} gọi là gì?"
+   ],
+   "giai": "Đúng. {Cl2} + 2{NaOH} → {NaCl} + {NaClO} + {H2O}; dung dịch chứa {NaCl} và {NaClO} chính là nước Javel.",
+   "lab": null
+  }
+ ],
+ "ket": "a Đ – b S – c S – d Đ",
+ "nho": "Điện phân {NaCl} không màng ngăn: {Cl2} gặp {NaOH} thành nước Javel; có màng ngăn mới thu được {NaOH} và {Cl2}.",
+ "phepTinh": [],
+ "tuongTu": [
+  {
+   "t": "Điện phân dung dịch {NaCl} bão hoà có màng ngăn, điện cực trơ, thu được {NaOH} ở ngăn cathode và khí {Cl2} ở anode.",
+   "d": "D",
+   "giai": "Đúng. Màng ngăn giữ {Cl2} ở ngăn anode, không cho gặp {NaOH} sinh ra ở ngăn cathode; đó là cách sản xuất {NaOH} trong công nghiệp."
+  },
+  {
+   "t": "Điện phân dung dịch {NaCl} không màng ngăn đến khi thu được 0,1 mol {H2}, giả sử {Cl2} phản ứng hết với {NaOH}, thì dung dịch chứa 0,2 mol {NaClO}.",
+   "d": "S",
+   "giai": "Sai. Gộp lại: {NaCl} + {H2O} → {NaClO} + {H2}, tỉ lệ 1 : 1, nên chỉ có 0,1 mol {NaClO}.",
+   "phepTinh": [
+    { "ten": "n NaClO = n H2 (mol)", "bieuThuc": "0.1*1", "ketQua": 0.1, "lamTron": 2 }
+   ]
+  }
+ ],
+ "co": []
+}
