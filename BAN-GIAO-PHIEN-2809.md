@@ -125,3 +125,4 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 15:41 · Deploy #577 THÀNH CÔNG: PR #80 EXP v5 · main 6c333f3 · /khoe 200, chiến dịch OK · lùi: git revert -m 1 6c333f3.
 - 15:50 · Gộp PR #81 13 bộ chìa khoá lớp 10–11 + chương thiếu lớp 12 + nhật ký tự sửa đợt 1b/2 (main 179505e, 0 ca mở) · lùi: git revert -m 1 179505e.
 - 16:42 · Gộp PR #82 máy yếu đợt 2 (vào đề 1,33→0,32 s; tờ chiếu 5,4→3,6 s; precache 163/2925 KB) · main a72d513 · thầy cho đẩy trước ca 12L2-L1 bắt đầu 17:30 · lùi: git revert -m 1 a72d513.
+- 16:49 · Deploy #579 THÀNH CÔNG: PR #82 máy yếu đợt 2 · main a72d513 · /khoe 200 · lùi: git revert -m 1 a72d513. NGỪNG đưa lên tới khi ca 12L2-L1 (147227, 17:30, 15 phút) đóng + công bố. Code 4b hoãn ghi kho đợt 3 (88 sửa đề + 3 đổi đáp án) tới lúc đó.
