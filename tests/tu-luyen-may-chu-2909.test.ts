@@ -27,7 +27,8 @@ vi.mock('../server/src/goi-cu', async (orig) => {
     return { ok: true, items: ds }
   } }
 })
-const { tuLuyen, tuLuyenNguon, tuLuyenNop, tuLuyenRut, tuLuyenTongHop, tuLuyenXemTruoc } = await import('../server/src/tu-luyen')
+const { tuLuyen, tuLuyenNguon, tuLuyenNop, tuLuyenRut, tuLuyenTongHop, tuLuyenXemTruoc, tuLuyenXemLuot, damBaoBangTuLuyen, SQL_BANG_TU_LUYEN } = await import('../server/src/tu-luyen')
+import { readFileSync } from 'node:fs'
 
 const T0 = Date.parse('2026-09-29T19:00:00+07:00')
 beforeEach(() => {
@@ -204,5 +205,39 @@ describe('Tu luyện — câu công khai, chấm ở máy chủ', () => {
     expect((t.cau as unknown[]).length).toBe(3)
     expect(((await tuLuyenTongHop(d.env, 'HS2')).cau as unknown[]).length).toBe(0)
     expect((await tuLuyen(d.env, 'rut', { cheDo: 3 })).ok).toBe(false)
+  })
+
+  it('xem lại lượt cũ: chưa nộp ⇒ từ chối (không lộ đáp án); đã nộp ⇒ câu công khai + kết quả đã chốt, không ghi thêm', async () => {
+    const d = dung()
+    const r = await tuLuyenRut(d.env, 'HS1', { cheDo: 3, dsDang: [MA_DB], soCau: 5 })
+    expect((await tuLuyenXemLuot(d.env, 'HS1', { luotId: r.luotId })).ok).toBe(false)
+    await tuLuyenNop(d.env, 'HS1', { luotId: r.luotId, traLoi: { [`${MA_DB}-I-2`]: 'D' }, giay: 20 })
+    const truoc = d.dem('tu_luyen_cau')
+    const x = await tuLuyenXemLuot(d.env, 'HS1', { luotId: r.luotId })
+    expect(x.ok).toBe(true)
+    expect((x.cauCongKhai as { qid: string }[]).map((c) => c.qid).sort()).toEqual((r.cau as { qid: string }[]).map((c) => c.qid).sort())
+    expect(coDapAnTrongChu(x.cauCongKhai)).toBe(false)
+    expect(x.soDung).toBe(1)
+    expect(d.dem('tu_luyen_cau')).toBe(truoc)
+    expect((await tuLuyenXemLuot(d.env, 'HS2', { luotId: r.luotId })).ok).toBe(false)
+  })
+})
+
+describe('Tu luyện — tự dựng bảng khi CI deploy không chạy migration', () => {
+  it('câu dựng tại chỗ = đúng câu trong migration-2909-tu-luyen.sql', () => {
+    const sql = readFileSync('server/migration-2909-tu-luyen.sql', 'utf8').split('\n').filter((l) => !l.startsWith('--')).join('\n')
+    const cau = sql.split(';').map((x) => x.replace(/\s+/g, ' ').trim()).filter(Boolean)
+    expect([...SQL_BANG_TU_LUYEN]).toEqual(cau)
+  })
+  it('bảng chưa có ⇒ lệnh đầu tự dựng; chạy lại vô hại, không mất dữ liệu', async () => {
+    const d = dung()
+    d.sql.exec('DROP TABLE tu_luyen_cau; DROP TABLE tu_luyen_luot')
+    await damBaoBangTuLuyen(d.env)
+    const r = await tuLuyenRut(d.env, 'HS1', { cheDo: 3, dsDang: [MA_DB], soCau: 5 })
+    expect(r.ok).toBe(true)
+    await tuLuyenNop(d.env, 'HS1', { luotId: r.luotId, traLoi: {}, giay: 5 })
+    await Promise.all(SQL_BANG_TU_LUYEN.map((s) => d.env.DB.prepare(s).run())) // chạy lại y câu ấy
+    expect(d.dem('tu_luyen_luot')).toBe(1)
+    expect(d.dem('tu_luyen_cau')).toBe(3)
   })
 })

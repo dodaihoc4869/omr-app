@@ -56,6 +56,29 @@ const SO_CAU_XIN_KHO = 200
 export const LOI_CHUA_BAT = 'Máy chủ chưa bật Tu luyện. Em quay lại sau nhé.'
 export const LOI_DANG_THI = 'Em đang có ca kiểm tra mở nên Tu luyện tạm khoá. Làm xong ca kiểm tra rồi luyện tiếp nhé.'
 
+// ------------------------------------------------------------------ bảng (dựng tại chỗ)
+/**
+ * CI deploy KHÔNG tự chạy migration ⇒ dựng bảng CHỈ-THÊM ngay tại chỗ, y hệt `server/migration-2909-tu-luyen.sql` (mẫu `damBaoBangBia`).
+ * `IF NOT EXISTS` nên chạy lại vô hại; mỗi CSDL một lần mỗi isolate; lỗi ⇒ lượt sau thử lại. Test khoá: câu ở đây = câu trong tệp migration.
+ */
+export const SQL_BANG_TU_LUYEN: readonly string[] = [
+  'CREATE TABLE IF NOT EXISTS tu_luyen_luot ( id TEXT PRIMARY KEY, sbd TEXT NOT NULL, che_do INTEGER NOT NULL, tieu_de TEXT NOT NULL DEFAULT \'\', tham_so_json TEXT NOT NULL DEFAULT \'{}\', de_rieng_json TEXT NOT NULL DEFAULT \'[]\', de_cong_khai_json TEXT NOT NULL DEFAULT \'[]\', so_cau INTEGER NOT NULL DEFAULT 0, so_dung INTEGER NOT NULL DEFAULT 0, diem REAL, giay INTEGER NOT NULL DEFAULT 0, trang_thai TEXT NOT NULL DEFAULT \'dang_lam\', tao_luc INTEGER NOT NULL, nop_luc INTEGER )',
+  'CREATE INDEX IF NOT EXISTS idx_tu_luyen_luot_sbd ON tu_luyen_luot(sbd, tao_luc)',
+  'CREATE TABLE IF NOT EXISTS tu_luyen_cau ( luot_id TEXT NOT NULL, sbd TEXT NOT NULL, che_do INTEGER NOT NULL, qid TEXT NOT NULL, phan TEXT NOT NULL, dung INTEGER NOT NULL DEFAULT 0, diem REAL NOT NULL DEFAULT 0, tra_loi TEXT NOT NULL DEFAULT \'\', dang_ma TEXT NOT NULL DEFAULT \'\', dang_ten TEXT NOT NULL DEFAULT \'\', bai TEXT NOT NULL DEFAULT \'\', lop TEXT NOT NULL DEFAULT \'\', sao INTEGER NOT NULL DEFAULT 0, giay INTEGER NOT NULL DEFAULT 0, co_goi_y INTEGER NOT NULL DEFAULT 0, nop_luc INTEGER NOT NULL, PRIMARY KEY (luot_id, qid) )',
+  'CREATE INDEX IF NOT EXISTS idx_tu_luyen_cau_sbd ON tu_luyen_cau(sbd, nop_luc)',
+]
+const bangDaDung = new WeakMap<object, Promise<void>>()
+export function damBaoBangTuLuyen(env: Env): Promise<void> {
+  const db = env.DB as unknown as object
+  let p = bangDaDung.get(db)
+  if (!p) {
+    p = env.DB.batch(SQL_BANG_TU_LUYEN.map((s) => env.DB.prepare(s))).then(() => undefined)
+    p.catch(() => bangDaDung.delete(db))
+    bangDaDung.set(db, p)
+  }
+  return p
+}
+
 /** Xác thực: SBD LUÔN lấy từ token của em (không nhận `sbd` trần). */
 async function emCua(env: Env, b: Obj): Promise<string> {
   return gameIdentity(env, b)
@@ -272,6 +295,19 @@ export async function tuLuyenXemTruoc(env: Env, sbd: string, b: Obj): Promise<Ob
   return { ok: true, tongToiDa: r.tongToiDa, ...(r.thongKe ? { thongKe: r.thongKe } : {}) }
 }
 
+/** Bản câu công khai cất để XEM LẠI lượt cũ. Dòng D1 ≤ 2 MB ⇒ quá 1,5 triệu ký tự thì bỏ ẢNH nhúng data: (chữ đề vẫn đủ). */
+export function congKhaiDeLuu(ds: CauCongKhai[]): string {
+  const day = JSON.stringify(ds)
+  if (day.length <= 1_500_000) return day
+  const laData = (s: string | undefined) => !!s && s.startsWith('data:')
+  return JSON.stringify(ds.map((c) => ({
+    ...c,
+    anhThanCau: laData(c.anhThanCau) ? undefined : c.anhThanCau,
+    anhLuaChon: c.anhLuaChon?.map((a) => (laData(a) ? undefined : a)),
+    hinh: c.hinh?.filter((h) => !laData(h.src)),
+  })))
+}
+
 /** Mã lượt: 16 ký tự ngẫu nhiên (không đoán được). */
 function maLuot(): string {
   const a = new Uint8Array(10)
@@ -308,8 +344,8 @@ export async function tuLuyenRut(env: Env, sbd: string, b: Obj): Promise<Obj> {
   const tieuDe = r.tieuDe || TEN_CHE_DO[t.cheDo]
   try {
     await env.DB.prepare(
-      `INSERT INTO tu_luyen_luot (id, sbd, che_do, tieu_de, tham_so_json, de_rieng_json, so_cau, trang_thai, tao_luc) VALUES (?,?,?,?,?,?,?, 'dang_lam', ?)`,
-    ).bind(id, sbd, t.cheDo, tieuDe, JSON.stringify({ soCau: t.soCau, dsMaCa: t.dsMaCa, dsDang: t.dsDang, mucDo: t.mucDo }), JSON.stringify(rieng), rieng.length, nay).run()
+      `INSERT INTO tu_luyen_luot (id, sbd, che_do, tieu_de, tham_so_json, de_rieng_json, de_cong_khai_json, so_cau, trang_thai, tao_luc) VALUES (?,?,?,?,?,?,?,?, 'dang_lam', ?)`,
+    ).bind(id, sbd, t.cheDo, tieuDe, JSON.stringify({ soCau: t.soCau, dsMaCa: t.dsMaCa, dsDang: t.dsDang, mucDo: t.mucDo }), JSON.stringify(rieng), congKhaiDeLuu(congKhai), rieng.length, nay).run()
   } catch (e) {
     if (/no such table/i.test(String(e))) return { ok: false, error: LOI_CHUA_BAT }
     throw e
@@ -401,6 +437,22 @@ export async function tuLuyenNop(env: Env, sbd: string, b: Obj): Promise<Obj> {
   }
 }
 
+/** XEM LẠI một lượt ĐÃ NỘP (bấm trong "Lượt gần đây"): câu công khai đã cất + kết quả đã chốt (đi đúng nhánh "đã nộp" của `tuLuyenNop`,
+ * không chấm lại, không ghi gì). Lượt chưa nộp ⇒ từ chối (không trả đáp án khi em chưa nộp). */
+export async function tuLuyenXemLuot(env: Env, sbd: string, b: Obj): Promise<Obj> {
+  const luotId = str(b.luotId).trim()
+  if (!/^tl_[a-z0-9]{6,20}$/.test(luotId)) return { ok: false, error: 'Không tìm thấy lượt luyện này.' }
+  const dong = await env.DB.prepare('SELECT trang_thai, de_cong_khai_json FROM tu_luyen_luot WHERE id = ? AND sbd = ?').bind(luotId, sbd).first<Obj>()
+  if (!dong) return { ok: false, error: 'Không tìm thấy lượt luyện này.' }
+  if (str(dong.trang_thai) !== 'da_nop') return { ok: false, error: 'Lượt này chưa nộp nên chưa xem lại được.' }
+  let cauCongKhai: CauCongKhai[] = []
+  try { const a = JSON.parse(str(dong.de_cong_khai_json)); if (Array.isArray(a)) cauCongKhai = a as CauCongKhai[] } catch { /* bản cũ không cất ⇒ rỗng */ }
+  if (cauCongKhai.length === 0) return { ok: false, error: 'Lượt này không còn bản đề để xem lại.' }
+  const kq = await tuLuyenNop(env, sbd, { luotId })
+  if (kq.ok !== true) return kq
+  return { ...kq, cauCongKhai }
+}
+
 // ------------------------------------------------------------------ tổng hợp đánh giá (dữ liệu thô; máy em tính bằng `tongHopTuLuyen`)
 
 export async function tuLuyenTongHop(env: Env, sbd: string): Promise<Obj> {
@@ -433,7 +485,9 @@ export async function tuLuyen(env: Env, lenh: string, b: Obj): Promise<Obj> {
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại nhé.' }
   }
+  await damBaoBangTuLuyen(env) // CI deploy không chạy migration ⇒ dựng bảng CHỈ-THÊM tại chỗ (một lần mỗi isolate)
   if (lenh === 'nguon') return tuLuyenNguon(env, sbd)
+  if (lenh === 'xem-luot') return tuLuyenXemLuot(env, sbd, b)
   if (lenh === 'xem-truoc') return tuLuyenXemTruoc(env, sbd, b)
   if (lenh === 'rut') return tuLuyenRut(env, sbd, b)
   if (lenh === 'nop') return tuLuyenNop(env, sbd, b)

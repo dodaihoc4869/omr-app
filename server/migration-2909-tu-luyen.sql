@@ -3,6 +3,8 @@
 --
 -- tu_luyen_luot: một dòng MỘT LƯỢT. Lúc rút: trang_thai 'dang_lam' + `de_rieng_json` (đáp án + lời giải, CHỈ nằm trên máy chủ
 --   tới lúc nộp — máy em chỉ nhận câu công khai). Lúc nộp: 'da_nop' + số đúng, điểm, thời gian làm.
+-- `de_cong_khai_json`: đúng các câu công khai đã gửi em (để em XEM LẠI lượt cũ trong "Lượt gần đây").
+-- Máy chủ cũng tự dựng hai bảng này tại chỗ (server/src/tu-luyen.ts `SQL_BANG_TU_LUYEN`, y hệt tệp này) vì CI deploy không chạy migration.
 -- tu_luyen_cau: một dòng MỘT CÂU đã nộp (đúng/sai + dạng/bài/lớp/sao/phần + thời gian) — nguồn của "Tổng hợp đánh giá".
 CREATE TABLE IF NOT EXISTS tu_luyen_luot (
   id TEXT PRIMARY KEY,
@@ -11,6 +13,7 @@ CREATE TABLE IF NOT EXISTS tu_luyen_luot (
   tieu_de TEXT NOT NULL DEFAULT '',
   tham_so_json TEXT NOT NULL DEFAULT '{}',
   de_rieng_json TEXT NOT NULL DEFAULT '[]',
+  de_cong_khai_json TEXT NOT NULL DEFAULT '[]',
   so_cau INTEGER NOT NULL DEFAULT 0,
   so_dung INTEGER NOT NULL DEFAULT 0,
   diem REAL,

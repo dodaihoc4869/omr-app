@@ -24,7 +24,7 @@ import {
   type CheDoTuLuyen,
   type KetQuaCau,
 } from '../../lib/tu-luyen'
-import { nopBai, rutCau, taiNguon, xemTruoc, type KetQuaNop, type LuotDangLam, type NguonTuLuyen, type ThamSoRut } from './api'
+import { nopBai, rutCau, taiNguon, xemLuot, xemTruoc, type KetQuaNop, type LuotDangLam, type NguonTuLuyen, type ThamSoRut } from './api'
 import TongHopTuLuyen from './TongHopTuLuyen'
 
 export interface ManTuLuyenProps {
@@ -111,6 +111,8 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const [dangNop, setDangNop] = useState(false)
   const [loi, setLoi] = useState('')
   const [lamMoiTongHop, setLamMoiTongHop] = useState(0)
+  const [dangMoLuot, setDangMoLuot] = useState('')
+  const [loiXemLuot, setLoiXemLuot] = useState('')
 
   // tham số từng chế độ
   const [caChon1, setCaChon1] = useState<Set<string>>(new Set())
@@ -253,7 +255,7 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
   const veChon = () => { setBai(null); setKetQua(null); setLoi('') }
 
   // ================================================================== KẾT QUẢ
-  if (ketQua) return <ManKetQua kq={ketQua.nop} cau={ketQua.cau} onVe={onVe} onLuyenTiep={() => { setKetQua(null); setBai(null) }} onTongHop={() => { veChon(); setThePhu('tong-hop') }} />
+  if (ketQua) return <ManKetQua kq={ketQua.nop} cau={ketQua.cau} onVe={onVe} onLuyenTiep={() => { setKetQua(null); setBai(null); setThePhu('luyen') }} onTongHop={() => { veChon(); setThePhu('tong-hop') }} />
 
   // ================================================================== ĐANG LÀM
   if (bai) {
@@ -452,10 +454,21 @@ export default function ManTuLuyen({ token, sbd, onVe }: ManTuLuyenProps) {
 
       {thePhu === 'tong-hop' ? (
         <main className="tlu-than">
+          {loiXemLuot && <p className="tlu-bao" data-kieu="loi" role="alert">{loiXemLuot}</p>}
           <TongHopTuLuyen
             token={token}
             lamMoi={lamMoiTongHop}
             danhMuc={nguon?.danhMuc ?? []}
+            dangMoLuot={dangMoLuot}
+            onXemLuot={async (id) => {
+              setDangMoLuot(id)
+              setLoiXemLuot('')
+              const r = await xemLuot(token, id)
+              setDangMoLuot('')
+              if (!r.ok) { setLoiXemLuot(r.loi); return }
+              setKetQua(r.du)
+              window.scrollTo?.({ top: 0 })
+            }}
             onLuyenDang={(lop, tenBai, ma) => {
               setLop3(lop); setBai3(tenBai); setDang3(new Set([ma])); setSoCau3(SO_CAU_MAC_DINH)
               setCheDo(3); setThePhu('luyen')

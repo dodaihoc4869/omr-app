@@ -10,6 +10,7 @@ Mọi lệnh: `POST /hs/tu-luyen/<lệnh>`, thân JSON có `token` (token học 
 | `xem-truoc` | `{cheDo, dsMaCa?, dsDang?, mucDo?}` | `{ok, tongToiDa, loi?, thongKe?}` (chế độ 2: `thongKe` theo dạng câu sai) |
 | `rut` | `{cheDo:1..4, soCau?, dsMaCa?, dsDang?, mucDo?}` | `{ok, luotId, cheDo, tieuDe, taoLuc, tongToiDa, cau: CauCongKhai[]}` — **không đáp án, không lời giải** |
 | `nop` | `{luotId, traLoi:{qid:chuỗi}, giay, giayCau?, coGoiY?}` | `{ok, soCau, soDung, diem (thang 10), giay, nopLuc, cau:[{qid,phan,dung,diem,traLoi,dapAn,yDung?,loiGiai?,anDapAn?}]}` |
+| `xem-luot` | `{luotId}` (lượt ĐÃ nộp của chính em) | như `nop` (kết quả đã chốt, không chấm lại) + `cauCongKhai` — lượt chưa nộp ⇒ từ chối |
 | `tong-hop` | — | `{ok, luot:[…], cau:[…]}` (máy em tính bằng `tongHopTuLuyen`) |
 
 Chế độ ↔ hàm rút cũ (`src/lib/thuat-toan-rut-cau-sai-loi.ts`, giữ nguyên thuật toán):
@@ -20,4 +21,4 @@ Chế độ ↔ hàm rút cũ (`src/lib/thuat-toan-rut-cau-sai-loi.ts`, giữ ng
 
 Luật: không rút tự luận (`laCauTuLuan`), gỡ câu ca đang bảo vệ (`docBaoVeKho`), em có ca kiểm tra mở ⇒ `rut` trả `khoa:'dang_kiem_tra'`. Chấm: `chamCauTuLuyen` (Phần III = `khopPhanIII`). Nộp lại ⇒ trả kết quả đã chốt. KHÔNG ghi EXP, `su_kien_hoc`, `qid_da_lam`, kế hoạch ngày.
 
-Chạy migration (Code 3/Boss, sau khi gộp): `cd server && npx -y wrangler@latest d1 execute omr --remote --file=migration-2909-tu-luyen.sql`. Chưa chạy ⇒ `rut`/`nop` trả "Máy chủ chưa bật Tu luyện", `tong-hop` trả rỗng.
+BẢNG TỰ DỰNG: mọi lệnh gọi `damBaoBangTuLuyen` trước (câu `SQL_BANG_TU_LUYEN` = y hệt tệp migration, `IF NOT EXISTS`, một lần mỗi isolate) vì CI deploy không chạy migration. Chạy tay migration (tuỳ chọn): `cd server && npx -y wrangler@latest d1 execute omr --remote --file=migration-2909-tu-luyen.sql`.

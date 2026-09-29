@@ -103,3 +103,14 @@ export async function taiTongHop(token: string): Promise<KetQua<{ luot: DongLuot
   if (!j || j.ok !== true) return { ok: false, loi: loiCua(j) }
   return { ok: true, du: { luot: (Array.isArray(j.luot) ? j.luot : []) as DongLuotTuLuyen[], cau: (Array.isArray(j.cau) ? j.cau : []) as DongCauTuLuyen[] } }
 }
+
+/** Xem lại một lượt ĐÃ NỘP: câu công khai đã cất + kết quả đã chốt (máy chủ không chấm lại). */
+export async function xemLuot(token: string, luotId: string): Promise<KetQua<{ nop: KetQuaNop; cau: CauCongKhai[] }>> {
+  const j = await goi('xem-luot', token, { luotId })
+  if (!j || j.ok !== true) return { ok: false, loi: loiCua(j) }
+  const nop: KetQuaNop = {
+    luotId: chu(j.luotId), tieuDe: chu(j.tieuDe), cheDo: so(j.cheDo) as CheDoTuLuyen, soCau: so(j.soCau), soDung: so(j.soDung),
+    diem: so(j.diem), giay: so(j.giay), nopLuc: so(j.nopLuc), cau: (Array.isArray(j.cau) ? j.cau : []) as KetQuaCau[],
+  }
+  return { ok: true, du: { nop, cau: (Array.isArray(j.cauCongKhai) ? j.cauCongKhai : []) as CauCongKhai[] } }
+}

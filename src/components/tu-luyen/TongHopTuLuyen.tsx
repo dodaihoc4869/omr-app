@@ -21,6 +21,10 @@ export interface TongHopTuLuyenProps {
   lamMoi: number
   danhMuc: LopDangBaiTL[]
   onLuyenDang: (lop: string, tenBai: string, ma: string) => void
+  /** Bấm "Xem lại" một lượt đã nộp ⇒ màn kết quả của lượt ấy (đáp án + lời giải đã chốt). */
+  onXemLuot?: (luotId: string) => void
+  /** Lượt đang mở (hiện "Đang mở…" trên nút). */
+  dangMoLuot?: string
 }
 
 /** Phần trăm kiểu Việt: dấu phẩy thập phân (60,7%). */
@@ -105,7 +109,7 @@ function TheNoiBat({ nhan, d, chu }: { nhan: string; d: TongHopDang | null; chu:
   )
 }
 
-export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang }: TongHopTuLuyenProps) {
+export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang, onXemLuot, dangMoLuot }: TongHopTuLuyenProps) {
   const [du, setDu] = useState<{ luot: DongLuotTuLuyen[]; cau: DongCauTuLuyen[] } | null>(null)
   const [loi, setLoi] = useState('')
   const [lan, setLan] = useState(0)
@@ -229,6 +233,11 @@ export default function TongHopTuLuyen({ token, lamMoi, danhMuc, onLuyenDang }: 
                 <span className="tlu-tab">{ngayGio(l.nopLuc)} · {chuThoiGian(l.giay)}</span>
               </div>
               <span className="tlu-luot-so tlu-tab">{l.soDung}/{l.soCau} câu đúng</span>
+              {onXemLuot && (
+                <button type="button" className="tlu-nut-phu" disabled={dangMoLuot === l.id} onClick={() => onXemLuot(l.id)} aria-label={`Xem lại lượt ${l.tieuDe || TEN_CHE_DO[l.cheDo]}: đáp án và lời giải`}>
+                  {dangMoLuot === l.id ? 'Đang mở…' : 'Xem lại'}
+                </button>
+              )}
             </li>
           ))}
         </ul>
