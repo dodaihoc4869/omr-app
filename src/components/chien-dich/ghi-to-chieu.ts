@@ -59,8 +59,11 @@ interface Phien {
   goc: string
 }
 
+/** Hàm ghi một ô — mặc định `ghiMotO` (lệnh `ghiLenBang`). Kiểm tra đầu giờ (29/09) truyền hàm riêng ghi qua `/gv/dau-gio` (sổ nguon='dau_gio'). */
+export type GhiMotO = (o: OGhiToChieu, dat: boolean, giayThuc?: number) => Promise<{ ok: true } | { ok: false; chu: string }>
+
 /** Hook của màn Lên bảng chiến dịch: giữ bảng kết quả của chiến dịch đang chọn và nghe tờ chiếu đang mở. */
-export function useGhiToChieu(chienDichId: string) {
+export function useGhiToChieu(chienDichId: string, ghiO: GhiMotO = ghiMotO) {
   const showToast = useAppStore((s) => s.showToast)
   const [ketQua, setKetQua] = useState<BangKetQua>(() => docKetQuaNho(chienDichId))
   const ketQuaRef = useRef(ketQua)
@@ -98,12 +101,12 @@ export function useGhiToChieu(chienDichId: string) {
       const dang = dangGhi.current.get(khoa)
       if (dang) return dang
       const luot = (async () => {
-        const r = await ghiMotO(o, dat, giayThuc)
+        const r = await ghiO(o, dat, giayThuc)
         if (!r.ok) {
           showToast(r.chu, 'error')
           return false
         }
-        showToast(`${o.hoTen || o.sbd}: ${dat ? 'đạt' : 'không đạt'} — đã ghi vào ${o.chuyenDe}`, dat ? 'success' : 'warn')
+        showToast(`${o.hoTen || o.sbd}: ${dat ? 'đạt' : 'không đạt'} — đã ghi vào ${o.chuyenDe || 'sổ học'}`, dat ? 'success' : 'warn')
         const moi = { ...ketQuaRef.current, [khoa]: dat ? 'dat' : 'khong_dat' } as BangKetQua
         ketQuaRef.current = moi
         setKetQua(moi)
@@ -117,7 +120,7 @@ export function useGhiToChieu(chienDichId: string) {
         dangGhi.current.delete(khoa)
       }
     },
-    [chienDichId, showToast],
+    [chienDichId, showToast, ghiO],
   )
   const ghiRef = useRef(ghiTheoKhoa)
   ghiRef.current = ghiTheoKhoa
