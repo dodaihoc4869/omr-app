@@ -57,3 +57,5 @@ export function chuanGoc(a: number): number {
   if (x <= -Math.PI) x += 2 * Math.PI
   return x
 }
+/** Bán kính vùng chạm để kéo bi cái khi đặt bi (đơn vị bàn): ≥ 2,4 R và ≥ 30 px CSS (bàn nhỏ khi xoay ngang vẫn chạm trúng). */
+export const banKinhBatBiCai = (S: number): number => Math.max(R * 2.4, 30 / Math.max(0.05, S))
