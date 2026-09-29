@@ -31,7 +31,6 @@ import { gradeSubmissionFull, type GradedSubmission } from '../lib/exam-grade'
 import { dongBoGioMayChu, gioMayChu } from '../lib/gio-may-chu'
 import { CACH_TAI_DAY_MS, NHIP_SONG_CA_MS, goiNhipCa, gopTienDoSong, hetLucMuonNhat, phuTienDoSong, type TienDoSong } from '../lib/nhip-song-ca'
 import { soanTinRoiMan } from '../lib/tin-nhan-thay'
-import KhoiCauHoiEm from '../components/KhoiCauHoiEm'
 import { mergeKeepAnswers, type SoCauMoiPhan, type TeacherExamSource } from '../data/examContent'
 import { chuTatDe } from '../lib/giu-de-doc'
 import { useAppStore } from '../store/appStore'
@@ -45,6 +44,7 @@ import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
 // CA THI 28/09 (docs/ban-ve-ca-thi-2809): đầu màn Theo dõi, màn Kết thúc ca, Báo cáo chi tiết — THAY khối gập BaoCaoCaLop + trang BaoCaoMotEm cũ.
 import TheoDoiCa, { type EmTheoDoi } from '../components/ca-thi/TheoDoiCa'
+import NutThemPhutCa from '../components/ca-thi/NutThemPhutCa'
 import PhongChoCa from '../components/ca-thi/PhongChoCa'
 import KetThucCa from '../components/ca-thi/KetThucCa'
 import BaoCaoChiTiet from '../components/ca-thi/BaoCaoChiTiet'
@@ -214,8 +214,10 @@ export default function ExamMonitorScreen() {
   const moToanCanh = useAppStore((s) => s.moToanCanh)
   const datSbdGiaoRieng = useAppStore((s) => s.datSbdGiaoRieng)
   // GAME HÓA 2.0: ca đã kết thúc ⇒ thẻ "BƯỚC TIẾP THEO · Giao chiến dịch luyện" (chỉ khi cờ bật; tắt thì màn như cũ).
+  // Thầy 29/09: "phần này có một nút bật lên thì mới giao chiến dịch, còn mặc định là tắt để theo dõi ca thi bình thường" ⇒ MẶC ĐỊNH TẮT (ẩn cả khối),
+  // một công tắc ở thanh đầu màn bật khối lên; KHÔNG nhớ giữa các lần mở ca (đổi ca ⇒ tắt lại).
   const hoa2 = useHoa2Bat()
-  const [thuGonGiao, setThuGonGiao] = useState(false)
+  const [moGiao, setMoGiao] = useState(false)
 
   const [scriptUrl, setScriptUrl] = useState('')
   const [secret, setSecret] = useState('')
@@ -689,6 +691,7 @@ export default function ExamMonitorScreen() {
   useEffect(() => {
     // Đổi ca ⇒ quên tiến độ sống của ca cũ.
     nhipRef.current = { maCa: maCaTheoDoiNen ?? '', moc: '', dauVet: null, taiDayLuc: Date.now() }
+    setMoGiao(false) // công tắc Giao chiến dịch: mỗi lần mở ca đều TẮT (thầy 29/09)
     setTienDoSong({})
     setSongOn(false)
   }, [maCaTheoDoiNen])
@@ -1089,6 +1092,7 @@ export default function ExamMonitorScreen() {
       }
     : null
   const tt = chiTiet && tk ? trangThaiCa({ ...chiTiet.ca, ...tk }, now) : null
+  const coGiaoChienDich = !!(hoa2 && chiTiet && tt && chiTiet.ca.loai !== 'baitap' && (chiTiet.ca.trangThai === 'dong' || tt.ten === 'Xong' || tt.ten === 'Hết giờ vào'))
 
   // ---------------------------------------------------------- KHOÁ / MỞ CA
   // Hai con số này đi thẳng vào hộp xác nhận. Nói "một số em" thì thầy không
@@ -1171,9 +1175,346 @@ export default function ExamMonitorScreen() {
   // Thay toàn bộ màn chi tiết cũ bằng modal Báo cáo ca thi chuẩn Google Material 3 của học sinh
 
 
+
+  // ------------------------------------------------ KHỐI DÙNG HAI CHỖ (thầy 29/09: "bỏ từ phần 12:17 chỉ để lại phần trên")
+  // Ca ĐANG MỞ: màn Theo dõi chỉ còn khu trên (TheoDoiCa) — các khối dưới đây cắm vào chỗ trống của nó (dòng phụ, Cần thầy xử lý, Việc nhanh);
+  // việc với TỪNG EM (Cho thi lại, Cho vào bằng máy khác, Mở khoá, Báo phụ huynh) nằm trong hồ sơ em (chạm thẻ em). Ca ĐÃ ĐÓNG: giữ bố cục hai cột cũ.
+  const vePhongCho = () => {
+    if (!chiTiet) return null
+    return (
+      <>
+          {/* PHÒNG CHỜ (thầy chốt 07/09; làm lại 28/09 theo M3 — src/components/ca-thi/PhongChoCa.tsx). Ca bật phòng chờ mà thầy chưa bấm
+              bắt đầu thì em đang đứng ở màn chờ — việc gấp nhất trên màn này, nên đứng đầu cột. Hai nút như thầy chốt: Bắt đầu thi và Huỷ ca kiểm tra.
+              Danh sách em tự làm mới 5 giây (cùng lệnh chiTietCa của Chiếu mã); màn Chiếu mã đang mở thì nghỉ để không gọi trùng. */}
+          {chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && (
+            <PhongChoCa
+              maCa={chiTiet.ca.maCa}
+              em={gopEmDaVao(chiTiet.dsCho, [])}
+              siSo={Array.isArray(chiTiet.ca.danhSachMoi) ? chiTiet.ca.danhSachMoi.length : null}
+              onCauSai={caCanDeRieng}
+              coDongBoGio={chiTiet.ca.loai !== 'baitap'}
+              dongBoGio={gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false}
+              onDoiDongBoGio={(bat) => setGioChungTheoCa((c) => ({ ...c, [chiTiet.ca.maCa]: bat }))}
+              dangBatDau={dangBatDau}
+              onBatDau={() => void batDauCaNay()}
+              dangHuy={dangXoa}
+              onHuy={() => void huyCaCho()}
+              noiKhoiPhuc={hoa2 ? 'Ca vào Ca kiểm tra › Ca đã xoá, khôi phục lại được.' : 'Ca vào Lịch sử ca, khôi phục lại được.'}
+              onChieuMa={() => setChieuMa(true)}
+              tuCapNhat
+              matKetNoi={soHut > 0}
+            />
+          )}
+      </>
+    )
+  }
+  const veCuaVao = () => {
+    if (!chiTiet) return null
+    return (
+      <>
+              <DongMatKetNoiCa soHut={soHut} gioTotMs={gioTot} />
+              {/* CỬA VÀO CA: trạng thái nói bằng chữ. KHOÁ CA cũ đã gỡ 28/09 (trùng "Kết thúc ca ngay"); MỞ CA chỉ hiện khi cửa đang đóng — cũng dùng khi
+                  QUÁ GIỜ VÀO: nó gỡ hạn vào phòng, em đến muộn vào được ngay. */}
+              <p className="ca-gio-dong" data-cua-vao={cua.nhan}>
+                Cửa vào ca: <b style={{ color: cua.moCua ? 'var(--xanh)' : 'var(--do)' }}>{cua.nhan}</b>
+                {cua.daKhoa && chiTiet.ca.khoaLuc ? (
+                  <>
+                    {' '}
+                    lúc <span style={SO}>{gio(chiTiet.ca.khoaLuc)}</span>
+                    {chiTiet.ca.khoaBoi ? ` bởi ${chiTiet.ca.khoaBoi}` : ''}
+                  </>
+                ) : null}
+                {!cua.daKhoa && chiTiet.ca.hetHanVao ? (
+                  <>
+                    {' '}
+                    · {cua.quaGioVao ? 'hạn' : 'đến'} <span style={SO}>{gio(chiTiet.ca.hetHanVao)}</span>
+                  </>
+                ) : null}
+              </p>
+              {chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && (
+                <p className="ca-gio-dong">
+                  Phòng chờ đã mở lúc <span style={SO}>{gio(chiTiet.ca.batDauThiLuc)}</span> — {chiTiet.ca.dongBoGio ? `đồng bộ giờ cả phòng, cùng hết giờ lúc ${gio(new Date(Date.parse(chiTiet.ca.batDauThiLuc) + chiTiet.ca.thoiGianPhut * 60000).toISOString())}.` : 'em vào từ giờ nhận đề ngay, tính giờ riêng từng em.'}
+                </p>
+              )}
+              {!cua.moCua && (
+                <div className="grid grid-cols-1" style={{ gap: 'var(--k2)' }}>
+                  <button
+                    type="button"
+                    onClick={moLaiCa}
+                    disabled={dangKhoa || !cua.moDuoc}
+                    aria-label="Mở ca cho em vào"
+                    className="tap-target flex items-center"
+                    style={{
+                      minHeight: 64,
+                      gap: 'var(--k2)',
+                      padding: '0 var(--k3)',
+                      borderRadius: 'var(--bo-3)',
+                      border: 'none',
+                      textAlign: 'left',
+                      background: cua.moDuoc ? 'var(--xanh)' : 'var(--the-2)',
+                      color: cua.moDuoc ? 'var(--muc-nguoc)' : 'var(--mo)',
+                      boxShadow: cua.moDuoc ? 'var(--bong-2)' : 'none',
+                      transition: 'transform 120ms ease, box-shadow 120ms ease',
+                    }}
+                  >
+                    <span
+                      className="flex items-center justify-center shrink-0"
+                      style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: cua.moDuoc ? 'var(--xanh-nen)' : 'var(--the)', color: cua.moDuoc ? 'var(--xanh)' : 'var(--mo)' }}
+                    >
+                      <Unlock size={19} />
+                    </span>
+                    <span className="flex flex-col" style={{ gap: 1, minWidth: 0 }}>
+                      <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
+                        {dangKhoa && cua.moDuoc ? 'Đang mở…' : 'Mở ca'}
+                      </span>
+                      <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', opacity: 0.85 }}>Em vào được ngay</span>
+                    </span>
+                  </button>
+                </div>
+                )}
+              {!cua.moCua && (
+                <p className="ca-gio-dong">Mở ca: bỏ hạn giờ vào phòng, em đến muộn vào được ngay. Em đã bị nộp do kết thúc ca phải duyệt thi lại từng em.</p>
+              )}
+      </>
+    )
+  }
+  const veSaiLai = () => {
+    if (!chiTiet) return null
+    return (
+      <>
+        {laCaDeRieng && (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setMoSaiLai((v) => !v)}
+                  aria-expanded={moSaiLai}
+                  className="tap-target font-bold w-full"
+                  style={{
+                    ...SO,
+                    textAlign: 'left',
+                    minHeight: 44,
+                    padding: 'var(--k2) var(--k3)',
+                    borderRadius: 'var(--bo-1)',
+                    background: tongKetLap.soEmCoLap === 0 ? 'var(--cam-nen)' : tongKetLap.tongSaiLai > 0 ? 'var(--do-nen)' : 'var(--xanh-nen)',
+                    color: tongKetLap.soEmCoLap === 0 ? 'var(--cam)' : tongKetLap.tongSaiLai > 0 ? 'var(--do)' : 'var(--xanh)',
+                    border: 'none',
+                    fontSize: 'var(--cx-1)',
+                  }}
+                >
+                  {tongKetLap.soEmCoLap === 0
+                    ? 'Câu em sai buổi trước · chưa rút được câu nào'
+                    : tongKetLap.tongSaiLai > 0
+                      ? `${tongKetLap.emSaiLai.length} em còn sai lại câu từng sai · ${tongKetLap.tongSaiLai}/${tongKetLap.tongCauLap} câu`
+                      : `Cả ${tongKetLap.soEmCoLap} em đã sửa được hết ${tongKetLap.tongCauLap} câu từng sai`}
+                  <span style={{ ...NHAN_NHO, display: 'block', color: 'inherit', opacity: 0.85 }}>
+                    {moSaiLai ? 'Bấm để gập lại' : tongKetLap.soEmCoLap === 0 ? 'Bấm để xem vì sao' : 'Bấm để xem chi tiết từng em, từng câu'}
+                  </span>
+                </button>
+
+                {moSaiLai && (
+                  <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
+                    {bienBanLap && <BangBienBanLap bb={bienBanLap} tenCua={(sbd) => dsEm.find((e) => e.sbd === sbd)?.hoTen || ''} />}
+                    {!bienBanLap && tongKetLap.soEmCoLap === 0 && (
+                      <div style={{ ...NHAN_NHO, color: 'var(--cam)', lineHeight: 1.6 }}>
+                        Máy này không giữ biên bản lúc rút đề. Bấm Bắt đầu ở máy khác thì biên bản nằm ở máy đó; mở lại ca sau khi máy chủ đã ghi bản đồ thì
+                        bảng trên vẫn đếm đúng.
+                      </div>
+                    )}
+                    {tongKetLap.emSaiLai.map((e) => (
+                      <div key={`sailai-${e.sbd}`} style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
+                        <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
+                          {e.hoTen || `SBD ${e.sbd}`} <span style={{ ...NHAN_NHO, ...SO }}>· SBD {e.sbd}</span>
+                        </div>
+                        {/* GỌI ĐÚNG TÊN CON SỐ. Biên bản ghi "rút được 8" còn
+                            chỗ này từng ghi "hỏi lại 9 câu" — thầy đọc ra hai số
+                            vênh nhau (08/09). Cả hai đều đúng, chỉ đếm hai tập
+                            khác nhau. Xem dem-cau-hoi-lai.ts. */}
+                        <div style={{ ...NHAN_NHO, ...SO }}>
+                          {dongSoCauHoiLai({
+                            tong: e.lap!.tong,
+                            daSua: e.lap!.daSua,
+                            saiLai: e.lap!.saiLai,
+                            rutChuDong: bienBanLap?.soLapCua?.[e.sbd] ?? null,
+                          })}
+                        </div>
+                        <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k2)' }}>
+                          {e.lap!.saiLaiChiTiet.map((c) => (
+                            <div key={`${e.sbd}-${c.qid}`} style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
+                              <b style={SO}>
+                                Câu {c.soCau} phần {c.phan}
+                              </b>
+                              {c.chuyenDe ? ` · ${c.chuyenDe}` : ''} · <span style={{ color: 'var(--do)' }}>{c.soLanSai > 0 ? `sai lần thứ ${c.soLanSai}` : 'lại sai'}</span>
+                              <span style={{ ...SO, display: 'block', color: 'var(--nhat)' }}>
+                                {/* Cùng luật với hai cổng kia: phần EM CHỌN tô đỏ,
+                                    phần đáp án đúng giữ màu chữ thường. */}
+                                đúng: {c.dapAnDung || '—'} · em chọn:{' '}
+                                <b style={{ color: 'var(--do)' }}>{c.dapAnChon || 'bỏ trống'}</b>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    {tongKetLap.emSachTron.length > 0 && (
+                      <div style={{ ...NHAN_NHO, color: 'var(--xanh)' }}>
+                        Sửa được hết: {tongKetLap.emSachTron.map((e) => e.hoTen || `SBD ${e.sbd}`).join(' · ')}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+      </>
+    )
+  }
+  const veBiChan = () => {
+    if (!chiTiet) return null
+    return (
+      <>
+        {chiTiet.biChan && chiTiet.biChan.length > 0 && (
+              <div>
+                <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
+                  Bị chặn ở cổng danh sách (<b style={SO}>{chiTiet.biChan.length}</b> lượt)
+                </div>
+                <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
+                  {chiTiet.biChan.slice(0, 8).map((b, i) => (
+                    <div key={`${b.luc}-${i}`} style={{ background: 'var(--cam-nen)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
+                      <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
+                        SBD <span style={SO}>{b.sbd}</span> · {moTaLyDoChan(b.lyDo)}
+                      </div>
+                      <div style={NHAN_NHO}>
+                        Em gõ: <b>{b.hoTenGoi || '(trống)'}</b>
+                        {b.namSinhGoi ? <> · sinh <span style={SO}>{b.namSinhGoi}</span></> : null}
+                      </div>
+                      <div style={NHAN_NHO}>
+                        {b.hoTenDs ? (
+                          <>
+                            Danh sách: <b>{b.hoTenDs}</b>
+                            {b.namSinhDs ? <> · sinh <span style={SO}>{b.namSinhDs}</span></> : null}
+                          </>
+                        ) : (
+                          'Danh sách lớp không có số báo danh này'
+                        )}
+                        {b.luc ? <> · lúc <span style={SO}>{gio(b.luc)}</span></> : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+      </>
+    )
+  }
+  const veCanhBao = () => (
+    <>
+          {loi && <OThongBao tone="do">{loi}</OThongBao>}
+          {!teacherBank && dsEm.some((e) => e.moiNhat.dapAn) && (
+            <OThongBao tone="cam">
+              Máy này chưa lấy được ngân hàng CÓ đáp án của ca. Ca mở khi chưa bật "xem điểm" thì đáp án không nằm trên máy chủ, chỉ máy đã mở ca mới chấm được — điểm hiện ra là điểm đã ghi trên Sheet.
+            </OThongBao>
+          )}
+
+    </>
+  )
+  const veThieuTen = () => (
+    <>
+      {emThieuTen.length > 0 && (
+              <div style={{ background: 'var(--cam-nen)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', marginBottom: 'var(--k3)' }}>
+                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)' }}>
+                  <b style={SO}>{emThieuTen.length}</b> em trong ca chưa có họ tên, phiếu gửi phụ huynh sẽ in số báo danh thay cho tên con.
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void dongBoTenChoCa()}
+                  disabled={dangDongBoTen}
+                  className="tap-target font-bold"
+                  style={{ marginTop: 'var(--k2)', minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
+                >
+                  {dangDongBoTen ? 'Đang đồng bộ…' : 'Lấy tên từ danh sách lớp'}
+                </button>
+              </div>
+            )}
+    </>
+  )
+
+  const veHanhDongEm = (e: (typeof dsEm)[number]) => {
+    const l = e.moiNhat
+    const daNop = l.trangThai === 'da_nop' || l.trangThai === 'khoa'
+    return (
+      <>
+                          {/* GAME HÓA 2.0: app phụ huynh tắt ⇒ tin báo không tới ai — bỏ nút (RA-SOAT mục 3). */}
+                          {!hoa2 && (l.trangThai === 'khoa' || l.soLanRoiMan > 0) && (
+                            <button type="button" onClick={() => moBaoPhuHuynh(e.sbd, l.hoTen, l)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--cam)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--cam)' }}>
+                              Báo phụ huynh
+                            </button>
+                          )}
+                          {l.trangThai === 'khoa' &&
+                            (xacNhanMoKhoa === e.sbd ? (
+                              <span className="inline-flex items-center" style={{ gap: 4 }}>
+                                <button type="button" onClick={() => handleMoKhoa(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
+                                  {dangDuyet === e.sbd ? '…' : 'Đồng ý mở khoá'}
+                                </button>
+                                <button type="button" onClick={() => setXacNhanMoKhoa(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
+                                  Huỷ
+                                </button>
+                              </span>
+                            ) : (
+                              <button type="button" onClick={() => setXacNhanMoKhoa(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--do)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--do)' }}>
+                                Mở khoá
+                              </button>
+                            ))}
+                          {l.trangThai === 'duoc_duyet_lai' &&
+                            l.khoaMay !== false &&
+                            (xacNhanMayKhac === e.sbd ? (
+                              /* Nói rõ việc này làm gì TRƯỚC khi thầy bấm: chỉ gỡ khoá máy, không xoá gì, không đổi đề. */
+                              <span className="inline-flex flex-col" style={{ gap: 4 }}>
+                                <span style={{ ...NHAN_NHO, lineHeight: 1.5 }}>
+                                  Em sẽ vào được bằng MÁY KHÁC (không còn buộc vào máy cũ). Đề mới giữ nguyên; máy cũ cũng vẫn vào được.
+                                </span>
+                                <span className="inline-flex items-center" style={{ gap: 4 }}>
+                                  <button type="button" onClick={() => handleChoVaoMayKhac(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
+                                    {dangDuyet === e.sbd ? '…' : 'Đồng ý cho vào bằng máy khác'}
+                                  </button>
+                                  <button type="button" onClick={() => setXacNhanMayKhac(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
+                                    Huỷ
+                                  </button>
+                                </span>
+                              </span>
+                            ) : (
+                              <button type="button" onClick={() => setXacNhanMayKhac(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>
+                                Cho vào bằng máy khác
+                              </button>
+                            ))}
+                          {daNop &&
+                            (xacNhanSbd === e.sbd ? (
+                              /* NÓI RÕ NÓ XOÁ GÌ trước khi thầy bấm. Việc này
+                                 KHÔNG khôi phục được: điểm, bài làm và chi tiết
+                                 từng câu của lượt cũ mất hẳn. */
+                              <span className="inline-flex flex-col" style={{ gap: 4 }}>
+                                <span style={{ ...NHAN_NHO, color: 'var(--do)', lineHeight: 1.5 }}>
+                                  Xoá hẳn điểm và bài làm lượt này của em, rút đề mới, và em chỉ vào lại được ở đúng máy cũ. Không khôi phục được.
+                                </span>
+                                <span className="inline-flex items-center" style={{ gap: 4 }}>
+                                <button type="button" onClick={() => handleChoThiLai(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--do)', color: 'var(--muc-nguoc)' }}>
+                                  {dangDuyet === e.sbd ? '…' : 'Xoá lượt cũ và cho thi lại'}
+                                </button>
+                                <button type="button" onClick={() => setXacNhanSbd(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
+                                  Huỷ
+                                </button>
+                                </span>
+                              </span>
+                            ) : (
+                              <button type="button" onClick={() => setXacNhanSbd(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>
+                                Cho thi lại
+                              </button>
+                            ))}
+      </>
+    )
+  }
+
   return (
     <div className="gv-page min-h-screen pb-28 px-3 sm:px-4 pt-4 flex flex-col" style={{ background: 'var(--nen)', color: 'var(--muc)', gap: 'var(--k4)', fontFamily: 'var(--sans)' }}>
-      <div className="gv-page-header flex items-center justify-between" style={{ gap: 'var(--k3)' }}>
+      <div className="gv-page-header flex flex-wrap items-center justify-between" style={{ gap: 'var(--k3)' }}>
         {/* TÊN CA SỬA ĐƯỢC TẠI CHỖ (thầy báo 07/09).
             Chạm vào tên là mở ô nhập ngay tại chỗ nó đang đứng, không nhảy sang
             màn khác: thầy sửa tên giữa lúc coi thi, mất bảng lượt thi một nhịp
@@ -1227,7 +1568,15 @@ export default function ExamMonitorScreen() {
               </h1>
               {chiTiet && <Pencil size={16} className="shrink-0" style={{ color: 'var(--nhat)' }} />}
             </button>
-            <span className="flex items-center shrink-0" style={{ gap: 'var(--k2)' }}>
+            <span className="flex items-center flex-wrap justify-end min-w-0" style={{ gap: 'var(--k2)' }}>
+            {coGiaoChienDich && (
+              <button type="button" role="switch" aria-checked={moGiao} className="ca-nut-chieu ca-cong-tac" data-bat={moGiao ? 'bat' : 'tat'} onClick={() => setMoGiao((v) => !v)}>
+                <span className="ca-cong-tac-ray" aria-hidden="true">
+                  <i />
+                </span>
+                Giao chiến dịch luyện từ ca này
+              </button>
+            )}
             {chiTiet && (
               <button type="button" className="ca-nut-chieu" onClick={() => setChieuMa(true)}>
                 Chiếu mã vào thi
@@ -1316,27 +1665,22 @@ export default function ExamMonitorScreen() {
 
       {chiTiet && tk && tt && (
         <>
-          {hoa2 && chiTiet.ca.loai !== 'baitap' && (chiTiet.ca.trangThai === 'dong' || tt.ten === 'Xong' || tt.ten === 'Hết giờ vào') && (() => {
+          {coGiaoChienDich && (() => {
             const maDeCa = maDeTuBoCau((teacherBank ?? []).flatMap((b) => [...(b.phanI ?? []), ...(b.phanII ?? []), ...(b.phanIII ?? [])].map((q) => q.id)))
-            return thuGonGiao ? (
-              <section className="cd-the" data-khoi="giao-chien-dich-thu-gon" style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span className="cd-nhan-buoc">BƯỚC TIẾP THEO · Giao chiến dịch luyện</span>
-                <button type="button" className="m3-nut-vien" onClick={() => setThuGonGiao(false)}>
-                  Giao chiến dịch luyện từ ca này
-                </button>
-              </section>
-            ) : (
+            return !moGiao ? null : (
               <GiaoChienDich
                 key={`${chiTiet.ca.maCa}|${maDeCa.join(',')}`}
                 maCa={chiTiet.ca.maCa}
                 lop={chiTiet.ca.lop}
                 maDeCa={maDeCa}
                 tenGoiY={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
-                onDeSau={() => setThuGonGiao(true)}
+                onDeSau={() => setMoGiao(false)}
               />
             )
           })()}
           {chiTiet.ca.trangThai === 'mo' ? (
+            <>
+            {vePhongCho()}
             <TheoDoiCa
               tenCa={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
               maCa={chiTiet.ca.maCa}
@@ -1385,7 +1729,11 @@ export default function ExamMonitorScreen() {
               dangTai={dangTai}
               dangDuyet={dangDuyet}
               onLamMoi={() => tai(chiTiet.ca.maCa)}
-              onMoKhoa={(sbd) => setXacNhanMoKhoa(sbd)}
+              onMoKhoa={(sbd) => {
+                // Bảng từng em đã bỏ (29/09): câu hỏi lại "Đồng ý mở khoá" nằm trong hồ sơ em ⇒ mở hồ sơ với câu hỏi sẵn.
+                setXacNhanMoKhoa(sbd)
+                setSbdHoSo(sbd)
+              }}
               onXemEm={(sbd) => setSbdHoSo(sbd)}
               onChieuMa={() => setChieuMa(true)}
               onKetThuc={() => {
@@ -1402,7 +1750,45 @@ export default function ExamMonitorScreen() {
                 return Number.isFinite(t) && t <= now
               })()}
               dangLamNgay={dangLamNgay}
+              dongPhu={veCuaVao()}
+              soCanXuLyThem={(laCaDeRieng ? 1 : 0) + (chiTiet.biChan?.length ? 1 : 0) + (emThieuTen.length > 0 ? 1 : 0)}
+              canXuLyThem={
+                <>
+                  {veThieuTen()}
+                  {veSaiLai()}
+                  {veBiChan()}
+                  {/* Hai dòng báo (lỗi tải, thiếu ngân hàng có đáp án) — cùng lời với khối ở ca đã đóng, vẽ theo kiểu thẻ của khu trên. */}
+                  {loi && (
+                    <div className="ct-cb-tu-do" role="alert">
+                      {loi}
+                    </div>
+                  )}
+                  {!teacherBank && dsEm.some((e) => e.moiNhat.dapAn) && (
+                    <div className="ct-cb-tu-do">
+                      Máy này chưa lấy được ngân hàng CÓ đáp án của ca. Ca mở khi chưa bật "xem điểm" thì đáp án không nằm trên máy chủ, chỉ máy đã mở ca mới chấm được — điểm hiện ra là điểm đã ghi trên Sheet.
+                    </div>
+                  )}
+                </>
+              }
+              viecNhanhThem={
+                <>
+                  {chiTiet.ca.loai !== 'baitap' && !(chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc) && (
+                    <NutThemPhutCa
+                      tong={chiTiet.themPhutTong}
+                      chay={() => themPhutCa(chiTiet.ca.maCa)}
+                      onXong={(k) => {
+                        showToast(cauKetQuaThemPhut(k), 'success')
+                        void tai(chiTiet.ca.maCa, true) // tải lại: hạn giờ mới hiện ngay ở đồng hồ vòng
+                      }}
+                    />
+                  )}
+                  <button type="button" onClick={() => setHoiXoa(true)} className="ct-nut ct-nut-vien ct-nut-nho" style={{ width: '100%', marginTop: 10, color: 'var(--gvm-ho-dam)' }}>
+                    <Trash2 size={16} aria-hidden="true" /> Xoá ca này
+                  </button>
+                </>
+              }
             />
+            </>
           ) : (
             <KetThucCa
               tenCa={tenHienCua(chiTiet.ca.tenCa, chiTiet.ca.maCa)}
@@ -1421,30 +1807,57 @@ export default function ExamMonitorScreen() {
               emChuaNop={dsEm.filter((e) => e.moiNhat.trangThai === 'dang_lam' || e.moiNhat.trangThai === 'duoc_duyet_lai').map((e) => ({ sbd: e.sbd, hoTen: e.hoTen }))}
             />
           )}
+          {/* HỘP XÁC NHẬN KHOÁ — nêu ĐÚNG SỐ ĐẾM THẬT, không nói chung chung.
+              Thầy phải biết mình đang cắt bài của mấy em trước khi bấm. */}
+          {hoiDongCua && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }} role="dialog" aria-modal="true">
+              <div className="w-full flex flex-col" style={{ maxWidth: 460, maxHeight: '90vh', overflowY: 'auto', background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', boxShadow: 'var(--bong-2)' }}>
+              <div data-hop="dong-cua" style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Đóng cửa vào ca {chiTiet.ca.maCa}?</div>
+              <OThongBao tone="cam">
+                {chuaVao === null ? 'Em nào chưa vào sẽ không vào được nữa.' : <><b style={SO}>{chuaVao}</b> em chưa vào sẽ không vào được nữa.</>}{' '}
+                <b style={SO}>{dangLamNgay}</b> em đang làm vẫn làm tiếp tới hết giờ.
+              </OThongBao>
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Em được thầy duyệt thi lại vẫn vào được. Ca vẫn mở, chưa nộp bài của ai.</div>
+              <div className="flex" style={{ gap: 'var(--k3)', marginTop: 'var(--k4)' }}>
+                <button type="button" onClick={() => setHoiDongCua(false)} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}>
+                  Huỷ
+                </button>
+                <button type="button" onClick={dongCuaVaoNay} disabled={dangDongCua} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--cam)', color: 'var(--giay)' }}>
+                  {dangDongCua ? 'Đang đóng…' : 'Đóng cửa vào'}
+                </button>
+              </div>
+              </div>
+            </div>
+          )}
+
+          {hoiKhoa && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'var(--phu)' }} role="dialog" aria-modal="true">
+              <div className="w-full flex flex-col" style={{ maxWidth: 460, maxHeight: '90vh', overflowY: 'auto', background: 'var(--the)', borderRadius: 'var(--bo-3)', padding: 'var(--k5)', boxShadow: 'var(--bong-2)' }}>
+              <div data-hop="khoa-ca" style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Kết thúc ca {chiTiet.ca.maCa}?</div>
+              <OThongBao tone="do">
+                <b style={SO}>{dangLamNgay}</b> em đang làm bài sẽ bị nộp bài ngay, chấm theo phần đã làm.{' '}
+                {chuaVao === null ? 'Em nào chưa vào sẽ không vào được nữa.' : <>
+                  <b style={SO}>{chuaVao}</b> em chưa vào sẽ không vào được nữa.
+                </>}
+              </OThongBao>
+              <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Mở ca lại được, nhưng em đã bị nộp thì phải duyệt thi lại từng em.</div>
+              <div className="flex" style={{ gap: 'var(--k3)', marginTop: 'var(--k4)' }}>
+                <button type="button" onClick={() => setHoiKhoa(false)} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}>
+                  Huỷ
+                </button>
+                <button type="button" onClick={khoaCaNay} disabled={dangKhoa} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--do)', color: 'var(--giay)' }}>
+                  {dangKhoa ? 'Đang kết thúc…' : 'Kết thúc ca'}
+                </button>
+              </div>
+              </div>
+            </div>
+          )}
+
+          {/* CA ĐANG MỞ: KHÔNG còn hai cột dưới (thầy 29/09 "bỏ từ phần 12:17 chỉ để lại phần trên") — mọi thứ đã cắm vào khu trên ở trên. */}
+          {chiTiet.ca.trangThai !== 'mo' && (
           <div className="ca-luoi">
           <div className="ca-cot ca-cot-phai">
-          {/* PHÒNG CHỜ (thầy chốt 07/09; làm lại 28/09 theo M3 — src/components/ca-thi/PhongChoCa.tsx). Ca bật phòng chờ mà thầy chưa bấm
-              bắt đầu thì em đang đứng ở màn chờ — việc gấp nhất trên màn này, nên đứng đầu cột. Hai nút như thầy chốt: Bắt đầu thi và Huỷ ca kiểm tra.
-              Danh sách em tự làm mới 5 giây (cùng lệnh chiTietCa của Chiếu mã); màn Chiếu mã đang mở thì nghỉ để không gọi trùng. */}
-          {chiTiet.ca.phongCho && !chiTiet.ca.batDauThiLuc && (
-            <PhongChoCa
-              maCa={chiTiet.ca.maCa}
-              em={gopEmDaVao(chiTiet.dsCho, [])}
-              siSo={Array.isArray(chiTiet.ca.danhSachMoi) ? chiTiet.ca.danhSachMoi.length : null}
-              onCauSai={caCanDeRieng}
-              coDongBoGio={chiTiet.ca.loai !== 'baitap'}
-              dongBoGio={gioChungTheoCa[chiTiet.ca.maCa] ?? chiTiet.ca.dongBoGio ?? false}
-              onDoiDongBoGio={(bat) => setGioChungTheoCa((c) => ({ ...c, [chiTiet.ca.maCa]: bat }))}
-              dangBatDau={dangBatDau}
-              onBatDau={() => void batDauCaNay()}
-              dangHuy={dangXoa}
-              onHuy={() => void huyCaCho()}
-              noiKhoiPhuc={hoa2 ? 'Ca vào Ca kiểm tra › Ca đã xoá, khôi phục lại được.' : 'Ca vào Lịch sử ca, khôi phục lại được.'}
-              onChieuMa={() => setChieuMa(true)}
-              tuCapNhat
-              matKetNoi={soHut > 0}
-            />
-          )}
+          {vePhongCho()}
           <KhoiThoiGianCa
             ca={chiTiet.ca}
             themPhut={{
@@ -1463,185 +1876,11 @@ export default function ExamMonitorScreen() {
                 - Cửa vào ca, giờ bắt đầu phòng chờ, nút Mở ca (khi quá giờ vào / đã khoá), câu em sai buổi trước, em bị chặn ở cổng danh sách, Xoá ca này
                   ⇒ không có chỗ nào khác làm được ⇒ DỜI GỌN vào đáy thẻ Thời gian này (một thẻ thay cho hai). */}
             <div className="gv-monitor-overview" style={{ display: 'contents' }}>
-              <DongMatKetNoiCa soHut={soHut} gioTotMs={gioTot} />
-              {/* CỬA VÀO CA: trạng thái nói bằng chữ. KHOÁ CA cũ đã gỡ 28/09 (trùng "Kết thúc ca ngay"); MỞ CA chỉ hiện khi cửa đang đóng — cũng dùng khi
-                  QUÁ GIỜ VÀO: nó gỡ hạn vào phòng, em đến muộn vào được ngay. */}
-              <p className="ca-gio-dong" data-cua-vao={cua.nhan}>
-                Cửa vào ca: <b style={{ color: cua.moCua ? 'var(--xanh)' : 'var(--do)' }}>{cua.nhan}</b>
-                {cua.daKhoa && chiTiet.ca.khoaLuc ? (
-                  <>
-                    {' '}
-                    lúc <span style={SO}>{gio(chiTiet.ca.khoaLuc)}</span>
-                    {chiTiet.ca.khoaBoi ? ` bởi ${chiTiet.ca.khoaBoi}` : ''}
-                  </>
-                ) : null}
-                {!cua.daKhoa && chiTiet.ca.hetHanVao ? (
-                  <>
-                    {' '}
-                    · {cua.quaGioVao ? 'hạn' : 'đến'} <span style={SO}>{gio(chiTiet.ca.hetHanVao)}</span>
-                  </>
-                ) : null}
-              </p>
-              {chiTiet.ca.phongCho && chiTiet.ca.batDauThiLuc && (
-                <p className="ca-gio-dong">
-                  Phòng chờ đã mở lúc <span style={SO}>{gio(chiTiet.ca.batDauThiLuc)}</span> — {chiTiet.ca.dongBoGio ? `đồng bộ giờ cả phòng, cùng hết giờ lúc ${gio(new Date(Date.parse(chiTiet.ca.batDauThiLuc) + chiTiet.ca.thoiGianPhut * 60000).toISOString())}.` : 'em vào từ giờ nhận đề ngay, tính giờ riêng từng em.'}
-                </p>
-              )}
-              {!cua.moCua && (
-                <div className="grid grid-cols-1" style={{ gap: 'var(--k2)' }}>
-                  <button
-                    type="button"
-                    onClick={moLaiCa}
-                    disabled={dangKhoa || !cua.moDuoc}
-                    aria-label="Mở ca cho em vào"
-                    className="tap-target flex items-center"
-                    style={{
-                      minHeight: 64,
-                      gap: 'var(--k2)',
-                      padding: '0 var(--k3)',
-                      borderRadius: 'var(--bo-3)',
-                      border: 'none',
-                      textAlign: 'left',
-                      background: cua.moDuoc ? 'var(--xanh)' : 'var(--the-2)',
-                      color: cua.moDuoc ? 'var(--muc-nguoc)' : 'var(--mo)',
-                      boxShadow: cua.moDuoc ? 'var(--bong-2)' : 'none',
-                      transition: 'transform 120ms ease, box-shadow 120ms ease',
-                    }}
-                  >
-                    <span
-                      className="flex items-center justify-center shrink-0"
-                      style={{ width: 36, height: 36, borderRadius: 'var(--bo-tron)', background: cua.moDuoc ? 'var(--xanh-nen)' : 'var(--the)', color: cua.moDuoc ? 'var(--xanh)' : 'var(--mo)' }}
-                    >
-                      <Unlock size={19} />
-                    </span>
-                    <span className="flex flex-col" style={{ gap: 1, minWidth: 0 }}>
-                      <span className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)' }}>
-                        {dangKhoa && cua.moDuoc ? 'Đang mở…' : 'Mở ca'}
-                      </span>
-                      <span style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-0)', opacity: 0.85 }}>Em vào được ngay</span>
-                    </span>
-                  </button>
-                </div>
-                )}
-              {!cua.moCua && (
-                <p className="ca-gio-dong">Mở ca: bỏ hạn giờ vào phòng, em đến muộn vào được ngay. Em đã bị nộp do kết thúc ca phải duyệt thi lại từng em.</p>
-              )}
-            {laCaDeRieng && (
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setMoSaiLai((v) => !v)}
-                  aria-expanded={moSaiLai}
-                  className="tap-target font-bold w-full"
-                  style={{
-                    ...SO,
-                    textAlign: 'left',
-                    minHeight: 44,
-                    padding: 'var(--k2) var(--k3)',
-                    borderRadius: 'var(--bo-1)',
-                    background: tongKetLap.soEmCoLap === 0 ? 'var(--cam-nen)' : tongKetLap.tongSaiLai > 0 ? 'var(--do-nen)' : 'var(--xanh-nen)',
-                    color: tongKetLap.soEmCoLap === 0 ? 'var(--cam)' : tongKetLap.tongSaiLai > 0 ? 'var(--do)' : 'var(--xanh)',
-                    border: 'none',
-                    fontSize: 'var(--cx-1)',
-                  }}
-                >
-                  {tongKetLap.soEmCoLap === 0
-                    ? 'Câu em sai buổi trước · chưa rút được câu nào'
-                    : tongKetLap.tongSaiLai > 0
-                      ? `${tongKetLap.emSaiLai.length} em còn sai lại câu từng sai · ${tongKetLap.tongSaiLai}/${tongKetLap.tongCauLap} câu`
-                      : `Cả ${tongKetLap.soEmCoLap} em đã sửa được hết ${tongKetLap.tongCauLap} câu từng sai`}
-                  <span style={{ ...NHAN_NHO, display: 'block', color: 'inherit', opacity: 0.85 }}>
-                    {moSaiLai ? 'Bấm để gập lại' : tongKetLap.soEmCoLap === 0 ? 'Bấm để xem vì sao' : 'Bấm để xem chi tiết từng em, từng câu'}
-                  </span>
-                </button>
-
-                {moSaiLai && (
-                  <div className="flex flex-col" style={{ gap: 'var(--k2)', marginTop: 'var(--k2)' }}>
-                    {bienBanLap && <BangBienBanLap bb={bienBanLap} tenCua={(sbd) => dsEm.find((e) => e.sbd === sbd)?.hoTen || ''} />}
-                    {!bienBanLap && tongKetLap.soEmCoLap === 0 && (
-                      <div style={{ ...NHAN_NHO, color: 'var(--cam)', lineHeight: 1.6 }}>
-                        Máy này không giữ biên bản lúc rút đề. Bấm Bắt đầu ở máy khác thì biên bản nằm ở máy đó; mở lại ca sau khi máy chủ đã ghi bản đồ thì
-                        bảng trên vẫn đếm đúng.
-                      </div>
-                    )}
-                    {tongKetLap.emSaiLai.map((e) => (
-                      <div key={`sailai-${e.sbd}`} style={{ background: 'var(--the-2)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
-                        <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-                          {e.hoTen || `SBD ${e.sbd}`} <span style={{ ...NHAN_NHO, ...SO }}>· SBD {e.sbd}</span>
-                        </div>
-                        {/* GỌI ĐÚNG TÊN CON SỐ. Biên bản ghi "rút được 8" còn
-                            chỗ này từng ghi "hỏi lại 9 câu" — thầy đọc ra hai số
-                            vênh nhau (08/09). Cả hai đều đúng, chỉ đếm hai tập
-                            khác nhau. Xem dem-cau-hoi-lai.ts. */}
-                        <div style={{ ...NHAN_NHO, ...SO }}>
-                          {dongSoCauHoiLai({
-                            tong: e.lap!.tong,
-                            daSua: e.lap!.daSua,
-                            saiLai: e.lap!.saiLai,
-                            rutChuDong: bienBanLap?.soLapCua?.[e.sbd] ?? null,
-                          })}
-                        </div>
-                        <div className="flex flex-col" style={{ gap: 4, marginTop: 'var(--k2)' }}>
-                          {e.lap!.saiLaiChiTiet.map((c) => (
-                            <div key={`${e.sbd}-${c.qid}`} style={{ ...NHAN_NHO, color: 'var(--muc)' }}>
-                              <b style={SO}>
-                                Câu {c.soCau} phần {c.phan}
-                              </b>
-                              {c.chuyenDe ? ` · ${c.chuyenDe}` : ''} · <span style={{ color: 'var(--do)' }}>{c.soLanSai > 0 ? `sai lần thứ ${c.soLanSai}` : 'lại sai'}</span>
-                              <span style={{ ...SO, display: 'block', color: 'var(--nhat)' }}>
-                                {/* Cùng luật với hai cổng kia: phần EM CHỌN tô đỏ,
-                                    phần đáp án đúng giữ màu chữ thường. */}
-                                đúng: {c.dapAnDung || '—'} · em chọn:{' '}
-                                <b style={{ color: 'var(--do)' }}>{c.dapAnChon || 'bỏ trống'}</b>
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                    {tongKetLap.emSachTron.length > 0 && (
-                      <div style={{ ...NHAN_NHO, color: 'var(--xanh)' }}>
-                        Sửa được hết: {tongKetLap.emSachTron.map((e) => e.hoTen || `SBD ${e.sbd}`).join(' · ')}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {chiTiet.biChan && chiTiet.biChan.length > 0 && (
-              <div>
-                <div style={{ ...NHAN_NHO, marginBottom: 'var(--k2)' }}>
-                  Bị chặn ở cổng danh sách (<b style={SO}>{chiTiet.biChan.length}</b> lượt)
-                </div>
-                <div className="flex flex-col" style={{ gap: 'var(--k2)' }}>
-                  {chiTiet.biChan.slice(0, 8).map((b, i) => (
-                    <div key={`${b.luc}-${i}`} style={{ background: 'var(--cam-nen)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)' }}>
-                      <div className="font-bold" style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-2)', color: 'var(--muc)' }}>
-                        SBD <span style={SO}>{b.sbd}</span> · {moTaLyDoChan(b.lyDo)}
-                      </div>
-                      <div style={NHAN_NHO}>
-                        Em gõ: <b>{b.hoTenGoi || '(trống)'}</b>
-                        {b.namSinhGoi ? <> · sinh <span style={SO}>{b.namSinhGoi}</span></> : null}
-                      </div>
-                      <div style={NHAN_NHO}>
-                        {b.hoTenDs ? (
-                          <>
-                            Danh sách: <b>{b.hoTenDs}</b>
-                            {b.namSinhDs ? <> · sinh <span style={SO}>{b.namSinhDs}</span></> : null}
-                          </>
-                        ) : (
-                          'Danh sách lớp không có số báo danh này'
-                        )}
-                        {b.luc ? <> · lúc <span style={SO}>{gio(b.luc)}</span></> : null}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+              {veCuaVao()}
+              {veSaiLai()}
+              {veBiChan()}
               <div className="ca-hang-nut">
-                {chiTiet.ca.trangThai !== 'mo' && (
+                {/* Ca đã đóng: không có đầu màn Theo dõi ⇒ hai link nhỏ ở đây. */}
                   <>
                     <button type="button" className="ca-nut-nho" onClick={copyLink}>
                       {daCopy ? <Check size={16} aria-hidden /> : <LogIn size={16} aria-hidden />}
@@ -1652,7 +1891,6 @@ export default function ExamMonitorScreen() {
                       {daCopyDiem ? 'Đã copy' : 'Link xem điểm'}
                     </button>
                   </>
-                )}
                 <button type="button" onClick={() => setHoiXoa(true)} className="ca-nut-nho ca-nut-nho--do">
                   <Trash2 size={14} aria-hidden /> Xoá ca này
                 </button>
@@ -1660,55 +1898,7 @@ export default function ExamMonitorScreen() {
             </div>
           </KhoiThoiGianCa>
 
-          {/* HỘP XÁC NHẬN KHOÁ — nêu ĐÚNG SỐ ĐẾM THẬT, không nói chung chung.
-              Thầy phải biết mình đang cắt bài của mấy em trước khi bấm. */}
-          {hoiDongCua && (
-            <TheNoiDung>
-              <div data-hop="dong-cua" style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Đóng cửa vào ca {chiTiet.ca.maCa}?</div>
-              <OThongBao tone="cam">
-                {chuaVao === null ? 'Em nào chưa vào sẽ không vào được nữa.' : <><b style={SO}>{chuaVao}</b> em chưa vào sẽ không vào được nữa.</>}{' '}
-                <b style={SO}>{dangLamNgay}</b> em đang làm vẫn làm tiếp tới hết giờ.
-              </OThongBao>
-              <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Em được thầy duyệt thi lại vẫn vào được. Ca vẫn mở, chưa nộp bài của ai.</div>
-              <div className="flex" style={{ gap: 'var(--k3)', marginTop: 'var(--k4)' }}>
-                <button type="button" onClick={() => setHoiDongCua(false)} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}>
-                  Huỷ
-                </button>
-                <button type="button" onClick={dongCuaVaoNay} disabled={dangDongCua} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--cam)', color: 'var(--giay)' }}>
-                  {dangDongCua ? 'Đang đóng…' : 'Đóng cửa vào'}
-                </button>
-              </div>
-            </TheNoiDung>
-          )}
-
-          {hoiKhoa && (
-            <TheNoiDung>
-              <div data-hop="khoa-ca" style={{ ...TIEU_DE_MUC, marginBottom: 'var(--k3)' }}>Kết thúc ca {chiTiet.ca.maCa}?</div>
-              <OThongBao tone="do">
-                <b style={SO}>{dangLamNgay}</b> em đang làm bài sẽ bị nộp bài ngay, chấm theo phần đã làm.{' '}
-                {chuaVao === null ? 'Em nào chưa vào sẽ không vào được nữa.' : <>
-                  <b style={SO}>{chuaVao}</b> em chưa vào sẽ không vào được nữa.
-                </>}
-              </OThongBao>
-              <div style={{ ...NHAN_NHO, marginTop: 'var(--k3)' }}>Mở ca lại được, nhưng em đã bị nộp thì phải duyệt thi lại từng em.</div>
-              <div className="flex" style={{ gap: 'var(--k3)', marginTop: 'var(--k4)' }}>
-                <button type="button" onClick={() => setHoiKhoa(false)} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--the-2)', color: 'var(--muc)' }}>
-                  Huỷ
-                </button>
-                <button type="button" onClick={khoaCaNay} disabled={dangKhoa} className="tap-target flex-1 font-bold" style={{ height: 48, borderRadius: 'var(--bo-1)', background: 'var(--do)', color: 'var(--giay)' }}>
-                  {dangKhoa ? 'Đang kết thúc…' : 'Kết thúc ca'}
-                </button>
-              </div>
-            </TheNoiDung>
-          )}
-
-          {loi && <OThongBao tone="do">{loi}</OThongBao>}
-          {!teacherBank && dsEm.some((e) => e.moiNhat.dapAn) && (
-            <OThongBao tone="cam">
-              Máy này chưa lấy được ngân hàng CÓ đáp án của ca. Ca mở khi chưa bật "xem điểm" thì đáp án không nằm trên máy chủ, chỉ máy đã mở ca mới chấm được — điểm hiện ra là điểm đã ghi trên Sheet.
-            </OThongBao>
-          )}
-
+          {veCanhBao()}
           {/* GỌI LÊN BẢNG đã GỠ khỏi màn này (thầy chốt 05/09). Nó có màn riêng
               ở thanh điều hướng, chọn được nhiều đề và nhiều lớp. Nhét thêm
               vào đây thì màn coi thi dài gấp đôi, mà lúc đang coi thi thì thầy
@@ -1725,22 +1915,7 @@ export default function ExamMonitorScreen() {
                 nên cột tên của lượt bỏ trống, và phiếu gửi phụ huynh in
                 "SBD 10038" thay vì tên con. Danh sách lớp có sẵn tên, chỉ cần
                 một nút kéo sang. Nút chỉ hiện khi thật sự có em thiếu tên. */}
-            {emThieuTen.length > 0 && (
-              <div style={{ background: 'var(--cam-nen)', borderRadius: 'var(--bo-1)', padding: 'var(--k3)', marginBottom: 'var(--k3)' }}>
-                <div style={{ fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)', color: 'var(--muc)' }}>
-                  <b style={SO}>{emThieuTen.length}</b> em trong ca chưa có họ tên, phiếu gửi phụ huynh sẽ in số báo danh thay cho tên con.
-                </div>
-                <button
-                  type="button"
-                  onClick={() => void dongBoTenChoCa()}
-                  disabled={dangDongBoTen}
-                  className="tap-target font-bold"
-                  style={{ marginTop: 'var(--k2)', minHeight: 40, padding: '0 var(--k4)', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)', border: 'none', fontFamily: 'var(--sans)', fontSize: 'var(--cx-1)' }}
-                >
-                  {dangDongBoTen ? 'Đang đồng bộ…' : 'Lấy tên từ danh sách lớp'}
-                </button>
-              </div>
-            )}
+            {veThieuTen()}
             <div id="ca-bang-em" className="ca-bang" role="tabpanel" aria-labelledby={`ca-tab-${tabHieu}`}>
             {tabHieu === 'cho' ? (
               emChoVao.length === 0 ? (
@@ -1854,72 +2029,7 @@ export default function ExamMonitorScreen() {
                           {l.soLanRoiMan === 0 && !chuTatDe(l.integrity) && <span className="ca-khong" aria-label="Không có cảnh báo">—</span>}
                       </span>
                       <span className="ca-hd">
-                          {/* GAME HÓA 2.0: app phụ huynh tắt ⇒ tin báo không tới ai — bỏ nút (RA-SOAT mục 3). */}
-                          {!hoa2 && (l.trangThai === 'khoa' || l.soLanRoiMan > 0) && (
-                            <button type="button" onClick={() => moBaoPhuHuynh(e.sbd, l.hoTen, l)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--cam)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--cam)' }}>
-                              Báo phụ huynh
-                            </button>
-                          )}
-                          {l.trangThai === 'khoa' &&
-                            (xacNhanMoKhoa === e.sbd ? (
-                              <span className="inline-flex items-center" style={{ gap: 4 }}>
-                                <button type="button" onClick={() => handleMoKhoa(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
-                                  {dangDuyet === e.sbd ? '…' : 'Đồng ý mở khoá'}
-                                </button>
-                                <button type="button" onClick={() => setXacNhanMoKhoa(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
-                                  Huỷ
-                                </button>
-                              </span>
-                            ) : (
-                              <button type="button" onClick={() => setXacNhanMoKhoa(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--do)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--do)' }}>
-                                Mở khoá
-                              </button>
-                            ))}
-                          {l.trangThai === 'duoc_duyet_lai' &&
-                            l.khoaMay !== false &&
-                            (xacNhanMayKhac === e.sbd ? (
-                              /* Nói rõ việc này làm gì TRƯỚC khi thầy bấm: chỉ gỡ khoá máy, không xoá gì, không đổi đề. */
-                              <span className="inline-flex flex-col" style={{ gap: 4 }}>
-                                <span style={{ ...NHAN_NHO, lineHeight: 1.5 }}>
-                                  Em sẽ vào được bằng MÁY KHÁC (không còn buộc vào máy cũ). Đề mới giữ nguyên; máy cũ cũng vẫn vào được.
-                                </span>
-                                <span className="inline-flex items-center" style={{ gap: 4 }}>
-                                  <button type="button" onClick={() => handleChoVaoMayKhac(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--muc)', color: 'var(--muc-nguoc)' }}>
-                                    {dangDuyet === e.sbd ? '…' : 'Đồng ý cho vào bằng máy khác'}
-                                  </button>
-                                  <button type="button" onClick={() => setXacNhanMayKhac(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
-                                    Huỷ
-                                  </button>
-                                </span>
-                              </span>
-                            ) : (
-                              <button type="button" onClick={() => setXacNhanMayKhac(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>
-                                Cho vào bằng máy khác
-                              </button>
-                            ))}
-                          {daNop &&
-                            (xacNhanSbd === e.sbd ? (
-                              /* NÓI RÕ NÓ XOÁ GÌ trước khi thầy bấm. Việc này
-                                 KHÔNG khôi phục được: điểm, bài làm và chi tiết
-                                 từng câu của lượt cũ mất hẳn. */
-                              <span className="inline-flex flex-col" style={{ gap: 4 }}>
-                                <span style={{ ...NHAN_NHO, color: 'var(--do)', lineHeight: 1.5 }}>
-                                  Xoá hẳn điểm và bài làm lượt này của em, rút đề mới, và em chỉ vào lại được ở đúng máy cũ. Không khôi phục được.
-                                </span>
-                                <span className="inline-flex items-center" style={{ gap: 4 }}>
-                                <button type="button" onClick={() => handleChoThiLai(e.sbd)} disabled={dangDuyet === e.sbd} className="tap-target font-bold" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--do)', color: 'var(--muc-nguoc)' }}>
-                                  {dangDuyet === e.sbd ? '…' : 'Xoá lượt cũ và cho thi lại'}
-                                </button>
-                                <button type="button" onClick={() => setXacNhanSbd(null)} className="tap-target" style={{ ...NHAN_NHO, minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', background: 'var(--the)' }}>
-                                  Huỷ
-                                </button>
-                                </span>
-                              </span>
-                            ) : (
-                              <button type="button" onClick={() => setXacNhanSbd(e.sbd)} className="tap-target font-bold" style={{ ...NHAN_NHO, color: 'var(--muc)', minHeight: 44, padding: '0 10px', borderRadius: 'var(--bo-tron)', border: '1px solid var(--vien-dam)' }}>
-                                Cho thi lại
-                              </button>
-                            ))}
+                        {veHanhDongEm(e)}
                       </span>
                       <span className="ca-o ca-o-diem">
                         <span className="block font-bold" style={{ ...SO, fontSize: 'var(--cx-4)', color: e.diem === null ? 'var(--mo)' : 'var(--muc)' }}>
@@ -1949,20 +2059,9 @@ export default function ExamMonitorScreen() {
           {/* CÂU HỎI CỦA EM (HOIBAITHAY.md mục 4C). Không gọi máy chủ cho tới
               khi thầy bấm — Chi tiết ca đã đủ nặng, thêm một lệnh nữa mỗi lần
               mở màn là đi ngược việc giảm tải vừa làm. */}
-          {chiTiet && (
-            <KhoiCauHoiEm
-              scriptUrl={scriptUrl.trim()}
-              secret={secret.trim()}
-              maCa={chiTiet.ca.maCa}
-              tenCa={chiTiet.ca.tenCa || ''}
-              lop={chiTiet.ca.lop || ''}
-              banks={teacherBank}
-              showToast={showToast}
-            />
+          </div>
+          </div>
           )}
-
-          </div>
-          </div>
 
           {/* BÁO PHỤ HUYNH — thầy đọc lại, sửa, rồi mới gửi */}
           {tinBao && (
@@ -2065,6 +2164,14 @@ export default function ExamMonitorScreen() {
             setMoBaoCao(null)
             setSbdHoSo('')
           }}
+          viecVoiEm={(() => {
+            // Ca đang mở: bảng từng em đã bỏ (thầy 29/09) ⇒ việc của em nằm trong hồ sơ em. Chỉ vẽ khi em có việc để làm.
+            const e = chiTiet.ca.trangThai === 'mo' ? dsEm.find((x) => x.sbd === sbdHoSo) : undefined
+            if (!e) return null
+            const t = e.moiNhat.trangThai
+            const coViec = t === 'khoa' || t === 'da_nop' || (t === 'duoc_duyet_lai' && e.moiNhat.khoaMay !== false) || (!hoa2 && e.moiNhat.soLanRoiMan > 0)
+            return coViec ? veHanhDongEm(e) : null
+          })()}
           onToanCanh={(sbd) => moToanCanh(sbd)}
           onGiaoRieng={(sbd) => {
             datSbdGiaoRieng(sbd) // màn Giao bài mở sẵn chế độ chọn từng em, đã tick em này

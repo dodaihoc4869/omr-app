@@ -2,7 +2,7 @@
 // bằng MỘT phong cách: hai tab Cả lớp / Từng em. Số liệu: `BaoCaoCaLop` + `ThemBaoCaoCa` (máy chủ `/gv/bao-cao-ca`: hocSinh, maTran, tbCaTruoc, aiDaLo) và `BaoCaoMotEm`
 // (bản tính sẵn có ở màn Theo dõi, ghép máy chủ khi thiếu bảng chấm). Nhận xét của thầy: `/gv/nhan-xet-ca-em`.
 // IN / LƯU PDF: `window.print()` + `@media print` A4 (ca-thi.css) — vẽ vào cổng `body > .ct-in-goc`, lúc in chỉ vùng này hiện (khung app ẩn), hộp In của trình duyệt có "Lưu PDF".
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowLeft, Printer, TrendingDown, TrendingUp } from 'lucide-react'
 import type { BaoCaoCaLop } from '../../lib/bao-cao-ca-lop'
@@ -49,6 +49,9 @@ export interface BaoCaoChiTietProps {
   onGiaoRieng?: (sbd: string) => void
   /** Chỉ để test: bỏ cổng (vẽ tại chỗ). */
   khongCong?: boolean
+  /** VIỆC VỚI EM ĐANG CHỌN (thầy 29/09: màn Theo dõi ca chỉ còn khu trên ⇒ Cho thi lại / Cho vào bằng máy khác / Mở khoá / Báo phụ huynh của từng em
+   *  dời vào đây — chạm thẻ em là tới). Màn cha vẽ sẵn nút + câu hỏi lại; vắng ⇒ không có khối. Không in ra PDF. */
+  viecVoiEm?: ReactNode
   /** `hs` = EM XEM BÁO CÁO CỦA CHÍNH MÌNH (thầy 28/09 "thay thế hết bằng bản mới"): chỉ trang "Từng em" của đúng em ấy — không tab Cả lớp,
    * không chọn em, không hạng, không so với lớp, không tên/điểm em khác, không mã ca, không ô nhận xét để sửa. Mặc định `gv`. */
   cheDo?: 'gv' | 'hs'
@@ -393,6 +396,14 @@ export default function BaoCaoChiTiet(p: BaoCaoChiTietProps) {
         </select>
       </div>
       )}
+      {!laHs && p.sbdEm && p.viecVoiEm ? (
+        <div className="ct-tam ct-khong-in" style={{ padding: '12px 16px' }} aria-label="Việc với em này">
+          <div className="ct-ghi" style={{ fontWeight: 700, color: 'var(--gvm-chu-2)', marginBottom: 8 }}>
+            Việc với em này
+          </div>
+          <div className="ct-viec-em">{p.viecVoiEm}</div>
+        </div>
+      ) : null}
       {!p.sbdEm ? (
         <div className="ct-tam ct-ghi">Chọn một em để xem báo cáo.</div>
       ) : !b || b.tong === null ? (

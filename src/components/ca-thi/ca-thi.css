@@ -1937,3 +1937,59 @@ table.ct-bang {
   background: var(--gvm-ho);
   color: var(--gvm-tren-dac);
 }
+
+/* KHU TRÊN LÀ CẢ MÀN (thầy 29/09: "bỏ từ phần 12:17 chỉ để lại phần trên") — các dòng/nút dời lên từ thẻ Thời gian + bảng dưới */
+.ct-dong-phu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--gvm-chu-2);
+}
+.ct-dong-phu p {
+  margin: 0;
+  line-height: 1.5;
+}
+.ct-dong-phu b {
+  color: var(--gvm-chu);
+}
+.ct-them-phut {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+.ct-them-phut > .ct-nut {
+  width: 100%;
+}
+.ct-them-phut-da {
+  font-weight: 600;
+  opacity: 0.85;
+}
+.ct-them-phut-hoi {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--gvm-hp-nen);
+  color: var(--gvm-hp-dam);
+}
+.ct-them-phut-hoi p {
+  margin: 0 0 10px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.ct-them-phut-loi {
+  color: var(--gvm-ho-dam);
+}
+.ct-cb-tu-do {
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--gvm-mat-2);
+  color: var(--gvm-chu);
+  font-size: 13.5px;
+}
+.ct-viec-em {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

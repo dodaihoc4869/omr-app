@@ -77,7 +77,7 @@ afterEach(() => {
 const mo = async (trangThai: 'mo' | 'dong', congBo = 'khong') => {
   m.detail.mockImplementation(async () => ({ ca: { ...CA(trangThai), congBo }, luot: DS.map((l) => ({ ...l })), dsCho: [], biChan: [] }))
   const r = render(<ExamMonitorScreen />)
-  await screen.findByRole('tablist', { name: 'Lọc học sinh theo trạng thái' })
+  await waitFor(() => expect(document.querySelector('[data-vung="theo-doi-ca"], [data-vung="ket-thuc-ca"]')).toBeTruthy()) // 29/09: ca đang mở không còn bảng (tab lọc) ⇒ chờ khu trên
   return r
 }
 
@@ -114,7 +114,7 @@ describe('(b) Theo dõi ca — đầu màn mới', () => {
   it('hạn vào phòng đã qua ⇒ nút chìm "Đã đóng cửa vào"', async () => {
     m.detail.mockImplementation(async () => ({ ca: { ...CA('mo'), hetHanVao: ISO(BAY_GIO - 60000) }, luot: DS.map((l) => ({ ...l })), dsCho: [], biChan: [] }))
     const { container } = render(<ExamMonitorScreen />)
-    await screen.findByRole('tablist', { name: 'Lọc học sinh theo trạng thái' })
+    await waitFor(() => expect(document.querySelector('[data-vung="theo-doi-ca"], [data-vung="ket-thuc-ca"]')).toBeTruthy()) // 29/09: ca đang mở không còn bảng (tab lọc) ⇒ chờ khu trên
     const dau = container.querySelector('[data-vung="theo-doi-ca"]') as HTMLElement
     expect((within(dau).getByRole('button', { name: 'Đã đóng cửa vào' }) as HTMLButtonElement).disabled).toBe(true)
   })

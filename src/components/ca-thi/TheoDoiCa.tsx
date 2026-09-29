@@ -1,7 +1,7 @@
 // (b) THEO DÕI CA — đầu màn theo bản vẽ thầy chốt 28/09/2026 (docs/ban-ve-ca-thi-2809, màn b): tên ca + link + Chép link + đồng hồ vòng; 4 thẻ số màu theo nghĩa
 // (Đang làm xanh dương · Đã nộp xanh lục · Chưa vào hổ phách · Cảnh báo hồng) + thanh cả lớp; lưới thẻ từng em có lọc; "Cần thầy xử lý" (khoá bài → Mở khoá sẵn có;
 // rời màn; chưa vào); Việc nhanh (Chiếu mã, Đóng cửa vào, Kết thúc ca — cả hai HỎI LẠI ở hộp xác nhận của màn cha). Chỉ VẼ số màn cha đã đếm; mọi lệnh đi qua hàm sẵn có của màn cha.
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { AlertTriangle, BarChart3, Copy, DoorClosed, Lock, MonitorPlay, RefreshCw, Users } from 'lucide-react'
 import { soVn } from '../../lib/ket-qua-sau-nop'
 import { gioMayChu } from '../../lib/gio-may-chu'
@@ -40,6 +40,14 @@ export interface TheoDoiCaProps {
   /** Chép link XEM ĐIỂM (dời lên từ thẻ thông tin ca cũ, 29/09) — cạnh nút Chép link vào thi. */
   onChepLinkDiem?: () => void
   daChepLinkDiem?: boolean
+  /** KHU TRÊN LÀ CẢ MÀN (thầy 29/09: "bỏ từ phần 12:17 chỉ để lại phần trên"): các chỗ cắm cho những dòng/nút dời lên từ phía dưới.
+   *  `dongPhu` dưới dòng thông tin ca (cửa vào ca, phòng chờ, Mở ca, mất kết nối); `canXuLyThem` đầu "Cần thầy xử lý" (đếm vào số `soCanXuLyThem`);
+   *  `viecNhanhThem` cuối "Việc nhanh" (Thêm 5 phút, Xoá ca); `cotPhaiThem` dưới "Việc nhanh". */
+  dongPhu?: ReactNode
+  canXuLyThem?: ReactNode
+  soCanXuLyThem?: number
+  viecNhanhThem?: ReactNode
+  cotPhaiThem?: ReactNode
   em: EmTheoDoi[]
   /** null = ca không có danh sách mời (không biết sĩ số) ⇒ ẩn số "Chưa vào". */
   soChuaVao: number | null
@@ -102,7 +110,7 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
   const cv = 2 * Math.PI * vongR
   const tiLeCon = phutCon === null ? 0 : Math.min(1, phutCon / Math.max(1, p.thoiGianPhut * 60))
   const pt = (n: number) => (tong > 0 ? `${((n / tong) * 100).toFixed(1)}%` : '0%')
-  const coCanXuLy = biKhoa.length + roiMan.length + (soChuaVao ? 1 : 0)
+  const coCanXuLy = biKhoa.length + roiMan.length + (soChuaVao ? 1 : 0) + (p.soCanXuLyThem ?? 0)
   return (
     <div className="ct ct-khung" data-vung="theo-doi-ca">
       <div className="ct-td-dau">
@@ -126,6 +134,7 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
               Công bố điểm: <b>{p.congBoChu}</b> · {p.phamViChu}
             </span>
           </div>
+          {p.dongPhu ? <div className="ct-dong-phu">{p.dongPhu}</div> : null}
           <div className="ct-link">
             <Users size={18} aria-hidden="true" style={{ color: 'var(--gvm-xd)' }} />
             <span className="mono">{p.link.replace(/^https?:\/\//, '')}</span>
@@ -258,6 +267,9 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
               ))}
             </div>
           </div>
+          <p className="ct-ghi" style={{ margin: '0 0 10px' }}>
+            Chạm thẻ em để mở hồ sơ: cho thi lại, mở khoá, cho vào bằng máy khác nằm ở đó.
+          </p>
           {dsLoc.length === 0 ? (
             <p className="ct-ghi">Không em nào ở mục này.</p>
           ) : (
@@ -293,6 +305,7 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
             </div>
             <div className="ct-canh-bao">
               {coCanXuLy === 0 && <p className="ct-ghi">Chưa có việc gì cần thầy xử lý.</p>}
+              {p.canXuLyThem}
               {biKhoa.map((e) => (
                 <div key={e.sbd} className="ct-cb c-ho">
                   <div className="bt">
@@ -371,7 +384,9 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
             <p className="ct-ghi so" style={{ marginTop: 8 }}>
               Kết thúc ca: em đang làm bị nộp theo phần đã làm ({p.dangLamNgay} em), em chưa vào không vào được nữa. Máy hỏi lại trước khi làm.
             </p>
+            {p.viecNhanhThem}
           </div>
+          {p.cotPhaiThem}
         </div>
       </div>
     </div>

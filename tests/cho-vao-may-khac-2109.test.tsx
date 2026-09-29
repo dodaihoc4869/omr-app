@@ -71,7 +71,9 @@ const CA = {
   batDauThiLuc: ISO(BAY_GIO - 19 * 60000),
   dongBoGio: true,
   thoiGianPhut: 50,
-  trangThai: 'mo',
+  // SỬA CÓ CHỦ Ý 29/09 (thầy: màn Theo dõi ca đang mở chỉ còn khu trên): bảng từng em + các nút của em nay chỉ ở ca ĐÃ ĐÓNG; ca đang mở thì
+  // cùng các nút ấy nằm trong hồ sơ em (test tests/theo-doi-ca-chi-phan-tren-2909.test.tsx). Luồng xác nhận/gọi máy chủ không đổi.
+  trangThai: 'dong',
   phamVi: 'tu_do',
   congBo: 'khong',
   hetHanVao: ISO(BAY_GIO + 30 * 60000),
