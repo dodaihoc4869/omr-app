@@ -270,3 +270,72 @@ describe('Bi-a — máy chủ trên D1 thật', () => {
     expect((d.sql.prepare("SELECT gia_tri FROM cau_hinh WHERE khoa='game_hoa_2'").get() as { gia_tri: string }).gia_tri).toContain('"bat":true')
   })
 })
+
+describe('Bi-a — Trả lời câu hỏi (không cần chơi, thầy lệnh 29/09)', () => {
+  it('lấy đúng câu Bi-a hôm nay (trong kế hoạch, trong trần, không tự luận, không Câu chốt, không lộ đáp án); phiên Bi-a thường + chiCau; không tạo ván', async () => {
+    const { d, env } = fixture()
+    await giao(env)
+    const nay = Date.now()
+    const { kh } = await layKeHoachHomNay(env, 'S1', nay)
+    const s = await biaAction(env, 'S1', 'bia-sanh', {}, nay)
+    const r = await biaAction(env, 'S1', 'bia-tra-loi', {}, nay)
+    expect(r.ok).toBe(true)
+    khongLoDapAn(r)
+    const cau = r.cau as { qid: string; vai: string }[]
+    expect(cau.length).toBeGreaterThan(0)
+    expect(cau.length).toBeLessThanOrEqual(Math.min(10, (s.tran as { con: number }).con))
+    const keHoach = new Set([...kh.doan, ...kh.dao])
+    for (const q of cau) { expect(keHoach.has(q.qid)).toBe(true); expect(q.vai).not.toBe('trum') }
+    expect(JSON.stringify(r)).not.toContain('QTL')
+    const phien = JSON.parse((d.sql.prepare('SELECT json FROM game_v2_session WHERE id=?').get(String(r.session)) as { json: string }).json)
+    expect(phien).toMatchObject({ mode: 'bia', bia: 1, hoa2: 1, chiCau: 1 })
+    expect(d.dem('bi_a_van', '1=1')).toBe(0)
+  })
+
+  it('chấm qua answer chung (sổ su_kien_hoc, EXP máy chủ); câu đã trả lời không lên bàn bi-a hôm đó; hết câu ⇒ lý do như Bi-a', async () => {
+    const { d, env } = fixture()
+    await giao(env)
+    const token = await gameToken(env, 'S1')
+    const nay = Date.now()
+    const tranTruoc = ((await biaAction(env, 'S1', 'bia-sanh', {}, nay)).tran as { con: number }).con
+    const r = await biaAction(env, 'S1', 'bia-tra-loi', {}, nay)
+    const cau = r.cau as { qid: string }[]
+    const da: string[] = []
+    for (const c of cau) {
+      const i = Number(c.qid.slice(1))
+      const a = await gameV2(env, 'answer', { token, session: String(r.session), qid: c.qid, answer: dapAn(i), assisted: false })
+      expect(a.correct).toBe(true)
+      expect(d.dem('su_kien_hoc', `sbd='S1' AND nguon='game' AND qid='${c.qid}'`)).toBe(1)
+      da.push(c.qid)
+    }
+    const sau = (await biaAction(env, 'S1', 'bia-sanh', {}, nay)).tran as { con: number }
+    expect(sau.con).toBe(Math.max(0, tranTruoc - cau.length))
+    if (sau.con > 0) {
+      const ban = await biaAction(env, 'S1', 'bia-xep-ban', { loai: 'ai', cheDo: 'don', soBi: 7 }, nay)
+      const tren = [...((ban.bi as { qid: string }[]) ?? []), ...(ban.chot ? [ban.chot as { qid: string }] : [])].map((x) => x.qid)
+      for (const q of da) expect(tren).not.toContain(q)
+    }
+    // Làm tới hết trần ⇒ báo như Bi-a.
+    let lan = 0, cuoi: Record<string, unknown> = {}
+    while (lan++ < 10) {
+      cuoi = await biaAction(env, 'S1', 'bia-tra-loi', {}, nay)
+      if (!cuoi.session) break
+      for (const c of cuoi.cau as { qid: string }[]) await gameV2(env, 'answer', { token, session: String(cuoi.session), qid: c.qid, answer: dapAnSai(Number(c.qid.slice(1))) })
+    }
+    expect(['het_tran', 'xong_ke_hoach', 'cau_dang_bao_ve']).toContain(cuoi.lyDo)
+    expect(String(cuoi.message)).toBeTruthy()
+  })
+
+  it('rời màn (dong) đóng đúng phiên chỉ-trả-lời ⇒ câu chưa làm về lại kế hoạch', async () => {
+    const { d, env } = fixture()
+    await giao(env)
+    const nay = Date.now()
+    const tranTruoc = ((await biaAction(env, 'S1', 'bia-sanh', {}, nay)).tran as { con: number }).con
+    const r = await biaAction(env, 'S1', 'bia-tra-loi', {}, nay)
+    expect(((await biaAction(env, 'S1', 'bia-sanh', {}, nay)).tran as { con: number }).con).toBeLessThan(tranTruoc) // đang giữ chỗ
+    expect(await biaAction(env, 'S1', 'bia-tra-loi', { dong: true, session: r.session }, nay)).toMatchObject({ ok: true, dong: true })
+    const phien = JSON.parse((d.sql.prepare('SELECT json FROM game_v2_session WHERE id=?').get(String(r.session)) as { json: string }).json)
+    expect(phien.dong).toBe(1)
+    expect(((await biaAction(env, 'S1', 'bia-sanh', {}, nay)).tran as { con: number }).con).toBe(tranTruoc)
+  })
+})

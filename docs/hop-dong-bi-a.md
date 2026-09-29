@@ -103,3 +103,9 @@ Phòng → máy em: `phong {toi, phong}` · `bat_dau {ghe, veGhe}` · `tt {toi, 
 - Xếp ghế trong phòng chờ (thêm/bỏ A.I, đổi chỗ) đi qua WebSocket của phòng (gói `ghe`), không qua lệnh HTTP riêng.
 - Có mặt ở Sảnh: máy em gửi kèm số câu Bi-a còn (`con`) để bạn thấy, không tính lại trên máy chủ mỗi 6 giây.
 - Cài đặt Worker: `wrangler.toml` thêm binding `BAN_BIA` + migration DO `bia-v1` (`new_sqlite_classes`). Không có binding ⇒ `online:false`, Sảnh giữ nút "Sắp mở".
+
+## Trả lời câu hỏi (không cần chơi) + Luôn bật Mắt thần — thầy lệnh 29/09
+- `POST /game-v2/bia-tra-loi` (token em, qua cổng `bia-*` chung: cờ Bi-a, ca đang mở ⇒ `dang_co_ca`) `{}` ⇒ `{ ok, session, cau: CauCongKhai[] (≤ 10, không Câu chốt, không đáp án), tran:{con,tong}, theLuc }`; hết câu ⇒ `{ ok, lyDo, message }` đúng bảng `LOI_BIA`. Chọn câu bằng CHÍNH `chonCauBan` (kế hoạch hôm nay, trần 40%, `protectedQuestions`, câu đang giữ ở Đảo/Đoàn, không tự luận). Phiên `{mode:'bia', hoa2:1, bia:1, chiCau:1, van:'tl-…'}`; vào lượt mới đóng phiên Bi-a cũ (G8). Không tạo dòng `bi_a_van`.
+- Chấm: lệnh `answer` chung (`assisted:true` khi em bấm Hỏi thầy trước khi chốt) ⇒ sổ `su_kien_hoc` nguồn Bi-a, EXP v5 (`expCau`), câu đã trả lời tính vào trần và không lên bàn bi-a hôm đó.
+- `bia-tra-loi {dong:true, session}` ⇒ đóng đúng phiên chỉ-trả-lời đó (em rời màn: câu chưa làm về kế hoạch ngay).
+- Luôn bật Mắt thần: công tắc theo máy (`localStorage` `bia_luon_mat_than`). Ván A.I: không trừ `matThan`. Phòng đấu: gói `cu` kèm `giuMT:true` (chỉ ghế người đang đánh) ⇒ `apCu` không trừ Mắt thần của ghế đó; luật/điểm/EXP không đổi.

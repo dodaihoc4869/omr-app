@@ -48,6 +48,11 @@ datBoGoiBia(async (lenh, _token, d = {}) => {
     const soBi = Number(d.soBi) || 7
     return { ok: true, van: 'v1', session: 's1', bi: CAU.slice(0, soBi === 4 ? 4 : 7).map(congKhai), chot: congKhai(CAU[7]!), tran: { con: 7, tong: 15 } }
   }
+  if (lenh === 'bia-tra-loi') {
+    if (d.dong === true) return { ok: true, dong: true }
+    const lo = du.splice(0, 3)
+    return lo.length ? { ok: true, session: 's-tl', cau: lo.map(congKhai), tran: { con: du.length, tong: 15 } } : { ok: true, lyDo: 'het_tran', message: 'Hết câu Bi-a hôm nay. Em sang Đoàn Hộ Tống và Bát Linh Đảo làm tiếp nhé.' }
+  }
   if (lenh === 'answer') {
     const c = CAU.find((x) => x.qid === d.qid)!
     const tl = String(d.answer ?? '')

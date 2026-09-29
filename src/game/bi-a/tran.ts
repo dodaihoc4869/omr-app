@@ -45,7 +45,8 @@ export interface TranBia {
   over: KetThucTran | null
 }
 /** Gói "cú đánh" (đặc tả 6.2): gửi TỐC ĐỘ `v` (đã tính) thay cho lực để hai máy khỏi lệch vì làm tròn. */
-export interface GoiCu { dx: number; dy: number; v: number; sx: number; sy: number; datBi?: { x: number; y: number } }
+/** `giuMT`: máy em đang "Luôn bật Mắt thần" ⇒ cú này KHÔNG trừ lượt Mắt thần (chỉ ảnh hưởng máy đó; không đổi luật/điểm). */
+export interface GoiCu { dx: number; dy: number; v: number; sx: number; sy: number; datBi?: { x: number; y: number }; giuMT?: boolean }
 /** Tóm tắt một sự kiện để máy em hiện chữ/hiệu ứng (không cần suy luật lại). */
 export type SuKienTran =
   | { k: 'cu'; ghe: number; cu: GoiCu; kq: KetQuaXet; phaBan: boolean; bamVa: string }
@@ -190,7 +191,7 @@ export function apCu(t: TranBia, ghe: number, cu: GoiCu, now: number): SuKienTra
     return bamVi(ballsTu(st))
   })
   t.soCu++
-  if (!g.ai && t.loai === 'ban' && t.matThan[ghe]! > 0) t.matThan[ghe]!-- // Mắt thần: mỗi cú của người dùng 1 (G4)
+  if (!g.ai && t.loai === 'ban' && t.matThan[ghe]! > 0 && cu.giuMT !== true) t.matThan[ghe]!-- // Mắt thần: mỗi cú của người dùng 1 (G4)
   t.isBreak = false; t.ballInHand = false
   const kq = xetCu(ev, ghe, t.ghe, t.bi, phaBan, shotCon, chotTrong(t, ghe))
   voi(t, (st) => {

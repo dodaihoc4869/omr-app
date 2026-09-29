@@ -19,7 +19,7 @@ import { ELO_DAU, type CauBi } from '../../src/game/bi-a/tran'
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
 
-export const LENH_BIA: ReadonlySet<string> = new Set(['bia-sanh', 'bia-xep-ban', 'bia-doi-cau', 'bia-ket-van', 'bia-tao-ban', 'bia-vao-ban', 'bia-moi', 'bia-loi-moi', 'bia-tra-loi-moi'])
+export const LENH_BIA: ReadonlySet<string> = new Set(['bia-sanh', 'bia-xep-ban', 'bia-doi-cau', 'bia-ket-van', 'bia-tao-ban', 'bia-vao-ban', 'bia-moi', 'bia-loi-moi', 'bia-tra-loi-moi', 'bia-tra-loi'])
 /** Khoá cờ riêng (không nhét vào `game_hoa_2` vì `coLuu` của nó ghi đè đúng 3 trường). Giá trị `{bat, lop[], sbd[]}`. */
 export const KHOA_CO_BIA = 'bi_a'
 export const TI_LE_TRAN_BIA = 0.4
@@ -196,6 +196,7 @@ export async function biaAction(env: Env, sbd: string, action: string, b: Row, n
   if (action === 'bia-moi') return moiBan(env, sbd, b, nowMs)
   if (action === 'bia-loi-moi') return loiMoi(env, sbd, b, nowMs)
   if (action === 'bia-tra-loi-moi') return traLoiMoi(env, sbd, b, nowMs)
+  if (action === 'bia-tra-loi') return chiTraLoi(env, sbd, b, nowMs)
   return { ok: false, error: 'Lệnh không hợp lệ.' }
 }
 
@@ -255,7 +256,7 @@ type ChonCau =
  * Chọn Câu chốt (G1) rồi tối đa `soBi` câu cho bi (phần Đoàn trước tới hết trần phần Đoàn, rồi phần Đảo; giữ thứ tự kế hoạch), tạo phiên
  * `{mode:'bia', hoa2:1, bia:1, van, cheDo, questions}`. Hết câu / hết trần ⇒ `ok:false` kèm lý do cho em.
  */
-async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, van: string, cheDo: 'don' | 'doi', them: Record<string, unknown> = {}): Promise<ChonCau> {
+async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, van: string, cheDo: 'don' | 'doi', them: Record<string, unknown> = {}, coChot = true): Promise<ChonCau> {
   const c = await boiCanh(env, sbd, nowMs)
   const { kh, hs, tran } = c
   const conKeHoach = kh.conDao.length + kh.conDoan.length
@@ -266,7 +267,7 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
   // Câu chốt trước (G1), trong phần còn trần.
   const phepDoan = conDoan > 0 ? c.ungDoan : []
   const phepDao = conDao > 0 ? c.ungDao : []
-  const chon = await napMot(env, hs, xepUngVienChot([...phepDoan, ...phepDao], hs), c.chan)
+  const chon = coChot ? await napMot(env, hs, xepUngVienChot([...phepDoan, ...phepDao], hs), c.chan) : null
   const daLay = new Set<string>()
   const refs: RefPhien[] = []
   const cau: CauBia[] = [], qs: PrivateQuestion[] = []
@@ -403,6 +404,28 @@ async function ketVan(env: Env, sbd: string, b: Row, nowMs: number): Promise<Rec
   await env.DB.batch(q)
   const { kh } = await layKeHoachHomNay(env, sbd, nowMs)
   return { ok: true, van, dung, sai, theLuc: { con: kh.conDao.length + kh.conDoan.length, tong: kh.tong } }
+}
+
+// ---------------------------------------------------------------- TRẢ LỜI CÂU HỎI (không cần chơi) — thầy lệnh 29/09
+/** Số câu mỗi lượt của chế độ chỉ trả lời (làm hết lượt thì xin lượt sau; trần Bi-a vẫn là trần chung). */
+export const SO_CAU_TRA_LOI = 10
+/**
+ * Chế độ "Trả lời câu hỏi": lấy ĐÚNG các câu Bi-a hôm nay của em — cùng `chonCauBan` (cùng nguồn kế hoạch, cùng trần 40%, cùng luật chặn câu
+ * đang bảo vệ cho ca / đang giữ ở Đảo-Đoàn, `napCau` bỏ câu tự luận), không Câu chốt, KHÔNG đáp án (câu công khai). Phiên là phiên Bi-a
+ * thường (`bia:1`, thêm `chiCau:1`) ⇒ chấm qua `answer` chung, sổ `su_kien_hoc` nguồn Bi-a, EXP v5, và câu đã trả lời ở đây tính vào
+ * trần + không hỏi lại ở ván bi-a hôm đó. Không tạo dòng `bi_a_van` (không phải một ván). Vào lượt mới là đóng phiên Bi-a cũ (G8).
+ */
+async function chiTraLoi(env: Env, sbd: string, b: Row, nowMs: number): Promise<Record<string, unknown>> {
+  // Em rời màn: đóng ĐÚNG phiên chỉ-trả-lời của em ⇒ câu chưa trả lời về lại kế hoạch ngay (không giữ chỗ 2 giờ).
+  if (b.dong === true) {
+    await env.DB.prepare(`UPDATE game_v2_session SET json = json_set(json, '$.dong', 1) WHERE id = ? AND sbd = ? AND json_extract(json,'$.bia') = 1 AND json_extract(json,'$.chiCau') = 1`).bind(str(b.session), sbd).run()
+    return { ok: true, dong: true }
+  }
+  await dongVanCu(env, sbd, nowMs)
+  // `van` riêng (không có dòng bi_a_van) để `dongVanCu` lần sau đóng được phiên này.
+  const r = await chonCauBan(env, sbd, nowMs, SO_CAU_TRA_LOI, `tl-${crypto.randomUUID()}`, 'don', { chiCau: 1 }, false)
+  if (!r.ok) return r.kq
+  return { ok: true, session: r.session, cau: r.cau, tran: { con: r.tranCon, tong: r.tranTong }, theLuc: { con: r.kh.conDao.length + r.kh.conDoan.length, tong: r.kh.tong } }
 }
 
 /** Phần `bia` trả kèm `hoa2-sanh` để Sảnh Bát Linh vẽ cửa thứ ba. Cờ tắt ⇒ `{ bat:false }` (không vẽ cửa). Lỗi ⇒ `{ bat:false }`. */

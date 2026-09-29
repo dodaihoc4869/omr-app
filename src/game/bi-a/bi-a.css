@@ -311,3 +311,29 @@
 .bia-loi-moi{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;width:min(520px,calc(100% - 24px));display:grid;gap:10px;padding:14px;border-radius:22px;background:var(--b-dac);color:var(--b-chu);border:1px solid var(--b-vien);box-shadow:0 16px 40px rgba(0,0,0,.3)}
 .bia-loi-moi small{display:block;color:var(--b-mo);font-size:12px;margin-top:2px}
 .bia-loi-moi .bia-hang-nut{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* ───── công tắc "Luôn bật Mắt thần" (29/09) + màn "Trả lời câu hỏi" (không cần chơi) ───── */
+.bia-cong-tac{display:flex;align-items:center;gap:12px;min-height:48px;padding:8px 12px;border-radius:16px;border:1px solid var(--b-vien);background:var(--b-kinh);cursor:pointer;position:relative}
+.bia-cong-tac input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.bia-cong-tac-gat{flex:none;position:relative;width:44px;height:26px;border-radius:999px;background:var(--b-vien);border:1px solid var(--b-vien);transition:background .2s}
+.bia-cong-tac-gat::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--b-dac);box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.bia-cong-tac[data-bat] .bia-cong-tac-gat{background:linear-gradient(180deg,var(--b-vang-1),var(--b-vang-2));border-color:var(--b-vang-bo)}
+.bia-cong-tac[data-bat] .bia-cong-tac-gat::after{transform:translateX(18px)}
+.bia-cong-tac input:focus-visible + .bia-cong-tac-gat{outline:3px solid rgb(11,87,208);outline-offset:2px}
+.bia-cong-tac-chu{display:flex;flex-direction:column;gap:2px;line-height:1.25;font-size:14.5px}
+.bia-cong-tac-chu small{font-size:12px;font-weight:600;color:var(--b-mo)}
+.bia-cong-tac[data-gon]{flex:none;min-height:32px;padding:2px 8px 2px 4px;gap:6px;border-radius:999px}
+.bia-cong-tac[data-gon] .bia-cong-tac-gat{width:34px;height:20px}
+.bia-cong-tac[data-gon] .bia-cong-tac-gat::after{width:14px;height:14px}
+.bia-cong-tac[data-gon][data-bat] .bia-cong-tac-gat::after{transform:translateX(14px)}
+.bia-cong-tac[data-gon] .bia-cong-tac-chu{font-size:12px;white-space:nowrap}
+/* Điện thoại dọc: hàng "Bi của em" chật ⇒ công tắc gọn chỉ còn cái gạt đứng sát ô Mắt thần (nhãn đủ nằm ở aria-label + Sảnh). */
+@media (max-width:480px){.bia-cong-tac[data-gon] .bia-cong-tac-chu{display:none}.bia-cong-tac[data-gon]{padding:2px 4px}}
+.bia[data-bo-cuc='ngang'] .bia-cong-tac[data-gon] .bia-cong-tac-chu{display:none}
+.bia[data-bo-cuc='ngang'] .bia-cong-tac[data-gon]{padding:2px 4px}
+@media (prefers-reduced-motion:reduce){.bia-cong-tac-gat,.bia-cong-tac-gat::after{transition:none}}
+.bia-tl{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:max(12px,env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.bia-tl-trong{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.bia-tl-tien-do{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--b-mo)}
+.bia-tl-the{border-radius:20px;border:1px solid var(--b-vien);background:var(--b-kinh);padding:12px;display:flex;flex-direction:column;gap:12px}
+.bia-tl .bia-kq{position:relative}
