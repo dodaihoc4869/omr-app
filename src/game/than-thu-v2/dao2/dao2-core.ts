@@ -18,7 +18,7 @@ export type VaiAi2='moi'|'on_lai'|'trum'
 /** Gợi ý M3 (Bùa Trợ giảng) máy chủ gửi kèm câu: Phần I gạch 2 phương án SAI (máy chủ chọn, KHÔNG có đáp án); Phần II/III mở trước ô Kiến thức cốt lõi. */
 export interface GoiYM3{gach?:('A'|'B'|'C'|'D')[];cotLoi?:string}
 /** Câu của chuyến 2.0 = câu công khai + `vai` + (tuỳ) `goiY`. */
-export interface CauDao2 extends CauDao{vai?:string;goiY?:unknown}
+export interface CauDao2 extends CauDao{vai?:string;goiY?:unknown;/** Nhãn nợ (Sổ nợ 29/09). */nhanNo?:string}
 export const TEN_VAI:Record<VaiAi2,string>={moi:'Câu mới',on_lai:'Ôn lại',trum:'Trùm ải'}
 /** Nhãn ngắn trên 6 ô vai của tấm dưới bản đồ. */
 export const NHAN_O_VAI:Record<VaiAi2,string>={moi:'Mới',on_lai:'Ôn lại',trum:'Trùm'}

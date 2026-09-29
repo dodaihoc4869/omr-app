@@ -46,8 +46,9 @@ export default function DongHoSucChua({
   const rong = Math.max(0, Math.min(1, Number.isFinite(tiLe) ? tiLe : 1)) * 100
   const cauQuaTai = sc.soEmQuaTai > 0 ? ` ${sc.soEmQuaTai}/${sc.soEm} em quá tải.` : ' Không em nào quá tải.'
   // Vì sao ra số lượt: mỗi câu MỚI cần 2 lượt (đúng 2 lần mới chín), câu đang ôn cần 2 − số lần đúng liên tiếp.
-  const tg = sc.tachGiua && sc.tachGiua.cauMoi * 2 + sc.tachGiua.luotOn === khoiLuong ? sc.tachGiua : null
-  const viSao = tg ? ` (${tg.cauMoi} câu mới × 2 lượt${tg.luotOn > 0 ? ` + ${tg.luotOn} lượt ôn` : ''})` : ''
+  const tg = sc.tachGiua && sc.tachGiua.cauMoi * 2 + sc.tachGiua.luotOn + (sc.tachGiua.luotNoCu ?? 0) === khoiLuong ? sc.tachGiua : null
+  const viSao = tg ? ` (${tg.cauMoi} câu mới × 2 lượt${tg.luotOn > 0 ? ` + ${tg.luotOn} lượt ôn` : ''}${tg.luotNoCu ? ` + ${tg.luotNoCu} lượt nợ cũ` : ''})` : ''
+  const noCu = sc.noCu ?? []
 
   return (
     <div className="cd-dong-ho" data-khoi="dong-ho-suc-chua" data-muc={muc} aria-live="polite" aria-busy={dangTinh}>
@@ -70,6 +71,12 @@ export default function DongHoSucChua({
         Em ở giữa lớp cần khoảng {khoiLuong} lượt{viSao} · có {sc.D} ngày × {theLuc} lượt/ngày = {sc.sucChua} lượt.
         {cauQuaTai}
       </p>
+      {noCu.length > 0 && (
+        <ul className="cd-phu" data-khoi="no-cu">
+          {noCu.slice(0, 5).map((x) => <li key={x.sbd}>{x.cau}.</li>)}
+          {noCu.length > 5 && <li>… và {noCu.length - 5} em nữa.</li>}
+        </ul>
+      )}
     </div>
   )
 }

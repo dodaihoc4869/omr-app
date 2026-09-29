@@ -19,7 +19,7 @@ import type { LyDoThieuLap } from './de-rieng'
 
 export interface NguonVaBienBan {
   /** Phạm vi ghi trên bản ghi CA ở máy chủ. */
-  phamViCa?: 'gan_nhat' | 'ba_ca' | null
+  phamViCa?: 'gan_nhat' | 'ba_ca' | 'khong' | null
   /** sbd → qid câu hỏi lại của em, do máy chủ giữ. */
   lapTheoEm?: Record<string, string[]> | null
   /** Mọi qid CÓ TRONG KHO đề của ca. Dùng để phân biệt "ngoài kho" với

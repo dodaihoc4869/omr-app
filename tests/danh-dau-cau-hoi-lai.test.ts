@@ -400,8 +400,10 @@ describe('HAI NÚT PHẠM VI + BẢN ĐỒ SAI DỰNG SẴN', () => {
   //     tôi chọn rút 30% câu sai ca trước thì sẵn có bản đồ để tính sai lần mấy"
   const KHOI = doc('src/components/KhoiRutDe.tsx')
 
-  it('màn Mở ca có ĐÚNG hai nút, mặc định là ca gần nhất', () => {
-    expect(KHOI).toContain("(['gan_nhat', 'ba_ca'] as const).map")
+  // 29/09 (đặc tả mục C): thêm nút thứ ba "Không rút câu sai" — hai nút cũ giữ nguyên, mặc định vẫn ca gần nhất.
+  it('màn Mở ca có hai nút cũ + "Không rút câu sai", mặc định là ca gần nhất', () => {
+    expect(KHOI).toContain('MOI_PHAM_VI_HOI_LAI.map')
+    expect(doc('src/lib/cau-hinh-de-rieng.ts')).toContain("MOI_PHAM_VI_HOI_LAI: readonly PhamViHoiLai[] = ['gan_nhat', 'ba_ca', 'khong']")
     expect(KHOI).toContain('TEN_PHAM_VI_HOI_LAI[v]')
     expect(doc('src/lib/cau-hinh-de-rieng.ts')).toContain("PHAM_VI_HOI_LAI: 'gan_nhat',")
   })

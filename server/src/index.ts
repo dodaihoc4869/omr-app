@@ -76,6 +76,7 @@ import { gvChienDich } from './srs2-gv'
 import { gvSuaChienDich } from './srs2-sua'
 import { gvHoSoLenBang } from './ho-so-em-chieu'
 import { gvBuoiHoc, gvSucHocBuoi, hsBuoiHocDangMo, hsDiemDanh } from './buoi-hoc'
+import { gvDauGio } from './dau-gio'
 import { gvThongKeLopCau } from './thong-ke-lop-cau'
 import { docCoHoa2 } from './srs2-d1'
 import { viecPhu } from './viec-phu'
@@ -255,10 +256,13 @@ export function locGoiDeRiengChoEm(goi: Record<string, unknown> | null, sbd: str
 
   const lap = doiTuong(goi.lap)[sbd]
   const dem = doiTuong(goi.dem)[sbd]
+  // Ca "Không rút câu sai" (29/09): nhãn "đã làm ở ca dd/mm" của CHÍNH em — chỉ qid + ngày, không đáp án.
+  const daLam = doiTuong(goi.daLam)[sbd]
   return {
     bo: { [sbd]: cua },
     lap: Array.isArray(lap) ? { [sbd]: lap } : {},
     dem: dem && typeof dem === 'object' ? { [sbd]: dem } : {},
+    ...(daLam && typeof daLam === 'object' && !Array.isArray(daLam) ? { daLam: { [sbd]: daLam } } : {}),
     // BIÊN BẢN là ghi chép của THẦY về cả lớp — không đi xuống máy em.
     bb: null,
   }
@@ -1258,7 +1262,7 @@ async function chiTietCaMoi(env: Env, maCa: string): Promise<Response> {
       // ca này phát đề riêng từng em; thiếu nó là thầy bấm Bắt đầu mà cả lớp
       // nhận chung một đề.
       deRieng: Number(ca.de_rieng ?? 0) === 1,
-      phamViHoiLai: String(ca.pham_vi_hoi_lai ?? '') === 'ba_ca' ? 'ba_ca' : 'gan_nhat',
+      phamViHoiLai: ['ba_ca', 'khong'].includes(String(ca.pham_vi_hoi_lai ?? '')) ? String(ca.pham_vi_hoi_lai) : 'gan_nhat',
       danhSachChon: doJson(ca.danh_sach_chon_json),
     },
     luot,
@@ -3356,6 +3360,8 @@ const boXuLy = {
       if (p === '/gv/ho-so-len-bang') return ra(await gvHoSoLenBang(envDoc, b))
       // BUỔI HỌC — bảng DẠY HỌC của Lên bảng (buoi-hoc.ts): mở/xem/thêm-bớt em/kết thúc điểm danh (GHI, bảng chỉ-thêm) + sức học em có mặt (ĐỌC-CHỈ).
       if (p === '/gv/buoi-hoc') return ra(await gvBuoiHoc(env, b))
+      // KIỂM TRA ĐẦU GIỜ (thẻ thứ ba của Lên bảng, 29/09 — dau-gio.ts): ứng viên / chốt lượt / chấm Đạt–Chưa đạt (sổ nguon='dau_gio') / Thầy đã chữa / kết thúc. Có ghi ⇒ `env`.
+      if (p === '/gv/dau-gio') return ra(await gvDauGio(env, b))
       // GIAO ĐỀ THEO TUẦN (26/09, gv-kho-de-giao.ts): màn thầy `GiaoDeTheoTuanScreen` gọi lệnh này; dòng định tuyến bị rơi mất sau một lần gộp ⇒ màn báo
       // "Máy chủ chưa có lệnh". Nối lại (28/09). Có ghi (`luu`) ⇒ dùng `env` (không phải bản đọc-chỉ).
       if (p === '/gv/kho-de-giao') return ra(await gvKhoDeGiao(env, b))

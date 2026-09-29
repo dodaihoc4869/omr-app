@@ -7,9 +7,9 @@ import { dbGoc, xoaDemCauHinh } from './cau-hinh-dem'
 import { gvLop } from './ten-lop'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { laCauTuLuan } from './cam-tu-luan'
-import { hangTuTiLe, khoiLuongCan, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
+import { hangTuTiLe, khoiLuongCan, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { KHOA_CO_BIA } from './bi-a'
-import { chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, mocTinhCua, ngayVnCua, type ChienDich } from './srs2-d1'
+import { chanDoanEm, chuaBatDau, dauNgayVn, docChienDichKemBatDau, ghiBatDau, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -120,16 +120,16 @@ export async function lanLamCaLop(env: Env, sbd: readonly string[], qids: readon
   if (!sbd.length || !qids.length) return ra
   let rows: Row[]
   try {
-    rows = (await env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility FROM su_kien_hoc
+    rows = (await env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, assistance, visibility, nguon FROM su_kien_hoc
         WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(sbd), JSON.stringify(qids)).all<Row>()).results ?? []
   } catch {
-    rows = (await env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`)
+    rows = (await env.DB.prepare(`SELECT sbd, qid, ngay_vn, luc, ket_qua, nguon FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) AND qid IN (SELECT value FROM json_each(?))`)
       .bind(JSON.stringify(sbd), JSON.stringify(qids)).all<Row>()).results ?? []
   }
   for (const x of rows) {
     if (str(x.visibility) === 'embargoed') continue
     const k = str(x.sbd)
-    ra.set(k, [...(ra.get(k) ?? []), { qid: str(x.qid), ngay: str(x.ngay_vn), luc: str(x.luc), dung: Number(x.ket_qua) === 1, coGoiY: str(x.assistance) === 'assisted' }])
+    ra.set(k, [...(ra.get(k) ?? []), lanLamTuDong(x)])
   }
   return ra
 }
@@ -308,15 +308,17 @@ async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   // Có ngày bắt đầu (thầy 28/09) ⇒ D, sức chứa, đề xuất lượt/ngày, trần Quá tải tính TỪ NGÀY BẮT ĐẦU tới hạn.
   const D = soNgayTuBatDau(homNay, dv.batDau, dv.hanNop)
   const tuLuc = dv.batDau ? dauNgayVn(dv.batDau) : new Date(nowMs).toISOString()
-  const tt = await trangThaiLop(env, dv.sbd, qids, dv.hanNop, tuLuc)
-  const khoiLuong = dv.sbd.map((em) => khoiLuongCan([...tt.get(em)!.values()]))
+  const [tt, noCu] = await Promise.all([trangThaiLop(env, dv.sbd, qids, dv.hanNop, tuLuc), noCuCaLop(env, dv.sbd, homNay, qids)])
+  // SỔ NỢ (thầy chốt 29/09): khối lượng của em = lượt câu chiến dịch mới + lượt NỢ CŨ (≈ 2 − cc lượt/câu nợ) ⇒ Tự tính, trần Quá tải kịp hạn.
+  const khoiLuong = dv.sbd.map((em) => khoiLuongCan([...tt.get(em)!.values()]) + (noCu.get(em)?.luot ?? 0))
   const kl = trungVi(khoiLuong)
   // Tách lượt của EM Ở GIỮA LỚP thành "câu mới × 2" + "lượt ôn" để thầy đọc được vì sao ra số lượt (chỉ khi có em đúng bằng trung vị).
   const emGiua = dv.sbd.find((_, i) => khoiLuong[i] === kl)
   const tachGiua = emGiua === undefined ? null : (() => {
     const ds = [...tt.get(emGiua)!.values()].filter((t) => !t.catTia && !t.thanhThao)
     const cauMoi = ds.filter((t) => t.laMoi).length
-    return { cauMoi, luotOn: kl - 2 * cauMoi }
+    const luotNoCu = noCu.get(emGiua)?.luot ?? 0
+    return { cauMoi, luotOn: kl - 2 * cauMoi - luotNoCu, luotNoCu }
   })()
   const sc = sucChua(kl, D, dv.theLucNgay)
   const tran = D * dv.theLucNgay
@@ -325,6 +327,7 @@ async function tinhSucChua(env: Env, b: Row, nowMs: number) {
   return {
     ok: true, batDau: dv.batDau ?? homNay, soCau: qids.length, theLucDeXuat: theLucDeXuat(kl, Math.max(0, ...khoiLuong), D), soCauTheoTo: theoTo, soCauTheoMucDo: theoMucDo, soEm: dv.sbd.length, D, sucChua: tran, khoiLuongTrungVi: kl, tachGiua, tiLe: sc.tiLe, muc: sc.muc,
     soEmQuaTai: khoiLuong.filter((x) => x > tran).length,
+    noCu: await dongNoCu(env, noCu, dv.theLucNgay),
     goiY: sc.muc === 'xanh' ? null : {
       rutCon: soBo > 0 && soBo < qids.length ? { soCau: qids.length - soBo, tiLe: (kl - 2 * soBo) / tran } : null,
       luiHan: Dmoi > D ? { hanNop: congNgay(dv.batDau ?? homNay, Dmoi - 1), tiLe: kl / (Dmoi * dv.theLucNgay) } : null,
@@ -404,6 +407,8 @@ async function bang(env: Env, id: string, nowMs: number) {
   const canDayLai = cd.qids.map((q) => ({ qid: q, stt: cd.qids.indexOf(q) + 1, dang: dangTheoQid.get(q), mucDo: meta.get(q)?.mucDo ?? null, soEm: cd.sbd.filter((s) => tt.get(s)!.get(q)!.catTia).length }))
     .filter((x) => x.soEm > 0).sort((a, b) => b.soEm - a.soEm)
   const tong = cd.qids.length * Math.max(1, cd.sbd.length)
+  // SỔ NỢ (29/09): em có nợ cũ (ngoài chiến dịch này) vượt trần 50% nhiều ngày ⇒ dòng báo thầy. Lỗi đọc ⇒ không báo.
+  const noCu = await noCuCaLop(env, cd.sbd, homNay, cd.qids, cd.id).then((m) => dongNoCu(env, m, cd.theLucNgay, ten)).catch(() => [])
   // So với hôm qua (chỉ-thêm): phát lại trạng thái chỉ với lần làm TRƯỚC hôm nay.
   const lanHomQua = new Map([...lanTho].map(([k, v]) => [k, v.filter((x) => x.ngay < homNay)] as const))
   const ttHomQua = await trangThaiLop(env, cd.sbd, cd.qids, cd.hanNop, cd.mocBatDau, lanHomQua, them)
@@ -428,8 +433,24 @@ async function bang(env: Env, id: string, nowMs: number) {
       nhip, dungNhip: nhip.vuot + nhip.dung, mucCanHomNay: moc.mucCanHomNay, ngayThu: moc.ngayThu, tongNgay: moc.tongNgay,
       theoDang: theoDangLop, hangTheoDang: hangLopTheoDang,
     },
-    dang, em, canDayLai,
+    dang, em, canDayLai, noCu,
   }
+}
+
+/**
+ * Dòng báo "Em X còn N câu nợ cũ — cần ≈ K ngày" (thầy chốt 29/09): em có nợ cũ cần ≥ NGUONG_BAO_NO_NGAY ngày để trả hết trong trần 50%
+ * thể lực/ngày. Xếp em cần nhiều ngày nhất trước.
+ */
+export async function dongNoCu(env: Env, noCu: ReadonlyMap<string, NoCuEm>, theLucNgay: number, tenSan?: ReadonlyMap<string, string>): Promise<{ sbd: string; ten: string; soCau: number; luot: number; soNgay: number; cau: string }[]> {
+  const ds = [...noCu].map(([sbd, n]) => ({ sbd, ...n, soNgay: soNgayTraNo(n.luot, theLucNgay) })).filter((x) => x.soNgay >= NGUONG_BAO_NO_NGAY)
+  if (!ds.length) return []
+  const ten = tenSan ?? (await tenEm(env, ds.map((x) => x.sbd)).catch(() => new Map<string, string>()))
+  return ds
+    .sort((a, b) => b.soNgay - a.soNgay || b.soCau - a.soCau || (a.sbd < b.sbd ? -1 : 1))
+    .map((x) => {
+      const t = ten.get(x.sbd) ?? x.sbd
+      return { ...x, ten: t, cau: `Em ${t} còn ${x.soCau} câu nợ cũ — cần ≈ ${x.soNgay} ngày để trả hết` }
+    })
 }
 
 // ---------------------------------------------------------------- buổi chữa

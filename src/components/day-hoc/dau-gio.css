@@ -1,0 +1,89 @@
+/* KIỂM TRA ĐẦU GIỜ (29/09) — bổ sung cho `day-hoc.css`, chỉ token M3 (không hex thô). */
+.dg-tong {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+.dg-luot + .dg-luot {
+  margin-top: 16px;
+}
+.dg-luot-ten {
+  margin: 0 0 8px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--bts-chu-phu);
+}
+.dg-dong[data-trang-thai='dat'] {
+  border-color: var(--bts-la-nhat);
+}
+.dg-dong[data-trang-thai='chua_dat'] {
+  border-color: var(--bts-do-nhat);
+}
+.dg-ten {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  min-width: 0;
+  margin: 0;
+}
+.dg-ten b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  color: var(--bts-chu);
+}
+.dg-ten small {
+  font-size: 13px;
+  color: var(--bts-chu-phu);
+  font-variant-numeric: tabular-nums;
+}
+.dg-lich-su {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--bts-chu);
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.dg-lich-su-nhan {
+  color: var(--bts-chu-phu);
+}
+.dg-cham {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.dg-da-chua {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--bts-vien);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bts-chu);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.dg-da-chua input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+.dg-da-chua--co {
+  background: var(--bts-vang-nhat);
+  color: var(--bts-vang-chu);
+  border-color: transparent;
+}
+.dg-da-chua:focus-within {
+  outline: 2px solid var(--bts-duong, currentColor);
+  outline-offset: 2px;
+}

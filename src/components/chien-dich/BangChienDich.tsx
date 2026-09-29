@@ -336,6 +336,21 @@ export default function BangChienDich({
             </section>
           )}
 
+          {(du.noCu?.length ?? 0) > 0 && (
+            <section className="cd-the" aria-labelledby="cd-no-cu" data-khoi="no-cu">
+              <div className="cd-the-dau">
+                <h2 id="cd-no-cu">Nợ cũ nhiều</h2>
+                <span className="cd-so cd-phu">{du.noCu!.length} em</span>
+              </div>
+              <p className="cd-phu">Nợ cũ chiếm tối đa một nửa lượt mỗi ngày. Thầy có thể nâng số lượt/ngày hoặc chữa trên lớp.</p>
+              <ul className="cd-ds-cau">
+                {du.noCu!.map((x) => (
+                  <li key={x.sbd}>{x.cau}.</li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           <section className="cd-the cd-the--nhan" aria-labelledby="cd-can-day-lai">
             <div className="cd-the-dau">
               <h2 id="cd-can-day-lai">Cần thầy dạy lại</h2>

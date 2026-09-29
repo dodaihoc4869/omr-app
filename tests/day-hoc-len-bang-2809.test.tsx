@@ -153,7 +153,8 @@ describe('màn Lên bảng — thẻ Dạy học', () => {
   })
 
   it('Điểm danh ⇒ mở buổi + chiếu mã & QR; danh sách có mặt tự làm mới mỗi 5 giây qua nhịp chung', async () => {
-    const nguon = readFileSync('src/components/day-hoc/DayHocLenBang.tsx', 'utf8')
+    // Bước Điểm danh tách thành thành phần chung (29/09, dùng lại ở thẻ Kiểm tra đầu giờ) — nhịp 5 giây nằm ở đó.
+    const nguon = readFileSync('src/components/day-hoc/DiemDanhBuoi.tsx', 'utf8')
     expect(nguon).toMatch(/useNhipThay\(lamMoi, NHIP_PHONG_CHO_THAY/)
     render(<DayHocLenBang />)
     fireEvent.click(await screen.findByRole('button', { name: 'Điểm danh' }))
