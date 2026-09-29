@@ -34,6 +34,7 @@ export const LOI_BIA = {
   het_tran: 'Hết câu Bi-a hôm nay. Em sang Đoàn Hộ Tống và Bát Linh Đảo làm tiếp nhé.',
   xong_ke_hoach: 'Hôm nay em xong kế hoạch rồi. Em chơi Bàn giao hữu được (không câu, không EXP).',
   cau_dang_bao_ve: 'Các câu hôm nay đang dùng cho ca kiểm tra. Em quay lại sau khi ca kết thúc nhé.',
+  cau_dang_o_dao: 'Các câu còn lại đang nằm trong chuyến thám hiểm hoặc chuyến hộ tống em đang làm. Em làm xong ở đó nhé.',
   giao_huu_chua_mo: 'Bàn giao hữu mở khi em xong kế hoạch hôm nay.',
   het_luot_giao_huu: `Hôm nay em đã chơi đủ ${TOI_DA_GIAO_HUU} ván giao hữu. Mai quay lại nhé.`,
 } as const
@@ -130,6 +131,8 @@ interface BoiCanh {
   tran: TranBia
   /** Câu không được đưa lên bàn: đang bảo vệ cho ca thi, đang giữ ở Đảo/Đoàn, đang giữ ở bàn Bi-a khác. */
   chan: Set<string>
+  /** Chỉ phần đang bảo vệ cho ca (để báo đúng lý do khi hết câu). */
+  chanCa: ReadonlySet<string>
   /** Khoá kế hoạch còn chưa làm, theo phần, đã lọc `chan`. */
   ungDoan: string[]
   ungDao: string[]
@@ -147,12 +150,15 @@ async function boiCanh(env: Env, sbd: string, nowMs: number): Promise<BoiCanh> {
   for (const x of da.results ?? []) dem(str(x.qid))
   for (const q of giuBia) dem(q)
   const tran = tinhTranBia(kh.doan.length, kh.dao.length, dDoan, dDao)
-  const chan = await protectedQuestions(env)
+  const chanCa = await protectedQuestions(env)
+  const chan = new Set(chanCa)
   for (const q of await cauDangGiu(env, sbd, nowMs, DK_PHIEN_DAO_DOAN)) chan.add(q)
   for (const q of giuBia) chan.add(q)
   const loc = (ds: readonly string[]) => ds.filter((k) => !chan.has(qidGoc(k)))
-  return { kh, hs, tran, chan, ungDoan: loc(kh.conDoan), ungDao: loc(kh.conDao) }
+  return { kh, hs, tran, chan, chanCa, ungDoan: loc(kh.conDoan), ungDao: loc(kh.conDao) }
 }
+/** Còn trần mà không có câu lên bàn: do ca khoá thật, hay do câu đang nằm ở Đảo/Đoàn (sửa lỗi 29/09: trước báo "ca kiểm tra" cho mọi trường hợp). */
+const lyDoHetCau = (c: BoiCanh): LyDoKhoaBia => ([...c.kh.conDoan, ...c.kh.conDao].some((k) => c.chanCa.has(qidGoc(k))) ? 'cau_dang_bao_ve' : 'cau_dang_o_dao')
 
 // ---------------------------------------------------------------- câu công khai
 type CauBia = Record<string, unknown>
@@ -214,7 +220,7 @@ async function sanhBia(env: Env, sbd: string, nowMs: number): Promise<Record<str
   const coCau = Math.min(tran.conDoan, c.ungDoan.length) + Math.min(tran.conDao, c.ungDao.length)
   const xong = kh.tong > 0 && conKeHoach === 0
   const daGiaoHuu = xong ? await demGiaoHuuHomNay(env, sbd, kh.ngay) : 0
-  const lyDoKhoa: LyDoKhoaBia | null = !kh.tong ? 'chua_co_chien_dich' : xong ? 'xong_ke_hoach' : coCau <= 0 ? (tran.con <= 0 ? 'het_tran' : 'cau_dang_bao_ve') : null
+  const lyDoKhoa: LyDoKhoaBia | null = !kh.tong ? 'chua_co_chien_dich' : xong ? 'xong_ke_hoach' : coCau <= 0 ? (tran.con <= 0 ? 'het_tran' : lyDoHetCau(c)) : null
   const cd = hs.chienDich
   return {
     ok: true, bat: true, ngay: kh.ngay,
@@ -263,7 +269,7 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
   if (!kh.tong) return { ok: false, kq: { ok: true, lyDo: 'chua_co_chien_dich', message: LOI_BIA.chua_co_chien_dich } }
   if (conKeHoach === 0) return { ok: false, kq: { ok: true, lyDo: 'xong_ke_hoach', message: LOI_BIA.xong_ke_hoach } }
   let conDoan = Math.min(tran.conDoan, c.ungDoan.length), conDao = Math.min(tran.conDao, c.ungDao.length)
-  if (conDoan + conDao <= 0) return { ok: false, kq: { ok: true, lyDo: tran.con <= 0 ? 'het_tran' : 'cau_dang_bao_ve', message: tran.con <= 0 ? LOI_BIA.het_tran : LOI_BIA.cau_dang_bao_ve, conDoan: kh.conDoan.length, conDao: kh.conDao.length } }
+  if (conDoan + conDao <= 0) { const lyDo: LyDoKhoaBia = tran.con <= 0 ? 'het_tran' : lyDoHetCau(c); return { ok: false, kq: { ok: true, lyDo, message: LOI_BIA[lyDo], conDoan: kh.conDoan.length, conDao: kh.conDao.length } } }
   // Câu chốt trước (G1), trong phần còn trần.
   const phepDoan = conDoan > 0 ? c.ungDoan : []
   const phepDao = conDao > 0 ? c.ungDao : []
@@ -288,7 +294,7 @@ async function chonCauBan(env: Env, sbd: string, nowMs: number, soBi: number, va
     const ref = taoRef(x.q, x.m, hs, sbd, kh.ngay, false)
     refs.push(ref); cau.push(cauCongKhai(x.q, ref)); qs.push(x.q)
   }
-  if (!refs.length) return { ok: false, kq: { ok: true, lyDo: 'cau_dang_bao_ve', message: LOI_BIA.cau_dang_bao_ve } }
+  if (!refs.length) { const lyDo = lyDoHetCau(c); return { ok: false, kq: { ok: true, lyDo, message: LOI_BIA[lyDo] } } }
   // Sổ nợ (29/09): nhãn nợ trên câu ôn ("Sai 2 lần · Ca 26/09 · …") — một truy vấn sổ; lỗi ⇒ không nhãn.
   const nhan = await docNhanNo(env, sbd, hs, refs.map((r) => r.qid)).catch(() => new Map<string, string>())
   for (const r of refs) { const n = nhan.get(r.qid); if (n) r.nhanNo = n }
