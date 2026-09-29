@@ -65,13 +65,14 @@ describe('EXP kết chặng Đoàn', () => {
     expect(khoan(e, 'S1')).toEqual([])
   })
 
-  it('qua CỬA TRẦN 120 EXP game/ngày: đã nhận 118 ⇒ thắng 15 chỉ vào 2, vỡ giáp vào 0 (khoản ghi 0, đã xét); ngày mới trần mới', async () => {
+  // SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT luật EXP v5, docs/DE-XUAT-EXP-V5-2909.md): bỏ trần 120 EXP game/ngày ⇒ đã nhận 118 vẫn nhận ĐỦ thắng 15 + vỡ giáp 3.
+  it('v5 KHÔNG trần ngày: đã nhận 118 ⇒ thắng 15 và vỡ giáp 3 vào đủ; ngày mới vẫn đủ', async () => {
     const d = dung()
     d.sql.prepare("UPDATE game_v2_profile SET json = json_set(json, '$.expGame', json(?)) WHERE sbd='S1'").run(JSON.stringify({ ngay: NGAY, da: 118 }))
     luot(d, 'M1', 'S1', 1)
     await traoExpKetChang(d.env, 'M1', KET_LUC, tt({ thang: true, sao: 3, trumVoGiap: [true] }))
-    expect(khoan(d, 'S1').map((x) => [x.loai, x.exp])).toEqual([['doan_chang', 2], ['doan_giap', 0]])
-    expect(vi(d, 'S1')).toMatchObject({ wallet: 2, expGame: { ngay: NGAY, da: 120 } })
+    expect(khoan(d, 'S1').map((x) => [x.loai, x.exp])).toEqual([['doan_chang', 15], ['doan_giap', 3]])
+    expect(vi(d, 'S1')).toMatchObject({ wallet: 18, expGame: { ngay: NGAY, da: 136 } })
     luot(d, 'M2', 'S1', 1, '2026-09-23')
     await traoExpKetChang(d.env, 'M2', Date.parse('2026-09-23T20:30:00+07:00'), tt({ thang: true, sao: 1, trumVoGiap: [] }))
     expect(khoan(d, 'S1').find((x) => x.khoa === 'S1|doan_chang|M2')!.exp).toBe(5)

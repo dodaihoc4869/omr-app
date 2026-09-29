@@ -36,11 +36,12 @@ describe('EXP audit 23/09: executable observed behavior',()=>{
     expect(profile(d).wallet).toBe(5)
     expect(profile(d).expGame?.da).toBe(5)
   })
-  it('REGRESSION late prior-day reward preserves current-day cap',()=>{
+  // SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT luật EXP v5, docs/DE-XUAT-EXP-V5-2909.md): bỏ trần 120 EXP game/ngày và trần mềm câu; bộ đếm ngày vẫn tách theo ngày.
+  it('REGRESSION late prior-day reward keeps a separate day counter (v5: no daily cap)',()=>{
     const p={expGame:{ngay,da:120}} as Profile
     expect(nhanExpGame(p,'2026-09-22',3)).toBe(3)
-    expect(nhanExpGame(p,ngay,120)).toBe(0)
-    expect(p.expGame).toMatchObject({ngay,da:120})
+    expect(nhanExpGame(p,ngay,120)).toBe(120)
+    expect(p.expGame).toMatchObject({ngay,da:240})
   })
   it('REGRESSION 10 prior achieved days receive the full streak award',async()=>{
     const d=fixture()
@@ -76,22 +77,22 @@ describe('EXP audit 23/09: executable observed behavior',()=>{
     expect((await docExpHomNay(d.env,'S1',now)).homNay).toBe(10)
     expect(profile(d).wallet).toBe(10)
   })
-  it('question reward is daily by qid and mastery-independent: 16 full I0 questions then 25 percent',()=>{
+  it('question reward is daily by qid and mastery-independent: v5 every I0 question full price',()=>{
     const v=input()
     v.suKien=Array.from({length:17},(_,i)=>({khoa:String(i).padStart(2,'0'),nguon:'btvn',maNguon:'B',qid:'Q-I-'+i,lan:1,ketQua:1 as const,luc:new Date(now+i*1000).toISOString()}))
     const r=tinhExp(v)
-    expect(r.khoan.filter(k=>k.loai==='cau').reduce((a,k)=>a+k.exp,0)).toBe(33)
+    expect(r.khoan.filter(k=>k.loai==='cau').reduce((a,k)=>a+k.exp,0)).toBe(34)
     expect(r.khoan.find(k=>k.loai==='dau_ngay')?.exp).toBe(10)
   })
 })
 
-it('different rewards concurrently share one 120 EXP daily allowance',async()=>{
+it('different rewards concurrently are both credited in full (v5: no 120 EXP daily allowance)',async()=>{
   const d=fixture()
   const k={loai:'thu_thach',exp:80,ngay,luc:new Date(now).toISOString(),ghiChu:'fixture'}
   await Promise.all(['one','two'].map(khoa=>ghiKhoanExpGame(d.env,'S1',{...k,khoa},now)))
   expect(d.dem('exp_so')).toBe(2)
-  expect(profile(d).wallet).toBe(120)
-  expect(profile(d).expGame?.da).toBe(120)
+  expect(profile(d).wallet).toBe(160)
+  expect(profile(d).expGame?.da).toBe(160)
 })
 it('a learning challenge is credited even before the first game profile exists',async()=>{
   const d=fixture()
