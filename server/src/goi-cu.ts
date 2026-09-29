@@ -9,6 +9,7 @@ import {docBoCuaCacEm,docTomTat,laBaiCaNhan,nopBaiCaNhan} from './btvn-nang-do-d
 import {btvnNopTreBat,ghiNopTre} from './btvn-nang-do-chang'
 import { hopLe3DangChuan } from './loc-cau-chuan'
 import { goTuLuanKhoiGoi, laCauTuLuan, locPhieuBaiTap, type PhanCau } from './cam-tu-luan'
+import { docBaoVeKho, goCauBaoVeKhoiGoi, LOI_CHUA_KIEM_BAO_VE } from './bao-ve-kho-cong-khai'
 import { chuanNhanKienThuc, gomDiemNhan, thuongNhan, type BangChungCau, type CauCoNhan } from '../../src/lib/uu-tien-nhan-kho'
 // CỔNG TƯƠNG THÍCH `/goi` — CẮT HẲN GOOGLE.
 //
@@ -2441,7 +2442,7 @@ async function thuongNhanTheoQid(
  * CẤM BỊA: tờ nào đọc không được thì bỏ tờ ấy, không dựng câu thay. */
 async function goiTheoDang(
   env: Env,
-  x: { dsDang: Set<string>; dong: Record<string, unknown>[]; loaiTru: Set<string>; sbd: string; soCau: number },
+  x: { dsDang: Set<string>; dong: Record<string, unknown>[]; loaiTru: Set<string>; sbd: string; soCau: number; baoVe: ReadonlySet<string> },
 ): Promise<Record<string, unknown>> {
   const daLam = new Set<string>()
   if (x.sbd) {
@@ -2495,6 +2496,7 @@ async function goiTheoDang(
       console.warn('[kho] không đọc được gói đề', maDe, e)
     }
     if (!goi) continue
+    await goCauBaoVeKhoiGoi(goi, maDe, x.baoVe) // CHẶN LỘ ĐÁP ÁN (29/09): câu của ca đang bảo vệ không vào vùng chọn (bao-ve-kho-cong-khai.ts)
     const gom: any[] = Array.isArray(goi.cau) ? goi.cau : []
     const phanMacDinh = new Map<unknown, PhanCau>() // nguồn thầy (phanI/II/III) không mang `phan` trong từng câu
     for (const [k, p] of [['phanI', 'I'], ['phanII', 'II'], ['phanIII', 'III']] as const) {
@@ -2604,6 +2606,11 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
   }
   if (dsCd.length === 0) return { ok: true, items: [], soCau: 0, soChon: 0, thuTu: [], catBotViNang: false }
 
+  // CHẶN LỘ ĐÁP ÁN CA KIỂM TRA (29/09, bao-ve-kho-cong-khai.ts): lệnh công khai này trả gói kho CÓ đáp án + lời giải, mà ca dựng từ
+  // kho giữ nguyên qid ⇒ gỡ mọi câu của ca đang bảo vệ (qid hoặc nhóm nội dung) ở CẢ HAI đường dưới. Không kiểm được ⇒ đóng cửa.
+  const baoVe = await docBaoVeKho(env)
+  if (!baoVe) return { ok: false, error: LOI_CHUA_KIEM_BAO_VE, items: [], soCau: 0, soChon: 0, thuTu: [], catBotViNang: false }
+
   const oCd = dsCd.map(() => '?').join(',')
   const rCauTho = await env.DB.prepare(
     `SELECT c.qid, c.ma_de, c.chuyen_de FROM cau_hoi c JOIN de_kho d ON d.ma_de = c.ma_de
@@ -2643,6 +2650,7 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
       loaiTru,
       sbd,
       soCau,
+      baoVe,
     })
   }
 
@@ -2654,7 +2662,7 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
 
   const con = (rCau.results ?? []).filter((x) => {
     const q = chuoi(x.qid)
-    return q !== '' && !loaiTru.has(q) && !daLam.has(q)
+    return q !== '' && !loaiTru.has(q) && !daLam.has(q) && !baoVe.has(q)
   })
 
   // GOM THEO ĐỀ rồi chọn đề nhiều câu dùng được nhất: cùng một số câu, ít gói
@@ -2683,8 +2691,10 @@ export async function cauKhacPhucGoi(env: Env, b: Record<string, unknown>): Prom
       }
     }
     const bo = goi ? goTuLuanKhoiGoi(goi, maDe).qidBo : new Set<string>()
+    // Gói đi NGUYÊN TỜ ra máy em ⇒ gỡ tại chỗ cả câu của ca đang bảo vệ (kể cả câu trùng nội dung mang qid khác).
+    const boBaoVe = goi ? await goCauBaoVeKhoiGoi(goi, maDe, baoVe) : new Set<string>()
     // Lọc câu tự luận TRƯỚC, giữ nguyên thứ tự cũ của tờ.
-    const con = qids.filter((q) => !bo.has(q))
+    const con = qids.filter((q) => !bo.has(q) && !boBaoVe.has(q))
     // XẾP LẠI TRONG CÙNG MỘT MỨC ĐỘ: câu em còn yếu đáng chọn trước. Mức độ
     // chưa gắn thì KHÔNG ưu tiên — giữ nguyên thứ tự cũ. Không đổi thứ tự giữa
     // các mức độ (dễ trước, khó sau là luật của thầy).
@@ -3923,6 +3933,13 @@ function soBaiCua(ten: string): number {
   return m ? Number(m[1]) : 9999
 }
 
+/** Gói còn ít nhất một câu (khuôn `cau[]` hoặc `phanI/II/III`). */
+function conCau(goi: unknown): boolean {
+  if (!goi || typeof goi !== 'object') return false
+  const g = goi as Record<string, unknown>
+  return ['cau', 'phanI', 'phanII', 'phanIII'].some((k) => Array.isArray(g[k]) && (g[k] as unknown[]).length > 0)
+}
+
 /** TRẢ TRỌN MỘT TỜ DẠNG BÀI. Chỉ nhận mã `DB-…` — không mở đường cho máy em
  * tải tờ đề bất kỳ bằng lệnh không cần mã bí mật. */
 export async function deTheoDangBai(env: Env, b: Record<string, unknown>): Promise<Record<string, unknown>> {
@@ -3933,12 +3950,19 @@ export async function deTheoDangBai(env: Env, b: Record<string, unknown>): Promi
 
   const co = await env.DB.prepare('SELECT ma_de FROM de_kho WHERE ma_de = ? AND da_xoa = 0').bind(ma).first()
   if (!co) return { ok: false, error: 'Kho chưa có dạng bài này. Thầy cần đẩy lại kho đề.' }
+  // CHẶN LỘ ĐÁP ÁN CA KIỂM TRA (29/09): tờ dạng bài chép câu từ kho (có khi giữ qid gốc, có khi không) ⇒ gỡ theo qid VÀ nhóm nội dung.
+  const baoVe = await docBaoVeKho(env)
+  if (!baoVe) return { ok: false, error: LOI_CHUA_KIEM_BAO_VE }
 
   const o = await env.DE.get(`kho/${ma}.json`)
   if (!o?.body) return { ok: false, error: 'Gói đề của dạng bài này không còn trên máy chủ.' }
   try {
     const de = await new Response(o.body).json()
     goTuLuanKhoiGoi(de, ma) // CẤM RÚT TỰ LUẬN (21/09): tờ dạng bài trả cho máy em chỉ còn câu trắc nghiệm / đúng sai / trả lời ngắn
+    const boBaoVe = await goCauBaoVeKhoiGoi(de, ma, baoVe)
+    if (boBaoVe.size > 0 && !conCau(de)) {
+      return { ok: false, error: 'Dạng bài này đang tạm khoá vì có câu thuộc ca kiểm tra chưa công bố. Em quay lại sau khi thầy công bố điểm.' }
+    }
     return { ok: true, de }
   } catch {
     return { ok: false, error: 'Gói đề của dạng bài này hỏng, không đọc được.' }
