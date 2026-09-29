@@ -61,3 +61,13 @@
   background: var(--m3-inverse-surface, var(--m3-on-surface)); color: var(--m3-inverse-on-surface, var(--m3-surface)); font-size: 15px;
 }
 .lg-bao-loi span { flex: 1; min-width: 0; }
+
+/* NÚT "HỎI THẦY" TRONG GAME (29/09): vỏ game đặt lại mọi nút (`.dh button`, `.spirit-game button` — đặc hiệu 0,1,1) làm nút thành chữ trơn / nền trắng.
+ * Bộ chọn 0,2,1 thắng các luật ấy; màu có dự phòng rgb() vì trong game có thể không có biến M3. (Đảo dùng biến --nut-* riêng: xem dao.css.) */
+button.lg-nut.lg-nut--hoi {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 16px; margin: 0;
+  border-radius: 999px; border: 0; font: inherit; font-size: 15px; font-weight: 700; line-height: 1.2; white-space: nowrap; cursor: pointer;
+  background: var(--m3-tertiary-container, rgb(255 216 232)); color: var(--m3-on-tertiary-container, rgb(49 17 29));
+  box-shadow: none; transform: none;
+}
+button.lg-nut.lg-nut--hoi:disabled { opacity: 0.6; cursor: progress; }
