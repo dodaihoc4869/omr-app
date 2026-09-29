@@ -137,3 +137,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 20:58 · Boss · merge PR #87 Bi-a cầm gậy xoay (merge d9da4f8) · không ca mở · lùi: git revert -m1 d9da4f8
 - 21:11 · deploy #87 xanh (run 584)
 - 22:05 · Boss · merge PR #88 chấm trả lời ngắn ×10ⁿ (merge 6dc00e7) · không ca mở · lùi: git revert -m1 6dc00e7
+- 22:17 · deploy #88 xanh (run 585)
+- 22:3x · Boss · merge PR #89 version câu tất định (merge 7e56d8a) · 181 test xanh · không ca mở · lùi: git revert -m1 7e56d8a
