@@ -16,6 +16,8 @@ export interface CauSrs {
   mucDo: string | null
   dang: string | null
   nguon?: 'chien_dich' | 'no_cu' | 'duy_tri'
+  /** Số sao "cần chữa" của câu trong kho (chỉ-thêm 29/09, Sổ nợ): 2 sao đang nợ ⇒ ưu tiên ngang câu sai 2 lần. */
+  sao?: number
 }
 
 /** Một lần làm câu, đã lọc sẵn (bỏ sự kiện ca chưa công bố). `coGoiY` = máy chủ đã cho gợi ý M3 trước khi em trả lời. */
@@ -27,6 +29,11 @@ export interface LanLam {
   luc: string
   dung: boolean
   coGoiY: boolean
+  /**
+   * Nguồn trong sổ (`su_kien_hoc.nguon`, chỉ-thêm 29/09). `'dau_gio'` (Kiểm tra đầu giờ) ĐÚNG ⇒ thầy xác nhận: thành thạo NGAY kể cả
+   * câu 2 sao. Vắng ⇒ như nguồn thường.
+   */
+  nguon?: string
 }
 
 export interface TrangThaiCau {
@@ -46,6 +53,10 @@ export interface TrangThaiCau {
   lichSu: { ngay: string; dung: boolean; coGoiY: boolean }[]
   /** Thành thạo NGAY từ lần làm đầu (đúng, không gợi ý, câu khó đoán mò — `laCauKhoDoanMo`) — chỉ có mặt khi `true`; sai về sau thì bỏ. */
   thanhThaoLanDau?: true
+  /** SỔ NỢ (29/09): ngày sai ĐẦU TIÊN của đợt nợ hiện tại (xoá khi thành thạo lại) — xếp "nợ lâu trước". */
+  ngayVaoNo?: string
+  /** Ngày (VN) thầy bấm "Chữa xong"/"Thầy đã chữa" gần nhất — xếp "vừa chữa" và nhãn "Thầy đã chữa dd/mm". */
+  ngayChua?: string
 }
 
 export const TRAN_NGAY = 40
@@ -59,6 +70,12 @@ const HEN_DUNG_1 = 3
 const HEN_DUNG_2 = 7
 const HEN_DUNG_3 = 14
 export const HEN_DUY_TRI = 30
+/** SỔ NỢ (thầy chốt 29/09): câu 2 sao đã thành thạo ôn duy trì sau 14 ngày (câu thường 30). */
+export const HEN_DUY_TRI_2_SAO = 14
+/** Trần nợ khi có chiến dịch: tối đa 50% số lượt trong ngày (phần còn lại dành cho câu mới). */
+export const TI_LE_TRAN_NO = 0.5
+/** Nguồn sổ của Kiểm tra đầu giờ (hợp đồng docs/so-no-2909/HOP-DONG.md). */
+export const NGUON_DAU_GIO = 'dau_gio'
 /**
  * THÀNH THẠO LẦN ĐẦU (thầy CHỐT 28/09/2026): câu làm ĐÚNG ngay lần đầu, KHÔNG gợi ý ⇒ thành thạo luôn, không ôn lại
  * trong chiến dịch (chỉ còn ôn duy trì sau hạn) — CHỈ với câu KHÓ ĐOÁN MÒ (`laCauKhoDoanMo`):
@@ -83,14 +100,22 @@ export function laCauKhoDoanMo(tc: TuyChonPhatLai): boolean {
   return tc.phan === 'I' && tc.mucDo != null && HANG_MUC_DO[tc.mucDo] === 0
 }
 
-/** Hẹn của câu thành thạo lần đầu: không ôn trong chiến dịch — ôn duy trì sau ≥ 30 ngày và SAU hạn nộp. */
-export function henThanhThaoLanDau(ngay: string, hanNop: string | null): string {
-  const duyTri = congNgay(ngay, HEN_DUY_TRI)
+/** Số ngày ôn duy trì của câu đã thành thạo: 2 sao 14 ngày, còn lại 30 ngày. */
+export const soNgayDuyTri = (sao: number | null | undefined): number => ((Number(sao) || 0) >= SAO_PHAI_ON ? HEN_DUY_TRI_2_SAO : HEN_DUY_TRI)
+
+/** Hẹn của câu thành thạo lần đầu (và câu Đạt ở Kiểm tra đầu giờ): không ôn trong chiến dịch — ôn duy trì sau `soNgay` ngày và SAU hạn nộp. */
+export function henThanhThaoLanDau(ngay: string, hanNop: string | null, soNgay = HEN_DUY_TRI): string {
+  const duyTri = congNgay(ngay, soNgay)
   return hanNop && ngay <= hanNop && duyTri <= hanNop ? congNgay(hanNop, 1) : duyTri
 }
 
 // ---------------------------------------------------------------- ngày VN dạng chuỗi
 const MOT_NGAY = 86_400_000
+/** Ngày VN (YYYY-MM-DD) của một mốc ISO; chuỗi lạ ⇒ 10 ký tự đầu. */
+export const ngayVnCuaIso = (iso: string): string => {
+  const ms = Date.parse(iso)
+  return Number.isFinite(ms) ? new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10) : iso.slice(0, 10)
+}
 const msNgay = (ngay: string): number => Date.parse(`${ngay}T00:00:00Z`)
 export const congNgay = (ngay: string, so: number): string => new Date(msNgay(ngay) + so * MOT_NGAY).toISOString().slice(0, 10)
 /** Số ngày từ `a` tới `b` (b − a). */
@@ -105,14 +130,14 @@ export const soNgayConLai = (homNay: string, hanNop: string): number => Math.max
  *   câu đã thành thạo ôn chốt MỘT lần vào ngày áp chót (hết chỗ ⇒ không ôn thêm trước hạn).
  * - Sau hạn (nợ cũ, ôn duy trì): khoảng chuẩn, không nén; câu đã thành thạo hẹn ≥ 30 ngày.
  */
-export function henOnSau(ngay: string, soNgayChuan: number, hanNop: string | null, daThanhThao: boolean): string {
-  if (!hanNop || ngay > hanNop) return congNgay(ngay, daThanhThao ? Math.max(soNgayChuan, HEN_DUY_TRI) : soNgayChuan)
+export function henOnSau(ngay: string, soNgayChuan: number, hanNop: string | null, daThanhThao: boolean, duyTri = HEN_DUY_TRI): string {
+  if (!hanNop || ngay > hanNop) return congNgay(ngay, daThanhThao ? Math.max(soNgayChuan, duyTri) : soNgayChuan)
   const D = soNgayConLai(ngay, hanNop)
   if (D > soNgayChuan) return congNgay(ngay, soNgayChuan)
   if (daThanhThao) {
     const apChot = congNgay(hanNop, -1)
     // Hết chỗ ôn chốt trước hạn ⇒ không ôn thêm trong chiến dịch; sau hạn vào ôn duy trì.
-    return apChot > ngay ? apChot : congNgay(ngay, HEN_DUY_TRI)
+    return apChot > ngay ? apChot : congNgay(ngay, duyTri)
   }
   return D > 1 ? congNgay(ngay, 1) : ngay
 }
@@ -123,6 +148,7 @@ export function henOnSau(ngay: string, soNgayChuan: number, hanNop: string | nul
  */
 export function phatLaiCau(qid: string, lanLam: readonly LanLam[], hanNop: string | null, mocDayLai: readonly string[] = [], tuyChon: TuyChonPhatLai = {}): TrangThaiCau {
   const duocLanDau = THANH_THAO_LAN_DAU && laCauKhoDoanMo(tuyChon)
+  const duyTri = soNgayDuyTri(tuyChon.sao)
   const ds = [...lanLam].filter((x) => x.qid === qid).sort((a, b) => (a.luc < b.luc ? -1 : a.luc > b.luc ? 1 : 0))
   const moc = [...mocDayLai].sort()
   let iMoc = 0
@@ -131,6 +157,7 @@ export function phatLaiCau(qid: string, lanLam: readonly LanLam[], hanNop: strin
     while (iMoc < moc.length && moc[iMoc]! <= den) {
       tt.lanSai = 0
       tt.catTia = false
+      tt.ngayChua = ngayVnCuaIso(moc[iMoc]!)
       if (!tt.laMoi) tt.henOn = congNgay(moc[iMoc]!.slice(0, 10), 1)
       iMoc++
     }
@@ -138,7 +165,14 @@ export function phatLaiCau(qid: string, lanLam: readonly LanLam[], hanNop: strin
   for (const x of ds) {
     quaMoc(x.luc)
     const D = hanNop && x.ngay <= hanNop ? soNgayConLai(x.ngay, hanNop) : Number.POSITIVE_INFINITY
-    if (x.dung && tt.laMoi && !x.coGoiY && duocLanDau) {
+    if (x.dung && x.nguon === NGUON_DAU_GIO) {
+      // KIỂM TRA ĐẦU GIỜ — Đạt (thầy chốt 29/09): thầy xác nhận ⇒ thành thạo NGAY, kể cả câu 2 sao; hẹn duy trì 30 ngày (2 sao 14).
+      tt.cc = Math.max(tt.cc, 2)
+      tt.ngayDungCuoi = x.ngay
+      tt.thanhThao = true
+      delete tt.thanhThaoLanDau
+      tt.henOn = henThanhThaoLanDau(x.ngay, hanNop, duyTri)
+    } else if (x.dung && tt.laMoi && !x.coGoiY && duocLanDau) {
       // Thành thạo lần đầu: coi như đã đủ chuỗi 2 ngày; không hẹn ôn trong chiến dịch.
       tt.cc = 2
       tt.ngayDungCuoi = x.ngay
@@ -153,14 +187,17 @@ export function phatLaiCau(qid: string, lanLam: readonly LanLam[], hanNop: strin
       if (!tt.thanhThao) delete tt.thanhThaoLanDau
       const so = tt.cc >= 3 ? HEN_DUNG_3 : tt.cc === 2 ? HEN_DUNG_2 : HEN_DUNG_1
       // Câu thành thạo lần đầu làm đúng lại (ví dụ gặp trong ca kiểm tra): vẫn không kéo vào ôn trong chiến dịch.
-      tt.henOn = tt.thanhThaoLanDau ? henThanhThaoLanDau(x.ngay, hanNop) : henOnSau(x.ngay, so, hanNop, tt.thanhThao)
+      tt.henOn = tt.thanhThaoLanDau ? henThanhThaoLanDau(x.ngay, hanNop) : henOnSau(x.ngay, so, hanNop, tt.thanhThao, duyTri)
     } else {
       tt.cc = 0
       tt.lanSai += 1
       tt.thanhThao = false
       delete tt.thanhThaoLanDau
+      // SỔ NỢ (29/09): sai hôm nay ⇒ tới lịch NGÀY MAI ở mọi nguồn, kể cả sau hạn / không chiến dịch (ngày cuối trước hạn: ngay trong ngày).
       tt.henOn = henOnSau(x.ngay, 1, hanNop, false)
+      if (!tt.ngayVaoNo) tt.ngayVaoNo = x.ngay
     }
+    if (tt.thanhThao) delete tt.ngayVaoNo
     tt.laMoi = false
     tt.lanCuoiDung = x.dung
     tt.lichSu.push({ ngay: x.ngay, dung: x.dung, coGoiY: x.coGoiY })
@@ -479,10 +516,12 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   const coChienDich = !!tc.hanNop && tc.homNay <= tc.hanNop
   const D = coChienDich ? soNgayConLai(tc.homNay, tc.hanNop!) : 1
   const tt = (c: CauSrs) => trangThai.get(c.qid)!
+  const nguonCua = (c: CauSrs) => c.nguon ?? 'chien_dich'
   const catTia = cau.filter((c) => tt(c).catTia).map((c) => c.qid)
   const song = cau.filter((c) => !tt(c).catTia)
-  const cauChienDich = song.filter((c) => (c.nguon ?? 'chien_dich') === 'chien_dich')
-  const khoiLuong = coChienDich ? khoiLuongCan(cauChienDich.map(tt)) : 0
+  const cauChienDich = song.filter((c) => nguonCua(c) === 'chien_dich')
+  // SỔ NỢ (29/09): Huyết Chiến tính CẢ lượt nợ cũ (câu ngoài chiến dịch chưa thành thạo, ≈ 2 − cc lượt/câu).
+  const khoiLuong = coChienDich ? khoiLuongCan(song.filter((c) => nguonCua(c) !== 'duy_tri').map(tt)) : 0
   const huyetChien = coChienDich && khoiLuong > 0.9 * D * tranNgay
   const tran = Math.max(0, (huyetChien ? tranHuyet : tranNgay) - daLamHomNay)
 
@@ -493,22 +532,32 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
   }
   const xepOn = (ds: CauSrs[]) =>
     ds.sort((a, b) => trongSoOn(tt(b), tc.homNay) - trongSoOn(tt(a), tc.homNay) || bam(`${tc.homNay}|${a.qid}`) - bam(`${tc.homNay}|${b.qid}`))
-  const on = xepOn(song.filter((c) => (c.nguon ?? 'chien_dich') !== 'duy_tri' && denLich(c)))
-  const duyTri = xepOn(song.filter((c) => c.nguon === 'duy_tri' && denLich(c)))
+  // NỢ = câu đã làm, chưa thành thạo, chưa cắt tỉa — MỌI nguồn (chiến dịch đang chạy, chiến dịch cũ, ca/lên bảng/đầu giờ). Xếp `soSanhNo`.
+  const no = song.filter((c) => nguonCua(c) !== 'duy_tri' && laNo(tt(c)) && denLich(c)).sort((a, b) => soSanhNo(a, b, trangThai, tc.homNay))
+  // Câu chiến dịch ĐÃ thành thạo tới lịch ôn củng cố/ôn chốt (không phải nợ): sau câu mới.
+  const cungCo = xepOn(song.filter((c) => nguonCua(c) === 'chien_dich' && tt(c).thanhThao && denLich(c)))
+  const duyTri = xepOn(song.filter((c) => nguonCua(c) === 'duy_tri' && denLich(c)))
 
+  // Trần nợ 50% khi chiến dịch còn câu mới chưa giao; không chiến dịch (hoặc hết câu mới) ⇒ nợ tới 100%.
+  const tranNo = coChienDich && moi.length > 0 ? Math.floor(tran * TI_LE_TRAN_NO) : tran
+  const layNo = Math.min(no.length, tranNo)
   const quota = D > NGAY_DEM ? Math.ceil(moi.length / (D - NGAY_DEM)) : moi.length
-  const layMoi = Math.min(moi.length, quota, tran)
-  const layOn = Math.min(on.length, tran - layMoi)
-  const layDuyTri = Math.min(duyTri.length, Math.floor(tran * TI_LE_DUY_TRI), tran - layMoi - layOn)
-  const conDu = tran - layMoi - layOn - layDuyTri
+  const layMoi = Math.min(moi.length, quota, tran - layNo)
+  const layCungCo = Math.min(cungCo.length, tran - layNo - layMoi)
+  const layDuyTri = Math.min(duyTri.length, Math.floor(tran * TI_LE_DUY_TRI), tran - layNo - layMoi - layCungCo)
+  let conDu = tran - layNo - layMoi - layCungCo - layDuyTri
+  // Còn chỗ ⇒ thêm câu mới (nợ < 50% thì câu mới được thêm); đã giao HẾT câu mới hôm nay mà vẫn còn chỗ ⇒ thêm nợ vượt trần.
+  const themMoi = Math.min(Math.max(0, conDu), moi.length - layMoi)
+  conDu -= themMoi
+  const themNo = layMoi + themMoi >= moi.length ? Math.min(Math.max(0, conDu), no.length - layNo) : 0
   // Bốc câu mới cá nhân hoá (thầy 28/09): chỉ khi có `hangTheoDang`; số câu mới/ngày giữ nguyên quota.
   const hangCua = (c: CauSrs): HangEm => tc.hangTheoDang?.[c.dang ?? ''] ?? tc.hangChung ?? 'L2'
   const thuTuMoi = tc.hangTheoDang ? bocCauMoiCaNhan(moi, layMoi, D > NGAY_DEM ? D - NGAY_DEM : 1, hangCua, cauChienDich) : moi
-  const chonMoi = thuTuMoi.slice(0, layMoi + Math.max(0, conDu))
-  const chonOn = [...on.slice(0, layOn), ...duyTri.slice(0, layDuyTri)]
+  const chonMoi = thuTuMoi.slice(0, layMoi + themMoi)
+  const chonOn = [...no.slice(0, layNo + themNo), ...cungCo.slice(0, layCungCo), ...duyTri.slice(0, layDuyTri)]
 
   return {
-    // Câu ôn Đúng–sai đứng TRƯỚC câu mới: dọn nợ cũ trước (cùng tinh thần khoá Đảo khi Đoàn còn câu ôn).
+    // Câu ôn Đúng–sai (nợ trước) đứng TRƯỚC câu mới: dọn nợ trước (cùng tinh thần khoá Đảo khi Đoàn còn câu ôn).
     dao: [...chonOn.filter((c) => c.phan === 'II').map((c) => c.qid), ...chonMoi.map((c) => c.qid)],
     doan: chonOn.filter((c) => c.phan !== 'II').map((c) => c.qid),
     huyetChien,
@@ -518,6 +567,60 @@ export function lapKeHoachNgay(cau: readonly CauSrs[], trangThai: ReadonlyMap<st
     tran: huyetChien ? tranHuyet : tranNgay,
     catTia,
   }
+}
+
+// ---------------------------------------------------------------- SỔ NỢ (thầy chốt 29/09)
+/** Câu nợ: đã làm, chưa thành thạo, chưa cắt tỉa (sang "Cần thầy dạy lại"). */
+export const laNo = (t: TrangThaiCau): boolean => !t.laMoi && !t.thanhThao && !t.catTia
+/** Tổng số lần sai trong lịch sử (không đặt lại khi thầy chữa — nhãn "Sai N lần"). */
+export const soLanSai = (t: TrangThaiCau): number => t.lichSu.filter((l) => !l.dung).length
+/** Điểm "sai nhiều": số lần sai; câu 2 sao đang nợ tính ngang sai 2 lần. */
+export const diemSaiNo = (t: TrangThaiCau, sao: number | null | undefined): number => Math.max(soLanSai(t), (Number(sao) || 0) >= SAO_PHAI_ON ? 2 : 0)
+/** Vừa "Thầy đã chữa": mốc dạy lại cách hôm nay ≤ 1 ngày. */
+export const vuaChua = (t: TrangThaiCau, homNay: string): boolean => !!t.ngayChua && soNgayGiua(t.ngayChua, homNay) <= 1
+/**
+ * Thứ tự nợ: (1) sai nhiều trước (2 sao ngang sai 2 lần) → (2) nợ lâu trước (ngày sai đầu cũ nhất) → (3) vừa "Thầy đã chữa" trước →
+ * hoà thì băm theo ngày (tất định). Bỏ ưu tiên cũ "sắp chín trên vừa sai".
+ */
+export function soSanhNo(a: CauSrs, b: CauSrs, trangThai: ReadonlyMap<string, TrangThaiCau>, homNay: string): number {
+  const ta = trangThai.get(a.qid)!, tb = trangThai.get(b.qid)!
+  const sai = diemSaiNo(tb, b.sao) - diemSaiNo(ta, a.sao)
+  if (sai) return sai
+  const na = ta.ngayVaoNo ?? '9999', nb = tb.ngayVaoNo ?? '9999'
+  if (na !== nb) return na < nb ? -1 : 1
+  const ca = vuaChua(ta, homNay) ? 1 : 0, cb = vuaChua(tb, homNay) ? 1 : 0
+  if (ca !== cb) return cb - ca
+  return bam(`${homNay}|${a.qid}`) - bam(`${homNay}|${b.qid}`)
+}
+
+/** Trần nợ một ngày khi có chiến dịch: 50% thể lực/ngày (tối thiểu 1). */
+export const tranNoNgay = (theLucNgay: number): number => Math.max(1, Math.floor(Math.max(1, theLucNgay) * TI_LE_TRAN_NO))
+/** Số ngày ≈ để trả hết `luotNo` lượt nợ trong trần 50% của `theLucNgay`. */
+export const soNgayTraNo = (luotNo: number, theLucNgay: number): number => (luotNo > 0 ? Math.ceil(luotNo / tranNoNgay(theLucNgay)) : 0)
+/** Màn Chiến dịch báo thầy khi nợ cũ vượt trần từ ngần này ngày trở lên. */
+export const NGUONG_BAO_NO_NGAY = 3
+
+/** Nguồn của một lần làm để ghi nhãn. */
+export type NguonNhan = 'bia' | 'doan' | 'dao' | 'thi' | 'len_bang' | 'dau_gio' | 'khac'
+export const TEN_NGUON_NHAN: Record<NguonNhan, string> = { bia: 'Bi-a', doan: 'Đoàn', dao: 'Đảo', thi: 'Ca', len_bang: 'Lên bảng', dau_gio: 'Đầu giờ', khac: 'Khác' }
+const ddmm = (ngay: string): string => `${ngay.slice(8, 10)}/${ngay.slice(5, 7)}`
+/**
+ * Nhãn nợ trên câu: "Sai 2 lần · Ca 26/09 · Lên bảng 28/09 · Thầy đã chữa 29/09". Liệt kê tối đa `toiDa` lần sai gần nhất (gộp cùng nguồn + ngày),
+ * theo thứ tự thời gian; `chienDichCu` = "Chiến dịch 'Tên' · 25/09" khi câu là nợ của chiến dịch đã đóng. Chưa sai lần nào ⇒ null.
+ */
+export function nhanNo(lichSu: readonly { ngay: string; dung: boolean; nguon?: string }[], ngayChua?: string | null, chienDichCu?: { ten: string; hanNop: string } | null, toiDa = 3): string | null {
+  const sai = lichSu.filter((l) => !l.dung)
+  if (!sai.length) return null
+  const lan: string[] = []
+  for (const l of sai) {
+    const ten = TEN_NGUON_NHAN[(l.nguon ?? 'khac') as NguonNhan] ?? 'Khác'
+    const k = l.nguon && l.nguon !== 'khac' ? `${ten} ${ddmm(l.ngay)}` : `Sai ${ddmm(l.ngay)}`
+    if (lan[lan.length - 1] !== k) lan.push(k)
+  }
+  const phan = [`Sai ${sai.length} lần`, ...[...new Set(lan)].slice(-toiDa)]
+  if (chienDichCu) phan.push(`Chiến dịch '${chienDichCu.ten}' · ${ddmm(chienDichCu.hanNop)}`)
+  if (ngayChua) phan.push(`Thầy đã chữa ${ddmm(ngayChua)}`)
+  return phan.join(' · ')
 }
 
 /** Huyết Chiến: từ câu thứ 41 trong ngày không rơi EXP, không rơi vật phẩm. `thuTu` đếm từ 1. */

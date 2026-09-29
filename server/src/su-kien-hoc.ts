@@ -18,9 +18,9 @@ import type { D1PreparedStatement, Env } from './kieu'
 import { answerText, homeworkQuestions, isAnswerCorrect, kiemTraDapAnBtvn } from './btvn-grading'
 import { POLICY_VERSION } from './ho-so-cau-hinh'
 
-export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng'
+export type NguonSuKien = 'thi' | 'btvn' | 'btvn_lo' | 'khac_phuc' | 'mom' | 'len_bang' | 'game' | 'luyen' | 'on_lai' | 'thu_thach_rieng' | 'dau_gio'
 
-export const CAC_NGUON: readonly NguonSuKien[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'len_bang', 'game', 'luyen', 'on_lai', 'thu_thach_rieng']
+export const CAC_NGUON: readonly NguonSuKien[] = ['thi', 'btvn', 'btvn_lo', 'khac_phuc', 'mom', 'len_bang', 'game', 'luyen', 'on_lai', 'thu_thach_rieng', 'dau_gio']
 
 /** Hỗ trợ đã cấp cho lần làm này (CNH-1.0 04 §2). */
 export type Assistance = 'none' | 'assisted' | 'unknown'
