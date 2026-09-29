@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { NGAY_DAT_MO_CAP_10 } from '../../lib/kinh-te-game'
 import { dangCheDoMayYeu } from '../../lib/may-yeu'
 import { cheDoHieuUng, chuChoMocNgan, chuExpCau, chuLenCap, chuThanhThu, tiLeThanh, type AnhThuNhan, type CheDoHieuUng } from '../../lib/hieu-ung-exp-cau'
-import './exp-cau.css'
+// CSS: `./exp-cau.css` nạp MỘT lần ở src/main.tsx (gói CSS vỏ) — không nhập ở đây để khỏi tách thêm tệp precache.
 
 /** Mức hiệu ứng của máy này (đọc một lần lúc vẽ). */
 export function useCheDoHieuUng(): CheDoHieuUng {
@@ -21,10 +21,16 @@ export function useCheDoHieuUng(): CheDoHieuUng {
   return cheDo
 }
 
-export function SoExpCau({ exp, cheDo }: { exp: number; cheDo: CheDoHieuUng }) {
+/**
+ * MỘT thành phần hiệu ứng dùng CHUNG cho bảng nhiệm vụ, BTVN lô và mọi game. `vaoThu`:
+ *   · vắng — số nổi lên cạnh câu (mặc định);
+ *   · 'noi' — số bay VÀO ảnh thần thú trong cảnh trận (đặt tuyệt đối, cha phải có position);
+ *   · 'dong' — nằm trong dòng kết quả cạnh ảnh thú nhỏ, bay sang phía ảnh.
+ */
+export function SoExpCau({ exp, cheDo, vaoThu }: { exp: number; cheDo: CheDoHieuUng; vaoThu?: 'noi' | 'dong' }) {
   if (!(exp > 0)) return null
   return (
-    <span className="exp-cau-so" data-che-do={cheDo} data-vung="exp-cau" role="status">
+    <span className="exp-cau-so" data-che-do={cheDo} data-vao-thu={vaoThu} data-vung="exp-cau" role="status">
       {chuExpCau(exp)}
       {cheDo === 'day-du' && (
         <>

@@ -6,6 +6,7 @@
 import { useEffect, useRef } from 'react'
 import { ArrowRight, Award, Layers, RotateCcw, Sparkles, TrendingUp, X } from 'lucide-react'
 import type { TheChangView } from '../../lib/btvn-ca-nhan-kieu'
+import { SoExpCau, ThanhExpNho, useCheDoHieuUng } from '../exp-cau/ExpCau'
 import './m3-theme.css'
 import './the-cuoi-chang.css'
 
@@ -14,6 +15,7 @@ const BAC = ['Biết', 'Hiểu', 'Vận dụng'] as const
 const BIEU_TUONG = { lai: RotateCcw, moi: Sparkles, dang: Layers } as const
 
 export default function TheCuoiChang({ view, dong, veBang }: { view: TheChangView; dong: () => void; veBang: () => void }) {
+  const cheDo = useCheDoHieuUng()
   const nutChinh = useRef<HTMLButtonElement>(null)
   const dongRef = useRef(dong)
   dongRef.current = dong
@@ -110,6 +112,15 @@ export default function TheCuoiChang({ view, dong, veBang }: { view: TheChangVie
               <div className="tcc-exp-so">
                 +{view.exp.homNay} EXP<small>{view.exp.thu ? 'đã vào ống nghiệm' : 'hôm nay'}</small>
               </div>
+              {/* Luật v4 (29/09): "+N EXP" theo từng câu đúng của chặng + thanh EXP của thần thú (số máy chủ). */}
+              {view.expCau && view.expCau.length > 0 && (
+                <ul className="tcc-exp-cau" aria-label="EXP từng câu đúng" data-vung="exp-cau-chang">
+                  {view.expCau.map((c) => (
+                    <li key={c.stt}>Câu {c.stt} <SoExpCau exp={c.exp} cheDo={cheDo} /></li>
+                  ))}
+                </ul>
+              )}
+              {view.thu && <ThanhExpNho thu={view.thu} cheDo={cheDo} />}
               {view.exp.thu ? (
                 <div className="tcc-exp-phu" data-vung="exp-thu">
                   Thần thú của em còn <b>{view.exp.thu.expConThieu} EXP</b> nữa lên cấp · ống nghiệm có <b>{view.exp.thu.ongNghiem} EXP</b> · hôm nay thú còn ăn được <b>{view.exp.thu.hapThuConLaiHomNay} EXP</b>

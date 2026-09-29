@@ -4,7 +4,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { KhoiLoiGiai, TheCauAi } from '../than-thu-v2/dao2/TrongAi'
 import type { PhanHoi2 } from '../than-thu-v2/dao2/TrongAi'
-import { docVai } from '../than-thu-v2/dao2/dao2-core'
+import { docGoiY, docVai } from '../than-thu-v2/dao2/dao2-core'
+import { SoExpCau, useCheDoHieuUng } from '../../components/exp-cau/ExpCau'
+import { expCauGame } from '../../lib/hieu-ung-exp-cau'
 import { traLoiBia, type PhanHoiBia } from './api'
 import { giayCau, TEN_MUC, hangMuc } from './luat'
 import type { YeuCauCau } from './dieu-khien'
@@ -72,24 +74,25 @@ export default function TamCauBia({ y, token, session, tenNguoiDanh, laEmDanh, t
     return () => clearInterval(h)
   }, [xong]) // eslint-disable-line react-hooks/exhaustive-deps
   const dung = !!phanHoi?.correct
+  const cheDo = useCheDoHieuUng()
   const tt = y.mode === 'sau-lo' ? (laEmDanh ? `Bi ${y.id} vào lỗ · trả lời đúng để ăn bi` : `Đồng đội ${tenNguoiDanh} đánh bi ${y.id} của em vào lỗ · em trả lời`)
     : y.mode === 'chot' ? 'Bi chốt vào lỗ · trả lời đúng là thắng ván' : `Lượt của ${tenLuotNay} · em giải trước`
   const ttSau = xong && !dung && y.mode !== 'giai-truoc' ? `Đã sang lượt ${tenKeTiep} · em đọc lời giải` : tt
   let tieuDe = '', phu = ''
   if (hetGio && !phanHoi) { tieuDe = 'Hết giờ'; phu = y.mode === 'giai-truoc' ? 'Câu này chưa tính, em giải lại sau.' : `Bi ${y.mode === 'chot' ? 'chốt' : y.id} quay lại bàn. Câu này chưa tính, để lại cho lần sau.` }
   else if (phanHoi) {
-    const exp = phanHoi.reward + phanHoi.expThuThach
     if (y.mode === 'sau-lo') { tieuDe = dung ? `Đúng · ăn bi ${y.id}` : `Chưa đúng · bi ${y.id} quay lại bàn`; phu = dung ? (laEmDanh ? 'Em được đánh tiếp và có thêm 1 Mắt thần.' : `${tenNguoiDanh} được đánh tiếp. Em có thêm 1 Mắt thần.`) : `Câu này vào lịch ôn, bi ${y.id} đổi sang câu khác cùng dạng.` }
     else if (y.mode === 'chot') { tieuDe = dung ? 'Đúng · hạ Bi chốt' : 'Chưa đúng · Bi chốt quay lại bàn'; phu = dung ? 'Phe em thắng ván.' : 'Câu này vào lịch ôn.' }
     else { tieuDe = dung ? `Đúng · bi ${y.id} hoá vàng` : 'Chưa đúng'; phu = dung ? 'Bi vàng vào lỗ là ăn ngay. +1 Mắt thần.' : `Câu này vào lịch ôn. Bi ${y.id} đổi sang câu khác cùng dạng.` }
-    if (exp > 0) phu += ` +${exp} EXP.`
   }
+  // Luật v4 (29/09): "+N EXP" bay sang thần thú — số máy chủ (`reward` + `expThuThach`); câu sai / có Bùa Trợ giảng ⇒ không hiệu ứng.
+  const expBay = phanHoi ? expCauGame({ correct: phanHoi.correct, coTroGiup: !!docGoiY(y.cau.goiY, y.cau.phan), reward: phanHoi.reward, expThuThach: phanHoi.expThuThach }) : 0
   const nutDong = dung ? (y.mode === 'sau-lo' && laEmDanh ? 'Đánh tiếp' : y.mode === 'chot' ? 'Xem kết quả' : 'Về bàn') : hetGio && !phanHoi ? 'Về bàn' : 'Đã đọc lời giải'
   return (
     <div className="bia-che" role="presentation">
       <div className="bia-tam" ref={goc} role="dialog" aria-modal="true" aria-label={tt}>
         <div className="bia-dong-tt">{ttSau}</div>
-        {xong && <div className="bia-kq" data-sai={dung ? undefined : ''} role="status"><b>{tieuDe}</b><span>{phu}</span></div>}
+        {xong && <div className="bia-kq" data-sai={dung ? undefined : ''} role="status"><b>{tieuDe}</b><span>{phu}</span>{expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}</div>}
         <div className="bia-dau-cau"><NhanCau y={y} /><span>{moTa(y)}</span>{!xong && <span className="gio" data-gap={con <= 15 ? '' : undefined}>Còn {Math.floor(con / 60)}:{String(con % 60).padStart(2, '0')}</span>}</div>
         {y.cau.nhanNo && <p className="bia-nhan-no" data-khoi="nhan-no">{y.cau.nhanNo}</p>}
         <div className="dao2 bia-dao2">

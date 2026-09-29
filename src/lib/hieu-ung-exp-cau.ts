@@ -47,6 +47,16 @@ export function expTheoCau(
   return ra
 }
 
+/**
+ * EXP hiện cho MỘT câu trả lời trong GAME (Đảo, Đoàn Hộ Tống, Bi-a): số lấy NGUYÊN từ phản hồi máy chủ (`reward` thưởng nấc đã qua trần 120 + `expThuThach`).
+ * Câu sai, câu có trợ giúp (ô "Trợ giúp", Bùa Trợ giảng) hoặc câu em đã bấm Hỏi thầy ⇒ 0 (không hiệu ứng), dù máy chủ trả gì.
+ */
+export function expCauGame(r: { correct?: boolean; assisted?: boolean; coTroGiup?: boolean; daHoi?: boolean; reward?: number; expThuThach?: number } | null | undefined): number {
+  if (!r || r.correct !== true || r.assisted === true || r.coTroGiup === true || r.daHoi === true) return 0
+  const so = (x: unknown) => (typeof x === 'number' && Number.isFinite(x) && x > 0 ? Math.floor(x) : 0)
+  return so(r.reward) + so(r.expThuThach)
+}
+
 const nguyen = (x: unknown): number | null => (typeof x === 'number' && Number.isFinite(x) && x >= 0 ? Math.floor(x) : null)
 
 /** Đọc CHẶT `thanThu` máy chủ gửi; thiếu/sai dạng ⇒ null (màn chỉ hiện số, không thanh — không bịa). */

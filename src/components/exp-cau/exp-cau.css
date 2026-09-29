@@ -92,6 +92,34 @@
   100% { transform: scale(1); opacity: 1; }
 }
 
+/* GAME: số bay VÀO thần thú. 'noi' = trong cảnh trận (cha có position), 'dong' = trong dòng kết quả cạnh ảnh thú nhỏ. */
+.exp-cau-so[data-vao-thu='noi'] {
+  position: absolute;
+  z-index: 4;
+  left: 12%;
+  top: 14%;
+  pointer-events: none;
+}
+.exp-cau-so[data-vao-thu='noi'][data-che-do='day-du'],
+.exp-cau-so[data-vao-thu='noi'][data-che-do='gon'] {
+  animation: exp-bay-vao-thu 1400ms ease-out both;
+}
+.exp-cau-so[data-vao-thu='dong'][data-che-do='day-du'],
+.exp-cau-so[data-vao-thu='dong'][data-che-do='gon'] {
+  animation: exp-bay-sang-thu 900ms ease-out both;
+}
+@keyframes exp-bay-vao-thu {
+  0% { transform: translateY(24px) scale(0.8); opacity: 0; }
+  25% { transform: translateY(0) scale(1.08); opacity: 1; }
+  75% { transform: translate(-6px, 36px) scale(0.9); opacity: 1; }
+  100% { transform: translate(-10px, 56px) scale(0.5); opacity: 0; }
+}
+@keyframes exp-bay-sang-thu {
+  0% { transform: translateX(16px); opacity: 0; }
+  40% { transform: translateX(-4px); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
 /* Máy yếu: không hạt. Xin giảm chuyển động: mọi hoạt ảnh đứng yên. */
 .may-yeu .exp-cau-hat { display: none; }
 @media (prefers-reduced-motion: reduce) {

@@ -1,4 +1,6 @@
 import {useEffect,useRef,useState} from 'react'
+import {SoExpCau,useCheDoHieuUng} from '../../../components/exp-cau/ExpCau'
+import {expCauGame} from '../../../lib/hieu-ung-exp-cau'
 import {learningBattle} from '../learning-battle'
 import type {BattleAnswer} from '../learning-battle'
 import {battleMuted,playBattleSound,setBattleMuted,unlockBattleAudio} from '../battle-audio'
@@ -14,7 +16,9 @@ import {chiSoThu,tenNhomAi,tenThu} from './dao-core'
 import type {CauDao,DaoProfile,LyDoThuong} from './kieu'
 import './dao.css'
 
-export interface PhanHoiAi{correct:boolean;answer:string;solution:unknown;solutionImages:HinhAnh[];lyDo:LyDoThuong}
+export interface PhanHoiAi{correct:boolean;answer:string;solution:unknown;solutionImages:HinhAnh[];lyDo:LyDoThuong
+ /** Luật v4 (chỉ-thêm): số máy chủ trả cho hiệu ứng "+N EXP bay vào thú" — `reward` thưởng nấc, `expThuThach`. Vắng ⇒ dùng `lyDo.exp`. */
+ reward?:number;expThuThach?:number}
 export interface TongKetChuyen{dung:number;tong:number;exp:number;sao:number}
 export interface ThamHiemProps{
  profile:DaoProfile;cau:readonly CauDao[];viTri:number
@@ -50,7 +54,8 @@ export function useKhungGon(ref:{current:HTMLElement|null}):boolean{
  return gon}
 
 /** Sân đấu: giữ công thức `learning-battle.ts` (HP, 3 đúng liền → cuồng nộ ×2); Cuồng nộ hiện bằng TRANH cuồng nộ thật. */
-export function SanDau({profile,ketQua,tong,suKien,xong}:{profile:DaoProfile;ketQua:readonly BattleAnswer[];tong:number;suKien:number;xong:boolean}){
+export function SanDau({profile,ketQua,tong,suKien,xong,expBay=0}:{profile:DaoProfile;ketQua:readonly BattleAnswer[];tong:number;suKien:number;xong:boolean;/** Luật v4: EXP câu vừa chấm (số máy chủ, 0 = không hiệu ứng). */expBay?:number}){
+ const cheDo=useCheDoHieuUng()
  const thu=chiSoThu(profile.pet),ten=tenThu(profile),tran=learningBattle([...ketQua],tong),[tat,setTat]=useState(battleMuted),khung=useRef<HTMLElement>(null),gon=useKhungGon(khung)
  const vuaNop=suKien>0&&tran.count>0
  useEffect(()=>{if(vuaNop)playBattleSound(thu,evolutionStage(profile.cap),!!tran.correct,tran.rage)},[suKien]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -69,6 +74,7 @@ export function SanDau({profile,ketQua,tong,suKien,xong}:{profile:DaoProfile;ket
   </div>
   {vuaNop&&<p className="dao-san-so" key={`so-${suKien}`} data-phia={tran.correct?'quai':'thu'}>−{tran.damage}</p>}
   {vuaNop&&tran.heal>0&&<p className="dao-san-hoi" key={`hoi-${suKien}`}>+{tran.heal}</p>}
+  {vuaNop&&expBay>0&&<SoExpCau key={`exp-${suKien}`} exp={expBay} cheDo={cheDo} vaoThu="noi"/>}
   <div className="dao-san-ta"><div className="dao-san-mau" role="progressbar" aria-label={`Máu của ${ten}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={tran.hp}><i style={{width:`${tran.hp}%`}}/></div><span className="dao-san-ten"><small>Thần thú của em: {ten}</small>Máu {tran.hp}/100</span></div>
   <button type="button" className="dao-san-tieng" aria-pressed={!tat} aria-label={tat?'Bật tiếng trận đấu':'Tắt tiếng trận đấu'} onClick={()=>{setBattleMuted(!tat);setTat(!tat)}}><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/>{tat?<path d="m22 9-6 6M16 9l6 6"/>:<path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/>}</svg></button>
  </section>
@@ -91,7 +97,7 @@ export default function ThamHiem({profile,cau,viTri,ketQua,traLoi,assisted,phanH
  return <div className="dao-tham" data-thu={chiSoThu(profile.pet)}>
   {zoom&&<ManHinhAnh src={zoom} alt="Ảnh câu hỏi / lời giải" onClose={()=>setZoom('')}/>}
   <div className="dao-tham-dau"><button type="button" className="dao-tham-ve" onClick={onVeDao} aria-label="Về đảo (chuyến đang làm được giữ lại)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button><DaiAi cau={cau} viTri={viTri} ketQua={ketQua} xong={xong}/></div>
-  <SanDau profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length} xong={xong}/>
+  <SanDau profile={profile} ketQua={ketQua} tong={cau.length} suKien={ketQua.length} xong={xong} expBay={phanHoi?expCauGame({correct:phanHoi.correct,assisted,reward:phanHoi.reward??phanHoi.lyDo.exp,expThuThach:phanHoi.expThuThach}):0}/>
   {thongBao&&<p className="dao-chuyen-bao" role="status">{thongBao}</p>}
   {loi&&(xong||!q)&&<p className="dao-loi" role="alert">{loi}</p>}
   {xong?<section className="dao-kinh dao-tham-xong" aria-live="polite"><h3>Xong chuyến thám hiểm</h3>

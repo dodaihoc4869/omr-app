@@ -15,7 +15,7 @@ import {
   type BoCuaEm, type CauGiao, type DieuChinhEm, type HoSoEmRut, type Muc, type NganSachBai, type NhanCau, type PhanCau, type Sao, type TienBo, type TomTatBo,
 } from '../../src/lib/btvn-nang-do'
 import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
-import { capNhatExp, capNhatExpSauNopLo, docExpHomNay, expNhanCuaKetQua, manhNhanCuaKetQua } from './exp-d1'
+import { capNhatExp, capNhatExpSauNopLo, docExpHomNay, expNhanCuaKetQua, manhNhanCuaKetQua, thanThuCuaKetQua } from './exp-d1'
 import { docHapThuChoEm } from './game-v2-hap-thu'
 import { PHUT_NGAY_TOI_DA, PHUT_NGAY_TOI_THIEU, SO_NGAY_DO_VAN_TOC, SO_NGAY_LICH_SU, TY_LE_ON_TOI_DA } from './ho-so-cau-hinh'
 import { dungLaiHoSo, themNgay } from './ho-so-nam-kt'
@@ -871,7 +871,7 @@ export async function nopChangCaNhan(env: Env, bt: Hang, sbd: string, chiSoTho: 
     chuaLam,
     exp: { homNay: homNay.homNay, conLaiLenCap: await docConLaiLenCap(env, sbd), ...(await docHapThuChoEm(env, sbd, now) ?? {}) },
     tienBo: { ...tien, dangLenBac: tien.dangLenBac.map((d) => ({ ...d, ten: ten.get(d.ma) ?? d.ma })) } satisfies TienBo & { dangLenBac: { ma: string; ten: string; tu: Muc; den: Muc }[] },
-    ...(moiExp.bat ? { expNhan: expNhanCuaKetQua(moiExp), manhNhan: manhNhanCuaKetQua(moiExp) } : {}),
+    ...(moiExp.bat ? { expNhan: expNhanCuaKetQua(moiExp), manhNhan: manhNhanCuaKetQua(moiExp), ...thanThuCuaKetQua(moiExp) } : {}),
   }
 }
 
@@ -981,7 +981,7 @@ async function nopThuSucThem(env: Env, bt: Hang, em0: Hang, sbd: string, dapAnTh
     thuSucThem: trangThai,
     ...(bai?.nop_luc ? { baiDaNop: { soDung: soHoac(bai.so_dung), soCau: soHoac(bai.so_cau) } } : {}), // điểm hiện tại của bài sau khi cộng thử sức đúng (chỉ khi bài đã nộp)
     exp: { homNay: homNay.homNay, conLaiLenCap: await docConLaiLenCap(env, sbd), ...(await docHapThuChoEm(env, sbd, now) ?? {}) },
-    ...(moiExp.bat ? { expNhan: expNhanCuaKetQua(moiExp), manhNhan: manhNhanCuaKetQua(moiExp) } : {}),
+    ...(moiExp.bat ? { expNhan: expNhanCuaKetQua(moiExp), manhNhan: manhNhanCuaKetQua(moiExp), ...thanThuCuaKetQua(moiExp) } : {}),
   }
 }
 

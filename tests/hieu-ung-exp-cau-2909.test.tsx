@@ -3,7 +3,12 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
-import { cheDoHieuUng, docAnhThu, expTheoCau, tiLeThanh } from '../src/lib/hieu-ung-exp-cau'
+import { cheDoHieuUng, docAnhThu, expCauGame, expTheoCau, tiLeThanh } from '../src/lib/hieu-ung-exp-cau'
+import { DaiKetQua, type PhanHoi2 } from '../src/game/than-thu-v2/dao2/TrongAi'
+import type { CauDao2 } from '../src/game/than-thu-v2/dao2/dao2-core'
+import type { DaoProfile } from '../src/game/than-thu-v2/dao/kieu'
+import DoanCau from '../src/game/than-thu-v2/DoanCau'
+import { docKetQuaChang, theChangView } from '../src/lib/btvn-ca-nhan-kieu'
 import { SoExpCau, ThanhExpNho } from '../src/components/exp-cau/ExpCau'
 
 afterEach(cleanup)
@@ -63,5 +68,55 @@ describe('SoExpCau / ThanhExpNho', () => {
     expect(css).toMatch(/prefers-reduced-motion: reduce/)
     expect(css).toMatch(/\.may-yeu \.exp-cau-hat \{ display: none; \}/)
     expect(css.replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/#[0-9a-fA-F]{3,8}\b/)
+  })
+})
+
+// ── GAME + BTVN lô (Boss soát PR #74): CÙNG một thành phần `SoExpCau`, số lấy từ phản hồi máy chủ ─────────────────────────
+describe('expCauGame — game chỉ hiệu ứng câu TỰ LÀM ĐÚNG', () => {
+  it('đúng ⇒ reward + expThuThach của máy chủ; sai / assisted / trợ giúp / Bùa / Hỏi thầy ⇒ 0', () => {
+    expect(expCauGame({ correct: true, reward: 10, expThuThach: 3 })).toBe(13)
+    expect(expCauGame({ correct: false, reward: 10 })).toBe(0)
+    expect(expCauGame({ correct: true, assisted: true, reward: 10 })).toBe(0)
+    expect(expCauGame({ correct: true, coTroGiup: true, reward: 10 })).toBe(0)
+    expect(expCauGame({ correct: true, daHoi: true, reward: 10 })).toBe(0)
+    expect(expCauGame({ correct: true, reward: 0 })).toBe(0)
+    expect(expCauGame(null)).toBe(0)
+  })
+})
+
+const hoSo: DaoProfile = { nickname: 'Lửa Nhỏ', pet: 'lua_phuong', choice: false, cap: 7, exp: 0, wallet: 0, mastery: [] }
+const cauI = { qid: 'q1', maDe: 'DE', version: '1', group: 'g1', phan: 'I', text: 'Câu', choices: ['A1', 'B1', 'C1', 'D1'], ideas: [], hinhAnh: [], dang: 'd', mucDo: 'biet' } as unknown as CauDao2
+const ph = (o: Partial<PhanHoi2>): PhanHoi2 => ({ correct: true, answer: 'A', traLoi: 'A', solution: null, solutionImages: [], reward: 10, lyDo: { moc: 1, exp: 10, chu: '+10 · Sao thứ nhất' }, ...o })
+
+describe('Đảo 2.0 · Đoàn · BTVN lô dùng chung SoExpCau', () => {
+  it('Đảo 2.0 (DaiKetQua): đúng ⇒ "+N EXP" bay sang ảnh thú (reward + thử thách); có trợ giúp ⇒ không hiệu ứng', () => {
+    const r = render(<DaiKetQua profile={hoSo} cau={cauI} phanHoi={ph({ expThuThach: 3 })} ketQua={[{ qid: 'q1', correct: true }]} tong={6} />)
+    const so = r.container.querySelector('[data-vung="exp-cau"]')!
+    expect(so.textContent).toContain('+13 EXP'); expect(so.getAttribute('data-vao-thu')).toBe('dong')
+    cleanup()
+    const t = render(<DaiKetQua profile={hoSo} cau={cauI} phanHoi={ph({ coTroGiup: true })} ketQua={[{ qid: 'q1', correct: true }]} tong={6} />)
+    expect(t.container.querySelector('[data-vung="exp-cau"]')).toBeNull()
+  })
+  it('Đoàn (DoanCau): đúng + reward ⇒ hiệu ứng; assisted / Bùa (gạch) / sai ⇒ không', () => {
+    const q = { ...cauI, correct: 'A' } as never
+    const ve = (ketQua: object, gach?: string[]) => render(<DoanCau q={q} chon="A" onChon={() => {}} khoa ketQua={ketQua as never} onZoom={() => {}} dau={<b>CÂU</b>} gach={gach} />)
+    expect(ve({ correct: true, answer: 'A', solution: null, reward: 10 }).container.querySelector('[data-vung="exp-cau"]')?.textContent).toContain('+10 EXP'); cleanup()
+    expect(ve({ correct: true, answer: 'A', solution: null, reward: 10, assisted: true }).container.querySelector('[data-vung="exp-cau"]')).toBeNull(); cleanup()
+    expect(ve({ correct: true, answer: 'A', solution: null, reward: 10 }, ['B']).container.querySelector('[data-vung="exp-cau"]')).toBeNull(); cleanup()
+    expect(ve({ correct: false, answer: 'B', solution: null, reward: 10 }).container.querySelector('[data-vung="exp-cau"]')).toBeNull()
+  })
+  it('BTVN lô: theChangView đưa "+N EXP" theo từng câu đúng (khoản `cau` của máy chủ) + thần thú sau lượt; máy chủ cũ ⇒ không thêm trường', () => {
+    const tho = { ok: true, chang: { chiSo: 0, soCau: 3, soDung: 2, xong: true }, ketQua: [{ qid: 'a', dung: true }, { qid: 'b', dung: false }, { qid: 'c', dung: true }], chuaLam: [],
+      expNhan: [{ loai: 'cau', qid: 'a', exp: 5, ghiChu: 'x' }, { loai: 'cau', qid: 'c', exp: 2, ghiChu: 'y' }, { loai: 'lo', exp: 20, ghiChu: 'z' }], thanThu: { cap: 3, exp: 40, thanh: 510, soCapLen: 1, choMoc: 0 } }
+    const v = theChangView(docKetQuaChang(tho)!, 3)!
+    expect(v.expCau).toEqual([{ stt: 1, exp: 5 }, { stt: 3, exp: 2 }])
+    expect(v.thu).toEqual({ cap: 3, exp: 40, thanh: 510, soCapLen: 1, choMoc: 0 })
+    const cu = theChangView(docKetQuaChang({ ...tho, expNhan: undefined, thanThu: undefined })!, 3)!
+    expect(cu).not.toHaveProperty('expCau'); expect(cu).not.toHaveProperty('thu')
+  })
+  it('mọi nơi gắn hiệu ứng dùng CHUNG SoExpCau (không tự viết hiệu ứng riêng)', () => {
+    for (const f of ['src/game/than-thu-v2/dao/ThamHiem.tsx', 'src/game/than-thu-v2/dao2/TrongAi.tsx', 'src/game/than-thu-v2/DoanCau.tsx', 'src/game/bi-a/TamCauBia.tsx', 'src/components/bang-nhiem-vu/TheCuoiChang.tsx', 'src/components/bang-nhiem-vu/LamCauOn.tsx']) {
+      expect(readFileSync(f, 'utf8'), f).toMatch(/<SoExpCau\b/)
+    }
   })
 })

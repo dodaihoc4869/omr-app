@@ -22,7 +22,8 @@ describe('lõi thuần không đụng API trình duyệt', () => {
     const ma = boChuThich(doc('src/lib/btvn-ca-nhan-kieu.ts'))
     // HAI import được phép, đều THUẦN (không API trình duyệt): './ngay-gio-24' (định dạng ngày giờ VN) cho `hanChu`; './mo-som-chang' (Code 1: luật + câu chữ mở sớm chặng, Điều 6) cho `chuMoSomCuaChang`
     const dong = ma.match(/^\s*import\s.*$/gm) ?? []
-    expect(dong.map((d) => /from '([^']+)'/.exec(d)![1]).sort()).toEqual(['./mo-som-chang', './ngay-gio-24'])
+    // + './hieu-ung-exp-cau' (luật v4 29/09, THUẦN, không API trình duyệt): đọc `thanThu` và EXP từng câu cho hiệu ứng "+N EXP" ở thẻ cuối chặng. Sửa CÓ CHỦ Ý.
+    expect(dong.map((d) => /from '([^']+)'/.exec(d)![1]).sort()).toEqual(['./hieu-ung-exp-cau', './mo-som-chang', './ngay-gio-24'])
     expect(doc('src/lib/mo-som-chang.ts').replace(/\/\/.*$/gm, '')).not.toMatch(/localStorage|sessionStorage|\bwindow\b|\bdocument\b|navigator/)
   })
 
