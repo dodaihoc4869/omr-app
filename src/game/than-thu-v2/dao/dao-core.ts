@@ -5,6 +5,7 @@ import type {Mastery} from '../core'
 import {BATTLE_SKINS} from '../learning-battle'
 import {EVOLUTION_LEVELS,evolutionStage} from '../evolution'
 import {thanhExp} from '../../than-thu-hoa-hoc/kinh-nghiem'
+import {CAP_KHOA_MOC,NGAY_DAT_MO_CAP_10} from '../../../lib/kinh-te-game'
 import {lyDoThuong} from '../ly-do-thuong'
 import type {DaoExp,DaoProfile,LyDoThuong,VaiAi} from './kieu'
 
@@ -28,7 +29,16 @@ export function tenThu(p:Pick<DaoProfile,'pet'|'nickname'>){return p.nickname||B
 export function vongExp(cap:number,exp:number){const can=thanhExp(cap);if(cap>=CAP_TOI_DA||can<=0)return {toiDa:true,can:0,con:0,tiLe:1}
  const co=Math.max(0,Math.min(can,Math.floor(exp)));return {toiDa:false,can,con:can-co,tiLe:co/can}}
 
-/** Trần hấp thụ tối đa mỗi ngày (khi đạt nhiệm vụ ngày) = `HAP_THU_DAT` của Code 1. */
+/**
+ * KHOÁ MỐC cấp 10 (luật v4, 29/09): EXP của em vẫn vào thú ngay, nhưng thú chỉ lên cấp 10 khi em đạt nhiệm vụ ngày đủ 21 ngày; phần vượt "chờ mốc" (không mất).
+ * Trả câu cho màn khi đang chờ (`choMoc > 0`), ngược lại null. Số lấy từ máy chủ (`choMoc`, `soNgayDat`, `ngayMoCap10`).
+ */
+export function chuChoMoc(p:Pick<DaoProfile,'choMoc'|'soNgayDat'|'ngayMoCap10'>,ten:string):string|null{
+ const cho=Math.max(0,Math.floor(Number(p.choMoc)||0));if(cho<=0)return null
+ const can=Math.max(1,Math.floor(Number(p.ngayMoCap10)||NGAY_DAT_MO_CAP_10)),co=Math.max(0,Math.floor(Number(p.soNgayDat)||0))
+ return `${ten} đã đủ EXP lên cấp ${CAP_KHOA_MOC}. Em đạt nhiệm vụ ngày đủ ${can} ngày thì ${ten} lên cấp (em đã có ${co} ngày). ${cho.toLocaleString('vi-VN')} EXP đang được giữ, không mất.`}
+
+/** (LỊCH SỬ v3) Trần hấp thụ tối đa mỗi ngày (khi đạt nhiệm vụ ngày) = `HAP_THU_DAT` của Code 1. Luật v4 bỏ trần hấp thụ; máy chủ v4 không gửi `hapThuHomNay` nên thanh này tự ẩn. */
 export const HAP_THU_TOI_DA_NGAY=HAP_THU_DAT
 export interface HapThuView{da:number;toiDa:number;tiLe:number;chu:string;bao:string}
 /** THANH "Hôm nay {tên} đã hấp thụ 120 / 200 EXP" + lời báo khi lần nạp bị chặn (giọng trung tính, nói thật). Thiếu/sai dạng ⇒ null (ẩn, KHÔNG bịa số).
@@ -54,7 +64,7 @@ export function duTruNgayAn(wallet:number):number|null{const n=Number.isFinite(w
 export function lyDoTranExpGame(reward:number|undefined,thuongGoc:number|undefined,tenThuCuaEm:string):LyDoThuong|null{
  const r=Math.max(0,Math.floor(Number(reward)||0)),g=Math.floor(Number(thuongGoc)||0)
  if(g<=0||r>=g)return null
- return {moc:0,exp:r,chu:`+${r} EXP · hôm nay em đã đủ ${TRAN_EXP_GAME_NGAY} EXP từ game. Muốn ${tenThuCuaEm} ăn no thì làm bài tập về nhà hoặc phần ôn lại.`}}
+ return {moc:0,exp:r,chu:`+${r} EXP · hôm nay em đã đủ ${TRAN_EXP_GAME_NGAY} EXP từ game. Muốn ${tenThuCuaEm} lớn thêm thì làm bài tập về nhà hoặc phần ôn lại.`}}
 
 export interface MucTieu{loai:'cap'|'dang'|'khien'|'tien-hoa';tieuDe:string;phu:string;tiLe:number}
 /** Dạng gần thành thạo nhất: nhiều sao nhất trong các dạng chưa đủ 3 sao; hoà thì dạng tới hạn sớm hơn. */

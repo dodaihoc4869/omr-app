@@ -293,14 +293,14 @@ describe('EXP câu THỬ THÁCH / LƯỢT TRÙM làm đúng lần đầu (qua c�
     const a = await tra(d, 'SS', 'A-1')
     expect(a).toMatchObject({ correct: true, reward: 10, expThuThach: 3 }) // nấc 1 = 10 EXP (đường Đảo) + 3 EXP thử thách
     expect(khoan(d)).toEqual([{ khoa: 'S1|thuthach|A-1', loai: 'thu_thach', exp: 3, qid: 'A-1' }])
-    expect(hoSo(d)).toMatchObject({ wallet: 13, earned: 13, expGame: { ngay: NGAY, da: 13 } })
-    expect((a.profile as any).wallet).toBe(13) // phản hồi mang hồ sơ MỚI (sau khi cộng ống)
+    expect(hoSo(d)).toMatchObject({ exp: 13, wallet: 0, earned: 13, expGame: { ngay: NGAY, da: 13 } }) // luật v4 (29/09): EXP vào THẲNG thần thú (trước: vào ống nghiệm)
+    expect((a.profile as any).exp).toBe(13) // phản hồi mang hồ sơ MỚI (luật v4: EXP đã vào thú)
     const b = await tra(d, 'SS', 'A-2'); expect(b.expThuThach).toBe(3)
     const c = await tra(d, 'SS', 'A-3'); expect(c).not.toHaveProperty('expThuThach')
     expect(khoan(d).map((x) => x.qid)).toEqual(['A-1', 'A-2'])
-    expect(hoSo(d).wallet).toBe(16) // nấc dạng A.1 chỉ MỘT lần (10) + 2 thử thách × 3
+    expect(hoSo(d).exp).toBe(16) // nấc dạng A.1 chỉ MỘT lần (10) + 2 thử thách × 3
     await tra(d, 'SS', 'A-1') // replay
-    expect(khoan(d)).toHaveLength(2); expect(hoSo(d).wallet).toBe(16)
+    expect(khoan(d)).toHaveLength(2); expect(hoSo(d).exp).toBe(16)
   })
 
   it('câu thử thách SAI hoặc có trợ giúp ⇒ không có EXP thử thách; EXP mới TẮT cho em ⇒ không ghi sổ', async () => {

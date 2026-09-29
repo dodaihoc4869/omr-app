@@ -27,8 +27,8 @@ import {
   chuTrangThai,
 } from './chu-shop'
 
-/** Mức EXP dư mỗi ngày của em học đủ (đề xuất mục 2). CHỈ dùng để ước lượng lời "khoảng N ngày nữa là đủ vàng"; Boss đổi sau khi đo. */
-export const DU_MOI_NGAY = 80
+/** Vàng mỗi ngày của em TRUNG BÌNH theo luật v4 (docs/DE-XUAT-EXP-2909.md mục 2.4/2.6: ≈ 314 EXP/ngày ÷ 5). CHỈ dùng để ước lượng lời "khoảng N ngày nữa là đủ vàng"; bảng giá cũng định theo số này. */
+export const DU_MOI_NGAY = 63
 
 /**
  * [D2] số ngày ước lượng = làm tròn lên của (vàng còn thiếu − EXP thừa đang đổi được) ÷ 80.

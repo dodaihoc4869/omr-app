@@ -25,6 +25,8 @@ import './index.css'
 import './styles/the-loc.css'
 // Chế độ máy yếu (29/09): quy tắc chỉ có hiệu lực khi <html> mang lớp `may-yeu` (xem src/lib/may-yeu.ts).
 import './styles/may-yeu.css'
+// Hiệu ứng "+N EXP" dùng chung (luật v4 29/09): CSS nằm trong gói CSS vỏ để mảnh `ExpCau` (dùng ở bảng nhiệm vụ, BTVN, mọi game) không đẻ thêm một tệp CSS precache.
+import './components/exp-cau/exp-cau.css'
 // KaTeX + katex.min.css NẠP LƯỜI qua `napKatex()` (src/lib/katex-goi.ts) — không còn trong lượt tải đầu.
 import App from './App.tsx'
 import { napKatex } from './lib/chem-format'

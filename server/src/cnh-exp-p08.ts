@@ -10,7 +10,8 @@
 // ⚠️ Tệp này KHÔNG đọc DB/đồng hồ/ngẫu nhiên, KHÔNG ghi, KHÔNG quyết định thay giáo viên.
 // Đầu vào KHÔNG hợp lệ (NaN/âm/thập phân/tràn) ⇒ NÉM LỖI (`03` §1: "từ chối …"), KHÔNG ép về 0.
 import { CAP_TOI_DA } from '../../src/game/than-thu-hoa-hoc/hinh-thai'
-import { BANG_THANH_EXP, thanhExp, tongExpToiCap } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
+// ⚠️ 29/09: luật EXP v4 (docs/DE-XUAT-EXP-2909.md) CHƯA port sang P08. P08 (cửa đóng) giữ đường cấp v3 (`BANG_THANH_EXP_V3`, tổng 238 200) để vector MAU-KET-QUA còn đúng; KHÔNG mở cửa P08 trước khi port.
+import { BANG_THANH_EXP_V3 as BANG_THANH_EXP, thanhExpV3 as thanhExp, tongExpToiCapV3 as tongExpToiCap } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 
 /** Hằng số kinh tế P08 — khớp `THAM-SO.json` §economy. Đổi ở đây PHẢI đổi THAM-SO + tăng phiên bản. */
 export const KINH_TE = Object.freeze({

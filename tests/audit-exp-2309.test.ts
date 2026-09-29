@@ -97,7 +97,7 @@ it('a learning challenge is credited even before the first game profile exists',
   const d=fixture()
   d.sql.exec("DELETE FROM game_v2_profile WHERE sbd='S1'")
   expect(await ghiKhoanExpGame(d.env,'S1',{khoa:'first-challenge',loai:'thu_thach',exp:10,ngay,luc:new Date(now).toISOString(),ghiChu:'fixture'},now)).toMatchObject({bat:true,exp:10})
-  expect(profile(d).wallet).toBe(10)
+  expect(profile(d).exp).toBe(10) // luật v4 (29/09): hồ sơ mới vào thẳng thần thú (trước: ống nghiệm)
   expect(profile(d).expGame?.da).toBe(10)
   expect(d.dem('exp_so')).toBe(1)
 })

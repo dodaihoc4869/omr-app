@@ -2,10 +2,12 @@
 // Luật (hàm thuần của Code 1: src/lib/hap-thu-ngay.ts): thần thú hấp thụ tối đa 200 EXP/ngày khi em ĐẠT nhiệm vụ ngày, 120 khi có học chưa đạt, 0 khi không học; EXP dư nằm ở ống nghiệm (`wallet`).
 // MỌI lên cấp đi qua `invest` → `hapThu`. Máy chủ chỉ ĐỌC hôm nay em đạt/có học chưa (từ `exp_so`, `game_v2_attempt`) rồi gọi hàm thuần; máy em chỉ hiển thị kết quả.
 // Chuyển đổi hồ sơ đã chơi (luatCap ≠ LUAT_CAP_MOI) là LƯỜI (khi mở hồ sơ) + cron quét từng lô; luôn ghi bằng CAS theo `revision` (thua CAS = em đang chơi ⇒ KHÔNG đè, lần sau làm lại).
+// LUẬT v4 (29/09, docs/DE-XUAT-EXP-2909.md): bỏ trần hấp thụ và ống nghiệm. Hồ sơ v3 → v4 CHỈ chuyển LƯỜI từng em (khi mở hồ sơ hoặc khi em có EXP mới), KHÔNG quét hàng loạt:
+// cron ở đây chỉ còn lo các hồ sơ cũ hơn v3 (luatCap < 3), đúng như trước. Phần "hấp thụ theo ngày" dưới đây là lịch sử v3.
 import type { Env } from './kieu'
 import type { Profile } from './game-v2'
-import { CO_HOC_TOI_THIEU_CAU, LUAT_CAP_MOI, chuyenDoiLuatCap, tranExpGameNgay, tranHapThu } from '../../src/lib/hap-thu-ngay'
-import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
+import { CO_HOC_TOI_THIEU_CAU, LUAT_CAP_MOI, LUAT_CAP_V3, chuyenDoiLuatCap, tranExpGameNgay, tranHapThu } from '../../src/lib/hap-thu-ngay'
+import { thanhExpV3 as thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { NGAY_BANG_GIA_MOI } from './exp-cau-hinh'
 import { ngayVn } from './su-kien-hoc'
 
@@ -13,7 +15,9 @@ export const TOI_DA_HO_SO_MOI_TICK = 40
 export const KHOA_CHUYEN_DOI_XONG = 'chuyen_doi_cap_v3'
 export const TIEU_DE_LUAT_CAP = 'Thầy Đỗ Đại Học · Thần thú của em'
 export const KENH_LUAT_CAP = 'than_thu'
-export const LOI_LUAT_CAP = 'Từ 21/09 thần thú lớn theo từng ngày em học: mỗi ngày hấp thụ tối đa 200 EXP khi em đạt nhiệm vụ ngày. EXP em đã kiếm vẫn nguyên trong ống nghiệm, thần thú sẽ ăn dần mỗi ngày em học.'
+export const LOI_LUAT_CAP = 'Từ nay EXP em kiếm được vào thần thú ngay, không cần nạp. EXP còn trong ống nghiệm đã vào thần thú, cấp của em giữ nguyên. Cứ 5 EXP em kiếm được thì có thêm 1 vàng.'
+/** Mã tin một lần cho lần chuyển sang luật v4 (khác mã tin 21/09 để em đã nhận tin cũ vẫn nhận tin mới). */
+export const MA_TIN_LUAT_CAP = 'luat-cap-v4'
 
 const batDauNgay = (ngay: string): string => new Date(`${ngay}T00:00:00+07:00`).toISOString()
 
@@ -84,14 +88,14 @@ async function doiMotHoSo(env: Env, sbd: string, p: Profile, revision: number, l
   const tuNgay = ngayVn(Number.isFinite(Date.parse(p.cutover)) ? Date.parse(p.cutover) : nowMs)
   const ngayHoc = [...lieu.ngayCoHoc].filter((d) => d >= tuNgay)
   const datTruoc = lieu.ngayDat.filter((d) => d >= tuNgay).length
-  const kq = chuyenDoiLuatCap(p, ngayHoc.length, homNay, { luc: new Date(nowMs).toISOString(), coHocHomNay: ngayHoc.includes(homNay), soNgayDatTruocBangGiaMoi: datTruoc })
+  const kq = chuyenDoiLuatCap(p, ngayHoc.length, homNay, { luc: new Date(nowMs).toISOString(), coHocHomNay: ngayHoc.includes(homNay), soNgayDatTruocBangGiaMoi: datTruoc, soNgayDat: p.expMoi?.ngayDat ?? 0 })
   if (!kq.daChuyen) return { daDoi: false, lyDo: 'da_moi' }
   const moi = kq.hoSo as Profile
   const w = await env.DB.prepare('UPDATE game_v2_profile SET json = ?, revision = revision + 1 WHERE sbd = ? AND revision = ?').bind(JSON.stringify(moi), sbd, revision).run()
   if (!w.meta.changes) return { daDoi: false, lyDo: 'thua_cas' }
   if (moi.cap !== p.cap || moi.exp !== p.exp) {
     await env.DB.prepare('INSERT OR IGNORE INTO student_notice (id, sbd, title, body, target, created_at) VALUES (?, ?, ?, ?, ?, ?)')
-      .bind(`luat-cap|${sbd}`, sbd, TIEU_DE_LUAT_CAP, LOI_LUAT_CAP, KENH_LUAT_CAP, new Date(nowMs).toISOString()).run().catch(() => { /* tin phụ: hụt thì thôi */ })
+      .bind(`${MA_TIN_LUAT_CAP}|${sbd}`, sbd, TIEU_DE_LUAT_CAP, LOI_LUAT_CAP, KENH_LUAT_CAP, new Date(nowMs).toISOString()).run().catch(() => { /* tin phụ: hụt thì thôi */ })
   }
   return { daDoi: true, profile: moi, revision: revision + 1 }
 }
@@ -101,7 +105,7 @@ export async function chuyenDoiKhiMo(env: Env, sbd: string, p: Profile, revision
   try {
     if (p.luatCap === LUAT_CAP_MOI) return null
     const tuNgay = ngayVn(Number.isFinite(Date.parse(p.cutover)) ? Date.parse(p.cutover) : nowMs)
-    const lieu = p.luatCap === 2 ? { ngayCoHoc: new Set<string>(), ngayDat: [] } : (await docLieuChuyenDoi(env, [sbd], tuNgay)).get(sbd)!
+    const lieu = p.luatCap === 2 || p.luatCap === LUAT_CAP_V3 ? { ngayCoHoc: new Set<string>(), ngayDat: [] } : (await docLieuChuyenDoi(env, [sbd], tuNgay)).get(sbd)!
     const r = await doiMotHoSo(env, sbd, p, revision, lieu, nowMs)
     return r.daDoi ? { profile: r.profile, revision: r.revision } : null
   } catch (e) {
@@ -117,7 +121,8 @@ export async function chuyenDoiLoCron(env: Env, nowMs: number, tuyChon: { toiDa?
   const xong = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_CHUYEN_DOI_XONG).first<{ gia_tri: string }>().catch(() => null)
   if (String(xong?.gia_tri ?? '') === 'xong') return { soDoc: 0, daDoi: 0, thuaCas: 0, xong: true }
   const toiDa = Math.max(1, Math.floor(tuyChon.toiDa ?? TOI_DA_HO_SO_MOI_TICK))
-  const r = await env.DB.prepare(`SELECT sbd, revision, json FROM game_v2_profile WHERE COALESCE(json_extract(json, '$.luatCap'), 0) <> ${LUAT_CAP_MOI} ORDER BY sbd LIMIT ${toiDa}`).all<{ sbd: string; revision: number; json: string }>()
+  // Chỉ hồ sơ CŨ HƠN v3 (v4 không quét hàng loạt: hồ sơ v3 chuyển lười từng em).
+  const r = await env.DB.prepare(`SELECT sbd, revision, json FROM game_v2_profile WHERE COALESCE(json_extract(json, '$.luatCap'), 0) < ${LUAT_CAP_V3} ORDER BY sbd LIMIT ${toiDa}`).all<{ sbd: string; revision: number; json: string }>()
   const dong = r.results ?? []
   if (dong.length === 0) {
     await env.DB.prepare('INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
@@ -154,7 +159,8 @@ export async function docHapThuChoEm(env: Env, sbd: string, nowMs: number = Date
     const r = await env.DB.prepare('SELECT json FROM game_v2_profile WHERE sbd = ?').bind(sbd).first<{ json: string }>()
     if (!r) return null
     const p = JSON.parse(String(r.json)) as Profile
-    if (p.choice || p.luatCap !== LUAT_CAP_MOI) return null
+    // Luật v4 không còn ống nghiệm / trần hấp thụ ⇒ chỉ hồ sơ v3 CHƯA chuyển mới có ba con số này.
+    if (p.choice || p.luatCap !== LUAT_CAP_V3) return null
     const ngay = ngayVn(nowMs)
     const t = await docTranHapThu(env, sbd, ngay)
     const da = p.hapThu && p.hapThu.ngay === ngay ? Math.max(0, Math.floor(Number(p.hapThu.da) || 0)) : 0

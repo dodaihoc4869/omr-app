@@ -9,7 +9,11 @@ export interface DaoProfile{nickname?:string;pet:string;choice:boolean;cap:numbe
  khienConLai?:number
  ngayMoKhienQua?:number
  soNgayDat?:number
- renKhien?:{gia:number;duTru:number;manh:number}
+ /** Giá rèn một khiên. Luật v4 (29/09): `donVi:'vang'` ⇒ `gia` là VÀNG (1 400), `duTru` = 0; máy chủ cũ (không có `donVi`) ⇒ `gia` là EXP. */
+ renKhien?:{gia:number;duTru:number;manh:number;donVi?:'vang'}
+ /** Luật v4: EXP chờ mốc cấp 10 (chưa đủ `ngayMoCap10` ngày đạt). Vắng ⇒ 0. */
+ choMoc?:number
+ ngayMoCap10?:number
  khienRen?:{manh:number;daRen?:number;chuaDung?:number;conLai?:number;moiKhien:number}
  /** THẦN THÚ MỖI NGÀY (Điều 1, Đợt 1): hôm nay thú đã hấp thụ `da` EXP; hôm nay được ăn tối đa `tran` (200 khi đạt nhiệm vụ ngày · 120 khi có học · 0 khi chưa học). `lyDo` = vì sao lần nạp gần nhất bị chặn:
   *  'no' (đủ trần) · 'chua_hoc' · 'het_ong' · 'cap_toi_da' · null. Máy chủ cũ KHÔNG có trường này ⇒ màn ẩn thanh. */
@@ -29,7 +33,7 @@ export interface DaoKetQua{ok:boolean;error?:string;message?:string;missing?:num
  tranNgay?:number
  suggestions?:{title:string;source:string;part:string}[]
  id?:string;mode?:Mode;questions?:CauDao[];answered?:{attempt:{qid:string;correct:boolean};correct:boolean;answer:string;solution:unknown;reward:number;stage:number;solutionImages:HinhAnh[]}[]
- correct?:boolean;answer?:string;solution?:unknown;reward?:number;stage?:number;solutionImages?:HinhAnh[];lyDoThuong?:LyDoThuong
+ correct?:boolean;answer?:string;solution?:unknown;reward?:number;/** EXP câu thử thách / Lượt trùm máy chủ trả (chỉ-thêm). */expThuThach?:number;stage?:number;solutionImages?:HinhAnh[];lyDoThuong?:LyDoThuong
  /** Đợt 2 (chỉ-thêm): tóm tắt lượt trong ngày · màn hết lượt (`het`) + "Mai thú chờ em" (`maiCho`) — đọc chặt bằng `docLuotNgay`/`docMaiCho`. */
  luot?:unknown;maiCho?:unknown;het?:boolean
  /** Thưởng ĐÁNG LẼ của câu — chỉ có khi trần 120 EXP/ngày từ game đã CẮT `reward` (máy chủ Đợt 1). */

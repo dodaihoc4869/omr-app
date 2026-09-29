@@ -12,7 +12,8 @@ import type { Env } from './kieu'
 import { bamSha256, jsonChuanHoa } from './cnh-exp-task'
 import { TRAN_INVESTED_EXP, capTuInvestedExp } from './cnh-exp-p08'
 import { LoiLenhP08 } from './cnh-exp-p08-lenh'
-import { tongExpToiCap } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
+// P08 (cửa đóng) đứng trên đường cấp v3 (21/09) — luật v4 29/09 chưa port sang P08; KHÔNG mở cửa P08 trước khi port.
+import { tongExpToiCapV3 as tongExpToiCap } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 
 export const LENH_CHUYEN_DOI = 'chuyen_doi_p08' as const
 

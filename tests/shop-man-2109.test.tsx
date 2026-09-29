@@ -1,6 +1,7 @@
 // CỬA HÀNG PHỤ KIỆN · B1 — LOGIC MÀN (React Testing Library + máy chủ giả đúng hợp đồng). Bố cục Chromium: shop-bo-cuc-2109; khoá nguồn: shop-khoa-nguon-2109.
 // (a) luồng đủ · (b) số dư CHỈ đổi theo đáp máy chủ · (c) bấm đúp ⇒ MỘT lần ghi cùng khoá · (d) mọi lỗi hợp đồng hiện lời máy chủ + "Thử lại"
-// (e) đổi EXP không xuống dưới giữ lại · (f) cờ tắt / mất mạng / trống / đang tải / tấm chào · điểm cắm `veThu`.
+// (e) luật v4 (29/09): không còn đổi tay EXP → vàng · (f) cờ tắt / mất mạng / trống / đang tải / tấm chào · điểm cắm `veThu`.
+// SỬA CÓ CHỦ Ý 29/09 (docs/DE-XUAT-EXP-2909.md): giá theo bảng v4 (VD-04 250, HQ-03 300, HQ-05 590, HQ-07 1 320); bỏ các test của khối Đổi vàng (thanh kéo, ô nhập, hộp đổi, duoi_nguong).
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { ReactNode } from 'react'
@@ -55,19 +56,18 @@ describe('(a) luồng đủ: Cửa hàng → chạm món → Thử đồ → Mua
     expect(chu(c)).toContain('Đang thử 1 phụ kiện')
     expect(chu(c)).toContain('Cả đoàn sẽ thấy thần thú của em y như thế này. Bảng vinh danh cũng vậy.')
     expect(chu(c)).toContain('Đủ vàng rồi')
-    expect(nut(c, 'mua').textContent).toBe('Mua · 120 vàng')
+    expect(nut(c, 'mua').textContent).toBe('Mua · 250 vàng')
     expect(api.ghi.mua).toBe(0) // thử thì không mất vàng, không ghi gì
 
     fireEvent.click(nut(c, 'mua'))
-    expect(within(hop()).getByText('Em trả 120 vàng, còn lại 220 vàng. Mua rồi giữ mãi, không trả lại hay bán lại được.')).toBeTruthy()
+    expect(within(hop()).getByText('Em trả 250 vàng, còn lại 90 vàng. Mua rồi giữ mãi, không trả lại hay bán lại được.')).toBeTruthy()
     expect(api.ghi.mua).toBe(0) // một bước xác nhận: chưa ghi
-    fireEvent.click(within(hop()).getByRole('button', { name: 'Mua · 120 vàng' }))
+    fireEvent.click(within(hop()).getByRole('button', { name: 'Mua · 250 vàng' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
 
     expect(api.ghi.mua).toBe(1)
-    expect(vangHien(c)).toBe('220')
-    expect(chu(c)).toContain('Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 220 vàng.')
-    expect(chu(c)).toContain('Em vẫn đủ vàng cho Thảm Tinh Thể Xanh, giá 220 vàng.')
+    expect(vangHien(c)).toBe('90')
+    expect(chu(c)).toContain('Hợp quá! Đuôi Lửa Tím đã là của em. Em còn 90 vàng.')
     expect(c.querySelector('.ps-gc-vet[data-mon="VD-04"]')).not.toBeNull() // món tự mặc lên thú
     expect(nut(c, 'dang-mac').disabled).toBe(true)
     expect(nut(c, 'dang-mac').textContent).toBe('Thần thú đang mặc món này')
@@ -134,15 +134,15 @@ describe('(a) luồng đủ: Cửa hàng → chạm món → Thử đồ → Mua
       return kq
     }
     const dv = await xem('HQ-03')
-    expect(dv.nut.textContent).toBe('Mua · 150 vàng')
+    expect(dv.nut.textContent).toBe('Mua · 300 vàng')
     expect(dv.tt).toBe('Đủ vàng rồi')
     const tv = await xem('HQ-05')
-    expect(tv.tt).toContain('Chưa đủ vàng — còn thiếu 260 vàng')
-    expect(tv.tt).toContain('Em có đủ EXP thừa. Đổi vàng là mua được.')
-    expect(tv.nut.textContent).toBe('Đổi vàng')
+    expect(tv.tt).toContain('Chưa đủ vàng — còn thiếu 250 vàng')
+    expect(tv.tt).toContain('Học đều khoảng 4 ngày nữa là đủ vàng.') // luật v4: 250 / 63 ⇒ 4 (không còn đổi tay)
+    expect(tv.nut.disabled).toBe(true)
     const xa = await xem('HQ-07')
-    expect(xa.tt).toContain('Chưa đủ vàng — còn thiếu 2.060 vàng')
-    expect(xa.tt).toContain('Học đều khoảng 21 ngày nữa là đủ vàng.') // (2.060 − 420) / 80 = 20,5 ⇒ 21
+    expect(xa.tt).toContain('Chưa đủ vàng — còn thiếu 980 vàng')
+    expect(xa.tt).toContain('Học đều khoảng 16 ngày nữa là đủ vàng.') // 980 / 63 = 15,6 ⇒ 16
     const kh = await xem('KT-08')
     expect(kh.tt).toContain('Chưa mua được — cần chuỗi 14 ngày (em đang chuỗi 9 ngày)')
     expect(kh.tt).toContain('Giữ chuỗi thêm 5 ngày nữa là mở.')
@@ -164,11 +164,12 @@ describe('(a) luồng đủ: Cửa hàng → chạm món → Thử đồ → Mua
     expect(mac.nut.disabled).toBe(true)
   })
 
-  it('"Đổi vàng" ở Thử đồ đưa em tới khối Đổi vàng; "Mặc ngay" một món đã có chạy qua máy chủ', async () => {
+  it('luật v4: Thử đồ không còn nút "Đổi vàng" (không có khối Đổi vàng); "Mặc ngay" một món đã có chạy qua máy chủ', async () => {
     const { api, container: c } = dung()
     await chonMon(c, 'HQ-05')
-    fireEvent.click(nut(c, 'toi-doi'))
-    expect(screen.getByRole('heading', { level: 3, name: /^Đổi vàng/ })).toBeTruthy()
+    expect(c.querySelector('[data-viec="toi-doi"]')).toBeNull()
+    expect(screen.queryByRole('heading', { level: 3, name: /^Đổi vàng/ })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Về Cửa hàng' }))
     fireEvent.click(the(c, 'VD-01'))
     fireEvent.click(nut(c, 'mac'))
     await waitFor(() => expect(api.dangMac.vet).toBe('VD-01'))
@@ -183,7 +184,8 @@ describe('Cửa hàng: ví, thẻ món, thanh lọc', () => {
     await sanSang(c)
     expect(vangHien(c)).toBe('340')
     expect(chu(c)).toContain('Vàng của em')
-    expect(chu(c)).toContain('Ống nghiệm có 620 EXP · Dự trữ đủ 3 ngày ăn')
+    expect(chu(c)).toContain('Vàng tự vào ví: cứ 5 EXP em kiếm được thì có 1 vàng. Thần thú vẫn nhận đủ EXP.')
+    expect(chu(c)).not.toContain('Ống nghiệm')
     expect(chu(c)).toContain('Sắm đồ cho thần thú · Mùa 1, tới hết học kỳ I')
     expect(chu(c)).toContain('Đắt dần:')
     const gia = [...c.querySelectorAll<HTMLElement>('.ps-the')].map((e) => Number((e.querySelector('.ps-the-gia b')!.textContent ?? '').replace(/\./g, '')))
@@ -192,7 +194,7 @@ describe('Cửa hàng: ví, thẻ món, thanh lọc', () => {
     const t = the(c, 'VD-04').textContent!
     expect(t).toContain('Đẹp')
     expect(t).toContain('Chỗ đeo: Đuôi sáng')
-    expect(t).toContain('Giá 120 vàng')
+    expect(t).toContain('Giá 250 vàng')
     expect(the(c, 'KT-08').textContent).toContain('Cần chuỗi 14 ngày (em đang chuỗi 9 ngày)')
     expect(the(c, 'KT-08').textContent).toContain('Chỉ còn 12 cái')
     expect(the(c, 'HQ-08').textContent).toContain('Mùa 1 chỉ có 20 cái')
@@ -200,7 +202,7 @@ describe('Cửa hàng: ví, thẻ món, thanh lọc', () => {
     expect(the(c, 'VD-08').textContent).toContain('Đã hết')
     expect(the(c, 'VD-01').textContent).toContain('Đã có')
     expect(the(c, 'KT-03').textContent).toContain('Đang mặc')
-    expect(the(c, 'VD-04').getAttribute('aria-label')).toBe('Thử Đuôi Lửa Tím. Bậc Đẹp. Giá 120 vàng. Đủ vàng rồi')
+    expect(the(c, 'VD-04').getAttribute('aria-label')).toBe('Thử Đuôi Lửa Tím. Bậc Đẹp. Giá 250 vàng. Đủ vàng rồi')
   })
 
   it('thanh lọc theo chỗ đeo; Trên đầu / Trên lưng là chip "Sắp mở" (vô hiệu); đợt 2 mở ⇒ chip mở và đủ 40 món', async () => {
@@ -229,7 +231,7 @@ describe('Cửa hàng: ví, thẻ món, thanh lọc', () => {
     expect(c.querySelector('.ps-luoi')!.getAttribute('aria-busy')).toBe('true')
     expect(c.querySelector('[data-vang]')).toBeNull()
     expect(c.querySelector('.ps-the:not(.ps-xam)')).toBeNull()
-    expect((c.querySelector('.ps-truot') as HTMLInputElement).disabled).toBe(true)
+    expect(c.querySelector('.ps-truot')).toBeNull() // luật v4: không còn thanh kéo đổi vàng
     await sanSang(c)
     expect(c.querySelectorAll('.ps-xam')).toHaveLength(0)
     expect(c.querySelector('.ps-luoi')!.getAttribute('aria-busy')).toBe('false')
@@ -237,7 +239,7 @@ describe('Cửa hàng: ví, thẻ món, thanh lọc', () => {
 })
 
 describe('(b) số dư CHỈ đổi theo đáp máy chủ (máy chủ giả trả số "lạ")', () => {
-  it('mua: máy chủ trả 777 (không phải 340 − 120 = 220) ⇒ màn hiện 777, cả ở lời mừng', async () => {
+  it('mua: máy chủ trả 777 (không phải 340 − 250 = 90) ⇒ màn hiện 777, cả ở lời mừng', async () => {
     const { api, container: c } = dung({ tre: 40, congTac: { vangSauGhi: 777 } }) // chậm 40 ms: làm mới nền sau khi mua chưa kịp về khi ta đọc số
     await chonMon(c, 'VD-04')
     expect(vangHien(c)).toBe('340')
@@ -247,36 +249,23 @@ describe('(b) số dư CHỈ đổi theo đáp máy chủ (máy chủ giả tr�
     fireEvent.click(nut(c, 'mua-that'))
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     expect(vangHien(c)).toBe('777')
-    expect(vangHien(c)).not.toBe('220')
+    expect(vangHien(c)).not.toBe('90')
     expect(chu(c)).toContain('Em còn 777 vàng.')
     // số chạy nhìn thấy được (300 ms) dừng đúng ở số máy chủ trả
     await act(async () => {
       await new Promise((r) => setTimeout(r, 380))
     })
     expect(c.querySelector('[data-vang-hien]')!.textContent).toBe('777')
-    // làm mới nền sau đó (máy chủ giả giữ 777) cũng không kéo số về 220
+    // làm mới nền sau đó (máy chủ giả giữ 777) cũng không kéo số về 90
     await waitFor(() => expect(api.nhatKy.filter((x) => x === 'shop-danh-sach').length).toBeGreaterThanOrEqual(2))
     await new Promise((r) => setTimeout(r, 30))
     expect(vangHien(c)).toBe('777')
-  })
-
-  it('đổi EXP: máy chủ trả 4.321 vàng, ống nghiệm 200 ⇒ màn hiện đúng số ấy', async () => {
-    const { container: c } = dung({ tre: 40, congTac: { vangSauGhi: 4321 } })
-    await sanSang(c)
-    fireEvent.click(screen.getByRole('button', { name: 'Em đổi được tối đa 420 EXP' }))
-    fireEvent.click(nut(c, 'doi'))
-    fireEvent.click(nut(c, 'doi-that'))
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-    expect(vangHien(c)).toBe('4.321')
-    expect(chu(c)).toContain('Đã đổi xong. Em có 4.321 vàng, thần thú vẫn đủ 1 ngày ăn.')
-    await waitFor(() => expect(chu(c)).toContain('Ống nghiệm có 200 EXP · Dự trữ đủ 1 ngày ăn'))
   })
 
   it('số ban đầu cũng là số máy chủ (không mặc định 340)', async () => {
     const { container: c } = dung({ vang: 1234, ongNghiem: 700 })
     await sanSang(c)
     expect(vangHien(c)).toBe('1.234')
-    expect(chu(c)).toContain('Ống nghiệm có 700 EXP · Dự trữ đủ 3 ngày ăn')
   })
 })
 
@@ -294,23 +283,8 @@ describe('(c) chống bấm đúp: MỘT lần ghi, cùng khoá', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     expect(api.khoaMua).toHaveLength(1)
     expect(api.ghi.mua).toBe(1)
-    expect(api.vang).toBe(220)
-    expect(vangHien(c)).toBe('220')
-  })
-
-  it('bấm "Đổi" nhiều lần ⇒ một lệnh ghi', async () => {
-    const { api, container: c } = dung({ tre: 30 })
-    await sanSang(c)
-    fireEvent.change(c.querySelector('.ps-truot')!, { target: { value: '180' } })
-    fireEvent.click(nut(c, 'doi'))
-    const b = nut(c, 'doi-that')
-    act(() => {
-      for (let i = 0; i < 3; i++) b.dispatchEvent(new MouseEvent('click', { bubbles: true }))
-    })
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-    expect(api.khoaDoi).toHaveLength(1)
-    expect(api.ghi.doi).toBe(1)
-    expect(vangHien(c)).toBe('520')
+    expect(api.vang).toBe(90)
+    expect(vangHien(c)).toBe('90')
   })
 
   it('mất mạng giữa lúc gửi: "Thử lại" DÙNG LẠI khoá cũ (không mua hai lần); lỗi máy chủ rõ ràng thì khoá MỚI', async () => {
@@ -407,28 +381,14 @@ describe('(d) mọi lỗi hợp đồng hiện lời máy chủ + "Thử lại"'
       expect(vangHien(c)).toBe('340') // lỗi thì số dư đứng nguyên
       const lai = within(hop()).getByRole('button', { name: 'Thử lại' })
       if (ma === 'gia_doi') {
-        // máy chủ đổi giá 120 → 130: màn làm mới và nói giá mới trước khi em bấm lại
-        await waitFor(() => expect(within(hop()).getByText(/Em trả 130 vàng, còn lại 210 vàng/)).toBeTruthy())
+        // máy chủ đổi giá 250 → 260: màn làm mới và nói giá mới trước khi em bấm lại
+        await waitFor(() => expect(within(hop()).getByText(/Em trả 260 vàng, còn lại 80 vàng/)).toBeTruthy())
       }
       fireEvent.click(lai)
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
       expect(api.ghi.mua).toBe(1)
-      expect(vangHien(c)).toBe(ma === 'gia_doi' ? '210' : '220')
+      expect(vangHien(c)).toBe(ma === 'gia_doi' ? '80' : '90')
     })
-
-  it('vang-doi · duoi_nguong: lời "Thần thú cần giữ lại 200 EXP để ăn. Em đổi được tối đa 420 EXP." + "Thử lại"', async () => {
-    const { api, container: c } = dung()
-    await sanSang(c)
-    fireEvent.change(c.querySelector('.ps-truot')!, { target: { value: '100' } })
-    fireEvent.click(nut(c, 'doi'))
-    api.congTac.epLoi = 'duoi_nguong'
-    fireEvent.click(nut(c, 'doi-that'))
-    await waitFor(() => expect(within(hop()).getByRole('alert').textContent).toBe('Thần thú cần giữ lại 200 EXP để ăn. Em đổi được tối đa 420 EXP.'))
-    fireEvent.click(within(hop()).getByRole('button', { name: 'Thử lại' }))
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-    expect(api.ghi.doi).toBe(1)
-    expect(vangHien(c)).toBe('440')
-  })
 
   it('tải hỏng: lời RIÊNG của máy chủ hiện nguyên văn + "Thử lại" (bấm lại gọi lại máy chủ); lỗi không rõ ⇒ lời chung', async () => {
     class Hong extends ShopApiGia {
@@ -476,70 +436,14 @@ describe('(d) mọi lỗi hợp đồng hiện lời máy chủ + "Thử lại"'
   })
 })
 
-describe('(e) đổi EXP: không xuống dưới giữ lại', () => {
-  it('thanh kéo + ô nhập cho chọn TỪNG EXP (không bắt bội của 10), kẹp ở doiToiDa do máy chủ tính; số ngày ăn trước / sau khi đổi', async () => {
-    const { container: c } = dung()
-    await sanSang(c)
-    const thanh = c.querySelector<HTMLInputElement>('.ps-truot')!
-    const o = c.querySelector<HTMLInputElement>('.ps-nhap')!
-    expect(thanh.max).toBe('420')
-    expect(thanh.step).toBe('1')
-    expect(nut(c, 'doi').disabled).toBe(true)
-    expect(nut(c, 'doi').textContent).toBe('Kéo thanh để chọn số EXP')
-    fireEvent.change(thanh, { target: { value: '180' } })
-    expect(o.value).toBe('180')
-    expect(nut(c, 'doi').textContent).toBe('Đổi 180 EXP lấy 180 vàng')
-    expect(chu(c)).toContain('180 EXP thành 180 vàng')
-    const dong = () => [...c.querySelectorAll('.ps-doi-dong')].map((r) => `${r.querySelector('span')!.textContent}|${r.querySelector('b')!.textContent}`)
-    expect(dong()).toEqual(['Trước khi đổi|620 EXP · đủ 3 ngày ăn', 'Sau khi đổi|440 EXP · đủ 2 ngày ăn'])
-    fireEvent.change(o, { target: { value: '7' } })
-    expect(nut(c, 'doi').textContent).toBe('Đổi 7 EXP lấy 7 vàng')
-    fireEvent.change(o, { target: { value: '999' } })
-    expect(o.value).toBe('420')
-    expect(dong()[1]).toBe('Sau khi đổi|200 EXP · đủ 1 ngày ăn') // đúng mức giữ lại, không thấp hơn
-    fireEvent.change(o, { target: { value: '-5' } })
-    expect(o.value).toBe('0')
-    expect(nut(c, 'doi').disabled).toBe(true)
-    fireEvent.click(screen.getByRole('button', { name: 'Em đổi được tối đa 420 EXP' }))
-    expect(o.value).toBe('420')
-  })
-
-  it('hộp xác nhận nói thật cái giá [X1]; đổi xong [M3]; hết EXP thừa thì khối đổi khoá và nói "Chưa có EXP thừa"', async () => {
+describe('(e) luật v4: không còn đổi tay EXP → vàng', () => {
+  it('Cửa hàng không có khối Đổi vàng (không thanh kéo, không ô nhập, không nút đổi); không lệnh vang-doi nào được gửi', async () => {
     const { api, container: c } = dung()
     await sanSang(c)
-    fireEvent.change(c.querySelector('.ps-truot')!, { target: { value: '180' } })
-    fireEvent.click(nut(c, 'doi'))
-    expect(within(hop()).getByText('Thần thú bớt 180 EXP dự trữ, vẫn đủ 2 ngày ăn. Em nhận 180 vàng, đổi rồi không đổi ngược lại được.')).toBeTruthy()
-    expect(within(hop()).getByRole('button', { name: 'Đổi 180 EXP' })).toBeTruthy()
-    fireEvent.click(nut(c, 'doi-that'))
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-    expect(chu(c)).toContain('Đã đổi xong. Em có 520 vàng, thần thú vẫn đủ 2 ngày ăn.')
-    expect(vangHien(c)).toBe('520')
-    await waitFor(() => expect(c.querySelector<HTMLInputElement>('.ps-truot')!.max).toBe('240')) // doiToiDa máy chủ tính lại
-    expect(api.ghi.doi).toBe(1)
-    // đổi nốt phần còn lại
-    fireEvent.click(screen.getByRole('button', { name: 'Em đổi được tối đa 240 EXP' }))
-    fireEvent.click(nut(c, 'doi'))
-    fireEvent.click(nut(c, 'doi-that'))
-    await waitFor(() => expect(vangHien(c)).toBe('760'))
-    await waitFor(() => expect(c.querySelector<HTMLInputElement>('.ps-truot')!.disabled).toBe(true))
-    expect(c.querySelector<HTMLInputElement>('.ps-nhap')!.disabled).toBe(true)
-    expect(nut(c, 'doi').disabled).toBe(true)
-    expect(nut(c, 'doi').textContent).toBe('Chưa có EXP thừa để đổi')
-    expect(chu(c)).toContain('Chưa có EXP thừa. Thần thú cần giữ 200 EXP để ăn.')
-    expect(chu(c)).toContain('Làm nhiệm vụ hôm nay để ống nghiệm đầy thêm.')
-    expect(api.ongNghiem).toBe(200) // máy chủ giữ đúng 200
-  })
-
-  it('ống nghiệm ≤ 200 EXP ngay từ đầu: khối đổi khoá, nói lý do, không có gì để gửi', async () => {
-    const { api, container: c } = dung({ ongNghiem: 200 })
-    await sanSang(c)
-    expect(c.querySelector<HTMLInputElement>('.ps-truot')!.disabled).toBe(true)
-    expect(nut(c, 'doi').disabled).toBe(true)
-    expect(chu(c)).toContain('Chưa có EXP thừa. Thần thú cần giữ 200 EXP để ăn.')
-    expect(chu(c)).toContain('Ống nghiệm có 200 EXP · Dự trữ đủ 1 ngày ăn')
-    fireEvent.click(nut(c, 'doi'))
-    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(c.querySelector('.ps-doi')).toBeNull()
+    expect(c.querySelector('.ps-truot')).toBeNull()
+    expect(c.querySelector('.ps-nhap')).toBeNull()
+    expect(c.querySelector('[data-viec="doi"]')).toBeNull()
     expect(api.nhatKy.filter((x) => x === 'vang-doi')).toHaveLength(0)
   })
 })

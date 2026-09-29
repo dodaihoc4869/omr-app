@@ -1,8 +1,9 @@
-import {EXP_DU_TRU,EXP_REN_KHIEN} from '../../src/lib/kinh-te-game'
+import {EXP_MOI_VANG,NGAY_DAT_MO_CAP_10,VANG_REN_KHIEN} from '../../src/lib/kinh-te-game'
 import {moCuaRoute,cuaP08Mo,hapThuQuaP08,renKhienQuaP08,dungKhienQuaP08} from './cnh-exp-adapter'
 import {tramP08LenHienThi} from './cnh-exp-p08-hien-thi'
 
-import {renKhienBangExp} from './exp-ho-so-game'
+import {congExpVaoHoSo} from './exp-ho-so-game'
+import {renKhienVang} from './vang-duc'
 import {normalizePetName} from '../../src/game/than-thu-v2/pet-name'
 import {escortAction,escortContext} from './game-v2-escort'
 import {readGameScope} from './game-v2-reports'
@@ -29,7 +30,7 @@ import {ghiSuKien} from './su-kien-hoc'
 import {doanAction,laGoiNoiBoDoan,doanMoCho} from './game-v2-doan'
 import {buCauLauNhat,docCauDaLamMoiNguon,docCauLamHomNay,tachMoiCu} from './game-v2-cau-moi'
 import {SO_HIEP} from '../../src/game/than-thu-v2/doan-core'
-import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,hapThu} from '../../src/lib/hap-thu-ngay'
+import {LUAT_CAP_MOI,TRAN_EXP_GAME_NGAY,type TruocSiet4} from '../../src/lib/hap-thu-ngay'
 import {chuyenDoiKhiMo,daExpGameHomNay,docTranHapThu,nhanExpGame} from './game-v2-hap-thu'
 import {cheDo2} from './srs2-d1'
 import {startDao2,startDoan2,hoa2Action,LENH_HOA2,soCauGameHomNay} from './srs2-game'
@@ -39,7 +40,7 @@ import {ghiKhoanExpGame} from './exp-d1'
 import {LENH_SHOP,shopAction,shopBatCho} from './game-v2-shop'
 import {LENH_BIA,biaAction,biaChoSanh} from './bi-a'
 import {expMotCau} from './exp-hoc-tap'
-export interface Profile {nickname?:string;/** Đếm lượt đổi tên trong ngày VN (rename). */doiTen?:{ngay:string;lan:number};academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string}
+export interface Profile {nickname?:string;/** Đếm lượt đổi tên trong ngày VN (rename). */doiTen?:{ngay:string;lan:number};academic?:Academic;shields?:ShieldState;expMoi?:{daCong:number;manhDaTinh:number;ngayDat?:number};khienRen?:KhienRen;expGame?:{ngay:string;da:number;days?:Record<string,number>};hapThu?:{ngay:string;da:number};luatCap?:number;truocSiet?:unknown;pet:string;choice:boolean;legacy:unknown;cap:number;exp:number;wallet:number;earned:number;tower:number;mastery:Mastery[];arena:Arena|null;cutover:string;season?:string;/** Luật v4: EXP chờ mốc cấp 10 (chưa đủ 21 ngày đạt). */choMoc?:number;/** Luật v4: `earned` lúc chuyển sang v4 — vàng chỉ đúc trên EXP kiếm sau mốc. */mocVang?:number;/** Dấu vết trước khi sang v4 (để lùi). */truocSiet4?:TruocSiet4}
 type Row={revision:number;json:string}
 type Session={doan?:number;guardian?:string;guardianRound?:number;mode:Mode;questions:{qid:string;maDe:string;version:string;group:string;novel:boolean;role?:string}[];created:number}
 const now=()=>new Date().toISOString()
@@ -56,14 +57,14 @@ export async function loadProfile(env:Env,sbd:string):Promise<{profile:Profile;r
     const id=String(old.idThanhThuChon??old.thanThuId??'');const pet=ALIASES[id]??id
     const profile:Profile={pet:PETS.some(p=>p.id===pet)?pet:'dat_quy',choice:!id||OLD_SIX.has(id)||!PETS.some(p=>p.id===pet),legacy:legacy?.json??null,
       cap:Math.max(1,Math.min(120,Number(old.capDo)||1)),exp:Math.max(0,Number(old.exp)||0),wallet:Math.max(0,Number(old.khoExp)||0),earned:0,tower:Math.max(1,Math.min(999,Number(old.tangThapCaoNhat)||1)),mastery:[],arena:null,cutover:now()}
-    if(season)Object.assign(profile,{pet:'dat_quy',choice:true,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,season,luatCap:LUAT_CAP_MOI})
+    if(season)Object.assign(profile,{pet:'dat_quy',choice:true,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,season,luatCap:LUAT_CAP_MOI,mocVang:0})
     await env.DB.prepare('INSERT OR IGNORE INTO game_v2_profile(sbd,json,created_at) VALUES(?,?,?)').bind(sbd,JSON.stringify(profile),now()).run()
     row=await env.DB.prepare('SELECT revision,json FROM game_v2_profile WHERE sbd=?').bind(sbd).first<Row>()
   }
   if(!row)throw new Error('Chưa mở được hồ sơ game.')
   const current=JSON.parse(row.json) as Profile
   if(season&&current.season!==season){
-    const fresh:Profile={pet:'dat_quy',choice:true,legacy:current.legacy,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:now(),season,luatCap:LUAT_CAP_MOI}
+    const fresh:Profile={pet:'dat_quy',choice:true,legacy:current.legacy,cap:1,exp:0,wallet:0,earned:0,tower:1,mastery:[],arena:null,cutover:now(),season,luatCap:LUAT_CAP_MOI,mocVang:0}
     const updated=await env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=?').bind(JSON.stringify(fresh),sbd,row.revision).run()
     if(!updated.meta.changes)return loadProfile(env,sbd)
     return {profile:fresh,revision:row.revision+1}
@@ -73,7 +74,9 @@ export async function loadProfile(env:Env,sbd:string):Promise<{profile:Profile;r
   return {profile:current,revision:row.revision}
 }
 async function save(env:Env,sbd:string,p:Profile,rev:number){const r=await env.DB.prepare('UPDATE game_v2_profile SET json=?,revision=revision+1 WHERE sbd=? AND revision=?').bind(JSON.stringify(p),sbd,rev).run();if(!r.meta.changes)throw new Error('Hồ sơ vừa đổi trên thiết bị khác. Em tải lại hồ sơ.');return rev+1}
-function visible(p:Profile,hapThuInfo?:{tran:number;lyDo?:string|null;soCauHomNay?:number;canCau?:number}){const {legacy:_,academic,expMoi,truocSiet:_ts,...rest}=p;const homNay=academicDay(now());return {...rest,ongNghiem:p.wallet,hapThuHomNay:{da:p.hapThu&&p.hapThu.ngay===homNay?p.hapThu.da:0,tran:hapThuInfo?.tran??null,lyDo:hapThuInfo?.lyDo??null,...(hapThuInfo?.soCauHomNay!==undefined?{soCauHomNay:hapThuInfo.soCauHomNay,canCau:hapThuInfo.canCau}:{})},expGameHomNay:{da:daExpGameHomNay(p,homNay),tran:TRAN_EXP_GAME_NGAY},khienConLai:khienConLai(p),soNgayDat:expMoi?.ngayDat??0,renKhien:{gia:EXP_REN_KHIEN,duTru:EXP_DU_TRU,manh:MANH_MOI_KHIEN},ngayMoKhienQua:NGAY_DAT_MO_KHIEN_QUA,khienRen:p.khienRen?{manh:p.khienRen.manh,daRen:p.khienRen.daRen,chuaDung:khienRenChuaDung(p),conLai:khienConLai(p),moiKhien:MANH_MOI_KHIEN}:undefined,academic:academic?{total:academic.total,today:academic.days[academicDay(now())]??0,lastGain:academic.lastGain,at:academic.at,dailyLimit:100}:undefined}}
+function visible(p:Profile,hapThuInfo?:{tran:number;lyDo?:string|null;soCauHomNay?:number;canCau?:number}){const {legacy:_,academic,expMoi,truocSiet:_ts,truocSiet4:_t4,mocVang:_mv,...rest}=p;const homNay=academicDay(now());const v4=p.luatCap===LUAT_CAP_MOI
+  // LUẬT v4 (29/09): không còn ống nghiệm / trần hấp thụ ⇒ KHÔNG gửi `hapThuHomNay` (màn tự ẩn thanh hấp thụ và nút nạp); gửi `choMoc` + mốc 21 ngày + tỉ lệ vàng.
+  return {...rest,ongNghiem:v4?0:p.wallet,...(v4?{choMoc:p.choMoc??0,ngayMoCap10:NGAY_DAT_MO_CAP_10,expMoiVang:EXP_MOI_VANG}:{hapThuHomNay:{da:p.hapThu&&p.hapThu.ngay===homNay?p.hapThu.da:0,tran:hapThuInfo?.tran??null,lyDo:hapThuInfo?.lyDo??null,...(hapThuInfo?.soCauHomNay!==undefined?{soCauHomNay:hapThuInfo.soCauHomNay,canCau:hapThuInfo.canCau}:{})}}),expGameHomNay:{da:daExpGameHomNay(p,homNay),tran:TRAN_EXP_GAME_NGAY},khienConLai:khienConLai(p),soNgayDat:expMoi?.ngayDat??0,renKhien:{gia:VANG_REN_KHIEN,duTru:0,manh:MANH_MOI_KHIEN,donVi:'vang'},ngayMoKhienQua:NGAY_DAT_MO_KHIEN_QUA,khienRen:p.khienRen?{manh:p.khienRen.manh,daRen:p.khienRen.daRen,chuaDung:khienRenChuaDung(p),conLai:khienConLai(p),moiKhien:MANH_MOI_KHIEN}:undefined,academic:academic?{total:academic.total,today:academic.days[academicDay(now())]??0,lastGain:academic.lastGain,at:academic.at,dailyLimit:100}:undefined}}
 async function attempts(env:Env,sbd:string){const r=await env.DB.prepare('SELECT json FROM game_v2_attempt WHERE sbd=? ORDER BY created_at DESC LIMIT 3000').bind(sbd).all<{json:string}>();return r.results.map(x=>(JSON.parse(x.json) as {attempt:Attempt}).attempt).reverse()}
 async function currentQuestion(env:Env,q:{qid:string;maDe:string;version:string}){
   const row=await env.DB.prepare(`SELECT q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index g ON g.ma_de=d.ma_de AND g.source_version=d.cap_nhat_luc WHERE q.ma_de=? AND q.qid=? AND q.version=? AND COALESCE(d.da_xoa,0)=0`).bind(q.maDe,q.qid,q.version).first<{json:string}>()
@@ -298,8 +301,9 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
         return {ok:true,p08:kq}
       }
     }
-    const daRen=renKhienBangExp(p,Number(b.soDaRen))
-    return {ok:true,profile:visible(p),revision:daRen?await save(env,sbd,p,revision):revision,daRen}
+    // Luật v4: rèn bằng VÀNG (21 mảnh + 21 ngày đạt + 1 400 vàng), ghi dòng trừ vàng CÙNG lô với hồ sơ (vang-duc.ts).
+    const r=await renKhienVang(env,sbd,p,revision,Number(b.soDaRen))
+    return {ok:true,profile:visible(p),revision:r.revision,daRen:r.daRen}
   }
   if(action==='shield-use'){
     const id=String(b.useId??'');if(!/^[a-zA-Z0-9-]{16,80}$/.test(id))throw new Error('Lượt dùng khiên không hợp lệ.')
@@ -342,13 +346,9 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
         return {ok:true,p08:kq,daNap:kq.take,conTran:kq.conLaiTranNgay,lyDo:kq.chamTranCap?'cham_cap_120':kq.take>0?null:'het_tran_ngay'}
       }
     }
-    if(p.cap>=120)throw new Error('Thần thú đã đạt cấp 120. EXP tiếp tục được giữ trong kho.')
-    // MỘT CỔNG HẤP THỤ (Đợt 1 thần thú mỗi ngày): mỗi ngày VN thần thú ăn tối đa 200 EXP khi em đạt nhiệm vụ ngày, 120 khi có học chưa đạt, 0 khi chưa học; phần dư ở lại ống nghiệm.
+    // LUẬT v4 (29/09): NẠP TỰ DO — EXP đã vào thần thú ngay lúc ghi sổ, không còn gì để nạp. Lệnh giữ lại cho máy em bản cũ: trả hồ sơ, KHÔNG đổi gì.
     if(p.luatCap!==LUAT_CAP_MOI)throw new Error('Hồ sơ thần thú đang được cập nhật sang cách lên cấp mới. Em thử lại sau ít phút.')
-    const ngay=academicDay(now());const t=await docTranHapThu(env,sbd,ngay)
-    const r=hapThu(p,Number.POSITIVE_INFINITY,ngay,t.tran)
-    if(!r.daNap)return {ok:true,profile:visible(p,{tran:t.tran,lyDo:r.lyDo,soCauHomNay:t.soCauHomNay,canCau:t.canCau}),revision,daNap:0,lyDo:r.lyDo,conTran:r.conTran}
-    return {ok:true,profile:visible(r.hoSo,{tran:t.tran,lyDo:r.lyDo,soCauHomNay:t.soCauHomNay,canCau:t.canCau}),revision:await save(env,sbd,r.hoSo,revision),daNap:r.daNap,lyDo:r.lyDo,conTran:r.conTran}
+    return {ok:true,profile:visible(p),revision,daNap:0,lyDo:null,conTran:0}
   }
   if(action==='start'||action==='recommendations'){
     const mode:Mode=['adventure','repair','tower','arena'].includes(String(b.mode))?b.mode as Mode:'adventure'
@@ -462,7 +462,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>):Promise
     const step=advance(p.mastery.find(m=>m.key===(q.dang??q.group)),attempt)
     // ĐIỀU 9: thưởng nấc dạng (Đảo và Đoàn cùng đường này) đi qua MỘT cửa có trần 120 EXP/ngày VN; quá trần ⇒ thưởng 0 nhưng mastery, sổ sự kiện, vé vẫn ghi đủ.
     const thuong=step.reward>0&&!khongThuong?nhanExpGame(p,academicDay(now()),step.reward):0
-    p.mastery=[...p.mastery.filter(m=>m.key!==step.mastery.key),step.mastery];p.wallet+=thuong;p.earned+=thuong
+    p.mastery=[...p.mastery.filter(m=>m.key!==step.mastery.key),step.mastery];congExpVaoHoSo(p,thuong) // luật v4: thưởng nấc vào THẲNG thú (hồ sơ cũ hơn v3 vẫn vào ống)
     if(session.mode==='arena'&&p.arena&&!p.arena.finished)p.arena.studied=(p.arena.studied??0)+1
     if(session.mode==='arena'&&p.arena&&!p.arena.finished&&attempt.correct&&!attempt.assisted&&p.arena.learned<2&&!(p.arena.learnedGroups??[]).includes(q.group)){p.arena.gold+=2;p.arena.learned++;p.arena.learnedGroups=[...(p.arena.learnedGroups??[]),q.group]}
     const result={attempt,traLoi:submitted,correct:attempt.correct,answer:q.correct,solution:q.solution,solutionImages:q.hinhAnh.filter(h=>h.viTri==='sau_loi_giai'),reward:thuong,...(thuong<step.reward?{thuongGoc:step.reward}:{}),stage:step.mastery.stage,lyDoThuong:lyDoThuong({correct:attempt.correct,assisted:attempt.assisted,reward:thuong,milestone:step.milestone,stage:step.mastery.stage})}

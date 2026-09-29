@@ -1,4 +1,5 @@
 import { gioDayDu } from './ngay-gio-24'
+import { docAnhThu, expTheoCau, type AnhThuNhan, type KhoanExpNhan } from './hieu-ung-exp-cau'
 import { chuMoSomChang } from './mo-som-chang'
 
 // BTVN "NÂNG ĐỠ" — KIỂU + HÀM THUẦN phía máy em. Hợp đồng: docs/hop-dong-btvn-nang-do-2109.md (mục 3, 4).
@@ -365,6 +366,9 @@ export interface KetQuaChang {
   baiDaNop?: { soDung: number; soCau: number }
   /** ĐIỀU 6 (mở sớm chặng, Boss chốt B): chỉ khi chặng vừa xong KHÔNG phải chặng cuối. `duoc` = máy chủ ĐÃ mở sớm chặng kế; `lyDo` (khi không được): het_chang · da_mo_som_hom_nay · chua_du_ti_le · da_mo_san · thua_cas. Máy khách tự dựng chữ bằng `chuMoSomChang` (mo-som-chang.ts), KHÔNG in `chu` của máy chủ. */
   moSom?: { duoc: boolean; lyDo: string | null }
+  /** Luật v4 (chỉ-thêm): khoản EXP vừa ghi (có `qid` với khoản câu) + thần thú sau lượt nộp. */
+  expNhan?: KhoanExpNhan[]
+  thanThu?: AnhThuNhan | null
 }
 
 /** Đọc phản hồi `/btvn/xong-lo` của bài cá nhân hoá. null khi không phải một đối tượng. */
@@ -396,6 +400,10 @@ export function docKetQuaChang(r: unknown): KetQuaChang | null {
   if (laDoiTuong(r.chang) && laSoNguyenKhongAm(r.chang.chiSo) && laSoNguyenKhongAm(r.chang.soCau) && laSoNguyenKhongAm(r.chang.soDung)) {
     out.chang = { chiSo: r.chang.chiSo, soCau: r.chang.soCau, soDung: r.chang.soDung, xong: r.chang.xong === true }
   }
+  if (Array.isArray(r.expNhan)) {
+    out.expNhan = r.expNhan.flatMap((x): KhoanExpNhan[] => (laDoiTuong(x) && typeof x.exp === 'number' ? [{ exp: Math.max(0, Math.floor(x.exp)), ghiChu: typeof x.ghiChu === 'string' ? x.ghiChu : '', ...(typeof x.loai === 'string' ? { loai: x.loai } : {}), ...(typeof x.qid === 'string' && x.qid ? { qid: x.qid } : {}) }] : []))
+  }
+  { const t = docAnhThu(r.thanThu); if (t) out.thanThu = t }
   if (laDoiTuong(r.moSom) && typeof r.moSom.duoc === 'boolean') out.moSom = { duoc: r.moSom.duoc, lyDo: typeof r.moSom.lyDo === 'string' ? r.moSom.lyDo : null }
   if (laDoiTuong(r.exp) && laSo(r.exp.homNay)) {
     out.exp = { homNay: r.exp.homNay, conLaiLenCap: laSo(r.exp.conLaiLenCap) ? r.exp.conLaiLenCap : null }
@@ -493,6 +501,10 @@ export interface TheChangView {
   dong: { kieu: 'lai' | 'moi' | 'dang'; chu: string }[]
   /** `thu` (có khi máy chủ trả đủ 3 số Đợt 1): EXP học đã VÀO ỐNG NGHIỆM (chưa lên cấp) — màn nói "còn N EXP nữa lên cấp · ống nghiệm có M · hôm nay thú còn ăn được K". */
   exp: { homNay: number; conLai: number | null; thu?: { expConThieu: number; ongNghiem: number; hapThuConLaiHomNay: number } } | null
+  /** Luật v4 (29/09): "+N EXP" theo TỪNG câu đúng của chặng (số máy chủ, khoản `cau` mang qid) — `stt` = số thứ tự câu trong chặng. Rỗng ⇒ không hiệu ứng. */
+  expCau?: { stt: number; exp: number }[]
+  /** Luật v4: thần thú sau lượt nộp (thanh EXP nhích, lên cấp). Máy chủ cũ không gửi ⇒ null. */
+  thu?: AnhThuNhan | null
   /** Chỉ khi chặng CUỐI vừa xong và máy chủ đã tự chốt nộp bài. */
   nop: { chu: string; ghiThuong: string | null } | null
   tram: { xong: number; tong: number } | null
@@ -545,6 +557,9 @@ export function theChangView(ket: KetQuaChang, soChang?: number | null): TheChan
     dangLenBac,
     dong,
     exp: ket.exp && ket.exp.homNay > 0 ? { homNay: ket.exp.homNay, conLai: ket.exp.conLaiLenCap, ...(ket.exp.thu ? { thu: ket.exp.thu } : {}) } : null,
+    // Luật v4: chỉ thêm trường khi có số (máy chủ cũ ⇒ view y như trước).
+    ...(() => { const theo = expTheoCau(ket.ketQua, ket.expNhan), ds = ket.ketQua.flatMap((k, i) => (theo[k.qid] ? [{ stt: i + 1, exp: theo[k.qid]! }] : [])); return ds.length ? { expCau: ds } : {} })(),
+    ...(ket.thanThu ? { thu: ket.thanThu } : {}),
     nop,
     tram: tong && !thuSuc ? { xong: Math.min(ket.loDaXong ?? k, tong), tong } : null,
     moSom: thuSuc || nop ? null : chuMoSomCuaChang(ket),

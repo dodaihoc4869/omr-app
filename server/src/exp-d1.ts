@@ -28,6 +28,7 @@ import { tinhDatNhiemVuNgay } from '../../src/lib/dat-nhiem-vu-ngay'
 import { cuaP08Mo, ghiManhQuaP08 } from './cnh-exp-adapter'
 import type { ThieuDat } from '../../src/lib/dat-nhiem-vu-ngay'
 import { ngayVn } from './su-kien-hoc'
+import { thanhExp } from '../../src/game/than-thu-hoa-hoc/kinh-nghiem'
 
 const MOT_NGAY_MS = 86_400_000
 /** Ca thi công bố muộn: chỉ dò lại các lượt nộp trong ngần này ngày (lượt điểm 0 không bao giờ sinh khoản nên không được dò mãi). */
@@ -293,12 +294,18 @@ const KHONG_BAT: KetQuaExp = { bat: false, khoan: [], manh: [], daCong: null, da
  */
 export async function expNhanSauNop(env: Env, sbd: string, nowMs: number, tuyChon: { laNopLo?: boolean } = {}): Promise<Record<string, unknown>> {
   const k = tuyChon.laNopLo ? await capNhatExpSauNopLo(env, sbd, nowMs) : await capNhatExp(env, sbd, nowMs)
-  return k.bat ? { expNhan: expNhanCuaKetQua(k), manhNhan: manhNhanCuaKetQua(k) } : {}
+  return k.bat ? { expNhan: expNhanCuaKetQua(k), manhNhan: manhNhanCuaKetQua(k), ...thanThuCuaKetQua(k) } : {}
 }
 
-/** EXP vừa nhận, dạng gửi cho máy em: `[{loai, exp, ghiChu}]` (chữ tiếng Việt in sẵn, kèm số). */
-export const expNhanCuaKetQua = (k: KetQuaExp) => k.khoan.map((x) => ({ loai: x.loai, exp: x.exp, ghiChu: x.ghiChu }))
+/** EXP vừa nhận, dạng gửi cho máy em: `[{loai, exp, ghiChu, qid?}]` (chữ tiếng Việt in sẵn, kèm số). `qid` (chỉ-thêm, v4) để màn phát hiệu ứng "+N EXP" đúng câu. */
+export const expNhanCuaKetQua = (k: KetQuaExp) => k.khoan.map((x) => ({ loai: x.loai, exp: x.exp, ghiChu: x.ghiChu, ...(x.qid ? { qid: x.qid } : {}) }))
 export const manhNhanCuaKetQua = (k: KetQuaExp) => k.manh.map((x) => ({ loai: x.loai, so: x.so, ghiChu: x.ghiChu }))
+/**
+ * Luật v4 (chỉ-thêm): thần thú SAU lần cộng này — `{cap, exp, thanh, soCapLen, choMoc}` để màn phát hiệu ứng "+N EXP", thanh nhích, lên cấp. Vắng khi không có EXP mới
+ * hoặc hồ sơ chưa sang v4 (màn chỉ hiện số, không thanh).
+ */
+export const thanThuCuaKetQua = (k: KetQuaExp): { thanThu: { cap: number; exp: number; thanh: number; soCapLen: number; choMoc: number } } | Record<string, never> =>
+  k.daCong?.thu ? { thanThu: { ...k.daCong.thu, thanh: thanhExp(k.daCong.thu.cap) } } : {}
 export const tongExpCuaKetQua = (k: KetQuaExp) => k.khoan.reduce((t, x) => t + x.exp, 0)
 
 const CHEN_EXP = `INSERT OR IGNORE INTO exp_so (khoa, sbd, ngay_vn, loai, qid, ma_nguon, exp, luc, ghi_chu)
@@ -368,12 +375,22 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   const cacNgay = [...ngayCanTinh]
   const khoaCu = await an(
     () => env.DB.prepare(
-      `SELECT khoa FROM exp_so WHERE sbd = ? AND (ngay_vn IN (SELECT value FROM json_each(?)) OR loai IN ('lo','btvn','mom','khac_phuc','len_bang','diem_ca'))`,
-    ).bind(sbd, json(cacNgay)).all<{ khoa: string }>(),
+      `SELECT khoa, loai, ngay_vn FROM exp_so WHERE sbd = ? AND (ngay_vn IN (SELECT value FROM json_each(?)) OR loai IN ('lo','btvn','mom','khac_phuc','len_bang','diem_ca'))`,
+    ).bind(sbd, json(cacNgay)).all<{ khoa: string; loai?: string; ngay_vn?: string }>(),
     null,
   )
   const tienTo = `${sbd}|`
-  for (const x of khoaCu?.results ?? []) daCo.add(String(x.khoa).slice(tienTo.length))
+  // Trần nguồn v4: đếm khoản khắc phục / lên bậc ĐÃ GHI theo từng ngày (lần gọi trước) để trần tính trên cả ngày.
+  const daTraNgay = new Map<string, { khacPhuc: number; lenBac: number }>()
+  const demTra = (x: { loai?: string; ngay_vn?: string }) => {
+    if (x.loai !== 'khac_phuc' && x.loai !== 'len_bac') return
+    const n = String(x.ngay_vn ?? '')
+    const d = daTraNgay.get(n) ?? { khacPhuc: 0, lenBac: 0 }
+    if (x.loai === 'khac_phuc') d.khacPhuc++
+    else d.lenBac++
+    daTraNgay.set(n, d)
+  }
+  for (const x of khoaCu?.results ?? []) { daCo.add(String(x.khoa).slice(tienTo.length)); demTra(x) }
   for (const l of luot) {
     if (l.nopLuc >= tu && l.nopLuc >= gioiHanDoLai && !daCo.has(`diem|${l.maCa}|${l.lanThu}`) && ngayVn(ms(l.nopLuc)) !== homNay) {
       ngayCanTinh.add(ngayVn(ms(l.nopLuc)))
@@ -382,10 +399,10 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
   if (ngayCanTinh.size > 1) {
     // Đọc thêm khoá của các ngày phụ (các ngày tính thêm cần khoá `cau|…|ngày`, `bac|…|ngày`).
     const them = await an(
-      () => env.DB.prepare('SELECT khoa FROM exp_so WHERE sbd = ? AND ngay_vn IN (SELECT value FROM json_each(?))').bind(sbd, json([...ngayCanTinh])).all<{ khoa: string }>(),
+      () => env.DB.prepare('SELECT khoa, loai, ngay_vn FROM exp_so WHERE sbd = ? AND ngay_vn IN (SELECT value FROM json_each(?)) AND ngay_vn NOT IN (SELECT value FROM json_each(?))').bind(sbd, json([...ngayCanTinh]), json(cacNgay)).all<{ khoa: string; loai?: string; ngay_vn?: string }>(),
       null,
     )
-    for (const x of them?.results ?? []) daCo.add(String(x.khoa).slice(tienTo.length))
+    for (const x of them?.results ?? []) { daCo.add(String(x.khoa).slice(tienTo.length)); demTra(x) }
   }
   const manhCu = await an(
     () => env.DB.prepare(`SELECT khoa FROM manh_khien_so WHERE sbd = ? AND (ngay_vn IN (SELECT value FROM json_each(?)) OR loai = 'dang')`).bind(sbd, json([...ngayCanTinh])).all<{ khoa: string }>(),
@@ -491,7 +508,7 @@ async function capNhatCoTu(env: Env, sbd: string, nowMs: number, tu: string, tuy
       ngay, suKien, metaCau: metaTatCa, mucTieuCau,
       lenBac: ct.lenBac, khacPhuc: ct.khacPhuc, dangRoiYeu: ct.dangRoiYeu,
       loXong: chinh ? loXong : [], baiBtvnNop: chinh ? baiBtvnNop : [], momXong: chinh ? momXong : [], diemCa: chinh ? diemCa : [],
-      datNgay: chinh ? datNgay : null, daCoKhoa: daCo,
+      datNgay: chinh ? datNgay : null, daCoKhoa: daCo, daTraTrongNgay: daTraNgay.get(ngay),
       ngayTruocGanNhat: soTho.reduce<string | null>((m, e) => (e.ngayVn < ngay && (m === null || e.ngayVn > m) ? e.ngayVn : m), null), troLaiGanNhat,
     }
     const ra = tinhExp(vao)

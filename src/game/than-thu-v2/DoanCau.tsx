@@ -1,5 +1,7 @@
 // ĐOÀN HỘ TỐNG — thẻ câu nền giấy ấm, gọn để màn trận KHÔNG cuộn từ 360×740. Nội dung câu (công thức hoá, bảng, ảnh cắt từ đề)
 // dùng lại đúng bộ hiển thị của app (ChemText, BangSoLieu, CauHinh, HinhTaiViTri) — chỉ bố cục là riêng của game.
+import { SoExpCau, useCheDoHieuUng } from '../../components/exp-cau/ExpCau'
+import { expCauGame } from '../../lib/hieu-ung-exp-cau'
 import type { ReactNode } from 'react'
 import { ChemText } from '../../lib/chem-format'
 import { tachDongTheoY } from '../../lib/tach-dong-cau'
@@ -41,10 +43,13 @@ export interface DoanCau2 { gach?: readonly string[]; bua?: ReactNode; xemLaiChu
 
 export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, gach, bua, xemLaiChuan }: { q: Question; chon: string; onChon: (v: string) => void; khoa: boolean; ketQua?: KetQuaCau | null; onZoom: (src: string) => void; dau: ReactNode } & DoanCau2) {
   const hinh = q.hinhAnh as HinhAnh[]
+  // Luật v4 (29/09): "+N EXP" bay sang thần thú — số máy chủ (`reward`); câu sai / có trợ giúp / có Bùa Trợ giảng ⇒ không hiệu ứng.
+  const cheDo = useCheDoHieuUng()
+  const expBay = ketQua ? expCauGame({ correct: ketQua.correct, assisted: ketQua.assisted, coTroGiup: (gach?.length ?? 0) > 0, reward: ketQua.reward }) : 0
   if (xemLaiChuan && ketQua) return (
     <section className="dh-giay dh2-giay-ket" aria-label="Kết quả câu của em">
       <div className="dh-giay-dau">{dau}</div>
-      <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status"><b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b></div>
+      <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status"><b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>{expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}</div>
       <XemLaiChuan q={q} chon={chon} dapAn={ketQua.answer} solution={ketQua.solution} solutionImages={ketQua.solutionImages} stt={xemLaiChuan.stt} onZoom={onZoom} />
     </section>
   )
@@ -93,6 +98,7 @@ export default function DoanCau({ q, chon, onChon, khoa, ketQua, onZoom, dau, ga
       {ketQua && (
         <div className={`dh-ket-qua-cau ${ketQua.correct ? 'dh-dung' : 'dh-sai'}`} role="status">
           <b>{ketQua.correct ? 'Em trả lời đúng.' : 'Chưa đúng — em xem lời giải để sửa câu này.'}</b>
+          {expBay > 0 && <SoExpCau exp={expBay} cheDo={cheDo} vaoThu="dong" />}
           <details open={!ketQua.correct}>
             <summary>Lời giải</summary>
             <LoiGiaiCauSai hoaHoc c={{ text: q.text, phan: q.phan, dapAnDung: ketQua.answer, loiGiai: ketQua.solution }} qid={q.qid} nguon="doan" />

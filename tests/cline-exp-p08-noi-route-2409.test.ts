@@ -49,33 +49,26 @@ describe('P08 nối route · SHOP `vang-doi` (§8)', () => {
     expect(tongVang(d1)).toBe(0)
   })
 
-  it('cửa MỞ ⇒ đi lệnh `doiVangCore`: sổ tiêu P08 + `vang_so` + gương `gold` CÙNG giao dịch', async () => {
+  // LUẬT v4 (thầy chốt 29/09, docs/DE-XUAT-EXP-2909.md): BỎ đổi tay EXP → vàng ⇒ `vang-doi` KHÔNG BAO GIỜ đi P08: cửa hàng đóng ⇒ `tam_dong`, mở ⇒ `da_bo`; không ghi vàng.
+  // (Trước: cửa MỞ đi `doiVangCore`, chưa chuyển đổi ném NOT_FOUND, xuyên dự trữ 400 ném KHONG_DU_DIEU_KIEN — sửa CÓ CHỦ Ý theo luật mới.)
+  it('luật v4: cửa P08 MỞ (cờ cửa hàng tắt) ⇒ `vang-doi` trả tam_dong, KHÔNG ghi sổ tiêu P08, không đổi vàng/ví', async () => {
     const d1 = taoD1That()
     gieoHoSo(d1, 'S1')
     gieoP07(d1, 'S1', { wallet: 700, gold: 0 })
     datCua(d1, CUA_MO)
     const kq = await shopAction(d1.env, 'S1', hoSo(700), 0, 'vang-doi', { khoaYeuCau: 'khoa-du-16-ky-tu', soExp: 300 }, docLai(hoSo(700)))
-    expect(kq).toMatchObject({ ok: true, daDoi: 300, vang: 300, ongNghiem: 400, lapLai: false })
-    expect(dem(d1, 'cnh_exp_spend_ledger', "command_type = 'doi_vang'")).toBe(1)
-    expect(tongVang(d1)).toBe(300) // shop đọc SUM(vang_so) ⇒ thấy vàng vừa đổi
-    expect(Number((d1.sql.prepare("SELECT gold AS g FROM cnh_exp_p08_state WHERE student_id = 'S1'").get() as { g: number }).g)).toBe(300)
-    expect(Number((d1.sql.prepare("SELECT wallet_exp AS w FROM cnh_exp_account WHERE student_id = 'S1'").get() as { w: number }).w)).toBe(400)
-  })
-
-  it('cửa MỞ nhưng CHƯA chuyển đổi ⇒ NÉM `NOT_FOUND` (đúng thứ tự: chuyển TRƯỚC, bật cờ SAU)', async () => {
-    const d1 = taoD1That()
-    gieoHoSo(d1, 'S1')
-    datCua(d1, CUA_MO)
-    await expect(shopAction(d1.env, 'S1', hoSo(700), 0, 'vang-doi', { khoaYeuCau: 'khoa-du-16-ky-tu', soExp: 300 }, docLai(hoSo(700)))).rejects.toMatchObject({ ma: 'NOT_FOUND' })
+    expect(kq).toMatchObject({ ok: false, ma: 'tam_dong' })
+    expect(dem(d1, 'cnh_exp_spend_ledger')).toBe(0)
     expect(tongVang(d1)).toBe(0)
+    expect(Number((d1.sql.prepare("SELECT wallet_exp AS w FROM cnh_exp_account WHERE student_id = 'S1'").get() as { w: number }).w)).toBe(700)
   })
 
-  it('cửa MỞ: xuyên dự trữ 400 ⇒ NÉM `KHONG_DU_DIEU_KIEN`, không ghi gì', async () => {
+  it('luật v4: cửa P08 MỞ mà em chưa chuyển P08 ⇒ không ném, không ghi gì', async () => {
     const d1 = taoD1That()
     gieoHoSo(d1, 'S1')
-    gieoP07(d1, 'S1', { wallet: 700 })
     datCua(d1, CUA_MO)
-    await expect(shopAction(d1.env, 'S1', hoSo(700), 0, 'vang-doi', { khoaYeuCau: 'khoa-du-16-ky-tu', soExp: 301 }, docLai(hoSo(700)))).rejects.toMatchObject({ ma: 'KHONG_DU_DIEU_KIEN' })
+    expect(await shopAction(d1.env, 'S1', hoSo(700), 0, 'vang-doi', { khoaYeuCau: 'khoa-du-16-ky-tu', soExp: 301 }, docLai(hoSo(700)))).toMatchObject({ ok: false, ma: 'tam_dong' })
+    expect(tongVang(d1)).toBe(0)
     expect(dem(d1, 'cnh_exp_spend_ledger')).toBe(0)
   })
 })
@@ -144,8 +137,10 @@ describe('P08 nối route · ĐƯỜNG ĐỌC (trám số P08 lên bản hiển 
     gieoEm(d1, 500)
     gieoP07(d1, 'S1', { wallet: 900, unused: 3 })
     const r = await lay(d1)
-    expect(r.profile.wallet).toBe(500)
-    expect(r.profile.ongNghiem).toBe(500)
+    // Luật v4 (29/09): mở hồ sơ cũ ⇒ chuyển MỘT lần, 500 EXP ống nghiệm vào thẳng thú (90 + 270 ⇒ cấp 3, dư 140); không còn ống. Sửa CÓ CHỦ Ý.
+    expect(r.profile.wallet).toBe(0)
+    expect(r.profile.ongNghiem).toBe(0)
+    expect([r.profile.cap, r.profile.exp]).toEqual([3, 140])
     expect(r.profile.khienConLai).toBe(0)
   })
 
@@ -168,6 +163,8 @@ describe('P08 nối route · ĐƯỜNG ĐỌC (trám số P08 lên bản hiển 
     gieoEm(d1, 500)
     datCua(d1, CUA_MO)
     const r = await lay(d1)
-    expect(r.profile.wallet).toBe(500)
+    // Luật v4: số sổ cũ = hồ sơ đã chuyển (ống nghiệm 500 đã vào thú). Sửa CÓ CHỦ Ý.
+    expect(r.profile.wallet).toBe(0)
+    expect([r.profile.cap, r.profile.exp]).toEqual([3, 140])
   })
 })

@@ -4,7 +4,7 @@ import {PETS} from '../core'
 import {EVOLUTION_NAMES,evolutionStage} from '../evolution'
 import {normalizePetName} from '../pet-name'
 import {anhThu,anhThuTheoDang} from './anh'
-import {CAP_TOI_DA,NHOM_AI,chiSoThu,chuLuotConLai,chuMaiCho,chuMoThemLuot,duTruNgayAn,duongTienHoa,hapThuHienThi,loiThu,mucTieuGanNhat,nhanLuot,tenThu,tienHoaKe,trangLuot,vongExp} from './dao-core'
+import {CAP_TOI_DA,NHOM_AI,chiSoThu,chuChoMoc,chuLuotConLai,chuMaiCho,chuMoThemLuot,duTruNgayAn,duongTienHoa,hapThuHienThi,loiThu,mucTieuGanNhat,nhanLuot,tenThu,tienHoaKe,trangLuot,vongExp} from './dao-core'
 import type {LuotNgay,MaiCho,MucTieu} from './dao-core'
 import type {DaoExp,DaoProfile} from './kieu'
 import {chuHetLuotDao,type LuotCauNgay} from '../chu-het-luot'
@@ -40,6 +40,7 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
  const hetLuotCau=conLai===0,hetLuotNgay=!!luotNgay&&luotNgay.conLai===0,hetLuot=hetLuotCau||hetLuotNgay,soAi=NHOM_AI.reduce((s,n)=>s+n.suat,0)
  const hapThu=hapThuHienThi(profile.hapThuHomNay,ten,profile.wallet>0)
  const duTru=hapThu?duTruNgayAn(profile.wallet):null
+ const choMoc=chuChoMoc(profile,ten)
  return <div className="dao-nha" data-thu={thu}>
   <header className="dao-nha-dau"><div><small className="dao-nhan">BÁT LINH ĐẢO</small>
    {suaTen?<form className="dao-nha-doi-ten" onSubmit={luuTen}><input aria-label="Tên thần thú" value={tenMoi} maxLength={48} autoComplete="off" autoFocus onChange={e=>{setTenMoi(e.target.value);setLoiTen('')}}/><button type="submit" className="dao-nut-nho" disabled={busy||!tenMoi.trim()}>Lưu</button><button type="button" className="dao-nut-nho dao-nut-nho-mo" onClick={()=>{setSuaTen(false);setLoiTen('')}}>Huỷ</button></form>
@@ -54,7 +55,8 @@ export default function DaoCuaEm({profile,exp,chuoiNgay,now=Date.now(),goiY=null
    <div className="dao-hon-vong"><svg viewBox="0 0 260 260" aria-hidden="true"><circle className="dao-vong-nen" cx="130" cy="130" r={BAN_KINH}/><circle className="dao-vong-day" cx="130" cy="130" r={BAN_KINH} strokeDasharray={`${(CHU_VI*vong.tiLe).toFixed(0)} ${CHU_VI.toFixed(0)}`}/></svg>
     <img className="dao-hon-thu" src={anhThu(thu,profile.cap)} alt="" width="288" height="288" decoding="async" draggable={false}/></div>
    <div className="dao-hon-cap"><small>CẤP</small><strong>{profile.cap}</strong></div>
-   <div className="dao-hon-con" role="status">{vong.toiDa?`Cấp cao nhất · ${CAP_TOI_DA}`:`còn ${vong.con.toLocaleString('vi-VN')} EXP lên cấp ${profile.cap+1}`}</div>
+   <div className="dao-hon-con" role="status">{vong.toiDa?`Cấp cao nhất · ${CAP_TOI_DA}`:choMoc?`Chờ đủ ngày đạt để lên cấp ${profile.cap+1}`:`còn ${vong.con.toLocaleString('vi-VN')} EXP lên cấp ${profile.cap+1}`}</div>
+   {choMoc&&<p className="dao-hon-loi" data-vung="cho-moc">{choMoc}</p>}
    {profile.wallet>0&&profile.cap<CAP_TOI_DA&&onNap&&<button type="button" className="dao-hon-nap" disabled={busy} onClick={onNap}>Nạp {profile.wallet.toLocaleString('vi-VN')} EXP cho {ten}</button>}
    <p className="dao-hon-loi">{loiThu(profile,now,chuoiNgay)}</p>
   </section>

@@ -15,7 +15,7 @@ export interface TranXem {
   /** Chỉ-thêm (Hóa 2.0, phòng một người thật): hiệp kế đang CHỜ em bấm "ĐÁNH TIẾP" — không có đồng hồ. Vắng ⇒ nhịp cũ. */
   choTiep?: boolean
 }
-export interface KetQuaCau { correct: boolean; answer: string; solution: unknown; solutionImages?: HinhAnh[]; reward?: number; stage?: number }
+export interface KetQuaCau { correct: boolean; answer: string; solution: unknown; solutionImages?: HinhAnh[]; reward?: number; stage?: number; /** Chỉ-thêm (luật v4): câu có trợ giúp ⇒ không hiệu ứng EXP. */ assisted?: boolean }
 export interface CauXem { qid?: string; nhan?: NhanCau; /** Nhãn nợ (Sổ nợ 29/09): "Sai 2 lần · Ca 26/09". */ nhanNo?: string; an?: boolean; de?: Question; giuNguyen?: boolean; daChot?: boolean; hanhDong?: HanhDong; boTrong?: boolean; ketQua?: KetQuaCau | null; het?: boolean; rut?: boolean; loiNhan?: string
   /** 28/09: em đã hết câu riêng ⇒ hiệp này máy tính em chốt vai GIỮ KHIÊN (`chan` = khiên góp cho Linh Tâm). */
   giuKhien?: boolean; chan?: number }
