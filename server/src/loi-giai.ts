@@ -4,8 +4,9 @@
 // DÂY CHUYỀN
 //   nạp đề (dayDeKho) ──móc──▶ loi_giai_cau (qid → băm) + loi_giai_viec (hàng việc theo BĂM, gộp câu trùng)
 //   máy soạn của thầy ──/kho/loi-giai/viec──▶ nhận một lô CÙNG CHƯƠNG ──/kho/loi-giai/nop──▶ máy chủ KIỂM LẠI với đáp án KHO
-//        (không tin máy soạn) ──qua──▶ R2 `giai/<băm>.json` + loi_giai 'cho_duyet'
-//   thầy mở đề sắp giao ──/gv/loi-giai/cho-duyet──▶ duyệt cả lô câu sạch / trả lại từng câu ──▶ 'da_duyet'
+//        (không tin máy soạn) ──qua──▶ R2 `giai/<băm>.json` + loi_giai: SẠCH ⇒ 'da_duyet' ngay ("máy duyệt", thầy chốt 29/09);
+//        còn cờ đáp án ⇒ 'cho_duyet' (không hiện với học sinh; gom ở /gv/loi-giai/sua-kho để báo thầy)
+//   thầy mở đề sắp giao ──/gv/loi-giai/cho-duyet──▶ xem / trả lại từng câu (không bắt buộc) ──▶ 'tra_lai' ⇒ máy soạn lại
 //   học sinh ──/hs/loi-giai──▶ chỉ khi ca đã CÔNG BỐ (hoặc em đã tự làm câu ở chỗ luyện) + hồ sơ đã duyệt + băm còn khớp đề hiện tại.
 //
 // Bảng CHỈ-THÊM, dựng tại chỗ (CI không chạy migration — mẫu bi-a.ts); bản ghi tay: server/migration-2909-loi-giai.sql.
@@ -54,6 +55,16 @@ export function damBaoBangLoiGiai(env: Env): Promise<void> {
  * Thầy giao máy tự chốt (29/09) và muốn "Hỏi thầy" hiện lời giải ngay ⇒ không bắt em đợi thầy duyệt từng đề. Cờ "đáp án kho sai" không bao giờ lộ ra.
  */
 const SQL_XEM_DUOC = (l = 'l') => `(${l}.trang_thai = 'da_duyet' OR (${l}.trang_thai = 'cho_duyet' AND ${l}.so_co_dap_an = 0))`
+
+/**
+ * MÁY TỰ DUYỆT (thầy chốt 29/09: "Giữ hiện luôn, máy duyệt luôn. Tôi không làm gì cả."): hồ sơ qua đủ 6 khoá + không còn cờ đáp án
+ * (cờ đã chuyển daChot / loiDe / hienThi vẫn là sạch) ⇒ 'da_duyet' lúc nộp, ghi chú bắt đầu bằng dấu này. Ghi chú trả lại cũ của thầy
+ * (nếu có) được giữ sau dấu " · ", không mất.
+ */
+export const GHI_CHU_MAY_DUYET = 'máy duyệt'
+const SQL_GHI_CHU_MAY_DUYET = (cot = 'ghi_chu') =>
+  `CASE WHEN ${cot} IS NULL OR ${cot} = '' OR ${cot} LIKE '${GHI_CHU_MAY_DUYET}%' THEN '${GHI_CHU_MAY_DUYET}' ELSE '${GHI_CHU_MAY_DUYET} · ' || ${cot} END`
+const SQL_HO_SO_SACH_CHO = "trang_thai = 'cho_duyet' AND so_co_dap_an = 0"
 
 /** Số lần máy soạn được thử một câu trước khi câu bị đẩy sang "trượt" để thầy xem. */
 const SO_LAN_TOI_DA = 3
@@ -214,7 +225,7 @@ export async function nopHoSo(env: Env, b: Obj) {
   const bo = BO_CHIA_KHOA[vao.bo]
   if (!bo) return { ok: false, error: `Chương ${vao.bo || '?'} chưa có bộ chìa khoá` }
   const cu = await env.DB.prepare('SELECT trang_thai FROM loi_giai WHERE bam = ?').bind(bam).first<Obj>()
-  if (str(cu?.trang_thai) === 'da_duyet' && b.ghiDe !== true) return { ok: false, error: 'Hồ sơ câu này thầy đã duyệt — không ghi đè' }
+  if (str(cu?.trang_thai) === 'da_duyet' && b.ghiDe !== true) return { ok: false, error: 'Hồ sơ câu này đã duyệt — không ghi đè' }
   const { loi, canhBao } = kiemHoSo(vao, hoSo, bo)
   const nay = new Date().toISOString()
   if (loi.length) {
@@ -226,18 +237,26 @@ export async function nopHoSo(env: Env, b: Obj) {
   // Trường định danh lấy từ KHO, không lấy từ máy soạn: khung chọn bộ chìa khoá theo `bo`.
   const gon: Obj = { ...gonHoSo(hoSo as Obj), qid, bam, dang: vao.dang, bo: vao.bo }
   const co = (gon.co as { loai: string }[]) ?? []
+  const soCoDapAn = co.filter((c) => c.loai === 'dapAn').length
+  // Máy duyệt: đã qua 6 khoá ở trên + không còn cờ đáp án. Cờ đáp án ⇒ chờ (không hiện với học sinh), để cuối đợt báo thầy.
+  const daDuyet = soCoDapAn === 0
   const khoa = `giai/${bam}.json`
   await env.DE.put(khoa, JSON.stringify(gon))
   await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO loi_giai (bam, qid_mau, dang, bo, lop, tang, trang_thai, so_co_dap_an, co_json, r2_khoa, soan_luc, duyet_luc, ghi_chu)
-       VALUES (?,?,?,?,?,?,'cho_duyet',?,?,?,?,NULL,NULL)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)
        ON CONFLICT(bam) DO UPDATE SET qid_mau=excluded.qid_mau, dang=excluded.dang, bo=excluded.bo, lop=excluded.lop, tang=excluded.tang,
-         trang_thai='cho_duyet', so_co_dap_an=excluded.so_co_dap_an, co_json=excluded.co_json, r2_khoa=excluded.r2_khoa, soan_luc=excluded.soan_luc, duyet_luc=NULL`,
-    ).bind(bam, qid, vao.dang, vao.bo, lopCua(ht.c.maDe), vao.tang, co.filter((c) => c.loai === 'dapAn').length, JSON.stringify(co), khoa, nay),
+         trang_thai=excluded.trang_thai, so_co_dap_an=excluded.so_co_dap_an, co_json=excluded.co_json, r2_khoa=excluded.r2_khoa, soan_luc=excluded.soan_luc,
+         duyet_luc=excluded.duyet_luc,
+         ghi_chu=CASE WHEN excluded.trang_thai = 'da_duyet' THEN ${SQL_GHI_CHU_MAY_DUYET('loi_giai.ghi_chu')}
+           WHEN loi_giai.ghi_chu = '${GHI_CHU_MAY_DUYET}' THEN NULL
+           WHEN loi_giai.ghi_chu LIKE '${GHI_CHU_MAY_DUYET} · %' THEN substr(loi_giai.ghi_chu, ${GHI_CHU_MAY_DUYET.length + 4}) ELSE loi_giai.ghi_chu END`,
+    ).bind(bam, qid, vao.dang, vao.bo, lopCua(ht.c.maDe), vao.tang, daDuyet ? 'da_duyet' : 'cho_duyet', soCoDapAn, JSON.stringify(co), khoa, nay,
+      daDuyet ? nay : null, daDuyet ? GHI_CHU_MAY_DUYET : null),
     env.DB.prepare("UPDATE loi_giai_viec SET trang_thai = 'xong', ma_luot = NULL, loi = NULL WHERE bam = ?").bind(bam),
   ])
-  return { ok: true, bam, sach: laHoSoSach(gon), canhBao, kichThuoc: JSON.stringify(gon).length }
+  return { ok: true, bam, sach: laHoSoSach(gon), daDuyet, canhBao, kichThuoc: JSON.stringify(gon).length }
 }
 
 /** Tổng quan hàng việc theo chương (máy soạn in ra; màn thầy hiện). */
@@ -273,13 +292,34 @@ export async function gvChoDuyet(env: Env, b: Obj) {
       : !BO_CHIA_KHOA[str(r.bo)] ? 'chua_co_bo' : str(r.viec) === 'truot' ? 'truot' : 'dang_soan'
     let co: unknown[] = []
     try { co = JSON.parse(str(r.co_json) || '[]') } catch { co = [] }
-    return { qid: str(r.qid), bam: str(r.bam), dang: str(r.dang), bo: str(r.bo), trangThai, sach: trangThai === 'cho_duyet' && Number(r.so_co_dap_an ?? 0) === 0, co, ghiChu: str(r.ghi_chu), loiMay: str(r.loi_viec), soLan: Number(r.so_lan ?? 0) }
+    const { mayDuyet, ghiChu } = tachGhiChu(trangThai, str(r.ghi_chu))
+    return { qid: str(r.qid), bam: str(r.bam), dang: str(r.dang), bo: str(r.bo), trangThai, sach: trangThai === 'cho_duyet' && Number(r.so_co_dap_an ?? 0) === 0, mayDuyet, co, ghiChu, loiMay: str(r.loi_viec), soLan: Number(r.so_lan ?? 0) }
   }).sort((a, b2) => soThu(a.qid) - soThu(b2.qid))
   const dem = (t: string) => cau.filter((c) => c.trangThai === t).length
   return {
     ok: true, maDe, cau,
     tong: { cau: cau.length, daDuyet: dem('da_duyet'), choDuyet: dem('cho_duyet'), sach: cau.filter((c) => c.sach).length, dangSoan: dem('dang_soan'), traLai: dem('tra_lai'), truot: dem('truot'), chuaCoBo: dem('chua_co_bo') },
   }
+}
+
+/** Ghi chú trong bảng ⇒ (máy duyệt?, ghi chú trả lại của thầy còn lại). */
+function tachGhiChu(trangThai: string, ghi: string): { mayDuyet: boolean; ghiChu: string } {
+  if (!ghi.startsWith(GHI_CHU_MAY_DUYET)) return { mayDuyet: false, ghiChu: ghi }
+  return { mayDuyet: trangThai === 'da_duyet', ghiChu: ghi.slice(GHI_CHU_MAY_DUYET.length).replace(/^ · /, '') }
+}
+
+/**
+ * BÙ MÁY DUYỆT cho hồ sơ nộp TRƯỚC khi có luật máy duyệt: hồ sơ sạch đang chờ ⇒ 'da_duyet' (ghi giờ + "máy duyệt").
+ * CHỈ đổi trạng thái — không xoá, không đụng hồ sơ còn cờ đáp án, hồ sơ thầy đã trả lại hay đã duyệt. Chạy lại vô hại. `thu: true` ⇒ chỉ đếm.
+ */
+export async function gvMayDuyetBu(env: Env, b: Obj) {
+  await damBaoBangLoiGiai(env)
+  const dem = async (dk: string) => Number((await env.DB.prepare(`SELECT COUNT(*) AS n FROM loi_giai WHERE ${dk}`).first<Obj>())?.n ?? 0)
+  const conCoDapAn = await dem("trang_thai = 'cho_duyet' AND so_co_dap_an > 0")
+  if (b.thu === true) return { ok: true, thu: true, soCau: await dem(SQL_HO_SO_SACH_CHO), conCoDapAn }
+  const r = await env.DB.prepare(`UPDATE loi_giai SET trang_thai = 'da_duyet', duyet_luc = ?, ghi_chu = ${SQL_GHI_CHU_MAY_DUYET()} WHERE ${SQL_HO_SO_SACH_CHO}`)
+    .bind(new Date().toISOString()).run()
+  return { ok: true, soCau: r.meta?.changes ?? 0, conCoDapAn }
 }
 
 /** Thầy xem một hồ sơ (mọi trạng thái) + câu để khung vẽ. */
@@ -327,15 +367,16 @@ export async function gvDuyet(env: Env, b: Obj) {
 /**
  * DANH SÁCH SỬA KHO do phiên chốt đề xuất (cờ `loiDe` / `hienThi` có `sua`), đúng khuôn `docs/ra-soat-hien-thi-de-2809/sua-tung-cau.json`
  * để công cụ áp dụng sẵn có ghi qua `/kho/day` (kiểm ca mở, đọc lại, lùi được). Cờ `dapAn` đã chốt "đáp án kho sai" trả riêng: đổi đáp án là đổi điểm thật.
+ * Cờ `dapAn` phiên chốt chưa kết luận (không có `chot`) trả ở `chuaChot` — cuối đợt Boss báo thầy cả hai danh sách.
  */
 export async function gvSuaKho(env: Env, b: Obj) {
   await damBaoBangLoiGiai(env)
   const maDe = str(b.maDe)
   const r = await env.DB.prepare(
     `SELECT q.qid, q.ma_de, l.co_json FROM loi_giai l JOIN loi_giai_cau q ON q.bam = l.bam
-     WHERE l.co_json LIKE '%"sua"%' OR l.co_json LIKE '%"chot"%' ${maDe ? 'AND q.ma_de = ?' : ''} ORDER BY q.ma_de, q.qid`,
+     WHERE (l.co_json LIKE '%"sua"%' OR l.co_json LIKE '%"chot"%' OR l.so_co_dap_an > 0) ${maDe ? 'AND q.ma_de = ?' : ''} ORDER BY q.ma_de, q.qid`,
   ).bind(...(maDe ? [maDe] : [])).all<Obj>()
-  const sua: Obj[] = [], dapAnSai: Obj[] = []
+  const sua: Obj[] = [], dapAnSai: Obj[] = [], chuaChot: Obj[] = []
   for (const row of r.results ?? []) {
     let co: Obj[] = []
     try { co = JSON.parse(str(row.co_json) || '[]') } catch { co = [] }
@@ -343,10 +384,10 @@ export async function gvSuaKho(env: Env, b: Obj) {
     for (const c of co) {
       const su = c.sua as Obj | undefined
       if (su && typeof su === 'object') sua.push({ qid, maDe: str(row.ma_de), phan: m?.[1] ?? '', so: Number(m?.[2] ?? 0), truong: str(su.truong), truoc: String(su.truoc ?? ''), sau: String(su.sau ?? ''), lyDo: str(c.ghi), loai: [c.loai === 'hienThi' ? 'hien-thi' : 'loi-de'] })
-      if (c.loai === 'dapAn' && str(c.chot)) dapAnSai.push({ qid, maDe: str(row.ma_de), ghi: str(c.ghi), chot: str(c.chot) })
+      if (c.loai === 'dapAn') (str(c.chot) ? dapAnSai : chuaChot).push({ qid, maDe: str(row.ma_de), ghi: str(c.ghi), ...(str(c.chot) ? { chot: str(c.chot) } : {}) })
     }
   }
-  return { ok: true, sua, dapAnSai }
+  return { ok: true, sua, dapAnSai, chuaChot }
 }
 
 /** Đề thầy sắp giao ⇒ câu của đề lên đầu hàng (mục 5.6: ưu tiên 1). */

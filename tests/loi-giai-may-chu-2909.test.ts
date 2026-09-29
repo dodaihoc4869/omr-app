@@ -69,7 +69,7 @@ describe('móc nạp đề → hàng việc', () => {
 })
 
 describe('máy soạn nhận lô + nộp; máy chủ kiểm lại', () => {
-  it('nhận lô cùng chương, không nhận trùng; nộp đúng ⇒ chờ duyệt; nộp sai đáp án ⇒ trả về hàng', async () => {
+  it('nhận lô cùng chương, không nhận trùng; nộp đúng + sạch ⇒ máy duyệt; nộp sai đáp án ⇒ trả về hàng', async () => {
     const d = taoD1That()
     await napDe(d, DE_A, GOI_A)
     const [l1, l2] = await Promise.all([thay(d, '/kho/loi-giai/viec', { so: 2, lop: '12' }), thay(d, '/kho/loi-giai/viec', { so: 2, lop: '12' })])
@@ -99,7 +99,7 @@ describe('máy soạn nhận lô + nộp; máy chủ kiểm lại', () => {
       expect(luu.de).toBeUndefined()
       expect(luu.khuon).toBe('1.2')
     }
-    expect(d.dem('loi_giai', "trang_thai='cho_duyet'")).toBe(3)
+    expect(d.dem('loi_giai', "trang_thai='da_duyet' AND ghi_chu='máy duyệt'")).toBe(3)
     expect(d.dem('loi_giai_viec', "trang_thai='xong'")).toBe(3)
   })
   it('nộp băm cũ sau khi thầy sửa đề ⇒ từ chối; đề sửa xếp băm mới vào hàng', async () => {
@@ -129,11 +129,13 @@ describe('thầy duyệt theo đề + học sinh xem qua cổng công bố', () 
     return { d, token: await gameToken(d.env, 'E1') }
   }
 
-  it('màn chờ duyệt: đủ câu theo thứ tự, đếm câu sạch; duyệt cả lô chỉ duyệt câu sạch', async () => {
+  it('màn chờ duyệt: đủ câu theo thứ tự; câu sạch máy đã duyệt; duyệt cả lô (hồ sơ sạch cũ còn chờ) chỉ duyệt câu sạch', async () => {
     const { d } = await chuanBi()
     const r = await thay(d, '/gv/loi-giai/cho-duyet', { maDe: DE_A })
     expect((r.cau as { qid: string }[]).map((c) => c.qid)).toEqual([QA.tn, QA.ds, QA.tln])
-    expect(r.tong).toMatchObject({ cau: 3, choDuyet: 3, sach: 2, daDuyet: 0 })
+    expect(r.tong).toMatchObject({ cau: 3, choDuyet: 1, sach: 0, daDuyet: 2 })
+    // Hồ sơ sạch nộp trước khi có máy duyệt (còn 'cho_duyet') ⇒ nút duyệt cả lô vẫn duyệt được, không đụng câu còn cờ.
+    d.sql.prepare("UPDATE loi_giai SET trang_thai='cho_duyet', duyet_luc=NULL, ghi_chu=NULL WHERE so_co_dap_an=0").run()
     expect(await thay(d, '/gv/loi-giai/duyet', { quyet: 'duyet', maDe: DE_A, caLoSach: true })).toMatchObject({ ok: true, soCau: 2 })
     const r2 = await thay(d, '/gv/loi-giai/cho-duyet', { maDe: DE_A })
     expect(r2.tong).toMatchObject({ daDuyet: 2, choDuyet: 1 })
