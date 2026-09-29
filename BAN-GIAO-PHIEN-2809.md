@@ -135,3 +135,5 @@ Thầy: "cái màn này (Sảnh) có thể thiết kế sống động, đỉnh 
 - 20:41 · Boss · merge PR #86 Theo dõi ca chỉ khu trên + công tắc Giao chiến dịch + bỏ khối Câu hỏi của em (merge afbb205) · không ca mở · lùi: git revert -m1 afbb205
 - 20:53 · deploy #86 xanh (run 583)
 - 20:58 · Boss · merge PR #87 Bi-a cầm gậy xoay (merge d9da4f8) · không ca mở · lùi: git revert -m1 d9da4f8
+- 21:11 · deploy #87 xanh (run 584)
+- 22:05 · Boss · merge PR #88 chấm trả lời ngắn ×10ⁿ (merge 6dc00e7) · không ca mở · lùi: git revert -m1 6dc00e7
